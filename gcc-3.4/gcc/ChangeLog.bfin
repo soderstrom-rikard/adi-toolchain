@@ -19,6 +19,14 @@
 	(const_fits_p): Delete function.
 	(effective_address_32bit_p): Simplify; reformat.
 
+	* config/bfin/bfin.c (section_names, directive_names, bfin_lvno,
+	sect_prefix, section_asm_op, section_asm_op_1): Delete; all remaining
+	uses also deleted.
+	(conditional_register_usage, print_address_operand, print_operand,
+	bfin_globalize_label, register_move_cost): Reformat.
+	* config/bfin/bfin.h (OPTIMIZATION_OPTIONS, SECT_NM_T, section_names,
+	directive_names, TARGET_OPTIONS): Delete.
+
 2004-11-24  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (xorsi3, iorsi3): Simplify using '%X' output

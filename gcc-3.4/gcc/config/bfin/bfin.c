@@ -70,6 +70,8 @@ const char *high_reg_names[]   =  HIGH_REGISTER_NAMES;
 const char *dregs_pair_names[] =  DREGS_PAIR_NAMES;
 const char *byte_reg_names[]   =  BYTE_REGISTER_NAMES;
 
+static int arg_regs[] = FUNCTION_ARG_REGISTERS;
+
 int out_bytes = 0;
 int out_ind = 0;
 
@@ -81,14 +83,11 @@ extern int fputs_unlocked (const char *, FILE *);
 void
 bfin_globalize_label (FILE *stream, const char *name)
 {
-	fputs (".global ", stream);
-        assemble_name (stream, name);
-	fputc (';',stream);
-        fputc ('\n',stream);
+  fputs (".global ", stream);
+  assemble_name (stream, name);
+  fputc (';',stream);
+  fputc ('\n',stream);
 }
-
-static int arg_regs[] = FUNCTION_ARG_REGISTERS;
-
 
 void 
 output_file_start (void) 
@@ -111,59 +110,15 @@ output_file_start (void)
   max_arg_registers = i;	/* how many arg reg used  */
 }
 
-/*
-SECT_NM_T section_names[LAST_SECT_NM] = {
-	[CODE_DIR] = {.sect_name = "$code", .dir_name = ".text"},
-	[DATA_DIR] = {.sect_name = "$data", .dir_name = ".data"}
-};
-*/
+/* Called early in the compilation to conditionally modify
+   fixed_regs/call_used_regs.  */
 
-SECT_NM_T section_names[LAST_SECT_NM] = {
-         {".text", "$code"},
-         {".data", "$data"}
-};
-
-const char * directive_names[LAST_DIR_NM] = {
-	".dd", ".dw", ".db", ".space", "\t"};
-
-int bfin_lvno; /* internal labelno for .var/.byte directives */
-
-#define DIR_DEL '/'
-
-/* sect_prefix cannot be a hex number, [Aa-Ff]+ */
-const char *sect_prefix = "$";
-char *section_asm_op_1 (SECT_ENUM_T dir) {
-    const char *dir_nm = section_names[dir].dir_name;
-    const char *name = section_names[dir].sect_name ? 
-			section_names[dir].sect_name :
-			input_filename;
-    const char *cp;
-    char *s, *sectnm;
-    int len, c;
-
-    c = DIR_DEL;
-    cp = (char *) strrchr (name, c);
-    cp = cp ? cp+1: name;
-    
-    len = strlen(cp)+1;
-    sectnm = (char *) xmalloc (len);
-
-    memcpy (sectnm, cp, len);
-    strip_off_ending (sectnm, len);
-    s = (char *) xmalloc (len + strlen(dir_nm) + strlen(sect_prefix) + 3);
-/*    sprintf (s, "%s %s%s;", dir_nm, sect_prefix, sectnm);  */
-    sprintf (s, "%s;", dir_nm); 
-    return s;
-}
-
-char *section_asm_op (SECT_ENUM_T dir) {
-    const char *dir_nm = section_names[dir].dir_name;
-    const char *name = section_names[dir].sect_name;
-    char *s;
-    s = (char *) xmalloc (strlen (name) + strlen(dir_nm) + 3);
-/*    sprintf (s, "%s %s;", dir_nm, name);	*/
-    sprintf (s, "%s;", dir_nm);
-    return s;
+void 
+conditional_register_usage (void)
+{
+  /* initialize condition code flag register rtx */
+  bfin_cc_rtx = gen_rtx_REG (BImode, REG_CC);
+  bfin_rets_rtx = gen_rtx_REG (Pmode, REG_RETS);
 }
 
 /* Examine machine-dependent attributes of function type FUNTYPE and return its
@@ -877,34 +832,38 @@ bfin_address_cost (rtx addr)
   return 1;
 }
 
+/* Subroutine of print_operand; used to print a memory reference X to FILE.  */
+
 void
 print_address_operand (FILE *file, rtx x)
 {
   if (GET_CODE (x) == MEM) 
-	x = XEXP (x,0);
-  switch (GET_CODE (x)) {
-  case PLUS:
-    output_address (XEXP (x, 0));
-    fprintf (file, "+");
-    output_address (XEXP (x, 1));
-    break;
+    abort ();
 
-  case PRE_DEC:
-    fprintf (file, "--");
-    output_address (XEXP (x, 0));    
-    break;
-  case POST_INC:
-    output_address (XEXP (x, 0));
-    fprintf (file, "++");
-    break;
-  case POST_DEC:
-    output_address (XEXP (x, 0));
-    fprintf (file, "--");
-    break;
+  switch (GET_CODE (x))
+    {
+    case PLUS:
+      output_address (XEXP (x, 0));
+      fprintf (file, "+");
+      output_address (XEXP (x, 1));
+      break;
 
-  default:
-    print_operand (file, x, 0);
-  }
+    case PRE_DEC:
+      fprintf (file, "--");
+      output_address (XEXP (x, 0));    
+      break;
+    case POST_INC:
+      output_address (XEXP (x, 0));
+      fprintf (file, "++");
+      break;
+    case POST_DEC:
+      output_address (XEXP (x, 0));
+      fprintf (file, "--");
+      break;
+
+    default:
+      print_operand (file, x, 0);
+    }
 }
 
 /* Adding intp DImode support by Tony
@@ -912,143 +871,199 @@ print_address_operand (FILE *file, rtx x)
  * -- R: (high word)
  */
 
-void print_operand (FILE *file,  rtx x,  char code)
+void
+print_operand (FILE *file, rtx x, char code)
 {
-  enum machine_mode mode = GET_MODE(x);
+  enum machine_mode mode = GET_MODE (x);
 
-  switch (code) {
-  case 'j':
-    switch (GET_CODE (x)) {
-      case EQ:	fprintf (file, "e");	break;
-      case NE:	fprintf (file, "ne");	break;
-      case GT:	fprintf (file, "g");	break;
-      case LT:	fprintf (file, "l");	break;
-      case GE:	fprintf (file, "ge");	break;
-      case LE:	fprintf (file, "le");	break;
-      case GTU:	fprintf (file, "g");	break;
-      case LTU:	fprintf (file, "l");	break;
-      case GEU:	fprintf (file, "ge");	break;
-      case LEU:	fprintf (file, "le");	break;
-      default:
-	output_operand_lossage ("invalid %%j value");
-      }
-    break;
-    
-  case 'J':					 /* reverse logic */
-    switch (GET_CODE(x)) {
-      case EQ:	fprintf (file, "ne");	break;
-      case NE:	fprintf (file, "e");	break;
-      case GT:	fprintf (file, "le");	break;
-      case LT:	fprintf (file, "ge");	break;
-      case GE:	fprintf (file, "l");	break;
-      case LE:	fprintf (file, "g");	break;
-      case GTU:	fprintf (file, "le");	break;
-      case LTU:	fprintf (file, "ge");	break;
-      case GEU:	fprintf (file, "l");	break;
-      case LEU:	fprintf (file, "g");	break;
-      default:
-	output_operand_lossage("invalid %%J value");
-      }
-    break;
-
-  default:
-    switch (GET_CODE (x)) {
-    case REG:
-      if (code == 'h') {
-	assert ((REGNO (x) < 32));
-	fprintf (file, "%s", short_reg_names[REGNO(x)]);
-	/*fprintf (file, "\n%d\n ", REGNO(x));*/
-	break;
-      }
-      else if (code == 'd') {
-	assert ((REGNO (x) < 32));
-	fprintf (file, "%s", high_reg_names[REGNO(x)]);
-	break;
-      }
-      else if (code == 'w') {
-	assert (REGNO (x) == REG_A0 || REGNO (x) == REG_A1);
-	fprintf (file, "%s.w", reg_names[REGNO(x)]);
-      }
-      else if (code == 'x') {
-	assert (REGNO (x) == REG_A0 || REGNO (x) == REG_A1);
-	fprintf (file, "%s.x", reg_names[REGNO(x)]);
-      }
-      else if (code == 'D') {
-	fprintf (file, "%s", dregs_pair_names[REGNO(x)]);
-      }
-      /* Write second word of DImode or DFmode reference, 
-       * register or memory. -- Tony
-       */
-      else if (code == 'H') {
-        assert (mode == DImode || mode == DFmode);
-	if (GET_CODE(x) == REG)
-	   fprintf (file, "%s", reg_names[REGNO(x)+1]);
-	else if (GET_CODE(x) == MEM)
-	  {
-	    fputc ('[', file);
-	    /* Handle possible auto-increment.  Since it is pre-increment and
-               we have already done it, we can just use an offset of four.  */ 
-	    if (GET_CODE (XEXP (x, 0)) == PRE_INC
-                || GET_CODE (XEXP (x, 0)) == PRE_DEC)
-               output_address (plus_constant (XEXP (XEXP (x, 0), 0), 4));
-            else
-               output_address (plus_constant (XEXP (x, 0), 4));
-            fputc (']', file);
-	 }
-
-      }
-      else if (code == 'Q') {
-        /*assert (mode == DImode);*/
-        if (REGNO(x) > 7)
-            abort();
-        fprintf(file,"%s", reg_names[REGNO(x)]);
-      }
-      else if (code == 'R') {
-        /*assert (mode == DImode);*/
-        if (REGNO(x) > 7)
-            abort();
-        fprintf(file,"%s", reg_names[REGNO(x)+1]);
-      }
-      else if (code == 'T') {
-        /*Byte mode selection Akbar Hussain Oct. 02 2001*/
-        if (REGNO(x) > 7)
-            abort();
-        fprintf(file,"%s", byte_reg_names[REGNO(x)]);
-      }
-      else 
-	fprintf (file, "%s", reg_names[REGNO(x)]);
-      break;
-
-    case MEM:
-      fputc ('[', file);
-      x = XEXP (x,0);
-      print_address_operand (file, x);
-      fputc (']', file);
+  switch (code)
+    {
+    case 'j':
+      switch (GET_CODE (x))
+	{
+	case EQ:
+	  fprintf (file, "e");
+	  break;
+	case NE:
+	  fprintf (file, "ne");
+	  break;
+	case GT:
+	  fprintf (file, "g");
+	  break;
+	case LT:
+	  fprintf (file, "l");
+	  break;
+	case GE:
+	  fprintf (file, "ge");
+	  break;
+	case LE:
+	  fprintf (file, "le");
+	  break;
+	case GTU:
+	  fprintf (file, "g");
+	  break;
+	case LTU:
+	  fprintf (file, "l");
+	  break;
+	case GEU:
+	  fprintf (file, "ge");
+	  break;
+	case LEU:
+	  fprintf (file, "le");
+	  break;
+	default:
+	  output_operand_lossage ("invalid %%j value");
+	}
       break;
     
-    case CONST_INT:
-      /* Moves to half registers with d or h modifiers always use unsigned
-	 constants.  */
-      if (code == 'd')
-	x = GEN_INT ((INTVAL (x) >> 16) & 0xffff);
-      else if (code == 'h')
-	x = GEN_INT (INTVAL (x) & 0xffff);
-      else if (code == 'X')
-	x = GEN_INT (exact_log2 (0xffffffff & INTVAL (x)));
-      else if (code == 'Y')
-	x = GEN_INT (exact_log2 (0xffffffff & ~INTVAL (x)));
-      /* fall through */
+    case 'J':					 /* reverse logic */
+      switch (GET_CODE(x))
+	{
+	case EQ:
+	  fprintf (file, "ne");
+	  break;
+	case NE:
+	  fprintf (file, "e");
+	  break;
+	case GT:
+	  fprintf (file, "le");
+	  break;
+	case LT:
+	  fprintf (file, "ge");
+	  break;
+	case GE:
+	  fprintf (file, "l");
+	  break;
+	case LE:
+	  fprintf (file, "g");
+	  break;
+	case GTU:
+	  fprintf (file, "le");
+	  break;
+	case LTU:
+	  fprintf (file, "ge");
+	  break;
+	case GEU:
+	  fprintf (file, "l");
+	  break;
+	case LEU:
+	  fprintf (file, "g");
+	  break;
+	default:
+	  output_operand_lossage("invalid %%J value");
+	}
+      break;
 
-    case SYMBOL_REF:
-      output_addr_const(file, x);
-      break;
-    case CONST_DOUBLE:
-      output_operand_lossage ("invalid const_double operand");
-      break;
     default:
-      output_addr_const(file, x);
+      switch (GET_CODE (x))
+	{
+	case REG:
+	  if (code == 'h')
+	    {
+	      assert ((REGNO (x) < 32));
+	      fprintf (file, "%s", short_reg_names[REGNO(x)]);
+	      /*fprintf (file, "\n%d\n ", REGNO(x));*/
+	      break;
+	    }
+	  else if (code == 'd')
+	    {
+	      assert ((REGNO (x) < 32));
+	      fprintf (file, "%s", high_reg_names[REGNO(x)]);
+	      break;
+	    }
+	  else if (code == 'w')
+	    {
+	      assert (REGNO (x) == REG_A0 || REGNO (x) == REG_A1);
+	      fprintf (file, "%s.w", reg_names[REGNO(x)]);
+	    }
+	  else if (code == 'x')
+	    {
+	      assert (REGNO (x) == REG_A0 || REGNO (x) == REG_A1);
+	      fprintf (file, "%s.x", reg_names[REGNO(x)]);
+	    }
+	  else if (code == 'D')
+	    {
+	      fprintf (file, "%s", dregs_pair_names[REGNO(x)]);
+	    }
+	  /* Write second word of DImode or DFmode reference, 
+	   * register or memory. -- Tony
+	   */
+	  else if (code == 'H')
+	    {
+	      assert (mode == DImode || mode == DFmode);
+	      if (GET_CODE(x) == REG)
+		fprintf (file, "%s", reg_names[REGNO(x)+1]);
+	      else if (GET_CODE(x) == MEM)
+		{
+		  fputc ('[', file);
+		  /* Handle possible auto-increment.  Since it is pre-increment and
+		     we have already done it, we can just use an offset of four.  */ 
+		  if (GET_CODE (XEXP (x, 0)) == PRE_INC
+		      || GET_CODE (XEXP (x, 0)) == PRE_DEC)
+		    output_address (plus_constant (XEXP (XEXP (x, 0), 0), 4));
+		  else
+		    output_address (plus_constant (XEXP (x, 0), 4));
+		  fputc (']', file);
+		}
+
+	    }
+	  else if (code == 'Q')
+	    {
+	      /*assert (mode == DImode);*/
+	      if (REGNO(x) > 7)
+		abort();
+	      fprintf(file,"%s", reg_names[REGNO(x)]);
+	    }
+	  else if (code == 'R')
+	    {
+	      /*assert (mode == DImode);*/
+	      if (REGNO(x) > 7)
+		abort();
+	      fprintf(file,"%s", reg_names[REGNO(x)+1]);
+	    }
+	  else if (code == 'T')
+	    {
+	      /*Byte mode selection Akbar Hussain Oct. 02 2001*/
+	      if (REGNO(x) > 7)
+		abort();
+	      fprintf(file,"%s", byte_reg_names[REGNO(x)]);
+	    }
+	  else 
+	    fprintf (file, "%s", reg_names[REGNO(x)]);
+	  break;
+
+	case MEM:
+	  fputc ('[', file);
+	  x = XEXP (x,0);
+	  print_address_operand (file, x);
+	  fputc (']', file);
+	  break;
+    
+	case CONST_INT:
+	  /* Moves to half registers with d or h modifiers always use unsigned
+	     constants.  */
+	  if (code == 'd')
+	    x = GEN_INT ((INTVAL (x) >> 16) & 0xffff);
+	  else if (code == 'h')
+	    x = GEN_INT (INTVAL (x) & 0xffff);
+	  else if (code == 'X')
+	    x = GEN_INT (exact_log2 (0xffffffff & INTVAL (x)));
+	  else if (code == 'Y')
+	    x = GEN_INT (exact_log2 (0xffffffff & ~INTVAL (x)));
+	  /* fall through */
+
+	case SYMBOL_REF:
+	  output_addr_const(file, x);
+	  break;
+
+	case CONST_DOUBLE:
+	  output_operand_lossage ("invalid const_double operand");
+	  break;
+
+	default:
+	  output_addr_const(file, x);
+	}
     }
-  }
 }
 
 /* Argument support functions.  */
@@ -1344,6 +1359,8 @@ emit_pic_move (rtx *operands, enum machine_mode mode ATTRIBUTE_UNUSED)
     operands[1] = legitimize_pic_address (operands[1], temp);
 }
 
+/* Expand a move operation in mode MODE.  The operands are in OPERANDS.  */
+
 void
 expand_move (rtx *operands, enum machine_mode mode)
 {
@@ -1363,6 +1380,9 @@ expand_move (rtx *operands, enum machine_mode mode)
     }
 }
 
+/* Return nonzero iff C has exactly one bit set if it is interpreted
+   as a 32 bit constant.  */
+
 int
 log2constp (unsigned HOST_WIDE_INT c)
 {
@@ -1370,18 +1390,12 @@ log2constp (unsigned HOST_WIDE_INT c)
   return c != 0 && (c & (c-1)) == 0;
 }
 
-void 
-conditional_register_usage (void)
-{
-  /* initialize condition code flag register rtx */
-  bfin_cc_rtx = gen_rtx_REG (BImode, REG_CC);
-  bfin_rets_rtx = gen_rtx_REG (Pmode, REG_RETS);
-}
+/* Return nonzero iff OP is one of the integer constants 1 or 2.  */
 
 int
 pos_scale_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
 {
-  if (GET_CODE(op) == CONST_INT)
+  if (GET_CODE (op) == CONST_INT)
     {
       int iv = INTVAL (op);
       return iv == 2 || iv == 1;
@@ -1389,13 +1403,15 @@ pos_scale_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
   return 0;
 }
 
+/* Return nonzero iff OP is one of the integer constants 2 or 4.  */
+
 int
 scale_by_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
 {
-  if (GET_CODE(op) == CONST_INT)
+  if (GET_CODE (op) == CONST_INT)
     {
       int iv = INTVAL (op);
-      return (iv == 4 || iv == 2);
+      return iv == 4 || iv == 2;
     }
   return 0;
 }
@@ -1408,6 +1424,10 @@ highbits_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
 
   return 0;
 }
+
+/* Return nonzero if OP is valid as an operand in an AND operation with
+   a register.  We allow registers, constants with exactly one bit zero,
+   constants that allow us to use zero-extend instructions, and constant 1.  */
 
 int
 rhs_andsi3_operand (rtx op, enum machine_mode mode)
@@ -1422,6 +1442,9 @@ rhs_andsi3_operand (rtx op, enum machine_mode mode)
   value = INTVAL (op);
   return log2constp (~value) || value == 255 || value == 65535 || value == 1;
 }
+
+/* Return nonzero if OP is a register or a constant with exactly one bit
+   set.  */
 
 int
 regorlog2_operand (rtx op, enum machine_mode mode)
@@ -1442,12 +1465,16 @@ valid_reg_operand (rtx op, enum machine_mode mode)
     return HARD_REGNO_MODE_OK (REGNO (op), mode);
   return 1;
 }
-  
+
+/* Return nonzero if OP is the CC register.  */
+
 int
 cc_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
 {
   return REG_P (op) && REGNO (op) == REG_CC && GET_MODE (op) == BImode;
 }
+
+/* Return nonzero if OP is a register or a 7 bit signed constant.  */
 
 int
 reg_or_7bit_operand (rtx op, enum machine_mode mode)
@@ -1557,19 +1584,22 @@ hard_regno_mode_ok (int regno, enum machine_mode mode)
 #undef MAX_COST
 #define MAX_COST 100
 
+/* Return the cost of moving data from a register in class CLASS1 to
+   one in class CLASS2.  */
+
 int
-register_move_cost(enum reg_class class1, enum reg_class class2)
+register_move_cost (enum reg_class class1, enum reg_class class2)
 {
   return 
-    ((!reg_class_subset_p (class1, DPREGS) && 
-      reg_class_subset_p (class2, DPREGS)) || 
-     (reg_class_subset_p (class1, DPREGS) && 
-      !reg_class_subset_p (class2, DPREGS)))
-    ? 2*MAX_COST
-    : ((class1==DREGS && class2==PREGS) || 
-       (class1==PREGS && class2==DREGS))
-      ? 2*2
-      : 2;
+    ((!reg_class_subset_p (class1, DPREGS)
+      && reg_class_subset_p (class2, DPREGS))
+     || (reg_class_subset_p (class1, DPREGS)
+	 && !reg_class_subset_p (class2, DPREGS)))
+    ? 2 * MAX_COST
+    : ((class1 == DREGS && class2 == PREGS)
+       || (class1 == PREGS && class2 == DREGS))
+    ? 2 * 2
+    : 2;
 }
 
 enum reg_class
@@ -1643,8 +1673,6 @@ override_options (void)
     flag_omit_frame_pointer = 1;
 
   flag_schedule_insns = 0;
-
-  bfin_lvno = 0;
 }
 
 /* Return the destination address of BRANCH.  */
@@ -1828,6 +1856,8 @@ split_load_immediate (rtx operands[])
     }
   return 0;
 }
+
+/* Return false iff type is returned in memory.  */
 
 int
 bfin_return_in_memory (tree type)

@@ -128,23 +128,6 @@ extern int target_flags;
    `-O'.  That is what `OPTIMIZATION_OPTIONS' is for.  */
  
 #define OVERRIDE_OPTIONS override_options ()
-#if 0
-#define OPTIMIZATION_OPTIONS(optimize,space) (optimize=2)
-#endif
-
-typedef struct snm {
-	const char *dir_name;
-	const char *sect_name;
-} SECT_NM_T;
-extern SECT_NM_T section_names[];
-
-extern const char * directive_names[];
-
-#define TARGET_OPTIONS {\
-	{ "text=", (const char **)&section_names[CODE_DIR].sect_name, 	\
-	  N_("Name of text section"), 0 },			\
-	{ "data=", (const char **)&section_names[DATA_DIR].sect_name,	\
-	  N_("Name of data section"), 0} }
 
 #define FUNCTION_MODE    SImode
 #define Pmode            SImode
