@@ -1922,11 +1922,9 @@ elflink.lo: elflink.c $(INCDIR)/filenames.h $(INCDIR)/bfdlink.h \
 elf-strtab.lo: elf-strtab.c $(INCDIR)/filenames.h elf-bfd.h \
   $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h $(INCDIR)/elf/external.h \
   $(INCDIR)/bfdlink.h $(INCDIR)/hashtab.h $(INCDIR)/libiberty.h
-elf32-bfin.lo: reloctypes elf32-bfin.c $(INCDIR)/bfdlink.h elf-bfd.h \
+elf32-bfin.lo: elf32-bfin.c $(INCDIR)/bfdlink.h elf-bfd.h \
   $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h $(INCDIR)/elf/external.h \
   elf32-target.h
-reloctypes: 
-	cp -bf $(srcdir)/bfin-reloctype.h ./bfin-reloctype.h
 elf-eh-frame.lo: elf-eh-frame.c $(INCDIR)/filenames.h \
   elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(INCDIR)/elf/dwarf2.h
