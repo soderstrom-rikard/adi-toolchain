@@ -607,14 +607,6 @@ bfin_function_prologue (FILE *file, HOST_WIDE_INT framesize)
 	  } 
 	while (arg_size > 0);
     }
-
-  /*for gdb (-g), we generate [FP+8] = R0, [FP+12] = R1, [FP+16] = R2 */
-  if (debug_info_level != DINFO_LEVEL_NONE && frame_pointer_needed)
-    {
-      int i;
-      for (i = 0 ; i < max_arg_registers; i++)
-         fprintf (file, "\t[FP+%d] = %s;\n", 8 + (i * UNITS_PER_WORD), reg_names[i]);
-    }
 }
  
 static void
