@@ -1,19 +1,19 @@
 	.text
 	.global bitclr
 bitclr:
-	bitclr (r4, 31);
+	bitclr(r4, 31);
 	bitCLR (r0, 0);
 
 	.text
 	.global bitset
 bitset:
-	BITSET (R2, 30);
+	BITSET(R2, 30);
 	BiTsET (r3, 29);
 
 	.text
 	.global bittgl
 bittgl:
-	bitTGL (r7, 22);
+	bitTGL(r7, 22);
 	BITtgl (r6, 16);
 
 	.text
@@ -41,7 +41,7 @@ extract:
 	.text
 	.global bitmux
 bitmux:
-	BITMUX (R1, R0, A0) (ASR);
+	BITMUX(R1, R0, A0) (ASR);
 	Bitmux (r2, R3, a0) (aSr);
 
 	bitmux (r4, r5, a0) (asl);

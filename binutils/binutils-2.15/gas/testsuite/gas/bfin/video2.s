@@ -203,7 +203,7 @@ r5 = bytepack (r6,r7) ;
 //SAA (Dreg_pair, Dreg_pair) ; /* forward byte order operands (b) */
 //SAA (Dreg_pair, Dreg_pair) (R) ; /* reverse byte order operands (b) */
 
-saa (r1:0, r3:2) || r0 = [i0++] || r2 = [i1++] ; /* parallel fill instructions */
+saa(r1:0, r3:2) || r0 = [i0++] || r2 = [i1++] ; /* parallel fill instructions */
 saa (r1:0, r3:2) (R) || r1 = [i0++] || r3 = [i1++] ; /* reverse, parallel fill instructions */
 saa (r1:0, r3:2) ; /* last SAA in a loop, no more fill required */
 

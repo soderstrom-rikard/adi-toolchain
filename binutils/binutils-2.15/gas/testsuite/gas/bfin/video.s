@@ -62,7 +62,7 @@ byteop16m:
 	.text
 	.global saa
 saa:
-	saa (r1:0, r3:2);
+	saa(r1:0, r3:2);
 	SAA (R1:0, R3:2) (r);
 
 	.text

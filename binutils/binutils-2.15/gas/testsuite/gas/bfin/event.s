@@ -45,7 +45,7 @@ excpt:
 	.text
 	.global testset
 testset:
-	testset (p5);
+	testset(p5);
 	TESTset (P0);
 
 	.text

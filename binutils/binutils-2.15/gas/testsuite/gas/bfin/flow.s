@@ -5,7 +5,7 @@ footext:
 	.text
 	.global jump
 jump:
-	jump (P5);
+	jump(P5);
 	Jump (pc + p3);
 	jUMp (0);
 	JumP.l (-16777216);
@@ -32,7 +32,7 @@ call:
 	call (P3);
 	Call (PC+p2);
 	cALL (0xff000000);
-	CalL (0x00FFFFFe);
+	CalL(0x00FFFFFe);
 	CAll call_test;
 
 
@@ -75,7 +75,7 @@ loop_lc0:
 	LOOP third_loop lC0 = P1 >> 1;
 
 	Lsetup (4, 2046) Lc0;
-	LSETUP (30, 1024) LC0 = P5;
+	LSETUP(30, 1024) LC0 = P5;
 	LSeTuP (30, 4) lc0 = p0 >> 1;
 
 

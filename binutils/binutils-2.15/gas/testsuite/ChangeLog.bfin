@@ -1,3 +1,13 @@
+2005-02-24  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/bit.s: Vary format of test.
+	* gas/bfin/cache.s: Likewise.
+	* gas/bfin/event.s: Likewise.
+	* gas/bfin/flow.s: Likewise.
+	* gas/bfin/parallel.s: Likewise.
+	* gas/bfin/video.s: Likewise.
+	* gas/bfin/video2.s: Likewise.
+
 2005-02-16  Catherine Moore  <clm@cm00re.com>
 
 	* gas/bfin/store.s: Vary format of b store data register half

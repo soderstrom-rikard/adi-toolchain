@@ -7,7 +7,7 @@
 	r7 = ExtracT (r3, r4.L) (X) || I3 += M1 (breV);
 	r5 = ExtRACt (R6, R1.L) (x) || i0 -= 2;
 
-	BITMUX (R1, R0, A0) (ASR) || I1 -= 4;
+	BITMUX(R1, R0, A0) (ASR) || I1 -= 4;
 	Bitmux (r2, R3, a0) (aSr) || I0 += 2;
 
 	bitmux (r4, r5, a0) (asl) || Sp = [P0];
