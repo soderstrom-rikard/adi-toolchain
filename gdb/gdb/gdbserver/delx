@@ -1,0 +1,54 @@
+Hi,
+
+The ptrace function defined in uClinux-dist/uClibc/libc/sysdeps/linux/frio/ptrace.c
+is obsolete in 0.9,26 uClibc library. It's implementation is already
+defined in uClinux-dist/uClibc/libc/sysdeps/linux/common/ptrace.c.
+
+So please remove the ptrace.c entry in uClinux-dist/uClibc/libc/sysdeps/linux/frio/Makefile.
+then give make clean in uClinux-dist followed by a make.
+This should solve your problem.
+
+Also please make sure that there is a dependeny on string support for 
+gdbserver. So please under uClibc menuconfig enable the following.
+
+"Support sys_errlist[] (obsolete-compat)"  
+under "String snd Stdio support" --->submenu.
+
+regards,
+
+Srinidhi K
+
+
+
+
+-----Original Message-----
+From: raja [mailto:raja@rrap-software.com]
+Sent: Monday, July 05, 2004 5:02 PM
+To: Srinidhi K.
+Cc: Pradip Shah
+Subject: Issues in libc
+
+
+Hi,
+
+    I was trying to build the uClinux-dist/user/gdbserver and got the 
+following error in libc.
+
+bfin-elf-gcc -L/home2/sri/uClinux-dist/uClibc/libc/ 
+-L/home2/sri/uClinux-dist/uClibc/lib/ -o gdbserver utils.o low-linux.o 
+server.o remote-utils.o  
+/home2/sri/uClinux-dist/uClibc/libc//libc.a(ptrace.o)(.text+0x24): In 
+function `_ptrace':
+: undefined reference to `___ptrace'
+
+have a look at this and update me.
+
+Regards,
+Raja
+
+
+
+
+
+
+
