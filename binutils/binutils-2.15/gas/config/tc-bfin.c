@@ -510,6 +510,13 @@ md_apply_fix3 (fixP, valp, seg)
   shift = 0;
   switch (fixP->fx_r_type)
     {
+    case BFD_RELOC_BFIN_GOT:
+      fixP->fx_addnumber = 0;
+      buf[lowbyte] = 0;
+      buf[highbyte] |= 0 & 0x7f;
+      fixP->fx_no_overflow = 1;
+      shift = 0;
+      break;
     case BFD_RELOC_10_PCREL:
       if (!val)
 	{
@@ -639,7 +646,6 @@ md_apply_fix3 (fixP, valp, seg)
       *buf++ = val >> 8;
       break;
 
-    case BFD_RELOC_BFIN_GOT :
     case BFD_RELOC_BFIN_PLTPC :
       *buf++ = val >> 0;
       *buf++ = val >> 8;
@@ -803,19 +809,32 @@ md_pcrel_from (fixP)
   return fixP->fx_frag->fr_address + fixP->fx_where;
 }
 
+/* Here we decide which fixups can be adjusted to make them relative
+   to the beginning of the section instead of the symbol.  Basically
+   we need to make sure that the dynamic relocations are done
+   correctly, so in some cases we force the original symbol to be
+   used.  */
 /* Return true if the fix can be handled by GAS, false if it must
    be passed through to the linker.  */
-bfd_boolean
-bfin_fix_adjustable (fixP)
-   fixS * fixP;
-{
+bfd_boolean  
+bfin_fix_adjustable (fixS *fixP)
+{         
+  switch (fixP->fx_r_type)
+    {     
+  /* Adjust_reloc_syms doesn't know about the GOT.  */
+    case BFD_RELOC_BFIN_GOT :
+    case BFD_RELOC_BFIN_PLTPC :
   /* We need the symbol name for the VTABLE entries.  */
-  if (   fixP->fx_r_type == BFD_RELOC_VTABLE_INHERIT
-      || fixP->fx_r_type == BFD_RELOC_VTABLE_ENTRY)
-    return 0;
-
-  return 1;
+    case BFD_RELOC_VTABLE_INHERIT:
+    case BFD_RELOC_VTABLE_ENTRY:
+      return 0;
+        
+    default:
+      return 1;
+    }     
 }
+
+
 /* Handle the LOOP_BEGIN and LOOP_END statements.
    Parse the Loop_Begin/Loop_End and create a label.  */
 void

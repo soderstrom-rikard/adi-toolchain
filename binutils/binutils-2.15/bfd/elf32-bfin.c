@@ -1280,7 +1280,6 @@ elf_bfin_check_relocs (bfd * abfd,
       struct elf_link_hash_entry *h;
 
       r_symndx = ELF32_R_SYM (rel->r_info);
-
       if (r_symndx < symtab_hdr->sh_info)
 	h = NULL;
       else
@@ -1462,6 +1461,9 @@ elf_bfin_relocate_section (bfd * output_bfd,
 	  sym = local_syms + r_symndx;
 	  sec = local_sections[r_symndx];
 	  relocation = _bfd_elf_rela_local_sym (output_bfd, sym, &sec, rel);
+	  /* call to bfd_elf_rela_local_sym would have CHANGED the sec as well as updated
+             relocation. The value returned is w.r.t the original section!
+	  */
 	  sec = local_sections[r_symndx];
 	}
       else
@@ -1588,13 +1590,7 @@ elf_bfin_relocate_section (bfd * output_bfd,
 	      }
 
 	    relocation = sgot->output_offset + off;
-	    if (r_type == R_got)
-	      {
-		/* This relocation does not use the addend.  RAJA */
-		rel->r_addend = 0;
-	      }
-	    else
-	      relocation += sgot->output_section->vma;
+	    rel->r_addend = 0;
             /* bfin : preg = [preg + 17bitdiv4offset] relocation is div by 4 */
             relocation /= 4;
 	  }
