@@ -1,3 +1,13 @@
+2005-01-19  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (print_operand): Simplify 'H' case.  Remove 'Q'
+	and 'R'.
+	* config/bfin/bfin.h (MINIMUM_ATOMIC_ALIGNMENT,
+	PRINT_OPERAND_PUNCT_VALID, ASM_OUTPUT_DWARF_ADDR_CONST,
+	ASM_OUTPUT_DWARF2_ADDR_CONST): Delete useless macros.
+	(commented out ASM_OUTPUT_DEF, SET_ASM_OP, ASM_OUTPUT_LABEL_REF):
+	Delete.
+
 2005-01-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin-protos.h (output_push_multiple,

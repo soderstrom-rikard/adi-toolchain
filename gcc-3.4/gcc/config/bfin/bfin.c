@@ -996,38 +996,11 @@ print_operand (FILE *file, rtx x, char code)
 	    {
 	      fprintf (file, "%s", dregs_pair_names[REGNO (x)]);
 	    }
-	  /* Write second word of DImode or DFmode reference, 
-	   * register or memory. -- Tony
-	   */
 	  else if (code == 'H')
 	    {
 	      gcc_assert (mode == DImode || mode == DFmode);
-	      if (GET_CODE (x) == REG)
-		fprintf (file, "%s", reg_names[REGNO (x) + 1]);
-	      else if (GET_CODE (x) == MEM)
-		{
-		  fputc ('[', file);
-		  /* Handle possible auto-increment.  Since it is pre-increment and
-		     we have already done it, we can just use an offset of four.  */ 
-		  if (GET_CODE (XEXP (x, 0)) == PRE_INC
-		      || GET_CODE (XEXP (x, 0)) == PRE_DEC)
-		    output_address (plus_constant (XEXP (XEXP (x, 0), 0), 4));
-		  else
-		    output_address (plus_constant (XEXP (x, 0), 4));
-		  fputc (']', file);
-		}
-	    }
-	  else if (code == 'Q')
-	    {
-	      if (REGNO (x) > 7)
-		abort ();
-	      fprintf (file, "%s", reg_names[REGNO (x)]);
-	    }
-	  else if (code == 'R')
-	    {
-	      if (REGNO (x) > 7)
-		abort();
-	      fprintf (file,"%s", reg_names[REGNO (x)+1]);
+	      gcc_assert (REG_P (x));
+	      fprintf (file, "%s", reg_names[REGNO (x) + 1]);
 	    }
 	  else if (code == 'T')
 	    {

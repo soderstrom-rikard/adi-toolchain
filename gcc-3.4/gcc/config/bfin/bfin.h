@@ -901,8 +901,6 @@ do {                                              \
 /* No data type wants to be aligned rounder than this.  */
 #define BIGGEST_ALIGNMENT 32
 
-#define MINIMUM_ATOMIC_ALIGNMENT BITS_PER_UNIT
-
 /* Define this if move instructions will actually fail to work
    when given unaligned data.  */
 #define STRICT_ALIGNMENT 1
@@ -1139,9 +1137,6 @@ do {                                              \
 /* Switch into a generic section.  */
 #define TARGET_ASM_NAMED_SECTION  default_elf_asm_named_section
 
-/* Assembler output */
-#define PRINT_OPERAND_PUNCT_VALID_P(CODE)      index ("jJhXDQR", CODE)
-
 #define PRINT_OPERAND(FILE, RTX, CODE)	 print_operand (FILE, RTX, CODE)
 #define PRINT_OPERAND_ADDRESS(FILE, RTX) print_address_operand (FILE, RTX)
 
@@ -1205,12 +1200,6 @@ typedef enum directives {
     do {  fprintf (FILE, ((TARGET_NO_UNDERSCORE)) ? "%s" : "_%s", NAME); \
         } while (0)
 
-#if 0   /* temporarily not use, change for uclinux kernel */
-#define ASM_OUTPUT_LABELREF(FILE,NAME) 	\
-    do {  fprintf (FILE, "%s", NAME); \
-        } while (0)
-#endif
-
 #define ASM_FORMAT_PRIVATE_NAME(OUTPUT, NAME, LABELNO)			\
   do {									\
     int len = strlen (NAME);						\
@@ -1273,12 +1262,6 @@ do { 						\
      do {						\
 	ASM_GLOBALIZE_LABEL1(FILE,NAME); 		\
         ASM_OUTPUT_LOCAL (FILE, NAME, SIZE, ROUNDED); } while(0)
-/*
-     do {  fputs(".comm ", (FILE));			\
-	   assemble_name ((FILE), (NAME));		\
-	   fprintf((FILE), ",%u,%u;\n", (SIZE), (ROUNDED));	\
-        } while (0)	
-*/
 
 #define ASM_COMMENT_START "//"
 
@@ -1301,31 +1284,8 @@ extern struct rtx_def *bfin_cc_rtx, *bfin_rets_rtx;
    dwarf2.out. */
 #define UNALIGNED_WORD_ASM_OP ".4byte"
 
-#define ASM_OUTPUT_DWARF2_ADDR_CONST(FILE,ADDR)                  \
-     fprintf ((FILE), "\t%s\t%s", UNALIGNED_WORD_ASM_OP, ADDR)
-
-#define ASM_OUTPUT_DWARF_ADDR_CONST(FILE,RTX)                   \
-do {                                                            \
-  fprintf ((FILE), "\t%s\t", UNALIGNED_WORD_ASM_OP);            \
-  output_addr_const ((FILE), (RTX));                            \
-  fputc ('\n', (FILE));                                         \
-} while (0) 
-
-
 /* DBX register number for a given compiler register number */
 #define DBX_REGISTER_NUMBER(REGNO)  (REGNO) 
-
-/* This is how we tell the assembler that two symbols have the same value. 
-#define ASM_OUTPUT_DEF(FILE,NAME1,NAME2) \
-  do { assemble_name (FILE, NAME1);      \
-       fputs (" = ", FILE);              \
-       assemble_name (FILE, NAME2);      \
-       fputc ('\n', FILE); } while (0) 
-*/
-
-/* This works for GAS and some other assemblers.  
-#define SET_ASM_OP              ".set"
-*/
 
 #define SIZE_ASM_OP     "\t.size\t"
 
