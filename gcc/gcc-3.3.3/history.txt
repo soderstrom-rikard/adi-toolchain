@@ -5,9 +5,14 @@ If you are working on something, feel free to add that information
 here. The port follows the Visual DSP ABI for parameter passing.
 ##############################################
 Next        :
+            - -kPIC crash (simple examples crash with -kPIC. Issue is with
+                           an instruction that is used, rather than lack of
+                           kPIC support)
+            - Fix 3.4+ merge 
+            - More torture failures
+21 Jun 2004 : Fixed
             - The compiler sometimes generates an incorrect instruction
               such as Rx = [Px + 1].
-            - More torture failures
 18 Jun 2004 : Fixed
               1. Optimization bug : switch inside loop failure fixed.
               2. Removed nisa calling convention assembly functions
