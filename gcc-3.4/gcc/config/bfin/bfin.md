@@ -122,8 +122,32 @@
   [(UNSPEC_VOLATILE_EH_RETURN 0)])
 
 (define_attr "type"
-  "move,mvi,mcld,mcldp,mcst,dsp32,mult,alu0,shft,brcc,br,call,misc,compare"
+  "move,mvi,mcld,mcst,dsp32,mult,alu0,shft,brcc,br,call,misc,compare,dummy"
   (const_string "misc"))
+
+;; Scheduling definitions
+
+(define_automaton "bfin")
+
+(define_cpu_unit "core" "bfin")
+
+(define_insn_reservation "alu" 1
+  (eq_attr "type" "move,mvi,mcst,dsp32,alu0,shft,brcc,br,call,misc,compare")
+  "core")
+
+(define_insn_reservation "imul" 3
+  (eq_attr "type" "mult")
+  "core*3")
+
+(define_insn_reservation "load" 1
+  (eq_attr "type" "mcld")
+  "core")
+
+;; Make sure genautomata knows about the maximum latency that can be produced
+;; by the adjust_cost function.
+(define_insn_reservation "dummy" 5
+  (eq_attr "type" "mcld")
+  "core")
 
 ;;; FRIO branches have been optimized for code density
 ;;; this comes at a slight cost of complexity when
@@ -188,21 +212,6 @@
         ]
 
 	(const_int 2)))
-
-(define_attr "sets_preg" "no,yes"
-	(cond
-	 [(eq_attr "type" "move,mcld")
-	  (symbol_ref "REG_P (SET_DEST (PATTERN (insn))) && PREG_P (SET_DEST (PATTERN (insn)))")]
-	  (const_string "no")))
-
-;;; Default 2-bytes INSN: load, store, push, alu0, shft, compare, misc, mult
-
-
-;; Syntax : (define_function_unit {name} {num-units} {n-users} {test}
-;;                                {ready-delay} {issue-delay} [{conflict-list}])
-;;(define_function_unit "dag" 1 0 (eq_attr "type" "move") 1 2)
-
-(define_function_unit "dag" 1 1 (eq_attr "sets_preg" "yes") 4 0)
 
 ;; Conditional moves
 

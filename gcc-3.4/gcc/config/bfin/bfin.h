@@ -297,6 +297,7 @@ extern const char *bfin_library_id_string;
 #define FIRST_PSEUDO_REGISTER 44
 
 #define PREG_P(X) (REG_P (X) && REGNO (X) >= REG_P0 && REGNO (X) <= REG_P7)
+#define ADDRESS_REGNO_P(X) ((X) >= REG_P0 && (X) <= REG_M3)
 
 #define REGISTER_NAMES { \
   "R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", \

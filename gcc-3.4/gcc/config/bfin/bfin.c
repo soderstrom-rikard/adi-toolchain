@@ -2366,6 +2366,46 @@ output_pop_multiple (rtx insn, rtx *operands)
   output_asm_insn (buf, operands);
 }
 
+static int
+bfin_adjust_cost (rtx insn, rtx link, rtx dep_insn, int cost)
+{
+  enum attr_type insn_type, dep_insn_type;
+  rtx set, set2;
+  int dep_insn_code_number;
+
+  /* Anti and output dependencies have zero cost.  */
+  if (REG_NOTE_KIND (link) != 0)
+    return 0;
+
+  dep_insn_code_number = recog_memoized (dep_insn);
+
+  /* If we can't recognize the insns, we can't really do anything.  */
+  if (dep_insn_code_number < 0 || recog_memoized (insn) < 0)
+    return cost;
+
+  insn_type = get_attr_type (insn);
+  dep_insn_type = get_attr_type (dep_insn);
+
+  if (dep_insn_type == TYPE_MOVE || dep_insn_type == TYPE_MCLD)
+    {
+      rtx pat = PATTERN (dep_insn);
+      rtx dest = SET_DEST (pat);
+      rtx src = SET_SRC (pat);
+      if (! ADDRESS_REGNO_P (REGNO (dest))
+	  || ! (REGNO (src) >= REG_R0 && REGNO (src) <= REG_R7))
+	return cost;
+      return cost + (dep_insn_type == TYPE_MOVE ? 4 : 3);
+    }
+
+  return cost;
+}
+
+static int
+bfin_use_dfa_pipeline_interface (void)
+{
+  return 1;
+}
+
 /* We use the machine specific reorg pass for emitting CSYNC instructions
    after conditional branches as needed.
 
@@ -2624,5 +2664,12 @@ bfin_output_mi_thunk (FILE *file ATTRIBUTE_UNUSED,
 #define TARGET_ASM_OUTPUT_MI_THUNK bfin_output_mi_thunk
 #undef TARGET_ASM_CAN_OUTPUT_MI_THUNK
 #define TARGET_ASM_CAN_OUTPUT_MI_THUNK hook_bool_tree_hwi_hwi_tree_true
+
+#undef TARGET_SCHED_ADJUST_COST
+#define TARGET_SCHED_ADJUST_COST bfin_adjust_cost
+
+#undef TARGET_SCHED_USE_DFA_PIPELINE_INTERFACE
+#define TARGET_SCHED_USE_DFA_PIPELINE_INTERFACE \
+  bfin_use_dfa_pipeline_interface
 
 struct gcc_target targetm = TARGET_INITIALIZER;
