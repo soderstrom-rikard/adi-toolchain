@@ -1345,10 +1345,6 @@ do {                                                            \
 #define SET_ASM_OP              ".set"
 */
 
-/* Debugging for standard elf stabs */
-/*#include "dbxelf.h"*/
-#include "../elfos.h"
-#include "elf.h"
 #define SIZE_ASM_OP     "\t.size\t"
 
 
