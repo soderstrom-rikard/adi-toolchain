@@ -136,7 +136,7 @@ rm -rf $DIR_OUTPUT/*
 ###################### set up log file ###########################
 
 echo "Creating new log file ...."
-LOGFILE=$DIR_SOURCE/log.`date +%m%d%y`
+LOGFILE=$DIR_BUILD/log.`date +%m%d%y`
 
 echo "Deleting old log file created on same day ...."
 rm -f $LOGFILE
