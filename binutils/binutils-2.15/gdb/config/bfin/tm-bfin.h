@@ -232,3 +232,9 @@ extern void bfin_pop_frame PARAMS ((void));
 //#define GDBARCH_DEBUG 2
 #define GDB_MULTI_ARCH GDB_MULTI_ARCH_PARTIAL
 
+/* enable software single step */
+#undef SOFTWARE_SINGLE_STEP_P
+#define SOFTWARE_SINGLE_STEP_P() 1
+#define SOFTWARE_SINGLE_STEP(sig, bp_p) bfin_software_single_step (sig, bp_p)
+
+void bfin_software_single_step (unsigned int, int);

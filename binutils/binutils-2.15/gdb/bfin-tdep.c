@@ -65,6 +65,8 @@ static CORE_ADDR bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * f
 		     struct value **args, CORE_ADDR sp, int struct_return,
 		     CORE_ADDR struct_addr);
 static int is_minus_minus_sp(int op);
+CORE_ADDR bfin_next_bp_addr (CORE_ADDR pc);
+extern void bfin_software_single_step (enum target_signal, int);
 
 
 //Following macro has been used by prologue functions
@@ -79,11 +81,35 @@ static int is_minus_minus_sp(int op);
 #define P_SP_EQ_SP_PLUS_P2    		0X5BB2
 #define P_SP_EQ_P2_PLUS_SP    		0x5B96
 #define P_MINUS_MINUS_SP_EQ_RETS	0x0167
-#define P_RTS				0x0010
-#define P_JUMP_PREG			0x0050
-#define P_JUMP_PC_PLUS_PREG		0x0080
-#define P_JUMP_S			0x2000
-#define P_JUMP_L			0xE200
+
+/* Macros used for Program flow control */
+#define P_16_BIT_INSR_MAX		0xBFFF // 16 bit instruction, max
+#define P_32_BIT_INSR_MIN		0xC000 // 16 bit instruction, max
+#define P_32_BIT_INSR_MAX		0xE801 // 16 bit instruction, max
+#define P_JUMP_PREG_MIN			0x0050 // jump (preg), 16-bit, min
+#define P_JUMP_PREG_MAX			0x0057 // jump (preg), 16-bit, max
+#define P_JUMP_PC_PLUS_PREG_MIN		0x0080 // jump (pc+preg), 16-bit, min
+#define P_JUMP_PC_PLUS_PREG_MAX		0x0087 // jump (pc+preg), 16-bit, max
+#define P_JUMP_S_MIN			0x2000 // jump.s pcrel13m2, 16-bit, min
+#define P_JUMP_S_MAX			0x2FFF // jump.s pcrel13m2, 16-bit, max
+#define P_JUMP_L_MIN			0xE200 // jump.l pcrel25m2, 32-bit, min
+#define P_JUMP_L_MAX			0xE2FF // jump.l pcrel25m2, 32-bit, max
+#define P_IF_CC_JUMP_MIN		0x1400 // conditional jump pcrel11m2, 16-bit, min
+#define P_IF_CC_JUMP_MAX		0x17FF // conditional jump pcrel11m2, 16-bit, max
+#define P_IF_CC_JUMP_BP_MIN		0x1C00 // conditional jump(bp) pcrel11m2, 16-bit, min
+#define P_IF_CC_JUMP_BP_MAX		0x1FFF // conditional jump(bp) pcrel11m2, 16-bit, max
+#define P_IF_NOT_CC_JUMP_MIN		0x1000 // conditional !jump pcrel11m2, 16-bit, min
+#define P_IF_NOT_CC_JUMP_MAX		0x13FF // conditional !jump pcrel11m2, 16-bit, max
+#define P_IF_NOT_CC_JUMP_BP_MIN		0x1C00 // conditional jump(bp) pcrel11m2, 16-bit, min
+#define P_IF_NOT_CC_JUMP_BP_MAX		0x1FFF // conditional jump(bp) pcrel11m2, 16-bit, max
+#define P_CALL_PREG_MIN			0x0060 // call (preg), 16-bit, min
+#define P_CALL_PREG_MAX			0x0067 // call (preg), 16-bit, max
+#define P_CALL_PC_PLUS_PREG_MIN		0x0070 // call (pc+preg), 16-bit, min
+#define P_CALL_PC_PLUS_PREG_MAX		0x0077 // call (pc+preg), 16-bit, max
+#define P_CALL_MIN			0xE300 // call pcrel25m2, 32-bit, min
+#define P_CALL_MAX			0xE3FF // call pcrel25m2, 32-bit, max
+#define P_RTS				0x0010 // RTS
+#define P_MNOP				0xC803 // MNOP
 
 #define UPPER_LIMIT			(40)
 #define BFIN_NOT_TESTED	       		0	
@@ -281,12 +307,174 @@ int map_gcc_gdb[ ] =
 };
 
 
+/* The bfin_next_bp_addr function supports single_step when the remote
+   target stub is not developed enough to do a single_step. It works by
+   decoding the current instruction and predicting where a branch will go. */
+CORE_ADDR
+bfin_next_bp_addr (CORE_ADDR pc)
+{
+  unsigned short op;
+  unsigned short op_next;
+  int op_extract;
+  CORE_ADDR p0;
+  CORE_ADDR pc_temp;
+
+  op = read_memory_unsigned_integer (pc, 2);
+
+  if ((op >= P_JUMP_PREG_MIN && op <= P_JUMP_PREG_MAX) ||
+      (op >= P_CALL_PREG_MIN && op <= P_CALL_PREG_MAX)) {
+    op_extract = op & 0x0007; // Extract 3 bits
+    pc = read_register (op_extract);
+    return pc;
+  }
+  else if ((op >= P_JUMP_PC_PLUS_PREG_MIN && op <= P_JUMP_PC_PLUS_PREG_MAX) ||
+           (op >= P_CALL_PC_PLUS_PREG_MIN && op <= P_CALL_PC_PLUS_PREG_MAX)) {
+    op_extract = op & 0x0007; // Extract 3 bits
+    pc += read_register (op_extract);
+    return pc;
+  }
+  else if (op >= P_JUMP_S_MIN && op <= P_JUMP_S_MAX) {
+    union {
+      struct{
+        int offset:12;
+	unsigned int op_part:4;
+      }val;
+      unsigned short op;
+    }op_val;
+
+    op_val.op = op;
+    op_extract = op_val.val.offset;
+    op_extract *= 2;
+    pc += op_extract;
+    return pc;
+  }
+  else if ((op >= P_JUMP_L_MIN && op <= P_JUMP_L_MAX) ||
+           (op >= P_CALL_MIN && op <= P_CALL_MAX)) {
+    union {
+      struct{
+        int offset:24;
+        unsigned int op_part:8;
+      }val;
+      struct {
+        unsigned short op_next;
+        unsigned short op;
+      }op;
+    }op_val;
+
+    op_next = read_memory_unsigned_integer (pc + 2, 2);
+    op_val.op.op = op;
+    op_val.op.op_next = op_next;
+    op_extract = op_val.val.offset;
+    op_extract *= 2;
+    pc += op_extract;
+    return pc;
+  }
+  else if ((op >= P_IF_CC_JUMP_MIN && op <= P_IF_CC_JUMP_MAX) ||
+           (op >= P_IF_CC_JUMP_BP_MIN && op <= P_IF_CC_JUMP_BP_MAX)) {
+
+    CORE_ADDR astat_reg_val = read_register(BFIN_ASTAT_REGNUM);
+    int cc_bit = astat_reg_val & 0x0020;  // cc is 6th bit in astat register
+
+    if (cc_bit == 0) {
+      union {
+        struct{
+          int offset:10;
+	  unsigned int op_part:6;
+        }val;
+        unsigned short op;
+      }op_val;
+
+      op_val.op = op;
+      op_extract = op_val.val.offset;
+      op_extract *= 2;
+      pc += op_extract;
+    }
+    else
+      pc += 2;
+    return pc;
+  }
+  else if ((op >= P_IF_NOT_CC_JUMP_MIN && op <= P_IF_NOT_CC_JUMP_MAX) ||
+           (op >= P_IF_NOT_CC_JUMP_BP_MIN && op <= P_IF_NOT_CC_JUMP_BP_MAX)) {
+
+    CORE_ADDR astat_reg_val = read_register(BFIN_ASTAT_REGNUM);
+    int cc_bit = astat_reg_val & 0x0020;  // cc is 6th bit in astat register
+
+    if (cc_bit != 0) {
+      union {
+        struct{
+          int offset:10;
+	  unsigned int op_part:6;
+        }val;
+        unsigned short op;
+      }op_val;
+
+      op_val.op = op;
+      op_extract = op_val.val.offset;
+      op_extract *= 2;
+      pc += op_extract;
+    }
+    else
+      pc += 2;
+    return pc;
+  }
+  else if (op == P_RTS) {
+    pc = read_register (BFIN_RETS_REGNUM);
+    return pc;
+  }
+  else if (op == P_MNOP) {
+    /* MNOP when issued in parallel with two compatible load/store instructions */
+    return pc + 8;
+  }
+  else if (op <= P_16_BIT_INSR_MAX) {
+    return pc + 2;
+  }
+  else if (op >= P_32_BIT_INSR_MIN && op <= P_32_BIT_INSR_MAX) {
+    return pc + 4;
+  }
+
+    fprintf(stderr, "unhandled type????, op = %x :: skipping to %x (by 2)\n", op, pc + 2);
+    return pc + 2;
+}
+
+
+/* bfin_software_single_step() is called just before we want to resume
+   the inferior, if we want to single-step it. We find the target of
+   the coming instruction and breakpoint it.
+   single_step is also called just after the inferior stops.  If we had
+   set up a simulated single-step, we undo our damage.  */
+void
+bfin_software_single_step (enum target_signal sig, int insert_breakpoints_p)
+{
+
+  struct ss_location
+  {
+     CORE_ADDR bp_addr;
+     /* "Real" contents of byte where breakpoint has been inserted.
+     Valid only when breakpoints are in the program.  Under the complete
+     control of the target insert_breakpoint and remove_breakpoint routines.
+     No other code should assume anything about the value(s) here.
+     Valid only for bp_loc_software_breakpoint.  */
+     char shadow_contents[BREAKPOINT_MAX];
+  };
+
+  CORE_ADDR pc;
+  static struct ss_location break_mem;
+
+  if (insert_breakpoints_p) {
+    pc = read_register (BFIN_PC_REGNUM);
+    break_mem.bp_addr = bfin_next_bp_addr(pc);
+    target_insert_breakpoint (break_mem.bp_addr, break_mem.shadow_contents);
+  }
+  else
+    target_remove_breakpoint (break_mem.bp_addr, break_mem.shadow_contents);
+}
+
 /* Check whether insn1 and insn2 are parts of a signal trampoline.  */
 #define IS_SIGTRAMP(insn1, insn2)               \
  (/* P0=0x77 (X); EXCPT 0x0 */                  \
  (insn1 == 0x0077e128 && insn2 == 0x000000a0))
 
-#define SIGCONTEXT_OFFSET 28
+#define SIGCONTEXT_OFFSET   28
 
 /* From <asm/sigcontext.h>.  */
 static int bfin_linux_sigcontext_reg_offset[BFIN_NUM_REGS] =
@@ -346,15 +534,15 @@ static int bfin_linux_sigcontext_reg_offset[BFIN_NUM_REGS] =
   -1,                           /* %origpc */
   -1,                           /* %extra1 */
   -1,                           /* %extra2 */
-  -1,                           /* %extra3 */
+  -1                            /* %extra3 */
 };
 
 
 /* Get info about saved registers in sigtramp.  */
 struct bfin_linux_sigtramp_info
 {
-  /* Address of sigcontext.  */
-  CORE_ADDR sigcontext_addr;
+  /* Address of context.  */
+  CORE_ADDR context_addr;
 
   /* Offset of registers in `struct sigcontext'.  */
   int *sc_reg_offset;
@@ -375,7 +563,7 @@ bfin_linux_pc_in_sigtramp (CORE_ADDR pc)
 
   insn1 = extract_unsigned_integer (buf + 4, 4);
   insn2 = extract_unsigned_integer (buf + 8, 4);
-  if (IS_SIGTRAMP (insn1, insn2)){
+  if (IS_SIGTRAMP (insn1, insn2)) {
     return 1;
   }
   
@@ -404,14 +592,14 @@ bfin_linux_get_sigtramp_info (struct frame_info *next_frame)
   frame_unwind_register (next_frame, BFIN_SP_REGNUM, buf);
   sp = extract_unsigned_integer (buf, 4);
 
-  /* Get sigcontext address */
-  info.sigcontext_addr = sp + SIGCONTEXT_OFFSET;
+    /* Get sigcontext address */
+    info.context_addr = sp + SIGCONTEXT_OFFSET;
 
   if(bfin_linux_pc_in_sigtramp(frame_pc_unwind(next_frame)) == 0)
     fprintf(stderr, "not a sigtramp\n");
-  else
+  else if(bfin_linux_pc_in_sigtramp(frame_pc_unwind(next_frame)) == 1) {
     info.sc_reg_offset = bfin_linux_sigcontext_reg_offset;
-
+  }
   return info;
 }
 
@@ -440,8 +628,7 @@ bfin_linux_sigtramp_frame_cache (struct frame_info *next_frame,
   sp = extract_unsigned_integer (buf, 4);
 
   /* This would come after the LINK instruction in the ret_from_signal
-     function, hence the frame id would be sp + 8
-  */
+     function, hence the frame id would be sp + 8 */
   this_id = frame_id_build (sp + 8, frame_pc_unwind(next_frame));
   trad_frame_set_id (cache, this_id);
 
@@ -449,7 +636,7 @@ bfin_linux_sigtramp_frame_cache (struct frame_info *next_frame,
 
   for (i = 0; i < BFIN_NUM_REGS; i++)
     if (info.sc_reg_offset[i] != -1)
-      trad_frame_set_reg_addr (cache, i, info.sigcontext_addr + info.sc_reg_offset[i]);
+      trad_frame_set_reg_addr (cache, i, info.context_addr + info.sc_reg_offset[i]);
 
   *this_cache = cache;
   return cache;
@@ -771,10 +958,9 @@ bfin_skip_prologue (pc)
        {
 	  done = 1;
        }
-       else if ((op == P_JUMP_PREG)
-	 || (op == P_JUMP_PC_PLUS_PREG)
-	 || (op == P_JUMP_S)
-	 || (op == P_JUMP_S))
+       else if ((op >= P_JUMP_PREG_MIN && op <= P_JUMP_PREG_MAX) ||
+                (op >= P_JUMP_PC_PLUS_PREG_MIN && op <= P_JUMP_PC_PLUS_PREG_MAX) ||
+	        (op == P_JUMP_S_MIN && op <= P_JUMP_S_MAX))
        { 
            done = 1;
        }
@@ -1241,6 +1427,8 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   set_gdbarch_inner_than (gdbarch, core_addr_lessthan);
   // Do not set parm boundary
   // removed set_gdbarch_parm_boundary (gdbarch, 32);
+
+  set_gdbarch_software_single_step (gdbarch, bfin_software_single_step);
 
   set_gdbarch_believe_pcc_promotion (gdbarch, 1);
   set_gdbarch_decr_pc_after_break (gdbarch, 2);
