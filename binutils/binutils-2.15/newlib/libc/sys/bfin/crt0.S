@@ -11,10 +11,10 @@ _mainCRTStartup:
 	/* Start by setting up a stack */
 	/* Zero the memory in the .bss section.  */
 
-	p0.l = _end;
-	p0.h = _end;
-	p1.l = _edata;
-	p1.h = _edata;
+	p0.l = _edata;
+	p0.h = _edata;
+	p1.l = _end;
+	p1.h = _end;
 	p1 -= p0;
 	r0 = 0;
 	lsetup (clear_bss, clear_bss) lc0 = p1;

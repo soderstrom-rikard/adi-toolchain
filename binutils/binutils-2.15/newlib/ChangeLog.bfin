@@ -1,3 +1,7 @@
+2005-01-24  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* libc/sys/bfin/crt0.S (start): Properly compute length of BSS.
+
 2004-12-02  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* libc/sys/bfin/crt0.S (start): Call initialise_monitor_handles.
