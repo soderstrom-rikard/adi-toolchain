@@ -1692,10 +1692,9 @@ gen_ldstii(REG_T ptr, REG_T reg, ExprNode *poffset, int W, int op)
 INSTR_T
 gen_ldstiifp(REG_T sreg, ExprNode *poffset, int W)
 {
-	int offset, reg;
 	// set bit 4 if it's a Preg:
-	reg = (sreg->regno & CODE_MASK) | (IS_PREG(*sreg) ? 0x8 : 0x0);
-	offset = -EXPR_VALUE(poffset) >> 2;
+	int reg = (sreg->regno & CODE_MASK) | (IS_PREG(*sreg) ? 0x8 : 0x0);
+	int offset = -EXPR_VALUE(poffset) >> 2;
 	INIT(LDSTiiFP);
 	ASSIGN(reg);
 	ASSIGN(offset);

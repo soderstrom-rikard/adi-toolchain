@@ -1,3 +1,7 @@
+2004-12-14  Catherine Moore  <clm@cm00re.com>
+
+	* config/tc-bfin.c (gen_ldstiifp): Fix compilation error.
+
 2004-12-14  Raja <raja@rrap-software.com>
         * config/tc-bfin.c: in bfin-opcodes.h, reverted to explicit shifts instead of using
          union to fix Endianess issue.
