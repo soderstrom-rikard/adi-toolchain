@@ -205,7 +205,9 @@ enum machine_registers {
   REG_P4,    REG_P5,    REG_SP,    REG_FP,    REG_A0x,   REG_A1x,   REG_A0w,   REG_A1w,
   REG_A0,    REG_A1,    REG_I0,    REG_I1,    REG_I2,    REG_I3,    REG_M0,    REG_M1,
   REG_M2,    REG_M3,    REG_B0,    REG_B1,    REG_B2,    REG_B3,    REG_L0,    REG_L1,
-  REG_L2,    REG_L3,    REG_AZ,    REG_AN,    REG_AC,    REG_AV0,   REG_AV1,   REG_AQ,
+  REG_L2,    REG_L3,
+  REG_AZ,    REG_AN,    REG_AC0,   REG_AC1,   REG_AV0,   REG_AV1,  REG_AV0S,  REG_AV1S,
+  REG_AQ,    REG_V,     REG_VS, 
   REG_sftreset, REG_omode, REG_excause, REG_emucause, REG_idle_req, REG_hwerrcause, REG_CC,    REG_LC0,
   REG_LC1,   REG_GP,    REG_ASTAT, REG_RETS,  REG_LT0,   REG_LB0,   REG_LT1,   REG_LB1,
   REG_CYCLES, REG_CYCLES2, REG_USP,   REG_SEQSTAT, REG_SYSCFG, REG_RETI,  REG_RETX,  REG_RETN,
@@ -235,7 +237,9 @@ static char *reg_names[] = {
   "P4",      "P5",      "SP",      "FP",      "A0.x",     "A1.x",     "A0.w",     "A1.w",
   "A0",      "A1",      "I0",      "I1",      "I2",      "I3",      "M0",      "M1",
   "M2",      "M3",      "B0",      "B1",      "B2",      "B3",      "L0",      "L1",
-  "L2",      "L3",      "AZ",      "AN",      "AC",      "AV0",     "AV1",     "AQ",
+  "L2",      "L3",
+  "AZ",      "AN",      "AC0",     "AC1",     "AV0",     "AV1",     "AV0S",    "AV1S",
+  "AQ",      "V",       "VS",
   "sftreset", "omode",   "excause", "emucause", "idle_req", "hwerrcause", "CC",      "LC0",
   "LC1",     "GP",      "ASTAT",   "RETS",    "LT0",     "LB0",     "LT1",     "LB1",
   "CYCLES",  "CYCLES2", "USP",     "SEQSTAT", "SYSCFG",  "RETI",    "RETX",    "RETN",
@@ -251,61 +255,7 @@ static char *reg_names[] = {
     0
 };
 
-static char reg_sizes[] = {
-  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,
-  32,  32,  32,  32,  32,  32,  32,  32,  32,  32,  32,  32,  32,  32,  32,  32,
-  32,  32,  32,  32,  8,   8,   32,  32,  32,  32,  32,  32,  32,  32,  32,  32,
-  32,  32,  32,  32,  32,  32,  32,  32,  32,  32,  1,   1,   1,   1,   1,   1,
-  32,  32,  32,  32,  32,  32,  1,   32,  32,  32,  32,  32,  32,  32,  32,  32,
-  32,  32,  32,  32,  32,  32,  32,  32,  
-  32,  
-  8,   8,   8,   8,   8,   8,   8,    8,
-  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,
-  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,
-  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,  16,
-  1,   1,   32,
-  };
-
 #define REGNAME(x) ((x) < REG_LASTREG ? (reg_names[x]) : "...... Illegal register .......")
-
-static char *reg_class_names[] = {
-  "dregs_lo", "dregs_hi", "dregs",   "dregs_pair", "pregs",   "spfp",    "dregs_hilo", "accum_ext",
-  "accum_word", "accum",   "iregs",   "mregs",   "bregs",   "lregs",   "dpregs",  "gregs",
-  "regs",    "statbits", "ignore_bits", "ccstat",  "counters", "dregs2_sysregs1", "open",    "sysregs2",
-  "sysregs3", "allregs",
-  };
-
-static long reg_class_contents[][3] = {
-{0x000000ff, 0x00000000, 0x00000000}, /* dregs_lo */
-{0x0000ff00, 0x00000000, 0x00000000}, /* dregs_hi */
-{0x00ff0000, 0x00000000, 0x00000000}, /* dregs */
-{0x0f000000, 0x00000000, 0x00000000}, /* dregs_pair */
-{0xf0000000, 0x0000000f, 0x00000000}, /* pregs */
-{0x00000000, 0x0000000c, 0x00000000}, /* spfp */
-{0x0000ffff, 0x00000000, 0x00000000}, /* dregs_hilo */
-{0x00000000, 0x00000030, 0x00000000}, /* accum_ext */
-{0x00000000, 0x000000c0, 0x00000000}, /* accum_word */
-{0x00000000, 0x00000300, 0x00000000}, /* accum */
-{0x00000000, 0x00003c00, 0x00000000}, /* iregs */
-{0x00000000, 0x0003c000, 0x00000000}, /* mregs */
-{0x00000000, 0x003c0000, 0x00000000}, /* bregs */
-{0x00000000, 0x03c00000, 0x00000000}, /* lregs */
-{0xf0ff0000, 0x0000000f, 0x00000000}, /* dpregs */
-{0xf0ff0000, 0x0000000f, 0x00000000}, /* gregs */
-{0xf0ff0000, 0x03fffc0f, 0x00000000}, /* regs */
-{0x00000000, 0xfc000000, 0x00000000}, /* statbits */
-{0x00000000, 0x00000000, 0x0000003f}, /* ignore_bits */
-{0x00000000, 0x00000000, 0x00000040}, /* ccstat */
-{0x00000000, 0x00000000, 0x00000180}, /* counters */
-{0x00000000, 0x000000f0, 0x00000e00}, /* dregs2_sysregs1 */
-{0x00000000, 0x00000000, 0x00000000}, /* open */
-{0x00000000, 0x00000000, 0x0003f180}, /* sysregs2 */
-{0x00000000, 0x00000000, 0x01fc0000}, /* sysregs3 */
-{0xf0ff0000, 0x03fffcff, 0x01ffff80}, /* allregs */
-};
-
-#define reginclass(r,c) (reg_class_contents[c][r>>5]&(1<<((r)&63)))
-
 
 /* RL(0..7)  */
 static enum machine_registers decode_dregs_lo[] = {
@@ -456,19 +406,12 @@ static enum machine_registers decode_regs_hi[] = {
   };
 #define regs_hi(x,i) REGNAME(decode_regs_hi[((i)<<3)|x])
 
-/* AZ AN AC AV0 AV1 - AQ -                  -  -  -  -   -   -  - -                  -  -  -  -   -   -  - -                  -  -  -  -   -   -  - -  */
 static enum machine_registers decode_statbits[] = {
-  REG_AZ,      REG_AN,      REG_AC,      REG_AV0,     REG_AV1,    REG_LASTREG, REG_AQ,      REG_LASTREG,
-  REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG,
-  REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG,
-  REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG,
-  }; 
-/*static enum machine_registers decode_statbits[] = {
   REG_AZ,      REG_AN,      REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_AQ,      REG_LASTREG,
   REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_AC0, 	   REG_AC1,     REG_LASTREG, REG_LASTREG,
-  REG_AV0,     REG_LASTREG, REG_AV1, 	 REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG,
-  REG_V,       REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG,
-  };*/
+  REG_AV0,     REG_AV0S,    REG_AV1, 	 REG_AV1S,    REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG,
+  REG_V,       REG_VS,      REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG,
+};
 
 #define statbits(x) REGNAME(decode_statbits[x&31])
 
@@ -2009,7 +1952,6 @@ static int decode_UJUMP_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info
 */  int offset = ((iw0 >> 0) & 0xfff);
 
 
-printf ("\nOFFSET = %d \n", offset);
   notethat ("JUMP.S pcrel12");
   OUTS(outf,"JUMP.S  ");
   OUTS(outf,pcrel12(offset));
@@ -3420,7 +3362,8 @@ static int decode_LDSTiiFP_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_i
         OUTS(outf,"=");
         OUTS(outf,"[");
         OUTS(outf,"FP");
-        OUTS(outf,"-");
+	/* negimm5s4 will print the minus sign; no need to print anything
+	   here.  */ 
         OUTS(outf,negimm5s4(offset));
         OUTS(outf,"]");
         return 1*2;
@@ -3428,7 +3371,8 @@ static int decode_LDSTiiFP_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_i
         notethat ("[ FP - negimm5s4 ] = dpregs");
         OUTS(outf,"[");
         OUTS(outf,"FP");
-        OUTS(outf,"-");
+	/* negimm5s4 will print the minus sign; no need to print anything
+	   here.  */ 
         OUTS(outf,negimm5s4(offset));
         OUTS(outf,"]");
         OUTS(outf,"=");
@@ -6576,7 +6520,8 @@ _print_insn_bfin (bfd_vma pc, disassemble_info *outf)
     TIword iw0;
     TIword iw1;
     int status;
-    status = (*outf->read_memory_func) (pc & ~ 0x1, buf, 4, outf);
+    status = (*outf->read_memory_func) (pc & ~ 0x1, buf, 2, outf);
+    status = (*outf->read_memory_func) ((pc + 2) & ~ 0x1, buf + 2, 2, outf);
 
     iw0 = bfd_getl16 (buf);
     iw1 = bfd_getl16 (buf+2);

@@ -1,0 +1,16 @@
+2004-10-03  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin-dis.c (enum machine_registers): Remove REG_AC; add REG_AC0,
+	REG_AC1, REG_AV0S, REG_AV1S, REG_V and REG_VS.
+	(reg_names): Likewise.
+	(reg_sizes, reg_class_names, reg_class_contents, reginclass):
+	Unused; delete.
+	(decode_statbits): Delete incorrect definition and comment the proper
+	one back in.  Add REG_VS, REG_AV0S and REG_AV1S to it.
+	(decode_UJUMP_0): Remove spurious printf.
+	(decode_LDSTiiFP_0): Correct double minus sign problem.
+	(_print_insn_bfin): Read instruction words one at a time, not in one
+	four byte read.
+	
+	
+	
