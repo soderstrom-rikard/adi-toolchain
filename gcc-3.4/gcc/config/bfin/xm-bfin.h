@@ -1,0 +1,35 @@
+#define TRUE 1
+#define FALSE 0
+
+#define FATAL_EXIT_CODE 33
+#define SUCCESS_EXIT_CODE 0
+
+#define	HOST_BITS_PER_LONGLONG 64
+#define HOST_BITS_PER_LONG 32
+#define HOST_BITS_PER_INT 32
+#define HOST_BITS_PER_SHORT 16
+#define HOST_BITS_PER_CHAR 8
+#define	BITS_PER_UNIT 8
+
+#define	HOST_FLOAT_FORMAT IEEE_FLOAT_FORMAT
+
+
+
+#if 0
+#ifndef HOST_BITS_PER_LONG
+#define HOST_BITS_PER_LONG 32
+#endif
+#ifndef HOST_BITS_PER_INT
+#define HOST_BITS_PER_INT 32
+#endif
+#ifndef HOST_BITS_PER_SHORT
+#define HOST_BITS_PER_SHORT 16
+#endif
+#ifndef HOST_BITS_PER_CHAR
+#define HOST_BITS_PER_CHAR 8
+#endif
+#ifndef	BITS_PER_UNIT
+#define	BITS_PER_UNIT 8
+#endif
+#endif
+

@@ -1,0 +1,474 @@
+1.
+
+TARGET_BELL is defined in nisa.h
+in /gcc/gcc/defaults.h, TARGET_ESC is defined only if not TARGET_BELL defined
+TARGET_ESC is used in cpplex.c without checking ifndef TARGET_BELL
+
+so, i defined the TARGET_ESC in nisa.h as in /gcc/gcc/defaults.h
+
+2.
+
+in nisa.h,
+ifdef HAIFA, ASM_OUTPUT_ADDR_DIFF_ELT is defined with four arg, otherwise three arg
+intern it calls my_ASM_OUTPUT_ADDR_DIFF_ELT with 3 arg
+
+but there is a call to this macro in final.c with four arg.
+
+need to look at it.
+
+HAIFA is always on in 3.3.2
+so i am removing the ifdef HAIFA in nisa.h:1464
+
+********do grep for ifdef HAIFA
+
+3. run the make in the root dir
+study the operand missing in nisa.md when u run genoutput
+see diff of genoutput in both version
+
+error:
+956 missing operand 2
+966
+1617
+1626
+1637
+1646
+2188
+2208
+
+
+(refer 16.3 RTL Template)
+Operand numbers must be choosen consecutively counting from 0 in each insn patern.
+Usually operands are numbered in the order of their appearance in match_operand expr.
+	
+````````````````````````````````````````````````
+newer version of assemble_real function takes three arg and the first one is of type REAL_VALUE_TYPE
+
+union real_extract is removed in newver version.
+and we may have to use  
+REAL_VALUE_TYPE R;
+
+aligned data (arg)
+
+third arg is the alignment of the data 
+*** i need to check for the ifdef CONSTANT_ALIGN
+
+newer version of assemble_integer func will take four arg
+third arg is alignment of the integer in bits.
+
+
+````````````````````````````````````
+./config/nisa/nisa.md:1762: operand 1 missing output reload
+./config/nisa/nisa.md:1772: operand 1 missing output reload
+./config/nisa/nisa.md:1782: operand 1 missing output reload
+./config/nisa/nisa.md:1792: operand 1 missing output reload
+./config/nisa/nisa.md:1802: operand 1 missing output reload
+./config/nisa/nisa.md:1812: operand 0 missing output reload
+./config/nisa/nisa.md:1822: operand 0 missing output reload
+./config/nisa/nisa.md:1831: operand 0 missing output reload
+./config/nisa/nisa.md:1876: operand 1 missing output reload
+./config/nisa/nisa.md:1885: operand 1 missing output reload
+./config/nisa/nisa.md:1894: operand 1 missing output reload
+./config/nisa/nisa.md:1903: operand 1 missing output reload
+./config/nisa/nisa.md:1912: operand 1 missing output reload
+./config/nisa/nisa.md:1921: operand 1 missing output reload
+./config/nisa/nisa.md:1953: operand 0 missing output reload
+./config/nisa/nisa.md:1962: operand 0 missing output reload
+./config/nisa/nisa.md:1971: operand 0 missing output reload
+./config/nisa/nisa.md:1980: operand 0 missing output reload
+./config/nisa/nisa.md:1989: operand 0 missing output reload
+./config/nisa/nisa.md:1998: operand 0 missing output reload
+./config/nisa/nisa.md:2032: operand 1 missing output reload
+./config/nisa/nisa.md:2041: operand 1 missing output reload
+./config/nisa/nisa.md:2050: operand 1 missing output reload
+./config/nisa/nisa.md:2059: operand 1 missing output reload
+./config/nisa/nisa.md:2068: operand 1 missing output reload
+./config/nisa/nisa.md:2077: operand 1 missing output reload
+./config/nisa/nisa.md:2086: operand 1 missing output reload
+./config/nisa/nisa.md:2095: operand 1 missing output reload
+./config/nisa/nisa.md:2136: operand 0 missing output reload
+./config/nisa/nisa.md:2145: operand 0 missing output reload
+./config/nisa/nisa.md:2154: operand 0 missing output reload
+./config/nisa/nisa.md:2068: operand 1 missing output reload
+
+
+./config/nisa/nisa.md:489: operand 0 missing output reload
+./config/nisa/nisa.md:516: operand 0 missing output reload
+./config/nisa/nisa.md:543: operand 0 missing output reload
+
+
+in the above lines, i inserted + if operand is 1 , = if operand is 0 
+
+***refer
+genrecog.c:56
+A match_operand that is a SET should have an output reload
+
+```````````````````````
+REGISTER_MOVE_COST takes three arg in the v3.3.2
+first arg is the mode
+
+***need to modify the register_move_cost in nisa.c
+`````````````````````
+../include/safe-ctype.h:39:3: #error "safe-ctype.h and ctype.h may not be used simultaneously"
+
+****in nisa.c,
+include ctype.h removed and included safe-ctype.h, system.h
+
+ref comments
+gcc/gcc/system.h
+`````````````````````
+nisa.c:35
+
+extern char *version_string;
+
+is changed in the v3.3.2
+
+extern const char version_string[];
+
+```````````````````
+:- undefined reference to targetm
+
+new target specific structure gcc_target is introduced in v3.3.2
+/gcc/target.h:31
+
+each target should have a file that includes target.h and target-def.h and overrides any inappropriate defaults
+by undefining the macro and defining a suitable replacement. the file should then contain the definition of targetm
+
+
+***need to redefine macro
+
+````````````````````````
+
+i included the expr.h in the nisa.c
+
+:- default_init_builtins is undeclared
+
+```````````````````````````````````
+:-exact_log2 macro definition is moved from rtl.h to toplev.h
+
+so i am including the toplev.h in nisa.c
+
+`````````````````````````````````
+:- TARGET_ASM_GLOBALIZE_LABEL is renamed to TARGET_... ( gcc_target )
+
+so i am defining the same macro and a function BFIN_globalize_label in nisa.c before the line in which gcc_target is present
+later on we need to remove the ASM_GLOBALIZE_LABEL
+
+need to study what is GLOBAL_ASM_OP, we can use the default macro itself if we define GLOBAL_ASM_OP in the target
+
+````````````````
+in nisa, dwarfout.c includes defaults.h which has the definition for ASM_OUTPUT_DEF
+but, in v3.3.2 defaults.h not included in dwarfout.c 
+
+
+in nisa target, definition for this macro is commented out.
+
+should i copy from defaults to nisa?
+or should i remove the comments in nisa?
+or should i include the default.h in dwarfout.c? 
+
+in nisa.h defaults.h is included but before the definition of SET_ASM_OP
+
+***so i moved the define stmt SET_ASM_OP before "#include <defaults.h>"
+
+````````````````````
+:- crtstuff.c
+read gcc.info-22.txt to fix init section INIT_SECTION_ASM_OP, HAS_INIT_SECTION
+
+##We do not want to build for C++ on the blackfin tartget for now
+EXTRA_PARTS =
+
+````````````````````````
+
+/* Table of language-specific spec functions.  */
+
+const struct spec_function lang_specific_spec_functions[] =
+{
+          { 0, 0 }
+};
+
+
+** the above is added in gcc/cp/gcc.c to avoid undefined reference
+** gcc.h is included
+**all the language spec file should define one ( refer gcc.h ) 
+```````````````````````````````````````````
+compare the make file of nisa and merged nisa
+
+`````````````````````
+poisoned bcopy to memcpy
+
+2520
+2551
+***********************bcopy was converted to memcpy but the parameters were not reversed.
+***look at the prototype of memcpy and bcopy
+
+
+poisoned malloc to xmalloc in nisa.c
+
+````````````````````````````
+
+ASM_GLOBALIZE_LABEL in nisa.h is renamed to ASM_GLOBALIZE_LABEL1
+and used in func ASM_OUTPUT_COMMON as ASM_GLOBALIZE_LABEL1
+
+***need to fix
+
+````````````````````````````
+used memset instead of bzero in gcc/cp/g++spec.c +102
+
+`````````````````````````````
+remove the rule to make underscore.o from makefile. refer the gcc/ChangeLog
+instead of using prepends_underscore defined in underscore.c ( which was generated automatically by s-under rule), USER_LABEL_PREFIX used
+
+`````````````````````````````
+gcc/ChangeLog.0
+        * gcc.c (process_command): Do not take address of function fatal when
+        calling lang_specific_driver.
+
+**i removed the function pointer, calling the fatal function direcly.
+`````````````````````````````````
+:= function declaration isn't a prototype
+
+add to changeLog file,
+
+* config/nisa/nisa.h: Move prototypes to nisa-protos.h
+
+ nisa-protos.h is included in config.gcc.
+
+````````````````````````````````````
+the following macros are prepend with TARGET
+
+1.
+COMP_TYPE_ATTRIBUTES
+#define TARGET_COMP_TYPE_ATTRIBUTES hook_int_tree_tree_1 (default,  which has the same implementation as the nisa )
+so i am changing the in nisa
+
+" COMP_TYPE_ATTRIBUTES, SET_DEFAULT_TYPE_ATTRIBUTES): Remove
+ functions and macros with default behavior." -- add to ChangeLog
+
+
+/* Old target macros that have moved to the target hooks structure.  */
+ #pragma GCC poison ASM_OPEN_PAREN ASM_CLOSE_PAREN                      \
+        FUNCTION_PROLOGUE FUNCTION_EPILOGUE                             \
+        FUNCTION_END_PROLOGUE FUNCTION_BEGIN_EPILOGUE                   \
+        DECL_MACHINE_ATTRIBUTES COMP_TYPE_ATTRIBUTES INSERT_ATTRIBUTES  \
+        VALID_MACHINE_DECL_ATTRIBUTE VALID_MACHINE_TYPE_ATTRIBUTE       \
+        SET_DEFAULT_TYPE_ATTRIBUTES SET_DEFAULT_DECL_ATTRIBUTES         \
+        MERGE_MACHINE_TYPE_ATTRIBUTES MERGE_MACHINE_DECL_ATTRIBUTES     \
+        MD_INIT_BUILTINS MD_EXPAND_BUILTIN ASM_OUTPUT_CONSTRUCTOR       \
+        ASM_OUTPUT_DESTRUCTOR SIGNED_CHAR_SPEC MAX_CHAR_TYPE_SIZE       \
+        WCHAR_UNSIGNED UNIQUE_SECTION SELECT_SECTION SELECT_RTX_SECTION \
+        ENCODE_SECTION_INFO STRIP_NAME_ENCODING ASM_GLOBALIZE_LABEL     \
+        ASM_OUTPUT_MI_THUNK
+
+
+`````````````````````````````
+the following macros are prepended with TARGET_ and moved to target.c from target.h
+(for ex :* i386/winnt.c (i386_pe_merge_decl_attributes): Move to tree.c. )
+
+system.h:598:21: warning: poisoning existing macro "ASM_OPEN_PAREN" -- done
+system.h:598:36: warning: poisoning existing macro "ASM_CLOSE_PAREN" -- done
+system.h:599:9: warning: poisoning existing macro "FUNCTION_PROLOGUE" -- done
+system.h:599:27: warning: poisoning existing macro "FUNCTION_EPILOGUE" -- done
+
+the following macros are removed.
+
+system.h:602:9: warning: poisoning existing macro "VALID_MACHINE_DECL_ATTRIBUTE"
+system.h:602:38: warning: poisoning existing macro "VALID_MACHINE_TYPE_ATTRIBUTE"
+system.h:617:23: warning: poisoning existing macro "EASY_DIV_EXPR"
+system.h:617:37: warning: poisoning existing macro "IMPLICIT_FIX_EXPR"
+system.h:618:54: warning: poisoning existing macro "ASM_IDENTIFY_GCC"
+
+In file included from toplev.c:69:
+real.h:298:1: warning: "REAL_VALUE_ATOF" redefined
+
+```````````````````````````````````````````````````
+
+                from toplev.c:27:
+config/nisa/nisa.h:1554:1: warning: this is the location of the previous definition
+toplev.c: In function `rest_of_compilation':
+toplev.c:3522: warning: implicit declaration of function `nisa_reorg'
+toplev.c: In function `init_asm_output':
+toplev.c:4729: warning: implicit declaration of function `output_file_start'
+toplev.c: In function `process_options':
+toplev.c:5052: warning: implicit declaration of function `override_options'
+gcc   -g -O2 -DIN_GCC -DCROSS_COMPILE  -W -Wall -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wtraditional -pedantic -Wno-long-long   -DHAVE_CONFIG_H  -o cc1 \
+
+```````````````````````````````
+/config/nisa/nisa.md:201: warning: unrecognized escape \/
+./config/nisa/nisa.md:201: warning: unrecognized escape \/
+./config/nisa/nisa.md:202: warning: unrecognized escape \/	
+./config/nisa/nisa.md:202: warning: unrecognized escape \/
+./config/nisa/nisa.md:203: warning: unrecognized escape \/
+./config/nisa/nisa.md:203: warning: unrecognized escape \/
+./config/nisa/nisa.md:216: warning: unrecognized escape \/
+./config/nisa/nisa.md:216: warning: unrecognized escape \/
+./config/nisa/nisa.md:217: warning: unrecognized escape \/
+./config/nisa/nisa.md:217: warning: unrecognized escape \/
+./config/nisa/nisa.md:218: warning: unrecognized escape \/
+./config/nisa/nisa.md:218: warning: unrecognized escape \/
+./config/nisa/nisa.md:715: warning: unrecognized escape \/
+./config/nisa/nisa.md:715: warning: unrecognized escape \/
+./config/nisa/nisa.md:2441: warning: unrecognized escape \/
+./config/nisa/nisa.md:2441: warning: unrecognized escape \/
+./config/nisa/nisa.md:2454: warning: unrecognized escape \/
+./config/nisa/nisa.md:2454: warning: unrecognized escape \/
+./config/nisa/nisa.md:2467: warning: unrecognized escape \/
+./config/nisa/nisa.md:2467: warning: unrecognized escape \/
+./config/nisa/nisa.md:2497: warning: unrecognized escape \/
+
+--fixed
+````````````````
+```````````````````````````````
+config/nisa/nisa.h:611:11: warning: macro argument "C" would be stringified with -traditional
+--fixed by changing the C as LETTER
+
+```````````````````````
+config/nisa/nisa.h:1554:1: warning: "PREFERRED_DEBUGGING_TYPE" redefined
+In file included from config/nisa/nisa.h:1538,
+                 from config.h:17,
+                 from cppinit.c:22:
+defaults.h:513:1: warning: this is the location of the previous definition
+
+--fixed
+
+`````````````````````````````
+In file included from c-pretty-print.c:24:
+real.h:298:1: warning: "REAL_VALUE_ATOF" redefined
+In file included from config.h:17,
+                 from c-pretty-print.c:22:
+config/nisa/nisa.h:1533:1: warning: this is the location of the previous definition
+
+
+`````````````````````````````````
+config/nisa/nisa.h:1300: warning: comma at end of enumerator list
+config/nisa/nisa.h:1309: warning: comma at end of enumerator list
+config/nisa/nisa.h:1338:5: warning: C++ style comments are not allowed in ISO C89	
+config/nisa/nisa.h:1531:1: warning: C++ style comments are not allowed in ISO C89
+config/nisa/nisa.h:1531:1: warning: (this will be reported only once per input file)
+--fixed
+
+``````````````````````````````
+./genrecog ./config/nisa/nisa.md > tmp-recog.c
+./config/nisa/nisa.md:192: warning: source missing a mode?
+./config/nisa/nisa.md:207: warning: source missing a mode?
+./config/nisa/nisa.md:224: warning: destination operand 0 allows non-lvalue
+./config/nisa/nisa.md:240: warning: destination operand 0 allows non-lvalue
+./config/nisa/nisa.md:284: warning: destination operand 0 allows non-lvalue
+./config/nisa/nisa.md:308: warning: destination operand 0 allows non-lvalue
+./config/nisa/nisa.md:956: warning: destination operand 0 allows non-lvalue
+./config/nisa/nisa.md:966: warning: destination operand 0 allows non-lvalue
+./config/nisa/nisa.md:1104: warning: destination operand 0 allows non-lvalue
+./config/nisa/nisa.md:1140: warning: destination operand 0 allows non-lvalue
+./config/nisa/nisa.md:1176: warning: destination operand 0 allows non-lvalue
+./config/nisa/nisa.md:1311: warning: operand 1 missing mode?
+./config/nisa/nisa.md:1317: warning: operand 2 missing mode?
+./config/nisa/nisa.md:1394: warning: destination operand 0 allows non-lvalue
+./config/nisa/nisa.md:1411: warning: destination operand 0 allows non-lvalue
+./config/nisa/nisa.md:1419: warning: destination operand 0 allows non-lvalue
+./config/nisa/nisa.md:1427: warning: destination operand 0 allows non-lvalue
+./config/nisa/nisa.md:1436: warning: destination operand 0 allows non-lvalue
+./config/nisa/nisa.md:1722: warning: source missing a mode?
+./config/nisa/nisa.md:1722: warning: destination operand 0 allows non-lvalue
+./config/nisa/nisa.md:1731: warning: source missing a mode?
+./config/nisa/nisa.md:3554: warning: source missing a mode?
+/bin/sh ./move-if-change tmp-recog.c insn-recog.c
+insn-recog.c is unchanged
+
+````````````````````````
+GO_IF_LEGITIMATE_ADDRESS
+````````````````````````
+explow.c:534: warning: function declaration isn't a prototype
+
+fixed by moving 'extern rtx legitimize_address();' from LEGITIMIZE_ADDRESS to nisa-protos.h
+
+`````````````````````````````````
+real.h:298:1: warning: "REAL_VALUE_ATOF" redefined
+In file included from config.h:17,
+                 from gcse.c:146:
+config/nisa/nisa.h:1533:1: warning: this is the location of the previous definition
+
+--fixed by moving from nisa.h to nisa.c
+--#undef REAL_VALUE_ATOF and then define
+
+``````````````````````````````````
+can i fix the following?
+
+warning: return discards qualifiers from pointer target type
+initialization discards qualifiers from pointer target type
+======
+warning: destination operand 0 allows non-lvalue
+reload.c:2070: warning: enumeration value `US_PLUS' not handled in switch
+
+
+***i fixed ( nisa :1664 - :1685) by casting to appropriate data type.
+
+````````````````````````````
+--to fix the following warnings, i added the prototype of the functions in nisa.c to nisa-protos.h
+ warning: implicit declaration of function `nisa_gen_compare
+`````````````````````````````````````
+static int saved_dregs_no PARAMS((void));
+static int saved_pregs_no PARAMS((void));
+
+int save_area_size ()
+int new_save_instr ()
+int frame_pointer_required ()
+````````````````````````````````````
+do the diff with gcc.c r1.2 and r1.3
+first compare the configure.in file ( nisa-gcc and	 gcc-nisa-3 merged one )
+
+
+vim doc/gccint.info +7317
+``````````````````````````````````
+1.structure return converntion
+
+From
+#define STRUCTURE_SIZE_BOUNDARY       32 /*RAJA biggest_alignment old - 8*/
+To
+#define STRUCTURE_SIZE_BOUNDARY       8
+
+#define DEFAULT_PCC_STRUCT_RETURN 0
+#define RETURN_IN_MEMORY(TYPE) bfin_return_in_memory(TYPE)
+
+bfin_return_in_memory() is added.
+
+```````````````````````````
+2.structure pass convention
+
+function_arg_partial_nregs is modified to return the no of words to pass through register.
+====
+i also include the BLKmode (if bytes > 0), DImode also in the list of allowable mode to pass through reg (nisa.c :1065)
+====
+in nisa.c:1023
+From:
+    cum->nregs--;
+To:
+
+  if (mode == BLKmode)
+    cum->nregs -= words;
+  else
+    cum->nregs--;
+====
+also fixed some of the warnings
+cvs diff -r1.6 -r1.5 nisa.c
+cvs diff -r1.7 -r1.6 nisa.h
+====
+/home/adicvs/gcc/compilation_error,v  <--  compilation_error
+new revision: 1.4; previous revision: 1.3
+
+/home/adicvs/gcc/gcc/config/nisa/nisa-protos.h,v  <--  nisa-protos.h
+new revision: 1.4; previous revision: 1.3
+
+/home/adicvs/gcc/gcc/config/nisa/nisa.c,v  <--  nisa.c
+new revision: 1.6; previous revision: 1.5
+
+/home/adicvs/gcc/gcc/config/nisa/nisa.h,v  <--  nisa.h
+new revision: 1.7; previous revision: 1.6
+
+/home/adicvs/gcc/gcc/config/nisa/nisa.md,v  <--  nisa.md
+new revision: 1.6; previous revision: 1.5
+====
+
+````````````````````````````
+in nisa.c 
+macro TARGET_ASM_NAMED_SECTION is defined in nisa.c to swith into generic section to support -g option.
+``````````````````````````
+````````````````````

@@ -1,0 +1,33 @@
+? gcc/config/m68k/.sun3.h.swp -- done
+? gcc/config/nisa -- done
+? gcc/testsuite
+? gcc/objc
+? gcc/java
+? gcc/f
+? gcc/cp
+? gcc/ch
+? gcc/autom4te.cache
+? gcc/.cccp.c.swp
+? testsuite
+? libstdc++
+? libobjc
+? libio
+? libf2c
+? libchill
+
+
+```````nisa~~~~~~~~~~~~~~
+
+? gcc/config/nisa/crt0-nisa.c -- done
+? gcc/config/nisa/elf.h -- done
+? gcc/config/nisa/lib1funcs.asm -- done
+? gcc/config/nisa/nisa.c -- done
+? gcc/config/nisa/nisa.h -- done
+? gcc/config/nisa/nisa.md -- done
+? gcc/config/nisa/t-nisa -- done 
+? gcc/config/nisa/t-nisa-elf -- done
+? gcc/config/nisa/version.h -- done
+? gcc/config/nisa/xm-i386.h -- done
+? gcc/config/nisa/xm-nisa.h -- done
+
+
