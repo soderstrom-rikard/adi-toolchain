@@ -456,7 +456,8 @@ ALL_EMULATIONS = \
 	evsta.o \
 	ew65.o \
 	ez8001.o \
-	ez8002.o
+	ez8002.o \
+	ebfin.o
 
 
 ALL_64_EMULATIONS = \
@@ -2102,6 +2103,9 @@ ez8001.c: $(srcdir)/emulparams/z8001.sh \
 ez8002.c: $(srcdir)/emulparams/z8002.sh \
   $(srcdir)/emultempl/generic.em $(srcdir)/scripttempl/z8000.sc ${GEN_DEPENDS}
 	${GENSCRIPTS} z8002 "$(tdir_z8002)"
+ebfin.c: $(srcdir)/emulparams/bfin.sh \
+  $(srcdir)/emultempl/generic.em $(srcdir)/scripttempl/bfin.sc ${GEN_DEPENDS}
+	${GENSCRIPTS} bfin "$(tdir_bfin)"
 
 # The generated emulation files mostly have the same dependencies.
 $(EMULATION_OFILES): ../bfd/bfd.h sysdep.h config.h $(INCDIR)/bfdlink.h \
