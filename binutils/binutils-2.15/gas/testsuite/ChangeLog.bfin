@@ -1,3 +1,13 @@
+2004-12-13  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/store.s: New.
+	* gas/bfin/store.d: New.
+	* gas/bfin/video.s: New.
+	* gas/bfin/video.d: New.
+	* gas/bfin/move.s: New.
+	* gas/bfin/move.d: New.
+	* gas/bfin/bfin.exp: Update to run new tests.
+
 2004-12-10  Catherine Moore  <clm@cm00re.com>
 	
 	* gas/bfin/event.s: New.
