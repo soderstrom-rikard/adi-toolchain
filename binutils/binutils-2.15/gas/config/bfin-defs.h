@@ -108,7 +108,7 @@ enum machine_registers {
 // status register flags
 //
 enum statusflags {
-	S_AZ = 0, S_AN, S_AC,
+	S_AZ = 0, S_AN,
 	S_AQ = 6,
 	S_AC0 = 12, S_AC1,
 	S_AV0 = 16, S_AV0S, S_AV1, S_AV1S,

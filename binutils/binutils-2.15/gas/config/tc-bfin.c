@@ -106,7 +106,6 @@ static const struct bfin_reg_entry bfin_reg_info[] =
   { "L3", REG_L3 },
   { "AZ", S_AZ },
   { "AN", S_AN },
-  { "AC", S_AC},
   { "AC0", S_AC0 },
   { "AC1", S_AC1 },
   { "AV0", S_AV0 },

@@ -1,0 +1,5 @@
+2004-10-03  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin-defs.h (enum statusflags): Delete S_AC.
+	* config/bfin-lex.l: Don't recognize AC as a keyword.
+	* config/tc-bfin.c (bfin_reg_info): Remove it here as well.

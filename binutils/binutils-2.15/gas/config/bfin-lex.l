@@ -211,7 +211,6 @@ b|B                                     return B;
 az|AZ     _REG.regno = S_AZ;   return MODIFIED_STATUS_REG;
 an|AN     _REG.regno = S_AN;   return MODIFIED_STATUS_REG;
 aq|AQ     _REG.regno = S_AQ;   return MODIFIED_STATUS_REG;
-ac|AC     _REG.regno = S_AC;   return MODIFIED_STATUS_REG;
 ac0|AC0   _REG.regno = S_AC0;  return MODIFIED_STATUS_REG;
 ac1|AC1   _REG.regno = S_AC1;  return MODIFIED_STATUS_REG;
 av0|AV0   _REG.regno = S_AV0;  return MODIFIED_STATUS_REG;
