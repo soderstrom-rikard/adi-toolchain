@@ -1,3 +1,7 @@
+2005-01-17  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/load.d: Update expected output.
+
 2005-01-12  Catherine Moore  <clm@cm00re.com>
 
 	* gas/bfin/arithmetic.d: Conditionalize expected output.

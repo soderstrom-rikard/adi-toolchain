@@ -19,9 +19,9 @@ Disassembly of section .text:
   2c:	8f e1 20 ff 	FP=ff20 <load_data2\+0xfe35>\(Z\);
   30:	9e e1 20 00 	L2=20 <load_immediate\+0x20>\(Z\);
   34:	85 e1 00 00 	R5=0 <load_immediate>\(Z\);
-  38:	08 c4 3f 00 	A0=0;
-  3c:	08 c4 3f 40 	A1=0;
-  40:	08 c4 3f 80 	A1=A0=0;
+  38:	08 c4 [0-3][[:xdigit:]] 00 	A0=0;
+  3c:	08 c4 [0-3][[:xdigit:]] 40 	A1=0;
+  40:	08 c4 [0-3][[:xdigit:]] 80 	A1=A0=0;
   44:	02 62       	R2=-64\(x\);
   46:	20 e1 7f 00 	R0=0x7f \(X\);
   4a:	02 68       	P2=0x0;
@@ -30,8 +30,8 @@ Disassembly of section .text:
   50:	3f e1 00 08 	L3=0x800 \(X\);
   54:	36 e1 ff 7f 	M2=0x7fff \(X\);
   58:	81 60       	R1=0x10\(x\);
-  5a:	9c e1 00 00 	L0=0x0 \(X\);
-  5e:	87 e1 00 00 	R7=0xeb \(X\);
+  5a:	3c e1 00 00 	L0=0x0 \(X\);
+  5e:	27 e1 eb 00 	R7=0xeb \(X\);
 
 00000062 <load_pointer_register>:
   62:	7e 91       	SP=\[FP\];
@@ -41,7 +41,7 @@ Disassembly of section .text:
   6a:	3b ac       	P3=\[FP\+0x0];
   6c:	3c e5 ff 7f 	P4=\[FP\+0x1fffc\];
   70:	3e e5 01 80 	SP=\[FP\+-131068\];
-  74:	26 ac       	SP=\[P4\];
+  74:	26 ac       	SP=\[P4\+0x0\];
   76:	0d b8       	P5=\[FP-128\];
 
 00000078 <load_data_register>:
@@ -50,7 +50,7 @@ Disassembly of section .text:
   7c:	a5 90       	R5=\[P4--\];
   7e:	bc a2       	R4=\[FP\+0x28\];
   80:	33 e4 ff 7f 	R3=\[SP\+0x1fffc\];
-  84:	32 a0       	R2=\[SP\];
+  84:	32 a0       	R2=\[SP\+0x0\];
   86:	39 e4 01 80 	R1=\[FP\+-131068\];
   8a:	06 80       	R0=\[SP\+\+P0\];
   8c:	05 b8       	R5=\[FP-128\];
