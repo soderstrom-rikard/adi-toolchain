@@ -1,3 +1,10 @@
+2005-03-29  Srivathsa  <sri@rrap-software.com>
+
+	* Makefile.in : removes config.cache on distclean
+	* Makefile, config.cache, config.log,
+	config.status, make.log, config.h, stamp-h :
+	removed generated files
+
 2005-03-24  Srivathsa  <sri@rrap-software.com>
 
 	* configure.srv (case "${target}" in bfin*-*-*) : 
