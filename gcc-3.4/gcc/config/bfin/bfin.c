@@ -1137,7 +1137,7 @@ print_operand (FILE *file, rtx x, char code)
 	case SYMBOL_REF:
 	  output_addr_const (file, x);
 	  if (code == 'G' && flag_pic)
-	    fprintf (file, "@PLTPC");
+	    fprintf (file, "@GOT");
 	  break;
 
 	case CONST_DOUBLE:
@@ -1639,9 +1639,14 @@ call_insn_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
   if (GET_CODE (op) == CONST_INT)
     return 0;
 
-  /* Explicitly allow SYMBOL_REF even if pic.  */
   if (GET_CODE (op) == SYMBOL_REF)
-    return 1;
+    {
+	if(flag_pic)
+	    return 0;
+	else
+	    /* Explicitly allow SYMBOL_REF if not pic.  */
+	    return 1;
+    }
 
   /* Otherwise we can allow any nonmemory_operand in the address.  */
   return nonmemory_operand (op, Pmode);
