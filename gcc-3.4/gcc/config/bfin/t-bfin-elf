@@ -30,8 +30,6 @@ LIB2FUNCS = _muldi3 _divdi3 _moddi3 _udivdi3 _umoddi3 _negdi2 \
     _bb _shtab _clear_cache _trampoline __main _exit \
     _ctors _pure \
 
-LANGUAGES = c
-
 #cpp_install_dir=$(prefix)/bin
 #CROSS_INCLUDE_DIR=$(tooldir)/include
 #INSTALL_HEADERS=

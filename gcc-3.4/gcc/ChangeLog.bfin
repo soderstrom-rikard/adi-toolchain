@@ -10,6 +10,9 @@
 	* config/bfin/bfin.h (PREDICATE_CODES): Add symbolic_operand.
 	* config/bfin/bfin.c (symbolic_operand): New function.
 
+	* config/bfin/t-bfin (LANGUAGES): Delete.
+	* config/bfin/t-bfin-elf (LANGUAGES): Likewise.
+
 2004-11-16  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* combine.c (simplify_and_const_int): Try to turn XOR inside a shift
