@@ -1376,12 +1376,9 @@ static INSTR_T ExprNodeGenRelocR(ExprNode *head)
 #include "bfin-aux.h"
 #include "../opcodes/bfin-opcodes.h"
 
-#define INIT(t)  t c_code; c_code.opcode = init_##t;
-
-#define _BF c_code.bits
-
-#define ASSIGN(x) _BF.x = x
-#define ASSIGN_R(x) _BF.x = x ? (x->regno & CODE_MASK) : 0
+#define INIT(t)  t c_code; c_code = init_##t
+#define ASSIGN(x) c_code.opcode |= ((x & c_code.mask_##x)<<c_code.bits_##x)
+#define ASSIGN_R(x) c_code.opcode |= (((x ? (x->regno & CODE_MASK) : 0) & c_code.mask_##x)<<c_code.bits_##x)
 
 #define HI(x) ((x >> 16) & 0xffff)
 #define LO(x) ((x      ) & 0xffff)
@@ -1507,22 +1504,26 @@ gen_dsp32shiftimm(int sopcde, REG_T dst0, int immag, REG_T src1,
 ///////////////////////////////////////////////////////////////////////////
 // LOOP SETUP
 
-INSTR_T
-gen_loopsetup(ExprNode *soffset, REG_T c, int rop, ExprNode *eoffset, REG_T reg)
-{
-	INIT(LoopSetup);
 
-	_BF.soffset = EXPR_VALUE(soffset) >> 1;
-	_BF.eoffset = EXPR_VALUE(eoffset) >> 1;
+INSTR_T
+gen_loopsetup(ExprNode *psoffset, REG_T c, int rop, ExprNode *peoffset, REG_T reg)
+{
+	int soffset, eoffset;
+	INIT(LoopSetup);
+	
+	soffset = (EXPR_VALUE(psoffset) >> 1);
+	ASSIGN(soffset);
+	eoffset = (EXPR_VALUE(peoffset) >> 1);
+	ASSIGN(eoffset);
 	ASSIGN(rop);
 	ASSIGN_R(c);
 	ASSIGN_R(reg);
 
 	return
 		CONSCODE(GENCODE(HI(c_code.opcode)),
-		conctcode(ExprNodeGenReloc(soffset, BFD_RELOC_5_PCREL),
+		conctcode(ExprNodeGenReloc(psoffset, BFD_RELOC_5_PCREL),
 			  conctcode(GENCODE(LO(c_code.opcode)),
-		          ExprNodeGenReloc(eoffset, BFD_RELOC_11_PCREL))));
+		          ExprNodeGenReloc(peoffset, BFD_RELOC_11_PCREL))));
 
 }
 
@@ -1536,12 +1537,10 @@ gen_calla(ExprNode *addr, int S)
 	int high_val;
 
 	INIT(CALLa);
-	//int val;
 	ASSIGN(S);
+	
 	val = EXPR_VALUE(addr) >> 1;
 	high_val = val >> 16;
-	//printf("call %x\n", val << 1);
-	// _BF.addr = val;
 
 	return CONSCODE(GENCODE(HI(c_code.opcode) | LO(high_val)),
 		ExprNodeGenReloc(addr, 
@@ -1564,9 +1563,10 @@ gen_linkage(int R, int framesize)
 // LOAD / STORE
 
 INSTR_T
-gen_ldimmhalf(REG_T reg, int H, int S, int Z, ExprNode *hword, int reloc)
+gen_ldimmhalf(REG_T reg, int H, int S, int Z, ExprNode *phword, int reloc)
 {
-	unsigned val = EXPR_VALUE(hword);
+	int grp, hword;
+	unsigned val = EXPR_VALUE(phword);
 	INIT(LDIMMhalf);
 
 	ASSIGN(H);
@@ -1575,26 +1575,28 @@ gen_ldimmhalf(REG_T reg, int H, int S, int Z, ExprNode *hword, int reloc)
 
 	ASSIGN_R(reg);
 	// determine group:
-	_BF.grp = GROUP(reg);
-        
+	grp = (GROUP(reg));
+        ASSIGN(grp);
 	if(reloc == 2) { //Relocation 5 , rN = <preg>
 		return CONSCODE(GENCODE(HI(c_code.opcode)),
-			ExprNodeGenReloc(hword, BFD_RELOC_16_IMM));
+			ExprNodeGenReloc(phword, BFD_RELOC_16_IMM));
 	}
 	else if (reloc == 1) {
 		return CONSCODE(GENCODE(HI(c_code.opcode)),
-				ExprNodeGenReloc(hword,
+				ExprNodeGenReloc(phword,
 					IS_H(*reg) ? BFD_RELOC_16_HIGH : BFD_RELOC_16_LOW));
 	} else {
-		_BF.hword = val;
+		hword = val;
+		ASSIGN(hword);
 	}
 	return GEN_OPCODE32();
 }
 
 INSTR_T
 gen_ldstidxi(REG_T ptr, REG_T reg, int W, int sz, int Z,
-             ExprNode *offset)
+             ExprNode *poffset)
 {
+	int offset;
 	int value = 0;
 	INIT(LDSTidxI);
 
@@ -1610,20 +1612,21 @@ gen_ldstidxi(REG_T ptr, REG_T reg, int W, int sz, int Z,
 	ASSIGN(sz);
 	switch (sz) { // load/store access size
 		case 0: // 32 bit
-			value = EXPR_VALUE(offset) >> 2;
+			value = EXPR_VALUE(poffset) >> 2;
 			break;
 		case 1: // 16 bit
-			value = EXPR_VALUE(offset) >> 1;
+			value = EXPR_VALUE(poffset) >> 1;
 			break;
 		case 2: // 8 bit
-			value = EXPR_VALUE(offset);
+			value = EXPR_VALUE(poffset);
 			break;
 	}
 
 
 	ASSIGN(Z);
-	_BF.offset = value & 0xffff;
-	
+
+	offset = (value & 0xffff);
+	ASSIGN(offset);
 	return GEN_OPCODE32();
 }
 
@@ -1651,8 +1654,9 @@ gen_ldst(REG_T ptr, REG_T reg, int aop, int sz, int Z, int W)
 }
 
 INSTR_T
-gen_ldstii(REG_T ptr, REG_T reg, ExprNode *offset, int W, int op)
+gen_ldstii(REG_T ptr, REG_T reg, ExprNode *poffset, int W, int op)
 {
+	int offset;
 	int value = 0;
 	INIT(LDSTii);
 
@@ -1665,11 +1669,11 @@ gen_ldstii(REG_T ptr, REG_T reg, ExprNode *offset, int W, int op)
 	switch (op) {
 		case 1:  // W [ ]
 		case 2:
-			value = EXPR_VALUE(offset) >> 1;
+			value = EXPR_VALUE(poffset) >> 1;
 			break;
 		case 0:
 		case 3:
-			value = EXPR_VALUE(offset) >> 2;
+			value = EXPR_VALUE(poffset) >> 2;
 			break;
 	}
 
@@ -1677,7 +1681,8 @@ gen_ldstii(REG_T ptr, REG_T reg, ExprNode *offset, int W, int op)
 	ASSIGN_R(ptr);
 	ASSIGN_R(reg);
 
-	_BF.offset = value;
+	offset = value;
+	ASSIGN(offset);
 	ASSIGN(W);
 	ASSIGN(op);
 
@@ -1685,13 +1690,15 @@ gen_ldstii(REG_T ptr, REG_T reg, ExprNode *offset, int W, int op)
 }
 
 INSTR_T
-gen_ldstiifp(REG_T reg, ExprNode *offset, int W)
+gen_ldstiifp(REG_T sreg, ExprNode *poffset, int W)
 {
-	INIT(LDSTiiFP);
-
+	int offset, reg;
 	// set bit 4 if it's a Preg:
-	_BF.reg = (reg->regno & CODE_MASK) | (IS_PREG(*reg) ? 0x8 : 0x0);
-	_BF.offset = -EXPR_VALUE(offset) >> 2;
+	reg = (sreg->regno & CODE_MASK) | (IS_PREG(*sreg) ? 0x8 : 0x0);
+	offset = -EXPR_VALUE(poffset) >> 2;
+	INIT(LDSTiiFP);
+	ASSIGN(reg);
+	ASSIGN(offset);
 	ASSIGN(W);
 
 	return GEN_OPCODE16();
@@ -1738,27 +1745,30 @@ gen_logi2op(int opc, int src, int dst)
 }
 
 INSTR_T
-gen_brcc(int T, int B, ExprNode *offset)
+gen_brcc(int T, int B, ExprNode *poffset)
 {
+	int offset;
 	INIT(BRCC);
 
 	ASSIGN(T);
 	ASSIGN(B);
-	_BF.offset = (EXPR_VALUE(offset) >> 1);
-
+	offset = ((EXPR_VALUE(poffset) >> 1));
+	ASSIGN(offset);
 	return CONSCODE(GENCODE(c_code.opcode), 
-		ExprNodeGenReloc(offset, BFD_RELOC_10_PCREL));
+		ExprNodeGenReloc(poffset, BFD_RELOC_10_PCREL));
 }
 
 INSTR_T
-gen_ujump(ExprNode *offset)
+gen_ujump(ExprNode *poffset)
 {
+	int offset;
 	INIT(UJump);
 
-	_BF.offset = (EXPR_VALUE(offset) >> 1);
+	offset = ((EXPR_VALUE(poffset) >> 1));
+	ASSIGN(offset);
 
 	return CONSCODE(GENCODE(c_code.opcode),
-		ExprNodeGenReloc(offset, BFD_RELOC_12_PCREL_JUMP_S));
+		ExprNodeGenReloc(poffset, BFD_RELOC_12_PCREL_JUMP_S));
 }
 
 INSTR_T
@@ -1864,12 +1874,15 @@ gen_ccflag(REG_T x, int y, int opc, int I, int G)
 INSTR_T
 gen_ccmv(REG_T src, REG_T dst, int T)
 {
+	int s,d;
 	INIT(CCmv);
 
 	ASSIGN_R(src);
 	ASSIGN_R(dst);
-	_BF.s = GROUP(src);
-	_BF.d = GROUP(dst);
+	s = (GROUP(src));
+	ASSIGN(s);
+	d = (GROUP(dst));
+	ASSIGN(d);
 	ASSIGN(T);
 
 	return GEN_OPCODE16();
@@ -1890,13 +1903,16 @@ gen_cc2stat(int cbit, int op, int D)
 INSTR_T
 gen_regmv(REG_T src, REG_T dst)
 {
+	int gs,gd;
 	INIT(RegMv);
 
 	ASSIGN_R(src);
 	ASSIGN_R(dst);
-
-	_BF.gs = GROUP(src);
-	_BF.gd = GROUP(dst);
+	
+	gs = (GROUP(src));
+	ASSIGN(gs);
+	gd = (GROUP(dst));
+	ASSIGN(gd);
 
 	return GEN_OPCODE16();
 }
@@ -1952,10 +1968,12 @@ gen_pushpopmultiple(int dr, int pr, int d, int p, int W)
 INSTR_T
 gen_pushpopreg(REG_T reg, int W)
 {
+	int grp;
 	INIT(PushPopReg);
 
-	ASSIGN_R(reg);
-	_BF.grp = GROUP(reg);
+	ASSIGN_R(reg);	
+	grp = (GROUP(reg));
+	ASSIGN(grp);
 	ASSIGN(W);
 
 	return GEN_OPCODE16();
