@@ -1228,6 +1228,12 @@ ADI Blackfin Call.x not implemented
 @deffn {} BFD_RELOC_24_PCREL_JUMP_L
 ADI Blackfin Long Jump pcrel
 @end deffn
+@deffn {} BFD_RELOC_BFIN_GOT
+  ADI Blackfin GOT relocation
+@end deffn
+@deffn {} BFD_RELOC_BFIN_PLTPC
+  ADI Blackfin PLTPC relocation
+@end deffn
 @deffn {} BFD_ARELOC_PUSH
 ADI Blackfin Arith reloc
 @end deffn

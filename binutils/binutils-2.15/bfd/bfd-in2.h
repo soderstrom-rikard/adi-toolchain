@@ -2812,6 +2812,9 @@ through 0.  */
 /* ADI Blackfin Long Jump pcrel  */
   BFD_RELOC_24_PCREL_JUMP_L,
 
+  BFD_RELOC_BFIN_GOT,
+  BFD_RELOC_BFIN_PLTPC,
+
 /* ADI Blackfin Arith reloc  */
   BFD_ARELOC_PUSH,
 

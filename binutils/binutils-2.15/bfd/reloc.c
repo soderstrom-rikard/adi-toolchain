@@ -2880,6 +2880,14 @@ ENUM
 ENUMDOC
   ADI Blackfin Long Jump pcrel
 ENUM
+  BFD_RELOC_BFIN_GOT
+ENUMDOC
+  ADI Blackfin GOT relocation
+ENUM
+  BFD_RELOC_BFIN_PLTPC
+ENUMDOC
+  ADI Blackfin PLTPC relocation
+ENUM
   BFD_ARELOC_PUSH
 ENUMDOC
   ADI Blackfin Arith reloc

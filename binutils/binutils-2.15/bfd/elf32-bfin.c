@@ -183,7 +183,39 @@ bfin_unused_reloc(bfd* abfd ATTRIBUTE_UNUSED,
   return bfd_reloc_undefined;
 }
 
+/* FUNCTION : bfin_got_reloc
+   ABSTRACT : TODO : figure out how to handle got relocs
+*/
+static bfd_reloc_status_type
+bfin_got_reloc (
+     bfd *abfd,
+     arelent *reloc_entry,
+     asymbol *symbol,
+     PTR data,
+     asection *input_section,
+     bfd *output_bfd,
+     char **error_message ATTRIBUTE_UNUSED) 
+{
+  bfd_reloc_status_type flag = bfd_reloc_ok;
+  return flag; 
+}
 
+/* FUNCTION : bfin_pltpc_reloc
+   ABSTRACT : TODO : figure out how to handle pltpc relocs
+*/
+static bfd_reloc_status_type
+bfin_pltpc_reloc (
+     bfd *abfd,
+     arelent *reloc_entry,
+     asymbol *symbol,
+     PTR data,
+     asection *input_section,
+     bfd *output_bfd,
+     char **error_message ATTRIBUTE_UNUSED) 
+{
+  bfd_reloc_status_type flag = bfd_reloc_ok;
+  return flag; 
+}
 /* FUNCTION : bfin_bfd_reloc
    ABSTRACT : Very similar to the bfd_perform_relocation in reloc.c
               It understands the blackfin arithmetic relocations
@@ -1036,32 +1068,32 @@ static reloc_howto_type bfin_elf_howto_table[] =
 
 
   /* A standard 32 bit relocation.  */
-  HOWTO (R_unused14,               /* type */
-         0,                     /* rightshift */
-         2,                     /* size (0 = byte, 1 = short, 2 = long) */
-         16,                    /* bitsize */
-         FALSE,                 /* pc_relative */
-         0,                     /* bitpos */
-         complain_overflow_bitfield, /* complain_on_overflow */
-         bfin_unused_reloc, /* special_function */
-         "R_abs16",             /* name */
-         FALSE,                 /* partial_inplace */
-         0x0000ffff,            /* src_mask */
-         0x0000ffff,            /* dst_mask */
-         FALSE),                /* pcrel_offset */
-  /* A standard 32 bit relocation.  */
-     HOWTO (R_unused15,               /* type */
+     HOWTO (R_pltpc,               /* type */
              0,                     /* rightshift */
-             2,                     /* size (0 = byte, 1 = short, 2 = long) */
-             32,                    /* bitsize */
+             1,                     /* size (0 = byte, 1 = short, 2 = long) */
+             16,                    /* bitsize */
              FALSE,                 /* pc_relative */
              0,                     /* bitpos */
              complain_overflow_bitfield, /* complain_on_overflow */
-             bfin_unused_reloc, /* special_function */
-             "R_abs32",             /* name */
+             bfin_pltpc_reloc, /* special_function */
+             "R_pltpc",             /* name */
              FALSE,                 /* partial_inplace */
-             0xffffffff,            /* src_mask */
-             0xffffffff,            /* dst_mask */
+             0xffff,            /* src_mask */
+             0xffff,            /* dst_mask */
+             FALSE),                /* pcrel_offset */
+  /* A standard 32 bit relocation.  */
+     HOWTO (R_got,               /* type */
+             0,                     /* rightshift */
+             1,                     /* size (0 = byte, 1 = short, 2 = long) */
+             16,                    /* bitsize */
+             FALSE,                 /* pc_relative */
+             0,                     /* bitpos */
+             complain_overflow_bitfield, /* complain_on_overflow */
+             bfin_got_reloc, /* special_function */
+             "R_got",             /* name */
+             FALSE,                 /* partial_inplace */
+             0xffff,            /* src_mask */
+             0xffff,            /* dst_mask */
              FALSE),                /* pcrel_offset */
      
   //Arithmetic relocations entries
@@ -1148,6 +1180,8 @@ static const struct bfin_reloc_map {
 	{ BFD_RELOC_16, R_byte2_data},
 	{ BFD_RELOC_32, R_byte4_data},
 	{ BFD_RELOC_11_PCREL, R_pcrel11},
+	{ BFD_RELOC_BFIN_GOT, R_got},
+	{ BFD_RELOC_BFIN_PLTPC, R_pltpc},
 
 	{ BFD_ARELOC_PUSH, R_push},
 	{ BFD_ARELOC_CONST, R_const},
