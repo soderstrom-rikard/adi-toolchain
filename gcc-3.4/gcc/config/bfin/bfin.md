@@ -300,13 +300,9 @@
 
 ;;; Future work: split constants in expand
 
-;; Note: Constraints are chosen so that reload can form the union of classes
-;; sequentially (e.g., for "fcr", the class is built up as
-;; MREGS, DAGREGS, MOST_REGS).
-
 (define_insn "*movsi_insn"
-  [(set (match_operand:SI 0 "nonimmediate_operand" "=da ,  *cf,  d, a,  mr, !*e, !*e, !d, !d, !C")
-        (match_operand:SI 1 "general_operand"      "fcri, fcri, mr, mr, da,   d,  eP, *e,  C, d"))]
+  [(set (match_operand:SI 0 "nonimmediate_operand" "=da,*cf,  d, a,  mr, !*e, !*e, !d, !d, !C")
+        (match_operand:SI 1 "general_operand"      " xi, xi, mr, mr, da,   d,  eP, *e,  C, d"))]
 
   ""
   "*
@@ -316,8 +312,8 @@
   [(set_attr "type" "move,move,mcld,mcldp,mcst,move,move,move,compare,compare")])
 
 (define_insn "*movhi_insn"
-  [(set (match_operand:HI 0 "nonimmediate_operand" "=da ,  *cf, d, mr, !*e, !*e, !d, !d, !C")
-        (match_operand:HI 1 "general_operand"      "fcri, fcri, mr, d,   d,  eP, *e,  C, d"))]
+  [(set (match_operand:HI 0 "nonimmediate_operand" "=da,*cf, d, mr, !*e, !*e, !d, !d, !C")
+        (match_operand:HI 1 "general_operand"      " xi, xi, mr, d,   d,  eP, *e,  C, d"))]
   ""
   "*
    output_load_immediate (operands);
@@ -326,8 +322,8 @@
   [(set_attr "type" "move,move,mcld,mcst,move,move,move,compare,compare")])
 
 (define_insn "*movqi_insn"
-  [(set (match_operand:QI 0 "nonimmediate_operand" "=da ,  *cf, d, mr, !*e, !*e, !d, !d, !C")
-        (match_operand:QI 1 "general_operand"      "fcri, fcri, mr, d,   d,  eP, *e,  C, d"))]
+  [(set (match_operand:QI 0 "nonimmediate_operand" "=da,*cf, d, mr, !*e, !*e, !d, !d, !C")
+        (match_operand:QI 1 "general_operand"      " xi, xi, mr, d,   d,  eP, *e,  C, d"))]
   ""
   "*
    output_load_immediate (operands);
@@ -336,8 +332,8 @@
   [(set_attr "type" "move,move,mcld,mcst,move,move,move,compare,compare")])
 
 (define_insn "*movsf_insn"
-  [(set (match_operand:SF 0 "nonimmediate_operand" "=da ,  *cf,  d,  a, mr, !*e, !*e, !d, !d, !C")
-        (match_operand:SF 1 "general_operand"      "fcri, fcri, mr, mr, da,   d,  eP, *e,  C, d"))]
+  [(set (match_operand:SF 0 "nonimmediate_operand" "=da,*cf,  d,  a, mr, !*e, !*e, !d, !d, !C")
+        (match_operand:SF 1 "general_operand"      " xi, xi, mr, mr, da,   d,  eP, *e,  C, d"))]
   ""
   "*
   {
@@ -812,82 +808,51 @@
 ;;;------------------------------------------------------------
 ;;;
 
-;; Avoid too many reloads
+;; A pattern to reload the equivalent of
+;;   (set (Dreg) (plus (FP) (large_constant)))
+;; using a scratch register
+(define_expand "reload_insi"
+  [(parallel [(set (match_operand:SI 0 "register_operand" "=x")
+                   (match_operand:SI 1 "fp_plus_const_operand" ""))
+              (clobber (match_operand:SI 2 "register_operand"    "=&a"))])]
+  ""
+  "
+{
+  rtx fp_op = XEXP (operands[1], 0);
+  rtx const_op = XEXP (operands[1], 1);
+  rtx primary = operands[0];
+  rtx scratch = operands[2];
+
+  emit_move_insn (scratch, const_op);
+  emit_insn (gen_addsi3 (scratch, scratch, fp_op));
+  emit_move_insn (primary, scratch);
+  DONE;
+}")    
+
 (define_expand "addsi3"
   [(set (match_operand:SI 0 "register_operand"           "")
 	(plus:SI (match_operand:SI 1 "simple_reg_operand" "")
-		 (match_operand:SI 2 "nonmemory_operand" "")))]
+		 (match_operand:SI 2 "reg_or_7bit_operand" "")))]
   ""
-  ""
-)
+  "")
 
 (define_insn ""
-  [(set (match_operand:SI 0 "register_operand"           "=ad,  a, d, &a, &d,  b,  f, fb, &d, &a")
-	(plus:SI (match_operand:SI 1 "register_operand"  " %0,  a, d,  a,  d,  b,  f, fb,  a,  d")
-		 (match_operand:SI 2 "nonmemory_operand" "  M,  a, d,  i,  i,  M,  M,  i,  M,  M")))]
+  [(set (match_operand:SI 0 "register_operand"           "=ad,a,d,b")
+	(plus:SI (match_operand:SI 1 "register_operand"  "%0, a,d,0")
+		 (match_operand:SI 2 "reg_or_7bit_operand" " M, a,d,M")))]
   ""
-  "*
-    {
-	static const char *const strings_addsi3[] = {
-	\"%0+=%2;\",
-	\"%0=%1+%2;\",
-	\"%0=%1+%2;\",
-	\"%0=%0+%1; //immed->Preg \",
-	\"%0=%0+%1; //immed->Dreg \",
-	\"M3=%2;\\n\\t%0+=M3;\",
-	\"[--SP] = R3;\\n\\tR3=%0;\\n\\tR3+=%2;\\n\\t%0=R3;\\n\\tR3 = [SP++];\",
-	\"[--SP] = R3;\\n\\tR3 = %0;\\n\\tA0 = R3;\\n\\tA1 = %2;\\n\\tR3 = (A0 += A1);\\n\\t%0 = R3;\\n\\tR3 = [SP++];\",
-	\"%0 = %1;\\n\\t%0 += %2 (X);\",
-	\"%0 = %1;\\n\\t%0 += %2 (X);\",
-	};
-	
-        if ((which_alternative == 3 || which_alternative == 4) && REGNO(operands[0]) == REGNO(operands[1])) {
-          int i,last_reg;
-
-	  (which_alternative == 3) ? (last_reg = LAST_USER_PREG) : (last_reg = LAST_USER_DREG);
-	  (which_alternative == 3) ? (i = 8) : (i = 0);
-
-          for (; i < last_reg; i++)
-             if (i != REGNO (operands[0])) {
-               char buf[128];
-               rtx tmp = operands[0];
-               rtx tmp1 = operands[1];
-
-               sprintf (buf, \"[--SP] = %s;\", reg_names[i]);
-               output_asm_insn (buf, operands);
-
-               operands[0] =  gen_rtx_REG (SImode, i);
-               operands[1] = operands[2];
-               output_load_immediate (operands);
-               operands[0] = tmp;
-               operands[1] = tmp1;
-
-               sprintf (buf, \"%%0 = %%0 + %s;\", reg_names[i]);
-               output_asm_insn (buf, operands);
-
-               sprintf (buf, \"%s = [SP++];\", reg_names[i]);
-               output_asm_insn (buf, operands);          
-               return \"\";
-            }
-            abort();
-        }
- 
-	if (which_alternative < 5 && which_alternative > 2) {
-	  rtx tmp = operands[1];
- 	  operands[1] = operands[2];
-	  output_load_immediate (operands);
-	  operands[1] = tmp;
-	}
-
-        return strings_addsi3[which_alternative];
-     }"
-  [(set_attr "type" "alu0")])
-
-
+  "@
+   %0 += %2;
+   %0 = %1 + %2;
+   %0 = %1 + %2;
+   M3 = %2;\\n\\t%0 += M3;"
+  [(set_attr "type" "alu0")
+   (set_attr "length" "2,2,2,4")])
+  
 (define_expand "subsi3"
-  [(set (match_operand:SI 0 "register_operand"           "=d,a,d")
-	(minus:SI (match_operand:SI 1 "register_operand"  "0,0,d")
-		  (match_operand:SI 2 "nonmemory_operand" "M,aM,d")))]
+  [(set (match_operand:SI 0 "register_operand"            "")
+	(minus:SI (match_operand:SI 1 "register_operand"  "")
+		  (match_operand:SI 2 "nonmemory_operand" "")))]
   ""
   ""
 )
@@ -1204,9 +1169,11 @@
   rtx reg;
   if (operands[1] != const0_rtx)
     {
+      rtx tmp_const = GEN_INT (-INTVAL (operands[1]));
+      if (! imm7bit_operand_p (tmp_const, SImode))
+	tmp_const = force_reg (SImode, tmp_const);
       reg = gen_reg_rtx (SImode);
-      emit_insn (gen_addsi3 (reg, operands[0],
-                             GEN_INT (-INTVAL (operands[1]))));
+      emit_insn (gen_addsi3 (reg, operands[0], tmp_const));
       operands[0] = reg;
     }                                               
 

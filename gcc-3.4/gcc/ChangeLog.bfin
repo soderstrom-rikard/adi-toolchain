@@ -31,6 +31,27 @@
 	(symbolic_or_const_operand_p): Renamed from symbolic_operand_p; added
 	CONST_INT and CONST_DOUBLE.  All callers changed.
 
+	* config/bfin/bfin-protos.h (always_true): Remove.
+	(fp_plus_const_operand): Declare.
+	* config/bfin/bfin.c (always_true): Remove.
+	(fp_plus_const_operand): New function.
+	(secondary_input_reload): Handle reloading a PLUS of frame pointer
+	and large constant.  Add some braces to eliminate warning.
+	* config/bfin/bfin.h (enum reg_class, REG_CLASS_NAMES,
+	REG_CLASS_CONTENTS):  Remove extra GENERAL_REGS.
+	(GENERAL_REGS): Define as identical to DPREGS.
+	(REG_CLASS_FROM_LETTER): Use 'x' for MOST_REGS.
+	(PREDICATE_CODES): Add reg_or_7bit_operand.
+	* config/bfin/bfin.md (movsi_insn, movhi_insn, movqi_insn,
+	movsf_insn): Use new constraint letter 'x'.
+	(reload_insi): New pattern.
+	(addsi3 expander): Accept only valid constants in predicate.
+	(addsi3 insn): Reduce number of alternatives to exactly describe the
+	abilities of the machine.  Lose scratch register allocation kludge.
+	Set length attribute properly.
+	(subsi3): Remove constraints from define_expand pattern.
+	(casesi): Make sure we generate valid add insns.
+
 2004-09-01  Bernd Schmidt  <bernds@btinternet.com>
 
 	* config/bfin/bfin.c (imm7bit_operand, imm16bit_operand): Test for

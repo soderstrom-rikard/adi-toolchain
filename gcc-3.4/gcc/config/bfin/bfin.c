@@ -1615,6 +1615,23 @@ int
 reg_or_0_operand (rtx op, enum machine_mode mode) {
   return op == const0_rtx || register_operand (op, mode);
 }
+
+/* Used for secondary reloads, this function returns 1 if OP is of the
+   form (plus (fp) (const_int)), where CONST_INT can't be added in one
+   instruction.  */
+
+int
+fp_plus_const_operand (rtx op, enum machine_mode mode)
+{
+  rtx op1, op2;
+  if (GET_CODE (op) != PLUS)
+    return 0;
+  op1 = XEXP (op, 0);
+  op2 = XEXP (op, 1);
+  return (REG_P (op1) && REGNO (op1) == FRAME_POINTER_REGNUM
+	  && GET_CODE (op2) == CONST_INT && ! imm7bit_operand_p (op2, mode));
+}
+
 #undef MAX_COST
 #define MAX_COST 100
 
@@ -1653,6 +1670,12 @@ secondary_input_reload_class(enum reg_class class,enum machine_mode mode, rtx x)
 	x_class = REGNO_REG_CLASS (regno);
     }
 
+  /* We can be asked to reload (plus (FP) (large_constant)) into a DREG.
+     This happens as a side effect of register elimination, and we need
+     a scratch register to do it.  */
+  if (fp_plus_const_operand (x, mode))
+    return class == PREGS ? NO_REGS : PREGS;
+
   /* Data can usually be moved freely between registers of most classes.
      AREGS are an exception; they can only move to or from another register
      in AREGS or one in DREGS.  They can also be assigned the constant 0.  */
@@ -1660,10 +1683,12 @@ secondary_input_reload_class(enum reg_class class,enum machine_mode mode, rtx x)
     return class == DREGS || class == AREGS ? NO_REGS : DREGS;
 
   if (class == AREGS)
-    if (x != const0_rtx && x_class != DREGS)
-      return DREGS;
-    else
-      return NO_REGS;
+    {
+      if (x != const0_rtx && x_class != DREGS)
+	return DREGS;
+      else
+	return NO_REGS;
+    }
 
   /* All registers other than AREGS can load arbitrary constants.  The only
      case that remains is MEM.  */
@@ -1677,12 +1702,6 @@ enum reg_class
 secondary_output_reload_class(enum reg_class class,enum machine_mode mode, rtx x)
 {
   return secondary_input_reload_class(class,mode,x);
-}
-
-int
-always_true(rtx op ATTRIBUTE_UNUSED, enum machine_mode mode ATTRIBUTE_UNUSED)
-{
-  return (1);
 }
 
 void

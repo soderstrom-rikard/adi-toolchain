@@ -494,11 +494,12 @@ enum reg_class
   DAGREGS,
   AREGS,
   CCREGS,
-  GENERAL_REGS,
   MOST_REGS,
   ALL_REGS, LIM_REG_CLASSES
 };
 #define N_REG_CLASSES ((int)LIM_REG_CLASSES)
+
+#define GENERAL_REGS DPREGS
 
 /* Give names of register classes as strings for dump file.   */
 
@@ -516,7 +517,6 @@ enum reg_class
    "DAGREGS",		\
    "AREGS",		\
    "CCREGS",		\
-   "GENERAL_REGS",	\
    "MOST_REGS",	\
    "ALL_REGS" }
 
@@ -528,7 +528,8 @@ enum reg_class
    that register R is in the class if `MASK & (1 << R)' is 1
    where R is the define in register enumeration such as REG_I0 */
 /* Since we have more than 32 registers a longer version is used below */
-/* NOTE: DSP registers, IREGS - AREGS, are not GENERAL_REGS */
+/* NOTE: DSP registers, IREGS - AREGS, are not GENERAL_REGS.  We use
+   MOST_REGS as the union of DPREGS and DAGREGS.  */
 
 #define REG_CLASS_CONTENTS \
     /* 31 - 0       63-32   */ \
@@ -545,7 +546,6 @@ enum reg_class
      0xffff0000,    0,		/* DAGREGS */   \
      0x00000000,    0x3,	/* AREGS */   \
      0x00000000,    0x4,        /* CCREGS */  \
-     0x0000ffff,    0x0,	/* GENERAL_REGS */\
      0xffffffff,    0x0,	/* MOST_REGS */\
      0xffffffff,    0x7,	/* ALL_REGS */\
      /*0xffffffff,    0x3, */	}
@@ -580,6 +580,7 @@ enum reg_class
    (LETTER) == 'f' ? MREGS : 		\
    (LETTER) == 'c' ? CIRCREGS :         \
    (LETTER) == 'C' ? CCREGS : 		\
+   (LETTER) == 'x' ? MOST_REGS :	\
    NO_REGS)
 
 /* The same information, inverted:
@@ -1034,15 +1035,16 @@ do {                                              \
 #define PROMOTE_FUNCTION_RETURN
 
 /* Define the codes that are matched by predicates in bfin.c.  */
-#define PREDICATE_CODES                                                 	\
-  {"cc_operand", {REG}},					        	\
-  {"simple_reg_operand", {SUBREG, REG, ADDRESSOF}},        			\
-  {"scale_by_operand", {CONST_INT}},						\
-  {"pos_scale_operand", {CONST_INT}},                                   	\
-  {"regorbitclr_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},         	\
-  {"regorlog2_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},           	\
-  {"nonmemory_or_sym_operand", {CONST_INT, CONST_DOUBLE, CONST,			\
-			 SYMBOL_REF, LABEL_REF, SUBREG, REG, ADDRESSOF}},	\
+#define PREDICATE_CODES                                                	\
+  {"cc_operand", {REG}},				        	\
+  {"simple_reg_operand", {SUBREG, REG, ADDRESSOF}},     		\
+  {"scale_by_operand", {CONST_INT}},					\
+  {"pos_scale_operand", {CONST_INT}},                                  	\
+  {"reg_or_7bit_operand", {CONST_INT, REG}},				\
+  {"regorbitclr_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},        	\
+  {"regorlog2_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},          	\
+  {"nonmemory_or_sym_operand", {CONST_INT, CONST_DOUBLE, CONST,		\
+			 SYMBOL_REF, LABEL_REF, SUBREG, REG, ADDRESSOF}},
 
 /* Describing Relative Costs of Operations */
 
