@@ -1,3 +1,18 @@
+2004-10-13  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (simple_reg_operand): Delete.  All users replaced
+	with register_operand.
+	(valid_reg_operand): New function.
+	* config/bfin/bfin-protos.h (simple_reg_operand): Delete.
+	(valid_reg_operand): Declare.
+	* config/bfin/bfin.h (PREDICATE_CODES): Delete simple_reg_operand, add
+	valid_reg_operand.
+	* config/bfin/bfin.md (shiftadd patterns): Remove conditions that seem
+	to workaround reload problems.
+	(andsi_insn): Now a named pattern; merge the two zero-extend patterns
+	preceding it into this one and use valid_reg_operand.
+	(iorsi3, xorsi3): Use valid_reg_operand.
+
 2004-10-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (negdi2): Clobbers CC.

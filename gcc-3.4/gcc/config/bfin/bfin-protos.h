@@ -57,7 +57,7 @@ extern int extract_const_double PARAMS ((rtx));
 extern void output_symbolic_address PARAMS ((rtx *));
 extern int reg_or_7bit_operand PARAMS ((rtx op, Mmode));
 extern int scale_by_operand PARAMS ((rtx, Mmode));
-extern int simple_reg_operand PARAMS ((rtx, Mmode));
+extern int valid_reg_operand PARAMS ((rtx, Mmode));
 extern int pos_scale_operand PARAMS ((rtx, Mmode));
 extern int regorbitclr_operand PARAMS ((rtx, Mmode));
 extern int regorlog2_operand PARAMS ((rtx, Mmode));

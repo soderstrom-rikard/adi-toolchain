@@ -1505,13 +1505,15 @@ int regorlog2_operand (rtx op, enum machine_mode mode) {
   return register_operand (op, mode);
 }
 
-/* Disallow SUBREG (MEM) to avoid additional reloads */
+/* Like register_operand, but make sure that hard regs have a valid mode.  */
 int 
-simple_reg_operand (rtx op, enum machine_mode mode) {
-  return (register_operand (op, mode)
-	  && (!REG_P (op) || REGNO (op) != REG_CC)
-	  && !(GET_CODE(op) == SUBREG && (GET_MODE(XEXP(op,0)) == HImode
-					  || GET_MODE(XEXP(op,0)) == QImode)));
+valid_reg_operand (rtx op, enum machine_mode mode)
+{
+  if (! register_operand (op, mode))
+    return 0;
+  if (REG_P (op) && REGNO (op) < FIRST_PSEUDO_REGISTER)
+    return HARD_REGNO_MODE_OK (REGNO (op), mode);
+  return 1;
 }
   
 int cc_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) {

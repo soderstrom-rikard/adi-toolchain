@@ -712,12 +712,8 @@
   [(set (match_operand:SI 0 "register_operand"           "=a")
 	(plus:SI (mult:SI (match_operand:SI 1 "register_operand"  "a")
 			    (match_operand:SI 2 "scale_by_operand" "i"))
-		 (match_operand:SI 3 "simple_reg_operand"  "a")))]
-;; For now, to avoid abort in reload
-   "(!(GET_CODE(operands[3])==SUBREG && GET_CODE(XEXP(operands[3],0))==MEM
-   && (GET_MODE(XEXP(operands[3],0))==HImode
-	|| GET_MODE(XEXP(operands[3],0))==QImode)))
-   "
+		 (match_operand:SI 3 "register_operand"  "a")))]
+   ""
    "%0 =%3+(%1<<%X2);"
   [(set_attr "type" "alu0")])
 
@@ -726,12 +722,7 @@
 	(plus:SI (ashift:SI (match_operand:SI 1 "register_operand"  "a")
 			    (match_operand:SI 2 "pos_scale_operand" "i"))
 		 (match_operand:SI 3 "register_operand"  "a")))]
-;; For now, to avoid abort in reload
-   "(!(GET_CODE(operands[3])==SUBREG && GET_CODE(XEXP(operands[3],0))==MEM
-   && (GET_MODE(XEXP(operands[3],0))==HImode
-	|| GET_MODE(XEXP(operands[3],0))==QImode)))
-   "
-
+   ""
    "%0 =%3+(%1<<%2);"
   [(set_attr "type" "alu0")])
 
@@ -837,7 +828,7 @@
 
 (define_expand "addsi3"
   [(set (match_operand:SI 0 "register_operand"           "")
-	(plus:SI (match_operand:SI 1 "simple_reg_operand" "")
+	(plus:SI (match_operand:SI 1 "register_operand"  "")
 		 (match_operand:SI 2 "reg_or_7bit_operand" "")))]
   ""
   "")
@@ -919,50 +910,23 @@
  "cc =BITTST (%1,%2);"
   [(set_attr "type" "alu0")])
 
-
-;(define_insn "andsi3"
-;  [(set (match_operand:SI 0 "register_operand"          "=d")
-;	(and:SI (match_operand:SI 1 "register_operand"  "%d")
-;		(match_operand:SI 2 "register_operand"  "d")))]
-;  ""
-;  "%0 =%1&%2;"
-;  [(set_attr "type" "alu0")])
-
-;; 
-(define_insn ""
-  [(set (match_operand:SI 0 "register_operand"     	"=d")
-	(and:SI (match_operand:SI 1 "register_operand"  " d")
-		   (const_int 255)))]
+(define_insn "*andsi_insn"
+  [(set (match_operand:SI 0 "valid_reg_operand" "=d,d")
+	(and:SI (match_operand:SI 1 "valid_reg_operand" "%0,d")
+		(match_operand:SI 2 "regorbitclr_operand" "Q,?d")))]
   ""
-  "%0 = %T1 (Z);"     /* %0 =B %1;"*/
-  [(set_attr "type" "alu0")])
-
-(define_insn ""
-  [(set (match_operand:SI 0 "register_operand"     	"=d")
-	(and:SI (match_operand:SI 1 "register_operand"  " d")
-		   (const_int 65535)))]
-  ""
-  "%0 = %h1 (Z);"   /* %0 =H %1;"*/ 
-  [(set_attr "type" "alu0")])
-
-
-; To combine into extract_zero, disallow combining with memory operands
-(define_insn ""
-  [(set (match_operand:SI 0 "register_operand"          "=d,d")
-	(and:SI (match_operand:SI 1 "register_operand"  "%0,d")
-		(match_operand:SI 2 "regorbitclr_operand"  "Q,?d")))]
-  "(!(GET_CODE (operands[1]) == MEM || (GET_CODE (operands[1]) == SUBREG
-	&& GET_CODE (XEXP (operands[1], 0)) == MEM)))"
-  "*
 {
-   if ((GET_CODE (operands[2]) == CONST_INT) 
-	&& (log2constp (~(INTVAL (operands[2])))))
-	output_asm_insn (\"BITCLR (%0,%Y2);\", operands);
-   else 
-	output_asm_insn (\"%0 =%1&%2;\", operands);
-
-   RET;
-}"
+  if (GET_CODE (operands[2]) == CONST_INT)
+    {
+      if (log2constp (~(INTVAL (operands[2]))))
+	return "BITCLR (%0,%Y2);";
+      else if (INTVAL (operands[2]) == 0xff)
+	return "%0 = %T1 (Z);\";
+      else if (INTVAL (operands[2]) == 0xffff)
+	return "%0 = %h1 (Z);\";
+    }
+  return "%0 = %1 & %2;\";
+}
   [(set_attr "type" "alu0")])
 
 (define_expand "andsi3"
@@ -983,8 +947,8 @@
 )
 
 (define_insn "iorsi3"
-  [(set (match_operand:SI 0 "register_operand"          "=d,d")
-	(ior:SI (match_operand:SI 1 "register_operand"  "%0,d")
+  [(set (match_operand:SI 0 "valid_reg_operand"         "=d,d")
+	(ior:SI (match_operand:SI 1 "valid_reg_operand" "%0,d")
 		(match_operand:SI 2 "regorlog2_operand" "J,d")))]
   ""
   "*
@@ -1000,8 +964,8 @@
   [(set_attr "type" "alu0")])
 
 (define_insn "xorsi3"
-  [(set (match_operand:SI 0 "register_operand"            "=d,d")
-	(xor:SI (match_operand:SI 1 "register_operand"    "%0,d")
+  [(set (match_operand:SI 0 "valid_reg_operand"           "=d,d")
+	(xor:SI (match_operand:SI 1 "valid_reg_operand"   "%0,d")
 		  (match_operand:SI 2 "regorlog2_operand" "J,d")))]
   ""
   "*
@@ -1084,8 +1048,8 @@
  ")
 
 (define_insn ""
-  [(set (match_operand:SI 0 "simple_reg_operand"             "=a")
-	(ashift:SI (match_operand:SI 1 "simple_reg_operand"  "a")
+  [(set (match_operand:SI 0 "register_operand"             "=a")
+	(ashift:SI (match_operand:SI 1 "register_operand"  "a")
 		   (match_operand:SI 2 "pos_scale_operand"   "K")))]
   ""
   "*
@@ -1120,8 +1084,8 @@
 ) 
 
 (define_insn ""
-  [(set (match_operand:SI 0 "simple_reg_operand"               "=a")
-	(lshiftrt:SI (match_operand:SI 1 "simple_reg_operand"  "a")
+  [(set (match_operand:SI 0 "register_operand"               "=a")
+	(lshiftrt:SI (match_operand:SI 1 "register_operand"  "a")
 		     (match_operand:SI 2 "pos_scale_operand" "K")))]
   ""
   "%0 =%1>>%2;"
