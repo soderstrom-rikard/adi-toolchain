@@ -272,8 +272,10 @@ bfin_bfd_reloc (
         
         relocation += output_base + symbol->section->output_offset;
         
+#if 0 /* we do not generate addend ... see arith expr 
         /* Add in supplied addend.  */
         relocation += reloc_entry->addend;
+#endif
       }
       else{
         relocation = reloc_stack_pop();
@@ -411,8 +413,10 @@ bfin_pcrel24_reloc (
       
         relocation += output_base + symbol->section->output_offset;
         
+#if 0 /* we do not generate addend ... see arith expr 
         /* Add in supplied addend.  */
         relocation += reloc_entry->addend;
+#endif
       }
       else{
         relocation = reloc_stack_pop();
@@ -522,8 +526,10 @@ bfin_push_reloc (
   if (!strcmp(symbol->name, symbol->section->name) || output_bfd == NULL)
       	relocation += output_base + symbol->section->output_offset;
 
+#if 0 /* we do not generate addend ... see arith expr 
   /* Add in supplied addend.  */
   relocation += reloc_entry->addend;
+#endif
 
   /* now that we have the value, push it */
   reloc_stack_push(relocation);
@@ -602,9 +608,11 @@ bfin_h_l_uimm16_reloc (
   
         if (!strcmp(symbol->name, symbol->section->name) || output_bfd == NULL)
       	  relocation += output_base + symbol->section->output_offset;
-  
+ 
+#if 0 /* we do not generate addend ... see arith expr 
         /* Add in supplied addend.  */
         relocation += reloc_entry->addend;
+#endif
         
         if (output_bfd != (bfd *) NULL)
         {	              
