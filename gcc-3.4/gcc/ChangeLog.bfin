@@ -1,7 +1,8 @@
-2004-09-07  Bernd Schmidt  <bernds@btinternet.com>
+2004-09-08  Bernd Schmidt  <bernds@btinternet.com>
 
 	* config/bfin/bfin.md (adddi3): Turn this into a two-operand insn to
 	avoid running out of registers.
+	* config/bfin/bfin.h (FIXED_REGISTERS): BREGS don't need to be fixed.
 
 2004-09-06  Bernd Schmidt  <bernds@btinternet.com>
 
