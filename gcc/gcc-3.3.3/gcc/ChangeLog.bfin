@@ -36,6 +36,9 @@
 	(subsi3): Remove constraints from define_expand pattern.
 	(casesi): Make sure we generate valid add insns.
 
+	* config/bfin/bfin.md (adddi3): Rewrite pattern to properly mark
+	scratch register and destination as earlyclobber.
+
 2004-09-01  Bernd Schmidt  <bernds@btinternet.com>
 
 	* config/bfin/bfin.c (imm7bit_operand, imm16bit_operand): Test for

@@ -537,16 +537,15 @@
 
 ;;;<<<  adddi3-mode    >>>;;;
 (define_insn "adddi3"
-  [(set (match_operand:DI 0 "register_operand"           "=d, d")
-        (plus:DI (match_operand:DI 1 "register_operand"  "%0, d")
-                 (match_operand:DI 2 "nonmemory_operand" " M, d")))
-   (clobber (match_scratch:SI 3 "=d,d"))
+  [(set (match_operand:DI 0 "register_operand"           "=&d,&d")
+        (plus:DI (match_operand:DI 1 "register_operand"  "%0,d")
+                 (match_operand:DI 2 "nonmemory_operand" "M,d")))
+   (clobber (match_scratch:SI 3 "=&d,X"))
    (clobber (reg:CC 34))]
-;;  "TARGET_ASM_DIR"
   ""
   "@
-    %0+=%2; cc=ac; %3=cc; %H0=%H0+%3;
-    [--SP]=I0;[--SP]=%3;%3=%1+%2;cc=ac;I0=%3;%3=[SP++];%H0=%H1+%H2;%3=cc;%H0=%H0+%3;%0=I0;I0=[SP++];"
+    %0 += %2; cc = ac; %3 = cc; %H0 = %H0 + %3;
+    %0 = %1 + %2; cc = ac; %H0 = cc; %H0 = %H0 + %H1; %H0 = %H0 + %H2;"
   [(set_attr "type" "alu0")
    (set_attr "length" "8,10")])
 
@@ -764,16 +763,6 @@
 ;;;
 ;;;------------------------------------------------------------
 ;;;
-;(define_insn "*adddi3_1"
-;  [(set (match_operand:DI 0 "register_operand"           "=da,d,a")
-;	(plus:DI (match_operand:DI 1 "register_operand"  "%0, d,a")
-;		 (match_operand:DI 2 "nonmemory_operand" " i, i,a")))]
-;  "0"
-;  "@
-;   %0 +=%2;
-;   %0 =%1+%2;
-;   %0 =%1+%2;"
-;  [(set_attr "type" "alu0")])
 
 ;; A pattern to reload the equivalent of
 ;;   (set (Dreg) (plus (FP) (large_constant)))
