@@ -5,19 +5,19 @@
 Disassembly of section .text:
 
 00000000 <load_immediate>:
-   0:	17 e1 ff ff 	M3.L=ffff <load_data2\+0xff14>;
-   4:	1a e1 fe ff 	B2.L=fffe <load_data2\+0xff13>;
-   8:	0e e1 00 00 	SP.L=0 <load_immediate>;
-   c:	0f e1 dc fe 	FP.L=fedc <load_data2\+0xfdf1>;
+   0:	17 e1 ff ff 	M3.L=ffff.*
+   4:	1a e1 fe ff 	B2.L=fffe.*
+   8:	0e e1 00 00 	SP.L=0.*
+   c:	0f e1 dc fe 	FP.L=fedc.*
   10:	40 e1 02 00 	R0.H=0x2;
-  14:	4d e1 20 00 	P5.H=20 <load_immediate\+0x20>;
-  18:	52 e1 04 f2 	I2.H=f204 <load_data2\+0xf119>;
-  1c:	59 e1 40 00 	B1.H=40 <load_immediate\+0x40>;
-  20:	5c e1 ff ff 	L0.H=ffff <load_data2\+0xff14>;
+  14:	4d e1 20 00 	P5.H=20.*
+  18:	52 e1 04 f2 	I2.H=f204.*
+  1c:	59 e1 40 00 	B1.H=40.*
+  20:	5c e1 ff ff 	L0.H=ffff.*
   24:	45 e1 00 00 	R5.H=0x0;
   28:	5a e1 00 00 	B2.H=0 <load_immediate>;
-  2c:	8f e1 20 ff 	FP=ff20 <load_data2\+0xfe35>\(Z\);
-  30:	9e e1 20 00 	L2=20 <load_immediate\+0x20>\(Z\);
+  2c:	8f e1 20 ff 	FP=ff20.*
+  30:	9e e1 20 00 	L2=20.*
   34:	85 e1 00 00 	R5=0 <load_immediate>\(Z\);
   38:	08 c4 [0-3][[:xdigit:]] 00 	A0=0;
   3c:	08 c4 [0-3][[:xdigit:]] 40 	A1=0;
