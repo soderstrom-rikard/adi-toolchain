@@ -49,6 +49,7 @@
 #define CONST_4BIT_IMM_P(VALUE) ((int)(VALUE) >= -8 && (int)(VALUE) <= 7)
 #define CONST_4UBIT_IMM_P(VALUE) (/* RAJA : why typecast to unsigned (unsigned)(VALUE) >= 0 && */(unsigned)(VALUE) <= 15U)
 #define CONST_5UBIT_IMM_P(VALUE) (/* RAJA : why typecast to unsigned (unsigned)(VALUE) >= 0 && */(unsigned)(VALUE) < 32U)
+#define CONST_18UBIT_IMM_P(VALUE) ((unsigned) (VALUE) <= 262140)
 
 /*
   The following set of defines, describe the commandline api.

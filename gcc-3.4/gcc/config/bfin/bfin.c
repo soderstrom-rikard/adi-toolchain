@@ -562,9 +562,19 @@ bfin_function_prologue (FILE *file, HOST_WIDE_INT framesize)
 	if (framesize == 0 && optimize_size)
 	    /* use 16-bit instruction */
 	    fprintf (file, "\t[--SP] =RETS;\n");
-	else
-	    /* use 32-bit instruction */
-	    fprintf (file, "\tLINK %d;\n", framesize);
+        else {
+            /* use 32-bit instruction */
+                if (CONST_18UBIT_IMM_P(framesize))
+                  fprintf (file, "\tLINK %d;\n", framesize);
+                else {
+                    rtx operands1[2];
+                    fprintf (file, "\tLINK 0;\n");
+                    operands1[0] =  gen_rtx_REG (Pmode, REG_P2);
+                    operands1[1] =  gen_rtx_CONST_INT (Pmode, -framesize);
+                    output_load_immediate (operands1);
+                    fprintf (file,"\tSP = SP + P2;\n");
+                }
+        }
 	if (TARGET_NON_GNU_PROFILE)
 	    fprintf (file, "\tcall mcount_entry;\n");
     } 
