@@ -1,3 +1,6 @@
+2004-12-14  Raja <raja@rrap-software.com>
+	* bfin-opcodes.h: reverted to explicit shifts instead of using
+	 union to fix Endianess issue.
 2004-12-10  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin-dis.c: Include "bfin-opcodes.h"
