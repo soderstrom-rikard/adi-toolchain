@@ -255,7 +255,7 @@ scan_mem (rtx insn, enum machine_mode mode, rtx *loc)
       regno = REGNO (x);
       if (REGNO_REG_SET_P (&regs_to_terminate, regno))
 	return;
-      c = get_reg_chain (x, PREV_INSN (insn));
+      c = get_reg_chain (x, insn);
       new_use (c, insn, loc, NULL_RTX, state[regno].offset);
       break;
 
@@ -301,7 +301,7 @@ scan_mem (rtx insn, enum machine_mode mode, rtx *loc)
 	  regno = REGNO (op0);
 	  if (REGNO_REG_SET_P (&regs_to_terminate, regno))
 	    return;
-	  c = get_reg_chain (op0, PREV_INSN (insn));
+	  c = get_reg_chain (op0, insn);
 	  state[regno].offset += preinc;
 	  new_use (c, insn, loc, NULL_RTX, state[regno].offset);
 	  state[regno].offset += postinc;
@@ -321,7 +321,7 @@ scan_mem (rtx insn, enum machine_mode mode, rtx *loc)
 	  regno = REGNO (op0);
 	  if (REGNO_REG_SET_P (&regs_to_terminate, regno))
 	    return;
-	  c = get_reg_chain (op0, PREV_INSN (insn));
+	  c = get_reg_chain (op0, insn);
 	  c->cost += address_cost (x, mode);
 	  new_use (c, insn, loc, NULL_RTX, state[regno].offset + INTVAL (op1));
 	}
@@ -492,6 +492,33 @@ scan_block (basic_block bb, int nregs)
   return last;
 }
 
+static rtx
+gen_add (rtx dstreg, rtx srcreg, HOST_WIDE_INT offset)
+{
+  rtx insn;
+  if (offset)
+    {
+      rtx offs_rtx = GEN_INT (offset);
+      insn = gen_add3_insn (dstreg, srcreg, offs_rtx);
+      if (!insn)
+	{
+	  start_sequence ();
+	  offs_rtx = force_reg (Pmode, offs_rtx);
+	  emit_insn (gen_add3_insn (dstreg, srcreg, offs_rtx));
+	  insn = get_insns ();
+	  end_sequence ();
+	}
+    }
+  else
+    {
+      start_sequence ();
+      emit_move_insn (dstreg, srcreg);
+      insn = get_insns ();
+      end_sequence ();
+    }
+  return insn;
+}
+
 static void
 optimize_block (basic_block bb, rtx last_insn)
 {
@@ -511,7 +538,7 @@ optimize_block (basic_block bb, rtx last_insn)
 
       if (c->init_insn)
 	{
-	  emit_insn_after (insn, c->init_insn);
+	  emit_insn_before (insn, c->init_insn);
 	}
       else
 	{
@@ -527,15 +554,13 @@ optimize_block (basic_block bb, rtx last_insn)
 	  if (u->loc)
 	    {
 	      rtx newreg = gen_reg_rtx (Pmode);
-	      rtx insn = gen_add3_insn (newreg, new_base,
-					GEN_INT (this_offset));
+	      rtx insn = gen_add (newreg, new_base, this_offset);
 	      emit_insn_before (insn, u->insn);
 	      *u->loc = newreg;
 	    }
 	  else
 	    {
-	      rtx insn = gen_add3_insn (u->reg, new_base,
-					GEN_INT (this_offset));
+	      rtx insn = gen_add (u->reg, new_base, this_offset);
 	      if (u->insn)
 		emit_insn_before (insn, u->insn);
 	      else
@@ -569,9 +594,9 @@ optimize_addressing_modes (void)
     }
 
   max_regno = max_reg_num ();
-  allocate_reg_info (max_regno, FALSE, FALSE);
+  allocate_reg_life_data ();
   update_life_info_in_dirty_blocks (UPDATE_LIFE_GLOBAL_RM_NOTES,
-				    (PROP_DEATH_NOTES | PROP_KILL_DEAD_CODE
-				     | PROP_SCAN_DEAD_CODE));
+				    (PROP_DEATH_NOTES | PROP_KILL_DEAD_CODE 
+				     | PROP_SCAN_DEAD_CODE | PROP_REG_INFO));
   no_new_pseudos = 1;
 }
