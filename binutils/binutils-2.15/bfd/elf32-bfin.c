@@ -185,23 +185,6 @@ reloc_stack_operate (unsigned int oper)
   return value;
 }
 
-/* FUNCTION : bfin_got_reloc
-   ABSTRACT : TODO : figure out how to handle got relocs
-*/
-static bfd_reloc_status_type
-bfin_got_reloc (
-     bfd *abfd ATTRIBUTE_UNUSED,
-     arelent *reloc_entry ATTRIBUTE_UNUSED,
-     asymbol *symbol ATTRIBUTE_UNUSED,
-     PTR data ATTRIBUTE_UNUSED,
-     asection *input_section ATTRIBUTE_UNUSED,
-     bfd *output_bfd ATTRIBUTE_UNUSED,
-     char **error_message ATTRIBUTE_UNUSED) 
-{
-  bfd_reloc_status_type flag = bfd_reloc_ok;
-  return flag; 
-}
-
 /* FUNCTION : bfin_pltpc_reloc
    ABSTRACT : TODO : figure out how to handle pltpc relocs
 */
@@ -1962,11 +1945,10 @@ elf_bfin_link_hash_table_create (bfd * abfd)
 /* Finish up the dynamic sections.  */
 
 static bfd_boolean
-elf_bfin_finish_dynamic_sections (bfd * output_bfd,
+elf_bfin_finish_dynamic_sections (bfd * output_bfd ATTRIBUTE_UNUSED,
 				  struct bfd_link_info *info)
 {
   bfd *dynobj;
-  asection *sgot;
   asection *sdyn;
 
   dynobj = elf_hash_table (info)->dynobj;
@@ -1984,8 +1966,6 @@ elf_bfin_finish_dynamic_sections (bfd * output_bfd,
       for (; dyncon < dynconend; dyncon++)
 	{
 	  Elf_Internal_Dyn dyn;
-	  const char *name;
-	  asection *s;
 
 	  bfd_elf32_swap_dyn_in (dynobj, dyncon, &dyn);
 
@@ -2117,30 +2097,7 @@ elf_bfin_adjust_dynamic_symbol (struct bfd_link_info *info,
      when we know the address of the .got section.  */
   if (h->type == STT_FUNC || h->needs_plt)
     {
-BFD_ASSERT(0); //RAJA
-      /* Make sure this symbol is output as a dynamic symbol.  */
-      if (h->dynindx == -1 && !h->forced_local)
-	{
-	  if (!bfd_elf_link_record_dynamic_symbol (info, h))
-	    return FALSE;
-	}
-
-
-      /* If this symbol is not defined in a regular file, and we are
-         not generating a shared library, then set the symbol to this
-         location in the .plt.  This is required to make function
-         pointers compare as equal between the normal executable and
-         the shared library.  */
-      if (!info->shared && !h->def_regular)
-	{
-	  h->root.u.def.section = s;
-	  h->root.u.def.value = s->size;
-	}
-
-
-BFD_ASSERT(0); //RAJA
-
-      return TRUE;
+      BFD_ASSERT(0);
     }
 
   /* If this is a weak symbol, and there is a real definition, the
@@ -2438,12 +2395,12 @@ elf_bfin_size_dynamic_sections (bfd * output_bfd ATTRIBUTE_UNUSED,
    objects, and before the final_link entry point is called.  */
 
 bfd_boolean
-bfd_bfin_elf32_create_embedded_relocs (abfd, info, datasec, relsec, errmsg)
-     bfd *abfd;
-     struct bfd_link_info *info;
-     asection *datasec;
-     asection *relsec;
-     char **errmsg;
+bfd_bfin_elf32_create_embedded_relocs (
+     bfd *abfd,
+     struct bfd_link_info *info,
+     asection *datasec,
+     asection *relsec,
+     char **errmsg)
 {
   Elf_Internal_Shdr *symtab_hdr;
   Elf_Internal_Sym *isymbuf = NULL;

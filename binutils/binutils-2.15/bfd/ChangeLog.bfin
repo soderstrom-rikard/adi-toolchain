@@ -1,3 +1,9 @@
+2005-02-17 : raja <raja@rrap-software.com>
+	* elf32-bfin.c: (bfin_got_reloc) : removed
+        (elf_bfin_check_relocs, elf_bfin_relocate_section,
+         elf_bfin_gc_sweep_hook) : removed R_pltpc
+        (elf_bfin_relocate_section) : Forced 0 addend for GOT
+        (bfd_bfin_elf32_create_embedded_relocs) New function
 2005-02-01 : raja <raja@rrap-software.com>
 	* elf32-bfin.c: using bfin_bfd_reloc instead of  bfd_elf_generic_reloc as
 	special_function for reloc type R_byte2_data.
