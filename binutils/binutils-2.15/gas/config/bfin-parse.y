@@ -431,7 +431,7 @@ is_group2 (INSTR_T x)
   Register reg;
 
   Macfunc macfunc;
-  struct { int r0; int s0; int x0; } modcodes;
+  struct { int r0; int s0; int x0; int aop; } modcodes;
   struct { int r0; } r0;
   Opt_mode mod;
 }
@@ -1032,7 +1032,7 @@ asm_1:
 	  else
 	    {
 	      notethat("dsp32alu: dregs = BYTEOP2P (dregs_pair , dregs_pair ) (rnd_op)\n");
-		$$ = DSP32ALU (22, $13.r0, 0, &$1, &$5, &$9, $13.s0, 0, $13.x0);
+	      $$ = DSP32ALU (22, $13.r0, 0, &$1, &$5, &$9, $13.s0, $13.x0, $13.aop);
 	    }
 	}
 
@@ -3778,56 +3778,64 @@ rnd_op:
 	{
 	  $$.r0 = 1; // HL
 	  $$.s0 = 0; // s
-	  $$.x0 = 0; // aop
+	  $$.x0 = 0; // x
+	  $$.aop = 0; // aop
 	}
 
 	| LPAREN TH RPAREN
 	{
 	  $$.r0 = 1; // HL
 	  $$.s0 = 0; // s
-	  $$.x0 = 1; // aop
+	  $$.x0 = 0; // x
+	  $$.aop = 1; // aop
 	}
 
 	| LPAREN RNDL RPAREN
 	{
 	  $$.r0 = 0; // HL
 	  $$.s0 = 0; // s
-	  $$.x0 = 0; // aop
+	  $$.x0 = 0; // x
+	  $$.aop = 0; // aop
 	}
 
 	| LPAREN TL RPAREN
 	{
 	  $$.r0 = 0; // HL
 	  $$.s0 = 0; // s
-	  $$.x0 = 1; // aop
+	  $$.x0 = 0; // x
+	  $$.aop = 1;
 	}
 
 	| LPAREN RNDH COMMA R RPAREN
 	{
-	  $$.r0 = 0; // HL
+	  $$.r0 = 1; // HL
 	  $$.s0 = 1; // s
-	  $$.x0 = 1; // aop
+	  $$.x0 = 0; // x
+	  $$.aop = 0; // aop
 	}
 
 	| LPAREN TH COMMA R RPAREN
 	{
 	  $$.r0 = 1; // HL
 	  $$.s0 = 1; // s
-	  $$.x0 = 1; // aop
+	  $$.x0 = 0; // x
+	  $$.aop = 1; // aop
 	}
 
 	| LPAREN RNDL COMMA R RPAREN
 	{
 	  $$.r0 = 0; // HL
 	  $$.s0 = 1; // s
-	  $$.x0 = 0; // aop
+	  $$.x0 = 0; // x
+	  $$.aop = 0; // aop
 	}
 
 	| LPAREN TL COMMA R RPAREN
 	{
 	  $$.r0 = 0; // HL
 	  $$.s0 = 1; // s
-	  $$.x0 = 1; // aop
+	  $$.x0 = 0; // x
+	  $$.aop = 1;  // aop
 	}
 ;
 

@@ -1,3 +1,9 @@
+2005-01-28  Catherine Moore  <clm@cm00re.com>
+
+	* config/bfin-parse.y (modcodes): Add aop.
+	(BYTEOP2P): Use aop to generate opcode.
+	(rnd_op): Set up aop.
+
 2005-01-27  Catherine Moore  <clm@cm00re.com>
 
 	* config/bfin-parse.y: Correct arguments to DSP32SHIFTIMM.
