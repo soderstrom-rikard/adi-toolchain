@@ -2,7 +2,13 @@
 
 	* gas/bfin/parallel.s: New.
 	* gas/bfin/parallel.d: New.
-	* gas/bfin/bfin.exp: Run new test.
+	* gas/bfin/parallel2.s: New.
+	* gas/bfin/parallel2.d: New.
+	* gas/bfin/parallel3.s: New.
+	* gas/bfin/parallel3.d: New.
+	* gas/bfin/parallel4.s: New.
+	* gas/bfin/parallel4.d: New.
+	* gas/bfin/bfin.exp: Run new tests.
 
 2004-12-20  Catherine Moore  <clm@cm00re.com>
 
