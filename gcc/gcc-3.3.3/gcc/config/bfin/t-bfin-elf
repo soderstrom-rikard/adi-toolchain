@@ -18,12 +18,15 @@ CROSS_LIBGCC1 = libgcc1-asm.a
 LIB1ASMSRC = bfin/lib1funcs.asm
 
 LIB1ASMFUNCS = 	_addsf3 _divsf3 _fixsfsi _lesf2 _modsi3 _nesf2 \
-		_divsi3 _fixunssfdi _gesf2 _mulsf3 _subsf3 \
-		_fixunssfsi _udivsi3 \
-		_eqsf2 _gtsf2 _umodsi3 \
-		_cmpsf2 _fixsfdi _floatsisf _ltsf2 _negsf2 \
-		_truncdfsf2 _extendsfdf2 \
-		_floatsidf
+	_divsi3 _fixunssfdi _gesf2 _mulsf3 _subsf3 \
+	_fixunssfsi _udivsi3 \
+	_eqsf2 _gtsf2 _umodsi3 \
+	_cmpsf2 _fixsfdi _floatsisf _ltsf2 _negsf2 _extendsfdf2 \
+	_adddf3 _gtdf2 _nedf2 _eqdf2  _gedf2 _subdf3 _muldf3\
+	_divdf3 _cmpdf2 _ltdf2 _negdf2 _fixdfsi \
+	_truncdfsf2 \
+	_floatsidf
+ 
 
 # Hard code LIB2FUNCS so that DI and DF functions are not included.
 # Faisal Akber - 2001-12-11
@@ -51,9 +54,7 @@ LIB2FUNCS = _muldi3 _divdi3 _moddi3 _udivdi3 _umoddi3 _negdi2 \
     _fixtfdi _fixunstfdi _floatditf \
     __gcc_bcmp _varargs __dummy _eprintf \
     _bb _shtab _clear_cache _trampoline __main _exit \
-    _ctors _pure _gedf2 _nedf2 _adddf3 _subdf3 _muldf3 \
-    _divdf3 _cmpdf2 _eqdf2 _ltdf2 _gtdf2 _negdf2 _fixdfsi \
-
+    _ctors _pure \
 
 LANGUAGES = c
 
@@ -69,11 +70,11 @@ TARGET_LIBGCC2_CFLAGS = -Dinhibit_libc -DDF=SF
  LIB2FUNCS_EXTRA = fp-bit.c
 
 FPBIT = fp-bit.c
-DPBIT = dp-bit.c
+#DPBIT = dp-bit.c
 
 
-dp-bit.c: $(srcdir)/config/fp-bit.c
-	cat $(srcdir)/config/fp-bit.c > dp-bit.c
+#dp-bit.c: $(srcdir)/config/fp-bit.c
+#	cat $(srcdir)/config/fp-bit.c > dp-bit.c
 
 #
 # commented out because of __mulsf3
