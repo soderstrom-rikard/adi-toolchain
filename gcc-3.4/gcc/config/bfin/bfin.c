@@ -2478,6 +2478,111 @@ output_pop_multiple (rtx insn, rtx *operands)
 
   output_asm_insn (buf, operands);
 }
+
+/* Adjust DST and SRC by OFFSET bytes, and generate one move in mode MODE.  */
+
+static void
+single_move_for_strmov (rtx dst, rtx src, enum machine_mode mode, HOST_WIDE_INT offset)
+{
+  rtx scratch = gen_reg_rtx (mode);
+  rtx srcmem, dstmem;
+
+  srcmem = adjust_address_nv (src, mode, offset);
+  dstmem = adjust_address_nv (dst, mode, offset);
+  emit_move_insn (scratch, srcmem);
+  emit_move_insn (dstmem, scratch);
+}
+
+/* Expand a string move operation of COUNT_EXP bytes from SRC to DST, with
+   alignment ALIGN_EXP.  Return true if successful, false if we should fall
+   back on a different method.  */
+
+bool
+bfin_expand_strmov (rtx dst, rtx src, rtx count_exp, rtx align_exp)
+{
+  rtx srcreg, destreg, countreg;
+  HOST_WIDE_INT align = 0;
+  unsigned HOST_WIDE_INT count = 0;
+
+  if (GET_CODE (align_exp) == CONST_INT)
+    align = INTVAL (align_exp);
+  if (GET_CODE (count_exp) == CONST_INT)
+    {
+      count = INTVAL (count_exp);
+#if 0
+      if (!TARGET_INLINE_ALL_STRINGOPS && count > 64)
+	return false;
+#endif
+    }
+
+  /* If optimizing for size, only do single copies inline.  */
+  if (optimize_size)
+    {
+      if (count == 2 && align < 2)
+	return false;
+      if (count == 4 && align < 4)
+	return false;
+      if (count != 1 && count != 2 && count != 4)
+	return false;
+    }
+  if (align < 2 && count != 1)
+    return false;
+
+  destreg = copy_to_mode_reg (Pmode, XEXP (dst, 0));
+  if (destreg != XEXP (dst, 0))
+    dst = replace_equiv_address_nv (dst, destreg);
+  srcreg = copy_to_mode_reg (Pmode, XEXP (src, 0));
+  if (srcreg != XEXP (src, 0))
+    src = replace_equiv_address_nv (src, srcreg);
+
+  if (count != 0 && align >= 2)
+    {
+      unsigned HOST_WIDE_INT offset = 0;
+
+      if (align >= 4)
+	{
+	  if ((count & ~3) == 4)
+	    {
+	      single_move_for_strmov (dst, src, SImode, offset);
+	      offset = 4;
+	    }
+	  else if (count & ~3)
+	    {
+	      HOST_WIDE_INT new_count = ((count >> 2) & 0x3fffffff) - 1;
+	      countreg = copy_to_mode_reg (Pmode, GEN_INT (new_count));
+
+	      emit_insn (gen_rep_movsi (destreg, srcreg, countreg, destreg, srcreg));
+	    }
+	}
+      else
+	{
+	  if ((count & ~1) == 2)
+	    {
+	      single_move_for_strmov (dst, src, HImode, offset);
+	      offset = 2;
+	    }
+	  else if (count & ~1)
+	    {
+	      HOST_WIDE_INT new_count = ((count >> 1) & 0x7fffffff) - 1;
+	      countreg = copy_to_mode_reg (Pmode, GEN_INT (new_count));
+
+	      emit_insn (gen_rep_movhi (destreg, srcreg, countreg, destreg, srcreg));
+	    }
+	}
+      if (count & 2)
+	{
+	  single_move_for_strmov (dst, src, HImode, offset);
+	  offset += 2;
+	}
+      if (count & 1)
+	{
+	  single_move_for_strmov (dst, src, QImode, offset);
+	}
+      return true;
+    }
+  return false;
+}
+
 
 static int
 bfin_adjust_cost (rtx insn, rtx link, rtx dep_insn, int cost)

@@ -1,3 +1,10 @@
+2005-02-26  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (rep_movsi, rep_movhi, movstrsi): New patterns.
+	* config/bfin/bfin.c (bfin_expand_strmov, single_move_for_strmov): New
+	functions.
+	* config/bfin/bfin-protos.h (bfin_expand_strmov): Declare.
+
 2005-02-22  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/t-bfin-elf (LIB2FUNCS): Delete.

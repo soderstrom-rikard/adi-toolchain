@@ -1322,6 +1322,60 @@
   [(set_attr "type" "br")
    (set_attr "length" "2,4")])
 
+;; Block move patterns
+
+;; We cheat.  This copies one more word than operand 2 indicates.
+
+(define_insn "rep_movsi"
+  [(set (match_operand:SI 0 "register_operand" "=&a")
+        (plus:SI (plus:SI (match_operand:SI 3 "register_operand" "0")
+			  (ashift:SI (match_operand:SI 2 "register_operand" "a")
+				     (const_int 2)))
+		 (const_int 4)))
+   (set (match_operand:SI 1 "register_operand" "=&b")
+        (plus:SI (plus:SI (match_operand:SI 4 "register_operand" "1")
+			  (ashift:SI (match_dup 2) (const_int 2)))
+		 (const_int 4)))
+   (set (mem:BLK (match_dup 3))
+	(mem:BLK (match_dup 4)))
+   (use (match_dup 2))
+   (clobber (match_scratch:HI 5 "=&d"))]
+  ""
+  "lsetup (1f, 1f) LC1 = %2; %5 = [%4++]; 1: MNOP || [%3++] = %5 || %5 = [%4++]; [%3++] = %5;"
+  [(set_attr "type" "misc")
+   (set_attr "length" "16")])
+
+(define_insn "rep_movhi"
+  [(set (match_operand:SI 0 "register_operand" "=&a")
+        (plus:SI (plus:SI (match_operand:SI 3 "register_operand" "0")
+			  (ashift:SI (match_operand:SI 2 "register_operand" "a")
+				     (const_int 1)))
+		 (const_int 2)))
+   (set (match_operand:SI 1 "register_operand" "=&b")
+        (plus:SI (plus:SI (match_operand:SI 4 "register_operand" "1")
+			  (ashift:SI (match_dup 2) (const_int 1)))
+		 (const_int 2)))
+   (set (mem:BLK (match_dup 3))
+	(mem:BLK (match_dup 4)))
+   (use (match_dup 2))
+   (clobber (match_scratch:HI 5 "=&d"))]
+  ""
+  "lsetup (1f, 1f) LC1 = %2; %h5 = W[%4++]; 1: MNOP || W [%3++] = %5 || %h5 = W [%4++]; W [%3++] = %5;"
+  [(set_attr "type" "misc")
+   (set_attr "length" "16")])
+
+(define_expand "movstrsi"
+  [(match_operand:BLK 0 "general_operand" "")
+   (match_operand:BLK 1 "general_operand" "")
+   (match_operand:SI 2 "const_int_operand" "")
+   (match_operand:SI 3 "const_int_operand" "")]
+  ""
+{
+  if (bfin_expand_strmov (operands[0], operands[1], operands[2], operands[3]))
+    DONE;
+  FAIL;
+})
+
 ;; Conditional branch patterns
 ;; The Blackfin has only few condition codes: eq, lt, lte, ltu, leu
 
