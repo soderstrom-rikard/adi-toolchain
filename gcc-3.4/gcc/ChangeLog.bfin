@@ -1,3 +1,25 @@
+2004-11-20  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* ifcvt.c (note_clobbers_of_cond): Return void.
+	* config/bfin/bfin-protos.h (imm7bit_operand, regorbitclr_operand,
+	scale_operand, reg_or_scale_operand, log2_operand,
+	positive_immediate_operand, reg_or_0_operand,
+	signed_comparison_operator, ccregister_p, loop_end,
+	bfin_force_reg): Don't declare.
+	* config/bfin/bfin.c (go_if_legitimate_address, imm7bit_operand,
+	signed_comparison_operator, ccregister_p, backward_reference,
+	scale_operand, reg_or_scale_operand, log2_operand, regorbitclr_operand,
+	positive_immediate_operand, reg_or_0_operand, bfin_force_reg): Delete.
+	(fp_plus_const_operand, reg_or_7bit_operand): Use CONST_7BIT_IMM_P
+	directly, don't call imm7bit_operand.
+	* config/bfin/bfin.h (USER_LABEL_PREFIX): Don't define here.
+	(LEGITIMIZE_ADDRESS): Small cleanup.
+	(PREDICATE_CODES): Remove regorbitclr_operand.
+	* config/bfin/bfin.md (casesi): Use CONST_7BIT_IMM_P
+	directly, don't call imm7bit_operand.  Use force_reg instead of
+	bfin_force_reg.
+	* config/bfin/elf.h (USER_LABEL_PREFIX): Define here.
+
 2004-11-19  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_hard_regno_rename_ok): New function.

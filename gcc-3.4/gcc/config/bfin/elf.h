@@ -18,3 +18,7 @@
 
 #undef  ENDFILE_SPEC
 #define ENDFILE_SPEC	"crtend%O%s crtn%O%s"
+
+#undef USER_LABEL_PREFIX
+#define USER_LABEL_PREFIX "_"
+

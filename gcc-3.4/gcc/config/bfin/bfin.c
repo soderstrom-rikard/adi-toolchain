@@ -854,47 +854,8 @@ legitimize_address (rtx x ATTRIBUTE_UNUSED, rtx oldx ATTRIBUTE_UNUSED, enum mach
   return NULL_RTX;
 }
 
-#if 0
-int 
-go_if_legitimate_address (enum machine_mode mode, rtx x, int strict_p)
-{
+/* This predicate is used to compute the length of a load/store insn.  */
 
-  
-  switch (GET_CODE (x)) {
-  case REG:
-    return REGNO_OK_FOR_BASE_P (REGNO (x));
-
-  case PLUS:
-    return (REG_P (XEXP (x, 0))
-	    && (REG_P (XEXP (x, 1))
-		|| CONSTANT_P (XEXP (x, 1))));
-
-
-#ifdef HAVE_POST_INCREMENT
-  case POST_INC:
-    if (register_operand (XEXP (x, 0), Pmode)
-	&& (strict_p ? REG_OK_FOR_BASE_P (XEXP (x, 0)) : 1))
-      return 1;
-#endif
-
-#ifdef HAVE_PRE_DECREMENT
-  case PRE_DEC:
-    if (register_operand (XEXP (x, 0), Pmode)
-	&& (strict_p ? REG_OK_FOR_BASE_P (XEXP (x, 0)) : 1))
-      return 1;
-#endif
-
-  }
-  return 0;
-}
-#endif
-
-/*
-  This predicate is used to compute the lenght of a 
-  load/store instruction.
-  The placement of this code next go_if_legitimate_address
-  is for helping the maintability of the routine.
-*/
 int effective_address_32bit_p (rtx op, enum machine_mode mode) 
 {
   op = XEXP (op, 0);
@@ -923,44 +884,6 @@ int effective_address_32bit_p (rtx op, enum machine_mode mode)
     default:
       return 1;
     }
-}
-
-/* Returns 1 if OP is a symbolic operand, i.e. a symbol_ref or a label_ref,
-   possibly with an offset.  */
-
-int
-symbolic_operand (rtx op, enum machine_mode mode)
-{
-  if (mode != VOIDmode && GET_MODE (op) != VOIDmode && mode != GET_MODE (op))
-    return 0;
-  if (GET_CODE (op) == SYMBOL_REF || GET_CODE (op) == LABEL_REF)
-    return 1;
-  if (GET_CODE (op) == CONST
-      && GET_CODE (XEXP (op,0)) == PLUS
-      && GET_CODE (XEXP (XEXP (op,0), 0)) == SYMBOL_REF
-      && GET_CODE (XEXP (XEXP (op,0), 1)) == CONST_INT)
-    return 1;
-  return 0;
-}
-
-/* Returns 1 if OP is a plain constant or matched by symbolic_operand.  */
-
-int
-symbolic_or_const_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) 
-{
-  if (GET_CODE (op) == CONST_INT || GET_CODE (op) == CONST_DOUBLE)
-    return 1;
-  return symbolic_operand (op, mode);
-}
-
-int imm7bit_operand_p (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) 
-{
-  return GET_CODE (op) == CONST_INT && CONST_7BIT_IMM_P (INTVAL (op));
-}
-
-int imm16bit_operand_p (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) 
-{
-  return GET_CODE (op) == CONST_INT && CONST_16BIT_IMM_P (INTVAL (op));
 }
 
 int
@@ -1141,22 +1064,6 @@ void print_operand (FILE *file,  rtx x,  char code)
       output_addr_const(file, x);
     }
   }
-}
-
-int
-signed_comparison_operator (rtx op, enum machine_mode mode)
-{
-  switch (GET_CODE(op))
-    {
-    case LEU:
-    case LTU:
-    case GTU:
-    case GEU:
-      return 0;
-    default:
-      return comparison_operator (op, mode);
-    }
-    return 0;
 }
 
 /* Argument support functions.  */
@@ -1467,13 +1374,6 @@ log2constp (unsigned HOST_WIDE_INT c)
   return c != 0 && (c & (c-1)) == 0;
 }
 
-int
-ccregister_p (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) {
-  debug_rtx (op);
-  printf ("\n");
-  return 1;
-}
-
 void 
 conditional_register_usage (void)
 {
@@ -1482,80 +1382,34 @@ conditional_register_usage (void)
   bfin_rets_rtx = gen_rtx_REG (Pmode, REG_RETS);
 }
 
-#if 0
 int
-backward_reference (rtx jump) 
+pos_scale_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
 {
-  rtx insn;
-  int lab_ref_num;
-
-  if (JUMP_INSN != GET_CODE(jump))
-      abort();
-
-  lab_ref_num = CODE_LABEL_NUMBER (JUMP_LABEL (jump));
-  for (insn = PREV_INSN(jump); ; insn = PREV_INSN(insn)) {
-    if (CODE_LABEL == GET_CODE (insn)) {
-      if (CODE_LABEL_NUMBER (insn) >= lab_ref_num)
-	return 1;
-      else
-	return 0;
+  if (GET_CODE(op) == CONST_INT)
+    {
+      int iv = INTVAL (op);
+      return iv == 2 || iv == 1;
     }
-  }
-}
-#endif
-
-int scale_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) {
-  if (GET_CODE(op) == CONST_INT) {
-    int iv = INTVAL (op);
-    return (iv == 2 || iv == 1 || iv == -2 || iv == -1);
-  }
   return 0;
 }
 
-int pos_scale_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) {
-  if (GET_CODE(op) == CONST_INT) {
-    int iv = INTVAL (op);
-    return (iv == 2 || iv == 1);
-  }
+int
+scale_by_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
+{
+  if (GET_CODE(op) == CONST_INT)
+    {
+      int iv = INTVAL (op);
+      return (iv == 4 || iv == 2);
+    }
   return 0;
 }
 
-int scale_by_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) {
-  if (GET_CODE(op) == CONST_INT) {
-    int iv = INTVAL (op);
-    return (iv == 4 || iv == 2);
-  }
-  return 0;
-}
-
-int reg_or_scale_operand (rtx op, enum machine_mode mode) {
-  if (GET_CODE(op) == CONST_INT) {
-    int iv = INTVAL (op);
-    return (iv == 4 || iv == 2);
-  }
-  return register_operand (op, mode);
-}
-
-
-int log2_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) {
-  if (GET_CODE(op) == CONST_INT) {
-    return log2constp (INTVAL (op));
-  }
-  return 0;
-}
-
-int 
-regorbitclr_operand (rtx op, enum machine_mode mode) {
-  if (GET_CODE(op) == CONST_INT) {
-    return log2constp (~(INTVAL (op)));
-  }
-  return register_operand (op, mode);
-}
-
-int highbits_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) {
-  if (GET_CODE(op) == CONST_INT) {
+int
+highbits_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
+{
+  if (GET_CODE(op) == CONST_INT)
     return (log2constp (-INTVAL (op)) && !CONST_7BIT_IMM_P (INTVAL (op)));
-  }
+
   return 0;
 }
 
@@ -1573,10 +1427,12 @@ rhs_andsi3_operand (rtx op, enum machine_mode mode)
   return log2constp (~value) || value == 255 || value == 65535 || value == 1;
 }
 
-int regorlog2_operand (rtx op, enum machine_mode mode) {
-  if (GET_CODE(op) == CONST_INT) {
+int
+regorlog2_operand (rtx op, enum machine_mode mode)
+{
+  if (GET_CODE(op) == CONST_INT)
     return log2constp (INTVAL (op));
-  }
+
   return register_operand (op, mode);
 }
 
@@ -1597,14 +1453,61 @@ cc_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
   return REG_P (op) && REGNO (op) == REG_CC && GET_MODE (op) == BImode;
 }
 
-int reg_or_7bit_operand (rtx op, enum machine_mode mode) {
-    return (imm7bit_operand_p (op, mode) || register_operand (op, mode));
+int
+reg_or_7bit_operand (rtx op, enum machine_mode mode)
+{
+  if (register_operand (op, mode))
+    return 1;
+  if (GET_CODE (op) == CONST_INT
+      && CONST_7BIT_IMM_P (INTVAL (op)))
+    return 1;
+  return 0;
 }
 
+/* Used for secondary reloads, this function returns 1 if OP is of the
+   form (plus (fp) (const_int)), where CONST_INT can't be added in one
+   instruction.  */
+
 int
-positive_immediate_operand (rtx op, enum machine_mode mode)
+fp_plus_const_operand (rtx op, enum machine_mode mode)
 {
-  return GET_CODE (op) == CONST_INT && INTVAL (op) >= 0;
+  rtx op1, op2;
+  if (GET_CODE (op) != PLUS)
+    return 0;
+  op1 = XEXP (op, 0);
+  op2 = XEXP (op, 1);
+  return (REG_P (op1)
+	  && (REGNO (op1) == FRAME_POINTER_REGNUM
+	      || REGNO (op1) == STACK_POINTER_REGNUM)
+	  && GET_CODE (op2) == CONST_INT && ! CONST_7BIT_IMM_P (INTVAL (op2)));
+}
+
+/* Returns 1 if OP is a symbolic operand, i.e. a symbol_ref or a label_ref,
+   possibly with an offset.  */
+
+int
+symbolic_operand (rtx op, enum machine_mode mode)
+{
+  if (mode != VOIDmode && GET_MODE (op) != VOIDmode && mode != GET_MODE (op))
+    return 0;
+  if (GET_CODE (op) == SYMBOL_REF || GET_CODE (op) == LABEL_REF)
+    return 1;
+  if (GET_CODE (op) == CONST
+      && GET_CODE (XEXP (op,0)) == PLUS
+      && GET_CODE (XEXP (XEXP (op,0), 0)) == SYMBOL_REF
+      && GET_CODE (XEXP (XEXP (op,0), 1)) == CONST_INT)
+    return 1;
+  return 0;
+}
+
+/* Returns 1 if OP is a plain constant or matched by symbolic_operand.  */
+
+int
+symbolic_or_const_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) 
+{
+  if (GET_CODE (op) == CONST_INT || GET_CODE (op) == CONST_DOUBLE)
+    return 1;
+  return symbolic_operand (op, mode);
 }
 
 /* Split one or more DImode RTL references into pairs of SImode
@@ -1653,32 +1556,6 @@ hard_regno_mode_ok (int regno, enum machine_mode mode)
   if (mode == PDImode)
     return regno == REG_A0 || regno == REG_A1;
   return TEST_HARD_REG_BIT (reg_class_contents[MOST_REGS], regno);
-}
-
-/* Returns 1 if OP is either the constant zero or a register.  If a
-   register, it must be in the proper mode unless MODE is VOIDmode.  */
- 
-int
-reg_or_0_operand (rtx op, enum machine_mode mode) {
-  return op == const0_rtx || register_operand (op, mode);
-}
-
-/* Used for secondary reloads, this function returns 1 if OP is of the
-   form (plus (fp) (const_int)), where CONST_INT can't be added in one
-   instruction.  */
-
-int
-fp_plus_const_operand (rtx op, enum machine_mode mode)
-{
-  rtx op1, op2;
-  if (GET_CODE (op) != PLUS)
-    return 0;
-  op1 = XEXP (op, 0);
-  op2 = XEXP (op, 1);
-  return (REG_P (op1)
-	  && (REGNO (op1) == FRAME_POINTER_REGNUM
-	      || REGNO (op1) == STACK_POINTER_REGNUM)
-	  && GET_CODE (op2) == CONST_INT && ! imm7bit_operand_p (op2, mode));
 }
 
 #undef MAX_COST
@@ -1975,43 +1852,6 @@ bfin_return_in_memory (tree type)
   if (size > 12)
     return 1;
   return 0;
-}
-
-rtx
-bfin_force_reg (enum machine_mode mode, rtx x)
-{
-  rtx temp, insn/*, set*/;
-
-  if (GET_CODE (x) == REG)
-    return x;
-
-  if (general_operand (x, mode))
-    {
-      temp = gen_reg_rtx (mode);
-      insn = emit_move_insn (temp, x);
-    }
-  else
-    {
-      temp = force_operand (x, NULL_RTX);
-      if (GET_CODE (temp) == REG)
-        insn = get_last_insn ();
-      else
-        {
-          rtx temp2 = gen_reg_rtx (mode);
-          insn = emit_move_insn (temp2, temp);
-          temp = temp2;
-        }
-    }
-
-  /* Let optimizers know that TEMP's value never changes
-     and that X can be substituted for it.  Don't get confused
-     if INSN set something else (such as a SUBREG of TEMP).  */
-/*  if (CONSTANT_P (x)
-      && (set = single_set (insn)) != 0
-      && SET_DEST (set) == temp)
-    set_unique_reg_note (insn, REG_EQUAL, x);
-*/
-  return temp;
 }
 
 const char *

@@ -620,7 +620,7 @@ static int condition_clobbered;
    condition which is passed through DATA.  Called via note_stores
    from sequence_clobbers_condition_p.  */
 
-static int
+static void
 note_clobbers_of_cond (rtx x, rtx pat, void *data)
 {
   rtx cond = (rtx) data;

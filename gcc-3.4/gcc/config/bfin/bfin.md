@@ -1210,15 +1210,16 @@
   rtx reg;
   if (operands[1] != const0_rtx)
     {
-      rtx tmp_const = GEN_INT (-INTVAL (operands[1]));
-      if (! imm7bit_operand_p (tmp_const, SImode))
+      HOST_WIDE_INT v = -INTVAL (operands[1]);
+      rtx tmp_const = GEN_INT (v);
+      if (! CONST_7BIT_IMM_P (v))
 	tmp_const = force_reg (SImode, tmp_const);
       reg = gen_reg_rtx (SImode);
       emit_insn (gen_addsi3 (reg, operands[0], tmp_const));
       operands[0] = reg;
     }                                               
 
-  operands[2] = bfin_force_reg (SImode, operands[2]);
+  operands[2] = force_reg (SImode, operands[2]);
   emit_jump_insn (gen_casesi_internal (operands[0], operands[2], operands[3],
                                        operands[4]));
   DONE;

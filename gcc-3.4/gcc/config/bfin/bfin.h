@@ -14,8 +14,6 @@
 /* In order to use atof */
 /* #include <stdlib.h>	*/
 
-#define USER_LABEL_PREFIX "_"
-
 #define OBJECT_FORMAT_ELF
 
 #define BRT 1
@@ -741,15 +739,15 @@ typedef struct {
    that is a valid memory address for an instruction.
    The MODE argument is the machine mode for the MEM expression
    that wants to use this address. 
-   
-   bfin addressing modes are as follows:
-   
+
+   Blackfin addressing modes are as follows:
+
       [preg]
       [preg + imm16]
 
-B [ Preg + uimm15 ]
-W [ Preg + uimm16m2 ]
-[ Preg + uimm17m4 ] 
+      B [ Preg + uimm15 ]
+      W [ Preg + uimm16m2 ]
+      [ Preg + uimm17m4 ] 
 
       [preg++]
       [preg--]
@@ -800,9 +798,11 @@ W [ Preg + uimm16m2 ]
    It is always safe for this macro to do nothing.  It exists to recognize
    opportunities to optimize the output.
  */
-#define LEGITIMIZE_ADDRESS(X,OLDX,MODE,WIN) {\
-   rtx _q;\
-   if((_q = legitimize_address(X,OLDX,MODE))) { X = _q; goto WIN;}}
+#define LEGITIMIZE_ADDRESS(X,OLDX,MODE,WIN)    \
+do {					       \
+   rtx _q = legitimize_address(X, OLDX, MODE); \
+   if (_q) { X = _q; goto WIN; }	       \
+} while (0)
 
 #define HAVE_POST_INCREMENT 1
 #define HAVE_POST_DECREMENT 1
@@ -1017,7 +1017,6 @@ do {                                              \
   {"pos_scale_operand", {CONST_INT}},                                  	\
   {"positive_immediate_operand", {CONST_INT}},				\
   {"reg_or_7bit_operand", {CONST_INT, REG}},				\
-  {"regorbitclr_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},        	\
   {"regorlog2_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},          	\
 
 /* Describing Relative Costs of Operations */
