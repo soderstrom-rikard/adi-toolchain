@@ -429,10 +429,6 @@ bfin_next_bp_addr (CORE_ADDR pc)
     pc = read_register (BFIN_RETS_REGNUM);
     return pc;
   }
-  else if (op == P_MNOP) {
-    /* MNOP when issued in parallel with two compatible load/store instructions */
-    return pc + 8;
-  }
   else if (op >= P_EXCPT_MIN && op <= P_EXCPT_MAX) {
     op_prev = read_memory_unsigned_integer (pc - 4, 4);
     if ((op_prev == P_SIGNAL_INS_1) || (op_prev == P_RT_SIGNAL_INS_1)) {
@@ -481,11 +477,70 @@ bfin_software_single_step (enum target_signal sig, int insert_breakpoints_p)
   };
 
   CORE_ADDR pc;
+
+  CORE_ADDR lb0;
+  CORE_ADDR lb1;
+  CORE_ADDR lc0;
+  CORE_ADDR lc1;
+  CORE_ADDR lt0;
+  CORE_ADDR lt1;
+
+  CORE_ADDR next_pc;
+
   static struct ss_location break_mem;
 
   if (insert_breakpoints_p) {
     pc = read_register (BFIN_PC_REGNUM);
     break_mem.bp_addr = bfin_next_bp_addr(pc);
+
+    /* Now, check if you are at the loop end.
+       due to the way loops work, we cannot set a breakpoint on the last instruction
+       of the loop - that instruction will never get executed as the pc changes due
+       to a side effect of LBx register being equal to pc
+       Read, the instruction manual VERY carefully. */
+
+    lb0 = read_register (BFIN_LB0_REGNUM) & ~1; //LB register has the last bit set, sometimes.
+    lb1 = read_register (BFIN_LB1_REGNUM) & ~1; //LB register has the last bit set, sometimes.
+    lc0 = read_register (BFIN_LC0_REGNUM);
+    lc1 = read_register (BFIN_LC1_REGNUM);
+    lt0 = read_register (BFIN_LT0_REGNUM);
+    lt1 = read_register (BFIN_LT1_REGNUM);
+
+
+    next_pc = break_mem.bp_addr;
+
+    /* First check for LB1 as it is the inner loop */
+    if (lb1 == next_pc) {
+       if (lc1 > 1) {
+          if (lb1 == lt1) {
+    	     break_mem.bp_addr = bfin_next_bp_addr(break_mem.bp_addr);
+          }
+          else {
+    	     break_mem.bp_addr = lt1;
+          }
+       }
+       else {
+    	  break_mem.bp_addr = bfin_next_bp_addr(break_mem.bp_addr);
+       }
+    }
+
+    next_pc = break_mem.bp_addr;
+
+    /* Next check for LB0 as it is the outer loop */
+    if (lb0 == pc) {
+       if (lc0 > 1) {
+          if (lb0 == lt0) {
+    	     break_mem.bp_addr = bfin_next_bp_addr(break_mem.bp_addr);
+          }
+          else {
+    	     break_mem.bp_addr = lt0;
+          }
+       }
+       else {
+    	  break_mem.bp_addr = bfin_next_bp_addr(break_mem.bp_addr);
+       }
+    }
+
     target_insert_breakpoint (break_mem.bp_addr, break_mem.shadow_contents);
   }
   else
