@@ -350,6 +350,7 @@ md_assemble (char *line)
     {
 	switch (insn->reloc)
 	  {
+	   case BFD_RELOC_24_PCREL_JUMP_L:
 	   case BFD_RELOC_24_PCREL_CALL_X:
 	   case BFD_RELOC_24_PCREL:
 	   case BFD_RELOC_16_LOW:
@@ -524,7 +525,7 @@ md_apply_fix3 (fixP, valp, seg)
 	if (! val) 
        {   fixP->fx_addnumber = 0; break;      }
        fixP->fx_addnumber = 1;
-       val /=2; val++;  /*  Add into the length of "BRF/T label"   --- Tony */
+       val /=2; //val++;  /*  Add into the length of "BRF/T label"   --- Tony */
        shift = 1;
          /* as_tsktsk ("Value of val = %x \n", val); */
        if (val < -0x200 || val >= 0x1ff)
@@ -547,7 +548,7 @@ md_apply_fix3 (fixP, valp, seg)
            break;
         }
 	fixP->fx_addnumber = 1;
-	val /= 2; val++; /*  Add into the length of "jump label"   --- Tony */ 
+	val /= 2; //val++; /*  Add into the length of "jump label"   --- Tony */ 
 	shift = 1;
 	if (val < -0x800 || val >= 0x7ff)
 	  as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_12");
@@ -583,7 +584,7 @@ md_apply_fix3 (fixP, valp, seg)
        /*This switch case and next one BFD_RELOC_24_PCREL_CALL_X looks
          very similar. I think these two should be handled in same way.
          But, for time being I am handling it separately*/
-       	if (! val) {   
+       /*	if (! val) {   
 	   fixP->fx_addnumber = 0; 
            break;
         }
@@ -596,7 +597,7 @@ md_apply_fix3 (fixP, valp, seg)
 	buf[0] = val >> 16;
 	buf[2] = val >> 0;
 	buf[3] = val >> 8;
-	break;
+	break;*/
      case BFD_RELOC_24_PCREL_CALL_X: 
      case BFD_RELOC_24_PCREL: 
 	if (! val) {   
@@ -604,7 +605,7 @@ md_apply_fix3 (fixP, valp, seg)
            break;
         }
 	fixP->fx_addnumber = 1;
-	val = (val + 6)/2; /*  Add into the length of "call/ljump label"   --- Tony */ 
+	val /=2; val++;// (val + 6)/2; /*  Add into the length of "call/ljump label"   --- Tony */ 
 	shift = 1;
 	if (val < -0x800000 || val >= 0x7fffff)
 	  as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_24");
@@ -619,7 +620,7 @@ md_apply_fix3 (fixP, valp, seg)
            break;
         }
 	fixP->fx_addnumber = 1;
-	val /=2; val++; /* Add into opcode length   ---Tony */
+	val /=2; //val++; /* Add into opcode length   ---Tony */
 	shift = 1;
 
 	if (val < -0x8 || val >= 0x7)
@@ -634,7 +635,7 @@ md_apply_fix3 (fixP, valp, seg)
            break; 
         }
 	fixP->fx_addnumber = 1;
-	val =(val+4)/2;
+	val /=2; val++;//(val+4)/2;
 	shift = 1;
         if (val < -0x200 || val >= 0x1ff)
           as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_11_PCREL");
@@ -795,7 +796,7 @@ md_pcrel_from (fixP)
     }
 
   /* Return the address of the delay slot.  */
-  return fixP->fx_frag->fr_address + fixP->fx_where + fixP->fx_size;
+  return fixP->fx_frag->fr_address + fixP->fx_where;// + fixP->fx_size;
 }
 
 /*
