@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "GCC 1"
-.TH GCC 1 "2004-04-19" "gcc-3.4.0" "GNU"
+.TH GCC 1 "2004-07-01" "gcc-3.4.1" "GNU"
 .SH "NAME"
 gcc \- GNU project C and C++ compiler
 .SH "SYNOPSIS"
@@ -4520,10 +4520,14 @@ Predefine \fIname\fR as a macro, with definition \f(CW1\fR.
 .IP "\fB\-D\fR \fIname\fR\fB=\fR\fIdefinition\fR" 4
 .IX Item "-D name=definition"
 Predefine \fIname\fR as a macro, with definition \fIdefinition\fR.
-There are no restrictions on the contents of \fIdefinition\fR, but if
-you are invoking the preprocessor from a shell or shell-like program you
-may need to use the shell's quoting syntax to protect characters such as
-spaces that have a meaning in the shell syntax.
+The contents of \fIdefinition\fR are tokenized and processed as if
+they appeared during translation phase three in a \fB#define\fR
+directive.  In particular, the definition will be truncated by
+embedded newline characters.
+.Sp
+If you are invoking the preprocessor from a shell or shell-like
+program you may need to use the shell's quoting syntax to protect
+characters such as spaces that have a meaning in the shell syntax.
 .Sp
 If you wish to define a function-like macro on the command line, write
 its argument list with surrounding parentheses before the equals sign
@@ -5289,14 +5293,14 @@ this is the right thing to do.
 .Sp
 If, instead, you use the \s-1GCC\s0 driver to create shared libraries, you may
 find that they will not always be linked with the shared \fIlibgcc\fR.
-If \s-1GCC\s0 finds, at its configuration time, that you have a \s-1GNU\s0 linker that
-does not support option \fB\-\-eh\-frame\-hdr\fR, it will link the shared
-version of \fIlibgcc\fR into shared libraries by default.  Otherwise,
-it will take advantage of the linker and optimize away the linking with
-the shared version of \fIlibgcc\fR, linking with the static version of
-libgcc by default.  This allows exceptions to propagate through such
-shared libraries, without incurring relocation costs at library load
-time.
+If \s-1GCC\s0 finds, at its configuration time, that you have a non-GNU linker
+or a \s-1GNU\s0 linker that does not support option \fB\-\-eh\-frame\-hdr\fR,
+it will link the shared version of \fIlibgcc\fR into shared libraries
+by default.  Otherwise, it will take advantage of the linker and optimize
+away the linking with the shared version of \fIlibgcc\fR, linking with
+the static version of libgcc by default.  This allows exceptions to
+propagate through such shared libraries, without incurring relocation
+costs at library load time.
 .Sp
 However, if a library or main executable is supposed to throw or catch
 exceptions, you must link it using the G++ or \s-1GCJ\s0 driver, as appropriate
@@ -6516,8 +6520,8 @@ Supported values for \fIcpu_type\fR are \fB401\fR, \fB403\fR,
 \&\fB7450\fR, \fB750\fR, \fB801\fR, \fB821\fR, \fB823\fR,
 \&\fB860\fR, \fB970\fR, \fBcommon\fR, \fBec603e\fR, \fBG3\fR,
 \&\fBG4\fR, \fBG5\fR, \fBpower\fR, \fBpower2\fR, \fBpower3\fR,
-\&\fBpower4\fR, \fBpowerpc\fR, \fBpowerpc64\fR, \fBrios\fR,
-\&\fBrios1\fR, \fBrios2\fR, \fBrsc\fR, and \fBrs64a\fR.
+\&\fBpower4\fR, \fBpower5\fR, \fBpowerpc\fR, \fBpowerpc64\fR,
+\&\fBrios\fR, \fBrios1\fR, \fBrios2\fR, \fBrsc\fR, and \fBrs64a\fR.
 .Sp
 \&\fB\-mcpu=common\fR selects a completely generic processor.  Code
 generated under this option will run on any \s-1POWER\s0 or PowerPC processor.
@@ -7582,13 +7586,25 @@ Intel PentiumPro \s-1CPU\s0.
 .IP "\fIpentium2\fR" 4
 .IX Item "pentium2"
 Intel Pentium2 \s-1CPU\s0 based on PentiumPro core with \s-1MMX\s0 instruction set support.
-.IP "\fIpentium3\fR" 4
-.IX Item "pentium3"
+.IP "\fIpentium3, pentium3m\fR" 4
+.IX Item "pentium3, pentium3m"
 Intel Pentium3 \s-1CPU\s0 based on PentiumPro core with \s-1MMX\s0 and \s-1SSE\s0 instruction set
 support.
-.IP "\fIpentium4\fR" 4
-.IX Item "pentium4"
+.IP "\fIpentium-m\fR" 4
+.IX Item "pentium-m"
+Low power version of Intel Pentium3 \s-1CPU\s0 with \s-1MMX\s0, \s-1SSE\s0 and \s-1SSE2\s0 instruction set
+support.  Used by Centrino notebooks.
+.IP "\fIpentium4, pentium4m\fR" 4
+.IX Item "pentium4, pentium4m"
 Intel Pentium4 \s-1CPU\s0 with \s-1MMX\s0, \s-1SSE\s0 and \s-1SSE2\s0 instruction set support.
+.IP "\fIprescott\fR" 4
+.IX Item "prescott"
+Improved version of Intel Pentium4 \s-1CPU\s0 with \s-1MMX\s0, \s-1SSE\s0, \s-1SSE2\s0 and \s-1SSE3\s0 instruction
+set support.
+.IP "\fInocona\fR" 4
+.IX Item "nocona"
+Improved version of Intel Pentium4 \s-1CPU\s0 with 64\-bit extensions, \s-1MMX\s0, \s-1SSE\s0,
+\&\s-1SSE2\s0 and \s-1SSE3\s0 instruction set support.
 .IP "\fIk6\fR" 4
 .IX Item "k6"
 \&\s-1AMD\s0 K6 \s-1CPU\s0 with \s-1MMX\s0 instruction set support.

@@ -364,7 +364,7 @@ int main()
           might  print 50 on some systems and optimization levels, and 49
           on others.
 
-          The  is  the  result of rounding: The computer cannot represent
+          This  is  the result of rounding: The computer cannot represent
           all real numbers exactly, so it has to use approximations. When
           computing  with  approximation,  the computer needs to round to
           the nearest representable number.
@@ -659,8 +659,8 @@ void bar(void)
    standard  (available  at  [35]http://www.ncits.org/cplusplus.htm).  We
    have  also  implemented  some  of  the core and library defect reports
    (available at
-   [36]http://anubis.dkuug.dk/jtc1/sc22/wg21/docs/cwg_defects.html      &
-   [37]http://anubis.dkuug.dk/jtc1/sc22/wg21/docs/lwg-defects.html
+   [36]http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_defects.html     &
+   [37]http://www.open-std.org/jtc1/sc22/wg21/docs/lwg-defects.html
    respectively).
 
    Non-conforming  legacy code that worked with older versions of GCC may
@@ -804,6 +804,6 @@ References
   33. http://www.gnu.org/software/libc/
   34. http://gcc.gnu.org/onlinedocs/gcc/Compatibility.html
   35. http://www.ncits.org/cplusplus.htm
-  36. http://anubis.dkuug.dk/jtc1/sc22/wg21/docs/cwg_defects.html
-  37. http://anubis.dkuug.dk/jtc1/sc22/wg21/docs/lwg-defects.html
+  36. http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_defects.html
+  37. http://www.open-std.org/jtc1/sc22/wg21/docs/lwg-defects.html
   38. http://gcc.gnu.org/onlinedocs/gcc/C---Misunderstandings.html

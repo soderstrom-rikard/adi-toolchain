@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "CPP 1"
-.TH CPP 1 "2004-04-19" "gcc-3.4.0" "GNU"
+.TH CPP 1 "2004-07-01" "gcc-3.4.1" "GNU"
 .SH "NAME"
 cpp \- The C Preprocessor
 .SH "SYNOPSIS"
@@ -219,10 +219,14 @@ Predefine \fIname\fR as a macro, with definition \f(CW1\fR.
 .IP "\fB\-D\fR \fIname\fR\fB=\fR\fIdefinition\fR" 4
 .IX Item "-D name=definition"
 Predefine \fIname\fR as a macro, with definition \fIdefinition\fR.
-There are no restrictions on the contents of \fIdefinition\fR, but if
-you are invoking the preprocessor from a shell or shell-like program you
-may need to use the shell's quoting syntax to protect characters such as
-spaces that have a meaning in the shell syntax.
+The contents of \fIdefinition\fR are tokenized and processed as if
+they appeared during translation phase three in a \fB#define\fR
+directive.  In particular, the definition will be truncated by
+embedded newline characters.
+.Sp
+If you are invoking the preprocessor from a shell or shell-like
+program you may need to use the shell's quoting syntax to protect
+characters such as spaces that have a meaning in the shell syntax.
 .Sp
 If you wish to define a function-like macro on the command line, write
 its argument list with surrounding parentheses before the equals sign

@@ -5568,6 +5568,7 @@ handle_braces (const char *p)
 	abort ();
     }
   while (*p++ != '}');
+
   return p;
 
 #undef SKIP_WHITE
