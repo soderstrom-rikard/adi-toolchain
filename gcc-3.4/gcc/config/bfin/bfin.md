@@ -248,7 +248,7 @@
 ;; Insns to load HIGH and LO_SUM
 
 (define_insn "*movsi_high"
-  [(set (match_operand:SI 0 "register_operand" "=da")
+  [(set (match_operand:SI 0 "register_operand" "=x")
 	(high:SI (match_operand:SI 1 "immediate_operand" "i")))]
   "reload_completed"
   "%d0 = %d1;"
@@ -256,7 +256,7 @@
    (set_attr "length" "4")])
 
 (define_insn "*movsi_low"
-  [(set (match_operand:SI 0 "register_operand" "=da")
+  [(set (match_operand:SI 0 "register_operand" "=x")
 	(lo_sum:SI (match_operand:SI 1 "register_operand" "0")
 		   (match_operand:SI 2 "immediate_operand" "i")))]
   "reload_completed"
@@ -320,7 +320,7 @@
   [(set_attr "type" "move,mcst,mcld")])
 
 (define_insn "*movsi_insn"
-  [(set (match_operand:SI 0 "nonimmediate_operand" "=x,da,x,x,da,da,mr,d,y,<da,xy")
+  [(set (match_operand:SI 0 "nonimmediate_operand" "=x,da,x,x,x,da,mr,d,y,<da,xy")
         (match_operand:SI 1 "general_operand" "x,xKs7,xKsh,xKuh,ix,mr,da,y,d,xy,>da"))]
 
   ""
