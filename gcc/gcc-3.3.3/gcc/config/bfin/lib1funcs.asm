@@ -2833,6 +2833,31 @@ L$25:
 
 #endif
 
+#ifdef L_ledf2
+.align 2
+.global ___ledf2;
+.type ___ledf2, STT_FUNC;
+.global __ledf2;
+.type __ledf2, STT_FUNC;
+___ledf2:
+__ledf2:
+      LINK 0x0;
+      SP+=-0xC;
+      [FP +8] =R0 ;
+      [FP +12] =R1 ;
+      [FP +16] =R2 ;
+      CALL ___truncdfsf2;
+      R2 = R0;
+      R0=[FP+0x10];
+      R1=[FP+0x14];
+      CALL ___truncdfsf2;
+      R1 = R0;
+      R0 = [SP+0x8];
+      SP+=0xC;
+      CALL ___lesf2;
+      UNLINK;
+      RTS;
+#endif
 
 
 

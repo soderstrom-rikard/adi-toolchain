@@ -25,7 +25,7 @@ LIB1ASMFUNCS = 	_addsf3 _divsf3 _fixsfsi _lesf2 _modsi3 _nesf2 \
 	_adddf3 _gtdf2 _nedf2 _eqdf2  _gedf2 _subdf3 _muldf3\
 	_divdf3 _cmpdf2 _ltdf2 _negdf2 _fixdfsi \
 	_truncdfsf2 \
-	_floatsidf
+	_floatsidf _ledf2
  
 
 # Hard code LIB2FUNCS so that DI and DF functions are not included.
