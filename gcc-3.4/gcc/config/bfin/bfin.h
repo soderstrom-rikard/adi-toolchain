@@ -337,11 +337,11 @@ extern const char * directive_names[];
 
 #define TRAMPOLINE_SIZE 18
 #define TRAMPOLINE_TEMPLATE(FILE)                                       \
-  fprintf(FILE, "\t.dd\t0xe10c0000\n"); /* p3.l = fn low */		\
-  fprintf(FILE, "\t.dd\t0xe12c0000\n"); /* p3.h = fn high */;		\
-  fprintf(FILE, "\t.dd\t0xe10d0000\n"); /* p4.l = sc low */;		\
-  fprintf(FILE, "\t.dd\t0xe12d0000\n"); /* p4.h = sc high */;		\
-  fprintf(FILE, "\t.dw\t0x0083\n"); /* jump (p3)*/
+  fprintf(FILE, "\t.dd\t0x0000e10b\n"); /* p3.l = fn low */		\
+  fprintf(FILE, "\t.dd\t0x0000e14b\n"); /* p3.h = fn high */;		\
+  fprintf(FILE, "\t.dd\t0x0000e10c\n"); /* p4.l = sc low */;		\
+  fprintf(FILE, "\t.dd\t0x0000e14c\n"); /* p4.h = sc high */;		\
+  fprintf(FILE, "\t.dw\t0x0053\n"); /* jump (p3)*/
 
 #define INITIALIZE_TRAMPOLINE(TRAMP, FNADDR, CXT) \
   initialize_trampoline (TRAMP, FNADDR, CXT)

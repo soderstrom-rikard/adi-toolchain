@@ -1,3 +1,8 @@
+2004-10-03  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.h (TRAMPOLINE_TEMPLATE): Correct instruction
+	encodings.
+
 2004-09-29  Bernd Schmidt  <bernds@btinternet.com>
 
 	* config/bfin/bfin.h (PREFERRED_RELOAD_CLASS): Simply return CLASS.
