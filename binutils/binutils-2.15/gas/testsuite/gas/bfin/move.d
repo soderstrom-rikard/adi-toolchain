@@ -26,13 +26,13 @@ Disassembly of section .text:
   24:	85 31       	R0=LB1;
   26:	96 31       	R2=CYCLES;
   28:	9f 31       	R3=CYCLES2;
-  2a:	cf 31		R1=EMUDAT;
+  2a:	cf 31       	R1=EMUDAT;
   2c:	31 3d       	CYCLES=A0.w;
   2e:	7f 38       	RETS=FP;
   30:	e0 3d       	LT1=USP;
   32:	72 38       	ASTAT=P2;
-  34:	08 c4 3f c0 	A0=A1;
-  38:	08 c4 3f e0 	A1=A0;
+  34:	08 c4 [0|3][0|f] c0 	A0=A1;
+  38:	08 c4 [0|3][0|f] e0 	A1=A0;
   3c:	09 c4 00 20 	A0=R0;
   40:	09 c4 08 a0 	A1=R1;
   44:	8b c0 00 39 	R4 = A0 \(FU\);
@@ -57,8 +57,8 @@ Disassembly of section .text:
 00000068 <move_register_half>:
   68:	09 c4 28 40 	A0.x=R5.L;
   6c:	09 c4 10 c0 	A1.x=R2.L;
-  70:	0a c4 36 00 	R0.L=A0.x;
-  74:	0a c4 36 4e 	R7.L=A1.x;
+  70:	0a c4 [0|3][0|6] 00 	R0.L=A0.x;
+  74:	0a c4 [0|3][0|6] 4e 	R7.L=A1.x;
   78:	09 c4 18 00 	A0.L=R3.L;
   7c:	09 c4 20 80 	A1.L=R4.L;
   80:	29 c4 30 00 	A0.H=R6.H;

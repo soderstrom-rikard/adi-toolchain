@@ -27,7 +27,7 @@ Disassembly of section .text:
 0000002c <byteop1p>:
   2c:	14 c4 02 0e 	R7=BYTEOP1P\(R1:0x0,R3:0x2\);
   30:	14 c4 02 44 	R2=BYTEOP1P\(R1:0x0,R3:0x2\)\(T\);
-  34:	14 c4 02 26 	R3=BYTEOP1P\(R1:0x0,R3:0x2\) \(R\);
+  34:	14 c4 02 26 	R3=BYTEOP1P\(R1:0x0,R3:0x2\)\(R\);
   38:	14 c4 02 6e 	R7=BYTEOP1P\(R1:0x0,R3:0x2\)\(T, R\);
 
 0000003c <byteop2p>:
@@ -52,5 +52,5 @@ Disassembly of section .text:
   6c:	12 c4 02 20 	SAA\(R1:0x0,R3:0x2\) \(R\);
 
 00000070 <byteunpack>:
-  70:	18 c4 c0 45 	\(R7,R2\)=BYTEUNPACKR1:0x0 ;
-  74:	18 c4 90 69 	\(R6,R4\)=BYTEUNPACKR3:0x2 \(R\);
+  70:	18 c4 c0 45 	\(R7,R2\) = BYTEUNPACK R1:0x0 ;
+  74:	18 c4 90 69 	\(R6,R4\) = BYTEUNPACK R3:0x2 \(R\);

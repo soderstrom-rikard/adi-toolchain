@@ -48,8 +48,8 @@ Disassembly of section .text:
   a0:	37 c4 02 26 	R3=BYTEOP3P\(R1:0x0,R3:0x2\)\(HI, R\);
   a4:	17 c4 10 08 	R4=BYTEOP3P\(R3:0x2,R1:0x0\)\(LO\);
   a8:	37 c4 10 0a 	R5=BYTEOP3P\(R3:0x2,R1:0x0\)\(HI\);
-  ac:	17 c4 10 2c 	R6=BYTEOP3P\(R3:0x2,R1:0x2\)\(LO, R\);
-  b0:	37 c4 10 2e 	R7=BYTEOP3P\(R3:0x2,R1:0x2\)\(HI, R\);
+  ac:	17 c4 10 2c 	R6=BYTEOP3P\(R3:0x2,R1:0x0\)\(LO, R\);
+  b0:	37 c4 10 2e 	R7=BYTEOP3P\(R3:0x2,R1:0x0\)\(HI, R\);
   b4:	0c c4 36 40 	R0=A1.L\+A1.H,R0=A0.L\+A0.H;
   b8:	0c c4 36 42 	R0=A1.L\+A1.H,R1=A0.L\+A0.H;
   bc:	0c c4 b6 46 	R2=A1.L\+A1.H,R3=A0.L\+A0.H;
@@ -72,11 +72,11 @@ Disassembly of section .text:
  100:	15 c4 02 22 	\(R0,R1\)=BYTEOP16P\(R1:0x0,R3:0x2\) \(R\);
  104:	15 c4 82 26 	\(R2,R3\)=BYTEOP16P\(R1:0x0,R3:0x2\) \(R\);
  108:	14 c4 02 06 	R3=BYTEOP1P\(R1:0x0,R3:0x2\);
- 10c:	14 c4 02 26 	R3=BYTEOP1P\(R1:0x0,R3:0x2\) \(R\);
+ 10c:	14 c4 02 26 	R3=BYTEOP1P\(R1:0x0,R3:0x2\)\(R\);
  110:	14 c4 02 46 	R3=BYTEOP1P\(R1:0x0,R3:0x2\)\(T\);
  114:	14 c4 02 66 	R3=BYTEOP1P\(R1:0x0,R3:0x2\)\(T, R\);
  118:	14 c4 10 00 	R0=BYTEOP1P\(R3:0x2,R1:0x0\);
- 11c:	14 c4 10 22 	R1=BYTEOP1P\(R3:0x2,R1:0x0\) \(R\);
+ 11c:	14 c4 10 22 	R1=BYTEOP1P\(R3:0x2,R1:0x0\)\(R\);
  120:	14 c4 10 44 	R2=BYTEOP1P\(R3:0x2,R1:0x0\)\(T\);
  124:	14 c4 10 66 	R3=BYTEOP1P\(R3:0x2,R1:0x0\)\(T, R\);
  128:	16 c4 02 06 	R3=BYTEOP2P\(R1:0x0,R3:0x2\)\(RNDL\);
@@ -138,11 +138,11 @@ Disassembly of section .text:
  208:	12 cc 02 20 	SAA\(R1:0x0,R3:0x2\) \(R\) || R1=\[I0\+\+\] || R3=\[I1\+\+\];
  20c:	01 9c 0b 9c 
  210:	12 c4 02 00 	SAA\(R1:0x0,R3:0x2\) ;
- 214:	18 c4 80 4b 	\(R6,R5\)=BYTEUNPACKR1:0x0 ;
- 218:	18 c4 80 6b 	\(R6,R5\)=BYTEUNPACKR1:0x0 \(R\);
- 21c:	18 c4 90 4b 	\(R6,R5\)=BYTEUNPACKR3:0x2 ;
- 220:	18 c4 90 6b 	\(R6,R5\)=BYTEUNPACKR3:0x2 \(R\);
- 224:	18 c4 00 42 	\(R0,R1\)=BYTEUNPACKR1:0x0 ;
- 228:	18 c4 80 66 	\(R2,R3\)=BYTEUNPACKR1:0x0 \(R\);
- 22c:	18 c4 10 4b 	\(R4,R5\)=BYTEUNPACKR3:0x2 ;
- 230:	18 c4 90 6f 	\(R6,R7\)=BYTEUNPACKR3:0x2 \(R\);
+ 214:	18 c4 80 4b 	\(R6,R5\) = BYTEUNPACK R1:0x0 ;
+ 218:	18 c4 80 6b 	\(R6,R5\) = BYTEUNPACK R1:0x0 \(R\);
+ 21c:	18 c4 90 4b 	\(R6,R5\) = BYTEUNPACK R3:0x2 ;
+ 220:	18 c4 90 6b 	\(R6,R5\) = BYTEUNPACK R3:0x2 \(R\);
+ 224:	18 c4 00 42 	\(R0,R1\) = BYTEUNPACK R1:0x0 ;
+ 228:	18 c4 80 66 	\(R2,R3\) = BYTEUNPACK R1:0x0 \(R\);
+ 22c:	18 c4 10 4b 	\(R4,R5\) = BYTEUNPACK R3:0x2 ;
+ 230:	18 c4 90 6f 	\(R6,R7\) = BYTEUNPACK R3:0x2 \(R\);

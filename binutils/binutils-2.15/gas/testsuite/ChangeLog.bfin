@@ -1,3 +1,11 @@
+2005-01-11  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/move.d: Update expected output.
+	* gas/bfin/move2.d: Likewise.
+	* gas/bfin/video.d: Likewise.
+	* gas/bfin/video2.d: Likewise.
+	* gas/bfin/video.s: Correct BYTEOP1P test.
+
 2004-12-30  Catherine Moore  <clm@cm00re.com>
 
 	* gas/bfin/arithmetic.d: Update expected output.

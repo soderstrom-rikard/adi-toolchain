@@ -31,7 +31,7 @@ byteop16p:
 	.text
 	.global byteop1p
 byteop1p:
-	R7 = BYTEOP1P (R1:0, R3:2) (t);
+	R7 = BYTEOP1P (R1:0, R3:2);
 	r2 = byteop1p (r1:0, r3:2) (t);
 	R3 = ByteOp1P (r1:0, R3:2) (R);
 	r7 = byteOP1P (R1:0, r3:2) (T, r);
