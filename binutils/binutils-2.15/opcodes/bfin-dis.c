@@ -759,6 +759,12 @@ decode_optmode (int mod, int MM, disassemble_info *outf)
 
   OUTS (outf, " (");
 
+  if (MM && !mod)
+    {
+      OUTS (outf, "M)");
+      return;
+    }
+
   if (MM)
     OUTS (outf, "M, ");
   
@@ -785,7 +791,6 @@ decode_optmode (int mod, int MM, disassemble_info *outf)
 
   OUTS (outf, ")");
 }
-
 static int
 decode_ProgCtrl_0 (TIword iw0, disassemble_info *outf)
 {
@@ -5179,9 +5184,6 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
   int src1 = ((iw1 >> 0) & 0x7);
   int sop = ((iw1 >> 14) & 0x3);
   int dst0 = ((iw1 >> 9) & 0x7);
-#if 0				/* commented out as it is not used currently */
-  int M = ((iw0 >> 11) & 0x1);
-#endif
   int sopcde = ((iw0 >> 0) & 0x1f);
   int HLs = ((iw1 >> 12) & 0x3);
   const char *acc01 = (HLs & 1) == 0 ? "A0" : "A1";

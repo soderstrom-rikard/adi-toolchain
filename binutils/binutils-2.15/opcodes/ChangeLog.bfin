@@ -1,3 +1,7 @@
+2005-01-12  Catherine Moore  <clm@cm00re.com>
+
+	* bfin-dis.c (decode_optmode):  Handle (M) case.
+
 2005-01-11  Catherine Moore  <clm@cm00re.com>
 
 	* bfin-dis.c (machine_registers): Define REG_EMUDAT.
