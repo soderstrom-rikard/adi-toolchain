@@ -1,3 +1,8 @@
+2004-10-18  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* cse.c (cse_insn): Stores in a libcall sequence can invalidate
+	previous loads, namely those used to save parts of the argument area.
+
 2004-10-17  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (output_load_immediate): Use byte accesses for

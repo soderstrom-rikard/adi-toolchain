@@ -5761,12 +5761,7 @@ cse_insn (rtx insn, rtx libcall_insn)
 	  if (GET_CODE (dest) == REG || GET_CODE (dest) == SUBREG)
 	    invalidate (dest, VOIDmode);
 	  else if (GET_CODE (dest) == MEM)
-	    {
-	      /* Outgoing arguments for a libcall don't
-		 affect any recorded expressions.  */
-	      if (! libcall_insn || insn == libcall_insn)
-		invalidate (dest, VOIDmode);
-	    }
+	    invalidate (dest, VOIDmode);
 	  else if (GET_CODE (dest) == STRICT_LOW_PART
 		   || GET_CODE (dest) == ZERO_EXTRACT)
 	    invalidate (XEXP (dest, 0), GET_MODE (dest));
@@ -5934,12 +5929,7 @@ cse_insn (rtx insn, rtx libcall_insn)
 	if (GET_CODE (dest) == REG || GET_CODE (dest) == SUBREG)
 	  invalidate (dest, VOIDmode);
 	else if (GET_CODE (dest) == MEM)
-	  {
-	    /* Outgoing arguments for a libcall don't
-	       affect any recorded expressions.  */
-	    if (! libcall_insn || insn == libcall_insn)
-	      invalidate (dest, VOIDmode);
-	  }
+	  invalidate (dest, VOIDmode);
 	else if (GET_CODE (dest) == STRICT_LOW_PART
 		 || GET_CODE (dest) == ZERO_EXTRACT)
 	  invalidate (XEXP (dest, 0), GET_MODE (dest));
