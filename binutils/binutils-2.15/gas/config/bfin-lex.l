@@ -240,6 +240,8 @@ abort                                   return ABORT;
 [aA]0"."[xX]    _REG.regno = REG_A0x; return REG;
 [aA]0"."[wW]    _REG.regno = REG_A0w; return REG;
 [aA]0           _REG.regno = REG_A0;  return REG_A00;
+[Gg][Oo][Tt]	return GOT;
+[Pp][Ll][Tt][Pp][Cc]	return PLTPC;
 
 
 "~"                     return TILDA;
@@ -283,6 +285,7 @@ abort                                   return ABORT;
 ";"                     return SEMICOLON;
 "=!"					return _ASSIGN_BANG;
 "||"					return DOUBLE_BAR;
+"@"			return AT;
 <KEYWORD>[pP][rR][eE][fF][eE][tT][cC][hH]        return PREFETCH;
 <KEYWORD>[uU][nN][lL][iI][nN][kK]                return UNLINK;
 <KEYWORD>[lL][iI][nN][kK]                        return LINK;

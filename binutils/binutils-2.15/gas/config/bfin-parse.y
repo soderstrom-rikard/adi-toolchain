@@ -541,6 +541,7 @@ is_group2 (INSTR_T x)
 %token MODIFIED_STATUS_REG
 %token MNOP
 %token SYMBOL NUMBER
+%token GOT AT PLTPC
 
 /***************************************************************************/
 /* Types                                                                   */
@@ -597,6 +598,9 @@ is_group2 (INSTR_T x)
 %type<r0> w32_or_nothing
 %type<r0> c_align
 %type<r0> min_max
+%type<expr> got
+%type<expr> got_or_expr
+%type<expr> pltpc
 
 
 /* Precedence Rules */
@@ -2686,6 +2690,17 @@ asm_1:
 	    return semantic_error ("Bad value for long jump");
 	}
 
+	| JUMP_DOT_L pltpc
+	{
+	  if (IS_PCREL24 ($2))
+	    {
+	      notethat("CALLa: jump.l pcrel24\n");
+	      $$ = CALLA ($2, 2);
+	    }
+	  else
+	    return semantic_error ("Bad value for long jump");
+	}
+
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -2695,6 +2710,16 @@ asm_1:
 	    {
 	      notethat("CALLa: CALL pcrel25m2\n");
 	      $$ = CALLA ($2, 1);
+	    }
+	  else
+	    return semantic_error ("Bad call address");
+	}
+	| CALL pltpc
+	{
+	  if (IS_PCREL24 ($2))
+	    {
+	      notethat("CALLa: CALL pcrel25m2\n");
+	      $$ = CALLA ($2, 2);
 	    }
 	  else
 	    return semantic_error ("Bad call address");
@@ -3188,10 +3213,11 @@ asm_1:
 	    return semantic_error ("Bad register for LOAD");
 	}
 
-	| REG ASSIGN LBRACK REG plus_minus expr RBRACK
+	| REG ASSIGN LBRACK REG plus_minus got_or_expr RBRACK
 	{
 	  ExprNode *tmp = $6;
 	  int ispreg = IS_PREG ($1);
+	  int isgot = IS_RELOC($6);
 
 	  if (!IS_PREG ($4))
 	    return semantic_error ("Preg expected for indirect");
@@ -3202,7 +3228,11 @@ asm_1:
 	  if ($5.r0)
 	    tmp = unary (ExprOpTypeNEG, tmp);
 
-	  if (in_range_p (tmp, 0, 63, 3))
+	  if(isgot){
+	      notethat("LDSTidxI: dpregs = [ pregs + sym@got ]\n");
+	      $$ = LDSTIDXI (&$4, &$1, 0, 0, ispreg ? 1: 0, tmp);
+	  }
+	  else if (in_range_p (tmp, 0, 63, 3))
 	    {
 	      notethat("LDSTii: dpregs = [ pregs + uimm7m4 ]\n");
 	      $$ = LDSTII (&$4, &$1, tmp, 0, ispreg ? 3 : 0);
@@ -3902,67 +3932,24 @@ ccstat:
 //
 // are valid without brackets
 
-/*
-symbol:
-	SYMBOL
-	{ $$ = MKREF($1); }
-;
-
-eterm:
-	NUMBER
-	{ $$ = mkexpr($1,0); }
-;
-
-offset_expr:
-	{ $$ = mkexpr(0,0); }
-	| PLUS expr_1
-	{ $$ = $2; }
-	| MINUS expr_1
-	{ $$ = unary(twos_compl,$2); }
-;
-
-expr:
-    expr_1 
-	{ $$ = $1; }
-	| symbol offset_expr
-	{ $$ = binary(add,$1,$2); }
-;
-
-expr_1:
-	expr_1 STAR expr_1
-	{ $$ = binary(mult,$1,$3);   }
-    | LPAREN expr_1 RPAREN
-	{ $$ = $2; }
-	| expr_1 SLASH expr_1
-	{ $$ = binary(divide,$1,$3); }
-	| expr_1 PERCENT expr_1
-	{ $$ = binary(mod,$1,$3);    }
-	| expr_1 PLUS expr_1
-	{ $$ = binary(add,$1,$3);    }
-	| expr_1 MINUS expr_1
-	{ $$ = binary(sub,$1,$3);    }
-	| expr_1 LESS_LESS expr_1
-	{ $$ = binary(lsh,$1,$3);    }
-	| expr_1 GREATER_GREATER expr_1
-	{ $$ = binary(rsh,$1,$3);    }
-	| expr_1 AMPERSAND expr_1
-	{ $$ = binary(logand,$1,$3); }
-	| expr_1 CARET expr_1
-	{ $$ = binary(logxor,$1,$3); }
-	| expr_1 BAR expr_1
-	{ $$ = binary(logior,$1,$3); }
-	| TILDA expr_1
-	{ $$ = unary(ones_compl,$2); }
-	| MINUS expr_1 %prec TILDA
-	{ $$ = unary(twos_compl,$2); }
-	| eterm
-	{ $$ = $1;		     }
-;
-*/
 
 symbol: SYMBOL
 	{ ExprNodeValue val; val.s_value = S_GET_NAME($1);
 	  $$ = ExprNodeCreate(ExprNodeReloc, val, NULL, NULL); }
+;
+
+got :
+	symbol AT GOT
+	{ $$ = $1; }
+;
+
+got_or_expr: got {$$ = $1;}
+	| expr { $$ = $1; }
+;
+
+pltpc :
+	symbol AT PLTPC
+	{ $$ = $1; }
 ;
 
 eterm: NUMBER
@@ -3977,16 +3964,6 @@ eterm: NUMBER
 	| MINUS expr_1 %prec TILDA
 	{ $$ = unary(ExprOpTypeNEG,$2); }
 ;
-
-/*
-offset_expr: PLUS eterm
-	{ $$ = $2; }
-	| MINUS eterm
-	{ $$ = unary(ExprOpTypeNEG,$2); }
-	|
-	{ $$ = NULL; }
-;
-*/
 
 expr: expr_1
 	{ $$ = $1; }
@@ -4026,40 +4003,6 @@ EXPR_T mkexpr(int x, SYMBOL_T s)
   EXPR_SYMBOL(e) = s;
   return e;
 }
-
-/*
-static EXPR_T binary(expr_opcodes_t op,EXPR_T x,EXPR_T y)
-{
-    int val = 0;
-    switch (op)
-    {
-		case mult:   val = EXPR_VALUE (x) * EXPR_VALUE (y);	break;
-		case divide: val = EXPR_VALUE (x) / EXPR_VALUE (y);	break;
-		case mod:    val = EXPR_VALUE (x) % EXPR_VALUE (y);	break;
-		case add:    val = EXPR_VALUE (x) + EXPR_VALUE (y);	break;
-		case sub:    val = EXPR_VALUE (x) - EXPR_VALUE (y);	break;
-		case lsh:    val = EXPR_VALUE (x) << EXPR_VALUE (y);  break;
-		case rsh:    val = EXPR_VALUE (x) >> EXPR_VALUE (y);  break;
-		case logand: val = EXPR_VALUE (x) & EXPR_VALUE (y);	break;
-		case logior: val = EXPR_VALUE (x) | EXPR_VALUE (y);	break;
-		case logxor: val = EXPR_VALUE (x) ^ EXPR_VALUE (y);	break;
-		default: break;  // to avoid warnings
-    }
-    return mkexpr (val, EXPR_SYMBOL(x));
-}
-
-static EXPR_T unary(expr_opcodes_t op,EXPR_T x)
-{
-    int val = 0;
-    switch (op)
-    {
-		case ones_compl: val = ~EXPR_VALUE (x);	break;
-		case twos_compl: val = -EXPR_VALUE (x);	break;
-		default: break; // to avoid warnings
-    }
-    return mkexpr (val, EXPR_SYMBOL(x));
-}
-*/
 
 static int
 value_match(ExprNode *expr, int sz, int sign, int mul, int issigned)

@@ -730,6 +730,11 @@ md_apply_fix3 (fixP, valp, seg)
       *buf++ = val >> 0;
       *buf++ = val >> 8;
       break;
+    case BFD_RELOC_BFIN_GOT :
+    case BFD_RELOC_BFIN_PLTPC :
+      *buf++ = val >> 0;
+      *buf++ = val >> 8;
+      break;
       //added following line for arithmetic reloc check -Jyotik
     default:
       if ((BFD_ARELOC_PUSH > fixP->fx_r_type) || (BFD_ARELOC_COMP < fixP->fx_r_type))
@@ -779,6 +784,7 @@ md_atof (type, litP, sizeP)
      int *sizeP ATTRIBUTE_UNUSED;
 {
   as_tsktsk ("Generally we don't need md_atof.\n");
+  return NULL;
 }
 
 /* Convert a machine dependent frag.  We never generate these.  */
@@ -1026,11 +1032,18 @@ ExprNodeGenReloc (ExprNode * head, int parent_reloc)
 	  note1 = CONSCODE (GENCODE (value), NULL_CODE);
 	  pcrel = 0;		// only these are not pc relative
 	  break;
+	case BFD_RELOC_BFIN_PLTPC:
+	  note1 = CONSCODE (GENCODE (value), NULL_CODE);
+	  pcrel = 0;		// only these are not pc relative
+	  break;
+	case BFD_RELOC_BFIN_GOT:
+	  note1 = CONSCODE (GENCODE (value), NULL_CODE);
+	  pcrel = 0;		// only these are not pc relative
+	  break;
 	case BFD_RELOC_24_PCREL:
 	case BFD_RELOC_24_PCREL_JUMP_L:
 	case BFD_RELOC_24_PCREL_CALL_X:
-//      case BFD_RELOC_11_PCREL : // bug fix : the high part also has some opcode
-	  /* these offsets are even numbered, mostly pcrel */
+	  /* these offsets are even numbered pcrel */
 	  note1 = CONSCODE (GENCODE (value >> 1), NULL_CODE);
 	  break;
 	default:
@@ -1334,6 +1347,14 @@ gen_calla (ExprNode * addr, int S)
 {
   int val;
   int high_val;
+  int reloc;
+
+  switch(S){
+   case 0 : reloc = BFD_RELOC_24_PCREL_JUMP_L; break;
+   case 1 : reloc = BFD_RELOC_24_PCREL; break;
+   case 2 : reloc = BFD_RELOC_BFIN_PLTPC; break;
+   default : break;
+  }
 
   INIT (CALLa);
   ASSIGN (S);
@@ -1342,7 +1363,7 @@ gen_calla (ExprNode * addr, int S)
   high_val = val >> 16;
 
   return CONSCODE (GENCODE (HI (c_code.opcode) | LO (high_val)),
-		   ExprNodeGenReloc (addr, S ? BFD_RELOC_24_PCREL : BFD_RELOC_24_PCREL_JUMP_L));
+		   ExprNodeGenReloc (addr, reloc));
 }
 
 INSTR_T
@@ -1398,7 +1419,6 @@ gen_ldstidxi (REG_T ptr, REG_T reg, int W, int sz, int Z, ExprNode * poffset)
   int value = 0;
   INIT (LDSTidxI);
 
-
   if (!IS_PREG (*ptr) || (!IS_DREG (*reg) && !Z))
     {
       fprintf (stderr, "Warning: possible mixup of Preg/Dreg\n");
@@ -1427,7 +1447,18 @@ gen_ldstidxi (REG_T ptr, REG_T reg, int W, int sz, int Z, ExprNode * poffset)
 
   offset = (value & 0xffff);
   ASSIGN (offset);
-  return GEN_OPCODE32 ();
+  /* TODO : test if you need to check this here.
+     The reloc case should automatically generate instruction
+     if constant.
+  */
+  if(poffset->type != ExprNodeConstant){
+    /* a GOT relocation such as R0 = [P5 + symbol@GOT] */
+    return  CONSCODE (GENCODE (HI (c_code.opcode)),
+			ExprNodeGenReloc(poffset, BFD_RELOC_BFIN_GOT));
+  }
+  else{
+    return GEN_OPCODE32 ();
+  }
 }
 
 // } END 32 BIT INSTRUCTIONS
