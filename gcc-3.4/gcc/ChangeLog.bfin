@@ -1,3 +1,15 @@
+2005-01-24  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/lib1funcs.asm (___divsi3, ___udivsi3, ___umodsi3,
+	___modsi3): Rewrite.
+	(___addsf3, ___subsf3, ___mulsf3, ___divsf3, ___cmpsf2, ___eqsf2,
+	___nesf2, ___ltsf2, ___lesf2, ___gtsf2, ___gesf2, ___negsf2,
+	___floatsisf, ___floatdisf, ___dcmp, ___cmpdi2, ___eqdi2, ___nedi2,
+	___ltdi2, ___ledi2, ___gedi2, ___gtdi2, ___negdi2, ___ashldi3,
+	___ashrdi3, ___extendsfdf2, ___truncdfsf2): Delete.
+	* config/bfin/t-bfin-elf (LIB1ASMFUNCS): Change to match deletions.
+	(LIBGCC1, CROSS_LIBGCC1): Delete useless macros.
+
 2005-01-22  Raja  <raja@rrap-software.com>
 	* config/bfin/t-bfin-elf : removed _addsf3, _subsf3 in LIB1ASMFUNCS
 	to avoid multiple definition. because we are using the fp-bit.c. 
