@@ -1047,6 +1047,7 @@ enum gdb_osabi
   GDB_OSABI_QNXNTO,
 
   GDB_OSABI_CYGWIN,
+  GDB_OSABI_BFIN,               /* For Analog Devices blackfin */
 
   GDB_OSABI_INVALID		/* keep this last */
 };
