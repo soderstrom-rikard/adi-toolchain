@@ -202,18 +202,6 @@
   "%0 = %h1 (Z);" /* "%0 = H %1;"*/
   [(set_attr "type" "alu0")])
 
-
-
-;;;;; tonyko@lineo.ca    get rid of "memory" option
-(define_insn ""
-  [(set (match_operand:SI 0 "register_operand" "=d, d")
-	(subreg:SI (match_operand:HI 1 "nonimmediate_operand" "d,m")0))]
-  ""
-  "@
-   %0 = %h1 (X);
-   %0 = W %h1 (X);"
-  [(set_attr "type" "alu0")])
-
 (define_insn "extendhisi2"
   [(set (match_operand:SI 0 "register_operand" "=d, d")
 	(sign_extend:SI (match_operand:HI 1 "nonimmediate_operand" "d, m")))]
@@ -221,7 +209,7 @@
   "@
    %0 = %h1 (X);
    %0 = W %h1 (X);"
-  [(set_attr "type" "alu0")])
+  [(set_attr "type" "alu0,mcld")])
 
 (define_insn "zero_extendhisi2"
   [(set (match_operand:SI 0 "register_operand" "=d, d")
@@ -230,7 +218,7 @@
   "@
    %0 = %h1 (Z);
    %0 = W%h1 (Z);"
-  [(set_attr "type" "alu0")])
+  [(set_attr "type" "alu0,mcld")])
 
 
 ;;;
@@ -377,7 +365,7 @@
   "@
    %0 = B %1 (X);
    %0 = %T1 (X);"
-  [(set_attr "type" "alu0")])
+  [(set_attr "type" "mcld,alu0")])
 
 (define_insn "extendqisi2"
   [(set (match_operand:SI 0 "register_operand" "=d, d")
@@ -386,7 +374,7 @@
   "@
    %0 = B %1 (X);
    %0 = %T1 (X);"
-  [(set_attr "type" "alu0")])
+  [(set_attr "type" "mcld,alu0")])
 
 
 (define_insn "zero_extendqihi2"
@@ -396,7 +384,7 @@
   "@
    %0 = B %1 (Z);
    %0 = %T1 (Z);"
-  [(set_attr "type" "alu0")])
+  [(set_attr "type" "mcld,alu0")])
 
 
 (define_insn "zero_extendqisi2"
@@ -406,7 +394,7 @@
   "@
    %0 = B %1 (Z);
    %0 = %T1 (Z);"
-  [(set_attr "type" "alu0")])
+  [(set_attr "type" "mcld,alu0")])
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;                INSN related with DI mode              ;;;;;;;;;;;

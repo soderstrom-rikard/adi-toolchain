@@ -1,3 +1,10 @@
+2004-10-05  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (extendhisi2, zero_extendhisi2, extendqisi2,
+	zero_extendqisi2, extendqihi2, zero_extendqihi2): Properly mark the
+	memory alternatives as type "mcld".
+	(subreg hisi extendpattern): Delete.
+
 2004-10-04  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (hard_regno_mode_ok): Allow all registers to hold
