@@ -2836,7 +2836,12 @@ ENUMDOC
   through 7 of the instruction.
 ENUM
   BFD_RELOC_ARC_B26
-ELOC_16_IMM
+ENUMDOC
+  ARC 26 bit absolute branch.  The lowest two bits must be zero and are not
+  stored in the instruction.  The high 24 bits are installed in bits 23
+  through 0.
+ENUM
+  BFD_RELOC_16_IMM
 ENUMDOC
   ADI Blackfin 16 bit immediate absolute reloc
 ENUM

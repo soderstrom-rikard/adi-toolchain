@@ -1713,7 +1713,6 @@ enum bfd_architecture
 #define bfd_mach_arm_3M        4
 #define bfd_mach_arm_4         5
 #define bfd_mach_arm_4T        6
-  bfd_arch_bfin,      /* Adi BFIN */
 #define bfd_mach_arm_5         7
 #define bfd_mach_arm_5T        8
 #define bfd_mach_arm_5TE       9
@@ -1743,6 +1742,7 @@ enum bfd_architecture
 #define bfd_mach_m32r2         '2'
   bfd_arch_mn10200,   /* Matsushita MN10200 */
   bfd_arch_mn10300,   /* Matsushita MN10300 */
+  bfd_arch_bfin,      /* Adi BFIN */
 #define bfd_mach_mn10300               300
 #define bfd_mach_am33          330
 #define bfd_mach_am33_2        332
@@ -2812,7 +2812,10 @@ through 0.  */
 /* ADI Blackfin Long Jump pcrel  */
   BFD_RELOC_24_PCREL_JUMP_L,
 
+/* ADI Blackfin GOT relocation  */
   BFD_RELOC_BFIN_GOT,
+
+/* ADI Blackfin PLTPC relocation  */
   BFD_RELOC_BFIN_PLTPC,
 
 /* ADI Blackfin Arith reloc  */
@@ -2872,7 +2875,11 @@ through 0.  */
 /* ADI Blackfin Arith reloc  */
   BFD_ARELOC_HWPAGE,
 
-/* ADI Blackfin Arith reloc  */
+/* ADI Blackfin Arith reloc
+
+ARC 26 bit absolute branch.  The lowest two bits must be zero and are not
+stored in the instruction.  The high 24 bits are installed in bits 23
+through 0.  */
   BFD_ARELOC_ADDR,
 
 /* Mitsubishi D10V relocs.
