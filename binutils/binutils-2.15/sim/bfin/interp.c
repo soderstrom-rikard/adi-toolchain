@@ -734,7 +734,7 @@ step_once (SIM_DESC sd, int pollcount)
 	     get_word (saved_state.memory, PCREG));
 
   did_jump = 0;
-  _interp_insn_bfin (PCREG);
+  interp_insn_bfin (PCREG);
 
   /* @@@ Not sure how the hardware really behaves when the last insn
      of a loop is a jump.  */

@@ -1,3 +1,14 @@
+2005-02-25  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin/bfin-dis.c (struct store): New.
+	(stores, n_stores): New variables.
+	(STORE): New macro.
+	(decode_LDSTpmod_0, decode_dspLDST_0): Implement these instructions.
+	(_interp_insn_bfin): Now static.  Returns void.  Decode MNOP.
+	(interp_insn_bfin): New function.
+	* bfin/bfin-sim.h (interp_insn_bfin): Declare it.
+	* bfin/interp.c (step_once): Call it instead of _interp_insn_bfin.
+
 2005-01-31  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin/syscall.h: New file.

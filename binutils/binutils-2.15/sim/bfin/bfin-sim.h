@@ -111,3 +111,5 @@ static inline bu32 get_long (unsigned char *memory, bu32 addr)
   return (memory[addr] | (memory[addr + 1] << 8)
 	  | (memory[addr + 2] << 16) | (memory[addr + 3] << 24));
 }
+
+extern void interp_insn_bfin (bu32);

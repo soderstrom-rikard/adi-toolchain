@@ -39,6 +39,23 @@ typedef long TIword;
 
 #include "bfin-sim.h"
 
+/* For dealing with parallel instructions, we must avoid changing our register
+   file until all parallel insns have been simulated.  This queue of stores
+   can be used to delay a modification.
+   @@@ Should go and convert all 32 bit insns to use this.  */
+struct store {
+  bu32 *addr;
+  bu32 val;
+};
+
+struct store stores[10];
+int n_stores;
+
+#define STORE(X,Y) do { \
+    stores[n_stores].addr = &(X); \
+    stores[n_stores++].val = (Y); \
+  } while (0)
+
 static __attribute__ ((noreturn)) void
 unhandled_instruction (void)
 {
@@ -1962,156 +1979,105 @@ decode_LDSTpmod_0 (bu16 iw0)
   int ptr = ((iw0 >> 0) & 0x7);
   int reg = ((iw0 >> 6) & 0x7);
   int W = ((iw0 >> 11) & 0x1);
-
-
+  bu32 addr, val;
 
   if (aop == 1 && W == 0 && idx == ptr)
     {
       notethat ("dregs_lo = W [ pregs ]");
-      OUTS (outf, dregs_lo (reg));
-      OUTS (outf, "=");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, pregs (ptr));
-      OUTS (outf, "]");
+      addr = PREG (ptr);
+      val = get_word (saved_state.memory, addr);
+      STORE (DREG (reg), (DREG (reg) & 0xFFFF0000) | val);
       PCREG += 2; return;
     }
   else if (aop == 2 && W == 0 && idx == ptr)
     {
       notethat ("dregs_hi = W [ pregs ]");
-      OUTS (outf, dregs_hi (reg));
-      OUTS (outf, "=");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, pregs (ptr));
-      OUTS (outf, "]");
+      addr = PREG (ptr);
+      val = get_word (saved_state.memory, addr);
+      STORE (DREG (reg), (DREG (reg) & 0xFFFF) | (val << 16);
       PCREG += 2; return;
     }
   else if (aop == 1 && W == 1 && idx == ptr)
     {
       notethat ("W [ pregs ] = dregs_lo");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, pregs (ptr));
-      OUTS (outf, "]");
-      OUTS (outf, "=");
-      OUTS (outf, dregs_lo (reg));
+      addr = PREG (ptr);
+      put_word (saved_state.memory, addr, DREG (reg));
       PCREG += 2; return;
     }
   else if (aop == 2 && W == 1 && idx == ptr)
     {
       notethat ("W [ pregs ] = dregs_hi");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, pregs (ptr));
-      OUTS (outf, "]");
-      OUTS (outf, "=");
-      OUTS (outf, dregs_hi (reg));
+      addr = PREG (ptr);
+      put_word (saved_state.memory, addr, DREG (reg) >> 16);
       PCREG += 2; return;
     }
   else if (aop == 0 && W == 0)
     {
       notethat ("dregs = [ pregs ++ pregs ]");
-      OUTS (outf, dregs (reg));
-      OUTS (outf, "=");
-      OUTS (outf, "[");
-      OUTS (outf, pregs (ptr));
-      OUTS (outf, "++");
-      OUTS (outf, pregs (idx));
-      OUTS (outf, "]");
+      addr = PREG (ptr);
+      val = get_long (saved_state.memory, addr);
+      STORE (DREG (reg), val);
+      STORE (PREG (ptr), addr + PREG (idx));
       PCREG += 2; return;
     }
   else if (aop == 1 && W == 0)
     {
       notethat ("dregs_lo = W [ pregs ++ pregs ]");
-      OUTS (outf, dregs_lo (reg));
-      OUTS (outf, "=");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, pregs (ptr));
-      OUTS (outf, "++");
-      OUTS (outf, pregs (idx));
-      OUTS (outf, "]");
+      addr = PREG (ptr);
+      val = get_word (saved_state.memory, addr);
+      STORE (DREG (reg), (DREG (reg) & 0xFFFF0000) | val);
+      STORE (PREG (ptr), addr + PREG (idx));
       PCREG += 2; return;
     }
   else if (aop == 2 && W == 0)
     {
       notethat ("dregs_hi = W [ pregs ++ pregs ]");
-      OUTS (outf, dregs_hi (reg));
-      OUTS (outf, "=");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, pregs (ptr));
-      OUTS (outf, "++");
-      OUTS (outf, pregs (idx));
-      OUTS (outf, "]");
+      addr = PREG (ptr);
+      val = get_word (saved_state.memory, addr);
+      STORE (DREG (reg), (DREG (reg) & 0xFFFF) | (val << 16);
+      STORE (PREG (ptr), addr + PREG (idx));
       PCREG += 2; return;
     }
   else if (aop == 3 && W == 0)
     {
       notethat ("dregs = W [ pregs ++ pregs ] (Z)");
-      OUTS (outf, dregs (reg));
-      OUTS (outf, "=");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, pregs (ptr));
-      OUTS (outf, "++");
-      OUTS (outf, pregs (idx));
-      OUTS (outf, "] (Z)");
+      addr = PREG (ptr);
+      val = get_word (saved_state.memory, addr);
+      STORE (DREG (reg), val);
+      STORE (PREG (ptr), addr + PREG (idx));
       PCREG += 2; return;
     }
   else if (aop == 3 && W == 1)
     {
       notethat ("dregs = W [ pregs ++ pregs ] (X)");
-      OUTS (outf, dregs (reg));
-      OUTS (outf, "=");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, pregs (ptr));
-      OUTS (outf, "++");
-      OUTS (outf, pregs (idx));
-      OUTS (outf, "]");
-      OUTS (outf, "(");
-      OUTS (outf, "X");
-      OUTS (outf, ")");
+      addr = PREG (ptr);
+      val = get_word (saved_state.memory, addr);
+      STORE (DREG (reg), (bs32) (bs16) val);
+      STORE (PREG (ptr), addr + PREG (idx));
       PCREG += 2; return;
     }
   else if (aop == 0 && W == 1)
     {
       notethat ("[ pregs ++ pregs ] = dregs");
-      OUTS (outf, "[");
-      OUTS (outf, pregs (ptr));
-      OUTS (outf, "++");
-      OUTS (outf, pregs (idx));
-      OUTS (outf, "]");
-      OUTS (outf, "=");
-      OUTS (outf, dregs (reg));
+      addr = PREG (ptr);
+      put_long (saved_state.memory, addr, DREG (reg));
+      STORE (PREG (ptr), addr + PREG (idx));
       PCREG += 2; return;
     }
   else if (aop == 1 && W == 1)
     {
       notethat (" W [ pregs ++ pregs ] = dregs_lo");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, pregs (ptr));
-      OUTS (outf, "++");
-      OUTS (outf, pregs (idx));
-      OUTS (outf, "]");
-      OUTS (outf, "=");
-      OUTS (outf, dregs_lo (reg));
+      addr = PREG (ptr);
+      put_word (saved_state.memory, addr, DREG (reg));
+      STORE (PREG (ptr), addr + PREG (idx));
       PCREG += 2; return;
     }
   else if (aop == 2 && W == 1)
     {
       notethat (" W[ pregs ++ pregs ] = dregs_hi");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, pregs (ptr));
-      OUTS (outf, "++");
-      OUTS (outf, pregs (idx));
-      OUTS (outf, "]");
-      OUTS (outf, "=");
-      OUTS (outf, dregs_hi (reg));
+      addr = PREG (ptr);
+      put_word (saved_state.memory, addr, DREG (reg) >> 16);
+      STORE (PREG (ptr), addr + PREG (idx));
       PCREG += 2; return;
     }
   else
@@ -2226,235 +2192,160 @@ decode_dspLDST_0 (bu16 iw0)
   int m = ((iw0 >> 5) & 0x3);
   int reg = ((iw0 >> 0) & 0x7);
   int W = ((iw0 >> 9) & 0x1);
-
-
+  bu32 addr;
 
   if (aop == 0 && W == 0 && m == 0)
     {
       notethat ("dregs = [ iregs ++ ]");
-      OUTS (outf, dregs (reg));
-      OUTS (outf, "=");
-      OUTS (outf, "[");
-      OUTS (outf, iregs (i));
-      OUTS (outf, "++");
-      OUTS (outf, "]");
+      addr = IREG (i);
+      STORE (IREG (i), addr + 4);
+      STORE (DREG (reg), get_long (saved_state.memory, addr));
       PCREG += 2; return;
     }
   else if (aop == 0 && W == 0 && m == 1)
     {
       notethat ("dregs_lo = W [ iregs ++ ]");
-      OUTS (outf, dregs_lo (reg));
-      OUTS (outf, "=");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, iregs (i));
-      OUTS (outf, "++");
-      OUTS (outf, "]");
+      addr = IREG (i);
+      STORE (IREG (i), addr + 2);
+      STORE (DREG (reg), (DREG (reg) & 0xFFFF0000) | get_word (saved_state.memory, addr));
       PCREG += 2; return;
     }
   else if (aop == 0 && W == 0 && m == 2)
     {
       notethat ("dregs_hi = W [ iregs ++ ]");
-      OUTS (outf, dregs_hi (reg));
-      OUTS (outf, "=");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, iregs (i));
-      OUTS (outf, "++");
-      OUTS (outf, "]");
+      addr = IREG (i);
+      STORE (IREG (i), addr + 2);
+      STORE (DREG (reg), (DREG (reg) & 0xFFFF) | (get_word (saved_state.memory, addr) << 16));
       PCREG += 2; return;
     }
   else if (aop == 1 && W == 0 && m == 0)
     {
       notethat ("dregs = [ iregs -- ]");
-      OUTS (outf, dregs (reg));
-      OUTS (outf, "=");
-      OUTS (outf, "[");
-      OUTS (outf, iregs (i));
-      OUTS (outf, "--");
-      OUTS (outf, "]");
+      addr = IREG (i);
+      STORE (IREG (i), addr - 4);
+      STORE (DREG (reg), get_long (saved_state.memory, addr));
       PCREG += 2; return;
     }
   else if (aop == 1 && W == 0 && m == 1)
     {
       notethat ("dregs_lo = W [ iregs -- ]");
-      OUTS (outf, dregs_lo (reg));
-      OUTS (outf, "=");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, iregs (i));
-      OUTS (outf, "--");
-      OUTS (outf, "]");
+      addr = IREG (i);
+      STORE (IREG (i), addr - 2);
+      STORE (DREG (reg), (DREG (reg) & 0xFFFF0000) | get_word (saved_state.memory, addr));
       PCREG += 2; return;
     }
   else if (aop == 1 && W == 0 && m == 2)
     {
       notethat ("dregs_hi = W [ iregs -- ]");
-      OUTS (outf, dregs_hi (reg));
-      OUTS (outf, "=");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, iregs (i));
-      OUTS (outf, "--");
-      OUTS (outf, "]");
+      addr = IREG (i);
+      STORE (IREG (i), addr - 2);
+      STORE (DREG (reg), (DREG (reg) & 0xFFFF) | (get_word (saved_state.memory, addr) << 16));
       PCREG += 2; return;
     }
   else if (aop == 2 && W == 0 && m == 0)
     {
       notethat ("dregs = [ iregs ]");
-      OUTS (outf, dregs (reg));
-      OUTS (outf, "=");
-      OUTS (outf, "[");
-      OUTS (outf, iregs (i));
-      OUTS (outf, "]");
+      addr = IREG (i);
+      STORE (DREG (reg), get_long (saved_state.memory, addr));
       PCREG += 2; return;
     }
   else if (aop == 2 && W == 0 && m == 1)
     {
       notethat ("dregs_lo = W [ iregs ]");
-      OUTS (outf, dregs_lo (reg));
-      OUTS (outf, "=");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, iregs (i));
-      OUTS (outf, "]");
+      addr = IREG (i);
+      STORE (DREG (reg), (DREG (reg) & 0xFFFF0000) | get_word (saved_state.memory, addr));
       PCREG += 2; return;
     }
   else if (aop == 2 && W == 0 && m == 2)
     {
       notethat ("dregs_hi = W [ iregs ]");
-      OUTS (outf, dregs_hi (reg));
-      OUTS (outf, "=");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, iregs (i));
-      OUTS (outf, "]");
+      addr = IREG (i);
+      STORE (DREG (reg), (DREG (reg) & 0xFFFF) | (get_word (saved_state.memory, addr) << 16));
       PCREG += 2; return;
     }
   else if (aop == 0 && W == 1 && m == 0)
     {
       notethat ("[ iregs ++ ] = dregs");
-      OUTS (outf, "[");
-      OUTS (outf, iregs (i));
-      OUTS (outf, "++");
-      OUTS (outf, "]");
-      OUTS (outf, "=");
-      OUTS (outf, dregs (reg));
+      addr = IREG (i);
+      STORE (IREG (i), addr + 4);
+      put_long (saved_state.memory, addr, DREG (reg));
       PCREG += 2; return;
     }
   else if (aop == 0 && W == 1 && m == 1)
     {
       notethat ("W [ iregs ++ ] = dregs_lo");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, iregs (i));
-      OUTS (outf, "++");
-      OUTS (outf, "]");
-      OUTS (outf, "=");
-      OUTS (outf, dregs_lo (reg));
+      addr = IREG (i);
+      STORE (IREG (i), addr + 2);
+      put_word (saved_state.memory, addr, DREG (reg));
       PCREG += 2; return;
     }
   else if (aop == 0 && W == 1 && m == 2)
     {
       notethat ("W [ iregs ++ ] = dregs_hi");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, iregs (i));
-      OUTS (outf, "++");
-      OUTS (outf, "]");
-      OUTS (outf, "=");
-      OUTS (outf, dregs_hi (reg));
+      addr = IREG (i);
+      STORE (IREG (i), addr + 2);
+      put_word (saved_state.memory, addr, DREG (reg) >> 16);
       PCREG += 2; return;
     }
   else if (aop == 1 && W == 1 && m == 0)
     {
       notethat ("[ iregs -- ] = dregs");
-      OUTS (outf, "[");
-      OUTS (outf, iregs (i));
-      OUTS (outf, "--");
-      OUTS (outf, "]");
-      OUTS (outf, "=");
-      OUTS (outf, dregs (reg));
+      addr = IREG (i);
+      STORE (IREG (i), addr - 4);
+      put_long (saved_state.memory, addr, DREG (reg));
       PCREG += 2; return;
     }
   else if (aop == 1 && W == 1 && m == 1)
     {
       notethat ("W [ iregs -- ] = dregs_lo");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, iregs (i));
-      OUTS (outf, "--");
-      OUTS (outf, "]");
-      OUTS (outf, "=");
-      OUTS (outf, dregs_lo (reg));
+      addr = IREG (i);
+      STORE (IREG (i), addr - 2);
+      put_word (saved_state.memory, addr, DREG (reg));
       PCREG += 2; return;
     }
   else if (aop == 1 && W == 1 && m == 2)
     {
       notethat ("W [ iregs -- ] = dregs_hi");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, iregs (i));
-      OUTS (outf, "--");
-      OUTS (outf, "]");
-      OUTS (outf, "=");
-      OUTS (outf, dregs_hi (reg));
+      addr = IREG (i);
+      STORE (IREG (i), addr - 2);
+      put_word (saved_state.memory, addr, DREG (reg) >> 16);
       PCREG += 2; return;
     }
   else if (aop == 2 && W == 1 && m == 0)
     {
       notethat ("[ iregs ] = dregs");
-      OUTS (outf, "[");
-      OUTS (outf, iregs (i));
-      OUTS (outf, "]");
-      OUTS (outf, "=");
-      OUTS (outf, dregs (reg));
+      addr = IREG (i);
+      put_long (saved_state.memory, addr, DREG (reg));
       PCREG += 2; return;
     }
   else if (aop == 2 && W == 1 && m == 1)
     {
       notethat (" W [ iregs ] = dregs_lo");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, iregs (i));
-      OUTS (outf, "]");
-      OUTS (outf, "=");
-      OUTS (outf, dregs_lo (reg));
+      addr = IREG (i);
+      put_word (saved_state.memory, addr, DREG (reg));
       PCREG += 2; return;
     }
   else if (aop == 2 && W == 1 && m == 2)
     {
       notethat (" W [ iregs ] = dregs_hi");
-      OUTS (outf, "W");
-      OUTS (outf, "[");
-      OUTS (outf, iregs (i));
-      OUTS (outf, "]");
-      OUTS (outf, "=");
-      OUTS (outf, dregs_hi (reg));
+      addr = IREG (i);
+      put_word (saved_state.memory, addr, DREG (reg) >> 16);
       PCREG += 2; return;
     }
   else if (aop == 3 && W == 0)
     {
       notethat ("dregs = [ iregs ++ mregs ]");
-      OUTS (outf, dregs (reg));
-      OUTS (outf, "=");
-      OUTS (outf, "[");
-      OUTS (outf, iregs (i));
-      OUTS (outf, "++");
-      OUTS (outf, mregs (m));
-      OUTS (outf, "]");
+      addr = IREG (i);
+      STORE (IREG (i), addr + MREG (m));
+      STORE (DREG (reg), get_long (saved_state.memory, addr));
       PCREG += 2; return;
     }
   else if (aop == 3 && W == 1)
     {
       notethat ("[ iregs ++ mregs ] = dregs");
-      OUTS (outf, "[");
-      OUTS (outf, iregs (i));
-      OUTS (outf, "++");
-      OUTS (outf, mregs (m));
-      OUTS (outf, "]");
-      OUTS (outf, "=");
-      OUTS (outf, dregs (reg));
+      addr = IREG (i);
+      STORE (IREG (i), addr + MREG (m));
+      put_long (saved_state.memory, addr, DREG (reg));
       PCREG += 2; return;
     }
   else
@@ -5474,13 +5365,19 @@ decode_psedodbg_assert_0 (bu16 iw0, bu16 iw1)
     unhandled_instruction ();
 }
 
-int
+static void
 _interp_insn_bfin (bu32 pc)
 {
   bu8 buf[4];
   bu16 iw0 = get_word (saved_state.memory, pc);
   bu16 iw1 = get_word (saved_state.memory, pc + 2);
 
+  if (iw0 == 0xc803 && iw1 == 0x1800)
+    {
+      /* MNOP.  */
+      PCREG += 4;
+      return;
+    }
   if ((iw0 & 0xFF00) == 0x0000)
     decode_ProgCtrl_0 (iw0);
   else if ((iw0 & 0xFFC0) == 0x0240)
@@ -5557,4 +5454,27 @@ _interp_insn_bfin (bu32 pc)
     decode_psedodbg_assert_0 (iw0, iw1);
   else
     unhandled_instruction ();
+}
+
+void
+interp_insn_bfin (bu32 pc)
+{
+  int i;
+  bu16 iw0 = get_word (saved_state.memory, pc);
+  
+  int is_multiinsn = ((iw0 & 0xc000) == 0xc000 && (iw0 & BIT_MULTI_INS)
+		      && ((iw0 & 0xe800) != 0xe800 /* not Linkage */));
+
+  n_stores = 0;
+
+  _interp_insn_bfin (pc);
+  
+  // Proper display of multiple issue instructions
+  if (is_multiinsn)
+    {
+      _interp_insn_bfin (pc + 4);
+      _interp_insn_bfin (pc + 6);
+    }
+  for (i = 0; i < n_stores; i++)
+    *stores[i].addr = stores[i].val;
 }
