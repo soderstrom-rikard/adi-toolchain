@@ -30,7 +30,18 @@
 	return_internal): New patterns.  * config/bfin/bfin-protos.h
 	(bfin_expand_prologue, bfin_expand_epilogue,
 	push_multiple_operation, pop_multiple_operation): Declare.
-	
+
+	* config.gcc (bfin*-elf*, bfin*-*): Include "elfos.h" and
+	"bfin/elf.h".
+	* config/bfin/bfin.h: Don't include "defaults.h".
+	(LOCAL_LABEL_PREFIX, ASM_WEAKEN_LABEL, ASM_OUTPUT_CASE_LABEL,
+	ASM_GENERATE_INTERNAL_LABEL, TARGET_ASM_INTERNAL_LABEL,
+	HANDLE_SYSV_PRAGMA, DWARF2_DEBUGGING_INFO, ASM_DECLARE_FUNCTION_SIZE,
+	ASM_DECLARE_OBJECT_NAME, ASM_FINISH_DECLARE_OBJECT): Delete.
+	* config/bfin/elf.h (TARGET_CPU_CPP_BUILTINS, ASM_SPEC, CC1_SPEC,
+	LINK_SPEC, STARTFILE_SPEC): Delete.
+	(LOCAL_LABEL_PREFIX, ASM_GENERATE_INTERNAL_LABEL): Define.
+
 2004-10-18  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* cse.c (cse_insn): Stores in a libcall sequence can invalidate

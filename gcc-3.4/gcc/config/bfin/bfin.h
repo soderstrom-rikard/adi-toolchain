@@ -16,8 +16,6 @@
 
 #define USER_LABEL_PREFIX "_"
 
-#define LOCAL_LABEL_PREFIX "L$"
-
 #define OBJECT_FORMAT_ELF
 
 #define BRT 1
@@ -83,12 +81,6 @@ extern int target_flags;
 #define CC1_SPEC  " -O2 "
 #define ASM_SPEC " %{I*} -I include/asm%s "
 #define LIB_SPEC " -lc "
-
-#undef  ASM_WEAKEN_LABEL
-#define ASM_WEAKEN_LABEL(FILE, NAME) \
-  do { fputs ("\t.weak\t", FILE); assemble_name (FILE, NAME); \
-       fputc ('\n', FILE); } while (0)
-
 
 /* Don't create frame pointers for leaf functions */
 #define TARGET_OMIT_LEAF_FRAME_POINTER (target_flags & MASK_OMIT_LEAF_FRAME_POINTER)
@@ -1170,16 +1162,6 @@ typedef enum directives {
         } while (0)
 #endif
 
-#define ASM_GENERATE_INTERNAL_LABEL(LABEL, PREFIX, NUM)\
-     sprintf (LABEL, "*%s%s$%d", LOCAL_LABEL_PREFIX, PREFIX, (int) NUM)
-
-/*
-#define TARGET_ASM_INTERNAL_LABEL(FILE, PREFIX, NUM) 	\
-  do {  fprintf(FILE, "%s%s$%d:\n", LOCAL_LABEL_PREFIX, PREFIX, NUM);		\
-      } while (0)
-*/
-
-
 #define ASM_FORMAT_PRIVATE_NAME(OUTPUT, NAME, LABELNO)			\
   do {									\
     int len = strlen (NAME);						\
@@ -1191,15 +1173,6 @@ typedef enum directives {
     temp[len + 3] = 0;							\
     (OUTPUT) = (char *) alloca (strlen (NAME) + 13);			\
     sprintf (OUTPUT, "_%s$%d", temp, LABELNO);				\
-  } while (0)
-
-/* Output a label which precedes a jumptable.  Since
-   instructions are 2 bytes, we need explicit alignment here.  */
- 
-#define ASM_OUTPUT_CASE_LABEL(FILE,PREFIX,NUM,JUMPTABLE)\
-  do {  if (CASE_VECTOR_MODE == SImode)			\
-	ASM_OUTPUT_ALIGN (FILE, 2);                     \
-  (*targetm.asm_out.internal_label) (FILE, PREFIX, NUM);\
   } while (0)
 
 #define ASM_OUTPUT_ADDR_VEC_ELT(FILE, VALUE)    	\
@@ -1342,11 +1315,6 @@ extern struct rtx_def *bfin_cc_rtx, *bfin_rets_rtx;
 
 extern int bfin_lvno;
 
-#define HANDLE_SYSV_PRAGMA 1
-
-/* Debugging for dwarf-1 and dwarf-2 */
-#define DWARF2_DEBUGGING_INFO
-
 /* Don't know how to order these.  UNALIGNED_WORD_ASM_OP is in
    dwarf2.out. */
 #define UNALIGNED_WORD_ASM_OP ".4byte"
@@ -1380,59 +1348,6 @@ do {                                                            \
 /* Debugging for standard elf stabs */
 /*#include "dbxelf.h"*/
 #define SIZE_ASM_OP     "\t.size\t"
-
-#include <defaults.h>
-/* This is how to declare the size of a function.  */
-#ifndef ASM_DECLARE_FUNCTION_SIZE
-#define ASM_DECLARE_FUNCTION_SIZE(FILE, FNAME, DECL)       \
-  do                                                       \
-  {                                                        \
-    if (!flag_inhibit_size_directive)                      \
-    ASM_OUTPUT_MEASURED_SIZE (FILE, FNAME);                \
-  }                                                        \
-while (0)
-#endif
-
-/* Write the extra assembler code needed to declare an object properly.  */
-#define ASM_DECLARE_OBJECT_NAME(FILE, NAME, DECL)               \
-  do                                                            \
-    {                                                           \
-      HOST_WIDE_INT size;                                       \
-      size_directive_output = 0;                                \
-      if (!flag_inhibit_size_directive                          \
-          && (DECL) && DECL_SIZE (DECL))                        \
-        {                                                       \
-          size_directive_output = 1;                            \
-          size = int_size_in_bytes (TREE_TYPE (DECL));          \
-          ASM_OUTPUT_SIZE_DIRECTIVE (FILE, NAME, size);         \
-        }                                                       \
-                                                                \
-      ASM_OUTPUT_LABEL (FILE, NAME);                            \
-    }                                                           \
-  while (0)
-
-/* Output the size directive for a decl in rest_of_decl_compilation
-   in the case where we did not do so before the initializer.
-   Once we find the error_mark_node, we know that the value of
-   size_directive_output was set
-   by ASM_DECLARE_OBJECT_NAME when it was run for the same decl.  */
-
-#undef ASM_FINISH_DECLARE_OBJECT
-#define ASM_FINISH_DECLARE_OBJECT(FILE, DECL, TOP_LEVEL, AT_END)        \
-do {                                                                    \
-     const char *name = XSTR (XEXP (DECL_RTL (DECL), 0), 0);            \
-     HOST_WIDE_INT size;                                                \
-     if (!flag_inhibit_size_directive && DECL_SIZE (DECL)               \
-         && ! AT_END && TOP_LEVEL                                       \
-         && DECL_INITIAL (DECL) == error_mark_node                      \
-         && !size_directive_output)                                     \
-       {                                                                \
-         size_directive_output = 1;                                     \
-         size = int_size_in_bytes (TREE_TYPE (DECL));                   \
-         ASM_OUTPUT_SIZE_DIRECTIVE (FILE, name, size);                  \
-       }                                                                \
-   } while (0)
-
 
 
 #endif /*  _BFIN_CONFIG */
