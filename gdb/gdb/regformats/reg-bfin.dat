@@ -3,7 +3,8 @@ expedite:pc,sp,fp
 32:extra3
 32:extra2
 32:extra1
-32:syscfg
+32:orig_pc
+32:ipend
 32:seqstat
 32:rete
 32:retn
@@ -54,5 +55,5 @@ expedite:pc,sp,fp
 32:r2
 32:r1
 32:r0
-32:ipend
-32:orig_pc
+32:orig_r0
+32:syscfg
