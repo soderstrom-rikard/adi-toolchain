@@ -1,3 +1,7 @@
+2004-12-17  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin-parse.y: Fix some LDSTPMOD calls to pass correct args.
+
 2004-12-14  Catherine Moore  <clm@cm00re.com>
 
 	* config/tc-bfin.c (gen_ldstiifp): Fix compilation error.

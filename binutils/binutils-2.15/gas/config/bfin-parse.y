@@ -3053,7 +3053,7 @@ asm_1:
 	  else if ($6.x0 == 2 && IS_DREG ($1) && IS_PREG ($5))
 	    {
 	      notethat("LDSTpmod: dregs_half = W [ pregs ]\n");
-	      $$ = LDSTPMOD (&$1, &$5, &$5, 1 + IS_H ($1), 0);
+	      $$ = LDSTPMOD (&$5, &$1, &$5, 1 + IS_H ($1), 0);
 	    }
 	  else
 	    return semantic_error ("Bad register or post_op for LOAD");
@@ -3076,7 +3076,7 @@ asm_1:
 	  if (IS_DREG ($1) && IS_PREG ($5) && IS_PREG ($7))
 	    {
 	      notethat("LDSTpmod: dregs = W [ pregs ++ pregs ] (.)\n");
-	      $$ = LDSTPMOD (&$1, &$5, &$7, 3, $9.r0);
+	      $$ = LDSTPMOD (&$5, &$1, &$7, 3, $9.r0);
 	    }
 	  else
 	    return semantic_error ("Bad register for LOAD");
@@ -3087,7 +3087,7 @@ asm_1:
 	  if (IS_DREG ($1) && IS_PREG ($5) && IS_PREG ($7))
 	    {
 	      notethat("LDSTpmod: dregs_half = W [ pregs ++ pregs ]\n");
-	      $$ = LDSTPMOD (&$1, &$5, &$7, 1 + IS_H ($1), 0);
+	      $$ = LDSTPMOD (&$5, &$1, &$7, 1 + IS_H ($1), 0);
 	    }
 	  else
 	    return semantic_error ("Bad register for LOAD");
