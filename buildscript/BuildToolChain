@@ -145,7 +145,7 @@ fi
 for PREREQ in gcc $MAKE autoconf m4 automake gettext bison flex
 do
     RUN=`whereis $PREREQ | wc -w`
-    if [$RUN -eq 1 ] ; then
+    if [ $RUN -eq 1 ] ; then
         echo "Can not find $PREREQ"
         exit
     fi
