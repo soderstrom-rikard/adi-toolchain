@@ -1,3 +1,16 @@
+2005-01-11  Catherine Moore  <clm@cm00re.com>
+
+	* bfin-dis.c (machine_registers): Define REG_EMUDAT.
+	(reg_names): Add "EMUDAT".
+	(decode_sysregs2): Add REG_EMUDAT.
+	(decode_all): Likewise.
+	(decode_dsp32mac_0): Fix warning.
+	(decode_dsp32mult_0): Likewise.
+	(decode_dsp32alu_0): Decode register pairs correctly for
+	BYTEOP2M, BYTEOP2P, BYTEOP3P, SAA, BYTEOP1P, BYTEOP16P,
+	BYTEOP16M and BYTEUNPACK.
+	Improve output format for SEARCH and BYTEUNPACK.
+
 2004-12-17  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin-dis.c (decode_dsp32shift_0): Reduce number of alternatives by
