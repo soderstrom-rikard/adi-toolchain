@@ -1,3 +1,8 @@
+2005-02-09  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.h (CLASS_LIKELY_SPILLED): Reduce to only include
+	really small classes.
+
 2005-02-08  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* combine.c (try_combine): When modifying mode of a hard reg, check

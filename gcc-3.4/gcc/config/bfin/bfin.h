@@ -558,7 +558,10 @@ enum reg_class
    extending the lifetime of these registers. */
 #define SMALL_REGISTER_CLASSES 1
 
-#define CLASS_LIKELY_SPILLED_P(CLASS) (CLASS < MOST_REGS)
+#define CLASS_LIKELY_SPILLED_P(CLASS) \
+    ((CLASS) == PREGS_CLOBBERED \
+     || (CLASS) == PROLOGUE_REGS \
+     || (CLASS) == CCREGS)
 
 /* Do not allow to store a value in REG_CC for any mode */
 /* Do not allow to store value in pregs if mode is not SI*/
