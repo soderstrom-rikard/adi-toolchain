@@ -6,6 +6,9 @@
 	* config/bfin/bfin.md (adddi3): Rewrite pattern to properly mark
 	scratch register and destination as earlyclobber.
 
+	* config/bfin/bfin.md (REG_R0 .. REG_CC): Define here...
+	* config/bfin/bfin.h: ... instead of here.
+
 2004-09-01  Bernd Schmidt  <bernds@btinternet.com>
 
 	* config/bfin/bfin.c (imm7bit_operand, imm16bit_operand): Test for

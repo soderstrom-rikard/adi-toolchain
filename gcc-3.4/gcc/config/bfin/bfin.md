@@ -60,6 +60,50 @@
 ; 4		end of mini constant pool (consttable_end)
 ; 5		align instruction on 4 byte boundary (align_4) For future use 
 
+/* Define constants for hard registers.  */
+
+(define_constants
+  [(REG_R0 0)
+   (REG_R1 1)
+   (REG_R2 2)
+   (REG_R3 3)
+   (REG_R4 4)
+   (REG_R5 5)
+   (REG_R6 6)
+   (REG_R7 7)
+
+   (REG_P0 8)
+   (REG_P1 9)
+   (REG_P2 10)
+   (REG_P3 11)
+   (REG_P4 12)
+   (REG_P5 13)
+   (REG_P6 14)
+   (REG_P7 15)
+
+   (REG_I0 16)
+   (REG_B0 17)
+   (REG_L0 18)
+   (REG_I1 19)
+   (REG_B1 20)
+   (REG_L1 21)
+   (REG_I2 22)
+   (REG_B2 23)
+   (REG_L2 24)
+   (REG_I3 25)
+   (REG_B3 26)
+   (REG_L3 27)
+
+   (REG_M0 28)
+   (REG_M1 29)
+   (REG_M2 30)
+   (REG_M3 31)
+
+   (REG_A0 32)
+   (REG_A1 33)
+
+   (REG_CC 34)])
+
 (define_attr "type"
   "move,mvp,load,store,push,mcld,mcldp,mcst,dsp32,mult,alu0,shft,brcc,br,call,misc,compare"
   (const_string "misc"))

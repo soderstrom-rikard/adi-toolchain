@@ -360,53 +360,12 @@ extern const char * directive_names[];
        1  condition code flag register CC
 */
 
-/* Register Enumerarion */
-#define REG_R0 0
-#define REG_R1 1
-#define REG_R2 2
-#define REG_R3 3
-#define REG_R4 4
-#define REG_R5 5
-#define REG_R6 6
-#define REG_R7 7
-
-#define REG_P0 8
-#define REG_P1 9
-#define REG_P2 10
-#define REG_P3 11
-#define REG_P4 12
-#define REG_P5 13
-#define REG_P6 14
-#define REG_P7 15
-
-#define REG_I0 16
-#define REG_B0 17
-#define REG_L0 18
-#define REG_I1 19
-#define REG_B1 20
-#define REG_L1 21
-#define REG_I2 22
-#define REG_B2 23
-#define REG_L2 24
-#define REG_I3 25
-#define REG_B3 26
-#define REG_L3 27
-
-#define REG_M0 28
-#define REG_M1 29
-#define REG_M2 30
-#define REG_M3 31
-
-#define REG_A0 32
-#define REG_A1 33
-
-#define REG_CC 34
-
-
 #define FIRST_PSEUDO_REGISTER 35
 
 #define LAST_USER_DREG REG_R7
 #define LAST_USER_PREG REG_P5
+
+#define PREG_P(X) (REG_P (X) && REGNO (X) >= REG_P0 && REGNO (X) <= REG_P7)
 
 #define REGISTER_NAMES { \
   "R0",      "R1",      "R2",      "R3",      "R4",      "R5",      "R6",      "R7",  \
