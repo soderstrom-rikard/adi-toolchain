@@ -776,8 +776,8 @@
    (set_attr "length" "10,8,10")])
 
 (define_insn "subdi3"
-  [(set (match_operand:DI 0 "register_operand" "=d")
-        (minus:DI (match_operand:DI 1 "register_operand" "d")
+  [(set (match_operand:DI 0 "register_operand" "=&d")
+        (minus:DI (match_operand:DI 1 "register_operand" "0")
                   (match_operand:DI 2 "register_operand" "d")))
    (clobber (reg:CC 34))]
   ""

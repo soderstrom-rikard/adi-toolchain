@@ -1,3 +1,7 @@
+2004-12-20  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (subdi3): Make operand 1 match operand 0.
+
 2004-12-19  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (movstricthi_high): New pattern.
