@@ -72,6 +72,7 @@
 #include "elf/arc.h"
 #include "elf/arm.h"
 #include "elf/avr.h"
+#include "elf/bfin.h"
 #include "elf/cris.h"
 #include "elf/d10v.h"
 #include "elf/d30v.h"
@@ -1210,6 +1211,11 @@ dump_relocations (FILE *file,
 	case EM_XTENSA:
 	  rtype = elf_xtensa_reloc_type (type);
 	  break;
+
+	case EM_BLACKFIN:
+	  rtype = elf_bfin_reloc_type (type);
+	  break;
+
 	}
 
       if (rtype == NULL)

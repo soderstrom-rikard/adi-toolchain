@@ -1,0 +1,4 @@
+2005-01-07  Catherine Moore  <clm@cm00re.com>
+
+	* readelf.c: Include elf/bfin.h.
+	 (dump_relocations): Add support for EM_BLACKFIN.
