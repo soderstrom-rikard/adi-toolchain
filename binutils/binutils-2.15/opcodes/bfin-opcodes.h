@@ -15,7 +15,7 @@
 #define BIT_MULTI_INS 0x0800  // multi instruction bit
 
 // This just sets the multi instruction bit of a DSP32 instruction
-#define SET_MULTI_INSTRUCTION_BIT(x) x->value |= BIT_MULTI_INS;
+#define SET_MULTI_INSTRUCTION_BIT(x) x->value |  BIT_MULTI_INS;
 
 
 ////////////////////////////////////////////////////////////////////////////
@@ -69,25 +69,25 @@ typedef struct{
 	int mask_code;
 } DSP32Mac;
 
-DSP32Mac init_DSP32Mac ={
-	0xc0000000,
-	/*src1*/0,0x7,
-	/*src0*/3,0x7,
-	/*dst*/6,0x7,
-	/*h10*/9,0x01,
-	/*h00*/10,0x01,
-	/*op0*/11,0x3,
-	/*w0*/13,0x01,
-	/*h11*/14,0x01,
-	/*h01*/15,0x01,
-	/*op1*/16,0x3,
-	/*w1*/18,0x01,
-	/*P*/19,0x01,
-	/*MM*/20,0x01,
-	/*mmod*/21,0xf,
-	/*code2*/25,0x3,
-	/*M*/27,0x01,
-	/*code*/28,0xf
+#define init_DSP32Mac {\
+	0xc0000000,\
+	/*src1*/0,0x7,\
+	/*src0*/3,0x7,\
+	/*dst*/6,0x7,\
+	/*h10*/9,0x01,\
+	/*h00*/10,0x01,\
+	/*op0*/11,0x3,\
+	/*w0*/13,0x01,\
+	/*h11*/14,0x01,\
+	/*h01*/15,0x01,\
+	/*op1*/16,0x3,\
+	/*w1*/18,0x01,\
+	/*P*/19,0x01,\
+	/*MM*/20,0x01,\
+	/*mmod*/21,0xf,\
+	/*code2*/25,0x3,\
+	/*M*/27,0x01,\
+	/*code*/28,0xf\
 };
 
 /* dsp32mult
@@ -99,25 +99,25 @@ DSP32Mac init_DSP32Mac ={
 
 typedef DSP32Mac DSP32Mult;
 
-DSP32Mult init_DSP32Mult ={
-	0xc2000000,
-	/*src1*/0,0x7,
-	/*src0*/3,0x7,
-	/*dst*/6,0x7,
-	/*h10*/9,0x01,
-	/*h00*/10,0x01,
-	/*op0*/11,0x3,
-	/*w0*/13,0x01,
-	/*h11*/14,0x01,
-	/*h01*/15,0x01,
-	/*op1*/16,0x3,
-	/*w1*/18,0x01,
-	/*P*/19,0x01,
-	/*MM*/20,0x01,
-	/*mmod*/21,0xf,
-	/*code2*/25,0x3,
-	/*M*/27,0x01,
-	/*code*/28,0xf
+#define init_DSP32Mult {\
+	0xc2000000,\
+	/*src1*/0,0x7,\
+	/*src0*/3,0x7,\
+	/*dst*/6,0x7,\
+	/*h10*/9,0x01,\
+	/*h00*/10,0x01,\
+	/*op0*/11,0x3,\
+	/*w0*/13,0x01,\
+	/*h11*/14,0x01,\
+	/*h01*/15,0x01,\
+	/*op1*/16,0x3,\
+	/*w1*/18,0x01,\
+	/*P*/19,0x01,\
+	/*MM*/20,0x01,\
+	/*mmod*/21,0xf,\
+	/*code2*/25,0x3,\
+	/*M*/27,0x01,\
+	/*code*/28,0xf\
 };
 
 /* dsp32alu
@@ -157,21 +157,21 @@ typedef struct{
 	int mask_code;
 } DSP32Alu;
 
-DSP32Alu init_DSP32Alu ={
-	0xc4000000,
-	/*src1*/0,0x7,
-	/*src0*/3,0x7,
-	/*dst1*/6,0x7,
-	/*dst0*/9,0x7,
-	/*x*/12,0x01,
-	/*s*/13,0x01,
-	/*aop*/14,0x3,
-	/*aopcde*/16,0x1f,
-	/*HL*/21,0x01,
-	/*dontcare*/22,0x7,
-	/*code2*/25,0x3,
-	/*M*/27,0x01,
-	/*code*/28,0xf
+#define init_DSP32Alu {\
+	0xc4000000,\
+	/*src1*/0,0x7,\
+	/*src0*/3,0x7,\
+	/*dst1*/6,0x7,\
+	/*dst0*/9,0x7,\
+	/*x*/12,0x01,\
+	/*s*/13,0x01,\
+	/*aop*/14,0x3,\
+	/*aopcde*/16,0x1f,\
+	/*HL*/21,0x01,\
+	/*dontcare*/22,0x7,\
+	/*code2*/25,0x3,\
+	/*M*/27,0x01,\
+	/*code*/28,0xf\
 };
 
 /* dsp32shift
@@ -207,19 +207,19 @@ typedef struct{
 	int mask_code;
 } DSP32Shift;
 
-DSP32Shift init_DSP32Shift ={
-	0xc6000000,
-	/*src1*/0,0x7,
-	/*src0*/3,0x7,
-	/*dst1*/6,0x7,
-	/*dst0*/9,0x7,
-	/*HLs*/12,0x3,
-	/*sop*/14,0x3,
-	/*sopcde*/16,0x1f,
-	/*dontcare*/21,0x3,
-	/*code2*/23,0xf,
-	/*M*/27,0x01,
-	/*code*/28,0xf
+#define init_DSP32Shift {\
+	0xc6000000,\
+	/*src1*/0,0x7,\
+	/*src0*/3,0x7,\
+	/*dst1*/6,0x7,\
+	/*dst0*/9,0x7,\
+	/*HLs*/12,0x3,\
+	/*sop*/14,0x3,\
+	/*sopcde*/16,0x1f,\
+	/*dontcare*/21,0x3,\
+	/*code2*/23,0xf,\
+	/*M*/27,0x01,\
+	/*code*/28,0xf\
 };
 
 /* dsp32shiftimm
@@ -253,18 +253,18 @@ typedef struct{
 	int mask_code;
 } DSP32ShiftImm;
 
-DSP32ShiftImm init_DSP32ShiftImm ={
-	0xc6800000,
-	/*src1*/0,0x7,
-	/*immag*/3,0x3f,
-	/*dst0*/9,0x7,
-	/*HLs*/12,0x3,
-	/*sop*/14,0x3,
-	/*sopcde*/16,0x1f,
-	/*dontcare*/21,0x3,
-	/*code2*/23,0xf,
-	/*M*/27,0x01,
-	/*code*/28,0xf
+#define init_DSP32ShiftImm {\
+	0xc6800000,\
+	/*src1*/0,0x7,\
+	/*immag*/3,0x3f,\
+	/*dst0*/9,0x7,\
+	/*HLs*/12,0x3,\
+	/*sop*/14,0x3,\
+	/*sopcde*/16,0x1f,\
+	/*dontcare*/21,0x3,\
+	/*code2*/23,0xf,\
+	/*M*/27,0x01,\
+	/*code*/28,0xf\
 };
 
 // }
@@ -296,15 +296,15 @@ typedef struct{
 	int mask_code;
 } LDSTidxI;
 
-LDSTidxI init_LDSTidxI ={
-	0xe4000000,
-	/*offset*/0,0xffff,
-	/*reg*/16,0x7,
-	/*ptr*/19,0x7,
-	/*sz*/22,0x3,
-	/*Z*/24,0x01,
-	/*W*/25,0x01,
-	/*code*/26,0x3f
+#define init_LDSTidxI {\
+	0xe4000000,\
+	/*offset*/0,0xffff,\
+	/*reg*/16,0x7,\
+	/*ptr*/19,0x7,\
+	/*sz*/22,0x3,\
+	/*Z*/24,0x01,\
+	/*W*/25,0x01,\
+	/*code*/26,0x3f\
 };
 
 
@@ -332,15 +332,15 @@ typedef struct{
 	int mask_code;
 } LDST;
 
-LDST init_LDST ={
-	0x9000,
-	/*reg*/0,0x7,
-	/*ptr*/3,0x7,
-	/*Z*/6,0x01,
-	/*aop*/7,0x3,
-	/*W*/9,0x01,
-	/*sz*/10,0x3,
-	/*code*/12,0xf
+#define init_LDST {\
+	0x9000,\
+	/*reg*/0,0x7,\
+	/*ptr*/3,0x7,\
+	/*Z*/6,0x01,\
+	/*aop*/7,0x3,\
+	/*W*/9,0x01,\
+	/*sz*/10,0x3,\
+	/*code*/12,0xf\
 };
 
 
@@ -366,14 +366,14 @@ typedef struct{
 	int mask_code;
 } LDSTii;
 
-LDSTii init_LDSTii ={
-	0xa000,
-	/*reg*/0,0x7,
-	/*ptr*/3,0x7,
-	/*offset*/6,0xf,
-	/*op*/10,0x3,
-	/*W*/12,0x01,
-	/*code*/13,0x7
+#define init_LDSTii {\
+	0xa000,\
+	/*reg*/0,0x7,\
+	/*ptr*/3,0x7,\
+	/*offset*/6,0xf,\
+	/*op*/10,0x3,\
+	/*W*/12,0x01,\
+	/*code*/13,0x7\
 };
 
 
@@ -395,12 +395,12 @@ typedef struct{
 	int mask_code;
 } LDSTiiFP;
 
-LDSTiiFP init_LDSTiiFP ={
-	0xb800,
-	/*reg*/0,0xf,
-	/*offset*/4,0x1f,
-	/*W*/9,0x01,
-	/*code*/10,0x3f
+#define init_LDSTiiFP {\
+	0xb800,\
+	/*reg*/0,0xf,\
+	/*offset*/4,0x1f,\
+	/*W*/9,0x01,\
+	/*code*/10,0x3f\
 };
 
 /* dspLDST
@@ -425,14 +425,14 @@ typedef struct{
 	int mask_code;
 } DspLDST;
 
-DspLDST init_DspLDST ={
-	0x9c00,
-	/*reg*/0,0x7,
-	/*i*/3,0x3,
-	/*m*/5,0x3,
-	/*aop*/7,0x3,
-	/*W*/9,0x01,
-	/*code*/10,0x3f
+#define init_DspLDST {\
+	0x9c00,\
+	/*reg*/0,0x7,\
+	/*i*/3,0x3,\
+	/*m*/5,0x3,\
+	/*aop*/7,0x3,\
+	/*W*/9,0x01,\
+	/*code*/10,0x3f\
 };
 
 
@@ -458,14 +458,14 @@ typedef struct{
 	int mask_code;
 } LDSTpmod;
 
-LDSTpmod init_LDSTpmod ={
-	0x8000,
-	/*ptr*/0,0x7,
-	/*idx*/3,0x7,
-	/*reg*/6,0x7,
-	/*aop*/9,0x3,
-	/*W*/11,0x01,
-	/*code*/12,0xf
+#define init_LDSTpmod  {\
+	0x8000,\
+	/*ptr*/0,0x7,\
+	/*idx*/3,0x7,\
+	/*reg*/6,0x7,\
+	/*aop*/9,0x3,\
+	/*W*/11,0x01,\
+	/*code*/12,0xf\
 };
 
 ////////////////////////////////////////////////////////////////////////////
@@ -488,12 +488,12 @@ typedef struct{
 	int mask_code;
 } LOGI2op;
 
-LOGI2op init_LOGI2op ={
-	0x4800,
-	/*dst*/0,0x7,
-	/*src*/3,0x1f,
-	/*opc*/8,0x7,
-	/*code*/11,0x1f
+#define init_LOGI2op  {\
+	0x4800,\
+	/*dst*/0,0x7,\
+	/*src*/3,0x1f,\
+	/*opc*/8,0x7,\
+	/*code*/11,0x1f\
 };
 
 
@@ -515,12 +515,12 @@ typedef struct{
 	int mask_code;
 } ALU2op;
 
-ALU2op init_ALU2op ={
-	0x4000,
-	/*dst*/0,0x7,
-	/*src*/3,0x7,
-	/*opc*/6,0xf,
-	/*code*/10,0x3f
+#define init_ALU2op  {\
+	0x4000,\
+	/*dst*/0,0x7,\
+	/*src*/3,0x7,\
+	/*opc*/6,0xf,\
+	/*code*/10,0x3f\
 };
 
 
@@ -542,12 +542,12 @@ typedef struct{
 	int mask_code;
 } BRCC;
 
-BRCC init_BRCC ={
-	0x1000,
-	/*offset*/0,0x3ff,
-	/*B*/10,0x01,
-	/*T*/11,0x01,
-	/*code*/12,0xf
+#define init_BRCC  {\
+	0x1000,\
+	/*offset*/0,0x3ff,\
+	/*B*/10,0x01,\
+	/*T*/11,0x01,\
+	/*code*/12,0xf\
 };
 
 
@@ -565,10 +565,10 @@ typedef struct{
 	int mask_code;
 } UJump;
 
-UJump init_UJump ={
-	0x2000,
-	/*offset*/0,0xfff,
-	/*code*/12,0xf
+#define init_UJump  {\
+	0x2000,\
+	/*offset*/0,0xfff,\
+	/*code*/12,0xf\
 };
 
 
@@ -588,11 +588,11 @@ typedef struct{
 	int mask_code;
 } ProgCtrl;
 
-ProgCtrl init_ProgCtrl ={
-	0x0000,
-	/*poprnd*/0,0xf,
-	/*prgfunc*/4,0xf,
-	/*code*/8,0xff
+#define init_ProgCtrl  {\
+	0x0000,\
+	/*poprnd*/0,0xf,\
+	/*prgfunc*/4,0xf,\
+	/*code*/8,0xff\
 };
 
 /* CALLa
@@ -613,11 +613,11 @@ typedef struct{
 	int mask_code;
 } CALLa;
 
-CALLa init_CALLa ={
-	0xe2000000,
-	/*addr*/0,0xffffff,
-	/*S*/24,0x01,
-	/*code*/25,0x7f
+#define init_CALLa  {\
+	0xe2000000,\
+	/*addr*/0,0xffffff,\
+	/*S*/24,0x01,\
+	/*code*/25,0x7f\
 };
 
 
@@ -639,12 +639,12 @@ typedef struct{
 	int mask_code;
 } PseudoDbg;
 
-PseudoDbg init_PseudoDbg ={
-	0xf800,
-	/*reg*/0,0x7,
-	/*grp*/3,0x7,
-	/*fn*/ 6, 0x3,
-	/*code*/8,0xff
+#define init_PseudoDbg  {\
+	0xf800,\
+	/*reg*/0,0x7,\
+	/*grp*/3,0x7,\
+	/*fn*/ 6, 0x3,\
+	/*code*/8,0xff\
 };
 
 
@@ -669,13 +669,13 @@ typedef struct{
 	int mask_code;
 } PseudoDbg_Assert;
 
-PseudoDbg_Assert init_PseudoDbg_Assert ={
-	0xf0000000,
-	/*expected*/0,0xffff,
-	/*regtest*/16,0x7,
-	/*dbgop*/19,0x7,
-	/*dontcare*/22,0x1f,
-	/*code*/27,0x1f
+#define init_PseudoDbg_Assert  {\
+	0xf0000000,\
+	/*expected*/0,0xffff,\
+	/*regtest*/16,0x7,\
+	/*dbgop*/19,0x7,\
+	/*dontcare*/22,0x1f,\
+	/*code*/27,0x1f\
 };
 
 
@@ -697,12 +697,12 @@ typedef struct{
 	int mask_code;
 } CaCTRL;
 
-CaCTRL init_CaCTRL ={
-	0x0240,
-	/*reg*/0,0x7,
-	/*op*/3,0x3,
-	/*a*/5,0x01,
-	/*code*/6,0x3ff,
+#define init_CaCTRL  {\
+	0x0240,\
+	/*reg*/0,0x7,\
+	/*op*/3,0x3,\
+	/*a*/5,0x01,\
+	/*code*/6,0x3ff,\
 };
 
 /* PushPopMultiple
@@ -727,14 +727,14 @@ typedef struct{
 	int mask_code;
 } PushPopMultiple;
 
-PushPopMultiple init_PushPopMultiple ={
-	0x0400,
-	/*pr*/0,0x7,
-	/*dr*/3,0x7,
-	/*W*/6,0x01,
-	/*p*/7,0x01,
-	/*d*/8,0x01,
-	/*code*/9,0x7f
+#define init_PushPopMultiple  {\
+	0x0400,\
+	/*pr*/0,0x7,\
+	/*dr*/3,0x7,\
+	/*W*/6,0x01,\
+	/*p*/7,0x01,\
+	/*d*/8,0x01,\
+	/*code*/9,0x7f\
 };
 
 /* PushPopReg
@@ -755,12 +755,12 @@ typedef struct{
 	int mask_code;
 } PushPopReg;
 
-PushPopReg init_PushPopReg ={
-	0x0100,
-	/*reg*/0,0x7,
-	/*grp*/3,0x7,
-	/*W*/6,0x01,
-	/*code*/7,0x1ff
+#define init_PushPopReg  {\
+	0x0100,\
+	/*reg*/0,0x7,\
+	/*grp*/3,0x7,\
+	/*W*/6,0x01,\
+	/*code*/7,0x1ff\
 };
 
 /* linkage
@@ -780,11 +780,11 @@ typedef struct{
 	int mask_code;
 } Linkage;
 
-Linkage init_Linkage ={
-	0xe8000000,
-	/*framesize*/0,0xffff,
-	/*R*/16,0x01,
-	/*code*/17,0x7fff
+#define init_Linkage  {\
+	0xe8000000,\
+	/*framesize*/0,0xffff,\
+	/*R*/16,0x01,\
+	/*code*/17,0x7fff\
 };
 
 /* LoopSetup
@@ -812,15 +812,15 @@ typedef struct{
 	int mask_code;
 } LoopSetup;
 
-LoopSetup init_LoopSetup ={
-	0xe0800000,
-	/*eoffset*/0,0x3ff,
-	/*dontcare*/10,0x3,
-	/*reg*/12,0xf,
-	/*soffset*/16,0xf,
-	/*c*/20,0x01,
-	/*rop*/21,0x3,
-	/*code*/23,0x1ff
+#define init_LoopSetup  {\
+	0xe0800000,\
+	/*eoffset*/0,0x3ff,\
+	/*dontcare*/10,0x3,\
+	/*reg*/12,0xf,\
+	/*soffset*/16,0xf,\
+	/*c*/20,0x01,\
+	/*rop*/21,0x3,\
+	/*code*/23,0x1ff\
 };
 
 /* LDIMMhalf
@@ -848,15 +848,15 @@ typedef struct{
 	int mask_code;
 } LDIMMhalf;
 
-LDIMMhalf init_LDIMMhalf ={
-	0xe1000000,
-	/*hword*/0,0xffff,
-	/*reg*/16,0x7,
-	/*grp*/19,0x3,
-	/*S*/21,0x01,
-	/*H*/22,0x01,
-	/*Z*/23,0x01,
-	/*code*/24,0xff
+#define init_LDIMMhalf  {\
+	0xe1000000,\
+	/*hword*/0,0xffff,\
+	/*reg*/16,0x7,\
+	/*grp*/19,0x3,\
+	/*S*/21,0x01,\
+	/*H*/22,0x01,\
+	/*Z*/23,0x01,\
+	/*code*/24,0xff\
 };
 
 
@@ -876,11 +876,11 @@ typedef struct{
 	int mask_code;
 } CC2dreg;
 
-CC2dreg init_CC2dreg ={
-	0x0200,
-	/*reg*/0,0x7,
-	/*op*/3,0x3,
-	/*code*/5,0x7ff
+#define init_CC2dreg  {\
+	0x0200,\
+	/*reg*/0,0x7,\
+	/*op*/3,0x3,\
+	/*code*/5,0x7ff\
 };
 
 
@@ -902,12 +902,12 @@ typedef struct{
 	int mask_code;
 } PTR2op;
 
-PTR2op init_PTR2op ={
-	0x4400,
-	/*dst*/0,0x7,
-	/*src*/3,0x7,
-	/*opc*/6,0x7,
-	/*code*/9,0x7f
+#define init_PTR2op  {\
+	0x4400,\
+	/*dst*/0,0x7,\
+	/*src*/3,0x7,\
+	/*opc*/6,0x7,\
+	/*code*/9,0x7f\
 };
 
 
@@ -931,13 +931,13 @@ typedef struct{
 	int mask_code;
 } COMP3op;
 
-COMP3op init_COMP3op ={
-	0x5000,
-	/*src0*/0,0x7,
-	/*src1*/3,0x7,
-	/*dst*/6,0x7,
-	/*opc*/9,0x7,
-	/*code*/12,0xf
+#define init_COMP3op  {\
+	0x5000,\
+	/*src0*/0,0x7,\
+	/*src1*/3,0x7,\
+	/*dst*/6,0x7,\
+	/*opc*/9,0x7,\
+	/*code*/12,0xf\
 };
 
 /* ccMV
@@ -962,14 +962,14 @@ typedef struct{
 	int mask_code;
 } CCmv;
 
-CCmv init_CCmv ={
-	0x0600,
-	/*src*/0,0x7,
-	/*dst*/3,0x7,
-	/*s*/6,0x01,
-	/*d*/7,0x01,
-	/*T*/8,0x01,
-	/*code*/9,0x7f
+#define init_CCmv  {\
+	0x0600,\
+	/*src*/0,0x7,\
+	/*dst*/3,0x7,\
+	/*s*/6,0x01,\
+	/*d*/7,0x01,\
+	/*T*/8,0x01,\
+	/*code*/9,0x7f\
 };
 
 
@@ -995,14 +995,14 @@ typedef struct{
 	int mask_code;
 } CCflag;
 
-CCflag init_CCflag ={
-	0x0800,
-	/*x*/0,0x7,
-	/*y*/3,0x7,
-	/*G*/6,0x01,
-	/*opc*/7,0x7,
-	/*I*/10,0x01,
-	/*code*/11,0x1f
+#define init_CCflag  {\
+	0x0800,\
+	/*x*/0,0x7,\
+	/*y*/3,0x7,\
+	/*G*/6,0x01,\
+	/*opc*/7,0x7,\
+	/*I*/10,0x01,\
+	/*code*/11,0x1f\
 };
 
 
@@ -1024,12 +1024,12 @@ typedef struct{
 	int mask_code;
 } CC2stat;
 
-CC2stat init_CC2stat ={
-	0x0300,
-	/*cbit*/0,0x1f,
-	/*op*/5,0x3,
-	/*D*/7,0x01,
-	/*code*/8,0xff
+#define init_CC2stat  {\
+	0x0300,\
+	/*cbit*/0,0x1f,\
+	/*op*/5,0x3,\
+	/*D*/7,0x01,\
+	/*code*/8,0xff\
 };
 
 
@@ -1053,13 +1053,13 @@ typedef struct{
 	int mask_code;
 } RegMv;
 
-RegMv init_RegMv ={
-	0x3000,
-	/*src*/0,0x7,
-	/*dst*/3,0x7,
-	/*gs*/6,0x7,
-	/*gd*/9,0x7,
-	/*code*/12,0xf
+#define init_RegMv  {\
+	0x3000,\
+	/*src*/0,0x7,\
+	/*dst*/3,0x7,\
+	/*gs*/6,0x7,\
+	/*gd*/9,0x7,\
+	/*code*/12,0xf\
 };
 
 
@@ -1081,12 +1081,12 @@ typedef struct{
 	int mask_code;
 } COMPI2opD;
 
-COMPI2opD init_COMPI2opD ={
-	0x6000,
-	/*dst*/0,0x7,
-	/*src*/3,0x7f,
-	/*op*/10,0x01,
-	/*code*/11,0x1f
+#define init_COMPI2opD  {\
+	0x6000,\
+	/*dst*/0,0x7,\
+	/*src*/3,0x7f,\
+	/*op*/10,0x01,\
+	/*code*/11,0x1f\
 };
 
 /* COMPI2opP
@@ -1097,12 +1097,12 @@ COMPI2opD init_COMPI2opD ={
 
 typedef COMPI2opD COMPI2opP;
 
-COMPI2opP init_COMPI2opP ={
-	0x6800,
-	/*dst*/0,0x7,
-	/*src*/3,0x7f,
-	/*op*/10,0x01,
-	/*code*/11,0x1f
+#define init_COMPI2opP  {\
+	0x6800,\
+	/*dst*/0,0x7,\
+	/*src*/3,0x7f,\
+	/*op*/10,0x01,\
+	/*code*/11,0x1f\
 };
 
 
@@ -1128,14 +1128,14 @@ typedef struct{
 	int mask_code;
 } DagMODim;
 
-DagMODim init_DagMODim ={
-	0x9e60,
-	/*i*/0,0x3,
-	/*m*/2,0x3,
-	/*op*/4,0x01,
-	/*code2*/5,0x3,
-	/*br*/7,0x01,
-	/*code*/8,0xff
+#define init_DagMODim  {\
+	0x9e60,\
+	/*i*/0,0x3,\
+	/*m*/2,0x3,\
+	/*op*/4,0x01,\
+	/*code2*/5,0x3,\
+	/*br*/7,0x01,\
+	/*code*/8,0xff\
 };
 
 /* dagMODik
@@ -1154,11 +1154,11 @@ typedef struct{
 	int mask_code;
 } DagMODik;
 
-DagMODik init_DagMODik ={
-	0x9f60,
-	/*i*/0,0x3,
-	/*op*/2,0x3,
-	/*code*/4,0xfff
+#define init_DagMODik  {\
+	0x9f60,\
+	/*i*/0,0x3,\
+	/*op*/2,0x3,\
+	/*code*/4,0xfff\
 };
 
 #endif //BFIN_OPCODES_H_HD9837U0U9I27E902702DYHCXH2D79218D701D
