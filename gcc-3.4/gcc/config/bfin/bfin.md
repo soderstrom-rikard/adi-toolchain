@@ -60,7 +60,7 @@
 ; 4		end of mini constant pool (consttable_end)
 ; 5		align instruction on 4 byte boundary (align_4) For future use 
 
-/* Define constants for hard registers.  */
+;; Define constants for hard registers.
 
 (define_constants
   [(REG_R0 0)
@@ -107,6 +107,12 @@
 
    (REG_CC 34)
    (REG_RETS 35)])
+
+;; Constants used in UNSPECs.
+
+(define_constants
+  [(UNSPEC_CBRANCH_TAKEN 0)
+   (UNSPEC_CBRANCH_NOPS 0)])
 
 (define_attr "type"
   "move,mvi,mcld,mcldp,mcst,dsp32,mult,alu0,shft,brcc,br,call,misc,compare"
@@ -1564,10 +1570,56 @@ else
 	 (label_ref (match_operand 3 "" ""))
 	 (pc)))]
   ""
-  "* return asm_conditional_branch (insn, GET_CODE (operands[0]) == EQ ? BRF : BRT);"
-  [(set_attr "type" "brcc")
-  ])
+{
+  asm_conditional_branch (insn, operands, 0, 0);
+  return "";
+}
+  [(set_attr "type" "brcc")])
 
+;; Special cbranch patterns to deal with the speculative load problem - see
+;; bfin_reorg for details.
+
+(define_insn "cbranch_predicted_taken"
+  [(set (pc)
+	(if_then_else
+	 (match_operator 0 "bfin_cbranch_operator"
+			 [(match_operand:BI 1 "cc_operand" "C")
+			  (match_operand:BI 2 "immediate_operand" "P")])
+	 (label_ref (match_operand 3 "" ""))
+	 (pc)))
+   (unspec [(const_int 0)] UNSPEC_CBRANCH_TAKEN)]
+  ""
+{
+  asm_conditional_branch (insn, operands, 0, 1);
+  return "";
+}
+  [(set_attr "type" "brcc")])
+
+(define_insn "cbranch_with_nops"
+  [(set (pc)
+	(if_then_else
+	 (match_operator 0 "bfin_cbranch_operator"
+			 [(match_operand:BI 1 "cc_operand" "C")
+			  (match_operand:BI 2 "immediate_operand" "P")])
+	 (label_ref (match_operand 3 "" ""))
+	 (pc)))
+   (unspec [(match_operand 4 "immediate_operand" "")] UNSPEC_CBRANCH_NOPS)]
+  "reload_completed"
+{
+  asm_conditional_branch (insn, operands, INTVAL (operands[4]), 0);
+  return "";
+}
+  [(set_attr "type" "brcc")
+   (set (attr "length")
+	(cond [(and
+		(le (minus (match_dup 3) (pc)) (const_int 1020))
+		(ge (minus (match_dup 3) (pc)) (const_int -1024)))
+	       (const_int 6)
+	       (and
+		(le (minus (match_dup 3) (pc)) (const_int 4090))
+		(ge (minus (match_dup 3) (pc)) (const_int -4096)))
+	       (const_int 4)]
+	      (const_int 6)))])
 
 (define_expand "seq"
   [(set (match_dup 1) (eq:BI (match_dup 2) (match_dup 3)))

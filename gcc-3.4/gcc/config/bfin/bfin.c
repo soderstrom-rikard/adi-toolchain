@@ -88,17 +88,6 @@ bfin_globalize_label (FILE *stream, const char *name)
         fputc ('\n',stream);
 }
 
-#undef TARGET_RTX_COSTS
-#define TARGET_RTX_COSTS bfin_rtx_costs
-
-#undef  TARGET_ADDRESS_COST
-#define TARGET_ADDRESS_COST bfin_address_cost
-
-#undef TARGET_ASM_INTERNAL_LABEL
-#define TARGET_ASM_INTERNAL_LABEL bfin_internal_label
-
-struct gcc_target targetm = TARGET_INITIALIZER;
-
 static int arg_regs[] = FUNCTION_ARG_REGISTERS;
 
 
@@ -1416,23 +1405,6 @@ backward_reference (rtx jump)
 }
 #endif
 
-int
-loop_end (rtx jump)
-{
-/* return true if the jump is followed by loop end. */
-  rtx insn;
-
-  if (JUMP_INSN != GET_CODE(jump))
-      abort();
-    
-  insn = NEXT_INSN (jump);
-  if (GET_CODE (insn) == NOTE
-       && (NOTE_LINE_NUMBER (insn) == NOTE_INSN_LOOP_END))
-    return 1;
-  else
-    return 0;
-}
-
 int scale_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) {
   if (GET_CODE(op) == CONST_INT) {
     int iv = INTVAL (op);
@@ -1761,20 +1733,77 @@ override_options (void)
   bfin_lvno = 0;
 }
 
+/* Return the destination address of BRANCH.  */
 
-const char *ccbranch_templates[][3] = {
-  { "if !cc jump %3;",  "if cc jump 4; jump.s %3;",  "if cc jump 6; jump.l %3;" },
-  { "if cc jump %3;",   "if !cc jump 4; jump.s %3;", "if !cc jump 6; jump.l %3;" },
+static int
+branch_dest (rtx branch)
+{
+  rtx dest;
+  int dest_uid;
+  rtx pat = PATTERN (branch);
+  if (GET_CODE (pat) == PARALLEL)
+    pat = XVECEXP (pat, 0, 0);
+  dest = SET_SRC (pat);
+  if (GET_CODE (dest) == IF_THEN_ELSE)
+    dest = XEXP (dest, 1);
+  dest = XEXP (dest, 0);
+  dest_uid = INSN_UID (dest);
+  return INSN_ADDRESSES (dest_uid);
+}
+
+/* Return nonzero if INSN is annotated with a REG_BR_PROB note that indicates
+   it's a branch that's predicted taken.  */
+
+static int
+cbranch_predicted_taken_p (rtx insn)
+{
+  rtx x = find_reg_note (insn, REG_BR_PROB, 0);
+
+  if (x)
+    {
+      int pred_val = INTVAL (XEXP (x, 0));
+
+      return pred_val >= REG_BR_PROB_BASE / 2;
+    }
+
+  return 0;
+}
+
+/* Templates for use by asm_conditional_branch.  */
+
+static const char *ccbranch_templates[][3] = {
+  { "if !cc jump %3;",  "if cc jump 4 (bp); jump.s %3;",  "if cc jump 6 (bp); jump.l %3;" },
+  { "if cc jump %3;",   "if !cc jump 4 (bp); jump.s %3;", "if !cc jump 6 (bp); jump.l %3;" },
   { "if !cc jump %3 (bp);",  "if cc jump 4; jump.s %3;",  "if cc jump 6; jump.l %3;" },
   { "if cc jump %3 (bp);",  "if !cc jump 4; jump.s %3;",  "if !cc jump 6; jump.l %3;" },
 };
 
-char *asm_conditional_branch (rtx insn, int cond)
+/* Output INSN, which is a conditional branch instruction with operands
+   OPERANDS.
+
+   We deal with the various forms of conditional branches that can be generated
+   by bfin_reorg to prevent the hardware from doing speculative loads, by
+   - emitting a sufficient number of nops, if N_NOPS is nonzero, or
+   - always emitting the branch as predicted taken, if PREDICT_TAKEN is true.
+   Either of these is only necessary if the branch is short, otherwise the
+   template we use ends in an unconditional jump which flushes the pipeline
+   anyway.  */
+
+void
+asm_conditional_branch (rtx insn, rtx *operands, int n_nops, int predict_taken)
 {
-  int bp = loop_end (insn);
-  int idx = (bp<<1)|cond;
-  int len = (get_attr_length (insn)/2)-1;
-  return (char *) ccbranch_templates[idx][len];
+  int offset = branch_dest (insn) - INSN_ADDRESSES (INSN_UID (insn));
+  int len = (offset >= -1024 && offset <= 1022 ? 0
+	     : offset >= -4096 && offset <= 4094 ? 1
+	     : 2);
+  int bp = predict_taken && len == 0 ? 1 : cbranch_predicted_taken_p (insn);
+  int idx = (bp << 1) | (GET_CODE (operands[0]) == EQ ? BRF : BRT);
+  output_asm_insn (ccbranch_templates[idx][len], operands);
+  if (n_nops > 0 && bp)
+    abort ();
+  if (len == 0)
+    while (n_nops-- > 0)
+      output_asm_insn ("nop;", NULL);
 }
 
 int
@@ -2274,3 +2303,102 @@ output_pop_multiple (rtx insn, rtx *operands)
 
   output_asm_insn (buf, operands);
 }
+
+/* We use the machine specific reorg pass for emitting CSYNC instructions
+   after conditional branches as needed.
+
+   The Blackfin is unusual in that a code sequence like
+     if cc jump label
+     r0 = (p0)
+   may speculatively perform the load even if the condition isn't true.  This
+   happens for a branch that is predicted not taken, because the pipeline
+   isn't flushed or stalled, so the early stages of the following instructions,
+   which perform the memory reference, are allowed to execute before the
+   jump condition is evaluated.
+   Therefore, we must insert additional instructions in all places where this
+   could lead to incorrect behaviour.  The manual recommends CSYNC, while
+   VDSP seems to use NOPs (even though its corresponding compiler option is
+   named CSYNC).
+
+   When optimizing for speed, we emit NOPs, which seems faster than a CSYNC.
+   When optimizing for size, we turn the branch into a predicted taken one.
+   This may be slower due to mispredicts, but saves code size.  */
+
+static void
+bfin_reorg (void)
+{
+  rtx insn, last_condjump = NULL_RTX;
+  int cycles_since_jump = INT_MAX;
+
+  if (! TARGET_CSYNC)
+    return;
+
+  for (insn = get_insns (); insn; insn = NEXT_INSN (insn))
+    {
+      rtx pat;
+
+      if (NOTE_P (insn) || BARRIER_P (insn) || LABEL_P (insn))
+	continue;
+
+      pat = PATTERN (insn);
+      if (GET_CODE (pat) == USE || GET_CODE (pat) == CLOBBER
+	  || GET_CODE (pat) == ASM_INPUT || GET_CODE (pat) == ADDR_VEC
+	  || GET_CODE (pat) == ADDR_DIFF_VEC || asm_noperands (pat) >= 0)
+	continue;
+
+      if (JUMP_P (insn))
+	{
+	  if (any_condjump_p (insn)
+	      && ! cbranch_predicted_taken_p (insn))
+	    {
+	      last_condjump = insn;
+	      cycles_since_jump = 0;
+	    }
+	  else
+	    cycles_since_jump = INT_MAX;
+	}
+      else if (INSN_P (insn))
+	{
+	  enum attr_type type = get_attr_type (insn);
+	  if (cycles_since_jump < INT_MAX)
+	    cycles_since_jump++;
+
+	  if (type == TYPE_MCLD && cycles_since_jump < 3)
+	    {
+	      rtx pat;
+
+	      pat = single_set (insn);
+	      if (may_trap_p (SET_SRC (pat)))
+		{
+		  int num_clobbers;
+		  rtx *op = recog_data.operand;
+
+		  extract_insn (last_condjump);
+		  if (optimize_size)
+		    pat = gen_cbranch_predicted_taken (op[0], op[1], op[2],
+						       op[3]);
+		  else
+		    pat = gen_cbranch_with_nops (op[0], op[1], op[2], op[3],
+						 GEN_INT (3 - cycles_since_jump));
+		  PATTERN (last_condjump) = pat;
+		  INSN_CODE (last_condjump) = recog (pat, insn, &num_clobbers);
+		  cycles_since_jump = INT_MAX;
+		}
+	    }
+	}
+    }
+}
+
+#undef TARGET_RTX_COSTS
+#define TARGET_RTX_COSTS bfin_rtx_costs
+
+#undef  TARGET_ADDRESS_COST
+#define TARGET_ADDRESS_COST bfin_address_cost
+
+#undef TARGET_ASM_INTERNAL_LABEL
+#define TARGET_ASM_INTERNAL_LABEL bfin_internal_label
+
+#undef TARGET_MACHINE_DEPENDENT_REORG
+#define TARGET_MACHINE_DEPENDENT_REORG bfin_reorg
+
+struct gcc_target targetm = TARGET_INITIALIZER;

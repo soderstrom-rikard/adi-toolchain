@@ -1,3 +1,24 @@
+2004-11-04  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (UNSPEC_CBRANCH_TAKEN, UNSPEC_CBRANCH_NOPS): New
+	constants.
+	(cbranch_with_nops, cbranch_predicted_taken): New patterns.
+	* config/bfin/bfin.c (TARGET_MACHINE_DEPENDENT_REORG): Define.
+	(loop_end): Delete function.
+	(bfin_reorg, branch_dest, cbranch_predicted_taken_p): New
+	functions.
+	(asm_conditional_branch): Add N_NOPS and PREDICT_TAKEN arguments;
+	change COND argument to OPERANDS arg. All callers changed.  Use
+	INSN_ADDRESSES instead of length attribute.  Use PREDICT_TAKEN arg
+	and cbranch_predicted_taken_p to determine whether to set the
+	predicted bit. Emit nops when caller sets N_NOPS and emitted insn
+	is a single conditional branch.
+	(ccbranch_templates): Add more prediction hints.
+	* config/bfin/bfin.h (MASK_CSYNC, TARGET_CSYNC): New macros.
+	(TARGET_SWITCHES): Add -mcsync (default) and -mno-csync.
+	* config/bfin/bfin-protos.h (asm_conditional_branch): Delete duplicate
+	prototype; adjust remaining one to match new definition.
+
 2004-11-03  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (ashlsi3_insn, lshrsi3_insn): New named patterns,

@@ -53,6 +53,7 @@
   The following set of defines, describe the commandline api.
 */
 #define MASK_OMIT_LEAF_FRAME_POINTER 0x00000800 /* omit leaf frame pointers */
+#define MASK_CSYNC                   0x00010000
 #define MASK_SIMPLE_RTM              0x00020000
 #define MASK_LOW_64K           	     0x00040000
 #define MASK_ASM_DIR                 0x00100000 /* use alternative assembly ectives */
@@ -88,6 +89,7 @@ extern int target_flags;
 #define TARGET_SIMPLE_RTM              (target_flags & MASK_SIMPLE_RTM)
 #define TARGET_LOW_64K                 (target_flags & MASK_LOW_64K)
 #define TARGET_ASM_DIR		       (target_flags & MASK_ASM_DIR)
+#define TARGET_CSYNC		       (target_flags & MASK_CSYNC)
 #define TARGET_NO_UNDERSCORE	       (target_flags & MASK_NO_UNDERSCORE)
 
 #define TARGET_HAS_SYMBOLIC_ADDRESSES  (0)
@@ -121,14 +123,18 @@ extern int target_flags;
     "Use conditional moves"},						\
   { "no-cmov",			-MASK_CMOV,				\
     "Do not generate conditional moves"},				\
+  { "csync",		         MASK_CSYNC,				\
+    "Avoid speculative loads by inserting CSYNC or equivalent"},	\
+  { "no-csync",			-MASK_CSYNC,				\
+    "Do not generate extra code to avoid speculative loads"},		\
   { "profile",		         MASK_PROFILE,				\
     "Non GNU Profiling"},						\
   { "no-profile",		-MASK_PROFILE,				\
     "NO Non GNU profiling"},						\
   { "no-underscore",		MASK_NO_UNDERSCORE,			\
     "No underscore fro local label definition"},			\
-  { "", MASK_CMOV,							\
-    "default: cmov"}}
+  { "", MASK_CMOV | MASK_CSYNC,						\
+    "default: cmov, csync"}}
 
 /* Sometimes certain combinations of command options do not make
    sense on a particular target machine.  You can define a macro

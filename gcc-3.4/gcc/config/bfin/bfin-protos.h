@@ -31,7 +31,6 @@ extern void function_arg_advance PARAMS ((CUMULATIVE_ARGS *, Mmode,
                                         tree, int));
 extern int  function_arg_regno_p PARAMS ((int));
 
-extern char *asm_conditional_branch PARAMS ((rtx, int));
 extern const char *output_load_immediate PARAMS ((rtx *));
 extern const char *output_casesi_internal PARAMS ((rtx *));
 extern char *bfin_asm_long PARAMS ((void));
@@ -83,7 +82,7 @@ extern enum reg_class secondary_input_reload_class PARAMS ((enum reg_class, Mmod
 extern enum reg_class secondary_output_reload_class PARAMS ((enum reg_class, Mmode, rtx));
 extern void output_symbolic_address PARAMS ((rtx *));
 extern void override_options PARAMS ((void));
-extern char *asm_conditional_branch PARAMS ((rtx, int));
+extern void asm_conditional_branch PARAMS ((rtx, rtx *, int, int));
 extern rtx bfin_gen_compare PARAMS ((rtx, Mmode));
 extern int signed_comparison_operator PARAMS ((rtx, Mmode));
 extern int ccregister_p PARAMS ((rtx, Mmode));
