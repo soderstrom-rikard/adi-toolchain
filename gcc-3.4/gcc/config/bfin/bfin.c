@@ -820,12 +820,12 @@ int symbolic_operand_p (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
 
 int imm7bit_operand_p (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) 
 {
-  return CONSTANT_P (op) && CONST_7BIT_IMM_P (INTVAL (op));
+  return GET_CODE (op) == CONST_INT && CONST_7BIT_IMM_P (INTVAL (op));
 }
 
 int imm16bit_operand_p (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) 
 {
-  return CONSTANT_P (op) && CONST_16BIT_IMM_P (INTVAL (op));
+  return GET_CODE (op) == CONST_INT && CONST_16BIT_IMM_P (INTVAL (op));
 }
 
 int bfin_address_cost (rtx addr) {
@@ -1523,9 +1523,9 @@ int regorlog2_operand (rtx op, enum machine_mode mode) {
 int 
 simple_reg_operand (rtx op, enum machine_mode mode) {
   return (register_operand (op, mode)
-    && REGNO (op) != REG_CC
-    && !(GET_CODE(op) == SUBREG && (GET_MODE(XEXP(op,0)) == HImode
-	|| GET_MODE(XEXP(op,0)) == QImode)));
+	  && (!REG_P (op) || REGNO (op) != REG_CC)
+	  && !(GET_CODE(op) == SUBREG && (GET_MODE(XEXP(op,0)) == HImode
+					  || GET_MODE(XEXP(op,0)) == QImode)));
 }
   
 int cc_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) {
@@ -1580,9 +1580,6 @@ int hard_regno_mode_ok (int regno,enum machine_mode mode) {
         && (mode == HImode || mode == QImode)) ? 0 :
 	1;
 
-    /* 8.04.04 : Return 1 for class PREGS if reload_in_progress. to fix 
-       error: unable to find a register to spill in class `PREGS'*/
-    if ((class == PREGS && (mode == HImode || mode == QImode)) && (reload_in_progress /*| reload_completed*/) == 1) ret = 1;
 
     return ret;
 }
@@ -1615,8 +1612,6 @@ register_move_cost(enum reg_class class1, enum reg_class class2)
 #define SWITCH_SUBREG(X)\
   {while(GET_CODE(X)==SUBREG)X=SUBREG_REG(X);}
 
-int use_secondary_reload_patterns=1;
- 
 enum reg_class
 secondary_input_reload_class(enum reg_class class,enum machine_mode mode, rtx x)
 {
@@ -1924,12 +1919,14 @@ output_load_immediate (rtx *operands) {
 	|| GET_CODE (operands[1]) == LABEL_REF) {
 	   output_symbolic_address (operands);
 	   return "";
-     } else if (REGNO_REG_CLASS (REGNO (operands[0])) == AREGS
-	&& !(GET_CODE (operands[1]) == CONST_INT
-	&& INTVAL (operands[1])==0)) {
+    } else if (REG_P (operands[0])
+	       && REGNO_REG_CLASS (REGNO (operands[0])) == AREGS
+	       && !(GET_CODE (operands[1]) == CONST_INT
+		    && INTVAL (operands[1])==0)) {
 	 output_asm_insn ("%w0 =%1;", operands);
-	return "";
-     } else if (REGNO_REG_CLASS (REGNO (operands[1])) == AREGS) {
+	 return "";
+    } else if (REG_P (operands[1])
+	       && REGNO_REG_CLASS (REGNO (operands[1])) == AREGS) {
 	 output_asm_insn ("%0 =%w1;", operands);
 	 return "";
      }
@@ -2222,7 +2219,7 @@ replace_symbols_in_block (tree block, rtx orig, rtx new)
 	      )
 	    continue;
 
-	  DECL_RTL (sym) = new;
+	  SET_DECL_RTL (sym, new);
 	}
       
       replace_symbols_in_block (BLOCK_SUBBLOCKS (block), orig, new);

@@ -1,0 +1,15 @@
+2004-09-01  Bernd Schmidt  <bernds@btinternet.com>
+
+	* config/bfin/bfin.c (imm7bit_operand, imm16bit_operand): Test for
+	CONST_INT, not CONSTANT_P, before taking INTVAL.
+	(simple_reg_operand): Make sure OP is a REG before taking REGNO.
+	(hard_regno_mode_ok): Remove workaround for problem in
+	secondary_input_reload_class.
+	(use_secondary_reload_patterns): Remove unused variable.
+	(secondary_input_reload_class): Make sure X is a REG before taking its
+	REGNO.
+	(output_load_immediate): Likewise for elements of OPERANDS.
+	(replace_symbols_in_block): Use SET_DECL_RTL instead of assigning
+	DECL_RTL.
+	* config/bfin/bfin.h (PREFERRED_RELOAD_CLASS): Make sure X is a REG
+	before taking its REGNO.
