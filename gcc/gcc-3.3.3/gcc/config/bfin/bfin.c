@@ -92,26 +92,6 @@ bfin_globalize_label (FILE *stream, const char *name)
           fputc ('\n',stream);
 }
 
-/*Initialize the GCC target structure.  */
-#ifdef TARGET_ASM_GLOBALIZE_LABEL
-#undef TARGET_ASM_GLOBALIZE_LABEL
-#define TARGET_ASM_GLOBALIZE_LABEL bfin_globalize_label 
-#endif
-
-#undef TARGET_ASM_OPEN_PAREN
-#define TARGET_ASM_OPEN_PAREN "("
-#undef TARGET_ASM_CLOSE_PAREN
-#define TARGET_ASM_CLOSE_PAREN ")"
-
-#undef TARGET_ASM_FUNCTION_PROLOGUE
-#define TARGET_ASM_FUNCTION_PROLOGUE bfin_function_prologue
-
-#undef TARGET_ASM_FUNCTION_EPILOGUE
-#define TARGET_ASM_FUNCTION_EPILOGUE bfin_function_epilogue
-
-/* Switch into a generic section.  */
-#define TARGET_ASM_NAMED_SECTION  default_elf_asm_named_section
-
 struct gcc_target targetm = TARGET_INITIALIZER;
 
 void 

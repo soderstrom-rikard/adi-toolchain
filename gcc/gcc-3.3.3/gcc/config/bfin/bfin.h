@@ -255,7 +255,7 @@ extern const char * directive_names[];
  * machine-dependent stack frame: `OUTGOING_REG_PARM_STACK_SPACE'
  * says which.  */
 #define FIXED_STACK_AREA 12
-#define REG_PARM_STACK_SPACE(FNDECL) (FNDECL) ? FIXED_STACK_AREA : 0
+#define REG_PARM_STACK_SPACE(FNDECL, LIBCALL) ((LIBCALL) ? 0 : FIXED_STACK_AREA)
 
 /* Define this if the above stack space is to be considered part of the
  * space allocated by the caller.  */
@@ -1282,6 +1282,20 @@ do {                                              \
 #define TARGET_FF        014
 #define TARGET_CR        015
 #define TARGET_ESC	 033
+
+/*Initialize the GCC target structure.  */
+#define TARGET_ASM_GLOBALIZE_LABEL bfin_globalize_label 
+
+#define TARGET_ASM_OPEN_PAREN "("
+#define TARGET_ASM_CLOSE_PAREN ")"
+
+#define TARGET_ASM_FUNCTION_PROLOGUE bfin_function_prologue
+
+#define TARGET_ASM_FUNCTION_EPILOGUE bfin_function_epilogue
+
+/* Switch into a generic section.  */
+#define TARGET_ASM_NAMED_SECTION  default_elf_asm_named_section
+
 
 /* Assembler output */
 #define PRINT_OPERAND_PUNCT_VALID_P(CODE)      index ("jJhXDQR", CODE)
