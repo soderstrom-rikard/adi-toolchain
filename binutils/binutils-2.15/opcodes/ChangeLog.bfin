@@ -1,3 +1,13 @@
+2005-01-26  Catherine Moore  <clm@cm00re.com>
+
+	* bfin-dis.c (decode_dsp32shift_0): Improve whitespace in
+	output.
+	(decode_dsp32shiftimm_0): Use correct immediate sizes and 
+	correct operator for the output of all variations of shift
+	immediate.  Improve whitespace in output.  Extract bit 8 and
+	use it to determine which shift immediate to print.  Print
+	two's complement of the immediate field when necessary.
+
 2005-01-12  Catherine Moore  <clm@cm00re.com>
 
 	* bfin-dis.c (decode_optmode):  Handle (M) case.

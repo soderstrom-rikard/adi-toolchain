@@ -5144,7 +5144,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs_lo (src1));
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
       return 2 * 2;
     }
@@ -5155,7 +5155,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs_hi (src1));
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
       return 2 * 2;
     }
@@ -5166,7 +5166,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs_lo (src1));
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
       return 2 * 2;
     }
@@ -5177,7 +5177,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs_hi (src1));
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
       return 2 * 2;
     }
@@ -5188,7 +5188,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs_lo (src1));
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
       OUTS (outf, "(S)");
       return 2 * 2;
@@ -5200,7 +5200,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs_hi (src1));
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
       OUTS (outf, "(S)");
       return 2 * 2;
@@ -5212,7 +5212,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs_lo (src1));
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
       OUTS (outf, "(S)");
       return 2 * 2;
@@ -5224,7 +5224,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs_hi (src1));
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
       OUTS (outf, "(S)");
       return 2 * 2;
@@ -5235,7 +5235,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, (HLs & 2) == 0 ? dregs_lo (dst0) : dregs_hi (dst0));
       OUTS (outf, "= LSHIFT ");
       OUTS (outf, (HLs & 1) == 0 ? dregs_lo (src1) : dregs_hi (src1));
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
       return 2 * 2;
     }
@@ -5246,7 +5246,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, " ASHIFT ");
       OUTS (outf, acc01);
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
       return 2 * 2;
     }
@@ -5257,7 +5257,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, " LSHIFT ");
       OUTS (outf, acc01);
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
       return 2 * 2;
     }
@@ -5268,7 +5268,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, " ROT ");
       OUTS (outf, acc01);
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
       return 2 * 2;
     }
@@ -5279,7 +5279,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, " ROT ");
       OUTS (outf, dregs (src1));
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
       return 2 * 2;
     }
@@ -5290,7 +5290,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs (src1));
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
       OUTS (outf, "(");
       OUTS (outf, "V,S)");
@@ -5303,7 +5303,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs (src1));
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
       OUTS (outf, "(V)");
       return 2 * 2;
@@ -5315,7 +5315,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs (src1));
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
       return 2 * 2;
     }
@@ -5326,7 +5326,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs (src1));
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
       OUTS (outf, "(S)");
       return 2 * 2;
@@ -5338,7 +5338,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, "SHIFT");
       OUTS (outf, dregs (src1));
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
       return 2 * 2;
     }
@@ -5349,7 +5349,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, " ROT ");
       OUTS (outf, dregs (src1));
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
       return 2 * 2;
     }
@@ -5360,7 +5360,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, "SHIFT");
       OUTS (outf, dregs (src1));
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
       OUTS (outf, "(V)");
       return 2 * 2;
@@ -5762,139 +5762,167 @@ decode_dsp32shiftimm_0 (TIword iw0, TIword iw1, disassemble_info *outf)
 */
   int src1 = ((iw1 >> 0) & 0x7);
   int sop = ((iw1 >> 14) & 0x3);
+  int bit8 = ((iw1 >> 8) & 0x1);
   int immag = ((iw1 >> 3) & 0x3f);
   int newimmag = (-(iw1 >> 3) & 0x3f);
+  int newimmag5 = (-(iw1 >> 3) & 0x1f);
   int dst0 = ((iw1 >> 9) & 0x7);
-#if 0				/* commented out as it is not used currently */
-  int M = ((iw0 >> 11) & 0x1);
-#endif
   int sopcde = ((iw0 >> 0) & 0x1f);
   int HLs = ((iw1 >> 12) & 0x3);
 
 
-
   if (HLs == 0 && sop == 0 && sopcde == 0)
     {
-      notethat ("dregs_lo = dregs_lo << uimm5");
+      notethat ("dregs_lo = dregs_lo >>> uimm4");
       OUTS (outf, dregs_lo (dst0));
       OUTS (outf, "=");
       OUTS (outf, dregs_lo (src1));
-      OUTS (outf, "<<");
-      OUTS (outf, uimm5 (immag));
+      OUTS (outf, ">>>");
+      OUTS (outf, uimm4 (immag));
       return 2 * 2;
     }
   else if (HLs == 1 && sop == 0 && sopcde == 0)
     {
-      notethat ("dregs_lo = dregs_hi << uimm5");
+      notethat ("dregs_lo = dregs_hi >>> uimm4");
       OUTS (outf, dregs_lo (dst0));
       OUTS (outf, "=");
       OUTS (outf, dregs_hi (src1));
-      OUTS (outf, "<<");
-      OUTS (outf, uimm5 (immag));
+      OUTS (outf, ">>>");
+      OUTS (outf, uimm4 (immag));
       return 2 * 2;
     }
   else if (HLs == 2 && sop == 0 && sopcde == 0)
     {
-      notethat ("dregs_hi = dregs_lo << uimm5");
+      notethat ("dregs_hi = dregs_lo >>> uimm4");
       OUTS (outf, dregs_hi (dst0));
       OUTS (outf, "=");
       OUTS (outf, dregs_lo (src1));
-      OUTS (outf, "<<");
-      OUTS (outf, uimm5 (immag));
+      OUTS (outf, ">>>");
+      OUTS (outf, uimm4 (immag));
       return 2 * 2;
     }
   else if (HLs == 3 && sop == 0 && sopcde == 0)
     {
-      notethat ("dregs_hi = dregs_hi << uimm5");
+      notethat ("dregs_hi = dregs_hi >>> uimm4");
       OUTS (outf, dregs_hi (dst0));
       OUTS (outf, "=");
       OUTS (outf, dregs_hi (src1));
-      OUTS (outf, "<<");
-      OUTS (outf, uimm5 (immag));
+      OUTS (outf, ">>>");
+      OUTS (outf, uimm4 (immag));
       return 2 * 2;
     }
   else if (HLs == 0 && sop == 1 && sopcde == 0)
     {
-      notethat ("dregs_lo = dregs_lo << imm5 (S)");
+      notethat ("dregs_lo = dregs_lo << uimm4 (S)");
       OUTS (outf, dregs_lo (dst0));
       OUTS (outf, "=");
       OUTS (outf, dregs_lo (src1));
-      OUTS (outf, " << ");
-      OUTS (outf, imm5 (immag));
+      OUTS (outf, "<<");
+      OUTS (outf, uimm4 (immag));
       OUTS (outf, "(S)");
       return 2 * 2;
     }
   else if (HLs == 1 && sop == 1 && sopcde == 0)
     {
-      notethat ("dregs_lo = dregs_hi << imm5 (S)");
+      notethat ("dregs_lo = dregs_hi << uimm4 (S)");
       OUTS (outf, dregs_lo (dst0));
       OUTS (outf, "=");
       OUTS (outf, dregs_hi (src1));
-      OUTS (outf, " << ");
-      OUTS (outf, imm5 (immag));
+      OUTS (outf, "<<");
+      OUTS (outf, uimm4 (immag));
       OUTS (outf, "(S)");
       return 2 * 2;
     }
   else if (HLs == 2 && sop == 1 && sopcde == 0)
     {
-      notethat ("dregs_hi = dregs_lo << imm5 (S)");
+      notethat ("dregs_hi = dregs_lo << uimm4 (S)");
       OUTS (outf, dregs_hi (dst0));
       OUTS (outf, "=");
       OUTS (outf, dregs_lo (src1));
-      OUTS (outf, " << ");
-      OUTS (outf, imm5 (immag));
+      OUTS (outf, "<<");
+      OUTS (outf, uimm4 (immag));
       OUTS (outf, "(S)");
       return 2 * 2;
     }
   else if (HLs == 3 && sop == 1 && sopcde == 0)
     {
-      notethat ("dregs_hi = dregs_hi << imm5 (S)");
+      notethat ("dregs_hi = dregs_hi << uimm4 (S)");
       OUTS (outf, dregs_hi (dst0));
       OUTS (outf, "=");
       OUTS (outf, dregs_hi (src1));
-      OUTS (outf, " << ");
-      OUTS (outf, imm5 (immag));
+      OUTS (outf, "<<");
+      OUTS (outf, uimm4 (immag));
       OUTS (outf, "(S)");
       return 2 * 2;
     }
-  else if (HLs == 0 && sop == 2 && sopcde == 0)
+  else if (HLs == 0 && sop == 2 && sopcde == 0 && bit8 == 0)
     {
-      notethat ("dregs_lo = dregs_lo >> uimm5");
+      notethat ("dregs_lo = dregs_lo << uimm4");
+      OUTS (outf, dregs_lo (dst0));
+      OUTS (outf, "=");
+      OUTS (outf, dregs_lo (src1));
+      OUTS (outf, "<<");
+      OUTS (outf, uimm4 (immag));
+      return 2 * 2;
+    }
+  else if (HLs == 0 && sop == 2 && sopcde == 0 && bit8 == 1)
+    {
+      notethat ("dregs_lo = dregs_lo >> uimm4");
       OUTS (outf, dregs_lo (dst0));
       OUTS (outf, "=");
       OUTS (outf, dregs_lo (src1));
       OUTS (outf, ">>");
-      OUTS (outf, uimm5 (newimmag));
+      OUTS (outf, uimm4 (newimmag));
       return 2 * 2;
     }
   else if (HLs == 1 && sop == 2 && sopcde == 0)
     {
-      notethat ("dregs_lo = dregs_hi >> uimm5");
+      notethat ("dregs_lo = dregs_hi >> uimm4");
       OUTS (outf, dregs_lo (dst0));
       OUTS (outf, "=");
       OUTS (outf, dregs_hi (src1));
       OUTS (outf, ">>");
-      OUTS (outf, uimm5 (newimmag));
+      OUTS (outf, uimm4 (newimmag));
       return 2 * 2;
     }
-  else if (HLs == 2 && sop == 2 && sopcde == 0)
+  else if (HLs == 2 && sop == 2 && sopcde == 0 && bit8 == 1)
     {
-      notethat ("dregs_hi = dregs_lo >> uimm5");
+      notethat ("dregs_hi = dregs_lo >> uimm4");
       OUTS (outf, dregs_hi (dst0));
       OUTS (outf, "=");
       OUTS (outf, dregs_lo (src1));
       OUTS (outf, ">>");
-      OUTS (outf, uimm5 (newimmag));
+      OUTS (outf, uimm4 (newimmag));
       return 2 * 2;
     }
-  else if (HLs == 3 && sop == 2 && sopcde == 0)
+  else if (HLs == 2 && sop == 2 && sopcde == 0 && bit8 == 0)
     {
-      notethat ("dregs_hi = dregs_hi >> uimm5");
+      notethat ("dregs_hi = dregs_lo << uimm4");
+      OUTS (outf, dregs_hi (dst0));
+      OUTS (outf, "=");
+      OUTS (outf, dregs_lo (src1));
+      OUTS (outf, "<<");
+      OUTS (outf, uimm4 (immag));
+      return 2 * 2;
+    }
+  else if (HLs == 3 && sop == 2 && sopcde == 0 && bit8 == 1)
+    {
+      notethat ("dregs_hi = dregs_hi >> uimm4");
       OUTS (outf, dregs_hi (dst0));
       OUTS (outf, "=");
       OUTS (outf, dregs_hi (src1));
       OUTS (outf, ">>");
-      OUTS (outf, uimm5 (newimmag));
+      OUTS (outf, uimm4 (newimmag));
+      return 2 * 2;
+    }
+  else if (HLs == 3 && sop == 2 && sopcde == 0 && bit8 == 0)
+    {
+      notethat ("dregs_hi = dregs_hi << uimm4");
+      OUTS (outf, dregs_hi (dst0));
+      OUTS (outf, "=");
+      OUTS (outf, dregs_hi (src1));
+      OUTS (outf, "<<");
+      OUTS (outf, uimm4 (immag));
       return 2 * 2;
     }
   else if (sop == 2 && sopcde == 3 && HLs == 1)
@@ -5904,48 +5932,68 @@ decode_dsp32shiftimm_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, " ROT ");
       OUTS (outf, "A1");
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, imm6 (immag));
       return 2 * 2;
     }
-  else if (sop == 0 && sopcde == 3 && HLs == 0)
+  else if (sop == 0 && sopcde == 3 && HLs == 0 && bit8 == 0)
     {
-      notethat ("A0 = A0 << imm6");
+      notethat ("A0 = A0 << uimm5");
       OUTS (outf, "A0");
       OUTS (outf, "=");
       OUTS (outf, "A0");
       OUTS (outf, "<<");
-      OUTS (outf, imm6 (immag));
+      OUTS (outf, uimm5 (immag));
       return 2 * 2;
     }
-  else if (sop == 0 && sopcde == 3 && HLs == 1)
+  else if (sop == 0 && sopcde == 3 && HLs == 0 && bit8 == 1)
     {
-      notethat ("A1 = A1 << imm6");
+      notethat ("A0 = A0 >>> uimm5");
+      OUTS (outf, "A0");
+      OUTS (outf, "=");
+      OUTS (outf, "A0");
+      OUTS (outf, ">>>");
+      OUTS (outf, uimm5 (newimmag5));
+      return 2 * 2;
+    }
+  else if (sop == 0 && sopcde == 3 && HLs == 1 && bit8 == 0)
+    {
+      notethat ("A1 = A1 << uimm5");
       OUTS (outf, "A1");
       OUTS (outf, "=");
       OUTS (outf, "A1");
       OUTS (outf, "<<");
-      OUTS (outf, imm6 (immag));
+      OUTS (outf, uimm5 (immag));
+      return 2 * 2;
+    }
+  else if (sop == 0 && sopcde == 3 && HLs == 1 && bit8 == 1)
+    {
+      notethat ("A1 = A1 >>> uimm5");
+      OUTS (outf, "A1");
+      OUTS (outf, "=");
+      OUTS (outf, "A1");
+      OUTS (outf, ">>>");
+      OUTS (outf, uimm5 (newimmag5));
       return 2 * 2;
     }
   else if (sop == 1 && sopcde == 3 && HLs == 0)
     {
-      notethat ("A0 = A0 >> imm6");
+      notethat ("A0 = A0 >> uimm5");
       OUTS (outf, "A0");
       OUTS (outf, "=");
       OUTS (outf, "A0");
       OUTS (outf, ">>");
-      OUTS (outf, imm6 (newimmag));
+      OUTS (outf, uimm5 (newimmag));
       return 2 * 2;
     }
   else if (sop == 1 && sopcde == 3 && HLs == 1)
     {
-      notethat ("A1 = A1 >> imm6");
+      notethat ("A1 = A1 >> uimm5");
       OUTS (outf, "A1");
       OUTS (outf, "=");
       OUTS (outf, "A1");
       OUTS (outf, ">>");
-      OUTS (outf, imm6 (newimmag));
+      OUTS (outf, uimm5 (newimmag));
       return 2 * 2;
     }
   else if (sop == 2 && sopcde == 3 && HLs == 0)
@@ -5955,7 +6003,7 @@ decode_dsp32shiftimm_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, " ROT ");
       OUTS (outf, "A0");
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, imm6 (immag));
       return 2 * 2;
     }
@@ -5965,7 +6013,7 @@ decode_dsp32shiftimm_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, dregs (dst0));
       OUTS (outf, "=");
       OUTS (outf, dregs (src1));
-      OUTS (outf, " >>> ");
+      OUTS (outf, ">>>");
       OUTS (outf, imm5 (-immag));
       OUTS (outf, " (V, ");
       OUTS (outf, "S)");
@@ -5988,31 +6036,41 @@ decode_dsp32shiftimm_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, dregs (dst0));
       OUTS (outf, "=");
       OUTS (outf, dregs (src1));
-      OUTS (outf, " << ");
+      OUTS (outf, "<<");
       OUTS (outf, imm5 (immag));
       OUTS (outf, " (V)");
       return 2 * 2;
     }
   else if (sop == 1 && sopcde == 2)
     {
-      notethat ("dregs = dregs << imm6 (S)");
+      notethat ("dregs = dregs << uimm5 (S)");
       OUTS (outf, dregs (dst0));
       OUTS (outf, "=");
       OUTS (outf, dregs (src1));
       OUTS (outf, "<<");
-      OUTS (outf, imm6 (immag));
+      OUTS (outf, uimm5 (immag));
       OUTS (outf, "(");
       OUTS (outf, "S)");
       return 2 * 2;
     }
-  else if (sop == 2 && sopcde == 2)
+  else if (sop == 2 && sopcde == 2 && bit8 == 1)
     {
-      notethat ("dregs = dregs >> imm6");
+      notethat ("dregs = dregs >> uimm5");
       OUTS (outf, dregs (dst0));
       OUTS (outf, "=");
       OUTS (outf, dregs (src1));
       OUTS (outf, ">>");
-      OUTS (outf, imm6 (newimmag));
+      OUTS (outf, uimm5 (newimmag));
+      return 2 * 2;
+    }
+  else if (sop == 2 && sopcde == 2 && bit8 == 0)
+    {
+      notethat ("dregs = dregs << uimm5");
+      OUTS (outf, dregs (dst0));
+      OUTS (outf, "=");
+      OUTS (outf, dregs (src1));
+      OUTS (outf, "<<");
+      OUTS (outf, uimm5 (immag));
       return 2 * 2;
     }
   else if (sop == 3 && sopcde == 2)
@@ -6022,18 +6080,18 @@ decode_dsp32shiftimm_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, " ROT ");
       OUTS (outf, dregs (src1));
-      OUTS (outf, "BY");
+      OUTS (outf, " BY ");
       OUTS (outf, imm6 (immag));
       return 2 * 2;
     }
   else if (sop == 0 && sopcde == 2)
     {
-      notethat ("dregs = dregs >>> imm6");
+      notethat ("dregs = dregs >>> uimm5");
       OUTS (outf, dregs (dst0));
       OUTS (outf, "=");
       OUTS (outf, dregs (src1));
-      OUTS (outf, " >>> ");
-      OUTS (outf, imm6 (newimmag));
+      OUTS (outf, ">>>");
+      OUTS (outf, uimm5 (newimmag));
       return 2 * 2;
     }
   else
