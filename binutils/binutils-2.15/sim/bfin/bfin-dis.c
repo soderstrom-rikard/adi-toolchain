@@ -11,6 +11,16 @@
 
 #include "bfin-opcodes.h"
 
+#define M_S2RND 1
+#define M_T     2
+#define M_W32   3
+#define M_FU    4
+#define M_TFU   6
+#define M_IS    8
+#define M_ISS2  9
+#define M_IH    11
+#define M_IU    12
+
 #ifndef PRINTF
 #define PRINTF printf
 #endif
@@ -342,7 +352,7 @@ static enum machine_registers decode_dregs_lo[] =
   REG_RL0, REG_RL1, REG_RL2, REG_RL3, REG_RL4, REG_RL5, REG_RL6, REG_RL7,
 };
 
-#define dregs_lo(x) REGNAME(decode_dregs_lo[x&7])
+#define dregs_lo(x) REGNAME(decode_dregs_lo[(x) & 7])
 
 /* RH(0..7)  */
 static enum machine_registers decode_dregs_hi[] =
@@ -350,7 +360,7 @@ static enum machine_registers decode_dregs_hi[] =
   REG_RH0, REG_RH1, REG_RH2, REG_RH3, REG_RH4, REG_RH5, REG_RH6, REG_RH7,
 };
 
-#define dregs_hi(x) REGNAME(decode_dregs_hi[x&7])
+#define dregs_hi(x) REGNAME(decode_dregs_hi[(x) & 7])
 
 /* R(0..7)  */
 static enum machine_registers decode_dregs[] =
@@ -358,7 +368,7 @@ static enum machine_registers decode_dregs[] =
   REG_R0, REG_R1, REG_R2, REG_R3, REG_R4, REG_R5, REG_R6, REG_R7,
 };
 
-#define dregs(x) REGNAME(decode_dregs[x&7])
+#define dregs(x) REGNAME(decode_dregs[(x) & 7])
 
 /* R BYTE(0..7)  */
 static enum machine_registers decode_dregs_byte[] =
@@ -366,7 +376,7 @@ static enum machine_registers decode_dregs_byte[] =
   REG_BR0, REG_BR1, REG_BR2, REG_BR3, REG_BR4, REG_BR5, REG_BR6, REG_BR7,
 };
 
-#define dregs_byte(x) REGNAME(decode_dregs_byte[x&7])
+#define dregs_byte(x) REGNAME(decode_dregs_byte[(x) & 7])
 
 /* R1:0 - R3:2 - R5:4 - R7:6 -  */
 static enum machine_registers decode_dregs_pair[] =
@@ -375,7 +385,7 @@ static enum machine_registers decode_dregs_pair[] =
     REG_R7_6, REG_LASTREG,
 };
 
-#define dregs_pair(x) REGNAME(decode_dregs_pair[x&7])
+#define dregs_pair(x) REGNAME(decode_dregs_pair[(x) & 7])
 
 /* P(0..5) SP FP  */
 static enum machine_registers decode_pregs[] =
@@ -383,7 +393,7 @@ static enum machine_registers decode_pregs[] =
   REG_P0, REG_P1, REG_P2, REG_P3, REG_P4, REG_P5, REG_SP, REG_FP,
 };
 
-#define pregs(x) REGNAME(decode_pregs[x&7])
+#define pregs(x) REGNAME(decode_pregs[(x) & 7])
 
 /* SP FP  */
 static enum machine_registers decode_spfp[] =
@@ -391,7 +401,7 @@ static enum machine_registers decode_spfp[] =
   REG_SP, REG_FP,
 };
 
-#define spfp(x) REGNAME(decode_spfp[x&1])
+#define spfp(x) REGNAME(decode_spfp[(x) & 1])
 
 /* [dregs_lo dregs_hi]  */
 static enum machine_registers decode_dregs_hilo[] =
@@ -408,7 +418,7 @@ static enum machine_registers decode_accum_ext[] =
   REG_A0x, REG_A1x,
 };
 
-#define accum_ext(x) REGNAME(decode_accum_ext[x&1])
+#define accum_ext(x) REGNAME(decode_accum_ext[(x) & 1])
 
 /* A0w A1w  */
 static enum machine_registers decode_accum_word[] =
@@ -416,7 +426,7 @@ static enum machine_registers decode_accum_word[] =
   REG_A0w, REG_A1w,
 };
 
-#define accum_word(x) REGNAME(decode_accum_word[x&1])
+#define accum_word(x) REGNAME(decode_accum_word[(x) & 1])
 
 /* A0 A1  */
 static enum machine_registers decode_accum[] =
@@ -424,7 +434,7 @@ static enum machine_registers decode_accum[] =
   REG_A0, REG_A1,
 };
 
-#define accum(x) REGNAME(decode_accum[x&1])
+#define accum(x) REGNAME(decode_accum[(x) & 1])
 
 /* I(0..3)   */
 static enum machine_registers decode_iregs[] =
@@ -432,7 +442,7 @@ static enum machine_registers decode_iregs[] =
   REG_I0, REG_I1, REG_I2, REG_I3,
 };
 
-#define iregs(x) REGNAME(decode_iregs[x&3])
+#define iregs(x) REGNAME(decode_iregs[(x) & 3])
 
 /* M(0..3)   */
 static enum machine_registers decode_mregs[] =
@@ -440,7 +450,7 @@ static enum machine_registers decode_mregs[] =
   REG_M0, REG_M1, REG_M2, REG_M3,
 };
 
-#define mregs(x) REGNAME(decode_mregs[x&3])
+#define mregs(x) REGNAME(decode_mregs[(x) & 3])
 
 /* B(0..3)  */
 static enum machine_registers decode_bregs[] =
@@ -448,7 +458,7 @@ static enum machine_registers decode_bregs[] =
   REG_B0, REG_B1, REG_B2, REG_B3,
 };
 
-#define bregs(x) REGNAME(decode_bregs[x&3])
+#define bregs(x) REGNAME(decode_bregs[(x) & 3])
 
 /* L(0..3)  */
 static enum machine_registers decode_lregs[] =
@@ -456,7 +466,7 @@ static enum machine_registers decode_lregs[] =
   REG_L0, REG_L1, REG_L2, REG_L3,
 };
 
-#define lregs(x) REGNAME(decode_lregs[x&3])
+#define lregs(x) REGNAME(decode_lregs[(x) & 3])
 
 /* dregs pregs  */
 static enum machine_registers decode_dpregs[] =
@@ -465,7 +475,7 @@ static enum machine_registers decode_dpregs[] =
   REG_P0, REG_P1, REG_P2, REG_P3, REG_P4, REG_P5, REG_SP, REG_FP,
 };
 
-#define dpregs(x) REGNAME(decode_dpregs[x&15])
+#define dpregs(x) REGNAME(decode_dpregs[(x) & 15])
 
 /* [dregs pregs] */
 static enum machine_registers decode_gregs[] =
@@ -527,7 +537,7 @@ static enum machine_registers decode_statbits[] =
   REG_V,       REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG,
   };*/
 
-#define statbits(x) REGNAME(decode_statbits[x&31])
+#define statbits(x) REGNAME(decode_statbits[(x) & 31])
 
 /* sftreset omode excause emucause idle_req hwerrcause */
 static enum machine_registers decode_ignore_bits[] =
@@ -536,7 +546,7 @@ static enum machine_registers decode_ignore_bits[] =
     REG_hwerrcause,
 };
 
-#define ignore_bits(x) REGNAME(decode_ignore_bits[x&7])
+#define ignore_bits(x) REGNAME(decode_ignore_bits[(x) & 7])
 
 /* CC  */
 static enum machine_registers decode_ccstat[] =
@@ -544,7 +554,7 @@ static enum machine_registers decode_ccstat[] =
   REG_CC,
 };
 
-#define ccstat(x) REGNAME(decode_ccstat[x&0])
+#define ccstat(x) REGNAME(decode_ccstat[(x) & 0])
 
 /* LC0 LC1  */
 static enum machine_registers decode_counters[] =
@@ -552,7 +562,7 @@ static enum machine_registers decode_counters[] =
   REG_LC0, REG_LC1,
 };
 
-#define counters(x) REGNAME(decode_counters[x&1])
+#define counters(x) REGNAME(decode_counters[(x) & 1])
 
 /* A0x A0w A1x A1w GP - ASTAT RETS  */
 static enum machine_registers decode_dregs2_sysregs1[] =
@@ -561,7 +571,7 @@ static enum machine_registers decode_dregs2_sysregs1[] =
     REG_RETS,
 };
 
-#define dregs2_sysregs1(x) REGNAME(decode_dregs2_sysregs1[x&7])
+#define dregs2_sysregs1(x) REGNAME(decode_dregs2_sysregs1[(x) & 7])
 
 /* - - - - - - - - */
 static enum machine_registers decode_open[] =
@@ -570,7 +580,7 @@ static enum machine_registers decode_open[] =
     REG_LASTREG, REG_LASTREG, REG_LASTREG,
 };
 
-#define open(x) REGNAME(decode_open[x&7])
+#define open(x) REGNAME(decode_open[(x) & 7])
 
 /* LC0 LT0 LB0 LC1 LT1 LB1 CYCLES CYCLES2 */
 static enum machine_registers decode_sysregs2[] =
@@ -579,7 +589,7 @@ static enum machine_registers decode_sysregs2[] =
     REG_CYCLES2,
 };
 
-#define sysregs2(x) REGNAME(decode_sysregs2[x&7])
+#define sysregs2(x) REGNAME(decode_sysregs2[(x) & 7])
 
 /* USP SEQSTAT SYSCFG RETI RETX RETN RETE - */
 static enum machine_registers decode_sysregs3[] =
@@ -588,7 +598,7 @@ static enum machine_registers decode_sysregs3[] =
     REG_LASTREG,
 };
 
-#define sysregs3(x) REGNAME(decode_sysregs3[x&7])
+#define sysregs3(x) REGNAME(decode_sysregs3[(x) &7])
 
 /* [dregs pregs (iregs mregs) (bregs lregs) 	         dregs2_sysregs1 open sysregs2 sysregs3] */
 static enum machine_registers decode_allregs[] =
@@ -840,395 +850,225 @@ illegal_instruction:
   return;
 }
 
-/* static void A0macfunc (int op,int h0,int h1, bu32 pc, bfin_sim_info *outf) */
-static void
-A0macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
+/* Perform a multiplication, sign- or zero-extending the result to 64 bit.  */
+static bu64
+decode_multfunc (int h0, int h1, int src0, int src1, int mmod, int MM)
 {
-/* dsp32mac
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-  int src1 = ((iw1 >> 0) & 0x7);
-  int src0 = ((iw1 >> 3) & 0x7);
+  bu32 s0 = DREG (src0), s1 = DREG (src1);
+  bu32 sgn0, sgn1;
+  bu32 val;
+  bu64 val1;
 
-  if (h0 == 0 && h1 == 0 && op == 0)
+  if (h0)
+    s0 >>= 16;
+
+  if (h1)
+    s1 >>= 16;
+
+  s0 &= 0xffff;
+  s1 &= 0xffff;
+
+  sgn0 = -(s0 & 0x8000);
+  sgn1 = -(s1 & 0x8000);
+
+  if (MM)
+    s0 |= sgn0;
+  else switch (mmod)
     {
-      notethat ("A0 = dregs_lo * dregs_lo");
-      OUTS (outf, "A0");
-      OUTS (outf, "=");
-      OUTS (outf, dregs_lo (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_lo (src1));
-      return;
+    case 0:
+    case M_S2RND:
+    case M_T:
+    case M_IS:
+    case M_ISS2:
+    case M_IH:
+      s0 |= sgn0;
+      s1 |= sgn1;
+      break;
+    case M_FU:
+    case M_IU:
+    case M_TFU:
+      break;
+    default:
+      abort ();
     }
-  else if (h0 == 0 && h1 == 1 && op == 0)
+
+  val = s0 * s1;
+  /* Perform shift correction if appropriate for the mode.  */
+  if (mmod == 0 || mmod == M_T || mmod == M_S2RND)
     {
-      notethat ("A0 = dregs_lo * dregs_hi");
-      OUTS (outf, "A0");
-      OUTS (outf, "=");
-      OUTS (outf, dregs_lo (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_hi (src1));
-      return;
+      if (val == 0x40000000)
+	val = 0x7fffffff;
+      else
+	val <<= 1;
     }
-  else if (h0 == 1 && h1 == 0 && op == 0)
-    {
-      notethat ("A0 = dregs_hi * dregs_lo");
-      OUTS (outf, "A0");
-      OUTS (outf, "=");
-      OUTS (outf, dregs_hi (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_lo (src1));
-      return;
-    }
-  else if (h0 == 1 && h1 == 1 && op == 0)
-    {
-      notethat ("A0 = dregs_hi * dregs_hi");
-      OUTS (outf, "A0");
-      OUTS (outf, "=");
-      OUTS (outf, dregs_hi (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_hi (src1));
-      return;
-    }
-  else if (h0 == 0 && h1 == 0 && op == 1)
-    {
-      notethat ("A0 += dregs_lo * dregs_lo");
-      OUTS (outf, "A0");
-      OUTS (outf, "+=");
-      OUTS (outf, dregs_lo (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_lo (src1));
-      return;
-    }
-  else if (h0 == 0 && h1 == 1 && op == 1)
-    {
-      notethat ("A0 += dregs_lo * dregs_hi");
-      OUTS (outf, "A0");
-      OUTS (outf, "+=");
-      OUTS (outf, dregs_lo (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_hi (src1));
-      return;
-    }
-  else if (h0 == 1 && h1 == 0 && op == 1)
-    {
-      notethat ("A0 += dregs_hi * dregs_lo");
-      OUTS (outf, "A0");
-      OUTS (outf, "+=");
-      OUTS (outf, dregs_hi (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_lo (src1));
-      return;
-    }
-  else if (h0 == 1 && h1 == 1 && op == 1)
-    {
-      notethat ("A0 += dregs_hi * dregs_hi");
-      OUTS (outf, "A0");
-      OUTS (outf, "+=");
-      OUTS (outf, dregs_hi (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_hi (src1));
-      return;
-    }
-  else if (h0 == 0 && h1 == 0 && op == 2)
-    {
-      notethat ("A0 -= dregs_lo * dregs_lo");
-      OUTS (outf, "A0");
-      OUTS (outf, "-=");
-      OUTS (outf, dregs_lo (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_lo (src1));
-      return;
-    }
-  else if (h0 == 0 && h1 == 1 && op == 2)
-    {
-      notethat ("A0 -= dregs_lo * dregs_hi");
-      OUTS (outf, "A0");
-      OUTS (outf, "-=");
-      OUTS (outf, dregs_lo (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_hi (src1));
-      return;
-    }
-  else if (h0 == 1 && h1 == 0 && op == 2)
-    {
-      notethat ("A0 -= dregs_hi * dregs_lo");
-      OUTS (outf, "A0");
-      OUTS (outf, "-=");
-      OUTS (outf, dregs_hi (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_lo (src1));
-      return;
-    }
-  else if (h0 == 1 && h1 == 1 && op == 2)
-    {
-      notethat ("A0 -= dregs_hi * dregs_hi");
-      OUTS (outf, "A0");
-      OUTS (outf, "-=");
-      OUTS (outf, dregs_hi (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_hi (src1));
-      return;
-/*  } else if ((op==3)) {
-        notethat ("MNOP");
-        OUTS(outf,"MNOP");
-        return;*/
-    }
-  else
-    unhandled_instruction ();
+
+  val1 = val;
+  if (mmod == 0 || mmod == M_IS || mmod == M_T || mmod == M_S2RND
+      || mmod == M_ISS2 || mmod == M_IH)
+    val1 |= -(val1 & 0x80000000);
+
+  return val1;
 }
 
-/* static void multfunc (int op,int h0,int h1, bu32 pc, bfin_sim_info *outf)  */
-static void
-multfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
+static bu32
+saturate_s32 (bu64 val)
 {
-/* dsp32mac
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-  int src1 = ((iw1 >> 0) & 0x7);
-  int src0 = ((iw1 >> 3) & 0x7);
-
-
-  if (h0 == 0 && h1 == 0 && op == 0)
-    {
-      notethat ("dregs_lo * dregs_lo");
-      OUTS (outf, dregs_lo (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_lo (src1));
-      return;
-    }
-  else if (h0 == 0 && h1 == 1 && op == 0)
-    {
-      notethat ("dregs_lo * dregs_hi");
-      OUTS (outf, dregs_lo (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_hi (src1));
-      return;
-    }
-  else if (h0 == 1 && h1 == 0 && op == 0)
-    {
-      notethat ("dregs_hi * dregs_lo");
-      OUTS (outf, dregs_hi (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_lo (src1));
-      return;
-    }
-  else if (h0 == 1 && h1 == 1 && op == 0)
-    {
-      notethat ("dregs_hi * dregs_hi");
-      OUTS (outf, dregs_hi (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_hi (src1));
-      return;
-    }
-  else
-    unhandled_instruction ();
-}
-static void
-A1macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
-/*static void A1macfunc (int op,int h0,int h1, bu32 pc, bfin_sim_info *outf) */
-{
-/* dsp32mac
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-  int src1 = ((iw1 >> 0) & 0x7);
-  int src0 = ((iw1 >> 3) & 0x7);
-
-  if (h0 == 0 && h1 == 0 && op == 0)
-    {
-      notethat ("A1 = dregs_lo * dregs_lo");
-      OUTS (outf, "A1");
-      OUTS (outf, "=");
-      OUTS (outf, dregs_lo (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_lo (src1));
-      return;
-    }
-  else if (h0 == 0 && h1 == 1 && op == 0)
-    {
-      notethat ("A1 = dregs_lo * dregs_hi");
-      OUTS (outf, "A1");
-      OUTS (outf, "=");
-      OUTS (outf, dregs_lo (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_hi (src1));
-      return;
-    }
-  else if (h0 == 1 && h1 == 0 && op == 0)
-    {
-      notethat ("A1 = dregs_hi * dregs_lo");
-      OUTS (outf, "A1");
-      OUTS (outf, "=");
-      OUTS (outf, dregs_hi (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_lo (src1));
-      return;
-    }
-  else if (h0 == 1 && h1 == 1 && op == 0)
-    {
-      notethat ("A1 = dregs_hi * dregs_hi");
-      OUTS (outf, "A1");
-      OUTS (outf, "=");
-      OUTS (outf, dregs_hi (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_hi (src1));
-      return;
-    }
-  else if (h0 == 0 && h1 == 0 && op == 1)
-    {
-      notethat ("A1 += dregs_lo * dregs_lo");
-      OUTS (outf, "A1");
-      OUTS (outf, "+=");
-      OUTS (outf, dregs_lo (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_lo (src1));
-      return;
-    }
-  else if (h0 == 0 && h1 == 1 && op == 1)
-    {
-      notethat ("A1 += dregs_lo * dregs_hi");
-      OUTS (outf, "A1");
-      OUTS (outf, "+=");
-      OUTS (outf, dregs_lo (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_hi (src1));
-      return;
-    }
-  else if (h0 == 1 && h1 == 0 && op == 1)
-    {
-      notethat ("A1 += dregs_hi * dregs_lo");
-      OUTS (outf, "A1");
-      OUTS (outf, "+=");
-      OUTS (outf, dregs_hi (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_lo (src1));
-      return;
-    }
-  else if (h0 == 1 && h1 == 1 && op == 1)
-    {
-      notethat ("A1 += dregs_hi * dregs_hi");
-      OUTS (outf, "A1");
-      OUTS (outf, "+=");
-      OUTS (outf, dregs_hi (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_hi (src1));
-      return;
-    }
-  else if (h0 == 0 && h1 == 0 && op == 2)
-    {
-      notethat ("A1 -= dregs_lo * dregs_lo");
-      OUTS (outf, "A1");
-      OUTS (outf, "-=");
-      OUTS (outf, dregs_lo (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_lo (src1));
-      return;
-    }
-  else if (h0 == 0 && h1 == 1 && op == 2)
-    {
-      notethat ("A1 -= dregs_lo * dregs_hi");
-      OUTS (outf, "A1");
-      OUTS (outf, "-=");
-      OUTS (outf, dregs_lo (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_hi (src1));
-      return;
-    }
-  else if (h0 == 1 && h1 == 0 && op == 2)
-    {
-      notethat ("A1 -= dregs_hi * dregs_lo");
-      OUTS (outf, "A1");
-      OUTS (outf, "-=");
-      OUTS (outf, dregs_hi (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_lo (src1));
-      return;
-    }
-  else if (h0 == 1 && h1 == 1 && op == 2)
-    {
-      notethat ("A1 -= dregs_hi * dregs_hi");
-      OUTS (outf, "A1");
-      OUTS (outf, "-=");
-      OUTS (outf, dregs_hi (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_hi (src1));
-      return;
-/*  } else if ((op==3)) {
-        notethat ("MNOP");
-        OUTS(outf,"MNOP");
-        return;   */
-    }
-  else
-    unhandled_instruction ();
+  if ((bs64)val < -0x80000000ll)
+    return 0x80000000;
+  if ((bs64)val > 0x7fffffff)
+    return 0x7fffffff;
+  return val;
 }
 
-static void
-macmod_hmove (int mod, bu32 pc)
+static bu32
+saturate_s16 (bu64 val)
 {
-  if (mod == 0)
-    {
-      notethat ("");
-      return;
-    }
-  else if (mod == 8)
-    {
-      notethat ("(IS)");
-      OUTS (outf, "(IS)");
-      return;
-    }
-  else if (mod == 4)
-    {
-      notethat ("(FU)");
-      OUTS (outf, "(FU)");
-      return;
-    }
-  else if (mod == 12)
-    {
-      notethat ("(IU)");
-      OUTS (outf, "(IU)");
-      return;
-    }
-  else if (mod == 2)
-    {
-      notethat ("(T)");
-      OUTS (outf, "(T)");
-      return;
-    }
-  else if (mod == 6)
-    {
-      notethat ("(TFU)");
-      OUTS (outf, "(TFU)");
-      return;
-    }
-  else if (mod == 1)
-    {
-      notethat ("(S2RND)");
-      OUTS (outf, "(S2RND)");
-      return;
-    }
-  else if (mod == 9)
-    {
-      notethat ("(ISS2)");
-      OUTS (outf, "(ISS2)");
-      return;
-    }
-  else if (mod == 11)
-    {
-      notethat ("(IH)");
-      OUTS (outf, "(IH)");
-      return;
-    }
+  if ((bs64)val < -0x8000ll)
+    return 0x8000;
+  if ((bs64)val > 0x7fff)
+    return 0x7fff;
+  return val;
+}
+
+static bu32
+saturate_u32 (bu64 val)
+{
+  if (val > 0xffffffff)
+    return 0xffffffff;
+  return val;
+}
+
+static bu32
+saturate_u16 (bu64 val)
+{
+  if (val > 0xffff)
+    return 0xffff;
+  return val;
+}
+
+static bu64
+rnd16 (bu64 val)
+{
+  bu64 sgnbits = val & 0xff00000000000000ull;
+  /* @@@ Should honour rounding mode.  Can this overflow?  */
+  val += 0x8000;
+  val >>= 16;
+  return val | sgnbits;
+
+}
+
+static bu64
+trunc16 (bu64 val)
+{
+  bu64 sgnbits = val & 0xff00000000000000ull;
+  val >>= 16;
+  return val | sgnbits;
+}
+
+/* Extract a 16 or 32 bit value from a 64 bit multiplication result.
+   These 64 bits must be sign- or zero-extended properly from the source
+   we want to extract, either a 32 bit multiply or a 40 bit accumulator.  */
+
+static bu32
+extract_mult (bu64 res, int mmod, int fullword)
+{
+  if (fullword)
+    switch (mmod)
+      {
+      case 0:
+      case M_IS:
+	return saturate_s32 (res);
+      case M_FU:
+	return saturate_u32 (res);
+      case M_S2RND:
+      case M_ISS2:
+	return saturate_s32 (res << 1);
+      default:
+	abort ();
+      }
   else
-    unhandled_instruction ();
+    switch (mmod)
+      {
+      case 0:
+      case M_IH:
+	return saturate_s16 (rnd16 (res));
+      case M_IS:
+	return saturate_s16 (res);
+      case M_FU:
+	return saturate_u16 (rnd16 (res));
+      case M_IU:
+	return saturate_u16 (res);
+
+      case M_T:
+	return saturate_s16 (trunc16 (res));
+      case M_TFU:
+	return saturate_u16 (trunc16 (res));
+
+      case M_S2RND:
+	return saturate_s16 (rnd16 (res << 1));
+      case M_ISS2:
+	return saturate_s16 (res << 1);
+      default:
+	abort ();
+      }
+}
+
+static bu32
+decode_macfunc (int which, int op, int h0, int h1, int src0, int src1,
+		int mmod, int MM, int fullword)
+{
+  bu64 *accum = which ? &A1REG : &A0REG;
+  bu64 acc = *accum & 0xFFFFFFFFFFull;
+
+  /* Sign extend accumulator if necessary.  */
+  if (mmod == 0 || mmod == M_T || mmod == M_IS || mmod == M_ISS2
+      || mmod == M_S2RND)
+    acc |= -(acc & 0x80000000);
+
+  if (op != 3)
+    {
+      bu64 res = decode_multfunc (h0, h1, src0, src1, mmod, MM);
+
+      /* Perform accumulation.  */
+      switch (op)
+	{
+	case 0:
+	  *accum = res;
+	  break;
+	case 1:
+	  *accum = acc + res;
+	  break;
+	case 2:
+	  *accum = acc - res;
+	  break;
+	}
+
+      /* Saturate.  */
+      switch (mmod)
+	{
+	case 0:
+	case M_T:
+	case M_IS:
+	case M_ISS2:
+	case M_S2RND:
+	  if ((bs64)*accum < -0x8000000000ll)
+	    *accum = -0x8000000000ull;
+	  else if ((bs64)*accum >= 0x7fffffffffll)
+	    *accum = 0x7fffffffffull;
+	  break;
+	case M_TFU:
+	case M_FU:
+	case M_IU:
+	  if (*accum > 0xFFFFFFFFFFull)
+	    *accum = 0xFFFFFFFFFFull;
+	  break;
+	default:
+	  abort ();
+	}
+      acc = *accum;
+    }
+
+  return extract_mult (acc, mmod, fullword);
 }
 
 static void
@@ -3031,171 +2871,64 @@ decode_dsp32mac_0 (bu16 iw0, bu16 iw1, bu32 pc)
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
   int op1 = ((iw0 >> 0) & 0x3);
-  int P = ((iw0 >> 3) & 0x1);
-  int w0 = ((iw1 >> 13) & 0x1);
-  int src0 = ((iw1 >> 3) & 0x7);
-  int h00 = ((iw1 >> 10) & 0x1);
   int w1 = ((iw0 >> 2) & 0x1);
-  int src1 = ((iw1 >> 0) & 0x7);
-  int h10 = ((iw1 >> 9) & 0x1);
-  int h01 = ((iw1 >> 15) & 0x1);
+  int P = ((iw0 >> 3) & 0x1);
   int MM = ((iw0 >> 4) & 0x1);
-  int h11 = ((iw1 >> 14) & 0x1);
-  int dst = ((iw1 >> 6) & 0x7);
-  int M = ((iw0 >> 11) & 0x1);
   int mmod = ((iw0 >> 5) & 0xf);
-  int op0 = ((iw1 >> 11) & 0x3);
+  int M = ((iw0 >> 11) & 0x1);
 
-  if (w0 == 0 && w1 == 0 && P == 0 && op1 != 3 && op0 != 3)
+  int w0 = ((iw1 >> 13) & 0x1);
+  int src1 = ((iw1 >> 0) & 0x7);
+  int src0 = ((iw1 >> 3) & 0x7);
+  int dst = ((iw1 >> 6) & 0x7);
+  int h10 = ((iw1 >> 9) & 0x1);
+  int h00 = ((iw1 >> 10) & 0x1);
+  int op0 = ((iw1 >> 11) & 0x3);
+  int h11 = ((iw1 >> 14) & 0x1);
+  int h01 = ((iw1 >> 15) & 0x1);
+
+  bu32 res0, res1;
+
+  if (w0 == 0 && w1 == 0 && op1 == 3 && op0 == 3)
+    unhandled_instruction();
+
+  if ((op1 == 3 || w1 == 0) && MM)
+    unhandled_instruction();
+
+  if (((1 << mmod) & (P ? 0x313 : 0x1b57)) == 0)
+    unhandled_instruction();
+
+  if (w1 == 1 || op1 != 3)
+    res1 = decode_macfunc (1, op1, h01, h11, src0, src1, mmod, MM, P);
+
+  if (w0 == 1 || op0 != 3)
+    res0 = decode_macfunc (0, op0, h00, h10, src0, src1, mmod, 0, P);
+
+  if (w0)
     {
-      notethat ("A1macfunc mxd_mod , A0macfunc macmod_accm");
-      A1macfunc (iw0, iw1, op1, h01, h11, pc);
-      OUTS (outf, " ");
-      mxd_mod (MM, pc);
-      OUTS (outf, ",");
-      A0macfunc (iw0, iw1, op0, h00, h10, pc);
-      OUTS (outf, " ");
-      macmod_accm (mmod, pc);
-      PCREG += 4; return;
+      if (P)
+	DREG (dst) = res0;
+      else
+	{
+	  if (res0 & 0xffff0000)
+	    abort ();
+	  DREG (dst) = (DREG (dst) & 0xFFFF0000) | res0;
+	}
     }
-  else if (w0 == 0 && w1 == 0 && P == 0 && op1 != 3 && op0 == 3)
+
+  if (w1)
     {
-      notethat ("A1macfunc mxd_mod");
-      A1macfunc (iw0, iw1, op1, h01, h11, pc);
-      OUTS (outf, " ");
-      mxd_mod (MM, pc);
-      PCREG += 4; return;
+      if (P)
+	DREG (dst + 1) = res1;
+      else
+	{
+	  if (res1 & 0xffff0000)
+	    abort ();
+	  DREG (dst) = (DREG (dst) & 0xFFFF) | (res1 << 16);
+	}
     }
-  else if (w0 == 0 && w1 == 0 && P == 0 && op1 == 3 && op0 != 3)
-    {
-      notethat ("A0macfunc macmod_accm");
-      A0macfunc (iw0, iw1, op0, h00, h10, pc);
-      OUTS (outf, " ");
-      macmod_accm (mmod, pc);
-      PCREG += 4; return;
-    }
-  else if (w0 == 0 && w1 == 1 && P == 0 && op0 != 3 && op1 != 3)
-    {
-      notethat ("dregs_hi = ( A1macfunc ) mxd_mod , A0macfunc macmod_hmove");
-      OUTS (outf, dregs_hi (dst));
-      OUTS (outf, "=");
-      OUTS (outf, "(");
-      A1macfunc (iw0, iw1, op1, h01, h11, pc);
-      OUTS (outf, ") ");
-      mxd_mod (MM, pc);
-      OUTS (outf, ",");
-      A0macfunc (iw0, iw1, op0, h00, h10, pc);
-      OUTS (outf, " ");
-      macmod_hmove (mmod, pc);
-      PCREG += 4; return;
-    }
-  else if (w0 == 1 && w1 == 0 && P == 0 && op0 != 3 && op1 != 3)
-    {
-      notethat ("A1macfunc mxd_mod , dregs_lo = ( A0macfunc ) macmod_hmove");
-      A1macfunc (iw0, iw1, op1, h01, h11, pc);
-      OUTS (outf, " ");
-      mxd_mod (MM, pc);
-      OUTS (outf, ", ");
-      OUTS (outf, dregs_lo (dst));
-      OUTS (outf, "=");
-      OUTS (outf, "(");
-      A0macfunc (iw0, iw1, op0, h00, h10, pc);
-      OUTS (outf, ") ");
-      macmod_hmove (mmod, pc);
-      PCREG += 4; return;
-    }
-  else if (w0 == 1 && w1 == 1 && P == 0 && op0 != 3 && op1 != 3)
-    {
-      notethat
-	("dregs_hi = ( A1macfunc) mxd_mod , dregs_lo = (A0macfunc ) macmod_hmove");
-      OUTS (outf, dregs_hi (dst));
-      OUTS (outf, "=");
-      OUTS (outf, "(");
-      A1macfunc (iw0, iw1, op1, h01, h11, pc);
-      OUTS (outf, ") ");
-      mxd_mod (MM, pc);
-      OUTS (outf, ", ");
-      OUTS (outf, dregs_lo (dst));
-      OUTS (outf, "=");
-      OUTS (outf, "(");
-      A0macfunc (iw0, iw1, op0, h00, h10, pc);
-      OUTS (outf, ") ");
-      macmod_hmove (mmod, pc);
-      PCREG += 4; return;
-    }
-  else if (w0 == 1 && w1 == 0 && P == 0 && op0 != 3 && op1 == 3)
-    {
-      notethat ("dregs_lo = (A0macfunc ) macmod_hmove");
-      OUTS (outf, dregs_lo (dst));
-      OUTS (outf, "=");
-      OUTS (outf, "(");
-      A0macfunc (iw0, iw1, op0, h00, h10, pc);
-      OUTS (outf, ") ");
-      macmod_hmove (mmod, pc);
-      PCREG += 4; return;
-    }
-  else if (w0 == 0 && w1 == 1 && P == 1 && op0 != 3 && op1 != 3)
-    {
-      notethat ("dregs = ( A1macfunc ) mxd_mod , A0macfunc macmod_hmove");
-      OUTS (outf, dregs (dst));
-      OUTS (outf, "=");
-      OUTS (outf, "(");
-      A1macfunc (iw0, iw1, op1, h01, h11, pc);
-      OUTS (outf, ") ");
-      mxd_mod (MM, pc);
-      OUTS (outf, ",");
-      A0macfunc (iw0, iw1, op0, h00, h10, pc);
-      OUTS (outf, " ");
-      macmod_hmove (mmod, pc);
-      PCREG += 4; return;
-    }
-  else if (w0 == 1 && w1 == 0 && P == 1 && op0 != 3 && op1 != 3)
-    {
-      notethat ("A1macfunc mxd_mod , dregs = ( A0macfunc ) macmod_hmove");
-      A1macfunc (iw0, iw1, op1, h01, h11, pc);
-      OUTS (outf, " ");
-      mxd_mod (MM, pc);
-      OUTS (outf, ", ");
-      OUTS (outf, dregs (dst));
-      OUTS (outf, "=");
-      OUTS (outf, "(");
-      A0macfunc (iw0, iw1, op0, h00, h10, pc);
-      OUTS (outf, ") ");
-      macmod_hmove (mmod, pc);
-      PCREG += 4; return;
-    }
-  else if (w0 == 1 && w1 == 1 && P == 0 && op0 != 3 && op1 == 3)
-    {
-      notethat ("dregs = ( A0macfunc ) macmod_hmove");
-      OUTS (outf, dregs (dst));
-      OUTS (outf, "=");
-      OUTS (outf, "(");
-      A0macfunc (iw0, iw1, op0, h00, h10, pc);
-      OUTS (outf, ") ");
-      macmod_hmove (mmod, pc);
-      PCREG += 4; return;
-    }
-  else if (w0 == 1 && w1 == 1 && P == 1 && op0 != 3 && op1 != 3)
-    {
-      notethat
-	("dregs = ( A1macfunc) mxd_mod , dregs = (A0macfunc ) macmod_hmove");
-      OUTS (outf, dregs (dst + 1));
-      OUTS (outf, "=");
-      OUTS (outf, "(");
-      A1macfunc (iw0, iw1, op1, h01, h11, pc);
-      OUTS (outf, ") ");
-      mxd_mod (MM, pc);
-      OUTS (outf, ", ");
-      OUTS (outf, dregs (dst));
-      OUTS (outf, "=");
-      OUTS (outf, "(");
-      A0macfunc (iw0, iw1, op0, h00, h10, pc);
-      OUTS (outf, ") ");
-      macmod_hmove (mmod, pc);
-      PCREG += 4; return;
-    }
-  else
-    unhandled_instruction ();
+
+  PCREG += 4;
 }
 
 static void
@@ -3208,94 +2941,66 @@ decode_dsp32mult_0 (bu16 iw0, bu16 iw1, bu32 pc)
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
   int op1 = ((iw0 >> 0) & 0x3);
-  int P = ((iw0 >> 3) & 0x1);
-  int w0 = ((iw1 >> 13) & 0x1);
-  int src0 = ((iw1 >> 3) & 0x7);
-  int h00 = ((iw1 >> 10) & 0x1);
   int w1 = ((iw0 >> 2) & 0x1);
-  int src1 = ((iw1 >> 0) & 0x7);
-  int h10 = ((iw1 >> 9) & 0x1);
-  int h01 = ((iw1 >> 15) & 0x1);
+  int P = ((iw0 >> 3) & 0x1);
   int MM = ((iw0 >> 4) & 0x1);
-  int h11 = ((iw1 >> 14) & 0x1);
-  int dst = ((iw1 >> 6) & 0x7);
-  int M = ((iw0 >> 11) & 0x1);
   int mmod = ((iw0 >> 5) & 0xf);
+  int M = ((iw0 >> 11) & 0x1);
+
+  int src1 = ((iw1 >> 0) & 0x7);
+  int src0 = ((iw1 >> 3) & 0x7);
+  int dst = ((iw1 >> 6) & 0x7);
+  int h10 = ((iw1 >> 9) & 0x1);
+  int h00 = ((iw1 >> 10) & 0x1);
   int op0 = ((iw1 >> 11) & 0x3);
+  int w0 = ((iw1 >> 13) & 0x1);
+  int h01 = ((iw1 >> 15) & 0x1);
+  int h11 = ((iw1 >> 14) & 0x1);
 
+  bu32 res0, res1;
 
-
-  if (w0 == 0 && w1 == 1 && P == 0 && MM == 0)
-    {
-      notethat ("dregs_hi = multfunc macmod_hmove");
-      OUTS (outf, dregs_hi (dst));
-      OUTS (outf, "=");
-      multfunc (iw0, iw1, op1, h01, h11, pc);
-      OUTS (outf, " ");
-      macmod_hmove (mmod, pc);
-      PCREG += 4; return;
-    }
-  else if (w0 == 1 && w1 == 0 && P == 0 && MM == 0)
-    {
-      notethat ("dregs_lo = multfunc macmod_hmove");
-      OUTS (outf, dregs_lo (dst));
-      OUTS (outf, "=");
-      multfunc (iw0, iw1, op0, h00, h10, pc);
-      OUTS (outf, " ");
-      macmod_hmove (mmod, pc);
-      PCREG += 4; return;
-    }
-  else if (w0 == 0 && w1 == 1 && P == 1 && MM == 0)
-    {
-      notethat ("dregs (odd) =  multfunc macmod_hmove");
-      OUTS (outf, dregs (dst));
-      OUTS (outf, "=");
-      multfunc (iw0, iw1, op1, h01, h11, pc);
-      OUTS (outf, " ");
-      macmod_hmove (mmod, pc);
-      PCREG += 4; return;
-    }
-  else if (w0 == 1 && w1 == 0 && P == 1 && MM == 0)
-    {
-      notethat ("dregs (even) =  multfunc macmod_hmove");
-      OUTS (outf, dregs (dst));
-      OUTS (outf, "=");
-      multfunc (iw0, iw1, op0, h00, h10, pc);
-      OUTS (outf, " ");
-      macmod_hmove (mmod, pc);
-      PCREG += 4; return;
-    }
-  else if (w0 == 1 && w1 == 1 && P == 0)
-    {
-      notethat
-	("dregs_hi = multfunc mxd_mod , dregs_lo = multfunc macmod_hmove");
-      OUTS (outf, dregs_hi (dst));
-      OUTS (outf, "=");
-      multfunc (iw0, iw1, op1, h01, h11, pc);
-      mxd_mod (MM, pc);
-      OUTS (outf, ", ");
-      OUTS (outf, dregs_lo (dst));
-      OUTS (outf, "= ");
-      multfunc (iw0, iw1, op0, h00, h10, pc);
-      macmod_hmove (mmod, pc);
-      PCREG += 4; return;
-    }
-  else if (w0 == 1 && w1 == 1 && P == 1)
-    {
-      notethat ("dregs = multfunc mxd_mod , dregs = multfunc macmod_hmove");
-      OUTS (outf, dregs (1 + dst));
-      OUTS (outf, "=");
-      multfunc (iw0, iw1, op1, h01, h11, pc);
-      mxd_mod (MM, pc);
-      OUTS (outf, ", ");
-      OUTS (outf, dregs (dst));
-      OUTS (outf, "=");
-      multfunc (iw0, iw1, op0, h00, h10, pc);
-      macmod_hmove (mmod, pc);
-      PCREG += 4; return;
-    }
-  else
+  if (w1 == 0 && w0 == 0)
     unhandled_instruction ();
+  if (((1 << mmod) & (P ? 0x313 : 0x1b57)) == 0)
+    unhandled_instruction ();
+
+  if (w1)
+    {
+      bu64 r = decode_multfunc (h01, h11, src0, src1, mmod, MM);
+      res1 = extract_mult (r, mmod, P);
+    }
+
+  if (w0)
+    {
+      bu64 r = decode_multfunc (h00, h10, src0, src1, mmod, 0);
+      res0 = extract_mult (r, mmod, P);
+    }
+
+  if (w0)
+    {
+      if (P)
+	DREG (dst) = res0;
+      else
+	{
+	  if (res0 & 0xFFFF0000)
+	    abort ();
+	  DREG (dst) = (DREG (dst) & 0xFFFF0000) | res0;
+	}
+    }
+
+  if (w1)
+    {
+      if (P)
+	DREG (dst + 1) = res1;
+      else
+	{
+	  if (res1 & 0xFFFF0000)
+	    abort ();
+	  DREG (dst) = (DREG (dst) & 0xFFFF) | (res1 << 16);
+	}
+    }
+
+  PCREG += 4;
 }
 
 static void
