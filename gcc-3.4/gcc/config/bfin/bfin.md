@@ -734,30 +734,45 @@
   "%0 = %h1 (Z);\\n\\t%H0 = 0;"
   [(set_attr "length" "4")])
 
-(define_insn "extendsidi2"
+(define_insn_and_split "extendsidi2"
   [(set (match_operand:DI 0 "register_operand" "=d")
         (sign_extend:DI (match_operand:SI 1 "register_operand" "d")))]
   ""
+  "#"
+  "reload_completed"
+  [(set (match_dup 3) (match_dup 1))
+   (set (match_dup 3) (ashiftrt:SI (match_dup 3) (const_int 31)))]
 {
-  if (REGNO (operands[1]) != REGNO (operands[0]))
-    output_asm_insn ("%0 = %1;", operands);
-  return "%H0 = %1;\\n\\t%H0 >>>= 31;";
-}
-  [(set_attr "length" "4")])
+  split_di (operands, 1, operands + 2, operands + 3);
+  if (REGNO (operands[0]) != REGNO (operands[1]))
+    emit_move_insn (operands[2], operands[1]);
+})
 
-(define_insn "extendqidi2"
+(define_insn_and_split "extendqidi2"
   [(set (match_operand:DI 0 "register_operand" "=d")
         (sign_extend:DI (match_operand:QI 1 "register_operand" "d")))]
   ""
-  "%0 = %T1 (X);\\n\\t%H0 = %T1 (X);\\n\\t%H0 >>>= 31;"
-  [(set_attr "length" "6")])
+  "#"
+  "reload_completed"
+  [(set (match_dup 2) (sign_extend:SI (match_dup 1)))
+   (set (match_dup 3) (sign_extend:SI (match_dup 1)))
+   (set (match_dup 3) (ashiftrt:SI (match_dup 3) (const_int 31)))]
+{
+  split_di (operands, 1, operands + 2, operands + 3);
+})
 
-(define_insn "extendhidi2"
+(define_insn_and_split "extendhidi2"
   [(set (match_operand:DI 0 "register_operand" "=d")
         (sign_extend:DI (match_operand:HI 1 "register_operand" "d")))]
   ""
-  "%0 = %h1 (X);\\n\\t%H0 = %h1 (X);\\n\\t%H0 >>>= 31;"
-  [(set_attr "length" "6")])
+  "#"
+  "reload_completed"
+  [(set (match_dup 2) (sign_extend:SI (match_dup 1)))
+   (set (match_dup 3) (sign_extend:SI (match_dup 1)))
+   (set (match_dup 3) (ashiftrt:SI (match_dup 3) (const_int 31)))]
+{
+  split_di (operands, 1, operands + 2, operands + 3);
+})
 
 ;; DImode arithmetic operations
 

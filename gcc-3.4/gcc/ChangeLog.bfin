@@ -1,3 +1,8 @@
+2004-12-21  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (extendsidi2, extendhidi2, extendqidi2): Turn
+	into define_insn_and_split patterns.
+
 2004-12-20  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (subdi3): Make operand 1 match operand 0.
