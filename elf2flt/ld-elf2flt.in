@@ -101,7 +101,7 @@ then
 			fi
 
 			# Provide the magic parameter that defines the library data segment pointer offset
-			ARG1="$ARG1 -defsym _current_shared_library_a5_offset_=`expr ${SHARED_ID} '*' -4 - 4`"
+			ARG1="$ARG1 -defsym _current_shared_library_p5_offset_=`expr ${SHARED_ID} '*' -4 - 4`"
 		fi
 		
 		# provide a default linker script, we usually need one
