@@ -100,18 +100,22 @@
 		       (const_int 4) (const_int 2))
 
 	 (eq_attr "type" "move")
-	 (if_then_else (match_operand 1 "symbolic_operand_p" "")
-	               (const_int 8) 
-	               (if_then_else (match_operand 1 "imm7bit_operand_p" "")
-	                             (const_int 2)
-	                             (const_int 4)))
+	 (if_then_else (match_operand 1 "register_operand" "")
+          (const_int 2)
+	   (if_then_else (match_operand 1 "imm7bit_operand_p" "")
+            (const_int 2)
+	    (if_then_else (match_operand 1 "symbolic_or_const_operand_p" "")
+	     (const_int 8)
+	     (const_int 4))))
 
          (eq_attr "type" "mvp")
-         (if_then_else (match_operand 1 "symbolic_operand_p" "")
-                       (const_int 8)
-                       (if_then_else (match_operand 1 "imm7bit_operand_p" "")
-                                     (const_int 2)
-                                     (const_int 4)))
+	 (if_then_else (match_operand 1 "register_operand" "")
+          (const_int 2)
+	   (if_then_else (match_operand 1 "imm7bit_operand_p" "")
+            (const_int 2)
+	    (if_then_else (match_operand 1 "symbolic_or_const_operand_p" "")
+	     (const_int 8)
+	     (const_int 4))))
 
 	 (eq_attr "type" "dsp32") (const_int 4)
 	 (eq_attr "type" "call")  (const_int 4)
@@ -251,26 +255,45 @@
    (set_attr "type" "move,mvp,move,mvp,move,mvp")])
 
 ;;; Future work: split constants in expand
+
+;; Note: Constraints are chosen so that reload can form the union of classes
+;; sequentially (e.g., for "fcr", the class is built up as
+;; MREGS, DAGREGS, MOST_REGS).
+
 (define_insn "*movsi_insn"
-  [(set (match_operand:SI 0 "nonimmediate_operand" "=d, a, mc, *!c, !e, !e, !d, !a, !d, !C, a,f")
-        (match_operand:SI 1 "general_operand" "damic, damic, da, daic, ad,  P, *e, *e, C, d, f,a"))]
+  [(set (match_operand:SI 0 "nonimmediate_operand" "=da ,  *cf,  d, a,  mr, !*e, !*e, !d, !d, !C")
+        (match_operand:SI 1 "general_operand"      "fcri, fcri, mr, mr, da,   d,  eP, *e,  C, d"))]
 
   ""
   "*
    output_load_immediate (operands);
    return \"\";
   "
-  [(set_attr "type" "mcld,mcldp,mcst,move,move,move,move,mvp,compare,compare,mcld,move")])
+  [(set_attr "type" "move,move,mcld,mcldp,mcst,move,move,move,compare,compare")])
 
-(define_expand "movsi"
-  [(set (match_operand:SI 0 "nonimmediate_operand" "")
-	(match_operand:SI 1 "general_operand" ""))]
+(define_insn "*movhi_insn"
+  [(set (match_operand:HI 0 "nonimmediate_operand" "=da ,  *cf, d, mr, !*e, !*e, !d, !d, !C")
+        (match_operand:HI 1 "general_operand"      "fcri, fcri, mr, d,   d,  eP, *e,  C, d"))]
   ""
-  "expand_move (operands, SImode);")
+  "*
+   output_load_immediate (operands);
+   return \"\";
+  "
+  [(set_attr "type" "move,move,mcld,mcst,move,move,move,compare,compare")])
+
+(define_insn "*movqi_insn"
+  [(set (match_operand:QI 0 "nonimmediate_operand" "=da ,  *cf, d, mr, !*e, !*e, !d, !d, !C")
+        (match_operand:QI 1 "general_operand"      "fcri, fcri, mr, d,   d,  eP, *e,  C, d"))]
+  ""
+  "*
+   output_load_immediate (operands);
+   return \"\";
+  "
+  [(set_attr "type" "move,move,mcld,mcst,move,move,move,compare,compare")])
 
 (define_insn "*movsf_insn"
- [(set (match_operand:SF 0 "nonimmediate_operand" "=d, a, m")
-       (match_operand:SF 1 "general_operand" "dami, dami, da"))]
+  [(set (match_operand:SF 0 "nonimmediate_operand" "=da ,  *cf,  d,  a, mr, !*e, !*e, !d, !d, !C")
+        (match_operand:SF 1 "general_operand"      "fcri, fcri, mr, mr, da,   d,  eP, *e,  C, d"))]
   ""
   "*
   {
@@ -288,40 +311,25 @@
             {/* output_asm_insn (\"lz(%0) = %2;\", operands); */
             output_asm_insn (\"%0 = %2 (Z);\", operands);
             }
-        RET;
-     } else if (GET_CODE (operands[1]) == CONST
-        && (GET_CODE (XEXP (operands[1], 0)) == SYMBOL_REF
-        || GET_CODE (XEXP (operands[1], 0)) == LABEL_REF
-        || GET_CODE (XEXP (operands[1], 0)) == PLUS)) {
-           output_symbolic_address (operands);
-           RET;
-    } else if (GET_CODE (operands[1]) == SYMBOL_REF
-        || GET_CODE (operands[1]) == LABEL_REF) {
-           output_symbolic_address (operands);
-           RET;
-    }
- 
-     output_asm_insn (\"%0 =%1;\", operands);
-     RET;
+        return \"\";
+     }
+   output_load_immediate (operands);
+   return \"\";
   }"
-  [(set_attr "type" "mcld, mcldp, mcst")])
+  [(set_attr "type" "move,move,mcld,mcldp,mcst,move,move,move,compare,compare")])
+
+(define_expand "movsi"
+  [(set (match_operand:SI 0 "nonimmediate_operand" "")
+	(match_operand:SI 1 "general_operand" ""))]
+  ""
+  "expand_move (operands, SImode);")
+
 
 (define_expand "movsf"
  [(set (match_operand:SF 0 "nonimmediate_operand" "")
        (match_operand:SF 1 "general_operand" ""))]
   ""
   "expand_move (operands, SFmode);")
-
-(define_insn ""
-  [(set (match_operand:HI 0 "nonimmediate_operand" "=d,  m, d,a,d,a")
-	(match_operand:HI 1 "general_operand" "I?di, d, m,d,a,i"))]
-  ""
-  "*output_load_immediate (operands);
-    return \"\";
-  "
-  [(set_attr "type" "move,mcst,mcld,mcld,mcld,move")])
-
-
 
 (define_expand "movhi"
   [(set (match_operand:HI 0 "nonimmediate_operand" "")
@@ -335,126 +343,6 @@
   ""
   " expand_move (operands, QImode); ")
 
-
-(define_insn ""
-  [(set (match_operand:QI 0 "nonimmediate_operand" "=d,d,m,d,a,d")
-	(match_operand:QI 1 "general_operand" "d,m,d,i,d,a"))]
-  ""
-  "@
-   %0 =%1;
-   %0 = B %1 (X);
-   B %0 =%1;
-   %0 = %1 (X);
-   %0 =%1;
-   %0 =%1;"
-  [(set_attr "type" "alu0")])
-
-;; ********************************************************
-;; movdi pattern support. -- Tony
-
-
-;; ********************************************************
-;;
-;;      match(set (non-dpreg)
-;;              (memory)
-;;      match(set (memory)
-;;              (non-dpreg)
-;;
-;; Move from memory to non-dpreg requires a secondary register
-;; For details on register class selection see function
-;; secondary_input_reload_class
-;; 17/3/99 -- lev
-;; ********************************************************
-
-;(define_expand "reload_insi"
-;  [(parallel [(set (match_operand:SI 0 "register_operand" "=a")
-;		(subreg:SI (match_operand:HI 1 "always_true"     "mi") 0))
-;       (clobber (match_operand:SI 2 "register_operand"    "=&d"))])
-;  
-;	(set (match_dup 2) (subreg:SI (match_dup 1) 0))
-;	(set (match_dup 0) (match_dup 2))
-;  ]
-;""
-;""
-;)
-
-(define_expand "reload_insi"
-  [(parallel [(set (match_operand:SI 0 "register_operand" "=a")
-               (subreg:SI (match_operand:HI 1 "always_true"     "mi") 0))
-       (clobber (match_operand:SI 2 "register_operand"    "=&d"))])
-  ]
-""
-"   emit_move_insn (operands[2], operands[1]);
-    emit_move_insn (operands[0], operands[2]);
-    DONE;"
-)    
- 
-;(define_expand "reload_outsi"
-;  [(parallel [(set (subreg:SI (match_operand:HI 0 "always_true" "=m") 0)
-;	    (match_operand:SI 1 "register_operand"       "a"))
-;       (clobber (match_operand:SI 2 "register_operand"   "=&d"))])
-;
-;	(set (match_dup 2) (match_dup 1))
-;	(set (subreg:SI (match_dup 0) 0) (match_dup 2))
-;  ]
-;""
-;""
-;)
-
-(define_expand "reload_outsi"
-  [(parallel [(set (subreg:SI (match_operand:HI 0 "always_true" "=m") 0)
-            (match_operand:SI 1 "register_operand"       "a"))
-       (clobber (match_operand:SI 2 "register_operand"   "=&d"))])
-  ]
-""
-"   emit_move_insn (operands[2], operands[1]);
-    emit_move_insn (operands[0], operands[2]);
-    DONE;"
-)  
-
-(define_expand "reload_inhi"
-  [(parallel [(set (match_operand:SI 0 "register_operand" "=a")
-		(match_operand:HI 1 "always_true"     "mi"))
-       (clobber (match_operand:HI 2 "register_operand"    "=&d"))])
-  ]
-""
-"   emit_move_insn (operands[2], operands[1]);
-    emit_move_insn (operands[0], operands[2]);
-    DONE;"
-)
-
-(define_expand "reload_outhi"
-  [(parallel [(set (match_operand:HI 0 "always_true" "=m")
-	    (match_operand:SI 1 "register_operand"       "a"))
-       (clobber (match_operand:HI 2 "register_operand"   "=&d"))])
-  ]
-""
-"   emit_move_insn (operands[2], operands[1]);
-    emit_move_insn (operands[0], operands[2]);
-    DONE;"
-)
-
-(define_expand "reload_inqi"
-  [(parallel [(set (match_operand:SI 0 "register_operand" "=a")
-		(match_operand:QI 1 "always_true"     "mi"))
-       (clobber (match_operand:QI 2 "register_operand"    "=&d"))])
-  ]
-""
-"   emit_move_insn (operands[2], operands[1]);
-    emit_move_insn (operands[0], operands[2]);
-    DONE;"
-)
-
-(define_expand "reload_outqi"
-  [(parallel [(set (match_operand:QI 0 "always_true" "=m")
-	    (match_operand:SI 1 "register_operand"       "a"))
-       (clobber (match_operand:QI 2 "register_operand"   "=&d"))])
-  ]
-""
-"   emit_move_insn (operands[2], operands[1]);
-    emit_move_insn (operands[0], operands[2]);
-    DONE;"
-)
 ;;;;;;;;;;;;;;;;;; BYTE conversion patterns ;;;;;;;;;;;;;;;;;;;;;;
 (define_insn "extendqihi2"
   [(set (match_operand:HI 0 "register_operand" "=d, d")
