@@ -51,10 +51,14 @@ extern saved_state_type saved_state;
 #define DPREG(x) saved_state.dpregs[x]
 #define GREG(x,i) DPREG ((x) | (i << 3))
 #define PREG(x) saved_state.dpregs[x + 8]
+#define FPREG 	(PREG(6))
+#define SPREG 	(PREG(7))
 #define IREG(x) saved_state.iregs[x]
 #define LREG(x) saved_state.lregs[x]
 #define MREG(x) saved_state.mregs[x]
 #define BREG(x) saved_state.bregs[x]
+#define A0REG   saved_state.a0
+#define A1REG   saved_state.a1
 #define CCREG saved_state.cc
 #define PCREG saved_state.pc
 #define LC0REG saved_state.lc[0]
@@ -63,6 +67,8 @@ extern saved_state_type saved_state;
 #define LC1REG saved_state.lc[1]
 #define LT1REG saved_state.lt[1]
 #define LB1REG saved_state.lb[1]
+#define RETSREG saved_state.rets
+#define PCREG saved_state.pc
 
 typedef struct
 {

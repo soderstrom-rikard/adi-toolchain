@@ -66,6 +66,7 @@
 #include "gdb_assert.h"
 #include "command.h"
 #include "tm.h"
+#include "sim-regno.h"
 
 /* forward static declarations */
 static struct type * bfin_register_type (struct gdbarch *gdbarch, int regnum);
@@ -1052,6 +1053,27 @@ bfin_unwind_pc (struct gdbarch *gdbarch, struct frame_info *next_frame)
   return  extract_typed_address (buf, builtin_type_void_func_ptr);
 }
 
+static int
+bfin_sim_regno(int regno)
+{
+  /* for registers the simulator cannot understand return a neg value */
+  switch(regno){
+  	case BFIN_SYSCFG_REGNUM :
+  	case BFIN_RETX_REGNUM :
+  	case BFIN_RETN_REGNUM :
+  	case BFIN_RETE_REGNUM :
+  	case BFIN_SEQSTAT_REGNUM :
+  	case BFIN_IPEND_REGNUM :
+  	case BFIN_ORIGPC_REGNUM :
+  	case BFIN_EXTRA1 :
+  	case BFIN_EXTRA2 :
+  	case BFIN_EXTRA3 :
+		return SIM_REGNO_DOES_NOT_EXIST;
+  default :
+	return regno;
+  }
+}
+
 /* Initialize the current architecture based on INFO.  If possible,
    re-use an architecture from ARCHES, which is a list of
    architectures already created during this debugging session.
@@ -1137,6 +1159,8 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   /* Breakpoint manipulation.  PC will get decremented in kernel */
   set_gdbarch_decr_pc_after_break (gdbarch, 0);
   frame_unwind_append_sniffer (gdbarch, bfin_frame_sniffer);
+
+  set_gdbarch_register_sim_regno (gdbarch, bfin_sim_regno);
 
   set_main_name("_main");
 

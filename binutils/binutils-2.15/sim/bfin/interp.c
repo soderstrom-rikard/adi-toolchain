@@ -30,6 +30,7 @@
 #include "gdb/callback.h"
 #include "gdb/remote-sim.h"
 #include "bfin-sim.h"
+#include "gdb/sim-bfin.h"
 
 /* This file is local - if newlib changes, then so should this.  */
 #include "syscall.h"
@@ -110,7 +111,11 @@ void
 raise_exception (x)
      int x;
 {
-  raise (x);
+  //raise (x);
+  saved_state.exception = x;
+  if(x != SIGTRAP){
+    raise(x);
+  }
 }
 
 void
@@ -714,32 +719,10 @@ sim_stop (sd)
   return 1;
 }
 
-void
-sim_resume (sd, step, siggnal)
-     SIM_DESC sd;
-     int step, siggnal;
+/* Execute a single instruction */
+static void
+step_once(SIM_DESC sd, int pollcount)
 {
-  struct loop_bounds loop;
-  register int cycles = 0;
-  register int insts = 0;
-  register int prevlock;
-#if 1
-  int thislock;
-#else
-  register int thislock;
-#endif
-  register unsigned int doprofile;
-  register int pollcount = 0;
-
-  int tick_start = get_now ();
-  void (*prev) () = signal (SIGINT, control_c);
-  void (*prev_fpe) () = signal (SIGFPE, SIG_IGN);
-
-  init_pointers ();
-  saved_state.exception = 0;
-
-  while (!step)
-    {
       if (tracing)
 	fprintf (stderr, "PC: %08x, insn: %04x\n", PCREG,
 		 get_word (saved_state.memory, PCREG));
@@ -760,7 +743,7 @@ sim_resume (sd, step, siggnal)
 		PCREG = LT0REG;
 	    }
 	}
-      _print_insn_bfin (PCREG);
+      _interp_insn_bfin (PCREG);
 
       if (--pollcount < 0)
 	{
@@ -771,8 +754,51 @@ sim_resume (sd, step, siggnal)
 	      sim_stop (sd);
 	    }	    
 	}
+}
 
+void
+sim_resume (sd, step, siggnal)
+     SIM_DESC sd;
+     int step, siggnal;
+{
+  struct loop_bounds loop;
+  register int cycles = 0;
+  register int insts = 0;
+  register int prevlock;
+#if 1
+  int thislock;
+#else
+  register int thislock;
+#endif
+  register unsigned int doprofile;
+  register int pollcount = 0;
+
+//tracing = 1;
+
+  int tick_start = get_now ();
+  void (*prev) () = signal (SIGINT, control_c);
+  void (*prev_fpe) () = signal (SIGFPE, SIG_IGN);
+
+  init_pointers ();
+
+  /* clear exceptions else it will stop */
+  saved_state.exception = 0;
+
+  if(step){
+    while(step){
+      /* not clear if this will be > 1. Potential problem area */
+      step_once(sd, pollcount);
+      step--;
     }
+    /* Emulate a hardware single step ... raise an exception */
+    saved_state.exception = SIGTRAP;
+  }
+  else{
+    while (saved_state.exception != SIGTRAP)
+    {
+	step_once(sd, pollcount);
+    }
+  }
 
   saved_state.ticks += get_now () - tick_start;
   saved_state.cycles += cycles;
@@ -1053,4 +1079,136 @@ sim_set_callbacks (p)
      host_callback *p;
 {
   callback = p;
+}
+
+/***************************************************************/
+/* SIM debug support                                           */
+/***************************************************************/
+int
+sim_fetch_register (sd, rn, memory, length)
+     SIM_DESC sd;
+     int rn;
+     unsigned char *memory;
+     int length;
+{
+  int value;
+
+  init_pointers ();
+  switch (rn)
+    {
+	case BFIN_R0_REGNUM : value = DREG(0); break;
+	case BFIN_R1_REGNUM : value = DREG(1); break;
+	case BFIN_R2_REGNUM : value = DREG(2); break;
+	case BFIN_R3_REGNUM : value = DREG(3); break;
+	case BFIN_R4_REGNUM : value = DREG(4); break;
+	case BFIN_R5_REGNUM : value = DREG(5); break;
+	case BFIN_R6_REGNUM : value = DREG(6); break;
+	case BFIN_R7_REGNUM : value = DREG(7); break;
+	case BFIN_P0_REGNUM : value = DREG(0); break;
+	case BFIN_P1_REGNUM : value = PREG(1); break;
+	case BFIN_P2_REGNUM : value = PREG(2); break;
+	case BFIN_P3_REGNUM : value = PREG(3); break;
+	case BFIN_P4_REGNUM : value = PREG(4); break;
+	case BFIN_P5_REGNUM : value = PREG(5); break;
+	case BFIN_FP_REGNUM : value = FPREG; break;
+	case BFIN_SP_REGNUM : value = SPREG; break;
+	case BFIN_I0_REGNUM : value = IREG(0); break;
+	case BFIN_I1_REGNUM : value = IREG(1); break;
+	case BFIN_I2_REGNUM : value = IREG(2); break;
+	case BFIN_I3_REGNUM : value = IREG(3); break;
+	case BFIN_M0_REGNUM : value = MREG(0); break;
+	case BFIN_M1_REGNUM : value = MREG(1); break;
+	case BFIN_M2_REGNUM : value = MREG(2); break;
+	case BFIN_M3_REGNUM : value = MREG(3); break;
+	case BFIN_L0_REGNUM : value = LREG(0); break;
+	case BFIN_L1_REGNUM : value = LREG(1); break;
+	case BFIN_L2_REGNUM : value = LREG(2); break;
+	case BFIN_L3_REGNUM : value = LREG(3); break;
+	case BFIN_B0_REGNUM : value = BREG(0); break;
+	case BFIN_B1_REGNUM : value = BREG(1); break;
+	case BFIN_B2_REGNUM : value = BREG(2); break;
+	case BFIN_B3_REGNUM : value = BREG(3); break;
+	case BFIN_A0_DOT_X_REGNUM : value = A0REG; break;
+	case BFIN_AO_DOT_W_REGNUM : value = A0REG; break;
+	case BFIN_A1_DOT_X_REGNUM : value = A1REG; break;
+	case BFIN_A1_DOT_W_REGNUM : value = A1REG; break;
+	case BFIN_LC0_REGNUM : value = LC0REG; break;
+	case BFIN_LC1_REGNUM : value = LC1REG; break;
+	case BFIN_LT0_REGNUM : value = LT0REG; break;
+	case BFIN_LT1_REGNUM : value = LT1REG; break;
+	case BFIN_LB0_REGNUM : value = LB0REG; break;
+	case BFIN_LB1_REGNUM : value = LB1REG; break;
+	case BFIN_RETS_REGNUM : value = RETSREG; break;
+	case BFIN_PC_REGNUM : value = PCREG; break;
+	default :
+		return 0; // will be an error in gdb
+      break;
+   }
+
+  * (int *) memory = value;
+  return -1; // disables size checking in gdb
+}
+
+int
+sim_store_register (sd, rn, memory, length)
+     SIM_DESC sd;
+     int rn;
+     unsigned char *memory;
+     int length;
+{
+  int value = *((int *)memory);
+
+  init_pointers ();
+  switch (rn)
+    {
+	case BFIN_R0_REGNUM : DREG(0) = value; break;
+	case BFIN_R1_REGNUM : DREG(1) = value; break;
+	case BFIN_R2_REGNUM : DREG(2) = value; break;
+	case BFIN_R3_REGNUM : DREG(3) = value; break;
+	case BFIN_R4_REGNUM : DREG(4) = value; break;
+	case BFIN_R5_REGNUM : DREG(5) = value; break;
+	case BFIN_R6_REGNUM : DREG(6) = value; break;
+	case BFIN_R7_REGNUM : DREG(7) = value; break;
+	case BFIN_P0_REGNUM : DREG(0) = value; break;
+	case BFIN_P1_REGNUM : PREG(1) = value; break;
+	case BFIN_P2_REGNUM : PREG(2) = value; break;
+	case BFIN_P3_REGNUM : PREG(3) = value; break;
+	case BFIN_P4_REGNUM : PREG(4) = value; break;
+	case BFIN_P5_REGNUM : PREG(5) = value; break;
+	case BFIN_FP_REGNUM : FPREG = value; break;
+	case BFIN_SP_REGNUM : SPREG = value; break;
+	case BFIN_I0_REGNUM : IREG(0) = value; break;
+	case BFIN_I1_REGNUM : IREG(1) = value; break;
+	case BFIN_I2_REGNUM : IREG(2) = value; break;
+	case BFIN_I3_REGNUM : IREG(3) = value; break;
+	case BFIN_M0_REGNUM : MREG(0) = value; break;
+	case BFIN_M1_REGNUM : MREG(1) = value; break;
+	case BFIN_M2_REGNUM : MREG(2) = value; break;
+	case BFIN_M3_REGNUM : MREG(3) = value; break;
+	case BFIN_L0_REGNUM : LREG(0) = value; break;
+	case BFIN_L1_REGNUM : LREG(1) = value; break;
+	case BFIN_L2_REGNUM : LREG(2) = value; break;
+	case BFIN_L3_REGNUM : LREG(3) = value; break;
+	case BFIN_B0_REGNUM : BREG(0) = value; break;
+	case BFIN_B1_REGNUM : BREG(1) = value; break;
+	case BFIN_B2_REGNUM : BREG(2) = value; break;
+	case BFIN_B3_REGNUM : BREG(3) = value; break;
+	case BFIN_A0_DOT_X_REGNUM : A0REG = value; break;
+	case BFIN_AO_DOT_W_REGNUM : A0REG = value; break;
+	case BFIN_A1_DOT_X_REGNUM : A1REG = value; break;
+	case BFIN_A1_DOT_W_REGNUM : A1REG = value; break;
+	case BFIN_LC0_REGNUM : LC0REG = value; break;
+	case BFIN_LC1_REGNUM : LC1REG = value; break;
+	case BFIN_LT0_REGNUM : LT0REG = value; break;
+	case BFIN_LT1_REGNUM : LT1REG = value; break;
+	case BFIN_LB0_REGNUM : LB0REG = value; break;
+	case BFIN_LB1_REGNUM : LB1REG = value; break;
+	case BFIN_RETS_REGNUM : RETSREG = value; break;
+	case BFIN_PC_REGNUM : PCREG = value; break;
+	default :
+		return 0; // will be an error in gdb
+      break;
+   }
+
+  return -1; // disables size checking in gdb
 }

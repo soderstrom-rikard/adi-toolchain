@@ -31,6 +31,7 @@ static __attribute__ ((noreturn)) void
 unhandled_instruction (void)
 {
   raise (SIGILL);
+  fprintf(stderr, "unhandled instruction ... aborting\n");
   abort ();
 }
 
@@ -722,7 +723,7 @@ static enum machine_registers decode_allregs[] =
 /* (arch.pm)arch_disassembler_functions */
 #define notethat(x)
 
-#define OUTS(p,txt) abort ()
+#define OUTS(p,txt) unhandled_instruction ()
 
 static int *
 get_allreg (int grp, int reg)
@@ -1498,9 +1499,17 @@ decode_ProgCtrl_0 (bu16 iw0, bu16 iw1, bu32 pc)
   else if ((prgfunc == 10))
     {
       notethat ("EXCPT uimm4");
-      OUTS (outf, "EXCPT  ");
-      OUTS (outf, uimm4 (poprnd));
-      PCREG += 2; return;
+      if(uimm4(poprnd) == 1){
+        raise_exception(SIGTRAP);
+        // single step exception dont increment PCREG ... PCREG += 2; 
+        return;
+      }
+      else{
+        fprintf(stderr, "unhandled exception\n");
+        OUTS (outf, "EXCPT  ");
+        OUTS (outf, uimm4 (poprnd));
+        PCREG += 2; return;
+      }
     }
   else if ((prgfunc == 11))
     {
@@ -5889,7 +5898,7 @@ decode_psedodbg_assert_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 int
-_print_insn_bfin (bu32 pc)
+_interp_insn_bfin (bu32 pc)
 {
   bu8 buf[4];
   bu16 iw0 = get_word (saved_state.memory, pc);
