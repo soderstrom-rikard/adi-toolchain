@@ -1,5 +1,5 @@
 #objdump: -dr
-#name: bit
+#name: arithmetic
 .*: +file format .*
 
 

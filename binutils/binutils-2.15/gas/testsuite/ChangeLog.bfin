@@ -1,3 +1,7 @@
+2004-12-20  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/arithmetic.d: Correct name of test.
+
 2004-12-17  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* gas/bfin/move.d: Insert a new instruction at 0x32 to fill a gap in
