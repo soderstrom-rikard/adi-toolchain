@@ -377,6 +377,7 @@ emucause                                yylval.regno = REG_emucause;return REG;
      }
 [A-Za-z_$][A-Za-z0-9_$]*                 { char *t =strdup (yytext);
                                            yylval.symbol = symbol_find_or_make(yytext);
+					   symbol_mark_used(yylval.symbol);
 					   return SYMBOL; }
 [0-9][bfBF]				 {
 	char *name;
