@@ -11,7 +11,6 @@
  */
 #define _ASM
 #define _SETJMP_H
-#include <bits/setjmp.h>
 
 .globl ___sigsetjmp;
 .align 4;
