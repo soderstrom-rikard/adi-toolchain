@@ -231,6 +231,7 @@ bfin_bfd_reloc (
   bfd_vma output_base = 0;
   reloc_howto_type *howto = reloc_entry->howto;
   asection *reloc_target_output_section;
+  int possible_addend_delta = 0;
 
 #if 0
   flag = bfd_elf_generic_reloc (abfd, reloc_entry, 
@@ -270,10 +271,13 @@ bfin_bfd_reloc (
         else
 	    output_base = reloc_target_output_section->vma;
         
-        relocation += output_base + symbol->section->output_offset;
+        if (!strcmp(symbol->name, symbol->section->name) || output_bfd == NULL){
+          relocation += output_base + symbol->section->output_offset;
+          possible_addend_delta = symbol->section->output_offset;
+	}
         
 #if 0 /* we do not generate addend ... see arith expr 
-        /* Add in supplied addend.  */
+        Add in supplied addend.  */
         relocation += reloc_entry->addend;
 #endif
       }
@@ -298,6 +302,7 @@ bfin_bfd_reloc (
     if (output_bfd != (bfd *) NULL) {
        /* this output will be relocatable ... like ld -r */
        reloc_entry->address += input_section->output_offset;
+       reloc_entry->addend += possible_addend_delta; // for symbols that are section names
     }
 
 
@@ -376,6 +381,7 @@ bfin_pcrel24_reloc (
   bfd_vma output_base = 0;
   reloc_howto_type *howto = reloc_entry->howto;
   asection *reloc_target_output_section;
+  int possible_addend_delta = 0;
 
 #if 0
   flag = bfd_elf_generic_reloc (abfd, reloc_entry, 
@@ -416,10 +422,13 @@ bfin_pcrel24_reloc (
         else
 	  output_base = reloc_target_output_section->vma;
       
-        relocation += output_base + symbol->section->output_offset;
+        if (!strcmp(symbol->name, symbol->section->name) || output_bfd == NULL){
+          relocation += output_base + symbol->section->output_offset;
+          possible_addend_delta = symbol->section->output_offset;
+	}
         
 #if 0 /* we do not generate addend ... see arith expr 
-        /* Add in supplied addend.  */
+        Add in supplied addend.  */
         relocation += reloc_entry->addend;
 #endif
       }
@@ -471,6 +480,7 @@ bfin_pcrel24_reloc (
     if (output_bfd != (bfd *) NULL) {
        /* this output will be relocatable ... like ld -r */
        reloc_entry->address += input_section->output_offset;
+       reloc_entry->addend += possible_addend_delta; // for symbols that are section names
     }
       {
          short x;
@@ -699,6 +709,7 @@ bfin_byte4_reloc (
   bfd_vma output_base = 0;
   reloc_howto_type *howto = reloc_entry->howto;
   asection *reloc_target_output_section;
+  int  possible_addend_delta = 0; // to be added to addend if output_bfd is 0
     /* Is the address of the relocation really within the section?  */
       if (reloc_entry->address > input_section->_cooked_size)
 	      return bfd_reloc_outofrange;
@@ -711,8 +722,10 @@ bfin_byte4_reloc (
         else
 	    output_base = reloc_target_output_section->vma;
   
-        if (!strcmp(symbol->name, symbol->section->name) || output_bfd == NULL)
+        if (!strcmp(symbol->name, symbol->section->name) || output_bfd == NULL){
       	  relocation += output_base + symbol->section->output_offset;
+          possible_addend_delta = symbol->section->output_offset;
+	}
 
         relocation += reloc_entry->addend;
       }
@@ -724,7 +737,7 @@ bfin_byte4_reloc (
       if (output_bfd != (bfd *) NULL) {	              
 	 /* this output will be relocatable ... like ld -r */
 	 reloc_entry->address += input_section->output_offset;
-	 reloc_entry->addend = relocation - symbol->value;
+	 reloc_entry->addend += possible_addend_delta;
        }
       else {
         reloc_entry->addend = 0;
@@ -741,27 +754,6 @@ bfin_byte4_reloc (
     return bfd_reloc_ok;
 }
 
-/*static bfd_reloc_status_type
-bfin_spl_reloc (
-		     bfd *abfd,
-		          arelent *reloc_entry,
-			       asymbol *symbol,
-			            PTR data,
-				         asection *input_section,
-					      bfd *output_bfd,
-					           char **error_message)
-{
-	  //bfd_vma relocation, x;
-	    //bfd_reloc_status_type flag = bfd_reloc_ok;
-	  //  bfd_size_type addr = reloc_entry->address;
-	  //    bfd_vma output_base = 0;
-	  reloc_howto_type *howto = reloc_entry->howto;
-	  fprintf(stderr, "Called spl func with reloc type %s(%d)n",
-			  howto->name, howto->type);
-	  return bfd_reloc_ok;
-	  
-}	  
-*/
 /* HOWTO Table for blackfin.
    Blackfin relocations are fairly complicated. Some of the salient features are
    a. Even numbered offsets. A number of (not all) relocations are
@@ -1179,26 +1171,26 @@ static const struct bfin_reloc_map {
 	{ BFD_RELOC_32, R_byte4_data},
 	{ BFD_RELOC_11_PCREL, R_pcrel11},
 
-	{ BFD_ARELOC_PUSH, AR_e0},
-	{ BFD_ARELOC_CONST, AR_e1},
-	{ BFD_ARELOC_ADD, AR_e2},
-	{ BFD_ARELOC_SUB, AR_e3},
-	{ BFD_ARELOC_MULT, AR_e4},
-	{ BFD_ARELOC_DIV, AR_e5},
-	{ BFD_ARELOC_MOD, AR_e6},
-	{ BFD_ARELOC_LSHIFT, AR_e7},
-	{ BFD_ARELOC_RSHIFT, AR_e8},
-	{ BFD_ARELOC_AND, AR_e9},
-	{ BFD_ARELOC_OR, AR_ea},
-	{ BFD_ARELOC_XOR, AR_eb},
-	{ BFD_ARELOC_LAND, AR_ec},
-	{ BFD_ARELOC_LOR, AR_ed},
-	{ BFD_ARELOC_LEN, AR_ee},
-	{ BFD_ARELOC_NEG, AR_ef},
-	{ BFD_ARELOC_COMP, AR_f0},
-	{ BFD_ARELOC_PAGE, AR_f1},
-	{ BFD_ARELOC_HWPAGE, AR_f2},
-	{ BFD_ARELOC_ADDR, AR_f3}
+	{ BFD_ARELOC_PUSH, R_push},
+	{ BFD_ARELOC_CONST, R_const},
+	{ BFD_ARELOC_ADD, R_add},
+	{ BFD_ARELOC_SUB, R_sub},
+	{ BFD_ARELOC_MULT, R_mult},
+	{ BFD_ARELOC_DIV, R_div},
+	{ BFD_ARELOC_MOD, R_mod},
+	{ BFD_ARELOC_LSHIFT, R_lshift},
+	{ BFD_ARELOC_RSHIFT, R_rshift},
+	{ BFD_ARELOC_AND, R_and},
+	{ BFD_ARELOC_OR, R_or},
+	{ BFD_ARELOC_XOR, R_xor},
+	{ BFD_ARELOC_LAND, R_land},
+	{ BFD_ARELOC_LOR, R_lor},
+	{ BFD_ARELOC_LEN, R_len},
+	{ BFD_ARELOC_NEG, R_neg},
+	{ BFD_ARELOC_COMP, R_comp},
+	{ BFD_ARELOC_PAGE, R_page},
+	{ BFD_ARELOC_HWPAGE, R_hwpage},
+	{ BFD_ARELOC_ADDR, R_addr}
 };
 
 
@@ -1233,7 +1225,7 @@ bfd_info_to_howto_rel (bfd *abfd ATTRIBUTE_UNUSED,
    * FIXME : Change the entire approach to this code
    */
   if(r_type >= 0xe0 && r_type <= 0xf3)
-	  r_type = r_type - 0xe0 + AR_e0;
+	  r_type = r_type - 0xe0 + R_push;
   BFD_ASSERT (r_type < (unsigned int) R_max);
   cache_ptr->howto = &bfin_elf_howto_table[r_type];
 }
