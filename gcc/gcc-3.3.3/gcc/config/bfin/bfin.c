@@ -1939,35 +1939,6 @@ output_load_immediate (rtx *operands) {
             output_asm_insn ("W %0=%1;", operands);
         return "";
      }
-/*     else if (GET_CODE (operands[1]) == MEM
-        && GET_MODE (operands[1]) == SImode) {
-	char buf[128];
-        rtx x = XEXP (operands[1], 0);
-	rtx z = XEXP (x, 1);
-        if (GET_CODE (x) == PLUS  && REGNO(XEXP(x,0)) != STACK_POINTER_REGNUM
-	  && REGNO(XEXP(x,0)) != FRAME_POINTER_REGNUM 
-	  && ((z->fld[0].rtwint)%4) != 0 /*if not multiple of 4 RAJA*//*) {
-	 
-         for (i = REG_P0; i <= LAST_USER_PREG; i++) 
-	    if (operands[0]->fld[0].rtwint != i && REGNO(XEXP(x,0)) != i) break;
-	 
-         sprintf (buf, "[--SP] =%s;", reg_names[i]);
-         output_asm_insn (buf, operands);
-
-         sprintf (buf, "%s =%d;", reg_names[i], z->fld[0].rtwint);
-         output_asm_insn (buf, operands);
-
-         sprintf (buf, "%s =%s + %s;",  reg_names[i], reg_names[REGNO(XEXP(x,0))],  reg_names[i]);
-         output_asm_insn (buf, operands);
-
-         sprintf (buf, "%s = [%s];", reg_names[operands[0]->fld[0].rtwint], reg_names[i]);
-         output_asm_insn (buf, operands);
-
-         sprintf (buf, "%s = [SP++];", reg_names[i]);
-         output_asm_insn (buf, operands);
-	 return "";
-	}
-     }*/
 
      output_asm_insn ("%0 =%1;", operands);
      return "";
@@ -2431,5 +2402,36 @@ output_casesi_internal(rtx *operands)
         output_asm_insn ("jump (%1);", operands);
 
         return "";
+}
+
+/*
+return true if the legitimate memory address for a memory operand of mode
+return false if not.
+
+[ Preg + uimm17m4 ]
+W [ Preg + uimm16m2 ]
+B [ Preg + uimm15 ]
+
+uimm17m4: 17-bit unsigned field that must be a multiple of 4
+uimm16m2: 16-bit unsigned field that must be a multiple of 2 
+*/
+
+int 
+bfin_valid_add(const enum machine_mode mode, const int value)
+{
+	switch(mode)
+	{
+	case SImode:
+	  if (!(value%4))
+            return 1;
+	  break;
+	case HImode:
+	  if (!(value%2))	
+	    return 1;
+	  break;
+	default:
+	  return 1; 
+	}
+	return 0;
 }
 

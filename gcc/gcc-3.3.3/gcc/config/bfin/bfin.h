@@ -41,6 +41,7 @@
 # define STRICTNESS 0
 #endif
 
+
 #define CONST_16BIT_IMM_P(VALUE) ((int)(VALUE) >= -32768 && (int)(VALUE) <= 32767)
 #define CONST_7BIT_IMM_P(VALUE) ((int)(VALUE) >= -64 && (int)(VALUE) <= 63)
 #define CONST_3BIT_IMM_P(VALUE) ((int)(VALUE) >= -4 && (int)(VALUE) <= 3)
@@ -800,10 +801,16 @@ typedef struct {
    
       [preg]
       [preg + imm16]
+
+B [ Preg + uimm15 ]
+W [ Preg + uimm16m2 ]
+[ Preg + uimm17m4 ] 
+
       [preg++]
       [preg--]
       [--sp]
 */
+
 #define GO_IF_LEGITIMATE_ADDRESS(MODE, X, WIN) do {            \
 /* This is PC relative data before MACHINE_DEPENDENT_REORG runs.*/ \
   if (GET_MODE_SIZE (MODE) >= 4 && TARGET_MINI_CONST_POOL && CONSTANT_P (X) \
@@ -826,7 +833,8 @@ typedef struct {
   case PLUS:						       \
     if (REG_OK_FOR_BASE_P (XEXP (X, 0))			       \
 	&& (GET_CODE (XEXP (X, 1)) == CONST_INT	       	       \
-		&& CONST_16BIT_IMM_P(INTVAL (XEXP (X,1)))))    \
+		&& CONST_16BIT_IMM_P(INTVAL (XEXP (X,1)))      \
+		&& bfin_valid_add(MODE,INTVAL (XEXP (X,1)))))  \
       goto WIN;						       \
     break;						       \
   case POST_INC:					       \
@@ -839,7 +847,7 @@ typedef struct {
       goto WIN;						       \
     break;						       \
   default:						       \
-	break;/*RAJA */					       \
+	break;						       \
   }							       \
 } while (0)
 
