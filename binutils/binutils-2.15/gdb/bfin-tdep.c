@@ -56,6 +56,7 @@
 #include "tm.h"
 #include "sim-regno.h"
 #include "objfiles.h"
+#include "trad-frame.h"
 
 /* forward static declarations */
 static struct type * bfin_register_type (struct gdbarch *gdbarch, int regnum);
@@ -233,23 +234,6 @@ main()
 
 ***************************************************************************/
 
-
-struct bfin_frame_cache
-{
-  /* Base address.  */
-  CORE_ADDR base;
-  CORE_ADDR sp_offset;
-  CORE_ADDR pc;
-  int frameless_pc_value;
-
-  /* Saved registers.  */
-  CORE_ADDR saved_regs[BFIN_NUM_REGS];
-  CORE_ADDR saved_sp;
-
-  /* Stack space reserved for local variables.  */
-  long locals;
-};
-
 int map_gcc_gdb[ ] = 
 {
   BFIN_R0_REGNUM,
@@ -297,6 +281,245 @@ int map_gcc_gdb[ ] =
 };
 
 
+/* Check whether insn1 and insn2 are parts of a signal trampoline.  */
+#define IS_SIGTRAMP(insn1, insn2)               \
+ (/* P0=0x77 (X); EXCPT 0x0 */                  \
+ (insn1 == 0x0077e128 && insn2 == 0x000000a0))
+
+#define SIGCONTEXT_OFFSET 28
+
+/* From <asm/sigcontext.h>.  */
+static int bfin_linux_sigcontext_reg_offset[BFIN_NUM_REGS] =
+{
+  -1,                           /* syscfg */
+  2 * 4,                        /* %r0 */
+  3 * 4,                        /* %r1 */
+  -1,                           /* %r2 */
+  -1,                           /* %r3 */
+  -1,                           /* %r4 */
+  -1,                           /* %r5 */
+  -1,                           /* %r6 */
+  -1,                           /* %r7 */
+  4 * 4,                        /* %p0 */
+  5 * 4,                        /* %p1 */
+  -1,                           /* %p2 */
+  -1,                           /* %p3 */
+  -1,                           /* %p4 */
+  -1,                           /* %p5 */
+  -1,                           /* %fp */
+  1 * 4,                        /* %sp */
+  -1,                           /* %i0 */
+  -1,                           /* %i1 */
+  -1,                           /* %i2 */
+  -1,                           /* %i3 */
+  -1,                           /* %m0 */
+  -1,                           /* %m1 */
+  -1,                           /* %m2 */
+  -1,                           /* %m3 */
+  -1,                           /* %l0 */
+  -1,                           /* %l1 */
+  -1,                           /* %l2 */
+  -1,                           /* %l3 */
+  -1,                           /* %b0 */
+  -1,                           /* %b1 */
+  -1,                           /* %b2 */
+  -1,                           /* %b3 */
+  -1,                           /* %a0x */
+  -1,                           /* %a0w */
+  -1,                           /* %a1x */
+  -1,                           /* %a1w */
+  -1,                           /* %lc0 */
+  -1,                           /* %lc1 */
+  -1,                           /* %lt0 */
+  -1,                           /* %lt1 */
+  -1,                           /* %lb0 */
+  -1,                           /* %lb1 */
+  -1,                           /* %astat */
+  -1,                           /* %reserved */
+  9 * 4,        		/* %rets */
+  7 * 4,                        /* %pc */
+  8 * 4,	                /* %retx */
+  -1,                           /* %retn */
+  -1,                           /* %rete */
+  6 * 4,                        /* %seqstat */
+  -1,                           /* %ipend */
+  -1,                           /* %origpc */
+  -1,                           /* %extra1 */
+  -1,                           /* %extra2 */
+  -1,                           /* %extra3 */
+};
+
+
+/* Get info about saved registers in sigtramp.  */
+struct bfin_linux_sigtramp_info
+{
+  /* Address of sigcontext.  */
+  CORE_ADDR sigcontext_addr;
+
+  /* Offset of registers in `struct sigcontext'.  */
+  int *sc_reg_offset;
+};
+
+
+/* Return non-zero if PC points into the signal trampoline.  For the
+   sake of bfin_linux_get_sigtramp_info.  */
+static int
+bfin_linux_pc_in_sigtramp (CORE_ADDR pc)
+{
+  char buf[12];
+  unsigned long insn0, insn1, insn2;
+
+  if (deprecated_read_memory_nobpt (pc - 4, buf, sizeof (buf))) {
+    return 0;
+  }
+
+  insn1 = extract_unsigned_integer (buf + 4, 4);
+  insn2 = extract_unsigned_integer (buf + 8, 4);
+  if (IS_SIGTRAMP (insn1, insn2)){
+    return 1;
+  }
+  
+  insn0 = extract_unsigned_integer (buf, 4);
+  if (IS_SIGTRAMP (insn0, insn1)) {
+    return 1;
+  }
+
+  insn0 = ((insn0 << 16) & 0xffffffff) | (insn1 >> 16);
+  insn1 = ((insn1 << 16) & 0xffffffff) | (insn2 >> 16);
+  if (IS_SIGTRAMP (insn0, insn1)) {
+    return 1;
+  }
+
+  return 0;
+}
+
+
+static struct bfin_linux_sigtramp_info
+bfin_linux_get_sigtramp_info (struct frame_info *next_frame)
+{
+  CORE_ADDR sp;
+  char buf[4];
+  struct bfin_linux_sigtramp_info info;
+
+  frame_unwind_register (next_frame, BFIN_SP_REGNUM, buf);
+  sp = extract_unsigned_integer (buf, 4);
+
+  /* Get sigcontext address */
+  info.sigcontext_addr = sp + SIGCONTEXT_OFFSET;
+
+  if(bfin_linux_pc_in_sigtramp(frame_pc_unwind(next_frame)) == 0)
+    fprintf(stderr, "not a sigtramp\n");
+  else
+    info.sc_reg_offset = bfin_linux_sigcontext_reg_offset;
+
+  return info;
+}
+
+
+/* Signal trampolines.  */
+static struct trad_frame_cache *
+bfin_linux_sigtramp_frame_cache (struct frame_info *next_frame,
+                                 void **this_cache)
+{
+  struct frame_id this_id;
+  struct trad_frame_cache *cache;
+  struct gdbarch_tdep *tdep = gdbarch_tdep (current_gdbarch);
+  struct bfin_linux_sigtramp_info info;
+  char buf[4];
+  CORE_ADDR sp;
+  int i;
+
+  if (*this_cache)
+    return *this_cache;
+
+  cache = trad_frame_cache_zalloc (next_frame);
+
+  /* The frame ID's code address should be the start-address of the
+     signal trampoline and not the current PC within that trampoline. */
+  frame_unwind_register (next_frame, BFIN_SP_REGNUM, buf);
+  sp = extract_unsigned_integer (buf, 4);
+
+  /* This would come after the LINK instruction in the ret_from_signal
+     function, hence the frame id would be sp + 8
+  */
+  this_id = frame_id_build (sp + 8, frame_pc_unwind(next_frame));
+  trad_frame_set_id (cache, this_id);
+
+  info = bfin_linux_get_sigtramp_info (next_frame);
+
+  for (i = 0; i < BFIN_NUM_REGS; i++)
+    if (info.sc_reg_offset[i] != -1)
+      trad_frame_set_reg_addr (cache, i, info.sigcontext_addr + info.sc_reg_offset[i]);
+
+  *this_cache = cache;
+  return cache;
+}
+
+
+static void
+bfin_linux_sigtramp_frame_this_id (struct frame_info *next_frame,
+                                   void **this_cache,
+                                   struct frame_id *this_id)
+{
+  struct trad_frame_cache *cache = bfin_linux_sigtramp_frame_cache (next_frame, this_cache);
+  trad_frame_get_id (cache, this_id);
+}
+
+
+static void
+bfin_linux_sigtramp_frame_prev_register (struct frame_info *next_frame,
+                                         void **this_cache,
+                                         int regnum, int *optimizedp,
+                                         enum lval_type *lvalp,
+                                         CORE_ADDR *addrp,
+                                         int *realnump, void *valuep)
+{
+  /* Make sure we've initialized the cache.  */
+  struct trad_frame_cache *cache = bfin_linux_sigtramp_frame_cache (next_frame, this_cache);
+  trad_frame_get_register (cache, next_frame, regnum, optimizedp, lvalp,
+                           addrp, realnump, valuep);
+}
+
+
+static const struct frame_unwind bfin_linux_sigtramp_frame_unwind =
+{
+  SIGTRAMP_FRAME,
+  bfin_linux_sigtramp_frame_this_id,
+  bfin_linux_sigtramp_frame_prev_register
+};
+
+
+static const struct frame_unwind *
+bfin_linux_sigtramp_frame_sniffer (struct frame_info *next_frame)
+{
+  char *name;
+  CORE_ADDR pc = frame_pc_unwind (next_frame);
+
+  find_pc_partial_function (pc, &name, NULL, NULL);
+  if (bfin_linux_pc_in_sigtramp (pc))
+    return &bfin_linux_sigtramp_frame_unwind;
+
+  return NULL;
+}
+
+
+struct bfin_frame_cache
+{
+  /* Base address.  */
+  CORE_ADDR base;
+  CORE_ADDR sp_offset;
+  CORE_ADDR pc;
+  int frameless_pc_value;
+
+  /* Saved registers.  */
+  CORE_ADDR saved_regs[BFIN_NUM_REGS];
+  CORE_ADDR saved_sp;
+
+  /* Stack space reserved for local variables.  */
+  long locals;
+};
+
+
 /* Allocate and initialize a frame cache.  */
 static struct bfin_frame_cache *
 bfin_alloc_frame_cache (void)
@@ -312,6 +535,8 @@ bfin_alloc_frame_cache (void)
   cache->pc = 0;
   cache->frameless_pc_value = 0;
 
+  /* Saved registers.  We initialize these to -1 since zero is a valid
+     offset (that's where fp is supposed to be stored).  */
   for (i = 0; i < BFIN_NUM_REGS; i++)
     cache->saved_regs[i] = -1;
 
@@ -364,14 +589,14 @@ bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
 fprintf(stderr, "frameless pc case base %x\n", cache->base);
 #endif //_DEBUG 
     cache->saved_regs[BFIN_FP_REGNUM] = cache->base;
+    cache->saved_sp = cache->base;
   }
   else{
     cache->frameless_pc_value = 0;
+    /* Now that we have the base address for the stack frame we can
+       calculate the value of SP in the calling frame.  */
+    cache->saved_sp = cache->base + 8;
   }
-
-  /* Now that we have the base address for the stack frame we can
-     calculate the value of SP in the calling frame.  */
-  cache->saved_sp = cache->base + 8;
 
   return cache;
 }
@@ -384,8 +609,9 @@ bfin_frame_this_id (struct frame_info *next_frame, void **this_cache,
   struct bfin_frame_cache *cache = bfin_frame_cache (next_frame, this_cache);
 
   /* This marks the outermost frame.  */
-  if (cache->base == 0)
+  if (cache->base == 0){
     return;
+  }
 
   /* See the end of bfin_push_dummy_call.  */
   *this_id = frame_id_build (cache->base + 8, cache->pc);
@@ -654,24 +880,21 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
       regcache_cooked_write (regcache, BFIN_P0_REGNUM, buf);
     }
 
-  /* Store return address.  */
-  store_unsigned_integer (buf, 4, bp_addr);
-  write_memory (sp, buf, 4);
-
-  /* Finally, update the stack pointer...  */
-  store_unsigned_integer (buf, 4, sp);
-  regcache_cooked_write (regcache, BFIN_SP_REGNUM, buf);
-
   /* set the dummy return value to bp_addr.
      A dummy breakpoint will be setup to execute the call. */
   store_unsigned_integer (buf, 4, bp_addr);
   regcache_cooked_write (regcache, BFIN_RETS_REGNUM, buf);
 
+  /* Finally, update the stack pointer...  */
+  store_unsigned_integer (buf, 4, sp);
+  regcache_cooked_write (regcache, BFIN_SP_REGNUM, buf);
+
+
   /* fp is changed by called program prologue */
 
   /* DWARF2/GCC uses the stack address *before* the function call as a
      frame's CFA.  */
-  return sp + 8;
+  return sp;
 }
 
 
@@ -719,7 +942,6 @@ const unsigned char *
 bfin_breakpoint_from_pc (CORE_ADDR *pcptr, int *lenptr)
 {
   static char bfin_breakpoint[] = REMOTE_BREAKPOINT;
-                                                                                                         
   *lenptr = sizeof (bfin_breakpoint);
   return bfin_breakpoint;
 }
@@ -944,9 +1166,7 @@ bfin_unwind_dummy_id (struct gdbarch *gdbarch, struct frame_info *next_frame)
   frame_unwind_register (next_frame, BFIN_SP_REGNUM, buf);
   sp = extract_unsigned_integer (buf, 4);
 
-
-  /* See the end of bfin_push_dummy_call.  */
-  return frame_id_build (sp + 8, frame_pc_unwind (next_frame));
+  return frame_id_build (sp, frame_pc_unwind (next_frame));
 }
 
 
@@ -1077,6 +1297,8 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
 
   /* Breakpoint manipulation.  PC will get decremented in kernel */
   set_gdbarch_decr_pc_after_break (gdbarch, 0);
+
+  frame_unwind_append_sniffer (gdbarch, bfin_linux_sigtramp_frame_sniffer);
   frame_unwind_append_sniffer (gdbarch, bfin_frame_sniffer);
 
   set_gdbarch_register_sim_regno (gdbarch, bfin_sim_regno);

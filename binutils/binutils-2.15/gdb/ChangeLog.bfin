@@ -1,3 +1,16 @@
+2005-02-27  Srivathsa  <sri@rrap-software.com>
+
+	* bfin-tdep.c (bfin_linux_pc_in_sigtramp, fin_linux_get_sigtramp_info
+        bfin_linux_sigtramp_frame_cache, bfin_linux_sigtramp_frame_this_id,
+        fin_linux_sigtramp_frame_prev_register, bfin_linux_sigtramp_frame_sniffer,
+        bfin_skip_prologue) : Code to support signal trampolines
+
+	* bfin-tdep.c (bfin_push_dummy_call, bfin_unwind_dummy_id) :
+	 Returning proper sp value for stack trace
+
+	* bfin-tdep.c (bfin_frame_cache) : Returning sp based on framed or 
+	frameless function
+
 2005-02-22  Srivathsa  <sri@rrap-software.com>
 
 	* bfin-tdep.c (bfin_skip_prologue) : Code to skip --sp added
