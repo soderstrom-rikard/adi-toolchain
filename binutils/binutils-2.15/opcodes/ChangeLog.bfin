@@ -31,6 +31,16 @@
 
 	* bfin-dis.c: Run through indent and fix up some more style issues
 	manually.
+	(decode_dsp32mult_0, decode_dsp32mac_0): Rewrite using Martin Strubel's
+	code as guideline.
+	(decode_optmode, decode_multfunc, decode_macfunc): New functions,
+	mostly from Martin Strubel's code.
+	(A1macfunc, A0macfunc, macmod_hmove, multfunc): Delete functions.
+	(sysregs3, sysregs2, sysregs1, open, counters, ccstat, ignore_bits,
+	statbits, regs_hi, regs, regs_lo, gregs, dpregs, lregs, bregs, mregs,
+	iregs, accum, accum_word, accum_ext, dregs_hilo, spfp, pregs,
+	dregs_pair, dregs_byte, dregs_lo, dregs_hi): Properly wrap macro arg
+	in parentheses.
 
 2004-11-18  Bernd Schmidt  <bernd.schmidt@analog.com>
 
