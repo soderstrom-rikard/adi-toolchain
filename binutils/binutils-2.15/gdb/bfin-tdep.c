@@ -262,6 +262,12 @@ struct bfin_frame_cache
   long locals;
 };
 
+struct offset_value
+{
+  CORE_ADDR text_addr;
+  long      data_offset;
+};
+
 /* Allocate and initialize a frame cache.  */
 static struct bfin_frame_cache *
 bfin_alloc_frame_cache (void)
@@ -420,8 +426,24 @@ static CORE_ADDR bfin_analyze_prologue(CORE_ADDR pc, CORE_ADDR cur_pc, struct bf
   return pc;
 }
 
-CORE_ADDR text_addr = 0;
-long      data_offset = 0;
+struct offset_value offvalue;
+
+/* initialize the offset values */
+static void set_offset_value(void)
+{
+  offvalue.text_addr = read_register(BFIN_EXTRA1);
+  offvalue.data_offset = read_register(BFIN_EXTRA3) ;
+}
+
+static CORE_ADDR get_text_addr_value()
+{
+  return offvalue.text_addr;
+}
+
+static long get_data_offset_value()
+{
+  return offvalue.data_offset;
+}
 
 static struct bfin_frame_cache *
 bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
@@ -429,24 +451,24 @@ bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
   struct bfin_frame_cache *cache;
   char buf[4];
   int i;
+  static int chk_offvalue;
 
-  if(0 == text_addr)
+  if (!chk_offvalue)
   {
-    text_addr = read_register(BFIN_EXTRA1) ;
-    data_offset = read_register(BFIN_EXTRA3) ;
+    chk_offvalue = 1;
+    set_offset_value();
   }
+
   if (*this_cache)
     return *this_cache;
 
   cache = bfin_alloc_frame_cache ();
   *this_cache = cache;
 
-
   frame_unwind_register (next_frame, BFIN_FP_REGNUM, buf);
   cache->base = extract_unsigned_integer (buf, 4);
-  if(cache->base > text_addr)
-    cache->base -=  text_addr + data_offset;
-
+  if(cache->base > get_text_addr_value())
+    cache->base -=  (get_text_addr_value() + get_data_offset_value());
   if (cache->base == 0)
     return cache;
 
@@ -468,12 +490,12 @@ bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
        FP points to previous frame.
     */
     cache->saved_regs[BFIN_PC_REGNUM] = 
-       read_register(BFIN_RETS_REGNUM) - text_addr;
+       read_register(BFIN_RETS_REGNUM) - get_text_addr_value();
     cache->frameless_pc_value = 1;
     frame_unwind_register (next_frame, BFIN_FP_REGNUM, buf);
     cache->base = extract_unsigned_integer (buf, 4);
-    if(cache->base > text_addr)
-    	cache->base -=  text_addr + data_offset;
+    if(cache->base > get_text_addr_value())
+        cache->base -=  (get_text_addr_value() + get_data_offset_value());
 #ifdef _DEBUG
 fprintf(stderr, "frameless pc case base %x\n", cache->base);
 #endif //_DEBUG 
@@ -555,7 +577,7 @@ bfin_frame_prev_register (struct frame_info *next_frame, void **this_cache,
               *pi = *addrp;
             }
             else{
-              *pi = read_memory_integer (*addrp, 4) - text_addr;
+              *pi = read_memory_integer (*addrp, 4) - get_text_addr_value();
             }
           }
           else if(regnum == BFIN_FP_REGNUM){
