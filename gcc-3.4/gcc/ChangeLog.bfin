@@ -5,6 +5,11 @@
 	memory alternatives as type "mcld".
 	(subreg hisi extendpattern): Delete.
 
+	* config/bfin/bfin.md (iordi3, anddi3, xordi3): Turn into 2-operand
+	insns.
+	(iordi_sesidi_di, anddi_sesidi_di, xordi_sesidi_di): Likewise, also
+	add scratch register to avoid clobbering one of the inputs too early.
+
 2004-10-04  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (hard_regno_mode_ok): Allow all registers to hold

@@ -406,7 +406,7 @@
 ;;;<<<  Logical-and        >>>;;;
 (define_insn "anddi3"
   [(set (match_operand:DI 0 "register_operand" "=d")
-        (and:DI (match_operand:DI 1 "register_operand" "d")
+        (and:DI (match_operand:DI 1 "register_operand" "0")
                 (match_operand:DI 2 "register_operand" "d")))]
   ""
   "%0 = %1 & %2;\\n\\t%H0 = %H1 & %H2;"
@@ -425,15 +425,16 @@
   [(set (match_operand:DI 0 "register_operand" "=d")
         (and:DI (sign_extend:DI
                  (match_operand:SI 2 "register_operand" "d"))
-                 (match_operand:DI 1 "register_operand" "d")))]
+                 (match_operand:DI 1 "register_operand" "0")))
+   (clobber (match_scratch:SI 3 "=&d"))]
   ""
-  "%0 = %1 & %2;\\n\\t%H0 = %2;\\n\\t%H0>>>=31;\\n\\t%H0 = %H0 & %H1;"
+  "%0 = %1 & %2;\\n\\t%3 = %2;\\n\\t%3 >>>= 31;\\n\\t%H0 = %H1 & %3;"
 [(set_attr "length" "8")])
 
 ;;;<<<  Logical-or         >>>;;;
 (define_insn "iordi3"
   [(set (match_operand:DI 0 "register_operand" "=d")
-        (ior:DI (match_operand:DI 1 "register_operand" "d")
+        (ior:DI (match_operand:DI 1 "register_operand" "0")
                 (match_operand:DI 2 "register_operand" "d")))]
   ""
   "%0 = %1 | %2;\\n\\t%H0 = %H1 | %H2;"
@@ -452,15 +453,16 @@
   [(set (match_operand:DI 0 "register_operand" "=d")
         (ior:DI (sign_extend:DI
                  (match_operand:SI 2 "register_operand" "d"))
-                 (match_operand:DI 1 "register_operand" "d")))]
+                 (match_operand:DI 1 "register_operand" "0")))
+   (clobber (match_scratch:SI 3 "=&d"))]
   ""
-  "%0 = %1 | %2;\\n\\t%H0 = %2;\\n\\t%H0>>>=31;\\n\\t%H0 = %H0 | %H1;"
-[(set_attr "length" "8")]) 
+  "%0 = %1 | %2;\\n\\t%3 = %2;\\n\\t%3 >>>= 31;\\n\\t%H0 = %H1 | %3;"
+[(set_attr "length" "8")])
 
 ;;;<<<  Logical-xor        >>>;;;
 (define_insn "xordi3"
   [(set (match_operand:DI 0 "register_operand" "=d")
-        (xor:DI (match_operand:DI 1 "register_operand" "d")
+        (xor:DI (match_operand:DI 1 "register_operand" "0")
                 (match_operand:DI 2 "register_operand" "d")))]
   ""
   "%0 = %1 ^ %2;\\n\\t%H0 = %H1 ^ %H2;"
@@ -479,9 +481,10 @@
   [(set (match_operand:DI 0 "register_operand" "=d")
         (xor:DI (sign_extend:DI
                  (match_operand:SI 2 "register_operand" "d"))
-                 (match_operand:DI 1 "register_operand" "d")))]
+                 (match_operand:DI 1 "register_operand" "0")))
+   (clobber (match_scratch:SI 3 "=&d"))]
   ""
-  "%0 = %1 ^ %2;\\n\\t%H0 = %2;\\n\\t%H0>>>=31;\\n\\t%H0 = %H0 ^ %H1;"
+  "%0 = %1 ^ %2;\\n\\t%3 = %2;\\n\\t%3 >>>= 31;\\n\\t%H0 = %H1 ^ %3;"
 [(set_attr "length" "8")]) 
 
 (define_insn "negdi2"
