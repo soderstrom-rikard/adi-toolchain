@@ -363,13 +363,16 @@ md_assemble (char *line)
 	/*Following if condition checks for the arithmetic relocations. 
 	 * If the case then it doesn't required to generate the code.
 	 * It has been assumed that, their ID will be contiguous*/
-	if(((BFD_ARELOC_E0 <= insn->reloc) && (BFD_ARELOC_F3 >= insn->reloc)) ||
+	if(((BFD_ARELOC_PUSH <= insn->reloc) && (BFD_ARELOC_COMP >= insn->reloc)) ||
 		insn->reloc == BFD_RELOC_16_IMM)
 	{
 //fprintf(stderr, "generating reloc for %x at %x\n", insn->reloc, toP);
 		gen_insn = 0;
 		size = 2;
 	}
+        if(insn->reloc == BFD_ARELOC_CONST){
+          size = 4; // the constant in an expression can be large
+        }
 	if(gen_insn){
           toP = frag_more(2);
           md_number_to_chars(toP, insn->value, 2);
@@ -650,7 +653,7 @@ return; // currently let us not fix local relocations.
           }
         break;
 		//added following line for arithmetic reloc check -Jyotik
-     default: if((BFD_ARELOC_E0 > fixP->fx_r_type) || (BFD_ARELOC_F3 < fixP->fx_r_type))
+     default: if((BFD_ARELOC_PUSH > fixP->fx_r_type) || (BFD_ARELOC_COMP < fixP->fx_r_type))
 		      {
 
 		abort ();
@@ -846,6 +849,14 @@ INSTR_T notereloc1(INSTR_T code, const char *symbol, int reloc, int pcrel)
   return (code);
 }
 
+INSTR_T notereloc2(INSTR_T code, const char *symbol, int reloc, int value, int pcrel)
+{
+  (code)->reloc = reloc;
+  (code)->exp = mkexpr(value, symbol_find_or_make(symbol));
+  (code)->pcrel = pcrel;
+  return (code);
+}
+
 INSTR_T gencode(unsigned long x)
 {
   INSTR_T cell = (INSTR_T)obstack_alloc (&mempool, sizeof (struct bfin_insn));
@@ -950,11 +961,11 @@ static INSTR_T ExprNodeGenRelocR(ExprNode *head)
   switch(head->type)
   {
   case ExprNodeConstant : 
-    note =  CONSCODE(NOTERELOC1(0, BFD_ARELOC_E1, con, GENCODE(0x0)), 
+    note =  CONSCODE(NOTERELOC2(0, BFD_ARELOC_CONST, con, head->value.i_value, GENCODE(0x0)), 
                      NULL_CODE);
     break;
   case ExprNodeReloc :  
-    note = CONSCODE(NOTERELOC(0, BFD_ARELOC_E0, head, GENCODE(0x0)), 
+    note = CONSCODE(NOTERELOC(0, BFD_ARELOC_PUSH, head, GENCODE(0x0)), 
                     NULL_CODE); 
     break;    
   case ExprNodeBinop :   
@@ -964,62 +975,62 @@ static INSTR_T ExprNodeGenRelocR(ExprNode *head)
     {
       case  ExprOpTypeAdd  :  
         note = CONCTCODE(note1, 
-                  CONSCODE(NOTERELOC1(0, BFD_ARELOC_E2, op, GENCODE(0x0)), 
+                  CONSCODE(NOTERELOC1(0, BFD_ARELOC_ADD, op, GENCODE(0x0)), 
                            NULL_CODE));
         break;
       case  ExprOpTypeSub   :  
         note = CONCTCODE(note1, 
-                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_E3, op, GENCODE(0x0)), 
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_SUB, op, GENCODE(0x0)), 
 														NULL_CODE));
           break;
       case  ExprOpTypeMult   :  
          note = CONCTCODE(note1,
-                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_E4, op, GENCODE(0x0)), 
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_MULT, op, GENCODE(0x0)), 
 														NULL_CODE));
           break;
       case  ExprOpTypeDiv  :   
 					note = CONCTCODE(note1,  
-                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_E5, op, GENCODE(0x0)), 
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_DIV, op, GENCODE(0x0)), 
 														NULL_CODE));
           break;
       case  ExprOpTypeMod  :   
 					note = CONCTCODE(note1,
-                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_E6, op, GENCODE(0x0)), 
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_MOD, op, GENCODE(0x0)), 
 														NULL_CODE));
           break;
       case  ExprOpTypeLsft  :   
 					note = CONCTCODE(note1,
-                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_E7, op, GENCODE(0x0)), 
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_LSHIFT, op, GENCODE(0x0)), 
 														NULL_CODE));
           break;
       case  ExprOpTypeRsft  :   
 					note = CONCTCODE(note1,
-                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_E8, op, GENCODE(0x0)), 
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_RSHIFT, op, GENCODE(0x0)), 
 														NULL_CODE));
           break;
       case  ExprOpTypeBAND  :   
 					note = CONCTCODE(note1,
-                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_E9, op, GENCODE(0x0)), 
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_AND, op, GENCODE(0x0)), 
 														NULL_CODE));
           break;
       case  ExprOpTypeBOR  :   
 					note = CONCTCODE(note1,
-                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_EA, op, GENCODE(0x0)), 
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_OR, op, GENCODE(0x0)), 
 														NULL_CODE));
           break;
       case  ExprOpTypeBXOR  :    
 					note = CONCTCODE(note1,
-                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_EB, op, GENCODE(0x0)), 
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_XOR, op, GENCODE(0x0)), 
 														NULL_CODE));
           break;
       case  ExprOpTypeLAND  :     
 					note = CONCTCODE(note1,
-                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_EC, op, GENCODE(0x0)), 
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_LAND, op, GENCODE(0x0)), 
 														NULL_CODE));
           break;
       case  ExprOpTypeLOR  :   
 					note = CONCTCODE(note1,
-                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_ED, op, GENCODE(0x0)), 
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_LOR, op, GENCODE(0x0)), 
 														NULL_CODE));
           break;
       default      : fprintf(stderr, 
@@ -1036,12 +1047,12 @@ static INSTR_T ExprNodeGenRelocR(ExprNode *head)
     {
       case  ExprOpTypeNEG  :   
 					note = CONCTCODE(note1,
-                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_EF, op, GENCODE(0x0)), 
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_NEG, op, GENCODE(0x0)), 
 														NULL_CODE));
           break;
       case  ExprOpTypeCOMP  :    
 					note = CONCTCODE(note1,
-                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_F0, op, GENCODE(0x0)), 
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_COMP, op, GENCODE(0x0)), 
 														NULL_CODE));
           break;
       default      : fprintf(stderr, 

@@ -96,6 +96,7 @@ extern INSTR_T notereloc1(INSTR_T code, const char * sym, int reloc, int pcrel);
 #define GENCODE(x)                gencode(x)
 #define NOTERELOC(pcrel, rel, expr, code)  notereloc(code,expr,rel,pcrel)
 #define NOTERELOC1(pcrel, rel, expr, code)  notereloc1(code,expr,rel,pcrel)
+#define NOTERELOC2(pcrel, rel, expr, value, code)  notereloc2(code,expr,rel,value,pcrel)
  
  
 /****************typedef and methods related to new expresion parser ***/

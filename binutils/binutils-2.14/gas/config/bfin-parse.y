@@ -18157,7 +18157,7 @@ offset_expr	: PLUS eterm    { $$ = $2; }
 		|		{ $$ = NULL; }
 		;
 
-expr		: eterm				{ $$ = $1; }
+expr		: expr_1				{ $$ = $1; }
 		;
 
 expr_1		: expr_1 STAR expr_1		{ $$ = binary(ExprOpTypeMult,$1,$3);   }
@@ -18244,10 +18244,10 @@ static ExprNode * unary(ExprOpType op,ExprNode * x)
   if(x->type == ExprNodeConstant){
     switch (op) {
         case ExprOpTypeNEG: 
-                x->value.i_value = -x->value.i_value;
+                x->value.i_value = ~x->value.i_value;
 		break;
         case ExprOpTypeCOMP: 
-                x->value.i_value = ~x->value.i_value;
+                x->value.i_value = -x->value.i_value;
 		break;
 	default :  fprintf(stderr, "Internal compiler error at line %d in file %s\n", __LINE__, __FILE__);
     }
@@ -18269,11 +18269,11 @@ static int const_fits(ExprNode * expr, const_forms_t form) {
     int issigned = constant_formats[form].issigned;
 
     /* check if reloc is allowed */
-    if((expr->type == ExprNodeReloc) && 
+    if((expr->type != ExprNodeConstant) && 
         !constant_formats[form].reloc)
 	return 0;
 
-    if(expr->type == ExprNodeReloc)
+    if(expr->type != ExprNodeConstant)
       return 1; // it will be relocated, not a constant
 
     if (sz < 32) {
