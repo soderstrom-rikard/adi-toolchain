@@ -1,3 +1,7 @@
+2004-10-22  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin/bfin-dis.c (sub32): Invert carry flag.
+
 2004-10-12  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin/bfin-dis.c (decode_CC2dreg_0): DREG to CC sets CC if

@@ -127,7 +127,7 @@ sub32 (bu32 a, bu32 b, int carry)
   saved_state.v_internal |= overflow;
   saved_state.az = v == 0;
   if (carry)
-    saved_state.ac0 = b > a;
+    saved_state.ac0 = b <= a;
   return v;
 }
 
