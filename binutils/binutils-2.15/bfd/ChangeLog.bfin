@@ -1,3 +1,7 @@
+2004-12-28  Pradip Shah <pcs@rrap-software.com>
+
+	* elf32-bfin.c (R_got, R_pltpc) PIC support.
+
 2004-12-03  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* elf32-bfin.c (ELF_MACHINE_CODE): Use EM_BLACKFIN.

@@ -1,3 +1,12 @@
+2004-12-30  Pradip Shah <pcs@rrap-software.com>
+
+	* config/tc-bfin.c : Fixed compiler error.
+
+2004-12-29  Pradip Shah <pcs@rrap-software.com>
+
+	* config/bfin-parse.y, config/bfin-lex.l : GOT & PLTPC support.
+	* config/tc-bfin.c : same
+
 2004-12-20  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/tc-bfin.c (md_apply_fix3): Discard unused absolute relocs.
@@ -11,6 +20,7 @@
 	* config/tc-bfin.c (gen_ldstiifp): Fix compilation error.
 
 2004-12-14  Raja <raja@rrap-software.com>
+
         * config/tc-bfin.c: in bfin-opcodes.h, reverted to explicit shifts instead of using
          union to fix Endianess issue.
 
