@@ -1,0 +1,44 @@
+##
+## Copyright (c) 2000, 2001 Analog Devices Inc.,
+## Copyright (c) 2000, 2001 by Lineo, Inc./Lineo Canada Corp. (www.lineo.com),
+## Copyright (c) 2001 by Arcturus Networks Inc. (www.arcturusnetworks.com),
+## Ported for Blackfin/Frio Architecture by Akbar Hussain  <akbar.hussain@arcturusnetworks.com>,
+##                                          Tony Kou <tony.ko@arcturusnetworks.com>
+## Modified by A Raja <raja@rrap-software.com>
+##
+
+
+## Target part of the Makefile
+
+## We do not want to build for C++ on the blackfin target for now
+EXTRA_PARTS =
+
+# Do not build libgcc1.
+LIBGCC1 =
+LIBGCC2 =
+LIBGCC1_TEST = 
+CROSS_LIBGCC1 =
+
+LANGUAGES = c
+
+LIBGCC = 
+INSTALL_LIBGCC = 
+USE_COLLECT2 =
+#cpp_install_dir=$(prefix)/bin
+CROSS_INCLUDE_DIR=$(tooldir)/include
+INSTALL_HEADERS=
+LIBC=$(tooldir)/lib
+
+# These are really part of libgcc1, but this will cause them to be
+# built correctly, so... [taken from t-sparclite]
+LIB2FUNCS_EXTRA = fp-bit.c
+ 
+#dp-bit.c: $(srcdir)/config/fp-bit.c
+#	cat $(srcdir)/config/fp-bit.c > dp-bit.c
+ 
+# Currently is not used
+fp-bit.c: $(srcdir)/config/fp-bit.c
+	echo '#define FLOAT' > fp-bit.c
+	echo '#define FLOAT_ONLY' > fp-bit.c
+	cat $(srcdir)/config/fp-bit.c >> fp-bit.c
+
