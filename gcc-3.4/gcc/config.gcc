@@ -1665,13 +1665,13 @@ mn10300-*-*)
 	use_fixproto=yes
 	;;
 bfin*-elf*)
-	tm_file="${tm_file} dbxelf.h"
+	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h"
         tmake_file=bfin/t-bfin-elf
         use_collect2=no
 #       fixincludes=Makefile.in
         ;;  
 bfin*-*)
-	tm_file="${tm_file} dbxelf.h"
+	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h"
         xm_file="${xm_file} bfin/xm-i386.h"
         tmake_file=bfin/t-bfin
         use_collect2=no
