@@ -1200,7 +1200,7 @@ dump_symbols(symbols, number_of_symbols);
 				else
 					*(unsigned long *)r_mem = tmp.l;
 #elif defined(TARGET_bfin)
-				if (sym_reloc_size == 4) {
+	if (sym_reloc_size == 4) {
            if(((*p)->howto->type == R_pcrel24) ||
               ((*p)->howto->type == R_pcrel24_jump_l)	||
               ((*p)->howto->type == R_pcrel24_jump_x) ||
@@ -1224,12 +1224,13 @@ dump_symbols(symbols, number_of_symbols);
             } else {
               *((unsigned short *)(sectionp+q->address)) = (unsigned short)(sym_addr>>16);
             }
-          } else if((0xE0 == (*p)->howto->type) || (0xE1 == (*p)->howto->type)){
+          } else if((0xE0 <= (*p)->howto->type) && (0xF3 >= (*p)->howto->type)){
 
 		//push and const are 4 byte so just by pass it
               }
 	    else {
-            printf("Blackfin relocation doomed\n");
+            //printf("Blackfin relocation doomed\n");
+	    printf("Blackfin relocation fail for reloc type: 0x%x\n", (*p)->howto->type);
           }
 
 #else /* ! TARGET_arm */
