@@ -1,3 +1,8 @@
+2005-02-01  Catherine Moore  <clm@cm00re.com>
+
+	* bfin-dis.c (decode_dsp32shift_0): Improve whitespace.
+	(decode_dsp32alu_0):  Handle add with saturation flag.
+
 2005-01-28  Catherine Moore  <clm@cm00re.com>
 
 	* bfin-dis.c (decode_dspshiftimm_0):  Handle vector shift

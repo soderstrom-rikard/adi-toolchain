@@ -4533,6 +4533,26 @@ decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "(V)");
       return 2 * 2;
     }
+  else if (aop == 3 && s == 1 && HL == 0 && aopcde == 7)
+    {
+      notethat ("dregs = - dregs (S)");
+      OUTS (outf, dregs (dst0));
+      OUTS (outf, "=");
+      OUTS (outf, "-");
+      OUTS (outf, dregs (src0));
+      OUTS (outf, "(S)");
+      return 2 * 2;
+    }
+  else if (aop == 3 && s == 0 && HL == 0 && aopcde == 7)
+    {
+      notethat ("dregs = - dregs (NS)");
+      OUTS (outf, dregs (dst0));
+      OUTS (outf, "=");
+      OUTS (outf, "-");
+      OUTS (outf, dregs (src0));
+      OUTS (outf, "(NS)");
+      return 2 * 2;
+    }
   else if (aop == 1 && HL == 1 && aopcde == 11)
     {
       notethat ("dregs_hi = ( A0 += A1 )");
@@ -5422,7 +5442,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs_lo = SIGNBITS dregs");
       OUTS (outf, dregs_lo (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "SIGNBITS");
+      OUTS (outf, "SIGNBITS ");
       OUTS (outf, dregs (src1));
       return 2 * 2;
     }
@@ -5431,7 +5451,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs_lo = SIGNBITS dregs_lo");
       OUTS (outf, dregs_lo (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "SIGNBITS");
+      OUTS (outf, "SIGNBITS ");
       OUTS (outf, dregs_lo (src1));
       return 2 * 2;
     }
@@ -5440,7 +5460,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs_lo = SIGNBITS dregs_hi");
       OUTS (outf, dregs_lo (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "SIGNBITS");
+      OUTS (outf, "SIGNBITS ");
       OUTS (outf, dregs_hi (src1));
       return 2 * 2;
     }
@@ -5449,7 +5469,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs_lo = SIGNBITS A0");
       OUTS (outf, dregs_lo (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "SIGNBITS");
+      OUTS (outf, "SIGNBITS ");
       OUTS (outf, "A0");
       return 2 * 2;
     }
@@ -5458,7 +5478,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs_lo = SIGNBITS A1");
       OUTS (outf, dregs_lo (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "SIGNBITS");
+      OUTS (outf, "SIGNBITS ");
       OUTS (outf, "A1");
       return 2 * 2;
     }
@@ -5467,7 +5487,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs_lo = ONES dregs");
       OUTS (outf, dregs_lo (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "ONES");
+      OUTS (outf, "ONES ");
       OUTS (outf, dregs (src1));
       return 2 * 2;
     }
