@@ -1,3 +1,8 @@
+2005-02-18  Raja  <raja@rrap-software.com>
+
+        * config/bfin/bfin.c (print_operand): Generating only GOT, no PLTPC 
+	(call_insn_operand): Explicitly allow SYMBOL_REF if not -fpic
+
 2005-02-14  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_expand_prologue): Don't load the PIC register
