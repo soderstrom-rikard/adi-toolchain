@@ -71,7 +71,7 @@ syscfg|SYSCFG      _REG.regno = REG_SYSCFG; return REG;
 sti|STI                                 return STI;
 ssync|SSYNC                             return SSYNC;
 sp"."l|SP"."L                           _REG.regno = REG_SP; return HALF_REG;
-sp"."h|SP"."H                           _REG.regno = REG_SP; return HALF_REG;
+sp"."h|SP"."H                           _REG.regno = REG_SP | F_REG_HIGH; return HALF_REG;
 sp|SP                                   _REG.regno = REG_SP; return REG;
 signbits|SIGNBITS                       return SIGNBITS;
 sign|SIGN                               return SIGN;
@@ -161,7 +161,7 @@ ge|GE                                   return GE;
 fu|FU                                   yylval.value = M_FU; return MMOD;
 fp|FP            _REG.regno = REG_FP; return REG;
 fp"."l|FP"."L    _REG.regno = REG_FP; return HALF_REG;
-fp"."h|FP"."H    _REG.regno = REG_FP; return HALF_REG;
+fp"."h|FP"."H    _REG.regno = REG_FP | F_REG_HIGH; return HALF_REG;
 
 extract|EXTRACT                         return EXTRACT;
 expadj|EXPADJ                           return EXPADJ;
