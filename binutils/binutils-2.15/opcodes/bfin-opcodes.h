@@ -18,6 +18,8 @@
 // This just sets the multi instruction bit of a DSP32 instruction
 #define SET_MULTI_INSTRUCTION_BIT(x) x->value |= BIT_MULTI_INS;
 
+#include <asm/byteorder.h>
+
 
 ////////////////////////////////////////////////////////////////////////////
 //
@@ -34,6 +36,7 @@
 typedef union _dsp32mac {
 	unsigned long opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned long src1:3;
 		unsigned long src0:3;
 		unsigned long dst:3;
@@ -52,6 +55,28 @@ typedef union _dsp32mac {
 		unsigned long code2:2;
 		unsigned long M:1;
 		unsigned long code:4;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned long code:4;
+                unsigned long M:1;
+                unsigned long code2:2;
+                unsigned long mmod:4;
+                unsigned long MM:1;
+                unsigned long P:1;
+                unsigned long w1:1;
+                unsigned long op1:2;
+
+                unsigned long h01:1;
+                unsigned long h11:1;
+                unsigned long w0:1;
+                unsigned long op0:2;
+                unsigned long h00:1;
+                unsigned long h10:1;
+                unsigned long dst:3;
+                unsigned long src0:3;
+                unsigned long src1:3;
+#else 
+#error "Unknown bitfield order forfiles."
+# endif
 	} bits;
 } DSP32Mac;
 
@@ -78,6 +103,7 @@ typedef DSP32Mac DSP32Mult;
 typedef union _dsp32alu {
 	unsigned long opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned long src1:3;
 		unsigned long src0:3;
 		unsigned long dst1:3;
@@ -92,6 +118,24 @@ typedef union _dsp32alu {
 		unsigned long code2:2;
 		unsigned long M:1;
 		unsigned long code:4;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned long code:4;
+                unsigned long M:1;
+                unsigned long code2:2;
+                unsigned long dontcare:3;
+                unsigned long HL:1;
+                unsigned long aopcde:5;
+
+                unsigned long aop:2;
+                unsigned long s:1;
+                unsigned long x:1;
+                unsigned long dst0:3;
+                unsigned long dst1:3;
+                unsigned long src0:3;
+                unsigned long src1:3;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } DSP32Alu;
 
@@ -109,6 +153,7 @@ typedef union _dsp32alu {
 typedef union _dsp32shift {
 	unsigned long opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned long src1:3;
 		unsigned long src0:3;
 		unsigned long dst1:3; // Don't care
@@ -121,6 +166,22 @@ typedef union _dsp32shift {
 		unsigned long code2:4;
 		unsigned long M:1;
 		unsigned long code:4;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned long code:4;
+                unsigned long M:1;
+                unsigned long code2:4;
+                unsigned long dontcare:2;
+                unsigned long sopcde:5;
+
+                unsigned long sop:2;
+                unsigned long HLs:2;
+                unsigned long dst0:3;
+                unsigned long dst1:3; // Don't care
+                unsigned long src0:3;
+                unsigned long src1:3;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } DSP32Shift;
 
@@ -136,6 +197,7 @@ typedef union _dsp32shift {
 typedef union _dsp32shiftimm {
 	unsigned long opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned long src1:3;
 		unsigned long immag:6;
 		unsigned long dst0:3;
@@ -147,6 +209,21 @@ typedef union _dsp32shiftimm {
 		unsigned long code2:4;
 		unsigned long M:1;
 		unsigned long code:4;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned long code:4;
+                unsigned long M:1;
+                unsigned long code2:4;
+                unsigned long dontcare:2;
+                unsigned long sopcde:5;
+
+                unsigned long sop:2;
+                unsigned long HLs:2;
+                unsigned long dst0:3;
+                unsigned long immag:6;
+                unsigned long src1:3;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } DSP32ShiftImm;
 
@@ -166,6 +243,7 @@ typedef union _dsp32shiftimm {
 typedef union _ldsidxi {
 	unsigned long opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		short offset;
 		unsigned short reg:3;
 		unsigned short ptr:3;
@@ -173,6 +251,17 @@ typedef union _ldsidxi {
 		unsigned short Z:1;
 		unsigned short W:1;
 		unsigned short code:6;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:6;
+                unsigned short W:1;
+                unsigned short Z:1;
+                unsigned short sz:2;
+                unsigned short ptr:3;
+                unsigned short reg:3;
+                short offset;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } LDSTidxI;
 
@@ -188,6 +277,7 @@ typedef union _ldsidxi {
 typedef union _ldst {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short reg:3;
 		unsigned short ptr:3;
 		unsigned short Z:1;
@@ -195,6 +285,17 @@ typedef union _ldst {
 		unsigned short W:1;
 		unsigned short sz:2;
 		unsigned short code:4;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:4;
+                unsigned short sz:2;
+                unsigned short W:1;
+                unsigned short aop:2;
+                unsigned short Z:1;
+                unsigned short ptr:3;
+                unsigned short reg:3;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } LDST;
 
@@ -210,12 +311,23 @@ typedef union _ldst {
 typedef union _ldstii {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short reg:3;
 		unsigned short ptr:3;
 		unsigned short offset:4;
 		unsigned short op:2;
 		unsigned short W:1;
 		unsigned short code:3;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:3;
+                unsigned short W:1;
+                unsigned short op:2;
+                unsigned short offset:4;
+                unsigned short ptr:3;
+                unsigned short reg:3;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } LDSTii;
 
@@ -231,10 +343,19 @@ typedef union _ldstii {
 typedef union _ldstiifp {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short reg:4;
 		unsigned short offset:5;
 		unsigned short W:1;
 		unsigned short code:6;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:6;
+                unsigned short W:1;
+                unsigned short offset:5;
+                unsigned short reg:4;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } LDSTiiFP;
 
@@ -250,12 +371,23 @@ typedef union _ldstiifp {
 typedef union _dspldst {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short reg:3;
 		unsigned short i:2;
 		unsigned short m:2;
 		unsigned short aop:2;
 		unsigned short W:1;
 		unsigned short code:6;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:6;
+                unsigned short W:1;
+                unsigned short aop:2;
+                unsigned short m:2;
+                unsigned short i:2;
+                unsigned short reg:3;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } DspLDST;
 
@@ -271,12 +403,23 @@ typedef union _dspldst {
 typedef union _ldstpmod {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short ptr:3;
 		unsigned short idx:3;
 		unsigned short reg:3;
 		unsigned short aop:2;
 		unsigned short W:1;
 		unsigned short code:4;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:4;
+                unsigned short W:1;
+                unsigned short aop:2;
+                unsigned short reg:3;
+                unsigned short idx:3;
+                unsigned short ptr:3;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } LDSTpmod;
 
@@ -293,10 +436,19 @@ typedef union _ldstpmod {
 typedef union _logi2op {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short dst:3;
 		unsigned short src:5;
 		unsigned short opc:3;
 		unsigned short code:5;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:5;
+                unsigned short opc:3;
+                unsigned short src:5;
+                unsigned short dst:3;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } LOGI2op;
 
@@ -312,10 +464,19 @@ typedef union _logi2op {
 typedef union _alu2op {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short dst:3;
 		unsigned short src:3;
 		unsigned short opc:4;
 		unsigned short code:6;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:6;
+                unsigned short opc:4;
+                unsigned short src:3;
+                unsigned short dst:3;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } ALU2op;
 
@@ -331,10 +492,19 @@ typedef union _alu2op {
 typedef union _brcc {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short offset:10;
 		unsigned short B:1;
 		unsigned short T:1;
 		unsigned short code:4;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:4;
+                unsigned short T:1;
+                unsigned short B:1;
+                unsigned short offset:10;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } BRCC;
 
@@ -350,8 +520,15 @@ typedef union _brcc {
 typedef union _ujump {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short offset:12;
 		unsigned short code:4;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:4;
+                unsigned short offset:12;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } UJump;
 
@@ -367,9 +544,17 @@ typedef union _ujump {
 typedef union _progctrl {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short poprnd:4;
 		unsigned short prgfunc:4;
 		unsigned short code:8;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:8;
+                unsigned short prgfunc:4;
+                unsigned short poprnd:4;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } ProgCtrl;
 
@@ -386,9 +571,17 @@ typedef union _progctrl {
 typedef union _calla {
 	unsigned long opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned long addr:24;
 		unsigned long S:1;
 		unsigned long code:7;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned long code:7;
+                unsigned long S:1;
+                unsigned long addr:24;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } CALLa;
 
@@ -404,10 +597,19 @@ typedef union _calla {
 typedef union _pseudodbg {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short reg:3;
 		unsigned short grp:3;
 		unsigned short fn:2;
 		unsigned short code:8;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:8;
+                unsigned short fn:2;
+                unsigned short grp:3;
+                unsigned short reg:3;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } PseudoDbg;
 
@@ -424,11 +626,21 @@ typedef union _pseudodbg {
 typedef union _pseudodbg_assert {
 	unsigned long opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned long expected:16;
 		unsigned long regtest:3;
 		unsigned long dbgop:3;
 		unsigned long dontcare:5;
 		unsigned long code:5;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned long code:5;
+                unsigned long dontcare:5;
+                unsigned long dbgop:3;
+                unsigned long regtest:3;
+                unsigned long expected:16;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } PseudoDbg_Assert;
 
@@ -444,10 +656,19 @@ typedef union _pseudodbg_assert {
 typedef union _cactrl {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short reg:3;
 		unsigned short op:2;
 		unsigned short a:1;
 		unsigned short code:10;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:10;
+                unsigned short a:1;
+                unsigned short op:2;
+                unsigned short reg:3;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } CaCTRL;
 
@@ -463,12 +684,23 @@ typedef union _cactrl {
 typedef union _pushpopmultiple {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short pr:3;
 		unsigned short dr:3;
 		unsigned short W:1;
 		unsigned short p:1;
 		unsigned short d:1;
 		unsigned short code:7;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:7;
+                unsigned short d:1;
+                unsigned short p:1;
+                unsigned short W:1;
+                unsigned short dr:3;
+                unsigned short pr:3;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } PushPopMultiple;
 
@@ -484,10 +716,19 @@ typedef union _pushpopmultiple {
 typedef union _pushpopreg {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short reg:3;
 		unsigned short grp:3;
 		unsigned short W:1;
 		unsigned short code:9;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:9;
+                unsigned short W:1;
+                unsigned short grp:3;
+                unsigned short reg:3;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } PushPopReg;
 
@@ -503,9 +744,17 @@ typedef union _pushpopreg {
 typedef union _linkage {
 	unsigned long opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned long framesize:16;
 		unsigned long R:1;
 		unsigned long code:15;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned long code:15;
+                unsigned long R:1;
+                unsigned long framesize:16;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } Linkage;
 
@@ -522,6 +771,7 @@ typedef union _linkage {
 typedef union _loopsetup {
 	unsigned long opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned long eoffset:10;
 		unsigned long dontcare:2;
 		unsigned long reg:4;
@@ -529,6 +779,17 @@ typedef union _loopsetup {
 		unsigned long c:1;
 		unsigned long rop:2;
 		unsigned long code:9;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned long code:9;
+                unsigned long rop:2;
+                unsigned long c:1;
+                unsigned long soffset:4;
+                unsigned long reg:4;
+                unsigned long dontcare:2;
+                unsigned long eoffset:10;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } LoopSetup;
 
@@ -545,6 +806,7 @@ typedef union _loopsetup {
 typedef union _ldimmhalf {
 	unsigned long opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short hword;
 		unsigned short reg:3;
 		unsigned short grp:2;
@@ -552,7 +814,17 @@ typedef union _ldimmhalf {
 		unsigned short H:1;
 		unsigned short Z:1;
 		unsigned short code:8;
-
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:8;
+                unsigned short Z:1;
+                unsigned short H:1;
+                unsigned short S:1;
+                unsigned short grp:2;
+                unsigned short reg:3;
+                unsigned short hword;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } LDIMMhalf;
 
@@ -568,9 +840,17 @@ typedef union _ldimmhalf {
 typedef union _cc2dreg {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short reg:3;
 		unsigned short op:2;
 		unsigned short code:11;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:11;
+                unsigned short op:2;
+                unsigned short reg:3;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } CC2dreg;
 
@@ -586,10 +866,19 @@ typedef union _cc2dreg {
 typedef union _ptr2op {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short dst:3;
 		unsigned short src:3;
 		unsigned short opc:3;
 		unsigned short code:7;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:7;
+                unsigned short opc:3;
+                unsigned short src:3;
+                unsigned short dst:3;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } PTR2op;
 
@@ -605,11 +894,21 @@ typedef union _ptr2op {
 typedef union _comp3op {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short src0:3;
 		unsigned short src1:3;
 		unsigned short dst:3;
 		unsigned short opc:3;
 		unsigned short code:4;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:4;
+                unsigned short opc:3;
+                unsigned short dst:3;
+                unsigned short src1:3;
+                unsigned short src0:3;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } COMP3op;
 
@@ -624,12 +923,23 @@ typedef union _comp3op {
 typedef union _ccmv {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short src:3;
 		unsigned short dst:3;
 		unsigned short s:1;
 		unsigned short d:1;
 		unsigned short T:1;
 		unsigned short code:7;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:7;
+                unsigned short T:1;
+                unsigned short d:1;
+                unsigned short s:1;
+                unsigned short dst:3;
+                unsigned short src:3;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } CCmv;
 
@@ -645,12 +955,23 @@ typedef union _ccmv {
 typedef union _ccflag {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short x:3;
 		unsigned short y:3;
 		unsigned short G:1;
 		unsigned short opc:3;
 		unsigned short I:1;
 		unsigned short code:5;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:5;
+                unsigned short I:1;
+                unsigned short opc:3;
+                unsigned short G:1;
+                unsigned short y:3;
+                unsigned short x:3;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } CCflag;
 
@@ -666,10 +987,19 @@ typedef union _ccflag {
 typedef union _cc2stat {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short cbit:5;
 		unsigned short op:2;
 		unsigned short D:1;
 		unsigned short code:8;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:8;
+                unsigned short D:1;
+                unsigned short op:2;
+                unsigned short cbit:5;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } CC2stat;
 
@@ -685,11 +1015,21 @@ typedef union _cc2stat {
 typedef union _regmv {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short src:3;
 		unsigned short dst:3;
 		unsigned short gs:3;
 		unsigned short gd:3;
 		unsigned short code:4;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:4;
+                unsigned short gd:3;
+                unsigned short gs:3;
+                unsigned short dst:3;
+                unsigned short src:3;
+#else 
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } RegMv;
 
@@ -705,10 +1045,19 @@ typedef union _regmv {
 typedef union _compi2opd {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short dst:3;
 		unsigned short src:7;
 		unsigned short op:1;
 		unsigned short code:5;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:5;
+                unsigned short op:1;
+                unsigned short src:7;
+                unsigned short dst:3;
+#else
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } COMPI2opD;
 
@@ -734,12 +1083,23 @@ typedef COMPI2opD COMPI2opP;
 typedef union _dagmodim {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short i:2;
 		unsigned short m:2;
 		unsigned short op:1;
 		unsigned short code2:2;
 		unsigned short br:1;
 		unsigned short code:8;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:8;
+                unsigned short br:1;
+                unsigned short code2:2;
+                unsigned short op:1;
+                unsigned short m:2;
+                unsigned short i:2;
+#else
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } DagMODim;
 
@@ -754,9 +1114,17 @@ typedef union _dagmodim {
 typedef union _dagmodik {
 	unsigned short opcode;
 	struct {
+#if defined(__LITTLE_ENDIAN_BITFIELD)
 		unsigned short i:2;
 		unsigned short op:2;
 		unsigned short code:12;
+#elif defined(__BIG_ENDIAN_BITFIELD)
+                unsigned short code:12;
+                unsigned short op:2;
+                unsigned short i:2;
+#else
+#error "Unknown bitfield order for files."
+# endif
 	} bits;
 } DagMODik;
 
