@@ -108,14 +108,18 @@
 
    (REG_ARGP 43)])
 
-;; Constants used in UNSPECs.
+;; Constants used in UNSPECs and UNSPEC_VOLATILEs.
 
 (define_constants
   [(UNSPEC_CBRANCH_TAKEN 0)
    (UNSPEC_CBRANCH_NOPS 1)
    (UNSPEC_RETURN 2)
    (UNSPEC_MOVE_PIC 3)
-   (UNSPEC_LIBRARY_OFFSET 4)])
+   (UNSPEC_LIBRARY_OFFSET 4)
+   (UNSPEC_PUSH_MULTIPLE 5)])
+
+(define_constants
+  [(UNSPEC_VOLATILE_EH_RETURN 0)])
 
 (define_attr "type"
   "move,mvi,mcld,mcldp,mcst,dsp32,mult,alu0,shft,brcc,br,call,misc,compare"
@@ -238,7 +242,7 @@
 
 ;; Insns to load HIGH and LO_SUM
 
-(define_insn "*movsi_high"
+(define_insn "movsi_high"
   [(set (match_operand:SI 0 "register_operand" "=x")
 	(high:SI (match_operand:SI 1 "immediate_operand" "i")))]
   "reload_completed"
@@ -246,7 +250,7 @@
   [(set_attr "type" "mvi")
    (set_attr "length" "4")])
 
-(define_insn "*movsi_low"
+(define_insn "movsi_low"
   [(set (match_operand:SI 0 "register_operand" "=x")
 	(lo_sum:SI (match_operand:SI 1 "register_operand" "0")
 		   (match_operand:SI 2 "immediate_operand" "i")))]
@@ -1773,24 +1777,40 @@
 (define_expand "epilogue"
   [(const_int 1)]
   ""
-  "bfin_expand_epilogue (1); DONE;")
+  "bfin_expand_epilogue (1, 0); DONE;")
 
 (define_expand "sibcall_epilogue"
   [(const_int 1)]
   ""
-  "bfin_expand_epilogue (0); DONE;")
+  "bfin_expand_epilogue (0, 0); DONE;")
+
+(define_expand "eh_return"
+  [(unspec_volatile [(match_operand:SI 0 "register_operand" "")]
+		    UNSPEC_VOLATILE_EH_RETURN)]
+  ""
+{
+  emit_move_insn (EH_RETURN_HANDLER_RTX, operands[0]);
+  emit_insn (gen_eh_return_internal ());
+  emit_barrier ();
+})
+
+(define_insn_and_split "eh_return_internal"
+  [(unspec_volatile [(reg:SI REG_P2)] UNSPEC_VOLATILE_EH_RETURN)]
+  ""
+  "#"
+  "reload_completed"
+  [(const_int 1)]
+  "bfin_expand_epilogue (1, 1); DONE;")
 
 (define_insn "link"
-  [(set (mem:SI (reg:SI REG_SP)) (reg:SI REG_RETS))
-   (set (mem:SI (plus:SI (reg:SI REG_SP) (const_int -4))) (reg:SI REG_FP))
-   (set (reg:SI REG_SP)
-	(minus:SI (reg:SI REG_SP)
-		  (plus:SI (match_operand:SI 0 "immediate_operand" "i")
-			   (const_int 8))))
+  [(set (mem:SI (plus:SI (reg:SI REG_SP) (const_int -4))) (reg:SI REG_RETS))
+   (set (mem:SI (plus:SI (reg:SI REG_SP) (const_int -8))) (reg:SI REG_FP))
    (set (reg:SI REG_FP)
-	(plus:SI (reg:SI REG_SP) (const_int -8)))]
+	(plus:SI (reg:SI REG_SP) (const_int -8)))
+   (set (reg:SI REG_SP)
+	(plus:SI (reg:SI REG_SP) (match_operand:SI 0 "immediate_operand" "i")))]
   ""
-  "LINK %0;"
+  "LINK %Z0;"
   [(set_attr "length" "4")])
 
 (define_insn "unlink"
@@ -1801,10 +1821,13 @@
   "UNLINK;"
   [(set_attr "length" "4")])
 
+;; This pattern is slightly clumsy.  The stack adjust must be the final SET in
+;; the pattern, otherwise dwarf2out becomes very confused about which reg goes
+;; where on the stack, since it goes through all elements of the parallel in
+;; sequence.
 (define_insn "push_multiple"
   [(match_parallel 0 "push_multiple_operation"
-    [(set (reg:SI REG_SP)
-	  (plus:SI (reg:SI REG_SP) (match_operand:SI 1 "immediate_operand" "i")))])]
+    [(unspec [(match_operand:SI 1 "immediate_operand" "i")] UNSPEC_PUSH_MULTIPLE)])]
   ""
 {
   output_push_multiple (insn, operands);

@@ -125,9 +125,25 @@ n_dregs_to_save (void)
 {
   int i;
 
-  for (i = REG_R1; i <= REG_R7; i++)
-    if (regs_ever_live[i] && ! call_used_regs[i])
-      return REG_R7 - i + 1;
+  for (i = REG_R0; i <= REG_R7; i++)
+    {
+      if (regs_ever_live[i] && ! call_used_regs[i])
+	return REG_R7 - i + 1;
+
+      if (current_function_calls_eh_return)
+	{
+	  unsigned j;
+	  for (j = 0; ; j++)
+	    {
+	      unsigned test = EH_RETURN_DATA_REGNO (j);
+	      if (test == INVALID_REGNUM)
+		break;
+	      if (test == i)
+		return REG_R7 - i + 1;
+	    }
+	}
+
+    }
   return 0;
 }
 
@@ -167,35 +183,39 @@ expand_prologue_reg_save (rtx spreg, int saveall)
   int pregno = REG_P5 + 1 - npregs;
   int total = ndregs + npregs;
   int i;
-  rtx pat, insn;
+  rtx pat, insn, val;
 
   if (total == 0)
     return;
 
-  pat = gen_rtx_PARALLEL (VOIDmode, rtvec_alloc (total + 1));
-  XVECEXP (pat, 0, 0) = gen_rtx_SET (VOIDmode, spreg,
-				     gen_rtx_PLUS (Pmode, spreg,
-						   GEN_INT (-total * 4)));
-
+  val = GEN_INT (-total * 4);
+  pat = gen_rtx_PARALLEL (VOIDmode, rtvec_alloc (total + 2));
+  XVECEXP (pat, 0, 0) = gen_rtx_UNSPEC (VOIDmode, gen_rtvec (1, val),
+					UNSPEC_PUSH_MULTIPLE);
+  XVECEXP (pat, 0, total + 1) = gen_rtx_SET (VOIDmode, spreg,
+					     gen_rtx_PLUS (Pmode, spreg,
+							   val));
+  RTX_FRAME_RELATED_P (XVECEXP (pat, 0, 0)) = 1;
   for (i = 0; i < total; i++)
     {
       rtx memref = gen_rtx_MEM (word_mode,
 				gen_rtx_PLUS (Pmode, spreg,
 					      GEN_INT (- i * 4 - 4)));
+      rtx subpat;
       if (ndregs > 0)
 	{
-	  XVECEXP (pat, 0, i + 1)
-	    = gen_rtx_SET (VOIDmode, memref, gen_rtx_REG (word_mode,
-							  dregno++));
+	  subpat = gen_rtx_SET (VOIDmode, memref, gen_rtx_REG (word_mode,
+							       dregno++));
 	  ndregs--;
 	}
       else
 	{
-	  XVECEXP (pat, 0, i + 1)
-	    = gen_rtx_SET (VOIDmode, memref, gen_rtx_REG (word_mode,
-							  pregno++));
+	  subpat = gen_rtx_SET (VOIDmode, memref, gen_rtx_REG (word_mode,
+							       pregno++));
 	  npregs++;
 	}
+      XVECEXP (pat, 0, i + 1) = subpat;
+      RTX_FRAME_RELATED_P (subpat) = 1;
     }
   insn = emit_insn (pat);
   RTX_FRAME_RELATED_P (insn) = 1;
@@ -368,6 +388,41 @@ bfin_initial_elimination_offset (int from, int to)
   return offset;
 }
 
+/* Emit code to load a constant CONSTANT into register REG; setting
+   RTX_FRAME_RELATED_P on all insns we generate.  Make sure that the insns
+   we generate need not be split.  */
+
+static void
+frame_related_constant_load (rtx reg, HOST_WIDE_INT constant)
+{
+  rtx insn;
+  rtx xop[2];
+  xop[0] = reg;
+  xop[1] = GEN_INT (constant);
+
+  start_sequence ();
+  if (constant >= -32768 && constant < 65536)
+    insn = emit_move_insn (reg, xop[1]);
+  else
+    {
+      if (! split_load_immediate (xop))
+	{
+	  emit_insn (gen_movsi_high (xop[0], xop[1]));
+	  emit_insn (gen_movsi_low (xop[0], xop[0], xop[1]));
+	}
+      insn = get_insns ();
+    }
+
+  while (insn)
+    {
+      RTX_FRAME_RELATED_P (insn) = 1;
+      insn = NEXT_INSN (insn);
+    }
+  insn = get_insns ();
+  end_sequence ();
+  emit_insn (insn);
+}
+
 /* Generate a LINK insn for a frame sized FRAME_SIZE.  If this constant
    is too large, generate a sequence of insns that has the same effect.
    SPREG contains (reg:SI REG_SP).  */
@@ -377,25 +432,33 @@ emit_link_insn (rtx spreg, HOST_WIDE_INT frame_size)
 {
   HOST_WIDE_INT link_size = frame_size;
   rtx insn;
+  rtx set;
+  int i;
 
   if (link_size > 262140)
     link_size = 262140;
 
   /* Use a LINK insn with as big a constant as possible, then subtract
      any remaining size from the SP.  */
-  insn = emit_insn (gen_link (GEN_INT (link_size)));
+  insn = emit_insn (gen_link (GEN_INT (-8 - link_size)));
   RTX_FRAME_RELATED_P (insn) = 1;
+
+  for (i = 0; i < XVECLEN (PATTERN (insn), 0); i++)
+    {
+      rtx set = XVECEXP (PATTERN (insn), 0, i);
+      if (GET_CODE (set) != SET)
+	abort ();
+      RTX_FRAME_RELATED_P (set) = 1;
+    }
+
   frame_size -= link_size;
 
   if (frame_size > 0)
     {
       /* Must use a call-clobbered PREG that isn't the static chain.  */
       rtx tmpreg = gen_rtx_REG (Pmode, REG_P1);
-      rtx size = GEN_INT (-frame_size);
 
-      insn = emit_move_insn (tmpreg, size);
-      RTX_FRAME_RELATED_P (insn) = 1;
-
+      frame_related_constant_load (tmpreg, -frame_size);
       insn = emit_insn (gen_addsi3 (spreg, spreg, tmpreg));
       RTX_FRAME_RELATED_P (insn) = 1;
     }
@@ -560,30 +623,38 @@ add_to_sp (rtx spreg, HOST_WIDE_INT value, int frame)
       rtx tmpreg = gen_rtx_REG (SImode, REG_P1);
       rtx insn;
 
-      insn = emit_move_insn (tmpreg, GEN_INT (value));
       if (frame)
-	RTX_FRAME_RELATED_P (insn) = 1;
+	frame_related_constant_load (tmpreg, value);
+      else
+	{
+	  insn = emit_move_insn (tmpreg, GEN_INT (value));
+	  if (frame)
+	    RTX_FRAME_RELATED_P (insn) = 1;
+	}
+
       insn = emit_insn (gen_addsi3 (spreg, spreg, tmpreg));
       if (frame)
 	RTX_FRAME_RELATED_P (insn) = 1;
     }
   else
-      do 
-	{
-	  int size = value;
-	  rtx insn;
+    do 
+      {
+	int size = value;
+	rtx insn;
 
-	  if (size > 60)
-	    size = 60;
-	  else if (size < -62)
-	    size = -62;
+	if (size > 60)
+	  size = 60;
+	else if (size < -60)
+	  /* We could use -62, but that would leave the stack unaligned, so
+	     it's no good.  */
+	  size = -60;
 
-	  insn = emit_insn (gen_addsi3 (spreg, spreg, GEN_INT (size)));
-	  if (frame)
-	    RTX_FRAME_RELATED_P (insn) = 1;
-	  value -= size;
-	}
-      while (value != 0);
+	insn = emit_insn (gen_addsi3 (spreg, spreg, GEN_INT (size)));
+	if (frame)
+	  RTX_FRAME_RELATED_P (insn) = 1;
+	value -= size;
+      }
+    while (value != 0);
 }
 
 /* Generate RTL for the prologue of the current function.  */
@@ -598,10 +669,11 @@ bfin_expand_prologue (void)
   rtx spreg = gen_rtx_REG (Pmode, REG_SP);
   e_funkind fkind = funkind (TREE_TYPE (current_function_decl));
 
-  if (fkind != SUBROUTINE) {
-    expand_interrupt_handler_prologue (spreg, fkind);
-    return;
-  }
+  if (fkind != SUBROUTINE)
+    {
+      expand_interrupt_handler_prologue (spreg, fkind);
+      return;
+    }
 
   if (! must_save_fp_p ())
     {
@@ -647,10 +719,12 @@ bfin_expand_prologue (void)
     }
 }
 
-/* Generate RTL for the epilogue of the current function.  */
+/* Generate RTL for the epilogue of the current function.  NEED_RETURN is zero
+   if this is for a sibcall.  EH_RETURN is nonzero if we're expanding an
+   eh_return pattern.  */
 
 void
-bfin_expand_epilogue (int need_return)
+bfin_expand_epilogue (int need_return, int eh_return)
 {
   rtx spreg = gen_rtx_REG (Pmode, REG_SP);
   e_funkind fkind = funkind (TREE_TYPE (current_function_decl));
@@ -698,6 +772,9 @@ bfin_expand_epilogue (int need_return)
   /* Omit the return insn if this is for a sibcall.  */
   if (! need_return)
     return;
+
+  if (eh_return)
+    emit_insn (gen_addsi3 (spreg, spreg, gen_rtx_REG (Pmode, REG_P2)));
 
   emit_jump_insn (gen_return_internal (GEN_INT (SUBROUTINE)));
 }
@@ -995,6 +1072,10 @@ print_operand (FILE *file, rtx x, char code)
 	    x = GEN_INT (exact_log2 (0xffffffff & INTVAL (x)));
 	  else if (code == 'Y')
 	    x = GEN_INT (exact_log2 (0xffffffff & ~INTVAL (x)));
+	  else if (code == 'Z')
+	    /* Used for LINK insns.  */
+	    x = GEN_INT (-8 - INTVAL (x));
+
 	  /* fall through */
 
 	case SYMBOL_REF:
@@ -1544,7 +1625,8 @@ hard_regno_mode_ok (int regno, enum machine_mode mode)
     return mode == BImode;
   if (mode == PDImode)
     return regno == REG_A0 || regno == REG_A1;
-  return TEST_HARD_REG_BIT (reg_class_contents[MOST_REGS], regno);
+  return (TEST_HARD_REG_BIT (reg_class_contents[MOST_REGS], regno)
+	  || TEST_HARD_REG_BIT (reg_class_contents[PROLOGUE_REGS], regno));
 }
 
 /* Return the cost of moving data from a register in class CLASS1 to
@@ -2028,7 +2110,7 @@ push_multiple_operation (rtx op, enum machine_mode mode)
 
   first_preg_to_save = lastpreg;
   first_dreg_to_save = lastdreg;
-  for (i = 1, group = 0; i < XVECLEN (op, 0); i++)
+  for (i = 1, group = 0; i < XVECLEN (op, 0) - 1; i++)
     {
       rtx t = XVECEXP (op, 0, i);
       rtx src, dest;

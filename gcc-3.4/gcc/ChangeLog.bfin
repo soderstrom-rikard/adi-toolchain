@@ -1,3 +1,34 @@
+2004-12-14  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin-protos.h (bfin_expand_epilogue): Add extra
+	argument.
+	* config/bfin/bfin.c (n_dregs_to_save): Save all registers if
+	current_fucntion_calls_eh_return.
+	(frame_related_constant_load): New function.
+	(expand_prologue_reg_save): Update to changed definition of the
+	pattern.  Set RTX_FRAME_RELATED_P on all elements of the PARALLEL.
+	(emit_link_insn): Likewise.  Use frame_related_constant_load.
+	(add_to_sp): Don't misalign the stack pointer.  Use
+	frame_related_constant_load.
+	(bfin_expand_epilogue): New argument EH_RETURN.  Add P2 to SP if
+	it is nonzero.
+	(print_operand): New code 'Z' for CONST_INT, used in link insns.
+	(hard_regno_mode_ok): PROLOGUE_REGS are OK too.
+	(push_multiple_operation): Change to match new definition of the
+	pattern.
+	* config/bfin/bfin.h (INCOMING_RETURN_ADDR_RTX, RETURN_ADDR_RTX,
+	DWARF_FRAME_RETURN_COLUMN, INCOMING_FRAME_SP_OFFSET,
+	EH_RETURN_DATA_REGNO, EH_RETURN_STACKADJ_RTX, EH_RETURN_HANDLER_RTX):
+	New macros.
+	* config/bfin/bfin.md (UNSPEC_PUSH_MULTIPLE,
+	UNSPEC_VOLATILE_EH_RETURN): New constants.
+	(movsi_high, movsi_low): Proper named patterns now.
+	(epilogue, sibcall_epilogue): Pass 0 for new arg of
+	bfin_expand_epilogue.
+	(link): Operand 0 now holds the full offset added to the stack pointer.
+	(eh_return, eh_return_internal): New patterns.
+	(push_multiple): Stack pointer adjust moved to the end of the PARALLEL.
+
 2004-12-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (mulhisi3): Correct the pattern and enable it.

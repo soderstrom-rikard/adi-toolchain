@@ -691,6 +691,27 @@ typedef struct {
 #define EXPAND_BUILTIN_VA_ARG(VALIST, TYPE) \
   bfin_va_arg ((VALIST), (TYPE))
 
+/* Before the prologue, the return address is in the RETS register.  */
+#define INCOMING_RETURN_ADDR_RTX gen_rtx_REG (Pmode, REG_RETS)
+
+/* After the prologue, RA is at -4(AP) in the current frame.  We can't
+   tell for sure for previous frames.  */
+#define RETURN_ADDR_RTX(COUNT, FRAME)					   \
+  ((COUNT) == 0								   \
+   ? gen_rtx_MEM (Pmode, plus_constant (arg_pointer_rtx, -UNITS_PER_WORD)) \
+   : NULL_RTX)
+
+#define DWARF_FRAME_RETURN_COLUMN DWARF_FRAME_REGNUM (REG_RETS)
+
+/* Call instructions don't modify the stack pointer on the Blackfin.  */
+#define INCOMING_FRAME_SP_OFFSET 0
+
+/* Describe how we implement __builtin_eh_return.  */
+#define EH_RETURN_DATA_REGNO(N)	((N) < 2 ? (N) : INVALID_REGNUM)
+#define EH_RETURN_STACKADJ_RTX	gen_rtx_REG (Pmode, REG_P2)
+#define EH_RETURN_HANDLER_RTX \
+    gen_rtx_MEM (Pmode, plus_constant (arg_pointer_rtx, -UNITS_PER_WORD))
+
 /* Addressing Modes */
 
 /* Recognize any constant value that is a valid address.  */

@@ -91,7 +91,7 @@ extern void setup_incoming_varargs (CUMULATIVE_ARGS *, enum machine_mode, tree,
 				    int *, int);
 
 extern void bfin_expand_prologue (void);
-extern void bfin_expand_epilogue (int);
+extern void bfin_expand_epilogue (int, int);
 extern int push_multiple_operation (rtx, Mmode);
 extern int pop_multiple_operation (rtx, Mmode);
 extern int bfin_hard_regno_rename_ok (unsigned int, unsigned int);
