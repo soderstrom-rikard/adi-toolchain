@@ -38,25 +38,25 @@
 
 struct flat_hdr {
 	char magic[4];
-	unsigned long rev;          /* version (as above) */
-	unsigned long entry;        /* Offset of first executable instruction
+	uint32_t rev;          /* version (as above) */
+	uint32_t entry;        /* Offset of first executable instruction
 	                               with text segment from beginning of file */
-	unsigned long data_start;   /* Offset of data segment from beginning of
+	uint32_t data_start;   /* Offset of data segment from beginning of
 	                               file */
-	unsigned long data_end;     /* Offset of end of data segment
+	uint32_t data_end;     /* Offset of end of data segment
 	                               from beginning of file */
-	unsigned long bss_end;      /* Offset of end of bss segment from beginning
+	uint32_t bss_end;      /* Offset of end of bss segment from beginning
 	                               of file */
 
 	/* (It is assumed that data_end through bss_end forms the bss segment.) */
 
-	unsigned long stack_size;   /* Size of stack, in bytes */
-	unsigned long reloc_start;  /* Offset of relocation records from
+	uint32_t stack_size;   /* Size of stack, in bytes */
+	uint32_t reloc_start;  /* Offset of relocation records from
 	                               beginning of file */
-	unsigned long reloc_count;  /* Number of relocation records */
-	unsigned long flags;       
-        unsigned long build_date;  /* bfin changes added build_date */     
-	unsigned long filler[6];    /* Reservered, set to zero */
+	uint32_t reloc_count;  /* Number of relocation records */
+	uint32_t flags;       
+        uint32_t build_date;  /* bfin changes added build_date */     
+	uint32_t filler[6];    /* Reservered, set to zero */
 };
 
 #define FLAT_FLAG_RAM    0x0001 /* load program entirely into RAM */
@@ -75,7 +75,7 @@ struct flat_hdr {
 #if (FLAT_VERSION <= 2)
 #define flat_reloc_t flat_v2_reloc_t
 #elif (FLAT_VERSION == 4)
-#define flat_reloc_t unsigned long
+#define flat_reloc_t uint32_t
 #elif (FLAT_VERSION == 5)
 #define flat_reloc_t flat_v5_reloc_t
 #else
@@ -87,7 +87,7 @@ struct flat_hdr {
  */
 #if defined(CONFIG_ARM) || defined(CONFIG_M68K)
 #undef flat_reloc_t
-#define flat_reloc_t unsigned long
+#define flat_reloc_t uint32_t
 #endif
 
 /*
@@ -176,7 +176,7 @@ struct flat_hdr {
  * ARM and M68K Details
  * ====================
  * These architectures use the version 4 bFLT format.  The version 4 format is 
- * a simple unsigned long integer (32-bits).  This record holds the relocation
+ * a simple uint32_t integer (32-bits).  This record holds the relocation
  * offset from the start of text.  The loader must check for size of offset 
  * against the size of text section for XIP to work properly.
  *
@@ -187,18 +187,18 @@ struct flat_hdr {
 
 typedef union
 {
-  unsigned long	value;
+  uint32_t	value;
   struct {
 #if defined(__LITTLE_ENDIAN_BITFIELD)
-    unsigned long type  : 2;
-    unsigned long hi_lo : 1;
-    unsigned long sp    : 3;
-    signed long offset  : 26;
+    uint32_t type  : 2;
+    uint32_t hi_lo : 1;
+    uint32_t sp    : 3;
+    int32_t offset  : 26;
 #elif defined(__BIG_ENDIAN_BITFIELD)
-    signed long offset  : 26;
-    unsigned long sp    : 3;
-    unsigned long hi_lo : 1;
-    unsigned long type  : 2;
+    int32_t offset  : 26;
+    uint32_t sp    : 3;
+    uint32_t hi_lo : 1;
+    uint32_t type  : 2;
 #else
 #error "Unknown bitfield order for flat files."
 # endif
@@ -256,19 +256,19 @@ typedef union
 #define OLD_FLAT_RELOC_TYPE_BSS		2
 
 typedef union {
-        unsigned long   value;
+        uint32_t   value;
         struct {
 # if defined(mc68000) && !defined(CONFIG_COLDFIRE)
-                signed long offset : 30;
-                unsigned long type : 2;
+                int32_t offset : 30;
+                uint32_t type : 2;
 #       define OLD_FLAT_FLAG_RAM    0x1 /* load program entirely into RAM */
 # elif defined(__BIG_ENDIAN_BITFIELD)
-                unsigned long type : 2;
-                signed long offset : 30;
+                uint32_t type : 2;
+                int32_t offset : 30;
 #       define OLD_FLAT_FLAG_RAM    0x1 /* load program entirely into RAM */
 # elif defined(__LITTLE_ENDIAN_BITFIELD)
-                signed long offset : 30;
-                unsigned long type : 2;
+                int32_t offset : 30;
+                uint32_t type : 2;
 #       define OLD_FLAT_FLAG_RAM    0x1 /* load program entirely into RAM */
 # else
 #       error "Unknown bitfield order for flat files."
@@ -296,25 +296,25 @@ typedef union {
 
 struct flat_hdr {
 	char magic[4];
-	unsigned long rev;          /* version (as above) */
-	unsigned long entry;        /* Offset of first executable instruction
+	uint32_t rev;          /* version (as above) */
+	uint32_t entry;        /* Offset of first executable instruction
 	                               with text segment from beginning of file */
-	unsigned long data_start;   /* Offset of data segment from beginning of
+	uint32_t data_start;   /* Offset of data segment from beginning of
 	                               file */
-	unsigned long data_end;     /* Offset of end of data segment
+	uint32_t data_end;     /* Offset of end of data segment
 	                               from beginning of file */
-	unsigned long bss_end;      /* Offset of end of bss segment from beginning
+	uint32_t bss_end;      /* Offset of end of bss segment from beginning
 	                               of file */
 
 	/* (It is assumed that data_end through bss_end forms the bss segment.) */
 
-	unsigned long stack_size;   /* Size of stack, in bytes */
-	unsigned long reloc_start;  /* Offset of relocation records from
+	uint32_t stack_size;   /* Size of stack, in bytes */
+	uint32_t reloc_start;  /* Offset of relocation records from
 	                               beginning of file */
-	unsigned long reloc_count;  /* Number of relocation records */
-	unsigned long flags;  
-        unsigned long build_date;  /* bfin changes added build_date */     
-	unsigned long filler[6];    /* Reservered, set to zero */
+	uint32_t reloc_count;  /* Number of relocation records */
+	uint32_t flags;  
+        uint32_t build_date;  /* bfin changes added build_date */     
+	uint32_t filler[6];    /* Reservered, set to zero */
 };
 
 #define FLAT_FLAG_RAM    0x0001 /* load program entirely into RAM */
@@ -339,19 +339,19 @@ struct flat_hdr {
 #define OLD_FLAT_RELOC_TYPE_BSS		2
 
 typedef union {
-	unsigned long	value;
+	uint32_t	value;
 	struct {
 # if defined(mc68000) && !defined(CONFIG_COLDFIRE)
-		signed long offset : 30;
-		unsigned long type : 2;
+		int32_t offset : 30;
+		uint32_t type : 2;
 #   	define OLD_FLAT_FLAG_RAM    0x1 /* load program entirely into RAM */
 # elif defined(__BIG_ENDIAN_BITFIELD)
-		unsigned long type : 2;
-		signed long offset : 30;
+		uint32_t type : 2;
+		int32_t offset : 30;
 #   	define OLD_FLAT_FLAG_RAM    0x1 /* load program entirely into RAM */
 # elif defined(__LITTLE_ENDIAN_BITFIELD)
-		signed long offset : 30;
-		unsigned long type : 2;
+		int32_t offset : 30;
+		uint32_t type : 2;
 #   	define OLD_FLAT_FLAG_RAM    0x1 /* load program entirely into RAM */
 # else
 #   	error "Unknown bitfield order for flat files."
