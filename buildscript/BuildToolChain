@@ -270,6 +270,14 @@ if [ ! -d $DIR_BINUTILS_SOURCE/gcc ] ; then
   echo "*** Making some symlinks"
   ln -snf $DIR_GCC_SOURCE/gcc $DIR_BINUTILS_SOURCE/
   ln -snf $DIR_GCC_SOURCE/libstdc++-v3 $DIR_BINUTILS_SOURCE/
+  ## check to make sure the symlinks were made
+  if [ ! -d $DIR_BINUTILS_SOURCE/gcc ] ; then
+    echo "*** ERROR : can not make symlink in $DIR_BINUTILS_SOURCE"
+    echo -n "*** ERROR : running as user "
+    whoami
+    ls -ld $DIR_BINUTILS_SOURCE
+    exit
+  fi
 fi
 
 ###################### Setting up test  ##########################
