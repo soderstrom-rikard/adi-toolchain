@@ -2150,6 +2150,8 @@ push_multiple_operation (rtx op, enum machine_mode mode)
   int lastdreg = 8, lastpreg = 6;
   int i, group;
 
+  first_preg_to_save = lastpreg;
+  first_dreg_to_save = lastdreg;
   for (i = 1, group = 0; i < XVECLEN (op, 0); i++)
     {
       rtx t = XVECEXP (op, 0, i);
