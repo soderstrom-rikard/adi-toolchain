@@ -18244,10 +18244,10 @@ static ExprNode * unary(ExprOpType op,ExprNode * x)
   if(x->type == ExprNodeConstant){
     switch (op) {
         case ExprOpTypeNEG: 
-                x->value.i_value = ~x->value.i_value;
+                x->value.i_value = -x->value.i_value;
 		break;
         case ExprOpTypeCOMP: 
-                x->value.i_value = -x->value.i_value;
+                x->value.i_value = ~x->value.i_value;
 		break;
 	default :  fprintf(stderr, "Internal compiler error at line %d in file %s\n", __LINE__, __FILE__);
     }
@@ -18280,7 +18280,6 @@ static int const_fits(ExprNode * expr, const_forms_t form) {
       long mask   = (1l<<sz)-1;
       long minint = (-1l<<(sz-1));
       long maxint = (1l<<(sz-1));
-
       long v = expr->value.i_value;
 
       if (scale) {
@@ -18314,7 +18313,6 @@ static int const_fits(ExprNode * expr, const_forms_t form) {
       }
 
       v -= offset;
-
       return (!issigned && (v & ~mask) == 0)
 	  || ((minint <= v) && (v < maxint));
     }

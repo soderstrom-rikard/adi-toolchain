@@ -192,13 +192,13 @@ reloc_stack_operate(unsigned int oper)
     }
     case 0xEF :
     {
-      value = ~reloc_stack[reloc_stack_tos - 1];
+      value = -reloc_stack[reloc_stack_tos - 1];
       reloc_stack_tos --;
       break;
     }
     case 0xF0 :
     {
-      value = -reloc_stack[reloc_stack_tos - 1];
+      value = ~reloc_stack[reloc_stack_tos - 1];
       reloc_stack_tos -= 1;
       break;
     }
