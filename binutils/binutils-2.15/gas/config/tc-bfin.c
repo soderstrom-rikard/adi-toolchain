@@ -1446,12 +1446,12 @@ gen_ldstidxi (REG_T ptr, REG_T reg, int W, int sz, int Z, ExprNode * poffset)
 			   P5 = [P5 + _current_shared_library_p5_offset_]
     */
     if(!strcmp(poffset->value.s_value, "_current_shared_library_p5_offset_")){
-      return  CONSCODE (GENCODE (HI (c_code.opcode)),
+      return  conscode (gencode (HI (c_code.opcode)),
 			ExprNodeGenReloc(poffset, BFD_RELOC_16));
     }
     else
-{
-      return  CONSCODE (GENCODE (HI (c_code.opcode)),
+    {
+      return  conscode (gencode (HI (c_code.opcode)),
 			ExprNodeGenReloc(poffset, BFD_RELOC_BFIN_GOT));
     }
   }
