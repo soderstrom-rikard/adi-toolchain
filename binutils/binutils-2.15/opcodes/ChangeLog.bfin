@@ -2,6 +2,11 @@
 
 	* bfin-dis.c (decode_dsp32shift_0): Reduce number of alternatives by
 	factoring code.  Add missing dreg rotates.
+	(M_S2RND, M_T, M_FU, M_TFU, M_IS, M_IU, M_W32, M_ISS2, M_IH): New
+	macros.
+	(decode_optmode): Add W32; use M_xxx macros.
+	(decode_dsp32mac): Allow (W32) if not moving to a DREG.  Relax test
+	that disallows (M) in some cases.
 
 2004-12-16  Catherine Moore  <clm@cm00re.com>
 

@@ -10,6 +10,16 @@
 
 #include "bfin-opcodes.h"
 
+#define M_S2RND 1
+#define M_T     2
+#define M_W32   3
+#define M_FU    4
+#define M_TFU   6
+#define M_IS    8
+#define M_ISS2  9
+#define M_IH    11
+#define M_IU    12
+
 #ifndef PRINTF
 #define PRINTF printf
 #endif
@@ -752,21 +762,23 @@ decode_optmode (int mod, int MM, disassemble_info *outf)
   if (MM)
     OUTS (outf, "M, ");
   
-  if (mod == 1)
+  if (mod == M_S2RND)
     OUTS (outf, "S2RND");
-  else if (mod == 2)
+  else if (mod == M_T)
     OUTS (outf, "T");
-  else if (mod == 4)
+  else if (mod == M_W32)
+    OUTS (outf, "W32");
+  else if (mod == M_FU)
     OUTS (outf, "FU");
-  else if (mod == 6)
+  else if (mod == M_TFU)
     OUTS (outf, "TFU");
-  else if (mod == 8)
+  else if (mod == M_IS)
     OUTS (outf, "IS");
-  else if (mod == 9)
+  else if (mod == M_ISS2)
     OUTS (outf, "ISS2");
-  else if (mod == 11)
+  else if (mod == M_IH)
     OUTS (outf, "IH");
-  else if (mod == 12)
+  else if (mod == M_IU)
     OUTS (outf, "IU");
   else
     abort ();
@@ -3703,10 +3715,13 @@ decode_dsp32mac_0 (TIword iw0, TIword iw1, disassemble_info *outf)
   if (w0 == 0 && w1 == 0 && op1 == 3 && op0 == 3)
     return 0;
 
-  if ((op1 == 3 || w1 == 0) && MM)
+  if (op1 == 3 && MM)
     return 0;
 
-  if (((1 << mmod) & (P ? 0x313 : 0x1b57)) == 0)
+  if ((w1 || w0) && mmod == M_W32)
+    return 0;
+
+  if (((1 << mmod) & (P ? 0x31b : 0x1b5f)) == 0)
     return 0;
 
   if (w1 == 1 || op1 != 3)
