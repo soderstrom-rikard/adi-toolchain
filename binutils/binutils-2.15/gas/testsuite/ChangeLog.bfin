@@ -1,0 +1,15 @@
+2004-12-08  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/bfin.exp: New.
+	* gas/bfin/bit.s: New.
+	* gas/bfin/bit.d: New.
+	* gas/bfin/control_code.s: New.
+	* gas/bfin/control_code.d: New.
+	* gas/bfin/logical.s: New.
+	* gas/bfin/logical.d: New.
+	* gas/bfin/shift.s: New.
+	* gas/bfin/shift.d: New.
+
+2004-12-07  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin: New directory.
