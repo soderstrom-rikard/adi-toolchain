@@ -13,6 +13,10 @@
 	sibcall_epilogue): New.
 	(duplicate call patterns): Delete.
 
+	* config/bfin/bfin.c (bfin_rtx_costs): Reformat.  Change costs to
+	match machine better.  Use COSTS_N_INSNS instead of hardcoded
+	constants.
+
 2004-11-24  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (xorsi3, iorsi3): Simplify using '%X' output

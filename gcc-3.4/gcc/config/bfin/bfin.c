@@ -1907,54 +1907,43 @@ bfin_valid_add (enum machine_mode mode, HOST_WIDE_INT value)
 }
 
 bool
-bfin_rtx_costs (rtx x,
-               int code,
-               int outer_code,
-               int *total)
+bfin_rtx_costs (rtx x, int code, int outer_code, int *total)
 {
+  int cost2 = COSTS_N_INSNS (1);
+
   switch (code)
     {
-  case CONST_INT:
-    if ((outer_code)==SET || (outer_code)==PLUS)
-        *total = CONST_7BIT_IMM_P(INTVAL(x)) ?
-        0 : 2;
-    else if ((outer_code)==AND)
-        *total = (CONST_7BIT_IMM_P(INTVAL(x)) ||
-            log2constp (1+INTVAL(x)) || log2constp (-INTVAL(x)))?
-        0 : 2;
-    else if ((outer_code)==LE || (outer_code)==LT
-                || (outer_code)==EQ)
-        *total = (INTVAL (x) >= -4 && INTVAL (x) <= 3) ?
-        0 : 2;
-    else if ((outer_code)==LEU || (outer_code)==LTU)
-        *total = (INTVAL (x) >= 0 && INTVAL (x) <= 7) ?
-        0 : 2;
-    else if ((outer_code)==MULT)
-        *total = ((INTVAL (x)==2 || INTVAL (x)==4)) ?
-        0 : 2;
-    else if ((outer_code)==ASHIFT &&
-        (INTVAL (x) == 1 && INTVAL (x) == 2))
+    case CONST_INT:
+      if (outer_code == SET || outer_code == PLUS)
+        *total = CONST_7BIT_IMM_P (INTVAL (x)) ? 0 : cost2;
+      else if (outer_code == AND)
+        *total = log2constp (~INTVAL (x)) ? 0 : cost2;
+      else if (outer_code == LE || outer_code == LT || outer_code == EQ)
+        *total = (INTVAL (x) >= -4 && INTVAL (x) <= 3) ? 0 : cost2;
+      else if (outer_code == LEU || outer_code == LTU)
+        *total = (INTVAL (x) >= 0 && INTVAL (x) <= 7) ? 0 : cost2;
+      else if (outer_code == MULT)
+        *total = (INTVAL (x) == 2 || INTVAL (x) == 4) ? 0 : cost2;
+      else if (outer_code == ASHIFT && (INTVAL (x) == 1 || INTVAL (x) == 2))
         *total = 0;
-    else if ((outer_code)==ASHIFT || (outer_code)==ASHIFTRT
-        || (outer_code)==LSHIFTRT)
-        *total = (INTVAL (x) >= 0 && INTVAL (x) <= 31) ?
-        0 : 2;
-    else if ((outer_code)==IOR || (outer_code)==XOR)
-        *total = ((INTVAL (x) >= 0 && INTVAL (x) <= 31) &&
-        (INTVAL (x) & (INTVAL (x) - 1)) == 0) ?
-        0 : 2;
-    else
-      *total = 2;
+      else if (outer_code == ASHIFT || outer_code == ASHIFTRT
+	       || outer_code == LSHIFTRT)
+        *total = (INTVAL (x) >= 0 && INTVAL (x) <= 31) ? 0 : cost2;
+      else if (outer_code == IOR || outer_code == XOR)
+        *total = (INTVAL (x) & (INTVAL (x) - 1)) == 0 ? 0 : cost2;
+      else
+	*total = cost2;
       return true;
-  case CONST:
-  case LABEL_REF:
-  case SYMBOL_REF:
-  case CONST_DOUBLE:
-       *total = COSTS_N_INSNS (2);
-       return true;
 
-  default:
-       return false;
+    case CONST:
+    case LABEL_REF:
+    case SYMBOL_REF:
+    case CONST_DOUBLE:
+      *total = COSTS_N_INSNS (2);
+      return true;
+
+    default:
+      return false;
     }
 }
 
