@@ -1819,8 +1819,12 @@ void
 asm_conditional_branch (rtx insn, rtx *operands, int n_nops, int predict_taken)
 {
   int offset = branch_dest (insn) - INSN_ADDRESSES (INSN_UID (insn));
+  /* Note : offset for instructions like if cc jmp; jump.[sl] offset
+            is to be taken from start of if cc rather than jump.
+            Range for jump.s is (-4094, 4096) instead of (-4096, 4094)
+  */
   int len = (offset >= -1024 && offset <= 1022 ? 0
-	     : offset >= -4096 && offset <= 4094 ? 1
+	     : offset >= -4094 && offset <= 4096 ? 1
 	     : 2);
   int bp = predict_taken && len == 0 ? 1 : cbranch_predicted_taken_p (insn);
   int idx = (bp << 1) | (GET_CODE (operands[0]) == EQ ? BRF : BRT);

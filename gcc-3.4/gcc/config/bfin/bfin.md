@@ -139,6 +139,11 @@
 ;;;   1024 10-bit imm *2 is 2048 (-1024..1022)
 ;;; br 12-bit  :
 ;;;   4096 12-bit imm *2 is 8192 (-4096..4094)
+;;; NOTE : For brcc we generate instructions such as
+;;;   if cc jmp; jump.[sl] offset
+;;;   offset of jump.[sl] is from the jump instruction but
+;;;     gcc calculates length from the if cc jmp instruction
+;;;     hence our range is (-4094, 4096) instead of (-4096, 4094) for a br
 ;;;
 ;;; The way the (pc) rtx works in these calculations is somewhat odd;
 ;;; for backward branches it's the address of the current instruction,
@@ -175,8 +180,9 @@
 	            (ge (minus (match_dup 3) (pc)) (const_int -1024)))
 		  (const_int 2)
 		(and
-	            (le (minus (match_dup 3) (pc)) (const_int 4090))
-	            (ge (minus (match_dup 3) (pc)) (const_int -4096)))
+;;              See comment above why (4096, -4095) instead of (4094, -4096)
+	            (le (minus (match_dup 3) (pc)) (const_int 4096))
+	            (ge (minus (match_dup 3) (pc)) (const_int -4094)))
 		  (const_int 4)]
 	       (const_int 6))
         ]

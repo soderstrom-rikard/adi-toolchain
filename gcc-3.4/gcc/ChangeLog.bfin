@@ -1,3 +1,9 @@
+2004-12-30 Pradip Shah <pcs@rrap-software.com>
+
+	* config/bfin/bfin.md (brcc): Length
+	* config/bfin/bfin.c  (asm_conditional_branch) : Corrected 
+        offset calculation
+
 2004-12-21  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (extendsidi2, extendhidi2, extendqidi2): Turn
