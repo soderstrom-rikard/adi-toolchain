@@ -1,3 +1,6 @@
+2005-01-31 : raja <raja@rrap-software.com>
+	* elf32-bfin.c: some clean up is done. code that are related to pltpc are 
+	removed.
 2005-01-24 : raja <raja@rrap-software.com>
 	* elf32-bfin.c: The following macros are redefined to support fpic.
 	elf_backend_create_dynamic_sections, bfd_elf32_bfd_link_hash_table_create,
