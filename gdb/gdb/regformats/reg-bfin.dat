@@ -55,5 +55,4 @@ expedite:pc,sp,fp
 32:r2
 32:r1
 32:r0
-32:orig_r0
 32:syscfg

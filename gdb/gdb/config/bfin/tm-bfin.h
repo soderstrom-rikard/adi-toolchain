@@ -67,7 +67,7 @@ int gdbtgt_nregs ();
 
 
 #define REGISTER_NAMES  \
- {"syscfg", "orig_r0","r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", \
+ {"syscfg", /*"orig_r0",*/ "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", \
   "p0", "p1", "p2", "p3", "p4", "p5", "fp", "usp", \
   "i0", "i1", "i2", "i3", "m0", "m1", "m2", "m3", \
   "l0", "l1", "l2", "l3", "b0", "b1", "b2", "b3", \
@@ -75,7 +75,7 @@ int gdbtgt_nregs ();
   "lb0", "lb1", "astat", "unk", "rets", "pc", "retx", "retn", \
   "rete", "seqstat", "ipend", "orig_pc",  "extra1", "extra2", "extra3"};
 
-#define NUM_REGS 57	
+#define NUM_REGS 56	
 #define NUM_FREGS	0
 
 #define REGISTER_BYTES  (NUM_REGS *4)
