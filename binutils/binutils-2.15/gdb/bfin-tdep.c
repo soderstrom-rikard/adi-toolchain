@@ -691,7 +691,6 @@ static const struct frame_unwind bfin_frame_unwind =
 static const struct frame_unwind *
 bfin_frame_sniffer (struct frame_info *next_frame)
 {
-fprintf(stderr, "************** calling our sniffer ***************\n");
   return &bfin_frame_unwind;
 }
 
@@ -854,8 +853,7 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
   char buf[4];
   int i;
   long reg_r0, reg_r1, reg_r2;
-  unsigned int sp_decr = 0; // how much sp was decremented by ... atleast 12
-
+  CORE_ADDR ret_sp = sp;
 
   /* Push arguments in reverse order.  */
   for (i = nargs - 1; i >= 0; i--)
@@ -876,13 +874,8 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
       else
         offset = container_len - len;
       sp -= container_len;
-      sp_decr += container_len;
       write_memory (sp + offset, VALUE_CONTENTS_ALL (args[i]), len);
     }
-
-  if(sp_decr < 12 ){
-    sp -= 12 - sp_decr;
-  }
 
   /* initialize R0, R1 and R2 to the first 3 words of paramters */
   reg_r0 = read_memory_integer(sp, 4);
@@ -917,9 +910,9 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
   /* fp is changed by called program prologue */
 
   /* DWARF2/GCC uses the stack address *before* the function call as a
-     frame's CFA.  Blackfin does not update sp on a call statement. */
+     frame's CFA. Hence, sp returned is same as what came in. */
 
-  return sp;
+  return ret_sp;
 }
 
 /* Convert register number REG to the appropriate register number
@@ -1209,29 +1202,6 @@ bfin_frame_align (struct gdbarch *gdbarch, CORE_ADDR address)
   return ((address + 3) & ~0x3);
 }
 
-/* Return nonzero if a value of type TYPE stored in register REGNUM
-   needs any special handling.  */
-
-static int
-bfin_convert_register_p (int regnum, struct type *type)
-{
-fprintf(stderr, "in %s :: for regnum = %d\n", __FUNCTION__, regnum);
-  return (regnum == BFIN_PC_REGNUM);
-}
-
-/* Read a value of type TYPE from register REGNUM in frame FRAME, and
-   return its contents in TO.  */
-
-static void
-bfin_register_to_value (struct frame_info *frame, int regnum,
-                        struct type *type, void *to)
-{
-  
-
-  get_frame_register (frame, regnum, to);
-fprintf(stderr, "in %s :: for regnum = %d, to = %x\n", __FUNCTION__, regnum,  *((void **)to));
-}
-
 /* Initialize the current architecture based on INFO.  If possible,
    re-use an architecture from ARCHES, which is a list of
    architectures already created during this debugging session.
@@ -1277,9 +1247,6 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   set_gdbarch_num_regs(gdbarch, BFIN_NUM_REGS);
   set_gdbarch_sp_regnum (gdbarch, BFIN_SP_REGNUM);
   set_gdbarch_pc_regnum(gdbarch, BFIN_PC_REGNUM);
-
-  //set_gdbarch_convert_register_p (gdbarch, bfin_convert_register_p);
-  //set_gdbarch_register_to_value (gdbarch,  bfin_register_to_value);
 
   set_gdbarch_push_dummy_call (gdbarch, bfin_push_dummy_call);
   set_gdbarch_frame_align(gdbarch, bfin_frame_align);
