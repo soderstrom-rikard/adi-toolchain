@@ -1392,10 +1392,10 @@ ccregister_p (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) {
 }
 
 void 
-conditional_register_usage(void) {
-    /* initialize condition code flag register rtx */
-    /*bfin_cc_rtx = cc0_rtx;*/
-    bfin_cc_rtx = gen_rtx (REG, CCmode, REG_CC);
+conditional_register_usage (void)
+{
+  /* initialize condition code flag register rtx */
+  bfin_cc_rtx = gen_rtx (REG, BImode, REG_CC);
 }
 
 #if 0
@@ -1563,7 +1563,7 @@ hard_regno_mode_ok (int regno, enum machine_mode mode)
     int ret;
 
     if (class == CCREGS)
-	return mode == CCmode || mode == SImode;
+	return mode == CCmode || mode == SImode || mode == BImode;
 
     return mode != CCmode;
 }
@@ -1763,9 +1763,9 @@ bfin_gen_compare (rtx cmp, enum machine_mode mode ATTRIBUTE_UNUSED)
       code1 = reverse_condition (code);
       code2 = EQ;
   }
-  emit_insn (gen_rtx_SET (CCmode, tem, gen_rtx_fmt_ee (code1, CCmode, op0, op1)));
+  emit_insn (gen_rtx_SET (BImode, tem, gen_rtx_fmt_ee (code1, BImode, op0, op1)));
 
-  return gen_rtx_fmt_ee (code2, CCmode, tem, CONST0_RTX(CCmode));
+  return gen_rtx_fmt_ee (code2, BImode, tem, CONST0_RTX (BImode));
 }
 
 static int

@@ -8,6 +8,15 @@
 	(secondary_input_reload_class): Don't use true_regnum, go through
 	reg_renumber.
 
+	* config/bfin/bfin.c (confitional_register_usage): Generate bfin_cc_rtx
+	with BImode.
+	(hard_regno_mode_ok): Allow BImode for CCREGS.
+	(bfin_gen_compare): Use BImode instead of CCmode.
+	* config/bfin/bfin.md (movsicc_insn1, movsicc_insn2, bit test patterns,
+	not CC pattern, comparison patterns, beq, bne, bgt, bgtu, blt, bltu,
+	bge, bgeu, ble, bleu, conditional branch patterns, seq, slt, sle, sltu,
+	sleu, cc to/from dreg move patterns): Likewise.
+
 2004-10-03  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (TRAMPOLINE_TEMPLATE): Correct instruction

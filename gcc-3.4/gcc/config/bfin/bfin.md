@@ -257,7 +257,7 @@
 (define_insn "*movsicc_insn1"
   [(set (match_operand:SI 0 "register_operand" "=da,da,da")
         (if_then_else:SI 
-	    (eq:CC (match_operand:CC 3 "cc_operand" "C,C,C") 
+	    (eq:BI (match_operand:BI 3 "cc_operand" "C,C,C") 
 		(const_int 0))
 	    (match_operand:SI 1 "register_operand" "da,0,da")
 	    (match_operand:SI 2 "register_operand" "0,da,da")))]
@@ -272,7 +272,7 @@
 (define_insn "*movsicc_insn2"
   [(set (match_operand:SI 0 "register_operand" "=da,da,da")
         (if_then_else:SI 
-	    (ne:CC (match_operand:CC 3 "cc_operand" "C,C,C") 
+	    (ne:BI (match_operand:BI 3 "cc_operand" "C,C,C") 
 		(const_int 0))
 	    (match_operand:SI 1 "register_operand" "0,da,da")
 	    (match_operand:SI 2 "register_operand" "da,0,da")))]
@@ -859,20 +859,20 @@
 ; 04/23/99 --lev
 
 (define_insn ""
- [(set (match_operand:CC 0 "cc_operand" "=C")
-       (eq:CC (zero_extract:SI (match_operand:SI 1 "register_operand" "d")
-			(const_int 1)
-			(match_operand:SI 2 "immediate_operand" "L"))
-		(const_int 0)))]
+ [(set (match_operand:BI 0 "cc_operand" "=C")
+       (eq:BI (zero_extract:SI (match_operand:SI 1 "register_operand" "d")
+			       (const_int 1)
+			       (match_operand:SI 2 "immediate_operand" "L"))
+	      (const_int 0)))]
  ""
  "cc =!BITTST (%1,%2);"
   [(set_attr "type" "alu0")])
 
 (define_insn ""
- [(set (match_operand:CC 0 "cc_operand" "=C")
-       (eq:CC (zero_extract:SI (match_operand:SI 1 "register_operand" "d")
-			(const_int 1)
-			(match_operand:SI 2 "immediate_operand" "L"))
+ [(set (match_operand:BI 0 "cc_operand" "=C")
+       (eq:BI (zero_extract:SI (match_operand:SI 1 "register_operand" "d")
+			       (const_int 1)
+			       (match_operand:SI 2 "immediate_operand" "L"))
 		(const_int 1)))]
  ""
  "cc =BITTST (%1,%2);"
@@ -1007,8 +1007,8 @@
   [(set_attr "type" "alu0")])
 
 (define_insn ""
-  [(set (match_operand:CC 0 "cc_operand"         "=C")
-	(not:CC (match_operand:CC 1 "cc_operand" " 0")))]
+  [(set (match_operand:BI 0 "cc_operand"         "=C")
+	(not:BI (match_operand:BI 1 "cc_operand" " 0")))]
   ""
   "%0 = ! %0;"    /*  NOT CC;"  */
   [(set_attr "type" "compare")])
@@ -1298,16 +1298,16 @@ else
 ;  [(set_attr "type" "compare")])
 
 (define_insn ""
-  [(set (match_operand:CC 0 "cc_operand" "=C,C")
-        (eq:CC (match_operand:SI 1 "register_operand"  "d, a")
+  [(set (match_operand:BI 0 "cc_operand" "=C,C")
+        (eq:BI (match_operand:SI 1 "register_operand"  "d, a")
                (match_operand:SI 2 "nonmemory_operand" "dO,aO")))]
   ""
   "cc =%1==%2;"
   [(set_attr "type" "compare")])
 
 (define_insn ""
-  [(set (match_operand:CC 0 "cc_operand" "=C,C")
-        (ne:CC (match_operand:SI 1 "register_operand"  "d, a")
+  [(set (match_operand:BI 0 "cc_operand" "=C,C")
+        (ne:BI (match_operand:SI 1 "register_operand"  "d, a")
                (match_operand:SI 2 "nonmemory_operand" "dO,aO")))]
   "0"
   "cc =%1!=%2;"
@@ -1315,32 +1315,32 @@ else
 
 
 (define_insn ""
-  [(set (match_operand:CC 0 "cc_operand" "=C,C")
-        (lt:CC (match_operand:SI 1 "register_operand"  "d, a")
+  [(set (match_operand:BI 0 "cc_operand" "=C,C")
+        (lt:BI (match_operand:SI 1 "register_operand"  "d, a")
                (match_operand:SI 2 "nonmemory_operand" "dO,aO")))]
   ""
   "cc =%1<%2;"
   [(set_attr "type" "compare")])
 
 (define_insn ""
-  [(set (match_operand:CC 0 "cc_operand" "=C,C")
-        (le:CC (match_operand:SI 1 "register_operand"  "d, a")
+  [(set (match_operand:BI 0 "cc_operand" "=C,C")
+        (le:BI (match_operand:SI 1 "register_operand"  "d, a")
                (match_operand:SI 2 "nonmemory_operand" "dO,aO")))]
   ""
   "cc =%1<=%2;"
   [(set_attr "type" "compare")])
 
 (define_insn ""
-  [(set (match_operand:CC 0 "cc_operand" "=C,C")
-        (leu:CC (match_operand:SI 1 "register_operand"  "d, a")
+  [(set (match_operand:BI 0 "cc_operand" "=C,C")
+        (leu:BI (match_operand:SI 1 "register_operand"  "d, a")
                 (match_operand:SI 2 "nonmemory_operand" "dN,aN")))]
   ""
   "cc =%1<=%2 (iu);"
   [(set_attr "type" "compare")])
 
 (define_insn ""
-  [(set (match_operand:CC 0 "cc_operand" "=C,C")
-        (ltu:CC (match_operand:SI 1 "register_operand"  "d, a")
+  [(set (match_operand:BI 0 "cc_operand" "=C,C")
+        (ltu:BI (match_operand:SI 1 "register_operand"  "d, a")
                 (match_operand:SI 2 "nonmemory_operand" "dN,aN")))]
   ""
   "cc =%1<%2 (iu);"
@@ -1357,9 +1357,9 @@ else
   "
 {
   operands[1] = bfin_cc_rtx;	/* hard register: CC */
-  operands[2] = gen_rtx (EQ, CCmode,
+  operands[2] = gen_rtx (EQ, BImode,
 			 bfin_compare_op0, bfin_compare_op1);
-  operands[3] = gen_rtx (NE, CCmode,
+  operands[3] = gen_rtx (NE, BImode,
 			 operands[1], const0_rtx);
 }")
 
@@ -1374,9 +1374,9 @@ else
   "
 {
   operands[1] = bfin_cc_rtx;
-  operands[2] = gen_rtx (EQ, CCmode,
+  operands[2] = gen_rtx (EQ, BImode,
 			 bfin_compare_op0, bfin_compare_op1);
-  operands[3] = gen_rtx (EQ, CCmode,
+  operands[3] = gen_rtx (EQ, BImode,
 			 operands[1], const0_rtx);
 }")
 
@@ -1391,9 +1391,9 @@ else
   "
 {
   operands[1] = bfin_cc_rtx;
-  operands[2] = gen_rtx (LE, CCmode,
+  operands[2] = gen_rtx (LE, BImode,
 			 bfin_compare_op0, bfin_compare_op1);
-  operands[3] = gen_rtx (EQ, CCmode,
+  operands[3] = gen_rtx (EQ, BImode,
 			 operands[1], const0_rtx);
 }")
 
@@ -1408,9 +1408,9 @@ else
   "
 {
   operands[1] = bfin_cc_rtx;
-  operands[2] = gen_rtx (LEU, CCmode,
+  operands[2] = gen_rtx (LEU, BImode,
 			 bfin_compare_op0, bfin_compare_op1);
-  operands[3] = gen_rtx (EQ, CCmode,
+  operands[3] = gen_rtx (EQ, BImode,
 			 operands[1], const0_rtx);
 }")
 
@@ -1425,9 +1425,9 @@ else
   "
 {
   operands[1] = bfin_cc_rtx;
-  operands[2] = gen_rtx (LT, CCmode,
+  operands[2] = gen_rtx (LT, BImode,
 			 bfin_compare_op0, bfin_compare_op1);
-  operands[3] = gen_rtx (NE, CCmode,
+  operands[3] = gen_rtx (NE, BImode,
 			 operands[1], const0_rtx);
 }")
 
@@ -1442,9 +1442,9 @@ else
   "
 {
   operands[1] = bfin_cc_rtx;
-  operands[2] = gen_rtx (LTU, CCmode,
+  operands[2] = gen_rtx (LTU, BImode,
 			 bfin_compare_op0, bfin_compare_op1);
-  operands[3] = gen_rtx (NE, CCmode,
+  operands[3] = gen_rtx (NE, BImode,
 			 operands[1], const0_rtx);
 }")
 
@@ -1460,9 +1460,9 @@ else
   "
 {
   operands[1] = bfin_cc_rtx;
-  operands[2] = gen_rtx (LT, CCmode,
+  operands[2] = gen_rtx (LT, BImode,
 			 bfin_compare_op0, bfin_compare_op1);
-  operands[3] = gen_rtx (EQ, CCmode,
+  operands[3] = gen_rtx (EQ, BImode,
 			 operands[1], const0_rtx);
 }")
 
@@ -1477,9 +1477,9 @@ else
   "
 {
   operands[1] = bfin_cc_rtx;
-  operands[2] = gen_rtx (LTU, CCmode,
+  operands[2] = gen_rtx (LTU, BImode,
 			 bfin_compare_op0, bfin_compare_op1);
-  operands[3] = gen_rtx (EQ, CCmode,
+  operands[3] = gen_rtx (EQ, BImode,
 			 operands[1], const0_rtx);
 }")
 
@@ -1494,9 +1494,9 @@ else
   "
 {
   operands[1] = bfin_cc_rtx;
-  operands[2] = gen_rtx (LE, CCmode,
+  operands[2] = gen_rtx (LE, BImode,
 			 bfin_compare_op0, bfin_compare_op1);
-  operands[3] = gen_rtx (NE, CCmode,
+  operands[3] = gen_rtx (NE, BImode,
 			 operands[1], const0_rtx);
 }")
 
@@ -1512,16 +1512,16 @@ else
   "
 {
   operands[1] = bfin_cc_rtx;
-  operands[2] = gen_rtx (LEU, CCmode,
+  operands[2] = gen_rtx (LEU, BImode,
 			 bfin_compare_op0, bfin_compare_op1);
-  operands[3] = gen_rtx (NE, CCmode,
+  operands[3] = gen_rtx (NE, BImode,
 			 operands[1], const0_rtx);
 }")
 
 
 (define_insn ""
   [(set (pc)
-	(if_then_else (eq:CC (match_operand:CC 0 "cc_operand" "C") (const_int 0))
+	(if_then_else (eq:BI (match_operand:BI 0 "cc_operand" "C") (const_int 0))
 		(label_ref (match_operand 1 "" ""))
 		(pc)))]
   ""
@@ -1531,7 +1531,7 @@ else
 
 (define_insn ""
   [(set (pc)
-	(if_then_else (ne:CC (match_operand:CC 0 "cc_operand" "C") (const_int 0))
+	(if_then_else (ne:BI (match_operand:BI 0 "cc_operand" "C") (const_int 0))
 		      (label_ref (match_operand 1 "" ""))
 		      (pc)))]
   ""
@@ -1543,7 +1543,7 @@ else
 
 (define_insn ""
   [(set (pc)
-	(if_then_else (eq:CC (match_operand:CC 0 "cc_operand" "C") (const_int 0))
+	(if_then_else (eq:BI (match_operand:BI 0 "cc_operand" "C") (const_int 0))
 		      (pc)
 		      (label_ref (match_operand 1 "" ""))))]
   ""
@@ -1553,7 +1553,7 @@ else
 
 (define_insn ""
   [(set (pc)
-	(if_then_else (ne:CC (match_operand:CC 0 "cc_operand" "C") (const_int 0))
+	(if_then_else (ne:BI (match_operand:BI 0 "cc_operand" "C") (const_int 0))
 		      (pc)
 		      (label_ref (match_operand 1 "" ""))))]
   ""
@@ -1562,7 +1562,7 @@ else
   ])
 
 (define_expand "seq"
-  [(set (match_dup 1) (eq:CC (match_dup 2) (match_dup 3)))
+  [(set (match_dup 1) (eq:BI (match_dup 2) (match_dup 3)))
    (set (match_operand:SI 0 "register_operand" "")
 	(subreg:SI (match_dup 1) 0))]
   ""
@@ -1573,9 +1573,8 @@ else
    operands[1] = bfin_cc_rtx;
 }")
 
-
 (define_expand "slt"
-  [(set (match_dup 1) (lt:CC (match_dup 2) (match_dup 3)))
+  [(set (match_dup 1) (lt:BI (match_dup 2) (match_dup 3)))
    (set (match_operand:SI 0 "register_operand" "")
 	(subreg:SI (match_dup 1) 0))]
   ""
@@ -1587,7 +1586,7 @@ else
 }")
 
 (define_expand "sle"
-  [(set (match_dup 1) (le:CC (match_dup 2) (match_dup 3)))
+  [(set (match_dup 1) (le:BI (match_dup 2) (match_dup 3)))
    (set (match_operand:SI 0 "register_operand" "")
 	(subreg:SI (match_dup 1) 0))]
   ""
@@ -1599,7 +1598,7 @@ else
 }")
 
 (define_expand "sltu"
-  [(set (match_dup 1) (ltu:CC (match_dup 2) (match_dup 3)))
+  [(set (match_dup 1) (ltu:BI (match_dup 2) (match_dup 3)))
    (set (match_operand:SI 0 "register_operand" "") 
 	(subreg:SI (match_dup 1) 0))]
   ""
@@ -1611,7 +1610,7 @@ else
 }")
 
 (define_expand "sleu"
-  [(set (match_dup 1) (leu:CC (match_dup 2) (match_dup 3)))
+  [(set (match_dup 1) (leu:BI (match_dup 2) (match_dup 3)))
    (set (match_operand:SI 0 "register_operand" "") 
 	(subreg:SI (match_dup 1) 0))]
   ""
@@ -1629,9 +1628,9 @@ else
 
 ;;;;;;;;;;;;;;;;;;;;   CC2dreg   ;;;;;;;;;;;;;;;;;;;;;;;;;
 (define_insn ""
-        [(set (match_operand:CC 0 "cc_operand"         "=C")
-              (if_then_else:CC
-                 (eq (match_operand:SI 1 "register_operand" "d") (const_int 0))
+        [(set (match_operand:BI 0 "cc_operand"         "=C")
+              (if_then_else
+                 (eq:BI (match_operand:SI 1 "register_operand" "d") (const_int 0))
                  (const_int 0) (const_int 1)))]
         ""
         "CC = %1;"
@@ -1640,7 +1639,7 @@ else
 (define_insn ""
         [(set (match_operand:SI 0 "register_operand" "=d")
               (if_then_else:SI
-                  (eq:CC (match_operand:CC 1 "cc_operand" "C")
+                  (eq:BI (match_operand:BI 1 "cc_operand" "C")
                       (const_int 0))
               (const_int 0)
               (const_int 1)))]
