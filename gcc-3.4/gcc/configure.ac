@@ -1679,8 +1679,6 @@ gcc_cv_ld_gld_srcdir=`echo $srcdir | sed -e 's,/gcc$,,'`/ld
 gcc_cv_ld_bfd_srcdir=`echo $srcdir | sed -e 's,/gcc$,,'`/bfd
 if test -x "$DEFAULT_LINKER"; then
 	gcc_cv_ld="$DEFAULT_LINKER"
-elif test -x "$LD"; then
-	gcc_cv_ld="$LD"
 elif test -x collect-ld$host_exeext; then
 	# Build using linker in the current directory.
 	gcc_cv_ld=./collect-ld$host_exeext
@@ -1709,6 +1707,8 @@ changequote([,])dnl
 	rm -f collect-ld$host_exeext
 	$symbolic_link ../ld/ld-new$host_exeext collect-ld$host_exeext \
 		2>/dev/null
+elif test -x "$LD"; then
+	gcc_cv_ld="$LD"
 fi
 
 if test "x$gcc_cv_ld" = x; then

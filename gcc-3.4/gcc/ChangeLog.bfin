@@ -2,6 +2,9 @@
 
 	* config/bfin/bfin.md (negdi2): Clobbers CC.
 	* config/bfin/bfin.c (effective_address_32bit_p): Strip off the MEM.
+	* configure.ac (test for ld): Move test for $LD to the end of the if
+	statement, so we give priority to an in-tree ld.
+	* configure: Regenerated.
 
 2004-10-07  Bernd Schmidt  <bernd.schmidt@analog.com>
 
