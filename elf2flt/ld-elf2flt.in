@@ -24,7 +24,7 @@ if expr "$*" : ".*-elf2flt.*" > /dev/null
 then
 	ARG1=
 	ARG2=
-	OFILE=
+	OFILE=a.out
 	PIC=
 	SDIRS=
 	LDSCRIPT=
