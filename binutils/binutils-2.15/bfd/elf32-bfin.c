@@ -1673,12 +1673,12 @@ elf_bfin_relocate_section (bfd * output_bfd,
 		      symbol.section = h->root.u.def.section;
 		      symbol.name = h->root.root.string;
 		      symbol.value = h->root.u.def.value;
-		      if (h->root.type == bfd_link_hash_defweak
-			  || h->root.type == bfd_link_hash_undefweak)
-			{
+		   }
+		  else if (h->root.type == bfd_link_hash_defweak
+				  || h->root.type == bfd_link_hash_undefweak)
+			 {
 			  symbol.flags |= BSF_WEAK;
-			}
-		    }
+			 }
 		}
 	      else
 		{
