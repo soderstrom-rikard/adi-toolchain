@@ -66,7 +66,7 @@ struct expressionS;
 #define SYMBOL_T       symbolS*
  
 struct expression_cell {
-    int value;
+    long value;
     SYMBOL_T symbol;
 };
 
@@ -83,15 +83,84 @@ struct bfin_insn
 #define INSTR_T        struct bfin_insn*
 #define EXPR_T         struct expression_cell* 
  
+typedef struct expr_node_struct ExprNode;
+
 extern INSTR_T gencode (unsigned long x);
 extern INSTR_T conscode(INSTR_T head, INSTR_T tail);   
-extern INSTR_T notereloc(INSTR_T code, EXPR_T sym, int reloc, int pcrel);
+extern INSTR_T conctcode(INSTR_T head, INSTR_T tail);
+extern INSTR_T notereloc(INSTR_T code, ExprNode *, int reloc, int pcrel);
+extern INSTR_T notereloc1(INSTR_T code, const char * sym, int reloc, int pcrel);
  
 #define CONSCODE(head,tail)       conscode(head,tail)
+#define CONCTCODE(head, tail)	  conctcode(head, tail)
 #define GENCODE(x)                gencode(x)
 #define NOTERELOC(pcrel, rel, expr, code)  notereloc(code,expr,rel,pcrel)
+#define NOTERELOC1(pcrel, rel, expr, code)  notereloc1(code,expr,rel,pcrel)
  
  
+/****************typedef and methods related to new expresion parser ***/
+/* types of expressions */
+typedef enum 
+{
+	ExprNodeBinop, // binary operator
+	ExprNodeUnop,  // unary  opertor
+	ExprNodeReloc, // a symbol, to be relocated
+	ExprNodeConstant // a constant value
+} ExprNodeType;
+
+/* types of operators */
+typedef enum 
+{
+	ExprOpTypeAdd, 		/*Addition*/
+	ExprOpTypeSub,		/*subtraction*/
+	ExprOpTypeMult,		/*Multiplication*/
+	ExprOpTypeDiv,		/*Division*/
+	ExprOpTypeMod,		/*Modulus*/
+	ExprOpTypeLsft,		/*Left shift*/
+	ExprOpTypeRsft,		/*Right shift*/
+	ExprOpTypeBAND,		/*Bitwise AND*/
+	ExprOpTypeBOR,		/*Bitwise OR*/
+	ExprOpTypeBXOR,		/*Bitwise exclusive OR*/
+	ExprOpTypeLAND,		/*Logical AND*/
+	ExprOpTypeLOR,		/*Logical OR*/
+	ExprOpTypeNEG,	/*Negate expression*/
+	ExprOpTypeCOMP	/*Complement expression*/
+} ExprOpType;
+
+/* The value that can be stored ... depends on type */
+typedef union
+{
+	char *s_value;       /* if relocation symbol, the text */
+	int  i_value;        /* if constant, the value */
+	ExprOpType op_value; /* if operator, the value */
+} ExprNodeValue;
+
+/* the actual expression node */
+struct expr_node_struct
+{
+	ExprNodeType type;
+	ExprNodeValue value;
+	ExprNode *LeftChild;
+	ExprNode *RightChild;
+};
+
+
+/* operations on the expression node */
+ExprNode *ExprNodeCreate(ExprNodeType type, 
+		         ExprNodeValue value, 
+			 ExprNode *LeftChild, 
+			 ExprNode *RightChild);
+
+/* generate the reloc structure as a series of instructions */
+INSTR_T ExprNodeGenReloc(ExprNode *head, 
+		          int parent_reloc /* the real reloction type - depends on
+					      the assembly instruction
+					   */
+			 );
+
+
+/****************************************************************************/
+
  
 #define MKREF(x)	mkexpr(0,x)
 #define ALLOCATE(x)	malloc(x)
@@ -104,7 +173,7 @@ extern INSTR_T notereloc(INSTR_T code, EXPR_T sym, int reloc, int pcrel);
 
 
 #ifndef EXPR_VALUE
-#define EXPR_VALUE(x)  ((x)->value)
+#define EXPR_VALUE(x)  (((x)->type == ExprNodeConstant)?((x)->value.i_value):0)
 #endif
 #ifndef EXPR_SYMBOL
 #define EXPR_SYMBOL(x) ((x)->symbol)

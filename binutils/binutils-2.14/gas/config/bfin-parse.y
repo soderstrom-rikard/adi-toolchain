@@ -27,10 +27,10 @@ int nwarnings;
 extern FILE *errorf;
 extern INSTR_T insn;
 
-static EXPR_T binary(expr_opcodes_t,EXPR_T,EXPR_T);
-static EXPR_T unary(expr_opcodes_t,EXPR_T);
+static ExprNode * binary(ExprOpType,ExprNode *,ExprNode *);
+static ExprNode * unary(ExprOpType,ExprNode *);
 
-static int const_fits(EXPR_T expr, const_forms_t form);
+static int const_fits(ExprNode * expr, const_forms_t form);
 static void notethat(char *format, ...);
 
 char *current_inputline;
@@ -402,7 +402,7 @@ static void  ensure_legal_multi_issue_slavep (INSTR_T x) {
 %union {
     INSTR_T instr;
     reg_t regno;
-    EXPR_T expr;
+    ExprNode *expr;
     SYMBOL_T symbol;
     long value;
 
@@ -1705,6 +1705,13 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
 		    notethat("BRCC: IF !CC JUMP  pcrel11m2\n");
+                    $$ = CONSCODE(GENCODE(0x001000
+                                  |((pcrel10($5)&0x3ff)<<0)   /* offset<(pcrel10) */
+                                  |((0&0x1)<<11)              /* T<(0)            */
+                                         ),
+                                   ExprNodeGenReloc($5, BFD_RELOC_10_PCREL));
+
+#if 0
 		    $$ = CONSCODE(
 		        NOTERELOC(PCREL,BFD_RELOC_10_PCREL,$5,
 		          GENCODE(0x001000
@@ -1712,6 +1719,7 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 		                  |((0&0x1)<<11)                           /* T<(0) */
 		          )),
 		        NULL_CODE);
+#endif
 		  } else { $$ = 0; semantic_error ("IF BANG REG JUMP expr"); }
 		}
 	| IF BANG REG JUMP expr LPAREN BP RPAREN
@@ -1725,6 +1733,13 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
 		    notethat("BRCC: IF !CC JUMP  pcrel11m2 (bp)\n");
+                    $$ = CONSCODE(GENCODE(0x001000
+                                  |((pcrel10($5)&0x3ff)<<0)    /* offset<(pcrel10) */
+                                  |((0&0x1)<<11)               /* T<(0) */
+                                  |((1&0x1)<<10)               /* B<(1) */
+                                  ),
+                                  ExprNodeGenReloc($5, BFD_RELOC_10_PCREL));
+#if 0
 		    $$ = CONSCODE(
 		        NOTERELOC(PCREL,BFD_RELOC_10_PCREL,$5,
 		          GENCODE(0x001000
@@ -1733,6 +1748,7 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 		                  |((1&0x1)<<10)                           /* B<(1) */
 		          )),
 		        NULL_CODE);
+#endif
 		  } else { $$ = 0; semantic_error ("IF BANG REG JUMP expr LPAREN BP RPAREN"); }
 		}
 	| IF REG JUMP expr
@@ -1746,6 +1762,12 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
 		    notethat("BRCC: IF CC JUMP pcrel11m2\n");
+                    $$ = CONSCODE(GENCODE(0x001000
+                                  |((pcrel10($4)&0x3ff)<<0)    /* offset<(pcrel10) */
+                                  |((1&0x1)<<11)               /* T<(1) */
+                                         ),
+                                   ExprNodeGenReloc($4, BFD_RELOC_10_PCREL));
+#if 0
 		    $$ = CONSCODE(
 		        NOTERELOC(PCREL,BFD_RELOC_10_PCREL,$4,
 		          GENCODE(0x001000
@@ -1753,6 +1775,7 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 		                  |((1&0x1)<<11)                           /* T<(1) */
 		          )),
 		        NULL_CODE);
+#endif
 		  } else { $$ = 0; semantic_error ("IF REG JUMP expr"); }
 		}
  
@@ -1767,6 +1790,13 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
 		    notethat("BRCC: IF CC JUMP pcrel11m2 (bp)\n");
+                    $$ = CONSCODE(GENCODE(0x001000
+                                  |((pcrel10($4)&0x3ff)<<0)    /* offset<(pcrel10) */
+                                  |((1&0x1)<<11)               /* T<(1) */
+                                  |((1&0x1)<<10)               /* B<(1) */
+                                         ),
+                                   ExprNodeGenReloc($4, BFD_RELOC_10_PCREL));
+#if 0
 		    $$ = CONSCODE(
 		        NOTERELOC(PCREL,BFD_RELOC_10_PCREL,$4,
 		          GENCODE(0x001000
@@ -1775,6 +1805,7 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 		                  |((1&0x1)<<10)                           /* B<(1) */
 		          )),
 		        NULL_CODE);
+#endif
 		  } else { $$ = 0; semantic_error ("IF REG JUMP expr LPAREN BP RPAREN"); }
 		}
 
@@ -1828,6 +1859,12 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
 		    notethat("CALLa: CALL pcrel25m2\n");
+                    $$ = CONSCODE(GENCODE(0x00e200
+                            |(((pcrel24($2)>>16)&0xff)<<0)/* msw<(pcrel24)>>16 */
+                            |((1&0x1)<<8)                 /* S<(1) */
+                            ),
+                           ExprNodeGenReloc($2, BFD_RELOC_24_PCREL));
+#if 0
 		    $$ = CONSCODE(
 		        NOTERELOC(PCREL,BFD_RELOC_24_PCREL,$2,
 		          GENCODE(0x00e200
@@ -1839,6 +1876,7 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 		                  |((pcrel24($2)&0xffff)<<0)               /* lsw<(pcrel24) */
 		          ),
 		          NULL_CODE));
+#endif
 		  } else { $$ = 0; semantic_error ("CALL expr"); }
 		}
 
@@ -1854,6 +1892,12 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
                     notethat("CALLa: CALL pcrel25m2\n");
+                    $$ = CONSCODE(GENCODE(0x00e200
+                         |(((pcrel24_call_x($2)>>16)&0xff)<<0)/* msw<(pcrel24)>>16 */
+                         |((1&0x1)<<8)                        /* S<(1) */
+                         ),
+                         ExprNodeGenReloc($2, BFD_RELOC_24_PCREL_CALL_X));
+#if 0
                     $$ = CONSCODE(
                         NOTERELOC(PCREL,BFD_RELOC_24_PCREL_CALL_X,$2,
                           GENCODE(0x00e200
@@ -1865,6 +1909,7 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
                                   |((pcrel24_call_x($2)&0xffff)<<0)               /* lsw<(pcrel24) */
                           ),
                           NULL_CODE));
+#endif
                   } else { $$ = 0; semantic_error ("CALL expr"); }
                 }
 
@@ -2762,12 +2807,18 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
 		    notethat("UJUMP: JUMP pcrel12\n");
+		    $$ = CONSCODE(GENCODE(0x002000
+                             |((pcrel12_jump($2)&0xfff)<<0) /* offset<(pcrel12) */
+                                 ),
+                         ExprNodeGenReloc($2, BFD_RELOC_12_PCREL_JUMP));
+#if 0
 		    $$ = CONSCODE(
 		        NOTERELOC(PCREL,BFD_RELOC_12_PCREL_JUMP,$2,
 		          GENCODE(0x002000
 		                  |((pcrel12_jump($2)&0xfff)<<0)                /* offset<(pcrel12) */
 		          )),
 		        NULL_CODE);
+#endif
 		  } else { $$ = 0; semantic_error ("JUMP expr"); }
 		}
 	| JUMP_DOT_S expr
@@ -2781,12 +2832,19 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
 		    notethat("UJUMP: JUMP_DOT_S pcrel12\n");
+                    $$ = CONSCODE(GENCODE(0x002000
+                             |((pcrel12_jump_s($2)&0xfff)<<0)/* offset<(pcrel12) */
+                             ),
+                         ExprNodeGenReloc($2, BFD_RELOC_12_PCREL_JUMP_S));
+
+#if 0
 		    $$ = CONSCODE(
 		        NOTERELOC(PCREL,BFD_RELOC_12_PCREL_JUMP_S,$2,
 		          GENCODE(0x002000
 		                  |((pcrel12_jump_s($2)&0xfff)<<0)                /* offset<(pcrel12) */
 		          )),
 		        NULL_CODE);
+#endif
 
 		  } else { $$ = 0; semantic_error ("JUMP_DOT_S expr"); }
 		}
@@ -3322,6 +3380,12 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
 		    notethat("CALLa: JUMP_DOT_L pcrel24\n");
+                    $$ = CONSCODE(GENCODE(0x00e200
+                         |(((pcrel24_jump_l($2)>>16)&0xff)<<0)/* msw<(pcrel24)>>16 */
+                         |((0&0x1)<<8)                        /* S<(0) */
+                         ),
+                         ExprNodeGenReloc($2, BFD_RELOC_24_PCREL_JUMP_L));
+#if 0
 		    $$ =
 		      CONSCODE(
 		        NOTERELOC(PCREL,BFD_RELOC_24_PCREL_JUMP_L,$2,
@@ -3334,6 +3398,7 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 		                  |((pcrel24_jump_l($2)&0xffff)<<0)               /* lsw<(pcrel24) */
 		          ),
 		          NULL_CODE));
+#endif
 
 		  } else { $$ = 0; semantic_error ("JUMP_DOT_L expr"); }
 		}
@@ -3350,6 +3415,12 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
                     notethat("CALLa: JUMP_DOT_X pcrel24_call_x\n");
+                    $$ = CONSCODE(GENCODE(0x00e200
+                         |(((pcrel24_call_x($2)>>16)&0xff)<<0)/* msw<(pcrel24)>>16 */
+                         |((0&0x1)<<8)                        /* S<(0) */
+                         ),
+                         ExprNodeGenReloc($2, BFD_RELOC_24_PCREL_JUMP_X));
+#if 0
                     $$ =
                       CONSCODE(
                         NOTERELOC(PCREL,BFD_RELOC_24_PCREL_JUMP_X,$2,
@@ -3362,6 +3433,7 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
                                   |((pcrel24_call_x($2)&0xffff)<<0)               /* lsw<(pcrel24) */
                           ),
                           NULL_CODE));
+#endif
 
                   } else { $$ = 0; semantic_error ("JUMP_DOT_L expr"); }
                 }
@@ -3939,6 +4011,14 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
 		    notethat("LoopSetup: LSETUP ( pcrel4 , lppcrel10 ) counters\n");
+                    $$ = CONSCODE(GENCODE(0x00e080
+                                  |((pcrel5($3)&0xf)<<0)/* soffset<(pcrel4) */
+                                  |((counters($7)&0x1)<<4)/* c<(counters) */
+                                  |((0&0x3)<<5)           /* rop<(0) */
+                            ),
+                            CONCTCODE(ExprNodeGenReloc($3, BFD_RELOC_5_PCREL),
+                                     ExprNodeGenReloc($5, BFD_RELOC_11_PCREL)));
+#if 0
 		    $$ =
 		      CONSCODE(
 		        NOTERELOC(PCREL,BFD_RELOC_5_PCREL,$3,
@@ -3953,6 +4033,7 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 		                    |((pcrel11($5)&0x3ff)<<0)              /* eoffset<(lppcrel10) */
 		            )),
 		          NULL_CODE));
+#endif
 
 		  } else { $$ = 0; semantic_error ("LSETUP LPAREN expr COMMA expr RPAREN REG"); }
 		}
@@ -3971,6 +4052,14 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
 		    notethat("LoopSetup: LSETUP ( pcrel4 , lppcrel10 ) counters = pregs\n");
+                    $$ = CONSCODE(GENCODE(0x00e080
+                                  |((pcrel5($3)&0xf)<<0)  /* soffset<(pcrel4) */
+                                  |((counters($7)&0x1)<<4)/* c<(counters) */
+                                  |((1&0x3)<<5)           /* rop<(1) */
+                          ),
+                          CONCTCODE(ExprNodeGenReloc($3, BFD_RELOC_5_PCREL),
+                                    ExprNodeGenReloc($5, BFD_RELOC_11_PCREL)));
+#if 0
 		    $$ =
 		      CONSCODE(
 		        NOTERELOC(PCREL,BFD_RELOC_5_PCREL,$3,
@@ -3986,6 +4075,7 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 		                    |((pregs($9)&0xf)<<12)                   /* reg<(pregs) */
 		            )),
 		          NULL_CODE));
+#endif
 
 		  } else { $$ = 0; semantic_error ("LSETUP LPAREN expr COMMA expr RPAREN REG ASSIGN REG"); }
 		}
@@ -4005,6 +4095,14 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
 		    notethat("LoopSetup: LSETUP ( pcrel4 , lppcrel10 ) counters = pregs >> 1\n");
+                    $$ = CONSCODE(GENCODE(0x00e080
+                                  |((pcrel5($3)&0xf)<<0)  /* soffset<(pcrel4) */
+                                  |((counters($7)&0x1)<<4)/* c<(counters) */
+                                  |((3&0x3)<<5)           /* rop<(3) */
+                             ),
+                             CONCTCODE(ExprNodeGenReloc($3, BFD_RELOC_5_PCREL),
+                                       ExprNodeGenReloc($5, BFD_RELOC_11_PCREL)));
+#if 0
 		    $$ =
 		      CONSCODE(
 		        NOTERELOC(PCREL,BFD_RELOC_5_PCREL,$3,
@@ -4020,6 +4118,7 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 		                    |((pregs($9)&0xf)<<12)                   /* reg<(pregs) */
 		            )),
 		          NULL_CODE));
+#endif
 
 		  } else { $$ = 0; semantic_error ("LSETUP LPAREN expr COMMA expr RPAREN REG ASSIGN REG GREATER_GREATER expr"); }
 		}
@@ -4036,6 +4135,15 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
 		    notethat("LDIMMhalf: regs = luimm16 (z)\n");
+                    $$ = CONSCODE(GENCODE(0x00e100
+                                |((regs($1)&0x7)<<0)       /* reg<(regs) */
+                                |((Xregs($1)&0x3)<<3)      /* grp<(Xregs($3)) */
+                                |((0&0x1)<<6)              /* H<(0) */
+                                |((0&0x1)<<5)              /* S<(0) */
+                                |((1&0x1)<<7)              /* Z<(1) */
+                           ),
+                           ExprNodeGenReloc($3, BFD_RELOC_16_LOW));
+#if 0
 		    $$ =
 		      CONSCODE(
 		        GENCODE(0x00e100
@@ -4051,6 +4159,7 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 		                    |((luimm16($3)&0xffff)<<0)               /* hword<(luimm16) */
 		            )),
 		          NULL_CODE));
+#endif
 
 		  } else { $$ = 0; semantic_error ("REG ASSIGN expr LPAREN Z RPAREN"); }
 		}
@@ -15833,7 +15942,7 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 		      CONSCODE(
 		        GENCODE(0x004000
 		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                |((dregs($3)&0x7)<<3)                    /* src<(dregs) */
+		                <((dregs($3)&0x7)<<3)                    /* src<(dregs) */
 		                |((12&0xf)<<6)                           /* opc<(12) */
 		        ),
 		        NULL_CODE);
@@ -16030,6 +16139,15 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
 		    notethat("LDIMMhalf: regs = luimm16\n");
+                    $$ = CONSCODE(GENCODE(0x00e100
+                                |((regs($1)&0x7)<<0)    /* reg<(regs) */
+                                |((Xregs($1)&0x3)<<3)   /* grp<(Xregs($3)) */
+                                |((0&0x1)<<6)           /* H<(0) */
+                                |((0&0x1)<<5)           /* S<(0) */
+                                |((0&0x1)<<7)           /* Z<(0) */
+                           ),
+                           ExprNodeGenReloc($3, BFD_RELOC_16_LOW));
+#if 0
 		    $$ = CONSCODE(
 		        GENCODE(0x00e100
 		                |((regs($1)&0x7)<<0)                     /* reg<(regs) */
@@ -16044,6 +16162,7 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 		                    |((luimm16($3)&0xffff)<<0)               /* hword<(luimm16) */
 		            )),
 		          NULL_CODE));
+#endif
 		
 		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN expr"); }
 		}
@@ -16086,6 +16205,15 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
 		    notethat("LDIMMhalf: regs = huimm16\n");
+                    $$ = CONSCODE(GENCODE(0x00e100
+                                |((regs($1)&0x7)<<0)     /* reg<(regs) */
+                                |((Xregs($1)&0x3)<<3)    /* grp<(Xregs($3)) */
+                                |((1&0x1)<<6)            /* H<(1) */
+                                |((0&0x1)<<5)            /* S<(0) */
+                                |((0&0x1)<<7)            /* Z<(0) */
+                           ),
+                           ExprNodeGenReloc($3, BFD_RELOC_16_HIGH));
+#if 0
 		    $$ = CONSCODE(
 		        GENCODE(0x00e100
 		                |((regs($1)&0x7)<<0)                     /* reg<(regs) */
@@ -16100,6 +16228,7 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 		                    |((huimm16($3)&0xffff)<<0)               /* hword<(huimm16) */
 		            )),
 		          NULL_CODE));
+#endif
 		
 		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN expr"); }
 		}
@@ -16157,7 +16286,14 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 		}
 	| REG ASSIGN expr 
 		{
-		  if(0) {
+                   /* ExprNode *pNode = ExprNodeCreate(ExprNodeBinOp, "+",
+                                             ExprNodeCreate(ExprNodeReloc, "$L$1", 0, 0),
+                                             ExprNodeCreate(ExprNodeConstant, 1, 0, 0));
+			printf("reg = target got called zero param = %s"
+	"first param = %d third param = %s\n", $$->exp->symbol->bsym->, $1,  $3->symbol->bsym);*/
+//		int arith_reloc_code = 0xAABBCCDD;
+//		fprintf(stderr, "entry for rN=<preg>\n");	
+		if(0) {
 		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
 		             && reginclass($1,rc_dregs)
 		             && const_fits($3,c_imm7)) {
@@ -16167,6 +16303,7 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
 		    notethat("COMPI2opD: dregs = imm7 \n");
+
 		    $$ =
 		      CONSCODE(
 		        GENCODE(0x006000
@@ -16183,7 +16320,7 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 | 0 | 1 | 1 | 0 | 1 |.op|.src.......................|.dst.......|
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
+*/		   
 		    notethat("COMPI2opP: pregs = imm7\n");
 		    $$ =
 		      CONSCODE(
@@ -16203,9 +16340,12 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 |.hword.........................................................|
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
+//			fprintf(stderr, "adding %d reloc\n",BFD_ARELOC_EC);	
 		    notethat("LDIMMhalf: regs = luimm16 \n");
+#if 0
 		    $$ =
-		      CONSCODE(
+		  //    CONSCODE(GENCODE(arith_reloc_code),
+			CONSCODE(
 		        GENCODE(0x00e100
 		                |((regs($1)&0x7)<<0)                     /* reg<(regs) */
 		                |((Xregs($1)&0x3)<<3)                    /* grp<(Xregs($3)) */
@@ -16219,6 +16359,36 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 		                    |((luimm16($3)&0xffff)<<0)               /* hword<(luimm16) */
 		            )),
 		          NULL_CODE));
+#endif
+			{
+#if 0
+			ExprNode* constVal;
+			ExprNode* negOp;
+			ExprNode* head;
+			ExprNodeValue val, val1, val2;
+			val.i_value = 1;
+			constVal = ExprNodeCreate(ExprNodeConstant,val, NULL, NULL);
+			val.op_value = ExprOpTypeSub;
+			val1.s_value = "_L$L4";
+			val2.s_value = "_L$L5";
+			negOp  = ExprNodeCreate(ExprNodeBinop, val,
+					ExprNodeCreate(ExprNodeReloc, val1, NULL, NULL),
+					ExprNodeCreate(ExprNodeReloc, val2, NULL, NULL));
+			val.op_value = ExprOpTypeAdd;
+			head   = ExprNodeCreate(ExprNodeBinop, val, negOp, constVal); 
+#endif
+		
+			$$ = CONSCODE(
+		        	GENCODE(0x00e100
+		                |((regs($1)&0x7)<<0)                     /* reg<(regs) */
+		                |((Xregs($1)&0x3)<<3)                    /* grp<(Xregs($3)) */
+		                |((0&0x1)<<6)                            /* H<(0) */
+		                |((0&0x1)<<5)                            /* S<(0) */
+		                |((1&0x1)<<7)                            /* Z<(1) */
+		        ),
+			ExprNodeGenReloc($3, BFD_RELOC_16_IMM)
+		          );
+			}
 
 		  } else { $$ = 0; semantic_error ("REG ASSIGN expr"); }
 		}
@@ -17972,34 +18142,34 @@ macmod_hmove:
 	;
 
 
-symbol		: SYMBOL 			{ $$ = MKREF($1); }
+symbol		: SYMBOL 			{ ExprNodeValue val; val.s_value = S_GET_NAME($1); $$ = ExprNodeCreate(ExprNodeReloc, val, NULL, NULL); }
 		;
 
-eterm           : NUMBER 			{ $$ = mkexpr($1,0); }
+eterm           : NUMBER 			{ ExprNodeValue val; val.i_value = $1; $$ = ExprNodeCreate(ExprNodeConstant, val, NULL, NULL); }
+		| symbol			{ $$ = $1; }
     		| LPAREN expr_1 RPAREN  	{ $$ = $2; }
-                | TILDA expr_1			{ $$ = unary(ones_compl,$2); }
-		| MINUS expr_1 %prec TILDA	{ $$ = unary(twos_compl,$2); }
+                | TILDA expr_1			{ $$ = unary(ExprOpTypeCOMP,$2); }
+		| MINUS expr_1 %prec TILDA	{ $$ = unary(ExprOpTypeNEG,$2); }
 		;
 
 offset_expr	: PLUS eterm    { $$ = $2; }
-		| MINUS eterm   { $$ = unary(twos_compl,$2); }
-		|		{ $$ = mkexpr(0,0); }
+		| MINUS eterm   { $$ = unary(ExprOpTypeNEG,$2); }
+		|		{ $$ = NULL; }
 		;
 
 expr		: eterm				{ $$ = $1; }
-		| symbol offset_expr		{ $$ = binary(add,$1,$2); }
 		;
 
-expr_1		: expr_1 STAR expr_1		{ $$ = binary(mult,$1,$3);   }
-		| expr_1 SLASH expr_1		{ $$ = binary(divide,$1,$3); }
-		| expr_1 PERCENT expr_1		{ $$ = binary(mod,$1,$3);    }
-		| expr_1 PLUS expr_1		{ $$ = binary(add,$1,$3);    }
-		| expr_1 MINUS expr_1		{ $$ = binary(sub,$1,$3);    }
-		| expr_1 LESS_LESS expr_1	{ $$ = binary(lsh,$1,$3);    }
-		| expr_1 GREATER_GREATER expr_1	{ $$ = binary(rsh,$1,$3);    }
-		| expr_1 AMPERSAND expr_1	{ $$ = binary(logand,$1,$3); }
-		| expr_1 CARET expr_1		{ $$ = binary(logxor,$1,$3); }
-		| expr_1 BAR expr_1		{ $$ = binary(logior,$1,$3); }
+expr_1		: expr_1 STAR expr_1		{ $$ = binary(ExprOpTypeMult,$1,$3);   }
+		| expr_1 SLASH expr_1		{ $$ = binary(ExprOpTypeDiv,$1,$3); }
+		| expr_1 PERCENT expr_1		{ $$ = binary(ExprOpTypeMod,$1,$3);    }
+		| expr_1 PLUS expr_1		{ $$ = binary(ExprOpTypeAdd,$1,$3);    }
+		| expr_1 MINUS expr_1		{ $$ = binary(ExprOpTypeSub,$1,$3);    }
+		| expr_1 LESS_LESS expr_1	{ $$ = binary(ExprOpTypeLsft,$1,$3);    }
+		| expr_1 GREATER_GREATER expr_1	{ $$ = binary(ExprOpTypeRsft,$1,$3);    }
+		| expr_1 AMPERSAND expr_1	{ $$ = binary(ExprOpTypeBAND,$1,$3); }
+		| expr_1 CARET expr_1		{ $$ = binary(ExprOpTypeLOR,$1,$3); }
+		| expr_1 BAR expr_1		{ $$ = binary(ExprOpTypeBOR,$1,$3); }
 		| eterm				{ $$ = $1;		     }
 		;
 
@@ -18008,57 +18178,110 @@ expr_1		: expr_1 STAR expr_1		{ $$ = binary(mult,$1,$3);   }
 
 EXPR_T mkexpr(int x, SYMBOL_T s) {
     EXPR_T e = (EXPR_T) ALLOCATE(sizeof (struct expression_cell));
-    EXPR_VALUE(e) = x;
+    e->value = x;
     EXPR_SYMBOL(e) = s;
     return e;
     }
 
-static EXPR_T binary(expr_opcodes_t op,EXPR_T x,EXPR_T y) {
-    int val = 0;
-    switch (op) {
-	case mult:   val = EXPR_VALUE(x)*EXPR_VALUE(y);	break;
-	case divide: val = EXPR_VALUE(x)/EXPR_VALUE(y);	break;
-	case mod:    val = EXPR_VALUE(x)%EXPR_VALUE(y);	break;
-	case add:    val = EXPR_VALUE(x)+EXPR_VALUE(y);	break;
-	case sub:    val = EXPR_VALUE(x)-EXPR_VALUE(y);	break;
-	case lsh:    val = EXPR_VALUE(x)<<EXPR_VALUE(y);break;
-	case rsh:    val = EXPR_VALUE(x)>>EXPR_VALUE(y);break;
-	case logand: val = EXPR_VALUE(x)&EXPR_VALUE(y);	break;
-	case logior: val = EXPR_VALUE(x)|EXPR_VALUE(y);	break;
-	case logxor: val = EXPR_VALUE(x)^EXPR_VALUE(y);	break;
+/* return the new expression structure that allows
+   symbol operations
+   if the left and right children are constants, do the operation
+*/
+static ExprNode * binary(ExprOpType op,ExprNode *x,ExprNode *y) {
+    if(x->type == ExprNodeConstant && y->type == ExprNodeConstant){
+      switch (op) {
+        case ExprOpTypeAdd: 
+                x->value.i_value += y->value.i_value;
+		break;
+        case ExprOpTypeSub: 
+                x->value.i_value -= y->value.i_value;
+		break;
+        case ExprOpTypeMult: 
+                x->value.i_value *= y->value.i_value;
+		break;
+        case ExprOpTypeDiv: 
+                x->value.i_value /= y->value.i_value;
+		break;
+        case ExprOpTypeMod: 
+                x->value.i_value %= y->value.i_value;
+		break;
+        case ExprOpTypeLsft: 
+                x->value.i_value <<= y->value.i_value;
+		break;
+        case ExprOpTypeRsft: 
+                x->value.i_value >>= y->value.i_value;
+		break;
+        case ExprOpTypeBAND: 
+                x->value.i_value &= y->value.i_value;
+		break;
+        case ExprOpTypeBOR: 
+                x->value.i_value |= y->value.i_value;
+		break;
+        case ExprOpTypeBXOR: 
+                x->value.i_value ^= y->value.i_value;
+		break;
+        case ExprOpTypeLAND: 
+                x->value.i_value = x->value.i_value && y->value.i_value;
+		break;
+        case ExprOpTypeLOR: 
+                x->value.i_value = x->value.i_value || y->value.i_value;
+		break;
+
 	default : fprintf(stderr, "Internal compiler error at line %d in file %s\n", __LINE__, __FILE__);
+      }
+      return x; // should delete y
     }
-
-    return mkexpr (val, EXPR_SYMBOL(x));
+    else{
+      /* create a new expression structure */
+      ExprNodeValue val;
+      val.op_value = op;
+      return ExprNodeCreate(ExprNodeBinop, val, x, y);
     }
+}
 
-static EXPR_T unary(expr_opcodes_t op,EXPR_T x) {
-    int val = 0;
+static ExprNode * unary(ExprOpType op,ExprNode * x) 
+{
+  if(x->type == ExprNodeConstant){
     switch (op) {
-	case ones_compl: val = ~EXPR_VALUE(x);	break;
-	case twos_compl: val = -EXPR_VALUE(x);	break;
+        case ExprOpTypeNEG: 
+                x->value.i_value = -x->value.i_value;
+		break;
+        case ExprOpTypeCOMP: 
+                x->value.i_value = ~x->value.i_value;
+		break;
 	default :  fprintf(stderr, "Internal compiler error at line %d in file %s\n", __LINE__, __FILE__);
     }
-    return mkexpr (val, EXPR_SYMBOL(x));
-    }
+    return x;
+  }
+  else{
+      /* create a new expression structure */
+      ExprNodeValue val;
+      val.op_value = op;
+      return ExprNodeCreate(ExprNodeUnop, val, x, NULL);
+  }
+}
 
-static int const_fits(EXPR_T expr, const_forms_t form) {
+static int const_fits(ExprNode * expr, const_forms_t form) {
 #if 1
     int sz       = constant_formats[form].nbits;
     int scale    = constant_formats[form].scale;
     int offset   = constant_formats[form].offset;
     int issigned = constant_formats[form].issigned;
 
-    if (EXPR_SYMBOL(expr) 
-	&& !constant_formats[form].reloc)
+    /* check if reloc is allowed */
+    if((expr->type == ExprNodeReloc) && 
+        !constant_formats[form].reloc)
 	return 0;
+
+    if(expr->type == ExprNodeReloc)
+      return 1; // it will be relocated, not a constant
 
     if (sz < 32) {
       long mask   = (1l<<sz)-1;
       long minint = (-1l<<(sz-1));
       long maxint = (1l<<(sz-1));
 
-      long v = EXPR_VALUE (expr);
+      long v = expr->value.i_value;
 
       if (scale) {
 	long temp = v >> scale;

@@ -14,7 +14,7 @@
 #include "bfin-defs.h"
 #include "obstack.h"
 
-extern yyparse();
+extern int yyparse();
 struct yy_buffer_state;
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 extern YY_BUFFER_STATE yy_scan_string ( const char *yy_str );
@@ -332,6 +332,7 @@ md_assemble (char *line)
   char *toP;
   extern char *current_inputline; 
   int size;
+  int gen_insn = 1; // some relocations do not generate instructions
   
   current_inputline = line;
   /* Parse line here.  */
@@ -344,8 +345,6 @@ md_assemble (char *line)
    */
   while (insn)
   {
-    toP = frag_more(2);
-    md_number_to_chars(toP, insn->value, 2);
 
     if (insn->reloc != 0 && insn->exp->symbol) 
     {
@@ -360,9 +359,28 @@ md_assemble (char *line)
 	   default:
 		size = 2;
 	  }
+	gen_insn = 0;
+	/*Following if condition checks for the arithmetic relocations. 
+	 * If the case then it doesn't required to generate the code.
+	 * It has been assumed that, their ID will be contiguous*/
+	if(((BFD_ARELOC_E0 <= insn->reloc) && (BFD_ARELOC_F3 >= insn->reloc)) ||
+		insn->reloc == BFD_RELOC_16_IMM)
+	{
+//fprintf(stderr, "generating reloc for %x at %x\n", insn->reloc, toP);
+		gen_insn = 0;
+		size = 2;
+	}
+	if(gen_insn){
+          toP = frag_more(2);
+          md_number_to_chars(toP, insn->value, 2);
+	}
 
         fix_new(frag_now, (toP - frag_now->fr_literal),
 		  size, insn->exp->symbol, insn->exp->value, insn->pcrel, insn->reloc);
+    }
+    else{
+      toP = frag_more(2);
+      md_number_to_chars(toP, insn->value, 2);
     }
     
     insn = insn->next;
@@ -455,7 +473,9 @@ md_number_to_chars (buf, val, n)
      char * buf;
      valueT val;
      int    n;
-{   number_to_chars_littleendian (buf, val, n);
+{
+//fprintf(stderr, "generating %x at %x\n", val, buf);
+     	number_to_chars_littleendian (buf, val, n);
 }
 
 int md_estimate_size_before_relax (fragS * fragP, segT segment)
@@ -477,6 +497,8 @@ md_apply_fix3 (fixP, valp, seg)
   int highbyte = target_big_endian ? 0 : 1; 
   long val = *valp;
   int shift;
+//fprintf(stderr, "calling fix3 with %x\n", fixP->fx_r_type);
+return; // currently let us not fix local relocations.
 
 #if 0
   if (fixP->fx_r_type == BFD_RELOC_32)
@@ -627,9 +649,12 @@ md_apply_fix3 (fixP, valp, seg)
             *buf++ = val >> 0;
           }
         break;
+		//added following line for arithmetic reloc check -Jyotik
+     default: if((BFD_ARELOC_E0 > fixP->fx_r_type) || (BFD_ARELOC_F3 < fixP->fx_r_type))
+		      {
 
-     default:
-	abort ();
+		abort ();
+		      }
    }
 
    if (shift != 0)
@@ -788,14 +813,35 @@ struct obstack mempool;
 
 INSTR_T conscode(INSTR_T head, INSTR_T tail) 
 {
+	if(!head)
+		return tail;
   (head)->next = (tail);
   return (head);
 }
 
-INSTR_T notereloc(INSTR_T code, EXPR_T expr, int reloc, int pcrel)
+INSTR_T conctcode(INSTR_T head, INSTR_T tail)
+{
+	INSTR_T temp = (head);
+	if(!head)
+		return tail;
+	while(temp->next)
+		temp = temp->next;
+	temp->next = (tail);
+	  
+	return (head);
+}
+INSTR_T notereloc(INSTR_T code, ExprNode *symbol, int reloc, int pcrel)
+{
+	/* assert that the symbol is not an operator */
+	assert(symbol->type == ExprNodeReloc);
+
+	return notereloc1(code, symbol->value.s_value, reloc, pcrel);
+
+}
+INSTR_T notereloc1(INSTR_T code, const char *symbol, int reloc, int pcrel)
 {
   (code)->reloc = reloc;
-  (code)->exp = expr;
+  (code)->exp = mkexpr(0,symbol_find_or_make(symbol));
   (code)->pcrel = pcrel;
   return (code);
 }
@@ -817,5 +863,197 @@ int count_insns;
 void *allocate(int n)
 {
   return (void *)obstack_alloc (&mempool, n);
+}
+
+
+ExprNode *ExprNodeCreate(ExprNodeType type, ExprNodeValue value, 
+		ExprNode *LeftChild, ExprNode *RightChild)
+{
+
+
+	ExprNode *node = (ExprNode*)allocate(sizeof(ExprNode));
+	node->type = type;
+	node->value = value;
+	node->LeftChild = LeftChild;
+	node->RightChild = RightChild;
+	 return node;
+}
+
+static  const char *con=".__constant";
+static  const char *op = ".__operator";
+static INSTR_T ExprNodeGenRelocR(ExprNode *head);
+INSTR_T ExprNodeGenReloc(ExprNode *head, int parent_reloc)
+{
+  /* top level reloction expression generator VDSP style
+   * if the relocation is just by itself, generate one item
+   * else generate this convoluted expression
+   */
+  INSTR_T note = NULL_CODE;
+  INSTR_T note1 = NULL_CODE;
+  if(parent_reloc)
+  {
+    //If it's 32 bit quantity then extra 16bit code needed to be add
+    int value = 0;
+
+    if(head->type == ExprNodeConstant){
+      /* if note1 is not null code, we have to generate a right aligned
+       * value for the constant. Otherwise the reloc is a part of the
+       * basic command and the yacc file generates this
+       */
+       value = head->value.i_value;
+    }
+    switch(parent_reloc)
+    {
+      // some reloctions will need to allocate extra words
+      case BFD_RELOC_16_IMM:
+      case BFD_RELOC_16_LOW :
+      case BFD_RELOC_16_HIGH :
+        note1 = CONSCODE(GENCODE(value), NULL_CODE);
+        break;
+      case BFD_RELOC_24_PCREL_JUMP_X :
+      case BFD_RELOC_24_PCREL :
+      case BFD_RELOC_24_PCREL_JUMP_L :
+      case BFD_RELOC_24_PCREL_CALL_X :  
+      case BFD_RELOC_11_PCREL :
+	/* these offsets are even numbered, mostly pcrel */
+        note1 = CONSCODE(GENCODE(value>>1), NULL_CODE);
+        break;
+      default :
+	note1 = NULL_CODE;
+    }
+  }
+  if(head->type == ExprNodeConstant){
+     // this has been handled.
+     note = note1;
+  }
+  else if(head->type == ExprNodeReloc){
+    note =  NOTERELOC1(0, parent_reloc, head->value.s_value, GENCODE(0x0));
+    if(note1 != NULL_CODE)
+      note =  CONSCODE(note1, note);
+  }
+  else{
+    /* call the recursive function */
+    note = NOTERELOC1(0, parent_reloc, op, GENCODE(0x0));
+    if(note1 != NULL_CODE)
+      note =  CONSCODE(note1, note);
+    note =  CONCTCODE(ExprNodeGenRelocR(head), note);
+  }
+  return note;
+}
+
+static INSTR_T ExprNodeGenRelocR(ExprNode *head)
+{
+  
+  INSTR_T note;
+  INSTR_T note1;
+
+  switch(head->type)
+  {
+  case ExprNodeConstant : 
+    note =  CONSCODE(NOTERELOC1(0, BFD_ARELOC_E1, con, GENCODE(0x0)), 
+                     NULL_CODE);
+    break;
+  case ExprNodeReloc :  
+    note = CONSCODE(NOTERELOC(0, BFD_ARELOC_E0, head, GENCODE(0x0)), 
+                    NULL_CODE); 
+    break;    
+  case ExprNodeBinop :   
+    note1 = CONCTCODE(ExprNodeGenRelocR(head->LeftChild),
+                          ExprNodeGenRelocR (head->RightChild));     
+    switch(head->value.op_value)
+    {
+      case  ExprOpTypeAdd  :  
+        note = CONCTCODE(note1, 
+                  CONSCODE(NOTERELOC1(0, BFD_ARELOC_E2, op, GENCODE(0x0)), 
+                           NULL_CODE));
+        break;
+      case  ExprOpTypeSub   :  
+        note = CONCTCODE(note1, 
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_E3, op, GENCODE(0x0)), 
+														NULL_CODE));
+          break;
+      case  ExprOpTypeMult   :  
+         note = CONCTCODE(note1,
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_E4, op, GENCODE(0x0)), 
+														NULL_CODE));
+          break;
+      case  ExprOpTypeDiv  :   
+					note = CONCTCODE(note1,  
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_E5, op, GENCODE(0x0)), 
+														NULL_CODE));
+          break;
+      case  ExprOpTypeMod  :   
+					note = CONCTCODE(note1,
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_E6, op, GENCODE(0x0)), 
+														NULL_CODE));
+          break;
+      case  ExprOpTypeLsft  :   
+					note = CONCTCODE(note1,
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_E7, op, GENCODE(0x0)), 
+														NULL_CODE));
+          break;
+      case  ExprOpTypeRsft  :   
+					note = CONCTCODE(note1,
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_E8, op, GENCODE(0x0)), 
+														NULL_CODE));
+          break;
+      case  ExprOpTypeBAND  :   
+					note = CONCTCODE(note1,
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_E9, op, GENCODE(0x0)), 
+														NULL_CODE));
+          break;
+      case  ExprOpTypeBOR  :   
+					note = CONCTCODE(note1,
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_EA, op, GENCODE(0x0)), 
+														NULL_CODE));
+          break;
+      case  ExprOpTypeBXOR  :    
+					note = CONCTCODE(note1,
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_EB, op, GENCODE(0x0)), 
+														NULL_CODE));
+          break;
+      case  ExprOpTypeLAND  :     
+					note = CONCTCODE(note1,
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_EC, op, GENCODE(0x0)), 
+														NULL_CODE));
+          break;
+      case  ExprOpTypeLOR  :   
+					note = CONCTCODE(note1,
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_ED, op, GENCODE(0x0)), 
+														NULL_CODE));
+          break;
+      default      : fprintf(stderr, 
+                  "%s:%d:Unkonwn operator found for arithmetic"
+                    " relocation", __FILE__, __LINE__);
+
+
+   }
+   break;
+  case ExprNodeUnop :
+    note1 = CONSCODE(ExprNodeGenRelocR(head->LeftChild),
+                          NULL_CODE);
+    switch(head->value.op_value)
+    {
+      case  ExprOpTypeNEG  :   
+					note = CONCTCODE(note1,
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_EF, op, GENCODE(0x0)), 
+														NULL_CODE));
+          break;
+      case  ExprOpTypeCOMP  :    
+					note = CONCTCODE(note1,
+                    CONSCODE(NOTERELOC1(0, BFD_ARELOC_F0, op, GENCODE(0x0)), 
+														NULL_CODE));
+          break;
+      default      : fprintf(stderr, 
+                  "%s:%d:Unkonwn operator found for arithmetic"
+                    " relocation", __FILE__, __LINE__);
+
+
+   }
+   break;
+    default : fprintf(stderr, "%s:%d:Unknown node expression found during "
+            "arithmetic relocation generation", __FILE__, __LINE__);
+  }
+  return note;
 }
 

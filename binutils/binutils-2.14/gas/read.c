@@ -707,6 +707,9 @@ read_a_source_file (name)
 		  /* Input_line_pointer->after ':'.  */
 		  SKIP_WHITESPACE ();
 		}
+#ifdef TC_BFIN
+	      else if (0)
+#else
 	      else if (c == '='
 		       || ((c == ' ' || c == '\t')
 			   && input_line_pointer[1] == '='
@@ -714,6 +717,7 @@ read_a_source_file (name)
 			   && !TC_EQUAL_IN_INSN (c, input_line_pointer)
 #endif
 			   ))
+#endif
 		{
 		  equals (s, 1);
 		  demand_empty_rest_of_line ();

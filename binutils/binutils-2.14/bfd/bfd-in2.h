@@ -2902,6 +2902,31 @@ significant 8 bits of the opcode.  */
   BFD_RELOC_24_PCREL_JUMP,   // acts like BFD_RELOC_24_PCREL else acts
   BFD_RELOC_24_PCREL_JUMP_X, // as indirect P1 relative
   BFD_RELOC_24_PCREL_JUMP_L,
+
+
+  /*bfin arithmatic relocations*/
+  BFD_ARELOC_E0,
+  BFD_ARELOC_E1,
+  BFD_ARELOC_E2,
+  BFD_ARELOC_E3,
+  BFD_ARELOC_E4,
+  BFD_ARELOC_E5,
+  BFD_ARELOC_E6,
+  BFD_ARELOC_E7,
+  BFD_ARELOC_E8,
+  BFD_ARELOC_E9,
+  BFD_ARELOC_EA,
+  BFD_ARELOC_EB,
+  BFD_ARELOC_EC,
+  BFD_ARELOC_ED,
+  BFD_ARELOC_EE,
+  BFD_ARELOC_EF,
+  BFD_ARELOC_F0,
+  BFD_ARELOC_F1,
+  BFD_ARELOC_F2,
+  BFD_ARELOC_F3,
+
+
   /* bfin relocations end: */
 
 
