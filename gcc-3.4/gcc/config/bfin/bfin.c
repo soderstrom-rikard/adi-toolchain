@@ -156,7 +156,7 @@ n_pregs_to_save (void)
     if ((regs_ever_live[i] && ! call_used_regs[i])
 	|| (i == PIC_OFFSET_TABLE_REGNUM
 	    && (current_function_uses_pic_offset_table
-		|| !current_function_is_leaf)))
+		|| (TARGET_ID_SHARED_LIBRARY && ! current_function_is_leaf))))
       return REG_P5 - i + 1;
   return 0;
 }

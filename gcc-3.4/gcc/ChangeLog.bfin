@@ -1,3 +1,8 @@
+2005-02-28  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (n_pregs_to_save): Don't unconditionally save PIC
+	reg if not generating PIC.
+
 2005-02-26  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (rep_movsi, rep_movhi, movstrsi): New patterns.
