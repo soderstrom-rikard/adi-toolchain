@@ -159,17 +159,19 @@ struct flat_hdr {
  * BLACKfin sp Specification
  * =========================
  * 
- * 000 luimm16 and huimm16. hi_lo used for selecting.
- * 001 pcrel24.
+ * 000 Rn = target, 16 bit
+ * 001 luimm16 and huimm16. hi_lo used for selecting.
  * 010 abs32.
  *
- * Blackfin has too many kinds of relocations to fit into 3 bits. Only those
- * types of relocations that are required for compiled code are supported at
- * this time. Unlike mips tools, we don't have enough support for carry. The
- * kernel has to do ad-hoc carry calculations for huimm16 relocations. It
- * doesn't cause any problems for compiler generated code because a compiler
- * always generates a luimm16 type instruction followed by a huimm16
- * instruction. - akale
+ * Blackfin has too many kinds of relocations to fit into 3 bits. 
+ * However, runtime of non-shared library code requires only absolute relocations
+ * PC rel relocations are resolved when creating the flat file
+ * Since there is not enough support for carry when using hi_lo we do something
+ * unique
+ *  if sp = 0, location has 16 bit relative symbol address
+ *  if sp = 1, if location has 0, next 32 bit word has relative symbol address
+ *             else location has the relocation table offset of the 32 bit value
+ *  if sp = 2, location has 32 bit relative value, make it absolute
  *
  * SPARC sp Specification
  * ======================

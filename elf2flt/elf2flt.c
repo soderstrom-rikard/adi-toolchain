@@ -416,8 +416,30 @@ reloc_stack_operate(unsigned int oper)
 
   return value;
 }
-#endif
 
+static int
+bfin_set_reloc (flat_v5_reloc_t *reloc, const char *reloc_section_name, const char *sym_name,
+		int sp, int hilo, long offset)
+{
+  if (strstr (reloc_section_name, "text"))
+    reloc->reloc.type = FLAT_RELOC_TYPE_TEXT;
+  else if (strstr (reloc_section_name, "data"))
+    reloc->reloc.type = FLAT_RELOC_TYPE_DATA;
+  else if (strstr (reloc_section_name, "bss"))
+    reloc->reloc.type = FLAT_RELOC_TYPE_BSS;
+  else
+    {
+      printf ("Unknown Type - relocation for %s in bad section - %s\n", sym_name, reloc_section_name);
+      return 1;
+    }
+  
+  reloc->reloc.offset = offset;
+  reloc->reloc.hi_lo = hilo;
+  reloc->reloc.sp = sp;
+  return 0;
+
+}
+#endif
 
 #ifdef TARGET_bfin
 flat_v5_reloc_t *
@@ -640,10 +662,10 @@ dump_symbols(symbols, number_of_symbols);
 #ifdef TARGET_bfin
 			if ((q->sym_ptr_ptr && *q->sym_ptr_ptr) &&
 			     (!is_reloc_stack_empty() && strstr((*(q->sym_ptr_ptr))->name, "operator"))){
-									/* must be an arith reloc ... get the value from the stack */
-									sym_name = (*(q->sym_ptr_ptr))->name;
-									sym_section = reloc_stack_get_section();
-									section_name = reloc_stack_get_section_name();
+				/* must be an arith reloc ... get the value from the stack */
+				sym_name = (*(q->sym_ptr_ptr))->name;
+				sym_section = reloc_stack_get_section();
+				section_name = reloc_stack_get_section_name();
 			}
 			else
 #endif
@@ -1048,102 +1070,100 @@ dump_symbols(symbols, number_of_symbols);
 				case R_pcrel10:
 				  sym_addr += q->addend;// get the symbol addr
 				  sym_vma = bfd_section_vma(abs_bfd, sym_section);
-#if 0
-				  if(sym_vma != 0){
-				    sym_addr += (sym_vma - section_vma);// make it absolute in the bfd
-				  }
-#endif
 				  sym_addr -= q->address; // make it PC relative 
 				  // implicitly assumes code section and symbol section are same
 				  break;
 				
-				case R_rimm16: /* This is same as R_luimm16 in all 
-                          respect except it's abs. 16 bit quantity.K*/
-					// TODO : Incorrect check ... the sym_addr should be 16 bit
-          //        and that too after relocation calculation in loader
-					if(0xFFFF0000 & (long)(section_vma + q->address))
-					{
-						fprintf(stderr, "%s@%d: Reloc value overflow.\n", __FILE__, __LINE__);
+				case R_rimm16:
+				    if (is_reloc_stack_empty ())
+				    {
+					sym_addr += q->addend;
+				    }
+				    else
+				    {
+					sym_addr = reloc_stack_pop ();
+				    }
+				    if(0xFFFF0000 & sym_addr){
+					fprintf (stderr, "Relocation overflow for rN = %s\n",sym_name);
+					bad_relocs++;
+				    }
+				    flat_relocs = (flat_v5_reloc_t *)
+					(realloc (flat_relocs, (flat_reloc_count + 1) * sizeof (flat_v5_reloc_t)));
+				    if (bfin_set_reloc (flat_relocs + flat_reloc_count, 
+							sym_section->name, sym_name,
+							0, FLAT_RELOC_PART_LO, 
+							section_vma + q->address))
+					bad_relocs++;
+				    flat_reloc_count++;
+				    break;
+				    
+				case R_luimm16:
+				case R_huimm16:
+				{
+				    unsigned int sp;
+				    unsigned int reloc_count_incr;
+				    unsigned int hi_lo;
+
+
+				    if(q->howto->type == R_luimm16)
+					hi_lo = FLAT_RELOC_PART_LO;
+				    else
+					hi_lo = FLAT_RELOC_PART_HI;
+				
+				    if (is_reloc_stack_empty ())
+					sym_addr += q->addend;
+				    else
+					sym_addr = reloc_stack_pop ();
+				    
+				    flat_relocs = (flat_v5_reloc_t *) 
+					(realloc (flat_relocs, (flat_reloc_count + 2) * sizeof (flat_v5_reloc_t)));
+				    reloc_count_incr = 1;
+				    if(0xFFFF0000 & sym_addr){
+					/* value is > 16 bits - use an extra field */
+					/* see if we have already output that symbol */
+					sp = 1;
+					if((*(q->sym_ptr_ptr))->udata.i == 0){
+						reloc_count_incr = 2;
+				        	flat_relocs[flat_reloc_count + 1].value = sym_addr;
+						(*(q->sym_ptr_ptr))->udata.i = flat_reloc_count + 1;
+						sym_addr = 0; // indication to loader to read next
 					}
-				case R_luimm16: 
-				  relocation_needed = 1;
-				  if(is_reloc_stack_empty()){
-#if 0 /* In the current binutils, the sym_vma is not added to symbol value */
-             if (sym_addr != 0)
-             {
-               sym_vma = bfd_section_vma(abs_bfd, sym_section);
-               sym_addr -= sym_vma;
-             }
-#endif
-				    sym_addr += q->addend;
-             //printf ("sym_addr = %x, q->addend=%x, sym_name= %s\n", sym_addr, q->addend, sym_name);
+					else{
+						sym_addr = (*(q->sym_ptr_ptr))->udata.i;
+					}
 				    }
-				   else{
-				    sym_addr = reloc_stack_pop();
+				    else{
+					sp = 0;
 				    }
-				    flat_relocs = (flat_v5_reloc_t*)
-				      (realloc(flat_relocs,
-				      (flat_reloc_count + 1) * sizeof(flat_v5_reloc_t)));
-				    // store the offset as an absolute address
-				    flat_relocs[flat_reloc_count].reloc.offset = 
-				      (long)(section_vma + q->address);
-				    flat_relocs[flat_reloc_count].reloc.hi_lo = 
-				      FLAT_RELOC_PART_LO;
-				    flat_relocs[flat_reloc_count].reloc.sp = 
-				      0;//FLAT_FRIO_RELOC_SP_TYPE_16_BIT;
+					
 
-				break;
-				case  R_huimm16:
-				  relocation_needed = 1;
-				  if(is_reloc_stack_empty()){
-#if 0
-				  if (sym_addr != 0)
-				  {
-				    sym_vma = bfd_section_vma(abs_bfd, sym_section);
-				    sym_addr -= sym_vma;
-				  }
-#endif
-				    sym_addr += q->addend;
-				  }
-				  else{
-				    sym_addr = reloc_stack_pop();
-				  }
-				  flat_relocs = (flat_v5_reloc_t*)(realloc(flat_relocs,(flat_reloc_count + 1) * sizeof(flat_v5_reloc_t)));
-				  flat_relocs[flat_reloc_count].reloc.offset = section_vma + q->address;
-				  flat_relocs[flat_reloc_count].reloc.hi_lo = FLAT_RELOC_PART_HI;
-				  flat_relocs[flat_reloc_count].reloc.sp = 0;//FLAT_FRIO_RELOC_SP_TYPE_16_BIT;
-				  break;
+				    if (bfin_set_reloc (flat_relocs + flat_reloc_count, 
+							sym_section->name, sym_name,
+							sp, hi_lo, 
+							section_vma + q->address))
+					bad_relocs++;
+				    flat_reloc_count += reloc_count_incr;
+				    break;
+				}
+				case R_byte4_data:
+				    if (is_reloc_stack_empty ())
+					sym_addr += q->addend;
+				    else
+					sym_addr = reloc_stack_pop ();
+				    
+				    flat_relocs = (flat_v5_reloc_t *) 
+					(realloc (flat_relocs, (flat_reloc_count + 1) * sizeof (flat_v5_reloc_t)));
+				    if (bfin_set_reloc (flat_relocs + flat_reloc_count, 
+							sym_section->name, sym_name,
+							2, FLAT_RELOC_PART_LO, 
+							section_vma + q->address))
+					bad_relocs++;
+				    
+				    flat_reloc_count++;
+				    break;
 
-				case R_byte4_data: 
-				  relocation_needed = 1;
-				  if(is_reloc_stack_empty()){
-#if 0
-				  if (sym_addr != 0)
-				  {
-				    sym_vma = bfd_section_vma(abs_bfd, sym_section);
-				    sym_addr -= sym_vma;
-				  }
-#endif
-				    sym_addr += q->addend;
-				  }
-				  else{
-				    sym_addr = reloc_stack_pop();
-				  }
-
-				  flat_relocs = (flat_v5_reloc_t*)(realloc(flat_relocs,(flat_reloc_count + 1) * sizeof(flat_v5_reloc_t)));
-				  flat_relocs[flat_reloc_count].reloc.offset = section_vma + q->address;
-				  flat_relocs[flat_reloc_count].reloc.hi_lo = FLAT_RELOC_PART_LO;
-				  flat_relocs[flat_reloc_count].reloc.sp = 2;//FLAT_FRIO_RELOC_SP_TYPE_32_BIT;
-				  break;
 				case 0xE0 : 
 				   /* push */
-#if 0
-           if (sym_addr != 0)
-           {
-             sym_vma = bfd_section_vma(abs_bfd, sym_section);
-             sym_addr -= sym_vma;
-           }
-#endif
 				  sym_addr += q->addend;
 				  reloc_stack_push(sym_addr);
 				  reloc_stack_set_section(sym_section, section_name);
@@ -1266,13 +1286,13 @@ dump_symbols(symbols, number_of_symbols);
               *((unsigned short *)(sectionp+q->address)) = 
                         (~0x3ff & *((unsigned short *)(sectionp+q->address)) |
                         (((sym_addr)>>1)&0x3ff));
-	   } else if(((*p)->howto->type == R_luimm16) ||
-                   ((*p)->howto->type == R_rimm16)) {
-              *((unsigned short *)(sectionp+q->address)) = (unsigned short)sym_addr;
-
-           } else if((*p)->howto->type == R_huimm16) {
-              *((unsigned short *)(sectionp+q->address)) = (unsigned short)(sym_addr>>16);
-           } else if((0xE0 <= (*p)->howto->type) && (0xF3 >= (*p)->howto->type)){
+	   } else if (((*p)->howto->type == R_rimm16)  ||
+			((*p)->howto->type == R_huimm16 ||
+			(*p)->howto->type == R_luimm16)){
+		/* for l and h we set the lower 16 bits which is only when it will be used */
+	       *((unsigned short *) (sectionp + q->address)) = (unsigned short) sym_addr;
+	   }
+	   else if((0xE0 <= (*p)->howto->type) && (0xF3 >= (*p)->howto->type)){
 
 		//arith relocs dont generate a real relocation
            }
@@ -1323,19 +1343,7 @@ dump_symbols(symbols, number_of_symbols);
 			 *	Create relocation entry (PC relative doesn't need this).
 			 */
 			if (relocation_needed) {
-#ifdef TARGET_bfin
-			  reloc_section_name = sym_section->name;
-			  if (strstr(reloc_section_name, "text"))
-			    flat_relocs[flat_reloc_count].reloc.type = FLAT_RELOC_TYPE_TEXT;
-			  else if (strstr(reloc_section_name, "data"))
-			    flat_relocs[flat_reloc_count].reloc.type = FLAT_RELOC_TYPE_DATA;
-			  else if (strstr(reloc_section_name, "bss"))
-			    flat_relocs[flat_reloc_count].reloc.type = FLAT_RELOC_TYPE_BSS;
-			  else{
-			    bad_relocs++;
-			    printf("Unknown Type - relocation for %s in bad section - %s\n", sym_name, reloc_section_name);
-			  }
-#else
+#ifndef TARGET_bfin
 				flat_relocs = realloc(flat_relocs,
 					(flat_reloc_count + 1) * sizeof(unsigned long));
 				flat_relocs[flat_reloc_count] = pflags |
@@ -1344,8 +1352,8 @@ dump_symbols(symbols, number_of_symbols);
 				if (verbose)
 					printf("reloc[%d] = 0x%x\n", flat_reloc_count,
 							section_vma + q->address);
-#endif //TARGET_bfin
 				flat_reloc_count++;
+#endif //TARGET_bfin
 				relocation_needed = 0;
 				pflags = 0;
 			}
