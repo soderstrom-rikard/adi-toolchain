@@ -396,7 +396,7 @@ md_assemble (char *line)
   static size_t buffer_len = 0;
 
   len = strlen (line);
-  if (len > buffer_len)
+  if (len + 2 > buffer_len)
     {
       if (buffer_len > 0)
 	free (current_inputline);
