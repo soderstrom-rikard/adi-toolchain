@@ -1,3 +1,31 @@
+2004-11-18  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin-protos.h (symbolic_or_const_operand): Renamed from
+	symbolic_or_const_operand_p.
+	(extract_const_double, output_symbolic_address, output_load_immediate,
+	reg_or_16bit_operand): Delete.
+	(split_load_immediate): New.
+	* config/bfin/bfin.c (symbolic_or_const_operand): Renamed from
+	symbolic_or_const_operand_p; changed to use symbolic_operand.
+	(print_operand): Add ability to take high- and lowparts of constants.
+	(extract_const_double, output_symbolic_address, output_load_immediate,
+	reg_or_16bit_operand): Delete.
+	(shiftr_zero): Clean up.
+	(split_load_immediate): New function, contains remains of
+	output_load_immediate.
+	* config/bfin/bfin.h (enum reg_class, REG_CLASS_NAMES,
+	REG_CLASS_CONTENTS): Add NON_A_CC_REGS.
+	* config/bfin/bfin.md (attr "length" default): Remove code for "mvi"
+	insns.
+	(movsi_high, movsi_low): Add lengths.
+	(movbi, movqi, movhi, movsi, movsf): Don't call output_load_immediate,
+	spell out alternatives and rely on splitters to handle complex cases.
+	Clean up the constraints; no longer discourage use of "c" regs.
+	(movsf splitter): New; code to convert CONST_DOUBLEs to CONST_INTs
+	rewritten and moved here.
+	(movsi splitter): Changed to handle all constants, not just symbolic
+	ones.
+
 2004-11-17  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (extendsidi2, zero_extendsidi2): Generate valid

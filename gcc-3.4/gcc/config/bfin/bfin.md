@@ -141,6 +141,9 @@
 ;;; for forward branches it's the previously known address of the following
 ;;; instruction - we have to take this into account by reducing the range
 ;;; for a forward branch.
+
+;; Lengths for type "mvi" insns are always defined by the instructions
+;; themselves.
 (define_attr "length" ""
   (cond [(eq_attr "type" "mcld")
          (if_then_else (match_operand 1 "effective_address_32bit_p" "")
@@ -151,13 +154,6 @@
 		       (const_int 4) (const_int 2))
 
 	 (eq_attr "type" "move") (const_int 2)
-
-	 (eq_attr "type" "mvi")
-	  (if_then_else (match_operand 1 "imm7bit_operand_p" "")
-	   (const_int 2)
-	   (if_then_else (match_operand 1 "imm16bit_operand_p" "")
-            (const_int 4)
-	    (const_int 8)))
 
 	 (eq_attr "type" "dsp32") (const_int 4)
 	 (eq_attr "type" "call")  (const_int 4)
@@ -249,6 +245,25 @@
   [(set_attr "length" "2,2,4")
    (set_attr "type" "move")])
 
+;; Insns to load HIGH and LO_SUM
+
+(define_insn "*movsi_high"
+  [(set (match_operand:SI 0 "register_operand" "=da")
+	(high:SI (match_operand:SI 1 "immediate_operand" "i")))]
+  "reload_completed"
+  "%d0 = %d1;"
+  [(set_attr "type" "mvi")
+   (set_attr "length" "4")])
+
+(define_insn "*movsi_low"
+  [(set (match_operand:SI 0 "register_operand" "=da")
+	(lo_sum:SI (match_operand:SI 1 "register_operand" "0")
+		   (match_operand:SI 2 "immediate_operand" "i")))]
+  "reload_completed"
+  "%h0 = %h2;"
+  [(set_attr "type" "mvi")
+   (set_attr "length" "4")])
+
 ;;; Future work: split constants in expand
 
 (define_insn_and_split "movdi_insn"
@@ -280,15 +295,19 @@
 })
 
 (define_insn "movbi"
-  [(set (match_operand:BI 0 "nonimmediate_operand" "=da,da,*cf,*cf,d,mr,C,d")
-        (match_operand:BI 1 "general_operand"      "  x,ix,  x, ix,mr,d,d,C"))]
+  [(set (match_operand:BI 0 "nonimmediate_operand" "=x,x,d,mr,C,d")
+        (match_operand:BI 1 "general_operand" "x,xKsh3,mr,d,d,C"))]
 
   ""
-  "*
-   output_load_immediate (operands);
-   return \"\";
-  "
-  [(set_attr "type" "move,mvi,move,mvi,mcld,mcst,compare,compare")])
+  "@
+   %0 = %1;
+   %0 = %1 (X);
+   %0 = %1;
+   %0 = %1;
+   CC = %1;
+   %0 = CC;"
+  [(set_attr "type" "move,mvi,mcld,mcst,compare,compare")
+   (set_attr "length" "2,2,*,*,2,2")])
 
 (define_insn "movpdi"
   [(set (match_operand:PDI 0 "nonimmediate_operand" "=e,<,e")
@@ -301,62 +320,61 @@
   [(set_attr "type" "move,mcst,mcld")])
 
 (define_insn "*movsi_insn"
-  [(set (match_operand:SI 0 "nonimmediate_operand" "=da,da,*cf,*cf,da,mr,d,y,<d,y,a")
-        (match_operand:SI 1 "general_operand"      "  x,ix,  x, ix,mr,da,y,d,y,>d,y"))]
+  [(set (match_operand:SI 0 "nonimmediate_operand" "=x,da,x,x,da,da,mr,d,y,<da,xy")
+        (match_operand:SI 1 "general_operand" "x,xKs7,xKsh,xKuh,ix,mr,da,y,d,xy,>da"))]
 
   ""
-  "*
-   output_load_immediate (operands);
-   return \"\";
-  "
-  [(set_attr "type" "move,mvi,move,mvi,mcld,mcst,move,move,mcst,mcld,move")])
+  "@
+   %0 = %1;
+   %0 = %1 (X);
+   %0 = %1 (X);
+   %0 = %1 (Z);
+   #
+   %0 = %1;
+   %0 = %1;
+   %0 = %1;
+   %0 = %1;
+   [--SP] =%1;
+   %0 =[SP++];"
+  [(set_attr "type" "move,mvi,mvi,mvi,*,mcld,mcst,move,move,mcst,mcld")
+   (set_attr "length" "2,2,4,4,*,*,*,2,2,2,2")])
 
 (define_insn "*movhi_insn"
-  [(set (match_operand:HI 0 "nonimmediate_operand" "=da,da,*cf,*cf,d,mr")
-        (match_operand:HI 1 "general_operand"      "  x,ix,  x, ix,mr,d"))]
+  [(set (match_operand:HI 0 "nonimmediate_operand" "=x,da,x,d,mr")
+        (match_operand:HI 1 "general_operand" "x,xKs7,xKsh,mr,d"))]
   ""
-  "*
-   output_load_immediate (operands);
-   return \"\";
-  "
-  [(set_attr "type" "move,mvi,move,mvi,mcld,mcst")])
+  "@
+   %0 = %1;
+   %0 = %1 (X);
+   %0 = %1 (X);
+   %0 = W %1 (X);
+   W %0 = %1;"
+  [(set_attr "type" "move,mvi,mvi,mcld,mcst")
+   (set_attr "length" "2,2,4,*,*")])
 
 (define_insn "*movqi_insn"
-  [(set (match_operand:QI 0 "nonimmediate_operand" "=da,da,*cf,*cf,d,mr")
-        (match_operand:QI 1 "general_operand"      "  x,ix,  x, ix,mr,d"))]
+  [(set (match_operand:QI 0 "nonimmediate_operand" "=x,da,x,d,mr")
+        (match_operand:QI 1 "general_operand" "x,xKs7,xKsh,mr,d"))]
   ""
-  "*
-   output_load_immediate (operands);
-   return \"\";
-  "
-  [(set_attr "type" "move,mvi,move,mvi,mcld,mcst")])
+  "@
+   %0 = %1;
+   %0 = %1 (X);
+   %0 = %1 (X);
+   %0 = B %1 (X);
+   B %0 = %1;"
+  [(set_attr "type" "move,mvi,mvi,mcld,mcst")
+   (set_attr "length" "2,2,4,*,*")])
 
 (define_insn "*movsf_insn"
-  [(set (match_operand:SF 0 "nonimmediate_operand" "=da,da,*cf,*cf,da,mr")
-        (match_operand:SF 1 "general_operand"      "  x,ix,  x, ix,mr,da"))]
+  [(set (match_operand:SF 0 "nonimmediate_operand" "=x,x,da,mr")
+        (match_operand:SF 1 "general_operand"      "x,Fx,mr,da"))]
   ""
-  "*
-  {
-    if (GET_CODE (operands[1]) == CONST_DOUBLE) {
-	  int val = extract_const_double (operands[1]);
-          short hi = (val >> 16) & 0xffff;
-          short lo = val & 0xffff;
-          operands[2] = GEN_INT (lo);
-          operands[3] = GEN_INT (hi);
-          if (hi)
-            {/* output_asm_insn (\"l(%0) = %2; h(%0) = %3;\", operands);*/
-            output_asm_insn (\"%h0 = %2; %d0 = %3;\", operands);
-            }
-          else
-            {/* output_asm_insn (\"lz(%0) = %2;\", operands); */
-            output_asm_insn (\"%0 = %2 (Z);\", operands);
-            }
-        return \"\";
-     }
-   output_load_immediate (operands);
-   return \"\";
-  }"
-  [(set_attr "type" "move,mvi,move,mvi,mcld,mcst")])
+  "@
+   %0 = %1;
+   #
+   %0 = %1;
+   %0 = %1;"
+  [(set_attr "type" "move,*,mcld,mcst")])
 
 (define_expand "movsi"
   [(set (match_operand:SI 0 "nonimmediate_operand" "")
@@ -388,33 +406,59 @@
   ""
   " expand_move (operands, QImode); ")
 
+;; Some define_splits to break up SI/SFmode loads of immediate constants.
+
 (define_split
   [(set (match_operand:SI 0 "register_operand" "")
-	(match_operand:SI 1 "symbolic_operand" ""))]
-  "reload_completed"
+	(match_operand:SI 1 "symbolic_or_const_operand" ""))]
+  "reload_completed
+   /* Always split symbolic operands; split integer constants that are
+      too large for a single instruction.  */
+   && (GET_CODE (operands[1]) != CONST_INT
+       || (INTVAL (operands[1]) < -32768
+ 	   || INTVAL (operands[1]) >= 65536
+	   || (INTVAL (operands[1]) >= 32768 && PREG_P (operands[0]))))"
   [(set (match_dup 0) (high:SI (match_dup 1)))
    (set (match_dup 0) (lo_sum:SI (match_dup 0) (match_dup 1)))]
-  "")
+{
+  if (GET_CODE (operands[1]) == CONST_INT
+      && split_load_immediate (operands))
+    DONE;
+  /* ??? Do something about TARGET_LOW_64K.  */
+})
 
-(define_insn "*movsi_high"
-  [(set (match_operand:SI 0 "register_operand" "=da")
-	(high:SI (match_operand:SI 1 "symbolic_operand" "i")))]
-  ""
-  "%d0 = %d1;"
-  [(set_attr "type" "mvi")
-   (set_attr "length" "4")])
+(define_split
+  [(set (match_operand:SF 0 "register_operand" "")
+	(match_operand:SF 1 "immediate_operand" ""))]
+  "reload_completed"
+  [(set (match_dup 2) (high:SI (match_dup 3)))
+   (set (match_dup 2) (lo_sum:SI (match_dup 2) (match_dup 3)))]
+{
+  long values;
+  REAL_VALUE_TYPE value;
 
-(define_insn "*movsi_low"
-  [(set (match_operand:SI 0 "register_operand" "=da")
-	(lo_sum:SI (match_operand:SI 1 "register_operand" "0")
-		   (match_operand:SI 2 "symbolic_operand" "i")))]
-  ""
-  "%h0 = %h2;"
-  [(set_attr "type" "mvi")
-   (set_attr "length" "4")])
+  if (GET_CODE (operands[1]) != CONST_DOUBLE)
+    abort ();
+
+  REAL_VALUE_FROM_CONST_DOUBLE (value, operands[1]);
+  REAL_VALUE_TO_TARGET_SINGLE (value, values);
+
+  operands[2] = gen_rtx_REG (SImode, true_regnum (operands[0]));
+  operands[3] = GEN_INT (values);
+  if (values >= -32768 && values < 65536)
+    {
+      emit_move_insn (operands[2], operands[3]);
+      DONE;
+    }
+  if (split_load_immediate (operands + 2))
+    DONE;
+})
 
 ;; Sadly, this can't be a proper named movstrict pattern, since the compiler
 ;; expects to be able to use registers for operand 1.
+;; Note that the asm instruction is defined by the manual to take an unsigned
+;; constant, but it doesn't matter to the assembler, and the compiler only
+;; deals with sign-extended constants.  Hence "Ksh".
 (define_insn "*movstricthi"
   [(set (strict_low_part (match_operand:HI 0 "register_operand" "+x"))
 	(match_operand:HI 1 "immediate_operand" "Ksh"))]

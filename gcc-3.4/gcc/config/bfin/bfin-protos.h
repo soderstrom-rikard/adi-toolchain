@@ -46,13 +46,14 @@ extern int bfin_frame_pointer_required (void);
 extern HOST_WIDE_INT bfin_initial_elimination_offset (int, int);
 
 extern int effective_address_32bit_p (rtx, Mmode);
-extern int symbolic_operand (rtx, Mmode);
-extern int imm7bit_operand_p (rtx, Mmode);
-extern int imm16bit_operand_p (rtx, Mmode);
+extern int symbolic_reference_mentioned_p (rtx);
 extern rtx bfin_gen_compare (rtx, Mmode);
 extern void expand_move (rtx *, Mmode);
-extern int extract_const_double (rtx);
-extern void output_symbolic_address (rtx *);
+
+extern int symbolic_operand (rtx, Mmode);
+extern int symbolic_or_const_operand (rtx , enum machine_mode);
+extern int imm7bit_operand_p (rtx, Mmode);
+extern int imm16bit_operand_p (rtx, Mmode);
 extern int reg_or_7bit_operand (rtx op, Mmode);
 extern int scale_by_operand (rtx, Mmode);
 extern int valid_reg_operand (rtx, Mmode);
@@ -60,8 +61,16 @@ extern int pos_scale_operand (rtx, Mmode);
 extern int regorbitclr_operand (rtx, Mmode);
 extern int regorlog2_operand (rtx, Mmode);
 extern int cc_operand (rtx, Mmode);
-extern int symbolic_reference_mentioned_p (rtx);
-	
+extern int fp_plus_const_operand (rtx, Mmode);
+extern int scale_operand (rtx, Mmode);
+extern int reg_or_scale_operand (rtx, Mmode);
+extern int log2_operand (rtx, Mmode);
+extern int rhs_andsi3_operand (rtx, Mmode);
+extern int positive_immediate_operand (rtx, Mmode);
+extern int reg_or_0_operand (rtx, Mmode);
+extern int signed_comparison_operator (rtx, Mmode);
+extern int bfin_cbranch_operator (rtx, Mmode);
+
 extern void conditional_register_usage (void);
 extern int register_move_cost (enum reg_class, enum reg_class);
 extern enum reg_class secondary_input_reload_class (enum reg_class, Mmode,
@@ -76,24 +85,15 @@ extern void asm_output_skip (FILE *, int);
 extern void print_operand (FILE *,  rtx, char);
 extern void print_address_operand (FILE *, rtx);
 extern void split_di (rtx [], int, rtx [], rtx []);
+extern int split_load_immediate (rtx []);
 extern rtx legitimize_pic_address (rtx, rtx);
 extern void emit_pic_move (rtx *, Mmode);
-extern void output_symbolic_address (rtx *);
 extern void override_options (void);
 extern void asm_conditional_branch (rtx, rtx *, int, int);
 extern rtx bfin_gen_compare (rtx, Mmode);
 extern int signed_comparison_operator (rtx, Mmode);
 extern int ccregister_p (rtx, Mmode);
 extern int loop_end (rtx);
-extern int fp_plus_const_operand (rtx, Mmode);
-extern int scale_operand (rtx, Mmode);
-extern int reg_or_scale_operand (rtx, Mmode);
-extern int log2_operand (rtx, Mmode);
-extern int rhs_andsi3_operand (rtx, Mmode);
-extern int positive_immediate_operand (rtx, Mmode);
-extern int reg_or_0_operand (rtx, Mmode);
-extern int signed_comparison_operator (rtx, Mmode);
-extern int bfin_cbranch_operator (rtx, Mmode);
 
 extern int bfin_return_in_memory (tree);
 extern void bfin_internal_label (FILE *, const char *, unsigned long);
@@ -103,8 +103,6 @@ extern int  bfin_valid_add (Mmode, HOST_WIDE_INT);
 extern rtx bfin_va_arg (tree, tree);
 extern void setup_incoming_varargs (CUMULATIVE_ARGS *, enum machine_mode, tree,
 				    int *, int);
-extern int  symbolic_or_const_operand_p (rtx , enum machine_mode);
-extern int  reg_or_16bit_operand (rtx, enum machine_mode);
 extern rtx  bfin_force_reg (enum machine_mode, rtx);
 
 extern void bfin_expand_prologue (void);

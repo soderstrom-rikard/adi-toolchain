@@ -466,6 +466,7 @@ enum reg_class
   DPREGS,
   MOST_REGS,
   PROLOGUE_REGS,
+  NON_A_CC_REGS,
   ALL_REGS, LIM_REG_CLASSES
 };
 #define N_REG_CLASSES ((int)LIM_REG_CLASSES)
@@ -491,8 +492,9 @@ enum reg_class
    "DREGS",		\
    "PREGS",		\
    "DPREGS",		\
-   "MOST_REGS",	\
+   "MOST_REGS",		\
    "PROLOGUE_REGS",	\
+   "NON_A_CC_REGS",	\
    "ALL_REGS" }
 
 
@@ -526,8 +528,8 @@ enum reg_class
     { 0x0000ffff,    0x800 },		/* DPREGS */   \
     { 0xffffffff,    0x800 },		/* MOST_REGS */\
     { 0x00000000,    0x7f8 },		/* PROLOGUE_REGS */\
-    { 0xffffffff,    0xfff },		/* ALL_REGS */\
-     /*{ 0xffffffff,    0x3 }, */	}
+    { 0xffffffff,    0xff8 },		/* NON_A_CC_REGS */\
+    { 0xffffffff,    0xfff }}		/* ALL_REGS */
 
 #define BASE_REG_CLASS          PREGS
 #define INDEX_REG_CLASS         PREGS
@@ -1011,6 +1013,8 @@ do {                                              \
   {"cc_operand", {REG}},				        	\
   {"valid_reg_operand", {SUBREG, REG, ADDRESSOF}},			\
   {"symbolic_operand", {CONST, SYMBOL_REF, LABEL_REF}},			\
+  {"symbolic_or_const_operand",						\
+      {CONST_INT, CONST_DOUBLE, CONST, SYMBOL_REF, LABEL_REF}},		\
   {"scale_by_operand", {CONST_INT}},					\
   {"pos_scale_operand", {CONST_INT}},                                  	\
   {"positive_immediate_operand", {CONST_INT}},				\
@@ -1141,7 +1145,6 @@ do {                                              \
      /*Constant Output Formats */
 #define CONST_DOUBLE_OK_FOR_LETTER_P(VALUE, C)	\
   ((C) == 'H' ? 1 : 0)
-
 
 /* `FINALIZE_PIC'
      By generating position-independent code, when two different

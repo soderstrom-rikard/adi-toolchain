@@ -923,22 +923,14 @@ symbolic_operand (rtx op, enum machine_mode mode)
   return 0;
 }
 
-int symbolic_or_const_operand_p (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) 
+/* Returns 1 if OP is a plain constant or matched by symbolic_operand.  */
+
+int
+symbolic_or_const_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) 
 {
-  switch (GET_CODE (op)) {
-  case SYMBOL_REF:
-  case LABEL_REF:
-  case CONST_INT:
-  case CONST_DOUBLE:
+  if (GET_CODE (op) == CONST_INT || GET_CODE (op) == CONST_DOUBLE)
     return 1;
-  case CONST:
-    op = XEXP (op, 0);
-    return ((GET_CODE (XEXP (op, 0)) == SYMBOL_REF
-	     || GET_CODE (XEXP (op, 0)) == LABEL_REF)
-	    && GET_CODE (XEXP (op, 1)) == CONST_INT);
-  default:
-    return 0;
-  }
+  return symbolic_operand (op, mode);
 }
 
 int imm7bit_operand_p (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) 
@@ -1107,11 +1099,18 @@ void print_operand (FILE *file,  rtx x,  char code)
       break;
     
     case CONST_INT:
-      if (code == 'X') {
+      /* Moves to half registers with d or h modifiers always use unsigned
+	 constants.  */
+      if (code == 'd')
+	x = GEN_INT ((INTVAL (x) >> 16) & 0xffff);
+      else if (code == 'h')
+	x = GEN_INT (INTVAL (x) & 0xffff);
+      else if (code == 'X')
 	x = GEN_INT (exact_log2 (INTVAL (x)));
-      } else if (code == 'Y') {
+      else if (code == 'Y')
 	x = GEN_INT (exact_log2 (~INTVAL (x)));
-      }
+      /* fall through */
+
     case SYMBOL_REF:
       output_addr_const(file, x);
       break;
@@ -1123,38 +1122,6 @@ void print_operand (FILE *file,  rtx x,  char code)
     }
   }
 }
-
-
-int extract_const_double (rtx x)
-{
-  if (GET_CODE (x) == CONST_DOUBLE && GET_MODE(x) != DImode)
-  {
-    union { double d; int    i[2]; } u;
-    union { float f; int i; } u1;
-
-      if ( GET_MODE(x) == VOIDmode)
-        {
-          u.i[0] = CONST_DOUBLE_LOW (x);
-          u.i[1] = CONST_DOUBLE_HIGH (x);
-        }
-      else
-        {
-	  long l[2];
-      	  REAL_VALUE_TYPE rv;
-          int endian = (WORDS_BIG_ENDIAN == 0);
-	  REAL_VALUE_FROM_CONST_DOUBLE (rv, x);
-          REAL_VALUE_TO_TARGET_DOUBLE (rv, l);
-          u.i[0] = l[1 - endian];
-          u.i[1] = l[endian];
-        }
-    u1.f = u.d;
-    return u1.i;
-  } 
-  else 
-    output_operand_lossage ("unsupported mode DI");
-  return 0;
-}
-	
 
 int
 signed_comparison_operator (rtx op, enum machine_mode mode)
@@ -1614,10 +1581,6 @@ int reg_or_7bit_operand (rtx op, enum machine_mode mode) {
     return (imm7bit_operand_p (op, mode) || register_operand (op, mode));
 }
 
-int reg_or_16bit_operand (rtx op, enum machine_mode mode) {
-    return (imm16bit_operand_p (op, mode) || register_operand (op, mode));
-}
-
 int
 positive_immediate_operand (rtx op, enum machine_mode mode)
 {
@@ -1807,21 +1770,6 @@ secondary_output_reload_class(enum reg_class class,enum machine_mode mode, rtx x
   return secondary_input_reload_class(class,mode,x);
 }
 
-void
-output_symbolic_address (rtx *operands)
-{
-  if (TARGET_LOW_64K)
-    {
-    /* output_asm_insn ("lz(%0) = %1;", operands);*/
-    output_asm_insn ("%0 = %1 (Z);", operands);
-    }
-  else
-    {
-    /* output_asm_insn ("l(%0) = %1; h(%0) = %1;", operands);*/
-    output_asm_insn ("%h0 = %1; %d0 = %1;", operands);
-    }
-}
-
 /* For macro `OVERRIDE_OPTIONS' */
 
 void
@@ -1978,137 +1926,66 @@ bfin_gen_compare (rtx cmp, enum machine_mode mode ATTRIBUTE_UNUSED)
   return gen_rtx_fmt_ee (code2, BImode, tem, CONST0_RTX (BImode));
 }
 
-static int
-shiftr_zero (int *v) {
-    /* returns the number of consecutive least significant zeros
-     * in the binary representation of *v,
-     * *v is shifted right by the number of zeros*/
-    int n = 0;
-    if ((*v) == 0)
-	return n;
+/* Returns the number of consecutive least significant zeros in the binary
+   representation of *V.
+   We modify *V to contain the original value arithmetically shifted right by
+   the number of zeroes.  */
 
-    while (((*v) & 0x1) == 0 && n <= 32) { 
-	(*v) >>= 1; 
-	n += 1;
+static int
+shiftr_zero (HOST_WIDE_INT *v)
+{
+  unsigned HOST_WIDE_INT tmp = *v;
+  unsigned HOST_WIDE_INT sgn;
+  int n = 0;
+
+  if (tmp == 0)
+    return 0;
+
+  sgn = tmp & ((unsigned HOST_WIDE_INT) 1 << (HOST_BITS_PER_WIDE_INT - 1));
+  while ((tmp & 0x1) == 0 && n <= 32)
+    {
+      tmp = (tmp >> 1) | sgn;
+      n++;
     }
-    return n;
+  *v = tmp;
+  return n;
 }
 
-#define HIGH_16BIT_ZERO(val) ((int) ((val) & 0xffff0000) == 0)
+/* After reload, split the load of an immediate constant.  OPERANDS are the
+   operands of the movsi_insn pattern which we are splitting.  We return
+   nonzero if we emitted a sequence to load the constant, zero if we emitted
+   nothing because we want to use the splitter's default sequence.  */
 
-const char *
-output_load_immediate (rtx *operands) {
-/* place code from bfin.md in movsi_insn and move HI here */
-/*
- * dregs_lo = imm16 	=> RL3=0x800; sign extended
- * dregs_hi = imm16	=> RH3=0x800; 
- * dregs    = imm16
- * regs     = imm16     => R0-7 P0-7 I0-3 M0-3 B0-3 L0-3
- * LZ (regs)= luimm16	=> 32-bit instr & zero_extended
- * L (regs) = luimm16   => 32-bit instr
- * H (regs) = huimm16   => 32-bit instr
- */
-    enum machine_mode mode = GET_MODE (operands[0]);
+int
+split_load_immediate (rtx operands[])
+{
+  int val = INTVAL (operands[1]);
+  HOST_WIDE_INT shifted = val;
+  HOST_WIDE_INT shifted_compl = ~val;
+  int num_zero = shiftr_zero (&shifted);
+  int num_compl_zero = shiftr_zero (&shifted_compl);
+  enum reg_class class1 = REGNO_REG_CLASS (REGNO (operands[0]));
 
-    if (GET_CODE (operands[1]) == CONST_INT) {
-	int val = INTVAL (operands[1]);
-	int shifted_val = val;
-	unsigned int compl_val = (~val);
-	unsigned int shifted_compl_val = compl_val;
-	int num_zero = shiftr_zero (&shifted_val); /* consecutive number zero from least signi... */
-	int num_compl_zero = shiftr_zero ((int *)&shifted_compl_val);
-	enum reg_class class1 = REGNO_REG_CLASS (REGNO (operands[0]));
-
-	if (CONST_16BIT_IMM_P (val)) {
-	  if (reg_class_subset_p (class1, DPREGS)
-	    || reg_class_subset_p (class1, DAGREGS))
-	    output_asm_insn ("%0 = %1 (X);", operands); /* ("%0 = %1;", operands); */
-          else
-	    output_asm_insn ("%0 = %1 (Z);", operands);/*("lz(%0) = %1;", operands);*/
-	} else if (HIGH_16BIT_ZERO (val)) {
-            short lo = val & 0xffff;
-            operands[2] = GEN_INT (lo);
-	    output_asm_insn ("%0 = %2 (Z);", operands);/*("lz(%0) = %2;", operands);*/
-	} else if ((class1 == DREGS || (class1 == PREGS && num_zero == 2))
-	    && num_zero && CONST_16BIT_IMM_P (shifted_val)) {
-	    operands[2] = GEN_INT (shifted_val);
-	    operands[3] = GEN_INT (num_zero);
-	    if (class1 == DREGS)
-		output_asm_insn ("%0 = %2 (X); %0 <<= %3; // zeros", operands);
-	    else
-		output_asm_insn ("%0 = %2 (X); %0 = %0 << %3; // zeros", operands);
-	} else if (class1 == DREGS
-	    && num_zero && HIGH_16BIT_ZERO (shifted_val)) {
-	    operands[2] = GEN_INT (shifted_val);
-	    operands[3] = GEN_INT (num_zero);
-	    /*output_asm_insn ("lz(%0) = %2; %0 <<= %3; //zeros", operands);*/
-            output_asm_insn ("%0 = %2 (Z); %0 <<= %3; //zeros", operands);
-	} else if (class1 == DREGS && optimize_size
-	    && num_compl_zero && CONST_7BIT_IMM_P (shifted_compl_val)) {
-	    /* Do it if optimize by size, "-Os" */
-	    operands[2] = GEN_INT (shifted_compl_val);
-	    operands[3] = GEN_INT (num_compl_zero);
-	    output_asm_insn ("%0 = %2 (X); %0 <<= %3; %0 = ~%0;// compl", operands);
-       	} else {
-	  short hi = (val >> 16) & 0xffff;
-	  short lo = val & 0xffff;
-	  operands[2] = GEN_INT (lo);
-	  operands[3] = GEN_INT (hi);
-	  if (hi)
-	    output_asm_insn ("%h0 = %2; %d0 = %3;", operands);
-	    /*("l(%0) = %2; h(%0) = %3;", operands);*/
-          else
-	    output_asm_insn ("%0 = %2 (Z);", operands);
-        }
-	return "";
-     } else if (GET_CODE (operands[1]) == CONST
-        && (GET_CODE (XEXP (operands[1], 0)) == SYMBOL_REF
-	|| GET_CODE (XEXP (operands[1], 0)) == LABEL_REF
-        || GET_CODE (XEXP (operands[1], 0)) == PLUS)) {
-	   output_symbolic_address (operands);
-	   return "";
-    } else if (GET_CODE (operands[1]) == SYMBOL_REF
-	|| GET_CODE (operands[1]) == LABEL_REF) {
-	   output_symbolic_address (operands);
-	   return "";
-    } else if (REG_P (operands[0])
-	       && REGNO_REG_CLASS (REGNO (operands[0])) == AREGS
-	       && !(GET_CODE (operands[1]) == CONST_INT
-		    && INTVAL (operands[1])==0)) {
-	 output_asm_insn ("%w0 =%1;", operands);
-	 return "";
-    } else if (REG_P (operands[1])
-	       && REGNO_REG_CLASS (REGNO (operands[1])) == AREGS) {
-	 output_asm_insn ("%0 =%w1;", operands);
-	 return "";
-     }
-     else if (GET_CODE (operands[1]) == MEM
-	      && GET_MODE_SIZE (mode) < UNITS_PER_WORD)
-       {
-	 rtx x = XEXP (operands[1], 0);
-	 if (GET_CODE (x) == POST_INC && REGNO(XEXP(x,0)) == STACK_POINTER_REGNUM)
-	   output_asm_insn ("%0=%1;", operands);
-	 else if (mode == HImode)
-	   output_asm_insn ("%0 = W %1 (X);", operands);
-	 else
-	   output_asm_insn ("%0 = B %1 (X);", operands);
-	 return "";
-       }
-     else if (GET_CODE (operands[0]) == MEM
-	      && GET_MODE_SIZE (mode) < UNITS_PER_WORD)
-       {
-	 rtx x = XEXP (operands[0], 0);
-	 if (GET_CODE (x) == PRE_DEC && REGNO(XEXP(x,0)) == STACK_POINTER_REGNUM)
-	   output_asm_insn ("%0=%1;", operands);
-	 else if (mode == HImode)
-	   output_asm_insn ("W %0=%1;", operands);
-	 else
-	   output_asm_insn ("B %0=%1;", operands);
-	 return "";
-       }
-
-     output_asm_insn ("%0 =%1;", operands);
-     return "";
+  if (num_zero
+      && shifted >= -32768 && shifted < 65536
+      && (class1 == DREGS || (class1 == PREGS && num_zero <= 2)))
+    {
+      emit_insn (gen_movsi (operands[0], GEN_INT (shifted)));
+      emit_insn (gen_ashlsi3 (operands[0], operands[0], GEN_INT (num_zero)));
+      return 1;
+    }
+  else if (class1 == DREGS && optimize_size
+	   && num_compl_zero && CONST_7BIT_IMM_P (shifted_compl))
+    {
+      /* If optimizing for size, generate a sequence that has more instructions
+	 but is shorter.  */
+      emit_insn (gen_movsi (operands[0], GEN_INT (shifted_compl)));
+      emit_insn (gen_ashlsi3 (operands[0], operands[0],
+			      GEN_INT (num_compl_zero)));
+      emit_insn (gen_one_cmplsi2 (operands[0], operands[0]));
+      return 1;
+    }
+  return 0;
 }
 
 int
