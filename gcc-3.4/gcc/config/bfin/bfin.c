@@ -111,54 +111,7 @@ bfin_globalize_label (FILE *stream, const char *name)
 #undef TARGET_ASM_INTERNAL_LABEL
 #define TARGET_ASM_INTERNAL_LABEL bfin_internal_label
 
-struct gcc_target targetm = /*TARGET_INITIALIZER;*/
-
-{                                               
-  TARGET_ASM_OUT,                               
-  TARGET_SCHED,                                 
-  TARGET_MERGE_DECL_ATTRIBUTES,                 
-  TARGET_MERGE_TYPE_ATTRIBUTES,                 
-  TARGET_ATTRIBUTE_TABLE,                       
-  TARGET_COMP_TYPE_ATTRIBUTES,                  
-  TARGET_SET_DEFAULT_TYPE_ATTRIBUTES,           
-  TARGET_INSERT_ATTRIBUTES,                     
-  TARGET_FUNCTION_ATTRIBUTE_INLINABLE_P,        
-  TARGET_MS_BITFIELD_LAYOUT_P,                  
-  TARGET_INIT_BUILTINS,                         
-  TARGET_EXPAND_BUILTIN,                        
-  TARGET_INIT_LIBFUNCS,                         
-  TARGET_SECTION_TYPE_FLAGS,                    
-  TARGET_CANNOT_MODIFY_JUMPS_P,                 
-  TARGET_BRANCH_TARGET_REGISTER_CLASS,          
-  TARGET_BRANCH_TARGET_REGISTER_CALLEE_SAVED,   
-  TARGET_CANNOT_FORCE_CONST_MEM,                
-  TARGET_CANNOT_COPY_INSN_P,                    
-  TARGET_DELEGITIMIZE_ADDRESS,                  
-  TARGET_FUNCTION_OK_FOR_SIBCALL,               
-  TARGET_IN_SMALL_DATA_P,                       
-  TARGET_BINDS_LOCAL_P,                         
-  TARGET_ENCODE_SECTION_INFO,                   
-  TARGET_STRIP_NAME_ENCODING,                   
-  TARGET_VALID_POINTER_MODE,                    
-  TARGET_VECTOR_OPAQUE_P,                       
-  TARGET_RTX_COSTS,                             
-  TARGET_ADDRESS_COST,                          
-  TARGET_DWARF_REGISTER_SPAN,                   
-  TARGET_FIXED_CONDITION_CODE_REGS,             
-  TARGET_CC_MODES_COMPATIBLE,                   
-  TARGET_MACHINE_DEPENDENT_REORG,               
-  TARGET_BUILD_BUILTIN_VA_LIST,                 
-  TARGET_GET_PCH_VALIDITY,                      
-  TARGET_PCH_VALID_P,                           
-  TARGET_CALLS,                                 
-  TARGET_HAVE_NAMED_SECTIONS,                   
-  TARGET_HAVE_CTORS_DTORS,                      
-  TARGET_HAVE_TLS,                              
-  TARGET_HAVE_SRODATA_SECTION,                  
-  TARGET_TERMINATE_DW2_EH_FRAME_INFO,           
-  TARGET_ASM_FILE_START_APP_OFF,                
-  TARGET_ASM_FILE_START_FILE_DIRECTIVE,         
-};
+struct gcc_target targetm = TARGET_INITIALIZER;
 
 void 
 output_file_start (void) 
