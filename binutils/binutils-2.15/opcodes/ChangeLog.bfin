@@ -1,3 +1,11 @@
+2004-12-16  Catherine Moore  <clm@cm00re.com>
+
+	* bfin-dis.c (decode_dsp32alu_0):  Add spaces to "ABS" to improve
+	readability.
+	(decode_dsp32shift_0): Add spaces to "ASHIFT","LSHIFT" and "ROT"
+	to improve readability.
+	(decode_dsp32shiftimm_0): Add spaces to "ROT".
+
 2004-12-14  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin-dis.c (decode_PushPopMultiple_0): Don't print register numbers

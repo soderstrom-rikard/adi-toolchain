@@ -4473,12 +4473,12 @@ decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("A1 = ABS A1, A0 = ABS A0");
       OUTS (outf, "A1");
       OUTS (outf, "=");
-      OUTS (outf, "ABS");
+      OUTS (outf, " ABS ");
       OUTS (outf, "A0");
       OUTS (outf, ",");
       OUTS (outf, "A0");
       OUTS (outf, "=");
-      OUTS (outf, "ABS");
+      OUTS (outf, " ABS ");
       OUTS (outf, "A0");
       return 2 * 2;
     }
@@ -4518,7 +4518,7 @@ decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("A1 = ABS A1");
       OUTS (outf, "A1");
       OUTS (outf, "=");
-      OUTS (outf, "ABS");
+      OUTS (outf, " ABS ");
       OUTS (outf, "A1");
       return 2 * 2;
     }
@@ -4527,7 +4527,7 @@ decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("A1 = ABS A0");
       OUTS (outf, "A1");
       OUTS (outf, "=");
-      OUTS (outf, "ABS");
+      OUTS (outf, " ABS ");
       OUTS (outf, "A0");
       return 2 * 2;
     }
@@ -4553,7 +4553,7 @@ decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("A0 = ABS A1");
       OUTS (outf, "A0");
       OUTS (outf, "=");
-      OUTS (outf, "ABS");
+      OUTS (outf, " ABS ");
       OUTS (outf, "A1");
       return 2 * 2;
     }
@@ -4562,7 +4562,7 @@ decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("A0 = ABS A0");
       OUTS (outf, "A0");
       OUTS (outf, "=");
-      OUTS (outf, "ABS");
+      OUTS (outf, " ABS ");
       OUTS (outf, "A0");
       return 2 * 2;
     }
@@ -4994,7 +4994,7 @@ decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs = ABS dregs");
       OUTS (outf, dregs (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "ABS");
+      OUTS (outf, " ABS ");
       OUTS (outf, dregs (src0));
       return 2 * 2;
     }
@@ -5029,7 +5029,7 @@ decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs = ABS dregs (V)");
       OUTS (outf, dregs (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "ABS");
+      OUTS (outf, " ABS ");
       OUTS (outf, dregs (src0));
       OUTS (outf, "(V)");
       return 2 * 2;
@@ -5188,7 +5188,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs_lo = ASHIFT dregs_lo BY dregs_lo");
       OUTS (outf, dregs_lo (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "ASHIFT");
+      OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs_lo (src1));
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5199,7 +5199,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs_lo = ASHIFT dregs_hi BY dregs_lo");
       OUTS (outf, dregs_lo (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "ASHIFT");
+      OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs_hi (src1));
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5210,7 +5210,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs_hi = ASHIFT dregs_lo BY dregs_lo");
       OUTS (outf, dregs_hi (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "ASHIFT");
+      OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs_lo (src1));
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5221,7 +5221,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs_hi = ASHIFT dregs_hi BY dregs_lo");
       OUTS (outf, dregs_hi (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "ASHIFT");
+      OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs_hi (src1));
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5232,7 +5232,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs_lo = ASHIFT dregs_lo BY dregs_lo (S)");
       OUTS (outf, dregs_lo (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "ASHIFT");
+      OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs_lo (src1));
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5246,7 +5246,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs_lo = ASHIFT dregs_hi BY dregs_lo (S)");
       OUTS (outf, dregs_lo (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "ASHIFT");
+      OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs_hi (src1));
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5258,7 +5258,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs_hi = ASHIFT dregs_lo BY dregs_lo (S)");
       OUTS (outf, dregs_hi (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "ASHIFT");
+      OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs_lo (src1));
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5270,7 +5270,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs_hi = ASHIFT dregs_hi BY dregs_lo (S)");
       OUTS (outf, dregs_hi (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "ASHIFT");
+      OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs_hi (src1));
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5282,7 +5282,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs_lo = LSHIFT dregs_lo BY dregs_lo");
       OUTS (outf, dregs_lo (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "LSHIFT");
+      OUTS (outf, " LSHIFT ");
       OUTS (outf, dregs_lo (src1));
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5293,7 +5293,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs_lo = LSHIFT dregs_hi BY dregs_lo");
       OUTS (outf, dregs_lo (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "LSHIFT");
+      OUTS (outf, " LSHIFT ");
       OUTS (outf, dregs_hi (src1));
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5304,7 +5304,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs_hi = LSHIFT dregs_lo BY dregs_lo");
       OUTS (outf, dregs_hi (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "LSHIFT");
+      OUTS (outf, " LSHIFT ");
       OUTS (outf, dregs_lo (src1));
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5315,7 +5315,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs_hi = LSHIFT dregs_hi BY dregs_lo");
       OUTS (outf, dregs_hi (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "LSHIFT");
+      OUTS (outf, " LSHIFT ");
       OUTS (outf, dregs_hi (src1));
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5326,7 +5326,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("A1 = ROT A1 BY dregs_lo");
       OUTS (outf, "A1");
       OUTS (outf, "=");
-      OUTS (outf, "ROT");
+      OUTS (outf, " ROT ");
       OUTS (outf, "A1");
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5337,7 +5337,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("A0 = ASHIFT A0 BY dregs_lo");
       OUTS (outf, "A0");
       OUTS (outf, "=");
-      OUTS (outf, "ASHIFT");
+      OUTS (outf, " ASHIFT ");
       OUTS (outf, "A0");
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5348,7 +5348,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("A1 = ASHIFT A1 BY dregs_lo");
       OUTS (outf, "A1");
       OUTS (outf, "=");
-      OUTS (outf, "ASHIFT");
+      OUTS (outf, " ASHIFT ");
       OUTS (outf, "A1");
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5359,7 +5359,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("A0 = LSHIFT A0 BY dregs_lo");
       OUTS (outf, "A0");
       OUTS (outf, "=");
-      OUTS (outf, "LSHIFT");
+      OUTS (outf, " LSHIFT ");
       OUTS (outf, "A0");
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5370,7 +5370,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("A1 = LSHIFT A1 BY dregs_lo");
       OUTS (outf, "A1");
       OUTS (outf, "=");
-      OUTS (outf, "LSHIFT");
+      OUTS (outf, " LSHIFT ");
       OUTS (outf, "A1");
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5381,7 +5381,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("A0 = ROT A0 BY dregs_lo");
       OUTS (outf, "A0");
       OUTS (outf, "=");
-      OUTS (outf, "ROT");
+      OUTS (outf, " ROT ");
       OUTS (outf, "A0");
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5392,7 +5392,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs = ASHIFT dregs BY dregs_lo (V, S)");
       OUTS (outf, dregs (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "ASHIFT");
+      OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs (src1));
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5405,7 +5405,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs = ASHIFT dregs BY dregs_lo (V)");
       OUTS (outf, dregs (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "ASHIFT");
+      OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs (src1));
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5417,7 +5417,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs = ASHIFT dregs BY dregs_lo");
       OUTS (outf, dregs (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "ASHIFT");
+      OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs (src1));
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5428,7 +5428,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs = ASHIFT dregs BY dregs_lo (S)");
       OUTS (outf, dregs (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "ASHIFT");
+      OUTS (outf, " ASHIFT ");
       OUTS (outf, dregs (src1));
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -5451,7 +5451,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs = ROT dregs BY dregs_lo");
       OUTS (outf, dregs (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "ROT");
+      OUTS (outf, " ROT ");
       OUTS (outf, dregs (src1));
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
@@ -6006,7 +6006,7 @@ decode_dsp32shiftimm_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("A1 = ROT A1 BY imm6");
       OUTS (outf, "A1");
       OUTS (outf, "=");
-      OUTS (outf, "ROT");
+      OUTS (outf, " ROT ");
       OUTS (outf, "A1");
       OUTS (outf, "BY");
       OUTS (outf, imm6 (immag));
@@ -6057,7 +6057,7 @@ decode_dsp32shiftimm_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("A0 = ROT A0 BY imm6");
       OUTS (outf, "A0");
       OUTS (outf, "=");
-      OUTS (outf, "ROT");
+      OUTS (outf, " ROT ");
       OUTS (outf, "A0");
       OUTS (outf, "BY");
       OUTS (outf, imm6 (immag));
@@ -6124,7 +6124,7 @@ decode_dsp32shiftimm_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs = ROT dregs BY imm6");
       OUTS (outf, dregs (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "ROT");
+      OUTS (outf, " ROT ");
       OUTS (outf, dregs (src1));
       OUTS (outf, "BY");
       OUTS (outf, imm6 (immag));
