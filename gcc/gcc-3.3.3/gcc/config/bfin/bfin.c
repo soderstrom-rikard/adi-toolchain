@@ -38,6 +38,7 @@
 #undef REAL_VALUE_ATOF
 #define REAL_VALUE_ATOF(v,t) atof(v)
 
+#define SP_SIZE 62
 
 void print_operand (FILE *file,  rtx x,  char code);
 
@@ -546,6 +547,7 @@ static void
 bfin_function_prologue (FILE *file, int framesize)
 {
   int i;
+  signed int arg_size;
 
   e_funkind fkind = funkind (current_function_decl);
 
@@ -623,18 +625,56 @@ bfin_function_prologue (FILE *file, int framesize)
     if (framesize != 0) 
       fprintf (file, "\tSP += %d;\n", -framesize);
   }
- 
+
+  if (current_function_outgoing_args_size) {
+    if (current_function_outgoing_args_size > FIXED_STACK_AREA)
+      arg_size = current_function_outgoing_args_size;
+    else
+      arg_size = FIXED_STACK_AREA;
+
+    if (arg_size < SP_SIZE)
+      fprintf (file, "\tSP += %d;\n", -arg_size);
+    else {
+        do {
+          int size;
+          (arg_size > SP_SIZE) ? (size = SP_SIZE) : (size = arg_size);
+          fprintf (file, "\tSP += %d;\n", -size);
+          arg_size -= SP_SIZE;
+        } while (arg_size > 0);
+    }
+  } 
+
 }
  
 static void
 bfin_function_epilogue (FILE *file, int framesize)
 {
   int i;
+  signed int arg_size;
+
   e_funkind fkind = funkind (current_function_decl);
 
   if (fkind != SUBROUTINE) {
   	output_interrupt_handler_epilogue (file, framesize, fkind);
 	return;
+  }
+
+  if (current_function_outgoing_args_size) {
+        if (current_function_outgoing_args_size > FIXED_STACK_AREA)
+          arg_size = current_function_outgoing_args_size;
+        else
+          arg_size = FIXED_STACK_AREA;
+
+        if (arg_size <= SP_SIZE)
+          fprintf (file, "\tSP += %d;\n", arg_size);
+        else {
+            do {
+              int size;
+              (arg_size > SP_SIZE) ? (size = SP_SIZE) : (size = arg_size);
+              fprintf (file, "\tSP += %d;\n", size);
+              arg_size -= SP_SIZE;
+            } while (arg_size > 0);
+        }
   }
 
   if (!TARGET_NEW_PROLOGUE) {
@@ -1174,7 +1214,7 @@ function_arg_partial_nregs (CUMULATIVE_ARGS *cum ,	/* current arg information */
 
   last_reg_num = max_arg_registers - 1;
   ret = ((arg_num <= last_reg_num && 
-         ((arg_num + words) >= (last_reg_num + 1)))
+         ((arg_num + words) > (last_reg_num + 1)))
          ? last_reg_num - arg_num + 1
          : 0);
 

@@ -263,8 +263,13 @@ extern const char * directive_names[];
 	  
  /*If we generate an insn to push BYTES bytes, this says how many the
    stack pointer really advances by.  On Hummingbird pushw decrements
-   by exactly 2 no matter what the position was.   */
-#define PUSH_ROUNDING(BYTES) (((BYTES) + 3) & (~3))
+   by exactly 2 no matter what the position was.   
+#define PUSH_ROUNDING(BYTES) (((BYTES) + 3) & (~3))*/
+
+/* Define this if the maximum size of all the outgoing args is to be
+ *    accumulated and pushed during the prologue.  The amount can be
+ *       found in the variable current_function_outgoing_args_size. */ 
+#define ACCUMULATE_OUTGOING_ARGS 1
 
 /* Value should be nonzero if functions must have frame pointers.
    Zero means the frame pointer need not be set up (and parms
