@@ -9,10 +9,7 @@
 
 /* The BFIN code generation auxilary output file */
 
-#include <stdio.h>
 #include "config.h"
-#include <setjmp.h>
-#include <safe-ctype.h>
 #include "system.h"
 #include "coretypes.h"
 #include "tm.h"

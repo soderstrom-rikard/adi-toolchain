@@ -12,6 +12,9 @@
 	(automaton "bfin" and associated definitions): New.
 	(attr "sets_preg", define_function_unit "dag"): Delete.
 
+	* config/bfin/bfin.c: Don't include <stdio.h>, <setjmp.h>, and
+	<safe-ctype.h>.
+
 2005-01-04  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (symbolic_or_const_operand): Accept labels with
