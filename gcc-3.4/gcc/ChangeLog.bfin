@@ -1,3 +1,7 @@
+2004-10-11  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bin/bfin.md (negdi2): Clobbers CC.
+
 2004-10-07  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (adddi3): Generate correct code for add of small

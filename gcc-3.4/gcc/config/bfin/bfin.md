@@ -523,7 +523,8 @@
 (define_insn "negdi2"
   [(set (match_operand:DI 0 "register_operand" "=d")
         (neg:DI (match_operand:DI 1 "register_operand" "d")))
-   (clobber (match_scratch:SI 2 "=&d"))]
+   (clobber (match_scratch:SI 2 "=&d"))
+   (clobber (reg:CC REG_CC))]
   ""
   "%2 = 0; %2 = %2 - %1; cc = ac0; %2 = cc;\\n\\t%0 = -%1; %H0 = -%H1; %H0 = %H0 - %2;"
 [(set_attr "length" "14")]) 
