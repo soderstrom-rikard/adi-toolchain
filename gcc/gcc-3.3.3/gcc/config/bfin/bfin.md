@@ -40,6 +40,8 @@
 ;     O  -4 .. 3    3bit imm
 ;     P  0          constant zero
 ;     Q  ~(2**N)    bitclear constant
+;     R  -32768 .. 32767    16bit imm
+;     S  0 .. 63   7bit posimm
 ;  
 ; register operands
 ;     d  (r0..r7)
@@ -48,8 +50,8 @@
 ;     b  (i0..i3)
 ;     f  (m0..m3)
 ;     B
-;     c
-;     C
+;     c (i0..i3,m0..m3) CIRCREGS 
+;     C (CC)            CCREGS
 ;
 ; `unspec' values used in bfin.md:
 ; Number       	Use
@@ -874,7 +876,7 @@
 (define_insn ""
   [(set (match_operand:SI 0 "register_operand"           "=ad,a,d,&a,&d,b,f,f")
 	(plus:SI (match_operand:SI 1 "register_operand"  "%0, a,d,a,d,%0,%0,%0")
-		 (match_operand:SI 2 "nonmemory_operand" " M, a,d,i,i,Mi,M,i")))]
+		 (match_operand:SI 2 "nonmemory_operand" " M, a,d,i,i,MR,M,R")))]
   ""
   "*
     {

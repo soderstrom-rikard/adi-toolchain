@@ -254,22 +254,17 @@ extern const char * directive_names[];
  * This space can either be allocated by the caller or be a part of the
  * machine-dependent stack frame: `OUTGOING_REG_PARM_STACK_SPACE'
  * says which.  */
-#define REG_PARM_STACK_SPACE(FNDECL) 12
+#define FIXED_STACK_AREA 12
+#define REG_PARM_STACK_SPACE(FNDECL) (FNDECL) ? FIXED_STACK_AREA : 0
 
 /* Define this if the above stack space is to be considered part of the
  * space allocated by the caller.  */
 #define OUTGOING_REG_PARM_STACK_SPACE
 	  
-/* Define this if the maximum size of all the outgoing args is to be
- *    accumulated and pushed during the prologue.  The amount can be
- *       found in the variable current_function_outgoing_args_size.  */
-#define ACCUMULATE_OUTGOING_ARGS 1
-
-
-/* If we generate an insn to push BYTES bytes, this says how many the
+ /*If we generate an insn to push BYTES bytes, this says how many the
    stack pointer really advances by.  On Hummingbird pushw decrements
-   by exactly 2 no matter what the position was.   
-#define PUSH_ROUNDING(BYTES) (((BYTES) + 3) & (~3))*/
+   by exactly 2 no matter what the position was.   */
+#define PUSH_ROUNDING(BYTES) (((BYTES) + 3) & (~3))
 
 /* Value should be nonzero if functions must have frame pointers.
    Zero means the frame pointer need not be set up (and parms
@@ -320,22 +315,22 @@ extern const char * directive_names[];
 
 #define TRAMPOLINE_SIZE 18
 #define TRAMPOLINE_TEMPLATE(FILE)                                       \
-      fprintf(FILE, "\t.word\t0xe10c0000\t\t# p3.l = fn low");          \
-      fprintf(FILE, "\t.word\t0xe12c0000\t\t# p3.h = fn high");         \
-      fprintf(FILE, "\t.word\t0xe10d0000\t\t# p4.l = sc low");          \
-      fprintf(FILE, "\t.word\t0xe12d0000\t\t# p4.h = sc high");         \
-      fprintf(FILE, "\t.word\t0x0083\t\t# jump (p3)");
+      fprintf(FILE, "\t.word\t0xe10c0000\n\t\t# p3.l = fn low");        \
+      fprintf(FILE, "\n\t.word\t0xe12c0000\n\t\t# p3.h = fn high");     \
+      fprintf(FILE, "\n\t.word\t0xe10d0000\n\t\t# p4.l = sc low");      \
+      fprintf(FILE, "\n\t.word\t0xe12d0000\n\t\t# p4.h = sc high");     \
+      fprintf(FILE, "\n\t.word\t0x0083\n\t\t# jump (p3)");
 
 #define INITIALIZE_TRAMPOLINE(TRAMP, FNADDR, CXT)  \
 {                                                                       \
   emit_move_insn (gen_rtx_MEM (HImode, plus_constant ((TRAMP),  2)),    \
-                  (rtx) (((int) FNADDR) & 0x0000ffff));                 \
+                  GEN_INT ((((int) FNADDR) & 0x0000ffff)));             \
   emit_move_insn (gen_rtx_MEM (HImode, plus_constant ((TRAMP),  6)),    \
-                  (rtx) ((((int) FNADDR) & 0xffff0000) >> 16));         \
+                  GEN_INT (((((int) FNADDR) & 0xffff0000) >> 16)));     \
   emit_move_insn (gen_rtx_MEM (HImode, plus_constant ((TRAMP), 10)),    \
-                  (rtx) (((int) CXT) & 0x0000ffff));                    \
+                  GEN_INT ((((int) CXT) & 0x0000ffff)));                \
   emit_move_insn (gen_rtx_MEM (HImode, plus_constant ((TRAMP), 14)),    \
-                  (rtx) ((((int) (CXT)) & 0xffff0000) >> 16));          \
+                  GEN_INT (((((int) (CXT)) & 0xffff0000) >> 16)));      \
 }
 
 /* Number of actual hardware registers.
