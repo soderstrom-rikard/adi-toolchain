@@ -406,7 +406,7 @@ extern const char * directive_names[];
 /*r0 r1 r2 r3 r4 r5 r6 r7   p0 p1 p2 p3 p4 p5 p6 p7 */ \
 { 0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 1, 1,    \
 /*i0 b0 l0 i1 b1 l1 i2 b2   l2 i3 b3 l3 m0 m1 m2 m3 */ \
-  0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 1,    \
+  0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,    \
 /*a0 a1 cc */ \
   0, 0, 1,   \
 }
@@ -1400,7 +1400,7 @@ do { long l;                                            \
 
 #define FUNCTION_PROFILER(FILE, LABELNO) \
   do {\
-    fprintf (FILE, "\tl(p1) =LP$%d; h(p1) =LP$%d; call mcount;\n", \
+    fprintf (FILE, "\tP1.l =LP$%d; P1.h =LP$%d; call mcount;\n", \
        LABELNO, LABELNO);\
   } while(0)
 

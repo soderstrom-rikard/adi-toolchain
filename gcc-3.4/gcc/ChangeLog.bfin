@@ -20,7 +20,13 @@
 	numbers.
 	(GO_IF_LEGITIMATE_ADDRESS): Don't test for out-of-range constants
 	here; that's now done by bfin_valid_add.
-	
+
+	* config/bfin/bfin.h (FIXED_REGISTERS): M3 is no longer fixed.
+	(FUNCTION_PROFILER): Fix assembly syntax.
+	(addsi pattern): Delete last alternative.
+	(subsi pattern): Delete last alternative, replace with two-operand
+	subtraction of PREGS.
+
 2004-09-08  Bernd Schmidt  <bernds@btinternet.com>
 
 	* config/bfin/bfin.md (adddi3): Turn this into a two-operand insn to

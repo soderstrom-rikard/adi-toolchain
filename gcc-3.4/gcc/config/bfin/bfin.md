@@ -784,6 +784,11 @@
   DONE;
 }")    
 
+;; The processor also supports ireg += mreg or ireg -= mreg, but these
+;; are unusable if we don't ensure that the corresponding lreg is zero.
+;; The same applies to the add/subtract constant versions involving
+;; iregs
+
 (define_expand "addsi3"
   [(set (match_operand:SI 0 "register_operand"           "")
 	(plus:SI (match_operand:SI 1 "simple_reg_operand" "")
@@ -792,30 +797,28 @@
   "")
 
 (define_insn ""
-  [(set (match_operand:SI 0 "register_operand"           "=ad,a,d,b")
-	(plus:SI (match_operand:SI 1 "register_operand"  "%0, a,d,0")
-		 (match_operand:SI 2 "reg_or_7bit_operand" " M, a,d,M")))]
+  [(set (match_operand:SI 0 "register_operand"           "=ad,a,d")
+	(plus:SI (match_operand:SI 1 "register_operand"  "%0, a,d")
+		 (match_operand:SI 2 "reg_or_7bit_operand" " M, a,d")))]
   ""
   "@
    %0 += %2;
    %0 = %1 + %2;
-   %0 = %1 + %2;
-   M3 = %2;\\n\\t%0 += M3;"
+   %0 = %1 + %2;"
   [(set_attr "type" "alu0")
-   (set_attr "length" "2,2,2,4")])
+   (set_attr "length" "2,2,2")])
 
 (define_expand "subsi3"
   [(set (match_operand:SI 0 "register_operand"            "")
 	(minus:SI (match_operand:SI 1 "register_operand"  "")
 		  (match_operand:SI 2 "nonmemory_operand" "")))]
   ""
-  ""
-)
+  "")
 
 (define_insn ""
-  [(set (match_operand:SI 0 "register_operand"           "=da,d,b")
+  [(set (match_operand:SI 0 "register_operand"           "=da,d,a")
 	(minus:SI (match_operand:SI 1 "register_operand"  "0,d,0")
-		  (match_operand:SI 2 "nonmemory_operand" "M,d,f")))]
+		  (match_operand:SI 2 "nonmemory_operand" "M,d,a")))]
   "GET_CODE (operands[2]) != CONST_INT || INTVAL (operands[2]) != -64"
   "*
 {
