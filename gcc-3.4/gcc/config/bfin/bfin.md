@@ -1050,32 +1050,27 @@
     }
  ")
 
-(define_insn ""
-  [(set (match_operand:SI 0 "register_operand"             "=a")
-	(ashift:SI (match_operand:SI 1 "register_operand"  "a")
-		   (match_operand:SI 2 "pos_scale_operand"   "K")))]
+(define_insn "*ashlsi3_insn"
+  [(set (match_operand:SI 0 "register_operand" "=d,a")
+	(ashift:SI (match_operand:SI 1 "register_operand" "0,a")
+		   (match_operand:SI 2 "nonmemory_operand" "dL,K")))]
   ""
-  "*
-  if (INTVAL (operands[2]) == 1) return \"%0 =%1+%1;\";
-  else                           return \"%0 =%1<<%2;\";
-  "
+{
+  if (which_alternative == 0)
+    return "%0 <<= %2;";
+  if (INTVAL (operands[2]) == 1)
+    return \"%0 = %1 + %1;\";
+  else
+    return \"%0 = %1 << %2;\";
+}
   [(set_attr "type" "shft")])
-
-(define_insn ""
-  [(set (match_operand:SI 0 "register_operand"                "=d")
-	(ashift:SI (match_operand:SI 1 "register_operand"     " 0")
-		   (match_operand:SI 2 "nonmemory_operand" "dL")))]
-  ""
-  "%0 <<=%2;"
-  [(set_attr "type" "shft")])
-
 
 (define_insn "ashrsi3"
   [(set (match_operand:SI 0 "register_operand" "=d")
 	(ashiftrt:SI (match_operand:SI 1 "register_operand" "0")
 		     (match_operand:SI 2 "nonmemory_operand" "dL")))]
   ""
-  "%0 >>>=%2;"
+  "%0 >>>= %2;"
   [(set_attr "type" "shft")])
 
 (define_expand "lshrsi3"
@@ -1086,20 +1081,14 @@
   ""
 ) 
 
-(define_insn ""
-  [(set (match_operand:SI 0 "register_operand"               "=a")
-	(lshiftrt:SI (match_operand:SI 1 "register_operand"  "a")
-		     (match_operand:SI 2 "pos_scale_operand" "K")))]
+(define_insn "*lshrsi3_insn"
+  [(set (match_operand:SI 0 "register_operand"                   "=d,a")
+	(lshiftrt:SI (match_operand:SI 1 "register_operand"      " 0,a")
+		     (match_operand:SI 2 "nonmemory_operand" "dL,K")))]
   ""
-  "%0 =%1>>%2;"
-  [(set_attr "type" "shft")])
-
-(define_insn ""
-  [(set (match_operand:SI 0 "register_operand"                   "=d")
-	(lshiftrt:SI (match_operand:SI 1 "register_operand"      " 0")
-		     (match_operand:SI 2 "nonmemory_operand" "dL")))]
-  ""
-  "%0 >>=%2;"
+  "@
+   %0 >>= %2;
+   %0 = %1 >> %2;"
   [(set_attr "type" "shft")])
 	
 
