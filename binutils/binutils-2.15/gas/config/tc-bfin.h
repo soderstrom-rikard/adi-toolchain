@@ -52,4 +52,6 @@ extern void bfin_start_line_hook PARAMS ((void));
 
 #define LOCAL_LABELS_FB 1
 
+#define DOUBLESLASH_LINE_COMMENTS
+
 /* end of tc-bfin.h */

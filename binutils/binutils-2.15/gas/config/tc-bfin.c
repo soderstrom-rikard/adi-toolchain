@@ -213,8 +213,8 @@ static void s_bss (int ignore ATTRIBUTE_UNUSED)
 
 
 /* Characters that are used to denote comments and line separators. */
-const char comment_chars[]        = "//";
-const char line_comment_chars[]   = "//#";
+const char comment_chars[]        = "";
+const char line_comment_chars[]   = "#";
 const char line_separator_chars[] = ";";
 
 /* Chars that can be used to separate mant from exp in floating point nums */
