@@ -35,7 +35,9 @@
 #include "expr.h"
 #include "toplev.h"
 #include "recog.h"
+#include "ggc.h"
 #include "bfin-protos.h"
+#include "gt-bfin.h"
 
 #undef REAL_VALUE_ATOF
 #define REAL_VALUE_ATOF(v,t) atof(v)
@@ -53,6 +55,7 @@ extern rtx *reg_equiv_mem;
 rtx bfin_compare_op0, bfin_compare_op1;
 
 /* RTX for condition code flag register */
+extern GTY(()) rtx bfin_cc_rtx;
 rtx bfin_cc_rtx;
 
 #ifndef assert
