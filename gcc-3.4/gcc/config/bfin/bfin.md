@@ -1296,7 +1296,6 @@
 
 ;; The USE in this pattern is needed to tell flow analysis that this is
 ;; a CASESI insn.  It has no other purpose. 
-;; The operand 4 is used to get one unused Preg from define_expand "casesi"
 
 (define_insn "casesi_internal"
   [(parallel [(set (pc)
@@ -1306,10 +1305,11 @@
                 (mem:SI (plus:SI (mult:SI (match_dup 0) (const_int 4))
                                  (label_ref (match_operand 2 "" ""))))
                 (label_ref (match_operand 3 "" ""))))
-              (use (label_ref (match_dup 2)))])]
+              (use (label_ref (match_dup 2)))
+	      (clobber (match_scratch:SI 4 "=&a"))])]
   ""
-  "*
-   { output_casesi_internal(operands); }
+  "*output_casesi_internal(operands);
+    return \"\";
   "
   [(set_attr "length" "24")])
 

@@ -22,3 +22,8 @@
 	* config/bfin/bfin.h (ASM_OUTPUT_LABEL): Print a newline character.
 	* config/bfin/bfin.c (bfin_function_prologue): Not here.
 	(print_operand): Omit trailing whitespace from register names.
+
+	* config/bfin/bfin.md (casesi_internal): Add a scratch register.
+	Return an empty string.
+	* config/bfin/bfin.c (output_casesi_internal): Use that scratch
+	register instead of trying to free one here.
