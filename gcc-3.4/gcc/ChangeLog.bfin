@@ -6,6 +6,13 @@
 	* config/bfin/bfin-protos.h (positive_immediate_operand): Declare.
 	* config/bfin/bfin.c (positive_immediate_operand): New function.
 
+	* config/bfin/lib1funcs.asm (__nedf2, __gedf2, __adddf3, __subdf3,
+	__muldf3, __divdf3, __cmpdf2, __eqdf2, __ltdf2, __gtdf2, __negdf2,
+	__fixdfsi, __fixunsdfsi, __fixdfdi, __floatsidf, __ledf2, __fixsfsi,
+	__fixunssfsi, __fixsfdi, __fixunssfdi): Delete.
+	* config/bfin/t-bfin-elf (LIB1ASMFUNCS): Remove them from here, too.
+	(fp-bit.c): Don't define FLOAT_ONLY or SMALL_MACHINE.
+
 2004-10-05  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (extendhisi2, zero_extendhisi2, extendqisi2,
