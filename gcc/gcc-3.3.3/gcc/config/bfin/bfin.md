@@ -874,9 +874,9 @@
 )
 
 (define_insn ""
-  [(set (match_operand:SI 0 "register_operand"           "=ad,a,d,&a,&d,b,f,fb")
-	(plus:SI (match_operand:SI 1 "register_operand"  "%0, a,d,a,d,%0,%0,%0")
-		 (match_operand:SI 2 "nonmemory_operand" " M, a,d,i,i,M,M,i")))]
+  [(set (match_operand:SI 0 "register_operand"           "=ad,a,d,&a,&d,b,f,fb,&d,&a")
+	(plus:SI (match_operand:SI 1 "register_operand"  "%0, a,d,a,d,%0,%0,%0,a,d")
+		 (match_operand:SI 2 "nonmemory_operand" " M, a,d,i,i,M,M,i,M,M")))]
   ""
   "*
     {
@@ -889,6 +889,8 @@
 	\"M3=%2;\\n\\t%0+=M3;\",
 	\"[--SP] = R3;\\n\\tR3=%0;\\n\\tR3+=%2;\\n\\t%0=R3;\\n\\tR3 = [SP++];\",
 	\"[--SP] = R3;\\n\\tR3 = %0;\\n\\tA0 = R3;\\n\\tA1 = %2;\\n\\tR3 = (A0 += A1);\\n\\t%0 = R3;\\n\\tR3 = [SP++];\",
+	\"%0 = %1;\\n\\t%0 += %2 (X);\",
+	\"%0 = %1;\\n\\t%0 += %2 (X);\",
 	};
 
 	if (which_alternative < 5 && which_alternative > 2) {
