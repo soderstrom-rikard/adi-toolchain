@@ -1024,6 +1024,7 @@ ExprNodeGenReloc (ExprNode * head, int parent_reloc)
 	  note1 = conscode (gencode (value), NULL_CODE);
 	  pcrel = 0;		// only these are not pc relative
 	  break;
+	case BFD_RELOC_16:
 	case BFD_RELOC_BFIN_GOT:
 	  note1 = conscode (gencode (value), NULL_CODE);
 	  pcrel = 0;		// only these are not pc relative
@@ -1441,8 +1442,18 @@ gen_ldstidxi (REG_T ptr, REG_T reg, int W, int sz, int Z, ExprNode * poffset)
   */
   if(poffset->type != ExprNodeConstant){
     /* a GOT relocation such as R0 = [P5 + symbol@GOT] */
-    return  conscode (gencode (HI (c_code.opcode)),
+    /* distinguish between R0 = [P5 + symbol@GOT] and
+			   P5 = [P5 + _current_shared_library_p5_offset_]
+    */
+    if(!strcmp(poffset->value.s_value, "_current_shared_library_p5_offset_")){
+      return  CONSCODE (GENCODE (HI (c_code.opcode)),
+			ExprNodeGenReloc(poffset, BFD_RELOC_16));
+    }
+    else
+{
+      return  CONSCODE (GENCODE (HI (c_code.opcode)),
 			ExprNodeGenReloc(poffset, BFD_RELOC_BFIN_GOT));
+    }
   }
   else{
     return GEN_OPCODE32 ();
