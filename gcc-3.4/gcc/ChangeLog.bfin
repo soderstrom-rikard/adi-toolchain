@@ -1,3 +1,10 @@
+2004-12-19  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (movstricthi_high): New pattern.
+	* config/bfin/bfin.c (split_load_immediate): More strategies.
+	(frame_related_constant_load): Simplify; don't call
+	split_load_immediate.
+
 2004-12-15  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin-protos.h (bfin_expand_epilogue): Add extra

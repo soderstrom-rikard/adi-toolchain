@@ -250,6 +250,15 @@
   [(set_attr "type" "mvi")
    (set_attr "length" "4")])
 
+(define_insn "movstricthi_high"
+  [(set (match_operand:SI 0 "register_operand" "+x")
+	(ior:SI (and:SI (match_dup 0) (const_int 65535))
+		(match_operand:SI 1 "immediate_operand" "i")))]
+  "reload_completed"
+  "%d0 = %d1;"
+  [(set_attr "type" "mvi")
+   (set_attr "length" "4")])
+
 (define_insn "movsi_low"
   [(set (match_operand:SI 0 "register_operand" "=x")
 	(lo_sum:SI (match_operand:SI 1 "register_operand" "0")

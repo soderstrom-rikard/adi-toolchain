@@ -396,31 +396,19 @@ static void
 frame_related_constant_load (rtx reg, HOST_WIDE_INT constant)
 {
   rtx insn;
-  rtx xop[2];
-  xop[0] = reg;
-  xop[1] = GEN_INT (constant);
+  rtx cst = GEN_INT (constant);
 
-  start_sequence ();
   if (constant >= -32768 && constant < 65536)
-    insn = emit_move_insn (reg, xop[1]);
+    insn = emit_move_insn (reg, cst);
   else
     {
-      if (! split_load_immediate (xop))
-	{
-	  emit_insn (gen_movsi_high (xop[0], xop[1]));
-	  emit_insn (gen_movsi_low (xop[0], xop[0], xop[1]));
-	}
-      insn = get_insns ();
-    }
-
-  while (insn)
-    {
+      /* We don't call split_load_immediate here, since dwarf2out.c can get
+	 confused about some of the more clever sequences it can generate.  */
+      insn = emit_insn (gen_movsi_high (reg, cst));
       RTX_FRAME_RELATED_P (insn) = 1;
-      insn = NEXT_INSN (insn);
+      insn = emit_insn (gen_movsi_low (reg, reg, cst));
     }
-  insn = get_insns ();
-  end_sequence ();
-  emit_insn (insn);
+  RTX_FRAME_RELATED_P (insn) = 1;
 }
 
 /* Generate a LINK insn for a frame sized FRAME_SIZE.  If this constant
@@ -1927,23 +1915,76 @@ shiftr_zero (HOST_WIDE_INT *v)
 int
 split_load_immediate (rtx operands[])
 {
-  int val = INTVAL (operands[1]);
+  HOST_WIDE_INT val = INTVAL (operands[1]);
+  HOST_WIDE_INT tmp;
   HOST_WIDE_INT shifted = val;
   HOST_WIDE_INT shifted_compl = ~val;
   int num_zero = shiftr_zero (&shifted);
   int num_compl_zero = shiftr_zero (&shifted_compl);
-  enum reg_class class1 = REGNO_REG_CLASS (REGNO (operands[0]));
+  unsigned int regno = REGNO (operands[0]);
+  enum reg_class class1 = REGNO_REG_CLASS (regno);
 
+  /* This case takes care of single-bit set/clear constants, which we could
+     also implement with BITSET/BITCLR.  */
   if (num_zero
       && shifted >= -32768 && shifted < 65536
-      && (class1 == DREGS || (class1 == PREGS && num_zero <= 2)))
+      && ((regno >= REG_R0 && regno <= REG_R7)
+	  || (regno >= REG_P0 && regno <= REG_P7 && num_zero <= 2)))
     {
       emit_insn (gen_movsi (operands[0], GEN_INT (shifted)));
       emit_insn (gen_ashlsi3 (operands[0], operands[0], GEN_INT (num_zero)));
       return 1;
     }
-  else if (class1 == DREGS && optimize_size
-	   && num_compl_zero && CONST_7BIT_IMM_P (shifted_compl))
+
+  tmp = val & 0xFFFF;
+  tmp |= -(tmp & 0x8000);
+
+  /* If high word has one bit set or clear, try to use a bit operation.  */
+  if (regno >= REG_R0 && regno <= REG_R7)
+    {
+      if (log2constp (val & 0xFFFF0000))
+	{
+	  emit_insn (gen_movsi (operands[0], GEN_INT (val & 0xFFFF)));
+	  emit_insn (gen_iorsi3 (operands[0], operands[0], GEN_INT (val & 0xFFFF0000)));
+	  return 1;
+	}
+      else if (log2constp (val | 0xFFFF) && (val & 0x8000) != 0)
+	{
+	  emit_insn (gen_movsi (operands[0], GEN_INT (tmp)));
+	  emit_insn (gen_andsi3 (operands[0], operands[0], GEN_INT (val | 0xFFFF)));
+	}
+    }
+
+  if (regno >= REG_R0 && regno <= REG_P7)
+    {
+      if (CONST_7BIT_IMM_P (tmp))
+	{
+	  emit_insn (gen_movsi (operands[0], GEN_INT (tmp)));
+	  emit_insn (gen_movstricthi_high (operands[0], GEN_INT (val & -65536)));
+	  return 1;
+	}
+
+      if ((val & 0xFFFF0000) == 0)
+	{
+	  emit_insn (gen_movsi (operands[0], const0_rtx));
+	  emit_insn (gen_movsi_low (operands[0], operands[0], operands[1]));
+	  return 1;
+	}
+
+      if ((val & 0xFFFF0000) == 0xFFFF0000)
+	{
+	  emit_insn (gen_movsi (operands[0], constm1_rtx));
+	  emit_insn (gen_movsi_low (operands[0], operands[0], operands[1]));
+	  return 1;
+	}
+    }
+
+  /* Need DREGs for the remaining case.  */
+  if (regno > REG_R7)
+    return 0;
+
+  if (optimize_size
+      && num_compl_zero && CONST_7BIT_IMM_P (shifted_compl))
     {
       /* If optimizing for size, generate a sequence that has more instructions
 	 but is shorter.  */
