@@ -55,7 +55,6 @@ extern int symbolic_or_const_operand (rtx , enum machine_mode);
 extern int imm16bit_operand_p (rtx, Mmode);
 extern int reg_or_7bit_operand (rtx op, Mmode);
 extern int scale_by_operand (rtx, Mmode);
-extern int valid_reg_operand (rtx, Mmode);
 extern int pos_scale_operand (rtx, Mmode);
 extern int regorlog2_operand (rtx, Mmode);
 extern int cc_operand (rtx, Mmode);

@@ -1551,18 +1551,6 @@ regorlog2_operand (rtx op, enum machine_mode mode)
   return register_operand (op, mode);
 }
 
-/* Like register_operand, but make sure that hard regs have a valid mode.  */
-
-int 
-valid_reg_operand (rtx op, enum machine_mode mode)
-{
-  if (! register_operand (op, mode))
-    return 0;
-  if (REG_P (op) && REGNO (op) < FIRST_PSEUDO_REGISTER)
-    return HARD_REGNO_MODE_OK (REGNO (op), mode);
-  return 1;
-}
-
 /* Return nonzero if OP is the CC register.  */
 
 int

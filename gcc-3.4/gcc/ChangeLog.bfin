@@ -1,3 +1,13 @@
+2005-02-08  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* combine.c (try_combine): When modifying mode of a hard reg, check
+	that the new mode is valid.
+	* config/bfin/bfin.md: Replace all occurrences of valid_reg_operand
+	with register_operand.
+	* config/bfin/bfin.c (valid_reg_operand): Delete.
+	* config/bfin/bfin-protos.h (valid_reg_operand): Don't declare.
+	* config/bfin/bfin.h (PREDICATE_CODES): Remove valid_reg_operand.
+
 2005-02-02  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c: Include "integrate.h".

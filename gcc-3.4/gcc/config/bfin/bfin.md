@@ -559,7 +559,7 @@
 ;; Sign and zero extensions
 
 (define_insn "extendhisi2"
-  [(set (match_operand:SI 0 "valid_reg_operand" "=d, d")
+  [(set (match_operand:SI 0 "register_operand" "=d, d")
 	(sign_extend:SI (match_operand:HI 1 "nonimmediate_operand" "d, m")))]
   ""
   "@
@@ -568,7 +568,7 @@
   [(set_attr "type" "alu0,mcld")])
 
 (define_insn "zero_extendhisi2"
-  [(set (match_operand:SI 0 "valid_reg_operand" "=d, d")
+  [(set (match_operand:SI 0 "register_operand" "=d, d")
 	(zero_extend:SI (match_operand:HI 1 "nonimmediate_operand" "d, m")))]
   ""
   "@
@@ -577,14 +577,14 @@
   [(set_attr "type" "alu0,mcld")])
 
 (define_insn "zero_extendbisi2"
-  [(set (match_operand:SI 0 "valid_reg_operand" "=d")
+  [(set (match_operand:SI 0 "register_operand" "=d")
 	(zero_extend:SI (match_operand:BI 1 "nonimmediate_operand" "C")))]
   ""
   "%0 = %1;"
   [(set_attr "type" "compare")])
 
 (define_insn "extendqihi2"
-  [(set (match_operand:HI 0 "valid_reg_operand" "=d, d")
+  [(set (match_operand:HI 0 "register_operand" "=d, d")
 	(sign_extend:HI (match_operand:QI 1 "nonimmediate_operand" "m, d")))]
   ""
   "@
@@ -593,7 +593,7 @@
   [(set_attr "type" "mcld,alu0")])
 
 (define_insn "extendqisi2"
-  [(set (match_operand:SI 0 "valid_reg_operand" "=d, d")
+  [(set (match_operand:SI 0 "register_operand" "=d, d")
 	(sign_extend:SI (match_operand:QI 1 "nonimmediate_operand" "m, d")))]
   ""
   "@
@@ -603,7 +603,7 @@
 
 
 (define_insn "zero_extendqihi2"
-  [(set (match_operand:HI 0 "valid_reg_operand" "=d, d")
+  [(set (match_operand:HI 0 "register_operand" "=d, d")
 	(zero_extend:HI (match_operand:QI 1 "nonimmediate_operand" "m, d")))]
   ""
   "@
@@ -613,7 +613,7 @@
 
 
 (define_insn "zero_extendqisi2"
-  [(set (match_operand:SI 0 "valid_reg_operand" "=d, d")
+  [(set (match_operand:SI 0 "register_operand" "=d, d")
 	(zero_extend:SI (match_operand:QI 1 "nonimmediate_operand" "m, d")))]
   ""
   "@
@@ -1022,8 +1022,8 @@
 	(ne:SI (reg:BI REG_CC) (const_int 0)))])
 
 (define_insn_and_split "*andsi_insn"
-  [(set (match_operand:SI 0 "valid_reg_operand" "=d,d,d,d,d")
-	(and:SI (match_operand:SI 1 "valid_reg_operand" "%0,d,d,d,d")
+  [(set (match_operand:SI 0 "register_operand" "=d,d,d,d,d")
+	(and:SI (match_operand:SI 1 "register_operand" "%0,d,d,d,d")
 		(match_operand:SI 2 "rhs_andsi3_operand" "L,M1,M2,P1,d")))
    (clobber (reg:BI REG_CC))]
   ""
@@ -1061,8 +1061,8 @@
 })
 
 (define_insn "iorsi3"
-  [(set (match_operand:SI 0 "valid_reg_operand" "=d,d")
-	(ior:SI (match_operand:SI 1 "valid_reg_operand" "%0,d")
+  [(set (match_operand:SI 0 "register_operand" "=d,d")
+	(ior:SI (match_operand:SI 1 "register_operand" "%0,d")
 		(match_operand:SI 2 "regorlog2_operand" "J,d")))]
   ""
   "@
@@ -1071,8 +1071,8 @@
   [(set_attr "type" "alu0")])
 
 (define_insn "xorsi3"
-  [(set (match_operand:SI 0 "valid_reg_operand" "=d,d")
-	(xor:SI (match_operand:SI 1 "valid_reg_operand" "%0,d")
+  [(set (match_operand:SI 0 "register_operand" "=d,d")
+	(xor:SI (match_operand:SI 1 "register_operand" "%0,d")
 		  (match_operand:SI 2 "regorlog2_operand" "J,d")))]
   ""
   "@

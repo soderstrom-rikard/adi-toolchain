@@ -982,7 +982,6 @@ do {                                              \
 /* Define the codes that are matched by predicates in bfin.c.  */
 #define PREDICATE_CODES                                                	\
   {"cc_operand", {REG}},				        	\
-  {"valid_reg_operand", {SUBREG, REG, ADDRESSOF}},			\
   {"call_insn_operand", {SUBREG, REG, SYMBOL_REF}},			\
   {"symbolic_operand", {CONST, SYMBOL_REF, LABEL_REF}},			\
   {"symbolic_or_const_operand",						\
