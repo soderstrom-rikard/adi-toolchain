@@ -213,8 +213,9 @@ extern const char * directive_names[];
      to allocate such a register (if necessary). */
 #define PIC_OFFSET_TABLE_REGNUM (REG_P5)
 
-/* SFA - STATIC_CHAIN for trampolines .... */
-#define STATIC_CHAIN_REGNUM REG_P4
+/* A static chain register for nested functions.  We need to use a
+   call-clobbered register for this.  */
+#define STATIC_CHAIN_REGNUM REG_P2
 
 /* Define this if functions should assume that stack space has been
  * allocated for arguments even when their values are passed in
@@ -278,11 +279,11 @@ extern const char * directive_names[];
 
 #define TRAMPOLINE_SIZE 18
 #define TRAMPOLINE_TEMPLATE(FILE)                                       \
-  fprintf(FILE, "\t.dd\t0x0000e10b\n"); /* p3.l = fn low */		\
-  fprintf(FILE, "\t.dd\t0x0000e14b\n"); /* p3.h = fn high */;		\
-  fprintf(FILE, "\t.dd\t0x0000e10c\n"); /* p4.l = sc low */;		\
-  fprintf(FILE, "\t.dd\t0x0000e14c\n"); /* p4.h = sc high */;		\
-  fprintf(FILE, "\t.dw\t0x0053\n"); /* jump (p3)*/
+  fprintf(FILE, "\t.dd\t0x0000e109\n"); /* p1.l = fn low */		\
+  fprintf(FILE, "\t.dd\t0x0000e149\n"); /* p1.h = fn high */;		\
+  fprintf(FILE, "\t.dd\t0x0000e10a\n"); /* p2.l = sc low */;		\
+  fprintf(FILE, "\t.dd\t0x0000e14a\n"); /* p2.h = sc high */;		\
+  fprintf(FILE, "\t.dw\t0x0051\n"); /* jump (p1)*/
 
 #define INITIALIZE_TRAMPOLINE(TRAMP, FNADDR, CXT) \
   initialize_trampoline (TRAMP, FNADDR, CXT)

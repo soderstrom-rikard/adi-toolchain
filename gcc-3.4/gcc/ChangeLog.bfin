@@ -7,7 +7,10 @@
 	* config/bfin/bfin-protos.h (bfin_va_arg): Declare it.
 	* config/bfin/bfin.h (EXPAND_BUILTIN_VA_ARG,
 	FUNCTION_ARG_PASS_BY_REFERENCE): New macros.
-	
+
+	* config/bfin/bfin.h (TRAMPOLINE_TEMPLATE, STATIC_CHAIN_REGNUM): Use
+	call-clobbered registers for this sort of thing.
+
 2004-10-21  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/lib1funcs.asm (___udivsi3): Use unsigned comparison
