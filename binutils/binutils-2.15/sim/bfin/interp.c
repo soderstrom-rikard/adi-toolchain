@@ -786,7 +786,7 @@ sim_resume (sd, step, siggnal)
   saved_state.exception = 0;
 
   if(step){
-    while(step){
+    while(step && saved_state.exception != SIGTRAP){
       /* not clear if this will be > 1. Potential problem area */
       step_once(sd, pollcount);
       step--;
@@ -1141,6 +1141,7 @@ sim_fetch_register (sd, rn, memory, length)
 	case BFIN_LB1_REGNUM : value = LB1REG; break;
 	case BFIN_RETS_REGNUM : value = RETSREG; break;
 	case BFIN_PC_REGNUM : value = PCREG; break;
+	case BFIN_ASTAT_REGNUM : value = CCREG ? (1<<5):0; break; // gdb needs cc bit in astat for software single step
 	default :
 		return 0; // will be an error in gdb
       break;
