@@ -3,8 +3,11 @@
 .align 2
 .global ___divsi3;
 .type ___divsi3, STT_FUNC;
+.global __divsi3;
+.type __divsi3, STT_FUNC;
 
 ___divsi3:
+__divsi3:
         [--SP]= RETS;
 	[--SP] = R7;
 
@@ -34,8 +37,11 @@ ___divsi3:
 .align 2
 .global ___modsi3;
 .type ___modsi3, STT_FUNC;
+.global __modsi3;
+.type __modsi3, STT_FUNC;
 
 ___modsi3:
+__modsi3:
         [--SP] = RETS;
 	/* P1 and P2 are preserved by divsi3 and udivsi3.  */
 	P1 = R0;
@@ -53,8 +59,11 @@ ___modsi3:
 .align 2
 .global ___udivsi3;
 .type ___udivsi3, STT_FUNC;
+.global __udivsi3;
+.type __udivsi3, STT_FUNC;
 
 ___udivsi3:
+__udivsi3:
         P0 = 32;
         LSETUP (0f, 1f) LC0 = P0;
 	/* upper half of dividend */
@@ -81,8 +90,11 @@ ___udivsi3:
 .align 2
 .global ___umodsi3;
 .type ___umodsi3, STT_FUNC;
+.global __umodsi3;
+.type __umodsi3, STT_FUNC;
 
 ___umodsi3:
+__umodsi3:
         P1 = RETS;
         CALL ___udivsi3;
 	R0 = R3;
