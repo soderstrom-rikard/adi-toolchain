@@ -38,10 +38,10 @@ Disassembly of section .text:
   64:	47 90       	FP=\[P0\+\+\];
   66:	f1 90       	P1=\[SP--\];
   68:	96 af       	SP=\[P2\+0x38\];
-  6a:	3b ac       	P3=\[FP\];
+  6a:	3b ac       	P3=\[FP\+0x0];
   6c:	3c e5 ff 7f 	P4=\[FP\+0x1fffc\];
   70:	3e e5 01 80 	SP=\[FP\+-131068\];
-  74:	66 91       	SP=\[P4\];
+  74:	66 91       	SP=\[P4\+0x0];
   76:	0d b8       	P5=\[FP-128\];
 
 00000078 <load_data_register>:
@@ -103,7 +103,7 @@ Disassembly of section .text:
   de:	4a 98       	R2=B\[P1\+\+\]\(X\);
   e0:	fb 98       	R3=B\[FP--\]\(X\);
   e2:	77 99		R7=B\[SP\]\(X\);
-  e4:	be e5 01 80 	R6=B\[FP\+-32767\]\(X\);
+  e4:	be e5 01 80 	R6=B\[FP\+-32767\] \(X\);
 
 000000ea <load_data1>:
 	...
