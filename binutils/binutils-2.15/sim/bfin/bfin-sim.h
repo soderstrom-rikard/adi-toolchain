@@ -51,8 +51,8 @@ extern saved_state_type saved_state;
 #define DPREG(x) saved_state.dpregs[x]
 #define GREG(x,i) DPREG ((x) | (i << 3))
 #define PREG(x) saved_state.dpregs[x + 8]
-#define FPREG 	(PREG(6))
-#define SPREG 	(PREG(7))
+#define SPREG 	(PREG(6))
+#define FPREG 	(PREG(7))
 #define IREG(x) saved_state.iregs[x]
 #define LREG(x) saved_state.lregs[x]
 #define MREG(x) saved_state.mregs[x]

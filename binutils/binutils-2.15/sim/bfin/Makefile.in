@@ -23,6 +23,6 @@ SIM_EXTRA_LIBS = -lm
 
 ## COMMON_POST_CONFIG_FRAG
 
-interp.o: interp.c 
+interp.o: interp.c bfin-sim.h
 #$(srcroot)/include/gdb/sim-bfin.h
 
