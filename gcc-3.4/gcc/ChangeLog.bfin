@@ -1,3 +1,7 @@
+2005-01-22  Raja  <raja@rrap-software.com>
+	* config/bfin/t-bfin-elf : removed _addsf3, _subsf3 in LIB1ASMFUNCS
+	to avoid multiple definition. because we are using the fp-bit.c. 
+
 2005-01-19  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (print_operand): Simplify 'H' case.  Remove 'Q'
