@@ -419,6 +419,7 @@ static CORE_ADDR bfin_analyze_prologue(CORE_ADDR pc, CORE_ADDR cur_pc, struct bf
 }
 
 CORE_ADDR text_addr = 0;
+long      data_offset = 0;
 
 static struct bfin_frame_cache *
 bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
@@ -430,6 +431,7 @@ bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
   if(0 == text_addr)
   {
     text_addr = read_register(BFIN_EXTRA1) ;
+    data_offset = read_register(BFIN_EXTRA3) ;
   }
   if (*this_cache)
     return *this_cache;
@@ -441,7 +443,7 @@ bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
   frame_unwind_register (next_frame, BFIN_FP_REGNUM, buf);
   cache->base = extract_unsigned_integer (buf, 4);
   if(cache->base > text_addr)
-    cache->base -=  text_addr;
+    cache->base -=  text_addr + data_offset;
 
   if (cache->base == 0)
     return cache;
@@ -469,7 +471,7 @@ bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
     frame_unwind_register (next_frame, BFIN_FP_REGNUM, buf);
     cache->base = extract_unsigned_integer (buf, 4);
     if(cache->base > text_addr)
-    	cache->base -=  text_addr;
+    	cache->base -=  text_addr + data_offset;
 #ifdef _DEBUG
 fprintf(stderr, "frameless pc case base %x\n", cache->base);
 #endif //_DEBUG 
