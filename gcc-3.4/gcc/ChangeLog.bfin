@@ -1,3 +1,8 @@
+2005-01-31  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* optabs.c (expand_abs): Add missing protect_from_queue/force_not_mem
+	calls.
+
 2005-01-24  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/lib1funcs.asm (___divsi3, ___udivsi3, ___umodsi3,

@@ -2849,6 +2849,16 @@ expand_abs (enum machine_mode mode, rtx op0, rtx target,
 {
   rtx temp, op1;
 
+  op0 = protect_from_queue (op0, 0);
+
+  if (flag_force_mem)
+    {
+      op0 = force_not_mem (op0);
+    }
+
+  if (target)
+    target = protect_from_queue (target, 1);
+
   if (! flag_trapv)
     result_unsignedp = 1;
 
