@@ -600,6 +600,10 @@ enum reg_class
 ((MODE) == PDImode && ((REGNO) == REG_A0 || (REGNO) == REG_A1) \
  ? 1 : CLASS_MAX_NREGS (GENERAL_REGS, MODE))
 
+/* A C expression that is nonzero if hard register TO can be
+   considered for use as a rename register for FROM register */
+#define HARD_REGNO_RENAME_OK(FROM, TO) bfin_hard_regno_rename_ok (FROM, TO)
+
 /* A C expression that is nonzero if it is desirable to choose
    register allocation so as to avoid move instructions between a
    value of mode MODE1 and a value of mode MODE2.

@@ -190,12 +190,12 @@ char *section_asm_op (SECT_ENUM_T dir) {
     return s;
 }
 
-/* Examine machine-dependent attributes of function FUNDECL and return its
+/* Examine machine-dependent attributes of function type FUNTYPE and return its
    type.  See the definition of E_FUNKIND.  */
 
-static e_funkind funkind (tree fundecl)
+static e_funkind funkind (tree funtype)
 {
-  tree attrs = TYPE_ATTRIBUTES (TREE_TYPE (fundecl));
+  tree attrs = TYPE_ATTRIBUTES (funtype);
   if (lookup_attribute ("interrupt_handler", attrs))
     return INTERRUPT_HANDLER;
   else if (lookup_attribute ("exception_handler", attrs))
@@ -477,7 +477,7 @@ bfin_va_arg (tree va_list, tree type)
 int
 bfin_frame_pointer_required (void) 
 {
-  e_funkind fkind = funkind (current_function_decl);
+  e_funkind fkind = funkind (TREE_TYPE (current_function_decl));
 
   if (TARGET_NON_GNU_PROFILE || fkind != SUBROUTINE)
     return 1;
@@ -657,8 +657,11 @@ expand_interrupt_handler_epilogue (rtx spreg, e_funkind fkind)
 	|| (!leaf_function_p () && call_used_regs[i]))
       {
 	if (i == REG_A0 || i == REG_A1)
-	  emit_move_insn (gen_rtx_REG (PDImode, i),
-			  gen_rtx_MEM (PDImode, postinc1));
+	  {
+	    rtx mem = gen_rtx_MEM (PDImode, postinc1);
+	    MEM_VOLATILE_P (mem) = 1;
+	    emit_move_insn (gen_rtx_REG (PDImode, i), mem);
+	  }
 	else
 	  emit_move_insn (gen_rtx_REG (SImode, i), postinc);
       }
@@ -739,7 +742,7 @@ bfin_expand_prologue (void)
   HOST_WIDE_INT frame_size = get_frame_size ();
   int is_leaf_function = leaf_function_p ();
   rtx spreg = gen_rtx_REG (Pmode, REG_SP);
-  e_funkind fkind = funkind (current_function_decl);
+  e_funkind fkind = funkind (TREE_TYPE (current_function_decl));
 
   if (fkind != SUBROUTINE) {
     expand_interrupt_handler_prologue (spreg, fkind);
@@ -782,7 +785,7 @@ void
 bfin_expand_epilogue (void)
 {
   rtx spreg = gen_rtx_REG (Pmode, REG_SP);
-  e_funkind fkind = funkind (current_function_decl);
+  e_funkind fkind = funkind (TREE_TYPE (current_function_decl));
 
   if (fkind != SUBROUTINE)
     {
@@ -826,6 +829,23 @@ bfin_expand_epilogue (void)
     emit_insn (gen_unlink ());
 
   emit_jump_insn (gen_return_internal (GEN_INT (SUBROUTINE)));
+}
+
+/* Return nonzero if register OLD_REG can be renamed to register NEW_REG.  */
+
+int
+bfin_hard_regno_rename_ok (unsigned int old_reg ATTRIBUTE_UNUSED,
+			   unsigned int new_reg)
+{
+  /* Interrupt functions can only use registers that have already been
+     saved by the prologue, even if they would normally be
+     call-clobbered.  */
+
+  if (funkind (TREE_TYPE (current_function_decl)) != SUBROUTINE
+      && !regs_ever_live[new_reg])
+    return 0;
+
+  return 1;
 }
 
 rtx
@@ -2335,21 +2355,83 @@ bfin_reorg (void)
     }
 }
 
+/* Handle interrupt_handler, exception_handler and nmi_handler function
+   attributes; arguments as in struct attribute_spec.handler.  */
+
+static tree
+handle_int_attribute (tree *node, tree name,
+		      tree args ATTRIBUTE_UNUSED,
+		      int flags ATTRIBUTE_UNUSED,
+		      bool *no_add_attrs)
+{
+  tree x = *node;
+  if (TREE_CODE (x) == FUNCTION_DECL)
+    x = TREE_TYPE (x);
+
+  if (TREE_CODE (x) != FUNCTION_TYPE)
+    {
+      warning ("`%s' attribute only applies to functions",
+	       IDENTIFIER_POINTER (name));
+      *no_add_attrs = true;
+    }
+  else if (funkind (x) != SUBROUTINE)
+    error ("multiple function type attributes specified");
+
+  return NULL_TREE;
+}
+
+/* Return 0 if the attributes for two types are incompatible, 1 if they
+   are compatible, and 2 if they are nearly compatible (which causes a
+   warning to be generated).  */
+
+static int
+bfin_comp_type_attributes (tree type1, tree type2)
+{
+  e_funkind kind1, kind2;
+
+  if (TREE_CODE (type1) != FUNCTION_TYPE)
+    return 1;
+
+  kind1 = funkind (type1);
+  kind2 = funkind (type2);
+
+  if (kind1 != kind2)
+    return 0;
+  
+  /*  Check for mismatched modifiers */
+  if (!lookup_attribute ("nesting", TYPE_ATTRIBUTES (type1))
+      != !lookup_attribute ("nesting", TYPE_ATTRIBUTES (type2)))
+    return 0;
+
+  if (!lookup_attribute ("saveall", TYPE_ATTRIBUTES (type1))
+      != !lookup_attribute ("saveall", TYPE_ATTRIBUTES (type2)))
+    return 0;
+
+  if (!lookup_attribute ("kspisusp", TYPE_ATTRIBUTES (type1))
+      != !lookup_attribute ("kspisusp", TYPE_ATTRIBUTES (type2)))
+    return 0;
+
+  return 1;
+}
+
 /* Table of valid machine attributes.  */
 const struct attribute_spec bfin_attribute_table[] =
 {
   /* { name, min_len, max_len, decl_req, type_req, fn_type_req, handler } */
-  { "interrupt_handler", 0, 0, false, true,  true, NULL },
-  { "exception_handler", 0, 0, false, true,  true, NULL },
+  { "interrupt_handler", 0, 0, false, true,  true, handle_int_attribute },
+  { "exception_handler", 0, 0, false, true,  true, handle_int_attribute },
+  { "nmi_handler", 0, 0, false, true,  true, handle_int_attribute },
   { "nesting", 0, 0, false, true,  true, NULL },
   { "kspisusp", 0, 0, false, true,  true, NULL },
-  { "nmi_handler", 0, 0, false, true,  true, NULL },
   { "saveall", 0, 0, false, true,  true, NULL },
   { NULL, 0, 0, false, false, false, NULL }
 };
 
 #undef TARGET_ATTRIBUTE_TABLE
 #define TARGET_ATTRIBUTE_TABLE bfin_attribute_table
+
+#undef TARGET_COMP_TYPE_ATTRIBUTES
+#define TARGET_COMP_TYPE_ATTRIBUTES bfin_comp_type_attributes
 
 #undef TARGET_RTX_COSTS
 #define TARGET_RTX_COSTS bfin_rtx_costs
