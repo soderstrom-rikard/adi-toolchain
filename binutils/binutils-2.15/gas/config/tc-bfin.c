@@ -263,11 +263,6 @@ md_show_usage (FILE * stream ATTRIBUTE_UNUSED)
 void
 md_begin ()
 {
-  /* create any necessary hash tables here  */
-  char buf[100];
-  struct bfin_reg_entry *walk;
-  register unsigned int j;
-
   /* Set the default machine type. */
   if (!bfd_set_arch_mach (stdoutput, bfd_arch_bfin, 0))
     as_warn ("Could not set architecture and machine.");
@@ -300,62 +295,6 @@ md_begin ()
    */
   lex_type['('] = 3;
 
-
-  /*
-   * Need to add all of the registers to the symbol table, so that
-   * GAS knows that these are registers, and not just any other symbol.
-   *
-   * May also need symbol like "REG=" added in the symbol table
-   *
-   * May also need to check for instruction mnemonics.
-   */
-
-  walk = (struct bfin_reg_entry *) bfin_reg_info;
-
-  while (walk->name)
-    {
-      symbol_table_insert (symbol_new (walk->name, reg_section, walk->number, &zero_address_frag));
-
-      for (j = 0; walk->name[j]; j++)
-	{
-	  buf[j] = ISUPPER (walk->name[j]) ? TOLOWER (walk->name[j]) : walk->name[j];
-	}
-      buf[j] = '\0';
-
-      symbol_table_insert (symbol_new (buf, reg_section, walk->number, &zero_address_frag));
-      buf[j] = '=';
-      buf[j + 1] = '\0';
-      symbol_table_insert (symbol_new (buf, reg_section, walk->number, &zero_address_frag));
-      walk++;
-    }
-
-  /*
-   * Who the heck started off with that horrible indenting ?
-   *
-   for (i = 0; i < REG_LASTREG; i++)
-   {
-   symbol_table_insert(symbol_new(bfin_reg_info[i].name, reg_section,
-   bfin_reg_info[i].number,
-   &zero_address_frag));
-
-   for (j = 0; bfin_reg_info[i].name[j]; j++)
-   {
-   buf[j] = ISUPPER (bfin_reg_info[i].name[j]) ?
-   tolower(bfin_reg_info[i].name[j]) :
-   bfin_reg_info[i].name[j];
-   }
-   buf[j]='\0';
-
-   symbol_table_insert(symbol_new(buf, reg_section,
-   bfin_reg_info[i].number,
-   &zero_address_frag));
-   buf[j]='='; buf[j+1]='\0';
-   symbol_table_insert(symbol_new(buf, reg_section,
-   bfin_reg_info[i].number,
-   &zero_address_frag));
-   }
-   */
-
 #ifdef OBJ_ELF
   record_alignment (text_section, 2);
   record_alignment (data_section, 2);
@@ -363,6 +302,7 @@ md_begin ()
 #endif
 
   assembler_parser_init ();
+
 #ifdef DEBUG
   extern int debug_codeselection;
   debug_codeselection = 1;

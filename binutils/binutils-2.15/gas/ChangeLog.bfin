@@ -1,3 +1,8 @@
+2005-02-09  Catherine Moore  <clm@cm00re.com>
+
+	* config/tc-bfin.c (md_begin):  Do not put the register
+	in the symbol table.
+
 2005-02-07  Catherine Moore  <clm@cm00re.com>
 
 	* config/tc-bfin.c (gen_loop): Fix warning.
