@@ -1,3 +1,8 @@
+2005-02-22  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/t-bfin-elf (LIB2FUNCS): Delete.
+	* config/bfin/t-bfin: Copied over from t-bfin-elf.
+
 2005-02-18  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (PREDICATE_CODES): Add bfin_cbranch_operator and

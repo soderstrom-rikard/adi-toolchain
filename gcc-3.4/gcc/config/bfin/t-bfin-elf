@@ -1,27 +1,10 @@
 ##
-## Copyright (c) 2000, 2001 Analog Devices Inc.,
-## Copyright (c) 2000, 2001 Lineo, Inc./Lineo Canada Corp. (www.lineo.com),
-## Copyright (c) 2001-2002 Arcturus Networks Inc, (www.arcturusnetworks.com),
-## Copyright (c) 2003 Metrowerks Inc, (www.metrowerks.com)
-##
-## Ported for Blackfin/Frio Architecture by 
-##		Akbar Hussain  <akbar.hussain@arcturusnetworks.com>,
-##		Tony Kou <tonyko@arcturusnetworks.com>
-##		Faisal Akber <fakber@arcturusnetworks.com>
-## 
-
+## Copyright (c) 2000, 2001, 2002, 2003, 2004, 2005 Analog Devices Inc.,
 
 ## Target part of the Makefile
 
 LIB1ASMSRC = bfin/lib1funcs.asm
 LIB1ASMFUNCS = _divsi3 _udivsi3 _umodsi3 _modsi3
-
-LIB2FUNCS = _muldi3 _divdi3 _moddi3 _udivdi3 _umoddi3 _negdi2 \
-     _lshrdi3 _ashldi3 _ashrdi3 _ffsdi2 \
-    _udiv_w_sdiv _udivmoddi4 _cmpdi2 _ucmpdi2 \
-    __gcc_bcmp _varargs __dummy _eprintf \
-    _bb _shtab _clear_cache _trampoline __main _exit \
-    _ctors _pure \
 
 EXTRA_PARTS = crtbegin.o crtend.o crti.o crtn.o
 
