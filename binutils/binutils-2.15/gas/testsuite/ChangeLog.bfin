@@ -6,6 +6,8 @@
 	* gas/bfin/video.d: New.
 	* gas/bfin/move.s: New.
 	* gas/bfin/move.d: New.
+	* gas/bfin/vector.s: New.
+	* gas/bfin/vector.d: New.
 	* gas/bfin/bfin.exp: Update to run new tests.
 
 2004-12-10  Catherine Moore  <clm@cm00re.com>

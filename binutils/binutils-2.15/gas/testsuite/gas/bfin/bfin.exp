@@ -12,5 +12,6 @@ if [istarget bfin*-*-*] {
 	run_dump_test "shift"
 	run_dump_test "stack"
 	run_dump_test "store"
+	run_dump_test "vector"
 	run_dump_test "video"
 }
