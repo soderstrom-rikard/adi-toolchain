@@ -1,3 +1,7 @@
+2004-12-20  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/tc-bfin.c (md_apply_fix3): Discard unused absolute relocs.
+
 2004-12-17  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin-parse.y: Fix some LDSTPMOD calls to pass correct args.
