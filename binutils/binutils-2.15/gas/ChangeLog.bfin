@@ -1,3 +1,8 @@
+2005-01-12  Catherine Moore  <clm@cm00re.com>
+
+	* config/bfin-parse.y: Correct encoding for ADD on SIGN and
+	vector logical shift immediate.
+
 2005-01-11  Catherine Moore  <clm@cm00re.com>
 	
 	* config/bfin-defs.h (machine_registers): Define REG_EMUDAT.

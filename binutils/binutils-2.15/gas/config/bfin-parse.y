@@ -1089,7 +1089,7 @@ asm_1:
 		       "SIGN (dregs_hi) * dregs_hi + "
 		       "SIGN (dregs_lo) * dregs_lo \n");
 
-		$$ = DSP32ALU (12, 0, &$3, &$1, &$7, &$10, 0, 0, 0);
+		$$ = DSP32ALU (12, 0, 0, &$1, &$7, &$10, 0, 0, 0);
 	    }
 	  else
 	    return semantic_error ("Dregs expected");
@@ -1953,18 +1953,18 @@ asm_1:
 /* 5 rules compacted */
 	| REG ASSIGN REG LESS_LESS expr vsmod
 	{
-	  if (IS_DREG ($1) && IS_DREG ($3) && IS_UIMM ($5, 5))
+	  if (IS_DREG ($1) && IS_DREG ($3) && IS_UIMM ($5, 4))
 	    {
 	      if ($6.r0)
 		{
 		  // vector ?
 		  notethat("dsp32shiftimm: dregs = dregs << expr (V, .)\n");
-		  $$ = DSP32SHIFTIMM (1, &$1, imm5 ($5), &$3, $6.s0, 0);
+		  $$ = DSP32SHIFTIMM (1, &$1, imm4 ($5), &$3, $6.s0 ? 1 : 2, 0);
 		}
 	      else
 		{
 		  notethat("dsp32shiftimm: dregs =  dregs << uimm5 (.)\n");
-		  $$ = DSP32SHIFTIMM (2, &$1, imm6 ($5), &$3, $6.s0 ? 1: 2, 0);
+		  $$ = DSP32SHIFTIMM (2, &$1, imm6 ($5), &$3, $6.s0 ? 1 : 2, 0);
 		}
 	    }
 	  else if ($6.s0 == 0 && IS_PREG ($1) && IS_PREG ($3))
