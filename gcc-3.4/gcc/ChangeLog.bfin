@@ -1,3 +1,8 @@
+2005-03-17  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_return_in_memory): Return all structures in
+	memory.
+
 2005-03-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* gengtype-yacc.h: Remove.

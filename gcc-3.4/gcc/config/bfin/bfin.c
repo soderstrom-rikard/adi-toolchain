@@ -2151,6 +2151,11 @@ bfin_return_in_memory (tree type)
 
   if (mode == BLKmode)
     return 1;
+
+  /* VDSP returns all structures in memory.  */
+  if (AGGREGATE_TYPE_P (type))
+    return 1;
+
   size = int_size_in_bytes (type);	
   if (VECTOR_MODE_P (mode) || mode == TImode)
     {
