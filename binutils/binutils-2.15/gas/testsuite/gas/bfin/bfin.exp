@@ -1,0 +1,10 @@
+# Blackfin assembler testsuite
+
+if [istarget bfin*-*-*] {
+	run_dump_test "arithmetic"
+	run_dump_test "bit"
+	run_dump_test "cache"
+	run_dump_test "control_code"
+	run_dump_test "logical"
+	run_dump_test "shift"
+}

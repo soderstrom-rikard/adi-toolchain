@@ -1,3 +1,10 @@
+2004-12-09  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/cache.s: New.
+	* gas/bfin/cache.d: New.
+	* gas/bfin/arithmetic.s: New.
+	* gas/bfin/arithmetic.d: New.
+
 2004-12-08  Catherine Moore  <clm@cm00re.com>
 
 	* gas/bfin/bfin.exp: New.
