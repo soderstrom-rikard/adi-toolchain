@@ -1581,25 +1581,46 @@ hard_regno_mode_ok (int regno, enum machine_mode mode)
   return TEST_HARD_REG_BIT (reg_class_contents[MOST_REGS], regno);
 }
 
-#undef MAX_COST
-#define MAX_COST 100
-
 /* Return the cost of moving data from a register in class CLASS1 to
-   one in class CLASS2.  */
+   one in class CLASS2.  A cost of 2 is the default.  */
 
 int
-register_move_cost (enum reg_class class1, enum reg_class class2)
+bfin_register_move_cost (enum machine_mode mode ATTRIBUTE_UNUSED,
+			 enum reg_class class1, enum reg_class class2)
 {
-  return 
-    ((!reg_class_subset_p (class1, DPREGS)
-      && reg_class_subset_p (class2, DPREGS))
-     || (reg_class_subset_p (class1, DPREGS)
-	 && !reg_class_subset_p (class2, DPREGS)))
-    ? 2 * MAX_COST
-    : ((class1 == DREGS && class2 == PREGS)
-       || (class1 == PREGS && class2 == DREGS))
-    ? 2 * 2
-    : 2;
+  /* If optimizing for size, always prefer reg-reg over reg-memory moves.  */
+  if (optimize_size)
+    return 2;
+
+  /* There are some stalls involved when moving from a DREG to a different
+     class reg, and using the value in one of the following instructions.
+     Attempt to model this by slightly discouraging such moves.  */
+  if (class1 == DREGS && class2 != DREGS)
+    return 2 * 2;
+
+  return 2;
+}
+
+/* Return the cost of moving data of mode M between a
+   register and memory.  A value of 2 is the default; this cost is
+   relative to those in `REGISTER_MOVE_COST'.
+
+   ??? In theory L1 memory has single-cycle latency.  We should add a switch
+   that tells the compiler whether we expect to use only L1 memory for the
+   program; it'll make the costs more accurate.  */
+
+int
+bfin_memory_move_cost (enum machine_mode mode ATTRIBUTE_UNUSED,
+		       enum reg_class class,
+		       int in ATTRIBUTE_UNUSED)
+{
+  /* Make memory accesses slightly more expensive than any register-register
+     move.  Also, penalize non-DP registers, since they need secondary
+     reloads to load and store.  */
+  if (! reg_class_subset_p (class, DPREGS))
+    return 10;
+
+  return 8;
 }
 
 enum reg_class

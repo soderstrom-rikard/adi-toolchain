@@ -347,7 +347,7 @@ extern int target_flags;
 /*r0 r1 r2 r3 r4 r5 r6 r7   p0 p1 p2 p3 p4 p5 p6 p7 */ \
 { 0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 1, 0,    \
 /*i0 b0 l0 i1 b1 l1 i2 b2   l2 i3 b3 l3 m0 m1 m2 m3 */ \
-  0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,    \
+  0, 0, 1, 0, 0, 1, 0, 0,   1, 0, 0, 1, 0, 0, 0, 0,    \
 /*a0 a1 cc rets/i/x/n/e     astat seqstat usp argp */ \
   0, 0, 1, 1, 1, 1, 1, 1,   1, 1, 1, 1	 \
 }
@@ -1012,28 +1012,28 @@ do {                                              \
 #define NO_FUNCTION_CSE 1
 #define NO_RECURSIVE_FUNCTION_CSE 1
 
-/* `RTX_COSTS (X, CODE, OUTER_CODE)'
-   Like `CONST_COSTS' but applies to nonconstant RTL expressions.
-   This can be used, for example, to indicate how costly a multiply
-   instruction is.  In writing this macro, you can use the construct
-   `COSTS_N_INSNS (N)' to specify a cost equal to N fast
-   instructions.  OUTER_CODE is the code of the expression in which X
-   is contained.
+/* A C expression for the cost of moving data from a register in class FROM to
+   one in class TO.  The classes are expressed using the enumeration values
+   such as `GENERAL_REGS'.  A value of 2 is the default; other values are
+   interpreted relative to that.
 
-   This macro is optional; do not define it if the default cost
-   assumptions are adequate for the target machine.
-#define DEFAULT_RTX_COSTS(X, CODE, OUTER_CODE) (bfin_rtx_costs ((X), (CODE), (OUTER_CODE)))
-*/
+   It is not required that the cost always equal 2 when FROM is the same as TO;
+   on some machines it is expensive to move between registers if they are not
+   general registers.  */
 
+#define REGISTER_MOVE_COST(MODE, CLASS1, CLASS2) \
+   bfin_register_move_cost ((MODE), (CLASS1), (CLASS2))
 
-/* Define the cost of moving between registers of various classes.
-   If we want to avoid some moves, we will make them expensive.
-   Moves from dpregs to aregs take one extra cycle.
-   */
- 
-#define REGISTER_MOVE_COST(MODE, CLASS1, CLASS2) register_move_cost((CLASS1), (CLASS2))
+/* A C expression for the cost of moving data of mode M between a
+   register and memory.  A value of 2 is the default; this cost is
+   relative to those in `REGISTER_MOVE_COST'.
 
+   If moving between registers and memory is more expensive than
+   between two registers, you should define this macro to express the
+   relative cost.  */
 
+#define MEMORY_MOVE_COST(MODE, CLASS, IN)	\
+  bfin_memory_move_cost ((MODE), (CLASS), (IN))
 
 /* Define as C expression which evaluates to nonzero if the tablejump
    instruction expects the table to contain offsets from the address of the

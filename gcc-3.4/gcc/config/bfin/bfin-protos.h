@@ -64,7 +64,9 @@ extern int signed_comparison_operator (rtx, Mmode);
 extern int bfin_cbranch_operator (rtx, Mmode);
 
 extern void conditional_register_usage (void);
-extern int register_move_cost (enum reg_class, enum reg_class);
+extern int bfin_register_move_cost (enum machine_mode, enum reg_class,
+				    enum reg_class);
+extern int bfin_memory_move_cost (enum machine_mode, enum reg_class, int in);
 extern enum reg_class secondary_input_reload_class (enum reg_class, Mmode,
 						    rtx);
 extern enum reg_class secondary_output_reload_class (enum reg_class, Mmode,

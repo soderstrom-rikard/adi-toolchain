@@ -1,3 +1,17 @@
+2004-12-02  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin-protos.h (bfin_register_move_cost): Renamed from
+	register_move_cost; added MODE parameter.
+	(bfin_memory_move_cost): Declare.
+	* config/bfin/bfin.h (REGISTER_MOVE_COST): Call bfin_register_move_cost
+	with MODE argument.
+	(MEMORY_MOVE_COST): New macro.
+	(FIXED_REGISTERS): L registers are fixed.
+	* config/bfin/bfin.c (MAX_COST): Delete.
+	(bfin_register_move_cost): Renamed from register_move_cost; added MODE
+	parameter.  Simplify; try to match machine better.
+	(bfin_memory_move_cost): New function.
+
 2004-11-29  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_expand_epilogue): Additional argument
