@@ -1,0 +1,62 @@
+*  new file added bfin-ext.h :  forward declaration for print_insn_bfin ().
+*  bfin-tdep.c :
+             struct bfin_regname added.
+             parse_bfin_disassembler_option ()
+             bfin_frame_chain ()
+             bfin_addr_bits_remove ()
+             bfin_skip_prologue ()
+             bfin_find_callers_reg ()
+             bfin_init_extra_frame_info ()
+             bfin_frame_saved_pc()
+             bfin_read_fp ()
+             bfin_frame_init_saved_regs ()
+             bfin_set_call_dummy_breakpoint_offset ()
+             bfin_fix_call_dummy()
+             bfin_pop_frame()
+             push_stack_item ()
+             bfin_push_dummy_call ()
+             bfin_register_type ()
+             convert_from_extended ()
+             gdb_print_insn_bfin()
+             bfin_breakpoint_from_pc ()
+             bfin_extract_return_value ()
+             bfin_extract_struct_value_address()
+             bfin_use_struct_convention ()
+             bfin_store_return_value ()
+             bfin_get_longjmp_target ()
+             set_bfin_command()
+             show_bfin_command()
+             set_disassembly_style_sfunc()
+             bfin_register_name()
+             get_bfin_regnames ()
+             set_bfin_regname_option()
+             set_disassembly_style()
+             bfin_elf_osabi_sniffer()
+             bfin_gdbarch_init()
+             bfin_dump_tdep ()
+             _initialize_bfin_tdep ()
+             Note : maximum portion of the code is from the 5.0 nisa.
+
+*              gdb/config/nisa directory now named as
+                   gdb/config/bfin.         
+             
+               And the file names nisa.mh, nisa.mt, tm-nisa.h
+               are changed now bfin.mh, bfin.mt, tm-bfin.h.
+   
+*             In the Root Directory:
+              config.sub:
+                     all the nisa naming is modified to
+                     bfin.
+        
+              configure.in:   
+                     bfin-*-*) instead of nisa, which takes care of 
+                     cygwin target also.
+ 
+            
+*            In the gdb/gdb directory:
+              
+             configure.host: All nisa convention is modified to bfin.
+             configure.tgt : All the nisa convention is modified to bfin.    
+
+
+

@@ -1,0 +1,161 @@
+diff include/ansidecl.h /home2/srinivas/gdb/include/ansidecl.h
+315,325d314
+< /* Bootstrap support:  Adjust certain macros defined by Autoconf,
+<    which are only valid for the stage1 compiler.  If we detect
+<    a modern version of GCC, we are probably in stage2 or beyond,
+<    so unconditionally reset the values.  Note that const, inline,
+<    etc. have been dealt with above.  */
+< #if (GCC_VERSION >= 2007)
+< # ifndef HAVE_LONG_DOUBLE
+< #  define HAVE_LONG_DOUBLE 1
+< # endif
+< #endif /* GCC >= 2.7 */
+< 
+Common subdirectories: include/aout and /home2/srinivas/gdb/include/aout
+diff include/bfdlink.h /home2/srinivas/gdb/include/bfdlink.h
+293a294,307
+>   /* TRUE if generating a position independent executable.  */
+>   unsigned int pie: 1;
+> 
+>   /* TRUE if generating an executable, position independent or not.  */
+>   unsigned int executable : 1;
+> 
+>   /* TRUE if PT_GNU_STACK segment should be created with PF_R|PF_W|PF_X
+>      flags.  */
+>   unsigned int execstack: 1;
+> 
+>   /* TRUE if PT_GNU_STACK segment should be created with PF_R|PF_W
+>      flags.  */
+>   unsigned int noexecstack: 1;
+> 
+491a506,508
+> 
+> /* Identifiers of linker error messages used by error_handler.  */
+> #define LD_DEFINITION_IN_DISCARDED_SECTION	1
+diff include/ChangeLog /home2/srinivas/gdb/include/ChangeLog
+0a1,39
+> 2003-09-15  Andrew Cagney  <cagney@redhat.com>
+> 
+> 	* floatformat.h (floatformat_to_double): Make input buffer constant.
+> 	(floatformat_from_double, floatformat_is_valid): Ditto.
+> 	
+> 2003-09-15  Daniel Jacobowitz  <drow@mvista.com>
+> 
+> 	* floatformat.h (floatformat_is_valid): Add prototype.
+> 
+> 2003-06-22  Zack Weinberg  <zack@codesourcery.com>
+> 
+> 	* safe-ctype.h (HC_UNKNOWN, HC_ASCII, HC_EBCDIC): Rename to
+> 	HOST_CHARSET_UNKNOWN, HOST_CHARSET_ASCII, HOST_CHARSET_EBCDIC
+> 	respectively.
+> 
+> 2003-06-21  Zack Weinberg  <zack@codesourcery.com>
+> 
+> 	* safe-ctype.h (HC_UNKNOWN, HC_ASCII, HC_EBCDIC, HOST_CHARSET):
+> 	New #defines.
+> 
+> 2003-06-17  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+> 
+> 	* ansidecl.h: Delete HAVE_LONG_DOUBLE GCC bootstrap support.
+> 
+> 2003-05-23  Jakub Jelinek  <jakub@redhat.com>
+> 
+> 	* bfdlink.h (struct bfd_link_info): Add execstack and noexecstack.
+> 	* elf/common.h (PT_GNU_STACK): Define.
+> 
+> 2003-06-03  H.J. Lu <hongjiu.lu@intel.com>
+> 
+> 	* bfdlink.h (LD_DEFINITION_IN_DISCARDED_SECTION): New.
+> 
+> 2003-05-30  Ulrich Drepper  <drepper@redhat.com>
+> 	    Jakub Jelinek  <jakub@redhat.com>
+> 
+> 	* bfdlink.h (struct bfd_link_info): Add pie and executable
+> 	bits.
+> 
+4a44,50
+> 2003-05-15  Jim Blandy  <jimb@redhat.com>
+> 
+> 	* libiberty.h (hex_value): Make the value an unsigned int, to
+> 	avoid unexpected sign-extension when cast to unsigned types larger
+> 	than int --- like bfd_vma, on some platforms.
+> 	(_hex_value): Update declaration.
+> 
+9a56,60
+> 2003-05-07  Jason Merrill  <jason@redhat.com>
+> 
+> 	* hashtab.h (iterative_hash): Prototype.
+> 	(iterative_hash_object): New macro.
+> 
+Common subdirectories: include/coff and /home2/srinivas/gdb/include/coff
+Common subdirectories: include/CVS and /home2/srinivas/gdb/include/CVS
+diff include/dis-asm.h /home2/srinivas/gdb/include/dis-asm.h
+237a238,241
+> extern int print_insn_tic80		PARAMS ((bfd_vma, disassemble_info*));
+> extern int print_insn_pj		PARAMS ((bfd_vma, disassemble_info*));
+> extern int print_insn_avr		PARAMS ((bfd_vma, disassemble_info*));
+> extern int print_insn_nisa              PARAMS ((bfd_vma, disassemble_info*)); 
+239d242
+< extern int print_insn_bfin              PARAMS ((bfd_vma, disassemble_info*)); 
+Common subdirectories: include/elf and /home2/srinivas/gdb/include/elf
+diff include/floatformat.h /home2/srinivas/gdb/include/floatformat.h
+2c2
+<    Copyright 1991, 1994, 1995, 1997, 2000 Free Software Foundation, Inc.
+---
+>    Copyright 1991, 1994, 1995, 1997, 2000, 2003 Free Software Foundation, Inc.
+112c112
+< floatformat_to_double PARAMS ((const struct floatformat *, char *, double *));
+---
+> floatformat_to_double PARAMS ((const struct floatformat *, const char *, double *));
+119c119,124
+< 				 double *, char *));
+---
+> 				 const double *, char *));
+> 
+> /* Return non-zero iff the data at FROM is a valid number in format FMT.  */
+> 
+> extern int
+> floatformat_is_valid PARAMS ((const struct floatformat *fmt, const char *from));
+Common subdirectories: include/gdb and /home2/srinivas/gdb/include/gdb
+diff include/hashtab.h /home2/srinivas/gdb/include/hashtab.h
+185a186,190
+> /* An iterative hash function for arbitrary data.  */
+> extern hashval_t iterative_hash PARAMS ((const PTR, size_t, hashval_t));
+> /* Shorthand for hashing something with an intrinsic size.  */
+> #define iterative_hash_object(OB,INIT) iterative_hash (&OB, sizeof (OB), INIT)
+> 
+diff include/libiberty.h /home2/srinivas/gdb/include/libiberty.h
+257c257
+< extern const char _hex_value[_hex_array_size];
+---
+> extern const unsigned char _hex_value[_hex_array_size];
+262c262
+< #define hex_value(c)	(_hex_value[(unsigned char) (c)])
+---
+> #define hex_value(c)	((unsigned int) _hex_value[(unsigned char) (c)])
+Common subdirectories: include/mpw and /home2/srinivas/gdb/include/mpw
+Common subdirectories: include/nlm and /home2/srinivas/gdb/include/nlm
+Common subdirectories: include/opcode and /home2/srinivas/gdb/include/opcode
+Common subdirectories: include/regs and /home2/srinivas/gdb/include/regs
+diff include/safe-ctype.h /home2/srinivas/gdb/include/safe-ctype.h
+39a40,49
+> #endif
+> 
+> /* Determine host character set.  */
+> #define HOST_CHARSET_UNKNOWN 0
+> #define HOST_CHARSET_ASCII   1
+> #define HOST_CHARSET_EBCDIC  2
+> 
+> #if  '\n' == 0x0A && ' ' == 0x20 && '0' == 0x30 \
+>    && 'A' == 0x41 && 'a' == 0x61 && '!' == 0x21
+> #  define HOST_CHARSET HOST_CHARSET_ASCII
+40a51,57
+> # if '\n' == 0x15 && ' ' == 0x40 && '0' == 0xF0 \
+>    && 'A' == 0xC1 && 'a' == 0x81 && '!' == 0x5A
+> #  define HOST_CHARSET HOST_CHARSET_EBCDIC
+> # else
+> #  define HOST_CHARSET HOST_CHARSET_UNKNOWN
+> # endif
+> #endif
+102d118
+< #endif /* no ctype.h */

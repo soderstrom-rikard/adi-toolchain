@@ -1,0 +1,1 @@
+gcc -DHAVE_CONFIG_H -I. -I. -I. -D_GNU_SOURCE     -I. -I. -I./../include  -I./../intl -I../intl   -W -Wall -Wstrict-prototypes -Wmissing-prototypes -fnew-ra -O0 -c -save-temps elf32.c
