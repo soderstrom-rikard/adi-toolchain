@@ -1,3 +1,31 @@
+2004-12-09  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin-protos.h (bfin_valid_add): Don't declare.
+	(bfin_legitimate_address_p): Declare.
+	* config/bfin/bfin.c (bfin_library_id_string): New global variable.
+	(n_pregs_to_save): Save pic register if it is used.
+	(bfin_expand_prologue): Emit extra code if -mid-shared-library.
+	(print_operand): SYMBOL_REFs get a new modifier, 'G'.  Handle UNSPEC.
+	(legitimize_pic_address): Correct code generation.
+	(override_options): Import m68k code to handle id shared libraries.
+	(bfin_valid_add): Now static.
+	(bfin_valid_reg_p): New static function.
+	(bfin_legitimate_address_p): New function.
+	* config/bfin/bfin.h (MASK_ID_SHARED_LIBRARY,
+	TARGET_ID_SHARED_LIBRARY, MAX_LIBRARY_ID): New macros.
+	(TARGET_FLAGS): Add -mid-shared-library, -mno-id-shared-library.
+	(TARGET_OPTIONS): New macro.
+	(bfin_library_id_string): Declare.
+	(REGNO_OK_FOR_BASE_STRICT_P, REGNO_OK_FOR_BASE_NONSTRICT_P): New
+	macros.
+	(REGNO_OK_FOR_BASE_P): Use them.
+	(GO_IF_LEGITIMATE_ADDRESS): Use bfin_legitimate_address_p.
+	* config/bfin/bfin.md (UNSPEC_MOVE_PIC, UNSPEC_LIBRARY_OFFSET):
+	New constants.
+	(movsf splitter): Call trunc_int_for_mode to fix 64bitness problem.
+	(call_insn, call_value_insn, sibcall_insn, sibcall_value_insn): Add
+	'G' modifiers where necessary.
+
 2004-12-06  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md: Fix style issues and rearrange code a little.

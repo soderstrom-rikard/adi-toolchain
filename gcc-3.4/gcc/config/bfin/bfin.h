@@ -34,6 +34,11 @@
 						 * profiling */
 #define MASK_NO_UNDERSCORE	     0x02000000 /* lacal label without underscore */
 
+/* Compile using library ID based shared libraries.
+ * Set a specific ID using the -mshared-library-id=xxx option.
+ */
+#define MASK_ID_SHARED_LIBRARY	(1<<18)
+
 /* Run-time compilation parameters selecting different hardware subsets.  */
 
 extern int target_flags;
@@ -62,6 +67,7 @@ extern int target_flags;
 #define TARGET_LOW_64K                 (target_flags & MASK_LOW_64K)
 #define TARGET_CSYNC		       (target_flags & MASK_CSYNC)
 #define TARGET_NO_UNDERSCORE	       (target_flags & MASK_NO_UNDERSCORE)
+#define TARGET_ID_SHARED_LIBRARY       (target_flags & MASK_ID_SHARED_LIBRARY)
 
 #define TARGET_HAS_SYMBOLIC_ADDRESSES  (0)
 #define TARGET_MOVE                    (1)
@@ -98,10 +104,33 @@ extern int target_flags;
     "Non GNU Profiling"},						\
   { "no-profile",		-MASK_PROFILE,				\
     "NO Non GNU profiling"},						\
+  { "id-shared-library", MASK_ID_SHARED_LIBRARY,			\
+    "Enable ID based shared library" },					\
+  { "no-id-shared-library", -MASK_ID_SHARED_LIBRARY,			\
+    "Disable ID based shared library" },				\
   { "no-underscore",		MASK_NO_UNDERSCORE,			\
     "No underscore fro local label definition"},			\
   { "", MASK_CMOV | MASK_CSYNC,						\
     "default: cmov, csync"}}
+
+/* This macro is similar to `TARGET_SWITCHES' but defines names of
+   command options that have values.  Its definition is an
+   initializer with a subgrouping for each command option.
+
+   Each subgrouping contains a string constant, that defines the
+   fixed part of the option name, and the address of a variable.  The
+   variable, type `char *', is set to the variable part of the given
+   option if the fixed part matches.  The actual option name is made
+   by appending `-m' to the specified name.  */
+#define TARGET_OPTIONS							\
+{ { "shared-library-id=",	&bfin_library_id_string,		\
+    "ID of shared library to build", 0}					\
+}
+
+/* Maximum number of library ids we permit */
+#define MAX_LIBRARY_ID 255
+
+extern const char *bfin_library_id_string;
 
 /* Sometimes certain combinations of command options do not make
    sense on a particular target machine.  You can define a macro
@@ -471,11 +500,14 @@ enum reg_class
 #define BASE_REG_CLASS          PREGS
 #define INDEX_REG_CLASS         PREGS
 
+#define REGNO_OK_FOR_BASE_STRICT_P(X) (REGNO_REG_CLASS (X) == BASE_REG_CLASS)
+#define REGNO_OK_FOR_BASE_NONSTRICT_P(X)  \
+ (((X) >= FIRST_PSEUDO_REGISTER) || REGNO_REG_CLASS (X) == BASE_REG_CLASS)
+
 #ifdef REG_OK_STRICT
-#define REGNO_OK_FOR_BASE_P(x) (REGNO_REG_CLASS (x) == BASE_REG_CLASS)
+#define REGNO_OK_FOR_BASE_P(X) REGNO_OK_FOR_BASE_STRICT_P (X)
 #else
-#define REGNO_OK_FOR_BASE_P(x)  \
- (((x) >= FIRST_PSEUDO_REGISTER) || REGNO_REG_CLASS (x) == BASE_REG_CLASS)
+#define REGNO_OK_FOR_BASE_P(X) REGNO_OK_FOR_BASE_NONSTRICT_P (X)
 #endif
 
 #define REG_OK_FOR_BASE_P(X)    (REG_P (X) && REGNO_OK_FOR_BASE_P (REGNO (X)))
@@ -699,33 +731,19 @@ typedef struct {
 #define LEGITIMATE_MODE_FOR_AUTOINC_P(MODE) \
       (GET_MODE_SIZE (MODE) <= 4 || (MODE) == PDImode)
 
-#define GO_IF_LEGITIMATE_ADDRESS(MODE, X, WIN) do {            \
-  switch (GET_CODE (X)) {			 	       \
-  case REG:						       \
-    if (REGNO_OK_FOR_BASE_P (REGNO (X)))		       \
-      goto WIN;						       \
-    break;						       \
-  case PLUS:						       \
-    if (REG_OK_FOR_BASE_P (XEXP (X, 0))			       \
-	&& (GET_CODE (XEXP (X, 1)) == CONST_INT	       	       \
-	    && bfin_valid_add (MODE, INTVAL (XEXP (X, 1)))))   \
-      goto WIN;						       \
-    break;						       \
-  case POST_INC:					       \
-  case POST_DEC:					       \
-      if (LEGITIMATE_MODE_FOR_AUTOINC_P (MODE) 		       \
-	  && REG_OK_FOR_BASE_P (XEXP (X, 0)))		       \
-      goto WIN;						       \
-  case PRE_DEC:						       \
-      if (LEGITIMATE_MODE_FOR_AUTOINC_P (MODE) 		       \
-	&& XEXP (X, 0) == stack_pointer_rtx		       \
-        && REG_OK_FOR_BASE_P (XEXP (X, 0)))	               \
-      goto WIN;						       \
-    break;						       \
-  default:						       \
-	break;						       \
-  }							       \
-} while (0)
+#ifdef REG_OK_STRICT
+#define GO_IF_LEGITIMATE_ADDRESS(MODE, X, WIN)		\
+  do {							\
+    if (bfin_legitimate_address_p (MODE, X, 1))		\
+      goto WIN;						\
+  } while (0);
+#else
+#define GO_IF_LEGITIMATE_ADDRESS(MODE, X, WIN)		\
+  do {							\
+    if (bfin_legitimate_address_p (MODE, X, 0))		\
+      goto WIN;						\
+  } while (0);
+#endif
 
 /* Try machine-dependent ways of modifying an illegitimate address
    to be legitimate.  If we find one, return the new, valid address.

@@ -61,6 +61,8 @@ const char *byte_reg_names[]   =  BYTE_REGISTER_NAMES;
 
 static int arg_regs[] = FUNCTION_ARG_REGISTERS;
 
+const char *bfin_library_id_string;
+
 static void
 bfin_globalize_label (FILE *stream, const char *name)
 {
@@ -137,7 +139,9 @@ n_pregs_to_save (void)
   int i;
 
   for (i = REG_P0; i <= REG_P5; i++)
-    if (regs_ever_live[i] && ! call_used_regs[i])
+    if ((regs_ever_live[i] && ! call_used_regs[i])
+	|| (i == PIC_OFFSET_TABLE_REGNUM
+	    && current_function_uses_pic_offset_table))
       return REG_P5 - i + 1;
   return 0;
 }
@@ -627,6 +631,20 @@ bfin_expand_prologue (void)
 
       add_to_sp (spreg, -arg_size, 1);
     }
+  if (TARGET_ID_SHARED_LIBRARY)
+    {
+      rtx addr;
+      
+      if (bfin_library_id_string)
+	addr = plus_constant (pic_offset_table_rtx, atoi (bfin_library_id_string));
+      else
+	addr = gen_rtx_PLUS (Pmode, pic_offset_table_rtx,
+			     gen_rtx_UNSPEC (Pmode, gen_rtvec (1, const0_rtx),
+					     UNSPEC_LIBRARY_OFFSET));
+      insn = emit_insn (gen_movsi (pic_offset_table_rtx,
+				   gen_rtx_MEM (Pmode, addr)));
+      REG_NOTES (insn) = gen_rtx_EXPR_LIST (REG_MAYBE_DEAD, const0_rtx, NULL);
+    }
 }
 
 /* Generate RTL for the epilogue of the current function.  */
@@ -981,10 +999,24 @@ print_operand (FILE *file, rtx x, char code)
 
 	case SYMBOL_REF:
 	  output_addr_const (file, x);
+	  if (code == 'G' && flag_pic)
+	    fprintf (file, "@PLTPC");
 	  break;
 
 	case CONST_DOUBLE:
 	  output_operand_lossage ("invalid const_double operand");
+	  break;
+
+	case UNSPEC:
+	  if (XINT (x, 1) == UNSPEC_MOVE_PIC)
+	    {
+	      output_addr_const (file, XVECEXP (x, 0, 0));
+	      fprintf (file, "@GOT");
+	    }
+	  else if (XINT (x, 1) == UNSPEC_LIBRARY_OFFSET)
+	    fprintf (file, "_current_shared_library_p5_offset_");
+	  else
+	    abort ();
 	  break;
 
 	default:
@@ -1186,32 +1218,10 @@ bfin_function_ok_for_sibcall (tree decl, tree exp)
   return true;
 }
 
-/* Return a legitimate reference for ORIG (an address) using the
-   register REG.  If REG is 0, a new pseudo is generated.
-
-   There are three types of references that must be handled:
-
-   1. Global data references must load the address from the GOT, via
-      the PIC reg.  An insn is emitted to do this load, and the reg is
-      returned.
-
-   2. Static data references must compute the address as an offset
-      from the GOT, whose base is in the PIC reg.  An insn is emitted to
-      compute the address into a reg, and the reg is returned.  Static
-      data objects have SYMBOL_REF_FLAG set to differentiate them from
-      global data objects.
-
-   3. Constant pool addresses must be handled special.  They are
-      considered legitimate addresses, but only if not used with regs.
-      When printed, the output routines know to print the reference with the
-      PIC reg, even though the PIC reg doesn't appear in the RTL.
-
-   GO_IF_LEGITIMATE_ADDRESS rejects symbolic references unless the PIC
-   reg also appears in the address (except for constant pool references,
-   noted above).
-
-   "switch" statements also require special handling when generating
-   PIC code.  See comments by the `casesi' insn in i386.md for details.  */
+/* Legitimize PIC addresses.  If the address is already position-independent,
+   we return ORIG.  Newly generated position-independent addresses go into a
+   reg.  This is REG if nonzero, otherwise we allocate register(s) as
+   necessary.  */
 
 rtx
 legitimize_pic_address (rtx orig, rtx reg)
@@ -1226,14 +1236,26 @@ legitimize_pic_address (rtx orig, rtx reg)
       else
 	{
 	  if (reg == 0)
-	    reg = gen_reg_rtx (Pmode);
+	    {
+	      if (no_new_pseudos)
+		abort ();
+	      reg = gen_reg_rtx (Pmode);
+	    }
 
-	  if ((GET_CODE (addr) == SYMBOL_REF && SYMBOL_REF_FLAG (addr))
-	      || GET_CODE (addr) == LABEL_REF)
-	    new = gen_rtx (PLUS, Pmode, pic_offset_table_rtx, orig);
+	  if (flag_pic == 2)
+	    {
+	      emit_insn (gen_movsi_high_pic (reg, addr));
+	      emit_insn (gen_movsi_low_pic (reg, reg, addr));
+	      emit_insn (gen_addsi3 (reg, reg, pic_offset_table_rtx));
+	      new = gen_rtx (MEM, Pmode, reg);
+	    }
 	  else
-	    new = gen_rtx (MEM, Pmode,
-			   gen_rtx (PLUS, Pmode, pic_offset_table_rtx, orig));
+	    {
+	      rtx tmp = gen_rtx_UNSPEC (Pmode, gen_rtvec (1, addr),
+					UNSPEC_MOVE_PIC);
+	      new = gen_rtx (MEM, Pmode,
+			     gen_rtx_PLUS (Pmode, pic_offset_table_rtx, tmp));
+	    }
 	  emit_move_insn (reg, new);
 	}
       current_function_uses_pic_offset_table = 1;
@@ -1255,14 +1277,24 @@ legitimize_pic_address (rtx orig, rtx reg)
 	return orig;
 
       if (reg == 0)
-	reg = gen_reg_rtx (Pmode);
+	{
+	  if (no_new_pseudos)
+	    abort ();
+	  reg = gen_reg_rtx (Pmode);
+	}
 
       base = legitimize_pic_address (XEXP (addr, 0), reg);
       addr = legitimize_pic_address (XEXP (addr, 1),
 				     base == reg ? NULL_RTX : reg);
 
       if (GET_CODE (addr) == CONST_INT)
-	return plus_constant (base, INTVAL (addr));
+	{
+	  if (! reload_in_progress && ! reload_completed)
+	    addr = force_reg (Pmode, addr);
+	  else
+	    /* If we reach here, then something is seriously wrong.  */
+	    abort ();
+	}
 
       if (GET_CODE (addr) == PLUS && CONSTANT_P (XEXP (addr, 1)))
 	{
@@ -1635,6 +1667,25 @@ override_options (void)
   if (TARGET_OMIT_LEAF_FRAME_POINTER)
     flag_omit_frame_pointer = 1;
 
+  /* Library identification */
+  if (bfin_library_id_string)
+    {
+      int id;
+
+      if (! TARGET_ID_SHARED_LIBRARY)
+	error ("-mshared-library-id= specified without -mid-shared-library");
+      id = atoi (bfin_library_id_string);
+      if (id < 0 || id > MAX_LIBRARY_ID)
+	error ("-mshared-library-id=%d is not between 0 and %d", id, MAX_LIBRARY_ID);
+
+      /* From now on, bfin_library_id_string will contain the library offset.  */
+      asprintf ((char **)&bfin_library_id_string, "%d", (id * -4) - 4);
+    }
+
+  if (TARGET_ID_SHARED_LIBRARY)
+    /* ??? Provide a way to use a bigger GOT.  */
+    flag_pic = 1;
+
   flag_schedule_insns = 0;
 }
 
@@ -1864,7 +1915,7 @@ output_casesi_internal (rtx *operands)
 /* Return true if the legitimate memory address for a memory operand of mode
    MODE.  Return false if not.  */
 
-bool
+static bool
 bfin_valid_add (enum machine_mode mode, HOST_WIDE_INT value)
 {
   unsigned HOST_WIDE_INT v = value > 0 ? value : -value;
@@ -1874,6 +1925,48 @@ bfin_valid_add (enum machine_mode mode, HOST_WIDE_INT value)
      port, so we deal with the problem here.  */
   unsigned HOST_WIDE_INT mask = sz == 8 ? 0x7ffe : 0x7fff;
   return (v & ~(mask << shift)) == 0;
+}
+
+static bool
+bfin_valid_reg_p (unsigned int regno, int strict)
+{
+  return ((strict && REGNO_OK_FOR_BASE_STRICT_P (regno))
+	  || (!strict && REGNO_OK_FOR_BASE_NONSTRICT_P (regno)));
+}
+
+bool
+bfin_legitimate_address_p (enum machine_mode mode, rtx x, int strict)
+{
+  switch (GET_CODE (x)) {
+  case REG:
+    if (bfin_valid_reg_p (REGNO (x), strict))
+      return true;
+    break;
+  case PLUS:
+    if (REG_P (XEXP (x, 0))
+	&& bfin_valid_reg_p (REGNO (XEXP (x, 0)), strict)
+	&& (GET_CODE (XEXP (x, 1)) == UNSPEC
+	    || (GET_CODE (XEXP (x, 1)) == CONST_INT
+		&& bfin_valid_add (mode, INTVAL (XEXP (x, 1))))))
+      return true;
+    break;
+  case POST_INC:
+  case POST_DEC:
+    if (LEGITIMATE_MODE_FOR_AUTOINC_P (mode)
+	&& REG_P (XEXP (x, 0))
+	&& bfin_valid_reg_p (REGNO (XEXP (x, 0)), strict))
+      return true;
+  case PRE_DEC:
+    if (LEGITIMATE_MODE_FOR_AUTOINC_P (mode)
+	&& XEXP (x, 0) == stack_pointer_rtx
+	&& REG_P (XEXP (x, 0))
+	&& bfin_valid_reg_p (REGNO (XEXP (x, 0)), strict))
+      return true;
+    break;
+  default:
+    break;
+  }
+  return false;
 }
 
 static bool

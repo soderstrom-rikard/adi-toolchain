@@ -85,7 +85,7 @@ extern rtx bfin_gen_compare (rtx, Mmode);
 
 extern int bfin_return_in_memory (tree);
 extern void initialize_trampoline (rtx, rtx, rtx);
-extern bool bfin_valid_add (Mmode, HOST_WIDE_INT);
+extern bool bfin_legitimate_address_p (Mmode, rtx, int);
 extern rtx bfin_va_arg (tree, tree);
 extern void setup_incoming_varargs (CUMULATIVE_ARGS *, enum machine_mode, tree,
 				    int *, int);

@@ -113,7 +113,9 @@
 (define_constants
   [(UNSPEC_CBRANCH_TAKEN 0)
    (UNSPEC_CBRANCH_NOPS 1)
-   (UNSPEC_RETURN 2)])
+   (UNSPEC_RETURN 2)
+   (UNSPEC_MOVE_PIC 3)
+   (UNSPEC_LIBRARY_OFFSET 4)])
 
 (define_attr "type"
   "move,mvi,mcld,mcldp,mcst,dsp32,mult,alu0,shft,brcc,br,call,misc,compare"
@@ -250,6 +252,25 @@
 		   (match_operand:SI 2 "immediate_operand" "i")))]
   "reload_completed"
   "%h0 = %h2;"
+  [(set_attr "type" "mvi")
+   (set_attr "length" "4")])
+
+(define_insn "movsi_high_pic"
+  [(set (match_operand:SI 0 "register_operand" "=x")
+	(high:SI (unspec:SI [(match_operand:SI 1 "immediate_operand" "i")]
+			    UNSPEC_MOVE_PIC)))]
+  ""
+  "%d0 = %1@GOT_LOW;"
+  [(set_attr "type" "mvi")
+   (set_attr "length" "4")])
+
+(define_insn "movsi_low_pic"
+  [(set (match_operand:SI 0 "register_operand" "=x")
+	(lo_sum:SI (match_operand:SI 1 "register_operand" "0")
+		   (unspec:SI [(match_operand:SI 2 "immediate_operand" "i")]
+			      UNSPEC_MOVE_PIC)))]
+  ""
+  "%h0 = %h2@GOT_HIGH;"
   [(set_attr "type" "mvi")
    (set_attr "length" "4")])
 
@@ -407,6 +428,11 @@
     }
 })
 
+;; This is the main "hook" for PIC code.  When generating
+;; PIC, movsi is responsible for determining when the source address
+;; needs PIC relocation and appropriately calling legitimize_pic_address
+;; to perform the actual relocation.
+
 (define_expand "movsi"
   [(set (match_operand:SI 0 "nonimmediate_operand" "")
 	(match_operand:SI 1 "general_operand" ""))]
@@ -481,7 +507,7 @@
   REAL_VALUE_TO_TARGET_SINGLE (value, values);
 
   operands[2] = gen_rtx_REG (SImode, true_regnum (operands[0]));
-  operands[3] = GEN_INT (values);
+  operands[3] = GEN_INT (trunc_int_for_mode (values, SImode));
   if (values >= -32768 && values < 65536)
     {
       emit_move_insn (operands[2], operands[3]);
@@ -1260,7 +1286,7 @@
    && (GET_CODE (operands[0]) == SYMBOL_REF || GET_CODE (operands[0]) == REG)"
   "@
   call (%0);
-  call %0;"
+  call %G0;"
   [(set_attr "type" "call")
    (set_attr "length" "2,4")])
 
@@ -1272,7 +1298,7 @@
    && (GET_CODE (operands[0]) == SYMBOL_REF || GET_CODE (operands[0]) == REG)"
   "@
   jump (%0);
-  jump.l %0;"
+  jump.l %G0;"
   [(set_attr "type" "br")
    (set_attr "length" "2,4")])
 
@@ -1284,7 +1310,7 @@
    && (GET_CODE (operands[0]) == SYMBOL_REF || GET_CODE (operands[0]) == REG)"
   "@
   call (%1);
-  call %1;"
+  call %G1;"
   [(set_attr "type" "call")
    (set_attr "length" "2,4")])
 
@@ -1297,7 +1323,7 @@
    && (GET_CODE (operands[0]) == SYMBOL_REF || GET_CODE (operands[0]) == REG)"
   "@
   jump (%1);
-  jump.l %1;"
+  jump.l %G1;"
   [(set_attr "type" "br")
    (set_attr "length" "2,4")])
 
