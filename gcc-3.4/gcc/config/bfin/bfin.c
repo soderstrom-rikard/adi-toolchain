@@ -2237,6 +2237,45 @@ bfin_rtx_costs (rtx x, int code, int outer_code, int *total)
       *total = COSTS_N_INSNS (2);
       return true;
 
+    case PLUS:
+      if (GET_MODE (x) == Pmode)
+	{
+	  if (GET_CODE (XEXP (x, 0)) == MULT
+	      && GET_CODE (XEXP (XEXP (x, 0), 1)) == CONST_INT)
+	    {
+	      HOST_WIDE_INT val = INTVAL (XEXP (XEXP (x, 0), 1));
+	      if (val == 2 || val == 4)
+		{
+		  *total = cost2;
+		  *total += rtx_cost (XEXP (XEXP (x, 0), 0), outer_code);
+		  *total += rtx_cost (XEXP (x, 1), outer_code);
+		  return true;
+		}
+	    }
+	}
+
+      /* fall through */
+
+    case MINUS:
+    case ASHIFT: 
+    case ASHIFTRT:
+    case LSHIFTRT:
+      if (GET_MODE (x) == DImode)
+	*total = 6 * cost2;
+      return false;
+	  
+    case AND:
+    case IOR:
+    case XOR:
+      if (GET_MODE (x) == DImode)
+	*total = 2 * cost2;
+      return false;
+
+    case MULT:
+      if (GET_MODE_SIZE (GET_MODE (x)) <= UNITS_PER_WORD)
+	*total = COSTS_N_INSNS (3);
+      return false;
+
     default:
       return false;
     }

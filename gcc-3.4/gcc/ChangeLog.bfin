@@ -3,6 +3,32 @@
 	* config/bfin/bfin.c (hard_regno_mode_ok): Disallow anything but SImode
 	for PROLOGUE_REGS.
 
+	Bring over the three following patches:
+	2004-06-12  Roger Sayle  <roger@eyesopen.com>
+	* expmed.c (shift_cost, shiftadd_cost, shiftsub_cost): Additionally
+	index by machine mode.
+	(init_expmed): Initialize shift_cost, shiftadd_cost and shiftsub_cost
+	tables inside the loop over machine modes.
+	(synth_mult, expand_mult_highpart_optab, expand_mult_highpart,
+	expand_divmod): Index shift*_cost by the appropriate machine mode.
+	2004-06-11  Roger Sayle  <roger@eyesopen.com>
+	* expmed.c (synth_mult): Add an additional MODE argument for the
+	machine mode of the multiplication.  Update recursive calls.  Use
+	mode instead of word_mode for determining operation costs.
+	(choose_mult_variant): Update calls to synth_mult with "mode".
+	2004-06-07  Roger Sayle  <roger@eyesopen.com>
+	* expmed.c (add_cost, neg_cost, sdiv_pow2_cheap, smod_pow2_cheap):
+	Make arrays indexed by machine mode.  Rename negate_cost to neg_cost.
+	(init_expmed): Initialize these cost arrays as appropriate.
+	(store_bit_field, extract_bit_field): Correct whitespace.
+	(synth_mult, choose_mult_variant, expand_mult, expand_mult_highpart,
+	expand_mult_highpart_optab, expand_divmod): Update uses of add_cost,
+	neg_cost, sdiv_pow2_cheap, smod_pow2_cheap to index with mode,
+	word_mode or compute_mode as appropriate.
+
+	* config/bfin/bfin.c (bfin_rtx_costs): Add some more costs for better
+	accuracy.
+
 2005-02-09  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (CLASS_LIKELY_SPILLED): Reduce to only include
