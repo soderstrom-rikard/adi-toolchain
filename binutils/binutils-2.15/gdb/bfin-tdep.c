@@ -83,16 +83,24 @@ static CORE_ADDR bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * f
 
 //Following macro has been used by
 //prologue functions
-#define P_LINKAGE             0xE800  
-#define P_MINUS_SP1           0x0140
-#define P_MINUS_SP2           0x05C0
-#define P_MINUS_SP3           0x0540
-#define P_MINUS_SP4           0x04C0
-#define P_SP_PLUS             0x6C06
-#define P_P2_LOW              0xE10A
-#define P_P2_HIGH             0XE14A
-#define P_SP_EQ_SP_PLUS_P2    0X5BB2
-#define P_SP_EQ_P2_PLUS_SP    0x5B96
+#define P_LINKAGE             		0xE800  
+#define P_MINUS_SP1           		0x0140
+#define P_MINUS_SP2           		0x05C0
+#define P_MINUS_SP3           		0x0540
+#define P_MINUS_SP4           		0x04C0
+#define P_SP_PLUS             		0x6C06
+#define P_P2_LOW              		0xE10A
+#define P_P2_HIGH             		0XE14A
+#define P_SP_EQ_SP_PLUS_P2    		0X5BB2
+#define P_SP_EQ_P2_PLUS_SP    		0x5B96
+#define P_MINUS_MINUS_SP_EQ_RETS	0x0167
+#define P_RTS				0x0010
+#define P_JUMP_PREG			0x0050
+#define P_JUMP_PC_PLUS_PREG		0x0080
+#define P_JUMP_S			0x2000
+#define P_JUMP_L			0xE200
+
+#define UPPER_LIMIT			(40)
 
 #define BFIN_NOT_TESTED	      0	
 
@@ -790,22 +798,54 @@ bfin_skip_prologue (pc)
      CORE_ADDR pc;
 {
   int op = read_memory_unsigned_integer (pc, 2);
+  CORE_ADDR orig_pc = pc;
+  int done = 0;
+
 #ifdef _DEBUG
 fprintf(stderr, "bfin_skip_prologue called\n");
 #endif //_DEBUG 
 
-  if (op == P_LINKAGE) {
-     pc = skip_link(pc);
+  /* The new gcc prologue generates the register saves BEFORE the link
+     or rets saving instruction.
+     So, our job is to stop either at those instructions or some upper
+     limit saying there is no frame!
+  */
+  while(!done) {
+
+    if (op == P_LINKAGE) {
+         pc += 4;
+         done = 1;
+    }
+    else if (op == P_MINUS_MINUS_SP_EQ_RETS) {
+         pc += 2;
+         done = 1;
+    }
+    else if ((op & P_RTS) == P_RTS) {
+	  done = 1;
+    }
+    else if (((op & P_JUMP_PREG) == P_JUMP_PREG)
+	 || ((op & P_JUMP_PC_PLUS_PREG) == P_JUMP_PC_PLUS_PREG)
+	 || ((op & P_JUMP_S) == P_JUMP_S)
+	 || ((op & P_JUMP_S) == P_JUMP_S)) {
+	done = 1;
+    }
+    else if(pc - orig_pc >= UPPER_LIMIT){
+	fprintf(stderr, "Function Prologue not recognised. pc will point to ENTRY_POINT of the function\n");
+	pc = orig_pc + 2;
+	done = 1;
+    }
+    else{
+	pc += 2; // not a terminating instruction go on.
+    }
   }
-  else {
-     // assume otherwise it's [--SP]. 
-     // skip_minus_minus_sp will verify
-     pc = skip_minus_minus_sp(pc);
-  } 
+
+    // TODO : Dwarf2 uses entry point value AFTER some register initializations.
+    // we should perhaps skip such asssignments as well (R6 = R1, ...)
         
 #ifdef _DEBUG
   printf("Value of PC after prologue = 0x%x\n", (int)pc);
 #endif //_DEBUG 
+
   return pc;
 }
 

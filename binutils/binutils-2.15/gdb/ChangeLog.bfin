@@ -1,3 +1,8 @@
+2005-02-08  Srivathsa  <sri@rrap-software.com>
+
+	* bfin-tdep.c (bfin_skip_prologue) : Changes
+	made to suit the new frame structure
+
 2005-02-03  Srivathsa  <sri@rrap-software.com>
 
 	* tm-bfin.h : obsoleted dependency for target
