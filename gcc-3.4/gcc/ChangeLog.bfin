@@ -3,6 +3,9 @@
 	* config/bfin/bfin.c: Include "ggc.h" and "gt-bfin.h"
 	(bfin_cc_rtx): Make safe from garbage collection.
 
+	* config/bfin/bfin.md (adddi3): Rewrite pattern to properly mark
+	scratch register and destination as earlyclobber.
+
 2004-09-01  Bernd Schmidt  <bernds@btinternet.com>
 
 	* config/bfin/bfin.c (imm7bit_operand, imm16bit_operand): Test for
