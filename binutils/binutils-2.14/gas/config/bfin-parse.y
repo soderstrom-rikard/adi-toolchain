@@ -4016,8 +4016,15 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
                                   |((counters($7)&0x1)<<4)/* c<(counters) */
                                   |((0&0x3)<<5)           /* rop<(0) */
                             ),
+			  CONCTCODE( ExprNodeGenReloc($3, BFD_RELOC_5_PCREL),
+                          CONCTCODE(GENCODE(0x000000
+                                    |((pcrel11($5)&0x3ff)<<0)              /* eoffset<(lppcrel10) */
+                                    ),
+                                    ExprNodeGenReloc($5, BFD_RELOC_11_PCREL))));
+#if 0
                             CONCTCODE(ExprNodeGenReloc($3, BFD_RELOC_5_PCREL),
                                      ExprNodeGenReloc($5, BFD_RELOC_11_PCREL)));
+#endif
 #if 0
 		    $$ =
 		      CONSCODE(
@@ -4113,8 +4120,16 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
                                   |((counters($7)&0x1)<<4)/* c<(counters) */
                                   |((3&0x3)<<5)           /* rop<(3) */
                              ),
+			  CONCTCODE( ExprNodeGenReloc($3, BFD_RELOC_5_PCREL),
+                          CONCTCODE(GENCODE(0x000000
+                                    |((pcrel11($5)&0x3ff)<<0)              /* eoffset<(lppcrel10) */
+		                    |((pregs($9)&0xf)<<12)                   /* reg<(pregs) */
+                                    ),
+                                    ExprNodeGenReloc($5, BFD_RELOC_11_PCREL))));
+#if 0
                              CONCTCODE(ExprNodeGenReloc($3, BFD_RELOC_5_PCREL),
                                        ExprNodeGenReloc($5, BFD_RELOC_11_PCREL)));
+#endif
 #if 0
 		    $$ =
 		      CONSCODE(
