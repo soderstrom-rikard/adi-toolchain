@@ -374,24 +374,15 @@ int save_area_size (void)
   return size;
 }
 
-/* change this function when save instr is available */
-int new_save_instr (void) {return 1;}
-
-
 /* Used by macro `frame_pointer_required' */
 int frame_pointer_required (void) 
 {
-    int new, omit, leaf, save, frame, required;
+    int omit, leaf, frame, required;
 
-    new = new_save_instr ();
     omit = TARGET_OMIT_LEAF_FRAME_POINTER;
     leaf = leaf_function_p ();
-    save = save_area_size ();
     frame = get_frame_size ();
-    required = (new ? !((omit && leaf) 
-		|| (leaf && frame == 0 && current_function_args_size == 0)) :
-	!(omit && leaf && current_function_args_size == 0 
-	    && save == 0 && frame == 0));
+    required = !((omit && leaf) || (leaf && frame == 0 && current_function_args_size == 0));
     return required;
 }
 
@@ -550,68 +541,55 @@ bfin_function_prologue (FILE *file, HOST_WIDE_INT framesize)
   e_funkind fkind = funkind (current_function_decl);
 
   if (fkind != SUBROUTINE) {
-    	output_interrupt_handler_prologue (file, framesize, fkind);
-	return;
+    output_interrupt_handler_prologue (file, framesize, fkind);
+    return;
   }
 
   is_leaf_function = leaf_function_p ();
   frame_pointer_needed = FRAME_POINTER_REQUIRED;
 
-  if (TARGET_NEW_PROLOGUE) {
-    if (frame_pointer_needed || TARGET_NON_GNU_PROFILE) { 
-	if (current_function_args_size <= FIXED_STACK_AREA && framesize == 0 && optimize_size)
-	    /*for -Os, use 16-bit instruction if arg_size is <= three words and framesize is zero*/
-	    fprintf (file, "\t[--SP] =RETS;\n");
-        else {
-            /* use 32-bit instruction */
-                if (CONST_18UBIT_IMM_P(framesize))
-                  fprintf (file, "\tLINK %ld;\n", framesize);
-                else {
-                    rtx operands1[2];
-                    fprintf (file, "\tLINK 0;\n");
-                    operands1[0] =  gen_rtx_REG (Pmode, REG_P2);
-                    operands1[1] =  gen_rtx_CONST_INT (Pmode, -framesize);
-                    output_load_immediate (operands1);
-                    fprintf (file,"\tSP = SP + P2;\n");
-                }
-        }
-	if (TARGET_NON_GNU_PROFILE)
-	    fprintf (file, "\tcall mcount_entry;\n");
-    } 
-  }
+  if (! frame_pointer_needed && ! TARGET_NON_GNU_PROFILE)
+    fprintf (file, "\t[--SP] = RETS;\n");
+  else
+    {
+      /* use 32-bit instruction */
+      if (CONST_18UBIT_IMM_P(framesize))
+	fprintf (file, "\tLINK %ld;\n", framesize);
+      else 
+	{
+	  rtx operands1[2];
+	  fprintf (file, "\tLINK 0;\n");
+	  operands1[0] =  gen_rtx_REG (Pmode, REG_P2);
+	  operands1[1] =  gen_rtx_CONST_INT (Pmode, -framesize);
+	  output_load_immediate (operands1);
+	  fprintf (file,"\tSP = SP + P2;\n");
+	}
+    }
+  if (TARGET_NON_GNU_PROFILE)
+    fprintf (file, "\tcall mcount_entry;\n");
   
   ndregs = 7; npregs = 5;
-  for (i=1;i<8;i++) {
-    if (regs_ever_live[i] && ! call_used_regs[i]) {
-      if (TARGET_NEW_PROLOGUE)
+  for (i = 1; i < 8; i++)
+    {
+      if (regs_ever_live[i] && ! call_used_regs[i]) 
 	{
 	  ndregs = i;
 	  break;
 	}
-      else
-	fprintf (file,"\t[--SP] = %s;\n", reg_names[i]);
     }
-  }
 
-
-  for (i=8;i<14;i++) {
-    if (regs_ever_live[i] && ! call_used_regs[i]) {
-      if (TARGET_NEW_PROLOGUE)
-	{
-	  npregs = i-8;
-	  break;
-	}
-      else
-	fprintf (file, "\t[--SP] = %s;\n", reg_names[i]);
-    }
+  for (i = 8; i < 14; i++) {
+    if (regs_ever_live[i] && ! call_used_regs[i])
+      {
+	npregs = i - 8;
+	break;
+      }
   }
-  
-  
   
   ndregs = saved_dregs_no (); 
   npregs = saved_pregs_no ();
-  if (TARGET_NEW_PROLOGUE) {
-    if (save_area_size() != 0) {
+  if (save_area_size() != 0) 
+    {
       if (ndregs == NDREGS)
 	fprintf (file, "\t[--sp] = ( p5:%d );\n", npregs-2);
       else if (npregs == NPREGS)
@@ -619,115 +597,82 @@ bfin_function_prologue (FILE *file, HOST_WIDE_INT framesize)
       else
 	fprintf (file, "\t[--sp] = ( r7:%d, p5:%d );\n", ndregs, npregs-2);    
     }
-  } else {
-    if (save_area_size() != 0) {
-      if (ndregs == NDREGS)
-	fprintf (file, "\tsave p5:%d;\n", npregs);
-      else if (npregs == NPREGS)
-	fprintf (file, "\tsave r7:%d;\n", ndregs);
+
+  if (current_function_outgoing_args_size) 
+    {
+      if (current_function_outgoing_args_size >= FIXED_STACK_AREA)
+	arg_size = current_function_outgoing_args_size;
       else
-	fprintf (file, "\tsave r7:%d, p5:%d;\n", ndregs, npregs);
-    }
-    if (framesize != 0) 
-      fprintf (file, "\tSP += %ld;\n", -framesize);
-  }
+	arg_size = FIXED_STACK_AREA;
 
-  if (current_function_outgoing_args_size) {
-    if (current_function_outgoing_args_size >= FIXED_STACK_AREA)
-      arg_size = current_function_outgoing_args_size;
-    else
-      arg_size = FIXED_STACK_AREA;
-
-    if (arg_size < SP_SIZE)
-      fprintf (file, "\tSP += %d;\n", -arg_size);
-    else {
-        do {
-          int size;
-          (arg_size > SP_SIZE) ? (size = SP_SIZE) : (size = arg_size);
-          fprintf (file, "\tSP += %d;\n", -size);
-          arg_size -= SP_SIZE;
-        } while (arg_size > 0);
-    }
-  } 
+      if (arg_size < SP_SIZE)
+	fprintf (file, "\tSP += %d;\n", -arg_size);
+      else
+	do 
+	  {
+	    int size;
+	    (arg_size > SP_SIZE) ? (size = SP_SIZE) : (size = arg_size);
+	    fprintf (file, "\tSP += %d;\n", -size);
+	    arg_size -= SP_SIZE;
+	  } 
+	while (arg_size > 0);
+    } 
 
 }
  
 static void
 bfin_function_epilogue (FILE *file, HOST_WIDE_INT framesize)
 {
-  int i;
   signed int arg_size;
 
   e_funkind fkind = funkind (current_function_decl);
 
-  if (fkind != SUBROUTINE) {
-  	output_interrupt_handler_epilogue (file, framesize, fkind);
-	return;
-  }
-
-  if (current_function_outgoing_args_size) {
-        if (current_function_outgoing_args_size >= FIXED_STACK_AREA)
-          arg_size = current_function_outgoing_args_size;
-        else
-          arg_size = FIXED_STACK_AREA;
-
-        if (arg_size <= SP_SIZE)
-          fprintf (file, "\tSP += %d;\n", arg_size);
-        else {
-            do {
-              int size;
-              (arg_size > SP_SIZE) ? (size = SP_SIZE) : (size = arg_size);
-              fprintf (file, "\tSP += %d;\n", size);
-              arg_size -= SP_SIZE;
-            } while (arg_size > 0);
-        }
-  }
-
-  if (!TARGET_NEW_PROLOGUE) {
-    for (i=13;i>=8;i--) {
-      if (regs_ever_live[i] && ! call_used_regs[i])
-	fprintf (file, "\t%s = [SP++];\n", reg_names[i]);
+  if (fkind != SUBROUTINE)
+    {
+      output_interrupt_handler_epilogue (file, framesize, fkind);
+      return;
     }
-    for (i=7;i>=0;i--) {
-      if (regs_ever_live[i] && ! call_used_regs[i])
-	fprintf (file, "\t%s = [SP++];\n", reg_names[i]);
+
+  if (current_function_outgoing_args_size)
+    {
+      if (current_function_outgoing_args_size >= FIXED_STACK_AREA)
+	arg_size = current_function_outgoing_args_size;
+      else
+	arg_size = FIXED_STACK_AREA;
+
+      if (arg_size <= SP_SIZE)
+	fprintf (file, "\tSP += %d;\n", arg_size);
+      else
+	do 
+	  {
+	    int size;
+	    (arg_size > SP_SIZE) ? (size = SP_SIZE) : (size = arg_size);
+	    fprintf (file, "\tSP += %d;\n", size);
+	    arg_size -= SP_SIZE;
+	  }
+	while (arg_size > 0);        
     }
-  }
+
 
   ndregs = saved_dregs_no (); 
   npregs = saved_pregs_no ();
-  if (TARGET_NEW_PROLOGUE) {
-      if (save_area_size() != 0) {
-        if (ndregs == NDREGS)
-          fprintf (file, "\t( p5:%d ) = [sp++];\n", npregs-2);
-        else if (npregs == NPREGS)
-          fprintf (file, "\t( r7:%d ) = [sp++];\n", ndregs);
-        else
-	  fprintf (file, "\t( r7:%d, p5:%d ) = [sp++];\n", ndregs, npregs-2);    
-      }
-  } else {
-      if (save_area_size() != 0) {
-        if (ndregs == NDREGS)
-          fprintf (file, "\trestore  p5:%d;\n", npregs);
-        else if (npregs == NPREGS)
-          fprintf (file, "\trestore  r7:%d;\n", ndregs);
-        else
-          fprintf (file, "\trestore  r7:%d,  p5:%d;\n", ndregs, npregs);
-      }
-      if (framesize != 0)
-        fprintf (file, "\tSP += %ld;\n", framesize);
+
+  if (save_area_size() != 0) 
+    {
+      if (ndregs == NDREGS)
+	fprintf (file, "\t( p5:%d ) = [sp++];\n", npregs-2);
+      else if (npregs == NPREGS)
+	fprintf (file, "\t( r7:%d ) = [sp++];\n", ndregs);
+      else
+	fprintf (file, "\t( r7:%d, p5:%d ) = [sp++];\n", ndregs, npregs-2);    
     }
-  if (TARGET_NEW_PROLOGUE)
-    if (TARGET_NON_GNU_PROFILE)	{
-	fprintf (file, "\tcall mcount_exit;\n");
-    }
-    if (frame_pointer_needed || TARGET_NON_GNU_PROFILE) {
-	if (current_function_args_size <= FIXED_STACK_AREA && framesize == 0 && optimize_size)
-	    /*for -Os, use 16-bit instruction if arg_size is <= three words and framesize is zero*/
-	    fprintf (file, "\tRETS = [SP++];\n");
-	else
-	    fprintf (file, "\tUNLINK;\n");
-    }
+  if (TARGET_NON_GNU_PROFILE)
+    fprintf (file, "\tcall mcount_exit;\n");
+
+  if (! frame_pointer_needed || TARGET_NON_GNU_PROFILE) 
+    fprintf (file, "\tRETS = [SP++];\n");
+  else
+    fprintf (file, "\tUNLINK;\n");
 
   fprintf (file, "\trts;\n\n\n");
 }

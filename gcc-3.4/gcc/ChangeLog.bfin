@@ -19,6 +19,12 @@
 	* config/bfin/bfin.md (define_attr "length"): Adjust for the odd way
 	genattrtab treats the PC rtx.
 
+	* config/bfin/bfin.c (new_save_instr): Delete.
+	(frame_pointer_required): Don't call it.  Clean up.
+	(bfin_function_prologue): Remove non-TARGET_NEW_PROLOGUE code.
+	Make sure FP is set up whenever it is needed.
+	(bfin_function_epilogue): Matching changes.
+
 2004-09-29  Bernd Schmidt  <bernds@btinternet.com>
 
 	* config/bfin/bfin.h (PREFERRED_RELOAD_CLASS): Simply return CLASS.
