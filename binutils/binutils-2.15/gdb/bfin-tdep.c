@@ -67,6 +67,7 @@
 #include "command.h"
 #include "tm.h"
 #include "sim-regno.h"
+#include "objfiles.h"
 
 /* forward static declarations */
 static struct type * bfin_register_type (struct gdbarch *gdbarch, int regnum);
@@ -766,11 +767,9 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
   struct gdbarch_tdep *tdep = gdbarch_tdep (gdbarch);
   char buf[4];
   int i;
+  long reg_r0, reg_r1, reg_r2;
 
 
-#ifdef BFIN_NOT_TESTED
-  fprintf(stderr, "bfin_push_dummy_call not tested on bfin\n");
-#endif 
   /* Push arguments in reverse order.  */
   for (i = nargs - 1; i >= 0; i--)
     {
@@ -793,6 +792,17 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
       write_memory (sp + offset, VALUE_CONTENTS_ALL (args[i]), len);
     }
 
+  /* initialize R0, R1 and R2 to the first 3 words of paramters */
+  reg_r0 = read_memory_integer(sp, 4);
+  store_unsigned_integer (buf, 4, reg_r0);
+  regcache_cooked_write (regcache, BFIN_R0_REGNUM, buf);
+  reg_r1 = read_memory_integer(sp + 4, 4);
+  store_unsigned_integer (buf, 4, reg_r1);
+  regcache_cooked_write (regcache, BFIN_R1_REGNUM, buf);
+  reg_r2 = read_memory_integer(sp + 8, 4);
+  store_unsigned_integer (buf, 4, reg_r2);
+  regcache_cooked_write (regcache, BFIN_R2_REGNUM, buf);
+
   /* Store struct value address.  */
   if (struct_return)
     {
@@ -800,21 +810,22 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
       regcache_cooked_write (regcache, tdep->struct_value_regnum, buf);
     }
 
-  /* Store return address.  */
-  sp -= 4;
-  store_unsigned_integer (buf, 4, bp_addr);
-  write_memory (sp, buf, 4);
+  /* return address is in R0 ... need to investigate about structure return */
 
   /* Finally, update the stack pointer...  */
   store_unsigned_integer (buf, 4, sp);
   regcache_cooked_write (regcache, BFIN_SP_REGNUM, buf);
+  /* set the dummy return value to entry_point_address().
+     A dummy breakpoint will be setup to execute the call.
+  */
+  store_unsigned_integer (buf, 4, entry_point_address());
+  regcache_cooked_write (regcache, BFIN_RETS_REGNUM, buf);
 
-  /* ...and fake a frame pointer.  */
-  regcache_cooked_write (regcache, BFIN_FP_REGNUM, buf);
+  /* fp is changed by called program prologue */
 
   /* DWARF2/GCC uses the stack address *before* the function call as a
-     frame's CFA.  */
-  return sp + 8;
+     frame's CFA.  Blackfin does not update sp on a call statement. */
+  return sp;
 }
 
 #include "bfd-in2.h"
@@ -1033,13 +1044,13 @@ static struct frame_id
 bfin_unwind_dummy_id (struct gdbarch *gdbarch, struct frame_info *next_frame)
 {
   char buf[4];
-  CORE_ADDR fp;
+  CORE_ADDR sp;
 
-  frame_unwind_register (next_frame, BFIN_FP_REGNUM, buf);
-  fp = extract_unsigned_integer (buf, 4);
+  frame_unwind_register (next_frame, BFIN_SP_REGNUM, buf);
+  sp = extract_unsigned_integer (buf, 4);
 
   /* See the end of bfin_push_dummy_call.  */
-  return frame_id_build (fp + 8, frame_pc_unwind (next_frame));
+  return frame_id_build (sp, frame_pc_unwind (next_frame));
 }
 
 static CORE_ADDR
@@ -1072,6 +1083,12 @@ bfin_sim_regno(int regno)
   default :
 	return regno;
   }
+}
+
+CORE_ADDR 
+bfin_frame_align (struct gdbarch *gdbarch, CORE_ADDR address)
+{
+  return ((address + 3) & ~0x3);
 }
 
 /* Initialize the current architecture based on INFO.  If possible,
@@ -1120,6 +1137,7 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   set_gdbarch_sp_regnum (gdbarch, BFIN_SP_REGNUM);
   set_gdbarch_pc_regnum(gdbarch, BFIN_PC_REGNUM);
   set_gdbarch_push_dummy_call (gdbarch, bfin_push_dummy_call);
+  set_gdbarch_frame_align(gdbarch, bfin_frame_align);
   
   /* Disassembly.  */
   set_gdbarch_print_insn (gdbarch, gdb_print_insn_bfin);
