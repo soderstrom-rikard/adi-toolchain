@@ -109,7 +109,7 @@
 #endif
 
 #ifdef TARGET_bfin
-#include "bfin-reloctype.h"
+#include "elf/bfin.h"
 #endif //TARGET_bfin
 
 int verbose = 0;      /* extra output when running */
