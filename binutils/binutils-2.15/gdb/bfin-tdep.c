@@ -45,6 +45,7 @@
 
 #define NUM_PSEUDO_REGS (3)
 #include "defs.h"
+#include "dwarf2-frame.h"
 #include "frame.h"
 #include "frame-base.h"
 #include "frame-unwind.h"
@@ -262,10 +263,68 @@ struct bfin_frame_cache
   long locals;
 };
 
+/********************************************************/
+/* Flat memory image has the start text which is actully*/
+/* an offset from 4 from start, but we have taken care  */
+/* of that in the linker descriptor file                */
+/* The data section too starts at an offset of a table  */
+/* of MAX_SHARED_LIBS * 4 which will only be known      */
+/* to the kernel. Hence, if we have a address which     */
+/* we know to be elf data, we convert to flat by adding */
+/* text_addr + data_offset                              */
+/********************************************************/
+
 struct offset_value
 {
   CORE_ADDR text_addr;
   long      data_offset;
+  int       init;
+};
+
+int map_gcc_gdb[ ] = 
+{
+  BFIN_R0_REGNUM,
+  BFIN_R1_REGNUM,
+  BFIN_R2_REGNUM,
+  BFIN_R3_REGNUM,
+  BFIN_R4_REGNUM,
+  BFIN_R5_REGNUM,
+  BFIN_R6_REGNUM,
+  BFIN_R7_REGNUM,
+  BFIN_P0_REGNUM,
+  BFIN_P1_REGNUM,
+  BFIN_P2_REGNUM,
+  BFIN_P3_REGNUM,
+  BFIN_P4_REGNUM,
+  BFIN_P5_REGNUM,
+  BFIN_SP_REGNUM,
+  BFIN_FP_REGNUM,
+  BFIN_I0_REGNUM,
+  BFIN_B0_REGNUM,
+  BFIN_L0_REGNUM,
+  BFIN_I1_REGNUM,
+  BFIN_L1_REGNUM,
+  BFIN_B1_REGNUM,
+  BFIN_I2_REGNUM,
+  BFIN_B2_REGNUM,
+  BFIN_L2_REGNUM,
+  BFIN_I3_REGNUM,
+  BFIN_B3_REGNUM,
+  BFIN_L3_REGNUM,
+  BFIN_M0_REGNUM,
+  BFIN_M1_REGNUM,
+  BFIN_M2_REGNUM,
+  BFIN_M3_REGNUM,
+  BFIN_A0_DOT_X_REGNUM,
+  BFIN_A1_DOT_X_REGNUM,
+  0,  // not defined, should get ??? in gdb
+  BFIN_RETS_REGNUM,
+  BFIN_PC_REGNUM,
+  BFIN_RETX_REGNUM,
+  BFIN_RETN_REGNUM,
+  BFIN_RETE_REGNUM,
+  BFIN_ASTAT_REGNUM,
+  BFIN_SEQSTAT_REGNUM
 };
 
 /* Allocate and initialize a frame cache.  */
@@ -428,22 +487,27 @@ static CORE_ADDR bfin_analyze_prologue(CORE_ADDR pc, CORE_ADDR cur_pc, struct bf
 }
 #endif
 
-struct offset_value offvalue;
+struct offset_value offvalue = {0,0,0};
 
 /* initialize the offset values */
 static void set_offset_value(void)
 {
-  offvalue.text_addr = read_register(BFIN_EXTRA1);
-  offvalue.data_offset = read_register(BFIN_EXTRA3) ;
+  if(!offvalue.init){
+    offvalue.text_addr = read_register(BFIN_EXTRA1);
+    offvalue.data_offset = read_register(BFIN_EXTRA3) ;
+    offvalue.init = 1;
+  }
 }
 
 static CORE_ADDR get_text_addr_value()
 {
+  set_offset_value();
   return offvalue.text_addr;
 }
 
 static long get_data_offset_value()
 {
+  set_offset_value();
   return offvalue.data_offset;
 }
 
@@ -453,13 +517,8 @@ bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
   struct bfin_frame_cache *cache;
   char buf[4];
   int i;
-  static int chk_offvalue;
 
-  if (!chk_offvalue)
-  {
-    chk_offvalue = 1;
-    set_offset_value();
-  }
+  set_offset_value();
 
   if (*this_cache)
     return *this_cache;
@@ -792,6 +851,7 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
   char buf[4];
   int i;
   long reg_r0, reg_r1, reg_r2;
+  unsigned int sp_decr = 0; // how much sp was decremented by ... atleast 12
 
 
   /* Push arguments in reverse order.  */
@@ -813,8 +873,13 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
       else
         offset = container_len - len;
       sp -= container_len;
+      sp_decr += container_len;
       write_memory (sp + offset, VALUE_CONTENTS_ALL (args[i]), len);
     }
+
+  if(sp_decr < 12 ){
+    sp -= 12 - sp_decr;
+  }
 
   /* initialize R0, R1 and R2 to the first 3 words of paramters */
   reg_r0 = read_memory_integer(sp, 4);
@@ -839,17 +904,42 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
   /* Finally, update the stack pointer...  */
   store_unsigned_integer (buf, 4, sp);
   regcache_cooked_write (regcache, BFIN_SP_REGNUM, buf);
+
   /* set the dummy return value to entry_point_address().
-     A dummy breakpoint will be setup to execute the call.
-  */
-  store_unsigned_integer (buf, 4, entry_point_address());
+     A dummy breakpoint will be setup to execute the call. */
+
+  store_unsigned_integer (buf, 4, entry_point_address() + get_text_addr_value());
   regcache_cooked_write (regcache, BFIN_RETS_REGNUM, buf);
 
   /* fp is changed by called program prologue */
 
   /* DWARF2/GCC uses the stack address *before* the function call as a
      frame's CFA.  Blackfin does not update sp on a call statement. */
+
   return sp;
+}
+
+/* Convert register number REG to the appropriate register number
+   used by GDB.  */
+
+static int
+bfin_reg_to_regnum (int reg)
+{
+  /* This implements the GCC register map that tries to be compatible
+     with the C compiler for DWARF */
+
+  /* gdb register numbers match up with numbers in the kernel
+     which start with a SYSCFG, which is not printable.
+     So, for r and p registers, we need to add 1
+     i.e. dwarf thinks the first register is R0, 
+          but actually that is the second register
+  */
+
+  if(reg > sizeof(map_gcc_gdb)/sizeof(int))
+    return 0; // happens to be an illegal value
+
+  return map_gcc_gdb[reg];
+
 }
 
 #include "bfd-in2.h"
@@ -1053,6 +1143,7 @@ static CORE_ADDR
 bfin_frame_args_address (struct frame_info *next_frame, void **this_cache)
 {
   struct bfin_frame_cache *cache = bfin_frame_cache (next_frame, this_cache);
+
   return cache->base -4;
 }
 
@@ -1166,8 +1257,15 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   /* Disassembly.  */
   set_gdbarch_print_insn (gdbarch, gdb_print_insn_bfin);
 
+  /* Frame unwinder.  */
   set_gdbarch_unwind_dummy_id (gdbarch, bfin_unwind_dummy_id);
   set_gdbarch_unwind_pc (gdbarch, bfin_unwind_pc);
+
+  /* Hook in the DWARF CFI frame unwinder.  */
+  set_gdbarch_dwarf2_reg_to_regnum (gdbarch, bfin_reg_to_regnum);
+  frame_unwind_append_sniffer (gdbarch, dwarf2_frame_sniffer);
+  frame_base_append_sniffer(gdbarch, dwarf2_frame_base_sniffer);
+
   frame_base_set_default (gdbarch, &bfin_frame_base);
 
   set_gdbarch_get_longjmp_target (gdbarch, bfin_get_longjmp_target);
@@ -1180,23 +1278,17 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   */
   set_gdbarch_num_pseudo_regs (gdbarch, 0); 
 
-
-  
- 
   /* On BFIN targets char defaults to unsigned.  */
   set_gdbarch_char_signed (gdbarch, 0);
 
   /* do our address translations */
   set_gdbarch_remote_translate_xfer_address(gdbarch, bfin_translate_address);
 
-
   /* Frame handling.  */
   /* Frame unwinder.  */
   set_gdbarch_frame_args_skip (gdbarch, 0);
 
-
   /* Advance PC across function entry code.  */
-
 
   /* Breakpoint manipulation.  PC will get decremented in kernel */
   set_gdbarch_decr_pc_after_break (gdbarch, 0);
@@ -1205,7 +1297,6 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   set_gdbarch_register_sim_regno (gdbarch, bfin_sim_regno);
 
   set_main_name("_main");
-
 
   return gdbarch;
 }
