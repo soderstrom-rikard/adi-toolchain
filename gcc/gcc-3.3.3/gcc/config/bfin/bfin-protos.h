@@ -102,6 +102,8 @@ extern int signed_comparison_operator PARAMS ((rtx, Mmode));
 
 extern int bfin_return_in_memory PARAMS ((tree));
 extern const char *output_compare PARAMS ((rtx *,const char*));
+extern void initialize_trampoline PARAMS ((rtx, rtx, rtx));
+
 #undef  Mmode 
 
 #endif /* ! GCC_V850_PROTOS_H */

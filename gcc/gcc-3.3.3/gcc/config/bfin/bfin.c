@@ -1258,6 +1258,27 @@ symbolic_reference_mentioned_p (rtx op)
   return 0;
 }
 
+void
+initialize_trampoline (tramp, fnaddr, cxt)
+     rtx tramp, fnaddr, cxt;
+{
+  rtx t1 = copy_to_reg (fnaddr);
+  rtx t2 = copy_to_reg (cxt);
+  rtx addr;
+
+  addr = memory_address (Pmode, plus_constant (tramp, 2));
+  emit_move_insn (gen_rtx_MEM (HImode, addr), gen_lowpart (HImode, t1));
+  emit_insn (gen_ashrsi3 (t1, t1, GEN_INT (16)));
+  addr = memory_address (Pmode, plus_constant (tramp, 6));
+  emit_move_insn (gen_rtx_MEM (HImode, addr), gen_lowpart (HImode, t1));
+
+  addr = memory_address (Pmode, plus_constant (tramp, 10));
+  emit_move_insn (gen_rtx_MEM (HImode, addr), gen_lowpart (HImode, t2));
+  emit_insn (gen_ashrsi3 (t2, t2, GEN_INT (16)));
+  addr = memory_address (Pmode, plus_constant (tramp, 14));
+  emit_move_insn (gen_rtx_MEM (HImode, addr), gen_lowpart (HImode, t2));
+}
+
 /* Return a legitimate reference for ORIG (an address) using the
    register REG.  If REG is 0, a new pseudo is generated.
 
