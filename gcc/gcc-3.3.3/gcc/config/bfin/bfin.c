@@ -983,6 +983,7 @@ void print_operand (FILE *file,  rtx x,  char code)
   }
 }
 
+
 int extract_const_double (rtx x)
 {
   if (GET_CODE (x) == CONST_DOUBLE && GET_MODE(x) != DImode)
@@ -991,26 +992,27 @@ int extract_const_double (rtx x)
     union { float f; int i; } u1;
 
       if ( GET_MODE(x) == VOIDmode)
-      {
+        {
           u.i[0] = CONST_DOUBLE_LOW (x);
           u.i[1] = CONST_DOUBLE_HIGH (x);
-      }
+        }
       else
-      {
-          long l[2];
-	  REAL_VALUE_TYPE rv;
+        {
+	  long l[2];
+      	  REAL_VALUE_TYPE rv;
           int endian = (WORDS_BIG_ENDIAN == 0);
-          REAL_VALUE_FROM_CONST_DOUBLE (rv, x);
+	  REAL_VALUE_FROM_CONST_DOUBLE (rv, x);
           REAL_VALUE_TO_TARGET_DOUBLE (rv, l);
           u.i[0] = l[1 - endian];
           u.i[1] = l[endian];
-      }
+        }
     u1.f = u.d;
     return u1.i;
-  }
-  else
+  } 
+  else 
     output_operand_lossage ("unsupported mode DI");
 }
+	
 
 int
 signed_comparison_operator (rtx op, enum machine_mode mode)
@@ -1304,7 +1306,6 @@ legitimize_pic_address (rtx orig, rtx reg)
 	  else
 	    new = gen_rtx (MEM, Pmode,
 			   gen_rtx (PLUS, Pmode, pic_offset_table_rtx, orig));
-
 	  emit_move_insn (reg, new);
 	}
       current_function_uses_pic_offset_table = 1;
@@ -2445,5 +2446,39 @@ bfin_valid_add(const enum machine_mode mode, const int value)
 	  return 1; 
 	}
 	return 0;
+}
+
+const char *
+output_compare(rtx *operands,const char * pstr)
+{
+  char buf[512];
+  int reg1, reg2;
+  char *rName2;
+
+  rtx xop0 = operands[1];                                  
+  rtx xop1 = operands[2];
+  memset(buf,'\0',512);
+
+  if (GET_CODE(xop0) == REG && GET_CODE(xop1) == REG 
+      && (REGNO_REG_CLASS (REGNO (xop0))                   
+          != REGNO_REG_CLASS (REGNO (xop1)))) {
+    reg1 = REGNO(xop0);
+
+    if (REGNO_REG_CLASS (REGNO (xop0)) == DREGS) {
+      for (reg2 = REG_R0; reg2 <= REG_R7; reg2++)
+         if (reg2 != reg1)
+           break;
+    }
+    else if (REGNO_REG_CLASS (REGNO (xop0)) == PREGS)                
+      for (reg2 = REG_P0; reg2 <= REG_P5; reg2++)
+         if (reg2 != reg1)
+           break;
+
+    rName2 = reg_names[reg2];
+    sprintf (buf, "[--SP]=%s;%s=%%2;cc =%%1%s%s;%s=[SP++];", rName2, rName2, pstr, rName2, rName2);
+  }
+  else sprintf(buf, "cc =%%1%s%%2;", pstr);
+  output_asm_insn (buf, operands);
+  return "";
 }
 

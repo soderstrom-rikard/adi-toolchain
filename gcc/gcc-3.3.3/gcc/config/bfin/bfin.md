@@ -1464,11 +1464,9 @@ else
         (eq:CC (match_operand:SI 1 "register_operand"  "d, a,d,a")
                (match_operand:SI 2 "nonmemory_operand" "dO,aO,a,d")))]
   ""
-  "@
-    cc =%1==%2;
-    cc =%1==%2;
-    [--SP]=R3;R3=%2;cc =%1==R3;R3=[SP++];
-    [--SP]=R3;R3=%1;cc =%2==R3;R3=[SP++];"
+  "*
+   { output_compare(operands,\"==\"); }
+  "
   [(set_attr "type" "compare")])
 
 (define_insn ""
@@ -1489,11 +1487,13 @@ else
   [(set_attr "type" "compare")])
 
 (define_insn ""
-  [(set (match_operand:CC 0 "cc_operand" "=C,C")
-        (le:CC (match_operand:SI 1 "register_operand"  "d, a")
-               (match_operand:SI 2 "nonmemory_operand" "dO,aO")))]
+  [(set (match_operand:CC 0 "cc_operand" "=C,C,C,C")
+        (le:CC (match_operand:SI 1 "register_operand"  "d, a, d, a")
+               (match_operand:SI 2 "nonmemory_operand" "dO,aO, a, d")))]
   ""
-  "cc =%1<=%2;"
+  "*
+   { output_compare(operands,\"<=\"); }
+  "
   [(set_attr "type" "compare")])
 
 (define_insn ""
