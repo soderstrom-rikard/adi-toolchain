@@ -1,0 +1,5 @@
+2004-12-03  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin.h: New file.
+	* common.h (EM_BF533): Delete.
+	(EM_BLACKFIN): New.

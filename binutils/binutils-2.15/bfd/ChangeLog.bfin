@@ -2,3 +2,4 @@
 
 	* elf32-bfin.c (ELF_MACHINE_CODE): Use EM_BLACKFIN.
 	Include elf/bfin.h instead of bfin-reloctype.h.
+	* bfin-reloctype.h: Delete file.
