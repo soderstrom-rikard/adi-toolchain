@@ -1623,7 +1623,10 @@ secondary_input_reload_class(enum reg_class class,enum machine_mode mode, rtx x)
     x = SUBREG_REG (x), code = GET_CODE (x);
   if (REG_P (x))
     {
-      int regno = true_regnum (x);
+      int regno = REGNO (x);
+      if (regno >= FIRST_PSEUDO_REGISTER)
+	regno = reg_renumber[regno];
+
       if (regno == -1)
 	code = MEM;
       else
