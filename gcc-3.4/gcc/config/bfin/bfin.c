@@ -726,6 +726,7 @@ go_if_legitimate_address (enum machine_mode mode, rtx x, int strict_p)
 */
 int effective_address_32bit_p (rtx op, enum machine_mode mode) 
 {
+  op = XEXP (op, 0);
   switch (GET_CODE (op))
     {
     case REG:

@@ -1,6 +1,7 @@
 2004-10-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
-	* config/bin/bfin.md (negdi2): Clobbers CC.
+	* config/bfin/bfin.md (negdi2): Clobbers CC.
+	* config/bfin/bfin.c (effective_address_32bit_p): Strip off the MEM.
 
 2004-10-07  Bernd Schmidt  <bernd.schmidt@analog.com>
 
