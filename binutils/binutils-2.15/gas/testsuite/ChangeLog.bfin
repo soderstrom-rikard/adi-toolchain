@@ -1,5 +1,11 @@
 2004-12-21  Catherine Moore  <clm@cm00re.com>
 
+	* gas/bfin/reloc.d: New.
+	* gas/bfin/reloc.s: New.
+	* gas/bfin/bfin.exp: Run new test.
+
+2004-12-21  Catherine Moore  <clm@cm00re.com>
+
 	* gas/bfin/parallel.d: Fix EOL problem.
 	* gas/bfin/parallel2.d: Likewise.
 	* gas/bfin/parallel3.d: Likewise.
