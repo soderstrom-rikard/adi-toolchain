@@ -532,13 +532,6 @@ dump_symbols(symbols, number_of_symbols);
 
   for (a = abs_bfd->sections; (a != (asection *) NULL); a = a->next) {
   	section_vma = bfd_section_vma(abs_bfd, a);
-	if (!strstr(a->name, "text")){
-		section_vma += MAX_SHARED_LIBS*sizeof(int);
-#ifdef DEBUG_BFIN
-		fprintf(stderr, "adding %d to section %s to %x\n", 
-		MAX_SHARED_LIBS, a->name, section_vma);
-#endif
-}
 
 	if (verbose)
 		printf("SECTION: %s [0x%x]: flags=0x%x vma=0x%x\n", a->name, a,
@@ -689,8 +682,6 @@ dump_symbols(symbols, number_of_symbols);
 			/* Adjust the address to account for the GOT table which wasn't
 			 * present in the relative file link.
 			 */
-			if (pic_with_got)
-			  q->address += got_size;
 					
 			/* A pointer to what's being relocated, used often
 			   below.  */
@@ -700,11 +691,19 @@ dump_symbols(symbols, number_of_symbols);
 			 *	Fixup offset in the actual section.
 			 */
 			addstr[0] = 0;
-  			if ((sym_addr = get_symbol_offset((char *) sym_name,
-			    sym_section, symbols, number_of_symbols)) == -1) {
-				sym_addr = 0;
+#ifdef TARGET_bfin
+			if(pic_with_got) 
+				sym_addr = (((*(q->sym_ptr_ptr))->value));
+			else
+			{
+#endif
+  				if ((sym_addr = get_symbol_offset((char *) sym_name,
+				    sym_section, symbols, number_of_symbols)) == -1) {
+					sym_addr = 0;
+				}
+#ifdef TARGET_bfin
 			}
-
+#endif
 			if (use_resolved) {
 				/* Use the address of the symbol already in
 				   the program text.  How this is handled may
@@ -1325,7 +1324,7 @@ dump_symbols(symbols, number_of_symbols);
 	    printf("Blackfin relocation fail for reloc type: 0x%x\n", (*p)->howto->type);
           }					
 
-#else /* ! TARGET_arm */
+#else /* ! TARGET_arm && ! TARGET_bfin*/
 
 				switch (q->howto->type) {
 #ifdef TARGET_v850
@@ -1355,6 +1354,18 @@ dump_symbols(symbols, number_of_symbols);
 				}
 #endif /* !TARGET_arm */
 			}
+#ifdef TARGET_bfin
+			else{
+	   			if (((*p)->howto->type == R_rimm16)  ||
+						((*p)->howto->type == R_huimm16 ||
+						(*p)->howto->type == R_luimm16)){
+					/* for l and h we set the lower 16 bits which is only when it will be used */
+	       				*((unsigned short *) (sectionp + q->address)) = (unsigned short) sym_addr;
+           			} else if((*p)->howto->type == R_byte4_data){
+             				*((unsigned long *)(sectionp+q->address)) = sym_addr;
+				}
+			}
+#endif
 
 			if (verbose)
 				printf("  RELOC[%d]: offset=0x%x symbol=%s%s "
