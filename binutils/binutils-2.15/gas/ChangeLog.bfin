@@ -1,3 +1,7 @@
+2005-02-15  Catherine Moore  <clm@cmoore.com>
+
+	* bfin-parse.y (asm_or_directive): Avoid warning.
+
 2005-02-15  Catherine Moore  <clm@cm00re.com>
 
 	* read.c (read_a_source_file):  Remove bfin-specific code.

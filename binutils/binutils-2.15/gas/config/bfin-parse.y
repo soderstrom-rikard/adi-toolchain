@@ -631,10 +631,10 @@ asm_or_directive:
 	{ INIT_ASM(); }
 	asm
 	{
-	  insn=$2;
-	  if (insn == 0)
+	  insn = $2;
+	  if (insn == (INSTR_T) 0)
 	    return NO_INSN_GENERATED;
-	  else if (insn == -1)
+	  else if (insn == (INSTR_T) -1)
 	    return SEMANTIC_ERROR;
 	  else
 	    return INSN_GENERATED;
