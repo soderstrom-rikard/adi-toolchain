@@ -1,0 +1,10 @@
+###### history.txt for gcc-3.3.3 checkins #####
+This history file will help in knowing the status of the gcc-3.3.3
+port and what to expect next.
+If you are working on something, feel free to add that information
+here. The port follows the Visual DSP ABI for parameter passing.
+##############################################
+30 May 2004 : VDSP ABI supported.
+              gcc-3.4 tree started. 3.4 port is unstable.
+              Recently incorporated correct length info for move
+              instruction.
