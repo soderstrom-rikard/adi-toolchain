@@ -1,3 +1,11 @@
+2005-02-01  Catherine Moore  <clm@cm00re.com>
+
+	* config/bfin-parse.y (dregs +- dregs): Generate 16 bit
+	variation if no saturation flag is present.  Generate 32
+	bit variation if saturation flag is present.
+	(vsmod): Save aop.  Use it to differentiate between vector
+	and saturation.
+
 2005-02-01  Raja  <raja@rrap-software.com>
 	* config/tc-bfin.c: generating relocation for _current_shared_library_p5_offset_
 	as R_byte2_data.

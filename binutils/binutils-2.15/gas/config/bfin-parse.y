@@ -1094,26 +1094,21 @@ asm_1:
 	  else
 	    return semantic_error ("Dregs expected");
 	}
-
-// XXX This is an 'intrinsically redundant' one. (Nice word, huh ?)
-//     We have a problem if we want to use this in a parallel instruction
-//     where we have to use the 32 bit variant instead of the 16 bit one
-//     of this assigment. Do we solve this with an assembler flag or
-//     'switch' the opcodes if we detect a parallel command being issued ?
 	| REG ASSIGN REG plus_minus REG amod1 
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3) && IS_DREG ($5))
 	    {
-	      // XXX For the moment, we always use the 16 bit variant
-	      if (0)
+	      if ($6.aop == 0)
 		{
-		  notethat("dsp32alu: dregs = dregs +- dregs (amod1)\n");
-		  $$ = DSP32ALU (4, 0, 0, &$1, &$3, &$5, $6.s0, $6.x0, $4.r0);
+	          /* No saturation flag specified, generate the 16 bit variant.  */
+		  notethat("COMP3op: dregs = dregs +- dregs\n");
+		  $$ = COMP3OP (&$1, &$3, &$5, $4.r0);
 		}
 	      else
 		{
-		  notethat("COMP3op: dregs = dregs +- dregs\n");
-		  $$ = COMP3OP (&$1, &$3, &$5, $4.r0);
+		 /* Saturation flag specified, generate the 32 bit variant.  */
+                 notethat("dsp32alu: dregs = dregs +- dregs (amod1)\n");
+                 $$ = DSP32ALU (4, 0, 0, &$1, &$3, &$5, $6.s0, $6.x0, $4.r0);
 		}
 	    }
 	  else
@@ -2806,15 +2801,20 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_DREG ($4))
 	    {
-	      if ($5.r0 == 0 && $5.s0 == 0)
+	      if ($5.r0 == 0 && $5.s0 == 0 && $5.aop == 0)
 		{
 		  notethat("ALU2op: dregs = - dregs\n");
 		  $$ = ALU2OP (&$1, &$4, 14);   // dst, src, opc
 		}
-	      else
+	      else if ($5.r0 == 1 && $5.s0 == 0 && $5.aop == 3)
 		{
 		  notethat("dsp32alu: dregs = - dregs (.)\n");
 		  $$ = DSP32ALU (15, 0, 0, &$1, &$4, 0, $5.s0, 0, 3);
+		}
+	      else
+		{
+		  notethat("dsp32alu: dregs = - dregs (.)\n");
+		  $$ = DSP32ALU (7, 0, 0, &$1, &$4, 0, $5.s0, 0, 3);
 		}
 	    }
 	  else
@@ -3611,11 +3611,11 @@ amod0:
 
 
 amod1:
-	{ $$.s0 = 0; $$.x0 = 0; }
+	{ $$.s0 = 0; $$.x0 = 0; $$.aop = 0; }
 	| LPAREN NS RPAREN
-	{ $$.s0 = 0; $$.x0 = 0; }
+	{ $$.s0 = 0; $$.x0 = 0; $$.aop = 1; }
 	| LPAREN S RPAREN
-	{ $$.s0 = 1; $$.x0 = 0; }
+	{ $$.s0 = 1; $$.x0 = 0; $$.aop = 1; }
 ;
 
 
@@ -3651,13 +3651,13 @@ xpmod1:
 ;
 
 vsmod:
-	{ $$.r0 = 0; $$.s0 = 0; }
+	{ $$.r0 = 0; $$.s0 = 0; $$.aop = 0; }
 	| LPAREN NS RPAREN
-	{ $$.r0 = 0; $$.s0 = 0; }
+	{ $$.r0 = 0; $$.s0 = 0; $$.aop = 3; }
 	| LPAREN S RPAREN
-	{ $$.r0 = 0; $$.s0 = 1; }
+	{ $$.r0 = 0; $$.s0 = 1; $$.aop = 3; }
 	| LPAREN V RPAREN
-	{ $$.r0 = 1; $$.s0 = 0; }
+	{ $$.r0 = 1; $$.s0 = 0; $$.aop = 3; }
 	| LPAREN V COMMA S RPAREN
 	{ $$.r0 = 1; $$.s0 = 1; }
 	| LPAREN S COMMA V RPAREN
