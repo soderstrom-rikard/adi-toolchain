@@ -1821,7 +1821,7 @@ decode_CC2dreg_0 (bu16 iw0, bu16 iw1, bu32 pc)
   else if ((op == 1))
     {
       notethat ("CC = dregs");
-      CCREG = DREG (reg);
+      CCREG = DREG (reg) != 0;
     }
   else if ((op == 3))
     {
