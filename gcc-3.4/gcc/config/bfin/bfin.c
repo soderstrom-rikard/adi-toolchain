@@ -2252,6 +2252,76 @@ const struct attribute_spec bfin_attribute_table[] =
   { NULL, 0, 0, false, false, false, NULL }
 };
 
+/* Output the assembler code for a thunk function.  THUNK_DECL is the
+   declaration for the thunk function itself, FUNCTION is the decl for
+   the target function.  DELTA is an immediate constant offset to be
+   added to THIS.  If VCALL_OFFSET is nonzero, the word at
+   *(*this + vcall_offset) should be added to THIS.  */
+
+static void
+bfin_output_mi_thunk (FILE *file ATTRIBUTE_UNUSED,
+		      tree thunk ATTRIBUTE_UNUSED, HOST_WIDE_INT delta,
+		      HOST_WIDE_INT vcall_offset, tree function)
+{
+  rtx xops[3];
+  /* The this parameter is passed as the first argument.  */
+  rtx this = gen_rtx_REG (Pmode, REG_R0);
+
+  /* Adjust the this parameter by a fixed constant.  */
+  if (delta)
+    {
+      xops[1] = this;
+      if (delta >= -64 && delta <= 63)
+	{
+	  xops[0] = GEN_INT (delta);
+	  output_asm_insn ("%1 += %0;", xops);
+	}
+      else if (delta >= -128 && delta < -64)
+	{
+	  xops[0] = GEN_INT (delta + 64);
+	  output_asm_insn ("%1 += -64; %1 += %0;", xops);
+	}
+      else if (delta > 63 && delta <= 126)
+	{
+	  xops[0] = GEN_INT (delta - 63);
+	  output_asm_insn ("%1 += 63; %1 += %0;", xops);
+	}
+      else
+	{
+	  xops[0] = GEN_INT (delta);
+	  output_asm_insn ("r3.l = %h0; r3.h = %d0; %1 = %1 + r3;", xops);
+	}
+    }
+
+  /* Adjust the this parameter by a value stored in the vtable.  */
+  if (vcall_offset)
+    {
+      rtx p2tmp = gen_rtx_REG (Pmode, REG_P2);
+      rtx tmp = gen_rtx_REG (Pmode, REG_R2);
+
+      xops[1] = tmp;
+      xops[2] = p2tmp;
+      output_asm_insn ("%2 = r0; %2 = [%2];", xops);
+
+      /* Adjust the this parameter.  */
+      xops[0] = gen_rtx_MEM (Pmode, plus_constant (p2tmp, vcall_offset));
+      if (!memory_operand (xops[0], Pmode))
+	{
+	  rtx tmp2 = gen_rtx_REG (Pmode, REG_P1);
+	  xops[0] = GEN_INT (vcall_offset);
+	  xops[1] = tmp2;
+	  output_asm_insn ("%h1 = %h0; %d1 = %d0; %2 = %2 + %1", xops);
+	  xops[0] = gen_rtx_MEM (Pmode, p2tmp);
+	}
+      xops[2] = this;
+      output_asm_insn ("%1 = %0; %2 = %2 + %1;", xops);
+    }
+
+  xops[0] = XEXP (DECL_RTL (function), 0);
+  if (1 || !flag_pic || (*targetm.binds_local_p) (function))
+    output_asm_insn ("jump.l\t%P0", xops);
+}
+
 #undef TARGET_ASM_GLOBALIZE_LABEL
 #define TARGET_ASM_GLOBALIZE_LABEL bfin_globalize_label 
 
@@ -2278,5 +2348,10 @@ const struct attribute_spec bfin_attribute_table[] =
 
 #undef TARGET_FUNCTION_OK_FOR_SIBCALL
 #define TARGET_FUNCTION_OK_FOR_SIBCALL bfin_function_ok_for_sibcall
+
+#undef TARGET_ASM_OUTPUT_MI_THUNK
+#define TARGET_ASM_OUTPUT_MI_THUNK bfin_output_mi_thunk
+#undef TARGET_ASM_CAN_OUTPUT_MI_THUNK
+#define TARGET_ASM_CAN_OUTPUT_MI_THUNK hook_bool_tree_hwi_hwi_tree_true
 
 struct gcc_target targetm = TARGET_INITIALIZER;

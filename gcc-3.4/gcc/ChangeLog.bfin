@@ -1,3 +1,10 @@
+2004-12-03  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_output_mi_thunk): New function.
+	(TARGET_ASM_OUTPUT_MI_THUNK, TARGET_ASM_CAN_OUTPUT_MI_THUNK): New
+	macros.
+	* config/bfin/bfin-protos.h (bfin_address_cost): Don't declare.
+
 2004-12-02  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin-protos.h (bfin_register_move_cost): Renamed from

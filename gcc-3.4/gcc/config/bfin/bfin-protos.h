@@ -38,7 +38,6 @@ extern int highbits_operand (rtx, Mmode);
 
 extern rtx legitimize_address (rtx, rtx, Mmode);
 extern int hard_regno_mode_ok (int, Mmode);
-extern int bfin_address_cost  (rtx);
 extern int function_arg_partial_nregs (CUMULATIVE_ARGS *, Mmode, tree, int);
 extern void init_cumulative_args (CUMULATIVE_ARGS *, tree, rtx);	  
 extern int bfin_frame_pointer_required (void);
