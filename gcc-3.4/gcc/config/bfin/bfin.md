@@ -1342,20 +1342,6 @@ else
   "jump (PC+%0);"
   [(set_attr "type" "misc")])
 
-(define_insn ""
-  [(call (mem:SI (match_operand:SI 0 "register_operand" "a"))
-	 (match_operand:SI 1 "general_operand" "g"))]
-  ""
-  "call (%0);"
-  [(set_attr "type" "misc")])
-(define_insn ""
-  [(set (match_operand 0 "register_operand" "=d")
-	(call (mem:SI (match_operand:SI 1 "register_operand" "a"))
-	      (match_operand:SI 2 "general_operand" "g")))]
-  ""
-  "call (%1);"
-  [(set_attr "type" "misc")])
-
 ;;;;
 ;;;;
 ;;;;  Call instructions....
@@ -1365,33 +1351,78 @@ else
 	 (match_operand 1 "general_operand" "g,g"))]
   ""
   "")
-;; Call subroutine, returning value in operand 0
-;; (which must be a hard register).
-(define_expand "call_value"
-  [(set (match_operand 0 "register_operand" "=d,d")
-         (call (match_operand:SI 1 "general_operand" "a,i")
-	       (match_operand 2 "general_operand" "g,g")))]
+
+(define_expand "sibcall"
+  [(parallel [(call (match_operand:SI 0 "general_operand" "a,i")
+		    (match_operand 1 "general_operand" "g,g"))
+	      (return)])]
   ""
   "")
 
-(define_insn ""
+;; Call subroutine, returning value in operand 0
+;; (which must be a hard register).
+(define_expand "call_value"
+  [(set (match_operand 0 "register_operand" "")
+         (call (match_operand:SI 1 "general_operand" "")
+	       (match_operand 2 "general_operand" "")))]
+  ""
+  "")
+
+(define_expand "sibcall_value"
+  [(parallel [(set (match_operand 0 "register_operand" "")
+		   (call (match_operand:SI 1 "general_operand" "")
+			 (match_operand 2 "general_operand" "")))
+	      (return)])]
+  ""
+  "")
+
+(define_insn "*call_insn"
   [(call (mem:SI (match_operand:SI 0 "nonmemory_operand" "a,i"))
 	 (match_operand 1 "general_operand" "g,g"))]
-  "GET_CODE (operands[0]) == SYMBOL_REF || GET_CODE (operands[0]) == REG"
+  "! SIBLING_CALL_P (insn)
+   && (GET_CODE (operands[0]) == SYMBOL_REF || GET_CODE (operands[0]) == REG)"
   "@
   call (%0);
   call %0;"
-  [(set_attr "type" "misc,call")])
+  [(set_attr "type" "call")
+   (set_attr "length" "2,4")])
 
-(define_insn ""
+(define_insn "*sibcall_insn"
+  [(call (mem:SI (match_operand:SI 0 "nonmemory_operand" "z,i"))
+	 (match_operand 1 "general_operand" "g,g"))
+   (return)]
+  "SIBLING_CALL_P (insn)
+   && (GET_CODE (operands[0]) == SYMBOL_REF || GET_CODE (operands[0]) == REG)"
+  "@
+  jump (%0);
+  jump.l %0;"
+  [(set_attr "type" "br")
+   (set_attr "length" "2,4")])
+
+(define_insn "*call_value_insn"
   [(set (match_operand 0 "register_operand" "=d,d")
-         (call (mem:SI (match_operand:SI 1 "nonmemory_operand" "a,i"))
-	       (match_operand 2 "general_operand" "g,g")))]
-  "GET_CODE (operands[0]) == SYMBOL_REF || GET_CODE (operands[0]) == REG"
+        (call (mem:SI (match_operand:SI 1 "nonmemory_operand" "a,i"))
+	      (match_operand 2 "general_operand" "g,g")))]
+  "! SIBLING_CALL_P (insn)
+   && (GET_CODE (operands[0]) == SYMBOL_REF || GET_CODE (operands[0]) == REG)"
   "@
   call (%1);
   call %1;"
-  [(set_attr "type" "misc,call")])
+  [(set_attr "type" "call")
+   (set_attr "length" "2,4")])
+
+(define_insn "*sibcall_value_insn"
+  [(set (match_operand 0 "register_operand" "=d,d")
+         (call (mem:SI (match_operand:SI 1 "nonmemory_operand" "z,i"))
+	       (match_operand 2 "general_operand" "g,g")))
+   (return)]
+  "SIBLING_CALL_P (insn)
+   && (GET_CODE (operands[0]) == SYMBOL_REF || GET_CODE (operands[0]) == REG)"
+  "@
+  jump (%1);
+  jump.l %1;"
+  [(set_attr "type" "br")
+   (set_attr "length" "2,4")])
 
 
 /*****************************************************************
@@ -1940,7 +1971,12 @@ else
 (define_expand "epilogue"
   [(const_int 1)]
   ""
-  "bfin_expand_epilogue (); DONE;")
+  "bfin_expand_epilogue (1); DONE;")
+
+(define_expand "sibcall_epilogue"
+  [(const_int 1)]
+  ""
+  "bfin_expand_epilogue (0); DONE;")
 
 (define_insn "link"
   [(set (mem:SI (reg:SI REG_SP)) (reg:SI REG_RETS))

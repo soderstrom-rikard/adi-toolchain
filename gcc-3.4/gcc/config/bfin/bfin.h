@@ -454,6 +454,7 @@ enum reg_class
   EVEN_DREGS,
   ODD_DREGS,
   DREGS,
+  PREGS_CLOBBERED,
   PREGS,
   DPREGS,
   MOST_REGS,
@@ -482,6 +483,7 @@ enum reg_class
    "EVEN_DREGS",	\
    "ODD_DREGS",		\
    "DREGS",		\
+   "PREGS_CLOBBERED",	\
    "PREGS",		\
    "DPREGS",		\
    "MOST_REGS",		\
@@ -516,6 +518,7 @@ enum reg_class
     { 0x00000055,    0 },		/* EVEN_DREGS */   \
     { 0x000000aa,    0 },		/* ODD_DREGS */   \
     { 0x000000ff,    0 },		/* DREGS */   \
+    { 0x00004700,    0x800 },		/* PREGS_CLOBBERED */   \
     { 0x0000ff00,    0x800 },		/* PREGS */   \
     { 0x0000ffff,    0x800 },		/* DPREGS */   \
     { 0xffffffff,    0x800 },		/* MOST_REGS */\
@@ -542,6 +545,7 @@ enum reg_class
 #define REG_CLASS_FROM_LETTER(LETTER)	\
   ((LETTER) == 'a' ? PREGS :            \
    (LETTER) == 'd' ? DREGS : 		\
+   (LETTER) == 'z' ? PREGS_CLOBBERED :	\
    (LETTER) == 'D' ? EVEN_DREGS : 	\
    (LETTER) == 'W' ? ODD_DREGS : 	\
    (LETTER) == 'e' ? AREGS : 		\

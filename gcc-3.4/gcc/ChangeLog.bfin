@@ -1,3 +1,18 @@
+2004-11-29  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_expand_epilogue): Additional argument
+	"needs_return"; omit return insn if zero.  All callers changed.
+	(bfin_function_ok_for_sibcall): New function.
+	(TARGET_FUNCTION_OK_FOR_SIBCALL): New macro.
+	* config/bfin/bfin.h (enum reg_class, REG_CLASS_NAMES,
+	REG_CLASS_CONTENTS): Add PREGS_CC.
+	(REG_CLASS_FROM_LETTER): 'z' is PREGS_CC.
+	* config/bfin/bfin.md (call_insn, call_value_insn): Now named
+	patterns.  Compute insn lengths here; set types properly.
+	(sibcall, sibcall_return, sibcall_insn, sibcall_value_insn,
+	sibcall_epilogue): New.
+	(duplicate call patterns): Delete.
+
 2004-11-24  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (xorsi3, iorsi3): Simplify using '%X' output

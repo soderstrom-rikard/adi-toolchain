@@ -782,7 +782,7 @@ bfin_expand_prologue (void)
 /* Generate RTL for the epilogue of the current function.  */
 
 void
-bfin_expand_epilogue (void)
+bfin_expand_epilogue (int need_return)
 {
   rtx spreg = gen_rtx_REG (Pmode, REG_SP);
   e_funkind fkind = funkind (TREE_TYPE (current_function_decl));
@@ -827,6 +827,10 @@ bfin_expand_epilogue (void)
     }
   else
     emit_insn (gen_unlink ());
+
+  /* Omit the return insn if this is for a sibcall.  */
+  if (! need_return)
+    return;
 
   emit_jump_insn (gen_return_internal (GEN_INT (SUBROUTINE)));
 }
@@ -1244,6 +1248,16 @@ initialize_trampoline (tramp, fnaddr, cxt)
   emit_insn (gen_ashrsi3 (t2, t2, GEN_INT (16)));
   addr = memory_address (Pmode, plus_constant (tramp, 14));
   emit_move_insn (gen_rtx_MEM (HImode, addr), gen_lowpart (HImode, t2));
+}
+
+/* Decide whether we can make a sibling call to a function.  DECL is the
+   declaration of the function being targeted by the call and EXP is the
+   CALL_EXPR representing the call.  */
+
+static bool
+bfin_function_ok_for_sibcall (tree decl, tree exp)
+{
+  return true;
 }
 
 /* Return a legitimate reference for ORIG (an address) using the
@@ -2290,5 +2304,8 @@ const struct attribute_spec bfin_attribute_table[] =
 
 #undef TARGET_MACHINE_DEPENDENT_REORG
 #define TARGET_MACHINE_DEPENDENT_REORG bfin_reorg
+
+#undef TARGET_FUNCTION_OK_FOR_SIBCALL
+#define TARGET_FUNCTION_OK_FOR_SIBCALL bfin_function_ok_for_sibcall
 
 struct gcc_target targetm = TARGET_INITIALIZER;
