@@ -965,7 +965,7 @@ static const struct bfin_reloc_map
 	     FALSE,		/* pc_relative */
 	     0,			/* bitpos */
 	     complain_overflow_signed,	/* complain_on_overflow */
-	     bfd_elf_generic_reloc,	/* special_function */
+	     bfin_bfd_reloc,	/* special_function */
 	     "R_byte2_data",	/* name */
 	     TRUE,		/* partial_inplace */
 	     0xFFFF,		/* src_mask */
@@ -1595,8 +1595,6 @@ elf_bfin_relocate_section (bfd * output_bfd,
 	      }
 	    else
 	      relocation += sgot->output_section->vma;
-
-fprintf(stderr, "relocation is %d ... div by 4 %d\n", relocation, relocation/4);
             /* bfin : preg = [preg + 17bitdiv4offset] relocation is div by 4 */
             relocation /= 4;
 	  }
