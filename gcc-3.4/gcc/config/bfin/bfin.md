@@ -81,6 +81,9 @@
    (REG_P6 14)
    (REG_P7 15)
 
+   (REG_SP 14)
+   (REG_FP 15)
+
    (REG_I0 16)
    (REG_B0 17)
    (REG_L0 18)
@@ -102,7 +105,8 @@
    (REG_A0 32)
    (REG_A1 33)
 
-   (REG_CC 34)])
+   (REG_CC 34)
+   (REG_RETS 35)])
 
 (define_attr "type"
   "move,mvi,mcld,mcldp,mcst,dsp32,mult,alu0,shft,brcc,br,call,misc,compare"
@@ -3320,3 +3324,60 @@ else
 	"%d0 = %d1 * %d2, %h0 = %h1 * %h2 (M, ISS2);"  /*"%0 = (H * H M, L * L) (%1, %2) IS;"*/
 	[(set_attr "type" "dsp32")])
 
+;; Prologue and epilogue.
+
+(define_expand "prologue"
+  [(const_int 1)]
+  ""
+  "bfin_expand_prologue (); DONE;")
+
+(define_expand "epilogue"
+  [(const_int 1)]
+  ""
+  "bfin_expand_epilogue (); DONE;")
+
+(define_insn "link"
+  [(set (mem:SI (reg:SI REG_SP)) (reg:SI REG_RETS))
+   (set (mem:SI (plus:SI (reg:SI REG_SP) (const_int -4))) (reg:SI REG_FP))
+   (set (reg:SI REG_SP)
+	(minus:SI (reg:SI REG_SP)
+		  (plus:SI (match_operand:SI 0 "immediate_operand" "i")
+			   (const_int 8))))
+   (set (reg:SI REG_FP)
+	(plus:SI (reg:SI REG_SP) (const_int -8)))]
+  ""
+  "LINK %0;"
+  [(set_attr "length" "4")])
+
+(define_insn "unlink"
+  [(set (reg:SI REG_FP) (mem:SI (reg:SI REG_FP)))
+   (set (reg:SI REG_RETS) (mem:SI (plus:SI (reg:SI REG_FP) (const_int 4))))
+   (set (reg:SI REG_SP) (plus:SI (reg:SI REG_FP) (const_int 8)))]
+  ""
+  "UNLINK;"
+  [(set_attr "length" "4")])
+
+(define_insn "push_multiple"
+  [(match_parallel 0 "push_multiple_operation"
+    [(set (reg:SI REG_SP)
+	  (plus:SI (reg:SI REG_SP) (match_operand:SI 1 "immediate_operand" "i")))])]
+  ""
+{
+  output_push_multiple (insn, operands);
+  return "";
+})
+
+(define_insn "pop_multiple"
+  [(match_parallel 0 "pop_multiple_operation"
+    [(set (reg:SI REG_SP)
+	  (plus:SI (reg:SI REG_SP) (match_operand:SI 1 "immediate_operand" "i")))])]
+  ""
+{
+  output_pop_multiple (insn, operands);
+  return "";
+})
+
+(define_insn "return_internal"
+  [(return)]
+  "reload_completed"
+  "rts;")

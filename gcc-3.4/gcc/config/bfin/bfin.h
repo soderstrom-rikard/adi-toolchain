@@ -307,25 +307,16 @@ extern const char * directive_names[];
 #define INITIALIZE_TRAMPOLINE(TRAMP, FNADDR, CXT) \
   initialize_trampoline (TRAMP, FNADDR, CXT)
 
-/* Number of actual hardware registers.
-   The hardware registers are assigned numbers for the compiler
-   from 0 to just below FIRST_PSEUDO_REGISTER.
-   All registers that the compiler knows about must be given numbers,
-   even those that are not normally considered general registers.
+/* This processor has
+   8 data register for doing arithmetic
+   8  pointer register for doing addressing, including
+      1  stack pointer P6
+      1  frame pointer P7
+   4 sets of indexing registers (I0-3, B0-3, L0-3, M0-3)
+   1  condition code flag register CC
+   1  return address register RETS.  */
 
-   This processor has
-       8 data register for doing arithmetic
-       8  pointer register for doing addressing
-          including 1  stack pointer P6
-                    1  frame pointer P7
-       4 sets of indexing registers (I0-3, B0-3, L0-3, M0-3
-       1  condition code flag register CC
-*/
-
-#define FIRST_PSEUDO_REGISTER 35
-
-#define LAST_USER_DREG REG_R7
-#define LAST_USER_PREG REG_P5
+#define FIRST_PSEUDO_REGISTER 36
 
 #define PREG_P(X) (REG_P (X) && REGNO (X) >= REG_P0 && REGNO (X) <= REG_P7)
 
@@ -334,7 +325,7 @@ extern const char * directive_names[];
   "P0",      "P1",      "P2",      "P3",      "P4",      "P5",      "SP",      "FP",  \
   "I0",      "B0",      "L0",      "I1",      "B1",      "L1",      "I2",      "B2",  \
   "L2",      "I3",      "B3",      "L3",      "M0",      "M1",      "M2",      "M3",  \
-  "A0",      "A1",      "CC", \
+  "A0",      "A1",      "CC",    "RETS" \
 }
 
 
@@ -368,8 +359,8 @@ extern const char * directive_names[];
 { 0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 1, 1,    \
 /*i0 b0 l0 i1 b1 l1 i2 b2   l2 i3 b3 l3 m0 m1 m2 m3 */ \
   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,    \
-/*a0 a1 cc */ \
-  0, 0, 1,   \
+/*a0 a1 cc rets*/ \
+  0, 0, 1, 1  \
 }
 
 /* the registers that are not available for general 
@@ -386,8 +377,8 @@ extern const char * directive_names[];
 { 1, 1, 1, 1, 0, 0, 0, 0,   1, 1, 1, 0, 0, 0, 1, 1, \
 /*i0 b0 l0 i1 b1 l1 i2 b2   l2 i3 b3 l3 m0 m1 m2 m3 */ \
   1, 1, 1, 1, 1, 1, 1, 1,   1, 1, 1, 1, 1, 1, 1, 1,   \
-/*a0 a1 cc */ \
-  1, 1, 1, \
+/*a0 a1 cc rets */ \
+  1, 1, 1, 0 \
 }
 
 
@@ -406,7 +397,7 @@ extern const char * directive_names[];
  /*REG_L2, REG_I3, REG_B3, REG_L3, REG_M0, REG_M1, REG_M2, REG_M3,*/ \
   REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, \
   REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, \
-  REG_NO, \
+  REG_NO, REG_NO \
 }
 
 #define CONDITIONAL_REGISTER_USAGE			\
@@ -509,7 +500,7 @@ enum reg_class
     { 0x0000ff00,    0 },		/* PREGS */   \
     { 0x0000ffff,    0 },		/* DPREGS */   \
     { 0xffffffff,    0x0 },		/* MOST_REGS */\
-    { 0xffffffff,    0x7 },		/* ALL_REGS */\
+    { 0xffffffff,    0xF },		/* ALL_REGS */\
      /*{ 0xffffffff,    0x3 }, */	}
 
 #define BASE_REG_CLASS          PREGS
@@ -561,6 +552,7 @@ enum reg_class
  : ((REGNO)<=REG_M3 && (REGNO)>=REG_M0) ? MREGS \
  : ((REGNO)==REG_A0 || (REGNO)==REG_A1) ? AREGS \
  : (REGNO)==REG_CC ? CCREGS 			\
+ : (REGNO) == REG_RETS ? ALL_REGS		\
  : NO_REGS)
 
 /* When defined, the compiler allows registers explicitly used in the
@@ -1092,8 +1084,6 @@ do {                                              \
 #define TARGET_ASM_GLOBALIZE_LABEL bfin_globalize_label 
 #define TARGET_ASM_OPEN_PAREN "("
 #define TARGET_ASM_CLOSE_PAREN ")"
-#define TARGET_ASM_FUNCTION_PROLOGUE bfin_function_prologue
-#define TARGET_ASM_FUNCTION_EPILOGUE bfin_function_epilogue
 
 /* Output at beginning of assembler file.  */
 #define TARGET_ASM_FILE_START output_file_start
@@ -1340,7 +1330,7 @@ do { long l;                                            \
 #define ASM_OUTPUT_REG_POP(FILE, REGNO)  fprintf (FILE, "// pop %s\n", reg_names[REGNO])
 
 extern struct rtx_def *bfin_compare_op0, *bfin_compare_op1;
-extern struct rtx_def *bfin_cc_rtx;
+extern struct rtx_def *bfin_cc_rtx, *bfin_rets_rtx;
 
 /*#define REAL_IS_NOT_DOUBLE
 #define REAL_VALUE_TYPE float*/

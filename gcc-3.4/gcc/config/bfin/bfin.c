@@ -54,9 +54,10 @@ extern rtx *reg_equiv_mem;
 
 rtx bfin_compare_op0, bfin_compare_op1;
 
-/* RTX for condition code flag register */
+/* RTX for condition code flag register and RETS register */
 extern GTY(()) rtx bfin_cc_rtx;
-rtx bfin_cc_rtx;
+extern GTY(()) rtx bfin_rets_rtx;
+rtx bfin_cc_rtx, bfin_rets_rtx;
 
 #ifndef assert
 #define assert(x) ((x)?0:abort())
@@ -73,11 +74,6 @@ const char *byte_reg_names[]   =  BYTE_REGISTER_NAMES;
 int out_bytes = 0;
 int out_ind = 0;
 
-static int saved_dregs_no PARAMS ((void));
-static int saved_pregs_no PARAMS ((void));
-
-static void bfin_function_prologue PARAMS ((FILE *, HOST_WIDE_INT));
-static void bfin_function_epilogue PARAMS ((FILE *, HOST_WIDE_INT));
 void bfin_globalize_label PARAMS ((FILE *, const char *));
 void output_file_start PARAMS ((void));
 
@@ -103,10 +99,15 @@ bfin_globalize_label (FILE *stream, const char *name)
 
 struct gcc_target targetm = TARGET_INITIALIZER;
 
+static int arg_regs[] = FUNCTION_ARG_REGISTERS;
+
+
 void 
 output_file_start (void) 
 {
   FILE *file = asm_out_file;
+  int i;
+
   if (optimize_size)
     fprintf (file, "// gcc version %s bfin version %s opt -Os\n", 
            version_string, bfin_ver_str);
@@ -114,20 +115,12 @@ output_file_start (void)
     fprintf (file, "// gcc version %s bfin version %s opt -O%d\n", 
            version_string, bfin_ver_str, optimize);
   fprintf (file, ".file \"%s\";\n", input_filename);
-  if (TARGET_SIMPLE_RTM) {
+  if (TARGET_SIMPLE_RTM)
     fprintf (file,"\nsimple_rtm:\nl(SP) =0xFFFC; h(SP) =0x4000;\nFP =SP;\ncall _main;\nhlt;\n___main:\n\nrts;\n\n");
-
-  }
-#ifdef FUNCTION_ARG_REGISTERS
-  {
-    int  i;
-    static int argregs[] = FUNCTION_ARG_REGISTERS;
-    for (i=0;argregs[i]>=0;i++)
+  
+  for (i = 0; arg_regs[i] >= 0; i++)
       ;
-    max_arg_registers = i;	/* how many arg reg used  */
-  }
-#endif
-
+  max_arg_registers = i;	/* how many arg reg used  */
 }
 
 static int const_fits_p (rtx expr, int sz, int scale, int issigned)
@@ -235,6 +228,7 @@ char *section_asm_op (SECT_ENUM_T dir) {
   In reality we don't need to save that much state here only the compiler scratch
   registers need to be added to the prologue and epilogue of an ISR.
 */
+
 typedef enum { 
   SUBROUTINE, INTERRUPT_HANDLER, EXCPT_HANDLER, NMI_HANDLER
 } e_funkind ;
@@ -316,64 +310,125 @@ static e_funkind funkind (tree fundecl)
  *
  */
 
-/* save masks */
-static int ndregs;
-static int npregs;
-static int is_leaf_function;
-
-
-/* First save data reg and first save pointer reg */
-#define NDREGS 8
-#define NPREGS 8
-
-static int saved_dregs_no (void)
+static int
+n_dregs_to_save (void)
 {
-  int i, nregs;
+  int i;
 
-  nregs = NDREGS;
-  for (i=1;i<LAST_USER_DREG+1;i++) 
-    if (regs_ever_live[i] && ! call_used_regs[i]) {
-      nregs = i;
-      break;
-    }
-  return nregs;
+  for (i = REG_R1; i <= REG_R7; i++)
+    if (regs_ever_live[i] && ! call_used_regs[i])
+      return REG_R7 - i + 1;
+  return 0;
 }
 
-static int saved_pregs_no (void)
+static int
+n_pregs_to_save (void)
 {
-  int i, nregs;
+  int i;
 
-  nregs = NPREGS;
-  for (i=LAST_USER_DREG+1;i<LAST_USER_PREG+1;i++) {
-    if (regs_ever_live[i] && ! call_used_regs[i]) {
-      nregs = (i-LAST_USER_DREG+1);
-      break;
-    }
-  }
-  return nregs;
+  for (i = REG_P0; i <= REG_P5; i++)
+    if (regs_ever_live[i] && ! call_used_regs[i])
+      return REG_P5 - i + 1;
+  return 0;
 }
 
-int save_area_size (void)
-/* return the size (in bytes) of register save area on the stack */
+static void
+expand_prologue_reg_save (rtx spreg)
 {
-  int size;
+  int ndregs = n_dregs_to_save ();
+  int npregs = n_pregs_to_save ();
+  int dregno = REG_R7 + 1 - ndregs;
+  int pregno = REG_P5 + 1 - npregs;
+  int total = ndregs + npregs;
+  int i;
+  rtx pat, insn;
 
-  ndregs = saved_dregs_no (); 
-  npregs = saved_pregs_no ();
-  size = ((NDREGS - ndregs) + (NPREGS - npregs)) * UNITS_PER_WORD;
-  return size;
+  if (total == 0)
+    return;
+
+  pat = gen_rtx_PARALLEL (VOIDmode, rtvec_alloc (total + 1));
+  XVECEXP (pat, 0, 0) = gen_rtx_SET (VOIDmode, spreg,
+				     gen_rtx_PLUS (Pmode, spreg,
+						   GEN_INT (-total * 4)));
+
+  for (i = 0; i < total; i++)
+    {
+      rtx memref = gen_rtx_MEM (word_mode,
+				gen_rtx_PLUS (Pmode, spreg,
+					      GEN_INT (- i * 4 - 4)));
+      if (ndregs > 0)
+	{
+	  XVECEXP (pat, 0, i + 1)
+	    = gen_rtx_SET (VOIDmode, memref, gen_rtx_REG (word_mode,
+							  dregno++));
+	  ndregs--;
+	}
+      else
+	{
+	  XVECEXP (pat, 0, i + 1)
+	    = gen_rtx_SET (VOIDmode, memref, gen_rtx_REG (word_mode,
+							  pregno++));
+	  npregs++;
+	}
+    }
+  insn = emit_insn (pat);
+  RTX_FRAME_RELATED_P (insn) = 1;
+}
+
+static void
+expand_epilogue_reg_restore (rtx spreg)
+{
+  int ndregs = n_dregs_to_save ();
+  int npregs = n_pregs_to_save ();
+  int total = ndregs + npregs;
+  int i, regno;
+  rtx pat, insn;
+
+  if (total == 0)
+    return;
+
+  pat = gen_rtx_PARALLEL (VOIDmode, rtvec_alloc (total + 1));
+  XVECEXP (pat, 0, 0) = gen_rtx_SET (VOIDmode, spreg,
+				     gen_rtx_PLUS (Pmode, spreg,
+						   GEN_INT (total * 4)));
+
+  if (npregs > 0)
+    regno = REG_P5 + 1;
+  else
+    regno = REG_R7 + 1;
+
+  for (i = 0; i < total; i++)
+    {
+      rtx addr = (i > 0
+		  ? gen_rtx_PLUS (Pmode, spreg, GEN_INT (i * 4))
+		  : spreg);
+      rtx memref = gen_rtx_MEM (word_mode, addr);
+
+      regno--;
+      XVECEXP (pat, 0, i + 1)
+	= gen_rtx_SET (VOIDmode, gen_rtx_REG (word_mode, regno), memref);
+
+      if (npregs > 0)
+	{
+	  if (--npregs == 0)
+	    regno = REG_R7 + 1;
+	}
+    }
+
+  insn = emit_insn (pat);
+  RTX_FRAME_RELATED_P (insn) = 1;
 }
 
 /* Used by macro `frame_pointer_required' */
 int frame_pointer_required (void) 
 {
-    int omit, leaf, frame, required;
+  int omit, leaf, frame, required;
 
-    omit = TARGET_OMIT_LEAF_FRAME_POINTER;
-    leaf = leaf_function_p ();
-    frame = get_frame_size ();
-    required = !((omit && leaf) || (leaf && frame == 0 && current_function_args_size == 0));
-    return required;
+  omit = TARGET_OMIT_LEAF_FRAME_POINTER;
+  leaf = leaf_function_p ();
+  frame = get_frame_size ();
+  required = !((omit && leaf) || (leaf && frame == 0 && current_function_args_size == 0));
+  return required;
 }
 
 /* Perform any needed actions needed for a function that is receiving a
@@ -522,71 +577,63 @@ output_interrupt_handler_epilogue (FILE *file, int framesize ATTRIBUTE_UNUSED, e
   }
 }
 
-static void
-bfin_function_prologue (FILE *file, HOST_WIDE_INT framesize)
+void
+bfin_expand_prologue (void)
 {
   int i;
-  signed int arg_size;
+  HOST_WIDE_INT arg_size;
+  HOST_WIDE_INT frame_size = get_frame_size ();
+  int is_leaf_function = leaf_function_p ();
+  rtx spreg = gen_rtx_REG (Pmode, REG_SP);
 
+#if 0
   e_funkind fkind = funkind (current_function_decl);
 
   if (fkind != SUBROUTINE) {
-    output_interrupt_handler_prologue (file, framesize, fkind);
+    expand_interrupt_handler_prologue (file, frame_size, fkind);
     return;
   }
-
-  is_leaf_function = leaf_function_p ();
-  frame_pointer_needed = FRAME_POINTER_REQUIRED;
+#endif
 
   if (! frame_pointer_needed && ! TARGET_NON_GNU_PROFILE)
-    fprintf (file, "\t[--SP] = RETS;\n");
+    {
+      rtx pat = gen_movsi (gen_rtx_MEM (Pmode,
+					gen_rtx_PRE_DEC (Pmode, spreg)),
+			   bfin_rets_rtx);
+      rtx insn = emit_insn (pat);
+      RTX_FRAME_RELATED_P (insn) = 1;
+    }
   else
     {
       /* use 32-bit instruction */
-      if (CONST_18UBIT_IMM_P(framesize))
-	fprintf (file, "\tLINK %ld;\n", framesize);
+      if (CONST_18UBIT_IMM_P(frame_size))
+	{
+	  rtx insn = emit_insn (gen_link (GEN_INT (frame_size)));
+	  RTX_FRAME_RELATED_P (insn) = 1;
+	}
       else 
 	{
-	  rtx operands1[2];
-	  fprintf (file, "\tLINK 0;\n");
-	  operands1[0] =  gen_rtx_REG (Pmode, REG_P2);
-	  operands1[1] =  gen_rtx_CONST_INT (Pmode, -framesize);
-	  output_load_immediate (operands1);
-	  fprintf (file,"\tSP = SP + P2;\n");
-	}
-    }
-  if (TARGET_NON_GNU_PROFILE)
-    fprintf (file, "\tcall mcount_entry;\n");
-  
-  ndregs = 7; npregs = 5;
-  for (i = 1; i < 8; i++)
-    {
-      if (regs_ever_live[i] && ! call_used_regs[i]) 
-	{
-	  ndregs = i;
-	  break;
+	  rtx p2reg = gen_rtx_REG (Pmode, REG_P2);
+	  rtx size = GEN_INT (-frame_size);
+	  rtx insn;
+
+	  insn = emit_insn (gen_link (const0_rtx));
+	  RTX_FRAME_RELATED_P (insn) = 1;
+
+	  insn = emit_move_insn (p2reg, size);
+	  RTX_FRAME_RELATED_P (insn) = 1;
+
+	  insn = emit_insn (gen_addsi3 (spreg, spreg, p2reg));
+	  RTX_FRAME_RELATED_P (insn) = 1;
 	}
     }
 
-  for (i = 8; i < 14; i++) {
-    if (regs_ever_live[i] && ! call_used_regs[i])
-      {
-	npregs = i - 8;
-	break;
-      }
-  }
-  
-  ndregs = saved_dregs_no (); 
-  npregs = saved_pregs_no ();
-  if (save_area_size() != 0) 
-    {
-      if (ndregs == NDREGS)
-	fprintf (file, "\t[--sp] = ( p5:%d );\n", npregs-2);
-      else if (npregs == NPREGS)
-	fprintf (file, "\t[--sp] = ( r7:%d );\n", ndregs);
-      else
-	fprintf (file, "\t[--sp] = ( r7:%d, p5:%d );\n", ndregs, npregs-2);    
-    }
+#if 0
+  if (TARGET_NON_GNU_PROFILE)
+    fprintf (file, "\tcall mcount_entry;\n");
+#endif
+
+  expand_prologue_reg_save (spreg);
 
   if (current_function_outgoing_args_size) 
     {
@@ -595,25 +642,32 @@ bfin_function_prologue (FILE *file, HOST_WIDE_INT framesize)
       else
 	arg_size = FIXED_STACK_AREA;
 
-      if (arg_size < SP_SIZE)
-	fprintf (file, "\tSP += %d;\n", -arg_size);
-      else
-	do 
-	  {
-	    int size;
-	    (arg_size > SP_SIZE) ? (size = SP_SIZE) : (size = arg_size);
-	    fprintf (file, "\tSP += %d;\n", -size);
-	    arg_size -= SP_SIZE;
-	  } 
-	while (arg_size > 0);
+      do 
+	{
+	  int size;
+	  rtx insn;
+
+	  if (arg_size > SP_SIZE)
+	    size = SP_SIZE;
+	  else
+	    size = arg_size;
+
+	  insn = emit_insn (gen_addsi3 (spreg, spreg, GEN_INT (-size)));
+	  RTX_FRAME_RELATED_P (insn) = 1;
+	  arg_size -= size;
+	} 
+      while (arg_size > 0);
     }
 }
  
-static void
-bfin_function_epilogue (FILE *file, HOST_WIDE_INT framesize)
+void
+bfin_expand_epilogue (void)
 {
-  signed int arg_size;
+  HOST_WIDE_INT arg_size;
+  HOST_WIDE_INT frame_size = get_frame_size ();
+  rtx spreg = gen_rtx_REG (Pmode, REG_SP);
 
+#if 0
   e_funkind fkind = funkind (current_function_decl);
 
   if (fkind != SUBROUTINE)
@@ -621,6 +675,7 @@ bfin_function_epilogue (FILE *file, HOST_WIDE_INT framesize)
       output_interrupt_handler_epilogue (file, framesize, fkind);
       return;
     }
+#endif
 
   if (current_function_outgoing_args_size)
     {
@@ -629,41 +684,43 @@ bfin_function_epilogue (FILE *file, HOST_WIDE_INT framesize)
       else
 	arg_size = FIXED_STACK_AREA;
 
-      if (arg_size <= SP_SIZE)
-	fprintf (file, "\tSP += %d;\n", arg_size);
-      else
-	do 
-	  {
-	    int size;
-	    (arg_size > SP_SIZE) ? (size = SP_SIZE) : (size = arg_size);
-	    fprintf (file, "\tSP += %d;\n", size);
-	    arg_size -= SP_SIZE;
-	  }
-	while (arg_size > 0);        
+      do
+	{
+	  int size;
+	  rtx insn;
+
+	  if (arg_size > SP_SIZE)
+	    size = SP_SIZE;
+	  else
+	    size = arg_size;
+
+	  insn = emit_insn (gen_addsi3 (spreg, spreg, GEN_INT (size)));
+	  RTX_FRAME_RELATED_P (insn) = 1;
+	  arg_size -= size;
+	}
+      while (arg_size > 0);        
     }
 
 
-  ndregs = saved_dregs_no (); 
-  npregs = saved_pregs_no ();
-
-  if (save_area_size() != 0) 
-    {
-      if (ndregs == NDREGS)
-	fprintf (file, "\t( p5:%d ) = [sp++];\n", npregs-2);
-      else if (npregs == NPREGS)
-	fprintf (file, "\t( r7:%d ) = [sp++];\n", ndregs);
-      else
-	fprintf (file, "\t( r7:%d, p5:%d ) = [sp++];\n", ndregs, npregs-2);    
-    }
+  expand_epilogue_reg_restore (spreg);
+#if 0
   if (TARGET_NON_GNU_PROFILE)
     fprintf (file, "\tcall mcount_exit;\n");
+#endif
 
-  if (! frame_pointer_needed || TARGET_NON_GNU_PROFILE) 
-    fprintf (file, "\tRETS = [SP++];\n");
+  if (! frame_pointer_needed || TARGET_NON_GNU_PROFILE)
+    {
+      rtx addr = gen_rtx_POST_INC (Pmode, spreg);
+      rtx insn = emit_move_insn (bfin_rets_rtx, gen_rtx_MEM (Pmode, addr));
+      RTX_FRAME_RELATED_P (insn) = 1;
+    }
   else
-    fprintf (file, "\tUNLINK;\n");
+    {
+      rtx insn = emit_insn (gen_unlink ());
+      RTX_FRAME_RELATED_P (insn) = 1;
+    }
 
-  fprintf (file, "\trts;\n\n\n");
+    emit_jump_insn (gen_return_internal ());
 }
 
 rtx
@@ -990,9 +1047,6 @@ signed_comparison_operator (rtx op, enum machine_mode mode)
 }
 
 /* Argument support functions.  */
-#ifdef FUNCTION_ARG_REGISTERS
-
-static int arg_regs[] = FUNCTION_ARG_REGISTERS;
 
 /* Initialize a variable CUM of type CUMULATIVE_ARGS
    for a call to a function whose data type is FNTYPE.
@@ -1131,8 +1185,6 @@ function_arg_regno_p(int n)
       return 1;
   return 0;
 }
-
-#endif
 
 
 /* Returns 1 if OP contains a symbol reference */
@@ -1325,7 +1377,8 @@ void
 conditional_register_usage (void)
 {
   /* initialize condition code flag register rtx */
-  bfin_cc_rtx = gen_rtx (REG, BImode, REG_CC);
+  bfin_cc_rtx = gen_rtx_REG (BImode, REG_CC);
+  bfin_rets_rtx = gen_rtx_REG (Pmode, REG_RETS);
 }
 
 #if 0
@@ -2045,3 +2098,166 @@ bfin_internal_label(FILE *stream, const char *prefix, unsigned long num)
         fprintf(stream, "%s%s$%ld:\n", LOCAL_LABEL_PREFIX, prefix, num);
 }
 
+/* Used for communication between {push,pop}_multiple_operation (which
+   we use not only as a predicate) and the corresponding output functions.  */
+static int first_preg_to_save, first_dreg_to_save;
+
+int
+push_multiple_operation (rtx op, enum machine_mode mode)
+{
+  int lastdreg = 8, lastpreg = 6;
+  int i, group;
+
+  for (i = 1, group = 0; i < XVECLEN (op, 0); i++)
+    {
+      rtx t = XVECEXP (op, 0, i);
+      rtx src, dest;
+      int regno;
+
+      if (GET_CODE (t) != SET)
+	return 0;
+
+      src = SET_SRC (t);
+      dest = SET_DEST (t);
+      if (GET_CODE (dest) != MEM || ! REG_P (src))
+	return 0;
+      dest = XEXP (dest, 0);
+      if (GET_CODE (dest) != PLUS
+	  || ! REG_P (XEXP (dest, 0))
+	  || REGNO (XEXP (dest, 0)) != REG_SP
+	  || GET_CODE (XEXP (dest, 1)) != CONST_INT
+	  || INTVAL (XEXP (dest, 1)) != -i * 4)
+	return 0;
+
+      regno = REGNO (src);
+      if (group == 0)
+	{
+	  if (regno >= REG_R0 && regno <= REG_R7)
+	    {
+	      group = 1;
+	      first_dreg_to_save = lastdreg = regno - REG_R0;
+	    }
+	  else if (regno >= REG_P0 && regno <= REG_P7)
+	    {
+	      group = 2;
+	      first_preg_to_save = lastpreg = regno - REG_P0;
+	    }
+	  else
+	    return 0;
+
+	  continue;
+	}
+
+      if (group == 1)
+	{
+	  if (regno >= REG_P0 && regno <= REG_P7)
+	    {
+	      group = 2;
+	      first_preg_to_save = lastpreg = regno - REG_P0;
+	    }
+	  else if (regno != REG_R0 + lastdreg + 1)
+	    return 0;
+	  else
+	    lastdreg++;
+	}
+      else if (group == 2)
+	{
+	  if (regno != REG_P0 + lastpreg + 1)
+	    return 0;
+	  lastpreg++;
+	}
+    }
+  return 1;
+}
+
+int
+pop_multiple_operation (rtx op, enum machine_mode mode)
+{
+  int lastdreg = 8, lastpreg = 6;
+  int i, group;
+
+  for (i = 1, group = 0; i < XVECLEN (op, 0); i++)
+    {
+      rtx t = XVECEXP (op, 0, i);
+      rtx src, dest;
+      int regno;
+
+      if (GET_CODE (t) != SET)
+	return 0;
+
+      src = SET_SRC (t);
+      dest = SET_DEST (t);
+      if (GET_CODE (src) != MEM || ! REG_P (dest))
+	return 0;
+      src = XEXP (src, 0);
+
+      if (i == 1)
+	{
+	  if (! REG_P (src) || REGNO (src) != REG_SP)
+	    return 0;
+	}
+      else if (GET_CODE (src) != PLUS
+	       || ! REG_P (XEXP (src, 0))
+	       || REGNO (XEXP (src, 0)) != REG_SP
+	       || GET_CODE (XEXP (src, 1)) != CONST_INT
+	       || INTVAL (XEXP (src, 1)) != (i - 1) * 4)
+	return 0;
+
+      regno = REGNO (dest);
+      if (group == 0)
+	{
+	  if (regno == REG_R7)
+	    {
+	      group = 1;
+	      lastdreg = 7;
+	    }
+	  else if (regno != REG_P0 + lastpreg - 1)
+	    return 0;
+	  else
+	    lastpreg--;
+	}
+      else if (group == 1)
+	{
+	  if (regno != REG_R0 + lastdreg - 1)
+	    return 0;
+	  else
+	    lastdreg--;
+	}
+    }
+  first_dreg_to_save = lastdreg;
+  first_preg_to_save = lastpreg;
+  return 1;
+}
+
+void
+output_push_multiple (rtx insn, rtx *operands)
+{
+  char buf[80];
+  if (! push_multiple_operation (PATTERN (insn), VOIDmode))
+    abort ();
+  if (first_dreg_to_save == 8)
+    sprintf (buf, "[--sp] = ( p5:%d );\n", first_preg_to_save);
+  else if (first_preg_to_save == 6)
+    sprintf (buf, "[--sp] = ( r7:%d );\n", first_dreg_to_save);
+  else
+    sprintf (buf, "[--sp] = ( r7:%d, p5:%d );\n", first_dreg_to_save, first_preg_to_save);
+
+  output_asm_insn (buf, operands);
+}
+
+void
+output_pop_multiple (rtx insn, rtx *operands)
+{
+  char buf[80];
+  if (! pop_multiple_operation (PATTERN (insn), VOIDmode))
+    abort ();
+
+  if (first_dreg_to_save == 8)
+    sprintf (buf, "( p5:%d ) = [sp++];\n", first_preg_to_save);
+  else if (first_preg_to_save == 6)
+    sprintf (buf, "( r7:%d ) = [sp++];\n", first_dreg_to_save);
+  else
+    sprintf (buf, "( r7:%d, p5:%d ) = [sp++];\n", first_dreg_to_save, first_preg_to_save);
+
+  output_asm_insn (buf, operands);
+}

@@ -76,8 +76,6 @@ extern void asm_output_skip PARAMS ((FILE *, int));
 extern void print_operand PARAMS ((FILE *,  rtx, char));
 extern void print_address_operand PARAMS ((FILE *, rtx));
 
-extern int save_area_size PARAMS ((void));
-extern int new_save_instr PARAMS ((void)); 
 extern rtx legitimize_pic_address PARAMS ((rtx, rtx));
 extern void emit_pic_move PARAMS ((rtx *, Mmode));
 extern int register_move_cost PARAMS ((enum reg_class, enum reg_class));
@@ -109,6 +107,12 @@ extern void setup_incoming_varargs PARAMS ((CUMULATIVE_ARGS *, enum machine_mode
 extern int  symbolic_or_const_operand_p PARAMS ((rtx , enum machine_mode));
 extern int  reg_or_16bit_operand PARAMS ((rtx, enum machine_mode));
 extern rtx  bfin_force_reg PARAMS ((enum machine_mode, rtx));
+
+extern void bfin_expand_prologue PARAMS ((void));
+extern void bfin_expand_epilogue PARAMS ((void));
+extern int push_multiple_operation PARAMS ((rtx, Mmode));
+extern int pop_multiple_operation PARAMS ((rtx, Mmode));
+
 #undef  Mmode 
 
 #endif /* ! GCC_V850_PROTOS_H */

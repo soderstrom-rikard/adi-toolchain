@@ -1,3 +1,36 @@
+2004-10-20  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_rets_rtx): New variable.
+	(conditional_register_usage): Set it.
+	(nr_dregs_to_save): Rename from saved_dregs_no and change to
+	return number of regs to save.
+	(nr_pregs_to_save): Likewise, from saved_pregs_no.
+	(bfin_function_prologue, bfin_function_epilogue, save_area_size):
+	Delete.
+	(output_file_start): FUNCTION_ARG_REGISTERS is always defined.
+	Lose local array, use arg_regs.
+	(init_cumulative_args, function_arg, function_arg_advance,
+	function_arg_partial_nregs, function_arg_regno_p): No longer
+	conditional on FUNCTION_ARG_REGISTERS.
+	(npregs, ndregs, is_leaf_function): Delete global variables.
+	(expand_prologue_reg_save, expand_epilogue_reg_restore,
+	bfin_expand_prologue, bfin_expand_epilogue,
+	push_multiple_operation, pop_multiple_operation,
+	output_push_multiple, output_pop_multiple): New functions.
+	(first_preg_to_save, first_dreg_to_save): New static variables.
+	* config/bfin/bfin.h (FIRST_PSEUDO_REGISTER): Now 36.
+	(LAST_USER_DREG, LAST_USER_PREG): Don't define.
+	(REGISTER_NAMES, FIXED_REGISTERS, CALL_USED_REGISTERS,
+	REG_ALLOC_ORDER, REGNO_REG_CLASS): Add entry for RETS.
+	(REG_CLASS_CONTENTS): ALL_REGS contains RETS.
+	(TARGET_ASM_FUNCTION_PROLOGUE, TARGET_ASM_FUNCTION_EPILOGUE): Delete.
+	* config/bfin/bfin.md (define_constants): Add REG_SP, REG_FP,
+	REG_RETS.
+	(prologue, epilogue, link, unlink, push_multiple, pop_multiple,
+	return_internal): New patterns.  * config/bfin/bfin-protos.h
+	(bfin_expand_prologue, bfin_expand_epilogue,
+	push_multiple_operation, pop_multiple_operation): Declare.
+	
 2004-10-18  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* cse.c (cse_insn): Stores in a libcall sequence can invalidate
