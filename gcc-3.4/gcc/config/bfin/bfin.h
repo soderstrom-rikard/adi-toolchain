@@ -797,10 +797,12 @@ W [ Preg + uimm16m2 ]
     break;						       \
   case POST_INC:					       \
   case POST_DEC:					       \
-    if (REG_OK_FOR_BASE_P (XEXP (X, 0)))	               \
+      if (GET_MODE_SIZE (MODE) <= 4			       \
+	  && REG_OK_FOR_BASE_P (XEXP (X, 0)))		       \
       goto WIN;						       \
   case PRE_DEC:						       \
-    if (XEXP (X, 0) == stack_pointer_rtx		       \
+    if (GET_MODE_SIZE (MODE) <= 4			       \
+	&& XEXP (X, 0) == stack_pointer_rtx		       \
         && REG_OK_FOR_BASE_P (XEXP (X, 0)))	               \
       goto WIN;						       \
     break;						       \

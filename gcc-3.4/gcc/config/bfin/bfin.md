@@ -274,6 +274,34 @@
 
 ;;; Future work: split constants in expand
 
+(define_insn_and_split "movdi_insn"
+  [(set (match_operand:DI 0 "nonimmediate_operand" "=x,ox,r")
+	(match_operand:DI 1 "general_operand"      "iFx,r,ox"))]
+  ""
+  "#"
+  "reload_completed"
+  [(set (match_dup 2) (match_dup 3))
+   (set (match_dup 4) (match_dup 5))]
+{
+  rtx lo_half[2], hi_half[2];
+  split_di (operands, 2, lo_half, hi_half);
+
+  if (reg_overlap_mentioned_p (lo_half[0], hi_half[1]))
+    {
+      operands[2] = hi_half[0];
+      operands[3] = hi_half[1];
+      operands[4] = lo_half[0];
+      operands[5] = lo_half[1];
+    }
+  else
+    {
+      operands[2] = lo_half[0];
+      operands[3] = lo_half[1];
+      operands[4] = hi_half[0];
+      operands[5] = hi_half[1];
+    }
+})
+
 (define_insn "*movsi_insn"
   [(set (match_operand:SI 0 "nonimmediate_operand" "=da,da,*cf,*cf,da,mr,!*e,!*e,!d,!d,!C")
         (match_operand:SI 1 "general_operand"      "  x,ix,  x, ix,mr,da,  d, eP,*e, C,d"))]
@@ -338,6 +366,11 @@
   ""
   "expand_move (operands, SImode);")
 
+(define_expand "movdi"
+  [(set (match_operand:DI 0 "nonimmediate_operand" "")
+	(match_operand:DI 1 "general_operand" ""))]
+  ""
+  "expand_move (operands, DImode);")
 
 (define_expand "movsf"
  [(set (match_operand:SF 0 "nonimmediate_operand" "")

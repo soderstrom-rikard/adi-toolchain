@@ -13,6 +13,15 @@
 	* config/bfin/t-bfin-elf (LIB1ASMFUNCS): Remove them from here, too.
 	(fp-bit.c): Don't define FLOAT_ONLY or SMALL_MACHINE.
 
+	* config/bfin/bfin.c (split_di): New function, from i386.c.
+	(hard_regno_mode_ok): Limit regs usable for DImode to MOST_REGS.
+	(secondary_input_reload_class): DImode to memory works just like
+	SImode.
+	* config/bfin/bfin.h (GO_IF_LEGITIMATE_ADDRESS): Don't allow
+	autoincrements when addressing a DImode value.
+	* config/bfin/bfin.md (movdi_insn): New pattern.
+	(movdi): New expander.
+
 2004-10-05  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (extendhisi2, zero_extendhisi2, extendqisi2,

@@ -1525,6 +1525,12 @@ int reg_or_16bit_operand (rtx op, enum machine_mode mode) {
     return (imm16bit_operand_p (op, mode) || register_operand (op, mode));
 }
 
+int
+positive_immediate_operand (rtx op, enum machine_mode mode)
+{
+  return GET_CODE (op) == CONST_INT && INTVAL (op) >= 0;
+}
+
 void
 asm_output_skip (FILE *file, int size) {
     if (!TARGET_ASM_DIR) {					
@@ -1553,19 +1559,53 @@ asm_output_ascii (FILE *file, const char *str, int sz) {
          }
     }
 }
+
+/* Split one or more DImode RTL references into pairs of SImode
+   references.  The RTL can be REG, offsettable MEM, integer constant, or
+   CONST_DOUBLE.  "operands" is a pointer to an array of DImode RTL to
+   split and "num" is its length.  lo_half and hi_half are output arrays
+   that parallel "operands".  */
 
+void
+split_di (rtx operands[], int num, rtx lo_half[], rtx hi_half[])
+{
+  while (num--)
+    {
+      rtx op = operands[num];
 
+      /* simplify_subreg refuse to split volatile memory addresses,
+         but we still have to handle it.  */
+      if (GET_CODE (op) == MEM)
+	{
+	  lo_half[num] = adjust_address (op, SImode, 0);
+	  hi_half[num] = adjust_address (op, SImode, 4);
+	}
+      else
+	{
+	  lo_half[num] = simplify_gen_subreg (SImode, op,
+					      GET_MODE (op) == VOIDmode
+					      ? DImode : GET_MODE (op), 0);
+	  hi_half[num] = simplify_gen_subreg (SImode, op,
+					      GET_MODE (op) == VOIDmode
+					      ? DImode : GET_MODE (op), 4);
+	}
+    }
+}
+
 int
 hard_regno_mode_ok (int regno, enum machine_mode mode)
 {
-    /* Allow only dregs to store value of mode HI or QI */
-    enum reg_class class = REGNO_REG_CLASS (regno);
-    int ret;
+  /* Allow only dregs to store value of mode HI or QI */
+  enum reg_class class = REGNO_REG_CLASS (regno);
+  int ret;
 
-    if (class == CCREGS)
-	return mode == CCmode || mode == SImode || mode == BImode;
+  if (class == CCREGS)
+    return mode == CCmode || mode == SImode || mode == BImode;
 
-    return mode != CCmode;
+  if (mode == DImode)
+    return TEST_HARD_REG_BIT (reg_class_contents[MOST_REGS], regno);
+
+  return mode != CCmode;
 }
 
 /* Returns 1 if OP is either the constant zero or a register.  If a
@@ -1615,7 +1655,7 @@ secondary_input_reload_class(enum reg_class class,enum machine_mode mode, rtx x)
 {
   /* If we have HImode or QImode, we can only use DREGS as secondary registers;
      in most other cases we can also use PREGS.  */
-  enum reg_class default_class = GET_MODE_SIZE (mode) == 4 ? DPREGS : DREGS;
+  enum reg_class default_class = GET_MODE_SIZE (mode) >= 4 ? DPREGS : DREGS;
   enum reg_class x_class = NO_REGS;
   enum rtx_code code = GET_CODE (x);
 
