@@ -19,6 +19,8 @@
 	decode_psedodbg_assert_0): Remove unused argument "pc".  All callers
 	changed.
 
+	* bfin-dis.c: Remove redundant parentheses throughout.
+
 2004-12-02  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin/interp.c (bfin_trap): Better support for open/close/write.

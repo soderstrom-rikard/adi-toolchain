@@ -198,7 +198,6 @@ static struct
   char positive;
 } constant_formats[] =
 {
-
   { "0", 0, 0, 1, 0, 0, 0, 0, 0},
   { "1", 0, 0, 1, 0, 0, 0, 0, 0},
   { "4", 0, 0, 1, 0, 0, 0, 0, 0},
@@ -681,24 +680,24 @@ get_allreg (int grp, int reg)
 static void
 amod0 (int s0, int x0, bu32 pc)
 {
-  if ((s0 == 0) && (x0 == 0))
+  if (s0 == 0 && x0 == 0)
     {
       notethat ("(NS)");
       return;
     }
-  else if ((s0 == 1) && (x0 == 0))
+  else if (s0 == 1 && x0 == 0)
     {
       notethat ("(S)");
       OUTS (outf, "(S)");
       return;
     }
-  else if ((s0 == 0) && (x0 == 1))
+  else if (s0 == 0 && x0 == 1)
     {
       notethat ("(CO)");
       OUTS (outf, "(CO)");
       return;
     }
-  else if ((s0 == 1) && (x0 == 1))
+  else if (s0 == 1 && x0 == 1)
     {
       notethat ("(SCO)");
       OUTS (outf, "(SCO)");
@@ -713,13 +712,13 @@ illegal_instruction:
 static void
 amod1 (int s0, int x0, bu32 pc)
 {
-  if ((s0 == 0) && (x0 == 0))
+  if (s0 == 0 && x0 == 0)
     {
       notethat ("(NS)");
       OUTS (outf, "(NS)");
       return;
     }
-  else if ((s0 == 1) && (x0 == 0))
+  else if (s0 == 1 && x0 == 0)
     {
       notethat ("(S)");
       OUTS (outf, "(S)");
@@ -734,24 +733,24 @@ illegal_instruction:
 static void
 macmod_accm (int mod, bu32 pc)
 {
-  if ((mod == 0))
+  if (mod == 0)
     {
       notethat ("");
       return;
     }
-  else if ((mod == 8))
+  else if (mod == 8)
     {
       notethat ("(IS)");
       OUTS (outf, "(IS)");
       return;
     }
-  else if ((mod == 4))
+  else if (mod == 4)
     {
       notethat ("(FU)");
       OUTS (outf, "(FU)");
       return;
     }
-  else if ((mod == 3))
+  else if (mod == 3)
     {
       notethat ("(W32)");
       OUTS (outf, "(W32)");
@@ -766,25 +765,25 @@ illegal_instruction:
 static void
 searchmod (int r0, bu32 pc)
 {
-  if ((r0 == 0))
+  if (r0 == 0)
     {
       notethat ("GT");
       OUTS (outf, "GT");
       return;
     }
-  else if ((r0 == 1))
+  else if (r0 == 1)
     {
       notethat ("GE");
       OUTS (outf, "GE");
       return;
     }
-  else if ((r0 == 2))
+  else if (r0 == 2)
     {
       notethat ("LT");
       OUTS (outf, "LT");
       return;
     }
-  else if ((r0 == 3))
+  else if (r0 == 3)
     {
       notethat ("LE");
       OUTS (outf, "LE");
@@ -802,12 +801,12 @@ mxd_mod (int mod, bu32 pc)
 {
 
 
-  if ((mod == 0))
+  if (mod == 0)
     {
       notethat ("");
       return;
     }
-  else if ((mod == 1))
+  else if (mod == 1)
     {
       notethat ("(M)");
       OUTS (outf, "(M)");
@@ -824,12 +823,12 @@ aligndir (int r0, bu32 pc)
 {
 
 
-  if ((r0 == 0))
+  if (r0 == 0)
     {
       notethat ("");
       return;
     }
-  else if ((r0 == 1))
+  else if (r0 == 1)
     {
       notethat ("(R)");
       OUTS (outf, "(R)");
@@ -854,7 +853,7 @@ A0macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
   int src1 = ((iw1 >> 0) & 0x7);
   int src0 = ((iw1 >> 3) & 0x7);
 
-  if ((h0 == 0) && (h1 == 0) && (op == 0))
+  if (h0 == 0 && h1 == 0 && op == 0)
     {
       notethat ("A0 = dregs_lo * dregs_lo");
       OUTS (outf, "A0");
@@ -864,7 +863,7 @@ A0macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_lo (src1));
       return;
     }
-  else if ((h0 == 0) && (h1 == 1) && (op == 0))
+  else if (h0 == 0 && h1 == 1 && op == 0)
     {
       notethat ("A0 = dregs_lo * dregs_hi");
       OUTS (outf, "A0");
@@ -874,7 +873,7 @@ A0macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_hi (src1));
       return;
     }
-  else if ((h0 == 1) && (h1 == 0) && (op == 0))
+  else if (h0 == 1 && h1 == 0 && op == 0)
     {
       notethat ("A0 = dregs_hi * dregs_lo");
       OUTS (outf, "A0");
@@ -884,7 +883,7 @@ A0macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_lo (src1));
       return;
     }
-  else if ((h0 == 1) && (h1 == 1) && (op == 0))
+  else if (h0 == 1 && h1 == 1 && op == 0)
     {
       notethat ("A0 = dregs_hi * dregs_hi");
       OUTS (outf, "A0");
@@ -894,7 +893,7 @@ A0macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_hi (src1));
       return;
     }
-  else if ((h0 == 0) && (h1 == 0) && (op == 1))
+  else if (h0 == 0 && h1 == 0 && op == 1)
     {
       notethat ("A0 += dregs_lo * dregs_lo");
       OUTS (outf, "A0");
@@ -904,7 +903,7 @@ A0macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_lo (src1));
       return;
     }
-  else if ((h0 == 0) && (h1 == 1) && (op == 1))
+  else if (h0 == 0 && h1 == 1 && op == 1)
     {
       notethat ("A0 += dregs_lo * dregs_hi");
       OUTS (outf, "A0");
@@ -914,7 +913,7 @@ A0macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_hi (src1));
       return;
     }
-  else if ((h0 == 1) && (h1 == 0) && (op == 1))
+  else if (h0 == 1 && h1 == 0 && op == 1)
     {
       notethat ("A0 += dregs_hi * dregs_lo");
       OUTS (outf, "A0");
@@ -924,7 +923,7 @@ A0macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_lo (src1));
       return;
     }
-  else if ((h0 == 1) && (h1 == 1) && (op == 1))
+  else if (h0 == 1 && h1 == 1 && op == 1)
     {
       notethat ("A0 += dregs_hi * dregs_hi");
       OUTS (outf, "A0");
@@ -934,7 +933,7 @@ A0macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_hi (src1));
       return;
     }
-  else if ((h0 == 0) && (h1 == 0) && (op == 2))
+  else if (h0 == 0 && h1 == 0 && op == 2)
     {
       notethat ("A0 -= dregs_lo * dregs_lo");
       OUTS (outf, "A0");
@@ -944,7 +943,7 @@ A0macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_lo (src1));
       return;
     }
-  else if ((h0 == 0) && (h1 == 1) && (op == 2))
+  else if (h0 == 0 && h1 == 1 && op == 2)
     {
       notethat ("A0 -= dregs_lo * dregs_hi");
       OUTS (outf, "A0");
@@ -954,7 +953,7 @@ A0macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_hi (src1));
       return;
     }
-  else if ((h0 == 1) && (h1 == 0) && (op == 2))
+  else if (h0 == 1 && h1 == 0 && op == 2)
     {
       notethat ("A0 -= dregs_hi * dregs_lo");
       OUTS (outf, "A0");
@@ -964,7 +963,7 @@ A0macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_lo (src1));
       return;
     }
-  else if ((h0 == 1) && (h1 == 1) && (op == 2))
+  else if (h0 == 1 && h1 == 1 && op == 2)
     {
       notethat ("A0 -= dregs_hi * dregs_hi");
       OUTS (outf, "A0");
@@ -996,7 +995,7 @@ multfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
   int src0 = ((iw1 >> 3) & 0x7);
 
 
-  if ((h0 == 0) && (h1 == 0) && (op == 0))
+  if (h0 == 0 && h1 == 0 && op == 0)
     {
       notethat ("dregs_lo * dregs_lo");
       OUTS (outf, dregs_lo (src0));
@@ -1004,7 +1003,7 @@ multfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_lo (src1));
       return;
     }
-  else if ((h0 == 0) && (h1 == 1) && (op == 0))
+  else if (h0 == 0 && h1 == 1 && op == 0)
     {
       notethat ("dregs_lo * dregs_hi");
       OUTS (outf, dregs_lo (src0));
@@ -1012,7 +1011,7 @@ multfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_hi (src1));
       return;
     }
-  else if ((h0 == 1) && (h1 == 0) && (op == 0))
+  else if (h0 == 1 && h1 == 0 && op == 0)
     {
       notethat ("dregs_hi * dregs_lo");
       OUTS (outf, dregs_hi (src0));
@@ -1020,7 +1019,7 @@ multfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_lo (src1));
       return;
     }
-  else if ((h0 == 1) && (h1 == 1) && (op == 0))
+  else if (h0 == 1 && h1 == 1 && op == 0)
     {
       notethat ("dregs_hi * dregs_hi");
       OUTS (outf, dregs_hi (src0));
@@ -1044,7 +1043,7 @@ A1macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
   int src1 = ((iw1 >> 0) & 0x7);
   int src0 = ((iw1 >> 3) & 0x7);
 
-  if ((h0 == 0) && (h1 == 0) && (op == 0))
+  if (h0 == 0 && h1 == 0 && op == 0)
     {
       notethat ("A1 = dregs_lo * dregs_lo");
       OUTS (outf, "A1");
@@ -1054,7 +1053,7 @@ A1macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_lo (src1));
       return;
     }
-  else if ((h0 == 0) && (h1 == 1) && (op == 0))
+  else if (h0 == 0 && h1 == 1 && op == 0)
     {
       notethat ("A1 = dregs_lo * dregs_hi");
       OUTS (outf, "A1");
@@ -1064,7 +1063,7 @@ A1macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_hi (src1));
       return;
     }
-  else if ((h0 == 1) && (h1 == 0) && (op == 0))
+  else if (h0 == 1 && h1 == 0 && op == 0)
     {
       notethat ("A1 = dregs_hi * dregs_lo");
       OUTS (outf, "A1");
@@ -1074,7 +1073,7 @@ A1macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_lo (src1));
       return;
     }
-  else if ((h0 == 1) && (h1 == 1) && (op == 0))
+  else if (h0 == 1 && h1 == 1 && op == 0)
     {
       notethat ("A1 = dregs_hi * dregs_hi");
       OUTS (outf, "A1");
@@ -1084,7 +1083,7 @@ A1macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_hi (src1));
       return;
     }
-  else if ((h0 == 0) && (h1 == 0) && (op == 1))
+  else if (h0 == 0 && h1 == 0 && op == 1)
     {
       notethat ("A1 += dregs_lo * dregs_lo");
       OUTS (outf, "A1");
@@ -1094,7 +1093,7 @@ A1macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_lo (src1));
       return;
     }
-  else if ((h0 == 0) && (h1 == 1) && (op == 1))
+  else if (h0 == 0 && h1 == 1 && op == 1)
     {
       notethat ("A1 += dregs_lo * dregs_hi");
       OUTS (outf, "A1");
@@ -1104,7 +1103,7 @@ A1macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_hi (src1));
       return;
     }
-  else if ((h0 == 1) && (h1 == 0) && (op == 1))
+  else if (h0 == 1 && h1 == 0 && op == 1)
     {
       notethat ("A1 += dregs_hi * dregs_lo");
       OUTS (outf, "A1");
@@ -1114,7 +1113,7 @@ A1macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_lo (src1));
       return;
     }
-  else if ((h0 == 1) && (h1 == 1) && (op == 1))
+  else if (h0 == 1 && h1 == 1 && op == 1)
     {
       notethat ("A1 += dregs_hi * dregs_hi");
       OUTS (outf, "A1");
@@ -1124,7 +1123,7 @@ A1macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_hi (src1));
       return;
     }
-  else if ((h0 == 0) && (h1 == 0) && (op == 2))
+  else if (h0 == 0 && h1 == 0 && op == 2)
     {
       notethat ("A1 -= dregs_lo * dregs_lo");
       OUTS (outf, "A1");
@@ -1134,7 +1133,7 @@ A1macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_lo (src1));
       return;
     }
-  else if ((h0 == 0) && (h1 == 1) && (op == 2))
+  else if (h0 == 0 && h1 == 1 && op == 2)
     {
       notethat ("A1 -= dregs_lo * dregs_hi");
       OUTS (outf, "A1");
@@ -1144,7 +1143,7 @@ A1macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_hi (src1));
       return;
     }
-  else if ((h0 == 1) && (h1 == 0) && (op == 2))
+  else if (h0 == 1 && h1 == 0 && op == 2)
     {
       notethat ("A1 -= dregs_hi * dregs_lo");
       OUTS (outf, "A1");
@@ -1154,7 +1153,7 @@ A1macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
       OUTS (outf, dregs_lo (src1));
       return;
     }
-  else if ((h0 == 1) && (h1 == 1) && (op == 2))
+  else if (h0 == 1 && h1 == 1 && op == 2)
     {
       notethat ("A1 -= dregs_hi * dregs_hi");
       OUTS (outf, "A1");
@@ -1175,54 +1174,54 @@ A1macfunc (bu16 iw0, bu16 iw1, int op, int h0, int h1, bu32 pc)
 static void
 macmod_hmove (int mod, bu32 pc)
 {
-  if ((mod == 0))
+  if (mod == 0)
     {
       notethat ("");
       return;
     }
-  else if ((mod == 8))
+  else if (mod == 8)
     {
       notethat ("(IS)");
       OUTS (outf, "(IS)");
       return;
     }
-  else if ((mod == 4))
+  else if (mod == 4)
     {
       notethat ("(FU)");
       OUTS (outf, "(FU)");
       return;
     }
-  else if ((mod == 12))
+  else if (mod == 12)
     {
       notethat ("(IU)");
       OUTS (outf, "(IU)");
       return;
     }
-  else if ((mod == 2))
+  else if (mod == 2)
     {
       notethat ("(T)");
       OUTS (outf, "(T)");
       return;
     }
-  else if ((mod == 6))
+  else if (mod == 6)
     {
       notethat ("(TFU)");
       OUTS (outf, "(TFU)");
       return;
     }
-  else if ((mod == 1))
+  else if (mod == 1)
     {
       notethat ("(S2RND)");
       OUTS (outf, "(S2RND)");
       return;
     }
-  else if ((mod == 9))
+  else if (mod == 9)
     {
       notethat ("(ISS2)");
       OUTS (outf, "(ISS2)");
       return;
     }
-  else if ((mod == 11))
+  else if (mod == 11)
     {
       notethat ("(IH)");
       OUTS (outf, "(IH)");
@@ -1245,112 +1244,112 @@ decode_ProgCtrl_0 (bu16 iw0)
 
 
 
-  if ((prgfunc == 0) && (poprnd == 0))
+  if (prgfunc == 0 && poprnd == 0)
     {
       notethat ("NOP");
       PCREG += 2; return;
     }
-  else if ((prgfunc == 1) && (poprnd == 0))
+  else if (prgfunc == 1 && poprnd == 0)
     {
       notethat ("RTS");
       PCREG = saved_state.rets;
       return;
     }
-  else if ((prgfunc == 1) && (poprnd == 1))
+  else if (prgfunc == 1 && poprnd == 1)
     {
       notethat ("RTI");
       OUTS (outf, "RTI");
       return;
     }
-  else if ((prgfunc == 1) && (poprnd == 2))
+  else if (prgfunc == 1 && poprnd == 2)
     {
       notethat ("RTX");
       OUTS (outf, "RTX");
       return;
     }
-  else if ((prgfunc == 1) && (poprnd == 3))
+  else if (prgfunc == 1 && poprnd == 3)
     {
       notethat ("RTN");
       OUTS (outf, "RTN");
       return;
     }
-  else if ((prgfunc == 1) && (poprnd == 4))
+  else if (prgfunc == 1 && poprnd == 4)
     {
       notethat ("RTE");
       OUTS (outf, "RTE");
       return;
     }
-  else if ((prgfunc == 2) && (poprnd == 0))
+  else if (prgfunc == 2 && poprnd == 0)
     {
       notethat ("IDLE");
       OUTS (outf, "IDLE");
       PCREG += 2; return;
     }
-  else if ((prgfunc == 2) && (poprnd == 3))
+  else if (prgfunc == 2 && poprnd == 3)
     {
       notethat ("CSYNC");
       OUTS (outf, "CSYNC");
       PCREG += 2; return;
     }
-  else if ((prgfunc == 2) && (poprnd == 4))
+  else if (prgfunc == 2 && poprnd == 4)
     {
       notethat ("SSYNC");
       OUTS (outf, "SSYNC");
       PCREG += 2; return;
     }
-  else if ((prgfunc == 2) && (poprnd == 5))
+  else if (prgfunc == 2 && poprnd == 5)
     {
       notethat ("EMUEXCPT");
       OUTS (outf, "EMUEXCPT");
       PCREG += 2; return;
     }
-  else if ((prgfunc == 3))
+  else if (prgfunc == 3)
     {
       notethat ("CLI dregs");
       OUTS (outf, "CLI  ");
       OUTS (outf, dregs (poprnd));
       PCREG += 2; return;
     }
-  else if ((prgfunc == 4))
+  else if (prgfunc == 4)
     {
       notethat ("STI dregs");
       OUTS (outf, "STI");
       OUTS (outf, dregs (poprnd));
       PCREG += 2; return;
     }
-  else if ((prgfunc == 5))
+  else if (prgfunc == 5)
     {
       notethat ("JUMP ( pregs )");
       PCREG = PREG (poprnd);
       return;
     }
-  else if ((prgfunc == 6))
+  else if (prgfunc == 6)
     {
       notethat ("CALL ( pregs )");
       saved_state.rets = PCREG + 2;
       PCREG = PREG (poprnd);
       return;
     }
-  else if ((prgfunc == 7))
+  else if (prgfunc == 7)
     {
       notethat ("CALL ( PC + pregs )");
       saved_state.rets = PCREG + 2;
       PCREG = PCREG + PREG (poprnd);
       return;
     }
-  else if ((prgfunc == 8))
+  else if (prgfunc == 8)
     {
       notethat ("JUMP ( PC + pregs )");
       PCREG = PCREG + PREG (poprnd);
       return;
     }
-  else if ((prgfunc == 9))
+  else if (prgfunc == 9)
     {
       notethat ("RAISE uimm4");
       bfin_trap ();
       PCREG += 2; return;
     }
-  else if ((prgfunc == 10))
+  else if (prgfunc == 10)
     {
       notethat ("EXCPT uimm4");
       if(uimm4(poprnd) == 1){
@@ -1365,7 +1364,7 @@ decode_ProgCtrl_0 (bu16 iw0)
         PCREG += 2; return;
       }
     }
-  else if ((prgfunc == 11))
+  else if (prgfunc == 11)
     {
       notethat ("TESTSET ( pregs )");
       OUTS (outf, "TESTSET  ");
@@ -1392,7 +1391,7 @@ decode_CaCTRL_0 (bu16 iw0)
 
 
 
-  if ((a == 0) && (op == 0))
+  if (a == 0 && op == 0)
     {
       notethat ("PREFETCH [ pregs ]");
       OUTS (outf, "PREFETCH");
@@ -1401,7 +1400,7 @@ decode_CaCTRL_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((a == 0) && (op == 1))
+  else if (a == 0 && op == 1)
     {
       notethat ("FLUSHINV [ pregs ]");
       OUTS (outf, "FLUSHINV");
@@ -1410,7 +1409,7 @@ decode_CaCTRL_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((a == 0) && (op == 2))
+  else if (a == 0 && op == 2)
     {
       notethat ("FLUSH [ pregs ]");
       OUTS (outf, "FLUSH");
@@ -1419,7 +1418,7 @@ decode_CaCTRL_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((a == 0) && (op == 3))
+  else if (a == 0 && op == 3)
     {
       notethat ("IFLUSH [ pregs ]");
       OUTS (outf, "IFLUSH");
@@ -1428,7 +1427,7 @@ decode_CaCTRL_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((a == 1) && (op == 0))
+  else if (a == 1 && op == 0)
     {
       notethat ("PREFETCH [ pregs ++ ]");
       OUTS (outf, "PREFETCH");
@@ -1438,7 +1437,7 @@ decode_CaCTRL_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((a == 1) && (op == 1))
+  else if (a == 1 && op == 1)
     {
       notethat ("FLUSHINV [ pregs ++ ]");
       OUTS (outf, "FLUSHINV");
@@ -1448,7 +1447,7 @@ decode_CaCTRL_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((a == 1) && (op == 2))
+  else if (a == 1 && op == 2)
     {
       notethat ("FLUSH [ pregs ++ ]");
       OUTS (outf, "FLUSH");
@@ -1458,7 +1457,7 @@ decode_CaCTRL_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((a == 1) && (op == 3))
+  else if (a == 1 && op == 3)
     {
       notethat ("IFLUSH [ pregs ++ ]");
       OUTS (outf, "IFLUSH");
@@ -1597,7 +1596,7 @@ decode_CCflag_0 (bu16 iw0)
 
   if (opc > 4)
     {
-      if ((opc == 5) && (I == 0) && (G == 0))
+      if (opc == 5 && I == 0 && G == 0)
 	{
 	  notethat ("CC = A0 == A1");
 	  OUTS (outf, "CC");
@@ -1607,7 +1606,7 @@ decode_CCflag_0 (bu16 iw0)
 	  OUTS (outf, "A1");
 	  PCREG += 2; return;
 	}
-      else if ((opc == 6) && (I == 0) && (G == 0))
+      else if (opc == 6 && I == 0 && G == 0)
 	{
 	  notethat ("CC = A0 < A1");
 	  OUTS (outf, "CC");
@@ -1617,7 +1616,7 @@ decode_CCflag_0 (bu16 iw0)
 	  OUTS (outf, "A1");
 	  PCREG += 2; return;
 	}
-      else if ((opc == 7) && (I == 0) && (G == 0))
+      else if (opc == 7 && I == 0 && G == 0)
 	{
 	  notethat ("CC = A0 <= A1");
 	  OUTS (outf, "CC");
@@ -1676,17 +1675,17 @@ decode_CC2dreg_0 (bu16 iw0)
   int reg = ((iw0 >> 0) & 0x7);
   int op = ((iw0 >> 3) & 0x3);
 
-  if ((op == 0))
+  if (op == 0)
     {
       notethat ("dregs = CC");
       DREG (reg) = CCREG;
     }
-  else if ((op == 1))
+  else if (op == 1)
     {
       notethat ("CC = dregs");
       CCREG = DREG (reg) != 0;
     }
-  else if ((op == 3))
+  else if (op == 3)
     {
       notethat ("CC =! CC");
       CCREG = ! CCREG;
@@ -1814,37 +1813,37 @@ decode_ALU2op_0 (bu16 iw0)
   int opc = ((iw0 >> 6) & 0xf);
   int dst = ((iw0 >> 0) & 0x7);
 
-  if ((opc == 0))
+  if (opc == 0)
     {
       notethat ("dregs >>>= dregs");
       DREG (dst) = ashiftrt (DREG (dst), DREG (src));
     }
-  else if ((opc == 1))
+  else if (opc == 1)
     {
       notethat ("dregs >>= dregs");
       DREG (dst) = lshiftrt (DREG (dst), DREG (src));
     }
-  else if ((opc == 2))
+  else if (opc == 2)
     {
       notethat ("dregs <<= dregs");
       DREG (dst) = lshift (DREG (dst), DREG (src));
     }
-  else if ((opc == 3))
+  else if (opc == 3)
     {
       notethat ("dregs *= dregs");
       DREG (dst) *= DREG (src);
     }
-  else if ((opc == 4))
+  else if (opc == 4)
     {
       notethat ("dregs = (dregs + dregs) << 1");
       DREG (dst) = add_and_shift (DREG (dst), DREG (src), 1);
     }
-  else if ((opc == 5))
+  else if (opc == 5)
     {
       notethat ("dregs = (dregs + dregs) << 2");
       DREG (dst) = add_and_shift (DREG (dst), DREG (src), 2);
     }
-  else if ((opc == 8))
+  else if (opc == 8)
     {
       notethat ("DIVQ (dregs , dregs)");
       OUTS (outf, "DIVQ");
@@ -1855,7 +1854,7 @@ decode_ALU2op_0 (bu16 iw0)
       OUTS (outf, ")");
       PCREG += 2; return;
     }
-  else if ((opc == 9))
+  else if (opc == 9)
     {
       notethat ("DIVS (dregs , dregs)");
       OUTS (outf, "DIVS");
@@ -1865,31 +1864,31 @@ decode_ALU2op_0 (bu16 iw0)
       OUTS (outf, dregs (src));
       OUTS (outf, ")");
     }
-  else if ((opc == 10))
+  else if (opc == 10)
     {
       notethat ("dregs = dregs_lo (X)");
       DREG (dst) = (bs32) (bs16) DREG (src);
       setflags_logical (DREG (dst));
     }
-  else if ((opc == 11))
+  else if (opc == 11)
     {
       notethat ("dregs = dregs_lo (Z)");
       DREG (dst) = (bu32) (bu16) DREG (src);
       setflags_logical (DREG (dst));
     }
-  else if ((opc == 12))
+  else if (opc == 12)
     {
       notethat ("dregs = dregs_byte (X)");
       DREG (dst) = (bs32) (bs8) DREG (src);
       setflags_logical (DREG (dst));
     }
-  else if ((opc == 13))
+  else if (opc == 13)
     {
       notethat ("dregs = dregs_byte (Z)");
       DREG (dst) = (bu32) (bu8) DREG (src);
       setflags_logical (DREG (dst));
     }
-  else if ((opc == 14))
+  else if (opc == 14)
     {
       bu32 val = DREG (src);
       notethat ("dregs = - dregs");
@@ -1901,7 +1900,7 @@ decode_ALU2op_0 (bu16 iw0)
 	}
       /* @@@ Documentation isn't entirely clear about av0 and av1.  */
     }
-  else if ((opc == 15))
+  else if (opc == 15)
     {
       notethat ("dregs = ~ dregs");
       DREG (dst) = ~DREG (src);
@@ -1924,15 +1923,15 @@ decode_PTR2op_0 (bu16 iw0)
   int opc = ((iw0 >> 6) & 0x7);
   int dst = ((iw0 >> 0) & 0x7);
 
-  if ((opc == 0))
+  if (opc == 0)
     PREG (dst) -= PREG (src);
-  else if ((opc == 1))
+  else if (opc == 1)
     PREG (dst) = PREG (src) << 2;
-  else if ((opc == 3))
+  else if (opc == 3)
     PREG (dst) = PREG (src) >> 2;
-  else if ((opc == 4))
+  else if (opc == 4)
     PREG (dst) = PREG (src) >> 1;
-  else if ((opc == 5))
+  else if (opc == 5)
     {
       notethat ("pregs += pregs ( BREV )");
       OUTS (outf, pregs (dst));
@@ -1942,9 +1941,9 @@ decode_PTR2op_0 (bu16 iw0)
       OUTS (outf, "BREV");
       OUTS (outf, ")");
     }
-  else if ((opc == 6))
+  else if (opc == 6)
     PREG (dst) = (PREG (dst) + PREG (src)) << 1;
-  else if ((opc == 7))
+  else if (opc == 7)
     PREG (dst) = (PREG (dst) + PREG (src)) << 2;
   else
     unhandled_instruction ();
@@ -1964,45 +1963,45 @@ decode_LOGI2op_0 (bu16 iw0)
   int opc = ((iw0 >> 8) & 0x7);
   int dst = ((iw0 >> 0) & 0x7);
 
-  if ((opc == 0))
+  if (opc == 0)
     {
       notethat ("CC = ! BITTST ( dregs , uimm5 )");
       CCREG = (~DREG (dst) >> uimm5 (src)) & 1;
     }
-  else if ((opc == 1))
+  else if (opc == 1)
     {
       notethat ("CC = BITTST ( dregs , uimm5 )");
       CCREG = (DREG (dst) >> uimm5 (src)) & 1;
     }
-  else if ((opc == 2))
+  else if (opc == 2)
     {
       notethat ("BITSET ( dregs , uimm5 )");
       DREG (dst) |= 1 << uimm5 (src);
       setflags_logical (DREG (dst));
     }
-  else if ((opc == 3))
+  else if (opc == 3)
     {
       notethat ("BITTGL ( dregs , uimm5 )");
       DREG (dst) ^= 1 << uimm5 (src);
       setflags_logical (DREG (dst));
     }
-  else if ((opc == 4))
+  else if (opc == 4)
     {
       notethat ("BITCLR ( dregs , uimm5 )");
       DREG (dst) &= ~(1 << uimm5 (src));
       setflags_logical (DREG (dst));
     }
-  else if ((opc == 5))
+  else if (opc == 5)
     {
       notethat ("dregs >>>= uimm5");
       DREG (dst) = ashiftrt (DREG (dst), uimm5 (src));
     }
-  else if ((opc == 6))
+  else if (opc == 6)
     {
       notethat ("dregs >>= uimm5");
       DREG (dst) = lshiftrt (DREG (dst), uimm5 (src));
     }
-  else if ((opc == 7))
+  else if (opc == 7)
     {
       notethat ("dregs <<= uimm5");
       DREG (dst) = lshift (DREG (dst), uimm5 (src));
@@ -2024,41 +2023,41 @@ decode_COMP3op_0 (bu16 iw0)
   int dst = ((iw0 >> 6) & 0x7);
 
 
-  if ((opc == 0))
+  if (opc == 0)
     {
       notethat ("dregs = dregs + dregs");
       DREG (dst) = add32 (DREG (src0), DREG (src1), 1);
     }
-  else if ((opc == 1))
+  else if (opc == 1)
     {
       notethat ("dregs = dregs - dregs");
       DREG (dst) = sub32 (DREG (src0), DREG (src1), 1);
     }
-  else if ((opc == 2))
+  else if (opc == 2)
     {
       notethat ("dregs = dregs & dregs");
       DREG (dst) = DREG (src0) & DREG (src1);
       setflags_logical (DREG (dst));
     }
-  else if ((opc == 3))
+  else if (opc == 3)
     {
       notethat ("dregs = dregs | dregs");
       DREG (dst) = DREG (src0) | DREG (src1);
       setflags_logical (DREG (dst));
     }
-  else if ((opc == 4))
+  else if (opc == 4)
     {
       notethat ("dregs = dregs ^ dregs");
       DREG (dst) = DREG (src0) ^ DREG (src1);
       setflags_logical (DREG (dst));
     }
-  else if ((opc == 5))
+  else if (opc == 5)
     /* If src0 == src1 this is disassembled as a shift by 1, but this
        distinction doesn't matter for our purposes.  */
     PREG (dst) = PREG (src0) + PREG (src1);
-  else if ((opc == 6))
+  else if (opc == 6)
     PREG (dst) = PREG (src0) + (PREG (src1) << 1);
-  else if ((opc == 7))
+  else if (opc == 7)
     PREG (dst) = PREG (src0) + (PREG (src1) << 2);
 
   PCREG += 2; return;
@@ -2118,7 +2117,7 @@ decode_LDSTpmod_0 (bu16 iw0)
 
 
 
-  if ((aop == 1) && (W == 0) && (idx == ptr))
+  if (aop == 1 && W == 0 && idx == ptr)
     {
       notethat ("dregs_lo = W [ pregs ]");
       OUTS (outf, dregs_lo (reg));
@@ -2129,7 +2128,7 @@ decode_LDSTpmod_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((aop == 2) && (W == 0) && (idx == ptr))
+  else if (aop == 2 && W == 0 && idx == ptr)
     {
       notethat ("dregs_hi = W [ pregs ]");
       OUTS (outf, dregs_hi (reg));
@@ -2140,7 +2139,7 @@ decode_LDSTpmod_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((aop == 1) && (W == 1) && (idx == ptr))
+  else if (aop == 1 && W == 1 && idx == ptr)
     {
       notethat ("W [ pregs ] = dregs_lo");
       OUTS (outf, "W");
@@ -2151,7 +2150,7 @@ decode_LDSTpmod_0 (bu16 iw0)
       OUTS (outf, dregs_lo (reg));
       PCREG += 2; return;
     }
-  else if ((aop == 2) && (W == 1) && (idx == ptr))
+  else if (aop == 2 && W == 1 && idx == ptr)
     {
       notethat ("W [ pregs ] = dregs_hi");
       OUTS (outf, "W");
@@ -2162,7 +2161,7 @@ decode_LDSTpmod_0 (bu16 iw0)
       OUTS (outf, dregs_hi (reg));
       PCREG += 2; return;
     }
-  else if ((aop == 0) && (W == 0))
+  else if (aop == 0 && W == 0)
     {
       notethat ("dregs = [ pregs ++ pregs ]");
       OUTS (outf, dregs (reg));
@@ -2174,7 +2173,7 @@ decode_LDSTpmod_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((aop == 1) && (W == 0))
+  else if (aop == 1 && W == 0)
     {
       notethat ("dregs_lo = W [ pregs ++ pregs ]");
       OUTS (outf, dregs_lo (reg));
@@ -2187,7 +2186,7 @@ decode_LDSTpmod_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((aop == 2) && (W == 0))
+  else if (aop == 2 && W == 0)
     {
       notethat ("dregs_hi = W [ pregs ++ pregs ]");
       OUTS (outf, dregs_hi (reg));
@@ -2200,7 +2199,7 @@ decode_LDSTpmod_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((aop == 3) && (W == 0))
+  else if (aop == 3 && W == 0)
     {
       notethat ("dregs = W [ pregs ++ pregs ] (Z)");
       OUTS (outf, dregs (reg));
@@ -2213,7 +2212,7 @@ decode_LDSTpmod_0 (bu16 iw0)
       OUTS (outf, "] (Z)");
       PCREG += 2; return;
     }
-  else if ((aop == 3) && (W == 1))
+  else if (aop == 3 && W == 1)
     {
       notethat ("dregs = W [ pregs ++ pregs ] (X)");
       OUTS (outf, dregs (reg));
@@ -2229,7 +2228,7 @@ decode_LDSTpmod_0 (bu16 iw0)
       OUTS (outf, ")");
       PCREG += 2; return;
     }
-  else if ((aop == 0) && (W == 1))
+  else if (aop == 0 && W == 1)
     {
       notethat ("[ pregs ++ pregs ] = dregs");
       OUTS (outf, "[");
@@ -2241,7 +2240,7 @@ decode_LDSTpmod_0 (bu16 iw0)
       OUTS (outf, dregs (reg));
       PCREG += 2; return;
     }
-  else if ((aop == 1) && (W == 1))
+  else if (aop == 1 && W == 1)
     {
       notethat (" W [ pregs ++ pregs ] = dregs_lo");
       OUTS (outf, "W");
@@ -2254,7 +2253,7 @@ decode_LDSTpmod_0 (bu16 iw0)
       OUTS (outf, dregs_lo (reg));
       PCREG += 2; return;
     }
-  else if ((aop == 2) && (W == 1))
+  else if (aop == 2 && W == 1)
     {
       notethat (" W[ pregs ++ pregs ] = dregs_hi");
       OUTS (outf, "W");
@@ -2286,7 +2285,7 @@ decode_dagMODim_0 (bu16 iw0)
 
 
 
-  if ((op == 0) && (br == 1))
+  if (op == 0 && br == 1)
     {
       notethat ("iregs += mregs ( BREV )");
       OUTS (outf, iregs (i));
@@ -2297,7 +2296,7 @@ decode_dagMODim_0 (bu16 iw0)
       OUTS (outf, ")");
       PCREG += 2; return;
     }
-  else if ((op == 0))
+  else if (op == 0)
     {
       notethat ("iregs += mregs");
       OUTS (outf, iregs (i));
@@ -2305,7 +2304,7 @@ decode_dagMODim_0 (bu16 iw0)
       OUTS (outf, mregs (m));
       PCREG += 2; return;
     }
-  else if ((op == 1))
+  else if (op == 1)
     {
       notethat ("iregs -= mregs");
       OUTS (outf, iregs (i));
@@ -2330,7 +2329,7 @@ decode_dagMODik_0 (bu16 iw0)
 
 
 
-  if ((op == 0))
+  if (op == 0)
     {
       notethat ("iregs += 2");
       OUTS (outf, iregs (i));
@@ -2338,7 +2337,7 @@ decode_dagMODik_0 (bu16 iw0)
       OUTS (outf, "2");
       PCREG += 2; return;
     }
-  else if ((op == 1))
+  else if (op == 1)
     {
       notethat ("iregs -= 2");
       OUTS (outf, iregs (i));
@@ -2346,7 +2345,7 @@ decode_dagMODik_0 (bu16 iw0)
       OUTS (outf, "2");
       PCREG += 2; return;
     }
-  else if ((op == 2))
+  else if (op == 2)
     {
       notethat ("iregs += 4");
       OUTS (outf, iregs (i));
@@ -2354,7 +2353,7 @@ decode_dagMODik_0 (bu16 iw0)
       OUTS (outf, "4");
       PCREG += 2; return;
     }
-  else if ((op == 3))
+  else if (op == 3)
     {
       notethat ("iregs -= 4");
       OUTS (outf, iregs (i));
@@ -2382,7 +2381,7 @@ decode_dspLDST_0 (bu16 iw0)
 
 
 
-  if ((aop == 0) && (W == 0) && (m == 0))
+  if (aop == 0 && W == 0 && m == 0)
     {
       notethat ("dregs = [ iregs ++ ]");
       OUTS (outf, dregs (reg));
@@ -2393,7 +2392,7 @@ decode_dspLDST_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((aop == 0) && (W == 0) && (m == 1))
+  else if (aop == 0 && W == 0 && m == 1)
     {
       notethat ("dregs_lo = W [ iregs ++ ]");
       OUTS (outf, dregs_lo (reg));
@@ -2405,7 +2404,7 @@ decode_dspLDST_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((aop == 0) && (W == 0) && (m == 2))
+  else if (aop == 0 && W == 0 && m == 2)
     {
       notethat ("dregs_hi = W [ iregs ++ ]");
       OUTS (outf, dregs_hi (reg));
@@ -2417,7 +2416,7 @@ decode_dspLDST_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((aop == 1) && (W == 0) && (m == 0))
+  else if (aop == 1 && W == 0 && m == 0)
     {
       notethat ("dregs = [ iregs -- ]");
       OUTS (outf, dregs (reg));
@@ -2428,7 +2427,7 @@ decode_dspLDST_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((aop == 1) && (W == 0) && (m == 1))
+  else if (aop == 1 && W == 0 && m == 1)
     {
       notethat ("dregs_lo = W [ iregs -- ]");
       OUTS (outf, dregs_lo (reg));
@@ -2440,7 +2439,7 @@ decode_dspLDST_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((aop == 1) && (W == 0) && (m == 2))
+  else if (aop == 1 && W == 0 && m == 2)
     {
       notethat ("dregs_hi = W [ iregs -- ]");
       OUTS (outf, dregs_hi (reg));
@@ -2452,7 +2451,7 @@ decode_dspLDST_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((aop == 2) && (W == 0) && (m == 0))
+  else if (aop == 2 && W == 0 && m == 0)
     {
       notethat ("dregs = [ iregs ]");
       OUTS (outf, dregs (reg));
@@ -2462,7 +2461,7 @@ decode_dspLDST_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((aop == 2) && (W == 0) && (m == 1))
+  else if (aop == 2 && W == 0 && m == 1)
     {
       notethat ("dregs_lo = W [ iregs ]");
       OUTS (outf, dregs_lo (reg));
@@ -2473,7 +2472,7 @@ decode_dspLDST_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((aop == 2) && (W == 0) && (m == 2))
+  else if (aop == 2 && W == 0 && m == 2)
     {
       notethat ("dregs_hi = W [ iregs ]");
       OUTS (outf, dregs_hi (reg));
@@ -2484,7 +2483,7 @@ decode_dspLDST_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((aop == 0) && (W == 1) && (m == 0))
+  else if (aop == 0 && W == 1 && m == 0)
     {
       notethat ("[ iregs ++ ] = dregs");
       OUTS (outf, "[");
@@ -2495,7 +2494,7 @@ decode_dspLDST_0 (bu16 iw0)
       OUTS (outf, dregs (reg));
       PCREG += 2; return;
     }
-  else if ((aop == 0) && (W == 1) && (m == 1))
+  else if (aop == 0 && W == 1 && m == 1)
     {
       notethat ("W [ iregs ++ ] = dregs_lo");
       OUTS (outf, "W");
@@ -2507,7 +2506,7 @@ decode_dspLDST_0 (bu16 iw0)
       OUTS (outf, dregs_lo (reg));
       PCREG += 2; return;
     }
-  else if ((aop == 0) && (W == 1) && (m == 2))
+  else if (aop == 0 && W == 1 && m == 2)
     {
       notethat ("W [ iregs ++ ] = dregs_hi");
       OUTS (outf, "W");
@@ -2519,7 +2518,7 @@ decode_dspLDST_0 (bu16 iw0)
       OUTS (outf, dregs_hi (reg));
       PCREG += 2; return;
     }
-  else if ((aop == 1) && (W == 1) && (m == 0))
+  else if (aop == 1 && W == 1 && m == 0)
     {
       notethat ("[ iregs -- ] = dregs");
       OUTS (outf, "[");
@@ -2530,7 +2529,7 @@ decode_dspLDST_0 (bu16 iw0)
       OUTS (outf, dregs (reg));
       PCREG += 2; return;
     }
-  else if ((aop == 1) && (W == 1) && (m == 1))
+  else if (aop == 1 && W == 1 && m == 1)
     {
       notethat ("W [ iregs -- ] = dregs_lo");
       OUTS (outf, "W");
@@ -2542,7 +2541,7 @@ decode_dspLDST_0 (bu16 iw0)
       OUTS (outf, dregs_lo (reg));
       PCREG += 2; return;
     }
-  else if ((aop == 1) && (W == 1) && (m == 2))
+  else if (aop == 1 && W == 1 && m == 2)
     {
       notethat ("W [ iregs -- ] = dregs_hi");
       OUTS (outf, "W");
@@ -2554,7 +2553,7 @@ decode_dspLDST_0 (bu16 iw0)
       OUTS (outf, dregs_hi (reg));
       PCREG += 2; return;
     }
-  else if ((aop == 2) && (W == 1) && (m == 0))
+  else if (aop == 2 && W == 1 && m == 0)
     {
       notethat ("[ iregs ] = dregs");
       OUTS (outf, "[");
@@ -2564,7 +2563,7 @@ decode_dspLDST_0 (bu16 iw0)
       OUTS (outf, dregs (reg));
       PCREG += 2; return;
     }
-  else if ((aop == 2) && (W == 1) && (m == 1))
+  else if (aop == 2 && W == 1 && m == 1)
     {
       notethat (" W [ iregs ] = dregs_lo");
       OUTS (outf, "W");
@@ -2575,7 +2574,7 @@ decode_dspLDST_0 (bu16 iw0)
       OUTS (outf, dregs_lo (reg));
       PCREG += 2; return;
     }
-  else if ((aop == 2) && (W == 1) && (m == 2))
+  else if (aop == 2 && W == 1 && m == 2)
     {
       notethat (" W [ iregs ] = dregs_hi");
       OUTS (outf, "W");
@@ -2586,7 +2585,7 @@ decode_dspLDST_0 (bu16 iw0)
       OUTS (outf, dregs_hi (reg));
       PCREG += 2; return;
     }
-  else if ((aop == 3) && (W == 0))
+  else if (aop == 3 && W == 0)
     {
       notethat ("dregs = [ iregs ++ mregs ]");
       OUTS (outf, dregs (reg));
@@ -2598,7 +2597,7 @@ decode_dspLDST_0 (bu16 iw0)
       OUTS (outf, "]");
       PCREG += 2; return;
     }
-  else if ((aop == 3) && (W == 1))
+  else if (aop == 3 && W == 1)
     {
       notethat ("[ iregs ++ mregs ] = dregs");
       OUTS (outf, "[");
@@ -2638,32 +2637,32 @@ decode_LDST_0 (bu16 iw0)
 	if (ptr == reg)
 	  unhandled_instruction ();
 
-      if ((sz == 0) && (Z == 0))
+      if (sz == 0 && Z == 0)
 	{
 	  notethat ("dregs = [ pregs ]");
 	  DREG (reg) = get_long (saved_state.memory, PREG (ptr));
 	}
-      else if ((sz == 0) && (Z == 1))
+      else if (sz == 0 && Z == 1)
 	{
 	  notethat ("pregs = [ pregs ]");
 	  PREG (reg) = get_long (saved_state.memory, PREG (ptr));
 	}
-      else if ((sz == 1) && (Z == 0))
+      else if (sz == 1 && Z == 0)
 	{
 	  notethat ("dregs = W [ pregs ] (z)");
 	  DREG (reg) = get_word (saved_state.memory, PREG (ptr));
 	}
-      else if ((sz == 1) && (Z == 1))
+      else if (sz == 1 && Z == 1)
 	{
 	  notethat ("dregs = W [ pregs ] (X)");
 	  DREG (reg) = (bs32) (bs16) get_word (saved_state.memory, PREG (ptr));
 	}
-      else if ((sz == 2) && (Z == 0))
+      else if (sz == 2 && Z == 0)
 	{
 	  notethat ("dregs = B [ pregs ] (Z)");
 	  DREG (reg) = get_byte (saved_state.memory, PREG (ptr));
 	}
-      else if ((sz == 2) && (Z == 1))
+      else if (sz == 2 && Z == 1)
 	{
 	  notethat ("dregs = B [ pregs ] (X)");
 	  DREG (reg) = (bs32) (bs8) get_byte (saved_state.memory, PREG (ptr));
@@ -2679,22 +2678,22 @@ decode_LDST_0 (bu16 iw0)
       if (sz != 0 && Z == 1)
 	unhandled_instruction ();
 
-      if ((sz == 0) && (Z == 0))
+      if (sz == 0 && Z == 0)
 	{
 	  notethat ("[ pregs ] = dregs");
 	  put_long (saved_state.memory, PREG (ptr), DREG (reg));
 	}
-      else if ((sz == 0) && (Z == 1))
+      else if (sz == 0 && Z == 1)
 	{
 	  notethat ("[ pregs ] = pregs");
 	  put_long (saved_state.memory, PREG (ptr), PREG (reg));
 	}
-      else if ((sz == 1) && (Z == 0))
+      else if (sz == 1 && Z == 0)
 	{
 	  notethat ("W [ pregs ] = dregs");
 	  put_word (saved_state.memory, PREG (ptr), DREG (reg));
 	}
-      else if ((sz == 2) && (Z == 0))
+      else if (sz == 2 && Z == 0)
 	{
 	  notethat ("B [ pregs ] = dregs");
 	  put_byte (saved_state.memory, PREG (ptr), DREG (reg));
@@ -2807,14 +2806,14 @@ decode_LoopSetup_0 (bu16 iw0, bu16 iw1, bu32 pc)
   int eoffset = ((iw1 >> 0) & 0x3ff);
   int reg = ((iw1 >> 12) & 0xf);
 
-  if ((rop == 0))
+  if (rop == 0)
     {
       notethat ("LSETUP ( pcrel4 , lppcrel10 ) counters");
       saved_state.lt[c] = PCREG + pcrel4 (soffset);
       saved_state.lb[c] = PCREG + lppcrel10 (eoffset);
       PCREG += 4; return;
     }
-  else if ((rop == 1))
+  else if (rop == 1)
     {
       notethat ("LSETUP ( pcrel4 , lppcrel10 ) counters = pregs");
       saved_state.lt[c] = PCREG + pcrel4 (soffset);
@@ -2822,7 +2821,7 @@ decode_LoopSetup_0 (bu16 iw0, bu16 iw1, bu32 pc)
       saved_state.lc[c] = PREG (reg);
       PCREG += 4; return;
     }
-  else if ((rop == 3))
+  else if (rop == 3)
     {
       notethat ("LSETUP ( pcrel4 , lppcrel10 ) counters = pregs >> 1");
       saved_state.lt[c] = PCREG + pcrel4 (soffset);
@@ -2850,26 +2849,26 @@ decode_LDIMMhalf_0 (bu16 iw0, bu16 iw1, bu32 pc)
   int hword = ((iw1 >> 0) & 0xffff);
   int reg = ((iw0 >> 0) & 0x7);
 
-  if ((H == 0) && (S == 1) && (Z == 0))
+  if (H == 0 && S == 1 && Z == 0)
     {
       int *pval = get_allreg (grp, reg);
       notethat ("regs = imm16 (x)");
       *pval = imm16 (hword);
     }
-  else if ((H == 0) && (S == 0) && (Z == 1))
+  else if (H == 0 && S == 0 && Z == 1)
     {
       int *pval = get_allreg (grp, reg);
       notethat ("regs = luimm16 (Z)");
       *pval = luimm16 (hword);
     }
-  else if ((H == 0) && (S == 0) && (Z == 0))
+  else if (H == 0 && S == 0 && Z == 0)
     {
       int *pval = get_allreg (grp, reg);
       notethat ("regs_lo = luimm16");
       *pval &= 0xFFFF0000;
       *pval |= luimm16 (hword);
     }
-  else if ((H == 1) && (S == 0) && (Z == 0))
+  else if (H == 1 && S == 0 && Z == 0)
     {
       int *pval = get_allreg (grp, reg);
       notethat ("regs_hi = huimm16");
@@ -2894,7 +2893,7 @@ decode_CALLa_0 (bu16 iw0, bu16 iw1, bu32 pc)
   int lsw = ((iw1 >> 0) & 0xffff);
   int msw = ((iw0 >> 0) & 0xff);
 
-  if ((S == 1))
+  if (S == 1)
     {
       notethat ("CALL  pcrel24");
       saved_state.rets = PCREG + 4;
@@ -2925,32 +2924,32 @@ decode_LDSTidxI_0 (bu16 iw0, bu16 iw1, bu32 pc)
 
   if (W == 0)
     {
-      if ((sz == 0) && (Z == 0))
+      if (sz == 0 && Z == 0)
 	{
 	  notethat ("dregs = [ pregs + imm16s4 ]");
 	  DREG (reg) = get_long (saved_state.memory, PREG (ptr) + imm16s4 (offset));
 	}
-      else if ((sz == 0) && (Z == 1))
+      else if (sz == 0 && Z == 1)
 	{
 	  notethat ("pregs = [ pregs + imm16s4 ]");
 	  PREG (reg) = get_long (saved_state.memory, PREG (ptr) + imm16s4 (offset));
 	}
-      else if ((sz == 1) && (Z == 0))
+      else if (sz == 1 && Z == 0)
 	{
 	  notethat ("dregs = W [ pregs + imm16s2 ] (Z)");
 	  DREG (reg) = get_word (saved_state.memory, PREG (ptr) + imm16s2 (offset));
 	}
-      else if ((sz == 1) && (Z == 1))
+      else if (sz == 1 && Z == 1)
 	{
 	  notethat ("dregs = W [ pregs + imm16s2 ] (X)");
 	  DREG (reg) = (bs32) (bs16) get_word (saved_state.memory, PREG (ptr) + imm16s2 (offset));
 	}
-      else if ((sz == 2) && (Z == 0))
+      else if (sz == 2 && Z == 0)
 	{
 	  notethat ("dregs = B [ pregs + imm16 ] (Z)");
 	  DREG (reg) = get_byte (saved_state.memory, PREG (ptr) + imm16 (offset));
 	}
-      else if ((sz == 2) && (Z == 1))
+      else if (sz == 2 && Z == 1)
 	{
 	  notethat ("dregs = B [ pregs + imm16 ] (X)");
 	  DREG (reg) = (bs32) (bs8) get_byte (saved_state.memory, PREG (ptr) + imm16 (offset));
@@ -2960,22 +2959,22 @@ decode_LDSTidxI_0 (bu16 iw0, bu16 iw1, bu32 pc)
     if (sz != 0 && Z != 0)
       unhandled_instruction ();
 
-    if ((sz == 0) && (Z == 0))
+    if (sz == 0 && Z == 0)
       {
 	notethat ("[ pregs + imm16s4 ] = dregs");
 	put_long (saved_state.memory, PREG (ptr) + imm16s4 (offset), DREG (reg));
       }
-    else if ((sz == 0) && (Z == 1))
+    else if (sz == 0 && Z == 1)
       {
 	notethat ("[ pregs + imm16s4 ] = pregs");
 	put_long (saved_state.memory, PREG (ptr) + imm16s4 (offset), PREG (reg));
       }
-    else if ((sz == 1) && (Z == 0))
+    else if (sz == 1 && Z == 0)
       {
 	notethat ("W [ pregs + imm16s2 ] = dregs");
 	put_word (saved_state.memory, PREG (ptr) + imm16s2 (offset), DREG (reg));
       }
-    else if ((sz == 2) && (Z == 0))
+    else if (sz == 2 && Z == 0)
       {
 	notethat ("B [ pregs + imm16 ] = dregs");
 	put_byte (saved_state.memory, PREG (ptr) + imm16 (offset), DREG (reg));
@@ -2996,7 +2995,7 @@ decode_linkage_0 (bu16 iw0, bu16 iw1)
   int R = ((iw0 >> 0) & 0x1);
   int framesize = ((iw1 >> 0) & 0xffff);
 
-  if ((R == 0))
+  if (R == 0)
     {
       bu32 sp = PREG (6);
       notethat ("LINK uimm16s4");
@@ -3047,7 +3046,7 @@ decode_dsp32mac_0 (bu16 iw0, bu16 iw1, bu32 pc)
   int mmod = ((iw0 >> 5) & 0xf);
   int op0 = ((iw1 >> 11) & 0x3);
 
-  if ((w0 == 0) && (w1 == 0) && (P == 0) && (op1 != 3) && (op0 != 3))
+  if (w0 == 0 && w1 == 0 && P == 0 && op1 != 3 && op0 != 3)
     {
       notethat ("A1macfunc mxd_mod , A0macfunc macmod_accm");
       A1macfunc (iw0, iw1, op1, h01, h11, pc);
@@ -3059,7 +3058,7 @@ decode_dsp32mac_0 (bu16 iw0, bu16 iw1, bu32 pc)
       macmod_accm (mmod, pc);
       PCREG += 4; return;
     }
-  else if ((w0 == 0) && (w1 == 0) && (P == 0) && (op1 != 3) && (op0 == 3))
+  else if (w0 == 0 && w1 == 0 && P == 0 && op1 != 3 && op0 == 3)
     {
       notethat ("A1macfunc mxd_mod");
       A1macfunc (iw0, iw1, op1, h01, h11, pc);
@@ -3067,7 +3066,7 @@ decode_dsp32mac_0 (bu16 iw0, bu16 iw1, bu32 pc)
       mxd_mod (MM, pc);
       PCREG += 4; return;
     }
-  else if ((w0 == 0) && (w1 == 0) && (P == 0) && (op1 == 3) && (op0 != 3))
+  else if (w0 == 0 && w1 == 0 && P == 0 && op1 == 3 && op0 != 3)
     {
       notethat ("A0macfunc macmod_accm");
       A0macfunc (iw0, iw1, op0, h00, h10, pc);
@@ -3075,7 +3074,7 @@ decode_dsp32mac_0 (bu16 iw0, bu16 iw1, bu32 pc)
       macmod_accm (mmod, pc);
       PCREG += 4; return;
     }
-  else if ((w0 == 0) && (w1 == 1) && (P == 0) && (op0 != 3) && (op1 != 3))
+  else if (w0 == 0 && w1 == 1 && P == 0 && op0 != 3 && op1 != 3)
     {
       notethat ("dregs_hi = ( A1macfunc ) mxd_mod , A0macfunc macmod_hmove");
       OUTS (outf, dregs_hi (dst));
@@ -3090,7 +3089,7 @@ decode_dsp32mac_0 (bu16 iw0, bu16 iw1, bu32 pc)
       macmod_hmove (mmod, pc);
       PCREG += 4; return;
     }
-  else if ((w0 == 1) && (w1 == 0) && (P == 0) && (op0 != 3) && (op1 != 3))
+  else if (w0 == 1 && w1 == 0 && P == 0 && op0 != 3 && op1 != 3)
     {
       notethat ("A1macfunc mxd_mod , dregs_lo = ( A0macfunc ) macmod_hmove");
       A1macfunc (iw0, iw1, op1, h01, h11, pc);
@@ -3105,7 +3104,7 @@ decode_dsp32mac_0 (bu16 iw0, bu16 iw1, bu32 pc)
       macmod_hmove (mmod, pc);
       PCREG += 4; return;
     }
-  else if ((w0 == 1) && (w1 == 1) && (P == 0) && (op0 != 3) && (op1 != 3))
+  else if (w0 == 1 && w1 == 1 && P == 0 && op0 != 3 && op1 != 3)
     {
       notethat
 	("dregs_hi = ( A1macfunc) mxd_mod , dregs_lo = (A0macfunc ) macmod_hmove");
@@ -3124,7 +3123,7 @@ decode_dsp32mac_0 (bu16 iw0, bu16 iw1, bu32 pc)
       macmod_hmove (mmod, pc);
       PCREG += 4; return;
     }
-  else if ((w0 == 1) && (w1 == 0) && (P == 0) && (op0 != 3) && (op1 == 3))
+  else if (w0 == 1 && w1 == 0 && P == 0 && op0 != 3 && op1 == 3)
     {
       notethat ("dregs_lo = (A0macfunc ) macmod_hmove");
       OUTS (outf, dregs_lo (dst));
@@ -3135,7 +3134,7 @@ decode_dsp32mac_0 (bu16 iw0, bu16 iw1, bu32 pc)
       macmod_hmove (mmod, pc);
       PCREG += 4; return;
     }
-  else if ((w0 == 0) && (w1 == 1) && (P == 1) && (op0 != 3) && (op1 != 3))
+  else if (w0 == 0 && w1 == 1 && P == 1 && op0 != 3 && op1 != 3)
     {
       notethat ("dregs = ( A1macfunc ) mxd_mod , A0macfunc macmod_hmove");
       OUTS (outf, dregs (dst));
@@ -3150,7 +3149,7 @@ decode_dsp32mac_0 (bu16 iw0, bu16 iw1, bu32 pc)
       macmod_hmove (mmod, pc);
       PCREG += 4; return;
     }
-  else if ((w0 == 1) && (w1 == 0) && (P == 1) && (op0 != 3) && (op1 != 3))
+  else if (w0 == 1 && w1 == 0 && P == 1 && op0 != 3 && op1 != 3)
     {
       notethat ("A1macfunc mxd_mod , dregs = ( A0macfunc ) macmod_hmove");
       A1macfunc (iw0, iw1, op1, h01, h11, pc);
@@ -3165,7 +3164,7 @@ decode_dsp32mac_0 (bu16 iw0, bu16 iw1, bu32 pc)
       macmod_hmove (mmod, pc);
       PCREG += 4; return;
     }
-  else if ((w0 == 1) && (w1 == 1) && (P == 0) && (op0 != 3) && (op1 == 3))
+  else if (w0 == 1 && w1 == 1 && P == 0 && op0 != 3 && op1 == 3)
     {
       notethat ("dregs = ( A0macfunc ) macmod_hmove");
       OUTS (outf, dregs (dst));
@@ -3176,7 +3175,7 @@ decode_dsp32mac_0 (bu16 iw0, bu16 iw1, bu32 pc)
       macmod_hmove (mmod, pc);
       PCREG += 4; return;
     }
-  else if ((w0 == 1) && (w1 == 1) && (P == 1) && (op0 != 3) && (op1 != 3))
+  else if (w0 == 1 && w1 == 1 && P == 1 && op0 != 3 && op1 != 3)
     {
       notethat
 	("dregs = ( A1macfunc) mxd_mod , dregs = (A0macfunc ) macmod_hmove");
@@ -3226,7 +3225,7 @@ decode_dsp32mult_0 (bu16 iw0, bu16 iw1, bu32 pc)
 
 
 
-  if ((w0 == 0) && (w1 == 1) && (P == 0) && (MM == 0))
+  if (w0 == 0 && w1 == 1 && P == 0 && MM == 0)
     {
       notethat ("dregs_hi = multfunc macmod_hmove");
       OUTS (outf, dregs_hi (dst));
@@ -3236,7 +3235,7 @@ decode_dsp32mult_0 (bu16 iw0, bu16 iw1, bu32 pc)
       macmod_hmove (mmod, pc);
       PCREG += 4; return;
     }
-  else if ((w0 == 1) && (w1 == 0) && (P == 0) && (MM == 0))
+  else if (w0 == 1 && w1 == 0 && P == 0 && MM == 0)
     {
       notethat ("dregs_lo = multfunc macmod_hmove");
       OUTS (outf, dregs_lo (dst));
@@ -3246,7 +3245,7 @@ decode_dsp32mult_0 (bu16 iw0, bu16 iw1, bu32 pc)
       macmod_hmove (mmod, pc);
       PCREG += 4; return;
     }
-  else if ((w0 == 0) && (w1 == 1) && (P == 1) && (MM == 0))
+  else if (w0 == 0 && w1 == 1 && P == 1 && MM == 0)
     {
       notethat ("dregs (odd) =  multfunc macmod_hmove");
       OUTS (outf, dregs (dst));
@@ -3256,7 +3255,7 @@ decode_dsp32mult_0 (bu16 iw0, bu16 iw1, bu32 pc)
       macmod_hmove (mmod, pc);
       PCREG += 4; return;
     }
-  else if ((w0 == 1) && (w1 == 0) && (P == 1) && (MM == 0))
+  else if (w0 == 1 && w1 == 0 && P == 1 && MM == 0)
     {
       notethat ("dregs (even) =  multfunc macmod_hmove");
       OUTS (outf, dregs (dst));
@@ -3266,7 +3265,7 @@ decode_dsp32mult_0 (bu16 iw0, bu16 iw1, bu32 pc)
       macmod_hmove (mmod, pc);
       PCREG += 4; return;
     }
-  else if ((w0 == 1) && (w1 == 1) && (P == 0))
+  else if (w0 == 1 && w1 == 1 && P == 0)
     {
       notethat
 	("dregs_hi = multfunc mxd_mod , dregs_lo = multfunc macmod_hmove");
@@ -3281,7 +3280,7 @@ decode_dsp32mult_0 (bu16 iw0, bu16 iw1, bu32 pc)
       macmod_hmove (mmod, pc);
       PCREG += 4; return;
     }
-  else if ((w0 == 1) && (w1 == 1) && (P == 1))
+  else if (w0 == 1 && w1 == 1 && P == 1)
     {
       notethat ("dregs = multfunc mxd_mod , dregs = multfunc macmod_hmove");
       OUTS (outf, dregs (1 + dst));
@@ -3321,7 +3320,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
 
 
 
-  if ((aop == 0) && (aopcde == 9) && (HL == 0) && (s == 0))
+  if (aop == 0 && aopcde == 9 && HL == 0 && s == 0)
     {
       notethat ("A0.L = dregs_lo");
       OUTS (outf, "A0.L");
@@ -3329,7 +3328,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src0));
       PCREG += 4; return;
     }
-  else if ((aop == 2) && (aopcde == 9) && (HL == 1) && (s == 0))
+  else if (aop == 2 && aopcde == 9 && HL == 1 && s == 0)
     {
       notethat ("A1.H = dregs_hi");
       OUTS (outf, "A1.H");
@@ -3337,7 +3336,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_hi (src0));
       PCREG += 4; return;
     }
-  else if ((aop == 2) && (aopcde == 9) && (HL == 0) && (s == 0))
+  else if (aop == 2 && aopcde == 9 && HL == 0 && s == 0)
     {
       notethat ("A1.L = dregs_lo");
       OUTS (outf, "A1.L");
@@ -3345,7 +3344,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src0));
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (aopcde == 9) && (HL == 1) && (s == 0))
+  else if (aop == 0 && aopcde == 9 && HL == 1 && s == 0)
     {
       notethat ("A0.H = dregs_hi");
       OUTS (outf, "A0.H");
@@ -3353,7 +3352,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_hi (src0));
       PCREG += 4; return;
     }
-  else if ((x == 1) && (HL == 1) && (aop == 3) && (aopcde == 5))
+  else if (x == 1 && HL == 1 && aop == 3 && aopcde == 5)
     {
       notethat ("dregs_hi = dregs - dregs (RND20)");
       OUTS (outf, dregs_hi (dst0));
@@ -3366,7 +3365,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((x == 1) && (HL == 1) && (aop == 2) && (aopcde == 5))
+  else if (x == 1 && HL == 1 && aop == 2 && aopcde == 5)
     {
       notethat ("dregs_hi = dregs + dregs (RND20)");
       OUTS (outf, dregs_hi (dst0));
@@ -3379,7 +3378,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((x == 0) && (HL == 0) && (aop == 1) && (aopcde == 5))
+  else if (x == 0 && HL == 0 && aop == 1 && aopcde == 5)
     {
       notethat ("dregs_lo = dregs - dregs (RND12)");
       OUTS (outf, dregs_lo (dst0));
@@ -3392,7 +3391,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((x == 0) && (HL == 0) && (aop == 0) && (aopcde == 5))
+  else if (x == 0 && HL == 0 && aop == 0 && aopcde == 5)
     {
       notethat ("dregs_lo = dregs + dregs (RND12)");
       OUTS (outf, dregs_lo (dst0));
@@ -3405,7 +3404,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((x == 1) && (HL == 0) && (aop == 3) && (aopcde == 5))
+  else if (x == 1 && HL == 0 && aop == 3 && aopcde == 5)
     {
       notethat ("dregs_lo = dregs - dregs (RND20)");
       OUTS (outf, dregs_lo (dst0));
@@ -3418,7 +3417,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((x == 0) && (HL == 1) && (aop == 0) && (aopcde == 5))
+  else if (x == 0 && HL == 1 && aop == 0 && aopcde == 5)
     {
       notethat ("dregs_hi = dregs + dregs (RND12)");
       OUTS (outf, dregs_hi (dst0));
@@ -3431,7 +3430,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((x == 1) && (HL == 0) && (aop == 2) && (aopcde == 5))
+  else if (x == 1 && HL == 0 && aop == 2 && aopcde == 5)
     {
       notethat ("dregs_lo = dregs + dregs (RND20)");
       OUTS (outf, dregs_lo (dst0));
@@ -3444,7 +3443,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((x == 0) && (HL == 1) && (aop == 1) && (aopcde == 5))
+  else if (x == 0 && HL == 1 && aop == 1 && aopcde == 5)
     {
       notethat ("dregs_hi = dregs - dregs (RND12)");
       OUTS (outf, dregs_hi (dst0));
@@ -3457,7 +3456,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((HL == 1) && (aop == 0) && (aopcde == 2))
+  else if (HL == 1 && aop == 0 && aopcde == 2)
     {
       notethat ("dregs_hi = dregs_lo + dregs_lo amod1");
       OUTS (outf, dregs_hi (dst0));
@@ -3469,7 +3468,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod1 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((HL == 1) && (aop == 1) && (aopcde == 2))
+  else if (HL == 1 && aop == 1 && aopcde == 2)
     {
       notethat ("dregs_hi = dregs_lo + dregs_hi amod1");
       OUTS (outf, dregs_hi (dst0));
@@ -3481,7 +3480,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod1 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((HL == 1) && (aop == 2) && (aopcde == 2))
+  else if (HL == 1 && aop == 2 && aopcde == 2)
     {
       notethat ("dregs_hi = dregs_hi + dregs_lo amod1");
       OUTS (outf, dregs_hi (dst0));
@@ -3493,7 +3492,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod1 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((HL == 1) && (aop == 3) && (aopcde == 2))
+  else if (HL == 1 && aop == 3 && aopcde == 2)
     {
       notethat ("dregs_hi = dregs_hi + dregs_hi amod1");
       OUTS (outf, dregs_hi (dst0));
@@ -3505,7 +3504,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod1 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((HL == 0) && (aop == 0) && (aopcde == 3))
+  else if (HL == 0 && aop == 0 && aopcde == 3)
     {
       notethat ("dregs_lo = dregs_lo - dregs_lo amod1");
       OUTS (outf, dregs_lo (dst0));
@@ -3517,7 +3516,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod1 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((HL == 0) && (aop == 1) && (aopcde == 3))
+  else if (HL == 0 && aop == 1 && aopcde == 3)
     {
       notethat ("dregs_lo = dregs_lo - dregs_hi amod1");
       OUTS (outf, dregs_lo (dst0));
@@ -3529,7 +3528,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod1 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((HL == 0) && (aop == 3) && (aopcde == 2))
+  else if (HL == 0 && aop == 3 && aopcde == 2)
     {
       notethat ("dregs_lo = dregs_hi + dregs_hi amod1");
       OUTS (outf, dregs_lo (dst0));
@@ -3541,7 +3540,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod1 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((HL == 1) && (aop == 0) && (aopcde == 3))
+  else if (HL == 1 && aop == 0 && aopcde == 3)
     {
       notethat ("dregs_hi = dregs_lo - dregs_lo amod1");
       OUTS (outf, dregs_hi (dst0));
@@ -3553,7 +3552,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod1 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((HL == 1) && (aop == 1) && (aopcde == 3))
+  else if (HL == 1 && aop == 1 && aopcde == 3)
     {
       notethat ("dregs_hi = dregs_lo - dregs_hi amod1");
       OUTS (outf, dregs_hi (dst0));
@@ -3565,7 +3564,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod1 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((HL == 1) && (aop == 2) && (aopcde == 3))
+  else if (HL == 1 && aop == 2 && aopcde == 3)
     {
       notethat ("dregs_hi = dregs_hi - dregs_lo amod1");
       OUTS (outf, dregs_hi (dst0));
@@ -3577,7 +3576,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod1 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((HL == 1) && (aop == 3) && (aopcde == 3))
+  else if (HL == 1 && aop == 3 && aopcde == 3)
     {
       notethat ("dregs_hi = dregs_hi - dregs_hi amod1");
       OUTS (outf, dregs_hi (dst0));
@@ -3589,7 +3588,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod1 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((HL == 0) && (aop == 2) && (aopcde == 2))
+  else if (HL == 0 && aop == 2 && aopcde == 2)
     {
       notethat ("dregs_lo = dregs_hi + dregs_lo amod1");
       OUTS (outf, dregs_lo (dst0));
@@ -3601,7 +3600,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod1 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((HL == 0) && (aop == 1) && (aopcde == 2))
+  else if (HL == 0 && aop == 1 && aopcde == 2)
     {
       notethat ("dregs_lo = dregs_lo + dregs_hi amod1");
       OUTS (outf, dregs_lo (dst0));
@@ -3613,7 +3612,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod1 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((HL == 0) && (aop == 2) && (aopcde == 3))
+  else if (HL == 0 && aop == 2 && aopcde == 3)
     {
       notethat ("dregs_lo = dregs_hi - dregs_lo amod1");
       OUTS (outf, dregs_lo (dst0));
@@ -3625,7 +3624,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod1 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((HL == 0) && (aop == 3) && (aopcde == 3))
+  else if (HL == 0 && aop == 3 && aopcde == 3)
     {
       notethat ("dregs_lo = dregs_hi - dregs_hi amod1");
       OUTS (outf, dregs_lo (dst0));
@@ -3637,7 +3636,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod1 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((HL == 0) && (aop == 0) && (aopcde == 2))
+  else if (HL == 0 && aop == 0 && aopcde == 2)
     {
       notethat ("dregs_lo = dregs_lo + dregs_lo amod1");
       OUTS (outf, dregs_lo (dst0));
@@ -3649,7 +3648,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod1 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (aopcde == 9) && (s == 1))
+  else if (aop == 0 && aopcde == 9 && s == 1)
     {
       notethat ("A0 = dregs");
       OUTS (outf, "A0");
@@ -3657,7 +3656,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs (src0));
       PCREG += 4; return;
     }
-  else if ((aop == 3) && (aopcde == 11) && (s == 0))
+  else if (aop == 3 && aopcde == 11 && s == 0)
     {
       notethat ("A0 -= A1");
       OUTS (outf, "A0");
@@ -3665,7 +3664,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "A1");
       PCREG += 4; return;
     }
-  else if ((aop == 3) && (aopcde == 11) && (s == 1))
+  else if (aop == 3 && aopcde == 11 && s == 1)
     {
       notethat ("A0 -= A1 (W32)");
       OUTS (outf, "A0");
@@ -3674,7 +3673,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(W32)");
       PCREG += 4; return;
     }
-  else if ((aop == 3) && (aopcde == 22) && (HL == 1))
+  else if (aop == 3 && aopcde == 22 && HL == 1)
     {
       notethat ("dregs = BYTEOP2M ( dregs_pair , dregs_pair ) (TH , R)");
       OUTS (outf, dregs (dst0));
@@ -3697,7 +3696,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
 	OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((aop == 3) && (aopcde == 22) && (HL == 0))
+  else if (aop == 3 && aopcde == 22 && HL == 0)
     {
       notethat ("dregs = BYTEOP2M ( dregs_pair , dregs_pair ) (TL , R)");
       OUTS (outf, dregs (dst0));
@@ -3720,7 +3719,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
 	OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((aop == 2) && (aopcde == 22) && (HL == 1))
+  else if (aop == 2 && aopcde == 22 && HL == 1)
     {
       notethat ("dregs = BYTEOP2M ( dregs_pair , dregs_pair ) (RNDH , R)");
       OUTS (outf, dregs (dst0));
@@ -3743,7 +3742,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
 	OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((aop == 2) && (aopcde == 22) && (HL == 0))
+  else if (aop == 2 && aopcde == 22 && HL == 0)
     {
       notethat ("dregs = BYTEOP2M ( dregs_pair , dregs_pair ) (RNDL , R)");
       OUTS (outf, dregs (dst0));
@@ -3766,7 +3765,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
 	OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((aop == 1) && (aopcde == 22) && (HL == 1))
+  else if (aop == 1 && aopcde == 22 && HL == 1)
     {
       notethat ("dregs = BYTEOP2P ( dregs_pair , dregs_pair ) (TH , R)");
       OUTS (outf, dregs (dst0));
@@ -3789,7 +3788,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
 	OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((aop == 1) && (aopcde == 22) && (HL == 0))
+  else if (aop == 1 && aopcde == 22 && HL == 0)
     {
       notethat ("dregs = BYTEOP2P ( dregs_pair , dregs_pair ) (TL , R)");
       OUTS (outf, dregs (dst0));
@@ -3812,7 +3811,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
 	OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (aopcde == 22) && (HL == 1))
+  else if (aop == 0 && aopcde == 22 && HL == 1)
     {
       notethat ("dregs = BYTEOP2P ( dregs_pair , dregs_pair ) (RNDH , R)");
       OUTS (outf, dregs (dst0));
@@ -3835,7 +3834,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
 	OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (aopcde == 22) && (HL == 0))
+  else if (aop == 0 && aopcde == 22 && HL == 0)
     {
       notethat
 	("dregs = BYTEOP2P ( dregs_pair , dregs_pair ) (RNDL , aligndir)");
@@ -3859,13 +3858,13 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
 	OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (s == 0) && (aopcde == 8))
+  else if (aop == 0 && s == 0 && aopcde == 8)
     {
       notethat ("A0 = 0");
       saved_state.a0 = 0;
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (s == 1) && (aopcde == 8))
+  else if (aop == 0 && s == 1 && aopcde == 8)
     {
       notethat ("A0 = A0 (S)");
       OUTS (outf, "A0");
@@ -3874,13 +3873,13 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(S)");
       PCREG += 4; return;
     }
-  else if ((aop == 1) && (s == 0) && (aopcde == 8))
+  else if (aop == 1 && s == 0 && aopcde == 8)
     {
       notethat ("A1 = 0");
       saved_state.a1 = 0;
       PCREG += 4; return;
     }
-  else if ((aop == 1) && (s == 1) && (aopcde == 8))
+  else if (aop == 1 && s == 1 && aopcde == 8)
     {
       notethat ("A1 = A1 (S)");
       OUTS (outf, "A1");
@@ -3889,13 +3888,13 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(S)");
       PCREG += 4; return;
     }
-  else if ((aop == 2) && (s == 0) && (aopcde == 8))
+  else if (aop == 2 && s == 0 && aopcde == 8)
     {
       notethat ("A1 = A0 = 0");
       saved_state.a1 = saved_state.a0 = 0;
       PCREG += 4; return;
     }
-  else if ((aop == 2) && (s == 1) && (aopcde == 8))
+  else if (aop == 2 && s == 1 && aopcde == 8)
     {
       notethat ("A1 = A1 (S) , A0 = A0 (S)");
       OUTS (outf, "A1");
@@ -3909,7 +3908,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(S)");
       PCREG += 4; return;
     }
-  else if ((aop == 3) && (s == 0) && (aopcde == 8))
+  else if (aop == 3 && s == 0 && aopcde == 8)
     {
       notethat ("A0 = A1");
       OUTS (outf, "A0");
@@ -3917,7 +3916,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "A1");
       PCREG += 4; return;
     }
-  else if ((aop == 3) && (s == 1) && (aopcde == 8))
+  else if (aop == 3 && s == 1 && aopcde == 8)
     {
       notethat ("A1 = A0");
       OUTS (outf, "A1");
@@ -3925,7 +3924,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "A0");
       PCREG += 4; return;
     }
-  else if ((aop == 1) && (aopcde == 9) && (s == 0))
+  else if (aop == 1 && aopcde == 9 && s == 0)
     {
       notethat ("A0.x = dregs_lo");
       OUTS (outf, "A0.x");
@@ -3933,7 +3932,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src0));
       PCREG += 4; return;
     }
-  else if ((aop == 1) && (HL == 0) && (aopcde == 11))
+  else if (aop == 1 && HL == 0 && aopcde == 11)
     {
       notethat ("dregs_lo = ( A0 += A1 )");
       OUTS (outf, dregs_lo (dst0));
@@ -3945,7 +3944,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((aop == 3) && (HL == 0) && (aopcde == 16))
+  else if (aop == 3 && HL == 0 && aopcde == 16)
     {
       notethat ("A1 = ABS A1, A0 = ABS A0");
       OUTS (outf, "A1");
@@ -3959,7 +3958,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "A0");
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (aopcde == 23) && (HL == 1))
+  else if (aop == 0 && aopcde == 23 && HL == 1)
     {
       notethat ("dregs = BYTEOP3P ( dregs_pair , dregs_pair ) (HI , R)");
       OUTS (outf, dregs (dst0));
@@ -3982,7 +3981,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
 	OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((aop == 3) && (aopcde == 9) && (s == 0))
+  else if (aop == 3 && aopcde == 9 && s == 0)
     {
       notethat ("A1.x = dregs_lo");
       OUTS (outf, "A1.x");
@@ -3990,7 +3989,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src0));
       PCREG += 4; return;
     }
-  else if ((aop == 1) && (HL == 1) && (aopcde == 16))
+  else if (aop == 1 && HL == 1 && aopcde == 16)
     {
       notethat ("A1 = ABS A1");
       OUTS (outf, "A1");
@@ -3999,7 +3998,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "A1");
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (HL == 1) && (aopcde == 16))
+  else if (aop == 0 && HL == 1 && aopcde == 16)
     {
       notethat ("A1 = ABS A0");
       OUTS (outf, "A1");
@@ -4008,7 +4007,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "A0");
       PCREG += 4; return;
     }
-  else if ((aop == 2) && (aopcde == 9) && (s == 1))
+  else if (aop == 2 && aopcde == 9 && s == 1)
     {
       notethat ("A1 = dregs");
       OUTS (outf, "A1");
@@ -4016,7 +4015,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs (src0));
       PCREG += 4; return;
     }
-  else if ((HL == 0) && (aop == 3) && (aopcde == 12))
+  else if (HL == 0 && aop == 3 && aopcde == 12)
     {
       notethat ("dregs_lo = dregs (RND)");
       OUTS (outf, dregs_lo (dst0));
@@ -4025,7 +4024,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(RND)");
       PCREG += 4; return;
     }
-  else if ((aop == 1) && (HL == 0) && (aopcde == 16))
+  else if (aop == 1 && HL == 0 && aopcde == 16)
     {
       notethat ("A0 = ABS A1");
       OUTS (outf, "A0");
@@ -4034,7 +4033,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "A1");
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (HL == 0) && (aopcde == 16))
+  else if (aop == 0 && HL == 0 && aopcde == 16)
     {
       notethat ("A0 = ABS A0");
       OUTS (outf, "A0");
@@ -4043,7 +4042,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "A0");
       PCREG += 4; return;
     }
-  else if ((aop == 3) && (HL == 0) && (aopcde == 15))
+  else if (aop == 3 && HL == 0 && aopcde == 15)
     {
       notethat ("dregs = - dregs (V)");
       OUTS (outf, dregs (dst0));
@@ -4053,7 +4052,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(V)");
       PCREG += 4; return;
     }
-  else if ((aop == 1) && (HL == 1) && (aopcde == 11))
+  else if (aop == 1 && HL == 1 && aopcde == 11)
     {
       notethat ("dregs_hi = ( A0 += A1 )");
       OUTS (outf, dregs_hi (dst0));
@@ -4065,7 +4064,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((aop == 2) && (aopcde == 11) && (s == 0))
+  else if (aop == 2 && aopcde == 11 && s == 0)
     {
       notethat ("A0 += A1");
       OUTS (outf, "A0");
@@ -4073,7 +4072,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "A1");
       PCREG += 4; return;
     }
-  else if ((aop == 2) && (aopcde == 11) && (s == 1))
+  else if (aop == 2 && aopcde == 11 && s == 1)
     {
       notethat ("A0 += A1 (W32)");
       OUTS (outf, "A0");
@@ -4082,7 +4081,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(W32)");
       PCREG += 4; return;
     }
-  else if ((aop == 3) && (HL == 0) && (aopcde == 14))
+  else if (aop == 3 && HL == 0 && aopcde == 14)
     {
       notethat ("A1 = - A1 , A0 = - A0");
       OUTS (outf, "A1");
@@ -4096,7 +4095,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "A0");
       PCREG += 4; return;
     }
-  else if ((HL == 1) && (aop == 3) && (aopcde == 12))
+  else if (HL == 1 && aop == 3 && aopcde == 12)
     {
       notethat ("dregs_hi = dregs (RND)");
       OUTS (outf, dregs_hi (dst0));
@@ -4105,7 +4104,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(RND)");
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (aopcde == 23) && (HL == 0))
+  else if (aop == 0 && aopcde == 23 && HL == 0)
     {
       notethat ("dregs = BYTEOP3P ( dregs_pair , dregs_pair ) (LO , R)");
       OUTS (outf, dregs (dst0));
@@ -4128,7 +4127,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
 	OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (HL == 0) && (aopcde == 14))
+  else if (aop == 0 && HL == 0 && aopcde == 14)
     {
       notethat ("A0 = - A0");
       OUTS (outf, "A0");
@@ -4137,7 +4136,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "A0");
       PCREG += 4; return;
     }
-  else if ((aop == 1) && (HL == 0) && (aopcde == 14))
+  else if (aop == 1 && HL == 0 && aopcde == 14)
     {
       notethat ("A0 = - A1");
       OUTS (outf, "A0");
@@ -4146,7 +4145,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "A1");
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (HL == 1) && (aopcde == 14))
+  else if (aop == 0 && HL == 1 && aopcde == 14)
     {
       notethat ("A1 = - A0");
       OUTS (outf, "A1");
@@ -4155,7 +4154,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "A0");
       PCREG += 4; return;
     }
-  else if ((aop == 1) && (HL == 1) && (aopcde == 14))
+  else if (aop == 1 && HL == 1 && aopcde == 14)
     {
       notethat ("A1 = - A1");
       OUTS (outf, "A1");
@@ -4164,7 +4163,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "A1");
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (aopcde == 12))
+  else if (aop == 0 && aopcde == 12)
     {
       notethat
 	("dregs_hi=dregs_lo=SIGN(dregs_hi)*dregs_hi + SIGN(dregs_lo)*dregs_lo)");
@@ -4188,7 +4187,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((aop == 2) && (aopcde == 0))
+  else if (aop == 2 && aopcde == 0)
     {
       notethat ("dregs = dregs -|+ dregs amod0");
       OUTS (outf, dregs (dst0));
@@ -4200,7 +4199,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod0 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((aop == 1) && (aopcde == 12))
+  else if (aop == 1 && aopcde == 12)
     {
       notethat ("dregs = A1.L + A1.H , dregs = A0.L + A0.H");
       OUTS (outf, dregs (dst1));
@@ -4216,7 +4215,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "A0.H");
       PCREG += 4; return;
     }
-  else if ((aop == 2) && (aopcde == 4))
+  else if (aop == 2 && aopcde == 4)
     {
       notethat ("dregs = dregs + dregs , dregs = dregs - dregs amod1");
       OUTS (outf, dregs (dst1));
@@ -4234,7 +4233,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod1 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((HL == 0) && (aopcde == 1))
+  else if (HL == 0 && aopcde == 1)
     {
       notethat
 	("dregs = dregs +|+ dregs , dregs = dregs -|- dregs (amod0, amod2)");
@@ -4249,19 +4248,19 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs (src0));
       OUTS (outf, "-|-");
       OUTS (outf, dregs (src1));
-      if ((s == 1) && (x == 0) && (aop == 2))
+      if (s == 1 && x == 0 && aop == 2)
 	OUTS (outf, "(S, ASR)");
-      else if ((s == 1) && (x == 0) && (aop == 3))
+      else if (s == 1 && x == 0 && aop == 3)
 	OUTS (outf, "(S, ASL)");
-      else if ((s == 0) && (x == 0) && (aop == 2))
+      else if (s == 0 && x == 0 && aop == 2)
 	OUTS (outf, "(ASR)");
-      else if ((s == 0) && (x == 0) && (aop == 3))
+      else if (s == 0 && x == 0 && aop == 3)
 	OUTS (outf, "(ASL)");
       else
 	OUTS (outf, "");
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (aopcde == 11))
+  else if (aop == 0 && aopcde == 11)
     {
       notethat ("dregs = ( A0 += A1 )");
       OUTS (outf, dregs (dst0));
@@ -4273,7 +4272,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (aopcde == 10))
+  else if (aop == 0 && aopcde == 10)
     {
       notethat ("dregs_lo = A0.x");
       OUTS (outf, dregs_lo (dst0));
@@ -4281,7 +4280,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "A0.x");
       PCREG += 4; return;
     }
-  else if ((aop == 1) && (aopcde == 10))
+  else if (aop == 1 && aopcde == 10)
     {
       notethat ("dregs_lo = A1.x");
       OUTS (outf, dregs_lo (dst0));
@@ -4289,7 +4288,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "A1.x");
       PCREG += 4; return;
     }
-  else if ((aop == 1) && (aopcde == 0))
+  else if (aop == 1 && aopcde == 0)
     {
       notethat ("dregs = dregs +|- dregs amod0");
       OUTS (outf, dregs (dst0));
@@ -4301,7 +4300,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod0 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((aop == 3) && (aopcde == 0))
+  else if (aop == 3 && aopcde == 0)
     {
       notethat ("dregs = dregs -|- dregs amod0");
       OUTS (outf, dregs (dst0));
@@ -4313,7 +4312,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod0 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((aop == 1) && (aopcde == 4))
+  else if (aop == 1 && aopcde == 4)
     {
       notethat ("dregs = dregs - dregs amod1");
       OUTS (outf, dregs (dst0));
@@ -4325,7 +4324,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod1 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (aopcde == 17))
+  else if (aop == 0 && aopcde == 17)
     {
       notethat ("dregs = A1 + A0, dregs = A1 - A0 amod1");
       OUTS (outf, dregs (dst1));
@@ -4343,7 +4342,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod1 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((aop == 1) && (aopcde == 17))
+  else if (aop == 1 && aopcde == 17)
     {
       notethat ("dregs = A0 + A1, dregs = A0 - A1 amod1");
       OUTS (outf, dregs (dst1));
@@ -4361,7 +4360,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod1 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (aopcde == 18))
+  else if (aop == 0 && aopcde == 18)
     {
       notethat ("SAA ( dregs_pair , dregs_pair ) aligndir");
       OUTS (outf, "SAA");
@@ -4377,13 +4376,13 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       aligndir (s, pc);
       PCREG += 4; return;
     }
-  else if ((aop == 3) && (aopcde == 18))
+  else if (aop == 3 && aopcde == 18)
     {
       notethat ("DISALGNEXCPT");
       OUTS (outf, "DISALGNEXCPT");
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (aopcde == 20))
+  else if (aop == 0 && aopcde == 20)
     {
       notethat ("dregs = BYTEOP1P ( dregs_pair , dregs_pair ) aligndir");
       OUTS (outf, dregs (dst0));
@@ -4401,7 +4400,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       aligndir (s, pc);
       PCREG += 4; return;
     }
-  else if ((aop == 1) && (aopcde == 20))
+  else if (aop == 1 && aopcde == 20)
     {
       notethat ("dregs = BYTEOP1P ( dregs_pair , dregs_pair ) (T, R)");
       OUTS (outf, dregs (dst0));
@@ -4424,7 +4423,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
 	OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (aopcde == 21))
+  else if (aop == 0 && aopcde == 21)
     {
       notethat
 	("( dregs , dregs ) = BYTEOP16P ( dregs_pair , dregs_pair ) aligndir");
@@ -4447,7 +4446,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       aligndir (s, pc);
       PCREG += 4; return;
     }
-  else if ((aop == 1) && (aopcde == 21))
+  else if (aop == 1 && aopcde == 21)
     {
       notethat
 	("( dregs , dregs ) = BYTEOP16M ( dregs_pair , dregs_pair ) aligndir");
@@ -4470,7 +4469,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       aligndir (s, pc);
       PCREG += 4; return;
     }
-  else if ((aop == 2) && (aopcde == 7))
+  else if (aop == 2 && aopcde == 7)
     {
       bu32 val = DREG (src0);
       notethat ("dregs = ABS dregs");
@@ -4482,19 +4481,19 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       DREG (dst0) = val;
       PCREG += 4; return;
     }
-  else if ((aop == 1) && (aopcde == 7))
+  else if (aop == 1 && aopcde == 7)
     {
       notethat ("dregs = MIN ( dregs , dregs )");
       DREG (dst0) = min32 (DREG (src0), DREG (src1));
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (aopcde == 7))
+  else if (aop == 0 && aopcde == 7)
     {
       notethat ("dregs = MAX ( dregs , dregs )");
       DREG (dst0) = max32 (DREG (src0), DREG (src1));
       PCREG += 4; return;
     }
-  else if ((aop == 2) && (aopcde == 6))
+  else if (aop == 2 && aopcde == 6)
     {
       notethat ("dregs = ABS dregs (V)");
       OUTS (outf, dregs (dst0));
@@ -4504,7 +4503,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(V)");
       PCREG += 4; return;
     }
-  else if ((aop == 1) && (aopcde == 6))
+  else if (aop == 1 && aopcde == 6)
     {
       notethat ("dregs = MIN ( dregs , dregs ) (V)");
       OUTS (outf, dregs (dst0));
@@ -4517,7 +4516,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")(V)");
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (aopcde == 6))
+  else if (aop == 0 && aopcde == 6)
     {
       notethat ("dregs = MAX ( dregs , dregs ) (V)");
       OUTS (outf, dregs (dst0));
@@ -4530,7 +4529,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")(V)");
       PCREG += 4; return;
     }
-  else if ((HL == 1) && (aopcde == 1))
+  else if (HL == 1 && aopcde == 1)
     {
       notethat
 	("dregs = dregs +|- dregs, dregs = dregs -|+ dregs (amod0, amod2)");
@@ -4545,19 +4544,19 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs (src0));
       OUTS (outf, "-|+");
       OUTS (outf, dregs (src1));
-      if ((s == 1) && (x == 0) && (aop == 2))
+      if (s == 1 && x == 0 && aop == 2)
 	OUTS (outf, "(S, ASR)");
-      else if ((s == 1) && (x == 0) && (aop == 3))
+      else if (s == 1 && x == 0 && aop == 3)
 	OUTS (outf, "(S, ASL)");
-      else if ((s == 0) && (x == 0) && (aop == 2))
+      else if (s == 0 && x == 0 && aop == 2)
 	OUTS (outf, "(ASR)");
-      else if ((s == 0) && (x == 0) && (aop == 3))
+      else if (s == 0 && x == 0 && aop == 3)
 	OUTS (outf, "(ASL)");
       else
 	OUTS (outf, "");
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (aopcde == 4))
+  else if (aop == 0 && aopcde == 4)
     {
       notethat ("dregs = dregs + dregs amod1");
       OUTS (outf, dregs (dst0));
@@ -4569,7 +4568,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod1 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (aopcde == 0))
+  else if (aop == 0 && aopcde == 0)
     {
       notethat ("dregs = dregs +|+ dregs amod0");
       OUTS (outf, dregs (dst0));
@@ -4581,7 +4580,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       amod0 (s, x, pc);
       PCREG += 4; return;
     }
-  else if ((aop == 0) && (aopcde == 24))
+  else if (aop == 0 && aopcde == 24)
     {
       notethat ("dregs = BYTEPACK ( dregs , dregs )");
       OUTS (outf, dregs (dst0));
@@ -4594,7 +4593,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((aop == 1) && (aopcde == 24))
+  else if (aop == 1 && aopcde == 24)
     {
       notethat ("( dregs , dregs ) = BYTEUNPACK dregs_pair aligndir");
       OUTS (outf, "(");
@@ -4611,7 +4610,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       aligndir (s, pc);
       PCREG += 4; return;
     }
-  else if ((aopcde == 13))
+  else if (aopcde == 13)
     {
       notethat ("( dregs , dregs ) = SEARCH dregs (searchmod)");
       OUTS (outf, "(");
@@ -4650,7 +4649,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
 
 
 
-  if ((HLs == 0) && (sop == 0) && (sopcde == 0))
+  if (HLs == 0 && sop == 0 && sopcde == 0)
     {
       notethat ("dregs_lo = ASHIFT dregs_lo BY dregs_lo");
       OUTS (outf, dregs_lo (dst0));
@@ -4661,7 +4660,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src0));
       PCREG += 4; return;
     }
-  else if ((HLs == 1) && (sop == 0) && (sopcde == 0))
+  else if (HLs == 1 && sop == 0 && sopcde == 0)
     {
       notethat ("dregs_lo = ASHIFT dregs_hi BY dregs_lo");
       OUTS (outf, dregs_lo (dst0));
@@ -4672,7 +4671,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src0));
       PCREG += 4; return;
     }
-  else if ((HLs == 2) && (sop == 0) && (sopcde == 0))
+  else if (HLs == 2 && sop == 0 && sopcde == 0)
     {
       notethat ("dregs_hi = ASHIFT dregs_lo BY dregs_lo");
       OUTS (outf, dregs_hi (dst0));
@@ -4683,7 +4682,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src0));
       PCREG += 4; return;
     }
-  else if ((HLs == 3) && (sop == 0) && (sopcde == 0))
+  else if (HLs == 3 && sop == 0 && sopcde == 0)
     {
       notethat ("dregs_hi = ASHIFT dregs_hi BY dregs_lo");
       OUTS (outf, dregs_hi (dst0));
@@ -4694,7 +4693,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src0));
       PCREG += 4; return;
     }
-  else if ((HLs == 0) && (sop == 1) && (sopcde == 0))
+  else if (HLs == 0 && sop == 1 && sopcde == 0)
     {
       notethat ("dregs_lo = ASHIFT dregs_lo BY dregs_lo (S)");
       OUTS (outf, dregs_lo (dst0));
@@ -4708,7 +4707,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((HLs == 1) && (sop == 1) && (sopcde == 0))
+  else if (HLs == 1 && sop == 1 && sopcde == 0)
     {
       notethat ("dregs_lo = ASHIFT dregs_hi BY dregs_lo (S)");
       OUTS (outf, dregs_lo (dst0));
@@ -4720,7 +4719,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(S)");
       PCREG += 4; return;
     }
-  else if ((HLs == 2) && (sop == 1) && (sopcde == 0))
+  else if (HLs == 2 && sop == 1 && sopcde == 0)
     {
       notethat ("dregs_hi = ASHIFT dregs_lo BY dregs_lo (S)");
       OUTS (outf, dregs_hi (dst0));
@@ -4732,7 +4731,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(S)");
       PCREG += 4; return;
     }
-  else if ((HLs == 3) && (sop == 1) && (sopcde == 0))
+  else if (HLs == 3 && sop == 1 && sopcde == 0)
     {
       notethat ("dregs_hi = ASHIFT dregs_hi BY dregs_lo (S)");
       OUTS (outf, dregs_hi (dst0));
@@ -4744,7 +4743,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(S)");
       PCREG += 4; return;
     }
-  else if ((HLs == 0) && (sop == 2) && (sopcde == 0))
+  else if (HLs == 0 && sop == 2 && sopcde == 0)
     {
       notethat ("dregs_lo = LSHIFT dregs_lo BY dregs_lo");
       OUTS (outf, dregs_lo (dst0));
@@ -4755,7 +4754,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src0));
       PCREG += 4; return;
     }
-  else if ((HLs == 1) && (sop == 2) && (sopcde == 0))
+  else if (HLs == 1 && sop == 2 && sopcde == 0)
     {
       notethat ("dregs_lo = LSHIFT dregs_hi BY dregs_lo");
       OUTS (outf, dregs_lo (dst0));
@@ -4766,7 +4765,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src0));
       PCREG += 4; return;
     }
-  else if ((HLs == 2) && (sop == 2) && (sopcde == 0))
+  else if (HLs == 2 && sop == 2 && sopcde == 0)
     {
       notethat ("dregs_hi = LSHIFT dregs_lo BY dregs_lo");
       OUTS (outf, dregs_hi (dst0));
@@ -4777,7 +4776,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src0));
       PCREG += 4; return;
     }
-  else if ((HLs == 3) && (sop == 2) && (sopcde == 0))
+  else if (HLs == 3 && sop == 2 && sopcde == 0)
     {
       notethat ("dregs_hi = LSHIFT dregs_hi BY dregs_lo");
       OUTS (outf, dregs_hi (dst0));
@@ -4788,7 +4787,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src0));
       PCREG += 4; return;
     }
-  else if ((sop == 2) && (sopcde == 3) && (HLs == 1))
+  else if (sop == 2 && sopcde == 3 && HLs == 1)
     {
       notethat ("A1 = ROT A1 BY dregs_lo");
       OUTS (outf, "A1");
@@ -4799,7 +4798,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src0));
       PCREG += 4; return;
     }
-  else if ((sop == 0) && (sopcde == 3) && (HLs == 0))
+  else if (sop == 0 && sopcde == 3 && HLs == 0)
     {
       notethat ("A0 = ASHIFT A0 BY dregs_lo");
       OUTS (outf, "A0");
@@ -4810,7 +4809,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src0));
       PCREG += 4; return;
     }
-  else if ((sop == 0) && (sopcde == 3) && (HLs == 1))
+  else if (sop == 0 && sopcde == 3 && HLs == 1)
     {
       notethat ("A1 = ASHIFT A1 BY dregs_lo");
       OUTS (outf, "A1");
@@ -4821,7 +4820,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src0));
       PCREG += 4; return;
     }
-  else if ((sop == 1) && (sopcde == 3) && (HLs == 0))
+  else if (sop == 1 && sopcde == 3 && HLs == 0)
     {
       notethat ("A0 = LSHIFT A0 BY dregs_lo");
       OUTS (outf, "A0");
@@ -4832,7 +4831,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src0));
       PCREG += 4; return;
     }
-  else if ((sop == 1) && (sopcde == 3) && (HLs == 1))
+  else if (sop == 1 && sopcde == 3 && HLs == 1)
     {
       notethat ("A1 = LSHIFT A1 BY dregs_lo");
       OUTS (outf, "A1");
@@ -4843,7 +4842,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src0));
       PCREG += 4; return;
     }
-  else if ((sop == 2) && (sopcde == 3) && (HLs == 0))
+  else if (sop == 2 && sopcde == 3 && HLs == 0)
     {
       notethat ("A0 = ROT A0 BY dregs_lo");
       OUTS (outf, "A0");
@@ -4854,7 +4853,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src0));
       PCREG += 4; return;
     }
-  else if ((sop == 1) && (sopcde == 1))
+  else if (sop == 1 && sopcde == 1)
     {
       notethat ("dregs = ASHIFT dregs BY dregs_lo (V, S)");
       OUTS (outf, dregs (dst0));
@@ -4867,7 +4866,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "V,S)");
       PCREG += 4; return;
     }
-  else if ((sop == 0) && (sopcde == 1))
+  else if (sop == 0 && sopcde == 1)
     {
       notethat ("dregs = ASHIFT dregs BY dregs_lo (V)");
       OUTS (outf, dregs (dst0));
@@ -4879,7 +4878,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(V)");
       PCREG += 4; return;
     }
-  else if ((sop == 0) && (sopcde == 2))
+  else if (sop == 0 && sopcde == 2)
     {
       notethat ("dregs = ASHIFT dregs BY dregs_lo");
       OUTS (outf, dregs (dst0));
@@ -4890,7 +4889,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src0));
       PCREG += 4; return;
     }
-  else if ((sop == 1) && (sopcde == 2))
+  else if (sop == 1 && sopcde == 2)
     {
       notethat ("dregs = ASHIFT dregs BY dregs_lo (S)");
       OUTS (outf, dregs (dst0));
@@ -4902,7 +4901,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(S)");
       PCREG += 4; return;
     }
-  else if ((sop == 2) && (sopcde == 2))
+  else if (sop == 2 && sopcde == 2)
     {
       notethat ("dregs = SHIFT dregs BY dregs_lo");
       OUTS (outf, dregs (dst0));
@@ -4913,7 +4912,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src0));
       PCREG += 4; return;
     }
-  else if ((sop == 3) && (sopcde == 2))
+  else if (sop == 3 && sopcde == 2)
     {
       notethat ("dregs = ROT dregs BY dregs_lo");
       OUTS (outf, dregs (dst0));
@@ -4924,7 +4923,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src0));
       PCREG += 4; return;
     }
-  else if ((sop == 2) && (sopcde == 1))
+  else if (sop == 2 && sopcde == 1)
     {
       notethat ("dregs = SHIFT dregs BY dregs_lo (V)");
       OUTS (outf, dregs (dst0));
@@ -4936,7 +4935,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(V)");
       PCREG += 4; return;
     }
-  else if ((sop == 0) && (sopcde == 4))
+  else if (sop == 0 && sopcde == 4)
     {
       notethat ("dregs = PACK ( dregs_lo , dregs_lo )");
       OUTS (outf, dregs (dst0));
@@ -4949,7 +4948,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((sop == 1) && (sopcde == 4))
+  else if (sop == 1 && sopcde == 4)
     {
       notethat ("dregs = PACK ( dregs_lo , dregs_hi )");
       OUTS (outf, dregs (dst0));
@@ -4962,7 +4961,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((sop == 2) && (sopcde == 4))
+  else if (sop == 2 && sopcde == 4)
     {
       notethat ("dregs = PACK ( dregs_hi , dregs_lo )");
       OUTS (outf, dregs (dst0));
@@ -4975,7 +4974,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((sop == 3) && (sopcde == 4))
+  else if (sop == 3 && sopcde == 4)
     {
       notethat ("dregs = PACK ( dregs_hi , dregs_hi )");
       OUTS (outf, dregs (dst0));
@@ -4988,7 +4987,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((sop == 0) && (sopcde == 5))
+  else if (sop == 0 && sopcde == 5)
     {
       notethat ("dregs_lo = SIGNBITS dregs");
       OUTS (outf, dregs_lo (dst0));
@@ -4997,7 +4996,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs (src1));
       PCREG += 4; return;
     }
-  else if ((sop == 1) && (sopcde == 5))
+  else if (sop == 1 && sopcde == 5)
     {
       notethat ("dregs_lo = SIGNBITS dregs_lo");
       OUTS (outf, dregs_lo (dst0));
@@ -5006,7 +5005,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_lo (src1));
       PCREG += 4; return;
     }
-  else if ((sop == 2) && (sopcde == 5))
+  else if (sop == 2 && sopcde == 5)
     {
       notethat ("dregs_lo = SIGNBITS dregs_hi");
       OUTS (outf, dregs_lo (dst0));
@@ -5015,7 +5014,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs_hi (src1));
       PCREG += 4; return;
     }
-  else if ((sop == 0) && (sopcde == 6))
+  else if (sop == 0 && sopcde == 6)
     {
       notethat ("dregs_lo = SIGNBITS A0");
       OUTS (outf, dregs_lo (dst0));
@@ -5024,7 +5023,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "A0");
       PCREG += 4; return;
     }
-  else if ((sop == 1) && (sopcde == 6))
+  else if (sop == 1 && sopcde == 6)
     {
       notethat ("dregs_lo = SIGNBITS A1");
       OUTS (outf, dregs_lo (dst0));
@@ -5033,7 +5032,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "A1");
       PCREG += 4; return;
     }
-  else if ((sop == 3) && (sopcde == 6))
+  else if (sop == 3 && sopcde == 6)
     {
       notethat ("dregs_lo = ONES dregs");
       OUTS (outf, dregs_lo (dst0));
@@ -5042,7 +5041,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, dregs (src1));
       PCREG += 4; return;
     }
-  else if ((sop == 0) && (sopcde == 7))
+  else if (sop == 0 && sopcde == 7)
     {
       notethat ("dregs_lo = EXPADJ (dregs , dregs_lo)");
       OUTS (outf, dregs_lo (dst0));
@@ -5054,7 +5053,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((sop == 1) && (sopcde == 7))
+  else if (sop == 1 && sopcde == 7)
     {
       notethat ("dregs_lo = EXPADJ (dregs , dregs_lo) (V)");
       OUTS (outf, dregs_lo (dst0));
@@ -5066,7 +5065,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ") (V)");
       PCREG += 4; return;
     }
-  else if ((sop == 2) && (sopcde == 7))
+  else if (sop == 2 && sopcde == 7)
     {
       notethat ("dregs_lo = EXPADJ (dregs_lo , dregs_lo)");
       OUTS (outf, dregs_lo (dst0));
@@ -5078,7 +5077,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((sop == 3) && (sopcde == 7))
+  else if (sop == 3 && sopcde == 7)
     {
       notethat ("dregs_lo = EXPADJ (dregs_hi , dregs_lo)");
       OUTS (outf, dregs_lo (dst0));
@@ -5090,7 +5089,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((sop == 0) && (sopcde == 8))
+  else if (sop == 0 && sopcde == 8)
     {
       notethat ("BITMUX (dregs , dregs , A0) (ASR)");
       OUTS (outf, "BITMUX (");
@@ -5102,7 +5101,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(ASR)");
       PCREG += 4; return;
     }
-  else if ((sop == 1) && (sopcde == 8))
+  else if (sop == 1 && sopcde == 8)
     {
       notethat ("BITMUX (dregs , dregs , A0) (ASL)");
       OUTS (outf, "BITMUX (");
@@ -5114,7 +5113,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(ASL)");
       PCREG += 4; return;
     }
-  else if ((sop == 0) && (sopcde == 9))
+  else if (sop == 0 && sopcde == 9)
     {
       notethat ("dregs_lo = VIT_MAX (dregs) (ASL)");
       OUTS (outf, dregs_lo (dst0));
@@ -5124,7 +5123,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ") (ASL)");
       PCREG += 4; return;
     }
-  else if ((sop == 1) && (sopcde == 9))
+  else if (sop == 1 && sopcde == 9)
     {
       notethat ("dregs_lo = VIT_MAX (dregs) (ASR)");
       OUTS (outf, dregs_lo (dst0));
@@ -5134,7 +5133,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ") (ASR)");
       PCREG += 4; return;
     }
-  else if ((sop == 2) && (sopcde == 9))
+  else if (sop == 2 && sopcde == 9)
     {
       notethat ("dregs = VIT_MAX ( dregs , dregs ) (ASL)");
       OUTS (outf, dregs (dst0));
@@ -5150,7 +5149,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((sop == 3) && (sopcde == 9))
+  else if (sop == 3 && sopcde == 9)
     {
       notethat ("dregs = VIT_MAX ( dregs , dregs ) (ASR)");
       OUTS (outf, dregs (dst0));
@@ -5166,7 +5165,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((sop == 0) && (sopcde == 10))
+  else if (sop == 0 && sopcde == 10)
     {
       notethat ("dregs = EXTRACT ( dregs , dregs_lo ) (Z)");
       OUTS (outf, dregs (dst0));
@@ -5179,7 +5178,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ") (Z)");
       PCREG += 4; return;
     }
-  else if ((sop == 1) && (sopcde == 10))
+  else if (sop == 1 && sopcde == 10)
     {
       notethat ("dregs = EXTRACT ( dregs , dregs_lo ) (X)");
       OUTS (outf, dregs (dst0));
@@ -5193,7 +5192,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(X)");
       PCREG += 4; return;
     }
-  else if ((sop == 2) && (sopcde == 10))
+  else if (sop == 2 && sopcde == 10)
     {
       notethat ("dregs = DEPOSIT ( dregs , dregs )");
       OUTS (outf, dregs (dst0));
@@ -5206,7 +5205,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((sop == 3) && (sopcde == 10))
+  else if (sop == 3 && sopcde == 10)
     {
       notethat ("dregs = DEPOSIT ( dregs , dregs ) (X)");
       OUTS (outf, dregs (dst0));
@@ -5220,7 +5219,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(X)");
       PCREG += 4; return;
     }
-  else if ((sop == 0) && (sopcde == 11))
+  else if (sop == 0 && sopcde == 11)
     {
       notethat ("dregs_lo = CC = BXORSHIFT ( A0 , dregs )");
       OUTS (outf, dregs_lo (dst0));
@@ -5235,7 +5234,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((sop == 1) && (sopcde == 11))
+  else if (sop == 1 && sopcde == 11)
     {
       notethat ("dregs_lo = CC = BXOR (A0 , dregs)");
       OUTS (outf, dregs_lo (dst0));
@@ -5249,7 +5248,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((sop == 0) && (sopcde == 12))
+  else if (sop == 0 && sopcde == 12)
     {
       notethat ("A0 = BXORSHIFT ( A0 , A1 , CC )");
       OUTS (outf, "A0");
@@ -5263,7 +5262,7 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((sop == 1) && (sopcde == 12))
+  else if (sop == 1 && sopcde == 12)
     {
       notethat ("dregs_lo = CC = BXOR (A0 , A1 , CC)");
       OUTS (outf, dregs_lo (dst0));
@@ -5277,19 +5276,19 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "CC )");
       PCREG += 4; return;
     }
-  else if ((sop == 0) && (sopcde == 13))
+  else if (sop == 0 && sopcde == 13)
     {
       notethat ("dregs = ALIGN8 ( dregs , dregs )");
       DREG (dst0) = (DREG (src1) << 24) | (DREG (src0) >> 8);
       PCREG += 4; return;
     }
-  else if ((sop == 1) && (sopcde == 13))
+  else if (sop == 1 && sopcde == 13)
     {
       notethat ("dregs = ALIGN16 ( dregs , dregs )");
       DREG (dst0) = (DREG (src1) << 16) | (DREG (src0) >> 16);
       PCREG += 4; return;
     }
-  else if ((sop == 2) && (sopcde == 13))
+  else if (sop == 2 && sopcde == 13)
     {
       notethat ("dregs = ALIGN24 ( dregs , dregs )");
       DREG (dst0) = (DREG (src1) << 8) | (DREG (src0) >> 24);
@@ -5319,7 +5318,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
 
 
 
-  if ((HLs == 0) && (sop == 0) && (sopcde == 0))
+  if (HLs == 0 && sop == 0 && sopcde == 0)
     {
       notethat ("dregs_lo = dregs_lo << uimm5");
       OUTS (outf, dregs_lo (dst0));
@@ -5329,7 +5328,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, uimm5 (immag));
       PCREG += 4; return;
     }
-  else if ((HLs == 1) && (sop == 0) && (sopcde == 0))
+  else if (HLs == 1 && sop == 0 && sopcde == 0)
     {
       notethat ("dregs_lo = dregs_hi << uimm5");
       OUTS (outf, dregs_lo (dst0));
@@ -5339,7 +5338,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, uimm5 (immag));
       PCREG += 4; return;
     }
-  else if ((HLs == 2) && (sop == 0) && (sopcde == 0))
+  else if (HLs == 2 && sop == 0 && sopcde == 0)
     {
       notethat ("dregs_hi = dregs_lo << uimm5");
       OUTS (outf, dregs_hi (dst0));
@@ -5349,7 +5348,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, uimm5 (immag));
       PCREG += 4; return;
     }
-  else if ((HLs == 3) && (sop == 0) && (sopcde == 0))
+  else if (HLs == 3 && sop == 0 && sopcde == 0)
     {
       notethat ("dregs_hi = dregs_hi << uimm5");
       OUTS (outf, dregs_hi (dst0));
@@ -5359,7 +5358,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, uimm5 (immag));
       PCREG += 4; return;
     }
-  else if ((HLs == 0) && (sop == 1) && (sopcde == 0))
+  else if (HLs == 0 && sop == 1 && sopcde == 0)
     {
       notethat ("dregs_lo = dregs_lo << imm5 (S)");
       OUTS (outf, dregs_lo (dst0));
@@ -5370,7 +5369,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(S)");
       PCREG += 4; return;
     }
-  else if ((HLs == 1) && (sop == 1) && (sopcde == 0))
+  else if (HLs == 1 && sop == 1 && sopcde == 0)
     {
       notethat ("dregs_lo = dregs_hi << imm5 (S)");
       OUTS (outf, dregs_lo (dst0));
@@ -5381,7 +5380,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(S)");
       PCREG += 4; return;
     }
-  else if ((HLs == 2) && (sop == 1) && (sopcde == 0))
+  else if (HLs == 2 && sop == 1 && sopcde == 0)
     {
       notethat ("dregs_hi = dregs_lo << imm5 (S)");
       OUTS (outf, dregs_hi (dst0));
@@ -5392,7 +5391,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(S)");
       PCREG += 4; return;
     }
-  else if ((HLs == 3) && (sop == 1) && (sopcde == 0))
+  else if (HLs == 3 && sop == 1 && sopcde == 0)
     {
       notethat ("dregs_hi = dregs_hi << imm5 (S)");
       OUTS (outf, dregs_hi (dst0));
@@ -5403,7 +5402,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "(S)");
       PCREG += 4; return;
     }
-  else if ((HLs == 0) && (sop == 2) && (sopcde == 0))
+  else if (HLs == 0 && sop == 2 && sopcde == 0)
     {
       notethat ("dregs_lo = dregs_lo >> uimm5");
       OUTS (outf, dregs_lo (dst0));
@@ -5413,7 +5412,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, uimm5 (newimmag));
       PCREG += 4; return;
     }
-  else if ((HLs == 1) && (sop == 2) && (sopcde == 0))
+  else if (HLs == 1 && sop == 2 && sopcde == 0)
     {
       notethat ("dregs_lo = dregs_hi >> uimm5");
       OUTS (outf, dregs_lo (dst0));
@@ -5423,7 +5422,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, uimm5 (newimmag));
       PCREG += 4; return;
     }
-  else if ((HLs == 2) && (sop == 2) && (sopcde == 0))
+  else if (HLs == 2 && sop == 2 && sopcde == 0)
     {
       notethat ("dregs_hi = dregs_lo >> uimm5");
       OUTS (outf, dregs_hi (dst0));
@@ -5433,7 +5432,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, uimm5 (newimmag));
       PCREG += 4; return;
     }
-  else if ((HLs == 3) && (sop == 2) && (sopcde == 0))
+  else if (HLs == 3 && sop == 2 && sopcde == 0)
     {
       notethat ("dregs_hi = dregs_hi >> uimm5");
       OUTS (outf, dregs_hi (dst0));
@@ -5443,7 +5442,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, uimm5 (newimmag));
       PCREG += 4; return;
     }
-  else if ((sop == 2) && (sopcde == 3) && (HLs == 1))
+  else if (sop == 2 && sopcde == 3 && HLs == 1)
     {
       notethat ("A1 = ROT A1 BY imm6");
       OUTS (outf, "A1");
@@ -5454,7 +5453,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, imm6 (immag));
       PCREG += 4; return;
     }
-  else if ((sop == 0) && (sopcde == 3) && (HLs == 0))
+  else if (sop == 0 && sopcde == 3 && HLs == 0)
     {
       notethat ("A0 = A0 << imm6");
       OUTS (outf, "A0");
@@ -5464,7 +5463,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, imm6 (immag));
       PCREG += 4; return;
     }
-  else if ((sop == 0) && (sopcde == 3) && (HLs == 1))
+  else if (sop == 0 && sopcde == 3 && HLs == 1)
     {
       notethat ("A1 = A1 << imm6");
       OUTS (outf, "A1");
@@ -5474,7 +5473,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, imm6 (immag));
       PCREG += 4; return;
     }
-  else if ((sop == 1) && (sopcde == 3) && (HLs == 0))
+  else if (sop == 1 && sopcde == 3 && HLs == 0)
     {
       notethat ("A0 = A0 >> imm6");
       OUTS (outf, "A0");
@@ -5484,7 +5483,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, imm6 (newimmag));
       PCREG += 4; return;
     }
-  else if ((sop == 1) && (sopcde == 3) && (HLs == 1))
+  else if (sop == 1 && sopcde == 3 && HLs == 1)
     {
       notethat ("A1 = A1 >> imm6");
       OUTS (outf, "A1");
@@ -5494,7 +5493,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, imm6 (newimmag));
       PCREG += 4; return;
     }
-  else if ((sop == 2) && (sopcde == 3) && (HLs == 0))
+  else if (sop == 2 && sopcde == 3 && HLs == 0)
     {
       notethat ("A0 = ROT A0 BY imm6");
       OUTS (outf, "A0");
@@ -5505,7 +5504,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, imm6 (immag));
       PCREG += 4; return;
     }
-  else if ((sop == 1) && (sopcde == 1))
+  else if (sop == 1 && sopcde == 1)
     {
       notethat ("dregs = dregs >>> uimm5 (V, S)");
       OUTS (outf, dregs (dst0));
@@ -5517,7 +5516,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "S)");
       PCREG += 4; return;
     }
-  else if ((sop == 2) && (sopcde == 1))
+  else if (sop == 2 && sopcde == 1)
     {
       notethat ("dregs = dregs >> uimm5 (V)");
       OUTS (outf, dregs (dst0));
@@ -5528,7 +5527,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, " (V)");
       PCREG += 4; return;
     }
-  else if ((sop == 0) && (sopcde == 1))
+  else if (sop == 0 && sopcde == 1)
     {
       notethat ("dregs = dregs << imm5 (V)");
       OUTS (outf, dregs (dst0));
@@ -5539,7 +5538,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, " (V)");
       PCREG += 4; return;
     }
-  else if ((sop == 1) && (sopcde == 2))
+  else if (sop == 1 && sopcde == 2)
     {
       notethat ("dregs = dregs << imm6 (S)");
       OUTS (outf, dregs (dst0));
@@ -5551,7 +5550,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, "S)");
       PCREG += 4; return;
     }
-  else if ((sop == 2) && (sopcde == 2))
+  else if (sop == 2 && sopcde == 2)
     {
       int count = imm6 (newimmag);
       notethat ("dregs = dregs >> imm6");
@@ -5561,7 +5560,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
 	DREG (dst0) = lshiftrt (DREG (src1), count);
       PCREG += 4; return;
     }
-  else if ((sop == 3) && (sopcde == 2))
+  else if (sop == 3 && sopcde == 2)
     {
       notethat ("dregs = ROT dregs BY imm6");
       OUTS (outf, dregs (dst0));
@@ -5572,7 +5571,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       OUTS (outf, imm6 (immag));
       PCREG += 4; return;
     }
-  else if ((sop == 0) && (sopcde == 2))
+  else if (sop == 0 && sopcde == 2)
     {
       int count = imm6 (newimmag);
       notethat ("dregs = dregs >>> imm6");
@@ -5600,39 +5599,39 @@ decode_psedoDEBUG_0 (bu16 iw0)
 
 
 
-  if ((reg == 0) && (fn == 3))
+  if (reg == 0 && fn == 3)
     {
       notethat ("DBG A0");
       OUTS (outf, "DBG");
       OUTS (outf, "A0");
       PCREG += 2; return;
     }
-  else if ((reg == 1) && (fn == 3))
+  else if (reg == 1 && fn == 3)
     {
       notethat ("DBG A1");
       OUTS (outf, "DBG");
       OUTS (outf, "A1");
       PCREG += 2; return;
     }
-  else if ((reg == 3) && (fn == 3))
+  else if (reg == 3 && fn == 3)
     {
       notethat ("ABORT");
       OUTS (outf, "ABORT");
       PCREG += 2; return;
     }
-  else if ((reg == 4) && (fn == 3))
+  else if (reg == 4 && fn == 3)
     {
       notethat ("HLT");
       OUTS (outf, "HLT");
       PCREG += 2; return;
     }
-  else if ((reg == 5) && (fn == 3))
+  else if (reg == 5 && fn == 3)
     {
       notethat ("DBGHALT");
       OUTS (outf, "DBGHALT");
       PCREG += 2; return;
     }
-  else if ((reg == 6) && (fn == 3))
+  else if (reg == 6 && fn == 3)
     {
       notethat ("DBGCMPLX ( dregs )");
       OUTS (outf, "DBGCMPLX");
@@ -5641,27 +5640,27 @@ decode_psedoDEBUG_0 (bu16 iw0)
       OUTS (outf, ")");
       PCREG += 2; return;
     }
-  else if ((reg == 7) && (fn == 3))
+  else if (reg == 7 && fn == 3)
     {
       notethat ("DBG");
       OUTS (outf, "DBG");
       PCREG += 2; return;
     }
-  else if ((grp == 0) && (fn == 2))
+  else if (grp == 0 && fn == 2)
     {
       notethat ("OUTC dregs");
       OUTS (outf, "OUTC");
       OUTS (outf, dregs (reg));
       PCREG += 2; return;
     }
-  else if ((fn == 0))
+  else if (fn == 0)
     {
       notethat ("DBG allregs");
       OUTS (outf, "DBG");
       OUTS (outf, allregs (reg, grp));
       PCREG += 2; return;
     }
-  else if ((fn == 1))
+  else if (fn == 1)
     {
       notethat ("PRNT allregs");
       OUTS (outf, "PRNT");
@@ -5703,7 +5702,7 @@ decode_psedodbg_assert_0 (bu16 iw0, bu16 iw1)
   int dbgop = ((iw0 >> 3) & 0x7);
   int regtest = ((iw0 >> 0) & 0x7);
 
-  if ((dbgop == 0))
+  if (dbgop == 0)
     {
       notethat ("DBGA ( dregs_lo , uimm16 )");
       OUTS (outf, "DBGA");
@@ -5714,7 +5713,7 @@ decode_psedodbg_assert_0 (bu16 iw0, bu16 iw1)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((dbgop == 1))
+  else if (dbgop == 1)
     {
       notethat ("DBGA ( dregs_hi , uimm16 )");
       OUTS (outf, "DBGA");
@@ -5725,7 +5724,7 @@ decode_psedodbg_assert_0 (bu16 iw0, bu16 iw1)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((dbgop == 2))
+  else if (dbgop == 2)
     {
       notethat ("DBGAL ( dregs , uimm16 )");
       OUTS (outf, "DBGAL");
@@ -5736,7 +5735,7 @@ decode_psedodbg_assert_0 (bu16 iw0, bu16 iw1)
       OUTS (outf, ")");
       PCREG += 4; return;
     }
-  else if ((dbgop == 3))
+  else if (dbgop == 3)
     {
       notethat ("DBGAH ( dregs , uimm16 )");
       OUTS (outf, "DBGAH");
