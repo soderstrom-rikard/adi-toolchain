@@ -53,9 +53,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #include "symtab.h"
 #include "frame.h"
 
-/* Define the bit, byte, and word ordering of the machine.  */
-#define TARGET_BYTE_ORDER LITTLE_ENDIAN
-
 /* Immediately after a function call, return the saved pc.
    Can't always go through the frames for this because on some machines
    the new frame is not set up until the new function executes
