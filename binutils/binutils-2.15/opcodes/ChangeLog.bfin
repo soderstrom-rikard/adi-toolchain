@@ -1,3 +1,8 @@
+2004-12-17  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin-dis.c (decode_dsp32shift_0): Reduce number of alternatives by
+	factoring code.  Add missing dreg rotates.
+
 2004-12-16  Catherine Moore  <clm@cm00re.com>
 
 	* bfin-dis.c (decode_dsp32alu_0):  Add spaces to "ABS" to improve

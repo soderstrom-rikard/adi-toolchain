@@ -5180,7 +5180,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
 #endif
   int sopcde = ((iw0 >> 0) & 0x1f);
   int HLs = ((iw1 >> 12) & 0x3);
-
+  const char *acc01 = (HLs & 1) == 0 ? "A0" : "A1";
 
 
   if (HLs == 0 && sop == 0 && sopcde == 0)
@@ -5236,9 +5236,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, dregs_lo (src1));
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
-      OUTS (outf, "(");
-      OUTS (outf, "S");
-      OUTS (outf, ")");
+      OUTS (outf, "(S)");
       return 2 * 2;
     }
   else if (HLs == 1 && sop == 1 && sopcde == 0)
@@ -5277,112 +5275,56 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "(S)");
       return 2 * 2;
     }
-  else if (HLs == 0 && sop == 2 && sopcde == 0)
+  else if (sop == 2 && sopcde == 0)
     {
-      notethat ("dregs_lo = LSHIFT dregs_lo BY dregs_lo");
-      OUTS (outf, dregs_lo (dst0));
-      OUTS (outf, "=");
-      OUTS (outf, " LSHIFT ");
-      OUTS (outf, dregs_lo (src1));
+      notethat ("dregs_hilo = LSHIFT dregs_hilo BY dregs_lo");
+      OUTS (outf, (HLs & 2) == 0 ? dregs_lo (dst0) : dregs_hi (dst0));
+      OUTS (outf, "= LSHIFT ");
+      OUTS (outf, (HLs & 1) == 0 ? dregs_lo (src1) : dregs_hi (src1));
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
       return 2 * 2;
     }
-  else if (HLs == 1 && sop == 2 && sopcde == 0)
+  else if (sop == 0 && sopcde == 3)
     {
-      notethat ("dregs_lo = LSHIFT dregs_hi BY dregs_lo");
-      OUTS (outf, dregs_lo (dst0));
-      OUTS (outf, "=");
-      OUTS (outf, " LSHIFT ");
-      OUTS (outf, dregs_hi (src1));
-      OUTS (outf, "BY");
-      OUTS (outf, dregs_lo (src0));
-      return 2 * 2;
-    }
-  else if (HLs == 2 && sop == 2 && sopcde == 0)
-    {
-      notethat ("dregs_hi = LSHIFT dregs_lo BY dregs_lo");
-      OUTS (outf, dregs_hi (dst0));
-      OUTS (outf, "=");
-      OUTS (outf, " LSHIFT ");
-      OUTS (outf, dregs_lo (src1));
-      OUTS (outf, "BY");
-      OUTS (outf, dregs_lo (src0));
-      return 2 * 2;
-    }
-  else if (HLs == 3 && sop == 2 && sopcde == 0)
-    {
-      notethat ("dregs_hi = LSHIFT dregs_hi BY dregs_lo");
-      OUTS (outf, dregs_hi (dst0));
-      OUTS (outf, "=");
-      OUTS (outf, " LSHIFT ");
-      OUTS (outf, dregs_hi (src1));
-      OUTS (outf, "BY");
-      OUTS (outf, dregs_lo (src0));
-      return 2 * 2;
-    }
-  else if (sop == 2 && sopcde == 3 && HLs == 1)
-    {
-      notethat ("A1 = ROT A1 BY dregs_lo");
-      OUTS (outf, "A1");
-      OUTS (outf, "=");
-      OUTS (outf, " ROT ");
-      OUTS (outf, "A1");
-      OUTS (outf, "BY");
-      OUTS (outf, dregs_lo (src0));
-      return 2 * 2;
-    }
-  else if (sop == 0 && sopcde == 3 && HLs == 0)
-    {
-      notethat ("A0 = ASHIFT A0 BY dregs_lo");
-      OUTS (outf, "A0");
+      notethat ("An = ASHIFT An BY dregs_lo");
+      OUTS (outf, acc01);
       OUTS (outf, "=");
       OUTS (outf, " ASHIFT ");
-      OUTS (outf, "A0");
+      OUTS (outf, acc01);
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
       return 2 * 2;
     }
-  else if (sop == 0 && sopcde == 3 && HLs == 1)
+  else if (sop == 1 && sopcde == 3)
     {
-      notethat ("A1 = ASHIFT A1 BY dregs_lo");
-      OUTS (outf, "A1");
-      OUTS (outf, "=");
-      OUTS (outf, " ASHIFT ");
-      OUTS (outf, "A1");
-      OUTS (outf, "BY");
-      OUTS (outf, dregs_lo (src0));
-      return 2 * 2;
-    }
-  else if (sop == 1 && sopcde == 3 && HLs == 0)
-    {
-      notethat ("A0 = LSHIFT A0 BY dregs_lo");
-      OUTS (outf, "A0");
+      notethat ("An = LSHIFT An BY dregs_lo");
+      OUTS (outf, acc01);
       OUTS (outf, "=");
       OUTS (outf, " LSHIFT ");
-      OUTS (outf, "A0");
+      OUTS (outf, acc01);
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
       return 2 * 2;
     }
-  else if (sop == 1 && sopcde == 3 && HLs == 1)
+  else if (sop == 2 && sopcde == 3)
     {
-      notethat ("A1 = LSHIFT A1 BY dregs_lo");
-      OUTS (outf, "A1");
-      OUTS (outf, "=");
-      OUTS (outf, " LSHIFT ");
-      OUTS (outf, "A1");
-      OUTS (outf, "BY");
-      OUTS (outf, dregs_lo (src0));
-      return 2 * 2;
-    }
-  else if (sop == 2 && sopcde == 3 && HLs == 0)
-    {
-      notethat ("A0 = ROT A0 BY dregs_lo");
-      OUTS (outf, "A0");
+      notethat ("An = ROT An BY dregs_lo");
+      OUTS (outf, acc01);
       OUTS (outf, "=");
       OUTS (outf, " ROT ");
-      OUTS (outf, "A0");
+      OUTS (outf, acc01);
+      OUTS (outf, "BY");
+      OUTS (outf, dregs_lo (src0));
+      return 2 * 2;
+    }
+  else if (sop == 3 && sopcde == 3)
+    {
+      notethat ("dregs = ROT dregs BY dregs_lo");
+      OUTS (outf, dregs (dst0));
+      OUTS (outf, "=");
+      OUTS (outf, " ROT ");
+      OUTS (outf, dregs (src1));
       OUTS (outf, "BY");
       OUTS (outf, dregs_lo (src0));
       return 2 * 2;
