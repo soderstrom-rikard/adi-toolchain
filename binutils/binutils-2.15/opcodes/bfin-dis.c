@@ -1168,7 +1168,7 @@ static int decode_ProgCtrl_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_i
         return 1*2;
   } else if ((prgfunc==4)) {
         notethat ("STI dregs");
-        OUTS(outf,"STI");
+        OUTS(outf,"STI  ");
         OUTS(outf,dregs(poprnd));
         return 1*2;
   } else if ((prgfunc==5)) {
@@ -6820,8 +6820,10 @@ print_insn_bfin (bfd_vma pc, disassemble_info *outf)
 	outf->fprintf_func (outf->stream, ", ");
 	count += _print_insn_bfin (pc+6, outf);
     }
-    if (count == 0)
-	return -1;
+    if (count == 0) {
+	outf->fprintf_func (outf->stream, "ILLEGAL");
+	return 2;
+    }
     outf->fprintf_func (outf->stream, ";");
     return count;
 }

@@ -1,3 +1,9 @@
+2004-10-09  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin-dis.c (decode_ProgCtrl_0): Add spaces after "STI".
+	(print_insn_bfin): Don't terminate disassembly when finding an illegal
+	instruction.
+
 2004-10-03  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin-dis.c (enum machine_registers): Remove REG_AC; add REG_AC0,
@@ -11,6 +17,4 @@
 	(decode_LDSTiiFP_0): Correct double minus sign problem.
 	(_print_insn_bfin): Read instruction words one at a time, not in one
 	four byte read.
-	
-	
 	
