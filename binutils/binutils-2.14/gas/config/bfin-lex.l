@@ -358,7 +358,7 @@ emucause                                yylval.regno = REG_emucause;return REG;
 "+|-"					return _PLUS_BAR_MINUS;
 "-|-"					return _MINUS_BAR_MINUS;
 "--"                                    return _MINUS_MINUS;
-"-"                                     return MINUS;
+"-"                                     { return MINUS;}
 ","                                     return COMMA;
 "+="                                    return _PLUS_ASSIGN;
 "++"                                    return _PLUS_PLUS;

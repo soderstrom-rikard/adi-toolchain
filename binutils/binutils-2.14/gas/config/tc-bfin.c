@@ -500,8 +500,9 @@ md_apply_fix3 (fixP, valp, seg)
   int highbyte = target_big_endian ? 0 : 1; 
   long val = *valp;
   int shift;
+  int not_yet_resolved = 0;
 //fprintf(stderr, "calling fix3 with %x\n", fixP->fx_r_type);
-return; // currently let us not fix local relocations.
+//return; // currently let us not fix local relocations.
 
 #if 0
   if (fixP->fx_r_type == BFD_RELOC_32)
@@ -590,8 +591,7 @@ return; // currently let us not fix local relocations.
 	buf[2] = val >> 0;
 	buf[3] = val >> 8;
 	break;
-     case BFD_RELOC_5_PCREL: //TODO -Jyotik
-     case BFD_RELOC_4_PCREL:
+     case BFD_RELOC_5_PCREL: 
 	if (! val) 
 	{   fixP->fx_addnumber = 0; break;	}
 	fixP->fx_addnumber = 1;
@@ -599,7 +599,9 @@ return; // currently let us not fix local relocations.
 	shift = 1;
 
 	if (val < -0x8 || val >= 0x7)
-	  as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_4");
+	{
+	       	as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_5");
+	}
 	*buf = (*buf & 0xf0) | (val & 0xf);
 	break;
      case BFD_RELOC_11_PCREL : //TODO Jyotik
@@ -655,11 +657,23 @@ return; // currently let us not fix local relocations.
 		//added following line for arithmetic reloc check -Jyotik
      default: if((BFD_ARELOC_PUSH > fixP->fx_r_type) || (BFD_ARELOC_COMP < fixP->fx_r_type))
 		      {
-
-		abort ();
+		fprintf(stderr, "Relocation %d not handled in gas."
+			       " Contact support.", fixP->fx_r_type);
+			return;
+//		abort ();
 		      }
+	      not_yet_resolved = 1; 
    }
-
+  // XXX
+  // <strubi>
+  // This might be a dirty hack. I don't know if it's appropriate,
+  // but once we have done the fixing, we don't want to have LD
+  // relocating anymore on these entries. We mark them as 'done'
+  // to not emit them to the relocation table. 
+   if (!fixP->fx_addsy && !not_yet_resolved)
+   {
+       fixP->fx_done = TRUE;
+   }
    if (shift != 0)
    {
      val = *valp;
@@ -901,6 +915,9 @@ INSTR_T ExprNodeGenReloc(ExprNode *head, int parent_reloc)
    */
   INSTR_T note = NULL_CODE;
   INSTR_T note1 = NULL_CODE;
+  int pcrel = 1; /* is the parent reloc pcrelative?
+		    This calculation here and HOWTO should match
+		 */
   if(parent_reloc)
   {
     //If it's 32 bit quantity then extra 16bit code needed to be add
@@ -920,6 +937,7 @@ INSTR_T ExprNodeGenReloc(ExprNode *head, int parent_reloc)
       case BFD_RELOC_16_LOW :
       case BFD_RELOC_16_HIGH :
         note1 = CONSCODE(GENCODE(value), NULL_CODE);
+	pcrel = 0; // only these are not pc relative
         break;
       case BFD_RELOC_24_PCREL_JUMP_X :
       case BFD_RELOC_24_PCREL :
@@ -938,13 +956,13 @@ INSTR_T ExprNodeGenReloc(ExprNode *head, int parent_reloc)
      note = note1;
   }
   else if(head->type == ExprNodeReloc){
-    note =  NOTERELOC1(0, parent_reloc, head->value.s_value, GENCODE(0x0));
+    note =  NOTERELOC1(pcrel, parent_reloc, head->value.s_value, GENCODE(0x0));
     if(note1 != NULL_CODE)
       note =  CONSCODE(note1, note);
   }
   else{
     /* call the recursive function */
-    note = NOTERELOC1(0, parent_reloc, op, GENCODE(0x0));
+    note = NOTERELOC1(pcrel, parent_reloc, op, GENCODE(0x0));
     if(note1 != NULL_CODE)
       note =  CONSCODE(note1, note);
     note =  CONCTCODE(ExprNodeGenRelocR(head), note);
