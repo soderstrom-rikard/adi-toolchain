@@ -65,11 +65,11 @@ Disassembly of section .text:
   a4:	04 c3 c1 e0 	R3.H = R0.H \* R1.H, R3 = R0.L \* R1.L \(IS\);
   a8:	00 c0 13 46 	a1 = R2.L \* R3.H, a0 = R2.H \* R3.H;
   ac:	01 c0 08 c0 	a1 \+= R1.H \* R0.H, a0 = R1.L \* R0.L;
-  b0:	60 c0 2f c8	a1 = R5.H \* R7.H, a0 \+= R5.L \* R7.L \(W32\);
-  b4:	01 c1 01 c0	a1 \+= R0.H \* R1.H, a0 = R0.L \* R1.L \(TS\);
+  b0:	60 c0 2f c8 	a1 = R5.H \* R7.H, a0 \+= R5.L \* R7.L \(W32\);
+  b4:	01 c1 01 c0 	a1 \+= R0.H \* R1.H, a0 = R0.L \* R1.L \(IS\);
   b8:	90 c0 1c c8 	a1 = R3.H \* R4.H \(M\), a0 \+= R3.L \* R4.L \(FU\);
-  bc:	01 c0 24 96	a1 \+= R4.H \* R4.L, a0 -= R4.H \* R4.H; 
-  c0:	25 c1 3e e8	R0.H = \(a1 \+= R7.H \* R6.H\), R0.L = \(a0 \+= R7.L \* R6.L\) \(ISS2\);
+  bc:	01 c0 24 96 	a1 \+= R4.H \* R4.L, a0 -= R4.H \* R4.H;
+  c0:	25 c1 3e e8 	R0.H = \(a1 \+= R7.H \* R6.H\), R0.L = \(a0 \+= R7.L \* R6.L\) \(ISS2\);
   c4:	27 c0 81 28 	R2.H = A1, R2.L = \(a0 \+= R0.L \* R1.L\) \(S2RND\);
   c8:	04 c0 d1 c9 	R7.H = \(a1 = R2.H \* R1.H\), a0 \+= R2.L \* R1.L;
   cc:	04 c0 be 66 	R2.H = \(a1 = R7.L \* R6.H\), R2.L = \(a0 = R7.H \* R6.H\);
