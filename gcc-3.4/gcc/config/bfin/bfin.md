@@ -105,7 +105,7 @@
    (REG_CC 34)])
 
 (define_attr "type"
-  "move,mvp,load,store,push,mcld,mcldp,mcst,dsp32,mult,alu0,shft,brcc,br,call,misc,compare"
+  "move,mvi,mcld,mcldp,mcst,dsp32,mult,alu0,shft,brcc,br,call,misc,compare"
   (const_string "misc"))
 
 
@@ -127,39 +127,20 @@
 (define_attr "length" ""
   (cond [(eq_attr "type" "mcld")
          (if_then_else (match_operand 1 "effective_address_32bit_p" "")
-                       (const_int 8)
-                        (if_then_else (match_operand 1 "imm7bit_operand_p" "")
-                                     (const_int 2)
-                                     (const_int 4)))
-
-         (eq_attr "type" "mcldp")
-         (if_then_else (match_operand 1 "effective_address_32bit_p" "")
-                       (const_int 8)
-                        (if_then_else (match_operand 1 "imm7bit_operand_p" "")
-                                     (const_int 2)
-                                     (const_int 4)))
+                       (const_int 8) (const_int 4))
 
 	 (eq_attr "type" "mcst")
 	 (if_then_else (match_operand 0 "effective_address_32bit_p" "")
 		       (const_int 4) (const_int 2))
 
-	 (eq_attr "type" "move")
-	 (if_then_else (match_operand 1 "register_operand" "")
-          (const_int 2)
-	   (if_then_else (match_operand 1 "imm7bit_operand_p" "")
-            (const_int 2)
-	    (if_then_else (match_operand 1 "symbolic_or_const_operand_p" "")
-	     (const_int 8)
-	     (const_int 4))))
+	 (eq_attr "type" "move") (const_int 2)
 
-         (eq_attr "type" "mvp")
-	 (if_then_else (match_operand 1 "register_operand" "")
-          (const_int 2)
-	   (if_then_else (match_operand 1 "imm7bit_operand_p" "")
-            (const_int 2)
-	    (if_then_else (match_operand 1 "symbolic_or_const_operand_p" "")
-	     (const_int 8)
-	     (const_int 4))))
+	 (eq_attr "type" "mvi")
+	  (if_then_else (match_operand 1 "imm7bit_operand_p" "")
+	   (const_int 2)
+	   (if_then_else (match_operand 1 "imm16bit_operand_p" "")
+            (const_int 4)
+	    (const_int 8)))
 
 	 (eq_attr "type" "dsp32") (const_int 4)
 	 (eq_attr "type" "call")  (const_int 4)
@@ -184,6 +165,13 @@
         ]
 
 	(const_int 2)))
+
+(define_attr "sets_preg" "no,yes"
+	(cond 
+	 [(eq_attr "type" "move,mcld")
+	  (symbol_ref "REG_P (SET_DEST (PATTERN (insn))) && PREG_P (SET_DEST (PATTERN (insn)))")]
+	  (const_string "no")))
+	  
 ;;; Default 2-bytes INSN: load, store, push, alu0, shft, compare, misc, mult
 
 
@@ -191,8 +179,7 @@
 ;;                                {ready-delay} {issue-delay} [{conflict-list}])
 ;;(define_function_unit "dag" 1 0 (eq_attr "type" "move") 1 2)
 
-(define_function_unit "dag" 1 1 (eq_attr "type" "mvp") 4 0)
-(define_function_unit "dag" 1 1 (eq_attr "type" "mcldp") 4 0)
+(define_function_unit "dag" 1 1 (eq_attr "sets_preg" "yes") 4 0)
 
 ;;; WORD conversion patterns
 
@@ -263,77 +250,71 @@
 ")
 
 (define_insn "*movsicc_insn1"
-  [(set (match_operand:SI 0 "register_operand" "=d, a, d, a, d, a")
+  [(set (match_operand:SI 0 "register_operand" "=da,da,da")
         (if_then_else:SI 
-	    (eq:CC (match_operand:CC 3 "cc_operand" "C, C, C, C, C, C") 
+	    (eq:CC (match_operand:CC 3 "cc_operand" "C,C,C") 
 		(const_int 0))
-	    (match_operand:SI 1 "register_operand" "da, da, 0, 0, da, da")
-	    (match_operand:SI 2 "register_operand" "0, 0, da, da, da, da")))]
+	    (match_operand:SI 1 "register_operand" "da,0,da")
+	    (match_operand:SI 2 "register_operand" "0,da,da")))]
   ""
   "@
     if !cc %0 =%1; /* movsicc-1a */
-    if !cc %0 =%1; /* movsicc-1a */
     if cc %0 =%2; /* movsicc-1b */
-    if cc %0 =%2; /* movsicc-1b */
-    if !cc %0 =%1; if cc %0=%2; /* movsicc-1 */
     if !cc %0 =%1; if cc %0=%2; /* movsicc-1 */"
-  [(set_attr "length" "2,2,2,2,4,4")
-   (set_attr "type" "move,mvp,move,mvp,move,mvp")])
+  [(set_attr "length" "2,2,4")
+   (set_attr "type" "move")])
  
 (define_insn "*movsicc_insn2"
-  [(set (match_operand:SI 0 "register_operand" "=d, a, d, a, d, a")
+  [(set (match_operand:SI 0 "register_operand" "=da,da,da")
         (if_then_else:SI 
-	    (ne:CC (match_operand:CC 3 "cc_operand" "C, C, C, C, C, C") 
+	    (ne:CC (match_operand:CC 3 "cc_operand" "C,C,C") 
 		(const_int 0))
-	    (match_operand:SI 1 "register_operand" "0, 0, da, da, da, da")
-	    (match_operand:SI 2 "register_operand" "da, da, 0, 0, da, da")))]
+	    (match_operand:SI 1 "register_operand" "0,da,da")
+	    (match_operand:SI 2 "register_operand" "da,0,da")))]
   ""
   "@
     if !cc %0 =%2; /* movsicc-2b */
-    if !cc %0 =%2; /* movsicc-2b */
     if cc %0 =%1; /* movsicc-2a */
-    if cc %0 =%1; /* movsicc-2a */
-    if cc %0 =%1; if !cc %0=%2; /* movsicc-1 */
     if cc %0 =%1; if !cc %0=%2; /* movsicc-1 */"
-  [(set_attr "length" "2,2,2,2,4,4")
-   (set_attr "type" "move,mvp,move,mvp,move,mvp")])
+  [(set_attr "length" "2,2,4")
+   (set_attr "type" "move")])
 
 ;;; Future work: split constants in expand
 
 (define_insn "*movsi_insn"
-  [(set (match_operand:SI 0 "nonimmediate_operand" "=da,*cf,  d, a,  mr, !*e, !*e, !d, !d, !C")
-        (match_operand:SI 1 "general_operand"      " xi, xi, mr, mr, da,   d,  eP, *e,  C, d"))]
+  [(set (match_operand:SI 0 "nonimmediate_operand" "=da,da,*cf,*cf,da,mr,!*e,!*e,!d,!d,!C")
+        (match_operand:SI 1 "general_operand"      "  x,ix,  x, ix,mr,da,  d, eP,*e, C,d"))]
 
   ""
   "*
    output_load_immediate (operands);
    return \"\";
   "
-  [(set_attr "type" "move,move,mcld,mcldp,mcst,move,move,move,compare,compare")])
+  [(set_attr "type" "move,mvi,move,mvi,mcld,mcst,move,move,move,compare,compare")])
 
 (define_insn "*movhi_insn"
-  [(set (match_operand:HI 0 "nonimmediate_operand" "=da,*cf, d, mr, !*e, !*e, !d, !d, !C")
-        (match_operand:HI 1 "general_operand"      " xi, xi, mr, d,   d,  eP, *e,  C, d"))]
+  [(set (match_operand:HI 0 "nonimmediate_operand" "=da,da,*cf,*cf,d,mr,!*e,!*e,!d,!d,!C")
+        (match_operand:HI 1 "general_operand"      "  x,ix,  x, ix,mr,d,  d, eP,*e, C,d"))]
   ""
   "*
    output_load_immediate (operands);
    return \"\";
   "
-  [(set_attr "type" "move,move,mcld,mcst,move,move,move,compare,compare")])
+  [(set_attr "type" "move,mvi,move,mvi,mcld,mcst,move,move,move,compare,compare")])
 
 (define_insn "*movqi_insn"
-  [(set (match_operand:QI 0 "nonimmediate_operand" "=da,*cf, d, mr, !*e, !*e, !d, !d, !C")
-        (match_operand:QI 1 "general_operand"      " xi, xi, mr, d,   d,  eP, *e,  C, d"))]
+  [(set (match_operand:QI 0 "nonimmediate_operand" "=da,da,*cf,*cf,d,mr,!*e,!*e,!d,!d,!C")
+        (match_operand:QI 1 "general_operand"      "  x,ix,  x, ix,mr,d,  d, eP,*e, C,d"))]
   ""
   "*
    output_load_immediate (operands);
    return \"\";
   "
-  [(set_attr "type" "move,move,mcld,mcst,move,move,move,compare,compare")])
+  [(set_attr "type" "move,mvi,move,mvi,mcld,mcst,move,move,move,compare,compare")])
 
 (define_insn "*movsf_insn"
-  [(set (match_operand:SF 0 "nonimmediate_operand" "=da,*cf,  d,  a, mr, !*e, !*e, !d, !d, !C")
-        (match_operand:SF 1 "general_operand"      " xi, xi, mr, mr, da,   d,  eP, *e,  C, d"))]
+  [(set (match_operand:SF 0 "nonimmediate_operand" "=da,da,*cf,*cf,da,mr,!*e,!*e,!d,!d,!C")
+        (match_operand:SF 1 "general_operand"      "  x,ix,  x, ix,mr,da,  d, eP,*e, C,d"))]
   ""
   "*
   {
@@ -356,7 +337,7 @@
    output_load_immediate (operands);
    return \"\";
   }"
-  [(set_attr "type" "move,move,mcld,mcldp,mcst,move,move,move,compare,compare")])
+  [(set_attr "type" "move,mvi,move,mvi,mcld,mcst,move,move,move,compare,compare")])
 
 (define_expand "movsi"
   [(set (match_operand:SI 0 "nonimmediate_operand" "")

@@ -52,6 +52,18 @@
 	(subsi3): Remove constraints from define_expand pattern.
 	(casesi): Make sure we generate valid add insns.
 
+	* config/bfin/bfin.md (attr "type"): Remove unused types "load" and
+	"store"; remove "mvp" and "mcldp"; add "mvi".
+	(attr "length"): Changes to deal with insn type reorganization.
+	Correct length of constant to register moves.
+	(attr "sets_preg"): New, replaces mvp/move and mcldp/mcld
+	distinction.
+	(function unit "dag"): Use it.
+	(movsicc_insn1, movsicc_insn2, movsi_insn, movhi_insn, movqi_insn,
+	movsf_insn): Combine move/mvp and mcld/mcldp alternatives. Create new
+	alternatives for immediate constant loads where appropriate.
+	* config/bfin/bfin-protos.h (imm16bit_operand_p): Declare.
+
 2004-09-01  Bernd Schmidt  <bernds@btinternet.com>
 
 	* config/bfin/bfin.c (imm7bit_operand, imm16bit_operand): Test for

@@ -50,6 +50,7 @@ extern int frame_pointer_required PARAMS ((void));
 extern int effective_address_32bit_p PARAMS ((rtx, Mmode));
 extern int symbolic_operand_p PARAMS ((rtx, Mmode));
 extern int imm7bit_operand_p PARAMS ((rtx, Mmode));
+extern int imm16bit_operand_p PARAMS ((rtx, Mmode));
 extern rtx bfin_gen_compare PARAMS ((rtx, Mmode));
 extern void expand_move PARAMS ((rtx *, Mmode));
 extern int extract_const_double PARAMS ((rtx));
