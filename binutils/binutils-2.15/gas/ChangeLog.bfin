@@ -1,3 +1,8 @@
+2005-01-27  Catherine Moore  <clm@cm00re.com>
+
+	* config/bfin-parse.y: Correct arguments to DSP32SHIFTIMM.
+	Correct arguments to IS_UIMM for shift immediates. 
+
 2005-01-25  Catherine Moore  <clm@cm00re.com>
 
 	* config/bfin-parse.y: Fix negation of fp-immediate.

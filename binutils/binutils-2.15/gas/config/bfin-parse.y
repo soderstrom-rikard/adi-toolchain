@@ -1944,7 +1944,7 @@ asm_1:
 	  if (IS_UIMM ($4, 5))
 	    {
 	      notethat("dsp32shiftimm: A0 = A0 << uimm5\n");
-	      $$ = DSP32SHIFTIMM (3, &$1, imm6($4), 0, 0, IS_A1 ($1));
+	      $$ = DSP32SHIFTIMM (3, 0, imm5($4), 0, 0, IS_A1 ($1));
 	    }
 	  else
 	    return semantic_error ("Bad shift value");
@@ -1953,7 +1953,7 @@ asm_1:
 /* 5 rules compacted */
 	| REG ASSIGN REG LESS_LESS expr vsmod
 	{
-	  if (IS_DREG ($1) && IS_DREG ($3) && IS_UIMM ($5, 4))
+	  if (IS_DREG ($1) && IS_DREG ($3) && IS_UIMM ($5, 5))
 	    {
 	      if ($6.r0)
 		{
@@ -1987,12 +1987,22 @@ asm_1:
 	}
 
 /* 4 rules compacted */
+	| HALF_REG ASSIGN HALF_REG LESS_LESS expr
+	{
+	  if (IS_UIMM ($5, 4))
+	    {
+	      notethat("dsp32shiftimm: dregs_half = dregs_half << uimm4\n");
+	      $$ = DSP32SHIFTIMM (0x0, &$1, imm5 ($5), &$3, 2, HL2 ($1, $3));
+	    }
+	  else
+	    return semantic_error ("Bad shift value");
+	}
 	| HALF_REG ASSIGN HALF_REG LESS_LESS expr smod 
 	{
 	  if (IS_UIMM ($5, 4))
 	    {
 	      notethat("dsp32shiftimm: dregs_half = dregs_half << uimm4\n");
-	      $$ = DSP32SHIFTIMM (0, &$1, imm5 ($5), &$3, $6.s0, HL2 ($1, $3));
+	      $$ = DSP32SHIFTIMM (0x0, &$1, imm5 ($5), &$3, $6.s0, HL2 ($1, $3));
 	    }
 	  else
 	    return semantic_error ("Bad shift value");
@@ -2096,7 +2106,7 @@ asm_1:
 	  if (IS_UIMM ($4, 5))
 	    {
 	      notethat("dsp32shiftimm: Ax = Ax >>> uimm5\n");
-	      $$ = DSP32SHIFTIMM (3, 0, -uimm5 ($4), 0, 0, IS_A1 ($1));
+	      $$ = DSP32SHIFTIMM (3, 0, -imm6($4), 0, 0, IS_A1 ($1));
 	    }
 	  else
 	    return semantic_error ("Shift value range error");
@@ -2313,7 +2323,7 @@ asm_1:
 	  if (IS_DREG ($1) && IS_DREG ($4) && IS_DREG_L($6))
 	    {
 	      notethat("dsp32shift: dregs = ROT dregs BY dregs_lo\n");
-	      $$ = DSP32SHIFT (3, &$1, &$6, &$4, 3, 0);
+	      $$ = DSP32SHIFT (2, &$1, &$6, &$4, 3, 0);
 	    }
 	  else
 	    return register_mismatch();
@@ -2324,7 +2334,7 @@ asm_1:
 	  if (IS_IMM ($5, 6))
 	    {
 	      notethat("dsp32shiftimm: An = ROT An BY imm6\n");
-	      $$ = DSP32SHIFTIMM (3, &$1, imm6($5), 0, 2, IS_A1 ($1));
+	      $$ = DSP32SHIFTIMM (3, 0, imm6($5), 0, 2, IS_A1 ($1));
 	    }
 	  else
 	    return register_mismatch();
