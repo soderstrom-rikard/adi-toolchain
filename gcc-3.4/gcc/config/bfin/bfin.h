@@ -46,7 +46,6 @@
 #define MASK_CSYNC                   0x00010000
 #define MASK_SIMPLE_RTM              0x00020000
 #define MASK_LOW_64K           	     0x00040000
-#define MASK_ASM_DIR                 0x00100000 /* use alternative assembly ectives */
 #define MASK_CMOV	             0x00200000 /* use conditional moves */
 #define MASK_PROFILE		     0x01000000 /* Instrument for NON GNU
 						 * profiling */
@@ -78,7 +77,6 @@ extern int target_flags;
 #define TARGET_DEBUG_ARG	       (target_flags & MASK_DEBUG_ARGS)
 #define TARGET_SIMPLE_RTM              (target_flags & MASK_SIMPLE_RTM)
 #define TARGET_LOW_64K                 (target_flags & MASK_LOW_64K)
-#define TARGET_ASM_DIR		       (target_flags & MASK_ASM_DIR)
 #define TARGET_CSYNC		       (target_flags & MASK_CSYNC)
 #define TARGET_NO_UNDERSCORE	       (target_flags & MASK_NO_UNDERSCORE)
 
@@ -105,10 +103,6 @@ extern int target_flags;
     "Program is located in low 64K of memory" },			\
   { "no-low64k",	         -MASK_LOW_64K,				\
     "Program is not located in low 64K of memory (default)"},		\
-  { "asm-dir",		         MASK_ASM_DIR,				\
-    "Alternative style of assembly directives"},			\
-  { "no-asm-dir",		-MASK_ASM_DIR,				\
-    "Alternative style of assembly directives"},			\
   { "cmov",		         MASK_CMOV,				\
     "Use conditional moves"},						\
   { "no-cmov",			-MASK_CMOV,				\
@@ -1207,17 +1201,11 @@ typedef enum directives {
     LAST_DIR_NM
 } DIR_ENUM_T;
 
-#define TEXT_SECTION_ASM_OP section_asm_op (CODE_DIR)
-#define DATA_SECTION_ASM_OP section_asm_op (DATA_DIR)
+#define TEXT_SECTION_ASM_OP ".text;"
+#define DATA_SECTION_ASM_OP ".data;"
 
 #define ASM_APP_ON  ""
 #define ASM_APP_OFF ""
-
-#define ASM_LONG  directive_names[LONG_CONST_DIR]
-#define ASM_SHORT directive_names[SHORT_CONST_DIR]
-#define ASM_BYTE directive_names[BYTE_CONST_DIR]
-#define ASM_SPACE directive_names[SPACE_DIR]
-#define ASM_INIT directive_names[INIT_DIR]
 
 /* Switch into a generic section.
  *    This is currently only used to support section attributes.
@@ -1279,7 +1267,7 @@ typedef enum directives {
 
 #define ASM_OUTPUT_ADDR_VEC_ELT(FILE, VALUE)    	\
 do { char __buf[256];					\
-     fprintf (FILE, "\t%s%s\t", ASM_LONG, ASM_INIT);	\
+     fprintf (FILE, "\t%s\t", ASM_LONG);		\
      ASM_GENERATE_INTERNAL_LABEL (__buf, "L", VALUE);	\
      assemble_name (FILE, __buf);			\
      fputc (';', FILE);					\
@@ -1290,44 +1278,36 @@ do { char __buf[256];					\
     MY_ASM_OUTPUT_ADDR_DIFF_ELT(FILE, VALUE, REL)
 
 #define MY_ASM_OUTPUT_ADDR_DIFF_ELT(FILE, VALUE, REL) \
-do { char __buf[256];					\
-     fprintf (FILE, "\t%s%s\t", ASM_SHORT, ASM_INIT);	\
-     ASM_GENERATE_INTERNAL_LABEL (__buf, "L", VALUE);	\
-     assemble_name (FILE, __buf);			\
-     fputs (" - ", FILE);					\
-     ASM_GENERATE_INTERNAL_LABEL (__buf, "L", REL);	\
-     assemble_name (FILE, __buf);			\
-     fputc (';', FILE);					\
-     fputc ('\n', FILE);				\
-   } while (0)
+    do {						\
+	char __buf[256];				\
+	fprintf (FILE, "\t%s\t", ASM_SHORT);		\
+	ASM_GENERATE_INTERNAL_LABEL (__buf, "L", VALUE);	\
+	assemble_name (FILE, __buf);				\
+	fputs (" - ", FILE);					\
+	ASM_GENERATE_INTERNAL_LABEL (__buf, "L", REL);		\
+	assemble_name (FILE, __buf);				\
+	fputc (';', FILE);					\
+	fputc ('\n', FILE);					\
+    } while (0)
 
 #define ASM_OUTPUT_ALIGN(FILE,LOG) 				\
     do {		 					\
-     if (!TARGET_ASM_DIR) fprintf (FILE, ".align %d\n", LOG); 	\
-     else fprintf (FILE, ".align %d;\n", 1 << LOG);		\
-   } while (0)
+	fprintf (FILE, ".align %d\n", LOG);			\
+    } while (0)
 
-#define ASM_OUTPUT_SKIP(FILE,SIZE) 	\
-   do {  asm_output_skip (FILE, SIZE);	\
-       } while (0)
+#define ASM_OUTPUT_SKIP(FILE,SIZE)		\
+    do {					\
+	asm_output_skip (FILE, SIZE);		\
+    } while (0)
 
 #define ASM_OUTPUT_LOCAL(FILE, NAME, SIZE, ROUNDED) 	\
 do { 						\
     data_section();				\
     if ((SIZE) >= (unsigned int) 4 ) ASM_OUTPUT_ALIGN(FILE,2);	\
-    if (!TARGET_ASM_DIR) {			\
-	ASM_OUTPUT_SIZE_DIRECTIVE (FILE, NAME, SIZE);\
-	ASM_OUTPUT_LABEL (FILE, NAME); 		\
-	fprintf (FILE, "%s %ld;\n", ASM_SPACE, 	\
-		(ROUNDED) > (unsigned int) 1 ? (ROUNDED) : 1); \
-    } else {					\
-	char __buf[256];			\
-	fprintf (FILE, "%s ", ASM_SPACE); 	\
-	sprintf (__buf, "%s[%ld]", (NAME), (ROUNDED) > (unsigned int) 1 ? (ROUNDED) : 1);\
-        assemble_name (FILE, __buf);            \
-        fputc (';', FILE);                    	\
-        fputc ('\n', FILE);                    	\
-    }						\
+    ASM_OUTPUT_SIZE_DIRECTIVE (FILE, NAME, SIZE);		\
+    ASM_OUTPUT_LABEL (FILE, NAME);				\
+    fprintf (FILE, "%s %ld;\n", ASM_SPACE,			\
+	     (ROUNDED) > (unsigned int) 1 ? (ROUNDED) : 1);	\
 } while (0)
 
 #define ASM_OUTPUT_COMMON(FILE, NAME, SIZE, ROUNDED)	\
@@ -1341,59 +1321,7 @@ do { 						\
         } while (0)	
 */
 
-#define ASM_OUTPUT_BYTE(FILE, VALUE)\
-    fprintf(FILE, "\t%s%s 0x%x;\n", ".db", ASM_INIT, (VALUE));
-
-#define ASM_OUTPUT_CHAR(FILE, VALUE)\
-      do {fprintf (FILE, "\t%s%s", ASM_BYTE, ASM_INIT);	\
-	  output_addr_const (FILE, (VALUE));	\
-	  putc (';', FILE);			\
-	  putc ('\n', FILE);			\
-      } while (0)
-
-#define ASM_OUTPUT_SHORT(FILE, VALUE)\
-  do {fprintf (FILE, "\t%s%s", ASM_SHORT, ASM_INIT); \
-      output_addr_const (FILE,(VALUE));	\
-      putc(';',FILE);			\
-      putc('\n',FILE);			\
-  } while (0)
-
-
-#define ASM_OUTPUT_INT(FILE, VALUE)\
-  do { fprintf (FILE, "\t%s%s", ASM_LONG, ASM_INIT); \
-       output_addr_const (FILE,(VALUE));     	\
-       putc(';',FILE);                       	\
-       putc('\n',FILE);				\
-  } while (0)
-
-#define ASM_OUTPUT_ASCII(FILE,STR,SZ) 		\
-    do { asm_output_ascii (FILE,STR,SZ);	\
-       } while (0)
-
-
 #define ASM_COMMENT_START "//"
-
-/* This is how to output an assembler line defining a `float' constant.  */
-#define ASM_OUTPUT_FLOAT(FILE,VALUE)                    \
-do { long l;                                            \
-     char str[30];					\
-     REAL_VALUE_TO_TARGET_SINGLE ((VALUE), l);          \
-     REAL_VALUE_TO_DECIMAL ((VALUE), "%.20e", str);	\
-     fprintf(FILE, "\t%s%s0x%lx;\t%s %s\n", ASM_LONG,	\
-     ASM_INIT, l, ASM_COMMENT_START, str);		\
-   } while (0)
-
-/* This is how to output an assembler line defining a `double' constant.  */
-#define ASM_OUTPUT_DOUBLE(FILE, VALUE) \
-{                                                       \
-  long t[2];                                            \
-  char str[30];                                         \
-  REAL_VALUE_TO_TARGET_DOUBLE ((VALUE), t);             \
-  REAL_VALUE_TO_DECIMAL ((VALUE), "%.20e", str);        \
-  fprintf (FILE, "\t%s\t0x%lx %s %s\n\t%s\t0x%lx\n",	\
-           ASM_LONG, t[0], ASM_COMMENT_START, str, ASM_LONG, t[1]);         \
-}  
-
 
 #define FUNCTION_PROFILER(FILE, LABELNO) \
   do {\

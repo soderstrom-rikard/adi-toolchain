@@ -26,6 +26,19 @@
 	(movsi splitter): Changed to handle all constants, not just symbolic
 	ones.
 
+	* config/bfin/bfin.h (MASK_ASM_DIR, TARGET_ASM_DIR): Delete macros.
+	(TARGET_SWITCHES): Remove -masm-dir, -mno-asm-dir.
+	(TEXT_SECTION_ASM_OP, DATA_SECTION_ASM_OP): Use plain strings.
+	(ASM_INIT, ASM_LONG, ASM_SHORT, ASM_BYTE, ASM_SPACE): Delete macros.
+	(ASM_OUTPUT_LOCAL): Remove code for -masm-dir.
+	(ASM_OUTPUT_BYTE, ASM_OUTPUT_CHAR, ASM_OUTPUT_SHORT, ASM_OUTPUT_INT,
+	ASM_OUTPUT_ASCII, ASM_OUTPUT_FLOAT, ASM_OUTPUT_DOUBLE): Delete unused
+	macros.
+	* config/bfin/bfin.c (asm_output_skip, asm_output_ascii): Delete
+	unused functions.
+	* config/bfin/bfin-protos.h (asm_output_skip, asm_output_ascii):
+	Delete.
+
 2004-11-17  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (extendsidi2, zero_extendsidi2): Generate valid

@@ -1586,35 +1586,6 @@ positive_immediate_operand (rtx op, enum machine_mode mode)
 {
   return GET_CODE (op) == CONST_INT && INTVAL (op) >= 0;
 }
-
-void
-asm_output_skip (FILE *file, int size) {
-    if (!TARGET_ASM_DIR) {					
-	fprintf (file, "\t%s\t%u\n", ASM_SPACE, size);
-    } else {							
-	char __buf[256];
-	fprintf (file, "%s ", ASM_BYTE);
-	sprintf (__buf, "LV$%d", bfin_lvno++);
-	fprintf(file, " %s[%d];\n", __buf, size);
-    }							
-}
-
-void
-asm_output_ascii (FILE *file, const char *str, int sz) {
-    int jk = 0;
-
-    while (jk < sz) {
-         if (jk+2 < sz){
-           fprintf (file, "%s%s0x%02x%02x;\n", ASM_SHORT, ASM_INIT,
-                    (unsigned char)str[jk+1], (unsigned char)str[jk]);
-	   jk+=2;
-         }
-         else {
-           fprintf (file, "%s%s0x%02x;\n", ASM_BYTE, ASM_INIT, (unsigned char)str[jk]);
-           jk+=1;
-         }
-    }
-}
 
 /* Split one or more DImode RTL references into pairs of SImode
    references.  The RTL can be REG, offsettable MEM, integer constant, or
