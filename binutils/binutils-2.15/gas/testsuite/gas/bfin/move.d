@@ -1,80 +1,81 @@
 #objdump: -dr
 #name: move
 .*: +file format .*
+
 Disassembly of section .text:
 
 00000000 <move_register>:
-   0:	38 31       	r7 = a0.x;
-   2:	fb 32       	fp = b3;
-   4:	35 36       	l2 = r5;
-   6:	b2 34       	m2 = i2;
-   8:	d8 39       	a1.w = usp;
-   a:	06 31       	r0 = astat;
-   c:	c9 31       	r1 = seqstat;
-   e:	d2 31       	r2 = syscfg;
-  10:	db 31       	r3 = reti;
-  12:	e4 31       	r4 = retx;
-  14:	ed 31       	r5 = retn;
-  16:	f6 31       	r6 = rete;
-  18:	3f 31       	r7 = rets;
-  1a:	a8 33       	p5 = lc0;
-  1c:	a3 33       	p4 = lc1;
-  1e:	99 33       	p3 = lt0;
-  20:	94 33       	p2 = lt1;
-  22:	8a 33       	p1 = lb0;
-  24:	85 33       	p0 = lb1;
-  26:	b6 33       	sp = cycles;
-  28:	bf 33       	fp = cycles2;
-  2a:	20 e1 00 00 	r0 = 0x0 \(x\);
-  2e:	31 3d       	cycles = a0.w;
-  30:	7f 38       	rets = fp;
-  32:	e0 3d       	lt1 = usp;
-  34:	08 c4 00 c0 	a0 = a1;
-  38:	08 c4 00 e0 	a1 = a0;
-  3c:	09 c4 00 20 	a0 = r0;
-  40:	09 c4 08 a0 	a1 = r1;
+   0:	38 31       	R7=A0.x;
+   2:	fb 32       	FP=B3;
+   4:	35 36       	L2=R5;
+   6:	b2 34       	M2=I2;
+   8:	d8 39       	A1.w=USP;
+   a:	06 31       	R0=ASTAT;
+   c:	c9 31       	R1=SEQSTAT;
+   e:	d2 31       	R2=SYSCFG;
+  10:	db 31       	R3=RETI;
+  12:	e4 31       	R4=RETX;
+  14:	ed 31       	R5=RETN;
+  16:	f6 31       	R6=RETE;
+  18:	3f 31       	R7=RETS;
+  1a:	a8 31       	R5=LC0;
+  1c:	a3 31       	R4=LC1;
+  1e:	99 31       	R3=LT0;
+  20:	94 31       	R2=LT1;
+  22:	8a 31       	R1=LB0;
+  24:	85 31       	R0=LB1;
+  26:	96 31       	R2=CYCLES;
+  28:	9f 31       	R3=CYCLES2;
+  2a:	cf 31		R1=EMUDAT;
+  2c:	31 3d       	CYCLES=A0.w;
+  2e:	7f 38       	RETS=FP;
+  30:	e0 3d       	LT1=USP;
+  34:	08 c4 3f c0 	A0=A1;
+  38:	08 c4 3f e0 	A1=A0;
+  3c:	09 c4 00 20 	A0=R0;
+  40:	09 c4 08 a0 	A1=R1;
+  44:	8b c0 00 39 	R4 = A0 \(FU\);
+  48:	2f c1 00 19 	R5 = A1 \(ISS2\);
+  4c:	0b c0 80 39 	R6 = A0;
+  50:	0f c0 80 19 	R7 = A1;
+  54:	0f c0 80 39 	R7 = A1, R6 = A0;
+  58:	8f c0 00 38 	R1 = A1, R0 = A0 \(FU\);
 
-00000044 <move_conditional>:
-  44:	6a 07       	if cc r5 = p2;
-  46:	b0 06       	if !cc sp = r0;
+0000005c <move_conditional>:
+  5c:	6a 07       	IF CC R5 = P2;
+  5e:	b0 06       	IF ! CC SP = R0;
 
-00000048 <move_half_to_full_zero_extend>:
-  48:	fa 42       	r2 = r7.l \(z\);
-  4a:	c8 42       	r0 = r1.l \(z\);
+00000060 <move_half_to_full_zero_extend>:
+  60:	fa 42       	R2=R7.L\(Z\);
+  62:	c8 42       	R0=R1.L\(Z\);
 
-0000004c <move_half_to_full_sign_extend>:
-  4c:	8d 42       	r5 = r1.l \(x\);
-  4e:	93 42       	r3 = r2.l \(x\);
+00000064 <move_half_to_full_sign_extend>:
+  64:	8d 42       	R5=R1.L\(X\);
+  66:	93 42       	R3=R2.L\(X\);
 
-00000050 <move_register_half>:
-  50:	09 c4 28 40 	a0.x = r5.l;
-  54:	09 c4 10 c0 	a1.x = r2.l;
-  58:	0a c4 00 00 	r0.l = a0.x;
-  5c:	0a c4 00 4e 	r7.l = a1.x;
-  60:	09 c4 18 00 	a0.l = r3.l;
-  64:	09 c4 20 80 	a1.l = r4.l;
-  68:	29 c4 30 00 	a0.h = r6.h;
-  6c:	29 c4 28 80 	a1.h = r5.h;
-  70:	83 c1 00 38 	, r0.l = a0 \(iu\);
-  74:	27 c0 40 18 	r1.h = a1,  \(s2rnd\);
-  78:	07 c0 40 18 	r1.h = a1, ;
-  7c:	67 c1 80 38 	r2.h = a1, r2.l = a0 \(ih\);
-  80:	07 c0 80 38 	r2.h = a1, r2.l = a0;
-  84:	47 c0 00 38 	r0.h = a1, r0.l = a0 \(iu\);
-  88:	87 c0 00 38 	r0.h = a1, r0.l = a0 \(fu\);
-  8c:	07 c1 00 38 	r0.h = a1, r0.l = a0 \(is\);
-  90:	07 c0 00 38 	r0.h = a1, r0.l = a0;
+00000068 <move_register_half>:
+  68:	09 c4 28 40 	A0.x=R5.L;
+  6c:	09 c4 10 c0 	A1.x=R2.L;
+  70:	0a c4 36 00 	R0.L=A0.x;
+  74:	0a c4 36 4e 	R7.L=A1.x;
+  78:	09 c4 18 00 	A0.L=R3.L;
+  7c:	09 c4 20 80 	A1.L=R4.L;
+  80:	29 c4 30 00 	A0.H=R6.H;
+  84:	29 c4 28 80 	A1.H=R5.H;
+  88:	83 c1 00 38 	R0.L = A0 \(IU\);
+  8c:	27 c0 40 18 	R1.H = A1 \(S2RND\);
+  90:	07 c0 40 18 	R1.H = A1;
+  94:	67 c1 80 38 	R2.H = A1, R2.L = A0 \(IH\);
+  98:	07 c0 80 38 	R2.H = A1, R2.L = A0;
+  9c:	47 c0 00 38 	R0.H = A1, R0.L = A0 \(T\);
+  a0:	87 c0 00 38 	R0.H = A1, R0.L = A0 \(FU\);
+  a4:	07 c1 00 38 	R0.H = A1, R0.L = A0 \(IS\);
+  a8:	07 c0 00 38 	R0.H = A1, R0.L = A0;
 
-00000094 <move_byte_zero_extend>:
-  94:	57 43       	r7 = r2.b \(z\);
-  96:	48 43       	r0 = r1.b \(z\);
+000000ac <move_byte_zero_extend>:
+  ac:	57 43       	R7=R2.B\(Z\);
+  ae:	48 43       	R0=R1.B\(Z\);
 
-00000098 <move_byte_sign_extend>:
-  98:	4e 43       	r6 = r1.b \(z\);
-  9a:	65 43       	r5 = r4.b \(z\);
-  9c:	8b c0 00 39 	, r4 = a0 \(fu\);
-  a0:	2f c1 00 19 	r5 = a1,  \(iss2\);
-  a4:	0b c0 80 39 	, r6 = a0;
-  a8:	0f c0 80 19 	r7 = a1, ;
-  ac:	0f c0 80 39 	r7 = a1, r6 = a0;
-  b0:	8f c0 00 38 	r1 = a1, r0 = a0 \(fu\);
+000000b0 <move_byte_sign_extend>:
+  b0:	4e 43       	R6=R1.B\(Z\);
+  b2:	65 43       	R5=R4.B\(Z\);
