@@ -1,3 +1,7 @@
+2004-11-15  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin-lex.l: Accept capitalized ABS.
+
 2004-11-15 Pradip Shah <pcs@rrap-software.com> 
 
 	* config/bfin-parse.y : rN=target distinguish between const and reloc.

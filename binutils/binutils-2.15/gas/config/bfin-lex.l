@@ -230,7 +230,7 @@ align24|ALIGN24                         return ALIGN24;
 [aA]0"."[lL]    return A_ZERO_DOT_L;
 [aA]1"."[hH]    return A_ONE_DOT_H;
 [aA]0"."[hH]    return A_ZERO_DOT_H;
-abs                                     return ABS;
+abs|ABS                                 return ABS;
 abort                                   return ABORT;
 [aA]1"."[xX]    _REG.regno = REG_A1x; return REG;
 [aA]1"."[wW]    _REG.regno = REG_A1w; return REG;
