@@ -1,3 +1,8 @@
+2005-02-24  Catherine Moore <clm@cm00re.com>
+
+	* read.c (read_a_source_file):  Update TC_EQUAL_IN_INSN test to match fsf sources.
+	* config/tc-bfin.c (bfin_start_label): Exclude SAA( from valid labels.
+
 2005-02-18  Raja  <raja@rrap-software.com>
 	* config/tc-bfin.c (bfin_fix_adjustable): Return false for r_type GOT and PLTPC also  
 	(apply_fix3): Handle GOT  

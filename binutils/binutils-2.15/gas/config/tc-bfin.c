@@ -1990,6 +1990,9 @@ bfin_name_is_register (char *name)
   if ((name[0] == 'B' || name[0] == 'b') && name[1] == '[')
     return TRUE;
 
+  if (!strncasecmp (name, "saa(", 4))
+    return TRUE;
+
   for (i=0; bfin_reg_info[i].name != 0; i++)
    {
      if (!strcasecmp (bfin_reg_info[i].name, name))
@@ -1997,6 +2000,7 @@ bfin_name_is_register (char *name)
    }
   return FALSE;
 }
+
 void
 bfin_equals (ExprNode *sym)
 {
@@ -2020,6 +2024,9 @@ bfin_start_label (char *ptr)
 
   ptr++;
   if (*ptr == '(' || *ptr == '[')
+    return FALSE;
+
+  if (!strncmp (ptr, "saa(", 4))
     return FALSE;
 
   return TRUE;
