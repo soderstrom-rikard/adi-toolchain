@@ -155,7 +155,8 @@ n_pregs_to_save (void)
   for (i = REG_P0; i <= REG_P5; i++)
     if ((regs_ever_live[i] && ! call_used_regs[i])
 	|| (i == PIC_OFFSET_TABLE_REGNUM
-	    && current_function_uses_pic_offset_table))
+	    && (current_function_uses_pic_offset_table
+		|| !current_function_is_leaf)))
       return REG_P5 - i + 1;
   return 0;
 }
@@ -795,7 +796,9 @@ bfin_expand_prologue (void)
     fprintf (file, "\tcall mcount_entry;\n");
 #endif
 
-  if (TARGET_ID_SHARED_LIBRARY)
+  if (TARGET_ID_SHARED_LIBRARY
+      && (current_function_uses_pic_offset_table
+	  || !current_function_is_leaf))
     {
       rtx addr;
       

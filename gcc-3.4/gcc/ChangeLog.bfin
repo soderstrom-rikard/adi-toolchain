@@ -1,3 +1,10 @@
+2005-02-14  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_expand_prologue): Don't load the PIC register
+	if we don't need it.
+	(n_pregs_to_save): When deciding whether to save the PIC register, match
+	bfin_expand_prologue's decision whether to load it.
+
 2005-02-10  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (hard_regno_mode_ok): Disallow anything but SImode
