@@ -1,3 +1,8 @@
+2005-02-18  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.h (PREDICATE_CODES): Add bfin_cbranch_operator and
+	rhs_andsi3_operand.  Add missing entries to reg_or_7bit_operand.
+
 2005-02-18  Raja  <raja@rrap-software.com>
 
         * config/bfin/bfin.c (print_operand): Generating only GOT, no PLTPC 
