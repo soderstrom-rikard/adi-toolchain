@@ -31,7 +31,7 @@ pop:
 	.text
 	.global pop_multiple
 pop_multiple:
-	(R7:5, P5:p) = [sp++];
+	(R7:5, P5:0) = [sp++];
 	(r7:6) = [SP++];
 	(P5:4) = [Sp++];
 
@@ -45,5 +45,5 @@ link:
 	.text
 	.global unlink
 unlink:
-	unlink
+	unlink;
 	

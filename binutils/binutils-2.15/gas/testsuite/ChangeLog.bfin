@@ -1,3 +1,28 @@
+2004-12-15  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/event2.s: New test contributed by Satyanarayana Reddy <reddy@epigonaudio.com>.
+	* gas/bfin/logical2.s: Likewise.
+	* gas/bfin/move2.s: Likewise.
+	* gas/bfin/shift2.s: Likewise.
+	* gas/bfin/stack2.s: Likewise.
+	* gas/bfin/vector2.s: Likewise.
+	* gas/bfin/event2.d: New.
+	* gas/bfin/logical2.d: New.
+	* gas/bfin/move2.d: New.
+	* gas/bfin/shift2.d: New.
+	* gas/bfin/vector2.d: New.
+	* gas/bfin/bfin.exp: Update to run new tests.
+	* gas/binf/event.d: Update to new objdump format.
+	* gas/bfin/logical.d: Likewise.
+	* gas/bfin/move.d: Likewise.
+	* gas/bfin/shift.d: Likewise.
+	* gas/bfin/stack.d: Likewise.
+	* gas/bfin/vector.d: Likewise.
+	* gas/bfin vector.s: Remove data section.
+	* gas/bfin/stack.s: Likewise.
+	* gas/bfin/shift.s: Likewise.
+	* gas/bfin/logical.s: Likewise.
+	
 2004-12-14  Catherine Moore  <clm@cm00re.com>
 
 	* gas/bfin/bit2.s: New test contributed by Satyanarayana Reddy <reddy@epigonaudio.com>.

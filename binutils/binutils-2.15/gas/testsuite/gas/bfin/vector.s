@@ -43,7 +43,7 @@ vector_add_sub:
 	.text
 	.global vector_ashift
 vector_ashift:
-	R1 = R3 >>> 16 (V);
+	R1 = R3 >>> 15 (V);
 	r4 = r0 >>> 4 (v);
 	r5 = r0 << 0 (v,s);
 	r2 = r2 << 12 (v, S);
@@ -74,7 +74,7 @@ vector_min:
 vector_mul:
 	r2.h = r7.l * r6.h, r2.l = r7.h * r6.h;
 	R4.L = R1.L * R0.L, R4.H = R1.H * R0.H;
-	R0.h = R3.H * r2.l, r0.l=r3.l * r2.l
+	R0.h = R3.H * r2.l, r0.l=r3.l * r2.l;
 	r5.h = r3.h * r2.h (M), r5.l = r3.L * r2.L (fu);
 	R0 = r4.l * r7.l, r1 = r4.h * r7.h (s2rnd);
 	R7 = R2.l * r5.l, r6 = r2.h * r5.h;
@@ -92,7 +92,7 @@ vector_mul:
 	r2.H = A1, r2.l = (a0 += r0.L * r1.L) (s2rnd);
 	r7.h = (a1 = r2.h * r1.h), a0 += r2.l * r1.l;
 	R2.H = (A1 = R7.L * R6.H), R2.L = (A0 = R7.H * R6.h);
-	r6.L = (A0 = R3.L * r1.L), R6.H = (A1 += R3.H * R2.H);
+	r6.L = (A0 = R3.L * r2.L), R6.H = (A1 += R3.H * R2.H);
 	R7.h = (a1 += r6.h * r5.l), r7.l = (a0=r6.h * r5.h);
 	r0.h = (A1 = r7.h * R4.l) (M), R0.l = (a0 += r7.l * r4.l);
 	R5.H = (a1 = r3.h * r2.h) (m), r5.l= (a0 += r3.l * r2.l) (fu);
@@ -105,7 +105,7 @@ vector_mul:
 	R7 = (A1 += r3.h * r5.H), R6 = (A0 -= r3.l * r5.l);
 	r5 = (a1 -= r6.h * r7.h), a0 += r6.l * r7.l;
 	R3 = (A1 = r6.h * R7.h), R2 = (A0 = R6.l * r7.l);
-	R5 = (A1 = r3.h * r7.h) (M), r4 = (A0 += R3.l * r2.l) (fu);
+	R5 = (A1 = r3.h * r7.h) (M), r4 = (A0 += R3.l * r7.l) (fu);
 	R3 = a1, r2 = (a0 += r0.l *r1.l) (s2rnd);
 	r1 = (a1 += r3.h * r2.h), r0 = (a0 = r3.l * r2.l) (is);
 

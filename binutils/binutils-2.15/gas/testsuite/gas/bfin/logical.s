@@ -1,7 +1,3 @@
-	.data
-foodata:	.word 42
-	.text
-footext:
 	.text
 	.global and
 and:

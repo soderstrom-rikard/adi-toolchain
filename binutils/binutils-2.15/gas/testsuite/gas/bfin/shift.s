@@ -1,8 +1,3 @@
-	.data
-foodata:	.word 42
-	.text
-footext:
-
 	.text
 	.global add_with_shift
 add_with_shift:
