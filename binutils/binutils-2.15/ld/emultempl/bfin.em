@@ -18,9 +18,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-# This file is sourced from elf32.em, and defines some extra routines for m68k
-# embedded systems using ELF and for some other systems using m68k ELF.  While
-# it is sourced from elf32.em for all m68k ELF configurations, here we include
+# This file is sourced from elf32.em, and defines some extra routines for bfin
+# embedded systems using ELF and for some other systems using bfin ELF.  While
+# it is sourced from elf32.em for all bfin ELF configurations, here we include
 # only the features we want depending on the configuration.
 
 case ${target} in
