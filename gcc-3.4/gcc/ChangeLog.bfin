@@ -16,6 +16,8 @@
 	* config/bfin/bfin.c (bfin_rtx_costs): Reformat.  Change costs to
 	match machine better.  Use COSTS_N_INSNS instead of hardcoded
 	constants.
+	(const_fits_p): Delete function.
+	(effective_address_32bit_p): Simplify; reformat.
 
 2004-11-24  Bernd Schmidt  <bernd.schmidt@analog.com>
 

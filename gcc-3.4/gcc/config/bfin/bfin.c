@@ -111,30 +111,6 @@ output_file_start (void)
   max_arg_registers = i;	/* how many arg reg used  */
 }
 
-static int const_fits_p (rtx expr, int sz, int scale, int issigned)
-{
-  if (sz < 32) {
-    long mask   = (1l<<sz)-1;
-    long minint = (-1l<<(sz-1));
-    long maxint = (1l<<(sz-1));
-    
-    long v = INTVAL (expr);
-    
-    if (scale) {
-      long temp = v >> scale;
-      /* This is to ensure that constants that are not
-         rounded up to the correct bit position
-         are not excepted by const_fits.*/
-      if (v != (temp << scale))
-	return 0;
-      v = temp;
-    }
-    
-    return (!issigned && (v & ~mask) == 0)
-      || ((minint <= v) && (v < maxint));
-  }
-  return 1;
-}
 /*
 SECT_NM_T section_names[LAST_SECT_NM] = {
 	[CODE_DIR] = {.sect_name = "$code", .dir_name = ".text"},
@@ -858,36 +834,41 @@ legitimize_address (rtx x ATTRIBUTE_UNUSED, rtx oldx ATTRIBUTE_UNUSED, enum mach
   return NULL_RTX;
 }
 
-/* This predicate is used to compute the length of a load/store insn.  */
+/* This predicate is used to compute the length of a load/store insn.
+   OP is a MEM rtx, we return nonzero if its addressing mode requires a
+   32 bit instruction.  */
 
-int effective_address_32bit_p (rtx op, enum machine_mode mode) 
+int
+effective_address_32bit_p (rtx op, enum machine_mode mode) 
 {
+  HOST_WIDE_INT offset;
+
+  mode = GET_MODE (op);
   op = XEXP (op, 0);
-  switch (GET_CODE (op))
+
+  if (REG_P (op) || GET_CODE (op) == POST_INC
+      || GET_CODE (op) == PRE_DEC || GET_CODE (op) == POST_DEC)
+    return 0;
+  if (GET_CODE (op) != PLUS)
+    abort ();
+
+  offset = INTVAL (XEXP (op, 1));
+
+  /* All byte loads use a 16 bit offset.  */
+  if (GET_MODE_SIZE (mode) == 1)
+    return 1;
+
+  if (GET_MODE_SIZE (mode) == 4)
     {
-    case REG:
-    case PRE_DEC:
-    case POST_INC:
-      return 0;
-    case PLUS:
-      if (XEXP (op,0) == frame_pointer_rtx)
-	if (GET_MODE_SIZE (mode) == 4
-	    && const_fits_p (XEXP (op,1), 6, 2, 1))
-	  return 0;
-	else
-	  return 1;
-      else
-	if (GET_MODE_SIZE (mode) == 4
-	    && const_fits_p (XEXP (op,1), 4, 2, 1))
-	  return 0;
-	else if (GET_MODE_SIZE (mode) == 2
-		 && const_fits_p (XEXP (op,1), 4, 1, 1))
-	  return 0;
-	else
-	  return 1;
-    default:
-      return 1;
+      /* Frame pointer relative loads can use a negative offset, all others
+	 are restricted to a small positive one.  */
+      if (XEXP (op, 0) == frame_pointer_rtx)
+	return offset < -128 || offset > 60;
+      return offset < 0 || offset > 60;
     }
+
+  /* Must be HImode now.  */
+  return offset < 0 || offset > 30;
 }
 
 int
