@@ -38,8 +38,6 @@
 ;     Ks3 -4 .. 3    signed 3bit imm
 ;     Ku3 0 .. 7     unsigned 3bit imm
 ;     Pn  0, 1, 2    constants 0, 1 or 2, corresponding to n
-;     Q   ~(2**N)    bitclear constant
-;     R   -32768 .. 32767    16bit imm
 ;  
 ; register operands
 ;     d  (r0..r7)

@@ -19,23 +19,8 @@
 #define BRT 1
 #define BRF 0
 
-/* Names to predefine in the preprocessor for this target machine.  */
-#define BFIN 1
-#define ADI_BFIN 1
-
 /* Print subsidiary information on the compiler version in use.  */
 #define TARGET_VERSION fprintf (stderr, " (BlackFin bfin)")
-
-/* The TOOL_CHAIN can be ADE or VDSP. 
- * Assembler and Linker options depend on the tool chain
-*/
-#define ADE
-
-#ifdef REG_OK_STRICT
-# define STRICTNESS 1
-#else
-# define STRICTNESS 0
-#endif
 
 /*
   The following set of defines, describe the commandline api.
@@ -131,6 +116,7 @@ extern int target_flags;
 
 #define FUNCTION_MODE    SImode
 #define Pmode            SImode
+
 /* store-condition-codes instructions store 0 for false
    This is the value stored for true.  */
 #define STORE_FLAG_VALUE 1
@@ -141,30 +127,27 @@ extern int target_flags;
 
 #define STACK_PUSH_CODE PRE_DEC
 
-/* Define this macro if successive arguments to a function occupy
-   decreasing addresses on the stack. 
-#define ARGS_GROW_DOWNWARD
-*/
-
 /* Define this if the nominal address of the stack frame
    is at the high-address end of the local variables;
    that is, each additional local variable allocated
    goes at a more negative offset in the frame.  */
 #define FRAME_GROWS_DOWNWARD
 
-/* Activation Record Stack/Frame.. */
+/* We define a dummy ARGP register; the parameters start at offset 0 from
+   it. */
 #define FIRST_PARM_OFFSET(decl) 0
 
-#define STARTING_FRAME_OFFSET   0 /*offset to first local*/
+/* Offset within stack frame to start allocating local variables at.
+   If FRAME_GROWS_DOWNWARD, this is the offset to the END of the
+   first local allocated.  Otherwise, it is the offset to the BEGINNING
+   of the first local allocated.  */
+#define STARTING_FRAME_OFFSET 0
 
-
-/*
-     Define this macro if an argument declared in a prototype as an
-     integral type smaller than `int' should actually be passed as an
-     `int'.  In addition to avoiding errors in certain cases of
-     mismatch, it also makes for better code on certain machines.   */
+/*  Define this macro if an argument declared in a prototype as an
+    integral type smaller than `int' should actually be passed as an
+    `int'.  In addition to avoiding errors in certain cases of
+    mismatch, it also makes for better code on certain machines.   */
 #define PROMOTE_PROTOTYPES 1
-
 
 /* Register to use for pushing function arguments.  */
 #define STACK_POINTER_REGNUM REG_P6
@@ -190,15 +173,15 @@ extern int target_flags;
 #define STATIC_CHAIN_REGNUM REG_P2
 
 /* Define this if functions should assume that stack space has been
- * allocated for arguments even when their values are passed in
- * registers.
- *
- * The value of this macro is the size, in bytes, of the area reserved for
- * arguments passed in registers.
- *
- * This space can either be allocated by the caller or be a part of the
- * machine-dependent stack frame: `OUTGOING_REG_PARM_STACK_SPACE'
- * says which.  */
+   allocated for arguments even when their values are passed in
+   registers.
+
+   The value of this macro is the size, in bytes, of the area reserved for
+   arguments passed in registers.
+
+   This space can either be allocated by the caller or be a part of the
+   machine-dependent stack frame: `OUTGOING_REG_PARM_STACK_SPACE'
+   says which.  */
 #define FIXED_STACK_AREA 12
 #define REG_PARM_STACK_SPACE(FNDECL) FIXED_STACK_AREA
 
@@ -206,14 +189,9 @@ extern int target_flags;
  * space allocated by the caller.  */
 #define OUTGOING_REG_PARM_STACK_SPACE
 	  
- /*If we generate an insn to push BYTES bytes, this says how many the
-   stack pointer really advances by.  On Hummingbird pushw decrements
-   by exactly 2 no matter what the position was.   
-#define PUSH_ROUNDING(BYTES) (((BYTES) + 3) & (~3))*/
-
 /* Define this if the maximum size of all the outgoing args is to be
- *    accumulated and pushed during the prologue.  The amount can be
- *       found in the variable current_function_outgoing_args_size. */ 
+   accumulated and pushed during the prologue.  The amount can be
+   found in the variable current_function_outgoing_args_size. */ 
 #define ACCUMULATE_OUTGOING_ARGS 1
 
 /* Value should be nonzero if functions must have frame pointers.
@@ -222,21 +200,6 @@ extern int target_flags;
    This is computed in `reload', in reload1.c.  
 */
 #define FRAME_POINTER_REQUIRED (bfin_frame_pointer_required ())
-
-/* `INITIAL_FRAME_POINTER_OFFSET (DEPTH-VAR)'
-     A C statement to store in the variable DEPTH-VAR the difference
-     between the frame pointer and the stack pointer values immediately
-     after the function prologue.  The value would be computed from
-     information such as the result of `get_frame_size ()' and the
-     tables of registers `regs_ever_live' and `call_used_regs'.
-
-     If `ELIMINABLE_REGS' is defined, this macro will be not be used and
-     need not be defined.  Otherwise, it must be defined even if
-     `FRAME_POINTER_REQUIRED' is defined to always be true; in that
-     case, you may set DEPTH-VAR to anything.
-*/
-#define INITIAL_FRAME_POINTER_OFFSET(DEPTH) { (DEPTH) = 	\
-    FRAME_POINTER_REQUIRED ? 0 : get_frame_size (); }
 
 #define PARM_BOUNDRY            32
 
@@ -307,24 +270,21 @@ extern int target_flags;
 #define PREG_P(X) (REG_P (X) && REGNO (X) >= REG_P0 && REGNO (X) <= REG_P7)
 
 #define REGISTER_NAMES { \
-  "R0",      "R1",      "R2",      "R3",      "R4",      "R5",      "R6",      "R7", \
-  "P0",      "P1",      "P2",      "P3",      "P4",      "P5",      "SP",      "FP", \
-  "I0",      "B0",      "L0",      "I1",      "B1",      "L1",      "I2",      "B2", \
-  "L2",      "I3",      "B3",      "L3",      "M0",      "M1",      "M2",      "M3", \
-  "A0",      "A1", \
+  "R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", \
+  "P0", "P1", "P2", "P3", "P4", "P5", "SP", "FP", \
+  "I0", "B0", "L0", "I1", "B1", "L1", "I2", "B2", \
+  "L2", "I3", "B3", "L3", "M0", "M1", "M2", "M3", \
+  "A0", "A1", \
   "CC", \
-  "RETS",  "RETI",    "RETX",    "RETN",    "RETE",   "ASTAT", "SEQSTAT",  "USP", \
+  "RETS", "RETI", "RETX", "RETN", "RETE", "ASTAT", "SEQSTAT", "USP", \
   "ARGP" \
 }
-
-
 
 #define SHORT_REGISTER_NAMES { \
 	"R0.L",	"R1.L",	"R2.L",	"R3.L", "R4.L", "R5.L", "R6.L", "R7.L", \
 	"P0.L",	"P1.L",	"P2.L",	"P3.L", "P4.L", "P5.L", "SP.L", "FP.L", \
 	"I0.L",	"B0.L", "L0.L",	"I1.L",	"B1.L",	"L1.L",	"I2.L",	"B2.L", \
 	"L2.L",	"I3.L",	"B3.L",	"L3.L",	"M0.L",	"M1.L",	"M2.L",	"M3.L", }
-
 
 #define HIGH_REGISTER_NAMES { \
 	"R0.H",	"R1.H",	"R2.H",	"R3.H", "R4.H", "R5.H", "R6.H", "R7.H", \
@@ -333,16 +293,15 @@ extern int target_flags;
 	"L2.H",	"I3.H",	"B3.H",	"L3.H",	"M0.H",	"M1.H",	"M2.H",	"M3.H", }
 
 #define DREGS_PAIR_NAMES { \
-  "R1:0.p",0,     "R3:2.p",0,     "R5:4.p",0,    "R7:6.p",0,  }
+  "R1:0.p", 0, "R3:2.p", 0, "R5:4.p", 0, "R7:6.p", 0,  }
 
 #define BYTE_REGISTER_NAMES { \
-  "R0.B",     "R1.B",     "R2.B",    "R3.B",     "R4.B",     "R5.B",     "R6.B",     "R7.B",  }
+  "R0.B", "R1.B", "R2.B", "R3.B", "R4.B", "R5.B", "R6.B", "R7.B",  }
 
 
-/* The Nth number is 1 if register N is fixed i.e. has a 
-   fixed predefined use and cannot be touched by gcc for
-   general purpose, 0 otherwise
-*/
+/* 1 for registers that have pervasive standard uses
+   and are not available for the register allocator.  */
+
 #define FIXED_REGISTERS \
 /*r0 r1 r2 r3 r4 r5 r6 r7   p0 p1 p2 p3 p4 p5 p6 p7 */ \
 { 0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 1, 0,    \
@@ -352,15 +311,13 @@ extern int target_flags;
   0, 0, 1, 1, 1, 1, 1, 1,   1, 1, 1, 1	 \
 }
 
-/* the registers that are not available for general 
-   allocation of values that must live across 
-   function calls.
-   If a register has 0 in `CALL_USED_REGISTERS', the compiler
-   automatically saves it on function entry and restores it on
-   function exit, if the register is used within the function.
+/* 1 for registers not available across function calls.
+   These must include the FIXED_REGISTERS and also any
+   registers that can be used without being saved.
+   The latter must include the registers where values are returned
+   and the register where structure-value addresses are passed.
+   Aside from that, you can include as many other registers as you like.  */
 
-   Refer page ,VDSP++ 3.5 C/C++ compiler Manual
-*/
 #define CALL_USED_REGISTERS \
 /*r0 r1 r2 r3 r4 r5 r6 r7   p0 p1 p2 p3 p4 p5 p6 p7 */ \
 { 1, 1, 1, 1, 0, 0, 0, 0,   1, 1, 1, 0, 0, 0, 1, 0, \
@@ -370,13 +327,11 @@ extern int target_flags;
   1, 1, 1, 1, 1, 1, 1, 1,   1, 1, 1, 1	 \
 }
 
-
 /* Order in which to allocate registers.  Each register must be
    listed once, even those in FIXED_REGISTERS.  List frame pointer
    late and fixed registers last.  Note that, in general, we prefer
    registers listed in CALL_USED_REGISTERS, keeping the others
    available for storage of persistent values. */
-#define REG_NO FIRST_PSEUDO_REGISTER
 
 #define REG_ALLOC_ORDER \
 { REG_R0, REG_R1, REG_R2, REG_R3, REG_R7, REG_R6, REG_R5, REG_R4, \
@@ -389,6 +344,7 @@ extern int target_flags;
   REG_CC, REG_ARGP						  \
 }
 
+/* Macro to conditionally modify fixed_regs/call_used_regs.  */
 #define CONDITIONAL_REGISTER_USAGE			\
   {							\
     conditional_register_usage();                       \
@@ -398,7 +354,6 @@ extern int target_flags;
 	call_used_regs[PIC_OFFSET_TABLE_REGNUM] = 1;	\
       }							\
   }
-
 
 /* Define the classes of registers for register constraints in the
    machine description.  Also define ranges of constants.
@@ -445,6 +400,7 @@ enum reg_class
   NON_A_CC_REGS,
   ALL_REGS, LIM_REG_CLASSES
 };
+
 #define N_REG_CLASSES ((int)LIM_REG_CLASSES)
 
 #define GENERAL_REGS DPREGS
@@ -474,14 +430,17 @@ enum reg_class
    "NON_A_CC_REGS",	\
    "ALL_REGS" }
 
+/* An initializer containing the contents of the register classes, as integers
+   which are bit masks.  The Nth integer specifies the contents of class N.
+   The way the integer MASK is interpreted is that register R is in the class
+   if `MASK & (1 << R)' is 1.
 
-/* Define which registers fit in which classes.
-   This is an initializer for a vector of HARD_REG_SET
-   of length N_REG_CLASSES.  
-   The way the integer MASK is interpreted is 
-   that register R is in the class if `MASK & (1 << R)' is 1
-   where R is the define in register enumeration such as REG_I0 */
-/* Since we have more than 32 registers a longer version is used below */
+   When the machine has more than 32 registers, an integer does not suffice.
+   Then the integers are replaced by sub-initializers, braced groupings
+   containing several integers.  Each sub-initializer must be suitable as an
+   initializer for the type `HARD_REG_SET' which is defined in
+   `hard-reg-set.h'.  */
+
 /* NOTE: DSP registers, IREGS - AREGS, are not GENERAL_REGS.  We use
    MOST_REGS as the union of DPREGS and DAGREGS.  */
 
@@ -547,6 +506,7 @@ enum reg_class
    Return the class number of the smallest class containing
    reg number REGNO.  This could be a conditional expression
    or could index an array.  */
+
 #define REGNO_REG_CLASS(REGNO) \
  ((REGNO) < REG_P0 ? DREGS				\
  : (REGNO) < REG_I0 ? PREGS				\
@@ -563,13 +523,8 @@ enum reg_class
 /* When defined, the compiler allows registers explicitly used in the
    rtl to be used as spill registers but prevents the compiler from
    extending the lifetime of these registers. */
- 
-/* It makes the following test to work in combiner and reload
- * m(int a, int b) {return a<b; }
- * It allows the hard registers which appear in rtl to be used for spills.
- * See reload1.c, function reload()
- */
 #define SMALL_REGISTER_CLASSES 1
+
 #define CLASS_LIKELY_SPILLED_P(CLASS) (CLASS < MOST_REGS)
 
 /* Do not allow to store a value in REG_CC for any mode */
@@ -1108,13 +1063,13 @@ do {                                              \
    
    bfin constant operands are as follows
    
-     I  -8 .. 7      4bit imm
-     J  2**N         5bit imm scaled
-     K  1, 2         scale by 2 or 4
-     L  0..31
-     M  -64 .. 63
-     N  0 .. 7     3bit uimm
-     O  -4 .. 3    3bit uimm
+     J   2**N       5bit imm scaled
+     Ks7 -64 .. 63  signed 7bit imm
+     Ku5 0..31      unsigned 5bit imm
+     Ks4 -8 .. 7    signed 4bit imm
+     Ks3 -4 .. 3    signed 3bit imm
+     Ku3 0 .. 7     unsigned 3bit imm
+     Pn  0, 1, 2    constants 0, 1 or 2, corresponding to n
 */
 #define CONST_OK_FOR_CONSTRAINT_P(VALUE, C, STR)		\
   ((C) == 'I' ? (CONST_4BIT_IMM_P(VALUE)) 			\
@@ -1146,28 +1101,8 @@ do {                                              \
      and were compiled to assembly language.) */
 #define FINALIZE_PIC  do {} while (0)
 
-
-/* Define results of standard character escape sequences.  */
-#define TARGET_BELL      007
-#define TARGET_BS        010
-#define TARGET_TAB       011
-#define TARGET_NEWLINE   012
-#define TARGET_VT        013
-#define TARGET_FF        014
-#define TARGET_CR        015
-#define TARGET_ESC	 033
-
-/*Initialize the GCC target structure.  */
-#define TARGET_ASM_GLOBALIZE_LABEL bfin_globalize_label 
-#define TARGET_ASM_OPEN_PAREN "("
-#define TARGET_ASM_CLOSE_PAREN ")"
-
-/* Output at beginning of assembler file.  */
-#define TARGET_ASM_FILE_START output_file_start
-
 /* Switch into a generic section.  */
 #define TARGET_ASM_NAMED_SECTION  default_elf_asm_named_section
-
 
 /* Assembler output */
 #define PRINT_OPERAND_PUNCT_VALID_P(CODE)      index ("jJhXDQR", CODE)
@@ -1324,15 +1259,8 @@ do { 						\
 extern struct rtx_def *bfin_compare_op0, *bfin_compare_op1;
 extern struct rtx_def *bfin_cc_rtx, *bfin_rets_rtx;
 
-/*#define REAL_IS_NOT_DOUBLE
-#define REAL_VALUE_TYPE float*/
-
 /* This works for GAS and some other assemblers.  */
 #define SET_ASM_OP              ".set "
-
-#define RET  return ""        /* Used in machine description */
-
-extern int bfin_lvno;
 
 /* Don't know how to order these.  UNALIGNED_WORD_ASM_OP is in
    dwarf2.out. */
@@ -1366,6 +1294,4 @@ do {                                                            \
 
 #define SIZE_ASM_OP     "\t.size\t"
 
-
 #endif /*  _BFIN_CONFIG */
-/* nothing should be placed after this point */

@@ -12,6 +12,32 @@
 	parameter.  Simplify; try to match machine better.
 	(bfin_memory_move_cost): New function.
 
+	* config/bfin/bfin-protos.h (output_file_start, bfin_internal_label,
+	bfin_rtx_costs): Don't declare.
+	(function_arg_regno_p): Now returns bool.
+	(bfin_valid_add): Likewise.
+	* config/bfin/bfin.c (REAL_VALUE_ATOF, SP_SIZE): Don't define.
+	(print_operand, version_string, reg_equiv_mem, bfin_globalize_label,
+	output_file_start, fputs_unlocked): Don't declare.
+	(bfin_ver_str, include_rtm, out_bytes, out_ind): Delete.
+	(gcc_assert): Renamed from assert and rewritten.  All users changed.
+	(bfin_globalize_label, bfin_address_cost, bfin_rtx_costs,
+	bfin_internal_label): Now static.
+	(output_file_start): Likewise.  Don't emit redundant version strings.
+	(expand_move): Don't declare flag_pic here.  Call force_reg only if
+	we don't have a reg.
+	(bfin_valid_add): Now returns bool.
+	(TARGET_ASM_GLOBALIZE_LABEL, TARGET_ASM_FILE_START): Define here.
+	* config/bfin/bfin.h (TARGET_ASM_GLOBALIZE_LABEL,
+	TARGET_ASM_FILE_START): Not here.
+	(TARGET_ASM_OPEN_PAREN, TARGET_ASM_CLOSE_PAREN): Delete, they match
+	the defaults.
+	(BFIN, ADI_BFIN, ADE, STRICTNESS, RET): Lose useless macros.
+	(INITIAL_FRAME_POINTER_OFFSET): Delete macro.
+	(TARGET_BELL, TARGET_BS, TARGET_TAB, TARGET_NEWLINE, TARGET_VT,
+	TARGET_FF, TARGET_CR, TARGET_ESC): Delete, they match the defaults.
+	(bfin_lvno): Don't declare.
+
 2004-11-29  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_expand_epilogue): Additional argument

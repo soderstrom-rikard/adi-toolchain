@@ -27,7 +27,7 @@
 
 extern rtx function_arg (CUMULATIVE_ARGS *, Mmode, tree, int);
 extern void function_arg_advance (CUMULATIVE_ARGS *, Mmode, tree, int);
-extern int  function_arg_regno_p (int);
+extern bool function_arg_regno_p (int);
 
 extern const char *output_load_immediate (rtx *);
 extern const char *output_casesi_internal (rtx *);
@@ -73,7 +73,6 @@ extern enum reg_class secondary_output_reload_class (enum reg_class, Mmode,
 						     rtx);
 extern char *section_asm_op_1 (SECT_ENUM_T);
 extern char *section_asm_op (SECT_ENUM_T);
-extern void output_file_start (void);
 extern void override_options (void);
 extern void print_operand (FILE *,  rtx, char);
 extern void print_address_operand (FILE *, rtx);
@@ -86,10 +85,8 @@ extern void asm_conditional_branch (rtx, rtx *, int, int);
 extern rtx bfin_gen_compare (rtx, Mmode);
 
 extern int bfin_return_in_memory (tree);
-extern void bfin_internal_label (FILE *, const char *, unsigned long);
-extern bool bfin_rtx_costs (rtx, int, int, int*);
 extern void initialize_trampoline (rtx, rtx, rtx);
-extern int  bfin_valid_add (Mmode, HOST_WIDE_INT);
+extern bool bfin_valid_add (Mmode, HOST_WIDE_INT);
 extern rtx bfin_va_arg (tree, tree);
 extern void setup_incoming_varargs (CUMULATIVE_ARGS *, enum machine_mode, tree,
 				    int *, int);

@@ -39,18 +39,11 @@
 #include "bfin-protos.h"
 #include "gt-bfin.h"
 
-#undef REAL_VALUE_ATOF
-#define REAL_VALUE_ATOF(v,t) atof(v)
+/* To be deleted when we move to gcc4.  */
+#define gcc_assert(X) do { if (! (X)) abort(); } while (0)
 
-#define SP_SIZE 62
-
-void print_operand (FILE *file,  rtx x,  char code);
-
-char *bfin_ver_str= (char *)
-#include "version.h"
-extern const char version_string[];
-extern rtx *reg_equiv_mem;
-
+/* Test and compare insns in bfin.md store the information needed to
+   generate branch and scc insns here.  */
 rtx bfin_compare_op0, bfin_compare_op1;
 
 /* RTX for condition code flag register and RETS register */
@@ -58,13 +51,9 @@ extern GTY(()) rtx bfin_cc_rtx;
 extern GTY(()) rtx bfin_rets_rtx;
 rtx bfin_cc_rtx, bfin_rets_rtx;
 
-#ifndef assert
-#define assert(x) ((x)?0:abort())
-#endif
-
-int include_rtm = 0;
 int max_arg_registers = 0;
 
+/* Arrays used when emitting register names.  */
 const char *short_reg_names[]  =  SHORT_REGISTER_NAMES;
 const char *high_reg_names[]   =  HIGH_REGISTER_NAMES;
 const char *dregs_pair_names[] =  DREGS_PAIR_NAMES;
@@ -72,15 +61,7 @@ const char *byte_reg_names[]   =  BYTE_REGISTER_NAMES;
 
 static int arg_regs[] = FUNCTION_ARG_REGISTERS;
 
-int out_bytes = 0;
-int out_ind = 0;
-
-void bfin_globalize_label PARAMS ((FILE *, const char *));
-void output_file_start PARAMS ((void));
-
-extern int fputs_unlocked (const char *, FILE *);
-
-void
+static void
 bfin_globalize_label (FILE *stream, const char *name)
 {
   fputs (".global ", stream);
@@ -89,24 +70,18 @@ bfin_globalize_label (FILE *stream, const char *name)
   fputc ('\n',stream);
 }
 
-void 
+static void 
 output_file_start (void) 
 {
   FILE *file = asm_out_file;
   int i;
 
-  if (optimize_size)
-    fprintf (file, "// gcc version %s bfin version %s opt -Os\n", 
-           version_string, bfin_ver_str);
-  else
-    fprintf (file, "// gcc version %s bfin version %s opt -O%d\n", 
-           version_string, bfin_ver_str, optimize);
   fprintf (file, ".file \"%s\";\n", input_filename);
   if (TARGET_SIMPLE_RTM)
     fprintf (file,"\nsimple_rtm:\nl(SP) =0xFFFC; h(SP) =0x4000;\nFP =SP;\ncall _main;\nhlt;\n___main:\n\nrts;\n\n");
   
   for (i = 0; arg_regs[i] >= 0; i++)
-      ;
+    ;
   max_arg_registers = i;	/* how many arg reg used  */
 }
 
@@ -136,65 +111,8 @@ static e_funkind funkind (tree funtype)
   else
     return SUBROUTINE;
 }
-
-/* Register Layout.. */
-/* Standard register usage.  */
-/*
- * CRTM:
- *  marc hoffman  Aug 27,1998
- *
- * Register passing is done in the registers: 
- *            R0-R4.
- *
- *      +------------+	    ^                   FP=P13
- *	|  an	     |	    |			SP=P14
- *	|  ...	     |	    |			GP=P12
- *    	|  a1 	     |	    |
- *	|  a0  	     |	    |
- *	+------------+	    |
- *    	|   return ""ADDR  |	    |
- *     	+------------+	    |
- *  FP->|  OLD FRAME |------+
- *    	+------------+
- *	|  l0  	     |          non-leaf environment
- *	|  l1	     |            prologue:
- *    	|  ....	     |              dm[sp--]       = retaddr;
- *	|  ln  	     |              dm[sp-=size+1] = fp;
- *	+------------+              save r15-dx, p15-px;
- *    	|  spill     |
- *	|	     |            epilogue:
- *	|	     |              load r15-dx, p15-px;
- *    	+------------+              sp=fp;
- *		                    fp = dm[fp];
- *				    retaddr = dm[++sp];
- *                                  ret;
- *
- *
- * This frame layout was considered because, it keeps locals and
- * arguments to functions in the neighboorhood of the frame
- * pointer. close to frame pointer is important when the offset used
- * to access locals is small.
- *
- *
- *      +------------+	                        FP=P13
- *	|  an	     |	     			SP=P14
- *	|  ...	     |	     			GP=P12
- *    	|  a1 	     |
- *	|  a0  	     |
- *	+------------+
- *	|  l0  	     |          leaf environment
- *	|  l1	     |            prologue:
- *    	|  ....	     |              sp -=size;
- *	|  ln  	     |              save r15-dx, p15-px;
- *	+------------+              
- *    	|  spill     |
- *	|	     |            epilogue:
- *	|	     |              load r15-dx, p15-px;
- *    	+------------+		    sp += size;
- *                                  ret;
- *
- *
- */
+
+/* Stack frame layout. */
 
 /* Compute the number of DREGS to save with a push_multiple operation.
    This could include registers that aren't modified in the function,
@@ -389,10 +307,11 @@ bfin_va_arg (tree va_list, tree type)
   if (int_size_in_bytes (type) >= 0)
     return std_expand_builtin_va_arg (va_list, type);
 
-  type_ptr     = build_pointer_type (type);
+  type_ptr = build_pointer_type (type);
   type_ptr_ptr = build_pointer_type (type_ptr);
 
-  t = build (POSTINCREMENT_EXPR, va_list_type_node, va_list, build_int_2 (UNITS_PER_WORD, 0));
+  t = build (POSTINCREMENT_EXPR, va_list_type_node, va_list,
+	     build_int_2 (UNITS_PER_WORD, 0));
   TREE_SIDE_EFFECTS (t) = 1;
   t = build1 (NOP_EXPR, type_ptr_ptr, t);
   TREE_SIDE_EFFECTS (t) = 1;
@@ -735,7 +654,6 @@ bfin_expand_epilogue (int need_return)
       add_to_sp (spreg, arg_size, 0);
     }
 
-
   expand_epilogue_reg_restore (spreg, 0);
 #if 0
   if (TARGET_NON_GNU_PROFILE)
@@ -765,7 +683,7 @@ bfin_expand_epilogue (int need_return)
 
   emit_jump_insn (gen_return_internal (GEN_INT (SUBROUTINE)));
 }
-
+
 /* Return nonzero if register OLD_REG can be renamed to register NEW_REG.  */
 
 int
@@ -783,8 +701,18 @@ bfin_hard_regno_rename_ok (unsigned int old_reg ATTRIBUTE_UNUSED,
   return 1;
 }
 
+/* Try machine-dependent ways of modifying an illegitimate address X
+   to be legitimate.  If we find one, return the new, valid address,
+   otherwise return NULL_RTX.
+
+   OLDX is the address as it was before break_out_memory_refs was called.
+   In some cases it is useful to look at this to decide what needs to be done.
+
+   MODE is the mode of the memory reference.  */
+
 rtx
-legitimize_address (rtx x ATTRIBUTE_UNUSED, rtx oldx ATTRIBUTE_UNUSED, enum machine_mode mode ATTRIBUTE_UNUSED)
+legitimize_address (rtx x ATTRIBUTE_UNUSED, rtx oldx ATTRIBUTE_UNUSED,
+		    enum machine_mode mode ATTRIBUTE_UNUSED)
 {
   return NULL_RTX;
 }
@@ -826,7 +754,10 @@ effective_address_32bit_p (rtx op, enum machine_mode mode)
   return offset < 0 || offset > 30;
 }
 
-int
+/* Return cost of the memory address ADDR.
+   All addressing modes are equally cheap on the Blackfin.  */
+
+static int
 bfin_address_cost (rtx addr)
 {
   return 1;
@@ -950,7 +881,7 @@ print_operand (FILE *file, rtx x, char code)
 	  fprintf (file, "g");
 	  break;
 	default:
-	  output_operand_lossage("invalid %%J value");
+	  output_operand_lossage ("invalid %%J value");
 	}
       break;
 
@@ -960,40 +891,40 @@ print_operand (FILE *file, rtx x, char code)
 	case REG:
 	  if (code == 'h')
 	    {
-	      assert ((REGNO (x) < 32));
-	      fprintf (file, "%s", short_reg_names[REGNO(x)]);
-	      /*fprintf (file, "\n%d\n ", REGNO(x));*/
+	      gcc_assert (REGNO (x) < 32);
+	      fprintf (file, "%s", short_reg_names[REGNO (x)]);
+	      /*fprintf (file, "\n%d\n ", REGNO (x));*/
 	      break;
 	    }
 	  else if (code == 'd')
 	    {
-	      assert ((REGNO (x) < 32));
-	      fprintf (file, "%s", high_reg_names[REGNO(x)]);
+	      gcc_assert (REGNO (x) < 32);
+	      fprintf (file, "%s", high_reg_names[REGNO (x)]);
 	      break;
 	    }
 	  else if (code == 'w')
 	    {
-	      assert (REGNO (x) == REG_A0 || REGNO (x) == REG_A1);
-	      fprintf (file, "%s.w", reg_names[REGNO(x)]);
+	      gcc_assert (REGNO (x) == REG_A0 || REGNO (x) == REG_A1);
+	      fprintf (file, "%s.w", reg_names[REGNO (x)]);
 	    }
 	  else if (code == 'x')
 	    {
-	      assert (REGNO (x) == REG_A0 || REGNO (x) == REG_A1);
-	      fprintf (file, "%s.x", reg_names[REGNO(x)]);
+	      gcc_assert (REGNO (x) == REG_A0 || REGNO (x) == REG_A1);
+	      fprintf (file, "%s.x", reg_names[REGNO (x)]);
 	    }
 	  else if (code == 'D')
 	    {
-	      fprintf (file, "%s", dregs_pair_names[REGNO(x)]);
+	      fprintf (file, "%s", dregs_pair_names[REGNO (x)]);
 	    }
 	  /* Write second word of DImode or DFmode reference, 
 	   * register or memory. -- Tony
 	   */
 	  else if (code == 'H')
 	    {
-	      assert (mode == DImode || mode == DFmode);
-	      if (GET_CODE(x) == REG)
-		fprintf (file, "%s", reg_names[REGNO(x)+1]);
-	      else if (GET_CODE(x) == MEM)
+	      gcc_assert (mode == DImode || mode == DFmode);
+	      if (GET_CODE (x) == REG)
+		fprintf (file, "%s", reg_names[REGNO (x) + 1]);
+	      else if (GET_CODE (x) == MEM)
 		{
 		  fputc ('[', file);
 		  /* Handle possible auto-increment.  Since it is pre-increment and
@@ -1005,31 +936,27 @@ print_operand (FILE *file, rtx x, char code)
 		    output_address (plus_constant (XEXP (x, 0), 4));
 		  fputc (']', file);
 		}
-
 	    }
 	  else if (code == 'Q')
 	    {
-	      /*assert (mode == DImode);*/
-	      if (REGNO(x) > 7)
-		abort();
-	      fprintf(file,"%s", reg_names[REGNO(x)]);
+	      if (REGNO (x) > 7)
+		abort ();
+	      fprintf (file, "%s", reg_names[REGNO (x)]);
 	    }
 	  else if (code == 'R')
 	    {
-	      /*assert (mode == DImode);*/
-	      if (REGNO(x) > 7)
+	      if (REGNO (x) > 7)
 		abort();
-	      fprintf(file,"%s", reg_names[REGNO(x)+1]);
+	      fprintf (file,"%s", reg_names[REGNO (x)+1]);
 	    }
 	  else if (code == 'T')
 	    {
-	      /*Byte mode selection Akbar Hussain Oct. 02 2001*/
-	      if (REGNO(x) > 7)
-		abort();
-	      fprintf(file,"%s", byte_reg_names[REGNO(x)]);
+	      if (REGNO (x) > 7)
+		abort ();
+	      fprintf (file, "%s", byte_reg_names[REGNO (x)]);
 	    }
 	  else 
-	    fprintf (file, "%s", reg_names[REGNO(x)]);
+	    fprintf (file, "%s", reg_names[REGNO (x)]);
 	  break;
 
 	case MEM:
@@ -1038,7 +965,7 @@ print_operand (FILE *file, rtx x, char code)
 	  print_address_operand (file, x);
 	  fputc (']', file);
 	  break;
-    
+
 	case CONST_INT:
 	  /* Moves to half registers with d or h modifiers always use unsigned
 	     constants.  */
@@ -1053,7 +980,7 @@ print_operand (FILE *file, rtx x, char code)
 	  /* fall through */
 
 	case SYMBOL_REF:
-	  output_addr_const(file, x);
+	  output_addr_const (file, x);
 	  break;
 
 	case CONST_DOUBLE:
@@ -1061,11 +988,11 @@ print_operand (FILE *file, rtx x, char code)
 	  break;
 
 	default:
-	  output_addr_const(file, x);
+	  output_addr_const (file, x);
 	}
     }
 }
-
+
 /* Argument support functions.  */
 
 /* Initialize a variable CUM of type CUMULATIVE_ARGS
@@ -1088,7 +1015,6 @@ init_cumulative_args (CUMULATIVE_ARGS *cum, tree fntype ATTRIBUTE_UNUSED,
   cum->nregs = max_arg_registers;
   cum->arg_regs = arg_regs;
 
-
   return;
 }
 
@@ -1108,14 +1034,16 @@ function_arg_advance (CUMULATIVE_ARGS *cum, enum machine_mode mode, tree type,
   cum->words += words;
   cum->nregs -= words;
 
-  if (cum->nregs <= 0) {
+  if (cum->nregs <= 0)
+    {
       cum->nregs = 0;
       cum->arg_regs = NULL;
-  }
-  else {
+    }
+  else
+    {
       for (count = 1; count <= words; count++)
         cum->arg_regs++;
-  }
+    }
 
   return;
 }
@@ -1152,18 +1080,17 @@ function_arg (CUMULATIVE_ARGS *cum, enum machine_mode mode, tree type,
 
 /* For an arg passed partly in registers and partly in memory,
    this is the number of registers used.
-   For args passed entirely in registers or entirely in memory, zero.  
+   For args passed entirely in registers or entirely in memory, zero.
+
    Refer VDSP C Compiler manual, our ABI.
    First 3 words are in registers. So, if a an argument is larger
    than the registers available, it will span the register and
-   stack. 
-*/
+   stack.   */
 
 int
-function_arg_partial_nregs (CUMULATIVE_ARGS *cum ,	/* current arg information */
-			     enum machine_mode mode ,	/* current arg mode */
-			     tree type ATTRIBUTE_UNUSED,		/* type of the argument or 0 if lib support */
-			     int named	 ATTRIBUTE_UNUSED		/* != 0 for normal args, == 0 for ... args */)
+function_arg_partial_nregs (CUMULATIVE_ARGS *cum, enum machine_mode mode,
+			     tree type ATTRIBUTE_UNUSED,
+			     int named ATTRIBUTE_UNUSED)
 {
   int bytes
     = (mode == BLKmode) ? int_size_in_bytes (type) : GET_MODE_SIZE (mode);
@@ -1175,25 +1102,24 @@ function_arg_partial_nregs (CUMULATIVE_ARGS *cum ,	/* current arg information */
     return 0;
   
   last_reg_num = max_arg_registers - 1;
-  ret = ((arg_num <= last_reg_num && 
-         ((arg_num + words) > (last_reg_num + 1)))
+  ret = (arg_num <= last_reg_num && arg_num + words > last_reg_num + 1
          ? last_reg_num - arg_num + 1
          : 0);
 
   return ret;
 }
 
+/* Return true when register may be used to pass function parameters.  */
 
-int 
-function_arg_regno_p(int n)
+bool 
+function_arg_regno_p (int n)
 {
   int i;
   for (i = 0; arg_regs[i] != -1; i++)
     if (n == arg_regs[i])
-      return 1;
-  return 0;
+      return true;
+  return false;
 }
-
 
 /* Returns 1 if OP contains a symbol reference */
 
@@ -1224,6 +1150,10 @@ symbolic_reference_mentioned_p (rtx op)
 
   return 0;
 }
+
+/* Emit RTL insns to initialize the variable parts of a trampoline at
+   TRAMP. FNADDR is an RTX for the address of the function's pure
+   code.  CXT is an RTX for the static chain value for the function.  */
 
 void
 initialize_trampoline (tramp, fnaddr, cxt)
@@ -1364,20 +1294,16 @@ emit_pic_move (rtx *operands, enum machine_mode mode ATTRIBUTE_UNUSED)
 void
 expand_move (rtx *operands, enum machine_mode mode)
 {
-  extern int flag_pic;
-  
   if (flag_pic && SYMBOLIC_CONST (operands[1]))
     emit_pic_move (operands, mode);
 
-  /* Don't generate memory->memory moves, go through a register */
+  /* Don't generate memory->memory or constant->memory moves, go through a
+     register */
   else if (TARGET_MOVE
 	   && (reload_in_progress | reload_completed) == 0
-	   && GET_CODE (operands[0]) == MEM)
-/*	   && GET_CODE (operands[1]) == MEM)  */
-/* For we don't have: mem = const             */
-    {
-      operands[1] = force_reg (mode, operands[1]);
-    }
+	   && GET_CODE (operands[0]) == MEM
+    	   && GET_CODE (operands[1]) != REG)
+    operands[1] = force_reg (mode, operands[1]);
 }
 
 /* Return nonzero iff C has exactly one bit set if it is interpreted
@@ -1415,6 +1341,11 @@ scale_by_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
     }
   return 0;
 }
+
+/* Return nonzero if OP is a constant that consists of two parts; lower
+   bits all zero and upper bits all ones.  In this case, we can perform
+   an AND operation with a sequence of two shifts.  Don't return nonzero
+   if the constant would be cheap to load.  */
 
 int
 highbits_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
@@ -1456,6 +1387,7 @@ regorlog2_operand (rtx op, enum machine_mode mode)
 }
 
 /* Like register_operand, but make sure that hard regs have a valid mode.  */
+
 int 
 valid_reg_operand (rtx op, enum machine_mode mode)
 {
@@ -1565,6 +1497,8 @@ split_di (rtx operands[], int num, rtx lo_half[], rtx hi_half[])
     }
 }
 
+/* Return 1 if hard register REGNO can hold a value of machine-mode MODE.  */
+
 int
 hard_regno_mode_ok (int regno, enum machine_mode mode)
 {
@@ -1623,8 +1557,13 @@ bfin_memory_move_cost (enum machine_mode mode ATTRIBUTE_UNUSED,
   return 8;
 }
 
+/* Inform reload about cases where moving X with a mode MODE to a register in
+   CLASS requires an extra scratch register.  Return the class needed for the
+   scratch register.  */
+
 enum reg_class
-secondary_input_reload_class(enum reg_class class,enum machine_mode mode, rtx x)
+secondary_input_reload_class (enum reg_class class, enum machine_mode mode,
+			      rtx x)
 {
   /* If we have HImode or QImode, we can only use DREGS as secondary registers;
      in most other cases we can also use PREGS.  */
@@ -1679,10 +1618,13 @@ secondary_input_reload_class(enum reg_class class,enum machine_mode mode, rtx x)
   return NO_REGS;
 }
 
+/* Like secondary_input_reload_class; and all we do is call that function.  */
+
 enum reg_class
-secondary_output_reload_class(enum reg_class class,enum machine_mode mode, rtx x)
+secondary_output_reload_class (enum reg_class class, enum machine_mode mode,
+			       rtx x)
 {
-  return secondary_input_reload_class(class,mode,x);
+  return secondary_input_reload_class (class, mode, x);
 }
 
 /* For macro `OVERRIDE_OPTIONS' */
@@ -1774,6 +1716,9 @@ bfin_cbranch_operator (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
 {
   return GET_CODE (op) == EQ || GET_CODE (op) == NE;
 }
+
+/* Emit rtl for a comparison operation CMP in mode MODE.  Operands have been
+   stored in bfin_compare_op0 and bfin_compare_op1 already.  */
 
 rtx
 bfin_gen_compare (rtx cmp, enum machine_mode mode ATTRIBUTE_UNUSED)
@@ -1878,7 +1823,9 @@ split_load_immediate (rtx operands[])
   return 0;
 }
 
-/* Return false iff type is returned in memory.  */
+/* Decide whether a type should be returned in memory (true)
+   or in a register (false).  This is called by the macro
+   RETURN_IN_MEMORY.  */
 
 int
 bfin_return_in_memory (tree type)
@@ -1914,19 +1861,10 @@ output_casesi_internal (rtx *operands)
   return "";
 }
 
-/*
-return true if the legitimate memory address for a memory operand of mode
-return false if not.
+/* Return true if the legitimate memory address for a memory operand of mode
+   MODE.  Return false if not.  */
 
-[ Preg + uimm17m4 ]
-W [ Preg + uimm16m2 ]
-B [ Preg + uimm15 ]
-
-uimm17m4: 17-bit unsigned field that must be a multiple of 4
-uimm16m2: 16-bit unsigned field that must be a multiple of 2 
-*/
-
-int
+bool
 bfin_valid_add (enum machine_mode mode, HOST_WIDE_INT value)
 {
   unsigned HOST_WIDE_INT v = value > 0 ? value : -value;
@@ -1938,7 +1876,7 @@ bfin_valid_add (enum machine_mode mode, HOST_WIDE_INT value)
   return (v & ~(mask << shift)) == 0;
 }
 
-bool
+static bool
 bfin_rtx_costs (rtx x, int code, int outer_code, int *total)
 {
   int cost2 = COSTS_N_INSNS (1);
@@ -1979,10 +1917,10 @@ bfin_rtx_costs (rtx x, int code, int outer_code, int *total)
     }
 }
 
-void
-bfin_internal_label(FILE *stream, const char *prefix, unsigned long num)
+static void
+bfin_internal_label (FILE *stream, const char *prefix, unsigned long num)
 {
-        fprintf(stream, "%s%s$%ld:\n", LOCAL_LABEL_PREFIX, prefix, num);
+  fprintf (stream, "%s%s$%ld:\n", LOCAL_LABEL_PREFIX, prefix, num);
 }
 
 /* Used for communication between {push,pop}_multiple_operation (which
@@ -2118,6 +2056,9 @@ pop_multiple_operation (rtx op, enum machine_mode mode)
   return 1;
 }
 
+/* Emit assembly code for one multi-register push described by INSN, with
+   operands in OPERANDS.  */
+
 void
 output_push_multiple (rtx insn, rtx *operands)
 {
@@ -2133,6 +2074,9 @@ output_push_multiple (rtx insn, rtx *operands)
 
   output_asm_insn (buf, operands);
 }
+
+/* Emit assembly code for one multi-register pop described by INSN, with
+   operands in OPERANDS.  */
 
 void
 output_pop_multiple (rtx insn, rtx *operands)
@@ -2308,6 +2252,12 @@ const struct attribute_spec bfin_attribute_table[] =
   { NULL, 0, 0, false, false, false, NULL }
 };
 
+#undef TARGET_ASM_GLOBALIZE_LABEL
+#define TARGET_ASM_GLOBALIZE_LABEL bfin_globalize_label 
+
+#undef TARGET_ASM_FILE_START
+#define TARGET_ASM_FILE_START output_file_start
+
 #undef TARGET_ATTRIBUTE_TABLE
 #define TARGET_ATTRIBUTE_TABLE bfin_attribute_table
 
