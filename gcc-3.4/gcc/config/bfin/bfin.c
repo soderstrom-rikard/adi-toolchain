@@ -1749,31 +1749,6 @@ override_options (void)
   if (TARGET_OMIT_LEAF_FRAME_POINTER)
     flag_omit_frame_pointer = 1;
 
-  /* Initialize assembler directive data structures */
-  if (!TARGET_ASM_DIR) {
-    section_names[CODE_DIR].dir_name = (char *) ".text";
-    section_names[CODE_DIR].sect_name = (char *) "$code";
-    section_names[DATA_DIR].dir_name = (char *) ".data";
-    section_names[DATA_DIR].sect_name = (char *) "$data";
-    
-    directive_names[LONG_CONST_DIR] = (char *) ".dd";
-    directive_names[SHORT_CONST_DIR] = (char *) ".dw";
-    directive_names[BYTE_CONST_DIR] = (char *) ".db";
-    directive_names[SPACE_DIR] = (char *) ".space";
-    directive_names[INIT_DIR] = (char *) "\t";
-
-  } else {
-    section_names[CODE_DIR].dir_name = (char *) ".section";
-    section_names[CODE_DIR].sect_name = (char *) "program";
-    section_names[DATA_DIR].dir_name = (char *) ".section";
-    section_names[DATA_DIR].sect_name = (char *) "data1";
-    
-    directive_names[LONG_CONST_DIR] = (char *) ".byte4";
-    directive_names[SHORT_CONST_DIR] = (char *) ".byte2";
-    directive_names[BYTE_CONST_DIR] = (char *) ".byte";
-    directive_names[SPACE_DIR] = (char *) ".byte";
-    directive_names[INIT_DIR] = (char *) "\t";
-  }
   bfin_lvno = 0;
 }
 

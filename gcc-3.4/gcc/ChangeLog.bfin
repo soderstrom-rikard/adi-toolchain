@@ -36,6 +36,7 @@
 	macros.
 	* config/bfin/bfin.c (asm_output_skip, asm_output_ascii): Delete
 	unused functions.
+	(override_options): Delete all TARGET_ASM_DIR code.
 	* config/bfin/bfin-protos.h (asm_output_skip, asm_output_ascii):
 	Delete.
 
