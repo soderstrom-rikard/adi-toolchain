@@ -1,3 +1,21 @@
+2005-01-31  Catherine Moore  <clm@cm00re.com>
+
+	* config/bfin-defs.h (NOTERELOC, NOTERELOC1, NOTERELOC2,
+	CONSCODE, GENCODE, CONCTCODE): Remove.
+	(notereloc, notereloc1, notereloc2): Add underscore.
+	* config/tc-bfin.c (notereloc1, notereloc2, notereloc): Rename.
+	(ExprNodeGenReloc): Change macro invocations to function calls.
+	(ExprNodeGenRelocR): Likewise.
+	(GEN_OPCODE32): Likewise.
+	(GEN_OPCODE16): Likewise.
+	(gen_loopsetup): Likewise.
+	(gen_calla): Likewise.
+	(gen_ldimmhalf): Likewise.
+	(gen_ldstidxi): Likewise.
+	(gen_ujump): Likewise.
+	(gen_multi_instr): Likewise.
+
+
 2005-01-28  Catherine Moore  <clm@cm00re.com>
 
 	* config/bfin-parse.y (modcodes): Add aop.

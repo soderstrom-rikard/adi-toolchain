@@ -921,17 +921,17 @@ conctcode (INSTR_T head, INSTR_T tail)
 }
 
 INSTR_T
-notereloc (INSTR_T code, ExprNode * symbol, int reloc, int pcrel)
+note_reloc (INSTR_T code, ExprNode * symbol, int reloc, int pcrel)
 {
   /* assert that the symbol is not an operator */
   assert (symbol->type == ExprNodeReloc);
 
-  return notereloc1 (code, symbol->value.s_value, reloc, pcrel);
+  return note_reloc1 (code, symbol->value.s_value, reloc, pcrel);
 
 }
 
 INSTR_T
-notereloc1 (INSTR_T code, const char *symbol, int reloc, int pcrel)
+note_reloc1 (INSTR_T code, const char *symbol, int reloc, int pcrel)
 {
   code->reloc = reloc;
   code->exp = mkexpr (0, symbol_find_or_make (symbol));
@@ -940,7 +940,7 @@ notereloc1 (INSTR_T code, const char *symbol, int reloc, int pcrel)
 }
 
 INSTR_T
-notereloc2 (INSTR_T code, const char *symbol, int reloc, int value, int pcrel)
+note_reloc2 (INSTR_T code, const char *symbol, int reloc, int value, int pcrel)
 {
   code->reloc = reloc;
   code->exp = mkexpr (value, symbol_find_or_make (symbol));
@@ -1017,22 +1017,22 @@ ExprNodeGenReloc (ExprNode * head, int parent_reloc)
 	case BFD_RELOC_16_IMM:
 	case BFD_RELOC_16_LOW:
 	case BFD_RELOC_16_HIGH:
-	  note1 = CONSCODE (GENCODE (value), NULL_CODE);
+	  note1 = conscode (gencode (value), NULL_CODE);
 	  pcrel = 0;		// only these are not pc relative
 	  break;
 	case BFD_RELOC_BFIN_PLTPC:
-	  note1 = CONSCODE (GENCODE (value), NULL_CODE);
+	  note1 = conscode (gencode (value), NULL_CODE);
 	  pcrel = 0;		// only these are not pc relative
 	  break;
 	case BFD_RELOC_BFIN_GOT:
-	  note1 = CONSCODE (GENCODE (value), NULL_CODE);
+	  note1 = conscode (gencode (value), NULL_CODE);
 	  pcrel = 0;		// only these are not pc relative
 	  break;
 	case BFD_RELOC_24_PCREL:
 	case BFD_RELOC_24_PCREL_JUMP_L:
 	case BFD_RELOC_24_PCREL_CALL_X:
 	  /* these offsets are even numbered pcrel */
-	  note1 = CONSCODE (GENCODE (value >> 1), NULL_CODE);
+	  note1 = conscode (gencode (value >> 1), NULL_CODE);
 	  break;
 	default:
 	  note1 = NULL_CODE;
@@ -1045,16 +1045,16 @@ ExprNodeGenReloc (ExprNode * head, int parent_reloc)
     }
   else if (head->type == ExprNodeReloc)
     {
-      note = NOTERELOC1 (pcrel, parent_reloc, head->value.s_value, GENCODE (0x0));
+      note = note_reloc1 (gencode(0), head->value.s_value, parent_reloc, pcrel);
       if (note1 != NULL_CODE)
-	note = CONSCODE (note1, note);
+	note = conscode (note1, note);
     }
   else
     {
       /* call the recursive function */
-      note = NOTERELOC1 (pcrel, parent_reloc, op, GENCODE (0x0));
+      note = note_reloc1 (gencode(0), op, parent_reloc, pcrel);
       if (note1 != NULL_CODE)
-	note = CONSCODE (note1, note);
+	note = conscode (note1, note);
       note = conctcode (ExprNodeGenRelocR (head), note);
     }
   return note;
@@ -1070,50 +1070,50 @@ ExprNodeGenRelocR (ExprNode * head)
   switch (head->type)
     {
     case ExprNodeConstant:
-      note = CONSCODE (NOTERELOC2 (0, BFD_ARELOC_CONST, con, head->value.i_value, GENCODE (0x0)), NULL_CODE);
+      note = conscode (note_reloc2 (gencode(0), con, BFD_ARELOC_CONST, head->value.i_value, 0), NULL_CODE);
       break;
     case ExprNodeReloc:
-      note = CONSCODE (NOTERELOC (0, BFD_ARELOC_PUSH, head, GENCODE (0x0)), NULL_CODE);
+      note = conscode (note_reloc (gencode(0), head, BFD_ARELOC_PUSH, 0), NULL_CODE);
       break;
     case ExprNodeBinop:
       note1 = conctcode (ExprNodeGenRelocR (head->LeftChild), ExprNodeGenRelocR (head->RightChild));
       switch (head->value.op_value)
 	{
 	case ExprOpTypeAdd:
-	  note = conctcode (note1, CONSCODE (NOTERELOC1 (0, BFD_ARELOC_ADD, op, GENCODE (0x0)), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_ADD, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeSub:
-	  note = conctcode (note1, CONSCODE (NOTERELOC1 (0, BFD_ARELOC_SUB, op, GENCODE (0x0)), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_SUB, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeMult:
-	  note = conctcode (note1, CONSCODE (NOTERELOC1 (0, BFD_ARELOC_MULT, op, GENCODE (0x0)), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_MULT, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeDiv:
-	  note = conctcode (note1, CONSCODE (NOTERELOC1 (0, BFD_ARELOC_DIV, op, GENCODE (0x0)), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_DIV, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeMod:
-	  note = conctcode (note1, CONSCODE (NOTERELOC1 (0, BFD_ARELOC_MOD, op, GENCODE (0x0)), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_MOD, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeLsft:
-	  note = conctcode (note1, CONSCODE (NOTERELOC1 (0, BFD_ARELOC_LSHIFT, op, GENCODE (0x0)), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_LSHIFT, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeRsft:
-	  note = conctcode (note1, CONSCODE (NOTERELOC1 (0, BFD_ARELOC_RSHIFT, op, GENCODE (0x0)), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_RSHIFT, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeBAND:
-	  note = conctcode (note1, CONSCODE (NOTERELOC1 (0, BFD_ARELOC_AND, op, GENCODE (0x0)), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_AND, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeBOR:
-	  note = conctcode (note1, CONSCODE (NOTERELOC1 (0, BFD_ARELOC_OR, op, GENCODE (0x0)), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_OR, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeBXOR:
-	  note = conctcode (note1, CONSCODE (NOTERELOC1 (0, BFD_ARELOC_XOR, op, GENCODE (0x0)), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_XOR, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeLAND:
-	  note = conctcode (note1, CONSCODE (NOTERELOC1 (0, BFD_ARELOC_LAND, op, GENCODE (0x0)), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_LAND, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeLOR:
-	  note = conctcode (note1, CONSCODE (NOTERELOC1 (0, BFD_ARELOC_LOR, op, GENCODE (0x0)), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_LOR, 0), NULL_CODE));
 	  break;
 	default:
 	  fprintf (stderr, "%s:%d:Unkonwn operator found for arithmetic" " relocation", __FILE__, __LINE__);
@@ -1122,14 +1122,14 @@ ExprNodeGenRelocR (ExprNode * head)
 	}
       break;
     case ExprNodeUnop:
-      note1 = CONSCODE (ExprNodeGenRelocR (head->LeftChild), NULL_CODE);
+      note1 = conscode (ExprNodeGenRelocR (head->LeftChild), NULL_CODE);
       switch (head->value.op_value)
 	{
 	case ExprOpTypeNEG:
-	  note = conctcode (note1, CONSCODE (NOTERELOC1 (0, BFD_ARELOC_NEG, op, GENCODE (0x0)), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_NEG, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeCOMP:
-	  note = conctcode (note1, CONSCODE (NOTERELOC1 (0, BFD_ARELOC_COMP, op, GENCODE (0x0)), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_COMP, 0), NULL_CODE));
 	  break;
 	default:
 	  fprintf (stderr, "%s:%d:Unkonwn operator found for arithmetic" " relocation", __FILE__, __LINE__);
@@ -1173,11 +1173,11 @@ ExprNodeGenRelocR (ExprNode * head)
 #define GROUP(x) ((x->regno & CLASS_MASK) >> 4)
 
 #define GEN_OPCODE32()  \
-	CONSCODE(            GENCODE(HI(c_code.opcode)), \
-				CONSCODE(GENCODE(LO(c_code.opcode)), NULL_CODE) )
+	conscode(            gencode(HI(c_code.opcode)), \
+				conscode(gencode(LO(c_code.opcode)), NULL_CODE) )
 
 #define GEN_OPCODE16()  \
-	CONSCODE(GENCODE(c_code.opcode), NULL_CODE)
+	conscode(gencode(c_code.opcode), NULL_CODE)
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -1321,9 +1321,9 @@ gen_loopsetup (ExprNode * psoffset, REG_T c, int rop, ExprNode * peoffset, REG_T
   ASSIGN_R (reg);
 
   return
-      CONSCODE (GENCODE (HI (c_code.opcode)),
+      conscode (gencode (HI (c_code.opcode)),
 		conctcode (ExprNodeGenReloc (psoffset, BFD_RELOC_5_PCREL),
-			   conctcode (GENCODE (LO (c_code.opcode)), ExprNodeGenReloc (peoffset, BFD_RELOC_11_PCREL))));
+			   conctcode (gencode (LO (c_code.opcode)), ExprNodeGenReloc (peoffset, BFD_RELOC_11_PCREL))));
 
 }
 
@@ -1350,7 +1350,7 @@ gen_calla (ExprNode * addr, int S)
   val = EXPR_VALUE (addr) >> 1;
   high_val = val >> 16;
 
-  return CONSCODE (GENCODE (HI (c_code.opcode) | LO (high_val)),
+  return conscode (gencode (HI (c_code.opcode) | LO (high_val)),
 		   ExprNodeGenReloc (addr, reloc));
 }
 
@@ -1386,11 +1386,11 @@ gen_ldimmhalf (REG_T reg, int H, int S, int Z, ExprNode * phword, int reloc)
   ASSIGN (grp);
   if (reloc == 2)
     {				//Relocation 5 , rN = <preg>
-      return CONSCODE (GENCODE (HI (c_code.opcode)), ExprNodeGenReloc (phword, BFD_RELOC_16_IMM));
+      return conscode (gencode (HI (c_code.opcode)), ExprNodeGenReloc (phword, BFD_RELOC_16_IMM));
     }
   else if (reloc == 1)
     {
-      return CONSCODE (GENCODE (HI (c_code.opcode)), ExprNodeGenReloc (phword, IS_H (*reg) ? BFD_RELOC_16_HIGH : BFD_RELOC_16_LOW));
+      return conscode (gencode (HI (c_code.opcode)), ExprNodeGenReloc (phword, IS_H (*reg) ? BFD_RELOC_16_HIGH : BFD_RELOC_16_LOW));
     }
   else
     {
@@ -1441,7 +1441,7 @@ gen_ldstidxi (REG_T ptr, REG_T reg, int W, int sz, int Z, ExprNode * poffset)
   */
   if(poffset->type != ExprNodeConstant){
     /* a GOT relocation such as R0 = [P5 + symbol@GOT] */
-    return  CONSCODE (GENCODE (HI (c_code.opcode)),
+    return  conscode (gencode (HI (c_code.opcode)),
 			ExprNodeGenReloc(poffset, BFD_RELOC_BFIN_GOT));
   }
   else{
@@ -1575,7 +1575,7 @@ gen_brcc (int T, int B, ExprNode * poffset)
   ASSIGN (B);
   offset = ((EXPR_VALUE (poffset) >> 1));
   ASSIGN (offset);
-  return CONSCODE (GENCODE (c_code.opcode), ExprNodeGenReloc (poffset, BFD_RELOC_10_PCREL));
+  return conscode (gencode (c_code.opcode), ExprNodeGenReloc (poffset, BFD_RELOC_10_PCREL));
 }
 
 INSTR_T
@@ -1587,7 +1587,7 @@ gen_ujump (ExprNode * poffset)
   offset = ((EXPR_VALUE (poffset) >> 1));
   ASSIGN (offset);
 
-  return CONSCODE (GENCODE (c_code.opcode), ExprNodeGenReloc (poffset, BFD_RELOC_12_PCREL_JUMP_S));
+  return conscode (gencode (c_code.opcode), ExprNodeGenReloc (poffset, BFD_RELOC_12_PCREL_JUMP_S));
 }
 
 INSTR_T
@@ -1843,19 +1843,19 @@ gen_multi_instr (INSTR_T dsp32, INSTR_T dsp16_grp1, INSTR_T dsp16_grp2)
     }
   else
     {
-      dsp32 = GENCODE (0xc803);
-      walk = GENCODE (0x1800);
+      dsp32 = gencode (0xc803);
+      walk = gencode (0x1800);
       dsp32->next = walk;
     }
 
   if (!dsp16_grp1)
     {
-      dsp16_grp1 = GENCODE (0x0000);
+      dsp16_grp1 = gencode (0x0000);
     }
 
   if (!dsp16_grp2)
     {
-      dsp16_grp2 = GENCODE (0x0000);
+      dsp16_grp2 = gencode (0x0000);
     }
 
   walk->next = dsp16_grp1;

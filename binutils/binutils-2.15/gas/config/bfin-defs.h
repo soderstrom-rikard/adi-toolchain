@@ -202,18 +202,11 @@ typedef struct expr_node_struct ExprNode;
 extern INSTR_T gencode (unsigned long x);
 extern INSTR_T conscode(INSTR_T head, INSTR_T tail);   
 extern INSTR_T conctcode(INSTR_T head, INSTR_T tail);
-extern INSTR_T notereloc(INSTR_T code, ExprNode *, int reloc, int pcrel);
-extern INSTR_T notereloc1(INSTR_T code, const char * sym, int reloc, int pcrel);
-extern INSTR_T notereloc2(INSTR_T code,
+extern INSTR_T note_reloc(INSTR_T code, ExprNode *, int reloc, int pcrel);
+extern INSTR_T note_reloc1(INSTR_T code, const char * sym, int reloc, int pcrel);
+extern INSTR_T note_reloc2(INSTR_T code,
 		const char *symbol, int reloc, int value, int pcrel);
  
-#define CONSCODE(head,tail)       conscode(head,tail)
-#define GENCODE(x)                gencode(x)
-#define CONCTCODE(head, tail)	  conctcode(head, tail)
-#define NOTERELOC(pcrel, rel, expr, code)  notereloc(code,expr,rel,pcrel)
-#define NOTERELOC1(pcrel, rel, expr, code)  notereloc1(code,expr,rel,pcrel)
-#define NOTERELOC2(pcrel, rel, expr, value, code)  notereloc2(code,expr,rel,value,pcrel)
-  
 /****************typedef and methods related to new expression parser ***/
 /* types of expressions */
 typedef enum 
