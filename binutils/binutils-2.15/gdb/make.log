@@ -1,0 +1,305 @@
+loading cache ./config.cache
+checking whether to enable maintainer-specific portions of Makefiles... no
+checking for gcc... gcc
+checking whether the C compiler (gcc  ) works... yes
+checking whether the C compiler (gcc  ) is a cross-compiler... no
+checking whether we are using GNU C... yes
+checking whether gcc accepts -g... yes
+checking how to run the C preprocessor... gcc -E
+checking for AIX... no
+checking for POSIXized ISC... no
+checking for gcc option to accept ANSI C... none needed
+checking host system type... i686-pc-linux-gnu
+checking target system type... bfin-unknown-elf
+checking build system type... i686-pc-linux-gnu
+checking for ranlib... ranlib
+checking whether make sets ${MAKE}... yes
+checking for ranlib... (cached) ranlib
+checking for ANSI C header files... yes
+checking for working const... yes
+checking for inline... inline
+checking for off_t... yes
+checking for size_t... yes
+checking for working alloca.h... yes
+checking for alloca... yes
+checking for unistd.h... yes
+checking for getpagesize... yes
+checking for working mmap... yes
+checking for argz.h... yes
+checking for limits.h... yes
+checking for locale.h... yes
+checking for nl_types.h... yes
+checking for malloc.h... yes
+checking for string.h... yes
+checking for unistd.h... (cached) yes
+checking for values.h... yes
+checking for sys/param.h... yes
+checking for getcwd... yes
+checking for munmap... yes
+checking for putenv... yes
+checking for setenv... yes
+checking for setlocale... yes
+checking for strchr... yes
+checking for strcasecmp... yes
+checking for __argz_count... yes
+checking for __argz_stringify... yes
+checking for __argz_next... yes
+checking for stpcpy... yes
+checking for LC_MESSAGES... yes
+checking whether NLS is requested... yes
+checking whether included gettext is requested... no
+checking for libintl.h... yes
+checking for gettext in libc... yes
+checking for msgfmt... /usr/bin/msgfmt
+checking for dcgettext... yes
+checking for gmsgfmt... /usr/bin/msgfmt
+checking for xgettext... /usr/bin/xgettext
+checking for catalogs to be installed... 
+checking for libunwind.h... no
+checking for libunwind-ia64.h... no
+checking for monstartup... yes
+checking for _mcleanup... yes
+checking for _etext... yes
+checking for mawk... no
+checking for gawk... gawk
+checking for a BSD compatible install... /usr/bin/install -c
+checking whether ln -s works... yes
+checking for ranlib... (cached) ranlib
+checking for bison... bison -y
+checking for ar... ar
+checking for dlltool... dlltool
+checking for windres... windres
+checking for mig... mig
+checking for main in -lm... yes
+checking for wctype... yes
+checking for library containing gethostbyname... none required
+checking for library containing socketpair... none required
+checking for library containing waddstr... -lncurses
+checking for library containing tgetent... none required
+checking for dirent.h that defines DIR... yes
+checking for opendir in -ldir... no
+checking whether stat file-mode macros are broken... no
+checking for ANSI C header files... (cached) yes
+checking for link.h... yes
+checking for machine/reg.h... no
+checking for nlist.h... no
+checking for poll.h... yes
+checking for sys/poll.h... yes
+checking for proc_service.h... no
+checking for thread_db.h... yes
+checking for gnu/libc-version.h... yes
+checking for stddef.h... yes
+checking for stdlib.h... yes
+checking for stdint.h... yes
+checking for string.h... (cached) yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for sys/fault.h... no
+checking for sys/file.h... yes
+checking for sys/filio.h... no
+checking for sys/ioctl.h... yes
+checking for sys/param.h... (cached) yes
+checking for sys/proc.h... no
+checking for sys/procfs.h... yes
+checking for sys/ptrace.h... yes
+checking for ptrace.h... no
+checking for sys/reg.h... yes
+checking for sys/debugreg.h... yes
+checking for sys/select.h... yes
+checking for sys/syscall.h... yes
+checking for sys/types.h... yes
+checking for sys/user.h... yes
+checking for sys/wait.h... yes
+checking for wait.h... yes
+checking for termios.h... yes
+checking for termio.h... yes
+checking for sgtty.h... yes
+checking for unistd.h... (cached) yes
+checking for curses.h... yes
+checking for cursesX.h... no
+checking for ncurses.h... yes
+checking for ncurses/ncurses.h... no
+checking for ncurses/term.h... no
+checking for term.h... yes
+checking for ctype.h... yes
+checking for time.h... yes
+checking for member st_blocks in struct stat... yes
+checking whether getopt is declared... no
+checking return type of signal handlers... void
+checking for working const... (cached) yes
+checking for inline... (cached) inline
+checking for working alloca.h... (cached) yes
+checking for alloca... (cached) yes
+checking for unistd.h... (cached) yes
+checking for getpagesize... (cached) yes
+checking for working mmap... (cached) yes
+checking for pid_t... yes
+checking for vfork.h... no
+checking for working vfork... yes
+checking for canonicalize_file_name... yes
+checking for realpath... yes
+checking for poll... yes
+checking for pread64... yes
+checking for sbrk... yes
+checking for setpgid... yes
+checking for setpgrp... yes
+checking for sigaction... yes
+checking for sigprocmask... yes
+checking for sigsetmask... yes
+checking for socketpair... yes
+checking for syscall... yes
+checking for ttrace... no
+checking for wborder... yes
+checking whether ptrace is declared... yes
+checking return type of ptrace... long
+checking types of arguments for ptrace... int,int,long,long
+checking whether setpgrp takes no argument... yes
+checking for sigsetjmp... yes
+checking for GNU regex... yes
+checking for td_pcb in struct thread... no
+checking for struct lwp... no
+checking for struct reg in machine/reg.h... no
+checking for r_fs in struct reg... no
+checking for r_gs in struct reg... no
+checking for PTRACE_GETREGS... yes
+checking for PTRACE_GETFPXREGS... yes
+checking for PT_GETDBREGS... no
+checking for PT_GETXMMREGS... no
+checking for uintptr_t in stdint.h... yes
+checking whether malloc must be declared... no
+checking whether realloc must be declared... no
+checking whether free must be declared... no
+checking whether strerror must be declared... no
+checking whether strdup must be declared... no
+checking whether strstr must be declared... no
+checking whether canonicalize_file_name must be declared... no
+checking for HPUX save_state structure... no
+checking for pstatus_t in sys/procfs.h... no
+checking for prrun_t in sys/procfs.h... no
+checking for gregset_t in sys/procfs.h... no
+checking for fpregset_t in sys/procfs.h... no
+checking for prgregset_t in sys/procfs.h... yes
+checking for prfpregset_t in sys/procfs.h... yes
+checking for prgregset32_t in sys/procfs.h... no
+checking for prfpregset32_t in sys/procfs.h... no
+checking for lwpid_t in sys/procfs.h... yes
+checking for psaddr_t in sys/procfs.h... yes
+checking for prsysent_t in sys/procfs.h... no
+checking for pr_sigset_t in sys/procfs.h... no
+checking for pr_sigaction64_t in sys/procfs.h... no
+checking for pr_siginfo64_t in sys/procfs.h... no
+checking whether prfpregset_t type is broken... no
+checking for PIOCSET ioctl entry in sys/procfs.h... no
+checking for long long support in compiler... yes
+checking for long long support in printf... yes
+checking for long double support in compiler... yes
+checking for long double support in printf... yes
+checking for long double support in scanf... yes
+checking whether <thread_db.h> has TD_NOTALLOC... yes
+checking whether <sys/syscall.h> has __NR_tkill... yes
+checking compiler warning flags...  -Wimplicit -Wreturn-type -Wcomment -Wtrigraphs -Wformat -Wparentheses -Wpointer-arith -Wuninitialized -Wformat-nonliteral -Wunused-label -Wunused-function
+checking for cygwin... no
+checking for X... no
+.
+bfin
+linux.mt
+Error...target.....
+
+./config/bfin/linux.mt
+Error........
+tm-bfin.h
+Error........
+tm-bfin.h
+Error
+config/bfin/tm-bfin.h
+checking for Cygwin environment... no
+checking for mingw32 environment... no
+checking for executable suffix... no
+checking for iconv... no, consider installing GNU libiconv
+updating cache ./config.cache
+creating ./config.status
+creating Makefile
+creating .gdbinit
+creating config.h
+linking ./config/bfin/tm-bfin.h to tm.h
+configuring in doc
+running /bin/sh ./configure  --target=bfin-elf --cache-file=.././config.cache --srcdir=.
+loading cache .././config.cache
+checking for a BSD compatible install... (cached) /usr/bin/install -c
+checking whether ln -s works... (cached) yes
+creating ./config.status
+creating Makefile
+configuring in testsuite
+running /bin/sh ./configure  --target=bfin-elf --cache-file=.././config.cache --srcdir=.
+loading cache .././config.cache
+checking build system type... config.sub: missing argument
+Try `config.sub --help' for more information.
+
+checking host system type... i686-pc-linux-gnu
+checking target system type... bfin-unknown-elf
+checking how to run the C preprocessor... (cached) gcc -E
+checking for pthread.h... yes
+checking for Cygwin environment... (cached) no
+checking for mingw32 environment... (cached) no
+checking for executable suffix... (cached) no
+updating cache .././config.cache
+creating ./config.status
+creating Makefile
+creating gdb.ada/Makefile
+creating gdb.ada/gnat_ada.gpr
+creating gdb.arch/Makefile
+creating gdb.asm/Makefile
+creating gdb.base/Makefile
+creating gdb.cp/Makefile
+creating gdb.disasm/Makefile
+creating gdb.dwarf2/Makefile
+creating gdb.fortran/Makefile
+creating gdb.java/Makefile
+creating gdb.mi/Makefile
+creating gdb.objc/Makefile
+creating gdb.threads/Makefile
+creating gdb.trace/Makefile
+configuring in gdb.stabs
+running /bin/sh ./configure  --target=bfin-elf --cache-file=../.././config.cache --srcdir=.
+loading cache ../.././config.cache
+checking host system type... i686-pc-linux-gnu
+checking target system type... bfin-unknown-elf
+checking build system type... i686-pc-linux-gnu
+creating ./config.status
+creating Makefile
+configuring in gdbserver
+running /bin/sh ./configure  --target=bfin-elf --cache-file=.././config.cache --srcdir=.
+loading cache .././config.cache
+checking for gcc... (cached) gcc
+checking whether the C compiler (gcc  ) works... yes
+checking whether the C compiler (gcc  ) is a cross-compiler... no
+checking whether we are using GNU C... (cached) yes
+checking whether gcc accepts -g... (cached) yes
+checking host system type... i686-pc-linux-gnu
+checking target system type... bfin-unknown-elf
+checking build system type... i686-pc-linux-gnu
+checking for a BSD compatible install... (cached) /usr/bin/install -c
+checking how to run the C preprocessor... (cached) gcc -E
+checking for ANSI C header files... (cached) yes
+checking for sgtty.h... (cached) yes
+checking for termio.h... (cached) yes
+checking for termios.h... (cached) yes
+checking for sys/reg.h... (cached) yes
+checking for string.h... (cached) yes
+checking for proc_service.h... (cached) no
+checking for sys/procfs.h... (cached) yes
+checking for thread_db.h... (cached) yes
+checking for linux/elf.h... yes
+checking for stdlib.h... (cached) yes
+checking for unistd.h... (cached) yes
+checking whether strerror must be declared... (cached) no
+checking for lwpid_t in sys/procfs.h... (cached) yes
+checking for psaddr_t in sys/procfs.h... (cached) yes
+checking for prgregset_t in sys/procfs.h... (cached) yes
+checking for prfpregset_t in sys/procfs.h... (cached) yes
+checking whether prfpregset_t type is broken... (cached) no
+checking for elf_fpregset_t in sys/procfs.h... no
+updating cache .././config.cache
+creating ./config.status
+creating Makefile
+creating config.h
