@@ -30,6 +30,7 @@ Disassembly of section .text:
   2c:	31 3d       	CYCLES=A0.w;
   2e:	7f 38       	RETS=FP;
   30:	e0 3d       	LT1=USP;
+  32:	72 38       	ASTAT=P2;
   34:	08 c4 3f c0 	A0=A1;
   38:	08 c4 3f e0 	A1=A0;
   3c:	09 c4 00 20 	A0=R0;
