@@ -1,4 +1,9 @@
-2005-01-26  Catherine Moore  <clm@cm00re.com>
+2005-01-28  Catherine Moore  <clm@cm00re.com>
+
+	* bfin-dis.c (decode_dspshiftimm_0):  Handle vector shift
+	immediates.
+
+2005-01-27  Catherine Moore  <clm@cm00re.com>
 
 	* bfin-dis.c (decode_dsp32shift_0): Improve whitespace in
 	output.
