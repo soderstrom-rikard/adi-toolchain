@@ -48,189 +48,191 @@ static int parse_reg(Register *r, int type, char *rt);
 %s KEYWORD
 
 %%
-sftreset|SFTRESET                       _REG.regno = REG_sftreset;  return REG;
-omode|OMODE                             _REG.regno = REG_omode;     return REG;
-idle_req|IDLE_REQ                       _REG.regno = REG_idle_req;  return REG;
-hwerrcause|HWERRCAUSE                   _REG.regno = REG_hwerrcause;return REG;
-excause|EXCAUSE                         _REG.regno = REG_excause;   return REG;
-emucause|EMUCAUSE                       _REG.regno = REG_emucause;  return REG;
-z|Z                                     return Z;
-x|X                                     return X;
-w32|W32                                 yylval.value = M_W32; return MMOD;
-w|W                                     return W;
-vit_max|VIT_MAX                         return VIT_MAX;
-v|V                return V; /* special: V is a statflag and a modifier */
-usp|USP            _REG.regno = REG_USP; return REG;
-tl|TL                                   return TL;
-th|TH                                   return TH;
-tfu|TFU                                 yylval.value = M_TFU; return MMOD;
-testset|TESTSET                         return TESTSET;
-t|T                                     yylval.value = M_T; return MMOD;
-s|S					                    return S;
-syscfg|SYSCFG      _REG.regno = REG_SYSCFG; return REG;
-sti|STI                                 return STI;
-ssync|SSYNC                             return SSYNC;
-sp"."l|SP"."L                           _REG.regno = REG_SP; return HALF_REG;
-sp"."h|SP"."H                           _REG.regno = REG_SP | F_REG_HIGH; return HALF_REG;
-sp|SP                                   _REG.regno = REG_SP; return REG;
-signbits|SIGNBITS                       return SIGNBITS;
-sign|SIGN                               return SIGN;
-seqstat|SEQSTAT     _REG.regno = REG_SEQSTAT; return REG;
-search|SEARCH                           return SEARCH;
-shift|SHIFT                             return SHIFT;
-sco|SCO                                 return SCO;
+[sS][fF][tT][rR][eE][sS][eE][tT]        _REG.regno = REG_sftreset;  return REG;
+[oO][mM][oO][dD][eE]                    _REG.regno = REG_omode;     return REG;
+[iI][dD][lL][eE]_[rR][eE][qQ]           _REG.regno = REG_idle_req;  return REG;
+[hH][wW][eE][rR][rR][cC][aA][uU][sS][eE] _REG.regno = REG_hwerrcause; return REG;
+[eE][xX][cC][aA][uU][sS][eE]            _REG.regno = REG_excause;   return REG;
+[eE][mM][uU][cC][aA][uU][sS][eE]        _REG.regno = REG_emucause;  return REG;
+[zZ]                                    return Z;
+[xX]                                    return X;
+[wW]32                                  yylval.value = M_W32; return MMOD;
+[wW]                                    return W;
+[vV][iI][tT]_[mM][aA][xX]               return VIT_MAX;
+[vV]               return V; /* special: V is a statflag and a modifier */
+[uU][sS][pP]       _REG.regno = REG_USP; return REG;
+[tT][lL]                                return TL;
+[tT][hH]                                return TH;
+[tT][fF][uU]                            yylval.value = M_TFU; return MMOD;
+[tT][eE][sS][tT][sS][eE][tT]            return TESTSET;
+[tT]                                    yylval.value = M_T; return MMOD;
+[sS]                                                        return S;
+[sS][yY][sS][cC][fF][gG]       _REG.regno = REG_SYSCFG; return REG;
+[sS][tT][iI]                            return STI;
+[sS][sS][yY][nN][cC]                    return SSYNC;
+[sS][pP]"."[lL]                         _REG.regno = REG_SP; return HALF_REG;
+[sS][pP]"."[hH]                         _REG.regno = REG_SP | F_REG_HIGH; return HALF_REG;
+[sS][pP]                                _REG.regno = REG_SP; return REG;
+[sS][iI][gG][nN][bB][iI][tT][sS]        return SIGNBITS;
+[sS][iI][gG][nN]                        return SIGN;
+[sS][eE][qQ][sS][tT][aA][tT]     _REG.regno = REG_SEQSTAT; return REG;
+[sS][eE][aA][rR][cC][hH]                return SEARCH;
+[sS][hH][iI][fF][tT]                    return SHIFT;
+[sS][cC][oO]                            return SCO;
 
-saa|SAA                                 return SAA;
-s2rnd|S2RND                             yylval.value = M_S2RND; return MMOD;
-rtx|RTX                                 return RTX;
-rts|RTS                                 return RTS;
-rtn|RTN                                 return RTN;
-rti|RTI                                 return RTI;
-rte|RTE                                 return RTE;
-rot|ROT                                 return ROT;
-rnd20|RND20                             return RND20;
-rnd12|RND12                             return RND12;
-rndl|RNDL                               return RNDL;
-rndh|RNDH                               return RNDH;
-rnd|RND                                 return RND;
+[sS][aA][aA]                            return SAA;
+[sS]2[rR][nN][dD]                       yylval.value = M_S2RND; return MMOD;
+[rR][tT][xX]                            return RTX;
+[rR][tT][sS]                            return RTS;
+[rR][tT][nN]                            return RTN;
+[rR][tT][iI]                            return RTI;
+[rR][tT][eE]                            return RTE;
+[rR][oO][tT]                            return ROT;
+[rR][nN][dD]20                          return RND20;
+[rR][nN][dD]12                          return RND12;
+[rR][nN][dD][lL]                        return RNDL;
+[rR][nN][dD][hH]                        return RNDH;
+[rR][nN][dD]                            return RND;
 
 [rR][0-7]"."[lLhHbB]  return parse_halfreg(&yylval.reg, T_REG_R, yytext);
 
-rets|RETS   _REG.regno = REG_RETS; return REG;
-reti|RETI   _REG.regno = REG_RETI; return REG;
-retx|RETX   _REG.regno = REG_RETX; return REG;
-retn|RETN   _REG.regno = REG_RETN; return REG;
-rete|RETE   _REG.regno = REG_RETE; return REG;
-raise|RAISE  return RAISE;
+[rR][eE][tT][sS]       _REG.regno = REG_RETS; return REG;
+[rR][eE][tT][iI]    _REG.regno = REG_RETI; return REG;
+[rR][eE][tT][xX]         _REG.regno = REG_RETX; return REG;
+[rR][eE][tT][nN]      _REG.regno = REG_RETN; return REG;
+[rR][eE][tT][eE]    _REG.regno = REG_RETE; return REG;
+[rR][aA][iI][sS][eE]      return RAISE;
 
 [rR][0-7]           return parse_reg(&yylval.reg, T_REG_R, yytext);
 
-r|R       return R;
-prnt|PRNT                               return PRNT;
-pc|PC                                   return PC;
-pack|PACK                               return PACK;
+[rR]      return R;
+[pP][rR][nN][tT]                        return PRNT;
+[pP][cC]                                return PC;
+[pP][aA][cC][kK]                        return PACK;
 
 [pP][0-5]"."[lLhH]  return parse_halfreg(&yylval.reg, T_REG_P, yytext);
 [pP][0-5]           return parse_reg(&yylval.reg, T_REG_P, yytext);
 
-outc|OUTC                               return OUTC;
-ones|ONES                               return ONES;
+[oO][uU][tT][cC]                        return OUTC;
+[oO][nN][eE][sS]                        return ONES;
 
-not|NOT                                 return NOT;
-nop|NOP                                 return NOP;
-mnop|MNOP                               return MNOP;
-ns|NS                                   return NS;
+[nN][oO][tT]                            return NOT;
+[nN][oO][pP]                            return NOP;
+[mM][nN][oO][pP]                        return MNOP;
+[nN][sS]                                return NS;
 
-min|MIN                                 return MIN;
-max|MAX                                 return MAX;
+
+[mM][iI][nN]                            return MIN;
+[mM][aA][xX]                            return MAX;
 
 [mM][0-3]"."[lLhH]  return parse_halfreg(&yylval.reg, T_REG_M, yytext);
 [mM][0-3]           return parse_reg(&yylval.reg, T_REG_M, yytext);
 
-m|M                                     return M;
-lt|LT                                   return LT;
-lshift|LSHIFT                           return LSHIFT;
-lsetup|LSETUP                           return LSETUP;
+[mM]                                    return M;
+[lL][tT]                                return LT;
+[lL][sS][hH][iI][fF][tT]                return LSHIFT;
+[lL][sS][eE][tT][uU][pP]                return LSETUP;
 
-le|LE                                   return LE;
-lc0|LC0   _REG.regno = REG_LC0; return REG;
-lt0|LT0   _REG.regno = REG_LT0; return REG;
-lb0|LB0   _REG.regno = REG_LB0; return REG;
-lc1|LC1   _REG.regno = REG_LC1; return REG;
-lt1|LT1   _REG.regno = REG_LT1; return REG;
-lb1|LB1   _REG.regno = REG_LB1; return REG;
+[lL][eE]                                return LE;
+[lL][cC]0 _REG.regno = REG_LC0; return REG;
+[lL][tT]0 _REG.regno = REG_LT0; return REG;
+[lL][bB]0 _REG.regno = REG_LB0; return REG;
+[lL][cC]1 _REG.regno = REG_LC1; return REG;
+[lL][tT]1 _REG.regno = REG_LT1; return REG;
+[lL][bB]1 _REG.regno = REG_LB1; return REG;
 
 [lL][0-3]"."[lLhH]  return parse_halfreg(&yylval.reg, T_REG_L, yytext);
 [lL][0-3]           return parse_reg(&yylval.reg, T_REG_L, yytext);
-lo|LO                                   return LO;
-jump"."s|JUMP"."S                       { BEGIN 0; return JUMP_DOT_S;}
-jump"."l|JUMP"."L                       { BEGIN 0; return JUMP_DOT_L;}
-jump|JUMP                               { BEGIN 0; return JUMP;}
-jump"."[xX]|JUMP"."[xX]                 { BEGIN 0; return JUMP_DOT_L; /* TODO: fix */}
-iu|IU                                   yylval.value = M_IU;   return MMOD;
-iss2|ISS2                               yylval.value = M_ISS2; return MMOD;
-is|IS                                   yylval.value = M_IS;   return MMOD;
-ih|IH                                   yylval.value = M_IH;   return MMOD;
-if|IF                                   return IF;
+[lL][oO]                                return LO;
+[jJ][uU][mM][pP]"."[sS]                 { BEGIN 0; return JUMP_DOT_S;}
+[jJ][uU][mM][pP]"."[lL]                 { BEGIN 0; return JUMP_DOT_L;}
+[jJ][uU][mM][pP]                        { BEGIN 0; return JUMP;}
+[jJ][uU][mM][pP]"."[xX]                 { BEGIN 0; return JUMP_DOT_L; /* TODO: fix */}
+[iI][uU]                                yylval.value = M_IU;   return MMOD;
+[iI][sS][sS]2                           yylval.value = M_ISS2; return MMOD;
+[iI][sS]                                yylval.value = M_IS;   return MMOD;
+[iI][hH]                                yylval.value = M_IH;   return MMOD;
+[iI][fF]                                return IF;
 [iI][0-3]"."[lLhH]  return parse_halfreg(&yylval.reg, T_REG_I, yytext);
 [iI][0-3]           return parse_reg(&yylval.reg, T_REG_I, yytext);
-hlt|HLT                                 return HLT;
-hi|HI                                   return HI;
-gt|GT                                   return GT;
-ge|GE                                   return GE;
-fu|FU                                   yylval.value = M_FU; return MMOD;
-fp|FP            _REG.regno = REG_FP; return REG;
-fp"."l|FP"."L    _REG.regno = REG_FP; return HALF_REG;
-fp"."h|FP"."H    _REG.regno = REG_FP | F_REG_HIGH; return HALF_REG;
+[hH][lL][tT]                            return HLT;
+[hH][iI]                                return HI;
+[gG][tT]                                return GT;
+[gG][eE]                                return GE;
+[fF][uU]                                yylval.value = M_FU; return MMOD;
+[fF][pP]         _REG.regno = REG_FP; return REG;
+[fF][pP]"."[lL]  _REG.regno = REG_FP; return HALF_REG;
+[fF][pP]"."[hH]  _REG.regno = REG_FP | F_REG_HIGH; return HALF_REG;
 
-extract|EXTRACT                         return EXTRACT;
-expadj|EXPADJ                           return EXPADJ;
-excpt|EXCPT                             return EXCPT;
-emuexcpt|EMUEXCPT                       return EMUEXCPT;
-divs|DIVS                               return DIVS;
-divq|DIVQ                               return DIVQ;
-disalgnexcpt|DISALGNEXCPT               return DISALGNEXCPT;
-deposit|DEPOSIT                         return DEPOSIT;
-dbghalt|DBGHALT                         return DBGHALT;
-dbgcmplx|DBGCOMPLX                      return DBGCMPLX;
-dbgal|DBGAL                             return DBGAL;
-dbgah|DBGAH                             return DBGAH;
-dbga|DBGA                               return DBGA;
-dbg|DBG                                 return DBG;
-cycles2|CYCLES2   { _REG.regno = REG_CYCLES2; return REG; }
-cycles|CYCLES     { _REG.regno = REG_CYCLES; return REG; }
-csync|CSYNC                             return CSYNC;
-co|CO                                   return CO;
-cli|CLI                                 return CLI;
+[eE][xX][tT][rR][aA][cC][tT]            return EXTRACT;
+[eE][xX][pP][aA][dD][jJ]                return EXPADJ;
+[eE][xX][cC][pP][tT]                    return EXCPT;
+[eE][mM][uU][eE][xX][cC][pP][tT]        return EMUEXCPT;
+[dD][iI][vV][sS]                        return DIVS;
+[dD][iI][vV][qQ]                        return DIVQ;
+[dD][iI][sS][aA][lL][gG][nN][eE][xX][cC][pP][tT]  return DISALGNEXCPT;
+[dD][eE][pP][oO][sS][iI][tT]            return DEPOSIT;
+[dD][bB][gG][hH][aA][lL][tT]            return DBGHALT;
+[dD][bB][gG][cC][mM][pP][lL][xX]        return DBGCMPLX;
+[dD][bB][gG][aA][lL]                    return DBGAL;
+[dD][bB][gG][aA][hH]                    return DBGAH;
+[dD][bB][gG][aA]                        return DBGA;
+[dD][bB][gG]                            return DBG;
+[cC][yY][cC][lL][eE][sS]2  { _REG.regno = REG_CYCLES2; return REG; }
+[cC][yY][cC][lL][eE][sS]  { _REG.regno = REG_CYCLES; return REG; }
+[cC][sS][yY][nN][cC]                    return CSYNC;
+[cC][oO]                                return CO;
+[cC][lL][iI]                            return CLI;
 
-cc|CC        _REG.regno = REG_CC; return CCREG;
-[call|CALL]"."[xX]                      { BEGIN 0; return CALL;}
-call|CALL                               { BEGIN 0; return CALL;}
-byteunpack|BYTEUNPACK                   return BYTEUNPACK;
-bytepack|BYTEPACK                       return BYTEPACK;
-byteop16m|BYTEOP16M                     return BYTEOP16M;
-byteop16p|BYTEOP16P                     return BYTEOP16P;
-byteop3p|BYTEOP3P                       return BYTEOP3P;
-byteop2m|BYTEOP2M                       return BYTEOP2M;
-byteop2p|BYTEOP2P                       return BYTEOP2P;
-byteop1p|BYTEOP1P                       return BYTEOP1P;
-by|BY                                   return BY;
-bxorshift|BXORSHIFT                     return BXORSHIFT;
-bxor|BXOR                               return BXOR;
+[cC][cC]     _REG.regno = REG_CC; return CCREG;
+[cC][aA][lL][lL]"."[xX]                 { BEGIN 0; return CALL;}
+[cC][aA][lL][lL]                        { BEGIN 0; return CALL;}
+[bB][yY][tT][eE][uU][nN][pP][aA][cC][kK] return BYTEUNPACK;
+[bB][yY][tT][eE][pP][aA][cC][kK]        return BYTEPACK;
+[bB][yY][tT][eE][oO][pP]16[mM]          return BYTEOP16M;
+[bB][yY][tT][eE][oO][pP]16[pP]          return BYTEOP16P;
+[bB][yY][tT][eE][oO][pP]3[pP]           return BYTEOP3P;
+[bB][yY][tT][eE][oO][pP]2[mM]           return BYTEOP2M;
+[bB][yY][tT][eE][oO][pP]2[pP]           return BYTEOP2P;
+[bB][yY][tT][eE][oO][pP]1[pP]           return BYTEOP1P;
+[bB][yY]                                return BY;
+[bB][xX][oO][rR][sS][hH][iI][fF][tT]    return BXORSHIFT;
+[bB][xX][oO][rR]                        return BXOR;
 
-brev|BREV                               return BREV;
-bp|BP                                   return BP;
-bittst|BITTST                           return BITTST;
-bittgl|BITTGL                           return BITTGL;
-bitset|BITSET                           return BITSET;
-bitmux|BITMUX                           return BITMUX;
-bitclr|BITCLR                           return BITCLR;
+[bB][rR][eE][vV]                        return BREV;
+[bB][pP]                                return BP;
+[bB][iI][tT][tT][sS][tT]                return BITTST;
+[bB][iI][tT][tT][gG][lL]                return BITTGL;
+[bB][iI][tT][sS][eE][tT]                return BITSET;
+[bB][iI][tT][mM][uU][xX]                return BITMUX;
+[bB][iI][tT][cC][lL][rR]                return BITCLR;
 [bB][0-3]"."[lLhH]  return parse_halfreg(&yylval.reg, T_REG_B, yytext);
 [bB][0-3]           return parse_reg(&yylval.reg, T_REG_B, yytext);
-b|B                                     return B;
-az|AZ     _REG.regno = S_AZ;   return MODIFIED_STATUS_REG;
-an|AN     _REG.regno = S_AN;   return MODIFIED_STATUS_REG;
-aq|AQ     _REG.regno = S_AQ;   return MODIFIED_STATUS_REG;
-ac0|AC0   _REG.regno = S_AC0;  return MODIFIED_STATUS_REG;
-ac1|AC1   _REG.regno = S_AC1;  return MODIFIED_STATUS_REG;
-av0|AV0   _REG.regno = S_AV0;  return MODIFIED_STATUS_REG;
-av0s|AV0S _REG.regno = S_AV0S; return MODIFIED_STATUS_REG;
-av1|AV1   _REG.regno = S_AV1;  return MODIFIED_STATUS_REG;
-av1s|AV1S _REG.regno = S_AV1S; return MODIFIED_STATUS_REG;
-vs|VS     _REG.regno = S_VS;   return MODIFIED_STATUS_REG;
+[bB]                                    return B;
+[aA][zZ]  _REG.regno = S_AZ;   return MODIFIED_STATUS_REG;
+[aA][nN]  _REG.regno = S_AN;   return MODIFIED_STATUS_REG;
+[aA][qQ]  _REG.regno = S_AQ;   return MODIFIED_STATUS_REG;
+[aA][cC]0 _REG.regno = S_AC0;  return MODIFIED_STATUS_REG;
+[aA][cC]1 _REG.regno = S_AC1;  return MODIFIED_STATUS_REG;
+[aA][vV]0 _REG.regno = S_AV0;  return MODIFIED_STATUS_REG;
+[aA][vV]0[sS] _REG.regno = S_AV0S; return MODIFIED_STATUS_REG;
+[aA][vV]1 _REG.regno = S_AV1;  return MODIFIED_STATUS_REG;
+[aA][vV]1[sS] _REG.regno = S_AV1S; return MODIFIED_STATUS_REG;
+[vV][sS]  _REG.regno = S_VS;   return MODIFIED_STATUS_REG;
 
-astat|ASTAT    _REG.regno = REG_ASTAT; return REG;
-ashift|ASHIFT                           return ASHIFT;
-asl|ASL                                 return ASL;
-asr|ASR                                 return ASR;
-align8|ALIGN8                           return ALIGN8;
-align16|ALIGN16                         return ALIGN16;
-align24|ALIGN24                         return ALIGN24;
+
+[aA][sS][tT][aA][tT]   _REG.regno = REG_ASTAT; return REG;
+[aA][sS][hH][iI][fF][tT]                return ASHIFT;
+[aA][sS][lL]                            return ASL;
+[aA][sS][rR]                            return ASR;
+[aA][lL][iI][gG][nN]8                   return ALIGN8;
+[aA][lL][iI][gG][nN]16                  return ALIGN16;
+[aA][lL][iI][gG][nN]24                  return ALIGN24;
 [aA]1"."[lL]    return A_ONE_DOT_L;
 [aA]0"."[lL]    return A_ZERO_DOT_L;
 [aA]1"."[hH]    return A_ONE_DOT_H;
 [aA]0"."[hH]    return A_ZERO_DOT_H;
-abs|ABS                                 return ABS;
+[aA][bB][sS]                            return ABS;
 abort                                   return ABORT;
 [aA]1"."[xX]    _REG.regno = REG_A1x; return REG;
 [aA]1"."[wW]    _REG.regno = REG_A1w; return REG;
@@ -281,13 +283,13 @@ abort                                   return ABORT;
 ";"                     return SEMICOLON;
 "=!"					return _ASSIGN_BANG;
 "||"					return DOUBLE_BAR;
-<KEYWORD>prefetch|PREFETCH                       return PREFETCH;
-<KEYWORD>unlink|UNLINK                           return UNLINK;
-<KEYWORD>link|LINK                               return LINK;
-<KEYWORD>idle|IDLE                               return IDLE;
-<KEYWORD>iflush|IFLUSH                           return IFLUSH;
-<KEYWORD>flushinv|FLUSHINV                       return FLUSHINV;
-<KEYWORD>flush|FLUSH                             return FLUSH;
+<KEYWORD>[pP][rR][eE][fF][eE][tT][cC][hH]        return PREFETCH;
+<KEYWORD>[uU][nN][lL][iI][nN][kK]                return UNLINK;
+<KEYWORD>[lL][iI][nN][kK]                        return LINK;
+<KEYWORD>[iI][dD][lL][eE]                        return IDLE;
+<KEYWORD>[iI][fF][lL][uU][sS][hH]                return IFLUSH;
+<KEYWORD>[fF][lL][uU][sS][hH][iI][nN][vV]        return FLUSHINV;
+<KEYWORD>[fF][lL][uU][sS][hH]                    return FLUSH;
 ([0-9]+)|(0[xX][0-9a-fA-F]+)|([bhfodBHOFD]#[0-9a-fA-F]+)|(0.[0-9]+)  {
          yylval.value = parse_int (&yytext);
          return NUMBER;
