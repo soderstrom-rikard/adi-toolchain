@@ -127,7 +127,7 @@
 (define_attr "length" ""
   (cond [(eq_attr "type" "mcld")
          (if_then_else (match_operand 1 "effective_address_32bit_p" "")
-                       (const_int 8) (const_int 4))
+                       (const_int 4) (const_int 2))
 
 	 (eq_attr "type" "mcst")
 	 (if_then_else (match_operand 0 "effective_address_32bit_p" "")

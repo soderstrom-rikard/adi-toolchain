@@ -483,18 +483,18 @@ extern const char * directive_names[];
 enum reg_class
 {
   NO_REGS,
+  IREGS,
+  BREGS,
+  LREGS,
+  MREGS,
+  CIRCREGS, /* Circular buffering registers, Ix, Bx, Lx together form. See Automatic Circlur Buffering */
+  DAGREGS,
+  AREGS,
+  CCREGS,
   DREGS,
   DREGS_PAIR,
   PREGS,
   DPREGS,
-  IREGS,
-  BREGS,
-  LREGS,
-  CIRCREGS, /* Circular buffering registers, Ix, Bx, Lx together form. See Automatic Circlur Buffering */
-  MREGS,
-  DAGREGS,
-  AREGS,
-  CCREGS,
   MOST_REGS,
   ALL_REGS, LIM_REG_CLASSES
 };
@@ -506,18 +506,18 @@ enum reg_class
 
 #define REG_CLASS_NAMES \
 {  "NO_REGS",		\
+   "IREGS",		\
+   "BREGS",		\
+   "LREGS",		\
+   "MREGS",		\
+   "CIRCREGS",		\
+   "DAGREGS",		\
+   "AREGS",		\
+   "CCREGS",		\
    "DREGS",		\
    "DREGS_PAIR",	\
    "PREGS",		\
    "DPREGS",		\
-   "IREGS",		\
-   "BREGS",		\
-   "LREGS",		\
-   "CIRCREGS",		\
-   "MREGS",		\
-   "DAGREGS",		\
-   "AREGS",		\
-   "CCREGS",		\
    "MOST_REGS",	\
    "ALL_REGS" }
 
@@ -534,21 +534,21 @@ enum reg_class
 
 #define REG_CLASS_CONTENTS \
     /* 31 - 0       63-32   */ \
-{   { 0x00000000,    0 },		/* NO_REGS */ \
+{   { 0x00000000,    0 },		/* NO_REGS */	\
+    { 0x02490000,    0 },		/* IREGS */	\
+    { 0x04920000,    0 },		/* BREGS */		\
+    { 0x09240000,    0 },		/* LREGS */	\
+    { 0xf0000000,    0 },		/* MREGS */   \
+    { 0x0fff0000,    0 },		/* CIRCREGS */   \
+    { 0xffff0000,    0 },		/* DAGREGS */   \
+    { 0x00000000,    0x3 },		/* AREGS */   \
+    { 0x00000000,    0x4 },		/* CCREGS */  \
     { 0x000000ff,    0 },		/* DREGS */   \
     { 0x00000055,    0 },		/* DREGS_PAIR */   \
     { 0x0000ff00,    0 },		/* PREGS */   \
     { 0x0000ffff,    0 },		/* DPREGS */   \
-    { 0x02490000,    0 },		/* IREGS */   \
-    { 0x04920000,    0 },		/* BREGS */   \
-    { 0x09240000,    0 },		/* LREGS */   \
-    { 0x0fff0000,    0 },		/* CIRCREGS */   \
-    { 0xf0000000,    0 },		/* MREGS */   \
-    { 0xffff0000,    0 },		/* DAGREGS */   \
-    { 0x00000000,    0x3 },	/* AREGS */   \
-    { 0x00000000,    0x4 },        /* CCREGS */  \
-    { 0xffffffff,    0x0 },	/* MOST_REGS */\
-    { 0xffffffff,    0x7 }	/* ALL_REGS */\
+    { 0xffffffff,    0x0 },		/* MOST_REGS */\
+    { 0xffffffff,    0x7 },		/* ALL_REGS */\
      /*{ 0xffffffff,    0x3 }, */	}
 
 #define BASE_REG_CLASS          PREGS
@@ -792,8 +792,7 @@ W [ Preg + uimm16m2 ]
   case PLUS:						       \
     if (REG_OK_FOR_BASE_P (XEXP (X, 0))			       \
 	&& (GET_CODE (XEXP (X, 1)) == CONST_INT	       	       \
-		&& CONST_16BIT_IMM_P(INTVAL (XEXP (X,1)))      \
-		&& bfin_valid_add(MODE,INTVAL (XEXP (X,1)))))  \
+	    && bfin_valid_add (MODE, INTVAL (XEXP (X, 1)))))   \
       goto WIN;						       \
     break;						       \
   case POST_INC:					       \

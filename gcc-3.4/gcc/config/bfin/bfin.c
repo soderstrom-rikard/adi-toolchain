@@ -788,7 +788,7 @@ int effective_address_32bit_p (rtx op, enum machine_mode mode)
     case POST_INC:
       return 0;
     case PLUS:
-      if (XEXP (op,0) == arg_pointer_rtx)
+      if (XEXP (op,0) == frame_pointer_rtx)
 	if (GET_MODE_SIZE (mode) == 4
 	    && const_fits_p (XEXP (op,1), 6, 2, 1))
 	  return 0;
@@ -2394,23 +2394,13 @@ uimm17m4: 17-bit unsigned field that must be a multiple of 4
 uimm16m2: 16-bit unsigned field that must be a multiple of 2 
 */
 
-int 
-bfin_valid_add(const enum machine_mode mode, const int value)
+int
+bfin_valid_add (enum machine_mode mode, HOST_WIDE_INT value)
 {
-	switch(mode)
-	{
-	case SImode:
-	  if (!(value%4))
-            return 1;
-	  break;
-	case HImode:
-	  if (!(value%2))	
-	    return 1;
-	  break;
-	default:
-	  return 1; 
-	}
-	return 0;
+  int v = value > 0 ? value : -value;
+  int sz = GET_MODE_SIZE (mode);
+  int shift = sz == 1 ? 0 : sz == 2 ? 1 : 2;
+  return (v & ~(0x7FFF << shift)) == 0;
 }
 
 bool
@@ -2457,7 +2447,7 @@ bfin_rtx_costs (rtx x,
   case LABEL_REF:
   case SYMBOL_REF:
   case CONST_DOUBLE:
-       *total = 4;
+       *total = COSTS_N_INSNS (2);
        return true;
 
   default:

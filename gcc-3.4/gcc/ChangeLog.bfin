@@ -1,4 +1,4 @@
-2004-09-08  Bernd Schmidt  <bernds@btinternet.com>
+2004-09-29  Bernd Schmidt  <bernds@btinternet.com>
 
 	* config/bfin/bfin.h (PREFERRED_RELOAD_CLASS): Simply return CLASS.
 	(PREFERRED_OUTPUT_RELOAD_CLASS): Delete.
@@ -9,6 +9,18 @@
 	reload_in_progress which appears to be a workaround for some other
 	problem.
 
+	* config/bfin/bfin-protos.h (bfin_valid_add): Adjust prototype.
+	* config/bfin/bfin.c (bfin_valid_add): Change prototype; simplify and
+	also test against too large values.
+	(effective_address_32bit_p): Use frame_pointer_rtx instead of
+	arg_pointer_rtx.
+	(bfin_rtx_costs): SYMBOL_REFS etc. are expensive.
+	* config/bfin/bfin.h (enum reg_class, REG_CLASS_NAMES,
+	REG_CLASS_CONTENTS): Rearrange classes to give larger classes higher
+	numbers.
+	(GO_IF_LEGITIMATE_ADDRESS): Don't test for out-of-range constants
+	here; that's now done by bfin_valid_add.
+	
 2004-09-08  Bernd Schmidt  <bernds@btinternet.com>
 
 	* config/bfin/bfin.md (adddi3): Turn this into a two-operand insn to

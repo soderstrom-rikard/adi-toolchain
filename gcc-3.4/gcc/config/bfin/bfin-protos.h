@@ -104,7 +104,7 @@ extern int bfin_return_in_memory PARAMS ((tree));
 extern void bfin_internal_label PARAMS ((FILE *, const char *, unsigned long));
 extern bool bfin_rtx_costs PARAMS ((rtx, int, int, int*));
 extern void initialize_trampoline PARAMS ((rtx, rtx, rtx));
-extern int  bfin_valid_add PARAMS ((const enum machine_mode, const int));
+extern int  bfin_valid_add PARAMS ((Mmode, HOST_WIDE_INT));
 extern void setup_incoming_varargs PARAMS ((CUMULATIVE_ARGS *, enum machine_mode, tree , int *, int));
 extern int  symbolic_or_const_operand_p PARAMS ((rtx , enum machine_mode));
 extern int  reg_or_16bit_operand PARAMS ((rtx, enum machine_mode));
