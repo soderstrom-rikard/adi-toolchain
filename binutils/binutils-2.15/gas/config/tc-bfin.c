@@ -246,7 +246,6 @@ const pseudo_typeS md_pseudo_table[] = {
   {"byte2", cons, 2},
   {"byte4", cons, 4},
   {"code", obj_elf_section, 0},
-/*  {"data", obj_elf_section, 0}, */
   {"db", cons, 1},
   {"dd", cons, 4},
   {"dw", cons, 2},
@@ -273,15 +272,15 @@ const char comment_chars[] = "";
 const char line_comment_chars[] = "#";
 const char line_separator_chars[] = ";";
 
-/* Chars that can be used to separate mant from exp in floating point nums */
+/* Characters that can be used to separate the mantissa from the
+   exponent in floating point numbers. */
 const char EXP_CHARS[] = "eE";
 
-/* Chars that mean this number is a floating point constant
-   As in 0f12.456 or  0d1.2345e12
-*/
+/* Characters that mean this number is a floating point constant.
+   As in 0f12.456 or  0d1.2345e12.  */
 const char FLT_CHARS[] = "fFdDxX";
 
-/* Define bfin specific command-line options (there are none). */
+/* Define bfin-specific command-line options (there are none). */
 const char *md_shortopts = "";
 
 struct option md_longopts[] = {
@@ -301,111 +300,18 @@ md_show_usage (FILE * stream ATTRIBUTE_UNUSED)
 {
 }
 
-
-/*
- * Use these definitions if and only if .word needs to be handled,
- * in different manners.  That also means that WORKING_DOT_WORD
- * cannot be defined in the tc-bfin.h header file.
- */
-/*  const int md_reloc_size = 0; */
-/*  int md_long_jump_size = 0; */
-/*  int md_short_jump_size = 0; */
-
-
-/*
- * Perform machine-specific initializations that may be required to
- * be done.
- */
+/* Perform machine-specific initializations.  */
 void
 md_begin ()
 {
-
   /* Set the default machine type. */
   if (!bfd_set_arch_mach (stdoutput, bfd_arch_bfin, 0))
     as_warn ("Could not set architecture and machine.");
 
-  /*
-   * Ensure that lines can begin with '(', for multiple register stack pops.
-   * and other such operations.
-   *
-   * It is better to define a macro called LEX_PAREN, and modify read.c,
-   * but for now this will do.
-   *
-
-   <strubi> Notes:
-   gas would try to generate a label, since it thinks, it's a name:
-   (R7:4) = [SP++];
-
-   -> label: '(R7'   parse: '4) = [SP++]'
-
-   So you always needed to spell:
-
-   ( R7 : 4) = [SP++];
-
-   which is a pain in the so called. See gas/read.c for better fix.
-
-   In binutils-2.9, the next command was commented out. In 2.14,
-   it is put back, because starting LPARENs are evaluated
-   differently once more...
-
-
-   */
+  /* Ensure that lines can begin with '(', for multiple
+     register stack pops. */
   lex_type ['('] = 3;
-  /*
-   * Need to add all of the registers to the symbol table, so that
-   * GAS knows that these are registers, and not just any other symbol.
-   *
-   * May also need symbol like "REG=" added in the symbol table
-   *
-   * May also need to check for instruction mnemonics.
-   */
-#if 0
-  walk = (struct bfin_reg_entry *) bfin_reg_info;
-
-  while (walk->name)
-    {
-      symbol_table_insert (symbol_new (walk->name, reg_section, walk->number, &zero_address_frag));
-
-      for (j = 0; walk->name[j]; j++)
-	{
-	  buf[j] = ISUPPER (walk->name[j]) ? TOLOWER (walk->name[j]) : walk->name[j];
-	}
-      buf[j] = '\0';
-
-      symbol_table_insert (symbol_new (buf, reg_section, walk->number, &zero_address_frag));
-      buf[j] = '=';
-      buf[j + 1] = '\0';
-      symbol_table_insert (symbol_new (buf, reg_section, walk->number, &zero_address_frag));
-      walk++;
-    }
-#endif
-  /*
-   * Who the heck started off with that horrible indenting ?
-   *
-   for (i = 0; i < REG_LASTREG; i++)
-   {
-   symbol_table_insert(symbol_new(bfin_reg_info[i].name, reg_section,
-   bfin_reg_info[i].number,
-   &zero_address_frag));
-
-   for (j = 0; bfin_reg_info[i].name[j]; j++)
-   {
-   buf[j] = ISUPPER (bfin_reg_info[i].name[j]) ?
-   tolower(bfin_reg_info[i].name[j]) :
-   bfin_reg_info[i].name[j];
-   }
-   buf[j]='\0';
-
-   symbol_table_insert(symbol_new(buf, reg_section,
-   bfin_reg_info[i].number,
-   &zero_address_frag));
-   buf[j]='='; buf[j+1]='\0';
-   symbol_table_insert(symbol_new(buf, reg_section,
-   bfin_reg_info[i].number,
-   &zero_address_frag));
-   }
-   */
-
+  
 #ifdef OBJ_ELF
   record_alignment (text_section, 2);
   record_alignment (data_section, 2);
@@ -413,18 +319,17 @@ md_begin ()
 #endif
 
   assembler_parser_init ();
+
 #ifdef DEBUG
   extern int debug_codeselection;
   debug_codeselection = 1;
-#endif /* TEST : for use in notethat( char *format, ...) */
+#endif 
 
 }
 
-/*
- * Perform the main parsing, and assembly of the input here.  Also,
- * call the required routines for alignment and fixups here.
- * This is called for every line that contains real assembly code.
- */
+/* Perform the main parsing, and assembly of the input here.  Also,
+   call the required routines for alignment and fixups here.
+   This is called for every line that contains real assembly code.  */
 
 void
 md_assemble (char *line)
@@ -466,7 +371,7 @@ md_assemble (char *line)
    * Let GAS do any relaxations.
    */
 #ifdef DEBUG
-  printf ("INS:");		// XXX DEBUG HACK
+  printf ("INS:");
 #endif
   while (insn)
     {
@@ -487,17 +392,21 @@ md_assemble (char *line)
 
 	  /* Following if condition checks for the arithmetic relocations.
 	     If the case then it doesn't required to generate the code.
-	     It has been assumed that, their ID will be contiguous */
-	  if ((BFD_ARELOC_PUSH <= insn->reloc && BFD_ARELOC_COMP >= insn->reloc) || insn->reloc == BFD_RELOC_16_IMM)
+	     It has been assumed that, their ID will be contiguous.  */
+	  if ((BFD_ARELOC_PUSH <= insn->reloc
+               && BFD_ARELOC_COMP >= insn->reloc)
+              || insn->reloc == BFD_RELOC_16_IMM)
 	    {
-	      //fprintf(stderr, "generating reloc for %x at %x\n", insn->reloc, toP);
 	      size = 2;
 	    }
-	  if (insn->reloc == BFD_ARELOC_CONST || insn->reloc == BFD_ARELOC_PUSH)
+	  if (insn->reloc == BFD_ARELOC_CONST
+              || insn->reloc == BFD_ARELOC_PUSH)
 	    size = 4;		// the constant in an expression can be large
 
-	  fix_new (frag_now, (prev_toP - frag_now->fr_literal),
-		   size, insn->exp->symbol, insn->exp->value, insn->pcrel, insn->reloc);
+	  fix_new (frag_now,
+                   (prev_toP - frag_now->fr_literal),
+		   size, insn->exp->symbol, insn->exp->value,
+                   insn->pcrel, insn->reloc);
 	}
       else
 	{
@@ -507,32 +416,21 @@ md_assemble (char *line)
 
 #ifdef DEBUG
       printf (" reloc :");
-#endif
-
-      // HACK XXX
-#ifdef DEBUG
-      printf (" %02x%02x", ((unsigned char *) &insn->value)[0], ((unsigned char *) &insn->value)[1]);
+      printf (" %02x%02x", ((unsigned char *) &insn->value)[0],
+              ((unsigned char *) &insn->value)[1]);
+      printf ("\n");
 #endif
       insn = insn->next;
-
-#ifdef DEBUG
-      printf ("\n");		// DEBUG HACK
-#endif
     }
-  /* call frag_var for special purpose relaxation, gcc can handle this  */
 }
 
-/*
- * Parse one line of instructions, and generate opcode for it.
- * To parse the line, YACC and LEX are used, because the instruction set
- * syntax doesn't confirm to the AT&T assembly syntax.
- *
- * To call a YACC & LEX generated parser, we must provide the input via
- * a FILE stream, otherwise stdin is used by default.  Below the input
- * to the function will be put into a temporary file, then the generated
- * parser uses the temporary file for parsing.
- */
-
+/* Parse one line of instructions, and generate opcode for it.
+   To parse the line, YACC and LEX are used, because the instruction set
+   syntax doesn't confirm to the AT&T assembly syntax.
+   To call a YACC & LEX generated parser, we must provide the input via
+   a FILE stream, otherwise stdin is used by default.  Below the input
+   to the function will be put into a temporary file, then the generated
+   parser uses the temporary file for parsing.  */
 
 static parse_state
 parse (char *line)
@@ -544,8 +442,7 @@ parse (char *line)
 
   /* our lex requires setting the start state to keyword
      every line as the first word may be a keyword.
-     Fixes a bug where we could not have keywords as labels
-   */
+     Fixes a bug where we could not have keywords as labels.  */
   set_start_state ();
 
   /* Call yyparse here.  */
@@ -560,16 +457,9 @@ parse (char *line)
   return state;
 }
 
-/*
- * This will be called at the end of the assembly process, for
- * clean-up purposes. Now we don't need this.
- */
-/* void md_cleanup() */
-
-
 /* We need to handle various expressions properly.
- * Such as, [SP--] = 34, concerned by md_assemble()
- */
+   Such as, [SP--] = 34, concerned by md_assemble().  */
+
 void
 md_operand (expressionS * expressionP)
 {
@@ -585,44 +475,20 @@ md_operand (expressionS * expressionP)
 symbolS *
 md_undefined_symbol (char *name ATTRIBUTE_UNUSED)
 {
-#if 0
-  symbolS *newsym, *symbolP;
-  symbolP = symbol_find(name);
-  if (symbolP == NULL)
-    {
-      if (strcmp(name,"X"))
-	{
-	  newsym = symbol_new(name, reg_section, (valueT) 0, &zero_address_frag);
-	}
-    }
-  else
-    {
-      newsym = NULL;
-    }
-
-  if (!newsym)
-    {
-#endif
-      return (symbolS *) 0;
-#if 0
-    }
-  else
-    {
-      return newsym;
-    }
-#endif
+  return (symbolS *) 0;
 }
 
-/* Write a value out to the object file, using the appropriate endianness.  */
+/* Write a value out to the object file,
+   using the appropriate endianness.  */
 void
 md_number_to_chars (char *buf, valueT val, int n)
 {
   number_to_chars_littleendian (buf, val, n);
 }
 
-
 int
-md_estimate_size_before_relax (fragS * fragP ATTRIBUTE_UNUSED, segT segment ATTRIBUTE_UNUSED)
+md_estimate_size_before_relax (fragS * fragP ATTRIBUTE_UNUSED,
+                               segT segment ATTRIBUTE_UNUSED)
 {
   return 0;
 }
@@ -653,7 +519,8 @@ md_apply_fix3 (fixP, valp, seg)
 	}
       fixP->fx_addnumber = 1;
       if (val < -1024 || val > 1022)
-	as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_10");
+	as_bad_where (fixP->fx_file, fixP->fx_line,
+                      "pcrel too far BFD_RELOC_10");
 
       val /= 2;			// 11 bit offset even numbered, so we remove right bit
       shift = 1;
@@ -665,11 +532,9 @@ md_apply_fix3 (fixP, valp, seg)
     case BFD_RELOC_12_PCREL_JUMP_S:
     case BFD_RELOC_12_PCREL:
 
-      /*
-       * If fixP->fx_offset is non-zero, it's a zero offset pc-relative
-       * relocation. We need to check it in other pc-relative relocations
-       * also - amit
-       */
+      /* If fixP->fx_offset is non-zero, it's a zero offset pc-relative
+         relocation. We need to check it in other pc-relative
+         relocations.  */
 
       if (!val && !fixP->fx_offset)
 	{
@@ -687,11 +552,6 @@ md_apply_fix3 (fixP, valp, seg)
 
     case BFD_RELOC_16_LOW:
 
-/*      leave to linker to resolve this reloc
-        if (val) fixP->fx_addnumber = 1;
-        buf[lowbyte] = val & 0xff;
-        buf[highbyte] = (val >> 8) & 0xff;
-*/
       fixP->fx_addnumber = 0;
       not_yet_resolved = 1;	// absolute values not be resolved here
 
@@ -2096,12 +1956,19 @@ gen_loop (ExprNode *expr, REG_T reg, int rop, REG_T preg)
   lend   = Expr_Node_Create (ExprNodeReloc, lendval, NULL, NULL);
   return gen_loopsetup(lbegin, reg, rop, lend, preg);
 }
+
 bfd_boolean
 bfin_name_is_register (char *name)
 {
   int i;
 
   if (*name == '[' || *name == '(')
+    return TRUE;
+
+  if ((name[0] == 'W' || name[0] == 'w') && name[1] == '[')
+    return TRUE;
+
+  if ((name[0] == 'B' || name[0] == 'b') && name[1] == '[')
     return TRUE;
 
   for (i=0; bfin_reg_info[i].name != 0; i++)

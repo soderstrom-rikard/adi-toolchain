@@ -1,6 +1,11 @@
+2005-02-16  Catherine Moore  <clm@cm00re.com>
+
+	* config/tc-bfin.c (bfin_name_is_register): Recognize W[reg]
+	and B[reg] as registers.
+
 2005-02-15  Catherine Moore  <clm@cmoore.com>
 
-	* bfin-parse.y (asm_or_directive): Avoid warning.
+	* config/bfin-parse.y (asm_or_directive): Avoid warning.
 
 2005-02-15  Catherine Moore  <clm@cm00re.com>
 
