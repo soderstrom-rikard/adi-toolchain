@@ -31,9 +31,9 @@ store_data_register:
 	.global store_data_register_half
 store_data_register_half:
 	w [ i3] = R4.h;
-	W [I0++] = r0.h;
+	W[I0++] = r0.h;
 	W [ i2--] = r7.H;
-	w [Sp] = R6.h;
+	w[Sp] = R6.h;
 	W [ Fp++P0] = r4.h;
 
 	.text
@@ -41,9 +41,9 @@ store_data_register_half:
 store_low_data_register_half:
 	W [I0] = r0.l;
 	w [i1++] = r7.L;
-	W [I2--] = R1.l;
+	W[I2--] = R1.l;
 	w [SP] = r2.l;
-	W [P2] = r3;
+	W[P2] = r3;
 	w [p3 ++ ] = R5;
 	W [fp--] = R4;
 	W [P1+30]=r7;
@@ -55,11 +55,7 @@ store_low_data_register_half:
 	.global store_byte
 store_byte:
 	b [Fp] = R1;
-	B [P0++] = r0;
+	B[P0++] = r0;
 	B [fp --] = r2;
 	B [ p2 + 25] = R7;
-	b [FP - 0x7FFF] = r6;
-
-	
-	
-
+	b[FP - 0x7FFF] = r6;

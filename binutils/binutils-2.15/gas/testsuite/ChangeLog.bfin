@@ -1,3 +1,8 @@
+2005-02-16  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/store.s: Vary format of b store data register half
+	and store byte instructions.
+
 2005-02-15  Catherine Moore  <clm@cm00re.com>
 
 	* gas/bfin/load.d: Update expected output.
