@@ -1,0 +1,5 @@
+Next :
+- More relocation issues (kernel currently does not run due to relocation issue)
+- Merge Martin's changes
+18 Jun 2004
+- Fixed relocation issues.
