@@ -265,6 +265,12 @@ extern const char * directive_names[];
  *       found in the variable current_function_outgoing_args_size.  */
 #define ACCUMULATE_OUTGOING_ARGS 1
 
+
+/* If we generate an insn to push BYTES bytes, this says how many the
+   stack pointer really advances by.  On Hummingbird pushw decrements
+   by exactly 2 no matter what the position was.   
+#define PUSH_ROUNDING(BYTES) (((BYTES) + 3) & (~3))*/
+
 /* Value should be nonzero if functions must have frame pointers.
    Zero means the frame pointer need not be set up (and parms
    may be accessed via the stack pointer) in functions that seem suitable.
@@ -306,48 +312,11 @@ extern const char * directive_names[];
 #define DEFAULT_PCC_STRUCT_RETURN 0
 #define RETURN_IN_MEMORY(TYPE) bfin_return_in_memory(TYPE)
 
-#if 0
-/* This is an array of structures.  Each structure initializes one pair
-   of eliminable registers.  The "from" register number is given first,
-   followed by "to".  Eliminations of the same "from" register are listed
-   in order of preference.  */
-#define ELIMINABLE_REGS				\
-{{ FRAME_POINTER_REGNUM, STACK_POINTER_REGNUM},	\
- { ARG_POINTER_REGNUM, STACK_POINTER_REGNUM},	\
- { ARG_POINTER_REGNUM, FRAME_POINTER_REGNUM},	\
-}
-/* Given FROM and TO register numbers, say whether this elimination is allowed.
-   Frame pointer elimination is automatically handled.
-*/
-#define CAN_ELIMINATE(FROM, TO)					\
- ((FROM) == ARG_POINTER_REGNUM && (TO) == STACK_POINTER_REGNUM	\
-  ? leaf_function_p () : 0)
+/*vararg implementation */
 
-/*Define the size of return address area on the stack */
-#define RTS_AREA_SIZE 4
-/* Define the offset between two registers, one to be eliminated, and the other
-   its replacement, at the start of a routine.  */
-#define INITIAL_ELIMINATION_OFFSET(FROM, TO, OFFSET)			\
-{									\
- if ((FROM) == FRAME_POINTER_REGNUM && (TO) == STACK_POINTER_REGNUM)	\
-   (OFFSET) = save_area_size () - RTS_AREA_SIZE;			\
- else									\
-   (OFFSET) = 0;							\
-}
-#endif
-#if 0
-/* varargs 
- * All parms are passed as 32-bit values.
- * First 64 bit parameters are passed in R0 - R1.
- */
-#define SETUP_INCOMING_VARARGS(CUM,MODE,TYPE,PRETEND_SIZE,NO_RTL)       \
-{                                                                       \
-  extern int current_function_anonymous_args;                           \
-  current_function_anonymous_args = 1;                                  \
-  if ((CUM) < 8)                                                       \
-    (PRETEND_SIZE) = 8 - (CUM);                                        \
-}
-#endif
+#define SETUP_INCOMING_VARARGS(CUM,MODE,TYPE,PRETEND_SIZE,NO_RTL) \
+  setup_incoming_varargs (&CUM, MODE, TYPE, &PRETEND_SIZE, NO_RTL)
+
 
 #define TRAMPOLINE_SIZE 18
 #define TRAMPOLINE_TEMPLATE(FILE)                                       \
@@ -468,9 +437,9 @@ extern const char * directive_names[];
 */
 #define FIXED_REGISTERS \
 /*r0 r1 r2 r3 r4 r5 r6 r7   p0 p1 p2 p3 p4 p5 p6 p7 */ \
-{ 0, 0, 0, 0, 0, 0, 0, 1,   0, 0, 0, 0, 0, 0, 1, 1,    \
+{ 0, 0, 0, 1, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 1, 1,    \
 /*i0 b0 l0 i1 b1 l1 i2 b2   l2 i3 b3 l3 m0 m1 m2 m3 */ \
-  0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,    \
+  0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 1,    \
 /*a0 a1 cc */ \
   0, 0, 1,   \
 }
@@ -478,11 +447,15 @@ extern const char * directive_names[];
 /* the registers that are not available for general 
    allocation of values that must live across 
    function calls.
+   If a register has 0 in `CALL_USED_REGISTERS', the compiler
+   automatically saves it on function entry and restores it on
+   function exit, if the register is used within the function.
+
    Refer page ,VDSP++ 3.5 C/C++ compiler Manual
 */
 #define CALL_USED_REGISTERS \
 /*r0 r1 r2 r3 r4 r5 r6 r7   p0 p1 p2 p3 p4 p5 p6 p7 */ \
-{ 1, 1, 1, 1, 0, 0, 0, 1,   1, 1, 1, 0, 0, 0, 1, 1, \
+{ 1, 1, 1, 1, 0, 0, 0, 0,   1, 1, 1, 0, 0, 0, 1, 1, \
 /*i0 b0 l0 i1 b1 l1 i2 b2   l2 i3 b3 l3 m0 m1 m2 m3 */ \
   1, 1, 1, 1, 1, 1, 1, 1,   1, 1, 1, 1, 1, 1, 1, 1,   \
 /*a0 a1 cc */ \
@@ -500,11 +473,9 @@ extern const char * directive_names[];
 #define REG_ALLOC_ORDER \
 { REG_R0, REG_R1, REG_R2, REG_R3, REG_R7, REG_R6, REG_R5, REG_R4, \
   REG_P2, REG_P1, REG_P0, REG_P5, REG_P4, REG_P3, REG_P6, REG_P7, \
-  /*REG_I0, REG_B0, REG_L0, REG_I1, REG_B1, REG_L1, REG_I2, REG_B2,*/ \
-  /*REG_L2, REG_I3, REG_B3, REG_L3, REG_M0, REG_M1, REG_M2, REG_M3,*/ \
-  REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO,\
-  REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO,\
   REG_A0, REG_A1, \
+  REG_I0, REG_B0, REG_L0, REG_I1, REG_B1, REG_L1, REG_I2, REG_B2, \
+  REG_L2, REG_I3, REG_B3, REG_L3, REG_M0, REG_M1, REG_M2, REG_M3, \
        REG_NO, \
 }
 
@@ -710,24 +681,6 @@ enum reg_class
 /* Function Calling Conventions. */
 #define FUNCTION_ARG_REGISTERS { REG_R0, REG_R1, REG_R2, -1 }
 
-#ifndef FUNCTION_ARG_REGISTERS
-
-#define CUMULATIVE_ARGS int
-
-#define FUNCTION_ARG(CUM, MODE, TYPE, NAMED) (0)
-
-#define FUNCTION_ARG_REGNO_P(REGNO) (0)
-
-#define FUNCTION_ARG_ADVANCE(CUM, MODE, TYPE, NAMED)	\
- ((CUM) += ((MODE) != BLKmode			\
-	    ? (GET_MODE_SIZE (MODE) + 3) & ~3	\
-	    : (int_size_in_bytes (TYPE) + 3) & ~3))
-
-#define INIT_CUMULATIVE_ARGS(CUM,FNTYPE,LIBNAME,INDIRECT)  ((CUM) = 0)
-
-
-#else
-
 typedef struct {
   int words;			/* # words passed so far */
   int nregs;			/* # registers available for passing */
@@ -771,7 +724,6 @@ typedef struct {
    (TYPE is null for libcalls where that information may not be available.)  */
 #define FUNCTION_ARG_ADVANCE(CUM, MODE, TYPE, NAMED)	\
   (function_arg_advance (&CUM, MODE, TYPE, NAMED))
-#endif
 
 #define RETURN_POPS_ARGS(FDECL, FUNTYPE, STKSIZE) 0
 
@@ -1102,7 +1054,7 @@ do {                                              \
 #define PROMOTE_FUNCTION_ARGS
 #define PROMOTE_FUNCTION_RETURN
 
-/* Define the codes that are matched by predicates in i386.c.  */
+/* Define the codes that are matched by predicates in bfin.c.  */
 #define PREDICATE_CODES                                                 	\
   {"cc_operand", {REG}},					        	\
   {"simple_reg_operand", {SUBREG, REG, ADDRESSOF}},        			\

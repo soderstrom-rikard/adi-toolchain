@@ -224,7 +224,7 @@
 
 ;;; Future work: split constants in expand
 (define_insn "*movsi_insn"
-  [(set (match_operand:SI 0 "general_operand" "=bcf,   da,    mda, e,   da, !d, !C,m")
+  [(set (match_operand:SI 0 "general_operand" "=fcb  , da,    mda, e,   da, !d, !C,m")
         (match_operand:SI 1 "general_operand" "idabcf, iMmbcf, da,  ade, e,  C,  d,bB"))]
 
   ""
@@ -866,15 +866,15 @@
 (define_expand "addsi3"
   [(set (match_operand:SI 0 "register_operand"           "")
 	(plus:SI (match_operand:SI 1 "simple_reg_operand" "")
-		 (match_operand:SI 2 "reg_or_7bit_operand" "")))]
+		 (match_operand:SI 2 "reg_or_16bit_operand" "")))]
   ""
   ""
 )
 
 (define_insn ""
-  [(set (match_operand:SI 0 "register_operand"           "=ad,a,d,&a,&d,b")
-	(plus:SI (match_operand:SI 1 "register_operand"  "%0, a,d,a,d,%0")
-		 (match_operand:SI 2 "nonmemory_operand" " M, a,d,i,i,M")))]
+  [(set (match_operand:SI 0 "register_operand"           "=ad,a,d,&a,&d,b,f,f")
+	(plus:SI (match_operand:SI 1 "register_operand"  "%0, a,d,a,d,%0,%0,%0")
+		 (match_operand:SI 2 "nonmemory_operand" " M, a,d,i,i,Mi,M,i")))]
   ""
   "*
     {
@@ -884,10 +884,12 @@
 	\"%0=%1+%2;\",
 	\"%0=%0+%1; //immed->Preg \",
 	\"%0=%0+%1; //immed->Dreg \",
-	\"R7 =%0;\\n\\tR7 +=%2;\\n\\t%0 =R7;\",
+	\"M3=%2;\\n\\t%0+=M3;\",
+	\"R3=%0;\\n\\tR3+=%2;\\n\\t%0=R3;\",
+	\"[--SP] = I0;\\n\\tI0 = %0;\\n\\tM3 = %2;\\n\\tI0 += M3;\\n\\t%0 = I0;\\n\\tI0 = [SP++];\",
 	};
 
-	if (which_alternative != 5 && which_alternative > 2) {
+	if (which_alternative < 5 && which_alternative > 2) {
 		rtx tmp = operands[1];
 
 		operands[1] = operands[2];
@@ -2205,13 +2207,13 @@ else
         ""
         "*
         {
-            unsigned int neg_val = INTVAL(operands[2]);
+            unsigned int neg_val = INTVAL(operands[1]);
           if (((neg_val & (!0x3))==neg_val)&&(neg_val <=128))
             {
-                /* operands[2]=GEN_INT( -neg_val);  */
-                operands[2]=GEN_INT(neg_val);
-                /* output_asm_insn (\" %0 = [FP+%2];\", operands); */
-                output_asm_insn (\" %0 = [FP-%2];\", operands);
+                /* operands[1]=GEN_INT( -neg_val);  */
+                operands[1]=GEN_INT(neg_val);
+                /* output_asm_insn (\" %0 = [FP+%1];\", operands); */
+                output_asm_insn (\" %0 = [FP-%1];\", operands);
                 RET;
              }
         }
@@ -2226,13 +2228,13 @@ else
         ""
         "*
         {
-            unsigned int neg_val = INTVAL(operands[1]);
+            unsigned int neg_val = INTVAL(operands[0]);
             if (((neg_val & (!0x3))==neg_val)&&(neg_val <=128))
             {
-                /* operands[1]=GEN_INT( -neg_val); */
-                operands[1]=GEN_INT(neg_val);
-                /* output_asm_insn (\"[FP+%1] = %2;\", operands); */
-                output_asm_insn (\"[FP-%1] = %2;\", operands);
+                /* operands[0]=GEN_INT( -neg_val); */
+                operands[0]=GEN_INT(neg_val);
+                /* output_asm_insn (\"[FP+%0] = %1;\", operands); */
+                output_asm_insn (\"[FP-%0] = %1;\", operands);
                 RET;
              }
         }
@@ -2459,8 +2461,8 @@ else
 )
 
 (define_peephole
-  [(set (match_operand 0 "register_operand" "=d")
-        (match_operand 1 "register_operand" "a"))
+  [(set (match_operand 0 "register_operand" "")
+        (match_operand 1 "register_operand" ""))
    (set (match_dup 0)
 	    (ashift:SI (match_dup 0)
 		    (const_int 4)))
@@ -2472,8 +2474,8 @@ else
 )
 
 (define_peephole
-  [(set (match_operand 0 "register_operand" "=d")
-        (match_operand 1 "register_operand" "a"))
+  [(set (match_operand 0 "register_operand" "")
+        (match_operand 1 "register_operand" ""))
    (set (match_dup 0)
 	    (ashift:SI (match_dup 0)
 		    (const_int 3)))

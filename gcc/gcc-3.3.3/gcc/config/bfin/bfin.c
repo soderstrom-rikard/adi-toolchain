@@ -393,6 +393,62 @@ int frame_pointer_required (void)
     return required;
 }
 
+/* Perform any needed actions needed for a function that is receiving a
+   variable number of arguments.
+                                                                                                                             
+   CUM is as above.
+                                                                                                                             
+   MODE and TYPE are the mode and type of the current parameter.
+                                                                                                                             
+   PRETEND_SIZE is a variable that should be set to the amount of stack
+   that must be pushed by the prolog to pretend that our caller pushed
+   it.
+                                                                                                                             
+   Normally, this macro will push all remaining incoming registers on the
+   stack and set PRETEND_SIZE to the length of the registers pushed.  
+
+   Blackfin specific :
+   - VDSP C compiler manual (our ABI) says that a variable args function
+     should save the R0, R1 and R2 registers in the stack.
+   - The caller will always leave space on the stack for the
+     arguments that are passed in registers, so we dont have
+     to leave any extra space.
+   - now, the vastart pointer can access all arguments from the stack.
+*/
+                                                                                                                             
+void
+setup_incoming_varargs (CUMULATIVE_ARGS *cum,
+			     enum machine_mode mode,
+			     tree type,
+			     int *pretend_size,
+			     int no_rtl)
+{
+  CUMULATIVE_ARGS next_cum;
+  int reg_size =  4;
+  rtx save_area = NULL_RTX, mem;
+  tree fntype;
+  int stdarg_p, i;
+
+  if(no_rtl)
+    return;
+
+  save_area = frame_pointer_rtx;
+  // gcc will generate the move rtx for us automatically for named arguments
+  // we need to generate the move rtx for the unnamed arguments if they
+  // are in the first 3 words. We assume atleast 1 named argument exists
+  // so we never generate [FP+8] = R0 here
+  // cum->words will 
+
+  for (i = cum->words + 1; i < max_arg_registers; i++) {
+ 	
+    mem = gen_rtx_MEM (Pmode,
+  			 plus_constant (save_area, 8 + (i * UNITS_PER_WORD)));
+    emit_move_insn (mem, gen_rtx_REG (Pmode, i));
+  }
+                                                                                                                             
+  *pretend_size = 0;
+}
+
 /* The saveall must be syncronized with include/sys/regs.h
  */
 
@@ -567,6 +623,7 @@ bfin_function_prologue (FILE *file, int framesize)
     if (framesize != 0) 
       fprintf (file, "\tSP += %d;\n", -framesize);
   }
+ 
 }
  
 static void
@@ -729,6 +786,11 @@ int symbolic_operand_p (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
 int imm7bit_operand_p (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) 
 {
   return CONSTANT_P (op) && CONST_7BIT_IMM_P (INTVAL (op));
+}
+
+int imm16bit_operand_p (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) 
+{
+  return CONSTANT_P (op) && CONST_16BIT_IMM_P (INTVAL (op));
 }
 
 int bfin_address_cost (rtx addr) {
@@ -941,7 +1003,10 @@ static int arg_regs[] = FUNCTION_ARG_REGISTERS;
 
 /* Initialize a variable CUM of type CUMULATIVE_ARGS
    for a call to a function whose data type is FNTYPE.
-   For a library call, FNTYPE is 0.  */
+   For a library call, FNTYPE is 0.  
+   VDSP C Compiler manual, our ABI says that
+   first 3 words of arguments will use R0, R1 and R2.
+*/
 
 void
 init_cumulative_args (CUMULATIVE_ARGS *cum,	/* Argument info to initialize */
@@ -972,6 +1037,8 @@ init_cumulative_args (CUMULATIVE_ARGS *cum,	/* Argument info to initialize */
 
   cum->nregs = max_arg_registers;
   cum->arg_regs = arg_regs;
+#if 0
+  // vdsp does not allow this ... compiler switch for using no of registers in params
   if (fntype)
     {
       tree attr = lookup_attribute ("regparm", TYPE_ATTRIBUTES (fntype));
@@ -979,22 +1046,8 @@ init_cumulative_args (CUMULATIVE_ARGS *cum,	/* Argument info to initialize */
       if (attr)
 	cum->nregs = TREE_INT_CST_LOW (TREE_VALUE (TREE_VALUE (attr)));
     }
+#endif
 
-  /* Determine if this function has variable arguments.  This is
-     indicated by the last argument being 'void_type_mode' if there
-     are no variable arguments.  If there are variable arguments, then
-     we won't pass anything in registers */
-
-  if (cum->nregs)
-    {
-      for (param = (fntype) ? TYPE_ARG_TYPES (fntype) : 0;
-	   param != 0; param = next_param)
-	{
-	  next_param = TREE_CHAIN (param);
-	  if (next_param == 0 && TREE_VALUE (param) != void_type_node)
-	    cum->nregs = 0;
-	}
-    }
 
   if (TARGET_DEBUG_ARG)
     fprintf (stderr, ", nregs =%d )\n", cum->nregs);
@@ -1012,6 +1065,7 @@ function_arg_advance (CUMULATIVE_ARGS *cum,		/* current arg information */
 			     tree type,			/* type of the argument or 0 if lib support */
 			     int named			/* whether or not the argument was named */)
 {
+  int count;
   int bytes
     = (mode == BLKmode) ? int_size_in_bytes (type) : GET_MODE_SIZE (mode);
 
@@ -1024,13 +1078,15 @@ function_arg_advance (CUMULATIVE_ARGS *cum,		/* current arg information */
 
   cum->words += words;
   cum->nregs -= words;
-  cum->arg_regs++;
 
-  if (cum->nregs <= 0)
-    {
+  if (cum->nregs <= 0) {
       cum->nregs = 0;
       cum->arg_regs = NULL;
-    }
+  }
+  else {
+      for (count = 1; count <= words; count++)
+        cum->arg_regs++;
+  }
 
   return;
 }
@@ -1097,11 +1153,16 @@ function_arg (CUMULATIVE_ARGS *cum,	/* current arg information */
 
 /* For an arg passed partly in registers and partly in memory,
    this is the number of registers used.
-   For args passed entirely in registers or entirely in memory, zero.  */
+   For args passed entirely in registers or entirely in memory, zero.  
+   Refer VDSP C Compiler manual, our ABI.
+   First 3 words are in registers. So, if a an argument is larger
+   than the registers available, it will span the register and
+   stack. 
+*/
 
 int
-function_arg_partial_nregs (CUMULATIVE_ARGS *cum ATTRIBUTE_UNUSED,	/* current arg information */
-			     enum machine_mode mode ATTRIBUTE_UNUSED,	/* current arg mode */
+function_arg_partial_nregs (CUMULATIVE_ARGS *cum ,	/* current arg information */
+			     enum machine_mode mode ,	/* current arg mode */
 			     tree type ATTRIBUTE_UNUSED,		/* type of the argument or 0 if lib support */
 			     int named	 ATTRIBUTE_UNUSED		/* != 0 for normal args, == 0 for ... args */)
 {
@@ -1111,16 +1172,11 @@ function_arg_partial_nregs (CUMULATIVE_ARGS *cum ATTRIBUTE_UNUSED,	/* current ar
   int arg_num = *cum->arg_regs;
   int ret, last_reg_num;
 
-  static int argregs[] = FUNCTION_ARG_REGISTERS;
-  for (last_reg_num=0;argregs[last_reg_num]>=0;last_reg_num++)
-    ;
-  last_reg_num--;
-  ret = ((arg_num <= last_reg_num && (arg_num + words) >= (last_reg_num+1))
+  last_reg_num = max_arg_registers - 1;
+  ret = ((arg_num <= last_reg_num && 
+         ((arg_num + words) >= (last_reg_num + 1)))
          ? last_reg_num - arg_num + 1
          : 0);
-
-  if (TARGET_DEBUG_ARG && ret)
-    fprintf (stderr, "function_arg_partial_nregs: %d\n", ret);
 
   return ret;
 }
@@ -1430,6 +1486,10 @@ int cc_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) {
 
 int reg_or_7bit_operand (rtx op, enum machine_mode mode) {
     return (imm7bit_operand_p (op, mode) || register_operand (op, mode));
+}
+
+int reg_or_16bit_operand (rtx op, enum machine_mode mode) {
+    return (imm16bit_operand_p (op, mode) || register_operand (op, mode));
 }
 
 void
@@ -1834,8 +1894,8 @@ output_load_immediate (rtx *operands) {
              output_asm_insn (buf, operands);
 	     return "";
 	  }
-          output_asm_insn ("R7 =%1;", operands);
-          output_asm_insn ("%0 =R7;", operands);
+          output_asm_insn ("R3 =%1;", operands);
+          output_asm_insn ("%0 =R3;", operands);
           return "";
      }
      else if (GET_CODE (operands[1]) == MEM
