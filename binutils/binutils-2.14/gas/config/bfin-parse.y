@@ -15955,8 +15955,8 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 		      CONSCODE(
 		        GENCODE(0x004000
 		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                <((dregs($3)&0x7)<<3)                    /* src<(dregs) */
-		                |((12&0xf)<<6)                           /* opc<(12) */
+		                |((dregs($3)&0x7)<<3)                    /* src<(dregs) */
+		                |((12&0xf)<<6)                           /* opc<(11) */
 		        ),
 		        NULL_CODE);
 

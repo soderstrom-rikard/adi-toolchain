@@ -370,7 +370,7 @@ md_assemble (char *line)
 		gen_insn = 0;
 		size = 2;
 	}
-        if(insn->reloc == BFD_ARELOC_CONST){
+        if((insn->reloc == BFD_ARELOC_CONST)|| (insn->reloc == BFD_ARELOC_PUSH)){
           size = 4; // the constant in an expression can be large
         }
 	if(gen_insn){

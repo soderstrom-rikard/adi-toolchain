@@ -513,6 +513,7 @@ bfin_push_reloc (
   bfd_vma output_base = 0;
   asection *reloc_target_output_section;
   bfd_reloc_status_type flag = bfd_reloc_ok;
+  int possible_addend_delta = 0;
 
   if (bfd_is_und_section (symbol->section)
       && (symbol->flags & BSF_WEAK) == 0
@@ -532,17 +533,21 @@ bfin_push_reloc (
       else
 	  output_base = reloc_target_output_section->vma;
 
-  if (!strcmp(symbol->name, symbol->section->name) || output_bfd == NULL)
+  if (!strcmp(symbol->name, symbol->section->name) || output_bfd == NULL){
       	relocation += output_base + symbol->section->output_offset;
+        possible_addend_delta = symbol->section->output_offset;
+   }
+
+  /* Add in supplied addend.  */
+  relocation += reloc_entry->addend;
 
   if (output_bfd != (bfd *) NULL) {
      /* this output will be relocatable ... like ld -r */
      reloc_entry->address += input_section->output_offset;
+     reloc_entry->addend += possible_addend_delta; // for symbols that are section names
   }
-#if 0 /* we do not generate addend ... see arith expr 
-  /* Add in supplied addend.  */
-  relocation += reloc_entry->addend;
-#endif
+
+
 
   /* now that we have the value, push it */
   reloc_stack_push(relocation);
@@ -610,6 +615,7 @@ bfin_h_l_uimm16_reloc (
   bfd_vma output_base = 0;
   reloc_howto_type *howto = reloc_entry->howto;
   asection *reloc_target_output_section;
+  int  possible_addend_delta = 0; // to be added to addend if output_bfd is 0
 
   // if the reloc stack is not empty, use that as the relocation value
 #if 0
@@ -626,13 +632,18 @@ bfin_h_l_uimm16_reloc (
         reloc_target_output_section = symbol->section->output_section;
         relocation = symbol->value;      
         /* Convert input-section-relative symbol value to absolute.  */
-        if (output_bfd)
+        if (output_bfd){
 	    output_base = 0;
+        }
         else
 	    output_base = reloc_target_output_section->vma;
   
-        if (!strcmp(symbol->name, symbol->section->name) || output_bfd == NULL)
+        if (!strcmp(symbol->name, symbol->section->name) || output_bfd == NULL){
       	  relocation += output_base + symbol->section->output_offset;
+          // if the symbol is the section name we need this delta to offset into
+          // the symbol's output section in a relocatable output
+          possible_addend_delta = symbol->section->output_offset;
+        }
 
 	if(symbol->flags & BSF_SECTION_SYM){
           /* Add in supplied addend.  */
@@ -652,7 +663,7 @@ bfin_h_l_uimm16_reloc (
 	 /* this output will be relocatable ... like ld -r */
 	 reloc_entry->address += input_section->output_offset;
 	 // reloc_entry->addend = relocation;
-	 reloc_entry->addend = relocation - symbol->value;
+	 reloc_entry->addend += possible_addend_delta;
       }
       else {
         reloc_entry->addend = 0;
@@ -1084,10 +1095,10 @@ static reloc_howto_type bfin_elf_howto_table[] =
      
   //Arithmetic relocations entries
   HOWTO(0xE0, 
-        0,0,0,FALSE, 0, complain_overflow_dont, bfin_push_reloc, 
+        0,2,0,FALSE, 0, complain_overflow_dont, bfin_push_reloc, 
         "R_expst_push", FALSE, 0, 0, FALSE),
   HOWTO(0xE1, 
-        0,0,0,FALSE, 0, complain_overflow_dont, bfin_const_reloc, 
+        0,2,0,FALSE, 0, complain_overflow_dont, bfin_const_reloc, 
         "R_expst_const", FALSE, 0, 0, FALSE),
   HOWTO(0xE2, 
         0,0,0,FALSE, 0, complain_overflow_dont, bfin_oper_reloc, 
