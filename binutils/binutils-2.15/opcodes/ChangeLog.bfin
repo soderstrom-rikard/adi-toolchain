@@ -1,3 +1,34 @@
+2004-12-10  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin-dis.c: Include "bfin-opcodes.h"
+	(const_fits, econd1, term, amod2, macmod_pmove): Delete unused
+	functions.
+	(uimm16s4, negimm5s4, rimm16, huimm16, imm16, uimm2, uimm3, luimm16,
+	uimm4, uimm5, imm16s2, uimm8, imm16s4, uimm4s2, uimm4s4, imm3, imm4,
+	uimm8s4, imm5, imm6, imm7, imm8, uimm16): Substitute zero for "pc".
+	(amod0, amod1, amod2, macmod_accm, searchmod, macmod_pmove, mxd_mod,
+	aligndir, A0macfunc, multfunc, A1macfunc, macmod_hmove): Remove
+	declarations.
+	(amod0, amod1, macmod_accm, searchmod, mxd_mod, aligndir, A0macfunc,
+	multfunc, A1macfunc, macmod_hmove): Remove unused "pc" argument.  All
+	callers changed.
+	(decode_ProgCtrl_0, decode_CaCTRL_0, decode_PushPopMultiple,
+	decode_PushPopReg_0, decode_ccMV_0, decode_CCflag_0, decode_CC2dreg_0,
+	decode_CC2stat_0, decode_REGMV_0, decode_ALU2op_0, decode_PTR2op_0,
+	decode_LOGI2op_0, decode_COMP3op_0, decode_COMPI2opD_0,
+	decode_COMPI2opP_0, decode_LDSTpmod_0, decode_dagMODim_0,
+	decode_dagMODik_0, decode_dspLDST_0, decode_LDST_0, decode_LDSTiiFP_0,
+	decode_LDSTii_0, decode_psedoDEBUG_0, decode_psedoOChar_0): Remove
+	unused arguments "iw1" and "pc".  All callers changed.
+	(decode_BRCC_0, decode_UJUMP_0): Remove unused argument "iw1".  All
+	callers changed.
+	(decode_LDIMMhalf_0, decode_LDSTidxI_0, decode_linkage_0,
+	decode_dsp32mac_0, decode_dsp32mult_0, decode_dsp32alu_0,
+	decode_dsp32shift_0, decode_dsp32shiftimm_0, decode_psedodbg_assert_0):
+	Remove unused argument "pc".  All callers changed.
+	(_print_insn_bfin): Add test for mnop.
+	(print_insn_bfin): Proper display of multiple issue instructions.
+
 2004-11-18  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin-dis.c (sreg_names): Add one entry to make it 32.
