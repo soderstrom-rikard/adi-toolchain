@@ -1523,14 +1523,17 @@ INSTR_T
 gen_calla(ExprNode *addr, int S)
 {
 	int val;
+	int high_val;
+
 	INIT(CALLa);
 	//int val;
 	ASSIGN(S);
 	val = EXPR_VALUE(addr) >> 1;
+	high_val = val >> 16;
 	//printf("call %x\n", val << 1);
 	// _BF.addr = val;
 
-	return CONSCODE(GENCODE(HI(c_code.opcode)),
+	return CONSCODE(GENCODE(HI(c_code.opcode) | LO(high_val)),
 		ExprNodeGenReloc(addr, 
 			S?BFD_RELOC_24_PCREL: BFD_RELOC_24_PCREL_JUMP_L));
 }
