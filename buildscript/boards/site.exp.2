@@ -1,0 +1,42 @@
+
+#
+# Determine target machines for all known targets
+#
+
+#
+# If we're testing GCC, G++ or GDB, then we want to run on all the
+# available targets. Otherwise, just test the first one.
+#
+if ![info exists tool] {
+    set run_multiple_targets 0;
+} elseif { $tool == "g++" || $tool == "gcc" || $tool == "gdb" || $tool == "libg++" || $tool == "libstdc++" || $tool == "libio" || $tool == "binutils" } {
+    set run_multiple_targets 1;
+} else {
+    set run_multiple_targets 0;
+}
+
+verbose "Global Config File: target_triplet is $target_triplet" 2
+global target_list
+case "$target_triplet" in {
+    { "native" } {
+	set target_list "unix"
+    }
+    { "i?86-*linux*" } {
+	set target_list "unix"
+    }
+
+    { bfin-*-elf } {
+	set target_list { bfin-sim }
+    }
+    default {
+	set target_list { "unix" }
+    }
+}
+
+#
+# If the tool under test won't really benefit from running on multiple
+# targets, then don't do so.
+#
+if { ! $run_multiple_targets } {
+    set target_list [list [lindex $target_list 0]];
+}

@@ -1,14 +1,72 @@
 #!/bin/sh
 #Build Script - Rohit Makasana ( RRAP Software )
-#chmod 755 BuildToolChainNew 
+#             - Modified by Bernd Schmidt (   )
+#             - Modified by Robin Getz (rgetz@blackfin.uclinux.org)
+#
+# This file is not an official part of GCC.
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GCC; see the file COPYING.  If not, write to
+# the Free Software Foundation, 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+#
+###############################################################
 
 APP_NAME=$0
 APP_NAME=${APP_NAME#.}
 APP_NAME=${APP_NAME#/}
 
-while getopts s:b:h parameter
+while getopts dpwvts:b:h parameter
 do
 	case $parameter in
+                p) echo "Check http://gcc.gnu.org/install/prerequisites.html for more information"
+		   gcc --version |grep -i gcc
+		   make --version |grep -i make
+		   autoconf --version |grep -i autoconf
+		   m4 --version |grep -i m4
+		   automake --version |grep -i automake
+		   gettext --version |grep -i gettext
+		   bison --version |grep -i bison
+		   flex --version
+		   echo $SHELL
+		   /bin/sh --version |grep -i version
+		   echo "runtest is only required for testing"
+		   runtest --version
+		   exit
+		   ;;
+		w)
+		   WARN=1
+		   echo "Warnings being set to seperate log file"
+		   ;;
+		d)
+		   DATE_STAMP=1
+		   echo "Outputfiles being date stamped"
+		   ;;
+		v)
+		   VERBOSE=1
+		   echo "Verbose output"
+		   ;;
+		t) 
+         	   RUN=`whereis runtest | wc -w`
+                   if [ "$RUN" -gt 1 ]
+                   then
+		     CHECK=1
+		     echo "Running tests"
+                   else
+		     echo "Can't find dejagnu's runtest"
+		     exit
+                   fi
+                   ;;
 		s)  
 		   if [ -d $OPTARG ]	
 		   then
@@ -33,8 +91,12 @@ do
 		   ;;
 		h)  
 		   echo "Usage : $APP_NAME -s SOURCE [-b BUILD]
+-p               Check prerequisites
+-d               Date Stamp all output files
+-t               Test components
 -s SOURCE 	 Source directory mandatory
 -b BUILD  	 Default build directory will be current dir
+-v               Verbose
 -h               Help"
 		    exit;;
 		*) echo "Try \`$APP_NAME -h' for more information."
@@ -61,11 +123,11 @@ fi
 if [ -d $DIR_SOURCE ]
 then
 	echo "
-This script cleans, configures and builds binutils, gcc, elf2flt n' uClibc for blackfin target in *_build dirs outside the source
+This script cleans, configures and builds gnu toolchain for blackfin target in *_build dirs outside the source
 
-By this script, ToolChain output will be generated at PWD, Source is being called from fixed location."
+By this script, ToolChain output will be generated at $PWD, Source is being called from fixed location."
 
-	echo "Absolute path where sources are present ...."
+	echo -n "Sources is at         "
 	echo $DIR_SOURCE
 else
 	echo "Invalid Source Path"
@@ -79,7 +141,7 @@ if [ $DIR_BUILD ]
 then
 	if [ -d $DIR_BUILD ]
 	then
-		echo "Absolute path where build will be done ...."
+		echo -n "Build will be done in "
 		echo $DIR_BUILD
 	else
 		echo "Invalid Build Path"
@@ -87,152 +149,222 @@ then
 	fi
 else
 
-	echo "Absolute path where build will be done ...."
+	echo -n "Build will be done in "
 	echo ${DIR_BUILD=`pwd`}
 fi
 
 ############ DO NOT MODIFY BELOW THIS LINE ######################
 ############ RELATIVE PATH TO SOURCE DIRECTORIES ################
 
-echo "Path to output dir ...."
-DIR_OUTPUT=$DIR_BUILD/output
-echo $DIR_OUTPUT
+#%Y_%b_%d_%H_%M is YYYY_MMM_DD_HH_MM
+#%Y_%b_%d       is YYYY_MMM_DD
+TIMESTAMP=`date +%Y_%b_%d`
 
-echo "Path to binutils dir ...."
+echo -n "Path to output dir    "
+DIR_OUTPUT=$DIR_BUILD/output
+
+DIR_LOG=$DIR_OUTPUT/logs
+
+echo $DIR_OUTPUT
+if [ ! -d $DIR_OUTPUT ] ; then
+  mkdir $DIR_OUTPUT
+  mkdir $DIR_LOG
+else
+  echo "$DIR_OUTPUT already exists - cleaning"
+  rm -rf $DIR_OUTPUT/bfin-elf $DIR_OUTPUT/bin $DIR_OUTPUT/include $DIR_OUTPUT/info $DIR_OUTPUT/lib $DIR_OUTPUT/libexec $DIR_OUTPUT/man $DIR_OUTPUT/share
+  if [ ! -d $DIR_LOG ] ; then
+    mkdir $DIR_LOG
+  fi
+fi
+
+if [ $CHECK ] ; then
+  echo -n "Path for test results "
+  DIR_TEST_RESULTS=$DIR_OUTPUT/tests
+  if [ ! -d $DIR_TEST_RESULTS ] ; then
+    mkdir $DIR_TEST_RESULTS
+  fi
+fi
+
+echo -n "Path to binutils dir  "
 DIR_BINUTILS_SOURCE=$DIR_SOURCE/binutils/binutils-2.15
 echo $DIR_BINUTILS_SOURCE
+if [ ! -d $DIR_BINUTILS_SOURCE ] ; then
+  echo "Can't find binutils source at $DIR_BINUTILS_SOURCE"
+  exit
+fi
 
-echo "Path to gcc dir ...."
+echo -n "Path to gcc dir       "
 DIR_GCC_SOURCE=$DIR_SOURCE/gcc-3.4
 echo $DIR_GCC_SOURCE
+if [ ! -d $DIR_GCC_SOURCE ] ; then
+  echo "Can't find gcc source at $DIR_GCC_SOURCE"
+  exit
+fi
 
-echo "Path to elf2flt dir ...."
+echo -n "Path to elf2flt dir   "
 DIR_ELF2FLT_SOURCE=$DIR_SOURCE/elf2flt
 echo $DIR_ELF2FLT_SOURCE
+if [ ! -d $DIR_ELF2FLT_SOURCE ] ; then
+  echo "Can't find elf2flt source at $DIR_ELF2FLT_SOURCE"
+  exit
+fi
+
+###################### set up log file ###########################
+
+if [ $DATE_STAMP ] ; then
+  echo "Creating log file     $DIR_LOG/log.$TIMESTAMP"
+
+  if [ $VERBOSE ]; then
+    LOGFILE="| tee -a $DIR_LOG/log.$TIMESTAMP"
+  else
+    if [ $WARN ] ; then
+      echo "*** Warnings going to $DIR_LOG/warn.$TIMESTAMP"
+      LOGFILE=">> $DIR_LOG/log.$TIMESTAMP 2>> $DIR_LOG/warn.$TIMESTAMP"
+    else
+      LOGFILE=">> $DIR_LOG/log.$TIMESTAMP 2>&1"
+    fi
+  fi
+else
+  echo "Creating log file     $DIR_LOG/log"
+
+  if [ $VERBOSE ]; then
+    LOGFILE="| tee -a $DIR_LOG/log"
+  else
+    if [ $WARN ] ; then
+      echo "*** Warnings going to $DIR_LOG/warn"
+      LOGFILE=">> $DIR_LOG/log 2>> $DIR_LOG/warn"
+    else
+      LOGFILE=">> $DIR_LOG/log 2>&1"
+    fi
+  fi
+fi
 
 ############ RELATIVE PATH TO BUILD DIR ################
 
 DIR_BINUTILS_BUILD=$DIR_BUILD/binutils_build
-DIR_GCC_BUILD=$DIR_BUILD/gcc_build
 DIR_ELF2FLT_BUILD=$DIR_BUILD/elf2flt_build
 
-echo "Remove old build dir ...."
+echo -n "*** Removing old build dir "
+date
 
 rm -rf $DIR_BINUTILS_BUILD
-rm -rf $DIR_GCC_BUILD
 rm -rf $DIR_ELF2FLT_BUILD
 
 mkdir $DIR_BINUTILS_BUILD
-mkdir $DIR_GCC_BUILD
 mkdir $DIR_ELF2FLT_BUILD
 
 #################################################################
 ############## DONOT CHANGE ANYTHING BELOW THIS LINE ############
 #################################################################
 
-echo "Remove old output dir ...."
-rm -rf $DIR_OUTPUT/*
+if [ ! -d $DIR_BINUTILS_SOURCE/gcc ] ; then
+  echo "*** Making some symlinks"
+  ln -snf $DIR_GCC_SOURCE/gcc $DIR_BINUTILS_SOURCE/
+  ln -snf $DIR_GCC_SOURCE/libstdc++-v3 $DIR_BINUTILS_SOURCE/
+fi
 
-###################### set up log file ###########################
+###################### Setting up test  ##########################
 
-echo "Creating new log file ...."
-LOGFILE=$DIR_BUILD/log.`date +%m%d%y`
+if [ $CHECK ]
+then
+  echo "*** Setting up site.exp"
+  rm -f $DIR_BUILD/boards/site.exp
+  (cat $PWD/boards/site.exp.1; echo "lappend boards_dir \"$PWD/boards\""; cat $PWD/boards/site.exp.2 ) > $DIR_BUILD/boards/site.exp
+  export DEJAGNU=$DIR_BUILD/boards/site.exp
+fi
 
-echo "Deleting old log file created on same day ...."
-rm -f $DIR_BUILD/log.*
+####################### build toolchain ###########################
 
-
-####################### build binutils ###########################
-
-echo "Building and installing binutils ...."
+echo "*** Building and installing toolchain"
 cd $DIR_BINUTILS_BUILD
 
-echo "Cleaning binutils ...."
-make distclean 2>&1 | tee -a $LOGFILE
+echo -n "*** Cleaning toolchain         "
+date
+(echo "make distclean " $LOGFILE ; ) | sh
 
-echo "Configuring binutils ...."
-$DIR_BINUTILS_SOURCE/configure --target=bfin-elf --prefix=$DIR_OUTPUT --exec-prefix=$DIR_OUTPUT 2>&1 | tee -a $LOGFILE
+echo -n "*** Configuring toolchain      "
+date
+(echo "$DIR_BINUTILS_SOURCE/configure --target=bfin-elf --prefix=$DIR_OUTPUT "  $LOGFILE ; ) | sh
 
-echo "Building binutils ...."
-make 2>&1 | tee -a $LOGFILE
+echo -n "*** Building toolchain         "
+date 
+(echo "make " $LOGFILE ; ) | sh
 
-echo "Installing binutils ...."
-make install 2>&1 | tee -a $LOGFILE
+if [ $CHECK ]
+then
+  echo -n "***  Running tests on binutils "
+  date
+  cd $DIR_BINUTILS_BUILD/binutils
+  ( echo "make check " $LOGFILE ; ) | sh
 
-echo "Completed installing binutils in $DIR_OUTPUT ...."
+  echo -n "***  Running tests on gas      "
+  date
+  cd $DIR_BINUTILS_BUILD/gas
+  ( echo "make check " $LOGFILE ; ) | sh
 
+  echo -n "***  Running tests on gcc      "
+  date
+  cd $DIR_BINUTILS_BUILD/gcc
+  ( echo "make check" $LOGFILE ; ) | sh
+ 
+  echo -n "***  Done testing - results    "
+  date
+
+if [ $DATE_STAMP ] ; then
+  cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.sum $DIR_TEST_RESULTS/gas-$TIMESTAMP.sum
+  cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.log $DIR_TEST_RESULTS/gas-$TIMESTAMP.log
+  cp $DIR_BINUTILS_BUILD/gcc/testsuite/gcc.sum $DIR_TEST_RESULTS/gcc-$TIMESTAMP.sum
+  cp $DIR_BINUTILS_BUILD/gcc/testsuite/gcc.log $DIR_TEST_RESULTS/gcc-$TIMESTAMP.log
+  cp $DIR_BINUTILS_BUILD/gcc/testsuite/g++.sum $DIR_TEST_RESULTS/g++-$TIMESTAMP.sum
+  cp $DIR_BINUTILS_BUILD/gcc/testsuite/g++.log $DIR_TEST_RESULTS/g++-$TIMESTAMP.log
+  cp $DIR_BINUTILS_BUILD/binutils/binutils.sum $DIR_TEST_RESULTS/binutils-$TIMESTAMP.sum
+  cp $DIR_BINUTILS_BUILD/binutils/binutils.log $DIR_TEST_RESULTS/binutils-$TIMESTAMP.log
+else 
+  cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.sum $DIR_TEST_RESULTS/gas.sum
+  cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.log $DIR_TEST_RESULTS/gas.log
+  cp $DIR_BINUTILS_BUILD/gcc/testsuite/gcc.sum $DIR_TEST_RESULTS/gcc.sum
+  cp $DIR_BINUTILS_BUILD/gcc/testsuite/gcc.log $DIR_TEST_RESULTS/gcc.log
+  cp $DIR_BINUTILS_BUILD/gcc/testsuite/g++.sum $DIR_TEST_RESULTS/g++.sum
+  cp $DIR_BINUTILS_BUILD/gcc/testsuite/g++.log $DIR_TEST_RESULTS/g++.log
+  cp $DIR_BINUTILS_BUILD/binutils/binutils.sum $DIR_TEST_RESULTS/binutils.sum
+  cp $DIR_BINUTILS_BUILD/binutils/binutils.log $DIR_TEST_RESULTS/binutils.log
+fi
+
+  cd $DIR_BINUTILS_BUILD
+
+  for FILE in ./gas/testsuite/gas.sum ./binutils/binutils.sum ./gcc/testsuite/gcc.sum ./gcc/testsuite/g++.sum
+  do
+    START=`grep -n Summary $FILE | sed 's/:/ /' | awk '{print $1}'`
+    END=`wc -l $FILE | awk '{print $1}'`
+    TAIL=$((END - START + 1))
+    tail -$TAIL $FILE
+  done
+
+fi
+
+echo -n "*** Installing toolchain       "
+date
+(echo "make install " $LOGFILE ; ) | sh
 
 ######################## build elf2flt ##########################
 
-echo "Building and Installing elf2flt ...."
+echo -n "*** Building elf2flt           "
+date
 cd $DIR_ELF2FLT_BUILD
 
-echo "Cleaning elf2flt ...."
-make distclean 2>&1 | tee -a $LOGFILE
+echo -n "*** Cleaning elf2flt           "
+date
+( echo "make distclean " $LOGFILE ; ) | sh
 
-$DIR_ELF2FLT_SOURCE/configure --target=bfin-elf --with-libbfd=$DIR_BINUTILS_BUILD/bfd/libbfd.a --with-libiberty=$DIR_OUTPUT/lib/libiberty.a --with-bfd-include-dir=$DIR_BINUTILS_BUILD/bfd --with-binutils-include-dir=$DIR_BINUTILS_SOURCE/include --prefix=$DIR_OUTPUT --exec-prefix=$DIR_OUTPUT --program-suffix= 2>&1 | tee -a $LOGFILE
+(echo "$DIR_ELF2FLT_SOURCE/configure --target=bfin-elf --with-libbfd=$DIR_BINUTILS_BUILD/bfd/libbfd.a --with-libiberty=$DIR_OUTPUT/lib/libiberty.a --with-bfd-include-dir=$DIR_BINUTILS_BUILD/bfd --with-binutils-include-dir=$DIR_BINUTILS_SOURCE/include --prefix=$DIR_OUTPUT --program-suffix= " $LOGFILE ; ) | sh
 
-echo "Building elf2flt ...."
-make 2>&1 | tee -a $LOGFILE
+echo -n "*** Building elf2flt           "
+date
+( echo "make " $LOGFILE ; ) | sh
 
-echo "Installing elf2flt ...."
-make install 2>&1 | tee -a $LOGFILE
+echo -n "*** Installing elf2flt         "
+date
+(echo "make install " $LOGFILE ; ) | sh
 
-echo "Completed installing elf2flt in $DIR_OUTPUT ...."
-
-
-############# set path to binutils build for bfin target #########
-
-cd $DIR_SOURCE
-
-echo "Setting Path to $DIR_OUTPUT ...."
-PATH=$DIR_OUTPUT/bin:$PATH
-
-
-########################## build gcc #############################
-
-echo "Building and installing gcc ...."
-cd $DIR_GCC_BUILD
-
-echo "Cleaning gcc ...."
-make distclean 2>&1 | tee -a $LOGFILE
-
-echo "Configuring gcc ...."
-$DIR_GCC_SOURCE/configure --target=bfin-elf --prefix=$DIR_OUTPUT --exec-prefix=$DIR_OUTPUT  --enable-languages=c 2>&1 | tee -a $LOGFILE
-
-echo "Building gcc ...."
-make 2>&1 | tee -a $LOGFILE
-
-echo "Installing gcc ...."
-make install 2>&1 | tee -a $LOGFILE
-
-echo "Completed installing gcc in $DIR_OUTPUT ...."
-
-################## build newlib in binutils #####################
-
-echo "Building newlib in binutils ...."
-cd $DIR_BINUTILS_BUILD
-PATH=$DIR_OUTPUT/bin:$PATH
-
-echo "Building newlib in binutils ...."
-make 2>&1 | tee -a $LOGFILE
-
-echo "Installing newlib in binutils ...."
-make install 2>&1 | tee -a $LOGFILE
-
-echo "Completed installing newlib of binutils in $DIR_OUTPUT ...."
-
-
-############# build elf2flt to include newlib###################
-
-echo "Building elf2flt to include newlib...."
-cd $DIR_ELF2FLT_BUILD
-
-echo "Installing elf2flt ...."
-make install 2>&1 | tee -a $LOGFILE
-
-echo "Completed installing toolchain in $DIR_OUTPUT ...."
-
-#################################################################
-
-
+echo -n "*** Done                       "
+date
