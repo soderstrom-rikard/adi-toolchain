@@ -1,3 +1,11 @@
+2005-03-01  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (hard_regno_mode_ok): DREGS can hold V2HImode.
+	* config/bfin/bfin.h (VECTOR_MODE_SUPPORTED_P): New macro.
+	(D_REGNO_P): New macro.
+	* config/bfin/bfin.md (movv2hi_insn, movv2hi, addv2hi, subv2hi,
+	sminv2hi, smaxv2hi, mulv2hi, negv2hi, absv2hi): New patterns.
+
 2005-02-28  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (n_pregs_to_save): Don't unconditionally save PIC

@@ -146,6 +146,8 @@ extern const char *bfin_library_id_string;
 #define FUNCTION_MODE    SImode
 #define Pmode            SImode
 
+#define VECTOR_MODE_SUPPORTED_P(MODE) ((MODE) == V2HImode)
+
 /* store-condition-codes instructions store 0 for false
    This is the value stored for true.  */
 #define STORE_FLAG_VALUE 1
@@ -298,6 +300,7 @@ extern const char *bfin_library_id_string;
 
 #define PREG_P(X) (REG_P (X) && REGNO (X) >= REG_P0 && REGNO (X) <= REG_P7)
 #define ADDRESS_REGNO_P(X) ((X) >= REG_P0 && (X) <= REG_M3)
+#define D_REGNO_P(X) ((X) <= REG_R7)
 
 #define REGISTER_NAMES { \
   "R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", \

@@ -1730,6 +1730,8 @@ hard_regno_mode_ok (int regno, enum machine_mode mode)
   if (mode == CCmode)
     return 0;
 
+  if (mode == V2HImode)
+    return D_REGNO_P (regno);
   if (class == CCREGS)
     return mode == BImode;
   if (mode == PDImode)
