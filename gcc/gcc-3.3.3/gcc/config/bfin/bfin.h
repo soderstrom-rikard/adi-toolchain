@@ -437,7 +437,7 @@ extern const char * directive_names[];
 */
 #define FIXED_REGISTERS \
 /*r0 r1 r2 r3 r4 r5 r6 r7   p0 p1 p2 p3 p4 p5 p6 p7 */ \
-{ 0, 0, 0, 1, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 1, 1,    \
+{ 0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 1, 1,    \
 /*i0 b0 l0 i1 b1 l1 i2 b2   l2 i3 b3 l3 m0 m1 m2 m3 */ \
   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 1,    \
 /*a0 a1 cc */ \
@@ -1064,8 +1064,6 @@ do {                                              \
   {"regorlog2_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},           	\
   {"nonmemory_or_sym_operand", {CONST_INT, CONST_DOUBLE, CONST,			\
 			 SYMBOL_REF, LABEL_REF, SUBREG, REG, ADDRESSOF}},	\
-
-
 
 /* Describing Relative Costs of Operations */
 

@@ -60,11 +60,8 @@
 ; 4		end of mini constant pool (consttable_end)
 ; 5		align instruction on 4 byte boundary (align_4) For future use 
 
-;;; -----------------------------------------------------------
-;;; WB - Notice that new types: mvp and mcldp have been created 
-;;; -----------------------------------------------------------
 (define_attr "type"
-  "move,mvp,load,store,push,mcld,mcldp,mcst,dsp32,mult,alu0,shft,brcc,br,call,misc,compare"
+  "move,load,store,push,mcld,mcst,dsp32,mult,alu0,shft,brcc,br,call,misc,compare"
   (const_string "misc"))
 
 
@@ -83,45 +80,16 @@
 ;;; br 12-bit  :
 ;;;   4096 12-bit imm *2 is 8192 (-4096..4097)
 ;;;   
-
-;;; -----------------------------------------------------------------------
-;;; WB - The following has been modified to correct the slection of lengths
-;;; for short jumps vs. long jumps
-;;; -----------------------------------------------------------------------
 (define_attr "length" ""
   (cond [(eq_attr "type" "mcld")
 	 (if_then_else (match_operand 1 "effective_address_32bit_p" "")
-		       (const_int 8) 
-			(if_then_else (match_operand 1 "imm7bit_operand_p" "")
-                                     (const_int 2)
-                                     (const_int 4)))
-
-;;; -----------------------------------------------------------------------
-;;; WB - New type mcldp
-;;; -----------------------------------------------------------------------
-	 (eq_attr "type" "mcldp")
-         (if_then_else (match_operand 1 "effective_address_32bit_p" "")
-                       (const_int 8) 
-			(if_then_else (match_operand 1 "imm7bit_operand_p" "")
-                                     (const_int 2)
-                                     (const_int 4)))
-
+		       (const_int 4) (const_int 2))
 
 	 (eq_attr "type" "mcst")
 	 (if_then_else (match_operand 0 "effective_address_32bit_p" "")
 		       (const_int 4) (const_int 2))
 
 	 (eq_attr "type" "move")
-	 (if_then_else (match_operand 1 "symbolic_operand_p" "")
-	               (const_int 8) 
-	               (if_then_else (match_operand 1 "imm7bit_operand_p" "")
-	                             (const_int 2)
-	                             (const_int 4)))
-
-;;; ----------------------------------------------------------------------
-;;; WB - New type mvp
-;;; ----------------------------------------------------------------------
-	 (eq_attr "type" "mvp")
 	 (if_then_else (match_operand 1 "symbolic_operand_p" "")
 	               (const_int 8) 
 	               (if_then_else (match_operand 1 "imm7bit_operand_p" "")
@@ -157,15 +125,6 @@
 ;; Syntax : (define_function_unit {name} {num-units} {n-users} {test}
 ;;                                {ready-delay} {issue-delay} [{conflict-list}])
 ;;(define_function_unit "dag" 1 0 (eq_attr "type" "move") 1 2)
-
-
-;;; --------------------------------------------------------------------
-;;; WB - Schedule P-reg load instructions
-;;; --------------------------------------------------------------------
-
-(define_function_unit "dag" 1 1 (eq_attr "type" "mvp") 4 0)
-
-(define_function_unit "dag" 1 1 (eq_attr "type" "mcldp") 4 0)
 
 ;;; WORD conversion patterns
 
@@ -236,54 +195,45 @@
 ")
 
 (define_insn "*movsicc_insn1"
-  [(set (match_operand:SI 0 "register_operand" "=d, a, d, a, d, a")
+  [(set (match_operand:SI 0 "register_operand" "=da,da,da")
         (if_then_else:SI 
-	    (eq:CC (match_operand:CC 3 "cc_operand" "C, C, C, C, C, C") 
+	    (eq:CC (match_operand:CC 3 "cc_operand" "C,C,C") 
 		(const_int 0))
-	    (match_operand:SI 1 "register_operand" "da,da,0, 0, da,da")
-	    (match_operand:SI 2 "register_operand" "0, 0, da,da,da,da")))]
+	    (match_operand:SI 1 "register_operand" "da,0,da")
+	    (match_operand:SI 2 "register_operand" "0,da,da")))]
   ""
   "@
-    if !cc %0=%1; /* movsicc-1a */
-    if !cc %0=%1; /* movsicc-1a */
-    if cc %0=%2; /* movsicc-1b */
-    if cc %0=%2; /* movsicc-1b */
-    if !cc %0=%1; if cc %0=%2; /* movsicc-1 */
-    if !cc %0=%1; if cc %0=%2; /* movsicc-1 */"
-  [(set_attr "length" "2,2,2,2,4,4")
-   (set_attr "type" "move,mvp,move,mvp,move,mvp")])
+    if !cc %0 =%1; /* movsicc-1a */
+    if cc %0 =%2; /* movsicc-1b */
+    if !cc %0 =%1; if cc %0=%2; /* movsicc-1 */"
+  [(set_attr "length" "2,2,4")
+   (set_attr "type" "move")])
  
 (define_insn "*movsicc_insn2"
-  [(set (match_operand:SI 0 "register_operand" "=d, a, d, a, d, a")
+  [(set (match_operand:SI 0 "register_operand" "=da,da,da")
         (if_then_else:SI 
-	    (ne:CC (match_operand:CC 3 "cc_operand" "C, C, C, C, C, C") 
+	    (ne:CC (match_operand:CC 3 "cc_operand" "C,C,C") 
 		(const_int 0))
-	    (match_operand:SI 1 "register_operand"  "0, 0, da,da,da,da")
-	    (match_operand:SI 2 "register_operand"  "da,da,0, 0, da,da")))]
+	    (match_operand:SI 1 "register_operand" "0,da,da")
+	    (match_operand:SI 2 "register_operand" "da,0,da")))]
   ""
   "@
-    if !cc %0=%2; /* movsicc-2b */
-    if !cc %0=%2; /* movsicc-2b */
-    if cc %0=%1; /* movsicc-2a */
-    if cc %0=%1; /* movsicc-2a */
-    if cc %0=%1; if !cc %0=%2; /* movsicc-1 */
-    if cc %0=%1; if !cc %0=%2; /* movsicc-1 */"
-  [(set_attr "length" "2,2,2,2,4,4")
-   (set_attr "type" "move,mvp,move,mvp,move,mvp")])
+    if !cc %0 =%2; /* movsicc-2b */
+    if cc %0 =%1; /* movsicc-2a */
+    if cc %0 =%1; if !cc %0=%2; /* movsicc-1 */"
+  [(set_attr "length" "2,2,4")
+   (set_attr "type" "move")])
 
 ;;; Future work: split constants in expand
 (define_insn "*movsi_insn"
-  [(set (match_operand:SI 0 "general_operand" "=d,    a,    mc,*!c, !e,!e,!d,!a,!d,!C")
-        (match_operand:SI 1 "general_operand" "damic,damic,da,daic,ad, P,*e,*e,C, d"))]
+  [(set (match_operand:SI 0 "general_operand" "=fcb  , da,    mda, e,   da, !d, !C,m")
+        (match_operand:SI 1 "general_operand" "idabcf, iMmbcf, da,  ade, e,  C,  d,bB"))]
 
   ""
   "*
-    { 
-	output_load_immediate (operands);
-	RET;
-    }
+    { output_load_immediate (operands); }
   "
-  [(set_attr "type" "mcld,mcldp,mcst,move,move,move,move,mvp,compare,compare")])
+  [(set_attr "type" "move,mcld,mcst,move,move,compare,compare,move")])
 
 (define_expand "movsi"
   [(set (match_operand:SI 0 "general_operand" "")
@@ -291,13 +241,9 @@
   ""
   "expand_move (operands, SImode);")
 
-
-;;; -----------------------------------------------------------------------
-;;; WB - Several modifications for scheduling
-;;; -----------------------------------------------------------------------
 (define_insn "*movsf_insn"
- [(set (match_operand:SF 0 "general_operand" "=d,  a,  m")
-       (match_operand:SF 1 "general_operand" "dami,dami,da"))]
+ [(set (match_operand:SF 0 "general_operand" "=da,m")
+       (match_operand:SF 1 "general_operand" "dami,da"))]
   ""
   "*
   {
@@ -328,10 +274,10 @@
            RET;
     }
  
-     output_asm_insn (\"%0=%1;\", operands);
+     output_asm_insn (\"%0 =%1;\", operands);
      RET;
   }"
-  [(set_attr "type" "mcld, mcldp, mcst")])
+  [(set_attr "type" "mcld,mcst")])
 
 (define_expand "movsf"
  [(set (match_operand:SF 0 "general_operand" "")
@@ -340,16 +286,13 @@
   "expand_move (operands, SFmode);")
 
 (define_insn ""
-  [(set (match_operand:HI 0 "general_operand" "=d,   m,d,a")
-	(match_operand:HI 1 "general_operand" "I?di,d,m,i"))]
+  [(set (match_operand:HI 0 "general_operand" "=d,  m, d,a,d")
+	(match_operand:HI 1 "general_operand" "dIi, d, m,d,a"))]
   ""
   "*
-    { 
-      output_load_immediate (operands);
-      RET;
-    }
+    { output_load_immediate (operands); }
   "
-  [(set_attr "type" "move,mcst,mcld,move")])
+  [(set_attr "type" "move,mcst,mcld,move,move")])
 
 
 
@@ -682,46 +625,30 @@
 [(set_attr "length" "6")]) 
 
 ;;;<<<  adddi3-mode    >>>;;;
-;;; -------------------------------------------------------------------
-;;; WB - The following is a bug fix when a live register was clobbered
-;;; -------------------------------------------------------------------
 (define_insn "adddi3"
-  [(set (match_operand:DI 0 "register_operand"           "=&d, &d")
-        (plus:DI (match_operand:DI 1 "register_operand"  "%0, 0")
-                 (match_operand:DI 2 "nonmemory_operand" " S, d")))
-   (clobber (match_scratch:SI 3 "=&d,&d"))
+  [(set (match_operand:DI 0 "register_operand"           "=d, d")
+        (plus:DI (match_operand:DI 1 "register_operand"  "%0, d")
+                 (match_operand:DI 2 "nonmemory_operand" " M, d")))
+   (clobber (match_scratch:SI 3 "=d,d"))
    (clobber (reg:CC 34))]
 ;;  "TARGET_ASM_DIR"
   ""
-  "*
-  {
-     if (GET_CODE (operands[2]) == CONST_INT ) {
-       output_asm_insn (\"%0+=%2;\\n\\tcc=ac;\", operands);
-       output_asm_insn (\"%3=cc;\\n\\t%H0=%H0+%3;\", operands);
-     } else {
-       output_asm_insn (\"%0=%1+%2;\\n\\tcc=ac;\\n\\t%H0=%H1+%H2;\", operands);
-       output_asm_insn (\"%3=cc;\\n\\t%H0=%H0+%3;\", operands);
-     }
-   RET;
-  }
-  "
+  "@
+    %0+=%2; cc=ac; %3=cc; %H0=%H0+%3;
+    %0=%1+%2; cc=ac; %H0=%H1+%H2; %3=cc; %H0=%H0+%3;"
   [(set_attr "type" "alu0")
    (set_attr "length" "8,10")])
 
+
 ;;;<<<  subdi3-mode    >>>;;;
 (define_insn "subdi3"
-  [(set (match_operand:DI 0 "register_operand" "=&d")
+  [(set (match_operand:DI 0 "register_operand" "=d")
         (minus:DI (match_operand:DI 1 "register_operand" "d")
                   (match_operand:DI 2 "register_operand" "d")))
-   (clobber (match_scratch:SI 3                          "=&d"))
    (clobber (reg:CC 34))]
   ""
-;;; --------------------------------------------------------------------
-;;; WB - Same here, no jumps
-;;; --------------------------------------------------------------------
-"%0=%1-%2;\\n\\tcc=%1<%0(iu);\\n\\t%3=cc;\\n\\t%H0=%H1-%H2;\\n\\t%H0=%H0-%3;"
-  [(set_attr "type" "alu0")
-   (set_attr "length" "10")])
+  "%0 = %1-%2;\\n\\tcc = ac;\\n\\t%H0 = %H1-%H2;\\n\\tif ! cc jump 1f;\\n\\t%H0 += -1;\\n\\t1:"
+[(set_attr "length" "10")]) 
 
 (define_insn "*subdi_di_zesidi"
   [(set (match_operand:DI 0 "register_operand" "=d")
@@ -946,18 +873,10 @@
   ""
 )
 
-;;
-;; Patterns anddi3, iordi3, xordi3 and one_compldi2 are not needed
-;; because optimal code is produced by default.
-
-;;; -----------------------------------------------------------------
-;;; WB - Added a *? in the constraints to avoid loading const in regs
-;;; -----------------------------------------------------------------
-
 (define_insn ""
-  [(set (match_operand:SI 0 "register_operand"           "=ad,a,d,&a,&d,b,f,f")
-	(plus:SI (match_operand:SI 1 "register_operand"  "%0, a,d,a,d,%0,%0,%0")
-		 (match_operand:SI 2 "nonmemory_operand" " M,*?a,*?d,i,i,MR,M,R")))]
+  [(set (match_operand:SI 0 "register_operand"           "=ad,a,d,&a,&d,b,f,d,fb")
+	(plus:SI (match_operand:SI 1 "register_operand"  "%0, a,d,a,d,%0,%0,%0,%0")
+		 (match_operand:SI 2 "nonmemory_operand" " M, a,d,i,i,M,M,i,i")))]
   ""
   "*
     {
@@ -968,8 +887,9 @@
 	\"%0=%0+%1; //immed->Preg \",
 	\"%0=%0+%1; //immed->Dreg \",
 	\"M3=%2;\\n\\t%0+=M3;\",
-	\"R3=%0;\\n\\tR3+=%2;\\n\\t%0=R3;\",
-	\"[--SP] = I0;\\n\\tI0 = %0;\\n\\tM3 = %2;\\n\\tI0 += M3;\\n\\t%0 = I0;\\n\\tI0 = [SP++];\",
+	\"[--SP] = R3;\\n\\tR3=%0;\\n\\tR3+=%2;\\n\\t%0=R3;\\n\\tR3 = [SP++];\",
+	\"A0 = %0;\\n\\tA1 = %2;\\n\\t%0 = (A0 += A1);\",
+	\"[--SP] = R3;\\n\\tR3 = %0;\\n\\tA0 = R3;\\n\\tA1 = %2;\\n\\tR3 = (A0 += A1);\\n\\t%0 = R3;\\n\\tR3 = [SP++];\",
 	};
 
 	if (which_alternative < 5 && which_alternative > 2) {
@@ -984,14 +904,11 @@
      }"
   [(set_attr "type" "alu0")])
 
-;;; ---------------------------------------------------------------------
-;;; WB - Same here added *? to constraints to reduce code size and avoid
-;;; preloading const in regs.
-;;; ---------------------------------------------------------------------
+
 (define_expand "subsi3"
   [(set (match_operand:SI 0 "register_operand"           "=d,a,d")
 	(minus:SI (match_operand:SI 1 "register_operand"  "0,0,d")
-		  (match_operand:SI 2 "nonmemory_operand" "M,M*?a,*?d")))]
+		  (match_operand:SI 2 "nonmemory_operand" "M,aM,d")))]
   ""
   ""
 )
@@ -1012,9 +929,9 @@
   [(set_attr "type" "alu0")])
 
 (define_insn ""
-  [(set (match_operand:SI 0 "register_operand"           "=d,a,d,b")
-	(minus:SI (match_operand:SI 1 "register_operand"  "0,0,d,0")
-		  (match_operand:SI 2 "nonmemory_operand" "M,M,d,f")))]
+  [(set (match_operand:SI 0 "register_operand"           "=d,a,d,b,b")
+	(minus:SI (match_operand:SI 1 "register_operand"  "0,0,d,0,0")
+		  (match_operand:SI 2 "nonmemory_operand" "M,M,d,f,Md")))]
   ""
   "*
 {
@@ -1023,7 +940,7 @@
     \"%0 -=%2;\",
     \"%0 =%1-%2;\",
     \"%0 -=%2;\",
-    \"%0 +=-%2;\",
+    \"M3 = %2; %0 -=M3;\",	
   };
 
   if (CONSTANT_P (operands[2]))
@@ -1132,11 +1049,7 @@
 (define_insn "iorsi3"
   [(set (match_operand:SI 0 "register_operand"          "=d,d")
 	(ior:SI (match_operand:SI 1 "register_operand"  "%0,d")
-;;; --------------------------------------------------------------------
-;;; WB - Preference for immediate value vs. reg. improves code size
-;;; --------------------------------------------------------------------
-
-		(match_operand:SI 2 "regorlog2_operand" "J,?*d")))]
+		(match_operand:SI 2 "regorlog2_operand" "J,d")))]
   ""
   "*
 {
@@ -1153,7 +1066,7 @@
 (define_insn "xorsi3"
   [(set (match_operand:SI 0 "register_operand"            "=d,d")
 	(xor:SI (match_operand:SI 1 "register_operand"    "%0,d")
-		  (match_operand:SI 2 "regorlog2_operand" "J,?*d")))]
+		  (match_operand:SI 2 "regorlog2_operand" "J,d")))]
   ""
   "*
 {
@@ -1248,7 +1161,7 @@
 (define_insn ""
   [(set (match_operand:SI 0 "register_operand"                "=d")
 	(ashift:SI (match_operand:SI 1 "register_operand"     " 0")
-		   (match_operand:SI 2 "nonmemory_operand" "L*?d")))]
+		   (match_operand:SI 2 "nonmemory_operand" "dL")))]
   ""
   "%0 <<=%2;"
   [(set_attr "type" "shft")])
@@ -1257,7 +1170,7 @@
 (define_insn "ashrsi3"
   [(set (match_operand:SI 0 "register_operand" "=d")
 	(ashiftrt:SI (match_operand:SI 1 "register_operand" "0")
-		     (match_operand:SI 2 "nonmemory_operand" "L*?d")))]
+		     (match_operand:SI 2 "nonmemory_operand" "dL")))]
   ""
   "%0 >>>=%2;"
   [(set_attr "type" "shft")])
@@ -1265,7 +1178,7 @@
 (define_expand "lshrsi3"
   [(set (match_operand:SI 0 "register_operand"               "=d,a")
 	(lshiftrt:SI (match_operand:SI 1 "register_operand" "0,a")
-		     (match_operand:SI 2 "nonmemory_operand" "L*d,K")))]
+		     (match_operand:SI 2 "nonmemory_operand" "dL,K")))]
   ""
   ""
 ) 
@@ -1281,7 +1194,7 @@
 (define_insn ""
   [(set (match_operand:SI 0 "register_operand"                   "=d")
 	(lshiftrt:SI (match_operand:SI 1 "register_operand"      " 0")
-		     (match_operand:SI 2 "nonmemory_operand" "L*?d")))]
+		     (match_operand:SI 2 "nonmemory_operand" "dL")))]
   ""
   "%0 >>=%2;"
   [(set_attr "type" "shft")])
@@ -1719,6 +1632,7 @@ else
   ""
   "* return asm_conditional_branch (insn, BRF);"
   [(set_attr "type" "brcc")
+   (set (attr "length") (const_int 6))
   ])
 
 (define_insn ""
@@ -1730,6 +1644,7 @@ else
   "* return asm_conditional_branch (insn, BRT);"
 
   [(set_attr "type" "brcc")
+   (set (attr "length") (const_int 6))
   ])
 
 
@@ -1741,6 +1656,7 @@ else
   ""
   "* return asm_conditional_branch (insn, BRF);"
   [(set_attr "type" "brcc")
+   (set (attr "length") (const_int 6))
   ])
 
 (define_insn ""
@@ -1751,6 +1667,7 @@ else
   ""
   "* return asm_conditional_branch (insn, BRT);"
   [(set_attr "type" "brcc")
+   (set (attr "length") (const_int 6))
   ])
 
 (define_expand "seq"
