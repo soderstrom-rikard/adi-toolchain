@@ -2,6 +2,10 @@
 
 	* config/bfin/bfin.h (TRAMPOLINE_TEMPLATE): Correct instruction
 	encodings.
+	* config/bfin/bfin.md (negdi2): Compute it properly - no such thing as
+	a logical neg.
+	(adddi3, subdi3, subdi_di_zesidi, subdi_zesidi_di, subdi_di_sesidi,
+	subdi_sesidi_di): The carry flag is called "ac0", not "ac".
 
 2004-09-29  Bernd Schmidt  <bernds@btinternet.com>
 
