@@ -1767,6 +1767,10 @@ em68kelf.c: $(srcdir)/emulparams/m68kelf.sh \
   $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/m68kelf.em \
   $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
 	${GENSCRIPTS} m68kelf "$(tdir_m68kelf)"
+ebfin.c: $(srcdir)/emulparams/bfin.sh \
+  $(srcdir)/emultempl/elf32.em \
+  $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+	${GENSCRIPTS} bfin "$(tdir_bfin)"
 em68kelfnbsd.c: $(srcdir)/emulparams/m68kelfnbsd.sh \
   $(srcdir)/emulparams/m68kelf.sh \
   $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/m68kelf.em \
@@ -2243,9 +2247,6 @@ ez8001.c: $(srcdir)/emulparams/z8001.sh \
 ez8002.c: $(srcdir)/emulparams/z8002.sh \
   $(srcdir)/emultempl/generic.em $(srcdir)/scripttempl/z8000.sc ${GEN_DEPENDS}
 	${GENSCRIPTS} z8002 "$(tdir_z8002)"
-ebfin.c: $(srcdir)/emulparams/bfin.sh \
-  $(srcdir)/emultempl/generic.em $(srcdir)/scripttempl/bfin.sc ${GEN_DEPENDS}
-	${GENSCRIPTS} bfin "$(tdir_bfin)"
 eelf32frvfd.c: $(srcdir)/emulparams/elf32frvfd.sh \
   $(srcdir)/emulparams/elf32frv.sh \
   $(srcdir)/emultempl/elf32.em $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
