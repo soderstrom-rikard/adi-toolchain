@@ -1185,54 +1185,7 @@
   DONE;
 })
 
-
-;; Tablejumps
-
-(define_expand "casesi"
-  [(match_operand:SI 0 "register_operand" "")   ; index to jump on
-   (match_operand:SI 1 "immediate_operand" "")  ; lower bound
-   (match_operand:SI 2 "immediate_operand" "")  ; total range
-   (match_operand:SI 3 "" "")                   ; table label
-   (match_operand:SI 4 "" "")]                  ; Out of range label
-  ""
-{
-  rtx reg;
-  if (operands[1] != const0_rtx)
-    {
-      HOST_WIDE_INT v = -INTVAL (operands[1]);
-      rtx tmp_const = GEN_INT (v);
-      if (! CONST_7BIT_IMM_P (v))
-	tmp_const = force_reg (SImode, tmp_const);
-      reg = gen_reg_rtx (SImode);
-      emit_insn (gen_addsi3 (reg, operands[0], tmp_const));
-      operands[0] = reg;
-    }
-
-  operands[2] = force_reg (SImode, operands[2]);
-  emit_jump_insn (gen_casesi_internal (operands[0], operands[2], operands[3],
-                                       operands[4]));
-  DONE;
-})
-
-;; The USE in this pattern is needed to tell flow analysis that this is
-;; a CASESI insn.  It has no other purpose.
-
-(define_insn "casesi_internal"
-  [(parallel [(set (pc)
-               (if_then_else
-                (leu (match_operand:SI 0 "register_operand" "a")
-                     (match_operand:SI 1 "register_operand" "a"))
-                (mem:SI (plus:SI (mult:SI (match_dup 0) (const_int 4))
-                                 (label_ref (match_operand 2 "" ""))))
-                (label_ref (match_operand 3 "" ""))))
-              (use (label_ref (match_dup 2)))
-	      (clobber (match_scratch:SI 4 "=&a"))])]
-  ""
-{
-  output_casesi_internal(operands);
-  return "";
-}
-  [(set_attr "length" "24")])
+;; Jump instructions
 
 (define_insn "jump"
   [(set (pc)
@@ -1262,8 +1215,8 @@
     emit_jump_insn (gen_tablejump_short (operands[0], operands[1]));
   else
     emit_jump_insn (gen_tablejump_long (operands[0], operands[1]));
+  DONE;
 })
-
 
 (define_expand "tablejump_long"
   [(parallel [(set (pc) (match_operand:SI 0 "register_operand" "a"))

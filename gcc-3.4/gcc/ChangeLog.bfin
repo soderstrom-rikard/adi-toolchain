@@ -1,3 +1,11 @@
+2005-01-04  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (symbolic_or_const_operand): Accept labels with
+	constant offset.
+	(output_casesi_internal): Delete.
+	* config/bfin/bfin.md (casesi, casesi_internal): Delete.
+	(tablejump): DONE once we emitted an insn.
+
 2004-12-30 Pradip Shah <pcs@rrap-software.com>
 
 	* config/bfin/bfin.md (brcc): Length

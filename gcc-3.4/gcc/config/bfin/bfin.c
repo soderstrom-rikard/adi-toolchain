@@ -1550,7 +1550,8 @@ symbolic_operand (rtx op, enum machine_mode mode)
     return 1;
   if (GET_CODE (op) == CONST
       && GET_CODE (XEXP (op,0)) == PLUS
-      && GET_CODE (XEXP (XEXP (op,0), 0)) == SYMBOL_REF
+      && (GET_CODE (XEXP (XEXP (op,0), 0)) == SYMBOL_REF
+	  || GET_CODE (XEXP (XEXP (op,0), 0)) == LABEL_REF)
       && GET_CODE (XEXP (XEXP (op,0), 1)) == CONST_INT)
     return 1;
   return 0;
@@ -2026,17 +2027,6 @@ bfin_return_in_memory (tree type)
   if (size > 12)
     return 1;
   return 0;
-}
-
-const char *
-output_casesi_internal (rtx *operands)
-{
-  output_asm_insn ("cc = %0<=%1 (iu);\n\tif cc jump 6; jump.l %3;", operands);
-  output_asm_insn ("%1 = %0<<2;\n\t%4.L = %2; %4.H = %2;", operands);
-  output_asm_insn ("%4 = %4 + %1;\n\t%1 = [%4];", operands);
-  output_asm_insn ("jump (%1);", operands);
-
-  return "";
 }
 
 /* Return true if the legitimate memory address for a memory operand of mode
