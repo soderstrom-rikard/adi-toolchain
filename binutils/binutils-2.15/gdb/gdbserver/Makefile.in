@@ -203,7 +203,7 @@ clean:
 	rm -f reg-bfin.c
 
 maintainer-clean realclean distclean: clean
-	rm -f nm.h tm.h xm.h config.status config.h stamp-h config.log
+	rm -f nm.h tm.h xm.h config.status config.h stamp-h config.log config.cache
 	rm -f Makefile
 
 STAGESTUFF=${OBS} ${TSOBS} ${NTSOBS} ${ADD_FILES} init.c init.o version.c gdb
