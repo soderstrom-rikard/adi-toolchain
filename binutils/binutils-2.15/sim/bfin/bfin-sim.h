@@ -70,6 +70,8 @@ extern saved_state_type saved_state;
 #define RETSREG saved_state.rets
 #define PCREG saved_state.pc
 
+extern int did_jump;
+
 typedef struct
 {
   

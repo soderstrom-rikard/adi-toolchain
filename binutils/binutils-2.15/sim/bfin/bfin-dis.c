@@ -1161,6 +1161,7 @@ decode_ProgCtrl_0 (bu16 iw0)
     {
       notethat ("JUMP ( pregs )");
       PCREG = PREG (poprnd);
+      did_jump = 1;
       return;
     }
   else if (prgfunc == 6)
@@ -1168,6 +1169,7 @@ decode_ProgCtrl_0 (bu16 iw0)
       notethat ("CALL ( pregs )");
       saved_state.rets = PCREG + 2;
       PCREG = PREG (poprnd);
+      did_jump = 1;
       return;
     }
   else if (prgfunc == 7)
@@ -1175,12 +1177,14 @@ decode_ProgCtrl_0 (bu16 iw0)
       notethat ("CALL ( PC + pregs )");
       saved_state.rets = PCREG + 2;
       PCREG = PCREG + PREG (poprnd);
+      did_jump = 1;
       return;
     }
   else if (prgfunc == 8)
     {
       notethat ("JUMP ( PC + pregs )");
       PCREG = PCREG + PREG (poprnd);
+      did_jump = 1;
       return;
     }
   else if (prgfunc == 9)
@@ -1600,7 +1604,10 @@ decode_BRCC_0 (bu16 iw0, bu32 pc)
 
   notethat ("IF CC JUMP pcrel10");
   if (CCREG == T)
-    PCREG += pcrel10 (offset);
+    {
+      PCREG += pcrel10 (offset);
+      did_jump = 1;
+    }
   else
     PCREG += 2; return;
 }
@@ -1617,6 +1624,7 @@ decode_UJUMP_0 (bu16 iw0, bu32 pc)
 
   notethat ("JUMP.S pcrel12");
   PCREG += pcrel12 (offset);
+  did_jump = 1;
 }
 
 static void
@@ -2892,7 +2900,7 @@ decode_dsp32mac_0 (bu16 iw0, bu16 iw1, bu32 pc)
   if (w0 == 0 && w1 == 0 && op1 == 3 && op0 == 3)
     unhandled_instruction();
 
-  if ((op1 == 3 || w1 == 0) && MM)
+  if (op1 == 3 && MM)
     unhandled_instruction();
 
   if (((1 << mmod) & (P ? 0x313 : 0x1b57)) == 0)
@@ -5267,13 +5275,24 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
     }
   else if (sop == 3 && sopcde == 2)
     {
+      int t = imm6 (immag);
       notethat ("dregs = ROT dregs BY imm6");
-      OUTS (outf, dregs (dst0));
-      OUTS (outf, "=");
-      OUTS (outf, "ROT");
-      OUTS (outf, dregs (src1));
-      OUTS (outf, "BY");
-      OUTS (outf, imm6 (immag));
+
+      /* Reduce everything to rotate left.  */
+      if (t < 0)
+	t += 33;
+
+      if (t > 0)
+	{
+	  int oldcc = CCREG;
+	  bu32 srcval = DREG (src1);
+	  bu32 result;
+	  result = t == 32 ? 0 : srcval << t;
+	  result |= t == 1 ? 0 : srcval >> (33 - t);
+	  result |= (oldcc << t) >> 1;
+	  DREG (dst0) = result;
+	  CCREG = (t == 32 ? srcval : (srcval >> (32 - t))) & 1;
+	}
       PCREG += 4; return;
     }
   else if (sop == 0 && sopcde == 2)

@@ -719,41 +719,42 @@ sim_stop (sd)
   return 1;
 }
 
-/* Execute a single instruction */
-static void
-step_once(SIM_DESC sd, int pollcount)
-{
-      if (tracing)
-	fprintf (stderr, "PC: %08x, insn: %04x\n", PCREG,
-		 get_word (saved_state.memory, PCREG));
-      
-      if (LC1REG)
-	{
-	  if (PCREG == LB1REG)
-	    {
-	      if (--LC1REG)
-		PCREG = LT1REG;
-	    }
-	}
-      if (LC0REG)
-	{
-	  if (PCREG == LB0REG)
-	    {
-	      if (--LC0REG)
-		PCREG = LT0REG;
-	    }
-	}
-      _interp_insn_bfin (PCREG);
+/* Set by an instruction emulation function if we performed a jump.  */
+int did_jump;
 
-      if (--pollcount < 0)
+/* Execute a single instruction.  */
+
+static void
+step_once (SIM_DESC sd, int pollcount)
+{
+  bu32 oldpc = PCREG;
+
+  if (tracing)
+    fprintf (stderr, "PC: %08x, insn: %04x\n", PCREG,
+	     get_word (saved_state.memory, PCREG));
+
+  did_jump = 0;
+  _interp_insn_bfin (PCREG);
+
+  /* @@@ Not sure how the hardware really behaves when the last insn
+     of a loop is a jump.  */
+  if (! did_jump)
+    {
+      if (LC1REG && oldpc == LB1REG && --LC1REG)
+	PCREG = LT1REG;
+      else if (LC0REG && oldpc == LB0REG && --LC0REG)
+	PCREG = LT0REG;
+    }
+
+  if (--pollcount < 0)
+    {
+      pollcount = POLL_QUIT_INTERVAL;
+      if ((*callback->poll_quit) != NULL
+	  && (*callback->poll_quit) (callback))
 	{
-	  pollcount = POLL_QUIT_INTERVAL;
-	  if ((*callback->poll_quit) != NULL
-	      && (*callback->poll_quit) (callback))
-	    {
-	      sim_stop (sd);
-	    }	    
-	}
+	  sim_stop (sd);
+	}	    
+    }
 }
 
 void

@@ -1,3 +1,14 @@
+2005-01-24  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin-sim.h (did_jump): Declare variable.
+	* bfin-dis.c (decode_ProgCrtl_0, decode_ProgCtrl_0, decode_BRCC_0,
+	decode_UJUMP_0): Set it for jumps and calls.
+	(decode_dsp32mac_0): Relax test for unrecognized instructions.
+	(decode_dsp32shiftimm_0): Implement rotation of DREG by constant.
+	* interp.c (step_once): Make zero-overhead loops execute their last
+	instruction.
+	(did_jump): New variable.
+
 2004-12-14  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin-dis.c (decode_PushPopMultiple_0): Remove useless calls of imm5
