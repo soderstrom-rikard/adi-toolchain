@@ -779,6 +779,19 @@ bfin_hard_regno_rename_ok (unsigned int old_reg ATTRIBUTE_UNUSED,
   return 1;
 }
 
+/* Return the value of the return address for the frame COUNT steps up
+   from the current frame, after the prologue.
+   We punt for everything but the current frame by returning const0_rtx.  */
+
+rtx
+bfin_return_addr_rtx (int count)
+{
+  if (count != 0)
+    return const0_rtx;
+
+  return get_hard_reg_initial_val (Pmode, REG_RETS);
+}
+
 /* Try machine-dependent ways of modifying an illegitimate address X
    to be legitimate.  If we find one, return the new, valid address,
    otherwise return NULL_RTX.

@@ -695,12 +695,7 @@ typedef struct {
 /* Before the prologue, the return address is in the RETS register.  */
 #define INCOMING_RETURN_ADDR_RTX gen_rtx_REG (Pmode, REG_RETS)
 
-/* After the prologue, RA is at -4(AP) in the current frame.  We can't
-   tell for sure for previous frames.  */
-#define RETURN_ADDR_RTX(COUNT, FRAME)					   \
-  ((COUNT) == 0								   \
-   ? gen_rtx_MEM (Pmode, plus_constant (arg_pointer_rtx, -UNITS_PER_WORD)) \
-   : NULL_RTX)
+#define RETURN_ADDR_RTX(COUNT, FRAME) bfin_return_addr_rtx (COUNT)
 
 #define DWARF_FRAME_RETURN_COLUMN DWARF_FRAME_REGNUM (REG_RETS)
 

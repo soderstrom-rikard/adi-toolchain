@@ -374,8 +374,8 @@
    (set_attr "length" "2")])
 
 (define_insn "*movsi_insn"
-  [(set (match_operand:SI 0 "nonimmediate_operand" "=x,da,x,x,x,da,mr,d,y")
-        (match_operand:SI 1 "general_operand" "x,xKs7,xKsh,xKuh,ix,mr,da,y,d"))]
+  [(set (match_operand:SI 0 "nonimmediate_operand" "=x*y,da,x,x,x,da,mr")
+        (match_operand:SI 1 "general_operand" "x*y,xKs7,xKsh,xKuh,ix,mr,da"))]
 
   "GET_CODE (operands[0]) != MEM || GET_CODE (operands[1]) != MEM"
   "@
@@ -385,11 +385,9 @@
    %0 = %1 (Z);
    #
    %0 = %1;
-   %0 = %1;
-   %0 = %1;
    %0 = %1;"
-  [(set_attr "type" "move,mvi,mvi,mvi,*,mcld,mcst,move,move")
-   (set_attr "length" "2,2,4,4,*,*,*,2,2")])
+  [(set_attr "type" "move,mvi,mvi,mvi,*,mcld,mcst")
+   (set_attr "length" "2,2,4,4,*,*,*")])
 
 (define_insn "*movhi_insn"
   [(set (match_operand:HI 0 "nonimmediate_operand" "=x,da,x,d,mr")

@@ -1,3 +1,11 @@
+2005-02-01  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (movsi_insn): All registers (including
+	PROLOGUE_REGS) can be moved to all registers.
+	* config/bfin/bfin.c (bfin_return_addr_rtx): New function.
+	* config/bfin/bfin-protos.h (bfin_return_addr_rtx): Declare.
+	* config/bfin/bfin.h (RETURN_ADDR_RTX): Use it.
+
 2005-01-31  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* optabs.c (expand_abs): Add missing protect_from_queue/force_not_mem
