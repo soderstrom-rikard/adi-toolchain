@@ -48,34 +48,34 @@ static int parse_reg(Register *r, int type, char *rt);
 %s KEYWORD
 
 %%
-[sS][fF][tT][rR][eE][sS][eE][tT]        _REG.regno = REG_sftreset;  return SYSREG;
-[oO][mM][oO][dD][eE]                    _REG.regno = REG_omode;     return SYSREG;
-[iI][dD][lL][eE]_[rR][eE][qQ]           _REG.regno = REG_idle_req;  return SYSREG;
-[hH][wW][eE][rR][rR][cC][aA][uU][sS][eE] _REG.regno = REG_hwerrcause; return SYSREG;
-[eE][xX][cC][aA][uU][sS][eE]            _REG.regno = REG_excause;   return SYSREG;
-[eE][mM][uU][cC][aA][uU][sS][eE]        _REG.regno = REG_emucause;  return SYSREG;
+[sS][fF][tT][rR][eE][sS][eE][tT]        _REG.regno = REG_sftreset;  return REG;
+[oO][mM][oO][dD][eE]                    _REG.regno = REG_omode;     return REG;
+[iI][dD][lL][eE]_[rR][eE][qQ]           _REG.regno = REG_idle_req;  return REG;
+[hH][wW][eE][rR][rR][cC][aA][uU][sS][eE] _REG.regno = REG_hwerrcause; return REG;
+[eE][xX][cC][aA][uU][sS][eE]            _REG.regno = REG_excause;   return REG;
+[eE][mM][uU][cC][aA][uU][sS][eE]        _REG.regno = REG_emucause;  return REG;
 [zZ]                                    return Z;
 [xX]                                    return X;
 [wW]32                                  yylval.value = M_W32; return MMOD;
 [wW]                                    return W;
 [vV][iI][tT]_[mM][aA][xX]               return VIT_MAX;
 [vV]               return V; /* special: V is a statflag and a modifier */
-[uU][sS][pP]       _REG.regno = REG_USP; return SYSREG;
+[uU][sS][pP]       _REG.regno = REG_USP; return REG;
 [tT][lL]                                return TL;
 [tT][hH]                                return TH;
 [tT][fF][uU]                            yylval.value = M_TFU; return MMOD;
 [tT][eE][sS][tT][sS][eE][tT]            return TESTSET;
 [tT]                                    yylval.value = M_T; return MMOD;
 [sS]                                                        return S;
-[sS][yY][sS][cC][fF][gG]       _REG.regno = REG_SYSCFG; return SYSREG;
+[sS][yY][sS][cC][fF][gG]       _REG.regno = REG_SYSCFG; return REG;
 [sS][tT][iI]                            return STI;
 [sS][sS][yY][nN][cC]                    return SSYNC;
-[sS][pP]"."[lL]                         _REG.regno = REG_SP; return HALF_PREG;
-[sS][pP]"."[hH]                         _REG.regno = REG_SP | F_REG_HIGH; return HALF_PREG;
-[sS][pP]                                _REG.regno = REG_SP; return PREG;
+[sS][pP]"."[lL]                         _REG.regno = REG_SP; return HALF_REG;
+[sS][pP]"."[hH]                         _REG.regno = REG_SP | F_REG_HIGH; return HALF_REG;
+[sS][pP]                                _REG.regno = REG_SP; return REG;
 [sS][iI][gG][nN][bB][iI][tT][sS]        return SIGNBITS;
 [sS][iI][gG][nN]                        return SIGN;
-[sS][eE][qQ][sS][tT][aA][tT]     _REG.regno = REG_SEQSTAT; return SYSREG;
+[sS][eE][qQ][sS][tT][aA][tT]     _REG.regno = REG_SEQSTAT; return REG;
 [sS][eE][aA][rR][cC][hH]                return SEARCH;
 [sS][hH][iI][fF][tT]                    return SHIFT;
 [sS][cC][oO]                            return SCO;
@@ -96,11 +96,11 @@ static int parse_reg(Register *r, int type, char *rt);
 
 [rR][0-7]"."[lLhHbB]  return parse_halfreg(&yylval.reg, T_REG_R, yytext);
 
-[rR][eE][tT][sS]       _REG.regno = REG_RETS; return SYSREG;
-[rR][eE][tT][iI]    _REG.regno = REG_RETI; return SYSREG;
-[rR][eE][tT][xX]         _REG.regno = REG_RETX; return SYSREG;
-[rR][eE][tT][nN]      _REG.regno = REG_RETN; return SYSREG;
-[rR][eE][tT][eE]    _REG.regno = REG_RETE; return SYSREG;
+[rR][eE][tT][sS]       _REG.regno = REG_RETS; return REG;
+[rR][eE][tT][iI]    _REG.regno = REG_RETI; return REG;
+[rR][eE][tT][xX]         _REG.regno = REG_RETX; return REG;
+[rR][eE][tT][nN]      _REG.regno = REG_RETN; return REG;
+[rR][eE][tT][eE]    _REG.regno = REG_RETE; return REG;
 [rR][aA][iI][sS][eE]      return RAISE;
 
 [rR][0-7]           return parse_reg(&yylval.reg, T_REG_R, yytext);
@@ -134,12 +134,12 @@ static int parse_reg(Register *r, int type, char *rt);
 [lL][sS][eE][tT][uU][pP]                return LSETUP;
 
 [lL][eE]                                return LE;
-[lL][cC]0 _REG.regno = REG_LC0; return LCREG;
-[lL][tT]0 _REG.regno = REG_LT0; return LTREG;
-[lL][bB]0 _REG.regno = REG_LB0; return LBREG;
-[lL][cC]1 _REG.regno = REG_LC1; return LCREG;
-[lL][tT]1 _REG.regno = REG_LT1; return LTREG;
-[lL][bB]1 _REG.regno = REG_LB1; return LBREG;
+[lL][cC]0 _REG.regno = REG_LC0; return REG;
+[lL][tT]0 _REG.regno = REG_LT0; return REG;
+[lL][bB]0 _REG.regno = REG_LB0; return REG;
+[lL][cC]1 _REG.regno = REG_LC1; return REG;
+[lL][tT]1 _REG.regno = REG_LT1; return REG;
+[lL][bB]1 _REG.regno = REG_LB1; return REG;
 
 [lL][0-3]"."[lLhH]  return parse_halfreg(&yylval.reg, T_REG_L, yytext);
 [lL][0-3]           return parse_reg(&yylval.reg, T_REG_L, yytext);
@@ -160,9 +160,9 @@ static int parse_reg(Register *r, int type, char *rt);
 [gG][tT]                                return GT;
 [gG][eE]                                return GE;
 [fF][uU]                                yylval.value = M_FU; return MMOD;
-[fF][pP]         _REG.regno = REG_FP; return PREG;
-[fF][pP]"."[lL]  _REG.regno = REG_FP; return HALF_PREG;
-[fF][pP]"."[hH]  _REG.regno = REG_FP | F_REG_HIGH; return HALF_PREG;
+[fF][pP]         _REG.regno = REG_FP; return REG;
+[fF][pP]"."[lL]  _REG.regno = REG_FP; return HALF_REG;
+[fF][pP]"."[hH]  _REG.regno = REG_FP | F_REG_HIGH; return HALF_REG;
 
 [eE][xX][tT][rR][aA][cC][tT]            return EXTRACT;
 [eE][xX][pP][aA][dD][jJ]                return EXPADJ;
@@ -178,8 +178,8 @@ static int parse_reg(Register *r, int type, char *rt);
 [dD][bB][gG][aA][hH]                    return DBGAH;
 [dD][bB][gG][aA]                        return DBGA;
 [dD][bB][gG]                            return DBG;
-[cC][yY][cC][lL][eE][sS]2  { _REG.regno = REG_CYCLES2; return SYSREG; }
-[cC][yY][cC][lL][eE][sS]  { _REG.regno = REG_CYCLES; return SYSREG; }
+[cC][yY][cC][lL][eE][sS]2  { _REG.regno = REG_CYCLES2; return REG; }
+[cC][yY][cC][lL][eE][sS]  { _REG.regno = REG_CYCLES; return REG; }
 [cC][sS][yY][nN][cC]                    return CSYNC;
 [cC][oO]                                return CO;
 [cC][lL][iI]                            return CLI;
@@ -221,7 +221,7 @@ static int parse_reg(Register *r, int type, char *rt);
 [vV][sS]  _REG.regno = S_VS;   return MODIFIED_STATUS_REG;
 
 
-[aA][sS][tT][aA][tT]   _REG.regno = REG_ASTAT; return SYSREG;
+[aA][sS][tT][aA][tT]   _REG.regno = REG_ASTAT; return REG;
 [aA][sS][hH][iI][fF][tT]                return ASHIFT;
 [aA][sS][lL]                            return ASL;
 [aA][sS][rR]                            return ASR;
@@ -234,11 +234,11 @@ static int parse_reg(Register *r, int type, char *rt);
 [aA]0"."[hH]    return A_ZERO_DOT_H;
 [aA][bB][sS]                            return ABS;
 abort                                   return ABORT;
-[aA]1"."[xX]    _REG.regno = REG_A1x; return AREG;
-[aA]1"."[wW]    _REG.regno = REG_A1w; return AREG;
+[aA]1"."[xX]    _REG.regno = REG_A1x; return REG;
+[aA]1"."[wW]    _REG.regno = REG_A1w; return REG;
 [aA]1           _REG.regno = REG_A1;  return REG_A11;
-[aA]0"."[xX]    _REG.regno = REG_A0x; return AREG;
-[aA]0"."[wW]    _REG.regno = REG_A0w; return AREG;
+[aA]0"."[xX]    _REG.regno = REG_A0x; return REG;
+[aA]0"."[wW]    _REG.regno = REG_A0w; return REG;
 [aA]0           _REG.regno = REG_A0;  return REG_A00;
 
 
@@ -482,32 +482,31 @@ value = (short)(finput*(1<<15))
 
 static int parse_reg(Register *r, int cl, char *rt)
 {
-  // compose regno:
-  r->regno = cl | (rt[1] - '0');
-  return cl == T_REG_R ? DREG : cl == T_REG_P ? PREG : DAGREG;
+	// compose regno:
+	r->regno = cl | (rt[1] - '0');
+	return REG;
 }
 
 // Xn.Y
 
 static int parse_halfreg(Register *r, int cl, char *rt)
 {
-  r->regno = cl | (rt[1] - '0');
+	r->regno = cl | (rt[1] - '0');
 
-  switch (rt[3])
-    {
-    case 'b':
-    case 'B':
-      return BYTE_REG;
-    case 'l':
-    case 'L':
-      break;
-    case 'h':
-    case 'H':
-      r->regno |= F_REG_HIGH;
-      break;
-    }
+	switch (rt[3]) {
+		case 'b':
+		case 'B':
+			return BYTE_REG;
+		case 'l':
+		case 'L':
+			break;
+		case 'h':
+		case 'H':
+			r->regno |= F_REG_HIGH;
+			break;
+	}
 
-  return cl == T_REG_R ? HALF_DREG : cl == T_REG_P ? HALF_PREG : HALF_DAGREG;
+	return HALF_REG;
 }
 
 /* Our start state is KEYWORD as we have command keywords such as
