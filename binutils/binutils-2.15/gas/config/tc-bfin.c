@@ -485,6 +485,12 @@ parse (char *line)
 
   buffstate = yy_scan_string(line);
 
+  /* our lex requires setting the start state to keyword
+     every line as the first word may be a keyword.
+     Fixes a bug where we could not have keywords as labels
+  */
+  set_start_state();
+
      /* Call yyparse here.  */
      if (yyparse() == 0)
      {

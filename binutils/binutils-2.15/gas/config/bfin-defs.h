@@ -338,6 +338,9 @@ void semantic_error_2(char *syntax);
 
 EXPR_T mkexpr(int, SYMBOL_T);
 
+/* defined in bfin-lex.l */
+void set_start_state(void);
+
 #ifdef __cplusplus
 }
 #endif

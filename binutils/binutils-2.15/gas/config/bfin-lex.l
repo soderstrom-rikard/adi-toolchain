@@ -7,6 +7,15 @@
  *       parsing through bfin-parse.y.
  *       Also changed all token matches to lowercase for better readability,
  *       sacrificing the previous total upper/lowercase freedom.
+ *   09/2004 Pradip Shah <pcs@rrap-software.com>
+ *       prefetch, unlink and other such keywords were not usable as
+ *       parameters to call. Added a start state KEYWORD which will be
+ *       the default start state, achieved by calling set_start_state()
+ *       before every line is parsed. When call is processed, we set
+ *       the state back to INITIAL, so keywords will not be matched.
+ *       Will only work for keywords that are the "command" type keywords
+ *       Only PREFETCH, LINK and UNLINK currently added
+ *       Only CALL & JUMP resets the state.
  *
  */
 
@@ -31,6 +40,13 @@ static int parse_reg(Register *r, int type, char *rt);
 
 %}
 
+/* Define Start States ... Actually we will use exclusion.
+   If no start state is specified it should match any state
+   and <INITIAL> would match some keyword rules only with
+   initial
+*/
+%s KEYWORD
+
 %%
 sftreset|SFTRESET                       _REG.regno = REG_sftreset;  return REG;
 omode|OMODE                             _REG.regno = REG_omode;     return REG;
@@ -45,7 +61,6 @@ w|W                                     return W;
 vit_max|VIT_MAX                         return VIT_MAX;
 v|V                return V; /* special: V is a statflag and a modifier */
 usp|USP            _REG.regno = REG_USP; return REG;
-unlink|UNLINK                           return UNLINK;
 tl|TL                                   return TL;
 th|TH                                   return TH;
 tfu|TFU                                 yylval.value = M_TFU; return MMOD;
@@ -92,7 +107,6 @@ raise|RAISE  return RAISE;
 
 r|R       return R;
 prnt|PRNT                               return PRNT;
-prefetch|PREFETCH                       return PREFETCH;
 pc|PC                                   return PC;
 pack|PACK                               return PACK;
 
@@ -118,7 +132,6 @@ lt|LT                                   return LT;
 lshift|LSHIFT                           return LSHIFT;
 lsetup|LSETUP                           return LSETUP;
 
-link|LINK                               return LINK;
 le|LE                                   return LE;
 lc0|LC0   _REG.regno = REG_LC0; return REG;
 lt0|LT0   _REG.regno = REG_LT0; return REG;
@@ -130,17 +143,15 @@ lb1|LB1   _REG.regno = REG_LB1; return REG;
 [lL][0-3]"."[lLhH]  return parse_halfreg(&yylval.reg, T_REG_L, yytext);
 [lL][0-3]           return parse_reg(&yylval.reg, T_REG_L, yytext);
 lo|LO                                   return LO;
-jump"."s|JUMP"."S                       return JUMP_DOT_S;
-jump"."l|JUMP"."L                       return JUMP_DOT_L;
-jump|JUMP                               return JUMP;
-jump"."[xX]|JUMP"."[xX]                 return JUMP_DOT_L; /* TODO: fix */
+jump"."s|JUMP"."S                       { BEGIN 0; return JUMP_DOT_S;}
+jump"."l|JUMP"."L                       { BEGIN 0; return JUMP_DOT_L;}
+jump|JUMP                               { BEGIN 0; return JUMP;}
+jump"."[xX]|JUMP"."[xX]                 { BEGIN 0; return JUMP_DOT_L; /* TODO: fix */}
 iu|IU                                   yylval.value = M_IU;   return MMOD;
 iss2|ISS2                               yylval.value = M_ISS2; return MMOD;
 is|IS                                   yylval.value = M_IS;   return MMOD;
 ih|IH                                   yylval.value = M_IH;   return MMOD;
-iflush|IFLUSH                           return IFLUSH;
 if|IF                                   return IF;
-idle|IDLE                               return IDLE;
 [iI][0-3]"."[lLhH]  return parse_halfreg(&yylval.reg, T_REG_I, yytext);
 [iI][0-3]           return parse_reg(&yylval.reg, T_REG_I, yytext);
 hlt|HLT                                 return HLT;
@@ -151,8 +162,6 @@ fu|FU                                   yylval.value = M_FU; return MMOD;
 fp|FP            _REG.regno = REG_FP; return REG;
 fp"."l|FP"."L    _REG.regno = REG_FP; return HALF_REG;
 fp"."h|FP"."H    _REG.regno = REG_FP; return HALF_REG;
-flushinv|FLUSHINV                       return FLUSHINV;
-flush|FLUSH                             return FLUSH;
 
 extract|EXTRACT                         return EXTRACT;
 expadj|EXPADJ                           return EXPADJ;
@@ -175,8 +184,8 @@ co|CO                                   return CO;
 cli|CLI                                 return CLI;
 
 cc|CC        _REG.regno = REG_CC; return CCREG;
-[call|CALL]"."[xX]                      return CALL;
-call|CALL                               return CALL;
+[call|CALL]"."[xX]                      { BEGIN 0; return CALL;}
+call|CALL                               { BEGIN 0; return CALL;}
 byteunpack|BYTEUNPACK                   return BYTEUNPACK;
 bytepack|BYTEPACK                       return BYTEPACK;
 byteop16m|BYTEOP16M                     return BYTEOP16M;
@@ -272,6 +281,13 @@ abort                                   return ABORT;
 "!"                     return BANG;
 "=!"					return _ASSIGN_BANG;
 "||"					return DOUBLE_BAR;
+<KEYWORD>prefetch|PREFETCH                       return PREFETCH;
+<KEYWORD>unlink|UNLINK                           return UNLINK;
+<KEYWORD>link|LINK                               return LINK;
+<KEYWORD>idle|IDLE                               return IDLE;
+<KEYWORD>iflush|IFLUSH                           return IFLUSH;
+<KEYWORD>flushinv|FLUSHINV                       return FLUSHINV;
+<KEYWORD>flush|FLUSH                             return FLUSH;
 ([0-9]+)|(0[xX][0-9a-fA-F]+)|([bhfodBHOFD]#[0-9a-fA-F]+)|(0.[0-9]+)  {
          yylval.value = parse_int (&yytext);
          return NUMBER;
@@ -491,6 +507,14 @@ static int parse_halfreg(Register *r, int cl, char *rt)
 	return HALF_REG;
 }
 
+/* Our start state is KEYWORD as we have command keywords such as
+   PREFETCH.
+*/
+void 
+set_start_state(void)
+{
+	BEGIN KEYWORD;
+}
 
 
 
