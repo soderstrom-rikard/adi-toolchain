@@ -1,3 +1,10 @@
+2004-12-27  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/parallel.d: Update expected output.
+	* gas/bfin/parallel2.d: Likewise.
+	* gas/bfin/parallel3.d: Likewise.
+	* gas/bfin/parallel4.d: Likewise.
+
 2004-12-22  Catherine Moore  <clm@cm00re.com>
 
 	* gas/bfin/expected_errors.s: New.
