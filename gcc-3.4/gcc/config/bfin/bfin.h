@@ -1267,7 +1267,7 @@ typedef enum directives {
 
 #define ASM_OUTPUT_ADDR_VEC_ELT(FILE, VALUE)    	\
 do { char __buf[256];					\
-     fprintf (FILE, "\t%s\t", ASM_LONG);		\
+     fprintf (FILE, "\t.dd\t");				\
      ASM_GENERATE_INTERNAL_LABEL (__buf, "L", VALUE);	\
      assemble_name (FILE, __buf);			\
      fputc (';', FILE);					\
@@ -1277,10 +1277,10 @@ do { char __buf[256];					\
 #define ASM_OUTPUT_ADDR_DIFF_ELT(FILE, BODY, VALUE, REL) \
     MY_ASM_OUTPUT_ADDR_DIFF_ELT(FILE, VALUE, REL)
 
-#define MY_ASM_OUTPUT_ADDR_DIFF_ELT(FILE, VALUE, REL) \
-    do {						\
-	char __buf[256];				\
-	fprintf (FILE, "\t%s\t", ASM_SHORT);		\
+#define MY_ASM_OUTPUT_ADDR_DIFF_ELT(FILE, VALUE, REL)		\
+    do {							\
+	char __buf[256];					\
+	fprintf (FILE, "\t.dw\t");				\
 	ASM_GENERATE_INTERNAL_LABEL (__buf, "L", VALUE);	\
 	assemble_name (FILE, __buf);				\
 	fputs (" - ", FILE);					\
