@@ -1,3 +1,9 @@
+2005-01-27  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/shift.d: Update expected output.
+	* gas/bfin/shift2.d: Likewise.
+	* gas/bfin/store.d: Likewise.
+
 2005-01-17  Catherine Moore  <clm@cm00re.com>
 
 	* gas/bfin/load.d: Update expected output.

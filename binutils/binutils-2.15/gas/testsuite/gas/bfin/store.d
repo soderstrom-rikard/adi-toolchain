@@ -9,7 +9,7 @@ Disassembly of section .text:
    4:	fd 92       	\[FP--\]=P5;
    6:	d6 bf       	\[P2\+0x3c\]=SP;
    8:	28 e7 ff 7f 	\[P5\+0x1fffc\]=P0;
-   c:	7a 93       	\[FP\+0x0\]=P2;
+   c:	3a bc       	\[FP\+0x0\]=P2;
    e:	f9 bb       	\[FP-4\]=P1;
   10:	08 ba       	\[FP-128\]=P0;
 
