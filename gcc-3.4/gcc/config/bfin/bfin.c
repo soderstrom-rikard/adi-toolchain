@@ -1880,10 +1880,13 @@ uimm16m2: 16-bit unsigned field that must be a multiple of 2
 int
 bfin_valid_add (enum machine_mode mode, HOST_WIDE_INT value)
 {
-  int v = value > 0 ? value : -value;
+  unsigned HOST_WIDE_INT v = value > 0 ? value : -value;
   int sz = GET_MODE_SIZE (mode);
   int shift = sz == 1 ? 0 : sz == 2 ? 1 : 2;
-  return (v & ~(0x7FFF << shift)) == 0;
+  /* The usual offsettable_memref machinery doesn't work so well for this
+     port, so we deal with the problem here.  */
+  unsigned HOST_WIDE_INT mask = sz == 8 ? 0x7ffe : 0x7fff;
+  return (v & ~(mask << shift)) == 0;
 }
 
 bool

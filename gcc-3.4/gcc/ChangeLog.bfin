@@ -1,3 +1,14 @@
+2004-11-23  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_valid_add): Deal with the fact that 8 byte
+	accesses are split into 4 byte halves.
+	* config/bfin/bfin.md (pushsi_insn, popsi_insn): New, broken out of
+	movsi_insn.
+	(movdi_insn, movsi_insn, movhi_insn, movqi_insn, movsf_insn): Disallow
+	memory-memory moves in insn condition.
+	(movdf_insn, movdf): New pattern and expander.
+	(movdi): Don't use 'o' constraints, use plain 'm'.
+
 2004-11-20  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* ifcvt.c (note_clobbers_of_cond): Return void.

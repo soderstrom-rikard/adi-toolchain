@@ -267,9 +267,9 @@
 ;;; Future work: split constants in expand
 
 (define_insn_and_split "movdi_insn"
-  [(set (match_operand:DI 0 "nonimmediate_operand" "=x,ox,r")
-	(match_operand:DI 1 "general_operand"      "iFx,r,ox"))]
-  ""
+  [(set (match_operand:DI 0 "nonimmediate_operand" "=x,mx,r")
+	(match_operand:DI 1 "general_operand"      "iFx,r,mx"))]
+  "GET_CODE (operands[0]) != MEM || GET_CODE (operands[1]) != MEM"
   "#"
   "reload_completed"
   [(set (match_dup 2) (match_dup 3))
@@ -319,11 +319,27 @@
    %w0 = %1; %x0 = %1;"
   [(set_attr "type" "move,mcst,mcld")])
 
-(define_insn "*movsi_insn"
-  [(set (match_operand:SI 0 "nonimmediate_operand" "=x,da,x,x,x,da,mr,d,y,<da,xy")
-        (match_operand:SI 1 "general_operand" "x,xKs7,xKsh,xKuh,ix,mr,da,y,d,xy,>da"))]
-
+(define_insn "*pushsi_insn"
+  [(set (mem:SI (pre_dec:SI (reg:SI REG_SP)))
+        (match_operand:SI 0 "register_operand" "xy"))]
   ""
+  "[--SP] = %0;"
+  [(set_attr "type" "mcst")
+   (set_attr "length" "2")])
+
+(define_insn "*popsi_insn"
+  [(set (match_operand:SI 0 "register_operand" "=xy")
+        (mem:SI (post_inc:SI (reg:SI REG_SP))))]
+  ""
+  "%0 = [SP++];"
+  [(set_attr "type" "mcld")
+   (set_attr "length" "2")])
+
+(define_insn "*movsi_insn"
+  [(set (match_operand:SI 0 "nonimmediate_operand" "=x,da,x,x,x,da,mr,d,y")
+        (match_operand:SI 1 "general_operand" "x,xKs7,xKsh,xKuh,ix,mr,da,y,d"))]
+
+  "GET_CODE (operands[0]) != MEM || GET_CODE (operands[1]) != MEM"
   "@
    %0 = %1;
    %0 = %1 (X);
@@ -333,16 +349,14 @@
    %0 = %1;
    %0 = %1;
    %0 = %1;
-   %0 = %1;
-   [--SP] =%1;
-   %0 =[SP++];"
-  [(set_attr "type" "move,mvi,mvi,mvi,*,mcld,mcst,move,move,mcst,mcld")
-   (set_attr "length" "2,2,4,4,*,*,*,2,2,2,2")])
+   %0 = %1;"
+  [(set_attr "type" "move,mvi,mvi,mvi,*,mcld,mcst,move,move")
+   (set_attr "length" "2,2,4,4,*,*,*,2,2")])
 
 (define_insn "*movhi_insn"
   [(set (match_operand:HI 0 "nonimmediate_operand" "=x,da,x,d,mr")
         (match_operand:HI 1 "general_operand" "x,xKs7,xKsh,mr,d"))]
-  ""
+  "GET_CODE (operands[0]) != MEM || GET_CODE (operands[1]) != MEM"
   "@
    %0 = %1;
    %0 = %1 (X);
@@ -355,7 +369,7 @@
 (define_insn "*movqi_insn"
   [(set (match_operand:QI 0 "nonimmediate_operand" "=x,da,x,d,mr")
         (match_operand:QI 1 "general_operand" "x,xKs7,xKsh,mr,d"))]
-  ""
+  "GET_CODE (operands[0]) != MEM || GET_CODE (operands[1]) != MEM"
   "@
    %0 = %1;
    %0 = %1 (X);
@@ -368,13 +382,41 @@
 (define_insn "*movsf_insn"
   [(set (match_operand:SF 0 "nonimmediate_operand" "=x,x,da,mr")
         (match_operand:SF 1 "general_operand"      "x,Fx,mr,da"))]
-  ""
+  "GET_CODE (operands[0]) != MEM || GET_CODE (operands[1]) != MEM"
   "@
    %0 = %1;
    #
    %0 = %1;
    %0 = %1;"
   [(set_attr "type" "move,*,mcld,mcst")])
+
+(define_insn_and_split "movdf_insn"
+  [(set (match_operand:DF 0 "nonimmediate_operand" "=x,mx,r")
+	(match_operand:DF 1 "general_operand"      "iFx,r,mx"))]
+  "GET_CODE (operands[0]) != MEM || GET_CODE (operands[1]) != MEM"
+  "#"
+  "reload_completed"
+  [(set (match_dup 2) (match_dup 3))
+   (set (match_dup 4) (match_dup 5))]
+{
+  rtx lo_half[2], hi_half[2];
+  split_di (operands, 2, lo_half, hi_half);
+
+  if (reg_overlap_mentioned_p (lo_half[0], hi_half[1]))
+    {
+      operands[2] = hi_half[0];
+      operands[3] = hi_half[1];
+      operands[4] = lo_half[0];
+      operands[5] = lo_half[1];
+    }
+  else
+    {
+      operands[2] = lo_half[0];
+      operands[3] = lo_half[1];
+      operands[4] = hi_half[0];
+      operands[5] = hi_half[1];
+    }
+})
 
 (define_expand "movsi"
   [(set (match_operand:SI 0 "nonimmediate_operand" "")
@@ -393,6 +435,12 @@
        (match_operand:SF 1 "general_operand" ""))]
   ""
   "expand_move (operands, SFmode);")
+
+(define_expand "movdf"
+ [(set (match_operand:DF 0 "nonimmediate_operand" "")
+       (match_operand:DF 1 "general_operand" ""))]
+  ""
+  "expand_move (operands, DFmode);")
 
 (define_expand "movhi"
   [(set (match_operand:HI 0 "nonimmediate_operand" "")
