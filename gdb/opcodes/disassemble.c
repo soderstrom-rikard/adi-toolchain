@@ -77,6 +77,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #endif
 
 
+
 disassembler_ftype
 disassembler (abfd)
      bfd *abfd;
@@ -359,9 +360,11 @@ disassembler (abfd)
       break;
 #endif
 #ifdef ARCH_bfin
-    case bfd_arch_bfin:
+    case bfd_arch_bfin:{
+	int print_insn_bfin(bfd_vma pc, disassemble_info *outf);
       disassemble = print_insn_bfin;
       break;
+	}
 #endif
 #ifdef ARCH_vax
     case bfd_arch_vax:
