@@ -1157,8 +1157,39 @@ static reloc_howto_type bfin_elf_howto_table[] =
   HOWTO(0xF3, 
         0,0,0,FALSE, 0, complain_overflow_dont, bfin_oper_reloc, 
         "R_expst_addr", FALSE, 0, 0, FALSE), 
-
 };
+
+  /* GNU extension to record C++ vtable hierarchy */
+static reloc_howto_type elf32_bfin_vtinherit_howto =
+  HOWTO (R_BFIN_GNU_VTINHERIT, /* type */
+         0,                     /* rightshift */
+         2,                     /* size (0 = byte, 1 = short, 2 = long) */
+         0,                     /* bitsize */
+         FALSE,                 /* pc_relative */
+         0,                     /* bitpos */
+         complain_overflow_dont, /* complain_on_overflow */
+         NULL,                  /* special_function */
+         "R_BFIN_GNU_VTINHERIT", /* name */
+         FALSE,                 /* partial_inplace */
+         0,                     /* src_mask */
+         0,                     /* dst_mask */
+         FALSE);                /* pcrel_offset */
+
+  /* GNU extension to record C++ vtable member usage */
+static reloc_howto_type elf32_bfin_vtentry_howto =
+  HOWTO (R_BFIN_GNU_VTENTRY,   /* type */
+         0,                     /* rightshift */
+         2,                     /* size (0 = byte, 1 = short, 2 = long) */
+         0,                     /* bitsize */
+         FALSE,                 /* pc_relative */
+         0,                     /* bitpos */
+         complain_overflow_dont,/* complain_on_overflow */
+         _bfd_elf_rel_vtable_reloc_fn,  /* special_function */
+         "R_BFIN_GNU_VTENTRY", /* name */
+         FALSE,                 /* partial_inplace */
+         0,                     /* src_mask */
+         0,                     /* dst_mask */
+         FALSE);                /* pcrel_offset */
 
 
 static const struct bfin_reloc_map {
@@ -1202,7 +1233,9 @@ static const struct bfin_reloc_map {
 	{ BFD_ARELOC_COMP, R_comp},
 	{ BFD_ARELOC_PAGE, R_page},
 	{ BFD_ARELOC_HWPAGE, R_hwpage},
-	{ BFD_ARELOC_ADDR, R_addr}
+	{ BFD_ARELOC_ADDR, R_addr},
+	{ BFD_RELOC_VTABLE_INHERIT, R_BFIN_GNU_VTINHERIT},
+	{ BFD_RELOC_VTABLE_ENTRY, R_BFIN_GNU_VTENTRY}
 };
 
 
@@ -1212,6 +1245,13 @@ bfd_elf32_bfd_reloc_type_lookup (bfd *abfd ATTRIBUTE_UNUSED,
 {
   int i;
   const int MAX = sizeof (bfin_reloc_map)/ sizeof (struct bfin_reloc_map);
+	
+  if (code == BFD_RELOC_VTABLE_INHERIT)
+      return &elf32_bfin_vtinherit_howto;
+
+  if (code == BFD_RELOC_VTABLE_ENTRY)
+      return &elf32_bfin_vtentry_howto;
+
   for (i = 0;
        i < MAX;
        i++)
@@ -1239,7 +1279,15 @@ bfd_info_to_howto_rel (bfd *abfd ATTRIBUTE_UNUSED,
   if(r_type >= 0xe0 && r_type <= 0xf3)
 	  r_type = r_type - 0xe0 + R_push;
   BFD_ASSERT (r_type < (unsigned int) R_max);
-  cache_ptr->howto = &bfin_elf_howto_table[r_type];
+
+  if (r_type == R_BFIN_GNU_VTINHERIT)
+    cache_ptr->howto = &elf32_bfin_vtinherit_howto;
+
+  else if (r_type == R_BFIN_GNU_VTENTRY)
+    cache_ptr->howto = &elf32_bfin_vtentry_howto;
+
+  else
+    cache_ptr->howto = &bfin_elf_howto_table[r_type];
 }
 
 /* Return whether a symbol name implies a local label.

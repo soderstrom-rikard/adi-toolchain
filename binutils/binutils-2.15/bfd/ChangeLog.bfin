@@ -1,3 +1,12 @@
+2005-01-07  Catherine Moore  <clm@cm00re.com>
+
+	* elf32-bfin.c: (elf32_bfin_vtinherit_howto): New HOWTO entry.
+	(elf32_bfin_vtentry_howto): New HOWTO entry.
+	(bfin_reloc_map): Map R_BFIN_GNU_VTINHERIT and
+	R_BFIN_GNU_VTENTRY.
+	(bfd_elf32_bfd_reloc_type_lookup): Handle VTABLE relocs.
+	(bfd_info_to_howto_rel): Likewise.
+	
 2005-01-06  Catherine Moore  <clm@cm00re.com>
 
 	* bfd/bfd-in2.h:  Regenerated.
