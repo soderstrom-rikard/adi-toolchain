@@ -379,8 +379,14 @@ static void
 bfin_frame_this_id (struct frame_info *next_frame, void **this_cache,
                     struct frame_id *this_id)
 {
-	struct bfin_frame_cache *cache = bfin_frame_cache (next_frame, this_cache);
-	*this_id = frame_id_build (cache->base, cache->pc);
+  struct bfin_frame_cache *cache = bfin_frame_cache (next_frame, this_cache);
+
+  /* This marks the outermost frame.  */
+  if (cache->base == 0)
+    return;
+
+  /* See the end of bfin_push_dummy_call.  */
+  *this_id = frame_id_build (cache->base + 8, cache->pc);
 }
 
 
@@ -578,7 +584,6 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
   char buf[4];
   int i;
   long reg_r0, reg_r1, reg_r2;
-  CORE_ADDR ret_sp = sp;
 
   /* Push arguments in reverse order.  */
   for (i = nargs - 1; i >= 0; i--)
@@ -620,21 +625,24 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
       regcache_cooked_write (regcache, BFIN_P0_REGNUM, buf);
     }
 
+  /* Store return address.  */
+  store_unsigned_integer (buf, 4, bp_addr);
+  write_memory (sp, buf, 4);
+
   /* Finally, update the stack pointer...  */
   store_unsigned_integer (buf, 4, sp);
   regcache_cooked_write (regcache, BFIN_SP_REGNUM, buf);
 
-  /* set the dummy return value to entry_point_address().
+  /* set the dummy return value to bp_addr.
      A dummy breakpoint will be setup to execute the call. */
-  store_unsigned_integer (buf, 4, entry_point_address());
+  store_unsigned_integer (buf, 4, bp_addr);
   regcache_cooked_write (regcache, BFIN_RETS_REGNUM, buf);
 
   /* fp is changed by called program prologue */
 
   /* DWARF2/GCC uses the stack address *before* the function call as a
-     frame's CFA. Hence, sp returned is same as what came in. */
-
-  return ret_sp;
+     frame's CFA.  */
+  return sp + 8;
 }
 
 
@@ -907,8 +915,9 @@ bfin_unwind_dummy_id (struct gdbarch *gdbarch, struct frame_info *next_frame)
   frame_unwind_register (next_frame, BFIN_SP_REGNUM, buf);
   sp = extract_unsigned_integer (buf, 4);
 
+
   /* See the end of bfin_push_dummy_call.  */
-  return frame_id_build (sp, frame_pc_unwind (next_frame));
+  return frame_id_build (sp + 8, frame_pc_unwind (next_frame));
 }
 
 

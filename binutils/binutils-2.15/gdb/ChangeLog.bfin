@@ -1,3 +1,9 @@
+2005-02-17  Srivathsa  <sri@rrap-software.com>
+
+	* bfin-tdep.c (bfin_push_dummy_call, bfin_unwind_dummy_id,
+	bfin_frame_this_id) : Returning proper sp value for stack
+	trace
+
 2005-02-15  Srivathsa  <sri@rrap-software.com>
 
 	* bfin-tdep.c (bfin_push_dummy_call) : Added code
