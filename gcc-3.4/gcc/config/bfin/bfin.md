@@ -296,23 +296,24 @@
 
 ;;; Future work: split constants in expand
 (define_insn "*movsi_insn"
-  [(set (match_operand:SI 0 "general_operand" "=d   , a    , mc, *!c , !e, !e, !d, !a, !d, !C, m ,a,f")
-        (match_operand:SI 1 "general_operand" "damic, damic, da, daic, ad,  P, *e, *e,  C,  d, bB,f,a"))]
+  [(set (match_operand:SI 0 "nonimmediate_operand" "=d, a, mc, *!c, !e, !e, !d, !a, !d, !C, a,f")
+        (match_operand:SI 1 "general_operand" "damic, damic, da, daic, ad,  P, *e, *e, C, d, f,a"))]
 
   ""
   "*
-    { output_load_immediate (operands); }
+   output_load_immediate (operands);
+   return \"\";
   "
-  [(set_attr "type" "mcld,mcldp,mcst,move,move,move,move,mvp,compare,compare,move,mcld,move")])
+  [(set_attr "type" "mcld,mcldp,mcst,move,move,move,move,mvp,compare,compare,mcld,move")])
 
 (define_expand "movsi"
-  [(set (match_operand:SI 0 "general_operand" "")
+  [(set (match_operand:SI 0 "nonimmediate_operand" "")
 	(match_operand:SI 1 "general_operand" ""))]
   ""
   "expand_move (operands, SImode);")
 
 (define_insn "*movsf_insn"
- [(set (match_operand:SF 0 "general_operand" "=d, a, m")
+ [(set (match_operand:SF 0 "nonimmediate_operand" "=d, a, m")
        (match_operand:SF 1 "general_operand" "dami, dami, da"))]
   ""
   "*
@@ -350,37 +351,37 @@
   [(set_attr "type" "mcld, mcldp, mcst")])
 
 (define_expand "movsf"
- [(set (match_operand:SF 0 "general_operand" "")
+ [(set (match_operand:SF 0 "nonimmediate_operand" "")
        (match_operand:SF 1 "general_operand" ""))]
   ""
   "expand_move (operands, SFmode);")
 
 (define_insn ""
-  [(set (match_operand:HI 0 "general_operand" "=d,  m, d,a,d,a")
+  [(set (match_operand:HI 0 "nonimmediate_operand" "=d,  m, d,a,d,a")
 	(match_operand:HI 1 "general_operand" "I?di, d, m,d,a,i"))]
   ""
-  "*
-    { output_load_immediate (operands); }
+  "*output_load_immediate (operands);
+    return \"\";
   "
   [(set_attr "type" "move,mcst,mcld,mcld,mcld,move")])
 
 
 
 (define_expand "movhi"
-  [(set (match_operand:HI 0 "general_operand" "")
+  [(set (match_operand:HI 0 "nonimmediate_operand" "")
 	(match_operand:HI 1 "general_operand" ""))]
   ""
   "expand_move (operands, HImode);")
 
 (define_expand "movqi"
-  [(set (match_operand:QI 0 "general_operand" "")
+  [(set (match_operand:QI 0 "nonimmediate_operand" "")
 	(match_operand:QI 1 "general_operand" ""))]
   ""
   " expand_move (operands, QImode); ")
 
 
 (define_insn ""
-  [(set (match_operand:QI 0 "general_operand" "=d,d,m,d,a,d")
+  [(set (match_operand:QI 0 "nonimmediate_operand" "=d,d,m,d,a,d")
 	(match_operand:QI 1 "general_operand" "d,m,d,i,d,a"))]
   ""
   "@

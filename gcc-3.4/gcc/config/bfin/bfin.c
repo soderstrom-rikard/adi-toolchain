@@ -1954,21 +1954,7 @@ output_load_immediate (rtx *operands) {
      }
      else if (GET_CODE (operands[0]) == MEM
 	&& (REGNO_REG_CLASS (REGNO (operands[1])) == IREGS || REGNO_REG_CLASS (REGNO (operands[1])) == BREGS)) {
-	 for (i = 0; i < LAST_USER_DREG; i++)
-	  if (!regs_ever_live[i] && call_used_regs[i]) {
-	     char buf[128];
-	     sprintf (buf, "%s =%%1;", reg_names[i]);
-             output_asm_insn (buf, operands);
-             sprintf (buf, "%s =%s;", "%0", reg_names[i]);
-             output_asm_insn (buf, operands);
-	     return "";
-	  }
-          output_asm_insn ("[--SP] = R3;", operands);
-          output_asm_insn ("R3 = %1;", operands);
-
-          output_asm_insn ("%0 = R3;", operands);
-          output_asm_insn ("R3 = [SP++];", operands);
-          return "";
+       abort ();
      }
      else if (GET_CODE (operands[1]) == MEM
 	&& GET_MODE (operands[1]) == HImode) {
