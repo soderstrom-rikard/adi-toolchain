@@ -188,7 +188,7 @@ extern const char * directive_names[];
 #define FRAME_GROWS_DOWNWARD
 
 /* Activation Record Stack/Frame.. */
-#define FIRST_PARM_OFFSET(decl) (FRAME_POINTER_REQUIRED ? 8 : 0)
+#define FIRST_PARM_OFFSET(decl) 0
 
 #define STARTING_FRAME_OFFSET   0 /*offset to first local*/
 
@@ -207,7 +207,8 @@ extern const char * directive_names[];
 /* Base register for access to local variables of the function.  */
 #define FRAME_POINTER_REGNUM REG_P7
 
-#define ARG_POINTER_REGNUM      FRAME_POINTER_REGNUM
+/* A dummy register that will be eliminated to either FP or SP.  */
+#define ARG_POINTER_REGNUM REG_ARGP
 
 /* `PIC_OFFSET_TABLE_REGNUM'
      The register number of the register used to address a table of
@@ -255,7 +256,7 @@ extern const char * directive_names[];
    may be accessed via the stack pointer) in functions that seem suitable.
    This is computed in `reload', in reload1.c.  
 */
-#define FRAME_POINTER_REQUIRED (frame_pointer_required ())
+#define FRAME_POINTER_REQUIRED (bfin_frame_pointer_required ())
 
 /* `INITIAL_FRAME_POINTER_OFFSET (DEPTH-VAR)'
      A C statement to store in the variable DEPTH-VAR the difference
@@ -293,7 +294,39 @@ extern const char * directive_names[];
 
 #define INITIALIZE_TRAMPOLINE(TRAMP, FNADDR, CXT) \
   initialize_trampoline (TRAMP, FNADDR, CXT)
+
+/* Definitions for register eliminations.
 
+   This is an array of structures.  Each structure initializes one pair
+   of eliminable registers.  The "from" register number is given first,
+   followed by "to".  Eliminations of the same "from" register are listed
+   in order of preference.
+
+   There are two registers that can always be eliminated on the i386.
+   The frame pointer and the arg pointer can be replaced by either the
+   hard frame pointer or to the stack pointer, depending upon the
+   circumstances.  The hard frame pointer is not used before reload and
+   so it is not eligible for elimination.  */
+
+#define ELIMINABLE_REGS				\
+{{ ARG_POINTER_REGNUM, STACK_POINTER_REGNUM},	\
+ { ARG_POINTER_REGNUM, FRAME_POINTER_REGNUM},	\
+ { FRAME_POINTER_REGNUM, STACK_POINTER_REGNUM}}	\
+
+/* Given FROM and TO register numbers, say whether this elimination is
+   allowed.  Frame pointer elimination is automatically handled.
+
+   All other eliminations are valid.  */
+
+#define CAN_ELIMINATE(FROM, TO) \
+  ((TO) == STACK_POINTER_REGNUM ? ! frame_pointer_needed : 1)
+
+/* Define the offset between two registers, one to be eliminated, and the other
+   its replacement, at the start of a routine.  */
+
+#define INITIAL_ELIMINATION_OFFSET(FROM, TO, OFFSET) \
+  ((OFFSET) = bfin_initial_elimination_offset ((FROM), (TO)))
+
 /* This processor has
    8 data register for doing arithmetic
    8  pointer register for doing addressing, including
@@ -304,7 +337,7 @@ extern const char * directive_names[];
    5  return address registers RETS/I/X/N/E
    1  arithmetic status register (ASTAT).  */
 
-#define FIRST_PSEUDO_REGISTER 43
+#define FIRST_PSEUDO_REGISTER 44
 
 #define PREG_P(X) (REG_P (X) && REGNO (X) >= REG_P0 && REGNO (X) <= REG_P7)
 
@@ -314,8 +347,9 @@ extern const char * directive_names[];
   "I0",      "B0",      "L0",      "I1",      "B1",      "L1",      "I2",      "B2", \
   "L2",      "I3",      "B3",      "L3",      "M0",      "M1",      "M2",      "M3", \
   "A0",      "A1", \
-  "CC",	\
-  "RETS",  "RETI",    "RETX",    "RETN",    "RETE",   "ASTAT", "SEQSTAT",  "USP" \
+  "CC", \
+  "RETS",  "RETI",    "RETX",    "RETN",    "RETE",   "ASTAT", "SEQSTAT",  "USP", \
+  "ARGP" \
 }
 
 
@@ -346,11 +380,11 @@ extern const char * directive_names[];
 */
 #define FIXED_REGISTERS \
 /*r0 r1 r2 r3 r4 r5 r6 r7   p0 p1 p2 p3 p4 p5 p6 p7 */ \
-{ 0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 1, 1,    \
+{ 0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 1, 0,    \
 /*i0 b0 l0 i1 b1 l1 i2 b2   l2 i3 b3 l3 m0 m1 m2 m3 */ \
   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,    \
-/*a0 a1 cc rets/i/x/n/e     astat seqstat usp */ \
-  0, 0, 1, 1, 1, 1, 1, 1,   1, 1, 1	    \
+/*a0 a1 cc rets/i/x/n/e     astat seqstat usp argp */ \
+  0, 0, 1, 1, 1, 1, 1, 1,   1, 1, 1, 1	 \
 }
 
 /* the registers that are not available for general 
@@ -364,11 +398,11 @@ extern const char * directive_names[];
 */
 #define CALL_USED_REGISTERS \
 /*r0 r1 r2 r3 r4 r5 r6 r7   p0 p1 p2 p3 p4 p5 p6 p7 */ \
-{ 1, 1, 1, 1, 0, 0, 0, 0,   1, 1, 1, 0, 0, 0, 1, 1, \
+{ 1, 1, 1, 1, 0, 0, 0, 0,   1, 1, 1, 0, 0, 0, 1, 0, \
 /*i0 b0 l0 i1 b1 l1 i2 b2   l2 i3 b3 l3 m0 m1 m2 m3 */ \
   1, 1, 1, 1, 1, 1, 1, 1,   1, 1, 1, 1, 1, 1, 1, 1,   \
-/*a0 a1 cc rets/i/x/n/e     astat seqstat usp */ \
-  1, 1, 1, 1, 1, 1, 1, 1,   1, 1, 1	\
+/*a0 a1 cc rets/i/x/n/e     astat seqstat usp argp */ \
+  1, 1, 1, 1, 1, 1, 1, 1,   1, 1, 1, 1	 \
 }
 
 
@@ -383,12 +417,11 @@ extern const char * directive_names[];
 { REG_R0, REG_R1, REG_R2, REG_R3, REG_R7, REG_R6, REG_R5, REG_R4, \
   REG_P2, REG_P1, REG_P0, REG_P5, REG_P4, REG_P3, REG_P6, REG_P7, \
   REG_A0, REG_A1, \
- /*REG_I0, REG_B0, REG_L0, REG_I1, REG_B1, REG_L1, REG_I2, REG_B2,*/ \
- /*REG_L2, REG_I3, REG_B3, REG_L3, REG_M0, REG_M1, REG_M2, REG_M3,*/ \
-  REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, \
-  REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, \
-  REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, \
-  REG_NO							  \
+  REG_I0, REG_B0, REG_L0, REG_I1, REG_B1, REG_L1, REG_I2, REG_B2, \
+  REG_L2, REG_I3, REG_B3, REG_L3, REG_M0, REG_M1, REG_M2, REG_M3, \
+  REG_RETS, REG_RETI, REG_RETX, REG_RETN, REG_RETE,		  \
+  REG_ASTAT, REG_SEQSTAT, REG_USP, 				  \
+  REG_CC, REG_ARGP						  \
 }
 
 #define CONDITIONAL_REGISTER_USAGE			\
@@ -499,30 +532,26 @@ enum reg_class
     { 0x00000055,    0 },		/* EVEN_DREGS */   \
     { 0x000000aa,    0 },		/* ODD_DREGS */   \
     { 0x000000ff,    0 },		/* DREGS */   \
-    { 0x0000ff00,    0 },		/* PREGS */   \
-    { 0x0000ffff,    0 },		/* DPREGS */   \
-    { 0xffffffff,    0x0 },		/* MOST_REGS */\
-    { 0x00000000,    0x7f0 },		/* PROLOGUE_REGS */\
-    { 0xffffffff,    0x7ff },		/* ALL_REGS */\
+    { 0x0000ff00,    0x800 },		/* PREGS */   \
+    { 0x0000ffff,    0x800 },		/* DPREGS */   \
+    { 0xffffffff,    0x800 },		/* MOST_REGS */\
+    { 0x00000000,    0x7f8 },		/* PROLOGUE_REGS */\
+    { 0xffffffff,    0xfff },		/* ALL_REGS */\
      /*{ 0xffffffff,    0x3 }, */	}
 
 #define BASE_REG_CLASS          PREGS
 #define INDEX_REG_CLASS         PREGS
 
 #ifdef REG_OK_STRICT
-#define REGNO_OK_FOR_BASE_P(x)  (REGNO_REG_CLASS (x) == BASE_REG_CLASS)
-#define REGNO_OK_FOR_INDEX_P(x) (REGNO_REG_CLASS (x) == INDEX_REG_CLASS)
+#define REGNO_OK_FOR_BASE_P(x) (REGNO_REG_CLASS (x) == BASE_REG_CLASS)
 #else
 #define REGNO_OK_FOR_BASE_P(x)  \
- (((x) >= FIRST_PSEUDO_REGISTER) \
-  || (REGNO_REG_CLASS (x) == BASE_REG_CLASS))
-#define REGNO_OK_FOR_INDEX_P(x) \
-     (((x) >= FIRST_PSEUDO_REGISTER) \
-      || (REGNO_REG_CLASS (x) == INDEX_REG_CLASS))
+ (((x) >= FIRST_PSEUDO_REGISTER) || REGNO_REG_CLASS (x) == BASE_REG_CLASS)
 #endif
 
-#define REG_OK_FOR_BASE_P(X)    (REG_P(X) && REGNO_OK_FOR_BASE_P (REGNO(X)))
-#define REG_OK_FOR_INDEX_P(X)   (REG_P(X) && REGNO_OK_FOR_INDEX_P (REGNO(X)))
+#define REG_OK_FOR_BASE_P(X)    (REG_P (X) && REGNO_OK_FOR_BASE_P (REGNO (X)))
+#define REG_OK_FOR_INDEX_P(X)   0
+#define REGNO_OK_FOR_INDEX_P(X)   0
 
 /* Get reg_class from a letter such as appears in the machine description.  */
 
@@ -548,18 +577,16 @@ enum reg_class
    reg number REGNO.  This could be a conditional expression
    or could index an array.  */
 #define REGNO_REG_CLASS(REGNO) \
- ((REGNO)<REG_P0 ? DREGS       \
- : (REGNO)<REG_I0 ? PREGS      \
- : ((REGNO)==REG_I0 || (REGNO)==REG_I1 || (REGNO)==REG_I2 || (REGNO)==REG_I3)\
-   ? IREGS \
- : ((REGNO)==REG_L0 || (REGNO)==REG_L1 || (REGNO)==REG_L2 || (REGNO)==REG_L3)\
-   ? LREGS \
- : ((REGNO)==REG_B0 || (REGNO)==REG_B1 || (REGNO)==REG_B2 || (REGNO)==REG_B3)\
-   ? BREGS \
- : ((REGNO)<=REG_M3 && (REGNO)>=REG_M0) ? MREGS \
- : ((REGNO)==REG_A0 || (REGNO)==REG_A1) ? AREGS \
- : (REGNO)==REG_CC ? CCREGS 			\
- : (REGNO) >= REG_RETS ? PROLOGUE_REGS		\
+ ((REGNO) < REG_P0 ? DREGS				\
+ : (REGNO) < REG_I0 ? PREGS				\
+ : (REGNO) == REG_ARGP ? BASE_REG_CLASS			\
+ : (REGNO) >= REG_I0 && (REGNO) <= REG_I3 ? IREGS	\
+ : (REGNO) >= REG_L0 && (REGNO) <= REG_L3 ? LREGS	\
+ : (REGNO) >= REG_B0 && (REGNO) <= REG_B3 ? BREGS	\
+ : (REGNO) >= REG_M0 && (REGNO) <= REG_M3 ? MREGS	\
+ : (REGNO) == REG_A0 || (REGNO) == REG_A1 ? AREGS	\
+ : (REGNO) == REG_CC ? CCREGS				\
+ : (REGNO) >= REG_RETS ? PROLOGUE_REGS			\
  : NO_REGS)
 
 /* When defined, the compiler allows registers explicitly used in the

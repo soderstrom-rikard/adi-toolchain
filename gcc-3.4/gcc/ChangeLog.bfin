@@ -1,5 +1,35 @@
 2004-11-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
+	* config/bfin/bfin-protos.h (bfin_frame_pointer_required): Renamed from
+	frame_pointer_required.
+	(bfin_initial_elimination_offset): Declare.
+	* config/bfin/bfin.c (must_save_fp_p): New function.
+	(bfin_frame_pointer_required): Renamed from frame_pointer_required.
+	Simplify.
+	(setup_incoming_varargs): Use arg pointer instead of FP.
+	(bfin_initial_elimination_offset): New function.
+	(add_to_sp): New function, broken out of bfin_expand_prologue and
+	enhanced.
+	(bfin_expand_prologue): Deal with frame pointer elimination properly.
+	Use add_to_sp where possible.
+	(bfin_expand_epilogue): Likewise.
+	(fp_plus_const_operand): Also accept SP + constant.
+	* config/bfin/bfin.h (FIRST_PARM_OFFSET): Always 0.
+	(ARG_POINTER_REGNUM): Use REG_ARGP.
+	(FRAME_POINTER_REQUIRED): Called function was renamed; adjust.
+	(ELIMINABLE_REGS, CAN_ELIMINATE, INITIAL_ELIMINATION_OFFSET): New.
+	(FIRST_PSEUDO_REGISTER): Bump to 44.
+	(REGISTER_NAMES): New reg ARGP.
+	(FIXED_REGISTERS, CALL_USED_REGISTERS): Likewise.
+	(REG_ALLOC_ORDER): Eliminate uses of REG_NO; list all available regs.
+	(REG_CLASS_CONTENTS): PROLOGUE_REGS contains RETS; PREGS and its
+	superclasses contain the arg pointer.
+	(REGNO_REG_CLASS): ARGP is of BASE_REG_CLASS.
+	(REGNO_OK_FOR_INDEX_P, REG_OK_FOR_INDEX_P): Always 0.
+	* config/bfin/bfin.md (REG_ARGP): New constant.
+	(movsi_insn): Remove some superfluous constraints from prologue reg
+	alternatives.
+
 	* config/bfin/bfin.c (bfin_address_cost): Always return 1.
 	* config/bfin/bfin.md (cbranch_with_nops): Always use length 6.
 	(addsi3): Renamed from nameless pattern; remove useless expander.

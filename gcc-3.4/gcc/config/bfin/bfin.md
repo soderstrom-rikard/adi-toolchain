@@ -114,7 +114,9 @@
 
    (REG_ASTAT 40)
    (REG_SEQSTAT 41)
-   (REG_USP 42)])
+   (REG_USP 42)
+
+   (REG_ARGP 43)])
 
 ;; Constants used in UNSPECs.
 
@@ -307,8 +309,8 @@
   [(set_attr "type" "move,mcst,mcld")])
 
 (define_insn "*movsi_insn"
-  [(set (match_operand:SI 0 "nonimmediate_operand" "=da,da,*cf,*cf,da,mr,d,y,<d,xy,a")
-        (match_operand:SI 1 "general_operand"      "  x,ix,  x, ix,mr,da,y,d,xy,>d,y"))]
+  [(set (match_operand:SI 0 "nonimmediate_operand" "=da,da,*cf,*cf,da,mr,d,y,<d,y,a")
+        (match_operand:SI 1 "general_operand"      "  x,ix,  x, ix,mr,da,y,d,y,>d,y"))]
 
   ""
   "*
@@ -876,14 +878,14 @@
 (define_expand "subsi3"
   [(set (match_operand:SI 0 "register_operand"            "")
 	(minus:SI (match_operand:SI 1 "register_operand"  "")
-		  (match_operand:SI 2 "nonmemory_operand" "")))]
+		  (match_operand:SI 2 "reg_or_7bit_operand" "")))]
   ""
   "")
 
 (define_insn ""
   [(set (match_operand:SI 0 "register_operand"           "=da,d,a")
 	(minus:SI (match_operand:SI 1 "register_operand"  "0,d,0")
-		  (match_operand:SI 2 "nonmemory_operand" "M,d,a")))]
+		  (match_operand:SI 2 "reg_or_7bit_operand" "M,d,a")))]
   "GET_CODE (operands[2]) != CONST_INT || INTVAL (operands[2]) != -64"
   "*
 {

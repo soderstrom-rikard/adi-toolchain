@@ -293,6 +293,14 @@ n_pregs_to_save (void)
   return 0;
 }
 
+/* Determine if we are going to save the frame pointer in the prologue.  */
+
+static int
+must_save_fp_p (void)
+{
+  return (frame_pointer_needed || regs_ever_live[REG_FP]);
+}
+
 /* Emit code to save registers in the prologue.  SAVEALL is nonzero if we
    must save all registers; this is used for interrupt handlers.
    SPREG contains (reg:SI REG_SP).  */
@@ -388,29 +396,17 @@ expand_epilogue_reg_restore (rtx spreg, int saveall)
   RTX_FRAME_RELATED_P (insn) = 1;
 }
 
-/* Used by macro `frame_pointer_required' */
-int frame_pointer_required (void) 
-{
-  int omit, leaf, frame, required;
-
-  omit = TARGET_OMIT_LEAF_FRAME_POINTER;
-  leaf = leaf_function_p ();
-  frame = get_frame_size ();
-  required = !((omit && leaf) || (leaf && frame == 0 && current_function_args_size == 0));
-  return required;
-}
-
 /* Perform any needed actions needed for a function that is receiving a
    variable number of arguments.
-                                                                                                                             
+
    CUM is as above.
-                                                                                                                             
+
    MODE and TYPE are the mode and type of the current parameter.
-                                                                                                                             
+
    PRETEND_SIZE is a variable that should be set to the amount of stack
    that must be pushed by the prolog to pretend that our caller pushed
    it.
-                                                                                                                             
+
    Normally, this macro will push all remaining incoming registers on the
    stack and set PRETEND_SIZE to the length of the registers pushed.  
 
@@ -420,36 +416,32 @@ int frame_pointer_required (void)
    - The caller will always leave space on the stack for the
      arguments that are passed in registers, so we dont have
      to leave any extra space.
-   - now, the vastart pointer can access all arguments from the stack.
-*/
-                                                                                                                             
+   - now, the vastart pointer can access all arguments from the stack.  */
+
 void
 setup_incoming_varargs (CUMULATIVE_ARGS *cum,
-			     enum machine_mode mode ATTRIBUTE_UNUSED,
-			     tree type ATTRIBUTE_UNUSED,
-			     int *pretend_size,
-			     int no_rtl)
+			enum machine_mode mode ATTRIBUTE_UNUSED,
+			tree type ATTRIBUTE_UNUSED, int *pretend_size,
+			int no_rtl)
 {
-  rtx save_area = NULL_RTX, mem;
+  rtx mem;
   int i;
 
-  if(no_rtl)
+  if (no_rtl)
     return;
 
-  save_area = frame_pointer_rtx;
-  /* gcc will generate the move rtx for us automatically for named arguments
-   we need to generate the move rtx for the unnamed arguments if they
-   are in the first 3 words. We assume atleast 1 named argument exists
-   so we never generate [FP+8] = R0 here
-   cum->words will */
+  /* The move for named arguments will be generated automatically by the
+     compiler.  We need to generate the move rtx for the unnamed arguments
+     if they are in the first 3 words.  We assume atleast 1 named argument
+     exists, so we never generate [ARGP] = R0 here.  */
 
-  for (i = cum->words + 1; i < max_arg_registers; i++) {
- 	
-    mem = gen_rtx_MEM (Pmode,
-  			 plus_constant (save_area, 8 + (i * UNITS_PER_WORD)));
-    emit_move_insn (mem, gen_rtx_REG (Pmode, i));
-  }
-                                                                                                                             
+  for (i = cum->words + 1; i < max_arg_registers; i++)
+    {
+      mem = gen_rtx_MEM (Pmode,
+			 plus_constant (arg_pointer_rtx, (i * UNITS_PER_WORD)));
+      emit_move_insn (mem, gen_rtx_REG (Pmode, i));
+    }
+
   *pretend_size = 0;
 }
 
@@ -476,6 +468,50 @@ bfin_va_arg (tree va_list, tree type)
   t = build1 (INDIRECT_REF, type_ptr, t);
 
   return expand_expr (t, NULL_RTX, Pmode, EXPAND_NORMAL);
+}
+
+/* Value should be nonzero if functions must have frame pointers.
+   Zero means the frame pointer need not be set up (and parms may
+   be accessed via the stack pointer) in functions that seem suitable.  */
+
+int
+bfin_frame_pointer_required (void) 
+{
+  e_funkind fkind = funkind (current_function_decl);
+
+  if (TARGET_NON_GNU_PROFILE || fkind != SUBROUTINE)
+    return 1;
+
+  /* We turn on on -fomit-frame-pointer if -momit-leaf-frame-pointer is used,
+     so we have to override it for non-leaf functions.  */
+  if (TARGET_OMIT_LEAF_FRAME_POINTER && ! current_function_is_leaf)
+    return 1;
+
+  return 0;
+}
+
+/* Return the offset between two registers, one to be eliminated, and the other
+   its replacement, at the start of a routine.  */
+
+HOST_WIDE_INT
+bfin_initial_elimination_offset (int from, int to)
+{
+  HOST_WIDE_INT offset = 0;
+
+  if (from == ARG_POINTER_REGNUM)
+    offset = to == STACK_POINTER_REGNUM && ! must_save_fp_p () ? 4 : 8;
+
+  if (to == STACK_POINTER_REGNUM)
+    {
+      if (current_function_outgoing_args_size >= FIXED_STACK_AREA)
+	offset += current_function_outgoing_args_size;
+      else if (current_function_outgoing_args_size)
+	offset += FIXED_STACK_AREA;
+
+      offset += get_frame_size ();
+      offset += (n_dregs_to_save () + n_pregs_to_save ()) * 4;
+    }
+  return offset;
 }
 
 /* Generate a LINK insn for a frame sized FRAME_SIZE.  If this constant
@@ -649,6 +685,50 @@ expand_interrupt_handler_epilogue (rtx spreg, e_funkind fkind)
   emit_jump_insn (gen_return_internal (GEN_INT (fkind)));
 }
 
+/* Generate efficient code to add a value to the frame pointer.  We
+   can use P1 as a scratch register.  Set RTX_FRAME_RELATED_P on the
+   generated insns if FRAME is nonzero.  */
+
+static void
+add_to_sp (rtx spreg, HOST_WIDE_INT value, int frame)
+{
+  if (value == 0)
+    return;
+
+  /* Choose whether to use a sequence using a temporary register, or
+     a sequence with multiple adds.  We can add a signed 7 bit value
+     in one instruction.  */
+  if (value > 120 || value < -124)
+    {
+      rtx tmpreg = gen_rtx_REG (SImode, REG_P1);
+      rtx insn;
+
+      insn = emit_move_insn (tmpreg, GEN_INT (value));
+      if (frame)
+	RTX_FRAME_RELATED_P (insn) = 1;
+      insn = emit_insn (gen_addsi3 (spreg, spreg, tmpreg));
+      if (frame)
+	RTX_FRAME_RELATED_P (insn) = 1;
+    }
+  else
+      do 
+	{
+	  int size = value;
+	  rtx insn;
+
+	  if (size > 60)
+	    size = 60;
+	  else if (size < -62)
+	    size = -62;
+
+	  insn = emit_insn (gen_addsi3 (spreg, spreg, GEN_INT (size)));
+	  if (frame)
+	    RTX_FRAME_RELATED_P (insn) = 1;
+	  value -= size;
+	}
+      while (value != 0);
+}
+
 /* Generate RTL for the prologue of the current function.  */
 
 void
@@ -666,13 +746,14 @@ bfin_expand_prologue (void)
     return;
   }
 
-  if (! frame_pointer_needed && ! TARGET_NON_GNU_PROFILE)
+  if (! must_save_fp_p ())
     {
       rtx pat = gen_movsi (gen_rtx_MEM (Pmode,
 					gen_rtx_PRE_DEC (Pmode, spreg)),
 			   bfin_rets_rtx);
       insn = emit_insn (pat);
       RTX_FRAME_RELATED_P (insn) = 1;
+      add_to_sp (spreg, -frame_size, 1);
     }
   else
     emit_link_insn (spreg, frame_size);
@@ -684,28 +765,14 @@ bfin_expand_prologue (void)
 
   expand_prologue_reg_save (spreg, 0);
 
-  if (current_function_outgoing_args_size) 
+  if (current_function_outgoing_args_size)
     {
       if (current_function_outgoing_args_size >= FIXED_STACK_AREA)
 	arg_size = current_function_outgoing_args_size;
       else
 	arg_size = FIXED_STACK_AREA;
 
-      do 
-	{
-	  int size;
-	  rtx insn;
-
-	  if (arg_size > SP_SIZE)
-	    size = SP_SIZE;
-	  else
-	    size = arg_size;
-
-	  insn = emit_insn (gen_addsi3 (spreg, spreg, GEN_INT (-size)));
-	  RTX_FRAME_RELATED_P (insn) = 1;
-	  arg_size -= size;
-	} 
-      while (arg_size > 0);
+      add_to_sp (spreg, -arg_size, 1);
     }
 }
 
@@ -714,7 +781,6 @@ bfin_expand_prologue (void)
 void
 bfin_expand_epilogue (void)
 {
-  HOST_WIDE_INT arg_size;
   rtx spreg = gen_rtx_REG (Pmode, REG_SP);
   e_funkind fkind = funkind (current_function_decl);
 
@@ -726,24 +792,13 @@ bfin_expand_epilogue (void)
 
   if (current_function_outgoing_args_size)
     {
+      HOST_WIDE_INT arg_size;
       if (current_function_outgoing_args_size >= FIXED_STACK_AREA)
 	arg_size = current_function_outgoing_args_size;
       else
 	arg_size = FIXED_STACK_AREA;
 
-      do
-	{
-	  int size;
-
-	  if (arg_size > SP_SIZE)
-	    size = SP_SIZE;
-	  else
-	    size = arg_size;
-
-	  emit_insn (gen_addsi3 (spreg, spreg, GEN_INT (size)));
-	  arg_size -= size;
-	}
-      while (arg_size > 0);        
+      add_to_sp (spreg, arg_size, 0);
     }
 
 
@@ -753,10 +808,19 @@ bfin_expand_epilogue (void)
     fprintf (file, "\tcall mcount_exit;\n");
 #endif
 
-  if (! frame_pointer_needed || TARGET_NON_GNU_PROFILE)
+  if (! frame_pointer_needed)
     {
-      rtx addr = gen_rtx_POST_INC (Pmode, spreg);
-      emit_move_insn (bfin_rets_rtx, gen_rtx_MEM (Pmode, addr));
+      rtx postinc = gen_rtx_MEM (Pmode, gen_rtx_POST_INC (Pmode, spreg));
+      HOST_WIDE_INT frame_size = get_frame_size ();
+      add_to_sp (spreg, frame_size, 0);
+      if (must_save_fp_p ())
+	{
+	  rtx fpreg = gen_rtx_REG (Pmode, REG_FP);
+	  emit_move_insn (fpreg, postinc);
+	  emit_insn (gen_rtx_USE (VOIDmode, fpreg));
+	}
+      emit_move_insn (bfin_rets_rtx, postinc);
+      emit_insn (gen_rtx_USE (VOIDmode, bfin_rets_rtx));
     }
   else
     emit_insn (gen_unlink ());
@@ -1628,7 +1692,9 @@ fp_plus_const_operand (rtx op, enum machine_mode mode)
     return 0;
   op1 = XEXP (op, 0);
   op2 = XEXP (op, 1);
-  return (REG_P (op1) && REGNO (op1) == FRAME_POINTER_REGNUM
+  return (REG_P (op1)
+	  && (REGNO (op1) == FRAME_POINTER_REGNUM
+	      || REGNO (op1) == STACK_POINTER_REGNUM)
 	  && GET_CODE (op2) == CONST_INT && ! imm7bit_operand_p (op2, mode));
 }
 

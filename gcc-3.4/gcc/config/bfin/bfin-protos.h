@@ -42,7 +42,8 @@ extern int bfin_address_cost  (rtx);
 extern void asm_output_ascii  (FILE *, const char *, int);
 extern int function_arg_partial_nregs (CUMULATIVE_ARGS *, Mmode, tree, int);
 extern void init_cumulative_args (CUMULATIVE_ARGS *, tree, rtx);	  
-extern int frame_pointer_required (void);
+extern int bfin_frame_pointer_required (void);
+extern HOST_WIDE_INT bfin_initial_elimination_offset (int, int);
 
 extern int effective_address_32bit_p (rtx, Mmode);
 extern int symbolic_operand_p (rtx, Mmode);
