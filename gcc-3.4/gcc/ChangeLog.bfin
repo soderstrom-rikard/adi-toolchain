@@ -40,6 +40,12 @@
 	* config/bfin/bfin-protos.h (asm_output_skip, asm_output_ascii):
 	Delete.
 
+	* config/bfin/crti.s: New file.
+	* config/bfin/crtn.s: New file.
+	* config/bfin/elf.h (STARTFILE_SPEC, ENDFILE_SPEC): Define.
+	* config/bfin/t-bfin-elf (EXTRA_PARTS): Add crtstuff.
+	($(T)crti.o, $(T)crtn.o): Add rules.
+
 2004-11-17  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (extendsidi2, zero_extendsidi2): Generate valid

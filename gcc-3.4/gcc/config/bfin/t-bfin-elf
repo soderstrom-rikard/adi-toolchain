@@ -30,6 +30,8 @@ LIB2FUNCS = _muldi3 _divdi3 _moddi3 _udivdi3 _umoddi3 _negdi2 \
     _bb _shtab _clear_cache _trampoline __main _exit \
     _ctors _pure \
 
+EXTRA_PARTS = crtbegin.o crtend.o crti.o crtn.o
+
 #cpp_install_dir=$(prefix)/bin
 #CROSS_INCLUDE_DIR=$(tooldir)/include
 #INSTALL_HEADERS=
@@ -58,3 +60,11 @@ fp-bit.c: $(srcdir)/config/fp-bit.c
 # it is fixed in binutils (if it is necessary).
 GCC_CFLAGS += -N
 
+# Assemble startup files.
+$(T)crti.o: $(srcdir)/config/bfin/crti.s $(GCC_PASSES)
+	$(GCC_FOR_TARGET) $(GCC_CFLAGS) $(MULTILIB_CFLAGS) $(INCLUDES) \
+	-c -o $(T)crti.o -x assembler-with-cpp $(srcdir)/config/bfin/crti.s
+
+$(T)crtn.o: $(srcdir)/config/bfin/crtn.s $(GCC_PASSES)
+	$(GCC_FOR_TARGET) $(GCC_CFLAGS) $(MULTILIB_CFLAGS) $(INCLUDES) \
+	-c -o $(T)crtn.o -x assembler-with-cpp $(srcdir)/config/bfin/crtn.s
