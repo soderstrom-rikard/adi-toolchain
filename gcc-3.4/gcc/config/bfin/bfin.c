@@ -75,11 +75,6 @@ int out_ind = 0;
 
 static int saved_dregs_no PARAMS ((void));
 static int saved_pregs_no PARAMS ((void));
-static HOST_WIDE_INT add_constant PARAMS ((rtx, enum machine_mode));
-static void dump_table PARAMS ((rtx));
-static int fixit PARAMS ((rtx, enum machine_mode mode));
-static rtx find_barrier PARAMS ((rtx));
-static int broken_move PARAMS ((rtx));
 
 static void bfin_function_prologue PARAMS ((FILE *, HOST_WIDE_INT));
 static void bfin_function_epilogue PARAMS ((FILE *, HOST_WIDE_INT));
@@ -102,11 +97,6 @@ bfin_globalize_label (FILE *stream, const char *name)
 
 #undef  TARGET_ADDRESS_COST
 #define TARGET_ADDRESS_COST bfin_address_cost
-
-/* The literal pool needs to reside in the text area due to the
-   limited PC addressing range: */
-#undef TARGET_MACHINE_DEPENDENT_REORG
-#define TARGET_MACHINE_DEPENDENT_REORG bfin_reorg
 
 #undef TARGET_ASM_INTERNAL_LABEL
 #define TARGET_ASM_INTERNAL_LABEL bfin_internal_label
@@ -754,11 +744,6 @@ int effective_address_32bit_p (rtx op, enum machine_mode mode)
     }
 }
 
-int nonmemory_or_sym_operand (rtx op, enum machine_mode mode) 
-{
-    return (nonmemory_operand (op, mode) 
-	|| (TARGET_MINI_CONST_POOL && GET_CODE (op) == SYMBOL_REF));
-}
 int symbolic_or_const_operand_p (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) 
 {
   switch (GET_CODE (op)) {
@@ -1018,29 +1003,10 @@ static int arg_regs[] = FUNCTION_ARG_REGISTERS;
 */
 
 void
-init_cumulative_args (CUMULATIVE_ARGS *cum,	/* Argument info to initialize */
-			     tree fntype,	/* tree ptr for function decl */
-			     rtx libname	/* SYMBOL_REF of library name or 0 */)
+init_cumulative_args (CUMULATIVE_ARGS *cum, tree fntype ATTRIBUTE_UNUSED,
+		      rtx libname ATTRIBUTE_UNUSED)
 {
   static CUMULATIVE_ARGS zero_cum;
-
-#if 0
-  tree param, next_param;
-#endif
-
-  if (TARGET_DEBUG_ARG)
-    {
-      fprintf (stderr, "\ninit_cumulative_args (");
-      if (fntype)
-	fprintf (stderr, "fntype code = %s, ret code = %s",
-		 tree_code_name[(int) TREE_CODE (fntype)],
-		 tree_code_name[(int) TREE_CODE (TREE_TYPE (fntype))]);
-      else
-	fprintf (stderr, "no fntype");
-
-      if (libname)
-	fprintf (stderr, ", libname = %s", XSTR (libname, 0));
-    }
 
   *cum = zero_cum;
 
@@ -1048,20 +1014,7 @@ init_cumulative_args (CUMULATIVE_ARGS *cum,	/* Argument info to initialize */
 
   cum->nregs = max_arg_registers;
   cum->arg_regs = arg_regs;
-#if 0
-  /* vdsp does not allow this ... compiler switch for using no of registers in params */
-  if (fntype)
-    {
-      tree attr = lookup_attribute ("regparm", TYPE_ATTRIBUTES (fntype));
 
-      if (attr)
-	cum->nregs = TREE_INT_CST_LOW (TREE_VALUE (TREE_VALUE (attr)));
-    }
-#endif
-
-
-  if (TARGET_DEBUG_ARG)
-    fprintf (stderr, ", nregs =%d )\n", cum->nregs);
 
   return;
 }
@@ -1071,20 +1024,13 @@ init_cumulative_args (CUMULATIVE_ARGS *cum,	/* Argument info to initialize */
    (TYPE is null for libcalls where that information may not be available.)  */
 
 void
-function_arg_advance (CUMULATIVE_ARGS *cum,		/* current arg information */
-			     enum machine_mode mode,	/* current arg mode */
-			     tree type,			/* type of the argument or 0 if lib support */
-			     int named			/* whether or not the argument was named */)
+function_arg_advance (CUMULATIVE_ARGS *cum, enum machine_mode mode, tree type,
+		      int named ATTRIBUTE_UNUSED)
 {
   int count, bytes, words;
 
   bytes = (mode == BLKmode) ? int_size_in_bytes (type) : GET_MODE_SIZE (mode);
   words = (bytes + UNITS_PER_WORD - 1) / UNITS_PER_WORD;
-
-  if (TARGET_DEBUG_ARG)
-    fprintf (stderr,
-	     "function_adv (sz=%d, wds=%2d, nregs=%d, mode=%s, named=%d)\n\n",
-	     words, cum->words, cum->nregs, GET_MODE_NAME (mode), named);
 
   cum->words += words;
   cum->nregs -= words;
@@ -1115,10 +1061,8 @@ function_arg_advance (CUMULATIVE_ARGS *cum,		/* current arg information */
     (otherwise it is an extra parameter matching an ellipsis).  */
 
 struct rtx_def *
-function_arg (CUMULATIVE_ARGS *cum,	/* current arg information */
-	     enum machine_mode mode,	/* current arg mode */
-	     tree type,			/* type of the argument or 0 if lib support */
-	     int named			/* != 0 for normal args, == 0 for ... args */)
+function_arg (CUMULATIVE_ARGS *cum, enum machine_mode mode, tree type,
+	      int named ATTRIBUTE_UNUSED)
 {
   rtx ret   = NULL_RTX;
   int bytes
@@ -1143,20 +1087,6 @@ function_arg (CUMULATIVE_ARGS *cum,	/* current arg information */
       if (cum->nregs)
 	ret = gen_rtx (REG, mode, *(cum->arg_regs));
       break;
-    }
-
-  if (TARGET_DEBUG_ARG)
-    {
-      fprintf (stderr,
-	       "function_arg (size=%d, wds=%2d, nregs=%d, mode=%4s, named=%d",
-	       words, cum->words, cum->nregs, GET_MODE_NAME (mode), named);
-
-      if (ret)
-	fprintf (stderr, ", reg =%%e%s", reg_names[ REGNO(ret) ]);
-      else
-	fprintf (stderr, ", stack");
-
-      fprintf (stderr, " )\n");
     }
 
   return ret;
@@ -1764,8 +1694,6 @@ override_options (void)
     directive_names[INIT_DIR] = (char *) "\t";
   }
   bfin_lvno = 0;
-  if (TARGET_MINI_CONST_POOL && TARGET_UNIT_CONST_POOL) 
-    target_flags ^= TARGET_UNIT_CONST_POOL;
 }
 
 
@@ -1967,361 +1895,6 @@ output_load_immediate (rtx *operands) {
      output_asm_insn ("%0 =%1;", operands);
      return "";
 }
-
-
-
-/***** Constant Pool Routines *****
- * The implementation is a modified version of sh.c/arm.c implementation
- */
-
-/* Symbolic addresses are put in constant pools. Constant pools are inserted
- * in function's code. Symbolic addresses are loaded from constant pools
- * with pc-relative loads. The max size of a literal pool is 1024 bytes.
- * A function can have several literal pools.
- * Branches around constant pool tables are inserted.
- * Code without literal pool:
- * 	l(P2) = _s; 	// load low half word
- *	h(P2) = _s;	// load high half word
- *	...................
- *      [P2] = R0;
- *
- * Code with literal pool:
- *	P2 = [PC+L$1];	// P2=[PC+offset];
- *	...................
- *	jump	L$10;     
- * 	.align	2;
- * L$0:	.dd	_a;
- * L$1:	.dd	_s;
- *	...................
- * L$10:
- *	...................
- * L$9: [P2] = R0;
- */
-
-typedef struct
-{
-  rtx value;                    /* Value in table */
-  HOST_WIDE_INT next_offset;
-  enum machine_mode mode;       /* Mode of value */
-} pool_node;
-
-/* The maximum number of constants that can fit into one pool, since
-   the pc relative range is 0...1020 bytes and constants are at least 4
-   bytes long */
- 
-#define PCREL_LD_RANGE 512
-#define MAX_POOL_SIZE (PCREL_LD_RANGE/4)
-static pool_node pool_vector[MAX_POOL_SIZE+1];
-static int pool_size;
-static rtx pool_vector_label;
-
-/* Add a constant to the pool and return its offset within the current pool.
-*/
-
-static HOST_WIDE_INT
-add_constant (x, mode)
-     rtx x;
-     enum machine_mode mode;
-{
-  int i;
-  HOST_WIDE_INT offset;
-
-  if (mode == SImode && GET_CODE (x) == MEM && CONSTANT_P (XEXP (x, 0))
-      && CONSTANT_POOL_ADDRESS_P (XEXP (x, 0)))
-    x = get_pool_constant (XEXP (x, 0));
-
-  /* First see if we've already got it */
- 
-  for (i = 0; i < pool_size; i++)
-    {
-      if (x->code == pool_vector[i].value->code
-          && mode == pool_vector[i].mode)
-        {
-          if (x->code == CODE_LABEL)
-            {
-              if (XINT (x, 3) != XINT (pool_vector[i].value, 3))
-                continue;
-            }
-          if (rtx_equal_p (x, pool_vector[i].value))
-            return pool_vector[i].next_offset - GET_MODE_SIZE (mode);
-        }
-    }
- 
-  /* Need a new one */
- 
-  pool_vector[pool_size].next_offset = GET_MODE_SIZE (mode);
-  offset = 0;
-  if (pool_size == 0)
-    pool_vector_label = gen_label_rtx ();
-  else
-    pool_vector[pool_size].next_offset 
-      += (offset = pool_vector[pool_size - 1].next_offset);
-
-  pool_vector[pool_size].value = x;
-  pool_vector[pool_size].mode = mode;
-  pool_size++;
-  return offset;
-}
-
-/* Output the literal table */
-static void
-dump_table (scan)
-     rtx scan;
-{
-  int i;
-
-  scan = emit_label_after (gen_label_rtx (), scan);
-  scan = emit_insn_after (gen_align_4 (), scan);
-  scan = emit_label_after (pool_vector_label, scan);
-
-  for (i = 0; i < pool_size; i++)
-    {
-      pool_node *p = pool_vector + i;
-
-      switch (GET_MODE_SIZE (p->mode))
-	{
-	case 4:
-	  scan = emit_insn_after (gen_consttable_4 (p->value), scan);
-	  break;
-
-	case 8:
-	  scan = emit_insn_after (gen_consttable_8 (p->value), scan);
-	  break;
-
-	default:
-	  abort ();
-	  break;
-	}
-    }
-
-  scan = emit_insn_after (gen_consttable_end (), scan);
-  scan = emit_barrier_after (scan);
-  pool_size = 0;
-}
-
-/* Non zero if the src operand needs to be fixed up */
-static int
-fixit (src, mode)
-     rtx src;
-     enum machine_mode mode;
-{
-    return (mode == SImode && GET_CODE (src) == MEM
-            && GET_CODE (XEXP (src, 0)) == SYMBOL_REF
-            && CONSTANT_POOL_ADDRESS_P (XEXP (src, 0)));
-}
-
-/* Find the last barrier less than MAX_COUNT bytes from FROM, or create one. */
- 
-/* For SImode: range is PCREL_LD_RANGE, 
- * subtract 2 for the jump instruction that we may need to emit
- * before the table. */
- 
-#define MAX_COUNT_SI (PCREL_LD_RANGE - 2)
- 
-static rtx
-find_barrier (from)
-     rtx from;
-{
-  int count = 0;
-  rtx found_barrier = 0;
-  rtx label;
-  rtx src;
- 
-  while (from && count < MAX_COUNT_SI)
-    {
-      if (GET_CODE (from) == BARRIER)
-        return from;
- 
-      /* Count the length of this insn */
-      if (GET_CODE (from) == INSN
-          && GET_CODE (PATTERN (from)) == SET
-          && CONSTANT_P (SET_SRC (PATTERN (from)))
-          && CONSTANT_POOL_ADDRESS_P (SET_SRC (PATTERN (from))))
-        {
-          src = SET_SRC (PATTERN (from));
-          count += 2;
-        }
-      else
-        count += get_attr_length (from);
- 
-      from = NEXT_INSN (from);
-    }
- 
-  /* We didn't find a barrier in time to
-     dump our stuff, so we'll make one */
-  label = gen_label_rtx ();
- 
-  if (from)
-    from = PREV_INSN (from);
-  else
-    from = get_last_insn ();
- 
-  /* Walk back to be just before any jump */
-  while (GET_CODE (from) == JUMP_INSN
-         || GET_CODE (from) == NOTE
-         || GET_CODE (from) == CODE_LABEL)
-    from = PREV_INSN (from);
- 
-  from = emit_jump_insn_after (gen_jump (label), from);
-  JUMP_LABEL (from) = label;
-  found_barrier = emit_barrier_after (from);
-  emit_label_after (label, found_barrier);
-  return found_barrier;
-}
- 
-/* Non zero if the insn is a move instruction which needs to be fixed. */
- 
-static int
-broken_move (insn)
-     rtx insn;
-{
-  if (!INSN_DELETED_P (insn)
-      && GET_CODE (insn) == INSN
-      && GET_CODE (PATTERN (insn)) == SET)
-    {
-      rtx pat = PATTERN (insn);
-      rtx src = SET_SRC (pat);
-      rtx dst = SET_DEST (pat);
-      enum machine_mode mode = GET_MODE (dst);
-      if (dst == pc_rtx)
-        return 0;
-      return fixit (src, mode);
-    }
-  return 0;
-}
-
-#ifdef DBX_DEBUGGING_INFO
-
-/* Recursively search through all of the blocks in a function
-   checking to see if any of the variables created in that
-   function match the RTX called 'orig'.  If they do then
-   replace them with the RTX called 'new'.  */
-
-static void
-replace_symbols_in_block (tree block, rtx orig, rtx new)
-{
-  for (; block; block = BLOCK_CHAIN (block))
-    {
-      tree sym;
-      
-      if (! TREE_USED (block))
-	continue;
-
-      for (sym = BLOCK_VARS (block); sym; sym = TREE_CHAIN (sym))
-	{
-	  if (  (DECL_NAME (sym) == 0 && TREE_CODE (sym) != TYPE_DECL)
-	      || DECL_IGNORED_P (sym)
-	      || TREE_CODE (sym) != VAR_DECL
-	      || DECL_EXTERNAL (sym)
-	      || ! rtx_equal_p (DECL_RTL (sym), orig)
-	      )
-	    continue;
-
-	  SET_DECL_RTL (sym, new);
-	}
-      
-      replace_symbols_in_block (BLOCK_SUBBLOCKS (block), orig, new);
-    }
-}
-#endif
-
- 
-void
-bfin_reorg (void)
-{
-  rtx insn;
-
-  if (!TARGET_MINI_CONST_POOL) return;
-
-  insn = get_insns ();
-  for (insn = next_nonnote_insn (insn); insn; insn = NEXT_INSN (insn))
-    {
-      if (broken_move (insn))
-        {
-          /* This is a broken move instruction, scan ahead looking for
-             a barrier to stick the constant table behind */
-          rtx scan;
-          rtx barrier = find_barrier (insn);
- 
-          /* Now find all the moves between the points and modify them */
-          for (scan = insn; scan != barrier; scan = NEXT_INSN (scan))
-            {
-              if (broken_move (scan))
-                {
-                  /* This is a broken move instruction, add it to the pool */
-                  rtx pat = PATTERN (scan);
-                  rtx src = SET_SRC (pat);
-                  rtx dst = SET_DEST (pat);
-                  enum machine_mode mode = GET_MODE (dst);
-                  HOST_WIDE_INT offset;
-                  rtx newinsn;
-                  rtx newsrc;
- 
-                  /* If this is an HImode constant load, convert it into
-                     an SImode constant load.  Since the register is always
-                     32 bits this is safe.  We have to do this, since the
-                     load pc-relative instruction only does a 32-bit load. */
-                  if (mode == HImode)
-                    {
-                      mode = SImode;
-                      if (GET_CODE (dst) != REG)
-                        abort ();
-                      PUT_MODE (dst, SImode);
-                    }
- 
-                  offset = add_constant (src, mode);
-                  newsrc = gen_rtx (MEM, mode,
-                                    plus_constant (gen_rtx (LABEL_REF,
-                                                            VOIDmode,
-                                                            pool_vector_label),
-                                                   offset));
- 
-                  /* Build a jump insn wrapper around the move instead
-                     of an ordinary insn, because we want to have room for
-                     the target label rtx in fld[7], which an ordinary
-                     insn doesn't have. */
-                  newinsn = emit_jump_insn_after (gen_rtx (SET, VOIDmode,
-                                                           dst, newsrc), scan);
-                  JUMP_LABEL (newinsn) = pool_vector_label;
- 
-                  /* But it's still an ordinary insn */
-                  PUT_CODE (newinsn, INSN);
- 
-#ifdef DBX_DEBUGGING_INFO
-                  /* If debugging information is going to be emitted then we must
-                     make sure that any refences to symbols which are removed by
-                     the above code are also removed in the descriptions of the
-                     function's variables.  Failure to do this means that the
-                     debugging information emitted could refer to symbols which
-                     are not emited by output_constant_pool() because
-                     mark_constant_pool() never sees them as being used.  */
- 
-                  if (optimize > 0                                /* These are the tests us
-ed in output_constant_pool() */
-                      && flag_expensive_optimizations             /*  to decide if the cons
-tant pool will be marked.  */
-                      && write_symbols == DBX_DEBUG               /* Only necessary if debu
-gging info is being emitted.  */
-                      && GET_CODE (src) == MEM                    /* Only necessary for ref
-erences to memory ... */
-                      && GET_CODE (XEXP (src, 0)) == SYMBOL_REF)  /*  ... whose address is
-given by a symbol.  */
-                    {
-                      replace_symbols_in_block (DECL_INITIAL (current_function_decl), src,
-newsrc);
-                    }
-#endif
- 
-                  /* Kill old insn */
-                  delete_insn (scan);
-                  scan = newinsn;
-                }
-            }
-          dump_table (barrier);
-        }
-    }
-}
-
 
 int
 bfin_return_in_memory (tree type)

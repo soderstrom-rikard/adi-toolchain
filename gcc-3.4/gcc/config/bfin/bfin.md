@@ -1248,7 +1248,7 @@ else
   "")
 
 (define_insn ""
-  [(call (mem:SI (match_operand:SI 0 "nonmemory_or_sym_operand" "a,i"))
+  [(call (mem:SI (match_operand:SI 0 "nonmemory_operand" "a,i"))
 	 (match_operand 1 "general_operand" "g,g"))]
   "GET_CODE (operands[0]) == SYMBOL_REF || GET_CODE (operands[0]) == REG"
   "@
@@ -1258,7 +1258,7 @@ else
 
 (define_insn ""
   [(set (match_operand 0 "register_operand" "=d,d")
-         (call (mem:SI (match_operand:SI 1 "nonmemory_or_sym_operand" "a,i"))
+         (call (mem:SI (match_operand:SI 1 "nonmemory_operand" "a,i"))
 	       (match_operand 2 "general_operand" "g,g")))]
   "GET_CODE (operands[0]) == SYMBOL_REF || GET_CODE (operands[0]) == REG"
   "@
@@ -1777,87 +1777,6 @@ else
    && REGNO (operands[1]) == REGNO (operands[4]))"
   "%1 +=%2;\\n\\t%0 = %3 (X); /* peep-4a */"
 )
-
-;; Special patterns for dealing with the constant pool
-
-(define_insn "consttable_4"
-[(unspec_volatile [(match_operand 0 "" "")] 2)]
-"TARGET_MINI_CONST_POOL"
-"*
-{
-enum machine_mode mode;
-REAL_VALUE_TYPE r;
-unsigned int align;
-
-mode = GET_MODE (operands[0]);
-
-/* Align the location counter as required by EXP's data type.  */
-align = GET_MODE_ALIGNMENT (mode == VOIDmode ? word_mode : mode);
-
-switch (GET_MODE_CLASS (mode))
-{
-case MODE_FLOAT:
-{
-memcpy ((char *) &CONST_DOUBLE_LOW (operands[0]), (char *) &r, sizeof r);
-assemble_real (r, mode, align);
-break;
-}
-default:
-assemble_integer (operands[0], 4, align, 1);
-break;
-}
-return \"\";
-}"
-[(set_attr "length" "4")])
-
-
-(define_insn "consttable_8"
-[(unspec_volatile [(match_operand 0 "" "")] 3)]
-"TARGET_MINI_CONST_POOL"
-"*
-{
-enum machine_mode mode;
-REAL_VALUE_TYPE r;
-unsigned int align;
-
-mode = GET_MODE (operands[0]);
-
-  /* Align the location counter as required by EXP's data type.  */
-  align = GET_MODE_ALIGNMENT (mode == VOIDmode ? word_mode : mode);
-
-switch (GET_MODE_CLASS (mode))
-{
-case MODE_FLOAT:
-{
-memcpy ((char *) &CONST_DOUBLE_LOW (operands[0]), (char *) &r, sizeof r);
-assemble_real (r, mode, align);
-break;
-}
-default:
-assemble_integer (operands[0], 8, align, 1);
-break;
-}
-return \"\";
-}"
-[(set_attr "length" "8")])
-
-(define_insn "consttable_end"
-[(unspec_volatile [(const_int 0)] 4)]
-"TARGET_MINI_CONST_POOL"
-"*
-/* Nothing to do (currently).  */
-return \"\";
-")
-
-(define_insn "align_4"
-[(unspec_volatile [(const_int 0)] 5)]
-"TARGET_MINI_CONST_POOL"
-"*
-assemble_align (32);
-return \"\";
-")
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -9,6 +9,35 @@
 	destination predicate.
 	(movbi, zero_extendbisi2): New patterns.
 
+	* config/bfin/bfin.c (struct pool_node, pool_vector, pool_vector_label,
+	pool_size): Delete.
+	(TARGET_MACHINE_DEPENDENT_REORG, PCREL_LD_RANGE, MAX_POOL_SIZE,
+	MAX_COUNT_SI): Delete macros.
+	(add_constant, dump_table, fixit, find_barrier, broken_move,
+	replace_symbols_in_block, bfin_reorg): Delete functions.
+	(init_cumulative_args): Delete TARGET_DEBUG_ARG and attribute regparm
+	code.
+	(function_arg_advance, function_arg): Likewise.
+	(override_options): Delete minipool code.
+	(nonmemory_or_sym_opernd): Delete.  All callers changed to use
+	nonmemory_operand.
+	* config/bfin/bfin-protos.h (bfin_reorg): Don't declare.
+	(nonmemory_or_sym_operand): Likewise.
+	* config/bfin/bfin.h (MASK_REG_ARGS, MASK_OPT_PROLOGUE,
+	MASK_MINI_CONST_POOL, MASK_UNIT_CONST_POOL, MASK_NEW_PROLOGUE,
+	TARGET_MINI_CONST_POOL, TARGET_UNIT_CONST_POOL, TARGET_CONST_POOL,
+	TARGET_NEW_PROLOGUE, TARGET_REGPARM, TARGET_DEBUG_ARG,
+	TARGET_OPT_PROLOGUE): Delete macros.
+	(TARGET_SWITCHES): Delete corresponding arguments.
+	(BFIN_POOL_ADDRESS): Delete.
+	(GO_IF_LEGITIMATE_ADDRESS): Remove TARGET_MINI_CONST_POOL code.
+	(MAX_REGS_PER_ADDRESS): Only 1 on the bfin.
+	(LEGITIMATE_CONSTANT_P): Define as 1.
+	(CONSTANT_ADDRESS_P): Just use CONSTANT_P.
+	(PREDICATE_CODES): Remove nonmemory_or_sym_operand.
+	* config/bfin/bfin.md (consttable_4, consttable_8, consttable_end,
+	align_4): Delete patterns.
+	
 2004-10-14  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (STRUCTURE_SIZE_BOUNDARY): Delete macro.

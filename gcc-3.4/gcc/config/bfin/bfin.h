@@ -55,17 +55,10 @@
   The following set of defines, describe the commandline api.
 */
 #define MASK_OMIT_LEAF_FRAME_POINTER 0x00000800 /* omit leaf frame pointers */
-#define MASK_REG_ARGS                0x00001000 /* pass arguments in registers */
-#define MASK_DEBUG_ARGS              0x00002000 /* debug argument passing */
-/*#define MASK_OPT_PROLOGUE          0x00010000*/
 #define MASK_SIMPLE_RTM              0x00020000
 #define MASK_LOW_64K           	     0x00040000
-#define MASK_NEW_PROLOGUE            0x00080000
 #define MASK_ASM_DIR                 0x00100000 /* use alternative assembly ectives */
 #define MASK_CMOV	             0x00200000 /* use conditional moves */
-#define MASK_MINI_CONST_POOL	             0x00400000 /* one const pool per function */
-#define MASK_UNIT_CONST_POOL         0x00800000 /* one const pool per 
-						 * compilation unit */
 #define MASK_PROFILE		     0x01000000 /* Instrument for NON GNU
 						 * profiling */
 #define MASK_NO_UNDERSCORE	     0x02000000 /* lacal label without underscore */
@@ -99,12 +92,9 @@ extern int target_flags;
 
 /* Don't create frame pointers for leaf functions */
 #define TARGET_OMIT_LEAF_FRAME_POINTER (target_flags & MASK_OMIT_LEAF_FRAME_POINTER)
-#define TARGET_REGPARM                 (target_flags & MASK_REG_ARGS) /* never use */
 #define TARGET_DEBUG_ARG	       (target_flags & MASK_DEBUG_ARGS)
-#define TARGET_OPT_PROLOGUE            (target_flags & MASK_OPT_PROLOGUE)
 #define TARGET_SIMPLE_RTM              (target_flags & MASK_SIMPLE_RTM)
 #define TARGET_LOW_64K                 (target_flags & MASK_LOW_64K)
-#define TARGET_NEW_PROLOGUE            (target_flags & MASK_NEW_PROLOGUE)
 #define TARGET_ASM_DIR		       (target_flags & MASK_ASM_DIR)
 #define TARGET_NO_UNDERSCORE	       (target_flags & MASK_NO_UNDERSCORE)
 
@@ -114,10 +104,7 @@ extern int target_flags;
 #define TARGET_DSP			(1)
 /* #define TARGET_MOVSICC		(target_flags & MASK_CMOV) */
 #define TARGET_MOVSICC			(1)
-#define TARGET_MINI_CONST_POOL		(target_flags & MASK_MINI_CONST_POOL)
-#define TARGET_UNIT_CONST_POOL		(target_flags & MASK_UNIT_CONST_POOL)
-#define TARGET_CONST_POOL		(TARGET_MINI_CONST_POOL 	\
-					|| TARGET_UNIT_CONST_POOL)
+
 /* Non-gprof profiler	*/
 #define TARGET_NON_GNU_PROFILE		(target_flags & MASK_PROFILE)
 
@@ -126,18 +113,6 @@ extern int target_flags;
     "Omit Frame Pointer for leaf functions" }, 				\
   { "no-omit-leaf-frame-pointer",-MASK_OMIT_LEAF_FRAME_POINTER,		\
     "Use Frame Pointer for leaf functions"},       			\
-  { "reg-args",			  MASK_REG_ARGS,			\
-    "Arguments are passed in registers (default)" }, 			\
-  { "no-reg-args",		 -MASK_REG_ARGS,			\
-    "Arguments are passed on stack" }, 			      		\
-  { "debug-reg-args",		  MASK_DEBUG_ARGS,                      \
-    "Debug info for register arguments" }, 				\
-  { "no-debug-reg-args",	 -MASK_DEBUG_ARGS,			\
-    "No debug info for register arguments" }, 		      		\
-  { "nprologue",	          MASK_NEW_PROLOGUE,			\
-    "Prologue with LINK/UNLNK and PUSHM/POPM" },			\
-  { "no-nprologue",	         -MASK_NEW_PROLOGUE ,			\
-    "Prologue with individual PUSH/POP"},				\
   { "simple-rtm",	          MASK_SIMPLE_RTM,			\
     "Use a subset of C run-time library" },				\
   { "no-simple-rtm",	         -MASK_SIMPLE_RTM,			\
@@ -154,26 +129,14 @@ extern int target_flags;
     "Use conditional moves"},						\
   { "no-cmov",			-MASK_CMOV,				\
     "Do not generate conditional moves"},				\
-  { "pool",		         MASK_MINI_CONST_POOL,			\
-    "Use one constant pool per function"},				\
-  { "no-pool",			-MASK_MINI_CONST_POOL,			\
-    "Do not use function constant pools"},				\
-  { "mini-pool",	         MASK_MINI_CONST_POOL,			\
-    "Use one constant pool per function"},				\
-  { "no-mini-pool",		-MASK_MINI_CONST_POOL,			\
-    "Do not use function constant pools"},				\
-  { "unit-pool",		 MASK_UNIT_CONST_POOL,			\
-    "Use one constant pool per compilation unit"},			\
-  { "no-unit-pool",		-MASK_UNIT_CONST_POOL,			\
-    "Do not use compilation unit constant pools"},			\
   { "profile",		         MASK_PROFILE,				\
     "Non GNU Profiling"},						\
   { "no-profile",		-MASK_PROFILE,				\
     "NO Non GNU profiling"},						\
   { "no-underscore",		MASK_NO_UNDERSCORE,			\
     "No underscore fro local label definition"},			\
-  { "", MASK_REG_ARGS | MASK_NEW_PROLOGUE  | MASK_CMOV,			\
-    "default: reg-args, new-prologue"}}
+  { "", MASK_CMOV,							\
+    "default: cmov"}}
 
 /* Sometimes certain combinations of command options do not make
    sense on a particular target machine.  You can define a macro
@@ -715,39 +678,21 @@ typedef struct {
 
 /* Addressing Modes */
 
-/* Recognize any constant value that is a valid address. If a constant
- * address is in a register, updating this register to get memory address
- * is not needed. 
- */
-#define BFIN_POOL_ADDRESS_P(x)				\
-    (TARGET_MINI_CONST_POOL && (GET_CODE (x) == SYMBOL_REF	\
-	&& CONSTANT_POOL_ADDRESS_P (x)))
-
-#ifdef TARGET_HAS_SYMBOLIC_ADDRESSES
-#define CONSTANT_ADDRESS_P(x) CONSTANT_P (x)
-#else
-#define CONSTANT_ADDRESS_P(x)                    		\
-    (GET_CODE (x) == CONST || (GET_CODE (x) == CONST_INT	\
-	&& CONST_16BIT_IMM_P(INTVAL (x)))			\
-    || BFIN_POOL_ADDRESS_P (x))
-#endif
+/* Recognize any constant value that is a valid address.  */
+#define CONSTANT_ADDRESS_P(X)	(CONSTANT_P (X))
 
 /* Nonzero if the constant value X is a legitimate general operand.
    symbol_ref are not legitimate and will be put into constant pool.
    See force_const_mem().
    If -mno-pool, all constants are legitimate.
  */
-#define LEGITIMATE_CONSTANT_P(x)				\
-    (!TARGET_MINI_CONST_POOL						\
-	|| GET_CODE (x) == CONST_INT || GET_CODE (x) == CONST	\
-	|| GET_CODE (x) == CONST_DOUBLE 			\
-	|| BFIN_POOL_ADDRESS_P (x))
+#define LEGITIMATE_CONSTANT_P(x) 1
 
 /*   A number, the maximum number of registers that can appear in a
      valid memory address.  Note that it is up to you to specify a
      value equal to the maximum number that `GO_IF_LEGITIMATE_ADDRESS'
      would ever accept. */
-#define MAX_REGS_PER_ADDRESS 2
+#define MAX_REGS_PER_ADDRESS 1
 
 /* GO_IF_LEGITIMATE_ADDRESS recognizes an RTL expression
    that is a valid memory address for an instruction.
@@ -769,19 +714,6 @@ W [ Preg + uimm16m2 ]
 */
 
 #define GO_IF_LEGITIMATE_ADDRESS(MODE, X, WIN) do {            \
-/* This is PC relative data before MACHINE_DEPENDENT_REORG runs.*/ \
-  if (GET_MODE_SIZE (MODE) >= 4 && TARGET_MINI_CONST_POOL && CONSTANT_P (X) \
-    && CONSTANT_POOL_ADDRESS_P (X))				\
-    goto WIN;							\
-  /* This is PC relative data after MACHINE_DEPENDENT_REORG runs.*/ \
-  else if (TARGET_MINI_CONST_POOL && GET_MODE_SIZE (MODE) >= 4	\
-    && reload_completed						\
-    && (GET_CODE (X) == LABEL_REF				\
-       || (GET_CODE (X) == CONST				\
-           && GET_CODE (XEXP (X, 0)) == PLUS			\
-           && GET_CODE (XEXP (XEXP (X, 0), 0)) == LABEL_REF	\
-           && GET_CODE (XEXP (XEXP (X, 0), 1)) == CONST_INT)))	\
-    goto WIN;							\
   switch (GET_CODE (X)) {			 	       \
   case REG:						       \
     if (REGNO_OK_FOR_BASE_P (REGNO (X)))		       \
@@ -1038,8 +970,6 @@ do {                                              \
   {"reg_or_7bit_operand", {CONST_INT, REG}},				\
   {"regorbitclr_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},        	\
   {"regorlog2_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},          	\
-  {"nonmemory_or_sym_operand", {CONST_INT, CONST_DOUBLE, CONST,		\
-			 SYMBOL_REF, LABEL_REF, SUBREG, REG, ADDRESSOF}},
 
 /* Describing Relative Costs of Operations */
 

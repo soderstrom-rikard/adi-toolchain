@@ -62,7 +62,6 @@ extern int pos_scale_operand PARAMS ((rtx, Mmode));
 extern int regorbitclr_operand PARAMS ((rtx, Mmode));
 extern int regorlog2_operand PARAMS ((rtx, Mmode));
 extern int cc_operand PARAMS ((rtx, Mmode));
-extern int nonmemory_or_sym_operand PARAMS ((rtx, Mmode));
 extern int symbolic_reference_mentioned_p PARAMS ((rtx));
 	
 extern void conditional_register_usage PARAMS ((void));
@@ -71,7 +70,6 @@ extern enum reg_class secondary_input_reload_class PARAMS ((enum reg_class , Mmo
 extern enum reg_class secondary_output_reload_class PARAMS ((enum reg_class , Mmode, rtx));
 extern char *section_asm_op_1 PARAMS ((SECT_ENUM_T));
 extern char *section_asm_op PARAMS ((SECT_ENUM_T));
-extern void bfin_reorg PARAMS ((void));
 extern void output_file_start PARAMS ((void));
 extern void override_options PARAMS ((void));
 extern void asm_output_skip PARAMS ((FILE *, int));
