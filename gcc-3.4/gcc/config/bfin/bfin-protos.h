@@ -71,7 +71,7 @@ extern enum reg_class secondary_input_reload_class PARAMS ((enum reg_class , Mmo
 extern enum reg_class secondary_output_reload_class PARAMS ((enum reg_class , Mmode, rtx));
 extern char *section_asm_op_1 PARAMS ((SECT_ENUM_T));
 extern char *section_asm_op PARAMS ((SECT_ENUM_T));
-extern void bfin_reorg PARAMS ((rtx));
+extern void bfin_reorg PARAMS ((void));
 extern void output_file_start PARAMS ((void));
 extern void override_options PARAMS ((void));
 extern void asm_output_skip PARAMS ((FILE *, int));
@@ -82,7 +82,6 @@ extern int save_area_size PARAMS ((void));
 extern int new_save_instr PARAMS ((void)); 
 extern rtx legitimize_pic_address PARAMS ((rtx, rtx));
 extern void emit_pic_move PARAMS ((rtx *, Mmode));
-extern void bfin_reorg PARAMS ((rtx));
 extern int register_move_cost PARAMS ((enum reg_class, enum reg_class));
 extern enum reg_class secondary_input_reload_class PARAMS ((enum reg_class, Mmode, rtx));
 extern enum reg_class secondary_output_reload_class PARAMS ((enum reg_class, Mmode, rtx));
@@ -105,6 +104,11 @@ extern int bfin_return_in_memory PARAMS ((tree));
 extern void bfin_internal_label PARAMS ((FILE *, const char *, unsigned long));
 extern bool bfin_rtx_costs PARAMS ((rtx, int, int, int*));
 extern void initialize_trampoline PARAMS ((rtx, rtx, rtx));
+extern int  bfin_valid_add PARAMS ((const enum machine_mode, const int));
+extern void setup_incoming_varargs PARAMS ((CUMULATIVE_ARGS *, enum machine_mode, tree , int *, int));
+extern int  symbolic_or_const_operand_p PARAMS ((rtx , enum machine_mode));
+extern int  reg_or_16bit_operand PARAMS ((rtx, enum machine_mode));
+extern rtx  bfin_force_reg PARAMS ((enum machine_mode, rtx));
 #undef  Mmode 
 
 #endif /* ! GCC_V850_PROTOS_H */

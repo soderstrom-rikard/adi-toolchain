@@ -199,9 +199,9 @@ extern const char * directive_names[];
 
 #define TARGET_OPTIONS {\
 	{ "text=", (const char **)&section_names[CODE_DIR].sect_name, 	\
-	  "Name of text section" },			\
+	  N_("Name of text section"), 0 },			\
 	{ "data=", (const char **)&section_names[DATA_DIR].sect_name,	\
-	  "Name of data section"} }
+	  N_("Name of data section"), 0} }
 
 #define FUNCTION_MODE    SImode
 #define Pmode            SImode
@@ -534,22 +534,22 @@ enum reg_class
 
 #define REG_CLASS_CONTENTS \
     /* 31 - 0       63-32   */ \
-{    0x00000000,    0,		/* NO_REGS */ \
-     0x000000ff,    0,		/* DREGS */   \
-     0x00000055,    0,		/* DREGS_PAIR */   \
-     0x0000ff00,    0,		/* PREGS */   \
-     0x0000ffff,    0,		/* DPREGS */   \
-     0x02490000,    0,		/* IREGS */   \
-     0x04920000,    0,		/* BREGS */   \
-     0x09240000,    0,		/* LREGS */   \
-     0x0fff0000,    0,		/* CIRCREGS */   \
-     0xf0000000,    0,		/* MREGS */   \
-     0xffff0000,    0,		/* DAGREGS */   \
-     0x00000000,    0x3,	/* AREGS */   \
-     0x00000000,    0x4,        /* CCREGS */  \
-     0xffffffff,    0x0,	/* MOST_REGS */\
-     0xffffffff,    0x7,	/* ALL_REGS */\
-     /*0xffffffff,    0x3, */	}
+{   { 0x00000000,    0 },		/* NO_REGS */ \
+    { 0x000000ff,    0 },		/* DREGS */   \
+    { 0x00000055,    0 },		/* DREGS_PAIR */   \
+    { 0x0000ff00,    0 },		/* PREGS */   \
+    { 0x0000ffff,    0 },		/* DPREGS */   \
+    { 0x02490000,    0 },		/* IREGS */   \
+    { 0x04920000,    0 },		/* BREGS */   \
+    { 0x09240000,    0 },		/* LREGS */   \
+    { 0x0fff0000,    0 },		/* CIRCREGS */   \
+    { 0xf0000000,    0 },		/* MREGS */   \
+    { 0xffff0000,    0 },		/* DAGREGS */   \
+    { 0x00000000,    0x3 },	/* AREGS */   \
+    { 0x00000000,    0x4 },        /* CCREGS */  \
+    { 0xffffffff,    0x0 },	/* MOST_REGS */\
+    { 0xffffffff,    0x7 }	/* ALL_REGS */\
+     /*{ 0xffffffff,    0x3 }, */	}
 
 #define BASE_REG_CLASS          PREGS
 #define INDEX_REG_CLASS         PREGS
@@ -1325,15 +1325,15 @@ do { char __buf[256];					\
 #define ASM_OUTPUT_LOCAL(FILE, NAME, SIZE, ROUNDED) 	\
 do { 						\
     data_section();				\
-    if ((SIZE) >= 4 ) ASM_OUTPUT_ALIGN(FILE,2);	\
+    if ((SIZE) >= (unsigned int) 4 ) ASM_OUTPUT_ALIGN(FILE,2);	\
     if (!TARGET_ASM_DIR) {			\
 	ASM_OUTPUT_LABEL (FILE, NAME); 		\
-	fprintf (FILE, "%s %d;\n", ASM_SPACE, 	\
-		(ROUNDED) > 1 ? (ROUNDED) : 1); \
+	fprintf (FILE, "%s %ld;\n", ASM_SPACE, 	\
+		(ROUNDED) > (unsigned int) 1 ? (ROUNDED) : 1); \
     } else {					\
 	char __buf[256];			\
 	fprintf (FILE, "%s ", ASM_SPACE); 	\
-	sprintf (__buf, "%s[%d]", (NAME), (ROUNDED) > 1 ? (ROUNDED) : 1);\
+	sprintf (__buf, "%s[%ld]", (NAME), (ROUNDED) > (unsigned int) 1 ? (ROUNDED) : 1);\
         assemble_name (FILE, __buf);            \
         fputc (';', FILE);                    	\
         fputc ('\n', FILE);                    	\

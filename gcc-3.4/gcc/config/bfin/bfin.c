@@ -86,6 +86,8 @@ static void bfin_function_epilogue PARAMS ((FILE *, HOST_WIDE_INT));
 void bfin_globalize_label PARAMS ((FILE *, const char *));
 void output_file_start PARAMS ((void));
 
+extern int fputs_unlocked (const char *, FILE *);
+
 void
 bfin_globalize_label (FILE *stream, const char *name)
 {
@@ -109,7 +111,54 @@ bfin_globalize_label (FILE *stream, const char *name)
 #undef TARGET_ASM_INTERNAL_LABEL
 #define TARGET_ASM_INTERNAL_LABEL bfin_internal_label
 
-struct gcc_target targetm = TARGET_INITIALIZER;
+struct gcc_target targetm = /*TARGET_INITIALIZER;*/
+
+{                                               
+  TARGET_ASM_OUT,                               
+  TARGET_SCHED,                                 
+  TARGET_MERGE_DECL_ATTRIBUTES,                 
+  TARGET_MERGE_TYPE_ATTRIBUTES,                 
+  TARGET_ATTRIBUTE_TABLE,                       
+  TARGET_COMP_TYPE_ATTRIBUTES,                  
+  TARGET_SET_DEFAULT_TYPE_ATTRIBUTES,           
+  TARGET_INSERT_ATTRIBUTES,                     
+  TARGET_FUNCTION_ATTRIBUTE_INLINABLE_P,        
+  TARGET_MS_BITFIELD_LAYOUT_P,                  
+  TARGET_INIT_BUILTINS,                         
+  TARGET_EXPAND_BUILTIN,                        
+  TARGET_INIT_LIBFUNCS,                         
+  TARGET_SECTION_TYPE_FLAGS,                    
+  TARGET_CANNOT_MODIFY_JUMPS_P,                 
+  TARGET_BRANCH_TARGET_REGISTER_CLASS,          
+  TARGET_BRANCH_TARGET_REGISTER_CALLEE_SAVED,   
+  TARGET_CANNOT_FORCE_CONST_MEM,                
+  TARGET_CANNOT_COPY_INSN_P,                    
+  TARGET_DELEGITIMIZE_ADDRESS,                  
+  TARGET_FUNCTION_OK_FOR_SIBCALL,               
+  TARGET_IN_SMALL_DATA_P,                       
+  TARGET_BINDS_LOCAL_P,                         
+  TARGET_ENCODE_SECTION_INFO,                   
+  TARGET_STRIP_NAME_ENCODING,                   
+  TARGET_VALID_POINTER_MODE,                    
+  TARGET_VECTOR_OPAQUE_P,                       
+  TARGET_RTX_COSTS,                             
+  TARGET_ADDRESS_COST,                          
+  TARGET_DWARF_REGISTER_SPAN,                   
+  TARGET_FIXED_CONDITION_CODE_REGS,             
+  TARGET_CC_MODES_COMPATIBLE,                   
+  TARGET_MACHINE_DEPENDENT_REORG,               
+  TARGET_BUILD_BUILTIN_VA_LIST,                 
+  TARGET_GET_PCH_VALIDITY,                      
+  TARGET_PCH_VALID_P,                           
+  TARGET_CALLS,                                 
+  TARGET_HAVE_NAMED_SECTIONS,                   
+  TARGET_HAVE_CTORS_DTORS,                      
+  TARGET_HAVE_TLS,                              
+  TARGET_HAVE_SRODATA_SECTION,                  
+  TARGET_TERMINATE_DW2_EH_FRAME_INFO,           
+  TARGET_ASM_FILE_START_APP_OFF,                
+  TARGET_ASM_FILE_START_FILE_DIRECTIVE,         
+};
 
 void 
 output_file_start (void) 
@@ -188,7 +237,8 @@ char *section_asm_op_1 (SECT_ENUM_T dir) {
     const char *name = section_names[dir].sect_name ? 
 			section_names[dir].sect_name :
 			input_filename;
-    char *s, *cp, *sectnm;
+    const char *cp;
+    char *s, *sectnm;
     int len, c;
 
     c = DIR_DEL;
@@ -417,26 +467,23 @@ int frame_pointer_required (void)
                                                                                                                              
 void
 setup_incoming_varargs (CUMULATIVE_ARGS *cum,
-			     enum machine_mode mode,
-			     tree type,
+			     enum machine_mode mode ATTRIBUTE_UNUSED,
+			     tree type ATTRIBUTE_UNUSED,
 			     int *pretend_size,
 			     int no_rtl)
 {
-  CUMULATIVE_ARGS next_cum;
-  int reg_size =  4;
   rtx save_area = NULL_RTX, mem;
-  tree fntype;
-  int stdarg_p, i;
+  int i;
 
   if(no_rtl)
     return;
 
   save_area = frame_pointer_rtx;
-  // gcc will generate the move rtx for us automatically for named arguments
-  // we need to generate the move rtx for the unnamed arguments if they
-  // are in the first 3 words. We assume atleast 1 named argument exists
-  // so we never generate [FP+8] = R0 here
-  // cum->words will 
+  /* gcc will generate the move rtx for us automatically for named arguments
+   we need to generate the move rtx for the unnamed arguments if they
+   are in the first 3 words. We assume atleast 1 named argument exists
+   so we never generate [FP+8] = R0 here
+   cum->words will */
 
   for (i = cum->words + 1; i < max_arg_registers; i++) {
  	
@@ -565,7 +612,7 @@ bfin_function_prologue (FILE *file, HOST_WIDE_INT framesize)
         else {
             /* use 32-bit instruction */
                 if (CONST_18UBIT_IMM_P(framesize))
-                  fprintf (file, "\tLINK %d;\n", framesize);
+                  fprintf (file, "\tLINK %ld;\n", framesize);
                 else {
                     rtx operands1[2];
                     fprintf (file, "\tLINK 0;\n");
@@ -629,7 +676,7 @@ bfin_function_prologue (FILE *file, HOST_WIDE_INT framesize)
 	fprintf (file, "\tsave r7:%d, p5:%d;\n", ndregs, npregs);
     }
     if (framesize != 0) 
-      fprintf (file, "\tSP += %d;\n", -framesize);
+      fprintf (file, "\tSP += %ld;\n", -framesize);
   }
 
   if (current_function_outgoing_args_size) {
@@ -715,7 +762,7 @@ bfin_function_epilogue (FILE *file, HOST_WIDE_INT framesize)
           fprintf (file, "\trestore  r7:%d,  p5:%d;\n", ndregs, npregs);
       }
       if (framesize != 0)
-        fprintf (file, "\tSP += %d;\n", framesize);
+        fprintf (file, "\tSP += %ld;\n", framesize);
     }
   if (TARGET_NEW_PROLOGUE)
     if (TARGET_NON_GNU_PROFILE)	{
@@ -1039,6 +1086,7 @@ int extract_const_double (rtx x)
   } 
   else 
     output_operand_lossage ("unsupported mode DI");
+  return 0;
 }
 	
 
@@ -1055,6 +1103,7 @@ signed_comparison_operator (rtx op, enum machine_mode mode)
     default:
       return comparison_operator (op, mode);
     }
+    return 0;
 }
 
 /* Argument support functions.  */
@@ -1076,7 +1125,9 @@ init_cumulative_args (CUMULATIVE_ARGS *cum,	/* Argument info to initialize */
 {
   static CUMULATIVE_ARGS zero_cum;
 
+#if 0
   tree param, next_param;
+#endif
 
   if (TARGET_DEBUG_ARG)
     {
@@ -1099,7 +1150,7 @@ init_cumulative_args (CUMULATIVE_ARGS *cum,	/* Argument info to initialize */
   cum->nregs = max_arg_registers;
   cum->arg_regs = arg_regs;
 #if 0
-  // vdsp does not allow this ... compiler switch for using no of registers in params
+  /* vdsp does not allow this ... compiler switch for using no of registers in params */
   if (fntype)
     {
       tree attr = lookup_attribute ("regparm", TYPE_ATTRIBUTES (fntype));
@@ -1840,7 +1891,6 @@ output_load_immediate (rtx *operands) {
  * L (regs) = luimm16   => 32-bit instr
  * H (regs) = huimm16   => 32-bit instr
  */
-    int i;
     enum machine_mode mode = GET_MODE (operands[0]);
 
     if (GET_CODE (operands[1]) == CONST_INT) {
@@ -1849,7 +1899,7 @@ output_load_immediate (rtx *operands) {
 	unsigned int compl_val = (~val);
 	unsigned int shifted_compl_val = compl_val;
 	int num_zero = shiftr_zero (&shifted_val); /* consecutive number zero from least signi... */
-	int num_compl_zero = shiftr_zero (&shifted_compl_val);
+	int num_compl_zero = shiftr_zero ((int *)&shifted_compl_val);
 	enum reg_class class1 = REGNO_REG_CLASS (REGNO (operands[0]));
 
 	if (CONST_16BIT_IMM_P (val)) {
@@ -2105,6 +2155,7 @@ find_barrier (from)
   int count = 0;
   rtx found_barrier = 0;
   rtx label;
+  rtx src;
  
   while (from && count < MAX_COUNT_SI)
     {
@@ -2117,7 +2168,7 @@ find_barrier (from)
           && CONSTANT_P (SET_SRC (PATTERN (from)))
           && CONSTANT_POOL_ADDRESS_P (SET_SRC (PATTERN (from))))
         {
-          rtx src = SET_SRC (PATTERN (from));
+          src = SET_SRC (PATTERN (from));
           count += 2;
         }
       else
@@ -2206,13 +2257,14 @@ replace_symbols_in_block (tree block, rtx orig, rtx new)
 
  
 void
-bfin_reorg (rtx first)
+bfin_reorg (void)
 {
+  rtx insn;
 
   if (!TARGET_MINI_CONST_POOL) return;
 
-  rtx insn;
-  for (insn = first; insn; insn = NEXT_INSN (insn))
+  insn = get_insns ();
+  for (insn = next_nonnote_insn (insn); insn; insn = NEXT_INSN (insn))
     {
       if (broken_move (insn))
         {
@@ -2325,11 +2377,9 @@ bfin_return_in_memory (tree type)
 }
 
 rtx
-bfin_force_reg (mode, x)
-     enum machine_mode mode;
-     rtx x;
+bfin_force_reg (enum machine_mode mode, rtx x)
 {
-  rtx temp, insn, set;
+  rtx temp, insn/*, set*/;
 
   if (GET_CODE (x) == REG)
     return x;
@@ -2460,6 +2510,6 @@ bfin_rtx_costs (rtx x,
 void
 bfin_internal_label(FILE *stream, const char *prefix, unsigned long num)
 {
-        fprintf(stream, "%s%s$%d:\n", LOCAL_LABEL_PREFIX, prefix, num);
+        fprintf(stream, "%s%s$%ld:\n", LOCAL_LABEL_PREFIX, prefix, num);
 }
 
