@@ -110,6 +110,8 @@ extern void bfin_software_single_step (enum target_signal, int);
 #define P_CALL_MAX			0xE3FF // call pcrel25m2, 32-bit, max
 #define P_RTS				0x0010 // RTS
 #define P_MNOP				0xC803 // MNOP
+#define P_EXCPT_MIN			0x00A0 // excpt, 16-bit, min
+#define P_EXCPT_MAX			0x00AF // excpt, 16-bit, max
 
 #define UPPER_LIMIT			(40)
 #define BFIN_NOT_TESTED	       		0	
@@ -315,9 +317,8 @@ bfin_next_bp_addr (CORE_ADDR pc)
 {
   unsigned short op;
   unsigned short op_next;
+  unsigned long op_prev;
   int op_extract;
-  CORE_ADDR p0;
-  CORE_ADDR pc_temp;
 
   op = read_memory_unsigned_integer (pc, 2);
 
@@ -341,7 +342,6 @@ bfin_next_bp_addr (CORE_ADDR pc)
       }val;
       unsigned short op;
     }op_val;
-
     op_val.op = op;
     op_extract = op_val.val.offset;
     op_extract *= 2;
@@ -360,7 +360,6 @@ bfin_next_bp_addr (CORE_ADDR pc)
         unsigned short op;
       }op;
     }op_val;
-
     op_next = read_memory_unsigned_integer (pc + 2, 2);
     op_val.op.op = op;
     op_val.op.op_next = op_next;
@@ -376,6 +375,9 @@ bfin_next_bp_addr (CORE_ADDR pc)
     int cc_bit = astat_reg_val & 0x0020;  // cc is 6th bit in astat register
 
     if (cc_bit == 0) {
+      pc += 2;
+    }
+    else {
       union {
         struct{
           int offset:10;
@@ -383,14 +385,11 @@ bfin_next_bp_addr (CORE_ADDR pc)
         }val;
         unsigned short op;
       }op_val;
-
       op_val.op = op;
       op_extract = op_val.val.offset;
       op_extract *= 2;
       pc += op_extract;
     }
-    else
-      pc += 2;
     return pc;
   }
   else if ((op >= P_IF_NOT_CC_JUMP_MIN && op <= P_IF_NOT_CC_JUMP_MAX) ||
@@ -399,7 +398,7 @@ bfin_next_bp_addr (CORE_ADDR pc)
     CORE_ADDR astat_reg_val = read_register(BFIN_ASTAT_REGNUM);
     int cc_bit = astat_reg_val & 0x0020;  // cc is 6th bit in astat register
 
-    if (cc_bit != 0) {
+    if (cc_bit == 0) {
       union {
         struct{
           int offset:10;
@@ -407,14 +406,14 @@ bfin_next_bp_addr (CORE_ADDR pc)
         }val;
         unsigned short op;
       }op_val;
-
       op_val.op = op;
       op_extract = op_val.val.offset;
       op_extract *= 2;
       pc += op_extract;
     }
-    else
+    else {
       pc += 2;
+    }
     return pc;
   }
   else if (op == P_RTS) {
@@ -425,15 +424,26 @@ bfin_next_bp_addr (CORE_ADDR pc)
     /* MNOP when issued in parallel with two compatible load/store instructions */
     return pc + 8;
   }
+  else if (op >= P_EXCPT_MIN && op <= P_EXCPT_MAX) {
+    op_prev = read_memory_unsigned_integer (pc - 4, 4);
+    if (op_prev == 0x0077e128) {
+      char buf[4];
+      struct frame_info *next_frame;
+      next_frame = get_current_frame ();
+      frame_unwind_register (next_frame, BFIN_PC_REGNUM, buf);
+      pc = extract_unsigned_integer (buf, 4);
+      return pc;
+    }
+    return pc + 2;
+  }
   else if (op <= P_16_BIT_INSR_MAX) {
     return pc + 2;
   }
   else if (op >= P_32_BIT_INSR_MIN && op <= P_32_BIT_INSR_MAX) {
     return pc + 4;
   }
-
-    fprintf(stderr, "unhandled type????, op = %x :: skipping to %x (by 2)\n", op, pc + 2);
-    return pc + 2;
+  fprintf(stderr, "unhandled instruction type (skipping by 2)\n");
+  return pc + 2;
 }
 
 

@@ -1,3 +1,8 @@
+2005-03-04  Srivathsa  <sri@rrap-software.com>
+
+	* bfin-tdep.c (bfin_next_bp_addr) :
+        singlestep in signal
+
 2005-03-03  Srivathsa  <sri@rrap-software.com>
 
 	* bfin-tdep.c (bfin_software_single_step, bfin_next_bp_addr) :
