@@ -446,9 +446,9 @@ Disassembly of section .text:
  6d8:	04 c6 26 42 	R1=PACK\(R6.L,R4.H\);
  6dc:	04 c6 22 80 	R0=PACK\(R2.H,R4.L\);
  6e0:	04 c6 17 ca 	R5=PACK\(R7.H,R2.H\);
- 6e4:	0d cc 50 c0 	\(R1,R0\)=SEARCHR2\(LE\) || R2=\[P0\+\+\] || NOP;
+ 6e4:	0d cc 50 c0 	\(R1,R0\) = SEARCH R2\(LE\) || R2=\[P0\+\+\] || NOP;
  6e8:	02 90 00 00 
- 6ec:	0d c4 50 c0 	\(R1,R0\)=SEARCHR2\(LE\);
+ 6ec:	0d c4 50 c0 	\(R1,R0\) = SEARCH R2\(LE\);
  6f0:	12 cc 02 00 	SAA\(R1:0x0,R3:0x2\)  || R0=\[I0\+\+\] || R2=\[I1\+\+\];
  6f4:	00 9c 0a 9c 
  6f8:	12 cc 02 20 	SAA\(R1:0x0,R3:0x2\) \(R\) || R1=\[I0\+\+\] || R3=\[I1\+\+\];

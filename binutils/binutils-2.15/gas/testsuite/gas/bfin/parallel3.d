@@ -149,11 +149,11 @@ Disassembly of section .text:
  234:	10 88 00 00 
  238:	04 ce 12 4a 	R5=PACK\(R2.L,R2.H\) || \[P0\+\+P3\]=R4 || NOP; 
  23c:	18 89 00 00 
- 240:	0d cc 10 82 	\(R0,R1\)=SEARCHR2\(LT\) || R2=\[P0\+0x4\] || NOP; 
+ 240:	0d cc 10 82 	\(R0,R1\) = SEARCH R2\(LT\) || R2=\[P0\+0x4\] || NOP; 
  244:	42 a0 00 00 
- 248:	0d cc 80 cf 	\(R6,R7\)=SEARCHR0\(LE\) || R5=\[P0--\] || NOP; 
+ 248:	0d cc 80 cf 	\(R6,R7\) = SEARCH R0\(LE\) || R5=\[P0--\] || NOP; 
  24c:	85 90 00 00 
- 250:	0d cc c8 0c 	\(R3,R6\)=SEARCHR1\(GT\) || R0=\[P0\+0x14\] || NOP; 
+ 250:	0d cc c8 0c 	\(R3,R6\) = SEARCH R1\(GT\) || R0=\[P0\+0x14\] || NOP; 
  254:	40 a1 00 00 
- 258:	0d cc 18 4b 	\(R4,R5\)=SEARCHR3\(GE\) || R1=\[P0\+\+\] || NOP; 
+ 258:	0d cc 18 4b 	\(R4,R5\) = SEARCH R3\(GE\) || R1=\[P0\+\+\] || NOP; 
  25c:	01 90 00 00 

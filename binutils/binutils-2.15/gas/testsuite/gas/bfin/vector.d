@@ -99,7 +99,7 @@ Disassembly of section .text:
  11c:	04 c6 12 4a 	R5=PACK\(R2.L,R2.H\);
 
 00000120 <vector_search>:
- 120:	0d c4 10 82 	\(R0,R1\)=SEARCHR2\(LT\);
- 124:	0d c4 80 cf 	\(R6,R7\)=SEARCHR0\(LE\);
- 128:	0d c4 c8 0c 	\(R3,R6\)=SEARCHR1\(GT\);
- 12c:	0d c4 18 4b 	\(R4,R5\)=SEARCHR3\(GE\);
+ 120:	0d c4 10 82 	\(R0,R1\) = SEARCH R2\(LT\);
+ 124:	0d c4 80 cf 	\(R6,R7\) = SEARCH R0\(LE\);
+ 128:	0d c4 c8 0c 	\(R3,R6\) = SEARCH R1\(GT\);
+ 12c:	0d c4 18 4b 	\(R4,R5\) = SEARCH R3\(GE\);

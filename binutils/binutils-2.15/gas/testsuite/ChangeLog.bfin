@@ -1,3 +1,10 @@
+2005-01-12  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/arithmetic.d: Conditionalize expected output.
+	* gas/bfin/parallel3.d: Fix whitespace.
+	* gas/bfin/vector.d: Likewise.
+	* gas/bfin/vector2.d: Likewise.
+
 2005-01-11  Catherine Moore  <clm@cm00re.com>
 
 	* gas/bfin/move.d: Update expected output.
