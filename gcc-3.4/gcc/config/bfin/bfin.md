@@ -985,7 +985,7 @@
 (define_insn_and_split "*andsi_insn"
   [(set (match_operand:SI 0 "valid_reg_operand" "=d,d,d,d,d")
 	(and:SI (match_operand:SI 1 "valid_reg_operand" "%0,d,d,d,d")
-		(match_operand:SI 2 "rhs_andsi3_operand" "L,M1,M2,J,d")))
+		(match_operand:SI 2 "rhs_andsi3_operand" "L,M1,M2,P1,d")))
    (clobber (reg:BI REG_CC))]
   ""
   "@
@@ -994,7 +994,7 @@
    %0 = %h1 (Z);
    #
    %0 = %1 & %2;"
-  "GET_CODE (operands[2]) == CONST_INT && log2constp (INTVAL (operands[2]))"
+  "GET_CODE (operands[2]) == CONST_INT && INTVAL (operands[2]) == 1"
   [(set (reg:BI REG_CC)
 	(ne:BI (zero_extract:SI (match_dup 1) (const_int 1) (match_dup 3))
 	       (const_int 0)))
