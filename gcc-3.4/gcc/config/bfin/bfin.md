@@ -1090,15 +1090,20 @@
    }
 })
 
-(define_insn "*ashlsi3_insn"
-  [(set (match_operand:SI 0 "register_operand" "=d,a,a")
-	(ashift:SI (match_operand:SI 1 "register_operand" "0,a,a")
-		   (match_operand:SI 2 "nonmemory_operand" "dKu5,P1,P2")))]
+(define_insn_and_split "*ashlsi3_insn"
+  [(set (match_operand:SI 0 "register_operand" "=d,a,a,a")
+	(ashift:SI (match_operand:SI 1 "register_operand" "0,a,a,a")
+		   (match_operand:SI 2 "nonmemory_operand" "dKu5,P1,P2,?P3P4")))]
   ""
   "@
    %0 <<= %2;
    %0 = %1 + %1;
-   %0 = %1 << %2;"
+   %0 = %1 << %2;
+   #"
+  "PREG_P (operands[0]) && INTVAL (operands[2]) > 2"
+  [(set (match_dup 0) (ashift:SI (match_dup 1) (const_int 2)))
+   (set (match_dup 0) (ashift:SI (match_dup 0) (match_dup 3)))]
+  "operands[3] = GEN_INT (INTVAL (operands[2]) - 2);"
   [(set_attr "type" "shft")])
 
 (define_insn "ashrsi3"
@@ -1718,75 +1723,6 @@
   ""
   "%0 = ! %0;"    /*  NOT CC;"  */
   [(set_attr "type" "compare")])
-
-;;;;;;;;;;;;;;;   COMPI2opD & COMPI2opP   ;;;;;;;;;;;;;;;;
-
-(define_peephole
-  [(set (match_operand 0 "register_operand" "=d")
-        (match_operand 1 "register_operand" "a"))
-   (set (match_dup 0)
-	    (ashift:SI (match_dup 0)
-		    (const_int 4)))
-   (set (match_dup 1) (match_dup 0))
-   (set (match_operand 2 "register_operand" "a")
-	    (plus:SI (match_dup 2)
-		    (match_dup 1)))]
-  "dead_or_set_p (prev_nonnote_insn (insn), operands[0])"
-  "%1 =%1<<2; %2 =%2+(%1<<2); /* peep-3 */"
-  [(set_attr "type" "shft")
-   (set_attr "length" "4")])
-
-(define_peephole
-  [(set (match_operand 0 "register_operand" "")
-        (match_operand 1 "register_operand" ""))
-   (set (match_dup 0)
-	    (ashift:SI (match_dup 0)
-		    (const_int 4)))
-   (set (match_dup 1) (match_dup 0))]
-  "dead_or_set_p (insn, operands[0])"
-  "%1 =%1<<2; %1 =%1<<2; /* peep-2 */"
-  [(set_attr "type" "shft")
-   (set_attr "length" "4")])
-
-(define_peephole
-  [(set (match_operand 0 "register_operand" "")
-        (match_operand 1 "register_operand" ""))
-   (set (match_dup 0)
-	    (ashift:SI (match_dup 0)
-		    (const_int 3)))
-   (set (match_dup 1) (match_dup 0))]
-  "dead_or_set_p (insn, operands[0])"
-  "%1 =%1<<2; %1 =%1+%1; /* peep-2a */"
-  [(set_attr "type" "shft")
-   (set_attr "length" "4")])
-
-;; it is left out because of combiner-reload limitation for addsi3
-;(define_peephole
-;  [(set (match_operand:SI 0 "register_operand" "")
-;        (match_operand:SI 1 "register_operand" ""))
-;   (set (match_dup 1) (plus:SI (match_dup 1)
-;			(match_operand 2 "reg_or_7bit_operand" "")))
-;   (set (match_dup 0) (sign_extend:SI
-;			(match_operand:HI 3 "register_operand" "")))
-;
-;  ]
-;  "REGNO (operands[1]) == REGNO (operands[3])"
-;  "%1 +=%2;\\n\\t%0 =XH %3; \/* peep-4 *\/"
-;)
-
-(define_peephole
-  [(set (match_operand:SI 0 "register_operand" "d")
-        (subreg:SI (match_operand:HI 1 "register_operand" "d")0))
-   (set (match_operand:SI 4 "register_operand" "d") (plus:SI (match_dup 4)
-			(match_operand 2 "reg_or_7bit_operand" "dKs7")))
-   (set (match_dup 0) (sign_extend:SI
-			(match_operand:HI 3 "register_operand" "d")))
-
-  ]
-  "(REGNO (operands[1]) == REGNO (operands[3])
-   && REGNO (operands[1]) == REGNO (operands[4]))"
-  "%1 +=%2;\\n\\t%0 = %3 (X); /* peep-4a */"
-)
 
 ;; Vector and DSP insns
 

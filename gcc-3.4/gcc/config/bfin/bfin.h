@@ -1048,6 +1048,8 @@ do {                                              \
     ((STR)[1] == '0' ? (VALUE) == 0   \
      : (STR)[1] == '1' ? (VALUE) == 1 \
      : (STR)[1] == '2' ? (VALUE) == 2 \
+     : (STR)[1] == '3' ? (VALUE) == 3 \
+     : (STR)[1] == '4' ? (VALUE) == 4 \
      : 0)
 
 #define CONST_OK_FOR_K(VALUE, STR)			\

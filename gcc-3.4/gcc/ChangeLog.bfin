@@ -26,6 +26,12 @@
 	(call_insn, call_value_insn, sibcall_insn, sibcall_value_insn): Add
 	'G' modifiers where necessary.
 
+	* config/bfin/bfin.md (ashift peepholes): Delete.
+	(ashlsi3): Add another alternative for larger PREGS shifts; turn into
+	define_insn_and_split.
+	(remaining peepholes): Delete.
+	* config/bfin/bfin.h (CONST_OK_FOR_P): Add 3 and 4.
+
 2004-12-06  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md: Fix style issues and rearrange code a little.
