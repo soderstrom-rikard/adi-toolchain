@@ -1,3 +1,7 @@
+2005-02-22  Srivathsa  <sri@rrap-software.com>
+
+	* bfin-tdep.c (bfin_skip_prologue) : Code to skip --sp added
+
 2005-02-17  Srivathsa  <sri@rrap-software.com>
 
 	* bfin-tdep.c (bfin_push_dummy_call, bfin_unwind_dummy_id,

@@ -63,6 +63,8 @@ static CORE_ADDR bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * f
 		     struct regcache *regcache, CORE_ADDR bp_addr, int nargs,
 		     struct value **args, CORE_ADDR sp, int struct_return,
 		     CORE_ADDR struct_addr);
+static int is_minus_minus_sp(int op);
+
 
 //Following macro has been used by prologue functions
 #define P_LINKAGE             		0xE800  
@@ -486,6 +488,20 @@ bfin_frame_sniffer (struct frame_info *next_frame)
 }
 
 
+/* The following functions are for function prolog length calculations */
+static int is_minus_minus_sp(int op)
+{
+      op &= 0xFFC0; 
+      if((op == P_MINUS_SP1) ||
+         (op == P_MINUS_SP2) ||
+         (op == P_MINUS_SP3) ||
+         (op == P_MINUS_SP4)) {
+        return 1;
+       }
+       return 0;
+}
+
+
 CORE_ADDR
 bfin_skip_prologue (pc)
      CORE_ADDR pc;
@@ -494,52 +510,65 @@ bfin_skip_prologue (pc)
   CORE_ADDR orig_pc = pc;
   int done = 0;
 
-#ifdef _DEBUG
-fprintf(stderr, "bfin_skip_prologue called\n");
-#endif //_DEBUG 
-
   /* The new gcc prologue generates the register saves BEFORE the link
      or rets saving instruction.
      So, our job is to stop either at those instructions or some upper
      limit saying there is no frame!
   */
-  while(!done) {
+  while(!done)
+  {
 
-    if (op == P_LINKAGE) {
-         pc += 4;
-         done = 1;
-    }
-    else if (op == P_MINUS_MINUS_SP_EQ_RETS) {
-         pc += 2;
-         done = 1;
-    }
-    else if ((op & P_RTS) == P_RTS) {
+       if (is_minus_minus_sp(op))
+       {
+           while(is_minus_minus_sp(op))
+           {
+               pc += 2;
+               op = read_memory_unsigned_integer(pc, 2);
+           }
+           if (op == P_LINKAGE) 
+	   {
+               pc += 4;
+	   }
+	   done = 1;
+       }
+       else if (op == P_LINKAGE)
+       {
+           pc += 4;
+           done = 1;
+       }
+       else if (op == P_MINUS_MINUS_SP_EQ_RETS)
+       {
+           pc += 2;
+           done = 1;
+       }
+       else if (op == P_RTS) 
+       {
 	  done = 1;
-    }
-    else if (((op & P_JUMP_PREG) == P_JUMP_PREG)
-	 || ((op & P_JUMP_PC_PLUS_PREG) == P_JUMP_PC_PLUS_PREG)
-	 || ((op & P_JUMP_S) == P_JUMP_S)
-	 || ((op & P_JUMP_S) == P_JUMP_S)) {
-	done = 1;
-    }
-    else if(pc - orig_pc >= UPPER_LIMIT){
-	fprintf(stderr, "Function Prologue not recognised. pc will point to ENTRY_POINT of the function\n");
-	pc = orig_pc + 2;
-	done = 1;
-    }
-    else{
-	pc += 2; // not a terminating instruction go on.
-    }
-  }
+       }
+       else if ((op == P_JUMP_PREG)
+	 || (op == P_JUMP_PC_PLUS_PREG)
+	 || (op == P_JUMP_S)
+	 || (op == P_JUMP_S))
+       { 
+           done = 1;
+       }
+       else if(pc - orig_pc >= UPPER_LIMIT)
+       {
+           fprintf(stderr, "Function Prologue not recognised. pc will point to ENTRY_POINT of the function\n");
+	   pc = orig_pc + 2;
+	   done = 1;
+       }
+       else
+       {
+	   pc += 2; // not a terminating instruction go on.
+           op = read_memory_unsigned_integer (pc, 2);
+       }
+   }
 
-    // TODO : Dwarf2 uses entry point value AFTER some register initializations.
-    // we should perhaps skip such asssignments as well (R6 = R1, ...)
+   // TODO : Dwarf2 uses entry point value AFTER some register initializations.
+   // we should perhaps skip such asssignments as well (R6 = R1, ...)
         
-#ifdef _DEBUG
-  printf("Value of PC after prologue = 0x%x\n", (int)pc);
-#endif //_DEBUG 
-
-  return pc;
+   return pc;
 }
 
 
