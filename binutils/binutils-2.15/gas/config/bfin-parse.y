@@ -448,12 +448,12 @@ is_group2 (INSTR_T x)
 %token LINK UNLINK
 
 // registers
-%token REG
+%token DREG PREG DAGREG AREG LCREG LBREG LTREG SYSREG
 %token PC
 %token CCREG BYTE_REG
 %token REG_A00 REG_A11
 %token A_ZERO_DOT_L A_ZERO_DOT_H A_ONE_DOT_L A_ONE_DOT_H
-%token HALF_REG
+%token HALF_DREG HALF_PREG HALF_DAGREG
 
 // progctrl
 %token NOP
@@ -571,7 +571,8 @@ is_group2 (INSTR_T x)
 %type<expr> symbol
 %type<symbol> SYMBOL
 %type<expr> eterm
-%type<reg> REG
+%type<reg> DREG PREG DAGREG AREG SYSREG LCREG LBREG LTREG reg
+%type<reg> HALF_DREG HALF_PREG HALF_DAGREG half_reg
 %type<reg> BYTE_REG
 %type<reg> REG_A00
 %type<reg> REG_A11
@@ -584,7 +585,6 @@ is_group2 (INSTR_T x)
 %type<modcodes> b3_op
 %type<modcodes> rnd_op
 %type<modcodes> post_op
-%type<reg> HALF_REG
 %type<r0> iu_or_nothing
 %type<r0> plus_minus
 %type<r0> asr_asl
@@ -617,6 +617,10 @@ asm_or_directive:
 	asm
 	{ insn=$2; return (1); }
 ;
+
+reg:	DREG | PREG | DAGREG | AREG | SYSREG | LCREG | LTREG | LBREG
+
+half_reg: HALF_DREG | HALF_PREG | HALF_DAGREG
 
 asm: asm_1 SEMICOLON
 	// Parallel instructions:
@@ -749,7 +753,7 @@ asm_1:
 	  $$ = DSP32ALU (18, 0, 0, 0, 0, 0, 0, 0, 3);
 	}
 
-	| REG ASSIGN LPAREN a_plusassign REG_A RPAREN
+	| reg ASSIGN LPAREN a_plusassign REG_A RPAREN
 	{
 	  if (IS_DREG ($1) && !IS_A1 ($4) && IS_A1 ($5))
 	    {
@@ -760,7 +764,7 @@ asm_1:
 	    return register_mismatch();
 	}	
 
-	| HALF_REG ASSIGN LPAREN a_plusassign REG_A RPAREN
+	| half_reg ASSIGN LPAREN a_plusassign REG_A RPAREN
 	{
 	  if (!IS_A1 ($4) && IS_A1 ($5))
 	    {
@@ -772,14 +776,14 @@ asm_1:
 	}
 
 /* 2 rules compacted */
-	| A_ZERO_DOT_H ASSIGN HALF_REG
+	| A_ZERO_DOT_H ASSIGN half_reg
 	{
 	  notethat("dsp32alu: A_ZERO_DOT_H = dregs_hi\n");
 	  $$ = DSP32ALU (9, IS_H ($3), 0, 0, &$3, 0, 0, 0, 0);
 	}
 
 /* 2 rules compacted */
-	| A_ONE_DOT_H ASSIGN HALF_REG
+	| A_ONE_DOT_H ASSIGN half_reg
 	{
 	  notethat("dsp32alu: A_ZERO_DOT_H = dregs_hi\n");
 	  $$ = DSP32ALU (9, IS_H ($3), 0, 0, &$3, 0,
@@ -787,8 +791,8 @@ asm_1:
 
 	}
 
-	| LPAREN REG COMMA REG RPAREN ASSIGN BYTEOP16P LPAREN REG COLON expr COMMA
-	  REG COLON expr RPAREN aligndir
+	| LPAREN reg COMMA reg RPAREN ASSIGN BYTEOP16P LPAREN reg COLON expr COMMA
+	  reg COLON expr RPAREN aligndir
 	{
 	  if (IS_DREG ($2) && IS_DREG ($4) && IS_DREG ($9) && IS_DREG ($13))
 	    {
@@ -799,8 +803,8 @@ asm_1:
 	    return register_mismatch();
 	}
 
-	| LPAREN REG COMMA REG RPAREN ASSIGN BYTEOP16M LPAREN REG COLON expr COMMA
-	  REG COLON expr RPAREN aligndir 
+	| LPAREN reg COMMA reg RPAREN ASSIGN BYTEOP16M LPAREN reg COLON expr COMMA
+	  reg COLON expr RPAREN aligndir 
 	{
 	  if (IS_DREG ($2) && IS_DREG ($4) && IS_DREG ($9) && IS_DREG ($13))
 	    {
@@ -811,7 +815,7 @@ asm_1:
 	    return register_mismatch();
 	}
 
-	| LPAREN REG COMMA REG RPAREN ASSIGN BYTEUNPACK REG COLON expr aligndir
+	| LPAREN reg COMMA reg RPAREN ASSIGN BYTEUNPACK reg COLON expr aligndir
 	{
 	  if (IS_DREG ($2) && IS_DREG ($4) && IS_DREG ($8))
 	    {
@@ -822,7 +826,7 @@ asm_1:
 	    return register_mismatch();
 	}
 
-	| LPAREN REG COMMA REG RPAREN ASSIGN SEARCH REG LPAREN searchmod RPAREN
+	| LPAREN reg COMMA reg RPAREN ASSIGN SEARCH reg LPAREN searchmod RPAREN
 	{
 	  if (IS_DREG ($2) && IS_DREG ($4) && IS_DREG ($8))
 	    {
@@ -833,8 +837,8 @@ asm_1:
 	    return register_mismatch();
 	}
 
-	| REG ASSIGN A_ONE_DOT_L PLUS A_ONE_DOT_H COMMA
-	  REG ASSIGN A_ZERO_DOT_L PLUS A_ZERO_DOT_H
+	| reg ASSIGN A_ONE_DOT_L PLUS A_ONE_DOT_H COMMA
+	  reg ASSIGN A_ZERO_DOT_L PLUS A_ZERO_DOT_H
 	{
 	  if (IS_DREG ($1) && IS_DREG ($7))
 	    {
@@ -846,7 +850,7 @@ asm_1:
 	}
 
 
-	| REG ASSIGN REG_A PLUS REG_A COMMA REG ASSIGN REG_A MINUS REG_A amod1 
+	| reg ASSIGN REG_A PLUS REG_A COMMA reg ASSIGN REG_A MINUS REG_A amod1 
 	{
 	  if (IS_DREG ($1) && IS_DREG ($7) && !REG_SAME ($3, $5)
 	      && IS_A1 ($9) && !IS_A1 ($11))
@@ -865,7 +869,7 @@ asm_1:
 	    return register_mismatch ();
 	}
 
-	| REG ASSIGN REG plus_minus REG COMMA REG ASSIGN REG plus_minus REG amod1
+	| reg ASSIGN reg plus_minus reg COMMA reg ASSIGN reg plus_minus reg amod1
 	{
 	  if ($4.r0 == $10.r0) 
 	    return semantic_error ("Operators must differ");
@@ -883,7 +887,7 @@ asm_1:
 
 // Bar operations:
 
-	| REG ASSIGN REG op_bar_op REG COMMA REG ASSIGN REG op_bar_op REG amod2 
+	| reg ASSIGN reg op_bar_op reg COMMA reg ASSIGN reg op_bar_op reg amod2 
 	{
 	  if (!REG_SAME ($3, $9) || !REG_SAME ($5, $11))
 	    return semantic_error ("Differing source registers");
@@ -906,7 +910,7 @@ asm_1:
 	    return semantic_error ("Bar operand mismatch");
 	}
 
-	| REG ASSIGN ABS REG vmod
+	| reg ASSIGN ABS reg vmod
 	{
 	  int op;
 
@@ -936,7 +940,7 @@ asm_1:
 	  $$ = DSP32ALU (16, IS_A1 ($1), 0, 0, 0, 0, 0, 0, IS_A1 ($3));
 	}
 
-	| A_ZERO_DOT_L ASSIGN HALF_REG
+	| A_ZERO_DOT_L ASSIGN half_reg
 	{
 	  if (IS_DREG_L($3))
 	    {
@@ -947,7 +951,7 @@ asm_1:
 	    return semantic_error ("A0.l = Rx.l expected");
 	}
 
-	| A_ONE_DOT_L ASSIGN HALF_REG
+	| A_ONE_DOT_L ASSIGN half_reg
 	{
 	  if (IS_DREG_L($3))
 	    {
@@ -958,7 +962,7 @@ asm_1:
 	    return semantic_error ("A1.l = Rx.l expected");
 	}
 
-	| REG ASSIGN c_align LPAREN REG COMMA REG RPAREN
+	| reg ASSIGN c_align LPAREN reg COMMA reg RPAREN
 	{
 	  if (IS_DREG ($1) && IS_DREG ($5) && IS_DREG ($7))
 	    {
@@ -969,7 +973,7 @@ asm_1:
 	    return semantic_error ("Dregs expected");
 	}
 
- 	| REG ASSIGN BYTEOP1P LPAREN REG COLON expr COMMA REG COLON expr RPAREN
+ 	| reg ASSIGN BYTEOP1P LPAREN reg COLON expr COMMA reg COLON expr RPAREN
 	  byteop_mod
 	{
 	  if (are_byteop_regs(&$1, &$5, $7, &$9, $11))
@@ -983,7 +987,7 @@ asm_1:
 	    return register_mismatch ();
 	}
 
-	| REG ASSIGN BYTEOP2P LPAREN REG COLON expr COMMA REG COLON expr RPAREN
+	| reg ASSIGN BYTEOP2P LPAREN reg COLON expr COMMA reg COLON expr RPAREN
 	  rnd_op
 	{
 	  if (are_byteop_regs(&$1, &$5, $7, &$9, $11))
@@ -996,7 +1000,7 @@ asm_1:
 	}
 
 /* 8 rules compacted */
-	| REG ASSIGN BYTEOP2M LPAREN REG COLON expr COMMA REG COLON expr RPAREN
+	| reg ASSIGN BYTEOP2M LPAREN reg COLON expr COMMA reg COLON expr RPAREN
 	  rnd_op
 	{
 	  if (are_byteop_regs(&$1, &$5, $7, &$9, $11))
@@ -1008,7 +1012,7 @@ asm_1:
 	    return semantic_error ("Dregs expected");
 	}
 
-	| REG ASSIGN BYTEOP3P LPAREN REG COLON expr COMMA REG COLON expr RPAREN
+	| reg ASSIGN BYTEOP3P LPAREN reg COLON expr COMMA reg COLON expr RPAREN
 	  b3_op
 	{
 	  if (are_byteop_regs(&$1, &$5, $7, &$9, $11))
@@ -1020,7 +1024,7 @@ asm_1:
 	    return semantic_error ("Dregs expected");
 	}
 
-	| REG ASSIGN BYTEPACK LPAREN REG COMMA REG RPAREN
+	| reg ASSIGN BYTEPACK LPAREN reg COMMA reg RPAREN
 	{
 	  if (IS_DREG ($1) && IS_DREG ($5) && IS_DREG ($7))
 	    {
@@ -1031,8 +1035,8 @@ asm_1:
 	    return semantic_error ("Dregs expected");
 	}
 
-	| HALF_REG ASSIGN HALF_REG ASSIGN SIGN LPAREN HALF_REG RPAREN STAR
-	  HALF_REG PLUS SIGN LPAREN HALF_REG RPAREN STAR HALF_REG 
+	| half_reg ASSIGN half_reg ASSIGN SIGN LPAREN half_reg RPAREN STAR
+	  half_reg PLUS SIGN LPAREN half_reg RPAREN STAR half_reg 
 	{
 	  if (IS_HCOMPL($1, $3) && IS_HCOMPL($7, $14) && IS_HCOMPL($10, $17))
 	    {
@@ -1051,7 +1055,7 @@ asm_1:
 //     where we have to use the 32 bit variant instead of the 16 bit one
 //     of this assigment. Do we solve this with an assembler flag or
 //     'switch' the opcodes if we detect a parallel command being issued ?
-	| REG ASSIGN REG plus_minus REG amod1 
+	| reg ASSIGN reg plus_minus reg amod1 
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3) && IS_DREG ($5))
 	    {
@@ -1078,7 +1082,7 @@ asm_1:
 	}
 
 /* 4 rules compacted */
-	| REG ASSIGN min_max LPAREN REG COMMA REG RPAREN vmod
+	| reg ASSIGN min_max LPAREN reg COMMA reg RPAREN vmod
 	{
 	  int op;
 
@@ -1103,7 +1107,7 @@ asm_1:
 	}
 
 /* 16 rules compacted */
-	| HALF_REG ASSIGN HALF_REG plus_minus HALF_REG amod1
+	| half_reg ASSIGN half_reg plus_minus half_reg amod1
 	{
 	  notethat("dsp32alu: dregs_lo = dregs_lo +- dregs_lo (amod1)\n");
 	  $$ = DSP32ALU (2 | $4.r0, IS_H ($1), 0, &$1, &$3, &$5,
@@ -1133,7 +1137,7 @@ asm_1:
 	    return semantic_error ("Registers must be equal");
 	}
 
-	| HALF_REG ASSIGN REG LPAREN RND RPAREN
+	| half_reg ASSIGN reg LPAREN RND RPAREN
 	{
 	  if (IS_DREG ($3))
 	    {
@@ -1144,7 +1148,7 @@ asm_1:
 	    return semantic_error ("Dregs expected");
 	}
 
-	| HALF_REG ASSIGN REG plus_minus REG LPAREN RND12 RPAREN
+	| half_reg ASSIGN reg plus_minus reg LPAREN RND12 RPAREN
 	{
 	  if (IS_DREG ($3) && IS_DREG ($5))
 	    {
@@ -1155,7 +1159,7 @@ asm_1:
 	    return semantic_error ("Dregs expected");
 	}
 
-	| HALF_REG ASSIGN REG plus_minus REG LPAREN RND20 RPAREN
+	| half_reg ASSIGN reg plus_minus reg LPAREN RND20 RPAREN
 	{
 	  if (IS_DREG ($3) && IS_DREG ($5))
 	    {
@@ -1177,7 +1181,7 @@ asm_1:
 	    return semantic_error ("Accu reg arguments must differ");
 	}
 
-	| a_assign REG
+	| a_assign reg
 	{
 	  if (IS_DREG ($2))
 	    {
@@ -1188,7 +1192,7 @@ asm_1:
 	    return semantic_error ("Dregs expected");
 	}
 
-	| REG ASSIGN HALF_REG xpmod
+	| reg ASSIGN half_reg xpmod
 	{
 	  if (!IS_H ($3))
 	    {
@@ -1214,7 +1218,7 @@ asm_1:
 	    return semantic_error ("Low reg expected");
 	}
 
-	| HALF_REG ASSIGN expr
+	| half_reg ASSIGN expr
 	{
 	  notethat("LDIMMhalf: pregs_half = sym32\n");
 	  $$ = LDIMMHALF_R (&$1, IS_H ($1), 0, 0, $3);
@@ -1232,7 +1236,7 @@ asm_1:
 	}
 
 /* 2 rules compacted */
-	| REG ASSIGN expr xpmod1
+	| reg ASSIGN expr xpmod1
 	{
 	  if ($4.r0 == 0)
 	    {
@@ -1275,7 +1279,7 @@ asm_1:
 	    }
 	}
 
-	| HALF_REG ASSIGN REG
+	| half_reg ASSIGN reg
 	{
 	  if (IS_H ($1))
 	    return semantic_error ("Low reg expected");
@@ -1295,7 +1299,7 @@ asm_1:
 	}
 
 /* 4 rules compacted */
-	| REG ASSIGN REG op_bar_op REG amod0 
+	| reg ASSIGN reg op_bar_op reg amod0 
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3) && IS_DREG ($5))
 	    {
@@ -1306,7 +1310,7 @@ asm_1:
 	    return register_mismatch ();
 	}
 
-	| REG ASSIGN BYTE_REG xpmod
+	| reg ASSIGN BYTE_REG xpmod
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3))
 	    {
@@ -1350,7 +1354,7 @@ asm_1:
 	    return register_mismatch ();
 	}
 
-	| REG _MINUS_ASSIGN expr
+	| reg _MINUS_ASSIGN expr
 	{
 	  if (IS_IREG ($1) && EXPR_VALUE ($3) == 4)
 	    {
@@ -1366,7 +1370,7 @@ asm_1:
 	    return semantic_error ("Register or value mismatch");
 	}
 
-	| REG _PLUS_ASSIGN REG LPAREN BREV RPAREN
+	| reg _PLUS_ASSIGN reg LPAREN BREV RPAREN
 	{
 	  if (IS_IREG ($1) && IS_MREG ($3))
 	    {
@@ -1383,7 +1387,7 @@ asm_1:
 	    return register_mismatch ();
 	}
 
-	| REG _MINUS_ASSIGN REG
+	| reg _MINUS_ASSIGN reg
 	{
 	  if (IS_IREG ($1) && IS_MREG ($3))
 	    {
@@ -1410,7 +1414,7 @@ asm_1:
 	    return register_mismatch ();
 	}
 
-	| REG _PLUS_ASSIGN REG
+	| reg _PLUS_ASSIGN reg
 	{
 	  if (IS_IREG ($1) && IS_MREG ($3))
 	    {
@@ -1421,7 +1425,7 @@ asm_1:
 	    return semantic_error ("iregs += mregs expected");
 	}
 
-	| REG _PLUS_ASSIGN expr
+	| reg _PLUS_ASSIGN expr
 	{
 	  if (IS_IREG ($1))
 	    {
@@ -1452,7 +1456,7 @@ asm_1:
 	    return register_mismatch ();
 	}
 
- 	| REG _STAR_ASSIGN REG
+ 	| reg _STAR_ASSIGN reg
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3))
 	    {
@@ -1463,7 +1467,7 @@ asm_1:
 	    return register_mismatch ();
 	}
 
-	| SAA LPAREN REG COLON expr COMMA REG COLON expr RPAREN aligndir
+	| SAA LPAREN reg COLON expr COMMA reg COLON expr RPAREN aligndir
 	{
 	  if (IS_DREG ($3) && IS_DREG ($7))
 	    {
@@ -1485,7 +1489,7 @@ asm_1:
 	    return register_mismatch ();
 	}
 
-	| REG ASSIGN LPAREN REG PLUS REG RPAREN LESS_LESS expr
+	| reg ASSIGN LPAREN reg PLUS reg RPAREN LESS_LESS expr
 	{
 	  if (IS_DREG ($1) && IS_DREG ($4) && IS_DREG ($6)
 	      && REG_SAME ($1, $4))
@@ -1529,7 +1533,7 @@ asm_1:
 // COMP3 CCFLAG
 // {
 
-	| REG ASSIGN REG BAR REG
+	| reg ASSIGN reg BAR reg
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3) && IS_DREG ($5))
 	    {
@@ -1540,7 +1544,7 @@ asm_1:
 	    return semantic_error ("Dregs expected");
 	}
 
-	| REG ASSIGN REG CARET REG
+	| reg ASSIGN reg CARET reg
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3) && IS_DREG ($5))
 	    {
@@ -1551,7 +1555,7 @@ asm_1:
 	    return semantic_error ("Dregs expected");
 	}
 
-	| REG ASSIGN REG PLUS LPAREN REG LESS_LESS expr RPAREN
+	| reg ASSIGN reg PLUS LPAREN reg LESS_LESS expr RPAREN
 	{
 	  if (IS_PREG ($1) && IS_PREG ($3) && IS_PREG ($6))
 	    {
@@ -1595,7 +1599,7 @@ asm_1:
 	}
 
 /* 2 rules compacted */
-	| CCREG ASSIGN REG LESS_THAN REG iu_or_nothing
+	| CCREG ASSIGN reg LESS_THAN reg iu_or_nothing
 	{
 	  if (REG_CLASS($3) == REG_CLASS($5))
 	    {
@@ -1607,7 +1611,7 @@ asm_1:
 	}
 
 /* 2 rules compacted */
-	| CCREG ASSIGN REG LESS_THAN expr iu_or_nothing
+	| CCREG ASSIGN reg LESS_THAN expr iu_or_nothing
 	{
 	  if ((IS_IMM ($5, 3) && $6.r0 == 1) || IS_UIMM ($5, 3))
 	    {
@@ -1618,7 +1622,7 @@ asm_1:
 	    return semantic_error ("Bad constant range");
 	}
 
-	| CCREG ASSIGN REG _ASSIGN_ASSIGN REG
+	| CCREG ASSIGN reg _ASSIGN_ASSIGN reg
 	{
 	  if (REG_CLASS($3) == REG_CLASS($5))
 	    {
@@ -1627,7 +1631,7 @@ asm_1:
 	    } 
 	}
 
-	| CCREG ASSIGN REG _ASSIGN_ASSIGN expr
+	| CCREG ASSIGN reg _ASSIGN_ASSIGN expr
 	{
 	  if (IS_IMM ($5, 3))
 	    {
@@ -1650,7 +1654,7 @@ asm_1:
 	}
 
 /* 2 rules compacted */
-	| CCREG ASSIGN REG _LESS_THAN_ASSIGN REG iu_or_nothing
+	| CCREG ASSIGN reg _LESS_THAN_ASSIGN reg iu_or_nothing
 	{
 	  if (REG_CLASS($3) == REG_CLASS($5))
 	    {
@@ -1662,7 +1666,7 @@ asm_1:
 	    return semantic_error ("Compare only of same register class");
 	}
 
-	| CCREG ASSIGN REG _LESS_THAN_ASSIGN expr iu_or_nothing
+	| CCREG ASSIGN reg _LESS_THAN_ASSIGN expr iu_or_nothing
 	{
 	  if ((IS_IMM ($5, 3) && $6.r0 == 1) || IS_UIMM ($5, 3))
 	    {
@@ -1685,7 +1689,7 @@ asm_1:
 	    return semantic_error ("Bad constant value");
 	}
 
-	| REG ASSIGN REG AMPERSAND REG
+	| reg ASSIGN reg AMPERSAND reg
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3) && IS_DREG ($5))
 	    {
@@ -1702,7 +1706,7 @@ asm_1:
 	  $$ = gen_cc2stat($1.r0, $1.x0, $1.s0); // cbit, op, D
 	}
 
-	| REG ASSIGN REG
+	| reg ASSIGN reg
 	{
 	  if (IS_ALLREG ($1) && IS_ALLREG ($3))
 	    {
@@ -1713,7 +1717,7 @@ asm_1:
 	    return register_mismatch ();
 	}
 
-	| CCREG ASSIGN REG
+	| CCREG ASSIGN reg
 	{
 	  if (IS_DREG ($3))
 	    {
@@ -1724,7 +1728,7 @@ asm_1:
 	    return register_mismatch();
 	}
 
-	| REG ASSIGN CCREG
+	| reg ASSIGN CCREG
 	{
 	  if (IS_DREG ($1))
 	    {
@@ -1745,7 +1749,7 @@ asm_1:
 // DSPMULT
 // {
 
-	| HALF_REG ASSIGN multfunc opt_mode
+	| half_reg ASSIGN multfunc opt_mode
 	{
 	  notethat("dsp32mult: dregs_half = multfunc (opt_mode)\n");
 
@@ -1766,7 +1770,7 @@ asm_1:
 		}	
 	}
 
-	| REG ASSIGN multfunc opt_mode 
+	| reg ASSIGN multfunc opt_mode 
 	{
 	  // Odd registers can use (M)
 	  if (!IS_DREG ($1))
@@ -1791,7 +1795,7 @@ asm_1:
 	    return semantic_error ("Register or mode mismatch");
 	}
 
-	| HALF_REG ASSIGN multfunc opt_mode COMMA HALF_REG ASSIGN multfunc opt_mode
+	| half_reg ASSIGN multfunc opt_mode COMMA half_reg ASSIGN multfunc opt_mode
 	{
 	  if (!IS_DREG ($1) || !IS_DREG ($6)) 
 	    return semantic_error ("Dregs expected");
@@ -1817,7 +1821,7 @@ asm_1:
 	    return semantic_error ("Multfunc Register or mode mismatch");
 	}
 
-	| REG ASSIGN multfunc opt_mode COMMA REG ASSIGN multfunc opt_mode 
+	| reg ASSIGN multfunc opt_mode COMMA reg ASSIGN multfunc opt_mode 
 	{
 	  if (!IS_DREG ($1) || !IS_DREG ($6)) 
 	    return semantic_error ("Dregs expected");
@@ -1858,7 +1862,7 @@ asm_1:
 
 /* 2 rules compacted */
 	
-	| a_assign ASHIFT REG_A BY HALF_REG
+	| a_assign ASHIFT REG_A BY half_reg
 	{
 	  if (!REG_SAME ($1, $3))
 	    return semantic_error ("Aregs must be same");
@@ -1873,7 +1877,7 @@ asm_1:
 	}
 
 /* 8 rules compacted */
-	| HALF_REG ASSIGN ASHIFT HALF_REG BY HALF_REG smod
+	| half_reg ASSIGN ASHIFT half_reg BY half_reg smod
 	{
 	  if (IS_DREG ($6) && !IS_H ($6))
 	    {
@@ -1900,7 +1904,7 @@ asm_1:
 	}
 
 /* 5 rules compacted */
-	| REG ASSIGN REG LESS_LESS expr vsmod
+	| reg ASSIGN reg LESS_LESS expr vsmod
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3) && IS_UIMM ($5, 5))
 	    {
@@ -1936,7 +1940,7 @@ asm_1:
 	}
 
 /* 4 rules compacted */
-	| HALF_REG ASSIGN HALF_REG LESS_LESS expr smod 
+	| half_reg ASSIGN half_reg LESS_LESS expr smod 
 	{
 	  if (IS_UIMM ($5, 4))
 	    {
@@ -1948,7 +1952,7 @@ asm_1:
 	}
 
 /* 6 rules compacted */
-	| REG ASSIGN ASHIFT REG BY HALF_REG vsmod
+	| reg ASSIGN ASHIFT reg BY half_reg vsmod
 	{
 	  int op;
 
@@ -1974,7 +1978,7 @@ asm_1:
 
 // EXPADJ
 /* 2 rules compacted */
-	| HALF_REG ASSIGN EXPADJ LPAREN REG COMMA HALF_REG RPAREN vmod
+	| half_reg ASSIGN EXPADJ LPAREN reg COMMA half_reg RPAREN vmod
 	{
 	  if (IS_DREG_L($1) && IS_DREG_L($5) && IS_DREG_L($7))
 	    {
@@ -1986,7 +1990,7 @@ asm_1:
 	}
 
 
-	| HALF_REG ASSIGN EXPADJ LPAREN HALF_REG COMMA HALF_REG RPAREN
+	| half_reg ASSIGN EXPADJ LPAREN half_reg COMMA half_reg RPAREN
 	{
 	  if (IS_DREG_L($1) && IS_DREG_L($5) && IS_DREG_L($7))
 	    {
@@ -2004,7 +2008,7 @@ asm_1:
 
 // DEPOSIT
 
-	| REG ASSIGN DEPOSIT LPAREN REG COMMA REG RPAREN
+	| reg ASSIGN DEPOSIT LPAREN reg COMMA reg RPAREN
 	{
 	  if (IS_DREG ($1) && IS_DREG ($5) && IS_DREG ($7))
 	    {
@@ -2015,7 +2019,7 @@ asm_1:
 	    return register_mismatch ();
 	}
 
-	| REG ASSIGN DEPOSIT LPAREN REG COMMA REG RPAREN LPAREN X RPAREN
+	| reg ASSIGN DEPOSIT LPAREN reg COMMA reg RPAREN LPAREN X RPAREN
 	{
 	  if (IS_DREG ($1) && IS_DREG ($5) && IS_DREG ($7))
 	    {
@@ -2026,7 +2030,7 @@ asm_1:
 	    return register_mismatch ();
 	}
 
-	| REG ASSIGN EXTRACT LPAREN REG COMMA HALF_REG RPAREN xpmod 
+	| reg ASSIGN EXTRACT LPAREN reg COMMA half_reg RPAREN xpmod 
 	{
 	  if (IS_DREG ($1) && IS_DREG ($5) && IS_DREG_L($7))
 	    {
@@ -2052,7 +2056,7 @@ asm_1:
 	}
 
 /* 2 rules compacted */
-	| a_assign LSHIFT REG_A BY HALF_REG
+	| a_assign LSHIFT REG_A BY half_reg
 	{
 	  if (REG_SAME ($1, $3) && IS_DREG_L($5))
 	    {
@@ -2063,7 +2067,7 @@ asm_1:
 	    return register_mismatch ();
 	}
 
-	| HALF_REG ASSIGN LSHIFT HALF_REG BY HALF_REG
+	| half_reg ASSIGN LSHIFT half_reg BY half_reg
 	{
 	  if (IS_DREG ($1) && IS_DREG ($4) && IS_DREG_L($6))
 	    {
@@ -2074,7 +2078,7 @@ asm_1:
 	    return register_mismatch ();
 	}
 
-	| REG ASSIGN LSHIFT REG BY HALF_REG vmod
+	| reg ASSIGN LSHIFT reg BY half_reg vmod
 	{
 	  if (IS_DREG ($1) && IS_DREG ($4) && IS_DREG_L($6))
 	    {
@@ -2085,7 +2089,7 @@ asm_1:
 	    return register_mismatch ();
 	}
 
-	| REG ASSIGN SHIFT REG BY HALF_REG
+	| reg ASSIGN SHIFT reg BY half_reg
 	{
 	  if (IS_DREG ($1) && IS_DREG ($4) && IS_DREG_L($6))
 	    {
@@ -2107,7 +2111,7 @@ asm_1:
 	    return semantic_error ("Accu register expected");
 	}
 
-	| REG ASSIGN REG GREATER_GREATER expr vmod
+	| reg ASSIGN reg GREATER_GREATER expr vmod
 	{
 	  if ($6.r0 == 1)
 	    {
@@ -2142,7 +2146,7 @@ asm_1:
 	}
 
 /* 4 rules compacted */
-	| HALF_REG ASSIGN HALF_REG GREATER_GREATER expr
+	| half_reg ASSIGN half_reg GREATER_GREATER expr
 	{
 	  if (IS_UIMM ($5, 5))
 	    {
@@ -2153,7 +2157,7 @@ asm_1:
 	    return register_mismatch ();
 	}
 
-	| HALF_REG ASSIGN HALF_REG _GREATER_GREATER_GREATER expr smod
+	| half_reg ASSIGN half_reg _GREATER_GREATER_GREATER expr smod
 	{
 	  if (IS_UIMM ($5, 5))
 	    {
@@ -2166,7 +2170,7 @@ asm_1:
 	}
 
 
-	| REG ASSIGN REG _GREATER_GREATER_GREATER expr vsmod
+	| reg ASSIGN reg _GREATER_GREATER_GREATER expr vsmod
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3) && IS_UIMM ($5, 5))
 	    {
@@ -2186,7 +2190,7 @@ asm_1:
 	    return register_mismatch ();
 	}
 
-	| HALF_REG ASSIGN ONES REG
+	| half_reg ASSIGN ONES reg
 	{
 	  if (IS_DREG_L($1) && IS_DREG ($4))
 	    {
@@ -2198,7 +2202,7 @@ asm_1:
 	}
 
 /* 4 rules compacted */
-	| REG ASSIGN PACK LPAREN HALF_REG COMMA HALF_REG RPAREN
+	| reg ASSIGN PACK LPAREN half_reg COMMA half_reg RPAREN
 	{
 	  if (IS_DREG ($1) && IS_DREG ($5) && IS_DREG ($7))
 	    {
@@ -2209,7 +2213,7 @@ asm_1:
 	    return register_mismatch ();
 	}
 
-	| HALF_REG ASSIGN CCREG ASSIGN BXORSHIFT LPAREN REG_A COMMA REG RPAREN 
+	| half_reg ASSIGN CCREG ASSIGN BXORSHIFT LPAREN REG_A COMMA reg RPAREN 
 	{
 	  if (IS_DREG ($1)
 	      && $7.regno == REG_A0
@@ -2222,7 +2226,7 @@ asm_1:
 	    return register_mismatch ();
 	}
 
-	| HALF_REG ASSIGN CCREG ASSIGN BXOR LPAREN REG_A COMMA REG RPAREN
+	| half_reg ASSIGN CCREG ASSIGN BXOR LPAREN REG_A COMMA reg RPAREN
 	{
 	  if (IS_DREG ($1)
 	      && $7.regno == REG_A0
@@ -2235,7 +2239,7 @@ asm_1:
 	    return register_mismatch();
 	}
 
-	| HALF_REG ASSIGN CCREG ASSIGN BXOR LPAREN REG_A COMMA REG_A COMMA CCREG RPAREN
+	| half_reg ASSIGN CCREG ASSIGN BXOR LPAREN REG_A COMMA REG_A COMMA CCREG RPAREN
 	{
 	  if (IS_DREG ($1) && !IS_H ($1) && !REG_SAME ($7, $9))
 	    {
@@ -2246,7 +2250,7 @@ asm_1:
 	    return register_mismatch();
 	}
 
-	| a_assign ROT REG_A BY HALF_REG
+	| a_assign ROT REG_A BY half_reg
 	{
 	  if (REG_SAME ($1, $3) && IS_DREG_L($5))
 	    {
@@ -2257,7 +2261,7 @@ asm_1:
 	    return register_mismatch();
 	}
 
-	| REG ASSIGN ROT REG BY HALF_REG
+	| reg ASSIGN ROT reg BY half_reg
 	{
 	  if (IS_DREG ($1) && IS_DREG ($4) && IS_DREG_L($6))
 	    {
@@ -2279,7 +2283,7 @@ asm_1:
 	    return register_mismatch();
 	}
 
-	| REG ASSIGN ROT REG BY expr 
+	| reg ASSIGN ROT reg BY expr 
 	{
 	  if (IS_DREG ($1) && IS_DREG ($4) && IS_IMM ($6, 6))
 	    {
@@ -2289,7 +2293,7 @@ asm_1:
 	    return register_mismatch();
 	}
 
-	| HALF_REG ASSIGN SIGNBITS REG_A
+	| half_reg ASSIGN SIGNBITS REG_A
 	{
 	  if (IS_DREG_L($1))
 	    {
@@ -2300,7 +2304,7 @@ asm_1:
 	    return register_mismatch();
 	}
 
-	| HALF_REG ASSIGN SIGNBITS REG
+	| half_reg ASSIGN SIGNBITS reg
 	{
 	  if (IS_DREG_L($1) && IS_DREG ($4))
 	    {
@@ -2311,7 +2315,7 @@ asm_1:
 	    return register_mismatch();
 	}
 
-	| HALF_REG ASSIGN SIGNBITS HALF_REG
+	| half_reg ASSIGN SIGNBITS half_reg
 	{
 	  if (IS_DREG_L($1))
 	    {
@@ -2323,7 +2327,7 @@ asm_1:
 	}
 	
 	// Silly. The ASR bit is just inverted here.
-	| HALF_REG ASSIGN VIT_MAX LPAREN REG RPAREN asr_asl 
+	| half_reg ASSIGN VIT_MAX LPAREN reg RPAREN asr_asl 
 	{
 	  if (IS_DREG_L($1) && IS_DREG ($5))
 	    {
@@ -2334,7 +2338,7 @@ asm_1:
 	    return register_mismatch();
 	}
 
-	| REG ASSIGN VIT_MAX LPAREN REG COMMA REG RPAREN asr_asl 
+	| reg ASSIGN VIT_MAX LPAREN reg COMMA reg RPAREN asr_asl 
 	{
 	  if (IS_DREG ($1) && IS_DREG ($5) && IS_DREG ($7))
 	    {
@@ -2345,7 +2349,7 @@ asm_1:
 	    return register_mismatch();
 	}
 
-	| BITMUX LPAREN REG COMMA REG COMMA REG_A RPAREN asr_asl
+	| BITMUX LPAREN reg COMMA reg COMMA REG_A RPAREN asr_asl
 	{
 	  if (IS_DREG ($3) && IS_DREG ($5) && !IS_A1 ($7))
 	    {
@@ -2374,7 +2378,7 @@ asm_1:
 
 
 // LOGI2op:	BITCLR (dregs , uimm5 )
-	| BITCLR LPAREN REG COMMA expr RPAREN
+	| BITCLR LPAREN reg COMMA expr RPAREN
 	{
 	  if (IS_DREG ($3) && IS_UIMM ($5, 5))
 	    {
@@ -2386,7 +2390,7 @@ asm_1:
 	}
 
 // LOGI2op:	BITSET (dregs , uimm5 )
-	| BITSET LPAREN REG COMMA expr RPAREN
+	| BITSET LPAREN reg COMMA expr RPAREN
 	{
 	  if (IS_DREG ($3) && IS_UIMM ($5, 5))
 	    {
@@ -2398,7 +2402,7 @@ asm_1:
 	}
 
 // LOGI2op:	BITTGL (dregs , uimm5 )
-	| BITTGL LPAREN REG COMMA expr RPAREN
+	| BITTGL LPAREN reg COMMA expr RPAREN
 	{
 	  if (IS_DREG ($3) && IS_UIMM ($5, 5))
 	    {
@@ -2409,7 +2413,7 @@ asm_1:
 	    return register_mismatch();
 	}
 
-	| CCREG _ASSIGN_BANG BITTST LPAREN REG COMMA expr RPAREN
+	| CCREG _ASSIGN_BANG BITTST LPAREN reg COMMA expr RPAREN
 	{
 	  if (IS_DREG ($5) && IS_UIMM ($7, 5))
 	    {
@@ -2420,7 +2424,7 @@ asm_1:
 	    return semantic_error ("Register mismatch or value error");
 	}
 
-	| CCREG ASSIGN BITTST LPAREN REG COMMA expr RPAREN
+	| CCREG ASSIGN BITTST LPAREN reg COMMA expr RPAREN
 	{
 	  if (IS_DREG ($5) && IS_UIMM ($7, 5))
 	    {
@@ -2431,7 +2435,7 @@ asm_1:
 	    return semantic_error ("Register mismatch or value error");
 	}
 
-	| IF BANG CCREG REG ASSIGN REG
+	| IF BANG CCREG reg ASSIGN reg
 	{
 	  if ((IS_DREG ($4) || IS_PREG ($4))
 	      && (IS_DREG ($6) || IS_PREG ($6)))
@@ -2443,7 +2447,7 @@ asm_1:
 	    return register_mismatch();
 	}
 
-	| IF CCREG REG ASSIGN REG
+	| IF CCREG reg ASSIGN reg
 	{
 	  if ((IS_DREG ($5) || IS_PREG ($5))
 	      && (IS_DREG ($3) || IS_PREG ($3)))
@@ -2559,7 +2563,7 @@ asm_1:
 	  $$ = PROGCTRL (2, 5);
 	}
 
-	| CLI REG
+	| CLI reg
 	{
 	  if (IS_DREG ($2))
 	    {
@@ -2570,7 +2574,7 @@ asm_1:
 	    return semantic_error ("Dreg expected for CLI");
 	}
 
-	| STI REG
+	| STI reg
 	{
 	  if (IS_DREG ($2))
 	    {
@@ -2581,7 +2585,7 @@ asm_1:
 	    return semantic_error ("Dreg expected for STI");
 	}
 
-	| JUMP LPAREN REG RPAREN
+	| JUMP LPAREN reg RPAREN
 	{
 	  if (IS_PREG ($3))
 	    {
@@ -2592,7 +2596,7 @@ asm_1:
 	    return semantic_error ("Bad register for indirect jump");
 	}
 
-	| CALL LPAREN REG RPAREN
+	| CALL LPAREN reg RPAREN
 	{
 	  if (IS_PREG ($3))
 	    {
@@ -2603,7 +2607,7 @@ asm_1:
 	    return semantic_error ("Bad register for indirect call");
 	}
 
-	| CALL LPAREN PC PLUS REG RPAREN
+	| CALL LPAREN PC PLUS reg RPAREN
 	{
 	  if (IS_PREG ($5))
 	    {
@@ -2614,7 +2618,7 @@ asm_1:
 	    return semantic_error ("Bad register for indirect call");
 	}
 
-	| JUMP LPAREN PC PLUS REG RPAREN
+	| JUMP LPAREN PC PLUS reg RPAREN
 	{
 	  if (IS_PREG ($5))
 	    {
@@ -2642,7 +2646,7 @@ asm_1:
 		$$ = PROGCTRL (10, uimm4 ($2));
 	}
 
-	| TESTSET LPAREN REG RPAREN
+	| TESTSET LPAREN reg RPAREN
 	{
 	  if (IS_PREG ($3))
 	    {
@@ -2702,7 +2706,7 @@ asm_1:
 
 // ALU2ops
 // ALU2op:	DIVQ (dregs, dregs)
-	| DIVQ LPAREN REG COMMA REG RPAREN
+	| DIVQ LPAREN reg COMMA reg RPAREN
 	{
 	  if (IS_DREG ($3) && IS_DREG ($5))
 	    $$ = ALU2OP (&$3, &$5, 8);   // dst, src, opc
@@ -2710,7 +2714,7 @@ asm_1:
 	    return semantic_error ("Bad registers for DIVQ");
 	}
 
-	| DIVS LPAREN REG COMMA REG RPAREN
+	| DIVS LPAREN reg COMMA reg RPAREN
 	{
 	  if (IS_DREG ($3) && IS_DREG ($5))
 	    $$ = ALU2OP (&$3, &$5, 9);   // dst, src, opc
@@ -2719,7 +2723,7 @@ asm_1:
 	}
 
 /* 3 rules compacted */
-	| REG ASSIGN MINUS REG vsmod
+	| reg ASSIGN MINUS reg vsmod
 	{
 	  if (IS_DREG ($1) && IS_DREG ($4))
 	    {
@@ -2738,7 +2742,7 @@ asm_1:
 	    return semantic_error ("Dregs expected");
 	}
 
-	| REG ASSIGN TILDA REG
+	| reg ASSIGN TILDA reg
 	{
 	  if (IS_DREG ($1) && IS_DREG ($4))
 	    {
@@ -2749,7 +2753,7 @@ asm_1:
 	    return semantic_error ("Dregs expected");
 	}
 
-	| REG _GREATER_GREATER_ASSIGN REG
+	| reg _GREATER_GREATER_ASSIGN reg
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3))
 	    {
@@ -2760,7 +2764,7 @@ asm_1:
 	    return semantic_error ("Dregs expected");
 	}
 
-	| REG _GREATER_GREATER_ASSIGN expr
+	| reg _GREATER_GREATER_ASSIGN expr
 	{
 	  if (IS_DREG ($1) && IS_UIMM ($3, 5))
 	    {
@@ -2771,7 +2775,7 @@ asm_1:
 	    return semantic_error ("Dregs expected or value error");
 	}
 
-	| REG _GREATER_GREATER_GREATER_THAN_ASSIGN REG
+	| reg _GREATER_GREATER_GREATER_THAN_ASSIGN reg
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3))
 	    {
@@ -2782,7 +2786,7 @@ asm_1:
 	    return semantic_error ("Dregs expected");
 	}
 
-	| REG _LESS_LESS_ASSIGN REG
+	| reg _LESS_LESS_ASSIGN reg
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3))
 	    {
@@ -2793,7 +2797,7 @@ asm_1:
 	    return semantic_error ("Dregs expected");
 	}
 
-	| REG _LESS_LESS_ASSIGN expr
+	| reg _LESS_LESS_ASSIGN expr
 	{
 	  if (IS_DREG ($1) && IS_UIMM ($3, 5))
 	    {
@@ -2805,7 +2809,7 @@ asm_1:
 	}
 
 
-	| REG _GREATER_GREATER_GREATER_THAN_ASSIGN expr
+	| reg _GREATER_GREATER_GREATER_THAN_ASSIGN expr
 	{
 	  if (IS_DREG ($1) && IS_UIMM ($3, 5))
 	    {
@@ -2820,7 +2824,7 @@ asm_1:
 ////////////////////////////////////////////////////////////////////////////
 // Cache Control
 
-	| FLUSH LBRACK REG RBRACK
+	| FLUSH LBRACK reg RBRACK
 	{
 	  notethat("CaCTRL: FLUSH [ pregs ]\n");
 	  if (IS_PREG ($3))
@@ -2829,7 +2833,7 @@ asm_1:
 	    return semantic_error ("Bad register(s) for FLUSH");
 	}
 
-	| FLUSH LBRACK REG _PLUS_PLUS RBRACK
+	| FLUSH LBRACK reg _PLUS_PLUS RBRACK
 	{
 	  if (IS_PREG ($3))
 	    {
@@ -2840,7 +2844,7 @@ asm_1:
 	    return semantic_error ("Bad register(s) for FLUSH");
 	}
 
-	| FLUSHINV LBRACK REG RBRACK
+	| FLUSHINV LBRACK reg RBRACK
 	{
 	  if (IS_PREG ($3))
 	    {
@@ -2851,7 +2855,7 @@ asm_1:
 	    return semantic_error ("Bad register(s) for FLUSH");
 	}
 
-	| FLUSHINV LBRACK REG _PLUS_PLUS RBRACK
+	| FLUSHINV LBRACK reg _PLUS_PLUS RBRACK
 	{
 	  if (IS_PREG ($3))
 	    {
@@ -2863,7 +2867,7 @@ asm_1:
 	}
 
 // CaCTRL:	IFLUSH [ pregs ]
-	| IFLUSH LBRACK REG RBRACK
+	| IFLUSH LBRACK reg RBRACK
 	{
 	  if (IS_PREG ($3))
 	    {
@@ -2874,7 +2878,7 @@ asm_1:
 	    return semantic_error ("Bad register(s) for FLUSH");
 	}
 
-	| IFLUSH LBRACK REG _PLUS_PLUS RBRACK
+	| IFLUSH LBRACK reg _PLUS_PLUS RBRACK
 	{
 	  if (IS_PREG ($3))
 	    {
@@ -2885,7 +2889,7 @@ asm_1:
 	    return semantic_error ("Bad register(s) for FLUSH");
 	}
 
-	| PREFETCH LBRACK REG RBRACK
+	| PREFETCH LBRACK reg RBRACK
 	{
 	  if (IS_PREG ($3))
 	    {
@@ -2896,7 +2900,7 @@ asm_1:
 	    return semantic_error ("Bad register(s) for PREFETCH");
 	}
 
-	| PREFETCH LBRACK REG _PLUS_PLUS RBRACK
+	| PREFETCH LBRACK reg _PLUS_PLUS RBRACK
 	{
 	  if (IS_PREG ($3))
 	    {
@@ -2912,7 +2916,7 @@ asm_1:
 // {
 
 // LDST:	B [ pregs <post_op> ] = dregs
-	| B LBRACK REG post_op RBRACK ASSIGN REG
+	| B LBRACK reg post_op RBRACK ASSIGN reg
 	{
 	  if (IS_PREG ($3) && IS_DREG ($7))
 	    {
@@ -2924,7 +2928,7 @@ asm_1:
 	}
 
 // LDSTidxI:	B [ pregs + imm16 ] = dregs */
-	| B LBRACK REG plus_minus expr RBRACK ASSIGN REG
+	| B LBRACK reg plus_minus expr RBRACK ASSIGN reg
 	{
 	  if (IS_PREG ($3) && IS_RANGE(16, $5, $4.r0, 1) && IS_DREG ($8))
 	    {
@@ -2939,7 +2943,7 @@ asm_1:
 
 
 // LDSTii:	W [ pregs + uimm4s2 ] = dregs
-	| W LBRACK REG plus_minus expr RBRACK ASSIGN REG
+	| W LBRACK reg plus_minus expr RBRACK ASSIGN reg
 	{
 	  if (IS_PREG ($3) && IS_URANGE (4, $5, $4.r0, 2) && IS_DREG ($8))
 	    {
@@ -2958,7 +2962,7 @@ asm_1:
 	}
 
 // LDST:	W [ pregs <post_op> ] = dregs
-	| W LBRACK REG post_op RBRACK ASSIGN REG
+	| W LBRACK reg post_op RBRACK ASSIGN reg
 	{
 	  if (IS_PREG ($3) && IS_DREG ($7))
 	    {
@@ -2969,7 +2973,7 @@ asm_1:
 	    return semantic_error ("Bad register(s) for STORE");
 	}
 
-	| W LBRACK REG post_op RBRACK ASSIGN HALF_REG
+	| W LBRACK reg post_op RBRACK ASSIGN half_reg
 	{
 	  if (IS_IREG ($3))
 	    {
@@ -2987,7 +2991,7 @@ asm_1:
 	}
 
 // LDSTiiFP:	[ FP - const ] = dpregs
-	| LBRACK REG plus_minus expr RBRACK ASSIGN REG
+	| LBRACK reg plus_minus expr RBRACK ASSIGN reg
 	{
 	  ExprNode *tmp = $4;
 	  int ispreg = IS_PREG ($7);
@@ -3025,7 +3029,7 @@ asm_1:
 	    return semantic_error ("Displacement out of range for store");
 	}
 
-	| REG ASSIGN W LBRACK REG plus_minus expr RBRACK xpmod
+	| reg ASSIGN W LBRACK reg plus_minus expr RBRACK xpmod
 	{
 	  if (IS_DREG ($1) && IS_PREG ($5) && IS_URANGE (4, $7, $6.r0, 2))
 	    {
@@ -3043,7 +3047,7 @@ asm_1:
 	    return semantic_error ("Bad register or constant for LOAD");
 	}	
 
-	| HALF_REG ASSIGN W LBRACK REG post_op RBRACK
+	| half_reg ASSIGN W LBRACK reg post_op RBRACK
 	{
 	  if (IS_IREG ($5))
 	    {
@@ -3060,7 +3064,7 @@ asm_1:
 	}
 
 
-	| REG ASSIGN W LBRACK REG post_op RBRACK xpmod
+	| reg ASSIGN W LBRACK reg post_op RBRACK xpmod
 	{
 	  if (IS_DREG ($1) && IS_PREG ($5))
 	    {
@@ -3071,7 +3075,7 @@ asm_1:
 	    return semantic_error ("Bad register for LOAD");
 	}
 
-	| REG ASSIGN W LBRACK REG _PLUS_PLUS REG RBRACK xpmod
+	| reg ASSIGN W LBRACK reg _PLUS_PLUS reg RBRACK xpmod
 	{
 	  if (IS_DREG ($1) && IS_PREG ($5) && IS_PREG ($7))
 	    {
@@ -3082,7 +3086,7 @@ asm_1:
 	    return semantic_error ("Bad register for LOAD");
 	}
 
-	| HALF_REG ASSIGN W LBRACK REG _PLUS_PLUS REG RBRACK
+	| half_reg ASSIGN W LBRACK reg _PLUS_PLUS reg RBRACK
 	{
 	  if (IS_DREG ($1) && IS_PREG ($5) && IS_PREG ($7))
 	    {
@@ -3093,7 +3097,7 @@ asm_1:
 	    return semantic_error ("Bad register for LOAD");
 	}
 
-	| LBRACK REG post_op RBRACK ASSIGN REG
+	| LBRACK reg post_op RBRACK ASSIGN reg
 	{
 	  if (IS_IREG ($2) && IS_DREG ($6))
 	    {
@@ -3114,7 +3118,7 @@ asm_1:
 	    return semantic_error ("Bad register for STORE");
 	}
 
-	| LBRACK REG _PLUS_PLUS REG RBRACK ASSIGN REG
+	| LBRACK reg _PLUS_PLUS reg RBRACK ASSIGN reg
 	{
 	  if (! IS_DREG ($7))
 	    return semantic_error ("Expected Dreg for last argument");
@@ -3133,7 +3137,7 @@ asm_1:
 	    return semantic_error ("Bad register for STORE");
 	}
 			
-	| W LBRACK REG _PLUS_PLUS REG RBRACK ASSIGN HALF_REG
+	| W LBRACK reg _PLUS_PLUS reg RBRACK ASSIGN half_reg
 	{
 	  if (!IS_DREG ($8))
 	    return semantic_error ("Expect Dreg as last argument");
@@ -3146,7 +3150,7 @@ asm_1:
 	    return semantic_error ("Bad register for STORE");
 	}
 
-	| REG ASSIGN B LBRACK REG plus_minus expr RBRACK xpmod
+	| reg ASSIGN B LBRACK reg plus_minus expr RBRACK xpmod
 	{
 	  if (IS_DREG ($1) && IS_PREG ($5) && IS_RANGE(16, $7, $6.r0, 1))
 	    {
@@ -3160,7 +3164,7 @@ asm_1:
 	    return semantic_error ("Bad register or value for LOAD");
 	}
 
-	| REG ASSIGN B LBRACK REG post_op RBRACK xpmod
+	| reg ASSIGN B LBRACK reg post_op RBRACK xpmod
 	{
 	  if (IS_DREG ($1) && IS_PREG ($5))
 	    {
@@ -3172,7 +3176,7 @@ asm_1:
 	    return semantic_error ("Bad register for LOAD");
 	}
 			
-	| REG ASSIGN LBRACK REG _PLUS_PLUS REG RBRACK
+	| reg ASSIGN LBRACK reg _PLUS_PLUS reg RBRACK
 	{
 	  if (IS_DREG ($1) && IS_IREG ($4) && IS_MREG ($6))
 	    {
@@ -3188,7 +3192,7 @@ asm_1:
 	    return semantic_error ("Bad register for LOAD");
 	}
 
-	| REG ASSIGN LBRACK REG plus_minus expr RBRACK
+	| reg ASSIGN LBRACK reg plus_minus expr RBRACK
 	{
 	  ExprNode *tmp = $6;
 	  int ispreg = IS_PREG ($1);
@@ -3228,7 +3232,7 @@ asm_1:
 	}
 
 /* 3 rules compacted */
-	| REG ASSIGN LBRACK REG post_op RBRACK
+	| reg ASSIGN LBRACK reg post_op RBRACK
 	{
 	  if (IS_DREG ($1) && IS_IREG ($4))
 	    {
@@ -3262,7 +3266,7 @@ asm_1:
 ////////////////////////////////////////////////////////////////////////////
 // PushPopMultiple
 // {
-	| LBRACK _MINUS_MINUS REG RBRACK ASSIGN LPAREN REG COLON expr COMMA REG COLON expr RPAREN
+	| LBRACK _MINUS_MINUS reg RBRACK ASSIGN LPAREN reg COLON expr COMMA reg COLON expr RPAREN
 	{
 	  if ($3.regno != REG_SP)
 	    return semantic_error ("SP expected");
@@ -3279,7 +3283,7 @@ asm_1:
 	    return semantic_error ("Bad register for PushPopMultiple");
 	}
 
-	| LBRACK _MINUS_MINUS REG RBRACK ASSIGN LPAREN REG COLON expr RPAREN
+	| LBRACK _MINUS_MINUS reg RBRACK ASSIGN LPAREN reg COLON expr RPAREN
 	{
 	  if ($3.regno != REG_SP)
 	    return semantic_error ("SP expected");
@@ -3300,7 +3304,7 @@ asm_1:
 	    return semantic_error ("Bad register for PushPopMultiple");
 	}
 
-	| LPAREN REG COLON expr COMMA REG COLON expr RPAREN ASSIGN LBRACK REG _PLUS_PLUS RBRACK
+	| LPAREN reg COLON expr COMMA reg COLON expr RPAREN ASSIGN LBRACK reg _PLUS_PLUS RBRACK
 	{
 	  if ($12.regno != REG_SP)
 	    return semantic_error ("SP expected");
@@ -3315,7 +3319,7 @@ asm_1:
 	    return semantic_error ("Bad register range for PushPopMultiple");
 	}
 
-	| LPAREN REG COLON expr RPAREN ASSIGN LBRACK REG _PLUS_PLUS RBRACK
+	| LPAREN reg COLON expr RPAREN ASSIGN LBRACK reg _PLUS_PLUS RBRACK
 	{
 	  if ($8.regno != REG_SP)
 	    return semantic_error ("SP expected");
@@ -3336,7 +3340,7 @@ asm_1:
 	    return semantic_error ("Bad register range for PushPopMultiple");
 	}
 
-	| LBRACK _MINUS_MINUS REG RBRACK ASSIGN REG
+	| LBRACK _MINUS_MINUS reg RBRACK ASSIGN reg
 	{
 	  if ($3.regno != REG_SP)
 	    return semantic_error ("SP expected");
@@ -3376,7 +3380,7 @@ asm_1:
 ////////////////////////////////////////////////////////////////////////////
 // LSETUP
 
-	| LSETUP LPAREN expr COMMA expr RPAREN REG
+	| LSETUP LPAREN expr COMMA expr RPAREN reg
 	{
 	  if (IS_PCREL4 ($3) && IS_LPPCREL10 ($5) && IS_CREG ($7))
 	    {
@@ -3388,7 +3392,7 @@ asm_1:
 	  
 	}
 
-	| LSETUP LPAREN expr COMMA expr RPAREN REG ASSIGN REG
+	| LSETUP LPAREN expr COMMA expr RPAREN reg ASSIGN reg
 	{
 	  if (IS_PCREL4 ($3) && IS_LPPCREL10 ($5)
 	      && IS_PREG ($9) && IS_CREG ($7))
@@ -3400,7 +3404,7 @@ asm_1:
 	    return semantic_error ("Bad register or values for LSETUP");
 	}
 
-	| LSETUP LPAREN expr COMMA expr RPAREN REG ASSIGN REG GREATER_GREATER expr
+	| LSETUP LPAREN expr COMMA expr RPAREN reg ASSIGN reg GREATER_GREATER expr
 	{
 	  if (IS_PCREL4 ($3) && IS_LPPCREL10 ($5)
 	      && IS_PREG ($9) && IS_CREG ($7) 
@@ -3429,13 +3433,13 @@ asm_1:
 	  $$ = gen_pseudodbg(3, IS_A1 ($2), 0);
 	}
 
-	| DBG REG
+	| DBG reg
 	{
 	  notethat("pseudoDEBUG: DBG allregs\n");
 	  $$ = gen_pseudodbg(0, $2.regno & CODE_MASK, $2.regno & CLASS_MASK);
 	}
 
-	| DBGCMPLX LPAREN REG RPAREN
+	| DBGCMPLX LPAREN reg RPAREN
 	{
 	  if (!IS_DREG ($3))
 	    return semantic_error ("Dregs expected");
@@ -3450,19 +3454,19 @@ asm_1:
 	  $$ = gen_pseudodbg(3, 5, 0);
 	}
 
-	| DBGA LPAREN HALF_REG COMMA expr RPAREN
+	| DBGA LPAREN half_reg COMMA expr RPAREN
 	{
 	  notethat("pseudodbg_assert: DBGA (dregs_lo , uimm16 )\n");
 	  $$ = gen_pseudodbg_assert (IS_H ($3), &$3, uimm16 ($5));
 	}
 		
-	| DBGAH LPAREN REG COMMA expr RPAREN
+	| DBGAH LPAREN reg COMMA expr RPAREN
 	{
 	  notethat("pseudodbg_assert: DBGAH (dregs , uimm16 )\n");
 	  $$ = gen_pseudodbg_assert (3, &$3, uimm16 ($5));
 	}
 
-	| DBGAL LPAREN REG COMMA expr RPAREN
+	| DBGAL LPAREN reg COMMA expr RPAREN
 	{
 	  notethat("psedodbg_assert: DBGAL (dregs , uimm16 )\n");
 	  $$ = gen_pseudodbg_assert (2, &$3, uimm16 ($5));
@@ -3725,8 +3729,8 @@ rnd_op:
 
 	| LPAREN RNDH COMMA R RPAREN
 	{
-	  $$.r0 = 0; // HL
-	  $$.s0 = 1; // s
+	  $$.r0 = 0; // HL	
+  $$.s0 = 1; // s
 	  $$.x0 = 1; // aop
 	}
 
@@ -3805,7 +3809,7 @@ a_plusassign:
 ;
 
 assign_macfunc:
-	REG ASSIGN REG_A
+	reg ASSIGN REG_A
 	{
 	  $$.w = 1; $$.P = 1; $$.n = IS_A1 ($3);
 	  $$.op = 3; $$.dst = $1;
@@ -3819,19 +3823,19 @@ assign_macfunc:
 	  $$.dst.regno = 0;
 	}
 
-	| REG ASSIGN LPAREN a_macfunc RPAREN
+	| reg ASSIGN LPAREN a_macfunc RPAREN
 	{
 	  $$ = $4;
 	  $$.w = 1; $$.P = 1; $$.dst = $1;
 	}
 
-	| HALF_REG ASSIGN LPAREN a_macfunc RPAREN
+	| half_reg ASSIGN LPAREN a_macfunc RPAREN
 	{
 	  $$ = $4;
 	  $$.w = 1; $$.P = 0; $$.dst = $1;
 	}
 
-	| HALF_REG ASSIGN REG_A
+	| half_reg ASSIGN REG_A
 	{
 	  $$.w = 1; $$.P = 0; $$.n = IS_A1 ($3);
 	  $$.op = 3; $$.dst = $1;
@@ -3840,22 +3844,22 @@ assign_macfunc:
 ;
 
 a_macfunc:
-	a_assign HALF_REG STAR HALF_REG
+	a_assign half_reg STAR half_reg
 	{
 	  $$.n = IS_A1 ($1); $$.op = 0;  $$.s0 = $2; $$.s1 = $4;
 	}
-	| a_plusassign HALF_REG STAR HALF_REG
+	| a_plusassign half_reg STAR half_reg
 	{
 	  $$.n = IS_A1 ($1); $$.op = 1;  $$.s0 = $2; $$.s1 = $4;
 	}
-	| a_minusassign HALF_REG STAR HALF_REG
+	| a_minusassign half_reg STAR half_reg
 	{
 	  $$.n = IS_A1 ($1); $$.op = 2;  $$.s0 = $2; $$.s1 = $4;
 	}
 ;
 
 multfunc:
-	HALF_REG STAR HALF_REG
+	half_reg STAR half_reg
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3))
 	    {

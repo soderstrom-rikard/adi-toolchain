@@ -1,3 +1,11 @@
+2004-12-16  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin-parse.y (REG, HALF_REG): Remove tokens, replace with
+	DREG, PREG, DAGREG, AREG, SYSREG, LCREG, LBREG, LTREG, HALF_DREG,
+	HALF_PREG, HALF_DAGREG.  All uses changed.
+	(reg, half_reg): New rules.
+	* config/bfin-lex.l: All uses of REG/HALF_REG changed here too.
+
 2004-12-14  Catherine Moore  <clm@cm00re.com>
 
 	* config/tc-bfin.c (gen_ldstiifp): Fix compilation error.
