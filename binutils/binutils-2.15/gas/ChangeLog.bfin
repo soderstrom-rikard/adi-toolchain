@@ -1,3 +1,9 @@
+2005-01-25  Catherine Moore  <clm@cm00re.com>
+
+	* config/bfin-parse.y: Fix negation of fp-immediate.
+	* config/tc-bfin.c (gen_ldstiifp): Fix encoding of the
+	immediate field for fp-immediate.
+
 2005-01-12  Catherine Moore  <clm@cm00re.com>
 
 	* config/bfin-parse.y: Correct encoding for ADD on SIGN and

@@ -3081,11 +3081,7 @@ asm_1:
 	  else if ($2.regno == REG_FP && in_range_p (tmp, -128, 0, 3))
 	    {
 	      notethat("LDSTiiFP: dpregs = [ FP - uimm7m4 ]\n");
-	      if ($3.r0)
-		tmp = $4;
-	      else
-		tmp = unary (ExprOpTypeNEG, tmp);
-
+	      tmp = unary (ExprOpTypeNEG, tmp);
 	      $$ = LDSTIIFP (tmp, &$7, 1);
 	    }
 	  else if (in_range_p (tmp, -131072, 131071, 3))
@@ -3287,11 +3283,7 @@ asm_1:
 	  else if ($4.regno == REG_FP && in_range_p (tmp, -128, 0, 3))
 	    {
 	      notethat("LDSTiiFP: dpregs = [ FP - uimm7m4 ]\n");
-	      if ($5.r0)
-		tmp = $6;
-	      else
-		tmp = unary (ExprOpTypeNEG, tmp);
-
+	      tmp = unary (ExprOpTypeNEG, tmp);
 	      $$ = LDSTIIFP (tmp, &$1, 0);
 	    }
 	  else if (in_range_p (tmp, -131072, 131071, 3))
