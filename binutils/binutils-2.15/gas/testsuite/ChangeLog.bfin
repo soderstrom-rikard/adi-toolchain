@@ -1,4 +1,11 @@
 2004-12-15  Catherine Moore  <clm@cm00re.com>
+	* gas/bfin/video2.s: New test contributed by Satyanarayana Reddy <reddy@epigonaudio.com>.
+	* gas/bfin/bfin.exp: Update to run video2.
+	* gas/bfin/video2.d: New.
+	* gas/bfin/store.d: Update to new objdump format.
+	* gas/bfin/store.s: Remove data section.
+
+2004-12-15  Catherine Moore  <clm@cm00re.com>
 
 	* gas/bfin/event2.s: New test contributed by Satyanarayana Reddy <reddy@epigonaudio.com>.
 	* gas/bfin/logical2.s: Likewise.

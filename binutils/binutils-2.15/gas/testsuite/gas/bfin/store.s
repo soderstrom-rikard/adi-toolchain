@@ -30,7 +30,7 @@ store_data_register:
 	.text
 	.global store_data_register_half
 store_data_register_half:
-	w [ i3] = R4.h
+	w [ i3] = R4.h;
 	W [I0++] = r0.h;
 	W [ i2--] = r7.H;
 	w [Sp] = R6.h;

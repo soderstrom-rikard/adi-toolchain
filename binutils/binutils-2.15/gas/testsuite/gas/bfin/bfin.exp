@@ -23,4 +23,5 @@ if [istarget bfin*-*-*] {
 	run_dump_test "vector"
 	run_dump_test "vector2"
 	run_dump_test "video"
+	run_dump_test "video2"
 }
