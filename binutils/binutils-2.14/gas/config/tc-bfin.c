@@ -488,6 +488,11 @@ int md_estimate_size_before_relax (fragS * fragP, segT segment)
 
 /* void md_convert_frag (bfd * abfd, segT sec, fragS * fragP)  */
 
+/* md_apply_fix3 : We only want to fix relocations that are
+   local. We define local as the relocations that
+   - are not absolute (i.e. they are PC relative)
+   - do not have a symbol table entry (fixP->fx_addsy is not null)
+*/
 void 
 md_apply_fix3 (fixP, valp, seg)
      fixS *fixP;
@@ -496,13 +501,11 @@ md_apply_fix3 (fixP, valp, seg)
 {
   char *buf = fixP->fx_where + fixP->fx_frag->fr_literal;
 
-  int lowbyte = target_big_endian ? 1 : 0;
-  int highbyte = target_big_endian ? 0 : 1; 
+  int lowbyte = 0; // bfin is little endian
+  int highbyte = 1; // bfin is little endian
   long val = *valp;
   int shift;
   int not_yet_resolved = 0;
-//fprintf(stderr, "calling fix3 with %x\n", fixP->fx_r_type);
-//return; // currently let us not fix local relocations.
 
 #if 0
   if (fixP->fx_r_type == BFD_RELOC_32)
@@ -517,20 +520,20 @@ md_apply_fix3 (fixP, valp, seg)
   shift = 0;
   switch (fixP->fx_r_type)
     {
-     case BFD_RELOC_10_PCREL:
+    case BFD_RELOC_10_PCREL: 
 	if (! val) 
-	{   fixP->fx_addnumber = 0; break;	}
-	fixP->fx_addnumber = 1;
-	val /=2; val++;  /*  Add into the length of "BRF/T label"   --- Tony */
-	shift = 1;
-        /* as_tsktsk ("Value of val = %x \n", val); */
-	if (val < -0x200 || val >= 0x1ff)
-	  as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_10");
-	buf[lowbyte] = val & 0xff;
-	buf[highbyte] |= (val >> 8) & 0x3;
-	break;
-     case BFD_RELOC_12_PCREL_JUMP : //TODO Jyotik
-     case BFD_RELOC_12_PCREL_JUMP_S : //TODO Jyotik
+       {   fixP->fx_addnumber = 0; break;      }
+       fixP->fx_addnumber = 1;
+       val /=2; val++;  /*  Add into the length of "BRF/T label"   --- Tony */
+       shift = 1;
+         /* as_tsktsk ("Value of val = %x \n", val); */
+       if (val < -0x200 || val >= 0x1ff)
+        as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_10");
+       buf[lowbyte] = val & 0xff;
+       buf[highbyte] |= (val >> 8) & 0x3;
+       break;
+     case BFD_RELOC_12_PCREL_JUMP : 
+     case BFD_RELOC_12_PCREL_JUMP_S : 
      case BFD_RELOC_12_PCREL:
 
 	/*
@@ -539,8 +542,10 @@ md_apply_fix3 (fixP, valp, seg)
 	 * also - amit
 	 */
 
-	if (! val && !fixP->fx_offset) 
-	{   fixP->fx_addnumber = 0; break;      }
+	if (! val && !fixP->fx_offset) {
+           fixP->fx_addnumber = 0; 
+           break;
+        }
 	fixP->fx_addnumber = 1;
 	val /= 2; val++; /*  Add into the length of "jump label"   --- Tony */ 
 	shift = 1;
@@ -558,12 +563,8 @@ md_apply_fix3 (fixP, valp, seg)
 	buf[highbyte] = (val >> 8) & 0xff;
 */
 	fixP->fx_addnumber = 0;
+        not_yet_resolved = 1; // absolute values not be resolved here
 
-/* Note:to make sure value correct, clear any original resolved by bfin parser
-        and leave to linker.
-	buf[0] = buf[1] = 0;
-	as_tsktsk("modified value = %x %x \n", buf[0], buf[1]);
-*/
 	break;
 
      case BFD_RELOC_16_HIGH:
@@ -574,45 +575,70 @@ md_apply_fix3 (fixP, valp, seg)
 	buf[0] = buf[1] = 0;
 */
 	fixP->fx_addnumber = 0;
+        not_yet_resolved = 1; // absolute values not be resolved here
 	break;
-     case BFD_RELOC_24_PCREL_JUMP :  //TODO Jyotik
-     case BFD_RELOC_24_PCREL_JUMP_X : //TODO Jyotik
-     case BFD_RELOC_24_PCREL_JUMP_L:  //TODO Jyotik
-     case BFD_RELOC_24_PCREL_CALL_X:   //TODO -Jyotik
-     case BFD_RELOC_24_PCREL:
-	if (! val) 
-	{   fixP->fx_addnumber = 0; break;	}
+     case BFD_RELOC_24_PCREL_JUMP :  
+     case BFD_RELOC_24_PCREL_JUMP_X : 
+     case BFD_RELOC_24_PCREL_JUMP_L: 
+       /*This switch case and next one BFD_RELOC_24_PCREL_CALL_X looks
+         very similar. I think these two should be handled in same way.
+         But, for time being I am handling it separately*/
+       	if (! val) {   
+	   fixP->fx_addnumber = 0; 
+           break;
+        }
 	fixP->fx_addnumber = 1;
-	val = (val + 4)/2; /*  Add into the length of "call/ljump label"   --- Tony */ 
+	val = (val + 4)/2;
 	shift = 1;
 	if (val < -0x800000 || val >= 0x7fffff)
 	  as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_24");
+        buf -= 2; // we want to go back and fix.
 	buf[0] = val >> 16;
 	buf[2] = val >> 0;
 	buf[3] = val >> 8;
 	break;
-     case BFD_RELOC_5_PCREL: 
-	if (! val) 
-	{   fixP->fx_addnumber = 0; break;	}
+     case BFD_RELOC_24_PCREL_CALL_X: 
+     case BFD_RELOC_24_PCREL: 
+	if (! val) {   
+	   fixP->fx_addnumber = 0; 
+           break;
+        }
+	fixP->fx_addnumber = 1;
+	val = (val + 6)/2; /*  Add into the length of "call/ljump label"   --- Tony */ 
+	shift = 1;
+	if (val < -0x800000 || val >= 0x7fffff)
+	  as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_24");
+        buf -= 2; // we want to go back and fix.
+	buf[0] = val >> 16;
+	buf[2] = val >> 0;
+	buf[3] = val >> 8;
+	break;
+     case BFD_RELOC_5_PCREL: /* LSETUP (a, b) : "a" */
+	if (! val) {
+           fixP->fx_addnumber = 0; 
+           break;
+        }
 	fixP->fx_addnumber = 1;
 	val /=2; val++; /* Add into opcode length   ---Tony */
 	shift = 1;
 
 	if (val < -0x8 || val >= 0x7)
 	{
-	       	as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_5");
+	  as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_5");
 	}
 	*buf = (*buf & 0xf0) | (val & 0xf);
 	break;
-     case BFD_RELOC_11_PCREL : //TODO Jyotik
-     case BFD_RELOC_10_LPPCREL:
-	if (! val) 
-	{   fixP->fx_addnumber = 0; break;	}
+     case BFD_RELOC_11_PCREL :  /* LSETUP (a, b) : "b" */
+	if (! val) {
+           fixP->fx_addnumber = 0; 
+           break; 
+        }
 	fixP->fx_addnumber = 1;
 	val =(val+4)/2;
 	shift = 1;
         if (val < -0x200 || val >= 0x1ff)
-          as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_10_LPP");
+          as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_11_PCREL");
+
         buf[lowbyte] = val & 0xff;
         buf[highbyte] |= (val >> 8) & 0x3;
         break;
@@ -625,40 +651,24 @@ md_apply_fix3 (fixP, valp, seg)
 
      case BFD_RELOC_32:
 	break;
-        if (! target_big_endian)
-          {
             *buf++ = val >> 0;
             *buf++ = val >> 8;
             *buf++ = val >> 16;
             *buf++ = val >> 24;
-          }
-        else
-          {
-            *buf++ = val >> 24;
-            *buf++ = val >> 16;
-            *buf++ = val >> 8;
-            *buf++ = val >> 0;
-          }
+            not_yet_resolved = 1; // absolute values not be resolved here
         break;
 
      case BFD_RELOC_16_IMM: //Jyotik
      case BFD_RELOC_16:
-        if (! target_big_endian)
-          {
             *buf++ = val >> 0;
             *buf++ = val >> 8;
-          }
-        else
-          {
-            *buf++ = val >> 8;
-            *buf++ = val >> 0;
-          }
+            not_yet_resolved = 1; // absolute values not be resolved here
         break;
 		//added following line for arithmetic reloc check -Jyotik
      default: if((BFD_ARELOC_PUSH > fixP->fx_r_type) || (BFD_ARELOC_COMP < fixP->fx_r_type))
 		      {
 		fprintf(stderr, "Relocation %d not handled in gas."
-			       " Contact support.", fixP->fx_r_type);
+			       " Contact support.\n", fixP->fx_r_type);
 			return;
 //		abort ();
 		      }
