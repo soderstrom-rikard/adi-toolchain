@@ -6,6 +6,27 @@
 	* config/bfin/bfin.md (casesi, casesi_internal): Delete.
 	(tablejump): DONE once we emitted an insn.
 
+	* config/bfin/bfin-protos.h (call_insn_operand): Declare.
+	* config/bfin/bfin.c (call_insn_operand): New function.
+	* config/bfin/bfin.h (LEGITIMATE_PIC_OPERAND_P): Anything but a
+	symbolic const.
+	(PREDICATE_CODES): Add call_insn_operand.
+	(CASE_VECTOR_PC_RELATIVE): Was commented out, delete.
+	(CASE_VECTOR_MODE): Always SImode.
+	(JUMP_TABLES_IN_TEXT_SECTION): True if flag_pic.
+	(EXTRA_CONSTRAINT): Allow SYMBOL_REF with 'Q'.
+	(MY_ASM_OUTPUT_ADDR_DIFF_ELT): Emit 32 bit values.
+	* config/bfin/bfin.md (movsi_high_pic, movsi_low_pic): Remove
+	predicate and constraint from input operand.
+	(tablejump): Lose HImode/SImode distinction, but generate proper
+	code for PC-relative jumps if flag_pic.
+	(tablejump_internal): Now a named pattern.
+	(tablejump_short, tablejump_long, short tablejump define_insn): Delete.
+	(call, sibcall, call_value, sibcall_value): Lose constraints and
+	predicates.
+	(call_insn, sibcall_insn, call_value_insn, sibcall_value_insn): Use
+	call_insn_operand for call target.  Use 'Q' constraint instrad of 'i'.
+
 2004-12-30 Pradip Shah <pcs@rrap-software.com>
 
 	* config/bfin/bfin.md (brcc): Length

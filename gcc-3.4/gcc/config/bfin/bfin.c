@@ -1566,6 +1566,32 @@ symbolic_or_const_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
     return 1;
   return symbolic_operand (op, mode);
 }
+
+/* Test for a valid operand for a call instruction.  Don't allow the
+   arg pointer register or virtual regs since they may decay into
+   reg + const, which the patterns can't handle.  */
+
+int
+call_insn_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
+{
+  /* Disallow indirect through a virtual register.  This leads to
+     compiler aborts when trying to eliminate them.  */
+  if (GET_CODE (op) == REG
+      && (op == arg_pointer_rtx
+	  || (REGNO (op) >= FIRST_PSEUDO_REGISTER
+	      && REGNO (op) <= LAST_VIRTUAL_REGISTER)))
+    return 0;
+
+  if (GET_CODE (op) == CONST_INT)
+    return 0;
+
+  /* Explicitly allow SYMBOL_REF even if pic.  */
+  if (GET_CODE (op) == SYMBOL_REF)
+    return 1;
+
+  /* Otherwise we can allow any nonmemory_operand in the address.  */
+  return nonmemory_operand (op, Pmode);
+}
 
 /* Split one or more DImode RTL references into pairs of SImode
    references.  The RTL can be REG, offsettable MEM, integer constant, or

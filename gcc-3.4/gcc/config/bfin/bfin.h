@@ -797,9 +797,7 @@ do {					       \
      not check it either.  You need not define this macro if all
      constants (including `SYMBOL_REF') can be immediate operands when
      generating position independent code. */
-#define LEGITIMATE_PIC_OPERAND_P(X) \
-  (! SYMBOLIC_CONST (X)							\
-   || (GET_CODE (X) == SYMBOL_REF && !CONSTANT_POOL_ADDRESS_P (X)))
+#define LEGITIMATE_PIC_OPERAND_P(X) ! SYMBOLIC_CONST (X)
 
 #define SYMBOLIC_CONST(X)	\
 (GET_CODE (X) == SYMBOL_REF						\
@@ -991,6 +989,7 @@ do {                                              \
 #define PREDICATE_CODES                                                	\
   {"cc_operand", {REG}},				        	\
   {"valid_reg_operand", {SUBREG, REG, ADDRESSOF}},			\
+  {"call_insn_operand", {SUBREG, REG, SYMBOL_REF}},			\
   {"symbolic_operand", {CONST, SYMBOL_REF, LABEL_REF}},			\
   {"symbolic_or_const_operand",						\
       {CONST_INT, CONST_DOUBLE, CONST, SYMBOL_REF, LABEL_REF}},		\
@@ -1029,20 +1028,11 @@ do {                                              \
 #define MEMORY_MOVE_COST(MODE, CLASS, IN)	\
   bfin_memory_move_cost ((MODE), (CLASS), (IN))
 
-/* Define as C expression which evaluates to nonzero if the tablejump
-   instruction expects the table to contain offsets from the address of the
-   table.
-   Do not define this if the table should contain absolute addresses.
-#define CASE_VECTOR_PC_RELATIVE 1
-*/
- 
 /* Specify the machine mode that this machine uses
    for the index in the tablejump instruction.  */
-#ifdef CASE_VECTOR_PC_RELATIVE
-#define CASE_VECTOR_MODE HImode
-#else
 #define CASE_VECTOR_MODE SImode
-#endif
+
+#define JUMP_TABLES_IN_TEXT_SECTION flag_pic
 
 /* Define if operations between registers always perform the operation
    on the full register even if a narrower mode is specified. 
@@ -1124,6 +1114,9 @@ do {                                              \
      /*Constant Output Formats */
 #define CONST_DOUBLE_OK_FOR_LETTER_P(VALUE, C)	\
   ((C) == 'H' ? 1 : 0)
+
+#define EXTRA_CONSTRAINT(VALUE, D) \
+    ((D) == 'Q' ? GET_CODE (VALUE) == SYMBOL_REF : 0)
 
 /* `FINALIZE_PIC'
      By generating position-independent code, when two different
@@ -1245,7 +1238,7 @@ do { char __buf[256];					\
 #define MY_ASM_OUTPUT_ADDR_DIFF_ELT(FILE, VALUE, REL)		\
     do {							\
 	char __buf[256];					\
-	fprintf (FILE, "\t.dw\t");				\
+	fprintf (FILE, "\t.dd\t");				\
 	ASM_GENERATE_INTERNAL_LABEL (__buf, "L", VALUE);	\
 	assemble_name (FILE, __buf);				\
 	fputs (" - ", FILE);					\

@@ -48,6 +48,7 @@ extern int symbolic_reference_mentioned_p (rtx);
 extern rtx bfin_gen_compare (rtx, Mmode);
 extern void expand_move (rtx *, Mmode);
 
+extern int call_insn_operand (rtx, Mmode);
 extern int symbolic_operand (rtx, Mmode);
 extern int symbolic_or_const_operand (rtx , enum machine_mode);
 extern int imm16bit_operand_p (rtx, Mmode);
