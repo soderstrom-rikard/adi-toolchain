@@ -296,7 +296,7 @@
 
 (define_insn "movbi"
   [(set (match_operand:BI 0 "nonimmediate_operand" "=x,x,d,mr,C,d")
-        (match_operand:BI 1 "general_operand" "x,xKsh3,mr,d,d,C"))]
+        (match_operand:BI 1 "general_operand" "x,xKs3,mr,d,d,C"))]
 
   ""
   "@
