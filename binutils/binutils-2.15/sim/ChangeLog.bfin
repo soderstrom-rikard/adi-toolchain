@@ -1,3 +1,7 @@
+2004-12-02  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin/interp.c (bfin_trap): Better support for open/close/write.
+
 2004-10-22  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin/bfin-dis.c (sub32): Invert carry flag.

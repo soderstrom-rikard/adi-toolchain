@@ -34,6 +34,10 @@ clear_bss:
 	r0.h = _fini; 
 	call	(p0)
 
+	p0.l = _initialise_monitor_handles;
+	p0.h = _initialise_monitor_handles;
+	call	(p0)
+
 	p0.l = _main;
 	p0.h = _main; 
 	call	(p0)

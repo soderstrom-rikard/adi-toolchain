@@ -143,7 +143,7 @@ initialise_monitor_handles (void)
   block[0] = (int) ":tt";
   block[2] = 3;     /* length of filename */
   block[1] = 4;     /* mode "w" */
-  monitor_stdout = monitor_stderr = do_syscall (AngelSWI_Reason_Open, (void *) block);
+  monitor_stdout = monitor_stderr = do_syscall (SYS_open, (void *) block);
 
   for (i = 0; i < MAX_OPEN_FILES; i ++)
     openfiles[i].handle = -1;
@@ -188,7 +188,7 @@ _swiread (int file,
   block[1] = (int) ptr;
   block[2] = len;
   
-  return do_syscall (AngelSWI_Reason_Read, block);
+  return do_syscall (SYS_read, block);
 }
 
 int
@@ -267,7 +267,7 @@ _swiwrite (
   block[1] = (int) ptr;
   block[2] = len;
   
-  return do_syscall (AngelSWI_Reason_Write, block);
+  return do_syscall (SYS_write, block);
 }
 
 int

@@ -1,3 +1,10 @@
+2004-12-02  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* libc/sys/bfin/crt0.S (start): Call initialise_monitor_handles.
+	* libc/sys/bfin/syscalls.c (initialise_monitor_handles, _swiwrite,
+	_swiread): Use proper syscall numbers.
+	
+
 2004-11-18  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* libc/sys/bfin/crt0.S (start): Clear BSS and ensure init and fini are

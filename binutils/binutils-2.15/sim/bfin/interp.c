@@ -385,17 +385,32 @@ bfin_trap ()
       {
 	char *arg0 = saved_state.memory + get_long (saved_state.memory, args);
 	bu32 arg1 = get_long (saved_state.memory, args + 4);
-	printf ("opening %s %d\n", arg0, arg1);
-	DREG (0) = open (arg0, arg1);
+	bu32 arg2 = get_long (saved_state.memory, args + 8);
+	if (strcmp (arg0, ":tt") == 0)
+	  {
+	    DREG (0) = arg2 == 3 ? 0 : 1;
+	  }
+	else
+	  DREG (0) = callback->open (callback, arg0, arg1);
       }
       return;
+
+    case SYS_write:
+      {
+	bu32 arg0 = get_long (saved_state.memory, args);
+	char *arg1 = saved_state.memory + get_long (saved_state.memory, args + 4);
+	bu32 arg2 = get_long (saved_state.memory, args + 8);
+	DREG (0) = callback->write (callback, arg0, arg1, arg2);
+      }
+      return;
+      
     case SYS_kill:
       printf ("Killing with signal %d\n", get_long (saved_state.memory, args + 4));
       raise (SIGABRT);
 
     case SYS_close:
       printf ("Closing %d\n", get_long (saved_state.memory, args));
-      DREG (0) = close (get_long (saved_state.memory, args));
+      DREG (0) = callback->close (callback, get_long (saved_state.memory, args));
       return;
     default:
       abort ();
