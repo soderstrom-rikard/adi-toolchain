@@ -1,3 +1,11 @@
+2004-10-07  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (adddi3): Generate correct code for add of small
+	negative constant.
+	* config/bfin/bfin.h (PREDICATE_CODES): Add positive_immediate_operand.
+	* config/bfin/bfin-protos.h (positive_immediate_operand): Declare.
+	* config/bfin/bfin.c (positive_immediate_operand): New function.
+
 2004-10-05  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (extendhisi2, zero_extendhisi2, extendqisi2,

@@ -1034,6 +1034,7 @@ do {                                              \
   {"simple_reg_operand", {SUBREG, REG, ADDRESSOF}},     		\
   {"scale_by_operand", {CONST_INT}},					\
   {"pos_scale_operand", {CONST_INT}},                                  	\
+  {"positive_immediate_operand", {CONST_INT}},				\
   {"reg_or_7bit_operand", {CONST_INT, REG}},				\
   {"regorbitclr_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},        	\
   {"regorlog2_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},          	\

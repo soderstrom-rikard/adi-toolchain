@@ -564,11 +564,27 @@
    (clobber (match_scratch:SI 3 "=&d,&d"))
    (clobber (reg:CC 34))]
   ""
-  "@
-    %0 += %2; cc = ac0; %3 = cc; %H0 = %H0 + %3;
-    %0 = %0 + %2; cc = ac0; %3 = cc; %H0 = %H0 + %H2; %H0 = %H0 + %3;"
+  "*
+{
+  int alt = which_alternative;
+  const char *alt_strings[] =
+    {
+      \"%0 += %2; cc = ac0; %3 = cc; %H0 = %H0 + %3;\",
+      \"%0 = %0 + %2; cc = ac0; %3 = cc; %H0 = %H0 + %H2; %H0 = %H0 + %3;\",
+      \"%0 += %2; cc = ac0; %3 = cc; %H0 += -1; %H0 = %H0 + %3;\"
+    };
+
+  if (alt == 0 && INTVAL (operands[2]) < 0)
+    alt = 2;
+
+  return alt_strings[alt];
+}"
   [(set_attr "type" "alu0")
-   (set_attr "length" "8,10")])
+   (set (attr "length")
+	(if_then_else
+	    (match_operand:DI 2 "positive_immediate_operand" "")
+	    (const_int 8)
+	    (const_int 10)))])
 
 
 ;;;<<<  subdi3-mode    >>>;;;

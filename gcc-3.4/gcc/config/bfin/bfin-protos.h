@@ -97,6 +97,7 @@ extern int scale_operand PARAMS ((rtx, Mmode));
 extern int reg_or_scale_operand PARAMS ((rtx, Mmode));
 extern int log2_operand PARAMS ((rtx, Mmode));
 extern int rhs_andsi3_operand PARAMS ((rtx, Mmode));
+extern int positive_immediate_operand PARAMS ((rtx, Mmode));
 extern int reg_or_0_operand PARAMS ((rtx, Mmode));
 extern int signed_comparison_operator PARAMS ((rtx, Mmode));
 
