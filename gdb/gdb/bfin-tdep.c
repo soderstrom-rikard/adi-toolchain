@@ -73,7 +73,6 @@ static void bfin_frame_init_saved_regs (struct frame_info *fip);
 /* Frame offsets */
 #define OLD_FP_OFFSET		0
 #define RETS_OFFSET		4
-#define NUM_PSEUDO_REGS    3
 
 /* Each OS has a different mechanism for accessing the various
    registers stored in the sigcontext structure.
@@ -118,7 +117,7 @@ static struct cmd_list_element *showbfincmdlist = NULL;
 
 /* Initial value: Register names used in BFIN's ISA documentation.  */
 static char *bfin_register_name_strings[] =
-{ "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", 
+{ "orig_pc", "ipend", "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", 
   "p0", "p1", "p2", "p3", "p4", "p5","fp","usp",
   "i0", "i1", "i2", "i3", 
   "m0", "m1", "m2", "m3", 
@@ -126,7 +125,7 @@ static char *bfin_register_name_strings[] =
   "b0", "b1", "b2", "b3",
   "a0x", "a0w", "a1x", "a1w", "lc0", "lc1", "lt0", "lt1", "lb0", "lb1", 
   "astat", "reserved", "rets", "pc", "retx", "retn", "rete", "seqstat",
-   "syscfg","ipend" }; 
+   "syscfg","extra1", "extra2", "extra3" }; 
 
 #define NUM_BFIN_REGNAMES (sizeof(bfin_register_name_strings)/sizeof(char *))
 /***************************************************************************
@@ -257,49 +256,62 @@ bfin_alloc_frame_cache (void)
   return cache;
 }
 
+CORE_ADDR text_addr = 0;
+
 static struct bfin_frame_cache *
 bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
 {
   struct bfin_frame_cache *cache;
   char buf[4];
   int i;
-
+  if(0 == text_addr)
+         text_addr = read_register(BFIN_EXTRA1) ;
   if (*this_cache)
     return *this_cache;
 
   cache = bfin_alloc_frame_cache ();
   *this_cache = cache;
+   /* In principle, for normal frames, %fp holds the frame pointer,
+     which holds the base address for the current stack frame.
+     However, for functions that don't need it, the frame pointer is
+     optional.  For these "frameless" functions the frame pointer is
+     actually the frame pointer of the calling frame.  Signal
+     trampolines are just a special case of a "frameless" function.
+     They (usually) share their frame pointer with the frame that was
+     in progress when the signal occurred.  */
 
 
   frame_unwind_register (next_frame, BFIN_FP_REGNUM, buf);
-  cache->base = extract_unsigned_integer (buf, 4);
+  cache->base = extract_unsigned_integer (buf, 4) - text_addr;
   if (cache->base == 0)
     return cache;
 
   /* For normal frames, PC is stored at [FP + 4].  */
   cache->saved_regs[BFIN_PC_REGNUM] = 4;
+  cache->saved_regs[BFIN_FP_REGNUM] = 0;
+ 
+  /* Adjust all the saved registers such that they contain addresses
+     instead of offsets.  */
+  for (i = 0; i < BFIN_NUM_REGS; i++)
+    if (cache->saved_regs[i] != -1)
+      cache->saved_regs[i] += cache->base;
 
-  cache->pc = frame_func_unwind (next_frame);
+  cache->pc = frame_func_unwind (next_frame) ;
 #if 0 //Jyotik TODO
   if (cache->pc != 0)
     bfin_analyze_prologue (cache->pc, frame_pc_unwind (next_frame), cache);
 #endif 
+#if 0
   if (cache->locals < 0)
     {
 
       frame_unwind_register (next_frame, BFIN_SP_REGNUM, buf);
       cache->base = extract_unsigned_integer (buf, 4) + cache->sp_offset;
     }
-
+#endif
   /* Now that we have the base address for the stack frame we can
      calculate the value of SP in the calling frame.  */
   cache->saved_sp = cache->base + 8;
-
-  /* Adjust all the saved registers such that they contain addresses
-     instead of offsets.  */
-  for (i = 0; i < BFIN_NUM_REGS; i++)
-    if (cache->saved_regs[i] != -1)
-      cache->saved_regs[i] += cache->base;
 
   return cache;
 }
@@ -327,7 +339,6 @@ bfin_frame_this_id (struct frame_info *next_frame, void **this_cache,
 #ifdef JYOTIK_DEBUG
  fprintf(stderr, "JYOTIK DEBUG(from cache): stack_addr = 0x%x  code_addr = 0x%x\n", id.stack_addr, id.code_addr);
 #endif
-    return ;
   /* This marks the outermost frame.  */
   if (cache->base == 0)
     return;
@@ -346,7 +357,6 @@ bfin_frame_prev_register (struct frame_info *next_frame, void **this_cache,
                           int *realnump, void *valuep)
 {
   struct bfin_frame_cache *cache = bfin_frame_cache (next_frame, this_cache);
-//  fprintf(stderr, "JYOTIK DEBUG: Inside \"bfin_frame_prev_register\" \n");
   gdb_assert (regnum >= 0);
 
   if (regnum == BFIN_SP_REGNUM && cache->saved_sp)
@@ -371,8 +381,21 @@ bfin_frame_prev_register (struct frame_info *next_frame, void **this_cache,
       if (valuep)
         {
           /* Read the value in from memory.  */
-          read_memory (*addrp, valuep,
+           if(regnum == BFIN_PC_REGNUM){
+            // fprintf(stderr, "cached %s being returned %x = %x\n", 
+             // (regnum == BFIN_PC_REGNUM)?"pc":"fp", *addrp, 
+              // read_memory_integer (*addrp, 4) - text_addr);
+          int *pi = (int *)valuep;
+          *pi = read_memory_integer (*addrp, 4) - text_addr;
+          }
+          else if(regnum == BFIN_FP_REGNUM){
+             int *pi = (int *)valuep;
+             *pi = read_memory_integer (*addrp, 4);
+          }
+          else{
+              read_memory (*addrp, valuep,
                        register_size (current_gdbarch, regnum));
+          }
         }
       return;
     }
@@ -1016,13 +1039,28 @@ bfin_frame_base_address (struct frame_info *next_frame, void **this_cache)
 
   return cache->base;
 }
+static CORE_ADDR
+bfin_frame_local_address (struct frame_info *next_frame, void **this_cache)
+{
+  struct bfin_frame_cache *cache = bfin_frame_cache (next_frame, this_cache);
+
+   fprintf(stderr, "JYOTIK DEBUG: LOCAL\n");
+  return cache->base + 4;
+}
+static CORE_ADDR
+bfin_frame_args_address (struct frame_info *next_frame, void **this_cache)
+{
+  struct bfin_frame_cache *cache = bfin_frame_cache (next_frame, this_cache);
+   fprintf(stderr, "JYOTIK DEBUG: ARGS\n");
+  return cache->base -4;
+}
 
 static const struct frame_base bfin_frame_base =
 {
   &bfin_frame_unwind,
   bfin_frame_base_address,
-  bfin_frame_base_address,
-  bfin_frame_base_address
+  bfin_frame_local_address ,
+  bfin_frame_args_address 
 };
 
 static struct frame_id
@@ -1042,19 +1080,11 @@ static CORE_ADDR
 bfin_unwind_pc (struct gdbarch *gdbarch, struct frame_info *next_frame)
 {
   char buf[8];
+  int* pInt1 = (int*)buf;
+  int* pInt2 = (int*)(buf +4);
   CORE_ADDR ret, start_code;
-  frame_unwind_register (next_frame, PC_REGNUM, buf);
-  ret=  extract_typed_address (buf, builtin_type_void_func_ptr);
-  memset(buf,  '\0', 8);
-  frame_unwind_register (next_frame, 52/*first psudo register to fetch start_code*/, buf);
-  
-
-  start_code = extract_typed_address (buf, builtin_type_void_func_ptr);
- // fprintf(stderr, "JYOTIK DEBUG: in bfin_unwind_pc start_code = 0x%x  pc = 0x%x  0x%x\n",
-            //start_code, ret, ret-start_code);
-  if(ret > start_code)
-     ret -= start_code;
-  return ret;
+  frame_unwind_register (next_frame, PC_REGNUM , buf);
+  return  extract_typed_address (buf, builtin_type_void_func_ptr);
 }
 
 static const struct frame_unwind *
@@ -1104,7 +1134,6 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   gdbarch = gdbarch_alloc (&info, NULL);
   
   /* Offset from address of function to start of its code.  */
-  printf("Need to review line %d in file %s\n", __LINE__ + 1, __FILE__);  
   set_gdbarch_function_start_offset (gdbarch, 0);
   set_gdbarch_skip_prologue (gdbarch, bfin_skip_prologue);
   set_gdbarch_breakpoint_from_pc (gdbarch, bfin_breakpoint_from_pc);
@@ -1118,7 +1147,7 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   set_gdbarch_store_return_value (gdbarch, bfin_store_return_value);
 
   set_gdbarch_frameless_function_invocation(gdbarch, bfin_frameless_func_invoke); 
-  set_gdbarch_frame_args_skip (gdbarch, 8);
+  set_gdbarch_frame_args_skip (gdbarch, FRAME_ARGS_SKIP);
   set_gdbarch_register_type (gdbarch, bfin_register_type);
   set_gdbarch_register_name (gdbarch, bfin_register_name);
   

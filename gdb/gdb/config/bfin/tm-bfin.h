@@ -67,15 +67,15 @@ int gdbtgt_nregs ();
 
 
 #define REGISTER_NAMES  \
- {"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", \
+ {"ipend", "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", \
   "p0", "p1", "p2", "p3", "p4", "p5", "usp", "fp", \
   "i0", "i1", "i2", "i3", "m0", "m1", "m2", "m3", \
   "l0", "l1", "l2", "l3", "b0", "b1", "b2", "b3", \
   "a0x", "a0w", "a1x", "a1w", "lc0", "lc1", "lt0", "lt1",\
   "lb0", "lb1", "astat", "unk", "rets", "pc", "retx", "retn", \
-  "rete", "seqstat", "syscfg", "ipend"};
+  "rete", "seqstat", "syscfg",  "extra1", "extra2", "extra3"};
 
-#define NUM_REGS 52	
+#define NUM_REGS 55	
 #define NUM_FREGS	0
 
 #define REGISTER_BYTES  (NUM_REGS *4)
@@ -174,6 +174,8 @@ int gdbtgt_nregs ();
 /* Return number of bytes at start of arglist that are not really args.  */
 /* On a regular frame with a link command rets and old fp are stored     */
 #define FRAME_ARGS_SKIP 8
+//#define FRAME_ARGS_ADDRESS(fi) (get_frame_base (fi) - 4)
+//#define FRAME_LOCALS_ADDRESS(fi) (get_frame_base (fi) + 4)
 
 struct frame_info;
 
@@ -215,7 +217,7 @@ extern void bfin_pop_frame PARAMS ((void));
 #define POP_FRAME		{ bfin_pop_frame (); }
 
 /* Offset from SP to first arg on stack at first instruction of a function */
-#define SP_ARG0 (1 * 4)
+#define SP_ARG0 (0)
 
 #define read_memory_short(x)  (read_memory_integer(x,2) & 0xffff)
 

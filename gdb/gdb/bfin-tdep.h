@@ -26,55 +26,69 @@
    passed to read_register.  */
 
 enum gdb_regnum {
-  BFIN_R0_REGNUM  = 0,
-  BFIN_R1_REGNUM  = 1,          /* first data register */
-  BFIN_R7_REGNUM  = 7,          /* last  data register */
-  BFIN_P0_REGNUM  = 8,
-  BFIN_P1_REGNUM  = 9,          /* first general addressing register */
-  BFIN_P5_REGNUM  = 13,         /* last  general addressing register */
-  BFIN_P6_REGNUM  = 14,         /* Stack Pointer Register */
-  BFIN_P7_REGNUM  = 15,         /* Frame Pointer Register */
-  BFIN_I0_REGNUM  = 16,
-  BFIN_I1_REGNUM  = 17,
-  BFIN_I2_REGNUM  = 18,
-  BFIN_I3_REGNUM  = 19,
-  BFIN_M0_REGNUM  = 20,
-  BFIN_M1_REGNUM  = 21,
-  BFIN_M2_REGNUM  = 22,
-  BFIN_M3_REGNUM  = 23,
-  BFIN_L0_REGNUM  = 24,
-  BFIN_L1_REGNUM  = 25,
-  BFIN_L2_REGNUM  = 26,
-  BFIN_L3_REGNUM  = 27,
-  BFIN_B0_REGNUM  = 28,
-  BFIN_B1_REGNUM  = 29,         /* START MODIFIER REGISTER */
-  BFIN_B2_REGNUM  = 30,         /* END MODIFIER REGISTER */
-  BFIN_B3_REGNUM  = 31,
-  BFIN_A0_DOT_X_REGNUM = 32,
-  BFIN_AO_DOT_W_REGNUM = 33,
-  BFIN_A1_DOT_X_REGNUM = 34,
-  BFIN_A1_DOT_W_REGNUM = 35,
-  BFIN_LC0_REGNUM      = 36,
-  BFIN_LC1_REGNUM      = 37,
-  BFIN_LT0_REGNUM      = 38,
-  BFIN_LT1_REGNUM      = 39,
-  BFIN_LB0_REGNUM      = 40,
-  BFIN_LB1_REGNUM      = 41,
-  BFIN_ASTAT_REGNUM    = 42,
-  BFIN_RESERVED_REGNUM = 43,
-  BFIN_RETS_REGNUM     = 44, /* Subroutine address register */
-  BFIN_PC_REGNUM       = 45, /*actually RETI*/
-  BFIN_RETX_REGNUM     = 46,
-  BFIN_RETN_REGNUM     = 47,
-  BFIN_RETE_REGNUM     = 48,
-  BFIN_SEQSTAT_REGNUM  = 49,
-  BFIN_SYSCFG_REGNUM   = 50,
-  BFIN_IPEND_REGNUM    = 51,        /* Subroutine address register */  
+  BFIN_ORIGPC_REGNUM    = 0,        /* Subroutine address register */  
+  BFIN_IPEND_REGNUM,        /* Subroutine address register */  
+  BFIN_R0_REGNUM,
+  BFIN_R1_REGNUM,
+  BFIN_R2_REGNUM,
+  BFIN_R3_REGNUM,
+  BFIN_R4_REGNUM,
+  BFIN_R5_REGNUM,
+  BFIN_R6_REGNUM,
+  BFIN_R7_REGNUM,
+  BFIN_P0_REGNUM,
+  BFIN_P1_REGNUM,
+  BFIN_P2_REGNUM,
+  BFIN_P3_REGNUM,
+  BFIN_P4_REGNUM,
+  BFIN_P5_REGNUM,
+  BFIN_P6_REGNUM,         /* Stack Pointer Register */
+  BFIN_P7_REGNUM,         /* Frame Pointer Register */
+  BFIN_I0_REGNUM,
+  BFIN_I1_REGNUM,
+  BFIN_I2_REGNUM,
+  BFIN_I3_REGNUM,
+  BFIN_M0_REGNUM,
+  BFIN_M1_REGNUM,
+  BFIN_M2_REGNUM,
+  BFIN_M3_REGNUM,
+  BFIN_L0_REGNUM,
+  BFIN_L1_REGNUM,
+  BFIN_L2_REGNUM,
+  BFIN_L3_REGNUM,
+  BFIN_B0_REGNUM,
+  BFIN_B1_REGNUM,         /* START MODIFIER REGISTER */
+  BFIN_B2_REGNUM,         /* END MODIFIER REGISTER */
+  BFIN_B3_REGNUM,
+  BFIN_A0_DOT_X_REGNUM,
+  BFIN_AO_DOT_W_REGNUM,
+  BFIN_A1_DOT_X_REGNUM,
+  BFIN_A1_DOT_W_REGNUM,
+  BFIN_LC0_REGNUM,
+  BFIN_LC1_REGNUM,
+  BFIN_LT0_REGNUM,
+  BFIN_LT1_REGNUM,
+  BFIN_LB0_REGNUM,
+  BFIN_LB1_REGNUM,
+  BFIN_ASTAT_REGNUM,
+  BFIN_RESERVED_REGNUM,
+  BFIN_RETS_REGNUM, 	/* Subroutine address register */
+  BFIN_PC_REGNUM, 	/*actually RETI pc will be in ORIG_PC*/
+  BFIN_RETX_REGNUM,
+  BFIN_RETN_REGNUM,
+  BFIN_RETE_REGNUM,
+  BFIN_SEQSTAT_REGNUM,
+  BFIN_SYSCFG_REGNUM,
+  BFIN_EXTRA1,        /* Extra "registers" for hacks 1. address of .text */
+  BFIN_EXTRA2,        
+  BFIN_EXTRA3,       
+
+  // LAST ENTRY SHOULD NOT BE CHANGED
+  BFIN_NUM_REGS       /* 0 index, so this entry is size */
 };
 
-#define BFIN_NUM_REGS  BFIN_IPEND_REGNUM +1
-#define BFIN_FP_REGNUM BFIN_P7_REGNUM
-#define BFIN_SP_REGNUM BFIN_P6_REGNUM
+#define BFIN_FP_REGNUM BFIN_P6_REGNUM 
+#define BFIN_SP_REGNUM BFIN_P7_REGNUM 
 /* Used in target-specific code when we need to know the size of the
    largest type of register we need to handle.  */
 #define BFIN_MAX_REGISTER_RAW_SIZE      4	

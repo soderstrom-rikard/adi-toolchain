@@ -1,6 +1,8 @@
 name:bfin
 expedite:pc,sp,fp
-32:ipend
+32:extra3
+32:extra2
+32:extra1
 32:syscfg
 32:seqstat
 32:rete
@@ -52,3 +54,5 @@ expedite:pc,sp,fp
 32:r2
 32:r1
 32:r0
+32:ipend
+32:orig_pc
