@@ -3457,7 +3457,6 @@ deplibs_check_method=$lt_cv_deplibs_check_method
 
 
 # Autoconf 2.13's AC_OBJEXT and AC_EXEEXT macros only works for C compilers!
-
 # Only perform the check for file, if the check method requires it
 case $deplibs_check_method in
 file_magic*)
@@ -4173,6 +4172,7 @@ for this_target in $target $canon_targets ; do
       m8*)		cpu_type=m88k ;;
       mips*el)		cpu_type=mips endian=little ;;
       mips*)		cpu_type=mips endian=big ;;
+      bfin*)		cpu_type=bfin endian=little ;;
       or32*)		cpu_type=or32 endian=big ;;
       pjl*)		cpu_type=pj endian=little ;;
       pj*)		cpu_type=pj endian=big ;;
@@ -4439,6 +4439,8 @@ echo "$as_me: error: Unknown vendor for mips-bsd configuration." >&2;}
       mn10200-*-*)			fmt=elf ;;
       mn10300-*-*)			fmt=elf ;;
       msp430-*-*)			fmt=elf ;;
+      bfin-*-*)             		fmt=elf bfd_gas=yes ;;
+      bfin-*elf)             		fmt=elf bfd_gas=yes ;;
       openrisc-*-*)			fmt=elf ;;
       or32-*-rtems*)			fmt=elf ;;
       or32-*-coff)			fmt=coff ;;
@@ -4741,6 +4743,18 @@ _ACEOF
 	if test $? -ne 0 ; then
 	  extra_objects="$extra_objects itbl-ops.o"
 	fi
+	;;
+
+      bfin)
+        echo ${extra_objects} | grep -s "bfin-parse.o"
+        if test $? -ne 0 ; then
+          extra_objects="$extra_objects bfin-parse.o"
+        fi
+ 
+        echo ${extra_objects} | grep -s "bfin-lex.o"
+        if test $? -ne 0 ; then
+          extra_objects="$extra_objects bfin-lex.o"
+        fi
 	;;
 
       i386 | s390 | sparc)

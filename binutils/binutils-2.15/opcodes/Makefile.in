@@ -274,7 +274,8 @@ CFILES = \
 	xstormy16-opc.c \
 	xtensa-dis.c \
 	z8k-dis.c \
-	z8kgen.c
+	z8kgen.c \
+	bfin-dis.c
 
 
 ALL_MACHINES = \
@@ -349,6 +350,7 @@ ALL_MACHINES = \
 	mmix-opc.lo \
 	msp430-dis.lo \
 	ns32k-dis.lo \
+	bfin-dis.lo \
 	openrisc-asm.lo \
 	openrisc-desc.lo \
 	openrisc-dis.lo \
@@ -1232,6 +1234,8 @@ mmix-dis.lo: mmix-dis.c $(INCDIR)/opcode/mmix.h $(INCDIR)/dis-asm.h \
   $(BFD_H) $(INCDIR)/ansidecl.h $(INCDIR)/symcat.h $(INCDIR)/libiberty.h \
   opintl.h
 mmix-opc.lo: mmix-opc.c $(INCDIR)/opcode/mmix.h $(INCDIR)/symcat.h
+bfin-dis.lo: bfin-dis.c sysdep.h config.h $(INCDIR)/dis-asm.h \
+  $(BFD_H)
 ns32k-dis.lo: ns32k-dis.c $(BFD_H) $(INCDIR)/ansidecl.h \
   $(INCDIR)/symcat.h sysdep.h config.h $(INCDIR)/dis-asm.h \
   $(INCDIR)/opcode/ns32k.h opintl.h

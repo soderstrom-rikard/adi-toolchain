@@ -243,6 +243,7 @@ extern int print_insn_vax		(bfd_vma, disassemble_info *);
 extern int print_insn_w65		(bfd_vma, disassemble_info *);
 extern int print_insn_xstormy16		(bfd_vma, disassemble_info *);
 extern int print_insn_xtensa		(bfd_vma, disassemble_info *);
+extern int print_insn_bfin (bfd_vma pc, disassemble_info *outf);
 extern int print_insn_sh64		(bfd_vma, disassemble_info *);
 extern int print_insn_sh64x_media	(bfd_vma, disassemble_info *);
 extern int print_insn_frv		(bfd_vma, disassemble_info *);

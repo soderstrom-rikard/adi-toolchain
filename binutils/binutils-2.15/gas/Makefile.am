@@ -70,6 +70,7 @@ CPU_TYPES = \
 	mn10200 \
 	mn10300 \
 	msp430 \
+	bfin \
 	ns32k \
 	openrisc \
 	or32 \
@@ -266,6 +267,7 @@ TARGET_CPU_CFILES = \
 	config/tc-mn10200.c \
 	config/tc-mn10300.c \
 	config/tc-msp430.c \
+	config/tc-bfin.c \
 	config/tc-ns32k.c \
 	config/tc-openrisc.c \
 	config/tc-or32.c \
@@ -318,6 +320,7 @@ TARGET_CPU_HFILES = \
 	config/tc-mn10200.h \
 	config/tc-mn10300.h \
 	config/tc-msp430.h \
+	config/tc-bfin.h \
 	config/tc-ns32k.h \
 	config/tc-openrisc.h \
 	config/tc-or32.h \
@@ -471,7 +474,9 @@ stamp-mk.com: vmsconf.sh Makefile
 	$(SHELL) $(srcdir)/../move-if-change new-make.com $(srcdir)/make-gas.com
 	touch stamp-mk.com
 
-EXTRA_DIST = make-gas.com m68k-parse.c itbl-parse.c itbl-parse.h itbl-lex.c
+EXTRA_DIST = make-gas.com m68k-parse.c itbl-parse.c itbl-parse.h itbl-lex.c \
+	bfin-parse.c bfin-lex.c bfin-defs.h
+
 diststuff: $(EXTRA_DIST) info
 
 DISTCLEANFILES = targ-cpu.h obj-format.h targ-env.h itbl-cpu.h cgen-desc.h
@@ -613,9 +618,9 @@ e-criself.o: $(srcdir)/config/e-criself.c
 xtensa-relax.o: $(srcdir)/config/xtensa-relax.c
 	$(COMPILE) -c $(srcdir)/config/xtensa-relax.c
 
-# The m68k operand parser.
+# The m68k & bfin operand parser.
 
-EXTRA_as_new_SOURCES = config/m68k-parse.y
+EXTRA_as_new_SOURCES = config/m68k-parse.y config/bfin-parse.y
 
 # If m68k-parse.y is in a different directory, then ylwrap will use an
 # absolute path when it invokes yacc, which will cause yacc to put the
@@ -645,6 +650,17 @@ m68k-parse.o: m68k-parse.c $(srcdir)/config/m68k-parse.h
 m68k-parse.h: ; @true
 $(srcdir)/config/m68k-parse.h: ; @true
 
+bfin-parse.c: $(srcdir)/config/bfin-parse.y
+	$(SHELL) $(YLWRAP) "$(YACC)" $(srcdir)/config/bfin-parse.y y.tab.c bfin-parse.c --
+bfin-parse.o: bfin-parse.c $(srcdir)/config/bfin-defs.h
+
+# Don't let the .y.h rule clobber bfin-defs.h.
+bfin-defs.h: ; @true
+$(srcdir)/config/bfin-defs.h: ; @true
+
+bfin-lex.o: bfin-lex.c $(srcdir)/config/bfin-defs.h
+bfin-lex.c: $(srcdir)/config/bfin-lex.l
+ 
 # The instruction table specification lexical analyzer and parser.
 
 itbl-lex.c: $(srcdir)/itbl-lex.l
@@ -1220,6 +1236,7 @@ DEPTC_m68hc11_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
   $(INCDIR)/opcode/m68hc11.h dwarf2dbg.h $(INCDIR)/elf/m68hc11.h \
   $(INCDIR)/elf/reloc-macros.h
 DEPTC_m68k_aout = $(INCDIR)/symcat.h $(srcdir)/config/obj-aout.h \
+>>>>>>> 1.1.1.2
   $(srcdir)/config/tc-m68k.h $(BFDDIR)/libaout.h $(INCDIR)/bfdlink.h \
   $(INCDIR)/safe-ctype.h $(INCDIR)/obstack.h subsegs.h \
   dwarf2dbg.h dw2gencfi.h $(INCDIR)/elf/dwarf2.h $(INCDIR)/opcode/m68k.h \
@@ -1325,6 +1342,10 @@ DEPTC_msp430_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-msp430.h \
   subsegs.h $(INCDIR)/obstack.h $(INCDIR)/opcode/msp430.h \
   $(INCDIR)/safe-ctype.h
+DEPTC_bfin_elf = $(srcdir)/config/obj-elf.h $(BFDDIR)/elf-bfd.h \
+  $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h $(INCDIR)/elf/external.h \
+  $(INCDIR)/bfdlink.h $(srcdir)/config/tc-bfin.h $(INCDIR)/obstack.h \
+  subsegs.h $(srcdir)/config/bfin-defs.h
 DEPTC_ns32k_aout = $(INCDIR)/symcat.h $(srcdir)/config/obj-aout.h \
   $(srcdir)/config/tc-ns32k.h $(BFDDIR)/libaout.h $(INCDIR)/bfdlink.h \
   $(INCDIR)/opcode/ns32k.h $(INCDIR)/obstack.h
@@ -1863,6 +1884,10 @@ DEPOBJ_msp430_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
 DEPOBJ_ns32k_aout = $(INCDIR)/symcat.h $(srcdir)/config/obj-aout.h \
   $(srcdir)/config/tc-ns32k.h $(BFDDIR)/libaout.h $(INCDIR)/bfdlink.h \
   $(INCDIR)/aout/aout64.h $(INCDIR)/obstack.h
+OBJDEP_bfin_elf = $(srcdir)/config/obj-elf.h $(BFDDIR)/elf-bfd.h \
+  $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h $(INCDIR)/elf/external.h \
+  $(INCDIR)/bfdlink.h $(srcdir)/config/tc-bfin.h $(srcdir)/config/bfin-defs.h \
+  subsegs.h $(INCDIR)/obstack.h $(INCDIR)/aout/aout64.h
 DEPOBJ_ns32k_coff = $(INCDIR)/symcat.h $(srcdir)/config/obj-coff.h \
   $(srcdir)/config/tc-ns32k.h $(INCDIR)/coff/internal.h \
   $(BFDDIR)/libcoff.h $(INCDIR)/bfdlink.h $(INCDIR)/obstack.h \
@@ -2269,6 +2294,9 @@ DEP_msp430_coff = $(srcdir)/config/obj-coff.h $(srcdir)/config/tc-msp430.h \
 DEP_msp430_elf = $(srcdir)/config/obj-elf.h $(INCDIR)/symcat.h \
   $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-msp430.h
+DEP_bfin_elf = $(srcdir)/config/obj-elf.h $(BFDDIR)/elf-bfd.h \
+  $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h $(INCDIR)/elf/external.h \
+  $(INCDIR)/bfdlink.h $(srcdir)/config/tc-bfin.h
 DEP_ns32k_aout = $(srcdir)/config/obj-aout.h $(srcdir)/config/tc-ns32k.h \
   $(BFDDIR)/libaout.h $(INCDIR)/bfdlink.h
 DEP_ns32k_coff = $(srcdir)/config/obj-coff.h $(srcdir)/config/tc-ns32k.h \

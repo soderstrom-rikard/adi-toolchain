@@ -2804,7 +2804,130 @@ ENUMDOC
   ARC 26 bit absolute branch.  The lowest two bits must be zero and are not
   stored in the instruction.  The high 24 bits are installed in bits 23
   through 0.
-
+ENUM
+  BFD_RELOC_16_IMM
+ENUMDOC
+  ADI Blackfin 16 bit immediate absolute reloc
+ENUM
+  BFD_RELOC_16_HIGH
+ENUMDOC
+  ADI Blackfin 16 bit immediate absolute reloc HIgher 16 bits
+ENUM
+  BFD_RELOC_4_PCREL
+ENUMDOC
+  ADI Blackfin 'a' part of LSETUP
+ENUM
+  BFD_RELOC_5_PCREL
+ENUMDOC
+  ADI Blackfin 
+ENUM
+  BFD_RELOC_16_LOW
+ENUMDOC
+  ADI Blackfin 16 bit immediate absolute reloc LOwer 16 bits
+ENUM
+  BFD_RELOC_10_PCREL
+ENUMDOC
+  ADI Blackfin 
+ENUM
+  BFD_RELOC_11_PCREL
+ENUMDOC
+  ADI Blackfin 'b' part of LSETUP
+ENUM
+  BFD_RELOC_12_PCREL_JUMP
+ENUMDOC
+  ADI Blackfin 
+ENUM
+  BFD_RELOC_12_PCREL_JUMP_S
+ENUMDOC
+  ADI Blackfin Short jump, pcrel
+ENUM
+  BFD_RELOC_24_PCREL_CALL_X
+ENUMDOC
+  ADI Blackfin Call.x not implemented
+ENUM
+  BFD_RELOC_24_PCREL_JUMP_L
+ENUMDOC
+  ADI Blackfin Long Jump pcrel
+ENUM
+  BFD_ARELOC_PUSH
+ENUMDOC
+  ADI Blackfin Arith reloc
+ENUM
+  BFD_ARELOC_CONST
+ENUMDOC
+  ADI Blackfin Arith reloc
+ENUM
+  BFD_ARELOC_ADD
+ENUMDOC
+  ADI Blackfin Arith reloc
+ENUM
+  BFD_ARELOC_SUB
+ENUMDOC
+  ADI Blackfin Arith reloc
+ENUM
+  BFD_ARELOC_MULT
+ENUMDOC
+  ADI Blackfin Arith reloc
+ENUM
+  BFD_ARELOC_DIV
+ENUMDOC
+  ADI Blackfin Arith reloc
+ENUM
+  BFD_ARELOC_MOD
+ENUMDOC
+  ADI Blackfin Arith reloc
+ENUM
+  BFD_ARELOC_LSHIFT
+ENUMDOC
+  ADI Blackfin Arith reloc
+ENUM
+  BFD_ARELOC_RSHIFT
+ENUMDOC
+  ADI Blackfin Arith reloc
+ENUM
+  BFD_ARELOC_AND
+ENUMDOC
+  ADI Blackfin Arith reloc
+ENUM
+  BFD_ARELOC_OR
+ENUMDOC
+  ADI Blackfin Arith reloc
+ENUM
+  BFD_ARELOC_XOR
+ENUMDOC
+  ADI Blackfin Arith reloc
+ENUM
+  BFD_ARELOC_LAND
+ENUMDOC
+  ADI Blackfin Arith reloc
+ENUM
+  BFD_ARELOC_LOR
+ENUMDOC
+  ADI Blackfin Arith reloc
+ENUM
+  BFD_ARELOC_LEN
+ENUMDOC
+  ADI Blackfin Arith reloc
+ENUM
+  BFD_ARELOC_NEG
+ENUMDOC
+  ADI Blackfin Arith reloc
+ENUM
+  BFD_ARELOC_COMP
+ENUMDOC
+  ADI Blackfin Arith reloc
+ENUM
+  BFD_ARELOC_PAGE
+ENUMDOC
+  ADI Blackfin Arith reloc
+ENUM
+  BFD_ARELOC_HWPAGE
+ENUMDOC
+  ADI Blackfin Arith reloc
+ENUM
+  BFD_ARELOC_ADDR
+ENUMDOC
+  ADI Blackfin Arith reloc
 ENUM
   BFD_RELOC_D10V_10_PCREL_R
 ENUMDOC
@@ -4228,7 +4351,7 @@ bfd_generic_get_relocated_section_contents (bfd *abfd,
 	{
 	  char *error_message = NULL;
 	  bfd_reloc_status_type r =
-	    bfd_perform_relocation (input_bfd,
+           bfd_perform_relocation (input_bfd,
 				    *parent,
 				    data,
 				    input_section,
@@ -4280,6 +4403,7 @@ bfd_generic_get_relocated_section_contents (bfd *abfd,
     }
   if (reloc_vector != NULL)
     free (reloc_vector);
+
   return data;
 
 error_return:

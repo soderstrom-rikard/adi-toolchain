@@ -1673,6 +1673,7 @@ enum bfd_architecture
 #define bfd_mach_m32r2         '2'
   bfd_arch_mn10200,   /* Matsushita MN10200 */
   bfd_arch_mn10300,   /* Matsushita MN10300 */
+  bfd_arch_bfin,      /* Adi BFIN */
 #define bfd_mach_mn10300               300
 #define bfd_mach_am33          330
 #define bfd_mach_am33_2        332
@@ -2675,6 +2676,99 @@ through 7 of the instruction.  */
 stored in the instruction.  The high 24 bits are installed in bits 23
 through 0.  */
   BFD_RELOC_ARC_B26,
+
+/* ADI Blackfin 16 bit immediate absolute reloc  */
+  BFD_RELOC_16_IMM,
+
+/* ADI Blackfin 16 bit immediate absolute reloc HIgher 16 bits  */
+  BFD_RELOC_16_HIGH,
+
+/* ADI Blackfin 'a' part of LSETUP  */
+  BFD_RELOC_4_PCREL,
+
+/* ADI Blackfin  */
+  BFD_RELOC_5_PCREL,
+
+/* ADI Blackfin 16 bit immediate absolute reloc LOwer 16 bits  */
+  BFD_RELOC_16_LOW,
+
+/* ADI Blackfin  */
+  BFD_RELOC_10_PCREL,
+
+/* ADI Blackfin 'b' part of LSETUP  */
+  BFD_RELOC_11_PCREL,
+
+/* ADI Blackfin  */
+  BFD_RELOC_12_PCREL_JUMP,
+
+/* ADI Blackfin Short jump, pcrel  */
+  BFD_RELOC_12_PCREL_JUMP_S,
+
+/* ADI Blackfin Call.x not implemented  */
+  BFD_RELOC_24_PCREL_CALL_X,
+
+/* ADI Blackfin Long Jump pcrel  */
+  BFD_RELOC_24_PCREL_JUMP_L,
+
+/* ADI Blackfin Arith reloc  */
+  BFD_ARELOC_PUSH,
+
+/* ADI Blackfin Arith reloc  */
+  BFD_ARELOC_CONST,
+
+/* ADI Blackfin Arith reloc  */
+  BFD_ARELOC_ADD,
+
+/* ADI Blackfin Arith reloc  */
+  BFD_ARELOC_SUB,
+
+/* ADI Blackfin Arith reloc  */
+  BFD_ARELOC_MULT,
+
+/* ADI Blackfin Arith reloc  */
+  BFD_ARELOC_DIV,
+
+/* ADI Blackfin Arith reloc  */
+  BFD_ARELOC_MOD,
+
+/* ADI Blackfin Arith reloc  */
+  BFD_ARELOC_LSHIFT,
+
+/* ADI Blackfin Arith reloc  */
+  BFD_ARELOC_RSHIFT,
+
+/* ADI Blackfin Arith reloc  */
+  BFD_ARELOC_AND,
+
+/* ADI Blackfin Arith reloc  */
+  BFD_ARELOC_OR,
+
+/* ADI Blackfin Arith reloc  */
+  BFD_ARELOC_XOR,
+
+/* ADI Blackfin Arith reloc  */
+  BFD_ARELOC_LAND,
+
+/* ADI Blackfin Arith reloc  */
+  BFD_ARELOC_LOR,
+
+/* ADI Blackfin Arith reloc  */
+  BFD_ARELOC_LEN,
+
+/* ADI Blackfin Arith reloc  */
+  BFD_ARELOC_NEG,
+
+/* ADI Blackfin Arith reloc  */
+  BFD_ARELOC_COMP,
+
+/* ADI Blackfin Arith reloc  */
+  BFD_ARELOC_PAGE,
+
+/* ADI Blackfin Arith reloc  */
+  BFD_ARELOC_HWPAGE,
+
+/* ADI Blackfin Arith reloc  */
+  BFD_ARELOC_ADDR,
 
 /* Mitsubishi D10V relocs.
 This is a 10-bit reloc with the right 2 bits

@@ -275,6 +275,7 @@ DESCRIPTION
 .#define bfd_mach_m32r2		'2'
 .  bfd_arch_mn10200,   {* Matsushita MN10200 *}
 .  bfd_arch_mn10300,   {* Matsushita MN10300 *}
+.  bfd_arch_bfin,      {* Adi BFIN *}
 .#define bfd_mach_mn10300		300
 .#define bfd_mach_am33		330
 .#define bfd_mach_am33_2	332
@@ -373,6 +374,7 @@ extern const bfd_arch_info_type bfd_alpha_arch;
 extern const bfd_arch_info_type bfd_arc_arch;
 extern const bfd_arch_info_type bfd_arm_arch;
 extern const bfd_arch_info_type bfd_avr_arch;
+extern const bfd_arch_info_type bfd_bfin_arch;
 extern const bfd_arch_info_type bfd_cris_arch;
 extern const bfd_arch_info_type bfd_d10v_arch;
 extern const bfd_arch_info_type bfd_d30v_arch;
@@ -433,6 +435,7 @@ static const bfd_arch_info_type * const bfd_archures_list[] =
     &bfd_arc_arch,
     &bfd_arm_arch,
     &bfd_avr_arch,
+    &bfd_bfin_arch,
     &bfd_cris_arch,
     &bfd_d10v_arch,
     &bfd_d30v_arch,
