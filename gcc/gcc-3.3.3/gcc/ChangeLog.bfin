@@ -18,3 +18,7 @@
 	* config/bfin/bfin-protos.h (initialize_trampoline): Declare it. 
 	config/bfin/bfin.h (INITIALIZE_TRAMPOLINE): Call it.
 	(TRAMPOLINE_TEMPLATE): Change so that correct assembly is emitted.
+
+	* config/bfin/bfin.h (ASM_OUTPUT_LABEL): Print a newline character.
+	* config/bfin/bfin.c (bfin_function_prologue): Not here.
+	(print_operand): Omit trailing whitespace from register names.
