@@ -47,6 +47,7 @@ extern int effective_address_32bit_p (rtx, Mmode);
 extern int symbolic_reference_mentioned_p (rtx);
 extern rtx bfin_gen_compare (rtx, Mmode);
 extern void expand_move (rtx *, Mmode);
+extern void bfin_expand_call (rtx, rtx, rtx, int);
 
 extern int call_insn_operand (rtx, Mmode);
 extern int symbolic_operand (rtx, Mmode);

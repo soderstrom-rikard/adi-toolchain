@@ -1625,6 +1625,41 @@ split_di (rtx operands[], int num, rtx lo_half[], rtx hi_half[])
     }
 }
 
+/* Expand a call instruction.  FNADDR is the call target, RETVAL the return value.
+   SIBCALL is nonzero if this is a sibling call.  */
+
+void
+bfin_expand_call (rtx retval, rtx fnaddr, rtx callarg1, int sibcall)
+{
+  rtx use = NULL, call;
+
+  /* Static functions and indirect calls don't need the pic register.  */
+  if (flag_pic
+      && GET_CODE (XEXP (fnaddr, 0)) == SYMBOL_REF
+      && ! SYMBOL_REF_LOCAL_P (XEXP (fnaddr, 0)))
+    use_reg (&use, pic_offset_table_rtx);
+
+  if (! call_insn_operand (XEXP (fnaddr, 0), Pmode))
+    {
+      fnaddr = copy_to_mode_reg (Pmode, XEXP (fnaddr, 0));
+      fnaddr = gen_rtx_MEM (Pmode, fnaddr);
+    }
+  call = gen_rtx_CALL (VOIDmode, fnaddr, callarg1);
+
+  if (retval)
+    call = gen_rtx_SET (VOIDmode, retval, call);
+  if (sibcall)
+    {
+      rtx pat = gen_rtx_PARALLEL (VOIDmode, rtvec_alloc (2));
+      XVECEXP (pat, 0, 0) = call;
+      XVECEXP (pat, 0, 1) = gen_rtx_RETURN (VOIDmode);
+      call = pat;
+    }
+  call = emit_call_insn (call);
+  if (use)
+    CALL_INSN_FUNCTION_USAGE (call) = use;
+}
+
 /* Return 1 if hard register REGNO can hold a value of machine-mode MODE.  */
 
 int

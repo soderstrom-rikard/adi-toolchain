@@ -715,16 +715,18 @@
 
 ;; DImode zero and sign extend patterns
 
-(define_insn "zero_extendsidi2"
+(define_insn_and_split "zero_extendsidi2"
   [(set (match_operand:DI 0 "register_operand" "=d")
         (zero_extend:DI (match_operand:SI 1 "register_operand" "d")))]
   ""
+  "#"
+  "reload_completed"
+  [(set (match_dup 3) (const_int 0))]
 {
-  if (REGNO (operands[1]) != REGNO (operands[0]))
-    output_asm_insn ("%0 = %1;", operands);
-  return "%H0 = 0;";
-}
-  [(set_attr "length" "2")])
+  split_di (operands, 1, operands + 2, operands + 3);
+  if (REGNO (operands[0]) != REGNO (operands[1]))
+    emit_move_insn (operands[2], operands[1]);
+})
 
 (define_insn "zero_extendqidi2"
   [(set (match_operand:DI 0 "register_operand" "=d")
@@ -1235,21 +1237,21 @@
   [(call (match_operand:SI 0 "" "")
 	 (match_operand 1 "" ""))]
   ""
-  "")
+  "bfin_expand_call (NULL_RTX, operands[0], operands[1], 0); DONE;")
 
 (define_expand "sibcall"
   [(parallel [(call (match_operand:SI 0 "" "")
 		    (match_operand 1 "" ""))
 	      (return)])]
   ""
-  "")
+  "bfin_expand_call (NULL_RTX, operands[0], operands[1], 1); DONE;")
 
 (define_expand "call_value"
   [(set (match_operand 0 "register_operand" "")
          (call (match_operand:SI 1 "" "")
 	       (match_operand 2 "" "")))]
   ""
-  "")
+  "bfin_expand_call (operands[0], operands[1], operands[2], 0); DONE;")
 
 (define_expand "sibcall_value"
   [(parallel [(set (match_operand 0 "register_operand" "")
@@ -1257,7 +1259,7 @@
 			 (match_operand 2 "" "")))
 	      (return)])]
   ""
-  "")
+  "bfin_expand_call (operands[0], operands[1], operands[2], 1); DONE;")
 
 (define_insn "*call_insn"
   [(call (mem:SI (match_operand:SI 0 "call_insn_operand" "a,Q"))

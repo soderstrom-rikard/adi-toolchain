@@ -27,6 +27,11 @@
 	(call_insn, sibcall_insn, call_value_insn, sibcall_value_insn): Use
 	call_insn_operand for call target.  Use 'Q' constraint instrad of 'i'.
 
+	* config/bfin/bfin-protos.h (bfin_expand_call): Declare.
+	* config/bfin/bfin.c (bfin_expand_call): New function.
+	* config/bfin/bfin.md (zero_extensidi2): Now a define_insn_and_split.
+	(call, call_value, sibcall, sibcall_value): Use bfin_expand_call.
+
 2004-12-30 Pradip Shah <pcs@rrap-software.com>
 
 	* config/bfin/bfin.md (brcc): Length
