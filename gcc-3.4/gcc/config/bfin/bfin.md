@@ -849,12 +849,14 @@
     \"%0 += -%2;\",
     \"%0 = %1 - %2;\",
     \"%0 -= %2;\",
-    \"%0 += %2;\", 
   };
 
   if (CONSTANT_P (operands[2]) && INTVAL (operands[2]) < 0) {
-     INTVAL (operands[2]) = -(INTVAL (operands[2]));
-     which_alternative = 3;
+     rtx tmp_op = operands[2];
+     operands[2] = GEN_INT (-INTVAL (operands[2]));
+     output_asm_insn (\"%0 += %2;\", operands);
+     operands[2] = tmp_op;
+     return \"\";
   }
 
   return strings_subsi3[which_alternative];
