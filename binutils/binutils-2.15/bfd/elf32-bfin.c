@@ -726,10 +726,10 @@ bfin_byte4_reloc (
       else
 	output_base = reloc_target_output_section->vma;
   
-      if (symbol->name 
+      if ((symbol->name 
 	  && symbol->section->name
-          && !strcmp (symbol->name, symbol->section->name)
-          || output_bfd == NULL)
+          && !strcmp (symbol->name, symbol->section->name))
+          || (output_bfd == NULL))
         {
 	  relocation += output_base + symbol->section->output_offset;
           possible_addend_delta = symbol->section->output_offset;
