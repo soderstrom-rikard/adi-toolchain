@@ -1,3 +1,7 @@
+2004-11-18  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin-dis.c (sreg_names): Add one entry to make it 32.
+
 2004-10-21  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin-dis.c (decode_PushPopReg_0, decode_CCflag_0, decode_CC2stat_0,

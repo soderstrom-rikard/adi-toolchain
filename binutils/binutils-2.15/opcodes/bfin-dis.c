@@ -213,11 +213,10 @@ static char *reg_names[] = {
 };
 
 static char *sreg_names[] = {
-	"az", "an", "", "", "", "",
-	"aq", "", "", "", "", "", 
-	"ac0", "ac1", "", "",
+	"az", "an", "", "", "", "", "aq", "",
+	"", "", "", "", "ac0", "ac1", "", "",
 	"av0", "av0s", "av1", "av1s", "", "", "", "",
-	"v", "vs", "", "", "", "", ""
+	"v", "vs", "", "", "", "", "", ""
 };
 
 #define REGNAME(x) ((x) < REG_LASTREG ? (reg_names[x]) : "...... Illegal register .......")
