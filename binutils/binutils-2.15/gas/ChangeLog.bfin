@@ -1,6 +1,9 @@
 2004-11-29  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/tc-bfin.c (md_assemble): Fix error in previous change.
+	* config/bfin-parse.y (asm_1): Clean up 32 bit load/stores; make sure
+	we always produce shortest possible insn.  Improve error messages.
+	(in_range_p): New function.
 
 2004-11-17  Bernd Schmidt  <bernd.schmidt@analog.com>
 

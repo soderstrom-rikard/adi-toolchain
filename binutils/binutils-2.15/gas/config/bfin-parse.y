@@ -229,6 +229,17 @@ int yyerror(char *msg) {
     return 0;	/* means successful	*/
 }
 
+static int
+in_range_p (ExprNode *expr, int from, int to, unsigned int mask)
+{
+  int val = EXPR_VALUE (expr);
+  if (expr->type != ExprNodeConstant)
+    return 0;
+  if (val < from || val > to)
+    return 0;
+  return (val & mask) == 0;
+}
+
 extern int yylex (void);
 
 #define uimm2(x) EXPR_VALUE(x)
@@ -3211,53 +3222,41 @@ asm_1:
 // LDSTiiFP:	[ FP - const ] = dpregs
 	| LBRACK REG plus_minus expr RBRACK ASSIGN REG
 	{
-		int ispreg = IS_PREG($7);
+	  ExprNode *tmp = $4;
+	  int ispreg = IS_PREG($7);
 
-		if (!IS_PREG($2))
-			return semantic_error("Preg expected for indirect");
+	  if (!IS_PREG ($2))
+	    return semantic_error("Preg expected for indirect");
 
-		if ($2.regno == REG_FP) {
-			if (IS_URANGE(4, $4, $3.r0, 4)) {
-				notethat("LDSTii: dpregs = [ FP + uimm6m4 ]\n");
-				$$ = LDSTII (&$2, &$7, $4, 1, ispreg ? 3: 0);
+	  if (!IS_DREG ($7) && !ispreg)
+	    return semantic_error ("Bad source register for STORE");
 
-			} else
-			if (IS_URANGE(5, $4, $3.r0 ? 0: 1, 4)) {
-				notethat("LDSTiiFP: dpregs = [ FP - uimm7m4 ]\n");
-				if (!$3.r0) { neg_value($4); }
-				$$ = LDSTIIFP ($4, &$7, 1);
-			} else 
-			if (IS_RANGE(16, $4, $3.r0, 4)) { // 16 offset, DREGS
-				notethat("LDSTidxI: [ FP + imm18m4 ] = dpregs\n");
-				if ($3.r0) { neg_value($4); }
-				$$ = LDSTIDXI (&$2, &$7,   /* W  sz  Z */
-											  1,  0, ispreg ? 1: 0, $4);
-			} else 
-			return semantic_error("Bad constant for load @FP");
+	  if ($3.r0)
+	    tmp = unary (ExprOpTypeNEG, tmp);
 
-		} else
-		if (IS_URANGE(4, $4, $3.r0, 4)) {
-			if (IS_DREG($7)) {
-				notethat("LDSTii: [ pregs + uimm6m4 ] = dregs\n");
-				$$ = LDSTII (&$2, &$7, $4, 1, 0);
-			} else 
-			if (ispreg) {
-				notethat("LDSTii: [ pregs + uimm6m4 ] = pregs\n");
-				$$ = LDSTII (&$2, &$7, $4, 1, 3);
-			} else {
-				return semantic_error("Bad registers for STORE");
-			}
-			break;
-		} else 
-		if (IS_RANGE(16, $4, $3.r0, 4)) { // 16 offset, DREGS
-			notethat("LDSTidxI: [ pregs + imm18m4 ] = dpregs\n");
-			if ($3.r0) { neg_value($4); }
-			$$ = LDSTIDXI (&$2, &$7,   /* W  sz  Z */
-			                              1,  0, ispreg ? 1: 0, $4);
-		} else {
-			return semantic_error("Bad constant for STORE");
-		}
+	  if (in_range_p (tmp, 0, 63, 3))
+	    {
+	      notethat("LDSTii: dpregs = [ pregs + uimm6m4 ]\n");
+	      $$ = LDSTII (&$2, &$7, tmp, 1, ispreg ? 3 : 0);
+	    }
+	  else if ($2.regno == REG_FP && in_range_p (tmp, -128, 0, 3))
+	    {
+	      notethat("LDSTiiFP: dpregs = [ FP - uimm7m4 ]\n");
+	      if ($3.r0)
+		tmp = $4;
+	      else
+		tmp = unary (ExprOpTypeNEG, tmp);
 
+	      $$ = LDSTIIFP (tmp, &$7, 1);
+	    }
+	  else if (in_range_p (tmp, -131072, 131071, 3))
+	    {
+	      notethat("LDSTidxI: [ pregs + imm18m4 ] = dpregs\n");
+	      $$ = LDSTIDXI (&$2, &$7,   /* W  sz  Z */
+			     1,  0, ispreg ? 1: 0, tmp);
+	    }
+	  else
+	    return semantic_error("Displacement out of range for store");
 	}
 
 	| REG ASSIGN W LBRACK REG plus_minus expr RBRACK xpmod
@@ -3414,49 +3413,41 @@ asm_1:
 
 	| REG ASSIGN LBRACK REG plus_minus expr RBRACK
 	{
-		int ispreg = IS_PREG($1);
+	  ExprNode *tmp = $6;
+	  int ispreg = IS_PREG($1);
 
-		if (!IS_PREG($4))
-			return semantic_error("Expects Preg for indirect");
+	  if (!IS_PREG ($4))
+	    return semantic_error("Preg expected for indirect");
 
-		// special case REG_FP:
-		if ($4.regno == REG_FP) {
+	  if (!IS_DREG ($1) && !ispreg)
+	    return semantic_error ("Bad destination register for LOAD");
 
-			if (IS_URANGE(4, $6, $5.r0, 4)) {
-				notethat("LDSTii: dpregs = [ FP + uimm6m4 ]\n");
-				$$ = LDSTII (&$4, &$1, $6, 0, ispreg ? 3: 0);
+	  if ($5.r0)
+	    tmp = unary (ExprOpTypeNEG, tmp);
 
-			} else
-			if (IS_URANGE(5, $6, $5.r0 ? 0: 1, 4)) {
-				notethat("LDSTiiFP: dpregs = [ FP - uimm7m4 ]\n");
-				if (!$5.r0) { neg_value($6); }
-				$$ = LDSTIIFP ($6, &$1, 0);
-			} else 
-			if (IS_RANGE(16, $6, $5.r0, 4)) {
-				notethat("LDSTidxI: dpregs = [ FP + imm18m4 ]\n");
-				$$ = LDSTIDXI (&$4, &$1,   /* W  sz  Z */
-											  0,  0, ispreg ? 1: 0,
-											  $6);
+	  if (in_range_p (tmp, 0, 63, 3))
+	    {
+	      notethat("LDSTii: dpregs = [ pregs + uimm7m4 ]\n");
+	      $$ = LDSTII (&$4, &$1, tmp, 0, ispreg ? 3 : 0);
+	    }
+	  else if ($4.regno == REG_FP && in_range_p (tmp, -128, 0, 3))
+	    {
+	      notethat("LDSTiiFP: dpregs = [ FP - uimm7m4 ]\n");
+	      if ($5.r0)
+		tmp = $6;
+	      else
+		tmp = unary (ExprOpTypeNEG, tmp);
 
-			} else 
-				return semantic_error("Bad constant for load @FP");
-		} else
-
-		if (IS_URANGE(4, $6, $5.r0, 4)) {
-			notethat("LDSTii: dpregs = [ pregs + uimm7m4 ]\n");
-			$$ = LDSTII (&$4, &$1, $6, 0, ispreg ? 3 : 0);
-		} else
-		if (IS_RANGE(16, $6, $5.r0, 4)) {
-			notethat("LDSTidxI: dpregs = [ pregs + imm18m4 ]\n");
-			if ($5.r0) { neg_value($6); }
-			$$ = LDSTIDXI (&$4, &$1,   /* W  sz  Z */
-										  0,  0, ispreg ? 1: 0,
-										  $6);
-
-		} else {
-			return semantic_error("Bad constant range or register");
-		}
-
+	      $$ = LDSTIIFP (tmp, &$1, 0);
+	    }
+	  else if (in_range_p (tmp, -131072, 131071, 3))
+	    {
+	      notethat("LDSTidxI: dpregs = [ pregs + imm18m4 ]\n");
+	      $$ = LDSTIDXI (&$4, &$1, 0, 0, ispreg ? 1: 0, tmp);
+	      
+	    }
+	  else
+	    return semantic_error("Displacement out of range for load");
 	}
 
 /* 3 rules compacted */
@@ -4366,7 +4357,7 @@ static ExprNode * unary(ExprOpType op,ExprNode * x)
         case ExprOpTypeNEG: 
                 x->value.i_value = -x->value.i_value;
 		break;
-        case ExprOpTypeCOMP: 
+        case ExprOpTypeCOMP:
                 x->value.i_value = ~x->value.i_value;
 		break;
 	default :  fprintf(stderr, "Internal compiler error at line %d in file %s\n", __LINE__, __FILE__);
