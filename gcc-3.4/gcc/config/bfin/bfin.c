@@ -559,8 +559,8 @@ bfin_function_prologue (FILE *file, HOST_WIDE_INT framesize)
 
   if (TARGET_NEW_PROLOGUE) {
     if (frame_pointer_needed || TARGET_NON_GNU_PROFILE) { 
-	if (framesize == 0 && optimize_size)
-	    /* use 16-bit instruction */
+	if (current_function_args_size <= FIXED_STACK_AREA && framesize == 0 && optimize_size)
+	    /*for -Os, use 16-bit instruction if arg_size is <= three words and framesize is zero*/
 	    fprintf (file, "\t[--SP] =RETS;\n");
         else {
             /* use 32-bit instruction */
@@ -722,8 +722,8 @@ bfin_function_epilogue (FILE *file, HOST_WIDE_INT framesize)
 	fprintf (file, "\tcall mcount_exit;\n");
     }
     if (frame_pointer_needed || TARGET_NON_GNU_PROFILE) {
-	if (framesize == 0 && optimize_size)
-	    /* use 16-bit instruction */
+	if (current_function_args_size <= FIXED_STACK_AREA && framesize == 0 && optimize_size)
+	    /*for -Os, use 16-bit instruction if arg_size is <= three words and framesize is zero*/
 	    fprintf (file, "\tRETS = [SP++];\n");
 	else
 	    fprintf (file, "\tUNLINK;\n");
