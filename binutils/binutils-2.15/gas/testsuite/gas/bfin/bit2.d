@@ -64,7 +64,7 @@ Disassembly of section .text:
   a4:	08 c6 0b 00 	BITMUX \(R1,R3,A0 \)\(ASR\);
   a8:	08 c6 01 40 	BITMUX \(R0,R1,A0 \)\(ASL\);
   ac:	08 c6 0a 40 	BITMUX \(R1,R2,A0 \)\(ASL\);
-  b0:	06 c6 00 c0 	R0.L=ONESR0;
-  b4:	06 c6 01 c0 	R0.L=ONESR1;
-  b8:	06 c6 06 c2 	R1.L=ONESR6;
-  bc:	06 c6 07 c4 	R2.L=ONESR7;
+  b0:	06 c6 00 c0 	R0.L=ONES R0;
+  b4:	06 c6 01 c0 	R0.L=ONES R1;
+  b8:	06 c6 06 c2 	R1.L=ONES R6;
+  bc:	06 c6 07 c4 	R2.L=ONES R7;

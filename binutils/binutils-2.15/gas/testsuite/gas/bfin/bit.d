@@ -37,6 +37,6 @@ Disassembly of section .text:
   36:	08 c6 3e 40 	BITMUX \(R7,R6,A0 \)\(ASL\);
 
 0000003a <ones>:
-  3a:	06 c6 00 ca 	R5.L=ONESR0;
-  3e:	06 c6 02 ce 	R7.L=ONESR2;
+  3a:	06 c6 00 ca 	R5.L=ONES R0;
+  3e:	06 c6 02 ce 	R7.L=ONES R2;
 	...

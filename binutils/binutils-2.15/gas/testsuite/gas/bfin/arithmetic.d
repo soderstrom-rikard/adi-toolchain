@@ -17,7 +17,7 @@ Disassembly of section .text:
   18:	86 5b       	SP=SP\+P0;
   1a:	96 5b       	SP=SP\+P2;
   1c:	f9 5b       	FP=P1\+FP;
-  1e:	04 c4 3a 0e	R7=R7\+R2 \(NS\);
+  1e:	04 c4 3a 0e 	R7=R7\+R2 \(NS\);
   22:	04 c4 30 2c 	R6=R6\+R0 \(S\);
   26:	02 c4 10 a8 	R4.L=R2.H\+R0.L \(S\);
   2a:	22 c4 09 aa 	R5.H=R1.H\+R1.L \(S\);
@@ -63,23 +63,23 @@ Disassembly of section .text:
   7c:	07 c4 38 48 	R4=MIN\(R7,R0\);
 
 00000080 <modify_decrement>:
-  80:	0b c4 36 c0 	A0-=A1;
-  84:	0b c4 36 e0 	A0-=A1\(W32\);
+  80:	0b c4 [0-3][[:xdigit:]] c0 	A0-=A1;
+  84:	0b c4 [0-3][[:xdigit:]] e0 	A0-=A1\(W32\);
   88:	17 44       	FP-=P2;
   8a:	06 44       	SP-=P0;
   8c:	73 9e       	I3-=M0;
   8e:	75 9e       	I1-=M1;
 
 00000090 <modify_increment>:
-  90:	0b c4 36 80 	A0\+=A1;
-  94:	0b c4 36 a0 	A0\+=A1\(W32\);
+  90:	0b c4 [0-3][[:xdigit:]] 80 	A0\+=A1;
+  94:	0b c4 [0-3][[:xdigit:]] a0 	A0\+=A1\(W32\);
   98:	4e 45       	SP\+=P1\(BREV\);
   9a:	7d 45       	P5\+=FP\(BREV\);
   9c:	6a 9e       	I2\+=M2;
   9e:	e0 9e       	I0\+=M0\(BREV\);
-  a0:	0b c4 36 0e 	R7=\(A0\+=A1\);
-  a4:	0b c4 36 4c 	R6.L=\(A0\+=A1\);
-  a8:	2b c4 2d 40 	R0.H=\(A0\+=A1\);
+  a0:	0b c4 [0-3][[:xdigit:]] 0e 	R7=\(A0\+=A1\);
+  a4:	0b c4 [0-3][[:xdigit:]] 4c 	R6.L=\(A0\+=A1\);
+  a8:	2b c4 [0-3][[:xdigit:]] 40 	R0.H=\(A0\+=A1\);
 
 000000ac <multiply16>:
   ac:	00 c2 0a 24 	R0 = R1.H \* R2.L;
@@ -90,10 +90,10 @@ Disassembly of section .text:
   c0:	08 c2 a8 25 	R6 = R5.H \* R0.L;
   c4:	94 c3 be 40 	R2.H = R7.L \* R6.H \(M, IU\);
   c8:	04 c2 e8 80 	R3.H = R5.H \* R0.L;
-  cc:	14 c2 09 40 	R0.H = R1.L \* R1.H \(M, \);
+  cc:	14 c2 09 40 	R0.H = R1.L \* R1.H \(M\);
   d0:	1c c3 3e 80 	R1 = R7.H \* R6.L \(M, IS\);
   d4:	0c c2 02 41 	R5 = R0.L \* R2.H;
-  d8:	1c c2 b0 c0 	R3 = R6.H \* R0.H \(M, \);
+  d8:	1c c2 b0 c0 	R3 = R6.H \* R0.H \(M\);
 
 000000dc <multiply32>:
   dc:	c4 40       	R4\*=R0;
@@ -106,7 +106,7 @@ Disassembly of section .text:
   ec:	03 c0 21 0c 	a0 \+= R4.H \* R1.L;
   f0:	03 c1 3e 12 	a0 -= R7.L \* R6.H \(IS\);
   f4:	03 c0 2a 16 	a0 -= R5.H \* R2.H;
-  f8:	10 c0 08 58     a1 = R1.L \* R0.H \(M\);
+  f8:	10 c0 08 58 	a1 = R1.L \* R0.H \(M\);
   fc:	00 c0 10 98 	a1 = R2.H \* R0.L;
  100:	70 c0 3e 98 	a1 = R7.H \* R6.L \(M, W32\);
  104:	81 c0 1a 18 	a1 \+= R3.L \* R2.L \(FU\);
@@ -145,36 +145,35 @@ Disassembly of section .text:
 00000174 <negate>:
  174:	85 43       	R5=-R0;
  176:	07 c4 10 ee 	R7=-R2\(S\);
- 17a:	07 c4 10 ce	R7=-R2\(NS\);
- 17e:	0e c4 36 00 	A0=-A0;
- 182:	0e c4 36 40 	A0=-A1;
- 186:	2e c4 36 00 	A1=-A0;
- 18a:	2e c4 36 40 	A1=-A1;
- 18e:	0e c4 36 c0 	A1=-A1,A0=-A0;
+ 17a:	07 c4 10 ce 	R7=-R2\(NS\);
+ 17e:	0e c4 [0-3][[:xdigit:]] 00 	A0=-A0;
+ 182:	0e c4 [0-3][[:xdigit:]] 40 	A0=-A1;
+ 186:	2e c4 [0-3][[:xdigit:]] 00 	A1=-A0;
+ 18a:	2e c4 [0-3][[:xdigit:]] 40 	A1=-A1;
+ 18e:	0e c4 [0-3][[:xdigit:]] c0 	A1=-A1,A0=-A0;
 
 00000192 <round_half>:
  192:	0c c4 18 ca 	R5.L=R3\(RND\);
  196:	2c c4 00 cc 	R6.H=R0\(RND\);
 
 0000019a <saturate>:
- 19a:	08 c4 2d 20 	A0=A0\(S\);
- 19e:	08 c4 36 60 	A1=A1\(S\);
- 1a2:	08 c4 36 a0 	A1=A1\(S\),A0=A0\(S\);
+ 19a:	08 c4 [0-3][[:xdigit:]] 20 	A0=A0\(S\);
+ 19e:	08 c4 [0-3][[:xdigit:]] 60 	A1=A1\(S\);
+ 1a2:	08 c4 [0-3][[:xdigit:]] a0 	A1=A1\(S\),A0=A0\(S\);
 
 000001a6 <signbits>:
- 1a6:	05 c6 00 0a 	R5.L=SIGNBITSR0;
- 1aa:	05 c6 07 80 	R0.L=SIGNBITSR7.H;
- 1ae:	06 c6 00 06 	R3.L=SIGNBITSA0;
- 1b2:	06 c6 00 4e 	R7.L=SIGNBITSA1;
+ 1a6:	05 c6 00 0a 	R5.L=SIGNBITS R0;
+ 1aa:	05 c6 07 80 	R0.L=SIGNBITS R7.H;
+ 1ae:	06 c6 00 06 	R3.L=SIGNBITS A0;
+ 1b2:	06 c6 00 4e 	R7.L=SIGNBITS A1;
 
 000001b6 <subtract>:
  1b6:	43 53       	R5=R3-R0;
- 1b8:	04 c4 38 6e	R7=R7-R0 \(S\);
- 1bc:	04 c4 11 46	R3=R2-R1 \(NS\);
+ 1b8:	04 c4 38 6e 	R7=R7-R0 \(S\);
+ 1bc:	04 c4 11 46 	R3=R2-R1 \(NS\);
  1c0:	03 c4 37 ea 	R5.L=R6.H-R7.H \(S\);
  1c4:	23 c4 1b 40 	R0.H=R3.L-R3.H \(NS\);
 
 000001c8 <subtract_immediate>:
  1c8:	66 9f       	I2-=2;
  1ca:	6c 9f       	I0-=4;
-	...

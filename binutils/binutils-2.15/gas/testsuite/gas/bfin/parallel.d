@@ -25,9 +25,9 @@ Disassembly of section .text:
   44:	46 91 00 00 
   48:	08 ce 3e 40 	BITMUX \(R7,R6,A0 \)\(ASL\) || FP=\[P1\+\+\] || NOP; 
   4c:	4f 90 00 00 
-  50:	06 ce 00 ca 	R5.L=ONESR0 || P0=\[FP--\] || NOP; 
+  50:	06 ce 00 ca 	R5.L=ONES R0 || P0=\[FP--\] || NOP; 
   54:	f8 90 00 00 
-  58:	06 ce 02 ce 	R7.L=ONESR2 || P1=\[P5\+0x18\] || NOP; 
+  58:	06 ce 02 ce 	R7.L=ONES R2 || P1=\[P5\+0x18\] || NOP; 
   5c:	a9 ad 00 00 
   60:	10 cc 36 00 	A0= ABS A0 || P2=\[SP\+0x3c\] || R0=\[I0\]; 
   64:	f2 af 00 9d 
@@ -209,13 +209,13 @@ Disassembly of section .text:
  324:	0d 97 9b 9d 
  328:	08 cc 36 a0 	A1=A1\(S\),A0=A0\(S\) || R6=W\[P1\] \(Z\) || \[I0\]=R0; 
  32c:	0e 95 00 9f 
- 330:	05 ce 00 0a 	R5.L=SIGNBITSR0 || R7=W\[P1\] \(Z\) || \[I1\]=R0; 
+ 330:	05 ce 00 0a 	R5.L=SIGNBITS R0 || R7=W\[P1\] \(Z\) || \[I1\]=R0; 
  334:	0f 95 08 9f 
- 338:	05 ce 07 80 	R0.L=SIGNBITSR7.H || R1=W\[P2\+\+\]\(X\) || \[I2\]=R0; 
+ 338:	05 ce 07 80 	R0.L=SIGNBITS R7.H || R1=W\[P2\+\+\]\(X\) || \[I2\]=R0; 
  33c:	51 94 10 9f 
- 340:	06 ce 00 06 	R3.L=SIGNBITSA0 || R2=W\[P2\+\+\]\(X\) || \[I3\]=R0; 
+ 340:	06 ce 00 06 	R3.L=SIGNBITS A0 || R2=W\[P2\+\+\]\(X\) || \[I3\]=R0; 
  344:	52 94 18 9f 
- 348:	06 ce 00 4e 	R7.L=SIGNBITSA1 || R3=W\[P2\+\+\] \(Z\) || \[I0\]=R1; 
+ 348:	06 ce 00 4e 	R7.L=SIGNBITS A1 || R3=W\[P2\+\+\] \(Z\) || \[I0\]=R1; 
  34c:	13 94 01 9f 
  350:	03 cc 37 ea 	R5.L=R6.H-R7.H \(S\) || R4=W\[P2\+\+\]\(X\) || \[I1\]=R1; 
  354:	54 94 09 9f 

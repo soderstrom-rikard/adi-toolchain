@@ -1,3 +1,11 @@
+2005-02-01  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/expected_errors.l: Update expected output.
+	* gas/bfin/arithmetic.d: Likewise.
+	* gas/bfin/bit.d: Likewise.
+	* gas/bfin/bit2.d: Likewise.
+	* gas/bfin/parallel.d: Likewise.
+
 2005-01-31  Catherine Moore  <clm@cm00re.com>
 
 	* gas/bfin/expected_errors.l: Update expected output.
