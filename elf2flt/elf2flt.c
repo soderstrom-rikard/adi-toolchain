@@ -415,6 +415,26 @@ reloc_stack_operate(unsigned int oper)
   return value;
 }
 
+/* FUNCTION : weak_und_symbol
+   ABSTRACT : return true if symbol is weak and undefined.
+*/
+static int
+weak_und_symbol(const char *reloc_section_name,
+                struct bfd_symbol *symbol)
+{
+  if(!((strstr (reloc_section_name, "text")) ||
+      (strstr (reloc_section_name, "data")) ||
+      (strstr (reloc_section_name, "bss")))){
+    if(symbol->flags & BSF_WEAK){
+#ifdef DEBUG_BFIN
+	fprintf(stderr, "found weak undefined symbol %s\n", symbol->name);
+#endif
+	return TRUE;
+    }
+  }
+  return FALSE;
+}
+
 static int
 bfin_set_reloc (flat_v5_reloc_t *reloc, 
 		const char *reloc_section_name, 
@@ -436,12 +456,11 @@ bfin_set_reloc (flat_v5_reloc_t *reloc,
     reloc->reloc.type = FLAT_RELOC_TYPE_TEXT;
   }
   else if (strstr (reloc_section_name, "*ABS*")){
-    /* (A data section initialization of something in the libc's text section
+    /* (A data section initialization of something in the shared libc's text section
 	does not resolve - i.e. a global pointer to function initialized with
 	a libc function).
-
-        it should return 0 rather than error
-        We will assume text section for the moment.
+	The text section here is appropriate as the section information
+        of the shared library is lost. The loader will do some calcs.
     */
     reloc->reloc.type = FLAT_RELOC_TYPE_TEXT;
   }
@@ -1102,6 +1121,8 @@ dump_symbols(symbols, number_of_symbols);
 				    {
 					sym_addr = reloc_stack_pop ();
 				    }
+				    if(weak_und_symbol(sym_section->name, (*(q->sym_ptr_ptr))))
+					continue;
 				    if(0xFFFF0000 & sym_addr){
 					fprintf (stderr, "Relocation overflow for rN = %s\n",sym_name);
 					bad_relocs++;
@@ -1138,6 +1159,8 @@ dump_symbols(symbols, number_of_symbols);
 				    flat_relocs = (flat_v5_reloc_t *) 
 					(realloc (flat_relocs, (flat_reloc_count + 2) * sizeof (flat_v5_reloc_t)));
 				    reloc_count_incr = 1;
+				    if(weak_und_symbol(sym_section->name, (*(q->sym_ptr_ptr))))
+					continue;
 				    if(0xFFFF0000 & sym_addr){
 					/* value is > 16 bits - use an extra field */
 					/* see if we have already output that symbol */
@@ -1175,6 +1198,8 @@ dump_symbols(symbols, number_of_symbols);
 					sym_addr += q->addend;
 				    else
 					sym_addr = reloc_stack_pop ();
+				    if(weak_und_symbol(sym_section->name, (*(q->sym_ptr_ptr))))
+					continue;
 				    
 				    flat_relocs = (flat_v5_reloc_t *) 
 					(realloc (flat_relocs, (flat_reloc_count + 1) * sizeof (flat_v5_reloc_t)));
