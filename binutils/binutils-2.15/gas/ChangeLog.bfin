@@ -1,3 +1,8 @@
+2005-02-17  Catherine Moore  <clm@cm00re.com>
+
+	* config/tc-bfin.h (LEX_BR): Do not allow a bracket to be
+	part of a name.
+
 2005-02-16  Catherine Moore  <clm@cm00re.com>
 
 	* config/tc-bfin.c (bfin_name_is_register): Recognize W[reg]

@@ -38,7 +38,7 @@ extern bfd_boolean bfin_start_label PARAMS ((char *));
 /* 
  * Allow for [, ], etc...
  */
-#define LEX_BR 3
+#define LEX_BR 6
 
 /* The instruction is permitted to contain an = character.  */
 #define TC_EQUAL_IN_INSN(C, NAME, PTR) (bfin_name_is_register (NAME) ? 1 : 0)
