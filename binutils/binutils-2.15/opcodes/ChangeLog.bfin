@@ -1,3 +1,11 @@
+2004-10-21  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin-dis.c (decode_PushPopReg_0, decode_CCflag_0, decode_CC2stat_0,
+	decode_ALU2op_0, decode_PTR2op_0, decode_LOGI2op_0, decode_COMP3op_0,
+	decode_dagMODik_0, decode_dspLDST_0, decode_LDST_0, decode_LDSTidxI_0,
+	decode_dsp32shift_0, decode_dsp32shiftimm_0): Don't mix code and
+	declarations.
+
 2004-10-09  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin-dis.c (decode_ProgCtrl_0): Add spaces after "STI".

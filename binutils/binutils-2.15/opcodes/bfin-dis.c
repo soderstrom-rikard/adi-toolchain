@@ -697,9 +697,8 @@ static int decode_PushPopReg_0 (TIword iw0,
 static int decode_PushPopMultiple_0 (TIword iw0,
 		disassemble_info *outf)
 {
-	_DECL16(PushPopMultiple, iw0);
-
 	char rrange[16];
+	_DECL16(PushPopMultiple, iw0);
 
 	if (_W.d) {
 		if (_W.p) {
@@ -746,10 +745,9 @@ static int decode_ccMV_0 (TIword iw0,
 static int decode_CCflag_0 (TIword iw0,
 		bfd_vma pc,  disassemble_info *outf)
 {
-	_DECL16(CCflag, iw0);
-
 	char *op = "";
 	char *mod = "";
+	_DECL16(CCflag, iw0);
 
 	switch (_W.opc) {
 		case 0: op = "=="; break;
@@ -815,9 +813,8 @@ static int decode_CC2dreg_0 (TIword iw0,
 static int decode_CC2stat_0 (TIword iw0,
 		disassemble_info *outf)
 {
-	_DECL16(CC2stat, iw0);
-
 	char *op = "<unknown op>";
+	_DECL16(CC2stat, iw0);
 
 	switch (_W.op) {
 		case 0: op = " = "; break;
@@ -874,12 +871,10 @@ static int decode_REGMV_0 (TIword iw0,
 static int decode_ALU2op_0 (TIword iw0,
 		disassemble_info *outf)
 {
-
+	char *op;
+	int type = 0;
 	_DECL16(ALU2op, iw0);
 
-	char *op;
-
-	int type = 0;
 
 	switch (_W.opc) {
 		case 0:
@@ -958,9 +953,8 @@ static int decode_ALU2op_0 (TIword iw0,
 static int decode_PTR2op_0 (TIword iw0,
 		disassemble_info *outf)
 {
-	_DECL16(PTR2op, iw0);
-
 	char *op = "<unknown op>";
+	_DECL16(PTR2op, iw0);
 
 	switch (_W.opc) {
 		case 0:
@@ -1004,11 +998,9 @@ static int decode_PTR2op_0 (TIword iw0,
 static int decode_LOGI2op_0 (TIword iw0,
 		bfd_vma pc,  disassemble_info *outf)
 {
-	_DECL16(LOGI2op, iw0);
-
 	char *op = "<unknown op>";
-
 	int type = 0;
+	_DECL16(LOGI2op, iw0);
 
 	switch (_W.opc) {
 		case 0:
@@ -1050,10 +1042,9 @@ static int decode_LOGI2op_0 (TIword iw0,
 static int decode_COMP3op_0 (TIword iw0,
 		disassemble_info *outf)
 {
-	_DECL16(COMP3op, iw0);
-
 	int type = 0;
 	char *op = "<unknown op>";
+	_DECL16(COMP3op, iw0);
 
 	switch (_W.opc) {
 		case 0:
@@ -1245,9 +1236,8 @@ static int decode_dagMODim_0 (TIword iw0,
 static int decode_dagMODik_0 (TIword iw0,
 		disassemble_info *outf)
 {
-	_DECL16(DagMODik, iw0);
-
 	char *op = "";
+	_DECL16(DagMODik, iw0);
 
 	switch (_W.op) {
 		case 0: op = "+= 2"; break;
@@ -1265,10 +1255,8 @@ static int decode_dagMODik_0 (TIword iw0,
 static int decode_dspLDST_0 (TIword iw0,
 		disassemble_info *outf)
 {
-	
-	_DECL16(DspLDST, iw0);
-
 	char *op = "";
+	_DECL16(DspLDST, iw0);
 
 	switch (_W.aop) {
 		case 0: op = "++"; break;
@@ -1329,10 +1317,9 @@ static int decode_dspLDST_0 (TIword iw0,
 static int decode_LDST_0 (TIword iw0,
 		disassemble_info *outf)
 {
-	_DECL16(LDST, iw0);
-
 	char *op = "";
 	char *size = "";
+	_DECL16(LDST, iw0);
 
 	switch (_W.aop) {
 		case 0: op = "++"; break;
@@ -1572,10 +1559,9 @@ static int decode_CALLa_0 (TIword iw0, TIword iw1,
 static int decode_LDSTidxI_0 (TIword iw0, TIword iw1,
 		bfd_vma pc,  disassemble_info *outf)
 {
-	_DECL32(LDSTidxI, iw0, iw1);
-
 	char *size = "";
 	char *mod = "";
+	_DECL32(LDSTidxI, iw0, iw1);
 
 	switch (_W.sz) { // size
 		case 0: break;
@@ -2228,9 +2214,8 @@ static int decode_dsp32alu_0(TIword iw0, TIword iw1,
 static int decode_dsp32shift_0 (TIword iw0, TIword iw1,
 		disassemble_info *outf)
 {
-	_DECL32(DSP32Shift, iw0, iw1);
-
 	char *reg;
+	_DECL32(DSP32Shift, iw0, iw1);
 
 	switch (_W.sopcde)
 	{
@@ -2498,12 +2483,11 @@ static int decode_dsp32shift_0 (TIword iw0, TIword iw1,
 static int decode_dsp32shiftimm_0 (TIword iw0, TIword iw1,
 		bfd_vma pc,  disassemble_info *outf)
 {
+	char *reg;
+	int immval;
 	_DECL32(DSP32ShiftImm, iw0, iw1);
 
-	char *reg;
-
-	int immval = SIGNEXTEND(_W.immag, 6);
-
+	immval = SIGNEXTEND(_W.immag, 6);
 	switch (_W.sopcde) {
 		case 0:
 			if (_W.sop == 3) return bad_opcode(1);
