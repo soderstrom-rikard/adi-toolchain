@@ -23,6 +23,8 @@
 ###############################################################
 
 APP_NAME=$0
+DIR_BOARDS=`dirname $APP_NAME`
+DIR_BOARDS=$DIR_BOARDS/boards/
 APP_NAME=${APP_NAME#.}
 APP_NAME=${APP_NAME#/}
 
@@ -79,14 +81,20 @@ do
 		   fi
 		   ;;
 		b)  
-
 		   if [ -d $OPTARG ]	
 		   then
-				DIR_BUILD=$OPTARG
-				DIR_BUILD=${DIR_BUILD%/}
+			DIR_BUILD=$OPTARG
+			DIR_BUILD=${DIR_BUILD%/}
 		   else
-			echo "Invalid Build Path"
-			exit
+                        DIR_BUILD=$OPTARG
+                        DIR_BUILD=${DIR_BUILD%/}
+
+			echo "Trying to create BuildPath of $DIR_BUILD"
+			mkdir $DIR_BUILD
+			if [ ! -d $DIR_BUILD ] ; then
+				echo "Error trying to create $DIR_BUILD"
+				exit
+			fi
 		   fi	
 		   ;;
 		h)  
@@ -180,6 +188,7 @@ fi
 if [ $CHECK ] ; then
   echo -n "Path for test results "
   DIR_TEST_RESULTS=$DIR_OUTPUT/tests
+  echo $DIR_TEST_RESULTS
   if [ ! -d $DIR_TEST_RESULTS ] ; then
     mkdir $DIR_TEST_RESULTS
   fi
@@ -244,7 +253,7 @@ fi
 DIR_BINUTILS_BUILD=$DIR_BUILD/binutils_build
 DIR_ELF2FLT_BUILD=$DIR_BUILD/elf2flt_build
 
-echo -n "*** Removing old build dir "
+echo -n "*** Removing old build dir     "
 date
 
 rm -rf $DIR_BINUTILS_BUILD
@@ -268,8 +277,14 @@ fi
 if [ $CHECK ]
 then
   echo "*** Setting up site.exp"
-  rm -f $DIR_BUILD/boards/site.exp
-  (cat $PWD/boards/site.exp.1; echo "lappend boards_dir \"$PWD/boards\""; cat $PWD/boards/site.exp.2 ) > $DIR_BUILD/boards/site.exp
+  if [ ! -d $DIR_BUILD/boards ] ; then
+    mkdir $DIR_BUILD/boards
+    cp $DIR_BOARDS/bfin-sim.exp  $DIR_BUILD/boards/bfin-sim.exp
+  else
+    rm -f $DIR_BUILD/boards/site.exp bfin-sim.exp
+    cp $DIR_BOARDS/bfin-sim.exp  $DIR_BUILD/boards/bfin-sim.exp
+  fi
+  (cat $DIR_BOARDS/site.exp.1; echo "lappend boards_dir \"$DIR_BUILD/boards\""; cat $DIR_BOARDS/site.exp.2 ) > $DIR_BUILD/boards/site.exp
   export DEJAGNU=$DIR_BUILD/boards/site.exp
 fi
 
@@ -366,5 +381,8 @@ echo -n "*** Installing elf2flt         "
 date
 (echo "make install " $LOGFILE ; ) | sh
 
+######################## Done ################################
+echo "*** Testing 'bfin-elf-gcc -v'"
+$DIR_OUTPUT/bin/bfin-elf-gcc -v
 echo -n "*** Done                       "
 date
