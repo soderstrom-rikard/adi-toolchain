@@ -1,179 +1,180 @@
 #objdump: -dr
-#name: arithmetic
+#name: bit
 .*: +file format .*
+
 
 Disassembly of section .text:
 
 00000000 <abs>:
-   0:	10 c4 00 00 	a0 = abs a0;
-   4:	10 c4 00 40 	a0 = abs a1;
-   8:	30 c4 00 00 	a1 = abs a0;
-   c:	30 c4 00 40 	a1 = abs a1;
-  10:	10 c4 00 c0 	a1 = abs a1, a0 = abs a0;
-  14:	07 c4 10 80 	r0 = abs r2;
+   0:	10 c4 3f 00 	A0= ABS A0;
+   4:	10 c4 3f 40 	A0= ABS A1;
+   8:	30 c4 3f 00 	A1= ABS A0;
+   c:	30 c4 3f 40 	A1= ABS A1;
+  10:	10 c4 3f c0 	A1= ABS A0,A0= ABS A0;
+  14:	07 c4 10 80 	R0= ABS R2;
 
 00000018 <add>:
-  18:	86 5b       	sp = sp \+ p0;
-  1a:	96 5b       	sp = sp \+ p2;
-  1c:	f9 5b       	fp = p1 \+ fp;
-  1e:	d7 51       	r7 = r7 \+ r2;
-  20:	86 51       	r6 = r6 \+ r0;
-  22:	02 c4 10 a8 	r4.l = r2.h \+ r0.l \(s\);
-  26:	22 c4 09 aa 	r5.h = r1.h \+ r1.l \(s\);
-  2a:	02 c4 35 0c 	r6.l = r6.l \+ r5.l \(ns\);
+  18:	86 5b       	SP=SP\+P0;
+  1a:	96 5b       	SP=SP\+P2;
+  1c:	f9 5b       	FP=P1\+FP;
+  1e:	04 c4 3a 0e	R7=R7\+R2 \(NS\);
+  22:	04 c4 30 2c 	R6=R6\+R0 \(S\);
+  26:	02 c4 10 a8 	R4.L=R2.H\+R0.L \(S\);
+  2a:	22 c4 09 aa 	R5.H=R1.H\+R1.L \(S\);
+  2e:	02 c4 35 0c	R6.L=R6.L\+R5.L \(NS\);
 
-0000002e <add_sub_prescale_down>:
-  2e:	05 c4 01 98 	r4.l = r0 \+ r1 \(rnd20\);
-  32:	25 c4 28 96 	r3.h = r5 \+ r0 \(rnd20\);
-  36:	05 c4 3d d2 	r1.l = r7 - r5 \(rnd20\);
+00000032 <add_sub_prescale_down>:
+  32:	05 c4 01 98 	R4.L=R0\+R1\(RND20\);
+  36:	25 c4 28 96 	R3.H=R5\+R0\(RND20\);
+  3a:	05 c4 3d d2 	R1.L=R7-R5\(RND20\);
 
-0000003a <add_sub_prescale_up>:
-  3a:	05 c4 01 04 	r2.l = r0 \+ r1 \(rnd12\);
-  3e:	25 c4 3e 0e 	r7.h = r7 \+ r6 \(rnd12\);
-  42:	05 c4 1a 4a 	r5.l = r3 - r2 \(rnd12\);
-  46:	25 c4 0a 44 	r2.h = r1 - r2 \(rnd12\);
+0000003e <add_sub_prescale_up>:
+  3e:	05 c4 01 04 	R2.L=R0\+R1\(RND12\);
+  42:	25 c4 3e 0e 	R7.H=R7\+R6\(RND12\);
+  46:	05 c4 1a 4a 	R5.L=R3-R2\(RND12\);
+  4a:	25 c4 0a 44 	R2.H=R1-R2\(RND12\);
 
-0000004a <add_immediate>:
-  4a:	05 66       	r5 \+= -64;
-  4c:	fa 65       	r2 \+= 0x3f;
-  4e:	60 9f       	i0 \+= 2;
-  50:	63 9f       	i3 \+= 2;
-  52:	6a 9f       	i2 \+= 4;
-  54:	69 9f       	i1 \+= 4;
-  56:	20 6c       	p0 \+= 0x4;
-  58:	86 6c       	sp \+= 0x10;
-  5a:	07 6f       	fp \+= -32;
+0000004e <add_immediate>:
+  4e:	05 66       	R5\+=-64;
+  50:	fa 65       	R2\+=0x3f;
+  52:	60 9f       	I0\+=2;
+  54:	63 9f       	I3\+=2;
+  56:	6a 9f       	I2\+=4;
+  58:	69 9f       	I1\+=4;
+  5a:	20 6c       	P0\+=0x4;
+  5c:	86 6c       	SP\+=0x10;
+  5e:	07 6f       	FP\+=-32;
 
-0000005c <divide_primitive>:
-  5c:	6b 42       	divs \(r3, r5\);
-  5e:	2b 42       	divq \(r3, r5\);
+00000060 <divide_primitive>:
+  60:	6b 42       	DIVS\(R3,R5\);
+  62:	2b 42       	DIVQ\(R3,R5\);
 
-00000060 <expadj>:
-  60:	07 c6 25 0c 	r6.l = expadj\(r5, r4.l\);
-  64:	07 c6 08 ca 	r5.l = expadj\(r0.h, r1.l\);
-  68:	07 c6 2b 48 	r4.l = expadj\(r3, r5.l\) \(v\);
+00000064 <expadj>:
+  60:	07 c6 25 0c 	R6.L=EXPADJ \(R5,R4.L\);
+  68:	07 c6 08 ca 	R5.L=EXPADJ \(R0.H,R1.L\);
+  6c:	07 c6 2b 48 	R4.L=EXPADJ \(R3,R5.L\) \(V\);
 
-0000006c <max>:
-  6c:	07 c4 2a 0c 	r6 = max \(r5, r2\);
-  70:	07 c4 0b 00 	r0 = max \(r1, r3\);
+00000070 <max>:
+  70:	07 c4 2a 0c 	R6=MAX\(R5,R2\);
+  74:	07 c4 0b 00 	R0=MAX\(R1,R3\);
 
-00000074 <min>:
-  74:	07 c4 13 4a 	r5 = min \(r2, r3\);
-  78:	07 c4 38 48 	r4 = min \(r7, r0\);
+00000078 <min>:
+  78:	07 c4 13 4a 	R5=MIN\(R2,R3\);
+  7c:	07 c4 38 48 	R4=MIN\(R7,R0\);
 
-0000007c <modify_decrement>:
-  7c:	0b c4 00 c0 	a0 -= a1;
-  80:	0b c4 00 e0 	a0 -= a1 \(w32\);
-  84:	17 44       	fp -= p2;
-  86:	06 44       	sp -= p0;
-  88:	73 9e       	i3 -= m0;
-  8a:	75 9e       	i1 -= m1;
+00000080 <modify_decrement>:
+  7c:	0b c4 36 c0 	A0-=A1;
+  84:	0b c4 36 e0 	A0-=A1\(W32\);
+  88:	17 44       	FP-=P2;
+  8a:	06 44       	SP-=P0;
+  8c:	73 9e       	I3-=M0;
+  8e:	75 9e       	I1-=M1;
 
-0000008c <modify_increment>:
-  8c:	0b c4 00 80 	a0 \+= a1;
-  90:	0b c4 00 a0 	a0 \+= a1 \(w32\);
-  94:	4e 45       	sp \+= p1 \(brev\);
-  96:	7d 45       	p5 \+= fp \(brev\);
-  98:	6a 9e       	i2 \+= m2;
-  9a:	e0 9e       	i0 \+= m0 \(brev\);
-  9c:	0b c4 00 0e 	r7 = \(a0 \+= a1\);
-  a0:	0b c4 00 4c 	r6.l = \(a0 \+= a1\);
-  a4:	2b c4 00 40 	r0.h = \(a0 \+= a1\);
+00000090 <modify_increment>:
+  90:	0b c4 36 80 	A0\+=A1;
+  94:	0b c4 36 a0 	A0\+=A1\(W32\);
+  98:	4e 45       	SP\+=P1\(BREV\);
+  9a:	7d 45       	P5\+=FP\(BREV\);
+  9c:	6a 9e       	I2\+=M2;
+  9e:	e0 9e       	I0\+=M0\(BREV\);
+  a0:	0b c4 36 0e 	R7=\(A0\+=A1\);
+  a4:	0b c4 36 4c 	R6.L=\(A0\+=A1\);
+  a8:	2b c4 2d 40 	R0.H=\(A0\+=A1\);
 
-000000a8 <multiply16>:
-  a8:	00 c2 0a 24 	, r0.l = r1.h \* r2.l;
-  ac:	20 c2 68 26 	, r1.l = r5.h \* r0.h \(s2rnd\);
-  b0:	80 c2 db 23 	, r7.l = r3.l \* r3.h \(fu\);
-  b4:	28 c3 15 27 	, r4 = r2.h \* r5.h \(iss2\);
-  b8:	08 c3 0b 20 	, r0 = r1.l \* r3.l \(is\);
-  bc:	08 c2 a8 25 	, r6 = r5.h \* r0.l;
-  c0:	94 c3 be 40 	r2.h = r7.l \* r6.h \(m\),  \(iu\);
-  c4:	04 c2 e8 80 	r3.h = r5.h \* r0.l, ;
-  c8:	14 c2 09 40 	r0.h = r1.l \* r1.h \(m\), ;
-  cc:	1c c3 3e 80 	r1 = r7.h \* r6.l \(m\),  \(is\);
-  d0:	0c c2 02 41 	r5 = r0.l \* r2.h, ;
-  d4:	1c c2 b0 c0 	r3 = r6.h \* r0.h \(m\), ;
+000000ac <multiply16>:
+  ac:	00 c2 0a 24 	R0 = R1.H \* R2.L;
+  b0:	20 c2 68 26 	R1 = R5.H \* R0.H \(S2RND\);
+  b4:	80 c2 db 23 	R7 = R3.L \* R3.H \(FU\);
+  b8:	28 c3 15 27 	R4 = R2.H \* R5.H \(ISS2\);
+  bc:	08 c3 0b 20 	R0 = R1.L \* R3.L \(IS\);
+  c0:	08 c2 a8 25 	R6 = R5.H \* R0.L;
+  c4:	94 c3 be 40 	R2.H = R7.L \* R6.H \(M, IU\);
+  c8:	04 c2 e8 80 	R3.H = R5.H \* R0.L;
+  cc:	14 c2 09 40 	R0.H = R1.L \* R1.H \(M, \);
+  d0:	1c c3 3e 80 	R1 = R7.H \* R6.L \(M, IS\);
+  d4:	0c c2 02 41 	R5 = R0.L \* R2.H;
+  d8:	1c c2 b0 c0 	R3 = R6.H \* R0.H \(M, \);
 
-000000d8 <multiply32>:
-  d8:	c4 40       	r4 \*= r0;
-  da:	d7 40       	r7 \*= r2;
+000000dc <multiply32>:
+  dc:	c4 40       	R4\*=R0;
+  de:	d7 40       	R7\*=R2;
 
-000000dc <multiply_accumulate>:
-  dc:	63 c0 2f 02 	, \(a0 = r5.l \* r7.h\) \(w32\);
-  e0:	03 c0 00 04 	, \(a0 = r0.h \* r0.l\);
-  e4:	83 c0 13 0a 	, \(a0 \+= r2.l \* r3.h\) \(fu\);
-  e8:	03 c0 21 0c 	, \(a0 \+= r4.h \* r1.l\);
-  ec:	03 c1 3e 12 	, \(a0 -= r7.l \* r6.h\) \(is\);
-  f0:	03 c0 2a 16 	, \(a0 -= r5.h \* r2.h\);
-  f4:	10 c0 08 58 	\(a1 = r1.l \* r0.h\) \(m\), ;
-  f8:	00 c0 10 98 	\(a1 = r2.h \* r0.l\), ;
-  fc:	70 c0 3e 98 	\(a1 = r7.h \* r6.l\) \(m\),  \(w32\);
- 100:	81 c0 1a 18 	\(a1 \+= r3.l \* r2.l\),  \(fu\);
- 104:	01 c0 31 98 	\(a1 \+= r6.h \* r1.l\), ;
- 108:	02 c1 03 58 	\(a1 -= r0.l \* r3.h\),  \(is\);
- 10c:	02 c0 17 58 	\(a1 -= r2.l \* r7.h\), ;
+000000e0 <multiply_accumulate>:
+  e0:	63 c0 2f 02     a0 = R5.L \* R7.H \(W32\);
+  e4:	03 c0 00 04 	a0 = R0.H \* R0.L;
+  e8:	83 c0 13 0a 	a0 \+= R2.L \* R3.H \(FU\);
+  ec:	03 c0 21 0c 	a0 \+= R4.H \* R1.L;
+  f0:	03 c1 3e 12 	a0 -= R7.L \* R6.H \(IS\);
+  f4:	03 c0 2a 16 	a0 -= R5.H \* R2.H;
+  f8:	10 c0 08 58     a1 = R1.L \* R0.H \(M\);
+  fc:	00 c0 10 98 	a1 = R2.H \* R0.L;
+ 100:	70 c0 3e 98	a1 = R7.H \* R6.L \(M, W32\);
+ 104:	81 c0 1a 18 	a1 \+= R3.L \* R2.L \(FU\);
+ 108:	01 c0 31 98 	a1 \+= R6.H \* R1.L;
+ 10c:	02 c1 03 58 	a1 -= R0.L \* R3.H \(IS\);
+ 110:	02 c0 17 58 	a1 -= R2.L \* R7.H;
 
-00000110 <multiply_accumulate_half>:
- 110:	03 c0 f5 25 	, r7.l = \(a0 = r6.h \* r5.l\);
- 114:	c3 c0 0a 24 	, r0.l = \(a0 = r1.h \* r2.l\) \(tfu\);
- 118:	03 c0 ac 28 	, r2.l = \(a0 \+= r5.l \* r4.l\);
- 11c:	43 c0 fe 2e 	, r3.l = \(a0 \+= r7.h \* r6.h\) \(iu\);
- 120:	03 c0 1a 36 	, r0.l = \(a0 -= r3.h \* r2.h\);
- 124:	63 c1 6c 30 	, r1.l = \(a0 -= r5.l \* r4.l\) \(ih\);
- 128:	04 c0 48 58 	r1.h = \(a1 = r1.l \* r0.h\), ;
- 12c:	34 c1 83 98 	r2.h = \(a1 = r0.h \* r3.l\) \(m\),  \(iss2\);
- 130:	05 c0 bf 59 	r6.h = \(a1 \+= r7.l \* r7.h\), ;
- 134:	25 c0 d3 19 	r7.h = \(a1 \+= r2.l \* r3.l\),  \(s2rnd\);
- 138:	06 c0 a2 d9 	r6.h = \(a1 -= r4.h \* r2.h\), ;
- 13c:	d6 c0 5f 99 	r5.h = \(a1 -= r3.h \* r7.l\) \(m\),  \(tfu\);
+00000114 <multiply_accumulate_half>:
+ 114:	03 c0 f5 25 	R7.L = \(a0 = R6.H \* R5.L\);
+ 118:	c3 c0 0a 24 	R0.L = \(a0 = R1.H \* R2.L\) \(TFU\);
+ 11c:	03 c0 ac 28 	R2.L = \(a0 \+= R5.L \* R4.L\);
+ 120:	43 c0 fe 2e 	R3.L = \(a0 \+= R7.H \* R6.H\) \(T\);
+ 124:	03 c0 1a 36 	R0.L = \(a0 -= R3.H \* R2.H\);
+ 128:	63 c1 6c 30 	R1.L = \(a0 -= R5.L \* R4.L\) \(IH\);
+ 12c:	04 c0 48 58 	R1.H = \(a1 = R1.L \* R0.H\);
+ 130:	34 c1 83 98 	R2.H = \(a1 = R0.H \* R3.L\) \(M, ISS2\);
+ 134:	05 c0 bf 59 	R6.H = \(a1 \+= R7.L \* R7.H\);
+ 138:	25 c0 d3 19 	R7.H = \(a1 \+= R2.L \* R3.L\) \(S2RND\);
+ 13c:	06 c0 a2 d9 	R6.H = \(a1 -= R4.H \* R2.H\);
+ 140:	d6 c0 5f 99 	R5.H = \(a1 -= R3.H \* R7.L\) \(M, TFU\);
 
-00000140 <multiply_accumulate_data_reg>:
- 140:	0b c0 0a 20 	, r0 = \(a0 = r1.l \* r2.l\);
- 144:	0b c1 8a 20 	, r2 = \(a0 = r1.l \* r2.l\) \(is\);
- 148:	0b c0 3e 2d 	, r4 = \(a0 \+= r7.h \* r6.l\);
- 14c:	2b c0 ab 2b 	, r6 = \(a0 \+= r5.l \* r3.h\) \(s2rnd\);
- 150:	0b c0 97 35 	, r6 = \(a0 -= r2.h \* r7.l\);
- 154:	8b c0 06 33 	, r4 = \(a0 -= r0.l \* r6.h\) \(fu\);
- 158:	0c c0 81 99 	r7 = \(a1 = r0.h \* r1.l\), ;
- 15c:	9c c0 13 d9 	r5 = \(a1 = r2.h \* r3.h\) \(m\),  \(fu\);
- 160:	0d c0 bd 18 	r3 = \(a1 \+= r7.l \* r5.l\), ;
- 164:	2d c1 17 d8 	r1 = \(a1 \+= r2.h \* r7.h\),  \(iss2\);
- 168:	0e c0 80 58 	r3 = \(a1 -= r0.l \* r0.h\), ;
- 16c:	1e c1 17 59 	r5 = \(a1 -= r2.l \* r7.h\) \(m\),  \(is\);
+00000144 <multiply_accumulate_data_reg>:
+ 144:	0b c0 0a 20 	R0 = \(a0 = R1.L \* R2.L\);
+ 148:	0b c1 8a 20 	R2 = \(a0 = R1.L \* R2.L\) \(IS\);
+ 14c:	0b c0 3e 2d 	R4 = \(a0 \+= R7.H \* R6.L\);
+ 150:	2b c0 ab 2b 	R6 = \(a0 \+= R5.L \* R3.H\) \(S2RND\);
+ 154:	0b c0 97 35 	R6 = \(a0 -= R2.H \* R7.L\);
+ 158:	8b c0 06 33 	R4 = \(a0 -= R0.L \* R6.H\) \(FU\);
+ 15c:	0c c0 81 99 	R7 = \(a1 = R0.H \* R1.L\);
+ 160:	9c c0 13 d9 	R5 = \(a1 = R2.H \* R3.H\) \(M, FU\);
+ 164:	0d c0 bd 18 	R3 = \(a1 \+= R7.L \* R5.L\);
+ 168:	2d c1 17 d8 	R1 = \(a1 \+= R2.H \* R7.H\) \(ISS2\);
+ 16c:	0e c0 80 58 	R3 = \(a1 -= R0.L \* R0.H\);
+ 170:	1e c1 17 59 	R5 = \(a1 -= R2.L \* R7.H\) \(M, IS\);
 
-00000170 <negate>:
- 170:	85 43       	r5 = -r0;
- 172:	0f c4 10 ee 	r7 = -r2 \(s\);
- 176:	97 43       	r7 = -r2;
- 178:	0e c4 00 00 	a0 = -a0;
- 17c:	0e c4 00 40 	a1 = -a1;
- 180:	2e c4 00 00 	a0 = -a0;
- 184:	2e c4 00 40 	a1 = -a1;
- 188:	0e c4 00 c0 	a1 = -a1;
+00000174 <negate>:
+ 174:	85 43       	R5=-R0;
+ 176:	07 c4 10 ee 	R7=-R2\(S\);
+ 17a:	07 c4 10 ce	R7=-R2\(NS\);
+ 17e:	0e c4 36 00 	A0=-A0;
+ 182:	0e c4 36 40 	A0=-A1;
+ 186:	2e c4 36 00 	A1=-A0;
+ 18a:	2e c4 36 40 	A1=-A1;
+ 18e:	0e c4 36 c0 	A1=-A1,A0=-A0;
 
-0000018c <round_half>:
- 18c:	0c c4 18 ca 	r5.l = r3 \(rnd\);
- 190:	2c c4 00 cc 	r6.h = r0 \(rnd\);
+00000192 <round_half>:
+ 192:	0c c4 18 ca 	R5.L=R3\(RND\);
+ 196:	2c c4 00 cc 	R6.H=R0\(RND\);
 
-00000194 <saturate>:
- 194:	08 c4 00 20 	a0 = a0 \(s\);
- 198:	08 c4 00 60 	a1 = a1 \(s\);
- 19c:	08 c4 00 a0 	a1 = a1 \(s\), a0 = a0 \(s\);
+0000019a <saturate>:
+ 19a:	08 c4 2d 20 	A0=A0\(S\);
+ 19e:	08 c4 36 60 	A1=A1\(S\);
+ 1a2:	08 c4 36 a0 	A1=A1\(S\),A0=A0\(S\);
 
-000001a0 <signbits>:
- 1a0:	05 c6 00 0a 	r0.l = signbits r0;
- 1a4:	05 c6 07 80 	r7.l = signbits r7.h;
- 1a8:	06 c6 00 06 	r0.l = signbits a0;
- 1ac:	06 c6 00 4e 	r0.l = signbits a1;
+000001a6 <signbits>:
+ 1a6:	05 c6 00 0a 	R5.L=SIGNBITSR0;
+ 1aa:	05 c6 07 80 	R0.L=SIGNBITSR7.H;
+ 1ae:	06 c6 00 06 	R3.L=SIGNBITSA0;
+ 1b2:	06 c6 00 4e 	R7.L=SIGNBITSA1;
 
-000001b0 <subtract>:
- 1b0:	43 53       	r5 = r3 - r0;
- 1b2:	c7 53       	r7 = r7 - r0;
- 1b4:	ca 52       	r3 = r2 - r1;
- 1b6:	03 c4 37 ea 	r5.l = r6.h - r7.h \(s\);
- 1ba:	23 c4 1b 40 	r0.h = r3.l - r3.h \(ns\);
+000001b6 <subtract>:
+ 1b6:	43 53       	R5=R3-R0;
+ 1b8:	04 c4 38 6e	R7=R7-R0 \(S\);
+ 1bc:	04 c4 11 46	R3=R2-R1 \(NS\);
+ 1c0:	03 c4 37 ea 	R5.L=R6.H-R7.H \(S\);
+ 1c4:	23 c4 1b 40 	R0.H=R3.L-R3.H \(NS\);
 
-000001be <subtract_immediate>:
- 1be:	66 9f       	i2 -= 2;
- 1c0:	6c 9f       	i0 -= 4;
+000001c8 <subtract_immediate>:
+ 1c8:	66 9f       	I2-=2;
+ 1ca:	6c 9f       	I0-=4;
 	...

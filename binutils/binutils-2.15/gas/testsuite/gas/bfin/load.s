@@ -1,3 +1,5 @@
+	.extern f001
+	.extern F002
 	.text
 	.global load_immediate
 load_immediate:
@@ -11,10 +13,13 @@ load_immediate:
 	I2.h = 0xf204;
 	b1.H = 64;
 	l0.h = 0xffff;
+	R5.h = load_data1;
+	B2.H = F002;
 
 	/* Zero Extended.  */
 	fp = 0xff20 (Z);
 	l2 = 32 (z);
+	R5 = foo2 (Z);
 	A0 = 0;
 	A1 = 0;
 	a1 = a0 = 0;
@@ -25,9 +30,11 @@ load_immediate:
 	P2 = 0 (x);
 	sp = -32 (x);
 	fp = 44 (X);
-	l3 = 0x8000 (x);
+	l3 = 0x800 (x);
 	m2 = 0x7fff (X);
 	R1 = 16 (X);
+	L0 = foo1;
+	r7 = load_data2;
 
 	.text
 	.global load_pointer_register
@@ -36,10 +43,10 @@ load_pointer_register:
 	FP = [ p0++ ];
 	p1 = [sp--];
 	SP = [P2 +56];
-	p3 = [fp + 0]
+	p3 = [fp + 0];
 	P4 = [FP + 0x0001FFFC];
-	sp = [fp-0x0001fffc]
-	sp = [p4-0]
+	sp = [fp-0x0001fffc];
+	sp = [p4-0];
 	P5 = [FP-128];
 	
 
@@ -106,8 +113,8 @@ load_byte_zero_extend:
 	r5 = b [p0] (z);
 	R4 = B [P1++] (Z);
 	r0 = b [p2--] (z);
-	R3 = B [sp + 0x7fff];
-	r7 = b [SP - 32767];
+	R3 = B [sp + 0x7fff] (Z);
+	r7 = b [SP - 32767] (z);
 
 	.text
 	.global load_bye_sign_extend
@@ -119,4 +126,6 @@ load_byte_sign_extend:
 	r6 = b [fp-0x7fff] (X);
 
 	.global load_data
-load_data:	.byte 0
+load_data1:	.byte 0
+load_data2:	.word 16
+

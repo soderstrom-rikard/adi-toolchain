@@ -147,7 +147,7 @@ multiply_accumulate_half:
 	r0.L = (A0 = r1.h * R2.l) (tfu);
 	R2.L = (a0 += r5.L * r4.L);
 	r3.l = (A0 += r7.H * r6.h) (T);
-	r0.H = (a0 -= r3.h * r2.h);
+	r0.l = (a0 -= r3.h * r2.h);
 	r1.l = (a0 -= r5.L * r4.L) (iH);
 
 	r1.H = (a1 = r1.l * R0.H);

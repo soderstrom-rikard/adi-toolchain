@@ -1,3 +1,14 @@
+2004-12-16  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/arithmetic.s:
+	* gas/bfin/arithmetic.d: Update to new objdump output.
+	* gas/bfin/load.d: Likewise.
+	* gas/bfin/video.d: Likewise.
+	* gas/bfin/shift.d: Likewise.
+	* gas/bfin/shift2.d: Likewise.
+	* gas/bfin/load.s: Add new tests.
+	* gas/bfin/video.s: Fix byteop1p test.
+
 2004-12-15  Catherine Moore  <clm@cm00re.com>
 	* gas/bfin/video2.s: New test contributed by Satyanarayana Reddy <reddy@epigonaudio.com>.
 	* gas/bfin/bfin.exp: Update to run video2.
