@@ -1689,8 +1689,8 @@ else
 ;;  [(set (match_operand 0 "register_operand" "=d")
 ;;        (match_operand 1 "log2_operand" "J"))
 ;;   (set (match_operand 2 "register_operand" "=d")
-;;      (and:SI (match_operand 3 "register_operand" "d")
-;;          (match_dup 0)))
+;;     (and:SI (match_operand 3 "register_operand" "d")
+;;         (match_dup 0)))
 ;;   (set (match_operand 4 "cc_operand" "C")
 ;;       (eq:CC (match_dup 2) (const_int 0)))]
 ;;  "dead_or_set_p (prev_nonnote_insn (insn), operands[0])"
@@ -1703,8 +1703,8 @@ else
 ;;  (set (match_operand 2 "register_operand" "=d")
 ;;        (match_operand 3 "general_operand" ""))
 ;;   (set (match_dup 0)
-;;      (and:SI (match_dup 2)
-;;          (match_dup 0)))
+;;     (and:SI (match_dup 2)
+;;         (match_dup 0)))
 ;;   (set (match_operand 5 "cc_operand" "C")
 ;;       (eq:CC (match_dup 0) (const_int 0)))]
 ;;  ""
