@@ -641,9 +641,11 @@ decode_m_packet (char *from, CORE_ADDR *mem_addr_ptr, unsigned int *len_ptr)
       *len_ptr |= fromhex (ch) & 0x0f;
       
     }
+#ifdef JYOTIK_DEBUG
     fprintf(stderr, "*len_ptr = %d\n", *len_ptr);
     fprintf(stderr, "from: %s   mem_add_ptr value: 0x%x  *len_ptr: %d\n", from, 
                     (int)(*mem_addr_ptr), *len_ptr);
+#endif
 }
 
 void

@@ -60,7 +60,9 @@ set_desired_inferior (int use_general)
 void
 read_inferior_memory (CORE_ADDR memaddr, char *myaddr, int len)
 {
+#ifdef JYOTIK_DEBUG
    fprintf(stderr, "Inside \"read_inferior_memory\" function with \n");
+#endif
   (*the_target->read_memory) (memaddr, myaddr, len);
   check_mem_read (memaddr, myaddr, len);
 }
