@@ -32,21 +32,21 @@ Disassembly of section .text:
   48:	21 c4 53 0a 	R1=R2\+|-R3,R5=R2-|\+R3;
   4c:	04 c4 41 8d 	R5=R0\+R1,R6=R0-R1 \(NS\);
   50:	04 c4 39 a6 	R0=R7\+R1,R3=R7-R1 \(S\);
-  54:	11 c4 f6 0b 	R7=A1\+A0,R5=A1-A0 \(NS\);
-  58:	11 c4 f6 6c 	R3=A0\+A1,R6=A0-A1 \(S\);
+  54:	11 c4 [c-f][[:xdigit:]] 0b 	R7=A1\+A0,R5=A1-A0 \(NS\);
+  58:	11 c4 [c-f][[:xdigit:]] 6c 	R3=A0\+A1,R6=A0-A1 \(S\);
 
 0000005c <vector_ashift>:
-  5c:	81 c6 8b 03 	R1=R3 << -15 \(V\);
-  60:	81 c6 e0 09 	R4=R0 << -4 \(V\);
-  64:	81 c6 00 4a 	R5=R0 >>> 0x0 \(V, S\);
-  68:	81 c6 62 44 	R2=R2 >>> -12 \(V, S\);
-  6c:	01 c6 15 0e 	R7= ASHIFT R5BYR2.L\(V\);
-  70:	01 c6 02 40 	R0= ASHIFT R2BYR0.L\(V,S\);
+  5c:	81 c6 8b 03 	R1=R3>>>0xf \(V\);
+  60:	81 c6 e0 09 	R4=R0>>>0x4 \(V\);
+  64:	81 c6 00 4a 	R5=R0<<0x0 \(V, S\);
+  68:	81 c6 62 44 	R2=R2<<0xc \(V, S\);
+  6c:	01 c6 15 0e 	R7= ASHIFT R5 BY R2.L\(V\);
+  70:	01 c6 02 40 	R0= ASHIFT R2 BY R0.L\(V,S\);
 
 00000074 <vector_lshift>:
   74:	81 c6 8a 8b 	R5=R2 >> 0xf \(V\);
-  78:	81 c6 11 80 	R0=R1 << 0x2 \(V\);
-  7c:	01 c6 11 88 	R4=SHIFTR1BYR2.L\(V\);
+  78:	81 c6 11 80 	R0=R1<<0x2 \(V\);
+  7c:	01 c6 11 88 	R4=SHIFTR1 BY R2.L\(V\);
 
 00000080 <vector_max>:
   80:	06 c4 01 0c 	R6=MAX\(R0,R1\)\(V\);

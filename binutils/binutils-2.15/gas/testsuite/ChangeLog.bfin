@@ -1,3 +1,8 @@
+2005-01-28  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/vector.d: Update expected output.
+	* gas/bfin/vector2.d: Likewise.
+
 2005-01-27  Catherine Moore  <clm@cm00re.com>
 
 	* gas/bfin/shift.d: Update expected output.
