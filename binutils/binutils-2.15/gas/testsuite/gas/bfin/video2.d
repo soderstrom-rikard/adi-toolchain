@@ -50,11 +50,11 @@ Disassembly of section .text:
   a8:	37 c4 10 0a 	R5=BYTEOP3P\(R3:0x2,R1:0x0\)\(HI\);
   ac:	17 c4 10 2c 	R6=BYTEOP3P\(R3:0x2,R1:0x0\)\(LO, R\);
   b0:	37 c4 10 2e 	R7=BYTEOP3P\(R3:0x2,R1:0x0\)\(HI, R\);
-  b4:	0c c4 36 40 	R0=A1.L\+A1.H,R0=A0.L\+A0.H;
-  b8:	0c c4 36 42 	R0=A1.L\+A1.H,R1=A0.L\+A0.H;
-  bc:	0c c4 b6 46 	R2=A1.L\+A1.H,R3=A0.L\+A0.H;
-  c0:	0c c4 36 4b 	R4=A1.L\+A1.H,R5=A0.L\+A0.H;
-  c4:	0c c4 b6 4f 	R6=A1.L\+A1.H,R7=A0.L\+A0.H;
+  b4:	0c c4 [0-3][[:xdigit:]] 40 	R0=A1.L\+A1.H,R0=A0.L\+A0.H;
+  b8:	0c c4 [0-3][[:xdigit:]] 42 	R0=A1.L\+A1.H,R1=A0.L\+A0.H;
+  bc:	0c c4 [8|9|a|b][[:xdigit:]] 46 	R2=A1.L\+A1.H,R3=A0.L\+A0.H;
+  c0:	0c c4 [0-3][[:xdigit:]] 4b 	R4=A1.L\+A1.H,R5=A0.L\+A0.H;
+  c4:	0c c4 [8|9|a|b][[:xdigit:]] 4f 	R6=A1.L\+A1.H,R7=A0.L\+A0.H;
   c8:	15 c4 d0 01 	\(R7,R0\)=BYTEOP16P\(R3:0x2,R1:0x0\) ;
   cc:	15 c4 50 04 	\(R1,R2\)=BYTEOP16P\(R3:0x2,R1:0x0\) ;
   d0:	15 c4 10 02 	\(R0,R1\)=BYTEOP16P\(R3:0x2,R1:0x0\) ;
@@ -92,7 +92,7 @@ Disassembly of section .text:
  150:	16 c4 02 44 	R2=BYTEOP2P\(R1:0x0,R3:0x2\)\(TL\);
  154:	36 c4 02 46 	R3=BYTEOP2P\(R1:0x0,R3:0x2\)\(TH\);
  158:	16 c4 02 28 	R4=BYTEOP2P\(R1:0x0,R3:0x2\)\(RNDL, R\);
- 15c:	16 c4 02 2a 	R5=BYTEOP2P\(R1:0x0,R3:0x2\)\(RNDH, R\);
+ 15c:	36 c4 02 2a 	R5=BYTEOP2P\(R1:0x0,R3:0x2\)\(RNDH, R\);
  160:	16 c4 02 6c 	R6=BYTEOP2P\(R1:0x0,R3:0x2\)\(TL, R\);
  164:	36 c4 02 6e 	R7=BYTEOP2P\(R1:0x0,R3:0x2\)\(TH, R\);
  168:	16 c4 12 00 	R0=BYTEOP2P\(R3:0x2,R3:0x2\)\(RNDL\);
@@ -100,7 +100,7 @@ Disassembly of section .text:
  170:	16 c4 12 44 	R2=BYTEOP2P\(R3:0x2,R3:0x2\)\(TL\);
  174:	36 c4 12 46 	R3=BYTEOP2P\(R3:0x2,R3:0x2\)\(TH\);
  178:	16 c4 12 28 	R4=BYTEOP2P\(R3:0x2,R3:0x2\)\(RNDL, R\);
- 17c:	16 c4 12 2a 	R5=BYTEOP2P\(R3:0x2,R3:0x2\)\(TL, R\);
+ 17c:	36 c4 12 2a 	R5=BYTEOP2P\(R3:0x2,R3:0x2\)\(RNDH, R\);
  180:	16 c4 12 6c 	R6=BYTEOP2P\(R3:0x2,R3:0x2\)\(TL, R\);
  184:	36 c4 12 6e 	R7=BYTEOP2P\(R3:0x2,R3:0x2\)\(TH, R\);
  188:	18 c4 00 00 	R0=BYTEPACK\(R0,R0\);

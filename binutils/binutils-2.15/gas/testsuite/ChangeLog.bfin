@@ -1,5 +1,10 @@
 2005-01-28  Catherine Moore  <clm@cm00re.com>
 
+	* gas/bfin/video.d: Update expected output.
+	* gas/bfin/video2.d: Likewise.
+
+2005-01-28  Catherine Moore  <clm@cm00re.com>
+
 	* gas/bfin/vector.d: Update expected output.
 	* gas/bfin/vector2.d: Likewise.
 

@@ -18,7 +18,7 @@ Disassembly of section .text:
   1c:	37 c4 02 24 	R2=BYTEOP3P\(R1:0x0,R3:0x2\)\(HI, R\);
 
 00000020 <dual16>:
-  20:	0c c4 76 45 	R5=A1.L\+A1.H,R2=A0.L\+A0.H;
+  20:	0c c4 [4-7][[:xdigit:]] 45 	R5=A1.L\+A1.H,R2=A0.L\+A0.H;
 
 00000024 <byteop16p>:
   24:	15 c4 82 06 	\(R2,R3\)=BYTEOP16P\(R1:0x0,R3:0x2\) ;
@@ -36,7 +36,7 @@ Disassembly of section .text:
   44:	16 c4 02 44 	R2=BYTEOP2P\(R1:0x0,R3:0x2\)\(TL\);
   48:	36 c4 02 46 	R3=BYTEOP2P\(R1:0x0,R3:0x2\)\(TH\);
   4c:	16 c4 02 28 	R4=BYTEOP2P\(R1:0x0,R3:0x2\)\(RNDL, R\);
-  50:	16 c4 02 6a 	R5=BYTEOP2P\(R1:0x0,R3:0x2\)\(TL, R\);
+  50:	36 c4 02 2a 	R5=BYTEOP2P\(R1:0x0,R3:0x2\)\(RNDH, R\);
   54:	16 c4 02 6c 	R6=BYTEOP2P\(R1:0x0,R3:0x2\)\(TL, R\);
   58:	36 c4 02 6e 	R7=BYTEOP2P\(R1:0x0,R3:0x2\)\(TH, R\);
 
