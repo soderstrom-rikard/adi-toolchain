@@ -2394,44 +2394,10 @@ bfin_force_reg (mode, x)
 const char *
 output_casesi_internal(rtx *operands)
 {
-        char buf[512];
-        int reg1, reg2;
-        char *rName2;
-        bool bSave = false;
-
-	reg1 = operands[1]->fld[0].rtwint;
-        if (!regs_ever_live[REG_P0])
-                reg2 = REG_P0;
-        else if (!regs_ever_live[REG_P1])
-                reg2 = REG_P1;
-        else if (!regs_ever_live[REG_P2])
-                reg2 = REG_P2;
-        else {
-                bSave = true;
-                for (reg2 = REG_P0; reg2 <= REG_P5; reg2++)
-                   if (reg2 != operands[0]->fld[0].rtwint && reg2 != reg1)
-                     break;
-        }
-
-        rName2 = reg_names[reg2];
-
         output_asm_insn ("cc = %0<=%1 (iu);\n\tif cc jump 6; jump.l %3;", operands);
+        output_asm_insn ("%1 = %0<<2;\n\t%4.L = %2; %4.H = %2;", operands);
+        output_asm_insn ("%4 = %4 + %1;\n\t%1 = [%4];", operands);
 
-        if (bSave) {
-                sprintf (buf, "[--SP] =%s;", rName2);
-                output_asm_insn (buf, operands);
-        }
-
-        sprintf (buf, "%%1 = %%0<<2;\n\t%s.L=%%2; %s.H=%%2;", rName2, rName2);
-        output_asm_insn (buf, operands);
-
-        sprintf (buf, "%s = %s + %%1;\n\t%%1 = [%s];", rName2, rName2, rName2);
-        output_asm_insn (buf, operands);
-
-        if (bSave) {
-                sprintf (buf, "%s = [SP++];", rName2);
-                output_asm_insn (buf, operands);
-        }
         output_asm_insn ("jump (%1);", operands);
 
         return "";
