@@ -15,7 +15,7 @@
 #define BIT_MULTI_INS 0x0800  // multi instruction bit
 
 // This just sets the multi instruction bit of a DSP32 instruction
-#define SET_MULTI_INSTRUCTION_BIT(x) x->value |  BIT_MULTI_INS;
+#define SET_MULTI_INSTRUCTION_BIT(x) x->value |=  BIT_MULTI_INS;
 
 
 ////////////////////////////////////////////////////////////////////////////
