@@ -1,5 +1,9 @@
 2005-02-17  Catherine Moore  <clm@cm00re.com>
 
+	* read.c (read_a_source_file):  Remove code that is bfin-specific.
+
+2005-02-17  Catherine Moore  <clm@cm00re.com>
+
 	* config/tc-bfin.h (LEX_BR): Do not allow a bracket to be
 	part of a name.
 

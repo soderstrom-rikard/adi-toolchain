@@ -512,11 +512,6 @@ read_a_source_file (char *name)
   found_comment = 0;
 #endif
 
-//#ifdef TC_BFIN
-//  // XXX : this flags prevents bfin-gas from parsing a label
-//        int nolabel;
-//#endif
-
   buffer = input_scrub_new_file (name);
 
   listing_file (name);
@@ -539,9 +534,6 @@ read_a_source_file (char *name)
 	  /* We now have input_line_pointer->1st char of next line.
 	     If input_line_pointer [-1] == '\n' then we just
 	     scanned another line: so bump line counters.  */
-//#ifdef TC_BFIN
-//                nolabel = 0;
-//#endif
 	  if (is_end_of_line[(unsigned char) input_line_pointer[-1]])
 	    {
 #ifdef md_start_line_hook
@@ -671,14 +663,6 @@ read_a_source_file (char *name)
 	  /* C is the 1st significant character.
 	     Input_line_pointer points after that character.  */
 	  if (is_name_beginner (c))
-
-//#ifdef TC_BFIN
-//        // special hack for bfin assembler: line may start with '(',
-//        // e.g. for PushPopMultiple statements
-//        if (c == '(') nolabel = 1;
-//        if (is_name_beginner (c) || nolabel)
-//#endif
-
 	    {
 	      /* Want user-defined label or pseudo/opcode.  */
 	      HANDLE_CONDITIONAL_ASSEMBLY ();
