@@ -472,6 +472,9 @@ is_group2 (INSTR_T x)
 %token EMUEXCPT
 %token RAISE EXCPT
 %token LSETUP
+%token LOOP
+%token LOOP_BEGIN
+%token LOOP_END
 %token DISALGNEXCPT
 %token JUMP JUMP_DOT_S JUMP_DOT_L
 %token CALL
@@ -3467,7 +3470,6 @@ asm_1:
 	    return semantic_error ("Bad register or values for LSETUP");
 	  
 	}
-
 	| LSETUP LPAREN expr COMMA expr RPAREN REG ASSIGN REG
 	{
 	  if (IS_PCREL4 ($3) && IS_LPPCREL10 ($5)
@@ -3492,7 +3494,36 @@ asm_1:
 	  else
 	    return semantic_error ("Bad register or values for LSETUP");
 	}
-
+////////////////////////////////////////////////////////////////////////////
+// LOOP
+	| LOOP expr REG
+	{
+	  if (!IS_RELOC ($2))
+	    return semantic_error ("Invalid expression in loop statement");
+	  if (!IS_CREG ($3))
+            return semantic_error ("Invalid loop counter register");
+	$$ = gen_loop ($2, &$3, 0, 0);
+	}
+	| LOOP expr REG ASSIGN REG
+	{
+	  if (IS_RELOC ($2) && IS_PREG ($5) && IS_CREG ($3))
+	    {
+	      notethat("Loop: LOOP expr counters = pregs\n");
+	      $$ = gen_loop ($2, &$3, 1, &$5);
+	    }
+	  else
+	    return semantic_error ("Bad register or values for LOOP");
+	}
+	| LOOP expr REG ASSIGN REG GREATER_GREATER expr
+	{
+	  if (IS_RELOC ($2) && IS_PREG ($5) && IS_CREG ($3) && EXPR_VALUE ($7) == 1)
+	    {
+	      notethat("Loop: LOOP expr counters = pregs >> 1\n");
+	      $$ = gen_loop ($2, &$3, 3, &$5);
+	    }
+	  else
+	    return semantic_error ("Bad register or values for LOOP");
+	}
 ////////////////////////////////////////////////////////////////////////////
 // pseudoDEBUG
 
@@ -3993,7 +4024,7 @@ ccstat:
 
 symbol: SYMBOL
 	{ ExprNodeValue val; val.s_value = S_GET_NAME($1);
-	  $$ = ExprNodeCreate(ExprNodeReloc, val, NULL, NULL); }
+	  $$ = Expr_Node_Create(ExprNodeReloc, val, NULL, NULL); }
 ;
 
 got :
@@ -4012,7 +4043,7 @@ pltpc :
 
 eterm: NUMBER
 	{ ExprNodeValue val; val.i_value = $1;
-	  $$ = ExprNodeCreate(ExprNodeConstant, val, NULL, NULL); }
+	  $$ = Expr_Node_Create(ExprNodeConstant, val, NULL, NULL); }
 	| symbol
 	{ $$ = $1; }
 	| LPAREN expr_1 RPAREN
@@ -4152,7 +4183,7 @@ static ExprNode *binary (ExprOpType op, ExprNode *x, ExprNode *y)
     /* create a new expression structure */
     ExprNodeValue val;
     val.op_value = op;
-    return ExprNodeCreate(ExprNodeBinop, val, x, y);
+    return Expr_Node_Create(ExprNodeBinop, val, x, y);
   }
 }
 
@@ -4178,7 +4209,7 @@ static ExprNode * unary(ExprOpType op,ExprNode * x)
       /* create a new expression structure */
       ExprNodeValue val;
       val.op_value = op;
-      return ExprNodeCreate(ExprNodeUnop, val, x, NULL);
+      return Expr_Node_Create(ExprNodeUnop, val, x, NULL);
     }
 }
 

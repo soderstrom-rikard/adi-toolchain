@@ -112,6 +112,9 @@ gen_progctrl(int prgfunc, int poprnd);
 INSTR_T
 gen_loopsetup(ExprNode *soffset, REG_T c, int rop, ExprNode *eoffset, REG_T reg);
 
+INSTR_T
+gen_loop (ExprNode *expr, REG_T reg, int rop, REG_T preg);
+
 
 INSTR_T
 gen_pushpopmultiple(int dr, int pr, int d, int p, int w);

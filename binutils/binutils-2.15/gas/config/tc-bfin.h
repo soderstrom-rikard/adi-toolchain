@@ -30,7 +30,7 @@
 #define WORKING_DOT_WORD
 
 extern void bfin_start_line_hook PARAMS ((void));
-/* #define md_start_line_hook()    bfin_start_line_hook() */
+#define md_start_line_hook()    bfin_start_line_hook()
 
 
 /* 

@@ -133,6 +133,9 @@ static int parse_reg(Register *r, int type, char *rt);
 [lL][tT]                                return LT;
 [lL][sS][hH][iI][fF][tT]                return LSHIFT;
 [lL][sS][eE][tT][uU][pP]                return LSETUP;
+[lL][oO][oO][pP]			return LOOP;
+[lL][oO][oO][pP]_[bB][eE][gG][iI][nN]	return LOOP_BEGIN;
+[lL][oO][oO][pP]_[eE][nN][dD]		return LOOP_END;
 
 [lL][eE]                                return LE;
 [lL][cC]0 _REG.regno = REG_LC0; return REG;

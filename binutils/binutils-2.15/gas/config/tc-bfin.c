@@ -21,8 +21,8 @@
 #include "obj-elf.h"
 #include "bfin-defs.h"
 #include "obstack.h"
+#include "safe-ctype.h"
 
-#include <ctype.h>		// isupper(), tolower()
 
 extern int yyparse (void);
 struct yy_buffer_state;
@@ -318,7 +318,7 @@ md_begin ()
 
       for (j = 0; walk->name[j]; j++)
 	{
-	  buf[j] = isupper (walk->name[j]) ? tolower (walk->name[j]) : walk->name[j];
+	  buf[j] = ISUPPER (walk->name[j]) ? TOLOWER (walk->name[j]) : walk->name[j];
 	}
       buf[j] = '\0';
 
@@ -340,7 +340,7 @@ md_begin ()
 
    for (j = 0; bfin_reg_info[i].name[j]; j++)
    {
-   buf[j] = isupper(bfin_reg_info[i].name[j]) ?
+   buf[j] = ISUPPER (bfin_reg_info[i].name[j]) ?
    tolower(bfin_reg_info[i].name[j]) :
    bfin_reg_info[i].name[j];
    }
@@ -855,14 +855,102 @@ bfin_fix_adjustable (fixP)
 
   return 1;
 }
-/*
- * Need to check the begining of each new line, to see if '[', ']' characters
- * are used.  This is used primarily for stack-pointers, and this notation
- * isn't handled by the GNU Assembler.
- */
+/* Handle the LOOP_BEGIN and LOOP_END statements.
+   Parse the Loop_Begin/Loop_End and create a label.  */
 void
 bfin_start_line_hook ()
 {
+  bfd_boolean maybe_begin = FALSE;
+  bfd_boolean maybe_end = FALSE;
+
+  char *c1, *label_name;
+  symbolS *line_label;
+  char *c = input_line_pointer;
+
+  while (ISSPACE (*c))
+    c++;
+
+  /* Look for Loop_Begin or Loop_End statements.  */
+
+  if (*c != 'L' && *c != 'l')
+    return;
+
+  c++;
+  if (*c != 'O' && *c != 'o')
+    return;
+
+  c++;
+  if (*c != 'O' && *c != 'o')
+    return;
+ 
+  c++;
+  if (*c != 'P' && *c != 'p')
+    return;
+
+  c++;
+  if (*c != '_')
+    return;
+
+  c++;
+  if (*c == 'E' || *c == 'e')
+    maybe_end = TRUE;
+  else if (*c == 'B' || *c == 'b')
+    maybe_begin = TRUE;
+  else
+    return;
+
+  if (maybe_end)
+    {
+      c++;
+      if (*c != 'N' && *c != 'n')
+	return;
+
+      c++;
+      if (*c != 'D' && *c != 'd')
+        return;
+    }
+
+  if (maybe_begin)
+    {
+      c++;
+      if (*c != 'E' && *c != 'e')
+	return;
+
+      c++;
+      if (*c != 'G' && *c != 'g')
+        return;
+
+      c++;
+      if (*c != 'I' && *c != 'i')
+	return;
+
+      c++;
+      if (*c != 'N' && *c != 'n')
+        return;
+    }
+
+  c++;
+  while (ISSPACE (*c)) c++;
+  c1 = c;
+  while (ISALPHA (*c) || ISDIGIT (*c) || *c == '_') c++;
+
+  input_line_pointer = c;
+  if (maybe_end)
+    {
+      label_name = (char *) xmalloc ((c - c1) + strlen ("__END") + 1);
+      label_name[0] = 0;
+      strncat (label_name, c1, c-c1);
+      strcat (label_name, "__END");
+    }
+  else /* maybe_begin */
+    {
+      label_name = (char *) xmalloc ((c - c1) + strlen ("__BEGIN") + 1);
+      label_name[0] = 0;
+      strncat (label_name, c1, c-c1);
+      strcat (label_name, "__BEGIN");
+    }
+
+  line_label = colon (label_name);
 }
 
 /*   sub routines   */
@@ -970,7 +1058,7 @@ allocate (int n)
 }
 
 ExprNode *
-ExprNodeCreate (ExprNodeType type, ExprNodeValue value, ExprNode * LeftChild, ExprNode * RightChild)
+Expr_Node_Create (ExprNodeType type, ExprNodeValue value, ExprNode * LeftChild, ExprNode * RightChild)
 {
 
 
@@ -1302,8 +1390,8 @@ gen_dsp32shiftimm (int sopcde, REG_T dst0, int immag, REG_T src1, int sop, int H
 
   return GEN_OPCODE32 ();
 }
-
 ///////////////////////////////////////////////////////////////////////////
+
 // LOOP SETUP
 
 
@@ -1351,9 +1439,13 @@ gen_calla (ExprNode * addr, int S)
   val = EXPR_VALUE (addr) >> 1;
   high_val = val >> 16;
 
-  return conscode (gencode (HI (c_code.opcode) | LO (high_val)),
-		   ExprNodeGenReloc (addr, reloc));
-}
+  return conscode (gencode (HI (c_code.opcode) | (high_val & 0xff)),
+                     ExprNodeGenReloc (addr, reloc));
+  }
+
+//  this_insn = gencode (c_code.opcode | LO (high_val));
+//  return conscode (this_insn, ExprNodeGenReloc (addr, reloc));
+//}
 
 INSTR_T
 gen_linkage (int R, int framesize)
@@ -1874,4 +1966,32 @@ gen_multi_instr (INSTR_T dsp32, INSTR_T dsp16_grp1, INSTR_T dsp16_grp2)
   dsp16_grp2->next = NULL_CODE;	// terminate
 
   return dsp32;
+}
+INSTR_T
+gen_loop (ExprNode *expr, REG_T reg, int rop, REG_T preg)
+{
+  char *loopsym;
+  char *lbeginsym, *lendsym;
+  ExprNodeValue lbeginval, lendval;
+  ExprNode *lbegin, *lend;
+
+  loopsym = expr->value.s_value;
+  lbeginsym = (char *) xmalloc (strlen (loopsym) + strlen ("__BEGIN") + 1);
+  lendsym = (char *) xmalloc (strlen (loopsym) + strlen ("__END") + 1);
+
+  lbeginsym[0] = 0;
+  lendsym[0] = 0;
+
+  strcat (lbeginsym, loopsym);
+  strcat (lbeginsym, "__BEGIN");
+
+  strcat (lendsym, loopsym);
+  strcat (lendsym, "__END");
+
+  lbeginval.s_value = lbeginsym;
+  lendval.s_value = lendsym;
+
+  lbegin = Expr_Node_Create (ExprNodeReloc, lbeginval, NULL, NULL);
+  lend   = Expr_Node_Create (ExprNodeReloc, lendval, NULL, NULL);
+  return gen_loopsetup(lbegin, reg, rop, lend, preg);
 }

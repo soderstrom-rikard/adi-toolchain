@@ -1,3 +1,18 @@
+2005-02-07  Catherine Moore  <clm@cmoore.com>
+
+	* config/bfin-aux.h (gen_loop): Declare.
+	* config/bfin-defs.h (Expr_Node_Create): Renamed.
+	* config-lex.l (LOOP, LOOP_BEGIN, LOOP_END): Recognize.
+	* config-parse.y: Parse LOOP, LOOP_BEGIN and LOOP_END
+	statements. Rename occurences of ExprNodeCreate.
+	* config/tc-bfin.h (md_start_line_hook): Define.
+	* config/tc/bfin.c (safe-ctype.h): Include instead of ctype.h
+	(md_begin): Use ISUPPER and ISLOWER.
+	(bfin_start_line_hook): New.
+	(ExprNodeCreate): Rename to Expr_Node_Create.
+	(gen_calla): Get correct bits of high_val.
+	(gen_loop): New.
+	
 2005-02-01  Catherine Moore  <clm@cm00re.com>
 
 	* config/bfin-parse.y (dregs +- dregs): Generate 16 bit

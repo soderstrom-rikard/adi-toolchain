@@ -255,7 +255,7 @@ struct expr_node_struct
 
 
 /* operations on the expression node */
-ExprNode *ExprNodeCreate(ExprNodeType type, 
+ExprNode *Expr_Node_Create(ExprNodeType type, 
 		         ExprNodeValue value, 
 			 ExprNode *LeftChild, 
 			 ExprNode *RightChild);
