@@ -1,4 +1,7 @@
 2005-03-07  Pradip Shah <pcs@rrap-software.com>
+	* bfin-tdep.c Corrected macro defs for IF CC JUMPs
+
+2005-03-07  Pradip Shah <pcs@rrap-software.com>
 	* bfin-tdep.c (bfin_push_dummy_call) : Simplified as per ABI.
 
 2005-03-07  Pradip Shah <pcs@rrap-software.com>

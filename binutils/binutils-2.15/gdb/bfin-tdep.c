@@ -94,14 +94,14 @@ extern void bfin_software_single_step (enum target_signal, int);
 #define P_JUMP_S_MAX			0x2FFF // jump.s pcrel13m2, 16-bit, max
 #define P_JUMP_L_MIN			0xE200 // jump.l pcrel25m2, 32-bit, min
 #define P_JUMP_L_MAX			0xE2FF // jump.l pcrel25m2, 32-bit, max
-#define P_IF_CC_JUMP_MIN		0x1400 // conditional jump pcrel11m2, 16-bit, min
-#define P_IF_CC_JUMP_MAX		0x17FF // conditional jump pcrel11m2, 16-bit, max
+#define P_IF_CC_JUMP_MIN		0x1800 // conditional jump pcrel11m2, 16-bit, min
+#define P_IF_CC_JUMP_MAX		0x1BFF // conditional jump pcrel11m2, 16-bit, max
 #define P_IF_CC_JUMP_BP_MIN		0x1C00 // conditional jump(bp) pcrel11m2, 16-bit, min
 #define P_IF_CC_JUMP_BP_MAX		0x1FFF // conditional jump(bp) pcrel11m2, 16-bit, max
 #define P_IF_NOT_CC_JUMP_MIN		0x1000 // conditional !jump pcrel11m2, 16-bit, min
 #define P_IF_NOT_CC_JUMP_MAX		0x13FF // conditional !jump pcrel11m2, 16-bit, max
-#define P_IF_NOT_CC_JUMP_BP_MIN		0x1C00 // conditional jump(bp) pcrel11m2, 16-bit, min
-#define P_IF_NOT_CC_JUMP_BP_MAX		0x1FFF // conditional jump(bp) pcrel11m2, 16-bit, max
+#define P_IF_NOT_CC_JUMP_BP_MIN		0x1400 // conditional jump(bp) pcrel11m2, 16-bit, min
+#define P_IF_NOT_CC_JUMP_BP_MAX		0x17FF // conditional jump(bp) pcrel11m2, 16-bit, max
 #define P_CALL_PREG_MIN			0x0060 // call (preg), 16-bit, min
 #define P_CALL_PREG_MAX			0x0067 // call (preg), 16-bit, max
 #define P_CALL_PC_PLUS_PREG_MIN		0x0070 // call (pc+preg), 16-bit, min
