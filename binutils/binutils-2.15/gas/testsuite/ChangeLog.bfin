@@ -5,6 +5,7 @@
 	* gas/bfin/move.s: Likewise.
 	* gas/bfin/shift.d: Correct one rotate insn.
 	* gas/bfin/vector.d: Fix whitespace, change (TS) to (IS) in one place.
+	* gas/bfin/vector2.d: Fix whitespace, fix a register number.
 
 2004-12-16  Catherine Moore  <clm@cm00re.com>
 
