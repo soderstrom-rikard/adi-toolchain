@@ -23,7 +23,15 @@
   Analog Devices Blackfin architecture (bfin)
   Written and tested on BF533
   TODO :
-  1. Frame cache. We should do it if efficiency is an issue.
+  1. dummy frame stuff
+  2. cache initialization of saved registers (analyze the prologue)
+  3. is there a more elegant way of the address conversion.
+     (We need it as we have no mmu)
+     There is a function pointer_to_address that should be tried.
+     Currently it is implemented quite kludgily ... the kernel returns
+     pc with a decremented value while most other manipulations are
+     done explicitly here. 
+  4. Resolve the orig_r0 mystery. 
 */
 
 #define NUM_PSEUDO_REGS (3)
@@ -224,6 +232,7 @@ struct bfin_frame_cache
   CORE_ADDR base;
   CORE_ADDR sp_offset;
   CORE_ADDR pc;
+  int frameless_pc_value;
 
   /* Saved registers.  */
   CORE_ADDR saved_regs[BFIN_NUM_REGS];
@@ -246,6 +255,7 @@ bfin_alloc_frame_cache (void)
   cache->base = 0;
   cache->sp_offset = -4;
   cache->pc = 0;
+  cache->frameless_pc_value = 0;
 
   for (i = 0; i < BFIN_NUM_REGS; i++)
     cache->saved_regs[i] = -1;
@@ -276,14 +286,6 @@ bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
 
   cache = bfin_alloc_frame_cache ();
   *this_cache = cache;
-   /* In principle, for normal frames, %fp holds the frame pointer,
-     which holds the base address for the current stack frame.
-     However, for functions that don't need it, the frame pointer is
-     optional.  For these "frameless" functions the frame pointer is
-     actually the frame pointer of the calling frame.  Signal
-     trampolines are just a special case of a "frameless" function.
-     They (usually) share their frame pointer with the frame that was
-     in progress when the signal occurred.  */
 
 
   frame_unwind_register (next_frame, BFIN_FP_REGNUM, buf);
@@ -304,11 +306,22 @@ bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
       cache->saved_regs[i] += cache->base;
 
   cache->pc = frame_func_unwind (next_frame) ;
-#if 0 //Jyotik TODO
+  if(cache->pc == frame_pc_unwind (next_frame)){
+    /* func unwind and pc unwind are same ... either there is no
+       prologue (frameless function) or we are at the start of a function,
+       In short we do not have a frame! pc is stored in rets register
+       FP points to previous frame.
+    */
+    cache->saved_regs[BFIN_PC_REGNUM] = 
+       read_register(BFIN_RETS_REGNUM) - text_addr;
+    cache->frameless_pc_value = 1;
+  }
+  else{
+    cache->frameless_pc_value = 0;
+  }
+#if 0 //TODO : Need to analyze and fill in the offsets of registers
   if (cache->pc != 0)
     bfin_analyze_prologue (cache->pc, frame_pc_unwind (next_frame), cache);
-#endif 
-#if 0
   if (cache->locals < 0)
     {
 
@@ -329,32 +342,14 @@ static void
 bfin_frame_this_id (struct frame_info *next_frame, void **this_cache,
                     struct frame_id *this_id)
 {
-// fprintf(stderr, "JYOTIK DEBUG: \"bfin_frame_this_id\" this_id is %x next_frame is %x\n",
-//this_id, next_frame);
-//#if TODO 
   struct bfin_frame_cache *cache = bfin_frame_cache (next_frame, this_cache);
-  char buf[4];
-  unsigned int text_code, count;
-  struct frame_id id = get_frame_id(next_frame); 
-#ifdef JYOTIK_DEBUG  
-  fprintf(stderr, "Jyotik Debug: Inside \"bfin_frame_this_id\" func: 0x%x\n",
-             (int)next_frame);
-   fprintf(stderr, "JYOTIK DEBUG: stack_addr = 0x%x  code_addr = 0x%x\n", id.stack_addr, id.code_addr);
-#endif
-   id =  frame_id_build (cache->base + 4, cache->pc + 8);
-   *this_id = id;
-#ifdef JYOTIK_DEBUG
- fprintf(stderr, "JYOTIK DEBUG(from cache): stack_addr = 0x%x  code_addr = 0x%x\n", id.stack_addr, id.code_addr);
-#endif
   /* This marks the outermost frame.  */
-  if (cache->base == 0)
-    return;
-
-  /* See the end of bfin_push_dummy_call.  */
-  
-  *this_id = frame_id_build (cache->base + 8, cache->pc);
-  // *this_id = frame_id_build (cache->base , cache->pc);
-//#endif
+  if (cache->base == 0){
+    *this_id =  frame_id_build (cache->base + 4, cache->pc + 8);
+  }
+  else{
+   *this_id = frame_id_build (cache->base + 8, cache->pc);
+  }
 }
 
 static void
@@ -389,11 +384,17 @@ bfin_frame_prev_register (struct frame_info *next_frame, void **this_cache,
         {
           /* Read the value in from memory.  */
            if(regnum == BFIN_PC_REGNUM){
-            // fprintf(stderr, "cached %s being returned %x = %x\n", 
-             // (regnum == BFIN_PC_REGNUM)?"pc":"fp", *addrp, 
-              // read_memory_integer (*addrp, 4) - text_addr);
-          int *pi = (int *)valuep;
-          *pi = read_memory_integer (*addrp, 4) - text_addr;
+            int *pi = (int *)valuep;
+            if(cache->frameless_pc_value){
+              /* Blackfin stores the value of the return pc on
+                 a register not a stack. A LINK command will 
+                 save it on the stack. 
+              */
+              *pi = *addrp;
+            }
+            else{
+              *pi = read_memory_integer (*addrp, 4) - text_addr;
+            }
           }
           else if(regnum == BFIN_FP_REGNUM){
              int *pi = (int *)valuep;
@@ -411,24 +412,6 @@ bfin_frame_prev_register (struct frame_info *next_frame, void **this_cache,
                          optimizedp, lvalp, addrp, realnump, valuep);
 }
 
-
-/* *INDENT-OFF* */
-/* Function: frame_chain
-   Given a GDB frame, determine the address of the calling function's frame.
-   This will be used to create a new GDB frame struct, and then
-   INIT_EXTRA_FRAME_INFO and INIT_FRAME_PC will be called for the new frame.
-   For ARM, we save the frame size when we initialize the frame_info.
-                                                                                                           
-   The original definition of this function was a macro in tm-arm.h:
-      { In the case of the ARM, the frame's nominal address is the FP value,
-         and 12 bytes before comes the saved previous FP value as a 4-byte word.  }
-                                                                                                           
-  m,     #define FRAME_CHAIN(thisframe)  \
-        ((thisframe)->pc >= LOWEST_PC ?    \
-         read_memory_integer ((thisframe)->frame - 12, 4) :\
-         0)
-*/
-/* *INDENT-ON* */
 
 CORE_ADDR
 bfin_frame_chain (frame_ptr)
@@ -1090,6 +1073,7 @@ bfin_unwind_pc (struct gdbarch *gdbarch, struct frame_info *next_frame)
   int* pInt1 = (int*)buf;
   int* pInt2 = (int*)(buf +4);
   CORE_ADDR ret, start_code;
+fprintf(stderr, "STEPBP TRACE : in bfin_unwind_pc\n");
   frame_unwind_register (next_frame, PC_REGNUM , buf);
   return  extract_typed_address (buf, builtin_type_void_func_ptr);
 }
