@@ -882,7 +882,7 @@ W [ Preg + uimm16m2 ]
      generating position independent code. */
 #define LEGITIMATE_PIC_OPERAND_P(X) \
   (! SYMBOLIC_CONST (X)							\
-   || (GET_CODE (X) == SYMBOL_REF && CONSTANT_POOL_ADDRESS_P (X)))
+   || (GET_CODE (X) == SYMBOL_REF && !CONSTANT_POOL_ADDRESS_P (X)))
 
 #define SYMBOLIC_CONST(X)	\
 (GET_CODE (X) == SYMBOL_REF						\
