@@ -287,20 +287,28 @@ void neg_value (ExprNode *expr)
   expr->value.i_value = -expr->value.i_value;
 }
 
-static
-int are_byteop_regs (Register *dst, Register *src0, ExprNode *s0,
-		     Register *src1, ExprNode *s1)
+static int
+valid_dreg_pair (Register *reg1, ExprNode *reg2)
 {
-  if (!IS_DREG (*dst) || !IS_DREG (*src0) || !IS_DREG (*src1))
+  if (!IS_DREG (*reg1))
     {
-      semantic_error ("Dregs expected"); return 0;
+      semantic_error ("Dregs expected");
+      return 0;
     }
 
-  if (((src0->regno & CODE_MASK) != 1 || imm7 (s0) != 0)
-      || ((src1->regno & CODE_MASK) != 3 || imm7 (s1) != 2))
+  if (reg1->regno != 1 && reg1->regno != 3)
     {
-      semantic_error ("Bad register pairs"); return 0;
+      semantic_error ("Bad register pair");
+      return 0;
     }
+
+  if (imm7 (reg2) != reg1->regno - 1)
+    {
+      semantic_error ("Bad register pair");
+      return 0;
+    }
+
+  reg1->regno--;
   return 1;
 }
 
@@ -794,36 +802,46 @@ asm_1:
 	| LPAREN REG COMMA REG RPAREN ASSIGN BYTEOP16P LPAREN REG COLON expr COMMA
 	  REG COLON expr RPAREN aligndir
 	{
-	  if (IS_DREG ($2) && IS_DREG ($4) && IS_DREG ($9) && IS_DREG ($13))
+	  if (!IS_DREG ($2) || !IS_DREG ($4))
+	    return semantic_error ("Dregs expected");
+	  else if (!valid_dreg_pair (&$9, $11))
+	    return semantic_error ("Bad dreg pair");
+	  else if (!valid_dreg_pair (&$13, $15))
+	    return semantic_error ("Bad dreg pair");
+	  else
 	    {
 	      notethat("dsp32alu: (dregs , dregs ) = BYTEOP16P (dregs_pair , dregs_pair ) (half)\n");
 	      $$ = DSP32ALU (21, 0, &$2, &$4, &$9, &$13, $17.r0, 0, 0);
 	    }
-	  else
-	    return register_mismatch();
 	}
 
 	| LPAREN REG COMMA REG RPAREN ASSIGN BYTEOP16M LPAREN REG COLON expr COMMA
 	  REG COLON expr RPAREN aligndir 
 	{
-	  if (IS_DREG ($2) && IS_DREG ($4) && IS_DREG ($9) && IS_DREG ($13))
+	  if (!IS_DREG ($2) || !IS_DREG($4))
+	    return semantic_error ("Dregs expected");
+	  else if (!valid_dreg_pair (&$9, $11))
+	    return semantic_error ("Bad dreg pair");
+	  else if (!valid_dreg_pair (&$13, $15))
+	    return semantic_error ("Bad dreg pair");
+	  else
 	    {
 	      notethat("dsp32alu: (dregs , dregs ) = BYTEOP16M (dregs_pair , dregs_pair ) (aligndir)\n");
 	      $$ = DSP32ALU (21, 0, &$2, &$4, &$9, &$13, $17.r0, 0, 1);
 	    }
-	  else
-	    return register_mismatch();
 	}
 
 	| LPAREN REG COMMA REG RPAREN ASSIGN BYTEUNPACK REG COLON expr aligndir
 	{
-	  if (IS_DREG ($2) && IS_DREG ($4) && IS_DREG ($8))
+	  if (!IS_DREG ($2) || !IS_DREG ($4))
+	    return semantic_error ("Dregs expected");
+	  else if (!valid_dreg_pair (&$8, $10))
+	    return semantic_error ("Bad dreg pair");
+	  else
 	    {
 	      notethat("dsp32alu: (dregs , dregs ) = BYTEUNPACK dregs_pair (aligndir)\n");
 	      $$ = DSP32ALU (24, 0, &$2, &$4, &$8, 0, $11.r0, 0, 1);
 	    }
-	  else
-	    return register_mismatch();
 	}
 
 	| LPAREN REG COMMA REG RPAREN ASSIGN SEARCH REG LPAREN searchmod RPAREN
@@ -973,55 +991,82 @@ asm_1:
 	    return semantic_error ("Dregs expected");
 	}
 
- 	| REG ASSIGN BYTEOP1P LPAREN REG COLON expr COMMA REG COLON expr RPAREN
-	  byteop_mod
+ 	| REG ASSIGN BYTEOP1P LPAREN REG COLON expr COMMA REG COLON expr RPAREN byteop_mod
 	{
-	  if (are_byteop_regs(&$1, &$5, $7, &$9, $11))
+	  if (!IS_DREG ($1))
+	    return semantic_error ("Dregs expected");
+	  else if (!valid_dreg_pair (&$5, $7))
+	    return semantic_error ("Bad dreg pair");
+	  else if (!valid_dreg_pair (&$9, $11))
+	    return semantic_error ("Bad dreg pair");
+	  else
 	    {
 	      notethat("dsp32alu: dregs = BYTEOP1P (dregs_pair , dregs_pair ) (T)\n");
-	      $$ = DSP32ALU (20, 0,
-			     0, &$1, &$5, &$9,
-			     $13.s0, 0, $13.r0);
+	      $$ = DSP32ALU (20, 0, 0, &$1, &$5, &$9, $13.s0, 0, $13.r0);
 	    }
+	}
+ 	| REG ASSIGN BYTEOP1P LPAREN REG COLON expr COMMA REG COLON expr RPAREN
+	{
+	  if (!IS_DREG ($1))
+	    return semantic_error ("Dregs expected");
+	  else if (!valid_dreg_pair (&$5, $7))
+	    return semantic_error ("Bad dreg pair");
+	  else if (!valid_dreg_pair (&$9, $11))
+	    return semantic_error ("Bad dreg pair");
 	  else
-	    return register_mismatch ();
+	    {
+	      notethat("dsp32alu: dregs = BYTEOP1P (dregs_pair , dregs_pair ) (T)\n");
+	      $$ = DSP32ALU (20, 0, 0, &$1, &$5, &$9, 0, 0, 0);
+	    }
 	}
 
 	| REG ASSIGN BYTEOP2P LPAREN REG COLON expr COMMA REG COLON expr RPAREN
 	  rnd_op
 	{
-	  if (are_byteop_regs(&$1, &$5, $7, &$9, $11))
+	  if (!IS_DREG ($1))
+	    return semantic_error ("Dregs expected");
+	  else if (!valid_dreg_pair (&$5, $7))
+	    return semantic_error ("Bad dreg pair");
+	  else if (!valid_dreg_pair (&$9, $11))
+	    return semantic_error ("Bad dreg pair");
+	  else
 	    {
 	      notethat("dsp32alu: dregs = BYTEOP2P (dregs_pair , dregs_pair ) (rnd_op)\n");
 		$$ = DSP32ALU (22, $13.r0, 0, &$1, &$5, &$9, $13.s0, 0, $13.x0);
 	    }
-	  else
-	    return semantic_error ("Dregs expected");
 	}
 
 /* 8 rules compacted */
 	| REG ASSIGN BYTEOP2M LPAREN REG COLON expr COMMA REG COLON expr RPAREN
 	  rnd_op
 	{
-	  if (are_byteop_regs(&$1, &$5, $7, &$9, $11))
+	  if (!IS_DREG ($1))
+	    return semantic_error ("Dregs expected");
+	  else if (!valid_dreg_pair (&$5, $7))
+	    return semantic_error ("Bad dreg pair");
+	  else if (!valid_dreg_pair (&$9, $11))
+	    return semantic_error ("Bad dreg pair");
+	  else
 	    {
 	      notethat("dsp32alu: dregs = BYTEOP2P (dregs_pair , dregs_pair ) (rnd_op)\n");
 	      $$ = DSP32ALU (22, $13.r0, 0, &$1, &$5, &$9, $13.s0, 0, $13.x0);
 	    }
-	  else
-	    return semantic_error ("Dregs expected");
 	}
 
 	| REG ASSIGN BYTEOP3P LPAREN REG COLON expr COMMA REG COLON expr RPAREN
 	  b3_op
 	{
-	  if (are_byteop_regs(&$1, &$5, $7, &$9, $11))
+	  if (!IS_DREG ($1))
+	    return semantic_error ("Dregs expected");
+	  else if (!valid_dreg_pair (&$5, $7))
+	    return semantic_error ("Bad dreg pair");
+	  else if (!valid_dreg_pair (&$9, $11))
+	    return semantic_error ("Bad dreg pair");
+	  else
 	    {
 	      notethat("dsp32alu: dregs = BYTEOP3P (dregs_pair , dregs_pair ) (b3_op)\n");
 	      $$ = DSP32ALU (23, $13.x0, 0, &$1, &$5, &$9, $13.s0, 0, 0);
 	    }
-	  else
-	    return semantic_error ("Dregs expected");
 	}
 
 	| REG ASSIGN BYTEPACK LPAREN REG COMMA REG RPAREN
@@ -1469,13 +1514,15 @@ asm_1:
 
 	| SAA LPAREN REG COLON expr COMMA REG COLON expr RPAREN aligndir
 	{
-	  if (IS_DREG ($3) && IS_DREG ($7))
+	  if (!valid_dreg_pair (&$3, $5))
+	    return semantic_error ("Bad dreg pair");
+	  else if (!valid_dreg_pair (&$7, $9))
+	    return semantic_error ("Bad dreg pair");
+	  else
 	    {
 	      notethat("dsp32alu: SAA (dregs_pair , dregs_pair ) (aligndir)\n");
 	      $$ = DSP32ALU (18, 0, 0, 0, &$3, &$7, $11.r0, 0, 0);
 	    }
-	  else
-	    return register_mismatch ();
 	}
 
 	| a_assign REG_A LPAREN S RPAREN COMMA a_assign REG_A LPAREN S RPAREN

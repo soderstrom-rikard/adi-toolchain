@@ -48,7 +48,7 @@ enum machine_registers {
   REG_sftreset, REG_omode, REG_excause, REG_emucause, REG_idle_req, REG_hwerrcause,
   REG_CC,    REG_LC0,   REG_LC1,   REG_GP,    REG_ASTAT, REG_RETS,  REG_LT0,   REG_LB0,
   REG_LT1,   REG_LB1,   REG_CYCLES, REG_CYCLES2, REG_USP,   REG_SEQSTAT, REG_SYSCFG,
-  REG_RETI,  REG_RETX,  REG_RETN,  REG_RETE,  REG_LASTREG, 
+  REG_RETI,  REG_RETX,  REG_RETN,  REG_RETE,  REG_EMUDAT, REG_LASTREG, 
   };
 
 */
@@ -89,7 +89,7 @@ enum machine_registers {
 	                  REG_CYCLES, REG_CYCLES2,
 
 	REG_USP   = 0x70, REG_SEQSTAT, REG_SYSCFG,
-	                  REG_RETI, REG_RETX, REG_RETN, REG_RETE,  
+	                  REG_RETI, REG_RETX, REG_RETN, REG_RETE, REG_EMUDAT, 
   
 
 // These don't have groups:

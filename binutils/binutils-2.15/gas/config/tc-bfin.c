@@ -116,7 +116,6 @@ static const struct bfin_reg_entry bfin_reg_info[] = {
   {"omode", REG_omode},
   {"excause", REG_excause},
   {"emucause", REG_emucause},
-  {"emudat", REG_emucause},
   {"idle_req", REG_idle_req},
   {"hwerrcause", REG_hwerrcause},
   {"CC", REG_CC},
@@ -137,6 +136,7 @@ static const struct bfin_reg_entry bfin_reg_info[] = {
   {"RETX", REG_RETX},
   {"RETN", REG_RETN},
   {"RETE", REG_RETE},
+  {"EMUDAT", REG_EMUDAT},
   {0, 0}			// Terminator
 };
 

@@ -1,3 +1,13 @@
+2005-01-11  Catherine Moore  <clm@cm00re.com>
+	
+	* config/bfin-defs.h (machine_registers): Define REG_EMUDAT.
+	* config/bfin-lex.l (parse_reg): Recognize EMUDAT.
+	* config/bfin-parse.y (are_byteop_regs): Remove.
+	(valid_dreg_pairs): New.
+	Use valid_dreg_pairs in recognition of BYTEOP2M, BYTEOP2P,
+	BYTEOP3P, SAA, BYTEOP1P, BYTEOP16P, BYTEOP16M and BYTEUNPACK.
+	* config/tc-bfin.c (bfin_reg_info): Add EMUDAT.
+
 2005-01-07  Catherine Moore  <clm@cm00re.com>
 
 	* config/tc-bfin.c (md_apply_fix3): Remove unused code.

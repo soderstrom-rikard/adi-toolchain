@@ -53,7 +53,7 @@ static int parse_reg(Register *r, int type, char *rt);
 [iI][dD][lL][eE]_[rR][eE][qQ]           _REG.regno = REG_idle_req;  return REG;
 [hH][wW][eE][rR][rR][cC][aA][uU][sS][eE] _REG.regno = REG_hwerrcause; return REG;
 [eE][xX][cC][aA][uU][sS][eE]            _REG.regno = REG_excause;   return REG;
-[eE][mM][uU][cC][aA][uU][sS][eE]        _REG.regno = REG_emucause;  return REG;
+[eE][mM][uU][cC][aA][uU][sS][eE]	_REG.regno = REG_emucause;  return REG;
 [zZ]                                    return Z;
 [xX]                                    return X;
 [wW]32                                  yylval.value = M_W32; return MMOD;
@@ -96,12 +96,13 @@ static int parse_reg(Register *r, int type, char *rt);
 
 [rR][0-7]"."[lLhHbB]  return parse_halfreg(&yylval.reg, T_REG_R, yytext);
 
-[rR][eE][tT][sS]       _REG.regno = REG_RETS; return REG;
-[rR][eE][tT][iI]    _REG.regno = REG_RETI; return REG;
-[rR][eE][tT][xX]         _REG.regno = REG_RETX; return REG;
-[rR][eE][tT][nN]      _REG.regno = REG_RETN; return REG;
-[rR][eE][tT][eE]    _REG.regno = REG_RETE; return REG;
-[rR][aA][iI][sS][eE]      return RAISE;
+[rR][eE][tT][sS]		_REG.regno = REG_RETS; return REG;
+[rR][eE][tT][iI]		_REG.regno = REG_RETI; return REG;
+[rR][eE][tT][xX]		_REG.regno = REG_RETX; return REG;
+[rR][eE][tT][nN]		_REG.regno = REG_RETN; return REG;
+[rR][eE][tT][eE]		_REG.regno = REG_RETE; return REG;
+[eE][mM][uU][dD][aA][tT]	_REG.regno = REG_EMUDAT; return REG;
+[rR][aA][iI][sS][eE]		return RAISE;
 
 [rR][0-7]           return parse_reg(&yylval.reg, T_REG_R, yytext);
 
