@@ -337,7 +337,7 @@ bfin_bfd_reloc (
 
     case 1:
       {
-	short x = bfd_get_16 (abfd, (bfd_byte *) data + addr);
+       unsigned short x = bfd_get_16 (abfd, (bfd_byte *) data + addr);
 	DOIT (x);
 	bfd_put_16 (abfd, (bfd_vma) x, (unsigned char *) data + addr);
       }
@@ -461,12 +461,22 @@ bfin_pcrel24_reloc (
       relocation <<= (bfd_vma) howto->bitpos;
       {
          short x;
-         x = bfd_get_16 (abfd, (bfd_byte *) data + addr);
+	/* We are getting reloc_entry->address 2 byte off from
+	 * the start of instruction. Assuming absolute postion
+	 * of the reloc data. But, following code had been written assuming 
+	 * reloc address is starting at begining of instruction.
+	 * To compensate that I have increased the value of 
+	 * relocation by 1 (effectively 2) and used the addr -2 instead of addr
+	 * -JyotiK
+	 */
+	 
+	 relocation += 1;
+         x = bfd_get_16 (abfd, (bfd_byte *) data + addr-2);
          x = (x&0xff00) | ((relocation>>16)&0xff);
- 	 bfd_put_16 (abfd, x, (unsigned char *) data + addr);
-         x = bfd_get_16 (abfd, (bfd_byte *) data + addr +2);
+ 	 bfd_put_16 (abfd, x, (unsigned char *) data + addr -2);
+         x = bfd_get_16 (abfd, (bfd_byte *) data + addr);
          x = relocation&0xFFFF;
- 	 bfd_put_16 (abfd, x, (unsigned char *) data + addr +2);
+ 	 bfd_put_16 (abfd, x, (unsigned char *) data + addr );
       }
       return bfd_reloc_ok;
 #if 0
