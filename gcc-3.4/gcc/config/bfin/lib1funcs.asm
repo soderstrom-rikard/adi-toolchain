@@ -87,16 +87,14 @@ __udivsi3:
  
 udiv_begin:
         CALL lshft;
-        R2 = R3;
-        R3 = R3-R1;
-        CC = R3<0;
+        CC = R3 < R1 (IU);
         IF !CC JUMP one_qb;
-        R3 = R2;
         R2=-2;
         R0 = R0&R2;
         JUMP.S udiv_end;
  
 one_qb:
+        R3 = R3-R1;
         R2=1;
         R0 = R0|R2;
  
