@@ -39,16 +39,6 @@
 # define STRICTNESS 0
 #endif
 
-
-#define CONST_16BIT_IMM_P(VALUE) ((int)(VALUE) >= -32768 && (int)(VALUE) <= 32767)
-#define CONST_7BIT_IMM_P(VALUE) ((int)(VALUE) >= -64 && (int)(VALUE) <= 63)
-#define CONST_3BIT_IMM_P(VALUE) ((int)(VALUE) >= -4 && (int)(VALUE) <= 3)
-#define CONST_3UBIT_IMM_P(VALUE) (/* RAJA : why unsigned (unsigned) (VALUE) >= 0 && */(unsigned) (VALUE) <= 7U)
-#define CONST_4BIT_IMM_P(VALUE) ((int)(VALUE) >= -8 && (int)(VALUE) <= 7)
-#define CONST_4UBIT_IMM_P(VALUE) (/* RAJA : why typecast to unsigned (unsigned)(VALUE) >= 0 && */(unsigned)(VALUE) <= 15U)
-#define CONST_5UBIT_IMM_P(VALUE) (/* RAJA : why typecast to unsigned (unsigned)(VALUE) >= 0 && */(unsigned)(VALUE) < 32U)
-#define CONST_18UBIT_IMM_P(VALUE) ((unsigned) (VALUE) <= 262140)
-
 /*
   The following set of defines, describe the commandline api.
 */
@@ -1075,7 +1065,44 @@ do {                                              \
    on the full register even if a narrower mode is specified. 
 #define WORD_REGISTER_OPERATIONS
 */
- 
+
+#define CONST_16BIT_IMM_P(VALUE) ((VALUE) >= -32768 && (VALUE) <= 32767)
+#define CONST_7BIT_IMM_P(VALUE) ((VALUE) >= -64 && (VALUE) <= 63)
+#define CONST_7NBIT_IMM_P(VALUE) ((VALUE) >= -64 && (VALUE) <= 0)
+#define CONST_3BIT_IMM_P(VALUE) ((VALUE) >= -4 && (VALUE) <= 3)
+#define CONST_3UBIT_IMM_P(VALUE) ((VALUE) >= 0 && (VALUE) <= 7)
+#define CONST_4BIT_IMM_P(VALUE) ((VALUE) >= -8 && (VALUE) <= 7)
+#define CONST_4UBIT_IMM_P(VALUE) ((VALUE) >= 0 && (VALUE) <= 15)
+#define CONST_5UBIT_IMM_P(VALUE) ((VALUE) >= 0 && (VALUE) <= 31)
+#define CONST_18UBIT_IMM_P(VALUE) ((VALUE) >= 0 && (VALUE) <= 262140)
+
+#define CONSTRAINT_LEN(C, STR) \
+    ((C) == 'P' ? 2			\
+     : (C) == 'K' ? 3			\
+     : DEFAULT_CONSTRAINT_LEN ((C), (STR)))
+
+#define CONST_OK_FOR_P(VALUE, STR) \
+    ((STR)[1] == '0' ? (VALUE) == 0 \
+     : (STR)[1] == '1' ? (VALUE) == 1 \
+     : (STR)[1] == '2' ? (VALUE) == 2 \
+     : 0)
+
+#define CONST_OK_FOR_K(VALUE, STR)			\
+    ((STR)[1] == 'u'					\
+     ? ((STR)[2] == '3' ? CONST_3UBIT_IMM_P (VALUE)	\
+	: (STR)[2] == '4' ? CONST_4UBIT_IMM_P (VALUE)	\
+	: (STR)[2] == '5' ? CONST_5UBIT_IMM_P (VALUE)	\
+	: 0)						\
+     : (STR)[1] == 's'					\
+     ? ((STR)[2] == '3' ? CONST_3BIT_IMM_P (VALUE)	\
+	: (STR)[2] == '4' ? CONST_4BIT_IMM_P (VALUE)	\
+	: (STR)[2] == '7' ? CONST_7BIT_IMM_P (VALUE)	\
+	: 0)						\
+     : (STR)[1] == 'n'					\
+     ? ((STR)[2] == '7' ? CONST_7NBIT_IMM_P (VALUE)	\
+	: 0)						\
+     : 0)
+
 /* The letters I, J, K, L and M in a register constraint string
    can be used to stand for particular ranges of immediate operands.
    This macro defines what the ranges are.
@@ -1092,17 +1119,14 @@ do {                                              \
      N  0 .. 7     3bit uimm
      O  -4 .. 3    3bit uimm
 */
-#define CONST_OK_FOR_LETTER_P(VALUE, C)         	\
-  ((C) == 'I' ? (CONST_4BIT_IMM_P(VALUE)) :		\
-   (C) == 'J' ? (log2constp ((VALUE)) 			\
-	&& CONST_5UBIT_IMM_P(exact_log2((VALUE)))) :	\
-   (C) == 'K' ? ((VALUE) == 1 || (VALUE) == 2) :        \
-   (C) == 'L' ? (CONST_5UBIT_IMM_P(VALUE)) :		\
-   (C) == 'M' ? (CONST_7BIT_IMM_P(VALUE)) :		\
-   (C) == 'N' ? (CONST_3UBIT_IMM_P(VALUE)) :		\
-   (C) == 'O' ? (CONST_3BIT_IMM_P(VALUE)) :		\
-   (C) == 'P' ? (VALUE) == 0 :				\
-   0)
+#define CONST_OK_FOR_CONSTRAINT_P(VALUE, C, STR)		\
+  ((C) == 'I' ? (CONST_4BIT_IMM_P(VALUE)) 			\
+   : (C) == 'J' ? (log2constp ((VALUE)) 			\
+		   && CONST_5UBIT_IMM_P(exact_log2((VALUE)))) 	\
+   : (C) == 'K' ? CONST_OK_FOR_K (VALUE, STR)			\
+   : (C) == 'M' ? (CONST_7BIT_IMM_P(VALUE))			\
+   : (C) == 'P' ? CONST_OK_FOR_P (VALUE, STR)			\
+   : 0)
 
 /* Note: need one general case for const interger. -- Tony */
 

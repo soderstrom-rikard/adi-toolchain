@@ -31,17 +31,15 @@
 
 ; constant operand classes
 ;   
-;     I  -8 .. 7      4bit imm
-;     J  2**N         5bit imm scaled
-;     K  1, 2         scale by 2 or 4
-;     L  0..31
-;     M  -64 .. 63  7bit imm
-;     N  0 .. 7     3bit uimm
-;     O  -4 .. 3    3bit imm
-;     P  0          constant zero
-;     Q  ~(2**N)    bitclear constant
-;     R  -32768 .. 32767    16bit imm
-;     S  0 .. 63   7bit posimm
+;     J   2**N       5bit imm scaled
+;     Ks7 -64 .. 63  signed 7bit imm
+;     Ku5 0..31      unsigned 5bit imm
+;     Ks4 -8 .. 7    signed 4bit imm
+;     Ks3 -4 .. 3    signed 3bit imm
+;     Ku3 0 .. 7     unsigned 3bit imm
+;     Pn  0, 1, 2    constants 0, 1 or 2, corresponding to n
+;     Q   ~(2**N)    bitclear constant
+;     R   -32768 .. 32767    16bit imm
 ;  
 ; register operands
 ;     d  (r0..r7)
@@ -53,12 +51,6 @@
 ;     c (i0..i3,m0..m3) CIRCREGS 
 ;     C (CC)            CCREGS
 ;
-; `unspec' values used in bfin.md:
-; Number       	Use
-; 2		mini constant pool, 4 byte entries (consttable_4)
-; 3		mini constant pool, 8 byte entries (consttable_8) For future use
-; 4		end of mini constant pool (consttable_end)
-; 5		align instruction on 4 byte boundary (align_4) For future use 
 
 ;; Define constants for hard registers.
 
@@ -625,33 +617,18 @@
 
 ;;;<<<  adddi3-mode    >>>;;;
 (define_insn "adddi3"
-  [(set (match_operand:DI 0 "register_operand"           "=&d,&d")
-        (plus:DI (match_operand:DI 1 "register_operand"  "%0,0")
-                 (match_operand:DI 2 "nonmemory_operand" "M,d")))
-   (clobber (match_scratch:SI 3 "=&d,&d"))
+  [(set (match_operand:DI 0 "register_operand"           "=&d,&d,&d")
+        (plus:DI (match_operand:DI 1 "register_operand"  "%0,0,0")
+                 (match_operand:DI 2 "nonmemory_operand" "Kn7,Ks7,d")))
+   (clobber (match_scratch:SI 3 "=&d,&d,&d"))
    (clobber (reg:CC 34))]
   ""
-  "*
-{
-  int alt = which_alternative;
-  const char *alt_strings[] =
-    {
-      \"%0 += %2; cc = ac0; %3 = cc; %H0 = %H0 + %3;\",
-      \"%0 = %0 + %2; cc = ac0; %3 = cc; %H0 = %H0 + %H2; %H0 = %H0 + %3;\",
-      \"%0 += %2; cc = ac0; %3 = cc; %H0 += -1; %H0 = %H0 + %3;\"
-    };
-
-  if (alt == 0 && INTVAL (operands[2]) < 0)
-    alt = 2;
-
-  return alt_strings[alt];
-}"
+  "@
+   %0 += %2; cc = ac0; %3 = cc; %H0 += -1; %H0 = %H0 + %3;
+   %0 += %2; cc = ac0; %3 = cc; %H0 = %H0 + %3;
+   %0 = %0 + %2; cc = ac0; %3 = cc; %H0 = %H0 + %H2; %H0 = %H0 + %3;"
   [(set_attr "type" "alu0")
-   (set (attr "length")
-	(if_then_else
-	    (match_operand:DI 2 "positive_immediate_operand" "")
-	    (const_int 8)
-	    (const_int 10)))])
+   (set_attr "length" "10,8,10")])
 
 
 ;;;<<<  subdi3-mode    >>>;;;
@@ -721,8 +698,8 @@
 (define_insn ""
   [(set (match_operand:SI 0 "register_operand"                      "=a,d")
 	(ashift:SI (plus:SI (match_operand:SI 1 "register_operand"  "%0,0")
-		            (match_operand:SI 2 "register_operand"  " a,d"))
-		    (match_operand:SI 3 "pos_scale_operand"         " K,K")))]
+		            (match_operand:SI 2 "register_operand"  "a,d"))
+		    (match_operand:SI 3 "pos_scale_operand"         "P1P2,P1P2")))]
    ""
    "%0 = (%0 + %2) << %3;" /* "shadd %0,%2,%3;" */
   [(set_attr "type" "alu0")])
@@ -866,7 +843,7 @@
 (define_insn "addsi3"
   [(set (match_operand:SI 0 "register_operand"           "=ad,a,d")
 	(plus:SI (match_operand:SI 1 "register_operand"  "%0, a,d")
-		 (match_operand:SI 2 "reg_or_7bit_operand" " M, a,d")))]
+		 (match_operand:SI 2 "reg_or_7bit_operand" "Ks7, a,d")))]
   ""
   "@
    %0 += %2;
@@ -885,7 +862,7 @@
 (define_insn ""
   [(set (match_operand:SI 0 "register_operand"           "=da,d,a")
 	(minus:SI (match_operand:SI 1 "register_operand"  "0,d,0")
-		  (match_operand:SI 2 "reg_or_7bit_operand" "M,d,a")))]
+		  (match_operand:SI 2 "reg_or_7bit_operand" "Ks7,d,a")))]
   "GET_CODE (operands[2]) != CONST_INT || INTVAL (operands[2]) != -64"
   "*
 {
@@ -912,7 +889,7 @@
 ;
 ;   (set (match_operand:SI 0 "register_operand" "d")
 ;	(and:SI (match_operand:SI 1 "register_operand" "d")
-;	    (match_operand:SI 2 "immediate_operand" "L")))
+;	    (match_operand:SI 2 "immediate_operand" "Ku5")))
 ;   (set (match_operand:CC 3 "cc_operand" "=C") 
 ;       (eq:CC (match_dup 0)
 ;	       (const_int 0)))
@@ -924,7 +901,7 @@
  [(set (match_operand:BI 0 "cc_operand" "=C")
        (eq:BI (zero_extract:SI (match_operand:SI 1 "register_operand" "d")
 			       (const_int 1)
-			       (match_operand:SI 2 "immediate_operand" "L"))
+			       (match_operand:SI 2 "immediate_operand" "Ku5"))
 	      (const_int 0)))]
  ""
  "cc =!BITTST (%1,%2);"
@@ -934,7 +911,7 @@
  [(set (match_operand:BI 0 "cc_operand" "=C")
        (eq:BI (zero_extract:SI (match_operand:SI 1 "register_operand" "d")
 			       (const_int 1)
-			       (match_operand:SI 2 "immediate_operand" "L"))
+			       (match_operand:SI 2 "immediate_operand" "Ku5"))
 		(const_int 1)))]
  ""
  "cc =BITTST (%1,%2);"
@@ -1071,40 +1048,28 @@
  ")
 
 (define_insn "*ashlsi3_insn"
-  [(set (match_operand:SI 0 "register_operand" "=d,a")
-	(ashift:SI (match_operand:SI 1 "register_operand" "0,a")
-		   (match_operand:SI 2 "nonmemory_operand" "dL,K")))]
+  [(set (match_operand:SI 0 "register_operand" "=d,a,a")
+	(ashift:SI (match_operand:SI 1 "register_operand" "0,a,a")
+		   (match_operand:SI 2 "nonmemory_operand" "dKu5,P1,P2")))]
   ""
-{
-  if (which_alternative == 0)
-    return "%0 <<= %2;";
-  if (INTVAL (operands[2]) == 1)
-    return \"%0 = %1 + %1;\";
-  else
-    return \"%0 = %1 << %2;\";
-}
+  "@
+   %0 <<= %2;
+   %0 = %1 + %1;
+   %0 = %1 << %2;"
   [(set_attr "type" "shft")])
 
 (define_insn "ashrsi3"
   [(set (match_operand:SI 0 "register_operand" "=d")
 	(ashiftrt:SI (match_operand:SI 1 "register_operand" "0")
-		     (match_operand:SI 2 "nonmemory_operand" "dL")))]
+		     (match_operand:SI 2 "nonmemory_operand" "dKu5")))]
   ""
   "%0 >>>= %2;"
   [(set_attr "type" "shft")])
 
-(define_expand "lshrsi3"
-  [(set (match_operand:SI 0 "register_operand"               "=d,a")
-	(lshiftrt:SI (match_operand:SI 1 "register_operand" "0,a")
-		     (match_operand:SI 2 "nonmemory_operand" "dL,K")))]
-  ""
-  ""
-) 
-
-(define_insn "*lshrsi3_insn"
+(define_insn "lshrsi3"
   [(set (match_operand:SI 0 "register_operand"                   "=d,a")
 	(lshiftrt:SI (match_operand:SI 1 "register_operand"      " 0,a")
-		     (match_operand:SI 2 "nonmemory_operand" "dL,K")))]
+		     (match_operand:SI 2 "nonmemory_operand" "dKu5,P1P2")))]
   ""
   "@
    %0 >>= %2;
@@ -1317,7 +1282,7 @@ else
 ;  [(set (match_operand:CC 0 "cc_operand" "=C,C")
 ;	(and (match_dup 0)
 ;             (eq:CC (match_operand:SI 1 "register_operand"  "d, a")
-;                    (match_operand:SI 2 "nonmemory_operand" "dO,aO"))))]
+;                    (match_operand:SI 2 "nonmemory_operand" "dKs3,aKs3"))))]
 ;  ""
 ;  "cc &=%1==%2;"
 ;  [(set_attr "type" "compare")])
@@ -1325,7 +1290,7 @@ else
 (define_insn ""
   [(set (match_operand:BI 0 "cc_operand" "=C,C")
         (eq:BI (match_operand:SI 1 "register_operand"  "d, a")
-               (match_operand:SI 2 "nonmemory_operand" "dO,aO")))]
+               (match_operand:SI 2 "nonmemory_operand" "dKs3,aKs3")))]
   ""
   "cc =%1==%2;"
   [(set_attr "type" "compare")])
@@ -1333,7 +1298,7 @@ else
 (define_insn ""
   [(set (match_operand:BI 0 "cc_operand" "=C,C")
         (ne:BI (match_operand:SI 1 "register_operand"  "d, a")
-               (match_operand:SI 2 "nonmemory_operand" "dO,aO")))]
+               (match_operand:SI 2 "nonmemory_operand" "dKs3,aKs3")))]
   "0"
   "cc =%1!=%2;"
   [(set_attr "type" "compare")])
@@ -1342,7 +1307,7 @@ else
 (define_insn ""
   [(set (match_operand:BI 0 "cc_operand" "=C,C")
         (lt:BI (match_operand:SI 1 "register_operand"  "d, a")
-               (match_operand:SI 2 "nonmemory_operand" "dO,aO")))]
+               (match_operand:SI 2 "nonmemory_operand" "dKs3,aKs3")))]
   ""
   "cc =%1<%2;"
   [(set_attr "type" "compare")])
@@ -1350,7 +1315,7 @@ else
 (define_insn ""
   [(set (match_operand:BI 0 "cc_operand" "=C,C")
         (le:BI (match_operand:SI 1 "register_operand"  "d, a")
-               (match_operand:SI 2 "nonmemory_operand" "dO,aO")))]
+               (match_operand:SI 2 "nonmemory_operand" "dKs3,aKs3")))]
   ""
   "cc =%1<=%2;"
   [(set_attr "type" "compare")])
@@ -1358,7 +1323,7 @@ else
 (define_insn ""
   [(set (match_operand:BI 0 "cc_operand" "=C,C")
         (leu:BI (match_operand:SI 1 "register_operand"  "d, a")
-                (match_operand:SI 2 "nonmemory_operand" "dN,aN")))]
+                (match_operand:SI 2 "nonmemory_operand" "dKu3,aKu3")))]
   ""
   "cc =%1<=%2 (iu);"
   [(set_attr "type" "compare")])
@@ -1366,7 +1331,7 @@ else
 (define_insn ""
   [(set (match_operand:BI 0 "cc_operand" "=C,C")
         (ltu:BI (match_operand:SI 1 "register_operand"  "d, a")
-                (match_operand:SI 2 "nonmemory_operand" "dN,aN")))]
+                (match_operand:SI 2 "nonmemory_operand" "dKu3,aKu3")))]
   ""
   "cc =%1<%2 (iu);"
   [(set_attr "type" "compare")])
@@ -1578,7 +1543,7 @@ else
 	(if_then_else
 	 (match_operator 0 "bfin_cbranch_operator"
 			 [(match_operand:BI 1 "cc_operand" "C")
-			  (match_operand:BI 2 "immediate_operand" "P")])
+			  (match_operand:BI 2 "immediate_operand" "P0")])
 	 (label_ref (match_operand 3 "" ""))
 	 (pc)))]
   ""
@@ -1596,7 +1561,7 @@ else
 	(if_then_else
 	 (match_operator 0 "bfin_cbranch_operator"
 			 [(match_operand:BI 1 "cc_operand" "C")
-			  (match_operand:BI 2 "immediate_operand" "P")])
+			  (match_operand:BI 2 "immediate_operand" "P0")])
 	 (label_ref (match_operand 3 "" ""))
 	 (pc)))
    (unspec [(const_int 0)] UNSPEC_CBRANCH_TAKEN)]
@@ -1612,7 +1577,7 @@ else
 	(if_then_else
 	 (match_operator 0 "bfin_cbranch_operator"
 			 [(match_operand:BI 1 "cc_operand" "C")
-			  (match_operand:BI 2 "immediate_operand" "P")])
+			  (match_operand:BI 2 "immediate_operand" "P0")])
 	 (label_ref (match_operand 3 "" ""))
 	 (pc)))
    (unspec [(match_operand 4 "immediate_operand" "")] UNSPEC_CBRANCH_NOPS)]
@@ -1716,21 +1681,6 @@ else
 
 ;;;;;;;;;;;;;;;   COMPI2opD & COMPI2opP   ;;;;;;;;;;;;;;;;
  
-(define_insn ""
-        [(set (match_operand:SI 0 "register_operand" "=d, a")
-              (sign_extend:SI (match_operand 1 "immediate_operand" "M ,M")))]
-        ""
-        "%0 = %1 (X);"
-  [(set_attr "length" "2")])
- 
-;(define_insn ""
-;        [(set (match_operand:SI 0 "register_operand" "=d, a")
-;              (plus:SI (match_dup 0)
-;                       (sign_extend:SI (match_operand 1 "immediate_operand" "M ,M"))))]
-;        ""
-;        "%0 += %1;"
-;  [(set_attr "length" "2")])  
-
 ;; Since the combiner will not produce zero_extract if operand3 is not dead,
 ;; we generate bittst instruction here.
 ;;(define_peephole
@@ -1820,7 +1770,7 @@ else
   [(set (match_operand:SI 0 "register_operand" "d")
         (subreg:SI (match_operand:HI 1 "register_operand" "d")0))
    (set (match_operand:SI 4 "register_operand" "d") (plus:SI (match_dup 4)
-			(match_operand 2 "reg_or_7bit_operand" "Md")))
+			(match_operand 2 "reg_or_7bit_operand" "dKs7")))
    (set (match_dup 0) (sign_extend:SI
 			(match_operand:HI 3 "register_operand" "d")))
 

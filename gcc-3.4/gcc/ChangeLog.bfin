@@ -1,3 +1,19 @@
+2004-11-14  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.h (CONST_16BIT_IMM_P, CONST_7BIT_IMM_P,
+	CONST_3BIT_IMM_P, CONST_3UBIT_IMM_P, CONST_4BIT_IMM_P,
+	CONST_4UBIT_IMM_P, CONST_5BIT_IMM_P, CONST_18UBIT_IMM_P): Lose the
+	casts.
+	(CONST_7NBIT_IMM_P): New macro.
+	(CONSTRAINT_LEN, CONST_OK_FOR_P, CONST_OK_FOR_K): New macros.
+	(CONST_OK_FOR_CONSTRAINT_P): Renamed from CONST_OK_FOR_LETTER_P.
+	Change 'L' to 'Ku5', 'M' to 'Ks7', 'N' to 'Ku3', 'O' to 'Ks3', 'P'
+	to 'P0'; add 'P1', 'P2', 'Kn7', 'Kn4' and 'Ks4'; remove previous
+	meaning of 'K'. All users changed.
+	* config/bfin/bfin.md (adddi3): Simplify using new Kn7 constraint.
+	(useless constant sign_extend pattern): Delete.
+	(lshrsi3): Renamed from lshrsi3_insn; useless expander deleted.
+
 2004-11-12  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* genconfig.c (walk_insn_part): Look at match_dups inside a label_ref.
