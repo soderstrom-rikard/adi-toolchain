@@ -681,57 +681,6 @@ illegal_instruction:
   return;
 }
 
-static void
-multfunc (TIword iw0, TIword iw1, int op, int h0, int h1, disassemble_info *outf)
-{
-/* dsp32mac
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-  int src1 = ((iw1 >> 0) & 0x7);
-  int src0 = ((iw1 >> 3) & 0x7);
-
-
-  if (h0 == 0 && h1 == 0 && op == 0)
-    {
-      notethat ("dregs_lo * dregs_lo");
-      OUTS (outf, dregs_lo (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_lo (src1));
-      return;
-    }
-  else if (h0 == 0 && h1 == 1 && op == 0)
-    {
-      notethat ("dregs_lo * dregs_hi");
-      OUTS (outf, dregs_lo (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_hi (src1));
-      return;
-    }
-  else if (h0 == 1 && h1 == 0 && op == 0)
-    {
-      notethat ("dregs_hi * dregs_lo");
-      OUTS (outf, dregs_hi (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_lo (src1));
-      return;
-    }
-  else if (h0 == 1 && h1 == 1 && op == 0)
-    {
-      notethat ("dregs_hi * dregs_hi");
-      OUTS (outf, dregs_hi (src0));
-      OUTS (outf, "*");
-      OUTS (outf, dregs_hi (src1));
-      return;
-    }
-  else
-    goto illegal_instruction;
-illegal_instruction:
-  return;
-}
-
 static int
 decode_multfunc (int h0, int h1, int src0, int src1, disassemble_info * outf)
 {
@@ -792,11 +741,11 @@ decode_macfunc (int which, int op, int h0, int h1, int src0, int src1, disassemb
   return 0;
 }
 
-static int
+static void
 decode_optmode (int mod, int MM, disassemble_info *outf)
 {
   if (mod == 0 && MM == 0)
-    return 1;
+    return;
 
   OUTS (outf, " (");
 
@@ -823,7 +772,6 @@ decode_optmode (int mod, int MM, disassemble_info *outf)
     abort ();
 
   OUTS (outf, ")");
-  return 1;
 }
 
 static int
@@ -1130,105 +1078,60 @@ decode_PushPopMultiple_0 (TIword iw0, disassemble_info *outf)
   int d = ((iw0 >> 8) & 0x1);
   int dr = ((iw0 >> 3) & 0x7);
   int W = ((iw0 >> 6) & 0x1);
-
-
+  char ps[5], ds[5];
+  sprintf (ps, "%d", pr);
+  sprintf (ds, "%d", dr);
 
   if (W == 1 && d == 1 && p == 1)
     {
       notethat ("[ -- SP ] = ( R7 : reglim , P5 : reglim )");
-      OUTS (outf, "[");
-      OUTS (outf, "--");
-      OUTS (outf, "SP");
-      OUTS (outf, "]");
-      OUTS (outf, " = ");
-      OUTS (outf, "( ");
-      OUTS (outf, "R7");
-      OUTS (outf, ":");
-      OUTS (outf, imm5 (dr));
-      OUTS (outf, ", ");
-      OUTS (outf, "P5");
-      OUTS (outf, ":");
-      OUTS (outf, imm5 (pr));
-      OUTS (outf, " )");
+      OUTS (outf, "[SP--] = (R7:");
+      OUTS (outf, ds);
+      OUTS (outf, ", P5:");
+      OUTS (outf, ps);
+      OUTS (outf, ")");
       return 1 * 2;
     }
   else if (W == 1 && d == 1 && p == 0)
     {
       notethat ("[ -- SP ] = ( R7 : reglim )");
-      OUTS (outf, "[");
-      OUTS (outf, "--");
-      OUTS (outf, "SP");
-      OUTS (outf, "]");
-      OUTS (outf, " = ");
-      OUTS (outf, "( ");
-      OUTS (outf, "R7");
-      OUTS (outf, ":");
-      OUTS (outf, imm5 (dr));
+      OUTS (outf, "[--SP] = (R7:");
+      OUTS (outf, ds);
       OUTS (outf, ")");
       return 1 * 2;
     }
   else if (W == 1 && d == 0 && p == 1)
     {
       notethat ("[ -- SP ] = ( P5 : reglim )");
-      OUTS (outf, "[");
-      OUTS (outf, "--");
-      OUTS (outf, "SP");
-      OUTS (outf, "]");
-      OUTS (outf, " = ");
-      OUTS (outf, "( ");
-      OUTS (outf, "P5");
-      OUTS (outf, ":");
-      OUTS (outf, imm5 (pr));
+      OUTS (outf, "[--SP] = (P5:");
+      OUTS (outf, ps);
       OUTS (outf, ")");
       return 1 * 2;
     }
   else if (W == 0 && d == 1 && p == 1)
     {
       notethat ("( R7 : reglim , P5 : reglim ) = [ SP ++ ]");
-      OUTS (outf, "( ");
-      OUTS (outf, "R7");
-      OUTS (outf, ":");
-      OUTS (outf, imm5 (dr));
-      OUTS (outf, ", ");
-      OUTS (outf, "P5");
-      OUTS (outf, ":");
-      OUTS (outf, imm5 (pr));
-      OUTS (outf, ") ");
-      OUTS (outf, " = ");
-      OUTS (outf, "[");
-      OUTS (outf, "SP");
-      OUTS (outf, "++");
-      OUTS (outf, "]");
+      OUTS (outf, "(R7:");
+      OUTS (outf, ds);
+      OUTS (outf, ", P5:");
+      OUTS (outf, ps);
+      OUTS (outf, ") = [SP++]");
       return 1 * 2;
     }
   else if (W == 0 && d == 1 && p == 0)
     {
       notethat ("( R7 : reglim ) = [ SP ++ ]");
-      OUTS (outf, "( ");
-      OUTS (outf, "R7");
-      OUTS (outf, ":");
-      OUTS (outf, imm5 (dr));
-      OUTS (outf, ")");
-      OUTS (outf, " = ");
-      OUTS (outf, "[");
-      OUTS (outf, "SP");
-      OUTS (outf, "++");
-      OUTS (outf, "]");
+      OUTS (outf, "(R7:");
+      OUTS (outf, ds);
+      OUTS (outf, ") = [SP++]");
       return 1 * 2;
     }
   else if (W == 0 && d == 0 && p == 1)
     {
       notethat ("( P5 : reglim ) = [ SP ++ ]");
-      OUTS (outf, "( ");
-      OUTS (outf, "P5");
-      OUTS (outf, ":");
-      OUTS (outf, imm5 (pr));
-      OUTS (outf, ")");
-      OUTS (outf, " = ");
-      OUTS (outf, "[");
-      OUTS (outf, "SP");
-      OUTS (outf, "++");
-      OUTS (outf, "]");
+      OUTS (outf, "(P5:");
+      OUTS (outf, ps);
+      OUTS (outf, ") = [SP++]");
       return 1 * 2;
     }
   else
@@ -3755,7 +3658,7 @@ decode_linkage_0 (TIword iw0, TIword iw1, disassemble_info *outf)
   if (R == 0)
     {
       notethat ("LINK uimm16s4");
-      OUTS (outf, "LINK");
+      OUTS (outf, "LINK ");
       OUTS (outf, uimm16s4 (framesize));
       return 2 * 2;
     }
@@ -3904,7 +3807,6 @@ decode_dsp32mult_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, dregs (dst));
       OUTS (outf, " = ");
       decode_multfunc (h00, h10, src0, src1, outf);
-
     }
 
   decode_optmode (mmod, MM, outf);

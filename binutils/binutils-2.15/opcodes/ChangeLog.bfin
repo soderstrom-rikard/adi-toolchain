@@ -1,6 +1,16 @@
+2004-12-14  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin-dis.c (decode_PushPopMultiple_0): Don't print register numbers
+	in hex.
+	(decode_linkage_0): Extra whitespace in output.
+	(multfunc): Delete unused function.
+	(decode_optmode): Now returns void.
+
 2004-12-14  Raja <raja@rrap-software.com>
+
 	* bfin-opcodes.h: reverted to explicit shifts instead of using
 	 union to fix Endianess issue.
+
 2004-12-10  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin-dis.c: Include "bfin-opcodes.h"
@@ -15,7 +25,7 @@
 	(amod0, amod1, macmod_accm, searchmod, mxd_mod, aligndir, A0macfunc,
 	multfunc, A1macfunc, macmod_hmove): Remove unused "pc" argument.  All
 	callers changed.
-	(decode_ProgCtrl_0, decode_CaCTRL_0, decode_PushPopMultiple,
+	(decode_ProgCtrl_0, decode_CaCTRL_0, decode_PushPopMultiple_0,
 	decode_PushPopReg_0, decode_ccMV_0, decode_CCflag_0, decode_CC2dreg_0,
 	decode_CC2stat_0, decode_REGMV_0, decode_ALU2op_0, decode_PTR2op_0,
 	decode_LOGI2op_0, decode_COMP3op_0, decode_COMPI2opD_0,
