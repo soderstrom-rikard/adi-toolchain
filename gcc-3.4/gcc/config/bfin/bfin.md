@@ -846,14 +846,16 @@
   "*
 {
   static const char *const strings_subsi3[] = {
-    \"%0 -= %2;\",
+    \"%0 += -%2;\",
     \"%0 = %1 - %2;\",
     \"%0 -= %2;\",
-    \"%0 +=-%2;\", 
+    \"%0 += %2;\", 
   };
 
-  if (CONSTANT_P (operands[2]))
+  if (CONSTANT_P (operands[2]) && INTVAL (operands[2]) < 0) {
+     INTVAL (operands[2]) = -(INTVAL (operands[2]));
      which_alternative = 3;
+  }
 
   return strings_subsi3[which_alternative];
 }"
