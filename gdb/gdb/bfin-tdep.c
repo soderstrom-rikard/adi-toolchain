@@ -117,7 +117,7 @@ static struct cmd_list_element *showbfincmdlist = NULL;
 
 /* Initial value: Register names used in BFIN's ISA documentation.  */
 static char *bfin_register_name_strings[] =
-{ "orig_pc", "ipend", "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", 
+{ "syscfg", "orig_r0", "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", 
   "p0", "p1", "p2", "p3", "p4", "p5","fp","usp",
   "i0", "i1", "i2", "i3", 
   "m0", "m1", "m2", "m3", 
@@ -125,7 +125,7 @@ static char *bfin_register_name_strings[] =
   "b0", "b1", "b2", "b3",
   "a0x", "a0w", "a1x", "a1w", "lc0", "lc1", "lt0", "lt1", "lb0", "lb1", 
   "astat", "reserved", "rets", "pc", "retx", "retn", "rete", "seqstat",
-   "syscfg","extra1", "extra2", "extra3" }; 
+   "ipend", "orig_pc", "extra1", "extra2", "extra3" }; 
 
 #define NUM_BFIN_REGNAMES (sizeof(bfin_register_name_strings)/sizeof(char *))
 /***************************************************************************
@@ -265,7 +265,12 @@ bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
   char buf[4];
   int i;
   if(0 == text_addr)
+  {
          text_addr = read_register(BFIN_EXTRA1) ;
+#ifdef DEBUG
+         fprintf(stderr, "JYOTIK DEBUG: text addr found = 0x%x\n", text_addr);
+#endif
+  }
   if (*this_cache)
     return *this_cache;
 
@@ -282,7 +287,9 @@ bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
 
 
   frame_unwind_register (next_frame, BFIN_FP_REGNUM, buf);
-  cache->base = extract_unsigned_integer (buf, 4) - text_addr;
+  cache->base = extract_unsigned_integer (buf, 4);
+ 
+  cache->base -=  text_addr;
   if (cache->base == 0)
     return cache;
 
@@ -626,7 +633,7 @@ printf("bfin_init_extra_frame_info called\n");
 static struct type *
 bfin_register_type (struct gdbarch *gdbarch, int regnum)
 {
-  if (regnum >= BFIN_P0_REGNUM && regnum <= BFIN_P7_REGNUM)
+  if (regnum >= BFIN_P0_REGNUM && regnum <= BFIN_SP_REGNUM)
     return builtin_type_void_data_ptr;
 
   if (regnum == BFIN_PC_REGNUM || regnum == BFIN_RETS_REGNUM)

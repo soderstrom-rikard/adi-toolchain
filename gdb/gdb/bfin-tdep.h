@@ -26,8 +26,8 @@
    passed to read_register.  */
 
 enum gdb_regnum {
-  BFIN_ORIGPC_REGNUM    = 0,        /* Subroutine address register */  
-  BFIN_IPEND_REGNUM,        /* Subroutine address register */  
+  BFIN_SYSCFG_REGNUM = 0,
+  //BFIN_ORIGR0_REGNUM, 
   BFIN_R0_REGNUM,
   BFIN_R1_REGNUM,
   BFIN_R2_REGNUM,
@@ -42,8 +42,8 @@ enum gdb_regnum {
   BFIN_P3_REGNUM,
   BFIN_P4_REGNUM,
   BFIN_P5_REGNUM,
-  BFIN_P6_REGNUM,         /* Stack Pointer Register */
-  BFIN_P7_REGNUM,         /* Frame Pointer Register */
+  BFIN_FP_REGNUM,
+  BFIN_SP_REGNUM,
   BFIN_I0_REGNUM,
   BFIN_I1_REGNUM,
   BFIN_I2_REGNUM,
@@ -78,7 +78,8 @@ enum gdb_regnum {
   BFIN_RETN_REGNUM,
   BFIN_RETE_REGNUM,
   BFIN_SEQSTAT_REGNUM,
-  BFIN_SYSCFG_REGNUM,
+  BFIN_IPEND_REGNUM,        /* Subroutine address register */  
+  BFIN_ORIGPC_REGNUM,        /* Subroutine address register */  
   BFIN_EXTRA1,        /* Extra "registers" for hacks 1. address of .text */
   BFIN_EXTRA2,        
   BFIN_EXTRA3,       
@@ -87,8 +88,6 @@ enum gdb_regnum {
   BFIN_NUM_REGS       /* 0 index, so this entry is size */
 };
 
-#define BFIN_FP_REGNUM BFIN_P6_REGNUM 
-#define BFIN_SP_REGNUM BFIN_P7_REGNUM 
 /* Used in target-specific code when we need to know the size of the
    largest type of register we need to handle.  */
 #define BFIN_MAX_REGISTER_RAW_SIZE      4	
