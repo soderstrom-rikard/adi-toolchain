@@ -304,14 +304,12 @@ static asection *reloc_stack_get_section()
 static void
 reloc_stack_push(bfd_vma value)
 {
-//fprintf(stderr, "pushing %d\n", (int)value);
   reloc_stack[reloc_stack_tos++] = value;
 }
 
 static bfd_vma
 reloc_stack_pop()
 {
-//fprintf(stderr, "popping %d\n", (int)reloc_stack[reloc_stack_tos-1]);
   return reloc_stack[--reloc_stack_tos];
 }
 
@@ -418,7 +416,10 @@ reloc_stack_operate(unsigned int oper)
 }
 
 static int
-bfin_set_reloc (flat_v5_reloc_t *reloc, const char *reloc_section_name, const char *sym_name,
+bfin_set_reloc (flat_v5_reloc_t *reloc, 
+		const char *reloc_section_name, 
+		const char *sym_name,
+		struct bfd_symbol *symbol,
 		int sp, int hilo, long offset)
 {
   if (strstr (reloc_section_name, "text"))
@@ -427,6 +428,13 @@ bfin_set_reloc (flat_v5_reloc_t *reloc, const char *reloc_section_name, const ch
     reloc->reloc.type = FLAT_RELOC_TYPE_DATA;
   else if (strstr (reloc_section_name, "bss"))
     reloc->reloc.type = FLAT_RELOC_TYPE_BSS;
+  else if (symbol->flags & BSF_WEAK){
+    /* weak symbol support ... if a weak symbol is undefined at the
+         end of a final link, it should return 0 rather than error
+         We will assume text section for the moment.
+    */
+    reloc->reloc.type = FLAT_RELOC_TYPE_TEXT;
+  }
   else
     {
       printf ("Unknown Type - relocation for %s in bad section - %s\n", sym_name, reloc_section_name);
@@ -1091,6 +1099,7 @@ dump_symbols(symbols, number_of_symbols);
 					(realloc (flat_relocs, (flat_reloc_count + 1) * sizeof (flat_v5_reloc_t)));
 				    if (bfin_set_reloc (flat_relocs + flat_reloc_count, 
 							sym_section->name, sym_name,
+							(*(q->sym_ptr_ptr)),
 							0, FLAT_RELOC_PART_LO, 
 							section_vma + q->address))
 					bad_relocs++;
@@ -1121,8 +1130,12 @@ dump_symbols(symbols, number_of_symbols);
 				    if(0xFFFF0000 & sym_addr){
 					/* value is > 16 bits - use an extra field */
 					/* see if we have already output that symbol */
+					/* reloc may be addend from symbol and       */
+					/* we can only store 16 bit offsets	     */
 					sp = 1;
-					if((*(q->sym_ptr_ptr))->udata.i == 0){
+					if(((*(q->sym_ptr_ptr))->udata.i == 0) ||
+                                           (flat_relocs[(*(q->sym_ptr_ptr))->udata.i].value != sym_addr) ||
+					   ((*(q->sym_ptr_ptr))->udata.i & 0xFFFF0000)){
 						reloc_count_incr = 2;
 				        	flat_relocs[flat_reloc_count + 1].value = sym_addr;
 						(*(q->sym_ptr_ptr))->udata.i = flat_reloc_count + 1;
@@ -1139,6 +1152,7 @@ dump_symbols(symbols, number_of_symbols);
 
 				    if (bfin_set_reloc (flat_relocs + flat_reloc_count, 
 							sym_section->name, sym_name,
+							(*(q->sym_ptr_ptr)),
 							sp, hi_lo, 
 							section_vma + q->address))
 					bad_relocs++;
@@ -1155,6 +1169,7 @@ dump_symbols(symbols, number_of_symbols);
 					(realloc (flat_relocs, (flat_reloc_count + 1) * sizeof (flat_v5_reloc_t)));
 				    if (bfin_set_reloc (flat_relocs + flat_reloc_count, 
 							sym_section->name, sym_name,
+							(*(q->sym_ptr_ptr)),
 							2, FLAT_RELOC_PART_LO, 
 							section_vma + q->address))
 					bad_relocs++;
