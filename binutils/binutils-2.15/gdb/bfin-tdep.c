@@ -484,7 +484,13 @@ bfin_software_single_step (enum target_signal sig, int insert_breakpoints_p)
  (/* P0=0x77 (X); EXCPT 0x0 */                  \
  (insn1 == 0x0077e128 && insn2 == 0x000000a0))
 
+#define IS_RT_SIGTRAMP(insn1, insn2)               \
+ (/* P0=0xad (X); EXCPT 0x0 */                  \
+ (insn1 == 0x00ade128 && (insn2 & 0x000000a0) == 0x000000a0))
+
 #define SIGCONTEXT_OFFSET   28
+#define UCONTEXT_OFFSET     172
+
 
 /* From <asm/sigcontext.h>.  */
 static int bfin_linux_sigcontext_reg_offset[BFIN_NUM_REGS] =
@@ -548,6 +554,68 @@ static int bfin_linux_sigcontext_reg_offset[BFIN_NUM_REGS] =
 };
 
 
+/* From <asm/ucontext.h>.  */
+static int bfin_linux_ucontext_reg_offset[BFIN_NUM_REGS] =
+{
+     -1,                        /* syscfg */
+  1 * 4,                        /* %r0 */
+  2 * 4,                        /* %r1 */
+  3 * 4,                        /* %r2 */
+  4 * 4,                        /* %r3 */
+  5 * 4,                        /* %r4 */
+  6 * 4,                        /* %r5 */
+  7 * 4,                        /* %r6 */
+  8 * 4,                        /* %r7 */
+  9 * 4,                        /* %p0 */
+ 10 * 4,                        /* %p1 */
+ 11 * 4,                        /* %p2 */
+ 12 * 4,                        /* %p3 */
+ 13 * 4,                        /* %p4 */
+ 14 * 4,                        /* %p5 */
+ 24 * 4,                        /* %fp */
+ 15 * 4,                        /* %sp */
+ 25 * 4,                        /* %i0 */
+ 26 * 4,                        /* %i1 */
+ 27 * 4,                        /* %i2 */
+ 28 * 4,                        /* %i3 */
+ 29 * 4,                        /* %m0 */
+ 30 * 4,                        /* %m1 */
+ 31 * 4,                        /* %m2 */
+ 32 * 4,                        /* %m3 */
+ 33 * 4,                        /* %l0 */
+ 34 * 4,                        /* %l1 */
+ 35 * 4,                        /* %l2 */
+ 36 * 4,                        /* %l3 */
+ 37 * 4,                        /* %b0 */
+ 38 * 4,                        /* %b1 */
+ 39 * 4,                        /* %b2 */
+ 40 * 4,                        /* %b3 */
+ 18 * 4,                        /* %a0x */
+ 16 * 4,                        /* %a0w */
+ 19 * 4,                        /* %a1x */
+ 17 * 4,                        /* %a1w */
+ 41 * 4,                        /* %lc0 */
+ 42 * 4,                        /* %lc1 */
+ 43 * 4,                        /* %lt0 */
+ 44 * 4,                        /* %lt1 */
+ 45 * 4,                        /* %lb0 */
+ 46 * 4,                        /* %lb1 */
+ 20 * 4,                        /* %astat */
+     -1,                        /* %reserved */
+ 21 * 4,                        /* %rets */
+ 22 * 4,                        /* %pc */
+ 23 * 4,                        /* %retx */
+     -1,                        /* %retn */
+     -1,                        /* %rete */
+ 47 *-1,                        /* %seqstat */
+     -1,                        /* %ipend */
+     -1,                        /* %origpc */
+     -1,                        /* %extra1 */
+     -1,                        /* %extra2 */
+     -1                         /* %extra3 */
+};
+
+
 /* Get info about saved registers in sigtramp.  */
 struct bfin_linux_sigtramp_info
 {
@@ -576,16 +644,25 @@ bfin_linux_pc_in_sigtramp (CORE_ADDR pc)
   if (IS_SIGTRAMP (insn1, insn2)) {
     return 1;
   }
+  if (IS_RT_SIGTRAMP (insn1, insn2)) {
+    return 2;
+  }
   
   insn0 = extract_unsigned_integer (buf, 4);
   if (IS_SIGTRAMP (insn0, insn1)) {
     return 1;
+  }
+  if (IS_RT_SIGTRAMP (insn0, insn1)) {
+    return 2;
   }
 
   insn0 = ((insn0 << 16) & 0xffffffff) | (insn1 >> 16);
   insn1 = ((insn1 << 16) & 0xffffffff) | (insn2 >> 16);
   if (IS_SIGTRAMP (insn0, insn1)) {
     return 1;
+  }
+  if (IS_RT_SIGTRAMP (insn0, insn1)) {
+    return 2;
   }
 
   return 0;
@@ -602,14 +679,19 @@ bfin_linux_get_sigtramp_info (struct frame_info *next_frame)
   frame_unwind_register (next_frame, BFIN_SP_REGNUM, buf);
   sp = extract_unsigned_integer (buf, 4);
 
-    /* Get sigcontext address */
-    info.context_addr = sp + SIGCONTEXT_OFFSET;
-
   if(bfin_linux_pc_in_sigtramp(frame_pc_unwind(next_frame)) == 0)
     fprintf(stderr, "not a sigtramp\n");
   else if(bfin_linux_pc_in_sigtramp(frame_pc_unwind(next_frame)) == 1) {
+    /* Get sigcontext address */
+    info.context_addr = sp + SIGCONTEXT_OFFSET;
     info.sc_reg_offset = bfin_linux_sigcontext_reg_offset;
   }
+  else if(bfin_linux_pc_in_sigtramp(frame_pc_unwind(next_frame)) == 2) {
+    /* Get ucontext address */
+    info.context_addr = sp + UCONTEXT_OFFSET;
+    info.sc_reg_offset = bfin_linux_ucontext_reg_offset;
+  }
+
   return info;
 }
 

@@ -1,3 +1,8 @@
+2005-03-04  Omkar Murty  <omkar@rrap-software.com>
+
+	* bfin-tdep.c (bfin_linux_pc_in_sigtramp, bfin_linux_get_sigtramp_info) :
+        supporting rt_signal
+
 2005-03-04  Srivathsa  <sri@rrap-software.com>
 
 	* bfin-tdep.c (bfin_next_bp_addr) :
