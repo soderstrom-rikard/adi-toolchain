@@ -1248,7 +1248,9 @@ finish_command (char *arg, int from_tty)
       add_continuation (finish_command_continuation, arg1);
     }
 
-  proceed_to_finish = 1;	/* We want stop_registers, please... */
+  /* this value if set to 1 looks for stop_registers  
+     that leads to segmentation fault	*/
+  proceed_to_finish = 0;	/* We want stop_registers, please... */
   proceed ((CORE_ADDR) -1, TARGET_SIGNAL_DEFAULT, 0);
 
   /* Do this only if not running asynchronously or if the target
