@@ -1908,7 +1908,7 @@ output_load_immediate (rtx *operands) {
 	 for (i = 0; i < LAST_USER_DREG; i++)
 	  if (!regs_ever_live[i] && call_used_regs[i]) {
 	     char buf[128];
-	     sprintf (buf, "%s =%1;", reg_names[i]);
+	     sprintf (buf, "%s =%%1;", reg_names[i]);
              output_asm_insn (buf, operands);
              sprintf (buf, "%s =%s;", "%0", reg_names[i]);
              output_asm_insn (buf, operands);
@@ -2389,10 +2389,10 @@ output_casesi_internal(rtx *operands)
                 output_asm_insn (buf, operands);
         }
 
-        sprintf (buf, "%1 = %0<<2;\n\t%s.L=%2; %s.H=%2;", rName2, rName2);
+        sprintf (buf, "%%1 = %%0<<2;\n\t%s.L=%%2; %s.H=%%2;", rName2, rName2);
         output_asm_insn (buf, operands);
 
-        sprintf (buf, "%s = %s + %1;\n\t%1 = [%s];", rName2, rName2, rName2);
+        sprintf (buf, "%s = %s + %%1;\n\t%%1 = [%s];", rName2, rName2, rName2);
         output_asm_insn (buf, operands);
 
         if (bSave) {
