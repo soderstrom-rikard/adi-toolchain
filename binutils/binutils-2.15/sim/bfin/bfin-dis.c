@@ -1994,7 +1994,7 @@ decode_LDSTpmod_0 (bu16 iw0)
       notethat ("dregs_hi = W [ pregs ]");
       addr = PREG (ptr);
       val = get_word (saved_state.memory, addr);
-      STORE (DREG (reg), (DREG (reg) & 0xFFFF) | (val << 16);
+      STORE (DREG (reg), (DREG (reg) & 0xFFFF) | (val << 16));
       PCREG += 2; return;
     }
   else if (aop == 1 && W == 1 && idx == ptr)
@@ -2034,7 +2034,7 @@ decode_LDSTpmod_0 (bu16 iw0)
       notethat ("dregs_hi = W [ pregs ++ pregs ]");
       addr = PREG (ptr);
       val = get_word (saved_state.memory, addr);
-      STORE (DREG (reg), (DREG (reg) & 0xFFFF) | (val << 16);
+      STORE (DREG (reg), (DREG (reg) & 0xFFFF) | (val << 16));
       STORE (PREG (ptr), addr + PREG (idx));
       PCREG += 2; return;
     }
