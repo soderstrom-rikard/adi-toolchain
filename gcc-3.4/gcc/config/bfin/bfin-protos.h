@@ -96,6 +96,8 @@ extern void bfin_expand_prologue (void);
 extern void bfin_expand_epilogue (int, int);
 extern int push_multiple_operation (rtx, Mmode);
 extern int pop_multiple_operation (rtx, Mmode);
+extern void output_push_multiple (rtx, rtx *);
+extern void output_pop_multiple (rtx, rtx *);
 extern int bfin_hard_regno_rename_ok (unsigned int, unsigned int);
 
 #undef  Mmode 

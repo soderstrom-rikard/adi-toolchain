@@ -1,3 +1,8 @@
+2005-01-11  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin-protos.h (output_push_multiple,
+	output_pop_multiple): Declare.
+
 2005-01-04  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (symbolic_or_const_operand): Accept labels with
