@@ -1665,10 +1665,10 @@ int main(int argc, char *argv[])
       if (*len > 0)
 	*len += s->vma - *vma;
       else
-	*len = s->_raw_size;
+	*len = s->size;
       *vma = s->vma;
-    } else if (s->vma + s->_raw_size > *vma + *len)
-      *len = s->vma + s->_raw_size - *vma;
+    } else if (s->vma + s->size > *vma + *len)
+      *len = s->vma + s->size - *vma;
   }
 
   if (text_len == 0) {
@@ -1686,7 +1686,7 @@ int main(int argc, char *argv[])
     if (s->flags & SEC_CODE) 
       if (bfd_get_section_contents(abs_bfd, s,
 				   text + (s->vma - text_vma), 0,
-				   s->_raw_size) == false)
+				   s->size) == false)
       {
 	fprintf(stderr, "read error section %s\n", s->name);
 	exit(2);
@@ -1719,7 +1719,7 @@ int main(int argc, char *argv[])
     if (s->flags & SEC_DATA) 
       if (bfd_get_section_contents(abs_bfd, s,
 				   data + (s->vma - data_vma), 0,
-				   s->_raw_size) == false)
+				   s->size) == false)
       {
 	fprintf(stderr, "read error section %s\n", s->name);
 	exit(2);
