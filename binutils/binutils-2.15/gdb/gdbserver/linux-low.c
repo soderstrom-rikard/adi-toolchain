@@ -139,7 +139,7 @@ linux_create_inferior (char *program, char **allargs)
   void *new_process;
   int pid;
 
-  pid = fork ();
+  pid = vfork ();
   if (pid < 0)
     perror_with_name ("fork");
 
