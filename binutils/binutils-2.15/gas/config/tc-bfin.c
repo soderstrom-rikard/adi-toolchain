@@ -233,15 +233,10 @@ struct option md_longopts[] = {
 };
 size_t md_longopts_size = sizeof (md_longopts);
 
-/* List out all options. */
+
 int
-md_parse_option (int c, char *arg)
+md_parse_option (int c ATTRIBUTE_UNUSED, char *arg ATTRIBUTE_UNUSED)
 {
-  int i;
-  for (i = 0; i < c; i++)
-    {
-      printf ("%c\n", arg[i]);
-    }
   return 0;
 }
 

@@ -1,3 +1,8 @@
+2005-01-04  Catherine Moore  <clm@cm00re.com>
+
+	* config/tc-bfin.c (md_parse_option): Do not print out each
+	character of each option on a separate line.
+
 2004-12-30  Pradip Shah <pcs@rrap-software.com>
 
 	* config/tc-bfin.c : Fixed compiler error.
