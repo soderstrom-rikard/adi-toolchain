@@ -88,8 +88,6 @@ handle_query (char *own_buf)
 {
   static struct inferior_list_entry *thread_ptr;
       
-fprintf (stderr, "inside handle_query %s\n",own_buf);
-
   if (strcmp ("qSymbol::", own_buf) == 0)
     {
       if (the_target->look_up_symbols != NULL)
@@ -210,7 +208,6 @@ main (int argc, char *argv[])
 	  unsigned char sig;
 	  i = 0;
 	  ch = own_buf[i++];
-      fprintf (stderr, " server : %s\n",own_buf);
 
 	  switch (ch)
 	    {
@@ -284,7 +281,6 @@ main (int argc, char *argv[])
 		}
 	      break;
 	    case 'g':
-              fprintf(stderr, "Calling registers_to_string with  param %s\n", own_buf);
 	      set_desired_inferior (1);
 	      registers_to_string (own_buf);
 	      break;
@@ -295,7 +291,6 @@ main (int argc, char *argv[])
 	      break;
 	    case 'm':
 	      decode_m_packet (&own_buf[1], &mem_addr, &len);
-              fprintf(stderr, "\"decode_m_packet\":Output length: %d  mem_addr: 0x%x\n", len, mem_addr);
 	      read_inferior_memory (mem_addr, mem_buf, len);
 	      convert_int_to_ascii (mem_buf, own_buf, len);
 	      break;
@@ -329,12 +324,10 @@ main (int argc, char *argv[])
 	      prepare_resume_reply (own_buf, status, signal);
 	      break;
 	    case 'c':
-      fprintf (stderr, "inside c before %c\n",ch);
 	      set_desired_inferior (0);
 	      myresume (0, 0);
 	      signal = mywait (&status, 1);
 	      prepare_resume_reply (own_buf, status, signal);
-      fprintf (stderr, "inside c after %c\n",ch);
 	      break;
 	    case 's':
 	      set_desired_inferior (0);
