@@ -13,3 +13,8 @@
 	DECL_RTL.
 	* config/bfin/bfin.h (PREFERRED_RELOAD_CLASS): Make sure X is a REG
 	before taking its REGNO.
+
+	* config/bfin/bfin.c (initialize_trampoline): New function.
+	* config/bfin/bfin-protos.h (initialize_trampoline): Declare it. 
+	config/bfin/bfin.h (INITIALIZE_TRAMPOLINE): Call it.
+	(TRAMPOLINE_TEMPLATE): Change so that correct assembly is emitted.

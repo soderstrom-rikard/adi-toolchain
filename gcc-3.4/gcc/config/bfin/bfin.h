@@ -336,23 +336,14 @@ extern const char * directive_names[];
 
 #define TRAMPOLINE_SIZE 18
 #define TRAMPOLINE_TEMPLATE(FILE)                                       \
-      fprintf(FILE, "\t.word\t0xe10c0000\t\t# p3.l = fn low");        \
-      fprintf(FILE, "\t.word\t0xe12c0000\t\t# p3.h = fn high");     \
-      fprintf(FILE, "\t.word\t0xe10d0000\t\t# p4.l = sc low");      \
-      fprintf(FILE, "\t.word\t0xe12d0000\t\t# p4.h = sc high");     \
-      fprintf(FILE, "\t.word\t0x0083\t\t# jump (p3)");
+  fprintf(FILE, "\t.dd\t0xe10c0000\n"); /* p3.l = fn low */		\
+  fprintf(FILE, "\t.dd\t0xe12c0000\n"); /* p3.h = fn high */;		\
+  fprintf(FILE, "\t.dd\t0xe10d0000\n"); /* p4.l = sc low */;		\
+  fprintf(FILE, "\t.dd\t0xe12d0000\n"); /* p4.h = sc high */;		\
+  fprintf(FILE, "\t.dw\t0x0083\n"); /* jump (p3)*/
 
-#define INITIALIZE_TRAMPOLINE(TRAMP, FNADDR, CXT)  \
-{                                                                       \
-  emit_move_insn (gen_rtx_MEM (HImode, plus_constant ((TRAMP),  2)),    \
-                  GEN_INT ((((int) FNADDR) & 0x0000ffff)));             \
-  emit_move_insn (gen_rtx_MEM (HImode, plus_constant ((TRAMP),  6)),    \
-                  GEN_INT (((((int) FNADDR) & 0xffff0000) >> 16)));     \
-  emit_move_insn (gen_rtx_MEM (HImode, plus_constant ((TRAMP), 10)),    \
-                  GEN_INT ((((int) CXT) & 0x0000ffff)));                \
-  emit_move_insn (gen_rtx_MEM (HImode, plus_constant ((TRAMP), 14)),    \
-                  GEN_INT (((((int) (CXT)) & 0xffff0000) >> 16)));      \
-}
+#define INITIALIZE_TRAMPOLINE(TRAMP, FNADDR, CXT) \
+  initialize_trampoline (TRAMP, FNADDR, CXT)
 
 /* Number of actual hardware registers.
    The hardware registers are assigned numbers for the compiler
