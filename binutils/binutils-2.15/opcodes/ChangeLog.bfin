@@ -5,6 +5,7 @@
 	decode_dagMODik_0, decode_dspLDST_0, decode_LDST_0, decode_LDSTidxI_0,
 	decode_dsp32shift_0, decode_dsp32shiftimm_0): Don't mix code and
 	declarations.
+	(decode_COMP3op_0): Properly disassemble PREG = PREG + PREG.
 
 2004-10-09  Bernd Schmidt  <bernd.schmidt@analog.com>
 

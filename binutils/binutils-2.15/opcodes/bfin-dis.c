@@ -1076,7 +1076,7 @@ static int decode_COMP3op_0 (TIword iw0,
 			_P(pregs(_W.dst)); _P(" = ");
 			_P(pregs(_W.src0));
 			_P(" "); _P(op); _P(" ");
-			_P(dregs(_W.src1));
+			_P(pregs(_W.src1));
 			break;
 		case 2:
 			_P(pregs(_W.dst)); _P(" = ");
