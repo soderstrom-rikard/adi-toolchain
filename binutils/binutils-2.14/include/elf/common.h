@@ -119,6 +119,7 @@
 #define EM_PPC64	 21	/* 64-bit PowerPC */
 #define EM_S390		 22	/* IBM S/390 */
 
+#define EM_BF533         34     /* ADI Blackfin 533 */
 #define EM_V800		 36	/* NEC V800 series */
 #define EM_FR20		 37	/* Fujitsu FR20 */
 #define EM_RH32		 38	/* TRW RH32 */
