@@ -2002,6 +2002,7 @@ bfin*-elf*)
         ;;  
 bfin*-*)
         xm_file="${xm_file} bfin/xm-i386.h"
+        tmake_file=bfin/t-bfin
         use_collect2=no
 #       fixincludes=Makefile.in
         ;;  
