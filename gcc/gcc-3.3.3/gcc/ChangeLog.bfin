@@ -27,3 +27,12 @@
 	Return an empty string.
 	* config/bfin/bfin.c (output_casesi_internal): Use that scratch
 	register instead of trying to free one here.
+
+	* config/bfin/bfin.md (movsi_insn, movsi, movsf_insn, movsf,
+	movhi pattern, movhi, movqi, movqi pattern): Use nonimmediate_operand
+	for operand 0.
+	(movsi_insn, movhi pattern): Return an empty string.
+	(movsi_insn): Remove alternative that requires a scratch register to
+	move a register to memory.
+	* config/bfin/bfin.c (output_load_immediate): Replace code to handle
+	that alternative with an abort.
