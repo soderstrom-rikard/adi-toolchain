@@ -212,10 +212,6 @@ extern void bfin_push_dummy_frame PARAMS ((void));
 
 extern void bfin_pop_frame PARAMS ((void));
 
-/* Discard from the stack the innermost frame, restoring all registers.  */
-
-#define POP_FRAME		{ bfin_pop_frame (); }
-
 /* Offset from SP to first arg on stack at first instruction of a function */
 #define SP_ARG0 (0)
 

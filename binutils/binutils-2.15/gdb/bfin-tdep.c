@@ -55,11 +55,18 @@
 
 #include "gdb_assert.h"
 #include "command.h"
+#include "tm.h"
 
 /* forward static declarations */
 static struct type * bfin_register_type (struct gdbarch *gdbarch, int regnum);
-static void bfin_frame_init_saved_regs (struct frame_info *fip);
-
+static CORE_ADDR skip_sp_plus(CORE_ADDR pc);
+static CORE_ADDR skip_minus_minus_sp(CORE_ADDR pc);
+static CORE_ADDR skip_blob(CORE_ADDR pc);
+static CORE_ADDR skip_link(CORE_ADDR pc);
+static CORE_ADDR bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
+		     struct regcache *regcache, CORE_ADDR bp_addr, int nargs,
+		     struct value **args, CORE_ADDR sp, int struct_return,
+		     CORE_ADDR struct_addr);
 
 //Following macro has been used by
 //prologue functions
@@ -109,6 +116,9 @@ static void bfin_frame_init_saved_regs (struct frame_info *fip);
 #define SIGCONTEXT_REGISTER_ADDRESS(SP,PC,REG) 0
 #define SIGCONTEXT_REGISTER_ADDRESS_P() 0
 #endif
+
+/* forward declarations */
+static int is_minus_minus_sp(int op);
 
 
 /* The list of available "set bfin ..." and "show bfin ..." commands.  */
@@ -290,9 +300,9 @@ static CORE_ADDR bfin_analyze_prologue(CORE_ADDR pc, CORE_ADDR cur_pc, struct bf
   CORE_ADDR offset;
   unsigned int op;
   int i;
-  int regno;
-  int dreglim;
-  int preglim;
+  int regno = 0;
+  int dreglim = 0;
+  int preglim = 0;
 
   pc = bfin_analyze_link(pc, cur_pc, cache);
 
@@ -563,7 +573,7 @@ static const struct frame_unwind bfin_frame_unwind =
 };
 
 static const struct frame_unwind *
-bfin_frame_p (CORE_ADDR pc)
+bfin_frame_sniffer (struct frame_info *next_frame)
 {
   return &bfin_frame_unwind;
 }
@@ -680,66 +690,6 @@ bfin_skip_prologue (pc)
   return pc;
 }
 
-
-/* Find REGNUM on the stack.  Otherwise, it's in an active register.
-   One thing we might want to do here is to check REGNUM against the
-   clobber mask, and somehow flag it as invalid if it isn't saved on
-   the stack somewhere.  This would provide a graceful failure mode
-   when trying to get the value of caller-saves registers for an inner
-   frame.  */
-
-static CORE_ADDR
-bfin_find_callers_reg (struct frame_info *fi, int regnum)
-{
-#if 0
-  /* NOTE: cagney/2002-05-03: This function really shouldn't be
-     needed.  Instead the (still being written) register unwind
-     function could be called directly.  */
-  for (; fi; fi = get_next_frame (fi))
-    {
-      if (DEPRECATED_PC_IN_CALL_DUMMY (get_frame_pc (fi), 0, 0))
-	{
-	  return deprecated_read_register_dummy (get_frame_pc (fi),
-						 get_frame_base (fi), regnum);
-	}
-      else if (frame_saved_regs (fi)[regnum] != 0)
-	{
-	  /* NOTE: cagney/2002-05-03: This would normally need to
-             handle BFIN_SP_REGNUM as a special case as, according to
-             the frame.h comments, saved_regs[SP_REGNUM] contains the
-             SP value not its address.  It appears that the BFIN isn't
-             doing this though.  */
-	  return read_memory_integer (frame_saved_regs (fi)[regnum],
-				      REGISTER_RAW_SIZE (regnum));
-	}
-    }
-  return read_register (regnum);
-#endif
-#ifdef BFIN_NOT_TESTED
-printf("bfin_find_callers_reg needs to be defined\n");
-#endif 
-
-  return 0;
-}
-
-
-/* This function actually figures out the frame address for a given pc
-   and sp.  This is tricky because we sometimes don't use an explicit
-   frame pointer, and the previous stack pointer isn't necessarily
-   recorded on the stack.  The only reliable way to get this info is
-   to examine the prologue.  FROMLEAF is a little confusing, it means
-   this is the next frame up the chain AFTER a frameless function.  If
-   this is true, then the frame value for this frame is still in the
-   fp register.  */
-
-static void
-bfin_init_extra_frame_info (int fromleaf, struct frame_info *fi)
-{
-#ifdef BFIN_NOT_TESTED
-printf("bfin_init_extra_frame_info called\n");
-#endif 
-}
-
 /* Return the GDB type object for the "standard" data type of data in
    register N.  This should be void pointer for P0-P5, SP, FP
    void pointer to function for PC
@@ -770,137 +720,12 @@ bfin_frame_saved_pc (frame)
     return (read_memory_unsigned_integer ( get_frame_base(frame) + RETS_OFFSET, 4));
 }
 
-
-/* Return the frame address.  */
-static CORE_ADDR
-bfin_read_fp (void)
-{
-    return read_register (BFIN_FP_REGNUM);
-}
-
-/* Store into a struct frame_saved_regs the addresses of the saved
-   registers of frame described by FRAME_INFO.  This includes special
-   registers such as PC and FP saved in special ways in the stack
-   frame.  SP is even more special: the address we return for it IS
-   the sp for the next frame.  */
-
-static void
-bfin_frame_init_saved_regs (struct frame_info *fip)
-{
-//  if (frame_saved_regs (fip))
-//    return;
-
-  bfin_init_extra_frame_info (0, fip);
-}
-
-  
-
-/* Adjust the call_dummy_breakpoint_offset for the bp_call_dummy
-   breakpoint to the proper address in the call dummy, so that
-   `finish' after a stop in a call dummy works.
-
-   FIXME rearnsha 2002-02018: Tweeking current_gdbarch is not an
-   optimal solution, but the call to bfin_fix_call_dummy is immediately
-   followed by a call to call_function_by_hand, which is the only
-   function where call_dummy_breakpoint_offset is actually used.  */
-
-
-static void
-bfin_set_call_dummy_breakpoint_offset (void)
-{
-   
-#ifdef BFIN_NOT_TESTED
-   printf("Need to see definition of \"set_gdbarch_deprecated_call_dummy_breakpoint_offset\"\n");
-#endif 
-   // set_gdbarch_deprecated_call_dummy_breakpoint_offset (current_gdbarch, 8);
-}
-
-static void
-bfin_fix_call_dummy (char *dummy, CORE_ADDR pc, CORE_ADDR fun, int nargs,
-		    struct value **args, struct type *type, int gcc_p)
-{
-
-#ifdef BFIN_NOT_TESTED
-  fprintf(stderr, "bfin_fix_call_dummy is not tested\n");
-#endif 
-
-  bfin_set_call_dummy_breakpoint_offset ();
-}
-
-/* Used to remove a stack frame. */
-void
-bfin_pop_frame ()
-{
-  struct frame_info *frame = get_current_frame ();
-  CORE_ADDR fp;
-  int regnum;
-  char regbuf[MAX_REGISTER_RAW_SIZE];
-                                                                                                         
-  fp = get_frame_base (frame);
-
-  bfin_frame_init_saved_regs (frame);
-                                                                                                         
-  for (regnum = 0; regnum < NUM_REGS; regnum++)
-  {
-    CORE_ADDR adr = 0;
-#ifdef BFIN_NOT_TESTED
-printf("BFIN DEBUG : Review definition of \"bfin_pop_frame\" in file %s at line %d\n", 
-             __FILE__, __LINE__);
-#endif
-   // adr = deprecated_get_frame_saved_regs_by_regnum (frame, regnum);
-    if (adr)
-    {
-      read_memory (adr, regbuf, REGISTER_RAW_SIZE (regnum));
-      write_register_bytes (REGISTER_BYTE (regnum), regbuf,
-        REGISTER_RAW_SIZE (regnum));
-    }
-  }
-  write_register (BFIN_FP_REGNUM, read_memory_integer (fp, 4));
-  write_register (BFIN_PC_REGNUM, read_memory_integer (fp + 4, 4));
-  write_register (SP_REGNUM, fp + 8);
-  flush_cached_frames ();
-}
-
-
-
-/* When arguments must be pushed onto the stack, they go on in reverse
-   order.  The code below implements a FILO (stack) to do this.  */
-
-struct stack_item
-{
-  int len;
-  struct stack_item *prev;
-  void *data;
-};
-
-static struct stack_item *
-push_stack_item (struct stack_item *prev, void *contents, int len)
-{
-  struct stack_item *si;
-  si = xmalloc (sizeof (struct stack_item));
-  si->data = xmalloc (len);
-  si->len = len;
-  si->prev = prev;
-  memcpy (si->data, contents, len);
-  return si;
-}
-
-static struct stack_item *
-pop_stack_item (struct stack_item *si)
-{
-  struct stack_item *dead = si;
-  si = si->prev;
-  xfree (dead->data);
-  xfree (dead);
-  return si;
-}
-
 /* We currently only support passing parameters in integer registers.  This
    conforms with GCC's default model.  Several other variants exist and
    we should probably support some of them based on the selected ABI.  */
 
 static CORE_ADDR
-bfin_push_dummy_call (struct gdbarch *gdbarch, CORE_ADDR func_addr,
+bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
 		     struct regcache *regcache, CORE_ADDR bp_addr, int nargs,
 		     struct value **args, CORE_ADDR sp, int struct_return,
 		     CORE_ADDR struct_addr)
@@ -1033,19 +858,6 @@ fprintf(stderr, "need to figure out how structures are returned in bfin\n");
 #endif 
   }
 }
-
-/* Extract from an array REGBUF containing the (raw) register state
-   the address in which a function should return its structure value.  */
-
-static CORE_ADDR
-bfin_extract_struct_value_address (struct regcache *regcache)
-{
-  ULONGEST ret;
-
-  regcache_cooked_read_unsigned (regcache, BFIN_R1_REGNUM, &ret);
-  return ret;
-}
-
 
 /* Write into appropriate registers a function return value of type
    TYPE, given in virtual format.  */
@@ -1208,31 +1020,6 @@ bfin_unwind_pc (struct gdbarch *gdbarch, struct frame_info *next_frame)
   return  extract_typed_address (buf, builtin_type_void_func_ptr);
 }
 
-static const struct frame_unwind *
-bfin_sigtramp_frame_p (CORE_ADDR pc)
-{
-  char *name;
-#if 0 // I think it's irrelevent for us so ignoring for the time being -Jyotik
-  /* We shouldn't even bother to try if the OSABI didn't register
-     a get_sigtramp_info handler.  */
-  if (!gdbarch_tdep (current_gdbarch)->get_sigtramp_info)
-    return NULL;
-
-  find_pc_partial_function (pc, &name, NULL, NULL);
-  if (PC_IN_SIGTRAMP (pc, name))
-    return &bfin_sigtramp_frame_unwind;
-#endif 
-  return NULL;
-}
-
-int bfin_frameless_func_invoke(struct frame_info *fi)
-{
-  if (get_frame_type (fi) == SIGTRAMP_FRAME)
-    return 0;
-//  else
-//    return frameless_look_for_prologue (fi);
-}
-
 /* Initialize the current architecture based on INFO.  If possible,
    re-use an architecture from ARCHES, which is a list of
    architectures already created during this debugging session.
@@ -1255,19 +1042,22 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   gdbarch = gdbarch_alloc (&info, NULL);
   
   /* Offset from address of function to start of its code.  */
-//  set_gdbarch_function_start_offset (gdbarch, 0);
+  // deprecated ... not needed as entry point is function pointer
+  // use the address conversion routine convert_from_func_ptr_addr
+  // set_gdbarch_function_start_offset (gdbarch, 0);
   set_gdbarch_skip_prologue (gdbarch, bfin_skip_prologue);
   set_gdbarch_breakpoint_from_pc (gdbarch, bfin_breakpoint_from_pc);
   /* stack grows downwards */
   set_gdbarch_inner_than (gdbarch, core_addr_lessthan);
- // set_gdbarch_parm_boundary (gdbarch, 32);
+  // Do not set parm boundary
+  // removed set_gdbarch_parm_boundary (gdbarch, 32);
 
   set_gdbarch_believe_pcc_promotion (gdbarch, 1);
   set_gdbarch_decr_pc_after_break (gdbarch, 2);
   set_gdbarch_extract_return_value (gdbarch, bfin_extract_return_value);
   set_gdbarch_store_return_value (gdbarch, bfin_store_return_value);
 
-  //set_gdbarch_frameless_function_invocation(gdbarch, bfin_frameless_func_invoke); 
+  // removed set_gdbarch_frameless_function_invocation(gdbarch, bfin_frameless_func_invoke); 
   set_gdbarch_frame_args_skip (gdbarch, FRAME_ARGS_SKIP);
   set_gdbarch_register_type (gdbarch, bfin_register_type);
   set_gdbarch_register_name (gdbarch, bfin_register_name);
@@ -1286,8 +1076,8 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
 
   set_gdbarch_get_longjmp_target (gdbarch, bfin_get_longjmp_target);
  
-  //frame_unwind_append_predicate (gdbarch, bfin_sigtramp_frame_p);
-//  frame_unwind_append_predicate (gdbarch, bfin_frame_p);
+  // removed frame_unwind_append_predicate (gdbarch, bfin_sigtramp_frame_p);
+  // removed frame_unwind_append_predicate (gdbarch, bfin_frame_p);
 
   /* currently dont expose psuedo regs
      we may give out text_start, data_start, bss_start
@@ -1314,6 +1104,7 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
 
   /* Breakpoint manipulation.  PC will get decremented in kernel */
   set_gdbarch_decr_pc_after_break (gdbarch, 0);
+  frame_unwind_append_sniffer (gdbarch, bfin_frame_sniffer);
 
 
   return gdbarch;
