@@ -117,7 +117,7 @@ static struct cmd_list_element *showbfincmdlist = NULL;
 
 /* Initial value: Register names used in BFIN's ISA documentation.  */
 static char *bfin_register_name_strings[] =
-{ "syscfg", "orig_r0", "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", 
+{ "syscfg", /*"orig_r0",*/ "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", 
   "p0", "p1", "p2", "p3", "p4", "p5","fp","usp",
   "i0", "i1", "i2", "i3", 
   "m0", "m1", "m2", "m3", 
