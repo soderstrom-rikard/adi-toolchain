@@ -292,7 +292,7 @@
   "*
     { output_load_immediate (operands); }
   "
-  [(set_attr "type" "move,mcst,mcld,move,move")])
+  [(set_attr "type" "move,mcst,mcld,mcld,mcld")])
 
 
 
@@ -874,9 +874,9 @@
 )
 
 (define_insn ""
-  [(set (match_operand:SI 0 "register_operand"           "=ad,a,d,&a,&d,b,f,d,fb")
-	(plus:SI (match_operand:SI 1 "register_operand"  "%0, a,d,a,d,%0,%0,%0,%0")
-		 (match_operand:SI 2 "nonmemory_operand" " M, a,d,i,i,M,M,i,i")))]
+  [(set (match_operand:SI 0 "register_operand"           "=ad,a,d,&a,&d,b,f,fb")
+	(plus:SI (match_operand:SI 1 "register_operand"  "%0, a,d,a,d,%0,%0,%0")
+		 (match_operand:SI 2 "nonmemory_operand" " M, a,d,i,i,M,M,i")))]
   ""
   "*
     {
@@ -888,7 +888,6 @@
 	\"%0=%0+%1; //immed->Dreg \",
 	\"M3=%2;\\n\\t%0+=M3;\",
 	\"[--SP] = R3;\\n\\tR3=%0;\\n\\tR3+=%2;\\n\\t%0=R3;\\n\\tR3 = [SP++];\",
-	\"A0 = %0;\\n\\tA1 = %2;\\n\\t%0 = (A0 += A1);\",
 	\"[--SP] = R3;\\n\\tR3 = %0;\\n\\tA0 = R3;\\n\\tA1 = %2;\\n\\tR3 = (A0 += A1);\\n\\t%0 = R3;\\n\\tR3 = [SP++];\",
 	};
 
@@ -929,9 +928,9 @@
   [(set_attr "type" "alu0")])
 
 (define_insn ""
-  [(set (match_operand:SI 0 "register_operand"           "=d,a,d,b,b")
-	(minus:SI (match_operand:SI 1 "register_operand"  "0,0,d,0,0")
-		  (match_operand:SI 2 "nonmemory_operand" "M,M,d,f,Md")))]
+  [(set (match_operand:SI 0 "register_operand"           "=d,a,d,b,b,d")
+	(minus:SI (match_operand:SI 1 "register_operand"  "0,0,d,0,0,0")
+		  (match_operand:SI 2 "nonmemory_operand" "M,M,d,f,Md,f")))]
   ""
   "*
 {
@@ -941,10 +940,12 @@
     \"%0 =%1-%2;\",
     \"%0 -=%2;\",
     \"M3 = %2; %0 -=M3;\",	
+    \"[--SP] = I0;\\n\\tI0 = %0;\\n\\tI0 -=%2;\\n\\t%0=I0;\\n\\tI0 = [SP++];\",
+    \"%0 +=-%2;\", 
   };
 
-  if (CONSTANT_P (operands[2]))
-     which_alternative = 4;
+  if (CONSTANT_P (operands[2]) && which_alternative < 4)
+     which_alternative = 6;
 
   return strings_subsi3[which_alternative];
 }"

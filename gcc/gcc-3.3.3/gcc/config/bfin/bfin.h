@@ -80,6 +80,12 @@ extern int target_flags;
 #define ASM_SPEC " %{I*} -I include/asm%s "
 #define LIB_SPEC " -lc "
 
+#undef  ASM_WEAKEN_LABEL
+#define ASM_WEAKEN_LABEL(FILE, NAME) \
+  do { fputs ("\t.weak\t", FILE); assemble_name (FILE, NAME); \
+       fputc ('\n', FILE); } while (0)
+
+
 /* Don't create frame pointers for leaf functions */
 #define TARGET_OMIT_LEAF_FRAME_POINTER (target_flags & MASK_OMIT_LEAF_FRAME_POINTER)
 #define TARGET_REGPARM                 (target_flags & MASK_REG_ARGS) /* never use */

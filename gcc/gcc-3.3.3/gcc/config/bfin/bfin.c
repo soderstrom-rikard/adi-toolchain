@@ -1914,8 +1914,11 @@ output_load_immediate (rtx *operands) {
              output_asm_insn (buf, operands);
 	     return "";
 	  }
-          output_asm_insn ("[--SP] = R3;\\n\\tR3 =%1;", operands);
-          output_asm_insn ("%0 =R3;\\n\\tR3 = [SP++];", operands);
+          output_asm_insn ("[--SP] = R3;", operands);
+          output_asm_insn ("R3 = %1;", operands);
+
+          output_asm_insn ("%0 = R3;", operands);
+          output_asm_insn ("R3 = [SP++];", operands);
           return "";
      }
      else if (GET_CODE (operands[1]) == MEM
