@@ -1727,8 +1727,11 @@ hard_regno_mode_ok (int regno, enum machine_mode mode)
     return mode == BImode;
   if (mode == PDImode)
     return regno == REG_A0 || regno == REG_A1;
-  return (TEST_HARD_REG_BIT (reg_class_contents[MOST_REGS], regno)
-	  || TEST_HARD_REG_BIT (reg_class_contents[PROLOGUE_REGS], regno));
+  if (mode == SImode
+      && TEST_HARD_REG_BIT (reg_class_contents[PROLOGUE_REGS], regno))
+    return 1;
+      
+  return TEST_HARD_REG_BIT (reg_class_contents[MOST_REGS], regno);
 }
 
 /* Return the cost of moving data from a register in class CLASS1 to
