@@ -36,7 +36,8 @@ case "${target}" in
   bfin*-*-*)       	srv_regobj=reg-bfin.o
                         srv_tgtobj="linux-low.o linux-bfin-low.o"
                         srv_linux_usrregs=yes
-			AC_PROG_CC=bfin-elf-gcc
+			CC=bfin-elf-gcc
+			LDFLAGS=-Wl,-elf2flt
                         ;;
   m68*-*-linux*)	srv_regobj=reg-m68k.o
 			srv_tgtobj="linux-low.o linux-m68k-low.o"
