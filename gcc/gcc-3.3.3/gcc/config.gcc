@@ -320,6 +320,9 @@ m68k-*-*)
 mips*-*-*)
 	cpu_type=mips
 	;;
+bfin*-*)
+	cpu_type=bfin
+	;;
 powerpc*-*-*)
 	cpu_type=rs6000
 	extra_headers="ppc-asm.h altivec.h spe.h"
@@ -1992,6 +1995,16 @@ mn10300-*-*)
 	fi
 	use_collect2=no
 	;;
+bfin*-elf*)
+        tmake_file=bfin/t-bfin-elf
+        use_collect2=no
+#       fixincludes=Makefile.in
+        ;;  
+bfin*-*)
+        xm_file="${xm_file} bfin/xm-i386.h"
+        use_collect2=no
+#       fixincludes=Makefile.in
+        ;;  
 ns32k-*-netbsdelf*)
 	echo "GCC does not yet support the ${machine} target"; exit 1
 	;;
