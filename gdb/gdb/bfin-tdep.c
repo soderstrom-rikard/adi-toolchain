@@ -1073,7 +1073,6 @@ bfin_unwind_pc (struct gdbarch *gdbarch, struct frame_info *next_frame)
   int* pInt1 = (int*)buf;
   int* pInt2 = (int*)(buf +4);
   CORE_ADDR ret, start_code;
-fprintf(stderr, "STEPBP TRACE : in bfin_unwind_pc\n");
   frame_unwind_register (next_frame, PC_REGNUM , buf);
   return  extract_typed_address (buf, builtin_type_void_func_ptr);
 }
