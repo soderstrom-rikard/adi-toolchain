@@ -316,8 +316,6 @@ extern const char * directive_names[];
 
 /*#define DATA_ALIGNMENT(TYPE, BASIC-ALIGN) for arrays.. */
 
-#define STRUCTURE_SIZE_BOUNDARY	32 /*RAJA biggest_alignment old - 8*/
-
 /* Make strings word-aligned so strcpy from constants will be faster.  */
 #define CONSTANT_ALIGNMENT(EXP, ALIGN)  \
   (TREE_CODE (EXP) == STRING_CST        \

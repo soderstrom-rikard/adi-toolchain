@@ -1,3 +1,7 @@
+2004-10-14  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.h (STRUCTURE_SIZE_BOUNDARY): Delete macro.
+
 2004-10-13  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (simple_reg_operand): Delete.  All users replaced
