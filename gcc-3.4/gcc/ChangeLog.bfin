@@ -1,6 +1,8 @@
 2004-11-12  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* genconfig.c (walk_insn_part): Look at match_dups inside a label_ref.
+	* config/bfin/bfin.md (attempt at DSP instruction patterns): Delete the
+	lot.
 
 2004-11-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
