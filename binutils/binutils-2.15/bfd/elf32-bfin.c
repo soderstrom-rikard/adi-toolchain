@@ -613,6 +613,10 @@ bfin_h_l_uimm16_reloc (
       if (reloc_entry->address > input_section->_cooked_size)
 	      return bfd_reloc_outofrange;
       if(is_reloc_stack_empty()){
+        if (bfd_is_und_section (symbol->section)
+             && (symbol->flags & BSF_WEAK) == 0
+             && output_bfd == (bfd *) NULL)
+          return bfd_reloc_undefined;
         reloc_target_output_section = symbol->section->output_section;
         relocation = symbol->value;      
         /* Convert input-section-relative symbol value to absolute.  */
@@ -687,6 +691,10 @@ bfin_byte4_reloc (
       if (reloc_entry->address > input_section->_cooked_size)
 	      return bfd_reloc_outofrange;
       if(is_reloc_stack_empty()){
+        if (bfd_is_und_section (symbol->section)
+             && (symbol->flags & BSF_WEAK) == 0
+             && output_bfd == (bfd *) NULL)
+          return bfd_reloc_undefined;
         reloc_target_output_section = symbol->section->output_section;
         relocation = symbol->value;      
         /* Convert input-section-relative symbol value to absolute.  */
@@ -715,9 +723,8 @@ bfin_byte4_reloc (
       else {
         reloc_entry->addend = 0;
       }
-        /* Here the variable relocation holds the final address of the
-	   symbol we are relocating against, plus any addend.  */
-
+      /* Here the variable relocation holds the final address of the
+	 symbol we are relocating against, plus any addend.  */
       x = relocation & 0xFFFF0000;
       x >>=16;
       bfd_put_16 (abfd, x, (unsigned char *) data + addr + 2);
