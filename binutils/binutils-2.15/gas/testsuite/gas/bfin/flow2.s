@@ -144,15 +144,12 @@ lsetup ( 4, 8 ) lc0 = p1 ;
 
 lsetup ( 4, 8 ) lc0 = p1>>1 ;
 
-// FIXME:
-//  flow2.d will need to be updated to reflect the actual text output once
-//  the parser accepts the loop construct.
 loop DoItSome LC0 ; /* define loop DoItSome with Loop Counter 0 */
 loop_begin DoItSome ; /* place before the first instruction in the loop */
 R0=1;
 R1=2;
 loop_end DoItSome ; /* place after the last instruction in the loop */
 
-loop DoItSome LC1 ; /* define loop MyLoop with Loop Counter 1*/
+loop DoItSomeMore LC1 ; /* define loop MyLoop with Loop Counter 1*/
 
 

@@ -22,37 +22,37 @@ Disassembly of section .text:
   1c:	86 00       	JUMP  \(PC\+SP\);
   1e:	87 00       	JUMP  \(PC\+FP\);
   20:	00 20       	JUMP.S  20 <MY_LABEL1-0xa>;
-  22:	69 22       	JUMP.S  4f4 <bottom_of_FIR_filter\+0x426>;
-  24:	97 2d       	JUMP.S  fffffb52 <bottom_of_FIR_filter\+0xfffffa84>;
+  22:	69 22       	JUMP.S  4f4.*
+  24:	97 2d       	JUMP.S  fffffb52.*
   26:	01 20       	JUMP.S  28 <MY_LABEL1-0x2>;
   28:	ff 2f       	JUMP.S  26 <MY_LABEL1-0x4>;
 
 0000002a <MY_LABEL1>:
   2a:	00 20       	JUMP.S  2a <MY_LABEL1>;
-  2c:	69 22       	JUMP.S  4fe <bottom_of_FIR_filter\+0x430>;
-  2e:	97 2d       	JUMP.S  fffffb5c <bottom_of_FIR_filter\+0xfffffa8e>;
+  2c:	69 22       	JUMP.S  4fe.*
+  2e:	97 2d       	JUMP.S  fffffb5c.*
   30:	01 20       	JUMP.S  32 <MY_LABEL1\+0x8>;
   32:	ff 2f       	JUMP.S  30 <MY_LABEL1\+0x6>;
-  34:	c0 e2 00 00	JUMP.L ff800034
-  38:	3f e2 ff ff 	JUMP.L  800036 <bottom_of_FIR_filter\+0x7fff68>;
+  34:	c0 e2 00 00 	JUMP.L  ff800034.*
+  38:	3f e2 ff ff 	JUMP.L  800036.*
   3c:	00 e2 00 00 	JUMP.L  3c <MY_LABEL1\+0x12>;
-  40:	00 e2 69 02 	JUMP.L  512 <bottom_of_FIR_filter\+0x444>;
-  44:	ff e2 97 fd	JUMP.L fffffb72
+  40:	00 e2 69 02 	JUMP.L  512.*
+  44:	ff e2 97 fd 	JUMP.L  fffffb72.*
   48:	00 e2 01 00 	JUMP.L  4a <MY_LABEL1\+0x20>;
-  4c:	ff e2 ff ff	JUMP.L -2
+  4c:	ff e2 ff ff 	JUMP.L  4a <MY_LABEL1\+0x20>;
   50:	ed 2f       	JUMP.S  2a <MY_LABEL1>;
   52:	d7 2f       	JUMP.S  0 <MY_LABEL1-0x2a>;
   54:	ea 2f       	JUMP.S  28 <MY_LABEL1-0x2>;
-  56:	d4 2f       	JUMP.S  fffffffe <bottom_of_FIR_filter\+0xffffff30>;
-  58:	04 1b       	IF CC JUMP fffffe60 <bottom_of_FIR_filter\+0xfffffd92>;
-  5a:	5a 18       	IF CC JUMP 10e <bottom_of_FIR_filter\+0x40>;
+  56:	d4 2f       	JUMP.S  fffffffe.*
+  58:	04 1b       	IF CC JUMP fffffe60.*
+  5a:	5a 18       	IF CC JUMP 10e.*
   5c:	00 18       	IF CC JUMP 5c <MY_LABEL1\+0x32>;
-  5e:	04 1f       	IF CC JUMP fffffe66 <bottom_of_FIR_filter\+0xfffffd98>\(BP\);
-  60:	5a 1c       	IF CC JUMP 114 <bottom_of_FIR_filter\+0x46>\(BP\);
-  62:	91 13       	IF ! CC JUMP ffffff84 <bottom_of_FIR_filter\+0xfffffeb6>;
-  64:	90 10       	IF ! CC JUMP 184 <bottom_of_FIR_filter\+0xb6>;
-  66:	91 17       	IF ! CC JUMP ffffff88 <bottom_of_FIR_filter\+0xfffffeba>\(BP\);
-  68:	90 14       	IF ! CC JUMP 188 <bottom_of_FIR_filter\+0xba>\(BP\);
+  5e:	04 1f       	IF CC JUMP fffffe66.*\(BP\);
+  60:	5a 1c       	IF CC JUMP 114.*\(BP\);
+  62:	91 13       	IF ! CC JUMP ffffff84.*;
+  64:	90 10       	IF ! CC JUMP 184.*;
+  66:	91 17       	IF ! CC JUMP ffffff88.*\(BP\);
+  68:	90 14       	IF ! CC JUMP 188.*\(BP\);
   6a:	e0 1b       	IF CC JUMP 2a <MY_LABEL1>;
   6c:	ca 1b       	IF CC JUMP 0 <MY_LABEL1-0x2a>;
   6e:	de 1f       	IF CC JUMP 2a <MY_LABEL1>\(BP\);
@@ -73,8 +73,8 @@ Disassembly of section .text:
   8c:	73 00       	CALL  \(PC\+P3\);
   8e:	74 00       	CALL  \(PC\+P4\);
   90:	75 00       	CALL  \(PC\+P5\);
-  92:	09 e3 2b 1a 	CALL  1234e8 <bottom_of_FIR_filter\+0x12341a>;
-  96:	ff e3 97 fd     CAll fffffbc4;
+  92:	09 e3 2b 1a 	CALL  1234e8.*;
+  96:	ff e3 97 fd 	CALL  fffffbc4.*;
   9a:	ff e3 c8 ff 	CALL  2a <MY_LABEL1>;
   9e:	ff e3 b1 ff 	CALL  0 <MY_LABEL1-0x2a>;
   a2:	10 00       	RTS;
@@ -102,8 +102,14 @@ Disassembly of section .text:
 000000ce <bottom_of_FIR_filter>:
   ce:	81 e1 02 00 	R1=2 <MY_LABEL1-0x28>\(Z\);
   d2:	a2 e0 04 10 	LSETUP\(d6 <bottom_of_FIR_filter\+0x8>,da <bottom_of_FIR_filter\+0xc>\)LC0=P1;
-  d6:	e2 e0 04 10 	LSETUP\(da <bottom_of_FIR_filter\+0xc>,de <bottom_of_FIR_filter\+0x10>\)LC0=P1>>1;
-  da:	80 e0 00 00	LSETUP\(da <bottom_of_FIR_filter\+0xc>,da <bottom_of_FIR_filter\+0xc>\)LC0;
-  de:	08 60		R0 = 1;
-  e0:	11 60		R1 = 2;
-  e2:	90 e0 00 00	LSETUP\(__END__DoItSome, __END__DoItSome\) LC1;
+  d6:	e2 e0 04 10 	LSETUP\(da <bottom_of_FIR_filter\+0xc>,de <DoItSome__BEGIN>\)LC0=P1>>1;
+  da:	82 e0 04 00 	LSETUP\(de <DoItSome__BEGIN>,e2 <DoItSome__END>\)LC0;
+
+000000de <DoItSome__BEGIN>:
+  de:	08 60       	R0=0x1\(x\);
+  e0:	11 60       	R1=0x2\(x\);
+
+000000e2 <DoItSome__END>:
+  e2:	9f e0 8e 03 	LSETUP\(e0 <DoItSome__BEGIN\+0x2>,fffffffe <DoItSome__END\+0xffffff1c>\)LC1;
+	...
+

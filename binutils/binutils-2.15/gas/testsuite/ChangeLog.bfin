@@ -1,3 +1,10 @@
+2005-02-07  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/flow.s: Update testcase.
+	* gas/bfin/flow2.s: Likewise.
+	* gas/bfin/flow.d: Update expected output.
+	* gas/bfin/flow2.d: Likewise.
+
 2005-02-01  Catherine Moore  <clm@cm00re.com>
 
 	* gas/bfin/expected_errors.l: Update expected output.
