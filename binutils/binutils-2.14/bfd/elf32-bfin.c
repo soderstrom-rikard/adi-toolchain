@@ -275,11 +275,11 @@ bfin_bfd_reloc (
           relocation += output_base + symbol->section->output_offset;
           possible_addend_delta = symbol->section->output_offset;
 	}
+        if (!strcmp(symbol->name, symbol->section->name) && output_bfd == NULL){
+          /* Add in supplied addend.  */
+          relocation += reloc_entry->addend;
+        }
         
-#if 0 /* we do not generate addend ... see arith expr 
-        Add in supplied addend.  */
-        relocation += reloc_entry->addend;
-#endif
       }
       else{
         relocation = reloc_stack_pop();
@@ -427,10 +427,10 @@ bfin_pcrel24_reloc (
           possible_addend_delta = symbol->section->output_offset;
 	}
         
-#if 0 /* we do not generate addend ... see arith expr 
-        Add in supplied addend.  */
-        relocation += reloc_entry->addend;
-#endif
+        if (!strcmp(symbol->name, symbol->section->name) && output_bfd == NULL){
+          /* Add in supplied addend.  */
+          relocation += reloc_entry->addend;
+        }
       }
       else{
         relocation = reloc_stack_pop();
@@ -439,8 +439,7 @@ bfin_pcrel24_reloc (
       /* Here the variable relocation holds the final address of the
 	 symbol we are relocating against, plus any addend.  */
 
-      if (howto->pc_relative == TRUE)
-	{
+      if (howto->pc_relative == TRUE){
           relocation -=
 	    input_section->output_section->vma + input_section->output_offset;
 
