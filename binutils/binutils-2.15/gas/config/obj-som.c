@@ -27,6 +27,7 @@
 #include "obstack.h"
 
 static void obj_som_weak PARAMS ((int));
+static void adjust_stab_sections PARAMS ((bfd *, asection *, PTR));
 
 const pseudo_typeS obj_pseudo_table[] =
 {
@@ -52,7 +53,7 @@ obj_read_begin_hook ()
 
 void
 obj_som_compiler (unused)
-     int unused;
+     int unused ATTRIBUTE_UNUSED;
 {
   char *buf;
   char c;
@@ -129,7 +130,7 @@ obj_som_compiler (unused)
 
 void
 obj_som_version (unused)
-     int unused;
+     int unused ATTRIBUTE_UNUSED;
 {
   char *version, c;
 
@@ -175,7 +176,7 @@ obj_som_version (unused)
 
 void
 obj_som_copyright (unused)
-     int unused;
+     int unused ATTRIBUTE_UNUSED;
 {
   char *copyright, c;
 
@@ -248,7 +249,7 @@ obj_som_init_stab_section (seg)
      (just created above).  Also set some attributes which BFD does
      not understand.  In particular, access bits, sort keys, and load
      quadrant.  */
-  obj_set_subsection_attributes (seg, space, 0x1f, 73, 0);
+  obj_set_subsection_attributes (seg, space, 0x1f, 73, 0, 0, 0, 0);
   bfd_set_section_alignment (stdoutput, seg, 2);
 
   /* Make some space for the first special stab entry and zero the memory.
@@ -271,7 +272,7 @@ obj_som_init_stab_section (seg)
      not understand.  In particular, access bits, sort keys, and load
      quadrant.  */
   seg = bfd_get_section_by_name (stdoutput, "$GDB_STRINGS$");
-  obj_set_subsection_attributes (seg, space, 0x1f, 72, 0);
+  obj_set_subsection_attributes (seg, space, 0x1f, 72, 0, 0, 0, 0);
   bfd_set_section_alignment (stdoutput, seg, 2);
 
   subseg_set (saved_seg, saved_subseg);
@@ -283,7 +284,7 @@ static void
 adjust_stab_sections (abfd, sec, xxx)
      bfd *abfd;
      asection *sec;
-     PTR xxx;
+     PTR xxx ATTRIBUTE_UNUSED;
 {
   asection *strsec;
   char *p;

@@ -15,3 +15,6 @@ Disassembly of section .text:
 			c: R_ARM_GOT32	sym
 			10: R_ARM_GOTOFF	sym
 			14: R_ARM_GOTPC	_GLOBAL_OFFSET_TABLE_
+			18: R_ARM_TARGET1	foo2
+			1c: R_ARM_SBREL32	foo3
+			20: R_ARM_TARGET2	foo4

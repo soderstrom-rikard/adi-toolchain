@@ -1,6 +1,6 @@
 \input texinfo       @c                    -*- Texinfo -*-
 @setfilename binutils.info
-@c Copyright 2001, 2002, 2003 Free Software Foundation, Inc.
+@c Copyright 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
 
 @include config.texi
 
@@ -30,7 +30,7 @@ END-INFO-DIR-ENTRY
 @ifinfo
 @c man begin COPYRIGHT
 Copyright @copyright{} 1991, 92, 93, 94, 95, 96, 97, 98, 99, 2000,
-2001, 2002, 2003 Free Software Foundation, Inc.
+2001, 2002, 2003, 2004 Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1
@@ -55,7 +55,7 @@ notice identical to this one except for the removal of this paragraph
 @c  "objdump", "nm", "size", "strings", "strip", "readelf" and "ranlib".
 @c
 @c Copyright (C) 1991, 92, 93, 94, 95, 96, 97, 98, 99, 2000, 2001,
-@c 2002, 2003 Free Software Foundation, Inc.
+@c 2002, 2003, 2004 Free Software Foundation, Inc.
 @c 
 @c This text may be freely distributed under the terms of the GNU
 @c Free Documentation License.
@@ -81,7 +81,7 @@ notice identical to this one except for the removal of this paragraph
 
 @vskip 0pt plus 1filll
 Copyright @copyright{} 1991, 92, 93, 94, 95, 96, 97, 1998, 2000, 2001,
-2002, 2003 Free Software Foundation, Inc.
+2002, 2003, 2004 Free Software Foundation, Inc.
 
       Permission is granted to copy, distribute and/or modify this document
       under the terms of the GNU Free Documentation License, Version 1.1
@@ -663,7 +663,7 @@ The @sc{gnu} linker @command{ld} is now described in a separate manual.
 nm [@option{-a}|@option{--debug-syms}] [@option{-g}|@option{--extern-only}]
    [@option{-B}] [@option{-C}|@option{--demangle}[=@var{style}]] [@option{-D}|@option{--dynamic}]
    [@option{-S}|@option{--print-size}] [@option{-s}|@option{--print-armap}]
-   [@option{-A}|@option{-o}|@option{--print-file-name}]
+   [@option{-A}|@option{-o}|@option{--print-file-name}][@option{--special-syms}]
    [@option{-n}|@option{-v}|@option{--numeric-sort}] [@option{-p}|@option{--no-sort}]
    [@option{-r}|@option{--reverse-sort}] [@option{--size-sort}] [@option{-u}|@option{--undefined-only}]
    [@option{-t} @var{radix}|@option{--radix=}@var{radix}] [@option{-P}|@option{--portability}]
@@ -748,7 +748,10 @@ The symbol is a weak symbol that has not been specifically tagged as a
 weak object symbol.  When a weak defined symbol is linked with a normal
 defined symbol, the normal defined symbol is used with no error.
 When a weak undefined symbol is linked and the symbol is not defined,
-the value of the weak symbol becomes zero with no error.
+the value of the symbol is determined in a system-specific manner without
+error.  On some systems, uppercase indicates that a default value has been 
+specified.
+
 
 @item -
 The symbol is a stabs symbol in an a.out object file.  In this case, the
@@ -877,6 +880,14 @@ the value of the symbol and the value of the symbol with the next higher
 value.  If the @code{bsd} output format is used the size of the symbol 
 is printed, rather than the value, and @samp{-S} must be used in order 
 both size and value to be printed.
+
+@item --special-syms
+Display symbols which have a target-specific special meaning.  These
+symbols are usually used by the target for some special processing and
+are not normally helpful when included included in the normal symbol
+lists.  For example for ARM targets this option would skip the mapping
+symbols used to mark transistions between ARM code, THUMB code and
+data.
 
 @item -t @var{radix}
 @itemx --radix=@var{radix}
@@ -1494,6 +1505,7 @@ objdump [@option{-a}|@option{--archive-headers}]
         [@option{--prefix-addresses}]
         [@option{--[no-]show-raw-insn}]
         [@option{--adjust-vma=}@var{offset}]
+        [@option{--special-syms}]
         [@option{-V}|@option{--version}]
         [@option{-H}|@option{--help}]
         @var{objfile}@dots{}
@@ -1836,6 +1848,11 @@ meaningful for dynamic objects, such as certain types of shared
 libraries.  This is similar to the information provided by the @samp{nm}
 program when given the @option{-D} (@option{--dynamic}) option.
 
+@item --special-syms
+When displaying symbols include those which the target considers to be
+special in some way and which would not normally be of interest to the
+user.
+
 @item -V
 @itemx --version
 Print the version number of @command{objdump} and exit.
@@ -1846,7 +1863,7 @@ Print the version number of @command{objdump} and exit.
 @cindex header information, all
 Display all available header information, including the symbol table and
 relocation entries.  Using @option{-x} is equivalent to specifying all of
-@option{-a -f -h -r -t}.
+@option{-a -f -h -p -r -t}.
 
 @item -w
 @itemx --wide
@@ -2865,6 +2882,7 @@ dlltool [@option{-d}|@option{--input-def} @var{def-file-name}]
         [@option{-D}|@option{--dllname} @var{name}] [@option{-m}|@option{--machine} @var{machine}]
         [@option{-a}|@option{--add-indirect}] [@option{-U}|@option{--add-underscore}] [@option{-k}|@option{--kill-at}]
         [@option{-A}|@option{--add-stdcall-alias}]
+        [@option{-p}|@option{--ext-prefix-alias} @var{prefix}]
         [@option{-x}|@option{--no-idata4}] [@option{-c}|@option{--no-idata5}] [@option{-i}|@option{--interwork}]
         [@option{-n}|@option{--nodelete}] [@option{-t}|@option{--temp-prefix} @var{prefix}]
         [@option{-v}|@option{--verbose}] 
@@ -3054,6 +3072,12 @@ Specifies that when @command{dlltool} is creating the exports file it
 should add aliases for stdcall symbols without @samp{@@ <number>}
 in addition to the symbols with @samp{@@ <number>}.
 
+@item -p
+@itemx --ext-prefix-alias @var{prefix}
+Causes @command{dlltool} to create external aliases for all DLL
+imports with the specified prefix.  The aliases are created for both
+external and import symbols with no leading underscore.
+
 @item -x
 @itemx --no-idata4
 Specifies that when @command{dlltool} is creating the exports and library
@@ -3131,8 +3155,8 @@ readelf [@option{-a}|@option{--all}]
         [@option{-A}|@option{--arch-specific}]
         [@option{-D}|@option{--use-dynamic}]
         [@option{-x} <number>|@option{--hex-dump=}<number>]
-        [@option{-w[liaprmfFso]}|
-         @option{--debug-dump}[=line,=info,=abbrev,=pubnames,=ranges,=macro,=frames,=frames-interp,=str,=loc]]
+        [@option{-w[liaprmfFsoR]}|
+         @option{--debug-dump}[=line,=info,=abbrev,=pubnames,=aranges,=macro,=frames,=frames-interp,=str,=loc,=Ranges]]
         [@option{-I}|@option{-histogram}]
         [@option{-v}|@option{--version}]
         [@option{-W}|@option{--wide}]
@@ -3203,8 +3227,8 @@ Display all the headers in the file.  Equivalent to @option{-h -l -S}.
 
 @item -n
 @itemx --notes
-@cindex ELF core notes
-Displays the contents of the NOTE segment, if it exists.
+@cindex ELF notes
+Displays the contents of the NOTE segments and/or sections, if any.
 
 @item -r
 @itemx --relocs
@@ -3249,8 +3273,8 @@ symbols section.
 @itemx --hex-dump=<number>
 Displays the contents of the indicated section as a hexadecimal dump.
 
-@item -w[liaprmfFso]
-@itemx --debug-dump[=line,=info,=abbrev,=pubnames,=ranges,=macro,=frames,=frames-interp,=str,=loc]
+@item -w[liaprmfFsoR]
+@itemx --debug-dump[=line,=info,=abbrev,=pubnames,=aranges,=macro,=frames,=frames-interp,=str,=loc,=Ranges]
 Displays the contents of the debug sections in the file, if any are
 present.  If one of the optional letters or words follows the switch
 then only data found in those specific sections will be dumped.

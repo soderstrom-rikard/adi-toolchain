@@ -39,6 +39,9 @@ extern const char *cris_target_format PARAMS ((void));
 
 #define TARGET_ARCH bfd_arch_cris
 
+extern unsigned int cris_mach PARAMS ((void));
+#define TARGET_MACH (cris_mach ())
+
 #define TARGET_BYTES_BIG_ENDIAN 0
 
 extern const char *md_shortopts;
@@ -64,9 +67,6 @@ extern const char FLT_CHARS[];
 #define md_operand(x)
 
 #define md_number_to_chars number_to_chars_littleendian
-
-extern const int md_short_jump_size;
-extern const int md_long_jump_size;
 
 /* There's no use having different functions for this; the sizes are the
    same.  Note that we can't #define md_short_jump_size here.  */

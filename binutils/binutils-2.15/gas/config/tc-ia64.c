@@ -1,5 +1,6 @@
 /* tc-ia64.c -- Assembler for the HP/Intel IA-64 architecture.
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004
+   Free Software Foundation, Inc.
    Contributed by David Mosberger-Tang <davidm@hpl.hp.com>
 
    This file is part of GAS, the GNU Assembler.
@@ -153,7 +154,11 @@ struct label_fix
   struct symbol *sym;
 };
 
+/* This is the endianness of the current section.  */
 extern int target_big_endian;
+
+/* This is the default endianness.  */
+static int default_big_endian = TARGET_BYTES_BIG_ENDIAN;
 
 void (*ia64_number_to_chars) PARAMS ((char *, valueT, int));
 
@@ -571,11 +576,6 @@ static char special_section_name[][20] =
     {".init_array"}, {".fini_array"}
   };
 
-static char *special_linkonce_name[] =
-  {
-    ".gnu.linkonce.ia64unw.", ".gnu.linkonce.ia64unwi."
-  };
-
 /* The best template for a particular sequence of up to three
    instructions:  */
 #define N	IA64_NUM_TYPES
@@ -698,10 +698,15 @@ static struct
   struct label_prologue_count * saved_prologue_counts;
 } unwind;
 
+/* The input value is a negated offset from psp, and specifies an address
+   psp - offset.  The encoded value is psp + 16 - (4 * offset).  Thus we
+   must add 16 and divide by 4 to get the encoded value.  */
+
+#define ENCODED_PSP_OFFSET(OFFSET) (((OFFSET) + 16) / 4)
+
 typedef void (*vbyte_func) PARAMS ((int, char *, char *));
 
 /* Forward declarations:  */
-static int ar_is_in_integer_unit PARAMS ((int regnum));
 static void set_section PARAMS ((char *name));
 static unsigned int set_regstack PARAMS ((unsigned int, unsigned int,
 					  unsigned int, unsigned int));
@@ -755,6 +760,7 @@ static void dot_xfloat_cons_ua PARAMS ((int));
 static void print_prmask PARAMS ((valueT mask));
 static void dot_pred_rel PARAMS ((int));
 static void dot_reg_val PARAMS ((int));
+static void dot_serialize PARAMS ((int));
 static void dot_dv_mode PARAMS ((int));
 static void dot_entry PARAMS ((int));
 static void dot_mem_offset PARAMS ((int));
@@ -908,49 +914,26 @@ static unw_rec_list *optimize_unw_records PARAMS ((unw_rec_list *));
 static void fixup_unw_records PARAMS ((unw_rec_list *, int));
 static int convert_expr_to_ab_reg PARAMS ((expressionS *, unsigned int *, unsigned int *));
 static int convert_expr_to_xy_reg PARAMS ((expressionS *, unsigned int *, unsigned int *));
-static void generate_unwind_image PARAMS ((const char *));
 static unsigned int get_saved_prologue_count PARAMS ((unsigned long));
 static void save_prologue_count PARAMS ((unsigned long, unsigned int));
 static void free_saved_prologue_counts PARAMS ((void));
 
-/* Build the unwind section name by appending the (possibly stripped)
-   text section NAME to the unwind PREFIX.  The resulting string
-   pointer is assigned to RESULT.  The string is allocated on the
-   stack, so this must be a macro...  */
-#define make_unw_section_name(special, text_name, result)		   \
-  {									   \
-    const char *_prefix = special_section_name[special];		   \
-    const char *_suffix = text_name;					   \
-    size_t _prefix_len, _suffix_len;					   \
-    char *_result;							   \
-    if (strncmp (text_name, ".gnu.linkonce.t.",				   \
-		 sizeof (".gnu.linkonce.t.") - 1) == 0)			   \
-      {									   \
-	_prefix = special_linkonce_name[special - SPECIAL_SECTION_UNWIND]; \
-	_suffix += sizeof (".gnu.linkonce.t.") - 1;			   \
-      }									   \
-    _prefix_len = strlen (_prefix), _suffix_len = strlen (_suffix);	   \
-    _result = alloca (_prefix_len + _suffix_len + 1);		   	   \
-    memcpy (_result, _prefix, _prefix_len);				   \
-    memcpy (_result + _prefix_len, _suffix, _suffix_len);		   \
-    _result[_prefix_len + _suffix_len] = '\0';				   \
-    result = _result;							   \
-  }									   \
-while (0)
-
-/* Determine if application register REGNUM resides in the integer
+/* Determine if application register REGNUM resides only in the integer
    unit (as opposed to the memory unit).  */
 static int
-ar_is_in_integer_unit (reg)
-     int reg;
+ar_is_only_in_integer_unit (int reg)
 {
   reg -= REG_AR;
+  return reg >= 64 && reg <= 111;
+}
 
-  return (reg == 64	/* pfs */
-	  || reg == 65	/* lc */
-	  || reg == 66	/* ec */
-	  /* ??? ias accepts and puts these in the integer unit.  */
-	  || (reg >= 112 && reg <= 127));
+/* Determine if application register REGNUM resides only in the memory 
+   unit (as opposed to the integer unit).  */
+static int
+ar_is_only_in_memory_unit (int reg)
+{
+  reg -= REG_AR;
+  return reg >= 0 && reg <= 47;
 }
 
 /* Switch to section NAME and create section if necessary.  It's
@@ -1018,12 +1001,6 @@ ia64_elf_section_type (str, len)
 
   if (STREQ ("unwind"))
     return SHT_IA_64_UNWIND;
-
-  if (STREQ ("init_array"))
-    return SHT_INIT_ARRAY;
-
-  if (STREQ ("fini_array"))
-    return SHT_FINI_ARRAY;
 
   return -1;
 #undef STREQ
@@ -1839,7 +1816,7 @@ output_rp_psprel (offset)
      unsigned int offset;
 {
   unw_rec_list *ptr = alloc_record (rp_psprel);
-  ptr->r.record.p.pspoff = offset / 4;
+  ptr->r.record.p.pspoff = ENCODED_PSP_OFFSET (offset);
   return ptr;
 }
 
@@ -1873,7 +1850,7 @@ output_pfs_psprel (offset)
      unsigned int offset;
 {
   unw_rec_list *ptr = alloc_record (pfs_psprel);
-  ptr->r.record.p.pspoff = offset / 4;
+  ptr->r.record.p.pspoff = ENCODED_PSP_OFFSET (offset);
   return ptr;
 }
 
@@ -1907,7 +1884,7 @@ output_preds_psprel (offset)
      unsigned int offset;
 {
   unw_rec_list *ptr = alloc_record (preds_psprel);
-  ptr->r.record.p.pspoff = offset / 4;
+  ptr->r.record.p.pspoff = ENCODED_PSP_OFFSET (offset);
   return ptr;
 }
 
@@ -1984,7 +1961,7 @@ output_spill_base (offset)
      unsigned int offset;
 {
   unw_rec_list *ptr = alloc_record (spill_base);
-  ptr->r.record.p.pspoff = offset / 4;
+  ptr->r.record.p.pspoff = ENCODED_PSP_OFFSET (offset);
   return ptr;
 }
 
@@ -2009,7 +1986,7 @@ output_unat_psprel (offset)
      unsigned int offset;
 {
   unw_rec_list *ptr = alloc_record (unat_psprel);
-  ptr->r.record.p.pspoff = offset / 4;
+  ptr->r.record.p.pspoff = ENCODED_PSP_OFFSET (offset);
   return ptr;
 }
 
@@ -2043,7 +2020,7 @@ output_lc_psprel (offset)
      unsigned int offset;
 {
   unw_rec_list *ptr = alloc_record (lc_psprel);
-  ptr->r.record.p.pspoff = offset / 4;
+  ptr->r.record.p.pspoff = ENCODED_PSP_OFFSET (offset);
   return ptr;
 }
 
@@ -2077,7 +2054,7 @@ output_fpsr_psprel (offset)
      unsigned int offset;
 {
   unw_rec_list *ptr = alloc_record (fpsr_psprel);
-  ptr->r.record.p.pspoff = offset / 4;
+  ptr->r.record.p.pspoff = ENCODED_PSP_OFFSET (offset);
   return ptr;
 }
 
@@ -2118,7 +2095,7 @@ output_priunat_psprel (offset)
      unsigned int offset;
 {
   unw_rec_list *ptr = alloc_record (priunat_psprel);
-  ptr->r.record.p.pspoff = offset / 4;
+  ptr->r.record.p.pspoff = ENCODED_PSP_OFFSET (offset);
   return ptr;
 }
 
@@ -2152,7 +2129,7 @@ output_bsp_psprel (offset)
      unsigned int offset;
 {
   unw_rec_list *ptr = alloc_record (bsp_psprel);
-  ptr->r.record.p.pspoff = offset / 4;
+  ptr->r.record.p.pspoff = ENCODED_PSP_OFFSET (offset);
   return ptr;
 }
 
@@ -2186,7 +2163,7 @@ output_bspstore_psprel (offset)
      unsigned int offset;
 {
   unw_rec_list *ptr = alloc_record (bspstore_psprel);
-  ptr->r.record.p.pspoff = offset / 4;
+  ptr->r.record.p.pspoff = ENCODED_PSP_OFFSET (offset);
   return ptr;
 }
 
@@ -2220,7 +2197,7 @@ output_rnat_psprel (offset)
      unsigned int offset;
 {
   unw_rec_list *ptr = alloc_record (rnat_psprel);
-  ptr->r.record.p.pspoff = offset / 4;
+  ptr->r.record.p.pspoff = ENCODED_PSP_OFFSET (offset);
   return ptr;
 }
 
@@ -2277,7 +2254,7 @@ output_spill_psprel (ab, reg, offset)
   unw_rec_list *ptr = alloc_record (spill_psprel);
   ptr->r.record.x.ab = ab;
   ptr->r.record.x.reg = reg;
-  ptr->r.record.x.pspoff = offset / 4;
+  ptr->r.record.x.pspoff = ENCODED_PSP_OFFSET (offset);
   return ptr;
 }
 
@@ -2304,7 +2281,7 @@ output_spill_psprel_p (ab, reg, offset, predicate)
   unw_rec_list *ptr = alloc_record (spill_psprel_p);
   ptr->r.record.x.ab = ab;
   ptr->r.record.x.reg = reg;
-  ptr->r.record.x.pspoff = offset / 4;
+  ptr->r.record.x.pspoff = ENCODED_PSP_OFFSET (offset);
   ptr->r.record.x.qp = predicate;
   return ptr;
 }
@@ -2770,7 +2747,13 @@ fixup_unw_records (list, before_relax)
 	    break;
 	  }
 	case epilogue:
-	  ptr->r.record.b.t = rlen - 1 - t;
+	  if (t < rlen)
+	    ptr->r.record.b.t = rlen - 1 - t;
+	  else
+	    /* This happens when a memory-stack-less procedure uses a
+	       ".restore sp" directive at the end of a region to pop
+	       the frame state.  */
+	    ptr->r.record.b.t = 0;
 	  break;
 
 	case mem_stack_f:
@@ -3315,9 +3298,126 @@ dot_restorereg_p (dummy)
   add_unwind_entry (output_spill_reg_p (ab, reg, 0, 0, qp));
 }
 
+static char *special_linkonce_name[] =
+  {
+    ".gnu.linkonce.ia64unw.", ".gnu.linkonce.ia64unwi."
+  };
+
 static void
-generate_unwind_image (text_name)
-     const char *text_name;
+start_unwind_section (const segT text_seg, int sec_index, int linkonce_empty)
+{
+  /*
+    Use a slightly ugly scheme to derive the unwind section names from
+    the text section name:
+
+    text sect.  unwind table sect.
+    name:       name:                      comments:
+    ----------  -----------------          --------------------------------
+    .text       .IA_64.unwind
+    .text.foo   .IA_64.unwind.text.foo
+    .foo        .IA_64.unwind.foo
+    .gnu.linkonce.t.foo
+		.gnu.linkonce.ia64unw.foo
+    _info       .IA_64.unwind_info         gas issues error message (ditto)
+    _infoFOO    .IA_64.unwind_infoFOO      gas issues error message (ditto)
+
+    This mapping is done so that:
+
+	(a) An object file with unwind info only in .text will use
+	    unwind section names .IA_64.unwind and .IA_64.unwind_info.
+	    This follows the letter of the ABI and also ensures backwards
+	    compatibility with older toolchains.
+
+	(b) An object file with unwind info in multiple text sections
+	    will use separate unwind sections for each text section.
+	    This allows us to properly set the "sh_info" and "sh_link"
+	    fields in SHT_IA_64_UNWIND as required by the ABI and also
+	    lets GNU ld support programs with multiple segments
+	    containing unwind info (as might be the case for certain
+	    embedded applications).
+
+	(c) An error is issued if there would be a name clash.
+  */
+
+  const char *text_name, *sec_text_name;
+  char *sec_name;
+  const char *prefix = special_section_name [sec_index];
+  const char *suffix;
+  size_t prefix_len, suffix_len, sec_name_len;
+
+  sec_text_name = segment_name (text_seg);
+  text_name = sec_text_name;
+  if (strncmp (text_name, "_info", 5) == 0)
+    {
+      as_bad ("Illegal section name `%s' (causes unwind section name clash)",
+	      text_name);
+      ignore_rest_of_line ();
+      return;
+    }
+  if (strcmp (text_name, ".text") == 0)
+    text_name = "";
+
+  /* Build the unwind section name by appending the (possibly stripped)
+     text section name to the unwind prefix.  */
+  suffix = text_name;
+  if (strncmp (text_name, ".gnu.linkonce.t.",
+	       sizeof (".gnu.linkonce.t.") - 1) == 0)
+    {
+      prefix = special_linkonce_name [sec_index - SPECIAL_SECTION_UNWIND];
+      suffix += sizeof (".gnu.linkonce.t.") - 1;
+    }
+  else if (linkonce_empty)
+    return;
+
+  prefix_len = strlen (prefix);
+  suffix_len = strlen (suffix);
+  sec_name_len = prefix_len + suffix_len;
+  sec_name = alloca (sec_name_len + 1);
+  memcpy (sec_name, prefix, prefix_len);
+  memcpy (sec_name + prefix_len, suffix, suffix_len);
+  sec_name [sec_name_len] = '\0';
+
+  /* Handle COMDAT group.  */
+  if (suffix == text_name && (text_seg->flags & SEC_LINK_ONCE) != 0)
+    {
+      char *section;
+      size_t len, group_name_len;
+      const char *group_name = elf_group_name (text_seg);
+
+      if (group_name == NULL)
+	{
+	  as_bad ("Group section `%s' has no group signature",
+		  sec_text_name);
+	  ignore_rest_of_line ();
+	  return;
+	}
+      /* We have to construct a fake section directive. */
+      group_name_len = strlen (group_name);
+      len = (sec_name_len
+	     + 16			/* ,"aG",@progbits,  */
+	     + group_name_len		/* ,group_name  */
+	     + 7);			/* ,comdat  */
+
+      section = alloca (len + 1);
+      memcpy (section, sec_name, sec_name_len);
+      memcpy (section + sec_name_len, ",\"aG\",@progbits,", 16);
+      memcpy (section + sec_name_len + 16, group_name, group_name_len);
+      memcpy (section + len - 7, ",comdat", 7);
+      section [len] = '\0';
+      set_section (section);
+    }
+  else
+    {
+      set_section (sec_name);
+      bfd_set_section_flags (stdoutput, now_seg,
+			     SEC_LOAD | SEC_ALLOC | SEC_READONLY);
+    }
+
+  elf_linked_to_section (now_seg) = text_seg;
+}
+
+static void
+generate_unwind_image (const segT text_seg)
 {
   int size, pad;
   unw_rec_list *list;
@@ -3350,14 +3450,10 @@ generate_unwind_image (text_name)
   /* If there are unwind records, switch sections, and output the info.  */
   if (size != 0)
     {
-      char *sec_name;
       expressionS exp;
       bfd_reloc_code_real_type reloc;
 
-      make_unw_section_name (SPECIAL_SECTION_UNWIND_INFO, text_name, sec_name);
-      set_section (sec_name);
-      bfd_set_section_flags (stdoutput, now_seg,
-			     SEC_LOAD | SEC_ALLOC | SEC_READONLY);
+      start_unwind_section (text_seg, SPECIAL_SECTION_UNWIND_INFO, 0);
 
       /* Make sure the section has 4 byte alignment for ILP32 and
 	 8 byte alignment for LP64.  */
@@ -3368,7 +3464,8 @@ generate_unwind_image (text_name)
       unwind.info = expr_build_dot ();
       
       frag_var (rs_machine_dependent, size, size, 0, 0,
-		(offsetT) unwind.personality_routine, (char *) list);
+		(offsetT) (long) unwind.personality_routine,
+		(char *) list);
 
       /* Add the personality address to the image.  */
       if (unwind.personality_routine != 0)
@@ -3397,6 +3494,8 @@ generate_unwind_image (text_name)
 	  unwind.personality_routine = 0;
 	}
     }
+  else
+    start_unwind_section (text_seg, SPECIAL_SECTION_UNWIND_INFO, 1);
 
   free_saved_prologue_counts ();
   unwind.list = unwind.tail = unwind.current_entry = NULL;
@@ -3406,13 +3505,6 @@ static void
 dot_handlerdata (dummy)
      int dummy ATTRIBUTE_UNUSED;
 {
-  const char *text_name = segment_name (now_seg);
-
-  /* If text section name starts with ".text" (which it should),
-     strip this prefix off.  */
-  if (strcmp (text_name, ".text") == 0)
-    text_name = "";
-
   unwind.force_unwind_entry = 1;
 
   /* Remember which segment we're in so we can switch back after .endp */
@@ -3422,7 +3514,7 @@ dot_handlerdata (dummy)
   /* Generate unwind info into unwind-info section and then leave that
      section as the currently active one so dataXX directives go into
      the language specific data area of the unwind info block.  */
-  generate_unwind_image (text_name);
+  generate_unwind_image (now_seg);
   demand_empty_rest_of_line ();
 }
 
@@ -4057,7 +4149,6 @@ dot_endp (dummy)
   long where;
   segT saved_seg;
   subsegT saved_subseg;
-  const char *sec_name, *text_name;
   char *name, *p, c;
   symbolS *sym;
 
@@ -4073,64 +4164,18 @@ dot_endp (dummy)
       saved_subseg = now_subseg;
     }
 
-  /*
-    Use a slightly ugly scheme to derive the unwind section names from
-    the text section name:
-
-    text sect.  unwind table sect.
-    name:       name:                      comments:
-    ----------  -----------------          --------------------------------
-    .text       .IA_64.unwind
-    .text.foo   .IA_64.unwind.text.foo
-    .foo        .IA_64.unwind.foo
-    .gnu.linkonce.t.foo
-		.gnu.linkonce.ia64unw.foo
-    _info       .IA_64.unwind_info         gas issues error message (ditto)
-    _infoFOO    .IA_64.unwind_infoFOO      gas issues error message (ditto)
-
-    This mapping is done so that:
-
-	(a) An object file with unwind info only in .text will use
-	    unwind section names .IA_64.unwind and .IA_64.unwind_info.
-	    This follows the letter of the ABI and also ensures backwards
-	    compatibility with older toolchains.
-
-	(b) An object file with unwind info in multiple text sections
-	    will use separate unwind sections for each text section.
-	    This allows us to properly set the "sh_info" and "sh_link"
-	    fields in SHT_IA_64_UNWIND as required by the ABI and also
-	    lets GNU ld support programs with multiple segments
-	    containing unwind info (as might be the case for certain
-	    embedded applications).
-
-	(c) An error is issued if there would be a name clash.
-  */
-  text_name = segment_name (saved_seg);
-  if (strncmp (text_name, "_info", 5) == 0)
-    {
-      as_bad ("Illegal section name `%s' (causes unwind section name clash)",
-	      text_name);
-      ignore_rest_of_line ();
-      return;
-    }
-  if (strcmp (text_name, ".text") == 0)
-    text_name = "";
-
   insn_group_break (1, 0, 0);
 
   /* If there wasn't a .handlerdata, we haven't generated an image yet.  */
   if (!unwind.info)
-    generate_unwind_image (text_name);
+    generate_unwind_image (saved_seg);
 
   if (unwind.info || unwind.force_unwind_entry)
     {
       subseg_set (md.last_text_seg, 0);
       unwind.proc_end = expr_build_dot ();
 
-      make_unw_section_name (SPECIAL_SECTION_UNWIND, text_name, sec_name);
-      set_section ((char *) sec_name);
-      bfd_set_section_flags (stdoutput, now_seg,
-			     SEC_LOAD | SEC_ALLOC | SEC_READONLY);
+      start_unwind_section (saved_seg, SPECIAL_SECTION_UNWIND, 0);
 
       /* Make sure that section has 4 byte alignment for ILP32 and
          8 byte alignment for LP64.  */
@@ -4170,6 +4215,9 @@ dot_endp (dummy)
 			    bytes_per_address);
 
     }
+  else
+    start_unwind_section (saved_seg, SPECIAL_SECTION_UNWIND, 1);
+
   subseg_set (saved_seg, saved_subseg);
 
   /* Parse names of main and alternate entry points and set symbol sizes.  */
@@ -4378,8 +4426,7 @@ dot_byteorder (byteorder)
   if (byteorder == -1)
     {
       if (seginfo->tc_segment_info_data.endian == 0)
-	seginfo->tc_segment_info_data.endian
-	  = TARGET_BYTES_BIG_ENDIAN ? 1 : 2;
+	seginfo->tc_segment_info_data.endian = default_big_endian ? 1 : 2;
       byteorder = seginfo->tc_segment_info_data.endian == 1;
     }
   else
@@ -4624,6 +4671,23 @@ dot_reg_val (dummy)
 	  gr_values[regno - REG_GR].path = md.path;
 	}
     }
+  demand_empty_rest_of_line ();
+}
+
+/*
+  .serialize.data
+  .serialize.instruction
+ */
+static void
+dot_serialize (type)
+     int type;
+{
+  insn_group_break (0, 0, 0);
+  if (type)
+    instruction_serialization ();
+  else
+    data_serialization ();
+  insn_group_break (0, 0, 0);
   demand_empty_rest_of_line ();
 }
 
@@ -5009,6 +5073,8 @@ const pseudo_typeS md_pseudo_table[] =
     { "pred.rel.mutex", dot_pred_rel, 'm' },
     { "pred.safe_across_calls", dot_pred_rel, 's' },
     { "reg.val", dot_reg_val, 0 },
+    { "serialize.data", dot_serialize, 0 },
+    { "serialize.instruction", dot_serialize, 1 },
     { "auto", dot_dv_mode, 'a' },
     { "explicit", dot_dv_mode, 'e' },
     { "default", dot_dv_mode, 'd' },
@@ -6082,6 +6148,7 @@ emit_one_bundle ()
   char mnemonic[16];
   fixS *fix;
   char *f;
+  int addr_mod;
 
   first = (md.curr_slot + NUM_SLOTS - md.num_slots_in_use) % NUM_SLOTS;
   know (first >= 0 & first < NUM_SLOTS);
@@ -6112,6 +6179,14 @@ emit_one_bundle ()
     insn[i] = nop[ia64_templ_desc[template].exec_unit[i]];
 
   f = frag_more (16);
+
+  /* Check to see if this bundle is at an offset that is a multiple of 16-bytes
+     from the start of the frag.  */
+  addr_mod = frag_now_fix () & 15;
+  if (frag_now->has_code && frag_now->insn_addr != addr_mod)
+    as_bad (_("instruction address is not a multiple of 16"));
+  frag_now->insn_addr = addr_mod;
+  frag_now->has_code = 1;
 
   /* now fill in slots with as many insns as possible:  */
   curr = first;
@@ -6427,9 +6502,12 @@ emit_one_bundle ()
   if (manual_bundling)
     {
       if (md.num_slots_in_use > 0)
-	as_bad_where (md.slot[curr].src_file, md.slot[curr].src_line,
-		      "`%s' does not fit into %s template",
-		      idesc->name, ia64_templ_desc[template].name);
+	{
+	  as_bad_where (md.slot[curr].src_file, md.slot[curr].src_line,
+			"`%s' does not fit into %s template",
+			idesc->name, ia64_templ_desc[template].name);
+	  --md.num_slots_in_use;
+	}
       else
 	as_bad_where (md.slot[curr].src_file, md.slot[curr].src_line,
 		      "Missing '}' at end of file");
@@ -6472,10 +6550,12 @@ md_parse_option (c, arg)
       else if (strcmp (arg, "le") == 0)
 	{
 	  md.flags &= ~EF_IA_64_BE;
+	  default_big_endian = 0;
 	}
       else if (strcmp (arg, "be") == 0)
 	{
 	  md.flags |= EF_IA_64_BE;
+	  default_big_endian = 1;
 	}
       else
 	return 0;
@@ -6648,7 +6728,7 @@ md_begin ()
 
   /* Make sure function pointers get initialized.  */
   target_big_endian = -1;
-  dot_byteorder (TARGET_BYTES_BIG_ENDIAN);
+  dot_byteorder (default_big_endian);
 
   alias_hash = hash_new ();
   alias_name_hash = hash_new ();
@@ -9513,17 +9593,15 @@ remove_marked_resource (rs)
 	insn_group_break (1, 0, 0);
       if (rs->insn_srlz < STATE_SRLZ)
 	{
-	  int oldqp = CURR_SLOT.qp_regno;
-	  struct ia64_opcode *oldidesc = CURR_SLOT.idesc;
+	  struct slot oldslot = CURR_SLOT;
 	  /* Manually jam a srlz.i insn into the stream */
-	  CURR_SLOT.qp_regno = 0;
+	  memset (&CURR_SLOT, 0, sizeof (CURR_SLOT));
 	  CURR_SLOT.idesc = ia64_find_opcode ("srlz.i");
 	  instruction_serialization ();
 	  md.curr_slot = (md.curr_slot + 1) % NUM_SLOTS;
 	  if (++md.num_slots_in_use >= NUM_SLOTS)
 	    emit_one_bundle ();
-	  CURR_SLOT.qp_regno = oldqp;
-	  CURR_SLOT.idesc = oldidesc;
+	  CURR_SLOT = oldslot;
 	}
       insn_group_break (1, 0, 0);
       break;
@@ -9536,17 +9614,15 @@ remove_marked_resource (rs)
       if (rs->data_srlz < STATE_STOP)
 	insn_group_break (1, 0, 0);
       {
-	int oldqp = CURR_SLOT.qp_regno;
-	struct ia64_opcode *oldidesc = CURR_SLOT.idesc;
+	struct slot oldslot = CURR_SLOT;
 	/* Manually jam a srlz.d insn into the stream */
-	CURR_SLOT.qp_regno = 0;
+	memset (&CURR_SLOT, 0, sizeof (CURR_SLOT));
 	CURR_SLOT.idesc = ia64_find_opcode ("srlz.d");
 	data_serialization ();
 	md.curr_slot = (md.curr_slot + 1) % NUM_SLOTS;
 	if (++md.num_slots_in_use >= NUM_SLOTS)
 	  emit_one_bundle ();
-	CURR_SLOT.qp_regno = oldqp;
-	CURR_SLOT.idesc = oldidesc;
+	CURR_SLOT = oldslot;
       }
       break;
     case IA64_DVS_IMPLIED:
@@ -9977,17 +10053,48 @@ md_assemble (str)
 	    rop = 1;
 	  else
 	    abort ();
-	  if (CURR_SLOT.opnd[rop].X_op == O_register
-	      && ar_is_in_integer_unit (CURR_SLOT.opnd[rop].X_add_number))
-	    mnemonic = "mov.i";
+	  if (CURR_SLOT.opnd[rop].X_op == O_register)
+	    {
+	      if (ar_is_only_in_integer_unit (CURR_SLOT.opnd[rop].X_add_number))
+		mnemonic = "mov.i";
+	      else
+		mnemonic = "mov.m";
+	    }
 	  else
-	    mnemonic = "mov.m";
+	    abort ();
 	  ia64_free_opcode (idesc);
 	  idesc = ia64_find_opcode (mnemonic);
 	  while (idesc != NULL
 		 && (idesc->operands[0] != opnd1
 		     || idesc->operands[1] != opnd2))
 	    idesc = get_next_opcode (idesc);
+	}
+    }
+  else if (strcmp (idesc->name, "mov.i") == 0
+	   || strcmp (idesc->name, "mov.m") == 0)
+    {
+      enum ia64_opnd opnd1, opnd2;
+      int rop;
+      
+      opnd1 = idesc->operands[0];
+      opnd2 = idesc->operands[1];
+      if (opnd1 == IA64_OPND_AR3)
+	rop = 0;
+      else if (opnd2 == IA64_OPND_AR3)
+	rop = 1;
+      else
+	abort ();
+      if (CURR_SLOT.opnd[rop].X_op == O_register)
+	{
+	  char unit = 'a';
+	  if (ar_is_only_in_integer_unit (CURR_SLOT.opnd[rop].X_add_number))
+	    unit = 'i';
+	  else if (ar_is_only_in_memory_unit (CURR_SLOT.opnd[rop].X_add_number))
+	    unit = 'm';
+	  if (unit != 'a' && unit != idesc->name [4])
+	    as_bad ("AR %d cannot be accessed by %c-unit",
+		    (int) (CURR_SLOT.opnd[rop].X_add_number - REG_AR),
+		    TOUPPER (unit));
 	}
     }
 
@@ -10934,6 +11041,9 @@ ia64_float_to_chars_littleendian (char *lit, LITTLENUM_TYPE *words,
 void
 ia64_elf_section_change_hook  (void)
 {
+  if (elf_section_type (now_seg) == SHT_IA_64_UNWIND
+      && elf_linked_to_section (now_seg) == NULL)
+    elf_linked_to_section (now_seg) = text_section;
   dot_byteorder (-1);
 }
 

@@ -1,6 +1,6 @@
 /* objdump.c -- dump information about an object file.
    Copyright 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-   2000, 2001, 2002, 2003
+   2000, 2001, 2002, 2003, 2004
    Free Software Foundation, Inc.
 
    This file is part of GNU Binutils.
@@ -102,6 +102,7 @@ static bfd_vma start_address = (bfd_vma) -1; /* --start-address */
 static bfd_vma stop_address = (bfd_vma) -1;  /* --stop-address */
 static int dump_debugging;		/* --debugging */
 static int dump_debugging_tags;		/* --debugging-tags */
+static int dump_special_syms = 0;	/* --special-syms */
 static bfd_vma adjust_section_vma = 0;	/* --adjust-vma */
 static int file_start_context = 0;      /* --file-start-context */
 
@@ -152,6 +153,10 @@ static long sorted_symcount = 0;
 
 /* The dynamic symbol table.  */
 static asymbol **dynsyms;
+
+/* The synthetic symbol table.  */
+static asymbol *synthsyms;
+static long synthcount = 0;
 
 /* Number of symbols in `dynsyms'.  */
 static long dynsymcount = 0;
@@ -213,6 +218,7 @@ usage (FILE *stream, int status)
       --prefix-addresses         Print complete address alongside disassembly\n\
       --[no-]show-raw-insn       Display hex alongside symbolic disassembly\n\
       --adjust-vma=OFFSET        Add OFFSET to all displayed section addresses\n\
+      --special-syms             Include special symbols in symbol dumps\n\
 \n"));
       list_supported_targets (program_name, stream);
       list_supported_architectures (program_name, stream);
@@ -264,6 +270,7 @@ static struct option long_options[]=
   {"section-headers", no_argument, NULL, 'h'},
   {"show-raw-insn", no_argument, &show_raw_insn, 1},
   {"source", no_argument, NULL, 'S'},
+  {"special-syms", no_argument, &dump_special_syms, 1},
   {"include", required_argument, NULL, 'I'},
   {"stabs", no_argument, NULL, 'G'},
   {"start-address", required_argument, NULL, OPTION_START_ADDRESS},
@@ -327,6 +334,7 @@ dump_section_header (bfd *abfd ATTRIBUTE_UNUSED, asection *section,
   if ((section->flags & SEC_LINK_ONCE) != 0)
     {
       const char *ls;
+      struct coff_comdat_info *comdat;
 
       switch (section->flags & SEC_LINK_DUPLICATES)
 	{
@@ -347,9 +355,9 @@ dump_section_header (bfd *abfd ATTRIBUTE_UNUSED, asection *section,
 	}
       printf ("%s%s", comma, ls);
 
-      if (section->comdat != NULL)
-	printf (" (COMDAT %s %ld)", section->comdat->name,
-		section->comdat->symbol);
+      comdat = bfd_coff_get_comdat_section (abfd, section);
+      if (comdat != NULL)
+	printf (" (COMDAT %s %ld)", comdat->name, comdat->symbol);
 
       comma = ", ";
     }
@@ -1142,8 +1150,8 @@ show_line (bfd *abfd, asection *section, bfd_vma addr_offset)
 typedef struct
 {
   char *buffer;
-  size_t size;
-  char *current;
+  size_t pos;
+  size_t alloc;
 } SFILE;
 
 /* sprintf to a "stream".  */
@@ -1151,39 +1159,25 @@ typedef struct
 static int
 objdump_sprintf (SFILE *f, const char *format, ...)
 {
-  char *buf;
   size_t n;
   va_list args;
 
-  va_start (args, format);
-
-  vasprintf (&buf, format, args);
-
-  if (buf == NULL)
+  while (1)
     {
+      size_t space = f->alloc - f->pos;
+  
+      va_start (args, format);
+      n = vsnprintf (f->buffer + f->pos, space, format, args);
       va_end (args);
-      fatal (_("Out of virtual memory"));
+
+      if (space > n)
+	break;
+      
+      f->alloc = (f->alloc + n) * 2;
+      f->buffer = xrealloc (f->buffer, f->alloc);
     }
-
-  n = strlen (buf);
-
-  while ((size_t) ((f->buffer + f->size) - f->current) < n + 1)
-    {
-      size_t curroff;
-
-      curroff = f->current - f->buffer;
-      f->size *= 2;
-      f->buffer = xrealloc (f->buffer, f->size);
-      f->current = f->buffer + curroff;
-    }
-
-  memcpy (f->current, buf, n);
-  f->current += n;
-  f->current[0] = '\0';
-
-  free (buf);
-
-  va_end (args);
+  f->pos += n;
+  
   return n;
 }
 
@@ -1243,10 +1237,15 @@ disassemble_bytes (struct disassemble_info * info,
   int skip_addr_chars;
   bfd_vma addr_offset;
   int opb = info->octets_per_byte;
+  SFILE sfile;
 
   aux = (struct objdump_disasm_info *) info->application_data;
   section = aux->sec;
 
+  sfile.alloc = 120;
+  sfile.buffer = xmalloc (sfile.alloc);
+  sfile.pos = 0;
+  
   if (insns)
     octets_per_line = 4;
   else
@@ -1311,7 +1310,6 @@ disassemble_bytes (struct disassemble_info * info,
       else
 	{
 	  char buf[50];
-	  SFILE sfile;
 	  int bpc = 0;
 	  int pb = 0;
 
@@ -1344,9 +1342,7 @@ disassemble_bytes (struct disassemble_info * info,
 
 	  if (insns)
 	    {
-	      sfile.size = 120;
-	      sfile.buffer = xmalloc (sfile.size);
-	      sfile.current = sfile.buffer;
+	      sfile.pos = 0;
 	      info->fprintf_func = (fprintf_ftype) objdump_sprintf;
 	      info->stream = (FILE *) &sfile;
 	      info->bytes_per_line = 0;
@@ -1371,9 +1367,8 @@ disassemble_bytes (struct disassemble_info * info,
 		octets_per_line = info->bytes_per_line;
 	      if (octets < 0)
 		{
-		  if (sfile.current != sfile.buffer)
+		  if (sfile.pos)
 		    printf ("%s\n", sfile.buffer);
-		  free (sfile.buffer);
 		  break;
 		}
 	    }
@@ -1415,6 +1410,7 @@ disassemble_bytes (struct disassemble_info * info,
 	      for (j = addr_offset * opb; j < addr_offset * opb + pb; j += bpc)
 		{
 		  int k;
+
 		  if (bpc > 1 && info->display_endian == BFD_ENDIAN_LITTLE)
 		    {
 		      for (k = bpc - 1; k >= 0; k--)
@@ -1447,11 +1443,8 @@ disassemble_bytes (struct disassemble_info * info,
 
 	  if (! insns)
 	    printf ("%s", buf);
-	  else
-	    {
-	      printf ("%s", sfile.buffer);
-	      free (sfile.buffer);
-	    }
+	  else if (sfile.pos)
+	    printf ("%s", sfile.buffer);
 
 	  if (prefix_addresses
 	      ? show_raw_insn > 0
@@ -1558,6 +1551,8 @@ disassemble_bytes (struct disassemble_info * info,
 
       addr_offset += octets / opb;
     }
+
+  free (sfile.buffer);
 }
 
 static void
@@ -1582,13 +1577,14 @@ disassemble_section (bfd *abfd, asection *section, void *info)
      code are not normally disassembled.  */
   if (! disassemble_all
       && only == NULL
-      && (section->flags & SEC_CODE) == 0)
+      && ((section->flags & (SEC_CODE | SEC_HAS_CONTENTS))
+	  != (SEC_CODE | SEC_HAS_CONTENTS)))
     return;
 
   if (! process_section_p (section))
     return;
 
-  datasize = bfd_get_section_size_before_reloc (section);
+  datasize = bfd_get_section_size (section);
   if (datasize == 0)
     return;
 
@@ -1789,6 +1785,7 @@ disassemble_data (bfd *abfd)
 {
   struct disassemble_info disasm_info;
   struct objdump_disasm_info aux;
+  long i;
 
   print_files = NULL;
   prev_functionname = NULL;
@@ -1796,10 +1793,18 @@ disassemble_data (bfd *abfd)
 
   /* We make a copy of syms to sort.  We don't want to sort syms
      because that will screw up the relocs.  */
-  sorted_syms = xmalloc (symcount * sizeof (asymbol *));
-  memcpy (sorted_syms, syms, symcount * sizeof (asymbol *));
+  sorted_symcount = symcount ? symcount : dynsymcount;
+  sorted_syms = xmalloc ((sorted_symcount + synthcount) * sizeof (asymbol *));
+  memcpy (sorted_syms, symcount ? syms : dynsyms,
+	  sorted_symcount * sizeof (asymbol *));
 
-  sorted_symcount = remove_useless_symbols (sorted_syms, symcount);
+  sorted_symcount = remove_useless_symbols (sorted_syms, sorted_symcount);
+
+  for (i = 0; i < synthcount; ++i)
+    {
+      sorted_syms[sorted_symcount] = synthsyms + i;
+      ++sorted_symcount;
+    }
 
   /* Sort the symbols into section and symbol order.  */
   qsort (sorted_syms, sorted_symcount, sizeof (asymbol *), compare_symbols);
@@ -2275,13 +2280,14 @@ dump_symbols (bfd *abfd ATTRIBUTE_UNUSED, bfd_boolean dynamic)
       bfd *cur_bfd;
 
       if (*current == NULL)
-	printf (_("no information for the %ld'th symbol"), count);
+	printf (_("no information for symbol number %ld\n"), count);
 
       else if ((cur_bfd = bfd_asymbol_bfd (*current)) == NULL)
-	printf (_("could not determine the type of the %ld'th symbol"),
+	printf (_("could not determine the type of symbol number %ld\n"),
 		count);
 
-      else
+      else if (dump_special_syms
+	       || !bfd_is_target_special_symbol (cur_bfd, *current))
 	{
 	  const char *name = (*current)->name;
 
@@ -2302,9 +2308,8 @@ dump_symbols (bfd *abfd ATTRIBUTE_UNUSED, bfd_boolean dynamic)
 	  else
 	    bfd_print_symbol (cur_bfd, stdout, *current,
 			      bfd_print_symbol_all);
+	  printf ("\n");
 	}
-
-      printf ("\n");
       current++;
     }
   printf ("\n\n");
@@ -2559,8 +2564,16 @@ dump_bfd (bfd *abfd)
 
   if (dump_symtab || dump_reloc_info || disassemble || dump_debugging)
     syms = slurp_symtab (abfd);
-  if (dump_dynamic_symtab || dump_dynamic_reloc_info)
+  if (dump_dynamic_symtab || dump_dynamic_reloc_info
+      || (disassemble && bfd_get_dynamic_symtab_upper_bound (abfd) > 0))
     dynsyms = slurp_dynamic_symtab (abfd);
+  if (disassemble)
+    {
+      synthcount = bfd_get_synthetic_symtab (abfd, symcount, syms,
+					     dynsymcount, dynsyms, &synthsyms);
+      if (synthcount < 0)
+	synthcount = 0;
+    }
 
   if (dump_symtab)
     dump_symbols (abfd, FALSE);
@@ -2605,6 +2618,16 @@ dump_bfd (bfd *abfd)
       free (dynsyms);
       dynsyms = NULL;
     }
+
+  if (synthsyms)
+    {
+      free (synthsyms);
+      synthsyms = NULL;
+    }
+
+  symcount = 0;
+  dynsymcount = 0;
+  synthcount = 0;
 }
 
 static void

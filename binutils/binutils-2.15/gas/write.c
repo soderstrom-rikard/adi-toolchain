@@ -1,6 +1,6 @@
 /* write.c - emit .o file
    Copyright 1986, 1987, 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997,
-   1998, 1999, 2000, 2001, 2002, 2003
+   1998, 1999, 2000, 2001, 2002, 2003, 2004
    Free Software Foundation, Inc.
 
    This file is part of GAS, the GNU Assembler.
@@ -95,11 +95,6 @@
 
 #ifndef	MD_PCREL_FROM_SECTION
 #define MD_PCREL_FROM_SECTION(FIX, SEC) md_pcrel_from (FIX)
-#endif
-
-#ifndef WORKING_DOT_WORD
-extern const int md_short_jump_size;
-extern const int md_long_jump_size;
 #endif
 
 /* Used to control final evaluation of expressions.  */
@@ -616,6 +611,9 @@ cvt_frag_to_fill (object_headers *headersP, segT sec, fragS *fragP)
       BAD_CASE (fragP->fr_type);
       break;
     }
+#ifdef md_frag_check
+  md_frag_check (fragP);
+#endif
 }
 
 #endif /* defined (BFD_ASSEMBLER) || !defined (BFD)  */
@@ -2409,7 +2407,7 @@ relax_segment (struct frag *segment_frag_root, segT segment)
 		      fragP->fr_type = rs_align;
 		      fragP->fr_subtype = 0;
 		      fragP->fr_offset = 0;
-		      fragP->fr_fix = after - address;
+		      fragP->fr_fix = after - was_address;
 		      growth = stretch;
 		    }
 

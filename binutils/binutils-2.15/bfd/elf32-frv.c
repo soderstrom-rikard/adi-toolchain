@@ -661,17 +661,7 @@ frvfdpic_elf_link_hash_table_create (bfd *abfd)
    its function descriptor must be assigned by the dynamic linker.  */
 #define FRVFDPIC_SYM_LOCAL(INFO, H) \
   (_bfd_elf_symbol_refs_local_p ((H), (INFO), 1) \
-   || ! elf_hash_table (INFO)->dynamic_sections_created \
-   || (/* The condition below is an ugly hack to get .scommon data to
-	  be regarded as local.  For some reason the
-	  ELF_LINK_HASH_DEF_REGULAR bit is not set on such common
-	  symbols, and the SEC_IS_COMMON bit is not set any longer
-	  when we need to perform this test.  Hopefully this
-	  approximation is good enough.  */ \
-       ((H)->root.type == bfd_link_hash_defined \
-	|| (H)->root.type == bfd_link_hash_defweak) \
-       && (H)->root.u.def.section->output_section \
-       && ((H)->root.u.def.section->flags & SEC_LINKER_CREATED)))
+   || ! elf_hash_table (INFO)->dynamic_sections_created)
 #define FRVFDPIC_FUNCDESC_LOCAL(INFO, H) \
   ((H)->dynindx == -1 || ! elf_hash_table (INFO)->dynamic_sections_created)
 
@@ -842,7 +832,7 @@ frvfdpic_relocs_info_for_global (struct htab *ht,
 
 /* Obtain the address of the entry in HT associated with the SYMNDXth
    local symbol of the input bfd ABFD, plus the addend, creating a new
-   entry if none existed.  */  
+   entry if none existed.  */
 inline static struct frvfdpic_relocs_info *
 frvfdpic_relocs_info_for_local (struct htab *ht,
 				bfd *abfd,
@@ -934,13 +924,23 @@ _frvfdpic_add_dyn_reloc (bfd *output_bfd, asection *sreloc, bfd_vma offset,
   outrel.r_addend = addend;
 
   reloc_offset = sreloc->reloc_count * sizeof (Elf32_External_Rel);
-  BFD_ASSERT (reloc_offset < sreloc->_raw_size);
+  BFD_ASSERT (reloc_offset < sreloc->size);
   bfd_elf32_swap_reloc_out (output_bfd, &outrel,
 			    sreloc->contents + reloc_offset);
   sreloc->reloc_count++;
 
-  BFD_ASSERT (entry->dynrelocs > 0);
-  entry->dynrelocs--;
+  /* If the entry's index is zero, this relocation was probably to a
+     linkonce section that got discarded.  We reserved a dynamic
+     relocation, but it was for another entry than the one we got at
+     the time of emitting the relocation.  Unfortunately there's no
+     simple way for us to catch this situation, since the relocation
+     is cleared right before calling relocate_section, at which point
+     we no longer know what the relocation used to point to.  */
+  if (entry->symndx)
+    {
+      BFD_ASSERT (entry->dynrelocs > 0);
+      entry->dynrelocs--;
+    }
 
   return reloc_offset;
 }
@@ -959,13 +959,15 @@ _frvfdpic_add_rofixup (bfd *output_bfd, asection *rofixup, bfd_vma offset,
   fixup_offset = rofixup->reloc_count * 4;
   if (rofixup->contents)
     {
-      BFD_ASSERT (fixup_offset < rofixup->_raw_size);
+      BFD_ASSERT (fixup_offset < rofixup->size);
       bfd_put_32 (output_bfd, offset, rofixup->contents + fixup_offset);
     }
   rofixup->reloc_count++;
 
-  if (entry)
+  if (entry && entry->symndx)
     {
+      /* See discussion about symndx == 0 in _frvfdpic_add_dyn_reloc
+	 above.  */
       BFD_ASSERT (entry->fixups > 0);
       entry->fixups--;
     }
@@ -1019,7 +1021,7 @@ _frvfdpic_emit_got_relocs_plt_entries (struct frvfdpic_relocs_info *entry,
 				       asection *sec,
 				       Elf_Internal_Sym *sym,
 				       bfd_vma addend)
-				  
+
 {
   bfd_vma fd_lazy_rel_offset = (bfd_vma)-1;
   int dynindx = -1;
@@ -1097,7 +1099,7 @@ _frvfdpic_emit_got_relocs_plt_entries (struct frvfdpic_relocs_info *entry,
 				 ->output_section->vma
 				 + frvfdpic_got_section (info)->output_offset,
 				 R_FRV_32, idx, ad, entry);
-	
+
       bfd_put_32 (output_bfd, ad,
 		  frvfdpic_got_section (info)->contents
 		  + frvfdpic_got_initial_offset (info)
@@ -1110,7 +1112,7 @@ _frvfdpic_emit_got_relocs_plt_entries (struct frvfdpic_relocs_info *entry,
     {
       int reloc, idx;
       bfd_vma ad = 0;
-      
+
       if (! (entry->symndx == -1
 	     && entry->d.h->root.type == bfd_link_hash_undefweak
 	     && FRVFDPIC_SYM_LOCAL (info, entry->d.h)))
@@ -1283,7 +1285,7 @@ _frvfdpic_emit_got_relocs_plt_entries (struct frvfdpic_relocs_info *entry,
 	{
 	  if (ad)
 	    return FALSE;
-	  
+
 	  fd_lazy_rel_offset = ofst;
 
 	  /* A function descriptor used for lazy or local resolving is
@@ -1295,7 +1297,7 @@ _frvfdpic_emit_got_relocs_plt_entries (struct frvfdpic_relocs_info *entry,
 	  lowword = entry->lzplt_entry + 4
 	    + frvfdpic_plt_section (info)->output_offset
 	    + frvfdpic_plt_section (info)->output_section->vma;
-	  highword = _frvfdpic_osec_to_segment 
+	  highword = _frvfdpic_osec_to_segment
 	    (output_bfd, frvfdpic_plt_section (info)->output_section);
 	}
       else
@@ -2040,9 +2042,8 @@ elf32_frv_relocate_section (output_bfd, info, input_bfd, input_section,
 						      rel->r_addend))
 	    {
 	      (*_bfd_error_handler)
-		(_("%s: relocation at `%s+0x%x' references symbol `%s' with nonzero addend"),
-		 bfd_archive_filename (input_bfd), input_section->name,
-		 rel->r_offset, name);
+		(_("%B: relocation at `%A+0x%x' references symbol `%s' with nonzero addend"),
+		 input_bfd, input_section, rel->r_offset, name);
 	      return FALSE;
 
 	    }
@@ -2094,14 +2095,14 @@ elf32_frv_relocate_section (output_bfd, info, input_bfd, input_section,
 	  relocation = picrel->got_entry;
 	  check_segment[0] = check_segment[1] = got_segment;
 	  break;
-	  
+
 	case R_FRV_FUNCDESC_GOT12:
 	case R_FRV_FUNCDESC_GOTHI:
 	case R_FRV_FUNCDESC_GOTLO:
 	  relocation = picrel->fdgot_entry;
 	  check_segment[0] = check_segment[1] = got_segment;
 	  break;
-	  
+
 	case R_FRV_GOTOFFHI:
 	case R_FRV_GOTOFF12:
 	case R_FRV_GOTOFFLO:
@@ -2478,7 +2479,7 @@ elf32_frv_relocate_section (output_bfd, info, input_bfd, input_section,
 	  if (! IS_FDPIC (output_bfd) || ! picrel->plt)
 	    break;
 	  /* Fall through.  */
-	  
+
 	  /* When referencing a GOT entry, a function descriptor or a
 	     PLT, we don't want the addend to apply to the reference,
 	     but rather to the referenced symbol.  The actual entry
@@ -2496,7 +2497,7 @@ elf32_frv_relocate_section (output_bfd, info, input_bfd, input_section,
 	  /* Note that we only want GOTOFFHI, not GOTOFFLO or GOTOFF12
 	     here, since we do want to apply the addend to the others.
 	     Note that we've applied the addend to GOTOFFHI before we
-	     shifted it right.  */ 
+	     shifted it right.  */
 	case R_FRV_GOTOFFHI:
 	  relocation -= rel->r_addend;
 	  break;
@@ -2543,8 +2544,8 @@ elf32_frv_relocate_section (output_bfd, info, input_bfd, input_section,
 	    {
 	    case bfd_reloc_overflow:
 	      r = info->callbacks->reloc_overflow
-		(info, name, howto->name, (bfd_vma) 0,
-		 input_bfd, input_section, rel->r_offset);
+		(info, (h ? &h->root : NULL), name, howto->name,
+		 (bfd_vma) 0, input_bfd, input_section, rel->r_offset);
 	      break;
 
 	    case bfd_reloc_undefined:
@@ -2673,6 +2674,30 @@ elf32_frv_add_symbol_hook (abfd, info, sym, namep, flagsp, secp, valp)
   return TRUE;
 }
 
+/* We need dynamic symbols for every section, since segments can
+   relocate independently.  */
+static bfd_boolean
+_frvfdpic_link_omit_section_dynsym (bfd *output_bfd ATTRIBUTE_UNUSED,
+				    struct bfd_link_info *info
+				    ATTRIBUTE_UNUSED,
+				    asection *p ATTRIBUTE_UNUSED)
+{
+  switch (elf_section_data (p)->this_hdr.sh_type)
+    {
+    case SHT_PROGBITS:
+    case SHT_NOBITS:
+      /* If sh_type is yet undecided, assume it could be
+	 SHT_PROGBITS/SHT_NOBITS.  */
+    case SHT_NULL:
+      return FALSE;
+
+      /* There shouldn't be section relative relocations
+	 against any other section.  */
+    default:
+      return TRUE;
+    }
+}
+
 /* Create  a .got section, as well as its additional info field.  This
    is almost entirely copied from
    elflink.c:_bfd_elf_create_got_section().  */
@@ -2730,7 +2755,7 @@ _frv_create_got_section (bfd *abfd, struct bfd_link_info *info)
 	     bed->collect, &bh)))
 	return FALSE;
       h = (struct elf_link_hash_entry *) bh;
-      h->elf_link_hash_flags |= ELF_LINK_HASH_DEF_REGULAR;
+      h->def_regular = 1;
       h->type = STT_OBJECT;
 
       /* Machine-specific: we want the symbol for executables as
@@ -2742,7 +2767,7 @@ _frv_create_got_section (bfd *abfd, struct bfd_link_info *info)
     }
 
   /* The first bit of the global offset table is the header.  */
-  s->_raw_size += bed->got_header_size + bed->got_symbol_offset;
+  s->size += bed->got_header_size + bed->got_symbol_offset;
 
   /* This is the machine-specific part.  Create and initialize section
      data for the got.  */
@@ -2789,7 +2814,7 @@ _frv_create_got_section (bfd *abfd, struct bfd_link_info *info)
 	 bed->collect, &bh)))
     return FALSE;
   h = (struct elf_link_hash_entry *) bh;
-  h->elf_link_hash_flags |= ELF_LINK_HASH_DEF_REGULAR;
+  h->def_regular = 1;
   h->type = STT_OBJECT;
 
   /* Machine-specific: we want the symbol for executables as well.  */
@@ -2844,7 +2869,7 @@ elf32_frvfdpic_create_dynamic_sections (bfd *abfd, struct bfd_link_info *info)
 	      FALSE, get_elf_backend_data (abfd)->collect, &bh)))
 	return FALSE;
       h = (struct elf_link_hash_entry *) bh;
-      h->elf_link_hash_flags |= ELF_LINK_HASH_DEF_REGULAR;
+      h->def_regular = 1;
       h->type = STT_OBJECT;
 
       if (! info->executable
@@ -3122,7 +3147,7 @@ _frvfdpic_compute_got_alloc_data (struct _frvfdpic_dynamic_got_alloc_data *gad,
       odd = cur + got;
       got += 4;
     }
-  
+
   /* Compute the tentative boundaries of this range.  */
   gad->max = cur + got;
   gad->min = fdcur - fd;
@@ -3197,7 +3222,7 @@ inline static bfd_signed_vma
 _frvfdpic_get_got_entry (struct _frvfdpic_dynamic_got_alloc_data *gad)
 {
   bfd_signed_vma ret;
-  
+
   if (gad->odd)
     {
       /* If there was an odd word left behind, use it.  */
@@ -3276,7 +3301,7 @@ _frvfdpic_assign_got_entries (void **entryp, void *info_)
     }
   else if (entry->privfd)
     entry->fd_entry = _frvfdpic_get_fd_entry (&dinfo->gothilo);
-  
+
   return 1;
 }
 
@@ -3306,7 +3331,7 @@ _frvfdpic_assign_plt_entries (void **entryp, void *info_)
 	}
       else
 	{
-	  BFD_ASSERT (dinfo->gothilo.fdplt)
+	  BFD_ASSERT (dinfo->gothilo.fdplt);
 	  entry->fd_entry = _frvfdpic_get_fd_entry (&dinfo->gothilo);
 	  dinfo->gothilo.fdplt -= 8;
 	}
@@ -3318,7 +3343,7 @@ _frvfdpic_assign_plt_entries (void **entryp, void *info_)
 
       /* We use the section's raw size to mark the location of the
 	 next PLT entry.  */
-      entry->plt_entry = frvfdpic_plt_section (dinfo->g.info)->_raw_size;
+      entry->plt_entry = frvfdpic_plt_section (dinfo->g.info)->size;
 
       /* Figure out the length of this PLT entry based on the
 	 addressing mode we need to reach the function descriptor.  */
@@ -3332,7 +3357,7 @@ _frvfdpic_assign_plt_entries (void **entryp, void *info_)
       else
 	size = 16;
 
-      frvfdpic_plt_section (dinfo->g.info)->_raw_size += size;
+      frvfdpic_plt_section (dinfo->g.info)->size += size;
     }
 
   if (entry->lazyplt)
@@ -3345,9 +3370,9 @@ _frvfdpic_assign_plt_entries (void **entryp, void *info_)
 	  == FRVFDPIC_LZPLT_RESOLV_LOC)
 	dinfo->g.lzplt += 4;
     }
-      
+
   return 1;
-}  
+}
 
 /* Follow indirect and warning hash entries so that each got entry
    points to the final symbol definition.  P must point to a pointer
@@ -3427,7 +3452,7 @@ elf32_frvfdpic_size_dynamic_sections (bfd *output_bfd,
 	{
 	  s = bfd_get_section_by_name (dynobj, ".interp");
 	  BFD_ASSERT (s != NULL);
-	  s->_raw_size = sizeof ELF_DYNAMIC_INTERPRETER;
+	  s->size = sizeof ELF_DYNAMIC_INTERPRETER;
 	  s->contents = (bfd_byte *) ELF_DYNAMIC_INTERPRETER;
 	}
     }
@@ -3494,76 +3519,75 @@ elf32_frvfdpic_size_dynamic_sections (bfd *output_bfd,
   htab_traverse (frvfdpic_relocs_info (info), _frvfdpic_assign_got_entries,
 		 &gpinfo);
 
-  frvfdpic_got_section (info)->_raw_size = gpinfo.gothilo.max
+  frvfdpic_got_section (info)->size = gpinfo.gothilo.max
     - gpinfo.gothilo.min
     /* If an odd word is the last word of the GOT, we don't need this
        word to be part of the GOT.  */
     - (odd + 4 == gpinfo.gothilo.max ? 4 : 0);
-  if (frvfdpic_got_section (info)->_raw_size == 0)
+  if (frvfdpic_got_section (info)->size == 0)
     frvfdpic_got_section (info)->flags |= SEC_EXCLUDE;
-  else if (frvfdpic_got_section (info)->_raw_size == 12
+  else if (frvfdpic_got_section (info)->size == 12
 	   && ! elf_hash_table (info)->dynamic_sections_created)
     {
       frvfdpic_got_section (info)->flags |= SEC_EXCLUDE;
-      frvfdpic_got_section (info)->_raw_size = 0;
+      frvfdpic_got_section (info)->size = 0;
     }
   else
     {
       frvfdpic_got_section (info)->contents =
 	(bfd_byte *) bfd_zalloc (dynobj,
-				 frvfdpic_got_section (info)->_raw_size);
+				 frvfdpic_got_section (info)->size);
       if (frvfdpic_got_section (info)->contents == NULL)
 	return FALSE;
     }
-  
+
   if (elf_hash_table (info)->dynamic_sections_created)
     /* Subtract the number of lzplt entries, since those will generate
        relocations in the pltrel section.  */
-    frvfdpic_gotrel_section (info)->_raw_size =
+    frvfdpic_gotrel_section (info)->size =
       (gpinfo.g.relocs - gpinfo.g.lzplt / 8)
       * get_elf_backend_data (output_bfd)->s->sizeof_rel;
   else
     BFD_ASSERT (gpinfo.g.relocs == 0);
-  if (frvfdpic_gotrel_section (info)->_raw_size == 0)
+  if (frvfdpic_gotrel_section (info)->size == 0)
     frvfdpic_gotrel_section (info)->flags |= SEC_EXCLUDE;
   else
     {
       frvfdpic_gotrel_section (info)->contents =
 	(bfd_byte *) bfd_zalloc (dynobj,
-				 frvfdpic_gotrel_section (info)->_raw_size);
+				 frvfdpic_gotrel_section (info)->size);
       if (frvfdpic_gotrel_section (info)->contents == NULL)
 	return FALSE;
     }
 
-  frvfdpic_gotfixup_section (info)->_raw_size = (gpinfo.g.fixups + 1) * 4;
-  if (frvfdpic_gotfixup_section (info)->_raw_size == 0)
+  frvfdpic_gotfixup_section (info)->size = (gpinfo.g.fixups + 1) * 4;
+  if (frvfdpic_gotfixup_section (info)->size == 0)
     frvfdpic_gotfixup_section (info)->flags |= SEC_EXCLUDE;
   else
     {
       frvfdpic_gotfixup_section (info)->contents =
 	(bfd_byte *) bfd_zalloc (dynobj,
-				 frvfdpic_gotfixup_section (info)->_raw_size);
+				 frvfdpic_gotfixup_section (info)->size);
       if (frvfdpic_gotfixup_section (info)->contents == NULL)
 	return FALSE;
     }
-  
+
   if (elf_hash_table (info)->dynamic_sections_created)
     {
-      frvfdpic_pltrel_section (info)->_raw_size =
+      frvfdpic_pltrel_section (info)->size =
 	gpinfo.g.lzplt / 8 * get_elf_backend_data (output_bfd)->s->sizeof_rel;
-      if (frvfdpic_pltrel_section (info)->_raw_size == 0)
+      if (frvfdpic_pltrel_section (info)->size == 0)
 	frvfdpic_pltrel_section (info)->flags |= SEC_EXCLUDE;
       else
 	{
 	  frvfdpic_pltrel_section (info)->contents =
 	    (bfd_byte *) bfd_zalloc (dynobj,
-				     frvfdpic_pltrel_section (info)
-				     ->_raw_size);
+				     frvfdpic_pltrel_section (info)->size);
 	  if (frvfdpic_pltrel_section (info)->contents == NULL)
 	    return FALSE;
 	}
     }
-  
+
   /* Add 4 bytes for every block of at most 65535 lazy PLT entries,
      such that there's room for the additional instruction needed to
      call the resolver.  Since _frvfdpic_assign_got_entries didn't
@@ -3571,7 +3595,7 @@ elf32_frvfdpic_size_dynamic_sections (bfd *output_bfd,
      block size.  */
   if (elf_hash_table (info)->dynamic_sections_created)
     {
-      frvfdpic_plt_section (info)->_raw_size = gpinfo.g.lzplt
+      frvfdpic_plt_section (info)->size = gpinfo.g.lzplt
 	+ ((gpinfo.g.lzplt + (FRVFDPIC_LZPLT_BLOCK_SIZE - 4) - 8)
 	   / (FRVFDPIC_LZPLT_BLOCK_SIZE - 4) * 4);
     }
@@ -3590,7 +3614,7 @@ elf32_frvfdpic_size_dynamic_sections (bfd *output_bfd,
 
   if (elf_hash_table (info)->dynamic_sections_created)
     frvfdpic_plt_initial_offset (info) =
-      frvfdpic_plt_section (info)->_raw_size;
+      frvfdpic_plt_section (info)->size;
 
   htab_traverse (frvfdpic_relocs_info (info), _frvfdpic_assign_plt_entries,
 		 &gpinfo);
@@ -3600,13 +3624,13 @@ elf32_frvfdpic_size_dynamic_sections (bfd *output_bfd,
      non-lazy PLT entries.  */
   if (elf_hash_table (info)->dynamic_sections_created)
     {
-      if (frvfdpic_plt_section (info)->_raw_size == 0)
+      if (frvfdpic_plt_section (info)->size == 0)
 	frvfdpic_plt_section (info)->flags |= SEC_EXCLUDE;
       else
 	{
 	  frvfdpic_plt_section (info)->contents =
 	    (bfd_byte *) bfd_zalloc (dynobj,
-				     frvfdpic_plt_section (info)->_raw_size);
+				     frvfdpic_plt_section (info)->size);
 	  if (frvfdpic_plt_section (info)->contents == NULL)
 	    return FALSE;
 	}
@@ -3614,17 +3638,17 @@ elf32_frvfdpic_size_dynamic_sections (bfd *output_bfd,
 
   if (elf_hash_table (info)->dynamic_sections_created)
     {
-      if (frvfdpic_got_section (info)->_raw_size)
+      if (frvfdpic_got_section (info)->size)
 	if (!_bfd_elf_add_dynamic_entry (info, DT_PLTGOT, 0))
 	  return FALSE;
 
-      if (frvfdpic_pltrel_section (info)->_raw_size)
+      if (frvfdpic_pltrel_section (info)->size)
 	if (!_bfd_elf_add_dynamic_entry (info, DT_PLTRELSZ, 0)
 	    || !_bfd_elf_add_dynamic_entry (info, DT_PLTREL, DT_REL)
 	    || !_bfd_elf_add_dynamic_entry (info, DT_JMPREL, 0))
 	  return FALSE;
 
-      if (frvfdpic_gotrel_section (info)->_raw_size)
+      if (frvfdpic_gotrel_section (info)->size)
 	if (!_bfd_elf_add_dynamic_entry (info, DT_REL, 0)
 	    || !_bfd_elf_add_dynamic_entry (info, DT_RELSZ, 0)
 	    || !_bfd_elf_add_dynamic_entry (info, DT_RELENT,
@@ -3653,7 +3677,7 @@ elf32_frvfdpic_always_size_sections (bfd *output_bfd,
 				FALSE, FALSE, FALSE);
       if (! h || h->root.type != bfd_link_hash_defined
 	  || h->type != STT_OBJECT
-	  || !(h->elf_link_hash_flags & ELF_LINK_HASH_DEF_REGULAR))
+	  || !h->def_regular)
 	{
 	  struct bfd_link_hash_entry *bh = NULL;
 
@@ -3665,7 +3689,7 @@ elf32_frvfdpic_always_size_sections (bfd *output_bfd,
 	    return FALSE;
 
 	  h = (struct elf_link_hash_entry *) bh;
-	  h->elf_link_hash_flags |= ELF_LINK_HASH_DEF_REGULAR;
+	  h->def_regular = 1;
 	  h->type = STT_OBJECT;
 	}
 
@@ -3713,9 +3737,9 @@ elf32_frvfdpic_modify_segment_map (bfd *output_bfd,
 	  /* Set the section size from the symbol value.  We
 	     intentionally ignore the symbol section.  */
 	  if (h->root.type == bfd_link_hash_defined)
-	    sec->_raw_size = h->root.u.def.value;
+	    sec->size = h->root.u.def.value;
 	  else
-	    sec->_raw_size = DEFAULT_STACK_SIZE;
+	    sec->size = DEFAULT_STACK_SIZE;
 
 	  /* Add the stack section to the PT_GNU_STACK segment,
 	     such that its size and alignment requirements make it
@@ -3749,7 +3773,7 @@ elf32_frvfdpic_finish_dynamic_sections (bfd *output_bfd,
 
   if (frvfdpic_got_section (info))
     {
-      BFD_ASSERT (frvfdpic_gotrel_section (info)->_raw_size
+      BFD_ASSERT (frvfdpic_gotrel_section (info)->size
 		  == (frvfdpic_gotrel_section (info)->reloc_count
 		      * sizeof (Elf32_External_Rel)));
 
@@ -3763,7 +3787,7 @@ elf32_frvfdpic_finish_dynamic_sections (bfd *output_bfd,
 	  _frvfdpic_add_rofixup (output_bfd, frvfdpic_gotfixup_section (info),
 				 got_value, 0);
 
-	  if (frvfdpic_gotfixup_section (info)->_raw_size
+	  if (frvfdpic_gotfixup_section (info)->size
 	      != (frvfdpic_gotfixup_section (info)->reloc_count * 4))
 	    {
 	      (*_bfd_error_handler)
@@ -3774,7 +3798,7 @@ elf32_frvfdpic_finish_dynamic_sections (bfd *output_bfd,
     }
   if (elf_hash_table (info)->dynamic_sections_created)
     {
-      BFD_ASSERT (frvfdpic_pltrel_section (info)->_raw_size
+      BFD_ASSERT (frvfdpic_pltrel_section (info)->size
 		  == (frvfdpic_pltrel_section (info)->reloc_count
 		      * sizeof (Elf32_External_Rel)));
     }
@@ -3789,7 +3813,7 @@ elf32_frvfdpic_finish_dynamic_sections (bfd *output_bfd,
       BFD_ASSERT (sdyn != NULL);
 
       dyncon = (Elf32_External_Dyn *) sdyn->contents;
-      dynconend = (Elf32_External_Dyn *) (sdyn->contents + sdyn->_raw_size);
+      dynconend = (Elf32_External_Dyn *) (sdyn->contents + sdyn->size);
 
       for (; dyncon < dynconend; dyncon++)
 	{
@@ -3817,10 +3841,7 @@ elf32_frvfdpic_finish_dynamic_sections (bfd *output_bfd,
 	      break;
 
 	    case DT_PLTRELSZ:
-	      if (frvfdpic_pltrel_section (info)->_cooked_size != 0)
-		dyn.d_un.d_val = frvfdpic_pltrel_section (info)->_cooked_size;
-	      else
-		dyn.d_un.d_val = frvfdpic_pltrel_section (info)->_raw_size;
+	      dyn.d_un.d_val = frvfdpic_pltrel_section (info)->size;
 	      bfd_elf32_swap_dyn_out (output_bfd, &dyn, dyncon);
 	      break;
 	    }
@@ -3844,23 +3865,20 @@ elf32_frvfdpic_adjust_dynamic_symbol
 
   /* Make sure we know what is going on here.  */
   BFD_ASSERT (dynobj != NULL
-	      && (h->weakdef != NULL
-		  || ((h->elf_link_hash_flags
-		       & ELF_LINK_HASH_DEF_DYNAMIC) != 0
-		      && (h->elf_link_hash_flags
-			  & ELF_LINK_HASH_REF_REGULAR) != 0
-		      && (h->elf_link_hash_flags
-			  & ELF_LINK_HASH_DEF_REGULAR) == 0)));
+	      && (h->u.weakdef != NULL
+		  || (h->def_dynamic
+		      && h->ref_regular
+		      && !h->def_regular)));
 
   /* If this is a weak symbol, and there is a real definition, the
      processor independent code will have arranged for us to see the
      real definition first, and we can just use the same value.  */
-  if (h->weakdef != NULL)
+  if (h->u.weakdef != NULL)
     {
-      BFD_ASSERT (h->weakdef->root.type == bfd_link_hash_defined
-		  || h->weakdef->root.type == bfd_link_hash_defweak);
-      h->root.u.def.section = h->weakdef->root.u.def.section;
-      h->root.u.def.value = h->weakdef->root.u.def.value;
+      BFD_ASSERT (h->u.weakdef->root.type == bfd_link_hash_defined
+		  || h->u.weakdef->root.type == bfd_link_hash_defweak);
+      h->root.u.def.section = h->u.weakdef->root.u.def.section;
+      h->root.u.def.value = h->u.weakdef->root.u.def.value;
     }
 
   return TRUE;
@@ -4127,14 +4145,14 @@ elf32_frv_check_relocs (abfd, info, sec, relocs)
 	  picrel = NULL;
 	  break;
 	}
-      
+
       switch (ELF32_R_TYPE (rel->r_info))
         {
 	case R_FRV_LABEL24:
 	  if (IS_FDPIC (abfd))
 	    picrel->call = 1;
 	  break;
-		
+
 	case R_FRV_FUNCDESC_VALUE:
 	  picrel->relocsfdv++;
 	  if (bfd_get_section_flags (abfd, sec) & SEC_ALLOC)
@@ -4149,11 +4167,11 @@ elf32_frv_check_relocs (abfd, info, sec, relocs)
 	  if (bfd_get_section_flags (abfd, sec) & SEC_ALLOC)
 	    picrel->relocs32++;
 	  break;
-	    
+
 	case R_FRV_GOT12:
 	  picrel->got12 = 1;
 	  break;
-	    
+
 	case R_FRV_GOTHI:
 	case R_FRV_GOTLO:
 	  picrel->gothilo = 1;
@@ -4162,32 +4180,32 @@ elf32_frv_check_relocs (abfd, info, sec, relocs)
 	case R_FRV_FUNCDESC_GOT12:
 	  picrel->fdgot12 = 1;
 	  break;
-	    
+
 	case R_FRV_FUNCDESC_GOTHI:
 	case R_FRV_FUNCDESC_GOTLO:
 	  picrel->fdgothilo = 1;
 	  break;
-	    
+
 	case R_FRV_GOTOFF12:
 	case R_FRV_GOTOFFHI:
 	case R_FRV_GOTOFFLO:
 	  picrel->gotoff = 1;
 	  break;
-	    
+
 	case R_FRV_FUNCDESC_GOTOFF12:
 	  picrel->fdgoff12 = 1;
 	  break;
-	    
+
 	case R_FRV_FUNCDESC_GOTOFFHI:
 	case R_FRV_FUNCDESC_GOTOFFLO:
 	  picrel->fdgoffhilo = 1;
 	  break;
-	    
+
 	case R_FRV_FUNCDESC:
 	  picrel->fd = 1;
 	  picrel->relocsfd++;
 	  break;
-	  
+
         /* This relocation describes the C++ object vtable hierarchy.
            Reconstruct it for later use during GC.  */
         case R_FRV_GNU_VTINHERIT:
@@ -4215,8 +4233,8 @@ elf32_frv_check_relocs (abfd, info, sec, relocs)
 	default:
 	bad_reloc:
 	  (*_bfd_error_handler)
-	    (_("%s: unsupported relocation type %i"),
-	     bfd_archive_filename (abfd), ELF32_R_TYPE (rel->r_info));
+	    (_("%B: unsupported relocation type %i"),
+	     abfd, ELF32_R_TYPE (rel->r_info));
 	  return FALSE;
         }
     }
@@ -4236,6 +4254,8 @@ elf32_frv_machine (abfd)
     default:		    break;
     case EF_FRV_CPU_FR550:  return bfd_mach_fr550;
     case EF_FRV_CPU_FR500:  return bfd_mach_fr500;
+    case EF_FRV_CPU_FR450:  return bfd_mach_fr450;
+    case EF_FRV_CPU_FR405:  return bfd_mach_fr400;
     case EF_FRV_CPU_FR400:  return bfd_mach_fr400;
     case EF_FRV_CPU_FR300:  return bfd_mach_fr300;
     case EF_FRV_CPU_SIMPLE: return bfd_mach_frvsimple;
@@ -4285,6 +4305,33 @@ frv_elf_copy_private_bfd_data (ibfd, obfd)
   elf_elfheader (obfd)->e_flags = elf_elfheader (ibfd)->e_flags;
   elf_flags_init (obfd) = TRUE;
   return TRUE;
+}
+
+/* Return true if the architecture described by elf header flag
+   EXTENSION is an extension of the architecture described by BASE.  */
+
+static bfd_boolean
+frv_elf_arch_extension_p (flagword base, flagword extension)
+{
+  if (base == extension)
+    return TRUE;
+
+  /* CPU_GENERIC code can be merged with code for a specific
+     architecture, in which case the result is marked as being
+     for the specific architecture.  Everything is therefore
+     an extension of CPU_GENERIC.  */
+  if (base == EF_FRV_CPU_GENERIC)
+    return TRUE;
+
+  if (extension == EF_FRV_CPU_FR450)
+    if (base == EF_FRV_CPU_FR400 || base == EF_FRV_CPU_FR405)
+      return TRUE;
+
+  if (extension == EF_FRV_CPU_FR405)
+    if (base == EF_FRV_CPU_FR400)
+      return TRUE;
+
+  return FALSE;
 }
 
 static bfd_boolean
@@ -4515,13 +4562,10 @@ frv_elf_merge_private_bfd_data (ibfd, obfd)
 	 the generic cpu).  */
       new_partial = (new_flags & EF_FRV_CPU_MASK);
       old_partial = (old_flags & EF_FRV_CPU_MASK);
-      if (new_partial == old_partial)
+      if (frv_elf_arch_extension_p (new_partial, old_partial))
 	;
 
-      else if (new_partial == EF_FRV_CPU_GENERIC)
-	;
-
-      else if (old_partial == EF_FRV_CPU_GENERIC)
+      else if (frv_elf_arch_extension_p (old_partial, new_partial))
 	old_flags = (old_flags & ~EF_FRV_CPU_MASK) | new_partial;
 
       else
@@ -4533,6 +4577,8 @@ frv_elf_merge_private_bfd_data (ibfd, obfd)
 	    case EF_FRV_CPU_SIMPLE:  strcat (new_opt, " -mcpu=simple"); break;
 	    case EF_FRV_CPU_FR550:   strcat (new_opt, " -mcpu=fr550");  break;
 	    case EF_FRV_CPU_FR500:   strcat (new_opt, " -mcpu=fr500");  break;
+	    case EF_FRV_CPU_FR450:   strcat (new_opt, " -mcpu=fr450");  break;
+	    case EF_FRV_CPU_FR405:   strcat (new_opt, " -mcpu=fr405");  break;
 	    case EF_FRV_CPU_FR400:   strcat (new_opt, " -mcpu=fr400");  break;
 	    case EF_FRV_CPU_FR300:   strcat (new_opt, " -mcpu=fr300");  break;
 	    case EF_FRV_CPU_TOMCAT:  strcat (new_opt, " -mcpu=tomcat"); break;
@@ -4545,6 +4591,8 @@ frv_elf_merge_private_bfd_data (ibfd, obfd)
 	    case EF_FRV_CPU_SIMPLE:  strcat (old_opt, " -mcpu=simple"); break;
 	    case EF_FRV_CPU_FR550:   strcat (old_opt, " -mcpu=fr550");  break;
 	    case EF_FRV_CPU_FR500:   strcat (old_opt, " -mcpu=fr500");  break;
+	    case EF_FRV_CPU_FR450:   strcat (old_opt, " -mcpu=fr450");  break;
+	    case EF_FRV_CPU_FR405:   strcat (old_opt, " -mcpu=fr405");  break;
 	    case EF_FRV_CPU_FR400:   strcat (old_opt, " -mcpu=fr400");  break;
 	    case EF_FRV_CPU_FR300:   strcat (old_opt, " -mcpu=fr300");  break;
 	    case EF_FRV_CPU_TOMCAT:  strcat (old_opt, " -mcpu=tomcat"); break;
@@ -4626,6 +4674,8 @@ frv_elf_print_private_bfd_data (abfd, ptr)
     case EF_FRV_CPU_SIMPLE: fprintf (file, " -mcpu=simple");	break;
     case EF_FRV_CPU_FR550:  fprintf (file, " -mcpu=fr550");	break;
     case EF_FRV_CPU_FR500:  fprintf (file, " -mcpu=fr500");	break;
+    case EF_FRV_CPU_FR450:  fprintf (file, " -mcpu=fr450");	break;
+    case EF_FRV_CPU_FR405:  fprintf (file, " -mcpu=fr405");	break;
     case EF_FRV_CPU_FR400:  fprintf (file, " -mcpu=fr400");	break;
     case EF_FRV_CPU_FR300:  fprintf (file, " -mcpu=fr300");	break;
     case EF_FRV_CPU_TOMCAT: fprintf (file, " -mcpu=tomcat");	break;
@@ -4673,7 +4723,7 @@ frv_elf_print_private_bfd_data (abfd, ptr)
 
   if (flags & EF_FRV_FDPIC)
     fprintf (file, " -mfdpic");
-  
+
   if (flags & EF_FRV_NON_PIC_RELOCS)
     fprintf (file, " non-pic relocations");
 
@@ -4780,5 +4830,8 @@ frv_elf_print_private_bfd_data (abfd, ptr)
 /* We use REL for dynamic relocations only.  */
 #undef elf_backend_default_use_rela_p
 #define elf_backend_default_use_rela_p  1
+
+#undef elf_backend_omit_section_dynsym
+#define elf_backend_omit_section_dynsym _frvfdpic_link_omit_section_dynsym
 
 #include "elf32-target.h"

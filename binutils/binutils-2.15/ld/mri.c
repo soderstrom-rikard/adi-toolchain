@@ -220,13 +220,13 @@ mri_draw_tree (void)
 
 	  lang_enter_output_section_statement (p->name, base,
 					       p->ok_to_load ? 0 : noload_section,
-					       align, subalign, NULL);
+					       align, subalign, NULL, 0);
 	  base = 0;
 	  tmp = xmalloc (sizeof *tmp);
 	  tmp->next = NULL;
 	  tmp->spec.name = p->name;
 	  tmp->spec.exclude_name_list = NULL;
-	  tmp->spec.sorted = FALSE;
+	  tmp->spec.sorted = none;
 	  lang_add_wild (NULL, tmp, FALSE);
 
 	  /* If there is an alias for this section, add it too.  */
@@ -237,7 +237,7 @@ mri_draw_tree (void)
 		tmp->next = NULL;
 		tmp->spec.name = aptr->name;
 		tmp->spec.exclude_name_list = NULL;
-		tmp->spec.sorted = FALSE;
+		tmp->spec.sorted = none;
 		lang_add_wild (NULL, tmp, FALSE);
 	      }
 

@@ -118,22 +118,30 @@ changequote(,)dnl
     eval `echo $this_target | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/cpu=\1 vendor=\2 os=\3/'`
 changequote([,])dnl
 
-    # check for architecture variants
+    # Check for architecture variants.
+    # Note: This table is alpha-sorted, please try to keep it that way.
     arch=
     endian=
     case ${cpu} in
       am33_2.0)		cpu_type=mn10300 endian=little ;;
       alpha*)		cpu_type=alpha ;;
+      arm*be|xscale*be|strongarm*be | \
       arm*b|xscale*b|strongarm*b) cpu_type=arm endian=big ;;
       arm*|xscale*|strongarm*)    cpu_type=arm endian=little ;;
       c4x*)		cpu_type=tic4x ;;
+      crisv32)		cpu_type=cris arch=crisv32
+			AC_DEFINE_UNQUOTED(DEFAULT_CRIS_ARCH, $arch,
+					   [Default CRIS architecture.])
+			;;
+      crx*)		cpu_type=crx endian=little ;;
       hppa*)		cpu_type=hppa ;;
 changequote(,)dnl
       i[3-7]86)		cpu_type=i386 arch=i386;;
-      x86_64)		cpu_type=i386 arch=x86_64;;
       ia64)		cpu_type=ia64 ;;
       ip2k)             cpu_type=ip2k endian=big ;; 
       iq2000)           cpu_type=iq2000 endian=big ;; 
+      m32r)             cpu_type=m32r target_cpu=m32r endian=big ;;
+      m32rle)           cpu_type=m32r target_cpu=m32r endian=little ;;
       m6811|m6812|m68hc12) cpu_type=m68hc11 ;;
       m680[012346]0)	cpu_type=m68k ;;
 changequote([,])dnl
@@ -141,9 +149,10 @@ changequote([,])dnl
       m683??)		cpu_type=m68k ;;
       m5200)		cpu_type=m68k ;;
       m8*)		cpu_type=m88k ;;
+      maxq)             cpu_type=maxq ;;
       mips*el)		cpu_type=mips endian=little ;;
       mips*)		cpu_type=mips endian=big ;;
-      bfin*)		cpu_type=bfin endian=little ;;
+      bfin*)            cpu_type=bfin endian=little ;;
       or32*)		cpu_type=or32 endian=big ;;
       pjl*)		cpu_type=pj endian=little ;;
       pj*)		cpu_type=pj endian=big ;;
@@ -164,9 +173,8 @@ changequote([,])dnl
       sparc86x*)	cpu_type=sparc arch=sparc86x  ;;
       sparc*)		cpu_type=sparc arch=sparclite ;; # ??? See tc-sparc.c.
       v850*)		cpu_type=v850 ;;
+      x86_64)		cpu_type=i386 arch=x86_64;;
       xtensa*)		cpu_type=xtensa arch=xtensa ;;
-      m32r)             cpu_type=m32r target_cpu=m32r endian=big ;;
-      m32rle)           cpu_type=m32r target_cpu=m32r endian=little ;;
       *)		cpu_type=${cpu} ;;
     esac
 
@@ -181,7 +189,8 @@ changequote([,])dnl
     bfd_gas=no
     em=generic
 
-    # assign object format
+    # Assign object format.
+    # Note: This table is alpha-sorted, please try to keep it that way.
     case ${generic_target} in
       a29k-*-coff)			fmt=coff ;;
       a29k-amd-udi)			fmt=coff ;;
@@ -191,15 +200,11 @@ changequote([,])dnl
       a29k-*-vxworks*)			fmt=coff ;;
 
       alpha*-*-*vms*)			fmt=evax ;;
-      alpha*-*-netware*)		fmt=ecoff ;;
       alpha*-*-osf*)			fmt=ecoff ;;
       alpha*-*-linuxecoff*)		fmt=ecoff ;;
       alpha*-*-linux-gnu*)		fmt=elf em=linux ;;
       alpha*-*-netbsd*)			fmt=elf em=nbsd ;;
       alpha*-*-openbsd*)		fmt=elf em=obsd ;;
-
-      # cpu_type for am33_2.0 is set to mn10300
-      mn10300-*-linux*)			fmt=elf bfd_gas=yes em=linux ;;
 
       arc-*-elf*)			fmt=elf ;;
 
@@ -207,6 +212,8 @@ changequote([,])dnl
       arm-*-coff | thumb-*-coff)	fmt=coff ;;
       arm-*-rtems* | thumb-*-rtems*)	fmt=elf ;;
       arm-*-elf | thumb-*-elf)		fmt=elf ;;
+      arm*-*-eabi*)                     fmt=elf ;;
+      arm*-*-symbianelf*)               fmt=elf em=symbian ;;
       arm-*-kaos*)			fmt=elf ;;
       arm*-*-conix*)			fmt=elf ;;
       arm-*-linux*aout*)		fmt=aout em=linux ;;
@@ -215,7 +222,6 @@ changequote([,])dnl
       arm-*-netbsdelf*)                 fmt=elf  em=nbsd ;;
       arm-*-*n*bsd*)			fmt=aout em=nbsd ;;
       arm-**-nto*)			fmt=elf ;;
-      arm-*-oabi | thumb-*-oabi)	fmt=elf ;;
       arm-epoc-pe | thumb-epoc-pe)	fmt=coff em=epoc-pe ;;
       arm-wince-pe | arm-*-wince)       fmt=coff em=wince-pe ;;
       arm-*-pe | thumb-*-pe)		fmt=coff em=pe ;;
@@ -223,8 +229,11 @@ changequote([,])dnl
 
       avr-*-*)				fmt=elf ;;
 
-      cris-*-linux-gnu*)		fmt=multi bfd_gas=yes em=linux ;;
-      cris-*-*)				fmt=multi bfd_gas=yes ;;
+      cris-*-linux-gnu* | crisv32-*-linux-gnu*)
+					fmt=multi bfd_gas=yes em=linux ;;
+      cris-*-* | crisv32-*-*)		fmt=multi bfd_gas=yes ;;
+
+      crx-*-elf*)	    		fmt=elf ;;
 
       d10v-*-*)				fmt=elf ;;
       d30v-*-*)				fmt=elf ;;
@@ -282,7 +291,7 @@ changequote([,])dnl
       i386-*-linux*coff*)		fmt=coff em=linux ;;
       i386-*-linux-gnu*)		fmt=elf em=linux ;;
       x86_64-*-linux-gnu*)		fmt=elf em=linux ;;
-      i386-*-lynxos*)			fmt=coff em=lynx ;;
+      i386-*-lynxos*)			fmt=elf em=lynx bfd_gas=yes ;;
 changequote(,)dnl
       i386-*-sysv[45]*)			fmt=elf ;;
       i386-*-solaris*)			fmt=elf ;;
@@ -373,6 +382,8 @@ changequote([,])dnl
       m88k-motorola-sysv3*)		fmt=coff em=delt88 ;;
       m88k-*-coff*)			fmt=coff ;;
 
+      maxq-*-coff)      		fmt=coff bfd_gas=yes ;;
+
       mcore-*-elf)			fmt=elf ;;
       mcore-*-pe)			fmt=coff em=pe bfd_gas=yes ;;
 
@@ -399,14 +410,24 @@ changequote([,])dnl
 
       mmix-*-*)				fmt=elf ;;
       mn10200-*-*)			fmt=elf ;;
+      # cpu_type for am33_2.0 is set to mn10300
+      mn10300-*-linux*)			fmt=elf bfd_gas=yes em=linux ;;
       mn10300-*-*)			fmt=elf ;;
+
       msp430-*-*)			fmt=elf ;;
-      bfin-*-*)             		fmt=elf bfd_gas=yes ;;
-      bfin-*elf)            		fmt=elf bfd_gas=yes ;;
+
+      ns32k-pc532-mach*)		fmt=aout em=pc532mach ;;
+      ns32k-pc532-ux*)			fmt=aout em=pc532mach ;;
+      ns32k-pc532-lites*)		fmt=aout em=nbsd532 ;;
+      ns32k-*-*n*bsd*)			fmt=aout em=nbsd532 ;;
+
+      bfin-*-*)                         fmt=elf bfd_gas=yes ;;
+      bfin-*elf)                        fmt=elf bfd_gas=yes ;;
       openrisc-*-*)			fmt=elf ;;
       or32-*-rtems*)			fmt=elf ;;
       or32-*-coff)			fmt=coff ;;
       or32-*-elf)			fmt=elf ;;
+
       pj*)				fmt=elf ;;
 
       ppc-*-pe | ppc-*-cygwin*)		fmt=coff em=pe ;;
@@ -436,10 +457,10 @@ changequote([,])dnl
 		AC_MSG_ERROR(Solaris must be configured little endian)
 	    fi ;;
       ppc-*-rtems*)			fmt=elf ;;
-      ppc-*-macos* | ppc-*-mpw*)	fmt=coff em=macos ;;
-      ppc-*-netware*)			fmt=elf em=ppcnw ;;
-      ppc-**-nto*)			fmt=elf ;;
+      ppc-*-macos*)			fmt=coff em=macos ;;
+      ppc-*-nto*)			fmt=elf ;;
       ppc-*-kaos*)			fmt=elf ;;
+      ppc-*-lynxos*)			fmt=elf em=lynx bfd_gas=yes ;;
 
       s390x-*-linux-gnu*)		fmt=elf em=linux ;;
       s390-*-linux-gnu*)		fmt=elf em=linux ;;
@@ -452,6 +473,9 @@ changequote([,])dnl
       sh5*-*-netbsd*)			fmt=elf em=nbsd ;;
       sh64*-*-netbsd*)			fmt=elf em=nbsd ;;
       sh*-*-netbsdelf*)			fmt=elf em=nbsd ;;
+      sh*-*-symbianelf*)		fmt=elf endian=little
+		AC_DEFINE(TARGET_SYMBIAN, 1, [Define if target is Symbian OS.])
+		;;
       sh-*-elf*)			fmt=elf ;;
       sh-*-coff*)			fmt=coff ;;
       sh-*-nto*)			fmt=elf ;;
@@ -461,11 +485,6 @@ changequote([,])dnl
       sh-*-kaos*)			fmt=elf ;;
       shle*-*-kaos*)			fmt=elf ;;
       sh64-*-elf*)			fmt=elf ;;
-
-      ns32k-pc532-mach*)		fmt=aout em=pc532mach ;;
-      ns32k-pc532-ux*)			fmt=aout em=pc532mach ;;
-      ns32k-pc532-lites*)		fmt=aout em=nbsd532 ;;
-      ns32k-*-*n*bsd*)			fmt=aout em=nbsd532 ;;
 
       sparc-*-rtemsaout*)		fmt=aout ;;
       sparc-*-rtemself*)		fmt=elf ;;
@@ -488,8 +507,6 @@ changequote([,])dnl
       strongarm-*-coff)			fmt=coff ;;
       strongarm-*-elf)			fmt=elf ;;
       strongarm-*-kaos*)		fmt=elf ;;
-      xscale-*-coff)			fmt=coff ;;
-      xscale-*-elf)			fmt=elf ;;
 
       tic30-*-*aout*)			fmt=aout bfd_gas=yes ;;
       tic30-*-*coff*)			fmt=coff bfd_gas=yes ;;
@@ -509,6 +526,9 @@ changequote([,])dnl
 
       w65-*-*)				fmt=coff ;;
 
+      xscale-*-coff)			fmt=coff ;;
+      xscale-*-elf)			fmt=elf ;;
+
       xstormy16-*-*)			fmt=elf ;;
 
       xtensa-*-*)			fmt=elf ;;
@@ -525,7 +545,7 @@ changequote([,])dnl
       *-*-elf | *-*-sysv4* | *-*-solaris*) fmt=elf dev=yes ;;
       *-*-aros*)			fmt=elf em=linux bfd_gas=yes ;;
       *-*-vxworks | *-*-windiss)	fmt=elf ;;
-      *-*-netware)			fmt=elf ;;
+      *-*-netware)			fmt=elf em=netware ;;
     esac
 
     if test ${this_target} = $target ; then
@@ -670,16 +690,16 @@ changequote([,])dnl
 	;;
 
       bfin)
-	echo ${extra_objects} | grep -s "bfin-parse.o" 
-	if test $? -ne 0 ; then
-	  extra_objects="$extra_objects bfin-parse.o"
-	fi
+        echo ${extra_objects} | grep -s "bfin-parse.o"
+        if test $? -ne 0 ; then
+          extra_objects="$extra_objects bfin-parse.o"
+        fi
 
-	echo ${extra_objects} | grep -s "bfin-lex.o" 
-	if test $? -ne 0 ; then
-	  extra_objects="$extra_objects bfin-lex.o"
-	fi
-	;;
+        echo ${extra_objects} | grep -s "bfin-lex.o"
+        if test $? -ne 0 ; then
+          extra_objects="$extra_objects bfin-lex.o"
+        fi
+        ;;
 
       mips)
 	echo ${extra_objects} | grep -s "itbl-parse.o" 
@@ -808,7 +828,7 @@ case ${target_cpu} in
 esac
 
 case "${obj_format}" in
-  "") AC_MSG_ERROR(GAS does not know what format (${obj_format}) to use for target ${target}) ;;
+  "") AC_MSG_ERROR(GAS does not know what format to use for target ${target}) ;;
 esac
 
 # Unfortunately the cpu in cpu-opc.h file isn't always $(TARGET_CPU).

@@ -935,7 +935,12 @@ extract_file (bfd *abfd)
   chmod (bfd_get_filename (abfd), buf.st_mode);
 
   if (preserve_dates)
-    set_times (bfd_get_filename (abfd), &buf);
+    {
+      /* Set access time to modification time.  Only st_mtime is
+	 initialized by bfd_stat_arch_elt.  */
+      buf.st_atime = buf.st_mtime;
+      set_times (bfd_get_filename (abfd), &buf);
+    }
 
   free (cbuf);
 }
@@ -1268,7 +1273,7 @@ static void
 replace_members (bfd *arch, char **files_to_move, bfd_boolean quick)
 {
   bfd_boolean changed = FALSE;
-  bfd **after_bfd;		/* New entries go after this one */
+  bfd **after_bfd;		/* New entries go after this one.  */
   bfd *current;
   bfd **current_ptr;
 
@@ -1325,8 +1330,7 @@ replace_members (bfd *arch, char **files_to_move, bfd_boolean quick)
       /* Add to the end of the archive.  */
       after_bfd = get_pos_bfd (&arch->next, pos_end, NULL);
 
-      if (get_file_size (* files_to_move) > 0
-	  && ar_emul_append (after_bfd, *files_to_move, verbose))
+      if (ar_emul_append (after_bfd, *files_to_move, verbose))
 	changed = TRUE;
 
     next_file:;

@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE LN_S RANLIB ac_ct_RANLIB LIBTOOL WARN_CFLAGS GDBINIT cgen_cpu_prefix extra_objects target_cpu_type obj_format te_file install_tooldir atof BFDLIB OPCODES_LIB BFDVER_H ALL_OBJ_DEPS YACC LEX LEXLIB LEX_OUTPUT_ROOT CPP EGREP ALLOCA USE_NLS MSGFMT GMSGFMT XGETTEXT USE_INCLUDED_LIBINTL CATALOGS CATOBJEXT DATADIRNAME GMOFILES INSTOBJEXT INTLDEPS INTLLIBS INTLOBJS POFILES POSUB INCLUDE_LOCALE_H GT_NO GT_YES MKINSTALLDIRS l MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBM LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot AMTAR am__tar am__untar DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE LN_S RANLIB ac_ct_RANLIB LIBTOOL WARN_CFLAGS GDBINIT cgen_cpu_prefix extra_objects target_cpu_type obj_format te_file install_tooldir atof BFDLIB OPCODES_LIB BFDVER_H ALL_OBJ_DEPS YACC LEX LEXLIB LEX_OUTPUT_ROOT CPP EGREP ALLOCA USE_NLS MSGFMT GMSGFMT XGETTEXT USE_INCLUDED_LIBINTL CATALOGS CATOBJEXT DATADIRNAME GMOFILES INSTOBJEXT INTLDEPS INTLLIBS INTLOBJS POFILES POSUB INCLUDE_LOCALE_H GT_NO GT_YES MKINSTALLDIRS l MAINTAINER_MODE_TRUE MAINTAINER_MODE_FALSE MAINT LIBM LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -2485,7 +2485,7 @@ fi
 
 
 BFD_VERSION=`sed -n -e 's/^.._INIT_AUTOMAKE.*,[ 	]*\([^ 	]*\)[ 	]*).*/\1/p' < ${srcdir}/../bfd/configure.in`
-am__api_version="1.8"
+am__api_version="1.9"
 # Find a good install program.  We prefer a C program (faster),
 # so one script is as good as another.  But avoid the broken or
 # incompatible versions:
@@ -2637,13 +2637,21 @@ echo "$as_me: WARNING: \`missing' script is too old or missing" >&2;}
 fi
 
 if mkdir -p --version . >/dev/null 2>&1 && test ! -d ./--version; then
-  # Keeping the `.' argument allows $(mkdir_p) to be used without
-  # argument.  Indeed, we sometimes output rules like
+  # We used to keeping the `.' as first argument, in order to
+  # allow $(mkdir_p) to be used without argument.  As in
   #   $(mkdir_p) $(somedir)
-  # where $(somedir) is conditionally defined.
-  # (`test -n '$(somedir)' && $(mkdir_p) $(somedir)' is a more
-  # expensive solution, as it forces Make to start a sub-shell.)
-  mkdir_p='mkdir -p -- .'
+  # where $(somedir) is conditionally defined.  However this is wrong
+  # for two reasons:
+  #  1. if the package is installed by a user who cannot write `.'
+  #     make install will fail,
+  #  2. the above comment should most certainly read
+  #     $(mkdir_p) $(DESTDIR)$(somedir)
+  #     so it does not work when $(somedir) is undefined and
+  #     $(DESTDIR) is not.
+  #  To support the latter case, we have to write
+  #     test -z "$(somedir)" || $(mkdir_p) $(DESTDIR)$(somedir),
+  #  so the `.' trick is pointless.
+  mkdir_p='mkdir -p --'
 else
   # On NextStep and OpenStep, the `mkdir' command does not
   # recognize any option.  It will interpret all options as
@@ -2852,9 +2860,6 @@ AUTOHEADER=${AUTOHEADER-"${am_missing_run}autoheader"}
 
 MAKEINFO=${MAKEINFO-"${am_missing_run}makeinfo"}
 
-
-AMTAR=${AMTAR-"${am_missing_run}tar"}
-
 install_sh=${install_sh-"$am_aux_dir/install-sh"}
 
 # Installed binaries are usually stripped using `strip' when the user
@@ -2947,6 +2952,13 @@ INSTALL_STRIP_PROGRAM="\${SHELL} \$(install_sh) -c -s"
 
 # We need awk for the "check" target.  The system "awk" is bad on
 # some platforms.
+# Always define AMTAR for backward compatibility.
+
+AMTAR=${AMTAR-"${am_missing_run}tar"}
+
+am__tar='${AMTAR} chof - "$$tardir"'; am__untar='${AMTAR} xf -'
+
+
 
 
 depcc="$CC"   am_compiler_list=
@@ -3340,7 +3352,7 @@ darwin* | rhapsody*)
   esac
   ;;
 
-freebsd* )
+freebsd* | kfreebsd*-gnu)
   if echo __ELF__ | $CC -E - | grep __ELF__ > /dev/null; then
     case $host_cpu in
     i*86 )
@@ -3408,7 +3420,7 @@ linux-gnu*)
   lt_cv_file_magic_test_file=`echo /lib/libc.so* /lib/libc-*.so`
   ;;
 
-netbsd*)
+netbsd* | knetbsd*-gnu)
   if echo __ELF__ | $CC -E - | grep __ELF__ > /dev/null; then
     lt_cv_deplibs_check_method='match_pattern /lib[^/\.]+\.so\.[0-9]+\.[0-9]+$'
   else
@@ -3799,7 +3811,7 @@ test x"$pic_mode" = xno && libtool_flags="$libtool_flags --prefer-non-pic"
 case $host in
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 3802 "configure"' > conftest.$ac_ext
+  echo '#line 3814 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -4159,30 +4171,42 @@ for this_target in $target $canon_targets ; do
 
     eval `echo $this_target | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/cpu=\1 vendor=\2 os=\3/'`
 
-    # check for architecture variants
+    # Check for architecture variants.
+    # Note: This table is alpha-sorted, please try to keep it that way.
     arch=
     endian=
     case ${cpu} in
       am33_2.0)		cpu_type=mn10300 endian=little ;;
       alpha*)		cpu_type=alpha ;;
+      arm*be|xscale*be|strongarm*be | \
       arm*b|xscale*b|strongarm*b) cpu_type=arm endian=big ;;
       arm*|xscale*|strongarm*)    cpu_type=arm endian=little ;;
       c4x*)		cpu_type=tic4x ;;
+      crisv32)		cpu_type=cris arch=crisv32
+
+cat >>confdefs.h <<_ACEOF
+#define DEFAULT_CRIS_ARCH $arch
+_ACEOF
+
+			;;
+      crx*)		cpu_type=crx endian=little ;;
       hppa*)		cpu_type=hppa ;;
       i[3-7]86)		cpu_type=i386 arch=i386;;
-      x86_64)		cpu_type=i386 arch=x86_64;;
       ia64)		cpu_type=ia64 ;;
       ip2k)             cpu_type=ip2k endian=big ;;
       iq2000)           cpu_type=iq2000 endian=big ;;
+      m32r)             cpu_type=m32r target_cpu=m32r endian=big ;;
+      m32rle)           cpu_type=m32r target_cpu=m32r endian=little ;;
       m6811|m6812|m68hc12) cpu_type=m68hc11 ;;
       m680[012346]0)	cpu_type=m68k ;;
       m68008)		cpu_type=m68k ;;
       m683??)		cpu_type=m68k ;;
       m5200)		cpu_type=m68k ;;
       m8*)		cpu_type=m88k ;;
+      maxq)             cpu_type=maxq ;;
       mips*el)		cpu_type=mips endian=little ;;
       mips*)		cpu_type=mips endian=big ;;
-      bfin*)		cpu_type=bfin endian=little ;;
+      bfin*)            cpu_type=bfin endian=little ;;
       or32*)		cpu_type=or32 endian=big ;;
       pjl*)		cpu_type=pj endian=little ;;
       pj*)		cpu_type=pj endian=big ;;
@@ -4203,9 +4227,8 @@ for this_target in $target $canon_targets ; do
       sparc86x*)	cpu_type=sparc arch=sparc86x  ;;
       sparc*)		cpu_type=sparc arch=sparclite ;; # ??? See tc-sparc.c.
       v850*)		cpu_type=v850 ;;
+      x86_64)		cpu_type=i386 arch=x86_64;;
       xtensa*)		cpu_type=xtensa arch=xtensa ;;
-      m32r)             cpu_type=m32r target_cpu=m32r endian=big ;;
-      m32rle)           cpu_type=m32r target_cpu=m32r endian=little ;;
       *)		cpu_type=${cpu} ;;
     esac
 
@@ -4220,7 +4243,8 @@ for this_target in $target $canon_targets ; do
     bfd_gas=no
     em=generic
 
-    # assign object format
+    # Assign object format.
+    # Note: This table is alpha-sorted, please try to keep it that way.
     case ${generic_target} in
       a29k-*-coff)			fmt=coff ;;
       a29k-amd-udi)			fmt=coff ;;
@@ -4230,15 +4254,11 @@ for this_target in $target $canon_targets ; do
       a29k-*-vxworks*)			fmt=coff ;;
 
       alpha*-*-*vms*)			fmt=evax ;;
-      alpha*-*-netware*)		fmt=ecoff ;;
       alpha*-*-osf*)			fmt=ecoff ;;
       alpha*-*-linuxecoff*)		fmt=ecoff ;;
       alpha*-*-linux-gnu*)		fmt=elf em=linux ;;
       alpha*-*-netbsd*)			fmt=elf em=nbsd ;;
       alpha*-*-openbsd*)		fmt=elf em=obsd ;;
-
-      # cpu_type for am33_2.0 is set to mn10300
-      mn10300-*-linux*)			fmt=elf bfd_gas=yes em=linux ;;
 
       arc-*-elf*)			fmt=elf ;;
 
@@ -4246,6 +4266,8 @@ for this_target in $target $canon_targets ; do
       arm-*-coff | thumb-*-coff)	fmt=coff ;;
       arm-*-rtems* | thumb-*-rtems*)	fmt=elf ;;
       arm-*-elf | thumb-*-elf)		fmt=elf ;;
+      arm*-*-eabi*)                     fmt=elf ;;
+      arm*-*-symbianelf*)               fmt=elf em=symbian ;;
       arm-*-kaos*)			fmt=elf ;;
       arm*-*-conix*)			fmt=elf ;;
       arm-*-linux*aout*)		fmt=aout em=linux ;;
@@ -4254,7 +4276,6 @@ for this_target in $target $canon_targets ; do
       arm-*-netbsdelf*)                 fmt=elf  em=nbsd ;;
       arm-*-*n*bsd*)			fmt=aout em=nbsd ;;
       arm-**-nto*)			fmt=elf ;;
-      arm-*-oabi | thumb-*-oabi)	fmt=elf ;;
       arm-epoc-pe | thumb-epoc-pe)	fmt=coff em=epoc-pe ;;
       arm-wince-pe | arm-*-wince)       fmt=coff em=wince-pe ;;
       arm-*-pe | thumb-*-pe)		fmt=coff em=pe ;;
@@ -4262,8 +4283,11 @@ for this_target in $target $canon_targets ; do
 
       avr-*-*)				fmt=elf ;;
 
-      cris-*-linux-gnu*)		fmt=multi bfd_gas=yes em=linux ;;
-      cris-*-*)				fmt=multi bfd_gas=yes ;;
+      cris-*-linux-gnu* | crisv32-*-linux-gnu*)
+					fmt=multi bfd_gas=yes em=linux ;;
+      cris-*-* | crisv32-*-*)		fmt=multi bfd_gas=yes ;;
+
+      crx-*-elf*)	    		fmt=elf ;;
 
       d10v-*-*)				fmt=elf ;;
       d30v-*-*)				fmt=elf ;;
@@ -4321,7 +4345,7 @@ for this_target in $target $canon_targets ; do
       i386-*-linux*coff*)		fmt=coff em=linux ;;
       i386-*-linux-gnu*)		fmt=elf em=linux ;;
       x86_64-*-linux-gnu*)		fmt=elf em=linux ;;
-      i386-*-lynxos*)			fmt=coff em=lynx ;;
+      i386-*-lynxos*)			fmt=elf em=lynx bfd_gas=yes ;;
       i386-*-sysv[45]*)			fmt=elf ;;
       i386-*-solaris*)			fmt=elf ;;
       i386-*-freebsdaout*)		fmt=aout em=386bsd ;;
@@ -4419,6 +4443,8 @@ echo "$as_me: WARNING: GAS support for ${generic_target} is preliminary and a wo
       m88k-motorola-sysv3*)		fmt=coff em=delt88 ;;
       m88k-*-coff*)			fmt=coff ;;
 
+      maxq-*-coff)      		fmt=coff bfd_gas=yes ;;
+
       mcore-*-elf)			fmt=elf ;;
       mcore-*-pe)			fmt=coff em=pe bfd_gas=yes ;;
 
@@ -4447,14 +4473,24 @@ echo "$as_me: error: Unknown vendor for mips-bsd configuration." >&2;}
 
       mmix-*-*)				fmt=elf ;;
       mn10200-*-*)			fmt=elf ;;
+      # cpu_type for am33_2.0 is set to mn10300
+      mn10300-*-linux*)			fmt=elf bfd_gas=yes em=linux ;;
       mn10300-*-*)			fmt=elf ;;
+
       msp430-*-*)			fmt=elf ;;
-      bfin-*-*)             		fmt=elf bfd_gas=yes ;;
-      bfin-*elf)            		fmt=elf bfd_gas=yes ;;
+
+      ns32k-pc532-mach*)		fmt=aout em=pc532mach ;;
+      ns32k-pc532-ux*)			fmt=aout em=pc532mach ;;
+      ns32k-pc532-lites*)		fmt=aout em=nbsd532 ;;
+      ns32k-*-*n*bsd*)			fmt=aout em=nbsd532 ;;
+
+      bfin-*-*)                         fmt=elf bfd_gas=yes ;;
+      bfin-*elf)                        fmt=elf bfd_gas=yes ;;
       openrisc-*-*)			fmt=elf ;;
       or32-*-rtems*)			fmt=elf ;;
       or32-*-coff)			fmt=coff ;;
       or32-*-elf)			fmt=elf ;;
+
       pj*)				fmt=elf ;;
 
       ppc-*-pe | ppc-*-cygwin*)		fmt=coff em=pe ;;
@@ -4492,10 +4528,10 @@ echo "$as_me: error: Solaris must be configured little endian" >&2;}
    { (exit 1); exit 1; }; }
 	    fi ;;
       ppc-*-rtems*)			fmt=elf ;;
-      ppc-*-macos* | ppc-*-mpw*)	fmt=coff em=macos ;;
-      ppc-*-netware*)			fmt=elf em=ppcnw ;;
-      ppc-**-nto*)			fmt=elf ;;
+      ppc-*-macos*)			fmt=coff em=macos ;;
+      ppc-*-nto*)			fmt=elf ;;
       ppc-*-kaos*)			fmt=elf ;;
+      ppc-*-lynxos*)			fmt=elf em=lynx bfd_gas=yes ;;
 
       s390x-*-linux-gnu*)		fmt=elf em=linux ;;
       s390-*-linux-gnu*)		fmt=elf em=linux ;;
@@ -4508,6 +4544,13 @@ echo "$as_me: error: Solaris must be configured little endian" >&2;}
       sh5*-*-netbsd*)			fmt=elf em=nbsd ;;
       sh64*-*-netbsd*)			fmt=elf em=nbsd ;;
       sh*-*-netbsdelf*)			fmt=elf em=nbsd ;;
+      sh*-*-symbianelf*)		fmt=elf endian=little
+
+cat >>confdefs.h <<\_ACEOF
+#define TARGET_SYMBIAN 1
+_ACEOF
+
+		;;
       sh-*-elf*)			fmt=elf ;;
       sh-*-coff*)			fmt=coff ;;
       sh-*-nto*)			fmt=elf ;;
@@ -4517,11 +4560,6 @@ echo "$as_me: error: Solaris must be configured little endian" >&2;}
       sh-*-kaos*)			fmt=elf ;;
       shle*-*-kaos*)			fmt=elf ;;
       sh64-*-elf*)			fmt=elf ;;
-
-      ns32k-pc532-mach*)		fmt=aout em=pc532mach ;;
-      ns32k-pc532-ux*)			fmt=aout em=pc532mach ;;
-      ns32k-pc532-lites*)		fmt=aout em=nbsd532 ;;
-      ns32k-*-*n*bsd*)			fmt=aout em=nbsd532 ;;
 
       sparc-*-rtemsaout*)		fmt=aout ;;
       sparc-*-rtemself*)		fmt=elf ;;
@@ -4544,8 +4582,6 @@ echo "$as_me: error: Solaris must be configured little endian" >&2;}
       strongarm-*-coff)			fmt=coff ;;
       strongarm-*-elf)			fmt=elf ;;
       strongarm-*-kaos*)		fmt=elf ;;
-      xscale-*-coff)			fmt=coff ;;
-      xscale-*-elf)			fmt=elf ;;
 
       tic30-*-*aout*)			fmt=aout bfd_gas=yes ;;
       tic30-*-*coff*)			fmt=coff bfd_gas=yes ;;
@@ -4565,6 +4601,9 @@ echo "$as_me: error: Solaris must be configured little endian" >&2;}
 
       w65-*-*)				fmt=coff ;;
 
+      xscale-*-coff)			fmt=coff ;;
+      xscale-*-elf)			fmt=elf ;;
+
       xstormy16-*-*)			fmt=elf ;;
 
       xtensa-*-*)			fmt=elf ;;
@@ -4581,7 +4620,7 @@ echo "$as_me: error: Solaris must be configured little endian" >&2;}
       *-*-elf | *-*-sysv4* | *-*-solaris*) fmt=elf dev=yes ;;
       *-*-aros*)			fmt=elf em=linux bfd_gas=yes ;;
       *-*-vxworks | *-*-windiss)	fmt=elf ;;
-      *-*-netware)			fmt=elf ;;
+      *-*-netware)			fmt=elf em=netware ;;
     esac
 
     if test ${this_target} = $target ; then
@@ -4739,16 +4778,16 @@ _ACEOF
 	;;
 
       bfin)
-	echo ${extra_objects} | grep -s "bfin-parse.o"
-	if test $? -ne 0 ; then
-	  extra_objects="$extra_objects bfin-parse.o"
-	fi
+        echo ${extra_objects} | grep -s "bfin-parse.o"
+        if test $? -ne 0 ; then
+          extra_objects="$extra_objects bfin-parse.o"
+        fi
 
-	echo ${extra_objects} | grep -s "bfin-lex.o"
-	if test $? -ne 0 ; then
-	  extra_objects="$extra_objects bfin-lex.o"
-	fi
-	;;
+        echo ${extra_objects} | grep -s "bfin-lex.o"
+        if test $? -ne 0 ; then
+          extra_objects="$extra_objects bfin-lex.o"
+        fi
+        ;;
 
       mips)
 	echo ${extra_objects} | grep -s "itbl-parse.o"
@@ -4881,8 +4920,8 @@ case ${target_cpu} in
 esac
 
 case "${obj_format}" in
-  "") { { echo "$as_me:$LINENO: error: GAS does not know what format (${obj_format}) to use for target ${target}" >&5
-echo "$as_me: error: GAS does not know what format (${obj_format}) to use for target ${target}" >&2;}
+  "") { { echo "$as_me:$LINENO: error: GAS does not know what format to use for target ${target}" >&5
+echo "$as_me: error: GAS does not know what format to use for target ${target}" >&2;}
    { (exit 1); exit 1; }; } ;;
 esac
 
@@ -11632,7 +11671,6 @@ s,@AUTOCONF@,$AUTOCONF,;t t
 s,@AUTOMAKE@,$AUTOMAKE,;t t
 s,@AUTOHEADER@,$AUTOHEADER,;t t
 s,@MAKEINFO@,$MAKEINFO,;t t
-s,@AMTAR@,$AMTAR,;t t
 s,@install_sh@,$install_sh,;t t
 s,@STRIP@,$STRIP,;t t
 s,@ac_ct_STRIP@,$ac_ct_STRIP,;t t
@@ -11641,6 +11679,9 @@ s,@mkdir_p@,$mkdir_p,;t t
 s,@AWK@,$AWK,;t t
 s,@SET_MAKE@,$SET_MAKE,;t t
 s,@am__leading_dot@,$am__leading_dot,;t t
+s,@AMTAR@,$AMTAR,;t t
+s,@am__tar@,$am__tar,;t t
+s,@am__untar@,$am__untar,;t t
 s,@DEPDIR@,$DEPDIR,;t t
 s,@am__include@,$am__include,;t t
 s,@am__quote@,$am__quote,;t t
@@ -12322,27 +12363,21 @@ echo X"$mf" |
   else
     continue
   fi
-  grep '^DEP_FILES *= *[^ #]' < "$mf" > /dev/null || continue
-  # Extract the definition of DEP_FILES from the Makefile without
-  # running `make'.
+  # Extract the definition of DEPDIR, am__include, and am__quote
+  # from the Makefile without running `make'.
   DEPDIR=`sed -n 's/^DEPDIR = //p' < "$mf"`
   test -z "$DEPDIR" && continue
+  am__include=`sed -n 's/^am__include = //p' < "$mf"`
+  test -z "am__include" && continue
+  am__quote=`sed -n 's/^am__quote = //p' < "$mf"`
   # When using ansi2knr, U may be empty or an underscore; expand it
   U=`sed -n 's/^U = //p' < "$mf"`
-  test -d "$dirpart/$DEPDIR" || mkdir "$dirpart/$DEPDIR"
-  # We invoke sed twice because it is the simplest approach to
-  # changing $(DEPDIR) to its actual value in the expansion.
-  for file in `sed -n '
-    /^DEP_FILES = .*\\\\$/ {
-      s/^DEP_FILES = //
-      :loop
-	s/\\\\$//
-	p
-	n
-	/\\\\$/ b loop
-      p
-    }
-    /^DEP_FILES = / s/^DEP_FILES = //p' < "$mf" | \
+  # Find all dependency output files, they are included files with
+  # $(DEPDIR) in their names.  We invoke sed twice because it is the
+  # simplest approach to changing $(DEPDIR) to its actual value in the
+  # expansion.
+  for file in `sed -n "
+    s/^$am__include $am__quote\(.*(DEPDIR).*\)$am__quote"'$/\1/p' <"$mf" | \
        sed -e 's/\$(DEPDIR)/'"$DEPDIR"'/g' -e 's/\$U/'"$U"'/g'`; do
     # Make sure the directory exists.
     test -f "$dirpart/$file" && continue

@@ -1,3 +1,67 @@
+2004-11-19  Shaun Jackman  <sjackman@gmail.com>
+                                                                                
+        * libc/include/stdio.h: Add sniprintf.
+        * libc/stdio/Makefile.am: Add sniprintf.c.
+        * libc/stdio/Makefile.in: Regenerated.
+        * libc/stdio/sniprintf.c: New file.
+        * libc/stdio/stdio.tex: Add sniprintf.
+                                                                                
+2004-11-17  Christopher Faylor  <cgf@timesys.com>
+
+	* libc/stdio/refill.c (__srefill): Try again after EOF on Cygwin.  Clear
+	EOF flag if successful.
+
+2004-10-28  Christopher Faylor  <cgf@timesys.com>
+
+	* libc/include/sys/signal.h: Move <signal.h> include to bottom of file
+	so that all relevant definitions have been performed for use in the
+	include.
+
+2004-10-26  Jason Tishler  <jason@tishler.net>
+
+	* libc/stdio/fread.c (fread): Fix return value for unbuffered
+	fread.
+
+2004-10-25  Ralf Corsepius <corsepiu@faw.uni-ulm.de>
+
+	* libc/include/machine/setjmp.h: Add AVR support.
+	* libc/sys/rtems/crt0.S [__AVR__]: Add __stack.
+
+2004-10-08  Jeff Johnston  <jjohnstn@redhat.com>
+                                                                                
+        * libc/include/sys/signal.h: If <signal.h> didn't include
+        this header file, include <signal.h> to account for
+        applications that take advantage that the two header
+        files are the same in glibc.
+                                                                                
+2004-10-05  Tomer Levi  <Tomer.Levi@nsc.com>
+
+        * configure.host: Add support for crx.
+        * libc/include/machine/ieeefp.h: Ditto.
+        * libc/include/machine/setjmp.h: Ditto.
+        * libc/machine/crx/Makefile.am: New file.
+        * libc/machine/crx/configure.in: Ditto.
+        * libc/machine/crx/setjmp.S: Ditto.
+        * libc/machine/crx/getenv.c: Ditto.
+        * libc/machine/crx/aclocal.m4: Generate.
+        * libc/machine/crx/configure: Ditto.
+        * libc/machine/crx/Makefile.in: Ditto.
+        * libc/machine/crx/sys/asm.h: New file.
+        * libc/machine/crx/sys/libh.h: Ditto.
+        * libc/machine/crx/sys/syscall.h: Ditto.
+
+2004-10-05  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* Makefile.am (stmp-targ-include): Support sys header files
+	from machine directories.
+	* Makefile.in: Regenerated.
+
+2004-10-04  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/vfscanf.c (__svfscanf_r): For int conversions,
+	count skipped zero characters as part of the nread count for %n.
+	* libc/machine/powerpc/vfscanf.c: Ditto.
+
 2004-09-24  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/local.h: Include <stdlib.h>.

@@ -1,5 +1,5 @@
 # Support routines for LD testsuite.
-#   Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+#   Copyright 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
 #   Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -90,7 +90,7 @@ proc is_endian_output_format { object_flags } {
 proc big_or_little_endian {} {
 
     if [board_info [target_info name] exists multilib_flags] {
-	set tmp_flags " [board_info [target_info name] multilib_flags]";
+	set tmp_flags " [board_info [target_info name] multilib_flags]"
 
 	foreach x $tmp_flags {
 	    case $x in {
@@ -235,7 +235,7 @@ proc default_ld_compile { cc source object } {
     }
 
     if [board_info [target_info name] exists multilib_flags] {
-	append flags " [board_info [target_info name] multilib_flags]";
+	append flags " [board_info [target_info name] multilib_flags]"
     }
 
     verbose -log "$cc $flags -c $source -o $object"
@@ -414,6 +414,20 @@ proc is_elf64 { binary_file } {
     }
 
     return 0
+}
+
+#
+# is_pecoff_format
+#	true if the object format is known to be PECOFF
+#
+proc is_pecoff_format {} {
+    if { ![istarget *-*-mingw32*] \
+	 && ![istarget *-*-cygwin*] \
+	 && ![istarget *-*-pe*] } {
+	return 0
+    }
+
+    return 1
 }
 
 #

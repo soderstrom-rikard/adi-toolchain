@@ -440,7 +440,9 @@ not-strip.o: not-strip.c
 objcopy.o: objcopy.c ../bfd/bfd.h $(INCDIR)/ansidecl.h \
   $(INCDIR)/symcat.h $(INCDIR)/progress.h bucomm.h config.h \
   $(INCDIR)/bin-bugs.h $(INCDIR)/fopen-same.h $(INCDIR)/libiberty.h \
-  budbg.h $(INCDIR)/filenames.h $(INCDIR)/fnmatch.h
+  budbg.h $(INCDIR)/filenames.h $(INCDIR)/fnmatch.h $(BFDDIR)/elf-bfd.h \
+  $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h $(INCDIR)/elf/external.h \
+  $(INCDIR)/bfdlink.h
 objdump.o: objdump.c ../bfd/bfd.h $(INCDIR)/ansidecl.h \
   $(INCDIR)/symcat.h ../bfd/bfdver.h $(INCDIR)/progress.h \
   bucomm.h config.h $(INCDIR)/bin-bugs.h $(INCDIR)/fopen-same.h \
@@ -475,9 +477,9 @@ readelf.o: readelf.c ../bfd/bfd.h $(INCDIR)/ansidecl.h \
   $(INCDIR)/elf/or32.h $(INCDIR)/elf/pj.h $(INCDIR)/elf/ppc.h \
   $(INCDIR)/elf/ppc64.h $(INCDIR)/elf/s390.h $(INCDIR)/elf/sh.h \
   $(INCDIR)/elf/sparc.h $(INCDIR)/elf/v850.h $(INCDIR)/elf/vax.h \
-  $(INCDIR)/elf/x86-64.h $(INCDIR)/elf/xstormy16.h $(INCDIR)/elf/iq2000.h \
-  $(INCDIR)/elf/xtensa.h $(INCDIR)/aout/ar.h bucomm.h \
-  config.h $(INCDIR)/bin-bugs.h $(INCDIR)/fopen-same.h \
+  $(INCDIR)/elf/x86-64.h $(INCDIR)/elf/xstormy16.h $(INCDIR)/elf/crx.h \
+  $(INCDIR)/elf/iq2000.h $(INCDIR)/elf/xtensa.h $(INCDIR)/aout/ar.h \
+  bucomm.h config.h $(INCDIR)/bin-bugs.h $(INCDIR)/fopen-same.h \
   $(INCDIR)/libiberty.h unwind-ia64.h
 rename.o: rename.c ../bfd/bfd.h $(INCDIR)/ansidecl.h \
   $(INCDIR)/symcat.h bucomm.h config.h $(INCDIR)/bin-bugs.h \

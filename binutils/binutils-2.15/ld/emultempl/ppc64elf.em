@@ -44,13 +44,22 @@ static bfd_signed_vma group_size = 1;
 static int dotsyms = 1;
 
 /* Whether to run tls optimization.  */
-static int notlsopt = 0;
+static int no_tls_opt = 0;
+
+/* Whether to run opd optimization.  */
+static int no_opd_opt = 0;
+
+/* Whether to run toc optimization.  */
+static int no_toc_opt = 0;
 
 /* Whether to emit symbols for stubs.  */
 static int emit_stub_syms = 0;
 
 static asection *toc_section = 0;
 
+/* Whether to canonicalize .opd so that there are no overlapping
+   .opd entries.  */
+static int non_overlapping_opd = 0;
 
 /* This is called before the input files are opened.  We create a new
    fake input file to hold the stub sections.  */
@@ -85,29 +94,18 @@ ppc_create_output_section_statements (void)
 }
 
 static void
-ppc_after_open (void)
-{
-  if (!ppc64_elf_mark_entry_syms (&link_info))
-    {
-      einfo ("%X%P: can not mark entry symbols %E\n");
-      return;
-    }
-
-  gld${EMULATION_NAME}_after_open ();
-}
-
-static void
 ppc_before_allocation (void)
 {
   if (stub_file != NULL)
     {
-      if (!ppc64_elf_edit_opd (output_bfd, &link_info))
+      if (!no_opd_opt
+	  && !ppc64_elf_edit_opd (output_bfd, &link_info, non_overlapping_opd))
 	{
-	  einfo ("%X%P: can not edit opd %E\n");
+	  einfo ("%X%P: can not edit %s %E\n", "opd");
 	  return;
 	}
 
-      if (ppc64_elf_tls_setup (output_bfd, &link_info) && !notlsopt)
+      if (ppc64_elf_tls_setup (output_bfd, &link_info) && !no_tls_opt)
 	{
 	  /* Size the sections.  This is premature, but we want to know the
 	     TLS segment layout so that certain optimizations can be done.  */
@@ -123,6 +121,14 @@ ppc_before_allocation (void)
 	  /* We must not cache anything from the preliminary sizing.  */
 	  elf_tdata (output_bfd)->program_header_size = 0;
 	  lang_reset_memory_regions ();
+	}
+
+      if (!no_toc_opt
+	  && !link_info.relocatable
+	  && !ppc64_elf_edit_toc (output_bfd, &link_info))
+	{
+	  einfo ("%X%P: can not edit %s %E\n", "toc");
+	  return;
 	}
     }
 
@@ -288,6 +294,7 @@ build_toc_list (lang_statement_union_type *statement)
 {
   if (statement->header.type == lang_input_section_enum
       && !statement->input_section.ifile->just_syms_flag
+      && (statement->input_section.section->flags & SEC_EXCLUDE) == 0
       && statement->input_section.section->output_section == toc_section)
     ppc64_elf_next_toc_section (&link_info, statement->input_section.section);
 }
@@ -298,6 +305,7 @@ build_section_lists (lang_statement_union_type *statement)
 {
   if (statement->header.type == lang_input_section_enum
       && !statement->input_section.ifile->just_syms_flag
+      && (statement->input_section.section->flags & SEC_EXCLUDE) == 0
       && statement->input_section.section->output_section != NULL
       && statement->input_section.section->output_section->owner == output_bfd)
     {
@@ -362,11 +370,20 @@ gld${EMULATION_NAME}_finish (void)
   if (need_laying_out)
     ppc_layout_sections_again ();
 
+  if (link_info.relocatable)
+    {
+      asection *toc = bfd_get_section_by_name (output_bfd, ".toc");
+      if (toc != NULL
+	  && bfd_section_size (output_bfd, toc) > 0x10000)
+	einfo ("%X%P: TOC section size exceeds 64k\n");
+    }
+
   if (stub_added)
     {
       char *msg = NULL;
       char *line, *endline;
 
+      emit_stub_syms |= link_info.emitrelocations;
       if (!ppc64_elf_build_stubs (emit_stub_syms, &link_info,
 				  config.stats ? &msg : NULL))
 	einfo ("%X%P: can not build stubs: %E\n");
@@ -381,6 +398,8 @@ gld${EMULATION_NAME}_finish (void)
       if (msg != NULL)
 	free (msg);
     }
+
+  ppc64_elf_restore_symbols (&link_info);
 }
 
 
@@ -420,6 +439,14 @@ gld${EMULATION_NAME}_new_vers_pattern (struct bfd_elf_version_expr *entry)
   dot_pat[0] = '.';
   memcpy (dot_pat + 1, entry->pattern, len - 1);
   dot_entry->pattern = dot_pat;
+  if (entry->symbol != NULL)
+    {
+      len = strlen (entry->symbol) + 2;
+      dot_pat = xmalloc (len);
+      dot_pat[0] = '.';
+      memcpy (dot_pat + 1, entry->symbol, len - 1);
+      dot_entry->symbol = dot_pat;
+    }
   return dot_entry;
 }
 
@@ -455,6 +482,9 @@ PARSE_AND_LIST_PROLOGUE='
 #define OPTION_DOTSYMS			(OPTION_STUBSYMS + 1)
 #define OPTION_NO_DOTSYMS		(OPTION_DOTSYMS + 1)
 #define OPTION_NO_TLS_OPT		(OPTION_NO_DOTSYMS + 1)
+#define OPTION_NO_OPD_OPT		(OPTION_NO_TLS_OPT + 1)
+#define OPTION_NO_TOC_OPT		(OPTION_NO_OPD_OPT + 1)
+#define OPTION_NON_OVERLAPPING_OPD	(OPTION_NO_TOC_OPT + 1)
 '
 
 PARSE_AND_LIST_LONGOPTS='
@@ -463,6 +493,9 @@ PARSE_AND_LIST_LONGOPTS='
   { "dotsyms", no_argument, NULL, OPTION_DOTSYMS },
   { "no-dotsyms", no_argument, NULL, OPTION_NO_DOTSYMS },
   { "no-tls-optimize", no_argument, NULL, OPTION_NO_TLS_OPT },
+  { "no-opd-optimize", no_argument, NULL, OPTION_NO_OPD_OPT },
+  { "no-toc-optimize", no_argument, NULL, OPTION_NO_TOC_OPT },
+  { "non-overlapping-opd", no_argument, NULL, OPTION_NON_OVERLAPPING_OPD },
 '
 
 PARSE_AND_LIST_OPTIONS='
@@ -490,6 +523,16 @@ PARSE_AND_LIST_OPTIONS='
   fprintf (file, _("\
   --no-tls-optimize     Don'\''t try to optimize TLS accesses.\n"
 		   ));
+  fprintf (file, _("\
+  --no-opd-optimize     Don'\''t optimize the OPD section.\n"
+		   ));
+  fprintf (file, _("\
+  --no-toc-optimize     Don'\''t optimize the TOC section.\n"
+		   ));
+  fprintf (file, _("\
+  --non-overlapping-opd Canonicalize .opd, so that there are no overlapping\n\
+                          .opd entries.\n"
+		   ));
 '
 
 PARSE_AND_LIST_ARGS_CASES='
@@ -515,13 +558,24 @@ PARSE_AND_LIST_ARGS_CASES='
       break;
 
     case OPTION_NO_TLS_OPT:
-      notlsopt = 1;
+      no_tls_opt = 1;
+      break;
+
+    case OPTION_NO_OPD_OPT:
+      no_opd_opt = 1;
+      break;
+
+    case OPTION_NO_TOC_OPT:
+      no_toc_opt = 1;
+      break;
+
+    case OPTION_NON_OVERLAPPING_OPD:
+      non_overlapping_opd = 1;
       break;
 '
 
 # Put these extra ppc64elf routines in ld_${EMULATION_NAME}_emulation
 #
-LDEMUL_AFTER_OPEN=ppc_after_open
 LDEMUL_BEFORE_ALLOCATION=ppc_before_allocation
 LDEMUL_AFTER_ALLOCATION=gld${EMULATION_NAME}_after_allocation
 LDEMUL_FINISH=gld${EMULATION_NAME}_finish

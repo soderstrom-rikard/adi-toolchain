@@ -128,7 +128,7 @@
 .\" ========================================================================
 .\"
 .IX Title "READELF 1"
-.TH READELF 1 "2004-04-09" "binutils-2.14.91" "GNU Development Tools"
+.TH READELF 1 "2004-11-23" "binutils-2.15.94" "GNU Development Tools"
 .SH "NAME"
 readelf \- Displays information about ELF files.
 .SH "SYNOPSIS"
@@ -147,8 +147,8 @@ readelf [\fB\-a\fR|\fB\-\-all\fR]
         [\fB\-A\fR|\fB\-\-arch\-specific\fR]
         [\fB\-D\fR|\fB\-\-use\-dynamic\fR]
         [\fB\-x\fR <number>|\fB\-\-hex\-dump=\fR<number>]
-        [\fB\-w[liaprmfFso]\fR|
-         \fB\-\-debug\-dump\fR[=line,=info,=abbrev,=pubnames,=ranges,=macro,=frames,=frames\-interp,=str,=loc]]
+        [\fB\-w[liaprmfFsoR]\fR|
+         \fB\-\-debug\-dump\fR[=line,=info,=abbrev,=pubnames,=aranges,=macro,=frames,=frames\-interp,=str,=loc,=Ranges]]
         [\fB\-I\fR|\fB\-histogram\fR]
         [\fB\-v\fR|\fB\-\-version\fR]
         [\fB\-W\fR|\fB\-\-wide\fR]
@@ -231,7 +231,7 @@ Display all the headers in the file.  Equivalent to \fB\-h \-l \-S\fR.
 .IP "\fB\-\-notes\fR" 4
 .IX Item "--notes"
 .PD
-Displays the contents of the \s-1NOTE\s0 segment, if it exists.
+Displays the contents of the \s-1NOTE\s0 segments and/or sections, if any.
 .IP "\fB\-r\fR" 4
 .IX Item "-r"
 .PD 0
@@ -294,11 +294,11 @@ symbols section.
 .IX Item "--hex-dump=<number>"
 .PD
 Displays the contents of the indicated section as a hexadecimal dump.
-.IP "\fB\-w[liaprmfFso]\fR" 4
-.IX Item "-w[liaprmfFso]"
+.IP "\fB\-w[liaprmfFsoR]\fR" 4
+.IX Item "-w[liaprmfFsoR]"
 .PD 0
-.IP "\fB\-\-debug\-dump[=line,=info,=abbrev,=pubnames,=ranges,=macro,=frames,=frames\-interp,=str,=loc]\fR" 4
-.IX Item "--debug-dump[=line,=info,=abbrev,=pubnames,=ranges,=macro,=frames,=frames-interp,=str,=loc]"
+.IP "\fB\-\-debug\-dump[=line,=info,=abbrev,=pubnames,=aranges,=macro,=frames,=frames\-interp,=str,=loc,=Ranges]\fR" 4
+.IX Item "--debug-dump[=line,=info,=abbrev,=pubnames,=aranges,=macro,=frames,=frames-interp,=str,=loc,=Ranges]"
 .PD
 Displays the contents of the debug sections in the file, if any are
 present.  If one of the optional letters or words follows the switch
@@ -342,7 +342,7 @@ Display the command line options understood by \fBreadelf\fR.
 .SH "COPYRIGHT"
 .IX Header "COPYRIGHT"
 Copyright (c) 1991, 92, 93, 94, 95, 96, 97, 98, 99, 2000,
-2001, 2002, 2003 Free Software Foundation, Inc.
+2001, 2002, 2003, 2004 Free Software Foundation, Inc.
 .PP
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the \s-1GNU\s0 Free Documentation License, Version 1.1

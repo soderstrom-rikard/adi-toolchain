@@ -684,10 +684,8 @@ coff_tic80_relocate_section (output_bfd, info, input_bfd,
 	  break;
 	case bfd_reloc_outofrange:
 	  (*_bfd_error_handler)
-	    (_("%s: bad reloc address 0x%lx in section `%s'"),
-	     bfd_archive_filename (input_bfd),
-	     (unsigned long) rel->r_vaddr,
-	     bfd_get_section_name (input_bfd, input_section));
+	    (_("%B: bad reloc address 0x%lx in section `%A'"),
+	     input_bfd, input_section, (unsigned long) rel->r_vaddr);
 	  return FALSE;
 	case bfd_reloc_overflow:
 	  {
@@ -697,7 +695,7 @@ coff_tic80_relocate_section (output_bfd, info, input_bfd,
 	    if (symndx == -1)
 	      name = "*ABS*";
 	    else if (h != NULL)
-	      name = h->root.root.string;
+	      name = NULL;
 	    else
 	      {
 		name = _bfd_coff_internal_syment_name (input_bfd, sym, buf);
@@ -706,8 +704,9 @@ coff_tic80_relocate_section (output_bfd, info, input_bfd,
 	      }
 
 	    if (! ((*info->callbacks->reloc_overflow)
-		   (info, name, howto->name, (bfd_vma) 0, input_bfd,
-		    input_section, rel->r_vaddr - input_section->vma)))
+		   (info, (h ? &h->root : NULL), name, howto->name,
+		    (bfd_vma) 0, input_bfd, input_section,
+		    rel->r_vaddr - input_section->vma)))
 	      return FALSE;
 	  }
 	}

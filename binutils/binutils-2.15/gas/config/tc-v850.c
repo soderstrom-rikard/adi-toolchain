@@ -1169,21 +1169,14 @@ md_parse_option (c, arg)
      char *arg;
 {
   if (c != 'm')
-    {
-      if (c != 'a')
-	/* xgettext:c-format  */
-	fprintf (stderr, _("unknown command line option: -%c%s\n"), c, arg);
-      return 0;
-    }
+    return 0;
 
   if (strcmp (arg, "warn-signed-overflow") == 0)
-    {
-      warn_signed_overflows = TRUE;
-    }
+    warn_signed_overflows = TRUE;
+
   else if (strcmp (arg, "warn-unsigned-overflow") == 0)
-    {
-      warn_unsigned_overflows = TRUE;
-    }
+    warn_unsigned_overflows = TRUE;
+
   else if (strcmp (arg, "v850") == 0)
     {
       machine = 0;
@@ -1211,11 +1204,7 @@ md_parse_option (c, arg)
   else if (strcmp (arg, "relax") == 0)
     v850_relax = 1;
   else
-    {
-      /* xgettext:c-format  */
-      fprintf (stderr, _("unknown command line option: -%c%s\n"), c, arg);
-      return 0;
-    }
+    return 0;
 
   return 1;
 }
@@ -1618,10 +1607,7 @@ v850_insert_operand (insn, operand, val, file, line, str)
 
 	  if (val < (offsetT) min || val > (offsetT) max)
 	    {
-	      /* xgettext:c-format  */
-	      const char *err =
-		_("operand out of range (%s not between %ld and %ld)");
-	      char buf[100];
+	      char buf [128];
 
 	      /* Restore min and mix to expected values for decimal ranges.  */
 	      if ((operand->flags & V850_OPERAND_SIGNED)
@@ -1633,18 +1619,12 @@ v850_insert_operand (insn, operand, val, file, line, str)
 		min = 0;
 
 	      if (str)
-		{
-		  sprintf (buf, "%s: ", str);
-
-		  sprint_value (buf + strlen (buf), val);
-		}
+		sprintf (buf, "%s: ", str);
 	      else
-		sprint_value (buf, val);
+		buf[0] = 0;
+	      strcat (buf, _("operand"));
 
-	      if (file == (char *) NULL)
-		as_warn (err, buf, min, max);
-	      else
-		as_warn_where (file, line, err, buf, min, max);
+	      as_bad_value_out_of_range (buf, val, (offsetT) min, (offsetT) max, file, line);
 	    }
 	}
 

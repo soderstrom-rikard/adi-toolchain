@@ -261,6 +261,8 @@
 #include <varargs.h>
 #endif
 
+#include <assert.h>
+
 #ifdef DLLTOOL_ARM
 #include "coff/arm.h"
 #include "coff/internal.h"
@@ -382,6 +384,7 @@ extern char * program_name;
 static int machine;
 static int killat;
 static int add_stdcall_alias;
+static const char *ext_prefix_alias;
 static int verbose;
 static FILE *output_def;
 static FILE *base_file;
@@ -427,7 +430,11 @@ static char * mcore_elf_linker_flags = NULL;
 #define DRECTVE_SECTION_NAME ".drectve"
 #endif
 
-#define PATHMAX 250		/* What's the right name for this ?  */
+/* What's the right name for this ?  */
+#define PATHMAX 250		
+
+/* External name alias numbering starts here.  */
+#define PREFIX_ALIAS_BASE	20000
 
 char *tmp_asm_buf;
 char *tmp_head_s_buf;
@@ -641,6 +648,7 @@ typedef struct export
   {
     const char *name;
     const char *internal_name;
+    const char *import_name;
     int ordinal;
     int constant;
     int noname;		/* Don't put name in image file.  */
@@ -664,7 +672,7 @@ static struct string_list *excludes;
 
 static const char *rvaafter (int);
 static const char *rvabefore (int);
-static const char *asm_prefix (int);
+static const char *asm_prefix (int, const char *);
 static void process_def_file (const char *);
 static void new_directive (char *);
 static void append_import (const char *, const char *, int);
@@ -795,7 +803,7 @@ rvabefore (int machine)
 }
 
 static const char *
-asm_prefix (int machine)
+asm_prefix (int machine, const char *name)
 {
   switch (machine)
     {
@@ -810,7 +818,11 @@ asm_prefix (int machine)
     case MARM_EPOC:
       break;
     case M386:
-      return "_";
+      /* Symbol names starting with ? do not have a leading underscore. */
+      if (name && *name == '?')
+        break;
+      else
+        return "_";
     default:
       /* xgettext:c-format */
       fatal (_("Internal error: Unknown machine type: %d"), machine);
@@ -819,26 +831,26 @@ asm_prefix (int machine)
   return "";
 }
 
-#define ASM_BYTE	mtable[machine].how_byte
-#define ASM_SHORT	mtable[machine].how_short
-#define ASM_LONG	mtable[machine].how_long
-#define ASM_TEXT	mtable[machine].how_asciz
-#define ASM_C		mtable[machine].how_comment
-#define ASM_JUMP	mtable[machine].how_jump
-#define ASM_GLOBAL	mtable[machine].how_global
-#define ASM_SPACE	mtable[machine].how_space
-#define ASM_ALIGN_SHORT mtable[machine].how_align_short
-#define ASM_RVA_BEFORE	rvabefore(machine)
-#define ASM_RVA_AFTER	rvaafter(machine)
-#define ASM_PREFIX	asm_prefix(machine)
-#define ASM_ALIGN_LONG  mtable[machine].how_align_long
-#define HOW_BFD_READ_TARGET  0  /* always default*/
-#define HOW_BFD_WRITE_TARGET mtable[machine].how_bfd_target
-#define HOW_BFD_ARCH    mtable[machine].how_bfd_arch
-#define HOW_JTAB        mtable[machine].how_jtab
-#define HOW_JTAB_SIZE   mtable[machine].how_jtab_size
-#define HOW_JTAB_ROFF   mtable[machine].how_jtab_roff
-#define ASM_SWITCHES    mtable[machine].how_default_as_switches
+#define ASM_BYTE		mtable[machine].how_byte
+#define ASM_SHORT		mtable[machine].how_short
+#define ASM_LONG		mtable[machine].how_long
+#define ASM_TEXT		mtable[machine].how_asciz
+#define ASM_C			mtable[machine].how_comment
+#define ASM_JUMP		mtable[machine].how_jump
+#define ASM_GLOBAL		mtable[machine].how_global
+#define ASM_SPACE		mtable[machine].how_space
+#define ASM_ALIGN_SHORT		mtable[machine].how_align_short
+#define ASM_RVA_BEFORE		rvabefore (machine)
+#define ASM_RVA_AFTER		rvaafter (machine)
+#define ASM_PREFIX(NAME)	asm_prefix (machine, (NAME))
+#define ASM_ALIGN_LONG  	mtable[machine].how_align_long
+#define HOW_BFD_READ_TARGET	0  /* Always default.  */
+#define HOW_BFD_WRITE_TARGET	mtable[machine].how_bfd_target
+#define HOW_BFD_ARCH		mtable[machine].how_bfd_arch
+#define HOW_JTAB		mtable[machine].how_jtab
+#define HOW_JTAB_SIZE		mtable[machine].how_jtab_size
+#define HOW_JTAB_ROFF		mtable[machine].how_jtab_roff
+#define ASM_SWITCHES		mtable[machine].how_default_as_switches
 
 static char **oav;
 
@@ -896,6 +908,7 @@ def_exports (const char *name, const char *internal_name, int ordinal,
 
   p->name = name;
   p->internal_name = internal_name ? internal_name : name;
+  p->import_name = name;
   p->ordinal = ordinal;
   p->constant = constant;
   p->noname = noname;
@@ -1206,7 +1219,7 @@ scan_drectve_symbols (bfd *abfd)
   if (s == NULL)
     return;
 
-  size = bfd_get_section_size_before_reloc (s);
+  size = bfd_get_section_size (s);
   buf  = xmalloc (size);
 
   bfd_get_section_contents (abfd, s, buf, 0, size);
@@ -1816,7 +1829,7 @@ gen_exp_file (void)
 			 exp->internal_name, ASM_RVA_AFTER, ASM_C, exp->ordinal);
 	      else
 		fprintf (f, "\t%s%s%s%s\t%s %d\n", ASM_RVA_BEFORE,
-			 ASM_PREFIX,
+			 ASM_PREFIX (exp->internal_name),
 			 exp->internal_name, ASM_RVA_AFTER, ASM_C, exp->ordinal);
 	    }
 	  else
@@ -2150,10 +2163,10 @@ ID2:	.short	2
 static char *
 make_label (const char *prefix, const char *name)
 {
-  int len = strlen (ASM_PREFIX) + strlen (prefix) + strlen (name);
-  char *copy = xmalloc (len +1 );
+  int len = strlen (ASM_PREFIX (name)) + strlen (prefix) + strlen (name);
+  char *copy = xmalloc (len + 1);
 
-  strcpy (copy, ASM_PREFIX);
+  strcpy (copy, ASM_PREFIX (name));
   strcat (copy, prefix);
   strcat (copy, name);
   return copy;
@@ -2174,10 +2187,10 @@ make_imp_label (const char *prefix, const char *name)
     }
   else
     {
-      len = strlen (ASM_PREFIX) + strlen (prefix) + strlen (name);
+      len = strlen (ASM_PREFIX (name)) + strlen (prefix) + strlen (name);
       copy = xmalloc (len + 1);
       strcpy (copy, prefix);
-      strcat (copy, ASM_PREFIX);
+      strcat (copy, ASM_PREFIX (name));
       strcat (copy, name);
     }
   return copy;
@@ -2197,12 +2210,12 @@ make_one_lib_file (export_type *exp, int i)
       sprintf (name, "%ss%05d.s", prefix, i);
       f = fopen (name, FOPEN_WT);
       fprintf (f, "\t.text\n");
-      fprintf (f, "\t%s\t%s%s\n", ASM_GLOBAL, ASM_PREFIX, exp->name);
+      fprintf (f, "\t%s\t%s%s\n", ASM_GLOBAL, ASM_PREFIX (exp->name), exp->name);
       if (create_compat_implib)
 	fprintf (f, "\t%s\t__imp_%s\n", ASM_GLOBAL, exp->name);
       fprintf (f, "\t%s\t_imp__%s\n", ASM_GLOBAL, exp->name);
       if (create_compat_implib)
-	fprintf (f, "%s%s:\n\t%s\t__imp_%s\n", ASM_PREFIX,
+	fprintf (f, "%s%s:\n\t%s\t__imp_%s\n", ASM_PREFIX (exp->name),
 		 exp->name, ASM_JUMP, exp->name);
 
       fprintf (f, "\t.section\t.idata$7\t%s To force loading of head\n", ASM_C);
@@ -2256,7 +2269,6 @@ make_one_lib_file (export_type *exp, int i)
 #endif
       asymbol *  ptrs[NSECS + 4 + EXTRA + 1];
       flagword   applicable;
-
       char *     outname = xmalloc (strlen (TMP_STUB) + 10);
       int        oidx = 0;
 
@@ -2286,6 +2298,7 @@ make_one_lib_file (export_type *exp, int i)
       for (i = 0; i < NSECS; i++)
 	{
 	  sinfo *si = secdata + i;
+
 	  if (si->id != i)
 	    abort();
 	  si->sec = bfd_make_section_old_way (abfd, si->name);
@@ -2352,10 +2365,10 @@ make_one_lib_file (export_type *exp, int i)
       iname2->flags = BSF_GLOBAL;
       iname2->value = 0;
 
-      iname_lab = bfd_make_empty_symbol(abfd);
+      iname_lab = bfd_make_empty_symbol (abfd);
 
       iname_lab->name = head_label;
-      iname_lab->section = (asection *)&bfd_und_section;
+      iname_lab->section = (asection *) &bfd_und_section;
       iname_lab->flags = 0;
       iname_lab->value = 0;
 
@@ -2479,16 +2492,16 @@ make_one_lib_file (export_type *exp, int i)
                      why it did that, and it does not match what I see
                      in programs compiled with the MS tools.  */
 		  int idx = exp->hint;
-		  si->size = strlen (xlate (exp->name)) + 3;
+		  si->size = strlen (xlate (exp->import_name)) + 3;
 		  si->data = xmalloc (si->size);
 		  si->data[0] = idx & 0xff;
 		  si->data[1] = idx >> 8;
-		  strcpy (si->data + 2, xlate (exp->name));
+		  strcpy (si->data + 2, xlate (exp->import_name));
 		}
 	      break;
 	    case IDATA7:
 	      si->size = 4;
-	      si->data =xmalloc (4);
+	      si->data = xmalloc (4);
 	      memset (si->data, 0, si->size);
 	      rel = xmalloc (sizeof (arelent));
 	      rpp = xmalloc (sizeof (arelent *) * 2);
@@ -2805,6 +2818,26 @@ gen_lib_file (void)
       n = make_one_lib_file (exp, i);
       n->next = head;
       head = n;
+      if (ext_prefix_alias)
+	{
+	  export_type alias_exp;
+
+	  assert (i < PREFIX_ALIAS_BASE);
+	  alias_exp.name = make_imp_label (ext_prefix_alias, exp->name);
+	  alias_exp.internal_name = exp->internal_name;
+	  alias_exp.import_name = exp->name;
+	  alias_exp.ordinal = exp->ordinal;
+	  alias_exp.constant = exp->constant;
+	  alias_exp.noname = exp->noname;
+	  alias_exp.private = exp->private;
+	  alias_exp.data = exp->data;
+	  alias_exp.hint = exp->hint;
+	  alias_exp.forward = exp->forward;
+	  alias_exp.next = exp->next;
+	  n = make_one_lib_file (&alias_exp, i + PREFIX_ALIAS_BASE);
+	  n->next = head;
+	  head = n;
+	}
     }
 
   /* Now stick them all into the archive.  */
@@ -2848,6 +2881,13 @@ gen_lib_file (void)
 	  if (unlink (name) < 0)
 	    /* xgettext:c-format */
 	    non_fatal (_("cannot delete %s: %s"), name, strerror (errno));
+	  if (ext_prefix_alias)
+	    {
+	      sprintf (name, "%s%05d.o", TMP_STUB, i + PREFIX_ALIAS_BASE);
+	      if (unlink (name) < 0)
+		/* xgettext:c-format */
+		non_fatal (_("cannot delete %s: %s"), name, strerror (errno));
+	    }
 	}
     }
 
@@ -3125,6 +3165,7 @@ usage (FILE *file, int status)
   fprintf (file, _("   -U --add-underscore       Add underscores to symbols in interface library.\n"));
   fprintf (file, _("   -k --kill-at              Kill @<n> from exported names.\n"));
   fprintf (file, _("   -A --add-stdcall-alias    Add aliases without @<n>.\n"));
+  fprintf (file, _("   -p --ext-prefix-alias <prefix> Add aliases with <prefix>.\n"));
   fprintf (file, _("   -S --as <name>            Use <name> for assembler.\n"));
   fprintf (file, _("   -f --as-flags <flags>     Pass <flags> to the assembler.\n"));
   fprintf (file, _("   -C --compat-implib        Create backward compatible import library.\n"));
@@ -3164,6 +3205,7 @@ static const struct option long_options[] =
   {"add-underscore", no_argument, NULL, 'U'},
   {"kill-at", no_argument, NULL, 'k'},
   {"add-stdcall-alias", no_argument, NULL, 'A'},
+  {"ext-prefix-alias", required_argument, NULL, 'p'},
   {"verbose", no_argument, NULL, 'v'},
   {"version", no_argument, NULL, 'V'},
   {"help", no_argument, NULL, 'h'},
@@ -3200,9 +3242,9 @@ main (int ac, char **av)
 
   while ((c = getopt_long (ac, av,
 #ifdef DLLTOOL_MCORE_ELF
-			   "m:e:l:aD:d:z:b:xcCuUkAS:f:nvVHhM:L:F:",
+			   "m:e:l:aD:d:z:b:xp:cCuUkAS:f:nvVHhM:L:F:",
 #else
-			   "m:e:l:aD:d:z:b:xcCuUkAS:f:nvVHh",
+			   "m:e:l:aD:d:z:b:xp:cCuUkAS:f:nvVHh",
 #endif
 			   long_options, 0))
 	 != EOF)
@@ -3276,6 +3318,9 @@ main (int ac, char **av)
 	  break;
 	case 'A':
 	  add_stdcall_alias = 1;
+	  break;
+	case 'p':
+	  ext_prefix_alias = optarg;
 	  break;
 	case 'd':
 	  def_file = optarg;

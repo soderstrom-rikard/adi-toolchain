@@ -216,6 +216,7 @@ static int dwarf_file_string;
 
 static void do_align (int, char *, int, int);
 static void s_align (int, int);
+static void s_altmacro (int);
 static int hex_float (int, char *);
 static segT get_known_segmented_expression (expressionS * expP);
 static void pobegin (void);
@@ -251,6 +252,7 @@ static struct hash_control *po_hash;
 static const pseudo_typeS potable[] = {
   {"abort", s_abort, 0},
   {"align", s_align_ptwo, 0},
+  {"altmacro", s_altmacro, 1},
   {"ascii", stringer, 0},
   {"asciz", stringer, 1},
   {"balign", s_align_bytes, 0},
@@ -351,6 +353,7 @@ static const pseudo_typeS potable[] = {
   {"mri", s_mri, 0},
   {".mri", s_mri, 0},	/* Special case so .mri works in MRI mode.  */
   {"name", s_ignore, 0},
+  {"noaltmacro", s_altmacro, 0},
   {"noformat", s_ignore, 0},
   {"nolist", listing_list, 0},	/* Turn listing off.  */
   {"nopage", listing_nopage, 0},
@@ -509,9 +512,9 @@ read_a_source_file (char *name)
   found_comment = 0;
 #endif
 
-#ifdef TC_BFIN 
+#ifdef TC_BFIN
   // XXX : this flags prevents bfin-gas from parsing a label
-	int nolabel;
+        int nolabel;
 #endif
 
   buffer = input_scrub_new_file (name);
@@ -536,9 +539,8 @@ read_a_source_file (char *name)
 	  /* We now have input_line_pointer->1st char of next line.
 	     If input_line_pointer [-1] == '\n' then we just
 	     scanned another line: so bump line counters.  */
-
 #ifdef TC_BFIN
-		nolabel = 0;
+                nolabel = 0;
 #endif
 	  if (is_end_of_line[(unsigned char) input_line_pointer[-1]])
 	    {
@@ -670,11 +672,11 @@ read_a_source_file (char *name)
 	     Input_line_pointer points after that character.  */
 	  if (is_name_beginner (c))
 
-#ifdef TC_BFIN 
-	// special hack for bfin assembler: line may start with '(',
-	// e.g. for PushPopMultiple statements
-	if (c == '(') nolabel = 1;
-	if (is_name_beginner (c) || nolabel)
+#ifdef TC_BFIN
+        // special hack for bfin assembler: line may start with '(',
+        // e.g. for PushPopMultiple statements
+        if (c == '(') nolabel = 1;
+        if (is_name_beginner (c) || nolabel)
 #endif
 
 	    {
@@ -685,14 +687,14 @@ read_a_source_file (char *name)
 	      c = get_symbol_end ();	/* name's delimiter.  */
 
 	      /* C is character after symbol.
-	         That character's place in the input line is now '\0'.
-	         S points to the beginning of the symbol.
-	           [In case of pseudo-op, s->'.'.]
-	         Input_line_pointer->'\0' where c was.  */
+		 That character's place in the input line is now '\0'.
+		 S points to the beginning of the symbol.
+		   [In case of pseudo-op, s->'.'.]
+		 Input_line_pointer->'\0' where c was.  */
 #ifdef TC_BFIN
-	      if (TC_START_LABEL(c, input_line_pointer) && !nolabel)
+              if (TC_START_LABEL(c, input_line_pointer) && !nolabel)
 #else
-	      if (TC_START_LABEL(c, input_line_pointer))
+              if (TC_START_LABEL(c, input_line_pointer))
 #endif
 		{
 		  if (flag_m68k_mri)
@@ -726,15 +728,15 @@ read_a_source_file (char *name)
 		  SKIP_WHITESPACE ();
 		}
 #ifdef TC_BFIN
-	      else if (0)
+              else if (0)
 #else
-	      else if (c == '='
-		       || ((c == ' ' || c == '\t')
-			   && input_line_pointer[1] == '='
+              else if (c == '='
+                       || ((c == ' ' || c == '\t')
+                           && input_line_pointer[1] == '='
 #ifdef TC_EQUAL_IN_INSN
-			   && !TC_EQUAL_IN_INSN (c, input_line_pointer)
+                           && !TC_EQUAL_IN_INSN (c, input_line_pointer)
 #endif
-			   ))
+                           ))
 #endif
 		{
 		  equals (s, 1);
@@ -1180,6 +1182,9 @@ do_align (int n, char *fill, int len, int max)
       len = 0;
     }
 
+#ifdef md_flush_pending_output
+  md_flush_pending_output ();
+#endif
 #ifdef md_do_align
   md_do_align (n, fill, len, max, just_record_alignment);
 #endif
@@ -1340,6 +1345,15 @@ void
 s_align_ptwo (int arg)
 {
   s_align (arg, 0);
+}
+
+/* Switch in and out of alternate macro mode.  */
+
+void
+s_altmacro (int on)
+{
+  demand_empty_rest_of_line ();
+  macro_set_alternate (on);
 }
 
 symbolS *
@@ -1580,7 +1594,7 @@ s_data (int ignore ATTRIBUTE_UNUSED)
    .file.  */
 
 void
-s_app_file_string (char *file)
+s_app_file_string (char *file, int appfile)
 {
 #ifdef LISTING
   if (listing)
@@ -1588,7 +1602,7 @@ s_app_file_string (char *file)
 #endif
   register_dependency (file);
 #ifdef obj_app_file
-  obj_app_file (file);
+  obj_app_file (file, appfile);
 #endif
 }
 
@@ -1616,7 +1630,7 @@ s_app_file (int appfile)
 
       demand_empty_rest_of_line ();
       if (!may_omit)
-	s_app_file_string (s);
+	s_app_file_string (s, appfile);
     }
 }
 
@@ -4401,10 +4415,6 @@ void
 s_leb128 (int sign)
 {
   expressionS exp;
-
-#ifdef md_flush_pending_output
-  md_flush_pending_output ();
-#endif
 
 #ifdef md_flush_pending_output
   md_flush_pending_output ();

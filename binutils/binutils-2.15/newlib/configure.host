@@ -96,6 +96,9 @@ case "${host_cpu}" in
   bfin)
 	machine_dir=bfin
 	;;
+  crx*)
+	machine_dir=crx
+	;;
   d10v*)
 	machine_dir=d10v
 	;;
@@ -313,6 +316,9 @@ case "${host}" in
   bfin-*-*)
 	sys_dir=bfin
 	;;
+  crx*)
+	sys_dir=
+	;;
   d10v*)
 	sys_dir=d10v
 	;;
@@ -504,6 +510,10 @@ case "${host}" in
 	;;
   bfin*)
 	syscall_dir=syscalls
+	;;
+  crx-*-*)
+	newlib_cflags="${newlib_cflags} -DHAVE_RENAME -DMISSING_SYSCALL_NAMES"
+	syscall_dir=
 	;;
   d10v*)
 	newlib_cflags="${newlib_cflags} -DSMALL_MEMORY"

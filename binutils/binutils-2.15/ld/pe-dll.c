@@ -398,7 +398,7 @@ auto_export (bfd *abfd, def_file *d, const char *n)
     libname = lbasename (abfd->my_archive->filename);
 
   /* We should not re-export imported stuff.  */
-  if (strncmp (n, "_imp__", 6) == 0)
+  if (strncmp (n, "_imp_", 5) == 0)
     return 0;
 
   for (i = 0; i < d->num_exports; i++)
@@ -515,7 +515,7 @@ process_def_file (bfd *abfd ATTRIBUTE_UNUSED, struct bfd_link_info *info)
       s = bfd_get_section_by_name (b, ".drectve");
       if (s)
 	{
-	  int size = bfd_get_section_size_before_reloc (s);
+	  long size = s->size;
 	  char *buf = xmalloc (size);
 
 	  bfd_get_section_contents (b, s, buf, 0, size);
@@ -527,7 +527,7 @@ process_def_file (bfd *abfd ATTRIBUTE_UNUSED, struct bfd_link_info *info)
   /* If we are not building a DLL, when there are no exports
      we do not build an export table at all.  */
   if (!pe_dll_export_everything && pe_def_file->num_exports == 0
-      && !info->shared)
+      && info->executable)
     return;
 
   /* Now, maybe export everything else the default way.  */
@@ -1252,7 +1252,7 @@ generate_reloc (bfd *abfd, struct bfd_link_info *info)
   if (page_ptr != (unsigned long) -1)
     bfd_put_32 (abfd, reloc_sz - page_ptr, reloc_d + page_ptr + 4);
 
-  while (reloc_sz < reloc_s->_raw_size)
+  while (reloc_sz < reloc_s->size)
     reloc_d[reloc_sz++] = 0;
 }
 
@@ -2665,7 +2665,7 @@ pe_dll_fill_sections (bfd *abfd, struct bfd_link_info *info)
 
   fill_edata (abfd, info);
 
-  if (info->shared)
+  if (info->shared && !info->pie)
     pe_data (abfd)->dll = 1;
 
   edata_s->contents = edata_d;

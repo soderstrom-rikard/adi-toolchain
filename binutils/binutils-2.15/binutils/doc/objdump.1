@@ -128,7 +128,7 @@
 .\" ========================================================================
 .\"
 .IX Title "OBJDUMP 1"
-.TH OBJDUMP 1 "2004-04-09" "binutils-2.14.91" "GNU Development Tools"
+.TH OBJDUMP 1 "2004-11-23" "binutils-2.15.94" "GNU Development Tools"
 .SH "NAME"
 objdump \- display information from object files.
 .SH "SYNOPSIS"
@@ -165,6 +165,7 @@ objdump [\fB\-a\fR|\fB\-\-archive\-headers\fR]
         [\fB\-\-prefix\-addresses\fR]
         [\fB\-\-[no\-]show\-raw\-insn\fR]
         [\fB\-\-adjust\-vma=\fR\fIoffset\fR]
+        [\fB\-\-special\-syms\fR]
         [\fB\-V\fR|\fB\-\-version\fR]
         [\fB\-H\fR|\fB\-\-help\fR]
         \fIobjfile\fR...
@@ -543,6 +544,11 @@ Print the dynamic symbol table entries of the file.  This is only
 meaningful for dynamic objects, such as certain types of shared
 libraries.  This is similar to the information provided by the \fBnm\fR
 program when given the \fB\-D\fR (\fB\-\-dynamic\fR) option.
+.IP "\fB\-\-special\-syms\fR" 4
+.IX Item "--special-syms"
+When displaying symbols include those which the target considers to be
+special in some way and which would not normally be of interest to the
+user.
 .IP "\fB\-V\fR" 4
 .IX Item "-V"
 .PD 0
@@ -558,7 +564,7 @@ Print the version number of \fBobjdump\fR and exit.
 .PD
 Display all available header information, including the symbol table and
 relocation entries.  Using \fB\-x\fR is equivalent to specifying all of
-\&\fB\-a \-f \-h \-r \-t\fR.
+\&\fB\-a \-f \-h \-p \-r \-t\fR.
 .IP "\fB\-w\fR" 4
 .IX Item "-w"
 .PD 0
@@ -582,7 +588,7 @@ any other data.
 .SH "COPYRIGHT"
 .IX Header "COPYRIGHT"
 Copyright (c) 1991, 92, 93, 94, 95, 96, 97, 98, 99, 2000,
-2001, 2002, 2003 Free Software Foundation, Inc.
+2001, 2002, 2003, 2004 Free Software Foundation, Inc.
 .PP
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the \s-1GNU\s0 Free Documentation License, Version 1.1

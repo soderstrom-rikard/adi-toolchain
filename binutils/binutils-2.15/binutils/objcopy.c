@@ -377,6 +377,7 @@ extern unsigned long          bfd_external_machine;
 
 /* Forward declarations.  */
 static void setup_section (bfd *, asection *, void *);
+static void setup_bfd_headers (bfd *, bfd *);
 static void copy_section (bfd *, asection *, void *);
 static void get_sections (bfd *, asection *, void *);
 static int compare_section_lma (const void *, const void *);
@@ -410,7 +411,7 @@ copy_usage (FILE *stream, int exit_status)
   -G --keep-global-symbol <name>   Localize all symbols except <name>\n\
   -W --weaken-symbol <name>        Force symbol <name> to be marked as a weak\n\
      --weaken                      Force all global symbols to be marked as weak\n\
-  -w --wildcard                    Permit wildcard in symbol comparasion\n\
+  -w --wildcard                    Permit wildcard in symbol comparison\n\
   -x --discard-all                 Remove all non-global symbols\n\
   -X --discard-locals              Remove any compiler-generated symbols\n\
   -i --interleave <number>         Only copy one out of every <number> bytes\n\
@@ -485,7 +486,7 @@ strip_usage (FILE *stream, int exit_status)
      --only-keep-debug             Strip everything but the debug information\n\
   -N --strip-symbol=<name>         Do not copy symbol <name>\n\
   -K --keep-symbol=<name>          Only copy symbol <name>\n\
-  -w --wildcard                    Permit wildcard in symbol comparasion\n\
+  -w --wildcard                    Permit wildcard in symbol comparison\n\
   -x --discard-all                 Remove all non-global symbols\n\
   -X --discard-locals              Remove any compiler-generated symbols\n\
   -v --verbose                     List all object files modified\n\
@@ -699,8 +700,8 @@ add_specific_symbols (const char *filename, struct symlist **list)
 	    ;
 
 	  if (! IS_LINE_TERMINATOR (* extra))
-	    non_fatal (_("Ignoring rubbish found on line %d of %s"),
-		       line_count, filename);
+	    non_fatal (_("%s:%d: Ignoring rubbish found on this line"),
+		       filename, line_count);
 	}
 
       * name_end = '\0';
@@ -890,7 +891,7 @@ filter_symbols (bfd *abfd, bfd *obfd, asymbol **osyms,
 	keep = (strip_symbols != STRIP_DEBUG
 		&& strip_symbols != STRIP_UNNEEDED
 		&& ! convert_debugging);
-      else if (bfd_get_section (sym)->comdat)
+      else if (bfd_coff_get_comdat_section (abfd, bfd_get_section (sym)))
 	/* COMDAT sections store special information in local
 	   symbols, so we cannot risk stripping any of them.  */
 	keep = 1;
@@ -1067,10 +1068,10 @@ add_redefine_syms_file (const char *filename)
 	  continue;
 	}
       else
-	fatal (_("%s: garbage at end of line %d"), filename, lineno);
+	fatal (_("%s:%d: garbage found at end of line"), filename, lineno);
  comment:
       if (len != 0 && (outsym_off == 0 || outsym_off == len))
-	fatal (_("%s: missing new symbol name at line %d"), filename, lineno);
+	fatal (_("%s:%d: missing new symbol name"), filename, lineno);
       buf[len++] = '\0';
 
       /* Eat the rest of the line and finish it.  */
@@ -1080,7 +1081,7 @@ add_redefine_syms_file (const char *filename)
     }
 
   if (len != 0)
-    fatal (_("%s: premature end of file at line %d"), filename, lineno);
+    fatal (_("%s:%d: premature end of file"), filename, lineno);
 
   free (buf);
 }
@@ -1177,6 +1178,8 @@ copy_object (bfd *ibfd, bfd *obfd)
   /* BFD mandates that all output sections be created and sizes set before
      any output is done.  Thus, we traverse all sections multiple times.  */
   bfd_map_over_sections (ibfd, setup_section, obfd);
+
+  setup_bfd_headers (ibfd, obfd);
 
   if (add_sections != NULL)
     {
@@ -1808,6 +1811,32 @@ find_section_rename (bfd * ibfd ATTRIBUTE_UNUSED, sec_ptr isection,
   return old_name;
 }
 
+/* Once each of the sections is copied, we may still need to do some
+   finalization work for private section headers.  Do that here.  */
+
+static void
+setup_bfd_headers (bfd *ibfd, bfd *obfd)
+{
+  const char *err;
+
+  /* Allow the BFD backend to copy any private data it understands
+     from the input section to the output section.  */
+  if (! bfd_copy_private_header_data (ibfd, obfd))
+    {
+      err = _("private header data");
+      goto loser;
+    }
+
+  /* All went well.  */
+  return;
+
+loser:
+  non_fatal (_("%s: error in %s: %s"),
+	     bfd_get_filename (ibfd),
+	     err, bfd_errmsg (bfd_get_error ()));
+  status = 1;
+}
+
 /* Create a section in OBFD with the same
    name and attributes as ISECTION in IBFD.  */
 
@@ -1985,7 +2014,7 @@ copy_section (bfd *ibfd, sec_ptr isection, void *obfdarg)
     return;
 
   osection = isection->output_section;
-  size = bfd_get_section_size_before_reloc (isection);
+  size = bfd_get_section_size (isection);
 
   if (size == 0 || osection == 0)
     return;
@@ -2040,9 +2069,6 @@ copy_section (bfd *ibfd, sec_ptr isection, void *obfdarg)
       if (relcount == 0)
 	free (relpp);
     }
-
-  isection->_cooked_size = isection->_raw_size;
-  isection->reloc_done = TRUE;
 
   if (bfd_get_section_flags (ibfd, isection) & SEC_HAS_CONTENTS
       && bfd_get_section_flags (obfd, osection) & SEC_HAS_CONTENTS)
@@ -2135,9 +2161,9 @@ compare_section_lma (const void *arg1, const void *arg2)
     return -1;
 
   /* Sort sections with the same LMA by size.  */
-  if ((*sec1)->_raw_size > (*sec2)->_raw_size)
+  if (bfd_get_section_size (*sec1) > bfd_get_section_size (*sec2))
     return 1;
-  else if ((*sec1)->_raw_size < (*sec2)->_raw_size)
+  else if (bfd_get_section_size (*sec1) < bfd_get_section_size (*sec2))
     return -1;
 
   return 0;

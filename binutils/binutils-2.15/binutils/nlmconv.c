@@ -1,6 +1,6 @@
 /* nlmconv.c -- NLM conversion program
-   Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
-   Free Software Foundation, Inc.
+   Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002,
+   2003, 2004 Free Software Foundation, Inc.
 
    This file is part of GNU Binutils.
 
@@ -133,7 +133,7 @@ static void mangle_relocs
   (bfd *, asection *, arelent ***, long *, char *, bfd_size_type);
 static void default_mangle_relocs
   (bfd *, asection *, arelent ***, long *, char *, bfd_size_type);
-static char *link_inputs (struct string_list *, char *);
+static char *link_inputs (struct string_list *, char *, char *);
 
 #ifdef NLMCONV_I386
 static void i386_mangle_relocs (bfd *, asection *, arelent ***, long *, char *, bfd_size_type);
@@ -320,7 +320,7 @@ main (int argc, char **argv)
       if (input_files->next == NULL)
 	input_file = input_files->string;
       else
-	input_file = link_inputs (input_files, ld_arg);
+	input_file = link_inputs (input_files, ld_arg, map_file);
     }
   else if (input_file == NULL)
     {
@@ -431,7 +431,7 @@ main (int argc, char **argv)
     {
       bfd_size_type add;
 
-      vma = bfd_get_section_size_before_reloc (data_sec);
+      vma = bfd_get_section_size (data_sec);
       align = 1 << bss_sec->alignment_power;
       add = ((vma + align - 1) &~ (align - 1)) - vma;
       vma += add;
@@ -441,7 +441,7 @@ main (int argc, char **argv)
 	{
 	  bfd_size_type data_size;
 
-	  data_size = bfd_get_section_size_before_reloc (data_sec);
+	  data_size = bfd_get_section_size (data_sec);
 	  if (! bfd_set_section_size (outbfd, data_sec, data_size + add))
 	    bfd_fatal (_("set .data size"));
 	}
@@ -459,7 +459,7 @@ main (int argc, char **argv)
   endsym = NULL;
   for (i = 0; i < symcount; i++)
     {
-      register asymbol *sym;
+      asymbol *sym;
 
       sym = symbols[i];
 
@@ -499,14 +499,14 @@ main (int argc, char **argv)
 	 symbols into the .bss section, and mark them as exported.  */
       if (bfd_is_com_section (bfd_get_section (sym)))
 	{
-	  bfd_vma size;
+	  bfd_vma size = sym->value;
 
 	  sym->section = bss_sec;
-	  size = sym->value;
-	  sym->value = bss_sec->_raw_size;
-	  bss_sec->_raw_size += size;
+	  sym->value = bfd_get_section_size (bss_sec);
+	  size += sym->value;
 	  align = 1 << bss_sec->alignment_power;
-	  bss_sec->_raw_size = (bss_sec->_raw_size + align - 1) &~ (align - 1);
+	  size = (size + align - 1) & ~(align - 1);
+	  bfd_set_section_size (outbfd, bss_sec, size);
 	  sym->flags |= BSF_EXPORT | BSF_GLOBAL;
 	}
       else if (bfd_get_section (sym)->output_section != NULL)
@@ -555,7 +555,7 @@ main (int argc, char **argv)
       /* If this is a global symbol, check the export list.  */
       if ((sym->flags & (BSF_EXPORT | BSF_GLOBAL)) != 0)
 	{
-	  register struct string_list *l;
+	  struct string_list *l;
 	  int found_simple;
 
 	  /* Unfortunately, a symbol can appear multiple times on the
@@ -603,7 +603,7 @@ main (int argc, char **argv)
 	 Change the prefix if necessary.  */
       if (bfd_is_und_section (bfd_get_section (sym)))
 	{
-	  register struct string_list *l;
+	  struct string_list *l;
 
 	  for (l = import_symbols; l != NULL; l = l->next)
 	    {
@@ -670,7 +670,7 @@ main (int argc, char **argv)
 
   if (endsym != NULL)
     {
-      endsym->value = bfd_get_section_size_before_reloc (bss_sec);
+      endsym->value = bfd_get_section_size (bss_sec);
 
       /* FIXME: If any relocs referring to _end use inplace addends,
 	 then I think they need to be updated.  This is handled by
@@ -922,8 +922,8 @@ main (int argc, char **argv)
 	 export information and the debugging information.  */
       nlm_fixed_header (outbfd)->debugInfoOffset = (file_ptr) -1;
     }
-  if (map_file != NULL)
-    non_fatal (_("warning: MAP and FULLMAP are not supported; try ld -M"));
+  if (full_map)
+    non_fatal (_("warning: FULLMAP is not supported; try ld -M"));
   if (help_file != NULL)
     {
       void *data;
@@ -1230,11 +1230,7 @@ copy_sections (bfd *inbfd, asection *insec, void *data_ptr)
   outsec = insec->output_section;
   assert (outsec != NULL);
 
-  size = bfd_get_section_size_before_reloc (insec);
-
-  /* FIXME: Why are these necessary?  */
-  insec->_cooked_size = insec->_raw_size;
-  insec->reloc_done = TRUE;
+  size = bfd_get_section_size (insec);
 
   if ((bfd_get_section_flags (inbfd, insec) & SEC_HAS_CONTENTS) == 0)
     contents = NULL;
@@ -1365,8 +1361,8 @@ default_mangle_relocs (bfd *outbfd ATTRIBUTE_UNUSED, asection *insec,
   if (insec->output_offset != 0)
     {
       long reloc_count;
-      register arelent **relocs;
-      register long i;
+      arelent **relocs;
+      long i;
 
       reloc_count = *reloc_count_ptr;
       relocs = *relocs_ptr;
@@ -1553,13 +1549,13 @@ static reloc_howto_type nlm32_alpha_nw_howto =
 
 static void
 alpha_mangle_relocs (bfd *outbfd, asection *insec,
-		     register arelent ***relocs_ptr, long *reloc_count_ptr,
+		     arelent ***relocs_ptr, long *reloc_count_ptr,
 		     char *contents ATTRIBUTE_UNUSED,
 		     bfd_size_type contents_size ATTRIBUTE_UNUSED)
 {
   long old_reloc_count;
   arelent **old_relocs;
-  register arelent **relocs;
+  arelent **relocs;
 
   old_reloc_count = *reloc_count_ptr;
   old_relocs = *relocs_ptr;
@@ -1615,7 +1611,7 @@ alpha_mangle_relocs (bfd *outbfd, asection *insec,
 
   if (insec->output_offset != 0)
     {
-      register bfd_size_type i;
+      bfd_size_type i;
 
       for (i = 0; i < (bfd_size_type) old_reloc_count; i++, relocs++)
 	(*relocs)->address += insec->output_offset;
@@ -1863,14 +1859,14 @@ powerpc_resolve_stubs (bfd *inbfd, bfd *outbfd)
 
 static void
 powerpc_mangle_relocs (bfd *outbfd, asection *insec,
-		       register arelent ***relocs_ptr,
+		       arelent ***relocs_ptr,
 		       long *reloc_count_ptr, char *contents,
 		       bfd_size_type contents_size ATTRIBUTE_UNUSED)
 {
   reloc_howto_type *toc_howto;
   long reloc_count;
-  register arelent **relocs;
-  register long i;
+  arelent **relocs;
+  long i;
 
   toc_howto = bfd_reloc_type_lookup (insec->owner, BFD_RELOC_PPC_TOC16);
   if (toc_howto == (reloc_howto_type *) NULL)
@@ -1881,8 +1877,7 @@ powerpc_mangle_relocs (bfd *outbfd, asection *insec,
      going to write out whatever we return in the contents field.  */
   if (strcmp (bfd_get_section_name (insec->owner, insec), ".got") == 0)
     memset (contents + powerpc_initial_got_size, 0,
-	    (size_t) (bfd_get_section_size_after_reloc (insec)
-		      - powerpc_initial_got_size));
+	    (size_t) (bfd_get_section_size (insec) - powerpc_initial_got_size));
 
   reloc_count = *reloc_count_ptr;
   relocs = *relocs_ptr;
@@ -2041,7 +2036,7 @@ powerpc_mangle_relocs (bfd *outbfd, asection *insec,
    file.  */
 
 static char *
-link_inputs (struct string_list *inputs, char *ld)
+link_inputs (struct string_list *inputs, char *ld, char * map_file)
 {
   size_t c;
   struct string_list *q;
@@ -2056,7 +2051,7 @@ link_inputs (struct string_list *inputs, char *ld)
   for (q = inputs; q != NULL; q = q->next)
     ++c;
 
-  argv = (char **) alloca ((c + 5) * sizeof(char *));
+  argv = (char **) alloca ((c + 7) * sizeof (char *));
 
 #ifndef __MSDOS__
   if (ld == NULL)
@@ -2088,7 +2083,19 @@ link_inputs (struct string_list *inputs, char *ld)
   argv[1] = (char *) "-Ur";
   argv[2] = (char *) "-o";
   argv[3] = unlink_on_exit;
-  i = 4;
+  /* If we have been given the name of a mapfile and that
+     name is not 'stderr' then pass it on to the linker.  */
+  if (map_file
+      && * map_file
+      && strcmp (map_file, "stderr") == 0)
+    {
+      argv[4] = (char *) "-Map";
+      argv[5] = map_file;
+      i = 6;
+    }
+  else
+    i = 4;
+
   for (q = inputs; q != NULL; q = q->next, i++)
     argv[i] = q->string;
   argv[i] = NULL;

@@ -46,6 +46,7 @@ CPU_TYPES = \
 	arm \
 	avr \
 	cris \
+	crx \
 	d10v \
 	d30v \
 	dlx \
@@ -70,7 +71,7 @@ CPU_TYPES = \
 	mn10200 \
 	mn10300 \
 	msp430 \
-	bfin \
+        bfin \
 	ns32k \
 	openrisc \
 	or32 \
@@ -232,7 +233,8 @@ HFILES = \
 	subsegs.h \
 	symbols.h \
 	tc.h \
-	write.h
+	write.h \
+        bfin-defs.h
 
 # CPU files in config.
 
@@ -243,6 +245,7 @@ TARGET_CPU_CFILES = \
 	config/tc-arm.c \
 	config/tc-avr.c \
 	config/tc-cris.c \
+	config/tc-crx.c \
 	config/tc-d10v.c \
 	config/tc-d30v.c \
 	config/tc-dlx.c \
@@ -267,7 +270,7 @@ TARGET_CPU_CFILES = \
 	config/tc-mn10200.c \
 	config/tc-mn10300.c \
 	config/tc-msp430.c \
-	config/tc-bfin.c \
+        config/tc-bfin.c \
 	config/tc-ns32k.c \
 	config/tc-openrisc.c \
 	config/tc-or32.c \
@@ -296,6 +299,7 @@ TARGET_CPU_HFILES = \
 	config/tc-arm.h \
 	config/tc-avr.h \
 	config/tc-cris.h \
+	config/tc-crx.h \
 	config/tc-d10v.h \
 	config/tc-d30v.h \
 	config/tc-dlx.h \
@@ -320,7 +324,7 @@ TARGET_CPU_HFILES = \
 	config/tc-mn10200.h \
 	config/tc-mn10300.h \
 	config/tc-msp430.h \
-	config/tc-bfin.h \
+        config/tc-bfin.h \
 	config/tc-ns32k.h \
 	config/tc-openrisc.h \
 	config/tc-or32.h \
@@ -394,14 +398,15 @@ TARG_ENV_HFILES = \
 	config/te-macos.h \
 	config/te-nbsd.h \
 	config/te-nbsd532.h \
+	config/te-netware.h \
 	config/te-pc532mach.h \
 	config/te-pe.h \
-	config/te-ppcnw.h \
 	config/te-psos.h \
 	config/te-riscix.h \
 	config/te-sparcaout.h \
 	config/te-sun3.h \
 	config/te-svr4.h \
+	config/te-symbian.h \
 	config/te-sysv32.h \
 	config/te-tmips.h
 
@@ -475,7 +480,7 @@ stamp-mk.com: vmsconf.sh Makefile
 	touch stamp-mk.com
 
 EXTRA_DIST = make-gas.com m68k-parse.c itbl-parse.c itbl-parse.h itbl-lex.c \
-	bfin-parse.c bfin-lex.c bfin-defs.h
+        bfin-parse.c bfin-lex.c bfin-defs.h
 
 diststuff: $(EXTRA_DIST) info
 
@@ -650,17 +655,21 @@ m68k-parse.o: m68k-parse.c $(srcdir)/config/m68k-parse.h
 m68k-parse.h: ; @true
 $(srcdir)/config/m68k-parse.h: ; @true
 
-bfin-parse.c: $(srcdir)/config/bfin-parse.y
-	$(SHELL) $(YLWRAP) "$(YACC)" $(srcdir)/config/bfin-parse.y y.tab.c bfin-parse.c --
+bfin-parse.c bfin-parse.tab.h: $(srcdir)/config/bfin-parse.y
+        $(SHELL) $(YLWRAP) "$(YACC)" $(srcdir)/config/bfin-parse.y y.tab.c bfin-parse.c bfin-parse.tab.h -- -d
 bfin-parse.o: bfin-parse.c $(srcdir)/config/bfin-defs.h
 
 # Don't let the .y.h rule clobber bfin-defs.h.
 bfin-defs.h: ; @true
 $(srcdir)/config/bfin-defs.h: ; @true
 
-bfin-lex.o: bfin-lex.c $(srcdir)/config/bfin-defs.h
 bfin-lex.c: $(srcdir)/config/bfin-lex.l
- 
+        $(SHELL) $(YLWRAP) "$(LEX)" $(srcdir)/config/bfin-lex.l lex.yy.c bfin-lex.c
+bfin-lex.o: bfin-lex.c $(srcdir)/config/bfin-defs.h
+
+#bfin-defs.o:
+#       $(COMPILE) -c $(srcdir)/config/bfin-defs.
+
 # The instruction table specification lexical analyzer and parser.
 
 itbl-lex.c: $(srcdir)/itbl-lex.l
@@ -1036,17 +1045,19 @@ DEPTC_arc_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
   $(INCDIR)/elf/arc.h $(INCDIR)/elf/reloc-macros.h dwarf2dbg.h
 DEPTC_arm_aout = $(INCDIR)/symcat.h $(srcdir)/config/obj-aout.h \
   $(srcdir)/config/tc-arm.h $(BFDDIR)/libaout.h $(INCDIR)/bfdlink.h \
-  $(INCDIR)/safe-ctype.h subsegs.h $(INCDIR)/obstack.h
+  $(INCDIR)/safe-ctype.h subsegs.h $(INCDIR)/obstack.h \
+  $(INCDIR)/opcode/arm.h
 DEPTC_arm_coff = $(INCDIR)/symcat.h $(srcdir)/config/obj-coff.h \
   $(srcdir)/config/tc-arm.h $(INCDIR)/coff/internal.h \
   $(INCDIR)/coff/arm.h $(INCDIR)/coff/external.h $(BFDDIR)/libcoff.h \
   $(INCDIR)/bfdlink.h $(INCDIR)/safe-ctype.h subsegs.h \
-  $(INCDIR)/obstack.h
+  $(INCDIR)/obstack.h $(INCDIR)/opcode/arm.h
 DEPTC_arm_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
   $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-arm.h \
   $(INCDIR)/safe-ctype.h subsegs.h $(INCDIR)/obstack.h \
-  $(INCDIR)/elf/arm.h $(INCDIR)/elf/reloc-macros.h dwarf2dbg.h
+  $(INCDIR)/opcode/arm.h $(INCDIR)/elf/arm.h $(INCDIR)/elf/reloc-macros.h \
+  dwarf2dbg.h dw2gencfi.h $(INCDIR)/elf/dwarf2.h
 DEPTC_avr_coff = $(INCDIR)/symcat.h $(srcdir)/config/obj-coff.h \
   $(srcdir)/config/tc-avr.h $(INCDIR)/coff/internal.h \
   $(BFDDIR)/libcoff.h $(INCDIR)/bfdlink.h $(INCDIR)/safe-ctype.h \
@@ -1065,6 +1076,16 @@ DEPTC_cris_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-cris.h \
   $(INCDIR)/safe-ctype.h subsegs.h $(INCDIR)/obstack.h \
   $(INCDIR)/opcode/cris.h dwarf2dbg.h
+DEPTC_crx_coff = $(INCDIR)/symcat.h $(srcdir)/config/obj-coff.h \
+  $(srcdir)/config/tc-crx.h $(INCDIR)/coff/internal.h \
+  $(BFDDIR)/libcoff.h $(INCDIR)/bfdlink.h $(INCDIR)/safe-ctype.h \
+  dwarf2dbg.h $(INCDIR)/opcode/crx.h $(INCDIR)/elf/crx.h \
+  $(INCDIR)/elf/reloc-macros.h
+DEPTC_crx_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
+  $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
+  $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-crx.h \
+  $(INCDIR)/safe-ctype.h dwarf2dbg.h $(INCDIR)/opcode/crx.h \
+  $(INCDIR)/elf/crx.h $(INCDIR)/elf/reloc-macros.h
 DEPTC_d10v_coff = $(INCDIR)/symcat.h $(srcdir)/config/obj-coff.h \
   $(srcdir)/config/tc-d10v.h $(INCDIR)/coff/internal.h \
   $(BFDDIR)/libcoff.h $(INCDIR)/bfdlink.h $(INCDIR)/safe-ctype.h \
@@ -1170,18 +1191,20 @@ DEPTC_i370_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
 DEPTC_i386_aout = $(INCDIR)/symcat.h $(srcdir)/config/obj-aout.h \
   $(srcdir)/config/tc-i386.h $(BFDDIR)/libaout.h $(INCDIR)/bfdlink.h \
   $(INCDIR)/safe-ctype.h subsegs.h $(INCDIR)/obstack.h \
-  dwarf2dbg.h dw2gencfi.h $(INCDIR)/elf/dwarf2.h $(INCDIR)/opcode/i386.h
+  dwarf2dbg.h dw2gencfi.h $(INCDIR)/elf/dwarf2.h $(INCDIR)/opcode/i386.h \
+  $(INCDIR)/elf/x86-64.h $(INCDIR)/elf/reloc-macros.h
 DEPTC_i386_coff = $(INCDIR)/symcat.h $(srcdir)/config/obj-coff.h \
   $(srcdir)/config/tc-i386.h $(INCDIR)/coff/internal.h \
   $(INCDIR)/coff/i386.h $(INCDIR)/coff/external.h $(BFDDIR)/libcoff.h \
   $(INCDIR)/bfdlink.h $(INCDIR)/safe-ctype.h subsegs.h \
   $(INCDIR)/obstack.h dwarf2dbg.h dw2gencfi.h $(INCDIR)/elf/dwarf2.h \
-  $(INCDIR)/opcode/i386.h
+  $(INCDIR)/opcode/i386.h $(INCDIR)/elf/x86-64.h $(INCDIR)/elf/reloc-macros.h
 DEPTC_i386_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
   $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-i386.h \
   $(INCDIR)/safe-ctype.h subsegs.h $(INCDIR)/obstack.h \
-  dwarf2dbg.h dw2gencfi.h $(INCDIR)/elf/dwarf2.h $(INCDIR)/opcode/i386.h
+  dwarf2dbg.h dw2gencfi.h $(INCDIR)/elf/dwarf2.h $(INCDIR)/opcode/i386.h \
+  $(INCDIR)/elf/x86-64.h $(INCDIR)/elf/reloc-macros.h
 DEPTC_i860_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
   $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-i860.h \
@@ -1216,13 +1239,14 @@ DEPTC_m32r_coff = $(INCDIR)/symcat.h $(srcdir)/config/obj-coff.h \
   $(BFDDIR)/libcoff.h $(INCDIR)/bfdlink.h $(INCDIR)/safe-ctype.h \
   subsegs.h $(INCDIR)/obstack.h $(srcdir)/../opcodes/m32r-desc.h \
   $(INCDIR)/opcode/cgen.h $(srcdir)/../opcodes/m32r-opc.h \
-  cgen.h
+  cgen.h $(INCDIR)/elf/m32r.h $(INCDIR)/elf/reloc-macros.h
 DEPTC_m32r_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
   $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-m32r.h \
   $(INCDIR)/safe-ctype.h subsegs.h $(INCDIR)/obstack.h \
   $(srcdir)/../opcodes/m32r-desc.h $(INCDIR)/opcode/cgen.h \
-  $(srcdir)/../opcodes/m32r-opc.h cgen.h
+  $(srcdir)/../opcodes/m32r-opc.h cgen.h $(INCDIR)/elf/m32r.h \
+  $(INCDIR)/elf/reloc-macros.h
 DEPTC_m68hc11_coff = $(INCDIR)/symcat.h $(srcdir)/config/obj-coff.h \
   $(srcdir)/config/tc-m68hc11.h $(INCDIR)/coff/internal.h \
   $(INCDIR)/coff/m68k.h $(INCDIR)/coff/external.h $(BFDDIR)/libcoff.h \
@@ -1236,7 +1260,6 @@ DEPTC_m68hc11_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
   $(INCDIR)/opcode/m68hc11.h dwarf2dbg.h $(INCDIR)/elf/m68hc11.h \
   $(INCDIR)/elf/reloc-macros.h
 DEPTC_m68k_aout = $(INCDIR)/symcat.h $(srcdir)/config/obj-aout.h \
->>>>>>> 1.1.1.2
   $(srcdir)/config/tc-m68k.h $(BFDDIR)/libaout.h $(INCDIR)/bfdlink.h \
   $(INCDIR)/safe-ctype.h $(INCDIR)/obstack.h subsegs.h \
   dwarf2dbg.h dw2gencfi.h $(INCDIR)/elf/dwarf2.h $(INCDIR)/opcode/m68k.h \
@@ -1279,13 +1302,6 @@ DEPTC_mcore_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-mcore.h \
   subsegs.h $(INCDIR)/obstack.h $(srcdir)/../opcodes/mcore-opc.h \
   $(INCDIR)/safe-ctype.h $(INCDIR)/elf/mcore.h $(INCDIR)/elf/reloc-macros.h
-DEPTC_mips_aout = $(INCDIR)/symcat.h $(srcdir)/config/obj-aout.h \
-  $(srcdir)/config/tc-mips.h $(BFDDIR)/libaout.h $(INCDIR)/bfdlink.h \
-  subsegs.h $(INCDIR)/obstack.h $(INCDIR)/safe-ctype.h \
-  $(INCDIR)/opcode/mips.h itbl-ops.h dwarf2dbg.h $(srcdir)/config/obj-elf.h \
-  $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
-  $(INCDIR)/elf/external.h $(INCDIR)/elf/mips.h $(INCDIR)/elf/reloc-macros.h \
-  ecoff.h $(INCDIR)/coff/sym.h $(INCDIR)/coff/ecoff.h
 DEPTC_mips_coff = $(INCDIR)/symcat.h $(srcdir)/config/obj-coff.h \
   $(srcdir)/config/tc-mips.h $(INCDIR)/coff/internal.h \
   $(INCDIR)/coff/mipspe.h $(INCDIR)/coff/external.h $(BFDDIR)/libcoff.h \
@@ -1424,20 +1440,23 @@ DEPTC_sh_coff = $(INCDIR)/symcat.h $(srcdir)/config/obj-coff.h \
   $(srcdir)/config/tc-sh.h $(INCDIR)/coff/internal.h \
   $(INCDIR)/coff/sh.h $(INCDIR)/coff/external.h $(BFDDIR)/libcoff.h \
   $(INCDIR)/bfdlink.h subsegs.h $(INCDIR)/obstack.h $(srcdir)/../opcodes/sh-opc.h \
-  $(INCDIR)/safe-ctype.h struc-symbol.h dwarf2dbg.h dw2gencfi.h
+  $(INCDIR)/safe-ctype.h struc-symbol.h dwarf2dbg.h dw2gencfi.h \
+  $(INCDIR)/elf/dwarf2.h
 DEPTC_sh_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
   $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-sh.h \
   subsegs.h $(INCDIR)/obstack.h $(srcdir)/../opcodes/sh-opc.h \
   $(INCDIR)/safe-ctype.h struc-symbol.h $(INCDIR)/elf/sh.h \
-  $(INCDIR)/elf/reloc-macros.h dwarf2dbg.h dw2gencfi.h
+  $(INCDIR)/elf/reloc-macros.h dwarf2dbg.h dw2gencfi.h \
+  $(INCDIR)/elf/dwarf2.h
 DEPTC_sh64_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
   $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-sh64.h \
   $(srcdir)/config/tc-sh.h $(INCDIR)/elf/sh.h $(INCDIR)/elf/reloc-macros.h \
   $(BFDDIR)/elf32-sh64.h $(INCDIR)/safe-ctype.h $(srcdir)/../opcodes/sh64-opc.h \
   $(srcdir)/config/tc-sh.c subsegs.h $(INCDIR)/obstack.h \
-  $(srcdir)/../opcodes/sh-opc.h struc-symbol.h dwarf2dbg.h dw2gencfi.h
+  $(srcdir)/../opcodes/sh-opc.h struc-symbol.h dwarf2dbg.h \
+  dw2gencfi.h $(INCDIR)/elf/dwarf2.h
 DEPTC_sparc_aout = $(INCDIR)/symcat.h $(srcdir)/config/obj-aout.h \
   $(srcdir)/config/tc-sparc.h $(BFDDIR)/libaout.h $(INCDIR)/bfdlink.h \
   $(INCDIR)/safe-ctype.h subsegs.h $(INCDIR)/obstack.h \
@@ -1560,9 +1579,9 @@ DEPTC_xstormy16_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
 DEPTC_xtensa_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
   $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-xtensa.h \
-  $(INCDIR)/xtensa-config.h sb.h $(INCDIR)/safe-ctype.h \
-  subsegs.h $(INCDIR)/obstack.h $(srcdir)/config/xtensa-relax.h \
-  $(INCDIR)/xtensa-isa.h $(srcdir)/config/xtensa-istack.h \
+  $(INCDIR)/xtensa-isa.h $(INCDIR)/xtensa-config.h sb.h \
+  $(INCDIR)/safe-ctype.h subsegs.h $(INCDIR)/obstack.h \
+  $(srcdir)/config/xtensa-relax.h $(srcdir)/config/xtensa-istack.h \
   dwarf2dbg.h struc-symbol.h
 DEPTC_z8k_coff = $(INCDIR)/symcat.h $(srcdir)/config/obj-coff.h \
   $(srcdir)/config/tc-z8k.h $(INCDIR)/coff/internal.h \
@@ -1645,6 +1664,15 @@ DEPOBJ_cris_aout = $(INCDIR)/symcat.h $(srcdir)/config/obj-aout.h \
 DEPOBJ_cris_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
   $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-cris.h \
+  $(INCDIR)/safe-ctype.h subsegs.h $(INCDIR)/obstack.h \
+  struc-symbol.h dwarf2dbg.h $(INCDIR)/aout/aout64.h
+DEPOBJ_crx_coff = $(INCDIR)/symcat.h $(srcdir)/config/obj-coff.h \
+  $(srcdir)/config/tc-crx.h $(INCDIR)/coff/internal.h \
+  $(BFDDIR)/libcoff.h $(INCDIR)/bfdlink.h $(INCDIR)/obstack.h \
+  subsegs.h
+DEPOBJ_crx_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
+  $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
+  $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-crx.h \
   $(INCDIR)/safe-ctype.h subsegs.h $(INCDIR)/obstack.h \
   struc-symbol.h dwarf2dbg.h $(INCDIR)/aout/aout64.h
 DEPOBJ_d10v_coff = $(INCDIR)/symcat.h $(srcdir)/config/obj-coff.h \
@@ -1831,9 +1859,6 @@ DEPOBJ_mcore_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-mcore.h \
   $(INCDIR)/safe-ctype.h subsegs.h $(INCDIR)/obstack.h \
   struc-symbol.h dwarf2dbg.h $(INCDIR)/aout/aout64.h
-DEPOBJ_mips_aout = $(INCDIR)/symcat.h $(srcdir)/config/obj-aout.h \
-  $(srcdir)/config/tc-mips.h $(BFDDIR)/libaout.h $(INCDIR)/bfdlink.h \
-  $(INCDIR)/aout/aout64.h $(INCDIR)/obstack.h
 DEPOBJ_mips_coff = $(INCDIR)/symcat.h $(srcdir)/config/obj-coff.h \
   $(srcdir)/config/tc-mips.h $(INCDIR)/coff/internal.h \
   $(INCDIR)/coff/mipspe.h $(INCDIR)/coff/external.h $(BFDDIR)/libcoff.h \
@@ -2080,8 +2105,9 @@ DEPOBJ_xstormy16_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
 DEPOBJ_xtensa_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
   $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-xtensa.h \
-  $(INCDIR)/xtensa-config.h $(INCDIR)/safe-ctype.h subsegs.h \
-  $(INCDIR)/obstack.h struc-symbol.h dwarf2dbg.h $(INCDIR)/aout/aout64.h
+  $(INCDIR)/xtensa-isa.h $(INCDIR)/xtensa-config.h $(INCDIR)/safe-ctype.h \
+  subsegs.h $(INCDIR)/obstack.h struc-symbol.h dwarf2dbg.h \
+  $(INCDIR)/aout/aout64.h
 DEPOBJ_z8k_coff = $(INCDIR)/symcat.h $(srcdir)/config/obj-coff.h \
   $(srcdir)/config/tc-z8k.h $(INCDIR)/coff/internal.h \
   $(INCDIR)/coff/z8k.h $(INCDIR)/coff/external.h $(BFDDIR)/libcoff.h \
@@ -2141,6 +2167,12 @@ DEP_cris_aout = $(srcdir)/config/obj-aout.h $(srcdir)/config/tc-cris.h \
 DEP_cris_elf = $(srcdir)/config/obj-elf.h $(INCDIR)/symcat.h \
   $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-cris.h
+DEP_crx_coff = $(srcdir)/config/obj-coff.h $(srcdir)/config/tc-crx.h \
+  $(INCDIR)/symcat.h $(INCDIR)/coff/internal.h $(BFDDIR)/libcoff.h \
+  $(INCDIR)/bfdlink.h
+DEP_crx_elf = $(srcdir)/config/obj-elf.h $(INCDIR)/symcat.h \
+  $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
+  $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-crx.h
 DEP_d10v_coff = $(srcdir)/config/obj-coff.h $(srcdir)/config/tc-d10v.h \
   $(INCDIR)/symcat.h $(INCDIR)/coff/internal.h $(BFDDIR)/libcoff.h \
   $(INCDIR)/bfdlink.h
@@ -2263,8 +2295,6 @@ DEP_mcore_coff = $(srcdir)/config/obj-coff.h $(srcdir)/config/tc-mcore.h \
 DEP_mcore_elf = $(srcdir)/config/obj-elf.h $(INCDIR)/symcat.h \
   $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-mcore.h
-DEP_mips_aout = $(srcdir)/config/obj-aout.h $(srcdir)/config/tc-mips.h \
-  $(BFDDIR)/libaout.h $(INCDIR)/bfdlink.h
 DEP_mips_coff = $(srcdir)/config/obj-coff.h $(srcdir)/config/tc-mips.h \
   $(INCDIR)/symcat.h $(INCDIR)/coff/internal.h $(INCDIR)/coff/mipspe.h \
   $(INCDIR)/coff/external.h $(BFDDIR)/libcoff.h $(INCDIR)/bfdlink.h
@@ -2428,7 +2458,7 @@ DEP_xstormy16_elf = $(srcdir)/config/obj-elf.h $(INCDIR)/symcat.h \
 DEP_xtensa_elf = $(srcdir)/config/obj-elf.h $(INCDIR)/symcat.h \
   $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-xtensa.h \
-  $(INCDIR)/xtensa-config.h
+  $(INCDIR)/xtensa-isa.h $(INCDIR)/xtensa-config.h
 DEP_z8k_coff = $(srcdir)/config/obj-coff.h $(srcdir)/config/tc-z8k.h \
   $(INCDIR)/symcat.h $(INCDIR)/coff/internal.h $(INCDIR)/coff/z8k.h \
   $(INCDIR)/coff/external.h $(BFDDIR)/libcoff.h $(INCDIR)/bfdlink.h
@@ -2474,7 +2504,8 @@ input-scrub.o: input-scrub.c $(INCDIR)/symcat.h input-file.h \
 listing.o: listing.c $(INCDIR)/symcat.h $(INCDIR)/obstack.h \
   $(INCDIR)/safe-ctype.h input-file.h subsegs.h
 literal.o: literal.c $(INCDIR)/symcat.h subsegs.h $(INCDIR)/obstack.h
-macro.o: macro.c $(INCDIR)/safe-ctype.h sb.h macro.h
+macro.o: macro.c $(INCDIR)/symcat.h $(INCDIR)/safe-ctype.h \
+  sb.h macro.h
 messages.o: messages.c $(INCDIR)/symcat.h
 output-file.o: output-file.c $(INCDIR)/symcat.h output-file.h
 read.o: read.c $(INCDIR)/symcat.h $(INCDIR)/safe-ctype.h \

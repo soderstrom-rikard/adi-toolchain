@@ -1363,7 +1363,8 @@ dwarf2_finish (void)
        below.  */
   if (all_segs == NULL
       && debug_type != DEBUG_DWARF2
-      && bfd_get_section_by_name (stdoutput, ".debug_info") == NULL)
+      && (bfd_get_section_by_name (stdoutput, ".debug_info") == NULL
+	  || files_in_use == 0))
     return;
 
   /* Calculate the size of an address for the target machine.  */
@@ -1371,7 +1372,7 @@ dwarf2_finish (void)
 
   /* Create and switch to the line number section.  */
   line_seg = subseg_new (".debug_line", 0);
-  bfd_set_section_flags (stdoutput, line_seg, SEC_READONLY);
+  bfd_set_section_flags (stdoutput, line_seg, SEC_READONLY | SEC_DEBUGGING);
 
   /* For each subsection, chain the debug entries together.  */
   for (s = all_segs; s; s = s->next)
@@ -1400,9 +1401,12 @@ dwarf2_finish (void)
       abbrev_seg = subseg_new (".debug_abbrev", 0);
       aranges_seg = subseg_new (".debug_aranges", 0);
 
-      bfd_set_section_flags (stdoutput, info_seg, SEC_READONLY);
-      bfd_set_section_flags (stdoutput, abbrev_seg, SEC_READONLY);
-      bfd_set_section_flags (stdoutput, aranges_seg, SEC_READONLY);
+      bfd_set_section_flags (stdoutput, info_seg,
+			     SEC_READONLY | SEC_DEBUGGING);
+      bfd_set_section_flags (stdoutput, abbrev_seg,
+			     SEC_READONLY | SEC_DEBUGGING);
+      bfd_set_section_flags (stdoutput, aranges_seg,
+			     SEC_READONLY | SEC_DEBUGGING);
 
       record_alignment (aranges_seg, ffs (2 * sizeof_address) - 1);
 

@@ -4,22 +4,22 @@
    Free Software Foundation, Inc.
    Written by Steve Chamberlain of Cygnus Support <sac@cygnus.com>.
 
-This file is part of GLD, the Gnu Linker.
+   This file is part of GLD, the Gnu Linker.
 
-GLD is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
-any later version.
+   GLD is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2, or (at your option)
+   any later version.
 
-GLD is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   GLD is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with GLD; see the file COPYING.  If not, write to the Free
-Software Foundation, 59 Temple Place - Suite 330, Boston, MA
-02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with GLD; see the file COPYING.  If not, write to the Free
+   Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+   02111-1307, USA.  */
 
 /* This module is in charge of working out the contents of expressions.
 
@@ -47,6 +47,8 @@ static bfd_vma align_n
   (bfd_vma, bfd_vma);
 
 struct exp_data_seg exp_data_seg;
+
+segment_type *segments;
 
 /* Print the string representation of the given token.  Surround it
    with spaces if INFIX_P is TRUE.  */
@@ -101,7 +103,11 @@ exp_print_token (token_code_type code, int infix_p)
     { MAX_K, "MAX_K" },
     { REL, "relocatable" },
     { DATA_SEGMENT_ALIGN, "DATA_SEGMENT_ALIGN" },
-    { DATA_SEGMENT_END, "DATA_SEGMENT_END" }
+    { DATA_SEGMENT_RELRO_END, "DATA_SEGMENT_RELRO_END" },
+    { DATA_SEGMENT_END, "DATA_SEGMENT_END" },
+    { ORIGIN, "ORIGIN" },
+    { LENGTH, "LENGTH" },
+    { SEGMENT_START, "SEGMENT_START" }
   };
   unsigned int idx;
 
@@ -268,10 +274,13 @@ fold_unary (etree_type *tree,
 	  if (allocation_done != lang_first_phase_enum
 	      && current_section == abs_output_section
 	      && (exp_data_seg.phase == exp_dataseg_align_seen
+		  || exp_data_seg.phase == exp_dataseg_relro_seen
 		  || exp_data_seg.phase == exp_dataseg_adjust
+		  || exp_data_seg.phase == exp_dataseg_relro_adjust
 		  || allocation_done != lang_allocating_phase_enum))
 	    {
-	      if (exp_data_seg.phase == exp_dataseg_align_seen)
+	      if (exp_data_seg.phase == exp_dataseg_align_seen
+		  || exp_data_seg.phase == exp_dataseg_relro_seen)
 		{
 		  exp_data_seg.phase = exp_dataseg_end_seen;
 		  exp_data_seg.end = result.value;
@@ -301,7 +310,27 @@ fold_binary (etree_type *tree,
 
   result = exp_fold_tree (tree->binary.lhs, current_section,
 			  allocation_done, dot, dotp);
-  if (result.valid_p)
+
+  /* The SEGMENT_START operator is special because its first
+     operand is a string, not the name of a symbol.  */
+  if (result.valid_p && tree->type.node_code == SEGMENT_START)
+    {
+      const char *segment_name;
+      segment_type *seg;
+      /* Check to see if the user has overridden the default
+	 value.  */
+      segment_name = tree->binary.rhs->name.name;
+      for (seg = segments; seg; seg = seg->next) 
+	if (strcmp (seg->name, segment_name) == 0)
+	  {
+	    seg->used = TRUE;
+	    result.value = seg->value;
+	    result.str = NULL;
+	    result.section = NULL;
+	    break;
+	  }
+    }
+  else if (result.valid_p)
     {
       etree_value_type other;
 
@@ -386,18 +415,21 @@ fold_binary (etree_type *tree,
 	    case ALIGN_K:
 	      result.value = align_n (result.value, other.value);
 	      break;
-	      
+
 	    case DATA_SEGMENT_ALIGN:
 	      if (allocation_done != lang_first_phase_enum
 		  && current_section == abs_output_section
 		  && (exp_data_seg.phase == exp_dataseg_none
 		      || exp_data_seg.phase == exp_dataseg_adjust
+		      || exp_data_seg.phase == exp_dataseg_relro_adjust
 		      || allocation_done != lang_allocating_phase_enum))
 		{
 		  bfd_vma maxpage = result.value;
 
 		  result.value = align_n (dot, maxpage);
-		  if (exp_data_seg.phase != exp_dataseg_adjust)
+		  if (exp_data_seg.phase == exp_dataseg_relro_adjust)
+		    result.value = exp_data_seg.base;
+		  else if (exp_data_seg.phase != exp_dataseg_adjust)
 		    {
 		      result.value += dot & (maxpage - 1);
 		      if (allocation_done == lang_allocating_phase_enum)
@@ -405,11 +437,38 @@ fold_binary (etree_type *tree,
 			  exp_data_seg.phase = exp_dataseg_align_seen;
 			  exp_data_seg.base = result.value;
 			  exp_data_seg.pagesize = other.value;
+			  exp_data_seg.relro_end = 0;
 			}
 		    }
 		  else if (other.value < maxpage)
 		    result.value += (dot + other.value - 1)
 				    & (maxpage - other.value);
+		}
+	      else
+		result.valid_p = FALSE;
+	      break;
+
+	    case DATA_SEGMENT_RELRO_END:
+	      if (allocation_done != lang_first_phase_enum
+		  && (exp_data_seg.phase == exp_dataseg_align_seen
+		      || exp_data_seg.phase == exp_dataseg_adjust
+		      || exp_data_seg.phase == exp_dataseg_relro_adjust
+		      || allocation_done != lang_allocating_phase_enum))
+		{
+		  if (exp_data_seg.phase == exp_dataseg_align_seen
+		      || exp_data_seg.phase == exp_dataseg_relro_adjust)
+		    exp_data_seg.relro_end
+		      = result.value + other.value;
+		  if (exp_data_seg.phase == exp_dataseg_relro_adjust
+		      && (exp_data_seg.relro_end
+			  & (exp_data_seg.pagesize - 1)))
+		    {
+		      exp_data_seg.relro_end += exp_data_seg.pagesize - 1;
+		      exp_data_seg.relro_end &= ~(exp_data_seg.pagesize - 1);
+		      result.value = exp_data_seg.relro_end - other.value;
+		    }
+		  if (exp_data_seg.phase == exp_dataseg_align_seen)
+		    exp_data_seg.phase = exp_dataseg_relro_seen;
 		}
 	      else
 		result.valid_p = FALSE;
@@ -458,7 +517,7 @@ fold_name (etree_type *tree,
   etree_value_type result;
 
   result.valid_p = FALSE;
-  
+
   switch (tree->type.node_code)
     {
     case SIZEOF_HEADERS:
@@ -541,7 +600,8 @@ fold_name (etree_type *tree,
 	    {
 	      h->type = bfd_link_hash_undefined;
 	      h->u.undef.abfd = NULL;
-	      bfd_link_add_undef (link_info.hash, h);
+	      if (h->u.undef.next == NULL)
+		bfd_link_add_undef (link_info.hash, h);
 	    }
 	}
       break;
@@ -583,8 +643,34 @@ fold_name (etree_type *tree,
 
 	  os = lang_output_section_find (tree->name.name);
 	  if (os && os->processed > 0)
-	    result = new_abs (os->bfd_section->_raw_size / opb);
+	    result = new_abs (os->bfd_section->size / opb);
 	}
+      break;
+
+    case LENGTH:
+      {
+        lang_memory_region_type *mem;
+        
+        mem = lang_memory_region_lookup (tree->name.name, FALSE);  
+        if (mem != NULL) 
+          result = new_abs (mem->length);
+        else          
+          einfo (_("%F%S: undefined MEMORY region `%s' referenced in expression\n"),
+		   tree->name.name);
+      }
+      break;
+
+    case ORIGIN:
+      {
+        lang_memory_region_type *mem;
+        
+        mem = lang_memory_region_lookup (tree->name.name, FALSE);  
+        if (mem != NULL) 
+          result = new_abs (mem->origin);
+        else          
+          einfo (_("%F%S: undefined MEMORY region `%s' referenced in expression\n"),
+		   tree->name.name);
+      }
       break;
 
     default:
@@ -634,7 +720,7 @@ exp_fold_tree (etree_type *tree,
       if (result.valid_p)
 	{
 	  if (! result.value)
-	    einfo ("%F%P: %s\n", tree->assert_s.message);
+	    einfo ("%X%P: %s\n", tree->assert_s.message);
 	  return result;
 	}
       break;

@@ -9,6 +9,10 @@ _BEGIN_STD_C
 #define _JBLEN 23
 #endif
 
+#if defined(__AVR__)
+#define _JBLEN 24
+#endif
+
 #ifdef __sparc__
 /*
  * onsstack,sigmask,sp,pc,npc,psr,g1,o0,wbcnt (sigcontext).
@@ -18,7 +22,7 @@ _BEGIN_STD_C
 #endif
 
 #ifdef bfin
-#define	_JBLEN	40
+#define _JBLEN  40
 #endif
 
 /* necv70 was 9 as well. */
@@ -176,6 +180,10 @@ _BEGIN_STD_C
 #ifdef __frv__
 #define _JBLEN (68/2)  /* room for 68 32-bit regs */
 #define _JBTYPE double
+#endif
+
+#ifdef __CRX__
+#define _JBLEN 9
 #endif
 
 #ifdef __fr30__

@@ -31,11 +31,11 @@ case $target_triplet in {
 
 if { ![istarget hppa*-*-*] || [istarget *-*-linux*] } {
     # FIXME: Due to macro mishandling of ONLY_STANDARD_ESCAPES.
-    setup_xfail "avr-*" "cris-*"
+    setup_xfail "avr-*" "cris-*" "crisv32-*"
 
     # These fail due to NO_STRING_ESCAPES
     setup_xfail "powerpc*-*-aix*" "powerpc*-*-beos*" "powerpc*-*-macos*"
-    setup_xfail "powerpc*-*-mpw*" "powerpc*-*-pe" "powerpc*-*-*win*"
+    setup_xfail "powerpc*-*-pe" "powerpc*-*-*win*"
     setup_xfail "rs6000-*-*"
 
     # FIXME: Due to difference in what "consecutive octets" means.

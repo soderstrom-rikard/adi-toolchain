@@ -1,5 +1,5 @@
 /* tc-m32r.c -- Assembler for the Renesas M32R.
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
    Free Software Foundation, Inc.
 
    This file is part of GAS, the GNU Assembler.
@@ -109,7 +109,7 @@ static int enable_special = 0;
 
 /* Non-zero if -bitinst has been specified, in which case support
    for extended M32R bit-field instruction set should be enabled.  */
-static int enable_special_m32r = 0;
+static int enable_special_m32r = 1;
 
 /* Non-zero if -float has been specified, in which case support for
    extended M32R floating point instruction set should be enabled.  */
@@ -216,7 +216,8 @@ struct option md_longopts[] =
 #define OPTION_NO_IGNORE_PARALLEL (OPTION_IGNORE_PARALLEL + 1)
 #define OPTION_SPECIAL		  (OPTION_NO_IGNORE_PARALLEL + 1)
 #define OPTION_SPECIAL_M32R       (OPTION_SPECIAL + 1)
-#define OPTION_SPECIAL_FLOAT      (OPTION_SPECIAL_M32R + 1)
+#define OPTION_NO_SPECIAL_M32R    (OPTION_SPECIAL_M32R + 1)
+#define OPTION_SPECIAL_FLOAT      (OPTION_NO_SPECIAL_M32R + 1)
 #define OPTION_WARN_UNMATCHED 	  (OPTION_SPECIAL_FLOAT + 1)
 #define OPTION_NO_WARN_UNMATCHED  (OPTION_WARN_UNMATCHED + 1)
   {"m32r",  no_argument, NULL, OPTION_M32R},
@@ -238,6 +239,7 @@ struct option md_longopts[] =
   {"nIp", no_argument, NULL, OPTION_NO_IGNORE_PARALLEL},
   {"hidden", no_argument, NULL, OPTION_SPECIAL},
   {"bitinst", no_argument, NULL, OPTION_SPECIAL_M32R},
+  {"no-bitinst", no_argument, NULL, OPTION_NO_SPECIAL_M32R},
   {"float", no_argument, NULL, OPTION_SPECIAL_FLOAT},
   /* Sigh.  I guess all warnings must now have both variants.  */
   {"warn-unmatched-high", no_argument, NULL, OPTION_WARN_UNMATCHED},
@@ -353,6 +355,10 @@ md_parse_option (c, arg)
       enable_special_m32r = 1;
       break;
 
+    case OPTION_NO_SPECIAL_M32R:
+      enable_special_m32r = 0;
+      break;
+
     case OPTION_SPECIAL_FLOAT:
       enable_special_float = 1;
       break;
@@ -409,6 +415,8 @@ md_show_usage (stream)
   -parallel               try to combine instructions in parallel\n"));
   fprintf (stream, _("\
   -no-parallel            disable -parallel\n"));
+  fprintf (stream, _("\
+  -no-bitinst             disallow the M32R2's extended bit-field instructions\n"));
   fprintf (stream, _("\
   -O                      try to optimize code.  Implies -parallel\n"));
 
@@ -480,6 +488,69 @@ const pseudo_typeS md_pseudo_table[] =
   { "big",      little,         0 },
   { NULL, NULL, 0 }
 };
+
+#define GOT_NAME "_GLOBAL_OFFSET_TABLE_"
+symbolS * GOT_symbol;
+
+static inline int
+m32r_PIC_related_p (symbolS *sym)
+{
+  expressionS *exp;
+
+  if (! sym)
+    return 0;
+
+  if (sym == GOT_symbol)
+    return 1;
+
+  exp = symbol_get_value_expression (sym);
+
+  return (exp->X_op == O_PIC_reloc
+          || exp->X_md == BFD_RELOC_M32R_26_PLTREL
+          || m32r_PIC_related_p (exp->X_add_symbol)
+          || m32r_PIC_related_p (exp->X_op_symbol));
+}
+
+static inline int
+m32r_check_fixup (expressionS *main_exp, bfd_reloc_code_real_type *r_type_p)
+{
+  expressionS *exp = main_exp;
+
+  if (exp->X_op == O_add && m32r_PIC_related_p (exp->X_op_symbol))
+    return 1;
+
+  if (exp->X_op == O_symbol && exp->X_add_symbol)
+    {
+      if (exp->X_add_symbol == GOT_symbol)
+        {
+          *r_type_p = BFD_RELOC_M32R_GOTPC24;
+          return 0;
+        }
+    }
+  else if (exp->X_op == O_add)
+    {
+      exp = symbol_get_value_expression (exp->X_add_symbol);
+      if (! exp)
+        return 0;
+    }
+
+  if (exp->X_op == O_PIC_reloc || exp->X_md != BFD_RELOC_UNUSED)
+    {
+      *r_type_p = exp->X_md;
+      if (exp == main_exp)
+        exp->X_op = O_symbol;
+      else
+       {
+          main_exp->X_add_symbol = exp->X_add_symbol;
+          main_exp->X_add_number += exp->X_add_number;
+       }
+    }
+  else
+    return (m32r_PIC_related_p (exp->X_add_symbol)
+            || m32r_PIC_related_p (exp->X_op_symbol));
+
+  return 0;
+}
 
 /* FIXME: Should be machine generated.  */
 #define NOP_INSN     0x7000
@@ -1374,6 +1445,14 @@ md_assemble (str)
 	 prev_insn.insn is NULL when we're on a 32 bit boundary.  */
       on_32bit_boundary_p = prev_insn.insn == NULL;
 
+      /* Change a frag to, if each insn to swap is in a different frag.
+         It must keep only one instruction in a frag.  */
+      if (parallel() && on_32bit_boundary_p)
+        {
+          frag_wane (frag_now);
+          frag_new (0);
+        }
+
       /* Look to see if this instruction can be combined with the
 	 previous instruction to make one, parallel, 32 bit instruction.
 	 If the previous instruction (potentially) changed the flow of
@@ -1434,13 +1513,25 @@ md_assemble (str)
 	  else if (insn.frag->fr_opcode == insn.addr)
 	    insn.frag->fr_opcode = prev_insn.addr;
 
-	  /* Update the addresses in any fixups.
-	     Note that we don't have to handle the case where each insn is in
-	     a different frag as we ensure they're in the same frag above.  */
-	  for (i = 0; i < prev_insn.num_fixups; ++i)
-	    prev_insn.fixups[i]->fx_where += 2;
-	  for (i = 0; i < insn.num_fixups; ++i)
-	    insn.fixups[i]->fx_where -= 2;
+          /* Change a frag to, if each insn is in a different frag.
+	     It must keep only one instruction in a frag.  */
+          if (prev_insn.frag != insn.frag)
+            {
+              for (i = 0; i < prev_insn.num_fixups; ++i)
+                prev_insn.fixups[i]->fx_frag = insn.frag;
+              for (i = 0; i < insn.num_fixups; ++i)
+                insn.fixups[i]->fx_frag = prev_insn.frag;
+            }
+          else
+	    {
+	      /* Update the addresses in any fixups.
+		 Note that we don't have to handle the case where each insn is in
+		 a different frag as we ensure they're in the same frag above.  */
+	      for (i = 0; i < prev_insn.num_fixups; ++i)
+		prev_insn.fixups[i]->fx_where += 2;
+	      for (i = 0; i < insn.num_fixups; ++i)
+		insn.fixups[i]->fx_where -= 2;
+	    }
 	}
 
       /* Keep track of whether we've seen a pair of 16 bit insns.
@@ -1860,23 +1951,28 @@ md_convert_frag (abfd, sec, fragP)
       || S_IS_EXTERNAL (fragP->fr_symbol)
       || S_IS_WEAK (fragP->fr_symbol))
     {
+      fixS *fixP;
+
       assert (fragP->fr_subtype != 1);
       assert (fragP->fr_cgen.insn != 0);
-      gas_cgen_record_fixup (fragP,
-			     /* Offset of branch insn in frag.  */
-			     fragP->fr_fix + extension - 4,
-			     fragP->fr_cgen.insn,
-			     4 /* Length.  */,
-			     /* FIXME: quick hack.  */
+
+      fixP = gas_cgen_record_fixup (fragP,
+				    /* Offset of branch insn in frag.  */
+				    fragP->fr_fix + extension - 4,
+				    fragP->fr_cgen.insn,
+				    4 /* Length.  */,
+				    /* FIXME: quick hack.  */
 #if 0
-			     cgen_operand_lookup_by_num (gas_cgen_cpu_desc,
-							 fragP->fr_cgen.opindex),
+				    cgen_operand_lookup_by_num (gas_cgen_cpu_desc,
+								fragP->fr_cgen.opindex),
 #else
-			     cgen_operand_lookup_by_num (gas_cgen_cpu_desc,
-							 M32R_OPERAND_DISP24),
+				    cgen_operand_lookup_by_num (gas_cgen_cpu_desc,
+								M32R_OPERAND_DISP24),
 #endif
-			     fragP->fr_cgen.opinfo,
-			     fragP->fr_symbol, fragP->fr_offset);
+				    fragP->fr_cgen.opinfo,
+				    fragP->fr_symbol, fragP->fr_offset);
+      if (fragP->fr_cgen.opinfo)
+        fixP->fx_r_type = fragP->fr_cgen.opinfo;
     }
 
 #define SIZE_FROM_RELAX_STATE(n) ((n) == 1 ? 1 : 3)
@@ -1978,8 +2074,14 @@ m32r_cgen_record_fixup_exp (frag, where, insn, length, operand, opinfo, exp)
      int opinfo;
      expressionS *exp;
 {
-  fixS *fixP = gas_cgen_record_fixup_exp (frag, where, insn, length,
-					  operand, opinfo, exp);
+  fixS *fixP;
+  bfd_reloc_code_real_type r_type = BFD_RELOC_UNUSED;
+
+  if (m32r_check_fixup (exp, &r_type))
+    as_bad (_("Invalid PIC expression."));
+
+  fixP = gas_cgen_record_fixup_exp (frag, where, insn, length,
+				    operand, opinfo, exp);
 
   switch (operand->type)
     {
@@ -1989,10 +2091,48 @@ m32r_cgen_record_fixup_exp (frag, where, insn, length, operand, opinfo, exp)
 	  || fixP->fx_cgen.opinfo == BFD_RELOC_M32R_HI16_ULO)
 	m32r_record_hi16 (fixP->fx_cgen.opinfo, fixP, now_seg);
       break;
+
     default:
-      /* Avoid -Wall warning */
+      /* Avoid -Wall warning.  */
       break;
     }
+
+  switch (r_type)
+    {
+    case BFD_RELOC_UNUSED:
+    default:
+      return fixP;
+
+    case BFD_RELOC_M32R_GOTPC24:
+      if (fixP->fx_cgen.opinfo == BFD_RELOC_M32R_HI16_SLO)
+        r_type = BFD_RELOC_M32R_GOTPC_HI_SLO;
+      else if (fixP->fx_cgen.opinfo == BFD_RELOC_M32R_HI16_ULO)
+        r_type = BFD_RELOC_M32R_GOTPC_HI_ULO;
+      else if (fixP->fx_cgen.opinfo == BFD_RELOC_M32R_LO16)
+        r_type = BFD_RELOC_M32R_GOTPC_LO;
+      break;
+    case BFD_RELOC_M32R_GOT24:
+      if (fixP->fx_cgen.opinfo == BFD_RELOC_M32R_HI16_SLO)
+        r_type = BFD_RELOC_M32R_GOT16_HI_SLO;
+      else if (fixP->fx_cgen.opinfo == BFD_RELOC_M32R_HI16_ULO)
+        r_type = BFD_RELOC_M32R_GOT16_HI_ULO;
+      else if (fixP->fx_cgen.opinfo == BFD_RELOC_M32R_LO16)
+        r_type = BFD_RELOC_M32R_GOT16_LO;
+      break;
+    case BFD_RELOC_M32R_GOTOFF:
+      if (fixP->fx_cgen.opinfo == BFD_RELOC_M32R_HI16_SLO)
+        r_type = BFD_RELOC_M32R_GOTOFF_HI_SLO;
+      else if (fixP->fx_cgen.opinfo == BFD_RELOC_M32R_HI16_ULO)
+        r_type = BFD_RELOC_M32R_GOTOFF_HI_ULO;
+      else if (fixP->fx_cgen.opinfo == BFD_RELOC_M32R_LO16)
+        r_type = BFD_RELOC_M32R_GOTOFF_LO;
+      break;
+    case BFD_RELOC_M32R_26_PLTREL:
+      as_bad (_("Invalid PIC expression."));
+      break;
+    }
+
+  fixP->fx_r_type = r_type;
 
   return fixP;
 }
@@ -2233,6 +2373,16 @@ m32r_fix_adjustable (fixP)
           || reloc_type == BFD_RELOC_M32R_LO16))
     return 0;
 
+  if (reloc_type == BFD_RELOC_M32R_GOT24
+      || reloc_type == BFD_RELOC_M32R_26_PLTREL
+      || reloc_type == BFD_RELOC_M32R_GOTPC_HI_SLO
+      || reloc_type == BFD_RELOC_M32R_GOTPC_HI_ULO
+      || reloc_type == BFD_RELOC_M32R_GOTPC_LO
+      || reloc_type == BFD_RELOC_M32R_GOT16_HI_SLO
+      || reloc_type == BFD_RELOC_M32R_GOT16_HI_ULO
+      || reloc_type == BFD_RELOC_M32R_GOT16_LO)
+    return 0;
+
   /* We need the symbol name for the VTABLE entries.  */
   if (reloc_type == BFD_RELOC_VTABLE_INHERIT
       || reloc_type == BFD_RELOC_VTABLE_ENTRY)
@@ -2242,17 +2392,16 @@ m32r_fix_adjustable (fixP)
 }
 
 void
-m32r_elf_final_processing ()
+m32r_elf_final_processing (void)
 {
   if (use_parallel)
     m32r_flags |= E_M32R_HAS_PARALLEL;
   elf_elfheader (stdoutput)->e_flags |= m32r_flags;
 }
 
-#define GOT_NAME "_GLOBAL_OFFSET_TABLE_"
- 
 /* Translate internal representation of relocation info to BFD target
    format. */
+
 arelent *
 tc_gen_reloc (section, fixP)
      asection * section;
@@ -2326,21 +2475,124 @@ printf(" => %s\n",reloc->howto->name);
       return NULL;
     }
  
-  /* Use fx_offset for these cases */
+  /* Use fx_offset for these cases.  */
   if (   fixP->fx_r_type == BFD_RELOC_VTABLE_ENTRY
       || fixP->fx_r_type == BFD_RELOC_VTABLE_INHERIT)
     reloc->addend  = fixP->fx_offset;
-  else if (!pic_code
+  else if ((!pic_code
+            && code != BFD_RELOC_M32R_26_PLTREL)
            && fixP->fx_pcrel
            && fixP->fx_addsy != NULL
            && (S_GET_SEGMENT(fixP->fx_addsy) != section)
            && S_IS_DEFINED (fixP->fx_addsy)
            && ! S_IS_EXTERNAL(fixP->fx_addsy)
            && ! S_IS_WEAK(fixP->fx_addsy))
-    /* already used fx_offset in the opcode field itseld. */
+    /* Already used fx_offset in the opcode field itseld.  */
     reloc->addend  = 0;
   else
     reloc->addend  = fixP->fx_addnumber;
  
   return reloc;
+}
+
+inline static char *
+m32r_end_of_match (char *cont, char *what)
+{
+  int len = strlen (what);
+
+  if (strncasecmp (cont, what, strlen (what)) == 0
+      && ! is_part_of_name (cont[len]))
+    return cont + len;
+
+  return NULL;
+}
+
+int
+m32r_parse_name (char const *name, expressionS *exprP, char *nextcharP)
+{
+  char *next = input_line_pointer;
+  char *next_end;
+  int reloc_type;
+  operatorT op_type;
+  segT segment;
+
+  exprP->X_op_symbol = NULL;
+  exprP->X_md = BFD_RELOC_UNUSED;
+
+  if (strcmp (name, GOT_NAME) == 0)
+    {
+      if (! GOT_symbol)
+	GOT_symbol = symbol_find_or_make (name);
+
+      exprP->X_add_symbol = GOT_symbol;
+    no_suffix:
+      /* If we have an absolute symbol or a
+	 reg, then we know its value now.  */
+      segment = S_GET_SEGMENT (exprP->X_add_symbol);
+      if (segment == absolute_section)
+	{
+	  exprP->X_op = O_constant;
+	  exprP->X_add_number = S_GET_VALUE (exprP->X_add_symbol);
+	  exprP->X_add_symbol = NULL;
+	}
+      else if (segment == reg_section)
+	{
+	  exprP->X_op = O_register;
+	  exprP->X_add_number = S_GET_VALUE (exprP->X_add_symbol);
+	  exprP->X_add_symbol = NULL;
+	}
+      else
+	{
+	  exprP->X_op = O_symbol;
+	  exprP->X_add_number = 0;
+	}
+
+      return 1;
+    }
+
+  exprP->X_add_symbol = symbol_find_or_make (name);
+
+  if (*nextcharP != '@')
+    goto no_suffix;
+  else if ((next_end = m32r_end_of_match (next + 1, "GOTOFF")))
+    {
+      reloc_type = BFD_RELOC_M32R_GOTOFF;
+      op_type = O_PIC_reloc;
+    }
+  else if ((next_end = m32r_end_of_match (next + 1, "GOT")))
+    {
+      reloc_type = BFD_RELOC_M32R_GOT24;
+      op_type = O_PIC_reloc;
+    }
+  else if ((next_end = m32r_end_of_match (next + 1, "PLT")))
+    {
+      reloc_type = BFD_RELOC_M32R_26_PLTREL;
+      op_type = O_PIC_reloc;
+    }
+  else
+    goto no_suffix;
+
+  *input_line_pointer = *nextcharP;
+  input_line_pointer = next_end;
+  *nextcharP = *input_line_pointer;
+  *input_line_pointer = '\0';
+
+  exprP->X_op = op_type;
+  exprP->X_add_number = 0;
+  exprP->X_md = reloc_type;
+
+  return 1;
+}
+
+int
+m32r_cgen_parse_fix_exp(int opinfo, expressionS *exp)
+{
+  if (exp->X_op == O_PIC_reloc
+      && exp->X_md == BFD_RELOC_M32R_26_PLTREL)
+    {
+      exp->X_op = O_symbol;
+      opinfo = exp->X_md;
+    }
+
+  return opinfo;
 }

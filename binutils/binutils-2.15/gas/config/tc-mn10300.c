@@ -57,12 +57,12 @@ const char FLT_CHARS[] = "dD";
 const relax_typeS md_relax_table[] = {
   /* bCC relaxing  */
   {0x7f, -0x80, 2, 1},
-  {0x7fff, -0x8000, 5, 2},
+  {0x7fff, -0x8000 + 1, 5, 2},
   {0x7fffffff, -0x80000000, 7, 0},
 
   /* bCC relaxing (uncommon cases)  */
   {0x7f, -0x80, 3, 4},
-  {0x7fff, -0x8000, 6, 5},
+  {0x7fff, -0x8000 + 1, 6, 5},
   {0x7fffffff, -0x80000000, 8, 0},
 
   /* call relaxing  */
@@ -80,7 +80,7 @@ const relax_typeS md_relax_table[] = {
 
   /* fbCC relaxing  */
   {0x7f, -0x80, 3, 14},
-  {0x7fff, -0x8000, 6, 15},
+  {0x7fff, -0x8000 + 1, 6, 15},
   {0x7fffffff, -0x80000000, 8, 0},
 
 };
@@ -2542,6 +2542,15 @@ mn10300_fix_adjustable (fixp)
   if (S_GET_SEGMENT (fixp->fx_addsy)->flags & SEC_CODE)
     return 0;
 
+  /* Likewise, do not adjust symbols that won't be merged, or debug
+     symbols, because they too break relaxation.  We do want to adjust
+     other mergable symbols, like .rodata, because code relaxations
+     need section-relative symbols to properly relax them.  */
+  if (! (S_GET_SEGMENT(fixp->fx_addsy)->flags & SEC_MERGE))
+    return 0;
+  if (strncmp (S_GET_SEGMENT (fixp->fx_addsy)->name, ".debug", 6) == 0)
+    return 0;
+
   return 1;
 }
 
@@ -2584,17 +2593,7 @@ mn10300_insert_operand (insnp, extensionp, operand, val, file, line, shift)
       test = val;
 
       if (test < (offsetT) min || test > (offsetT) max)
-	{
-	  const char *err =
-	    _("operand out of range (%s not between %ld and %ld)");
-	  char buf[100];
-
-	  sprint_value (buf, test);
-	  if (file == (char *) NULL)
-	    as_warn (err, buf, min, max);
-	  else
-	    as_warn_where (file, line, err, buf, min, max);
-	}
+	as_warn_value_out_of_range (_("operand"), test, (offsetT) min, (offsetT) max, file, line);
     }
 
   if ((operand->flags & MN10300_OPERAND_SPLIT) != 0)

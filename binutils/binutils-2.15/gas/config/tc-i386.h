@@ -33,13 +33,9 @@ struct fix;
 
 #define TARGET_BYTES_BIG_ENDIAN	0
 
-#ifdef TE_LYNX
-#define TARGET_FORMAT		"coff-i386-lynx"
-#endif
-
 #define TARGET_ARCH		bfd_arch_i386
 #define TARGET_MACH		(i386_mach ())
-extern unsigned long i386_mach PARAMS ((void));
+extern unsigned long i386_mach (void);
 
 #ifdef TE_FreeBSD
 #define AOUT_TARGET_FORMAT	"a.out-i386-freebsd"
@@ -144,18 +140,6 @@ extern const char extra_symbol_chars[];
 #define REGMEM_FIELD_HAS_MEM (~REGMEM_FIELD_HAS_REG)
 
 #define END_OF_INSN '\0'
-
-/* Intel Syntax */
-/* Values 0-4 map onto scale factor */
-#define BYTE_PTR     0
-#define WORD_PTR     1
-#define DWORD_PTR    2
-#define QWORD_PTR    3
-#define XWORD_PTR    4
-#define SHORT        5
-#define OFFSET_FLAT  6
-#define FLAT         7
-#define NONE_FOUND   8
 
 typedef struct
 {
@@ -408,6 +392,12 @@ extern void x86_cons_fix_new
   PARAMS ((fragS *, unsigned int, unsigned int, expressionS *));
 #endif
 
+#ifdef TE_PE
+#define TC_CONS_FIX_NEW(FRAG,OFF,LEN,EXP) x86_pe_cons_fix_new(FRAG, OFF, LEN, EXP)
+extern void x86_pe_cons_fix_new
+  PARAMS ((fragS *, unsigned int, unsigned int, expressionS *));
+#endif
+
 #define DIFF_EXPR_OK    /* foo-. gets turned into PC relative relocs */
 
 #define NO_RELOC BFD_RELOC_NONE
@@ -499,5 +489,17 @@ extern int tc_x86_regname_to_dw2regnum PARAMS ((const char *regname));
 
 #define tc_cfi_frame_initial_instructions tc_x86_frame_initial_instructions
 extern void tc_x86_frame_initial_instructions PARAMS ((void));
+
+#define md_elf_section_type(str,len) i386_elf_section_type (str, len)
+extern int i386_elf_section_type PARAMS ((const char *, size_t len));
+
+#ifdef TE_PE
+
+#define O_secrel O_md1
+
+#define TC_DWARF2_EMIT_OFFSET  tc_pe_dwarf2_emit_offset
+void tc_pe_dwarf2_emit_offset (symbolS *, unsigned int);
+
+#endif /* TE_PE */
 
 #endif /* TC_I386 */

@@ -63,7 +63,7 @@ i860_howto_pc26_reloc (bfd *abfd ATTRIBUTE_UNUSED,
   relocation += symbol->section->output_offset;
   relocation += reloc_entry->addend;
 
-  if (reloc_entry->address > input_section->_cooked_size)
+  if (reloc_entry->address > bfd_get_section_limit (abfd, input_section))
     return bfd_reloc_outofrange;
 
   /* Adjust for PC-relative relocation.  */
@@ -126,7 +126,7 @@ i860_howto_pc16_reloc (bfd *abfd,
   relocation += symbol->section->output_offset;
   relocation += reloc_entry->addend;
 
-  if (reloc_entry->address > input_section->_cooked_size)
+  if (reloc_entry->address > bfd_get_section_limit (abfd, input_section))
     return bfd_reloc_outofrange;
 
   /* Adjust for PC-relative relocation.  */
@@ -191,7 +191,7 @@ i860_howto_highadj_reloc (bfd *abfd,
   relocation += reloc_entry->addend;
   relocation += 0x8000;
 
-  if (reloc_entry->address > input_section->_cooked_size)
+  if (reloc_entry->address > bfd_get_section_limit (abfd, input_section))
     return bfd_reloc_outofrange;
 
   addr = (bfd_byte *) data + reloc_entry->address;
@@ -243,7 +243,7 @@ i860_howto_splitn_reloc (bfd *abfd,
   relocation += symbol->section->output_offset;
   relocation += reloc_entry->addend;
 
-  if (reloc_entry->address > input_section->_cooked_size)
+  if (reloc_entry->address > bfd_get_section_limit (abfd, input_section))
     return bfd_reloc_outofrange;
 
   addr = (bfd_byte *) data + reloc_entry->address;
@@ -1183,8 +1183,8 @@ elf32_i860_relocate_section (bfd *output_bfd ATTRIBUTE_UNUSED,
 	    {
 	    case bfd_reloc_overflow:
 	      r = info->callbacks->reloc_overflow
-		(info, name, howto->name, (bfd_vma) 0,
-		 input_bfd, input_section, rel->r_offset);
+		(info, (h ? &h->root : NULL), name, howto->name,
+		 (bfd_vma) 0, input_bfd, input_section, rel->r_offset);
 	      break;
 
 	    case bfd_reloc_undefined:
