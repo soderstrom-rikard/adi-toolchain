@@ -3296,7 +3296,6 @@ gdbarch_register_name (struct gdbarch *gdbarch, int regnr)
                     "gdbarch: gdbarch_register_name invalid");
   if (gdbarch_debug >= 2)
     fprintf_unfiltered (gdb_stdlog, "gdbarch_register_name called\n");
-fprintf(stderr, "returning %s for %d\n", gdbarch->register_name (regnr), regnr);
   return gdbarch->register_name (regnr);
 }
 
