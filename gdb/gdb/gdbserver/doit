@@ -1,5 +1,0 @@
-#!/bin/sh
-cat $1 | sed s/arm/bfin/ > $1.out
-cp $1 $1.old
-cp -f $1.out $1
-diff $1 $1.old
