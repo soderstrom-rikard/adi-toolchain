@@ -10,8 +10,29 @@ _mainCRTStartup:
 
 	/* Start by setting up a stack */
 	/* Zero the memory in the .bss section.  */
+
+	p0.l = _end;
+	p0.h = _end;
+	p1.l = _edata;
+	p1.h = _edata;
+	p1 -= p0;
+	r0 = 0;
+	lsetup (clear_bss, clear_bss) lc0 = p1;
+clear_bss:
+	B [p0++] = r0;
+
 	/* Need to set up standard file handles */
 	/*  Parse string at r1 */
+
+	p0.l = _init;
+	p0.h = _init; 
+	call	(p0)
+
+	p0.l = _atexit;
+	p0.h = _atexit;
+	r0.l = _fini;
+	r0.h = _fini; 
+	call	(p0)
 
 	p0.l = _main;
 	p0.h = _main; 
