@@ -618,7 +618,7 @@ add_to_sp (rtx spreg, HOST_WIDE_INT value, int frame)
   /* Choose whether to use a sequence using a temporary register, or
      a sequence with multiple adds.  We can add a signed 7 bit value
      in one instruction.  */
-  if (value > 120 || value < -124)
+  if (value > 120 || value < -120)
     {
       rtx tmpreg = gen_rtx_REG (SImode, REG_P1);
       rtx insn;
@@ -637,7 +637,7 @@ add_to_sp (rtx spreg, HOST_WIDE_INT value, int frame)
 	RTX_FRAME_RELATED_P (insn) = 1;
     }
   else
-    do 
+    do
       {
 	int size = value;
 	rtx insn;

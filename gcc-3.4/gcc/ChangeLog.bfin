@@ -29,6 +29,9 @@
 	(eh_return, eh_return_internal): New patterns.
 	(push_multiple): Stack pointer adjust moved to the end of the PARALLEL.
 
+	* config/bfin/bfin.c (add_to_sp): Restrict multi-insn sequence to a
+	value of no less than -120.
+
 2004-12-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (mulhisi3): Correct the pattern and enable it.
