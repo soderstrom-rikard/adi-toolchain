@@ -1701,6 +1701,7 @@ enum bfd_architecture
 #define bfd_mach_arm_3M        4
 #define bfd_mach_arm_4         5
 #define bfd_mach_arm_4T        6
+  bfd_arch_bfin,
 #define bfd_mach_arm_5         7
 #define bfd_mach_arm_5T        8
 #define bfd_mach_arm_5TE       9
@@ -2884,6 +2885,25 @@ instruction.  */
 significant 8 bits of a 24 bit word are placed into the least
 significant 8 bits of the opcode.  */
   BFD_RELOC_TIC30_LDP,
+
+  /* bfin relocations begin: */
+  BFD_RELOC_16_IMM,
+  BFD_RELOC_16_HIGH,
+  BFD_RELOC_4_PCREL,
+  BFD_RELOC_5_PCREL, //Added for LSETUP part a
+  BFD_RELOC_16_LOW,
+  BFD_RELOC_10_PCREL,
+  BFD_RELOC_11_PCREL, //Added for LSETUP part b
+  BFD_RELOC_10_LPPCREL, // -gy 4/26
+  BFD_RELOC_8s4_PCREL,  // -gy
+  BFD_RELOC_12_PCREL_JUMP,
+  BFD_RELOC_12_PCREL_JUMP_S,
+  BFD_RELOC_24_PCREL_CALL_X, // special ADSP reloc. If distance is < 24
+  BFD_RELOC_24_PCREL_JUMP,   // acts like BFD_RELOC_24_PCREL else acts
+  BFD_RELOC_24_PCREL_JUMP_X, // as indirect P1 relative
+  BFD_RELOC_24_PCREL_JUMP_L,
+  /* bfin relocations end: */
+
 
 /* This is a 7bit reloc for the tms320c54x, where the least
 significant 7 bits of a 16 bit word are placed into the least
