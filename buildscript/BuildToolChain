@@ -133,12 +133,6 @@ mkdir $DIR_ELF2FLT_BUILD
 echo "Remove old output dir ...."
 rm -rf $DIR_OUTPUT/*
 
-echo "Changing permission of files ...."
-chmod -R +xw $DIR_BINUTILS_SOURCE
-chmod -R +xw $DIR_GCC_SOURCE
-chmod -R +xw $DIR_ELF2FLT_SOURCE
-
-
 ###################### set up log file ###########################
 
 echo "Creating new log file ...."
