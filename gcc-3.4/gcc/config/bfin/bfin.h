@@ -1320,6 +1320,7 @@ do { 						\
     data_section();				\
     if ((SIZE) >= (unsigned int) 4 ) ASM_OUTPUT_ALIGN(FILE,2);	\
     if (!TARGET_ASM_DIR) {			\
+	ASM_OUTPUT_SIZE_DIRECTIVE (FILE, NAME, SIZE);\
 	ASM_OUTPUT_LABEL (FILE, NAME); 		\
 	fprintf (FILE, "%s %ld;\n", ASM_SPACE, 	\
 		(ROUNDED) > (unsigned int) 1 ? (ROUNDED) : 1); \
@@ -1470,6 +1471,46 @@ do {                                                            \
   }                                                        \
 while (0)
 #endif
+
+/* Write the extra assembler code needed to declare an object properly.  */
+#define ASM_DECLARE_OBJECT_NAME(FILE, NAME, DECL)               \
+  do                                                            \
+    {                                                           \
+      HOST_WIDE_INT size;                                       \
+      size_directive_output = 0;                                \
+      if (!flag_inhibit_size_directive                          \
+          && (DECL) && DECL_SIZE (DECL))                        \
+        {                                                       \
+          size_directive_output = 1;                            \
+          size = int_size_in_bytes (TREE_TYPE (DECL));          \
+          ASM_OUTPUT_SIZE_DIRECTIVE (FILE, NAME, size);         \
+        }                                                       \
+                                                                \
+      ASM_OUTPUT_LABEL (FILE, NAME);                            \
+    }                                                           \
+  while (0)
+
+/* Output the size directive for a decl in rest_of_decl_compilation
+   in the case where we did not do so before the initializer.
+   Once we find the error_mark_node, we know that the value of
+   size_directive_output was set
+   by ASM_DECLARE_OBJECT_NAME when it was run for the same decl.  */
+
+#undef ASM_FINISH_DECLARE_OBJECT
+#define ASM_FINISH_DECLARE_OBJECT(FILE, DECL, TOP_LEVEL, AT_END)        \
+do {                                                                    \
+     const char *name = XSTR (XEXP (DECL_RTL (DECL), 0), 0);            \
+     HOST_WIDE_INT size;                                                \
+     if (!flag_inhibit_size_directive && DECL_SIZE (DECL)               \
+         && ! AT_END && TOP_LEVEL                                       \
+         && DECL_INITIAL (DECL) == error_mark_node                      \
+         && !size_directive_output)                                     \
+       {                                                                \
+         size_directive_output = 1;                                     \
+         size = int_size_in_bytes (TREE_TYPE (DECL));                   \
+         ASM_OUTPUT_SIZE_DIRECTIVE (FILE, name, size);                  \
+       }                                                                \
+   } while (0)
 
 
 
