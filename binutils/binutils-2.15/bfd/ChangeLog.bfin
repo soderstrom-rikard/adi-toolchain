@@ -1,0 +1,4 @@
+2004-12-03  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* elf32-bfin.c (ELF_MACHINE_CODE): Use EM_BLACKFIN.
+	Include elf/bfin.h instead of bfin-reloctype.h.

@@ -21,12 +21,11 @@
 #define TARGET_LITTLE_SYM		bfd_elf32_bfin_vec
 #define TARGET_LITTLE_NAME		"elf32-bfin"
 #define ELF_ARCH			bfd_arch_bfin
-#define ELF_MACHINE_CODE		EM_BF533	
+#define ELF_MACHINE_CODE		EM_BLACKFIN	
 #define ELF_MAXPAGESIZE			0x1000
 static bfd_boolean elf_bfin_is_local_label_name PARAMS ((bfd *, const char *));
 
-//We are sharing the reloc_type enum with elf2flat utility. So, moving it to seperate file -JyotiK
-#include "bfin-reloctype.h"
+#include "elf/bfin.h"
 
 /* handling expression relocations for blackfin.
    Blackfin will generate relocations in an expression form
