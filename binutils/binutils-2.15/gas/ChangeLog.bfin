@@ -5,6 +5,8 @@
 	* config/bfin-parse.y (SEMICOLON): New token.
 	(asm): Require SEMICOLON at the end of each line.
 
+	* config/bfin-lex.l: Allow "." in symbol names.
+
 2004-11-15  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin-lex.l: Accept capitalized ABS.
