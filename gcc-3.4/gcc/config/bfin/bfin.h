@@ -1278,7 +1278,7 @@ typedef enum directives {
 
 #define ASM_OUTPUT_LABEL(FILE, NAME)    \
   do {  assemble_name (FILE, NAME);		\
-        fputc (':',FILE);			\
+        fputs (":\n",FILE);			\
       } while (0)
 
 #define ASM_OUTPUT_LABELREF(FILE,NAME) 	\

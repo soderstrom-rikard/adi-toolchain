@@ -551,8 +551,6 @@ bfin_function_prologue (FILE *file, HOST_WIDE_INT framesize)
 	return;
   }
 
-  fprintf (file, "\n");
-
   is_leaf_function = leaf_function_p ();
   frame_pointer_needed = FRAME_POINTER_REQUIRED;
 
@@ -914,21 +912,21 @@ void print_operand (FILE *file,  rtx x,  char code)
     case REG:
       if (code == 'h') {
 	assert ((REGNO (x) < 32));
-	fprintf (file, "%s ", short_reg_names[REGNO(x)]);
+	fprintf (file, "%s", short_reg_names[REGNO(x)]);
 	/*fprintf (file, "\n%d\n ", REGNO(x));*/
 	break;
       }
       else if (code == 'd') {
 	assert ((REGNO (x) < 32));
-	fprintf (file, "%s ", high_reg_names[REGNO(x)]);
+	fprintf (file, "%s", high_reg_names[REGNO(x)]);
 	break;
       }
       else if (code == 'w') {
 	assert (REGNO (x) == REG_A0 || REGNO (x) == REG_A1);
-	fprintf (file, "%s.w ", reg_names[REGNO(x)]);
+	fprintf (file, "%s.w", reg_names[REGNO(x)]);
       }
       else if (code == 'D') {
-	fprintf (file, "%s ", dregs_pair_names[REGNO(x)]);
+	fprintf (file, "%s", dregs_pair_names[REGNO(x)]);
       }
       /* Write second word of DImode or DFmode reference, 
        * register or memory. -- Tony
@@ -936,7 +934,7 @@ void print_operand (FILE *file,  rtx x,  char code)
       else if (code == 'H') {
         assert (mode == DImode || mode == DFmode);
 	if (GET_CODE(x) == REG)
-	   fprintf (file, "%s ", reg_names[REGNO(x)+1]);
+	   fprintf (file, "%s", reg_names[REGNO(x)+1]);
 	else if (GET_CODE(x) == MEM)
 	  {
 	    fputc ('[', file);
@@ -955,22 +953,22 @@ void print_operand (FILE *file,  rtx x,  char code)
         /*assert (mode == DImode);*/
         if (REGNO(x) > 7)
             abort();
-        fprintf(file,"%s ", reg_names[REGNO(x)]);
+        fprintf(file,"%s", reg_names[REGNO(x)]);
       }
       else if (code == 'R') {
         /*assert (mode == DImode);*/
         if (REGNO(x) > 7)
             abort();
-        fprintf(file,"%s ", reg_names[REGNO(x)+1]);
+        fprintf(file,"%s", reg_names[REGNO(x)+1]);
       }
       else if (code == 'T') {
         /*Byte mode selection Akbar Hussain Oct. 02 2001*/
         if (REGNO(x) > 7)
             abort();
-        fprintf(file,"%s ", byte_reg_names[REGNO(x)]);
+        fprintf(file,"%s", byte_reg_names[REGNO(x)]);
       }
       else 
-	fprintf (file, "%s ", reg_names[REGNO(x)]);
+	fprintf (file, "%s", reg_names[REGNO(x)]);
       break;
 
     case MEM:
