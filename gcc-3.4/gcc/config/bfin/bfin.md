@@ -863,12 +863,19 @@
   [(set_attr "type" "alu0")])
 
 (define_insn "mulhisi3"
-  [(set (match_operand:SI 0 "register_operand" "=D")
+  [(set (match_operand:SI 0 "register_operand" "=d")
 	(mult:SI (sign_extend:SI (match_operand:HI 1 "register_operand" "%d"))
-		 (sign_extend:SI (match_operand:HI 2 "register_operand" "d"))))
-   (clobber (reg:SI 32))]
-  "0"
-  "%0 = (A0 = %h1 + %h2) IS;"   /* %D0 mnop, =(A0=L*L) (%1,%2) I;" */
+		 (sign_extend:SI (match_operand:HI 2 "register_operand" "d"))))]
+  ""
+  "%0 = %h1 * %h2 (IS);"
+  [(set_attr "type" "dsp32")])
+
+(define_insn "umulhisi3"
+  [(set (match_operand:SI 0 "register_operand" "=d")
+	(mult:SI (zero_extend:SI (match_operand:HI 1 "register_operand" "%d"))
+		 (zero_extend:SI (match_operand:HI 2 "register_operand" "d"))))]
+  ""
+  "%0 = %h1 * %h2 (FU);"
   [(set_attr "type" "dsp32")])
 
 ;; The processor also supports ireg += mreg or ireg -= mreg, but these
