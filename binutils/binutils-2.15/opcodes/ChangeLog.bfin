@@ -29,6 +29,9 @@
 	(_print_insn_bfin): Add test for mnop.
 	(print_insn_bfin): Proper display of multiple issue instructions.
 
+	* bfin-dis.c: Run through indent and fix up some more style issues
+	manually.
+
 2004-11-18  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin-dis.c (sreg_names): Add one entry to make it 32.
