@@ -585,38 +585,6 @@ illegal_instruction:
 }
 
 static void
-macmod_accm (int mod, disassemble_info *outf)
-{
-  if ((mod == 0))
-    {
-      notethat ("");
-      return;
-    }
-  else if ((mod == 8))
-    {
-      notethat ("(IS)");
-      OUTS (outf, "(IS)");
-      return;
-    }
-  else if ((mod == 4))
-    {
-      notethat ("(FU)");
-      OUTS (outf, "(FU)");
-      return;
-    }
-  else if ((mod == 3))
-    {
-      notethat ("(W32)");
-      OUTS (outf, "(W32)");
-      return;
-    }
-  else
-    goto illegal_instruction;
-illegal_instruction:
-  return;
-}
-
-static void
 searchmod (int r0, disassemble_info *outf)
 {
   if ((r0 == 0))
@@ -641,26 +609,6 @@ searchmod (int r0, disassemble_info *outf)
     {
       notethat ("LE");
       OUTS (outf, "LE");
-      return;
-    }
-  else
-    goto illegal_instruction;
-illegal_instruction:
-  return;
-}
-
-static void
-mxd_mod (int mod, disassemble_info *outf)
-{
-  if ((mod == 0))
-    {
-      notethat ("");
-      return;
-    }
-  else if ((mod == 1))
-    {
-      notethat ("(M)");
-      OUTS (outf, "(M)");
       return;
     }
   else
@@ -6178,22 +6126,6 @@ decode_psedoDEBUG_0 (TIword iw0, disassemble_info *outf)
     goto illegal_instruction;
 illegal_instruction:
   return 0;
-}
-
-static int
-decode_psedoOChar_0 (TIword iw0, disassemble_info *outf)
-{
-/* psedoOChar
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 1 | 1 | 0 | 0 | 1 |.ch............................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-  int ch = ((iw0 >> 0) & 0xff);
-
-  notethat ("OUTC uimm8");
-  OUTS (outf, "OUTC");
-  OUTS (outf, uimm8 (ch));
-  return 1 * 2;
 }
 
 static int

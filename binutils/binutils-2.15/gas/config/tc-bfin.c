@@ -1335,7 +1335,7 @@ gen_calla (ExprNode * addr, int S)
 {
   int val;
   int high_val;
-  int reloc;
+  int reloc = 0;
   INIT (CALLa);
 
   switch(S){

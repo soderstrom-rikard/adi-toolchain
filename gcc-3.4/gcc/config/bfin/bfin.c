@@ -120,7 +120,7 @@ static e_funkind funkind (tree funtype)
 static int
 n_dregs_to_save (void)
 {
-  int i;
+  unsigned i;
 
   for (i = REG_R0; i <= REG_R7; i++)
     {
@@ -417,7 +417,6 @@ emit_link_insn (rtx spreg, HOST_WIDE_INT frame_size)
 {
   HOST_WIDE_INT link_size = frame_size;
   rtx insn;
-  rtx set;
   int i;
 
   if (link_size > 262140)
@@ -650,7 +649,6 @@ bfin_expand_prologue (void)
   rtx insn;
   HOST_WIDE_INT arg_size;
   HOST_WIDE_INT frame_size = get_frame_size ();
-  int is_leaf_function = leaf_function_p ();
   rtx spreg = gen_rtx_REG (Pmode, REG_SP);
   e_funkind fkind = funkind (TREE_TYPE (current_function_decl));
 
@@ -838,7 +836,7 @@ effective_address_32bit_p (rtx op, enum machine_mode mode)
    All addressing modes are equally cheap on the Blackfin.  */
 
 static int
-bfin_address_cost (rtx addr)
+bfin_address_cost (rtx addr ATTRIBUTE_UNUSED)
 {
   return 1;
 }
@@ -1138,7 +1136,6 @@ function_arg (CUMULATIVE_ARGS *cum, enum machine_mode mode, tree type,
 {
   int bytes
     = (mode == BLKmode) ? int_size_in_bytes (type) : GET_MODE_SIZE (mode);
-  int words = (bytes + UNITS_PER_WORD - 1) / UNITS_PER_WORD;
 
   if (bytes == -1)
     return NULL_RTX;
@@ -1252,7 +1249,7 @@ initialize_trampoline (tramp, fnaddr, cxt)
    CALL_EXPR representing the call.  */
 
 static bool
-bfin_function_ok_for_sibcall (tree decl, tree exp)
+bfin_function_ok_for_sibcall (tree decl ATTRIBUTE_UNUSED, tree exp ATTRIBUTE_UNUSED)
 {
   return true;
 }
@@ -1495,7 +1492,7 @@ reg_or_7bit_operand (rtx op, enum machine_mode mode)
    instruction.  */
 
 int
-fp_plus_const_operand (rtx op, enum machine_mode mode)
+fp_plus_const_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
 {
   rtx op1, op2;
   if (GET_CODE (op) != PLUS)
@@ -1958,13 +1955,12 @@ split_load_immediate (rtx operands[])
   int num_zero = shiftr_zero (&shifted);
   int num_compl_zero = shiftr_zero (&shifted_compl);
   unsigned int regno = REGNO (operands[0]);
-  enum reg_class class1 = REGNO_REG_CLASS (regno);
 
   /* This case takes care of single-bit set/clear constants, which we could
      also implement with BITSET/BITCLR.  */
   if (num_zero
       && shifted >= -32768 && shifted < 65536
-      && ((regno >= REG_R0 && regno <= REG_R7)
+      && ((regno <= REG_R7)
 	  || (regno >= REG_P0 && regno <= REG_P7 && num_zero <= 2)))
     {
       emit_insn (gen_movsi (operands[0], GEN_INT (shifted)));
@@ -1976,7 +1972,7 @@ split_load_immediate (rtx operands[])
   tmp |= -(tmp & 0x8000);
 
   /* If high word has one bit set or clear, try to use a bit operation.  */
-  if (regno >= REG_R0 && regno <= REG_R7)
+  if (regno <= REG_R7)
     {
       if (log2constp (val & 0xFFFF0000))
 	{
@@ -1991,7 +1987,7 @@ split_load_immediate (rtx operands[])
 	}
     }
 
-  if (regno >= REG_R0 && regno <= REG_P7)
+  if (regno <= REG_P7)
     {
       if (CONST_7BIT_IMM_P (tmp))
 	{
@@ -2169,7 +2165,7 @@ bfin_internal_label (FILE *stream, const char *prefix, unsigned long num)
 static int first_preg_to_save, first_dreg_to_save;
 
 int
-push_multiple_operation (rtx op, enum machine_mode mode)
+push_multiple_operation (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
 {
   int lastdreg = 8, lastpreg = 6;
   int i, group;
@@ -2239,7 +2235,7 @@ push_multiple_operation (rtx op, enum machine_mode mode)
 }
 
 int
-pop_multiple_operation (rtx op, enum machine_mode mode)
+pop_multiple_operation (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
 {
   int lastdreg = 8, lastpreg = 6;
   int i, group;
@@ -2340,7 +2336,6 @@ static int
 bfin_adjust_cost (rtx insn, rtx link, rtx dep_insn, int cost)
 {
   enum attr_type insn_type, dep_insn_type;
-  rtx set, set2;
   int dep_insn_code_number;
 
   /* Anti and output dependencies have zero cost.  */
@@ -2362,7 +2357,7 @@ bfin_adjust_cost (rtx insn, rtx link, rtx dep_insn, int cost)
       rtx dest = SET_DEST (pat);
       rtx src = SET_SRC (pat);
       if (! ADDRESS_REGNO_P (REGNO (dest))
-	  || ! (REGNO (src) >= REG_R0 && REGNO (src) <= REG_R7))
+	  || ! (REGNO (src) <= REG_R7))
 	return cost;
       return cost + (dep_insn_type == TYPE_MOVE ? 4 : 3);
     }

@@ -292,6 +292,7 @@ bfin_alloc_frame_cache (void)
   return cache;
 }
 
+#if 0
 /* Function to analyze the link opcode */
 static CORE_ADDR bfin_analyze_link(CORE_ADDR pc, CORE_ADDR cur_pc, struct bfin_frame_cache *cache)
 {
@@ -425,6 +426,7 @@ static CORE_ADDR bfin_analyze_prologue(CORE_ADDR pc, CORE_ADDR cur_pc, struct bf
 
   return pc;
 }
+#endif
 
 struct offset_value offvalue;
 

@@ -185,30 +185,17 @@ reloc_stack_operate (unsigned int oper)
   return value;
 }
 
-static bfd_reloc_status_type 
-bfin_unused_reloc(bfd* abfd ATTRIBUTE_UNUSED,
-		arelent *reloc_entry ATTRIBUTE_UNUSED, 
-		asymbol *symbol ATTRIBUTE_UNUSED,
-		PTR data ATTRIBUTE_UNUSED, 
-		asection *input_section ATTRIBUTE_UNUSED,
-		bfd* output_bfd ATTRIBUTE_UNUSED, 
-		char** error_message ATTRIBUTE_UNUSED)
-{
-  fprintf(stderr, "Unknown relocation type found %s(%d)\n",__FILE__, __LINE__);
-  return bfd_reloc_undefined;
-}
-
 /* FUNCTION : bfin_got_reloc
    ABSTRACT : TODO : figure out how to handle got relocs
 */
 static bfd_reloc_status_type
 bfin_got_reloc (
-     bfd *abfd,
-     arelent *reloc_entry,
-     asymbol *symbol,
-     PTR data,
-     asection *input_section,
-     bfd *output_bfd,
+     bfd *abfd ATTRIBUTE_UNUSED,
+     arelent *reloc_entry ATTRIBUTE_UNUSED,
+     asymbol *symbol ATTRIBUTE_UNUSED,
+     PTR data ATTRIBUTE_UNUSED,
+     asection *input_section ATTRIBUTE_UNUSED,
+     bfd *output_bfd ATTRIBUTE_UNUSED,
      char **error_message ATTRIBUTE_UNUSED) 
 {
   bfd_reloc_status_type flag = bfd_reloc_ok;
@@ -220,12 +207,12 @@ bfin_got_reloc (
 */
 static bfd_reloc_status_type
 bfin_pltpc_reloc (
-     bfd *abfd,
-     arelent *reloc_entry,
-     asymbol *symbol,
-     PTR data,
-     asection *input_section,
-     bfd *output_bfd,
+     bfd *abfd ATTRIBUTE_UNUSED,
+     arelent *reloc_entry ATTRIBUTE_UNUSED,
+     asymbol *symbol ATTRIBUTE_UNUSED,
+     PTR data ATTRIBUTE_UNUSED,
+     asection *input_section ATTRIBUTE_UNUSED,
+     bfd *output_bfd ATTRIBUTE_UNUSED,
      char **error_message ATTRIBUTE_UNUSED) 
 {
   bfd_reloc_status_type flag = bfd_reloc_ok;
@@ -1213,7 +1200,7 @@ bfd_elf32_elf_reloc_type_lookup (bfd * abfd ATTRIBUTE_UNUSED,
   const int MAX = sizeof (bfin_reloc_map) / sizeof (struct bfin_reloc_map);
   for (i = 0; i < MAX; i++)
     {
-      if (bfin_reloc_map[i].elf_reloc_val == (int) code)
+      if (bfin_reloc_map[i].elf_reloc_val == code)
         {
           return &bfin_reloc_map[i].howto;
         }
@@ -1468,7 +1455,7 @@ elf_bfin_relocate_section (bfd * output_bfd,
       struct elf_link_hash_entry *h;
       Elf_Internal_Sym *sym;
       asection *sec;
-      bfd_vma relocation;
+      bfd_vma relocation = 0;
       bfd_boolean unresolved_reloc;
       bfd_reloc_status_type r;
 
