@@ -276,18 +276,6 @@ extern const char * directive_names[];
   (TREE_CODE (EXP) == STRING_CST        \
    && (ALIGN) < BITS_PER_WORD ? BITS_PER_WORD : (ALIGN))    
 
-/* Register in which address to store a structure value
-   is passed to a function.  */
-#define STRUCT_VALUE_REGNUM REG_P0
-#define DEFAULT_PCC_STRUCT_RETURN 0
-#define RETURN_IN_MEMORY(TYPE) bfin_return_in_memory(TYPE)
-
-/*vararg implementation */
-
-#define SETUP_INCOMING_VARARGS(CUM,MODE,TYPE,PRETEND_SIZE,NO_RTL) \
-  setup_incoming_varargs (&CUM, MODE, TYPE, &PRETEND_SIZE, NO_RTL)
-
-
 #define TRAMPOLINE_SIZE 18
 #define TRAMPOLINE_TEMPLATE(FILE)                                       \
   fprintf(FILE, "\t.dd\t0x0000e10b\n"); /* p3.l = fn low */		\
@@ -638,6 +626,10 @@ typedef struct {
 #define FUNCTION_ARG_ADVANCE(CUM, MODE, TYPE, NAMED)	\
   (function_arg_advance (&CUM, MODE, TYPE, NAMED))
 
+/* Pass variable size arguments by reference for simplicity.  */
+#define FUNCTION_ARG_PASS_BY_REFERENCE(CUM, MODE, TYPE, NAMED) \
+    ((MODE) == BLKmode && TREE_CODE (TYPE_SIZE (TYPE)) != INTEGER_CST)
+
 #define RETURN_POPS_ARGS(FDECL, FUNTYPE, STKSIZE) 0
 
 /* Define how to find the value returned by a function.
@@ -659,6 +651,20 @@ typedef struct {
 
 #define FUNCTION_VALUE_REGNO_P(N) ((N) == REG_R0)
 
+/* Register in which address to store a structure value
+   is passed to a function.  */
+#define STRUCT_VALUE_REGNUM REG_P0
+#define DEFAULT_PCC_STRUCT_RETURN 0
+#define RETURN_IN_MEMORY(TYPE) bfin_return_in_memory(TYPE)
+
+/*vararg implementation */
+
+#define SETUP_INCOMING_VARARGS(CUM,MODE,TYPE,PRETEND_SIZE,NO_RTL) \
+  setup_incoming_varargs (&CUM, MODE, TYPE, &PRETEND_SIZE, NO_RTL)
+
+/* Implement `va_arg'.  */
+#define EXPAND_BUILTIN_VA_ARG(VALIST, TYPE) \
+  bfin_va_arg ((VALIST), (TYPE))
 
 /* Addressing Modes */
 

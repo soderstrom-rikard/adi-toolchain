@@ -1,3 +1,13 @@
+2004-10-22  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (function_arg): Pass everything but variable size
+	types in registers.
+	(function_arg_partial_nregs): Exit early for variable size types.
+	(bfin_va_arg): New function.
+	* config/bfin/bfin-protos.h (bfin_va_arg): Declare it.
+	* config/bfin/bfin.h (EXPAND_BUILTIN_VA_ARG,
+	FUNCTION_ARG_PASS_BY_REFERENCE): New macros.
+	
 2004-10-21  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/lib1funcs.asm (___udivsi3): Use unsigned comparison

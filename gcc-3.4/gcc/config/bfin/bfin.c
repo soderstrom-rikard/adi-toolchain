@@ -484,6 +484,31 @@ setup_incoming_varargs (CUMULATIVE_ARGS *cum,
   *pretend_size = 0;
 }
 
+/* Implement `va_arg'.  We only need to do something about variable size types,
+   which we pass by reference.  */
+
+rtx
+bfin_va_arg (tree va_list, tree type)
+{
+  tree type_ptr;
+  tree type_ptr_ptr;
+  tree t;
+
+  if (int_size_in_bytes (type) >= 0)
+    return std_expand_builtin_va_arg (va_list, type);
+
+  type_ptr     = build_pointer_type (type);
+  type_ptr_ptr = build_pointer_type (type_ptr);
+
+  t = build (POSTINCREMENT_EXPR, va_list_type_node, va_list, build_int_2 (UNITS_PER_WORD, 0));
+  TREE_SIDE_EFFECTS (t) = 1;
+  t = build1 (NOP_EXPR, type_ptr_ptr, t);
+  TREE_SIDE_EFFECTS (t) = 1;
+  t = build1 (INDIRECT_REF, type_ptr, t);
+
+  return expand_expr (t, NULL_RTX, Pmode, EXPAND_NORMAL);
+}
+
 /* The saveall must be syncronized with include/sys/regs.h
  */
 
@@ -1117,32 +1142,17 @@ struct rtx_def *
 function_arg (CUMULATIVE_ARGS *cum, enum machine_mode mode, tree type,
 	      int named ATTRIBUTE_UNUSED)
 {
-  rtx ret   = NULL_RTX;
   int bytes
     = (mode == BLKmode) ? int_size_in_bytes (type) : GET_MODE_SIZE (mode);
   int words = (bytes + UNITS_PER_WORD - 1) / UNITS_PER_WORD;
 
-  switch (mode)
-    {
-      /* For now, pass fp/complex values on the stack. */
-    default:
-      break;
+  if (bytes == -1)
+    return NULL_RTX;
 
-    case BLKmode:
-      if (bytes < 0)
-	break;
-    case DFmode:
-    case DImode:
-    case SImode:
-    case HImode:
-    case QImode:
-    case SFmode:
-      if (cum->nregs)
-	ret = gen_rtx (REG, mode, *(cum->arg_regs));
-      break;
-    }
+  if (cum->nregs)
+    return gen_rtx (REG, mode, *(cum->arg_regs));
 
-  return ret;
+  return NULL_RTX;
 }
 
 /* For an arg passed partly in registers and partly in memory,
@@ -1166,6 +1176,9 @@ function_arg_partial_nregs (CUMULATIVE_ARGS *cum ,	/* current arg information */
   int arg_num = *cum->arg_regs;
   int ret, last_reg_num;
 
+  if (bytes == -1)
+    return 0;
+  
   last_reg_num = max_arg_registers - 1;
   ret = ((arg_num <= last_reg_num && 
          ((arg_num + words) > (last_reg_num + 1)))
