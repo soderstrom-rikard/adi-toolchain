@@ -1,0 +1,241 @@
+  add_com ("begin", class_breakpoint, begin_command,
+  deprecate_cmd (add_com ("othernames", class_obscure, arm_othernames,
+  add_com ("ignore", class_breakpoint, ignore_command,
+    add_com_alias ("bc", "ignore", class_breakpoint, 1);
+  add_com ("commands", class_breakpoint, commands_command,
+  add_com ("condition", class_breakpoint, condition_command,
+  c = add_com ("tbreak", class_breakpoint, tbreak_command,
+  c = add_com ("hbreak", class_breakpoint, hbreak_command,
+  c = add_com ("thbreak", class_breakpoint, thbreak_command,
+    add_com ("ab", class_breakpoint, enable_command,
+  add_com_alias ("en", "enable", class_breakpoint, 1);
+  add_com_alias ("dis", "disable", class_breakpoint, 1);
+  add_com_alias ("disa", "disable", class_breakpoint, 1);
+    add_com ("sb", class_breakpoint, disable_command,
+  add_com_alias ("d", "delete", class_breakpoint, 1);
+    add_com ("db", class_breakpoint, delete_command,
+  add_com ("clear", class_breakpoint, clear_command,
+  c = add_com ("break", class_breakpoint, break_command,
+  add_com_alias ("b", "break", class_run, 1);
+  add_com_alias ("br", "break", class_run, 1);
+  add_com_alias ("bre", "break", class_run, 1);
+  add_com_alias ("brea", "break", class_run, 1);
+      add_com_alias ("ba", "break", class_breakpoint, 1);
+      add_com_alias ("bu", "ubreak", class_breakpoint, 1);
+      add_com ("status", class_info, breakpoints_info,
+    add_com ("lb", class_breakpoint, breakpoints_info,
+  add_com ("catch", class_breakpoint, catch_command,
+  add_com ("tcatch", class_breakpoint, tcatch_command,
+  c = add_com ("watch", class_breakpoint, watch_command,
+  c = add_com ("rwatch", class_breakpoint, rwatch_command,
+  c = add_com ("awatch", class_breakpoint, awatch_command,
+  deprecate_cmd (add_com ("regs", class_vars, show_regs, "Print all registers"),
+  add_com ("itrace", class_support, trace_command,
+  add_com ("iuntrace", class_support, untrace_command,
+  add_com ("itdisassemble", class_vars, tdisassemble_command,
+  add_com ("section", class_files, set_section_command,
+static void add_common_entry (struct symbol *);
+static void add_common_block (char *, CORE_ADDR, int, char *);
+add_common_block (char *name, CORE_ADDR offset, int secnum, char *func_stab)
+    error ("Malformed function STAB found in add_common_block()");
+add_common_entry (struct symbol *entry_sym_ptr)
+    add_com ("lc", class_info, info_common_command,
+  add_com ("generate-core-file", class_files, gcore_command,
+  add_com_alias ("gcore", "generate-core-file", class_files, 1);
+  add_com ("pwd", class_files, pwd_command,
+  add_com ("echo", class_support, echo_command,
+  add_com ("document", class_support, document_command,
+  add_com ("define", class_support, define_command,
+  add_com ("quit", class_support, quit_command, "Exit gdb.");
+  c = add_com ("help", class_support, help_command, "Print list of commands.");
+  add_com_alias ("q", "quit", class_support, 1);
+  add_com_alias ("h", "help", class_support, 1);
+  add_com_alias ("i", "info", class_info, 1);
+  add_com ("complete", class_obscure, complete_command,
+  add_com ("while", class_support, while_command,
+  add_com ("if", class_support, if_command,
+  c = add_com ("shell", class_support, shell_escape,
+  c = add_com ("edit", class_files, edit_command,
+  add_com ("list", class_files, list_command,
+    add_com_alias ("l", "list", class_files, 1);
+    add_com_alias ("v", "list", class_files, 1);
+    add_com_alias ("file", "list", class_files, 1);
+  c = add_com ("disassemble", class_vars, disassemble_command,
+    add_com_alias ("va", "disassemble", class_xdb, 0);
+    add_com_alias ("!", "shell", class_support, 0);
+  c = add_com ("make", class_support, make_command,
+  add_com ("apropos", class_support, apropos_command, "Search for commands matching a REGEXP");
+add_com (char *name, enum command_class class, void (*fun) (char *, int),
+add_com_alias (char *name, char *oldname, enum command_class class,
+  c = add_com ("restore", class_vars, restore_command, 
+  deprecate_cmd (add_com ("xbreak", class_breakpoint, 
+  deprecate_cmd (add_com_alias ("xb", "xbreak", class_breakpoint, 1), NULL);
+  deprecate_cmd (add_com_alias ("xbr", "xbreak", class_breakpoint, 1), NULL);
+  deprecate_cmd (add_com_alias ("xbre", "xbreak", class_breakpoint, 1), NULL);
+  deprecate_cmd (add_com_alias ("xbrea", "xbreak", class_breakpoint, 1), NULL);
+  deprecate_cmd (c = add_com ("txbreak", class_breakpoint, 
+    deprecate_cmd (add_com ("bx", class_breakpoint, 
+  c = add_com ("tty", class_run, tty_command,
+  c = add_com ("path", class_files, path_command,
+  add_com ("attach", class_run, attach_command,
+  add_com ("detach", class_run, detach_command,
+  add_com ("disconnect", class_run, disconnect_command,
+  add_com ("signal", class_run, signal_command,
+  add_com ("stepi", class_run, stepi_command,
+  add_com_alias ("si", "stepi", class_alias, 0);
+  add_com ("nexti", class_run, nexti_command,
+  add_com_alias ("ni", "nexti", class_alias, 0);
+  add_com ("finish", class_run, finish_command,
+  add_com ("next", class_run, next_command,
+  add_com_alias ("n", "next", class_run, 1);
+    add_com_alias ("S", "next", class_run, 1);
+  add_com ("step", class_run, step_command,
+  add_com_alias ("s", "step", class_run, 1);
+  c = add_com ("until", class_run, until_command,
+  add_com_alias ("u", "until", class_run, 1);
+  c = add_com ("advance", class_run, advance_command,
+  c = add_com ("jump", class_run, jump_command,
+      c = add_com ("go", class_run, go_command,
+    add_com_alias ("g", "go", class_run, 1);
+  add_com ("continue", class_run, continue_command,
+  add_com_alias ("c", "cont", class_run, 1);
+  add_com_alias ("fg", "cont", class_run, 1);
+  c = add_com ("run", class_run, run_command,
+  add_com_alias ("r", "run", class_run, 1);
+    add_com ("R", class_run, run_no_args_command,
+  add_com ("interrupt", class_run, interrupt_target_command,
+    add_com ("lr", class_info, nofp_registers_info,
+  add_com ("kill", class_run, kill_command,
+  add_com ("handle", class_run, handle_command,
+      add_com ("lz", class_info, signals_info,
+      add_com ("z", class_run, xdb_handle_command,
+// OBSOLETE   add_com_alias ("th", "mthread", class_stack, 1);
+// OBSOLETE   add_com_alias ("ta", "task", class_stack, 1);
+// OBSOLETE   add_com ("exception", class_run, exception_command,
+  add_com ("upload", class_obscure, m32r_upload_command,
+  add_com ("tload", class_obscure, m32r_load, "test upload command.");
+  deprecate_cmd (add_com ("regs", class_vars, show_regs,
+  add_com_alias ("mt", "maintenance", class_maintenance, 1);
+  add_com ("mem", class_vars, mem_command,
+  add_com ("print-object", class_vars, print_object_command, 
+  add_com_alias ("po", "print-object", class_vars, 1);
+  add_com ("sharedlibrary", class_files, pa64_solib_sharedlibrary_command,
+  add_com ("x", class_vars, x_command,
+  add_com ("whereis", class_vars, whereis_command,
+  add_com ("display", class_vars, display_command,
+  add_com ("printf", class_vars, printf_command,
+  add_com ("output", class_vars, output_command,
+    add_com ("assign", class_vars, set_command, concat ("Evaluate expression \
+  c = add_com ("call", class_vars, call_command,
+  c = add_com ("print", class_vars, print_command,
+  add_com_alias ("p", "print", class_vars, 1);
+  c = add_com ("inspect", class_vars, inspect_command,
+  add_com ("proc-trace-entry", no_class, proc_trace_sysentry_cmd, 
+  add_com ("proc-trace-exit", no_class, proc_trace_sysexit_cmd, 
+  add_com ("proc-untrace-entry", no_class, proc_untrace_sysentry_cmd, 
+  add_com ("proc-untrace-exit", no_class, proc_untrace_sysexit_cmd, 
+  add_com ("flushregs", class_maintenance, reg_flush_command,
+  add_com ("e7000", class_obscure, e7000_command,
+  add_com ("ftplogin", class_obscure, e7000_login_command,
+  add_com ("ftpload", class_obscure, e7000_ftp_command,
+  add_com ("drain", class_obscure, e7000_drain_command,
+  add_com ("pmon <command>", class_obscure, pmon_command,
+  add_com ("sds", class_obscure, sds_command,
+  add_com ("sim <command>", class_obscure, simulator_command,
+  add_com ("st2000 <command>", class_obscure, st2000_command,
+  add_com ("connect", class_obscure, connect_command,
+  add_com ("remote <command>", class_obscure, sr_com,
+  add_com ("tlist", class_obscure, threadlist_test_cmd,
+  add_com ("tinfo", class_obscure, threadinfo_test_cmd,
+  add_com ("tset", class_obscure, threadset_test_cmd,
+  add_com ("tupd", class_obscure, threadlist_update_test_cmd,
+  add_com ("talive", class_obscure, threadalive_test,
+  add_com ("connect", class_obscure, connect_command,
+  add_com ("regs", class_vars, sh_show_regs_command, "Print all registers");
+solib_add_common_symbols (CORE_ADDR rtc_symp)
+      solib_add_common_symbols (SOLIB_EXTRACT_ADDRESS (debug_copy.ldd_cp));
+  add_com ("sharedlibrary", class_files, sharedlibrary_command,
+  add_com ("nosharedlibrary", class_files, no_shared_libraries,
+  add_com ("sharedlibrary", class_files, som_solib_sharedlibrary_command,
+    add_com_alias ("use", "directory", class_files, 0);
+      add_com_alias ("D", "directory", class_files, 0);
+  add_com ("forward-search", class_files, forward_search_command,
+  add_com_alias ("search", "forward-search", class_files, 0);
+  add_com ("reverse-search", class_files, reverse_search_command,
+      add_com_alias ("/", "forward-search", class_files, 0);
+      add_com_alias ("?", "reverse-search", class_files, 0);
+  add_com ("return", class_stack, return_command,
+  add_com ("up", class_stack, up_command,
+  add_com ("up-silently", class_support, up_silently_command,
+  add_com ("down", class_stack, down_command,
+  add_com_alias ("do", "down", class_stack, 1);
+  add_com_alias ("dow", "down", class_stack, 1);
+  add_com ("down-silently", class_support, down_silently_command,
+  add_com ("frame", class_stack, frame_command,
+  add_com_alias ("f", "frame", class_stack, 1);
+      add_com ("L", class_stack, current_frame_command,
+      add_com_alias ("V", "frame", class_stack, 1);
+  add_com ("select-frame", class_stack, select_frame_command,
+  add_com ("backtrace", class_stack, backtrace_command,
+  add_com_alias ("bt", "backtrace", class_stack, 0);
+      add_com_alias ("t", "backtrace", class_stack, 0);
+      add_com ("T", class_stack, backtrace_full_command,
+  add_com_alias ("where", "backtrace", class_alias, 0);
+    add_com ("l", class_info, args_plus_locals_info,
+    add_com ("func", class_stack, func_command,
+  add_com_alias ("ovly", "overlay", class_alias, 1);
+  add_com_alias ("ov", "overlay", class_alias, 1);
+    add_com ("whereis", class_info, variables_info,
+  add_com ("rbreak", class_breakpoint, rbreak_command,
+      add_com ("lf", class_info, sources_info, "Source files in the program");
+      add_com ("lg", class_info, variables_info,
+  add_com ("monitor", class_obscure, do_monitor_command,
+    add_com_alias ("t", "thread", class_run, 1);
+  add_com ("dont-repeat", class_support, dont_repeat_command, "Don't repeat this command.\n\
+  c = add_com ("save-tracepoints", class_trace, tracepoint_save_command,
+  add_com ("tdump", class_trace, trace_dump_command,
+  add_com ("tstatus", class_trace, trace_status_command,
+  add_com ("tstop", class_trace, trace_stop_command,
+  add_com ("tstart", class_trace, trace_start_command,
+  add_com ("passcount", class_trace, trace_pass_command,
+  add_com ("end", class_trace, end_actions_pseudocommand,
+  add_com ("while-stepping", class_trace, while_stepping_pseudocommand,
+  add_com_alias ("ws", "while-stepping", class_alias, 0);
+  add_com_alias ("stepping", "while-stepping", class_alias, 0);
+  add_com ("collect", class_trace, collect_pseudocommand,
+  add_com ("actions", class_trace, trace_actions_command,
+  c = add_com ("trace", class_trace, trace_command,
+  add_com_alias ("tp", "trace", class_alias, 0);
+  add_com_alias ("tr", "trace", class_alias, 1);
+  add_com_alias ("tra", "trace", class_alias, 1);
+  add_com_alias ("trac", "trace", class_alias, 1);
+  add_com ("ptype", class_vars, ptype_command,
+  add_com ("whatis", class_vars, whatis_command,
+      add_com ("am", class_support, pagination_on_command,
+      add_com ("sm", class_support, pagination_off_command,
+  add_com ("ice", class_obscure, v850ice_command,
+  c = add_com ("dll-symbols", class_files, dll_symbol_command,
+  add_com_alias ("sharedlibrary", "dll-symbols", class_alias, 1);
+  add_com ("sharedlibrary", class_files, sharedlibrary_command,
+  add_com ("layout", class_tui, _tuiLayout_command,
+      add_com ("td", class_tui, _tuiToggleLayout_command,
+      add_com ("ts", class_tui, _tuiToggleSplitLayout_command,
+      add_com ("fr", class_tui, _tuiShowFloat_command,
+      add_com ("gr", class_tui, _tuiShowGeneral_command,
+      add_com ("sr", class_tui, _tuiShowSpecial_command,
+      add_com ("+r", class_tui, _tuiScrollRegsForward_command,
+      add_com ("-r", class_tui, _tuiScrollRegsBackward_command,
+      add_com ("tf", class_tui, _tuiToggleFloatRegs_command,
+  add_com ("update", class_tui, tui_update_command,
+  add_com ("refresh", class_tui, _tuiRefreshAll_command,
+    add_com_alias ("U", "refresh", class_tui, 0);
+  add_com ("tabset", class_tui, _tuiSetTabWidth_command,
+  add_com ("winheight", class_tui, _tuiSetWinHeight_command,
+  add_com_alias ("wh", "winheight", class_tui, 0);
+  add_com ("focus", class_tui, _tuiSetFocus_command,
+  add_com_alias ("fs", "focus", class_tui, 0);
+  add_com ("+", class_tui, _tuiScrollForward_command,
+  add_com ("-", class_tui, _tuiScrollBackward_command,
+  add_com ("<", class_tui, _tuiScrollLeft_command,
+  add_com (">", class_tui, _tuiScrollRight_command,
+    add_com ("w", class_xdb, _tuiXDBsetWinHeight_command,
