@@ -226,6 +226,7 @@ enum bfd_architecture
 #define bfd_mach_m32rx         'x'
   bfd_arch_mn10200,   /* Matsushita MN10200 */
   bfd_arch_mn10300,   /* Matsushita MN10300 */
+  bfd_arch_bfin,      /* Adi BFIN */
 #define bfd_mach_mn10300               300
 #define bfd_mach_am33          330
   bfd_arch_fr30,

@@ -72,6 +72,150 @@ enum reloc_type {
   R_max
 };
 
+/* handling expression relocations for blackfin.
+   Blackfin will generate relocations in an expression form
+   with a stack.
+   A relocation such as P1.H  = _typenames-4000000;
+   will generate the following relocs at offset 4:
+00000004 R_expst_push      _typenames
+00000004 R_expst_const     .__constant
+00000004 R_expst_sub       .__operator
+00000006 R_huimm16         .__operator
+
+   The .__constant and .__operator symbol names are fake.
+   Special case is a single relocation
+     P1.L  = _typenames; generates
+00000002 R_luimm16         _typenames
+
+   Thus, if you get a R_luimm16, R_huimm16, R_imm16,
+   if the stack is not empty, pop the stack and
+   put the value, else do the normal thing
+We will currenly assume that the max the stack would grow to is 100
+*/
+
+#define RELOC_STACK_SIZE 100
+static bfd_vma reloc_stack[RELOC_STACK_SIZE];
+static unsigned int reloc_stack_tos = 0;
+
+#define is_reloc_stack_empty() ((reloc_stack_tos > 0)?0:1)
+
+static void
+reloc_stack_push(bfd_vma value)
+{
+//fprintf(stderr, "pushing %d\n", (int)value);
+  reloc_stack[reloc_stack_tos++] = value;
+}
+
+static bfd_vma
+reloc_stack_pop()
+{
+//fprintf(stderr, "popping %d\n", (int)reloc_stack[reloc_stack_tos-1]);
+  return reloc_stack[--reloc_stack_tos];
+}
+
+static bfd_vma
+reloc_stack_operate(unsigned int oper)
+{
+  bfd_vma value;
+  switch(oper){
+    case 0xE2 :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] + reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xE3 :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] - reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xE4 :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] * reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xE5 :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] / reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xE6 :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] % reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xE7 :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] << reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xE8 :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] >> reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xE9 :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] & reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xEA :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] | reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xEB :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] ^ reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xEC :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] && reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xED :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] || reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xEF :
+    {
+      value = ~reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos --;
+      break;
+    }
+    case 0xF0 :
+    {
+      value = -reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 1;
+      break;
+    }
+    default :
+    {
+       fprintf(stderr, "bfin relocation : Internal bug\n");
+       return 0;
+    }
+  }
+
+  // now push the new value back on stack
+  reloc_stack_push(value);
+
+  return value;
+}
+
+
 #if 0
 /*defines map from constant type to bfd relocation type */
 static struct { 
@@ -109,6 +253,148 @@ static bfd_reloc_status_type bfin_unused_reloc(bfd* abfd ATTRIBUTE_UNUSED,
 }
 
 
+/* FUNCTION : bfin_bfd_reloc
+   ABSTRACT : Very similar to the bfd_perform_relocation in reloc.c
+              It understands the blackfin arithmetic relocations
+              It also handles different sizes using bfd_get_8
+*/
+static bfd_reloc_status_type
+bfin_bfd_reloc (
+     bfd *abfd,
+     arelent *reloc_entry,
+     asymbol *symbol,
+     PTR data,
+     asection *input_section,
+     bfd *output_bfd,
+     char **error_message) 
+{
+  bfd_vma relocation;
+  bfd_reloc_status_type flag = bfd_reloc_ok;
+  bfd_size_type addr = reloc_entry->address;
+  bfd_vma output_base = 0;
+  reloc_howto_type *howto = reloc_entry->howto;
+  asection *reloc_target_output_section;
+
+#if 0
+  flag = bfd_elf_generic_reloc (abfd, reloc_entry, 
+			       symbol, data, input_section,
+				     output_bfd, error_message);
+  if (flag    != bfd_reloc_continue) {
+      return flag;
+  }
+  if (flag == bfd_reloc_continue) {
+#endif
+
+      /* Is the address of the relocation really within the section?  */
+      if (reloc_entry->address > input_section->_cooked_size)
+	      return bfd_reloc_outofrange;
+      if(is_reloc_stack_empty()){
+        // check if symbol is defined
+        if (bfd_is_und_section (symbol->section)
+             && (symbol->flags & BSF_WEAK) == 0
+             && output_bfd == (bfd *) NULL)
+          return bfd_reloc_undefined;
+
+        /* Get symbol value.  (Common symbols are special.)  */
+        if (bfd_is_com_section (symbol->section)) {
+           relocation = 0;
+        }
+        else {
+           relocation = symbol->value;       
+  
+        }
+  
+        reloc_target_output_section = symbol->section->output_section;
+  
+        
+        /* Convert input-section-relative symbol value to absolute.  */
+        if (output_bfd && howto->partial_inplace == FALSE)
+	    output_base = 0;
+        else
+	    output_base = reloc_target_output_section->vma;
+        
+        relocation += output_base + symbol->section->output_offset;
+        
+        /* Add in supplied addend.  */
+        relocation += reloc_entry->addend;
+      }
+      else{
+        relocation = reloc_stack_pop();
+      }
+      
+        /* Here the variable relocation holds the final address of the
+	   symbol we are relocating against, plus any addend.  */
+
+      if (howto->pc_relative == TRUE)
+	{
+          relocation -=
+	    input_section->output_section->vma + input_section->output_offset;
+
+       /* if (howto->pcrel_offset == FALSE)
+             relocation -= reloc_entry->address; */
+ 
+          if (howto->pcrel_offset == TRUE && howto->partial_inplace == TRUE)
+             relocation -= reloc_entry->address;
+	}
+
+  /* FIXME: This overflow checking is incomplete, because the value
+     might have overflowed before we get here.  For a correct check we
+     need to compute the value in a size larger than bitsize, but we
+     can't reasonably do that for a reloc the same size as a host
+     machine word.
+     FIXME: We should also do overflow checking on the result after
+     adding in the value contained in the object file.              */
+
+     if (howto->complain_on_overflow != complain_overflow_dont)
+        flag = bfd_check_overflow (howto->complain_on_overflow, 
+                               howto->bitsize,
+                               howto->rightshift, 
+                               bfd_arch_bits_per_address(abfd),
+                               relocation);      
+      
+      /* if rightshift is 1 and the number odd, return error */
+      if(howto->rightshift && (relocation & 0x01)){
+        fprintf(stderr, "relocation should be even number\n");
+        return bfd_reloc_overflow; // the best we can!
+      }
+
+      relocation >>= (bfd_vma) howto->rightshift;
+
+      /* Shift everything up to where it's going to be used */
+
+      relocation <<= (bfd_vma) howto->bitpos;
+#define DOIT(x) \
+  x = ( (x & ~howto->dst_mask) | (relocation & howto->dst_mask))
+
+  // handle 8 and 16 bit relocations here
+  // actual relocations size are smaller and the src_mask will help
+  switch (howto->size)
+    {
+    case 0:
+      {
+	char x = bfd_get_8 (abfd, (char *) data + addr);
+	DOIT (x);
+	bfd_put_8 (abfd, x, (unsigned char *) data + addr);
+      }
+      break;
+
+    case 1:
+      {
+	short x = bfd_get_16 (abfd, (bfd_byte *) data + addr);
+	DOIT (x);
+	bfd_put_16 (abfd, (bfd_vma) x, (unsigned char *) data + addr);
+      }
+      break;
+    default:
+      return bfd_reloc_other;
+    }
+
+      return bfd_reloc_ok;
+#if 0
+  }
+#endif
+   return flag; 
+}
 
 static bfd_reloc_status_type
 bfin_pcrel24_reloc (
@@ -127,6 +413,7 @@ bfin_pcrel24_reloc (
   reloc_howto_type *howto = reloc_entry->howto;
   asection *reloc_target_output_section;
 
+#if 0
   flag = bfd_elf_generic_reloc (abfd, reloc_entry, 
 			       symbol, data, input_section,
 				     output_bfd, error_message);
@@ -134,39 +421,45 @@ bfin_pcrel24_reloc (
       return flag;
   }
 
- if (bfd_is_und_section (symbol->section)
-      && (symbol->flags & BSF_WEAK) == 0
-      && output_bfd == (bfd *) NULL)
-	      return bfd_reloc_continue;
-
   if (flag == bfd_reloc_continue) {
+#endif
 
       /* Is the address of the relocation really within the section?  */
       if (reloc_entry->address > input_section->_cooked_size)
 	      return bfd_reloc_outofrange;
+      if(is_reloc_stack_empty()){
 
-      /* Get symbol value.  (Common symbols are special.)  */
-      if (bfd_is_com_section (symbol->section)) {
-         relocation = 0;
-      }
-      else {
-         relocation = symbol->value;       
+        if (bfd_is_und_section (symbol->section)
+             && (symbol->flags & BSF_WEAK) == 0
+             && output_bfd == (bfd *) NULL)
+          return bfd_reloc_undefined;
 
-      }
-
-      reloc_target_output_section = symbol->section->output_section;
-
-      
-      /* Convert input-section-relative symbol value to absolute.  */
-      if (output_bfd && howto->partial_inplace == FALSE)
-	  output_base = 0;
-      else
+        /* Get symbol value.  (Common symbols are special.)  */
+        if (bfd_is_com_section (symbol->section)) {
+           relocation = 0;
+        }
+        else {
+           relocation = symbol->value;       
+  
+        }
+  
+        reloc_target_output_section = symbol->section->output_section;
+  
+        
+        /* Convert input-section-relative symbol value to absolute.  */
+        if (output_bfd && howto->partial_inplace == FALSE)
+	    output_base = 0;
+        else
 	  output_base = reloc_target_output_section->vma;
       
-      relocation += output_base + symbol->section->output_offset;
-      
-      /* Add in supplied addend.  */
-      relocation += reloc_entry->addend;
+        relocation += output_base + symbol->section->output_offset;
+        
+        /* Add in supplied addend.  */
+        relocation += reloc_entry->addend;
+      }
+      else{
+        relocation = reloc_stack_pop();
+      }
       
       /* Here the variable relocation holds the final address of the
 	 symbol we are relocating against, plus any addend.  */
@@ -198,6 +491,12 @@ bfin_pcrel24_reloc (
                                bfd_arch_bits_per_address(abfd),
                                relocation);      
       
+      /* if rightshift is 1 and the number odd, return error */
+      if(howto->rightshift && (relocation & 0x01)){
+        fprintf(stderr, "relocation should be even number\n");
+        return bfd_reloc_overflow; // the best we can!
+      }
+
       relocation >>= (bfd_vma) howto->rightshift;
 /*      relocation -= 1;  */
       /* Shift everything up to where it's going to be used */
@@ -213,8 +512,88 @@ bfin_pcrel24_reloc (
  	 bfd_put_16 (abfd, x, (unsigned char *) data + addr +2);
       }
       return bfd_reloc_ok;
+#if 0
   }
+#endif
    return flag; 
+}
+
+static bfd_reloc_status_type
+bfin_push_reloc (
+     bfd *abfd,
+     arelent *reloc_entry,
+     asymbol *symbol,
+     PTR data,
+     asection *input_section,
+     bfd *output_bfd,
+     char **error_message) 
+{
+  bfd_vma relocation;
+  //bfd_reloc_status_type flag = bfd_reloc_ok;
+  bfd_vma output_base = 0;
+  asection *reloc_target_output_section;
+  bfd_reloc_status_type flag = bfd_reloc_ok;
+
+  if (bfd_is_und_section (symbol->section)
+      && (symbol->flags & BSF_WEAK) == 0
+      && output_bfd == (bfd *) NULL)
+    flag = bfd_reloc_undefined;
+
+
+  /* Is the address of the relocation really within the section?  */
+  if (reloc_entry->address > input_section->_cooked_size)
+     return bfd_reloc_outofrange;
+      
+  reloc_target_output_section = symbol->section->output_section;
+  relocation = symbol->value;      
+  /* Convert input-section-relative symbol value to absolute.  */
+  if (output_bfd)
+	  output_base = 0;
+      else
+	  output_base = reloc_target_output_section->vma;
+
+  if (!strcmp(symbol->name, symbol->section->name) || output_bfd == NULL)
+      	relocation += output_base + symbol->section->output_offset;
+
+  /* Add in supplied addend.  */
+  relocation += reloc_entry->addend;
+
+  /* now that we have the value, push it */
+  reloc_stack_push(relocation);
+  
+  return flag;
+}
+
+static bfd_reloc_status_type
+bfin_oper_reloc (
+     bfd *abfd,
+     arelent *reloc_entry,
+     asymbol *symbol,
+     PTR data,
+     asection *input_section,
+     bfd *output_bfd,
+     char **error_message) 
+{
+  /* just call the operation based on the reloc_type */
+  reloc_stack_operate(reloc_entry->howto->type);
+  
+  return bfd_reloc_ok;
+}
+
+static bfd_reloc_status_type
+bfin_const_reloc (
+     bfd *abfd,
+     arelent *reloc_entry,
+     asymbol *symbol,
+     PTR data,
+     asection *input_section,
+     bfd *output_bfd,
+     char **error_message) 
+{
+  /* push the addend portion of the relocation */
+  reloc_stack_push(reloc_entry->addend);
+  
+  return bfd_reloc_ok;
 }
 
 static bfd_reloc_status_type
@@ -234,52 +613,74 @@ bfin_h_l_uimm16_reloc (
   reloc_howto_type *howto = reloc_entry->howto;
   asection *reloc_target_output_section;
 
+  // if the reloc stack is not empty, use that as the relocation value
+#if 0
   if ( bfd_elf_generic_reloc (abfd, reloc_entry,
 		  symbol, data, input_section, 
 		  output_bfd, error_message) == bfd_reloc_continue)
   {
+#endif
 
       /* Is the address of the relocation really within the section?  */
       if (reloc_entry->address > input_section->_cooked_size)
 	      return bfd_reloc_outofrange;
-      
-      reloc_target_output_section = symbol->section->output_section;
-      relocation = symbol->value;      
-      /* Convert input-section-relative symbol value to absolute.  */
-      if (output_bfd)
-	  output_base = 0;
-      else
-	  output_base = reloc_target_output_section->vma;
-
-      if (!strcmp(symbol->name, symbol->section->name) || output_bfd == NULL)
-      	relocation += output_base + symbol->section->output_offset;
-
-      /* Add in supplied addend.  */
-      relocation += reloc_entry->addend;
-      
-      if (output_bfd != (bfd *) NULL)
-      {	              
-	      reloc_entry->address += input_section->output_offset;
-	      reloc_entry->addend = relocation;
+      if(is_reloc_stack_empty()){
+        reloc_target_output_section = symbol->section->output_section;
+        relocation = symbol->value;      
+        /* Convert input-section-relative symbol value to absolute.  */
+        if (output_bfd)
+	    output_base = 0;
+        else
+	    output_base = reloc_target_output_section->vma;
+  
+        if (!strcmp(symbol->name, symbol->section->name) || output_bfd == NULL)
+      	  relocation += output_base + symbol->section->output_offset;
+  
+        /* Add in supplied addend.  */
+        relocation += reloc_entry->addend;
+        
+        if (output_bfd != (bfd *) NULL)
+        {	              
+	        reloc_entry->address += input_section->output_offset;
+	        reloc_entry->addend = relocation;
+        }
+        else
+        {
+	        reloc_entry->addend = 0;
+        }
+  
+        /* Here the variable relocation holds the final address of the
+	   symbol we are relocating against, plus any addend.  */
       }
-      else
-      {
-	      reloc_entry->addend = 0;
+      else{
+        relocation = reloc_stack_pop();
+        // assert(is_reloc_stack_empty());
       }
-
-      /* Here the variable relocation holds the final address of the
-	 symbol we are relocating against, plus any addend.  */
 
       x = bfd_get_16 (abfd, (bfd_byte *) data + addr);
       relocation >>= (bfd_vma) howto->rightshift;
       x = relocation;
       bfd_put_16 (abfd, x, (unsigned char *) data + addr);
+#if 0
     }
+#endif
 
     return bfd_reloc_ok;
 }
 
 
+/* HOWTO Table for blackfin.
+   Blackfin relocations are fairly complicated. Some of the salient features are
+   a. Even numbered offsets. A number of (not all) relocations are
+      even numbered. This means that the rightmost bit is not stored.
+      Needs to right shift by 1 and check to see if value is not odd
+   b. A relocation can be an expression. An expression takes on
+      a variety of relocations arranged in a stack.
+   As a result, we cannot use the standard generic function as special
+   function. We will have our own, which is very similar to the standard
+   generic function except that it understands how to get the value from
+   the relocation stack.
+*/
 
 static reloc_howto_type bfin_elf_howto_table[] =
 {
@@ -292,7 +693,7 @@ static reloc_howto_type bfin_elf_howto_table[] =
          0,             /* bitpos */
          complain_overflow_unsigned,             /* complain_on_overflow */
          bfin_unused_reloc,           /* special_function */
-         "R_pcrel4",            /* name */
+         "R_unused0",            /* name */
          TRUE,      /* partial_inplace */
          0x0000000F,            /* src_mask */
          0x0000000F,            /* dst_mask */
@@ -305,7 +706,7 @@ static reloc_howto_type bfin_elf_howto_table[] =
          TRUE,          /* pc_relative */
          0,             /* bitpos */
          complain_overflow_unsigned,             /* complain_on_overflow */
-         bfd_elf_generic_reloc,           /* special_function */
+         bfin_bfd_reloc,           /* special_function */
          "R_pcrel5m2",            /* name */
          TRUE,      /* partial_inplace */
          0x0000000F,            /* src_mask */
@@ -333,7 +734,7 @@ static reloc_howto_type bfin_elf_howto_table[] =
          TRUE,          /* pc_relative */
          0,             /* bitpos */
          complain_overflow_signed,             /* complain_on_overflow */
-         bfd_elf_generic_reloc,           /* special_function */
+         bfin_bfd_reloc,           /* special_function */
          "R_pcrel10",           /* name */
          TRUE,      /* partial_inplace */
          0x000003FF,            /* src_mask */
@@ -347,7 +748,7 @@ static reloc_howto_type bfin_elf_howto_table[] =
          TRUE,          /* pc_relative */
          0,             /* bitpos */
          complain_overflow_signed,             /* complain_on_overflow */
-         bfd_elf_generic_reloc,           /* special_function */
+         bfin_bfd_reloc,           /* special_function */
          "R_pcrel12_jump",              /* name */
          TRUE,      /* partial_inplace */
          0x0FFF,            /* src_mask */
@@ -361,7 +762,7 @@ static reloc_howto_type bfin_elf_howto_table[] =
          FALSE,         /* pc_relative */
          0,             /* bitpos */
          complain_overflow_signed,             /* complain_on_overflow */
-         bfd_elf_generic_reloc,           /* special_function */
+         bfin_bfd_reloc,           /* special_function */
          "R_rimm16",            /* name */
          TRUE,      /* partial_inplace */
          0x0000FFFF,            /* src_mask */
@@ -403,7 +804,7 @@ static reloc_howto_type bfin_elf_howto_table[] =
          TRUE,          /* pc_relative */
          0,             /* bitpos */
          complain_overflow_signed,             /* complain_on_overflow */
-         bfd_elf_generic_reloc,           /* special_function */
+         bfin_bfd_reloc,           /* special_function */
          "R_pcrel12_jump_s",            /* name */
          TRUE,      /* partial_inplace */
          0x00000FFF,            /* src_mask */
@@ -562,7 +963,7 @@ static reloc_howto_type bfin_elf_howto_table[] =
          TRUE,          /* pc_relative */
          0,             /* bitpos */
          complain_overflow_unsigned,             /* complain_on_overflow */
-         bfd_elf_generic_reloc,           /* special_function */
+         bfin_bfd_reloc,           /* special_function */
          "R_pcrel11",           /* name */
          TRUE,      /* partial_inplace */
          0x000003FF,            /* src_mask */
@@ -600,26 +1001,66 @@ static reloc_howto_type bfin_elf_howto_table[] =
              FALSE),                /* pcrel_offset */
      
   //Arithmetic relocations entries
-  HOWTO(0xE0, 0,0,0,FALSE, 0, complain_overflow_dont, bfd_elf_generic_reloc, "AR_e0", FALSE, 0, 0, FALSE),
-  HOWTO(0xE1, 0,0,0,FALSE, 0, complain_overflow_dont, bfd_elf_generic_reloc, "AR_e1", FALSE, 0, 0, FALSE),
-  HOWTO(0xE2, 0,0,0,FALSE, 0, complain_overflow_dont, bfd_elf_generic_reloc, "AR_e2", FALSE, 0, 0, FALSE),
-  HOWTO(0xE3, 0,0,0,FALSE, 0, complain_overflow_dont, bfd_elf_generic_reloc, "AR_e3", FALSE, 0, 0, FALSE),
-  HOWTO(0xE4, 0,0,0,FALSE, 0, complain_overflow_dont, bfd_elf_generic_reloc, "AR_e4", FALSE, 0, 0, FALSE),
-  HOWTO(0xE5, 0,0,0,FALSE, 0, complain_overflow_dont, bfd_elf_generic_reloc, "AR_e5", FALSE, 0, 0, FALSE),
-  HOWTO(0xE6, 0,0,0,FALSE, 0, complain_overflow_dont, bfd_elf_generic_reloc, "AR_e6", FALSE, 0, 0, FALSE),
-  HOWTO(0xE7, 0,0,0,FALSE, 0, complain_overflow_dont, bfd_elf_generic_reloc, "AR_e7", FALSE, 0, 0, FALSE),
-  HOWTO(0xE8, 0,0,0,FALSE, 0, complain_overflow_dont, bfd_elf_generic_reloc, "AR_e8", FALSE, 0, 0, FALSE),
-  HOWTO(0xE9, 0,0,0,FALSE, 0, complain_overflow_dont, bfd_elf_generic_reloc, "AR_e9", FALSE, 0, 0, FALSE), 
-  HOWTO(0xEA, 0,0,0,FALSE, 0, complain_overflow_dont, bfd_elf_generic_reloc, "AR_ea", FALSE, 0, 0, FALSE),
-  HOWTO(0xEB, 0,0,0,FALSE, 0, complain_overflow_dont, bfd_elf_generic_reloc, "AR_eb", FALSE, 0, 0, FALSE),
-  HOWTO(0xEC, 0,0,0,FALSE, 0, complain_overflow_dont, bfd_elf_generic_reloc, "AR_ec", FALSE, 0, 0, FALSE),
-  HOWTO(0xED, 0,0,0,FALSE, 0, complain_overflow_dont, bfd_elf_generic_reloc, "AR_ed", FALSE, 0, 0, FALSE),
-  HOWTO(0xEE, 0,0,0,FALSE, 0, complain_overflow_dont, bfd_elf_generic_reloc, "AR_ee", FALSE, 0, 0, FALSE),
-  HOWTO(0xEF, 0,0,0,FALSE, 0, complain_overflow_dont, bfd_elf_generic_reloc, "AR_ef", FALSE, 0, 0, FALSE),
-  HOWTO(0xF0, 0,0,0,FALSE, 0, complain_overflow_dont, bfd_elf_generic_reloc, "AR_f0", FALSE, 0, 0, FALSE),
-  HOWTO(0xF1, 0,0,0,FALSE, 0, complain_overflow_dont, bfd_elf_generic_reloc, "AR_f1", FALSE, 0, 0, FALSE),
-  HOWTO(0xF2, 0,0,0,FALSE, 0, complain_overflow_dont, bfd_elf_generic_reloc, "AR_f2", FALSE, 0, 0, FALSE),
-  HOWTO(0xF3, 0,0,0,FALSE, 0, complain_overflow_dont, bfd_elf_generic_reloc, "AR_f3", FALSE, 0, 0, FALSE), 
+  HOWTO(0xE0, 
+        0,0,0,FALSE, 0, complain_overflow_dont, bfin_push_reloc, 
+        "R_expst_push", FALSE, 0, 0, FALSE),
+  HOWTO(0xE1, 
+        0,0,0,FALSE, 0, complain_overflow_dont, bfin_const_reloc, 
+        "R_expst_const", FALSE, 0, 0, FALSE),
+  HOWTO(0xE2, 
+        0,0,0,FALSE, 0, complain_overflow_dont, bfin_oper_reloc, 
+        "R_expst_add", FALSE, 0, 0, FALSE),
+  HOWTO(0xE3, 
+        0,0,0,FALSE, 0, complain_overflow_dont, bfin_oper_reloc, 
+        "R_expst_sub", FALSE, 0, 0, FALSE),
+  HOWTO(0xE4, 
+        0,0,0,FALSE, 0, complain_overflow_dont, bfin_oper_reloc, 
+        "R_expst_mult", FALSE, 0, 0, FALSE),
+  HOWTO(0xE5, 
+        0,0,0,FALSE, 0, complain_overflow_dont, bfin_oper_reloc, 
+        "R_expst_div", FALSE, 0, 0, FALSE),
+  HOWTO(0xE6, 
+        0,0,0,FALSE, 0, complain_overflow_dont, bfin_oper_reloc, 
+        "R_expst_mod", FALSE, 0, 0, FALSE),
+  HOWTO(0xE7, 
+        0,0,0,FALSE, 0, complain_overflow_dont, bfin_oper_reloc, 
+        "R_expst_lshift", FALSE, 0, 0, FALSE),
+  HOWTO(0xE8, 
+        0,0,0,FALSE, 0, complain_overflow_dont, bfin_oper_reloc, 
+        "R_expst_rshift", FALSE, 0, 0, FALSE),
+  HOWTO(0xE9, 
+        0,0,0,FALSE, 0, complain_overflow_dont, bfin_oper_reloc, 
+        "R_expst_and", FALSE, 0, 0, FALSE), 
+  HOWTO(0xEA, 
+        0,0,0,FALSE, 0, complain_overflow_dont, bfin_oper_reloc, 
+        "R_expst_or", FALSE, 0, 0, FALSE),
+  HOWTO(0xEB, 
+        0,0,0,FALSE, 0, complain_overflow_dont, bfin_oper_reloc, 
+        "R_expst_xor", FALSE, 0, 0, FALSE),
+  HOWTO(0xEC, 
+        0,0,0,FALSE, 0, complain_overflow_dont, bfin_oper_reloc, 
+        "R_expst_land", FALSE, 0, 0, FALSE),
+  HOWTO(0xED, 
+        0,0,0,FALSE, 0, complain_overflow_dont, bfin_oper_reloc, 
+        "R_expst_lor", FALSE, 0, 0, FALSE),
+  HOWTO(0xEE, 
+        0,0,0,FALSE, 0, complain_overflow_dont, bfin_oper_reloc, 
+        "R_expst_len", FALSE, 0, 0, FALSE),
+  HOWTO(0xEF, 
+        0,0,0,FALSE, 0, complain_overflow_dont, bfin_oper_reloc, 
+        "R_expst_neg", FALSE, 0, 0, FALSE),
+  HOWTO(0xF0, 
+        0,0,0,FALSE, 0, complain_overflow_dont, bfin_oper_reloc, 
+        "R_expst_ocomp", FALSE, 0, 0, FALSE),
+  HOWTO(0xF1, 
+        0,0,0,FALSE, 0, complain_overflow_dont, bfin_oper_reloc, 
+        "R_expst_page", FALSE, 0, 0, FALSE),
+  HOWTO(0xF2, 
+        0,0,0,FALSE, 0, complain_overflow_dont, bfin_oper_reloc, 
+        "R_expst_hwpage", FALSE, 0, 0, FALSE),
+  HOWTO(0xF3, 
+        0,0,0,FALSE, 0, complain_overflow_dont, bfin_oper_reloc, 
+        "R_expst_addr", FALSE, 0, 0, FALSE), 
 
 };
 
@@ -645,26 +1086,26 @@ static const struct bfin_reloc_map {
 	{ BFD_RELOC_32, R_byte4_data},
 	{ BFD_RELOC_11_PCREL, R_pcrel11},
 
-	{ BFD_ARELOC_E0, AR_e0},
-	{ BFD_ARELOC_E1, AR_e1},
-	{ BFD_ARELOC_E2, AR_e2},
-	{ BFD_ARELOC_E3, AR_e3},
-	{ BFD_ARELOC_E4, AR_e4},
-	{ BFD_ARELOC_E5, AR_e5},
-	{ BFD_ARELOC_E6, AR_e6},
-	{ BFD_ARELOC_E7, AR_e7},
-	{ BFD_ARELOC_E8, AR_e8},
-	{ BFD_ARELOC_E9, AR_e9},
-	{ BFD_ARELOC_EA, AR_ea},
-	{ BFD_ARELOC_EB, AR_eb},
-	{ BFD_ARELOC_EC, AR_ec},
-	{ BFD_ARELOC_ED, AR_ed},
-	{ BFD_ARELOC_EE, AR_ee},
-	{ BFD_ARELOC_EF, AR_ef},
-	{ BFD_ARELOC_F0, AR_f0},
-	{ BFD_ARELOC_F1, AR_f1},
-	{ BFD_ARELOC_F2, AR_f2},
-	{ BFD_ARELOC_F3, AR_f3}
+	{ BFD_ARELOC_PUSH, AR_e0},
+	{ BFD_ARELOC_CONST, AR_e1},
+	{ BFD_ARELOC_ADD, AR_e2},
+	{ BFD_ARELOC_SUB, AR_e3},
+	{ BFD_ARELOC_MULT, AR_e4},
+	{ BFD_ARELOC_DIV, AR_e5},
+	{ BFD_ARELOC_MOD, AR_e6},
+	{ BFD_ARELOC_LSHIFT, AR_e7},
+	{ BFD_ARELOC_RSHIFT, AR_e8},
+	{ BFD_ARELOC_AND, AR_e9},
+	{ BFD_ARELOC_OR, AR_ea},
+	{ BFD_ARELOC_XOR, AR_eb},
+	{ BFD_ARELOC_LAND, AR_ec},
+	{ BFD_ARELOC_LOR, AR_ed},
+	{ BFD_ARELOC_LEN, AR_ee},
+	{ BFD_ARELOC_NEG, AR_ef},
+	{ BFD_ARELOC_COMP, AR_f0},
+	{ BFD_ARELOC_PAGE, AR_f1},
+	{ BFD_ARELOC_HWPAGE, AR_f2},
+	{ BFD_ARELOC_ADDR, AR_f3}
 };
 
 
@@ -674,7 +1115,6 @@ bfd_elf32_bfd_reloc_type_lookup (bfd *abfd ATTRIBUTE_UNUSED,
 {
   int i;
   const int MAX = sizeof (bfin_reloc_map)/ sizeof (struct bfin_reloc_map);
-//fprintf(stderr, "looking for %d ... ", code);
   for (i = 0;
        i < MAX;
        i++)
@@ -683,7 +1123,6 @@ bfd_elf32_bfd_reloc_type_lookup (bfd *abfd ATTRIBUTE_UNUSED,
 	return &bfin_elf_howto_table[bfin_reloc_map[i].elf_reloc_val];
       }
     }
-fprintf(stderr, "Looking for %d but found nothing\n", code);
 
   return (reloc_howto_type *) NULL;
 }
@@ -701,7 +1140,7 @@ bfd_info_to_howto_rel (bfd *abfd ATTRIBUTE_UNUSED,
    * FIXME : Change the entire approach to this code
    */
   if(r_type >= 0xe0 && r_type <= 0xf3)
-	  r_type -= 0xe0;
+	  r_type = r_type - 0xe0 + AR_e0;
   BFD_ASSERT (r_type < (unsigned int) R_max);
   cache_ptr->howto = &bfin_elf_howto_table[r_type];
 }
