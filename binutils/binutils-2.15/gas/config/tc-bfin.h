@@ -30,6 +30,8 @@
 #define WORKING_DOT_WORD
 
 extern void bfin_start_line_hook PARAMS ((void));
+extern bfd_boolean bfin_start_label PARAMS ((char *));
+
 #define md_start_line_hook()    bfin_start_line_hook()
 
 
@@ -39,14 +41,15 @@ extern void bfin_start_line_hook PARAMS ((void));
 #define LEX_BR 3
 
 /* The instruction is permitted to contain an = character.  */
-#define TC_EQUAL_IN_INSN(C, PTR) 1
-
+#define TC_EQUAL_IN_INSN(C, NAME, PTR) (bfin_name_is_register (NAME) ? 1 : 0)
+extern bfd_boolean bfin_name_is_register PARAMS ((char *));
 #define NOP_OPCODE 0x0000 
 
 #define LOCAL_LABELS_FB 1
 
 #define DOUBLESLASH_LINE_COMMENTS
 
+#define TC_START_LABEL(ch ,ptr) (ch == ':' && bfin_start_label (ptr))
 #define tc_fix_adjustable(FIX) bfin_fix_adjustable (FIX)
 extern bfd_boolean bfin_fix_adjustable PARAMS ((struct fix *));
 /* end of tc-bfin.h */

@@ -212,16 +212,16 @@ void error (char *format, ...)
 #define register_mismatch() _register_mismatch (__LINE__)
 
 static
-int _semantic_error (char *syntax, int line)
+int _semantic_error (char *syntax, int this_line)
 {
-  error ("\nSyntax error:<%d>:  `%s'\n", line, syntax);
+  error ("\nSyntax error:<%d>:  `%s'\n", this_line, syntax);
   return -1;
 }
 
 static
-int _register_mismatch (int line)
+int _register_mismatch (int other_line)
 {
-  return _semantic_error ("Register mismatch", line);
+  return _semantic_error ("Register mismatch", other_line);
 }
 
 int
@@ -630,7 +630,15 @@ is_group2 (INSTR_T x)
 asm_or_directive:
 	{ INIT_ASM(); }
 	asm
-	{ insn=$2; return (1); }
+	{
+	  insn=$2;
+	  if (insn == 0)
+	    return NO_INSN_GENERATED;
+	  else if (insn == -1)
+	    return SEMANTIC_ERROR;
+	  else
+	    return INSN_GENERATED;
+	}
 ;
 
 asm: asm_1 SEMICOLON
@@ -693,7 +701,6 @@ asm: asm_1 SEMICOLON
 	  else
 	    return semantic_error ("Wrong 16 bit instructions groups");
 	}
-
 	| error { $$ = 0; as_bad ("\nParse error.\n"); yyerrok; }  // recovery error
 ;
 
@@ -3341,6 +3348,15 @@ asm_1:
 	}
 
 
+// }
+////////////////////////////////////////////////////////////////////////////
+/// Expression Assignment
+// {
+	| expr ASSIGN expr
+	{
+	  bfin_equals ($1);
+	  $$ = 0;
+	}
 // }
 ////////////////////////////////////////////////////////////////////////////
 // PushPopMultiple

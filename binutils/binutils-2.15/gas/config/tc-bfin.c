@@ -29,7 +29,7 @@ struct yy_buffer_state;
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 extern YY_BUFFER_STATE yy_scan_string (const char *yy_str);
 extern void yy_delete_buffer (YY_BUFFER_STATE b);
-static void parse (char *line);
+static parse_state parse (char *line);
 void assembler_parser_init (void);
 static void s_bss PARAMS ((int));
 
@@ -73,35 +73,91 @@ static const struct bfin_reg_entry bfin_reg_info[] = {
   {"R6", REG_R6},
   {"R7", REG_R7},
   {"P0", REG_P0},
+  {"P0.H", REG_P0},
+  {"P0.L", REG_P0},
   {"P1", REG_P1},
+  {"P1.H", REG_P1},
+  {"P1.L", REG_P1},
   {"P2", REG_P2},
+  {"P2.H", REG_P2},
+  {"P2.L", REG_P2},
   {"P3", REG_P3},
+  {"P3.H", REG_P3},
+  {"P3.L", REG_P3},
   {"P4", REG_P4},
+  {"P4.H", REG_P4},
+  {"P4.L", REG_P4},
   {"P5", REG_P5},
+  {"P5.H", REG_P5},
+  {"P5.L", REG_P5},
   {"SP", REG_SP},
+  {"SP.L", REG_SP},
+  {"SP.H", REG_SP},
   {"FP", REG_FP},
+  {"FP.L", REG_FP},
+  {"FP.H", REG_FP},
   {"A0x", REG_A0x},
   {"A1x", REG_A1x},
   {"A0w", REG_A0w},
   {"A1w", REG_A1w},
+  {"A0.x", REG_A0x},
+  {"A1.x", REG_A1x},
+  {"A0.w", REG_A0w},
+  {"A1.w", REG_A1w},
   {"A0", REG_A0},
+  {"A0.L", REG_A0},
+  {"A0.H", REG_A0},
   {"A1", REG_A1},
+  {"A1.L", REG_A1},
+  {"A1.H", REG_A1},
   {"I0", REG_I0},
+  {"I0.L", REG_I0},
+  {"I0.H", REG_I0},
   {"I1", REG_I1},
+  {"I1.L", REG_I1},
+  {"I1.H", REG_I1},
   {"I2", REG_I2},
+  {"I2.L", REG_I2},
+  {"I2.H", REG_I2},
   {"I3", REG_I3},
+  {"I3.L", REG_I3},
+  {"I3.H", REG_I3},
   {"M0", REG_M0},
+  {"M0.H", REG_M0},
+  {"M0.L", REG_M0},
   {"M1", REG_M1},
+  {"M1.H", REG_M1},
+  {"M1.L", REG_M1},
   {"M2", REG_M2},
+  {"M2.H", REG_M2},
+  {"M2.L", REG_M2},
   {"M3", REG_M3},
+  {"M3.H", REG_M3},
+  {"M3.L", REG_M3},
   {"B0", REG_B0},
+  {"B0.H", REG_B0},
+  {"B0.L", REG_B0},
   {"B1", REG_B1},
+  {"B1.H", REG_B1},
+  {"B1.L", REG_B1},
   {"B2", REG_B2},
+  {"B2.H", REG_B2},
+  {"B2.L", REG_B2},
   {"B3", REG_B3},
+  {"B3.H", REG_B3},
+  {"B3.L", REG_B3},
   {"L0", REG_L0},
+  {"L0.H", REG_L0},
+  {"L0.L", REG_L0},
   {"L1", REG_L1},
+  {"L1.H", REG_L1},
+  {"L1.L", REG_L1},
   {"L2", REG_L2},
+  {"L2.H", REG_L2},
+  {"L2.L", REG_L2},
   {"L3", REG_L3},
+  {"L3.H", REG_L3},
+  {"L3.L", REG_L3},
   {"AZ", S_AZ},
   {"AN", S_AN},
   {"AC0", S_AC0},
@@ -263,6 +319,7 @@ md_show_usage (FILE * stream ATTRIBUTE_UNUSED)
 void
 md_begin ()
 {
+
   /* Set the default machine type. */
   if (!bfd_set_arch_mach (stdoutput, bfd_arch_bfin, 0))
     as_warn ("Could not set architecture and machine.");
@@ -293,7 +350,61 @@ md_begin ()
 
 
    */
-  lex_type['('] = 3;
+  lex_type ['('] = 3;
+  /*
+   * Need to add all of the registers to the symbol table, so that
+   * GAS knows that these are registers, and not just any other symbol.
+   *
+   * May also need symbol like "REG=" added in the symbol table
+   *
+   * May also need to check for instruction mnemonics.
+   */
+#if 0
+  walk = (struct bfin_reg_entry *) bfin_reg_info;
+
+  while (walk->name)
+    {
+      symbol_table_insert (symbol_new (walk->name, reg_section, walk->number, &zero_address_frag));
+
+      for (j = 0; walk->name[j]; j++)
+	{
+	  buf[j] = ISUPPER (walk->name[j]) ? TOLOWER (walk->name[j]) : walk->name[j];
+	}
+      buf[j] = '\0';
+
+      symbol_table_insert (symbol_new (buf, reg_section, walk->number, &zero_address_frag));
+      buf[j] = '=';
+      buf[j + 1] = '\0';
+      symbol_table_insert (symbol_new (buf, reg_section, walk->number, &zero_address_frag));
+      walk++;
+    }
+#endif
+  /*
+   * Who the heck started off with that horrible indenting ?
+   *
+   for (i = 0; i < REG_LASTREG; i++)
+   {
+   symbol_table_insert(symbol_new(bfin_reg_info[i].name, reg_section,
+   bfin_reg_info[i].number,
+   &zero_address_frag));
+
+   for (j = 0; bfin_reg_info[i].name[j]; j++)
+   {
+   buf[j] = ISUPPER (bfin_reg_info[i].name[j]) ?
+   tolower(bfin_reg_info[i].name[j]) :
+   bfin_reg_info[i].name[j];
+   }
+   buf[j]='\0';
+
+   symbol_table_insert(symbol_new(buf, reg_section,
+   bfin_reg_info[i].number,
+   &zero_address_frag));
+   buf[j]='='; buf[j+1]='\0';
+   symbol_table_insert(symbol_new(buf, reg_section,
+   bfin_reg_info[i].number,
+   &zero_address_frag));
+   }
+   */
 
 #ifdef OBJ_ELF
   record_alignment (text_section, 2);
@@ -302,7 +413,6 @@ md_begin ()
 #endif
 
   assembler_parser_init ();
-
 #ifdef DEBUG
   extern int debug_codeselection;
   debug_codeselection = 1;
@@ -325,6 +435,7 @@ md_assemble (char *line)
   struct bfin_insn *tmp_insn;
   size_t len;
   static size_t buffer_len = 0;
+  parse_state state;
 
   len = strlen (line);
   if (len + 2 > buffer_len)
@@ -338,7 +449,9 @@ md_assemble (char *line)
   current_inputline[len] = ';';
   current_inputline[len + 1] = '\0';
 
-  parse (current_inputline);
+  state = parse (current_inputline);
+  if (state == NO_INSN_GENERATED)
+    return;
 
   for (insn_size = 0, tmp_insn = insn; tmp_insn; tmp_insn = tmp_insn->next)
     if (!tmp_insn->reloc || !tmp_insn->exp->symbol)
@@ -420,9 +533,11 @@ md_assemble (char *line)
  * parser uses the temporary file for parsing.
  */
 
-void
+
+static parse_state
 parse (char *line)
 {
+  parse_state state;
   YY_BUFFER_STATE buffstate;
 
   buffstate = yy_scan_string (line);
@@ -434,13 +549,15 @@ parse (char *line)
   set_start_state ();
 
   /* Call yyparse here.  */
-  if (yyparse () == 0)
+  state = yyparse ();
+  if (state == SEMANTIC_ERROR)
     {
       as_bad ("Parse failed.");
       insn = 0;
     }
 
   yy_delete_buffer (buffstate);
+  return state;
 }
 
 /*
@@ -1979,3 +2096,45 @@ gen_loop (ExprNode *expr, REG_T reg, int rop, REG_T preg)
   lend   = Expr_Node_Create (ExprNodeReloc, lendval, NULL, NULL);
   return gen_loopsetup(lbegin, reg, rop, lend, preg);
 }
+bfd_boolean
+bfin_name_is_register (char *name)
+{
+  int i;
+
+  if (*name == '[' || *name == '(')
+    return TRUE;
+
+  for (i=0; bfin_reg_info[i].name != 0; i++)
+   {
+     if (!strcasecmp (bfin_reg_info[i].name, name))
+       return TRUE;
+   }
+  return FALSE;
+}
+void
+bfin_equals (ExprNode *sym)
+{
+  char *c;
+
+  c = input_line_pointer;
+  while (*c != '=')
+   c--;
+
+  input_line_pointer = c;
+
+  equals ((char *) sym->value.s_value, 1);
+}
+
+bfd_boolean
+bfin_start_label (char *ptr)
+{
+  ptr--;
+  while (!ISSPACE (*ptr))
+    ptr--;
+
+  ptr++;
+  if (*ptr == '(' || *ptr == '[')
+    return FALSE;
+
+  return TRUE;
+} 

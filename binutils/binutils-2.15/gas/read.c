@@ -512,10 +512,10 @@ read_a_source_file (char *name)
   found_comment = 0;
 #endif
 
-#ifdef TC_BFIN
-  // XXX : this flags prevents bfin-gas from parsing a label
-        int nolabel;
-#endif
+//#ifdef TC_BFIN
+//  // XXX : this flags prevents bfin-gas from parsing a label
+//        int nolabel;
+//#endif
 
   buffer = input_scrub_new_file (name);
 
@@ -539,9 +539,9 @@ read_a_source_file (char *name)
 	  /* We now have input_line_pointer->1st char of next line.
 	     If input_line_pointer [-1] == '\n' then we just
 	     scanned another line: so bump line counters.  */
-#ifdef TC_BFIN
-                nolabel = 0;
-#endif
+//#ifdef TC_BFIN
+//                nolabel = 0;
+//#endif
 	  if (is_end_of_line[(unsigned char) input_line_pointer[-1]])
 	    {
 #ifdef md_start_line_hook
@@ -672,12 +672,12 @@ read_a_source_file (char *name)
 	     Input_line_pointer points after that character.  */
 	  if (is_name_beginner (c))
 
-#ifdef TC_BFIN
-        // special hack for bfin assembler: line may start with '(',
-        // e.g. for PushPopMultiple statements
-        if (c == '(') nolabel = 1;
-        if (is_name_beginner (c) || nolabel)
-#endif
+//#ifdef TC_BFIN
+//        // special hack for bfin assembler: line may start with '(',
+//        // e.g. for PushPopMultiple statements
+//        if (c == '(') nolabel = 1;
+//        if (is_name_beginner (c) || nolabel)
+//#endif
 
 	    {
 	      /* Want user-defined label or pseudo/opcode.  */
@@ -691,11 +691,7 @@ read_a_source_file (char *name)
 		 S points to the beginning of the symbol.
 		   [In case of pseudo-op, s->'.'.]
 		 Input_line_pointer->'\0' where c was.  */
-#ifdef TC_BFIN
-              if (TC_START_LABEL(c, input_line_pointer) && !nolabel)
-#else
               if (TC_START_LABEL(c, input_line_pointer))
-#endif
 		{
 		  if (flag_m68k_mri)
 		    {
@@ -727,17 +723,17 @@ read_a_source_file (char *name)
 		  /* Input_line_pointer->after ':'.  */
 		  SKIP_WHITESPACE ();
 		}
-#ifdef TC_BFIN
-              else if (0)
-#else
-              else if (c == '='
+              else if ((c == '=' 
                        || ((c == ' ' || c == '\t')
                            && input_line_pointer[1] == '='
 #ifdef TC_EQUAL_IN_INSN
-                           && !TC_EQUAL_IN_INSN (c, input_line_pointer)
+                           && !TC_EQUAL_IN_INSN (c, s, input_line_pointer)
 #endif
                            ))
+#ifdef TC_EQUAL_IN_INSN
+		       && !TC_EQUAL_IN_INSN (c, s, input_line_pointer)
 #endif
+                          )
 		{
 		  equals (s, 1);
 		  demand_empty_rest_of_line ();

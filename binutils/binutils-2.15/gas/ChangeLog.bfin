@@ -1,3 +1,23 @@
+2005-02-15  Catherine Moore  <clm@cm00re.com>
+
+	* read.c (read_a_source_file):  Remove bfin-specific code.
+	Add additional TC_EQUAL_IN_INSN check.
+	* config/bfin-defs.h (parse_state): New enum.
+	(bfin_equals): Declare.
+	* config/bfin-parse.y (asm_or_directive): Return parse_state.
+	Add new rule for expression assignment.
+	* config/tc-bfin.h (bfin_start_label): Declare.
+	(TC_EQUAL_IN_INSN): Redefine.
+	(bfin_name_is_register): Declare.
+	(TC_START_LABEL): Define.
+	* config/tc-bfin.c (parse): Change declaration.
+	(bfin_reg_entry): Include all registers.
+	(md_assemble): Check parse_state.
+	(parse): Return parse_state.
+	(bfin_name_is_register): New function.
+	(bfin_equals): New function.
+	(bfin_start_label): New function.
+
 2005-02-09  Catherine Moore  <clm@cm00re.com>
 
 	* config/tc-bfin.c (md_begin):  Do not put the register
