@@ -1,3 +1,13 @@
+2005-03-24  Srivathsa  <sri@rrap-software.com>
+
+	* configure.srv (case "${target}" in bfin*-*-*) : 
+	configuring with threads
+	* linux-bfin-low.c (bfin_reinsert_addr) : 
+	added for thread support
+	* linux-low.c (linux_wait_for_process) : 
+	doing a waitpit with WNOHANG & WCLONE
+
+
 2005-03-11  Srivathsa  <sri@rrap-software.com>
 
 	* linux-low.c (linux_wait) : removed work

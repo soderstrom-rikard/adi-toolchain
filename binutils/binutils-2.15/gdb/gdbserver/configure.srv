@@ -38,6 +38,7 @@ case "${target}" in
                         srv_linux_usrregs=yes
                         CC=bfin-elf-gcc
                         LDFLAGS=-Wl,-elf2flt
+			srv_linux_thread_db=yes
                         ;;
   m68*-*-linux*)	srv_regobj=reg-m68k.o
 			srv_tgtobj="linux-low.o linux-m68k-low.o"
