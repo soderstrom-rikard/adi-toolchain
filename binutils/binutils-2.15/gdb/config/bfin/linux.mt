@@ -1,5 +1,5 @@
 # Target: BFIN with simulator
-TDEPFILES= bfin-tdep.o
+TDEPFILES= bfin-tdep.o solib.o solib-null.o
 TM_FILE= tm-bfin.h
 SIM_OBS = remote-sim.o
 SIM = ../sim/bfin/libsim.a

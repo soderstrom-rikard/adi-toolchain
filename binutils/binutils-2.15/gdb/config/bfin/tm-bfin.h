@@ -53,6 +53,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #include "symtab.h"
 #include "frame.h"
 
+#include "solib.h"
+
 /* Immediately after a function call, return the saved pc.
    Can't always go through the frames for this because on some machines
    the new frame is not set up until the new function executes

@@ -1,3 +1,8 @@
+2005-03-24  Srivathsa  <sri@rrap-software.com>
+
+	* tm-bfin.h : support for threads
+	* linux.mt : support for threads
+
 2005-03-22  Srivathsa  <sri@rrap-software.com>
 
 	* bfin-tdep.c (bfin_next_bp_addr) :
