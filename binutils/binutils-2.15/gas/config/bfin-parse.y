@@ -152,6 +152,7 @@
 	value_match(expr, bits, sign, mul, 1)
 #define IS_URANGE(bits, expr, sign, mul)    \
 	value_match(expr, bits, sign, mul, 0)
+#define IS_CONST(expr) (expr->type == ExprNodeConstant)
 #define IS_RELOC(expr) (expr->type != ExprNodeConstant)
 #define IS_IMM(expr, bits)  value_match(expr, bits, 0, 1, 1)
 #define IS_UIMM(expr, bits)  value_match(expr, bits, 0, 1, 0)
@@ -1384,55 +1385,35 @@ asm_1:
 	| REG ASSIGN expr xpmod1
 	{
 		if ($4.r0 == 0) { // Default: (x)
-			/* if the expr is a relocation, generate it */
-			if (IS_DREG($1) && IS_IMM($3, 7)) {
-				notethat("COMPI2opD: dregs = imm7 (x) \n");
-				$$ = COMPI2OPD (&$1, imm7($3),  0);
-			} else
-			if (IS_PREG($1) && IS_IMM($3, 7)) {
-				notethat("COMPI2opP: pregs = imm7 (x)\n");
-				$$ = COMPI2OPP (&$1, imm7($3),  0);
-			} else
-#if 0
-			if (IS_RELOC($3))
-#endif
-			{
+			/* 7 bit immediate value if possible.
+                           We will check for that constant value for efficiency
+                           If it goes to reloc, it will be 16 bit
+                        */
+			if(IS_CONST($3) && IS_IMM($3, 7) && (IS_DREG($1) || IS_PREG($1))){
+				/* if the expr is a relocation, generate it */
+				if (IS_DREG($1) && IS_IMM($3, 7)) {
+					notethat("COMPI2opD: dregs = imm7 (x) \n");
+					$$ = COMPI2OPD (&$1, imm7($3),  0);
+				} else
+				if (IS_PREG($1) && IS_IMM($3, 7)) {
+					notethat("COMPI2opP: pregs = imm7 (x)\n");
+					$$ = COMPI2OPP (&$1, imm7($3),  0);
+				}
+				else{
+				  return semantic_error("Bad register or value for assigment");
+				}
+			}
+			else{
 				notethat("LDIMMhalf: regs = luimm16 (x)\n");
 				/*      reg,   H,  S,  Z  */
 				$$ = LDIMMHALF_R5 (&$1,   0,  1,  0, $3);
 			} 
-#if 0 /* reloc takes care of const */
-			else
-			if (IS_IMM($3, 16) || IS_UIMM($3, 16)) {
-				/* TODO : Really not a reloc */
-				notethat("LDIMMhalf: regs = luimm16 (x)\n");
-				/*      reg,   H,  S,  Z  */
-				$$ = LDIMMHALF (&$1,   0,  1,  0, $3);
-			} else
-			{
-				return semantic_error("Bad register or value for assigment");
-			}
-#endif	
 		} else { // (z)
+			/* there is no 7 bit zero extended instruction */
 			/* if the expr is a relocation, generate it */
 				notethat("LDIMMhalf: regs = luimm16 (x)\n");
 				/*      reg,  H,  S,  Z  */
 				$$ = LDIMMHALF_R5 (&$1,  0,  0,  1, $3);
-#if 0
-			if (IS_RELOC($3)){
-				notethat("LDIMMhalf: regs = luimm16 (x)\n");
-				/*      reg,  H,  S,  Z  */
-				$$ = LDIMMHALF_R5 (&$1,  0,  0,  1, $3);
-			} else 
-			if (IS_IMM($3, 16) || IS_UIMM($3, 16)) {
-				notethat("LDIMMhalf: regs = luimm16 (z)\n");
-				/*      reg,  H,  S,  Z  */
-				$$ = LDIMMHALF (&$1,  0,  0,  1, $3);
-			} else 
-			{
-				return semantic_error("Bad register or value for assigment");
-			}
-#endif
 		}
 	}
 	| HALF_REG ASSIGN REG
