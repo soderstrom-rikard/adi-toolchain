@@ -170,8 +170,6 @@ echo "Completed installing binutils in $DIR_OUTPUT ...."
 
 ######################## build elf2flt ##########################
 
-cp $DIR_BINUTILS_SOURCE/bfd/bfin-reloctype.h $DIR_BINUTILS_BUILD/bfd/
-
 echo "Building and Installing elf2flt ...."
 cd $DIR_ELF2FLT_BUILD
 
