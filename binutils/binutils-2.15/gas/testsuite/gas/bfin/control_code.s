@@ -1,8 +1,3 @@
-	.data
-foodata:	.word 42
-	.text
-footext:
-
 	.text
 	.global compare_data_register
 compare_data_register:
@@ -36,8 +31,8 @@ compare_pointer:
 	.text
 compare_accumulator:
 	CC = A0 == A1;
-	cc = A1 < a0;
-	cc = a1 <= a0;
+	cc = A0 < a1;
+	cc = a0 <= a1;
 
 	.text
 	.global move_cc

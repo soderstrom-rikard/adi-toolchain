@@ -1,3 +1,19 @@
+2004-12-14  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/bit2.s: New test contributed by Satyanarayana Reddy <reddy@epigonaudio.com>.
+	* gas/bfin/cache2.s: Likewise.
+	* gas/bfin/control_code2.s: Likewise.
+	* gas/bfin/control_code2.d: New.
+	* gas/bfin/cache2.d: New.
+	* gas/bfin/bit2.d: New.
+	* gas/bfin/bfin.exp: Update to run new tests.
+	* gas/bfin/bit.d: Expected output modified to match new objdump output.
+	* gas/bfin/cache.d: Likewise.
+	* gas/bfin/control_code.d: Likewise.
+	* gas/bfin/bit.s: Remove data section.
+	* gas/bfin/cache.s: Likewise.
+	* gas/bfin/control_code.s Likewise.
+
 2004-12-13  Catherine Moore  <clm@cm00re.com>
 
 	* gas/bfin/store.s: New.

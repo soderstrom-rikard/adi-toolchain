@@ -1,7 +1,3 @@
-	.data
-foodata:	.word 42
-	.text
-footext:
 	.text
 	.global bitclr
 bitclr:
@@ -56,6 +52,3 @@ bitmux:
 ones:
 	R5.l = ones r0;
 	r7.L = Ones R2;
-
-
-

@@ -1,43 +1,42 @@
 #objdump: -dr
 #name: bit
 .*: +file format .*
-
 Disassembly of section .text:
 
 00000000 <bitclr>:
-   0:	fc 4c       	bitclr\(r4, 0x1f\);
-   2:	00 4c       	bitclr\(r0, 0x0\);
+   0:	fc 4c       	BITCLR \(R4,0x1f\);
+   2:	00 4c       	BITCLR \(R0,0x0\);
 
 00000004 <bitset>:
-   4:	f2 4a       	bitset\(r2, 0x1e\);
-   6:	eb 4a       	bitset\(r3, 0x1d\);
+   4:	f2 4a       	BITSET \(R2,0x1e\);
+   6:	eb 4a       	BITSET \(R3,0x1d\);
 
 00000008 <bittgl>:
-   8:	b7 4b       	bittgl\(r7, 0x16\);
-   a:	86 4b       	bittgl\(r6, 0x10\);
+   8:	b7 4b       	BITTGL \(R7,0x16\);
+   a:	86 4b       	BITTGL \(R6,0x10\);
 
 0000000c <bittst>:
-   c:	f8 49       	cc = bittst\(r0, 0x1f\);
-   e:	01 49       	cc = bittst\(r1, 0x0\);
-  10:	7f 49       	cc = bittst\(r7, 0xf\);
+   c:	f8 49       	CC = BITTST \(R0,0x1f\);
+   e:	01 49       	CC = BITTST \(R1,0x0\);
+  10:	7f 49       	CC = BITTST \(R7,0xf\);
 
 00000012 <deposit>:
-  12:	0a c6 13 8a 	r5 = deposit\(r3, r2\);
-  16:	0a c6 37 c0 	r0 = deposit\(r7, r6\) \(x\);
+  12:	0a c6 13 8a 	R5=DEPOSIT\(R3,R2\);
+  16:	0a c6 37 c0 	R0=DEPOSIT\(R7,R6\)\(X\);
 
 0000001a <extract>:
-  1a:	0a c6 0a 08 	r4 = extract\(r2, r1.l\);
-  1e:	0a c6 10 04 	r2 = extract\(r0, r2.l\);
-  22:	0a c6 23 4e 	r7 = extract\(r3, r4.l\) \(x\);
-  26:	0a c6 0e 4a 	r5 = extract\(r6, r1.l\) \(x\);
+  1a:	0a c6 0a 08 	R4=EXTRACT\(R2,R1.L\) \(Z\);
+  1e:	0a c6 10 04 	R2=EXTRACT\(R0,R2.L\) \(Z\);
+  22:	0a c6 23 4e 	R7=EXTRACT\(R3,R4.L\)\(X\);
+  26:	0a c6 0e 4a 	R5=EXTRACT\(R6,R1.L\)\(X\);
 
 0000002a <bitmux>:
-  2a:	08 c6 08 00 	bitmux \(r1, r0, a0\) \(asr\);
-  2e:	08 c6 13 00 	bitmux \(r2, r3, a0\) \(asr\);
-  32:	08 c6 25 40 	bitmux \(r4, r5, a0\) \(asl\);
-  36:	08 c6 3e 40 	bitmux \(r7, r6, a0\) \(asl\);
+  2a:	08 c6 08 00 	BITMUX \(R1,R0,A0 \)\(ASR\);
+  2e:	08 c6 13 00 	BITMUX \(R2,R3,A0 \)\(ASR\);
+  32:	08 c6 25 40 	BITMUX \(R4,R5,A0 \)\(ASL\);
+  36:	08 c6 3e 40 	BITMUX \(R7,R6,A0 \)\(ASL\);
 
 0000003a <ones>:
-  3a:	06 c6 00 ca 	r5.l = ones r0;
-  3e:	06 c6 02 ce 	r7.l = ones r2;
+  3a:	06 c6 00 ca 	R5.L=ONESR0;
+  3e:	06 c6 02 ce 	R7.L=ONESR2;
 	...
