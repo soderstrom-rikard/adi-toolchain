@@ -497,8 +497,17 @@ dump_symbols(symbols, number_of_symbols);
 #endif
   }
 
+//#define DEBUG_BFIN
+
   for (a = abs_bfd->sections; (a != (asection *) NULL); a = a->next) {
   	section_vma = bfd_section_vma(abs_bfd, a);
+	if (!strstr(a->name, "text")){
+		section_vma += MAX_SHARED_LIBS*sizeof(int);
+#ifdef DEBUG_BFIN
+		fprintf(stderr, "adding %d to section %s to %x\n", 
+		MAX_SHARED_LIBS, a->name, section_vma);
+#endif
+}
 
 	if (verbose)
 		printf("SECTION: %s [0x%x]: flags=0x%x vma=0x%x\n", a->name, a,
@@ -1315,15 +1324,15 @@ dump_symbols(symbols, number_of_symbols);
 			 */
 			if (relocation_needed) {
 #ifdef TARGET_bfin
-        reloc_section_name = sym_section->name;
-				if (strstr(reloc_section_name, "text"))
-           flat_relocs[flat_reloc_count].reloc.type = FLAT_RELOC_TYPE_TEXT;
-        else if (strstr(reloc_section_name, "data"))
-           flat_relocs[flat_reloc_count].reloc.type = FLAT_RELOC_TYPE_DATA;
-        else if (strstr(reloc_section_name, "bss"))
-           flat_relocs[flat_reloc_count].reloc.type = FLAT_RELOC_TYPE_BSS;
-        else
-           printf("Unknown Type - relocation in bad section.\n");
+			  reloc_section_name = sym_section->name;
+			  if (strstr(reloc_section_name, "text"))
+			    flat_relocs[flat_reloc_count].reloc.type = FLAT_RELOC_TYPE_TEXT;
+			  else if (strstr(reloc_section_name, "data"))
+			    flat_relocs[flat_reloc_count].reloc.type = FLAT_RELOC_TYPE_DATA;
+			  else if (strstr(reloc_section_name, "bss"))
+			    flat_relocs[flat_reloc_count].reloc.type = FLAT_RELOC_TYPE_BSS;
+			  else
+			    printf("Unknown Type - relocation in bad section.\n");
 #else
 				flat_relocs = realloc(flat_relocs,
 					(flat_reloc_count + 1) * sizeof(unsigned long));
