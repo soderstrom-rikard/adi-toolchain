@@ -584,15 +584,6 @@ md_apply_fix3 (fixP, valp, seg)
   int shift;
   int not_yet_resolved = 0;
 
-#if 0
-  if (fixP->fx_r_type == BFD_RELOC_32)
-    {
-      as_tsktsk ("value = %x addsy's value = %x\n", *valp, S_GET_VALUE (fixP->fx_addsy));
-      if (fixP->fx_addsy != NULL && OUTPUT_FLAVOR == bfd_target_elf_flavour)
-	as_tsktsk ("result is true!\n");
-    }
-#endif
-
   shift = 0;
   switch (fixP->fx_r_type)
     {
@@ -612,6 +603,7 @@ md_apply_fix3 (fixP, valp, seg)
       buf[lowbyte] = val & 0xff;
       buf[highbyte] |= (val >> 8) & 0x3;
       break;
+
     case BFD_RELOC_12_PCREL_JUMP:
     case BFD_RELOC_12_PCREL_JUMP_S:
     case BFD_RELOC_12_PCREL:
@@ -658,6 +650,7 @@ md_apply_fix3 (fixP, valp, seg)
       fixP->fx_addnumber = 0;
       not_yet_resolved = 1;	// absolute values not be resolved here
       break;
+
     case BFD_RELOC_24_PCREL_JUMP_L:
     case BFD_RELOC_24_PCREL_CALL_X:
     case BFD_RELOC_24_PCREL:
@@ -677,6 +670,7 @@ md_apply_fix3 (fixP, valp, seg)
       buf[2] = val >> 0;
       buf[3] = val >> 8;
       break;
+
     case BFD_RELOC_5_PCREL:	/* LSETUP (a, b) : "a" */
       if (!val)
 	{
@@ -691,6 +685,7 @@ md_apply_fix3 (fixP, valp, seg)
 
       *buf = (*buf & 0xf0) | (val & 0xf);
       break;
+
     case BFD_RELOC_11_PCREL:	/* LSETUP (a, b) : "b" */
       if (!val)
 	{
@@ -720,23 +715,29 @@ md_apply_fix3 (fixP, valp, seg)
       *buf++ = val >> 16;
       *buf++ = val >> 24;
       break;
+
     case BFD_RELOC_16_IMM:
     case BFD_RELOC_16:
       *buf++ = val >> 0;
       *buf++ = val >> 8;
       break;
+
     case BFD_RELOC_BFIN_GOT :
     case BFD_RELOC_BFIN_PLTPC :
       *buf++ = val >> 0;
       *buf++ = val >> 8;
       break;
-      //added following line for arithmetic reloc check -Jyotik
+
+    case BFD_RELOC_VTABLE_INHERIT:
+    case BFD_RELOC_VTABLE_ENTRY:
+      fixP->fx_done = 0;
+      break;
+
     default:
       if ((BFD_ARELOC_PUSH > fixP->fx_r_type) || (BFD_ARELOC_COMP < fixP->fx_r_type))
 	{
 	  fprintf (stderr, "Relocation %d not handled in gas." " Contact support.\n", fixP->fx_r_type);
 	  return;
-//              abort ();
 	}
       not_yet_resolved = 1;
     }
@@ -795,36 +796,15 @@ tc_gen_reloc (asection * section ATTRIBUTE_UNUSED, fixS * fixp)
 {
   arelent *reloc;
 
-  // generate relocation for long section, eg .text.init -- STChen
-#if 0
-  if (fixp->fx_addnumber)
-    {
-      fixp->fx_addnumber = 0;
-      return NULL;
-    }
-#endif
-
-
   reloc = (arelent *) xmalloc (sizeof (arelent));
   reloc->sym_ptr_ptr = (asymbol **) xmalloc (sizeof (asymbol *));
   *reloc->sym_ptr_ptr = symbol_get_bfdsym (fixp->fx_addsy);
   reloc->address = fixp->fx_frag->fr_address + fixp->fx_where;
 
-  /*
+#if DEBUG
      printf("gen reloc addr:%08lx type:%d sym:%s\n",
      reloc->address, fixp->fx_r_type, fixp->fx_addsy->bsym->name);
      printf("   offset: %x\n", fixp->fx_offset);
-   */
-
-/*  if (fixp->fx_r_type == BFD_RELOC_16_LOW)
-	reloc->address = fixp->fx_frag->fr_address;
- */
-
-#if 0
-  if (fixp->fx_pcrel == 0)
-    reloc->addend = fixp->fx_offset;
-  else
-    reloc->addend = fixp->fx_offset = reloc->address;
 #endif
 
   reloc->addend = fixp->fx_offset;
@@ -862,6 +842,19 @@ md_pcrel_from (fixP)
   return fixP->fx_frag->fr_address + fixP->fx_where;
 }
 
+/* Return true if the fix can be handled by GAS, false if it must
+   be passed through to the linker.  */
+bfd_boolean
+bfin_fix_adjustable (fixP)
+   fixS * fixP;
+{
+  /* We need the symbol name for the VTABLE entries.  */
+  if (   fixP->fx_r_type == BFD_RELOC_VTABLE_INHERIT
+      || fixP->fx_r_type == BFD_RELOC_VTABLE_ENTRY)
+    return 0;
+
+  return 1;
+}
 /*
  * Need to check the begining of each new line, to see if '[', ']' characters
  * are used.  This is used primarily for stack-pointers, and this notation

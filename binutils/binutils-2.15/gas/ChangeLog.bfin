@@ -1,3 +1,13 @@
+2005-01-07  Catherine Moore  <clm@cm00re.com>
+
+	* config/tc-bfin.c (md_apply_fix3): Remove unused code.
+	Add support for VTABLE relocations.
+	(tc_gen_reloc): Remove unused code.
+	(bfin_fix_adjustable): New function.
+	* config/tc-bfin.h: Remove unused code.
+	(tc_fix_adjustable): New definition.
+	(bfin_fix_adjustable): Declare.
+	
 2005-01-04  Catherine Moore  <clm@cm00re.com>
 
 	* config/tc-bfin.c (md_parse_option): Do not print out each

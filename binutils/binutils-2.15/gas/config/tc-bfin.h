@@ -32,13 +32,6 @@
 extern void bfin_start_line_hook PARAMS ((void));
 /* #define md_start_line_hook()    bfin_start_line_hook() */
 
-/*  we don't need the confusing .code section */
-#if 0
-#ifdef OBJ_ELF
-#define ELF_TC_SPECIAL_SECTION \
-{ ".code", SHT_PROGBITS,   SHF_ALLOC + SHF_EXECINSTR     },
-#endif
-#endif
 
 /* 
  * Allow for [, ], etc...
@@ -54,4 +47,6 @@ extern void bfin_start_line_hook PARAMS ((void));
 
 #define DOUBLESLASH_LINE_COMMENTS
 
+#define tc_fix_adjustable(FIX) bfin_fix_adjustable (FIX)
+extern bfd_boolean bfin_fix_adjustable PARAMS ((struct fix *));
 /* end of tc-bfin.h */
