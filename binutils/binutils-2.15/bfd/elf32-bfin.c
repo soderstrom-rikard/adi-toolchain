@@ -265,7 +265,7 @@ bfin_bfd_reloc (
 #endif
 
       /* Is the address of the relocation really within the section?  */
-      if (reloc_entry->address > input_section->size)
+      if (reloc_entry->address > bfd_get_section_limit(abfd, input_section))
 	      return bfd_reloc_outofrange;
       if(is_reloc_stack_empty()){
         // check if symbol is defined
@@ -416,7 +416,7 @@ bfin_pcrel24_reloc (
 #endif
 
       /* Is the address of the relocation really within the section?  */
-      if (reloc_entry->address > input_section->size)
+      if (reloc_entry->address > bfd_get_section_limit(abfd, input_section))
 	      return bfd_reloc_outofrange;
       if(is_reloc_stack_empty()){
 
@@ -552,7 +552,7 @@ bfin_push_reloc (
 
 
   /* Is the address of the relocation really within the section?  */
-  if (reloc_entry->address > input_section->size)
+  if (reloc_entry->address > bfd_get_section_limit(abfd, input_section))
      return bfd_reloc_outofrange;
       
   reloc_target_output_section = symbol->section->output_section;
@@ -656,7 +656,7 @@ bfin_h_l_uimm16_reloc (
 #endif
 
       /* Is the address of the relocation really within the section?  */
-      if (reloc_entry->address > input_section->size)
+      if (reloc_entry->address > bfd_get_section_limit(abfd, input_section))
 	      return bfd_reloc_outofrange;
       if(is_reloc_stack_empty()){
         if (bfd_is_und_section (symbol->section)
@@ -734,7 +734,7 @@ bfin_byte4_reloc (
   asection *reloc_target_output_section;
   int  possible_addend_delta = 0; // to be added to addend if output_bfd is 0
     /* Is the address of the relocation really within the section?  */
-      if (reloc_entry->address > input_section->size)
+      if (reloc_entry->address > bfd_get_section_limit(abfd, input_section))
 	      return bfd_reloc_outofrange;
       if(is_reloc_stack_empty()){
         if (bfd_is_und_section (symbol->section)
