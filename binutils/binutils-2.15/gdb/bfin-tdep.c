@@ -430,7 +430,8 @@ bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
 
   frame_unwind_register (next_frame, BFIN_FP_REGNUM, buf);
   cache->base = extract_unsigned_integer (buf, 4);
-  cache->base -=  text_addr;
+  if(cache->base > text_addr)
+    cache->base -=  text_addr;
 
   if (cache->base == 0)
     return cache;
@@ -455,11 +456,21 @@ bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
     cache->saved_regs[BFIN_PC_REGNUM] = 
        read_register(BFIN_RETS_REGNUM) - text_addr;
     cache->frameless_pc_value = 1;
+    frame_unwind_register (next_frame, BFIN_FP_REGNUM, buf);
+    cache->base = extract_unsigned_integer (buf, 4);
+    //cache->base -= 8;
+    if(cache->base > text_addr)
+    	cache->base -=  text_addr;
+#ifdef _DEBUG
+fprintf(stderr, "frameless pc case base %x\n", cache->base);
+#endif //_DEBUG 
+    cache->saved_regs[BFIN_FP_REGNUM] = cache->base;
   }
   else{
     cache->frameless_pc_value = 0;
   }
 
+#if 0 // PCS, temporarily disable Srivathsa's code
   if (cache->pc != 0)
   {
     bfin_analyze_prologue (cache->pc, frame_pc_unwind (next_frame), cache);
@@ -471,6 +482,7 @@ bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
       frame_unwind_register (next_frame, BFIN_SP_REGNUM, buf);
       cache->base = extract_unsigned_integer (buf, 4) + cache->sp_offset;
     }
+#endif
 
   /* Now that we have the base address for the stack frame we can
      calculate the value of SP in the calling frame.  */
@@ -485,14 +497,8 @@ static void
 bfin_frame_this_id (struct frame_info *next_frame, void **this_cache,
                     struct frame_id *this_id)
 {
-  struct bfin_frame_cache *cache = bfin_frame_cache (next_frame, this_cache);
-  /* This marks the outermost frame.  */
-  if (cache->base == 0){
-    *this_id =  frame_id_build (cache->base + 4, cache->pc + 8);
-  }
-  else{
-   *this_id = frame_id_build (cache->base + 8, cache->pc);
-  }
+	struct bfin_frame_cache *cache = bfin_frame_cache (next_frame, this_cache);
+	*this_id = frame_id_build (cache->base, cache->pc);
 }
 
 static void
@@ -541,7 +547,19 @@ bfin_frame_prev_register (struct frame_info *next_frame, void **this_cache,
           }
           else if(regnum == BFIN_FP_REGNUM){
              int *pi = (int *)valuep;
+            if(cache->frameless_pc_value){
+              /* Blackfin stores the value of the return pc on
+                 a register not a stack. A LINK command will 
+                 save it on the stack. 
+              */
+#ifdef _DEBUG
+fprintf(stderr, "returning frameless %x\n", *addrp);
+#endif //_DEBUG 
+              *pi = *addrp;
+            }
+            else{
              *pi = read_memory_integer (*addrp, 4);
+	    }
           }
           else{
               read_memory (*addrp, valuep,
@@ -674,6 +692,9 @@ bfin_skip_prologue (pc)
      CORE_ADDR pc;
 {
   int op = read_memory_unsigned_integer (pc, 2);
+#ifdef _DEBUG
+fprintf(stderr, "bfin_skip_prologue called\n");
+#endif //_DEBUG 
 
   if (op == P_LINKAGE) {
      pc = skip_link(pc);
