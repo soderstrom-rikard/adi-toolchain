@@ -1370,13 +1370,13 @@ decode_PushPopMultiple_0 (bu16 iw0)
   if (W == 1)
     {
       if (d)
-	for (i = imm5 (dr); i < 8; i++)
+	for (i = dr; i < 8; i++)
 	  {
 	    sp -= 4;
 	    put_long (saved_state.memory, sp, DREG (i));
 	  }
       if (p)
-	for (i = imm5 (pr); i < 6; i++)
+	for (i = pr; i < 6; i++)
 	  {
 	    sp -= 4;
 	    put_long (saved_state.memory, sp, PREG (i));
@@ -1385,13 +1385,13 @@ decode_PushPopMultiple_0 (bu16 iw0)
   else
     {
       if (p)
-	for (i = 5; i >= imm5 (pr); i--)
+	for (i = 5; i >= pr; i--)
 	  {
 	    PREG (i) = get_long (saved_state.memory, sp);
 	    sp += 4;
 	  }
       if (d)
-	for (i = 7; i >= imm5 (dr); i--)
+	for (i = 7; i >= dr; i--)
 	  {
 	    DREG (i) = get_long (saved_state.memory, sp);
 	    sp += 4;

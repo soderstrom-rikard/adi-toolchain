@@ -1,3 +1,8 @@
+2004-12-14  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin-dis.c (decode_PushPopMultiple_0): Remove useless calls of imm5
+	which caused signed/unsigned comparisons.
+
 2004-12-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin-dis.c (decode_macfunc, decode_multfunc, saturate_s32, rnd16,
