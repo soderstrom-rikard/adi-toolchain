@@ -1,3 +1,8 @@
+2004-10-08  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/tc-bfin.c (md_assemble): Precompute size of the insn and
+	allocate memory for it in one piece.
+
 2004-10-03  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin-defs.h (enum statusflags): Delete S_AC.

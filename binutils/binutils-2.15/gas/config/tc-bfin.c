@@ -390,13 +390,21 @@ md_assemble (char *line)
 {
   char *toP = 0;
   extern char *current_inputline; 
-  int size;
-  int gen_insn = 1; // some relocations do not generate instructions
+  int size, insn_size;
+  struct bfin_insn *tmp_insn;
+
   //char *c;
   
   current_inputline = line;
   /* Parse line here */
   parse(line); 
+
+  for (insn_size = 0, tmp_insn = insn; tmp_insn; tmp_insn = tmp_insn->next)
+    if (! tmp_insn->reloc || ! tmp_insn->exp->symbol)
+      insn_size += 2;
+
+  if (insn_size)
+    toP = frag_more (insn_size);
 
   /* 
    * Output the opcode. 
@@ -404,65 +412,62 @@ md_assemble (char *line)
    * Let GAS do any relaxations.
    */
 #ifdef DEBUG
-    printf("INS:"); // XXX DEBUG HACK
+  printf("INS:"); // XXX DEBUG HACK
 #endif
   while (insn)
-  {
-    if (insn->reloc && insn->exp->symbol) 
     {
-	switch (insn->reloc)
-	  {
-	   case BFD_RELOC_24_PCREL_JUMP_L:
-	   case BFD_RELOC_24_PCREL:
-	   case BFD_RELOC_16_LOW:
-	   case BFD_RELOC_16_HIGH:
-		size = 4;
-		break;
-	   default:
-		size = 2;
-	  }
-	gen_insn = 0;
-	/*Following if condition checks for the arithmetic relocations. 
-	 * If the case then it doesn't required to generate the code.
-	 * It has been assumed that, their ID will be contiguous*/
-	if(((BFD_ARELOC_PUSH <= insn->reloc) && (BFD_ARELOC_COMP >= insn->reloc)) ||
-		insn->reloc == BFD_RELOC_16_IMM)
+      if (insn->reloc && insn->exp->symbol) 
 	{
-//fprintf(stderr, "generating reloc for %x at %x\n", insn->reloc, toP);
-		gen_insn = 0;
-		size = 2;
-	}
-        if((insn->reloc == BFD_ARELOC_CONST) || (insn->reloc == BFD_ARELOC_PUSH)){
-          size = 4; // the constant in an expression can be large
-        }
-	if(gen_insn){
-          toP = frag_more(2);
-          md_number_to_chars(toP, insn->value, 2);
-	}
+	  char *prev_toP = toP - 2;
+	  switch (insn->reloc)
+	    {
+	    case BFD_RELOC_24_PCREL_JUMP_L:
+	    case BFD_RELOC_24_PCREL:
+	    case BFD_RELOC_16_LOW:
+	    case BFD_RELOC_16_HIGH:
+	      size = 4;
+	      break;
+	    default:
+	      size = 2;
+	    }
 
-        fix_new(frag_now, (toP - frag_now->fr_literal),
-		  size, insn->exp->symbol, insn->exp->value, insn->pcrel, insn->reloc);
-    }
-    else{
-      toP = frag_more(2);
-      md_number_to_chars(toP, insn->value, 2);
-    }
+	  /* Following if condition checks for the arithmetic relocations. 
+	     If the case then it doesn't required to generate the code.
+	     It has been assumed that, their ID will be contiguous*/
+	  if ((BFD_ARELOC_PUSH <= insn->reloc
+	       && BFD_ARELOC_COMP >= insn->reloc)
+	      || insn->reloc == BFD_RELOC_16_IMM)
+	    {
+	      //fprintf(stderr, "generating reloc for %x at %x\n", insn->reloc, toP);
+	      size = 2;
+	    }
+	  if (insn->reloc == BFD_ARELOC_CONST || insn->reloc == BFD_ARELOC_PUSH)
+	    size = 4; // the constant in an expression can be large
+
+	  fix_new (frag_now, (prev_toP - frag_now->fr_literal),
+		   size, insn->exp->symbol, insn->exp->value, insn->pcrel, insn->reloc);
+	}
+      else
+	{
+	  md_number_to_chars (toP, insn->value, 2);
+	  toP += 2;
+	}
     
 #ifdef DEBUG
-		printf(" reloc :");
+      printf(" reloc :");
 #endif
 
-	// HACK XXX
+      // HACK XXX
 #ifdef DEBUG
-    printf(" %02x%02x", ((unsigned char *) &insn->value)[0],
-			((unsigned char *) &insn->value)[1] );
+      printf(" %02x%02x", ((unsigned char *) &insn->value)[0],
+	     ((unsigned char *) &insn->value)[1] );
 #endif
-    insn = insn->next;
+      insn = insn->next;
 
 #ifdef DEBUG
-    printf("\n"); // DEBUG HACK
+      printf("\n"); // DEBUG HACK
 #endif
-	}
+    }
   /* call frag_var for special purpose relaxation, gcc can handle this  */
 }
 
