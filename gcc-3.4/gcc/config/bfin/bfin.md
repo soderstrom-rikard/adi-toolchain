@@ -532,8 +532,8 @@
    (clobber (match_scratch:SI 2 "=&d"))
    (clobber (reg:CC REG_CC))]
   ""
-  "%2 = 0; %2 = %2 - %1; cc = ac0; %2 = cc;\\n\\t%0 = -%1; %H0 = -%H1; %H0 = %H0 - %2;"
-[(set_attr "length" "14")]) 
+  "%2 = 0; %2 = %2 - %1; cc = ac0; cc = !cc; %2 = cc;\\n\\t%0 = -%1; %H0 = -%H1; %H0 = %H0 - %2;"
+[(set_attr "length" "16")])
 
 ;;;<<<  Logical-one-cmpl    >>>;;;
 (define_insn "one_cmpldi2"
@@ -634,47 +634,51 @@
                   (match_operand:DI 2 "register_operand" "d")))
    (clobber (reg:CC 34))]
   ""
-  "%0 = %1-%2;\\n\\tcc = ac0;\\n\\t%H0 = %H1-%H2;\\n\\tif ! cc jump 1f;\\n\\t%H0 += -1;\\n\\t1:"
+  "%0 = %1-%2;\\n\\tcc = ac0;\\n\\t%H0 = %H1-%H2;\\n\\tif cc jump 1f;\\n\\t%H0 += -1;\\n\\t1:"
 [(set_attr "length" "10")]) 
 
 (define_insn "*subdi_di_zesidi"
   [(set (match_operand:DI 0 "register_operand" "=d")
-        (minus:DI (match_operand:DI 1 "register_operand" "d")
+        (minus:DI (match_operand:DI 1 "register_operand" "0")
                   (zero_extend:DI
                   (match_operand:SI 2 "register_operand" "d"))))
+   (clobber (match_scratch:SI 3 "=&d"))
    (clobber (reg:CC 34))]
   ""
-  "%0 = %1 + %2;\\n\\tcc = ac0;\\n\\t%H0 = cc;\\n\\t%H0 = %H1 - %H0;"
-[(set_attr "length" "8")])
+  "%0 = %1 - %2;\\n\\tcc = ac0;\\n\\tcc = ! cc;\\n\\t%3 = cc;\\n\\t%H0 = %H1 - %3;"
+[(set_attr "length" "10")])
 
 (define_insn "*subdi_zesidi_di"
   [(set (match_operand:DI 0 "register_operand" "=d")
         (minus:DI (zero_extend:DI
                   (match_operand:SI 2 "register_operand" "d"))
-                  (match_operand:DI 1 "register_operand" "d")))
+                  (match_operand:DI 1 "register_operand" "0")))
+   (clobber (match_scratch:SI 3 "=&d"))
    (clobber (reg:CC 34))]
   ""
-  "%0 = %2 - %1;\\n\\tcc = ac0;\\n\\t%H0 = cc;\\n\\t%H0 = -%H0;\\n\\t%H0 = %H0 - %H1"
-[(set_attr "length" "10")]) 
+  "%0 = %2 - %1;\\n\\tcc = ac0;\\n\\tcc = ! cc;\\n\\t%3 = cc;\\n\\t%3 = -%3;\\n\\t%H0 = %3 - %H1"
+[(set_attr "length" "12")]) 
 
 (define_insn "*subdi_di_sesidi"
   [(set (match_operand:DI 0 "register_operand" "=d")
-        (minus:DI (match_operand:DI 1 "register_operand" "d")
+        (minus:DI (match_operand:DI 1 "register_operand" "0")
                   (sign_extend:DI
                   (match_operand:SI 2 "register_operand" "d"))))
+   (clobber (match_scratch:SI 3 "=&d"))
    (clobber (reg:CC 34))]
   ""
-  "%0 = %1 - %2;\\n\\tcc = ac0;\\n\\t%H0 = %2;\\n\\t%H0 >>>= 31;\\n\\t%H0 = %H1 - %H0;\\n\\tif ! cc jump 1f;\\n\\t%H0 += -1;\\n\\t1:"
+  "%0 = %1 - %2;\\n\\tcc = ac0;\\n\\t%3 = %2;\\n\\t%3 >>>= 31;\\n\\t%H0 = %H1 - %3;\\n\\tif cc jump 1f;\\n\\t%H0 += -1;\\n\\t1:"
 [(set_attr "length" "14")])
 
 (define_insn "*subdi_sesidi_di"
   [(set (match_operand:DI 0 "register_operand" "=d")
         (minus:DI (sign_extend:DI
                   (match_operand:SI 2 "register_operand" "d"))
-                  (match_operand:DI 1 "register_operand" "d")))
+                  (match_operand:DI 1 "register_operand" "0")))
+   (clobber (match_scratch:SI 3 "=&d"))
    (clobber (reg:CC 34))]
   ""
-  "%0 = %2 - %1;\\n\\tcc = ac0;\\n\\t%H0 = %2;\\n\\t%H0 >>>= 31;\\n\\t%H0 = %H0 -%H1;\\n\\tif ! cc jump 1f;\\n\\t%H0 += -1;\\n\\t1:"
+  "%0 = %2 - %1;\\n\\tcc = ac0;\\n\\t%3 = %2;\\n\\t%3 >>>= 31;\\n\\t%H0 = %3 - %H1;\\n\\tif cc jump 1f;\\n\\t%H0 += -1;\\n\\t1:"
 [(set_attr "length" "14")])
 
 

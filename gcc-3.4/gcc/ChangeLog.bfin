@@ -11,6 +11,12 @@
 	* config/bfin/bfin.h (TRAMPOLINE_TEMPLATE, STATIC_CHAIN_REGNUM): Use
 	call-clobbered registers for this sort of thing.
 
+	* config/bfin/bfin.md (subdi3, negdi2): Invert sense of carry flag
+	after subtraction.
+	(subdi_di_zesidi, subdi_zesidi_di, subdi_di_sesidi, subdi_sesidi_di):
+	Likewise.  Turn them into 2-operand insns and add scratch registers
+	as required.  Make subdi_di_zesidi use subtraction instead of add.
+
 2004-10-21  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/lib1funcs.asm (___udivsi3): Use unsigned comparison
