@@ -7,6 +7,15 @@
 	(adddi3, subdi3, subdi_di_zesidi, subdi_zesidi_di, subdi_di_sesidi,
 	subdi_sesidi_di): The carry flag is called "ac0", not "ac".
 
+	* config/bfin/t-bfin-elf (LIB2FUNCS): Remove _floatdidf, _floatdisf,
+	_fixunsdfsi, _fixunssfsi, _fixdfdi, _fixunssfdi, _fixsfdi, _fixxfdi,
+	_fixunsxfdi, _floatdixf, _fixunsxfsi, _fixtfdi, _fixunstfdi,
+	_floatditf.
+	(TARGET_LIBGCC2_FLAGS): Don't define DF=SF.
+	(LIB2FUNCS_EXTRA): Don't define.
+	(DPBIT): Define.
+	(dp-bit.c): New rule.
+
 2004-09-29  Bernd Schmidt  <bernds@btinternet.com>
 
 	* config/bfin/bfin.h (PREFERRED_RELOAD_CLASS): Simply return CLASS.

@@ -26,32 +26,10 @@ LIB1ASMFUNCS = 	_addsf3 _divsf3 _fixsfsi _lesf2 _modsi3 _nesf2 \
 	_divdf3 _cmpdf2 _ltdf2 _negdf2 _fixdfsi \
 	_truncdfsf2 \
 	_floatsidf _ledf2
- 
-
-# Hard code LIB2FUNCS so that DI and DF functions are not included.
-# Faisal Akber - 2001-12-11
-
-# Assembler problems with 
-# _udiv_w_sdiv
-# _cmpdi2
-# _ucmpdi2
-# _fixunssfsi
-# __gcc_bcmp
-# _varargs
-# __dummy
-# _clear_cache
-# __main
-# _exit
-# _pure
-
-
 
 LIB2FUNCS = _muldi3 _divdi3 _moddi3 _udivdi3 _umoddi3 _negdi2 \
      _lshrdi3 _ashldi3 _ashrdi3 _ffsdi2 \
-    _udiv_w_sdiv _udivmoddi4 _cmpdi2 _ucmpdi2 _floatdidf _floatdisf \
-    _fixunsdfsi _fixunssfsi _fixunsdfdi _fixdfdi _fixunssfdi _fixsfdi \
-    _fixxfdi _fixunsxfdi _floatdixf _fixunsxfsi \
-    _fixtfdi _fixunstfdi _floatditf \
+    _udiv_w_sdiv _udivmoddi4 _cmpdi2 _ucmpdi2 \
     __gcc_bcmp _varargs __dummy _eprintf \
     _bb _shtab _clear_cache _trampoline __main _exit \
     _ctors _pure \
@@ -63,18 +41,17 @@ LANGUAGES = c
 #INSTALL_HEADERS=
 #LIBC=$(tooldir)/lib
 
-TARGET_LIBGCC2_CFLAGS = -Dinhibit_libc -DDF=SF
+TARGET_LIBGCC2_CFLAGS = -Dinhibit_libc
 #Steven TARGET_LIBGCC2_CFLAGS = -Dinhibit_libc
 #Tonyko		TARGET_LIBGCC2_CFLAGS = -Dinhibit_libc -DDF=SF
 # commented out because of __mulsf3
- LIB2FUNCS_EXTRA = fp-bit.c
+# LIB2FUNCS_EXTRA = fp-bit.c
 
 FPBIT = fp-bit.c
-#DPBIT = dp-bit.c
+DPBIT = dp-bit.c
 
-
-#dp-bit.c: $(srcdir)/config/fp-bit.c
-#	cat $(srcdir)/config/fp-bit.c > dp-bit.c
+dp-bit.c: $(srcdir)/config/fp-bit.c
+	cat $(srcdir)/config/fp-bit.c > dp-bit.c
 
 #
 # commented out because of __mulsf3
