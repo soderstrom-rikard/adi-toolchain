@@ -9,6 +9,8 @@
 	(movdf_insn, movdf): New pattern and expander.
 	(movdi): Don't use 'o' constraints, use plain 'm'.
 
+	* config/bfin/bfin.c (override_options): Set flag_schedule_insns to 0.
+
 2004-11-20  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* ifcvt.c (note_clobbers_of_cond): Return void.
