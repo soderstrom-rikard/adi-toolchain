@@ -861,14 +861,7 @@
 ;; The same applies to the add/subtract constant versions involving
 ;; iregs
 
-(define_expand "addsi3"
-  [(set (match_operand:SI 0 "register_operand"           "")
-	(plus:SI (match_operand:SI 1 "register_operand"  "")
-		 (match_operand:SI 2 "reg_or_7bit_operand" "")))]
-  ""
-  "")
-
-(define_insn ""
+(define_insn "addsi3"
   [(set (match_operand:SI 0 "register_operand"           "=ad,a,d")
 	(plus:SI (match_operand:SI 1 "register_operand"  "%0, a,d")
 		 (match_operand:SI 2 "reg_or_7bit_operand" " M, a,d")))]
@@ -1629,16 +1622,7 @@ else
   return "";
 }
   [(set_attr "type" "brcc")
-   (set (attr "length")
-	(cond [(and
-		(le (minus (match_dup 3) (pc)) (const_int 1020))
-		(ge (minus (match_dup 3) (pc)) (const_int -1024)))
-	       (const_int 6)
-	       (and
-		(le (minus (match_dup 3) (pc)) (const_int 4090))
-		(ge (minus (match_dup 3) (pc)) (const_int -4096)))
-	       (const_int 4)]
-	      (const_int 6)))])
+   (set_attr "length" "6")])
 
 (define_expand "seq"
   [(set (match_dup 1) (eq:BI (match_dup 2) (match_dup 3)))

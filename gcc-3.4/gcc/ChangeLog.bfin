@@ -1,3 +1,9 @@
+2004-11-11  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_address_cost): Always return 1.
+	* config/bfin/bfin.md (cbranch_with_nops): Always use length 6.
+	(addsi3): Renamed from nameless pattern; remove useless expander.
+
 2004-11-10  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_attribute_table): New.

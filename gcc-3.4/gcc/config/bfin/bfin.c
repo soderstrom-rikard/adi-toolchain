@@ -869,10 +869,9 @@ int imm16bit_operand_p (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
   return GET_CODE (op) == CONST_INT && CONST_16BIT_IMM_P (INTVAL (op));
 }
 
-int bfin_address_cost (rtx addr) {
-  if (GET_CODE (addr) == PLUS
-      && CONSTANT_P (XEXP (addr,1)))
-    return 2;
+int
+bfin_address_cost (rtx addr)
+{
   return 1;
 }
 
