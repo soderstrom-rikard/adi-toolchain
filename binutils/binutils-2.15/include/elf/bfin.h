@@ -1,5 +1,5 @@
 /* Blackfin ELF support for BFD.
-   Copyright 2004 Free Software Foundation, Inc.
+   Copyright 2004, 2005 Free Software Foundation, Inc.
 
 This file is part of BFD, the Binary File Descriptor library.
 
@@ -65,7 +65,8 @@ START_RELOC_NUMBERS (elf_bfin_reloc_type)
   RELOC_NUMBER (R_page, 0x27)
   RELOC_NUMBER (R_hwpage, 0x28)
   RELOC_NUMBER (R_addr, 0x29)
-  RELOC_NUMBER (R_max, 0x2a)
-};
+  RELOC_NUMBER (R_BFIN_GNU_VTINHERIT, 200)
+  RELOC_NUMBER (R_BFIN_GNU_VTENTRY, 201)
+END_RELOC_NUMBERS (R_max)
 
-#endif
+#endif /* _ELF_BFIN_H */
