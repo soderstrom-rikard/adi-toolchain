@@ -4,6 +4,13 @@ port and what to expect next.
 If you are working on something, feel free to add that information
 here. The port follows the Visual DSP ABI for parameter passing.
 ##############################################
+Next        :
+            - The compiler sometimes generates an incorrect instruction
+              such as Rx = [Px + 1].
+            - More torture failures
+18 Jun 2004 : Fixed
+              1. Optimization bug : switch inside loop failure fixed.
+              2. Removed nisa calling convention assembly functions
 1  Jun 2004 : Modified gcc/config/bfin/bfin.c, bfin.h, bfin.md
               1. R3 was used as fixed register, now i reverted it back.
               2. Movhi, added for Dreg = Preg, Preg = Dreg

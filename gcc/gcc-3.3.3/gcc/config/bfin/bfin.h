@@ -261,7 +261,7 @@ extern const char * directive_names[];
  * machine-dependent stack frame: `OUTGOING_REG_PARM_STACK_SPACE'
  * says which.  */
 #define FIXED_STACK_AREA 12
-#define REG_PARM_STACK_SPACE(FNDECL, LIBCALL) ((LIBCALL) ? 0 : FIXED_STACK_AREA)
+#define REG_PARM_STACK_SPACE(FNDECL) FIXED_STACK_AREA
 
 /* Define this if the above stack space is to be considered part of the
  * space allocated by the caller.  */
@@ -326,11 +326,11 @@ extern const char * directive_names[];
 
 #define TRAMPOLINE_SIZE 18
 #define TRAMPOLINE_TEMPLATE(FILE)                                       \
-      fprintf(FILE, "\t.word\t0xe10c0000\n\t\t# p3.l = fn low");        \
-      fprintf(FILE, "\n\t.word\t0xe12c0000\n\t\t# p3.h = fn high");     \
-      fprintf(FILE, "\n\t.word\t0xe10d0000\n\t\t# p4.l = sc low");      \
-      fprintf(FILE, "\n\t.word\t0xe12d0000\n\t\t# p4.h = sc high");     \
-      fprintf(FILE, "\n\t.word\t0x0083\n\t\t# jump (p3)");
+      fprintf(FILE, "\t.word\t0xe10c0000\t\t# p3.l = fn low");        \
+      fprintf(FILE, "\t.word\t0xe12c0000\t\t# p3.h = fn high");     \
+      fprintf(FILE, "\t.word\t0xe10d0000\t\t# p4.l = sc low");      \
+      fprintf(FILE, "\t.word\t0xe12d0000\t\t# p4.h = sc high");     \
+      fprintf(FILE, "\t.word\t0x0083\t\t# jump (p3)");
 
 #define INITIALIZE_TRAMPOLINE(TRAMP, FNADDR, CXT)  \
 {                                                                       \
@@ -480,9 +480,11 @@ extern const char * directive_names[];
 { REG_R0, REG_R1, REG_R2, REG_R3, REG_R7, REG_R6, REG_R5, REG_R4, \
   REG_P2, REG_P1, REG_P0, REG_P5, REG_P4, REG_P3, REG_P6, REG_P7, \
   REG_A0, REG_A1, \
-  REG_I0, REG_B0, REG_L0, REG_I1, REG_B1, REG_L1, REG_I2, REG_B2, \
-  REG_L2, REG_I3, REG_B3, REG_L3, REG_M0, REG_M1, REG_M2, REG_M3, \
-       REG_NO, \
+ /*REG_I0, REG_B0, REG_L0, REG_I1, REG_B1, REG_L1, REG_I2, REG_B2,*/ \
+ /*REG_L2, REG_I3, REG_B3, REG_L3, REG_M0, REG_M1, REG_M2, REG_M3,*/ \
+  REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, \
+  REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, \
+  REG_NO, \
 }
 
 #define CONDITIONAL_REGISTER_USAGE			\

@@ -33,6 +33,7 @@ extern int  function_arg_regno_p PARAMS ((int));
 
 extern char *asm_conditional_branch PARAMS ((rtx, int));
 extern const char *output_load_immediate PARAMS ((rtx *));
+extern const char *output_casesi_internal PARAMS ((rtx *));
 extern char *bfin_asm_long PARAMS ((void));
 extern char *bfin_asm_short PARAMS ((void));
 extern int log2constp PARAMS ((unsigned HOST_WIDE_INT));
@@ -89,7 +90,6 @@ extern void output_symbolic_address PARAMS ((rtx *));
 extern void override_options PARAMS ((void));
 extern char *asm_conditional_branch PARAMS ((rtx, int));
 extern rtx bfin_gen_compare PARAMS ((rtx, Mmode));
-extern const char * output_load_immediate PARAMS ((rtx *));
 extern int signed_comparison_operator PARAMS ((rtx, Mmode));
 extern int ccregister_p PARAMS ((rtx, Mmode));
 extern int loop_end PARAMS ((rtx));
@@ -101,7 +101,6 @@ extern int reg_or_0_operand PARAMS ((rtx, Mmode));
 extern int signed_comparison_operator PARAMS ((rtx, Mmode));
 
 extern int bfin_return_in_memory PARAMS ((tree));
-
 #undef  Mmode 
 
 #endif /* ! GCC_V850_PROTOS_H */

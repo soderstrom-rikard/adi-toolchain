@@ -2900,7 +2900,7 @@ static int cfa_offset;
 #if defined(REG_PARM_STACK_SPACE) && ! defined(OUTGOING_REG_PARM_STACK_SPACE)
 #define STACK_DYNAMIC_OFFSET(FNDECL)	\
 ((ACCUMULATE_OUTGOING_ARGS						      \
-  ? (current_function_outgoing_args_size + REG_PARM_STACK_SPACE (FNDECL, 0)) : 0)\
+  ? (current_function_outgoing_args_size + REG_PARM_STACK_SPACE (FNDECL) : 0)\
  + (STACK_POINTER_OFFSET))						      \
 
 #else
@@ -4613,7 +4613,7 @@ assign_parms (fndecl)
 	      /* When REG_PARM_STACK_SPACE is nonzero, stack space for
 		 split parameters was allocated by our caller, so we
 		 won't be pushing it in the prolog.  */
-	      if (REG_PARM_STACK_SPACE (fndecl, 0) == 0)
+	      if (REG_PARM_STACK_SPACE (fndecl) == 0)
 #endif
 	      current_function_pretend_args_size
 		= (((nregs * UNITS_PER_WORD) + (PARM_BOUNDARY / BITS_PER_UNIT) - 1)
@@ -4661,7 +4661,7 @@ assign_parms (fndecl)
 	     is larger than some threshold, and we haven't calculated that
 	     yet.  So, for now, we just assume that stack slots never exist
 	     in this case.  */
-	  || REG_PARM_STACK_SPACE (fndecl, 0) > 0
+	  || REG_PARM_STACK_SPACE (fndecl) > 0
 #endif
 	  )
 	{
@@ -5162,7 +5162,7 @@ assign_parms (fndecl)
 #ifdef REG_PARM_STACK_SPACE
 #ifndef MAYBE_REG_PARM_STACK_SPACE
   current_function_args_size = MAX (current_function_args_size,
-				    REG_PARM_STACK_SPACE (fndecl, 0));
+				    REG_PARM_STACK_SPACE (fndecl));
 #endif
 #endif
 
@@ -5333,7 +5333,7 @@ locate_and_pad_parm (passed_mode, type, in_regs, fndecl,
 #ifdef MAYBE_REG_PARM_STACK_SPACE
       reg_parm_stack_space = MAYBE_REG_PARM_STACK_SPACE;
 #else
-      reg_parm_stack_space = REG_PARM_STACK_SPACE (fndecl, 0);
+      reg_parm_stack_space = REG_PARM_STACK_SPACE (fndecl);
 #endif
       if (reg_parm_stack_space > 0)
 	{
@@ -5376,7 +5376,7 @@ locate_and_pad_parm (passed_mode, type, in_regs, fndecl,
 
   if (!in_regs
 #ifdef REG_PARM_STACK_SPACE
-      || REG_PARM_STACK_SPACE (fndecl, 0) > 0
+      || REG_PARM_STACK_SPACE (fndecl) > 0
 #endif
      )
     pad_to_arg_alignment (offset_ptr, boundary, alignment_pad);
@@ -5402,7 +5402,7 @@ locate_and_pad_parm (passed_mode, type, in_regs, fndecl,
 #else /* !ARGS_GROW_DOWNWARD */
   if (!in_regs
 #ifdef REG_PARM_STACK_SPACE
-      || REG_PARM_STACK_SPACE (fndecl, 0) > 0
+      || REG_PARM_STACK_SPACE (fndecl) > 0
 #endif
       )
     pad_to_arg_alignment (initial_offset_ptr, boundary, alignment_pad);

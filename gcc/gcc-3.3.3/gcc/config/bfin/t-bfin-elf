@@ -16,28 +16,17 @@
 LIBGCC1 = libgcc1-asm.a
 CROSS_LIBGCC1 = libgcc1-asm.a
 LIB1ASMSRC = bfin/lib1funcs.asm
-LIB1ASMFUNCS = 	_addsf3 _divsf3 _fixsfsi _gedi2 _lesf2 _modsi3 _nesf2 \
-		_ashldi3 _divsi3 _fixunssfdi _gesf2 _mulsf3 _subsf3 \
-		_ashrdi3 _eqdi2 _fixunssfsi _gtdi2 _nedi2 _udivsi3 \
-		_cmpdi2 _eqsf2 _floatdisf _gtsf2 _ltdi2 _negdi2 _umodsi3 \
-		_cmpsf2 _fixsfdi _floatsisf _ledi2 _ltsf2 _negsf2 \
-		_truncdfsf2 _extendsfdf2 _adddf3 _subdf3 _muldf3 _divdf3 \
-		_cmpdf2 _eqdf2 _ltdf2 _gtdf2 _negdf2 _fixdfsi _fixunsdfsi \
-		_fixdfdi _floatsidf _dcmp _nedf2 _gedf2
+
+LIB1ASMFUNCS = 	_addsf3 _divsf3 _fixsfsi _lesf2 _modsi3 _nesf2 \
+		_divsi3 _fixunssfdi _gesf2 _mulsf3 _subsf3 \
+		_fixunssfsi _udivsi3 \
+		_eqsf2 _gtsf2 _umodsi3 \
+		_cmpsf2 _fixsfdi _floatsisf _ltsf2 _negsf2 \
+		_truncdfsf2 _extendsfdf2 \
+		_floatsidf
 
 # Hard code LIB2FUNCS so that DI and DF functions are not included.
 # Faisal Akber - 2001-12-11
-#LIB2FUNCS = _fixxfdi _fixunsxfdi _floatdixf _fixunsxfsi \
-#    _fixtfdi _fixunstfdi _floatditf \
-#    __gcc_bcmp _varargs __dummy _eprintf \
-#    _bb _shtab _clear_cache _trampoline __main _exit \
-#    _ctors _pure \
-#    _muldi3 _divdi3 _moddi3 _udivdi3 _umoddi3 _negdi2 \
-#    _lshrdi3 _ashldi3 _ashrdi3 _ffsdi2 \
-#    _udiv_w_sdiv _udivmoddi4 _cmpdi2 _ucmpdi2 \
-#    _fixunsdfsi _fixunssfsi _fixunsdfdi _fixdfdi _fixunssfdi _fixsfdi \
-#    _floatdidf _floatdisf
-    
 
 # Assembler problems with 
 # _udiv_w_sdiv
@@ -52,6 +41,7 @@ LIB1ASMFUNCS = 	_addsf3 _divsf3 _fixsfsi _gedi2 _lesf2 _modsi3 _nesf2 \
 # _exit
 # _pure
 
+
 LIB2FUNCS = _muldi3 _divdi3 _moddi3 _udivdi3 _umoddi3 _negdi2 \
      _lshrdi3 _ashldi3 _ashrdi3 _ffsdi2 \
     _udiv_w_sdiv _udivmoddi4 _cmpdi2 _ucmpdi2 _floatdidf _floatdisf \
@@ -60,7 +50,8 @@ LIB2FUNCS = _muldi3 _divdi3 _moddi3 _udivdi3 _umoddi3 _negdi2 \
     _fixtfdi _fixunstfdi _floatditf \
     __gcc_bcmp _varargs __dummy _eprintf \
     _bb _shtab _clear_cache _trampoline __main _exit \
-    _ctors _pure
+    _ctors _pure _gedf2 _nedf2 _adddf3 _subdf3 _muldf3 \
+    _divdf3 _cmpdf2 _eqdf2 _ltdf2 _gtdf2 _negdf2 _fixdfsi \
 
 
 LANGUAGES = c

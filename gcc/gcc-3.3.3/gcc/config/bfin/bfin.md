@@ -1211,7 +1211,7 @@
 ;;;  ####   ######   ### #
 ;;;
 
-;;;;;;;;;;;;;;;; Addtion: casesi insn    -- Tonyko   ;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;; Addtion: casesi insn    -- Tonyko   ;;;;;;;;;;;;;;;;;;;;;
 (define_expand "casesi"
   [(match_operand:SI 0 "register_operand" "")   ; index to jump on
    (match_operand:SI 1 "immediate_operand" "")  ; lower bound
@@ -1228,10 +1228,9 @@
       emit_insn (gen_addsi3 (reg, operands[0],
                              GEN_INT (-INTVAL (operands[1]))));
       operands[0] = reg;
-    }                                                                            
+    }                                               
 
-  operands[2] = force_reg (SImode, operands[2]); 
-
+  operands[2] = bfin_force_reg (SImode, operands[2]);
   emit_jump_insn (gen_casesi_internal (operands[0], operands[2], operands[3],
                                        operands[4]));
   DONE;
@@ -1239,19 +1238,20 @@
 
 ;; The USE in this pattern is needed to tell flow analysis that this is
 ;; a CASESI insn.  It has no other purpose. 
+;; The operand 4 is used to get one unused Preg from define_expand "casesi"
 
 (define_insn "casesi_internal"
   [(parallel [(set (pc)
                (if_then_else
                 (leu (match_operand:SI 0 "register_operand" "a")
-                     (match_operand:SI 1 "register_operand" "+a"))
+                     (match_operand:SI 1 "register_operand" "a"))
                 (mem:SI (plus:SI (mult:SI (match_dup 0) (const_int 4))
                                  (label_ref (match_operand 2 "" ""))))
                 (label_ref (match_operand 3 "" ""))))
               (use (label_ref (match_dup 2)))])]
   ""
   "*
-  return \"cc = %0<=%1 (iu);\\nif cc jump 6;\\njump.l %3;\\n%h1=%2;\\n%d1=%2;\\n%0 = %0<<2;\\n%0 = %0+%1;\\n%0 = [%0];\\njump (%0);\\n\";
+   { output_casesi_internal(operands); }
   "
   [(set_attr "length" "24")])
 

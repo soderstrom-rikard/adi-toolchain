@@ -607,7 +607,7 @@ bfin_function_prologue (FILE *file, int framesize)
   }
 
   if (current_function_outgoing_args_size) {
-    if (current_function_outgoing_args_size > FIXED_STACK_AREA)
+    if (current_function_outgoing_args_size >= FIXED_STACK_AREA)
       arg_size = current_function_outgoing_args_size;
     else
       arg_size = FIXED_STACK_AREA;
@@ -640,7 +640,7 @@ bfin_function_epilogue (FILE *file, int framesize)
   }
 
   if (current_function_outgoing_args_size) {
-        if (current_function_outgoing_args_size > FIXED_STACK_AREA)
+        if (current_function_outgoing_args_size >= FIXED_STACK_AREA)
           arg_size = current_function_outgoing_args_size;
         else
           arg_size = FIXED_STACK_AREA;
@@ -1085,11 +1085,10 @@ function_arg_advance (CUMULATIVE_ARGS *cum,		/* current arg information */
 			     tree type,			/* type of the argument or 0 if lib support */
 			     int named			/* whether or not the argument was named */)
 {
-  int count;
-  int bytes
-    = (mode == BLKmode) ? int_size_in_bytes (type) : GET_MODE_SIZE (mode);
+  int count, bytes, words;
 
-  int words = (bytes + UNITS_PER_WORD - 1) / UNITS_PER_WORD;
+  bytes = (mode == BLKmode) ? int_size_in_bytes (type) : GET_MODE_SIZE (mode);
+  words = (bytes + UNITS_PER_WORD - 1) / UNITS_PER_WORD;
 
   if (TARGET_DEBUG_ARG)
     fprintf (stderr,
@@ -1332,6 +1331,7 @@ legitimize_pic_address (rtx orig, rtx reg)
 
       return gen_rtx (PLUS, Pmode, base, addr);
     }
+
   return new;
 }
 
@@ -1939,6 +1939,35 @@ output_load_immediate (rtx *operands) {
             output_asm_insn ("W %0=%1;", operands);
         return "";
      }
+/*     else if (GET_CODE (operands[1]) == MEM
+        && GET_MODE (operands[1]) == SImode) {
+	char buf[128];
+        rtx x = XEXP (operands[1], 0);
+	rtx z = XEXP (x, 1);
+        if (GET_CODE (x) == PLUS  && REGNO(XEXP(x,0)) != STACK_POINTER_REGNUM
+	  && REGNO(XEXP(x,0)) != FRAME_POINTER_REGNUM 
+	  && ((z->fld[0].rtwint)%4) != 0 /*if not multiple of 4 RAJA*//*) {
+	 
+         for (i = REG_P0; i <= LAST_USER_PREG; i++) 
+	    if (operands[0]->fld[0].rtwint != i && REGNO(XEXP(x,0)) != i) break;
+	 
+         sprintf (buf, "[--SP] =%s;", reg_names[i]);
+         output_asm_insn (buf, operands);
+
+         sprintf (buf, "%s =%d;", reg_names[i], z->fld[0].rtwint);
+         output_asm_insn (buf, operands);
+
+         sprintf (buf, "%s =%s + %s;",  reg_names[i], reg_names[REGNO(XEXP(x,0))],  reg_names[i]);
+         output_asm_insn (buf, operands);
+
+         sprintf (buf, "%s = [%s];", reg_names[operands[0]->fld[0].rtwint], reg_names[i]);
+         output_asm_insn (buf, operands);
+
+         sprintf (buf, "%s = [SP++];", reg_names[i]);
+         output_asm_insn (buf, operands);
+	 return "";
+	}
+     }*/
 
      output_asm_insn ("%0 =%1;", operands);
      return "";
@@ -2317,5 +2346,90 @@ bfin_return_in_memory (tree type)
   if (size > 12)
     return 1;
   return 0;
+}
+
+rtx
+bfin_force_reg (mode, x)
+     enum machine_mode mode;
+     rtx x;
+{
+  rtx temp, insn, set;
+
+  if (GET_CODE (x) == REG)
+    return x;
+
+  if (general_operand (x, mode))
+    {
+      temp = gen_reg_rtx (mode);
+      insn = emit_move_insn (temp, x);
+    }
+  else
+    {
+      temp = force_operand (x, NULL_RTX);
+      if (GET_CODE (temp) == REG)
+        insn = get_last_insn ();
+      else
+        {
+          rtx temp2 = gen_reg_rtx (mode);
+          insn = emit_move_insn (temp2, temp);
+          temp = temp2;
+        }
+    }
+
+  /* Let optimizers know that TEMP's value never changes
+     and that X can be substituted for it.  Don't get confused
+     if INSN set something else (such as a SUBREG of TEMP).  */
+/*  if (CONSTANT_P (x)
+      && (set = single_set (insn)) != 0
+      && SET_DEST (set) == temp)
+    set_unique_reg_note (insn, REG_EQUAL, x);
+*/
+  return temp;
+}
+
+const char *
+output_casesi_internal(rtx *operands)
+{
+        char buf[512];
+        int reg1, reg2;
+        char *rName2;
+        bool bSave = false;
+
+	reg1 = operands[1]->fld[0].rtwint;
+        if (!regs_ever_live[REG_P0])
+                reg2 = REG_P0;
+        else if (!regs_ever_live[REG_P1])
+                reg2 = REG_P1;
+        else if (!regs_ever_live[REG_P2])
+                reg2 = REG_P2;
+        else {
+                bSave = true;
+                for (reg2 = REG_P0; reg2 <= REG_P5; reg2++)
+                   if (reg2 != operands[0]->fld[0].rtwint && reg2 != reg1)
+                     break;
+        }
+
+        rName2 = reg_names[reg2];
+
+        output_asm_insn ("cc = %0<=%1 (iu);\n\tif cc jump 6; jump.l %3;", operands);
+
+        if (bSave) {
+                sprintf (buf, "[--SP] =%s;", rName2);
+                output_asm_insn (buf, operands);
+        }
+
+        sprintf (buf, "%1 = %0<<2;\n\t%s.L=%2; %s.H=%2;", rName2, rName2);
+        output_asm_insn (buf, operands);
+
+        sprintf (buf, "%s = %s + %1;\n\t%1 = [%s];", rName2, rName2, rName2);
+        output_asm_insn (buf, operands);
+
+        if (bSave) {
+                sprintf (buf, "%s = [SP++];", rName2);
+                output_asm_insn (buf, operands);
+        }
+        output_asm_insn ("jump (%1);", operands);
+
+        return "";
 }
 

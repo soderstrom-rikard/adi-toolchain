@@ -1847,7 +1847,7 @@ try_to_integrate (fndecl, actparms, target, ignore, type, structure_value_addr)
 #ifdef MAYBE_REG_PARM_STACK_SPACE
   reg_parm_stack_space = MAYBE_REG_PARM_STACK_SPACE;
 #else
-  reg_parm_stack_space = REG_PARM_STACK_SPACE (fndecl, 0);
+  reg_parm_stack_space = REG_PARM_STACK_SPACE (fndecl);
 #endif
 #endif
 
@@ -2292,7 +2292,7 @@ expand_call (exp, target, ignore)
 #ifdef MAYBE_REG_PARM_STACK_SPACE
   reg_parm_stack_space = MAYBE_REG_PARM_STACK_SPACE;
 #else
-  reg_parm_stack_space = REG_PARM_STACK_SPACE (fndecl, 0);
+  reg_parm_stack_space = REG_PARM_STACK_SPACE (fndecl);
 #endif
 #endif
 
@@ -3554,7 +3554,7 @@ emit_library_call_value_1 (retval, orgfun, value, fn_type, outmode, nargs, p)
 #ifdef MAYBE_REG_PARM_STACK_SPACE
   reg_parm_stack_space = MAYBE_REG_PARM_STACK_SPACE;
 #else
-  reg_parm_stack_space = REG_PARM_STACK_SPACE ((tree) 0, 1);
+  reg_parm_stack_space = REG_PARM_STACK_SPACE ((tree) 0);
 #endif
 #endif
 
