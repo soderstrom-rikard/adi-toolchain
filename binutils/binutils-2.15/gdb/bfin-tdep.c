@@ -23,24 +23,13 @@
   Analog Devices Blackfin architecture (bfin)
   Written and tested on BF533
   TODO :
-  1. dummy frame stuff
-  2. is there a more elegant way of the address conversion.
-     (We need it as we have no mmu)
-     There is a function pointer_to_address that should be tried.
-     Currently it is implemented quite kludgily ... the kernel returns
-     pc with a decremented value while most other manipulations are
-     done explicitly here. 
-  3. Resolve the orig_r0 mystery. 
-  4. Test the frameless gcc option
+  1. Resolve the orig_r0 mystery. 
+  2. Test the frameless gcc option
   Info :
   1. Most of the frame functions have to bother about frameless
      as well as frame case. Since blackfin does not modify the
      stack with a call, on entry to a subroutine, we have the
      frameless case. A prologue may or maynot build a frame.
-  2. Address conversion needs to be done as gdb understands
-     addresses from the .gdb file while we have addresses that
-     may be absolute values. We find it safe to check the value
-     before proceeding.
 */
 
 #define NUM_PSEUDO_REGS (3)
@@ -61,9 +50,7 @@
 #include "arch-utils.h"
 #include "osabi.h"
 #include "bfin-tdep.h"
-
 #include "elf-bfd.h"
-
 #include "gdb_assert.h"
 #include "command.h"
 #include "tm.h"
@@ -72,17 +59,12 @@
 
 /* forward static declarations */
 static struct type * bfin_register_type (struct gdbarch *gdbarch, int regnum);
-/* static CORE_ADDR skip_sp_plus(CORE_ADDR pc); */
-/* static CORE_ADDR skip_minus_minus_sp(CORE_ADDR pc); */
-/* static CORE_ADDR skip_blob(CORE_ADDR pc); */
-/* static CORE_ADDR skip_link(CORE_ADDR pc); */
 static CORE_ADDR bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
 		     struct regcache *regcache, CORE_ADDR bp_addr, int nargs,
 		     struct value **args, CORE_ADDR sp, int struct_return,
 		     CORE_ADDR struct_addr);
 
-//Following macro has been used by
-//prologue functions
+//Following macro has been used by prologue functions
 #define P_LINKAGE             		0xE800  
 #define P_MINUS_SP1           		0x0140
 #define P_MINUS_SP2           		0x05C0
@@ -101,12 +83,10 @@ static CORE_ADDR bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * f
 #define P_JUMP_L			0xE200
 
 #define UPPER_LIMIT			(40)
-
-#define BFIN_NOT_TESTED	      0	
-
+#define BFIN_NOT_TESTED	       		0	
 /* Frame offsets */
-#define OLD_FP_OFFSET		0
-#define RETS_OFFSET		4
+#define OLD_FP_OFFSET			0
+#define RETS_OFFSET			4
 
 /* Each OS has a different mechanism for accessing the various
    registers stored in the sigcontext structure.
@@ -138,14 +118,9 @@ static CORE_ADDR bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * f
 #define SIGCONTEXT_REGISTER_ADDRESS_P() 0
 #endif
 
-/* forward declarations */
-/* static int is_minus_minus_sp(int op); */
-
-
 /* The list of available "set bfin ..." and "show bfin ..." commands.  */
 static struct cmd_list_element *setbfincmdlist  = NULL;
 static struct cmd_list_element *showbfincmdlist = NULL;
-
 
 /* We have more registers than the disassembler as gdb can print the value
    of special registers as well.
@@ -165,6 +140,8 @@ static char *bfin_register_name_strings[] =
    "ipend", "orig_pc", "extra1", "extra2", "extra3" }; 
 
 #define NUM_BFIN_REGNAMES (sizeof(bfin_register_name_strings)/sizeof(char *))
+
+
 /***************************************************************************
 In this diagram successive memory locations increase downwards or the
 stack grows upwards with negative indices. (PUSH analogy for stack.)
@@ -252,9 +229,9 @@ func2(a=10, b=4)
 func()
 main()
 
-
-
 ***************************************************************************/
+
+
 struct bfin_frame_cache
 {
   /* Base address.  */
@@ -269,24 +246,6 @@ struct bfin_frame_cache
 
   /* Stack space reserved for local variables.  */
   long locals;
-};
-
-/********************************************************/
-/* Flat memory image has the start text which is actully*/
-/* an offset from 4 from start, but we have taken care  */
-/* of that in the linker descriptor file                */
-/* The data section too starts at an offset of a table  */
-/* of MAX_SHARED_LIBS * 4 which will only be known      */
-/* to the kernel. Hence, if we have a address which     */
-/* we know to be elf data, we convert to flat by adding */
-/* text_addr + data_offset                              */
-/********************************************************/
-
-struct offset_value
-{
-  CORE_ADDR text_addr;
-  long      data_offset;
-  int       init;
 };
 
 int map_gcc_gdb[ ] = 
@@ -335,6 +294,7 @@ int map_gcc_gdb[ ] =
   BFIN_SEQSTAT_REGNUM
 };
 
+
 /* Allocate and initialize a frame cache.  */
 static struct bfin_frame_cache *
 bfin_alloc_frame_cache (void)
@@ -359,176 +319,12 @@ bfin_alloc_frame_cache (void)
   return cache;
 }
 
-#if 0
-/* Function to analyze the link opcode */
-static CORE_ADDR bfin_analyze_link(CORE_ADDR pc, CORE_ADDR cur_pc, struct bfin_frame_cache *cache)
-{
-  unsigned int op;
-
-  if (pc >= cur_pc)
-  {
-    return cur_pc;
-  }
-
-  op = read_memory_unsigned_integer(pc,2);
-  if (op == P_LINKAGE)
-  {
-    cache->locals = read_memory_unsigned_integer(pc+2, 2);
-    return pc+4;
-  }
-
-  return pc;
-}
-
-/* Function to analyze the call save registers */
-static CORE_ADDR bfin_analyze_prologue(CORE_ADDR pc, CORE_ADDR cur_pc, struct bfin_frame_cache *cache)
-{
-  CORE_ADDR offset;
-  unsigned int op;
-  int i;
-  int regno = 0;
-  int dreglim = 0;
-  int preglim = 0;
-
-  pc = bfin_analyze_link(pc, cur_pc, cache);
-
-  cache->locals <<= 2;
-  cache->locals -= 4;
-  offset = cache->locals;
-
-  op = read_memory_unsigned_integer(pc, 2);
-
-  if ((op & P_SP_PLUS) == P_SP_PLUS)
-  {
-    pc = skip_sp_plus(pc);
-  }
-  else if (((op * P_P2_LOW) == P_P2_LOW) || ((op & P_P2_HIGH) == P_P2_HIGH))
-  {
-    pc = skip_blob(pc);
-  }
-  else if (is_minus_minus_sp(pc))
-  {
-    if ((op & 0xFFc0) == P_MINUS_SP2)
-    {
-      dreglim = op & 0x0038;
-      preglim = op & 0x0007;
-      dreglim >>= 3;
-    }
-    else if ((op & 0xFFc0) == P_MINUS_SP3)
-    {
-      dreglim = op & 0x0038;
-      dreglim >>= 3;
-    }
-    else if ((op & 0xFFc0) == P_MINUS_SP4)
-    {
-      preglim = op & 0x0007;
-    }
-
-    if ((dreglim > 3) && (dreglim < 8))
-    {
-      for (i = dreglim; i < 8; i++)
-      {
-        switch (i) {
-		   case 0:
-			   regno = BFIN_R0_REGNUM;
-			   break;
-		   case 1:
-			   regno = BFIN_R1_REGNUM;
-			   break;
-		   case 2:
-			   regno = BFIN_R2_REGNUM;
-			   break;
-		   case 3:
-			   regno = BFIN_R3_REGNUM;
-			   break;
-		   case 4:
-			   regno = BFIN_R4_REGNUM;
-			   break;
-		   case 5:
-			   regno = BFIN_R5_REGNUM;
-			   break;
-		   case 6:
-			   regno = BFIN_R6_REGNUM;
-			   break;
-		   case 7:
-			   regno = BFIN_R7_REGNUM;
-			   break;
-                   }
-
-        cache->saved_regs[regno] = cache->base+offset;
-        offset -= 4;
-      }
-    }
-
-    if ((preglim > 2) && (preglim < 6))
-    {
-      for (i = preglim; i < 6; i++)
-      {
-        switch (i) {
-		   case 0:
-			   regno = BFIN_P0_REGNUM;
-			   break;
-		   case 1:
-			   regno = BFIN_P1_REGNUM;
-			   break;
-		   case 2:
-			   regno = BFIN_P2_REGNUM;
-			   break;
-		   case 3:
-			   regno = BFIN_P3_REGNUM;
-			   break;
-		   case 4:
-			   regno = BFIN_P4_REGNUM;
-			   break;
-		   case 5:
-			   regno = BFIN_P5_REGNUM;
-			   break;
-                   }
-
-        cache->saved_regs[regno] = cache->base+offset;
-        offset -= 4;
-      }
-    }
-  }
-
-  return pc;
-}
-#endif
-
-struct offset_value offvalue = {0,0,0};
-
-/* initialize the offset values */
-static void set_offset_value(void)
-{
-#if 0
-  if(!offvalue.init){
-    offvalue.text_addr = read_register(BFIN_EXTRA1);
-    offvalue.data_offset = read_register(BFIN_EXTRA3) ;
-    offvalue.init = 1;
-  }
-#endif
-}
-
-static CORE_ADDR get_text_addr_value()
-{
-  set_offset_value();
-  return offvalue.text_addr;
-}
-
-static long get_data_offset_value()
-{
-  set_offset_value();
-  return offvalue.data_offset;
-}
-
 static struct bfin_frame_cache *
 bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
 {
   struct bfin_frame_cache *cache;
   char buf[4];
   int i;
-
-  set_offset_value();
 
   if (*this_cache)
     return *this_cache;
@@ -538,8 +334,6 @@ bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
 
   frame_unwind_register (next_frame, BFIN_FP_REGNUM, buf);
   cache->base = extract_unsigned_integer (buf, 4);
-  if(cache->base > get_text_addr_value())
-    cache->base -=  (get_text_addr_value() + get_data_offset_value());
   if (cache->base == 0)
     return cache;
 
@@ -560,13 +354,10 @@ bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
        In short we do not have a frame! pc is stored in rets register
        FP points to previous frame.
     */
-    cache->saved_regs[BFIN_PC_REGNUM] = 
-       read_register(BFIN_RETS_REGNUM) - get_text_addr_value();
+    cache->saved_regs[BFIN_PC_REGNUM] = read_register(BFIN_RETS_REGNUM);
     cache->frameless_pc_value = 1;
     frame_unwind_register (next_frame, BFIN_FP_REGNUM, buf);
     cache->base = extract_unsigned_integer (buf, 4);
-    if(cache->base > get_text_addr_value())
-        cache->base -=  (get_text_addr_value() + get_data_offset_value());
 #ifdef _DEBUG
 fprintf(stderr, "frameless pc case base %x\n", cache->base);
 #endif //_DEBUG 
@@ -576,27 +367,12 @@ fprintf(stderr, "frameless pc case base %x\n", cache->base);
     cache->frameless_pc_value = 0;
   }
 
-#if 0 // PCS, temporarily disable Srivathsa's code
-  if (cache->pc != 0)
-  {
-    bfin_analyze_prologue (cache->pc, frame_pc_unwind (next_frame), cache);
-  }
-
-  if (cache->locals < 0)
-    {
-
-      frame_unwind_register (next_frame, BFIN_SP_REGNUM, buf);
-      cache->base = extract_unsigned_integer (buf, 4) + cache->sp_offset;
-    }
-#endif
-
   /* Now that we have the base address for the stack frame we can
      calculate the value of SP in the calling frame.  */
   cache->saved_sp = cache->base + 8;
 
   return cache;
 }
-
 
 
 static void
@@ -606,6 +382,7 @@ bfin_frame_this_id (struct frame_info *next_frame, void **this_cache,
 	struct bfin_frame_cache *cache = bfin_frame_cache (next_frame, this_cache);
 	*this_id = frame_id_build (cache->base, cache->pc);
 }
+
 
 static void
 bfin_frame_prev_register (struct frame_info *next_frame, void **this_cache,
@@ -648,7 +425,7 @@ bfin_frame_prev_register (struct frame_info *next_frame, void **this_cache,
               *pi = *addrp;
             }
             else{
-              *pi = read_memory_integer (*addrp, 4) - get_text_addr_value();
+              *pi = read_memory_integer (*addrp, 4);
             }
           }
           else if(regnum == BFIN_FP_REGNUM){
@@ -688,7 +465,6 @@ bfin_frame_chain (frame_ptr)
 }
 
 
-
 static const struct frame_unwind bfin_frame_unwind =
 {
   NORMAL_FRAME,
@@ -696,113 +472,13 @@ static const struct frame_unwind bfin_frame_unwind =
   bfin_frame_prev_register
 };
 
+
 static const struct frame_unwind *
 bfin_frame_sniffer (struct frame_info *next_frame)
 {
   return &bfin_frame_unwind;
 }
 
-#if 0
-//#define _DEBUG
-/* The following functions are for function prolog length calculations */
-static int is_minus_minus_sp(int op)
-{
-      op &= 0xFFC0; 
-      if((op == P_MINUS_SP1) ||
-         (op == P_MINUS_SP2) ||
-         (op == P_MINUS_SP3) ||
-         (op == P_MINUS_SP4)) {
-        return 1;
-       }
-       return 0;
-}
-#endif
-
-#if 0
-static CORE_ADDR skip_sp_plus(CORE_ADDR pc)
-{
-    register int op = read_memory_unsigned_integer(pc, 2);
-    if((op & P_SP_PLUS) == P_SP_PLUS) {
-#ifdef _DEBUG
-         fprintf(stderr, "Incrementing PC by 2 as opcode for SP+=N found\n");
-#endif //_DEBUG 
-         return pc + 2;
-    }
-   //Flow may not have SP+=N opcode if there is no function call
-   //So, it's okay to be continued
-    return pc;
-}
-#endif
-
-#if 0
-static CORE_ADDR skip_minus_minus_sp(CORE_ADDR pc)
-{
-    register int op = read_memory_unsigned_integer(pc, 2);
-       if(!is_minus_minus_sp(op))
-       {
-	  fprintf(stderr, "Error: Expecting [--SP] code but found %d at PC: %d\n",
-                   op, (int)pc);
-          return pc;
-        }
-       while(is_minus_minus_sp(op))
-       {
-           pc += 2;
-           op = read_memory_unsigned_integer(pc, 2);
-       }
-       return skip_sp_plus(pc);
-}
-#endif
-
-#if 0
-static CORE_ADDR skip_blob(CORE_ADDR pc)
-{
-	register int op1 = read_memory_unsigned_integer(pc, 2);
-        register int op2 = read_memory_unsigned_integer(pc+4, 2);
-        if(((op1 == P_P2_LOW) && (op2 == P_P2_HIGH)) ||  
-           ((op2 == P_P2_LOW) && (op1 == P_P2_HIGH)))  {
-              pc += 8;
-             op1 = read_memory_unsigned_integer(pc, 2);
-             if((op1 == P_SP_EQ_SP_PLUS_P2) || (op1 == P_SP_EQ_P2_PLUS_SP)) {
-                op2 = read_memory_unsigned_integer(pc + 2, 2);
-                if(is_minus_minus_sp(op2))
-                    return skip_minus_minus_sp(pc +2); 
-                return skip_sp_plus(pc + 2);
-             }
-            fprintf(stderr, "Error: Expecting SP= SP + P2 code but found %d at PC: %d\n",
-                   op1, (int)pc);
-
-        }
-        else  {
-         fprintf(stderr, "Error: Expecting P2.L=X1 & P2.H = X2 code but found %d and %d at PC: %d\n",
-                   op1, op2, (int)pc);
-
-         }
-    return pc;
-}
-#endif
-
-#if 0
-static CORE_ADDR skip_link(CORE_ADDR pc)
-{
-    //caller has already verified so no need of verification
-    register int op = read_memory_unsigned_integer(pc+4, 2);
-#ifdef _DEBUG
-         fprintf(stderr, "Incrementing PC(0x%x) by 4 as opcode for LINK found\n", (int)pc);
-#endif //_DEBUG 
-    pc += 4;
-    if((op & P_SP_PLUS) == P_SP_PLUS) {
-          pc = skip_sp_plus(pc); 
-     }
-    else if (((op & P_P2_LOW) == P_P2_LOW) ||
-             ((op & P_P2_HIGH) == P_P2_HIGH)) {
-          pc = skip_blob(pc);
-    }
-    else if(is_minus_minus_sp(op)){ //assume it's [--sp]
-       pc = skip_minus_minus_sp(pc);
-    }
-   return pc;
-}
-#endif
 
 CORE_ADDR
 bfin_skip_prologue (pc)
@@ -860,12 +536,12 @@ fprintf(stderr, "bfin_skip_prologue called\n");
   return pc;
 }
 
+
 /* Return the GDB type object for the "standard" data type of data in
    register N.  This should be void pointer for P0-P5, SP, FP
    void pointer to function for PC
    int otherwise.
 */
-
 static struct type *
 bfin_register_type (struct gdbarch *gdbarch, int regnum)
 {
@@ -880,20 +556,18 @@ bfin_register_type (struct gdbarch *gdbarch, int regnum)
 
 
 /* Return the saved PC from this frame.
-   Assumes LINK is used in every function.
-*/
+   Assumes LINK is used in every function.  */
 CORE_ADDR
 bfin_frame_saved_pc (frame)
      struct frame_info *frame;
 {
-
     return (read_memory_unsigned_integer ( get_frame_base(frame) + RETS_OFFSET, 4));
 }
+
 
 /* We currently only support passing parameters in integer registers.  This
    conforms with GCC's default model.  Several other variants exist and
    we should probably support some of them based on the selected ABI.  */
-
 static CORE_ADDR
 bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
 		     struct regcache *regcache, CORE_ADDR bp_addr, int nargs,
@@ -924,7 +598,6 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
         offset = 0;
       else
         offset = container_len - len;
-
       sp -= container_len;
       write_memory (sp + offset, VALUE_CONTENTS_ALL (args[i]), len);
     }
@@ -953,8 +626,7 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
 
   /* set the dummy return value to entry_point_address().
      A dummy breakpoint will be setup to execute the call. */
-
-  store_unsigned_integer (buf, 4, entry_point_address() + get_text_addr_value());
+  store_unsigned_integer (buf, 4, entry_point_address());
   regcache_cooked_write (regcache, BFIN_RETS_REGNUM, buf);
 
   /* fp is changed by called program prologue */
@@ -965,9 +637,9 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
   return ret_sp;
 }
 
+
 /* Convert register number REG to the appropriate register number
    used by GDB.  */
-
 static int
 bfin_reg_to_regnum (int reg)
 {
@@ -988,7 +660,9 @@ bfin_reg_to_regnum (int reg)
 
 }
 
+
 #include "bfd-in2.h"
+
 
 static int
 gdb_print_insn_bfin (bfd_vma memaddr, disassemble_info *info)
@@ -1004,7 +678,6 @@ gdb_print_insn_bfin (bfd_vma memaddr, disassemble_info *info)
    the string to *lenptr, and adjusts the program counter (if
    necessary) to point to the actual memory location where the
    breakpoint should be inserted.  */
-                                                                                                         
 const unsigned char *
 bfin_breakpoint_from_pc (CORE_ADDR *pcptr, int *lenptr)
 {
@@ -1018,7 +691,6 @@ bfin_breakpoint_from_pc (CORE_ADDR *pcptr, int *lenptr)
 /* Extract from an array REGBUF containing the (raw) register state a
    function return value of type TYPE, and copy that, in virtual
    format, into VALBUF.  */
-
 static void
 bfin_extract_return_value (struct type *type,
 			  struct regcache *regs,
@@ -1042,10 +714,8 @@ bfin_extract_return_value (struct type *type,
      || TYPE_CODE (type) == TYPE_CODE_PTR
      || TYPE_CODE (type) == TYPE_CODE_REF
      || TYPE_CODE (type) == TYPE_CODE_ENUM
-     || (TYPE_CODE (type) == TYPE_CODE_STRUCT
-     && len <= 2 * INT_REGISTER_RAW_SIZE)
-     || (TYPE_CODE (type) == TYPE_CODE_UNION
-     && len <= 2 * INT_REGISTER_RAW_SIZE))
+     || (TYPE_CODE (type) == TYPE_CODE_STRUCT && len <= 2 * INT_REGISTER_RAW_SIZE)
+     || (TYPE_CODE (type) == TYPE_CODE_UNION && len <= 2 * INT_REGISTER_RAW_SIZE))
      {
         while (len > 0)
         {
@@ -1062,9 +732,9 @@ bfin_extract_return_value (struct type *type,
     }
 }
 
+
 /* Write into appropriate registers a function return value of type
    TYPE, given in virtual format.  */
-
 static void
 bfin_store_return_value (struct type *type, struct regcache *regs,
 			const void *src)
@@ -1108,12 +778,12 @@ bfin_store_return_value (struct type *type, struct regcache *regs,
    }
 }
 
+
 /* Determine, for architecture GDBARCH, how a return value of TYPE
    should be returned.  If it is supposed to be returned in registers,
    and READBUF is non-zero, read the appropriate value from REGCACHE,
    and copy it into READBUF.  If WRITEBUF is non-zero, write the value
    from WRITEBUF into REGCACHE.  */
-
 static enum return_value_convention
 bfin_return_value (struct gdbarch *gdbarch, struct type *type,
                    struct regcache *regcache, void *readbuf,
@@ -1160,6 +830,7 @@ bfin_register_name (int i)
    return bfin_register_name_strings[i];
 }
 
+
 /****************************************************/
 /* FUNCTION : bfin_translate_address                */
 /* ABSTRACT : Given a file local address tranlate   */
@@ -1190,6 +861,7 @@ bfin_translate_address (struct gdbarch *gdbarch,
   *rem_len  = gdb_len;
 }
 
+
 static CORE_ADDR
 bfin_frame_base_address (struct frame_info *next_frame, void **this_cache)
 {
@@ -1197,6 +869,8 @@ bfin_frame_base_address (struct frame_info *next_frame, void **this_cache)
 
   return cache->base;
 }
+
+
 static CORE_ADDR
 bfin_frame_local_address (struct frame_info *next_frame, void **this_cache)
 {
@@ -1204,6 +878,8 @@ bfin_frame_local_address (struct frame_info *next_frame, void **this_cache)
 
   return cache->base + 4;
 }
+
+
 static CORE_ADDR
 bfin_frame_args_address (struct frame_info *next_frame, void **this_cache)
 {
@@ -1212,6 +888,7 @@ bfin_frame_args_address (struct frame_info *next_frame, void **this_cache)
   return cache->base -4;
 }
 
+
 static const struct frame_base bfin_frame_base =
 {
   &bfin_frame_unwind,
@@ -1219,6 +896,7 @@ static const struct frame_base bfin_frame_base =
   bfin_frame_local_address ,
   bfin_frame_args_address 
 };
+
 
 static struct frame_id
 bfin_unwind_dummy_id (struct gdbarch *gdbarch, struct frame_info *next_frame)
@@ -1233,6 +911,7 @@ bfin_unwind_dummy_id (struct gdbarch *gdbarch, struct frame_info *next_frame)
   return frame_id_build (sp, frame_pc_unwind (next_frame));
 }
 
+
 static CORE_ADDR
 bfin_unwind_pc (struct gdbarch *gdbarch, struct frame_info *next_frame)
 {
@@ -1243,6 +922,7 @@ bfin_unwind_pc (struct gdbarch *gdbarch, struct frame_info *next_frame)
   frame_unwind_register (next_frame, PC_REGNUM , buf);
   return  extract_typed_address (buf, builtin_type_void_func_ptr);
 }
+
 
 static int
 bfin_sim_regno(int regno)
@@ -1265,11 +945,13 @@ bfin_sim_regno(int regno)
   }
 }
 
+
 CORE_ADDR 
 bfin_frame_align (struct gdbarch *gdbarch, CORE_ADDR address)
 {
   return ((address + 3) & ~0x3);
 }
+
 
 /* Initialize the current architecture based on INFO.  If possible,
    re-use an architecture from ARCHES, which is a list of
@@ -1277,7 +959,6 @@ bfin_frame_align (struct gdbarch *gdbarch, CORE_ADDR address)
 
    Called e.g. at program startup, when reading a core file, and when
    reading a binary file.  */
-
 static struct gdbarch *
 bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
 {
@@ -1341,8 +1022,7 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   // removed frame_unwind_append_predicate (gdbarch, bfin_frame_p);
 
   /* currently dont expose psuedo regs
-     we may give out text_start, data_start, bss_start
-  */
+     we may give out text_start, data_start, bss_start */
   set_gdbarch_num_pseudo_regs (gdbarch, 0); 
 
   /* On BFIN targets char defaults to unsigned.  */
@@ -1367,6 +1047,7 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
 
   return gdbarch;
 }
+
 
 static void
 bfin_dump_tdep (struct gdbarch *current_gdbarch, struct ui_file *file)
