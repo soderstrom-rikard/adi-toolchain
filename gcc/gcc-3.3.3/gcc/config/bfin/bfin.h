@@ -12,7 +12,7 @@
 #define _BFIN_CONFIG
 
 /* In order to use atof */
-#include <stdlib.h>
+/* #include <stdlib.h> */
 
 #define USER_LABEL_PREFIX "_"
 
