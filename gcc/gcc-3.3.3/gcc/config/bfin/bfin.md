@@ -61,7 +61,7 @@
 ; 5		align instruction on 4 byte boundary (align_4) For future use 
 
 (define_attr "type"
-  "move,load,store,push,mcld,mcst,dsp32,mult,alu0,shft,brcc,br,call,misc,compare"
+  "move,mvp,load,store,push,mcld,mcldp,mcst,dsp32,mult,alu0,shft,brcc,br,call,misc,compare"
   (const_string "misc"))
 
 
@@ -82,8 +82,18 @@
 ;;;   
 (define_attr "length" ""
   (cond [(eq_attr "type" "mcld")
-	 (if_then_else (match_operand 1 "effective_address_32bit_p" "")
-		       (const_int 4) (const_int 2))
+         (if_then_else (match_operand 1 "effective_address_32bit_p" "")
+                       (const_int 8)
+                        (if_then_else (match_operand 1 "imm7bit_operand_p" "")
+                                     (const_int 2)
+                                     (const_int 4)))
+
+         (eq_attr "type" "mcldp")
+         (if_then_else (match_operand 1 "effective_address_32bit_p" "")
+                       (const_int 8)
+                        (if_then_else (match_operand 1 "imm7bit_operand_p" "")
+                                     (const_int 2)
+                                     (const_int 4)))
 
 	 (eq_attr "type" "mcst")
 	 (if_then_else (match_operand 0 "effective_address_32bit_p" "")
@@ -95,6 +105,13 @@
 	               (if_then_else (match_operand 1 "imm7bit_operand_p" "")
 	                             (const_int 2)
 	                             (const_int 4)))
+
+         (eq_attr "type" "mvp")
+         (if_then_else (match_operand 1 "symbolic_operand_p" "")
+                       (const_int 8)
+                       (if_then_else (match_operand 1 "imm7bit_operand_p" "")
+                                     (const_int 2)
+                                     (const_int 4)))
 
 	 (eq_attr "type" "dsp32") (const_int 4)
 	 (eq_attr "type" "call")  (const_int 4)
@@ -125,6 +142,9 @@
 ;; Syntax : (define_function_unit {name} {num-units} {n-users} {test}
 ;;                                {ready-delay} {issue-delay} [{conflict-list}])
 ;;(define_function_unit "dag" 1 0 (eq_attr "type" "move") 1 2)
+
+(define_function_unit "dag" 1 1 (eq_attr "type" "mvp") 4 0)
+(define_function_unit "dag" 1 1 (eq_attr "type" "mcldp") 4 0)
 
 ;;; WORD conversion patterns
 
@@ -195,45 +215,51 @@
 ")
 
 (define_insn "*movsicc_insn1"
-  [(set (match_operand:SI 0 "register_operand" "=da,da,da")
+  [(set (match_operand:SI 0 "register_operand" "=d, a, d, a, d, a")
         (if_then_else:SI 
-	    (eq:CC (match_operand:CC 3 "cc_operand" "C,C,C") 
+	    (eq:CC (match_operand:CC 3 "cc_operand" "C, C, C, C, C, C") 
 		(const_int 0))
-	    (match_operand:SI 1 "register_operand" "da,0,da")
-	    (match_operand:SI 2 "register_operand" "0,da,da")))]
+	    (match_operand:SI 1 "register_operand" "da, da, 0, 0, da, da")
+	    (match_operand:SI 2 "register_operand" "0, 0, da, da, da, da")))]
   ""
   "@
     if !cc %0 =%1; /* movsicc-1a */
+    if !cc %0 =%1; /* movsicc-1a */
     if cc %0 =%2; /* movsicc-1b */
+    if cc %0 =%2; /* movsicc-1b */
+    if !cc %0 =%1; if cc %0=%2; /* movsicc-1 */
     if !cc %0 =%1; if cc %0=%2; /* movsicc-1 */"
-  [(set_attr "length" "2,2,4")
-   (set_attr "type" "move")])
+  [(set_attr "length" "2,2,2,2,4,4")
+   (set_attr "type" "move,mvp,move,mvp,move,mvp")])
  
 (define_insn "*movsicc_insn2"
-  [(set (match_operand:SI 0 "register_operand" "=da,da,da")
+  [(set (match_operand:SI 0 "register_operand" "=d, a, d, a, d, a")
         (if_then_else:SI 
-	    (ne:CC (match_operand:CC 3 "cc_operand" "C,C,C") 
+	    (ne:CC (match_operand:CC 3 "cc_operand" "C, C, C, C, C, C") 
 		(const_int 0))
-	    (match_operand:SI 1 "register_operand" "0,da,da")
-	    (match_operand:SI 2 "register_operand" "da,0,da")))]
+	    (match_operand:SI 1 "register_operand" "0, 0, da, da, da, da")
+	    (match_operand:SI 2 "register_operand" "da, da, 0, 0, da, da")))]
   ""
   "@
     if !cc %0 =%2; /* movsicc-2b */
+    if !cc %0 =%2; /* movsicc-2b */
     if cc %0 =%1; /* movsicc-2a */
+    if cc %0 =%1; /* movsicc-2a */
+    if cc %0 =%1; if !cc %0=%2; /* movsicc-1 */
     if cc %0 =%1; if !cc %0=%2; /* movsicc-1 */"
-  [(set_attr "length" "2,2,4")
-   (set_attr "type" "move")])
+  [(set_attr "length" "2,2,2,2,4,4")
+   (set_attr "type" "move,mvp,move,mvp,move,mvp")])
 
 ;;; Future work: split constants in expand
 (define_insn "*movsi_insn"
-  [(set (match_operand:SI 0 "general_operand" "=fcb  , da,    mda, e,   da, !d, !C,m")
-        (match_operand:SI 1 "general_operand" "idabcf, iMmbcf, da,  ade, e,  C,  d,bB"))]
+  [(set (match_operand:SI 0 "general_operand" "=d, a, mc, *!c, !e, !e, !d, !a, !d, !C, m,a,f")
+        (match_operand:SI 1 "general_operand" "damic, damic, da, daic, ad, P, *e, *e, C, d, bB,f,a"))]
 
   ""
   "*
     { output_load_immediate (operands); }
   "
-  [(set_attr "type" "move,mcld,mcst,move,move,compare,compare,move")])
+  [(set_attr "type" "mcld,mcldp,mcst,move,move,move,move,mvp,compare,compare,move,mcld,move")])
 
 (define_expand "movsi"
   [(set (match_operand:SI 0 "general_operand" "")
@@ -242,8 +268,8 @@
   "expand_move (operands, SImode);")
 
 (define_insn "*movsf_insn"
- [(set (match_operand:SF 0 "general_operand" "=da,m")
-       (match_operand:SF 1 "general_operand" "dami,da"))]
+ [(set (match_operand:SF 0 "general_operand" "=d, a, m")
+       (match_operand:SF 1 "general_operand" "dami, dami, da"))]
   ""
   "*
   {
@@ -277,7 +303,7 @@
      output_asm_insn (\"%0 =%1;\", operands);
      RET;
   }"
-  [(set_attr "type" "mcld,mcst")])
+  [(set_attr "type" "mcld, mcldp, mcst")])
 
 (define_expand "movsf"
  [(set (match_operand:SF 0 "general_operand" "")
@@ -286,13 +312,13 @@
   "expand_move (operands, SFmode);")
 
 (define_insn ""
-  [(set (match_operand:HI 0 "general_operand" "=d,  m, d,a,d")
-	(match_operand:HI 1 "general_operand" "dIi, d, m,d,a"))]
+  [(set (match_operand:HI 0 "general_operand" "=d,  m, d,a,d,a")
+	(match_operand:HI 1 "general_operand" "I?di, d, m,d,a,i"))]
   ""
   "*
     { output_load_immediate (operands); }
   "
-  [(set_attr "type" "move,mcst,mcld,mcld,mcld")])
+  [(set_attr "type" "move,mcst,mcld,mcld,mcld,move")])
 
 
 
@@ -892,16 +918,45 @@
 	\"%0 = %1;\\n\\t%0 += %2 (X);\",
 	\"%0 = %1;\\n\\t%0 += %2 (X);\",
 	};
+	
+        if ((which_alternative == 3 || which_alternative == 4) && REGNO(operands[0]) == REGNO(operands[1])) {
+          int i,last_reg;
 
+	  (which_alternative == 3) ? (last_reg = LAST_USER_PREG) : (last_reg = LAST_USER_DREG);
+	  (which_alternative == 3) ? (i = 8) : (i = 0);
+
+          for (; i < last_reg; i++)
+             if (i != REGNO (operands[0])) {
+               char buf[128];
+               sprintf (buf, \"[--SP] = %s;\", reg_names[i]);
+               output_asm_insn (buf, operands);
+
+               rtx tmp = operands[0];
+               rtx tmp1 = operands[1];
+               operands[0] =  gen_rtx_REG (SImode, i);
+               operands[1] = operands[2];
+               output_load_immediate (operands);
+               operands[0] = tmp;
+               operands[1] = tmp1;
+
+               sprintf (buf, \"%%0 = %%0 + %s;\", reg_names[i]);
+               output_asm_insn (buf, operands);
+
+               sprintf (buf, \"%s = [SP++];\", reg_names[i]);
+               output_asm_insn (buf, operands);          
+               return \"\";
+            }
+            abort();
+        }
+ 
 	if (which_alternative < 5 && which_alternative > 2) {
-		rtx tmp = operands[1];
-
-		operands[1] = operands[2];
-		output_load_immediate (operands);
-		operands[1] = tmp;
+	  rtx tmp = operands[1];
+ 	  operands[1] = operands[2];
+	  output_load_immediate (operands);
+	  operands[1] = tmp;
 	}
 
-   return strings_addsi3[which_alternative];
+        return strings_addsi3[which_alternative];
      }"
   [(set_attr "type" "alu0")])
 
@@ -1635,7 +1690,6 @@ else
   ""
   "* return asm_conditional_branch (insn, BRF);"
   [(set_attr "type" "brcc")
-   (set (attr "length") (const_int 6))
   ])
 
 (define_insn ""
@@ -1647,7 +1701,6 @@ else
   "* return asm_conditional_branch (insn, BRT);"
 
   [(set_attr "type" "brcc")
-   (set (attr "length") (const_int 6))
   ])
 
 
@@ -1659,7 +1712,6 @@ else
   ""
   "* return asm_conditional_branch (insn, BRF);"
   [(set_attr "type" "brcc")
-   (set (attr "length") (const_int 6))
   ])
 
 (define_insn ""
@@ -1670,7 +1722,6 @@ else
   ""
   "* return asm_conditional_branch (insn, BRT);"
   [(set_attr "type" "brcc")
-   (set (attr "length") (const_int 6))
   ])
 
 (define_expand "seq"
