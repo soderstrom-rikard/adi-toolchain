@@ -117,7 +117,7 @@ load_byte_zero_extend:
 	r7 = b [SP - 32767] (z);
 
 	.text
-	.global load_bye_sign_extend
+	.global load_byte_sign_extend
 load_byte_sign_extend:
 	r5 = b [ P0 ] (X);
 	r2 = B [ p1++ ] (x);

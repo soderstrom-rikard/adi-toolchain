@@ -1,3 +1,10 @@
+2004-12-22  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/expected_errors.s: New.
+	* gas/bfin/expected_errors.l: New.
+	* gas/bfin/bfin.exp: Run new test.
+	* gas/bfin/load.s: Fix typo.
+
 2004-12-21  Catherine Moore  <clm@cm00re.com>
 
 	* gas/bfin/reloc.d: New.
