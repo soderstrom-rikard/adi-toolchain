@@ -1,3 +1,7 @@
+2005-01-11 : Pradip Shah <pcs@rrap-software.com>
+
+	* elf32-bfin.c: Reorganized howto processing
+
 2005-01-07  Catherine Moore  <clm@cm00re.com>
 
 	* elf32-bfin.c: (elf32_bfin_vtinherit_howto): New HOWTO entry.

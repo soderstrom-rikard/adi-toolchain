@@ -43,30 +43,30 @@ START_RELOC_NUMBERS (elf_bfin_reloc_type)
   RELOC_NUMBER (R_byte2_data, 0x11)     /* 0x11, 0x00) .byte2 var = symbol */
   RELOC_NUMBER (R_byte4_data, 0x12)     /* 0x12, 0x00) .byte4 var = symbol and .var var=symbol */
   RELOC_NUMBER (R_pcrel11, 0x13)        /* 0x13, 0x00) lsetup part b */
-  RELOC_NUMBER (R_pltpc, 0x14)            /* 0x14, PLT gnu only relocation */
-  RELOC_NUMBER (R_got, 0x15)            /* 0x15, GOT gnu only relocation */
-  RELOC_NUMBER (R_push, 0x16)
-  RELOC_NUMBER (R_const, 0x17)
-  RELOC_NUMBER (R_add, 0x18)
-  RELOC_NUMBER (R_sub, 0x19)
-  RELOC_NUMBER (R_mult, 0x1a)
-  RELOC_NUMBER (R_div, 0x1b)
-  RELOC_NUMBER (R_mod, 0x1c)
-  RELOC_NUMBER (R_lshift, 0x1d)
-  RELOC_NUMBER (R_rshift, 0x1e)
-  RELOC_NUMBER (R_and, 0x1f)
-  RELOC_NUMBER (R_or, 0x20)
-  RELOC_NUMBER (R_xor, 0x21)
-  RELOC_NUMBER (R_land, 0x22)
-  RELOC_NUMBER (R_lor, 0x23)
-  RELOC_NUMBER (R_len, 0x24)
-  RELOC_NUMBER (R_neg, 0x25)
-  RELOC_NUMBER (R_comp, 0x26)
-  RELOC_NUMBER (R_page, 0x27)
-  RELOC_NUMBER (R_hwpage, 0x28)
-  RELOC_NUMBER (R_addr, 0x29)
-  RELOC_NUMBER (R_BFIN_GNU_VTINHERIT, 200)
-  RELOC_NUMBER (R_BFIN_GNU_VTENTRY, 201)
+  RELOC_NUMBER (R_push, 0xE0)
+  RELOC_NUMBER (R_const, 0xE1)
+  RELOC_NUMBER (R_add, 0xE2)
+  RELOC_NUMBER (R_sub, 0xE3)
+  RELOC_NUMBER (R_mult, 0xE4)
+  RELOC_NUMBER (R_div, 0xE5)
+  RELOC_NUMBER (R_mod, 0xE6)
+  RELOC_NUMBER (R_lshift, 0xE7)
+  RELOC_NUMBER (R_rshift, 0xE8)
+  RELOC_NUMBER (R_and, 0xE9)
+  RELOC_NUMBER (R_or, 0xEA)
+  RELOC_NUMBER (R_xor, 0xEB)
+  RELOC_NUMBER (R_land, 0xEC)
+  RELOC_NUMBER (R_lor, 0xED)
+  RELOC_NUMBER (R_len, 0xEE)
+  RELOC_NUMBER (R_neg, 0xEF)
+  RELOC_NUMBER (R_comp, 0xF0)
+  RELOC_NUMBER (R_page, 0xF1)
+  RELOC_NUMBER (R_hwpage, 0xF2)
+  RELOC_NUMBER (R_addr, 0xF3)
+  RELOC_NUMBER (R_pltpc, 0x40)          /* PLT gnu only relocation */
+  RELOC_NUMBER (R_got, 0x41)            /* GOT gnu only relocation */
+  RELOC_NUMBER (R_BFIN_GNU_VTINHERIT, 0x42) /* C++, gnu only */
+  RELOC_NUMBER (R_BFIN_GNU_VTENTRY, 0x43) /* C++, gnu only */
 END_RELOC_NUMBERS (R_max)
 
 #endif /* _ELF_BFIN_H */

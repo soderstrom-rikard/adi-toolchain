@@ -1,3 +1,6 @@
+2005-01-11  Pradip Shah <pcs@rrap-software.com>
+	* bfin.h : Changed relocation numbers
+
 2005-01-07  Catherine Moore  <clm@cm00re.com>
 
 	* bfin.h (R_BFIN_GNU_VTINHERIT): New relocation.
