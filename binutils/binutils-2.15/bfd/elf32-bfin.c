@@ -224,6 +224,10 @@ bfin_bfd_reloc (
   asection *reloc_target_output_section;
   int possible_addend_delta = 0;
 
+  if (howto->type == R_BFIN_GNU_VTENTRY
+      || howto->type == R_BFIN_GNU_VTINHERIT)
+    return bfd_reloc_ok;
+
 #if 0
   flag = bfd_elf_generic_reloc (abfd, reloc_entry, 
 			       symbol, data, input_section,
@@ -698,56 +702,66 @@ bfin_byte4_reloc (
      char **error_message ATTRIBUTE_UNUSED) 
 {
   bfd_vma relocation, x;
-  //bfd_reloc_status_type flag = bfd_reloc_ok;
   bfd_size_type addr = reloc_entry->address;
   bfd_vma output_base = 0;
   asection *reloc_target_output_section;
-  int  possible_addend_delta = 0; // to be added to addend if output_bfd is 0
-    /* Is the address of the relocation really within the section?  */
-      if (reloc_entry->address > bfd_get_section_limit(abfd, input_section))
-	      return bfd_reloc_outofrange;
-      if(is_reloc_stack_empty()){
-        if (bfd_is_und_section (symbol->section)
-             && (symbol->flags & BSF_WEAK) == 0
-             && output_bfd == (bfd *) NULL)
-          return bfd_reloc_undefined;
-        reloc_target_output_section = symbol->section->output_section;
-        relocation = symbol->value;      
-        /* Convert input-section-relative symbol value to absolute.  */
-        if (output_bfd)
-	    output_base = 0;
-        else
-	    output_base = reloc_target_output_section->vma;
+  int possible_addend_delta = 0; // to be added to addend if output_bfd is 0
+
+  /* Is the address of the relocation really within the section?  */
+  if (reloc_entry->address > bfd_get_section_limit (abfd, input_section))
+    return bfd_reloc_outofrange;
+
+  if (is_reloc_stack_empty ())
+    {
+      if (bfd_is_und_section (symbol->section)
+          && (symbol->flags & BSF_WEAK) == 0
+          && output_bfd == (bfd *) NULL)
+        return bfd_reloc_undefined;
+
+      reloc_target_output_section = symbol->section->output_section;
+      relocation = symbol->value;      
+      /* Convert input-section-relative symbol value to absolute.  */
+      if (output_bfd)
+	output_base = 0;
+      else
+	output_base = reloc_target_output_section->vma;
   
-        if (!strcmp(symbol->name, symbol->section->name) || output_bfd == NULL){
-      	  relocation += output_base + symbol->section->output_offset;
+      if (symbol->name 
+	  && symbol->section->name
+          && !strcmp (symbol->name, symbol->section->name)
+          || output_bfd == NULL)
+        {
+	  relocation += output_base + symbol->section->output_offset;
           possible_addend_delta = symbol->section->output_offset;
 	}
 
-        relocation += reloc_entry->addend;
+      relocation += reloc_entry->addend;
+    }
+    else
+      {
+	relocation = reloc_stack_pop();
+	relocation += reloc_entry->addend;
       }
-      else{
-        relocation = reloc_stack_pop();
-        relocation += reloc_entry->addend;
-        // assert(is_reloc_stack_empty());
-      }
-      if (output_bfd != (bfd *) NULL) {	              
-	 /* this output will be relocatable ... like ld -r */
-	 reloc_entry->address += input_section->output_offset;
-	 reloc_entry->addend += possible_addend_delta;
-       }
-      else {
-        reloc_entry->addend = 0;
-      }
-      /* Here the variable relocation holds the final address of the
-	 symbol we are relocating against, plus any addend.  */
-      x = relocation & 0xFFFF0000;
-      x >>=16;
-      bfd_put_16 (abfd, x, (unsigned char *) data + addr + 2);
+  if (output_bfd != (bfd *) NULL)
+    { 
+      /* this output will be relocatable ... like ld -r */
+      reloc_entry->address += input_section->output_offset;
+      reloc_entry->addend += possible_addend_delta;
+    }
+  else
+    {
+      reloc_entry->addend = 0;
+    }
+
+  /* Here the variable relocation holds the final address of the
+     symbol we are relocating against, plus any addend.  */
+  x = relocation & 0xFFFF0000;
+  x >>=16;
+  bfd_put_16 (abfd, x, (unsigned char *) data + addr + 2);
             
-      x = relocation & 0x0000FFFF;
-      bfd_put_16 (abfd, x, (unsigned char *) data + addr);
-    return bfd_reloc_ok;
+  x = relocation & 0x0000FFFF;
+  bfd_put_16 (abfd, x, (unsigned char *) data + addr);
+  return bfd_reloc_ok;
 }
 
 /* HOWTO Table for blackfin.
@@ -1270,6 +1284,21 @@ elf_bfin_check_relocs (bfd * abfd,
 
       switch (ELF32_R_TYPE (rel->r_info))
 	{
+       /* This relocation describes the C++ object vtable hierarchy.
+           Reconstruct it for later use during GC.  */
+        case R_BFIN_GNU_VTINHERIT:
+          if (!bfd_elf_gc_record_vtinherit (abfd, sec, h, rel->r_offset))
+            return FALSE;
+          break;
+
+        /* This relocation describes which C++ vtable entries
+           are actually used.  Record for later use during GC.  */
+        case R_BFIN_GNU_VTENTRY:
+          if (!bfd_elf_gc_record_vtentry (abfd, sec, h, rel->r_addend))
+            return FALSE;
+          break;
+
+
 	case R_got:
 	  if (h != NULL
 	      && strcmp (h->root.root.string, "_GLOBAL_OFFSET_TABLE_") == 0)
@@ -1426,6 +1455,11 @@ elf_bfin_relocate_section (bfd * output_bfd,
 	  bfd_set_error (bfd_error_bad_value);
 	  return FALSE;
 	}
+
+      if (r_type == R_BFIN_GNU_VTENTRY
+          || r_type == R_BFIN_GNU_VTINHERIT)
+	continue;
+
       howto = bfd_elf32_elf_reloc_type_lookup (input_bfd, r_type);
       if (howto == NULL)
 	{
@@ -1473,6 +1507,10 @@ elf_bfin_relocate_section (bfd * output_bfd,
 
       switch (r_type)
 	{
+	case R_BFIN_GNU_VTINHERIT:
+	case R_BFIN_GNU_VTENTRY:
+	  return bfd_reloc_ok;
+
 	case R_got:
 	  /* Relocation is to the address of the entry for this symbol
 	     in the global offset table.  */
@@ -1707,6 +1745,10 @@ elf_bfin_gc_mark_hook (asection * sec,
     {
       switch (ELF32_R_TYPE (rel->r_info))
 	{
+
+	case R_BFIN_GNU_VTINHERIT:
+	case R_BFIN_GNU_VTENTRY:
+	  break;
 
 	default:
 	  switch (h->root.type)
