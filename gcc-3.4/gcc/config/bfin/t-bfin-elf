@@ -18,7 +18,7 @@ CROSS_LIBGCC1 = libgcc1-asm.a
 LIB1ASMSRC = bfin/lib1funcs.asm
 
 LIB1ASMFUNCS = 	_addsf3 _divsf3 _lesf2 _modsi3 _nesf2 \
-	_divsi3 _gesf2 _mulsf3 _subsf3 _udivsi3 \
+	_divsi3 _gesf2 _mulsf3 _udivsi3 \
 	_eqsf2 _gtsf2 _umodsi3 \
 	_cmpsf2 _floatsisf _ltsf2 _negsf2 _extendsfdf2 \
 	_truncdfsf2
