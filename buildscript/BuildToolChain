@@ -1,0 +1,246 @@
+#!/bin/sh
+#Build Script - Rohit Makasana ( RRAP Software )
+#chmod 755 BuildToolChainNew 
+
+APP_NAME=$0
+APP_NAME=${APP_NAME#.}
+APP_NAME=${APP_NAME#/}
+
+while getopts s:b:h parameter
+do
+	case $parameter in
+		s)  
+		   if [ -d $OPTARG ]	
+		   then
+				DIR_SOURCE=$OPTARG
+				DIR_SOURCE=${DIR_SOURCE%/}
+
+		   else
+			echo "Invalid Source Path"
+                        exit
+		   fi
+		   ;;
+		b)  
+
+		   if [ -d $OPTARG ]	
+		   then
+				DIR_BUILD=$OPTARG
+				DIR_BUILD=${DIR_BUILD%/}
+		   else
+			echo "Invalid Build Path"
+			exit
+		   fi	
+		   ;;
+		h)  
+		   echo "Usage : $APP_NAME -s SOURCE [-b BUILD]
+-s SOURCE 	 Source directory mandatory
+-b BUILD  	 Default build directory will be current dir
+-h               Help"
+		    exit;;
+		*) echo "Try \`$APP_NAME -h' for more information."
+			exit	
+	esac
+done
+
+
+############ SOURCE MUST PROVIDED WITH COMMAND LINE ARGUMENT ###
+
+if [ ! $DIR_SOURCE ]
+then
+		   echo "Usage : $APP_NAME -s SOURCE [-b BUILD]
+-s SOURCE 	 Source directory mandatory
+-b BUILD  	 Default build directory will be current dir
+-h               Help"
+exit
+fi 
+
+############ ABSOLUTE PATH TO SOURCE DIRECTORIES ################
+
+
+
+if [ -d $DIR_SOURCE ]
+then
+	echo "
+This script cleans, configures and builds binutils, gcc, elf2flt n' uClibc for blackfin target in *_build dirs outside the source
+
+By this script, ToolChain output will be generated at PWD, Source is being called from fixed location."
+
+	echo "Absolute path where sources are present ...."
+	echo $DIR_SOURCE
+else
+	echo "Invalid Source Path"
+	exit
+fi
+
+############ ABSOLUTE PATH TO BUILD DIRECTORIES ################
+
+
+if [ $DIR_BUILD ]
+then
+	if [ -d $DIR_BUILD ]
+	then
+		echo "Absolute path where build will be done ...."
+		echo $DIR_BUILD
+	else
+		echo "Invalid Build Path"
+		exit
+	fi
+else
+
+	echo "Absolute path where build will be done ...."
+	echo ${DIR_BUILD=`pwd`}
+fi
+
+############ DO NOT MODIFY BELOW THIS LINE ######################
+############ RELATIVE PATH TO SOURCE DIRECTORIES ################
+
+echo "Path to output dir ...."
+DIR_OUTPUT=$DIR_BUILD/output
+echo $DIR_OUTPUT
+
+echo "Path to binutils dir ...."
+DIR_BINUTILS_SOURCE=$DIR_SOURCE/binutils-2.15
+echo $DIR_BINUTILS_SOURCE
+
+echo "Path to gcc dir ...."
+DIR_GCC_SOURCE=$DIR_SOURCE/gcc-3.4
+echo $DIR_GCC_SOURCE
+
+echo "Path to elf2flt dir ...."
+DIR_ELF2FLT_SOURCE=$DIR_SOURCE/elf2flt
+echo $DIR_ELF2FLT_SOURCE
+
+############ RELATIVE PATH TO BUILD DIR ################
+
+DIR_BINUTILS_BUILD=$DIR_BUILD/binutils_build
+DIR_GCC_BUILD=$DIR_BUILD/gcc_build
+DIR_ELF2FLT_BUILD=$DIR_BUILD/elf2flt_build
+
+echo "Remove old build dir ...."
+
+rm -rf $DIR_BINUTILS_BUILD
+rm -rf $DIR_GCC_BUILD
+rm -rf $DIR_ELF2FLT_BUILD
+
+mkdir $DIR_BINUTILS_BUILD
+mkdir $DIR_GCC_BUILD
+mkdir $DIR_ELF2FLT_BUILD
+
+#################################################################
+############## DONOT CHANGE ANYTHING BELOW THIS LINE ############
+#################################################################
+
+echo "Remove old output dir ...."
+rm -rf $DIR_OUTPUT/*
+
+echo "Changing permission of files ...."
+chmod -R +xw $DIR_BINUTILS_SOURCE
+chmod -R +xw $DIR_GCC_SOURCE
+chmod -R +xw $DIR_ELF2FLT_SOURCE
+
+
+###################### set up log file ###########################
+
+echo "Creating new log file ...."
+LOGFILE=$DIR_SOURCE/log.`date +%m%d%y`
+
+echo "Deleting old log file created on same day ...."
+rm -f $LOGFILE
+
+
+####################### build binutils ###########################
+
+echo "Building and installing binutils ...."
+cd $DIR_BINUTILS_BUILD
+
+echo "Cleaning binutils ...."
+make distclean 2>&1 | tee -a $LOGFILE
+
+echo "Configuring binutils ...."
+$DIR_BINUTILS_SOURCE/configure --target=bfin-elf --prefix=$DIR_OUTPUT --exec-prefix=$DIR_OUTPUT 2>&1 | tee -a $LOGFILE
+
+echo "Building binutils ...."
+make 2>&1 | tee -a $LOGFILE
+
+echo "Installing binutils ...."
+make install 2>&1 | tee -a $LOGFILE
+
+echo "Completed installing binutils in $DIR_OUTPUT ...."
+
+
+######################## build elf2flt ##########################
+
+cp $DIR_BINUTILS_SOURCE/bfd/bfin-reloctype.h $DIR_BINUTILS_BUILD/bfd/
+
+echo "Building and Installing elf2flt ...."
+cd $DIR_ELF2FLT_BUILD
+
+echo "Cleaning elf2flt ...."
+make distclean 2>&1 | tee -a $LOGFILE
+
+$DIR_ELF2FLT_SOURCE/configure --target=bfin-elf --with-libbfd=$DIR_BINUTILS_BUILD/bfd/libbfd.a --with-libiberty=$DIR_OUTPUT/lib/libiberty.a --with-bfd-include-dir=$DIR_BINUTILS_BUILD/bfd --with-binutils-include-dir=$DIR_BINUTILS_SOURCE/include --prefix=$DIR_OUTPUT --exec-prefix=$DIR_OUTPUT --program-suffix= 2>&1 | tee -a $LOGFILE
+
+echo "Building elf2flt ...."
+make 2>&1 | tee -a $LOGFILE
+
+echo "Installing elf2flt ...."
+make install 2>&1 | tee -a $LOGFILE
+
+echo "Completed installing elf2flt in $DIR_OUTPUT ...."
+
+
+############# set path to binutils build for bfin target #########
+
+cd $DIR_SOURCE
+
+echo "Setting Path to $DIR_OUTPUT ...."
+PATH=$DIR_OUTPUT/bin:$PATH
+
+
+########################## build gcc #############################
+
+echo "Building and installing gcc ...."
+cd $DIR_GCC_BUILD
+
+echo "Cleaning gcc ...."
+make distclean 2>&1 | tee -a $LOGFILE
+
+echo "Configuring gcc ...."
+$DIR_GCC_SOURCE/configure --target=bfin-elf --prefix=$DIR_OUTPUT --exec-prefix=$DIR_OUTPUT  --enable-languages=c 2>&1 | tee -a $LOGFILE
+
+echo "Building gcc ...."
+make 2>&1 | tee -a $LOGFILE
+
+echo "Installing gcc ...."
+make install 2>&1 | tee -a $LOGFILE
+
+echo "Completed installing gcc in $DIR_OUTPUT ...."
+
+################## build newlib in binutils #####################
+
+echo "Building newlib in binutils ...."
+cd $DIR_BINUTILS_BUILD
+PATH=$DIR_OUTPUT/bin:$PATH
+
+echo "Building newlib in binutils ...."
+make 2>&1 | tee -a $LOGFILE
+
+echo "Installing newlib in binutils ...."
+make install 2>&1 | tee -a $LOGFILE
+
+echo "Completed installing newlib of binutils in $DIR_OUTPUT ...."
+
+
+############# build elf2flt to include newlib###################
+
+echo "Building elf2flt to include newlib...."
+cd $DIR_ELF2FLT_BUILD
+
+echo "Installing elf2flt ...."
+make install 2>&1 | tee -a $LOGFILE
+
+echo "Completed installing toolchain in $DIR_OUTPUT ...."
+
+#################################################################
+
+
