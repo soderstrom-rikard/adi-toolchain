@@ -33,6 +33,7 @@
 #include "toplev.h"
 #include "recog.h"
 #include "ggc.h"
+#include "integrate.h"
 #include "bfin-protos.h"
 #include "gt-bfin.h"
 
@@ -161,10 +162,20 @@ n_pregs_to_save (void)
 
 /* Determine if we are going to save the frame pointer in the prologue.  */
 
-static int
+static bool
 must_save_fp_p (void)
 {
   return (frame_pointer_needed || regs_ever_live[REG_FP]);
+}
+
+static bool
+stack_frame_needed_p (void)
+{
+  /* EH return puts a new return address into the frame using an
+     address relative to the frame pointer.  */
+  if (current_function_calls_eh_return)
+    return true;
+  return frame_pointer_needed;
 }
 
 /* Emit code to save registers in the prologue.  SAVEALL is nonzero if we
@@ -193,6 +204,7 @@ expand_prologue_reg_save (rtx spreg, int saveall)
 					     gen_rtx_PLUS (Pmode, spreg,
 							   val));
   RTX_FRAME_RELATED_P (XVECEXP (pat, 0, 0)) = 1;
+  RTX_FRAME_RELATED_P (XVECEXP (pat, 0, total + 1)) = 1;
   for (i = 0; i < total; i++)
     {
       rtx memref = gen_rtx_MEM (word_mode,
@@ -361,6 +373,47 @@ bfin_frame_pointer_required (void)
   return 0;
 }
 
+/* Return the number of registers pushed during the prologue.  */
+
+static int
+n_regs_saved_by_prologue (void)
+{
+  e_funkind fkind = funkind (TREE_TYPE (current_function_decl));
+  int n = n_dregs_to_save () + n_pregs_to_save ();
+
+  if (stack_frame_needed_p ())
+    /* We use a LINK instruction in this case.  */
+    n += 2;
+  else
+    {
+      if (must_save_fp_p ())
+	n++;
+      if (! current_function_is_leaf)
+	n++;
+    }
+
+  if (fkind != SUBROUTINE)
+    {
+      tree attrs = TYPE_ATTRIBUTES (TREE_TYPE (current_function_decl));
+      tree all = lookup_attribute ("saveall", attrs);
+      int i;
+
+      /* Increment once for ASTAT.  */
+      n++;
+
+      /* RETE/X/N.  */
+      if (lookup_attribute ("nesting", attrs))
+	n++;
+
+      for (i = REG_P7 + 1; i < REG_CC; i++)
+	if (all 
+	    || regs_ever_live[i]
+	    || (!leaf_function_p () && call_used_regs[i]))
+	  n += i == REG_A0 || i == REG_A1 ? 2 : 1;
+    }
+  return n;
+}
+
 /* Return the offset between two registers, one to be eliminated, and the other
    its replacement, at the start of a routine.  */
 
@@ -370,7 +423,7 @@ bfin_initial_elimination_offset (int from, int to)
   HOST_WIDE_INT offset = 0;
 
   if (from == ARG_POINTER_REGNUM)
-    offset = to == STACK_POINTER_REGNUM && ! must_save_fp_p () ? 4 : 8;
+    offset = n_regs_saved_by_prologue () * 4;
 
   if (to == STACK_POINTER_REGNUM)
     {
@@ -380,8 +433,8 @@ bfin_initial_elimination_offset (int from, int to)
 	offset += FIXED_STACK_AREA;
 
       offset += get_frame_size ();
-      offset += (n_dregs_to_save () + n_pregs_to_save ()) * 4;
     }
+
   return offset;
 }
 
@@ -406,187 +459,6 @@ frame_related_constant_load (rtx reg, HOST_WIDE_INT constant)
       insn = emit_insn (gen_movsi_low (reg, reg, cst));
     }
   RTX_FRAME_RELATED_P (insn) = 1;
-}
-
-/* Generate a LINK insn for a frame sized FRAME_SIZE.  If this constant
-   is too large, generate a sequence of insns that has the same effect.
-   SPREG contains (reg:SI REG_SP).  */
-
-static void
-emit_link_insn (rtx spreg, HOST_WIDE_INT frame_size)
-{
-  HOST_WIDE_INT link_size = frame_size;
-  rtx insn;
-  int i;
-
-  if (link_size > 262140)
-    link_size = 262140;
-
-  /* Use a LINK insn with as big a constant as possible, then subtract
-     any remaining size from the SP.  */
-  insn = emit_insn (gen_link (GEN_INT (-8 - link_size)));
-  RTX_FRAME_RELATED_P (insn) = 1;
-
-  for (i = 0; i < XVECLEN (PATTERN (insn), 0); i++)
-    {
-      rtx set = XVECEXP (PATTERN (insn), 0, i);
-      if (GET_CODE (set) != SET)
-	abort ();
-      RTX_FRAME_RELATED_P (set) = 1;
-    }
-
-  frame_size -= link_size;
-
-  if (frame_size > 0)
-    {
-      /* Must use a call-clobbered PREG that isn't the static chain.  */
-      rtx tmpreg = gen_rtx_REG (Pmode, REG_P1);
-
-      frame_related_constant_load (tmpreg, -frame_size);
-      insn = emit_insn (gen_addsi3 (spreg, spreg, tmpreg));
-      RTX_FRAME_RELATED_P (insn) = 1;
-    }
-}
-
-/* Generate a prologue suitable for a function of kind FKIND.  This is
-   called for interrupt and exception handler prologues.
-   SPREG contains (reg:SI REG_SP).  */
-
-static void
-expand_interrupt_handler_prologue (rtx spreg, e_funkind fkind)
-{
-  int i;
-  HOST_WIDE_INT frame_size = get_frame_size ();
-  rtx predec1 = gen_rtx_PRE_DEC (SImode, spreg);
-  rtx predec = gen_rtx_MEM (SImode, predec1);
-  rtx insn;
-  tree attrs = TYPE_ATTRIBUTES (TREE_TYPE (current_function_decl));
-  tree all = lookup_attribute ("saveall", attrs);
-  tree kspisusp = lookup_attribute ("kspisusp", attrs);
-
-  if (kspisusp)
-    {
-      insn = emit_move_insn (spreg, gen_rtx_REG (Pmode, REG_USP));
-      RTX_FRAME_RELATED_P (insn) = 1;
-    }
-
-  /* We need space on the stack in case we need to save the argument
-     registers.  */
-  if (fkind == EXCPT_HANDLER)
-    {
-      insn = emit_insn (gen_addsi3 (spreg, spreg, GEN_INT (-12)));
-      RTX_FRAME_RELATED_P (insn) = 1;
-    }
-
-  emit_link_insn (spreg, frame_size);
-  insn = emit_move_insn (predec, gen_rtx_REG (SImode, REG_ASTAT));
-  RTX_FRAME_RELATED_P (insn) = 1;
-
-  if (lookup_attribute ("nesting", 
-			TYPE_ATTRIBUTES(TREE_TYPE(current_function_decl))))
-    {
-      rtx srcreg = gen_rtx_REG (Pmode, (fkind == EXCPT_HANDLER ? REG_RETX
-					: fkind == NMI_HANDLER ? REG_RETN
-					: REG_RETI));
-      insn = emit_move_insn (predec, srcreg);
-      RTX_FRAME_RELATED_P (insn) = 1;
-    }
-
-  expand_prologue_reg_save (spreg, all != NULL_TREE);
-
-  for (i = REG_P7 + 1; i < REG_CC; i++)
-    if (all 
-	|| regs_ever_live[i]
-	|| (!leaf_function_p () && call_used_regs[i]))
-      {
-	if (i == REG_A0 || i == REG_A1)
-	  insn = emit_move_insn (gen_rtx_MEM (PDImode, predec1),
-				 gen_rtx_REG (PDImode, i));
-	else
-	  insn = emit_move_insn (predec, gen_rtx_REG (SImode, i));
-	RTX_FRAME_RELATED_P (insn) = 1;
-      }
-
-  if (fkind == EXCPT_HANDLER)
-    {
-      rtx r0reg = gen_rtx_REG (SImode, REG_R0);
-      rtx r1reg = gen_rtx_REG (SImode, REG_R1);
-      rtx r2reg = gen_rtx_REG (SImode, REG_R2);
-      rtx insn;
-
-      insn = emit_move_insn (r0reg, gen_rtx_REG (SImode, REG_SEQSTAT));
-      REG_NOTES (insn) = gen_rtx_EXPR_LIST (REG_MAYBE_DEAD, const0_rtx,
-					    NULL_RTX);
-      insn = emit_insn (gen_ashrsi3 (r0reg, r0reg, GEN_INT (26)));
-      REG_NOTES (insn) = gen_rtx_EXPR_LIST (REG_MAYBE_DEAD, const0_rtx,
-					    NULL_RTX);
-      insn = emit_insn (gen_ashlsi3 (r0reg, r0reg, GEN_INT (26)));
-      REG_NOTES (insn) = gen_rtx_EXPR_LIST (REG_MAYBE_DEAD, const0_rtx,
-					    NULL_RTX);
-      insn = emit_move_insn (r1reg, spreg);
-      REG_NOTES (insn) = gen_rtx_EXPR_LIST (REG_MAYBE_DEAD, const0_rtx,
-					    NULL_RTX);
-      insn = emit_move_insn (r2reg, gen_rtx_REG (Pmode, REG_FP));
-      REG_NOTES (insn) = gen_rtx_EXPR_LIST (REG_MAYBE_DEAD, const0_rtx,
-					    NULL_RTX);
-      insn = emit_insn (gen_addsi3 (r2reg, r2reg, GEN_INT (8)));
-      REG_NOTES (insn) = gen_rtx_EXPR_LIST (REG_MAYBE_DEAD, const0_rtx,
-					    NULL_RTX);
-    }
-}
-
-/* Generate an epilogue suitable for a function of kind FKIND.  This is
-   called for interrupt and exception handler epilogues.
-   SPREG contains (reg:SI REG_SP).  */
-
-static void
-expand_interrupt_handler_epilogue (rtx spreg, e_funkind fkind) 
-{
-  int i;
-  rtx postinc1 = gen_rtx_POST_INC (SImode, spreg);
-  rtx postinc = gen_rtx_MEM (SImode, postinc1);
-  tree attrs = TYPE_ATTRIBUTES (TREE_TYPE (current_function_decl));
-  tree all = lookup_attribute ("saveall", attrs);
-
-  /* A slightly crude technique to stop flow from trying to delete "dead"
-     insns.  */
-  MEM_VOLATILE_P (postinc) = 1;
-
-  for (i = REG_CC - 1; i > REG_P7; i--)
-    if (all
-	|| regs_ever_live[i] 
-	|| (!leaf_function_p () && call_used_regs[i]))
-      {
-	if (i == REG_A0 || i == REG_A1)
-	  {
-	    rtx mem = gen_rtx_MEM (PDImode, postinc1);
-	    MEM_VOLATILE_P (mem) = 1;
-	    emit_move_insn (gen_rtx_REG (PDImode, i), mem);
-	  }
-	else
-	  emit_move_insn (gen_rtx_REG (SImode, i), postinc);
-      }
-
-  expand_epilogue_reg_restore (spreg, all != NULL_TREE);
-
-  if (lookup_attribute ("nesting",
-			TYPE_ATTRIBUTES(TREE_TYPE(current_function_decl))))
-    {
-      rtx srcreg = gen_rtx_REG (Pmode, (fkind == EXCPT_HANDLER ? REG_RETX
-					: fkind == NMI_HANDLER ? REG_RETN
-					: REG_RETI));
-      emit_move_insn (srcreg, postinc);
-    }
-
-  emit_move_insn (gen_rtx_REG (SImode, REG_ASTAT), postinc);
-  emit_insn (gen_unlink ());
-
-  /* Deallocate any space we left on the stack in case we needed to save the
-     argument registers.  */
-  if (fkind == EXCPT_HANDLER)
-    emit_insn (gen_addsi3 (spreg, spreg, GEN_INT (12)));
-
-  emit_jump_insn (gen_return_internal (GEN_INT (fkind)));
 }
 
 /* Generate efficient code to add a value to the frame pointer.  We
@@ -641,13 +513,269 @@ add_to_sp (rtx spreg, HOST_WIDE_INT value, int frame)
     while (value != 0);
 }
 
+/* Generate a LINK insn for a frame sized FRAME_SIZE.  If this constant
+   is too large, generate a sequence of insns that has the same effect.
+   SPREG contains (reg:SI REG_SP).  */
+
+static void
+emit_link_insn (rtx spreg, HOST_WIDE_INT frame_size)
+{
+  HOST_WIDE_INT link_size = frame_size;
+  rtx insn;
+  int i;
+
+  if (link_size > 262140)
+    link_size = 262140;
+
+  /* Use a LINK insn with as big a constant as possible, then subtract
+     any remaining size from the SP.  */
+  insn = emit_insn (gen_link (GEN_INT (-8 - link_size)));
+  RTX_FRAME_RELATED_P (insn) = 1;
+
+  for (i = 0; i < XVECLEN (PATTERN (insn), 0); i++)
+    {
+      rtx set = XVECEXP (PATTERN (insn), 0, i);
+      if (GET_CODE (set) != SET)
+	abort ();
+      RTX_FRAME_RELATED_P (set) = 1;
+    }
+
+  frame_size -= link_size;
+
+  if (frame_size > 0)
+    {
+      /* Must use a call-clobbered PREG that isn't the static chain.  */
+      rtx tmpreg = gen_rtx_REG (Pmode, REG_P1);
+
+      frame_related_constant_load (tmpreg, -frame_size);
+      insn = emit_insn (gen_addsi3 (spreg, spreg, tmpreg));
+      RTX_FRAME_RELATED_P (insn) = 1;
+    }
+}
+
+/* Return the number of bytes we must reserve for outgoing arguments
+   in the current function's stack frame.  */
+
+static HOST_WIDE_INT
+arg_area_size (void)
+{
+  if (current_function_outgoing_args_size)
+    {
+      if (current_function_outgoing_args_size >= FIXED_STACK_AREA)
+	return current_function_outgoing_args_size;
+      else
+	return FIXED_STACK_AREA;
+    }
+  return 0;
+}
+
+/* Save RETS and FP, and allocate a stack frame.  */
+
+static void
+do_link (rtx spreg, HOST_WIDE_INT frame_size)
+{
+  frame_size += arg_area_size ();
+
+  if (stack_frame_needed_p ()
+      || (must_save_fp_p () && ! current_function_is_leaf))
+    emit_link_insn (spreg, frame_size);
+  else
+    {
+      if (! current_function_is_leaf)
+	{
+	  rtx pat = gen_movsi (gen_rtx_MEM (Pmode,
+					    gen_rtx_PRE_DEC (Pmode, spreg)),
+			       bfin_rets_rtx);
+	  rtx insn = emit_insn (pat);
+	  RTX_FRAME_RELATED_P (insn) = 1;
+	}
+      if (must_save_fp_p ())
+	{
+	  rtx pat = gen_movsi (gen_rtx_MEM (Pmode,
+					    gen_rtx_PRE_DEC (Pmode, spreg)),
+			       gen_rtx_REG (Pmode, REG_FP));
+	  rtx insn = emit_insn (pat);
+	  RTX_FRAME_RELATED_P (insn) = 1;
+	}
+      add_to_sp (spreg, -frame_size, 1);
+    }
+}
+
+/* Like do_link, but used for epilogues to deallocate the stack frame.  */
+
+static void
+do_unlink (rtx spreg, HOST_WIDE_INT frame_size)
+{
+  frame_size += arg_area_size ();
+
+  if (stack_frame_needed_p ())
+    emit_insn (gen_unlink ());
+  else 
+    {
+      rtx postinc = gen_rtx_MEM (Pmode, gen_rtx_POST_INC (Pmode, spreg));
+
+      add_to_sp (spreg, frame_size, 0);
+      if (must_save_fp_p ())
+	{
+	  rtx fpreg = gen_rtx_REG (Pmode, REG_FP);
+	  emit_move_insn (fpreg, postinc);
+	  emit_insn (gen_rtx_USE (VOIDmode, fpreg));
+	}
+      if (! current_function_is_leaf)
+	{
+	  emit_move_insn (bfin_rets_rtx, postinc);
+	  emit_insn (gen_rtx_USE (VOIDmode, bfin_rets_rtx));
+	}
+    }
+}
+
+/* Generate a prologue suitable for a function of kind FKIND.  This is
+   called for interrupt and exception handler prologues.
+   SPREG contains (reg:SI REG_SP).  */
+
+static void
+expand_interrupt_handler_prologue (rtx spreg, e_funkind fkind)
+{
+  int i;
+  HOST_WIDE_INT frame_size = get_frame_size ();
+  rtx predec1 = gen_rtx_PRE_DEC (SImode, spreg);
+  rtx predec = gen_rtx_MEM (SImode, predec1);
+  rtx insn;
+  tree attrs = TYPE_ATTRIBUTES (TREE_TYPE (current_function_decl));
+  tree all = lookup_attribute ("saveall", attrs);
+  tree kspisusp = lookup_attribute ("kspisusp", attrs);
+
+  if (kspisusp)
+    {
+      insn = emit_move_insn (spreg, gen_rtx_REG (Pmode, REG_USP));
+      RTX_FRAME_RELATED_P (insn) = 1;
+    }
+
+  /* We need space on the stack in case we need to save the argument
+     registers.  */
+  if (fkind == EXCPT_HANDLER)
+    {
+      insn = emit_insn (gen_addsi3 (spreg, spreg, GEN_INT (-12)));
+      RTX_FRAME_RELATED_P (insn) = 1;
+    }
+
+  insn = emit_move_insn (predec, gen_rtx_REG (SImode, REG_ASTAT));
+  RTX_FRAME_RELATED_P (insn) = 1;
+
+  expand_prologue_reg_save (spreg, all != NULL_TREE);
+
+  for (i = REG_P7 + 1; i < REG_CC; i++)
+    if (all 
+	|| regs_ever_live[i]
+	|| (!leaf_function_p () && call_used_regs[i]))
+      {
+	if (i == REG_A0 || i == REG_A1)
+	  insn = emit_move_insn (gen_rtx_MEM (PDImode, predec1),
+				 gen_rtx_REG (PDImode, i));
+	else
+	  insn = emit_move_insn (predec, gen_rtx_REG (SImode, i));
+	RTX_FRAME_RELATED_P (insn) = 1;
+      }
+
+  if (lookup_attribute ("nesting", attrs))
+    {
+      rtx srcreg = gen_rtx_REG (Pmode, (fkind == EXCPT_HANDLER ? REG_RETX
+					: fkind == NMI_HANDLER ? REG_RETN
+					: REG_RETI));
+      insn = emit_move_insn (predec, srcreg);
+      RTX_FRAME_RELATED_P (insn) = 1;
+    }
+
+  do_link (spreg, frame_size);
+
+  if (fkind == EXCPT_HANDLER)
+    {
+      rtx r0reg = gen_rtx_REG (SImode, REG_R0);
+      rtx r1reg = gen_rtx_REG (SImode, REG_R1);
+      rtx r2reg = gen_rtx_REG (SImode, REG_R2);
+      rtx insn;
+
+      insn = emit_move_insn (r0reg, gen_rtx_REG (SImode, REG_SEQSTAT));
+      REG_NOTES (insn) = gen_rtx_EXPR_LIST (REG_MAYBE_DEAD, const0_rtx,
+					    NULL_RTX);
+      insn = emit_insn (gen_ashrsi3 (r0reg, r0reg, GEN_INT (26)));
+      REG_NOTES (insn) = gen_rtx_EXPR_LIST (REG_MAYBE_DEAD, const0_rtx,
+					    NULL_RTX);
+      insn = emit_insn (gen_ashlsi3 (r0reg, r0reg, GEN_INT (26)));
+      REG_NOTES (insn) = gen_rtx_EXPR_LIST (REG_MAYBE_DEAD, const0_rtx,
+					    NULL_RTX);
+      insn = emit_move_insn (r1reg, spreg);
+      REG_NOTES (insn) = gen_rtx_EXPR_LIST (REG_MAYBE_DEAD, const0_rtx,
+					    NULL_RTX);
+      insn = emit_move_insn (r2reg, gen_rtx_REG (Pmode, REG_FP));
+      REG_NOTES (insn) = gen_rtx_EXPR_LIST (REG_MAYBE_DEAD, const0_rtx,
+					    NULL_RTX);
+      insn = emit_insn (gen_addsi3 (r2reg, r2reg, GEN_INT (8)));
+      REG_NOTES (insn) = gen_rtx_EXPR_LIST (REG_MAYBE_DEAD, const0_rtx,
+					    NULL_RTX);
+    }
+}
+
+/* Generate an epilogue suitable for a function of kind FKIND.  This is
+   called for interrupt and exception handler epilogues.
+   SPREG contains (reg:SI REG_SP).  */
+
+static void
+expand_interrupt_handler_epilogue (rtx spreg, e_funkind fkind) 
+{
+  int i;
+  rtx postinc1 = gen_rtx_POST_INC (SImode, spreg);
+  rtx postinc = gen_rtx_MEM (SImode, postinc1);
+  tree attrs = TYPE_ATTRIBUTES (TREE_TYPE (current_function_decl));
+  tree all = lookup_attribute ("saveall", attrs);
+
+  /* A slightly crude technique to stop flow from trying to delete "dead"
+     insns.  */
+  MEM_VOLATILE_P (postinc) = 1;
+
+  do_unlink (spreg, get_frame_size ());
+
+  if (lookup_attribute ("nesting", attrs))
+    {
+      rtx srcreg = gen_rtx_REG (Pmode, (fkind == EXCPT_HANDLER ? REG_RETX
+					: fkind == NMI_HANDLER ? REG_RETN
+					: REG_RETI));
+      emit_move_insn (srcreg, postinc);
+    }
+
+  for (i = REG_CC - 1; i > REG_P7; i--)
+    if (all
+	|| regs_ever_live[i] 
+	|| (!leaf_function_p () && call_used_regs[i]))
+      {
+	if (i == REG_A0 || i == REG_A1)
+	  {
+	    rtx mem = gen_rtx_MEM (PDImode, postinc1);
+	    MEM_VOLATILE_P (mem) = 1;
+	    emit_move_insn (gen_rtx_REG (PDImode, i), mem);
+	  }
+	else
+	  emit_move_insn (gen_rtx_REG (SImode, i), postinc);
+      }
+
+  expand_epilogue_reg_restore (spreg, all != NULL_TREE);
+
+  emit_move_insn (gen_rtx_REG (SImode, REG_ASTAT), postinc);
+
+  /* Deallocate any space we left on the stack in case we needed to save the
+     argument registers.  */
+  if (fkind == EXCPT_HANDLER)
+    emit_insn (gen_addsi3 (spreg, spreg, GEN_INT (12)));
+
+  emit_jump_insn (gen_return_internal (GEN_INT (fkind)));
+}
+
 /* Generate RTL for the prologue of the current function.  */
 
 void
 bfin_expand_prologue (void)
 {
   rtx insn;
-  HOST_WIDE_INT arg_size;
   HOST_WIDE_INT frame_size = get_frame_size ();
   rtx spreg = gen_rtx_REG (Pmode, REG_SP);
   e_funkind fkind = funkind (TREE_TYPE (current_function_decl));
@@ -658,34 +786,15 @@ bfin_expand_prologue (void)
       return;
     }
 
-  if (! must_save_fp_p ())
-    {
-      rtx pat = gen_movsi (gen_rtx_MEM (Pmode,
-					gen_rtx_PRE_DEC (Pmode, spreg)),
-			   bfin_rets_rtx);
-      insn = emit_insn (pat);
-      RTX_FRAME_RELATED_P (insn) = 1;
-      add_to_sp (spreg, -frame_size, 1);
-    }
-  else
-    emit_link_insn (spreg, frame_size);
+  expand_prologue_reg_save (spreg, 0);
+
+  do_link (spreg, frame_size);
 
 #if 0
   if (TARGET_NON_GNU_PROFILE)
     fprintf (file, "\tcall mcount_entry;\n");
 #endif
 
-  expand_prologue_reg_save (spreg, 0);
-
-  if (current_function_outgoing_args_size)
-    {
-      if (current_function_outgoing_args_size >= FIXED_STACK_AREA)
-	arg_size = current_function_outgoing_args_size;
-      else
-	arg_size = FIXED_STACK_AREA;
-
-      add_to_sp (spreg, -arg_size, 1);
-    }
   if (TARGET_ID_SHARED_LIBRARY)
     {
       rtx addr;
@@ -718,39 +827,14 @@ bfin_expand_epilogue (int need_return, int eh_return)
       return;
     }
 
-  if (current_function_outgoing_args_size)
-    {
-      HOST_WIDE_INT arg_size;
-      if (current_function_outgoing_args_size >= FIXED_STACK_AREA)
-	arg_size = current_function_outgoing_args_size;
-      else
-	arg_size = FIXED_STACK_AREA;
-
-      add_to_sp (spreg, arg_size, 0);
-    }
-
-  expand_epilogue_reg_restore (spreg, 0);
 #if 0
   if (TARGET_NON_GNU_PROFILE)
     fprintf (file, "\tcall mcount_exit;\n");
 #endif
 
-  if (! frame_pointer_needed)
-    {
-      rtx postinc = gen_rtx_MEM (Pmode, gen_rtx_POST_INC (Pmode, spreg));
-      HOST_WIDE_INT frame_size = get_frame_size ();
-      add_to_sp (spreg, frame_size, 0);
-      if (must_save_fp_p ())
-	{
-	  rtx fpreg = gen_rtx_REG (Pmode, REG_FP);
-	  emit_move_insn (fpreg, postinc);
-	  emit_insn (gen_rtx_USE (VOIDmode, fpreg));
-	}
-      emit_move_insn (bfin_rets_rtx, postinc);
-      emit_insn (gen_rtx_USE (VOIDmode, bfin_rets_rtx));
-    }
-  else
-    emit_insn (gen_unlink ());
+  do_unlink (spreg, get_frame_size ());
+
+  expand_epilogue_reg_restore (spreg, 0);
 
   /* Omit the return insn if this is for a sibcall.  */
   if (! need_return)

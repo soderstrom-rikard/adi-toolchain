@@ -1,3 +1,20 @@
+2005-02-02  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c: Include "integrate.h".
+	(must_save_fp_p): Return bool.
+	(stack_frame_needed_p, n_regs_saved_by_prologue, arg_area_size,
+	do_link, do_unlink): New functions.
+	(bfin_initial_elimination_offset): Use n_regs_saved_by_prologue.
+	Register saves are done before frame setup.
+	(expand_interrupt_handler_prologue, expand_prologue): Register
+	saves are done before frame setup.  Use do_link.
+	(expand_interrupt_handler_epilogue, expand_epilogue): Register
+	saves are done before frame setup.  Use do_unlink.
+	(expand_prologue_reg_save): Set RTX_FRAME_RELATED_P on stack
+	decrement part of the parallel.
+	* config/bfin/bfin.h (EH_RETURN_HANDLER_RTX): Use frame-pointer
+	relative address.
+
 2005-02-01  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (movsi_insn): All registers (including
