@@ -13,6 +13,24 @@
 	preceding it into this one and use valid_reg_operand.
 	(iorsi3, xorsi3): Use valid_reg_operand.
 
+	* config/bfin/bfin-protos.h (bfin_cbranch_operator): Declare.
+	* config/bfin/bfin.c (hard_regno_mode_ok): CC can't hold SImode.
+	(ccbranch_templates): Update to match new version of the pattern.
+	(bfin_cbranch_operator): New function.
+	(bfin_gen_compare): Omit emitting compare insn if we have BImode
+	comparison involving CC.
+	* config/bfin/bfin.md (define_attr "length"): Update to match changed
+	brcc insn.
+	(movsi_insn, movhi_insn, movqi_insn, movsf_insn): Remove alternatives
+	involving CC.
+	(cmpbi): New expander.
+	(beq, bne):  Omit emitting compare insn if we have BImode
+	comparison involving CC.
+	(cbranchbi4): New pattern, unified from the four cbranch patterns.
+	(seq, slt, sle, sltu, sleu): Describe without using SUBREGs.
+	(movsibi, movbisi): Named these patterns; simplify description
+	(not CC pattern): Describe as a compare against zero.
+
 2004-10-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (negdi2): Clobbers CC.

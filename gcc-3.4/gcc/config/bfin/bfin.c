@@ -1603,7 +1603,7 @@ hard_regno_mode_ok (int regno, enum machine_mode mode)
   int ret;
 
   if (class == CCREGS)
-    return mode == CCmode || mode == SImode || mode == BImode;
+    return mode == CCmode || mode == BImode;
 
   if (mode == DImode)
     return TEST_HARD_REG_BIT (reg_class_contents[MOST_REGS], regno);
@@ -1770,10 +1770,10 @@ override_options (void)
 
 
 const char *ccbranch_templates[][3] = {
-  { "if !cc jump %1;",  "if cc jump 4; jump.s %1;",  "if cc jump 6; jump.l %1;" },
-  { "if cc jump %1;",   "if !cc jump 4; jump.s %1;", "if !cc jump 6; jump.l %1;" },
-  { "if !cc jump %1 (bp);",  "if cc jump 4; jump.s %1;",  "if cc jump 6; jump.l %1;" },
-  { "if cc jump %1 (bp);",  "if !cc jump 4; jump.s %1;",  "if !cc jump 6; jump.l %1;" },
+  { "if !cc jump %3;",  "if cc jump 4; jump.s %3;",  "if cc jump 6; jump.l %3;" },
+  { "if cc jump %3;",   "if !cc jump 4; jump.s %3;", "if !cc jump 6; jump.l %3;" },
+  { "if !cc jump %3 (bp);",  "if cc jump 4; jump.s %3;",  "if cc jump 6; jump.l %3;" },
+  { "if cc jump %3 (bp);",  "if !cc jump 4; jump.s %3;",  "if !cc jump 6; jump.l %3;" },
 };
 
 char *asm_conditional_branch (rtx insn, int cond)
@@ -1784,6 +1784,12 @@ char *asm_conditional_branch (rtx insn, int cond)
   return (char *) ccbranch_templates[idx][len];
 }
 
+int
+bfin_cbranch_operator (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
+{
+  return GET_CODE (op) == EQ || GET_CODE (op) == NE;
+}
+
 rtx
 bfin_gen_compare (rtx cmp, enum machine_mode mode ATTRIBUTE_UNUSED)
 {
@@ -1792,21 +1798,35 @@ bfin_gen_compare (rtx cmp, enum machine_mode mode ATTRIBUTE_UNUSED)
   rtx tem = bfin_cc_rtx;
   enum rtx_code code = GET_CODE (cmp);
 
-  switch (code) {
-    /* bfin has these conditions */
-    case EQ:
-    case LT:
-    case LE:
-    case LEU:
-    case LTU:
-      code1 = code;
-      code2 = NE;
-      break;
-    default:
-      code1 = reverse_condition (code);
-      code2 = EQ;
-  }
-  emit_insn (gen_rtx_SET (BImode, tem, gen_rtx_fmt_ee (code1, BImode, op0, op1)));
+  /* If we have a BImode input, then we already have a compare result, and
+     do not need to emit another comparison.  */
+  if (GET_MODE (op0) == BImode)
+    {
+      if ((code == NE || code == EQ) && op1 == const0_rtx)
+	tem = op0, code2 = code;
+      else
+	abort ();
+    }
+  else
+    {
+      switch (code) {
+	/* bfin has these conditions */
+      case EQ:
+      case LT:
+      case LE:
+      case LEU:
+      case LTU:
+	code1 = code;
+	code2 = NE;
+	break;
+      default:
+	code1 = reverse_condition (code);
+	code2 = EQ;
+	break;
+      }
+      emit_insn (gen_rtx_SET (BImode, tem,
+			      gen_rtx_fmt_ee (code1, BImode, op0, op1)));
+    }
 
   return gen_rtx_fmt_ee (code2, BImode, tem, CONST0_RTX (BImode));
 }

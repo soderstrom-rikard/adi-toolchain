@@ -100,6 +100,7 @@ extern int rhs_andsi3_operand PARAMS ((rtx, Mmode));
 extern int positive_immediate_operand PARAMS ((rtx, Mmode));
 extern int reg_or_0_operand PARAMS ((rtx, Mmode));
 extern int signed_comparison_operator PARAMS ((rtx, Mmode));
+extern int bfin_cbranch_operator PARAMS ((rtx, Mmode));
 
 extern int bfin_return_in_memory PARAMS ((tree));
 extern void bfin_internal_label PARAMS ((FILE *, const char *, unsigned long));
