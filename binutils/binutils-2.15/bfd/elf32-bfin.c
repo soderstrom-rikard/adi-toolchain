@@ -1631,12 +1631,6 @@ elf_bfin_relocate_section (bfd * output_bfd,
 		{
 		  continue;
 		}
-	      else
-		{
-		  fprintf (stderr,
-			   "%s howto did not return ok h is %s r_type is %d\n",
-			   input_bfd->filename, symbol.name, r_type);
-		}
 	    }
 	  else
 	    {
