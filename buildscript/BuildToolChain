@@ -1,5 +1,5 @@
 #!/bin/sh
-#Build Script - Rohit Makasana ( RRAP Software )
+#Build Script - Rohit Makasana ( rohit.makasana@rrap-software.com )
 #             - Modified by Bernd Schmidt (   )
 #             - Modified by Robin Getz (rgetz@blackfin.uclinux.org)
 #
@@ -117,9 +117,13 @@ done
 
 if [ ! $DIR_SOURCE ]
 then
-		   echo "Usage : $APP_NAME -s SOURCE [-b BUILD]
--s SOURCE 	 Source directory mandatory
--b BUILD  	 Default build directory will be current dir
+                   echo "Usage : $APP_NAME -s SOURCE [-b BUILD]
+-p               Check prerequisites
+-d               Date Stamp all output files
+-t               Test components
+-s SOURCE        Source directory mandatory
+-b BUILD         Default build directory will be current dir
+-v               Verbose
 -h               Help"
 exit
 fi 
