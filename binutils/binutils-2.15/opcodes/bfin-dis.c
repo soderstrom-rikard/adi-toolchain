@@ -25,7 +25,10 @@ typedef long TIword;
 #define SIGNEXTEND(v, n) ((v << (HOST_LONG_WORD_SIZE - (n))) >> (HOST_LONG_WORD_SIZE - (n)))
 #define MASKBITS(val, bits) (val & (( 1 << bits)-1))
 
+#if 0 /* commented out as it not currently using */
 static int xfield (TIword w, int p, int s) { return XFIELD(w,p,s); }
+#endif
+
 #include "dis-asm.h"
 typedef enum {
   c_0,     c_1,     c_4,     c_2,     c_uimm2, c_uimm3, c_imm3,  c_pcrel4, 
@@ -83,6 +86,9 @@ static struct {
   { "pcrel24", 24, 1, 1, 1, 1, 0, 0, 0 },
 };
 
+int _print_insn_bfin (bfd_vma pc, disassemble_info *outf);
+int  print_insn_bfin (bfd_vma pc, disassemble_info *outf);
+
 static char *fmtconst(const_forms_t cf, TIword x, bfd_vma pc, disassemble_info *outf)
 {
     static char buf[60];
@@ -114,10 +120,10 @@ static char *fmtconst(const_forms_t cf, TIword x, bfd_vma pc, disassemble_info *
     if (constant_formats[cf].scale)
 	x <<= constant_formats[cf].scale;
 
-        if (constant_formats[cf].issigned)
-	sprintf (buf, "%d", x);
+        if (constant_formats[cf].issigned && x < 0)
+	sprintf (buf, "%ld", x);
     else
-	sprintf (buf, "0x%x", x);
+	sprintf (buf, "0x%lx", x);
 
     return buf;
 }
@@ -129,6 +135,7 @@ static char *fmtconst(const_forms_t cf, TIword x, bfd_vma pc, disassemble_info *
 #define SIGNEXTEND(v, n) (((long)(v) << (HOST_LONG_WORD_SIZE - (n))) >> (HOST_LONG_WORD_SIZE - (n)))
 #define MASKBITS(val, bits) (val & (( 1 << bits)-1))
 
+#if 0 /* commented it currently as not used currently */
 static int const_fits(long v, const_forms_t form) {
     int sz       = constant_formats[form].nbits;
     int scale    = constant_formats[form].scale;
@@ -197,6 +204,8 @@ static int const_fits(long v, const_forms_t form) {
     }
     return 1;
 }
+#endif
+
 enum machine_registers {
   REG_RL0,   REG_RL1,   REG_RL2,   REG_RL3,   REG_RL4,   REG_RL5,   REG_RL6,   REG_RL7,
   REG_RH0,   REG_RH1,   REG_RH2,   REG_RH3,   REG_RH4,   REG_RH5,   REG_RH6,   REG_RH7,
@@ -243,7 +252,7 @@ static char *reg_names[] = {
   "sftreset", "omode",   "excause", "emucause", "idle_req", "hwerrcause", "CC",      "LC0",
   "LC1",     "GP",      "ASTAT",   "RETS",    "LT0",     "LB0",     "LT1",     "LB1",
   "CYCLES",  "CYCLES2", "USP",     "SEQSTAT", "SYSCFG",  "RETI",    "RETX",    "RETN",
-  "RETE", 
+  "RETE",
   "R0.B",   "R1.B",   "R2.B",   "R3.B",   "R4.B",   "R5.B",   "R6.B",  "R7.B",
   "P0.L",   "P1.L",   "P2.L",   "P3.L",   "P4.L",   "P5.L",   "SP.L",  "FP.L",
   "P0.H",   "P1.H",   "P2.H",   "P3.H",   "P4.H",   "P5.H",   "SP.H",  "FP.H",
@@ -285,10 +294,13 @@ static enum machine_registers decode_dregs_byte[] = {
 
 #define dregs_byte(x) REGNAME(decode_dregs_byte[x&7])
 
+#if 0 /* commented it currently as not used currently */
+
 /* R1:0 - R3:2 - R5:4 - R7:6 -  */
 static enum machine_registers decode_dregs_pair[] = {
   REG_R1_0,    REG_LASTREG, REG_R3_2,    REG_LASTREG, REG_R5_4,    REG_LASTREG, REG_R7_6,    REG_LASTREG,
   };
+#endif
 
 #define dregs_pair(x) REGNAME(decode_dregs_pair[x&7])
 
@@ -299,39 +311,50 @@ static enum machine_registers decode_pregs[] = {
 
 #define pregs(x) REGNAME(decode_pregs[x&7])
 
+
+#if 0 /* commented it currently as not used currently */
 /* SP FP  */
 static enum machine_registers decode_spfp[] = {
   REG_SP,      REG_FP,
   };
+#endif
 
 #define spfp(x) REGNAME(decode_spfp[x&1])
 
+#if 0 /* commented it currently as not used currently */
 /* [dregs_lo dregs_hi]  */
 static enum machine_registers decode_dregs_hilo[] = {
   REG_RL0,     REG_RL1,     REG_RL2,     REG_RL3,     REG_RL4,     REG_RL5,     REG_RL6,     REG_RL7,
   REG_RH0,     REG_RH1,     REG_RH2,     REG_RH3,     REG_RH4,     REG_RH5,     REG_RH6,     REG_RH7,
   };
+#endif
 
 #define dregs_hilo(x,i) REGNAME(decode_dregs_hilo[((i)<<3)|x])
 
+#if 0 /* commented it currently as not used currently */
 /* A0x A1x  */
 static enum machine_registers decode_accum_ext[] = {
   REG_A0x,     REG_A1x,
   };
+#endif
 
 #define accum_ext(x) REGNAME(decode_accum_ext[x&1])
 
+#if 0 /* commented it currently as not used currently */
 /* A0w A1w  */
 static enum machine_registers decode_accum_word[] = {
   REG_A0w,     REG_A1w,
   };
+#endif
 
 #define accum_word(x) REGNAME(decode_accum_word[x&1])
 
+#if 0 /* commented it currently as not used currently */
 /* A0 A1  */
 static enum machine_registers decode_accum[] = {
   REG_A0,      REG_A1,
   };
+#endif
 
 #define accum(x) REGNAME(decode_accum[x&1])
 
@@ -349,17 +372,21 @@ static enum machine_registers decode_mregs[] = {
 
 #define mregs(x) REGNAME(decode_mregs[x&3])
 
+#if 0 /* commented it currently as not used currently */
 /* B(0..3)  */
 static enum machine_registers decode_bregs[] = {
   REG_B0,      REG_B1,      REG_B2,      REG_B3,
   };
+#endif
 
 #define bregs(x) REGNAME(decode_bregs[x&3])
 
+#if 0 /* commented it currently as not used currently */
 /* L(0..3)  */
 static enum machine_registers decode_lregs[] = {
   REG_L0,      REG_L1,      REG_L2,      REG_L3,
   };
+#endif
 
 #define lregs(x) REGNAME(decode_lregs[x&3])
 
@@ -415,17 +442,21 @@ static enum machine_registers decode_statbits[] = {
 
 #define statbits(x) REGNAME(decode_statbits[x&31])
 
+#if 0 /* commented it currently as not used currently */
 /* sftreset omode excause emucause idle_req hwerrcause */
 static enum machine_registers decode_ignore_bits[] = {
   REG_sftreset, REG_omode,   REG_excause, REG_emucause, REG_idle_req, REG_hwerrcause, 
   };
+#endif
 
 #define ignore_bits(x) REGNAME(decode_ignore_bits[x&7])
 
+#if 0 /* commented it currently as not used currently */
 /* CC  */
 static enum machine_registers decode_ccstat[] = {
   REG_CC,      
   };
+#endif
 
 #define ccstat(x) REGNAME(decode_ccstat[x&0])
 
@@ -436,6 +467,7 @@ static enum machine_registers decode_counters[] = {
 
 #define counters(x) REGNAME(decode_counters[x&1])
 
+#if 0 /* commented it currently as not used currently */
 /* A0x A0w A1x A1w GP - ASTAT RETS  */
 static enum machine_registers decode_dregs2_sysregs1[] = {
   REG_A0x,     REG_A0w,     REG_A1x,     REG_A1w,     REG_GP,      REG_LASTREG, REG_ASTAT,   REG_RETS,    
@@ -463,6 +495,7 @@ static enum machine_registers decode_sysregs3[] = {
   };
 
 #define sysregs3(x) REGNAME(decode_sysregs3[x&7])
+#endif
 
 /* [dregs pregs (iregs mregs) (bregs lregs) 	         dregs2_sysregs1 open sysregs2 sysregs3] */
 static enum machine_registers decode_allregs[] = {
@@ -508,6 +541,7 @@ static enum machine_registers decode_allregs[] = {
 #define pcrel24(x) fmtconst(c_pcrel24, x , pc, outf)
 #define uimm16(x) fmtconst(c_uimm16, x , pc, outf)
 
+#if 0 /* commented it out as its not used currently */
 static char *econd1 (int cc) {
   switch(cc) {
 	default: PRINTF ("#invalid condition code"); EXIT (-1);
@@ -519,6 +553,8 @@ static char *term (int cc) {
 	default: PRINTF ("#invalid termination code"); EXIT (-1);
   }
 }
+#endif
+
 /* (arch.pm)arch_disassembler_functions */
 #define notethat(x)
 
@@ -528,18 +564,24 @@ static char *term (int cc) {
 
 static void amod0 (int s0,int x0, bfd_vma pc,  disassemble_info *outf);
 static void amod1 (int s0,int x0, bfd_vma pc,  disassemble_info *outf);
+#if 0 /* commented it currently as not used currently */
 static void amod2 (int r0, bfd_vma pc,  disassemble_info *outf);
+#endif
 static void macmod_accm (int mod, bfd_vma pc,  disassemble_info *outf);
 static void searchmod (int r0, bfd_vma pc,  disassemble_info *outf);
+#if 0 /* commented it currently as not used currently */
 static void macmod_pmove (int mod, bfd_vma pc,  disassemble_info *outf);
+#endif
 static void mxd_mod (int mod, bfd_vma pc,  disassemble_info *outf);
 static void aligndir (int r0, bfd_vma pc,  disassemble_info *outf);
 static void A0macfunc (TIword iw0, TIword iw1, int op,int h0,int h1, bfd_vma pc,  disassemble_info *outf);
 static void multfunc (TIword iw0, TIword iw1, int op,int h0,int h1, bfd_vma pc,  disassemble_info *outf);
 static void A1macfunc (TIword iw0, TIword iw1, int op,int h0,int h1, bfd_vma pc,  disassemble_info *outf);
+#if 0 /* commented it currently as not used currently */
 static void macmod_hmove (int mod, bfd_vma pc,  disassemble_info *outf);
+#endif
 
-static void amod0 (int s0,int x0, bfd_vma pc,  disassemble_info *outf)
+static void amod0 (int s0,int x0, bfd_vma pc ATTRIBUTE_UNUSED,  disassemble_info *outf)
 {
   if ((s0==0)
       && (x0==0)) {
@@ -566,7 +608,7 @@ illegal_instruction:
   return;
 }
 
-static void amod1 (int s0,int x0, bfd_vma pc,  disassemble_info *outf)
+static void amod1 (int s0,int x0, bfd_vma pc ATTRIBUTE_UNUSED,  disassemble_info *outf)
 {
 
 
@@ -586,6 +628,7 @@ illegal_instruction:
   return;
 }
 
+#if 0 /* commented it out as it is not used currently */
 static void amod2 (int r0, bfd_vma pc,  disassemble_info *outf)
 {
 
@@ -606,8 +649,9 @@ static void amod2 (int r0, bfd_vma pc,  disassemble_info *outf)
 illegal_instruction:
   return;
 }
+#endif
 
-static void macmod_accm (int mod, bfd_vma pc,  disassemble_info *outf)
+static void macmod_accm (int mod, bfd_vma pc ATTRIBUTE_UNUSED,  disassemble_info *outf)
 {
 
 
@@ -658,6 +702,7 @@ illegal_instruction:
   return;
 }
 
+#if 0 /* commented it out as it is not used currently */
 static void macmod_pmove (int mod, bfd_vma pc,  disassemble_info *outf)
 {
 
@@ -686,8 +731,9 @@ static void macmod_pmove (int mod, bfd_vma pc,  disassemble_info *outf)
 illegal_instruction:
   return;
 }
+#endif
 
-static void mxd_mod (int mod, bfd_vma pc,  disassemble_info *outf)
+static void mxd_mod (int mod, bfd_vma pc ATTRIBUTE_UNUSED,  disassemble_info *outf)
 {
 
 
@@ -704,7 +750,7 @@ illegal_instruction:
   return;
 }
 
-static void aligndir (int r0, bfd_vma pc,  disassemble_info *outf)
+static void aligndir (int r0, bfd_vma pc ATTRIBUTE_UNUSED,  disassemble_info *outf)
 {
 
 
@@ -722,7 +768,7 @@ illegal_instruction:
 }
 
 /* static void A0macfunc (int op,int h0,int h1, bfd_vma pc,  disassemble_info *outf) */
-static void A0macfunc (TIword iw0, TIword iw1, int op,int h0,int h1, bfd_vma pc,  disassemble_info *outf)
+static void A0macfunc (TIword iw0 ATTRIBUTE_UNUSED, TIword iw1, int op,int h0,int h1, bfd_vma pc ATTRIBUTE_UNUSED,  disassemble_info *outf)
 {
 /* dsp32mac
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -864,7 +910,7 @@ illegal_instruction:
 }
 
 /* static void multfunc (int op,int h0,int h1, bfd_vma pc,  disassemble_info *outf)  */
-static void multfunc (TIword iw0, TIword iw1, int op,int h0,int h1, bfd_vma pc,  disassemble_info *outf)
+static void multfunc (TIword iw0 ATTRIBUTE_UNUSED, TIword iw1, int op,int h0,int h1, bfd_vma pc ATTRIBUTE_UNUSED,  disassemble_info *outf)
 {
 /* dsp32mac
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -913,7 +959,7 @@ static void multfunc (TIword iw0, TIword iw1, int op,int h0,int h1, bfd_vma pc, 
 illegal_instruction:
   return;
 }
-static void A1macfunc (TIword iw0, TIword iw1, int op,int h0,int h1, bfd_vma pc,  disassemble_info *outf)
+static void A1macfunc (TIword iw0 ATTRIBUTE_UNUSED, TIword iw1, int op,int h0,int h1, bfd_vma pc ATTRIBUTE_UNUSED,  disassemble_info *outf)
 /*static void A1macfunc (int op,int h0,int h1, bfd_vma pc,  disassemble_info *outf) */
 {
 /* dsp32mac
@@ -1055,7 +1101,7 @@ illegal_instruction:
   return;
 }
 
-static void macmod_hmove (int mod, bfd_vma pc,  disassemble_info *outf)
+static void macmod_hmove (int mod, bfd_vma pc ATTRIBUTE_UNUSED,  disassemble_info *outf)
 {
 
 
@@ -1100,7 +1146,7 @@ illegal_instruction:
   return;
 }
 
-static int decode_ProgCtrl_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info *outf)
+static int decode_ProgCtrl_0 (TIword iw0, TIword iw1 ATTRIBUTE_UNUSED, bfd_vma pc,  disassemble_info *outf)
 {
 /* ProgCtrl
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -1348,7 +1394,7 @@ illegal_instruction:
   return 0;
 }
 
-static int decode_PushPopMultiple_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info *outf)
+static int decode_PushPopMultiple_0 (TIword iw0, TIword iw1 ATTRIBUTE_UNUSED, bfd_vma pc,  disassemble_info *outf)
 {
 /* PushPopMultiple
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -1503,7 +1549,7 @@ illegal_instruction:
   return 0;
 }
 
-static int decode_CCflag_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info *outf)
+static int decode_CCflag_0 (TIword iw0, TIword iw1 ATTRIBUTE_UNUSED, bfd_vma pc,  disassemble_info *outf)
 {
 /* CCflag
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -1887,7 +1933,7 @@ illegal_instruction:
   return 0;
 }
 
-static int decode_BRCC_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info *outf)
+static int decode_BRCC_0 (TIword iw0, TIword iw1 ATTRIBUTE_UNUSED, bfd_vma pc,  disassemble_info *outf)
 {
 /* BRCC
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -1943,7 +1989,7 @@ illegal_instruction:
   return 0;
 }
 
-static int decode_UJUMP_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info *outf)
+static int decode_UJUMP_0 (TIword iw0, TIword iw1 ATTRIBUTE_UNUSED, bfd_vma pc,  disassemble_info *outf)
 {
 /* UJUMP
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -1956,8 +2002,6 @@ static int decode_UJUMP_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info
   OUTS(outf,"JUMP.S  ");
   OUTS(outf,pcrel12(offset));
   return 1*2;
-illegal_instruction:
-  return 0;
 }
 
 static int decode_REGMV_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info *outf)
@@ -1982,11 +2026,9 @@ printf ("\nsrc = %d \n", src);*/
   OUTS(outf,"=");
   OUTS(outf,allregs(src,gs));
   return 1*2;
-illegal_instruction:
-  return 0;
 }
 
-static int decode_ALU2op_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info *outf)
+static int decode_ALU2op_0 (TIword iw0, TIword iw1 ATTRIBUTE_UNUSED, bfd_vma pc ATTRIBUTE_UNUSED,  disassemble_info *outf)
 {
 /* ALU2op
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -2120,7 +2162,7 @@ illegal_instruction:
   return 0;
 }
 
-static int decode_PTR2op_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info *outf)
+static int decode_PTR2op_0 (TIword iw0, TIword iw1 ATTRIBUTE_UNUSED, bfd_vma pc ATTRIBUTE_UNUSED,  disassemble_info *outf)
 {
 /* PTR2op
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -2201,7 +2243,7 @@ illegal_instruction:
   return 0;
 }
 
-static int decode_LOGI2op_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info *outf)
+static int decode_LOGI2op_0 (TIword iw0, TIword iw1 ATTRIBUTE_UNUSED, bfd_vma pc,  disassemble_info *outf)
 {
 /* LOGI2op
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -2287,7 +2329,7 @@ illegal_instruction:
   return 0;
 }
 
-static int decode_COMP3op_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info *outf)
+static int decode_COMP3op_0 (TIword iw0, TIword iw1 ATTRIBUTE_UNUSED, bfd_vma pc ATTRIBUTE_UNUSED,  disassemble_info *outf)
 {
 /* COMP3op
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -2387,7 +2429,7 @@ illegal_instruction:
   return 0;
 }
 
-static int decode_COMPI2opD_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info *outf)
+static int decode_COMPI2opD_0 (TIword iw0, TIword iw1 ATTRIBUTE_UNUSED, bfd_vma pc,  disassemble_info *outf)
 {
 /* COMPI2opD
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -2418,7 +2460,7 @@ illegal_instruction:
   return 0;
 }
 
-static int decode_COMPI2opP_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info *outf)
+static int decode_COMPI2opP_0 (TIword iw0, TIword iw1 ATTRIBUTE_UNUSED, bfd_vma pc,  disassemble_info *outf)
 {
 /* COMPI2opP
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -2448,7 +2490,7 @@ illegal_instruction:
   return 0;
 }
 
-static int decode_LDSTpmod_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info *outf)
+static int decode_LDSTpmod_0 (TIword iw0, TIword iw1 ATTRIBUTE_UNUSED, bfd_vma pc ATTRIBUTE_UNUSED,  disassemble_info *outf)
 {
 /* LDSTpmod
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -2650,7 +2692,7 @@ illegal_instruction:
   return 0;
 }
 
-static int decode_dagMODik_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info *outf)
+static int decode_dagMODik_0 (TIword iw0, TIword iw1 ATTRIBUTE_UNUSED, bfd_vma pc ATTRIBUTE_UNUSED,  disassemble_info *outf)
 {
 /* dagMODik
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -2691,7 +2733,7 @@ illegal_instruction:
   return 0;
 }
 
-static int decode_dspLDST_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info *outf)
+static int decode_dspLDST_0 (TIword iw0, TIword iw1 ATTRIBUTE_UNUSED, bfd_vma pc ATTRIBUTE_UNUSED,  disassemble_info *outf)
 {
 /* dspLDST
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -3344,7 +3386,7 @@ illegal_instruction:
   return 0;
 }
 
-static int decode_LDSTiiFP_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info *outf)
+static int decode_LDSTiiFP_0 (TIword iw0, TIword iw1 ATTRIBUTE_UNUSED, bfd_vma pc,  disassemble_info *outf)
 {
 /* LDSTiiFP
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -3384,7 +3426,7 @@ illegal_instruction:
   return 0;
 }
 
-static int decode_LDSTii_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info *outf)
+static int decode_LDSTii_0 (TIword iw0, TIword iw1 ATTRIBUTE_UNUSED, bfd_vma pc,  disassemble_info *outf)
 {
 /* LDSTii
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -3852,16 +3894,22 @@ static int decode_dsp32mac_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_i
 */  int op1 = ((iw0 >> 0) & 0x3);
   int P = ((iw0 >> 3) & 0x1);
   int w0 = ((iw1 >> 13) & 0x1);
+#if 0 /* commented out as it is not used currently */
   int src0 = ((iw1 >> 3) & 0x7);
+#endif
   int h00 = ((iw1 >> 10) & 0x1);
   int w1 = ((iw0 >> 2) & 0x1);
+#if 0 /* commented out as it is not used currently */
   int src1 = ((iw1 >> 0) & 0x7);
+#endif
   int h10 = ((iw1 >> 9) & 0x1);
   int h01 = ((iw1 >> 15) & 0x1);
   int MM = ((iw0 >> 4) & 0x1);
   int h11 = ((iw1 >> 14) & 0x1);
   int dst = ((iw1 >> 6) & 0x7);
+#if 0 /* commented out as it is not used currently */
   int M = ((iw0 >> 11) & 0x1);
+#endif  
   int mmod = ((iw0 >> 5) & 0xf);
   int op0 = ((iw1 >> 11) & 0x3);
 
@@ -3986,7 +4034,7 @@ static int decode_dsp32mac_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_i
   } else if ((w0==1)
         && (w1==1) && (P==1) && (op0!=3) && (op1!=3)) {
         notethat ("dregs = ( A1macfunc) mxd_mod , dregs = (A0macfunc ) macmod_hmove");
-        OUTS(outf,dregs(dst+1));
+        OUTS(outf,dregs((dst+1)));
         OUTS(outf,"=");
         OUTS(outf,"(");
         A1macfunc(iw0, iw1, op1,h01,h11, pc, outf);
@@ -4016,16 +4064,22 @@ static int decode_dsp32mult_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_
 */  int op1 = ((iw0 >> 0) & 0x3);
   int P = ((iw0 >> 3) & 0x1);
   int w0 = ((iw1 >> 13) & 0x1);
+#if 0 /* commented out as it is not used currently */
   int src0 = ((iw1 >> 3) & 0x7);
+#endif  
   int h00 = ((iw1 >> 10) & 0x1);
   int w1 = ((iw0 >> 2) & 0x1);
+#if 0 /* commented out as it is not used currently */
   int src1 = ((iw1 >> 0) & 0x7);
+#endif  
   int h10 = ((iw1 >> 9) & 0x1);
   int h01 = ((iw1 >> 15) & 0x1);
   int MM = ((iw0 >> 4) & 0x1);
   int h11 = ((iw1 >> 14) & 0x1);
   int dst = ((iw1 >> 6) & 0x7);
+#if 0 /* commented out as it is not used currently */
   int M = ((iw0 >> 11) & 0x1);
+#endif  
   int mmod = ((iw0 >> 5) & 0xf);
   int op0 = ((iw1 >> 11) & 0x3);
 
@@ -4093,7 +4147,7 @@ static int decode_dsp32mult_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_
              && (w1==1)
              && (P==1)) {
         notethat ("dregs = multfunc mxd_mod , dregs = multfunc macmod_hmove");
-        OUTS(outf,dregs(1+dst));
+        OUTS(outf,dregs((1+dst)));
         OUTS(outf,"=");
         multfunc(iw0, iw1, op1,h01,h11, pc, outf);
         mxd_mod(MM, pc, outf);
@@ -4125,7 +4179,9 @@ static int decode_dsp32alu_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_i
   int dst0 = ((iw1 >> 9) & 0x7);
   int aopcde = ((iw0 >> 0) & 0x1f);
   int dst1 = ((iw1 >> 6) & 0x7);
+#if 0 /* commented out as it is not used currently */
   int M = ((iw0 >> 11) & 0x1);
+#endif
 
 
 
@@ -5445,7 +5501,9 @@ static int decode_dsp32shift_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble
   int src1 = ((iw1 >> 0) & 0x7);
   int sop = ((iw1 >> 14) & 0x3);
   int dst0 = ((iw1 >> 9) & 0x7);
+#if 0 /* commented out as it is not used currently */
   int M = ((iw0 >> 11) & 0x1);
+#endif
   int sopcde = ((iw0 >> 0) & 0x1f);
   int HLs = ((iw1 >> 12) & 0x3);
 
@@ -6097,7 +6155,9 @@ static int decode_dsp32shiftimm_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassem
   int immag = ((iw1 >> 3) & 0x3f);
   int newimmag = (-(iw1 >> 3) & 0x3f);
   int dst0 = ((iw1 >> 9) & 0x7);
+#if 0 /* commented out as it is not used currently */
   int M = ((iw0 >> 11) & 0x1);
+#endif
   int sopcde = ((iw0 >> 0) & 0x1f);
   int HLs = ((iw1 >> 12) & 0x3);
 
@@ -6365,7 +6425,7 @@ illegal_instruction:
   return 0;
 }
 
-static int decode_psedoDEBUG_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info *outf)
+static int decode_psedoDEBUG_0 (TIword iw0, TIword iw1 ATTRIBUTE_UNUSED, bfd_vma pc ATTRIBUTE_UNUSED,  disassemble_info *outf)
 {
 /* psedoDEBUG
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -6439,7 +6499,7 @@ illegal_instruction:
   return 0;
 }
 
-static int decode_psedoOChar_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info *outf)
+static int decode_psedoOChar_0 (TIword iw0, TIword iw1 ATTRIBUTE_UNUSED, bfd_vma pc,  disassemble_info *outf)
 {
 /* psedoOChar
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -6453,8 +6513,10 @@ static int decode_psedoOChar_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble
   OUTS(outf,"OUTC");
   OUTS(outf,uimm8(ch));
   return 1*2;
+#if 0 /* commented it currently as not using */
 illegal_instruction:
   return 0;
+#endif
 }
 
 static int decode_psedodbg_assert_0 (TIword iw0, TIword iw1, bfd_vma pc,  disassemble_info *outf)
@@ -6805,7 +6867,7 @@ illegal_instruction:
 
 
 
-
+int
 print_insn_bfin (bfd_vma pc, disassemble_info *outf)
 {
     short iw0  = 0;
