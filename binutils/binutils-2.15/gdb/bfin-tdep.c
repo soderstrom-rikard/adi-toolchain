@@ -72,10 +72,10 @@
 
 /* forward static declarations */
 static struct type * bfin_register_type (struct gdbarch *gdbarch, int regnum);
-static CORE_ADDR skip_sp_plus(CORE_ADDR pc);
-static CORE_ADDR skip_minus_minus_sp(CORE_ADDR pc);
-static CORE_ADDR skip_blob(CORE_ADDR pc);
-static CORE_ADDR skip_link(CORE_ADDR pc);
+/* static CORE_ADDR skip_sp_plus(CORE_ADDR pc); */
+/* static CORE_ADDR skip_minus_minus_sp(CORE_ADDR pc); */
+/* static CORE_ADDR skip_blob(CORE_ADDR pc); */
+/* static CORE_ADDR skip_link(CORE_ADDR pc); */
 static CORE_ADDR bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
 		     struct regcache *regcache, CORE_ADDR bp_addr, int nargs,
 		     struct value **args, CORE_ADDR sp, int struct_return,
@@ -139,7 +139,7 @@ static CORE_ADDR bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * f
 #endif
 
 /* forward declarations */
-static int is_minus_minus_sp(int op);
+/* static int is_minus_minus_sp(int op); */
 
 
 /* The list of available "set bfin ..." and "show bfin ..." commands.  */
@@ -702,6 +702,7 @@ bfin_frame_sniffer (struct frame_info *next_frame)
   return &bfin_frame_unwind;
 }
 
+#if 0
 //#define _DEBUG
 /* The following functions are for function prolog length calculations */
 static int is_minus_minus_sp(int op)
@@ -715,6 +716,9 @@ static int is_minus_minus_sp(int op)
        }
        return 0;
 }
+#endif
+
+#if 0
 static CORE_ADDR skip_sp_plus(CORE_ADDR pc)
 {
     register int op = read_memory_unsigned_integer(pc, 2);
@@ -727,8 +731,10 @@ static CORE_ADDR skip_sp_plus(CORE_ADDR pc)
    //Flow may not have SP+=N opcode if there is no function call
    //So, it's okay to be continued
     return pc;
-
 }
+#endif
+
+#if 0
 static CORE_ADDR skip_minus_minus_sp(CORE_ADDR pc)
 {
     register int op = read_memory_unsigned_integer(pc, 2);
@@ -745,6 +751,9 @@ static CORE_ADDR skip_minus_minus_sp(CORE_ADDR pc)
        }
        return skip_sp_plus(pc);
 }
+#endif
+
+#if 0
 static CORE_ADDR skip_blob(CORE_ADDR pc)
 {
 	register int op1 = read_memory_unsigned_integer(pc, 2);
@@ -770,8 +779,9 @@ static CORE_ADDR skip_blob(CORE_ADDR pc)
          }
     return pc;
 }
+#endif
 
-
+#if 0
 static CORE_ADDR skip_link(CORE_ADDR pc)
 {
     //caller has already verified so no need of verification
@@ -792,6 +802,7 @@ static CORE_ADDR skip_link(CORE_ADDR pc)
     }
    return pc;
 }
+#endif
 
 CORE_ADDR
 bfin_skip_prologue (pc)
@@ -913,6 +924,7 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
         offset = 0;
       else
         offset = container_len - len;
+
       sp -= container_len;
       write_memory (sp + offset, VALUE_CONTENTS_ALL (args[i]), len);
     }
@@ -932,10 +944,8 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
   if (struct_return)
     {
       store_unsigned_integer (buf, 4, struct_addr);
-      regcache_cooked_write (regcache, tdep->struct_value_regnum, buf);
+      regcache_cooked_write (regcache, BFIN_P0_REGNUM, buf);
     }
-
-  /* return address is in R0 ... need to investigate about structure return */
 
   /* Finally, update the stack pointer...  */
   store_unsigned_integer (buf, 4, sp);
@@ -1027,30 +1037,29 @@ bfin_extract_return_value (struct type *type,
      The caller is allocating space and using a pointer register
   */
   if (TYPE_CODE (type) == TYPE_CODE_INT
-	   || TYPE_CODE (type) == TYPE_CODE_CHAR
-	   || TYPE_CODE (type) == TYPE_CODE_BOOL
-	   || TYPE_CODE (type) == TYPE_CODE_PTR
-	   || TYPE_CODE (type) == TYPE_CODE_REF
-	   || TYPE_CODE (type) == TYPE_CODE_ENUM)
-  {
-    while (len > 0)
-    {
-	/* By using store_unsigned_integer we avoid having to do
-	   anything special for small big-endian values.  */
-	regcache_cooked_read_unsigned (regs, regno++, &tmp);
-	store_unsigned_integer (valbuf, 
+     || TYPE_CODE (type) == TYPE_CODE_CHAR
+     || TYPE_CODE (type) == TYPE_CODE_BOOL
+     || TYPE_CODE (type) == TYPE_CODE_PTR
+     || TYPE_CODE (type) == TYPE_CODE_REF
+     || TYPE_CODE (type) == TYPE_CODE_ENUM
+     || (TYPE_CODE (type) == TYPE_CODE_STRUCT
+     && len <= 2 * INT_REGISTER_RAW_SIZE)
+     || (TYPE_CODE (type) == TYPE_CODE_UNION
+     && len <= 2 * INT_REGISTER_RAW_SIZE))
+     {
+        while (len > 0)
+        {
+	   /* By using store_unsigned_integer we avoid having to do
+	      anything special for small big-endian values.  */
+	   regcache_cooked_read_unsigned (regs, regno++, &tmp);
+	   store_unsigned_integer (valbuf, 
 		(len > INT_REGISTER_RAW_SIZE
 		? INT_REGISTER_RAW_SIZE : len),
 		tmp);
-	len -= INT_REGISTER_RAW_SIZE;
-	valbuf += INT_REGISTER_RAW_SIZE;
+	   len -= INT_REGISTER_RAW_SIZE;
+	   valbuf += INT_REGISTER_RAW_SIZE;
+        }
     }
-  }
-  else{
-#ifdef BFIN_NOT_TESTED
-fprintf(stderr, "need to figure out how structures are returned in bfin\n");
-#endif 
-  }
 }
 
 /* Write into appropriate registers a function return value of type
@@ -1063,11 +1072,13 @@ bfin_store_return_value (struct type *type, struct regcache *regs,
   const bfd_byte *valbuf = src;
 
     if (TYPE_CODE (type)    == TYPE_CODE_INT
-	   || TYPE_CODE (type) == TYPE_CODE_CHAR
-	   || TYPE_CODE (type) == TYPE_CODE_BOOL
-	   || TYPE_CODE (type) == TYPE_CODE_PTR
-	   || TYPE_CODE (type) == TYPE_CODE_REF
-	   || TYPE_CODE (type) == TYPE_CODE_ENUM)
+       || TYPE_CODE (type) == TYPE_CODE_CHAR
+       || TYPE_CODE (type) == TYPE_CODE_BOOL
+       || TYPE_CODE (type) == TYPE_CODE_PTR
+       || TYPE_CODE (type) == TYPE_CODE_REF
+       || TYPE_CODE (type) == TYPE_CODE_ENUM
+       || (TYPE_CODE (type) == TYPE_CODE_STRUCT && TYPE_LENGTH (type) <= 2 * INT_REGISTER_RAW_SIZE)
+       || (TYPE_CODE (type) == TYPE_CODE_UNION && TYPE_LENGTH (type) <= 2 * INT_REGISTER_RAW_SIZE))
     {
       if (TYPE_LENGTH (type) <= 4)
       {
@@ -1079,8 +1090,8 @@ bfin_store_return_value (struct type *type, struct regcache *regs,
 	  store_signed_integer (tmpbuf, INT_REGISTER_RAW_SIZE, val);
 	  regcache_cooked_write (regs, BFIN_R0_REGNUM, tmpbuf);
      }
-      else
-      {
+     else
+     {
 	  /* Integral values greater than one word are stored in consecutive
 	     registers starting with r0.  This will always be a multiple of
 	     the regiser size.  */
@@ -1093,14 +1104,32 @@ bfin_store_return_value (struct type *type, struct regcache *regs,
 	      len -= INT_REGISTER_RAW_SIZE;
 	      valbuf += INT_REGISTER_RAW_SIZE;
 	  }
-     }
-  }
-  else
-    {
-#ifdef BFIN_NOT_TESTED
-      fprintf(stderr, "structure returning\n");
-#endif 
-    }
+      }
+   }
+}
+
+/* Determine, for architecture GDBARCH, how a return value of TYPE
+   should be returned.  If it is supposed to be returned in registers,
+   and READBUF is non-zero, read the appropriate value from REGCACHE,
+   and copy it into READBUF.  If WRITEBUF is non-zero, write the value
+   from WRITEBUF into REGCACHE.  */
+
+static enum return_value_convention
+bfin_return_value (struct gdbarch *gdbarch, struct type *type,
+                   struct regcache *regcache, void *readbuf,
+                   const void *writebuf)
+{
+
+    if ((TYPE_CODE (type) == TYPE_CODE_STRUCT && TYPE_LENGTH (type) > 2 * INT_REGISTER_RAW_SIZE)
+       || (TYPE_CODE (type) == TYPE_CODE_UNION && TYPE_LENGTH (type) > 2 * INT_REGISTER_RAW_SIZE))
+	  return RETURN_VALUE_STRUCT_CONVENTION;
+
+  if (readbuf)
+    bfin_extract_return_value (type, regcache, readbuf);
+  if (writebuf)
+    bfin_store_return_value (type, regcache, writebuf);
+
+  return RETURN_VALUE_REGISTER_CONVENTION;
 }
 
 static int
@@ -1289,6 +1318,7 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   set_gdbarch_pc_regnum(gdbarch, BFIN_PC_REGNUM);
 
   set_gdbarch_push_dummy_call (gdbarch, bfin_push_dummy_call);
+  set_gdbarch_return_value (gdbarch, bfin_return_value);
   set_gdbarch_frame_align(gdbarch, bfin_frame_align);
   
   /* Disassembly.  */

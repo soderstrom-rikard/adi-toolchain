@@ -1,3 +1,14 @@
+2005-02-15  Srivathsa  <sri@rrap-software.com>
+
+	* bfin-tdep.c (bfin_push_dummy_call) : Added code
+	to return struct value
+	* bfin-tdep.c (bfin_extract_return_value) : Added code
+	to check for structure and union
+	* bfin-tdep.c (bfin_store_return_value) : Added code
+	to check for structure and union
+	* bfin-tdep.c (bfin_return_value) : Added function
+	to check if return value is in structure or in register
+
 2005-02-08  Srivathsa  <sri@rrap-software.com>
 
 	* bfin-tdep.c (bfin_skip_prologue) : Changes
