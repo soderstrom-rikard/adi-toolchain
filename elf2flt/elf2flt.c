@@ -1331,8 +1331,10 @@ dump_symbols(symbols, number_of_symbols);
 			    flat_relocs[flat_reloc_count].reloc.type = FLAT_RELOC_TYPE_DATA;
 			  else if (strstr(reloc_section_name, "bss"))
 			    flat_relocs[flat_reloc_count].reloc.type = FLAT_RELOC_TYPE_BSS;
-			  else
-			    printf("Unknown Type - relocation in bad section.\n");
+			  else{
+			    bad_relocs++;
+			    printf("Unknown Type - relocation for %s in bad section - %s\n", sym_name, reloc_section_name);
+			  }
 #else
 				flat_relocs = realloc(flat_relocs,
 					(flat_reloc_count + 1) * sizeof(unsigned long));
