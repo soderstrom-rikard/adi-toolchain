@@ -492,11 +492,13 @@ struct offset_value offvalue = {0,0,0};
 /* initialize the offset values */
 static void set_offset_value(void)
 {
+#if 0
   if(!offvalue.init){
     offvalue.text_addr = read_register(BFIN_EXTRA1);
     offvalue.data_offset = read_register(BFIN_EXTRA3) ;
     offvalue.init = 1;
   }
+#endif
 }
 
 static CORE_ADDR get_text_addr_value()
@@ -689,6 +691,7 @@ static const struct frame_unwind bfin_frame_unwind =
 static const struct frame_unwind *
 bfin_frame_sniffer (struct frame_info *next_frame)
 {
+fprintf(stderr, "************** calling our sniffer ***************\n");
   return &bfin_frame_unwind;
 }
 
@@ -1206,6 +1209,29 @@ bfin_frame_align (struct gdbarch *gdbarch, CORE_ADDR address)
   return ((address + 3) & ~0x3);
 }
 
+/* Return nonzero if a value of type TYPE stored in register REGNUM
+   needs any special handling.  */
+
+static int
+bfin_convert_register_p (int regnum, struct type *type)
+{
+fprintf(stderr, "in %s :: for regnum = %d\n", __FUNCTION__, regnum);
+  return (regnum == BFIN_PC_REGNUM);
+}
+
+/* Read a value of type TYPE from register REGNUM in frame FRAME, and
+   return its contents in TO.  */
+
+static void
+bfin_register_to_value (struct frame_info *frame, int regnum,
+                        struct type *type, void *to)
+{
+  
+
+  get_frame_register (frame, regnum, to);
+fprintf(stderr, "in %s :: for regnum = %d, to = %x\n", __FUNCTION__, regnum,  *((void **)to));
+}
+
 /* Initialize the current architecture based on INFO.  If possible,
    re-use an architecture from ARCHES, which is a list of
    architectures already created during this debugging session.
@@ -1251,6 +1277,10 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   set_gdbarch_num_regs(gdbarch, BFIN_NUM_REGS);
   set_gdbarch_sp_regnum (gdbarch, BFIN_SP_REGNUM);
   set_gdbarch_pc_regnum(gdbarch, BFIN_PC_REGNUM);
+
+  set_gdbarch_convert_register_p (gdbarch, bfin_convert_register_p);
+  set_gdbarch_register_to_value (gdbarch,  bfin_register_to_value);
+
   set_gdbarch_push_dummy_call (gdbarch, bfin_push_dummy_call);
   set_gdbarch_frame_align(gdbarch, bfin_frame_align);
   
