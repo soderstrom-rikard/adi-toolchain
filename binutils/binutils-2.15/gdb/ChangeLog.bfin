@@ -1,7 +1,12 @@
 2005-03-22  Srivathsa  <sri@rrap-software.com>
 
 	* bfin-tdep.c (bfin_next_bp_addr) :
-        singlestep for rt_signal
+        singlestep support for 64-bit instructions
+
+2005-03-22  Srivathsa  <sri@rrap-software.com>
+
+	* bfin-tdep.c (bfin_next_bp_addr) :
+        singlestep support for rt_signal
 
 	* bfin-tdep.c (bfin_return_value) :
         struct return now compatible with gcc

@@ -84,8 +84,8 @@ extern void bfin_software_single_step (enum target_signal, int);
 
 /* Macros used for Program flow control */
 #define P_16_BIT_INSR_MAX		0xBFFF // 16 bit instruction, max
-#define P_32_BIT_INSR_MIN		0xC000 // 16 bit instruction, max
-#define P_32_BIT_INSR_MAX		0xE801 // 16 bit instruction, max
+#define P_32_BIT_INSR_MIN		0xC000 // 32 bit instruction, min
+#define P_32_BIT_INSR_MAX		0xE801 // 32 bit instruction, max
 #define P_JUMP_PREG_MIN			0x0050 // jump (preg), 16-bit, min
 #define P_JUMP_PREG_MAX			0x0057 // jump (preg), 16-bit, max
 #define P_JUMP_PC_PLUS_PREG_MIN		0x0080 // jump (pc+preg), 16-bit, min
@@ -112,8 +112,8 @@ extern void bfin_software_single_step (enum target_signal, int);
 #define P_MNOP				0xC803 // MNOP
 #define P_EXCPT_MIN			0x00A0 // excpt, 16-bit, min
 #define P_EXCPT_MAX			0x00AF // excpt, 16-bit, max
-#define P_BIT_MULTI_INS_1 		0xC000 // multi instruction bit 1, 32-bit
-#define P_BIT_MULTI_INS_2 		0x0800 // multi instruction bit 2, 32-bit
+#define P_BIT_MULTI_INS_1 		0xC000 // multi instruction mask 1, 16-bit
+#define P_BIT_MULTI_INS_2 		0x0800 // multi instruction mask 2, 16-bit
 
 /* used for signal handling */
 #define P_SIGNAL_INS_1			0x0077E128 // Instruction 1 for signal
@@ -444,6 +444,10 @@ bfin_next_bp_addr (CORE_ADDR pc)
       return pc;
     }
     return pc + 2;
+  }
+  else if (((op & P_BIT_MULTI_INS_1) == P_BIT_MULTI_INS_1) && (op & P_BIT_MULTI_INS_2)
+      && ((op & P_LINKAGE) != P_LINKAGE)) {
+     return pc + 8;
   }
   else if (op <= P_16_BIT_INSR_MAX) {
     return pc + 2;
