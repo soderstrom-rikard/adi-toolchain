@@ -435,6 +435,16 @@ bfin_set_reloc (flat_v5_reloc_t *reloc,
     */
     reloc->reloc.type = FLAT_RELOC_TYPE_TEXT;
   }
+  else if (strstr (reloc_section_name, "*ABS*")){
+    /* (A data section initialization of something in the libc's text section
+	does not resolve - i.e. a global pointer to function initialized with
+	a libc function).
+
+        it should return 0 rather than error
+        We will assume text section for the moment.
+    */
+    reloc->reloc.type = FLAT_RELOC_TYPE_TEXT;
+  }
   else
     {
       printf ("Unknown Type - relocation for %s in bad section - %s\n", sym_name, reloc_section_name);
