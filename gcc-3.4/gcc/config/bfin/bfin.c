@@ -1378,8 +1378,10 @@ expand_move (rtx *operands, enum machine_mode mode)
     }
 }
 
-int log2constp (unsigned HOST_WIDE_INT c) {
-  return (c & (c-1))==0;
+int
+log2constp (unsigned HOST_WIDE_INT c)
+{
+  return c != 0 && (c & (c-1)) == 0;
 }
 
 int

@@ -4,6 +4,8 @@
 	QImode and HImode values.
 	* config/bfin/bfin.md (recently added addsi pattern): Delete.
 
+	* config/bfin/bfin.c (log2constp): Also check that input is nonzero.
+
 2004-10-03  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (TRAMPOLINE_TEMPLATE): Correct instruction
