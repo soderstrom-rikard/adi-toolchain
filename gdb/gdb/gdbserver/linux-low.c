@@ -1190,11 +1190,6 @@ linux_read_memory (CORE_ADDR memaddr, char *myaddr, int len)
   int count 
     = ((((int)memaddr + len) - (int)addr) + sizeof (PTRACE_XFER_TYPE) - 1) 
       / sizeof (PTRACE_XFER_TYPE);
-  fprintf(stderr, "count = %d\n", count);
-  fprintf(stderr, "len   = %d\n", len);
-  fprintf(stderr, "memaddr = %d\n", (int)memaddr);
-  fprintf(stderr, "addr   = %d\n", (int)addr);
-  fprintf(stderr, "sizeof (PTRACE_XFER_TYPE) = %d\n", (int)sizeof(PTRACE_XFER_TYPE));
   /* Allocate buffer of that many longwords.  */
   register PTRACE_XFER_TYPE *buffer 
     = (PTRACE_XFER_TYPE *) malloc (count * sizeof (PTRACE_XFER_TYPE));
@@ -1202,7 +1197,6 @@ linux_read_memory (CORE_ADDR memaddr, char *myaddr, int len)
   /* Read all the longwords */
   for (i = 0; i < count; i++, addr += sizeof (PTRACE_XFER_TYPE))
     {
-      fprintf(stderr, "Calling ptrace method for PEEKTEXT case\n");
       buffer[i] = ptrace (PTRACE_PEEKTEXT, inferior_pid, (PTRACE_ARG3_TYPE) addr, 0);
     }
 
