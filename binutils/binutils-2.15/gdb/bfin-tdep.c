@@ -1245,28 +1245,18 @@ bfin_extract_return_value (struct type *type,
      Need to investigate the return value mechanism for structures.
      The caller is allocating space and using a pointer register
   */
-  if (TYPE_CODE (type) == TYPE_CODE_INT
-     || TYPE_CODE (type) == TYPE_CODE_CHAR
-     || TYPE_CODE (type) == TYPE_CODE_BOOL
-     || TYPE_CODE (type) == TYPE_CODE_PTR
-     || TYPE_CODE (type) == TYPE_CODE_REF
-     || TYPE_CODE (type) == TYPE_CODE_ENUM
-     || (TYPE_CODE (type) == TYPE_CODE_STRUCT && len <= 2 * INT_REGISTER_RAW_SIZE)
-     || (TYPE_CODE (type) == TYPE_CODE_UNION && len <= 2 * INT_REGISTER_RAW_SIZE))
-     {
-        while (len > 0)
-        {
-	   /* By using store_unsigned_integer we avoid having to do
-	      anything special for small big-endian values.  */
-	   regcache_cooked_read_unsigned (regs, regno++, &tmp);
-	   store_unsigned_integer (valbuf, 
-		(len > INT_REGISTER_RAW_SIZE
-		? INT_REGISTER_RAW_SIZE : len),
-		tmp);
-	   len -= INT_REGISTER_RAW_SIZE;
-	   valbuf += INT_REGISTER_RAW_SIZE;
-        }
-    }
+  gdb_assert(len <= 8);
+
+  while (len > 0) {
+    /* By using store_unsigned_integer we avoid having to do
+       anything special for small big-endian values.  */
+    regcache_cooked_read_unsigned (regs, regno++, &tmp);
+    store_unsigned_integer (valbuf, 
+       (len > INT_REGISTER_RAW_SIZE ? INT_REGISTER_RAW_SIZE : len),
+       tmp);
+    len -= INT_REGISTER_RAW_SIZE;
+    valbuf += INT_REGISTER_RAW_SIZE;
+  }
 }
 
 
@@ -1278,41 +1268,19 @@ bfin_store_return_value (struct type *type, struct regcache *regs,
 {
   const bfd_byte *valbuf = src;
 
-    if (TYPE_CODE (type)    == TYPE_CODE_INT
-       || TYPE_CODE (type) == TYPE_CODE_CHAR
-       || TYPE_CODE (type) == TYPE_CODE_BOOL
-       || TYPE_CODE (type) == TYPE_CODE_PTR
-       || TYPE_CODE (type) == TYPE_CODE_REF
-       || TYPE_CODE (type) == TYPE_CODE_ENUM
-       || (TYPE_CODE (type) == TYPE_CODE_STRUCT && TYPE_LENGTH (type) <= 2 * INT_REGISTER_RAW_SIZE)
-       || (TYPE_CODE (type) == TYPE_CODE_UNION && TYPE_LENGTH (type) <= 2 * INT_REGISTER_RAW_SIZE))
-    {
-      if (TYPE_LENGTH (type) <= 4)
-      {
-	  /* Values of one word or less are zero/sign-extended and
-	     returned in r0.  */
-	  bfd_byte tmpbuf[INT_REGISTER_RAW_SIZE];
-	  LONGEST val = unpack_long (type, valbuf);
+  /* Integral values greater than one word are stored in consecutive
+     registers starting with r0.  This will always be a multiple of
+     the regiser size.  */
+  int len = TYPE_LENGTH (type);
+  int regno = BFIN_R0_REGNUM;
 
-	  store_signed_integer (tmpbuf, INT_REGISTER_RAW_SIZE, val);
-	  regcache_cooked_write (regs, BFIN_R0_REGNUM, tmpbuf);
-     }
-     else
-     {
-	  /* Integral values greater than one word are stored in consecutive
-	     registers starting with r0.  This will always be a multiple of
-	     the regiser size.  */
-	  int len = TYPE_LENGTH (type);
-	  int regno = BFIN_R0_REGNUM;
-
-	  while (len > 0)
-	  {
-	      regcache_cooked_write (regs, regno++, valbuf);
-	      len -= INT_REGISTER_RAW_SIZE;
-	      valbuf += INT_REGISTER_RAW_SIZE;
-	  }
-      }
-   }
+  gdb_assert(len <= 8);
+  while (len > 0)
+  {
+    regcache_cooked_write (regs, regno++, valbuf);
+    len -= INT_REGISTER_RAW_SIZE;
+    valbuf += INT_REGISTER_RAW_SIZE;
+  }
 }
 
 
@@ -1327,9 +1295,8 @@ bfin_return_value (struct gdbarch *gdbarch, struct type *type,
                    const void *writebuf)
 {
 
-    if ((TYPE_CODE (type) == TYPE_CODE_STRUCT && TYPE_LENGTH (type) > 2 * INT_REGISTER_RAW_SIZE)
-       || (TYPE_CODE (type) == TYPE_CODE_UNION && TYPE_LENGTH (type) > 2 * INT_REGISTER_RAW_SIZE))
-	  return RETURN_VALUE_STRUCT_CONVENTION;
+  if(TYPE_LENGTH (type) > 2 * INT_REGISTER_RAW_SIZE)
+    return RETURN_VALUE_STRUCT_CONVENTION;
 
   if (readbuf)
     bfin_extract_return_value (type, regcache, readbuf);

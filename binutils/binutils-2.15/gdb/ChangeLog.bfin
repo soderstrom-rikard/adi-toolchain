@@ -1,3 +1,7 @@
+2005-03-07  Pradip Shah <pcs@rrap-software.com>
+	* bfin-tdep.c (bfin_extract_return_value, bfin_store_return_value,
+	bfin_return_value) : Simplified as per ABI.
+
 2005-03-04  Omkar Murty  <omkar@rrap-software.com>
 
 	* bfin-tdep.c (bfin_linux_pc_in_sigtramp, bfin_linux_get_sigtramp_info) :
