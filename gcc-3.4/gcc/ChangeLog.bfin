@@ -4,6 +4,11 @@
 	avoid running out of registers.
 	* config/bfin/bfin.h (FIXED_REGISTERS): BREGS don't need to be fixed.
 
+	* config/bfin/bfin.md (subsi3 insn): Restrict to alternatives the
+	machine can actually handle.
+	(odd subtract pattern): Remove this pattern which looks like a
+	workaround for some problem.
+
 2004-09-06  Bernd Schmidt  <bernds@btinternet.com>
 
 	* config/bfin/bfin.c: Include "ggc.h" and "gt-bfin.h"

@@ -839,39 +839,21 @@
 )
 
 (define_insn ""
-  [(set (match_operand:SI 0 "register_operand"          "=a")
-	(minus:SI (match_operand:SI 1 "register_operand" "0")
-		  (match_operand:SI 2 "register_operand" "a")))]
-  "reload_in_progress
-    /*||(!(GET_CODE(operands[1])==SUBREG 
-   && (GET_MODE(XEXP(operands[1],0))==HImode 
-	|| GET_MODE(XEXP(operands[1],0))==QImode)) 
-    && !(GET_CODE(operands[2])==SUBREG 
-   && (GET_MODE(XEXP(operands[2],0))==HImode
-	|| GET_MODE(XEXP(operands[2],0))==QImode)))*/
-  "
-  "%0 -=%2;"
-  [(set_attr "type" "alu0")])
-
-(define_insn ""
-  [(set (match_operand:SI 0 "register_operand"           "=d,a,d,b,b,d")
-	(minus:SI (match_operand:SI 1 "register_operand"  "0,0,d,0,0,0")
-		  (match_operand:SI 2 "nonmemory_operand" "M,M,d,f,Md,f")))]
-  ""
+  [(set (match_operand:SI 0 "register_operand"           "=da,d,b")
+	(minus:SI (match_operand:SI 1 "register_operand"  "0,d,0")
+		  (match_operand:SI 2 "nonmemory_operand" "M,d,f")))]
+  "GET_CODE (operands[2]) != CONST_INT || INTVAL (operands[2]) != -64"
   "*
 {
   static const char *const strings_subsi3[] = {
-    \"%0 -=%2;\",
-    \"%0 -=%2;\",
-    \"%0 =%1-%2;\",
-    \"%0 -=%2;\",
-    \"M3 = %2; %0 -=M3;\",	
-    \"[--SP] = I0;\\n\\tI0 = %0;\\n\\tI0 -=%2;\\n\\t%0=I0;\\n\\tI0 = [SP++];\",
+    \"%0 -= %2;\",
+    \"%0 = %1 - %2;\",
+    \"%0 -= %2;\",
     \"%0 +=-%2;\", 
   };
 
-  if (CONSTANT_P (operands[2]) && which_alternative < 4)
-     which_alternative = 6;
+  if (CONSTANT_P (operands[2]))
+     which_alternative = 3;
 
   return strings_subsi3[which_alternative];
 }"
