@@ -265,7 +265,7 @@ case $basic_machine in
 	| v850 | v850e \
 	| we32k \
 	| x86 | xscale | xstormy16 | xtensa \
-	| z8k)
+	| z8k | bfin)
 		basic_machine=$basic_machine-unknown
 		;;
 	m6811 | m68hc11 | m6812 | m68hc12)
@@ -339,7 +339,7 @@ case $basic_machine in
 	| x86-* | x86_64-* | xps100-* | xscale-* | xstormy16-* \
 	| xtensa-* \
 	| ymp-* \
-	| z8k-*)
+	| z8k-* | bfin-*)
 		;;
 	# Recognize the various machine names and aliases which stand
 	# for a CPU type and a company and sometimes even an OS.
