@@ -1416,8 +1416,6 @@ extern struct rtx_def *bfin_cc_rtx;
 /* This works for GAS and some other assemblers.  */
 #define SET_ASM_OP              ".set "
 
-#include <defaults.h>
-
 #define RET  return ""        /* Used in machine description */
 
 extern int bfin_lvno;
@@ -1425,10 +1423,7 @@ extern int bfin_lvno;
 #define HANDLE_SYSV_PRAGMA 1
 
 /* Debugging for dwarf-1 and dwarf-2 */
-#define DWARF_DEBUGGING_INFO
 #define DWARF2_DEBUGGING_INFO
-#undef PREFERRED_DEBUGGING_TYPE
-#define PREFERRED_DEBUGGING_TYPE DWARF2_DEBUG  
 
 /* Don't know how to order these.  UNALIGNED_WORD_ASM_OP is in
    dwarf2.out. */
@@ -1462,6 +1457,20 @@ do {                                                            \
 
 /* Debugging for standard elf stabs */
 /*#include "dbxelf.h"*/
+#define SIZE_ASM_OP     "\t.size\t"
+
+#include <defaults.h>
+/* This is how to declare the size of a function.  */
+#ifndef ASM_DECLARE_FUNCTION_SIZE
+#define ASM_DECLARE_FUNCTION_SIZE(FILE, FNAME, DECL)       \
+  do                                                       \
+  {                                                        \
+    if (!flag_inhibit_size_directive)                      \
+    ASM_OUTPUT_MEASURED_SIZE (FILE, FNAME);                \
+  }                                                        \
+while (0)
+#endif
+
 
 
 #endif /*  _BFIN_CONFIG */
