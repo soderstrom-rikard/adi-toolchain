@@ -9,6 +9,8 @@
 #include <string.h>
 #include <signal.h>
 
+#include "bfin-opcodes.h"
+
 #ifndef PRINTF
 #define PRINTF printf
 #endif
@@ -270,88 +272,6 @@ fmtconst (const_forms_t cf, bu32 x, bu32 pc)
 #define HOST_LONG_WORD_SIZE (sizeof(long)*8)
 #define SIGNEXTEND(v, n) (((long)(v) << (HOST_LONG_WORD_SIZE - (n))) >> (HOST_LONG_WORD_SIZE - (n)))
 
-static int
-const_fits (long v, const_forms_t form)
-{
-  int sz = constant_formats[form].nbits;
-  int scale = constant_formats[form].scale;
-  int offset = constant_formats[form].offset;
-  int issigned = constant_formats[form].issigned;
-
-  if (sz < 32)
-    {
-
-      long mask = (1l << sz) - 1;
-      long minint;
-      long maxint;
-
-      if (constant_formats[form].negative)
-	{
-	  int nb = constant_formats[form].nbits + 1;
-	  v = v | (1 << constant_formats[form].nbits);
-	  v = SIGNEXTEND (v, nb);
-	}
-      else if (issigned)
-	{
-	  int nb = constant_formats[form].nbits;
-	  v = SIGNEXTEND (v, nb);
-	}
-
-      if (constant_formats[form].negative && constant_formats[form].positive)
-	{
-	  minint = -1L << (sz - 1);
-	  maxint = 0;
-	  if (v > 0)
-	    v = v | ~mask;
-	}
-      else if (!issigned)
-	{
-	  minint = 0;
-	  maxint = (1 << sz) - 1;
-	}
-      else
-	{
-	  minint = (-1l << (sz - 1));
-	  maxint = (1l << (sz - 1));
-	}
-
-      if (scale)
-	{
-	  long temp = v >> scale;
-	  // This is to ensure that constants that are not
-	  // rounded up to the correct bit position
-	  // are not excepted by const_fits.
-	  if (v != (temp << scale))
-	    return 0;
-	  v = temp;
-	}
-
-
-
-      // some numbers are treated a negative but have positive format by gyacc
-      // The numbers are encodes as negative in the opcode
-
-      if (constant_formats[form].negative && !constant_formats[form].positive)
-	{
-	  if (v >= 0)
-	    return 0;
-	  v = v | ~mask;
-	  issigned = 0;
-	}
-
-      if (constant_formats[form].positive && !constant_formats[form].negative)
-	{
-	  if (v < 0)
-	    return 0;
-	}
-
-      v -= offset;
-
-      return (!issigned && (v & ~mask) == 0)
-	|| ((minint <= v) && (v < maxint));
-    }
-  return 1;
-}
 enum machine_registers
 {
   REG_RL0, REG_RL1, REG_RL2, REG_RL3, REG_RL4, REG_RL5, REG_RL6, REG_RL7,
@@ -689,36 +609,36 @@ static enum machine_registers decode_allregs[] =
 };
 
 #define allregs(x,i) REGNAME(decode_allregs[((i)<<3)|x])
-#define uimm16s4(x) fmtconst(c_uimm16s4, x , pc)
-#define pcrel4(x) fmtconst(c_pcrel4, x , pc)
-#define pcrel8(x) fmtconst(c_pcrel8, x , pc)
-#define pcrel8s4(x) fmtconst(c_pcrel8s4, x , pc)
-#define pcrel10(x) fmtconst(c_pcrel10, x , pc)
-#define pcrel12(x) fmtconst(c_pcrel12, x , pc)
-#define negimm5s4(x) fmtconst(c_negimm5s4, x , pc)
-#define rimm16(x) fmtconst(c_rimm16, x , pc)
-#define huimm16(x) fmtconst(c_huimm16, x , pc)
-#define imm16(x) fmtconst(c_imm16, x , pc)
-#define uimm2(x) fmtconst(c_uimm2, x , pc)
-#define uimm3(x) fmtconst(c_uimm3, x , pc)
-#define luimm16(x) fmtconst(c_luimm16, x , pc)
-#define uimm4(x) fmtconst(c_uimm4, x , pc)
-#define uimm5(x) fmtconst(c_uimm5, x , pc)
-#define imm16s2(x) fmtconst(c_imm16s2, x , pc)
-#define uimm8(x) fmtconst(c_uimm8, x , pc)
-#define imm16s4(x) fmtconst(c_imm16s4, x , pc)
-#define uimm4s2(x) fmtconst(c_uimm4s2, x , pc)
-#define uimm4s4(x) fmtconst(c_uimm4s4, x , pc)
-#define lppcrel10(x) fmtconst(c_lppcrel10, x , pc)
-#define imm3(x) fmtconst(c_imm3, x , pc)
-#define imm4(x) fmtconst(c_imm4, x , pc)
-#define uimm8s4(x) fmtconst(c_uimm8s4, x , pc)
-#define imm5(x) fmtconst(c_imm5, x , pc)
-#define imm6(x) fmtconst(c_imm6, x , pc)
-#define imm7(x) fmtconst(c_imm7, x , pc)
-#define imm8(x) fmtconst(c_imm8, x , pc)
-#define pcrel24(x) fmtconst(c_pcrel24, x , pc)
-#define uimm16(x) fmtconst(c_uimm16, x , pc)
+#define uimm16s4(x) fmtconst(c_uimm16s4, x, 0)
+#define pcrel4(x) fmtconst(c_pcrel4, x, pc)
+#define pcrel8(x) fmtconst(c_pcrel8, x, pc)
+#define pcrel8s4(x) fmtconst(c_pcrel8s4, x, pc)
+#define pcrel10(x) fmtconst(c_pcrel10, x, pc)
+#define pcrel12(x) fmtconst(c_pcrel12, x, pc)
+#define negimm5s4(x) fmtconst(c_negimm5s4, x, 0)
+#define rimm16(x) fmtconst(c_rimm16, x, 0)
+#define huimm16(x) fmtconst(c_huimm16, x, 0)
+#define imm16(x) fmtconst(c_imm16, x, 0)
+#define uimm2(x) fmtconst(c_uimm2, x, 0)
+#define uimm3(x) fmtconst(c_uimm3, x, 0)
+#define luimm16(x) fmtconst(c_luimm16, x, 0)
+#define uimm4(x) fmtconst(c_uimm4, x, 0)
+#define uimm5(x) fmtconst(c_uimm5, x, 0)
+#define imm16s2(x) fmtconst(c_imm16s2, x, 0)
+#define uimm8(x) fmtconst(c_uimm8, x, 0)
+#define imm16s4(x) fmtconst(c_imm16s4, x, 0)
+#define uimm4s2(x) fmtconst(c_uimm4s2, x, 0)
+#define uimm4s4(x) fmtconst(c_uimm4s4, x, 0)
+#define lppcrel10(x) fmtconst(c_lppcrel10, x, pc)
+#define imm3(x) fmtconst(c_imm3, x, 0)
+#define imm4(x) fmtconst(c_imm4, x, 0)
+#define uimm8s4(x) fmtconst(c_uimm8s4, x, 0)
+#define imm5(x) fmtconst(c_imm5, x, 0)
+#define imm6(x) fmtconst(c_imm6, x, 0)
+#define imm7(x) fmtconst(c_imm7, x, 0)
+#define imm8(x) fmtconst(c_imm8, x, 0)
+#define pcrel24(x) fmtconst(c_pcrel24, x, pc)
+#define uimm16(x) fmtconst(c_uimm16, x, 0)
 
 /* (arch.pm)arch_disassembler_functions */
 #define notethat(x)
@@ -757,7 +677,6 @@ get_allreg (int grp, int reg)
       return 0;
     }
 }
-
 
 static void
 amod0 (int s0, int x0, bu32 pc)
@@ -804,32 +723,6 @@ amod1 (int s0, int x0, bu32 pc)
     {
       notethat ("(S)");
       OUTS (outf, "(S)");
-      return;
-    }
-  else
-    goto illegal_instruction;
-illegal_instruction:
-  return;
-}
-
-static void
-amod2 (int r0, bu32 pc)
-{
-  if ((r0 == 0))
-    {
-      notethat ("");
-      return;
-    }
-  else if ((r0 == 2))
-    {
-      notethat ("(ASR)");
-      OUTS (outf, "(ASR)");
-      return;
-    }
-  else if ((r0 == 3))
-    {
-      notethat ("(ASL)");
-      OUTS (outf, "(ASL)");
       return;
     }
   else
@@ -903,45 +796,6 @@ illegal_instruction:
   return;
 }
 
-static void
-macmod_pmove (int mod, bu32 pc)
-{
-
-
-  if ((mod == 0))
-    {
-      notethat ("");
-      return;
-    }
-  else if ((mod == 8))
-    {
-      notethat ("I");
-      OUTS (outf, "I");
-      return;
-    }
-  else if ((mod == 4))
-    {
-      notethat ("U");
-      OUTS (outf, "U");
-      return;
-    }
-  else if ((mod == 1))
-    {
-      notethat ("S");
-      OUTS (outf, "S");
-      return;
-    }
-  else if ((mod == 9))
-    {
-      notethat ("IS");
-      OUTS (outf, "IS");
-      return;
-    }
-  else
-    goto illegal_instruction;
-illegal_instruction:
-  return;
-}
 
 static void
 mxd_mod (int mod, bu32 pc)
@@ -1379,7 +1233,7 @@ macmod_hmove (int mod, bu32 pc)
 }
 
 static void
-decode_ProgCtrl_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_ProgCtrl_0 (bu16 iw0)
 {
 /* ProgCtrl
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -1525,7 +1379,7 @@ decode_ProgCtrl_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_CaCTRL_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_CaCTRL_0 (bu16 iw0)
 {
 /* CaCTRL
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -1619,7 +1473,7 @@ decode_CaCTRL_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_PushPopReg_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_PushPopReg_0 (bu16 iw0)
 {
 
 /* PushPopReg
@@ -1654,7 +1508,7 @@ decode_PushPopReg_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_PushPopMultiple_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_PushPopMultiple_0 (bu16 iw0)
 {
 /* PushPopMultiple
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -1709,7 +1563,7 @@ decode_PushPopMultiple_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_ccMV_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_ccMV_0 (bu16 iw0)
 {
 /* ccMV
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -1728,7 +1582,7 @@ decode_ccMV_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_CCflag_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_CCflag_0 (bu16 iw0)
 {
   /* CCflag
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -1812,7 +1666,7 @@ decode_CCflag_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_CC2dreg_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_CC2dreg_0 (bu16 iw0)
 {
 /* CC2dreg
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -1843,7 +1697,7 @@ decode_CC2dreg_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_CC2stat_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_CC2stat_0 (bu16 iw0)
 {
 /* CC2stat
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -1892,7 +1746,7 @@ decode_CC2stat_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_BRCC_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_BRCC_0 (bu16 iw0, bu32 pc)
 {
 /* BRCC
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -1913,7 +1767,7 @@ decode_BRCC_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_UJUMP_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_UJUMP_0 (bu16 iw0, bu32 pc)
 {
 /* UJUMP
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -1927,7 +1781,7 @@ decode_UJUMP_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_REGMV_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_REGMV_0 (bu16 iw0)
 {
 /* REGMV
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -1949,7 +1803,7 @@ decode_REGMV_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_ALU2op_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_ALU2op_0 (bu16 iw0)
 {
 /* ALU2op
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -2059,7 +1913,7 @@ decode_ALU2op_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_PTR2op_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_PTR2op_0 (bu16 iw0)
 {
   /* PTR2op
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -2099,7 +1953,7 @@ decode_PTR2op_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_LOGI2op_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_LOGI2op_0 (bu16 iw0)
 {
 /* LOGI2op
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -2157,7 +2011,7 @@ decode_LOGI2op_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_COMP3op_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_COMP3op_0 (bu16 iw0)
 {
   /* COMP3op
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -2211,7 +2065,7 @@ decode_COMP3op_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_COMPI2opD_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_COMPI2opD_0 (bu16 iw0)
 {
 /* COMPI2opD
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -2230,7 +2084,7 @@ decode_COMPI2opD_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_COMPI2opP_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_COMPI2opP_0 (bu16 iw0)
 {
 /* COMPI2opP
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -2249,7 +2103,7 @@ decode_COMPI2opP_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_LDSTpmod_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_LDSTpmod_0 (bu16 iw0)
 {
 /* LDSTpmod
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -2418,7 +2272,7 @@ decode_LDSTpmod_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_dagMODim_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_dagMODim_0 (bu16 iw0)
 {
 /* dagMODim
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -2464,7 +2318,7 @@ decode_dagMODim_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_dagMODik_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_dagMODik_0 (bu16 iw0)
 {
 /* dagMODik
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -2513,7 +2367,7 @@ decode_dagMODik_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_dspLDST_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_dspLDST_0 (bu16 iw0)
 {
 /* dspLDST
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -2761,7 +2615,7 @@ decode_dspLDST_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_LDST_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_LDST_0 (bu16 iw0)
 {
   /* LDST
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -2856,7 +2710,7 @@ decode_LDST_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_LDSTiiFP_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_LDSTiiFP_0 (bu16 iw0)
 {
 /* LDSTiiFP
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -2876,7 +2730,7 @@ decode_LDSTiiFP_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_LDSTii_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_LDSTii_0 (bu16 iw0)
 {
   /* LDSTii
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -3131,7 +2985,7 @@ decode_LDSTidxI_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_linkage_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_linkage_0 (bu16 iw0, bu16 iw1)
 {
 /* linkage
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -5733,7 +5587,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_psedoDEBUG_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_psedoDEBUG_0 (bu16 iw0)
 {
 /* psedoDEBUG
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -5819,7 +5673,7 @@ decode_psedoDEBUG_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_psedoOChar_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_psedoOChar_0 (bu16 iw0)
 {
 /* psedoOChar
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -5837,7 +5691,7 @@ decode_psedoOChar_0 (bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_psedodbg_assert_0 (bu16 iw0, bu16 iw1, bu32 pc)
+decode_psedodbg_assert_0 (bu16 iw0, bu16 iw1)
 {
 /* psedodbg_assert
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -5905,53 +5759,53 @@ _interp_insn_bfin (bu32 pc)
   bu16 iw1 = get_word (saved_state.memory, pc + 2);
 
   if ((iw0 & 0xFF00) == 0x0000)
-    decode_ProgCtrl_0 (iw0, iw1, pc);
+    decode_ProgCtrl_0 (iw0);
   else if ((iw0 & 0xFFC0) == 0x0240)
-    decode_CaCTRL_0 (iw0, iw1, pc);
+    decode_CaCTRL_0 (iw0);
   else if ((iw0 & 0xFF80) == 0x0100)
-    decode_PushPopReg_0 (iw0, iw1, pc);
+    decode_PushPopReg_0 (iw0);
   else if ((iw0 & 0xFE00) == 0x0400)
-    decode_PushPopMultiple_0 (iw0, iw1, pc);
+    decode_PushPopMultiple_0 (iw0);
   else if ((iw0 & 0xFE00) == 0x0600)
-    decode_ccMV_0 (iw0, iw1, pc);
+    decode_ccMV_0 (iw0);
   else if ((iw0 & 0xF800) == 0x0800)
-    decode_CCflag_0 (iw0, iw1, pc);
+    decode_CCflag_0 (iw0);
   else if ((iw0 & 0xFFE0) == 0x0200)
-    decode_CC2dreg_0 (iw0, iw1, pc);
+    decode_CC2dreg_0 (iw0);
   else if ((iw0 & 0xFF00) == 0x0300)
-    decode_CC2stat_0 (iw0, iw1, pc);
+    decode_CC2stat_0 (iw0);
   else if ((iw0 & 0xF000) == 0x1000)
-    decode_BRCC_0 (iw0, iw1, pc);
+    decode_BRCC_0 (iw0, pc);
   else if ((iw0 & 0xF000) == 0x2000)
-    decode_UJUMP_0 (iw0, iw1, pc);
+    decode_UJUMP_0 (iw0, pc);
   else if ((iw0 & 0xF000) == 0x3000)
-    decode_REGMV_0 (iw0, iw1, pc);
+    decode_REGMV_0 (iw0);
   else if ((iw0 & 0xFC00) == 0x4000)
-    decode_ALU2op_0 (iw0, iw1, pc);
+    decode_ALU2op_0 (iw0);
   else if ((iw0 & 0xFE00) == 0x4400)
-    decode_PTR2op_0 (iw0, iw1, pc);
+    decode_PTR2op_0 (iw0);
   else if (((iw0 & 0xF800) == 0x4800))
-    decode_LOGI2op_0 (iw0, iw1, pc);
+    decode_LOGI2op_0 (iw0);
   else if (((iw0 & 0xF000) == 0x5000))
-    decode_COMP3op_0 (iw0, iw1, pc);
+    decode_COMP3op_0 (iw0);
   else if (((iw0 & 0xF800) == 0x6000))
-    decode_COMPI2opD_0 (iw0, iw1, pc);
+    decode_COMPI2opD_0 (iw0);
   else if (((iw0 & 0xF800) == 0x6800))
-    decode_COMPI2opP_0 (iw0, iw1, pc);
+    decode_COMPI2opP_0 (iw0);
   else if (((iw0 & 0xF000) == 0x8000))
-    decode_LDSTpmod_0 (iw0, iw1, pc);
+    decode_LDSTpmod_0 (iw0);
   else if (((iw0 & 0xFF60) == 0x9E60))
-    decode_dagMODim_0 (iw0, iw1, pc);
+    decode_dagMODim_0 (iw0);
   else if (((iw0 & 0xFFF0) == 0x9F60))
-    decode_dagMODik_0 (iw0, iw1, pc);
+    decode_dagMODik_0 (iw0);
   else if (((iw0 & 0xFC00) == 0x9C00))
-    decode_dspLDST_0 (iw0, iw1, pc);
+    decode_dspLDST_0 (iw0);
   else if (((iw0 & 0xF000) == 0x9000))
-    decode_LDST_0 (iw0, iw1, pc);
+    decode_LDST_0 (iw0);
   else if (((iw0 & 0xFC00) == 0xB800))
-    decode_LDSTiiFP_0 (iw0, iw1, pc);
+    decode_LDSTiiFP_0 (iw0);
   else if (((iw0 & 0xE000) == 0xA000))
-    decode_LDSTii_0 (iw0, iw1, pc);
+    decode_LDSTii_0 (iw0);
   else if (((iw0 & 0xFF80) == 0xE080) && ((iw1 & 0x0C00) == 0x0000))
     decode_LoopSetup_0 (iw0, iw1, pc);
   else if (((iw0 & 0xFF00) == 0xE100) && ((iw1 & 0x0000) == 0x0000))
@@ -5961,7 +5815,7 @@ _interp_insn_bfin (bu32 pc)
   else if (((iw0 & 0xFC00) == 0xE400) && ((iw1 & 0x0000) == 0x0000))
     decode_LDSTidxI_0 (iw0, iw1, pc);
   else if (((iw0 & 0xFFFE) == 0xE800) && ((iw1 & 0x0000) == 0x0000))
-    decode_linkage_0 (iw0, iw1, pc);
+    decode_linkage_0 (iw0, iw1);
   else if (((iw0 & 0xF600) == 0xC000) && ((iw1 & 0x0000) == 0x0000))
     decode_dsp32mac_0 (iw0, iw1, pc);
   else if (((iw0 & 0xF600) == 0xC200) && ((iw1 & 0x0000) == 0x0000))
@@ -5973,12 +5827,11 @@ _interp_insn_bfin (bu32 pc)
   else if (((iw0 & 0xF7E0) == 0xC680) && ((iw1 & 0x0000) == 0x0000))
     decode_dsp32shiftimm_0 (iw0, iw1, pc);
   else if (((iw0 & 0xFF00) == 0xF800))
-    decode_psedoDEBUG_0 (iw0, iw1, pc);
+    decode_psedoDEBUG_0 (iw0);
   else if (((iw0 & 0xFF00) == 0xF900))
-    decode_psedoOChar_0 (iw0, iw1, pc);
+    decode_psedoOChar_0 (iw0);
   else if (((iw0 & 0xFFC0) == 0xF000) && ((iw1 & 0x0000) == 0x0000))
-
-    decode_psedodbg_assert_0 (iw0, iw1, pc);
+    decode_psedodbg_assert_0 (iw0, iw1);
   else
     unhandled_instruction ();
 }
