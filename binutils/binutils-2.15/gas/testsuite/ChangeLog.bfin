@@ -1,9 +1,20 @@
+2004-12-10  Catherine Moore  <clm@cm00re.com>
+	
+	* gas/bfin/event.s: New.
+	* gas/bfin/event.d: New.
+	* gas/bfin/load.s: New.
+	* gas/bfin/load.d: New.
+	* gas/bfin/stack.s: New.
+	* gas/bfin/stack.d: New.
+	* gas/bfin/bfin.exp: Update to run new tests.
+
 2004-12-09  Catherine Moore  <clm@cm00re.com>
 
 	* gas/bfin/cache.s: New.
 	* gas/bfin/cache.d: New.
 	* gas/bfin/arithmetic.s: New.
 	* gas/bfin/arithmetic.d: New.
+	* gas/bfin/bfin.exp: Update to run new tests.
 
 2004-12-08  Catherine Moore  <clm@cm00re.com>
 

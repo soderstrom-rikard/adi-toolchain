@@ -5,6 +5,9 @@ if [istarget bfin*-*-*] {
 	run_dump_test "bit"
 	run_dump_test "cache"
 	run_dump_test "control_code"
+	run_dump_test "event"
+	run_dump_test "load"
 	run_dump_test "logical"
 	run_dump_test "shift"
+	run_dump_test "stack"
 }
