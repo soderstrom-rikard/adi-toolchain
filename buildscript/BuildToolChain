@@ -99,7 +99,7 @@ DIR_OUTPUT=$DIR_BUILD/output
 echo $DIR_OUTPUT
 
 echo "Path to binutils dir ...."
-DIR_BINUTILS_SOURCE=$DIR_SOURCE/binutils-2.15
+DIR_BINUTILS_SOURCE=$DIR_SOURCE/binutils/binutils-2.15
 echo $DIR_BINUTILS_SOURCE
 
 echo "Path to gcc dir ...."
