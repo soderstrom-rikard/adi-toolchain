@@ -1,3 +1,8 @@
+2004-09-07  Bernd Schmidt  <bernds@btinternet.com>
+
+	* config/bfin/bfin.md (adddi3): Turn this into a two-operand insn to
+	avoid running out of registers.
+
 2004-09-06  Bernd Schmidt  <bernds@btinternet.com>
 
 	* config/bfin/bfin.c: Include "ggc.h" and "gt-bfin.h"

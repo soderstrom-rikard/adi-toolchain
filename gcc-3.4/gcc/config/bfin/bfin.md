@@ -563,16 +563,16 @@
 ;;;<<<  adddi3-mode    >>>;;;
 (define_insn "adddi3"
   [(set (match_operand:DI 0 "register_operand"           "=&d,&d")
-        (plus:DI (match_operand:DI 1 "register_operand"  "%0,d")
+        (plus:DI (match_operand:DI 1 "register_operand"  "%0,0")
                  (match_operand:DI 2 "nonmemory_operand" "M,d")))
-   (clobber (match_scratch:SI 3 "=&d,X"))
+   (clobber (match_scratch:SI 3 "=&d,&d"))
    (clobber (reg:CC 34))]
   ""
   "@
     %0 += %2; cc = ac; %3 = cc; %H0 = %H0 + %3;
-    %0 = %1 + %2; cc = ac; %H0 = cc; %H0 = %H0 + %H1; %H0 = %H0 + %H2;"
+    %0 = %0 + %2; cc = ac; %3 = cc; %H0 = %H0 + %H1; %H0 = %H0 + %H2; %H0 = %H0 + %3;"
   [(set_attr "type" "alu0")
-   (set_attr "length" "8,10")])
+   (set_attr "length" "8,12")])
 
 
 ;;;<<<  subdi3-mode    >>>;;;
