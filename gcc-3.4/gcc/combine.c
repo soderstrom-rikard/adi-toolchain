@@ -7965,6 +7965,29 @@ simplify_and_const_int (rtx x, enum machine_mode mode, rtx varop,
 		      simplify_and_const_int (NULL_RTX, GET_MODE (varop),
 					      XEXP (varop, 1), constop))));
 
+  /* If we have (xshift (xor (...) (constant))), we may be able to turn the
+     xor into a not.  */
+  if ((GET_CODE (varop) == LSHIFTRT || GET_CODE (varop) == ASHIFTRT
+       || GET_CODE (varop) == ASHIFT)
+      && GET_CODE (XEXP (varop, 1)) == CONST_INT
+      && GET_CODE (XEXP (varop, 0)) == XOR
+      && GET_CODE (XEXP (XEXP (varop, 0), 1)) == CONST_INT)
+    {
+      unsigned HOST_WIDE_INT mask = ~(unsigned HOST_WIDE_INT) 0;
+      unsigned HOST_WIDE_INT xorval = INTVAL (XEXP (XEXP (varop, 0), 1));
+      int shift = INTVAL (XEXP (varop, 1));
+      
+      if (GET_CODE (varop) == ASHIFT)
+	mask <<= shift;
+      else
+	mask >>= shift;
+      if ((mask & xorval) == xorval)
+	varop = gen_rtx_fmt_ee (GET_CODE (varop), GET_MODE (varop),
+				gen_rtx_NOT (GET_MODE (varop),
+					     XEXP (XEXP (varop, 0), 0)),
+				XEXP (varop, 1));
+    }
+
   /* If VAROP is PLUS, and the constant is a mask of low bite, distribute
      the AND and see if one of the operands simplifies to zero.  If so, we
      may eliminate it.  */

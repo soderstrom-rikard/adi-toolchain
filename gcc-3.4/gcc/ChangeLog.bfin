@@ -1,3 +1,27 @@
+2004-11-16  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* combine.c (simplify_and_const_int): Try to turn XOR inside a shift
+	into a NOT.
+	* ifcvt.c (condition_clobbered): New static variable.
+	(note_clobbers_of_cond, sequence_clobbers_condition_p): New static
+	functions.
+	(noce_try_cmove_arith): Use sequence_clobbers_condition_p.
+	* config/bfin/bfin.c (rhs_andsi3_operand): Accept a few more constants.
+	(cc_operand): Hard regs aren't unique.
+	* config/bfin/bfin.h (CONST_OK_FOR_16UBIT_IMM_P): New.
+	(CONST_OK_FOR_K): Add 16 bit immediates.
+	(CONST_OK_FOR_M): New macro.
+	(CONSTRAINT_LEN, CONST_OK_FOR_CONSTRAINT_P): 'M1' and 'M2' are 8 bit
+	and 16 bit masks.  'L' renamed from EXTRA_CONSTRAINT's 'Q'.
+	(EXTRA_CONSTRAINT): Delete.
+	* config/bfin/bfin.md (bittst, not_bittst): Previously unnamed
+	patterns.  Changed to use comparison with zero in both patterns.
+	(bit_extract, not_bit_extract): New patterns.
+	(andsi_insn): Now a define_and_split; handle more cases.  Show that
+	it clobbers CC.
+	(andsi3): Generate additional CC clobber.
+	(commented out bittst peepholes): Delete.
+
 2004-11-14  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (CONST_16BIT_IMM_P, CONST_7BIT_IMM_P,

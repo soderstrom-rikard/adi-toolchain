@@ -1066,23 +1066,24 @@ do {                                              \
 #define WORD_REGISTER_OPERATIONS
 */
 
+#define CONST_18UBIT_IMM_P(VALUE) ((VALUE) >= 0 && (VALUE) <= 262140)
 #define CONST_16BIT_IMM_P(VALUE) ((VALUE) >= -32768 && (VALUE) <= 32767)
+#define CONST_16UBIT_IMM_P(VALUE) ((VALUE) >= 0 && (VALUE) <= 65535)
 #define CONST_7BIT_IMM_P(VALUE) ((VALUE) >= -64 && (VALUE) <= 63)
 #define CONST_7NBIT_IMM_P(VALUE) ((VALUE) >= -64 && (VALUE) <= 0)
-#define CONST_3BIT_IMM_P(VALUE) ((VALUE) >= -4 && (VALUE) <= 3)
-#define CONST_3UBIT_IMM_P(VALUE) ((VALUE) >= 0 && (VALUE) <= 7)
+#define CONST_5UBIT_IMM_P(VALUE) ((VALUE) >= 0 && (VALUE) <= 31)
 #define CONST_4BIT_IMM_P(VALUE) ((VALUE) >= -8 && (VALUE) <= 7)
 #define CONST_4UBIT_IMM_P(VALUE) ((VALUE) >= 0 && (VALUE) <= 15)
-#define CONST_5UBIT_IMM_P(VALUE) ((VALUE) >= 0 && (VALUE) <= 31)
-#define CONST_18UBIT_IMM_P(VALUE) ((VALUE) >= 0 && (VALUE) <= 262140)
+#define CONST_3BIT_IMM_P(VALUE) ((VALUE) >= -4 && (VALUE) <= 3)
+#define CONST_3UBIT_IMM_P(VALUE) ((VALUE) >= 0 && (VALUE) <= 7)
 
-#define CONSTRAINT_LEN(C, STR) \
-    ((C) == 'P' ? 2			\
-     : (C) == 'K' ? 3			\
+#define CONSTRAINT_LEN(C, STR)			\
+    ((C) == 'P' || (C) == 'M' || (C) == 'N' ? 2	\
+     : (C) == 'K' ? 3				\
      : DEFAULT_CONSTRAINT_LEN ((C), (STR)))
 
-#define CONST_OK_FOR_P(VALUE, STR) \
-    ((STR)[1] == '0' ? (VALUE) == 0 \
+#define CONST_OK_FOR_P(VALUE, STR)    \
+    ((STR)[1] == '0' ? (VALUE) == 0   \
      : (STR)[1] == '1' ? (VALUE) == 1 \
      : (STR)[1] == '2' ? (VALUE) == 2 \
      : 0)
@@ -1092,15 +1093,22 @@ do {                                              \
      ? ((STR)[2] == '3' ? CONST_3UBIT_IMM_P (VALUE)	\
 	: (STR)[2] == '4' ? CONST_4UBIT_IMM_P (VALUE)	\
 	: (STR)[2] == '5' ? CONST_5UBIT_IMM_P (VALUE)	\
+	: (STR)[2] == 'h' ? CONST_16UBIT_IMM_P (VALUE)	\
 	: 0)						\
      : (STR)[1] == 's'					\
      ? ((STR)[2] == '3' ? CONST_3BIT_IMM_P (VALUE)	\
 	: (STR)[2] == '4' ? CONST_4BIT_IMM_P (VALUE)	\
 	: (STR)[2] == '7' ? CONST_7BIT_IMM_P (VALUE)	\
+	: (STR)[2] == 'h' ? CONST_16BIT_IMM_P (VALUE)	\
 	: 0)						\
      : (STR)[1] == 'n'					\
      ? ((STR)[2] == '7' ? CONST_7NBIT_IMM_P (VALUE)	\
 	: 0)						\
+     : 0)
+
+#define CONST_OK_FOR_M(VALUE, STR)			\
+    ((STR)[1] == '1' ? (VALUE) == 255			\
+     : (STR)[1] == '2' ? (VALUE) == 65535		\
      : 0)
 
 /* The letters I, J, K, L and M in a register constraint string
@@ -1121,19 +1129,13 @@ do {                                              \
 */
 #define CONST_OK_FOR_CONSTRAINT_P(VALUE, C, STR)		\
   ((C) == 'I' ? (CONST_4BIT_IMM_P(VALUE)) 			\
-   : (C) == 'J' ? (log2constp ((VALUE)) 			\
-		   && CONST_5UBIT_IMM_P(exact_log2((VALUE)))) 	\
+   : (C) == 'J' ? (log2constp (VALUE)				\
+		   && CONST_5UBIT_IMM_P(exact_log2(VALUE))) 	\
    : (C) == 'K' ? CONST_OK_FOR_K (VALUE, STR)			\
-   : (C) == 'M' ? (CONST_7BIT_IMM_P(VALUE))			\
+   : (C) == 'L' ? log2constp (~(VALUE))				\
+   : (C) == 'M' ? CONST_OK_FOR_M (VALUE, STR)			\
    : (C) == 'P' ? CONST_OK_FOR_P (VALUE, STR)			\
    : 0)
-
-/* Note: need one general case for const interger. -- Tony */
-
-#define EXTRA_CONSTRAINT(VALUE, C)         		\
-   ((C) == 'Q' && GET_CODE (VALUE) == CONST_INT ? 	\
-    	log2constp (~(INTVAL(VALUE))) :			\
-   0)
 
      /*Constant Output Formats */
 #define CONST_DOUBLE_OK_FOR_LETTER_P(VALUE, C)	\

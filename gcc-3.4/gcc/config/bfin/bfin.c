@@ -1554,9 +1554,18 @@ int highbits_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) {
   return 0;
 }
 
-int 
-rhs_andsi3_operand (rtx op, enum machine_mode mode) {
-    return (regorbitclr_operand (op, mode) || highbits_operand (op, mode));
+int
+rhs_andsi3_operand (rtx op, enum machine_mode mode)
+{
+  HOST_WIDE_INT value;
+
+  if (register_operand (op, mode))
+    return 1;
+  if (GET_CODE (op) != CONST_INT)
+    return 0;
+
+  value = INTVAL (op);
+  return log2constp (~value) || value == 255 || value == 65535 || value == 1;
 }
 
 int regorlog2_operand (rtx op, enum machine_mode mode) {
@@ -1577,8 +1586,10 @@ valid_reg_operand (rtx op, enum machine_mode mode)
   return 1;
 }
   
-int cc_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) {
-  return bfin_cc_rtx == op;
+int
+cc_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
+{
+  return REG_P (op) && REGNO (op) == REG_CC && GET_MODE (op) == BImode;
 }
 
 int reg_or_7bit_operand (rtx op, enum machine_mode mode) {
