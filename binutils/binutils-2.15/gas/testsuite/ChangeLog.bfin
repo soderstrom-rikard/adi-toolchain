@@ -1,5 +1,13 @@
 2004-12-16  Catherine Moore  <clm@cm00re.com>
 
+	* gas/bfin/flow.s: New file.
+	* gas/bfin/flow.d: New file.
+	* gas/bfin/flow2.d: New file.
+	* gas/bfin/flow2.s: New test contributed by Satyanarayana Reddy <reddy@epigonaudio.com>.
+	* gas/bfin/bfin.exp: Update to run new tests.
+
+2004-12-16  Catherine Moore  <clm@cm00re.com>
+
 	* gas/bfin/arithmetic.s:
 	* gas/bfin/arithmetic.d: Update to new objdump output.
 	* gas/bfin/load.d: Likewise.
