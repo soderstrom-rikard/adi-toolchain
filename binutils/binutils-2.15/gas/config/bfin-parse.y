@@ -1,4 +1,4 @@
-/* Alternative bfin-parse.y
+/* bfin-parse.y
  *
  * This is the mainly rewritten bfin/nisa assembly parser
  * for the Blackfin processor family.
@@ -9,6 +9,7 @@
  *
  * 03/2004 (c) Martin Strubel <hackfin@section5.ch>
  * 05/2004 merged in new expression parsing from ADI CVS snapshot
+ * 09/2004 tested for all relocations and fixed bugs
  * 
  * This code is subject to the GNU license. Please see www.gnu.org for
  * license details. This source code is provided AS IS, without warranty.
@@ -56,7 +57,7 @@
 
 ////////////////////////////////////////////////////////////////////////////
 
-//#define LDIMMHALF(reg, h, s, z, hword) \
+//#define LDIMMHALF(reg, h, s, z, hword) 
 //	gen_ldimmhalf(reg, h, s, z, hword, 0)
 
 #define LDIMMHALF_R(reg, h, s, z, hword) \
@@ -177,7 +178,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 static int value_match(ExprNode *expr, int sz, int sign, int mul, int issigned);
-static int symbol_match(ExprNode *expr);
 
 int nerrors;
 int nwarnings;
@@ -187,8 +187,6 @@ extern INSTR_T insn;
 
 static ExprNode * binary(ExprOpType,ExprNode *,ExprNode *);
 static ExprNode * unary(ExprOpType,ExprNode *);
-
-static int const_fits(ExprNode * expr, const_forms_t form);
 
 static void notethat(char *format, ...);
 
@@ -1361,21 +1359,6 @@ asm_1:
 
 	| HALF_REG ASSIGN expr
 	{
-#if 0
-		if (symbol_match($3)) {
-		    notethat("LDIMMhalf: pregs_half = sym32\n");
-			          /*      reg, H,  S,  Z  */
-			$$ = LDIMMHALF_R (&$1, IS_H($1),  0,  0, $3);
-		} else 
-		if (IS_IMM($3, 16) || IS_UIMM($3, 16) ) {
-		    notethat("LDIMMhalf: dpregs_half = imm16\n");
-			          /*    reg,   H,  S,  Z  */
-			$$ = LDIMMHALF (&$1, IS_H($1),  0,  0, $3);
-
-		} else {
-			return semantic_error("Bad immediate constant range");
-		}
-#endif
 		notethat("LDIMMhalf: pregs_half = sym32\n");
                 /*      reg, H,  S,  Z  */
                 $$ = LDIMMHALF_R (&$1, IS_H($1),  0,  0, $3);
@@ -4339,16 +4322,6 @@ static int value_match(ExprNode *expr, int sz, int sign, int mul, int issigned)
 	return 0;
 }
 
-static int symbol_match(ExprNode *expr)
-{
-	if (expr->type == ExprNodeReloc)
-		return 1;
-	else
-		return 0;
-}
-
-		
-
  /* return the new expression structure that allows
    symbol operations
    if the left and right children are constants, do the operation
@@ -4426,126 +4399,6 @@ static ExprNode * unary(ExprOpType op,ExprNode * x)
       return ExprNodeCreate(ExprNodeUnop, val, x, NULL);
   }
 }
-
-#if 0
-
-static int const_fits(ExprNode * expr, const_forms_t form)
-{
-#if 1
-    int sz       = constant_formats[form].nbits;
-    int scale    = constant_formats[form].scale;
-    int offset   = constant_formats[form].offset;
-    int issigned = constant_formats[form].issigned;
-
-    /* check if reloc is allowed */
-    if((expr->type != ExprNodeConstant) && 
-        !constant_formats[form].reloc)
-	return 0;
-
-    if(expr->type != ExprNodeConstant)
-      return 1; // it will be relocated, not a constant
-
-    if (sz < 32) {
-      long mask   = (1l<<sz)-1;
-      long minint = (-1l<<(sz-1));
-      long maxint = (1l<<(sz-1));
-      long v = expr->value.i_value;
-
-      if (scale) {
-	long temp = v >> scale;
-	// This is to ensure that constants that are not
-	// rounded up to the correct bit position
-	// are not excepted by const_fits.
-	if (v != (temp << scale))
-	  return 0;
-	v = temp;
-      }
-
-
-      
-
-      if (0 && constant_formats[form].negative) {
-	  if (v >= 0)
-	      return 0;
-	  v = -v;
-	  issigned = 0;
-      }
-
-      if (constant_formats[form].negative) {
-        // return true if all the out-of-range sign bits are 1's
-        return ((v & ~mask) == ~mask);
-      }
-
-      if (constant_formats[form].positive) {
-	  if (v < 0)
-	      return 0;
-      }
-
-      v -= offset;
-      return (!issigned && (v & ~mask) == 0)
-	  || ((minint <= v) && (v < maxint));
-    }
-    return 1;
-
-#else	/* #if 0  */
-    int sz       = constant_formats[form].nbits;
-    int scale    = constant_formats[form].scale;
-    int offset   = constant_formats[form].offset;
-    int issigned = constant_formats[form].issigned;
-
-    if (EXPR_SYMBOL(expr) 
-	&& !constant_formats[form].reloc)
-	return 0;
-
-    if (sz < 32) {
-      long mask   = (1l<<sz)-1;
-      long minint = (-1l<<(sz-1));
-      long maxint = (1l<<(sz-1));
-
-      long v = EXPR_VALUE (expr);
-
-      if (scale) {
-	long temp = v >> scale;
-	// This is to ensure that constants that are not
-	// rounded up to the correct bit position
-	// are not excepted by const_fits.
-	if (v != (temp << scale))
-	  return 0;
-	v = temp;
-      }
-
-
-      
-
-      if (constant_formats[form].negative) {
-        // return true if all the out-of-range sign bits are 1's
-        return ((v & ~mask) == ~mask);
-      }
-
-      // some numbers are treated a negative but have positive format
-      if (constant_formats[form].negative && !constant_formats[form].positive){
-	  if (v >= 0)
-	      return 0;
-	  v = -v;
-	  issigned = 0;
-      }
-
-      if (constant_formats[form].positive && !constant_formats[form].negative) {
-	  if (v < 0)
-	      return 0;
-      }
-
-      v -= offset;
-
-      return (!issigned && (v & ~mask) == 0)
-	  || ((minint <= v) && (v < maxint));
-    }
-    return 1;
-#endif
-}
-
-#endif
-
 
 int debug_codeselection = 0;
 static void notethat(char *format, ...)

@@ -414,7 +414,6 @@ md_assemble (char *line)
 	switch (insn->reloc)
 	  {
 	   case BFD_RELOC_24_PCREL_JUMP_L:
-	   case BFD_RELOC_24_PCREL_CALL_X:
 	   case BFD_RELOC_24_PCREL:
 	   case BFD_RELOC_16_LOW:
 	   case BFD_RELOC_16_HIGH:
@@ -832,9 +831,7 @@ md_apply_fix3 (fixP, valp, seg)
         fixP->fx_addnumber = 0;
         not_yet_resolved = 1; // absolute values not be resolved here
         break;
-     case BFD_RELOC_24_PCREL_JUMP :
-     case BFD_RELOC_24_PCREL_JUMP_X :
-     case BFD_RELOC_24_PCREL_JUMP_L:
+     case BFD_RELOC_24_PCREL_JUMP_L :
      case BFD_RELOC_24_PCREL_CALL_X:
      case BFD_RELOC_24_PCREL:
         if (! val) {
@@ -1194,7 +1191,6 @@ INSTR_T ExprNodeGenReloc(ExprNode *head, int parent_reloc)
         note1 = CONSCODE(GENCODE(value), NULL_CODE);
 	pcrel = 0; // only these are not pc relative
         break;
-      case BFD_RELOC_24_PCREL_JUMP_X :
       case BFD_RELOC_24_PCREL :
       case BFD_RELOC_24_PCREL_JUMP_L :
       case BFD_RELOC_24_PCREL_CALL_X :  
