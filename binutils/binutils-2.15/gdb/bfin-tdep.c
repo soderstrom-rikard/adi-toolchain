@@ -31,6 +31,16 @@
      pc with a decremented value while most other manipulations are
      done explicitly here. 
   3. Resolve the orig_r0 mystery. 
+  4. Test the frameless gcc option
+  Info :
+  1. Most of the frame functions have to bother about frameless
+     as well as frame case. Since blackfin does not modify the
+     stack with a call, on entry to a subroutine, we have the
+     frameless case. A prologue may or maynot build a frame.
+  2. Address conversion needs to be done as gdb understands
+     addresses from the .gdb file while we have addresses that
+     may be absolute values. We find it safe to check the value
+     before proceeding.
 */
 
 #define NUM_PSEUDO_REGS (3)
@@ -458,7 +468,6 @@ bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
     cache->frameless_pc_value = 1;
     frame_unwind_register (next_frame, BFIN_FP_REGNUM, buf);
     cache->base = extract_unsigned_integer (buf, 4);
-    //cache->base -= 8;
     if(cache->base > text_addr)
     	cache->base -=  text_addr;
 #ifdef _DEBUG
@@ -1126,6 +1135,8 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   /* Breakpoint manipulation.  PC will get decremented in kernel */
   set_gdbarch_decr_pc_after_break (gdbarch, 0);
   frame_unwind_append_sniffer (gdbarch, bfin_frame_sniffer);
+
+  set_main_name("_main");
 
 
   return gdbarch;
