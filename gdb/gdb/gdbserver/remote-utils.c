@@ -53,7 +53,6 @@ void
 remote_open (char *name)
 {
   int save_fcntl_flags;
-      fprintf (stderr, "Msg : %s\n", name);
   
   if (!strchr (name, ':'))
     {
@@ -524,7 +523,6 @@ convert_ascii_to_int (char *from, char *to, int n)
 static char *
 outreg (int regno, char *buf)
 {
-      fprintf (stderr, "outreg B\n");
   if ((regno >> 12) != 0)
     *buf++ = tohex ((regno >> 12) & 0xf);
   if ((regno >> 8) != 0)
@@ -535,7 +533,6 @@ outreg (int regno, char *buf)
   collect_register_as_string (regno, buf);
   buf += 2 * register_size (regno);
   *buf++ = ';';
-      fprintf (stderr, "outreg End\n");
 
   return buf;
 }
@@ -586,17 +583,14 @@ prepare_resume_reply (char *buf, char status, unsigned char signo)
   *buf++ = tohex (nib);
   nib = sig & 0x0f;
   *buf++ = tohex (nib);
-      fprintf (stderr, "%c \n", status);
 
   if (status == 'T')
     {
       const char **regp = gdbserver_expedite_regs;
 
-      fprintf (stderr, "RAreply : %s\n",*regp);
       while (*regp)
 	{
 	  buf = outreg (find_regno (*regp), buf);
-      fprintf (stderr, "%s \n", buf);
 	  regp ++;
 	}
 
