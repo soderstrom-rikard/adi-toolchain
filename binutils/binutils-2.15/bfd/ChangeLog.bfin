@@ -1,3 +1,6 @@
+2005-02-01 : raja <raja@rrap-software.com>
+	* elf32-bfin.c: using bfin_bfd_reloc instead of  bfd_elf_generic_reloc as
+	special_function for reloc type R_byte2_data.
 2005-01-31 : raja <raja@rrap-software.com>
 	* elf32-bfin.c: some clean up is done. code that are related to pltpc are 
 	removed.
