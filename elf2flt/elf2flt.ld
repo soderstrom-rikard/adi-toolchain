@@ -94,6 +94,7 @@ R_RODAT		*(.rodata.*)
 		*(.bss)
 		*(.bss.*)
 		*(.bss*)
+		*(.gnu.linkonce.b*)
 		*(COMMON)
 		. = ALIGN(0x10) ;
 		_ebss = . ;
