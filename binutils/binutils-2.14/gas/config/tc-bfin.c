@@ -650,7 +650,7 @@ md_apply_fix3 (fixP, valp, seg)
 	break;
 
      case BFD_RELOC_32:
-	break;
+//	break;
             *buf++ = val >> 0;
             *buf++ = val >> 8;
             *buf++ = val >> 16;
@@ -953,10 +953,15 @@ INSTR_T ExprNodeGenReloc(ExprNode *head, int parent_reloc)
       case BFD_RELOC_24_PCREL :
       case BFD_RELOC_24_PCREL_JUMP_L :
       case BFD_RELOC_24_PCREL_CALL_X :  
-      case BFD_RELOC_11_PCREL :
 	/* these offsets are even numbered, mostly pcrel */
         note1 = CONSCODE(GENCODE(value>>1), NULL_CODE);
         break;
+#if 0
+      case BFD_RELOC_11_PCREL :
+	/* these offsets are even numbered, mostly pcrel */
+        note1 = CONSCODE(GENCODE(value), NULL_CODE);
+        break;
+#endif
       default :
 	note1 = NULL_CODE;
     }

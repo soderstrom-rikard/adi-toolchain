@@ -592,6 +592,8 @@ bfin_const_reloc (
   return bfd_reloc_ok;
 }
 
+
+
 static bfd_reloc_status_type
 bfin_h_l_uimm16_reloc (
      bfd *abfd,
@@ -643,12 +645,14 @@ bfin_h_l_uimm16_reloc (
       }
       else{
         relocation = reloc_stack_pop();
+        //relocation += reloc_entry->addend;
         // assert(is_reloc_stack_empty());
       }
       if (output_bfd != (bfd *) NULL) {	              
 	 /* this output will be relocatable ... like ld -r */
 	 reloc_entry->address += input_section->output_offset;
-	 reloc_entry->addend = relocation;
+	 // reloc_entry->addend = relocation;
+	 reloc_entry->addend = relocation - symbol->value;
       }
       else {
         reloc_entry->addend = 0;
@@ -668,6 +672,85 @@ bfin_h_l_uimm16_reloc (
 }
 
 
+static bfd_reloc_status_type
+bfin_byte4_reloc (
+     bfd *abfd,
+     arelent *reloc_entry,
+     asymbol *symbol,
+     PTR data,
+     asection *input_section,
+     bfd *output_bfd,
+     char **error_message) 
+{
+  bfd_vma relocation, x;
+  //bfd_reloc_status_type flag = bfd_reloc_ok;
+  bfd_size_type addr = reloc_entry->address;
+  bfd_vma output_base = 0;
+  reloc_howto_type *howto = reloc_entry->howto;
+  asection *reloc_target_output_section;
+    /* Is the address of the relocation really within the section?  */
+      if (reloc_entry->address > input_section->_cooked_size)
+	      return bfd_reloc_outofrange;
+      if(is_reloc_stack_empty()){
+        reloc_target_output_section = symbol->section->output_section;
+        relocation = symbol->value;      
+        /* Convert input-section-relative symbol value to absolute.  */
+        if (output_bfd)
+	    output_base = 0;
+        else
+	    output_base = reloc_target_output_section->vma;
+  
+        if (!strcmp(symbol->name, symbol->section->name) || output_bfd == NULL)
+      	  relocation += output_base + symbol->section->output_offset;
+
+        relocation += reloc_entry->addend;
+      }
+      else{
+        relocation = reloc_stack_pop();
+        relocation += reloc_entry->addend;
+        // assert(is_reloc_stack_empty());
+      }
+      if (output_bfd != (bfd *) NULL) {	              
+	 /* this output will be relocatable ... like ld -r */
+	 reloc_entry->address += input_section->output_offset;
+	 reloc_entry->addend = relocation - symbol->value;
+       }
+      else {
+        reloc_entry->addend = 0;
+      }
+        /* Here the variable relocation holds the final address of the
+	   symbol we are relocating against, plus any addend.  */
+
+      x = relocation & 0xFFFF0000;
+      x >>=16;
+      bfd_put_16 (abfd, x, (unsigned char *) data + addr + 2);
+            
+      x = relocation & 0x0000FFFF;
+      bfd_put_16 (abfd, x, (unsigned char *) data + addr);
+    return bfd_reloc_ok;
+}
+
+/*static bfd_reloc_status_type
+bfin_spl_reloc (
+		     bfd *abfd,
+		          arelent *reloc_entry,
+			       asymbol *symbol,
+			            PTR data,
+				         asection *input_section,
+					      bfd *output_bfd,
+					           char **error_message)
+{
+	  //bfd_vma relocation, x;
+	    //bfd_reloc_status_type flag = bfd_reloc_ok;
+	  //  bfd_size_type addr = reloc_entry->address;
+	  //    bfd_vma output_base = 0;
+	  reloc_howto_type *howto = reloc_entry->howto;
+	  fprintf(stderr, "Called spl func with reloc type %s(%d)n",
+			  howto->name, howto->type);
+	  return bfd_reloc_ok;
+	  
+}	  
+*/
 /* HOWTO Table for blackfin.
    Blackfin relocations are fairly complicated. Some of the salient features are
    a. Even numbered offsets. A number of (not all) relocations are
@@ -948,7 +1031,7 @@ static reloc_howto_type bfin_elf_howto_table[] =
          FALSE,          /* pc_relative */
          0,             /* bitpos */
          complain_overflow_unsigned,             /* complain_on_overflow */
-         bfd_elf_generic_reloc,           /* special_function */
+         bfin_byte4_reloc,           /* special_function */
          "R_byte4_data",           /* name */
          TRUE,      /* partial_inplace */
          0xFFFFFFFF,            /* src_mask */

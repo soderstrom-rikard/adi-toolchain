@@ -4051,14 +4051,27 @@ asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW
 |.reg...........| - | - |.eoffset...............................|
 +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
 */
+#if 0
+		    int value;
+			value = 0x00000000 | ((pcrel11($5)&0x3ff)<<0) | 
+				((pregs($9)&0xf)<<12);
+#endif
 		    notethat("LoopSetup: LSETUP ( pcrel4 , lppcrel10 ) counters = pregs\n");
                     $$ = CONSCODE(GENCODE(0x00e080
                                   |((pcrel5($3)&0xf)<<0)  /* soffset<(pcrel4) */
                                   |((counters($7)&0x1)<<4)/* c<(counters) */
                                   |((1&0x3)<<5)           /* rop<(1) */
                           ),
-                          CONCTCODE(ExprNodeGenReloc($3, BFD_RELOC_5_PCREL),
-                                    ExprNodeGenReloc($5, BFD_RELOC_11_PCREL)));
+			  CONCTCODE( ExprNodeGenReloc($3, BFD_RELOC_5_PCREL),
+                          CONCTCODE(GENCODE(0x000000
+                                    |((pcrel11($5)&0x3ff)<<0)              /* eoffset<(lppcrel10) */
+                                    |((pregs($9)&0xf)<<12)                   /* reg<(pregs) */
+                                    ),
+                                    ExprNodeGenReloc($5, BFD_RELOC_11_PCREL))));
+#if 0
+			CONSCODE(CONSCODE(GENCODE(value), NULL_CODE),
+			NOTERELOC1(1, BFD_RELOC_11_PCREL, ($5)->value.s_value, GENCODE(0x0)))));
+#endif
 #if 0
 		    $$ =
 		      CONSCODE(
