@@ -1,42 +1,202 @@
-/* This file is bfin-parse.y
- * Copyright (c) 2000-2001 Analog Devices Inc.,
- * Copyright (c) 2000-2001 by Lineo, Inc./Lineo Canada Corp. (www.lineo.com),
- * Copyright (c) 2001-2002 by Arcturus Networks Inc. (www.arcturusnetworks.com),
- * Ported for Blackfin/Frio Architecture by Akbar Hussain  <akbar.hussain@arcturusnetworks.com>,
- *                                          Tony Kou <tony.ko@arcturusnetworks.com>
- *                                          Faisal Akber <fakber@arcturusnetworks.com>
+/* Alternative bfin-parse.y
+ *
+ * This is the mainly rewritten bfin/nisa assembly parser
+ * for the Blackfin processor family.
+ * 
+ * Opcodes and some parts were derived from the original nisa-parse.y
+ * ( (c) by Analog Devices Inc. )
+ * which was considered to be too big for maintenance.
+ *
+ * 03/2004 (c) Martin Strubel <hackfin@section5.ch>
+ * 05/2004 merged in new expression parsing from ADI CVS snapshot
+ * 
+ * This code is subject to the GNU license. Please see www.gnu.org for
+ * license details. This source code is provided AS IS, without warranty.
+ *
+ * TODO:
+ *       - better syntax error reporting,
+ *       - Valid opt_mode checking in DSP32MAC commands
+ *       - More compacting of redundant code.
+ *
+ *       Parser:
+ *       - allow splitting up of commands in multiple lines
+ *       - enable better delimiter checks to prevent wrong parsing
+ * 
+ *
  */
- 
-/*
- * This file is the parser for the ADI FRIO (Blackfin) processor.
- * The syntax doesn't follow the conventions of M68K or IBM, and is very
- * complex.
- */          
-
-
 
 %{
+
 #include <stdio.h>
+#include "bfin-aux.h"  // opcode generating auxiliaries
 #include <stdarg.h>
-#include "bfin-defs.h"
 #include <obstack.h>
 
+
+////////////////////////////////////////////////////////////////////////////
+// Auxiliary macros to derive some systematics from the old nisa-parse.y
+// See bfin-aux.c for the function calls
+
+#define DSP32ALU(aopcde, HL, dst1, dst0, src0, src1, s, x, aop) \
+	gen_dsp32alu(HL, aopcde, aop, s, x, dst0, dst1, src0, src1)
+
+#define DSP32MAC(op1, MM, mmod, w1, P, h01, h11, h00, h10, dst, op0, src0, src1, w0) \
+	gen_dsp32mac(op1, MM, mmod, w1, P, h01, h11, h00, h10, op0, \
+	             dst, src0, src1, w0)
+
+#define DSP32MULT(op1, MM, mmod, w1, P, h01, h11, h00, h10, dst, op0, src0, src1, w0) \
+	gen_dsp32mult(op1, MM, mmod, w1, P, h01, h11, h00, h10, op0, \
+	              dst, src0, src1, w0)
+
+#define DSP32SHIFT(sopcde, dst0, src0, src1, sop, hls)  \
+	gen_dsp32shift(sopcde, dst0, src0, src1, sop, hls)
+
+#define DSP32SHIFTIMM(sopcde, dst0, immag, src1, sop, hls)  \
+	gen_dsp32shiftimm(sopcde, dst0, immag, src1, sop, hls)
+
+////////////////////////////////////////////////////////////////////////////
+
+//#define LDIMMHALF(reg, h, s, z, hword) \
+//	gen_ldimmhalf(reg, h, s, z, hword, 0)
+
+#define LDIMMHALF_R(reg, h, s, z, hword) \
+	gen_ldimmhalf(reg, h, s, z, hword, 1)
+
+#define LDIMMHALF_R5(reg, h, s, z, hword) \
+        gen_ldimmhalf(reg, h, s, z, hword, 2)
+
+#define LDSTIDXI(ptr, reg, w, sz, z, offset)  \
+	gen_ldstidxi(ptr, reg, w, sz, z, offset)
+
+#define LDST(ptr, reg, aop, sz, z, w)  \
+	gen_ldst(ptr, reg, aop, sz, z, w)
+
+#define LDSTII(ptr, reg, offset, w, op)  \
+	gen_ldstii(ptr, reg, offset, w, op)
+
+#define DSPLDST(i, m, reg, aop, w) \
+	gen_dspldst(i, reg, aop, w, m)
+
+#define LDSTPMOD(ptr, reg, idx, aop, w) \
+	gen_ldstpmod(ptr, reg, aop, w, idx)
+
+#define LDSTIIFP(offset, reg, w)  \
+	gen_ldstiifp(reg, offset, w)
+
+#define LOGI2OP(dst, src, opc) \
+	gen_logi2op(opc, src, dst.regno & CODE_MASK)
+
+#define ALU2OP(dst, src, opc)  \
+	gen_alu2op(dst, src, opc)
+
+#define BRCC(t, b, offset) \
+	gen_brcc(t, b, offset)
+
+#define UJUMP(offset) \
+	gen_ujump(offset)
+
+#define PROGCTRL(prgfunc, poprnd) \
+	gen_progctrl(prgfunc, poprnd)
+
+#define PUSHPOPMULTIPLE(dr, pr, d, p, w) \
+	gen_pushpopmultiple(dr, pr, d, p, w)
+
+#define PUSHPOPREG(reg, w) \
+	gen_pushpopreg(reg, w)
+
+#define CALLA(addr, s)  \
+	gen_calla(addr, s)
+
+#define LINKAGE(r, framesize) \
+	gen_linkage(r, framesize)
+
+#define COMPI2OPD(dst, src, op)  \
+	gen_compi2opd(dst, src, op)
+
+#define COMPI2OPP(dst, src, op)  \
+	gen_compi2opp(dst, src, op)
+
+#define DAGMODIK(i, op)  \
+	gen_dagmodik(i, op)
+
+#define DAGMODIM(i, m, op, br)  \
+	gen_dagmodim(i, m, op, br)
+
+#define COMP3OP(dst, src0, src1, opc)   \
+	gen_comp3op(src0, src1, dst, opc)
+
+#define PTR2OP(dst, src, opc)   \
+	gen_ptr2op(dst, src, opc)
+
+#define CCFLAG(x, y, opc, i, g)  \
+	gen_ccflag(x, y, opc, i, g)
+
+#define CCMV(src, dst, t) \
+	gen_ccmv(src, dst, t)
+
+#define CACTRL(reg, a, op) \
+	gen_cactrl(reg, a, op)
+
+#define LOOPSETUP(soffset, c, rop, eoffset, reg) \
+	gen_loopsetup(soffset, c, rop, eoffset, reg)
+
+// Auxiliaries: (TODO: move to bfin-defs.h)
+
+#define HL2(r1, r0)  (IS_H(r1) << 1 | IS_H(r0))
+
+
+#define IS_PLUS(o)       (o.r0 == 0)
+#define IS_MINUS(o)      (o.r0 == 1)
+#define IS_RANGE(bits, expr, sign, mul)    \
+	value_match(expr, bits, sign, mul, 1)
+#define IS_URANGE(bits, expr, sign, mul)    \
+	value_match(expr, bits, sign, mul, 0)
+#define IS_RELOC(expr) (expr->type != ExprNodeConstant)
+#define IS_IMM(expr, bits)  value_match(expr, bits, 0, 1, 1)
+#define IS_UIMM(expr, bits)  value_match(expr, bits, 0, 1, 0)
+
+#define IS_LIMM(expr, bits) \
+	(value_match(expr, bits, 0, 1, 1))
+
+#define IS_PCREL4(expr) \
+	(value_match(expr, 4, 0, 2, 0))
+
+#define IS_LPPCREL10(expr) \
+	(value_match(expr, 10, 0, 2, 0))
+
+#define IS_PCREL10(expr) \
+	(value_match(expr, 10, 0, 2, 1))
+
+#define IS_PCREL12(expr) \
+	(value_match(expr, 12, 0, 2, 1))
+
+#define IS_PCREL24(expr) \
+	(value_match(expr, 24, 0, 2, 1))
+
+
+////////////////////////////////////////////////////////////////////////////
+
+static int value_match(ExprNode *expr, int sz, int sign, int mul, int issigned);
+static int symbol_match(ExprNode *expr);
 
 int nerrors;
 int nwarnings;
 extern FILE *errorf;
 extern INSTR_T insn;
 
+
 static ExprNode * binary(ExprOpType,ExprNode *,ExprNode *);
 static ExprNode * unary(ExprOpType,ExprNode *);
 
 static int const_fits(ExprNode * expr, const_forms_t form);
+
 static void notethat(char *format, ...);
 
 char *current_inputline;
 extern char *yytext;
+int yyerror(char *msg);
 
-void error (char *format, ...)
+void error(char *format, ...)
 {
     va_list ap;
     char buffer[2000];
@@ -48,291 +208,34 @@ void error (char *format, ...)
     as_bad(buffer);
 }
 
-void warn (char *format, ...)
+
+#define semantic_error(s) _semantic_error(s, __LINE__)
+#define register_mismatch() _register_mismatch(__LINE__)
+
+static
+int _semantic_error(char *syntax, int line)
 {
-    va_list ap;
-    char buffer[2000];
-    
-    va_start (ap, format);
-    vsprintf (buffer,format,ap);
-    
-    va_end (ap);    
-    as_warn (buffer);
+    error("\nSyntax error:<%d>:  `%s'\n", line, syntax);
+	return -1;
 }
 
-void semantic_error(char *syntax)
+static
+int _register_mismatch(int line)
 {
-    error ("\nSemantic error operands don't fit instruction template:  `%s'\n", syntax);
+	return _semantic_error("Register mismatch", line);
 }
 
-void semantic_error_2(char *syntax)
-{
-    error ("\n Semantic error:  %s \n", syntax);
-}
-
-static int yyerror(char *msg) {
-    error ("\n %sInput text was `%s'\n", msg, yytext);
+int yyerror(char *msg) {
+    error("\n %s Input text was `%s'\n", msg, yytext);
     return 0;	/* means successful	*/
 }
 
 extern int yylex (void);
 
-static long reg_class_contents[][3] = {
-{0x000000ff, 0x00000000, 0x00000000}, /* dregs_lo */
-{0x0000ff00, 0x00000000, 0x00000000}, /* dregs_hi */
-{0x00ff0000, 0x00000000, 0x00000000}, /* dregs */
-{0x0f000000, 0x00000000, 0x00000000}, /* dregs_pair */
-{0xf0000000, 0x0000000f, 0x00000000}, /* pregs */
-{0x00000000, 0x0000000c, 0x00000000}, /* spfp */
-{0x0000ffff, 0x00000000, 0x00000000}, /* dregs_hilo */
-{0x00000000, 0x00000030, 0x00000000}, /* accum_ext */
-{0x00000000, 0x000000c0, 0x00000000}, /* accum_word */
-{0x00000000, 0x00000300, 0x00000000}, /* accum */
-{0x00000000, 0x00003c00, 0x00000000}, /* iregs */
-{0x00000000, 0x0003c000, 0x00000000}, /* mregs */
-{0x00000000, 0x003c0000, 0x00000000}, /* bregs */
-{0x00000000, 0x03c00000, 0x00000000}, /* lregs */
-{0xf0ff0000, 0x0000000f, 0x00000000}, /* dpregs */
-{0xf0ff0000, 0x0000000f, 0x00000000}, /* gregs */
-{0xf0ff0000, 0x03fffc0f, 0x00000000}, /* regs */
-{0x00000000, 0xfc000000, 0x00000000}, /* statbits */
-{0x00000000, 0x00000000, 0x0000003f}, /* ignore_bits */
-{0x00000000, 0x00000000, 0x00000040}, /* ccstat */
-{0x00000000, 0x00000000, 0x00000180}, /* counters */
-{0x00000000, 0x000000f0, 0x00000e00}, /* dregs2_sysregs1 */
-{0x00000000, 0x00000000, 0x00000000}, /* open */
-{0x00000000, 0x00000000, 0x0003f180}, /* sysregs2 */
-{0x00000000, 0x00000000, 0x01fc0000}, /* sysregs3 */
-{0xf0ff0000, 0x03fffcff, 0x01ffff80}, /* allregs */
-};
-
-#define reginclass(r,c) (reg_class_contents[c][r>>5]&(1<<((r)&63)))
-
-
-/* RL(0..7)  */
-static int encode_dregs_lo[] = {
-  0,   1,   2,   3,   4,   5,   6,   7,   -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  };
-
-#define dregs_lo(x) (encode_dregs_lo[x])
-
-/* RH(0..7)  */
-/*static int encode_dregs_hi[] = {
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  0,   1,   2,   3,   4,   5,   6,   7,   
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  };
-
-#define dregs_hi(x) (encode_dregs_hi[x])
-*/
-/* R(0..7)  */
-static int encode_dregs[] = {
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  0,   1,   2,   3,   4,   5,   6,   7,   -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  };
-
-#define dregs(x) (encode_dregs[x])
-
-/* R1:0 - R3:2 - R5:4 - R7:6 -  */
-/*static int encode_dregs_pair[] = {
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  0,   2,   4,   6,   -1,  -1,  -1,  -1,
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  };
-
-#define dregs_pair(x) (encode_dregs_pair[x])
-*/
-/* P(0..5) SP FP  */
-static int encode_pregs[] = {
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  0,   1,   2,   3,   
-  4,   5,   6,   7,   -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  };
-
-#define pregs(x) (encode_pregs[x])
-
-
-
-/* I(0..3)   */
-static int encode_iregs[] = {
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  0,   1,   2,   3,   -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  };
-
-#define iregs(x) (encode_iregs[x])
-
-/* M(0..3)   */
-static int encode_mregs[] = {
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  0,   1,   
-  2,   3,   -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-  };
-
-#define mregs(x) (encode_mregs[x])
-
-
-/* dregs pregs  */
-static int encode_dpregs[] = {
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  0,   1,   2,   3,   4,   5,   6,   7,   -1,  -1,  -1,  -1,  8,   9,   10,  11,  
-  12,  13,  14,  15,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  };
-
-#define dpregs(x) (encode_dpregs[x])
-
-/* [dregs pregs] */
-static int encode_gregs[] = {
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-  0,   1,   2,   3,   4,   5,   6,   7,   -1,  -1,  -1,  -1,  8,   9,   10,  11,  
-  12,  13,  14,  15,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  };
-
-#define gregs(x) (encode_gregs[x])
-#define Xgregs(x) (encode_gregs[x]>>3)
-
-/* [dregs pregs (iregs mregs) (bregs lregs)]  */
-static int encode_regs[] = {
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  0,   1,   2,   3,   4,   5,   6,   7,   -1,  -1,  -1,  -1,  8,   9,   10,  11,  
-  12,  13,  14,  15,  -1,  -1,  -1,  -1,  -1,  -1,  16,  17,  18,  19,  20,  21,  
-  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  };
-
-#define regs(x) (encode_regs[x])
-#define Xregs(x) (encode_regs[x]>>3)
-
-/* AZ AN AC AV0 AV1 - AQ -                  -  -  -  -   -   -  - -                  -  -  -  -   -   -  - -                  -  -  -  -   -   -  - -  */
-static int encode_statbits[] = {
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  0,   1,   2,   3,   4,   6,   
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-  };
-
-#define statbits(x) (encode_statbits[x])
-
-
-/* LC0 LC1  */
-static int encode_counters[] = {
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  0,   1,   -1,  -1,  -1,  -1,  -1,  -1,  -1,
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  };
-
-#define counters(x) (encode_counters[x])
-
-
-/* [dregs pregs (iregs mregs) (bregs lregs) 	         dregs2_sysregs1 open sysregs2 sysregs3] */
-static int encode_allregs[] = {
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,  
-  0,   1,   2,   3,   4,   5,   6,   7,   -1,  -1,  -1,  -1,  8,   9,   10,  11,  
-  12,  13,  14,  15,  32,  34,  33,  35,  -1,  -1,  16,  17,  18,  19,  20,  21,  
-  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,  -1,  -1,  -1,  -1,  -1,  -1,  
-  -1,  -1,  -1,  -1,  -1,  -1,  -1,  48,  51,  36,  38,  39,  49,  50,  52,  53,  
-  54,  55,  56,  57,  58,  59,  60,  61,  62,  
-  };
-
-#define allregs(x) (encode_allregs[x])
-#define Xallregs(x) (encode_allregs[x]>>3)
-struct {
-    char *name; 
-    int nbits; 
-    char reloc;
-    char issigned;
-    char pcrel; 
-    char scale;
-    char offset; 
-    char negative; 
-    char positive;
-} constant_formats[] = {
-   { "0", 0, 0, 1, 0, 0, 0, 0, 0 },
-  { "1", 0, 0, 1, 0, 0, 0, 0, 0 },
-  { "4", 0, 0, 1, 0, 0, 0, 0, 0 },
-  { "2", 0, 0, 1, 0, 0, 0, 0, 0 },
-  { "uimm2", 2, 0, 0, 0, 0, 0, 0, 0 },
-  { "uimm3", 3, 0, 0, 0, 0, 0, 0, 0 },
-  { "imm3", 3, 0, 1, 0, 0, 0, 0, 0 },
-  { "pcrel4", 4, 1, 0, 1, 1, 0, 0, 0 },
-  { "pcrel5", 4, 1, 0, 1, 1, 0, 0, 0 },
-  { "imm4", 4, 0, 1, 0, 0, 0, 0, 0 },
-  { "uimm4s4", 4, 0, 0, 0, 2, 0, 0, 1 },  
-  { "uimm4", 4, 0, 0, 0, 0, 0, 0, 0 },
-  { "uimm4s2", 4, 0, 0, 0, 1, 0, 0, 1 },  
-  { "negimm5s4", 5, 0, 1, 0, 2, 0, 1, 0 },
-  { "imm5", 5, 0, 1, 0, 0, 0, 0, 0 },
-  { "uimm5", 5, 0, 0, 0, 0, 0, 0, 0 },
-  { "imm6", 6, 0, 1, 0, 0, 0, 0, 0 },
-  { "imm7", 7, 0, 1, 0, 0, 0, 0, 0 },
-  { "imm8", 8, 0, 1, 0, 0, 0, 0, 0 },
-  { "uimm8", 8, 0, 0, 0, 0, 0, 0, 0 },
-  { "pcrel8", 8, 1, 0, 1, 1, 0, 0, 0 },
-  { "uimm8s4", 8, 0, 0, 0, 2, 0, 0, 0 },  
-  { "pcrel8s4", 8, 1, 1, 1, 2, 0, 0, 0 }, 
-  { "lppcrel10", 10, 1, 0, 1, 1, 0, 0, 0 },
-  { "pcrel10", 10, 1, 1, 1, 1, 0, 0, 0 }, 
-  { "pcrel11", 10, 1, 0, 1, 1, 0, 0, 0 }, 
-  { "pcrel12", 12, 1, 1, 1, 1, 0, 0, 0 }, 
-  { "pcrel12_jump", 12, 1, 1, 1, 1, 0, 0, 0},
-  { "pcrel12_jump_s", 12, 1, 1, 1, 1, 0, 0, 0},
-  { "imm16s4", 16, 0, 1, 0, 2, 0, 0, 0 },
-  { "luimm16", 16, 1, 0, 0, 0, 0, 0, 0 },
-  { "imm16", 16, 0, 1, 0, 0, 0, 0, 0 },
-  { "huimm16", 16, 1, 0, 0, 0, 0, 0, 0 },
-  { "rimm16", 16, 1, 1, 0, 0, 0, 0, 0 },
-  { "imm16s2", 16, 0, 1, 0, 1, 0, 0, 0 },
-  { "uimm16s4", 16, 0, 0, 0, 2, 0, 0, 0 },
-  { "uimm16", 16, 0, 0, 0, 0, 0, 0, 0 },
-  { "pcrel24", 24, 1, 1, 1, 1, 0, 0, 0 },
-  { "pcrel24_call_x", 24, 1, 1, 1, 1, 0, 0, 0},
-  { "pcrel24_jump", 24, 1, 1, 1, 1, 0, 0, 0},
-  { "pcrel24_jump_x", 24, 1, 1, 1, 1, 0, 0, 0},
-  { "pcrel24_jump_l", 24, 1, 1, 1, 1, 0, 0, 0},
-
-};
-
 #define uimm2(x) EXPR_VALUE(x)
 #define uimm3(x) EXPR_VALUE(x)
 #define imm3(x) EXPR_VALUE(x)
 #define pcrel4(x) ((EXPR_VALUE(x))>>1)
-#define pcrel5(x) ((EXPR_VALUE(x))>>1)
 #define imm4(x) EXPR_VALUE(x)
 #define uimm4s4(x) ((EXPR_VALUE(x))>>2)
 #define uimm4(x) EXPR_VALUE(x)
@@ -349,10 +252,7 @@ struct {
 #define pcrel8s4(x) ((EXPR_VALUE(x))>>2)
 #define lppcrel10(x) ((EXPR_VALUE(x))>>1)
 #define pcrel10(x) ((EXPR_VALUE(x))>>1)
-#define pcrel11(x) ((EXPR_VALUE(x))>>1)
 #define pcrel12(x) ((EXPR_VALUE(x))>>1)
-#define pcrel12_jump(x) ((EXPR_VALUE(x))>>1)
-#define pcrel12_jump_s(x) ((EXPR_VALUE(x))>>1)
 #define imm16s4(x) ((EXPR_VALUE(x))>>2)
 #define luimm16(x) EXPR_VALUE(x)
 #define imm16(x) EXPR_VALUE(x)
@@ -362,17856 +262,4094 @@ struct {
 #define uimm16s4(x) ((EXPR_VALUE(x))>>2)
 #define uimm16(x) EXPR_VALUE(x)
 #define pcrel24(x) ((EXPR_VALUE(x))>>1)
-#define pcrel24_call_x(x) ((EXPR_VALUE(x))>>1)
-#define pcrel24_jump(x) ((EXPR_VALUE(x))>>1)
-#define pcrel24_jump_x(x) ((EXPR_VALUE(x))>>1)
-#define pcrel24_jump_l(x) ((EXPR_VALUE(x))>>1)
 
-#define	align_power(addr, align)	\
-	( ((addr) + ((1<<(align))-1)) & (-1 << (align)))
 
-// this predicate allows only certain instruction to be
-// be issued in parallel with dsp32.  The instructions are
-// as below or nop which is just a zero.
-static void ensure_legal_multi_issue_slavep_first (INSTR_T x) {
+////////////////////////////////////////////////////////////////////////////
+// Auxiliary functions
+//
+
+
+static
+void neg_value(ExprNode *expr)
+{
+	expr->value.i_value = -expr->value.i_value;
+}
+
+static
+int are_byteop_regs(Register *dst, Register *src0, ExprNode *s0,
+	Register *src1, ExprNode *s1)
+{
+	if (!IS_DREG(*dst) || !IS_DREG(*src0) || !IS_DREG(*src1)) {
+		semantic_error("Dregs expected"); return 0;
+	}
+
+	if (((src0->regno & CODE_MASK) != 1 || imm7(s0) != 0)
+	 || ((src1->regno & CODE_MASK) != 3 || imm7(s1) != 2)) {
+		semantic_error("Bad register pairs"); return 0;
+	}
+	return 1;
+}
+
+static int
+check_multfuncs(Macfunc *aa, Macfunc *ab)
+{
+	if ( (!REG_EQUAL(aa->s0, ab->s0) && !REG_EQUAL(aa->s0, ab->s1))
+	   ||(!REG_EQUAL(aa->s1, ab->s1) && !REG_EQUAL(aa->s1, ab->s0)) )
+		return semantic_error("Source multiplication register mismatch");
+
+	return 0;
+}
+
+
+// check (vector) mac funcs and ops:
+
+static int
+check_macfuncs(Macfunc *aa, Opt_mode *opa,
+               Macfunc *ab, Opt_mode *opb)
+{
+	// Variables for swapping:
+	Macfunc mtmp;
+	Opt_mode otmp;
+
+
+	// if a0macfunc comes before a1macfunc, swap them.
+	
+	if (aa->n == 0) {
+		// (M) is not allowed here:
+		if (opa->MM != 0) return semantic_error("(M) not allowed with A0MAC");
+		if (ab->n != 1)   return semantic_error("Vector AxMACs can't be same");
+
+		mtmp = *aa; *aa = *ab; *ab = mtmp;
+		otmp = *opa; *opa = *opb; *opb = otmp;
+	} else {
+		if (opb->MM != 0) return semantic_error("(M) not allowed with A0MAC");
+		if (opa->mod != 0) return semantic_error("Bad opt mode");
+		if (ab->n != 0)   return semantic_error("Vector AxMACs can't be same");
+	}
+
+	// if both ops are != 3, we have multfuncs in both
+	// assignment_or_macfuncs
+	if (aa->op == ab->op && aa->op != 3) {
+		if (check_multfuncs(aa, ab) < 0) return -1;
+	} else {
+	// only one of the assign_macfuncs has a multfunc.
+	// Evil trick: Just 'OR' their source register codes:
+	// We can do that, because we know they were initialized to 0
+	// in the rules that don't use multfuncs.
+		aa->s0.regno |= (ab->s0.regno & CODE_MASK);
+		aa->s1.regno |= (ab->s1.regno & CODE_MASK);
+	}
+
+	if (aa->w == ab->w  && aa->P != ab->P) {
+		return semantic_error("macfuncs must differ");
+		if (aa->w && (aa->dst.regno - ab->dst.regno != 1))
+			return semantic_error("Destination Dregs must differ by one");
+	} else
+	// We assign to full regs, thus obey even/odd rules:	
+	if ( (aa->w && aa->P && IS_EVEN(aa->dst)) 
+	  || (ab->w && ab->P && !IS_EVEN(ab->dst)) ) {
+			return semantic_error("Even/Odd register assignment mismatch");
+	} else 
+	// We assign to half regs, thus obey hi/low rules:	
+	if ( (aa->w && !aa->P && !IS_H(aa->dst)) 
+	  || (ab->w && !aa->P && IS_H(ab->dst)) ) {
+			return semantic_error("High/Low register assignment mismatch");
+	}
+	// Make sure first macfunc has got both P flags ORed
+	aa->P |= ab->P;
+
+	// Make sure mod flags get ORed, too
+	opb->mod |= opa->mod;
+	return 0;	
+}
+
+
+static int is_group1 (INSTR_T x)
+{
     if ((x->value & 0xc000) == 0x8000  //dspLDST,LDSTpmod,LDST,LDSTiiFP,LDSTii
 	|| (x->value == 0x0000))
-	return ;
-    error ("illegal instruction in multi issue slot\\n");
-    }
+		return 1;
+	return 0;
+}
 
-static void  ensure_legal_multi_issue_slavep (INSTR_T x) {
-    if ((   ((x->value & 0xfc00) == 0x9c00)  // pick dspLDST
-	&& !((x->value & 0xfde0) == 0x9c60)  // pick dagMODim
-	&& !((x->value & 0xfde0) == 0x9ce0)  // pick dagMODim with bit rev
-	&& !((x->value & 0xfde0) == 0x9d60)) // pick dagMODik
-	|| (x->value == 0x0000))
-	return ;
-    error ("illegal instruction in multi issue slot\\n");
-    }
-
-
-#ifndef ENABLE_M_BIT
-#define ENABLE_M_BIT(x)
-#endif
-
-
+static int is_group2 (INSTR_T x)
+{
+    if ( (((x->value & 0xfc00) == 0x9c00)  // pick dspLDST
+	 && !((x->value & 0xfde0) == 0x9c60)  // pick dagMODim
+	 && !((x->value & 0xfde0) == 0x9ce0)  // pick dagMODim with bit rev
+	 && !((x->value & 0xfde0) == 0x9d60)) // pick dagMODik
+	 || (x->value == 0x0000))
+		return 1;
+	return 0;
+}
 
 %}
 
 %union {
     INSTR_T instr;
-    reg_t regno;
     ExprNode *expr;
     SYMBOL_T symbol;
     long value;
+	// new encoding of registers
+	Register reg;
 
-    struct { int s0; int x0; } s0x0;
+    Macfunc macfunc;
+    struct { int r0; int s0; int x0; } modcodes;
     struct { int r0; } r0;
-    struct { int mod; } mod;
-    struct { int op; int h0; int h1; } oph0h1;
+    Opt_mode mod;
 }
 
 
-%token BYTEOP1P         BYTEOP16P        BYTEOP16M        BYTEOP2P
-%token BYTEOP2M         BYTEOP3P         TILDA            BANG
-%token UNLINK           NUMBER           W                LBRACK
-%token RPAREN           DBG              BREV             RBRACK
-%token LE		M                LO
-%token CLI              _LESS_LESS_ASSIGN _LESS_THAN_ASSIGN
-%token CSYNC            ALIGN8           RND              S2RND
-%token JUMP             JUMP_DOT_S       TFU
-%token STAR             ISS2             RNDL             RNDH
-%token STI              SSYNC            PREFETCH         NS
-%token BYTEUNPACK       _MINUS_MINUS     HI               V
-%token COLON            BITCLR		 LOW_REG          HIGH_REG 
-%token MIN              MAX		 SHIFT		  REG_A00
-%token IS               _ASSIGN_BANG     BYTE_REG	  REG_A11
-%token NOP              ASL              ASR              CO
-%token _MINUS_ASSIGN    PLUS             SCO
-%token FLUSHINV         NOT              R		  V
-%token T                FU		 B
-%token ROT              SEARCH           ABS              X
-%token _GREATER_GREATER_ASSIGN           _BAR_ASSIGN		  
-%token LSETUP           _ASSIGN_ASSIGN   DISALGNEXCPT
-%token HLT              BITSET		 _PLUS_BAR_PLUS	  _PLUS_BAR_MINUS
-%token GE               COMMA            BYTEPACK         RAISE
-%token SYMBOL           DBGHALT		 _MINUS_BAR_PLUS  _MINUS_BAR_MINUS
-%token _PLUS_PLUS       BITTST		 S		  LT 
-%token GT               IH		 A_ZERO_DOT_L	  A_ZERO_DOT_H
-%token LESS_THAN        SIGN	         NEG
-%token PRNT             _AMPERSAND_ASSIGN
-%token SIGN             PERCENT          _STAR_ASSIGN     IFLUSH
-%token _GREATER_GREATER_GREATER		  MINUS
-%token DBGCMPLX         PC               A_ONE_DOT_L	  A_ONE_DOT_H
-%token CARET            TL               LSHIFT
-%token OUTC             TH               EXPADJ
-%token ASSIGN           FLUSH		 		  
-%token SIGNBITS         RND12            AMPERSAND        TESTSET
-%token LINK             IF               DIVQ             SAA
-%token DIVS             EXTRACT          ABORT
-%token IS               IU               _KARAT_ASSIGN    PACK
-%token BAR              GREATER_GREATER  
-%token EXCPT            RND20		 BXORSHIFT	  BXOR
-%token _PLUS_ASSIGN     ALIGN16          BP               SLASH
-%token _GREATER_GREATER_GREATER_THAN_ASSIGN               BY
-%token VIT_MAX          JUMP_DOT_L       W32              ASHIFT
-%token KARAT            BITTGL           JUMP_DOT_X
-%token EMUEXCPT         RTE              LPAREN           DBGA
-%token RTI              ALIGN24          RTN
-%token ONES             DBGAH            BITMUX           RTS
-%token DBGAL            LESS_LESS
-%token CALL_DOT_X       CALL             REG              RTX              IDLE
-%token DEPOSIT          Z		 WHATREG	  DOUBLE_BAR
+/***************************************************************************/
+/* Tokens                                                                  */
+/***************************************************************************/
+
+// Vector specific
+%token BYTEOP16P BYTEOP16M
+%token BYTEOP1P BYTEOP2P BYTEOP2M BYTEOP3P
+%token BYTEUNPACK BYTEPACK
+%token PACK
+%token SAA
+%token ALIGN8 ALIGN16 ALIGN24
+%token VIT_MAX
+%token EXTRACT DEPOSIT EXPADJ SEARCH
+%token ONES SIGN SIGNBITS
+
+// stack
+%token LINK UNLINK
+
+// registers
+%token REG
+%token PC
+%token CCREG BYTE_REG
+%token REG_A00 REG_A11
+%token A_ZERO_DOT_L A_ZERO_DOT_H A_ONE_DOT_L A_ONE_DOT_H
+%token HALF_REG
+
+// progctrl
+%token NOP
+%token RTI RTS RTX RTN RTE
+%token HLT IDLE
+%token STI CLI
+%token CSYNC SSYNC
+%token EMUEXCPT
+%token RAISE EXCPT
+%token LSETUP
+%token DISALGNEXCPT
+%token JUMP JUMP_DOT_S JUMP_DOT_L
+%token CALL
+
+// emulator only
+%token ABORT
+
+// operators
+%token NOT TILDA BANG
+%token AMPERSAND BAR
+%token PERCENT
+%token CARET
+%token BXOR
+
+%token MINUS PLUS STAR SLASH
+%token NEG
+%token MIN MAX ABS
+%token DOUBLE_BAR
+%token _PLUS_BAR_PLUS _PLUS_BAR_MINUS _MINUS_BAR_PLUS _MINUS_BAR_MINUS
+%token _MINUS_MINUS _PLUS_PLUS
+
+// shift/rotate ops
+%token SHIFT LSHIFT ASHIFT BXORSHIFT
+%token _GREATER_GREATER_GREATER_THAN_ASSIGN
+%token ROT
+%token LESS_LESS GREATER_GREATER  
+%token _GREATER_GREATER_GREATER
+%token _LESS_LESS_ASSIGN _GREATER_GREATER_ASSIGN
+%token DIVS DIVQ
+
+// in place operators
+%token ASSIGN _STAR_ASSIGN
+%token _BAR_ASSIGN _CARET_ASSIGN _AMPERSAND_ASSIGN
+%token _MINUS_ASSIGN _PLUS_ASSIGN
+
+// assignments, comparisons
+%token _ASSIGN_BANG _LESS_THAN_ASSIGN _ASSIGN_ASSIGN
+%token GE LT LE GT
+%token LESS_THAN
+
+// cache
+%token FLUSHINV FLUSH
+%token IFLUSH PREFETCH
+
+// misc
+%token PRNT
+%token OUTC
+%token WHATREG
+%token TESTSET
+
+// modifiers
+%token ASL ASR
+%token B W
+%token NS S CO SCO
+%token TH TL
+%token BP
+%token BREV
+%token X Z
+%token M MMOD
+%token R RND RNDL RNDH RND12 RND20
+%token V
+%token LO HI
+
+// bit ops
+%token BITTGL BITCLR BITSET BITTST BITMUX
+
+// debug
+%token DBGAL DBGAH DBGHALT DBG DBGA DBGCMPLX
+
+// semantic auxiliaries
+
+%token IF COMMA BY
+%token COLON
+%token RPAREN LPAREN LBRACK RBRACK
 %token MODIFIED_STATUS_REG
+%token MNOP
+%token SYMBOL NUMBER
 
-
-
+/***************************************************************************/
+/* Types                                                                   */
+/***************************************************************************/
 %type<instr> asm
-%type<mod> macmod_accm
-%type<expr> offset_expr
-%type<mod> mxd_mod
+%type<value> MMOD
+%type<mod> opt_mode
+
+// %type<expr> offset_expr
 %type<value> NUMBER
 %type<r0> aligndir
-%type<oph0h1> multfunc
-/* %type<oph0h1> A0macfunc */
-%type<r0> A0macfunc 
-%type<mod> macmod_hmove
-/* %type<oph0h1> A1macfunc */
-%type<r0> A1macfunc 
+%type<modcodes> byteop_mod
+%type<reg> a_assign
+%type<reg> a_plusassign
+%type<reg> a_minusassign
+%type<macfunc> multfunc
+%type<macfunc> assign_macfunc 
+%type<macfunc> a_macfunc 
 %type<expr> expr_1
 %type<instr> asm_1
-%type<s0x0> amod0
-%type<s0x0> amod1
-%type<r0> amod2
+%type<r0> vmod
+%type<modcodes> vsmod
+%type<modcodes> ccstat
+%type<r0> cc_op
+%type<reg> CCREG
+
 %type<r0> searchmod
 %type<expr> symbol
 %type<symbol> SYMBOL
-%type<mod> macmod_pmove 
 %type<expr> eterm
-%type<regno> REG
-%type<regno> LOW_REG
-%type<regno> HIGH_REG
-%type<regno> BYTE_REG
-%type<regno> REG_A00
-%type<regno> REG_A11
-%type<regno> MODIFIED_STATUS_REG 
+%type<reg> REG
+%type<reg> BYTE_REG
+%type<reg> REG_A00
+%type<reg> REG_A11
+%type<reg> REG_A
+%type<reg> MODIFIED_STATUS_REG 
 %type<expr> expr
-%type<r0> xorzornothing 
-%type<r0> sornothing 
+%type<r0> xpmod
+%type<r0> xpmod1
+%type<modcodes> smod 
+%type<modcodes> b3_op
+%type<modcodes> rnd_op
+%type<modcodes> post_op
+%type<reg> HALF_REG
+%type<r0> iu_or_nothing
+%type<r0> plus_minus
+%type<r0> asr_asl
+%type<r0> asr_asl_0
+%type<modcodes> sco
+%type<modcodes> amod0
+%type<modcodes> amod1
+%type<modcodes> amod2
+%type<r0> op_bar_op
+%type<r0> w32_or_nothing
+%type<r0> c_align
+%type<r0> min_max
 
 
-/* Precedencde Rules */
+/* Precedence Rules */
 %left BAR
 %left CARET
 %left AMPERSAND
 %left LESS_LESS GREATER_GREATER
 %left PLUS MINUS
 %left STAR SLASH PERCENT
+
+%right ASSIGN
+
 %right TILDA BANG
 %start asm_or_directive
 %%
-asm_or_directive: { INIT_ASM(); } asm {
-				       insn=$2;
-				       return (1);
-				       }
-		;
+asm_or_directive:
+	{ INIT_ASM(); }
+	asm
+	{ insn=$2; return (1); }
+;
 
 asm: asm_1
-       | asm_1 DOUBLE_BAR asm_1 DOUBLE_BAR asm_1 {
-       if (($1->value & 0xf800) == 0xc000) {
-	   INSTR_T tail;
-	   ENABLE_M_BIT($1);
-	   $1->value |= 0x0800;   
-           for (tail = $1; tail->next; tail = tail->next);
-	   ensure_legal_multi_issue_slavep_first ($3);
-	   ensure_legal_multi_issue_slavep ($5);
-           CONSCODE (tail, $3);
-	   CONSCODE ($3, $5);
-	   $$ = $1;
-       }
-       else
-	   error ("\nIllegal Multi Issue Construct, First instruction must be DSP32\n");
-     }
+	// Parallel instructions:
+	| asm_1 DOUBLE_BAR asm_1 DOUBLE_BAR asm_1 {
+	if (($1->value & 0xf800) == 0xc000) {
+		if (is_group1($3) && is_group2($5)) {
+			$$ = gen_multi_instr($1, $3, $5);
+		} else 
+		if (is_group2($3) && is_group1($5)) {
+			$$ = gen_multi_instr($1, $5, $3);
+		} else {
+			return semantic_error("Wrong 16 bit instructions groups");
+		}
+	}
+		else
+		error("\nIllegal Multi Issue Construct, first instruction must be DSP32\n");
+	}
 
-   | asm_1 DOUBLE_BAR asm_1 {
-       if (($1->value & 0xf800) == 0xc000) {
-	   INSTR_T tail;
-	   ENABLE_M_BIT($1);
-	   $1->value |= 0x0800;
-           for (tail = $1; tail->next; tail = tail->next);
-	   ensure_legal_multi_issue_slavep_first ($3);
-           CONSCODE (tail, $3);
-/*	    need to conscode a 0 to create a 64-bit execution packet, means NOP  */
-	   CONSCODE ($3, CONSCODE (GENCODE (0x0000), NULL_CODE));
-	   $$ = $1;
-       } 
-       else
-	   error ("\nIllegal Multi Issue Construct, First instruction must be DSP32\n");
-      }  
+	| MNOP DOUBLE_BAR asm_1 DOUBLE_BAR asm_1
+	{
+		if (is_group1($3) && is_group2($5)) {
+			$$ = gen_multi_instr(0, $3, $5);
+		} else
+		if (is_group2($3) && is_group1($5)) {
+			$$ = gen_multi_instr(0, $5, $3);
+		} else {
+			return semantic_error("Wrong 16 bit instructions groups");
+		}
+	}
 
-
-   | error { $$=0; as_bad("\nParse error.\n");yyerrok; }  // recovery error
-   ;
-/* First Pattern Page 7.75 */
-asm_1:   A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW_REG macmod_accm
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)==reginclass($8,rc_dregs)
-                                && reginclass($4,rc_dregs)==reginclass($10,rc_dregs) ){
-/*  dsp32mac:	A1macfunc (mxd_mod) , A0macfunc (macmod_accm)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod) , A0macfunc (macmod_accm)\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((($11.mod)&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((0)&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |(((0)&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((($7.r0)&0x3)<<11)                   /*    op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                    /*  h00=A0macfunc.h0  */
-		                  |(((0)&0x1)<<9)                    /*    h10=A0macfunc.h1 */
-				  |((dregs($2)&0x7)<<3)
-				  |((dregs($4)&0x7)<<0)
-		                  |((0&0x1)<<13)                          /*   w0<(0)         */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * LOW_REG mxd_mod COMMA A0macfunc LOW_REG * LOW_REG macmod_accm"); }
-		}
-	| A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR HIGH_REG macmod_accm
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)==reginclass($8,rc_dregs)
-                                && reginclass($4,rc_dregs)==reginclass($10,rc_dregs) ){
-/*  dsp32mac:	A1macfunc (mxd_mod) , A0macfunc (macmod_accm)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod) , A0macfunc (macmod_accm)\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((($11.mod)&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((0)&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |(((0)&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((($7.r0)&0x3)<<11)                   /*    op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                    /*  h00=A0macfunc.h0  */
-		                  |(((1)&0x1)<<9)                    /*    h10=A0macfunc.h1 */
-				  |((dregs($2)&0x7)<<3)
-				  |((dregs($4)&0x7)<<0)
-		                  |((0&0x1)<<13)                          /*   w0<(0)         */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * LOW_REG mxd_mod COMMA A0macfunc LOW_REG * HIGH_REG macmod_accm"); }
-		}
-	| A1macfunc  LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc HIGH_REG STAR LOW_REG macmod_accm
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)==reginclass($8,rc_dregs)
-                                && reginclass($4,rc_dregs)==reginclass($10,rc_dregs) ){
-/*  dsp32mac:	A1macfunc (mxd_mod) , A0macfunc (macmod_accm)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod) , A0macfunc (macmod_accm)\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((($11.mod)&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((0)&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |(((0)&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((($7.r0)&0x3)<<11)                   /*    op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                    /*  h00=A0macfunc.h0  */
-		                  |(((0)&0x1)<<9)                    /*    h10=A0macfunc.h1 */
-				  |((dregs($2)&0x7)<<3)
-				  |((dregs($4)&0x7)<<0)
-		                  |((0&0x1)<<13)                          /*   w0<(0)         */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * LOW_REG mxd_mod COMMA A0macfunc HIGH_REG * LOW_REG macmod_accm"); }
-		}
-	| A1macfunc  LOW_REG STAR LOW_REG mxd_mod COMMA A0macfunc HIGH_REG STAR HIGH_REG macmod_accm
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)==reginclass($8,rc_dregs)
-                                && reginclass($4,rc_dregs)==reginclass($10,rc_dregs) ){
-/*  dsp32mac:	A1macfunc (mxd_mod) , A0macfunc (macmod_accm)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod) , A0macfunc (macmod_accm)\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((($11.mod)&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((0)&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |(((0)&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((($7.r0)&0x3)<<11)                   /*    op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                    /*  h00=A0macfunc.h0  */
-		                  |(((1)&0x1)<<9)                    /*    h10=A0macfunc.h1 */
-				  |((dregs($2)&0x7)<<3)
-				  |((dregs($4)&0x7)<<0)
-		                  |((0&0x1)<<13)                          /*   w0<(0)         */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * LOW_REG mxd_mod COMMA A0macfunc HIGH_REG * HIGH_REG macmod_accm"); }
-		}
-        | A1macfunc LOW_REG STAR HIGH_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW_REG macmod_accm
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)==reginclass($8,rc_dregs)
-                                && reginclass($4,rc_dregs)==reginclass($10,rc_dregs) ){
-/*  dsp32mac:	A1macfunc (mxd_mod) , A0macfunc (macmod_accm)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod) , A0macfunc (macmod_accm)\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((($11.mod)&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((0)&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |(((1)&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((($7.r0)&0x3)<<11)                   /*    op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                    /*  h00=A0macfunc.h0  */
-		                  |(((0)&0x1)<<9)                    /*    h10=A0macfunc.h1 */
-				  |((dregs($2)&0x7)<<3)
-				  |((dregs($4)&0x7)<<0)
-		                  |((0&0x1)<<13)                          /*   w0<(0)         */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * HIGH_REG mxd_mod COMMA A0macfunc LOW_REG * LOW_REG macmod_accm"); }
-		}
-	| A1macfunc LOW_REG STAR HIGH_REG mxd_mod COMMA A0macfunc LOW_REG STAR HIGH_REG macmod_accm
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)==reginclass($8,rc_dregs)
-                                && reginclass($4,rc_dregs)==reginclass($10,rc_dregs) ){
-/*  dsp32mac:	A1macfunc (mxd_mod) , A0macfunc (macmod_accm)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod) , A0macfunc (macmod_accm)\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((($11.mod)&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((0)&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |(((1)&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((($7.r0)&0x3)<<11)                   /*    op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                    /*  h00=A0macfunc.h0  */
-		                  |(((1)&0x1)<<9)                    /*    h10=A0macfunc.h1 */
-				  |((dregs($2)&0x7)<<3)
-				  |((dregs($4)&0x7)<<0)
-		                  |((0&0x1)<<13)                          /*   w0<(0)         */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * HIGH_REG mxd_mod COMMA A0macfunc LOW_REG * HIGH_REG macmod_accm"); }
-		}
-	| A1macfunc  LOW_REG STAR HIGH_REG mxd_mod COMMA A0macfunc HIGH_REG STAR LOW_REG macmod_accm
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)==reginclass($8,rc_dregs)
-                                && reginclass($4,rc_dregs)==reginclass($10,rc_dregs) ){
-/*  dsp32mac:	A1macfunc (mxd_mod) , A0macfunc (macmod_accm)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod) , A0macfunc (macmod_accm)\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((($11.mod)&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((0)&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |(((1)&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((($7.r0)&0x3)<<11)                   /*    op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                    /*  h00=A0macfunc.h0  */
-		                  |(((0)&0x1)<<9)                    /*    h10=A0macfunc.h1 */
-				  |((dregs($2)&0x7)<<3)
-				  |((dregs($4)&0x7)<<0)
-		                  |((0&0x1)<<13)                          /*   w0<(0)         */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * HIGH_REG mxd_mod COMMA A0macfunc HIGH_REG * LOW_REG macmod_accm"); }
-		}
-	| A1macfunc  LOW_REG STAR HIGH_REG mxd_mod COMMA A0macfunc HIGH_REG STAR HIGH_REG macmod_accm
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)==reginclass($8,rc_dregs)
-                                && reginclass($4,rc_dregs)==reginclass($10,rc_dregs) ){
-/*  dsp32mac:	A1macfunc (mxd_mod) , A0macfunc (macmod_accm)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod) , A0macfunc (macmod_accm)\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((($11.mod)&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((0)&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |(((1)&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((($7.r0)&0x3)<<11)                   /*    op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                    /*  h00=A0macfunc.h0  */
-		                  |(((1)&0x1)<<9)                    /*    h10=A0macfunc.h1 */
-				  |((dregs($2)&0x7)<<3)
-				  |((dregs($4)&0x7)<<0)
-		                  |((0&0x1)<<13)                          /*   w0<(0)         */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * HIGH_REG mxd_mod COMMA A0macfunc HIGH_REG * HIGH_REG macmod_accm"); }
-		}
-        | A1macfunc HIGH_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW_REG macmod_accm
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)==reginclass($8,rc_dregs)
-                                && reginclass($4,rc_dregs)==reginclass($10,rc_dregs) ){
-/*  dsp32mac:	A1macfunc (mxd_mod) , A0macfunc (macmod_accm)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod) , A0macfunc (macmod_accm)\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((($11.mod)&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((1)&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |(((0)&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((($7.r0)&0x3)<<11)                   /*    op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                    /*  h00=A0macfunc.h0  */
-		                  |(((0)&0x1)<<9)                    /*    h10=A0macfunc.h1 */
-				  |((dregs($2)&0x7)<<3)
-				  |((dregs($4)&0x7)<<0)
-		                  |((0&0x1)<<13)                          /*   w0<(0)         */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * LOW_REG mxd_mod COMMA A0macfunc LOW_REG * LOW_REG macmod_accm"); }
-		}
-	| A1macfunc HIGH_REG STAR LOW_REG mxd_mod COMMA A0macfunc LOW_REG STAR HIGH_REG macmod_accm
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)==reginclass($8,rc_dregs)
-                                && reginclass($4,rc_dregs)==reginclass($10,rc_dregs) ){
-/*  dsp32mac:	A1macfunc (mxd_mod) , A0macfunc (macmod_accm)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod) , A0macfunc (macmod_accm)\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((($11.mod)&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((1)&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |(((0)&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((($7.r0)&0x3)<<11)                   /*    op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                    /*  h00=A0macfunc.h0  */
-		                  |(((1)&0x1)<<9)                    /*    h10=A0macfunc.h1 */
-				  |((dregs($2)&0x7)<<3)
-				  |((dregs($4)&0x7)<<0)
-		                  |((0&0x1)<<13)                          /*   w0<(0)         */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * LOW_REG mxd_mod COMMA A0macfunc LOW_REG * HIGH_REG macmod_accm"); }
-		}
-	| A1macfunc  HIGH_REG STAR LOW_REG mxd_mod COMMA A0macfunc HIGH_REG STAR LOW_REG macmod_accm
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)==reginclass($8,rc_dregs)
-                                && reginclass($4,rc_dregs)==reginclass($10,rc_dregs) ){
-/*  dsp32mac:	A1macfunc (mxd_mod) , A0macfunc (macmod_accm)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod) , A0macfunc (macmod_accm)\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((($11.mod)&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((1)&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |(((0)&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((($7.r0)&0x3)<<11)                   /*    op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                    /*  h00=A0macfunc.h0  */
-		                  |(((0)&0x1)<<9)                    /*    h10=A0macfunc.h1 */
-				  |((dregs($2)&0x7)<<3)
-				  |((dregs($4)&0x7)<<0)
-		                  |((0&0x1)<<13)                          /*   w0<(0)         */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * LOW_REG mxd_mod COMMA A0macfunc HIGH_REG * LOW_REG macmod_accm"); }
-		}
-	| A1macfunc  HIGH_REG STAR LOW_REG mxd_mod COMMA A0macfunc HIGH_REG STAR HIGH_REG macmod_accm
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)==reginclass($8,rc_dregs)
-                                && reginclass($4,rc_dregs)==reginclass($10,rc_dregs) ){
-/*  dsp32mac:	A1macfunc (mxd_mod) , A0macfunc (macmod_accm)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod) , A0macfunc (macmod_accm)\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((($11.mod)&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((1)&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |(((0)&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((($7.r0)&0x3)<<11)                   /*    op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                    /*  h00=A0macfunc.h0  */
-		                  |(((1)&0x1)<<9)                    /*    h10=A0macfunc.h1 */
-				  |((dregs($2)&0x7)<<3)
-				  |((dregs($4)&0x7)<<0)
-		                  |((0&0x1)<<13)                          /*   w0<(0)         */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * LOW_REG mxd_mod COMMA A0macfunc HIGH_REG * HIGH_REG macmod_accm"); }
-		}
-        | A1macfunc HIGH_REG STAR HIGH_REG mxd_mod COMMA A0macfunc LOW_REG STAR LOW_REG macmod_accm
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)==reginclass($8,rc_dregs)
-                                && reginclass($4,rc_dregs)==reginclass($10,rc_dregs) ){
-/*  dsp32mac:	A1macfunc (mxd_mod) , A0macfunc (macmod_accm)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod) , A0macfunc (macmod_accm)\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((($11.mod)&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((1)&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |(((1)&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((($7.r0)&0x3)<<11)                   /*    op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                    /*  h00=A0macfunc.h0  */
-		                  |(((0)&0x1)<<9)                    /*    h10=A0macfunc.h1 */
-				  |((dregs($2)&0x7)<<3)
-				  |((dregs($4)&0x7)<<0)
-		                  |((0&0x1)<<13)                          /*   w0<(0)         */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * HIGH_REG mxd_mod COMMA A0macfunc LOW_REG * LOW_REG macmod_accm"); }
-		}
-	| A1macfunc HIGH_REG STAR HIGH_REG mxd_mod COMMA A0macfunc LOW_REG STAR HIGH_REG macmod_accm
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)==reginclass($8,rc_dregs)
-                                && reginclass($4,rc_dregs)==reginclass($10,rc_dregs) ){
-/*  dsp32mac:	A1macfunc (mxd_mod) , A0macfunc (macmod_accm)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod) , A0macfunc (macmod_accm)\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((($11.mod)&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((1)&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |(((1)&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((($7.r0)&0x3)<<11)                   /*    op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                    /*  h00=A0macfunc.h0  */
-		                  |(((1)&0x1)<<9)                    /*    h10=A0macfunc.h1 */
-				  |((dregs($2)&0x7)<<3)
-				  |((dregs($4)&0x7)<<0)
-		                  |((0&0x1)<<13)                          /*   w0<(0)         */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * HIGH_REG mxd_mod COMMA A0macfunc LOW_REG * HIGH_REG macmod_accm"); }
-		}
-	| A1macfunc  HIGH_REG STAR HIGH_REG mxd_mod COMMA A0macfunc HIGH_REG STAR LOW_REG macmod_accm
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)==reginclass($8,rc_dregs)
-                                && reginclass($4,rc_dregs)==reginclass($10,rc_dregs) ){
-/*  dsp32mac:	A1macfunc (mxd_mod) , A0macfunc (macmod_accm)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod) , A0macfunc (macmod_accm)\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((($11.mod)&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((1)&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |(((1)&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((($7.r0)&0x3)<<11)                   /*    op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                    /*  h00=A0macfunc.h0  */
-		                  |(((0)&0x1)<<9)                    /*    h10=A0macfunc.h1 */
-				  |((dregs($2)&0x7)<<3)
-				  |((dregs($4)&0x7)<<0)
-		                  |((0&0x1)<<13)                          /*   w0<(0)         */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * HIGH_REG mxd_mod COMMA A0macfunc HIGH_REG * LOW_REG macmod_accm"); }
-		}
-	| A1macfunc  HIGH_REG STAR HIGH_REG mxd_mod COMMA A0macfunc HIGH_REG STAR HIGH_REG macmod_accm
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)==reginclass($8,rc_dregs)
-                                && reginclass($4,rc_dregs)==reginclass($10,rc_dregs) ){
-/*  dsp32mac:	A1macfunc (mxd_mod) , A0macfunc (macmod_accm)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod) , A0macfunc (macmod_accm)\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((($11.mod)&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((1)&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |(((1)&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((($7.r0)&0x3)<<11)                   /*    op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                    /*  h00=A0macfunc.h0  */
-		                  |(((1)&0x1)<<9)                    /*    h10=A0macfunc.h1 */
-				  |((dregs($2)&0x7)<<3)
-				  |((dregs($4)&0x7)<<0)
-		                  |((0&0x1)<<13)                          /*   w0<(0)         */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * HIGH_REG mxd_mod COMMA A0macfunc HIGH_REG * HIGH_REG macmod_accm"); }
-		}
-	| A1macfunc LOW_REG STAR LOW_REG mxd_mod
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)
-				&& reginclass($4,rc_dregs)) {
-/*  dsp32mac:	A1macfunc mxd_mod
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc mxd_mod\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((0&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((0)&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |(((0)&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((3&0x3)<<11)                  /*    op0=A0macfunc.op */
-		                  |((dregs($2)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((dregs($4)&0x7)<<0)                 /* src0<(dregs_lo) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * LOW_REG mxd_mod"); }
-		}
-	| A1macfunc LOW_REG STAR HIGH_REG mxd_mod
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)
-				&& reginclass($4,rc_dregs)) {
-/*  dsp32mac:	A1macfunc mxd_mod
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc mxd_mod\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((0&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((0)&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |(((1)&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((3&0x3)<<11)                  /*    op0=A0macfunc.op */
-		                  |((dregs($2)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((dregs($4)&0x7)<<0)                 /* src0<(dregs_lo) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * HIGH_REG mxd_mod"); }
-		}
-	| A1macfunc HIGH_REG STAR LOW_REG mxd_mod
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)
-				&& reginclass($4,rc_dregs)) {
-/*  dsp32mac:	A1macfunc mxd_mod
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc mxd_mod\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((0&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((1)&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |(((0)&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((3&0x3)<<11)                  /*    op0=A0macfunc.op */
-		                  |((dregs($2)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((dregs($4)&0x7)<<0)                 /* src0<(dregs_lo) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * LOW_REG mxd_mod"); }
-		}
-	| A1macfunc HIGH_REG STAR HIGH_REG mxd_mod
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)
-				&& reginclass($4,rc_dregs)) {
-/*  dsp32mac:	A1macfunc mxd_mod
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc mxd_mod\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((0&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((1)&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |(((1)&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((3&0x3)<<11)                  /*    op0=A0macfunc.op */
-		                  |((dregs($2)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((dregs($4)&0x7)<<0)                 /* src0<(dregs_lo) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * HIGH_REG mxd_mod"); }
-		}
-	| A0macfunc LOW_REG STAR LOW_REG macmod_accm
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)
-				&& reginclass($4,rc_dregs)) {
-/*  dsp32mac:	A0macfunc macmod_accm
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A0macfunc macmod_accm\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((3&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((0&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((($5.mod)&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((0&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |((0&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((($1.r0)&0x3)<<11)                   /*    op0=A0macfunc.op */
-		                  |((0&0x1)<<13)                          /*   w0<(0)         */
-		                  |(((0)&0x1)<<10)                    /*  h00=A0macfunc.h0  */
-		                  |(((0)&0x1)<<9)                    /*    h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((dregs($4)&0x7)<<0)                 /* src0<(dregs_lo) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A0macfunc LOW_REG * LOW_REG mxd_mod"); }
-		}
-	| A0macfunc LOW_REG STAR HIGH_REG macmod_accm
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)
-				&& reginclass($4,rc_dregs)) {
-/*  dsp32mac:	A0macfunc macmod_accm
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A0macfunc macmod_accm\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((3&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((0&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((($5.mod)&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((0&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |((0&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((($1.r0)&0x3)<<11)                   /*    op0=A0macfunc.op */
-		                  |((0&0x1)<<13)                          /*   w0<(0)         */
-		                  |(((0)&0x1)<<10)                    /*  h00=A0macfunc.h0  */
-		                  |(((1)&0x1)<<9)                    /*    h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((dregs($4)&0x7)<<0)                 /* src0<(dregs_lo) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A0macfunc LOW_REG * HIGH_REG mxd_mod"); }
-		}
-	| A0macfunc HIGH_REG STAR LOW_REG macmod_accm
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)
-				&& reginclass($4,rc_dregs)) {
-/*  dsp32mac:	A0macfunc macmod_accm
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A0macfunc macmod_accm\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((3&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((0&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((($5.mod)&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((0&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |((0&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((($1.r0)&0x3)<<11)                   /*    op0=A0macfunc.op */
-		                  |((0&0x1)<<13)                          /*   w0<(0)         */
-		                  |(((1)&0x1)<<10)                    /*  h00=A0macfunc.h0  */
-		                  |(((0)&0x1)<<9)                    /*    h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((dregs($4)&0x7)<<0)                 /* src0<(dregs_lo) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A0macfunc HIGH_REG * LOW_REG mxd_mod"); }
-		}
-	| A0macfunc HIGH_REG STAR HIGH_REG macmod_accm
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                                && reginclass($2,rc_dregs)
-				&& reginclass($4,rc_dregs)) {
-/*  dsp32mac:	A0macfunc macmod_accm
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A0macfunc macmod_accm\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c000
-		                |((3&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((0&0x1)<<4)                       /* MM=mxd_mod.mod */
-		                |((($5.mod)&0xf)<<5)                     /* mmod=macmod_accm.mod */
-		                |((0&0x1)<<2)                            /*  w1<(0) */
-		                |((0&0x1)<<3)                            /*  P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((0&0x1)<<15)                     /*  h01=A1macfunc.h0*/
-		                  |((0&0x1)<<14)                    /*   h11=A1macfunc.h1 */
-		                  |((($1.r0)&0x3)<<11)                   /*    op0=A0macfunc.op */
-		                  |((0&0x1)<<13)                          /*   w0<(0)         */
-		                  |(((1)&0x1)<<10)                    /*  h00=A0macfunc.h0  */
-		                  |(((1)&0x1)<<9)                    /*    h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((dregs($4)&0x7)<<0)                 /* src0<(dregs_lo) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A0macfunc HIGH_REG * HIGH_REG mxd_mod"); }
-		}
-	| ABORT
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-/* psedoDEBUG:	ABORT
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 1 | 1 | 0 | 0 | 0 |.fn....|.grp.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("psedoDEBUG: ABORT\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00f800
-		                |((3&0x7)<<0)                            /* reg<(3) */
-		                |((3&0x3)<<6)                            /* fn<(3) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("ABORT"); }
-		}
-	| A_ZERO_DOT_H ASSIGN HIGH_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($3,rc_dregs)) {
-/* dsp32alu:	A0.H = dregs_hi
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A_ZERO_DOT_H = dregs_hi\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c400
-		                |((9&0x1f)<<0)                           /* aopcde<(9) */
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($3)&0x7)<<3)                 /* src0<(dregs_hi) */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		                  |((0&0x1)<<13)                           /* s<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A_ZERO_DOT_H ASSIGN HIGH_REG"); }
-		}
-	| A_ONE_DOT_H ASSIGN HIGH_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($3,rc_dregs)) {
-/* dsp32alu:	A1.H = dregs_hi
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A_ONE_DOT_H = dregs_hi\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c400
-		                |((9&0x1f)<<0)                           /* aopcde<(9) */
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($3)&0x7)<<3)                 /* src0<(dregs_hi) */
-		                  |((2&0x3)<<14)                           /* aop<(2) */
-		                  |((0&0x1)<<13)                           /* s<(0) */
-		          ),
-		          NULL_CODE));
-		  } else { $$ = 0; semantic_error ("A_ONE_DOT_H ASSIGN HIGH_REG"); }
-		}
-	| A_ZERO_DOT_L ASSIGN LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($3,rc_dregs)) {
-/* dsp32alu:	A0.L = dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A_ZERO_DOT_L = dregs_lo\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c400
-		                |((9&0x1f)<<0)                           /* aopcde<(9) */
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($3)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		                  |((0&0x1)<<13)                           /* s<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A_ZERO_DOT_L ASSIGN LOW_REG"); }
-		}
-	| A_ONE_DOT_L ASSIGN LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($3,rc_dregs)) {
-/* dsp32alu:	A1.L = dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A_ONE_DOT_L = dregs_lo\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c400
-		                |((9&0x1f)<<0)                           /* aopcde<(9) */
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($3)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((2&0x3)<<14)                           /* aop<(2) */
-		                  |((0&0x1)<<13)                           /* s<(0) */
-		          ),
-		          NULL_CODE));
-		  } else { $$ = 0; semantic_error ("A_ONE_DOT_L ASSIGN LOW_REG"); }
-		}
-	| B LBRACK REG PLUS expr RBRACK ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($3,rc_pregs)
-		             && const_fits($5,c_imm16)
-		             && reginclass($8,rc_dregs)) {
-/* LDSTidxI:	B [ pregs + imm16 ] = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 1 |.W.|.Z.|.sz....|.ptr.......|.reg.......|
-|.offset........................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTidxI: B [ pregs + imm16 ] = dregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00e400
-		                |((pregs($3)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((dregs($8)&0x7)<<0)                    /* reg<(dregs) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		                |((2&0x3)<<6)                            /* sz<(2) */
-		                |((0&0x1)<<8)                            /* Z<(0) */
-		        ),
-		        CONSCODE(  
-		          GENCODE(0x000000
-		                  |((imm16($5)&0xffff)<<0)                 /* offset<(imm16) */
-		          ),
-		          NULL_CODE));
-		  } else { $$ = 0; semantic_error ("B LBRACK REG PLUS expr RBRACK ASSIGN REG"); }
-		}
-	| B LBRACK REG RBRACK ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($3,rc_pregs)
-		             && reginclass($6,rc_dregs)) {
-/* LDST:	B [ pregs ] = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: B [ pregs ] = dregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x009000
-		                |((pregs($3)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((dregs($6)&0x7)<<0)                    /* reg<(dregs) */
-		                |((2&0x3)<<7)                            /* aop<(2) */
-		                |((2&0x3)<<10)                           /* sz<(2) */
-		                |((0&0x1)<<6)                            /* Z<(0) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("B LBRACK REG RBRACK ASSIGN REG"); }
-		}
-	| B LBRACK REG _MINUS_MINUS RBRACK ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_pregs)
-		             && reginclass($7,rc_dregs)) {
-/* LDST:	B [ pregs -- ] = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: B [ pregs -- ] = dregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x009000
-		                |((pregs($3)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((dregs($7)&0x7)<<0)                    /* reg<(dregs) */
-		                |((1&0x3)<<7)                            /* aop<(1) */
-		                |((2&0x3)<<10)                           /* sz<(2) */
-		                |((0&0x1)<<6)                            /* Z<(0) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("B LBRACK REG _MINUS_MINUS RBRACK ASSIGN REG"); }
-		}
-	| B LBRACK REG _PLUS_PLUS RBRACK ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_pregs)
-		             && reginclass($7,rc_dregs)) {
-/* LDST:	B [ pregs ++ ] = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: B [ pregs ++ ] = dregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x009000
-		                |((pregs($3)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((dregs($7)&0x7)<<0)                    /* reg<(dregs) */
-		                |((0&0x3)<<7)                            /* aop<(0) */
-		                |((2&0x3)<<10)                           /* sz<(2) */
-		                |((0&0x1)<<6)                            /* Z<(0) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("B LBRACK REG _PLUS_PLUS RBRACK ASSIGN REG"); }
-		}
-	| BITCLR LPAREN REG COMMA expr RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm5)) {
-/* LOGI2op:	BITCLR ( dregs , uimm5 )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 1 |.opc.......|.src...............|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LOGI2op: BITCLR ( dregs , uimm5 )\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x004800
-		                |((dregs($3)&0x7)<<0)                    /* dst<(dregs) */
-		                |((uimm5($5)&0x1f)<<3)                   /* src<(uimm5) */
-		                |((4&0x7)<<8)                            /* opc<(4) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("BITCLR LPAREN REG COMMA expr RPAREN"); }
-		}
-	| BITSET LPAREN REG COMMA expr RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm5)) {
-/* LOGI2op:	BITSET ( dregs , uimm5 )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 1 |.opc.......|.src...............|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LOGI2op: BITSET ( dregs , uimm5 )\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x004800
-		                |((dregs($3)&0x7)<<0)                    /* dst<(dregs) */
-		                |((uimm5($5)&0x1f)<<3)                   /* src<(uimm5) */
-		                |((2&0x7)<<8)                            /* opc<(2) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("BITSET LPAREN REG COMMA expr RPAREN"); }
-		}
-	| BITTGL LPAREN REG COMMA expr RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm5)) {
-/* LOGI2op:	BITTGL ( dregs , uimm5 )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 1 |.opc.......|.src...............|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LOGI2op: BITTGL ( dregs , uimm5 )\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x004800
-		                |((dregs($3)&0x7)<<0)                    /* dst<(dregs) */
-		                |((uimm5($5)&0x1f)<<3)                   /* src<(uimm5) */
-		                |((3&0x7)<<8)                            /* opc<(3) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("BITTGL LPAREN REG COMMA expr RPAREN"); }
-		}
-	| IF BANG REG JUMP expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && const_fits($5,c_pcrel10)) {
-/* BRCC:	IF !CC JUMP pcrel11m2 
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 1 |.T.|.B.|.offset................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("BRCC: IF !CC JUMP  pcrel11m2\n");
-                    $$ = CONSCODE(GENCODE(0x001000
-                                  |((pcrel10($5)&0x3ff)<<0)   /* offset<(pcrel10) */
-                                  |((0&0x1)<<11)              /* T<(0)            */
-                                         ),
-                                   ExprNodeGenReloc($5, BFD_RELOC_10_PCREL));
-
-#if 0
-		    $$ = CONSCODE(
-		        NOTERELOC(PCREL,BFD_RELOC_10_PCREL,$5,
-		          GENCODE(0x001000
-		                  |((pcrel10($5)&0x3ff)<<0)                /* offset<(pcrel10) */
-		                  |((0&0x1)<<11)                           /* T<(0) */
-		          )),
-		        NULL_CODE);
-#endif
-		  } else { $$ = 0; semantic_error ("IF BANG REG JUMP expr"); }
-		}
-	| IF BANG REG JUMP expr LPAREN BP RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && const_fits($5,c_pcrel10)) {
-/* BRCC:	IF !CC JUMP pcrel11m2 (bp)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 1 |.T.|.B.|.offset................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("BRCC: IF !CC JUMP  pcrel11m2 (bp)\n");
-                    $$ = CONSCODE(GENCODE(0x001000
-                                  |((pcrel10($5)&0x3ff)<<0)    /* offset<(pcrel10) */
-                                  |((0&0x1)<<11)               /* T<(0) */
-                                  |((1&0x1)<<10)               /* B<(1) */
-                                  ),
-                                  ExprNodeGenReloc($5, BFD_RELOC_10_PCREL));
-#if 0
-		    $$ = CONSCODE(
-		        NOTERELOC(PCREL,BFD_RELOC_10_PCREL,$5,
-		          GENCODE(0x001000
-		                  |((pcrel10($5)&0x3ff)<<0)                /* offset<(pcrel10) */
-		                  |((0&0x1)<<11)                           /* T<(0) */
-		                  |((1&0x1)<<10)                           /* B<(1) */
-		          )),
-		        NULL_CODE);
-#endif
-		  } else { $$ = 0; semantic_error ("IF BANG REG JUMP expr LPAREN BP RPAREN"); }
-		}
-	| IF REG JUMP expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && const_fits($4,c_pcrel10)) {
-/* BRCC:	IF CC JUMP pcrel11m2
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 1 |.T.|.B.|.offset................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("BRCC: IF CC JUMP pcrel11m2\n");
-                    $$ = CONSCODE(GENCODE(0x001000
-                                  |((pcrel10($4)&0x3ff)<<0)    /* offset<(pcrel10) */
-                                  |((1&0x1)<<11)               /* T<(1) */
-                                         ),
-                                   ExprNodeGenReloc($4, BFD_RELOC_10_PCREL));
-#if 0
-		    $$ = CONSCODE(
-		        NOTERELOC(PCREL,BFD_RELOC_10_PCREL,$4,
-		          GENCODE(0x001000
-		                  |((pcrel10($4)&0x3ff)<<0)                /* offset<(pcrel10) */
-		                  |((1&0x1)<<11)                           /* T<(1) */
-		          )),
-		        NULL_CODE);
-#endif
-		  } else { $$ = 0; semantic_error ("IF REG JUMP expr"); }
-		}
- 
-	| IF REG JUMP expr LPAREN BP RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && const_fits($4,c_pcrel10)) {
-/* BRCC:	IF CC JUMP pcrel11m2 (bp)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 1 |.T.|.B.|.offset................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("BRCC: IF CC JUMP pcrel11m2 (bp)\n");
-                    $$ = CONSCODE(GENCODE(0x001000
-                                  |((pcrel10($4)&0x3ff)<<0)    /* offset<(pcrel10) */
-                                  |((1&0x1)<<11)               /* T<(1) */
-                                  |((1&0x1)<<10)               /* B<(1) */
-                                         ),
-                                   ExprNodeGenReloc($4, BFD_RELOC_10_PCREL));
-#if 0
-		    $$ = CONSCODE(
-		        NOTERELOC(PCREL,BFD_RELOC_10_PCREL,$4,
-		          GENCODE(0x001000
-		                  |((pcrel10($4)&0x3ff)<<0)                /* offset<(pcrel10) */
-		                  |((1&0x1)<<11)                           /* T<(1) */
-		                  |((1&0x1)<<10)                           /* B<(1) */
-		          )),
-		        NULL_CODE);
-#endif
-		  } else { $$ = 0; semantic_error ("IF REG JUMP expr LPAREN BP RPAREN"); }
+	| MNOP DOUBLE_BAR asm_1
+	{
+		if (is_group1($3)) {
+			$$ = gen_multi_instr(0, $3, 0);
+		} else
+		if (is_group2($3)) {
+			$$ = gen_multi_instr(0, 0, $3);
+		} else {
+			return semantic_error("Wrong 16 bit instructions groups");
 		}
 
-	| CALL LPAREN PC PLUS REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($5,rc_pregs)) {
-/* ProgCtrl:	CALL ( PC + pregs )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.prgfunc.......|.poprnd........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ProgCtrl: CALL ( PC + pregs )\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x000000
-		                |((pregs($5)&0xf)<<0)                    /* poprnd<(pregs) */
-		                |((7&0xf)<<4)                            /* prgfunc<(7) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("CALL LPAREN PC PLUS REG RPAREN"); }
+	}
+
+	| MNOP
+	{
+		$$ = gen_multi_instr(0, 0, 0);
+	}
+
+	| asm_1 DOUBLE_BAR asm_1
+	{
+		if (($1->value & 0xf800) == 0xc000) {
+
+			if (is_group1($3) )
+				$$ = gen_multi_instr($1, $3, 0);
+			else
+			if (is_group2($3) )
+				$$ = gen_multi_instr($1, 0, $3);
+			else
+				return semantic_error("Wrong 16 bit instructions groups");
+		} else
+		if (is_group1($1) && is_group2($3)) {
+			$$ = gen_multi_instr(0, $1, $3);
+		} else
+		if (is_group2($1) && is_group1($3)) {
+			$$ = gen_multi_instr(0, $3, $1);
+		} else {
+			return semantic_error("Wrong 16 bit instructions groups");
 		}
-	| CALL LPAREN REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_pregs)) {
-/* ProgCtrl:	CALL ( pregs )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.prgfunc.......|.poprnd........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ProgCtrl: CALL ( pregs )\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x000000
-		                |((pregs($3)&0xf)<<0)                    /* poprnd<(pregs) */
-		                |((6&0xf)<<4)                            /* prgfunc<(6) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("CALL LPAREN REG RPAREN"); }
-		}
-	| CALL expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && const_fits($2,c_pcrel24)) {
-/* CALLa:	CALL pcrel25m2
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 0 | 1 |.S.|.msw...........................|
-|.lsw...........................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CALLa: CALL pcrel25m2\n");
-                    $$ = CONSCODE(GENCODE(0x00e200
-                            |(((pcrel24($2)>>16)&0xff)<<0)/* msw<(pcrel24)>>16 */
-                            |((1&0x1)<<8)                 /* S<(1) */
-                            ),
-                           ExprNodeGenReloc($2, BFD_RELOC_24_PCREL));
-#if 0
-		    $$ = CONSCODE(
-		        NOTERELOC(PCREL,BFD_RELOC_24_PCREL,$2,
-		          GENCODE(0x00e200
-		                  |(((pcrel24($2)>>16)&0xff)<<0)           /* msw<(pcrel24)>>16 */
-		                  |((1&0x1)<<8)                            /* S<(1) */
-		          )),
-		        CONSCODE(  
-		          GENCODE(0x000000
-		                  |((pcrel24($2)&0xffff)<<0)               /* lsw<(pcrel24) */
-		          ),
-		          NULL_CODE));
-#endif
-		  } else { $$ = 0; semantic_error ("CALL expr"); }
+	}
+
+	| error { $$=0; as_bad("\nParse error.\n");yyerrok; }  // recovery error
+;
+
+////////////////////////////////////////////////////////////////////////////
+// DSPMAC
+// {
+
+asm_1:   
+
+	assign_macfunc opt_mode
+	{
+		int op0, op1;
+		int w0 = 0, w1 = 0;
+		int h00, h10, h01, h11;
+
+		if ($1.n == 0) {
+			if ($2.MM) 
+				return semantic_error("(m) not allowed with a0 unit");
+			op1 = 3; op0 = $1.op;
+			w1 = 0; w0 = $1.w;
+			h00 = IS_H($1.s0); h10 = IS_H($1.s1);
+			h01 = h11 = 0;
+		} else {
+			op1 = $1.op; op0 = 3;
+			w1 = $1.w; w0 = 0;
+			h00 = h10 = 0;
+			h01 = IS_H($1.s0); h11 = IS_H($1.s1);
 		}
 
-         | CALL_DOT_X expr
-                {
-                  if(0) {
-                  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && const_fits($2,c_pcrel24_call_x)) {
-/* CALLa:       CALL.X pcrel25m2
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 0 | 1 |.S.|.msw...........................|
-|.lsw...........................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-                    notethat("CALLa: CALL pcrel25m2\n");
-                    $$ = CONSCODE(GENCODE(0x00e200
-                         |(((pcrel24_call_x($2)>>16)&0xff)<<0)/* msw<(pcrel24)>>16 */
-                         |((1&0x1)<<8)                        /* S<(1) */
-                         ),
-                         ExprNodeGenReloc($2, BFD_RELOC_24_PCREL_CALL_X));
-#if 0
-                    $$ = CONSCODE(
-                        NOTERELOC(PCREL,BFD_RELOC_24_PCREL_CALL_X,$2,
-                          GENCODE(0x00e200
-                                  |(((pcrel24_call_x($2)>>16)&0xff)<<0)           /* msw<(pcrel24)>>16 */
-                                  |((1&0x1)<<8)                            /* S<(1) */
-                          )),
-                        CONSCODE(
-                          GENCODE(0x000000
-                                  |((pcrel24_call_x($2)&0xffff)<<0)               /* lsw<(pcrel24) */
-                          ),
-                          NULL_CODE));
-#endif
-                  } else { $$ = 0; semantic_error ("CALL expr"); }
-                }
+					   /*   op1       MM      mmod  */
+		$$ = DSP32MAC  (    op1,   $2.MM,   $2.mod,  /* w1     P */
+					   /*   h01   h11    h00    h10 */  w1, $1.P,
+							h01,  h11,   h00,   h10,
+					    &$1.dst,  // dst (dregs)
+					   /*   op0  src0     src1    w0              */
+						    op0, &$1.s0, &$1.s1,  w0              );
 
-	| CSYNC
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-/* ProgCtrl:	CSYNC
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.prgfunc.......|.poprnd........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ProgCtrl: CSYNC\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x000000
-		                |((2&0xf)<<4)                            /* prgfunc<(2) */
-		                |((3&0xf)<<0)                            /* poprnd<(3) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("CSYNC"); }
-		}
-	| DBG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-/* psedoDEBUG:	DBG
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 1 | 1 | 0 | 0 | 0 |.fn....|.grp.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("psedoDEBUG: DBG\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00f800
-		                |((7&0x7)<<0)                            /* reg<(7) */
-		                |((3&0x3)<<6)                            /* fn<(3) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("DBG"); }
-		}
-	| DBG REG_A00
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && $2 == REG_A0) {
-/* psedoDEBUG:	DBG A0
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 1 | 1 | 0 | 0 | 0 |.fn....|.grp.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("psedoDEBUG: DBG A0\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00f800
-		                |((0&0x7)<<0)                            /* reg<(0) */
-		                |((3&0x3)<<6)                            /* fn<(3) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("DBG REG_A00"); }
-		}
-	| DBG REG_A11
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && $2 == REG_A1) {
-/* psedoDEBUG:	DBG A1
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 1 | 1 | 0 | 0 | 0 |.fn....|.grp.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("psedoDEBUG: DBG A1\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00f800
-		                |((1&0x7)<<0)                            /* reg<(1) */
-		                |((3&0x3)<<6)                            /* fn<(3) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("DBG REG_A11"); }
-		}
-	| DBG REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($2,rc_allregs)) {
-/* psedoDEBUG:	DBG allregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 1 | 1 | 0 | 0 | 0 |.fn....|.grp.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("psedoDEBUG: DBG allregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00f800
-		                |((allregs($2)&0x7)<<0)                  /* reg<(allregs) */
-		                |((Xallregs($2)&0x7)<<3)                 /* grp<(Xallregs($2)) */
-		                |((0&0x3)<<6)                            /* fn<(0) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("DBG REG"); }
-		}
-	| DBGA LPAREN LOW_REG COMMA expr RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm16)) {
-/* psedodbg_assert:	DBGA ( dregs_lo , uimm16 )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 1 | 0 | - | - | - | - | - |.dbgop.....|.regtest...|
-|.expected......................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("psedodbg_assert: DBGA ( dregs_lo , uimm16 )\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00f000
-		                |((dregs($3)&0x7)<<0)                 /* regtest<(dregs_lo) */
-		                |((0&0x7)<<3)                            /* dbgop<(0) */
-		        ),
-		        CONSCODE(  
-		          GENCODE(0x000000
-		                  |((uimm16($5)&0xffff)<<0)                /* expected<(uimm16) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("DBGA LPAREN LOW_REG COMMA expr RPAREN"); }
-		}
-	| DBGA LPAREN HIGH_REG COMMA expr RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm16)) {
-/* psedodbg_assert:	DBGA ( dregs_hi , uimm16 )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 1 | 0 | - | - | - | - | - |.dbgop.....|.regtest...|
-|.expected......................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("psedodbg_assert: DBGA ( dregs_hi , uimm16 )\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00f000
-		                |((dregs($3)&0x7)<<0)                 /* regtest<(dregs_hi) */
-		                |((1&0x7)<<3)                            /* dbgop<(1) */
-		        ),
-		        CONSCODE(  
-		          GENCODE(0x000000
-		                  |((uimm16($5)&0xffff)<<0)                /* expected<(uimm16) */
-		          ),
-		          NULL_CODE));
+////////////////////////////////////////////////////////////////////////////
+// VECTOR MACs
+// }{
 
-		  } else { $$ = 0; semantic_error ("DBGA LPAREN HIGH_REG COMMA expr RPAREN"); }
+	| assign_macfunc opt_mode COMMA assign_macfunc opt_mode
+	{
+		Register *dst;
+
+		if (check_macfuncs(&$1, &$2, &$4, &$5) < 0) 
+			return -1;
+		notethat("assign_macfunc (.), assign_macfunc (.)\n");
+
+		if ($1.w) { // a1macfunc destination
+			dst = &$1.dst;
+		} else {
+			dst = &$4.dst;
 		}
-	| DBGAH LPAREN REG COMMA expr RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm16)) {
-/* psedodbg_assert:	DBGAH ( dregs , uimm16 )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 1 | 0 | - | - | - | - | - |.dbgop.....|.regtest...|
-|.expected......................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("psedodbg_assert: DBGAH ( dregs , uimm16 )\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00f000
-		                |((dregs($3)&0x7)<<0)                    /* regtest<(dregs) */
-		                |((3&0x7)<<3)                            /* dbgop<(3) */
-		        ),
-		        CONSCODE(  
-		          GENCODE(0x000000
-		                  |((uimm16($5)&0xffff)<<0)                /* expected<(uimm16) */
-		          ),
-		          NULL_CODE));
-		  } else { $$ = 0; semantic_error ("DBGAH LPAREN REG COMMA expr RPAREN"); }
-		}
-	| DBGAL LPAREN REG COMMA expr RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm16)) {
-/* psedodbg_assert:	DBGAL ( dregs , uimm16 )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 1 | 0 | - | - | - | - | - |.dbgop.....|.regtest...|
-|.expected......................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("psedodbg_assert: DBGAL ( dregs , uimm16 )\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00f000
-		                |((dregs($3)&0x7)<<0)                    /* regtest<(dregs) */
-		                |((2&0x7)<<3)                            /* dbgop<(2) */
-		        ),
-		        CONSCODE(  
-		          GENCODE(0x000000
-		                  |((uimm16($5)&0xffff)<<0)                /* expected<(uimm16) */
-		          ),
-		          NULL_CODE));
-		  } else { $$ = 0; semantic_error ("DBGAL LPAREN REG COMMA expr RPAREN"); }
-		}
-	| DBGCMPLX LPAREN REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_dregs)) {
-/* psedoDEBUG:	DBGCMPLX ( dregs )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 1 | 1 | 0 | 0 | 0 |.fn....|.grp.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("psedoDEBUG: DBGCMPLX ( dregs )\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00f800
-		                |((dregs($3)&0x7)<<3)                    /* grp<(dregs) */
-		                |((6&0x7)<<0)                            /* reg<(6) */
-		                |((3&0x3)<<6)                            /* fn<(3) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("DBGCMPLX LPAREN REG RPAREN"); }
-		}
-	| DBGHALT
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-/* psedoDEBUG:	DBGHALT
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 1 | 1 | 0 | 0 | 0 |.fn....|.grp.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("psedoDEBUG: DBGHALT\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00f800
-		                |((5&0x7)<<0)                            /* reg<(5) */
-		                |((3&0x3)<<6)                            /* fn<(3) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("DBGHALT"); }
-		}
+
+					   /*   op1       MM      mmod  */
+		$$ = DSP32MAC  (  $1.op,   $2.MM,   $5.mod,  /* w1     P */
+					   /*   h01   h11    h00    h10 */ $1.w, $1.P,
+			 		IS_H($1.s0),  IS_H($1.s1), IS_H($4.s0), IS_H($4.s1),
+					        dst,  // dst (dregs)
+					   /*   op0  src0     src1    w0              */
+						  $4.op, &$1.s0, &$1.s1,  $4.w            );
+
+	}
+
+// }
+////////////////////////////////////////////////////////////////////////////
+// DSPALU
+// { 
+
 	| DISALGNEXCPT
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-/* dsp32alu:	DISALGNEXCPT
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
+	{
 		    notethat("dsp32alu: DISALGNEXCPT\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00c400
-		                |((18&0x1f)<<0)                          /* aopcde<(18) */
-		        ),
-		        CONSCODE(  
-		          GENCODE(0x000000
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		          ),
-		          NULL_CODE));
-		  } else { $$ = 0; semantic_error ("DISALGNEXCPT"); }
-		}
-	| DIVQ LPAREN REG COMMA REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* ALU2op:	DIVQ (dregs, dregs)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 0 |.opc...........|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ALU2op: DIVQ (dregs, dregs)\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x004000
-		                |((dregs($3)&0x7)<<0)                    /* dst<(dregs) */
-		                |((dregs($5)&0x7)<<3)                    /* src<(dregs) */
-		                |((8&0xf)<<6)                            /* opc<(8) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("DIVQ LPAREN REG COMMA REG RPAREN"); }
-		}
-	| DIVS LPAREN REG COMMA REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* ALU2op:	DIVS (dregs, dregs)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 0 |.opc...........|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ALU2op: DIVS (dregs, dregs)\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x004000
-		                |((dregs($3)&0x7)<<0)                    /* dst<(dregs) */
-		                |((dregs($5)&0x7)<<3)                    /* src<(dregs) */
-		                |((9&0xf)<<6)                            /* opc<(9) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("DIVS LAPREN REG COMMA REG RPAREN"); }
-		}
-	| EMUEXCPT
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-/* ProgCtrl:	EMUEXCPT
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.prgfunc.......|.poprnd........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ProgCtrl: EMUEXCPT\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x000000
-		                |((2&0xf)<<4)                            /* prgfunc<(2) */
-		                |((5&0xf)<<0)                            /* poprnd<(5) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("EMUEXCPT"); }
-		}
-	| EXCPT expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && const_fits($2,c_uimm4)) {
-/* ProgCtrl:	EXCPT uimm4
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.prgfunc.......|.poprnd........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ProgCtrl: EXCPT uimm4\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x000000
-		                |((uimm4($2)&0xf)<<0)                    /* poprnd<(uimm4) */
-		                |((10&0xf)<<4)                           /* prgfunc<(10) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("EXCPT expr"); }
-		}
-	| FLUSH LBRACK REG RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($3,rc_pregs)) {
-/* CaCTRL:	FLUSH [ pregs ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 |.a.|.op....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CaCTRL: FLUSH [ pregs ]\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x000240
-		                |((pregs($3)&0x7)<<0)                    /* reg<(pregs) */
-		                |((0&0x1)<<5)                            /* a<(0) */
-		                |((2&0x3)<<3)                            /* op<(2) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("FLUSH LBRACK REG RBRACK"); }
-		}
-	| FLUSH LBRACK REG _PLUS_PLUS RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($3,rc_pregs)) {
-/* CaCTRL:	FLUSH [ pregs ++ ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 |.a.|.op....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CaCTRL: FLUSH [ pregs ++ ]\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x000240
-		                |((pregs($3)&0x7)<<0)                    /* reg<(pregs) */
-		                |((1&0x1)<<5)                            /* a<(1) */
-		                |((2&0x3)<<3)                            /* op<(2) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("FLUSH LBRACK REG _PLUS_PLUS RBRACK"); }
-		}
-	| FLUSHINV LBRACK REG RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_pregs)) {
-/* CaCTRL:	FLUSHINV [ pregs ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 |.a.|.op....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CaCTRL: FLUSHINV [ pregs ]\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x000240
-		                |((pregs($3)&0x7)<<0)                    /* reg<(pregs) */
-		                |((0&0x1)<<5)                            /* a<(0) */
-		                |((1&0x3)<<3)                            /* op<(1) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("FLUSHINV LBRACK REG RBRACK"); }
-		}
-	| FLUSHINV LBRACK REG _PLUS_PLUS RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_pregs)) {
-/* CaCTRL:	FLUSHINV [ pregs ++ ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 |.a.|.op....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CaCTRL: FLUSHINV [ pregs ++ ]\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x000240
-		                |((pregs($3)&0x7)<<0)                    /* reg<(pregs) */
-		                |((1&0x1)<<5)                            /* a<(1) */
-		                |((1&0x3)<<3)                            /* op<(1) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("FLUSHINV LBRACK REG _PLUS_PLUS RBRACK"); }
-		}
-	| W LBRACK REG PLUS expr RBRACK ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_pregs)
-		             && const_fits($5,c_uimm4s2)
-		             && reginclass($8,rc_dregs)) {
-/* LDSTii:	W [ pregs + uimm4s2 ] = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 1 |.W.|.op....|.offset........|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTii: W [ pregs + uimm4s2 ] = dregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00a000
-		                |((pregs($3)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((uimm4s2($5)&0xf)<<6)                  /* offset<(uimm4s2) */
-		                |((dregs($8)&0x7)<<0)                    /* reg<(dregs) */
-		                |((1&0x1)<<12)                           /* W<(1) */
-		                |((1&0x3)<<10)                           /* op<(1) */
-		        ),
-		        NULL_CODE);
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_pregs)
-		             && const_fits($5,c_imm16s2)
-		             && reginclass($8,rc_dregs)) {
-/* LDSTidxI:	W [ pregs + imm16s2 ] = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 1 |.W.|.Z.|.sz....|.ptr.......|.reg.......|
-|.offset........................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTidxI: W [ pregs + imm16s2 ] = dregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00e400
-		                |((pregs($3)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((dregs($8)&0x7)<<0)                    /* reg<(dregs) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		                |((1&0x3)<<6)                            /* sz<(1) */
-		                |((0&0x1)<<8)                            /* Z<(0) */
-		        ),
-		        CONSCODE(  
-		          GENCODE(0x000000
-		                  |((imm16s2($5)&0xffff)<<0)               /* offset<(imm16s2) */
-		          ),
-		          NULL_CODE));
-		  } else { $$ = 0; semantic_error ("W LBRACK REG PLUS expr RBRACK ASSIGN REG"); }
-		}
-	| W LBRACK REG RBRACK ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_pregs)
-		             && reginclass($6,rc_dregs)) {
-/* LDST:	W [ pregs ] = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: W [ pregs ] = dregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x009000
-		                |((pregs($3)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((dregs($6)&0x7)<<0)                    /* reg<(dregs) */
-		                |((2&0x3)<<7)                            /* aop<(2) */
-		                |((1&0x3)<<10)                           /* sz<(1) */
-		                |((0&0x1)<<6)                            /* Z<(0) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		        ),
-		        NULL_CODE);
 
-		  } else { $$ = 0; semantic_error ("W LBRACK REG RBRACK ASSIGN REG"); }
-		}
-	| W LBRACK REG RBRACK ASSIGN LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_iregs)
-		             && reginclass($6,rc_dregs)) {
-/* dspLDST:	W [ iregs ] = dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 |.W.|.aop...|.m.....|.i.....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dspLDST: W [ iregs ] = dregs_lo\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x009c00
-		                |((iregs($3)&0x3)<<3)                    /* i<(iregs) */
-		                |((dregs($6)&0x7)<<0)                 /* reg<(dregs_lo) */
-		                |((2&0x3)<<7)                            /* aop<(2) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		                |((1&0x3)<<5)                            /* m<(1) */
-		        ),
-		        NULL_CODE);
-
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_pregs)
-		             && reginclass($6,rc_dregs)) {
-/* LDSTpmod:	W [ pregs ] = dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 0 |.W.|.aop...|.reg.......|.idx.......|.ptr.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTpmod: W [ pregs ] = dregs_lo\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x008000
-		                |((pregs($3)&0x7)<<0)                    /* ptr<(pregs) */
-		                |((dregs($6)&0x7)<<6)                 /* reg<(dregs_lo) */
-		                |((1&0x3)<<9)                            /* aop<(1) */
-		                |((1&0x1)<<11)                           /* W<(1) */
-		                |((pregs($3)&0x7)<<3)                    /* idx<(pregs($2)) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("W LBRACK REG RBRACK ASSIGN LOW_REG"); }
-		}
-	| W LBRACK REG RBRACK ASSIGN HIGH_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_iregs)
-		             && reginclass($6,rc_dregs)) {
-/* dspLDST:	W [ iregs ] = dregs_hi
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 |.W.|.aop...|.m.....|.i.....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dspLDST: W [ iregs ] = dregs_hi\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x009c00
-		                |((iregs($3)&0x3)<<3)                    /* i<(iregs) */
-		                |((dregs($6)&0x7)<<0)                 /* reg<(dregs_hi) */
-		                |((2&0x3)<<7)                            /* aop<(2) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		                |((2&0x3)<<5)                            /* m<(2) */
-		        ),
-		        NULL_CODE);
-
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_pregs)
-		             && reginclass($6,rc_dregs)) {
-/* LDSTpmod:	W [ pregs ] = dregs_hi
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 0 |.W.|.aop...|.reg.......|.idx.......|.ptr.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTpmod: W [ pregs ] = dregs_hi\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x008000
-		                |((pregs($3)&0x7)<<0)                    /* ptr<(pregs) */
-		                |((dregs($6)&0x7)<<6)                 /* reg<(dregs_hi) */
-		                |((2&0x3)<<9)                            /* aop<(2) */
-		                |((1&0x1)<<11)                           /* W<(1) */
-		                |((pregs($3)&0x7)<<3)                    /* idx<(pregs($2)) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("W LBRACK REG RBRACK ASSIGN HIGH_REG"); }
-		}
-	| W LBRACK REG _MINUS_MINUS RBRACK ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_pregs)
-		             && reginclass($7,rc_dregs)) {
-/* LDST:	W [ pregs -- ] = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: W [ pregs -- ] = dregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x009000
-		                |((pregs($3)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((dregs($7)&0x7)<<0)                    /* reg<(dregs) */
-		                |((1&0x3)<<7)                            /* aop<(1) */
-		                |((1&0x3)<<10)                           /* sz<(1) */
-		                |((0&0x1)<<6)                            /* Z<(0) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("W LBRACK REG _MINUS_MINUS RBRACK ASSIGN REG"); }
-		}
-	| W LBRACK REG _MINUS_MINUS RBRACK ASSIGN LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_iregs)
-		             && reginclass($7,rc_dregs)) {
-/* dspLDST:	W [ iregs -- ] = dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 |.W.|.aop...|.m.....|.i.....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dspLDST: W [ iregs -- ] = dregs_lo\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x009c00
-		                |((iregs($3)&0x3)<<3)                    /* i<(iregs) */
-		                |((dregs($7)&0x7)<<0)                 /* reg<(dregs_lo) */
-		                |((1&0x3)<<7)                            /* aop<(1) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		                |((1&0x3)<<5)                            /* m<(1) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("W LBRACK REG _MINUS_MINUS RBRACK ASSIGN LOW_REG"); }
-		}
-	| W LBRACK REG _MINUS_MINUS RBRACK ASSIGN HIGH_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_iregs)
-		             && reginclass($7,rc_dregs)) {
-/* dspLDST:	W [ iregs -- ] = dregs_hi
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 |.W.|.aop...|.m.....|.i.....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dspLDST: W [ iregs -- ] = dregs_hi\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x009c00
-		                |((iregs($3)&0x3)<<3)                    /* i<(iregs) */
-		                |((dregs($7)&0x7)<<0)                 /* reg<(dregs_hi) */
-		                |((1&0x3)<<7)                            /* aop<(1) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		                |((2&0x3)<<5)                            /* m<(2) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("W LBRACK REG _MINUS_MINUS RBRACK ASSIGN HIGH_REG"); }
-		}
-	| W LBRACK REG _PLUS_PLUS RBRACK ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_pregs)
-		             && reginclass($7,rc_dregs)) {
-/* LDST:	W [ pregs ++ ] = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: W [ pregs ++ ] = dregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x009000
-		                |((pregs($3)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((dregs($7)&0x7)<<0)                    /* reg<(dregs) */
-		                |((0&0x3)<<7)                            /* aop<(0) */
-		                |((1&0x3)<<10)                           /* sz<(1) */
-		                |((0&0x1)<<6)                            /* Z<(0) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("W LBRACK REG _PLUS_PLUS RBRACK ASSIGN REG"); }
-		}
-	| W LBRACK REG _PLUS_PLUS RBRACK ASSIGN LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($3,rc_iregs)
-		             && reginclass($7,rc_dregs)) {
-/* dspLDST:	W [ iregs ++ ] = dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 |.W.|.aop...|.m.....|.i.....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dspLDST: W [ iregs ++ ] = dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009c00
-		                |((iregs($3)&0x3)<<3)                    /* i<(iregs) */
-		                |((dregs($7)&0x7)<<0)                 /* reg<(dregs_lo) */
-		                |((0&0x3)<<7)                            /* aop<(0) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		                |((1&0x3)<<5)                            /* m<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("W LBRACK REG _PLUS_PLUS RBRACK ASSIGN LOW_REG"); }
-		}
-	| W LBRACK REG _PLUS_PLUS RBRACK ASSIGN HIGH_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($3,rc_iregs)
-		             && reginclass($7,rc_dregs)) {
-/* dspLDST:	W [ iregs ++ ] = dregs_hi
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 |.W.|.aop...|.m.....|.i.....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dspLDST: W [ iregs ++ ] = dregs_hi\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009c00
-		                |((iregs($3)&0x3)<<3)                    /* i<(iregs) */
-		                |((dregs($7)&0x7)<<0)                 /* reg<(dregs_hi) */
-		                |((0&0x3)<<7)                            /* aop<(0) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		                |((2&0x3)<<5)                            /* m<(2) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("W LBRACK REG _PLUS_PLUS RBRACK ASSIGN HIGH_REG"); }
-		}
-	| HLT
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-/* psedoDEBUG:	HLT
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 1 | 1 | 0 | 0 | 0 |.fn....|.grp.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("psedoDEBUG: HLT\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00f800
-		                |((4&0x7)<<0)                            /* reg<(4) */
-		                |((3&0x3)<<6)                            /* fn<(3) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("HLT"); }
-		}
-	| IDLE
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-/* ProgCtrl:	IDLE
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.prgfunc.......|.poprnd........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ProgCtrl: IDLE\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x000000
-		                |((2&0xf)<<4)                            /* prgfunc<(2) */
-		                |((0&0xf)<<0)                            /* poprnd<(0) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("IDLE"); }
-		}
-	| IF BANG REG REG ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && $3 == REG_CC
-		             && reginclass($4,rc_gregs)
-		             && reginclass($6,rc_gregs)) {
-/* ccMV:	IF ! CC gregs = gregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 1 | 1 |.T.|.d.|.s.|.dst.......|.src.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ccMV: IF ! CC gregs = gregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x000600
-		                |((gregs($4)&0x7)<<3)                    /* dst<(gregs) */
-		                |((gregs($6)&0x7)<<0)                    /* src<(gregs) */
-		                |((0&0x1)<<8)                            /* T<(0) */
-		                |((Xgregs($4)&0x1)<<7)                   /* d<(Xgregs($4)) */
-		                |((Xgregs($6)&0x1)<<6)                   /* s<(Xgregs($6)) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("IF BANG REG REG ASSIGN REG"); }
-		}
-	| IF REG REG ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && $2 == REG_CC
-		             && reginclass($3,rc_gregs)
-		             && reginclass($5,rc_gregs)) {
-/* ccMV:	IF CC gregs = gregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 1 | 1 |.T.|.d.|.s.|.dst.......|.src.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ccMV: IF CC gregs = gregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x000600
-		                |((gregs($3)&0x7)<<3)                    /* dst<(gregs) */
-		                |((gregs($5)&0x7)<<0)                    /* src<(gregs) */
-		                |((1&0x1)<<8)                            /* T<(1) */
-		                |((Xgregs($3)&0x1)<<7)                   /* d<(Xgregs($3)) */
-		                |((Xgregs($5)&0x1)<<6)                   /* s<(Xgregs($5)) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("IF REG REG ASSIGN REG"); }
-		}
-	| IFLUSH LBRACK REG RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_pregs)) {
-/* CaCTRL:	IFLUSH [ pregs ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 |.a.|.op....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CaCTRL: IFLUSH [ pregs ]\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x000240
-		                |((pregs($3)&0x7)<<0)                    /* reg<(pregs) */
-		                |((0&0x1)<<5)                            /* a<(0) */
-		                |((3&0x3)<<3)                            /* op<(3) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("IFLUSH LBRACK REG RBRACK"); }
-		}
-	| IFLUSH LBRACK REG _PLUS_PLUS RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_pregs)) {
-/* CaCTRL:	IFLUSH [ pregs ++ ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 |.a.|.op....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CaCTRL: IFLUSH [ pregs ++ ]\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x000240
-		                |((pregs($3)&0x7)<<0)                    /* reg<(pregs) */
-		                |((1&0x1)<<5)                            /* a<(1) */
-		                |((3&0x3)<<3)                            /* op<(3) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("IFLUSH LBRACK REG _PLUS_PLUS RBRACK"); }
-		}
-	| JUMP LPAREN PC PLUS REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($5,rc_pregs)) {
-/* ProgCtrl:	JUMP ( PC + pregs )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.prgfunc.......|.poprnd........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ProgCtrl: JUMP ( PC + pregs )\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x000000
-		                |((pregs($5)&0xf)<<0)                    /* poprnd<(pregs) */
-		                |((8&0xf)<<4)                            /* prgfunc<(8) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("JUMP LPAREN PC PLUS REG RPAREN"); }
-		}
-	| JUMP LPAREN REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($3,rc_pregs)) {
-/* ProgCtrl:	JUMP ( pregs )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.prgfunc.......|.poprnd........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ProgCtrl: JUMP ( pregs )\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x000000
-		                |((pregs($3)&0xf)<<0)                    /* poprnd<(pregs) */
-		                |((5&0xf)<<4)                            /* prgfunc<(5) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("JUMP LPAREN REG RPAREN"); }
-		}
-	| JUMP expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && const_fits($2,c_pcrel12_jump)) {
-/* UJUMP:	JUMP pcrel12
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 1 | 0 |.offset........................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("UJUMP: JUMP pcrel12\n");
-		    $$ = CONSCODE(GENCODE(0x002000
-                             |((pcrel12_jump($2)&0xfff)<<0) /* offset<(pcrel12) */
-                                 ),
-                         ExprNodeGenReloc($2, BFD_RELOC_12_PCREL_JUMP));
-#if 0
-		    $$ = CONSCODE(
-		        NOTERELOC(PCREL,BFD_RELOC_12_PCREL_JUMP,$2,
-		          GENCODE(0x002000
-		                  |((pcrel12_jump($2)&0xfff)<<0)                /* offset<(pcrel12) */
-		          )),
-		        NULL_CODE);
-#endif
-		  } else { $$ = 0; semantic_error ("JUMP expr"); }
-		}
-	| JUMP_DOT_S expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && const_fits($2,c_pcrel12_jump_s)) {
-/* UJUMP:	JUMP.S pcrel12
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 1 | 0 |.offset........................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("UJUMP: JUMP_DOT_S pcrel12\n");
-                    $$ = CONSCODE(GENCODE(0x002000
-                             |((pcrel12_jump_s($2)&0xfff)<<0)/* offset<(pcrel12) */
-                             ),
-                         ExprNodeGenReloc($2, BFD_RELOC_12_PCREL_JUMP_S));
-
-#if 0
-		    $$ = CONSCODE(
-		        NOTERELOC(PCREL,BFD_RELOC_12_PCREL_JUMP_S,$2,
-		          GENCODE(0x002000
-		                  |((pcrel12_jump_s($2)&0xfff)<<0)                /* offset<(pcrel12) */
-		          )),
-		        NULL_CODE);
-#endif
-
-		  } else { $$ = 0; semantic_error ("JUMP_DOT_S expr"); }
-		}
-	| LBRACK REG PLUS expr RBRACK ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $2 == REG_FP
-		             && const_fits($4,c_negimm5s4)
-		             && reginclass($7,rc_dpregs)) {
-/* LDSTiiFP:	[ FP + negimm5s4 ] = dpregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 1 | 1 | 1 | 0 |.W.|.offset............|.reg...........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTiiFP: [ FP + negimm5s4 ] = dpregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00b800
-		                |((negimm5s4($4)&0x1f)<<4)               /* offset<(negimm5s4) */
-		                |((dpregs($7)&0xf)<<0)                   /* reg<(dpregs) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		        ),
-		        NULL_CODE);
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($2,rc_pregs)
-		             && const_fits($4,c_uimm4s4)
-		             && reginclass($7,rc_dregs)) {
-/* LDSTii:	[ pregs + uimm4s4 ] = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 1 |.W.|.op....|.offset........|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTii: [ pregs + uimm4s4 ] = dregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00a000
-		                |((pregs($2)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((uimm4s4($4)&0xf)<<6)                  /* offset<(uimm4s4) */
-		                |((dregs($7)&0x7)<<0)                    /* reg<(dregs) */
-		                |((1&0x1)<<12)                           /* W<(1) */
-		                |((0&0x3)<<10)                           /* op<(0) */
-		        ),
-		        NULL_CODE);
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($2,rc_pregs)
-		             && const_fits($4,c_uimm4s4)
-		             && reginclass($7,rc_pregs)) {
-/* LDSTii:	[ pregs + uimm4s4 ] = pregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 1 |.W.|.op....|.offset........|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTii: [ pregs + uimm4s4 ] = pregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00a000
-		                |((pregs($2)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((uimm4s4($4)&0xf)<<6)                  /* offset<(uimm4s4) */
-		                |((pregs($7)&0x7)<<0)                    /* reg<(pregs) */
-		                |((1&0x1)<<12)                           /* W<(1) */
-		                |((3&0x3)<<10)                           /* op<(3) */
-		        ),
-		        NULL_CODE);
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($2,rc_pregs)
-		             && const_fits($4,c_imm16s4)
-		             && reginclass($7,rc_dregs)) {
-/* LDSTidxI:	[ pregs + imm16s4 ] = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 1 |.W.|.Z.|.sz....|.ptr.......|.reg.......|
-|.offset........................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTidxI: [ pregs + imm16s4 ] = dregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00e400
-		                |((pregs($2)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((dregs($7)&0x7)<<0)                    /* reg<(dregs) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		                |((0&0x3)<<6)                            /* sz<(0) */
-		                |((0&0x1)<<8)                            /* Z<(0) */
-		        ),
-		        CONSCODE(  
-		          GENCODE(0x000000
-		                  |((imm16s4($4)&0xffff)<<0)               /* offset<(imm16s4) */
-		          ),
-		          NULL_CODE));
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($2,rc_pregs)
-		             && const_fits($4,c_imm16s4)
-		             && reginclass($7,rc_pregs)) {
-/* LDSTidxI:	[ pregs + imm16s4 ] = pregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 1 |.W.|.Z.|.sz....|.ptr.......|.reg.......|
-|.offset........................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTidxI: [ pregs + imm16s4 ] = pregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x00e400
-		                |((pregs($2)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((pregs($7)&0x7)<<0)                    /* reg<(pregs) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		                |((0&0x3)<<6)                            /* sz<(0) */
-		                |((1&0x1)<<8)                            /* Z<(1) */
-		        ),
-		        CONSCODE(  
-		          GENCODE(0x000000
-		                  |((imm16s4($4)&0xffff)<<0)               /* offset<(imm16s4) */
-		          ),
-		          NULL_CODE));
-		  } else { $$ = 0; semantic_error ("LBRACK REG PLUS expr RBRACK ASSIGN REG"); }
-		}
-	| LBRACK REG RBRACK ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($2,rc_iregs)
-		             && reginclass($5,rc_dregs)) {
-/* dspLDST:	[ iregs ] = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 |.W.|.aop...|.m.....|.i.....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dspLDST: [ iregs ] = dregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x009c00
-		                |((iregs($2)&0x3)<<3)                    /* i<(iregs) */
-		                |((dregs($5)&0x7)<<0)                    /* reg<(dregs) */
-		                |((2&0x3)<<7)                            /* aop<(2) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		                |((0&0x3)<<5)                            /* m<(0) */
-		        ),
-		        NULL_CODE);
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($2,rc_pregs)
-		             && reginclass($5,rc_dregs)) {
-/* LDST:	[ pregs ] = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: [ pregs ] = dregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x009000
-		                |((pregs($2)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((dregs($5)&0x7)<<0)                    /* reg<(dregs) */
-		                |((2&0x3)<<7)                            /* aop<(2) */
-		                |((0&0x3)<<10)                           /* sz<(0) */
-		                |((0&0x1)<<6)                            /* Z<(0) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		        ),
-		        NULL_CODE);
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($2,rc_pregs)
-		             && reginclass($5,rc_pregs)) {
-/* LDST:	[ pregs ] = pregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: [ pregs ] = pregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x009000
-		                |((pregs($2)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((pregs($5)&0x7)<<0)                    /* reg<(pregs) */
-		                |((2&0x3)<<7)                            /* aop<(2) */
-		                |((0&0x3)<<10)                           /* sz<(0) */
-		                |((1&0x1)<<6)                            /* Z<(1) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("LBRACK REG RBRACK ASSIGN REG"); }
-		}
-	| LBRACK REG _MINUS_MINUS RBRACK ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($2,rc_iregs)
-		             && reginclass($6,rc_dregs)) {
-/* dspLDST:	[ iregs -- ] = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 |.W.|.aop...|.m.....|.i.....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dspLDST: [ iregs -- ] = dregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x009c00
-		                |((iregs($2)&0x3)<<3)                    /* i<(iregs) */
-		                |((dregs($6)&0x7)<<0)                    /* reg<(dregs) */
-		                |((1&0x3)<<7)                            /* aop<(1) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		                |((0&0x3)<<5)                            /* m<(0) */
-		        ),
-		        NULL_CODE);
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($2,rc_pregs)
-		             && reginclass($6,rc_dregs)) {
-/* LDST:	[ pregs -- ] = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: [ pregs -- ] = dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((pregs($2)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((dregs($6)&0x7)<<0)                    /* reg<(dregs) */
-		                |((1&0x3)<<7)                            /* aop<(1) */
-		                |((0&0x3)<<10)                           /* sz<(0) */
-		                |((0&0x1)<<6)                            /* Z<(0) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_pregs)
-		             && reginclass($6,rc_pregs)) {
-/* LDST:	[ pregs -- ] = pregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: [ pregs -- ] = pregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((pregs($2)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((pregs($6)&0x7)<<0)                    /* reg<(pregs) */
-		                |((1&0x3)<<7)                            /* aop<(1) */
-		                |((0&0x3)<<10)                           /* sz<(0) */
-		                |((1&0x1)<<6)                            /* Z<(1) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("LBRACK REG _MINUS_MINUS RBRACK ASSIGN REG"); }
-		}
-	| LBRACK REG _PLUS_PLUS RBRACK ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_iregs)
-		             && reginclass($6,rc_dregs)) {
-/* dspLDST:	[ iregs ++ ] = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 |.W.|.aop...|.m.....|.i.....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dspLDST: [ iregs ++ ] = dregs\n");
-		    $$ = CONSCODE(
-		        GENCODE(0x009c00
-		                |((iregs($2)&0x3)<<3)                    /* i<(iregs) */
-		                |((dregs($6)&0x7)<<0)                    /* reg<(dregs) */
-		                |((0&0x3)<<7)                            /* aop<(0) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		                |((0&0x3)<<5)                            /* m<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_pregs)
-		             && reginclass($6,rc_dregs)) {
-/* LDST:	[ pregs ++ ] = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: [ pregs ++ ] = dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((pregs($2)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((dregs($6)&0x7)<<0)                    /* reg<(dregs) */
-		                |((0&0x3)<<7)                            /* aop<(0) */
-		                |((0&0x3)<<10)                           /* sz<(0) */
-		                |((0&0x1)<<6)                            /* Z<(0) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_pregs)
-		             && reginclass($6,rc_pregs)) {
-/* LDST:	[ pregs ++ ] = pregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: [ pregs ++ ] = pregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((pregs($2)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((pregs($6)&0x7)<<0)                    /* reg<(pregs) */
-		                |((0&0x3)<<7)                            /* aop<(0) */
-		                |((0&0x3)<<10)                           /* sz<(0) */
-		                |((1&0x1)<<6)                            /* Z<(1) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("LBRACK REG _PLUS_PLUS RBRACK ASSIGN REG"); }
-		}
-	| LBRACK REG _PLUS_PLUS REG RBRACK ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_iregs)
-		             && reginclass($4,rc_mregs)
-		             && reginclass($7,rc_dregs)) {
-/* dspLDST:	[ iregs ++ mregs ] = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 |.W.|.aop...|.m.....|.i.....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dspLDST: [ iregs ++ mregs ] = dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009c00
-		                |((iregs($2)&0x3)<<3)                    /* i<(iregs) */
-		                |((mregs($4)&0x3)<<5)                    /* m<(mregs) */
-		                |((dregs($7)&0x7)<<0)                    /* reg<(dregs) */
-		                |((3&0x3)<<7)                            /* aop<(3) */
-		                |((1&0x1)<<9)                            /* W<(1) */
-		        ),
-		        NULL_CODE);
-
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_pregs)
-		             && reginclass($4,rc_pregs)
-		             && reginclass($7,rc_dregs)) {
-/* LDSTpmod:	[ pregs ++ pregs ] = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 0 |.W.|.aop...|.reg.......|.idx.......|.ptr.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTpmod: [ pregs ++ pregs ] = dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x008000
-		                |((pregs($2)&0x7)<<0)                    /* ptr<(pregs) */
-		                |((pregs($4)&0x7)<<3)                    /* idx<(pregs) */
-		                |((dregs($7)&0x7)<<6)                    /* reg<(dregs) */
-		                |((0&0x3)<<9)                            /* aop<(0) */
-		                |((1&0x1)<<11)                           /* W<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("LBRACK REG _PLUS_PLUS REG RBRACK ASSIGN REG"); }
-		}
-	| W LBRACK REG _PLUS_PLUS REG RBRACK ASSIGN LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($3,rc_pregs)
-		             && reginclass($5,rc_pregs)
-		             && reginclass($8,rc_dregs)) {
-/* LDSTpmod:	W [ pregs ++ pregs ] = dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 0 |.W.|.aop...|.reg.......|.idx.......|.ptr.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTpmod: W [ pregs ++ pregs ] = dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x008000
-		                |((pregs($3)&0x7)<<0)                    /* ptr<(pregs) */
-		                |((pregs($5)&0x7)<<3)                    /* idx<(pregs) */
-		                |((dregs($8)&0x7)<<6)                 /* reg<(dregs_lo) */
-		                |((1&0x3)<<9)                            /* aop<(1) */
-		                |((1&0x1)<<11)                           /* W<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("W LBRACK REG _PLUS_PLUS REG RBRACK ASSIGN LOW_REG"); }
-		}
-	| W LBRACK REG _PLUS_PLUS REG RBRACK ASSIGN HIGH_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($3,rc_pregs)
-		             && reginclass($5,rc_pregs)
-		             && reginclass($8,rc_dregs)) {
-/* LDSTpmod:	W [ pregs ++ pregs ] = dregs_hi
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 0 |.W.|.aop...|.reg.......|.idx.......|.ptr.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTpmod: W [ pregs ++ pregs ] = dregs_hi\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x008000
-		                |((pregs($3)&0x7)<<0)                    /* ptr<(pregs) */
-		                |((pregs($5)&0x7)<<3)                    /* idx<(pregs) */
-		                |((dregs($8)&0x7)<<6)                 /* reg<(dregs_hi) */
-		                |((2&0x3)<<9)                            /* aop<(2) */
-		                |((1&0x1)<<11)                           /* W<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("W LBRACK REG _PLUS_PLUS REG RBRACK ASSIGN HIGH_REG"); }
-		}
-	| LBRACK _MINUS_MINUS REG RBRACK ASSIGN LPAREN REG COLON expr COMMA REG COLON expr RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $3 == REG_SP
-		             && $7 == REG_R7
-		             && (EXPR_VALUE($9) >= 0 && EXPR_VALUE($9) < 8)  
-		             && $11 == REG_P5
-		             && (EXPR_VALUE($13) >= 0 && EXPR_VALUE($13) < 6)  ) {   
-/* PushPopMultiple:	[ -- SP ] = ( R7 : reglim , P5 : reglim )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 1 | 0 |.d.|.p.|.W.|.dr........|.pr........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("PushPopMultiple: [ -- SP ] = ( R7 : reglim , P5 : reglim )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000400
-		                |((imm5($9)&0x7)<<3)                    /* dr<(reglim) */
-		                |((imm5($13)&0x7)<<0)                   /* pr<(reglim) */
-		                |((1&0x1)<<6)                            /* W<(1) */
-		                |((1&0x1)<<8)                            /* d<(1) */
-		                |((1&0x1)<<7)                            /* p<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("LBRACK _MINUS_MINUS REG RBRACK ASSIGN LPAREN REG COLON expr COMMA REG COLON expr RPAREN"); }
-		}
-	| LBRACK _MINUS_MINUS REG RBRACK ASSIGN LPAREN REG COLON expr RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $3 == REG_SP
-		             && $7 == REG_R7
-		             && (EXPR_VALUE($9) >= 0 && EXPR_VALUE($9) < 8) ) { 
-/* PushPopMultiple:	[ -- SP ] = ( R7 : reglim )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 1 | 0 |.d.|.p.|.W.|.dr........|.pr........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("PushPopMultiple: [ -- SP ] = ( R7 : reglim )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000400
-		                |((imm5($9)&0x7)<<3)                    /* dr<(dregs) */
-		                |((1&0x1)<<6)                            /* W<(1) */
-		                |((1&0x1)<<8)                            /* d<(1) */
-		                |((0&0x1)<<7)                            /* p<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $3 == REG_SP
-		             && $7 == REG_P5
-		             && (EXPR_VALUE($9) >= 0 && EXPR_VALUE($9) < 6) ) { 
-/* PushPopMultiple:	[ -- SP ] = ( P5 : reglim )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 1 | 0 |.d.|.p.|.W.|.dr........|.pr........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("PushPopMultiple: [ -- SP ] = ( P5 : reglim )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000400
-		                |((imm5($9)&0x7)<<0)                    /* pr<(pregs) */
-		                |((1&0x1)<<6)                            /* W<(1) */
-		                |((0&0x1)<<8)                            /* d<(0) */
-		                |((1&0x1)<<7)                            /* p<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("LBRACK _MINUS_MINUS REG RBRACK ASSIGN LPAREN REG COLON expr RPAREN"); }
-		}
-	| LBRACK _MINUS_MINUS REG RBRACK ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $3 == REG_SP
-		             && reginclass($6,rc_allregs)) {
-/* PushPopReg:	[ -- SP ] = allregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 |.W.|.grp.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("PushPopReg: [ -- SP ] = allregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000100
-		                |((allregs($6)&0x7)<<0)                  /* reg<(allregs) */
-		                |((1&0x1)<<6)                            /* W<(1) */
-		                |((Xallregs($6)&0x7)<<3)                 /* grp<(Xallregs($6)) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("LBRACK _MINUS_MINUS REG RBRACK ASSIGN REG"); }
-		}
-	| LINK expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && const_fits($2,c_uimm16s4)) {
-/* linkage:	LINK uimm16s4
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.R.|
-|.framesize.....................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("linkage: LINK uimm16s4\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00e800
-		                |((0&0x1)<<0)                            /* R<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((uimm16s4($2)&0xffff)<<0)              /* framesize<(uimm16s4) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("LINK expr"); }
-		}
-	| JUMP_DOT_L expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && const_fits($2,c_pcrel24_jump_l)) {
-/* CALLa:	JUMP.L pcrel24
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 0 | 1 |.S.|.msw...........................|
-|.lsw...........................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CALLa: JUMP_DOT_L pcrel24\n");
-                    $$ = CONSCODE(GENCODE(0x00e200
-                         |(((pcrel24_jump_l($2)>>16)&0xff)<<0)/* msw<(pcrel24)>>16 */
-                         |((0&0x1)<<8)                        /* S<(0) */
-                         ),
-                         ExprNodeGenReloc($2, BFD_RELOC_24_PCREL_JUMP_L));
-#if 0
-		    $$ =
-		      CONSCODE(
-		        NOTERELOC(PCREL,BFD_RELOC_24_PCREL_JUMP_L,$2,
-		          GENCODE(0x00e200
-		                  |(((pcrel24_jump_l($2)>>16)&0xff)<<0)           /* msw<(pcrel24)>>16 */
-		                  |((0&0x1)<<8)                            /* S<(0) */
-		          )),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((pcrel24_jump_l($2)&0xffff)<<0)               /* lsw<(pcrel24) */
-		          ),
-		          NULL_CODE));
-#endif
-
-		  } else { $$ = 0; semantic_error ("JUMP_DOT_L expr"); }
-		}
-        // Copied from JUMP_DOT_L
-        | JUMP_DOT_X expr
-                {
-                  if(0) {
-                  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && const_fits($2,c_pcrel24_call_x)) {
-/* CALLa:       JUMP.X pcrel24_call_x
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 0 | 1 |.S.|.msw...........................|
-|.lsw...........................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-                    notethat("CALLa: JUMP_DOT_X pcrel24_call_x\n");
-                    $$ = CONSCODE(GENCODE(0x00e200
-                         |(((pcrel24_call_x($2)>>16)&0xff)<<0)/* msw<(pcrel24)>>16 */
-                         |((0&0x1)<<8)                        /* S<(0) */
-                         ),
-                         ExprNodeGenReloc($2, BFD_RELOC_24_PCREL_JUMP_X));
-#if 0
-                    $$ =
-                      CONSCODE(
-                        NOTERELOC(PCREL,BFD_RELOC_24_PCREL_JUMP_X,$2,
-                          GENCODE(0x00e200
-                                  |(((pcrel24_call_x($2)>>16)&0xff)<<0)           /* msw<(pcrel24)>>16 */
-                                  |((0&0x1)<<8)                            /* S<(0) */
-                          )),
-                        CONSCODE(
-                          GENCODE(0x000000
-                                  |((pcrel24_call_x($2)&0xffff)<<0)               /* lsw<(pcrel24) */
-                          ),
-                          NULL_CODE));
-#endif
-
-                  } else { $$ = 0; semantic_error ("JUMP_DOT_L expr"); }
-                }
-
- 
-
-
-	| LPAREN REG COMMA REG RPAREN ASSIGN BYTEOP16P LPAREN REG COLON expr COMMA REG COLON expr RPAREN aligndir
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($9,rc_dregs)
-		             && reginclass($13,rc_dregs)) {
-/* dsp32alu:	( dregs , dregs ) = BYTEOP16P ( dregs_pair , dregs_pair ) (aligndir)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: ( dregs , dregs ) = BYTEOP16P ( dregs_pair , dregs_pair ) (aligndir)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((21&0x1f)<<0)                          /* aopcde<(21) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($2)&0x7)<<6)                    /* dst1<(dregs) */
-		                  |((dregs($4)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($9)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($13)&0x7)<<0)              /* src1<(dregs_pair) */
-		                  |((($17.r0)&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LPAREN REG COMMA REG RPAREN ASSIGN BYTEOP16P LPAREN REG COLON expr COMMA REG COLON expr RPAREN aligndir"); }
-		}
-	| LPAREN REG COMMA REG RPAREN ASSIGN BYTEOP16M LPAREN REG COLON expr COMMA REG COLON expr RPAREN aligndir 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($9,rc_dregs)
-		             && reginclass($13,rc_dregs)) {
-/* dsp32alu:	( dregs , dregs ) = BYTEOP16M ( dregs_pair , dregs_pair ) (aligndir)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: ( dregs , dregs ) = BYTEOP16M ( dregs_pair , dregs_pair ) (aligndir)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((21&0x1f)<<0)                          /* aopcde<(21) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($2)&0x7)<<6)                    /* dst1<(dregs) */
-		                  |((dregs($4)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($9)&0x7)<<3)              /* src0<(dregs_pair) */
-		                  |((dregs($13)&0x7)<<0)              /* src1<(dregs_pair) */
-		                  |((($17.r0)&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LPAREN REG COMMA REG RPAREN ASSIGN BYTEOP16M LPAREN REG COLON expr COMMA REG COLON expr RPAREN aligndir"); }
-		}
-	| LPAREN REG COMMA REG RPAREN ASSIGN BYTEUNPACK REG COLON expr aligndir
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($8,rc_dregs)) {
-/* dsp32alu:	( dregs , dregs ) = BYTEUNPACK dregs_pair (aligndir)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: ( dregs , dregs ) = BYTEUNPACK dregs_pair (aligndir)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((24&0x1f)<<0)                          /* aopcde<(24) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($2)&0x7)<<6)                    /* dst1<(dregs) */
-		                  |((dregs($4)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($8)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((($11.r0)&0x1)<<13)                     /* s=aligndir.r0 */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LPAREN REG COMMA REG RPAREN ASSIGN BYTEUNPACK REG COLON expr aligndir"); }
-		}
-	/*| LPAREN REG COMMA REG RPAREN ASSIGN L PLUS H COMMA L PLUS H LPAREN REG COMMA REG RPAREN*/
-        | REG ASSIGN A_ONE_DOT_L PLUS A_ONE_DOT_H COMMA REG ASSIGN A_ZERO_DOT_L PLUS A_ZERO_DOT_H
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($7,rc_dregs)  ) {
-/* dsp32alu:	( dregs , dregs ) = L + H , L + H ( A1 , A0 )
-   dsp32alu:	dregs = A1.l + A1.h, dregs = A0.l + A0.h
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-	    notethat("dsp32alu: dregs = A1.l + A1.h, dregs = A0.l + A0.h  \n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((12&0x1f)<<0)                          /* aopcde<(12) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($7)&0x7)<<6)                    /* dst1<(dregs) */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN A1.L PLUS A1.H COMMA REG ASSIGN A0.L PLUS A0.H"); }
-		}
-	| LPAREN REG COMMA REG RPAREN ASSIGN SEARCH REG LPAREN searchmod RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($8,rc_dregs)) {
-/* dsp32alu:	( dregs , dregs ) = SEARCH dregs (searchmod)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: ( dregs , dregs ) = SEARCH dregs (searchmod)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((13&0x1f)<<0)                          /* aopcde<(13) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($2)&0x7)<<6)                    /* dst1<(dregs) */
-		                  |((dregs($4)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($8)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((($10.r0)&0x3)<<14)                     /* aop=searchmod.r0 */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LPAREN REG COMMA REG RPAREN ASSIGN SEARCH REG LPAREN searchmod RPAREN"); }
-		}
-	| REG ASSIGN REG _PLUS_BAR_MINUS REG COMMA REG ASSIGN REG _MINUS_BAR_PLUS REG amod2 
-        	{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-                             && reginclass($3,rc_dregs)
-                             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)
-		             && reginclass($9,rc_dregs)
-		             && reginclass($11,rc_dregs)) {
-/* dsp32alu:	dregs = dregs +|- dregs , dregs = dregs -|+ dregs (amod2)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu:  dregs = dregs +|- dregs , dregs = dregs -|+ dregs (amod2)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		                |((1&0x1f)<<0)                           /* aopcde<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst1<(dregs) */
-		                  |((dregs($7)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($3)&0x7)<<3)                   /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                   /* src1<(dregs) */
-		                  |((($12.r0)&0x3)<<14)                    /* aop=amod2.r0 */
-		                  |((0&0x1)<<13)                    /* s=amod0.s0 */
-		                  |((0&0x1)<<12)                    /* x=amod0.x0 */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG _PLUS_BAR_MINUS REG COMMA REG ASSIGN REG _MINUS_BAR_PLUS REG amod2"); }
-		}
-	| REG ASSIGN REG _PLUS_BAR_MINUS REG COMMA REG ASSIGN REG _MINUS_BAR_PLUS REG LPAREN S COMMA ASR RPAREN
-        	{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-                             && reginclass($3,rc_dregs)
-                             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)
-		             && reginclass($9,rc_dregs)
-		             && reginclass($11,rc_dregs)) {
-/* dsp32alu:	dregs = dregs +|- dregs , dregs = dregs -|+ dregs (S, ASR)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu:  dregs = dregs +|- dregs , dregs = dregs -|+ dregs (S, ASR)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		                |((1&0x1f)<<0)                           /* aopcde<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst1<(dregs) */
-		                  |((dregs($7)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($3)&0x7)<<3)                   /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                   /* src1<(dregs) */
-		                  |((2&0x3)<<14)                    /* aop=amod2.r0 */
-		                  |((1&0x1)<<13)                    /* s=amod0.s0 */
-		                  |((0&0x1)<<12)                    /* x=amod0.x0 */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG _PLUS_BAR_MINUS REG COMMA REG ASSIGN REG _MINUS_BAR_PLUS REG LPAREN S COMMA ASR RPAREN"); }
-		}
-	| REG ASSIGN REG _PLUS_BAR_MINUS REG COMMA REG ASSIGN REG _MINUS_BAR_PLUS REG LPAREN S COMMA ASL RPAREN
-        	{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-                             && reginclass($3,rc_dregs)
-                             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)
-		             && reginclass($9,rc_dregs)
-		             && reginclass($11,rc_dregs)) {
-/* dsp32alu:	dregs = dregs +|- dregs , dregs = dregs -|+ dregs (S, ASL)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu:  dregs = dregs +|- dregs , dregs = dregs -|+ dregs (S, ASL)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		                |((1&0x1f)<<0)                           /* aopcde<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst1<(dregs) */
-		                  |((dregs($7)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($3)&0x7)<<3)                   /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                   /* src1<(dregs) */
-		                  |((3&0x3)<<14)                    /* aop=amod2.r0 */
-		                  |((1&0x1)<<13)                    /* s=amod0.s0 */
-		                  |((0&0x1)<<12)                    /* x=amod0.x0 */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG _PLUS_BAR_MINUS REG COMMA REG ASSIGN REG _MINUS_BAR_PLUS REG LPAREN S COMMA ASL RPAREN"); }
-		}
-	| REG ASSIGN REG_A11 PLUS REG_A00 COMMA REG ASSIGN REG_A11 MINUS REG_A00 amod1 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($7,rc_dregs)
-		             && $3 == REG_A1
-                             && $5 == REG_A0
-                             && $9 == REG_A1
-		             && $11 == REG_A0) {
-/* dsp32alu: dregs = A1 + A0 , dregs = A1 - A0 (amod1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = A1 + A0 , dregs = A1 - A0 (amod1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((17&0x1f)<<0)                          /* aopcde<(17) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst1<(dregs) */
-		                  |((dregs($7)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((($12.s0)&0x1)<<13)                    /* s=amod1.s0 */
-		                  |((($12.x0)&0x1)<<12)                    /* x=amod1.x0 */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG_A11 PLUS REG_A00 COMMA REG ASSIGN REG_A11 MINUS REG_A00 LPAREN amod1 RPAREN"); }
-		}
-	| REG ASSIGN REG_A00 PLUS REG_A11 COMMA REG ASSIGN REG_A00 MINUS REG_A11 amod1 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($1,rc_dregs)
-		             && reginclass($7,rc_dregs)
-		             && $3 == REG_A0
-                             && $5 == REG_A1
-                             && $9 == REG_A0
-		             && $11 == REG_A1) {
-/* dsp32alu: dregs = A0 + A1 , dregs = A0 - A1 (amod1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = A0 + A1 , dregs = A0 - A1 (amod1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((17&0x1f)<<0)                          /* aopcde<(17) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst1<(dregs) */
-		                  |((dregs($7)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((($12.s0)&0x1)<<13)                    /* s=amod1.s0 */
-		                  |((($12.x0)&0x1)<<12)                    /* x=amod1.x0 */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG_A00 PLUS REG_A11 COMMA REG ASSIGN REG_A00 MINUS REG_A11 LPAREN amod1 RPAREN"); }
-		}
-	| REG ASSIGN REG PLUS REG COMMA REG ASSIGN REG MINUS REG amod1
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)
-                             && reginclass($7,rc_dregs)
-                             && reginclass($9,rc_dregs)
-		             && reginclass($11,rc_dregs)) {
-/* dsp32alu: dregs = dregs + dregs , dregs = dregs - dregs (amod1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = dregs + dregs , dregs = dregs - dregs (amod1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((4&0x1f)<<0)                           /* aopcde<(4) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst1<(dregs) */
-		                  |((dregs($7)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                   /* src1<(dregs) */
-		                  |((($12.s0)&0x1)<<13)                    /* s=amod1.s0 */
-		                  |((($12.x0)&0x1)<<12)                    /* x=amod1.x0 */
-		                  |((2&0x3)<<14)                           /* aop<(2) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG PLUS REG COMMA REG ASSIGN REG MINUS REG LPAREN amod1 RPAREN"); }
-		}
-	| REG ASSIGN REG _PLUS_BAR_PLUS REG COMMA REG ASSIGN REG _MINUS_BAR_MINUS REG amod2
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-                             && reginclass($5,rc_dregs)
-                             && reginclass($7,rc_dregs)
-		             && reginclass($9,rc_dregs)
-		             && reginclass($11,rc_dregs)) {
-/* dsp32alu:	dregs = dregs +|+ dregs , dregs = dregs -|- dregs (amod2)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = dregs +|+ dregs , dregs = dregs -|- dregs (amod2)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((1&0x1f)<<0)                           /* aopcde<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst1<(dregs) */
-		                  |((dregs($7)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($3)&0x7)<<3)                   /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                   /* src1<(dregs) */
-		                  |((($12.r0)&0x3)<<14)                    /* aop=amod2.r0 */
-		                  |((0&0x1)<<13)                    /* s=amod0.s0 */
-		                  |((0&0x1)<<12)                    /* x=amod0.x0 */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN REG _PLUS_BAR_PLUS REG COMMA REG ASSIGN REG _MINUS_BAR_MINUS REG amod2"); }
-		}
-	| REG ASSIGN REG _PLUS_BAR_PLUS REG COMMA REG ASSIGN REG _MINUS_BAR_MINUS REG LPAREN S COMMA ASR RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-                             && reginclass($5,rc_dregs)
-                             && reginclass($7,rc_dregs)
-		             && reginclass($9,rc_dregs)
-		             && reginclass($11,rc_dregs)) {
-/*  dsp32alu:	dregs = dregs +|+ dregs , dregs = dregs -|- dregs (S, ASR)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = dregs +|+ dregs , dregs = dregs -|- dregs (S, ASR)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)
-		                |((1&0x1f)<<0)
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)
-		                  |((dregs($7)&0x7)<<9)
-		                  |((dregs($3)&0x7)<<3)
-		                  |((dregs($5)&0x7)<<0)
-		                  |((2&0x3)<<14)
-		                  |((1&0x1)<<13)
-		                  |((0&0x1)<<12)
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN REG _PLUS_BAR_PLUS REG COMMA REG ASSIGN REG _MINUS_BAR_MINUS REG LPAREN S COMMA ASR RPAREN"); }
-		}
-	| REG ASSIGN REG _PLUS_BAR_PLUS REG COMMA REG ASSIGN REG _MINUS_BAR_MINUS REG LPAREN S COMMA ASL RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-                             && reginclass($5,rc_dregs)
-                             && reginclass($7,rc_dregs)
-		             && reginclass($9,rc_dregs)
-		             && reginclass($11,rc_dregs)) {
-/*  dsp32alu:	dregs = dregs +|+ dregs , dregs = dregs -|- dregs (S, ASL)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = dregs +|+ dregs , dregs = dregs -|- dregs (S, ASL)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)
-		                |((1&0x1f)<<0)
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)
-		                  |((dregs($7)&0x7)<<9)
-		                  |((dregs($3)&0x7)<<3)
-		                  |((dregs($5)&0x7)<<0)
-		                  |((3&0x3)<<14)
-		                  |((1&0x1)<<13)
-		                  |((0&0x1)<<12)
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN REG _PLUS_BAR_PLUS REG COMMA REG ASSIGN REG _MINUS_BAR_MINUS REG LPAREN S COMMA ASL RPAREN"); }
-		}
-	| LPAREN REG COLON expr COMMA REG COLON expr RPAREN ASSIGN LBRACK REG _PLUS_PLUS RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $2 == REG_R7
-		             && (EXPR_VALUE($4) >= 0 && EXPR_VALUE($4) < 8)  
-		             && $6 == REG_P5
-		             && (EXPR_VALUE($8) >= 0 && EXPR_VALUE($8) < 6)  
-		             && $12 == REG_SP) {
-/* PushPopMultiple:	( R7 : reglim , P5 : reglim ) = [ SP ++ ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 1 | 0 |.d.|.p.|.W.|.dr........|.pr........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("PushPopMultiple: ( R7 : reglim , P5 : reglim ) = [ SP ++ ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000400
-		                |((imm5($4)&0x7)<<3)                    /* dr<(dregs) */
-		                |((imm5($8)&0x7)<<0)                    /* pr<(pregs) */
-		                |((0&0x1)<<6)                            /* W<(0) */
-		                |((1&0x1)<<8)                            /* d<(1) */
-		                |((1&0x1)<<7)                            /* p<(1) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("LPAREN REG COLON expr COMMA REG COLON expr RPAREN ASSIGN LBRACK REG _PLUS_PLUS RBRACK"); }
-		}
-	| LPAREN REG COLON expr RPAREN ASSIGN LBRACK REG _PLUS_PLUS RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $2 == REG_R7
-		             && (EXPR_VALUE($4) >= 0 && EXPR_VALUE($4) < 8)  
-		             && $8 == REG_SP) {
-/* PushPopMultiple:	( R7 : reglim ) = [ SP ++ ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 1 | 0 |.d.|.p.|.W.|.dr........|.pr........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("PushPopMultiple: ( R7 : reglim ) = [ SP ++ ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000400
-		                |((imm5($4)&0x7)<<3)                    /* dr<(dregs) */
-		                |((0&0x1)<<6)                            /* W<(0) */
-		                |((1&0x1)<<8)                            /* d<(1) */
-		                |((0&0x1)<<7)                            /* p<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $2 == REG_P5
-		             && (EXPR_VALUE($4) >= 0 && EXPR_VALUE($4) < 6)  
-		             && $8 == REG_SP) {
-/* PushPopMultiple:	( P5 : reglim ) = [ SP ++ ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 1 | 0 |.d.|.p.|.W.|.dr........|.pr........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("PushPopMultiple: ( P5 : reglim ) = [ SP ++ ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000400
-		                |((imm5($4)&0x7)<<0)                    /* pr<(pregs) */
-		                |((0&0x1)<<6)                            /* W<(0) */
-		                |((0&0x1)<<8)                            /* d<(0) */
-		                |((1&0x1)<<7)                            /* p<(1) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("LPAREN REG COLON expr RPAREN ASSIGN LBRACK REG _PLUS_PLUS RBRACK"); }
-		}
-	| LSETUP LPAREN expr COMMA expr RPAREN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && const_fits($3,c_pcrel5)
-		             && const_fits($5,c_pcrel11)
-		             && reginclass($7,rc_counters)) {
-/* LoopSetup:	LSETUP ( pcrel4 , lppcrel10 ) counters
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 1 |.rop...|.c.|.soffset.......|
-|.reg...........| - | - |.eoffset...............................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LoopSetup: LSETUP ( pcrel4 , lppcrel10 ) counters\n");
-                    $$ = CONSCODE(GENCODE(0x00e080
-                                  |((pcrel5($3)&0xf)<<0)/* soffset<(pcrel4) */
-                                  |((counters($7)&0x1)<<4)/* c<(counters) */
-                                  |((0&0x3)<<5)           /* rop<(0) */
-                            ),
-			  CONCTCODE( ExprNodeGenReloc($3, BFD_RELOC_5_PCREL),
-                          CONCTCODE(GENCODE(0x000000
-                                    |((pcrel11($5)&0x3ff)<<0)              /* eoffset<(lppcrel10) */
-                                    ),
-                                    ExprNodeGenReloc($5, BFD_RELOC_11_PCREL))));
-#if 0
-                            CONCTCODE(ExprNodeGenReloc($3, BFD_RELOC_5_PCREL),
-                                     ExprNodeGenReloc($5, BFD_RELOC_11_PCREL)));
-#endif
-#if 0
-		    $$ =
-		      CONSCODE(
-		        NOTERELOC(PCREL,BFD_RELOC_5_PCREL,$3,
-		          GENCODE(0x00e080
-		                  |((pcrel5($3)&0xf)<<0)                   /* soffset<(pcrel4) */
-		                  |((counters($7)&0x1)<<4)                 /* c<(counters) */
-		                  |((0&0x3)<<5)                            /* rop<(0) */
-		          )),
-		        CONSCODE(
-		          NOTERELOC(PCREL,BFD_RELOC_11_PCREL,$5,
-		            GENCODE(0x000000
-		                    |((pcrel11($5)&0x3ff)<<0)              /* eoffset<(lppcrel10) */
-		            )),
-		          NULL_CODE));
-#endif
-
-		  } else { $$ = 0; semantic_error ("LSETUP LPAREN expr COMMA expr RPAREN REG"); }
-		}
-	| LSETUP LPAREN expr COMMA expr RPAREN REG ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && const_fits($3,c_pcrel5)
-		             && const_fits($5,c_pcrel11)
-		             && reginclass($7,rc_counters)
-		             && reginclass($9,rc_pregs)) {
-/* LoopSetup:	LSETUP ( pcrel4 , lppcrel10 ) counters = pregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 1 |.rop...|.c.|.soffset.......|
-|.reg...........| - | - |.eoffset...............................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-#if 0
-		    int value;
-			value = 0x00000000 | ((pcrel11($5)&0x3ff)<<0) | 
-				((pregs($9)&0xf)<<12);
-#endif
-		    notethat("LoopSetup: LSETUP ( pcrel4 , lppcrel10 ) counters = pregs\n");
-                    $$ = CONSCODE(GENCODE(0x00e080
-                                  |((pcrel5($3)&0xf)<<0)  /* soffset<(pcrel4) */
-                                  |((counters($7)&0x1)<<4)/* c<(counters) */
-                                  |((1&0x3)<<5)           /* rop<(1) */
-                          ),
-			  CONCTCODE( ExprNodeGenReloc($3, BFD_RELOC_5_PCREL),
-                          CONCTCODE(GENCODE(0x000000
-                                    |((pcrel11($5)&0x3ff)<<0)              /* eoffset<(lppcrel10) */
-                                    |((pregs($9)&0xf)<<12)                   /* reg<(pregs) */
-                                    ),
-                                    ExprNodeGenReloc($5, BFD_RELOC_11_PCREL))));
-#if 0
-			CONSCODE(CONSCODE(GENCODE(value), NULL_CODE),
-			NOTERELOC1(1, BFD_RELOC_11_PCREL, ($5)->value.s_value, GENCODE(0x0)))));
-#endif
-#if 0
-		    $$ =
-		      CONSCODE(
-		        NOTERELOC(PCREL,BFD_RELOC_5_PCREL,$3,
-		          GENCODE(0x00e080
-		                  |((pcrel5($3)&0xf)<<0)                   /* soffset<(pcrel4) */
-		                  |((counters($7)&0x1)<<4)                 /* c<(counters) */
-		                  |((1&0x3)<<5)                            /* rop<(1) */
-		          )),
-		        CONSCODE(
-		          NOTERELOC(PCREL,BFD_RELOC_11_PCREL,$5,
-		            GENCODE(0x000000
-		                    |((pcrel11($5)&0x3ff)<<0)              /* eoffset<(lppcrel10) */
-		                    |((pregs($9)&0xf)<<12)                   /* reg<(pregs) */
-		            )),
-		          NULL_CODE));
-#endif
-
-		  } else { $$ = 0; semantic_error ("LSETUP LPAREN expr COMMA expr RPAREN REG ASSIGN REG"); }
-		}
-	| LSETUP LPAREN expr COMMA expr RPAREN REG ASSIGN REG GREATER_GREATER expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && const_fits($3,c_pcrel5)
-		             && const_fits($5,c_pcrel11)
-		             && reginclass($7,rc_counters)
-		             && reginclass($9,rc_pregs)
-		             && EXPR_VALUE($11) == 1) {
-/* LoopSetup:	LSETUP ( pcrel4 , lppcrel10 ) counters = pregs >> 1
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 1 |.rop...|.c.|.soffset.......|
-|.reg...........| - | - |.eoffset...............................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LoopSetup: LSETUP ( pcrel4 , lppcrel10 ) counters = pregs >> 1\n");
-                    $$ = CONSCODE(GENCODE(0x00e080
-                                  |((pcrel5($3)&0xf)<<0)  /* soffset<(pcrel4) */
-                                  |((counters($7)&0x1)<<4)/* c<(counters) */
-                                  |((3&0x3)<<5)           /* rop<(3) */
-                             ),
-			  CONCTCODE( ExprNodeGenReloc($3, BFD_RELOC_5_PCREL),
-                          CONCTCODE(GENCODE(0x000000
-                                    |((pcrel11($5)&0x3ff)<<0)              /* eoffset<(lppcrel10) */
-		                    |((pregs($9)&0xf)<<12)                   /* reg<(pregs) */
-                                    ),
-                                    ExprNodeGenReloc($5, BFD_RELOC_11_PCREL))));
-#if 0
-                             CONCTCODE(ExprNodeGenReloc($3, BFD_RELOC_5_PCREL),
-                                       ExprNodeGenReloc($5, BFD_RELOC_11_PCREL)));
-#endif
-#if 0
-		    $$ =
-		      CONSCODE(
-		        NOTERELOC(PCREL,BFD_RELOC_5_PCREL,$3,
-		          GENCODE(0x00e080
-		                  |((pcrel5($3)&0xf)<<0)                   /* soffset<(pcrel4) */
-		                  |((counters($7)&0x1)<<4)                 /* c<(counters) */
-		                  |((3&0x3)<<5)                            /* rop<(3) */
-		          )),
-		        CONSCODE(
-		          NOTERELOC(PCREL,BFD_RELOC_11_PCREL,$5,
-		            GENCODE(0x000000
-		                    |((pcrel11($5)&0x3ff)<<0)              /* eoffset<(lppcrel10) */
-		                    |((pregs($9)&0xf)<<12)                   /* reg<(pregs) */
-		            )),
-		          NULL_CODE));
-#endif
-
-		  } else { $$ = 0; semantic_error ("LSETUP LPAREN expr COMMA expr RPAREN REG ASSIGN REG GREATER_GREATER expr"); }
-		}
-	| REG ASSIGN expr LPAREN Z RPAREN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_regs)
-		             && const_fits($3,c_luimm16) ) {
-/* LDIMMhalf:	regs = luimm16 (z) 
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 0 | 0 | 1 |.Z.|.H.|.S.|.grp...|.reg.......|
-|.hword.........................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDIMMhalf: regs = luimm16 (z)\n");
-                    $$ = CONSCODE(GENCODE(0x00e100
-                                |((regs($1)&0x7)<<0)       /* reg<(regs) */
-                                |((Xregs($1)&0x3)<<3)      /* grp<(Xregs($3)) */
-                                |((0&0x1)<<6)              /* H<(0) */
-                                |((0&0x1)<<5)              /* S<(0) */
-                                |((1&0x1)<<7)              /* Z<(1) */
-                           ),
-                           ExprNodeGenReloc($3, BFD_RELOC_16_LOW));
-#if 0
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00e100
-		                |((regs($1)&0x7)<<0)                     /* reg<(regs) */
-		                |((Xregs($1)&0x3)<<3)                    /* grp<(Xregs($3)) */
-		                |((0&0x1)<<6)                            /* H<(0) */
-		                |((0&0x1)<<5)                            /* S<(0) */
-		                |((1&0x1)<<7)                            /* Z<(1) */
-		        ),
-		        CONSCODE(
-		          NOTERELOC(0,BFD_RELOC_16_LOW,$3,
-		            GENCODE(0x000000
-		                    |((luimm16($3)&0xffff)<<0)               /* hword<(luimm16) */
-		            )),
-		          NULL_CODE));
-#endif
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN expr LPAREN Z RPAREN"); }
-		}
-	| NOP
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-/* ProgCtrl:	NOP
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.prgfunc.......|.poprnd........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ProgCtrl: NOP\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000000
-		                |((0&0xf)<<4)                            /* prgfunc<(0) */
-		                |((0&0xf)<<0)                            /* poprnd<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("NOP"); }
-		}
-	| REG _ASSIGN_BANG REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC && $3 == REG_CC) {
-/* CC2dreg:	CC =! CC
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 |.op....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CC2dreg: CC =! CC\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000200
-		                |((3&0x3)<<3)                            /* op<(3) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG _ASSIGN_BANG REG"); }
-		}
-	| OUTC REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs)) {
-/* psedoDEBUG:	OUTC dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 1 | 1 | 0 | 0 | 0 |.fn....|.grp.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("psedoDEBUG: OUTC dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00f800
-		                |((dregs($2)&0x7)<<0)                    /* reg<(dregs) */
-		                |((0&0x7)<<3)                            /* grp<(0) */
-		                |((2&0x3)<<6)                            /* fn<(2) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("OUTC REG"); }
-		}
-	| OUTC expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && const_fits($2,c_uimm8)) {
-/* psedoOChar:	OUTC uimm8
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 1 | 1 | 0 | 0 | 1 |.ch............................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("psedoOChar: OUTC uimm8\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00f900
-		                |((uimm8($2)&0xff)<<0)                   /* ch<(uimm8) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("OUTC expr"); }
-		}
-	| PREFETCH LBRACK REG RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($3,rc_pregs)) {
-/* CaCTRL:	PREFETCH [ pregs ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 |.a.|.op....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CaCTRL: PREFETCH [ pregs ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000240
-		                |((pregs($3)&0x7)<<0)                    /* reg<(pregs) */
-		                |((0&0x1)<<5)                            /* a<(0) */
-		                |((0&0x3)<<3)                            /* op<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("PREFETCH LBRACK REG RBRACK"); }
-		}
-	| PREFETCH LBRACK REG _PLUS_PLUS RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($3,rc_pregs)) {
-/* CaCTRL:	PREFETCH [ pregs ++ ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 |.a.|.op....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CaCTRL: PREFETCH [ pregs ++ ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000240
-		                |((pregs($3)&0x7)<<0)                    /* reg<(pregs) */
-		                |((1&0x1)<<5)                            /* a<(1) */
-		                |((0&0x3)<<3)                            /* op<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("PREFETCH LBRACK REG _PLUS_PLUS RBRACK"); }
-		}
-	| PRNT REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_allregs)) {
-/* psedoDEBUG:	PRNT allregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 1 | 1 | 0 | 0 | 0 |.fn....|.grp.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("psedoDEBUG: PRNT allregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00f800
-		                |((allregs($2)&0x7)<<0)                  /* reg<(allregs) */
-		                |((Xallregs($2)&0x7)<<3)                 /* grp<(Xallregs($2)) */
-		                |((1&0x3)<<6)                            /* fn<(1) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("PRNT REG"); }
-		}
-	| RAISE expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && const_fits($2,c_uimm4)) {
-/* ProgCtrl:	RAISE uimm4
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.prgfunc.......|.poprnd........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ProgCtrl: RAISE uimm4\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000000
-		                |((uimm4($2)&0xf)<<0)                    /* poprnd<(uimm4) */
-		                |((9&0xf)<<4)                            /* prgfunc<(9) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("RAISE expr"); }
-		}
-  /* Third Pattern Page 7.75 */
-	| A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG STAR LOW_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-                             && reginclass($7,rc_dregs) ) {
-/* dsp32mac:	A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)               /*   src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                /*  src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * LOW_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG STAR HIGH_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-                             && reginclass($7,rc_dregs) ) {
-/* dsp32mac:	A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)               /*     src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * LOW_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG STAR LOW_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-                             && reginclass($7,rc_dregs) ) {
-/* dsp32mac:	A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * LOW_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG STAR HIGH_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-                             && reginclass($7,rc_dregs) ) {
-/* dsp32mac:	A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                 /*   src0<(dregs)  */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * LOW_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc LOW_REG STAR HIGH_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG STAR LOW_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-                             && reginclass($7,rc_dregs) ) {
-/* dsp32mac:	A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)               /*   src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                /*  src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * HIGH_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc LOW_REG STAR HIGH_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG STAR HIGH_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-                             && reginclass($7,rc_dregs) ) {
-/* dsp32mac:	A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)               /*     src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * HIGH_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc LOW_REG STAR HIGH_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG STAR LOW_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-                             && reginclass($7,rc_dregs) ) {
-/* dsp32mac:	A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * HIGH_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc LOW_REG STAR HIGH_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG STAR HIGH_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-                             && reginclass($7,rc_dregs) ) {
-/* dsp32mac:	A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                 /*   src0<(dregs)  */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * HIGH_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc HIGH_REG STAR LOW_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG STAR LOW_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-                             && reginclass($7,rc_dregs) ) {
-/* dsp32mac:	A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)               /*   src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                /*  src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * LOW_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc HIGH_REG STAR LOW_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG STAR HIGH_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-                             && reginclass($7,rc_dregs) ) {
-/* dsp32mac:	A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)               /*     src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * LOW_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc HIGH_REG STAR LOW_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG STAR LOW_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-                             && reginclass($7,rc_dregs) ) {
-/* dsp32mac:	A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * LOW_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc HIGH_REG STAR LOW_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG STAR HIGH_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-                             && reginclass($7,rc_dregs) ) {
-/* dsp32mac:	A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                 /*   src0<(dregs)  */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * LOW_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc HIGH_REG STAR HIGH_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG STAR LOW_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-                             && reginclass($7,rc_dregs) ) {
-/* dsp32mac:	A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)               /*   src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                /*  src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * HIGH_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc HIGH_REG STAR HIGH_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG STAR HIGH_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-                             && reginclass($7,rc_dregs) ) {
-/* dsp32mac:	A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)               /*     src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * HIGH_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc HIGH_REG STAR HIGH_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG STAR LOW_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-                             && reginclass($7,rc_dregs) ) {
-/* dsp32mac:	A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * HIGH_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc HIGH_REG STAR HIGH_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG STAR HIGH_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-                             && reginclass($7,rc_dregs) ) {
-/* dsp32mac:	A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                 /*   src0<(dregs)  */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * HIGH_REG mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-/* Sixth Pattern Page 7.75 */
-	| A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG STAR LOW_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-		             && reginclass($7,rc_dregs) && ((dregs($7)&0x7)%2)==0) {
-/* dsp32mac:   A1macfunc (mxd_mod) , dregs = ( A0macfunc ) (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs = ( A0macfunc ) (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * LOW_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG STAR HIGH_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-		             && reginclass($7,rc_dregs) && ((dregs($7)&0x7)%2)==0) {
-/* dsp32mac:   A1macfunc (mxd_mod) , dregs = ( A0macfunc ) (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs = ( A0macfunc ) (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * LOW_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG STAR LOW_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-		             && reginclass($7,rc_dregs) && ((dregs($7)&0x7)%2)==0) {
-/* dsp32mac:   A1macfunc (mxd_mod) , dregs = ( A0macfunc ) (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs = ( A0macfunc ) (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * LOW_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc LOW_REG STAR LOW_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG STAR HIGH_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-		             && reginclass($7,rc_dregs) && ((dregs($7)&0x7)%2)==0) {
-/* dsp32mac:   A1macfunc (mxd_mod) , dregs = ( A0macfunc ) (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs = ( A0macfunc ) (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * LOW_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc LOW_REG STAR HIGH_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG STAR LOW_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-		             && reginclass($7,rc_dregs) && ((dregs($7)&0x7)%2)==0) {
-/* dsp32mac:   A1macfunc (mxd_mod) , dregs = ( A0macfunc ) (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs = ( A0macfunc ) (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * HIGH_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc LOW_REG STAR HIGH_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG STAR HIGH_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-		             && reginclass($7,rc_dregs) && ((dregs($7)&0x7)%2)==0) {
-/* dsp32mac:   A1macfunc (mxd_mod) , dregs = ( A0macfunc ) (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs = ( A0macfunc ) (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * HIGH_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc LOW_REG STAR HIGH_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG STAR LOW_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-		             && reginclass($7,rc_dregs) && ((dregs($7)&0x7)%2)==0) {
-/* dsp32mac:   A1macfunc (mxd_mod) , dregs = ( A0macfunc ) (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs = ( A0macfunc ) (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * HIGH_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc LOW_REG STAR HIGH_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG STAR HIGH_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-		             && reginclass($7,rc_dregs) && ((dregs($7)&0x7)%2)==0) {
-/* dsp32mac:   A1macfunc (mxd_mod) , dregs = ( A0macfunc ) (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs = ( A0macfunc ) (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc LOW_REG * HIGH_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc HIGH_REG STAR LOW_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG STAR LOW_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-		             && reginclass($7,rc_dregs) && ((dregs($7)&0x7)%2)==0) {
-/* dsp32mac:   A1macfunc (mxd_mod) , dregs = ( A0macfunc ) (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs = ( A0macfunc ) (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * LOW_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc HIGH_REG STAR LOW_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG STAR HIGH_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-		             && reginclass($7,rc_dregs) && ((dregs($7)&0x7)%2)==0) {
-/* dsp32mac:   A1macfunc (mxd_mod) , dregs = ( A0macfunc ) (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs = ( A0macfunc ) (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * LOW_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc HIGH_REG STAR LOW_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG STAR LOW_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-		             && reginclass($7,rc_dregs) && ((dregs($7)&0x7)%2)==0) {
-/* dsp32mac:   A1macfunc (mxd_mod) , dregs = ( A0macfunc ) (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs = ( A0macfunc ) (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * LOW_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc HIGH_REG STAR LOW_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG STAR HIGH_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-		             && reginclass($7,rc_dregs) && ((dregs($7)&0x7)%2)==0) {
-/* dsp32mac:   A1macfunc (mxd_mod) , dregs = ( A0macfunc ) (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs = ( A0macfunc ) (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * LOW_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc HIGH_REG STAR HIGH_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG STAR LOW_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-		             && reginclass($7,rc_dregs) && ((dregs($7)&0x7)%2)==0) {
-/* dsp32mac:   A1macfunc (mxd_mod) , dregs = ( A0macfunc ) (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs = ( A0macfunc ) (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * HIGH_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc HIGH_REG STAR HIGH_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG STAR HIGH_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-		             && reginclass($7,rc_dregs) && ((dregs($7)&0x7)%2)==0) {
-/* dsp32mac:   A1macfunc (mxd_mod) , dregs = ( A0macfunc ) (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs = ( A0macfunc ) (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * HIGH_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc HIGH_REG STAR HIGH_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG STAR LOW_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-		             && reginclass($7,rc_dregs) && ((dregs($7)&0x7)%2)==0) {
-/* dsp32mac:   A1macfunc (mxd_mod) , dregs = ( A0macfunc ) (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs = ( A0macfunc ) (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * HIGH_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| A1macfunc HIGH_REG STAR HIGH_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG STAR HIGH_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs) == reginclass($11,rc_dregs)
-                             && reginclass($4,rc_dregs) == reginclass($13,rc_dregs)
-		             && reginclass($7,rc_dregs) && ((dregs($7)&0x7)%2)==0) {
-/* dsp32mac:   A1macfunc (mxd_mod) , dregs = ( A0macfunc ) (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: A1macfunc (mxd_mod), dregs = ( A0macfunc ) (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($1.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($5.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($7)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($10.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($2)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                 /*   src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("A1macfunc HIGH_REG * HIGH_REG mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| REG ASSIGN ABS REG LPAREN V RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)) {
-/* dsp32alu:	dregs = ABS dregs ( V )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = ABS dregs ( V )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((6&0x1f)<<0)                           /* aopcde<(6) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($4)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((2&0x3)<<14)                           /* aop<(2) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN ABS REG LPAREN V RPAREN"); }
-		}
-	| REG_A00 ASSIGN ABS REG_A00
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A0
-		             && $4 == REG_A0) {
-/* dsp32alu:	A0 = ABS A0
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A0 = ABS A0\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((16&0x1f)<<0)                          /* aopcde<(16) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG_A00 ASSIGN ABS REG_A00"); }
-		}
-	| REG_A00 ASSIGN ABS REG_A11
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A0
-		             && $4 == REG_A1) {
-/* dsp32alu:	A0 = ABS A1
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A0 = ABS A1\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((16&0x1f)<<0)                          /* aopcde<(16) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG_A00 ASSIGN ABS REG_A11"); }
-		}
-	| REG_A11 ASSIGN ABS REG_A00
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A1
-		             && $4 == REG_A0) {
-/* dsp32alu:	A1 = ABS A0
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A1 = ABS A0\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		                |((16&0x1f)<<0)                          /* aopcde<(16) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG_A11 ASSIGN ABS REG_A00"); }
-		}
-	| REG_A11 ASSIGN ABS REG_A11
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A1
-		             && $4 == REG_A1) {
-/* dsp32alu:	A1 = ABS A1
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A1 = ABS A1\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		                |((16&0x1f)<<0)                          /* aopcde<(16) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG_A11 ASSIGN ABS REG_A11"); }
-		}
-	| REG ASSIGN ABS REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)) {
-/* dsp32alu:	dregs = ABS dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = ABS dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((7&0x1f)<<0)                           /* aopcde<(7) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($4)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((2&0x3)<<14)                           /* aop<(2) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN ABS REG"); }
-		}
-	| REG ASSIGN ALIGN16 LPAREN REG COMMA REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)) {
-/* dsp32shift:	dregs = ALIGN16 ( dregs , dregs )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs = ALIGN16 ( dregs , dregs )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((13&0x1f)<<0)                          /* sopcde<(13) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((dregs($7)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN ALIGN16 LPAREN REG COMMA REG RPAREN"); }
-		}
-	| REG ASSIGN ALIGN24 LPAREN REG COMMA REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)) {
-/* dsp32shift:	dregs = ALIGN24 ( dregs , dregs )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs = ALIGN24 ( dregs , dregs )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((13&0x1f)<<0)                          /* sopcde<(13) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((dregs($7)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN ALIGN24 LPAREN REG COMMA REG RPAREN"); }
-		}
-	| REG ASSIGN ALIGN8 LPAREN REG COMMA REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)) {
-/* dsp32shift:	dregs = ALIGN8 ( dregs , dregs )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs = ALIGN8 ( dregs , dregs )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((13&0x1f)<<0)                          /* sopcde<(13) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((dregs($7)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN ALIGN8 LPAREN REG COMMA REG RPAREN"); }
-		}
-	| REG_A00 ASSIGN ASHIFT REG_A00 BY LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A0
-		             && $4 == REG_A0
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	A0 = ASHIFT  A0 BY dregs_lo 
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: A0 = ASHIFT A0 BY dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((3&0x1f)<<0)                           /* sopcde<(3) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((0&0x3)<<14)                           /* sop<(0) */
-		                  |((0&0x3)<<12)                           /* HLs<(0) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG_A00 ASSIGN ASHIFT REG_A00 BY LOW_REG"); }
-		}
-	| REG_A11 ASSIGN ASHIFT REG_A11 BY LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A1
-		             && $4 == REG_A1
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	A1 = ASHIFT A1 BY dregs_lo 
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: A1 = ASHIFT A1 BY dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((3&0x1f)<<0)                           /* sopcde<(3) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((0&0x3)<<14)                           /* sop<(0) */
-		                  |((1&0x3)<<12)                           /* HLs<(1) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG_A11 ASSIGN ASHIFT REG_A11 BY LOW_REG"); }
-		}
-	| REG ASSIGN ASHIFT REG BY LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	dregs = ASHIFT dregs BY dregs_lo 
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs = ASHIFT dregs BY dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((2&0x1f)<<0)                           /* sopcde<(2) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN ASHIFT REG BY LOW_REG"); }
-		}
-	| LOW_REG ASSIGN ASHIFT HIGH_REG BY LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	dregs_lo = ASHIFT dregs_hi BY dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_lo = ASHIFT dregs_hi BY dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($4)&0x7)<<0)                 /* src1<(dregs_hi) */
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((1&0x3)<<12)                           /* HLs<(1) */
-		                  |((0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN ASHIFT HIGH_REG BY LOW_REG"); }
-		}
-	| HIGH_REG ASSIGN ASHIFT LOW_REG BY LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	dregs_hi = ASHIFT dregs_lo BY dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_hi = ASHIFT dregs_lo BY dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($4)&0x7)<<0)                 /* src1<(dregs_lo) */
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((2&0x3)<<12)                           /* HLs<(2) */
-		                  |((0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN ASHIFT LOW_REG BY LOW_REG"); }
-		}
-	| HIGH_REG ASSIGN ASHIFT HIGH_REG BY LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	dregs_hi = ASHIFT dregs_hi BY dregs_lo 
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_hi = ASHIFT dregs_hi BY dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($4)&0x7)<<0)                 /* src1<(dregs_hi) */
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((3&0x3)<<12)                           /* HLs<(3) */
-		                  |((0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN ASHIFT HIGH_REG BY LOW_REG"); }
-		}
-	| LOW_REG ASSIGN ASHIFT LOW_REG BY LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	dregs_lo = ASHIFT dregs_lo BY dregs_lo 
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_lo = ASHIFT dregs_lo BY dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($4)&0x7)<<0)                 /* src1<(dregs_lo) */
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((0&0x3)<<12)                           /* HLs<(0) */
-		                  |((0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN ASHIFT LOW_REG BY LOW_REG"); }
-		}
-	| LOW_REG ASSIGN ASHIFT LOW_REG BY LOW_REG LPAREN S RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	dregs_lo = ASHIFT dregs_lo BY dregs_lo (S)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_lo = ASHIFT dregs_lo BY dregs_lo (S)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($4)&0x7)<<0)                 /* src1<(dregs_lo) */
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((0&0x3)<<12)                           /* HLs<(0) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN ASHIFT LOW_REG BY LOW_REG LPAREN S RPAREN"); }
-		}
-	| LOW_REG ASSIGN ASHIFT HIGH_REG BY LOW_REG LPAREN S RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	dregs_lo = ASHIFT dregs_hi BY dregs_lo (S)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_lo = ASHIFT dregs_hi BY dregs_lo (S)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($4)&0x7)<<0)                 /* src1<(dregs_hi) */
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((1&0x3)<<12)                           /* HLs<(1) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN ASHIFT HIGH_REG BY LOW_REG LPAREN S RPAREN"); }
-		}
-	| HIGH_REG ASSIGN ASHIFT LOW_REG BY LOW_REG LPAREN S RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	dregs_hi = ASHIFT dregs_lo BY dregs_lo (S)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_hi = ASHIFT dregs_lo BY dregs_lo (S)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($4)&0x7)<<0)                 /* src1<(dregs_lo) */
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((2&0x3)<<12)                           /* HLs<(2) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN ASHIFT LOW_REG BY LOW_REG LPAREN S RPAREN"); }
-		}
-	| HIGH_REG ASSIGN ASHIFT HIGH_REG BY LOW_REG LPAREN S RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	dregs_hi = ASHIFT dregs_hi BY dregs_lo (S)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_hi = ASHIFT dregs_hi BY dregs_lo (S)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($4)&0x7)<<0)                 /* src1<(dregs_hi) */
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((3&0x3)<<12)                           /* HLs<(3) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN ASHIFT HIGH_REG BY LOW_REG LPAREN S RPAREN"); }
-		}
-	| REG ASSIGN ASHIFT REG BY LOW_REG LPAREN S RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	dregs = ASHIFT dregs BY dregs_lo (S)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs = ASHIFT dregs BY dregs_lo (S)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((2&0x1f)<<0)                           /* sopcde<(2) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN ASHIFT REG BY LOW_REG LPAREN S RPAREN"); }
-		}
-        | REG_A00 ASSIGN REG_A00 LESS_LESS expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A0
-		             && $3 == REG_A0
-		             && const_fits($5,c_uimm5)) {
-/* dsp32shiftimm:	A0 = A0 << uimm5
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: A0 = A0 << uimm5\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((3&0x1f)<<0)                           /* sopcde<(3) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((imm6($5)&0x3f)<<3)                    /* immag<(imm6) */
-		                  |((0&0x3)<<14)                           /* sop<(0) */
-		                  |((0&0x3)<<12)                           /* HLs<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG_A00 ASSIGN REG_A00 LESS_LESS expr"); }
-		}
-        | REG_A11 ASSIGN REG_A11 LESS_LESS expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A1
-		             && $3 == REG_A1
-		             && const_fits($5,c_uimm5)) {
-/* dsp32shiftimm:	A1 = A1 << uimm5
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: A1 = A1 << uimm5\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((3&0x1f)<<0)                           /* sopcde<(3) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((imm6($5)&0x3f)<<3)                    /* immag<(imm6) */
-		                  |((0&0x3)<<14)                           /* sop<(0) */
-		                  |((1&0x3)<<12)                           /* HLs<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG_A11 ASSIGN REG_A11 LESS_LESS expr"); }
-		}
-        | REG ASSIGN REG LESS_LESS expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm5)) {
-/* dsp32shiftimm:	dregs = dregs << uimm5
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: dregs =  dregs << uimm5\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((2&0x1f)<<0)                           /* sopcde<(2) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($3)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((imm6($5)&0x3f)<<3)                    /* immag<(imm6) */
-		                  |((0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_pregs)
-		             && reginclass($3,rc_pregs)
-		             && EXPR_VALUE($5) == 2) {
-/* PTR2op:	pregs = pregs << 2
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 1 | 0 |.opc.......|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("PTR2op: pregs = pregs << 2\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004400
-		                |((pregs($1)&0x7)<<0)                    /* dst<(pregs) */
-		                |((pregs($3)&0x7)<<3)                    /* src<(pregs) */
-		                |((1&0x7)<<6)                            /* opc<(1) */
-		        ),
-		        NULL_CODE);
-
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_pregs)
-		             && reginclass($3,rc_pregs)
-		             && EXPR_VALUE($5) == 1) {
-/* COMP3op:	pregs = pregs << 1
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 1 |.opc.......|.dst.......|.src1......|.src0......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("COMP3op: pregs = pregs << 1\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x005000
-		                |((pregs($1)&0x7)<<6)                    /* dst<(pregs) */
-		                |((pregs($3)&0x7)<<0)                    /* src0<(pregs) */
-		                |((5&0x7)<<9)                            /* opc<(5) */
-		                |((pregs($3)&0x7)<<3)                    /* src1<(pregs($3)) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG LESS_LESS expr"); }
-		}
-        | LOW_REG ASSIGN HIGH_REG LESS_LESS expr sornothing 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm4)) {
-/* dsp32shiftimm:	dregs_lo = dregs_hi << uimm4
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: dregs_lo = dregs_hi << uimm4\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($3)&0x7)<<0)                 /* src1<(dregs_hi) */
-		                  |((imm5($5)&0x3f)<<3)                    /* immag<(imm5) */
-		                  |((1&0x3)<<12)                           /* HLs<(1) */
-		                  |(($6.r0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN HIGH_REG LESS_LESS expr sornothing"); }
-		}
-        | HIGH_REG ASSIGN LOW_REG LESS_LESS expr sornothing
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm4)) {
-/* dsp32shiftimm:	dregs_hi = dregs_lo << uimm4
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: dregs_hi = dregs_lo << uimm4\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($3)&0x7)<<0)                 /* src1<(dregs_lo) */
-		                  |((imm5($5)&0x3f)<<3)                    /* immag<(imm5) */
-		                  |((2&0x3)<<12)                           /* HLs<(2) */
-		                  |(($6.r0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LOW_REG LESS_LESS expr"); }
-		}
-        | HIGH_REG ASSIGN HIGH_REG LESS_LESS expr sornothing
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm4)) {
-/* dsp32shiftimm:	dregs_hi = dregs_hi << uimm4
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: dregs_hi = dregs_hi << uimm4\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($3)&0x7)<<0)                 /* src1<(dregs_hi) */
-		                  |((imm5($5)&0x3f)<<3)                    /* immag<(imm5) */
-		                  |((3&0x3)<<12)                           /* HLs<(3) */
-		                  |(($6.r0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN HIGH_REG LESS_LESS expr"); }
-		}
-        | LOW_REG ASSIGN LOW_REG LESS_LESS expr sornothing
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm4)) {
-/* dsp32shiftimm:	dregs_lo = dregs_lo << uimm4
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: dregs_lo = dregs_lo << uimm4\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($3)&0x7)<<0)                 /* src1<(dregs_lo) */
-		                  |((imm5($5)&0x3f)<<3)                    /* immag<(imm5) */
-		                  |((0&0x3)<<12)                           /* HLs<(0) */
-		                  |(($6.r0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN LOW_REG LESS_LESS expr"); }
-		}
-	| REG ASSIGN REG LESS_LESS expr LPAREN S RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_imm6)>=0 ) {
-/* dsp32shiftimm:	dregs = dregs << uimm5 ( S )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: dregs = dregs << uimm5 ( S )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((2&0x1f)<<0)                           /* sopcde<(2) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($3)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((imm6($5)&0x3f)<<3)                    /* immag<(imm6) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG LESS_LESS expr LPAREN S RPAREN"); }
-		}
-	| REG ASSIGN ASHIFT REG BY LOW_REG LPAREN V RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	dregs = ASHIFT dregs BY dregs_lo (V)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs = ASHIFT dregs BY dregs_lo (V)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((1&0x1f)<<0)                           /* sopcde<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN ASHIFT REG BY LOW_REG LPAREN V RPAREN"); }
-		}
-	| REG ASSIGN ASHIFT REG BY LOW_REG LPAREN V COMMA S RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	dregs = ASHIFT dregs BY dregs_lo ( V , S )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs = ASHIFT dregs BY dregs_lo ( V , S )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((1&0x1f)<<0)                           /* sopcde<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN ASHIFT REG BY LOW_REG LPAREN V COMMA S RPAREN"); }
-		}
-	| REG ASSIGN REG LESS_LESS expr LPAREN V RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_imm5)>=0) {
-/* dsp32shiftimm:	dregs = dregs << expr ( V )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: dregs = dregs << expr ( V )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((1&0x1f)<<0)                           /* sopcde<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($3)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((imm5($5)&0x3f)<<3)                    /* immag<(imm5) */
-		                  |((0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG LESS_LESS expr LPAREN V RPAREN"); }
-		}
-	|  REG ASSIGN REG LESS_LESS expr LPAREN V COMMA S RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_imm5)>=0 ) {
-/* dsp32shiftimm:	dregs = dregs << imm5 ( V , S )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: dregs = dregs << imm5 ( V , S )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((1&0x1f)<<0)                           /* sopcde<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($3)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((imm5($5)&0x3f)<<3)                    /* immag<(imm5) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG LESS_LESS expr LPAREN V COMMA S RPAREN"); }
-		}
-	| REG ASSIGN B LBRACK REG PLUS expr RBRACK LPAREN Z RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)
-		             && const_fits($7,c_imm16)) {
-/* LDSTidxI:	dregs = B [ pregs + imm16 ] (z)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 1 |.W.|.Z.|.sz....|.ptr.......|.reg.......|
-|.offset........................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTidxI: dregs = B [ pregs + imm16 ] (z)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00e400
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($5)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		                |((2&0x3)<<6)                            /* sz<(2) */
-		                |((0&0x1)<<8)                            /* Z<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((imm16($7)&0xffff)<<0)                 /* offset<(imm16) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN B LBRACK REG PLUS expr RBRACK LPAREN Z RPAREN"); }
-		}
-	| REG ASSIGN B LBRACK REG RBRACK LPAREN Z RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)) {
-/* LDST:	dregs = B [ pregs ] (z)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: dregs = B [ pregs ] (z)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($5)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((2&0x3)<<7)                            /* aop<(2) */
-		                |((2&0x3)<<10)                           /* sz<(2) */
-		                |((0&0x1)<<6)                            /* Z<(0) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN B LBRACK REG RBRACK LPAREN Z RPAREN"); }
-		}
-	| REG ASSIGN B LBRACK REG _MINUS_MINUS RBRACK LPAREN Z RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)) {
-/* LDST:	dregs = B [ pregs -- ] (z)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: dregs = B [ pregs -- ] (z)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($5)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((1&0x3)<<7)                            /* aop<(1) */
-		                |((2&0x3)<<10)                           /* sz<(2) */
-		                |((0&0x1)<<6)                            /* Z<(0) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN B LBRACK REG _MINUS_MINUS RBRACK LPAREN Z RPAREN"); }
-		}
-	| REG ASSIGN B LBRACK REG _PLUS_PLUS RBRACK LPAREN Z RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)) {
-/* LDST:	dregs = B [ pregs ++ ] (z)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: dregs = B [ pregs ++ ] (z)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($5)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((0&0x3)<<7)                            /* aop<(0) */
-		                |((2&0x3)<<10)                           /* sz<(2) */
-		                |((0&0x1)<<6)                            /* Z<(0) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN B LBRACK REG _PLUS_PLUS RBRACK LPAREN Z RPAREN"); }
-		}
-	| REG _ASSIGN_BANG BITTST LPAREN REG COMMA expr RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($5,rc_dregs)
-		             && const_fits($7,c_uimm5)) {
-/* LOGI2op:	CC = ! BITTST ( dregs , uimm5 )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 1 |.opc.......|.src...............|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LOGI2op: CC =! BITTST ( dregs , uimm5 )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004800
-		                |((dregs($5)&0x7)<<0)                    /* dst<(dregs) */
-		                |((uimm5($7)&0x1f)<<3)                   /* src<(uimm5) */
-		                |((0&0x7)<<8)                            /* opc<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG _ASSIGN_BANG BITTST LPAREN REG COMMA expr RPAREN"); }
-		}
-	| REG ASSIGN BITTST LPAREN REG COMMA expr RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($5,rc_dregs)
-		             && const_fits($7,c_uimm5)) {
-/* LOGI2op:	CC = BITTST ( dregs , uimm5 )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 1 |.opc.......|.src...............|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LOGI2op: CC = BITTST ( dregs , uimm5 )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004800
-		                |((dregs($5)&0x7)<<0)                    /* dst<(dregs) */
-		                |((uimm5($7)&0x1f)<<3)                   /* src<(uimm5) */
-		                |((1&0x7)<<8)                            /* opc<(1) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BITTST LPAREN REG COMMA expr RPAREN"); }
-		}
- 	| REG ASSIGN BYTEOP1P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN T RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP1P ( dregs_pair , dregs_pair ) (T)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP1P ( dregs_pair , dregs_pair ) (T)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((20&0x1f)<<0)                          /* aopcde<(20) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((0&0x1)<<13)                    /* s=aligndir.r0 */
-		                 /* |((($12.r0)&0x1)<<13)                     s=aligndir.r0 */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP1P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN T RPAREN)"); }
-		}
-	| REG ASSIGN BYTEOP1P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN T COMMA R RPAREN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP1P ( dregs_pair , dregs_pair ) (T , aligndir)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP1P ( dregs_pair , dregs_pair ) (T , aligndir)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((20&0x1f)<<0)                          /* aopcde<(20) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((1&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP1P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN T COMMA R RPAREN"); }
-		}
-	| REG ASSIGN BYTEOP1P LPAREN REG COLON expr COMMA REG COLON expr RPAREN aligndir
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP1P ( dregs_pair , dregs_pair ) (aligndir)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP1P ( dregs_pair , dregs_pair ) (aligndir)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((20&0x1f)<<0)                          /* aopcde<(20) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((($13.r0)&0x1)<<13)                     /* s=aligndir.r0 */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP1P LPAREN REG COLON expr COMMA REG COLON expr RPAREN aligndir"); }
-		}
-	| REG ASSIGN BYTEOP2P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN RNDH RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP2P ( dregs_pair , dregs_pair ) (RNDH)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP2P ( dregs_pair , dregs_pair ) (RNDH)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((22&0x1f)<<0)                          /* aopcde<(22) */
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  /*|((($12.r0)&0x1)<<13)                     s=aligndir.r0 */
-		                  |((0&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP2P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN RNDH RPAREN"); }
-		}
-	| REG ASSIGN BYTEOP2P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN TH RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP2P ( dregs_pair , dregs_pair ) (TH)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP2P ( dregs_pair , dregs_pair ) (TH)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((22&0x1f)<<0)                          /* aopcde<(22) */
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((0&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP2P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN TH RPAREN"); }
-		}
-	| REG ASSIGN BYTEOP2P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN RNDL RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP2P ( dregs_pair , dregs_pair ) (RNDL)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP2P ( dregs_pair , dregs_pair ) (RNDL)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((22&0x1f)<<0)                          /* aopcde<(22) */
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((0&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP2P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN RNDL RPAREN"); }
-		}
-	| REG ASSIGN BYTEOP2P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN TL RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP2P ( dregs_pair , dregs_pair ) (TL)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP2P ( dregs_pair , dregs_pair ) (TL)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((22&0x1f)<<0)                          /* aopcde<(22) */
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((0&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP2P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN TL RPAREN"); }
-		}
-	| REG ASSIGN BYTEOP2P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN RNDH COMMA R RPAREN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP2P ( dregs_pair , dregs_pair )  (RNDH , aligndir)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP2P ( dregs_pair , dregs_pair ) (RNDH, aligndir)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((22&0x1f)<<0)                          /* aopcde<(22) */
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((1&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP2P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN RNDH COMMA R RPAREN"); }
-		}
-	| REG ASSIGN BYTEOP2P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN TH COMMA R RPAREN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP2 ( dregs_pair , dregs_pair ) (TH, aligndir)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP2P ( dregs_pair , dregs_pair ) (TH, aligndir)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((22&0x1f)<<0)                          /* aopcde<(22) */
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((1&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP2P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN TH COMMA R RPAREN"); }
-		}
-	| REG ASSIGN BYTEOP2P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN RNDL COMMA R RPAREN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP2P ( dregs_pair , dregs_pair ) (RNDL, aligndir)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP2P ( dregs_pair , dregs_pair ) (RNDL, aligndir)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((22&0x1f)<<0)                          /* aopcde<(22) */
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((1&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP2P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN RNDL COMMA R RPAREN"); }
-		}
-	| REG ASSIGN BYTEOP2P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN TL COMMA R RPAREN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP2P ( dregs_pair , dregs_pair ) (TL, aligndir)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP2P ( dregs_pair , dregs_pair ) (TL, aligndir)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((22&0x1f)<<0)                          /* aopcde<(22) */
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((1&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP2P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN TL COMMA R RPAREN"); }
-		}
-	| REG ASSIGN BYTEOP2M LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN RNDH RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP2 ( dregs_pair , dregs_pair ) (RNDH)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP2  ( dregs_pair , dregs_pair ) (RNDH)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((22&0x1f)<<0)                          /* aopcde<(22) */
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((0&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((2&0x3)<<14)                           /* aop<(2) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP2M LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN RNDH RPAREN"); }
-		}
-	| REG ASSIGN BYTEOP2M LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN RNDH COMMA R RPAREN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP2M ( dregs_pair , dregs_pair ) (RNDH,  aligndir)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP2 ( dregs_pair , dregs_pair ) (RNDH, aligndir)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((22&0x1f)<<0)                          /* aopcde<(22) */
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((1&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((2&0x3)<<14)                           /* aop<(2) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP2M LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN RNDH COMMA R RPAREN"); }
-		}
-	| REG ASSIGN BYTEOP2M LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN TH RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:    dregs = BYTEOP2M ( dregs_pair , dregs_pair ) (TH)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP2M ( dregs_pair , dregs_pair ) (TH)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((22&0x1f)<<0)                          /* aopcde<(22) */
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((0&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP2M LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN TH RPAREN"); }
-		}
-	| REG ASSIGN BYTEOP2M LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN TH COMMA R RPAREN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP2M ( dregs_pair , dregs_pair ) (TH, aligndir)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP2M ( dregs_pair , dregs_pair ) (TH, aligndir)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((22&0x1f)<<0)                          /* aopcde<(22) */
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((1&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP2M LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN TH COMMA R RPAREN"); }
-		}
-	| REG ASSIGN BYTEOP2M LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN RNDL RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP2M ( dregs_pair , dregs_pair ) (RNDL)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP2M ( dregs_pair , dregs_pair ) (RNDL)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((22&0x1f)<<0)                          /* aopcde<(22) */
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((0&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((2&0x3)<<14)                           /* aop<(2) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP2M LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN RNDL RPAREN"); }
-		}
-	| REG ASSIGN BYTEOP2M LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN RNDL COMMA R RPAREN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP2M ( dregs_pair , dregs_pair ) (RNDL, aligndir)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP2M ( dregs_pair , dregs_pair ) (RNDL, aligndir)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((22&0x1f)<<0)                          /* aopcde<(22) */
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((1&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((2&0x3)<<14)                           /* aop<(2) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP2M LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN RNDL COMMA R RPAREN"); }
-		}
-	| REG ASSIGN BYTEOP2M LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN TL COMMA R RPAREN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP2M ( dregs_pair , dregs_pair ) (TL, aligndir)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP2M ( dregs_pair , dregs_pair ) (TL, aligndir)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((22&0x1f)<<0)                          /* aopcde<(22) */
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((1&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP2M LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN TL COMMA R RPAREN"); }
-		}
-	| REG ASSIGN BYTEOP2M LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN TL RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP2M ( dregs_pair , dregs_pair ) (TL)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP2M ( dregs_pair , dregs_pair ) (TL)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((22&0x1f)<<0)                          /* aopcde<(22) */
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((0&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP2M LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN TL RPAREN"); }
-		}
-	| REG ASSIGN BYTEOP3P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN HI RPAREN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP3P ( dregs_pair , dregs_pair ) (HI)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP3P ( dregs_pair , dregs_pair ) (HI)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((23&0x1f)<<0)                          /* aopcde<(23) */
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((0&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP3P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN HI RPAREN"); }
-		}
-	| REG ASSIGN BYTEOP3P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN LO RPAREN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP3P ( dregs_pair , dregs_pair ) (LO)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP3P ( dregs_pair , dregs_pair ) (LO)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((23&0x1f)<<0)                          /* aopcde<(23) */
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((0&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP3P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN LO RPAREN"); }
-		}
-	| REG ASSIGN BYTEOP3P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN HI COMMA R RPAREN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP3P ( dregs_pair , dregs_pair ) (HI, aligndir)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP3P ( dregs_pair , dregs_pair ) (HI, aligndir)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((23&0x1f)<<0)                          /* aopcde<(23) */
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((1&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP3P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN HI COMMA R RPAREN"); }
-		}
-	| REG ASSIGN BYTEOP3P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN LO COMMA R RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($9,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEOP3P ( dregs_pair , dregs_pair ) (LO, aligndir)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEOP3P ( dregs_pair , dregs_pair ) (LO, aligndir)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((23&0x1f)<<0)                          /* aopcde<(23) */
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($9)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((1&0x1)<<13)                    /* s=aligndir.r0 */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEOP3P LPAREN REG COLON expr COMMA REG COLON expr RPAREN LPAREN LO COMMA R RPAREN"); }
-		}
-	| REG ASSIGN BYTEPACK LPAREN REG COMMA REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)) {
-/* dsp32alu:	dregs = BYTEPACK ( dregs , dregs )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = BYTEPACK ( dregs , dregs )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((24&0x1f)<<0)                          /* aopcde<(24) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTEPACK LPAREN REG COMMA REG RPAREN"); }
-		}
-	| CLI REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs)) {
-/* ProgCtrl:	CLI dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.prgfunc.......|.poprnd........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ProgCtrl: CLI dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000000
-		                |((dregs($2)&0xf)<<0)                    /* poprnd<(dregs) */
-		                |((3&0xf)<<4)                            /* prgfunc<(3) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("CLI REG"); }
-		}
-	| LOW_REG ASSIGN EXPADJ LPAREN REG COMMA LOW_REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs_lo)) {
-/* dsp32shift:	dregs_lo = EXPADJ ( dregs , dregs_lo)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_lo = EXPADJ ( dregs , dregs_lo )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((7&0x1f)<<0)                           /* sopcde<(7) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((dregs_lo($7)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN EXPADJ LPAREN REG COMMA LOW_REG RPAREN"); }
-		}
-	| LOW_REG ASSIGN EXPADJ LPAREN LOW_REG COMMA LOW_REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)) {
-/* dsp32shift:	dregs_lo = EXPADJ ( dregs_lo , dregs_lo )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_lo = EXPADJ ( dregs_lo , dregs_lo )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((7&0x1f)<<0)                           /* sopcde<(7) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($5)&0x7)<<0)                 /* src1<(dregs_lo) */
-		                  |((dregs($7)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN EXPADJ LPAREN LOW_REG COMMA LOW_REG RPAREN"); }
-		}
-	| LOW_REG ASSIGN EXPADJ LPAREN HIGH_REG COMMA LOW_REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)) {
-/* dsp32shift:	dregs_lo = EXPADJ ( dregs_hi , dregs_lo )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_lo = EXPADJ ( dregs_hi , dregs_lo )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((7&0x1f)<<0)                           /* sopcde<(7) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($5)&0x7)<<0)                 /* src1<(dregs_hi) */
-		                  |((dregs($7)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((3&0x3)<<14)                           /* sop<(3) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN EXPADJ LPAREN HIGH_REG COMMA LOW_REG RPAREN"); }
-		}
-	| LOW_REG ASSIGN EXPADJ LPAREN REG COMMA LOW_REG RPAREN LPAREN V RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)) {
-/* dsp32shift:	dregs_lo = EXPADJ ( dregs , dregs_lo) ( V )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_lo = EXPADJ ( dregs , dregs_lo ) (V)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((7&0x1f)<<0)                           /* sopcde<(7) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((dregs($7)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN EXPADJ LPAREN REG COMMA LOW_REG RPAREN LPAREN V RPAREN"); }
-		}
-	| REG ASSIGN DEPOSIT LPAREN REG COMMA REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)) {
-/* dsp32shift:	dregs = DEPOSIT ( dregs , dregs )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs = DEPOSIT ( dregs , dregs )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((10&0x1f)<<0)                          /* sopcde<(10) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((dregs($7)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN DEPOSIT LPAREN REG COMMA REG RPAREN"); }
-		}
-	| REG ASSIGN DEPOSIT LPAREN REG COMMA REG RPAREN LPAREN X RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)) {
-/* dsp32shift:	dregs = DEPOSIT ( dregs , dregs ) (X)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs = DEPOSIT ( dregs , dregs ) (X)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((10&0x1f)<<0)                          /* sopcde<(10) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((dregs($7)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((3&0x3)<<14)                           /* sop<(3) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN DEPOSIT LPAREN REG COMMA REG RPAREN LPAREN X RPAREN"); }
-		}
-	| REG ASSIGN EXTRACT LPAREN REG COMMA LOW_REG RPAREN xorzornothing 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)) {
-/* dsp32shift:	dregs = EXTRACT ( dregs , dregs_lo ) xorzornothing 
----+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs = EXTRACT ( dregs , dregs_lo ) xorzornothing\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((10&0x1f)<<0)                          /* sopcde<(10) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((dregs($7)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |(($9.r0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN DEPOSIT LPAREN REG COMMA LOW_REG RPAREN xorzornothing"); }
-		}
-	| REG ASSIGN W LBRACK REG PLUS expr RBRACK LPAREN Z RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)
-		             && const_fits($7,c_uimm4s2)) {
-/* LDSTii:	dregs = W [ pregs + uimm4s2 ] (z)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 1 |.W.|.op....|.offset........|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTii: dregs = W [ pregs + uimm4s2 ] (z)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00a000
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($5)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((uimm4s2($7)&0xf)<<6)                  /* offset<(uimm4s2) */
-		                |((0&0x1)<<12)                           /* W<(0) */
-		                |((1&0x3)<<10)                           /* op<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)
-		             && const_fits($7,c_imm16s2)) {
-/* LDSTidxI:	dregs = W [ pregs + imm16s2 ] (z)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 1 |.W.|.Z.|.sz....|.ptr.......|.reg.......|
-|.offset........................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTidxI: dregs = W [ pregs + imm16s2 ] (z)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00e400
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($5)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		                |((1&0x3)<<6)                            /* sz<(1) */
-		                |((0&0x1)<<8)                            /* Z<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((imm16s2($7)&0xffff)<<0)               /* offset<(imm16s2) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN W LBRACK REG PLUS expr RBRACK LPAREN Z RPAREN"); }
-		}
-	| REG ASSIGN W LBRACK REG RBRACK LPAREN Z RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)) {
-/* LDST:	dregs = W [ pregs ] (z)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: dregs = W [ pregs ] (z)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($5)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((2&0x3)<<7)                            /* aop<(2) */
-		                |((1&0x3)<<10)                           /* sz<(1) */
-		                |((0&0x1)<<6)                            /* Z<(0) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN W LBRACK REG RBRACK LPAREN Z RPAREN"); }
-		}
-	| LOW_REG ASSIGN W LBRACK REG RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_iregs)) {
-/* dspLDST:	dregs_lo = W [ iregs ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 |.W.|.aop...|.m.....|.i.....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dspLDST: dregs_lo = W [ iregs ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009c00
-		                |((dregs($1)&0x7)<<0)                 /* reg<(dregs_lo) */
-		                |((iregs($5)&0x3)<<3)                    /* i<(iregs) */
-		                |((2&0x3)<<7)                            /* aop<(2) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		                |((1&0x3)<<5)                            /* m<(1) */
-		        ),
-		        NULL_CODE);
-
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)) {
-/* LDSTpmod:	dregs_lo = W [ pregs ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 0 |.W.|.aop...|.reg.......|.idx.......|.ptr.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTpmod: dregs_lo = W [ pregs ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x008000
-		                |((dregs($1)&0x7)<<6)                 /* reg<(dregs_lo) */
-		                |((pregs($5)&0x7)<<0)                    /* ptr<(pregs) */
-		                |((1&0x3)<<9)                            /* aop<(1) */
-		                |((0&0x1)<<11)                           /* W<(0) */
-		                |((pregs($5)&0x7)<<3)                    /* idx<(pregs($4)) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN W LBRACK REG RBRACK"); }
-		}
-	| HIGH_REG ASSIGN W LBRACK REG RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_iregs)) {
-/* dspLDST:	dregs_hi = W [ iregs ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 |.W.|.aop...|.m.....|.i.....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dspLDST: dregs_hi = W [ iregs ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009c00
-		                |((dregs($1)&0x7)<<0)                 /* reg<(dregs_hi) */
-		                |((iregs($5)&0x3)<<3)                    /* i<(iregs) */
-		                |((2&0x3)<<7)                            /* aop<(2) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		                |((2&0x3)<<5)                            /* m<(2) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)) {
-/* LDSTpmod:	dregs_hi = W [ pregs ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 0 |.W.|.aop...|.reg.......|.idx.......|.ptr.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTpmod: dregs_hi = W [ pregs ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x008000
-		                |((dregs($1)&0x7)<<6)                 /* reg<(dregs_hi) */
-		                |((pregs($5)&0x7)<<0)                    /* ptr<(pregs) */
-		                |((2&0x3)<<9)                            /* aop<(2) */
-		                |((0&0x1)<<11)                           /* W<(0) */
-		                |((pregs($5)&0x7)<<3)                    /* idx<(pregs($4)) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN W LBRACK REG RBRACK"); }
-		}
-	| REG ASSIGN W LBRACK REG _MINUS_MINUS RBRACK LPAREN Z RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)) {
-/* LDST:	dregs = W [ pregs -- ] (z)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: dregs = W [ pregs -- ] (z)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($5)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((1&0x3)<<7)                            /* aop<(1) */
-		                |((1&0x3)<<10)                           /* sz<(1) */
-		                |((0&0x1)<<6)                            /* Z<(0) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN W LBRACK REG _MINUS_MINUS RBRACK LPAREN Z RPAREN"); }
-		}
-	| LOW_REG ASSIGN W LBRACK REG _MINUS_MINUS RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_iregs)) {
-/* dspLDST:	dregs_lo = W [ iregs -- ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 |.W.|.aop...|.m.....|.i.....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dspLDST: dregs_lo = W [ iregs -- ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009c00
-		                |((dregs($1)&0x7)<<0)                 /* reg<(dregs_lo) */
-		                |((iregs($5)&0x3)<<3)                    /* i<(iregs) */
-		                |((1&0x3)<<7)                            /* aop<(1) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		                |((1&0x3)<<5)                            /* m<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN W LBRACK REG _MINUS_MINUS RBRACK"); }
-		}
-	| HIGH_REG ASSIGN W LBRACK REG _MINUS_MINUS RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_iregs)) {
-/* dspLDST:	dregs_hi = W [ iregs -- ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 |.W.|.aop...|.m.....|.i.....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dspLDST: dregs_hi = W [ iregs -- ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009c00
-		                |((dregs($1)&0x7)<<0)                 /* reg<(dregs_hi) */
-		                |((iregs($5)&0x3)<<3)                    /* i<(iregs) */
-		                |((1&0x3)<<7)                            /* aop<(1) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		                |((2&0x3)<<5)                            /* m<(2) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN W LBRACK REG _MINUS_MINUS RBRACK"); }
-		}
-	| REG ASSIGN W LBRACK REG _PLUS_PLUS RBRACK LPAREN Z RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)) {
-/* LDST:	dregs = W [ pregs ++ ] (z)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: dregs = W [ pregs ++ ] (z)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($5)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((0&0x3)<<7)                            /* aop<(0) */
-		                |((1&0x3)<<10)                           /* sz<(1) */
-		                |((0&0x1)<<6)                            /* Z<(0) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN W LBRACK REG _PLUS_PLUS RBRACK LPAREN Z RPAREN"); }
-		}
-	| LOW_REG ASSIGN W LBRACK REG _PLUS_PLUS RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_iregs)) {
-/* dspLDST:	dregs_lo = W [ iregs ++ ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 |.W.|.aop...|.m.....|.i.....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dspLDST: dregs_lo = W [ iregs ++ ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009c00
-		                |((dregs($1)&0x7)<<0)                 /* reg<(dregs_lo) */
-		                |((iregs($5)&0x3)<<3)                    /* i<(iregs) */
-		                |((0&0x3)<<7)                            /* aop<(0) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		                |((1&0x3)<<5)                            /* m<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN W LBRACK REG _PLUS_PLUS RBRACK"); }
-		}
-	| HIGH_REG ASSIGN W LBRACK REG _PLUS_PLUS RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_iregs)) {
-/* dspLDST:	dregs_hi = W [ iregs ++ ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 |.W.|.aop...|.m.....|.i.....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dspLDST: dregs_hi = W [ iregs ++ ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009c00
-		                |((dregs($1)&0x7)<<0)                 /* reg<(dregs_hi) */
-		                |((iregs($5)&0x3)<<3)                    /* i<(iregs) */
-		                |((0&0x3)<<7)                            /* aop<(0) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		                |((2&0x3)<<5)                            /* m<(2) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN W LBRACK REG _PLUS_PLUS RBRACK"); }
-		}
-	| REG ASSIGN W LBRACK REG _PLUS_PLUS REG RBRACK LPAREN Z RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)
-		             && reginclass($7,rc_pregs)) {
-/* LDSTpmod:	dregs = W [ pregs ++ pregs ] (z)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 0 |.W.|.aop...|.reg.......|.idx.......|.ptr.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTpmod: dregs = W [ pregs ++ pregs ] (z)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x008000
-		                |((dregs($1)&0x7)<<6)                    /* reg<(dregs) */
-		                |((pregs($5)&0x7)<<0)                    /* ptr<(pregs) */
-		                |((pregs($7)&0x7)<<3)                    /* idx<(pregs) */
-		                |((3&0x3)<<9)                            /* aop<(3) */
-		                |((0&0x1)<<11)                           /* W<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN W LBRACK REG _PLUS_PLUS REG RBRACK LPAREN Z RPAREN"); }
-		}
-	| LOW_REG ASSIGN W LBRACK REG _PLUS_PLUS REG RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)
-		             && reginclass($7,rc_pregs)) {
-/* LDSTpmod:	dregs_lo = W [ pregs ++ pregs ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 0 |.W.|.aop...|.reg.......|.idx.......|.ptr.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTpmod: dregs_lo = W [ pregs ++ pregs ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x008000
-		                |((dregs($1)&0x7)<<6)                 /* reg<(dregs_lo) */
-		                |((pregs($5)&0x7)<<0)                    /* ptr<(pregs) */
-		                |((pregs($7)&0x7)<<3)                    /* idx<(pregs) */
-		                |((1&0x3)<<9)                            /* aop<(1) */
-		                |((0&0x1)<<11)                           /* W<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN W LBRACK REG _PLUS_PLUS REG RBRACK"); }
-		}
-	| HIGH_REG ASSIGN W LBRACK REG _PLUS_PLUS REG RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)
-		             && reginclass($7,rc_pregs)) {
-/* LDSTpmod:	dregs_hi = W [ pregs ++ pregs ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 0 |.W.|.aop...|.reg.......|.idx.......|.ptr.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTpmod: dregs_hi = W [ pregs ++ pregs ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x008000
-		                |((dregs($1)&0x7)<<6)                 /* reg<(dregs_hi) */
-		                |((pregs($5)&0x7)<<0)                    /* ptr<(pregs) */
-		                |((pregs($7)&0x7)<<3)                    /* idx<(pregs) */
-		                |((2&0x3)<<9)                            /* aop<(2) */
-		                |((0&0x1)<<11)                           /* W<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN W LBRACK REG _PLUS_PLUS REG RBRACK"); }
-		}
-/*	| REG ASSIGN H PLUS L LPAREN SGN LPAREN REG RPAREN STAR REG RPAREN*/
-	| HIGH_REG ASSIGN LOW_REG ASSIGN SIGN LPAREN HIGH_REG RPAREN STAR HIGH_REG PLUS SIGN LPAREN LOW_REG RPAREN STAR LOW_REG 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($7,rc_dregs)
-		             && reginclass($10,rc_dregs)
-		             && reginclass($14,rc_dregs)
-		             && reginclass($17,rc_dregs)) {
-/* dsp32alu:	dregs = H + L ( SGN ( dregs ) * dregs )
-   dsp32alu:	dregs_hi = dregs_lo =  SIGN (dregs_hi) * dregs_hi + SIGN (dregs_lo) * dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-   		    notethat("dsp32alu:	dregs_hi = dregs_lo =  SIGN (dregs_hi) * dregs_hi + SIGN (dregs_lo) * dregs_lo \n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((12&0x1f)<<0)                          /* aopcde<(12) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($3)&0x7)<<6)                    /* dst0<(dregs) */
-		                  |((dregs($7)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($10)&0x7)<<0)                   /* src1<(dregs) */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else  { $$ = 0; semantic_error ("HIGH_REG ASSIGN LOW_REG ASSIGN SIGN LPAREN HIGH_REG RPAREN STAR HIGH_REG PLUS SIGN LPAREN LOW_REG RPAREN STAR LOW_REG");}
-		}
-        | REG ASSIGN REG MINUS REG amod1
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs = dregs - dregs (amod1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = dregs - dregs (amod1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((4&0x1f)<<0)                           /* aopcde<(4) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                     /* s=amod1.s0 */
-		                  |((($6.x0)&0x1)<<12)                     /* x=amod1.x0 */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG MINUS REG LPAREN amod1 RPAREN"); }
-		}
-        | LOW_REG ASSIGN LOW_REG MINUS LOW_REG amod1
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_lo =  dregs_lo - dregs_lo (amod1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_lo = dregs_lo - dregs_lo (amod1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((3&0x1f)<<0)                           /* aopcde<(3) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                    /* s=amod1.s0 */
-		                  |((($6.x0)&0x1)<<12)                    /* x=amod1.x0 */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN LOW_REG MINUS LOW_REG LPAREN amod1 RPAREN"); }
-		}
-        | HIGH_REG ASSIGN LOW_REG MINUS LOW_REG amod1
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_hi =  dregs_lo - dregs_lo (amod1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_hi = dregs_lo - dregs_lo (amod1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		                |((3&0x1f)<<0)                           /* aopcde<(3) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                    /* s=amod1.s0 */
-		                  |((($6.x0)&0x1)<<12)                    /* x=amod1.x0 */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LOW_REG MINUS LOW_REG LPAREN amod1 RPAREN"); }
-		}
-        | LOW_REG ASSIGN LOW_REG MINUS HIGH_REG amod1
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_lo = dregs_lo - dregs_hi (amod1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_lo = dregs_lo - dregs_hi (amod1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((3&0x1f)<<0)                           /* aopcde<(3) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                    /* s=amod1.s0 */
-		                  |((($6.x0)&0x1)<<12)                    /* x=amod1.x0 */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN LOW_REG MINUS HIGH_REG LPAREN amod1 RPAREN"); }
-		}
-        | HIGH_REG ASSIGN LOW_REG MINUS HIGH_REG amod1
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_hi =   dregs_lo - dregs_hi (amod1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_hi = dregs_lo - dregs_hi (amod1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		                |((3&0x1f)<<0)                           /* aopcde<(3) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                    /* s=amod1.s0 */
-		                  |((($6.x0)&0x1)<<12)                    /* x=amod1.x0 */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LOW_REG MINUS HIGH_REG LPAREN amod1 RPAREN"); }
-		}
-        | LOW_REG ASSIGN HIGH_REG MINUS LOW_REG amod1
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_lo =  dregs_hi - dregs_lo (amod1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_lo = dregs_hi - dregs_lo (amod1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((3&0x1f)<<0)                           /* aopcde<(3) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                    /* s=amod1.s0 */
-		                  |((($6.x0)&0x1)<<12)                    /* x=amod1.x0 */
-		                  |((2&0x3)<<14)                           /* aop<(2) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN HIGH_REG MINUS LOW_REG LPAREN amod1 RPAREN"); }
-		}
-        | HIGH_REG ASSIGN HIGH_REG MINUS LOW_REG amod1
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_hi =  dregs_hi - dregs_lo (amod1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_hi = dregs_hi - dregs_lo (amod1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		                |((3&0x1f)<<0)                           /* aopcde<(3) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                    /* s=amod1.s0 */
-		                  |((($6.x0)&0x1)<<12)                    /* x=amod1.x0 */
-		                  |((2&0x3)<<14)                           /* aop<(2) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN HIGH_REG MINUS LOW_REG LPAREN amod1 RPAREN"); }
-		}
-        | LOW_REG ASSIGN HIGH_REG MINUS HIGH_REG amod1
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_lo = dregs_hi - dregs_hi (amod1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_lo = dregs_hi - dregs_hi (amod1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((3&0x1f)<<0)                           /* aopcde<(3) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                    /* s=amod1.s0 */
-		                  |((($6.x0)&0x1)<<12)                    /* x=amod1.x0 */
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN HIGH_REG MINUS HIGH_REG LPAREN amod1 RPAREN"); }
-		}
-        | HIGH_REG ASSIGN HIGH_REG MINUS HIGH_REG amod1
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_hi = dregs_hi - dregs_hi (amod1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_hi = dregs_hi - dregs_hi (amod1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		                |((3&0x1f)<<0)                           /* aopcde<(3) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                    /* s=amod1.s0 */
-		                  |((($6.x0)&0x1)<<12)                    /* x=amod1.x0 */
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN HIGH_REG MINUS HIGH_REG LPAREN amod1 RPAREN"); }
-		}
-	| REG ASSIGN LBRACK REG PLUS expr RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dpregs)
-		             && $4 == REG_FP
-		             && const_fits($6,c_negimm5s4)) {
-/* LDSTiiFP:	dpregs = [ FP + negimm5s4 ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 1 | 1 | 1 | 0 |.W.|.offset............|.reg...........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTiiFP: dpregs = [ FP + negimm5s4 ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00b800
-		                |((dpregs($1)&0xf)<<0)                   /* reg<(dpregs) */
-		                |((negimm5s4($6)&0x1f)<<4)               /* offset<(negimm5s4) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_pregs)
-		             && const_fits($6,c_uimm4s4)) {
-/* LDSTii:	dregs = [ pregs + uimm4s4 ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 1 |.W.|.op....|.offset........|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTii: dregs = [ pregs + uimm4s4 ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00a000
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($4)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((uimm4s4($6)&0xf)<<6)                  /* offset<(uimm4s4) */
-		                |((0&0x1)<<12)                           /* W<(0) */
-		                |((0&0x3)<<10)                           /* op<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_pregs)
-		             && reginclass($4,rc_pregs)
-		             && const_fits($6,c_uimm4s4)) {
-/* LDSTii:	pregs = [ pregs + uimm4s4 ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 1 |.W.|.op....|.offset........|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTii: pregs = [ pregs + uimm4s4 ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00a000
-		                |((pregs($1)&0x7)<<0)                    /* reg<(pregs) */
-		                |((pregs($4)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((uimm4s4($6)&0xf)<<6)                  /* offset<(uimm4s4) */
-		                |((0&0x1)<<12)                           /* W<(0) */
-		                |((3&0x3)<<10)                           /* op<(3) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_pregs)
-		             && const_fits($6,c_imm16s4)) {
-/* LDSTidxI:	dregs = [ pregs + imm16s4 ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 1 |.W.|.Z.|.sz....|.ptr.......|.reg.......|
-|.offset........................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTidxI: dregs = [ pregs + imm16s4 ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00e400
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($4)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		                |((0&0x3)<<6)                            /* sz<(0) */
-		                |((0&0x1)<<8)                            /* Z<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((imm16s4($6)&0xffff)<<0)               /* offset<(imm16s4) */
-		          ),
-		          NULL_CODE));
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_pregs)
-		             && reginclass($4,rc_pregs)
-		             && const_fits($6,c_imm16s4)) {
-/* LDSTidxI:	pregs = [ pregs + imm16s4 ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 1 |.W.|.Z.|.sz....|.ptr.......|.reg.......|
-|.offset........................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTidxI: pregs = [ pregs + imm16s4 ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00e400
-		                |((pregs($1)&0x7)<<0)                    /* reg<(pregs) */
-		                |((pregs($4)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		                |((0&0x3)<<6)                            /* sz<(0) */
-		                |((1&0x1)<<8)                            /* Z<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((imm16s4($6)&0xffff)<<0)               /* offset<(imm16s4) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN LBRACK REG PLUS expr RBRACK"); }
-		}
-	| REG ASSIGN LBRACK REG RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_iregs)) {
-/* dspLDST:	dregs = [ iregs ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 |.W.|.aop...|.m.....|.i.....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dspLDST: dregs = [ iregs ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009c00
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((iregs($4)&0x3)<<3)                    /* i<(iregs) */
-		                |((2&0x3)<<7)                            /* aop<(2) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		                |((0&0x3)<<5)                            /* m<(0) */
-		        ),
-		        NULL_CODE);
-		
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_pregs)) {
-/* LDST:	dregs = [ pregs ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: dregs = [ pregs ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($4)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((2&0x3)<<7)                            /* aop<(2) */
-		                |((0&0x3)<<10)                           /* sz<(0) */
-		                |((0&0x1)<<6)                            /* Z<(0) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_pregs)
-		             && reginclass($4,rc_pregs)) {
-/* LDST:	pregs = [ pregs ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: pregs = [ pregs ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((pregs($1)&0x7)<<0)                    /* reg<(pregs) */
-		                |((pregs($4)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((2&0x3)<<7)                            /* aop<(2) */
-		                |((0&0x3)<<10)                           /* sz<(0) */
-		                |((1&0x1)<<6)                            /* Z<(1) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN LBRACK REG RBRACK"); }
-		}
-	| REG ASSIGN LBRACK REG _MINUS_MINUS RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_iregs)) {
-/* dspLDST:	dregs = [ iregs -- ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 |.W.|.aop...|.m.....|.i.....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dspLDST: dregs = [ iregs -- ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009c00
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((iregs($4)&0x3)<<3)                    /* i<(iregs) */
-		                |((1&0x3)<<7)                            /* aop<(1) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		                |((0&0x3)<<5)                            /* m<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_pregs)) {
-/* LDST:	dregs = [ pregs -- ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: dregs = [ pregs -- ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($4)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((1&0x3)<<7)                            /* aop<(1) */
-		                |((0&0x3)<<10)                           /* sz<(0) */
-		                |((0&0x1)<<6)                            /* Z<(0) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_pregs)
-		             && reginclass($4,rc_pregs)) {
-/* LDST:	pregs = [ pregs -- ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: pregs = [ pregs -- ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((pregs($1)&0x7)<<0)                    /* reg<(pregs) */
-		                |((pregs($4)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((1&0x3)<<7)                            /* aop<(1) */
-		                |((0&0x3)<<10)                           /* sz<(0) */
-		                |((1&0x1)<<6)                            /* Z<(1) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN LBRACK REG _MINUS_MINUS RBRACK"); }
-		}
-	| REG ASSIGN LBRACK REG _PLUS_PLUS RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_iregs)) {
-/* dspLDST:	dregs = [ iregs ++ ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 |.W.|.aop...|.m.....|.i.....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dspLDST: dregs = [ iregs ++ ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009c00
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((iregs($4)&0x3)<<3)                    /* i<(iregs) */
-		                |((0&0x3)<<7)                            /* aop<(0) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		                |((0&0x3)<<5)                            /* m<(0) */
-		        ),
-		        NULL_CODE);
-		
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_pregs)) {
-/* LDST:	dregs = [ pregs ++ ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: dregs = [ pregs ++ ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($4)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((0&0x3)<<7)                            /* aop<(0) */
-		                |((0&0x3)<<10)                           /* sz<(0) */
-		                |((0&0x1)<<6)                            /* Z<(0) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_pregs)
-		             && reginclass($4,rc_pregs)) {
-/* LDST:	pregs = [ pregs ++ ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: pregs = [ pregs ++ ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((pregs($1)&0x7)<<0)                    /* reg<(pregs) */
-		                |((pregs($4)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((0&0x3)<<7)                            /* aop<(0) */
-		                |((0&0x3)<<10)                           /* sz<(0) */
-		                |((1&0x1)<<6)                            /* Z<(1) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_allregs)
-		             && $4 == REG_SP) {
-/* PushPopReg:	allregs = [ SP ++ ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 |.W.|.grp.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("PushPopReg: allregs = [ SP ++ ]\n");
-		    $$ =
-		      CONSCODE(
-		         GENCODE(0x000100
-		                |((allregs($1)&0x7)<<0)                  /* reg<(allregs) */
-		                |((0&0x1)<<6)                            /* W<(0) */
-		                |((Xallregs($1)&0x7)<<3)                 /* grp<(Xallregs($1)) */
-		        ),
-		        NULL_CODE);
-		  } else { $$ = 0; semantic_error ("REG ASSIGN LBRACK REG _PLUS_PLUS RBRACK"); }
-		}
-	| REG ASSIGN LBRACK REG _PLUS_PLUS REG RBRACK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_iregs)
-		             && reginclass($6,rc_mregs)) {
-/* dspLDST:	dregs = [ iregs ++ mregs ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 |.W.|.aop...|.m.....|.i.....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dspLDST: dregs = [ iregs ++ mregs ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009c00
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((iregs($4)&0x3)<<3)                    /* i<(iregs) */
-		                |((mregs($6)&0x3)<<5)                    /* m<(mregs) */
-		                |((3&0x3)<<7)                            /* aop<(3) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_pregs)
-		             && reginclass($6,rc_pregs)) {
-/* LDSTpmod:	dregs = [ pregs ++ pregs ]
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 0 |.W.|.aop...|.reg.......|.idx.......|.ptr.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTpmod: dregs = [ pregs ++ pregs ]\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x008000
-		                |((dregs($1)&0x7)<<6)                    /* reg<(dregs) */
-		                |((pregs($4)&0x7)<<0)                    /* ptr<(pregs) */
-		                |((pregs($6)&0x7)<<3)                    /* idx<(pregs) */
-		                |((0&0x3)<<9)                            /* aop<(0) */
-		                |((0&0x1)<<11)                           /* W<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN LBRACK REG _PLUS_PLUS REG RBRACK"); }
-		}
-/* Second Pattern Page 7.75 */
-	| HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG STAR LOW_REG RPAREN mxd_mod COMMA A0macfunc LOW_REG STAR LOW_REG macmod_hmove
-		{
-		  if(0) {
-                  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-                             && reginclass($1,rc_dregs) ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-                                  |((($11.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                            /*      |((($8.op)&0x183f)<<0)                    op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)              /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*   src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc LOW_REG * LOW_REG LPAREN macmod_hmove RPAREN"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG STAR LOW_REG RPAREN mxd_mod COMMA A0macfunc LOW_REG STAR HIGH_REG macmod_hmove
-		{
-		  if(0) {
-                  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-                             && reginclass($1,rc_dregs) ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-                                  |((($11.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                            /*      |((($8.op)&0x183f)<<0)                    op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)              /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*   src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc LOW_REG * HIGH_REG LPAREN macmod_hmove RPAREN"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG STAR LOW_REG RPAREN mxd_mod COMMA A0macfunc HIGH_REG STAR LOW_REG macmod_hmove
-		{
-		  if(0) {
-                  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-                             && reginclass($1,rc_dregs) ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-                                  |((($11.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                            /*      |((($8.op)&0x183f)<<0)                    op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)              /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*   src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc HIGH_REG * LOW_REG LPAREN macmod_hmove RPAREN"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG STAR LOW_REG RPAREN mxd_mod COMMA A0macfunc HIGH_REG STAR HIGH_REG macmod_hmove
-		{
-		  if(0) {
-                  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-                             && reginclass($1,rc_dregs) ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-                                  |((($11.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                            /*      |((($8.op)&0x183f)<<0)                    op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)              /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*   src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc HIGH_REG * HIGH_REG LPAREN macmod_hmove RPAREN"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG STAR HIGH_REG RPAREN mxd_mod COMMA A0macfunc LOW_REG STAR LOW_REG macmod_hmove
-		{
-		  if(0) {
-                  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-                             && reginclass($1,rc_dregs) ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-                                  |((($11.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                            /*      |((($8.op)&0x183f)<<0)                    op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)              /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*   src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc LOW_REG * LOW_REG LPAREN macmod_hmove RPAREN"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG STAR HIGH_REG RPAREN mxd_mod COMMA A0macfunc LOW_REG STAR HIGH_REG macmod_hmove
-		{
-		  if(0) {
-                  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-                             && reginclass($1,rc_dregs) ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-                                  |((($11.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                            /*      |((($8.op)&0x183f)<<0)                    op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)              /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*   src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc LOW_REG * HIGH_REG LPAREN macmod_hmove RPAREN"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG STAR HIGH_REG RPAREN mxd_mod COMMA A0macfunc HIGH_REG STAR LOW_REG macmod_hmove
-		{
-		  if(0) {
-                  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-                             && reginclass($1,rc_dregs) ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-                                  |((($11.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                            /*      |((($8.op)&0x183f)<<0)                    op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)              /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*   src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc HIGH_REG * LOW_REG LPAREN macmod_hmove RPAREN"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG STAR HIGH_REG RPAREN mxd_mod COMMA A0macfunc HIGH_REG STAR HIGH_REG macmod_hmove
-		{
-		  if(0) {
-                  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-                             && reginclass($1,rc_dregs) ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-                                  |((($11.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                            /*      |((($8.op)&0x183f)<<0)                    op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)              /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*   src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc HIGH_REG * HIGH_REG LPAREN macmod_hmove RPAREN"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG STAR LOW_REG RPAREN mxd_mod COMMA A0macfunc LOW_REG STAR LOW_REG macmod_hmove
-		{
-		  if(0) {
-                  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-                             && reginclass($1,rc_dregs) ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-                                  |((($11.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                            /*      |((($8.op)&0x183f)<<0)                    op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)              /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*   src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc LOW_REG * LOW_REG LPAREN macmod_hmove RPAREN"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG STAR LOW_REG RPAREN mxd_mod COMMA A0macfunc LOW_REG STAR HIGH_REG macmod_hmove
-		{
-		  if(0) {
-                  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-                             && reginclass($1,rc_dregs) ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-                                  |((($11.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                            /*      |((($8.op)&0x183f)<<0)                    op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)              /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*   src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc LOW_REG * HIGH_REG LPAREN macmod_hmove RPAREN"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG STAR LOW_REG RPAREN mxd_mod COMMA A0macfunc HIGH_REG STAR LOW_REG macmod_hmove
-		{
-		  if(0) {
-                  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-                             && reginclass($1,rc_dregs) ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-                                  |((($11.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                            /*      |((($8.op)&0x183f)<<0)                    op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)              /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*   src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc HIGH_REG * LOW_REG LPAREN macmod_hmove RPAREN"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG STAR LOW_REG RPAREN mxd_mod COMMA A0macfunc HIGH_REG STAR HIGH_REG macmod_hmove
-		{
-		  if(0) {
-                  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-                             && reginclass($1,rc_dregs) ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-                                  |((($11.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                            /*      |((($8.op)&0x183f)<<0)                    op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)              /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*   src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc HIGH_REG * HIGH_REG LPAREN macmod_hmove RPAREN"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG STAR HIGH_REG RPAREN mxd_mod COMMA A0macfunc LOW_REG STAR LOW_REG macmod_hmove
-		{
-		  if(0) {
-                  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-                             && reginclass($1,rc_dregs) ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-                                  |((($11.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                            /*      |((($8.op)&0x183f)<<0)                    op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)              /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*   src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc LOW_REG * LOW_REG LPAREN macmod_hmove RPAREN"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG STAR HIGH_REG RPAREN mxd_mod COMMA A0macfunc LOW_REG STAR HIGH_REG macmod_hmove
-		{
-		  if(0) {
-                  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-                             && reginclass($1,rc_dregs) ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-                                  |((($11.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                            /*      |((($8.op)&0x183f)<<0)                    op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)              /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*   src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc LOW_REG * HIGH_REG LPAREN macmod_hmove RPAREN"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG STAR HIGH_REG RPAREN mxd_mod COMMA A0macfunc HIGH_REG STAR LOW_REG macmod_hmove
-		{
-		  if(0) {
-                  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-                             && reginclass($1,rc_dregs) ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-                                  |((($11.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                            /*      |((($8.op)&0x183f)<<0)                    op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)              /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*   src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc HIGH_REG * LOW_REG LPAREN macmod_hmove RPAREN"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG STAR HIGH_REG RPAREN mxd_mod COMMA A0macfunc HIGH_REG STAR HIGH_REG macmod_hmove
-		{
-		  if(0) {
-                  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-                             && reginclass($1,rc_dregs) ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-                                  |((($11.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                            /*      |((($8.op)&0x183f)<<0)                    op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)              /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*   src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc HIGH_REG * HIGH_REG LPAREN macmod_hmove RPAREN"); }
-		}
-/* Fifth Pattern Page 7.75  */
-	| REG ASSIGN LPAREN A1macfunc LOW_REG STAR LOW_REG RPAREN mxd_mod COMMA A0macfunc LOW_REG STAR LOW_REG macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-		             && reginclass($1,rc_dregs) && ((dregs($1)&0x7)%2)!=0) {
-/* dsp32mac:   dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($11.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1*/
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /* src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc LOW_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc LOW_REG * LOW_REG macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc LOW_REG STAR LOW_REG RPAREN mxd_mod COMMA A0macfunc LOW_REG STAR HIGH_REG macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-		             && reginclass($1,rc_dregs) && ((dregs($1)&0x7)%2)!=0) {
-/* dsp32mac:   dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($11.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1*/
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /* src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc LOW_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc LOW_REG * HIGH_REG macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc LOW_REG STAR LOW_REG RPAREN mxd_mod COMMA A0macfunc HIGH_REG STAR LOW_REG macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-		             && reginclass($1,rc_dregs) && ((dregs($1)&0x7)%2)!=0) {
-/* dsp32mac:   dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($11.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1*/
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /* src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc LOW_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc HIGH_REG * LOW_REG macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc LOW_REG STAR LOW_REG RPAREN mxd_mod COMMA A0macfunc HIGH_REG STAR HIGH_REG macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-		             && reginclass($1,rc_dregs) && ((dregs($1)&0x7)%2)!=0) {
-/* dsp32mac:   dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($11.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1*/
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /* src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc LOW_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc HIGH_REG * HIGH_REG macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc LOW_REG STAR HIGH_REG RPAREN mxd_mod COMMA A0macfunc LOW_REG STAR LOW_REG macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-		             && reginclass($1,rc_dregs) && ((dregs($1)&0x7)%2)!=0) {
-/* dsp32mac:   dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($11.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1*/
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /* src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc LOW_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc LOW_REG * LOW_REG macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc LOW_REG STAR HIGH_REG RPAREN mxd_mod COMMA A0macfunc LOW_REG STAR HIGH_REG macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-		             && reginclass($1,rc_dregs) && ((dregs($1)&0x7)%2)!=0) {
-/* dsp32mac:   dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($11.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1*/
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /* src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc LOW_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc LOW_REG * HIGH_REG macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc LOW_REG STAR HIGH_REG RPAREN mxd_mod COMMA A0macfunc HIGH_REG STAR LOW_REG macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-		             && reginclass($1,rc_dregs) && ((dregs($1)&0x7)%2)!=0) {
-/* dsp32mac:   dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($11.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1*/
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /* src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc LOW_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc HIGH_REG * LOW_REG macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc LOW_REG STAR HIGH_REG RPAREN mxd_mod COMMA A0macfunc HIGH_REG STAR HIGH_REG macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-		             && reginclass($1,rc_dregs) && ((dregs($1)&0x7)%2)!=0) {
-/* dsp32mac:   dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($11.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1*/
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /* src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc LOW_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc HIGH_REG * HIGH_REG macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc HIGH_REG STAR LOW_REG RPAREN mxd_mod COMMA A0macfunc LOW_REG STAR LOW_REG macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-		             && reginclass($1,rc_dregs) && ((dregs($1)&0x7)%2)!=0) {
-/* dsp32mac:   dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($11.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1*/
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /* src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc HIGH_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc LOW_REG * LOW_REG macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc HIGH_REG STAR LOW_REG RPAREN mxd_mod COMMA A0macfunc LOW_REG STAR HIGH_REG macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-		             && reginclass($1,rc_dregs) && ((dregs($1)&0x7)%2)!=0) {
-/* dsp32mac:   dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($11.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1*/
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /* src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc HIGH_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc LOW_REG * HIGH_REG macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc HIGH_REG STAR LOW_REG RPAREN mxd_mod COMMA A0macfunc HIGH_REG STAR LOW_REG macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-		             && reginclass($1,rc_dregs) && ((dregs($1)&0x7)%2)!=0) {
-/* dsp32mac:   dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($11.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1*/
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /* src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc HIGH_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc HIGH_REG * LOW_REG macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc HIGH_REG STAR LOW_REG RPAREN mxd_mod COMMA A0macfunc HIGH_REG STAR HIGH_REG macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-		             && reginclass($1,rc_dregs) && ((dregs($1)&0x7)%2)!=0) {
-/* dsp32mac:   dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($11.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1*/
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /* src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc HIGH_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc HIGH_REG * HIGH_REG macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc HIGH_REG STAR HIGH_REG RPAREN mxd_mod COMMA A0macfunc LOW_REG STAR LOW_REG macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-		             && reginclass($1,rc_dregs) && ((dregs($1)&0x7)%2)!=0) {
-/* dsp32mac:   dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($11.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1*/
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /* src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc HIGH_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc LOW_REG * LOW_REG macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc HIGH_REG STAR HIGH_REG RPAREN mxd_mod COMMA A0macfunc LOW_REG STAR HIGH_REG macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-		             && reginclass($1,rc_dregs) && ((dregs($1)&0x7)%2)!=0) {
-/* dsp32mac:   dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($11.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1*/
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /* src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc HIGH_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc LOW_REG * HIGH_REG macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc HIGH_REG STAR HIGH_REG RPAREN mxd_mod COMMA A0macfunc HIGH_REG STAR LOW_REG macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-		             && reginclass($1,rc_dregs) && ((dregs($1)&0x7)%2)!=0) {
-/* dsp32mac:   dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($11.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1*/
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /* src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc HIGH_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc HIGH_REG * LOW_REG macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc HIGH_REG STAR HIGH_REG RPAREN mxd_mod COMMA A0macfunc HIGH_REG STAR HIGH_REG macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($12,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($14,rc_dregs)
-		             && reginclass($1,rc_dregs) && ((dregs($1)&0x7)%2)!=0) {
-/* dsp32mac:   dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), A0macfunc (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($15.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($11.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1*/
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /* src1<(dregs) */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
-
-                        } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc HIGH_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA A0macfunc HIGH_REG * HIGH_REG macmod_hmove"); }
-		}
-/* Fourth Pattern Page 7.75 */
-	| HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG STAR LOW_REG RPAREN mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG STAR LOW_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && reginclass($1,rc_dregs) == reginclass($11,rc_dregs)  ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)               /*  src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*  src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG STAR LOW_REG RPAREN mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG STAR HIGH_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && reginclass($1,rc_dregs) == reginclass($11,rc_dregs)  ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)               /*  src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*  src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG STAR LOW_REG RPAREN mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG STAR LOW_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && reginclass($1,rc_dregs) == reginclass($11,rc_dregs)  ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)               /*  src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*  src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG STAR LOW_REG RPAREN mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG STAR HIGH_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && reginclass($1,rc_dregs) == reginclass($11,rc_dregs)  ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)               /*  src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*  src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG STAR HIGH_REG RPAREN mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG STAR LOW_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && reginclass($1,rc_dregs) == reginclass($11,rc_dregs)  ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)               /*  src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*  src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG STAR HIGH_REG RPAREN mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG STAR HIGH_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && reginclass($1,rc_dregs) == reginclass($11,rc_dregs)  ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)               /*  src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*  src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG STAR HIGH_REG RPAREN mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG STAR LOW_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && reginclass($1,rc_dregs) == reginclass($11,rc_dregs)  ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)               /*  src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*  src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG STAR HIGH_REG RPAREN mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG STAR HIGH_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && reginclass($1,rc_dregs) == reginclass($11,rc_dregs)  ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)               /*  src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*  src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc LOW_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG STAR LOW_REG RPAREN mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG STAR LOW_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && reginclass($1,rc_dregs) == reginclass($11,rc_dregs)  ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)               /*  src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*  src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG STAR LOW_REG RPAREN mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG STAR HIGH_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && reginclass($1,rc_dregs) == reginclass($11,rc_dregs)  ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)               /*  src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*  src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG STAR LOW_REG RPAREN mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG STAR LOW_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && reginclass($1,rc_dregs) == reginclass($11,rc_dregs)  ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)               /*  src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*  src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG STAR LOW_REG RPAREN mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG STAR HIGH_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && reginclass($1,rc_dregs) == reginclass($11,rc_dregs)  ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)               /*  src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*  src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG * LOW_REG RPAREN LPAREN mxd_mod RPAREN COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG STAR HIGH_REG RPAREN mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG STAR LOW_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && reginclass($1,rc_dregs) == reginclass($11,rc_dregs)  ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)               /*  src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*  src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG STAR HIGH_REG RPAREN mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG STAR HIGH_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && reginclass($1,rc_dregs) == reginclass($11,rc_dregs)  ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)               /*  src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*  src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA LOW_REG ASSIGN LPAREN A0macfunc LOW_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG STAR HIGH_REG RPAREN mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG STAR LOW_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && reginclass($1,rc_dregs) == reginclass($11,rc_dregs)  ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)               /*  src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*  src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG STAR HIGH_REG RPAREN mxd_mod COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG STAR HIGH_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && reginclass($1,rc_dregs) == reginclass($11,rc_dregs)  ) {
-/* dsp32mac:	dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_hi = ( A1macfunc ) (mxd_mod), dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                /* op0=A0macfunc.op */
-                                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)               /*  src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)               /*  src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN A1macfunc HIGH_REG * HIGH_REG RPAREN LPAREN mxd_mod RPAREN COMMA LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| LOW_REG ASSIGN LPAREN A0macfunc LOW_REG STAR LOW_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($1,rc_dregs) && reginclass($5,rc_dregs)
-                             && reginclass($7,rc_dregs) ) {
-/* dsp32mac:   dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_lo = A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |(((3)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |(((0)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($9.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($4.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN LPAREN A0macfunc LOW_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| LOW_REG ASSIGN LPAREN A0macfunc LOW_REG STAR HIGH_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($1,rc_dregs) && reginclass($5,rc_dregs)
-                             && reginclass($7,rc_dregs)  ) {
-/* dsp32mac:   dregs_lo = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |(((3)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |(((0)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($9.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($4.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN LPAREN A0macfunc LOW_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG STAR LOW_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($1,rc_dregs) && reginclass($5,rc_dregs)
-                             && reginclass($7,rc_dregs)  ) {
-/* dsp32mac:   dregs_lo  = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |(((3)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |(((0)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($9.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($4.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG STAR HIGH_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($1,rc_dregs) && reginclass($5,rc_dregs)
-                             && reginclass($7,rc_dregs)  ) {
-/* dsp32mac:   dregs_lo  = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs_lo = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |(((3)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |(((0)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($9.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($4.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN LPAREN A0macfunc HIGH_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A0macfunc LOW_REG STAR LOW_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($1,rc_dregs) && reginclass($5,rc_dregs)
-                             && reginclass($7,rc_dregs) && ((dregs($1)&0x7)%2)==0 ) {
-/* dsp32mac:   dregs (even) = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |(((3)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |(((0)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($9.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($4.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A0macfunc LOW_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A0macfunc LOW_REG STAR HIGH_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($1,rc_dregs) && reginclass($5,rc_dregs)
-                             && reginclass($7,rc_dregs) && ((dregs($1)&0x7)%2)==0 ) {
-/* dsp32mac:   dregs(even) = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |(((3)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |(((0)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($9.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($4.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A0macfunc LOW_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A0macfunc HIGH_REG STAR LOW_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($1,rc_dregs) && reginclass($5,rc_dregs)
-                             && reginclass($7,rc_dregs) && ((dregs($1)&0x7)%2)==0 ) {
-/* dsp32mac:   dregs (even) = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |(((3)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |(((0)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($9.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($4.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A0macfunc HIGH_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A0macfunc HIGH_REG STAR HIGH_REG RPAREN macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($1,rc_dregs) && reginclass($5,rc_dregs)
-                             && reginclass($7,rc_dregs) && ((dregs($1)&0x7)%2)==0 ) {
-/* dsp32mac:   dregs (even) = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |(((3)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |(((0)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($9.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($4.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A0macfunc HIGH_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-/* Seventh Pattern Page 7.75  */
-	| REG ASSIGN LPAREN A1macfunc LOW_REG STAR LOW_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG STAR LOW_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && (((dregs($1)&0x7)-(dregs($11)&0x7))==1)
-                             && ((dregs($1)&0x7)%2)!=0 && ((dregs($11)&0x7)%2)==0 ) {
-/* dsp32mac:   dregs(odd) = ( A1macfunc ) (mxd_mod), dregs (even) = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), dregs = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($11)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc LOW_REG * LOW_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc LOW_REG STAR LOW_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG STAR HIGH_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && (((dregs($1)&0x7)-(dregs($11)&0x7))==1)
-                             && ((dregs($1)&0x7)%2)!=0 && ((dregs($11)&0x7)%2)==0 ) {
-/* dsp32mac:   dregs(odd) = ( A1macfunc ) (mxd_mod), dregs (even) = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), dregs = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($11)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc LOW_REG * LOW_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc LOW_REG STAR LOW_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG STAR LOW_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && (((dregs($1)&0x7)-(dregs($11)&0x7))==1)
-                             && ((dregs($1)&0x7)%2)!=0 && ((dregs($11)&0x7)%2)==0 ) {
-/* dsp32mac:   dregs(odd) = ( A1macfunc ) (mxd_mod), dregs (even) = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), dregs = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($11)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc LOW_REG * LOW_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc LOW_REG STAR LOW_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG STAR HIGH_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && (((dregs($1)&0x7)-(dregs($11)&0x7))==1)
-                             && ((dregs($1)&0x7)%2)!=0 && ((dregs($11)&0x7)%2)==0 ) {
-/* dsp32mac:   dregs(odd) = ( A1macfunc ) (mxd_mod), dregs (even) = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), dregs = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($11)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc LOW_REG * LOW_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc LOW_REG STAR HIGH_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG STAR LOW_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && (((dregs($1)&0x7)-(dregs($11)&0x7))==1)
-                             && ((dregs($1)&0x7)%2)!=0 && ((dregs($11)&0x7)%2)==0 ) {
-/* dsp32mac:   dregs(odd) = ( A1macfunc ) (mxd_mod), dregs (even) = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), dregs = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($11)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc LOW_REG * HIGH_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc LOW_REG STAR HIGH_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG STAR HIGH_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && (((dregs($1)&0x7)-(dregs($11)&0x7))==1)
-                             && ((dregs($1)&0x7)%2)!=0 && ((dregs($11)&0x7)%2)==0 ) {
-/* dsp32mac:   dregs(odd) = ( A1macfunc ) (mxd_mod), dregs (even) = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), dregs = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($11)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc LOW_REG * HIGH_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc LOW_REG STAR HIGH_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG STAR LOW_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && (((dregs($1)&0x7)-(dregs($11)&0x7))==1)
-                             && ((dregs($1)&0x7)%2)!=0 && ((dregs($11)&0x7)%2)==0 ) {
-/* dsp32mac:   dregs(odd) = ( A1macfunc ) (mxd_mod), dregs (even) = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), dregs = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($11)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc LOW_REG * HIGH_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc LOW_REG STAR HIGH_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG STAR HIGH_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && (((dregs($1)&0x7)-(dregs($11)&0x7))==1)
-                             && ((dregs($1)&0x7)%2)!=0 && ((dregs($11)&0x7)%2)==0 ) {
-/* dsp32mac:   dregs(odd) = ( A1macfunc ) (mxd_mod), dregs (even) = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), dregs = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($11)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((0)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc LOW_REG * HIGH_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc HIGH_REG STAR LOW_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG STAR LOW_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && (((dregs($1)&0x7)-(dregs($11)&0x7))==1)
-                             && ((dregs($1)&0x7)%2)!=0 && ((dregs($11)&0x7)%2)==0 ) {
-/* dsp32mac:   dregs(odd) = ( A1macfunc ) (mxd_mod), dregs (even) = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), dregs = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($11)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc HIGH_REG * LOW_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc HIGH_REG STAR LOW_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG STAR HIGH_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && (((dregs($1)&0x7)-(dregs($11)&0x7))==1)
-                             && ((dregs($1)&0x7)%2)!=0 && ((dregs($11)&0x7)%2)==0 ) {
-/* dsp32mac:   dregs(odd) = ( A1macfunc ) (mxd_mod), dregs (even) = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), dregs = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($11)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc HIGH_REG * LOW_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc HIGH_REG STAR LOW_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG STAR LOW_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && (((dregs($1)&0x7)-(dregs($11)&0x7))==1)
-                             && ((dregs($1)&0x7)%2)!=0 && ((dregs($11)&0x7)%2)==0 ) {
-/* dsp32mac:   dregs(odd) = ( A1macfunc ) (mxd_mod), dregs (even) = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), dregs = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($11)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc HIGH_REG * LOW_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc HIGH_REG STAR LOW_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG STAR HIGH_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && (((dregs($1)&0x7)-(dregs($11)&0x7))==1)
-                             && ((dregs($1)&0x7)%2)!=0 && ((dregs($11)&0x7)%2)==0 ) {
-/* dsp32mac:   dregs(odd) = ( A1macfunc ) (mxd_mod), dregs (even) = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), dregs = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($11)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((0)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc HIGH_REG * LOW_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc HIGH_REG STAR HIGH_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG STAR LOW_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && (((dregs($1)&0x7)-(dregs($11)&0x7))==1)
-                             && ((dregs($1)&0x7)%2)!=0 && ((dregs($11)&0x7)%2)==0 ) {
-/* dsp32mac:   dregs(odd) = ( A1macfunc ) (mxd_mod), dregs (even) = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), dregs = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($11)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc HIGH_REG * HIGH_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc HIGH_REG STAR HIGH_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG STAR HIGH_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && (((dregs($1)&0x7)-(dregs($11)&0x7))==1)
-                             && ((dregs($1)&0x7)%2)!=0 && ((dregs($11)&0x7)%2)==0 ) {
-/* dsp32mac:   dregs(odd) = ( A1macfunc ) (mxd_mod), dregs (even) = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), dregs = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($11)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((0)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc HIGH_REG * HIGH_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc LOW_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc HIGH_REG STAR HIGH_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG STAR LOW_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && (((dregs($1)&0x7)-(dregs($11)&0x7))==1)
-                             && ((dregs($1)&0x7)%2)!=0 && ((dregs($11)&0x7)%2)==0 ) {
-/* dsp32mac:   dregs(odd) = ( A1macfunc ) (mxd_mod), dregs (even) = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), dregs = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($11)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((0)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc HIGH_REG * HIGH_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG * LOW_REG RPAREN macmod_hmove"); }
-		}
-	| REG ASSIGN LPAREN A1macfunc HIGH_REG STAR HIGH_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG STAR HIGH_REG RPAREN macmod_pmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($5,rc_dregs) == reginclass($15,rc_dregs)
-                             && reginclass($7,rc_dregs) == reginclass($17,rc_dregs)
-                             && (((dregs($1)&0x7)-(dregs($11)&0x7))==1)
-                             && ((dregs($1)&0x7)%2)!=0 && ((dregs($11)&0x7)%2)==0 ) {
-/* dsp32mac:   dregs(odd) = ( A1macfunc ) (mxd_mod), dregs (even) = ( A0macfunc ) (macmod_hmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 0 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mac: dregs = ( A1macfunc ) (mxd_mod), dregs = ( A0macfunc ) (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c000
-		                |((($4.r0)&0x3)<<0)                      /* op1=A1macfunc.op */
-		                |((($9.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($19.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($11)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |(((1)&0x1)<<15)                     /* h01=A1macfunc.h0 */
-		                  |(((1)&0x1)<<14)                     /* h11=A1macfunc.h1 */
-		                  |((($14.r0)&0x3)<<11)                     /* op0=A0macfunc.op */
-		                  |(((1)&0x1)<<10)                     /* h00=A0macfunc.h0 */
-		                  |(((1)&0x1)<<9)                      /* h10=A0macfunc.h1 */
-		                  |((dregs($5)&0x7)<<3)                /*    src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                /*    src1<(dregs) */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
-
-                  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN A1macfunc HIGH_REG * HIGH_REG RPAREN mxd_mod COMMA REG ASSIGN LPAREN A0macfunc HIGH_REG * HIGH_REG RPAREN macmod_hmove"); }
-		}
-        | REG ASSIGN LPAREN REG_A00 _PLUS_ASSIGN REG_A11 RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && $4 == REG_A0
-		             && $6 == REG_A1) {
-/* dsp32alu:	dregs = ( A0 += A1 )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
+						  /* aopcde       HL   */
+			$$ = DSP32ALU (      18,       0,
+						  /*   dst1     dst0     src0     src1 */
+							      0,       0,       0,       0,
+						  /*      s        x      aop */
+							      0,       0,       3           );
+
+	}
+
+	| REG ASSIGN LPAREN a_plusassign REG_A RPAREN
+	{
+		if (IS_DREG($1) && !IS_A1($4) && IS_A1($5)) {
 		    notethat("dsp32alu: dregs = ( A0 += A1 )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((11&0x1f)<<0)                          /* aopcde<(11) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
+						  /* aopcde       HL   */
+			$$ = DSP32ALU (      11,       0,
+						  /*   dst1     dst0     src0     src1 */
+							      0,     &$1,       0,       0,
+						  /*      s        x      aop */
+							      0,       0,       0           );
+		} else {
+			return register_mismatch();
+		}
+	}	
 
-		  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN REG_A00 _PLUS_ASSIGN REG_A11 RPAREN"); }
+	| HALF_REG ASSIGN LPAREN a_plusassign REG_A RPAREN
+	{
+		if (!IS_A1($4) && IS_A1($5)) {
+			notethat("dsp32alu: dregs_half = ( A0 += A1 )\n");
+						  /* aopcde       HL   */
+			$$ = DSP32ALU (      11,   IS_H($1), 
+						  /*   dst1     dst0     src0     src1 */
+								  0,     &$1,       0,       0,
+						  /*      s        x      aop */
+								  0,       0,       1           );
+		} else {
+			return register_mismatch();
 		}
-	| LOW_REG ASSIGN LPAREN REG_A00 _PLUS_ASSIGN REG_A11 RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && $4 == REG_A0
-		             && $6 == REG_A1) {
-/* dsp32alu:	dregs_lo = ( A0 += A1 )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_lo = ( A0 += A1 )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((11&0x1f)<<0)                          /* aopcde<(11) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN LPAREN REG_A00 _PLUS_ASSIGN REG_A11 RPAREN"); }
-		}
-	| HIGH_REG ASSIGN LPAREN REG_A00 _PLUS_ASSIGN REG_A11 RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && $4 == REG_A0
-		             && $6 == REG_A1) {
-/* dsp32alu:	dregs_hi = ( A0 += A1 )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_hi = ( A0 += A1 )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		                |((11&0x1f)<<0)                          /* aopcde<(11) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
+/* 2 rules compacted */
+	| A_ZERO_DOT_H ASSIGN HALF_REG
+	{
+		notethat("dsp32alu: A_ZERO_DOT_H = dregs_hi\n");
+					  /* aopcde        HL   */
+		$$ = DSP32ALU (       9, IS_H($3), 
+			          /*   dst1     dst0     src0     src1 */
+							  0,       0,     &$3,       0,
+					  /*      s        x      aop */
+							  0,       0,       0           );
+	               
+	}
 
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LPAREN REG_A00 _PLUS_ASSIGN REG_A11 RPAREN"); }
-		}
-/*First Pattern 7-81	| REG ASSIGN LPAREN multfunc RPAREN COMMA MUNOP LPAREN REG COMMA REG RPAREN macmod_hmove*/
-	| HIGH_REG ASSIGN multfunc macmod_hmove mxd_mod
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)) {
-/* dsp32mult:	dregs = ( multfunc ) , MUNOP ( dregs , dregs ) macmod_hmove
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 1 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mult: dregs_hi = multfunc (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c200
-		                |((0&0x3)<<0)                      /* op1=multfunc.op */
-		                |((($4.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		                |((0&0x1)<<4)                            /* MM<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |((($3.h0)&0x1)<<15)                     /* h01=multfunc.h0 */
-		                  |((($3.h1)&0x1)<<14)                     /* h11=multfunc.h1 */
-		                  |((($3.op)&0x183f)<<0)                   /* op0=A0macfunc.op */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
+/* 2 rules compacted */
+	| A_ONE_DOT_H ASSIGN HALF_REG
+	{
+		notethat("dsp32alu: A_ZERO_DOT_H = dregs_hi\n");
+			               /* aopcde       HL   */
+			$$ = DSP32ALU (       9, IS_H($3),
+			              /*   dst1     dst0     src0     src1 */
+							      0,       0,     &$3,       0,
+			              /*      s        x      aop */
+			                      0,       0,       2          );
 
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN multfunc LPAREN macmod_hmove RPAREN"); }
-		}
-/* Second Pattern 7-81	| REG MUNOP COMMA ASSIGN LPAREN multfunc RPAREN LPAREN REG COMMA REG RPAREN macmod_hmove */
-	| LOW_REG ASSIGN multfunc macmod_hmove mxd_mod 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)) {
-/* dsp32mult: dregs MUNOP , = ( multfunc ) ( dregs , dregs ) macmod_hmove
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 1 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mult: dregs_lo = multfunc (macmod_hmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c200
-		                |((($4.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		                |((0&0x1)<<4)                            /* MM<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |((($3.op)&0x183f)<<0)                     /* op0=multfunc.op */
-		                  |((($3.h0)&0x1)<<10)                     /* h00=multfunc.h0 */
-		                  |((($3.h1)&0x1)<<9)                      /* h10=multfunc.h1 */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN multfunc LPAREN macmod_hmove RPAREN"); }
-		}
-/* Fourth Pattern 7-81	| REG _DOTP ASSIGN LPAREN multfunc RPAREN COMMA MUNOP LPAREN REG COMMA REG RPAREN macmod_pmove
-   concerned about MAC1 so odd number */
-	| REG ASSIGN multfunc  macmod_pmove 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && ((dregs($1)&0x7)%2)!=0) {
-/* dsp32mult:	dregs_pair .P = ( multfunc ) , MUNOP ( dregs , dregs ) macmod_pmove
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 1 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mult: dregs = multfunc (macmod_pmove)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c200
-		                |((0&0x3)<<0)                      /* op1=multfunc.op */
-		                |((($4.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		                |((0&0x1)<<4)                            /* MM<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |((($3.h0)&0x1)<<15)                     /* h01=multfunc.h0 */
-		                  |((($3.h1)&0x1)<<14)                     /* h11=multfunc.h1 */
-		                  |((($3.op)&0x183f)<<0)                   /* op0 */
-		                  |((0&0x1)<<13)                           /* w0<(0) */
-		          ),
-		          NULL_CODE));
+	| LPAREN REG COMMA REG RPAREN ASSIGN BYTEOP16P LPAREN REG COLON expr COMMA
+	  REG COLON expr RPAREN aligndir
+	{
 
-/* Fifth Pattern 7-81	| REG _DOTP MUNOP COMMA ASSIGN LPAREN multfunc RPAREN LPAREN REG COMMA REG RPAREN macmod_pmove
-   concerned about MAC0 so even number */ 
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && ((dregs($1)&0x7)%2)==0) {
-/* dsp32mult:	dregs_pair .P MUNOP , = ( multfunc ) ( dregs , dregs ) macmod_pmove
-   dsp32mult:	dregs = multfunc (macmod_pmove)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 1 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mult: dregs = multfunc macmod_pmove\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c200
-		                |((($4.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((0&0x1)<<2)                            /* w1<(0) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		                |((0&0x1)<<4)                            /* MM<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)               /* dst<(dregs_pair) */
-		                  |((($3.op)&0x183f)<<0)                     /* op0=multfunc.op */
-		                  |((($3.h0)&0x1)<<10)                     /* h00=multfunc.h0 */
-		                  |((($3.h1)&0x1)<<9)                      /* h10=multfunc.h1 */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
+		if (IS_DREG($2) && IS_DREG($4) && IS_DREG($9) && IS_DREG($13)) {
+		    notethat("dsp32alu: ( dregs , dregs ) = BYTEOP16P ( dregs_pair , dregs_pair ) (half)\n");
+			               /* aopcde       HL   */
+			$$ = DSP32ALU (      21,       0,
+			              /*   dst1     dst0     src0     src1 */
+							    &$2,     &$4,     &$9,    &$13,
+			              /*      s        x      aop */
+			                 $17.r0,       0,       0          );
+		} else {
+			return register_mismatch();
+		}	
+	}
 
-		  } else { $$ = 0; semantic_error ("REG ASSIGN multfunc LPAREN macmod_hmove RPAREN"); }
-		}
-/* Third Pattern 7-81	| REG ASSIGN LPAREN multfunc mxd_mod COMMA multfunc RPAREN LPAREN REG COMMA REG RPAREN macmod_hmove */
-	| HIGH_REG ASSIGN multfunc mxd_mod COMMA LOW_REG ASSIGN multfunc macmod_hmove
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($6,rc_dregs)
-                             && (dregs($1)&0x7)==(dregs($6)&0x7) ) {
-/*   dsp32mult:	dregs_hi = multfunc mxd_mod , dregs_lo = multfunc macmod_hmove
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 1 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mult: dregs_hi = multfunc mxd_mod , dregs_lo = multfunc macmod_hmove\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c200
-		                |((0&0x3)<<0)                      /* op1=multfunc.op */
-		                |((($4.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($9.mod)&0xf)<<5)                    /* mmod=macmod_hmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((0&0x1)<<3)                            /* P<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                  |((($3.h0)&0x1)<<15)                     /* h01=multfunc.h0 */
-		                  |((($3.h1)&0x1)<<14)                     /* h11=multfunc.h1 */
-		                  |((($8.op)&0x183f)<<0)                     /* op0=multfunc.op */
-		                  |((($8.h0)&0x1)<<10)                     /* h00=multfunc.h0 */
-		                  |((($8.h1)&0x1)<<9)                      /* h10=multfunc.h1 */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
+	| LPAREN REG COMMA REG RPAREN ASSIGN BYTEOP16M LPAREN REG COLON expr COMMA
+	  REG COLON expr RPAREN aligndir 
+	{
 
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN multfunc mxd_mod COMMA LOW_REG ASSIGN multfunc macmod_hmove"); }
-		}
-/* Sixth Pattern 7-81	| REG _DOTP ASSIGN LPAREN multfunc mxd_mod COMMA multfunc RPAREN LPAREN REG COMMA REG RPAREN macmod_pmove */ 
-	| REG ASSIGN multfunc mxd_mod COMMA REG ASSIGN multfunc macmod_pmove 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($6,rc_dregs)
-			     && ((((dregs($1)&0x7)-(dregs($6)&0x7))==1) || 
-					((dregs($6)&0x7)-(dregs($1)&0x7))==1)) {
-/* dsp32mult:	dregs_pair .P = ( multfunc mxd_mod , multfunc ) ( dregs , dregs ) macmod_hmove
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 0 | 1 |.mmod..........|.MM|.P.|.w1|.op1...|
-|.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32mult: dregs = multfunc mxd_mod , dregs = multfunc macmod_hmove\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c200
-		                |((0&0x3)<<0)                      /* op1=multfunc.op */
-		                |((($4.mod)&0x1)<<4)                     /* MM=mxd_mod.mod */
-		                |((($9.mod)&0xf)<<5)                    /* mmod=macmod_pmove.mod */
-		                |((1&0x1)<<2)                            /* w1<(1) */
-		                |((1&0x1)<<3)                            /* P<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((dregs($1)&0x7)/2)*2<<6)               /* dst<(dregs_pair) */
-		                  |((($3.h0)&0x1)<<15)                     /* h01=multfunc.h0 */
-		                  |((($3.h1)&0x1)<<14)                     /* h11=multfunc.h1 */
-		                  |((($8.op)&0x183f)<<0)                     /* op0=multfunc.op */
-		                  |((($8.h0)&0x1)<<10)                     /* h00=multfunc.h0 */
-		                  |((($8.h1)&0x1)<<9)                      /* h10=multfunc.h1 */
-		                  |((1&0x1)<<13)                           /* w0<(1) */
-		          ),
-		          NULL_CODE));
+		if (IS_DREG($2) && IS_DREG($4) && IS_DREG($9) && IS_DREG($13)) {
+		    notethat("dsp32alu: ( dregs , dregs ) = BYTEOP16M ( dregs_pair , dregs_pair ) (aligndir)\n");
+			               /* aopcde       HL   */
+			$$ = DSP32ALU (      21,       0,
+			              /*   dst1     dst0     src0     src1 */
+							    &$2,     &$4,     &$9,    &$13,
+			              /*      s        x      aop */
+			                 $17.r0,       0,       1          );
+		} else {
+			return register_mismatch();
+		}	
+	}
 
-		  } else { $$ = 0; semantic_error ("REG ASSIGN multfunc mxd_mod COMMA REG ASSIGN multfunc macmod_hmove"); }
+	| LPAREN REG COMMA REG RPAREN ASSIGN BYTEUNPACK REG COLON expr aligndir
+	{
+		if (IS_DREG($2) && IS_DREG($4) && IS_DREG($8)) {
+		    notethat("dsp32alu: ( dregs , dregs ) = BYTEUNPACK dregs_pair (aligndir)\n");
+		                  /* aopcde       HL   */
+			$$ = DSP32ALU (      24,       0,
+			              /*   dst1     dst0     src0     src1 */
+							    &$2,     &$4,     &$8,       0,
+			              /*      s        x      aop */
+			                 $11.r0,       0,       1          );
+		} else {
+			return register_mismatch();
 		}
-	| REG_A00 ASSIGN LSHIFT REG_A00 BY LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A0
-		             && $4 == REG_A0
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	A0 = LSHIFT A0 BY dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: A0 = LSHIFT A0 BY dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((3&0x1f)<<0)                           /* sopcde<(3) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		                  |((0&0x3)<<12)                           /* HLs<(0) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("REG_A00 ASSIGN LSHIFT REG_A00 BY LOW_REG"); }
+	| LPAREN REG COMMA REG RPAREN ASSIGN SEARCH REG LPAREN searchmod RPAREN
+	{
+		if (IS_DREG($2) && IS_DREG($4) && IS_DREG($8)) {
+		    notethat("dsp32alu: ( dregs , dregs ) = SEARCH dregs (searchmod)\n");
+		                  /* aopcde       HL   */
+			$$ = DSP32ALU (      13,       0,
+			              /*   dst1     dst0     src0     src1 */
+							    &$2,     &$4,     &$8,       0,
+			              /*      s        x      aop */
+			                      0,       0,  $10.r0          );
+		} else {
+			return register_mismatch();
 		}
-	| REG_A11 ASSIGN LSHIFT REG_A11 BY LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A1
-		             && $4 == REG_A1
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	A1 = LSHIFT A1 BY dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: A1 = LSHIFT A1 BY dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((3&0x1f)<<0)                           /* sopcde<(3) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		                  |((1&0x3)<<12)                           /* HLs<(1) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("REG_A11 ASSIGN LSHIFT REG_A11 BY LOW_REG"); }
+	| REG ASSIGN A_ONE_DOT_L PLUS A_ONE_DOT_H COMMA
+	  REG ASSIGN A_ZERO_DOT_L PLUS A_ZERO_DOT_H
+	{
+		if (IS_DREG($1) && IS_DREG($7)  ) {
+			notethat("dsp32alu: dregs = A1.l + A1.h, dregs = A0.l + A0.h  \n");
+		                  /* aopcde       HL   */
+			$$ = DSP32ALU (      12,       0,
+			              /*   dst1     dst0     src0     src1 */
+							    &$1,     &$7,       0,       0,
+			              /*      s        x      aop */
+			                      0,       0,       1          );
+		} else {
+			return register_mismatch();
 		}
-	| LOW_REG ASSIGN LSHIFT HIGH_REG BY LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	dregs_lo = LSHIFT dregs_hi BY dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_lo = LSHIFT dregs_hi BY dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($4)&0x7)<<0)                 /* src1<(dregs_hi) */
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((1&0x3)<<12)                           /* HLs<(1) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN LSHIFT HIGH_REG BY LOW_REG"); }
-		}
-	| HIGH_REG ASSIGN LSHIFT LOW_REG BY LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	dregs_hi = LSHIFT dregs_lo BY dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_hi = LSHIFT dregs_lo BY dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($4)&0x7)<<0)                 /* src1<(dregs_lo) */
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((2&0x3)<<12)                           /* HLs<(2) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
 
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LSHIFT LOW_REG BY LOW_REG"); }
-		}
-	| HIGH_REG ASSIGN LSHIFT HIGH_REG BY LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	dregs_hi = LSHIFT dregs_hi BY dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_hi = LSHIFT dregs_hi BY dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($4)&0x7)<<0)                 /* src1<(dregs_hi) */
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((3&0x3)<<12)                           /* HLs<(3) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
+	| REG ASSIGN REG_A PLUS REG_A COMMA REG ASSIGN REG_A MINUS REG_A amod1 
+	{
+		if (IS_DREG($1) && IS_DREG($7) && !REG_SAME($3, $5)
+		   && IS_A1($9) && !IS_A1($11) ) {
+		    notethat("dsp32alu: dregs = A1 + A0 , dregs = A1 - A0 (amod1)\n");
+			              /* aopcde       HL   */
+			$$ = DSP32ALU (      17,       0,
+			              /*   dst1     dst0     src0     src1 */
+							    &$1,     &$7,       0,       0,
+			              /*      s        x      aop */
+			                 $12.s0,  $12.x0,       0          );
 
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LSHIFT HIGH_REG BY LOW_REG"); }
+		} else
+		if (IS_DREG($1) && IS_DREG($7) && !REG_SAME($3, $5)
+		   && !IS_A1($9) && IS_A1($11) ) {
+		    notethat("dsp32alu: dregs = A0 + A1 , dregs = A0 - A1 (amod1)\n");
+			              /* aopcde       HL   */
+			$$ = DSP32ALU (      17,       0,
+			              /*   dst1     dst0     src0     src1 */
+							    &$1,     &$7,       0,       0,
+			              /*      s        x      aop */
+			                 $12.s0,  $12.x0,       1          );
+	
+		} else {
+			return register_mismatch();
 		}
-	| LOW_REG ASSIGN LSHIFT LOW_REG BY LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	dregs_lo = LSHIFT dregs_lo BY dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_lo = LSHIFT dregs_lo BY dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($4)&0x7)<<0)                 /* src1<(dregs_lo) */
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((0&0x3)<<12)                           /* HLs<(0) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN LSHIFT LOW_REG BY LOW_REG"); }
-		}
-	| REG ASSIGN SHIFT REG BY LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	dregs = SHIFT dregs BY dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs = SHIFT dregs BY dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((2&0x1f)<<0)                           /* sopcde<(2) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
+	| REG ASSIGN REG plus_minus REG COMMA REG ASSIGN REG plus_minus REG amod1
+	{
+		if ($4.r0 == $10.r0) 
+			return semantic_error("Operators must differ");
 
-		  } else { $$ = 0; semantic_error ("REG ASSIGN SHIFT REG BY LOW_REG"); }
-		}
-	| REG_A00 ASSIGN REG_A00 GREATER_GREATER expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A0
-		             && $3 == REG_A0
-		             && const_fits($5,c_imm6)>=0 ) {
-/* dsp32shiftimm:	A0 = A0 >> uimm4
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: A0 = A0 >> imm6\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((3&0x1f)<<0)                           /* sopcde<(3) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((-imm6($5))&0x3f)<<3)                    /* immag<(imm6) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		                  |((0&0x3)<<12)                           /* HLs<(0) */
-		          ),
-		          NULL_CODE));
+		if (IS_DREG($1) && IS_DREG($3) && IS_DREG($5)
+		 && REG_SAME($3, $9) && REG_SAME($5, $11)) {
+			notethat("dsp32alu: dregs = dregs + dregs,"
+			         "dregs = dregs - dregs (amod1)\n");
+						  /* aopcde       HL   */
+			$$ = DSP32ALU (       4,       0,
+						  /*   dst1     dst0     src0     src1 */
+							    &$1,     &$7,     &$3,     &$5,
+						  /*      s        x      aop */
+							 $12.s0,  $12.x0,       2          );
 
-		  } else { $$ = 0; semantic_error ("REG_A00 ASSIGN REG_A00 GREATER_GREATER expr"); }
+		} else {
+			return register_mismatch();
 		}
-	| REG_A11 ASSIGN REG_A11 GREATER_GREATER expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A1
-		             && $3 == REG_A1
-		             && const_fits($5,c_imm6)>=0 ) {
-/* dsp32shiftimm:	A1 = A1 >> uimm5
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: A1 = A1 >> imm6\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((3&0x1f)<<0)                           /* sopcde<(3) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |(((-imm6($5))&0x3f)<<3)                    /* immag<(imm6) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		                  |((1&0x3)<<12)                           /* HLs<(1) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("REG_A11 ASSIGN REG_A11 GREATER_GREATER expr"); }
-		}
-	| REG ASSIGN REG GREATER_GREATER expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_imm6)>=0 ) {
-/*dsp32shiftimm: dregs  =  dregs >> imm6
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: dregs  =  dregs >> imm6\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((2&0x1f)<<0)                           /* sopcde<(2) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($3)&0x7)<<0)                    /* src1<(dregs) */
-		                  |(((-imm6($5))&0x3f)<<3)                    /* immag<(imm6) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
+// Bar operations:
 
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_pregs)
-		             && reginclass($3,rc_pregs)
-		             && EXPR_VALUE($5) == 2) {
-/* PTR2op:	pregs = pregs >> 2
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 1 | 0 |.opc.......|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("PTR2op: pregs = pregs >> 2\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004400
-		                |((pregs($1)&0x7)<<0)                    /* dst<(pregs) */
-		                |((pregs($3)&0x7)<<3)                    /* src<(pregs) */
-		                |((3&0x7)<<6)                            /* opc<(3) */
-		        ),
-		        NULL_CODE);
+	| REG ASSIGN REG op_bar_op REG COMMA REG ASSIGN REG op_bar_op REG amod2 
+	{
+		if (!REG_SAME($3, $9) || !REG_SAME($5, $11))
+			return semantic_error("Differing source registers");
 
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_pregs)
-		             && reginclass($3,rc_pregs)
-		             && EXPR_VALUE($5) == 1) {
-/* PTR2op:	pregs = pregs >> 1
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 1 | 0 |.opc.......|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("PTR2op: pregs = pregs >> 1\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004400
-		                |((pregs($1)&0x7)<<0)                    /* dst<(pregs) */
-		                |((pregs($3)&0x7)<<3)                    /* src<(pregs) */
-		                |((4&0x7)<<6)                            /* opc<(4) */
-		        ),
-		        NULL_CODE);
+		if (!IS_DREG($1) || !IS_DREG($3) || !IS_DREG($5) || !IS_DREG($7)) 
+			return semantic_error("Dregs expected");
 
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG GREATER_GREATER expr"); }
+	
+		if ($4.r0 == 1 && $10.r0 == 2) {
+			notethat("dsp32alu:  dregs = dregs .|. dregs , dregs = dregs .|. dregs (amod2)\n");
+						  /* aopcde       HL   */
+			$$ = DSP32ALU (       1,       1,
+						  /*   dst1     dst0     src0     src1 */
+							    &$1,     &$7,     &$3,     &$5,
+						  /*      s        x      aop */
+							  $12.s0, $12.x0,  $12.r0          );
+		} else
+		if ($4.r0 == 0 && $10.r0 == 3) {
+			notethat("dsp32alu:  dregs = dregs .|. dregs , dregs = dregs .|. dregs (amod2)\n");
+						  /* aopcde       HL   */
+			$$ = DSP32ALU (       1,       0,
+						  /*   dst1     dst0     src0     src1 */
+							    &$1,     &$7,     &$3,     &$5,
+						  /*      s        x      aop */
+							 $12.s0,  $12.x0,  $12.r0          );
+		} else {
+			return semantic_error("Bar operand mismatch");
 		}
-	| LOW_REG ASSIGN LOW_REG GREATER_GREATER expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm5) ) {
-/* dsp32shiftimm:	 dregs_lo = dregs_lo  >> uimm5
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm:  dregs_lo =  dregs_lo >> uimm5\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($3)&0x7)<<0)                 /* src1<(dregs_hi) */
-		                  |(((-uimm5($5))&0x3f)<<3)                    /* immag<(imm5) */
-		                  |((0&0x3)<<12)                           /* HLs<(1) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN LOW_REG GREATER_GREATER expr"); }
-		}
-	| LOW_REG ASSIGN HIGH_REG GREATER_GREATER expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm5) ) {
-/* dsp32shiftimm:	 dregs_lo = dregs_hi  >> uimm5
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm:  dregs_lo =  dregs_hi >> uimm5\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($3)&0x7)<<0)                 /* src1<(dregs_hi) */
-		                  |(((-uimm5($5))&0x3f)<<3)                    /* immag<(imm5) */
-		                  |((1&0x3)<<12)                           /* HLs<(1) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
+	| REG ASSIGN ABS REG vmod
+	{
+		int op;
 
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN HIGH_REG GREATER_GREATER expr"); }
+		if (IS_DREG($1) && IS_DREG($4)) {
+			if ($5.r0) {
+				notethat("dsp32alu: dregs = ABS dregs (v)\n");
+				op = 6;
+			} else {
+				// Vector version of ABS
+				notethat("dsp32alu: dregs = ABS dregs\n");
+				op = 7;
+			}
+		              /* aopcde       HL   */
+		$$ = DSP32ALU (      op,       0,
+					  /*   dst1     dst0     src0     src1 */
+		                      0,     &$1,    &$4,       0,
+					  /*      s        x      aop */
+							  0,       0,       2          );
+		} else {
+			return semantic_error("Dregs expected");
 		}
-	| HIGH_REG ASSIGN LOW_REG GREATER_GREATER expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm5) ) {
-/* dsp32shiftimm:	 dregs_hi = dregs_lo  >> uimm5
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: dregs_hi = dregs_lo >> uimm5\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($3)&0x7)<<0)                 /* src1<(dregs_lo) */
-		                  |(((-uimm5($5))&0x3f)<<3)                    /* immag<(imm5) */
-		                  |((2&0x3)<<12)                           /* HLs<(2) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LOW_REG GREATER_GREATER expr"); }
-		}
-	| HIGH_REG ASSIGN HIGH_REG GREATER_GREATER expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm5) ) {
-/* dsp32shiftimm:	dregs_hi  = dregs_hi  >> uimm5
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm:  dregs_hi = dregs_hi  >> uimm5\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($3)&0x7)<<0)                 /* src1<(dregs_hi) */
-		                  |(((-uimm5($5))&0x3f)<<3)                    /* immag<(imm5) */
-		                  |((3&0x3)<<12)                           /* HLs<(3) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
+/* 4 rules compacted */
+	| a_assign ABS REG_A
+	{
+		notethat("dsp32alu: Ax = ABS Ax\n");
+		              /* aopcde       HL   */
+		$$ = DSP32ALU (      16, IS_A1($1),
+					  /*   dst1     dst0     src0     src1 */
+							  0,       0,       0,       0,
+					  /*      s        x      aop */
+							  0,       0,  IS_A1($3)       );
+	}
 
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN HIGH_REG GREATER_GREATER expr"); }
+	| A_ZERO_DOT_L ASSIGN HALF_REG
+	{
+		if (IS_DREG_L($3)) {
+			notethat("dsp32alu: A0.l = reg_half\n");
+						  /* aopcde       HL   */
+			$$ = DSP32ALU (       9, IS_H($3),
+						  /*   dst1     dst0     src0     src1 */
+								  0,       0,     &$3,       0,
+						  /*      s        x      aop */
+								  0,       0,       0          );
+		} else {
+			return semantic_error("A0.l = Rx.l expected");
 		}
-	| REG ASSIGN REG _GREATER_GREATER_GREATER expr LPAREN S RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm5) ) {
-/*dsp32shiftimm: dregs  =  dregs >>> uimm5 ( S )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/		    	
-		    notethat("dsp32shiftimm: dregs  =  dregs >>> uimm5 ( S )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((2&0x1f)<<0)                           /* sopcde<(2) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($3)&0x7)<<0)                    /* src1<(dregs) */
-		                  |(((-uimm5($5))&0x3f)<<3)                    /* immag<(imm6) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG GREATER_GREATER_GREATER expr LPAREN S RPAREN"); }
+	| A_ONE_DOT_L ASSIGN HALF_REG
+	{
+		if (IS_DREG_L($3)) {
+			notethat("dsp32alu: A1.l = reg_half\n");
+						  /* aopcde       HL   */
+			$$ = DSP32ALU (       9, IS_H($3),
+						  /*   dst1     dst0     src0     src1 */
+								  0,       0,     &$3,       0,
+						  /*      s        x      aop */
+								  0,       0,       2          );
+		} else {
+			return semantic_error("A1.l = Rx.l expected");
 		}
-	| LOW_REG ASSIGN LOW_REG _GREATER_GREATER_GREATER expr LPAREN S RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm5) ) {
-/* dsp32shiftimm:	dregs_lo = dregs_lo >>> uimm5 ( S )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: dregs_lo = dregs_lo >>> uimm5 ( S )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($3)&0x7)<<0)                 /* src1<(dregs_lo) */
-		                  |(((-uimm5($5))&0x3f)<<3)                    /* immag<(imm5) */
-		                  |((0&0x3)<<12)                           /* HLs<(0) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN LOW_REG GREATER_GREATER_GREATER expr LPAREN S RPAREN"); }
+	| REG ASSIGN c_align LPAREN REG COMMA REG RPAREN
+	{
+		if (IS_DREG($1) && IS_DREG($5) && IS_DREG($7)) {
+		    notethat("dsp32shift: dregs = ALIGN8 ( dregs , dregs )\n");
+						  /*   sopcde   dst0     src0     src1 */
+			$$ = DSP32SHIFT (      13,   &$1,     &$7,     &$5,
+			              /*      sop      HLs */
+			                    $3.r0,       0                    );
+		} else {
+			return semantic_error("Dregs expected");
 		}
-	| HIGH_REG ASSIGN HIGH_REG _GREATER_GREATER_GREATER expr LPAREN S RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm5) ) {
-/* dsp32shiftimm:	dregs_hi  = dregs_hi  >>> uimm5 ( S )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm:  dregs_hi = dregs_hi  >>> uimm5 ( S )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($3)&0x7)<<0)                 /* src1<(dregs_hi) */
-		                  |(((-uimm5($5))&0x3f)<<3)                    /* immag<(imm5) */
-		                  |((3&0x3)<<12)                           /* HLs<(3) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN HIGH_REG GREATER_GREATER_GREATER expr LPAREN S RPAREN"); }
+ 	| REG ASSIGN BYTEOP1P LPAREN REG COLON expr COMMA REG COLON expr RPAREN
+	  byteop_mod
+	{
+		if (are_byteop_regs(&$1, &$5, $7, &$9, $11)) {
+		    notethat("dsp32alu: dregs = BYTEOP1P ( dregs_pair , dregs_pair ) (T)\n");
+		              /* aopcde       HL   */
+		$$ = DSP32ALU (      20,       0,
+					  /*   dst1     dst0     src0     src1 */
+		                      0,    &$1,      &$5,     &$9,
+					  /*      s        x      aop */
+						 $13.s0,       0,   $13.r0          );
+		} else {
+			return register_mismatch();
 		}
-	| LOW_REG ASSIGN HIGH_REG _GREATER_GREATER_GREATER expr LPAREN S RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_imm5)) {
-/* dsp32shiftimm:	 dregs_lo = dregs_hi  >>> uimm5 ( S )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm:  dregs_lo =  dregs_hi >>> uimm5 ( S )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($3)&0x7)<<0)                 /* src1<(dregs_hi) */
-		                  |(((-uimm5($5))&0x3f)<<3)                    /* immag<(imm5) */
-		                  |((1&0x3)<<12)                           /* HLs<(1) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
 
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN HIGH_REG GREATER_GREATER_GREATER expr LPAREN S RPAREN"); }
-		}
-	| HIGH_REG ASSIGN LOW_REG _GREATER_GREATER_GREATER expr LPAREN S RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm5) ) {
-/* dsp32shiftimm:	 dregs_hi = dregs_lo  >>> uimm5 ( S )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: dregs_hi = dregs_lo >>> uimm5 ( S ) \n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($3)&0x7)<<0)                 /* src1<(dregs_lo) */
-		                  |(((-uimm5($5))&0x3f)<<3)                    /* immag<(imm5) */
-		                  |((2&0x3)<<12)                           /* HLs<(2) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LOW_REG GREATER_GREATER_GREATER expr LPAREN S RPAREN"); }
+	| REG ASSIGN BYTEOP2P LPAREN REG COLON expr COMMA REG COLON expr RPAREN
+	  rnd_op
+	{
+		if (are_byteop_regs(&$1, &$5, $7, &$9, $11)) {
+		    notethat("dsp32alu: dregs = BYTEOP2P ( dregs_pair , dregs_pair ) (rnd_op)\n");
+		              /* aopcde       HL   */
+		$$ = DSP32ALU (      22,  $13.r0,
+		              /*   dst1     dst0     src0     src1 */
+		                      0,    &$1,      &$5,     &$9,
+		              /*      s        x      aop */
+		                 $13.s0,       0,   $13.x0         );
+		} else {
+			return semantic_error("Dregs expected");
 		}
-	| REG ASSIGN REG _GREATER_GREATER_GREATER expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_imm6)>=0 ) {
-/*dsp32shiftimm: dregs  =  dregs >>> imm6
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: dregs  =  dregs >>> imm6\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((2&0x1f)<<0)                           /* sopcde<(2) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($3)&0x7)<<0)                    /* src1<(dregs) */
-		                  |(((-imm6($5))&0x3f)<<3)                    /* immag<(imm6) */
-		                  |((0&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
 
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG GREATER_GREATER_GREATER expr"); }
-		}
-	| LOW_REG ASSIGN LOW_REG _GREATER_GREATER_GREATER expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm5) ) {
-/* dsp32shiftimm:	dregs_lo = dregs_lo >>> uimm4
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: dregs_lo = dregs_lo >>> uimm5\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($3)&0x7)<<0)                 /* src1<(dregs_lo) */
-		                  |(((-uimm5($5))&0x3f)<<3)                    /* immag<(imm5) */
-		                  |((0&0x3)<<12)                           /* HLs<(0) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN LOW_REG GREATER_GREATER_GREATER expr"); }
+/* 8 rules compacted */
+	| REG ASSIGN BYTEOP2M LPAREN REG COLON expr COMMA REG COLON expr RPAREN
+	  rnd_op
+	{
+		if (are_byteop_regs(&$1, &$5, $7, &$9, $11)) {
+		    notethat("dsp32alu: dregs = BYTEOP2P ( dregs_pair , dregs_pair ) (rnd_op)\n");
+		              /* aopcde       HL   */
+		$$ = DSP32ALU (      22,  $13.r0,
+		              /*   dst1     dst0     src0     src1 */
+		                      0,    &$1,      &$5,     &$9,
+		              /*      s        x      aop */
+		                 $13.s0,       0,   $13.x0         );
+		} else {
+			return semantic_error("Dregs expected");
 		}
-	| HIGH_REG ASSIGN HIGH_REG _GREATER_GREATER_GREATER expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm5) ) {
-/* dsp32shiftimm:	dregs_hi  = dregs_hi  >>> uimm4
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm:  dregs_hi = dregs_hi  >>> uimm5\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($3)&0x7)<<0)                 /* src1<(dregs_hi) */
-		                  |(((-uimm5($5))&0x3f)<<3)                    /* immag<(imm5) */
-		                  |((3&0x3)<<12)                           /* HLs<(3) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
 
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN HIGH_REG GREATER_GREATER_GREATER expr"); }
-		}
-	| LOW_REG ASSIGN HIGH_REG _GREATER_GREATER_GREATER expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm5) ) {
-/* dsp32shiftimm:	 dregs_lo = dregs_hi  >>> uimm5
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm:  dregs_lo =  dregs_hi >>> uimm5\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($3)&0x7)<<0)                 /* src1<(dregs_hi) */
-		                  |(((-uimm5($5))&0x3f)<<3)                    /* immag<(imm5) */
-		                  |((1&0x3)<<12)                           /* HLs<(1) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN HIGH_REG GREATER_GREATER_GREATER expr"); }
+	| REG ASSIGN BYTEOP3P LPAREN REG COLON expr COMMA REG COLON expr RPAREN
+	  b3_op
+	{
+		if (are_byteop_regs(&$1, &$5, $7, &$9, $11)) {
+		    notethat("dsp32alu: dregs = BYTEOP3P ( dregs_pair , dregs_pair ) (b3_op)\n");
+		              /* aopcde       HL   */
+		$$ = DSP32ALU (      23,  $13.x0,
+		              /*   dst1     dst0     src0     src1 */
+		                      0,    &$1,      &$5,     &$9,
+		              /*      s        x      aop */
+		                 $13.s0,       0,       0          );
+		} else {
+			return semantic_error("Dregs expected");
 		}
-	| HIGH_REG ASSIGN LOW_REG _GREATER_GREATER_GREATER expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm5) ) {
-/* dsp32shiftimm:	 dregs_hi = dregs_lo  >>> uimm4
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: dregs_hi = dregs_lo >>> uimm5 \n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((0&0x1f)<<0)                           /* sopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($3)&0x7)<<0)                 /* src1<(dregs_lo) */
-		                  |(((-uimm5($5))&0x3f)<<3)                    /* immag<(imm5) */
-		                  |((2&0x3)<<12)                           /* HLs<(2) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LOW_REG GREATER_GREATER_GREATER expr"); }
+	| REG ASSIGN BYTEPACK LPAREN REG COMMA REG RPAREN
+	{
+		if (IS_DREG($1) && IS_DREG($5) && IS_DREG($7)) {
+		    notethat("dsp32alu: dregs = BYTEPACK ( dregs , dregs )\n");
+		              /* aopcde       HL   */
+		$$ = DSP32ALU (      24,       0,
+		              /*   dst1     dst0     src0     src1 */
+		                      0,    &$1,      &$5,     &$7,
+		              /*      s        x      aop */
+		                      0,       0,       0          );
+		} else {
+			return semantic_error("Dregs expected");
 		}
-	| REG ASSIGN LSHIFT REG BY LOW_REG LPAREN V RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	dregs = LSHIFT dregs BY dregs_lo ( V )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs = LSHIFT dregs BY dregs_lo ( V )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((1&0x1f)<<0)                           /* sopcde<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("REG ASSIGN LSHIFT REG BY LOW_REG LPAREN V RPAREN"); }
-		}
-	| REG ASSIGN REG GREATER_GREATER expr LPAREN V RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm5)>=0 ) {
-/* dsp32shiftimm:	dregs = dregs >> uimm5 (V)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: dregs = dregs >> imm5 (V)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((1&0x1f)<<0)                           /* sopcde<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($3)&0x7)<<0)                    /* src1<(dregs) */
-		                  |(((-uimm5($5))&0x3f)<<3)                    /* immag<(imm5) */
-		                  |((2&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
+	| HALF_REG ASSIGN HALF_REG ASSIGN SIGN LPAREN HALF_REG RPAREN STAR
+	  HALF_REG PLUS SIGN LPAREN HALF_REG RPAREN STAR HALF_REG 
+	{
+		if (IS_HCOMPL($1, $3) && IS_HCOMPL($7, $14) && IS_HCOMPL($10, $17) ) {
+   		    notethat("dsp32alu:	dregs_hi = dregs_lo ="
+			         "SIGN (dregs_hi) * dregs_hi + "
+			         "SIGN (dregs_lo) * dregs_lo \n");
 
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG GREATER_GREATER expr LPAREN V RPAREN"); }
+		              /* aopcde       HL   */
+		$$ = DSP32ALU (      12,       0,
+		              /*   dst1     dst0     src0     src1 */
+		                    &$3,     &$1,     &$7,    &$10,
+		              /*      s        x      aop */
+		                      0,       0,       0          );
+		} else {
+			return semantic_error("Dregs expected");
 		}
-	| REG ASSIGN REG _GREATER_GREATER_GREATER expr LPAREN V COMMA S RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm5)>=0 ) {
-/* dsp32shiftimm:	dregs = dregs >>> uimm5 (V, S)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: dregs = dregs >>> uimm5 (V, S)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((1&0x1f)<<0)                           /* sopcde<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($3)&0x7)<<0)                    /* src1<(dregs) */
-		                  |(((-uimm5($5))&0x3f)<<3)                    /* immag<(imm5) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG GREATER_GREATER_GREATER expr LPAREN V COMMA S RPAREN"); }
-		}
-	| REG ASSIGN MAX LPAREN REG COMMA REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)) {
-/* dsp32alu:	dregs = MAX ( dregs , dregs )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = MAX ( dregs , dregs )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((7&0x1f)<<0)                           /* aopcde<(7) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN MAX LPAREN REG COMMA REG RPAREN"); }
-		}
-	| REG ASSIGN MAX LPAREN REG COMMA REG RPAREN LPAREN V RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)) {
-/* dsp32alu:	dregs = MAX / MAX ( dregs , dregs )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = MAX ( dregs , dregs ) (V)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((6&0x1f)<<0)                           /* aopcde<(6) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN MAX LPAREN REG COMMA REG RPAREN LPAREN V RPAREN"); }
-		}
-	| REG ASSIGN MIN LPAREN REG COMMA REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)) {
-/* dsp32alu:	dregs = MIN ( dregs , dregs )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = MIN ( dregs , dregs )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((7&0x1f)<<0)                           /* aopcde<(7) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN MIN LPAREN REG COMMA REG RPAREN"); }
-		}
-	| REG ASSIGN MIN LPAREN REG COMMA REG RPAREN LPAREN V RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)) {
-/* dsp32alu:	dregs = MIN ( dregs , dregs ) (V)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = MIN ( dregs , dregs ) (V)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((6&0x1f)<<0)                           /* aopcde<(6) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($7)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN MIN LPAREN REG COMMA REG RPAREN LPAREN V RPAREN"); }
-		}
-	| REG ASSIGN MINUS REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)) {
-/* ALU2op:	dregs = - dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 0 |.opc...........|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ALU2op: dregs = - dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004000
-		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                |((dregs($4)&0x7)<<3)                    /* src<(dregs) */
-		                |((14&0xf)<<6)                           /* opc<(14) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN MINUS REG"); }
-		}
-	| REG_A00 ASSIGN MINUS REG_A00
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A0
-		             && $4 == REG_A0) {
-/* dsp32alu:	A0 = - A0
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A0 = - A0\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((14&0x1f)<<0)                          /* aopcde<(14) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG_A00 ASSIGN MINUS REG_A00"); }
-		}
-	| REG_A00 ASSIGN MINUS REG_A11
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A0
-		             && $4 == REG_A1) {
-/* dsp32alu:	A0 = - A1
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A0 = - A1\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((14&0x1f)<<0)                          /* aopcde<(14) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG_A00 ASSIGN MINUS REG_A11"); }
-		}
-	| REG_A11 ASSIGN MINUS REG_A00
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A1
-		             && $4 == REG_A0) {
-/* dsp32alu:	A1 = - A0
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A1 = - A0\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		                |((14&0x1f)<<0)                          /* aopcde<(14) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG_A11 ASSIGN MINUS REG_A00"); }
-		}
-	| REG_A11 ASSIGN MINUS REG_A11
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A1
-		             && $4 == REG_A1) {
-/* dsp32alu:	A1 = - A1
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A1 = - A1\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		                |((14&0x1f)<<0)                          /* aopcde<(14) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG_A11 ASSIGN MINUS REG_A11"); }
-		}
-	| REG ASSIGN MINUS REG LPAREN V RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)) {
-/* dsp32alu:	dregs = NEG / NEG dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = - dregs (V)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((15&0x1f)<<0)                          /* aopcde<(15) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($4)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN MINUS REG LPAREN V RPAREN"); }
-		}
-	| LOW_REG ASSIGN ONES REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)) {
-/* dsp32shift:	dregs_lo = ONES dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_lo = ONES dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((6&0x1f)<<0)                           /* sopcde<(6) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($4)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((3&0x3)<<14)                           /* sop<(3) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN ONES REG"); }
-		}
-	| REG ASSIGN PACK LPAREN HIGH_REG COMMA HIGH_REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)) {
-/* dsp32shift:	dregs = PACK ( dregs_hi , dregs_hi )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs = PACK ( dregs_hi , dregs_hi )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((4&0x1f)<<0)                           /* sopcde<(4) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((dregs($7)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((3&0x3)<<14)                           /* sop<(3) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN PACK LPAREN HIGH_REG COMMA HIGH_REG RPAREN"); }
-		}
-	| REG ASSIGN PACK LPAREN HIGH_REG COMMA LOW_REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)) {
-/* dsp32shift:	dregs = PACK ( dregs_hi , dregs_lo )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs = PACK ( dregs_hi , dregs_lo )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((4&0x1f)<<0)                           /* sopcde<(4) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((dregs($7)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN PACK LPAREN HIGH_REG COMMA LOW_REG RPAREN"); }
-		}
-	| REG ASSIGN PACK LPAREN LOW_REG COMMA HIGH_REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)) {
-/* dsp32shift:	dregs = PACK ( dregs_lo , dregs_hi )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs = PACK ( dregs_lo , dregs_hi )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((4&0x1f)<<0)                           /* sopcde<(4) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((dregs($7)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN PACK LPAREN LOW_REG COMMA HIGH_REG RPAREN"); }
-		}
-	| REG ASSIGN PACK LPAREN LOW_REG COMMA LOW_REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)) {
-/* dsp32shift:	dregs = PACK ( dregs_lo , dregs_lo )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs = PACK ( dregs_lo , dregs_lo )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((4&0x1f)<<0)                           /* sopcde<(4) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((dregs($7)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN PACK LPAREN LOW_REG COMMA LOW_REG RPAREN"); }
-		}
-	| REG ASSIGN REG PLUS REG amod1 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs = dregs + dregs (amod1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = dregs + dregs (amod1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((4&0x1f)<<0)                           /* aopcde<(4) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                     /* s=amod1.s0 */
-		                  |((($6.x0)&0x1)<<12)                     /* x=amod1.x0 */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG PLUS REG LPAREN amod1 RPAREN"); }
-		}
-	| LOW_REG ASSIGN LOW_REG PLUS LOW_REG amod1
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_lo = dregs_lo + dregs_lo  (amod1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_lo = dregs_lo + dregs_lo (amod1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((2&0x1f)<<0)                           /* aopcde<(2) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($3)&0x7)<<3)                 /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                 /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                    /* s=amod1.s0 */
-		                  |((($6.x0)&0x1)<<12)                    /* x=amod1.x0 */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN LOW_REG PLUS LOW_REG LPAREN amod1 RPAREN"); }
-		}
-	| HIGH_REG ASSIGN LOW_REG PLUS LOW_REG amod1
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_hi =  dregs_lo + dregs_lo (amod1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_hi = dregs_lo + dregs_lo (amod1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		                |((2&0x1f)<<0)                           /* aopcde<(2) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                    /* s=amod1.s0 */
-		                  |((($6.x0)&0x1)<<12)                    /* x=amod1.x0 */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LOW_REG PLUS LOW_REG LPAREN amod1 RPAREN"); }
-		}
-	| LOW_REG ASSIGN LOW_REG PLUS HIGH_REG amod1 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_lo =  dregs_lo + dregs_hi (amod1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_lo = dregs_lo + dregs_hi (amod1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((2&0x1f)<<0)                           /* aopcde<(2) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                    /* s=amod1.s0 */
-		                  |((($6.x0)&0x1)<<12)                    /* x=amod1.x0 */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN LOW_REG PLUS HIGH_REG LPAREN amod1 RPAREN"); }
-		}
-	| HIGH_REG ASSIGN LOW_REG PLUS HIGH_REG amod1 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_hi = dregs_lo + dregs_hi (amod1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_hi = dregs_lo + dregs_hi (amod1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		                |((2&0x1f)<<0)                           /* aopcde<(2) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                    /* s=amod1.s0 */
-		                  |((($6.x0)&0x1)<<12)                    /* x=amod1.x0 */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN LOW_REG PLUS HIGH_REG LPAREN amod1 RPAREN"); }
-		}
-	| LOW_REG ASSIGN HIGH_REG PLUS HIGH_REG amod1 
-		{
-		  if(0) {
-		   } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_lo = dregs_hi + dregs_hi (amod1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_lo = dregs_hi + dregs_hi (amod1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((2&0x1f)<<0)                           /* aopcde<(2) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                    /* s=amod1.s0 */
-		                  |((($6.x0)&0x1)<<12)                    /* x=amod1.x0 */
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN HIGH_REG PLUS HIGH_REG LPAREN amod1 RPAREN"); }
-		}
-	| HIGH_REG ASSIGN HIGH_REG PLUS HIGH_REG amod1
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_hi = dregs_hi + dregs_hi (amod1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_hi = dregs_hi + dregs_hi (amod1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		                |((2&0x1f)<<0)                           /* aopcde<(2) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                    /* s=amod1.s0 */
-		                  |((($6.x0)&0x1)<<12)                    /* x=amod1.x0 */
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN HIGH_REG PLUS HIGH_REG LPAREN amod1 RPAREN"); }
-		}
-	| LOW_REG ASSIGN HIGH_REG PLUS LOW_REG amod1
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_lo = dregs_hi +  dregs_lo (amod1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_lo = dregs_hi +  dregs_lo (amod1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((2&0x1f)<<0)                           /* aopcde<(2) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                    /* s=amod1.s0 */
-		                  |((($6.x0)&0x1)<<12)                    /* x=amod1.x0 */
-		                  |((2&0x3)<<14)                           /* aop<(2) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN HIGH_REG PLUS LOW_REG LPAREN amod1 RPAREN"); }
-		}
-	| HIGH_REG ASSIGN HIGH_REG PLUS LOW_REG amod1
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_hi = dregs_hi + dregs_lo (amod1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_hi = dregs_hi + dregs_lo (amod1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		                |((2&0x1f)<<0)                           /* aopcde<(2) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                    /* s=amod1.s0 */
-		                  |((($6.x0)&0x1)<<12)                    /* x=amod1.x0 */
-		                  |((2&0x3)<<14)                           /* aop<(2) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN HIGH_REG PLUS LOW_REG LPAREN amod1 RPAREN"); }
-		}
-	| REG ASSIGN REG AMPERSAND REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* COMP3op:	dregs = dregs & dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 1 |.opc.......|.dst.......|.src1......|.src0......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("COMP3op: dregs = dregs & dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x005000
-		                |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                |((dregs($3)&0x7)<<0)                    /* src0<(dregs) */
-		                |((dregs($5)&0x7)<<3)                    /* src1<(dregs) */
-		                |((2&0x7)<<9)                            /* opc<(2) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG AMPERSAND REG"); }
-		}
-	| LOW_REG ASSIGN REG ASSIGN BXORSHIFT LPAREN REG_A00 COMMA REG RPAREN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && $3 == REG_CC
-		             && $7 == REG_A0
-		             && reginclass($9,rc_dregs)) {
-/* dsp32shift:	dregs_lo = CC = BXORSHIFT ( A0 , dregs ) 
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_lo = CC = BXORSHIFT ( A0 , dregs )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((11&0x1f)<<0)                          /* sopcde<(11) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($9)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN REG ASSIGN BXORSHIFT LPAREN REG_A00 COMMA REG RPAREN"); }
-		}
-	| LOW_REG ASSIGN REG ASSIGN BXOR LPAREN REG_A00 COMMA REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && $3 == REG_CC
-		             && $7 == REG_A0
-		             && reginclass($9,rc_dregs)) {
-/* dsp32shift:	dregs_lo = CC = BXOR (A0 , dregs)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_lo = CC = BXOR (A0 , dregs)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((11&0x1f)<<0)                          /* sopcde<(11) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($9)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN REG ASSIGN BXOR LPAREN REG_A00 COMMA REG RPAREN"); }
-		}
-	| LOW_REG ASSIGN REG ASSIGN BXOR LPAREN REG_A00 COMMA REG_A11 COMMA REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && $3 == REG_CC
-		             && $7 == REG_A0
-		             && $9 == REG_A1
-		             && $11 == REG_CC) {
-/* dsp32shift:	dregs_lo = CC = BXOR (A0 , A1 , CC)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_lo = CC = BXOR (A0 , A1 , CC)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((12&0x1f)<<0)                          /* sopcde<(12) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN REG ASSIGN BXOR LPAREN REG_A00 COMMA REG_A11 COMMA REG RPAREN"); }
-		}
-	| REG_A11 ASSIGN REG_A00 ASSIGN expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A1
-		             && $3 == REG_A0) {
-/* dsp32alu:	A1 = A0 = 0
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A1 = A0 = 0\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((8&0x1f)<<0)                           /* aopcde<(8) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((2&0x3)<<14)                           /* aop<(2) */
-		                  |((0&0x1)<<13)                           /* s<(0) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG_A11 ASSIGN REG_A00 ASSIGN expr"); }
-		}
-	| REG ASSIGN REG BAR REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* COMP3op:	dregs = dregs | dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 1 |.opc.......|.dst.......|.src1......|.src0......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("COMP3op: dregs = dregs | dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x005000
-		                |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                |((dregs($3)&0x7)<<0)                    /* src0<(dregs) */
-		                |((dregs($5)&0x7)<<3)                    /* src1<(dregs) */
-		                |((3&0x7)<<9)                            /* opc<(3) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG BAR REG"); }
-		}
-	| REG ASSIGN REG CARET REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* COMP3op:	dregs = dregs ^ dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 1 |.opc.......|.dst.......|.src1......|.src0......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("COMP3op: dregs = dregs ^ dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x005000
-		                |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                |((dregs($3)&0x7)<<0)                    /* src0<(dregs) */
-		                |((dregs($5)&0x7)<<3)                    /* src1<(dregs) */
-		                |((4&0x7)<<9)                            /* opc<(4) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG CARET REG"); }
-		}
-	| REG ASSIGN REG_A00 LESS_THAN REG_A11
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && $3 == REG_A0
-		             && $5 == REG_A1) {
-/* CCflag:	CC = A0 < A1
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = A0 < A1\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((6&0x7)<<7)                            /* opc<(6) */
-		                |((0&0x1)<<10)                           /* I<(0) */
-		                |((0&0x1)<<6)                            /* G<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG_A00 LESS_THAN REG_A11"); }
-		}
-	| REG ASSIGN REG LESS_THAN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($3,rc_pregs)
-		             && reginclass($5,rc_pregs)) {
-/* CCflag:	CC = pregs < pregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = pregs < pregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((pregs($3)&0x7)<<0)                    /* x<(pregs) */
-		                |((pregs($5)&0x7)<<3)                    /* y<(pregs) */
-		                |((1&0x7)<<7)                            /* opc<(1) */
-		                |((0&0x1)<<10)                           /* I<(0) */
-		                |((1&0x1)<<6)                            /* G<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* CCflag:	CC = dregs < dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = dregs < dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((dregs($3)&0x7)<<0)                    /* x<(dregs) */
-		                |((dregs($5)&0x7)<<3)                    /* y<(dregs) */
-		                |((1&0x7)<<7)                            /* opc<(1) */
-		                |((0&0x1)<<10)                           /* I<(0) */
-		                |((0&0x1)<<6)                            /* G<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG LESS_THAN REG"); }
-		}
-	| REG ASSIGN REG LESS_THAN REG LPAREN IU RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* CCflag:	CC = dregs < dregs ( IU )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = dregs < dregs ( IU )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((dregs($3)&0x7)<<0)                    /* x<(dregs) */
-		                |((dregs($5)&0x7)<<3)                    /* y<(dregs) */
-		                |((3&0x7)<<7)                            /* opc<(3) */
-		                |((0&0x1)<<10)                           /* I<(0) */
-		                |((0&0x1)<<6)                            /* G<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($3,rc_pregs)
-		             && reginclass($5,rc_pregs)) {
-/* CCflag:	CC = pregs < pregs ( IU )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = pregs < pregs ( IU )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((pregs($3)&0x7)<<0)                    /* x<(pregs) */
-		                |((pregs($5)&0x7)<<3)                    /* y<(pregs) */
-		                |((3&0x7)<<7)                            /* opc<(3) */
-		                |((0&0x1)<<10)                           /* I<(0) */
-		                |((1&0x1)<<6)                            /* G<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG LESS_THAN REG LPAREN IU RPAREN"); }
-		}
-	| REG ASSIGN REG LESS_THAN expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_imm3)) {
-/* CCflag:	CC = dregs < imm3
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = dregs < imm3\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((dregs($3)&0x7)<<0)                    /* x<(dregs) */
-		                |((imm3($5)&0x7)<<3)                     /* y<(imm3) */
-		                |((1&0x7)<<7)                            /* opc<(1) */
-		                |((1&0x1)<<10)                           /* I<(1) */
-		                |((0&0x1)<<6)                            /* G<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($3,rc_pregs)
-		             && const_fits($5,c_imm3)) {
-/* CCflag:	CC = pregs < imm3
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = pregs < imm3\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((pregs($3)&0x7)<<0)                    /* x<(pregs) */
-		                |((imm3($5)&0x7)<<3)                     /* y<(imm3) */
-		                |((1&0x7)<<7)                            /* opc<(1) */
-		                |((1&0x1)<<10)                           /* I<(1) */
-		                |((1&0x1)<<6)                            /* G<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG LESS_THAN expr"); }
-		}
-	| REG ASSIGN REG LESS_THAN expr LPAREN IU RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm3)) {
-/* CCflag:	CC = dregs < uimm3 ( IU )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = dregs < uimm3 ( IU )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((dregs($3)&0x7)<<0)                    /* x<(dregs) */
-		                |((uimm3($5)&0x7)<<3)                    /* y<(uimm3) */
-		                |((3&0x7)<<7)                            /* opc<(3) */
-		                |((1&0x1)<<10)                           /* I<(1) */
-		                |((0&0x1)<<6)                            /* G<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($3,rc_pregs)
-		             && const_fits($5,c_uimm3)) {
-/* CCflag:	CC = pregs < uimm3 ( IU )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = pregs < uimm3 ( IU )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((pregs($3)&0x7)<<0)                    /* x<(pregs) */
-		                |((uimm3($5)&0x7)<<3)                    /* y<(uimm3) */
-		                |((3&0x7)<<7)                            /* opc<(3) */
-		                |((1&0x1)<<10)                           /* I<(1) */
-		                |((1&0x1)<<6)                            /* G<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG LESS_THAN expr LPAREN IU RPAREN"); }
-		}
-	| REG ASSIGN REG MINUS REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* COMP3op:	dregs = dregs - dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 1 |.opc.......|.dst.......|.src1......|.src0......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("COMP3op: dregs = dregs - dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x005000
-		                |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                |((dregs($3)&0x7)<<0)                    /* src0<(dregs) */
-		                |((dregs($5)&0x7)<<3)                    /* src1<(dregs) */
-		                |((1&0x7)<<9)                            /* opc<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG MINUS REG"); }
-		}
-	| REG ASSIGN REG PLUS REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* COMP3op:	dregs = dregs + dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 1 |.opc.......|.dst.......|.src1......|.src0......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("COMP3op: dregs = dregs + dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x005000
-		                |((dregs($1)&0x7)<<6)                    /* dst<(dregs) */
-		                |((dregs($3)&0x7)<<0)                    /* src0<(dregs) */
-		                |((dregs($5)&0x7)<<3)                    /* src1<(dregs) */
-		                |((0&0x7)<<9)                            /* opc<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_pregs)
-		             && reginclass($3,rc_pregs)
-		             && reginclass($5,rc_pregs)) {
-/* COMP3op:	pregs = pregs + pregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 1 |.opc.......|.dst.......|.src1......|.src0......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
+// XXX This is an 'intrinsically redundant' one. (Nice word, huh ?)
+//     We have a problem if we want to use this in a parallel instruction
+//     where we have to use the 32 bit variant instead of the 16 bit one
+//     of this assigment. Do we solve this with an assembler flag or
+//     'switch' the opcodes if we detect a parallel command being issued ?
+	| REG ASSIGN REG plus_minus REG amod1 
+	{
+		if (IS_DREG($1) && IS_DREG($3) && IS_DREG($5)) {
+			// XXX For the moment, we always use the 16 bit variant
+			if (0) {
+				notethat("dsp32alu: dregs = dregs +- dregs (amod1)\n");
+						  /* aopcde       HL                   */
+				$$ = DSP32ALU (   4,       0,
+						  /*   dst1     dst0     src0     src1 */
+								  0,     &$1,     &$3,     &$5,
+						  /*      s        x      aop          */
+							  $6.s0,   $6.x0,   $4.r0          );
+			} else {
+				notethat("COMP3op: dregs = dregs +- dregs\n");
+				$$ = COMP3OP (&$1, &$3, &$5, $4.r0);
+			}
+		} else
+		if (IS_PREG($1) && IS_PREG($3) && IS_PREG($5) && $4.r0 == 0) {
 		    notethat("COMP3op: pregs = pregs + pregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x005000
-		                |((pregs($1)&0x7)<<6)                    /* dst<(pregs) */
-		                |((pregs($3)&0x7)<<0)                    /* src0<(pregs) */
-		                |((pregs($5)&0x7)<<3)                    /* src1<(pregs) */
-		                |((5&0x7)<<9)                            /* opc<(5) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG PLUS REG"); }
+			$$ = COMP3OP (&$1, &$3, &$5, 5);
+		} else {
+			return semantic_error("Dregs expected");
 		}
-	| REG ASSIGN REG PLUS LPAREN REG LESS_LESS expr RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_pregs)
-		             && reginclass($3,rc_pregs)
-		             && reginclass($6,rc_pregs)
-		             && EXPR_VALUE($8) == 1) {
-/* COMP3op:	pregs = pregs + (pregs << 1)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 1 |.opc.......|.dst.......|.src1......|.src0......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("COMP3op: pregs = pregs + (pregs << 1)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x005000
-		                |((pregs($1)&0x7)<<6)                    /* dst<(pregs) */
-		                |((pregs($3)&0x7)<<0)                    /* src0<(pregs) */
-		                |((pregs($6)&0x7)<<3)                    /* src1<(pregs) */
-		                |((6&0x7)<<9)                            /* opc<(6) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_pregs)
-		             && reginclass($3,rc_pregs)
-		             && reginclass($6,rc_pregs)
-		             && EXPR_VALUE($8) == 2) {
-/* COMP3op:	pregs = pregs + (pregs << 2)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 1 |.opc.......|.dst.......|.src1......|.src0......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("COMP3op: pregs = pregs + (pregs << 2)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x005000
-		                |((pregs($1)&0x7)<<6)                    /* dst<(pregs) */
-		                |((pregs($3)&0x7)<<0)                    /* src0<(pregs) */
-		                |((pregs($6)&0x7)<<3)                    /* src1<(pregs) */
-		                |((7&0x7)<<9)                            /* opc<(7) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG PLUS LPAREN REG LESS_LESS expr RPAREN"); }
-		}
-	| REG_A00 ASSIGN REG_A00 LPAREN S RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A0
-		             && $3 == REG_A0) {
-/* dsp32alu:	A0 = A0 (S)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A0 = A0 (S)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((8&0x1f)<<0)                           /* aopcde<(8) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		                  |((1&0x1)<<13)                           /* s<(1) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("REG_A00 ASSIGN REG_A00 LPAREN S RPAREN"); }
-		}
-	| REG_A11 ASSIGN REG_A11 LPAREN S RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A1
-		             && $3 == REG_A1) {
-/* dsp32alu:	A1 = A1 (S)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A1 = A1 (S)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((8&0x1f)<<0)                           /* aopcde<(8) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		                  |((1&0x1)<<13)                           /* s<(1) */
-		          ),
-		          NULL_CODE));
+/* 4 rules compacted */
+	| REG ASSIGN min_max LPAREN REG COMMA REG RPAREN vmod
+	{
+		int op;
 
-		  } else { $$ = 0; semantic_error ("REG_A11 ASSIGN REG_A11 LPAREN S RPAREN"); }
-		}
-	| REG ASSIGN REG_A00 _ASSIGN_ASSIGN REG_A11
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && $3 == REG_A0
-		             && $5 == REG_A1) {
-/* CCflag:	CC = A0 == A1
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = A0 == A1\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((5&0x7)<<7)                            /* opc<(5) */
-		                |((0&0x1)<<10)                           /* I<(0) */
-		                |((0&0x1)<<6)                            /* G<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG_A00 _ASSIGN_ASSIGN REG_A11"); }
-		}
-	| REG ASSIGN REG _ASSIGN_ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($3,rc_pregs)
-		             && reginclass($5,rc_pregs)) {
-/* CCflag:	CC = pregs == pregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = pregs == pregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((pregs($3)&0x7)<<0)                    /* x<(pregs) */
-		                |((pregs($5)&0x7)<<3)                    /* y<(pregs) */
-		                |((0&0x7)<<7)                            /* opc<(0) */
-		                |((0&0x1)<<10)                           /* I<(0) */
-		                |((1&0x1)<<6)                            /* G<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* CCflag:	CC = dregs == dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = dregs == dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((dregs($3)&0x7)<<0)                    /* x<(dregs) */
-		                |((dregs($5)&0x7)<<3)                    /* y<(dregs) */
-		                |((0&0x7)<<7)                            /* opc<(0) */
-		                |((0&0x1)<<10)                           /* I<(0) */
-		                |((0&0x1)<<6)                            /* G<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG _ASSIGN_ASSIGN REG"); }
-		}
-	| REG ASSIGN REG _ASSIGN_ASSIGN expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_imm3)) {
-/* CCflag:	CC = dregs == imm3
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = dregs == imm3\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((dregs($3)&0x7)<<0)                    /* x<(dregs) */
-		                |((imm3($5)&0x7)<<3)                     /* y<(imm3) */
-		                |((0&0x7)<<7)                            /* opc<(0) */
-		                |((1&0x1)<<10)                           /* I<(1) */
-		                |((0&0x1)<<6)                            /* G<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($3,rc_pregs)
-		             && const_fits($5,c_imm3)) {
-/* CCflag:	CC = pregs == imm3
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = pregs == imm3\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((pregs($3)&0x7)<<0)                    /* x<(pregs) */
-		                |((imm3($5)&0x7)<<3)                     /* y<(imm3) */
-		                |((0&0x7)<<7)                            /* opc<(0) */
-		                |((1&0x1)<<10)                           /* I<(1) */
-		                |((1&0x1)<<6)                            /* G<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG _ASSIGN_ASSIGN expr"); }
-		}
-	| REG ASSIGN REG_A00 _LESS_THAN_ASSIGN REG_A11
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && $3 == REG_A0
-		             && $5 == REG_A1) {
-/* CCflag:	CC = A0 <= A1
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = A0 <= A1\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((7&0x7)<<7)                            /* opc<(7) */
-		                |((0&0x1)<<10)                           /* I<(0) */
-		                |((0&0x1)<<6)                            /* G<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG_A00 _LESS_THAN_ASSIGN REG_A11"); }
-		}
-	| REG ASSIGN REG _LESS_THAN_ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($3,rc_pregs)
-		             && reginclass($5,rc_pregs)) {
-/* CCflag:	CC = pregs <= pregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = pregs <= pregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((pregs($3)&0x7)<<0)                    /* x<(pregs) */
-		                |((pregs($5)&0x7)<<3)                    /* y<(pregs) */
-		                |((2&0x7)<<7)                            /* opc<(2) */
-		                |((0&0x1)<<10)                           /* I<(0) */
-		                |((1&0x1)<<6)                            /* G<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* CCflag:	CC = dregs <= dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = dregs <= dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((dregs($3)&0x7)<<0)                    /* x<(dregs) */
-		                |((dregs($5)&0x7)<<3)                    /* y<(dregs) */
-		                |((2&0x7)<<7)                            /* opc<(2) */
-		                |((0&0x1)<<10)                           /* I<(0) */
-		                |((0&0x1)<<6)                            /* G<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG _LESS_THAN_ASSIGN REG"); }
-		}
-	| REG ASSIGN REG _LESS_THAN_ASSIGN REG LPAREN IU RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* CCflag:	CC = dregs <= dregs ( IU )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = dregs <= dregs ( IU )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((dregs($3)&0x7)<<0)                    /* x<(dregs) */
-		                |((dregs($5)&0x7)<<3)                    /* y<(dregs) */
-		                |((4&0x7)<<7)                            /* opc<(4) */
-		                |((0&0x1)<<10)                           /* I<(0) */
-		                |((0&0x1)<<6)                            /* G<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($3,rc_pregs)
-		             && reginclass($5,rc_pregs)) {
-/* CCflag:	CC = pregs <= pregs ( IU )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = pregs <= pregs ( IU )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((pregs($3)&0x7)<<0)                    /* x<(pregs) */
-		                |((pregs($5)&0x7)<<3)                    /* y<(pregs) */
-		                |((4&0x7)<<7)                            /* opc<(4) */
-		                |((0&0x1)<<10)                           /* I<(0) */
-		                |((1&0x1)<<6)                            /* G<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG _LESS_THAN_ASSIGN REG LPAREN IU RPAREN"); }
-		}
-	| REG ASSIGN REG _LESS_THAN_ASSIGN expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_imm3)) {
-/* CCflag:	CC = dregs <= imm3
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = dregs <= imm3\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((dregs($3)&0x7)<<0)                    /* x<(dregs) */
-		                |((imm3($5)&0x7)<<3)                     /* y<(imm3) */
-		                |((2&0x7)<<7)                            /* opc<(2) */
-		                |((1&0x1)<<10)                           /* I<(1) */
-		                |((0&0x1)<<6)                            /* G<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($3,rc_pregs)
-		             && const_fits($5,c_imm3)) {
-/* CCflag:	CC = pregs <= imm3
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = pregs <= imm3\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((pregs($3)&0x7)<<0)                    /* x<(pregs) */
-		                |((imm3($5)&0x7)<<3)                     /* y<(imm3) */
-		                |((2&0x7)<<7)                            /* opc<(2) */
-		                |((1&0x1)<<10)                           /* I<(1) */
-		                |((1&0x1)<<6)                            /* G<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG _LESS_THAN_ASSIGN expr"); }
-		}
-	| REG ASSIGN REG _LESS_THAN_ASSIGN expr LPAREN IU RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($3,rc_dregs)
-		             && const_fits($5,c_uimm3)) {
-/* CCflag:	CC = dregs <= uimm3 ( IU )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = dregs <= uimm3 ( IU )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((dregs($3)&0x7)<<0)                    /* x<(dregs) */
-		                |((uimm3($5)&0x7)<<3)                    /* y<(uimm3) */
-		                |((4&0x7)<<7)                            /* opc<(4) */
-		                |((1&0x1)<<10)                           /* I<(1) */
-		                |((0&0x1)<<6)                            /* G<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($3,rc_pregs)
-		             && const_fits($5,c_uimm3)) {
-/* CCflag:	CC = pregs <= uimm3 ( IU )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 1 |.I.|.opc.......|.G.|.y.........|.x.........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CCflag: CC = pregs <= uimm3 ( IU )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000800
-		                |((pregs($3)&0x7)<<0)                    /* x<(pregs) */
-		                |((uimm3($5)&0x7)<<3)                    /* y<(uimm3) */
-		                |((4&0x7)<<7)                            /* opc<(4) */
-		                |((1&0x1)<<10)                           /* I<(1) */
-		                |((1&0x1)<<6)                            /* G<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG _LESS_THAN_ASSIGN expr LPAREN IU RPAREN"); }
-		}
-	| LOW_REG ASSIGN REG LPAREN RND RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)) {
-/* dsp32alu:	dregs_lo = dregs (RND)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_lo = dregs (RND)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((12&0x1f)<<0)                          /* aopcde<(12) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN REG LPAREN RND RPAREN"); }
-		}
-	| HIGH_REG ASSIGN REG LPAREN RND RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)) {
-/* dsp32alu:	dregs_hi = dregs (RND)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_hi = dregs (RND)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		                |((12&0x1f)<<0)                          /* aopcde<(12) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN REG LPAREN RND RPAREN"); }
-		}
-	| LOW_REG ASSIGN REG MINUS REG LPAREN RND12 RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_lo = dregs - dregs (RND12)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_lo = dregs - dregs (RND12)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((5&0x1f)<<0)                           /* aopcde<(5) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((0&0x1)<<12)                           /* x<(0) */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN REG MINUS REG LPAREN RND12 RPAREN"); }
-		}
-	| HIGH_REG ASSIGN REG MINUS REG LPAREN RND12 RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_hi = dregs - dregs (RND12)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_hi = dregs - dregs (RND12)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		                |((5&0x1f)<<0)                           /* aopcde<(5) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((0&0x1)<<12)                           /* x<(0) */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN REG MINUS REG LPAREN RND12 RPAREN"); }
-		}
-	| LOW_REG ASSIGN REG PLUS REG LPAREN RND12 RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_lo =  dregs + dregs (RND12)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_lo = dregs + dregs (RND12)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((5&0x1f)<<0)                           /* aopcde<(5) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((0&0x1)<<12)                           /* x<(0) */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN REG PLUS REG LPAREN RND12 RPAREN"); }
-		}
-	| HIGH_REG ASSIGN REG PLUS REG LPAREN RND12 RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_hi = dregs + dregs (RND12)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_hi = dregs + dregs (RND12)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		                |((5&0x1f)<<0)                           /* aopcde<(5) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((0&0x1)<<12)                           /* x<(0) */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN REG PLUS REG LPAREN RND12 RPAREN"); }
-		}
-	| LOW_REG ASSIGN REG MINUS REG LPAREN RND20 RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_lo = dregs - dregs (RND20)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_lo = dregs - dregs (RND20)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((5&0x1f)<<0)                           /* aopcde<(5) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((1&0x1)<<12)                           /* x<(1) */
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN REG MINUS REG LPAREN RND20 RPAREN"); }
-		}
-	| HIGH_REG ASSIGN REG MINUS REG LPAREN RND20 RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_hi =  dregs - dregs (RND20)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_hi = dregs - dregs (RND20)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		                |((5&0x1f)<<0)                           /* aopcde<(5) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((1&0x1)<<12)                           /* x<(1) */
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN REG MINUS REG LPAREN RND20 RPAREN"); }
-		}
-	|  LOW_REG ASSIGN REG PLUS REG LPAREN RND20 RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_lo =  dregs + dregs (RND20)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_lo = dregs + dregs (RND20)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((5&0x1f)<<0)                           /* aopcde<(5) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((1&0x1)<<12)                           /* x<(1) */
-		                  |((2&0x3)<<14)                           /* aop<(2) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN REG PLUS REG LPAREN RND20 RPAREN"); }
-		}
-	|  HIGH_REG ASSIGN REG PLUS REG LPAREN RND20 RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs_hi =  dregs + dregs (RND20)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_hi = dregs + dregs (RND20)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((1&0x1)<<5)                            /* HL<(1) */
-		                |((5&0x1f)<<0)                           /* aopcde<(5) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_hi) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((1&0x1)<<12)                           /* x<(1) */
-		                  |((2&0x3)<<14)                           /* aop<(2) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN REG PLUS REG LPAREN RND20 RPAREN"); }
-		}
-	| REG_A00 ASSIGN REG_A11
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A0
-		             && $3 == REG_A1) {
-/* dsp32alu:	A0 = A1
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A0 = A1\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((8&0x1f)<<0)                           /* aopcde<(8) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		                  |((0&0x1)<<13)                           /* s<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG_A00 ASSIGN REG_A11"); }
-		}
-	| REG_A11 ASSIGN REG_A00
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A1
-		             && $3 == REG_A0) {
-/* dsp32alu:	A1 = A0
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A1 = A0\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((8&0x1f)<<0)                           /* aopcde<(8) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		                  |((1&0x1)<<13)                           /* s<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG_A11 ASSIGN REG_A00"); }
-		}
-	| REG_A00 ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A0
-		             && reginclass($3,rc_dregs)) {
-/* dsp32alu:	A0 = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A0 = dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((9&0x1f)<<0)                           /* aopcde<(9) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		                  |((1&0x1)<<13)                           /* s<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG_A00 ASSIGN REG"); }
-		}
-	| REG_A11 ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A1
-		             && reginclass($3,rc_dregs)) {
-/* dsp32alu:	A1 = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A1 = dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((9&0x1f)<<0)                           /* aopcde<(9) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((2&0x3)<<14)                           /* aop<(2) */
-		                  |((1&0x1)<<13)                           /* s<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG_A11 ASSIGN REG"); }
-		}
-	| REG ASSIGN MODIFIED_STATUS_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC 
-		             && (($3==0) || ($3==1) || ($3==6) || ($3==2) || ($3==3) || ($3==4)) ) {
-/* CC2stat:	CC = statbits
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 |.D.|.op....|.cbit..............|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CC2stat: CC = statbits\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000300
-		                |(($3&0x1f)<<0)                /* cbit<(statbits) */
-		                |((0&0x3)<<5)                            /* op<(0) */
-		                |((0&0x1)<<7)                            /* D<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN MODIFIED_STATUS_REG"); }
-		}
-	| MODIFIED_STATUS_REG ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && (($1==0) || ($1==1) || ($1==6) || ($1==2) || ($1==3) || ($1==4))
-		             && $3 == REG_CC) {
-/* CC2stat:	statbits = CC
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 |.D.|.op....|.cbit..............|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CC2stat: statbits = CC\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000300
-		                |(($1&0x1f)<<0)                /* cbit<(statbits) */
-		                |((0&0x3)<<5)                            /* op<(0) */
-		                |((1&0x1)<<7)                            /* D<(1) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("MODIFIED_STATUS_REG ASSIGN REG"); }
-		}
-	| REG ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_allregs)
-		             && reginclass($3,rc_allregs)) {
-/* REGMV:	allregs = allregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 1 | 1 |.gd........|.gs........|.dst.......|.src.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("REGMV: allregs = allregs\n");
-		    $$ = 
-		      CONSCODE(
-		        GENCODE(0x003000
-		                |((allregs($1)&0x7)<<3)                  /* dst<(allregs) */
-		                |((allregs($3)&0x7)<<0)                  /* src<(allregs) */
-		                |((Xallregs($3)&0x7)<<6)                 /* gs<(Xallregs($3)) */
-		                |((Xallregs($1)&0x7)<<9)                 /* gd<(Xallregs($1)) */
-		        ),
-		        NULL_CODE);
-
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC 
-		             && reginclass($3,rc_dregs)) {
-/* CC2dreg:	CC = dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 |.op....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CC2dreg: CC = dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000200
-		                |((dregs($3)&0x7)<<0)                    /* reg<(dregs) */
-		                |((1&0x3)<<3)                            /* op<(1) */
-		        ),
-		        NULL_CODE);
-
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && $3 == REG_CC) {
-/* CC2dreg:	dregs = CC
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 |.op....|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CC2dreg: dregs = CC\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000200
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((0&0x3)<<3)                            /* op<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG"); }
-		}
-	| REG ASSIGN LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A0x
-		             && reginclass($3,rc_dregs)) {
-/* dsp32alu:	A0.x = dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A0.x = dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((9&0x1f)<<0)                           /* aopcde<(9) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($3)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		                  |((0&0x1)<<13)                           /* s<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A1x
-		             && reginclass($3,rc_dregs)) {
-/* dsp32alu:	A1.x = dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A1.x = dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((9&0x1f)<<0)                           /* aopcde<(9) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($3)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		                  |((0&0x1)<<13)                           /* s<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)) {
-/* ALU2op:	dregs = dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 0 |.opc...........|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ALU2op: dregs = dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004000
-		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                |((dregs($3)&0x7)<<3)                    /* src<(dregs) */
-		                |((11&0xf)<<6)                           /* opc<(11) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN LOW_REG"); }
-		}
-	| LOW_REG ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && $3 == REG_A0x) {
-/* dsp32alu:	dregs_lo = A0.x
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_lo = A0.x\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((10&0x1f)<<0)                          /* aopcde<(10) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && $3 == REG_A1x) {
-/* dsp32alu:	dregs_lo = A1.x
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs_lo = A1.x\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((10&0x1f)<<0)                          /* aopcde<(10) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN REG"); }
-		}
-	| REG ASSIGN BYTE_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)) {
-/* ALU2op:	dregs = dregs_byte
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 0 |.opc...........|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ALU2op: dregs = dregs_byte\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004000
-		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                |((dregs($3)&0x7)<<3)                    /* src<(dregs) */
-		                |((13&0xf)<<6)                           /* opc<(13) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTE_REG"); }
-		}
-	| REG_A00 ASSIGN ROT REG_A00 BY LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A0
-		             && $4 == REG_A0
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	A0 = ROT  A0 BY dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: A0 = ROT A0 BY dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((3&0x1f)<<0)                           /* sopcde<(3) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		                  |((0&0x3)<<12)                           /* HLs<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG_A00 ASSIGN ROT REG_A00 BY LOW_REG"); }
-		}
-	| REG_A11 ASSIGN ROT REG_A11 BY LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A1
-		             && $4 == REG_A1
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	A1 = ROT A1 BY dregs_lo 
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: A1 = ROT A1 BY dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((3&0x1f)<<0)                           /* sopcde<(3) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		                  |((1&0x3)<<12)                           /* HLs<(1) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG_A11 ASSIGN ROT REG_A11 BY LOW_REG"); }
-		}
-	| REG ASSIGN ROT REG BY LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($6,rc_dregs)) {
-/* dsp32shift:	dregs = ROT dregs BY dregs_lo 
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs = ROT dregs BY dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((2&0x1f)<<0)                           /* sopcde<(2) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((dregs($6)&0x7)<<3)                 /* src0<(dregs_lo) */
-		                  |((3&0x3)<<14)                           /* sop<(3) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN ROT REG BY LOW_REG"); }
-		}
-	| REG_A00 ASSIGN ROT REG_A00 BY expr 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A0
-		             && $4 == REG_A0
-		             && const_fits($6,c_imm6)) {
-/* dsp32shiftimm:	A0 = ROT A0 BY imm6
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: A0 = ROT A0 BY imm6\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((3&0x1f)<<0)                           /* sopcde<(3) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((imm6($6)&0x3f)<<3)                    /* immag<(imm6) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		                  |((0&0x3)<<12)                           /* HLs<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG_A00 ASSIGN ROT REG_A00 BY expr"); }
-		}
-	| REG_A11 ASSIGN ROT REG_A11 BY expr 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A1
-		             && $4 == REG_A1
-		             && const_fits($6,c_imm6)) {
-/* dsp32shiftimm:	A1 = ROT A1 BY imm6
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: A1 = ROT A1 BY imm6\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((3&0x1f)<<0)                           /* sopcde<(3) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((imm6($6)&0x3f)<<3)                    /* immag<(imm6) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		                  |((1&0x3)<<12)                           /* HLs<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG_A11 ASSIGN ROT REG_A11 BY expr"); }
-		}
-	| REG ASSIGN ROT REG BY expr 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && const_fits($6,c_imm6)) {
-/* dsp32shiftimm:	dregs = ROT dregs BY imm6
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 1 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......|.immag.................|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shiftimm: dregs = ROT dregs BY imm6\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c680
-		                |((2&0x1f)<<0)                           /* sopcde<(2) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($4)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((imm6($6)&0x3f)<<3)                    /* immag<(imm6) */
-		                  |((3&0x3)<<14)                           /* sop<(3) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN ROT REG BY expr"); }
-		}
-	| LOW_REG ASSIGN SIGNBITS REG_A00
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && $4 == REG_A0) {
-/* dsp32shift:	dregs_lo = SIGNBITS A0
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_lo = SIGNBITS A0\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((6&0x1f)<<0)                           /* sopcde<(6) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN SIGNBITS REG_A00"); }
-		}
-	| LOW_REG ASSIGN SIGNBITS REG_A11
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && $4 == REG_A1) {
-/* dsp32shift:	dregs_lo = SIGNBITS A1
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_lo = SIGNBITS A1\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((6&0x1f)<<0)                           /* sopcde<(6) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN SIGNBITS REG_A11"); }
-		}
-	| LOW_REG ASSIGN SIGNBITS REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)) {
-/* dsp32shift:	dregs_lo = SIGNBITS dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_lo = SIGNBITS dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((5&0x1f)<<0)                           /* sopcde<(5) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($4)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN SIGNBITS REG"); }
-		}
-	| LOW_REG ASSIGN SIGNBITS LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)) {
-/* dsp32shift:	dregs_lo = SIGNBITS dregs_lo
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_lo = SIGNBITS dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((5&0x1f)<<0)                           /* sopcde<(5) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($4)&0x7)<<0)                 /* src1<(dregs_lo) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN SIGNBITS LOW_REG"); }
-		}
-	| LOW_REG ASSIGN SIGNBITS HIGH_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)) {
-/* dsp32shift:	dregs_lo = SIGNBITS dregs_hi
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_lo = SIGNBITS dregs_hi\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((5&0x1f)<<0)                           /* sopcde<(5) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($4)&0x7)<<0)                 /* src1<(dregs_hi) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN SIGNBITS HIGH_REG"); }
-		}
-	| REG ASSIGN TILDA REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)) {
-/* ALU2op:	dregs = ~ dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 0 |.opc...........|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ALU2op: dregs = ~ dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004000
-		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                |((dregs($4)&0x7)<<3)                    /* src<(dregs) */
-		                |((15&0xf)<<6)                           /* opc<(15) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN TILDA REG"); }
-		}
-	| LOW_REG ASSIGN VIT_MAX LPAREN REG RPAREN LPAREN ASR RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32shift:	dregs_lo = VIT_MAX (dregs) (ASR)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_lo = VIT_MAX (dregs) (ASR)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((9&0x1f)<<0)                           /* sopcde<(9) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN VIT_MAX LPAREN REG RPAREN LPAREN ASR RPAREN"); }
-		}
-	| LOW_REG ASSIGN VIT_MAX LPAREN REG RPAREN LPAREN ASL RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32shift:	dregs_lo = VIT_MAX (dregs) (ASL)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs_lo = VIT_MAX (dregs) (ASL)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((9&0x1f)<<0)                           /* sopcde<(9) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                 /* dst0<(dregs_lo) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN VIT_MAX LPAREN REG RPAREN LPAREN ASL RPAREN"); }
-		}
-	| REG ASSIGN VIT_MAX LPAREN REG COMMA REG RPAREN LPAREN ASR RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)) {
-/* dsp32shift:	dregs = VIT_MAX (dregs, dregs) (ASR)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs = VIT_MAX (dregs, dregs) (ASR)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((9&0x1f)<<0)                           /* sopcde<(9) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((dregs($7)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((3&0x3)<<14)                           /* sop<(3) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN VIT_MAX LPAREN REG COMMA REG RPAREN LPAREN ASR RPAREN"); }
-		}
-	| REG ASSIGN VIT_MAX LPAREN REG COMMA REG RPAREN LPAREN ASL RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && reginclass($7,rc_dregs)) {
-/* dsp32shift:	dregs = VIT_MAX (dregs, dregs) (ASL)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: dregs = VIT_MAX (dregs, dregs) (ASL)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((9&0x1f)<<0)                           /* sopcde<(9) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((dregs($7)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((2&0x3)<<14)                           /* sop<(2) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN VIT_MAX LPAREN REG COMMA REG RPAREN LPAREN ASL RPAREN"); }
-		}
-	| REG ASSIGN B LBRACK REG PLUS expr RBRACK LPAREN X RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)
-		             && const_fits($7,c_imm16)) {
-/* LDSTidxI:	dregs = B [ pregs + imm16 ] (x)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 1 |.W.|.Z.|.sz....|.ptr.......|.reg.......|
-|.offset........................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTidxI: dregs = B [ pregs + imm16 ] (x)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00e400
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($5)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		                |((2&0x3)<<6)                            /* sz<(2) */
-		                |((1&0x1)<<8)                            /* Z<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((imm16($7)&0xffff)<<0)                 /* offset<(imm16) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN B LBRACK REG PLUS expr RBRACK LPAREN X RPAREN"); }
-		}
-	| REG ASSIGN B LBRACK REG RBRACK LPAREN X RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)) {
-/* LDST:	dregs = B [ pregs ] (x)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: dregs = B [ pregs ] (x)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($5)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((2&0x3)<<7)                            /* aop<(2) */
-		                |((2&0x3)<<10)                           /* sz<(2) */
-		                |((1&0x1)<<6)                            /* Z<(1) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN B LBRACK REG RBRACK LPAREN X RPAREN"); }
-		}
-	| REG ASSIGN B LBRACK REG _MINUS_MINUS RBRACK LPAREN X RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)) {
-/* LDST:	dregs = B [ pregs -- ] (x)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: dregs = B [ pregs -- ] (x)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($5)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((1&0x3)<<7)                            /* aop<(1) */
-		                |((2&0x3)<<10)                           /* sz<(2) */
-		                |((1&0x1)<<6)                            /* Z<(1) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN B LBRACK REG _MINUS_MINUS RBRACK LPAREN X RPAREN"); }
-		}
-	| REG ASSIGN B LBRACK REG _PLUS_PLUS RBRACK LPAREN X RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)) {
-/* LDST:	dregs = B [ pregs ++ ] (x)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: dregs = B [ pregs ++ ] (x)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($5)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((0&0x3)<<7)                            /* aop<(0) */
-		                |((2&0x3)<<10)                           /* sz<(2) */
-		                |((1&0x1)<<6)                            /* Z<(1) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN B LBRACK REG _PLUS_PLUS RBRACK LPAREN X RPAREN"); }
-		}
-	| REG ASSIGN W LBRACK REG PLUS expr RBRACK LPAREN X RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)
-		             && const_fits($7,c_uimm4s2)) {
-/* LDSTii:	dregs = W [ pregs + uimm4s2 ] (x)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 1 |.W.|.op....|.offset........|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTii: dregs = W [ pregs + uimm4s2 ] (x)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00a000
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($5)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((uimm4s2($7)&0xf)<<6)                  /* offset<(uimm4s2) */
-		                |((0&0x1)<<12)                           /* W<(0) */
-		                |((2&0x3)<<10)                           /* op<(2) */
-		        ),
-		        NULL_CODE);
-
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)
-		             && const_fits($7,c_imm16s2)) {
-/* LDSTidxI:	dregs = W [ pregs + imm16s2 ] (x)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 1 |.W.|.Z.|.sz....|.ptr.......|.reg.......|
-|.offset........................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTidxI: dregs = W [ pregs + imm16s2 ] (x)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00e400
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($5)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		                |((1&0x3)<<6)                            /* sz<(1) */
-		                |((1&0x1)<<8)                            /* Z<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((imm16s2($7)&0xffff)<<0)               /* offset<(imm16s2) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN W LBRACK REG PLUS expr RBRACK LPAREN X RPAREN"); }
-		}
-	| REG ASSIGN W LBRACK REG RBRACK LPAREN X RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)) {
-/* LDST:	dregs = W [ pregs ] (x)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: dregs = W [ pregs ] (x)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($5)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((2&0x3)<<7)                            /* aop<(2) */
-		                |((1&0x3)<<10)                           /* sz<(1) */
-		                |((1&0x1)<<6)                            /* Z<(1) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN W LBRACK REG RBRACK LPAREN X RPAREN"); }
-		}
-	| REG ASSIGN W LBRACK REG _MINUS_MINUS RBRACK LPAREN X RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)) {
-/* LDST:	dregs = W [ pregs -- ] (x)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: dregs = W [ pregs -- ] (x)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($5)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((1&0x3)<<7)                            /* aop<(1) */
-		                |((1&0x3)<<10)                           /* sz<(1) */
-		                |((1&0x1)<<6)                            /* Z<(1) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN W LBRACK REG _MINUS_MINUS RBRACK LPAREN X RPAREN"); }
-		}
-	| REG ASSIGN W LBRACK REG _PLUS_PLUS RBRACK LPAREN X RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)) {
-/* LDST:	dregs = W [ pregs ++ ] (x)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 |.sz....|.W.|.aop...|.Z.|.ptr.......|.reg.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDST: dregs = W [ pregs ++ ] (x)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009000
-		                |((dregs($1)&0x7)<<0)                    /* reg<(dregs) */
-		                |((pregs($5)&0x7)<<3)                    /* ptr<(pregs) */
-		                |((0&0x3)<<7)                            /* aop<(0) */
-		                |((1&0x3)<<10)                           /* sz<(1) */
-		                |((1&0x1)<<6)                            /* Z<(1) */
-		                |((0&0x1)<<9)                            /* W<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN W LBRACK REG _PLUS_PLUS RBRACK LPAREN X RPAREN"); }
-		}
-	| REG ASSIGN W LBRACK REG _PLUS_PLUS REG RBRACK LPAREN X RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($5,rc_pregs)
-		             && reginclass($7,rc_pregs)) {
-/* LDSTpmod:	dregs = W [ pregs ++ pregs ] (x)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 0 |.W.|.aop...|.reg.......|.idx.......|.ptr.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDSTpmod: dregs = W [ pregs ++ pregs ] (x)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x008000
-		                |((dregs($1)&0x7)<<6)                    /* reg<(dregs) */
-		                |((pregs($5)&0x7)<<0)                    /* ptr<(pregs) */
-		                |((pregs($7)&0x7)<<3)                    /* idx<(pregs) */
-		                |((3&0x3)<<9)                            /* aop<(3) */
-		                |((1&0x1)<<11)                           /* W<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN W LBRACK REG _PLUS_PLUS REG RBRACK LPAREN X RPAREN"); }
-		}
-	| REG ASSIGN LOW_REG LPAREN X RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)) {
-/* ALU2op:	dregs = dregs_lo (x)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 0 |.opc...........|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ALU2op: dregs = dregs_lo (x)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004000
-		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                |((dregs($3)&0x7)<<3)                    /* src<(dregs) */
-		                |((10&0xf)<<6)                           /* opc<(10) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN LOW_REG LPAREN X RPAREN"); }
-		}
-	| REG ASSIGN BYTE_REG LPAREN Z RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)) {
-/* ALU2op:	dregs = dregs_byte (z)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 0 |.opc...........|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ALU2op: dregs = dregs_byte (z)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004000
-		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                |((dregs($3)&0x7)<<3)                    /* src<(dregs) */
-		                |((13&0xf)<<6)                           /* opc<(13) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTE_REG LPAREN Z RPAREN"); }
-		}
-	| REG ASSIGN BYTE_REG LPAREN X RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)) {
-/* ALU2op:	dregs = dregs_byte (x)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 0 |.opc...........|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ALU2op: dregs = dregs_byte (x)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004000
-		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                |((dregs($3)&0x7)<<3)                    /* src<(dregs) */
-		                |((12&0xf)<<6)                           /* opc<(11) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN BYTE_REG LPAREN X RPAREN"); }
-		}
-	| REG ASSIGN LOW_REG LPAREN Z RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)) {
-/* ALU2op:	dregs = dregs_lo (z)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 0 |.opc...........|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ALU2op: dregs = dregs_lo\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004000
-		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                |((dregs($3)&0x7)<<3)                    /* src<(dregs) */
-		                |((11&0xf)<<6)                           /* opc<(11) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN LOW_REG LPAREN Z RPAREN"); }
-		}
-	| REG ASSIGN REG _MINUS_BAR_MINUS REG amod0 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs = dregs -|- dregs (amod0)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = dregs -|- dregs (amod0)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1f)<<0)                           /* aopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                     /* s=amod0.s0 */
-		                  |((($6.x0)&0x1)<<12)                     /* x=amod0.x0 */
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG _MINUS_BAR_MINUS REG LPAREN amod0 RPAREN"); }
-		}
-	| REG ASSIGN REG _MINUS_BAR_PLUS REG amod0 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs = dregs -|+ dregs (amod0)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = dregs -|+ dregs (amod0)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1f)<<0)                           /* aopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                     /* s=amod0.s0 */
-		                  |((($6.x0)&0x1)<<12)                     /* x=amod0.x0 */
-		                  |((2&0x3)<<14)                           /* aop<(2) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG _MINUS_BAR_PLUS REG LPAREN amod0 RPAREN"); }
-		}
-	| REG ASSIGN REG _PLUS_BAR_MINUS REG amod0 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs = dregs +|- dregs (amod0)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: dregs = dregs +|- dregs (amod0)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1f)<<0)                           /* aopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                     /* s=amod0.s0 */
-		                  |((($6.x0)&0x1)<<12)                     /* x=amod0.x0 */
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG _PLUS_BAR_MINUS REG LPAREN amod0 RPAREN"); }
-		}
-	| REG ASSIGN REG _PLUS_BAR_PLUS REG amod0
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)) {
-/* dsp32alu:	dregs = dregs +|+ dregs (amod0)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu:  dregs +|+ dregs (amod0)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1f)<<0)                           /* aopcde<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($1)&0x7)<<9)                    /* dst0<(dregs) */
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((($6.s0)&0x1)<<13)                     /* s=amod0.s0 */
-		                  |((($6.x0)&0x1)<<12)                     /* x=amod0.x0 */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("REG ASSIGN REG _PLUS_BAR_PLUS REG LPAREN amod0 RPAREN"); }
-		}
-	| LOW_REG ASSIGN expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && const_fits($3,c_imm16)) {
-/* LDIMMhalf:	dregs_lo = imm16
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 0 | 0 | 1 |.Z.|.H.|.S.|.grp...|.reg.......|
-|.hword.........................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDIMMhalf: dregs_lo = imm16\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00e100
-		                |((dregs($1)&0x7)<<0)                 /* reg<(dregs_lo) */
-		                |((0&0x3)<<3)                            /* grp<(0) */
-		                |((0&0x1)<<6)                            /* H<(0) */
-		                |((0&0x1)<<5)                            /* S<(0) */
-		                |((0&0x1)<<7)                            /* Z<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((imm16($3)&0xffff)<<0)                 /* hword<(imm16) */
-		          ),
-		          NULL_CODE));
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($1,rc_regs)
-		             && const_fits($3,c_luimm16)) {
-/* LDIMMhalf:	L ( regs ) = luimm16
-   LDIMMhalf:	regs = luimm16  This includes M, B, I, L & P Registers
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 0 | 0 | 1 |.Z.|.H.|.S.|.grp...|.reg.......|
-|.hword.........................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDIMMhalf: regs = luimm16\n");
-                    $$ = CONSCODE(GENCODE(0x00e100
-                                |((regs($1)&0x7)<<0)    /* reg<(regs) */
-                                |((Xregs($1)&0x3)<<3)   /* grp<(Xregs($3)) */
-                                |((0&0x1)<<6)           /* H<(0) */
-                                |((0&0x1)<<5)           /* S<(0) */
-                                |((0&0x1)<<7)           /* Z<(0) */
-                           ),
-                           ExprNodeGenReloc($3, BFD_RELOC_16_LOW));
-#if 0
-		    $$ = CONSCODE(
-		        GENCODE(0x00e100
-		                |((regs($1)&0x7)<<0)                     /* reg<(regs) */
-		                |((Xregs($1)&0x3)<<3)                    /* grp<(Xregs($3)) */
-		                |((0&0x1)<<6)                            /* H<(0) */
-		                |((0&0x1)<<5)                            /* S<(0) */
-		                |((0&0x1)<<7)                            /* Z<(0) */
-		        ),
-		        CONSCODE(
-		          NOTERELOC(0,BFD_RELOC_16_LOW,$3,
-		            GENCODE(0x000000
-		                    |((luimm16($3)&0xffff)<<0)               /* hword<(luimm16) */
-		            )),
-		          NULL_CODE));
-#endif
-		
-		  } else { $$ = 0; semantic_error ("LOW_REG ASSIGN expr"); }
-		}
-	| HIGH_REG ASSIGN expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && const_fits($3,c_imm16)) {
-/* LDIMMhalf:	dregs_hi = imm16
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 0 | 0 | 1 |.Z.|.H.|.S.|.grp...|.reg.......|
-|.hword.........................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDIMMhalf: dregs_hi = imm16\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00e100
-		                |((dregs($1)&0x7)<<0)                 /* reg<(dregs_hi) */
-		                |((0&0x3)<<3)                            /* grp<(0) */
-		                |((1&0x1)<<6)                            /* H<(1) */
-		                |((0&0x1)<<5)                            /* S<(0) */
-		                |((0&0x1)<<7)                            /* Z<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((imm16($3)&0xffff)<<0)                 /* hword<(imm16) */
-		          ),
-		          NULL_CODE));
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) 
-		             && reginclass($1,rc_regs)
-		             && const_fits($3,c_huimm16)) {
-/* LDIMMhalf:	H ( regs ) = huimm16
-   LDIMMhalf:	regs = huimm16  This includes M, I, B, L & P Registers
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 0 | 0 | 1 |.Z.|.H.|.S.|.grp...|.reg.......|
-|.hword.........................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDIMMhalf: regs = huimm16\n");
-                    $$ = CONSCODE(GENCODE(0x00e100
-                                |((regs($1)&0x7)<<0)     /* reg<(regs) */
-                                |((Xregs($1)&0x3)<<3)    /* grp<(Xregs($3)) */
-                                |((1&0x1)<<6)            /* H<(1) */
-                                |((0&0x1)<<5)            /* S<(0) */
-                                |((0&0x1)<<7)            /* Z<(0) */
-                           ),
-                           ExprNodeGenReloc($3, BFD_RELOC_16_HIGH));
-#if 0
-		    $$ = CONSCODE(
-		        GENCODE(0x00e100
-		                |((regs($1)&0x7)<<0)                     /* reg<(regs) */
-		                |((Xregs($1)&0x3)<<3)                    /* grp<(Xregs($3)) */
-		                |((1&0x1)<<6)                            /* H<(1) */
-		                |((0&0x1)<<5)                            /* S<(0) */
-		                |((0&0x1)<<7)                            /* Z<(0) */
-		        ),
-		        CONSCODE(  
-		          NOTERELOC(0,BFD_RELOC_16_HIGH,$3,
-		            GENCODE(0x000000
-		                    |((huimm16($3)&0xffff)<<0)               /* hword<(huimm16) */
-		            )),
-		          NULL_CODE));
-#endif
-		
-		  } else { $$ = 0; semantic_error ("HIGH_REG ASSIGN expr"); }
-		}
-	| REG_A00 ASSIGN expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A0) {
-/* dsp32alu:	A0 = 0
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A0 = 0\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((8&0x1f)<<0)                           /* aopcde<(8) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		                  |((0&0x1)<<13)                           /* s<(0) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG_A00 ASSIGN expr"); }
-		}
-	| REG_A11 ASSIGN expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A1) {
-/* dsp32alu:	A1 = 0
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A1 = 0\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((8&0x1f)<<0)                           /* aopcde<(8) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((1&0x3)<<14)                           /* aop<(1) */
-		                  |((0&0x1)<<13)                           /* s<(0) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG_A11 ASSIGN expr"); }
-		}
-	| REG ASSIGN expr 
-		{
-                   /* ExprNode *pNode = ExprNodeCreate(ExprNodeBinOp, "+",
-                                             ExprNodeCreate(ExprNodeReloc, "$L$1", 0, 0),
-                                             ExprNodeCreate(ExprNodeConstant, 1, 0, 0));
-			printf("reg = target got called zero param = %s"
-	"first param = %d third param = %s\n", $$->exp->symbol->bsym->, $1,  $3->symbol->bsym);*/
-//		int arith_reloc_code = 0xAABBCCDD;
-//		fprintf(stderr, "entry for rN=<preg>\n");	
-		if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && const_fits($3,c_imm7)) {
-/* COMPI2opD:	dregs = imm7 
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 1 | 0 | 0 |.op|.isrc......................|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("COMPI2opD: dregs = imm7 \n");
-
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x006000
-		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                |((imm7($3)&0x7f)<<3)                    /* isrc<(imm7) */
-		                |((0&0x1)<<10)                           /* op<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_pregs)
-		             && const_fits($3,c_imm7)) {
-/* COMPI2opP:	pregs = imm7 
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 1 | 0 | 1 |.op|.src.......................|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/		   
-		    notethat("COMPI2opP: pregs = imm7\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x006800
-		                |((pregs($1)&0x7)<<0)                    /* dst<(pregs) */
-		                |((imm7($3)&0x7f)<<3)                    /* src<(imm7) */
-		                |((0&0x1)<<10)                           /* op<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_regs)
-		             && const_fits($3,c_luimm16)) {
-/* LDIMMhalf:	regs = luimm16 
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 0 | 0 | 1 |.Z.|.H.|.S.|.grp...|.reg.......|
-|.hword.........................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-//			fprintf(stderr, "adding %d reloc\n",BFD_ARELOC_EC);	
-		    notethat("LDIMMhalf: regs = luimm16 \n");
-#if 0
-		    $$ =
-		  //    CONSCODE(GENCODE(arith_reloc_code),
-			CONSCODE(
-		        GENCODE(0x00e100
-		                |((regs($1)&0x7)<<0)                     /* reg<(regs) */
-		                |((Xregs($1)&0x3)<<3)                    /* grp<(Xregs($3)) */
-		                |((0&0x1)<<6)                            /* H<(0) */
-		                |((0&0x1)<<5)                            /* S<(0) */
-		                |((1&0x1)<<7)                            /* Z<(1) */
-		        ),
-		        CONSCODE(
-		          NOTERELOC(0,BFD_RELOC_16_IMM,$3,
-		            GENCODE(0x000000
-		                    |((luimm16($3)&0xffff)<<0)               /* hword<(luimm16) */
-		            )),
-		          NULL_CODE));
-#endif
-			{
-#if 0
-			ExprNode* constVal;
-			ExprNode* negOp;
-			ExprNode* head;
-			ExprNodeValue val, val1, val2;
-			val.i_value = 1;
-			constVal = ExprNodeCreate(ExprNodeConstant,val, NULL, NULL);
-			val.op_value = ExprOpTypeSub;
-			val1.s_value = "_L$L4";
-			val2.s_value = "_L$L5";
-			negOp  = ExprNodeCreate(ExprNodeBinop, val,
-					ExprNodeCreate(ExprNodeReloc, val1, NULL, NULL),
-					ExprNodeCreate(ExprNodeReloc, val2, NULL, NULL));
-			val.op_value = ExprOpTypeAdd;
-			head   = ExprNodeCreate(ExprNodeBinop, val, negOp, constVal); 
-#endif
-		
-			$$ = CONSCODE(
-		        	GENCODE(0x00e100
-		                |((regs($1)&0x7)<<0)                     /* reg<(regs) */
-		                |((Xregs($1)&0x3)<<3)                    /* grp<(Xregs($3)) */
-		                |((0&0x1)<<6)                            /* H<(0) */
-		                |((0&0x1)<<5)                            /* S<(0) */
-		                |((1&0x1)<<7)                            /* Z<(1) */
-		        ),
-			ExprNodeGenReloc($3, BFD_RELOC_16_IMM)
-		          );
+		if (IS_DREG($1) && IS_DREG($5) && IS_DREG($7)) {
+			if ($9.r0) {
+				op = 6;
+			} else {
+				op = 7;
 			}
 
-		  } else { $$ = 0; semantic_error ("REG ASSIGN expr"); }
-		}
-	| REG ASSIGN expr LPAREN X RPAREN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && const_fits($3,c_imm7)) {
-/* COMPI2opD:	dregs = imm7 (x)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 1 | 0 | 0 |.op|.isrc......................|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("COMPI2opD: dregs = imm7 (x)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x006000
-		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                |((imm7($3)&0x7f)<<3)                    /* isrc<(imm7) */
-		                |((0&0x1)<<10)                           /* op<(0) */
-		        ),
-		        NULL_CODE);
+		    notethat("dsp32alu: dregs = {MIN|MAX} (dregs, dregs)\n");
+			          /* aopcde       HL   */
+		$$ = DSP32ALU (      op,       0,
+		              /*   dst1     dst0     src0     src1 */
+		                      0,     &$1,     &$5,     &$7,
+		              /*      s        x      aop */
+		                      0,       0,   $3.r0          );
 
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_pregs)
-		             && const_fits($3,c_imm7)) {
-/* COMPI2opP:	pregs = imm7 (x)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 1 | 0 | 1 |.op|.src.......................|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("COMPI2opP: pregs = imm7 (x)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x006800
-		                |((pregs($1)&0x7)<<0)                    /* dst<(pregs) */
-		                |((imm7($3)&0x7f)<<3)                    /* src<(imm7) */
-		                |((0&0x1)<<10)                           /* op<(0) */
-		        ),
-		        NULL_CODE);
+		} else {
+			return semantic_error("Dregs expected");
+		}
+	}
 
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_regs)
-		             && const_fits($3,c_imm16) ) {
-/* LDIMMhalf:	regs = imm16 (x)  This include R, P, M, I, B & L Registers
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 0 | 0 | 0 | 1 |.Z.|.H.|.S.|.grp...|.reg.......|
-|.hword.........................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LDIMMhalf: regs = imm16 (x)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00e100
-		                |((regs($1)&0x7)<<0)                     /* reg<(regs) */
-		                |((Xregs($1)&0x3)<<3)                    /* grp<(Xregs($1)) */
-		                |((0&0x1)<<6)                            /* H<(0) */
-		                |((1&0x1)<<5)                            /* S<(1) */
-		                |((0&0x1)<<7)                            /* Z<(0) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((imm16($3)&0xffff)<<0)                 /* hword<(imm16) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG ASSIGN expr LPAREN X RPAREN"); }
-		}
-	| REG_A11 ASSIGN ABS REG_A11 COMMA REG_A00 ASSIGN ABS REG_A00
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A1
-		             && $6 == REG_A0
-		             && $4 == REG_A1
-		             && $9 == REG_A0) {
-/* dsp32alu:	A1 = ABS A1 , A0 =  ABS A0
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A1 = ABS A1 , A0 = ABS A0\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((16&0x1f)<<0)                          /* aopcde<(16) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG_A11 ASSIGN ABS REG_A11 COMMA REG_A00 ASSIGN ABS REG_A00"); }
-		}
-	| REG_A11 ASSIGN MINUS REG_A11 COMMA REG_A00 ASSIGN MINUS REG_A00
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A1
-		             && $6 == REG_A0
-		             && $4 == REG_A1
-		             && $9 == REG_A0) {
-/* dsp32alu:	A1 = - A1 , A0 = - A0
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A1 = - A1 , A0 = - A0\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((0&0x1)<<5)                            /* HL<(0) */
-		                |((14&0x1f)<<0)                          /* aopcde<(14) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG_A11 ASSIGN MINUS REG_A11 COMMA REG_A00 ASSIGN MINUS REG_A00"); }
-		}
-	| BITMUX LPAREN REG COMMA REG COMMA REG_A00 RPAREN LPAREN ASR RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && $7 == REG_A0) {
-/* dsp32shift:	BITMUX (dregs , dregs , A0) (ASR)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: BITMUX (dregs , dregs , A0) (ASR)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((8&0x1f)<<0)                           /* sopcde<(8) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("BITMUX LPAREN REG COMMA REG COMMA REG_A00 RPAREN LPAREN ASR RPAREN"); }
-		}
-	| BITMUX LPAREN REG COMMA REG COMMA REG_A00 RPAREN LPAREN ASL RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($3,rc_dregs)
-		             && reginclass($5,rc_dregs)
-		             && $7 == REG_A0) {
-/* dsp32shift:	BITMUX (dregs , dregs , A0) (ASL)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: BITMUX (dregs , dregs , A0) (ASL)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((8&0x1f)<<0)                           /* sopcde<(8) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($3)&0x7)<<3)                    /* src0<(dregs) */
-		                  |((dregs($5)&0x7)<<0)                    /* src1<(dregs) */
-		                  |((1&0x3)<<14)                           /* sop<(1) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("BITMUX LPAREN REG COMMA REG COMMA REG_A00 RPAREN LPAREN ASL RPAREN"); }
-		}
-	| REG _AMPERSAND_ASSIGN MODIFIED_STATUS_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && (($3==0) || ($3==1) || ($3==6) || ($3==2) || ($3==3) || ($3==4)) ) {
-/* CC2stat:	CC &= statbits
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 |.D.|.op....|.cbit..............|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CC2stat: CC &= statbits\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000300
-		                |(($3&0x1f)<<0)                /* cbit<(statbits) */
-		                |((2&0x3)<<5)                            /* op<(2) */
-		                |((0&0x1)<<7)                            /* D<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG _AMPERSAND_ASSIGN MODIFIED_STATUS_REG"); }
-		}
-	| MODIFIED_STATUS_REG _AMPERSAND_ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && (($1==0) || ($1==1) || ($1==6) || ($1==2) || ($1==3) || ($1==4)) 
-		             && $3 == REG_CC) {
-/* CC2stat:	statbits &= CC
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 |.D.|.op....|.cbit..............|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CC2stat: statbits &= CC\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000300
-		                |(($1&0x1f)<<0)                /* cbit<(statbits) */
-		                |((2&0x3)<<5)                            /* op<(2) */
-		                |((1&0x1)<<7)                            /* D<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("MODIFIED_STATUS_REG _AMPERSAND_ASSIGN REG"); }
-		}
-	| REG _BAR_ASSIGN MODIFIED_STATUS_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && (($3==0) || ($3==1) || ($3==6) || ($3==2) || ($3==3) || ($3==4)) ) {
-/* CC2stat:	CC |= statbits
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 |.D.|.op....|.cbit..............|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CC2stat: CC |= statbits\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000300
-		                |(($3&0x1f)<<0)                /* cbit<(statbits) */
-		                |((1&0x3)<<5)                            /* op<(1) */
-		                |((0&0x1)<<7)                            /* D<(0) */
-		        ),
-		        NULL_CODE);
+	| a_assign MINUS REG_A
+	{
+		notethat("dsp32alu: Ax = - Ax\n");
+				  /*     aopcde       HL               */
+		$$ = DSP32ALU (  14,       IS_A1($1),
+				  /*   dst1     dst0     src0     src1 */
+						  0,       0,       0,       0,
+				  /*      s        x      aop          */
+						  0,       0,  IS_A1($3)       );
+	}
 
-		  } else { $$ = 0; semantic_error ("REG _BAR_ASSIGN MODIFIED_STATUS_REG"); }
-		}
-	| MODIFIED_STATUS_REG _BAR_ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && (($1==0) || ($1==1) || ($1==6) || ($1==2) || ($1==3) || ($1==4)) 
-		             && $3 == REG_CC) {
-/* CC2stat:	statbits |= CC
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 |.D.|.op....|.cbit..............|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CC2stat: statbits |= CC\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000300
-		                |(($1&0x1f)<<0)                /* cbit<(statbits) */
-		                |((1&0x3)<<5)                            /* op<(1) */
-		                |((1&0x1)<<7)                            /* D<(1) */
-		        ),
-		        NULL_CODE);
+/* 16 rules compacted */
+	| HALF_REG ASSIGN HALF_REG plus_minus HALF_REG amod1
+	{
+		notethat("dsp32alu: dregs_lo = dregs_lo +- dregs_lo (amod1)\n");
+				  /* aopcde       HL                   */
+		$$ = DSP32ALU ( 2 | $4.r0,  IS_H($1),
+				  /*   dst1     dst0     src0     src1 */
+						  0,     &$1,     &$3,     &$5,
+				  /*      s        x      aop          */
+					  $6.s0,   $6.x0,  HL2($3, $5)     );
+	}
 
-		  } else { $$ = 0; semantic_error ("MODIFIED_STATUS_REG _BAR_ASSIGN REG"); }
+	| a_assign a_assign expr
+	{
+		if (EXPR_VALUE($3) == 0 && !REG_SAME($1, $2) ) {
+			notethat("dsp32alu: A1 = A0 = 0\n");
+					  /* aopcde       HL                   */
+			$$ = DSP32ALU (   8,       0,
+					  /*   dst1     dst0     src0     src1 */
+							  0,       0,       0,       0,
+					  /*      s        x      aop          */
+							  0,       0,       2          );
+		} else {
+			return semantic_error("Bad value, 0 expected");
 		}
-	| REG _GREATER_GREATER_ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)) {
-/* ALU2op:	dregs >>= dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 0 |.opc...........|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ALU2op: dregs >>= dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004000
-		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                |((dregs($3)&0x7)<<3)                    /* src<(dregs) */
-		                |((1&0xf)<<6)                            /* opc<(1) */
-		        ),
-		        NULL_CODE);
+	}
 
-		  } else { $$ = 0; semantic_error ("REG _GREATER_GREATER_ASSIGN REG"); }
+// saturating:
+	| a_assign REG_A LPAREN S RPAREN
+	{
+		if (REG_SAME($1, $2)) {
+		    notethat("dsp32alu: Ax = Ax (S)\n");
+				  /* aopcde       HL                   */
+		$$ = DSP32ALU (   8,       0,
+				  /*   dst1     dst0     src0     src1 */
+						  0,       0,       0,       0,
+				  /*      s        x      aop          */
+						  1,       0,  IS_A1($1)       );
+		} else {
+			return semantic_error("Registers must be equal");
 		}
-	| REG _GREATER_GREATER_ASSIGN expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && const_fits($3,c_uimm5)) {
-/* LOGI2op:	dregs >>= uimm5
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 1 |.opc.......|.src...............|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LOGI2op: dregs >>= uimm5\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004800
-		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                |((uimm5($3)&0x1f)<<3)                   /* src<(uimm5) */
-		                |((6&0x7)<<8)                            /* opc<(6) */
-		        ),
-		        NULL_CODE);
+	}
 
-		  } else { $$ = 0; semantic_error ("REG _GREATER_GREATER_ASSIGN expr"); }
+	| HALF_REG ASSIGN REG LPAREN RND RPAREN
+	{
+		if (IS_DREG($3)) {
+		    notethat("dsp32alu: dregs_half = dregs (RND)\n");
+				  /* aopcde       HL                   */
+		$$ = DSP32ALU (  12,  IS_H($1),
+		          /*   dst1     dst0     src0     src1 */
+		                  0,     &$1,     &$3,       0,
+		          /*      s        x      aop          */
+		                  0,       0,       3          );
+		} else {
+			return semantic_error("Dregs expected");
 		}
-	| REG _GREATER_GREATER_GREATER_THAN_ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)) {
-/* ALU2op:	dregs >>>= dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 0 |.opc...........|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ALU2op: dregs >>>= dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004000
-		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                |((dregs($3)&0x7)<<3)                    /* src<(dregs) */
-		                |((0&0xf)<<6)                            /* opc<(0) */
-		        ),
-		        NULL_CODE);
+	}
 
-		  } else { $$ = 0; semantic_error ("REG _GREATER_GREATER_GREATER_THAN_ASSIGN REG"); }
+	| HALF_REG ASSIGN REG plus_minus REG LPAREN RND12 RPAREN
+	{
+		if (IS_DREG($3) && IS_DREG($5)) {
+		    notethat("dsp32alu: dregs_half = dregs (+-) dregs (RND12)\n");
+				  /* aopcde       HL                   */
+		$$ = DSP32ALU (   5,  IS_H($1),
+		          /*   dst1     dst0     src0     src1 */
+		                  0,     &$1,     &$3,     &$5,
+		          /*      s        x      aop          */
+		                  0,       0,   $4.r0          );
+		} else {
+			return semantic_error("Dregs expected");
 		}
-	| REG _GREATER_GREATER_GREATER_THAN_ASSIGN expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && const_fits($3,c_uimm5)) {
-/* LOGI2op:	dregs >>>= uimm5
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 1 |.opc.......|.src...............|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LOGI2op: dregs >>>= uimm5\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004800
-		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                |((uimm5($3)&0x1f)<<3)                   /* src<(uimm5) */
-		                |((5&0x7)<<8)                            /* opc<(5) */
-		        ),
-		        NULL_CODE);
+	}
 
-		  } else { $$ = 0; semantic_error ("REG _GREATER_GREATER_GREATER_THAN_ASSIGN expr"); }
+	| HALF_REG ASSIGN REG plus_minus REG LPAREN RND20 RPAREN
+	{
+		if (IS_DREG($3) && IS_DREG($5)) {
+		    notethat("dsp32alu: dregs_half = dregs -+ dregs (RND20)\n");
+				  /* aopcde       HL                   */
+		$$ = DSP32ALU (   5,  IS_H($1),
+		          /*   dst1     dst0     src0     src1 */
+		                  0,     &$1,     &$3,     &$5,
+		          /*      s        x      aop          */
+		                  0,       1,   $4.r0 | 2      );
+		} else {
+			return semantic_error("Dregs expected");
 		}
-	| REG _KARAT_ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_CC
-		             && reginclass($3,rc_statbits)) {
-/* CC2stat:	CC ^= statbits
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 |.D.|.op....|.cbit..............|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CC2stat: CC ^= statbits\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000300
-		                |((statbits($3)&0x1f)<<0)                /* cbit<(statbits) */
-		                |((3&0x3)<<5)                            /* op<(3) */
-		                |((0&0x1)<<7)                            /* D<(0) */
-		        ),
-		        NULL_CODE);
+	}
 
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_statbits)
-		             && $3 == REG_CC) {
-/* CC2stat:	statbits ^= CC
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 |.D.|.op....|.cbit..............|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("CC2stat: statbits ^= CC\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000300
-		                |((statbits($1)&0x1f)<<0)                /* cbit<(statbits) */
-		                |((3&0x3)<<5)                            /* op<(3) */
-		                |((1&0x1)<<7)                            /* D<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG _KARAT_ASSIGN REG"); }
+	| a_assign REG_A 
+	{
+		if (!REG_SAME($1, $2)) {
+			notethat("dsp32alu: An = Am\n");
+					  /* aopcde       HL                   */
+			$$ = DSP32ALU (   8,       0,
+					  /*   dst1     dst0     src0     src1 */
+							  0,       0,       0,       0,
+					  /*      s        x      aop          */
+						  IS_A1($1),   0,       3          );
+		} else {
+			return semantic_error("Accu reg arguments must differ");
 		}
-	| REG _LESS_LESS_ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)) {
-/* ALU2op:	dregs <<= dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 0 |.opc...........|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ALU2op: dregs <<= dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004000
-		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                |((dregs($3)&0x7)<<3)                    /* src<(dregs) */
-		                |((2&0xf)<<6)                            /* opc<(2) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG _LESS_LESS_ASSIGN REG"); }
-		}
-	| REG _LESS_LESS_ASSIGN expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && const_fits($3,c_uimm5)) {
-/* LOGI2op:	dregs <<= uimm5
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 1 |.opc.......|.src...............|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("LOGI2op: dregs <<= uimm5\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004800
-		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                |((uimm5($3)&0x1f)<<3)                   /* src<(uimm5) */
-		                |((7&0x7)<<8)                            /* opc<(7) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG _LESS_LESS_ASSIGN expr"); }
-		}
-	| REG_A00 ASSIGN BXORSHIFT LPAREN REG_A00 COMMA REG_A11 COMMA REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A0
-		             && $5 == REG_A0
-		             && $7 == REG_A1
-		             && $9 == REG_CC) {
-/* dsp32shift:	A0 = BXORSHIFT (A0 , A1 , CC )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 1 | 0 | 0 | - | - |.sopcde............|
-|.sop...|.HLs...|.dst0......| - | - | - |.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32shift: A0 = BXORSHIFT ( A0 , A1 , CC )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c600
-		                |((12&0x1f)<<0)                          /* sopcde<(12) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((0&0x3)<<14)                           /* sop<(0) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("REG_A00 ASSIGN BXORSHIFT LPAREN REG_A00 COMMA REG_A11 COMMA REG RPAREN"); }
+	| a_assign REG
+	{
+		if (IS_DREG($2)) {
+		    notethat("dsp32alu: An = dregs\n");
+					  /* aopcde       HL                   */
+			$$ = DSP32ALU (   9,       0,
+					  /*   dst1     dst0     src0     src1 */
+							  0,       0,     &$2,       0,
+					  /*      s        x      aop          */
+						      1,       0,   IS_A1($1) << 1 );
+		} else {
+			return semantic_error("Dregs expected");
 		}
-	| REG_A00 _MINUS_ASSIGN REG_A11
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A0
-		             && $3 == REG_A1) {
-/* dsp32alu:	A0 -= A1
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A0 -= A1\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((11&0x1f)<<0)                          /* aopcde<(11) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		                  |((0&0x1)<<13)                           /* s<(0) */
-		          ),
-		          NULL_CODE));
-		
-		  } else { $$ = 0; semantic_error ("REG_A00 _MINUS_ASSIGN REG_A11"); }
-		}
-	| REG _MINUS_ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_iregs)
-		             && reginclass($3,rc_mregs)) {
-/* dagMODim:	iregs -= mregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 | 1 | 0 |.br| 1 | 1 |.op|.m.....|.i.....|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dagMODim: iregs -= mregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009e60
-		                |((iregs($1)&0x3)<<0)                    /* i<(iregs) */
-		                |((mregs($3)&0x3)<<2)                    /* m<(mregs) */
-		                |((1&0x1)<<4)                            /* op<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_pregs)
-		             && reginclass($3,rc_pregs)) {
-/* PTR2op:	pregs -= pregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 1 | 0 |.opc.......|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("PTR2op: pregs -= pregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004400
-		                |((pregs($1)&0x7)<<0)                    /* dst<(pregs) */
-		                |((pregs($3)&0x7)<<3)                    /* src<(pregs) */
-		                |((0&0x7)<<6)                            /* opc<(0) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("REG _MINUS_ASSIGN REG"); }
-		}
-	| REG_A00 _MINUS_ASSIGN REG_A11 LPAREN W32 RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A0
-		             && $3 == REG_A1) {
-/* dsp32alu:	A0 -= A1 (W32)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A0 -= A1 (W32)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((11&0x1f)<<0)                          /* aopcde<(11) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((3&0x3)<<14)                           /* aop<(3) */
-		                  |((1&0x1)<<13)                           /* s<(1) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("REG_A00 _MINUS_ASSIGN REG_A11 LPAREN W32 RPAREN"); }
+	| REG ASSIGN HALF_REG xpmod
+	{
+		if (!IS_H($3)) {
+			if ($1.regno == REG_A0x && IS_DREG($3)) {
+				notethat("dsp32alu: A0.x = dregs_lo\n");
+							  /* aopcde       HL                   */
+				$$ = DSP32ALU (   9,       0,
+						  /*   dst1     dst0     src0     src1 */
+								  0,       0,     &$3,       0,
+						  /*      s        x      aop          */
+								  0,       0,       1          );
+			} else
+			if ($1.regno == REG_A1x && IS_DREG($3)) {
+				notethat("dsp32alu: A1.x = dregs_lo\n");
+							  /* aopcde       HL                   */
+				$$ = DSP32ALU (   9,       0,
+						  /*   dst1     dst0     src0     src1 */
+								  0,       0,     &$3,       0,
+						  /*      s        x      aop          */
+								  0,       0,       3          );
+			} else
+			if (IS_DREG($1) && IS_DREG($3)) {
+				notethat("ALU2op: dregs = dregs_lo\n");
+				$$ = ALU2OP (&$1, &$3, 10 | ($4.r0 ? 0: 1));   // dst, src, opc
+			} else {
+				return register_mismatch();
+			}
+		} else {
+			return semantic_error("Low reg expected");
 		}
+	}
+
+	| HALF_REG ASSIGN expr
+	{
+#if 0
+		if (symbol_match($3)) {
+		    notethat("LDIMMhalf: pregs_half = sym32\n");
+			          /*      reg, H,  S,  Z  */
+			$$ = LDIMMHALF_R (&$1, IS_H($1),  0,  0, $3);
+		} else 
+		if (IS_IMM($3, 16) || IS_UIMM($3, 16) ) {
+		    notethat("LDIMMhalf: dpregs_half = imm16\n");
+			          /*    reg,   H,  S,  Z  */
+			$$ = LDIMMHALF (&$1, IS_H($1),  0,  0, $3);
+
+		} else {
+			return semantic_error("Bad immediate constant range");
+		}
+#endif
+		notethat("LDIMMhalf: pregs_half = sym32\n");
+                /*      reg, H,  S,  Z  */
+                $$ = LDIMMHALF_R (&$1, IS_H($1),  0,  0, $3);
+
+	}
+
+	| a_assign expr
+	{
+		notethat("dsp32alu: An = 0\n");
+
+		if (imm7($2) != 0) return semantic_error("0 expected");
+
+				  /* aopcde       HL                   */
+		$$ = DSP32ALU (   8,       0,
+				  /*   dst1     dst0     src0     src1 */
+						  0,       0,       0,       0,
+				  /*      s        x      aop          */
+						  0,       0,   IS_A1($1)       );
+	}
+
+
+/* 2 rules compacted */
+	| REG ASSIGN expr xpmod1
+	{
+		if ($4.r0 == 0) { // Default: (x)
+			/* if the expr is a relocation, generate it */
+			if (IS_DREG($1) && IS_IMM($3, 7)) {
+				notethat("COMPI2opD: dregs = imm7 (x) \n");
+				$$ = COMPI2OPD (&$1, imm7($3),  0);
+			} else
+			if (IS_PREG($1) && IS_IMM($3, 7)) {
+				notethat("COMPI2opP: pregs = imm7 (x)\n");
+				$$ = COMPI2OPP (&$1, imm7($3),  0);
+			} else
+#if 0
+			if (IS_RELOC($3))
+#endif
+			{
+				notethat("LDIMMhalf: regs = luimm16 (x)\n");
+				/*      reg,   H,  S,  Z  */
+				$$ = LDIMMHALF_R5 (&$1,   0,  1,  0, $3);
+			} 
+#if 0 /* reloc takes care of const */
+			else
+			if (IS_IMM($3, 16) || IS_UIMM($3, 16)) {
+				/* TODO : Really not a reloc */
+				notethat("LDIMMhalf: regs = luimm16 (x)\n");
+				/*      reg,   H,  S,  Z  */
+				$$ = LDIMMHALF (&$1,   0,  1,  0, $3);
+			} else
+			{
+				return semantic_error("Bad register or value for assigment");
+			}
+#endif	
+		} else { // (z)
+			/* if the expr is a relocation, generate it */
+				notethat("LDIMMhalf: regs = luimm16 (x)\n");
+				/*      reg,  H,  S,  Z  */
+				$$ = LDIMMHALF_R5 (&$1,  0,  0,  1, $3);
+#if 0
+			if (IS_RELOC($3)){
+				notethat("LDIMMhalf: regs = luimm16 (x)\n");
+				/*      reg,  H,  S,  Z  */
+				$$ = LDIMMHALF_R5 (&$1,  0,  0,  1, $3);
+			} else 
+			if (IS_IMM($3, 16) || IS_UIMM($3, 16)) {
+				notethat("LDIMMhalf: regs = luimm16 (z)\n");
+				/*      reg,  H,  S,  Z  */
+				$$ = LDIMMHALF (&$1,  0,  0,  1, $3);
+			} else 
+			{
+				return semantic_error("Bad register or value for assigment");
+			}
+#endif
+		}
+	}
+	| HALF_REG ASSIGN REG
+	{
+		if (IS_H($1)) return semantic_error("Low reg expected");
+
+		if (IS_DREG($1) && $3.regno == REG_A0x) {
+		    notethat("dsp32alu: dregs_lo = A0.x\n");
+						  /* aopcde       HL                   */
+			$$ = DSP32ALU (  10,       0,
+					  /*   dst1     dst0     src0     src1 */
+							  0,     &$1,       0,       0,
+					  /*      s        x      aop          */
+						      0,       0,       0          );
+		} else
+		if (IS_DREG($1) && $3.regno == REG_A1x) {
+		    notethat("dsp32alu: dregs_lo = A1.x\n");
+						  /* aopcde       HL                   */
+			$$ = DSP32ALU (  10,       0,
+					  /*   dst1     dst0     src0     src1 */
+							  0,     &$1,       0,       0,
+					  /*      s        x      aop          */
+						      0,       0,       1          );
+
+		} else {
+			return register_mismatch();
+		}
+	}
+
+
+/* 4 rules compacted */
+	| REG ASSIGN REG op_bar_op REG amod0 
+	{
+		if (IS_DREG($1) && IS_DREG($3) && IS_DREG($5)) {
+		    notethat("dsp32alu: dregs = dregs .|. dregs (amod0)\n");
+						  /* aopcde       HL                   */
+			$$ = DSP32ALU (   0,       0,
+					  /*   dst1     dst0     src0     src1 */
+							  0,     &$1,     &$3,     &$5,
+					  /*      s        x      aop          */
+						  $6.s0,   $6.x0,   $4.r0          );
+		} else {
+			return register_mismatch();
+		}
+	}
+
+
+	| REG ASSIGN BYTE_REG xpmod
+	{
+		if (IS_DREG($1) && IS_DREG($3)) {
+		    notethat("ALU2op: dregs = dregs_byte\n");
+			$$ = ALU2OP (&$1, &$3, 12 | ($4.r0 ? 0: 1));   // dst, src, opc
+		} else {
+			return register_mismatch();
+		}
+	}
+
+	| a_assign ABS REG_A COMMA a_assign ABS REG_A
+	{
+		if (REG_SAME($1, $3) && REG_SAME($5, $7) && !REG_SAME($1, $5)) {
+			notethat("dsp32alu: A1 = ABS A1 , A0 = ABS A0\n");
+						  /* aopcde       HL                   */
+			$$ = DSP32ALU (  16,       0,
+					  /*   dst1     dst0     src0     src1 */
+							  0,       0,       0,       0,
+					  /*      s        x      aop          */
+							  0,       0,       3          );
+		} else {
+			return register_mismatch();
+		}
+	}
+
+	| a_assign MINUS REG_A COMMA a_assign MINUS REG_A
+	{
+		if (REG_SAME($1, $3) && REG_SAME($5, $7) && !REG_SAME($1, $5)) {
+			notethat("dsp32alu: A1 = - A1 , A0 = - A0\n");
+
+					  /* aopcde       HL                   */
+			$$ = DSP32ALU (  14,       0,
+					  /*   dst1     dst0     src0     src1 */
+							  0,       0,       0,       0,
+					  /*      s        x      aop          */
+							  0,       0,       3          );
+		} else {
+			return register_mismatch();
+		}
+	}
+
+	| a_minusassign REG_A w32_or_nothing
+	{
+		if (!IS_A1($1) && IS_A1($2)) {
+			notethat("dsp32alu: A0 -= A1\n");
+					  /* aopcde       HL                   */
+			$$ = DSP32ALU (  11,       0,
+					  /*   dst1     dst0     src0     src1 */
+							  0,       0,       0,       0,
+					  /*      s        x      aop          */
+						  $3.r0,       0,       3          );
+		} else {
+			return register_mismatch();
+		}
+	}
+
 	| REG _MINUS_ASSIGN expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_iregs)
-		             && EXPR_VALUE($3) == 4) {
-/* dagMODik:	iregs -= 4
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 | 1 | 1 | 0 | 1 | 1 | 0 |.op....|.i.....|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
+	{
+		if (IS_IREG($1) && EXPR_VALUE($3) == 4) {
 		    notethat("dagMODik: iregs -= 4\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009f60
-		                |((iregs($1)&0x3)<<0)                    /* i<(iregs) */
-		                |((3&0x3)<<2)                            /* op<(3) */
-		        ),
-		        NULL_CODE);
-
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_iregs)
-		             && EXPR_VALUE($3) == 2) {
-/* dagMODik:	iregs -= 2
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 | 1 | 1 | 0 | 1 | 1 | 0 |.op....|.i.....|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
+			$$ = DAGMODIK (&$1, 3);
+		} else
+		if (IS_IREG($1) && EXPR_VALUE($3) == 2) {
 		    notethat("dagMODik: iregs -= 2\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009f60
-		                |((iregs($1)&0x3)<<0)                    /* i<(iregs) */
-		                |((1&0x3)<<2)                            /* op<(1) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG _MINUS_ASSIGN expr"); }
+			$$ = DAGMODIK (&$1, 1);
+		} else {
+			return semantic_error("Register or value mismatch");
 		}
+	}
 
 	| REG _PLUS_ASSIGN REG LPAREN BREV RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_iregs)
-		             && reginclass($3,rc_mregs)) {
-/* dagMODim:	iregs += mregs (opt_brev)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 | 1 | 0 |.br| 1 | 1 |.op|.m.....|.i.....|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
+	{
+		if (IS_IREG($1) && IS_MREG($3)) {
 		    notethat("dagMODim: iregs += mregs (opt_brev)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009e60
-		                |((iregs($1)&0x3)<<0)                    /* i<(iregs) */
-		                |((mregs($3)&0x3)<<2)                    /* m<(mregs) */
-		                |((0&0x1)<<4)                            /* op<(0) */
-		                |((1&0x1)<<7)                            /* br<(1) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_pregs)
-		             && reginclass($3,rc_pregs)) {
-/* PTR2op:	pregs += pregs ( BREV )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 1 | 0 |.opc.......|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
+				/*         i          m  op  br */
+			$$ = DAGMODIM (&$1, &$3,  0,  1);
+		} else
+		if (IS_PREG($1) && IS_PREG($3)) {
 		    notethat("PTR2op: pregs += pregs ( BREV )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004400
-		                |((pregs($1)&0x7)<<0)                    /* dst<(pregs) */
-		                |((pregs($3)&0x7)<<3)                    /* src<(pregs) */
-		                |((5&0x7)<<6)                            /* opc<(5) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG _PLUS_ASSIGN REG LPAREN BREV RPAREN"); }
+			$$ = PTR2OP (&$1, &$3, 5);
+		} else {
+			return register_mismatch();
 		}
-	| REG_A00 _PLUS_ASSIGN REG_A11 LPAREN W32 RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A0
-		             && $3 == REG_A1) {
-/* dsp32alu:	A0 += A1 (W32)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A0 += A1 (W32)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((11&0x1f)<<0)                          /* aopcde<(11) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((2&0x3)<<14)                           /* aop<(2) */
-		                  |((1&0x1)<<13)                           /* s<(1) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("REG_A00 _PLUS_ASSIGN REG_A11 LPAREN W32 RPAREN)"); }
+	| REG _MINUS_ASSIGN REG
+	{
+		if (IS_IREG($1) && IS_MREG($3)) {
+		    notethat("dagMODim: iregs -= mregs\n");
+				/*         i          m  op  br */
+			$$ = DAGMODIM (&$1, &$3,  1,  0);
+		} else
+		if (IS_PREG($1) && IS_PREG($3)) {
+		    notethat("PTR2op: pregs -= pregs\n");
+			$$ = PTR2OP (&$1, &$3, 0);
+		} else {
+			return register_mismatch();
 		}
-	| REG_A00 _PLUS_ASSIGN REG_A11
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A0
-		             && $3 == REG_A1) {
-/* dsp32alu:	A0 += A1
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A0 += A1\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((11&0x1f)<<0)                          /* aopcde<(11) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((2&0x3)<<14)                           /* aop<(2) */
-		                  |((0&0x1)<<13)                           /* s<(0) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("REG_A00 _PLUS_ASSIGN REG_A11"); }
+	| REG_A _PLUS_ASSIGN REG_A w32_or_nothing
+	{
+		if (!IS_A1($1) && IS_A1($3)) {
+			notethat("dsp32alu: A0 += A1 (W32)\n");
+
+					  /* aopcde       HL                   */
+			$$ = DSP32ALU (  11,       0,
+					  /*   dst1     dst0     src0     src1 */
+							  0,       0,       0,       0,
+					  /*      s        x      aop          */
+						  $4.r0,       0,       2          );
+		} else {
+			return register_mismatch();
 		}
+	}
+
 	| REG _PLUS_ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_iregs)
-		             && reginclass($3,rc_mregs)) {
-/* dagMODim:	iregs += mregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 | 1 | 0 |.br| 1 | 1 |.op|.m.....|.i.....|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
+	{
+		if (IS_IREG($1) && IS_MREG($3)) {
 		    notethat("dagMODim: iregs += mregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009e60
-		                |((iregs($1)&0x3)<<0)                    /* i<(iregs) */
-		                |((mregs($3)&0x3)<<2)                    /* m<(mregs) */
-		                |((0&0x1)<<4)                            /* op<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG _PLUS_ASSIGN REG"); }
+			            /*         i          m  op  br */
+			$$ = DAGMODIM (&$1, &$3,  0,  0);
+		} else {
+			return semantic_error("iregs += mregs expected");
 		}
+	}
+
 	| REG _PLUS_ASSIGN expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_iregs)
-		             && EXPR_VALUE($3) == 4) {
-/* dagMODik:	iregs += 4
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 | 1 | 1 | 0 | 1 | 1 | 0 |.op....|.i.....|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dagMODik: iregs += 4\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009f60
-		                |((iregs($1)&0x3)<<0)                    /* i<(iregs) */
-		                |((2&0x3)<<2)                            /* op<(2) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_pregs)
-		             && const_fits($3,c_imm7)) {
-/* COMPI2opP:	pregs += imm7
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 1 | 0 | 1 |.op|.src.......................|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
+	{
+		if (IS_IREG($1)) {
+			if (EXPR_VALUE($3) == 4) {
+				notethat("dagMODik: iregs += 4\n");
+				$$ = DAGMODIK (&$1, 2);
+			} else
+			if (EXPR_VALUE($3) == 2) {
+				notethat("dagMODik: iregs += 2\n");
+				$$ = DAGMODIK (&$1, 0);
+			} else {
+				return semantic_error("iregs += [ 2 | 4 ");
+			}
+		} else
+		if (IS_PREG($1) && IS_IMM($3, 7)) {
 		    notethat("COMPI2opP: pregs += imm7\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x006800
-		                |((pregs($1)&0x7)<<0)                    /* dst<(pregs) */
-		                |((imm7($3)&0x7f)<<3)                    /* src<(imm7) */
-		                |((1&0x1)<<10)                           /* op<(1) */
-		        ),
-		        NULL_CODE);
-
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && const_fits($3,c_imm7)) {
-/* COMPI2opD:	dregs += imm7
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 1 | 0 | 0 |.op|.isrc......................|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
+			$$ = COMPI2OPP (&$1, imm7($3),  1);
+		} else
+		if (IS_DREG($1) && IS_IMM($3, 7)) {
 		    notethat("COMPI2opD: dregs += imm7\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x006000
-		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                |((imm7($3)&0x7f)<<3)                    /* isrc<(imm7) */
-		                |((1&0x1)<<10)                           /* op<(1) */
-		        ),
-		        NULL_CODE);
-
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_iregs)
-		             && EXPR_VALUE($3) == 2) {
-/* dagMODik:	iregs += 2
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 0 | 0 | 1 | 1 | 1 | 1 | 1 | 0 | 1 | 1 | 0 |.op....|.i.....|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dagMODik: iregs += 2\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x009f60
-		                |((iregs($1)&0x3)<<0)                    /* i<(iregs) */
-		                |((0&0x3)<<2)                            /* op<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG _PLUS_ASSIGN expr"); }
+			$$ = COMPI2OPD (&$1, imm7($3),  1);
+		} else {
+			return register_mismatch();
 		}
+	}
+
  	| REG _STAR_ASSIGN REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)) {
-/* ALU2op:	dregs *= dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 0 |.opc...........|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
+	{
+		if (IS_DREG($1) && IS_DREG($3)) {
 		    notethat("ALU2op: dregs *= dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004000
-		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                |((dregs($3)&0x7)<<3)                    /* src<(dregs) */
-		                |((3&0xf)<<6)                            /* opc<(3) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("REG _STAR_ASSIGN REG"); }
+			$$ = ALU2OP (&$1, &$3, 3);   // dst, src, opc
+		} else {
+			return register_mismatch();
 		}
-	| RTE
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-/* ProgCtrl:	RTE
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.prgfunc.......|.poprnd........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ProgCtrl: RTE\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000000
-		                |((1&0xf)<<4)                            /* prgfunc<(1) */
-		                |((4&0xf)<<0)                            /* poprnd<(4) */
-		        ),
-		        NULL_CODE);
+	}
 
-		  } else { $$ = 0; semantic_error ("RTE"); }
-		}
-	| RTI
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-/* ProgCtrl:	RTI
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.prgfunc.......|.poprnd........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ProgCtrl: RTI\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000000
-		                |((1&0xf)<<4)                            /* prgfunc<(1) */
-		                |((1&0xf)<<0)                            /* poprnd<(1) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("RTI"); }
-		}
-	| RTN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-/* ProgCtrl:	RTN
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.prgfunc.......|.poprnd........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ProgCtrl: RTN\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000000
-		                |((1&0xf)<<4)                            /* prgfunc<(1) */
-		                |((3&0xf)<<0)                            /* poprnd<(3) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("RTN"); }
-		}
-	| RTS
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-/* ProgCtrl:	RTS
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.prgfunc.......|.poprnd........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ProgCtrl: RTS\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000000
-		                |((1&0xf)<<4)                            /* prgfunc<(1) */
-		                |((0&0xf)<<0)                            /* poprnd<(0) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("RTS"); }
-		}
-	| RTX
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-/* ProgCtrl:	RTX
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.prgfunc.......|.poprnd........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ProgCtrl: RTX\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000000
-		                |((1&0xf)<<4)                            /* prgfunc<(1) */
-		                |((2&0xf)<<0)                            /* poprnd<(2) */
-		        ),
-		        NULL_CODE);
-
-		  } else { $$ = 0; semantic_error ("RTX"); }
-		}
 	| SAA LPAREN REG COLON expr COMMA REG COLON expr RPAREN aligndir
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($3,rc_dregs)
-		             && reginclass($7,rc_dregs)) {
-/* dsp32alu:	SAA ( dregs_pair , dregs_pair ) (aligndir)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
+	{
+		if (IS_DREG($3) && IS_DREG($7)) {
 		    notethat("dsp32alu: SAA ( dregs_pair , dregs_pair ) (aligndir)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((18&0x1f)<<0)                          /* aopcde<(18) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((dregs($3)&0x7)<<3)               /* src0<(dregs_pair) */
-		                  |((dregs($7)&0x7)<<0)               /* src1<(dregs_pair) */
-		                  |((($11.r0)&0x1)<<13)                     /* s=aligndir.r0 */
-		                  |((0&0x3)<<14)                           /* aop<(0) */
-		          ),
-		          NULL_CODE));
-
-		  } else { $$ = 0; semantic_error ("SAA LPAREN REG COLON expr COMMA REG COLON expr RPAREN aligndir"); }
+			          /* aopcde       HL                   */
+		$$ = DSP32ALU (  18,       0,
+		          /*   dst1     dst0     src0     src1 */
+		                  0,       0,     &$3,     &$7,
+		          /*      s        x      aop          */
+		             $11.r0,       0,       0          );
+		} else {
+			return register_mismatch();
 		}
-	| REG_A11 ASSIGN REG_A11 LPAREN S RPAREN COMMA REG_A00 ASSIGN REG_A00 LPAREN S RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && $1 == REG_A1
-		             && $3 == REG_A1
-		             && $8 == REG_A0
-		             && $10 == REG_A0) {
-/* dsp32alu:	A1 = A1 (S) , A0 = A0 (S)
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 0 | 0 |.M.| 1 | 0 | - | - | - |.HL|.aopcde............|
-|.aop...|.s.|.x.|.dst0......|.dst1......|.src0......|.src1......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("dsp32alu: A1 = A1 (S) , A0 = A0 (S)\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00c400
-		                |((8&0x1f)<<0)                           /* aopcde<(8) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		                  |((2&0x3)<<14)                           /* aop<(2) */
-		                  |((1&0x1)<<13)                           /* s<(1) */
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("REG_A11 ASSIGN REG_A11 LPAREN S RPAREN COMMA REG_A00 ASSIGN REG_A00 LPAREN S RPAREN"); }
+	| a_assign REG_A LPAREN S RPAREN COMMA a_assign REG_A LPAREN S RPAREN
+	{
+		if (REG_SAME($1, $2) && REG_SAME($7, $8) && !REG_SAME($1, $7)) {
+
+			notethat("dsp32alu: A1 = A1 (S) , A0 = A0 (S)\n");
+			$$ = DSP32ALU (   8,       0,
+					  /*   dst1     dst0     src0     src1 */
+							  0,       0,       0,       0,
+					  /*      s        x      aop          */
+							  1,       0,       2          );
+		} else {
+			return register_mismatch();
 		}
+	}
+
 	| REG ASSIGN LPAREN REG PLUS REG RPAREN LESS_LESS expr
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($6,rc_dregs)
-		             && EXPR_VALUE($9) == 1
-			     && $1==$4) {
-/* ALU2op:	dregs = (dregs + dregs) << 1
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 0 |.opc...........|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ALU2op: dregs = (dregs + dregs) << 1\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004000
-		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                |((dregs($6)&0x7)<<3)                    /* src<(dregs) */
-		                |((4&0xf)<<6)                            /* opc<(4) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_dregs)
-		             && reginclass($4,rc_dregs)
-		             && reginclass($6,rc_dregs)
-		             && EXPR_VALUE($9) == 2
-			     && $1==$4) {
-/* ALU2op:	dregs = (dregs + dregs) << 2
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 0 |.opc...........|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ALU2op: dregs = (dregs + dregs) << 2\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004000
-		                |((dregs($1)&0x7)<<0)                    /* dst<(dregs) */
-		                |((dregs($6)&0x7)<<3)                    /* src<(dregs) */
-		                |((5&0xf)<<6)                            /* opc<(5) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_pregs)
-		             && reginclass($4,rc_pregs)
-		             && reginclass($6,rc_pregs)
-		             && EXPR_VALUE($9) == 1
-			     && $1==$4) {
-/* PTR2op:	pregs = (pregs + pregs) << 1
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 1 | 0 |.opc.......|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("PTR2op: pregs = (pregs + pregs) << 1\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004400
-		                |((pregs($1)&0x7)<<0)                    /* dst<(pregs) */
-		                |((pregs($6)&0x7)<<3)                    /* src<(pregs) */
-		                |((6&0x7)<<6)                            /* opc<(6) */
-		        ),
-		        NULL_CODE);
-		
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($1,rc_pregs)
-		             && reginclass($4,rc_pregs)
-		             && reginclass($6,rc_pregs)
-		             && EXPR_VALUE($9) == 2
-			     && $1==$4) {
-/* PTR2op:	pregs = (pregs + pregs) << 2 
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 1 | 0 | 0 | 0 | 1 | 0 |.opc.......|.src.......|.dst.......|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("PTR2op: pregs = (pregs + pregs) << 2\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x004400
-		                |((pregs($1)&0x7)<<0)                    /* dst<(pregs) */
-		                |((pregs($6)&0x7)<<3)                    /* src<(pregs) */
-		                |((7&0x7)<<6)                            /* opc<(7) */
-		        ),
-		        NULL_CODE);
+	{
+		if (IS_DREG($1) && IS_DREG($4) && IS_DREG($6)
+		 && REG_SAME($1, $4)) {
+		 	if (EXPR_VALUE($9) == 1) {
+				notethat("ALU2op: dregs = (dregs + dregs) << 1\n");
+				$$ = ALU2OP (&$1, &$6, 4);   // dst, src, opc
+			} else
+		 	if (EXPR_VALUE($9) == 2) {
+				notethat("ALU2op: dregs = (dregs + dregs) << 2\n");
+				$$ = ALU2OP (&$1, &$6, 5);   // dst, src, opc
+			} else {
+				return semantic_error("Bad shift value");
+			}
+		} else
+		if (IS_PREG($1) && IS_PREG($4) && IS_PREG($6)
+		 && REG_SAME($1, $4)) {
+		 	if (EXPR_VALUE($9) == 1) {
+				notethat("PTR2op: pregs = (pregs + pregs) << 1\n");
+				$$ = PTR2OP (&$1, &$6, 6);
+			} else
+		 	if (EXPR_VALUE($9) == 2) {
+				notethat("PTR2op: pregs = (pregs + pregs) << 2\n");
+				$$ = PTR2OP (&$1, &$6, 7);
+			} else {
+				return semantic_error("Bad shift value");
+			}
+		} else {
+			return register_mismatch();
+		}
+	}
+			
+				
+// }
+////////////////////////////////////////////////////////////////////////////
+// COMP3 CCFLAG
+// {
 
-		  } else { $$ = 0; semantic_error ("REG ASSIGN LPAREN REG PLUS REG RPAREN LESS_LESS expr"); }
+	| REG ASSIGN REG BAR REG
+	{
+		if (IS_DREG($1) && IS_DREG($3) && IS_DREG($5)) {
+		    notethat("COMP3op: dregs = dregs | dregs\n");
+			$$ = COMP3OP (&$1, &$3, &$5, 3);
+		} else {
+			return semantic_error("Dregs expected");
 		}
-	| SSYNC
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-/* ProgCtrl:	SSYNC
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.prgfunc.......|.poprnd........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ProgCtrl: SSYNC\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000000
-		                |((2&0xf)<<4)                            /* prgfunc<(2) */
-		                |((4&0xf)<<0)                            /* poprnd<(4) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("SSYNC"); }
-		}
-	| STI REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($2,rc_dregs)) {
-/* ProgCtrl:	STI dregs
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.prgfunc.......|.poprnd........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ProgCtrl: STI dregs\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000000
-		                |((dregs($2)&0xf)<<0)                    /* poprnd<(dregs) */
-		                |((4&0xf)<<4)                            /* prgfunc<(4) */
-		        ),
-		        NULL_CODE);
+	}
 
-		  } else { $$ = 0; semantic_error ("STI REG"); }
+	| REG ASSIGN REG CARET REG
+	{
+		if (IS_DREG($1) && IS_DREG($3) && IS_DREG($5)) {
+		    notethat("COMP3op: dregs = dregs ^ dregs\n");
+			$$ = COMP3OP (&$1, &$3, &$5, 4);
+		} else {
+			return semantic_error("Dregs expected");
 		}
-	| TESTSET LPAREN REG RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-		             && reginclass($3,rc_pregs)) {
-/* ProgCtrl:	TESTSET ( pregs )
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.prgfunc.......|.poprnd........|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("ProgCtrl: TESTSET ( pregs )\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x000000
-		                |((pregs($3)&0xf)<<0)                    /* poprnd<(pregs) */
-		                |((11&0xf)<<4)                           /* prgfunc<(11) */
-		        ),
-		        NULL_CODE);
-		
-		  } else { $$ = 0; semantic_error ("TESTSET LPAREN REG RPAREN"); }
-		}
-	| UNLINK
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-/* linkage:	UNLINK
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-| 1 | 1 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |.R.|
-|.framesize.....................................................|
-+---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-*/
-		    notethat("linkage: UNLINK\n");
-		    $$ =
-		      CONSCODE(
-		        GENCODE(0x00e800
-		                |((1&0x1)<<0)                            /* R<(1) */
-		        ),
-		        CONSCODE(
-		          GENCODE(0x000000
-		          ),
-		          NULL_CODE));
+	}
 
-		  } else { $$ = 0; semantic_error ("UNLINK"); }
+	| REG ASSIGN REG PLUS LPAREN REG LESS_LESS expr RPAREN
+	{
+		if (IS_PREG($1) && IS_PREG($3) && IS_PREG($6)) {
+			if (EXPR_VALUE($8) == 1) {
+				notethat("COMP3op: pregs = pregs + (pregs << 1)\n");
+				$$ = COMP3OP (&$1, &$3, &$6, 6);
+			} else 
+			if (EXPR_VALUE($8) == 2) {
+				notethat("COMP3op: pregs = pregs + (pregs << 2)\n");
+				$$ = COMP3OP (&$1, &$3, &$6, 7);
+			} else {
+				return semantic_error("Bad shift value");
+			}
+		} else {
+			return semantic_error("Dregs expected");
 		}
+	}
 
-	;
+	| CCREG ASSIGN REG_A _ASSIGN_ASSIGN REG_A
+	{
+		if (!REG_SAME($3, $5)) {
+		    notethat("CCflag: CC = A0 == A1\n");
+					/*    x       y      opc     I     G   */
+			$$ = CCFLAG ( 0,      0,       5,    0,    0   );
+		} else {
+			return semantic_error("CC register expected");
+		}
+	}
 
+	| CCREG ASSIGN REG_A LESS_THAN REG_A
+	{
+		if (!REG_SAME($3, $5)) {
+		    notethat("CCflag: CC = A0 < A1\n");
+			        /*   x     y     opc     I     G   */
+			$$ = CCFLAG (0,    0,      6,    0,    0   );
+		} else {
+			return register_mismatch();
+		}
+	}
 
-/******************************************************************/
-amod0:
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.s0 = 0;
-		      $$.x0 = 0;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error (""); }
+/* 2 rules compacted */
+	| CCREG ASSIGN REG LESS_THAN REG iu_or_nothing
+	{
+		if (REG_CLASS($3) == REG_CLASS($5)) {
+		    notethat("CCflag: CC = dpregs < dpregs\n");
+			        /*    x       y        opc     I     G   */
+			$$ = CCFLAG (&$3, $5.regno & CODE_MASK, $6.r0,    0,  IS_PREG($3) ? 1 : 0 );
+		} else {
+			return semantic_error("Compare only of same register class");
 		}
-	| LPAREN S RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.s0 = 1;
-		      $$.x0 = 0;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("S"); }
-		}
-	| LPAREN SCO RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.s0 = 1;
-		      $$.x0 = 1;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("SCO"); }
-		}
-	| LPAREN CO RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.s0 = 0;
-		      $$.x0 = 1;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("CO"); }
-		}
-	| CO
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      memset (&$$, 0, sizeof ($$)); semantic_error ("Not Allowed"); 
-		  } 
-		}
-	| S
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      memset (&$$, 0, sizeof ($$)); semantic_error ("Not Allowed"); 
-		  } 
-		}
-	| SCO 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      memset (&$$, 0, sizeof ($$)); semantic_error ("Not Allowed"); 
-		  } 
-		}
-	;
-amod1:
+	}
 
-		 {
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.s0 = 0;
-		      $$.x0 = 0;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error (""); }
+/* 2 rules compacted */
+	| CCREG ASSIGN REG LESS_THAN expr iu_or_nothing
+	{
+		if ( (IS_IMM($5, 3) && $6.r0 == 1) || IS_UIMM($5, 3) ) {
+			notethat("CCflag: CC = dpregs < (u)imm3\n");
+					/*    x       y         opc     I     G   */
+			$$ = CCFLAG (&$3, imm3($5), $6.r0,    1,  IS_PREG($3) ? 1 : 0 );
+		} else {
+			return semantic_error("Bad constant range");
+		}
+	}
+
+	| CCREG ASSIGN REG _ASSIGN_ASSIGN REG
+	{
+		if (REG_CLASS($3) == REG_CLASS($5)) {
+			notethat("CCflag: CC = dpregs == dpregs\n");
+					/*    x       y        opc     I     G   */
+			$$ = CCFLAG (&$3, $5.regno & CODE_MASK,    0,    0,  IS_PREG($3) ? 1 : 0 );
 		} 
-	| LPAREN NS RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.s0 = 0;
-		      $$.x0 = 0;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("NS"); }
+	}
+
+	| CCREG ASSIGN REG _ASSIGN_ASSIGN expr
+	{
+		if (IS_IMM($5, 3)) {
+			notethat("CCflag: CC = dpregs == imm3\n");
+					/*    x       y         opc     I     G   */
+			$$ = CCFLAG (&$3, imm3($5),    0,    1, IS_PREG($3) ? 1 : 0 );
+		} else {
+			return semantic_error("Bad constant range");
 		}
-	| LPAREN S RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.s0 = 1;
-		      $$.x0 = 0;   
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("S"); }
+	}
+
+	| CCREG ASSIGN REG_A _LESS_THAN_ASSIGN REG_A
+	{
+		if (!REG_SAME($3, $5)) {
+		    notethat("CCflag: CC = A0 <= A1\n");
+					/*    x       y         opc     I     G   */
+			$$ = CCFLAG ( 0,      0,          7,    0,    0   );
+		} else {
+			return semantic_error("CC register expected");
 		}
-	| S 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      memset (&$$, 0, sizeof ($$)); semantic_error ("Not Allowed"); 
-		  } 
+	}
+
+/* 2 rules compacted */
+	| CCREG ASSIGN REG _LESS_THAN_ASSIGN REG iu_or_nothing
+	{
+		if (REG_CLASS($3) == REG_CLASS($5)) {
+			notethat("CCflag: CC = pregs <= pregs (..)\n");
+					/*    x       y     opc     I     G   */
+			$$ = CCFLAG (&$3, $5.regno & CODE_MASK,
+			                           1+$6.r0, 0, IS_PREG($3) ? 1 : 0 );
+
+		} else {
+			return semantic_error("Compare only of same register class");
 		}
-	| NS 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      memset (&$$, 0, sizeof ($$)); semantic_error ("Not Allowed"); 
-		  } 
+	}
+
+	| CCREG ASSIGN REG _LESS_THAN_ASSIGN expr iu_or_nothing
+	{
+		if ( (IS_IMM($5, 3) && $6.r0 == 1) || IS_UIMM($5, 3) ) {
+			if (IS_DREG($3)) {
+				notethat("CCflag: CC = dregs <= imm3\n");
+						/*    x       y     opc     I     G   */
+				$$ = CCFLAG (&$3, imm3($5), 1+$6.r0,    1,    0   );
+			} else
+			if (IS_PREG($3)) {
+				notethat("CCflag: CC = pregs <= imm3\n");
+						/*    x       y     opc     I     G   */
+				$$ = CCFLAG (&$3, imm3($5), 1+$6.r0,    1,    1   );
+			} else {
+				return semantic_error("Dreg or Preg expected");
+			}
+		} else {
+			return semantic_error("Bad constant value");
 		}
-	;
-amod2:
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.r0 = 0;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error (""); }
+	}
+
+	| REG ASSIGN REG AMPERSAND REG
+	{
+		if (IS_DREG($1) && IS_DREG($3) && IS_DREG($5)) {
+		    notethat("COMP3op: dregs = dregs & dregs\n");
+			$$ = COMP3OP (&$1, &$3, &$5, 2);
+		} else {
+			return semantic_error("Dregs expected");
 		}
-	| LPAREN ASR RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.r0 = 2;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("ASR");}
+	}
+
+	| ccstat
+	{
+		notethat("CC2stat operation\n");
+		$$ = gen_cc2stat($1.r0, $1.x0, $1.s0); // cbit, op, D
+	}
+
+	| REG ASSIGN REG
+	{
+		if (IS_ALLREG($1) && IS_ALLREG($3)) {
+		    notethat("REGMV: allregs = allregs\n");
+			$$ = gen_regmv(&$3, &$1);
+		} else {
+			return register_mismatch();
 		}
-	| LPAREN ASL RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.r0 = 3;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("ASL");}
+	}
+
+	| CCREG ASSIGN REG
+	{
+
+		if (IS_DREG($3)) {
+		    notethat("CC2dreg: CC = dregs\n");
+			$$ = gen_cc2dreg(1, &$3);
+		} else
+			return register_mismatch();
+	}
+
+	| REG ASSIGN CCREG
+	{
+		if (IS_DREG($1)) {
+		    notethat("CC2dreg: dregs = CC\n");
+			$$ = gen_cc2dreg(0, &$1);
+		} else
+			return register_mismatch();
+	}
+
+	| CCREG _ASSIGN_BANG CCREG
+	{
+		notethat("CC2dreg: CC =! CC\n");
+		$$ = gen_cc2dreg(3, 0);
+	}
+			
+////////////////////////////////////////////////////////////////////////////
+// DSPMULT
+// {
+
+	| HALF_REG ASSIGN multfunc opt_mode
+	{
+		notethat("dsp32mult: dregs_half = multfunc (opt_mode)\n");
+
+		if (!IS_H($1) && $4.MM) { // not allowed
+			return semantic_error("(M) not allowed with MAC0");
 		}
 
-	;
-xorzornothing:
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.r0 = 0;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error (""); }
+		if (IS_H($1)) {
+						   /*   op1     MM      mmod  */
+			$$ = DSP32MULT (     0,  $4.MM,   $4.mod,              /* w1  P */
+						   /*   h01    h11       h00    h10 */         1, 0,
+							   IS_H($3.s0), IS_H($3.s1),   0,   0,
+									 &$1,  // dst (dregs)
+						   /*  op0    src0    src1  w0  */
+								 0, &$3.s0, &$3.s1,  0                   );
+		} else {
+						   /*   op1     MM      mmod  */
+			$$ = DSP32MULT (     0,      0,   $4.mod,              /* w1  P */
+						   /*   h01    h11       h00    h10 */         0, 0,
+							    0,   0, IS_H($3.s0), IS_H($3.s1),  
+									 &$1,  // dst (dregs)
+						   /*  op0    src0    src1  w0  */
+								 0, &$3.s0, &$3.s1,  1                   );
+		}	
+	}
+
+	| REG ASSIGN multfunc opt_mode 
+	{
+		// Odd registers can use (M)
+		if (!IS_DREG($1)) return semantic_error("Dreg expected");
+
+		if (!IS_EVEN($1)) {
+		    notethat("dsp32mult: dregs = multfunc (opt_mode)\n");
+
+			               /*   op1       MM      mmod  */
+			$$ = DSP32MULT (      0,   $4.MM,   $4.mod,         /* w1  P */
+			               /*   h01    h11       h00      h10 */    1, 1,
+						   IS_H($3.s0), IS_H($3.s1),      0,     0,
+			                     &$1,  // dst (dregs)
+					   /*  op0    src0    src1  w0  */
+						     0, &$3.s0, &$3.s1,  0                   );
+		} else
+		if ($4.MM == 0) {
+		    notethat("dsp32mult: dregs = multfunc opt_mode\n");
+			               /*   op1       MM      mmod  */
+			$$ = DSP32MULT (      0,       0,   $4.mod,         /* w1  P */
+			               /*   h01    h11       h00      h10 */    0, 1,
+						       0,     0,  IS_H($3.s0), IS_H($3.s1),  
+			                     &$1,  // dst (dregs)
+					   /*  op0    src0    src1  w0  */
+						     0, &$3.s0, &$3.s1,  1                   );
+		} else {
+			return semantic_error("Register or mode mismatch");
 		}
-	| LPAREN Z RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.r0 = 0;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("(Z)");}
+	}
+
+	| HALF_REG ASSIGN multfunc opt_mode COMMA HALF_REG ASSIGN multfunc opt_mode
+	{
+		if (!IS_DREG($1) || !IS_DREG($6)) 
+			return semantic_error("Dregs expected");
+
+		if (check_multfuncs(&$3, &$8) < 0) return -1;
+
+		if (IS_H($1) && !IS_H($6)) {
+		    notethat("dsp32mult: dregs_hi = multfunc mxd_mod, "
+			         "dregs_lo = multfunc opt_mode\n");
+			               /*   op1       MM      mmod  */
+			$$ = DSP32MULT (      0,   $4.MM,   $9.mod,         /* w1  P */
+			               /*   h01    h11       h00      h10 */    1, 0,
+						   IS_H($3.s0), IS_H($3.s1), IS_H($8.s0), IS_H($8.s1),
+			                     &$1,  // dst (dregs)
+					   /*  op0    src0    src1  w0  */
+						     0, &$3.s0, &$3.s1,  1                   );
+		} else 
+		if (!IS_H($1) && IS_H($6) && $4.MM == 0) {
+			               /*   op1       MM      mmod  */
+			$$ = DSP32MULT (      0,   $9.MM,   $9.mod,         /* w1  P */
+			               /*   h01    h11       h00      h10 */    1, 0,
+						   IS_H($8.s0), IS_H($8.s1), IS_H($3.s0), IS_H($3.s1),
+			                     &$1,  // dst (dregs)
+					   /*  op0    src0    src1  w0  */
+						     0, &$3.s0, &$3.s1,  1                   );
+		} else {
+			return semantic_error("Multfunc Register or mode mismatch");
 		}
-	| LPAREN X RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.r0 = 1;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("(X)");}
+	}
+
+	| REG ASSIGN multfunc opt_mode COMMA REG ASSIGN multfunc opt_mode 
+	{
+		if (check_multfuncs(&$3, &$8) < 0) return -1;
+
+		if (!IS_DREG($1) || !IS_DREG($6)) 
+			return semantic_error("Dregs expected");
+
+		notethat("dsp32mult: dregs = multfunc mxd_mod, "
+		         "dregs = multfunc opt_mode\n");
+		if (IS_EVEN($1)) {
+			if ( $6.regno - $1.regno != 1 || $4.MM != 0)
+				return semantic_error("Dest registers or mode mismatch");
+
+						   /*   op1       MM      mmod  */
+			$$ = DSP32MULT (      0,       0,   $9.mod,         /* w1  P */
+							/*   h01    h11       h00      h10 */   1, 1,
+						IS_H($8.s0), IS_H($8.s1), IS_H($3.s0), IS_H($3.s1),
+							 &$1,
+					   /* op0    src0    src1  w0  */
+							0, &$3.s0, &$3.s1,  1                   );
+
+		} else {
+			if ( $1.regno - $6.regno != 1 ) 
+				return semantic_error("Dest registers mismatch");
+
+						   /*   op1       MM      mmod  */
+			$$ = DSP32MULT (      0,   $9.MM,   $9.mod,         /* w1  P */
+							/*   h01    h11       h00      h10 */   1, 1,
+						  IS_H($3.s0), IS_H($3.s1), IS_H($8.s0), IS_H($8.s1),
+							 &$1,
+					   /* op0    src0    src1  w0  */
+							0, &$3.s0, &$3.s1,  1                   );
+		}
+	}
+
+// }
+////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////
+// SHIFTs
+// {
+
+/* 2 rules compacted */
+	
+	| a_assign ASHIFT REG_A BY HALF_REG
+	{
+		if (!REG_SAME($1, $3)) {
+			return semantic_error("Aregs must be same");
+		}
+		if (IS_DREG($5) && !IS_H($5)) {
+		    notethat("dsp32shift: A0 = ASHIFT A0 BY dregs_lo\n");
+						  /*   sopcde   dst0     src0     src1 */
+			$$ = DSP32SHIFT (       3,     0,     &$5,       0,
+						  /*      sop      HLs */
+									0,  IS_A1($1)                 );
+		} else {
+			return semantic_error("Dregs expected");
+		}
+	}
+
+/* 8 rules compacted */
+	| HALF_REG ASSIGN ASHIFT HALF_REG BY HALF_REG smod
+	{
+		if (IS_DREG($6) && !IS_H($6)) {
+		    notethat("dsp32shift: dregs_half = ASHIFT dregs_half BY dregs_lo\n");
+						  /*   sopcde   dst0     src0     src1 */
+			$$ = DSP32SHIFT (       0,   &$1,     &$6,     &$4,
+						  /*      sop      HLs */
+								$7.s0,  HL2($1, $4)     );
+		} else {
+			return semantic_error("Dregs expected");
+		}
+	}
+
+/* 2 rules compacted */
+	| a_assign REG_A LESS_LESS expr
+	{
+		if (!REG_SAME($1, $2)) {
+			return semantic_error("Aregs must be same");
+		}
+		if (IS_UIMM($4, 5)) {
+		    notethat("dsp32shiftimm: A0 = A0 << uimm5\n");
+							/*   sopcde   dst0      immag     src1 */
+			$$ = DSP32SHIFTIMM (      3,   &$1,  imm6($4),    0,
+							/*      sop      HLs */
+									  0,   IS_A1($1)                 );
+		} else {
+			return semantic_error("Bad shift value");
 		}
 
-	;
+	}
 
-sornothing:
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.r0 = 0;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error (""); }
-		}
-	| LPAREN S RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.r0 = 1;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("(S)");}
-		}
-	;
+/* 5 rules compacted */
+	| REG ASSIGN REG LESS_LESS expr vsmod
+	{
+		if (IS_DREG($1) && IS_DREG($3) && IS_UIMM($5, 5)) {
+			if ($6.r0) { // vector ?
+				notethat("dsp32shiftimm: dregs = dregs << expr (V, .)\n");
+				                /*   sopcde   dst0      immag     src1 */
+				$$ = DSP32SHIFTIMM (      1,   &$1,  imm5($5),     &$3,
+				                /*      sop      HLs */
+				                      $6.s0,       0                      );
 
-macmod_accm:
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.mod = 0;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error (""); }
-		}
-	| IS
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      memset (&$$, 0, sizeof ($$)); semantic_error ("(IS)"); 
-		  } 
-		}
-	| FU 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      memset (&$$, 0, sizeof ($$)); semantic_error ("(FU)"); 
-		  } 
-		}
-	| W32
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      memset (&$$, 0, sizeof ($$)); semantic_error ("(W32)"); 
-		  } 
-		}
-	| LPAREN IS RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.mod = 8;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("(IS)"); }
-		}
-	| LPAREN FU RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.mod = 4;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("(FU)"); }
-		}
-	| LPAREN W32 RPAREN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.mod = 3;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("(W32)"); }
-		}
+			} else {
+				notethat("dsp32shiftimm: dregs =  dregs << uimm5 (.)\n");
+								/*   sopcde   dst0      immag     src1 */
+				$$ = DSP32SHIFTIMM (      2,   &$1,  imm6($5),     &$3,
+								/*      sop      HLs */
+				               $6.s0 ? 1: 2,       0                     );
+			}
+		} else
 
-	;
-
-
-
-searchmod:	  GE
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.r0 = 1;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("GE"); }
+		if ($6.s0 == 0 && IS_PREG($1) && IS_PREG($3)) {
+			if (EXPR_VALUE($5) == 2) {
+				notethat("PTR2op: pregs = pregs << 2\n");
+				$$ = PTR2OP (&$1, &$3, 1);
+			} else
+			if (EXPR_VALUE($5) == 1) {
+				notethat("COMP3op: pregs = pregs << 1\n");
+				$$ = COMP3OP (&$1, &$3, &$3, 5);
+			} else {
+				return semantic_error("Bad shift value");
+			}
+		} else {
+			return semantic_error("Bad shift value or register");
 		}
-	| GT
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.r0 = 0;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("GT"); }
-		}
-	| LE
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.r0 = 3;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("LE"); }
-		}
-	| LT
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.r0 = 2;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("LT"); }
-		}
+	}
 
-	;
+/* 4 rules compacted */
+	| HALF_REG ASSIGN HALF_REG LESS_LESS expr smod 
+	{
+		if (IS_UIMM($5, 4)) {
+		    notethat("dsp32shiftimm: dregs_half = dregs_half << uimm4\n");
+			                /*   sopcde   dst0      immag     src1  */
+			$$ = DSP32SHIFTIMM (      0,   &$1,  imm5($5),     &$3,
+		                    /*      sop      HLs */
+			                      $6.s0, HL2($1, $3)  );
+		} else {
+			return semantic_error("Bad shift value");
+		}
+	}
+
+/* 6 rules compacted */
+	| REG ASSIGN ASHIFT REG BY HALF_REG vsmod
+	{
+		int op;
+
+		if (IS_DREG($1) && IS_DREG($4) && IS_DREG($6) && !IS_H($6)) {
+			if ($7.r0) {
+				op = 1;
+				notethat("dsp32shift: dregs = ASHIFT dregs BY "
+				         "dregs_lo (V, .)\n");
+			} else {
+				op = 2;
+				notethat("dsp32shift: dregs = ASHIFT dregs BY dregs_lo (.)\n");
+			}
+						  /*   sopcde   dst0     src0     src1 */
+			$$ = DSP32SHIFT (      op,   &$1,     &$6,     &$4,
+						  /*      sop      HLs */
+								$7.s0,       0                    );
+		} else {
+			return semantic_error("Dregs expected");
+		}
+	}
+
+// EXPADJ
+/* 2 rules compacted */
+	| HALF_REG ASSIGN EXPADJ LPAREN REG COMMA HALF_REG RPAREN vmod
+	{
+		if (IS_DREG_L($1) && IS_DREG_L($5) && IS_DREG_L($7)) {
+		    notethat("dsp32shift: dregs_lo = EXPADJ ( dregs , dregs_lo )\n");
+						  /*   sopcde   dst0     src0     src1 */
+			$$ = DSP32SHIFT (       7,   &$1,     &$7,     &$5,
+						  /*      sop      HLs */
+								$9.r0,       0                    );
+		} else {
+			return semantic_error("Bad shift value or register");
+		}
+	}
 
 
+	| HALF_REG ASSIGN EXPADJ LPAREN HALF_REG COMMA HALF_REG RPAREN
+	{
+		if (IS_DREG_L($1) && IS_DREG_L($5) && IS_DREG_L($7)) {
+		    notethat("dsp32shift: dregs_lo = EXPADJ (dregs_lo, dregs_lo)\n");
+						  /*   sopcde   dst0     src0     src1 */
+			$$ = DSP32SHIFT (       7,   &$1,     &$7,     &$5,
+						  /*      sop      HLs */
+									2,       0                    );
+		} else 
+		if (IS_DREG_L($1) && IS_DREG_H($5) && IS_DREG_L($7)) {
+		    notethat("dsp32shift: dregs_lo = EXPADJ (dregs_hi, dregs_lo)\n");
+						  /*   sopcde   dst0     src0     src1 */
+			$$ = DSP32SHIFT (       7,   &$1,     &$7,     &$5,
+						  /*      sop      HLs */
+									3,       0                    );
+		} else {
+			return semantic_error("Bad shift value or register");
+		}
+	}
 
-macmod_pmove:
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.mod = 0;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error (""); }
+// DEPOSIT
+
+	| REG ASSIGN DEPOSIT LPAREN REG COMMA REG RPAREN
+	{
+		if (IS_DREG($1) && IS_DREG($5) && IS_DREG($7)) {
+		    notethat("dsp32shift: dregs = DEPOSIT ( dregs , dregs )\n");
+		              /*   sopcde   dst0     src0     src1 */
+			$$ = DSP32SHIFT (      10,   &$1,     &$7,     &$5,
+					  /*      sop      HLs */
+							    2,       0                    );
+		} else {
+			return register_mismatch();
 		}
-	| IS
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		   memset (&$$, 0, sizeof ($$)); semantic_error ("IS"); }
+	}
+
+	| REG ASSIGN DEPOSIT LPAREN REG COMMA REG RPAREN LPAREN X RPAREN
+	{
+		if (IS_DREG($1) && IS_DREG($5) && IS_DREG($7)) {
+		    notethat("dsp32shift: dregs = DEPOSIT ( dregs , dregs ) (X)\n");
+						  /*   sopcde   dst0     src0     src1 */
+			$$ = DSP32SHIFT (      10,   &$1,     &$7,     &$5,
+						  /*      sop      HLs */
+									3,       0                    );
+		} else {
+			return register_mismatch();
 		}
-	| ISS2
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		   memset (&$$, 0, sizeof ($$)); semantic_error ("ISS2"); }
+	}
+
+	| REG ASSIGN EXTRACT LPAREN REG COMMA HALF_REG RPAREN xpmod 
+	{
+		if (IS_DREG($1) && IS_DREG($5) && IS_DREG_L($7)) {
+		    notethat("dsp32shift: dregs = EXTRACT ( dregs ,dregs_lo ) (.)\n");
+		              /*   sopcde   dst0     src0     src1 */
+			$$ = DSP32SHIFT (      10,   &$1,     &$7,     &$5,
+			          /*      sop      HLs */
+			                $9.r0,       0                    );
+		} else {
+			return register_mismatch();
 		}
-	| S2RND
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		   memset (&$$, 0, sizeof ($$)); semantic_error ("S2RND"); }
+	}
+
+	| a_assign REG_A _GREATER_GREATER_GREATER expr
+	{
+		if (!REG_SAME($1, $2))
+			return semantic_error("Aregs must be same");
+		if (IS_UIMM($4, 5)) {
+			notethat("dsp32shiftimm: Ax = Ax >>> uimm5\n");
+							/*   sopcde   dst0      immag     src1 */
+			$$ = DSP32SHIFTIMM (      3,     0,  -uimm5($4),    0,
+							/*      sop    HLs                     */
+									  0,  IS_A1($1)                );
+		} else {
+			return semantic_error("Shift value range error");
 		}
-	| FU
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		   memset (&$$, 0, sizeof ($$)); semantic_error ("FU"); }
+	}
+
+/* 2 rules compacted */
+	| a_assign LSHIFT REG_A BY HALF_REG
+	{
+		if (REG_SAME($1, $3) && IS_DREG_L($5)) {
+		    notethat("dsp32shift: Ax = LSHIFT Ax BY dregs_lo\n");
+					      /*   sopcde   dst0     src0     src1 */
+			$$ = DSP32SHIFT (       3,     0,     &$5,       0,
+			              /*      sop    HLs                   */
+			                        1,  IS_A1($1)              );
+		} else {
+			return register_mismatch();
 		}
-	| LPAREN IS RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.mod = 8;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("(IS)"); }
+	}
+
+	| HALF_REG ASSIGN LSHIFT HALF_REG BY HALF_REG
+	{
+		if (IS_DREG($1) && IS_DREG($4) && IS_DREG_L($6)) {
+
+		    notethat("dsp32shift: dregs_lo = LSHIFT dregs_hi BY dregs_lo\n");
+					      /*   sopcde   dst0     src0     src1 */
+			$$ = DSP32SHIFT (       0,   &$1,     &$6,     &$4,
+			              /*      sop    HLs                   */
+			                        2,  HL2($1, $4)     );
+		} else {
+			return register_mismatch();
 		}
-	| LPAREN ISS2 RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.mod = 9;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("(ISS2)"); }
+	}
+
+	| REG ASSIGN LSHIFT REG BY HALF_REG vmod
+	{
+
+		if (IS_DREG($1) && IS_DREG($4) && IS_DREG_L($6)) {
+
+		    notethat("dsp32shift: dregs = LSHIFT dregs BY dregs_lo ( V )\n");
+
+					      /*   sopcde   dst0     src0     src1 */
+			$$ = DSP32SHIFT ( $7.r0 ? 1: 2, &$1, &$6,   &$4,
+			              /*      sop      HLs */
+			                        2,       0                   );
+		} else {
+			return register_mismatch();
 		}
-	| LPAREN S2RND RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.mod = 1;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("(S2RND)"); }
+	}
+
+	| REG ASSIGN SHIFT REG BY HALF_REG
+	{
+		if (IS_DREG($1) && IS_DREG($4) && IS_DREG_L($6)) {
+		    notethat("dsp32shift: dregs = SHIFT dregs BY dregs_lo\n");
+					      /*   sopcde   dst0     src0     src1 */
+			$$ = DSP32SHIFT (       2,   &$1,     &$6,     &$4,
+			              /*      sop      HLs */
+			                        2,       0                   );
+		} else {
+			return register_mismatch();
 		}
-	| LPAREN FU RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.mod = 4;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("(FU)"); }
+	}
+
+	| a_assign REG_A GREATER_GREATER expr
+	{
+		if (REG_SAME($1, $2) && IS_IMM($4, 6)>=0 ) {
+		    notethat("dsp32shiftimm: Ax = Ax >> imm6\n");
+			                /*   sopcde   dst0      immag     src1 */
+			$$ = DSP32SHIFTIMM (      3,     0,  -imm6($4),      0,
+			                /*      sop      HLs */
+			                          1,   IS_A1($1)                 );
+		} else {
+			return semantic_error("Accu register expected");
+		}
+	}
+
+	| REG ASSIGN REG GREATER_GREATER expr vmod
+	{
+		if ($6.r0 == 1) {
+			if (IS_DREG($1) && IS_DREG($3) && IS_UIMM($5, 5) ) {
+				notethat("dsp32shiftimm: dregs = dregs >> uimm5 (V)\n");
+								/*   sopcde     dst0      immag     src1 */
+				$$ = DSP32SHIFTIMM (      1,     &$1, -uimm5($5),    &$3,
+								/*      sop      HLs */
+										  2,       0                     );
+			} else {
+				return register_mismatch();
+			}
+		} else {
+			if (IS_DREG($1) && IS_DREG($3) && IS_UIMM($5, 5)) {
+				notethat("dsp32shiftimm: dregs = dregs >> uimm5\n");
+								/*   sopcde     dst0      immag     src1 */
+				$$ = DSP32SHIFTIMM (      2,     &$1,  -imm6($5),    &$3,
+								/*      sop      HLs */
+										  2,       0                     );
+			} else
+			if (IS_PREG($1) && IS_PREG($3)
+			 && EXPR_VALUE($5) == 2) {
+				notethat("PTR2op: pregs = pregs >> 2\n");
+					$$ = PTR2OP (&$1, &$3, 3);
+			} else
+			if (IS_PREG($1) && IS_PREG($3)
+			 && EXPR_VALUE($5) == 1) {
+				notethat("PTR2op: pregs = pregs >> 1\n");
+					$$ = PTR2OP (&$1, &$3, 4);
+
+			} else {
+				return register_mismatch();
+			}
+		}
+	}
+
+/* 4 rules compacted */
+	| HALF_REG ASSIGN HALF_REG GREATER_GREATER expr
+	{
+		if (IS_UIMM($5, 5) ) {
+		    notethat("dsp32shiftimm:  dregs_half =  dregs_half >> uimm5\n");
+
+			                /*   sopcde     dst0      immag     src1 */
+			$$ = DSP32SHIFTIMM (      0,     &$1, -uimm5($5),    &$3,
+			                /*      sop      HLs */
+			                          2,  HL2($1, $3)   );
+		} else {
+			return register_mismatch();
+		}
+	}
+
+
+	| HALF_REG ASSIGN HALF_REG _GREATER_GREATER_GREATER expr smod
+	{
+		if (IS_UIMM($5, 5)) {
+		    notethat("dsp32shiftimm: dregs_half = dregs_half >>> uimm5\n");
+			                /*   sopcde     dst0      immag     src1 */
+			$$ = DSP32SHIFTIMM (      0,     &$1, -uimm5($5),    &$3,
+			                /*      sop      HLs */
+			                      $6.s0,   HL2($1, $3) );
+		} else {
+			return semantic_error("Register or modifier mismatch");
+		}
+	}
+
+
+	| REG ASSIGN REG _GREATER_GREATER_GREATER expr vsmod
+	{
+		if (IS_DREG($1) && IS_DREG($3) && IS_UIMM($5, 5) ) {
+			if ($6.r0) { // Vector ?
+				notethat("dsp32shiftimm: dregs  =  dregs >>> uimm5 (V, .)\n");
+								/*  sopcde     dst0      immag     src1 */
+				$$ = DSP32SHIFTIMM (     1,      &$1, -uimm5($5),   &$3,
+								/*      sop      HLs */
+									 $6.s0,       0                      );
+
+			} else {
+				notethat("dsp32shiftimm: dregs  =  dregs >>> uimm5 (.)\n");
+								/*  sopcde     dst0      immag     src1 */
+				$$ = DSP32SHIFTIMM (     2,     &$1, -uimm5($5),    &$3,
+								/*      sop      HLs */
+									 $6.s0,       0                      );
+			}
+		} else {
+			return register_mismatch();
+		}
+	}
+
+	| HALF_REG ASSIGN ONES REG
+	{
+		if (IS_DREG_L($1) && IS_DREG($4)) {
+		    notethat("dsp32shift: dregs_lo = ONES dregs\n");
+					      /*   sopcde   dst0     src0     src1 */
+			$$ = DSP32SHIFT (       6,   &$1,       0,     &$4,
+			              /*      sop      HLs */
+			                        3,       0                   );
+		} else {
+			return register_mismatch();
+		}
+	}
+
+/* 4 rules compacted */
+	| REG ASSIGN PACK LPAREN HALF_REG COMMA HALF_REG RPAREN
+	{
+		if (IS_DREG($1) && IS_DREG($5) && IS_DREG($7)) {
+		    notethat("dsp32shift: dregs = PACK ( dregs_hi , dregs_hi )\n");
+					      /*   sopcde   dst0     src0     src1 */
+			$$ = DSP32SHIFT (       4,   &$1,     &$7,     &$5,
+			              /*      sop      HLs */
+			                HL2($5, $7),     0                   );
+		} else {
+			return register_mismatch();
+		}
+	}
+
+	| HALF_REG ASSIGN CCREG ASSIGN BXORSHIFT LPAREN REG_A COMMA REG RPAREN 
+	{
+		if (IS_DREG($1)
+		 && $7.regno == REG_A0
+		 && IS_DREG($9) && !IS_H($1) && !IS_A1($7)) {
+		    notethat("dsp32shift: dregs_lo = CC = BXORSHIFT ( A0 , dregs )\n");
+						  /*   sopcde   dst0     src0     src1 */
+			$$ = DSP32SHIFT (      11,   &$1,     &$9,       0,
+			              /*      sop      HLs */
+			                        0,       0                   );
+		} else {
+			return register_mismatch();
+		}
+	}
+
+	| HALF_REG ASSIGN CCREG ASSIGN BXOR LPAREN REG_A COMMA REG RPAREN
+	{
+		if (IS_DREG($1)
+		 && $7.regno == REG_A0
+		 && IS_DREG($9) && !IS_H($1) && !IS_A1($7)) {
+		    notethat("dsp32shift: dregs_lo = CC = BXOR (A0 , dregs)\n");
+						  /*   sopcde   dst0     src0     src1 */
+			$$ = DSP32SHIFT (      11,   &$1,     &$9,       0,
+			              /*      sop      HLs */
+			                        1,       0                   );
+		} else {
+			return register_mismatch();
+		}
+	}
+
+	| HALF_REG ASSIGN CCREG ASSIGN BXOR LPAREN REG_A COMMA REG_A COMMA CCREG RPAREN
+	{
+		if (IS_DREG($1) && !IS_H($1) && !REG_SAME($7, $9)) {
+		    notethat("dsp32shift: dregs_lo = CC = BXOR (A0 , A1 , CC)\n");
+						  /*   sopcde   dst0     src0     src1 */
+			$$ = DSP32SHIFT (      12,  &$1,       0,       0,
+			              /*      sop      HLs */
+			                        1,       0                   );
+		} else {
+			return register_mismatch();
+		}
+	}
+
+	| a_assign ROT REG_A BY HALF_REG
+	{
+		if (REG_SAME($1, $3) && IS_DREG_L($5)) {
+		    notethat("dsp32shift: Ax = ROT Ax BY dregs_lo\n");
+						  /*   sopcde   dst0     src0     src1 */
+			$$ = DSP32SHIFT (       3,     0,     &$5,       0,
+			              /*      sop      HLs */
+			                        2,   IS_A1($1)               );
+		} else {
+			return register_mismatch();
+		}
+	}
+
+	| REG ASSIGN ROT REG BY HALF_REG
+	{
+		if ( IS_DREG($1) && IS_DREG($4) && IS_DREG_L($6)) {
+		    notethat("dsp32shift: dregs = ROT dregs BY dregs_lo\n");
+						  /*   sopcde   dst0     src0     src1 */
+			$$ = DSP32SHIFT (       3,   &$1,     &$6,     &$4,
+			              /*      sop      HLs */
+			                        3,       0                   );
+		} else {
+			return register_mismatch();
+		}
+	}
+
+	| a_assign ROT REG_A BY expr 
+	{
+		if (IS_IMM($5, 6)) {
+		    notethat("dsp32shiftimm: An = ROT An BY imm6\n");
+							/*   sopcde   dst0      immag     src1 */
+			$$ = DSP32SHIFTIMM (      3,   &$1,  imm6($5),    0,
+							/*      sop      HLs */
+									  2,   IS_A1($1)                 );
+		} else {
+			return register_mismatch();
+		}
+	}
+
+	| REG ASSIGN ROT REG BY expr 
+	{
+		if (IS_DREG($1) && IS_DREG($4) && IS_IMM($6, 6)) {
+							/*   sopcde   dst0      immag     src1 */
+			$$ = DSP32SHIFTIMM (      2,   &$1,  imm6($6),     &$4,
+							/*      sop      HLs */
+									  3,   IS_A1($1)                 );
+		} else {
+			return register_mismatch();
+		}
+	}
+
+	| HALF_REG ASSIGN SIGNBITS REG_A
+	{
+		if (IS_DREG_L($1)) {
+		    notethat("dsp32shift: dregs_lo = SIGNBITS An\n");
+						  /*   sopcde     dst0     src0     src1 */
+			$$ = DSP32SHIFT (       6,     &$1,       0,       0,
+			              /*      sop      HLs */
+			                 IS_A1($4),    0                   );
+		} else {
+			return register_mismatch();
+		}
+	}
+
+	| HALF_REG ASSIGN SIGNBITS REG
+	{
+		if (IS_DREG_L($1) && IS_DREG($4)) {
+		    notethat("dsp32shift: dregs_lo = SIGNBITS dregs\n");
+						  /*   sopcde     dst0     src0     src1 */
+			$$ = DSP32SHIFT (       5,     &$1,       0,     &$4,
+			              /*      sop      HLs */
+			                        0,     0                   );
+		} else {
+			return register_mismatch();
+		}
+	}
+
+	| HALF_REG ASSIGN SIGNBITS HALF_REG
+	{
+		if (IS_DREG_L($1)) {
+		    notethat("dsp32shift: dregs_lo = SIGNBITS dregs_lo\n");
+						  /*   sopcde     dst0     src0     src1 */
+			$$ = DSP32SHIFT (       5,     &$1,       0,     &$4,
+			              /*      sop      HLs */
+			                1+IS_H($4),    0                   );
+		} else {
+			return register_mismatch();
+		}
+	}
+	
+	// Silly. The ASR bit is just inverted here.
+	| HALF_REG ASSIGN VIT_MAX LPAREN REG RPAREN asr_asl 
+	{
+		if (IS_DREG_L($1) && IS_DREG($5)) {
+		    notethat("dsp32shift: dregs_lo = VIT_MAX (dregs) (..)\n");
+						  /*   sopcde     dst0     src0     src1 */
+			$$ = DSP32SHIFT (       9,     &$1,       0,     &$5,
+			              /*      sop      HLs */
+			               ($7.r0 ? 0 : 1),     0                   );
+		} else {
+			return register_mismatch();
+		}
+	}
+
+	| REG ASSIGN VIT_MAX LPAREN REG COMMA REG RPAREN asr_asl 
+	{
+		if (IS_DREG($1) && IS_DREG($5) && IS_DREG($7)) {
+		    notethat("dsp32shift: dregs = VIT_MAX (dregs, dregs) (ASR)\n");
+						  /*   sopcde     dst0     src0     src1 */
+			$$ = DSP32SHIFT (       9,     &$1,     &$7,     &$5,
+			              /*      sop      HLs */
+			                2 | ($9.r0 ? 0 : 1),     0                   );
+		} else {
+			return register_mismatch();
+		}
+	}
+
+	| BITMUX LPAREN REG COMMA REG COMMA REG_A RPAREN asr_asl
+	{
+		if (IS_DREG($3) && IS_DREG($5) && !IS_A1($7)) {
+		    notethat("dsp32shift: BITMUX (dregs , dregs , A0) (ASR)\n");
+						  /*   sopcde     dst0     src0     src1 */
+			$$ = DSP32SHIFT (       8,       0,     &$3,     &$5,
+			              /*      sop      HLs */
+			                    $9.r0,     0                   );
+		} else {
+			return register_mismatch();
+		}
+	}
+
+	| a_assign BXORSHIFT LPAREN REG_A COMMA REG_A COMMA CCREG RPAREN
+	{
+		if (!IS_A1($1) && !IS_A1($4) && IS_A1($6)) {
+		    notethat("dsp32shift: A0 = BXORSHIFT ( A0 , A1 , CC )\n");
+						  /*   sopcde     dst0     src0     src1 */
+			$$ = DSP32SHIFT (      12,       0,       0,       0,
+			              /*      sop      HLs */
+			                        0,     0                   );
+		} else {
+			return semantic_error("Dregs expected");
+		}
+	}
+
+
+// }
+
+////////////////////////////////////////////////////////////////////////////
+
+
+// LOGI2op:	BITCLR ( dregs , uimm5 )
+	| BITCLR LPAREN REG COMMA expr RPAREN
+
+	{
+		if (IS_DREG($3) && IS_UIMM($5, 5)) {
+		    notethat("LOGI2op: BITCLR ( dregs , uimm5 )\n");
+			$$ = LOGI2OP ($3, uimm5($5), 4);
+		} else {
+			return register_mismatch();
+		}
+	}
+
+// LOGI2op:	BITSET ( dregs , uimm5 )
+	| BITSET LPAREN REG COMMA expr RPAREN
+	{
+		if (IS_DREG($3) && IS_UIMM($5, 5)) {
+		    notethat("LOGI2op: BITCLR ( dregs , uimm5 )\n");
+			$$ = LOGI2OP ($3, uimm5($5), 2);
+		} else {
+			return register_mismatch();
+		}
+	}
+
+// LOGI2op:	BITTGL ( dregs , uimm5 )
+	| BITTGL LPAREN REG COMMA expr RPAREN
+	{
+		if (IS_DREG($3) && IS_UIMM($5, 5)) {
+		    notethat("LOGI2op: BITCLR ( dregs , uimm5 )\n");
+			$$ = LOGI2OP ($3, uimm5($5), 3);
+		} else {
+			return register_mismatch();
+		}
+	}
+
+	| CCREG _ASSIGN_BANG BITTST LPAREN REG COMMA expr RPAREN
+	{
+		if (IS_DREG($5) && IS_UIMM($7, 5)) {
+		    notethat("LOGI2op: CC =! BITTST ( dregs , uimm5 )\n");
+			$$ = LOGI2OP ($5, uimm5($7), 0);
+		} else {
+			return semantic_error("Register mismatch or value error");
+		}
+	}
+
+	| CCREG ASSIGN BITTST LPAREN REG COMMA expr RPAREN
+	{
+		if (IS_DREG($5) && IS_UIMM($7, 5)) {
+		    notethat("LOGI2op: CC = BITTST ( dregs , uimm5 )\n");
+			$$ = LOGI2OP ($5, uimm5($7), 1);
+		} else {
+			return semantic_error("Register mismatch or value error");
+		}
+	}
+
+	| IF BANG CCREG REG ASSIGN REG
+	{
+		if ((IS_DREG($4) || IS_PREG($4))
+		 && (IS_DREG($6) || IS_PREG($6))) {
+		    notethat("ccMV: IF ! CC gregs = gregs\n");
+			$$ = CCMV (&$6, &$4, 0);
+		} else {
+			return register_mismatch();
+		}
+	}
+
+	| IF CCREG REG ASSIGN REG
+	{
+		if ((IS_DREG($5) || IS_PREG($5))
+		 && (IS_DREG($3) || IS_PREG($3))) {
+		    notethat("ccMV: IF CC gregs = gregs\n");
+			$$ = CCMV (&$5, &$3, 1);
+		} else {
+			return register_mismatch();
+		}
+	}
+
+	| IF BANG CCREG JUMP expr
+	{
+		if (IS_PCREL10($5)) {
+		    notethat("BRCC: IF !CC JUMP  pcrel11m2\n");
+			$$ = BRCC (0, 0, $5);
+
+		} else {
+			return semantic_error("Bad jump offset");
+		}
+	}
+	| IF BANG CCREG JUMP expr LPAREN BP RPAREN
+	{
+		if (IS_PCREL10($5)) {
+		    notethat("BRCC: IF !CC JUMP  pcrel11m2\n");
+			$$ = BRCC (0, 1, $5); // use branch prediction
+
+		} else {
+			return semantic_error("Bad jump offset");
 		}
 
-	;
+	}
 
-mxd_mod:
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.mod = 0;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error (""); }
+	| IF CCREG JUMP expr
+	{
+		if (IS_PCREL10($4)) {
+		    notethat("BRCC: IF CC JUMP  pcrel11m2\n");
+			$$ = BRCC (1, 0, $4); // use branch prediction
+
+		} else {
+			return semantic_error("Bad jump offset");
 		}
-	| M
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		   memset (&$$, 0, sizeof ($$)); semantic_error ("M"); }
+	}
+
+	| IF CCREG JUMP expr LPAREN BP RPAREN
+	{
+		if (IS_PCREL10($4)) {
+		    notethat("BRCC: IF !CC JUMP  pcrel11m2\n");
+			$$ = BRCC (1, 1, $4); // use branch prediction
+
+		} else {
+			return semantic_error("Bad jump offset");
 		}
+
+	}
+
+	| NOP
+	{
+		notethat("ProgCtrl: NOP\n");
+		$$ = PROGCTRL (0, 0);
+	}
+
+	| RTS
+	{
+		notethat("ProgCtrl: RTS\n");
+		$$ = PROGCTRL (1, 0);
+	}
+
+	| RTI
+	{
+		notethat("ProgCtrl: RTI\n");
+		$$ = PROGCTRL (1, 1);
+	}
+
+	| RTX
+	{
+		notethat("ProgCtrl: RTX\n");
+		$$ = PROGCTRL (1, 2);
+	}
+
+	| RTN
+	{
+		notethat("ProgCtrl: RTN\n");
+		$$ = PROGCTRL (1, 3);
+	}
+
+	| RTE
+	{
+		notethat("ProgCtrl: RTE\n");
+		$$ = PROGCTRL (1, 4);
+	}
+
+	| IDLE
+	{
+		notethat("ProgCtrl: IDLE\n");
+		$$ = PROGCTRL (2, 0);
+	}
+
+	| CSYNC
+	{
+		notethat("ProgCtrl: CSYNC\n");
+		$$ = PROGCTRL (2, 3);
+	}
+
+	| SSYNC
+	{
+		notethat("ProgCtrl: SSYNC\n");
+		$$ = PROGCTRL (2, 4);
+	}
+
+	| EMUEXCPT
+	{
+		notethat("ProgCtrl: EMUEXCPT\n");
+		$$ = PROGCTRL (2, 5);
+	}
+
+	| CLI REG
+	{
+		if (IS_DREG($2)) {
+		    notethat("ProgCtrl: CLI dregs\n");
+			$$ = PROGCTRL (3, $2.regno & CODE_MASK);
+		} else {
+			return semantic_error("Dreg expected for CLI");
+		}
+	}
+
+	| STI REG
+	{
+		if (IS_DREG($2)) {
+		    notethat("ProgCtrl: STI dregs\n");
+			$$ = PROGCTRL (4, $2.regno & CODE_MASK);
+		} else {
+			return semantic_error("Dreg expected for STI");
+		}
+	}
+
+	| JUMP LPAREN REG RPAREN
+	{
+		if (IS_PREG($3)) {
+		    notethat("ProgCtrl: JUMP ( pregs )\n");
+			$$ = PROGCTRL (5, $3.regno & CODE_MASK);
+		} else {
+			return semantic_error("Bad register for indirect jump");
+		}
+	}
+
+	| CALL LPAREN REG RPAREN
+	{
+		if (IS_PREG($3)) {
+		    notethat("ProgCtrl: CALL ( pregs )\n");
+			$$ = PROGCTRL (6, $3.regno & CODE_MASK);
+
+		} else {
+			return semantic_error("Bad register for indirect call");
+		}
+
+	}
+
+	| CALL LPAREN PC PLUS REG RPAREN
+	{
+		if (IS_PREG($5)) {
+		    notethat("ProgCtrl: CALL ( PC + pregs )\n");
+			$$ = PROGCTRL (7, $5.regno & CODE_MASK);
+
+		} else {
+			return semantic_error("Bad register for indirect call");
+		}
+
+	}
+
+	| JUMP LPAREN PC PLUS REG RPAREN
+	{
+		if (IS_PREG($5)) {
+		    notethat("ProgCtrl: JUMP ( PC + pregs )\n");
+			$$ = PROGCTRL (8, $5.regno & CODE_MASK);
+		} else {
+			return semantic_error("Bad register for indirect jump");
+		}
+	}
+
+	| RAISE expr
+	{
+		if (IS_UIMM($2, 4)) {
+		    notethat("ProgCtrl: RAISE uimm4\n");
+		$$ = PROGCTRL (9, uimm4($2));
+		} else {
+			return semantic_error("Bad value for RAISE");
+		}
+	}
+
+	| EXCPT expr
+	{
+		notethat("ProgCtrl: EMUEXCPT\n");
+		$$ = PROGCTRL (10, uimm4($2));
+	}
+
+	| TESTSET LPAREN REG RPAREN
+	{
+		if (IS_PREG($3)) {
+		    notethat("ProgCtrl: TESTSET ( pregs )\n");
+			$$ = PROGCTRL (11, $3.regno & CODE_MASK);
+		} else {
+			return semantic_error("Preg expected");
+		}
+	}
+
+	| JUMP expr
+	{
+		if (IS_PCREL12($2)) {
+		    notethat("UJUMP: JUMP pcrel12\n");
+		    $$ = UJUMP($2);
+
+		} else {
+			return semantic_error("Bad value for relative jump");
+		}
+	}
+
+	| JUMP_DOT_S expr
+	{
+		if (IS_PCREL12($2)) {
+		    notethat("UJUMP: JUMP_DOT_S pcrel12\n");
+		    $$ = UJUMP($2);
+		} else {
+			return semantic_error("Bad value for relative jump");
+		}
+	}
+
+	| JUMP_DOT_L expr
+	{
+		if (IS_PCREL24($2)) {
+		    notethat("CALLa: jump.l pcrel24\n");
+			$$ = CALLA ($2, 0);
+		} else {
+			return semantic_error("Bad value for long jump");
+		}
+	}
+
+
+////////////////////////////////////////////////////////////////////////////
+
+	| CALL expr
+	{
+		if (IS_PCREL24($2)) {
+		    notethat("CALLa: CALL pcrel25m2\n");
+			$$ = CALLA ($2, 1);
+		} else {
+			return semantic_error("Bad call address");
+		}
+	}
+
+// ALU2ops
+// ALU2op:	DIVQ (dregs, dregs)
+	| DIVQ LPAREN REG COMMA REG RPAREN
+	{
+		if (IS_DREG($3) && IS_DREG($5)) {
+			$$ = ALU2OP (&$3, &$5, 8);   // dst, src, opc
+		} else {
+			return semantic_error("Bad registers for DIVQ");
+		}
+	}
+
+	| DIVS LPAREN REG COMMA REG RPAREN
+	{
+		if (IS_DREG($3) && IS_DREG($5)) {
+			$$ = ALU2OP (&$3, &$5, 9);   // dst, src, opc
+		} else {
+			return semantic_error("Bad registers for DIVS");
+		}
+	}
+
+/* 3 rules compacted */
+	| REG ASSIGN MINUS REG vsmod
+	{
+		if (IS_DREG($1) && IS_DREG($4)) {
+			if ($5.r0 == 0 && $5.s0 == 0) {
+				notethat("ALU2op: dregs = - dregs\n");
+				$$ = ALU2OP (&$1, &$4, 14);   // dst, src, opc
+			} else {
+
+				notethat("dsp32alu: dregs = - dregs (.)\n");
+						  /*     aopcde       HL               */
+				$$ = DSP32ALU (      15,       0,
+						  /*   dst1     dst0     src0     src1 */
+								  0,     &$1,     &$4,       0,
+						  /*      s        x      aop          */
+							  $5.s0,       0,       3          );
+			}
+
+		} else {
+			return semantic_error("Dregs expected");
+		}
+	}
+
+	| REG ASSIGN TILDA REG
+	{
+		if (IS_DREG($1) && IS_DREG($4)) {
+		    notethat("ALU2op: dregs = ~dregs\n");
+			$$ = ALU2OP (&$1, &$4, 15);   // dst, src, opc
+		} else {
+			return semantic_error("Dregs expected");
+		}
+	}
+
+	| REG _GREATER_GREATER_ASSIGN REG
+	{
+		if (IS_DREG($1) && IS_DREG($3)) {
+		    notethat("ALU2op: dregs >>= dregs\n");
+			$$ = ALU2OP (&$1, &$3, 1);   // dst, src, opc
+		} else {
+			return semantic_error("Dregs expected");
+		}
+	}
+
+	| REG _GREATER_GREATER_ASSIGN expr
+	{
+		if (IS_DREG($1) && IS_UIMM($3, 5)) {
+		    notethat("LOGI2op: dregs >>= uimm5\n");
+			$$ = LOGI2OP ($1, uimm5($3), 6);
+		} else {
+			return semantic_error("Dregs expected or value error");
+		}
+	}
+
+	| REG _GREATER_GREATER_GREATER_THAN_ASSIGN REG
+	{
+		if (IS_DREG($1) && IS_DREG($3)) {
+		    notethat("ALU2op: dregs >>>= dregs\n");
+
+			$$ = ALU2OP (&$1, &$3, 0);   // dst, src, opc
+		} else {
+			return semantic_error("Dregs expected");
+		}
+	}
+
+	| REG _LESS_LESS_ASSIGN REG
+	{
+		if (IS_DREG($1) && IS_DREG($3)) {
+		    notethat("ALU2op: dregs <<= dregs\n");
+			$$ = ALU2OP (&$1, &$3, 2);   // dst, src, opc
+		} else {
+			return semantic_error("Dregs expected");
+		}
+	}
+
+	| REG _LESS_LESS_ASSIGN expr
+	{
+		if (IS_DREG($1) && IS_UIMM($3, 5)) {
+		    notethat("LOGI2op: dregs <<= uimm5\n");
+			$$ = LOGI2OP ($1, uimm5($3), 7);
+		} else {
+			return semantic_error("Dregs expected or const value error");
+		}
+	}
+
+
+	| REG _GREATER_GREATER_GREATER_THAN_ASSIGN expr
+	{
+		if (IS_DREG($1) && IS_UIMM($3, 5)) {
+		    notethat("LOGI2op: dregs >>>= uimm5\n");
+			$$ = LOGI2OP ($1, uimm5($3), 5);
+		} else {
+			return semantic_error("Dregs expected");
+		}
+	}
+
+
+////////////////////////////////////////////////////////////////////////////
+// Cache Control
+
+	| FLUSH LBRACK REG RBRACK
+	{
+		    notethat("CaCTRL: FLUSH [ pregs ]\n");
+		if (IS_PREG($3)) {
+			$$ = CACTRL (&$3, 0, 2);   // reg, a, op
+		} else {
+			return semantic_error("Bad register(s) for FLUSH");
+		}
+	}
+	| FLUSH LBRACK REG _PLUS_PLUS RBRACK
+	{
+		if (IS_PREG($3)) {
+		    notethat("CaCTRL: FLUSH [ pregs ++ ]\n");
+			$$ = CACTRL (&$3, 1, 2);   // reg, a, op
+		} else {
+			return semantic_error("Bad register(s) for FLUSH");
+		}
+	}
+
+	| FLUSHINV LBRACK REG RBRACK
+	{
+		if (IS_PREG($3)) {
+		    notethat("CaCTRL: FLUSHINV [ pregs ]\n");
+			$$ = CACTRL (&$3, 0, 1);   // reg, a, op
+		} else {
+			return semantic_error("Bad register(s) for FLUSH");
+		}
+	}
+
+	| FLUSHINV LBRACK REG _PLUS_PLUS RBRACK
+	{
+		if (IS_PREG($3)) {
+		    notethat("CaCTRL: FLUSHINV [ pregs ++ ]\n");
+			$$ = CACTRL (&$3, 1, 1);   // reg, a, op
+		} else {
+			return semantic_error("Bad register(s) for FLUSH");
+		}
+	}
+
+// CaCTRL:	IFLUSH [ pregs ]
+	| IFLUSH LBRACK REG RBRACK
+	{
+		if (IS_PREG($3)) {
+		    notethat("CaCTRL: IFLUSH [ pregs ]\n");
+			$$ = CACTRL (&$3, 0, 3);   // reg, a, op
+		} else {
+			return semantic_error("Bad register(s) for FLUSH");
+		}
+	}
+
+	| IFLUSH LBRACK REG _PLUS_PLUS RBRACK
+	{
+		if (IS_PREG($3)) {
+		    notethat("CaCTRL: IFLUSH [ pregs ++ ]\n");
+			$$ = CACTRL (&$3, 1, 3);   // reg, a, op
+		} else {
+			return semantic_error("Bad register(s) for FLUSH");
+		}
+	}
+
+	| PREFETCH LBRACK REG RBRACK
+	{
+		if (IS_PREG($3)) {
+		    notethat("CaCTRL: PREFETCH [ pregs ]\n");
+			$$ = CACTRL(&$3, 0, 0);
+		} else {
+			return semantic_error("Bad register(s) for PREFETCH");
+		}
+
+	}
+
+	| PREFETCH LBRACK REG _PLUS_PLUS RBRACK
+	{
+		if (IS_PREG($3)) {
+		    notethat("CaCTRL: PREFETCH [ pregs ++ ]\n");
+			$$ = CACTRL(&$3, 1, 0);
+		} else {
+			return semantic_error("Bad register(s) for PREFETCH");
+		}
+
+	}
+
+////////////////////////////////////////////////////////////////////////////
+// LOAD/STORE
+// {
+
+// LDST:	B [ pregs <post_op> ] = dregs
+	| B LBRACK REG post_op RBRACK ASSIGN REG
+	{
+		if (IS_PREG($3) && IS_DREG($7)) {
+		    notethat("LDST: B [ pregs <post_op> ] = dregs\n");
+			$$ = LDST (&$3, &$7, $4.x0, 2, 0, 1);
+		} else {
+			return register_mismatch();
+		}
+	}
+
+// LDSTidxI:	B [ pregs + imm16 ] = dregs */
+	| B LBRACK REG plus_minus expr RBRACK ASSIGN REG
+	{
+		if (IS_PREG($3) && IS_RANGE(16, $5, $4.r0, 1) && IS_DREG($8)) {
+		    notethat("LDST: B [ pregs + imm16 ] = dregs\n");
+			if ($4.r0) { neg_value($5); }
+			$$ = LDSTIDXI (&$3, &$8,   /* W  sz  Z */
+			                            1,  2,  0,
+									    $5);
+		} else {
+			return semantic_error("Register mismatch or const size wrong");
+		}
+	}
+
+
+// LDSTii:	W [ pregs + uimm4s2 ] = dregs
+	| W LBRACK REG plus_minus expr RBRACK ASSIGN REG
+	{
+		if (IS_PREG($3) && IS_URANGE(4, $5, $4.r0, 2) && IS_DREG($8)) {
+		    notethat("LDSTii: W [ pregs +- uimm5m2 ] = dregs\n");
+			$$ = LDSTII (&$3, &$8, $5, 1, 1); // ptr, reg, offset, W, op
+
+		} else if (IS_PREG($3) && IS_RANGE(16, $5, $4.r0, 2) && IS_DREG($8)) {
+		    notethat("LDSTidxI: W [ pregs + imm17m2 ] = dregs\n");
+			if ($4.r0) { neg_value($5); }
+			$$ = LDSTIDXI (&$3, &$8,   /* W  sz  Z */
+			                            1,  1, 0,
+									      $5);
+		} else {
+			return semantic_error("Bad register(s) or wrong constant size");
+		}
+	}
+
+// LDST:	W [ pregs <post_op> ] = dregs
+	| W LBRACK REG post_op RBRACK ASSIGN REG
+	{
+		if (IS_PREG($3) && IS_DREG($7)) {
+		    notethat("LDST: W [ pregs <post_op> ] = dregs\n");
+			$$ = LDST (&$3, &$7, $4.x0, 1, 0, 1);
+		} else {
+			return semantic_error("Bad register(s) for STORE");
+		}
+	}
+
+	| W LBRACK REG post_op RBRACK ASSIGN HALF_REG
+	{
+		if (IS_IREG($3) ) {
+		    notethat("dspLDST: W [ iregs <post_op> ] = dregs_half\n");
+			$$ = DSPLDST (&$3, 1 + IS_H($7), &$7, $4.x0, 1);
+		} else
+		if ($4.x0 == 2 && IS_PREG($3) && IS_DREG($7)) {
+		    notethat("LDSTpmod: W [ pregs <post_op>] = dregs_half\n");
+			$$ = LDSTPMOD (&$3, &$7, &$3, 1 + IS_H($7), 1);
+
+		} else {
+			return semantic_error("Bad register(s) for STORE");
+		}
+	}
+
+// LDSTiiFP:	[ FP - const ] = dpregs
+	| LBRACK REG plus_minus expr RBRACK ASSIGN REG
+	{
+		int ispreg = IS_PREG($7);
+
+		if (!IS_PREG($2))
+			return semantic_error("Preg expected for indirect");
+
+		if ($2.regno == REG_FP) {
+			if (IS_URANGE(4, $4, $3.r0, 4)) {
+				notethat("LDSTii: dpregs = [ FP + uimm6m4 ]\n");
+				$$ = LDSTII (&$2, &$7, $4, 1, ispreg ? 3: 0);
+
+			} else
+			if (IS_URANGE(5, $4, $3.r0 ? 0: 1, 4)) {
+				notethat("LDSTiiFP: dpregs = [ FP - uimm7m4 ]\n");
+				if (!$3.r0) { neg_value($4); }
+				$$ = LDSTIIFP ($4, &$7, 1);
+			} else 
+			if (IS_RANGE(16, $4, $3.r0, 4)) { // 16 offset, DREGS
+				notethat("LDSTidxI: [ FP + imm18m4 ] = dpregs\n");
+				if ($3.r0) { neg_value($4); }
+				$$ = LDSTIDXI (&$2, &$7,   /* W  sz  Z */
+											  1,  0, ispreg ? 1: 0, $4);
+			} else 
+			return semantic_error("Bad constant for load @FP");
+
+		} else
+		if (IS_URANGE(4, $4, $3.r0, 4)) {
+			if (IS_DREG($7)) {
+				notethat("LDSTii: [ pregs + uimm6m4 ] = dregs\n");
+				$$ = LDSTII (&$2, &$7, $4, 1, 0);
+			} else 
+			if (ispreg) {
+				notethat("LDSTii: [ pregs + uimm6m4 ] = pregs\n");
+				$$ = LDSTII (&$2, &$7, $4, 1, 3);
+			} else {
+				return semantic_error("Bad registers for STORE");
+			}
+			break;
+		} else 
+		if (IS_RANGE(16, $4, $3.r0, 4)) { // 16 offset, DREGS
+			notethat("LDSTidxI: [ pregs + imm18m4 ] = dpregs\n");
+			if ($3.r0) { neg_value($4); }
+			$$ = LDSTIDXI (&$2, &$7,   /* W  sz  Z */
+			                              1,  0, ispreg ? 1: 0, $4);
+		} else {
+			return semantic_error("Bad constant for STORE");
+		}
+
+	}
+
+	| REG ASSIGN W LBRACK REG plus_minus expr RBRACK xpmod
+	{
+		if (IS_DREG($1) && IS_PREG($5) && IS_URANGE(4, $7, $6.r0, 2)) {
+			notethat("LDSTii: dregs = W [ pregs + uimm4s2 ] (.)\n");
+			$$ = LDSTII (&$5, &$1, $7, 0, 1 << $9.r0 );
+		} else
+		if (IS_DREG($1) && IS_PREG($5) && IS_RANGE(16, $7, $6.r0, 2)) {
+		    notethat("LDSTidxI: dregs = W [ pregs + imm17m2 ] (.)\n");
+			if ($6.r0) { neg_value($7); }
+			$$ = LDSTIDXI (&$5, &$1,   /* W  sz  Z */
+			                              0,  1, $9.r0,
+									       $7);
+		} else {
+			return semantic_error("Bad register or constant for LOAD");
+        }
+	}	
+
+	| HALF_REG ASSIGN W LBRACK REG post_op RBRACK
+	{
+		if (IS_IREG($5)) {
+		    notethat("dspLDST: dregs_half = W [ iregs ]\n");
+			$$ = DSPLDST(&$5, 1 + IS_H($1), &$1, $6.x0, 0);
+		} else
+		if ($6.x0 == 2 && IS_DREG($1) && IS_PREG($5)) {
+		    notethat("LDSTpmod: dregs_half = W [ pregs ]\n");
+			$$ = LDSTPMOD (&$1, &$5, &$5, 1 + IS_H($1), 0);
+		} else {
+			return semantic_error("Bad register or post_op for LOAD");
+        }
+	}
+
+
+	| REG ASSIGN W LBRACK REG post_op RBRACK xpmod
+	{
+		if (IS_DREG($1) && IS_PREG($5)) {
+		    notethat("LDST: dregs = W [ pregs <post_op> ] (.)\n");
+			$$ = LDST (&$5, &$1, $6.x0, 1, $8.r0, 0);
+		} else {
+			return semantic_error("Bad register for LOAD");
+        }
+	}
+
+	| REG ASSIGN W LBRACK REG _PLUS_PLUS REG RBRACK xpmod
+	{
+		if (IS_DREG($1) && IS_PREG($5) && IS_PREG($7)) {
+		    notethat("LDSTpmod: dregs = W [ pregs ++ pregs ] (.)\n");
+			$$ = LDSTPMOD (&$1, &$5, &$7, 3, $9.r0);
+		} else {
+			return semantic_error("Bad register for LOAD");
+        }
+	}
+
+	| HALF_REG ASSIGN W LBRACK REG _PLUS_PLUS REG RBRACK
+	{
+		if (IS_DREG($1) && IS_PREG($5) && IS_PREG($7)) {
+		    notethat("LDSTpmod: dregs_half = W [ pregs ++ pregs ]\n");
+			$$ = LDSTPMOD (&$1, &$5, &$7, 1 + IS_H($1), 0);
+		} else {
+			return semantic_error("Bad register for LOAD");
+        }
+	}
+
+	| LBRACK REG post_op RBRACK ASSIGN REG
+	{
+		if (IS_IREG($2) && IS_DREG($6)) {
+		    notethat("dspLDST: [ iregs <post_op> ] = dregs\n");
+			$$ = DSPLDST(&$2, 0, &$6, $3.x0, 1);
+		} else
+		if (IS_PREG($2) && IS_DREG($6)) {
+		    notethat("LDST: [ pregs <post_op> ] = dregs\n");
+			$$ = LDST (&$2, &$6, $3.x0, 0, 0, 1);
+		} else
+		if (IS_PREG($2) && IS_PREG($6)) {
+		    notethat("LDST: [ pregs <post_op> ] = pregs\n");
+			$$ = LDST (&$2, &$6, $3.x0, 0, 1, 1);
+		} else {
+			return semantic_error("Bad register for STORE");
+		}
+	}
+
+	| LBRACK REG _PLUS_PLUS REG RBRACK ASSIGN REG
+	{
+		if (IS_DREG($7)) {
+			if (IS_IREG($2) && IS_MREG($4)) {
+				notethat("dspLDST: [ iregs ++ mregs ] = dregs\n");
+				$$ = DSPLDST(&$2, $4.regno & CODE_MASK, &$7, 3, 1);
+			} else
+			if (IS_PREG($2) && IS_PREG($4)) {
+				notethat("LDSTpmod: [ pregs ++ pregs ] = dregs\n");
+				$$ = LDSTPMOD (&$2, &$7, &$4, 0, 1);
+			} else {
+				return semantic_error("Bad register for STORE");
+			}
+		} else {
+			return semantic_error("Expected Dreg for last argument");
+		}
+	}
+			
+	| W LBRACK REG _PLUS_PLUS REG RBRACK ASSIGN HALF_REG
+	{
+		if (!IS_DREG($8))
+			return semantic_error("Expect Dreg as last argument");
+		if (IS_PREG($3) && IS_PREG($5)) {
+		    notethat("LDSTpmod: W [ pregs ++ pregs ] = dregs_half\n");
+			$$ = LDSTPMOD (&$3, &$8, &$5, 1 + IS_H($8), 1);
+			
+		} else {
+			return semantic_error("Bad register for STORE");
+		}
+	}
+
+	| REG ASSIGN B LBRACK REG plus_minus expr RBRACK xpmod
+	{
+		if (IS_DREG($1) && IS_PREG($5) && IS_RANGE(16, $7, $6.r0, 1)) {
+		    notethat("LDSTidxI: dregs = B [ pregs + imm16 ] (%c)\n",
+				$9.r0 ? 'X' : 'Z' );
+			if ($6.r0) { neg_value($7); }
+			$$ = LDSTIDXI (&$5, &$1,   /* W  sz  Z */
+			                              0,  2, $9.r0,
+									       $7);
+		} else {
+			return semantic_error("Bad register or value for LOAD");
+		}
+	}
+
+	| REG ASSIGN B LBRACK REG post_op RBRACK xpmod
+	{
+		if (IS_DREG($1) && IS_PREG($5)) {
+		    notethat("LDST: dregs = B [ pregs <post_op> ] (%c)\n",
+				$8.r0 ? 'X' : 'Z' );
+			$$ = LDST (&$5, &$1, $6.x0, 2, $8.r0, 0);
+		} else {
+			return semantic_error("Bad register for LOAD");
+		}
+	}
+			
+	| REG ASSIGN LBRACK REG _PLUS_PLUS REG RBRACK
+	{
+		if (IS_DREG($1) && IS_IREG($4) && IS_MREG($6)) {
+
+		    notethat("dspLDST: dregs = [ iregs ++ mregs ]\n");
+			$$ = DSPLDST(&$4, $6.regno & CODE_MASK, &$1, 3, 0);
+		} else
+		if (IS_DREG($1) && IS_PREG($4) && IS_PREG($6)) {
+
+		    notethat("LDSTpmod: dregs = [ pregs ++ pregs ]\n");
+			$$ = LDSTPMOD (&$4, &$1, &$6, 0, 0);
+		} else {
+			return semantic_error("Bad register for LOAD");
+		}
+	}
+
+	| REG ASSIGN LBRACK REG plus_minus expr RBRACK
+	{
+		int ispreg = IS_PREG($1);
+
+		if (!IS_PREG($4))
+			return semantic_error("Expects Preg for indirect");
+
+		// special case REG_FP:
+		if ($4.regno == REG_FP) {
+
+			if (IS_URANGE(4, $6, $5.r0, 4)) {
+				notethat("LDSTii: dpregs = [ FP + uimm6m4 ]\n");
+				$$ = LDSTII (&$4, &$1, $6, 0, ispreg ? 3: 0);
+
+			} else
+			if (IS_URANGE(5, $6, $5.r0 ? 0: 1, 4)) {
+				notethat("LDSTiiFP: dpregs = [ FP - uimm7m4 ]\n");
+				if (!$5.r0) { neg_value($6); }
+				$$ = LDSTIIFP ($6, &$1, 0);
+			} else 
+			if (IS_RANGE(16, $6, $5.r0, 4)) {
+				notethat("LDSTidxI: dpregs = [ FP + imm18m4 ]\n");
+				$$ = LDSTIDXI (&$4, &$1,   /* W  sz  Z */
+											  0,  0, ispreg ? 1: 0,
+											  $6);
+
+			} else 
+				return semantic_error("Bad constant for load @FP");
+		} else
+
+		if (IS_URANGE(4, $6, $5.r0, 4)) {
+			notethat("LDSTii: dpregs = [ pregs + uimm7m4 ]\n");
+			$$ = LDSTII (&$4, &$1, $6, 0, ispreg ? 3 : 0);
+		} else
+		if (IS_RANGE(16, $6, $5.r0, 4)) {
+			notethat("LDSTidxI: dpregs = [ pregs + imm18m4 ]\n");
+			if ($5.r0) { neg_value($6); }
+			$$ = LDSTIDXI (&$4, &$1,   /* W  sz  Z */
+										  0,  0, ispreg ? 1: 0,
+										  $6);
+
+		} else {
+			return semantic_error("Bad constant range or register");
+		}
+
+	}
+
+/* 3 rules compacted */
+	| REG ASSIGN LBRACK REG post_op RBRACK
+	{
+		if (IS_DREG($1) && IS_IREG($4)) {
+		    notethat("dspLDST: dregs = [ iregs <post_op> ]\n");
+			$$ = DSPLDST (&$4, 0, &$1, $5.x0, 0 );
+		} else
+		if (IS_DREG($1) && IS_PREG($4)) {
+		    notethat("LDST: dregs = [ pregs <post_op> ]\n");
+			$$ = LDST (&$4, &$1, $5.x0, 0, 0, 0);
+		} else
+		if (IS_PREG($1) && IS_PREG($4)) {
+			if (REG_SAME($1, $4) && $5.x0 != 2)
+				return semantic_error("Pregs can't be same");
+
+		    notethat("LDST: pregs = [ pregs <post_op> ]\n");
+			$$ = LDST (&$4, &$1, $5.x0, 0, 1, 0);
+		} else 
+		if ($4.regno == REG_SP && IS_ALLREG($1) && $5.x0 == 0) {
+		    notethat("PushPopReg: allregs = [ SP ++ ]\n");
+			$$ = PUSHPOPREG(&$1, 0);
+
+		} else {
+			return semantic_error("Bad register or value");
+		}
+	}
+
+
+// }
+////////////////////////////////////////////////////////////////////////////
+// PushPopMultiple
+// {
+	| LBRACK _MINUS_MINUS REG RBRACK ASSIGN LPAREN REG COLON expr COMMA REG COLON expr RPAREN
+	{
+		if ($3.regno != REG_SP)
+			return semantic_error("SP expected");
+
+		if ($7.regno == REG_R7
+		 && (EXPR_VALUE($9) >= 0 && EXPR_VALUE($9) < 8)  
+		 && $11.regno == REG_P5
+		 && (EXPR_VALUE($13) >= 0 && EXPR_VALUE($13) < 6)  ) {
+		    notethat("PushPopMultiple: [ -- SP ] = ( R7 : reglim , P5 : reglim )\n");
+			$$ = PUSHPOPMULTIPLE (imm5($9), imm5($13), 1, 1, 1);
+		} else {
+			return semantic_error("Bad register for PushPopMultiple");
+		}
+	}
+
+	| LBRACK _MINUS_MINUS REG RBRACK ASSIGN LPAREN REG COLON expr RPAREN
+	{
+		if ($3.regno != REG_SP)
+			return semantic_error("SP expected");
+
+		if ($7.regno == REG_R7
+		 && (EXPR_VALUE($9) >= 0 && EXPR_VALUE($9) < 8) ) {
+		    notethat("PushPopMultiple: [ -- SP ] = ( R7 : reglim )\n");
+			$$ = PUSHPOPMULTIPLE (imm5($9), 0, 1, 0, 1);
+		} else
+		if ($7.regno == REG_P5
+		 && (EXPR_VALUE($9) >= 0 && EXPR_VALUE($9) < 6) ) {
+		    notethat("PushPopMultiple: [ -- SP ] = ( P5 : reglim )\n");
+			$$ = PUSHPOPMULTIPLE (0, imm5($9), 0, 1, 1);
+		} else {
+			return semantic_error("Bad register for PushPopMultiple");
+		}
+	}
+
+	| LPAREN REG COLON expr COMMA REG COLON expr RPAREN ASSIGN LBRACK REG _PLUS_PLUS RBRACK
+	{
+		if ($12.regno != REG_SP)
+			return semantic_error("SP expected");
+
+		if ($2.regno == REG_R7 && (EXPR_VALUE($4) >= 0 && EXPR_VALUE($4) < 8)  
+		 && $6.regno == REG_P5 && (EXPR_VALUE($8) >= 0 && EXPR_VALUE($8) < 6)) {
+		    notethat("PushPopMultiple: ( R7 : reglim , P5 : reglim ) = [ SP ++ ]\n");
+			$$ = PUSHPOPMULTIPLE (imm5($4), imm5($8), 1, 1, 0);
+		} else {
+			return semantic_error("Bad register range for PushPopMultiple");
+		}
+	}
+
+	| LPAREN REG COLON expr RPAREN ASSIGN LBRACK REG _PLUS_PLUS RBRACK
+	{
+		if ($8.regno != REG_SP)
+			return semantic_error("SP expected");
+
+		if ($2.regno == REG_R7 && (EXPR_VALUE($4) >= 0
+		 && EXPR_VALUE($4) < 8)) {
+		    notethat("PushPopMultiple: ( R7 : reglim ) = [ SP ++ ]\n");
+			$$ = PUSHPOPMULTIPLE (imm5($4), 0, 1, 0, 0);
+		} else
+		if ($2.regno == REG_P5 && (EXPR_VALUE($4) >= 0
+		 && EXPR_VALUE($4) < 6)) {
+		    notethat("PushPopMultiple: ( P5 : reglim ) = [ SP ++ ]\n");
+			$$ = PUSHPOPMULTIPLE (0, imm5($4), 0, 1, 0);
+		} else {
+			return semantic_error("Bad register range for PushPopMultiple");
+		}
+	}
+
+	| LBRACK _MINUS_MINUS REG RBRACK ASSIGN REG
+	{
+		if ($3.regno != REG_SP)
+			return semantic_error("SP expected");
+
+		if (IS_ALLREG($6)) {
+		    notethat("PushPopReg: [ -- SP ] = allregs\n");
+			$$ = PUSHPOPREG(&$6, 1);
+		} else {
+			return semantic_error("Bad register for PushPopReg");
+		}
+	}
+
+// PushPopReg: allregs = [ SP ++ ] is covered in the LDST section.
+// We no longer pre-'lex' the SP against other Pregs.
+
+// }
+
+////////////////////////////////////////////////////////////////////////////
+// linkage
+
+	| LINK expr
+	{
+		if (IS_URANGE(16, $2, 0, 4)) {
+			$$ = LINKAGE (0, uimm16s4($2));
+		} else {
+			return semantic_error("Bad constant for LINK");
+		}
+	}
+		
+	| UNLINK
+	{
+		notethat("linkage: UNLINK\n");
+		$$ = LINKAGE (1, 0);
+	}
+
+
+////////////////////////////////////////////////////////////////////////////
+// LSETUP
+
+	| LSETUP LPAREN expr COMMA expr RPAREN REG
+	{
+		if (IS_PCREL4($3) && IS_LPPCREL10($5) && IS_CREG($7)) {
+		    notethat("LoopSetup: LSETUP ( pcrel4 , lppcrel10 ) counters\n");
+			$$ = LOOPSETUP ($3, &$7, 0, $5, 0);
+		} else {
+			return semantic_error("Bad register or values for LSETUP");
+		}
+	}
+
+	| LSETUP LPAREN expr COMMA expr RPAREN REG ASSIGN REG
+	{
+		if (IS_PCREL4($3) && IS_LPPCREL10($5)
+		 && IS_PREG($9) && IS_CREG($7)) {
+		    notethat("LoopSetup: LSETUP ( pcrel4 , lppcrel10 ) counters = pregs\n");
+			$$ = LOOPSETUP ($3, &$7, 1, $5, &$9);
+		} else {
+			return semantic_error("Bad register or values for LSETUP");
+		}
+	}
+
+	| LSETUP LPAREN expr COMMA expr RPAREN REG ASSIGN REG GREATER_GREATER expr
+	{
+		if (IS_PCREL4($3) && IS_LPPCREL10($5)
+		 && IS_PREG($9) && IS_CREG($7) 
+		 && EXPR_VALUE($11) == 1) {
+		    notethat("LoopSetup: LSETUP ( pcrel4 , lppcrel10 ) counters = pregs >> 1\n");
+			$$ = LOOPSETUP ($3, &$7, 3, $5, &$9);
+		} else {
+			return semantic_error("Bad register or values for LSETUP");
+		}
+	}
+
+////////////////////////////////////////////////////////////////////////////
+// pseudoDEBUG
+
+	| DBG
+	{
+		notethat("pseudoDEBUG: DBG\n");
+
+	 	$$ = gen_pseudodbg(3, 7, 0);
+	}
+
+	| DBG REG_A
+	{
+		notethat("pseudoDEBUG: DBG REG_A\n");
+		$$ = gen_pseudodbg(3, IS_A1($2), 0);
+	}
+
+	| DBG REG
+	{
+		notethat("pseudoDEBUG: DBG allregs\n");
+		$$ = gen_pseudodbg(0, $2.regno & CODE_MASK, $2.regno & CLASS_MASK);
+	}
+
+	| DBGCMPLX LPAREN REG RPAREN
+	{
+		if (!IS_DREG($3))
+			return semantic_error("Dregs expected");
+
+		notethat("pseudoDEBUG: DBGCMPLX ( dregs )\n");
+		$$ = gen_pseudodbg(3, 6, $3.regno & CODE_MASK);
+	}
+	
+	| DBGHALT
+	{
+		notethat("psedoDEBUG: DBGHALT\n");
+		$$ = gen_pseudodbg(3, 5, 0);
+	}
+
+	| DBGA LPAREN HALF_REG COMMA expr RPAREN
+	{
+		notethat("pseudodbg_assert: DBGA ( dregs_lo , uimm16 )\n");
+		$$ = gen_pseudodbg_assert(IS_H($3), &$3, uimm16($5) );
+	}
+		
+	| DBGAH LPAREN REG COMMA expr RPAREN
+	{
+		notethat("pseudodbg_assert: DBGAH ( dregs , uimm16 )\n");
+		$$ = gen_pseudodbg_assert(3, &$3, uimm16($5) );
+	}
+
+	| DBGAL LPAREN REG COMMA expr RPAREN
+	{
+		notethat("psedodbg_assert: DBGAL ( dregs , uimm16 )\n");
+		$$ = gen_pseudodbg_assert(2, &$3, uimm16($5) );
+
+	}
+
+
+;
+
+////////////////////////////////////////////////////////////////////////////
+// AUX RULES
+
+// Register rules
+
+REG_A:
+	REG_A00
+	{ $$ = $1; }
+	| REG_A11
+	{ $$ = $1; }
+;
+
+
+// Modifiers
+/* { */
+
+opt_mode:
+	{ $$.MM = 0; $$.mod = 0; }
+	| LPAREN M COMMA MMOD RPAREN
+	{ $$.MM = 1; $$.mod = $4; }
+	| LPAREN MMOD COMMA M RPAREN
+	{ $$.MM = 1; $$.mod = $2; }
+	| LPAREN MMOD RPAREN
+	{ $$.MM = 0; $$.mod = $2; }
 	| LPAREN M RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.mod = 1;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("(M)"); }
-		}
+	{ $$.MM = 1; $$.mod = 0; }
+;
 
-	;
+asr_asl:
+	LPAREN ASL RPAREN
+	{ $$.r0 = 1; }
+	| LPAREN ASR RPAREN
+	{ $$.r0 = 0; }
+;
 
+sco:
+	{ $$.s0 = 0; $$.x0 = 0; }
+	| S
+	{ $$.s0 = 1; $$.x0 = 0; }
+	| CO
+	{ $$.s0 = 0; $$.x0 = 1; }
+	| SCO
+	{ $$.s0 = 1; $$.x0 = 1; }
+;
+
+asr_asl_0:
+	ASL
+	{ $$.r0 = 1; }
+	| ASR
+	{ $$.r0 = 0; }
+;
+
+amod0:
+	{ $$.s0 = 0; $$.x0 = 0; }
+	| LPAREN sco RPAREN
+	{ $$.s0 = $2.s0; $$.x0 = $2.x0; }
+;
+
+
+amod1:
+	{ $$.s0 = 0; $$.x0 = 0; }
+	| LPAREN NS RPAREN
+	{ $$.s0 = 0; $$.x0 = 0; }
+	| LPAREN S RPAREN
+	{ $$.s0 = 1; $$.x0 = 0; }
+;
+
+
+amod2:
+	{ $$.r0 = 0; $$.s0 = 0; }
+	| LPAREN asr_asl_0 RPAREN
+	{ $$.r0 = 2 + $2.r0; $$.s0 = 0; $$.x0 = 0; }
+
+	| LPAREN sco RPAREN
+	{ $$.r0 = 0; $$.s0 = $2.s0; $$.x0 = $2.x0; }
+
+	| LPAREN asr_asl_0 COMMA sco RPAREN
+	{ $$.r0 = 2 + $2.r0; $$.s0 = $4.s0; $$.x0 = $4.x0; }
+
+	| LPAREN sco COMMA asr_asl_0 RPAREN
+	{ $$.r0 = 2 + $4.r0; $$.s0 = $2.s0; $$.x0 = $2.x0; }
+;
+
+xpmod:
+	{ $$.r0 = 0; }
+	| LPAREN Z RPAREN
+	{ $$.r0 = 0; }
+	| LPAREN X RPAREN
+	{ $$.r0 = 1; }
+;
+
+xpmod1:
+	{ $$.r0 = 0; }
+	| LPAREN X RPAREN
+	{ $$.r0 = 0; }
+	| LPAREN Z RPAREN
+	{ $$.r0 = 1; }
+;
+
+vsmod:
+	{ $$.r0 = 0; $$.s0 = 0; }
+	| LPAREN NS RPAREN
+	{ $$.r0 = 0; $$.s0 = 0; }
+	| LPAREN S RPAREN
+	{ $$.r0 = 0; $$.s0 = 1; }
+	| LPAREN V RPAREN
+	{ $$.r0 = 1; $$.s0 = 0; }
+	| LPAREN V COMMA S RPAREN
+	{ $$.r0 = 1; $$.s0 = 1; }
+	| LPAREN S COMMA V RPAREN
+	{ $$.r0 = 1; $$.s0 = 1; }
+;
+
+vmod:
+	{ $$.r0 = 0; }
+	| LPAREN V RPAREN
+	{ $$.r0 = 1; }
+;
+
+smod:
+	{ $$.s0 = 0; }
+	| LPAREN S RPAREN
+	{ $$.s0 = 1; }
+;
+
+searchmod:
+	  GE
+	{ $$.r0 = 1; }
+	| GT
+	{ $$.r0 = 0; }
+	| LE
+	{ $$.r0 = 3; }
+	| LT
+	{ $$.r0 = 2; }
+;
 
 
 aligndir:
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.r0 = 0;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error (""); }
-		}
+	{ $$.r0 = 0; }
 	| LPAREN R RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.r0 = 1;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("R"); }
-		}
-	| R
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      memset (&$$, 0, sizeof ($$)); semantic_error ("Not Allowed"); 
-		  } 
-		}
-	;
+	{ $$.r0 = 1; }
+;
+
+byteop_mod:
+	LPAREN R RPAREN
+	{ $$.r0 = 0; $$.s0 = 1; }
+	| LPAREN MMOD RPAREN
+	{ if ($2 != M_T) return semantic_error("Bad modifier");
+		$$.r0 = 1; $$.s0 = 0; }
+	| LPAREN MMOD COMMA R RPAREN
+	{ if ($2 != M_T) return semantic_error("Bad modifier");
+		$$.r0 = 1; $$.s0 = 1; }
+	| LPAREN R COMMA MMOD RPAREN
+	{ if ($4 != M_T) return semantic_error("Bad modifier");
+		$$.r0 = 1; $$.s0 = 1; }
+;
 
 
-A1macfunc:	  REG_A11 ASSIGN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && $1==REG_A1){
-		      $$.r0 = 0;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("REG_A11 ASSIGN"); }
-		}
-	| REG_A11 _PLUS_ASSIGN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && $1==REG_A1){
-		      $$.r0 = 1;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("REG_A11 _PLUS_ASSIGN"); }
-		}
-	| REG_A11 _MINUS_ASSIGN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && $1==REG_A1){
-		      $$.r0 = 2;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("REG_A11 _MINUS_ASSIGN"); }
-		}
-	;
 
-A0macfunc:	  REG_A00 ASSIGN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && $1==REG_A0){
-		      $$.r0 = 0;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("REG_A00 ASSIGN"); }
-		}
-	| REG_A00 _PLUS_ASSIGN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && $1==REG_A0){
-		      $$.r0 = 1;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("REG_A00 _PLUS_ASSIGN"); }
-		}
-	| REG_A00 _MINUS_ASSIGN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && $1==REG_A0){
-		      $$.r0 = 2;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("REG_A00 _MINUS_ASSIGN"); }
-		}
-	;
+c_align:
+	ALIGN8
+	{ $$.r0 = 0; }
+	| ALIGN16
+	{ $$.r0 = 1; }
+	| ALIGN24
+	{ $$.r0 = 2; }
+;
 
-multfunc:	  HIGH_REG STAR HIGH_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)){
-		      $$.h0 = 1;
-		      $$.h1 = 1;
-		      $$.op = 0<<11
-                      |((dregs($1)&0x7)<<3)                    /*src0<(dregs)*/
-		      |((dregs($3)&0x7)<<0);                    /*src1<(dregs)*/
+w32_or_nothing:
+	{ $$.r0 = 0; }
+	| LPAREN MMOD RPAREN
+	{
+		if ($2 == M_W32) $$.r0 = 1;
+		else return semantic_error("Only (W32) allowed");
+	}
+;
 
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("HIGH_REG STAR HIGH_REG"); }
-		}
-	| HIGH_REG STAR LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)){
-		      $$.h0 = 1;
-		      $$.h1 = 0;
-		      $$.op = 0<<11
-                      |((dregs($1)&0x7)<<3)                    /*src0<(dregs)*/
-		      |((dregs($3)&0x7)<<0);                    /*src1<(dregs)*/
-
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("HIGH_REG STAR LOW_REG"); }
-		}
-	| LOW_REG STAR HIGH_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)){
-		      $$.h0 = 0;
-		      $$.h1 = 1;
-		      $$.op = 0<<11
-                      |((dregs($1)&0x7)<<3)                    /*src0<(dregs)*/
-		      |((dregs($3)&0x7)<<0);                    /*src1<(dregs)*/
-
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("LOW_REG STAR HIGH_REG"); }
-		}
-	 | LOW_REG STAR LOW_REG
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE))
-                             && reginclass($1,rc_dregs)
-		             && reginclass($3,rc_dregs)){
-		      $$.h0 = 0;
-		      $$.h1 = 0;
-		      $$.op = 0<<11
-                      |((dregs($1)&0x7)<<3)                    /*src0<(dregs)*/
-		      |((dregs($3)&0x7)<<0);                    /*src1<(dregs)*/
-
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("LOW_REG STAR LOW_REG"); }
-		}
-
-	;
-
-macmod_hmove:
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.mod = 0;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error (""); }
-		}
-	| IS
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		   memset (&$$, 0, sizeof ($$)); semantic_error ("IS"); }
-		}
-	| IH
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		   memset (&$$, 0, sizeof ($$)); semantic_error ("IH"); }
-		}
-	| ISS2
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		   memset (&$$, 0, sizeof ($$)); semantic_error ("ISS2"); }
-		}
-	| IU
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		   memset (&$$, 0, sizeof ($$)); semantic_error ("IU"); }
-		}
-	| S2RND
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		   memset (&$$, 0, sizeof ($$)); semantic_error ("S2RND"); }
-		}
-	| T
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		   memset (&$$, 0, sizeof ($$)); semantic_error ("T"); }
-		}
-	| TFU 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		   memset (&$$, 0, sizeof ($$)); semantic_error ("TFU"); }
-		}
-	| FU
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		   memset (&$$, 0, sizeof ($$)); semantic_error ("FU"); }
-		}
-	| LPAREN IS RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.mod = 8;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("(IS)"); }
-		}
-	| LPAREN IH RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.mod = 11;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("(IH)"); }
-		}
-	| LPAREN ISS2 RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.mod = 9;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("(ISS2)"); }
-		}
-	| LPAREN IU RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.mod = 12;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("(IU)"); }
-		}
-	| LPAREN S2RND RPAREN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.mod = 1;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("(S2RND)"); }
-		}
-	| LPAREN T RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.mod = 2;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("(T)"); }
-		}
-	| LPAREN TFU RPAREN 
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.mod = 6;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("(TFU)"); }
-		}
-	| LPAREN FU RPAREN
-		{
-		  if(0) {
-		  } else if ( 1 && memset(&$$, 0, sizeof(YYSTYPE)) ) {
-		      $$.mod = 4;
-		  } else { memset (&$$, 0, sizeof ($$)); semantic_error ("(FU)"); }
-		}
-	;
+iu_or_nothing:
+	{ $$.r0 = 1; }
+	| LPAREN MMOD RPAREN
+	{
+		if ($2 == M_IU) $$.r0 = 3;
+		else return semantic_error("(IU) expected");
+	}
+;
 
 
-symbol		: SYMBOL 			{ ExprNodeValue val; val.s_value = S_GET_NAME($1); $$ = ExprNodeCreate(ExprNodeReloc, val, NULL, NULL); }
-		;
+/* } */
+// Operators
+/* { */
 
-eterm           : NUMBER 			{ ExprNodeValue val; val.i_value = $1; $$ = ExprNodeCreate(ExprNodeConstant, val, NULL, NULL); }
-		| symbol			{ $$ = $1; }
-    		| LPAREN expr_1 RPAREN  	{ $$ = $2; }
-                | TILDA expr_1			{ $$ = unary(ExprOpTypeCOMP,$2); }
-		| MINUS expr_1 %prec TILDA	{ $$ = unary(ExprOpTypeNEG,$2); }
-		;
+min_max:
+	MIN
+	{ $$.r0 = 1; }
+	| MAX
+	{ $$.r0 = 0; }
+;
+ 
+op_bar_op:
+	_PLUS_BAR_PLUS
+	{ $$.r0 = 0; }
+	| _PLUS_BAR_MINUS
+	{ $$.r0 = 1; }
+	| _MINUS_BAR_PLUS
+	{ $$.r0 = 2; }
+	| _MINUS_BAR_MINUS
+	{ $$.r0 = 3; }
+;
 
-offset_expr	: PLUS eterm    { $$ = $2; }
-		| MINUS eterm   { $$ = unary(ExprOpTypeNEG,$2); }
-		|		{ $$ = NULL; }
-		;
+plus_minus:
+	PLUS
+	{ $$.r0 = 0; }
+	| MINUS
+	{ $$.r0 = 1; }
+;
 
-expr		: expr_1				{ $$ = $1; }
-		;
+rnd_op:
+	LPAREN RNDH RPAREN
+	{
+		$$.r0 = 1; // HL
+		$$.s0 = 0; // s
+		$$.x0 = 0; // aop
+	}
 
-expr_1		: expr_1 STAR expr_1		{ $$ = binary(ExprOpTypeMult,$1,$3);   }
-		| expr_1 SLASH expr_1		{ $$ = binary(ExprOpTypeDiv,$1,$3); }
-		| expr_1 PERCENT expr_1		{ $$ = binary(ExprOpTypeMod,$1,$3);    }
-		| expr_1 PLUS expr_1		{ $$ = binary(ExprOpTypeAdd,$1,$3);    }
-		| expr_1 MINUS expr_1		{ $$ = binary(ExprOpTypeSub,$1,$3);    }
-		| expr_1 LESS_LESS expr_1	{ $$ = binary(ExprOpTypeLsft,$1,$3);    }
-		| expr_1 GREATER_GREATER expr_1	{ $$ = binary(ExprOpTypeRsft,$1,$3);    }
-		| expr_1 AMPERSAND expr_1	{ $$ = binary(ExprOpTypeBAND,$1,$3); }
-		| expr_1 CARET expr_1		{ $$ = binary(ExprOpTypeLOR,$1,$3); }
-		| expr_1 BAR expr_1		{ $$ = binary(ExprOpTypeBOR,$1,$3); }
-		| eterm				{ $$ = $1;		     }
-		;
+	| LPAREN TH RPAREN
+	{
+		$$.r0 = 1; // HL
+		$$.s0 = 0; // s
+		$$.x0 = 1; // aop
+	}
+
+	| LPAREN RNDL RPAREN
+	{
+		$$.r0 = 0; // HL
+		$$.s0 = 0; // s
+		$$.x0 = 0; // aop
+	}
+
+	| LPAREN TL RPAREN
+	{
+		$$.r0 = 0; // HL
+		$$.s0 = 0; // s
+		$$.x0 = 1; // aop
+	}
+
+	| LPAREN RNDH COMMA R RPAREN
+	{
+		$$.r0 = 0; // HL
+		$$.s0 = 1; // s
+		$$.x0 = 1; // aop
+	}
+
+	| LPAREN TH COMMA R RPAREN
+	{
+		$$.r0 = 1; // HL
+		$$.s0 = 1; // s
+		$$.x0 = 1; // aop
+	}
+
+	| LPAREN RNDL COMMA R RPAREN
+	{
+		$$.r0 = 0; // HL
+		$$.s0 = 1; // s
+		$$.x0 = 0; // aop
+	}
+
+	| LPAREN TL COMMA R RPAREN
+	{
+		$$.r0 = 0; // HL
+		$$.s0 = 1; // s
+		$$.x0 = 1; // aop
+	}
+;
+
+b3_op:
+	LPAREN LO RPAREN
+	{
+		$$.s0 = 0; // s
+		$$.x0 = 0; // HL
+	}
+
+	| LPAREN HI RPAREN
+	{
+		$$.s0 = 0; // s
+		$$.x0 = 1; // HL
+	}
+	| LPAREN LO COMMA R RPAREN
+	{
+		$$.s0 = 1; // s
+		$$.x0 = 0; // HL
+	}
+
+	| LPAREN HI COMMA R RPAREN
+	{
+		$$.s0 = 1; // s
+		$$.x0 = 1; // HL
+	}
+;
+
+post_op:
+	{ $$.x0 = 2; }
+	| _PLUS_PLUS 
+	{ $$.x0 = 0; }
+	| _MINUS_MINUS
+	{ $$.x0 = 1; }
+;
+
+/* } */
+// Assignments, Macfuncs
+/* { */
+
+a_assign:
+	REG_A ASSIGN
+	{ $$ = $1; }
+;
+
+a_minusassign:
+	REG_A _MINUS_ASSIGN
+	{ $$ = $1; }
+;
+
+a_plusassign:
+	REG_A _PLUS_ASSIGN
+	{ $$ = $1; }
+;
+
+assign_macfunc:
+	REG ASSIGN REG_A
+	{
+		$$.w = 1; $$.P = 1; $$.n = IS_A1($3);
+		$$.op = 3; $$.dst = $1;
+		$$.s0.regno = 0; $$.s1.regno = 0; // XXX
+	}
+
+	| a_macfunc
+	{
+		$$ = $1;
+		$$.w = 0; $$.P = 0;
+		$$.dst.regno = 0;
+	}
+
+	| REG ASSIGN LPAREN a_macfunc RPAREN
+	{
+		$$ = $4;
+		$$.w = 1; $$.P = 1; $$.dst = $1;
+	}
+
+	| HALF_REG ASSIGN LPAREN a_macfunc RPAREN
+	{
+		$$ = $4;
+		$$.w = 1; $$.P = 0; $$.dst = $1;
+	}
+
+	| HALF_REG ASSIGN REG_A
+	{
+		$$.w = 1; $$.P = 0; $$.n = IS_A1($3);
+		$$.op = 3; $$.dst = $1;
+		$$.s0.regno = 0; $$.s1.regno = 0;
+	}
+;
+
+a_macfunc:
+	a_assign HALF_REG STAR HALF_REG
+	{
+		$$.n = IS_A1($1); $$.op = 0;  $$.s0 = $2; $$.s1 = $4;
+	}
+	| a_plusassign HALF_REG STAR HALF_REG
+	{
+		$$.n = IS_A1($1); $$.op = 1;  $$.s0 = $2; $$.s1 = $4;
+	}
+	| a_minusassign HALF_REG STAR HALF_REG
+	{
+		$$.n = IS_A1($1); $$.op = 2;  $$.s0 = $2; $$.s1 = $4;
+	}
+;
+
+multfunc:
+	HALF_REG STAR HALF_REG
+	{
+		if (IS_DREG($1) && IS_DREG($3)) {
+			$$.s0 = $1; $$.s1 = $3;
+		} else {
+			return semantic_error("Multfunc expects Dregs");
+		}
+	}
+;
+
+cc_op:
+	ASSIGN
+	{ $$.r0 = 0; }
+	| _BAR_ASSIGN
+	{ $$.r0 = 1; }
+	| _AMPERSAND_ASSIGN
+	{ $$.r0 = 2; }
+	| _CARET_ASSIGN
+	{ $$.r0 = 3; }
+;
+
+ccstat:
+	CCREG cc_op MODIFIED_STATUS_REG
+	{ $$.r0 = $3.regno; $$.x0 = $2.r0; $$.s0 = 0; }
+
+	| CCREG cc_op V
+	{ $$.r0 = 0x18; $$.x0 = $2.r0; $$.s0 = 0; }
+
+	| MODIFIED_STATUS_REG cc_op CCREG
+	{ $$.r0 = $1.regno; $$.x0 = $2.r0; $$.s0 = 1; }
+
+	| V cc_op CCREG
+	{ $$.r0 = 0x18; $$.x0 = $2.r0; $$.s0 = 1; }
+
+;
+
+/* } */
+
+// Expressions / Symbols
+
+// Changed this such that expressions as:
+// 
+//    r0 = 2 + (1 << 4) * 3;
+//
+// are valid without brackets
+
+/*
+symbol:
+	SYMBOL
+	{ $$ = MKREF($1); }
+;
+
+eterm:
+	NUMBER
+	{ $$ = mkexpr($1,0); }
+;
+
+offset_expr:
+	{ $$ = mkexpr(0,0); }
+	| PLUS expr_1
+	{ $$ = $2; }
+	| MINUS expr_1
+	{ $$ = unary(twos_compl,$2); }
+;
+
+expr:
+    expr_1 
+	{ $$ = $1; }
+	| symbol offset_expr
+	{ $$ = binary(add,$1,$2); }
+;
+
+expr_1:
+	expr_1 STAR expr_1
+	{ $$ = binary(mult,$1,$3);   }
+    | LPAREN expr_1 RPAREN
+	{ $$ = $2; }
+	| expr_1 SLASH expr_1
+	{ $$ = binary(divide,$1,$3); }
+	| expr_1 PERCENT expr_1
+	{ $$ = binary(mod,$1,$3);    }
+	| expr_1 PLUS expr_1
+	{ $$ = binary(add,$1,$3);    }
+	| expr_1 MINUS expr_1
+	{ $$ = binary(sub,$1,$3);    }
+	| expr_1 LESS_LESS expr_1
+	{ $$ = binary(lsh,$1,$3);    }
+	| expr_1 GREATER_GREATER expr_1
+	{ $$ = binary(rsh,$1,$3);    }
+	| expr_1 AMPERSAND expr_1
+	{ $$ = binary(logand,$1,$3); }
+	| expr_1 CARET expr_1
+	{ $$ = binary(logxor,$1,$3); }
+	| expr_1 BAR expr_1
+	{ $$ = binary(logior,$1,$3); }
+	| TILDA expr_1
+	{ $$ = unary(ones_compl,$2); }
+	| MINUS expr_1 %prec TILDA
+	{ $$ = unary(twos_compl,$2); }
+	| eterm
+	{ $$ = $1;		     }
+;
+*/
+
+symbol: SYMBOL
+	{ ExprNodeValue val; val.s_value = S_GET_NAME($1);
+	  $$ = ExprNodeCreate(ExprNodeReloc, val, NULL, NULL); }
+;
+
+eterm: NUMBER
+	{ ExprNodeValue val; val.i_value = $1;
+	  $$ = ExprNodeCreate(ExprNodeConstant, val, NULL, NULL); }
+	| symbol
+	{ $$ = $1; }
+	| LPAREN expr_1 RPAREN
+	{ $$ = $2; }
+	| TILDA expr_1
+	{ $$ = unary(ExprOpTypeCOMP,$2); }
+	| MINUS expr_1 %prec TILDA
+	{ $$ = unary(ExprOpTypeNEG,$2); }
+;
+
+/*
+offset_expr: PLUS eterm
+	{ $$ = $2; }
+	| MINUS eterm
+	{ $$ = unary(ExprOpTypeNEG,$2); }
+	|
+	{ $$ = NULL; }
+;
+*/
+
+expr: expr_1
+	{ $$ = $1; }
+;
+
+expr_1: expr_1 STAR expr_1
+	{ $$ = binary(ExprOpTypeMult,$1,$3); }
+	| expr_1 SLASH expr_1
+	{ $$ = binary(ExprOpTypeDiv,$1,$3); }
+	| expr_1 PERCENT expr_1
+	{ $$ = binary(ExprOpTypeMod,$1,$3); }
+	| expr_1 PLUS expr_1
+	{ $$ = binary(ExprOpTypeAdd,$1,$3); }
+	| expr_1 MINUS expr_1
+	{ $$ = binary(ExprOpTypeSub,$1,$3); }
+	| expr_1 LESS_LESS expr_1
+	{ $$ = binary(ExprOpTypeLsft,$1,$3); }
+	| expr_1 GREATER_GREATER expr_1
+	{ $$ = binary(ExprOpTypeRsft,$1,$3); }
+	| expr_1 AMPERSAND expr_1
+	{ $$ = binary(ExprOpTypeBAND,$1,$3); }
+	| expr_1 CARET expr_1
+	{ $$ = binary(ExprOpTypeLOR,$1,$3); }
+	| expr_1 BAR expr_1
+	{ $$ = binary(ExprOpTypeBOR,$1,$3); }
+	| eterm	
+	{ $$ = $1; }
+;
 
 
 %%
 
-EXPR_T mkexpr(int x, SYMBOL_T s) {
+EXPR_T mkexpr(int x, SYMBOL_T s)
+{
     EXPR_T e = (EXPR_T) ALLOCATE(sizeof (struct expression_cell));
     e->value = x;
     EXPR_SYMBOL(e) = s;
     return e;
-    }
+}
 
-/* return the new expression structure that allows
+/*
+static EXPR_T binary(expr_opcodes_t op,EXPR_T x,EXPR_T y)
+{
+    int val = 0;
+    switch (op) {
+		case mult:   val = EXPR_VALUE(x) * EXPR_VALUE(y);	break;
+		case divide: val = EXPR_VALUE(x) / EXPR_VALUE(y);	break;
+		case mod:    val = EXPR_VALUE(x) % EXPR_VALUE(y);	break;
+		case add:    val = EXPR_VALUE(x) + EXPR_VALUE(y);	break;
+		case sub:    val = EXPR_VALUE(x) - EXPR_VALUE(y);	break;
+		case lsh:    val = EXPR_VALUE(x) << EXPR_VALUE(y);  break;
+		case rsh:    val = EXPR_VALUE(x) >> EXPR_VALUE(y);  break;
+		case logand: val = EXPR_VALUE(x) & EXPR_VALUE(y);	break;
+		case logior: val = EXPR_VALUE(x) | EXPR_VALUE(y);	break;
+		case logxor: val = EXPR_VALUE(x) ^ EXPR_VALUE(y);	break;
+		default: break;  // to avoid warnings
+    }
+    return mkexpr (val, EXPR_SYMBOL(x));
+}
+
+static EXPR_T unary(expr_opcodes_t op,EXPR_T x)
+{
+    int val = 0;
+    switch (op) {
+		case ones_compl: val = ~EXPR_VALUE(x);	break;
+		case twos_compl: val = -EXPR_VALUE(x);	break;
+		default: break; // to avoid warnings
+    }
+    return mkexpr (val, EXPR_SYMBOL(x));
+}
+*/
+
+static int value_match(ExprNode *expr, int sz, int sign, int mul, int issigned)
+{
+	long umax = (1L << sz) - 1;
+	long min = -1L << (sz - 1);
+	long max = (1L << (sz - 1)) - 1;
+	
+	long v = EXPR_VALUE(expr);
+
+	if ((v % mul) != 0) {
+		fprintf(stderr, "ValueError: Must align to %d\n", mul);
+		return 0;
+	}
+
+	v /= mul;
+
+	if (sign) v = -v;
+
+	if (issigned) {
+		if (v >= min && v <= max) return 1;
+#ifdef DEBUG
+		fprintf(stderr, "signed value %lx out of range\n", v * mul);
+#endif
+		return 0;
+	}
+	if (v <= umax && v >= 0) 
+		return 1;
+#ifdef DEBUG
+	fprintf(stderr, "unsigned value %lx out of range\n", v * mul);
+#endif
+	return 0;
+}
+
+static int symbol_match(ExprNode *expr)
+{
+	if (expr->type == ExprNodeReloc)
+		return 1;
+	else
+		return 0;
+}
+
+		
+
+ /* return the new expression structure that allows
    symbol operations
    if the left and right children are constants, do the operation
 */
@@ -18289,7 +4427,10 @@ static ExprNode * unary(ExprOpType op,ExprNode * x)
   }
 }
 
-static int const_fits(ExprNode * expr, const_forms_t form) {
+#if 0
+
+static int const_fits(ExprNode * expr, const_forms_t form)
+{
 #if 1
     int sz       = constant_formats[form].nbits;
     int scale    = constant_formats[form].scale;
@@ -18403,7 +4544,10 @@ static int const_fits(ExprNode * expr, const_forms_t form) {
 #endif
 }
 
-int debug_codeselection;
+#endif
+
+
+int debug_codeselection = 0;
 static void notethat(char *format, ...)
 {
     va_list ap;
@@ -18421,6 +4565,3 @@ main(int argc, char **argv)
 }
 #endif
 
-/* Note:
- * . keep in mind, "DOT" arg in patterm "eterm" has been temporarily eliminated.
-*/
