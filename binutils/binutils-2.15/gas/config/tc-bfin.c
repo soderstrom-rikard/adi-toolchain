@@ -1348,6 +1348,7 @@ gen_calla (ExprNode * addr, int S)
   int val;
   int high_val;
   int reloc;
+  INIT (CALLa);
 
   switch(S){
    case 0 : reloc = BFD_RELOC_24_PCREL_JUMP_L; break;
@@ -1356,7 +1357,6 @@ gen_calla (ExprNode * addr, int S)
    default : break;
   }
 
-  INIT (CALLa);
   ASSIGN (S);
 
   val = EXPR_VALUE (addr) >> 1;
