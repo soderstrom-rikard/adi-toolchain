@@ -1278,8 +1278,8 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   set_gdbarch_sp_regnum (gdbarch, BFIN_SP_REGNUM);
   set_gdbarch_pc_regnum(gdbarch, BFIN_PC_REGNUM);
 
-  set_gdbarch_convert_register_p (gdbarch, bfin_convert_register_p);
-  set_gdbarch_register_to_value (gdbarch,  bfin_register_to_value);
+  //set_gdbarch_convert_register_p (gdbarch, bfin_convert_register_p);
+  //set_gdbarch_register_to_value (gdbarch,  bfin_register_to_value);
 
   set_gdbarch_push_dummy_call (gdbarch, bfin_push_dummy_call);
   set_gdbarch_frame_align(gdbarch, bfin_frame_align);
