@@ -1,6 +1,0 @@
-gdb Remote communication error: Connection reset by peer
-
-(gdb) target remote 192.168.0.51:2345
-Remote debugging using 192.168.0.51:2345
-Couldn't establish connection to remote target
-Remote communication error: Connection reset by peer.

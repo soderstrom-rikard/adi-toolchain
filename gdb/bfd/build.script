@@ -1,3 +1,0 @@
- gcc -DHAVE_CONFIG_H -I. -I. -I. -D_GNU_SOURCE -I. -I. -I./../include -I./../intl -I../intl -W -Wall -Wstrict-prototypes -Wmissing-prototypes -fnew-ra -O0 -save-temps -c bfd.c -o bfd.o
-gcc -DHAVE_CONFIG_H -I. -I. -I. -D_GNU_SOURCE -I. -I. -I./../include -I./../intl -I../intl -W -Wall -Wstrict-prototypes -Wmissing-prototypes -O1 -c simple.c -o simple.o
-gcc -DHAVE_CONFIG_H -I. -I. -I. -D_GNU_SOURCE -I. -I. -I./../include -I./../intl -I../intl -W -Wall -Wstrict-prototypes -Wmissing-prototypes -O0 -fnew-ra -c elf32.c -o elf32.o
