@@ -3,6 +3,47 @@
 	* config/bfin/bfin.c (push_multiple_operation): Always initialize both
 	first_preg_to_save and first_dreg_to_save.
 
+	* config/bfin/bfin.c (bfin_attribute_table): New.
+	(enum e_funkind): Don't define here.
+	(expand_interrupt_handler_prologue, expand_interrupt_handler_epilogue):
+	Renamed from output_interrupt_handler_prologue and
+	output_interrupt_handler_epilogue.  Changed to emit RTL.
+	(funkind): Small cleanup.
+	(expand_prologue_reg_save, expand_epilogue_reg_restore): Accept new arg
+	SAVEALL.  All callers changed.  Save/restore all registers if SAVEALL
+	is nonzero.
+	(emit_link_insn): New, broken out of bfin_expand_prologue and modified
+	to always use a nonzero argument for LINK, and not to use P1.
+	(bfin_expand_prologue): Enable code to emit interrupt handler
+	prologues.  Use emit_link_insn.
+	(bfin_expand_epilogue): Enable code to emit interrupt handler
+	epilogues.  Don't set RTX_FRAME_RELATED_P in the epilogue.
+	(print_operand): Add 'x' modifier for accumulator registers.
+	(hard_regno_mode_ok): Accept PDImode and nothing else for accumulators.
+	Nothing accepts CCmode anymore.
+	(TARGET_ATTRIBUTE_TABLE): New macro.
+	(output_load_immediate): Don't abort when moving IREGS etc. to memory;
+	it can be a stack push.
+	* config/bfin/bfin.h (FIRST_PSEUDO_REGISTER): Bump to 43.
+	(REGISTER_NAMES): Add registers used in interrupt handler prologues.
+	(FIXED_REGISTERS, CALL_USED_REGISTERS): Likewise.
+	(REG_ALLOC_ORDER): Add a few more REG_NO entries.
+	(enum reg_class, REG_CLASS_NAMES, REG_CLASS_CONTENTS): Remove
+	DREGS_PAIR.  Add EVEN_AREGS, EVEN_DREGS, ODD_AREGS, ODD_DREGS,
+	PROLOGUE_REGS.
+	(REG_CLASS_FROM_LETTER): Likewise.
+	(REGNO_REG_CLASS): REG_RETS and beyond are PROLOGUE_REGS.
+	(HARD_REGNO_NREGS): Adjust for accumulators and PDImode.
+	(enum e_funkind): Define here.
+	(LEGITIMATE_MODE_FOR_AUTOINC_P): New macro.
+	(GO_IF_LEGITIMATE_ADDRESS): Use it.
+	* config/bfin/bfin.md (REG_RETI, REG_RETX, REG_RETN, REG_RETE,
+	REG_ASTAT, REG_SEQSTAT, REG_USP, UNSPEC_RETURN): New constants.
+	(movbi, movqi, movhi, movsi, movsf): Disallow accumulator moves.
+	(return_internal): Allow one operand to determine the type of return.
+	All uses changed.
+	* config/bfin/bfin-modes.def: New file.
+
 2004-11-04  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (UNSPEC_CBRANCH_TAKEN, UNSPEC_CBRANCH_NOPS): New

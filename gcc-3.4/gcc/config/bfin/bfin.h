@@ -301,18 +301,21 @@ extern const char * directive_names[];
       1  frame pointer P7
    4 sets of indexing registers (I0-3, B0-3, L0-3, M0-3)
    1  condition code flag register CC
-   1  return address register RETS.  */
+   5  return address registers RETS/I/X/N/E
+   1  arithmetic status register (ASTAT).  */
 
-#define FIRST_PSEUDO_REGISTER 36
+#define FIRST_PSEUDO_REGISTER 43
 
 #define PREG_P(X) (REG_P (X) && REGNO (X) >= REG_P0 && REGNO (X) <= REG_P7)
 
 #define REGISTER_NAMES { \
-  "R0",      "R1",      "R2",      "R3",      "R4",      "R5",      "R6",      "R7",  \
-  "P0",      "P1",      "P2",      "P3",      "P4",      "P5",      "SP",      "FP",  \
-  "I0",      "B0",      "L0",      "I1",      "B1",      "L1",      "I2",      "B2",  \
-  "L2",      "I3",      "B3",      "L3",      "M0",      "M1",      "M2",      "M3",  \
-  "A0",      "A1",      "CC",    "RETS" \
+  "R0",      "R1",      "R2",      "R3",      "R4",      "R5",      "R6",      "R7", \
+  "P0",      "P1",      "P2",      "P3",      "P4",      "P5",      "SP",      "FP", \
+  "I0",      "B0",      "L0",      "I1",      "B1",      "L1",      "I2",      "B2", \
+  "L2",      "I3",      "B3",      "L3",      "M0",      "M1",      "M2",      "M3", \
+  "A0",      "A1", \
+  "CC",	\
+  "RETS",  "RETI",    "RETX",    "RETN",    "RETE",   "ASTAT", "SEQSTAT",  "USP" \
 }
 
 
@@ -346,8 +349,8 @@ extern const char * directive_names[];
 { 0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 1, 1,    \
 /*i0 b0 l0 i1 b1 l1 i2 b2   l2 i3 b3 l3 m0 m1 m2 m3 */ \
   0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0,    \
-/*a0 a1 cc rets*/ \
-  0, 0, 1, 1  \
+/*a0 a1 cc rets/i/x/n/e     astat seqstat usp */ \
+  0, 0, 1, 1, 1, 1, 1, 1,   1, 1, 1	    \
 }
 
 /* the registers that are not available for general 
@@ -364,8 +367,8 @@ extern const char * directive_names[];
 { 1, 1, 1, 1, 0, 0, 0, 0,   1, 1, 1, 0, 0, 0, 1, 1, \
 /*i0 b0 l0 i1 b1 l1 i2 b2   l2 i3 b3 l3 m0 m1 m2 m3 */ \
   1, 1, 1, 1, 1, 1, 1, 1,   1, 1, 1, 1, 1, 1, 1, 1,   \
-/*a0 a1 cc rets */ \
-  1, 1, 1, 0 \
+/*a0 a1 cc rets/i/x/n/e     astat seqstat usp */ \
+  1, 1, 1, 1, 1, 1, 1, 1,   1, 1, 1	\
 }
 
 
@@ -384,7 +387,8 @@ extern const char * directive_names[];
  /*REG_L2, REG_I3, REG_B3, REG_L3, REG_M0, REG_M1, REG_M2, REG_M3,*/ \
   REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, \
   REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, \
-  REG_NO, REG_NO \
+  REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, \
+  REG_NO							  \
 }
 
 #define CONDITIONAL_REGISTER_USAGE			\
@@ -428,13 +432,17 @@ enum reg_class
   MREGS,
   CIRCREGS, /* Circular buffering registers, Ix, Bx, Lx together form. See Automatic Circlur Buffering */
   DAGREGS,
+  EVEN_AREGS,
+  ODD_AREGS,
   AREGS,
   CCREGS,
+  EVEN_DREGS,
+  ODD_DREGS,
   DREGS,
-  DREGS_PAIR,
   PREGS,
   DPREGS,
   MOST_REGS,
+  PROLOGUE_REGS,
   ALL_REGS, LIM_REG_CLASSES
 };
 #define N_REG_CLASSES ((int)LIM_REG_CLASSES)
@@ -451,13 +459,17 @@ enum reg_class
    "MREGS",		\
    "CIRCREGS",		\
    "DAGREGS",		\
+   "EVEN_AREGS",	\
+   "ODD_AREGS",		\
    "AREGS",		\
    "CCREGS",		\
+   "EVEN_DREGS",	\
+   "ODD_DREGS",		\
    "DREGS",		\
-   "DREGS_PAIR",	\
    "PREGS",		\
    "DPREGS",		\
    "MOST_REGS",	\
+   "PROLOGUE_REGS",	\
    "ALL_REGS" }
 
 
@@ -480,14 +492,18 @@ enum reg_class
     { 0xf0000000,    0 },		/* MREGS */   \
     { 0x0fff0000,    0 },		/* CIRCREGS */   \
     { 0xffff0000,    0 },		/* DAGREGS */   \
+    { 0x00000000,    0x1 },		/* EVEN_AREGS */   \
+    { 0x00000000,    0x2 },		/* ODD_AREGS */   \
     { 0x00000000,    0x3 },		/* AREGS */   \
     { 0x00000000,    0x4 },		/* CCREGS */  \
+    { 0x00000055,    0 },		/* EVEN_DREGS */   \
+    { 0x000000aa,    0 },		/* ODD_DREGS */   \
     { 0x000000ff,    0 },		/* DREGS */   \
-    { 0x00000055,    0 },		/* DREGS_PAIR */   \
     { 0x0000ff00,    0 },		/* PREGS */   \
     { 0x0000ffff,    0 },		/* DPREGS */   \
     { 0xffffffff,    0x0 },		/* MOST_REGS */\
-    { 0xffffffff,    0xF },		/* ALL_REGS */\
+    { 0x00000000,    0x7f0 },		/* PROLOGUE_REGS */\
+    { 0xffffffff,    0x7ff },		/* ALL_REGS */\
      /*{ 0xffffffff,    0x3 }, */	}
 
 #define BASE_REG_CLASS          PREGS
@@ -513,14 +529,18 @@ enum reg_class
 #define REG_CLASS_FROM_LETTER(LETTER)	\
   ((LETTER) == 'a' ? PREGS :            \
    (LETTER) == 'd' ? DREGS : 		\
-   (LETTER) == 'D' ? DREGS_PAIR : 	\
+   (LETTER) == 'D' ? EVEN_DREGS : 	\
+   (LETTER) == 'W' ? ODD_DREGS : 	\
    (LETTER) == 'e' ? AREGS : 		\
+   (LETTER) == 'A' ? EVEN_AREGS : 	\
+   (LETTER) == 'B' ? ODD_AREGS : 	\
    (LETTER) == 'b' ? IREGS :            \
    (LETTER) == 'B' ? BREGS :            \
    (LETTER) == 'f' ? MREGS : 		\
    (LETTER) == 'c' ? CIRCREGS :         \
    (LETTER) == 'C' ? CCREGS : 		\
    (LETTER) == 'x' ? MOST_REGS :	\
+   (LETTER) == 'y' ? PROLOGUE_REGS :	\
    NO_REGS)
 
 /* The same information, inverted:
@@ -539,7 +559,7 @@ enum reg_class
  : ((REGNO)<=REG_M3 && (REGNO)>=REG_M0) ? MREGS \
  : ((REGNO)==REG_A0 || (REGNO)==REG_A1) ? AREGS \
  : (REGNO)==REG_CC ? CCREGS 			\
- : (REGNO) == REG_RETS ? ALL_REGS		\
+ : (REGNO) >= REG_RETS ? PROLOGUE_REGS		\
  : NO_REGS)
 
 /* When defined, the compiler allows registers explicitly used in the
@@ -563,7 +583,9 @@ enum reg_class
 #define CLASS_MAX_NREGS(CLASS, MODE)	\
   ((GET_MODE_SIZE (MODE) + UNITS_PER_WORD - 1) / UNITS_PER_WORD)
 
-#define HARD_REGNO_NREGS(REGNO, MODE) CLASS_MAX_NREGS(GENERAL_REGS, MODE)
+#define HARD_REGNO_NREGS(REGNO, MODE) \
+((MODE) == PDImode && ((REGNO) == REG_A0 || (REGNO) == REG_A1) \
+ ? 1 : CLASS_MAX_NREGS (GENERAL_REGS, MODE))
 
 /* A C expression that is nonzero if it is desirable to choose
    register allocation so as to avoid move instructions between a
@@ -587,6 +609,13 @@ enum reg_class
     secondary_input_reload_class(class,mode,x)
 
 /* Function Calling Conventions. */
+
+/* The type of the current function; normal functions are of type
+   SUBROUTINE.  */
+typedef enum {
+  SUBROUTINE, INTERRUPT_HANDLER, EXCPT_HANDLER, NMI_HANDLER
+} e_funkind;
+
 #define FUNCTION_ARG_REGISTERS { REG_R0, REG_R1, REG_R2, -1 }
 
 typedef struct {
@@ -710,6 +739,9 @@ W [ Preg + uimm16m2 ]
       [--sp]
 */
 
+#define LEGITIMATE_MODE_FOR_AUTOINC_P(MODE) \
+      (GET_MODE_SIZE (MODE) <= 4 || (MODE) == PDImode)
+
 #define GO_IF_LEGITIMATE_ADDRESS(MODE, X, WIN) do {            \
   switch (GET_CODE (X)) {			 	       \
   case REG:						       \
@@ -724,11 +756,11 @@ W [ Preg + uimm16m2 ]
     break;						       \
   case POST_INC:					       \
   case POST_DEC:					       \
-      if (GET_MODE_SIZE (MODE) <= 4			       \
+      if (LEGITIMATE_MODE_FOR_AUTOINC_P (MODE) 		       \
 	  && REG_OK_FOR_BASE_P (XEXP (X, 0)))		       \
       goto WIN;						       \
   case PRE_DEC:						       \
-    if (GET_MODE_SIZE (MODE) <= 4			       \
+      if (LEGITIMATE_MODE_FOR_AUTOINC_P (MODE) 		       \
 	&& XEXP (X, 0) == stack_pointer_rtx		       \
         && REG_OK_FOR_BASE_P (XEXP (X, 0)))	               \
       goto WIN;						       \

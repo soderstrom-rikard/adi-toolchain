@@ -46,7 +46,6 @@
 
 void print_operand (FILE *file,  rtx x,  char code);
 
-
 char *bfin_ver_str= (char *)
 #include "version.h"
 extern const char version_string[];
@@ -191,50 +190,17 @@ char *section_asm_op (SECT_ENUM_T dir) {
     return s;
 }
 
-/*
-              Interrupt Extentions to the C-language
-
-  The embeded world is a very special place, first interrupt are
-  a dominating factor and we need to handle them from C with minimal
-  assembler code.  To minimize the need for assembler code we extend
-  the C-language by defining 3 function attributes
-  
-     interrupt			function is an interrupt
-     exception_handler		function is an exception_handler
-     nmi_handler		function is an nmi_handler
-
-  These attributes decorate a function prototype as follows:
-  
-  int foo (void) __attribute__ ((interrupt));
-
-  For simplicity, we save and restore the machine state that the compiler
-  uses directly on the supervisor stack.  There is a lot more work to
-  be done here 
-
-     1. only the compiler state is saved i.e. dregs and pregs ASTAT return ""S
-        this is short sighted because there is much more to be saved.
-
-  In reality we don't need to save that much state here only the compiler scratch
-  registers need to be added to the prologue and epilogue of an ISR.
-*/
-
-typedef enum { 
-  SUBROUTINE, INTERRUPT_HANDLER, EXCPT_HANDLER, NMI_HANDLER
-} e_funkind ;
-
-void output_interrupt_handler_prologue PARAMS ((FILE *, int, e_funkind));
-void output_interrupt_handler_epilogue PARAMS ((FILE *, int, e_funkind));
-
-
-static e_funkind funkind (tree fundecl);
+/* Examine machine-dependent attributes of function FUNDECL and return its
+   type.  See the definition of E_FUNKIND.  */
 
 static e_funkind funkind (tree fundecl)
 {
-  if (lookup_attribute ("interrupt_handler", TYPE_ATTRIBUTES(TREE_TYPE(fundecl))))
+  tree attrs = TYPE_ATTRIBUTES (TREE_TYPE (fundecl));
+  if (lookup_attribute ("interrupt_handler", attrs))
     return INTERRUPT_HANDLER;
-  else if (lookup_attribute ("exception_handler", TYPE_ATTRIBUTES(TREE_TYPE(fundecl))))
+  else if (lookup_attribute ("exception_handler", attrs))
     return EXCPT_HANDLER;
-  else if (lookup_attribute ("nmi_handler", TYPE_ATTRIBUTES(TREE_TYPE(fundecl))))
+  else if (lookup_attribute ("nmi_handler", attrs))
     return NMI_HANDLER;
   else
     return SUBROUTINE;
@@ -299,6 +265,10 @@ static e_funkind funkind (tree fundecl)
  *
  */
 
+/* Compute the number of DREGS to save with a push_multiple operation.
+   This could include registers that aren't modified in the function,
+   since push_multiple only takes a range of registers.  */
+
 static int
 n_dregs_to_save (void)
 {
@@ -309,6 +279,8 @@ n_dregs_to_save (void)
       return REG_R7 - i + 1;
   return 0;
 }
+
+/* Like n_dregs_to_save, but compute number of PREGS to save.  */
 
 static int
 n_pregs_to_save (void)
@@ -321,11 +293,15 @@ n_pregs_to_save (void)
   return 0;
 }
 
+/* Emit code to save registers in the prologue.  SAVEALL is nonzero if we
+   must save all registers; this is used for interrupt handlers.
+   SPREG contains (reg:SI REG_SP).  */
+
 static void
-expand_prologue_reg_save (rtx spreg)
+expand_prologue_reg_save (rtx spreg, int saveall)
 {
-  int ndregs = n_dregs_to_save ();
-  int npregs = n_pregs_to_save ();
+  int ndregs = saveall ? 8 : n_dregs_to_save ();
+  int npregs = saveall ? 6 : n_pregs_to_save ();
   int dregno = REG_R7 + 1 - ndregs;
   int pregno = REG_P5 + 1 - npregs;
   int total = ndregs + npregs;
@@ -364,11 +340,15 @@ expand_prologue_reg_save (rtx spreg)
   RTX_FRAME_RELATED_P (insn) = 1;
 }
 
+/* Emit code to restore registers in the epilogue.  SAVEALL is nonzero if we
+   must save all registers; this is used for interrupt handlers.
+   SPREG contains (reg:SI REG_SP).  */
+
 static void
-expand_epilogue_reg_restore (rtx spreg)
+expand_epilogue_reg_restore (rtx spreg, int saveall)
 {
-  int ndregs = n_dregs_to_save ();
-  int npregs = n_pregs_to_save ();
+  int ndregs = saveall ? 8 : n_dregs_to_save ();
+  int npregs = saveall ? 6 : n_pregs_to_save ();
   int total = ndregs + npregs;
   int i, regno;
   rtx pat, insn;
@@ -498,156 +478,211 @@ bfin_va_arg (tree va_list, tree type)
   return expand_expr (t, NULL_RTX, Pmode, EXPAND_NORMAL);
 }
 
-/* The saveall must be syncronized with include/sys/regs.h
- */
+/* Generate a LINK insn for a frame sized FRAME_SIZE.  If this constant
+   is too large, generate a sequence of insns that has the same effect.
+   SPREG contains (reg:SI REG_SP).  */
 
-void
-output_interrupt_handler_prologue (FILE *file, int framesize, e_funkind fkind) 
+static void
+emit_link_insn (rtx spreg, HOST_WIDE_INT frame_size)
+{
+  HOST_WIDE_INT link_size = frame_size;
+  rtx insn;
+
+  if (link_size > 262140)
+    link_size = 262140;
+
+  /* Use a LINK insn with as big a constant as possible, then subtract
+     any remaining size from the SP.  */
+  insn = emit_insn (gen_link (GEN_INT (link_size)));
+  RTX_FRAME_RELATED_P (insn) = 1;
+  frame_size -= link_size;
+
+  if (frame_size > 0)
+    {
+      /* Must use a call-clobbered PREG that isn't the static chain.  */
+      rtx tmpreg = gen_rtx_REG (Pmode, REG_P1);
+      rtx size = GEN_INT (-frame_size);
+
+      insn = emit_move_insn (tmpreg, size);
+      RTX_FRAME_RELATED_P (insn) = 1;
+
+      insn = emit_insn (gen_addsi3 (spreg, spreg, tmpreg));
+      RTX_FRAME_RELATED_P (insn) = 1;
+    }
+}
+
+/* Generate a prologue suitable for a function of kind FKIND.  This is
+   called for interrupt and exception handler prologues.
+   SPREG contains (reg:SI REG_SP).  */
+
+static void
+expand_interrupt_handler_prologue (rtx spreg, e_funkind fkind)
 {
   int i;
-  tree all = lookup_attribute 
-    ("saveall", 
-     TYPE_ATTRIBUTES(TREE_TYPE(current_function_decl)));
-  tree kspisusp = lookup_attribute 
-    ("kspisusp",
-     TYPE_ATTRIBUTES(TREE_TYPE(current_function_decl)));
+  HOST_WIDE_INT frame_size = get_frame_size ();
+  rtx predec1 = gen_rtx_PRE_DEC (SImode, spreg);
+  rtx predec = gen_rtx_MEM (SImode, predec1);
+  rtx insn;
+  tree attrs = TYPE_ATTRIBUTES (TREE_TYPE (current_function_decl));
+  tree all = lookup_attribute ("saveall", attrs);
+  tree kspisusp = lookup_attribute ("kspisusp", attrs);
 
   if (kspisusp)
-    fprintf (file, "sp =usp;\n");
-    
-  fprintf (file, "\n\
-	    \tLINK %d;\n\
-	    \t[--SP] =ASTAT;\n", framesize);
+    {
+      insn = emit_move_insn (spreg, gen_rtx_REG (Pmode, REG_USP));
+      RTX_FRAME_RELATED_P (insn) = 1;
+    }
+
+  /* We need space on the stack in case we need to save the argument
+     registers.  */
+  if (fkind == EXCPT_HANDLER)
+    {
+      insn = emit_insn (gen_addsi3 (spreg, spreg, GEN_INT (-12)));
+      RTX_FRAME_RELATED_P (insn) = 1;
+    }
+
+  emit_link_insn (spreg, frame_size);
+  insn = emit_move_insn (predec, gen_rtx_REG (SImode, REG_ASTAT));
+  RTX_FRAME_RELATED_P (insn) = 1;
+
   if (lookup_attribute ("nesting", 
 			TYPE_ATTRIBUTES(TREE_TYPE(current_function_decl))))
-    switch (fkind) {
-    case EXCPT_HANDLER:       fprintf (file, "\t[--SP] =RETX;\n"); break;
-    case NMI_HANDLER:         fprintf (file, "\t[--SP] =RETN;\n"); break;
-    case INTERRUPT_HANDLER:   fprintf (file, "\t[--SP] =RETI;\n"); break;
-    case SUBROUTINE:          break; /*RAJA warning*/
+    {
+      rtx srcreg = gen_rtx_REG (Pmode, (fkind == EXCPT_HANDLER ? REG_RETX
+					: fkind == NMI_HANDLER ? REG_RETN
+					: REG_RETI));
+      insn = emit_move_insn (predec, srcreg);
+      RTX_FRAME_RELATED_P (insn) = 1;
     }
 
-  for (i = 0;i<REG_CC /*FIRST_PSEUDO_REGISTER*/; i++) {
-    if (i != STACK_POINTER_REGNUM 
-	&& (all 
-	    || (regs_ever_live[i] 
-		|| (!leaf_function_p () && call_used_regs[i])))) {
-      if (i == REG_A0 || i == REG_A1)
-	fprintf (file,"\t[--SP] =%s.w; [--SP] =%s.x;\n", reg_names[i], reg_names[i]);
-      else
-	fprintf (file,"\t[--SP] =%s;\n", reg_names[i]);
-    }
-  }
+  expand_prologue_reg_save (spreg, all != NULL_TREE);
 
-  if (fkind == EXCPT_HANDLER) {
-    fprintf (file, 
-	     "\tr0 =SEQSTAT;\n\
-	      \tr0 <<=26; // r0<<=(32-6);\n\
-	      \tr0 >>=26; // r0>>=(32-6);\n\
-	      \tr1 =sp;\n\
-	      \tr2 =fp;r2 +=8; //r2=usp;\n");
-  }
+  for (i = REG_P7 + 1; i < REG_CC; i++)
+    if (all 
+	|| regs_ever_live[i]
+	|| (!leaf_function_p () && call_used_regs[i]))
+      {
+	if (i == REG_A0 || i == REG_A1)
+	  insn = emit_move_insn (gen_rtx_MEM (PDImode, predec1),
+				 gen_rtx_REG (PDImode, i));
+	else
+	  insn = emit_move_insn (predec, gen_rtx_REG (SImode, i));
+	RTX_FRAME_RELATED_P (insn) = 1;
+      }
+
+  if (fkind == EXCPT_HANDLER)
+    {
+      rtx r0reg = gen_rtx_REG (SImode, REG_R0);
+      rtx r1reg = gen_rtx_REG (SImode, REG_R1);
+      rtx r2reg = gen_rtx_REG (SImode, REG_R2);
+      rtx insn;
+
+      insn = emit_move_insn (r0reg, gen_rtx_REG (SImode, REG_SEQSTAT));
+      REG_NOTES (insn) = gen_rtx_EXPR_LIST (REG_MAYBE_DEAD, const0_rtx,
+					    NULL_RTX);
+      insn = emit_insn (gen_ashrsi3 (r0reg, r0reg, GEN_INT (26)));
+      REG_NOTES (insn) = gen_rtx_EXPR_LIST (REG_MAYBE_DEAD, const0_rtx,
+					    NULL_RTX);
+      insn = emit_insn (gen_ashlsi3 (r0reg, r0reg, GEN_INT (26)));
+      REG_NOTES (insn) = gen_rtx_EXPR_LIST (REG_MAYBE_DEAD, const0_rtx,
+					    NULL_RTX);
+      insn = emit_move_insn (r1reg, spreg);
+      REG_NOTES (insn) = gen_rtx_EXPR_LIST (REG_MAYBE_DEAD, const0_rtx,
+					    NULL_RTX);
+      insn = emit_move_insn (r2reg, gen_rtx_REG (Pmode, REG_FP));
+      REG_NOTES (insn) = gen_rtx_EXPR_LIST (REG_MAYBE_DEAD, const0_rtx,
+					    NULL_RTX);
+      insn = emit_insn (gen_addsi3 (r2reg, r2reg, GEN_INT (8)));
+      REG_NOTES (insn) = gen_rtx_EXPR_LIST (REG_MAYBE_DEAD, const0_rtx,
+					    NULL_RTX);
+    }
 }
 
-void
-output_interrupt_handler_epilogue (FILE *file, int framesize ATTRIBUTE_UNUSED, e_funkind fkind) 
+/* Generate an epilogue suitable for a function of kind FKIND.  This is
+   called for interrupt and exception handler epilogues.
+   SPREG contains (reg:SI REG_SP).  */
+
+static void
+expand_interrupt_handler_epilogue (rtx spreg, e_funkind fkind) 
 {
   int i;
-  tree all = lookup_attribute 
-    ("saveall", 
-     TYPE_ATTRIBUTES(TREE_TYPE(current_function_decl)));
+  rtx postinc1 = gen_rtx_POST_INC (SImode, spreg);
+  rtx postinc = gen_rtx_MEM (SImode, postinc1);
+  tree attrs = TYPE_ATTRIBUTES (TREE_TYPE (current_function_decl));
+  tree all = lookup_attribute ("saveall", attrs);
 
-  for (i = /*FIRST_PSEUDO_REGISTER*/REG_CC-1;i>=0; i--) {
-    if (i != STACK_POINTER_REGNUM 
-	&& (all
-	    || (regs_ever_live[i] 
-		|| (!leaf_function_p () && call_used_regs[i])))) {
-      if (i == REG_A0
-	  || i == REG_A1)
-	fprintf (file,"\t%s.x =[SP++]; %s.w =[SP++];\n", reg_names[i], reg_names[i]);
-      else
-	fprintf (file,"\t%s =[SP++];\n", reg_names[i]);
-    }
-  }
+  /* A slightly crude technique to stop flow from trying to delete "dead"
+     insns.  */
+  MEM_VOLATILE_P (postinc) = 1;
 
-  if (lookup_attribute ("nesting", 
+  for (i = REG_CC - 1; i > REG_P7; i--)
+    if (all
+	|| regs_ever_live[i] 
+	|| (!leaf_function_p () && call_used_regs[i]))
+      {
+	if (i == REG_A0 || i == REG_A1)
+	  emit_move_insn (gen_rtx_REG (PDImode, i),
+			  gen_rtx_MEM (PDImode, postinc1));
+	else
+	  emit_move_insn (gen_rtx_REG (SImode, i), postinc);
+      }
+
+  expand_epilogue_reg_restore (spreg, all != NULL_TREE);
+
+  if (lookup_attribute ("nesting",
 			TYPE_ATTRIBUTES(TREE_TYPE(current_function_decl))))
-    switch (fkind) {
-    case EXCPT_HANDLER:       fprintf (file, "\tRETX =[SP++];\n"); break;
-    case NMI_HANDLER:         fprintf (file, "\tRETN =[SP++];\n"); break;
-    case INTERRUPT_HANDLER:   fprintf (file, "\tRETI =[SP++];\n"); break;
-    case SUBROUTINE:          break; /*RAJA warning*/
+    {
+      rtx srcreg = gen_rtx_REG (Pmode, (fkind == EXCPT_HANDLER ? REG_RETX
+					: fkind == NMI_HANDLER ? REG_RETN
+					: REG_RETI));
+      emit_move_insn (srcreg, postinc);
     }
 
-  fprintf (file, "\n\
-	    \tASTAT =[SP++];\n\
-	    \tUNLINK;\n");
+  emit_move_insn (gen_rtx_REG (SImode, REG_ASTAT), postinc);
+  emit_insn (gen_unlink ());
 
-  switch (fkind) {
-  case EXCPT_HANDLER:       fprintf (file, "\trtx;\n"); break;
-  case NMI_HANDLER:         fprintf (file, "\trtn;\n"); break;
-  case INTERRUPT_HANDLER:   fprintf (file, "\trti;\n"); break;
-  case SUBROUTINE:	    break; /*RAJA warning*/
-  }
+  /* Deallocate any space we left on the stack in case we needed to save the
+     argument registers.  */
+  if (fkind == EXCPT_HANDLER)
+    emit_insn (gen_addsi3 (spreg, spreg, GEN_INT (12)));
+
+  emit_jump_insn (gen_return_internal (GEN_INT (fkind)));
 }
+
+/* Generate RTL for the prologue of the current function.  */
 
 void
 bfin_expand_prologue (void)
 {
-  int i;
+  rtx insn;
   HOST_WIDE_INT arg_size;
   HOST_WIDE_INT frame_size = get_frame_size ();
   int is_leaf_function = leaf_function_p ();
   rtx spreg = gen_rtx_REG (Pmode, REG_SP);
-
-#if 0
   e_funkind fkind = funkind (current_function_decl);
 
   if (fkind != SUBROUTINE) {
-    expand_interrupt_handler_prologue (file, frame_size, fkind);
+    expand_interrupt_handler_prologue (spreg, fkind);
     return;
   }
-#endif
 
   if (! frame_pointer_needed && ! TARGET_NON_GNU_PROFILE)
     {
       rtx pat = gen_movsi (gen_rtx_MEM (Pmode,
 					gen_rtx_PRE_DEC (Pmode, spreg)),
 			   bfin_rets_rtx);
-      rtx insn = emit_insn (pat);
+      insn = emit_insn (pat);
       RTX_FRAME_RELATED_P (insn) = 1;
     }
   else
-    {
-      /* use 32-bit instruction */
-      if (CONST_18UBIT_IMM_P(frame_size))
-	{
-	  rtx insn = emit_insn (gen_link (GEN_INT (frame_size)));
-	  RTX_FRAME_RELATED_P (insn) = 1;
-	}
-      else 
-	{
-	  rtx p2reg = gen_rtx_REG (Pmode, REG_P2);
-	  rtx size = GEN_INT (-frame_size);
-	  rtx insn;
-
-	  insn = emit_insn (gen_link (const0_rtx));
-	  RTX_FRAME_RELATED_P (insn) = 1;
-
-	  insn = emit_move_insn (p2reg, size);
-	  RTX_FRAME_RELATED_P (insn) = 1;
-
-	  insn = emit_insn (gen_addsi3 (spreg, spreg, p2reg));
-	  RTX_FRAME_RELATED_P (insn) = 1;
-	}
-    }
+    emit_link_insn (spreg, frame_size);
 
 #if 0
   if (TARGET_NON_GNU_PROFILE)
     fprintf (file, "\tcall mcount_entry;\n");
 #endif
 
-  expand_prologue_reg_save (spreg);
+  expand_prologue_reg_save (spreg, 0);
 
   if (current_function_outgoing_args_size) 
     {
@@ -673,23 +708,21 @@ bfin_expand_prologue (void)
       while (arg_size > 0);
     }
 }
- 
+
+/* Generate RTL for the epilogue of the current function.  */
+
 void
 bfin_expand_epilogue (void)
 {
   HOST_WIDE_INT arg_size;
-  HOST_WIDE_INT frame_size = get_frame_size ();
   rtx spreg = gen_rtx_REG (Pmode, REG_SP);
-
-#if 0
   e_funkind fkind = funkind (current_function_decl);
 
   if (fkind != SUBROUTINE)
     {
-      output_interrupt_handler_epilogue (file, framesize, fkind);
+      expand_interrupt_handler_epilogue (spreg, fkind);
       return;
     }
-#endif
 
   if (current_function_outgoing_args_size)
     {
@@ -701,22 +734,20 @@ bfin_expand_epilogue (void)
       do
 	{
 	  int size;
-	  rtx insn;
 
 	  if (arg_size > SP_SIZE)
 	    size = SP_SIZE;
 	  else
 	    size = arg_size;
 
-	  insn = emit_insn (gen_addsi3 (spreg, spreg, GEN_INT (size)));
-	  RTX_FRAME_RELATED_P (insn) = 1;
+	  emit_insn (gen_addsi3 (spreg, spreg, GEN_INT (size)));
 	  arg_size -= size;
 	}
       while (arg_size > 0);        
     }
 
 
-  expand_epilogue_reg_restore (spreg);
+  expand_epilogue_reg_restore (spreg, 0);
 #if 0
   if (TARGET_NON_GNU_PROFILE)
     fprintf (file, "\tcall mcount_exit;\n");
@@ -725,16 +756,12 @@ bfin_expand_epilogue (void)
   if (! frame_pointer_needed || TARGET_NON_GNU_PROFILE)
     {
       rtx addr = gen_rtx_POST_INC (Pmode, spreg);
-      rtx insn = emit_move_insn (bfin_rets_rtx, gen_rtx_MEM (Pmode, addr));
-      RTX_FRAME_RELATED_P (insn) = 1;
+      emit_move_insn (bfin_rets_rtx, gen_rtx_MEM (Pmode, addr));
     }
   else
-    {
-      rtx insn = emit_insn (gen_unlink ());
-      RTX_FRAME_RELATED_P (insn) = 1;
-    }
+    emit_insn (gen_unlink ());
 
-    emit_jump_insn (gen_return_internal ());
+  emit_jump_insn (gen_return_internal (GEN_INT (SUBROUTINE)));
 }
 
 rtx
@@ -940,6 +967,10 @@ void print_operand (FILE *file,  rtx x,  char code)
       else if (code == 'w') {
 	assert (REGNO (x) == REG_A0 || REGNO (x) == REG_A1);
 	fprintf (file, "%s.w", reg_names[REGNO(x)]);
+      }
+      else if (code == 'x') {
+	assert (REGNO (x) == REG_A0 || REGNO (x) == REG_A1);
+	fprintf (file, "%s.x", reg_names[REGNO(x)]);
       }
       else if (code == 'D') {
 	fprintf (file, "%s", dregs_pair_names[REGNO(x)]);
@@ -1567,15 +1598,15 @@ hard_regno_mode_ok (int regno, enum machine_mode mode)
 {
   /* Allow only dregs to store value of mode HI or QI */
   enum reg_class class = REGNO_REG_CLASS (regno);
-  int ret;
+
+  if (mode == CCmode)
+    return 0;
 
   if (class == CCREGS)
-    return mode == CCmode || mode == BImode;
-
-  if (mode == DImode)
-    return TEST_HARD_REG_BIT (reg_class_contents[MOST_REGS], regno);
-
-  return mode != CCmode;
+    return mode == BImode;
+  if (mode == PDImode)
+    return regno == REG_A0 || regno == REG_A1;
+  return TEST_HARD_REG_BIT (reg_class_contents[MOST_REGS], regno);
 }
 
 /* Returns 1 if OP is either the constant zero or a register.  If a
@@ -1956,10 +1987,6 @@ output_load_immediate (rtx *operands) {
 	       && REGNO_REG_CLASS (REGNO (operands[1])) == AREGS) {
 	 output_asm_insn ("%0 =%w1;", operands);
 	 return "";
-     }
-     else if (GET_CODE (operands[0]) == MEM
-	&& (REGNO_REG_CLASS (REGNO (operands[1])) == IREGS || REGNO_REG_CLASS (REGNO (operands[1])) == BREGS)) {
-       abort ();
      }
      else if (GET_CODE (operands[1]) == MEM
 	      && GET_MODE_SIZE (mode) < UNITS_PER_WORD)
@@ -2391,6 +2418,22 @@ bfin_reorg (void)
     }
 }
 
+/* Table of valid machine attributes.  */
+const struct attribute_spec bfin_attribute_table[] =
+{
+  /* { name, min_len, max_len, decl_req, type_req, fn_type_req, handler } */
+  { "interrupt_handler", 0, 0, false, true,  true, NULL },
+  { "exception_handler", 0, 0, false, true,  true, NULL },
+  { "nesting", 0, 0, false, true,  true, NULL },
+  { "kspisusp", 0, 0, false, true,  true, NULL },
+  { "nmi_handler", 0, 0, false, true,  true, NULL },
+  { "saveall", 0, 0, false, true,  true, NULL },
+  { NULL, 0, 0, false, false, false, NULL }
+};
+
+#undef TARGET_ATTRIBUTE_TABLE
+#define TARGET_ATTRIBUTE_TABLE bfin_attribute_table
+
 #undef TARGET_RTX_COSTS
 #define TARGET_RTX_COSTS bfin_rtx_costs
 

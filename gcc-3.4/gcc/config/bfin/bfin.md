@@ -106,13 +106,22 @@
    (REG_A1 33)
 
    (REG_CC 34)
-   (REG_RETS 35)])
+   (REG_RETS 35)
+   (REG_RETI 36)
+   (REG_RETX 37)
+   (REG_RETN 38)
+   (REG_RETE 39)
+
+   (REG_ASTAT 40)
+   (REG_SEQSTAT 41)
+   (REG_USP 42)])
 
 ;; Constants used in UNSPECs.
 
 (define_constants
   [(UNSPEC_CBRANCH_TAKEN 0)
-   (UNSPEC_CBRANCH_NOPS 0)])
+   (UNSPEC_CBRANCH_NOPS 1)
+   (UNSPEC_RETURN 2)])
 
 (define_attr "type"
   "move,mvi,mcld,mcldp,mcst,dsp32,mult,alu0,shft,brcc,br,call,misc,compare"
@@ -277,50 +286,60 @@
 })
 
 (define_insn "movbi"
-  [(set (match_operand:BI 0 "nonimmediate_operand" "=da,da,*cf,*cf,d,mr,!*e,!*e,!d,C,d")
-        (match_operand:BI 1 "general_operand"      "  x,ix,  x, ix,mr,d,  d, eP,*e,d,C"))]
+  [(set (match_operand:BI 0 "nonimmediate_operand" "=da,da,*cf,*cf,d,mr,C,d")
+        (match_operand:BI 1 "general_operand"      "  x,ix,  x, ix,mr,d,d,C"))]
 
   ""
   "*
    output_load_immediate (operands);
    return \"\";
   "
-  [(set_attr "type" "move,mvi,move,mvi,mcld,mcst,move,move,move,compare,compare")])
+  [(set_attr "type" "move,mvi,move,mvi,mcld,mcst,compare,compare")])
+
+(define_insn "movpdi"
+  [(set (match_operand:PDI 0 "nonimmediate_operand" "=e,<,e")
+        (match_operand:PDI 1 "general_operand"      " e,e,>"))]
+  ""
+  "@
+   %0 = %1;
+   %0 = %x1; %0 = %w1;
+   %w0 = %1; %x0 = %1;"
+  [(set_attr "type" "move,mcst,mcld")])
 
 (define_insn "*movsi_insn"
-  [(set (match_operand:SI 0 "nonimmediate_operand" "=da,da,*cf,*cf,da,mr,!*e,!*e,!d")
-        (match_operand:SI 1 "general_operand"      "  x,ix,  x, ix,mr,da,  d, eP,*e"))]
+  [(set (match_operand:SI 0 "nonimmediate_operand" "=da,da,*cf,*cf,da,mr,d,y,<d,xy,a")
+        (match_operand:SI 1 "general_operand"      "  x,ix,  x, ix,mr,da,y,d,xy,>d,y"))]
 
   ""
   "*
    output_load_immediate (operands);
    return \"\";
   "
-  [(set_attr "type" "move,mvi,move,mvi,mcld,mcst,move,move,move")])
+  [(set_attr "type" "move,mvi,move,mvi,mcld,mcst,move,move,mcst,mcld,move")])
 
 (define_insn "*movhi_insn"
-  [(set (match_operand:HI 0 "nonimmediate_operand" "=da,da,*cf,*cf,d,mr,!*e,!*e,!d")
-        (match_operand:HI 1 "general_operand"      "  x,ix,  x, ix,mr,d,  d, eP,*e"))]
+  [(set (match_operand:HI 0 "nonimmediate_operand" "=da,da,*cf,*cf,d,mr")
+        (match_operand:HI 1 "general_operand"      "  x,ix,  x, ix,mr,d"))]
   ""
   "*
    output_load_immediate (operands);
    return \"\";
   "
-  [(set_attr "type" "move,mvi,move,mvi,mcld,mcst,move,move,move")])
+  [(set_attr "type" "move,mvi,move,mvi,mcld,mcst")])
 
 (define_insn "*movqi_insn"
-  [(set (match_operand:QI 0 "nonimmediate_operand" "=da,da,*cf,*cf,d,mr,!*e,!*e,!d")
-        (match_operand:QI 1 "general_operand"      "  x,ix,  x, ix,mr,d,  d, eP,*e"))]
+  [(set (match_operand:QI 0 "nonimmediate_operand" "=da,da,*cf,*cf,d,mr")
+        (match_operand:QI 1 "general_operand"      "  x,ix,  x, ix,mr,d"))]
   ""
   "*
    output_load_immediate (operands);
    return \"\";
   "
-  [(set_attr "type" "move,mvi,move,mvi,mcld,mcst,move,move,move")])
+  [(set_attr "type" "move,mvi,move,mvi,mcld,mcst")])
 
 (define_insn "*movsf_insn"
-  [(set (match_operand:SF 0 "nonimmediate_operand" "=da,da,*cf,*cf,da,mr,!*e,!*e,!d")
-        (match_operand:SF 1 "general_operand"      "  x,ix,  x, ix,mr,da,  d, eP,*e"))]
+  [(set (match_operand:SF 0 "nonimmediate_operand" "=da,da,*cf,*cf,da,mr")
+        (match_operand:SF 1 "general_operand"      "  x,ix,  x, ix,mr,da"))]
   ""
   "*
   {
@@ -343,7 +362,7 @@
    output_load_immediate (operands);
    return \"\";
   }"
-  [(set_attr "type" "move,mvi,move,mvi,mcld,mcst,move,move,move")])
+  [(set_attr "type" "move,mvi,move,mvi,mcld,mcst")])
 
 (define_expand "movsi"
   [(set (match_operand:SI 0 "nonimmediate_operand" "")
@@ -3423,6 +3442,19 @@ else
 })
 
 (define_insn "return_internal"
-  [(return)]
+  [(return)
+   (unspec [(match_operand 0 "immediate_operand" "i")] UNSPEC_RETURN)]
   "reload_completed"
-  "rts;")
+{
+  switch (INTVAL (operands[0]))
+    {
+    case EXCPT_HANDLER:
+      return "rtx;";
+    case NMI_HANDLER:
+      return "rtn;";
+    case INTERRUPT_HANDLER:
+      return "rti;";
+    case SUBROUTINE:
+      return "rts;";
+    }
+})
