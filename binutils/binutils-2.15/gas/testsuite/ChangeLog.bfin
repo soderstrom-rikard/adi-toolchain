@@ -1,3 +1,9 @@
+2004-12-21  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/parallel.s: New.
+	* gas/bfin/parallel.d: New.
+	* gas/bfin/bfin.exp: Run new test.
+
 2004-12-20  Catherine Moore  <clm@cm00re.com>
 
 	* gas/bfin/arithmetic.d: Correct name of test.

@@ -17,6 +17,7 @@ if [istarget bfin*-*-*] {
 	run_dump_test "logical2"
 	run_dump_test "move"
 	run_dump_test "move2"
+	run_dump_test "parallel"
 	run_dump_test "shift"
 	run_dump_test "shift2"
 	run_dump_test "stack"
