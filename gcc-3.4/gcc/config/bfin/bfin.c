@@ -8,21 +8,18 @@
 
 
 /* The BFIN code generation auxilary output file */
-#if 0
+
 #include <stdio.h>
 #include "config.h"
 #include <setjmp.h>
 #include <safe-ctype.h>
 #include "system.h"
 #include "coretypes.h"
-#include "target.h"
-#include "target-def.h"
-#include "bfin.h"
-#include "tree.h"
+#include "tm.h"
 #include "rtl.h"
-/* #include "regs.h" */
+#include "regs.h"
 #include "hard-reg-set.h"
-/* #include "real.h" */
+#include "real.h"
 #include "insn-config.h"
 #include "conditions.h"
 #include "insn-flags.h"
@@ -33,44 +30,19 @@
 #include "except.h"
 #include "function.h"
 #include "input.h"
-#include "expr.h"
-#include "toplev.h"
-#include "recog.h"
-#include "bfin-protos.h"
-#endif
-
-#include "config.h"
-#include "system.h"
-#include "coretypes.h"
-#include "tm.h"
-#include "flags.h"
-#include "rtl.h"
-#include "tree.h"
-#include "regs.h"
-#include "hard-reg-set.h"
-#include "real.h"
-#include "insn-config.h"
-#include "conditions.h"
-#include "output.h"
-#include "recog.h"
-#include "insn-attr.h"
-#include "function.h"
-#include "expr.h"
-#include "optabs.h"
-#include "toplev.h"
-#include "tm_p.h"
 #include "target.h"
 #include "target-def.h"
-#include "langhooks.h"
+#include "expr.h"
+#include "toplev.h"
+#include "recog.h"
 #include "bfin-protos.h"
 
 #undef REAL_VALUE_ATOF
 #define REAL_VALUE_ATOF(v,t) atof(v)
 
+#define SP_SIZE 62
 
 void print_operand (FILE *file,  rtx x,  char code);
-
-
 
 
 char *bfin_ver_str= (char *)
@@ -106,26 +78,40 @@ static int fixit PARAMS ((rtx, enum machine_mode mode));
 static rtx find_barrier PARAMS ((rtx));
 static int broken_move PARAMS ((rtx));
 
-static void bfin_function_prologue PARAMS ((FILE *, int));
-static void bfin_function_epilogue PARAMS ((FILE *, int));
+static void bfin_function_prologue PARAMS ((FILE *, HOST_WIDE_INT));
+static void bfin_function_epilogue PARAMS ((FILE *, HOST_WIDE_INT));
 void bfin_globalize_label PARAMS ((FILE *, const char *));
-void output_file_start PARAMS ((FILE *));
+void output_file_start PARAMS ((void));
 
 void
 bfin_globalize_label (FILE *stream, const char *name)
 {
-	  fputs (".global ", stream);
-          assemble_name (stream, name);
-	  fputc (';',stream);
-          fputc ('\n',stream);
+	fputs (".global ", stream);
+        assemble_name (stream, name);
+	fputc (';',stream);
+        fputc ('\n',stream);
 }
 
+#undef TARGET_RTX_COSTS
+#define TARGET_RTX_COSTS bfin_rtx_costs
+
+#undef  TARGET_ADDRESS_COST
+#define TARGET_ADDRESS_COST bfin_address_cost
+
+/* The literal pool needs to reside in the text area due to the
+   limited PC addressing range: */
+#undef TARGET_MACHINE_DEPENDENT_REORG
+#define TARGET_MACHINE_DEPENDENT_REORG bfin_reorg
+
+#undef TARGET_ASM_INTERNAL_LABEL
+#define TARGET_ASM_INTERNAL_LABEL bfin_internal_label
 
 struct gcc_target targetm = TARGET_INITIALIZER;
 
 void 
-output_file_start (FILE *file) 
+output_file_start (void) 
 {
+  FILE *file = asm_out_file;
   if (optimize_size)
     fprintf (file, "// gcc version %s bfin version %s opt -Os\n", 
            version_string, bfin_ver_str);
@@ -371,7 +357,7 @@ static int saved_pregs_no (void)
   return nregs;
 }
 
-static int save_area_size (void)
+int save_area_size (void)
 /* return the size (in bytes) of register save area on the stack */
 {
   int size;
@@ -383,7 +369,7 @@ static int save_area_size (void)
 }
 
 /* change this function when save instr is available */
-static int new_save_instr (void) {return 1;}
+int new_save_instr (void) {return 1;}
 
 
 /* Used by macro `frame_pointer_required' */
@@ -428,25 +414,26 @@ int frame_pointer_required (void)
                                                                                                                              
 void
 setup_incoming_varargs (CUMULATIVE_ARGS *cum,
-			     enum machine_mode mode ATTRIBUTE_UNUSED,
-			     tree type ATTRIBUTE_UNUSED,
+			     enum machine_mode mode,
+			     tree type,
 			     int *pretend_size,
 			     int no_rtl)
 {
+  CUMULATIVE_ARGS next_cum;
+  int reg_size =  4;
   rtx save_area = NULL_RTX, mem;
-  int i;
+  tree fntype;
+  int stdarg_p, i;
 
   if(no_rtl)
     return;
 
   save_area = frame_pointer_rtx;
-  /*
   // gcc will generate the move rtx for us automatically for named arguments
   // we need to generate the move rtx for the unnamed arguments if they
   // are in the first 3 words. We assume atleast 1 named argument exists
   // so we never generate [FP+8] = R0 here
   // cum->words will 
-  */
 
   for (i = cum->words + 1; i < max_arg_registers; i++) {
  	
@@ -552,9 +539,10 @@ output_interrupt_handler_epilogue (FILE *file, int framesize ATTRIBUTE_UNUSED, e
 }
 
 static void
-bfin_function_prologue (FILE *file, int framesize)
+bfin_function_prologue (FILE *file, HOST_WIDE_INT framesize)
 {
   int i;
+  signed int arg_size;
 
   e_funkind fkind = funkind (current_function_decl);
 
@@ -632,18 +620,56 @@ bfin_function_prologue (FILE *file, int framesize)
     if (framesize != 0) 
       fprintf (file, "\tSP += %d;\n", -framesize);
   }
- 
+
+  if (current_function_outgoing_args_size) {
+    if (current_function_outgoing_args_size >= FIXED_STACK_AREA)
+      arg_size = current_function_outgoing_args_size;
+    else
+      arg_size = FIXED_STACK_AREA;
+
+    if (arg_size < SP_SIZE)
+      fprintf (file, "\tSP += %d;\n", -arg_size);
+    else {
+        do {
+          int size;
+          (arg_size > SP_SIZE) ? (size = SP_SIZE) : (size = arg_size);
+          fprintf (file, "\tSP += %d;\n", -size);
+          arg_size -= SP_SIZE;
+        } while (arg_size > 0);
+    }
+  } 
+
 }
  
 static void
-bfin_function_epilogue (FILE *file, int framesize)
+bfin_function_epilogue (FILE *file, HOST_WIDE_INT framesize)
 {
   int i;
+  signed int arg_size;
+
   e_funkind fkind = funkind (current_function_decl);
 
   if (fkind != SUBROUTINE) {
   	output_interrupt_handler_epilogue (file, framesize, fkind);
 	return;
+  }
+
+  if (current_function_outgoing_args_size) {
+        if (current_function_outgoing_args_size >= FIXED_STACK_AREA)
+          arg_size = current_function_outgoing_args_size;
+        else
+          arg_size = FIXED_STACK_AREA;
+
+        if (arg_size <= SP_SIZE)
+          fprintf (file, "\tSP += %d;\n", arg_size);
+        else {
+            do {
+              int size;
+              (arg_size > SP_SIZE) ? (size = SP_SIZE) : (size = arg_size);
+              fprintf (file, "\tSP += %d;\n", size);
+              arg_size -= SP_SIZE;
+            } while (arg_size > 0);
+        }
   }
 
   if (!TARGET_NEW_PROLOGUE) {
@@ -887,18 +913,18 @@ void print_operand (FILE *file,  rtx x,  char code)
     switch (GET_CODE (x)) {
     case REG:
       if (code == 'h') {
-	/* assert ((REGNO (x) < 32)); */
+	assert ((REGNO (x) < 32));
 	fprintf (file, "%s ", short_reg_names[REGNO(x)]);
 	/*fprintf (file, "\n%d\n ", REGNO(x));*/
 	break;
       }
       else if (code == 'd') {
-	/* assert ((REGNO (x) < 32)); */
+	assert ((REGNO (x) < 32));
 	fprintf (file, "%s ", high_reg_names[REGNO(x)]);
 	break;
       }
       else if (code == 'w') {
-	/* assert (REGNO (x) == REG_A0 || REGNO (x) == REG_A1); */
+	assert (REGNO (x) == REG_A0 || REGNO (x) == REG_A1);
 	fprintf (file, "%s.w ", reg_names[REGNO(x)]);
       }
       else if (code == 'D') {
@@ -908,7 +934,7 @@ void print_operand (FILE *file,  rtx x,  char code)
        * register or memory. -- Tony
        */
       else if (code == 'H') {
-        /* assert (mode == DImode || mode == DFmode); */
+        assert (mode == DImode || mode == DFmode);
 	if (GET_CODE(x) == REG)
 	   fprintf (file, "%s ", reg_names[REGNO(x)+1]);
 	else if (GET_CODE(x) == MEM)
@@ -980,15 +1006,26 @@ int extract_const_double (rtx x)
     union { double d; int    i[2]; } u;
     union { float f; int i; } u1;
 
-    u.i[0] = CONST_DOUBLE_LOW (x);
-    u.i[1] = CONST_DOUBLE_HIGH (x);
+      if ( GET_MODE(x) == VOIDmode)
+        {
+          u.i[0] = CONST_DOUBLE_LOW (x);
+          u.i[1] = CONST_DOUBLE_HIGH (x);
+        }
+      else
+        {
+	  long l[2];
+      	  REAL_VALUE_TYPE rv;
+          int endian = (WORDS_BIG_ENDIAN == 0);
+	  REAL_VALUE_FROM_CONST_DOUBLE (rv, x);
+          REAL_VALUE_TO_TARGET_DOUBLE (rv, l);
+          u.i[0] = l[1 - endian];
+          u.i[1] = l[endian];
+        }
     u1.f = u.d;
     return u1.i;
   } 
   else 
     output_operand_lossage ("unsupported mode DI");
-
-  return 0; /* should never reach here */
 }
 	
 
@@ -1025,6 +1062,8 @@ init_cumulative_args (CUMULATIVE_ARGS *cum,	/* Argument info to initialize */
 			     rtx libname	/* SYMBOL_REF of library name or 0 */)
 {
   static CUMULATIVE_ARGS zero_cum;
+
+  tree param, next_param;
 
   if (TARGET_DEBUG_ARG)
     {
@@ -1074,11 +1113,10 @@ function_arg_advance (CUMULATIVE_ARGS *cum,		/* current arg information */
 			     tree type,			/* type of the argument or 0 if lib support */
 			     int named			/* whether or not the argument was named */)
 {
-  int count;
-  int bytes
-    = (mode == BLKmode) ? int_size_in_bytes (type) : GET_MODE_SIZE (mode);
+  int count, bytes, words;
 
-  int words = (bytes + UNITS_PER_WORD - 1) / UNITS_PER_WORD;
+  bytes = (mode == BLKmode) ? int_size_in_bytes (type) : GET_MODE_SIZE (mode);
+  words = (bytes + UNITS_PER_WORD - 1) / UNITS_PER_WORD;
 
   if (TARGET_DEBUG_ARG)
     fprintf (stderr,
@@ -1133,6 +1171,7 @@ function_arg (CUMULATIVE_ARGS *cum,	/* current arg information */
     case BLKmode:
       if (bytes < 0)
 	break;
+    case DFmode:
     case DImode:
     case SImode:
     case HImode:
@@ -1183,7 +1222,7 @@ function_arg_partial_nregs (CUMULATIVE_ARGS *cum ,	/* current arg information */
 
   last_reg_num = max_arg_registers - 1;
   ret = ((arg_num <= last_reg_num && 
-         ((arg_num + words) >= (last_reg_num + 1)))
+         ((arg_num + words) > (last_reg_num + 1)))
          ? last_reg_num - arg_num + 1
          : 0);
 
@@ -1282,7 +1321,6 @@ legitimize_pic_address (rtx orig, rtx reg)
 	  else
 	    new = gen_rtx (MEM, Pmode,
 			   gen_rtx (PLUS, Pmode, pic_offset_table_rtx, orig));
-
 	  emit_move_insn (reg, new);
 	}
       current_function_uses_pic_offset_table = 1;
@@ -1321,6 +1359,7 @@ legitimize_pic_address (rtx orig, rtx reg)
 
       return gen_rtx (PLUS, Pmode, base, addr);
     }
+
   return new;
 }
 
@@ -1518,15 +1557,15 @@ asm_output_ascii (FILE *file, const char *str, int sz) {
     int jk = 0;
 
     while (jk < sz) {
-    if (jk+2 < sz){
-        fprintf (file, "%s%s0x%02x%02x;\n", ASM_SHORT, ASM_INIT,
-	         str[jk+1], str[jk]);
-	jk+=2;
-        }
-    else {
-        fprintf (file, "%s%s0x%02x;\n", ASM_BYTE, ASM_INIT, str[jk]);
-        jk+=1;
-        }
+         if (jk+2 < sz){
+           fprintf (file, "%s%s0x%02x%02x;\n", ASM_SHORT, ASM_INIT,
+                    (unsigned char)str[jk+1], (unsigned char)str[jk]);
+	   jk+=2;
+         }
+         else {
+           fprintf (file, "%s%s0x%02x;\n", ASM_BYTE, ASM_INIT, (unsigned char)str[jk]);
+           jk+=1;
+         }
     }
 }
 
@@ -1581,12 +1620,14 @@ int use_secondary_reload_patterns=1;
 enum reg_class
 secondary_input_reload_class(enum reg_class class,enum machine_mode mode, rtx x)
 {
-  /* 1.04.04 : Return DREGS assuming 'x' is IREGS and irrespective of mode */
+  if (REG_P (x)) { 
+	 /* 1.04.04 : Return DREGS assuming 'x' is IREGS and irrespective of mode */
+	 enum reg_class class1 = REGNO_REG_CLASS (REGNO (x));
+	 if (class1 == IREGS || class1 == BREGS) {
+	   return DREGS;
+   	 }
+    }
 
-  enum reg_class class1 = REGNO_REG_CLASS (REGNO (x));
-  if (class1 == IREGS) {
-    return DREGS;
-   }
   if (REG_P (x) && REGNO (x) > FIRST_PSEUDO_REGISTER
       && reg_equiv_mem[REGNO (x)])
     x = reg_equiv_mem[REGNO (x)];
@@ -1897,14 +1938,17 @@ output_load_immediate (rtx *operands) {
 	 for (i = 0; i < LAST_USER_DREG; i++)
 	  if (!regs_ever_live[i] && call_used_regs[i]) {
 	     char buf[128];
-	     sprintf (buf, "%s =%1;", reg_names[i]);
+	     sprintf (buf, "%s =%%1;", reg_names[i]);
              output_asm_insn (buf, operands);
              sprintf (buf, "%s =%s;", "%0", reg_names[i]);
              output_asm_insn (buf, operands);
 	     return "";
 	  }
-          output_asm_insn ("R3 =%1;", operands);
-          output_asm_insn ("%0 =R3;", operands);
+          output_asm_insn ("[--SP] = R3;", operands);
+          output_asm_insn ("R3 = %1;", operands);
+
+          output_asm_insn ("%0 = R3;", operands);
+          output_asm_insn ("R3 = [SP++];", operands);
           return "";
      }
      else if (GET_CODE (operands[1]) == MEM
@@ -2190,6 +2234,9 @@ replace_symbols_in_block (tree block, rtx orig, rtx new)
 void
 bfin_reorg (rtx first)
 {
+
+  if (!TARGET_MINI_CONST_POOL) return;
+
   rtx insn;
   for (insn = first; insn; insn = NEXT_INSN (insn))
     {
@@ -2297,12 +2344,185 @@ bfin_return_in_memory (tree type)
       if (size == 8 || size == 16)
 	return 1;
     }
-#if 0 /* 3.4, TFmode is not supported by default. Check machmodes.def */
-  if (mode == TFmode)
-    return 0;
-#endif /* 3.4, TFmode is not supported by default. Check machmodes.def */
+
   if (size > 12)
     return 1;
   return 0;
+}
+
+rtx
+bfin_force_reg (mode, x)
+     enum machine_mode mode;
+     rtx x;
+{
+  rtx temp, insn, set;
+
+  if (GET_CODE (x) == REG)
+    return x;
+
+  if (general_operand (x, mode))
+    {
+      temp = gen_reg_rtx (mode);
+      insn = emit_move_insn (temp, x);
+    }
+  else
+    {
+      temp = force_operand (x, NULL_RTX);
+      if (GET_CODE (temp) == REG)
+        insn = get_last_insn ();
+      else
+        {
+          rtx temp2 = gen_reg_rtx (mode);
+          insn = emit_move_insn (temp2, temp);
+          temp = temp2;
+        }
+    }
+
+  /* Let optimizers know that TEMP's value never changes
+     and that X can be substituted for it.  Don't get confused
+     if INSN set something else (such as a SUBREG of TEMP).  */
+/*  if (CONSTANT_P (x)
+      && (set = single_set (insn)) != 0
+      && SET_DEST (set) == temp)
+    set_unique_reg_note (insn, REG_EQUAL, x);
+*/
+  return temp;
+}
+
+const char *
+output_casesi_internal(rtx *operands)
+{
+        char buf[512];
+        int reg1, reg2;
+        char *rName2;
+        bool bSave = false;
+
+	//reg1 = operands[1]->u.fld[0].rtwint;
+	reg1 = INTVAL(operands[1]);
+	
+        if (!regs_ever_live[REG_P0])
+                reg2 = REG_P0;
+        else if (!regs_ever_live[REG_P1])
+                reg2 = REG_P1;
+        else if (!regs_ever_live[REG_P2])
+                reg2 = REG_P2;
+        else {
+                bSave = true;
+                for (reg2 = REG_P0; reg2 <= REG_P5; reg2++)
+                   if (reg2 != INTVAL(operands[0]) && reg2 != reg1)
+                     break;
+        }
+
+        rName2 = reg_names[reg2];
+
+        output_asm_insn ("cc = %0<=%1 (iu);\n\tif cc jump 6; jump.l %3;", operands);
+
+        if (bSave) {
+                sprintf (buf, "[--SP] =%s;", rName2);
+                output_asm_insn (buf, operands);
+        }
+
+        sprintf (buf, "%%1 = %%0<<2;\n\t%s.L=%%2; %s.H=%%2;", rName2, rName2);
+        output_asm_insn (buf, operands);
+
+        sprintf (buf, "%s = %s + %%1;\n\t%%1 = [%s];", rName2, rName2, rName2);
+        output_asm_insn (buf, operands);
+
+        if (bSave) {
+                sprintf (buf, "%s = [SP++];", rName2);
+                output_asm_insn (buf, operands);
+        }
+        output_asm_insn ("jump (%1);", operands);
+
+        return "";
+}
+
+/*
+return true if the legitimate memory address for a memory operand of mode
+return false if not.
+
+[ Preg + uimm17m4 ]
+W [ Preg + uimm16m2 ]
+B [ Preg + uimm15 ]
+
+uimm17m4: 17-bit unsigned field that must be a multiple of 4
+uimm16m2: 16-bit unsigned field that must be a multiple of 2 
+*/
+
+int 
+bfin_valid_add(const enum machine_mode mode, const int value)
+{
+	switch(mode)
+	{
+	case SImode:
+	  if (!(value%4))
+            return 1;
+	  break;
+	case HImode:
+	  if (!(value%2))	
+	    return 1;
+	  break;
+	default:
+	  return 1; 
+	}
+	return 0;
+}
+
+bool
+bfin_rtx_costs (rtx x,
+               int code,
+               int outer_code,
+               int *total)
+{
+  switch (code)
+    {
+  case CONST_INT:
+    if ((outer_code)==SET || (outer_code)==PLUS)
+        *total = CONST_7BIT_IMM_P(INTVAL(x)) ?
+        0 : 2;
+    else if ((outer_code)==AND)
+        *total = (CONST_7BIT_IMM_P(INTVAL(x)) ||
+            log2constp (1+INTVAL(x)) || log2constp (-INTVAL(x)))?
+        0 : 2;
+    else if ((outer_code)==LE || (outer_code)==LT
+                || (outer_code)==EQ)
+        *total = (INTVAL (x) >= -4 && INTVAL (x) <= 3) ?
+        0 : 2;
+    else if ((outer_code)==LEU || (outer_code)==LTU)
+        *total = (INTVAL (x) >= 0 && INTVAL (x) <= 7) ?
+        0 : 2;
+    else if ((outer_code)==MULT)
+        *total = ((INTVAL (x)==2 || INTVAL (x)==4)) ?
+        0 : 2;
+    else if ((outer_code)==ASHIFT &&
+        (INTVAL (x) == 1 && INTVAL (x) == 2))
+        *total = 0;
+    else if ((outer_code)==ASHIFT || (outer_code)==ASHIFTRT
+        || (outer_code)==LSHIFTRT)
+        *total = (INTVAL (x) >= 0 && INTVAL (x) <= 31) ?
+        0 : 2;
+    else if ((outer_code)==IOR || (outer_code)==XOR)
+        *total = ((INTVAL (x) >= 0 && INTVAL (x) <= 31) &&
+        (INTVAL (x) & (INTVAL (x) - 1)) == 0) ?
+        0 : 2;
+    else
+      *total = 2;
+      return true;
+  case CONST:
+  case LABEL_REF:
+  case SYMBOL_REF:
+  case CONST_DOUBLE:
+       *total = 4;
+       return true;
+
+  default:
+       return false;
+    }
+}
+
+void
+bfin_internal_label(FILE *stream, const char *prefix, unsigned long num)
+{
+        fprintf(stream, "%s%s$%d:\n", LOCAL_LABEL_PREFIX, prefix, num);
 }
 

@@ -1973,17 +1973,15 @@ ___nedf2:
 __nedf2:
 	LINK 0x0;
 	SP+=-0xC;
+        [FP +8] =R0 ;
+        [FP +12] =R1 ;
+        [FP +16] =R2 ;
 	R0 = [FP+0x8];
 	R1 = [FP+0xC];
-	[SP] = R0;
-	[SP+0x4] = R1;
 	CALL ___truncdfsf2;
 	R2 = R0;
 	R0 = [FP+0x10];
 	R1 = [FP+0x14];
-	[SP]=R0;
-	[SP+0x4]=R1;
-	[SP+0x8]=R2;
 	CALL ___truncdfsf2;
 	R1 = R0;
 	R0 = [SP+0x8];
@@ -2003,17 +2001,15 @@ ___gedf2:
 __gedf2:
 	LINK 0x0;
         SP+=-0xC;
+        [FP +8] =R0 ;
+        [FP +12] =R1 ;
+        [FP +16] =R2 ;
         R0 = [FP+0x8];
         R1 = [FP+0xC];
-        [SP] = R0;
-        [SP+0x4] = R1;
 	CALL ___truncdfsf2;
 	R2 = R0;
         R0=[FP+0x10];
         R1=[FP+0x14];
-        [SP]=R0;
-        [SP+0x4]=R1;
-        [SP+0x8]=R2;
 	CALL ___truncdfsf2;
 	R1 = R0;
         R0 = [SP+0x8];
@@ -2033,17 +2029,15 @@ ___adddf3:
 __adddf3:
 	LINK 0x0;
         SP+=-0xC;
+        [FP +8] =R0 ;
+        [FP +12] =R1 ;
+        [FP +16] =R2 ;
         R0 = [FP+0x8];
         R1 = [FP+0xC];
-        [SP] = R0;
-        [SP+0x4] = R1;
 	CALL ___truncdfsf2;
 	R2 = R0;
         R0=[FP+0x10];
         R1=[FP+0x14];
-        [SP]=R0;
-        [SP+0x4]=R1;
-        [SP+0x8]=R2;
 	CALL ___truncdfsf2;
 	R1 = R0;
         R0 = [SP+0x8];
@@ -2064,17 +2058,15 @@ ___subdf3:
 __subdf3:
 	LINK 0x0;
         SP+=-0xC;
+        [FP +8] =R0 ;
+        [FP +12] =R1 ;
+        [FP +16] =R2 ;
         R0 = [FP+0x8];
         R1 = [FP+0xC];
-        [SP] = R0;
-        [SP+0x4] = R1;
 	CALL ___truncdfsf2;
 	R2 = R0;
         R0=[FP+0x10];
         R1=[FP+0x14];
-        [SP]=R0;
-        [SP+0x4]=R1;
-        [SP+0x8]=R2;
 	CALL ___truncdfsf2;
 	R1 = R0;
         R0 = [SP+0x8];
@@ -2095,17 +2087,15 @@ ___muldf3:
 __muldf3:
 	LINK 0x0;
         SP+=-0xC;
+        [FP +8] =R0 ;
+        [FP +12] =R1 ;
+        [FP +16] =R2 ;
         R0 = [FP+0x8];
         R1 = [FP+0xC];
-        [SP] = R0;
-        [SP+0x4] = R1;
 	CALL ___truncdfsf2;
 	R2 = R0;
         R0=[FP+0x10];
         R1=[FP+0x14];
-        [SP]=R0;
-        [SP+0x4]=R1;
-        [SP+0x8]=R2;
 	CALL ___truncdfsf2;
 	R1 = R0;
         R0 = [SP+0x8];
@@ -2126,17 +2116,15 @@ ___divdf3:
 __divdf3:
 	LINK 0x0;
         SP+=-0xC;
+        [FP +8] =R0 ;
+        [FP +12] =R1 ;
+        [FP +16] =R2 ;
         R0 = [FP+0x8];
         R1 = [FP+0xC];
-        [SP] = R0;
-        [SP+0x4] = R1;
 	CALL ___truncdfsf2;
 	R2 = R0;
         R0=[FP+0x10];
         R1=[FP+0x14];
-        [SP]=R0;
-        [SP+0x4]=R1;
-        [SP+0x8]=R2;
 	CALL ___truncdfsf2;
 	R1 = R0;
         R0 = [SP+0x8];
@@ -2157,17 +2145,15 @@ ___cmpdf2:
 __cmpdf2:
         LINK 0x0;
         SP+=-0xC;
+        [FP +8] =R0 ;
+        [FP +12] =R1 ;
+        [FP +16] =R2 ;
         R0 = [FP+0x8];
         R1 = [FP+0xC];
-        [SP] = R0;
-        [SP+0x4] = R1;
 	CALL ___truncdfsf2;
 	R2 = R0;
         R0=[FP+0x10];
         R1=[FP+0x14];
-        [SP]=R0;
-        [SP+0x4]=R1;
-        [SP+0x8]=R2;
 	CALL ___truncdfsf2;
 	R1 = R0;
         R0 = [SP+0x8];
@@ -2187,17 +2173,15 @@ ___eqdf2:
 __eqdf2:
 	LINK 0x0;
         SP+=-0xC;
+        [FP +8] =R0 ;
+        [FP +12] =R1 ;
+        [FP +16] =R2 ;
         R0 = [FP+0x8];
         R1 = [FP+0xC];
-        [SP] = R0;
-        [SP+0x4] = R1;
 	CALL ___truncdfsf2;
 	R2 = R0;
         R0=[FP+0x10];
         R1=[FP+0x14];
-        [SP]=R0;
-        [SP+0x4]=R1;
-        [SP+0x8]=R2;
 	CALL ___truncdfsf2;
 	R1 = R0;
         R0 = [SP+0x8];
@@ -2217,17 +2201,15 @@ ___ltdf2:
 __ltdf2:
 	LINK 0x0;
         SP+=-0xC;
+        [FP +8] =R0 ;
+        [FP +12] =R1 ;
+        [FP +16] =R2 ;
         R0 = [FP+0x8];
         R1 = [FP+0xC];
-        [SP] = R0;
-        [SP+0x4] = R1;
 	CALL ___truncdfsf2;
 	R2 = R0;
         R0=[FP+0x10];
         R1=[FP+0x14];
-        [SP]=R0;
-        [SP+0x4]=R1;
-        [SP+0x8]=R2;
 	CALL ___truncdfsf2;
 	R1 = R0;
         R0 = [SP+0x8];
@@ -2247,17 +2229,15 @@ ___gtdf2:
 __gtdf2:
 	LINK 0x0;
         SP+=-0xC;
+        [FP +8] =R0 ;
+        [FP +12] =R1 ;
+        [FP +16] =R2 ;
         R0 = [FP+0x8];
         R1 = [FP+0xC];
-        [SP] = R0;
-        [SP+0x4] = R1;
 	CALL ___truncdfsf2;
 	R2 = R0;
         R0=[FP+0x10];
         R1=[FP+0x14];
-        [SP]=R0;
-        [SP+0x4]=R1;
-        [SP+0x8]=R2;
 	CALL ___truncdfsf2;
 	R1 = R0;
         R0 = [SP+0x8];
@@ -2276,13 +2256,14 @@ __gtdf2:
 ___negdf2:
 __negdf2:
 	LINK 0x0;
-        SP+=-0x8;
+        SP+=-0xC;
+        [FP +8] =R0 ;
+        [FP +12] =R1 ;
+        [FP +16] =R2 ;
         R0 = [FP+0x8];
         R1 = [FP+0xC];
-        [SP] = R0;
-        [SP+0x4] = R1;
 	CALL ___truncdfsf2;
-	SP+=0x8;
+	SP+=0xC;
 	CC = R0==0;
 	IF CC JUMP negdf2_4;
     	BITTGL (R0,0x1f);
@@ -2301,13 +2282,14 @@ negdf2_4:
 ___fixdfsi:
 __fixdfsi:
 	LINK 0x0;
-        SP+=-0x8;
+        SP+=-0xC;
+        [FP +8] =R0 ;
+        [FP +12] =R1 ;
+        [FP +16] =R2 ;
         R0 = [FP+0x8];
         R1 = [FP+0xC];
-        [SP] = R0;
-        [SP+0x4] = R1;
 	CALL ___truncdfsf2;
-	SP+=0x8;
+	SP+=0xC;
 	CALL ___fixsfsi;
 	UNLINK;
 	RTS;
@@ -2322,13 +2304,14 @@ __fixdfsi:
 ___fixunsdfsi:
 __fixunsdfsi:
 	LINK 0x0;
-        SP+=-0x8;
+        SP+=-0xC;
+        [FP +8] =R0 ;
+        [FP +12] =R1 ;
+        [FP +16] =R2 ;
         R0 = [FP+0x8];
         R1 = [FP+0xC];
-        [SP] = R0;
-        [SP+0x4] = R1;
 	CALL ___truncdfsf2;
-	SP+=0x8;
+	SP+=0xC;
 	CALL ___fixunssfsi;
 	UNLINK;
 	RTS;
@@ -2343,13 +2326,14 @@ __fixunsdfsi:
 ___fixdfdi:
 __fixdfdi:
 	LINK 0x0;
-        SP+=-0x8;
+        SP+=-0xC;
+        [FP +8] =R0 ;
+        [FP +12] =R1 ;
+        [FP +16] =R2 ;
         R0 = [FP+0x8];
         R1 = [FP+0xC];
-        [SP] = R0;
-        [SP+0x4] = R1;
 	CALL ___truncdfsf2;
-	SP+=0x8;
+	SP+=0xC;
 	CALL ___fixsfdi;
 	UNLINK;
 	RTS;
@@ -2802,6 +2786,9 @@ ___truncdfsf2:
 __truncdfsf2:
         LINK 0;
         [--sp] = ( r7:7 );
+        [FP +8] =R0 ;
+        [FP +12] =R1 ;
+        [FP +16] =R2 ;
         R3  =[FP +8];
         R2  =[FP +12];
         cc =R2 ==0;
@@ -2846,6 +2833,31 @@ L$25:
 
 #endif
 
+#ifdef L_ledf2
+.align 2
+.global ___ledf2;
+.type ___ledf2, STT_FUNC;
+.global __ledf2;
+.type __ledf2, STT_FUNC;
+___ledf2:
+__ledf2:
+      LINK 0x0;
+      SP+=-0xC;
+      [FP +8] =R0 ;
+      [FP +12] =R1 ;
+      [FP +16] =R2 ;
+      CALL ___truncdfsf2;
+      R2 = R0;
+      R0=[FP+0x10];
+      R1=[FP+0x14];
+      CALL ___truncdfsf2;
+      R1 = R0;
+      R0 = [SP+0x8];
+      SP+=0xC;
+      CALL ___lesf2;
+      UNLINK;
+      RTS;
+#endif
 
 
 

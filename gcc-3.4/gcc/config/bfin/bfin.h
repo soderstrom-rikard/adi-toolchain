@@ -12,7 +12,7 @@
 #define _BFIN_CONFIG
 
 /* In order to use atof */
-#include <stdlib.h>
+/* #include <stdlib.h>	*/
 
 #define USER_LABEL_PREFIX "_"
 
@@ -40,6 +40,7 @@
 #else
 # define STRICTNESS 0
 #endif
+
 
 #define CONST_16BIT_IMM_P(VALUE) ((int)(VALUE) >= -32768 && (int)(VALUE) <= 32767)
 #define CONST_7BIT_IMM_P(VALUE) ((int)(VALUE) >= -64 && (int)(VALUE) <= 63)
@@ -73,21 +74,27 @@
 extern int target_flags;
 
 /* Predefinition in the preprocessor for this target machine */
-/* Target CPU builtins.  Has a do..while(0) as it will have a ; */
-#define TARGET_CPU_CPP_BUILTINS()			\
-  do							\
-    {							\
-	builtin_define_std ("bfin");			\
-	builtin_define_std ("BFIN");			\
-	builtin_define_std ("FRIO");			\
-	builtin_define_std ("frio");			\
-	builtin_assert ("cpu=bfin");			\
-	builtin_assert ("machine=bfin");			\
-    } while (0)
+#ifndef TARGET_CPU_CPP_BUILTINS
+#define TARGET_CPU_CPP_BUILTINS()               \
+  do                                            \
+    {                                           \
+      builtin_define ("bfin");                  \
+      builtin_define ("BFIN");                  \
+      builtin_define ("FRIO");                  \
+      builtin_define ("frio");                  \
+    }                                           \
+  while (0)
+#endif
 
 #define CC1_SPEC  " -O2 "
 #define ASM_SPEC " %{I*} -I include/asm%s "
 #define LIB_SPEC " -lc "
+
+#undef  ASM_WEAKEN_LABEL
+#define ASM_WEAKEN_LABEL(FILE, NAME) \
+  do { fputs ("\t.weak\t", FILE); assemble_name (FILE, NAME); \
+       fputc ('\n', FILE); } while (0)
+
 
 /* Don't create frame pointers for leaf functions */
 #define TARGET_OMIT_LEAF_FRAME_POINTER (target_flags & MASK_OMIT_LEAF_FRAME_POINTER)
@@ -264,7 +271,7 @@ extern const char * directive_names[];
  * machine-dependent stack frame: `OUTGOING_REG_PARM_STACK_SPACE'
  * says which.  */
 #define FIXED_STACK_AREA 12
-#define REG_PARM_STACK_SPACE(FNDECL) (FNDECL) ? FIXED_STACK_AREA : 0
+#define REG_PARM_STACK_SPACE(FNDECL) FIXED_STACK_AREA
 
 /* Define this if the above stack space is to be considered part of the
  * space allocated by the caller.  */
@@ -272,15 +279,19 @@ extern const char * directive_names[];
 	  
  /*If we generate an insn to push BYTES bytes, this says how many the
    stack pointer really advances by.  On Hummingbird pushw decrements
-   by exactly 2 no matter what the position was.   */
-#define PUSH_ROUNDING(BYTES) (((BYTES) + 3) & (~3))
+   by exactly 2 no matter what the position was.   
+#define PUSH_ROUNDING(BYTES) (((BYTES) + 3) & (~3))*/
+
+/* Define this if the maximum size of all the outgoing args is to be
+ *    accumulated and pushed during the prologue.  The amount can be
+ *       found in the variable current_function_outgoing_args_size. */ 
+#define ACCUMULATE_OUTGOING_ARGS 1
 
 /* Value should be nonzero if functions must have frame pointers.
    Zero means the frame pointer need not be set up (and parms
    may be accessed via the stack pointer) in functions that seem suitable.
    This is computed in `reload', in reload1.c.  
 */
-extern int frame_pointer_required (void) ;
 #define FRAME_POINTER_REQUIRED (frame_pointer_required ())
 
 /* `INITIAL_FRAME_POINTER_OFFSET (DEPTH-VAR)'
@@ -325,11 +336,11 @@ extern int frame_pointer_required (void) ;
 
 #define TRAMPOLINE_SIZE 18
 #define TRAMPOLINE_TEMPLATE(FILE)                                       \
-      fprintf(FILE, "\t.word\t0xe10c0000\n\t\t# p3.l = fn low");        \
-      fprintf(FILE, "\n\t.word\t0xe12c0000\n\t\t# p3.h = fn high");     \
-      fprintf(FILE, "\n\t.word\t0xe10d0000\n\t\t# p4.l = sc low");      \
-      fprintf(FILE, "\n\t.word\t0xe12d0000\n\t\t# p4.h = sc high");     \
-      fprintf(FILE, "\n\t.word\t0x0083\n\t\t# jump (p3)");
+      fprintf(FILE, "\t.word\t0xe10c0000\t\t# p3.l = fn low");        \
+      fprintf(FILE, "\t.word\t0xe12c0000\t\t# p3.h = fn high");     \
+      fprintf(FILE, "\t.word\t0xe10d0000\t\t# p4.l = sc low");      \
+      fprintf(FILE, "\t.word\t0xe12d0000\t\t# p4.h = sc high");     \
+      fprintf(FILE, "\t.word\t0x0083\t\t# jump (p3)");
 
 #define INITIALIZE_TRAMPOLINE(TRAMP, FNADDR, CXT)  \
 {                                                                       \
@@ -442,9 +453,9 @@ extern int frame_pointer_required (void) ;
 */
 #define FIXED_REGISTERS \
 /*r0 r1 r2 r3 r4 r5 r6 r7   p0 p1 p2 p3 p4 p5 p6 p7 */ \
-{ 0, 0, 0, 1, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 1, 1,    \
+{ 0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 1, 1,    \
 /*i0 b0 l0 i1 b1 l1 i2 b2   l2 i3 b3 l3 m0 m1 m2 m3 */ \
-  0, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 1,    \
+  0, 1, 0, 0, 1, 0, 0, 1,   0, 0, 1, 0, 0, 0, 0, 1,    \
 /*a0 a1 cc */ \
   0, 0, 1,   \
 }
@@ -479,9 +490,11 @@ extern int frame_pointer_required (void) ;
 { REG_R0, REG_R1, REG_R2, REG_R3, REG_R7, REG_R6, REG_R5, REG_R4, \
   REG_P2, REG_P1, REG_P0, REG_P5, REG_P4, REG_P3, REG_P6, REG_P7, \
   REG_A0, REG_A1, \
-  REG_I0, REG_B0, REG_L0, REG_I1, REG_B1, REG_L1, REG_I2, REG_B2, \
-  REG_L2, REG_I3, REG_B3, REG_L3, REG_M0, REG_M1, REG_M2, REG_M3, \
-       REG_NO, \
+ /*REG_I0, REG_B0, REG_L0, REG_I1, REG_B1, REG_L1, REG_I2, REG_B2,*/ \
+ /*REG_L2, REG_I3, REG_B3, REG_L3, REG_M0, REG_M1, REG_M2, REG_M3,*/ \
+  REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, \
+  REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, REG_NO, \
+  REG_NO, \
 }
 
 #define CONDITIONAL_REGISTER_USAGE			\
@@ -721,11 +734,7 @@ typedef struct {
 /* Initialize a variable CUM of type CUMULATIVE_ARGS
    for a call to a function whose data type is FNTYPE.
    For a library call, FNTYPE is 0.  */
-/* 3.4 this macro has diff number of params see if we can make
-   use of them. TODO 
-#define INIT_CUMULATIVE_ARGS(CUM,FNTYPE,LIBNAME,INDIRECT)
-*/
-#define INIT_CUMULATIVE_ARGS(CUM,FNTYPE,LIBNAME, FNDECL, N_NAMED_ARGS)	\
+#define INIT_CUMULATIVE_ARGS(CUM,FNTYPE,LIBNAME,INDIRECT, N_NAMED_ARGS)	\
   (init_cumulative_args (&CUM, FNTYPE, LIBNAME))
 
 /* Update the data in CUM to advance over an argument
@@ -801,10 +810,16 @@ typedef struct {
    
       [preg]
       [preg + imm16]
+
+B [ Preg + uimm15 ]
+W [ Preg + uimm16m2 ]
+[ Preg + uimm17m4 ] 
+
       [preg++]
       [preg--]
       [--sp]
 */
+
 #define GO_IF_LEGITIMATE_ADDRESS(MODE, X, WIN) do {            \
 /* This is PC relative data before MACHINE_DEPENDENT_REORG runs.*/ \
   if (GET_MODE_SIZE (MODE) >= 4 && TARGET_MINI_CONST_POOL && CONSTANT_P (X) \
@@ -827,7 +842,8 @@ typedef struct {
   case PLUS:						       \
     if (REG_OK_FOR_BASE_P (XEXP (X, 0))			       \
 	&& (GET_CODE (XEXP (X, 1)) == CONST_INT	       	       \
-		&& CONST_16BIT_IMM_P(INTVAL (XEXP (X,1)))))    \
+		&& CONST_16BIT_IMM_P(INTVAL (XEXP (X,1)))      \
+		&& bfin_valid_add(MODE,INTVAL (XEXP (X,1)))))  \
       goto WIN;						       \
     break;						       \
   case POST_INC:					       \
@@ -840,7 +856,7 @@ typedef struct {
       goto WIN;						       \
     break;						       \
   default:						       \
-	break;/*RAJA */					       \
+	break;						       \
   }							       \
 } while (0)
 
@@ -875,7 +891,7 @@ typedef struct {
      generating position independent code. */
 #define LEGITIMATE_PIC_OPERAND_P(X) \
   (! SYMBOLIC_CONST (X)							\
-   || (GET_CODE (X) == SYMBOL_REF && CONSTANT_POOL_ADDRESS_P (X)))
+   || (GET_CODE (X) == SYMBOL_REF && !CONSTANT_POOL_ADDRESS_P (X)))
 
 #define SYMBOLIC_CONST(X)	\
 (GET_CODE (X) == SYMBOL_REF						\
@@ -1065,21 +1081,14 @@ do {                                              \
 
 /* Define the codes that are matched by predicates in bfin.c.  */
 #define PREDICATE_CODES                                                 	\
-  {"always_true", {CONST_INT, CONST_DOUBLE, CONST, SYMBOL_REF,			\
-                       LABEL_REF, SUBREG, REG, MEM, ADDRESSOF}},		\
   {"cc_operand", {REG}},					        	\
   {"simple_reg_operand", {SUBREG, REG, ADDRESSOF}},        			\
-  {"reg_or_16bit_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}}, 		\
-  {"reg_or_7bit_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}}, 		\
-  {"rhs_andsi3_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}}, 			\
   {"scale_by_operand", {CONST_INT}},						\
   {"pos_scale_operand", {CONST_INT}},                                   	\
   {"regorbitclr_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},         	\
   {"regorlog2_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},           	\
   {"nonmemory_or_sym_operand", {CONST_INT, CONST_DOUBLE, CONST,			\
 			 SYMBOL_REF, LABEL_REF, SUBREG, REG, ADDRESSOF}},	\
-
-
 
 /* Describing Relative Costs of Operations */
 
@@ -1108,113 +1117,7 @@ do {                                              \
  
 #define REGISTER_MOVE_COST(MODE, CLASS1, CLASS2) register_move_cost((CLASS1), (CLASS2))
 
-#if 0
-/* OBSOLETE for 3.4 ... what is it replaced by?
-// TODO : Fix this with other costs.
-*/
-/* The relative costs of various types of constants. */
-#define CONST_COSTS(RTX, CODE, OUTER_CODE)                      \
-  case CONST_INT:                                               \
-    if ((OUTER_CODE)==SET || (OUTER_CODE)==PLUS)		\
-        return CONST_7BIT_IMM_P(INTVAL(RTX)) ?			\
-	0 : 2;                                 			\
-    else if ((OUTER_CODE)==AND) 				\
-	return (CONST_7BIT_IMM_P(INTVAL(RTX)) || 		\
-	    log2constp (1+INTVAL(RTX)) || log2constp (-INTVAL(RTX)))?\
-	0 : 2;                                 			\
-    else if ((OUTER_CODE)==LE || (OUTER_CODE)==LT 		\
-		|| (OUTER_CODE)==EQ)				\
-	return (INTVAL (RTX) >= -4 && INTVAL (RTX) <= 3) ?	\
-	0 : 2;							\
-    else if ((OUTER_CODE)==LEU || (OUTER_CODE)==LTU)		\
-	return (INTVAL (RTX) >= 0 && INTVAL (RTX) <= 7) ?	\
-	0 : 2;							\
-    else if ((OUTER_CODE)==MULT)				\
-	return ((INTVAL (RTX)==2 || INTVAL (RTX)==4)) ?		\
-	0 : 2;							\
-    else if ((OUTER_CODE)==ASHIFT && 				\
-	(INTVAL (RTX) == 1 && INTVAL (RTX) == 2)) 		\
-	return 0;						\
-    else if ((OUTER_CODE)==ASHIFT || (OUTER_CODE)==ASHIFTRT     \
-	|| (OUTER_CODE)==LSHIFTRT)                              \
-	return (INTVAL (RTX) >= 0 && INTVAL (RTX) <= 31) ?      \
-	0 : 2;                                   		\
-    else if ((OUTER_CODE)==IOR || (OUTER_CODE)==XOR)    	\
-	return ((INTVAL (RTX) >= 0 && INTVAL (RTX) <= 31) &&	\
-	(INTVAL (RTX) & (INTVAL (RTX) - 1)) == 0) ?      	\
-	0 : 2;                                   		\
-    else                                                        \
-      return 2;                                  		\
-  case CONST:                                                   \
-  case LABEL_REF:                                               \
-  case SYMBOL_REF:                                              \
-  case CONST_DOUBLE:                                            \
-    return 4;
 
-
-#if 0
-#define CONST_COSTS(RTX, CODE, OUTER_CODE) 			\
-  case CONST_INT:						\
-    if (CONST_OK_FOR_LETTER_P (INTVAL (RTX), 'I')) 		\
-       return 1;    						\
-    else if (CONST_16BIT_IMM_P(INTVAL (RTX)))      	 	\
-       return 2;    						\
-    return 4;     						\
-  case CONST:							\
-  case LABEL_REF:						\
-  case SYMBOL_REF:						\
-    return 4;							\
-  case CONST_DOUBLE:						\
-    return 10;
-#endif
-
-
-/* `ADDRESS_COST (ADDRESS)'
-     An expression giving the cost of an addressing mode that contains
-     ADDRESS.  If not defined, the cost is computed from the ADDRESS
-     expression and the `CONST_COSTS' values.
-
-     For most CISC machines, the default cost is a good approximation
-     of the true cost of the addressing mode.  However, on RISC
-     machines, all instructions normally have the same length and
-     execution time.  Hence all addresses will have equal costs.
-
-     In cases where more than one form of an address is known, the form
-     with the lowest cost will be used.  If multiple forms have the
-     same, lowest, cost, the one that is the most complex will be used.
-
-     For example, suppose an address that is equal to the sum of a
-     register and a constant is used twice in the same basic block.
-     When this macro is not defined, the address will be computed in a
-     register and memory references will be indirect through that
-     register.  On machines where the cost of the addressing mode
-     containing the sum is no higher than that of a simple indirect
-     reference, this will produce an additional instruction and
-     possibly require an additional register.  Proper specification of
-     this macro eliminates this overhead for such machines.
-
-     Similar use of this macro is made in strength reduction of loops.
-
-     ADDRESS need not be valid as an address.  In such a case, the cost
-     is not relevant and can be any value; invalid addresses need not be
-     assigned a different cost.
-
-     On machines where an address involving more than one register is as
-     cheap as an address computation involving only one register,
-     defining `ADDRESS_COST' to reflect this can cause two registers to
-     be live over a region of code where only one would have been if
-     `ADDRESS_COST' were not defined in that manner.  This effect should
-     be considered in the definition of this macro.  Equivalent costs
-     should probably only be given to addresses with different numbers
-     of registers on machines with lots of registers.
-
-     This macro will normally either not be defined or be defined as a
-     constant. */
-
-int bfin_address_cost (rtx addr);
-#define ADDRESS_COST(ADDR) bfin_address_cost(ADDR)
-
-#endif /* 0, obsoleted by 3.4, TODO */
 
 /* Define as C expression which evaluates to nonzero if the tablejump
    instruction expects the table to contain offsets from the address of the
@@ -1304,11 +1207,24 @@ int bfin_address_cost (rtx addr);
 #define TARGET_CR        015
 #define TARGET_ESC	 033
 
+/*Initialize the GCC target structure.  */
+#define TARGET_ASM_GLOBALIZE_LABEL bfin_globalize_label 
+#define TARGET_ASM_OPEN_PAREN "("
+#define TARGET_ASM_CLOSE_PAREN ")"
+#define TARGET_ASM_FUNCTION_PROLOGUE bfin_function_prologue
+#define TARGET_ASM_FUNCTION_EPILOGUE bfin_function_epilogue
+
+/* Output at beginning of assembler file.  */
+#define TARGET_ASM_FILE_START output_file_start
+
+/* Switch into a generic section.  */
+#define TARGET_ASM_NAMED_SECTION  default_elf_asm_named_section
+
+
 /* Assembler output */
 #define PRINT_OPERAND_PUNCT_VALID_P(CODE)      index ("jJhXDQR", CODE)
 
 #define PRINT_OPERAND(FILE, RTX, CODE)	 print_operand (FILE, RTX, CODE)
-void print_address_operand (FILE *file, rtx x);
 #define PRINT_OPERAND_ADDRESS(FILE, RTX) print_address_operand (FILE, RTX)
 
 typedef enum sections {
@@ -1326,7 +1242,6 @@ typedef enum directives {
     LAST_DIR_NM
 } DIR_ENUM_T;
 
-extern char *section_asm_op (SECT_ENUM_T dir);
 #define TEXT_SECTION_ASM_OP section_asm_op (CODE_DIR)
 #define DATA_SECTION_ASM_OP section_asm_op (DATA_DIR)
 
@@ -1338,12 +1253,6 @@ extern char *section_asm_op (SECT_ENUM_T dir);
 #define ASM_BYTE directive_names[BYTE_CONST_DIR]
 #define ASM_SPACE directive_names[SPACE_DIR]
 #define ASM_INIT directive_names[INIT_DIR]
-
-#if 0 /* 3.4 obsoletes this : TODO */
-/* Output at beginning of assembler file.  */
-#define ASM_FILE_START(FILE) output_file_start (FILE)
-#endif /* 0, 3.4 obsoletes this TODO */
-
 
 /* Switch into a generic section.
  *    This is currently only used to support section attributes.
@@ -1393,11 +1302,12 @@ extern char *section_asm_op (SECT_ENUM_T dir);
 #define ASM_GENERATE_INTERNAL_LABEL(LABEL, PREFIX, NUM)\
      sprintf (LABEL, "*%s%s$%d", LOCAL_LABEL_PREFIX, PREFIX, (int) NUM)
 
-#if 0 /* 3.4 obsoletes this TODO: */
-#define ASM_OUTPUT_INTERNAL_LABEL(FILE, PREFIX, NUM) 	\
+/*
+#define TARGET_ASM_INTERNAL_LABEL(FILE, PREFIX, NUM) 	\
   do {  fprintf(FILE, "%s%s$%d:\n", LOCAL_LABEL_PREFIX, PREFIX, NUM);		\
       } while (0)
-#endif /* 3.4 obsoletes this TODO: */
+*/
+
 
 #define ASM_FORMAT_PRIVATE_NAME(OUTPUT, NAME, LABELNO)			\
   do {									\
@@ -1409,7 +1319,7 @@ extern char *section_asm_op (SECT_ENUM_T dir);
     temp[len + 2] = '_';						\
     temp[len + 3] = 0;							\
     (OUTPUT) = (char *) alloca (strlen (NAME) + 13);			\
-    sprintf (OUTPUT, "*%s$%d", temp, LABELNO);				\
+    sprintf (OUTPUT, "_%s$%d", temp, LABELNO);				\
   } while (0)
 
 /* Output a label which precedes a jumptable.  Since
@@ -1418,15 +1328,9 @@ extern char *section_asm_op (SECT_ENUM_T dir);
 #define ASM_OUTPUT_CASE_LABEL(FILE,PREFIX,NUM,JUMPTABLE)\
   do {  if (CASE_VECTOR_MODE == SImode)			\
 	ASM_OUTPUT_ALIGN (FILE, 2);                     \
-    (*targetm.asm_out.internal_label) (FILE, PREFIX, NUM);      \
+  (*targetm.asm_out.internal_label) (FILE, PREFIX, NUM);\
   } while (0)
-#if 0 /* 3.4 obsoletes ASM_OUTPUT_INTERNAL_LABEL TODO: */
-#define ASM_OUTPUT_CASE_LABEL(FILE,PREFIX,NUM,JUMPTABLE)\
-  do {  if (CASE_VECTOR_MODE == SImode)			\
-	ASM_OUTPUT_ALIGN (FILE, 2);                     \
-    ASM_OUTPUT_INTERNAL_LABEL (FILE, PREFIX, NUM);      \
-  } while (0)
-#endif /* 3.4 obsoletes this TODO: */
+
 #define ASM_OUTPUT_ADDR_VEC_ELT(FILE, VALUE)    	\
 do { char __buf[256];					\
      fprintf (FILE, "\t%s%s\t", ASM_LONG, ASM_INIT);	\
@@ -1566,14 +1470,6 @@ extern struct rtx_def *bfin_cc_rtx;
 
 #define RET  return ""        /* Used in machine description */
 
-/* The literal pool needs to reside in the text area due to the
-   limited PC addressing range: */
-/* TODO : 3.4 changed MACHINE_DEPENDENT_REORG to TARGET_MACHINE_DEPENDENT_REORG*/
-#if 0
-#define TARGET_MACHINE_DEPENDENT_REORG(INSN) \
-    if (TARGET_MINI_CONST_POOL) bfin_reorg ((INSN))
-#endif
-
 extern int bfin_lvno;
 
 #define HANDLE_SYSV_PRAGMA 1
@@ -1598,27 +1494,6 @@ do {                                                            \
   fputc ('\n', (FILE));                                         \
 } while (0) 
 
-/* Switch into a generic section.  */
-#ifdef TARGET_ASM_NAMED_SECTION
-#undef TARGET_ASM_NAMED_SECTION
-#endif
-#define TARGET_ASM_NAMED_SECTION  default_elf_asm_named_section
-
-/*Initialize the GCC target structure.  */
-#undef TARGET_ASM_GLOBALIZE_LABEL
-#define TARGET_ASM_GLOBALIZE_LABEL bfin_globalize_label 
-
-#undef TARGET_ASM_OPEN_PAREN
-#define TARGET_ASM_OPEN_PAREN "("
-#undef TARGET_ASM_CLOSE_PAREN
-#define TARGET_ASM_CLOSE_PAREN ")"
-
-#undef TARGET_ASM_FUNCTION_PROLOGUE
-#define TARGET_ASM_FUNCTION_PROLOGUE bfin_function_prologue
-
-#undef TARGET_ASM_FUNCTION_EPILOGUE
-#define TARGET_ASM_FUNCTION_EPILOGUE bfin_function_epilogue
-
 
 /* DBX register number for a given compiler register number */
 #define DBX_REGISTER_NUMBER(REGNO)  (REGNO) 
@@ -1636,8 +1511,7 @@ do {                                                            \
 */
 
 /* Debugging for standard elf stabs */
-#include "../dbxelf.h"
-
+/*#include "dbxelf.h"*/
 
 
 #endif /*  _BFIN_CONFIG */

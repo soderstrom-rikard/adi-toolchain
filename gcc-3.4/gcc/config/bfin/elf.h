@@ -6,9 +6,22 @@
 
 #define OBJECT_FORMAT_ELF
 
-#ifndef CPP_PREDEFINES
-#define CPP_PREDEFINES "-Dbfin -DBFIN -DFRIO -Dfrio -Acpu(bfin) -Amachine(bfin) -D__ELF__"
+/* Run-time target specifications */
+#ifndef TARGET_CPU_CPP_BUILTINS
+#define TARGET_CPU_CPP_BUILTINS()               \
+  do                                            \
+    {                                           \
+      builtin_define ("bfin");                  \
+      builtin_define ("BFIN");                  \
+      builtin_define ("FRIO");                  \
+      builtin_define ("frio");                  \
+      builtin_assert ("machine=bfin");          \
+      builtin_assert ("cpu=bfin");              \
+      builtin_define ("__ELF__");               \
+    }                                           \
+  while (0)
 #endif
+
 
 #define ASM_SPEC " %{I*} "
 #define CC1_SPEC " -O0 "

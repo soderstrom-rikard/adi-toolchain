@@ -33,6 +33,7 @@ extern int  function_arg_regno_p PARAMS ((int));
 
 extern char *asm_conditional_branch PARAMS ((rtx, int));
 extern const char *output_load_immediate PARAMS ((rtx *));
+extern const char *output_casesi_internal PARAMS ((rtx *));
 extern char *bfin_asm_long PARAMS ((void));
 extern char *bfin_asm_short PARAMS ((void));
 extern int log2constp PARAMS ((unsigned HOST_WIDE_INT));
@@ -49,7 +50,6 @@ extern int frame_pointer_required PARAMS ((void));
 extern int effective_address_32bit_p PARAMS ((rtx, Mmode));
 extern int symbolic_operand_p PARAMS ((rtx, Mmode));
 extern int imm7bit_operand_p PARAMS ((rtx, Mmode));
-extern int imm16bit_operand_p (rtx op, enum machine_mode mode ) ;
 extern rtx bfin_gen_compare PARAMS ((rtx, Mmode));
 extern void expand_move PARAMS ((rtx *, Mmode));
 extern int extract_const_double PARAMS ((rtx));
@@ -71,7 +71,7 @@ extern enum reg_class secondary_output_reload_class PARAMS ((enum reg_class , Mm
 extern char *section_asm_op_1 PARAMS ((SECT_ENUM_T));
 extern char *section_asm_op PARAMS ((SECT_ENUM_T));
 extern void bfin_reorg PARAMS ((rtx));
-extern void output_file_start PARAMS ((FILE *));
+extern void output_file_start PARAMS ((void));
 extern void override_options PARAMS ((void));
 extern void asm_output_skip PARAMS ((FILE *, int));
 extern void print_operand PARAMS ((FILE *,  rtx, char));
@@ -90,7 +90,6 @@ extern void output_symbolic_address PARAMS ((rtx *));
 extern void override_options PARAMS ((void));
 extern char *asm_conditional_branch PARAMS ((rtx, int));
 extern rtx bfin_gen_compare PARAMS ((rtx, Mmode));
-extern const char * output_load_immediate PARAMS ((rtx *));
 extern int signed_comparison_operator PARAMS ((rtx, Mmode));
 extern int ccregister_p PARAMS ((rtx, Mmode));
 extern int loop_end PARAMS ((rtx));
@@ -102,13 +101,9 @@ extern int reg_or_0_operand PARAMS ((rtx, Mmode));
 extern int signed_comparison_operator PARAMS ((rtx, Mmode));
 
 extern int bfin_return_in_memory PARAMS ((tree));
-extern int reg_or_16bit_operand (rtx op, enum machine_mode mode);
-extern void setup_incoming_varargs (CUMULATIVE_ARGS *cum,
-			     enum machine_mode mode, tree type,
-			     int *pretend_size, int no_rtl);
-
+extern void bfin_internal_label PARAMS ((FILE *, const char *, unsigned long));
+extern bool bfin_rtx_costs PARAMS ((rtx, int, int, int*));
 #undef  Mmode 
 
 #endif /* ! GCC_V850_PROTOS_H */
-
 
