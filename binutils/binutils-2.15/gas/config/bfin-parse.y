@@ -1265,9 +1265,10 @@ asm_1:
 
 	| HALF_REG ASSIGN expr
 	{
-	  notethat("LDIMMhalf: pregs_half = sym32\n");
+	  notethat("LDIMMhalf: pregs_half = imm16\n");
+	  if (!IS_IMM ($3, 16) && !IS_UIMM ($3, 16))
+	    return semantic_error ("Constant out of range");
 	  $$ = LDIMMHALF_R (&$1, IS_H ($1), 0, 0, $3);
-
 	}
 
 	| a_assign expr
