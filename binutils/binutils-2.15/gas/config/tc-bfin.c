@@ -772,15 +772,59 @@ md_section_align (segment, size)
 
 /* define md_relax_frag OR TC_GENERIC_RELAX_TABLE  */
 
-/* Convert an ASCII string to FP number. */
+/* Turn a string in input_line_pointer into a floating point constant of type
+   type, and store the appropriate bytes in *litP.  The number of LITTLENUMS
+   emitted is stored in *sizeP .  An error message is returned, or NULL on OK.
+*/
+
+/* Equal to MAX_PRECISION in atof-ieee.c */
+#define MAX_LITTLENUMS 6
+
 char *
 md_atof (type, litP, sizeP)
-     char type ATTRIBUTE_UNUSED;
-     char *litP ATTRIBUTE_UNUSED;
-     int *sizeP ATTRIBUTE_UNUSED;
+     char   type;
+     char * litP;
+     int *  sizeP;
 {
-  as_tsktsk ("Generally we don't need md_atof.\n");
-  return NULL;
+  int              prec;
+  LITTLENUM_TYPE   words [MAX_LITTLENUMS];
+  LITTLENUM_TYPE   *wordP;
+  char *           t;
+
+  switch (type)
+    {
+    case 'f':
+    case 'F':
+      prec = 2;
+      break;
+
+    case 'd':
+    case 'D':
+      prec = 4;
+      break;
+
+   /* FIXME: Some targets allow other format chars for bigger sizes here.  */
+
+    default:
+      * sizeP = 0;
+      return _("Bad call to md_atof()");
+    }
+
+  t = atof_ieee (input_line_pointer, type, words);
+  if (t)
+    input_line_pointer = t;
+  * sizeP = prec * sizeof (LITTLENUM_TYPE);
+
+  *sizeP = prec * sizeof (LITTLENUM_TYPE);
+  /* This loops outputs the LITTLENUMs in REVERSE order; in accord with
+     the littleendianness of the processor.  */
+  for (wordP = words + prec - 1; prec--;)
+    {
+      md_number_to_chars (litP, (valueT) (*wordP--), sizeof (LITTLENUM_TYPE));
+      litP += sizeof (LITTLENUM_TYPE);
+    }
+
+  return 0;
 }
 
 /* Convert a machine dependent frag.  We never generate these.  */
@@ -1970,7 +2014,7 @@ gen_multi_instr (INSTR_T dsp32, INSTR_T dsp16_grp1, INSTR_T dsp16_grp2)
 INSTR_T
 gen_loop (ExprNode *expr, REG_T reg, int rop, REG_T preg)
 {
-  char *loopsym;
+  const char *loopsym;
   char *lbeginsym, *lendsym;
   ExprNodeValue lbeginval, lendval;
   ExprNode *lbegin, *lend;

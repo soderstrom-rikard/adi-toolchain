@@ -1,4 +1,9 @@
-2005-02-07  Catherine Moore  <clm@cmoore.com>
+2005-02-07  Catherine Moore  <clm@cm00re.com>
+
+	* config/tc-bfin.c (gen_loop): Fix warning.
+	(md_atof): New.
+
+2005-02-07  Catherine Moore  <clm@cm00re.com>
 
 	* config/bfin-aux.h (gen_loop): Declare.
 	* config/bfin-defs.h (Expr_Node_Create): Renamed.
