@@ -1049,9 +1049,9 @@ void print_operand (FILE *file,  rtx x,  char code)
       else if (code == 'h')
 	x = GEN_INT (INTVAL (x) & 0xffff);
       else if (code == 'X')
-	x = GEN_INT (exact_log2 (INTVAL (x)));
+	x = GEN_INT (exact_log2 (0xffffffff & INTVAL (x)));
       else if (code == 'Y')
-	x = GEN_INT (exact_log2 (~INTVAL (x)));
+	x = GEN_INT (exact_log2 (0xffffffff & ~INTVAL (x)));
       /* fall through */
 
     case SYMBOL_REF:
@@ -1371,6 +1371,7 @@ expand_move (rtx *operands, enum machine_mode mode)
 int
 log2constp (unsigned HOST_WIDE_INT c)
 {
+  c &= 0xFFFFFFFF;
   return c != 0 && (c & (c-1)) == 0;
 }
 

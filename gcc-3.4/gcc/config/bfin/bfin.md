@@ -1118,16 +1118,9 @@
 	(ior:SI (match_operand:SI 1 "valid_reg_operand" "%0,d")
 		(match_operand:SI 2 "regorlog2_operand" "J,d")))]
   ""
-  "*
-{
-   if (GET_CODE (operands[2]) == CONST_INT) {
-	operands[2] = GEN_INT (exact_log2 (INTVAL (operands[2])));
-	output_asm_insn (\"BITSET (%0,%2);\", operands);
-   }
-   else output_asm_insn (\"%0 =%1|%2;\", operands);
-
-   RET;
-}"
+  "@
+   BITSET (%0, %X2);
+   %0 = %1 | %2;"
   [(set_attr "type" "alu0")])
 
 (define_insn "xorsi3"
@@ -1135,17 +1128,10 @@
 	(xor:SI (match_operand:SI 1 "valid_reg_operand"   "%0,d")
 		  (match_operand:SI 2 "regorlog2_operand" "J,d")))]
   ""
-  "*
-{
-   if (GET_CODE (operands[2]) == CONST_INT) {
-	operands[2] = GEN_INT (exact_log2 (INTVAL (operands[2])));
-	output_asm_insn (\"BITTGL(%0,%2);\", operands);
-   }
-   else output_asm_insn (\"%0 =%1^%2;\", operands);
-   RET;
-}"
+  "@
+   BITTGL (%0, %X2);
+   %0 = %1 ^ %2;"
   [(set_attr "type" "alu0")])
-
 
 (define_insn "smaxsi3"
   [(set (match_operand:SI 0 "register_operand" "=d")

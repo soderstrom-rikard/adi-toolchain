@@ -1131,8 +1131,7 @@ do {                                              \
 */
 #define CONST_OK_FOR_CONSTRAINT_P(VALUE, C, STR)		\
   ((C) == 'I' ? (CONST_4BIT_IMM_P(VALUE)) 			\
-   : (C) == 'J' ? (log2constp (VALUE)				\
-		   && CONST_5UBIT_IMM_P(exact_log2(VALUE))) 	\
+   : (C) == 'J' ? (log2constp (VALUE))				\
    : (C) == 'K' ? CONST_OK_FOR_K (VALUE, STR)			\
    : (C) == 'L' ? log2constp (~(VALUE))				\
    : (C) == 'M' ? CONST_OK_FOR_M (VALUE, STR)			\

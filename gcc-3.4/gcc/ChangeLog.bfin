@@ -1,3 +1,12 @@
+2004-11-24  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (xorsi3, iorsi3): Simplify using '%X' output
+	modifiers.
+	* config/bfin/bfin.c (log2constp): Only look at 32 bits.
+	(print_operand): For constants with %X and %Y, only look at 32 bits.
+	* config/bfin/bfin.h (CONST_OK_FOR_CONSTRAINT_P): In 'J' case, lose
+	unnecessary exact_log2 call.
+	
 2004-11-23  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_valid_add): Deal with the fact that 8 byte
