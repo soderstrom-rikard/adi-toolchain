@@ -1,7 +1,0 @@
-Next :
-- Merge Martin's changes
-22 Jun 2004
-- 2.6 kernel now builds using these binutils. All known relocation issues
-  resolved.
-18 Jun 2004
-- Fixed relocation issues.
