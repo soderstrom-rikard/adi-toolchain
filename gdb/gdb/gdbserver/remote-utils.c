@@ -273,7 +273,6 @@ putpkt (char *buf)
 
   /* Copy the packet into buffer BUF2, encapsulating it
      and giving it a checksum.  */
-remote_debug = 1;
   p = buf2;
   *p++ = '$';
 
