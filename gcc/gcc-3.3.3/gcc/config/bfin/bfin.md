@@ -894,7 +894,7 @@
 (define_expand "addsi3"
   [(set (match_operand:SI 0 "register_operand"           "")
 	(plus:SI (match_operand:SI 1 "simple_reg_operand" "")
-		 (match_operand:SI 2 "reg_or_16bit_operand" "")))]
+		 (match_operand:SI 2 "nonmemory_operand" "")))]
   ""
   ""
 )
@@ -928,12 +928,12 @@
           for (; i < last_reg; i++)
              if (i != REGNO (operands[0])) {
                char buf[128];
+               rtx tmp = operands[0];
+               rtx tmp1 = operands[1];
 
                sprintf (buf, \"[--SP] = %s;\", reg_names[i]);
                output_asm_insn (buf, operands);
 
-               rtx tmp = operands[0];
-               rtx tmp1 = operands[1];
                operands[0] =  gen_rtx_REG (SImode, i);
                operands[1] = operands[2];
                output_load_immediate (operands);

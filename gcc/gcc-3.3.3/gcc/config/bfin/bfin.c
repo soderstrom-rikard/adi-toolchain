@@ -1542,15 +1542,15 @@ asm_output_ascii (FILE *file, const char *str, int sz) {
     int jk = 0;
 
     while (jk < sz) {
-    if (jk+2 < sz){
-        fprintf (file, "%s%s0x%02x%02x;\n", ASM_SHORT, ASM_INIT,
-	         str[jk+1], str[jk]);
-	jk+=2;
-        }
-    else {
-        fprintf (file, "%s%s0x%02x;\n", ASM_BYTE, ASM_INIT, str[jk]);
-        jk+=1;
-        }
+         if (jk+2 < sz){
+           fprintf (file, "%s%s0x%02x%02x;\n", ASM_SHORT, ASM_INIT,
+                    (unsigned char)str[jk+1], (unsigned char)str[jk]);
+	   jk+=2;
+         }
+         else {
+           fprintf (file, "%s%s0x%02x;\n", ASM_BYTE, ASM_INIT, (unsigned char)str[jk]);
+           jk+=1;
+         }
     }
 }
 
