@@ -71,7 +71,7 @@ do
             echo "Verbose output"
             ;;
         t) 
-            RUN=`whereis runtest | wc -w`
+            RUN=`runtest --help 2>/dev/null | wc -l`
             if [ "$RUN" -gt 1 ] ; then
                 CHECK=1
                 echo "Running tests"
@@ -144,8 +144,8 @@ fi
 
 for PREREQ in gcc $MAKE autoconf m4 automake gettext bison flex
 do
-    RUN=`whereis $PREREQ | wc -w`
-    if [ $RUN -eq 1 ] ; then
+    RUN=`$PREREQ --help 2>/dev/null | wc -l`
+    if [ $RUN -eq 0 ] ; then
         echo "Can not find $PREREQ"
         exit
     fi
@@ -182,7 +182,7 @@ fi
 
 ############ ABSOLUTE PATH TO SOURCE DIRECTORIES ################
 
-if [ -d /$DIR_SOURCE ] ; then
+if [ -d /.$DIR_SOURCE ] ; then
     echo -n "Toolchain source is at      "
     echo $DIR_SOURCE
 else
@@ -191,7 +191,7 @@ else
     exit
 fi
 if [ $KERNEL_SOURCE ] ; then
-    if [ -d /$KERNEL_SOURCE ] ; then
+    if [ -d /.$KERNEL_SOURCE ] ; then
         echo -n "Kernel source is at         "
         echo $KERNEL_SOURCE
     else 
@@ -209,7 +209,7 @@ if [ $DIR_BUILD ] ; then
         echo $DIR_BUILD
     else
         mkdir -p $DIR_BUILD
-        if [ ! -d /$DIR_BUILD ] ; then
+        if [ ! -d /.$DIR_BUILD ] ; then
             echo "Invalid Build Path"
             exit
         fi
@@ -237,7 +237,7 @@ echo -n "Path to elf output dir      "
 echo $DIR_ELF_OUTPUT
 if [ ! -d $DIR_ELF_OUTPUT ] ; then
     mkdir -p $DIR_ELF_OUTPUT
-    if [ ! -d /$DIR_ELF_OUTPUT ] ; then
+    if [ ! -d /.$DIR_ELF_OUTPUT ] ; then
         echo "Invalid output directory"
         exit
     fi
