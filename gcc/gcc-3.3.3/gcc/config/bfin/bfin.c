@@ -983,7 +983,6 @@ void print_operand (FILE *file,  rtx x,  char code)
   }
 }
 
-
 int extract_const_double (rtx x)
 {
   if (GET_CODE (x) == CONST_DOUBLE && GET_MODE(x) != DImode)
@@ -991,15 +990,27 @@ int extract_const_double (rtx x)
     union { double d; int    i[2]; } u;
     union { float f; int i; } u1;
 
-    u.i[0] = CONST_DOUBLE_LOW (x);
-    u.i[1] = CONST_DOUBLE_HIGH (x);
+      if ( GET_MODE(x) == VOIDmode)
+      {
+          u.i[0] = CONST_DOUBLE_LOW (x);
+          u.i[1] = CONST_DOUBLE_HIGH (x);
+      }
+      else
+      {
+          long l[2];
+	  REAL_VALUE_TYPE rv;
+          int endian = (WORDS_BIG_ENDIAN == 0);
+          REAL_VALUE_FROM_CONST_DOUBLE (rv, x);
+          REAL_VALUE_TO_TARGET_DOUBLE (rv, l);
+          u.i[0] = l[1 - endian];
+          u.i[1] = l[endian];
+      }
     u1.f = u.d;
     return u1.i;
-  } 
-  else 
+  }
+  else
     output_operand_lossage ("unsupported mode DI");
 }
-	
 
 int
 signed_comparison_operator (rtx op, enum machine_mode mode)
@@ -1143,6 +1154,7 @@ function_arg (CUMULATIVE_ARGS *cum,	/* current arg information */
     case BLKmode:
       if (bytes < 0)
 	break;
+    case DFmode:
     case DImode:
     case SImode:
     case HImode:
