@@ -6,6 +6,16 @@
 	* config/bfin/bfin.md (movv2hi_insn, movv2hi, addv2hi, subv2hi,
 	sminv2hi, smaxv2hi, mulv2hi, negv2hi, absv2hi): New patterns.
 
+	* config/bfin/bfin.c (n_pregs_to_save): Make I unsigned.
+	(expand_prologue_reg_save): Don't set RTX_FRAME_RELATED_P on element 0
+	of the vector.
+	(function_arg, legitimize_pic_address): Don't use gen_rtx.
+	(split_load_immediate, push_multiple_operation, bfin_adjust_cost):
+	Use D_REGNO_P macro.
+	* config/bfin/bfin.h (FUNCTION_VALUE, LIBCALL_VALUE): Don't use
+	gen_rtx.
+	(UNITS_PER_SIMD_WORD): New macro.
+
 2005-02-28  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (n_pregs_to_save): Don't unconditionally save PIC

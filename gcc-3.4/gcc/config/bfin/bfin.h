@@ -673,14 +673,14 @@ typedef struct {
 
 #define VALUE_REGNO(MODE) (REG_R0)
 
-#define FUNCTION_VALUE(VALTYPE, FUNC)      \
-  gen_rtx (REG, TYPE_MODE (VALTYPE),       \
-            VALUE_REGNO(TYPE_MODE(VALTYPE)))
+#define FUNCTION_VALUE(VALTYPE, FUNC)		\
+  gen_rtx_REG (TYPE_MODE (VALTYPE),		\
+	       VALUE_REGNO(TYPE_MODE(VALTYPE)))
 
 /* Define how to find the value returned by a library function
    assuming the value has mode MODE.  */
 
-#define LIBCALL_VALUE(MODE)  gen_rtx (REG, MODE, VALUE_REGNO(MODE))
+#define LIBCALL_VALUE(MODE)  gen_rtx_REG (MODE, VALUE_REGNO(MODE))
 
 #define FUNCTION_VALUE_REGNO_P(N) ((N) == REG_R0)
 
@@ -880,6 +880,9 @@ do {                                              \
 
 /* Width of a word, in units (bytes).  */
 #define UNITS_PER_WORD 4
+
+/* Size of a vector for autovectorization.  */
+#define UNITS_PER_SIMD_WORD 4
 
 /* Width in bits of a pointer.
    See also the macro `Pmode1' defined below.  */

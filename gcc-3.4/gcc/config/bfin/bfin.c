@@ -150,7 +150,7 @@ n_dregs_to_save (void)
 static int
 n_pregs_to_save (void)
 {
-  int i;
+  unsigned i;
 
   for (i = REG_P0; i <= REG_P5; i++)
     if ((regs_ever_live[i] && ! call_used_regs[i])
@@ -204,7 +204,6 @@ expand_prologue_reg_save (rtx spreg, int saveall)
   XVECEXP (pat, 0, total + 1) = gen_rtx_SET (VOIDmode, spreg,
 					     gen_rtx_PLUS (Pmode, spreg,
 							   val));
-  RTX_FRAME_RELATED_P (XVECEXP (pat, 0, 0)) = 1;
   RTX_FRAME_RELATED_P (XVECEXP (pat, 0, total + 1)) = 1;
   for (i = 0; i < total; i++)
     {
@@ -1241,7 +1240,7 @@ function_arg (CUMULATIVE_ARGS *cum, enum machine_mode mode, tree type,
     return NULL_RTX;
 
   if (cum->nregs)
-    return gen_rtx (REG, mode, *(cum->arg_regs));
+    return gen_rtx_REG (mode, *(cum->arg_regs));
 
   return NULL_RTX;
 }
@@ -1383,14 +1382,15 @@ legitimize_pic_address (rtx orig, rtx reg)
 	      emit_insn (gen_movsi_high_pic (reg, addr));
 	      emit_insn (gen_movsi_low_pic (reg, reg, addr));
 	      emit_insn (gen_addsi3 (reg, reg, pic_offset_table_rtx));
-	      new = gen_rtx (MEM, Pmode, reg);
+	      new = gen_rtx_MEM (Pmode, reg);
 	    }
 	  else
 	    {
 	      rtx tmp = gen_rtx_UNSPEC (Pmode, gen_rtvec (1, addr),
 					UNSPEC_MOVE_PIC);
-	      new = gen_rtx (MEM, Pmode,
-			     gen_rtx_PLUS (Pmode, pic_offset_table_rtx, tmp));
+	      new = gen_rtx_MEM (Pmode,
+				 gen_rtx_PLUS (Pmode, pic_offset_table_rtx,
+					       tmp));
 	    }
 	  emit_move_insn (reg, new);
 	}
@@ -1434,11 +1434,11 @@ legitimize_pic_address (rtx orig, rtx reg)
 
       if (GET_CODE (addr) == PLUS && CONSTANT_P (XEXP (addr, 1)))
 	{
-	  base = gen_rtx (PLUS, Pmode, base, XEXP (addr, 0));
+	  base = gen_rtx_PLUS (Pmode, base, XEXP (addr, 0));
 	  addr = XEXP (addr, 1);
 	}
 
-      return gen_rtx (PLUS, Pmode, base, addr);
+      return gen_rtx_PLUS (Pmode, base, addr);
     }
 
   return new;
@@ -2070,7 +2070,7 @@ split_load_immediate (rtx operands[])
      also implement with BITSET/BITCLR.  */
   if (num_zero
       && shifted >= -32768 && shifted < 65536
-      && ((regno <= REG_R7)
+      && (D_REGNO_P (regno)
 	  || (regno >= REG_P0 && regno <= REG_P7 && num_zero <= 2)))
     {
       emit_insn (gen_movsi (operands[0], GEN_INT (shifted)));
@@ -2082,7 +2082,7 @@ split_load_immediate (rtx operands[])
   tmp |= -(tmp & 0x8000);
 
   /* If high word has one bit set or clear, try to use a bit operation.  */
-  if (regno <= REG_R7)
+  if (D_REGNO_P (regno))
     {
       if (log2constp (val & 0xFFFF0000))
 	{
@@ -2097,7 +2097,7 @@ split_load_immediate (rtx operands[])
 	}
     }
 
-  if (regno <= REG_P7)
+  if (D_REGNO_P (regno))
     {
       if (CONST_7BIT_IMM_P (tmp))
 	{
@@ -2345,7 +2345,7 @@ push_multiple_operation (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
       regno = REGNO (src);
       if (group == 0)
 	{
-	  if (regno >= REG_R0 && regno <= REG_R7)
+	  if (D_REGNO_P (regno))
 	    {
 	      group = 1;
 	      first_dreg_to_save = lastdreg = regno - REG_R0;
@@ -2449,6 +2449,7 @@ void
 output_push_multiple (rtx insn, rtx *operands)
 {
   char buf[80];
+  /* Validate the insn again, and compute first_[dp]reg_to_save. */
   if (! push_multiple_operation (PATTERN (insn), VOIDmode))
     abort ();
   if (first_dreg_to_save == 8)
@@ -2468,6 +2469,7 @@ void
 output_pop_multiple (rtx insn, rtx *operands)
 {
   char buf[80];
+  /* Validate the insn again, and compute first_[dp]reg_to_save. */
   if (! pop_multiple_operation (PATTERN (insn), VOIDmode))
     abort ();
 
@@ -2610,8 +2612,7 @@ bfin_adjust_cost (rtx insn, rtx link, rtx dep_insn, int cost)
       rtx pat = PATTERN (dep_insn);
       rtx dest = SET_DEST (pat);
       rtx src = SET_SRC (pat);
-      if (! ADDRESS_REGNO_P (REGNO (dest))
-	  || ! (REGNO (src) <= REG_R7))
+      if (! ADDRESS_REGNO_P (REGNO (dest)) || ! D_REGNO_P (REGNO (src)))
 	return cost;
       return cost + (dep_insn_type == TYPE_MOVE ? 4 : 3);
     }
