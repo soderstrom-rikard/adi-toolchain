@@ -414,8 +414,6 @@ linux_wait_for_event (struct thread_info *child)
   struct process_info *event_child;
   int wstat;
 
-fprintf(stderr, "waiting for event\n");
-
   /* Check for a process with a pending status.  */
   /* It is possible that the user changed the pending task's registers since
      it stopped.  We correctly handle the change of PC if we hit a breakpoint
@@ -460,9 +458,7 @@ fprintf(stderr, "waiting for event\n");
 	event_child = NULL;
       else
 	event_child = get_thread_process (child);
-fprintf(stderr, "before linux_wait\n");
       linux_wait_for_process (&event_child, &wstat);
-fprintf(stderr, "after linux_wait using threads %d\n", using_threads);
 
       if (event_child == NULL)
 	error ("event from unknown child");
@@ -527,20 +523,17 @@ fprintf(stderr, "after linux_wait using threads %d\n", using_threads);
 	      continue;
 	    }
 	}
-printf("returned from sigwait with WIFSTOPPED %d WSTOPSIG %d WIFSIGNALLED %d WTERMSIG %d\n", WIFSTOPPED (wstat), WSTOPSIG (wstat), WIFSIGNALED(wstat), WTERMSIG(wstat));
       /* If this event was not handled above, and is not a SIGTRAP, report
 	 it.  */
       if (!WIFSTOPPED (wstat) || WSTOPSIG (wstat) != SIGTRAP)
 	return wstat;
 
-printf("the_low_target.getpc is %x\n", the_low_target.get_pc);
       /* If this target does not support breakpoints, we simply report the
 	 SIGTRAP; it's of no concern to us.  */
       if (the_low_target.get_pc == NULL)
 	return wstat;
 
       stop_pc = get_stop_pc ();
-printf("stop_pc is %x\n", stop_pc);
 
       /* bp_reinsert will only be set if we were single-stepping.
 	 Notice that we will resume the process after hitting
@@ -864,19 +857,12 @@ linux_resume_one_process (struct inferior_list_entry *entry,
       free (*p_sig);
       *p_sig = NULL;
     }
-fprintf(stderr, "**** calling regcache_invalidate_one ***\n");
   regcache_invalidate_one ((struct inferior_list_entry *)
 			   get_process_thread (process));
   errno = 0;
   process->stopped = 0;
   process->stepping = step;
-#if 1 /* PCS */
-fprintf(stderr, "**** calling ptrace to continue signal is %d****\n", signal);fflush(stderr);
   ptrace (step ? PTRACE_SINGLESTEP : PTRACE_CONT, process->lwpid, 0, signal);
-#else
-  ptrace (step ? PTRACE_SINGLESTEP : PTRACE_CONT, process->lwpid, 0, signal == 4?0:signal);
-#endif
-fprintf(stderr, "**** ptrace returned ****\n");fflush(stderr);
 
   current_inferior = saved_inferior;
   if (errno)
@@ -958,7 +944,9 @@ fprintf(stderr, "calling ptrace with patam first = %d  second = %d third = %d fo
 #endif
       val = 
 	ptrace (PTRACE_PEEKUSER, inferior_pid, (PTRACE_ARG3_TYPE) regaddr, 0);
+#ifdef JYOTIK_DEBUG_1
 fprintf(stderr, "ptrace returned reg %d=%x\n", (int)regaddr/4, (int)val);
+#endif
       *(PTRACE_XFER_TYPE *) (buf + i) = val;
       regaddr += sizeof (PTRACE_XFER_TYPE);
       if (errno != 0)

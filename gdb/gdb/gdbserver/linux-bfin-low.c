@@ -22,9 +22,9 @@
 #include "server.h"
 #include "linux-low.h"
 #include <asm/asm-offsets.h>
-#ifdef HAVE_SYS_REG_H
-#include <sys/reg.h>
-#endif
+//#ifdef HAVE_SYS_REG_H
+//#include <sys/reg.h>
+//#endif
 
 //#define bfin_num_regs 52 
 //#define bfin_num_regs 49
@@ -61,7 +61,6 @@ bfin_get_pc ()
 {
   unsigned long pc;
   collect_register_by_name ("pc", &pc);
-printf( "in get pc %x\n", pc);
   return pc;
 }
 
@@ -69,7 +68,6 @@ static void
 bfin_set_pc (CORE_ADDR pc)
 {
   unsigned long newpc = pc;
-printf( "in set pc %x\n", pc);
   supply_register_by_name ("pc", &newpc);
 }
 
