@@ -1494,6 +1494,13 @@ compute_argument_block_size (reg_parm_stack_space, args_size,
 #ifndef OUTGOING_REG_PARM_STACK_SPACE
       args_size->constant -= reg_parm_stack_space;
 #endif
+
+#ifdef OUTGOING_REG_PARM_STACK_SPACE
+      if (reg_parm_stack_space > 0)
+        {
+		unadjusted_args_size = args_size->constant;
+  	}
+#endif
     }
   return unadjusted_args_size;
 }
