@@ -185,41 +185,6 @@
 
 (define_function_unit "dag" 1 1 (eq_attr "sets_preg" "yes") 4 0)
 
-;;; WORD conversion patterns
-
-(define_insn ""
-  [(set (match_operand:SI 0 "register_operand" "=d")
-    (sign_extend:SI (subreg:HI (match_operand:SI 1 "register_operand" "d")0)))]
-  ""
-  "%0 = %h1 (X);" /* "%0 =XH %1;"*/
-  [(set_attr "type" "alu0")])
-
-(define_insn ""
-  [(set (match_operand:SI 0 "register_operand" "=d")
-    (zero_extend:SI (subreg:HI (match_operand:SI 1 "register_operand" "d")0)))]
-  ""
-  "%0 = %h1 (Z);" /* "%0 = H %1;"*/
-  [(set_attr "type" "alu0")])
-
-(define_insn "extendhisi2"
-  [(set (match_operand:SI 0 "register_operand" "=d, d")
-	(sign_extend:SI (match_operand:HI 1 "nonimmediate_operand" "d, m")))]
-  ""
-  "@
-   %0 = %h1 (X);
-   %0 = W %h1 (X);"
-  [(set_attr "type" "alu0,mcld")])
-
-(define_insn "zero_extendhisi2"
-  [(set (match_operand:SI 0 "register_operand" "=d, d")
-	(zero_extend:SI (match_operand:HI 1 "nonimmediate_operand" "d, m")))]
-  ""
-  "@
-   %0 = %h1 (Z);
-   %0 = W%h1 (Z);"
-  [(set_attr "type" "alu0,mcld")])
-
-
 ;;;
 ;;; #    #   ####   #    #  ######   ####
 ;;; ##  ##  #    #  #    #  #       #
@@ -300,6 +265,17 @@
       operands[5] = hi_half[1];
     }
 })
+
+(define_insn "movbi"
+  [(set (match_operand:BI 0 "nonimmediate_operand" "=da,da,*cf,*cf,d,mr,!*e,!*e,!d,C,d")
+        (match_operand:BI 1 "general_operand"      "  x,ix,  x, ix,mr,d,  d, eP,*e,d,C"))]
+
+  ""
+  "*
+   output_load_immediate (operands);
+   return \"\";
+  "
+  [(set_attr "type" "move,mvi,move,mvi,mcld,mcst,move,move,move,compare,compare")])
 
 (define_insn "*movsi_insn"
   [(set (match_operand:SI 0 "nonimmediate_operand" "=da,da,*cf,*cf,da,mr,!*e,!*e,!d")
@@ -389,9 +365,35 @@
   ""
   " expand_move (operands, QImode); ")
 
-;;;;;;;;;;;;;;;;;; BYTE conversion patterns ;;;;;;;;;;;;;;;;;;;;;;
+;; Sign and zero extensions
+
+(define_insn "extendhisi2"
+  [(set (match_operand:SI 0 "valid_reg_operand" "=d, d")
+	(sign_extend:SI (match_operand:HI 1 "nonimmediate_operand" "d, m")))]
+  ""
+  "@
+   %0 = %h1 (X);
+   %0 = W %h1 (X);"
+  [(set_attr "type" "alu0,mcld")])
+
+(define_insn "zero_extendhisi2"
+  [(set (match_operand:SI 0 "valid_reg_operand" "=d, d")
+	(zero_extend:SI (match_operand:HI 1 "nonimmediate_operand" "d, m")))]
+  ""
+  "@
+   %0 = %h1 (Z);
+   %0 = W%h1 (Z);"
+  [(set_attr "type" "alu0,mcld")])
+
+(define_insn "zero_extendbisi2"
+  [(set (match_operand:SI 0 "valid_reg_operand" "=d")
+	(zero_extend:SI (match_operand:BI 1 "nonimmediate_operand" "C")))]
+  ""
+  "%0 = %1;"
+  [(set_attr "type" "compare")])
+
 (define_insn "extendqihi2"
-  [(set (match_operand:HI 0 "register_operand" "=d, d")
+  [(set (match_operand:HI 0 "valid_reg_operand" "=d, d")
 	(sign_extend:HI (match_operand:QI 1 "nonimmediate_operand" "m, d")))]
   ""
   "@
@@ -400,7 +402,7 @@
   [(set_attr "type" "mcld,alu0")])
 
 (define_insn "extendqisi2"
-  [(set (match_operand:SI 0 "register_operand" "=d, d")
+  [(set (match_operand:SI 0 "valid_reg_operand" "=d, d")
 	(sign_extend:SI (match_operand:QI 1 "nonimmediate_operand" "m, d")))]
   ""
   "@
@@ -410,7 +412,7 @@
 
 
 (define_insn "zero_extendqihi2"
-  [(set (match_operand:HI 0 "register_operand" "=d, d")
+  [(set (match_operand:HI 0 "valid_reg_operand" "=d, d")
 	(zero_extend:HI (match_operand:QI 1 "nonimmediate_operand" "m, d")))]
   ""
   "@
@@ -420,13 +422,14 @@
 
 
 (define_insn "zero_extendqisi2"
-  [(set (match_operand:SI 0 "register_operand" "=d, d")
+  [(set (match_operand:SI 0 "valid_reg_operand" "=d, d")
 	(zero_extend:SI (match_operand:QI 1 "nonimmediate_operand" "m, d")))]
   ""
   "@
    %0 = B %1 (Z);
    %0 = %T1 (Z);"
   [(set_attr "type" "mcld,alu0")])
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;                INSN related with DI mode              ;;;;;;;;;;;

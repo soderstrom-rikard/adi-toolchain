@@ -1940,7 +1940,7 @@ output_load_immediate (rtx *operands) {
        abort ();
      }
      else if (GET_CODE (operands[1]) == MEM
-	      && (mode == HImode || mode == QImode))
+	      && GET_MODE_SIZE (mode) < UNITS_PER_WORD)
        {
 	 rtx x = XEXP (operands[1], 0);
 	 if (GET_CODE (x) == POST_INC && REGNO(XEXP(x,0)) == STACK_POINTER_REGNUM)
@@ -1952,7 +1952,7 @@ output_load_immediate (rtx *operands) {
 	 return "";
        }
      else if (GET_CODE (operands[0]) == MEM
-	      && (mode == HImode || mode == QImode))
+	      && GET_MODE_SIZE (mode) < UNITS_PER_WORD)
        {
 	 rtx x = XEXP (operands[0], 0);
 	 if (GET_CODE (x) == PRE_DEC && REGNO(XEXP(x,0)) == STACK_POINTER_REGNUM)

@@ -1,3 +1,14 @@
+2004-10-17  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (output_load_immediate): Use byte accesses for
+	BImode memory locations.
+	* config/bfin/bfin.md (two useless extension patterns using subregs):
+	Delete.
+	(extendhisi2, zero_extendhisi2, extendqihi2, extendqisi2,
+	zero_extendqihi2, zero_extendqisi2): Use valid_reg_operand as
+	destination predicate.
+	(movbi, zero_extendbisi2): New patterns.
+
 2004-10-14  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (STRUCTURE_SIZE_BOUNDARY): Delete macro.
