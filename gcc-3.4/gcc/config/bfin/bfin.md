@@ -120,10 +120,15 @@
 ;;; unconditional br are 12-bit imm pcrelative branches *2
 ;;; conditional   br are 10-bit imm pcrelative branches *2
 ;;; brcc 10-bit:
-;;;   1024 10-bit imm *2 is 2048 (-1024..1023)
+;;;   1024 10-bit imm *2 is 2048 (-1024..1022)
 ;;; br 12-bit  :
-;;;   4096 12-bit imm *2 is 8192 (-4096..4097)
-;;;   
+;;;   4096 12-bit imm *2 is 8192 (-4096..4094)
+;;;
+;;; The way the (pc) rtx works in these calculations is somewhat odd;
+;;; for backward branches it's the address of the current instruction,
+;;; for forward branches it's the previously known address of the following
+;;; instruction - we have to take this into account by reducing the range
+;;; for a forward branch.
 (define_attr "length" ""
   (cond [(eq_attr "type" "mcld")
          (if_then_else (match_operand 1 "effective_address_32bit_p" "")
@@ -147,19 +152,19 @@
 
          (eq_attr "type" "br")
   	 (if_then_else (and
-	                  (lt (minus (pc) (match_dup 0)) (const_int 4097))
-	                  (gt (minus (pc) (match_dup 0)) (const_int -4098)))
+	                  (le (minus (match_dup 0) (pc)) (const_int 4092))
+	                  (ge (minus (match_dup 0) (pc)) (const_int -4096)))
         	  (const_int 2)
                   (const_int 4))
 
          (eq_attr "type" "brcc")
 	 (cond [(and
-	            (lt (minus (pc) (match_dup 1)) (const_int 1023))
-	            (gt (minus (pc) (match_dup 1)) (const_int -1024)))
+	            (le (minus (match_dup 1) (pc)) (const_int 1020))
+	            (ge (minus (match_dup 1) (pc)) (const_int -1024)))
 		  (const_int 2)
 		(and
-	            (lt (minus (pc) (match_dup 1)) (const_int 4097))
-	            (gt (minus (pc) (match_dup 1)) (const_int -4098)))
+	            (le (minus (match_dup 1) (pc)) (const_int 4090))
+	            (ge (minus (match_dup 1) (pc)) (const_int -4096)))
 		  (const_int 4)]
 	       (const_int 6))
         ]
