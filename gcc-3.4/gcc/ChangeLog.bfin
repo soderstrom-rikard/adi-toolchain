@@ -18,6 +18,19 @@
 	* config/bfin/bfin.c (output_load_immediate): Replace code to handle
 	that alternative with an abort.
 
+	* config/bfin/bfin.md (reload_insi, reload_inhi, reload_inqi,
+	reload_outsi, reload_outhi, reload_outqi): Delete.
+	(movhi_insn, movqi_insn): Named the patterns.
+	(movsi_insn, movhi_insn, movqi_insn, movsf_insn): Change constraints
+	to exactly describe the machine's capabilities.
+	* config/bfin/bfin.h (enum reg_class, REG_CLASS_NAMES,
+	REG_CLASS_CONTENTS): Add new class MOST_REGS, union of GENERAL_REGS
+	and DAGREGS.
+	* config/bfin/bfin.c (SWITCH_SUBREG): Delete macro.
+	(secondary_input_reload_class): Rewrite.
+	(symbolic_or_const_operand_p): Renamed from symbolic_operand_p; added
+	CONST_INT and CONST_DOUBLE.  All callers changed.
+
 2004-09-01  Bernd Schmidt  <bernds@btinternet.com>
 
 	* config/bfin/bfin.c (imm7bit_operand, imm16bit_operand): Test for

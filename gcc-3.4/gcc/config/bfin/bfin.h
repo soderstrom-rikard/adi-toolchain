@@ -495,6 +495,7 @@ enum reg_class
   AREGS,
   CCREGS,
   GENERAL_REGS,
+  MOST_REGS,
   ALL_REGS, LIM_REG_CLASSES
 };
 #define N_REG_CLASSES ((int)LIM_REG_CLASSES)
@@ -516,6 +517,7 @@ enum reg_class
    "AREGS",		\
    "CCREGS",		\
    "GENERAL_REGS",	\
+   "MOST_REGS",	\
    "ALL_REGS" }
 
 
@@ -544,6 +546,7 @@ enum reg_class
      0x00000000,    0x3,	/* AREGS */   \
      0x00000000,    0x4,        /* CCREGS */  \
      0x0000ffff,    0x0,	/* GENERAL_REGS */\
+     0xffffffff,    0x0,	/* MOST_REGS */\
      0xffffffff,    0x7,	/* ALL_REGS */\
      /*0xffffffff,    0x3, */	}
 

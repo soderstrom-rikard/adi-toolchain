@@ -803,11 +803,13 @@ int nonmemory_or_sym_operand (rtx op, enum machine_mode mode)
     return (nonmemory_operand (op, mode) 
 	|| (TARGET_MINI_CONST_POOL && GET_CODE (op) == SYMBOL_REF));
 }
-int symbolic_operand_p (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) 
+int symbolic_or_const_operand_p (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) 
 {
   switch (GET_CODE (op)) {
   case SYMBOL_REF:
   case LABEL_REF:
+  case CONST_INT:
+  case CONST_DOUBLE:
     return 1;
   case CONST:
     op = XEXP (op, 0);
@@ -1631,114 +1633,44 @@ register_move_cost(enum reg_class class1, enum reg_class class2)
       : 2;
 }
 
-#define SWITCH_SUBREG(X)\
-  {while(GET_CODE(X)==SUBREG)X=SUBREG_REG(X);}
-
 enum reg_class
 secondary_input_reload_class(enum reg_class class,enum machine_mode mode, rtx x)
 {
-  if (REG_P (x)) { 
-	 /* 1.04.04 : Return DREGS assuming 'x' is IREGS and irrespective of mode */
-	 enum reg_class class1 = REGNO_REG_CLASS (REGNO (x));
-	 if (class1 == IREGS || class1 == BREGS) {
-	   return DREGS;
-   	 }
+  /* If we have HImode or QImode, we can only use DREGS as secondary registers;
+     in most other cases we can also use PREGS.  */
+  enum reg_class default_class = GET_MODE_SIZE (mode) == 4 ? DPREGS : DREGS;
+  enum reg_class x_class = NO_REGS;
+  enum rtx_code code = GET_CODE (x);
+
+  if (code == SUBREG)
+    x = SUBREG_REG (x), code = GET_CODE (x);
+  if (REG_P (x))
+    {
+      int regno = true_regnum (x);
+      if (regno == -1)
+	code = MEM;
+      else
+	x_class = REGNO_REG_CLASS (regno);
     }
 
-  if (REG_P (x) && REGNO (x) > FIRST_PSEUDO_REGISTER
-      && reg_equiv_mem[REGNO (x)])
-    x = reg_equiv_mem[REGNO (x)];
- 
-  SWITCH_SUBREG(x);
+  /* Data can usually be moved freely between registers of most classes.
+     AREGS are an exception; they can only move to or from another register
+     in AREGS or one in DREGS.  They can also be assigned the constant 0.  */
+  if (x_class == AREGS)
+    return class == DREGS || class == AREGS ? NO_REGS : DREGS;
 
-  switch (mode) {
-    case HImode:
-    case QImode:
-    /* To load in HImode, dreg is needed */
-      switch (GET_CODE(x)) {
-	case MEM:
-	  if (!reg_class_subset_p (class, DREGS))
-	    return DREGS;
-	  else
-	    return NO_REGS;
-	  break;
-        case CONST:
-        case CONST_INT:
-	  if (!reg_class_subset_p (class, DREGS))
-	    return DREGS;
-	   else
-	    return NO_REGS;
-	  break;
-        case SYMBOL_REF:
-        case LABEL_REF:
-	  if (!reg_class_subset_p (class, DREGS))
-	    return DREGS;
-	  else
-	    return NO_REGS;
-          break;
-	case REG:
-          /* Need dreg because pseudos are usually in memory */
-          if(REGNO(x) >= FIRST_PSEUDO_REGISTER)
-	  {
-            if (!reg_class_subset_p (class, DREGS))
-              return DREGS;
-            else
-              return NO_REGS;	}
-          else
-              return NO_REGS;
-          break;
-	default:
-	  return NO_REGS;
-	  break;
-       } /*switch (GET_CODE(x)) */
-       break;
-
-/* Aregs can be assigned Dregs or 0. (Areg = Dreg; Areg = 0;)
- * If Areg is source then destination must be Dreg. (Dreg = Areg;)
- * If source is memory then destination must be Dreg or Preg. (DPreg=mem;)
- * DImode NYI */
-    case SImode:
-    case SFmode:
-      switch (GET_CODE(x)) {
-	case MEM:
-	  if (!reg_class_subset_p (class, DPREGS))
-	    return DPREGS;
-	  else
-	    return NO_REGS;
-	  break;
-        case CONST:
-        case CONST_INT:
-	  if ((AREGS == class) && INTVAL(x) != 0) 
-	    return DREGS;
-	   else
-	    return NO_REGS;
-	  break;
-        case SYMBOL_REF:
-        case LABEL_REF:
-	  if (!reg_class_subset_p (class, DPREGS))
-	    return DPREGS;
-	  else
-	    return NO_REGS;
-          break;
-	case REG:
-          /* Need dpreg because pseudos are usually in memory */
-          if(REGNO(x) >= FIRST_PSEUDO_REGISTER)
-	  {
-            if (!reg_class_subset_p (class, DPREGS))
-              return DPREGS;
-            else
-              return NO_REGS;	}
-          else
-	    return NO_REGS;
-          break;
-	default:
-	  return NO_REGS;
-	  break;
-       } /*switch (GET_CODE(x)) */
-       break;
-    default:
+  if (class == AREGS)
+    if (x != const0_rtx && x_class != DREGS)
+      return DREGS;
+    else
       return NO_REGS;
-  } /* switch (mode) */
+
+  /* All registers other than AREGS can load arbitrary constants.  The only
+     case that remains is MEM.  */
+  if (code == MEM)
+    if (! reg_class_subset_p (class, default_class))
+      return default_class;
+  return NO_REGS;
 }
 
 enum reg_class
@@ -1880,6 +1812,8 @@ output_load_immediate (rtx *operands) {
  * H (regs) = huimm16   => 32-bit instr
  */
     int i;
+    enum machine_mode mode = GET_MODE (operands[0]);
+
     if (GET_CODE (operands[1]) == CONST_INT) {
 	int val = INTVAL (operands[1]);
 	int shifted_val = val;
@@ -1957,23 +1891,29 @@ output_load_immediate (rtx *operands) {
        abort ();
      }
      else if (GET_CODE (operands[1]) == MEM
-	&& GET_MODE (operands[1]) == HImode) {
-	rtx x = XEXP (operands[1], 0);
-	if (GET_CODE (x) == POST_INC && REGNO(XEXP(x,0)) == STACK_POINTER_REGNUM)
-	    output_asm_insn ("%0=%1;", operands);
-	else
-            output_asm_insn ("%0 =W %1 (X);", operands);
-        return "";
-     }
+	      && (mode == HImode || mode == QImode))
+       {
+	 rtx x = XEXP (operands[1], 0);
+	 if (GET_CODE (x) == POST_INC && REGNO(XEXP(x,0)) == STACK_POINTER_REGNUM)
+	   output_asm_insn ("%0=%1;", operands);
+	 else if (mode == HImode)
+	   output_asm_insn ("%0 = W %1 (X);", operands);
+	 else
+	   output_asm_insn ("%0 = B %1 (X);", operands);
+	 return "";
+       }
      else if (GET_CODE (operands[0]) == MEM
-	&& GET_MODE (operands[0]) == HImode) {
-	rtx x = XEXP (operands[0], 0);
-	if (GET_CODE (x) == PRE_DEC && REGNO(XEXP(x,0)) == STACK_POINTER_REGNUM)
-	    output_asm_insn ("%0=%1;", operands);
-	else	  
-            output_asm_insn ("W %0=%1;", operands);
-        return "";
-     }
+	      && (mode == HImode || mode == QImode))
+       {
+	 rtx x = XEXP (operands[0], 0);
+	 if (GET_CODE (x) == PRE_DEC && REGNO(XEXP(x,0)) == STACK_POINTER_REGNUM)
+	   output_asm_insn ("%0=%1;", operands);
+	 else if (mode == HImode)
+	   output_asm_insn ("W %0=%1;", operands);
+	 else
+	   output_asm_insn ("B %0=%1;", operands);
+	 return "";
+       }
 
      output_asm_insn ("%0 =%1;", operands);
      return "";
