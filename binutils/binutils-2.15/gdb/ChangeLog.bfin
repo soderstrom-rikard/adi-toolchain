@@ -1,4 +1,7 @@
 2005-03-07  Pradip Shah <pcs@rrap-software.com>
+	* bfin-tdep.c (bfin_push_dummy_call) : Simplified as per ABI.
+
+2005-03-07  Pradip Shah <pcs@rrap-software.com>
 	* bfin-tdep.c (bfin_extract_return_value, bfin_store_return_value,
 	bfin_return_value) : Simplified as per ABI.
 

@@ -1124,20 +1124,8 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
       struct type *value_type = VALUE_ENCLOSING_TYPE (args[i]);
       int len = TYPE_LENGTH (value_type);
       int container_len = (len + 3) & ~3;
-      int offset;
-
-	/* TODO : Verify blackfin allignment requriements from Raja */
-      /* Non-scalars bigger than 4 bytes are left aligned, others are
-         right aligned.  */
-      if ((TYPE_CODE (value_type) == TYPE_CODE_STRUCT
-           || TYPE_CODE (value_type) == TYPE_CODE_UNION
-           || TYPE_CODE (value_type) == TYPE_CODE_ARRAY)
-          && len > 4)
-        offset = 0;
-      else
-        offset = container_len - len;
       sp -= container_len;
-      write_memory (sp + offset, VALUE_CONTENTS_ALL (args[i]), len);
+      write_memory (sp, VALUE_CONTENTS_ALL (args[i]), container_len);
     }
 
   /* initialize R0, R1 and R2 to the first 3 words of paramters */
