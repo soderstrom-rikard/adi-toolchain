@@ -4,6 +4,15 @@ port and what to expect next.
 If you are working on something, feel free to add that information
 here. The port follows the Visual DSP ABI for parameter passing.
 ##############################################
+1  Jun 2004 : Modified gcc/config/bfin/bfin.c, bfin.h, bfin.md
+              1. R3 was used as fixed register, now i reverted it back.
+              2. Movhi, added for Dreg = Preg, Preg = Dreg
+              3. reg += i, is added for Dreg, Mreg, Ireg
+              4. reg -=Md, is added
+              5. in bfin.md: 942, \"%0 +=-%2;\", is removed ( no of constraint was not
+                 matching no of template)
+              2.6 kernel now builds without internal compiler errors.
+              However, gcc torture results worsened!
 30 May 2004 : VDSP ABI supported.
               gcc-3.4 tree started. 3.4 port is unstable.
               Recently incorporated correct length info for move
