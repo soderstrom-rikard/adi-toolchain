@@ -533,6 +533,7 @@ enum reg_class
    (LETTER) == 'C' ? CCREGS : 		\
    (LETTER) == 'x' ? MOST_REGS :	\
    (LETTER) == 'y' ? PROLOGUE_REGS :	\
+   (LETTER) == 'w' ? NON_A_CC_REGS :	\
    NO_REGS)
 
 /* The same information, inverted:

@@ -1573,8 +1573,7 @@ reg_or_7bit_operand (rtx op, enum machine_mode mode)
 }
 
 /* Used for secondary reloads, this function returns 1 if OP is of the
-   form (plus (fp) (const_int)), where CONST_INT can't be added in one
-   instruction.  */
+   form (plus (fp) (const_int)).  */
 
 int
 fp_plus_const_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
@@ -1587,7 +1586,7 @@ fp_plus_const_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
   return (REG_P (op1)
 	  && (REGNO (op1) == FRAME_POINTER_REGNUM
 	      || REGNO (op1) == STACK_POINTER_REGNUM)
-	  && GET_CODE (op2) == CONST_INT && ! CONST_7BIT_IMM_P (INTVAL (op2)));
+	  && GET_CODE (op2) == CONST_INT);
 }
 
 /* Returns 1 if OP is a symbolic operand, i.e. a symbol_ref or a label_ref,
@@ -1808,7 +1807,20 @@ secondary_input_reload_class (enum reg_class class, enum machine_mode mode,
      This happens as a side effect of register elimination, and we need
      a scratch register to do it.  */
   if (fp_plus_const_operand (x, mode))
-    return class == PREGS ? NO_REGS : PREGS;
+    {
+      rtx op2 = XEXP (x, 1);
+      int large_constant_p = ! CONST_7BIT_IMM_P (INTVAL (op2));
+
+      if (class == PREGS || class == PREGS_CLOBBERED)
+	return NO_REGS;
+      /* If destination is a DREG, we can do this without a scratch register
+	 if the constant is valid for an add instruction.  */
+      if (class == DREGS || class == DPREGS)
+	return large_constant_p ? PREGS : NO_REGS;
+      /* Reloading to anything other than a DREG?  Use a PREG scratch
+	 register.  */
+      return PREGS;
+    }
 
   /* Data can usually be moved freely between registers of most classes.
      AREGS are an exception; they can only move to or from another register

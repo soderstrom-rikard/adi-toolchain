@@ -29,6 +29,12 @@
 	* config/bfin/bfin.c (bfin_rtx_costs): Add some more costs for better
 	accuracy.
 
+	* config/bfin/bfin.h (REG_CLASS_FROM_LETTER): Add 'w'.
+	* config/bfin/bfin.md (reload_insi): Use it for operand 0.
+	* config/bfin/bfin.c (fp_plus_const_operand): Allow any constant.
+	(secondary_input_reload_class): Add more variants of register classes
+	and constants involved in reloading (FP+const).
+
 2005-02-09  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (CLASS_LIKELY_SPILLED): Reduce to only include

@@ -373,12 +373,16 @@
   [(set_attr "type" "mcld")
    (set_attr "length" "2")])
 
+;; The first alternative is used to make reload choose a limited register
+;; class when faced with a movsi_insn that had its input operand replaced
+;; with a PLUS.  We generally require fewer secondary reloads this way.
 (define_insn "*movsi_insn"
-  [(set (match_operand:SI 0 "nonimmediate_operand" "=x*y,da,x,x,x,da,mr")
-        (match_operand:SI 1 "general_operand" "x*y,xKs7,xKsh,xKuh,ix,mr,da"))]
+  [(set (match_operand:SI 0 "nonimmediate_operand" "=da,x*y,da,x,x,x,da,mr")
+        (match_operand:SI 1 "general_operand" "da,x*y,xKs7,xKsh,xKuh,ix,mr,da"))]
 
   "GET_CODE (operands[0]) != MEM || GET_CODE (operands[1]) != MEM"
   "@
+   %0 = %1;
    %0 = %1;
    %0 = %1 (X);
    %0 = %1 (X);
@@ -386,8 +390,8 @@
    #
    %0 = %1;
    %0 = %1;"
-  [(set_attr "type" "move,mvi,mvi,mvi,*,mcld,mcst")
-   (set_attr "length" "2,2,4,4,*,*,*")])
+  [(set_attr "type" "move,move,mvi,mvi,mvi,*,mcld,mcst")
+   (set_attr "length" "2,2,2,4,4,*,*,*")])
 
 (define_insn "*movhi_insn"
   [(set (match_operand:HI 0 "nonimmediate_operand" "=x,da,x,d,mr")
@@ -1176,9 +1180,11 @@
 
 ;; A pattern to reload the equivalent of
 ;;   (set (Dreg) (plus (FP) (large_constant)))
+;; or
+;;   (set (dagreg) (plus (FP) (arbitrary_constant))) 
 ;; using a scratch register
 (define_expand "reload_insi"
-  [(parallel [(set (match_operand:SI 0 "register_operand" "=x")
+  [(parallel [(set (match_operand:SI 0 "register_operand" "=w")
                    (match_operand:SI 1 "fp_plus_const_operand" ""))
               (clobber (match_operand:SI 2 "register_operand" "=&a"))])]
   ""
