@@ -802,16 +802,6 @@
   "")
 
 (define_insn ""
-  [(set (match_operand:SI 0 "register_operand" "=d")
-        (plus:SI (match_operand:SI 1 "register_operand" "a")
-                 (match_operand:SI 2 "register_operand" "a")))
-   (clobber (match_scratch:SI 3 "=&a"))]
-  ""
-  "%3 = %1 + %2;%0 = %3;"
-  [(set_attr "type" "alu0")
-   (set_attr "length" "4")])
-
-(define_insn ""
   [(set (match_operand:SI 0 "register_operand"           "=ad,a,d")
 	(plus:SI (match_operand:SI 1 "register_operand"  "%0, a,d")
 		 (match_operand:SI 2 "reg_or_7bit_operand" " M, a,d")))]

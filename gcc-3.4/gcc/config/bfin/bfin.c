@@ -1553,18 +1553,17 @@ asm_output_ascii (FILE *file, const char *str, int sz) {
 }
 
 
-int hard_regno_mode_ok (int regno,enum machine_mode mode) {
+int
+hard_regno_mode_ok (int regno, enum machine_mode mode)
+{
     /* Allow only dregs to store value of mode HI or QI */
-    enum reg_class class = REGNO_REG_CLASS(regno);
+    enum reg_class class = REGNO_REG_CLASS (regno);
     int ret;
 
-    ret = ((class == CCREGS) && !(mode == CCmode || mode ==SImode)) ? 0:
-	((class == PREGS || class == AREGS || class == CIRCREGS)
-        && (mode == HImode || mode == QImode)) ? 0 :
-	1;
+    if (class == CCREGS)
+	return mode == CCmode || mode == SImode;
 
-
-    return ret;
+    return mode != CCmode;
 }
 
 /* Returns 1 if OP is either the constant zero or a register.  If a

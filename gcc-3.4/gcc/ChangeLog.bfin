@@ -1,3 +1,9 @@
+2004-10-04  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (hard_regno_mode_ok): Allow all registers to hold
+	QImode and HImode values.
+	* config/bfin/bfin.md (recently added addsi pattern): Delete.
+
 2004-10-03  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (TRAMPOLINE_TEMPLATE): Correct instruction
