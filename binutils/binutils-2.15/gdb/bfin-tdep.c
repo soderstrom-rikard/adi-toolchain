@@ -112,12 +112,21 @@ extern void bfin_software_single_step (enum target_signal, int);
 #define P_MNOP				0xC803 // MNOP
 #define P_EXCPT_MIN			0x00A0 // excpt, 16-bit, min
 #define P_EXCPT_MAX			0x00AF // excpt, 16-bit, max
+#define P_BIT_MULTI_INS_1 		0xC000 // multi instruction bit 1, 32-bit
+#define P_BIT_MULTI_INS_2 		0x0800 // multi instruction bit 2, 32-bit
+
+/* used for signal handling */
+#define P_SIGNAL_INS_1			0x0077E128 // Instruction 1 for signal
+#define P_RT_SIGNAL_INS_1		0x00ADE128 // Instruction 1 for rt_signal
+#define P_SIGNAL_INS_2			0x000000A0 // Instruction 2 is common for both signal and rt_signal
+
 
 #define UPPER_LIMIT			(40)
 #define BFIN_NOT_TESTED	       		0	
 /* Frame offsets */
 #define OLD_FP_OFFSET			0
 #define RETS_OFFSET			4
+
 
 /* Each OS has a different mechanism for accessing the various
    registers stored in the sigcontext structure.
@@ -426,7 +435,7 @@ bfin_next_bp_addr (CORE_ADDR pc)
   }
   else if (op >= P_EXCPT_MIN && op <= P_EXCPT_MAX) {
     op_prev = read_memory_unsigned_integer (pc - 4, 4);
-    if (op_prev == 0x0077e128) {
+    if ((op_prev == P_SIGNAL_INS_1) || (op_prev == P_RT_SIGNAL_INS_1)) {
       char buf[4];
       struct frame_info *next_frame;
       next_frame = get_current_frame ();
@@ -480,13 +489,13 @@ bfin_software_single_step (enum target_signal sig, int insert_breakpoints_p)
 }
 
 /* Check whether insn1 and insn2 are parts of a signal trampoline.  */
-#define IS_SIGTRAMP(insn1, insn2)               \
- (/* P0=0x77 (X); EXCPT 0x0 */                  \
- (insn1 == 0x0077e128 && insn2 == 0x000000a0))
+#define IS_SIGTRAMP(insn1, insn2)              					 \
+ (/* P0=0x77 (X); EXCPT 0x0 */                  				 \
+ (insn1 == P_SIGNAL_INS_1) && ((insn2 & P_SIGNAL_INS_2) == P_SIGNAL_INS_2))
 
-#define IS_RT_SIGTRAMP(insn1, insn2)               \
- (/* P0=0xad (X); EXCPT 0x0 */                  \
- (insn1 == 0x00ade128 && (insn2 & 0x000000a0) == 0x000000a0))
+#define IS_RT_SIGTRAMP(insn1, insn2)               				 \
+ (/* P0=0xad (X); EXCPT 0x0 */                 					 \
+ (insn1 == P_RT_SIGNAL_INS_1) && ((insn2 & P_SIGNAL_INS_2) == P_SIGNAL_INS_2))
 
 #define SIGCONTEXT_OFFSET   28
 #define UCONTEXT_OFFSET     172
@@ -1226,13 +1235,9 @@ bfin_extract_return_value (struct type *type,
   /* If the the type is a plain integer, then the access is
      straight-forward.  Otherwise we have to play around a bit more.  */
   int len = TYPE_LENGTH (type);
-  int regno = BFIN_R0_REGNUM;
   ULONGEST tmp;
+  int regno = BFIN_R0_REGNUM;
 
-  /* this is only for scalar types.
-     Need to investigate the return value mechanism for structures.
-     The caller is allocating space and using a pointer register
-  */
   gdb_assert(len <= 8);
 
   while (len > 0) {
@@ -1263,6 +1268,7 @@ bfin_store_return_value (struct type *type, struct regcache *regs,
   int regno = BFIN_R0_REGNUM;
 
   gdb_assert(len <= 8);
+
   while (len > 0)
   {
     regcache_cooked_write (regs, regno++, valbuf);
@@ -1270,7 +1276,6 @@ bfin_store_return_value (struct type *type, struct regcache *regs,
     valbuf += INT_REGISTER_RAW_SIZE;
   }
 }
-
 
 /* Determine, for architecture GDBARCH, how a return value of TYPE
    should be returned.  If it is supposed to be returned in registers,
@@ -1282,6 +1287,9 @@ bfin_return_value (struct gdbarch *gdbarch, struct type *type,
                    struct regcache *regcache, void *readbuf,
                    const void *writebuf)
 {
+  if((TYPE_CODE(type) == TYPE_CODE_STRUCT)
+  || (TYPE_CODE(type) == TYPE_CODE_UNION))
+    return RETURN_VALUE_STRUCT_CONVENTION;
 
   if(TYPE_LENGTH (type) > 2 * INT_REGISTER_RAW_SIZE)
     return RETURN_VALUE_STRUCT_CONVENTION;
