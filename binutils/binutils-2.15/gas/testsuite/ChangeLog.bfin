@@ -1,3 +1,10 @@
+2004-12-30  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/arithmetic.d: Update expected output.
+	* gas/bfin/vector.d: Likewise.
+	* gas/bfin/vector2.d: Likewise.
+	* gas/bfin/load.d: Likewise.
+
 2004-12-28  Catherine Moore  <clm@cm00re.com>
 
 	* gas/bfin/load.d: Update expected output.

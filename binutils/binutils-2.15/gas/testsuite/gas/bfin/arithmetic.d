@@ -21,7 +21,7 @@ Disassembly of section .text:
   22:	04 c4 30 2c 	R6=R6\+R0 \(S\);
   26:	02 c4 10 a8 	R4.L=R2.H\+R0.L \(S\);
   2a:	22 c4 09 aa 	R5.H=R1.H\+R1.L \(S\);
-  2e:	02 c4 35 0c	R6.L=R6.L\+R5.L \(NS\);
+  2e:	02 c4 35 0c 	R6.L=R6.L\+R5.L \(NS\);
 
 00000032 <add_sub_prescale_down>:
   32:	05 c4 01 98 	R4.L=R0\+R1\(RND20\);
@@ -50,7 +50,7 @@ Disassembly of section .text:
   62:	2b 42       	DIVQ\(R3,R5\);
 
 00000064 <expadj>:
-  60:	07 c6 25 0c 	R6.L=EXPADJ \(R5,R4.L\);
+  64:	07 c6 25 0c 	R6.L=EXPADJ \(R5,R4.L\);
   68:	07 c6 08 ca 	R5.L=EXPADJ \(R0.H,R1.L\);
   6c:	07 c6 2b 48 	R4.L=EXPADJ \(R3,R5.L\) \(V\);
 
@@ -63,7 +63,7 @@ Disassembly of section .text:
   7c:	07 c4 38 48 	R4=MIN\(R7,R0\);
 
 00000080 <modify_decrement>:
-  7c:	0b c4 36 c0 	A0-=A1;
+  80:	0b c4 36 c0 	A0-=A1;
   84:	0b c4 36 e0 	A0-=A1\(W32\);
   88:	17 44       	FP-=P2;
   8a:	06 44       	SP-=P0;
@@ -100,7 +100,7 @@ Disassembly of section .text:
   de:	d7 40       	R7\*=R2;
 
 000000e0 <multiply_accumulate>:
-  e0:	63 c0 2f 02     a0 = R5.L \* R7.H \(W32\);
+  e0:	63 c0 2f 02 	a0 = R5.L \* R7.H \(W32\);
   e4:	03 c0 00 04 	a0 = R0.H \* R0.L;
   e8:	83 c0 13 0a 	a0 \+= R2.L \* R3.H \(FU\);
   ec:	03 c0 21 0c 	a0 \+= R4.H \* R1.L;
@@ -108,7 +108,7 @@ Disassembly of section .text:
   f4:	03 c0 2a 16 	a0 -= R5.H \* R2.H;
   f8:	10 c0 08 58     a1 = R1.L \* R0.H \(M\);
   fc:	00 c0 10 98 	a1 = R2.H \* R0.L;
- 100:	70 c0 3e 98	a1 = R7.H \* R6.L \(M, W32\);
+ 100:	70 c0 3e 98 	a1 = R7.H \* R6.L \(M, W32\);
  104:	81 c0 1a 18 	a1 \+= R3.L \* R2.L \(FU\);
  108:	01 c0 31 98 	a1 \+= R6.H \* R1.L;
  10c:	02 c1 03 58 	a1 -= R0.L \* R3.H \(IS\);

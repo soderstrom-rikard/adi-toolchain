@@ -14,8 +14,8 @@ Disassembly of section .text:
   10:	09 c6 02 44 	R2.L=VIT_MAX \(R2\) \(ASR\);
 
 00000014 <vector_abs>:
-  14:	06 c4 28 8a 	R5=ABSR5\(V\);
-  18:	06 c4 00 84 	R2=ABSR0\(V\);
+  14:	06 c4 28 8a 	R5= ABS R5\(V\);
+  18:	06 c4 00 84 	R2= ABS R0\(V\);
 
 0000001c <vector_add_sub>:
   1c:	00 c4 1a 0a 	R5=R3\+|\+R2 ;
@@ -40,8 +40,8 @@ Disassembly of section .text:
   60:	81 c6 e0 09 	R4=R0 << -4 \(V\);
   64:	81 c6 00 4a 	R5=R0 >>> 0x0 \(V, S\);
   68:	81 c6 62 44 	R2=R2 >>> -12 \(V, S\);
-  6c:	01 c6 15 0e 	R7=ASHIFTR5BYR2.L\(V\);
-  70:	01 c6 02 40 	R0=ASHIFTR2BYR0.L\(V,S\);
+  6c:	01 c6 15 0e 	R7= ASHIFT R5BYR2.L\(V\);
+  70:	01 c6 02 40 	R0= ASHIFT R2BYR0.L\(V,S\);
 
 00000074 <vector_lshift>:
   74:	81 c6 8a 8b 	R5=R2 >> 0xf \(V\);
