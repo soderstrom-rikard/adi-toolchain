@@ -1010,6 +1010,7 @@ do {                                              \
 #define PREDICATE_CODES                                                	\
   {"cc_operand", {REG}},				        	\
   {"valid_reg_operand", {SUBREG, REG, ADDRESSOF}},			\
+  {"symbolic_operand", {CONST, SYMBOL_REF, LABEL_REF}},			\
   {"scale_by_operand", {CONST_INT}},					\
   {"pos_scale_operand", {CONST_INT}},                                  	\
   {"positive_immediate_operand", {CONST_INT}},				\

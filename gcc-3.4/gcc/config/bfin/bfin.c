@@ -905,6 +905,24 @@ int effective_address_32bit_p (rtx op, enum machine_mode mode)
     }
 }
 
+/* Returns 1 if OP is a symbolic operand, i.e. a symbol_ref or a label_ref,
+   possibly with an offset.  */
+
+int
+symbolic_operand (rtx op, enum machine_mode mode)
+{
+  if (mode != VOIDmode && GET_MODE (op) != VOIDmode && mode != GET_MODE (op))
+    return 0;
+  if (GET_CODE (op) == SYMBOL_REF || GET_CODE (op) == LABEL_REF)
+    return 1;
+  if (GET_CODE (op) == CONST
+      && GET_CODE (XEXP (op,0)) == PLUS
+      && GET_CODE (XEXP (XEXP (op,0), 0)) == SYMBOL_REF
+      && GET_CODE (XEXP (XEXP (op,0), 1)) == CONST_INT)
+    return 1;
+  return 0;
+}
+
 int symbolic_or_const_operand_p (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) 
 {
   switch (GET_CODE (op)) {

@@ -46,7 +46,7 @@ extern int bfin_frame_pointer_required (void);
 extern HOST_WIDE_INT bfin_initial_elimination_offset (int, int);
 
 extern int effective_address_32bit_p (rtx, Mmode);
-extern int symbolic_operand_p (rtx, Mmode);
+extern int symbolic_operand (rtx, Mmode);
 extern int imm7bit_operand_p (rtx, Mmode);
 extern int imm16bit_operand_p (rtx, Mmode);
 extern rtx bfin_gen_compare (rtx, Mmode);

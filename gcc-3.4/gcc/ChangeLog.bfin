@@ -3,6 +3,13 @@
 	* config/bfin/bfin.md (extendsidi2, zero_extendsidi2): Generate valid
 	assembler instructions.
 
+	* config/bfin/bfin.md (symbolic load splitter): New.
+	(movstricthi, movsi_high, movsi_low): New patterns.
+	* config/bfin/bfin-protos.h (symbolic_operand): Renamed from
+	symbolic_operand_p, which wasn't defined anywhere.
+	* config/bfin/bfin.h (PREDICATE_CODES): Add symbolic_operand.
+	* config/bfin/bfin.c (symbolic_operand): New function.
+
 2004-11-16  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* combine.c (simplify_and_const_int): Try to turn XOR inside a shift

@@ -388,6 +388,41 @@
   ""
   " expand_move (operands, QImode); ")
 
+(define_split
+  [(set (match_operand:SI 0 "register_operand" "")
+	(match_operand:SI 1 "symbolic_operand" ""))]
+  "reload_completed"
+  [(set (match_dup 0) (high:SI (match_dup 1)))
+   (set (match_dup 0) (lo_sum:SI (match_dup 0) (match_dup 1)))]
+  "")
+
+(define_insn "*movsi_high"
+  [(set (match_operand:SI 0 "register_operand" "=da")
+	(high:SI (match_operand:SI 1 "symbolic_operand" "i")))]
+  ""
+  "%d0 = %d1;"
+  [(set_attr "type" "mvi")
+   (set_attr "length" "4")])
+
+(define_insn "*movsi_low"
+  [(set (match_operand:SI 0 "register_operand" "=da")
+	(lo_sum:SI (match_operand:SI 1 "register_operand" "0")
+		   (match_operand:SI 2 "symbolic_operand" "i")))]
+  ""
+  "%h0 = %h2;"
+  [(set_attr "type" "mvi")
+   (set_attr "length" "4")])
+
+;; Sadly, this can't be a proper named movstrict pattern, since the compiler
+;; expects to be able to use registers for operand 1.
+(define_insn "*movstricthi"
+  [(set (strict_low_part (match_operand:HI 0 "register_operand" "+x"))
+	(match_operand:HI 1 "immediate_operand" "Ksh"))]
+  ""
+  "%h0 = %1;"
+  [(set_attr "type" "mvi")
+   (set_attr "length" "4")])
+
 ;; Sign and zero extensions
 
 (define_insn "extendhisi2"
