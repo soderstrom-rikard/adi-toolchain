@@ -69,7 +69,7 @@ Disassembly of section .text:
   b0:	83 c6 50 80 	A0= ROT A0BY0xa;
   b4:	83 c6 60 91 	A1= ROT A1BY-20;
   b8:	83 c6 00 91 	A1= ROT A1BY-32;
-  bc:	02 c6 11 c0	R0= ROT A1BYR2.L;
+  bc:	02 c6 11 c0	R0= ROT R1BYR2.L;
   c0:	02 c6 1c c0	R0= ROT R4BYR3.L;
   c4:	03 c6 38 80	A0= ROT A0BYR7.L;
   c8:	03 c6 30 90 	A1= ROT A1BYR6.L;

@@ -3,6 +3,7 @@
 	* gas/bfin/move.d: Insert a new instruction at 0x32 to fill a gap in
 	the insn sequence.
 	* gas/bfin/move.s: Likewise.
+	* gas/bfin/shift.d: Correct one rotate insn.
 
 2004-12-16  Catherine Moore  <clm@cm00re.com>
 
