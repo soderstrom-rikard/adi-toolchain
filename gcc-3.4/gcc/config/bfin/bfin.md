@@ -635,32 +635,6 @@
 ;;; #    #  ######   ####     #     #####    ###
 ;;;
 
-;;; Fixes reload problem if operand 3 is FP.
-(define_insn "" 
-  [(set (match_operand:SI 0 "register_operand" "=&a")
-        (plus:SI (plus:SI (mult:SI 
-			    (match_operand:SI 1 "register_operand" "a")
-                            (match_operand:SI 2 "scale_by_operand" "i"))
-		    (match_operand:SI 3 "register_operand"  "a"))
-	     (match_operand:SI 4 "const_int_operand" "i")))
-  ]
-  "reload_in_progress"
-  "*
-    {
-	rtx tmp_op = operands[1];
-
-	operands[1] = operands[4];
-	output_load_immediate (operands);
-	operands[1] = tmp_op;
-        output_asm_insn (\"%0 =%0+%3;\", operands);
-        output_asm_insn (\"%0 =%0+ (%1<<%X2); /* reload-1 */\", operands);
-        RET;
-    }
-  "
-;;; We do not know the length of immediate value in operand4, make it max
-  [(set_attr "length" "8")
-   (set_attr "type" "alu0")])
-
 (define_insn ""
   [(set (match_operand:SI 0 "register_operand"                      "=a,d")
 	(ashift:SI (plus:SI (match_operand:SI 1 "register_operand"  "%0,0")

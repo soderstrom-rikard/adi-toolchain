@@ -612,7 +612,7 @@ enum reg_class
  * See reload1.c, function reload()
  */
 #define SMALL_REGISTER_CLASSES 1
-
+#define CLASS_LIKELY_SPILLED_P(CLASS) (CLASS < MOST_REGS)
 
 /* Do not allow to store a value in REG_CC for any mode */
 /* Do not allow to store value in pregs if mode is not SI*/
@@ -635,17 +635,11 @@ enum reg_class
 #define MODES_TIEABLE_P(MODE1, MODE2) ((MODE1) == (MODE2))
 
 /* `PREFERRED_RELOAD_CLASS (X, CLASS)'
-     A C expression that places additional restrictions on the register
-     class to use when it is necessary to copy value X into a register
-     in class CLASS.  The value is a register class; perhaps CLASS, or
-     perhaps another, smaller class.
-*/
-#define PREFERRED_RELOAD_CLASS(X, CLASS) \
-    ((GET_MODE(X) == HImode || GET_MODE(X) == QImode) ? DREGS \
-     : GET_CODE (X) == REG && REGNO_REG_CLASS(REGNO(X)) == CCREGS \
-     ? DREGS : CLASS)
-
-#define PREFERRED_OUTPUT_RELOAD_CLASS(X, CLASS) PREFERRED_RELOAD_CLASS(X, CLASS)
+   A C expression that places additional restrictions on the register
+   class to use when it is necessary to copy value X into a register
+   in class CLASS.  The value is a register class; perhaps CLASS, or
+   perhaps another, smaller class.  */
+#define PREFERRED_RELOAD_CLASS(X, CLASS) (CLASS)
 
 #define  SECONDARY_OUTPUT_RELOAD_CLASS(class,mode,x) \
     secondary_output_reload_class(class,mode,x)

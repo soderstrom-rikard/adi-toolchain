@@ -1704,6 +1704,11 @@ secondary_input_reload_class(enum reg_class class,enum machine_mode mode, rtx x)
 	return NO_REGS;
     }
 
+  /* CCREGS can only be moved from/to DREGS.  */
+  if (class == CCREGS && x_class != DREGS)
+    return DREGS;
+  if (x_class == CCREGS && class != DREGS)
+    return DREGS;
   /* All registers other than AREGS can load arbitrary constants.  The only
      case that remains is MEM.  */
   if (code == MEM)
