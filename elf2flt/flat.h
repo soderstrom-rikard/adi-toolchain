@@ -60,6 +60,7 @@ struct flat_hdr {
 	                               beginning of file */
 	unsigned long reloc_count;  /* Number of relocation records */
 	unsigned long flags;       
+        unsigned long build_date;  /* bfin changes added build_date */     
 	unsigned long filler[6];    /* Reservered, set to zero */
 };
 
@@ -314,7 +315,8 @@ struct flat_hdr {
 	unsigned long reloc_start;  /* Offset of relocation records from
 	                               beginning of file */
 	unsigned long reloc_count;  /* Number of relocation records */
-	unsigned long flags;       
+	unsigned long flags;  
+        unsigned long build_date;  /* bfin changes added build_date */     
 	unsigned long filler[6];    /* Reservered, set to zero */
 };
 

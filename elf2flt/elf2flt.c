@@ -266,6 +266,148 @@ add_com_to_bss(asymbol **symbol_table, long number_of_symbols, long bss_len)
   return comsize;
 }  
 
+#ifdef TARGET_bfin
+/* stack to handle "arithmetic" relocations */
+#define RELOC_STACK_SIZE 100
+static bfd_vma reloc_stack[RELOC_STACK_SIZE];
+static unsigned int reloc_stack_tos = 0;
+static char sym_section_name[80];
+
+static void
+reloc_stack_set_section_name(const char *sym_section_name_in)
+{
+  /* TODO : we can add checks to make sure we do not
+     add different section names to the same arithmetic
+     expression.
+  */
+  strcpy(sym_section_name, sym_section_name_in);
+}
+
+static const char *
+reloc_stack_get_section()
+{
+  return sym_section_name;
+}
+
+#define is_reloc_stack_empty() ((reloc_stack_tos > 0)?0:1)
+
+static void
+reloc_stack_push(bfd_vma value)
+{
+//fprintf(stderr, "pushing %d\n", (int)value);
+  reloc_stack[reloc_stack_tos++] = value;
+}
+
+static bfd_vma
+reloc_stack_pop()
+{
+//fprintf(stderr, "popping %d\n", (int)reloc_stack[reloc_stack_tos-1]);
+  return reloc_stack[--reloc_stack_tos];
+}
+
+static bfd_vma
+reloc_stack_operate(unsigned int oper)
+{
+  bfd_vma value;
+  switch(oper){
+    case 0xE2 :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] + reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xE3 :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] - reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xE4 :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] * reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xE5 :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] / reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xE6 :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] % reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xE7 :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] << reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xE8 :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] >> reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xE9 :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] & reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xEA :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] | reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xEB :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] ^ reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xEC :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] && reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xED :
+    {
+      value = reloc_stack[reloc_stack_tos - 2] || reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 2;
+      break;
+    }
+    case 0xEF :
+    {
+      value = -reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos --;
+      break;
+    }
+    case 0xF0 :
+    {
+      value = ~reloc_stack[reloc_stack_tos - 1];
+      reloc_stack_tos -= 1;
+      break;
+    }
+    default :
+    {
+       fprintf(stderr, "bfin relocation : Internal bug\n");
+       return 0;
+    }
+  }
+
+  // now push the new value back on stack
+  reloc_stack_push(value);
+
+  return value;
+}
+#endif
+
 
 #ifdef TARGET_bfin
 flat_v5_reloc_t *
@@ -287,6 +429,7 @@ output_relocs (
   bfd_size_type         addr;
   bfd_vma               output_base;
   reloc_howto_type      *howto;
+  const char *          reloc_section_name;
 #else
   unsigned long		*flat_relocs;
 #endif //TARGET_bfin
@@ -621,7 +764,7 @@ dump_symbols(symbols, number_of_symbols);
 				/* Calculate the sym address ourselves.  */
 				sym_reloc_size = bfd_get_reloc_size(q->howto);
 
-#ifndef TARGET_h8300
+#if !defined(TARGET_h8300) && !defined(TARGET_bfin)
 				if (sym_reloc_size != 4) {
 					printf("ERROR: bad reloc type %d size=%d for symbol=%s\n",
 							(*p)->howto->type, sym_reloc_size, sym_name);
@@ -873,62 +1016,115 @@ dump_symbols(symbols, number_of_symbols);
 				case R_pcrel24_jump_l:
 				case R_pcrel24_jump_x:
 				case R_pcrel24_call_x:
-					sym_addr += q->addend;
-                                        sym_addr -= q->address;
-                                        break;
+					sym_addr += q->addend;  // get the symbol address
+          sym_addr -= q->address; // make it PC relative
+          break;
 				
-				case R_rimm16: /* This is same as R_luimm16 in all respect except it's abs. 16 bit quantity.K*/
-
+				case R_rimm16: /* This is same as R_luimm16 in all 
+                          respect except it's abs. 16 bit quantity.K*/
+					// TODO : Incorrect check ... the sym_addr should be 16 bit
+          //        and that too after relocation calculation in loader
 					if(0xFFFF0000 & (long)(section_vma + q->address))
 					{
 						fprintf(stderr, "%s@%d: Reloc value overflow.\n", __FILE__, __LINE__);
 					}
-				//I guess R_byte2_date is corresponding to R_abs16 of nisa version -JyotiK
-				/*case R_byte2_data:*/ 
 				case R_luimm16: 
 					 relocation_needed = 1;
-                                        if (sym_addr != 0)
-                                        {
-                                                sym_vma = bfd_section_vma(abs_bfd, sym_section);
-                                                sym_addr -= sym_vma;
-                                        }
-                                        sym_addr += q->addend;
-                                        //printf ("sym_addr = %x, q->addend=%x, sym_name= %s\n", sym_addr, q->addend, sym_name);
-                                        flat_relocs = (flat_v5_reloc_t*)(realloc(flat_relocs,(flat_reloc_count + 1) * sizeof(flat_v5_reloc_t)));
-                                        flat_relocs[flat_reloc_count].reloc.offset = (long)(section_vma + q->address);
-                                        flat_relocs[flat_reloc_count].reloc.hi_lo = FLAT_RELOC_PART_LO;
-                                        flat_relocs[flat_reloc_count].reloc.sp = 0;//FLAT_FRIO_RELOC_SP_TYPE_16_BIT;
+           if(is_reloc_stack_empty()){
+             if (sym_addr != 0)
+             {
+               sym_vma = bfd_section_vma(abs_bfd, sym_section);
+               sym_addr -= sym_vma;
+             }
+             sym_addr += q->addend;
+             //printf ("sym_addr = %x, q->addend=%x, sym_name= %s\n", sym_addr, q->addend, sym_name);
+           }
+				   else{
+             sym_addr = reloc_stack_pop();
+           }
+           flat_relocs = (flat_v5_reloc_t*)
+                          (realloc(flat_relocs,
+                                   (flat_reloc_count + 1) * sizeof(flat_v5_reloc_t)));
+           flat_relocs[flat_reloc_count].reloc.offset = 
+                    (long)(section_vma + q->address);
+           flat_relocs[flat_reloc_count].reloc.hi_lo = 
+                    FLAT_RELOC_PART_LO;
+           flat_relocs[flat_reloc_count].reloc.sp = 
+                    0;//FLAT_FRIO_RELOC_SP_TYPE_16_BIT;
 
-                                        break;
+           break;
 				case  R_huimm16:
-                                        relocation_needed = 1;
-                                        if (sym_addr != 0)
-                                        {
-                                                sym_vma = bfd_section_vma(abs_bfd, sym_section);
-                                                sym_addr -= sym_vma;
-                                        }
-                                        sym_addr += q->addend;
-                                        flat_relocs = (flat_v5_reloc_t*)(realloc(flat_relocs,(flat_reloc_count + 1) * sizeof(flat_v5_reloc_t)));
-                                        flat_relocs[flat_reloc_count].reloc.offset = section_vma + q->address;
-                                        flat_relocs[flat_reloc_count].reloc.hi_lo = FLAT_RELOC_PART_HI;
-                                        flat_relocs[flat_reloc_count].reloc.sp = 0;//FLAT_FRIO_RELOC_SP_TYPE_16_BIT;
-                                        break;
+           relocation_needed = 1;
+           if(is_reloc_stack_empty()){
+             if (sym_addr != 0)
+             {
+               sym_vma = bfd_section_vma(abs_bfd, sym_section);
+               sym_addr -= sym_vma;
+             }
+             sym_addr += q->addend;
+           }
+				   else{
+             sym_addr = reloc_stack_pop();
+           }
+           flat_relocs = (flat_v5_reloc_t*)(realloc(flat_relocs,(flat_reloc_count + 1) * sizeof(flat_v5_reloc_t)));
+           flat_relocs[flat_reloc_count].reloc.offset = section_vma + q->address;
+           flat_relocs[flat_reloc_count].reloc.hi_lo = FLAT_RELOC_PART_HI;
+           flat_relocs[flat_reloc_count].reloc.sp = 0;//FLAT_FRIO_RELOC_SP_TYPE_16_BIT;
+           break;
 
-				//I guess R_byte4_data coresponds to R_abs32 of nisa version.
-				//I am coping the code of R_abs32 here -JyotiK
-				/*case R_byte4_data: 
+				case R_byte4_data: 
 					relocation_needed = 1;
-                                        if (sym_addr != 0)
-                                        {
-                                                sym_vma = bfd_section_vma(abs_bfd, sym_section);
-                                                sym_addr -= sym_vma;
-                                        }
-                                        sym_addr += q->addend;
-                                        flat_relocs = (flat_v5_reloc_t*)(realloc(flat_relocs,(flat_reloc_count + 1) * sizeof(flat_v5_reloc_t)));
-                                        flat_relocs[flat_reloc_count].reloc.offset = section_vma + q->address;
-                                        flat_relocs[flat_reloc_count].reloc.hi_lo = FLAT_RELOC_PART_LO;
-                                        flat_relocs[flat_reloc_count].reloc.sp = 2;//FLAT_FRIO_RELOC_SP_TYPE_32_BIT;
-                                        break;*/
+           if(is_reloc_stack_empty()){
+             if (sym_addr != 0)
+             {
+               sym_vma = bfd_section_vma(abs_bfd, sym_section);
+               sym_addr -= sym_vma;
+             }
+             sym_addr += q->addend;
+           }
+           else{
+             sym_addr = reloc_stack_pop();
+           }
+
+           flat_relocs = (flat_v5_reloc_t*)(realloc(flat_relocs,(flat_reloc_count + 1) * sizeof(flat_v5_reloc_t)));
+           flat_relocs[flat_reloc_count].reloc.offset = section_vma + q->address;
+           flat_relocs[flat_reloc_count].reloc.hi_lo = FLAT_RELOC_PART_LO;
+           flat_relocs[flat_reloc_count].reloc.sp = 2;//FLAT_FRIO_RELOC_SP_TYPE_32_BIT;
+           break;
+        case 0xE0 : 
+				   /* push */
+           if (sym_addr != 0)
+           {
+             sym_vma = bfd_section_vma(abs_bfd, sym_section);
+             sym_addr -= sym_vma;
+           }
+           sym_addr += q->addend;
+					 reloc_stack_push(sym_addr);
+           reloc_stack_set_section_name(sym_section->name);
+				   break;
+        case 0xE1 :
+           /* const */
+					 reloc_stack_push(q->addend);
+           break;
+        case 0xE2 :
+        case 0xE3 :
+        case 0xE4 :
+        case 0xE5 :
+        case 0xE6 :
+        case 0xE7 :
+        case 0xE8 :
+        case 0xE9 :
+        case 0xEA :
+        case 0xEB :
+        case 0xEC :
+        case 0xED :
+        case 0xEE :
+        case 0xEF :
+        case 0xF0 :
+        case 0xF1 :
+        case 0xF2 :
+					reloc_stack_operate((*p)->howto->type);
+					break;
 
 #endif //TARGET_bfin
 
@@ -1005,29 +1201,36 @@ dump_symbols(symbols, number_of_symbols);
 					*(unsigned long *)r_mem = tmp.l;
 #elif defined(TARGET_bfin)
 				if (sym_reloc_size == 4) {
-                                        if(((*p)->howto->type == R_pcrel24)
-					   ||((*p)->howto->type == R_pcrel24_jump_l)	
-					   ||((*p)->howto->type == R_pcrel24_jump_x)
-					   ||((*p)->howto->type == R_pcrel24_call_x)) {
-                                            *((unsigned short *)(sectionp+q->address)+1) = ((sym_addr)>>1) & 0xffff;
-                                            *((unsigned short *)(sectionp+q->address)) = (0xff00 & *((unsigned short *) (sectionp+q->address)))|(((sym_addr)>>17) & 0xff);
-                                        } else {
-                                            *((unsigned long *)(sectionp+q->address)) = sym_addr;
-                                        }
-                                } else if (sym_reloc_size == 2) {
-                                        if(((*p)->howto->type == R_pcrel12_jump) 
-					||((*p)->howto->type == R_pcrel12_jump_s)){
-                                            *((unsigned short *)(sectionp+q->address)) = (0xf000 & *((unsigned short *)(sectionp+q->address))|(((sym_addr)>>1)&0xfff));
-                                        }
-                                        else
-                                            if((*p)->howto->type == R_luimm16) {
-                                                *((unsigned short *)(sectionp+q->address)) = (unsigned short)sym_addr;
-                                            } else {
-                                                *((unsigned short *)(sectionp+q->address)) = (unsigned short)(sym_addr>>16);
-                                            }
-                                } else {
-                                        printf("Blackfin relocation doomed\n");
-                                }
+           if(((*p)->howto->type == R_pcrel24) ||
+              ((*p)->howto->type == R_pcrel24_jump_l)	||
+              ((*p)->howto->type == R_pcrel24_jump_x) ||
+              ((*p)->howto->type == R_pcrel24_call_x)) {
+             *((unsigned short *)(sectionp+q->address)+1) = ((sym_addr)>>1) & 0xffff;
+             *((unsigned short *)(sectionp+q->address)) = 
+                       (0xff00 & *((unsigned short *) (sectionp+q->address))) |
+                       (((sym_addr)>>17) & 0xff);
+           } else {
+             *((unsigned long *)(sectionp+q->address)) = sym_addr;
+           }
+         } else if (sym_reloc_size == 2) {
+           if(((*p)->howto->type == R_pcrel12_jump) ||
+              ((*p)->howto->type == R_pcrel12_jump_s)){
+              *((unsigned short *)(sectionp+q->address)) = 
+                        (0xf000 & *((unsigned short *)(sectionp+q->address)) |
+                        (((sym_addr)>>1)&0xfff));
+            }
+            else if((*p)->howto->type == R_luimm16) {
+              *((unsigned short *)(sectionp+q->address)) = (unsigned short)sym_addr;
+            } else {
+              *((unsigned short *)(sectionp+q->address)) = (unsigned short)(sym_addr>>16);
+            }
+          } else if((0xE0 == (*p)->howto->type) || (0xE1 == (*p)->howto->type)){
+
+		//push and const are 4 byte so just by pass it
+              }
+	    else {
+            printf("Blackfin relocation doomed\n");
+          }
 
 #else /* ! TARGET_arm */
 
@@ -1073,19 +1276,23 @@ dump_symbols(symbols, number_of_symbols);
 			 */
 			if (relocation_needed) {
 #ifdef TARGET_bfin
-				if (strstr(sym_section->name, "text"))
-                                        flat_relocs[flat_reloc_count].reloc.type = FLAT_RELOC_TYPE_TEXT;
-                                else if (strstr(sym_section->name, "data"))
-                                        flat_relocs[flat_reloc_count].reloc.type = FLAT_RELOC_TYPE_DATA;
-                                else if (strstr(sym_section->name, "bss"))
-                                        flat_relocs[flat_reloc_count].reloc.type = FLAT_RELOC_TYPE_BSS;
-                                else
-                                        printf("Unknown Type - relocation in bad section.\n");
-#if 0
-                                printf("count=%02x sym name=%20s\taddr=%04x\tsec=%5s\tRELOC=%08x\tsp=%x\n", 
-                                        flat_reloc_count,sym_name, q->address, sym_section->name, 
-                                        flat_relocs[flat_reloc_count],flat_relocs[flat_reloc_count].reloc.sp);
-#endif			
+        /* flat_relocs are allocated in the individual cases */
+				if(strstr(sym_name, "operator")||
+					strstr(sym_name, "constant")){
+           /* must be an arith reloc ... get the value from the stack */
+          reloc_section_name = reloc_stack_get_section();
+        }
+        else{
+          reloc_section_name = sym_section->name;
+        }
+				if (strstr(reloc_section_name, "text"))
+           flat_relocs[flat_reloc_count].reloc.type = FLAT_RELOC_TYPE_TEXT;
+        else if (strstr(reloc_section_name, "data"))
+           flat_relocs[flat_reloc_count].reloc.type = FLAT_RELOC_TYPE_DATA;
+        else if (strstr(reloc_section_name, "bss"))
+           flat_relocs[flat_reloc_count].reloc.type = FLAT_RELOC_TYPE_BSS;
+        else
+           printf("Unknown Type - relocation in bad section.\n");
 #else
 				flat_relocs = realloc(flat_relocs,
 					(flat_reloc_count + 1) * sizeof(unsigned long));
@@ -1446,7 +1653,9 @@ int main(int argc, char *argv[])
 
   if ((text_vma + text_len) != data_vma) {
     if ((text_vma + text_len) > data_vma) {
-      printf("ERROR: text=0x%x overlaps data=0x%x ?\n", text_len, data_vma);
+      //printf("ERROR: text=0x%x overlaps data=0x%x ?\n", text_len, data_vma);
+       printf("ERROR: Text_vma=0x%x\tText_len=%d\tData_vma=0x%x\tData_len=%d\n",
+		       text_vma, text_len, data_vma, data_len);
       exit(1);
     }
     if (verbose)
