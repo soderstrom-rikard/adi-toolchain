@@ -295,6 +295,11 @@ bfin_bfd_reloc (
           if (howto->pcrel_offset == TRUE && howto->partial_inplace == TRUE)
              relocation -= reloc_entry->address;
 	}
+    if (output_bfd != (bfd *) NULL) {
+       /* this output will be relocatable ... like ld -r */
+       reloc_entry->address += input_section->output_offset;
+    }
+
 
   /* FIXME: This overflow checking is incomplete, because the value
      might have overflowed before we get here.  For a correct check we
@@ -463,6 +468,10 @@ bfin_pcrel24_reloc (
       /* Shift everything up to where it's going to be used */
 
       relocation <<= (bfd_vma) howto->bitpos;
+    if (output_bfd != (bfd *) NULL) {
+       /* this output will be relocatable ... like ld -r */
+       reloc_entry->address += input_section->output_offset;
+    }
       {
          short x;
 	/* We are getting reloc_entry->address 2 byte off from
@@ -526,6 +535,10 @@ bfin_push_reloc (
   if (!strcmp(symbol->name, symbol->section->name) || output_bfd == NULL)
       	relocation += output_base + symbol->section->output_offset;
 
+  if (output_bfd != (bfd *) NULL) {
+     /* this output will be relocatable ... like ld -r */
+     reloc_entry->address += input_section->output_offset;
+  }
 #if 0 /* we do not generate addend ... see arith expr 
   /* Add in supplied addend.  */
   relocation += reloc_entry->addend;
@@ -550,6 +563,11 @@ bfin_oper_reloc (
   /* just call the operation based on the reloc_type */
   reloc_stack_operate(reloc_entry->howto->type);
   
+  if (output_bfd != (bfd *) NULL) {
+    /* this output will be relocatable ... like ld -r */
+    /* Actually it would not matter as we ignore the address */
+    reloc_entry->address += input_section->output_offset;
+  }
   return bfd_reloc_ok;
 }
 
@@ -565,6 +583,11 @@ bfin_const_reloc (
 {
   /* push the addend portion of the relocation */
   reloc_stack_push(reloc_entry->addend);
+  if (output_bfd != (bfd *) NULL) {
+     /* this output will be relocatable ... like ld -r */
+     /* Actually it would not matter as we ignore the address */
+     reloc_entry->address += input_section->output_offset;
+  }
   
   return bfd_reloc_ok;
 }
@@ -608,29 +631,30 @@ bfin_h_l_uimm16_reloc (
   
         if (!strcmp(symbol->name, symbol->section->name) || output_bfd == NULL)
       	  relocation += output_base + symbol->section->output_offset;
- 
-#if 0 /* we do not generate addend ... see arith expr 
-        /* Add in supplied addend.  */
-        relocation += reloc_entry->addend;
-#endif
-        
-        if (output_bfd != (bfd *) NULL)
-        {	              
-	        reloc_entry->address += input_section->output_offset;
-	        reloc_entry->addend = relocation;
-        }
-        else
-        {
-	        reloc_entry->addend = 0;
-        }
-  
-        /* Here the variable relocation holds the final address of the
-	   symbol we are relocating against, plus any addend.  */
+
+	if(symbol->flags & BSF_SECTION_SYM){
+          /* Add in supplied addend.  */
+          /* we do not generate addends any more, but section
+	   * symbols (local symbols) have addends that has been added by the
+	   * system
+	   */
+          relocation += reloc_entry->addend;
+	}
       }
       else{
         relocation = reloc_stack_pop();
         // assert(is_reloc_stack_empty());
       }
+      if (output_bfd != (bfd *) NULL) {	              
+	 /* this output will be relocatable ... like ld -r */
+	 reloc_entry->address += input_section->output_offset;
+	 reloc_entry->addend = relocation;
+      }
+      else {
+        reloc_entry->addend = 0;
+      }
+        /* Here the variable relocation holds the final address of the
+	   symbol we are relocating against, plus any addend.  */
 
       x = bfd_get_16 (abfd, (bfd_byte *) data + addr);
       relocation >>= (bfd_vma) howto->rightshift;
@@ -737,7 +761,7 @@ static reloc_howto_type bfin_elf_howto_table[] =
          FALSE,         /* pc_relative */
          0,             /* bitpos */
          complain_overflow_signed,             /* complain_on_overflow */
-         bfin_bfd_reloc,           /* special_function */
+         bfin_h_l_uimm16_reloc,           /* special_function */
          "R_rimm16",            /* name */
          TRUE,      /* partial_inplace */
          0x0000FFFF,            /* src_mask */
