@@ -1,3 +1,8 @@
+2004-11-17  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (extendsidi2, zero_extendsidi2): Generate valid
+	assembler instructions.
+
 2004-11-16  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* combine.c (simplify_and_const_int): Try to turn XOR inside a shift

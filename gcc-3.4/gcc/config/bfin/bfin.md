@@ -569,7 +569,7 @@
   ""
   "*
   if (REGNO (operands[1]) != REGNO (operands[0]))
-    output_asm_insn (\"%0 = %1 (Z);\", operands);
+    output_asm_insn (\"%0 = %1;\", operands);
   return \"%H0 = 0;\";
 "
 [(set_attr "length" "2")]) 
@@ -596,8 +596,8 @@
   ""
   "*
   if (REGNO (operands[1]) != REGNO (operands[0]))
-    output_asm_insn (\"%0 = %1 (X);\", operands);
-  return \"%H0 = %1 (X);\\n\\t%H0 >>>= 31;\";
+    output_asm_insn (\"%0 = %1;\", operands);
+  return \"%H0 = %1;\\n\\t%H0 >>>= 31;\";
 "
 [(set_attr "length" "4")])
  
