@@ -1076,6 +1076,8 @@ dump_symbols(symbols, number_of_symbols);
 				case R_pcrel24_jump_x:
 				case R_pcrel24_call_x:
 				case R_pcrel10:
+				case R_pcrel11:
+				case R_pcrel5m2:
 				  sym_addr += q->addend;// get the symbol addr
 				  sym_vma = bfd_section_vma(abs_bfd, sym_section);
 				  sym_addr -= q->address; // make it PC relative 
@@ -1306,6 +1308,14 @@ dump_symbols(symbols, number_of_symbols);
 			(*p)->howto->type == R_luimm16)){
 		/* for l and h we set the lower 16 bits which is only when it will be used */
 	       *((unsigned short *) (sectionp + q->address)) = (unsigned short) sym_addr;
+	   } else if ((*p)->howto->type == R_pcrel5m2){
+              *((unsigned short *)(sectionp+q->address)) = 
+                        (0xfff0 & *((unsigned short *)(sectionp+q->address)) |
+                        (((sym_addr)>>1)&0xf));
+	   } else if ((*p)->howto->type == R_pcrel11){
+              *((unsigned short *)(sectionp+q->address)) = 
+                        (0xfc00 & *((unsigned short *)(sectionp+q->address)) |
+                        (((sym_addr)>>1)&0x3ff));
 	   }
 	   else if((0xE0 <= (*p)->howto->type) && (0xF3 >= (*p)->howto->type)){
 
