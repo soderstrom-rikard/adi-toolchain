@@ -24,14 +24,13 @@
   Written and tested on BF533
   TODO :
   1. dummy frame stuff
-  2. cache initialization of saved registers (analyze the prologue)
-  3. is there a more elegant way of the address conversion.
+  2. is there a more elegant way of the address conversion.
      (We need it as we have no mmu)
      There is a function pointer_to_address that should be tried.
      Currently it is implemented quite kludgily ... the kernel returns
      pc with a decremented value while most other manipulations are
      done explicitly here. 
-  4. Resolve the orig_r0 mystery. 
+  3. Resolve the orig_r0 mystery. 
 */
 
 #define NUM_PSEUDO_REGS (3)
@@ -266,6 +265,140 @@ bfin_alloc_frame_cache (void)
   return cache;
 }
 
+/* Function to analyze the link opcode */
+static CORE_ADDR bfin_analyze_link(CORE_ADDR pc, CORE_ADDR cur_pc, struct bfin_frame_cache *cache)
+{
+  unsigned int op;
+
+  if (pc >= cur_pc)
+  {
+    return cur_pc;
+  }
+
+  op = read_memory_unsigned_integer(pc,2);
+  if (op == P_LINKAGE)
+  {
+    cache->locals = read_memory_unsigned_integer(pc+2, 2);
+    return pc+4;
+  }
+
+  return pc;
+}
+
+/* Function to analyze the call save registers */
+static CORE_ADDR bfin_analyze_prologue(CORE_ADDR pc, CORE_ADDR cur_pc, struct bfin_frame_cache *cache)
+{
+  CORE_ADDR offset;
+  unsigned int op;
+  int i;
+  int regno;
+  int dreglim;
+  int preglim;
+
+  pc = bfin_analyze_link(pc, cur_pc, cache);
+
+  cache->locals <<= 2;
+  cache->locals -= 4;
+  offset = cache->locals;
+
+  op = read_memory_unsigned_integer(pc, 2);
+
+  if ((op & P_SP_PLUS) == P_SP_PLUS)
+  {
+    pc = skip_sp_plus(pc);
+  }
+  else if (((op * P_P2_LOW) == P_P2_LOW) || ((op & P_P2_HIGH) == P_P2_HIGH))
+  {
+    pc = skip_blob(pc);
+  }
+  else if (is_minus_minus_sp(pc))
+  {
+    if ((op & 0xFFc0) == P_MINUS_SP2)
+    {
+      dreglim = op & 0x0038;
+      preglim = op & 0x0007;
+      dreglim >>= 3;
+    }
+    else if ((op & 0xFFc0) == P_MINUS_SP3)
+    {
+      dreglim = op & 0x0038;
+      dreglim >>= 3;
+    }
+    else if ((op & 0xFFc0) == P_MINUS_SP4)
+    {
+      preglim = op & 0x0007;
+    }
+
+    if ((dreglim > 3) && (dreglim < 8))
+    {
+      for (i = dreglim; i < 8; i++)
+      {
+        switch (i) {
+		   case 0:
+			   regno = BFIN_R0_REGNUM;
+			   break;
+		   case 1:
+			   regno = BFIN_R1_REGNUM;
+			   break;
+		   case 2:
+			   regno = BFIN_R2_REGNUM;
+			   break;
+		   case 3:
+			   regno = BFIN_R3_REGNUM;
+			   break;
+		   case 4:
+			   regno = BFIN_R4_REGNUM;
+			   break;
+		   case 5:
+			   regno = BFIN_R5_REGNUM;
+			   break;
+		   case 6:
+			   regno = BFIN_R6_REGNUM;
+			   break;
+		   case 7:
+			   regno = BFIN_R7_REGNUM;
+			   break;
+                   }
+
+        cache->saved_regs[regno] = cache->base+offset;
+        offset -= 4;
+      }
+    }
+
+    if ((preglim > 2) && (preglim < 6))
+    {
+      for (i = preglim; i < 6; i++)
+      {
+        switch (i) {
+		   case 0:
+			   regno = BFIN_P0_REGNUM;
+			   break;
+		   case 1:
+			   regno = BFIN_P1_REGNUM;
+			   break;
+		   case 2:
+			   regno = BFIN_P2_REGNUM;
+			   break;
+		   case 3:
+			   regno = BFIN_P3_REGNUM;
+			   break;
+		   case 4:
+			   regno = BFIN_P4_REGNUM;
+			   break;
+		   case 5:
+			   regno = BFIN_P5_REGNUM;
+			   break;
+                   }
+
+        cache->saved_regs[regno] = cache->base+offset;
+        offset -= 4;
+      }
+    }
+  }
+
+  return pc;
+}
+
 CORE_ADDR text_addr = 0;
 
 static struct bfin_frame_cache *
@@ -274,12 +407,10 @@ bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
   struct bfin_frame_cache *cache;
   char buf[4];
   int i;
+
   if(0 == text_addr)
   {
-         text_addr = read_register(BFIN_EXTRA1) ;
-#ifdef DEBUG
-         fprintf(stderr, "JYOTIK DEBUG: text addr found = 0x%x\n", text_addr);
-#endif
+    text_addr = read_register(BFIN_EXTRA1) ;
   }
   if (*this_cache)
     return *this_cache;
@@ -290,15 +421,15 @@ bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
 
   frame_unwind_register (next_frame, BFIN_FP_REGNUM, buf);
   cache->base = extract_unsigned_integer (buf, 4);
- 
   cache->base -=  text_addr;
+
   if (cache->base == 0)
     return cache;
 
   /* For normal frames, PC is stored at [FP + 4].  */
   cache->saved_regs[BFIN_PC_REGNUM] = 4;
   cache->saved_regs[BFIN_FP_REGNUM] = 0;
- 
+
   /* Adjust all the saved registers such that they contain addresses
      instead of offsets.  */
   for (i = 0; i < BFIN_NUM_REGS; i++)
@@ -319,16 +450,19 @@ bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
   else{
     cache->frameless_pc_value = 0;
   }
-#if 0 //TODO : Need to analyze and fill in the offsets of registers
+
   if (cache->pc != 0)
+  {
     bfin_analyze_prologue (cache->pc, frame_pc_unwind (next_frame), cache);
+  }
+
   if (cache->locals < 0)
     {
 
       frame_unwind_register (next_frame, BFIN_SP_REGNUM, buf);
       cache->base = extract_unsigned_integer (buf, 4) + cache->sp_offset;
     }
-#endif
+
   /* Now that we have the base address for the stack frame we can
      calculate the value of SP in the calling frame.  */
   cache->saved_sp = cache->base + 8;
@@ -1034,14 +1168,12 @@ bfin_frame_local_address (struct frame_info *next_frame, void **this_cache)
 {
   struct bfin_frame_cache *cache = bfin_frame_cache (next_frame, this_cache);
 
-   fprintf(stderr, "JYOTIK DEBUG: LOCAL\n");
   return cache->base + 4;
 }
 static CORE_ADDR
 bfin_frame_args_address (struct frame_info *next_frame, void **this_cache)
 {
   struct bfin_frame_cache *cache = bfin_frame_cache (next_frame, this_cache);
-   fprintf(stderr, "JYOTIK DEBUG: ARGS\n");
   return cache->base -4;
 }
 
