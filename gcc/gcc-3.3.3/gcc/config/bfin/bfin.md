@@ -252,8 +252,8 @@
 
 ;;; Future work: split constants in expand
 (define_insn "*movsi_insn"
-  [(set (match_operand:SI 0 "general_operand" "=d, a, mc, *!c, !e, !e, !d, !a, !d, !C, m,a,f")
-        (match_operand:SI 1 "general_operand" "damic, damic, da, daic, ad, P, *e, *e, C, d, bB,f,a"))]
+  [(set (match_operand:SI 0 "general_operand" "=d   , a    , mc, *!c , !e, !e, !d, !a, !d, !C, m ,a,f")
+        (match_operand:SI 1 "general_operand" "damic, damic, da, daic, ad,  P, *e, *e,  C,  d, bB,f,a"))]
 
   ""
   "*
@@ -661,7 +661,7 @@
   ""
   "@
     %0+=%2; cc=ac; %3=cc; %H0=%H0+%3;
-    %0=%1+%2; cc=ac; %H0=%H1+%H2; %3=cc; %H0=%H0+%3;"
+    [--SP]=I0;[--SP]=%3;%3=%1+%2;cc=ac;I0=%3;%3=[SP++];%H0=%H1+%H2;%3=cc;%H0=%H0+%3;%0=I0;I0=[SP++];"
   [(set_attr "type" "alu0")
    (set_attr "length" "8,10")])
 
@@ -928,6 +928,7 @@
           for (; i < last_reg; i++)
              if (i != REGNO (operands[0])) {
                char buf[128];
+
                sprintf (buf, \"[--SP] = %s;\", reg_names[i]);
                output_asm_insn (buf, operands);
 
@@ -1458,13 +1459,16 @@ else
 ;  "cc &=%1==%2;"
 ;  [(set_attr "type" "compare")])
 
-
 (define_insn ""
-  [(set (match_operand:CC 0 "cc_operand" "=C,C")
-        (eq:CC (match_operand:SI 1 "register_operand"  "d, a")
-               (match_operand:SI 2 "nonmemory_operand" "dO,aO")))]
+  [(set (match_operand:CC 0 "cc_operand" "=C,C,C,C")
+        (eq:CC (match_operand:SI 1 "register_operand"  "d, a,d,a")
+               (match_operand:SI 2 "nonmemory_operand" "dO,aO,a,d")))]
   ""
-  "cc =%1==%2;"
+  "@
+    cc =%1==%2;
+    cc =%1==%2;
+    [--SP]=R3;R3=%2;cc =%1==R3;R3=[SP++];
+    [--SP]=R3;R3=%1;cc =%2==R3;R3=[SP++];"
   [(set_attr "type" "compare")])
 
 (define_insn ""
