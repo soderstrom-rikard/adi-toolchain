@@ -506,7 +506,7 @@ static int is_group2 (INSTR_T x)
 // semantic auxiliaries
 
 %token IF COMMA BY
-%token COLON
+%token COLON SEMICOLON
 %token RPAREN LPAREN LBRACK RBRACK
 %token MODIFIED_STATUS_REG
 %token MNOP
@@ -588,9 +588,9 @@ asm_or_directive:
 	{ insn=$2; return (1); }
 ;
 
-asm: asm_1
+asm: asm_1 SEMICOLON
 	// Parallel instructions:
-	| asm_1 DOUBLE_BAR asm_1 DOUBLE_BAR asm_1 {
+	| asm_1 DOUBLE_BAR asm_1 DOUBLE_BAR asm_1 SEMICOLON {
 	if (($1->value & 0xf800) == 0xc000) {
 		if (is_group1($3) && is_group2($5)) {
 			$$ = gen_multi_instr($1, $3, $5);
@@ -605,7 +605,7 @@ asm: asm_1
 		error("\nIllegal Multi Issue Construct, first instruction must be DSP32\n");
 	}
 
-	| MNOP DOUBLE_BAR asm_1 DOUBLE_BAR asm_1
+	| MNOP DOUBLE_BAR asm_1 DOUBLE_BAR asm_1 SEMICOLON
 	{
 		if (is_group1($3) && is_group2($5)) {
 			$$ = gen_multi_instr(0, $3, $5);
@@ -617,7 +617,7 @@ asm: asm_1
 		}
 	}
 
-	| MNOP DOUBLE_BAR asm_1
+	| MNOP DOUBLE_BAR asm_1 SEMICOLON
 	{
 		if (is_group1($3)) {
 			$$ = gen_multi_instr(0, $3, 0);
@@ -630,12 +630,12 @@ asm: asm_1
 
 	}
 
-	| MNOP
+	| MNOP SEMICOLON
 	{
 		$$ = gen_multi_instr(0, 0, 0);
 	}
 
-	| asm_1 DOUBLE_BAR asm_1
+	| asm_1 DOUBLE_BAR asm_1 SEMICOLON
 	{
 		if (($1->value & 0xf800) == 0xc000) {
 

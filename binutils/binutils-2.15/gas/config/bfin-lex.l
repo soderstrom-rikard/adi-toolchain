@@ -278,6 +278,7 @@ abort                                   return ABORT;
 "&"                     return AMPERSAND;
 "%"                     return PERCENT;
 "!"                     return BANG;
+";"                     return SEMICOLON;
 "=!"					return _ASSIGN_BANG;
 "||"					return DOUBLE_BAR;
 <KEYWORD>prefetch|PREFETCH                       return PREFETCH;

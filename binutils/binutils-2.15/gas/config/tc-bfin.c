@@ -389,15 +389,25 @@ void
 md_assemble (char *line)
 {
   char *toP = 0;
-  extern char *current_inputline; 
+  extern char *current_inputline;
   int size, insn_size;
   struct bfin_insn *tmp_insn;
+  size_t len;
+  static size_t buffer_len = 0;
 
-  //char *c;
-  
-  current_inputline = line;
-  /* Parse line here */
-  parse(line); 
+  len = strlen (line);
+  if (len > buffer_len)
+    {
+      if (buffer_len > 0)
+	free (current_inputline);
+      buffer_len = len + 40;
+      current_inputline = xmalloc (buffer_len);
+    }
+  memcpy (current_inputline, line, len);
+  current_inputline[len] = ';';
+  current_inputline[len + 1] = '\0';
+
+  parse (current_inputline);
 
   for (insn_size = 0, tmp_insn = insn; tmp_insn; tmp_insn = tmp_insn->next)
     if (! tmp_insn->reloc || ! tmp_insn->exp->symbol)

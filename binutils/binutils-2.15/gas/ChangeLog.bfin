@@ -1,3 +1,10 @@
+2004-11-17  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin-lex.l: ";" is SEMICOLON.
+	* config/tc-bfin.c (md_assemble): Append semicolons to input lines.
+	* config/bfin-parse.y (SEMICOLON): New token.
+	(asm): Require SEMICOLON at the end of each line.
+
 2004-11-15  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin-lex.l: Accept capitalized ABS.
