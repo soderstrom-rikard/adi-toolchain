@@ -86,7 +86,7 @@
 #error "Don't know how to support your CPU architecture??"
 #endif
 
-#ifdef TARGET_m68k
+#if defined(TARGET_m68k) || defined(TARGET_bfin)
 /*
  * Define a maximum number of bytes allowed in the offset table.
  * We'll fail if the table is larger than this.
@@ -514,6 +514,7 @@ dump_symbols(symbols, number_of_symbols);
     unsigned long *lp = (unsigned long *)data;
     /* Should call ntohl(*lp) here but is isn't going to matter */
     while (*lp != 0xffffffff) lp++;
+
     got_size = ((unsigned char *)lp) - data;
     if (verbose)
 	    printf("GOT table contains %d entries (%d bytes)\n",
@@ -597,7 +598,6 @@ dump_symbols(symbols, number_of_symbols);
 		for (p = relpp; (relcount && (*p != NULL)); p++, relcount--) {
 			unsigned char *r_mem;
 			int relocation_needed = 0;
-
 #ifdef TARGET_microblaze
 			/* The MICROBLAZE_XX_NONE relocs can be skipped.
 			   They represent PC relative branches that the
@@ -1785,7 +1785,7 @@ int main(int argc, char *argv[])
   hdr.stack_size  = htonl(stack); /* FIXME */
   hdr.reloc_start = htonl(sizeof(struct flat_hdr) + real_address_bits(data_vma) + data_len);
   hdr.reloc_count = htonl(reloc_len);
-#ifdef TARGET_bfin
+#if 0
   hdr.flags       = htonl(FLAT_FLAG_RAM);
 #else
   hdr.flags       = htonl(0
