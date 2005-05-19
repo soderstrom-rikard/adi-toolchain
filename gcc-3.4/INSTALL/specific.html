@@ -730,8 +730,9 @@ have installed.
 <p>IA-64 processor (also known as IPF, or Itanium Processor Family)
 running GNU/Linux.
 
-   <p>If you are using the optional libunwind library, then you must use
-libunwind 0.96 or later.
+   <p>If you are using the installed system libunwind library with
+<span class="option">--with-system-libunwind</span>, then you must use libunwind 0.98 or
+later.
 
    <p>None of the following versions of GCC has an ABI that is compatible
 with any of the other versions in this list, with the exception that
@@ -752,7 +753,9 @@ the option <span class="option">--with-gnu-as</span> may be necessary.
 
    <p>The GCC libunwind library has not been ported to HPUX. This means that for
 GCC versions 3.2.3 and earlier, <span class="option">--enable-libunwind-exceptions</span>
-is required to build GCC. For GCC 3.3 and later, this is the default.
+is required to build GCC. For GCC 3.3 and later, this is the default. 
+For gcc 3.4.3 and later, <span class="option">--enable-libunwind-exceptions</span> is
+removed and the system libunwind library will always be used.
 
    <p><hr />
 <!-- rs6000-ibm-aix*, powerpc-ibm-aix* -->
@@ -1002,6 +1005,14 @@ later, and use the <span class="option">--with-gnu-as</span> and <span class="op
 <span class="command">configure</span> options when configuring GCC.  You need to use GNU
 <span class="command">ar</span> and <span class="command">nm</span>, also distributed with GNU binutils.
 
+   <p>Some users have reported that <span class="command">/bin/sh</span> will hang during bootstrap. 
+This problem can be avoided by running the commands:
+
+<pre class="smallexample">        % CONFIG_SHELL=/bin/ksh
+        % export CONFIG_SHELL
+</pre>
+   <p>before starting the build.
+
    <p><hr />
 
 <h3 class="heading"><a name="TOC35"></a><a name="mips_002dsgi_002dirix6"></a>mips-sgi-irix6</h3>
@@ -1221,8 +1232,19 @@ have <span class="file">/usr/xpg4/bin</span> in your <span class="env">PATH</spa
 <span class="file">/usr/bin</span> before <span class="file">/usr/xpg4/bin</span> for the duration of the build.
 
    <p>All releases of GNU binutils prior to 2.11.2 have known bugs on this
-platform.  We recommend the use of GNU binutils 2.11.2 or the vendor
-tools (Sun <span class="command">as</span>, Sun <span class="command">ld</span>).
+platform.  We recommend the use of GNU binutils 2.11.2 or later, or the
+vendor tools (Sun <span class="command">as</span>, Sun <span class="command">ld</span>).  Note that your mileage
+may vary if you use a combination of the GNU tools and the Sun tools: while
+the combination GNU <span class="command">as</span> + Sun <span class="command">ld</span> should reasonably work,
+the reverse combination Sun <span class="command">as</span> + GNU <span class="command">ld</span> is known to
+cause memory corruption at runtime in some cases for C++ programs.
+
+   <p>The stock GNU binutils 2.15 release is broken on this platform because of a
+single bug.  It has been fixed on the 2.15 branch in the CVS repository. 
+You can obtain a working version by checking out the binutils-2_15-branch
+from the CVS repository or applying the patch
+<a href="http://sources.redhat.com/ml/binutils-cvs/2004-09/msg00036.html">http://sources.redhat.com/ml/binutils-cvs/2004-09/msg00036.html</a> to the
+release.
 
    <p>Sun bug 4296832 turns up when compiling X11 headers with GCC 2.95 or
 newer: <span class="command">g++</span> will complain that types are missing.  These headers assume
@@ -1237,6 +1259,17 @@ will assume that any missing type is <code>int</code> (as defined by C89).
 106248-42 or newer for Intel), Solaris 7 (108376-21 or newer for SPARC,
 108377-20 for Intel), and Solaris 8 (108652-24 or newer for SPARC,
 108653-22 for Intel) that fix this bug.
+
+   <p>Sun bug 4927647 sometimes causes random spurious testsuite failures
+related to missing diagnostic output.  This bug doesn't affect GCC
+itself, rather it is a kernel bug triggered by the <span class="command">expect</span>
+program which is used only by the GCC testsuite driver.  When the bug
+causes the <span class="command">expect</span> program to miss anticipated output, extra
+testsuite failures appear.
+
+   <p>There are patches for Solaris 8 (117350-12 or newer for SPARC,
+117351-12 or newer for Intel) and Solaris 9 (117171-11 or newer for
+SPARC, 117172-11 or newer for Intel) that address this problem.
 
    <p><hr />
 
@@ -1287,11 +1320,14 @@ compiler.  This is Sun bug 4974440.  This is fixed with patch 112760-07.
 assembler, this change apparently runs afoul of Sun bug 4910101, for
 which (as of 2004-05-23) there is no fix.  A symptom of the problem is
 that you cannot compile C++ programs like <span class="command">groff</span> 1.19.1
-without getting messages like <span class="samp">ld: warning: relocation error:
-R_SPARC_UA32 ... external symbolic relocation against
-non-allocatable section .debug_info; cannot be processed at runtime:
-relocation ignored</span>.  To work around this problem, compile with
-<span class="option">-gstabs+</span> instead of plain <span class="option">-g</span>.
+without getting messages similar to the following:
+
+<pre class="smallexample">     ld: warning: relocation error: R_SPARC_UA32: ...
+       external symbolic relocation against non-allocatable section
+       .debug_info cannot be processed at runtime: relocation ignored.
+</pre>
+   <p>To work around this problem, compile with <span class="option">-gstabs+</span> instead of
+plain <span class="option">-g</span>.
 
    <p><hr />
 
