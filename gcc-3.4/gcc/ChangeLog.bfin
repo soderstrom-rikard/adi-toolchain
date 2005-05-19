@@ -1,3 +1,8 @@
+2005-05-19  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.md (attr "length" default): Change the offset of
+	forward conditional branch of length 4 from 4096 to 4092.
+
 2005-05-18  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* aclocal.m4 (_gcc_COMPUTE_GAS_VERSION): Accept whitespace in
