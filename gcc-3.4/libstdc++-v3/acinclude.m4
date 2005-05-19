@@ -1431,28 +1431,12 @@ dnl --enable-long-long defines _GLIBCXX_USE_LONG_LONG
 dnl --disable-long-long leaves _GLIBCXX_USE_LONG_LONG undefined
 dnl  +  Usage:  GLIBCXX_ENABLE_LONG_LONG[(DEFAULT)]
 dnl       Where DEFAULT is either `yes' or `no'.
-dnl  +  If 'long long' stuff is not available, ignores DEFAULT and sets `no'.
 dnl
 AC_DEFUN([GLIBCXX_ENABLE_LONG_LONG], [
   GLIBCXX_ENABLE(long-long,$1,,[enables I/O support for 'long long'])
-
-  AC_LANG_SAVE
-  AC_LANG_CPLUSPLUS
-
-  AC_MSG_CHECKING([for enabled long long I/O support])
-  # iostreams require strtoll, strtoull to compile
-  AC_TRY_COMPILE([#include <stdlib.h>],
-                 [char* tmp; strtoll("gnu", &tmp, 10);],,[enable_long_long=no])
-  AC_TRY_COMPILE([#include <stdlib.h>],
-                 [char* tmp; strtoull("gnu", &tmp, 10);],,[enable_long_long=no])
-
-  # Option parsed, now set things appropriately
   if test $enable_long_long = yes; then
     AC_DEFINE(_GLIBCXX_USE_LONG_LONG)
   fi
-  AC_MSG_RESULT($enable_long_long)
-
-  AC_LANG_RESTORE
 ])
 
 
@@ -1615,6 +1599,23 @@ if test $enable_symvers != no; then
   CFLAGS=' -lgcc_s'
   AC_TRY_LINK(, [return 0;], glibcxx_shared_libgcc=yes, glibcxx_shared_libgcc=no)
   CFLAGS="$ac_save_CFLAGS"
+  if test $glibcxx_shared_libgcc = no; then
+    cat > conftest.c <<EOF
+int main (void) { return 0; }
+EOF
+changequote(,)dnl
+    glibcxx_libgcc_s_suffix=`${CC-cc} $CFLAGS $CPPFLAGS $LDFLAGS \
+			     -shared -shared-libgcc -o conftest.so \
+			     conftest.c -v 2>&1 >/dev/null \
+			     | sed -n 's/^.* -lgcc_s\([^ ]*\) .*$/\1/p'`
+changequote([,])dnl
+    rm -f conftest.c conftest.so
+    if test x${glibcxx_libgcc_s_suffix+set} = xset; then
+      CFLAGS=" -lgcc_s$glibcxx_libgcc_s_suffix"
+      AC_TRY_LINK(, [return 0;], glibcxx_shared_libgcc=yes)
+      CFLAGS="$ac_save_CFLAGS"
+    fi
+  fi
   AC_MSG_RESULT($glibcxx_shared_libgcc)
 fi
 

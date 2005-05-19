@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "GCC 1"
-.TH GCC 1 "2004-07-01" "gcc-3.4.1" "GNU"
+.TH GCC 1 "2004-09-06" "gcc-3.4.2" "GNU"
 .SH "NAME"
 gcc \- GNU project C and C++ compiler
 .SH "SYNOPSIS"
@@ -381,7 +381,8 @@ in the following sections.
 \&\-munaligned\-doubles  \-mno\-unaligned\-doubles 
 \&\-mv8plus  \-mno\-v8plus  \-mvis  \-mno\-vis 
 \&\-mcypress  \-mf930  \-mf934 
-\&\-msparclite  \-msupersparc  \-mv8\fR
+\&\-msparclite  \-msupersparc  \-mv8
+\&\-threads \-pthreads\fR
 .Sp
 \&\fI\s-1ARM\s0 Options\fR
 \&\fB\-mapcs\-frame  \-mno\-apcs\-frame 
@@ -1574,7 +1575,7 @@ to a plain pointer.
 .IP "\fB\-Wsign\-promo\fR (\*(C+ only)" 4
 .IX Item "-Wsign-promo ( only)"
 Warn when overload resolution chooses a promotion from unsigned or
-enumeral type to a signed type, over a conversion to an unsigned type of
+enumerated type to a signed type, over a conversion to an unsigned type of
 the same size.  Previous versions of G++ would try to preserve
 unsignedness, but the standard mandates the current behavior.
 .IP "\fB\-Wsynth\fR (\*(C+ only)" 4
@@ -1841,7 +1842,7 @@ two forms, whichever is not the default.
 .PP
 The following options control the amount and kinds of warnings produced
 by \s-1GCC\s0; for further, language-specific options also refer to
-\&\f(CW@ref\fR{\*(C+ Dialect Options} and \f(CW@ref\fR{Objective\-C Dialect Options}.
+\&\fB\*(C+ Dialect Options\fR and \fBObjective-C Dialect Options\fR.
 .IP "\fB\-fsyntax\-only\fR" 4
 .IX Item "-fsyntax-only"
 Check the code for syntax errors, but don't do anything beyond that.
@@ -2109,7 +2110,7 @@ future implementation may also work for \*(C+ programs.
 The C standard is worded confusingly, therefore there is some debate
 over the precise meaning of the sequence point rules in subtle cases.
 Links to discussions of the problem, including proposed formal
-definitions, may be found on our readings page, at
+definitions, may be found on the \s-1GCC\s0 readings page, at
 <\fBhttp://gcc.gnu.org/readings.html\fR>.
 .IP "\fB\-Wreturn\-type\fR" 4
 .IX Item "-Wreturn-type"
@@ -2122,7 +2123,7 @@ message, even when \fB\-Wno\-return\-type\fR is specified.  The only
 exceptions are \fBmain\fR and functions defined in system headers.
 .IP "\fB\-Wswitch\fR" 4
 .IX Item "-Wswitch"
-Warn whenever a \f(CW\*(C`switch\*(C'\fR statement has an index of enumeral type
+Warn whenever a \f(CW\*(C`switch\*(C'\fR statement has an index of enumerated type
 and lacks a \f(CW\*(C`case\*(C'\fR for one or more of the named codes of that
 enumeration.  (The presence of a \f(CW\*(C`default\*(C'\fR label prevents this
 warning.)  \f(CW\*(C`case\*(C'\fR labels outside the enumeration range also
@@ -2133,7 +2134,7 @@ Warn whenever a \f(CW\*(C`switch\*(C'\fR statement does not have a \f(CW\*(C`def
 case.
 .IP "\fB\-Wswitch\-enum\fR" 4
 .IX Item "-Wswitch-enum"
-Warn whenever a \f(CW\*(C`switch\*(C'\fR statement has an index of enumeral type
+Warn whenever a \f(CW\*(C`switch\*(C'\fR statement has an index of enumerated type
 and lacks a \f(CW\*(C`case\*(C'\fR for one or more of the named codes of that
 enumeration.  \f(CW\*(C`case\*(C'\fR labels outside the enumeration range also
 provoke warnings when this option is used.
@@ -2263,8 +2264,8 @@ All of the above \fB\-W\fR options combined.  This enables all the
 warnings about constructions that some users consider questionable, and
 that are easy to avoid (or modify to prevent the warning), even in
 conjunction with macros.  This also enables some language-specific
-warnings described in \f(CW@ref\fR{\*(C+ Dialect Options} and
-\&\f(CW@ref\fR{Objective\-C Dialect Options}.
+warnings described in \fB\*(C+ Dialect Options\fR and
+\&\fBObjective-C Dialect Options\fR.
 .PP
 The following \fB\-W...\fR options are not implied by \fB\-Wall\fR.
 Some of them warn about constructions that users generally do not
@@ -3777,11 +3778,10 @@ These two options are intended to be removed someday, once
 they have helped determine the efficacy of various
 approaches to improving loop optimizations.
 .Sp
-Please let us (<\fBgcc@gcc.gnu.org\fR> and <\fBfortran@gnu.org\fR>)
-know how use of these options affects
-the performance of your production code.
-We're very interested in code that runs \fIslower\fR
-when these options are \fIenabled\fR.
+Please contact <\fBgcc@gcc.gnu.org\fR>, and describe how use of
+these options affects the performance of your production code.
+Examples of code that runs \fIslower\fR when these options are
+\&\fIenabled\fR are very valuable.
 .IP "\fB\-fno\-peephole\fR" 4
 .IX Item "-fno-peephole"
 .PD 0
@@ -3969,7 +3969,7 @@ a ``home register''.
 .IP "\fB\-fweb\fR" 4
 .IX Item "-fweb"
 Constructs webs as commonly used for register allocation purposes and assign
-each web individual pseudo register.  This allows our register allocation pass
+each web individual pseudo register.  This allows the register allocation pass
 to operate on pseudos directly, but also strengthens several other optimization
 passes, such as \s-1CSE\s0, loop optimizer and trivial dead code remover.  It can,
 however, make debugging impossible, since variables will no longer stay in a
@@ -6013,6 +6013,20 @@ With \fB\-mstack\-bias\fR, \s-1GCC\s0 assumes that the stack pointer, and
 frame pointer if present, are offset by \-2047 which must be added back
 when making stack frame references.  This is the default in 64\-bit mode.
 Otherwise, assume no such offset is present.
+.PP
+These switches are supported in addition to the above on Solaris:
+.IP "\fB\-threads\fR" 4
+.IX Item "-threads"
+Add support for multithreading using the Solaris threads library.  This
+option sets flags for both the preprocessor and linker.  This option does
+not affect the thread safety of object code produced by the compiler or
+that of libraries supplied with it.
+.IP "\fB\-pthreads\fR" 4
+.IX Item "-pthreads"
+Add support for multithreading using the \s-1POSIX\s0 threads library.  This
+option sets flags for both the preprocessor and linker.  This option does
+not affect the thread safety of object code produced  by the compiler or
+that of libraries supplied with it.
 .PP
 \fI\s-1ARM\s0 Options\fR
 .IX Subsection "ARM Options"

@@ -1502,6 +1502,34 @@ precedence for that field, but the alignment of the rest of the structure
 may affect its placement.
 @end deftypefn
 
+@deftypefn {Target Hook} {const char *} TARGET_MANGLE_FUNDAMENTAL_TYPE (tree @var{type})
+If your target defines any fundamental types, define this hook to
+return the appropriate encoding for these types as part of a C++
+mangled name.  The @var{type} argument is the tree structure
+representing the type to be mangled.  The hook may be applied to trees
+which are not target-specific fundamental types; it should return
+@code{NULL} for all such types, as well as arguments it does not
+recognize.  If the return value is not @code{NULL}, it must point to
+a statically-allocated string constant.
+
+Target-specific fundamental types might be new fundamental types or
+qualified versions of ordinary fundamental types.  Encode new
+fundamental types as @samp{@w{u @var{n} @var{name}}}, where @var{name}
+is the name used for the type in source code, and @var{n} is the
+length of @var{name} in decimal.  Encode qualified versions of
+ordinary types as @samp{@w{U @var{n} @var{name} @var{code}}}, where
+@var{name} is the name used for the type qualifier in source code,
+@var{n} is the length of @var{name} as above, and @var{code} is the
+code used to represent the unqualified version of this type.  (See
+@code{write_builtin_type} in @file{cp/mangle.c} for the list of
+codes.)  In both cases the spaces are for clarity; do not include any
+spaces in your string.
+
+The default version of this hook always returns @code{NULL}, which is
+appropriate for a target that does not define any new fundamental
+types.
+@end deftypefn
+
 @node Type Layout
 @section Layout of Source Language Data Types
 
@@ -2283,9 +2311,9 @@ single-byte values can be loaded or stored.  This is so that
 @code{PREFERRED_RELOAD_CLASS} can always have a possible value to return.
 
 @deftp {Data type} {enum reg_class}
-An enumeral type that must be defined with all the register class names
-as enumeral values.  @code{NO_REGS} must be first.  @code{ALL_REGS}
-must be the last register class, followed by one more enumeral value,
+An enumerated type that must be defined with all the register class names
+as enumerated values.  @code{NO_REGS} must be first.  @code{ALL_REGS}
+must be the last register class, followed by one more enumerated value,
 @code{LIM_REG_CLASSES}, which is not a register class but rather
 tells how many classes there are.
 
@@ -4654,6 +4682,19 @@ If defined, expands to a C expression clearing the @emph{instruction
 cache} in the specified interval.  The definition of this macro would
 typically be a series of @code{asm} statements.  Both @var{beg} and
 @var{end} are both pointer expressions.
+@end defmac
+
+The operating system may also require the stack to be made executable
+before calling the trampoline.  To implement this requirement, define
+the following macro.
+
+@defmac ENABLE_EXECUTE_STACK
+Define this macro if certain operations must be performed before executing
+code located on the stack.  The macro should expand to a series of C
+file-scope constructs (e.g. functions) and provide a unique entry point
+named @code{__enable_execute_stack}.  The target is responsible for
+emitting calls to the entry point in the code, for example from the
+@code{INITIALIZE_TRAMPOLINE} macro.
 @end defmac
 
 To use a standard subroutine, define the following macro.  In addition,

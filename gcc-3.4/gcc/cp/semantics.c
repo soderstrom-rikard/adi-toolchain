@@ -2567,25 +2567,15 @@ finish_id_expression (tree id_expression,
       /* Only certain kinds of names are allowed in constant
        expression.  Enumerators and template parameters 
        have already been handled above.  */
-      if (integral_constant_expression_p)
+      if (integral_constant_expression_p
+	  && !DECL_INTEGRAL_CONSTANT_VAR_P (decl))
 	{
-	    /* Const variables or static data members of integral or
-	      enumeration types initialized with constant expressions
-	      are OK.  */
-	  if (TREE_CODE (decl) == VAR_DECL
-	      && CP_TYPE_CONST_P (TREE_TYPE (decl))
-	      && INTEGRAL_OR_ENUMERATION_TYPE_P (TREE_TYPE (decl))
-	      && DECL_INITIALIZED_BY_CONSTANT_EXPRESSION_P (decl))
-	    ;
-	  else
+	  if (!allow_non_integral_constant_expression_p)
 	    {
-	      if (!allow_non_integral_constant_expression_p)
-		{
-		  error ("`%D' cannot appear in a constant-expression", decl);
-		  return error_mark_node;
-		}
-	      *non_integral_constant_expression_p = true;
+	      error ("`%D' cannot appear in a constant-expression", decl);
+	      return error_mark_node;
 	    }
+	  *non_integral_constant_expression_p = true;
 	}
       
       if (TREE_CODE (decl) == NAMESPACE_DECL)
@@ -2935,18 +2925,6 @@ expand_body (tree fn)
 
   extract_interface_info ();
 
-  /* If this function is marked with the constructor attribute, add it
-     to the list of functions to be called along with constructors
-     from static duration objects.  */
-  if (DECL_STATIC_CONSTRUCTOR (fn))
-    static_ctors = tree_cons (NULL_TREE, fn, static_ctors);
-
-  /* If this function is marked with the destructor attribute, add it
-     to the list of functions to be called along with destructors from
-     static duration objects.  */
-  if (DECL_STATIC_DESTRUCTOR (fn))
-    static_dtors = tree_cons (NULL_TREE, fn, static_dtors);
-
   if (DECL_CLONED_FUNCTION_P (fn))
     {
       /* If this is a clone, go through the other clones now and mark
@@ -3009,6 +2987,18 @@ expand_or_defer_fn (tree fn)
   if (DECL_DECLARED_INLINE_P (fn))
     import_export_decl (fn);
 
+  /* If this function is marked with the constructor attribute, add it
+     to the list of functions to be called along with constructors
+     from static duration objects.  */
+  if (DECL_STATIC_CONSTRUCTOR (fn))
+    static_ctors = tree_cons (NULL_TREE, fn, static_ctors);
+
+  /* If this function is marked with the destructor attribute, add it
+     to the list of functions to be called along with destructors from
+     static duration objects.  */
+  if (DECL_STATIC_DESTRUCTOR (fn))
+    static_dtors = tree_cons (NULL_TREE, fn, static_dtors);
+
   function_depth++;
 
   /* Expand or defer, at the whim of the compilation unit manager.  */
@@ -3035,6 +3025,27 @@ nullify_returns_r (tree* tp, int* walk_subtrees, void* data)
   else if (TREE_CODE (*tp) == CLEANUP_STMT
 	   && CLEANUP_DECL (*tp) == nrv)
     CLEANUP_EH_ONLY (*tp) = 1;
+  /* Replace the DECL_STMT for the NRV with an initialization of the
+     RESULT_DECL, if needed.  */
+  else if (TREE_CODE (*tp) == DECL_STMT
+	   && DECL_STMT_DECL (*tp) == nrv)
+    {
+      tree init;
+      if (DECL_INITIAL (nrv)
+	  && DECL_INITIAL (nrv) != error_mark_node)
+	{
+	  init = build (INIT_EXPR, void_type_node,
+			DECL_RESULT (current_function_decl),
+			DECL_INITIAL (nrv));
+	  DECL_INITIAL (nrv) = error_mark_node;
+	}
+      else
+	init = NULL_TREE;
+      init = build_stmt (EXPR_STMT, init);
+      TREE_CHAIN (init) = TREE_CHAIN (*tp);
+      STMT_LINENO (init) = STMT_LINENO (*tp);
+      *tp = init;
+    }
 
   /* Keep iterating.  */
   return NULL_TREE;
