@@ -1,3 +1,9 @@
+2005-05-21  Jie Zhang  <jie.zhang@analog.com>
+
+	* gas/bfin/expected_move_errors.l: New.
+	* gas/bfin/expected_move_errors.s: New.
+	* gas/bfin/bfin.exp: Add expected_move_errors.
+
 2005-05-20  Jie Zhang  <jie.zhang@analog.com>
 
 	* gas/bfin/stack.d: Expect [--SP] instead of [SP--] for push multiple

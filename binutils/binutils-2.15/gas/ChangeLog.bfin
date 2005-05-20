@@ -1,3 +1,8 @@
+2005-05-21  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin-parse.y (assign_macfunc): Check if even/odd and high/low
+	register matches A0/A1.
+
 2005-02-24  Catherine Moore <clm@cm00re.com>
 
 	* read.c (read_a_source_file):  Update TC_EQUAL_IN_INSN test to match fsf sources.

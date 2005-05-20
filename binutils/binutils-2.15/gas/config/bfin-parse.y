@@ -3945,6 +3945,11 @@ assign_macfunc:
 	  $$.w = 1; $$.P = 1; $$.n = IS_A1 ($3);
 	  $$.op = 3; $$.dst = $1;
 	  $$.s0.regno = 0; $$.s1.regno = 0; // XXX
+
+	  if (IS_A1 ($3) && IS_EVEN ($1))
+	    return semantic_error ("Cannot move A1 to even register");
+	  else if (!IS_A1 ($3) && !IS_EVEN ($1))
+	    return semantic_error ("Cannot move A0 to odd register");
 	}
 
 	| a_macfunc
@@ -3971,6 +3976,11 @@ assign_macfunc:
 	  $$.w = 1; $$.P = 0; $$.n = IS_A1 ($3);
 	  $$.op = 3; $$.dst = $1;
 	  $$.s0.regno = 0; $$.s1.regno = 0;
+
+	  if (IS_A1 ($3) && !IS_H ($1))
+	    return semantic_error ("Cannot move A1 to low half of register");
+	  else if (!IS_A1 ($3) && IS_H ($1))
+	    return semantic_error ("Cannot move A0 to high half of register");
 	}
 ;
 
