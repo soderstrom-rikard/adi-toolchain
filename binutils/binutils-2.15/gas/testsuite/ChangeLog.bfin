@@ -1,3 +1,9 @@
+2005-05-20  Jie Zhang  <jie.zhang@analog.com>
+
+	* gas/bfin/stack.d: Expect [--SP] instead of [SP--] for push multiple
+	instruction.
+	* gas/bfin/stack2.d: Likewise.
+
 2005-02-24  Catherine Moore  <clm@cm00re.com>
 
 	* gas/bfin/bit.s: Vary format of test.

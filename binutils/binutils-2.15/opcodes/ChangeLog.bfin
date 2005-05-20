@@ -1,3 +1,8 @@
+2005-05-20  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-dis.c (decode_PushPopMultiple_0): Print [--SP] instead of
+	[SP--] for push multiple instruction.
+
 2005-02-01  Catherine Moore  <clm@cm00re.com>
 
 	* bfin-dis.c (decode_dsp32shift_0): Improve whitespace.

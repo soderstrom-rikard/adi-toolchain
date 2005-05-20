@@ -1050,7 +1050,7 @@ decode_PushPopMultiple_0 (TIword iw0, disassemble_info *outf)
   if (W == 1 && d == 1 && p == 1)
     {
       notethat ("[ -- SP ] = ( R7 : reglim , P5 : reglim )");
-      OUTS (outf, "[SP--] = (R7:");
+      OUTS (outf, "[--SP] = (R7:");
       OUTS (outf, ds);
       OUTS (outf, ", P5:");
       OUTS (outf, ps);
