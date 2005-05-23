@@ -38,6 +38,6 @@ Disassembly of section .text:
 
 0000001c <nop>:
   1c:	00 00       	NOP;
-  1e:	03 c8 00 18 	mnop || NOP || NOP;
+  1e:	03 c8 00 18 	mnop \|\| NOP \|\| NOP;
   22:	00 00 00 00 
 	...

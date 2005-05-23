@@ -35,27 +35,27 @@ Disassembly of section .text:
 
 00000030 <move_cc>:
   30:	00 02       	R0=CC;
-  32:	ac 03       	AC0|=CC;
+  32:	ac 03       	AC0\|=CC;
   34:	80 03       	AZ=CC;
   36:	81 03       	AN=CC;
   38:	cd 03       	AC1&=CC;
   3a:	f8 03       	V\^=CC;
-  3c:	b9 03       	VS|=CC;
+  3c:	b9 03       	VS\|=CC;
   3e:	90 03       	AV0=CC;
   40:	d2 03       	AV1&=CC;
   42:	93 03       	AV1S=CC;
-  44:	a6 03       	AQ|=CC;
+  44:	a6 03       	AQ\|=CC;
   46:	0c 02       	CC=R4;
   48:	00 03       	CC = AZ;
-  4a:	21 03       	CC|=AN;
+  4a:	21 03       	CC\|=AN;
   4c:	4c 03       	CC&=AC0;
   4e:	6d 03       	CC\^=AC1;
   50:	18 03       	CC = V;
-  52:	39 03       	CC|=VS;
+  52:	39 03       	CC\|=VS;
   54:	50 03       	CC&=AV0;
   56:	72 03       	CC\^=AV1;
   58:	13 03       	CC = AV1S;
-  5a:	26 03       	CC|=AQ;
+  5a:	26 03       	CC\|=AQ;
 
 0000005c <negate_cc>:
   5c:	18 02       	CC=!CC;

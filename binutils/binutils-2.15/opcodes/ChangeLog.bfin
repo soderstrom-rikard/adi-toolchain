@@ -1,3 +1,11 @@
+2005-05-23  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-dis.c (amod0amod2): New.
+	(decode_dsp32alu_0): Use amod0amod2 (). Fix decoding of opt_mode_0
+	for Vector Add/Subtract.
+	(decode_dsp32shift_0): Insert white space after SHIFT.
+	(decode_dsp32shiftimm_0): Fix decoding of 2's comp. of uimm4.
+
 2005-05-20  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin-dis.c (decode_PushPopMultiple_0): Print [--SP] instead of

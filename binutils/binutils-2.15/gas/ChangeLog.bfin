@@ -1,3 +1,7 @@
+2005-05-23  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin-parse.y (amod2): Initialize x0.
+
 2005-05-21  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin-parse.y (assign_macfunc): Check if even/odd and high/low

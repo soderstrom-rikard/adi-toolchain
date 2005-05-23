@@ -585,6 +585,86 @@ illegal_instruction:
 }
 
 static void
+amod0amod2 (int s0, int x0, int aop0, disassemble_info *outf)
+{
+  if (s0 == 0 && x0 == 0 && aop0 == 0)
+    {
+      notethat ("(NS)");
+      return;
+    }
+  else if (s0 == 1 && x0 == 0 && aop0 == 0)
+    {
+      notethat ("(S)");
+      OUTS (outf, "(S)");
+      return;
+    }
+  else if (s0 == 0 && x0 == 1 && aop0 == 0)
+    {
+      notethat ("(CO)");
+      OUTS (outf, "(CO)");
+      return;
+    }
+  else if (s0 == 1 && x0 == 1 && aop0 == 0)
+    {
+      notethat ("(SCO)");
+      OUTS (outf, "(SCO)");
+      return;
+    }
+  else if (s0 == 0 && x0 == 0 && aop0 == 2)
+    {
+      notethat ("(ASR)");
+      OUTS (outf, "(ASR)");
+      return;
+    }
+  else if (s0 == 1 && x0 == 0 && aop0 == 2)
+    {
+      notethat ("(S,ASR)");
+      OUTS (outf, "(S,ASR)");
+      return;
+    }
+  else if (s0 == 0 && x0 == 1 && aop0 == 2)
+    {
+      notethat ("(CO,ASR)");
+      OUTS (outf, "(CO,ASR)");
+      return;
+    }
+  else if (s0 == 1 && x0 == 1 && aop0 == 2)
+    {
+      notethat ("(SCO,ASR)");
+      OUTS (outf, "(SCO,ASR)");
+      return;
+    }
+  else if (s0 == 0 && x0 == 0 && aop0 == 3)
+    {
+      notethat ("(ASL)");
+      OUTS (outf, "(ASL)");
+      return;
+    }
+  else if (s0 == 1 && x0 == 0 && aop0 == 3)
+    {
+      notethat ("(S,ASL)");
+      OUTS (outf, "(S,ASL)");
+      return;
+    }
+  else if (s0 == 0 && x0 == 1 && aop0 == 3)
+    {
+      notethat ("(CO,ASL)");
+      OUTS (outf, "(CO,ASL)");
+      return;
+    }
+  else if (s0 == 1 && x0 == 1 && aop0 == 3)
+    {
+      notethat ("(SCO,ASL)");
+      OUTS (outf, "(SCO,ASL)");
+      return;
+    }
+  else
+    goto illegal_instruction;
+illegal_instruction:
+  return;
+}
+
+static void
 searchmod (int r0, disassemble_info *outf)
 {
   if ((r0 == 0))
@@ -4747,16 +4827,7 @@ decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, dregs (src0));
       OUTS (outf, "-|-");
       OUTS (outf, dregs (src1));
-      if (s == 1 && x == 0 && aop == 2)
-	OUTS (outf, "(S, ASR)");
-      else if (s == 1 && x == 0 && aop == 3)
-	OUTS (outf, "(S, ASL)");
-      else if (s == 0 && x == 0 && aop == 2)
-	OUTS (outf, "(ASR)");
-      else if (s == 0 && x == 0 && aop == 3)
-	OUTS (outf, "(ASL)");
-      else
-	OUTS (outf, "");
+      amod0amod2 (s, x, aop, outf);
       return 2 * 2;
     }
   else if (aop == 0 && aopcde == 11)
@@ -5051,16 +5122,7 @@ decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, dregs (src0));
       OUTS (outf, "-|+");
       OUTS (outf, dregs (src1));
-      if (s == 1 && x == 0 && aop == 2)
-	OUTS (outf, "(S, ASR)");
-      else if (s == 1 && x == 0 && aop == 3)
-	OUTS (outf, "(S, ASL)");
-      else if (s == 0 && x == 0 && aop == 2)
-	OUTS (outf, "(ASR)");
-      else if (s == 0 && x == 0 && aop == 3)
-	OUTS (outf, "(ASL)");
-      else
-	OUTS (outf, "");
+      amod0amod2 (s, x, aop, outf);
       return 2 * 2;
     }
   else if (aop == 0 && aopcde == 4)
@@ -5356,7 +5418,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs = SHIFT dregs BY dregs_lo");
       OUTS (outf, dregs (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "SHIFT");
+      OUTS (outf, "SHIFT ");
       OUTS (outf, dregs (src1));
       OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
@@ -5378,7 +5440,7 @@ decode_dsp32shift_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       notethat ("dregs = SHIFT dregs BY dregs_lo (V)");
       OUTS (outf, dregs (dst0));
       OUTS (outf, "=");
-      OUTS (outf, "SHIFT");
+      OUTS (outf, "SHIFT ");
       OUTS (outf, dregs (src1));
       OUTS (outf, " BY ");
       OUTS (outf, dregs_lo (src0));
@@ -5785,7 +5847,6 @@ decode_dsp32shiftimm_0 (TIword iw0, TIword iw1, disassemble_info *outf)
   int bit8 = ((iw1 >> 8) & 0x1);
   int immag = ((iw1 >> 3) & 0x3f);
   int newimmag = (-(iw1 >> 3) & 0x3f);
-  int newimmag5 = (-(iw1 >> 3) & 0x1f);
   int dst0 = ((iw1 >> 9) & 0x7);
   int sopcde = ((iw0 >> 0) & 0x1f);
   int HLs = ((iw1 >> 12) & 0x3);
@@ -5798,7 +5859,7 @@ decode_dsp32shiftimm_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, dregs_lo (src1));
       OUTS (outf, ">>>");
-      OUTS (outf, uimm4 (immag));
+      OUTS (outf, uimm4 (newimmag));
       return 2 * 2;
     }
   else if (HLs == 1 && sop == 0 && sopcde == 0)
@@ -5808,7 +5869,7 @@ decode_dsp32shiftimm_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, dregs_hi (src1));
       OUTS (outf, ">>>");
-      OUTS (outf, uimm4 (immag));
+      OUTS (outf, uimm4 (newimmag));
       return 2 * 2;
     }
   else if (HLs == 2 && sop == 0 && sopcde == 0)
@@ -5818,7 +5879,7 @@ decode_dsp32shiftimm_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, dregs_lo (src1));
       OUTS (outf, ">>>");
-      OUTS (outf, uimm4 (immag));
+      OUTS (outf, uimm4 (newimmag));
       return 2 * 2;
     }
   else if (HLs == 3 && sop == 0 && sopcde == 0)
@@ -5828,7 +5889,7 @@ decode_dsp32shiftimm_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, dregs_hi (src1));
       OUTS (outf, ">>>");
-      OUTS (outf, uimm4 (immag));
+      OUTS (outf, uimm4 (newimmag));
       return 2 * 2;
     }
   else if (HLs == 0 && sop == 1 && sopcde == 0)
@@ -5973,7 +6034,7 @@ decode_dsp32shiftimm_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, "A0");
       OUTS (outf, ">>>");
-      OUTS (outf, uimm5 (newimmag5));
+      OUTS (outf, uimm5 (newimmag));
       return 2 * 2;
     }
   else if (sop == 0 && sopcde == 3 && HLs == 1 && bit8 == 0)
@@ -5993,7 +6054,7 @@ decode_dsp32shiftimm_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, "=");
       OUTS (outf, "A1");
       OUTS (outf, ">>>");
-      OUTS (outf, uimm5 (newimmag5));
+      OUTS (outf, uimm5 (newimmag));
       return 2 * 2;
     }
   else if (sop == 1 && sopcde == 3 && HLs == 0)

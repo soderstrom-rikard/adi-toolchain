@@ -18,18 +18,18 @@ Disassembly of section .text:
   18:	06 c4 00 84 	R2= ABS R0\(V\);
 
 0000001c <vector_add_sub>:
-  1c:	00 c4 1a 0a 	R5=R3\+|\+R2 ;
-  20:	00 c4 1a 3a 	R5=R3\+|\+R2 \(SCO\);
-  24:	00 c4 06 8e 	R7=R0-|\+R6 ;
-  28:	00 c4 0b a4 	R2=R1-|\+R3 \(S\);
-  2c:	00 c4 02 48 	R4=R0\+|-R2 ;
-  30:	00 c4 0a 5a 	R5=R1\+|-R2 \(CO\);
-  34:	00 c4 1c cc 	R6=R3-|-R4 ;
-  38:	00 c4 2e de 	R7=R5-|-R6 \(CO\);
-  3c:	01 c4 63 bf 	R5=R4\+|\+R3,R7=R4-|-R3;
-  40:	01 c4 1e c2 	R0=R3\+|\+R6,R1=R3-|-R6\(ASL\);
-  44:	21 c4 ca 2d 	R7=R1\+|-R2,R6=R1-|\+R2;
-  48:	21 c4 53 0a 	R1=R2\+|-R3,R5=R2-|\+R3;
+  1c:	00 c4 1a 0a 	R5=R3\+\|\+R2 ;
+  20:	00 c4 1a 3a 	R5=R3\+\|\+R2 \(SCO\);
+  24:	00 c4 06 8e 	R7=R0-\|\+R6 ;
+  28:	00 c4 0b a4 	R2=R1-\|\+R3 \(S\);
+  2c:	00 c4 02 48 	R4=R0\+\|-R2 ;
+  30:	00 c4 0a 5a 	R5=R1\+\|-R2 \(CO\);
+  34:	00 c4 1c cc 	R6=R3-\|-R4 ;
+  38:	00 c4 2e de 	R7=R5-\|-R6 \(CO\);
+  3c:	01 c4 63 bf 	R5=R4\+\|\+R3,R7=R4-\|-R3\(SCO,ASR\);
+  40:	01 c4 1e c2 	R0=R3\+\|\+R6,R1=R3-\|-R6\(ASL\);
+  44:	21 c4 ca 2d 	R7=R1\+\|-R2,R6=R1-\|\+R2\(S\);
+  48:	21 c4 53 0a 	R1=R2\+\|-R3,R5=R2-\|\+R3;
   4c:	04 c4 41 8d 	R5=R0\+R1,R6=R0-R1 \(NS\);
   50:	04 c4 39 a6 	R0=R7\+R1,R3=R7-R1 \(S\);
   54:	11 c4 [c-f][[:xdigit:]] 0b 	R7=A1\+A0,R5=A1-A0 \(NS\);
@@ -46,7 +46,7 @@ Disassembly of section .text:
 00000074 <vector_lshift>:
   74:	81 c6 8a 8b 	R5=R2 >> 0xf \(V\);
   78:	81 c6 11 80 	R0=R1<<0x2 \(V\);
-  7c:	01 c6 11 88 	R4=SHIFTR1 BY R2.L\(V\);
+  7c:	01 c6 11 88 	R4=SHIFT R1 BY R2.L\(V\);
 
 00000080 <vector_max>:
   80:	06 c4 01 0c 	R6=MAX\(R0,R1\)\(V\);

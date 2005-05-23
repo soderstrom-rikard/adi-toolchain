@@ -16,9 +16,9 @@ Disassembly of section .text:
    c:	ec 43       	R4=~R5;
 
 0000000e <or>:
-   e:	08 56       	R0=R0|R1;
-  10:	a3 56       	R2=R3|R4;
-  12:	7e 57       	R5=R6|R7;
+   e:	08 56       	R0=R0\|R1;
+  10:	a3 56       	R2=R3\|R4;
+  12:	7e 57       	R5=R6\|R7;
 
 00000014 <xor>:
   14:	5d 59       	R5=R5\^R3;

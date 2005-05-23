@@ -25,5 +25,5 @@ Disassembly of section .text:
   22:	b1 00       	TESTSET  \(P1\);
   24:	b2 00       	TESTSET  \(P2\);
   26:	00 00       	NOP;
-  28:	03 c8 00 18 	mnop || NOP || NOP;
+  28:	03 c8 00 18 	mnop \|\| NOP \|\| NOP;
   2c:	00 00 00 00 
