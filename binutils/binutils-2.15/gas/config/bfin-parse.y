@@ -1666,13 +1666,14 @@ asm_1:
 /* 2 rules compacted */
 	| CCREG ASSIGN REG LESS_THAN expr iu_or_nothing
 	{
-	  if ((IS_IMM ($5, 3) && $6.r0 == 1) || IS_UIMM ($5, 3))
+	  if (($6.r0 == 1 && IS_IMM ($5, 3))
+	      || ($6.r0 == 3 && IS_UIMM ($5, 3)))
 	    {
 	      notethat("CCflag: CC = dpregs < (u)imm3\n");
 	      $$ = CCFLAG (&$3, imm3($5), $6.r0, 1, IS_PREG ($3) ? 1 : 0);
 	    }
 	  else
-	    return semantic_error ("Bad constant range");
+	    return semantic_error ("Bad constant value");
 	}
 
 	| CCREG ASSIGN REG _ASSIGN_ASSIGN REG
@@ -1721,17 +1722,18 @@ asm_1:
 
 	| CCREG ASSIGN REG _LESS_THAN_ASSIGN expr iu_or_nothing
 	{
-	  if ((IS_IMM ($5, 3) && $6.r0 == 1) || IS_UIMM ($5, 3))
+	  if (($6.r0 == 1 && IS_IMM ($5, 3))
+	      || ($6.r0 == 3 && IS_UIMM ($5, 3)))
 	    {
 	      if (IS_DREG ($3))
 		{
-		  notethat("CCflag: CC = dregs <= imm3\n");
+		  notethat("CCflag: CC = dregs <= (u)imm3\n");
 		  /*    x       y     opc     I     G   */
 		  $$ = CCFLAG (&$3, imm3($5), 1+$6.r0, 1, 0);
 		}
 	      else if (IS_PREG ($3))
 		{
-		  notethat("CCflag: CC = pregs <= imm3\n");
+		  notethat("CCflag: CC = pregs <= (u)imm3\n");
 		  /*    x       y     opc     I     G   */
 		  $$ = CCFLAG (&$3, imm3($5), 1+$6.r0, 1, 1);
 		}
