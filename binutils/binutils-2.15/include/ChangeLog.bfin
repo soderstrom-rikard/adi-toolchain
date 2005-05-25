@@ -1,0 +1,6 @@
+2005-05-25  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	Undo the following change for consistency with our GCC tree:
+
+	2004-03-30  Zack Weinberg  <zack@codesourcery.com>
+	* hashtab.h, splay-tree.h: Use new shorter form of GTY markers.
