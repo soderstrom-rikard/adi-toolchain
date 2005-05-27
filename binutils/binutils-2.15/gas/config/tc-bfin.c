@@ -208,7 +208,7 @@ static const struct bfin_reg_entry bfin_reg_info[] = {
  *
  * PSEUDO-OP    GAS or TC    REMARKS
  * =========    =========    ===============================================
- * .align          GAS
+ * .align          TC        Emulate the native assember in VDSP.
  * .ascii          GAS       ASCII string data.
  * .byte           GAS       8-bit data.
  * .byte2          TC        16-bit data.  Force GAS to handle.
@@ -243,6 +243,7 @@ static const struct bfin_reg_entry bfin_reg_info[] = {
  *
  */
 const pseudo_typeS md_pseudo_table[] = {
+  {"align", s_align_bytes, 0},
   {"byte2", cons, 2},
   {"byte4", cons, 4},
   {"code", obj_elf_section, 0},

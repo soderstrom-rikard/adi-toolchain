@@ -1,3 +1,9 @@
+2005-05-27  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/tc-bfin.c (md_pseudo_table): Use s_align_bytes () to deal
+	with .align directive to emulate the behavior of the native
+	assembler in VDSP.
+
 2005-05-24  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin-parse.y (asm_1): Fix signed constant value checking
