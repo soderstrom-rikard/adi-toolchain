@@ -1,4 +1,4 @@
-2005-05-19  Jie Zhang  <jie.zhang@analog.com>
+2005-05-27  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.h (ASM_OUTPUT_ALIGN): Gas now emulates the
 	behavior of the native assembler in VDSP. So change accordingly.
