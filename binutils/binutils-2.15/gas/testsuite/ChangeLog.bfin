@@ -1,3 +1,8 @@
+2005-05-27  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/control_code.s: Update to test for V =.
+	* gas/bfin/control_code.d: Update expected output to check for V =.
+
 2005-05-24  Jie Zhang  <jie.zhang@analog.com>
 
 	* gas/bfin/expected_errors.l: Add signed constant value range tests

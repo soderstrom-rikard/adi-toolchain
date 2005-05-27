@@ -43,6 +43,7 @@ move_cc:
 	an = Cc;
 	AC1 &= cC;
 	v ^= cc;
+	V = CC;
 	VS |= cC;
 	aV0 = cc;
 	Av1 &= CC;

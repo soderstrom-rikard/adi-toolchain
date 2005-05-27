@@ -40,23 +40,23 @@ Disassembly of section .text:
   36:	81 03       	AN=CC;
   38:	cd 03       	AC1&=CC;
   3a:	f8 03       	V\^=CC;
-  3c:	b9 03       	VS\|=CC;
-  3e:	90 03       	AV0=CC;
-  40:	d2 03       	AV1&=CC;
-  42:	93 03       	AV1S=CC;
-  44:	a6 03       	AQ\|=CC;
-  46:	0c 02       	CC=R4;
-  48:	00 03       	CC = AZ;
-  4a:	21 03       	CC\|=AN;
-  4c:	4c 03       	CC&=AC0;
-  4e:	6d 03       	CC\^=AC1;
-  50:	18 03       	CC = V;
-  52:	39 03       	CC\|=VS;
-  54:	50 03       	CC&=AV0;
-  56:	72 03       	CC\^=AV1;
-  58:	13 03       	CC = AV1S;
-  5a:	26 03       	CC\|=AQ;
+  3c:	98 03       	V=CC;
+  3e:	b9 03       	VS\|=CC;
+  40:	90 03       	AV0=CC;
+  42:	d2 03       	AV1&=CC;
+  44:	93 03       	AV1S=CC;
+  46:	a6 03       	AQ\|=CC;
+  48:	0c 02       	CC=R4;
+  4a:	00 03       	CC = AZ;
+  4c:	21 03       	CC\|=AN;
+  4e:	4c 03       	CC&=AC0;
+  50:	6d 03       	CC\^=AC1;
+  52:	18 03       	CC = V;
+  54:	39 03       	CC\|=VS;
+  56:	50 03       	CC&=AV0;
+  58:	72 03       	CC\^=AV1;
+  5a:	13 03       	CC = AV1S;
+  5c:	26 03       	CC\|=AQ;
 
-0000005c <negate_cc>:
-  5c:	18 02       	CC=!CC;
-	...
+0000005e <negate_cc>:
+  5e:	18 02       	CC=!CC;
