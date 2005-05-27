@@ -222,6 +222,7 @@ static int parse_reg(Register *r, int type, char *rt);
 [aA][vV]0[sS] _REG.regno = S_AV0S; return MODIFIED_STATUS_REG;
 [aA][vV]1 _REG.regno = S_AV1;  return MODIFIED_STATUS_REG;
 [aA][vV]1[sS] _REG.regno = S_AV1S; return MODIFIED_STATUS_REG;
+[vV] _REG.regno = S_V; return MODIFIED_STATUS_REG;
 [vV][sS]  _REG.regno = S_VS;   return MODIFIED_STATUS_REG;
 
 

@@ -1,3 +1,9 @@
+2005-05-27  Catherine Moore  <clm@cm00re.com>
+
+	* config/bfin-defs.h (S_V): Define.
+	* config/bfin-lex.l: Recognize status bit V.
+	* config/tc-bfin.c (bfin_reg_info): Add S_V.
+	
 2005-05-27  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/tc-bfin.c (md_pseudo_table): Use s_align_bytes () to deal
