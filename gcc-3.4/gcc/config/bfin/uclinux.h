@@ -1,0 +1,11 @@
+/*
+ * Copyright (c) 2005 by Analog Devices, Inc. All Rights Reserved.
+ */
+
+#undef  STARTFILE_SPEC
+#define STARTFILE_SPEC \
+  "crt1%O%s crti%O%s crtbegin%O%s"
+
+#undef  ENDFILE_SPEC
+#define ENDFILE_SPEC \
+  "crtend%O%s crtn%O%s"

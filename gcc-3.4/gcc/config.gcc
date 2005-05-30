@@ -1678,14 +1678,17 @@ bfin*-elf*)
 	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h"
         tmake_file=bfin/t-bfin-elf
         use_collect2=no
-#       fixincludes=Makefile.in
+        ;;  
+bfin*-uclinux*)
+	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h bfin/uclinux.h"
+        tmake_file=bfin/t-bfin-elf
+        use_collect2=no
         ;;  
 bfin*-*)
 	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h"
         xm_file="${xm_file} bfin/xm-i386.h"
         tmake_file=bfin/t-bfin
         use_collect2=no
-#       fixincludes=Makefile.in
         ;;  
 ns32k-*-netbsdelf*)
 	echo "GCC does not yet support the ${target} target"; exit 1
