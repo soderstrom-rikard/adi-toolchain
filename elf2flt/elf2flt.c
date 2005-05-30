@@ -238,22 +238,6 @@ dump_symbols(asymbol **symbol_table, int32_t number_of_symbols)
 
 
 int32_t
-get_symbol_offset(char *name, asection *sec, asymbol **symbol_table, int32_t number_of_symbols)
-{
-  int32_t i;
-  for (i=0; i<number_of_symbols; i++) {
-    if (symbol_table[i]->section == sec) {
-      if (!strcmp(symbol_table[i]->name, name)) {
-	return symbol_table[i]->value;
-      }
-    }
-  }
-  return -1;
-}  
-
-
-
-int32_t
 add_com_to_bss(asymbol **symbol_table, int32_t number_of_symbols, int32_t bss_len)
 {
   int32_t i, comsize;
@@ -720,19 +704,8 @@ dump_symbols(symbols, number_of_symbols);
 			 *	Fixup offset in the actual section.
 			 */
 			addstr[0] = 0;
-#ifdef TARGET_bfin
-			if(pic_with_got) 
-				sym_addr = (((*(q->sym_ptr_ptr))->value));
-			else
-			{
-#endif
-  				if ((sym_addr = get_symbol_offset((char *) sym_name,
-				    sym_section, symbols, number_of_symbols)) == -1) {
-					sym_addr = 0;
-				}
-#ifdef TARGET_bfin
-			}
-#endif
+			sym_addr = (((*(q->sym_ptr_ptr))->value));
+
 			if (use_resolved) {
 				/* Use the address of the symbol already in
 				   the program text.  How this is handled may

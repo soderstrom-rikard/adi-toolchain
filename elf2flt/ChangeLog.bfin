@@ -1,3 +1,9 @@
+2005-05-30  Jie Zhang  <jie.zhang@analog.com>
+
+	* elf2flt.c (get_symbol_offset): Removed.
+	(output_relocs): Directly use the symbol a relocation refers to
+	instead of looking it up by it's name.
+
 2005-02-18  Raja  <raja@rrap-software.com>
 	* elf2flt.c (output_rel): MAX_SHARED_LIBS dependency is removed  
 	Handle R_huimm16, R_luimm16, R_byte4_data for pic_with_got
