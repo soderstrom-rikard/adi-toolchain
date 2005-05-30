@@ -680,7 +680,8 @@ asm: asm_1 SEMICOLON
 
 	| MNOP SEMICOLON
 	{
-	  $$ = gen_multi_instr(0, 0, 0);
+	  $$ = DSP32MAC (3, 0, 0, 0, 0, 0, 0, 0, 0,
+			 0, 3, 0, 0, 0);
 	}
 
 	| asm_1 DOUBLE_BAR asm_1 SEMICOLON

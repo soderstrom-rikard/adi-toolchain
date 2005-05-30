@@ -6366,7 +6366,7 @@ _print_insn_bfin (bfd_vma pc, disassemble_info *outf)
   iw0 = bfd_getl16 (buf);
   iw1 = bfd_getl16 (buf + 2);
 
-  if (iw0 == 0xc803 && iw1 == 0x1800)
+  if ((iw0 & 0xf7ff) == 0xc003 && iw1 == 0x1800)
     {
       OUTS (outf, "mnop");
       return 4;
