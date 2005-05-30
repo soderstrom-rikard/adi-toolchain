@@ -3988,17 +3988,17 @@ assign_macfunc:
 ;
 
 a_macfunc:
-	a_assign HALF_REG STAR HALF_REG
+	a_assign multfunc
 	{
-	  $$.n = IS_A1 ($1); $$.op = 0;  $$.s0 = $2; $$.s1 = $4;
+	  $$.n = IS_A1 ($1); $$.op = 0;  $$.s0 = $2.s0; $$.s1 = $2.s1;
 	}
-	| a_plusassign HALF_REG STAR HALF_REG
+	| a_plusassign multfunc
 	{
-	  $$.n = IS_A1 ($1); $$.op = 1;  $$.s0 = $2; $$.s1 = $4;
+	  $$.n = IS_A1 ($1); $$.op = 1;  $$.s0 = $2.s0; $$.s1 = $2.s1;
 	}
-	| a_minusassign HALF_REG STAR HALF_REG
+	| a_minusassign multfunc
 	{
-	  $$.n = IS_A1 ($1); $$.op = 2;  $$.s0 = $2; $$.s1 = $4;
+	  $$.n = IS_A1 ($1); $$.op = 2;  $$.s0 = $2.s0; $$.s1 = $2.s1;
 	}
 ;
 

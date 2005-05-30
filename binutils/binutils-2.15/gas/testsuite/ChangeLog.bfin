@@ -2,6 +2,8 @@
 
 	* gas/bfin/event.d: Update expected output for "mnop;".
 	* gas/bfin/event2.d: Likewise.
+	* gas/bfin/expected_errors.l: Add test using non-DREGS in multfunc.
+	* gas/bfin/expected_errors.s: Likewise.
 
 2005-05-27  Catherine Moore  <clm@cm00re.com>
 

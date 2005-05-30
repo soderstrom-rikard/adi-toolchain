@@ -1,6 +1,8 @@
 2004-05-30  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin-parse.y (asm): Generate 32 bit insns for plain MNOP.
+	From Satyanarayana Reddy:
+	* config/bfin-parse.y (a_macfunc): Use multfunc.
 
 2005-05-27  Catherine Moore  <clm@cm00re.com>
 

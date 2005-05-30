@@ -23,3 +23,5 @@ Syntax error:<[[:digit:]]*>:  `Bad constant value'
 .*:11: Error: 
 Syntax error:<[[:digit:]]*>:  `Bad constant value'
 
+.*:13: Error: 
+Syntax error:<[[:digit:]]*>:  `Multfunc expects Dregs'
