@@ -1,5 +1,11 @@
 2005-05-30  Jie Zhang  <jie.zhang@analog.com>
 
+	Revert:
+	2005-05-30  Jie Zhang  <jie.zhang@analog.com>
+	* config/bfin/elf.h (STARTFILE_SPEC): Replace crt0 with crt1.
+
+2005-05-30  Jie Zhang  <jie.zhang@analog.com>
+
 	* config/bfin/elf.h (STARTFILE_SPEC): Replace crt0 with crt1.
 
 2005-05-27  Jie Zhang  <jie.zhang@analog.com>
