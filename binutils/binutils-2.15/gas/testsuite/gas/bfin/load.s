@@ -61,7 +61,7 @@ load_data_register:
 	r2 = [sp-0];
 	r1 = [fp - 0x0001fffc];
 	R0 = [sp ++ p0];
-	R5 = [Fp-128]
+	R5 = [Fp-128];
 	r2 = [i0];
 	r1 = [I1++];
 	R3 = [I2--];
