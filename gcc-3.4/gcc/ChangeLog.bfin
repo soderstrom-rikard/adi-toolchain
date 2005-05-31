@@ -1,3 +1,10 @@
+2005-05-31  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.h (CC1_SPEC): Remove -O2.
+	(ASM_SPEC): Set empty.
+	(LIB_SPEC): Undef first.
+	* config/bfin/uclinux.h (LIB_SPEC): Defined to process -pthread.
+
 2005-05-30  Jie Zhang  <jie.zhang@analog.com>
 
 	* config.gcc (bfin*-uclinux*): New.

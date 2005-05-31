@@ -56,9 +56,16 @@ extern int target_flags;
   while (0)
 #endif
 
-#define CC1_SPEC  " -O2 "
-#define ASM_SPEC " %{I*} -I include/asm%s "
-#define LIB_SPEC " -lc "
+#ifndef CC1_SPEC
+#define CC1_SPEC ""
+#endif
+
+#ifndef ASM_SPEC
+#define ASM_SPEC ""
+#endif
+
+#undef  LIB_SPEC
+#define LIB_SPEC "-lc"
 
 /* Don't create frame pointers for leaf functions */
 #define TARGET_OMIT_LEAF_FRAME_POINTER (target_flags & MASK_OMIT_LEAF_FRAME_POINTER)

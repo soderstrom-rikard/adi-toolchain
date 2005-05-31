@@ -9,3 +9,6 @@
 #undef  ENDFILE_SPEC
 #define ENDFILE_SPEC \
   "crtend%O%s crtn%O%s"
+
+#undef  LIB_SPEC
+#define LIB_SPEC "%{pthread:-lpthread} -lc"
