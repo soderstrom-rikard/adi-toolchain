@@ -54,6 +54,7 @@
 
 /* from uClinux-x.x.x/include/linux */
 #include "flat.h"     /* Binary flat header description                      */
+#include "libiberty.h"
 
 #ifdef TARGET_bfin
 #define PCREL24_MAGIC_OFFSET -1
