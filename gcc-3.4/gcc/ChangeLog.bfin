@@ -1,5 +1,14 @@
 2005-05-31  Jie Zhang  <jie.zhang@analog.com>
 
+	Apply:
+	2004-09-17  Hans-Peter Nilsson  <hp@bitrange.com>
+	* configure.ac (gcc_cv_gld_version): Handle whitespace before
+	"VERSION=".
+	* aclocal.m4 (_gcc_COMPUTE_GAS_VERSION): Ditto.
+	* configure: Regenerate.
+
+2005-05-31  Jie Zhang  <jie.zhang@analog.com>
+
 	* config/bfin/bfin.h (CC1_SPEC): Remove -O2.
 	(ASM_SPEC): Set empty.
 	(LIB_SPEC): Undef first.
