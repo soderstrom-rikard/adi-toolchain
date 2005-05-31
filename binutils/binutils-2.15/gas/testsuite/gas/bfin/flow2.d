@@ -103,13 +103,12 @@ Disassembly of section .text:
   ce:	81 e1 02 00 	R1=2 <MY_LABEL1-0x28>\(Z\);
   d2:	a2 e0 04 10 	LSETUP\(d6 <bottom_of_FIR_filter\+0x8>,da <bottom_of_FIR_filter\+0xc>\)LC0=P1;
   d6:	e2 e0 04 10 	LSETUP\(da <bottom_of_FIR_filter\+0xc>,de <DoItSome__BEGIN>\)LC0=P1>>1;
-  da:	82 e0 04 00 	LSETUP\(de <DoItSome__BEGIN>,e2 <DoItSome__END>\)LC0;
+  da:	82 e0 03 00 	LSETUP\(de <DoItSome__BEGIN>,e0 <DoItSome__END>\)LC0;
 
 000000de <DoItSome__BEGIN>:
   de:	08 60       	R0=0x1\(x\);
+
+000000e0 <DoItSome__END>:
   e0:	11 60       	R1=0x2\(x\);
-
-000000e2 <DoItSome__END>:
-  e2:	9f e0 8e 03 	LSETUP\(e0 <DoItSome__BEGIN\+0x2>,fffffffe <DoItSome__END\+0xffffff1c>\)LC1;
+  e2:	9f e0 8e 03 	LSETUP\(e0 <DoItSome__END>,fffffffe <DoItSome__END\+0xffffff1e>\)LC1;
 	...
-

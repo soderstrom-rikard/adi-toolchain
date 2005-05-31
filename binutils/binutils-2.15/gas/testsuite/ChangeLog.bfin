@@ -1,3 +1,9 @@
+2004-05-31  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/flow2.d: Update expected output for loop.
+	* gas/bfin/flow.d: Likewise.
+	* gas/bfin/flow.s: Update test case.
+
 2004-05-30  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* gas/bfin/event.d: Update expected output for "mnop;".

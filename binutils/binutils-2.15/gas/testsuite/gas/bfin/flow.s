@@ -70,6 +70,7 @@ loop_lc0:
 
 	lOOP second_loop Lc0 = P4;
 	Loop_Begin second_loop;
+	NOP;
 	Loop_End second_loop;
 
 	LOOP third_loop lC0 = P1 >> 1;
@@ -105,4 +106,4 @@ loop_lc1:
 	P2 = P2 + P0;
 	R0 = [P2];
 	[P1] = R0;
-	LOOP_END another_Loop;
+	LOOP_END another_loop;
