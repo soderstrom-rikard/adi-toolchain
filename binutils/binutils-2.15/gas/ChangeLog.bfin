@@ -1,4 +1,11 @@
-2004-05-30  Bernd Schmidt  <bernd.schmidt@analog.com>
+2005-05-31  Catherine Moore  <clm@cm00re.com>
+
+	* config/tc-bfin.c (last_insn_size): Declare.
+	(md_begin): Initialize last_insn_size.
+	(md_assemble): Track last_insn_size.
+	(bfin_start_line_hook): Set correct value for loop_end labels.
+
+2005-05-30  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin-parse.y (asm): Generate 32 bit insns for plain MNOP.
 	From Satyanarayana Reddy:

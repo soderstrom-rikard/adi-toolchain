@@ -35,6 +35,8 @@ static void s_bss PARAMS ((int));
 
 /* Global variables. */
 struct bfin_insn *insn;
+int last_insn_size;
+
 extern struct obstack mempool;
 FILE *errorf;
 
@@ -327,6 +329,7 @@ md_begin ()
   debug_codeselection = 1;
 #endif 
 
+  last_insn_size = 0;
 }
 
 /* Perform the main parsing, and assembly of the input here.  Also,
@@ -366,6 +369,8 @@ md_assemble (char *line)
 
   if (insn_size)
     toP = frag_more (insn_size);
+
+  last_insn_size = insn_size;
 
   /*
    * Output the opcode.
@@ -933,6 +938,11 @@ bfin_start_line_hook ()
     }
 
   line_label = colon (label_name);
+
+  /* Loop_End follows the last instruction in the loop.  Adjust label address.  */
+  if (maybe_end)
+    line_label->sy_value.X_add_number -= last_insn_size;
+
 }
 
 /*   sub routines   */
