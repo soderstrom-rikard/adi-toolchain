@@ -40,6 +40,9 @@ extern bfd_boolean bfin_start_label PARAMS ((char *));
  */
 #define LEX_BR 6
 
+#define TC_EOL_IN_INSN(PTR) (bfin_eol_in_insn(PTR) ? 1 : 0)
+extern bfd_boolean bfin_eol_in_insn PARAMS ((char *));
+
 /* The instruction is permitted to contain an = character.  */
 #define TC_EQUAL_IN_INSN(C, NAME, PTR) (bfin_name_is_register (NAME) ? 1 : 0)
 extern bfd_boolean bfin_name_is_register PARAMS ((char *));

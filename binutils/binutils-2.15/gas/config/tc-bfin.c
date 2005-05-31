@@ -1989,6 +1989,33 @@ gen_loop (ExprNode *expr, REG_T reg, int rop, REG_T preg)
 }
 
 bfd_boolean
+bfin_eol_in_insn (char *line)
+{
+   /* Allow a new-line to appear in the middle of a multi-issue instruction.  */
+
+   char *temp = line;
+
+  if (*line != '\n')
+    return FALSE;
+
+  /* A semi-colon followed by a newline is always the end of a line.  */
+  if (line[-1] == ';')
+    return FALSE;
+
+  if (line[-1] == '|')
+    return TRUE;
+
+  /* If the || is on the next line, there might be leading whitespace.  */
+  temp++;
+  while (*temp == ' ' || *temp == '\t') temp++;
+
+  if (*temp == '|')
+    return TRUE;
+
+  return FALSE;
+}
+
+bfd_boolean
 bfin_name_is_register (char *name)
 {
   int i;

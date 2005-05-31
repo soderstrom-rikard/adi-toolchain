@@ -1,5 +1,11 @@
 2005-05-31  Catherine Moore  <clm@cm00re.com>
 
+	* config/tc-bfin.h (TC_EOL_IN_INSN): Define.
+	(bfin_eol_in_insn): Declare.
+	* config/tc-bfin.c (bfin_eol_in_insn): New function.
+
+2005-05-31  Catherine Moore  <clm@cm00re.com>
+
 	* config/tc-bfin.c (last_insn_size): Declare.
 	(md_begin): Initialize last_insn_size.
 	(md_assemble): Track last_insn_size.
