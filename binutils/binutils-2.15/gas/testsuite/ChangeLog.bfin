@@ -1,5 +1,9 @@
 2005-05-31  Catherine Moore  <clm@cm00re.com>
 
+	* gas/bfin/parallel4.s:  Test multi-line multi-issue instructions.
+
+2005-05-31  Catherine Moore  <clm@cm00re.com>
+
 	* gas/bfin/load.s: Add missing semi-colon.
 
 2005-05-31  Catherine Moore  <clm@cm00re.com>

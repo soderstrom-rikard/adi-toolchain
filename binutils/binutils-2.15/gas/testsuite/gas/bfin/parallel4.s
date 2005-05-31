@@ -5,8 +5,10 @@
 
 	DISAlgnExcpt || [i1] = r0;
 
-	R5 = Byteop3p (r1:0, r3:2) (lO) || [i1++] = r0;
-	R0 = BYTEOP3P (R1:0, R3:2) (HI) || [i1--] = r0;
+	R5 = Byteop3p (r1:0, r3:2) (lO) 
+		|| [i1++] = r0;
+	R0 = BYTEOP3P (R1:0, R3:2) (HI) || // comment test
+		[i1--] = r0;
 	R1 = byteop3p (r1:0, r3:2) (LO, r) || [i2] = r0;
 	r2 = ByteOp3P (r1:0, R3:2) (hi, R) || [i2++] = r0;
 
