@@ -390,7 +390,7 @@ RUN="$MAKE distclean "
 
 echo -n "*** Configuring Elf Toolchain      " ; date
 RUN="$DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-elf \
-    --prefix=$DIR_ELF_OUTPUT "
+    --prefix=$DIR_ELF_OUTPUT --disable-libstdcxx-pch"
 (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 (echo $RUN $LOGFILE ; ) | sh
 
@@ -622,7 +622,7 @@ if [ $KERNEL_SOURCE ] ; then
 
     echo -n "*** Configuring uClinux toolchain  " ; date
     RUN="$DIR_BINUTILS_SOURCE/configure $HOST_TARGET  \
-         --target=bfin-uclinux --prefix=$DIR_uC_OUTPUT " 
+         --target=bfin-uclinux --prefix=$DIR_uC_OUTPUT --disable-libstdcxx-pch"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
