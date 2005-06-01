@@ -368,7 +368,8 @@ ALL_EMULATIONS = \
 	ew65.o \
 	ez8001.o \
 	  eelf32frvfd.o \
-	ez8002.o
+	ez8002.o \
+	eelf32bfin.o
 
 ALL_64_EMULATIONS = \
 	eelf64_aix.o \
@@ -1029,6 +1030,10 @@ em68kelf.c: $(srcdir)/emulparams/m68kelf.sh \
   $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/m68kelf.em \
   $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
 	${GENSCRIPTS} m68kelf "$(tdir_m68kelf)"
+eelf32bfin.c: $(srcdir)/emulparams/bfin.sh \
+  $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/bfin.em \
+  $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+	${GENSCRIPTS} elf32bfin "$(tdir_elf32bfin)" bfin
 em68kelfnbsd.c: $(srcdir)/emulparams/m68kelfnbsd.sh \
   $(srcdir)/emulparams/m68kelf.sh \
   $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/m68kelf.em \
