@@ -267,6 +267,8 @@ fi
 DIR_LOG=$DIR_BUILD/logs
 if [ ! -d $DIR_LOG ] ; then
     mkdir $DIR_LOG
+else
+    rm -rf $DIR_LOG/*
 fi
 
 if [ $CHECK ] ; then
@@ -275,7 +277,11 @@ if [ $CHECK ] ; then
     echo $DIR_TEST_RESULTS
     if [ ! -d $DIR_TEST_RESULTS ] ; then
         mkdir $DIR_TEST_RESULTS
+    else
+        rm -rf $DIR_TEST_RESULTS/*
     fi
+else
+    rm -rf $DIR_BUILD/tests
 fi
 
 echo -n "Path to binutils dir        "
@@ -302,30 +308,45 @@ if [ ! -d $DIR_ELF2FLT_SOURCE ] ; then
     exit
 fi
 
+echo -n "Path to genext2fs           "
+DIR_GENEXT2FS_SOURCE=$DIR_SOURCE/genext2fs
+echo $DIR_GENEXT2FS_SOURCE
+if [ ! -d $DIR_GENEXT2FS_SOURCE ] ; then
+    echo "Can't find genext2fs source at $DIR_GENEXT2FS_SOURCE"
+    exit
+fi
+
+
 ###################### set up log file ###########################
 
 if [ $DATE_STAMP ] ; then
     echo "Creating log file           $DIR_LOG/log.$TIMESTAMP"
     if [ $VERBOSE ]; then
         LOGFILE="| tee -a $DIR_LOG/log.$TIMESTAMP"
+        ACTUAL_LOGFILE=$DIR_LOG/log.$TIMESTAMP
     else
         if [ $WARN ] ; then
             echo "*** Warnings going to $DIR_LOG/warn.$TIMESTAMP"
             LOGFILE=">> $DIR_LOG/log.$TIMESTAMP 2>> $DIR_LOG/warn.$TIMESTAMP"
+            ACTUAL_LOGFILE= $DIR_LOG/warn.$TIMESTAMP
         else
             LOGFILE=">> $DIR_LOG/log.$TIMESTAMP 2>&1"
+            ACTUAL_LOGFILE=$DIR_LOG/log.$TIMESTAMP
         fi
     fi
 else
     echo "Creating log file           $DIR_LOG/log"
     if [ $VERBOSE ]; then
         LOGFILE="| tee -a $DIR_LOG/log"
+        ACTUAL_LOGFILE=$DIR_LOG/log
     else
         if [ $WARN ] ; then
             echo "*** Warnings going to $DIR_LOG/warn"
             LOGFILE=">> $DIR_LOG/log 2>> $DIR_LOG/warn"
+            ACTUAL_LOGFILE=$DIR_LOG/warn
         else
             LOGFILE=">> $DIR_LOG/log 2>&1"
+            ACTUAL_LOGFILE=$DIR_LOG/log
         fi
     fi
 fi
@@ -334,14 +355,17 @@ fi
 
 DIR_BINUTILS_BUILD=$DIR_BUILD/binutils_build
 DIR_ELF2FLT_BUILD=$DIR_BUILD/elf2flt_build
+DIR_GENEXT2FS_BUILD=$DIR_BUILD/genext2fs_build
 
 echo "Removing old build dir"
 
 rm -rf $DIR_BINUTILS_BUILD
 rm -rf $DIR_ELF2FLT_BUILD
+rm -rf $DIR_GENEXT2FS_BUILD
 
 mkdir $DIR_BINUTILS_BUILD
 mkdir $DIR_ELF2FLT_BUILD
+mkdir $DIR_GENEXT2FS_BUILD
 
 #################################################################
 ############## DONOT CHANGE ANYTHING BELOW THIS LINE ############
@@ -405,6 +429,7 @@ do
     if [ ! -f $DIR_BINUTILS_BUILD/binutils/$RUN ] ; then
         echo "BinUtils did not build properly : Missing $RUN"
         echo "Please report an error to http://blackfin.uclinux.org"
+        tail -10 $ACTUAL_LOGFILE
         exit
     fi
 done
@@ -414,6 +439,7 @@ do
     if [ ! -f $DIR_BINUTILS_BUILD/gas/$RUN ] ; then
         echo "Gas did not build properly : Missing $RUN"
         echo "Please report an error to http://blackfin.uclinux.org"
+        tail -10 $ACTUAL_LOGFILE
         exit
     fi
 done
@@ -427,6 +453,7 @@ do
     if [ ! -f $DIR_BINUTILS_BUILD/gcc/$RUN ] ; then
         echo "gcc did not build properly : Missing $RUN"
         echo "Please report an error to http://blackfin.uclinux.org"
+        tail -10 $ACTUAL_LOGFILE
         exit
     fi
 done
@@ -436,6 +463,7 @@ do
     if [ ! -f $DIR_BINUTILS_BUILD/gdb/$RUN ] ; then
         echo "gdb did not build properly : Missing $RUN"
         echo "Please report an error to http://blackfin.uclinux.org"
+        tail -10 $ACTUAL_LOGFILE
         exit
     fi
 done
@@ -447,6 +475,10 @@ if [ $CHECK ] ; then
 
     echo -n "***  Running tests on gas-elf      " ; date
     cd $DIR_BINUTILS_BUILD/gas
+    ( echo "make check " $LOGFILE ; ) | sh
+
+    echo -n "***  Running tests on gdb-elf      " ; date
+    cd $DIR_BINUTILS_BUILD/gdb
     ( echo "make check " $LOGFILE ; ) | sh
 
     echo -n "***  Running tests on gcc-elf      " ; date
@@ -472,6 +504,10 @@ if [ $CHECK ] ; then
            $DIR_TEST_RESULTS/binutils-$TIMESTAMP.sum
         cp $DIR_BINUTILS_BUILD/binutils/binutils.log \
            $DIR_TEST_RESULTS/binutils-$TIMESTAMP.log
+        cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.sum \
+           $DIR_TEST_RESULTS/gdb-$TIMESTAMP.sum
+        cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.log \
+           $DIR_TEST_RESULTS/gdb-$TIMESTAMP.log
     else
         cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.sum \
            $DIR_TEST_RESULTS/gas.sum
@@ -489,11 +525,16 @@ if [ $CHECK ] ; then
            $DIR_TEST_RESULTS/binutils.sum
         cp $DIR_BINUTILS_BUILD/binutils/binutils.log \
            $DIR_TEST_RESULTS/binutils.log
+        cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.sum \
+           $DIR_TEST_RESULTS/gdb.sum
+        cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.log \
+           $DIR_TEST_RESULTS/gdb.log
     fi
 
     cd $DIR_BINUTILS_BUILD
     for FILE in ./gas/testsuite/gas.sum ./binutils/binutils.sum \
-                ./gcc/testsuite/gcc.sum ./gcc/testsuite/g++.sum
+                ./gcc/testsuite/gcc.sum ./gcc/testsuite/g++.sum \
+                ./gdb/testsuite/gdb.sum
     do
         START=`grep -n Summary $FILE | sed 's/:/ /' | awk '{print $1}'`
         END=`wc -l $FILE | awk '{print $1}'`
@@ -516,6 +557,7 @@ for RUN in bfin-elf-addr2line bfin-elf-c++filt bfin-elf-gdbtui          \
 do
     if [ ! -f $DIR_ELF_OUTPUT/bin/$RUN ] ; then
         echo "The ELF toolchain did not install properly - report an error"
+        tail -10 $ACTUAL_LOGFILE
         exit
     fi
 done
@@ -553,6 +595,7 @@ do
     if [ ! -f $DIR_ELF2FLT_BUILD/$RUN ] ; then
         echo "Elf2flt did not build properly : Missing $RUN"
         echo "Please report an error to http://blackfin.uclinux.org"
+        tail -10 $ACTUAL_LOGFILE
         exit
     fi
 done
@@ -567,10 +610,56 @@ do
     if [ ! -f $DIR_ELF_OUTPUT/bin/$RUN ] ; then
         echo "Elf2flt did not install properly : Missing $RUN"
         echo "Please report an error to http://blackfin.uclinux.org"
+        tail -10 $ACTUAL_LOGFILE
+        exit
+   fi
+done
+########################### genext2fs ########################
+
+echo -n "*** Building Elf genext2fs         " ; date
+cd $DIR_GENEXT2FS_BUILD
+
+echo -n "*** Cleaning Elf genext2fs         " ; date
+RUN="$MAKE distclean "
+(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+(echo $RUN $LOGFILE ; ) | sh
+
+RUN="$DIR_GENEXT2FS_SOURCE/configure --prefix=$DIR_ELF_OUTPUT"
+(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+(echo $RUN $LOGFILE ; ) | sh
+
+echo -n "*** Make Elf genetx2fs             " ; date
+RUN=$MAKE
+(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+(echo $RUN $LOGFILE ; ) | sh
+
+for RUN in genext2fs
+do
+    if [ ! -f $DIR_GENEXT2FS_BUILD/$RUN ] ; then
+        echo "genext2fs did not build properly : Missing $RUN"
+        echo "Please report an error to http://blackfin.uclinux.org"
+        tail -10 $ACTUAL_LOGFILE
+        exit
+    fi
+done
+
+echo -n "*** Installing Elf genext2fs       " ; date
+RUN="$MAKE install"
+(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+(echo $RUN $LOGFILE ; ) | sh
+mv $DIR_ELF_OUTPUT/bin/genext2fs $DIR_ELF_OUTPUT/bin/bfin-elf-genext2fs 
+
+for RUN in bfin-elf-genext2fs
+do
+    if [ ! -f $DIR_ELF_OUTPUT/bin/$RUN ] ; then
+        echo "Elf2flt did not install properly : Missing $RUN"
+        echo "Please report an error to http://blackfin.uclinux.org"
+        tail -10 $ACTUAL_LOGFILE
         exit
    fi
 done
 
+rm -rf $DIR_GENEXT2FS_BUILD/*
 rm -rf $DIR_ELF2FLT_BUILD/*
 rm -rf $DIR_BINUTILS_BUILD/*
 ########################### Step 2 - done ####################
@@ -606,6 +695,7 @@ if [ $KERNEL_SOURCE ] ; then
         if [ ! -f $DIR_uC_OUTPUT/bfin-uclinux/lib/$RUN ] ; then
             echo "uClibc did not install properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
+            tail -10 $ACTUAL_LOGFILE
             exit
         fi
     done
@@ -622,7 +712,7 @@ if [ $KERNEL_SOURCE ] ; then
 
     echo -n "*** Configuring uClinux toolchain  " ; date
     RUN="$DIR_BINUTILS_SOURCE/configure $HOST_TARGET  \
-         --target=bfin-uclinux --prefix=$DIR_uC_OUTPUT --disable-libstdcxx-pch"
+         --target=bfin-uclinux --prefix=$DIR_uC_OUTPUT " 
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
@@ -668,9 +758,57 @@ if [ $KERNEL_SOURCE ] ; then
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
+    ########################### genext2fs ########################
+
+    echo -n "*** Building uClinux genext2fs     " ; date
+    cd $DIR_GENEXT2FS_BUILD
+
+    echo -n "*** Cleaning uClinux genext2fs     " ; date
+    RUN="$MAKE distclean "
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    RUN="$DIR_GENEXT2FS_SOURCE/configure --prefix=$DIR_uC_OUTPUT"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    echo -n "*** Make uClinux genetx2fs         " ; date
+    RUN=$MAKE
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    for RUN in genext2fs
+    do
+        if [ ! -f $DIR_GENEXT2FS_BUILD/$RUN ] ; then
+            echo "genext2fs did not build properly : Missing $RUN"
+            echo "Please report an error to http://blackfin.uclinux.org"
+            tail -10 $ACTUAL_LOGFILE
+            exit
+        fi
+    done
+
+    echo -n "*** Installing uClinux genext2fs   " ; date
+    RUN="$MAKE install"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+    mv $DIR_uC_OUTPUT/bin/genext2fs $DIR_uC_OUTPUT/bin/bfin-elf-genext2fs
+
+
+    for RUN in bfin-elf-genext2fs
+    do
+        if [ ! -f $DIR_ELF_OUTPUT/bin/$RUN ] ; then
+            echo "Elf2flt did not install properly : Missing $RUN"
+            echo "Please report an error to http://blackfin.uclinux.org"
+            tail -10 $ACTUAL_LOGFILE
+            exit
+       fi
+    done
+
+
     ######################## Done ################################
 fi
 
+rm -rf $DIR_GENEXT2FS_BUILD
 rm -rf $DIR_BINUTILS_BUILD
 rm -rf $DIR_ELF2FLT_BUILD
 
