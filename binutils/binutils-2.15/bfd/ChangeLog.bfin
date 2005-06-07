@@ -1,3 +1,15 @@
+2005-06-07  Catherine Moore  <clm@cm00re.com>
+
+	* elf32-bfin.c (bfin_is_local_label_name): Rewritten.
+	(bfin_check_relocs, bfin_gc_mark_hook, bfin_relocate_section,
+	bfin_gc_sweep_hook, bfin_link_hash_entry,
+	bfin_pcrel_relocs_copied, bfin_hash_entry,
+	bfin_link_hash_newfunc, bfin_finish_dynamic_sections,
+	bfin_finish_dynamic_symbol, bfin_adjust_dynamic_symbol,
+	bfin_pcrel_relocs_copied, bfin_discard_copies,
+	bfin_size_dynamic_sections: Renamed.
+	
+
 2005-03-02  Catherine Moore  <clm@cm00re.com>
 
 	* elf32-bfin.c (bfin_byte4_reloc):  Add parentheses.

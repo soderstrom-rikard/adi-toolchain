@@ -23,7 +23,7 @@
 #define ELF_ARCH			bfd_arch_bfin
 #define ELF_MACHINE_CODE		EM_BLACKFIN	
 #define ELF_MAXPAGESIZE			0x1000
-static bfd_boolean elf_bfin_is_local_label_name PARAMS ((bfd *, const char *));
+static bfd_boolean bfin_is_local_label_name PARAMS ((bfd *, const char *));
 
 #include "elf/bfin.h"
 
@@ -1224,28 +1224,26 @@ bfd_info_to_howto_rel (bfd * abfd ATTRIBUTE_UNUSED,
 	}
     }
 }
-
-
-
-/* Return whether a symbol name implies a local label.
- * The local symbol of bfin start with 'L$'
- */
+/* Return TRUE if the name is a local label.
+   bfin local labels begin with L$.  */
 static bfd_boolean
-elf_bfin_is_local_label_name ( bfd *abfd,
-     const char *name)
+bfin_is_local_label_name (abfd, label)
+     bfd *abfd ATTRIBUTE_UNUSED;
+     const char *label;
 {
-  if (name[0] == 'L' && name[1] == '$' )
+  if (label[0] == 'L' && label[1] == '$' )
     return TRUE;
 
-  return _bfd_elf_is_local_label_name (abfd, name);
+  return _bfd_elf_is_local_label_name (abfd, label);
 }
+
 
 /* Look through the relocs for a section during the first phase, and
    allocate space in the global offset table or procedure linkage
    table.  */
 
 static bfd_boolean
-elf_bfin_check_relocs (bfd * abfd,
+bfin_check_relocs (bfd * abfd,
 		       struct bfd_link_info *info,
 		       asection * sec, const Elf_Internal_Rela * relocs)
 {
@@ -1405,7 +1403,7 @@ elf32_bfin_reloc_type_class (const Elf_Internal_Rela * rela)
 }
 
 static bfd_boolean
-elf_bfin_relocate_section (bfd * output_bfd,
+bfin_relocate_section (bfd * output_bfd,
 			   struct bfd_link_info *info,
 			   bfd * input_bfd,
 			   asection * input_section,
@@ -1736,7 +1734,7 @@ elf_bfin_relocate_section (bfd * output_bfd,
 }
 
 static asection *
-elf_bfin_gc_mark_hook (asection * sec,
+bfin_gc_mark_hook (asection * sec,
 		       struct bfd_link_info *info ATTRIBUTE_UNUSED,
 		       Elf_Internal_Rela * rel,
 		       struct elf_link_hash_entry *h, Elf_Internal_Sym * sym)
@@ -1777,7 +1775,7 @@ elf_bfin_gc_mark_hook (asection * sec,
 /* Update the got entry reference counts for the section being removed.  */
 
 static bfd_boolean
-elf_bfin_gc_sweep_hook (bfd * abfd,
+bfin_gc_sweep_hook (bfd * abfd,
 			struct bfd_link_info *info,
 			asection * sec, const Elf_Internal_Rela * relocs)
 {
@@ -1911,17 +1909,17 @@ elf32_bfin_print_private_bfd_data (bfd * abfd, PTR ptr)
 
 /* bfin ELF linker hash entry.  */
 
-struct elf_bfin_link_hash_entry
+struct bfin_link_hash_entry
 {
   struct elf_link_hash_entry root;
 
   /* Number of PC relative relocs copied for this symbol.  */
-  struct elf_bfin_pcrel_relocs_copied *pcrel_relocs_copied;
+  struct bfin_pcrel_relocs_copied *pcrel_relocs_copied;
 };
 
 /* bfin ELF linker hash table.  */
 
-struct elf_bfin_link_hash_table
+struct bfin_link_hash_table
 {
   struct elf_link_hash_table root;
 
@@ -1929,10 +1927,10 @@ struct elf_bfin_link_hash_table
   struct sym_sec_cache sym_sec;
 };
 
-#define elf_bfin_hash_entry(ent) ((struct elf_bfin_link_hash_entry *) (ent))
+#define bfin_hash_entry(ent) ((struct bfin_link_hash_entry *) (ent))
 
 static struct bfd_hash_entry *
-elf_bfin_link_hash_newfunc (struct bfd_hash_entry *entry,
+bfin_link_hash_newfunc (struct bfd_hash_entry *entry,
 			    struct bfd_hash_table *table, const char *string)
 {
   struct bfd_hash_entry *ret = entry;
@@ -1940,14 +1938,14 @@ elf_bfin_link_hash_newfunc (struct bfd_hash_entry *entry,
   /* Allocate the structure if it has not already been allocated by a
      subclass.  */
   if (ret == NULL)
-    ret = bfd_hash_allocate (table, sizeof (struct elf_bfin_link_hash_entry));
+    ret = bfd_hash_allocate (table, sizeof (struct bfin_link_hash_entry));
   if (ret == NULL)
     return ret;
 
   /* Call the allocation method of the superclass.  */
   ret = _bfd_elf_link_hash_newfunc (ret, table, string);
   if (ret != NULL)
-    elf_bfin_hash_entry (ret)->pcrel_relocs_copied = NULL;
+    bfin_hash_entry (ret)->pcrel_relocs_copied = NULL;
 
   return ret;
 }
@@ -1955,17 +1953,17 @@ elf_bfin_link_hash_newfunc (struct bfd_hash_entry *entry,
 /* Create an bfin ELF linker hash table.  */
 
 static struct bfd_link_hash_table *
-elf_bfin_link_hash_table_create (bfd * abfd)
+bfin_link_hash_table_create (bfd * abfd)
 {
-  struct elf_bfin_link_hash_table *ret;
-  bfd_size_type amt = sizeof (struct elf_bfin_link_hash_table);
+  struct bfin_link_hash_table *ret;
+  bfd_size_type amt = sizeof (struct bfin_link_hash_table);
 
-  ret = (struct elf_bfin_link_hash_table *) bfd_malloc (amt);
-  if (ret == (struct elf_bfin_link_hash_table *) NULL)
+  ret = (struct bfin_link_hash_table *) bfd_malloc (amt);
+  if (ret == (struct bfin_link_hash_table *) NULL)
     return NULL;
 
   if (!_bfd_elf_link_hash_table_init (&ret->root, abfd,
-				      elf_bfin_link_hash_newfunc))
+				      bfin_link_hash_newfunc))
     {
       free (ret);
       return NULL;
@@ -1981,7 +1979,7 @@ elf_bfin_link_hash_table_create (bfd * abfd)
 /* Finish up the dynamic sections.  */
 
 static bfd_boolean
-elf_bfin_finish_dynamic_sections (bfd * output_bfd ATTRIBUTE_UNUSED,
+bfin_finish_dynamic_sections (bfd * output_bfd ATTRIBUTE_UNUSED,
 				  struct bfd_link_info *info)
 {
   bfd *dynobj;
@@ -2015,7 +2013,7 @@ elf_bfin_finish_dynamic_sections (bfd * output_bfd ATTRIBUTE_UNUSED,
    dynamic sections here.  */
 
 static bfd_boolean
-elf_bfin_finish_dynamic_symbol (bfd * output_bfd,
+bfin_finish_dynamic_symbol (bfd * output_bfd,
 				struct bfd_link_info *info,
 				struct elf_link_hash_entry *h,
 				Elf_Internal_Sym * sym)
@@ -2113,7 +2111,7 @@ fprintf(stderr, "*** check this relocation %s\n", __FUNCTION__);
    understand.  */
 
 static bfd_boolean
-elf_bfin_adjust_dynamic_symbol (struct bfd_link_info *info,
+bfin_adjust_dynamic_symbol (struct bfd_link_info *info,
 				struct elf_link_hash_entry *h)
 {
   bfd *dynobj;
@@ -2218,10 +2216,10 @@ elf_bfin_adjust_dynamic_symbol (struct bfd_link_info *info,
 /* This structure keeps track of the number of PC relative relocs we have
    copied for a given symbol.  */
 
-struct elf_bfin_pcrel_relocs_copied
+struct bfin_pcrel_relocs_copied
 {
   /* Next section.  */
-  struct elf_bfin_pcrel_relocs_copied *next;
+  struct bfin_pcrel_relocs_copied *next;
   /* A section in dynobj.  */
   asection *section;
   /* Number of relocs copied in this section.  */
@@ -2242,10 +2240,10 @@ struct elf_bfin_pcrel_relocs_copied
    case.  */
 
 static bfd_boolean
-elf_bfin_discard_copies (struct elf_link_hash_entry *h, PTR inf)
+bfin_discard_copies (struct elf_link_hash_entry *h, PTR inf)
 {
   struct bfd_link_info *info = (struct bfd_link_info *) inf;
-  struct elf_bfin_pcrel_relocs_copied *s;
+  struct bfin_pcrel_relocs_copied *s;
 
   if (h->root.type == bfd_link_hash_warning)
     h = (struct elf_link_hash_entry *) h->root.u.i.link;
@@ -2255,7 +2253,7 @@ elf_bfin_discard_copies (struct elf_link_hash_entry *h, PTR inf)
       if ((info->flags & DF_TEXTREL) == 0)
 	{
 	  /* Look for relocations against read-only sections.  */
-	  for (s = elf_bfin_hash_entry (h)->pcrel_relocs_copied;
+	  for (s = bfin_hash_entry (h)->pcrel_relocs_copied;
 	       s != NULL; s = s->next)
 	    if ((s->section->flags & SEC_READONLY) != 0)
 	      {
@@ -2267,7 +2265,7 @@ elf_bfin_discard_copies (struct elf_link_hash_entry *h, PTR inf)
       return TRUE;
     }
 
-  for (s = elf_bfin_hash_entry (h)->pcrel_relocs_copied;
+  for (s = bfin_hash_entry (h)->pcrel_relocs_copied;
        s != NULL; s = s->next)
     s->section->size -= s->count * sizeof (Elf32_External_Rela);
 
@@ -2278,7 +2276,7 @@ elf_bfin_discard_copies (struct elf_link_hash_entry *h, PTR inf)
 #define ELF_DYNAMIC_INTERPRETER "/usr/lib/libc.so.1"
 
 static bfd_boolean
-elf_bfin_size_dynamic_sections (bfd * output_bfd ATTRIBUTE_UNUSED,
+bfin_size_dynamic_sections (bfd * output_bfd ATTRIBUTE_UNUSED,
 				struct bfd_link_info *info)
 {
   bfd *dynobj;
@@ -2319,7 +2317,7 @@ elf_bfin_size_dynamic_sections (bfd * output_bfd ATTRIBUTE_UNUSED,
      will not fill them in in the relocate_section routine.  */
   if (info->shared)
     elf_link_hash_traverse (elf_hash_table (info),
-			    elf_bfin_discard_copies, (PTR) info);
+			    bfin_discard_copies, (PTR) info);
 
   /* The check_relocs and adjust_dynamic_symbol entry points have
      determined the sizes of the various dynamic sections.  Allocate
@@ -2389,7 +2387,7 @@ elf_bfin_size_dynamic_sections (bfd * output_bfd ATTRIBUTE_UNUSED,
   if (elf_hash_table (info)->dynamic_sections_created)
     {
       /* Add some entries to the .dynamic section.  We fill in the
-         values later, in elf_bfin_finish_dynamic_sections, but we
+         values later, in bfin_finish_dynamic_sections, but we
          must add the entries now so that we get the correct size for
          the .dynamic section.  The DT_DEBUG entry is filled in by the
          dynamic linker and used by the debugger.  */
@@ -2548,30 +2546,30 @@ error_return:
 
 #define elf_info_to_howto		bfd_info_to_howto_rel
 #define bfd_elf32_bfd_is_local_label_name \
-                                        elf_bfin_is_local_label_name
-#define elf_bfin_hash_table(p) \
-  ((struct elf_bfin_link_hash_table *) (p)->hash)
+                                        bfin_is_local_label_name
+#define bfin_hash_table(p) \
+  ((struct bfin_link_hash_table *) (p)->hash)
 
 
 
 #define elf_backend_create_dynamic_sections \
                                         _bfd_elf_create_dynamic_sections
 #define bfd_elf32_bfd_link_hash_table_create \
-                                        elf_bfin_link_hash_table_create
+                                        bfin_link_hash_table_create
 #define bfd_elf32_bfd_final_link        bfd_elf_gc_common_final_link
 
-#define elf_backend_check_relocs   elf_bfin_check_relocs
+#define elf_backend_check_relocs   bfin_check_relocs
 #define elf_backend_adjust_dynamic_symbol \
-                                        elf_bfin_adjust_dynamic_symbol
+                                        bfin_adjust_dynamic_symbol
 #define elf_backend_size_dynamic_sections \
-                                        elf_bfin_size_dynamic_sections
-#define elf_backend_relocate_section    elf_bfin_relocate_section
+                                        bfin_size_dynamic_sections
+#define elf_backend_relocate_section    bfin_relocate_section
 #define elf_backend_finish_dynamic_symbol \
-                                        elf_bfin_finish_dynamic_symbol
+                                        bfin_finish_dynamic_symbol
 #define elf_backend_finish_dynamic_sections \
-                                        elf_bfin_finish_dynamic_sections
-#define elf_backend_gc_mark_hook        elf_bfin_gc_mark_hook
-#define elf_backend_gc_sweep_hook       elf_bfin_gc_sweep_hook
+                                        bfin_finish_dynamic_sections
+#define elf_backend_gc_mark_hook        bfin_gc_mark_hook
+#define elf_backend_gc_sweep_hook       bfin_gc_sweep_hook
 #define bfd_elf32_bfd_merge_private_bfd_data \
                                         elf32_bfin_merge_private_bfd_data
 #define bfd_elf32_bfd_set_private_flags \
