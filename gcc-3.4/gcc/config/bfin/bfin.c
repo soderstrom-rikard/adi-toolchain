@@ -2151,24 +2151,9 @@ bfin_return_in_memory (tree type)
 
   if (mode == BLKmode)
     return 1;
-
-  /* VDSP returns all structures in memory.  */
-  if (AGGREGATE_TYPE_P (type))
-    return 1;
-
   size = int_size_in_bytes (type);	
-  if (VECTOR_MODE_P (mode) || mode == TImode)
-    {
-      /* User-created vectors small enough to fit in REG.  */
-      if (size < 8)
-        return 0;
-      if (size == 8 || size == 16)
-	return 1;
-    }
 
-  if (size > 12)
-    return 1;
-  return 0;
+  return size > 8;
 }
 
 /* Return true if the legitimate memory address for a memory operand of mode

@@ -1,3 +1,8 @@
+2005-06-07  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_return_in_memory): Undo previous change;
+	only return values larger than 8 bytes in memory.
+
 2005-05-31  Jie Zhang  <jie.zhang@analog.com>
 
 	Apply:
