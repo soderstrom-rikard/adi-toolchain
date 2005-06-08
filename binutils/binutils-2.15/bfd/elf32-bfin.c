@@ -291,7 +291,7 @@ bfin_bfd_reloc (
        /* if (howto->pcrel_offset == FALSE)
              relocation -= reloc_entry->address; */
  
-          if (howto->pcrel_offset == TRUE && howto->partial_inplace == TRUE)
+          if (howto->pcrel_offset == TRUE)
              relocation -= reloc_entry->address;
 	}
     if (output_bfd != (bfd *) NULL) {
@@ -378,72 +378,48 @@ bfin_pcrel24_reloc (
   asection *reloc_target_output_section;
   int possible_addend_delta = 0;
 
-#if 0
-  flag = bfd_elf_generic_reloc (abfd, reloc_entry, 
-			       symbol, data, input_section,
-				     output_bfd, error_message);
-  if (flag    != bfd_reloc_continue) {
-      return flag;
-  }
 
-  if (flag == bfd_reloc_continue) {
-#endif
+  if (reloc_entry->address > bfd_get_section_limit (abfd, input_section))
+    return bfd_reloc_outofrange;
 
-      /* Is the address of the relocation really within the section?  */
-      if (reloc_entry->address > bfd_get_section_limit(abfd, input_section))
-	      return bfd_reloc_outofrange;
-      if(is_reloc_stack_empty()){
+  if (!is_reloc_stack_empty ())
+    relocation = reloc_stack_pop();
+  else
+    {
+      if (bfd_is_und_section (symbol->section)
+          && (symbol->flags & BSF_WEAK) == 0
+          && output_bfd == (bfd *) NULL)
+        return bfd_reloc_undefined;
 
-        if (bfd_is_und_section (symbol->section)
-             && (symbol->flags & BSF_WEAK) == 0
-             && output_bfd == (bfd *) NULL)
-          return bfd_reloc_undefined;
+      if (bfd_is_com_section (symbol->section))
+	relocation = 0;
+      else
+	relocation = symbol->value;       
 
-        /* Get symbol value.  (Common symbols are special.)  */
-        if (bfd_is_com_section (symbol->section)) {
-           relocation = 0;
-        }
-        else {
-           relocation = symbol->value;       
-  
-        }
-  
-        reloc_target_output_section = symbol->section->output_section;
-  
-        
-        /* Convert input-section-relative symbol value to absolute.  */
-        if (output_bfd && howto->partial_inplace == FALSE)
-	    output_base = 0;
-        else
-	  output_base = reloc_target_output_section->vma;
+      reloc_target_output_section = symbol->section->output_section;
+
+      if (output_bfd)
+	output_base = 0;
+      else
+	output_base = reloc_target_output_section->vma;
       
-        if (!strcmp(symbol->name, symbol->section->name) || output_bfd == NULL){
-          relocation += output_base + symbol->section->output_offset;
-          possible_addend_delta = symbol->section->output_offset;
+      if (output_bfd == NULL
+          || !strcmp (symbol->name, symbol->section->name))
+	{
+	  relocation += output_base + symbol->section->output_offset;
+	  possible_addend_delta = symbol->section->output_offset;
 	}
         
-        if (!strcmp(symbol->name, symbol->section->name) && output_bfd == NULL){
-          /* Add in supplied addend.  */
+      if (output_bfd == NULL
+	  && !strcmp (symbol->name, symbol->section->name))
+	{
           relocation += reloc_entry->addend;
         }
-      }
-      else{
-        relocation = reloc_stack_pop();
-      }
+    }
       
-      /* Here the variable relocation holds the final address of the
-	 symbol we are relocating against, plus any addend.  */
+    relocation -= input_section->output_section->vma + input_section->output_offset;
+    relocation -= reloc_entry->address;
 
-      if (howto->pc_relative == TRUE){
-          relocation -=
-	    input_section->output_section->vma + input_section->output_offset;
-
-       /* if (howto->pcrel_offset == FALSE)
-             relocation -= reloc_entry->address; */
- 
-          if (howto->pcrel_offset == TRUE && howto->partial_inplace == TRUE)
-             relocation -= reloc_entry->address;
-	}
 
   /* FIXME: This overflow checking is incomplete, because the value
      might have overflowed before we get here.  For a correct check we
@@ -796,7 +772,7 @@ static const struct bfin_reloc_map
 	     complain_overflow_unsigned,	/* complain_on_overflow */
 	     bfin_bfd_reloc,	/* special_function */
 	     "R_pcrel5m2",	/* name */
-	     TRUE,		/* partial_inplace */
+	     FALSE,		/* partial_inplace */
 	     0x0000000F,	/* src_mask */
 	     0x0000000F,	/* dst_mask */
 	     TRUE)},		/* pcrel_offset */
@@ -812,7 +788,7 @@ static const struct bfin_reloc_map
 	     complain_overflow_signed,	/* complain_on_overflow */
 	     bfin_bfd_reloc,	/* special_function */
 	     "R_pcrel10",	/* name */
-	     TRUE,		/* partial_inplace */
+	     FALSE,		/* partial_inplace */
 	     0x000003FF,	/* src_mask */
 	     0x000003FF,	/* dst_mask */
 	     TRUE)},		/* pcrel_offset */
@@ -828,7 +804,7 @@ static const struct bfin_reloc_map
 	     complain_overflow_signed,	/* complain_on_overflow */
 	     bfin_bfd_reloc,	/* special_function */
 	     "R_pcrel12_jump",	/* name */
-	     TRUE,		/* partial_inplace */
+	     FALSE,		/* partial_inplace */
 	     0x0FFF,		/* src_mask */
 	     0x0FFF,		/* dst_mask */
 	     TRUE)},		/* pcrel_offset */
@@ -844,7 +820,7 @@ static const struct bfin_reloc_map
 	     complain_overflow_signed,	/* complain_on_overflow */
 	     bfin_h_l_uimm16_reloc,	/* special_function */
 	     "R_rimm16",	/* name */
-	     TRUE,		/* partial_inplace */
+	     FALSE,		/* partial_inplace */
 	     0x0000FFFF,	/* src_mask */
 	     0x0000FFFF,	/* dst_mask */
 	     TRUE)},		/* pcrel_offset */
@@ -860,7 +836,7 @@ static const struct bfin_reloc_map
 	     complain_overflow_dont,	/* complain_on_overflow */
 	     bfin_h_l_uimm16_reloc,	/* special_function */
 	     "R_luimm16",	/* name */
-	     TRUE,		/* partial_inplace */
+	     FALSE,		/* partial_inplace */
 	     0x0000FFFF,	/* src_mask */
 	     0x0000FFFF,	/* dst_mask */
 	     TRUE)},		/* pcrel_offset */
@@ -876,7 +852,7 @@ static const struct bfin_reloc_map
 	     complain_overflow_unsigned,	/* complain_on_overflow */
 	     bfin_h_l_uimm16_reloc,	/* special_function */
 	     "R_huimm16",	/* name */
-	     TRUE,		/* partial_inplace */
+	     FALSE,		/* partial_inplace */
 	     0x0000FFFF,	/* src_mask */
 	     0x0000FFFF,	/* dst_mask */
 	     TRUE)},		/* pcrel_offset */
@@ -892,7 +868,7 @@ static const struct bfin_reloc_map
 	     complain_overflow_signed,	/* complain_on_overflow */
 	     bfin_bfd_reloc,	/* special_function */
 	     "R_pcrel12_jump_s",	/* name */
-	     TRUE,		/* partial_inplace */
+	     FALSE,		/* partial_inplace */
 	     0x00000FFF,	/* src_mask */
 	     0x00000FFF,	/* dst_mask */
 	     TRUE)},		/* pcrel_offset */
@@ -907,7 +883,7 @@ static const struct bfin_reloc_map
 	     0,
 	     complain_overflow_signed,
 	     bfin_pcrel24_reloc,
-	     "R_pcrel24", TRUE, 0x00FFFFFF, 0x00FFFFFF, TRUE)},
+	     "R_pcrel24", FALSE, 0x00FFFFFF, 0x00FFFFFF, TRUE)},
   {
     BFD_RELOC_24_PCREL_JUMP_L, R_pcrel24_jump_l,
       /* Rrm8,Rrl16  #0x0a */
@@ -920,7 +896,7 @@ static const struct bfin_reloc_map
 	     complain_overflow_signed,	/* complain_on_overflow */
 	     bfin_pcrel24_reloc,	/* special_function */
 	     "R_pcrel24_jump_l",	/* name */
-	     TRUE,		/* partial_inplace */
+	     FALSE,		/* partial_inplace */
 	     0x00FFFFFF,	/* src_mask */
 	     0x00FFFFFF,	/* dst_mask */
 	     TRUE)},		/* pcrel_offset */
@@ -935,7 +911,7 @@ static const struct bfin_reloc_map
 	     0,
 	     complain_overflow_signed,
 	     bfin_pcrel24_reloc,
-	     "R_pcrel24_call_x", TRUE, 0x00FFFFFF, 0x00FFFFFF, TRUE)},
+	     "R_pcrel24_call_x", FALSE, 0x00FFFFFF, 0x00FFFFFF, TRUE)},
   {
     BFD_RELOC_8, R_byte_data,
       /* Rlp10  #0x10 */
@@ -964,7 +940,7 @@ static const struct bfin_reloc_map
 	     complain_overflow_signed,	/* complain_on_overflow */
 	     bfin_bfd_reloc,	/* special_function */
 	     "R_byte2_data",	/* name */
-	     TRUE,		/* partial_inplace */
+	     FALSE,		/* partial_inplace */
 	     0xFFFF,		/* src_mask */
 	     0xFFFF,		/* dst_mask */
 	     TRUE)},		/* pcrel_offset */
@@ -980,7 +956,7 @@ static const struct bfin_reloc_map
 	     complain_overflow_unsigned,	/* complain_on_overflow */
 	     bfin_byte4_reloc,	/* special_function */
 	     "R_byte4_data",	/* name */
-	     TRUE,		/* partial_inplace */
+	     FALSE,		/* partial_inplace */
 	     0xFFFFFFFF,	/* src_mask */
 	     0xFFFFFFFF,	/* dst_mask */
 	     TRUE)},		/* pcrel_offset */
@@ -996,7 +972,7 @@ static const struct bfin_reloc_map
 	     complain_overflow_unsigned,	/* complain_on_overflow */
 	     bfin_bfd_reloc,	/* special_function */
 	     "R_pcrel11",	/* name */
-	     TRUE,		/* partial_inplace */
+	     FALSE,		/* partial_inplace */
 	     0x000003FF,	/* src_mask */
 	     0x000003FF,	/* dst_mask */
 	     TRUE)},		/* pcrel_offset */

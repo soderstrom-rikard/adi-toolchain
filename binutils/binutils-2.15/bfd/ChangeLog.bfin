@@ -1,3 +1,10 @@
+2005-06-08  Catherine Moore  <clm@cm00re.com>
+
+	* elf32-bfin.c (bfin_bfd_reloc): Remove partial_inplace check.
+	(bfin_pcrel24_reloc): Remove unused code.  Reformat.  Remove
+	partial_inplace check.
+	(HOWTO): partial_inplace is FALSE for all relocations.
+
 2005-06-07  Catherine Moore  <clm@cm00re.com>
 
 	* elf32-bfin.c (bfin_is_local_label_name): Rewritten.
