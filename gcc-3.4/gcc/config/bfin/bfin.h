@@ -30,6 +30,7 @@
 #define MASK_SIMPLE_RTM              0x00020000
 #define MASK_LOW_64K           	     0x00040000
 #define MASK_CMOV	             0x00200000 /* use conditional moves */
+#define MASK_LONG_CALLS	             0x00400000 /* use long calls */
 #define MASK_PROFILE		     0x01000000 /* Instrument for NON GNU
 						 * profiling */
 #define MASK_NO_UNDERSCORE	     0x02000000 /* lacal label without underscore */
@@ -73,6 +74,7 @@ extern int target_flags;
 #define TARGET_SIMPLE_RTM              (target_flags & MASK_SIMPLE_RTM)
 #define TARGET_LOW_64K                 (target_flags & MASK_LOW_64K)
 #define TARGET_CSYNC		       (target_flags & MASK_CSYNC)
+#define TARGET_LONG_CALLS	       (target_flags & MASK_LONG_CALLS)
 #define TARGET_NO_UNDERSCORE	       (target_flags & MASK_NO_UNDERSCORE)
 #define TARGET_ID_SHARED_LIBRARY       (target_flags & MASK_ID_SHARED_LIBRARY)
 
@@ -103,6 +105,10 @@ extern int target_flags;
     "Use conditional moves"},						\
   { "no-cmov",			-MASK_CMOV,				\
     "Do not generate conditional moves"},				\
+  { "long-calls",	         MASK_LONG_CALLS,			\
+    "Don't generate PC-relative calls, use indirection"},		\
+  { "no-cmov",			-MASK_LONG_CALLS,			\
+    "Don't use long calls by default"},					\
   { "csync",		         MASK_CSYNC,				\
     "Avoid speculative loads by inserting CSYNC or equivalent"},	\
   { "no-csync",			-MASK_CSYNC,				\

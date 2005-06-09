@@ -1642,11 +1642,11 @@ call_insn_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
 
   if (GET_CODE (op) == SYMBOL_REF)
     {
-	if(flag_pic)
-	    return 0;
-	else
-	    /* Explicitly allow SYMBOL_REF if not pic.  */
-	    return 1;
+      if (flag_pic || TARGET_LONG_CALLS)
+	return 0;
+      else
+	/* Explicitly allow SYMBOL_REF if not pic.  */
+	return 1;
     }
 
   /* Otherwise we can allow any nonmemory_operand in the address.  */

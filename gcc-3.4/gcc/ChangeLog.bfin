@@ -1,3 +1,10 @@
+2005-06-09  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.h (TARGET_OPTIONS): Add -mlong-calls.
+	(TARGET_LONG_CALLS, MASK_LONG_CALLS): New.
+	* config/bfin/bfin.c (call_insn_operand): Disallow SYMBOL_REF if
+	TARGET_LONG_CALLS.
+
 2005-06-08  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (enum bfin_builtins): New.
