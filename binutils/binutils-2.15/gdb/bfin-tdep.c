@@ -1525,6 +1525,7 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   set_gdbarch_pc_regnum(gdbarch, BFIN_PC_REGNUM);
 
   set_gdbarch_push_dummy_call (gdbarch, bfin_push_dummy_call);
+  set_gdbarch_call_dummy_location (gdbarch, ON_STACK);
   set_gdbarch_return_value (gdbarch, bfin_return_value);
   set_gdbarch_frame_align(gdbarch, bfin_frame_align);
   

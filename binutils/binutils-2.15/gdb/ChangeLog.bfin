@@ -1,5 +1,9 @@
 2005-06-13  Jie Zhang  <jie.zhang@analog.com>
 
+	* bfin-tdep.c (bfin_gdbarch_init): Call dummy function on stack.
+
+2005-06-13  Jie Zhang  <jie.zhang@analog.com>
+
 	* bfin-tdep.c (bfin_return_value): Return small structs in registers.
 	(bfin_frame_align): Align frame downward.
 
