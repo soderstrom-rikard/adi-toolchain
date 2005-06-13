@@ -1346,10 +1346,6 @@ bfin_return_value (struct gdbarch *gdbarch, struct type *type,
                    struct regcache *regcache, void *readbuf,
                    const void *writebuf)
 {
-  if((TYPE_CODE(type) == TYPE_CODE_STRUCT)
-  || (TYPE_CODE(type) == TYPE_CODE_UNION))
-    return RETURN_VALUE_STRUCT_CONVENTION;
-
   if(TYPE_LENGTH (type) > 2 * INT_REGISTER_RAW_SIZE)
     return RETURN_VALUE_STRUCT_CONVENTION;
 
@@ -1477,7 +1473,7 @@ bfin_sim_regno(int regno)
 CORE_ADDR 
 bfin_frame_align (struct gdbarch *gdbarch, CORE_ADDR address)
 {
-  return ((address + 3) & ~0x3);
+  return (address & ~0x3);
 }
 
 
