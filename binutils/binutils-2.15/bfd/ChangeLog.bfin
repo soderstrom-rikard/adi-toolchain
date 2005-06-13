@@ -1,3 +1,22 @@
+2005-06-13  Catherine Moore  <clm@cm00re.com>
+
+	* bfd-in2.h, libbfd.h: Regenerated.
+	* reloc.c: Rename bfin-specific relocations.
+	* elf32-bfin.c: Many changes for gnu-coding standards.
+	Remove unused code.
+	(bfin_howto_table):  Rewritten.
+	(bfin_areloc_howto_table): New.
+	(bfin_gnuext_howto_table): New.
+	(bfin_reloc_map): New.
+	(bfin_bfd_reloc_type_lookup): New.
+	(bfin_reloc_type_lookup): New.
+	(bfin_info_to_howto): New.
+	(bfd_elf32_bfd_reloc_type_lookup): Removed.
+	(bfin_relocate_section): Use new routines.
+	(bfd_elf32_elf_reloc_type_lookup): Removed.
+	(bfd_info_to_howto_rel): Removed.
+
+
 2005-06-13  Jie Zhang  <jie.zhang@analog.com>
 
 	* elf32-bfin.c (elf_symbol_leading_char): Defined.
