@@ -133,10 +133,11 @@ then
 		if grep _GLOBAL_OFFSET_TABLE_ $OFILE.gdb > /dev/null 
 		then
 			$ELF2FLT $FLTFLAGS -o $OFILE -p $OFILE.gdb $OFILE.gdb || exit $?
+			rm -f $OFILE.elf
 		else
 			$ELF2FLT $FLTFLAGS -o $OFILE -r $OFILE.elf || exit $?
+			mv $OFILE.elf $OFILE.gdb
 		fi
-		rm -f $OFILE.elf  # not needed for any reason
 		rm -f "$NEWLDSCRIPT"
 		exit 0
 	fi
