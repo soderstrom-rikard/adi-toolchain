@@ -1,3 +1,7 @@
+2005-06-13  Jie Zhang  <jie.zhang@analog.com>
+
+	* elf32-bfin.c (elf_symbol_leading_char): Defined.
+
 2005-06-08  Catherine Moore  <clm@cm00re.com>
 
 	* elf32-bfin.c (bfin_bfd_reloc): Remove partial_inplace check.

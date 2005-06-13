@@ -23,6 +23,7 @@
 #define ELF_ARCH			bfd_arch_bfin
 #define ELF_MACHINE_CODE		EM_BLACKFIN	
 #define ELF_MAXPAGESIZE			0x1000
+#define elf_symbol_leading_char		'_'
 static bfd_boolean bfin_is_local_label_name PARAMS ((bfd *, const char *));
 
 #include "elf/bfin.h"
