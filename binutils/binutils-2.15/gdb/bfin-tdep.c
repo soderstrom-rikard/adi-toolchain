@@ -1389,36 +1389,6 @@ bfin_register_name (int i)
    return bfin_register_name_strings[i];
 }
 
-
-/****************************************************/
-/* FUNCTION : bfin_translate_address                */
-/* ABSTRACT : Given a file local address tranlate   */
-/*            to a process address                  */
-/*            Basic logic :                         */
-/*    if(addr is in text) new_addr = text + addr    */
-/*    if(addr is in data) new_addr = data + addr    */
-/*    where text and data are queried (once) from   */
-/*    the remote server using a fake register val   */
-/*    also queried would be text len to determine   */
-/*    if text or data                               */
-/****************************************************/
-void
-bfin_translate_address (struct gdbarch *gdbarch,
-                                       struct regcache *regcache,
-                                       CORE_ADDR gdb_addr, int gdb_len,
-                                       CORE_ADDR * rem_addr, int *rem_len)
-{
-  static long text = 0;
-  static long data = 0;
-  static long text_len = 0;
-  int text_regnum = 212;
-  if(!text){
-  }
-
-  *rem_addr = gdb_addr + text;
-
-  *rem_len  = gdb_len;
-}
 
 
 static CORE_ADDR
@@ -1587,9 +1557,6 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
 
   /* On BFIN targets char defaults to unsigned.  */
   set_gdbarch_char_signed (gdbarch, 0);
-
-  /* do our address translations */
-  set_gdbarch_remote_translate_xfer_address(gdbarch, bfin_translate_address);
 
   /* Frame handling.  */
   /* Frame unwinder.  */
