@@ -387,10 +387,10 @@ md_assemble (char *line)
 	  char *prev_toP = toP - 2;
 	  switch (insn->reloc)
 	    {
-	    case BFD_RELOC_24_PCREL_JUMP_L:
+	    case BFD_RELOC_BFIN_24_PCREL_JUMP_L:
 	    case BFD_RELOC_24_PCREL:
-	    case BFD_RELOC_16_LOW:
-	    case BFD_RELOC_16_HIGH:
+	    case BFD_RELOC_BFIN_16_LOW:
+	    case BFD_RELOC_BFIN_16_HIGH:
 	      size = 4;
 	      break;
 	    default:
@@ -400,14 +400,14 @@ md_assemble (char *line)
 	  /* Following if condition checks for the arithmetic relocations.
 	     If the case then it doesn't required to generate the code.
 	     It has been assumed that, their ID will be contiguous.  */
-	  if ((BFD_ARELOC_PUSH <= insn->reloc
-               && BFD_ARELOC_COMP >= insn->reloc)
-              || insn->reloc == BFD_RELOC_16_IMM)
+	  if ((BFD_ARELOC_BFIN_PUSH <= insn->reloc
+               && BFD_ARELOC_BFIN_COMP >= insn->reloc)
+              || insn->reloc == BFD_RELOC_BFIN_16_IMM)
 	    {
 	      size = 2;
 	    }
-	  if (insn->reloc == BFD_ARELOC_CONST
-              || insn->reloc == BFD_ARELOC_PUSH)
+	  if (insn->reloc == BFD_ARELOC_BFIN_CONST
+              || insn->reloc == BFD_ARELOC_BFIN_PUSH)
 	    size = 4;		// the constant in an expression can be large
 
 	  fix_new (frag_now,
@@ -524,7 +524,7 @@ md_apply_fix3 (fixP, valp, seg)
       fixP->fx_no_overflow = 1;
       shift = 0;
       break;
-    case BFD_RELOC_10_PCREL:
+    case BFD_RELOC_BFIN_10_PCREL:
       if (!val)
 	{
 	  /* val = 0 is special */
@@ -534,7 +534,7 @@ md_apply_fix3 (fixP, valp, seg)
       fixP->fx_addnumber = 1;
       if (val < -1024 || val > 1022)
 	as_bad_where (fixP->fx_file, fixP->fx_line,
-                      "pcrel too far BFD_RELOC_10");
+                      "pcrel too far BFD_RELOC_BFIN_10");
 
       val /= 2;			// 11 bit offset even numbered, so we remove right bit
       shift = 1;
@@ -542,8 +542,8 @@ md_apply_fix3 (fixP, valp, seg)
       buf[highbyte] |= (val >> 8) & 0x3;
       break;
 
-    case BFD_RELOC_12_PCREL_JUMP:
-    case BFD_RELOC_12_PCREL_JUMP_S:
+    case BFD_RELOC_BFIN_12_PCREL_JUMP:
+    case BFD_RELOC_BFIN_12_PCREL_JUMP_S:
     case BFD_RELOC_12_PCREL:
 
       /* If fixP->fx_offset is non-zero, it's a zero offset pc-relative
@@ -556,7 +556,7 @@ md_apply_fix3 (fixP, valp, seg)
 	  break;
 	}
       if (val < -4096 || val > 4094)
-	as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_12");
+	as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_BFIN_12");
       fixP->fx_addnumber = 1;
       val /= 2;			// 13 bit offset even numbered, so we remove right bit
       shift = 1;
@@ -564,14 +564,14 @@ md_apply_fix3 (fixP, valp, seg)
       buf[highbyte] |= (val >> 8) & 0xf;
       break;
 
-    case BFD_RELOC_16_LOW:
+    case BFD_RELOC_BFIN_16_LOW:
 
       fixP->fx_addnumber = 0;
       not_yet_resolved = 1;	// absolute values not be resolved here
 
       break;
 
-    case BFD_RELOC_16_HIGH:
+    case BFD_RELOC_BFIN_16_HIGH:
 /*      leave to linker to resolve this reloc
         if (val) fixP->fx_addnumber = 1;
 	buf[lowbyte] = (val >> 16) & 0xff;
@@ -582,8 +582,8 @@ md_apply_fix3 (fixP, valp, seg)
       not_yet_resolved = 1;	// absolute values not be resolved here
       break;
 
-    case BFD_RELOC_24_PCREL_JUMP_L:
-    case BFD_RELOC_24_PCREL_CALL_X:
+    case BFD_RELOC_BFIN_24_PCREL_JUMP_L:
+    case BFD_RELOC_BFIN_24_PCREL_CALL_X:
     case BFD_RELOC_24_PCREL:
       if (!val)
 	{
@@ -592,7 +592,7 @@ md_apply_fix3 (fixP, valp, seg)
 	}
       fixP->fx_addnumber = 1;
       if (val < -16777216 || val > 16777214)
-	as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_24");
+	as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_BFIN_24");
       val /= 2;			// 25 bit offset even numbered, so we remove right bit
       shift = 1;
       val++;			//
@@ -602,7 +602,7 @@ md_apply_fix3 (fixP, valp, seg)
       buf[3] = val >> 8;
       break;
 
-    case BFD_RELOC_5_PCREL:	/* LSETUP (a, b) : "a" */
+    case BFD_RELOC_BFIN_5_PCREL:	/* LSETUP (a, b) : "a" */
       if (!val)
 	{
 	  fixP->fx_addnumber = 0;
@@ -610,14 +610,14 @@ md_apply_fix3 (fixP, valp, seg)
 	}
       fixP->fx_addnumber = 1;
       if (val < 4 || val > 30)
-	as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_5");
+	as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_BFIN_5");
       val /= 2;			// 5 bit unsigned even, so we remove right bit
       shift = 1;
 
       *buf = (*buf & 0xf0) | (val & 0xf);
       break;
 
-    case BFD_RELOC_11_PCREL:	/* LSETUP (a, b) : "b" */
+    case BFD_RELOC_BFIN_11_PCREL:	/* LSETUP (a, b) : "b" */
       if (!val)
 	{
 	  fixP->fx_addnumber = 0;
@@ -626,7 +626,7 @@ md_apply_fix3 (fixP, valp, seg)
       fixP->fx_addnumber = 1;
       val += 2;
       if (val < 4 || val > 2046)
-	as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_11_PCREL");
+	as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_BFIN_11_PCREL");
       val /= 2;			// 11 bit unsigned even, so we remove right bit
       shift = 1;
 
@@ -647,7 +647,7 @@ md_apply_fix3 (fixP, valp, seg)
       *buf++ = val >> 24;
       break;
 
-    case BFD_RELOC_16_IMM:
+    case BFD_RELOC_BFIN_16_IMM:
     case BFD_RELOC_16:
       *buf++ = val >> 0;
       *buf++ = val >> 8;
@@ -664,7 +664,7 @@ md_apply_fix3 (fixP, valp, seg)
       break;
 
     default:
-      if ((BFD_ARELOC_PUSH > fixP->fx_r_type) || (BFD_ARELOC_COMP < fixP->fx_r_type))
+      if ((BFD_ARELOC_BFIN_PUSH > fixP->fx_r_type) || (BFD_ARELOC_BFIN_COMP < fixP->fx_r_type))
 	{
 	  fprintf (stderr, "Relocation %d not handled in gas." " Contact support.\n", fixP->fx_r_type);
 	  return;
@@ -1094,9 +1094,9 @@ ExprNodeGenReloc (ExprNode * head, int parent_reloc)
       switch (parent_reloc)
 	{
 	  // some reloctions will need to allocate extra words
-	case BFD_RELOC_16_IMM:
-	case BFD_RELOC_16_LOW:
-	case BFD_RELOC_16_HIGH:
+	case BFD_RELOC_BFIN_16_IMM:
+	case BFD_RELOC_BFIN_16_LOW:
+	case BFD_RELOC_BFIN_16_HIGH:
 	  note1 = conscode (gencode (value), NULL_CODE);
 	  pcrel = 0;		// only these are not pc relative
 	  break;
@@ -1110,8 +1110,8 @@ ExprNodeGenReloc (ExprNode * head, int parent_reloc)
 	  pcrel = 0;		// only these are not pc relative
 	  break;
 	case BFD_RELOC_24_PCREL:
-	case BFD_RELOC_24_PCREL_JUMP_L:
-	case BFD_RELOC_24_PCREL_CALL_X:
+	case BFD_RELOC_BFIN_24_PCREL_JUMP_L:
+	case BFD_RELOC_BFIN_24_PCREL_CALL_X:
 	  /* these offsets are even numbered pcrel */
 	  note1 = conscode (gencode (value >> 1), NULL_CODE);
 	  break;
@@ -1151,50 +1151,50 @@ ExprNodeGenRelocR (ExprNode * head)
   switch (head->type)
     {
     case ExprNodeConstant:
-      note = conscode (note_reloc2 (gencode(0), con, BFD_ARELOC_CONST, head->value.i_value, 0), NULL_CODE);
+      note = conscode (note_reloc2 (gencode(0), con, BFD_ARELOC_BFIN_CONST, head->value.i_value, 0), NULL_CODE);
       break;
     case ExprNodeReloc:
-      note = conscode (note_reloc (gencode(0), head, BFD_ARELOC_PUSH, 0), NULL_CODE);
+      note = conscode (note_reloc (gencode(0), head, BFD_ARELOC_BFIN_PUSH, 0), NULL_CODE);
       break;
     case ExprNodeBinop:
       note1 = conctcode (ExprNodeGenRelocR (head->LeftChild), ExprNodeGenRelocR (head->RightChild));
       switch (head->value.op_value)
 	{
 	case ExprOpTypeAdd:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_ADD, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_ADD, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeSub:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_SUB, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_SUB, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeMult:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_MULT, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_MULT, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeDiv:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_DIV, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_DIV, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeMod:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_MOD, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_MOD, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeLsft:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_LSHIFT, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_LSHIFT, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeRsft:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_RSHIFT, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_RSHIFT, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeBAND:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_AND, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_AND, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeBOR:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_OR, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_OR, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeBXOR:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_XOR, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_XOR, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeLAND:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_LAND, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_LAND, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeLOR:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_LOR, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_LOR, 0), NULL_CODE));
 	  break;
 	default:
 	  fprintf (stderr, "%s:%d:Unkonwn operator found for arithmetic" " relocation", __FILE__, __LINE__);
@@ -1207,10 +1207,10 @@ ExprNodeGenRelocR (ExprNode * head)
       switch (head->value.op_value)
 	{
 	case ExprOpTypeNEG:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_NEG, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_NEG, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeCOMP:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_COMP, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_COMP, 0), NULL_CODE));
 	  break;
 	default:
 	  fprintf (stderr, "%s:%d:Unkonwn operator found for arithmetic" " relocation", __FILE__, __LINE__);
@@ -1403,8 +1403,8 @@ gen_loopsetup (ExprNode * psoffset, REG_T c, int rop, ExprNode * peoffset, REG_T
 
   return
       conscode (gencode (HI (c_code.opcode)),
-		conctcode (ExprNodeGenReloc (psoffset, BFD_RELOC_5_PCREL),
-			   conctcode (gencode (LO (c_code.opcode)), ExprNodeGenReloc (peoffset, BFD_RELOC_11_PCREL))));
+		conctcode (ExprNodeGenReloc (psoffset, BFD_RELOC_BFIN_5_PCREL),
+			   conctcode (gencode (LO (c_code.opcode)), ExprNodeGenReloc (peoffset, BFD_RELOC_BFIN_11_PCREL))));
 
 }
 
@@ -1420,7 +1420,7 @@ gen_calla (ExprNode * addr, int S)
   INIT (CALLa);
 
   switch(S){
-   case 0 : reloc = BFD_RELOC_24_PCREL_JUMP_L; break;
+   case 0 : reloc = BFD_RELOC_BFIN_24_PCREL_JUMP_L; break;
    case 1 : reloc = BFD_RELOC_24_PCREL; break;
    case 2 : reloc = BFD_RELOC_BFIN_PLTPC; break;
    default : break;
@@ -1471,11 +1471,11 @@ gen_ldimmhalf (REG_T reg, int H, int S, int Z, ExprNode * phword, int reloc)
   ASSIGN (grp);
   if (reloc == 2)
     {				//Relocation 5 , rN = <preg>
-      return conscode (gencode (HI (c_code.opcode)), ExprNodeGenReloc (phword, BFD_RELOC_16_IMM));
+      return conscode (gencode (HI (c_code.opcode)), ExprNodeGenReloc (phword, BFD_RELOC_BFIN_16_IMM));
     }
   else if (reloc == 1)
     {
-      return conscode (gencode (HI (c_code.opcode)), ExprNodeGenReloc (phword, IS_H (*reg) ? BFD_RELOC_16_HIGH : BFD_RELOC_16_LOW));
+      return conscode (gencode (HI (c_code.opcode)), ExprNodeGenReloc (phword, IS_H (*reg) ? BFD_RELOC_BFIN_16_HIGH : BFD_RELOC_BFIN_16_LOW));
     }
   else
     {
@@ -1670,7 +1670,7 @@ gen_brcc (int T, int B, ExprNode * poffset)
   ASSIGN (B);
   offset = ((EXPR_VALUE (poffset) >> 1));
   ASSIGN (offset);
-  return conscode (gencode (c_code.opcode), ExprNodeGenReloc (poffset, BFD_RELOC_10_PCREL));
+  return conscode (gencode (c_code.opcode), ExprNodeGenReloc (poffset, BFD_RELOC_BFIN_10_PCREL));
 }
 
 INSTR_T
@@ -1682,7 +1682,7 @@ gen_ujump (ExprNode * poffset)
   offset = ((EXPR_VALUE (poffset) >> 1));
   ASSIGN (offset);
 
-  return conscode (gencode (c_code.opcode), ExprNodeGenReloc (poffset, BFD_RELOC_12_PCREL_JUMP_S));
+  return conscode (gencode (c_code.opcode), ExprNodeGenReloc (poffset, BFD_RELOC_BFIN_12_PCREL_JUMP_S));
 }
 
 INSTR_T

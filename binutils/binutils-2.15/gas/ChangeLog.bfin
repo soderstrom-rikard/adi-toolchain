@@ -1,3 +1,15 @@
+2005-06-13  Catherine Moore  <clm@cm00re.com>
+
+	* config/tc-bfin.c (md_assemble):  Used renamed BFD_RELOCS.
+	(md_apply_fix3): Likewise.
+	(gen_ujump): Likewise.
+	(gen_brcc): Likewise.
+	(gen_ldimmhalf): Likewise.
+	(gen_calla): Likewise.
+	(gen_loopsetup): Likewise.
+	(ExprNodeGenRelocR): Likewise.
+	(ExprNodeGenReloc): Likewise.
+
 2005-05-31  Catherine Moore  <clm@cm00re.com>
 
 	* config/tc-bfin.h (TC_EOL_IN_INSN): Define.
