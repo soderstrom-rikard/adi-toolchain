@@ -2148,13 +2148,11 @@ int
 bfin_return_in_memory (tree type)
 {
   int size;
-  enum machine_mode mode = TYPE_MODE (type);
 
-  if (mode == BLKmode)
-    return 1;
   size = int_size_in_bytes (type);	
 
-  return size > 8;
+  return ((size > 2 * UNITS_PER_WORD)
+	  || (size == -1));
 }
 
 /* Return true if the legitimate memory address for a memory operand of mode

@@ -1,3 +1,8 @@
+2005-06-18  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.c: (bfin_return_in_memory): Return values of small
+	size in registers.
+
 2005-06-13  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/uclinux.h (NO_IMPLICIT_EXTERN_C): Define.
