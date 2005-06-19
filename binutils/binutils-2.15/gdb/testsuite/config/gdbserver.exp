@@ -104,6 +104,8 @@ proc gdbserver_gdb_load { server_exec } {
 
     if [target_info exists sockethost] {
 	set debughost  [target_info sockethost];
+    } elseif [target_info exists hostname] {
+	set debughost "[target_info hostname]:";
     } else {
 	set debughost "localhost:";
     }
@@ -124,7 +126,7 @@ proc gdbserver_gdb_load { server_exec } {
     if [target_info exists sockethost] {
 	set sockethost [target_info sockethost];
     } else {
-	set sockethost ""
+	set sockethost ":"
     }
 
     # Export the host:port pair.
@@ -212,8 +214,14 @@ proc gdb_load { arg } {
     set gdbport [lindex $res 1]
 
     if { $arg != "" } {
-	if [gdb_file_cmd $arg] {
-	    return -1
+	if [istarget "*-*-uclinux*"] {
+	    if [gdb_file_cmd "$arg.gdb"] {
+		return -1
+	    }
+	} else {
+	    if [gdb_file_cmd $arg] {
+		return -1
+	    }
 	}
     }
     gdb_target_cmd $protocol $gdbport

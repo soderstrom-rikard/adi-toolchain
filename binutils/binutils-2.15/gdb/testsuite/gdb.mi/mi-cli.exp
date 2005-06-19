@@ -199,9 +199,13 @@ mi_gdb_test "-interpreter-exec console \"help set args\"" \
 # mi_gdb_test "-interpreter-exec console \"set \$pc=0x0\"" \
 #   {.*=target-changed.*\^done} \
 #   "-interpreter-exec console \"set \$pc=0x0\""
-mi_gdb_test "888-interpreter-exec console \"set \$pc=0x0\"" \
-  {888\^done} \
-  "-interpreter-exec console \"set \$pc=0x0\""
+
+# NOTE: jiez/2005-06-10: Cannot set pc to 0 on uClinux.
+if ![istarget "*-*-uclinux*"] {
+    mi_gdb_test "888-interpreter-exec console \"set \$pc=0x0\"" \
+      {888\^done} \
+      "-interpreter-exec console \"set \$pc=0x0\""
+}
 
 #mi_gdb_test "-interpreter-exec console \"\"" \
   {} \

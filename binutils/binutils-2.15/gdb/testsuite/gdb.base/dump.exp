@@ -31,6 +31,13 @@ set testfile "dump"
 
 set srcfile  ${testfile}.c
 set binfile  ${objdir}/${subdir}/${testfile}
+
+if [istarget "*-*-uclinux*"] {
+    set symfile "${binfile}.gdb"
+} else {
+    set symfile ${binfile}
+}
+
 set options  {debug}
 
 set is64bitonly "no"
@@ -186,7 +193,7 @@ make_dump_file \
 
 gdb_exit
 gdb_start
-gdb_file_cmd ${binfile}
+gdb_file_cmd ${symfile}
 
 # Reload saved values one by one, and compare.
 
