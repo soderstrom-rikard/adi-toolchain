@@ -2,6 +2,7 @@
 #Build Script - Rohit Makasana ( rohit.makasana@rrap-software.com )
 #             - Modified by Bernd Schmidt (   )
 #             - Modified by Robin Getz (rgetz@blackfin.uclinux.org)
+#             - Modified by Jie Zhang (jie.zhang@analog.com)
 #
 #             - parts of this borrowed from the build-uclinux-tools.sh
 #               written by David McCullough, Heiko Degenhardt, 
@@ -27,16 +28,16 @@
 ###############################################################
 
 APP_NAME=$0
-DIR_BOARDS=`dirname $APP_NAME`
-DIR_BOARDS=$DIR_BOARDS/boards/
+DIR_APP=`dirname $APP_NAME`
+DIR_BOARDS=$DIR_APP/boards/
 APP_NAME=${APP_NAME#.}
 APP_NAME=${APP_NAME#/}
 
 #Uncomment only one of these
-TIMESTAMP=`date +%Y-%b-%d-%H-%M` # is YYYY_MMM_DD_HH_MM
-#TIMESTAMP=`date +%Y-%b-%d`       # is YYYY_MMM_DD
+#TIMESTAMP=`date +%Y-%b-%d-%H-%M` # is YYYY_MMM_DD_HH_MM
+TIMESTAMP=`date +%Y%m%d`       # is YYYY_MMM_DD
 
-while getopts dpwvts:b:k:o:m:h parameter
+while getopts dpwvtT:s:b:k:o:m:h parameter
 do
     case $parameter in
         p) 
@@ -73,13 +74,37 @@ do
         t) 
             RUN=`runtest --help 2>/dev/null | wc -l`
             if [ "$RUN" -gt 1 ] ; then
-                CHECK=1
-                echo "Running tests"
+                CHECK_ON_SIMULATOR=1
+                echo "Running tests on simulator"
             else
                 echo "Can't find dejagnu's runtest"
                 exit
             fi
             ;;
+        T) 
+            RUN=`runtest --help 2>/dev/null | wc -l`
+            if [ "$RUN" -gt 1 ] ; then
+		TARGET_IPADDR=`expr "$OPTARG" : "\([0-9]*\.[0-9]*\.[0-9]*\.[0-9]*\)"`
+                if [ "x$TARGET_IPADDR" = "x" ] ; then
+                    echo "Target ip address in wrong format"
+                    exit
+                else
+                    CHECK_ON_HARDWARE=1
+
+		    # TODO: Check if target board is available using
+		    #       ping, rcp and rsh.
+                    #       Check gdbserver is available on the target
+                    #       board.
+
+                    echo "Running tests on hardware"
+                    echo "Target board IP address is $TARGET_IPADDR"
+		fi
+            else
+                echo "Can't find dejagnu's runtest"
+                exit
+            fi
+            ;;
+
         s)  
             if [ -d $OPTARG ] ; then
                 DIR_SOURCE=$OPTARG
@@ -119,7 +144,8 @@ do
              echo "Usage : $APP_NAME -s SOURCE [-b BUILD]
 -p               Check prerequisites
 -d               Date Stamp all output files
--t               Test components
+-t               Test components on simulator
+-T TARGET_IPADDR Test components on hardware
 -s SOURCE 	 Toolchain Source directory (builds bfin-elf-gcc)
 -k SOURCE        Kernel Source directory    (builds bfin-uclinux-gcc)
 -b BUILD  	 Build directory (leave blank to use current dir)
@@ -158,7 +184,7 @@ RUN=`echo $PATH | sed {'s/:/ /g'}`
 for SEARCH in $RUN
 do 
     if [ -d $SEARCH ] ; then
-        FIND=`find $SEARCH -maxdepth 0 -name bfin-elf-gcc |wc -c`
+        FIND=`find $SEARCH -maxdepth 1 -name bfin-elf-gcc -o -name bfin-uclinux-gcc |wc -c`
         if [ $FIND -gt 1 ] ; then
             echo "Removing $SEARCH from the PATH"
         else
@@ -271,17 +297,40 @@ else
     rm -rf $DIR_LOG/*
 fi
 
-if [ $CHECK ] ; then
-    echo -n "Path for test results       "
+if [ "x$CHECK_ON_SIMULATOR" != "x" -o "x$CHECK_ON_HARDWARE" != "x" ] ; then
+    echo "Path for test results       "
     DIR_TEST_RESULTS=$DIR_BUILD/tests
-    echo $DIR_TEST_RESULTS
     if [ ! -d $DIR_TEST_RESULTS ] ; then
         mkdir $DIR_TEST_RESULTS
-    else
-        rm -rf $DIR_TEST_RESULTS/*
     fi
-else
-    rm -rf $DIR_BUILD/tests
+fi
+
+if [ $CHECK_ON_SIMULATOR ] ; then
+    if [ $DATE_STAMP ] ; then
+        DIR_TEST_SIM_RESULTS=$DIR_TEST_RESULTS/simulator-$TIMESTAMP
+    else
+        DIR_TEST_SIM_RESULTS=$DIR_TEST_RESULTS/simulator
+    fi
+    if [ ! -d $DIR_TEST_SIM_RESULTS ] ; then
+        mkdir $DIR_TEST_SIM_RESULTS
+    else
+        rm -rf $DIR_TEST_SIM_RESULTS/*
+    fi
+    echo "  on simulator: $DIR_TEST_SIM_RESULTS"
+fi
+
+if [ $CHECK_ON_HARDWARE ] ; then
+    if [ $DATE_STAMP ] ; then
+        DIR_TEST_HW_RESULTS=$DIR_TEST_RESULTS/hardware-$TIMESTAMP
+    else
+        DIR_TEST_HW_RESULTS=$DIR_TEST_RESULTS/hardware
+    fi
+    if [ ! -d $DIR_TEST_HW_RESULTS ] ; then
+        mkdir $DIR_TEST_HW_RESULTS
+    else
+        rm -rf $DIR_TEST_HW_RESULTS/*
+    fi
+    echo "  on hardware: $DIR_TEST_HW_RESULTS"
 fi
 
 echo -n "Path to binutils dir        "
@@ -387,14 +436,17 @@ fi
 
 ###################### Setting up test  ##########################
 
-if [ $CHECK ] ; then
+if [ "x$CHECK_ON_SIMULATOR" != "x" -o "x$CHECK_ON_HARDWARE" != "x" ] ; then
     echo "Setting up site.exp"
     if [ ! -d $DIR_BUILD/boards ] ; then
         mkdir $DIR_BUILD/boards
-        cp $DIR_BOARDS/bfin-sim.exp  $DIR_BUILD/boards/bfin-sim.exp
-    else
-        rm -f $DIR_BUILD/boards/site.exp bfin-sim.exp
-        cp $DIR_BOARDS/bfin-sim.exp  $DIR_BUILD/boards/bfin-sim.exp
+    fi
+    if [ $CHECK_ON_SIMULATOR ] ; then
+        cp $DIR_BOARDS/bfin-sim.exp $DIR_BUILD/boards/bfin-sim.exp
+    fi
+    if [ $CHECK_ON_HARDWARE ] ; then
+        (cat $DIR_BOARDS/bfin-uclinux.exp.1; \
+         echo "set_board_info hostname $TARGET_IPADDR") > $DIR_BUILD/boards/bfin-uclinux.exp
     fi
     (cat $DIR_BOARDS/site.exp.1; \
      echo "lappend boards_dir \"$DIR_BUILD/boards\""; \
@@ -468,68 +520,47 @@ do
     fi
 done
 
-if [ $CHECK ] ; then
+if [ $CHECK_ON_SIMULATOR ] ; then
+    echo "*** Testing on simulator            "
+
     echo -n "***  Running tests on binutils-elf " ; date
     cd $DIR_BINUTILS_BUILD/binutils
-    ( echo "make check " $LOGFILE ; ) | sh
+    ( echo "$MAKE check " $LOGFILE ; ) | sh
 
     echo -n "***  Running tests on gas-elf      " ; date
     cd $DIR_BINUTILS_BUILD/gas
-    ( echo "make check " $LOGFILE ; ) | sh
+    ( echo "$MAKE check " $LOGFILE ; ) | sh
 
     echo -n "***  Running tests on gdb-elf      " ; date
     cd $DIR_BINUTILS_BUILD/gdb
-    ( echo "make check " $LOGFILE ; ) | sh
+    ( echo "$MAKE check " $LOGFILE ; ) | sh
 
     echo -n "***  Running tests on gcc-elf      " ; date
     cd $DIR_BINUTILS_BUILD/gcc
-    ( echo "make check" $LOGFILE ; ) | sh
+    ( echo "$MAKE check " $LOGFILE ; ) | sh
 
-    echo -n "***  Done testing - results        " ; date
+    echo -n "***  Done testing on simulator - results        " ; date
 
-    if [ $DATE_STAMP ] ; then
-        cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.sum \ 
-           $DIR_TEST_RESULTS/gas-$TIMESTAMP.sum
-        cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.log \
-           $DIR_TEST_RESULTS/gas-$TIMESTAMP.log
-        cp $DIR_BINUTILS_BUILD/gcc/testsuite/gcc.sum \
-           $DIR_TEST_RESULTS/gcc-$TIMESTAMP.sum
-        cp $DIR_BINUTILS_BUILD/gcc/testsuite/gcc.log \
-           $DIR_TEST_RESULTS/gcc-$TIMESTAMP.log
-        cp $DIR_BINUTILS_BUILD/gcc/testsuite/g++.sum \
-           $DIR_TEST_RESULTS/g++-$TIMESTAMP.sum
-        cp $DIR_BINUTILS_BUILD/gcc/testsuite/g++.log \
-           $DIR_TEST_RESULTS/g++-$TIMESTAMP.log
-        cp $DIR_BINUTILS_BUILD/binutils/binutils.sum \
-           $DIR_TEST_RESULTS/binutils-$TIMESTAMP.sum
-        cp $DIR_BINUTILS_BUILD/binutils/binutils.log \
-           $DIR_TEST_RESULTS/binutils-$TIMESTAMP.log
-        cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.sum \
-           $DIR_TEST_RESULTS/gdb-$TIMESTAMP.sum
-        cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.log \
-           $DIR_TEST_RESULTS/gdb-$TIMESTAMP.log
-    else
-        cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.sum \
-           $DIR_TEST_RESULTS/gas.sum
-        cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.log \
-           $DIR_TEST_RESULTS/gas.log
-        cp $DIR_BINUTILS_BUILD/gcc/testsuite/gcc.sum \
-           $DIR_TEST_RESULTS/gcc.sum
-        cp $DIR_BINUTILS_BUILD/gcc/testsuite/gcc.log \
-           $DIR_TEST_RESULTS/gcc.log
-        cp $DIR_BINUTILS_BUILD/gcc/testsuite/g++.sum \
-           $DIR_TEST_RESULTS/g++.sum
-        cp $DIR_BINUTILS_BUILD/gcc/testsuite/g++.log \
-           $DIR_TEST_RESULTS/g++.log
-        cp $DIR_BINUTILS_BUILD/binutils/binutils.sum \
-           $DIR_TEST_RESULTS/binutils.sum
-        cp $DIR_BINUTILS_BUILD/binutils/binutils.log \
-           $DIR_TEST_RESULTS/binutils.log
-        cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.sum \
-           $DIR_TEST_RESULTS/gdb.sum
-        cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.log \
-           $DIR_TEST_RESULTS/gdb.log
-    fi
+    cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.sum \
+       $DIR_TEST_SIM_RESULTS/gas.sum
+    cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.log \
+       $DIR_TEST_SIM_RESULTS/gas.log
+    cp $DIR_BINUTILS_BUILD/gcc/testsuite/gcc.sum \
+       $DIR_TEST_SIM_RESULTS/gcc.sum
+    cp $DIR_BINUTILS_BUILD/gcc/testsuite/gcc.log \
+       $DIR_TEST_SIM_RESULTS/gcc.log
+    cp $DIR_BINUTILS_BUILD/gcc/testsuite/g++.sum \
+       $DIR_TEST_SIM_RESULTS/g++.sum
+    cp $DIR_BINUTILS_BUILD/gcc/testsuite/g++.log \
+       $DIR_TEST_SIM_RESULTS/g++.log
+    cp $DIR_BINUTILS_BUILD/binutils/binutils.sum \
+       $DIR_TEST_SIM_RESULTS/binutils.sum
+    cp $DIR_BINUTILS_BUILD/binutils/binutils.log \
+       $DIR_TEST_SIM_RESULTS/binutils.log
+    cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.sum \
+       $DIR_TEST_SIM_RESULTS/gdb.sum
+    cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.log \
+       $DIR_TEST_SIM_RESULTS/gdb.log
 
     cd $DIR_BINUTILS_BUILD
     for FILE in ./gas/testsuite/gas.sum ./binutils/binutils.sum \
@@ -726,8 +757,6 @@ if [ $KERNEL_SOURCE ] ; then
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
-    ####################### Step 4 - build bfin-uclinux ################
-
     ######################## build elf2flt ##########################
 
     echo -n "*** Building uClinux elf2flt       " ; date
@@ -757,6 +786,71 @@ if [ $KERNEL_SOURCE ] ; then
     RUN="$MAKE install "
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
+
+    ########################## Add to PATH ##########################
+    # Add to PATH so when testing, bfin-uclinux toolchain can be found
+    export PATH=$NEW_PATH:/$DIR_uC_OUTPUT/bin
+
+    ####################### Test bfin-uclinux #######################
+
+    if [ $CHECK_ON_HARDWARE ] ; then
+        echo "*** Testing on hardware            "
+
+        # Remove all tools from build directory. Thus the installed ones
+        # are tested. This way gcc will use ld wrapper provided by elf2flt.
+        cd $DIR_BINUTILS_BUILD
+        ( echo "$MAKE clean " $LOGFILE ; ) | sh
+
+        echo -n "***  Running tests on binutils-uclinux " ; date
+        cd $DIR_BINUTILS_BUILD/binutils
+        ( echo "$MAKE check " $LOGFILE ; ) | sh
+    
+        echo -n "***  Running tests on gas-uclinux      " ; date
+        cd $DIR_BINUTILS_BUILD/gas
+        ( echo "$MAKE check " $LOGFILE ; ) | sh
+    
+        echo -n "***  Running tests on gdb-uclinux      " ; date
+        cd $DIR_BINUTILS_BUILD/gdb
+        ( echo "$MAKE check " $LOGFILE ; ) | sh
+    
+        echo -n "***  Running tests on gcc-uclinux      " ; date
+        cd $DIR_BINUTILS_BUILD/gcc
+        ( echo "$MAKE check " $LOGFILE ; ) | sh
+    
+        echo -n "***  Done testing on hardware - results " ; date
+    
+        cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.sum \
+           $DIR_TEST_HW_RESULTS/gas.sum
+        cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.log \
+           $DIR_TEST_HW_RESULTS/gas.log
+        cp $DIR_BINUTILS_BUILD/gcc/testsuite/gcc.sum \
+           $DIR_TEST_HW_RESULTS/gcc.sum
+        cp $DIR_BINUTILS_BUILD/gcc/testsuite/gcc.log \
+           $DIR_TEST_HW_RESULTS/gcc.log
+        cp $DIR_BINUTILS_BUILD/gcc/testsuite/g++.sum \
+           $DIR_TEST_HW_RESULTS/g++.sum
+        cp $DIR_BINUTILS_BUILD/gcc/testsuite/g++.log \
+           $DIR_TEST_HW_RESULTS/g++.log
+        cp $DIR_BINUTILS_BUILD/binutils/binutils.sum \
+           $DIR_TEST_HW_RESULTS/binutils.sum
+        cp $DIR_BINUTILS_BUILD/binutils/binutils.log \
+           $DIR_TEST_HW_RESULTS/binutils.log
+        cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.sum \
+           $DIR_TEST_HW_RESULTS/gdb.sum
+        cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.log \
+           $DIR_TEST_HW_RESULTS/gdb.log
+    
+        cd $DIR_BINUTILS_BUILD
+        for FILE in ./gas/testsuite/gas.sum ./binutils/binutils.sum \
+                    ./gcc/testsuite/gcc.sum ./gcc/testsuite/g++.sum \
+                    ./gdb/testsuite/gdb.sum
+        do
+            START=`grep -n Summary $FILE | sed 's/:/ /' | awk '{print $1}'`
+            END=`wc -l $FILE | awk '{print $1}'`
+            TAIL=$((END - START + 1))
+            tail -$TAIL $FILE
+        done
+    fi
 
     ########################### genext2fs ########################
 
@@ -808,9 +902,9 @@ if [ $KERNEL_SOURCE ] ; then
     ######################## Done ################################
 fi
 
-rm -rf $DIR_GENEXT2FS_BUILD
-rm -rf $DIR_BINUTILS_BUILD
-rm -rf $DIR_ELF2FLT_BUILD
+# rm -rf $DIR_GENEXT2FS_BUILD
+# rm -rf $DIR_BINUTILS_BUILD
+# rm -rf $DIR_ELF2FLT_BUILD
 
 echo "*** Testing 'bfin-elf-gcc -v'"
 $DIR_ELF_OUTPUT/bin/bfin-elf-gcc -v

@@ -28,6 +28,9 @@ case "$target_triplet" in {
     { bfin-*-elf } {
 	set target_list { bfin-sim }
     }
+    { bfin-*-uclinux* } {
+	set target_list { bfin-uclinux }
+    }
     default {
 	set target_list { "unix" }
     }
