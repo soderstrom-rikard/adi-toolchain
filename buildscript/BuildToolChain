@@ -902,9 +902,9 @@ if [ $KERNEL_SOURCE ] ; then
     ######################## Done ################################
 fi
 
-# rm -rf $DIR_GENEXT2FS_BUILD
-# rm -rf $DIR_BINUTILS_BUILD
-# rm -rf $DIR_ELF2FLT_BUILD
+rm -rf $DIR_GENEXT2FS_BUILD
+rm -rf $DIR_BINUTILS_BUILD
+rm -rf $DIR_ELF2FLT_BUILD
 
 echo "*** Testing 'bfin-elf-gcc -v'"
 $DIR_ELF_OUTPUT/bin/bfin-elf-gcc -v
