@@ -1105,7 +1105,7 @@ sim_fetch_register (sd, rn, memory, length)
 	case BFIN_R5_REGNUM : value = DREG(5); break;
 	case BFIN_R6_REGNUM : value = DREG(6); break;
 	case BFIN_R7_REGNUM : value = DREG(7); break;
-	case BFIN_P0_REGNUM : value = DREG(0); break;
+	case BFIN_P0_REGNUM : value = PREG(0); break;
 	case BFIN_P1_REGNUM : value = PREG(1); break;
 	case BFIN_P2_REGNUM : value = PREG(2); break;
 	case BFIN_P3_REGNUM : value = PREG(3); break;
@@ -1171,7 +1171,7 @@ sim_store_register (sd, rn, memory, length)
 	case BFIN_R5_REGNUM : DREG(5) = value; break;
 	case BFIN_R6_REGNUM : DREG(6) = value; break;
 	case BFIN_R7_REGNUM : DREG(7) = value; break;
-	case BFIN_P0_REGNUM : DREG(0) = value; break;
+	case BFIN_P0_REGNUM : PREG(0) = value; break;
 	case BFIN_P1_REGNUM : PREG(1) = value; break;
 	case BFIN_P2_REGNUM : PREG(2) = value; break;
 	case BFIN_P3_REGNUM : PREG(3) = value; break;
