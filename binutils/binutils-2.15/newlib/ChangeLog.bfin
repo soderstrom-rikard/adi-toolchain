@@ -1,3 +1,11 @@
+2005-06-24  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* libc/sys/bfin/crt0.S (start): Call ___setup_argv_and_call_main
+	instead of _main.
+	* libc/sys/bfin/syscalls.c (_read, _write): Correct return values.
+	(__setup_argv_for_main, __setup_argv_and_call_main): New functions,
+	copied from SH code.
+
 2005-01-24  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* libc/sys/bfin/crt0.S (start): Properly compute length of BSS.

@@ -203,10 +203,10 @@ _read (int file,
     return error (-1);
 
   if (slot != MAX_OPEN_FILES)
-    openfiles [slot].pos += len - x;
+    openfiles [slot].pos += x;
 
   /* x == len is not an error, at least if we want feof() to work.  */
-  return len - x;
+  return x;
 }
 
 int
@@ -278,13 +278,13 @@ _write (int    file,
   int slot = findslot (remap_handle (file));
   int x = _swiwrite (file, ptr,len);
 
-  if (x == -1 || x == len)
+  if (x < 0)
     return error (-1);
   
   if (slot != MAX_OPEN_FILES)
-    openfiles[slot].pos += len - x;
+    openfiles[slot].pos += x;
   
-  return len - x;
+  return x;
 }
 
 extern int strlen (const char *);
@@ -506,4 +506,35 @@ _rename (const char * oldpath, const char * newpath)
 {
   errno = ENOSYS;
   return -1;
+}
+
+static inline int
+__setup_argv_for_main (int argc)
+{
+  int block[2];
+  char **argv;
+  int i = argc;
+
+  argv = __builtin_alloca ((1 + argc) * sizeof (*argv));
+
+  argv[i] = NULL;
+  while (i--) {
+    block[0] = i;
+    argv[i] = __builtin_alloca (1 + do_syscall (SYS_argnlen, (void *)block));
+    block[1] = argv[i];
+    do_syscall (SYS_argn, (void *)block);
+  }
+
+  return main (argc, argv);
+}
+
+int
+__setup_argv_and_call_main ()
+{
+  int argc = do_syscall (SYS_argc, 0);
+
+  if (argc <= 0)
+    return main (argc, NULL);
+  else
+    return __setup_argv_for_main (argc);
 }

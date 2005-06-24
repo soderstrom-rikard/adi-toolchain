@@ -38,8 +38,8 @@ clear_bss:
 	p0.h = _initialise_monitor_handles;
 	call	(p0)
 
-	p0.l = _main;
-	p0.h = _main; 
+	p0.l = ___setup_argv_and_call_main;
+	p0.h = ___setup_argv_and_call_main; 
 	call	(p0)
 
 	p0.l = _exit;
