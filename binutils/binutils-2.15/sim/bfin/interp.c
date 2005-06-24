@@ -111,11 +111,7 @@ void
 raise_exception (x)
      int x;
 {
-  //raise (x);
   saved_state.exception = x;
-  if(x != SIGTRAP){
-    raise(x);
-  }
 }
 
 void
@@ -408,6 +404,15 @@ bfin_trap ()
 	DREG (0) = callback->write (callback, arg0, arg1, arg2);
       }
       return;
+
+    case SYS_read:
+      {
+	bu32 arg0 = get_long (saved_state.memory, args);
+	char *arg1 = saved_state.memory + get_long (saved_state.memory, args + 4);
+	bu32 arg2 = get_long (saved_state.memory, args + 8);
+	DREG (0) = callback->read (callback, arg0, arg1, arg2);
+      }
+      return;
       
     case SYS_kill:
       printf ("Killing with signal %d\n", get_long (saved_state.memory, args + 4));
@@ -416,6 +421,36 @@ bfin_trap ()
     case SYS_close:
       printf ("Closing %d\n", get_long (saved_state.memory, args));
       DREG (0) = callback->close (callback, get_long (saved_state.memory, args));
+      return;
+    case SYS_argc:
+      DREG (0) = count_argc (prog_argv);
+      break;
+    case SYS_argnlen:
+      {
+	bu32 arg0 = get_long (saved_state.memory, args);
+	if (arg0 < count_argc (prog_argv))
+	  DREG (0) = strlen (prog_argv[arg0]);
+	else
+	  DREG (0) = -1;
+      }
+      return;
+    case SYS_argn:
+      {
+	bu32 arg0 = get_long (saved_state.memory, args);
+	char *arg1 = saved_state.memory + get_long (saved_state.memory, args + 4);
+	if (arg0 < count_argc (prog_argv))
+	  {
+	    /* Include the termination byte.  */
+	    int i = strlen (prog_argv[arg0]) + 1;
+	    DREG (0) = get_long (saved_state.memory, args + 4);
+	    memcpy (arg1, prog_argv[arg0], i);
+	  }
+	else
+	  DREG (0) = -1;
+      }
+      return;
+    case SYS_time:
+      DREG (0) = get_now ();
       return;
     default:
       abort ();
@@ -443,8 +478,8 @@ bfin_trap ()
 	  case SYS_fork:
 	    regs[0] = fork ();
 	    break;
-/* This would work only if endianness matched between host and target.
-   Besides, it's quite dangerous.  */
+	    /* This would work only if endianness matched between host and target.
+	       Besides, it's quite dangerous.  */
 #if 0
 	  case SYS_execve:
 	    regs[0] = execve (ptr (regs[5]), (char **) ptr (regs[6]), 
@@ -786,16 +821,18 @@ sim_resume (sd, step, siggnal)
   saved_state.exception = 0;
 
   if(step){
-    while(step && saved_state.exception != SIGTRAP){
+    while(step && saved_state.exception == 0){
       /* not clear if this will be > 1. Potential problem area */
       step_once(sd, pollcount);
       step--;
     }
-    /* Emulate a hardware single step ... raise an exception */
+    #if 0
+        /* Emulate a hardware single step ... raise an exception */
     saved_state.exception = SIGTRAP;
+    #endif
   }
   else{
-    while (saved_state.exception != SIGTRAP)
+    while (saved_state.exception == 0)
     {
 	step_once(sd, pollcount);
     }

@@ -1,3 +1,11 @@
+2005-06-24  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin/interp.c (raise_exception): Don't call raise.
+	(bfin_trap): Handle SYS_read, SYS_argc, SYS_argnlen, SYS_argn,
+	SYS_time.
+	(sim_resume): Clear saved_state.exception, then loop until it is
+	set.
+
 2005-06-21  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/interp.c (sim_fetch_register): Fix a typo.
