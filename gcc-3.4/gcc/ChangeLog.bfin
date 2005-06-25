@@ -1,3 +1,11 @@
+2005-06-25  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (ror_one, rol_one, ashrdi3, ashldi3, lshrdi3):
+	New patterns.
+	(movbi): Add alternative to set CC to zero.
+	(compare_eq, compare_ne, compare_le, compare_lt, compare_leu,
+	compare_ltu): Now named patterns.
+
 2005-06-22  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/elf.h (NO_IMPLICIT_EXTERN_C): Define.
