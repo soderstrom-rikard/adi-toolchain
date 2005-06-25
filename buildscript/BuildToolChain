@@ -742,8 +742,8 @@ if [ $KERNEL_SOURCE ] ; then
     (echo $RUN $LOGFILE ; ) | sh
 
     echo -n "*** Configuring uClinux toolchain  " ; date
-    RUN="$DIR_BINUTILS_SOURCE/configure $HOST_TARGET  \
-         --target=bfin-uclinux --prefix=$DIR_uC_OUTPUT --disable-libstdcxx-pch" 
+    RUN="$DIR_BINUTILS_SOURCE/configure $HOST_TARGET --enable-threads=posix \
+         --target=bfin-uclinux --prefix=$DIR_uC_OUTPUT --disable-libstdcxx-pch"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
