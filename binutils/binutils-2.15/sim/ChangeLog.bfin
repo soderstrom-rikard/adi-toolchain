@@ -1,3 +1,8 @@
+2005-06-25  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin/bfin-dis.c (decode_dsp32shiftimm_0): Correct some shifts in
+	simulation of ROT.
+
 2005-06-24  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin/interp.c (raise_exception): Don't call raise.

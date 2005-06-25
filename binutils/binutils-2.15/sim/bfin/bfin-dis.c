@@ -5180,9 +5180,9 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
 	  bu32 result;
 	  result = t == 32 ? 0 : srcval << t;
 	  result |= t == 1 ? 0 : srcval >> (33 - t);
-	  result |= (oldcc << t) >> 1;
+	  result |= oldcc << (t - 1);
 	  DREG (dst0) = result;
-	  CCREG = (t == 32 ? srcval : (srcval >> (32 - t))) & 1;
+	  CCREG = (srcval >> (32 - t)) & 1;
 	}
       PCREG += 4; return;
     }
