@@ -22,7 +22,9 @@
 #include "bfin-defs.h"
 #include "obstack.h"
 #include "safe-ctype.h"
-
+#ifdef OBJ_ELF
+#include "dwarf2dbg.h"
+#endif
 
 extern int yyparse (void);
 struct yy_buffer_state;
@@ -429,6 +431,9 @@ md_assemble (char *line)
 #endif
       insn = insn->next;
     }
+#ifdef OBJ_ELF
+  dwarf2_emit_insn (insn_size);
+#endif
 }
 
 /* Parse one line of instructions, and generate opcode for it.
