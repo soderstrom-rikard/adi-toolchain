@@ -380,7 +380,8 @@ bfin_trap ()
   switch (sys)
     {
     case SYS_exit:
-      exit (get_long (saved_state.memory, args));
+      saved_state.exception = SIGQUIT;
+      DREG (0) = get_long (saved_state.memory, args);
       return;
     case SYS_open:
       {
@@ -419,7 +420,6 @@ bfin_trap ()
       raise (SIGABRT);
 
     case SYS_close:
-      printf ("Closing %d\n", get_long (saved_state.memory, args));
       DREG (0) = callback->close (callback, get_long (saved_state.memory, args));
       return;
     case SYS_argc:
@@ -911,7 +911,7 @@ sim_stop_reason (sd, reason, sigrc)
   if (saved_state.exception == SIGQUIT)
     {
       *reason = sim_exited;
-      *sigrc = saved_state.dpregs[5];
+      *sigrc = DREG (0);
     }
   else
     {

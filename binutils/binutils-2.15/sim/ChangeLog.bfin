@@ -1,3 +1,9 @@
+2005-06-29  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/interp.c (bfin-trap): Translate SYS_exit into SIGQUIT.
+	Not print out any thing for SYS_close.
+	(sim_stop_reason): Get exit code from R0.
+
 2005-06-25  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin/bfin-dis.c (decode_dsp32shiftimm_0): Correct some shifts in
