@@ -1,3 +1,7 @@
+2005-06-30  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/bfin-dis.c (_interp_insn_bfin): Add non parallel MNOP.
+
 2005-06-29  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/interp.c (bfin-trap): Translate SYS_exit into SIGQUIT.

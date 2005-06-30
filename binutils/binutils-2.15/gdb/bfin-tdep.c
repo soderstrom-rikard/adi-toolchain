@@ -1569,8 +1569,6 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
 
   set_gdbarch_register_sim_regno (gdbarch, bfin_sim_regno);
 
-  set_main_name("_main");
-
   return gdbarch;
 }
 

@@ -5372,7 +5372,7 @@ _interp_insn_bfin (bu32 pc)
   bu16 iw0 = get_word (saved_state.memory, pc);
   bu16 iw1 = get_word (saved_state.memory, pc + 2);
 
-  if (iw0 == 0xc803 && iw1 == 0x1800)
+  if ((iw0 & 0xf7ff) == 0xc003 && iw1 == 0x1800)
     {
       /* MNOP.  */
       PCREG += 4;

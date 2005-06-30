@@ -51,6 +51,17 @@ switch -glob -- [istarget] {
     "xscale-*-*" {
         set asm-arch arm
     }
+    "bfin-*-elf" {
+        set asm-arch bfin
+        set asm-flags "-I${srcdir}/${subdir} -I${objdir}/${subdir}"
+	set debug-flags "-g"
+    }
+    "bfin-*-uclinux" {
+        set asm-arch bfin
+        set asm-flags "-I${srcdir}/${subdir} -I${objdir}/${subdir}"
+	set debug-flags "-g"
+        append link-flags " -elf2flt"
+    }
     "d10v-*-*" {
         set asm-arch d10v
     }
@@ -225,7 +236,9 @@ remote_exec build "mv asmsrc1.o asmsrc2.o ${objdir}/${subdir}"
 gdb_start
 gdb_reinitialize_dir $srcdir/$subdir
 gdb_load ${binfile}
-
+if [istarget "bfin-*-uclinux"] {
+    gdb_file_cmd "${binfile}.gdb"
+}
 #
 # Run to `main' where we begin our tests.
 #
