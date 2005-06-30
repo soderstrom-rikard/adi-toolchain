@@ -160,7 +160,7 @@ static reloc_howto_type bfin_howto_table [] =
 	 TRUE,			/* pc_relative */
 	 0,			/* bitpos */
 	 complain_overflow_signed, /* complain_on_overflow */
-	 bfin_bfd_reloc,	/* special_function */
+	 bfd_elf_generic_reloc,	/* special_function */
 	 "R_pcrel12_jump",	/* name */
 	 FALSE,			/* partial_inplace */
 	 0x0FFF,		/* src_mask */
@@ -342,7 +342,7 @@ static reloc_howto_type bfin_howto_table [] =
 	 FALSE,			/* pc_relative */
 	 0,			/* bitpos */
 	 complain_overflow_signed, /* complain_on_overflow */
-	 bfin_bfd_reloc,	/* special_function */
+	 bfd_elf_generic_reloc,	/* special_function */
 	 "R_byte2_data",	/* name */
 	 FALSE,			/* partial_inplace */
 	 0xFFFF,		/* src_mask */
@@ -775,14 +775,15 @@ static const struct bfin_reloc_map bfin_reloc_map [] =
   { BFD_ARELOC_BFIN_ADDR,		R_addr }
 
 };
+
 static void
-reloc_stack_push(bfd_vma value)
+reloc_stack_push (bfd_vma value)
 {
   reloc_stack[reloc_stack_tos++] = value;
 }
 
 static bfd_vma
-reloc_stack_pop(void)
+reloc_stack_pop (void)
 {
   return reloc_stack[--reloc_stack_tos];
 }
@@ -946,76 +947,67 @@ bfin_bfd_reloc (
       || howto->type == R_BFIN_GNU_VTINHERIT)
     return bfd_reloc_ok;
 
-#if 0
-  flag = bfd_elf_generic_reloc (abfd, reloc_entry, 
-			       symbol, data, input_section,
-				     output_bfd, error_message);
-  if (flag    != bfd_reloc_continue) {
-      return flag;
-  }
-  if (flag == bfd_reloc_continue) {
-#endif
+  /* Is the address of the relocation really within the section?  */
+  if (reloc_entry->address > bfd_get_section_limit (abfd, input_section))
+    return bfd_reloc_outofrange;
 
-      /* Is the address of the relocation really within the section?  */
-      if (reloc_entry->address > bfd_get_section_limit(abfd, input_section))
-	      return bfd_reloc_outofrange;
-      if(is_reloc_stack_empty()){
-        // check if symbol is defined
-        if (bfd_is_und_section (symbol->section)
-             && (symbol->flags & BSF_WEAK) == 0
-             && output_bfd == (bfd *) NULL)
-          return bfd_reloc_undefined;
+  if (is_reloc_stack_empty())
+    {
+      if (bfd_is_und_section (symbol->section)
+          && (symbol->flags & BSF_WEAK) == 0
+          && output_bfd == (bfd *) NULL)
+        return bfd_reloc_undefined;
 
-        /* Get symbol value.  (Common symbols are special.)  */
-        if (bfd_is_com_section (symbol->section)) {
-           relocation = 0;
-        }
-        else {
-           relocation = symbol->value;       
+      /* Get symbol value.  (Common symbols are special.)  */
+      if (bfd_is_com_section (symbol->section))
+        relocation = 0;
+      else
+        relocation = symbol->value;       
   
-        }
-  
-        reloc_target_output_section = symbol->section->output_section;
-  
+      reloc_target_output_section = symbol->section->output_section;
         
-        /* Convert input-section-relative symbol value to absolute.  */
-        if (output_bfd && howto->partial_inplace == FALSE)
-	    output_base = 0;
-        else
-	    output_base = reloc_target_output_section->vma;
+      /* Convert input-section-relative symbol value to absolute.  */
+      if (output_bfd && howto->partial_inplace == FALSE)
+	output_base = 0;
+      else
+	output_base = reloc_target_output_section->vma;
         
-        if (!strcmp(symbol->name, symbol->section->name) || output_bfd == NULL){
+      if (!strcmp (symbol->name, symbol->section->name)
+          || output_bfd == NULL)
+	{
           relocation += output_base + symbol->section->output_offset;
           possible_addend_delta = symbol->section->output_offset;
 	}
-        if (!strcmp(symbol->name, symbol->section->name) && output_bfd == NULL){
-          /* Add in supplied addend.  */
-          relocation += reloc_entry->addend;
+
+     if (!strcmp (symbol->name, symbol->section->name)
+         && output_bfd == NULL)
+       {
+         /* Add in supplied addend.  */
+         relocation += reloc_entry->addend;
         }
         
-      }
-      else{
-        relocation = reloc_stack_pop();
-      }
+     }
+  else
+    {
+      relocation = reloc_stack_pop();
+    }
       
-        /* Here the variable relocation holds the final address of the
-	   symbol we are relocating against, plus any addend.  */
+  /* Here the variable relocation holds the final address of the
+     symbol we are relocating against, plus any addend.  */
 
-      if (howto->pc_relative == TRUE)
-	{
-          relocation -=
-	    input_section->output_section->vma + input_section->output_offset;
+  if (howto->pc_relative == TRUE)
+    {
+      relocation -= input_section->output_section->vma + input_section->output_offset;
 
-       /* if (howto->pcrel_offset == FALSE)
-             relocation -= reloc_entry->address; */
- 
-          if (howto->pcrel_offset == TRUE)
-             relocation -= reloc_entry->address;
-	}
-    if (output_bfd != (bfd *) NULL) {
-       /* this output will be relocatable ... like ld -r */
-       reloc_entry->address += input_section->output_offset;
-       reloc_entry->addend += possible_addend_delta; // for symbols that are section names
+      if (howto->pcrel_offset == TRUE)
+        relocation -= reloc_entry->address;
+    }
+
+  if (output_bfd != (bfd *) NULL)
+    {
+      /* this output will be relocatable ... like ld -r */
+      reloc_entry->address += input_section->output_offset;
+      reloc_entry->addend += possible_addend_delta; // for symbols that are section names
     }
 
 
@@ -1027,24 +1019,26 @@ bfin_bfd_reloc (
      FIXME: We should also do overflow checking on the result after
      adding in the value contained in the object file.              */
 
-     if (howto->complain_on_overflow != complain_overflow_dont)
-        flag = bfd_check_overflow (howto->complain_on_overflow, 
+  if (howto->complain_on_overflow != complain_overflow_dont)
+    flag = bfd_check_overflow (howto->complain_on_overflow, 
                                howto->bitsize,
                                howto->rightshift, 
                                bfd_arch_bits_per_address(abfd),
                                relocation);      
       
-      /* if rightshift is 1 and the number odd, return error */
-      if(howto->rightshift && (relocation & 0x01)){
-        fprintf(stderr, "relocation should be even number\n");
-        return bfd_reloc_overflow; // the best we can!
-      }
+  /* if rightshift is 1 and the number odd, return error */
+  if (howto->rightshift && (relocation & 0x01))
+    {
+      fprintf(stderr, "relocation should be even number\n");
+      return bfd_reloc_overflow;
+    }
 
-      relocation >>= (bfd_vma) howto->rightshift;
+  relocation >>= (bfd_vma) howto->rightshift;
 
-      /* Shift everything up to where it's going to be used */
+  /* Shift everything up to where it's going to be used */
 
-      relocation <<= (bfd_vma) howto->bitpos;
+  relocation <<= (bfd_vma) howto->bitpos;
+
 #define DOIT(x) \
   x = ( (x & ~howto->dst_mask) | (relocation & howto->dst_mask))
 
@@ -1054,39 +1048,38 @@ bfin_bfd_reloc (
     {
     case 0:
       {
-	char x = bfd_get_8 (abfd, (char *) data + addr);
-	DOIT (x);
-	bfd_put_8 (abfd, x, (unsigned char *) data + addr);
+        char x = bfd_get_8 (abfd, (char *) data + addr);
+        DOIT (x);
+        bfd_put_8 (abfd, x, (unsigned char *) data + addr);
       }
       break;
 
     case 1:
       {
-       unsigned short x = bfd_get_16 (abfd, (bfd_byte *) data + addr);
-	DOIT (x);
-	bfd_put_16 (abfd, (bfd_vma) x, (unsigned char *) data + addr);
+        unsigned short x = bfd_get_16 (abfd, (bfd_byte *) data + addr);
+        DOIT (x);
+        bfd_put_16 (abfd, (bfd_vma) x, (unsigned char *) data + addr);
       }
       break;
+
     default:
       return bfd_reloc_other;
     }
 
-      return bfd_reloc_ok;
-#if 0
-  }
-#endif
+   return bfd_reloc_ok;
    return flag; 
 }
 
 static bfd_reloc_status_type
-bfin_pcrel24_reloc (
-     bfd *abfd,
-     arelent *reloc_entry,
-     asymbol *symbol,
-     PTR data,
-     asection *input_section,
-     bfd *output_bfd,
-     char **error_message ATTRIBUTE_UNUSED) 
+bfin_pcrel24_reloc (abfd, reloc_entry, symbol, data, input_section,
+                    output_bfd, error_message)
+      bfd *abfd;
+      arelent *reloc_entry;
+      asymbol *symbol ATTRIBUTE_UNUSED;
+      PTR data ATTRIBUTE_UNUSED;
+      asection *input_section ATTRIBUTE_UNUSED;
+      bfd *output_bfd ATTRIBUTE_UNUSED;
+      char **error_message ATTRIBUTE_UNUSED;
 {
   bfd_vma relocation;
   bfd_reloc_status_type flag = bfd_reloc_ok;
@@ -1135,8 +1128,8 @@ bfin_pcrel24_reloc (
         }
     }
       
-    relocation -= input_section->output_section->vma + input_section->output_offset;
-    relocation -= reloc_entry->address;
+  relocation -= input_section->output_section->vma + input_section->output_offset;
+  relocation -= reloc_entry->address;
 
 
   /* FIXME: This overflow checking is incomplete, because the value
@@ -1147,53 +1140,51 @@ bfin_pcrel24_reloc (
      FIXME: We should also do overflow checking on the result after
      adding in the value contained in the object file.              */
 
-     if (howto->complain_on_overflow != complain_overflow_dont)
-        flag = bfd_check_overflow (howto->complain_on_overflow, 
+  if (howto->complain_on_overflow != complain_overflow_dont)
+    flag = bfd_check_overflow (howto->complain_on_overflow, 
                                howto->bitsize,
                                howto->rightshift, 
                                bfd_arch_bits_per_address(abfd),
                                relocation);      
       
-      /* if rightshift is 1 and the number odd, return error */
-      if(howto->rightshift && (relocation & 0x01)){
-        fprintf(stderr, "relocation should be even number\n");
-        return bfd_reloc_overflow; // the best we can!
-      }
-
-      relocation >>= (bfd_vma) howto->rightshift;
-/*      relocation -= 1;  */
-      /* Shift everything up to where it's going to be used */
-
-      relocation <<= (bfd_vma) howto->bitpos;
-    if (output_bfd != (bfd *) NULL) {
-       /* this output will be relocatable ... like ld -r */
-       reloc_entry->address += input_section->output_offset;
-       reloc_entry->addend += possible_addend_delta; // for symbols that are section names
+  /* if rightshift is 1 and the number odd, return error */
+  if (howto->rightshift && (relocation & 0x01))
+    {
+      fprintf(stderr, "relocation should be even number\n");
+      return bfd_reloc_overflow;
     }
-      {
-         short x;
-	/* We are getting reloc_entry->address 2 byte off from
-	 * the start of instruction. Assuming absolute postion
-	 * of the reloc data. But, following code had been written assuming 
-	 * reloc address is starting at begining of instruction.
-	 * To compensate that I have increased the value of 
-	 * relocation by 1 (effectively 2) and used the addr -2 instead of addr
-	 * -JyotiK
-	 */
-	 
-	 relocation += 1;
-         x = bfd_get_16 (abfd, (bfd_byte *) data + addr-2);
-         x = (x&0xff00) | ((relocation>>16)&0xff);
- 	 bfd_put_16 (abfd, x, (unsigned char *) data + addr -2);
-         x = bfd_get_16 (abfd, (bfd_byte *) data + addr);
-         x = relocation&0xFFFF;
- 	 bfd_put_16 (abfd, x, (unsigned char *) data + addr );
-      }
-      return bfd_reloc_ok;
-#if 0
+
+  relocation >>= (bfd_vma) howto->rightshift;
+  /* Shift everything up to where it's going to be used */
+
+  relocation <<= (bfd_vma) howto->bitpos;
+  if (output_bfd != (bfd *) NULL)
+    {
+      /* this output will be relocatable ... like ld -r */
+      reloc_entry->address += input_section->output_offset;
+      reloc_entry->addend += possible_addend_delta; // for symbols that are section names
+    }
+
+  {
+    short x;
+
+    /* We are getting reloc_entry->address 2 byte off from
+    the start of instruction. Assuming absolute postion
+    of the reloc data. But, following code had been written assuming 
+    reloc address is starting at begining of instruction.
+    To compensate that I have increased the value of 
+    relocation by 1 (effectively 2) and used the addr -2 instead of addr.  */ 
+
+    relocation += 1;
+    x = bfd_get_16 (abfd, (bfd_byte *) data + addr - 2);
+    x = (x&0xff00) | ((relocation >> 16) & 0xff);
+    bfd_put_16 (abfd, x, (unsigned char *) data + addr - 2);
+    x = bfd_get_16 (abfd, (bfd_byte *) data + addr);
+    x = relocation & 0xFFFF;
+    bfd_put_16 (abfd, x, (unsigned char *) data + addr );
   }
-#endif
-   return flag; 
+  return bfd_reloc_ok;
+  return flag; 
 }
 
 static bfd_reloc_status_type
@@ -1207,7 +1198,6 @@ bfin_push_reloc (
      char **error_message ATTRIBUTE_UNUSED) 
 {
   bfd_vma relocation;
-  //bfd_reloc_status_type flag = bfd_reloc_ok;
   bfd_vma output_base = 0;
   asection *reloc_target_output_section;
   bfd_reloc_status_type flag = bfd_reloc_ok;
@@ -1285,17 +1275,12 @@ bfin_const_reloc (
      char **error_message ATTRIBUTE_UNUSED) 
 {
   /* push the addend portion of the relocation */
-  reloc_stack_push(reloc_entry->addend);
-  if (output_bfd != (bfd *) NULL) {
-     /* this output will be relocatable ... like ld -r */
-     /* Actually it would not matter as we ignore the address */
-     reloc_entry->address += input_section->output_offset;
-  }
+  reloc_stack_push (reloc_entry->addend);
+  if (output_bfd != (bfd *) NULL)
+    reloc_entry->address += input_section->output_offset;
   
   return bfd_reloc_ok;
 }
-
-
 
 static bfd_reloc_status_type
 bfin_h_l_uimm16_reloc (
@@ -1308,20 +1293,11 @@ bfin_h_l_uimm16_reloc (
      char **error_message ATTRIBUTE_UNUSED) 
 {
   bfd_vma relocation, x;
-  //bfd_reloc_status_type flag = bfd_reloc_ok;
   bfd_size_type addr = reloc_entry->address;
   bfd_vma output_base = 0;
   reloc_howto_type *howto = reloc_entry->howto;
   asection *reloc_target_output_section;
   int  possible_addend_delta = 0; // to be added to addend if output_bfd is 0
-
-  // if the reloc stack is not empty, use that as the relocation value
-#if 0
-  if ( bfd_elf_generic_reloc (abfd, reloc_entry,
-		  symbol, data, input_section, 
-		  output_bfd, error_message) == bfd_reloc_continue)
-  {
-#endif
 
       /* Is the address of the relocation really within the section?  */
       if (reloc_entry->address > bfd_get_section_limit(abfd, input_section))
@@ -1358,13 +1334,10 @@ bfin_h_l_uimm16_reloc (
       }
       else{
         relocation = reloc_stack_pop();
-        //relocation += reloc_entry->addend;
-        // assert(is_reloc_stack_empty());
       }
       if (output_bfd != (bfd *) NULL) {	              
 	 /* this output will be relocatable ... like ld -r */
 	 reloc_entry->address += input_section->output_offset;
-	 // reloc_entry->addend = relocation;
 	 reloc_entry->addend += possible_addend_delta;
       }
       else {
@@ -1377,10 +1350,6 @@ bfin_h_l_uimm16_reloc (
       relocation >>= (bfd_vma) howto->rightshift;
       x = relocation;
       bfd_put_16 (abfd, x, (unsigned char *) data + addr);
-#if 0
-    }
-#endif
-
     return bfd_reloc_ok;
 }
 
@@ -2372,28 +2341,6 @@ fprintf(stderr, "*** check this relocation %s\n", __FUNCTION__);
   if (h->needs_copy)
     {
       BFD_ASSERT (0);
-/*      asection *s;
-      Elf_Internal_Rela rela;
-      bfd_byte *loc;
-
-      // This symbol needs a copy reloc.  Set it up.  
-
-      BFD_ASSERT (h->dynindx != -1
-		  && (h->root.type == bfd_link_hash_defined
-		      || h->root.type == bfd_link_hash_defweak));
-
-      s = bfd_get_section_by_name (h->root.u.def.section->owner,
-				   ".rela.bss");
-      BFD_ASSERT (s != NULL);
-
-      rela.r_offset = (h->root.u.def.value
-		       + h->root.u.def.section->output_section->vma
-		       + h->root.u.def.section->output_offset);
-      rela.r_info = ELF32_R_INFO (h->dynindx, R_68K_COPY);
-      rela.r_addend = 0;
-      loc = s->contents + s->reloc_count++ * sizeof (Elf32_External_Rela);
-      bfd_elf32_swap_reloca_out (output_bfd, &rela, loc);
-*/
     }
   /* Mark _DYNAMIC and _GLOBAL_OFFSET_TABLE_ as absolute.  */
   if (strcmp (h->root.root.string, "_DYNAMIC") == 0

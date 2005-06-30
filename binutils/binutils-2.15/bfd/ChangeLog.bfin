@@ -1,3 +1,11 @@
+2005-06-30  Catherine Moore  <clm@cm00re.com>
+
+	* elf32-bfin.c (bfin_howto_table):  Change the special function
+	to the generic function for the pcrel12 and byte2 data relocs.
+	(reloc_stack_push, reloc_stack_pop, bfin_pop_reloc): Reformat.
+	(bfin_bfd_reloc, bfin_pcrel24_reloc, bfin_push_reloc,
+	bfin_h_l_uimm16_reloc): Remove unused code and reformat.
+
 2005-06-13  Catherine Moore  <clm@cm00re.com>
 
 	* bfd-in2.h, libbfd.h: Regenerated.
