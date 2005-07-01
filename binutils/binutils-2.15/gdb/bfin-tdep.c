@@ -1552,9 +1552,6 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
      we may give out text_start, data_start, bss_start */
   set_gdbarch_num_pseudo_regs (gdbarch, 0); 
 
-  /* On BFIN targets char defaults to unsigned.  */
-  set_gdbarch_char_signed (gdbarch, 0);
-
   /* Frame handling.  */
   /* Frame unwinder.  */
   set_gdbarch_frame_args_skip (gdbarch, 0);
