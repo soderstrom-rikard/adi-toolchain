@@ -110,5 +110,5 @@ Disassembly of section .text:
 
 000000e0 <DoItSome__END>:
   e0:	11 60       	R1=0x2\(x\);
-  e2:	9f e0 8e 03 	LSETUP\(e0 <DoItSome__END>,fffffffe <DoItSome__END\+0xffffff1e>\)LC1;
+  e2:	90 e0 00 00 	LSETUP\(e2 <DoItSome__END\+0x2>,e2 <DoItSome__END\+0x2>\)LC1;
 	...

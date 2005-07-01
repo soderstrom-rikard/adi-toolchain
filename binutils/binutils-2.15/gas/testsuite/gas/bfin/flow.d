@@ -62,14 +62,14 @@ Disassembly of section .text:
 
 0000006e <second_loop__BEGIN>:
   6e:	00 00       	NOP;
-  70:	e8 e0 c7 13 	LSETUP\(60 <first_loop__BEGIN\+0x1c>,fffffffe <another_loop__END\+0xffffff40>\)LC0=P1>>1;
+  70:	e0 e0 00 10 	LSETUP\(70 <second_loop__BEGIN\+0x2>,70 <second_loop__BEGIN\+0x2>\)LC0=P1>>1;
   74:	82 e0 ff 03 	LSETUP\(78 <second_loop__BEGIN\+0xa>,72 <second_loop__BEGIN\+0x4>\)LC0;
   78:	af e0 00 52 	LSETUP\(76 <second_loop__BEGIN\+0x8>,fffffc78 <another_loop__END\+0xfffffbba>\)LC0=P5;
   7c:	ef e0 02 00 	LSETUP\(7a <second_loop__BEGIN\+0xc>,80 <loop_lc1>\)LC0=P0>>1;
 
 00000080 <loop_lc1>:
-  80:	90 e0 bf 03 	LSETUP\(80 <loop_lc1>,fffffffe <another_loop__END\+0xffffff40>\)LC1;
-  84:	be e0 bd 43 	LSETUP\(80 <loop_lc1>,fffffffe <another_loop__END\+0xffffff40>\)LC1=P4;
+  80:	90 e0 00 00 	LSETUP\(80 <loop_lc1>,80 <loop_lc1>\)LC1;
+  84:	b0 e0 00 40 	LSETUP\(84 <loop_lc1\+0x4>,84 <loop_lc1\+0x4>\)LC1=P4;
   88:	f8 e0 1b 10 	LSETUP\(78 <second_loop__BEGIN\+0xa>,be <another_loop__END>\)LC1=P1>>1;
   8c:	92 e0 ff 03 	LSETUP\(90 <loop_lc1\+0x10>,8a <loop_lc1\+0xa>\)LC1;
   90:	bf e0 00 52 	LSETUP\(8e <loop_lc1\+0xe>,fffffc90 <another_loop__END\+0xfffffbd2>\)LC1=P5;

@@ -1,3 +1,8 @@
+2005-07-01  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/flow.d: Update expected output.
+	* gas/bfin/flow2.d: Update expected output.
+
 2005-05-31  Catherine Moore  <clm@cm00re.com>
 
 	* gas/bfin/parallel4.s:  Test multi-line multi-issue instructions.
