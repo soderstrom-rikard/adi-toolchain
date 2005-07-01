@@ -119,7 +119,7 @@ static reloc_howto_type bfin_howto_table [] =
 	 FALSE,			/* partial_inplace */
 	 0x0000000F,		/* src_mask */
 	 0x0000000F,		/* dst_mask */
-	 TRUE),			/* pcrel_offset */
+	 FALSE),		/* pcrel_offset */
 
   HOWTO (R_unused1,		/* type */
 	 0,			/* rightshift */
@@ -160,7 +160,7 @@ static reloc_howto_type bfin_howto_table [] =
 	 TRUE,			/* pc_relative */
 	 0,			/* bitpos */
 	 complain_overflow_signed, /* complain_on_overflow */
-	 bfd_elf_generic_reloc,	/* special_function */
+	 bfin_bfd_reloc,	/* special_function */
 	 "R_pcrel12_jump",	/* name */
 	 FALSE,			/* partial_inplace */
 	 0x0FFF,		/* src_mask */
@@ -257,7 +257,7 @@ static reloc_howto_type bfin_howto_table [] =
 	 32,			/* bitsize */
 	 FALSE,			/* pc_relative */
 	 0,			/* bitpos */
-	 complain_overflow_bitfield, /* complain_on_overflow */
+	 complain_overflow_dont, /* complain_on_overflow */
 	 bfd_elf_generic_reloc,	/* special_function */
 	 "R_unusedb",		/* name */
 	 FALSE,			/* partial_inplace */
@@ -271,7 +271,7 @@ static reloc_howto_type bfin_howto_table [] =
 	 32,			/* bitsize */
 	 FALSE,			/* pc_relative */
 	 0,			/* bitpos */
-	 complain_overflow_bitfield, /* complain_on_overflow */
+	 complain_overflow_dont, /* complain_on_overflow */
 	 bfd_elf_generic_reloc,	/* special_function */
 	 "R_unusedc",		/* name */
 	 FALSE,			/* partial_inplace */
@@ -314,7 +314,7 @@ static reloc_howto_type bfin_howto_table [] =
 	 FALSE,			/* pc_relative */
 	 0,			/* bitpos */
 	 complain_overflow_bitfield, /* complain_on_overflow */
-	 bfd_elf_generic_reloc,	/* special_function */
+	 bfin_bfd_reloc,	/* special_function */
 	 "R_var_eq_symb",		/* name */
 	 FALSE,			/* partial_inplace */
 	 0,			/* src_mask */
@@ -328,7 +328,7 @@ static reloc_howto_type bfin_howto_table [] =
 	 FALSE,			/* pc_relative */
 	 0,			/* bitpos */
 	 complain_overflow_unsigned, /* complain_on_overflow */
-	 bfd_elf_generic_reloc,	/* special_function */
+	 bfin_bfd_reloc,	/* special_function */
 	 "R_byte_data",		/* name */
 	 FALSE,			/* partial_inplace */
 	 0xFF,			/* src_mask */
@@ -342,7 +342,7 @@ static reloc_howto_type bfin_howto_table [] =
 	 FALSE,			/* pc_relative */
 	 0,			/* bitpos */
 	 complain_overflow_signed, /* complain_on_overflow */
-	 bfd_elf_generic_reloc,	/* special_function */
+	 bfin_bfd_reloc,	/* special_function */
 	 "R_byte2_data",	/* name */
 	 FALSE,			/* partial_inplace */
 	 0xFFFF,		/* src_mask */
@@ -375,7 +375,7 @@ static reloc_howto_type bfin_howto_table [] =
 	 FALSE,			/* partial_inplace */
 	 0x000003FF,		/* src_mask */
 	 0x000003FF,		/* dst_mask */
-	 TRUE),			/* pcrel_offset */
+	 FALSE),		/* pcrel_offset */
 };
 
 static reloc_howto_type bfin_areloc_howto_table [] =
@@ -920,20 +920,17 @@ bfin_pltpc_reloc (
   bfd_reloc_status_type flag = bfd_reloc_ok;
   return flag; 
 }
-/* FUNCTION : bfin_bfd_reloc
-   ABSTRACT : Very similar to the bfd_perform_relocation in reloc.c
-              It understands the blackfin arithmetic relocations
-              It also handles different sizes using bfd_get_8
-*/
+
+/* bfin_bfd_reloc handles the blackfin arithmetic relocations.
+   Use this instead of bfd_perform_relocation.  */
 static bfd_reloc_status_type
-bfin_bfd_reloc (
-     bfd *abfd,
-     arelent *reloc_entry,
-     asymbol *symbol,
-     PTR data,
-     asection *input_section,
-     bfd *output_bfd,
-     char **error_message ATTRIBUTE_UNUSED) 
+bfin_bfd_reloc (bfd *abfd,
+		arelent *reloc_entry,
+     		asymbol *symbol,
+     		PTR data,
+     		asection *input_section,
+     		bfd *output_bfd,
+     		char **error_message ATTRIBUTE_UNUSED)
 {
   bfd_vma relocation;
   bfd_reloc_status_type flag = bfd_reloc_ok;
@@ -967,7 +964,7 @@ bfin_bfd_reloc (
       reloc_target_output_section = symbol->section->output_section;
         
       /* Convert input-section-relative symbol value to absolute.  */
-      if (output_bfd && howto->partial_inplace == FALSE)
+      if (output_bfd)
 	output_base = 0;
       else
 	output_base = reloc_target_output_section->vma;
@@ -1007,9 +1004,8 @@ bfin_bfd_reloc (
     {
       /* this output will be relocatable ... like ld -r */
       reloc_entry->address += input_section->output_offset;
-      reloc_entry->addend += possible_addend_delta; // for symbols that are section names
+      reloc_entry->addend += possible_addend_delta; 
     }
-
 
   /* FIXME: This overflow checking is incomplete, because the value
      might have overflowed before we get here.  For a correct check we
@@ -1020,11 +1016,15 @@ bfin_bfd_reloc (
      adding in the value contained in the object file.              */
 
   if (howto->complain_on_overflow != complain_overflow_dont)
-    flag = bfd_check_overflow (howto->complain_on_overflow, 
-                               howto->bitsize,
-                               howto->rightshift, 
-                               bfd_arch_bits_per_address(abfd),
-                               relocation);      
+    {
+      flag = bfd_check_overflow (howto->complain_on_overflow, 
+                                 howto->bitsize,
+                                 howto->rightshift, 
+                                 bfd_arch_bits_per_address(abfd),
+                                 relocation);
+      if (flag != bfd_reloc_ok)
+	return flag;
+    }
       
   /* if rightshift is 1 and the number odd, return error */
   if (howto->rightshift && (relocation & 0x01))
@@ -1067,7 +1067,6 @@ bfin_bfd_reloc (
     }
 
    return bfd_reloc_ok;
-   return flag; 
 }
 
 static bfd_reloc_status_type
@@ -1141,11 +1140,15 @@ bfin_pcrel24_reloc (abfd, reloc_entry, symbol, data, input_section,
      adding in the value contained in the object file.              */
 
   if (howto->complain_on_overflow != complain_overflow_dont)
-    flag = bfd_check_overflow (howto->complain_on_overflow, 
-                               howto->bitsize,
-                               howto->rightshift, 
-                               bfd_arch_bits_per_address(abfd),
-                               relocation);      
+    {
+      flag = bfd_check_overflow (howto->complain_on_overflow, 
+                                 howto->bitsize,
+                                 howto->rightshift, 
+                                 bfd_arch_bits_per_address(abfd),
+                                 relocation);      
+      if (flag != bfd_reloc_ok)
+	return flag;
+    }
       
   /* if rightshift is 1 and the number odd, return error */
   if (howto->rightshift && (relocation & 0x01))
@@ -1184,7 +1187,6 @@ bfin_pcrel24_reloc (abfd, reloc_entry, symbol, data, input_section,
     bfd_put_16 (abfd, x, (unsigned char *) data + addr );
   }
   return bfd_reloc_ok;
-  return flag; 
 }
 
 static bfd_reloc_status_type
@@ -1200,13 +1202,12 @@ bfin_push_reloc (
   bfd_vma relocation;
   bfd_vma output_base = 0;
   asection *reloc_target_output_section;
-  bfd_reloc_status_type flag = bfd_reloc_ok;
   int possible_addend_delta = 0;
 
   if (bfd_is_und_section (symbol->section)
       && (symbol->flags & BSF_WEAK) == 0
       && output_bfd == (bfd *) NULL)
-    flag = bfd_reloc_undefined;
+    return bfd_reloc_undefined;
 
 
   /* Is the address of the relocation really within the section?  */
@@ -1235,12 +1236,10 @@ bfin_push_reloc (
      reloc_entry->addend += possible_addend_delta; // for symbols that are section names
   }
 
-
-
   /* now that we have the value, push it */
-  reloc_stack_push(relocation);
+  reloc_stack_push (relocation);
   
-  return flag;
+  return bfd_reloc_ok;
 }
 
 static bfd_reloc_status_type
@@ -1456,13 +1455,13 @@ bfin_bfd_reloc_type_lookup (bfd * abfd ATTRIBUTE_UNUSED,
 				 bfd_reloc_code_real_type code)
 {
   unsigned int i;
-  unsigned int r_type;
+  unsigned int r_type = BFIN_RELOC_MIN;
 
   for (i = sizeof (bfin_reloc_map) / sizeof (bfin_reloc_map[0]); --i;)
     if (bfin_reloc_map[i].bfd_reloc_val == code)
       r_type = bfin_reloc_map[i].bfin_reloc_val;
 
-  if (r_type <= BFIN_RELOC_MAX)
+  if (r_type <= BFIN_RELOC_MAX && r_type > BFIN_RELOC_MIN)
     return &bfin_howto_table [r_type];
 
   else if (r_type >= BFIN_ARELOC_MIN && r_type <= BFIN_ARELOC_MAX)
