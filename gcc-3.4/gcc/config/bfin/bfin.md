@@ -2003,13 +2003,19 @@
 (define_insn "csync"
   [(unspec_volatile [(const_int 0)] UNSPEC_VOLATILE_CSYNC)]
   ""
-  "csync;"
+  "nop;
+   nop;
+   nop;
+   csync;"
   [(set_attr "type" "misc")])
 
 (define_insn "ssync"
   [(unspec_volatile [(const_int 0)] UNSPEC_VOLATILE_SSYNC)]
   ""
-  "ssync;"
+  "nop;
+   nop;
+   nop;
+   ssync;"
   [(set_attr "type" "misc")])
 
 ;;; Vector instructions
