@@ -1,5 +1,11 @@
 2005-07-05  Jie Zhang  <jie.zhang@analog.com>
 
+	Apply this patch from mainline
+	2004-11-28  Richard Earnshaw  <rearnsha@arm.com>
+	* config/sim.exp (gdb_load): Return 0 on success, -1 on failure.
+
+2005-07-05  Jie Zhang  <jie.zhang@analog.com>
+
 	* gdb.base/ending-run.exp: Check specific wrapper functions of bfin.
 
 2005-06-30  Jie Zhang  <jie.zhang@analog.com>
