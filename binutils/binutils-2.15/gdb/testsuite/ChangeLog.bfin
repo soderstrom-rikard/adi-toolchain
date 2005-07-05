@@ -1,3 +1,7 @@
+2005-07-05  Jie Zhang  <jie.zhang@analog.com>
+
+	* gdb.base/ending-run.exp: Check specific wrapper functions of bfin.
+
 2005-06-30  Jie Zhang  <jie.zhang@analog.com>
 
 	* gdb.asm/asm-source.exp: Enable this test for bfin-*-elf and

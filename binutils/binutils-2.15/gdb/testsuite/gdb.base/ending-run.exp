@@ -203,9 +203,13 @@ gdb_expect {
 		pass "step out of main (status wrapper)"
 	    }
 	    -re "__setup_argv_for_main (.*).*$gdb_prompt $" {
-		# On sh, another wrapper function (start_l) exists, so
-		# another `next' is necessary.
-		gdb_test "next" ".*in start_l ().*" "step out of main (on sh)"
+		if [istarget "bfin-*-elf"] {
+		    gdb_test "next" ".*in clear_bss ().*" "step out of main (on bfin)"
+		} else {
+		    # On sh, another wrapper function (start_l) exists, so
+		    # another `next' is necessary.
+		    gdb_test "next" ".*in start_l ().*" "step out of main (on sh)"
+		}
 	    }
             -re ".*$gdb_prompt $" { fail "step out of main (at end 2)" }
 	    timeout { 
@@ -270,6 +274,10 @@ if {! [target_info exists use_gdb_stub]
 		set program_exited_normally 1
 	    }
 	    -re ".*Single.*in exit.*from.*dld.sl.*$gdb_prompt $" {
+		pass "step to end of run" 
+		set program_in_exit 1
+	    }
+	    -re ".*Single.*until exit from.*$gdb_prompt $" {
 		pass "step to end of run" 
 		set program_in_exit 1
 	    }
