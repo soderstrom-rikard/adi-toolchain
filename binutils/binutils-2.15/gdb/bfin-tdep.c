@@ -334,13 +334,13 @@ bfin_next_bp_addr (CORE_ADDR pc)
   if ((op >= P_JUMP_PREG_MIN && op <= P_JUMP_PREG_MAX) ||
       (op >= P_CALL_PREG_MIN && op <= P_CALL_PREG_MAX)) {
     op_extract = op & 0x0007; // Extract 3 bits
-    pc = read_register (op_extract);
+    pc = read_register (BFIN_P0_REGNUM + op_extract);
     return pc;
   }
   else if ((op >= P_JUMP_PC_PLUS_PREG_MIN && op <= P_JUMP_PC_PLUS_PREG_MAX) ||
            (op >= P_CALL_PC_PLUS_PREG_MIN && op <= P_CALL_PC_PLUS_PREG_MAX)) {
     op_extract = op & 0x0007; // Extract 3 bits
-    pc += read_register (op_extract);
+    pc += read_register (BFIN_P0_REGNUM + op_extract);
     return pc;
   }
   else if (op >= P_JUMP_S_MIN && op <= P_JUMP_S_MAX) {
