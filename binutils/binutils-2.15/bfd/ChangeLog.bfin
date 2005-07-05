@@ -1,3 +1,17 @@
+2005-07-05  Catherine Moore  <clm@cm00re.com>
+
+	* elf32-bfin.c (R_luimm16_reloc, R_imm16, R_huimm16): Complaints
+	and special functions updated.
+	(bfin_bfd_reloc): Add relocatable, remove possible_addend_delta.
+	(bfin_push_reloc): Likewise.
+	(bfin_oper_reloc): Likewise.
+	(bfin_byte4_reloc): Likewise.
+	(bfin_const_reloc): Reformatted.
+	(bfin_pcrel24_reloc): Resolve copyright issues.
+	(bfin_h_l_uim16_reloc): Removed.
+	(bfin_uimm16_reloc): New function.
+	(elf32_bfin_print_private_bfd_data): Remove unused code.
+
 2005-07-01  Catherine Moore  <clm@cm00re.com>
 
 	* elf32-bfin.c (HOWTO): Revert all special_functions to
