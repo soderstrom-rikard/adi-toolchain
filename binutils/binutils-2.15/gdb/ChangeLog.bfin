@@ -1,3 +1,10 @@
+2005-07-08  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-tdep.c (bfin_frame_local_address): Return a more reasonable
+	value.
+	(bfin_frame_args_address): Likewise.
+	(bfin_gdbarch_init): Don't append dwarf2_frame_base_sniffer.
+
 2005-07-05  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin-tdep.c (bfin_next_bp_addr): Correctly read Pregs.

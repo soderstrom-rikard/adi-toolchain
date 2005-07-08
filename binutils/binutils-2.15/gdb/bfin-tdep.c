@@ -1401,7 +1401,7 @@ bfin_frame_local_address (struct frame_info *next_frame, void **this_cache)
 {
   struct bfin_frame_cache *cache = bfin_frame_cache (next_frame, this_cache);
 
-  return cache->base + 4;
+  return cache->base - 4;
 }
 
 
@@ -1410,7 +1410,7 @@ bfin_frame_args_address (struct frame_info *next_frame, void **this_cache)
 {
   struct bfin_frame_cache *cache = bfin_frame_cache (next_frame, this_cache);
 
-  return cache->base -4;
+  return cache->base + 8;
 }
 
 
@@ -1539,7 +1539,6 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   /* Hook in the DWARF CFI frame unwinder.  */
   set_gdbarch_dwarf2_reg_to_regnum (gdbarch, bfin_reg_to_regnum);
   frame_unwind_append_sniffer (gdbarch, dwarf2_frame_sniffer);
-  frame_base_append_sniffer(gdbarch, dwarf2_frame_base_sniffer);
 
   frame_base_set_default (gdbarch, &bfin_frame_base);
 
