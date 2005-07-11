@@ -26,9 +26,10 @@
   The following set of defines, describe the commandline api.
 */
 #define MASK_OMIT_LEAF_FRAME_POINTER 0x00000800 /* omit leaf frame pointers */
-#define MASK_CSYNC                   0x00010000
-#define MASK_SIMPLE_RTM              0x00020000
-#define MASK_LOW_64K           	     0x00040000
+#define MASK_CSYNC_ANOMALY           0x00010000
+#define MASK_SPECLD_ANOMALY          0x00020000
+#define MASK_SIMPLE_RTM              0x00040000
+#define MASK_LOW_64K           	     0x00080000
 #define MASK_CMOV	             0x00200000 /* use conditional moves */
 #define MASK_LONG_CALLS	             0x00400000 /* use long calls */
 #define MASK_PROFILE		     0x01000000 /* Instrument for NON GNU
@@ -73,7 +74,8 @@ extern int target_flags;
 #define TARGET_DEBUG_ARG	       (target_flags & MASK_DEBUG_ARGS)
 #define TARGET_SIMPLE_RTM              (target_flags & MASK_SIMPLE_RTM)
 #define TARGET_LOW_64K                 (target_flags & MASK_LOW_64K)
-#define TARGET_CSYNC		       (target_flags & MASK_CSYNC)
+#define TARGET_SPECLD_ANOMALY	       (target_flags & MASK_SPECLD_ANOMALY)
+#define TARGET_CSYNC_ANOMALY	       (target_flags & MASK_CSYNC_ANOMALY)
 #define TARGET_LONG_CALLS	       (target_flags & MASK_LONG_CALLS)
 #define TARGET_NO_UNDERSCORE	       (target_flags & MASK_NO_UNDERSCORE)
 #define TARGET_ID_SHARED_LIBRARY       (target_flags & MASK_ID_SHARED_LIBRARY)
@@ -109,10 +111,14 @@ extern int target_flags;
     "Don't generate PC-relative calls, use indirection"},		\
   { "no-cmov",			-MASK_LONG_CALLS,			\
     "Don't use long calls by default"},					\
-  { "csync",		         MASK_CSYNC,				\
-    "Avoid speculative loads by inserting CSYNC or equivalent"},	\
-  { "no-csync",			-MASK_CSYNC,				\
+  { "specld-anomaly",		 MASK_SPECLD_ANOMALY,			\
+    "Avoid speculative loads"},						\
+  { "no-specld-anomaly",	-MASK_SPECLD_ANOMALY,			\
     "Do not generate extra code to avoid speculative loads"},		\
+  { "csync-anomaly",		 MASK_CSYNC_ANOMALY,			\
+    "Avoid CSYNC/SSYNC after conditional jumps"},			\
+  { "no-csync-anomaly",		-MASK_CSYNC_ANOMALY,			\
+    "Do not generate extra code to avoid CSYNC/SSYNC after condjumps"},	\
   { "profile",		         MASK_PROFILE,				\
     "Non GNU Profiling"},						\
   { "no-profile",		-MASK_PROFILE,				\
@@ -123,8 +129,8 @@ extern int target_flags;
     "Disable ID based shared library" },				\
   { "no-underscore",		MASK_NO_UNDERSCORE,			\
     "No underscore fro local label definition"},			\
-  { "", MASK_CMOV | MASK_CSYNC,						\
-    "default: cmov, csync"}}
+  { "", MASK_CMOV | MASK_CSYNC_ANOMALY | MASK_SPECLD_ANOMALY,		\
+    "default: cmov, csync-anomaly, specld-anomaly"}}
 
 /* This macro is similar to `TARGET_SWITCHES' but defines names of
    command options that have values.  Its definition is an

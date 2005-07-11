@@ -1,3 +1,14 @@
+2005-07-11  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (define_attr "type"): Add "sync".
+	(define_insn_reservation "alu"): Likewise.
+	(csync, ssync): Remove nops.  Now of type sync.
+	* config/bfin/bfin.h (MASK_CSYNC, TARGET_CSYNC): Removed.
+	(MASK_CSYNC_ANOMALY, MASK_SPECLD_ANOMALY, TARGET_CSYNC_ANOMALY,
+	TARGET_SPECLD_ANOMALY): New.
+	* config/bfin/bfin.c: Include "insn-codes.h".
+	(bfin_reorg): Extend to handle the CSYNC anomaly as well.
+
 2005-06-25  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (ror_one, rol_one, ashrdi3, ashldi3, lshrdi3):
