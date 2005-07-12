@@ -586,6 +586,13 @@ in the following sections.
 @gccoptlist{-mmcu=@var{mcu}  -msize  -minit-stack=@var{n}  -mno-interrupts @gol
 -mcall-prologues  -mno-tablejump  -mtiny-stack}
 
+@emph{Blackfin Options}
+@gccoptlist{-momit-leaf-frame-pointer -mno-omit-leaf-frame-pointer @gol
+-mspecld-anomaly -mno-specld-anomaly -mcsync-anomaly -mno-csync-anomaly @gol
+-mlow-64k -mno-low64k -mid-shared-library @gol
+-mno-id-shared-library -mshared-library-id=@var{n} @gol
+-mlong-calls  -mno-long-calls}
+
 @emph{MCore Options}
 @gccoptlist{-mhardlit  -mno-hardlit  -mdiv  -mno-div  -mrelax-immediates @gol
 -mno-relax-immediates  -mwide-bitfields  -mno-wide-bitfields @gol
@@ -5861,6 +5868,7 @@ that macro, which enables you to change the defaults.
 * ARC Options::
 * NS32K Options::
 * AVR Options::
+* Blackfin Options::
 * MCore Options::
 * IA-64 Options::
 * D30V Options::
@@ -9943,6 +9951,83 @@ Generate code for a little endian target.
 @opindex m210
 @opindex m340
 Generate code for the 210 processor.
+@end table
+
+@node Blackfin Options
+@subsection Blackfin Options
+@cindex Blackfin Options
+
+@table @gcctabopt
+@item -momit-leaf-frame-pointer
+@opindex momit-leaf-frame-pointer
+Don't keep the frame pointer in a register for leaf functions.  This
+avoids the instructions to save, set up and restore frame pointers and
+makes an extra register available in leaf functions.  The option
+@option{-fomit-frame-pointer} removes the frame pointer for all functions
+which might make debugging harder.
+
+@item -mspecld-anomaly
+@opindex mspecld-anomaly
+When enabled, the compiler will ensure that the generated code does not
+contain speculative loads after jump instructions.  This option is enabled
+by default.
+
+@item -mno-specld-anomaly
+@opindex mno-specld-anomaly
+Don't generate extra code to prevent speculative loads from occurring.
+
+@item -mcsync-anomaly
+@opindex mcsync-anomaly
+When enabled, the compiler will ensure that the generated code does not
+contain CSYNC or SSYNC instructions too soon after conditional branches.
+This option is enabled by default.
+
+@item -mno-csync-anomaly
+@opindex mno-csync-anomaly
+Don't generate extra code to prevent CSYNC or SSYNC instructions from
+occurring too soon after a conditional branch.
+
+@item -mlow-64k
+@opindex mlow-64k
+When enabled, the compiler is free to take advantage of the knowledge that
+the entire program fits into the low 64k of memory.
+
+@item -mno-low-64k
+@opindex mno-low-64k
+Assume that the program is arbitrarily large.  This is the default.
+
+@item -mid-shared-library
+@opindex mid-shared-library
+Generate code that supports shared libraries via the library ID method.
+This allows for execute in place and shared libraries in an environment
+without virtual memory management.  This option implies @option{-fPIC}.
+
+@item -mno-id-shared-library
+@opindex mno-id-shared-library
+Generate code that doesn't assume ID based shared libraries are being used.
+This is the default.
+
+@item -mshared-library-id=n
+@opindex mshared-library-id
+Specified the identification number of the ID based shared library being
+compiled.  Specifying a value of 0 will generate more compact code, specifying
+other values will force the allocation of that number to the current
+library but is no more space or time efficient than omitting this option.
+
+@item -mlong-calls
+@itemx -mno-long-calls
+@opindex mlong-calls
+@opindex mno-long-calls
+Tells the compiler to perform function calls by first loading the
+address of the function into a register and then performing a subroutine
+call on this register.  This switch is needed if the target function
+will lie outside of the 24 bit addressing range of the offset based
+version of subroutine call instruction.
+
+This feature is not enabled by default.  Specifying
+@option{-mno-long-calls} will restore the default behavior.  Note these
+switches have no effect on how the compiler generates code to handle
+function calls via function pointers.
 @end table
 
 @node IA-64 Options

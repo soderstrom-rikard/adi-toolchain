@@ -1,3 +1,10 @@
+2005-07-12  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* doc/md.texi: Document Blackfin-specific constraint letters.
+	* doc/invoke.texi: Document Blackfin-specific options.
+	* doc/extend.texi: Document Blackfin-specific builtins and
+	attributes.
+
 2005-07-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (define_attr "type"): Add "sync".
