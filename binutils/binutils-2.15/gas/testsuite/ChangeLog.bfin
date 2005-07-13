@@ -1,3 +1,9 @@
+2005-07-13  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* gas/bfin/parallel.s: Test parallel insn with order of 16/32 bit
+	insns mixed up.
+	* gas/bfin/parallel.d: Likewise.
+
 2005-07-01  Catherine Moore  <clm@cm00re.com>
 
 	* gas/bfin/flow.d: Update expected output.

@@ -1,3 +1,11 @@
+2005-07-13  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin-parse.y (asm): Undo previous change for MNOP.
+	From Satyanarayana Reddy:
+	* config/bfin-parse.y (asm): Allow different order for 16 and 32 bit
+	instructions in a parallel group.
+	(asm_1): Handle MNOP here.
+
 2005-06-29  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/tc-bfin.c: Include dwarf2dbg.h if OBJ_ELF.

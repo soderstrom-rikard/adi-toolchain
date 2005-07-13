@@ -652,36 +652,28 @@ asm: asm_1 SEMICOLON
 	      else if (is_group2 ($3) && is_group1 ($5))
 		$$ = gen_multi_instr($1, $5, $3);
 	      else
-		return semantic_error ("Wrong 16 bit instructions groups");
+		return semantic_error ("Wrong 16 bit instructions groups, slot 2 and slot 3 must be 16-bit instrution group");
+	    }
+	  else if (($3->value & 0xf800) == 0xc000)
+	    {
+	      if (is_group1 ($1) && is_group2 ($5))
+		$$ = gen_multi_instr($3, $1, $5);
+	      else if (is_group2 ($1) && is_group1 ($5))
+		$$ = gen_multi_instr($3, $5, $1);
+	      else
+		return semantic_error ("Wrong 16 bit instructions groups, slot 1 and slot 3 must be 16-bit instrution group");
+	    }
+	  else if (($5->value & 0xf800) == 0xc000)
+	    {
+	      if (is_group1 ($1) && is_group2 ($3))
+		$$ = gen_multi_instr($5, $1, $3);
+	      else if (is_group2 ($1) && is_group1 ($3))
+		$$ = gen_multi_instr($5, $3, $1);
+	      else
+		return semantic_error ("Wrong 16 bit instructions groups, slot 1 and slot 2 must be 16-bit instrution group");
 	    }
 	  else
-	    error ("\nIllegal Multi Issue Construct, first instruction must be DSP32\n");
-	}
-
-	| MNOP DOUBLE_BAR asm_1 DOUBLE_BAR asm_1 SEMICOLON
-	{
-	  if (is_group1 ($3) && is_group2 ($5))
-	    $$ = gen_multi_instr(0, $3, $5);
-	  else if (is_group2 ($3) && is_group1 ($5))
-	    $$ = gen_multi_instr(0, $5, $3);
-	  else
-	    return semantic_error ("Wrong 16 bit instructions groups");
-	}
-
-	| MNOP DOUBLE_BAR asm_1 SEMICOLON
-	{
-	  if (is_group1 ($3))
-	    $$ = gen_multi_instr(0, $3, 0);
-	  else if (is_group2 ($3)) 
-	    $$ = gen_multi_instr(0, 0, $3);
-	  else 
-	    return semantic_error ("Wrong 16 bit instructions groups");
-	}
-
-	| MNOP SEMICOLON
-	{
-	  $$ = DSP32MAC (3, 0, 0, 0, 0, 0, 0, 0, 0,
-			 0, 3, 0, 0, 0);
+	    error ("\nIllegal Multi Issue Construct, at least any one of the slot must be DSP32 instruction group\n");
 	}
 
 	| asm_1 DOUBLE_BAR asm_1 SEMICOLON
@@ -693,14 +685,23 @@ asm: asm_1 SEMICOLON
 	      else if (is_group2 ($3))
 		$$ = gen_multi_instr($1, 0, $3);
 	      else
-		return semantic_error ("Wrong 16 bit instructions groups");
+		return semantic_error ("Wrong 16 bit instructions groups, slot 2 must be the 16-bit instruction group");
+	    }
+	  else if (($3->value & 0xf800) == 0xc000)
+	    {
+	      if (is_group1 ($1))
+		$$ = gen_multi_instr($3, $1, 0);
+	      else if (is_group2 ($1))
+		$$ = gen_multi_instr($3, 0, $1);
+	      else
+		return semantic_error ("Wrong 16 bit instructions groups, slot 1 must be the 16-bit instruction group");
 	    }
 	  else if (is_group1 ($1) && is_group2 ($3))
 	      $$ = gen_multi_instr(0, $1, $3);
 	  else if (is_group2 ($1) && is_group1 ($3))
 	    $$ = gen_multi_instr(0, $3, $1);
 	  else
-	    return semantic_error ("Wrong 16 bit instructions groups");
+	    return semantic_error ("Wrong 16 bit instructions groups, slot 1 and slot 2 must be the 16-bit instruction group");
 	}
 	| error { $$ = 0; as_bad ("\nParse error.\n"); yyerrok; }  // recovery error
 ;
@@ -710,8 +711,13 @@ asm: asm_1 SEMICOLON
 // {
 
 asm_1:   
+	MNOP
+	{
+	  $$ = DSP32MAC (3, 0, 0, 0, 0, 0, 0, 0, 0,
+			 0, 3, 0, 0, 0);
+	}
 
-	assign_macfunc opt_mode
+	| assign_macfunc opt_mode
 	{
 	  int op0, op1;
 	  int w0 = 0, w1 = 0;
@@ -2568,7 +2574,6 @@ asm_1:
 	  else
 	    return semantic_error ("Bad jump offset");
 	}
-
 	| NOP
 	{
 	  notethat("ProgCtrl: NOP\n");
