@@ -1246,7 +1246,7 @@ ExprNodeGenRelocR (ExprNode * head)
  */
 
 #include "bfin-aux.h"
-#include "../opcodes/bfin-opcodes.h"
+#include "opcode/bfin.h"
 
 #define INIT(t)  t c_code = init_##t
 #define ASSIGN(x) c_code.opcode |= ((x & c_code.mask_##x)<<c_code.bits_##x)

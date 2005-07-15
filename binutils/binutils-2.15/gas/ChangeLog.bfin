@@ -1,3 +1,8 @@
+2005-07-15  Catherine Moore  <clm@cm00re.com>
+
+	* config/tc-bfin.c:  Include include/opcode/bfin.h instead of
+	opcodes/bfin-opcodes.h.
+
 2005-07-13  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin-parse.y (asm): Undo previous change for MNOP.
