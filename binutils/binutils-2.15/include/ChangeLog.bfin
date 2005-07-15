@@ -1,3 +1,7 @@
+2005-07-15  Catherine Moore  <clm@cm00re.com>
+
+	* opcode/bfin.h: New file.
+
 2005-05-25  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	Undo the following change for consistency with our GCC tree:
