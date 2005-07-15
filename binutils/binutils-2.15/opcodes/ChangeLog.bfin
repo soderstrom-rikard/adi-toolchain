@@ -1,4 +1,24 @@
-2004-05-30  Bernd Schmidt  <bernd.schmidt@analog.com>
+2005-07-15  Catherine Moore  <clm@cm00re.com>
+
+	* bfin-opcodes.h:  Remove.
+	* bfin-dis.c:  Remove unused code.  Change bfin-opcodes.h to
+	include/opcode/bfin.h. Update for gnu coding standards.
+	(decode_ProgCrtl_0, decode_CaCTRL_0, decode_PushPopReg_0,
+	decode_PushPopMultiple_0, decode_ccMV_0, decode_CCflag_0,
+	decode_CC2dreg_0, decode_CC2stat_0, decode_BRCC_0,
+	decode_UJUMP_0, decode_REGMV_0, decode_ALU2op_0,
+	decode_PTR2op_0, decode_LOGI2op_0, decode_COMP3op_0,
+	decode_COMPI2opD_0, decode_LDSTpmod_0, decode_dapMODim_0,
+	decode_dagMODik_0, decode_dspLDST_0, decode_LDST_0,
+	decode_LDSTiiFP_0, decode_LDSTii_0, decode_LoopSetup_0,
+	decode_LDIMMhalf_0, decode_CALLa_0, decode_LDSTidxI_0,
+	decode_linkage_0, decode_dps32_mac_0, decode_dsp32mult_0,
+	decode_dsp32alu_0, decode_dps32shift_0, decodedsp32shiftimm_0,
+	decode_pseudoDEBUG_0, decode_pseudodbg_assert_0):  Reduce
+	number of calls to output routines.  Use new constant
+	definitions from include/opcode/bfin.h.
+
+2005-05-30  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin-dis.c (_print_insn_bfin): Allow 32 bit mnop insn.
 
