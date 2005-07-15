@@ -9,7 +9,7 @@
 #include <string.h>
 #include <signal.h>
 
-#include "bfin-opcodes.h"
+#include "opcode/bfin.h"
 
 #define M_S2RND 1
 #define M_T     2

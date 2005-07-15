@@ -1,3 +1,8 @@
+2005-07-15  Catherine Moore  <clm@cm00re.com>
+
+	* bfin/bfin-dis.c:  Include include/opcode/bfin.h instead of
+	opcodes/bfin-opcodes.h.
+
 2005-06-30  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/bfin-dis.c (_interp_insn_bfin): Add non parallel MNOP.
