@@ -433,6 +433,8 @@ bfin_set_reloc (flat_v5_reloc_t *reloc,
     reloc->reloc.type = FLAT_RELOC_TYPE_DATA;
   else if (strstr (reloc_section_name, "bss"))
     reloc->reloc.type = FLAT_RELOC_TYPE_BSS;
+  else if (strstr (reloc_section_name, "stack"))
+    reloc->reloc.type = FLAT_RELOC_TYPE_STACK;
   else if (symbol->flags & BSF_WEAK){
     /* weak symbol support ... if a weak symbol is undefined at the
          end of a final link, it should return 0 rather than error

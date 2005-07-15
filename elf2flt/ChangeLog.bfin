@@ -1,3 +1,9 @@
+2004-07-15  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* elf2flt.c (bfin_set_reloc): Support the stack section.
+	* elf2flt.ld (.stack): New section.
+	* flat.h (FLAT_RELOC_TYPE_STACK): New.
+
 2005-06-30  Jie Zhang  <jie.zhang@analog.com>
 
 	* elf2flt.c (main): Only print "No relocations" when verbose.

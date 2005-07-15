@@ -101,7 +101,10 @@ R_RODAT		*(.rodata.*)
 		_end = . ;
 		end = . ;
 	} > flatmem
-
+	.stack : {
+		. = ALIGN(0x4);
+		__stack_start = .;
+	}
 	.junk 0 : { *(.rel*) *(.rela*) }
 	/* Stabs debugging sections.    */
 	.stab 0 : { *(.stab) }
