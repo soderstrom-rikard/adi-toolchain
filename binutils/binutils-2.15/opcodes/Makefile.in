@@ -274,6 +274,7 @@ CFILES = \
 	arc-ext.c \
 	arm-dis.c \
 	avr-dis.c \
+	bfin-dis.c \
 	cgen-asm.c \
 	cgen-dis.c \
 	cgen-opc.c \
@@ -388,9 +389,7 @@ CFILES = \
 	xstormy16-opc.c \
 	xtensa-dis.c \
 	z8k-dis.c \
-	z8kgen.c \
-	bfin-dis.c
-
+	z8kgen.c
 
 ALL_MACHINES = \
 	a29k-dis.lo \
@@ -401,6 +400,7 @@ ALL_MACHINES = \
 	arc-ext.lo \
 	arm-dis.lo \
 	avr-dis.lo \
+	bfin-dis.lo \
 	cgen-asm.lo \
 	cgen-dis.lo \
 	cgen-opc.lo \
@@ -467,7 +467,6 @@ ALL_MACHINES = \
 	mmix-opc.lo \
 	msp430-dis.lo \
 	ns32k-dis.lo \
-        bfin-dis.lo \
 	openrisc-asm.lo \
 	openrisc-desc.lo \
 	openrisc-dis.lo \
@@ -1072,6 +1071,9 @@ arm-dis.lo: arm-dis.c sysdep.h config.h $(INCDIR)/ansidecl.h \
 avr-dis.lo: avr-dis.c sysdep.h config.h $(INCDIR)/ansidecl.h \
   $(INCDIR)/dis-asm.h $(BFD_H) $(INCDIR)/symcat.h opintl.h \
   $(INCDIR)/libiberty.h $(INCDIR)/opcode/avr.h
+bfin-dis.lo: bfin-dis.c sysdep.h config.h $(INCDIR)/ansidecl.h \
+  $(INCDIR)/dis-asm.h $(BFD_H) $(INCDIR)/symcat.h opintl.h \
+  $(INCDIR)/libiberty.h $(INCDIR)/opcode/bfin.h
 cgen-asm.lo: cgen-asm.c sysdep.h config.h $(INCDIR)/ansidecl.h \
   $(INCDIR)/libiberty.h $(INCDIR)/safe-ctype.h $(BFD_H) \
   $(INCDIR)/symcat.h $(INCDIR)/opcode/cgen.h opintl.h
@@ -1279,8 +1281,6 @@ mmix-dis.lo: mmix-dis.c $(INCDIR)/opcode/mmix.h $(INCDIR)/dis-asm.h \
   $(BFD_H) $(INCDIR)/ansidecl.h $(INCDIR)/symcat.h $(INCDIR)/libiberty.h \
   opintl.h
 mmix-opc.lo: mmix-opc.c $(INCDIR)/opcode/mmix.h $(INCDIR)/symcat.h
-bfin-dis.lo: bfin-dis.c sysdep.h config.h $(INCDIR)/dis-asm.h \
-  $(BFD_H)
 ns32k-dis.lo: ns32k-dis.c $(BFD_H) $(INCDIR)/ansidecl.h \
   $(INCDIR)/symcat.h sysdep.h config.h $(INCDIR)/dis-asm.h \
   $(INCDIR)/opcode/ns32k.h opintl.h

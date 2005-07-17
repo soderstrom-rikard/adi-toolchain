@@ -1,3 +1,8 @@
+2005-07-17  Catherine Moore  <clm@cm00re.com>
+
+	* Makefile.am:  Add rules for bfin port.
+	* Makefile.in:  Regenerated.
+
 2005-07-15  Catherine Moore  <clm@cm00re.com>
 
 	* bfin-opcodes.h:  Remove.
