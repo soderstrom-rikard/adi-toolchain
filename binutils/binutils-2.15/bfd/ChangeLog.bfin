@@ -1,3 +1,8 @@
+2005-07-17  Catherine Moore  <clm@cm00e.com>
+
+	* Makefile.am:  Add bfin support.
+	* Makefile.in:  Regenerate.
+
 2005-07-05  Catherine Moore  <clm@cm00re.com>
 
 	* elf32-bfin.c (R_luimm16_reloc, R_imm16, R_huimm16): Complaints
