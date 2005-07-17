@@ -44,12 +44,13 @@ noinst_PROGRAMS = as-new$(EXEEXT)
 EXTRA_PROGRAMS = itbl-test$(EXEEXT)
 DIST_COMMON = $(srcdir)/../config.guess $(srcdir)/../config.sub NEWS \
 	README ChangeLog $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(top_srcdir)/configure $(am__configure_deps) \
+	$(top_srcdir)/configure $(am__configure_deps) acconfig.h \
 	$(srcdir)/config.in $(srcdir)/../mkinstalldirs \
 	$(srcdir)/gdbinit.in $(srcdir)/gdbinit.in \
-	$(top_srcdir)/po/Make-in m68k-parse.c itbl-parse.c itbl-lex.c \
-	$(srcdir)/../ylwrap $(srcdir)/../ltmain.sh \
-	$(srcdir)/../config.guess $(srcdir)/../config.sub
+	$(top_srcdir)/po/Make-in m68k-parse.c bfin-parse.c \
+	itbl-parse.c itbl-lex.c $(srcdir)/../ylwrap \
+	$(srcdir)/../ltmain.sh $(srcdir)/../config.guess \
+	$(srcdir)/../config.sub
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -300,7 +301,7 @@ CPU_TYPES = \
 	mn10200 \
 	mn10300 \
 	msp430 \
-	bfin \
+        bfin \
 	ns32k \
 	openrisc \
 	or32 \
@@ -461,7 +462,7 @@ HFILES = \
 	symbols.h \
 	tc.h \
 	write.h \
-	bfin-defs.h
+        bfin-defs.h
 
 
 # CPU files in config.
@@ -497,7 +498,7 @@ TARGET_CPU_CFILES = \
 	config/tc-mn10200.c \
 	config/tc-mn10300.c \
 	config/tc-msp430.c \
-	config/tc-bfin.c \
+        config/tc-bfin.c \
 	config/tc-ns32k.c \
 	config/tc-openrisc.c \
 	config/tc-or32.c \
@@ -693,7 +694,8 @@ POTFILES = $(MULTI_CFILES) $(TARGET_ENV_HFILES) $(OBJ_FORMAT_HFILES) \
 noinst_SCRIPTS = $(GDBINIT)
 EXTRA_SCRIPTS = .gdbinit
 EXTRA_DIST = make-gas.com m68k-parse.c itbl-parse.c itbl-parse.h itbl-lex.c \
-         bfin-parse.c bfin-lex.c bfin-defs.h
+        bfin-parse.c bfin-lex.c bfin-defs.h
+
 DISTCLEANFILES = targ-cpu.h obj-format.h targ-env.h itbl-cpu.h cgen-desc.h
 
 # Now figure out from those variables how to compile and link.
@@ -842,6 +844,12 @@ DEPTC_avr_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-avr.h \
   $(INCDIR)/safe-ctype.h subsegs.h $(INCDIR)/obstack.h \
   $(INCDIR)/opcode/avr.h
+
+DEPTC_bfin_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
+  $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
+  $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-bfin.h \
+  $(INCDIR)/safe-ctype.h subsegs.h $(INCDIR)/obstack.h \
+  $(INCDIR)/opcode/bfin.h $(srcdir)/config/bfin-defs.h
 
 DEPTC_cris_aout = $(INCDIR)/symcat.h $(srcdir)/config/obj-aout.h \
   $(srcdir)/config/tc-cris.h $(BFDDIR)/libaout.h $(INCDIR)/bfdlink.h \
@@ -1188,11 +1196,6 @@ DEPTC_msp430_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-msp430.h \
   subsegs.h $(INCDIR)/obstack.h $(INCDIR)/opcode/msp430.h \
   $(INCDIR)/safe-ctype.h
-
-TCDEP_bfin_elf = $(srcdir)/config/obj-elf.h $(BFDDIR)/elf-bfd.h \
-  $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h $(INCDIR)/elf/external.h \
-  $(INCDIR)/bfdlink.h $(srcdir)/config/tc-bfin.h $(INCDIR)/obstack.h \
-  subsegs.h $(srcdir)/config/bfin-defs.h
 
 DEPTC_ns32k_aout = $(INCDIR)/symcat.h $(srcdir)/config/obj-aout.h \
   $(srcdir)/config/tc-ns32k.h $(BFDDIR)/libaout.h $(INCDIR)/bfdlink.h \
@@ -1554,6 +1557,13 @@ DEPOBJ_avr_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
   $(INCDIR)/safe-ctype.h subsegs.h $(INCDIR)/obstack.h \
   struc-symbol.h dwarf2dbg.h $(INCDIR)/aout/aout64.h
 
+DEPOBJ_bfin_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
+  $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
+  $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-bfin.h \
+  $(INCDIR)/safe-ctype.h subsegs.h $(INCDIR)/obstack.h \
+  struc-symbol.h dwarf2dbg.h $(INCDIR)/aout/aout64.h \
+  $(srcdir)/config/bfin-defs.h
+
 DEPOBJ_cris_aout = $(INCDIR)/symcat.h $(srcdir)/config/obj-aout.h \
   $(srcdir)/config/tc-cris.h $(BFDDIR)/libaout.h $(INCDIR)/bfdlink.h \
   $(INCDIR)/aout/aout64.h $(INCDIR)/obstack.h
@@ -1856,11 +1866,6 @@ DEPOBJ_msp430_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-msp430.h \
   $(INCDIR)/safe-ctype.h subsegs.h $(INCDIR)/obstack.h \
   struc-symbol.h dwarf2dbg.h $(INCDIR)/aout/aout64.h
-
-OBJDEP_bfin_elf = $(srcdir)/config/obj-elf.h $(BFDDIR)/elf-bfd.h \
-  $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h $(INCDIR)/elf/external.h \
-  $(INCDIR)/bfdlink.h $(srcdir)/config/tc-bfin.h $(srcdir)/config/bfin-defs.h \
-  subsegs.h $(INCDIR)/obstack.h $(INCDIR)/aout/aout64.h
 
 DEPOBJ_ns32k_aout = $(INCDIR)/symcat.h $(srcdir)/config/obj-aout.h \
   $(srcdir)/config/tc-ns32k.h $(BFDDIR)/libaout.h $(INCDIR)/bfdlink.h \
@@ -2173,6 +2178,10 @@ DEP_avr_coff = $(srcdir)/config/obj-coff.h $(srcdir)/config/tc-avr.h \
   $(INCDIR)/symcat.h $(INCDIR)/coff/internal.h $(BFDDIR)/libcoff.h \
   $(INCDIR)/bfdlink.h
 
+DEP_bfin_elf = $(srcdir)/config/obj-elf.h $(INCDIR)/symcat.h \
+  $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
+  $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-bfin.h
+
 DEP_avr_elf = $(srcdir)/config/obj-elf.h $(INCDIR)/symcat.h \
   $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-avr.h
@@ -2392,10 +2401,6 @@ DEP_msp430_coff = $(srcdir)/config/obj-coff.h $(srcdir)/config/tc-msp430.h \
 DEP_msp430_elf = $(srcdir)/config/obj-elf.h $(INCDIR)/symcat.h \
   $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-msp430.h
-
-DEP_bfin_elf = $(srcdir)/config/obj-elf.h $(BFDDIR)/elf-bfd.h \
-  $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h $(INCDIR)/elf/external.h \
-  $(INCDIR)/bfdlink.h $(srcdir)/config/tc-bfin.h
 
 DEP_ns32k_aout = $(srcdir)/config/obj-aout.h $(srcdir)/config/tc-ns32k.h \
   $(BFDDIR)/libaout.h $(INCDIR)/bfdlink.h
@@ -2639,7 +2644,7 @@ config.h: stamp-h1
 stamp-h1: $(srcdir)/config.in $(top_builddir)/config.status
 	@rm -f stamp-h1
 	cd $(top_builddir) && $(SHELL) ./config.status config.h
-$(srcdir)/config.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
+$(srcdir)/config.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) $(top_srcdir)/acconfig.h
 	cd $(top_srcdir) && $(AUTOHEADER)
 	rm -f stamp-h1
 	touch $@
@@ -2876,6 +2881,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-rm -f bfin-parse.c
 	-rm -f itbl-lex.c
 	-rm -f itbl-parse.c
 	-rm -f m68k-parse.c
@@ -2958,6 +2964,7 @@ stamp-mk.com: vmsconf.sh Makefile
 	sh $(srcdir)/vmsconf.sh $(GENERIC_OBJS) > new-make.com
 	$(SHELL) $(srcdir)/../move-if-change new-make.com $(srcdir)/make-gas.com
 	touch stamp-mk.com
+
 diststuff: $(EXTRA_DIST) info
 
 $(OBJS): @ALL_OBJ_DEPS@
@@ -3078,7 +3085,7 @@ m68k-parse.o: m68k-parse.c $(srcdir)/config/m68k-parse.h
 m68k-parse.h: ; @true
 $(srcdir)/config/m68k-parse.h: ; @true
 
-bfin-parse.c bfin-parse.tab.h: $(srcdir)/config/bfin-parse.y
+bfin-parse.c: $(srcdir)/config/bfin-parse.y
 	$(SHELL) $(YLWRAP) "$(YACC)" $(srcdir)/config/bfin-parse.y y.tab.c bfin-parse.c y.tab.h bfin-parse.tab.h -- -d
 bfin-parse.o: bfin-parse.c $(srcdir)/config/bfin-defs.h
 
@@ -3089,9 +3096,6 @@ $(srcdir)/config/bfin-defs.h: ; @true
 bfin-lex.c: $(srcdir)/config/bfin-lex.l
 	$(SHELL) $(YLWRAP) "$(LEX)" $(srcdir)/config/bfin-lex.l lex.yy.c bfin-lex.c
 bfin-lex.o: bfin-lex.c $(srcdir)/config/bfin-defs.h
-
-#bfin-defs.o:
-#       $(COMPILE) -c $(srcdir)/config/bfin-defs.c
 
 # The instruction table specification lexical analyzer and parser.
 

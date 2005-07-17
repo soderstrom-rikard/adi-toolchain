@@ -1,3 +1,12 @@
+2005-07-17  Catherine Moore  <clm@cm00re.com>
+
+	* Makefile.am:  Remove unused rule.  Add tabs to bfin rules.
+	(DEPTC_bfin_elf): Add dependence for include/opcode/bfin.h.
+	(DEPOBJ_bfin_elf):  Renamed from OBJDEP_bfin_elf.  Update
+	dependences. 
+	(DEP_bfin_elf):  Update dependences.
+	* Makefile.in:  Regenerated.
+
 2005-07-15  Catherine Moore  <clm@cm00re.com>
 
 	* config/tc-bfin.c:  Include include/opcode/bfin.h instead of
