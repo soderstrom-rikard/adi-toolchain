@@ -152,8 +152,8 @@
 	value_match(expr, bits, sign, mul, 1)
 #define IS_URANGE(bits, expr, sign, mul)    \
 	value_match(expr, bits, sign, mul, 0)
-#define IS_CONST(expr) (expr->type == ExprNodeConstant)
-#define IS_RELOC(expr) (expr->type != ExprNodeConstant)
+#define IS_CONST(expr) (expr->type == Expr_NodeConstant)
+#define IS_RELOC(expr) (expr->type != Expr_NodeConstant)
 #define IS_IMM(expr, bits)  value_match(expr, bits, 0, 1, 1)
 #define IS_UIMM(expr, bits)  value_match(expr, bits, 0, 1, 0)
 
@@ -178,7 +178,7 @@
 
 ////////////////////////////////////////////////////////////////////////////
 
-static int value_match(ExprNode *expr, int sz, int sign, int mul, int issigned);
+static int value_match(Expr_Node *expr, int sz, int sign, int mul, int issigned);
 
 int nerrors;
 int nwarnings;
@@ -186,8 +186,8 @@ extern FILE *errorf;
 extern INSTR_T insn;
 
 
-static ExprNode * binary(ExprOpType,ExprNode *,ExprNode *);
-static ExprNode * unary(ExprOpType,ExprNode *);
+static Expr_Node * binary(ExprOpType,Expr_Node *,Expr_Node *);
+static Expr_Node * unary(ExprOpType,Expr_Node *);
 
 static void notethat(char *format, ...);
 
@@ -232,10 +232,10 @@ yyerror (char *msg)
 }
 
 static int
-in_range_p (ExprNode *expr, int from, int to, unsigned int mask)
+in_range_p (Expr_Node *expr, int from, int to, unsigned int mask)
 {
   int val = EXPR_VALUE (expr);
-  if (expr->type != ExprNodeConstant)
+  if (expr->type != Expr_NodeConstant)
     return 0;
   if (val < from || val > to)
     return 0;
@@ -282,13 +282,13 @@ extern int yylex (void);
 
 
 static
-void neg_value (ExprNode *expr)
+void neg_value (Expr_Node *expr)
 {
   expr->value.i_value = -expr->value.i_value;
 }
 
 static int
-valid_dreg_pair (Register *reg1, ExprNode *reg2)
+valid_dreg_pair (Register *reg1, Expr_Node *reg2)
 {
   if (!IS_DREG (*reg1))
     {
@@ -424,7 +424,7 @@ is_group2 (INSTR_T x)
 
 %union {
   INSTR_T instr;
-  ExprNode *expr;
+  Expr_Node *expr;
   SYMBOL_T symbol;
   long value;
   // new encoding of registers
@@ -3090,7 +3090,7 @@ asm_1:
 // LDSTiiFP:	[ FP - const ] = dpregs
 	| LBRACK REG plus_minus expr RBRACK ASSIGN REG
 	{
-	  ExprNode *tmp = $4;
+	  Expr_Node *tmp = $4;
 	  int ispreg = IS_PREG ($7);
 
 	  if (!IS_PREG ($2))
@@ -3287,7 +3287,7 @@ asm_1:
 
 	| REG ASSIGN LBRACK REG plus_minus got_or_expr RBRACK
 	{
-	  ExprNode *tmp = $6;
+	  Expr_Node *tmp = $6;
 	  int ispreg = IS_PREG ($1);
 	  int isgot = IS_RELOC($6);
 
@@ -4057,8 +4057,8 @@ ccstat:
 
 
 symbol: SYMBOL
-	{ ExprNodeValue val; val.s_value = S_GET_NAME($1);
-	  $$ = Expr_Node_Create(ExprNodeReloc, val, NULL, NULL); }
+	{ Expr_NodeValue val; val.s_value = S_GET_NAME($1);
+	  $$ = Expr_Node_Create(Expr_Node_Reloc, val, NULL, NULL); }
 ;
 
 got :
@@ -4076,8 +4076,8 @@ pltpc :
 ;
 
 eterm: NUMBER
-	{ ExprNodeValue val; val.i_value = $1;
-	  $$ = Expr_Node_Create(ExprNodeConstant, val, NULL, NULL); }
+	{ Expr_NodeValue val; val.i_value = $1;
+	  $$ = Expr_Node_Create(Expr_NodeConstant, val, NULL, NULL); }
 	| symbol
 	{ $$ = $1; }
 	| LPAREN expr_1 RPAREN
@@ -4128,7 +4128,7 @@ EXPR_T mkexpr(int x, SYMBOL_T s)
 }
 
 static int
-value_match(ExprNode *expr, int sz, int sign, int mul, int issigned)
+value_match(Expr_Node *expr, int sz, int sign, int mul, int issigned)
 {
   long umax = (1L << sz) - 1;
   long min = -1L << (sz - 1);
@@ -4164,9 +4164,9 @@ value_match(ExprNode *expr, int sz, int sign, int mul, int issigned)
 
 /* Return the new expression structure that allows symbol operations
    if the left and right children are constants, do the operation  */
-static ExprNode *binary (ExprOpType op, ExprNode *x, ExprNode *y)
+static Expr_Node *binary (ExprOpType op, Expr_Node *x, Expr_Node *y)
 {
-  if(x->type == ExprNodeConstant && y->type == ExprNodeConstant)
+  if(x->type == Expr_NodeConstant && y->type == Expr_NodeConstant)
     {
       switch (op)
 	{
@@ -4215,15 +4215,15 @@ static ExprNode *binary (ExprOpType op, ExprNode *x, ExprNode *y)
   else
     {
     /* create a new expression structure */
-    ExprNodeValue val;
+    Expr_NodeValue val;
     val.op_value = op;
-    return Expr_Node_Create(ExprNodeBinop, val, x, y);
+    return Expr_Node_Create(Expr_NodeBinop, val, x, y);
   }
 }
 
-static ExprNode * unary(ExprOpType op,ExprNode * x) 
+static Expr_Node * unary(ExprOpType op,Expr_Node * x) 
 {
-  if (x->type == ExprNodeConstant)
+  if (x->type == Expr_NodeConstant)
     {
       switch (op)
 	{
@@ -4241,9 +4241,9 @@ static ExprNode * unary(ExprOpType op,ExprNode * x)
   else
     {
       /* create a new expression structure */
-      ExprNodeValue val;
+      Expr_NodeValue val;
       val.op_value = op;
-      return Expr_Node_Create(ExprNodeUnop, val, x, NULL);
+      return Expr_Node_Create(Expr_NodeUnop, val, x, NULL);
     }
 }
 

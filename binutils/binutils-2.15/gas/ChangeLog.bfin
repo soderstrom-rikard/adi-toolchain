@@ -1,3 +1,18 @@
+2005-07-18  Catherine Moore  <clm@cm00re.com>
+
+	* config/bfin-aux.h: Occurences of ExprNode changed
+	to Expr_Node.
+	* config/bfin-defs.h: Likewise.
+	* config/bfin-parse.y: Likewise.
+	* config/tc-bfin.c (md_show_usage): New output.
+	(md_number_to_chars): Removed.
+	(md_section_align): Align changed to boundary.
+	Unused code removed.  Occurences of ExprNode changed
+	to Expr_Node.  Occurences of ExprNodeGenReloc changed to 
+	Expr_Node_Gen_Reloc.  Some comments cleaned up.  Whitespace
+	improved.
+	* config/tc-bfin.h (md_number_of_chars):  Defined.
+
 2005-07-17  Catherine Moore  <clm@cm00re.com>
 
 	* Makefile.am:  Remove unused rule.  Add tabs to bfin rules.

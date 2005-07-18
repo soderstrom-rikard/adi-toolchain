@@ -198,12 +198,12 @@ struct bfin_insn
 #define INSTR_T        struct bfin_insn*
 #define EXPR_T         struct expression_cell* 
 
-typedef struct expr_node_struct ExprNode;
+typedef struct expr_node_struct Expr_Node;
  
 extern INSTR_T gencode (unsigned long x);
 extern INSTR_T conscode(INSTR_T head, INSTR_T tail);   
 extern INSTR_T conctcode(INSTR_T head, INSTR_T tail);
-extern INSTR_T note_reloc(INSTR_T code, ExprNode *, int reloc, int pcrel);
+extern INSTR_T note_reloc(INSTR_T code, Expr_Node *, int reloc, int pcrel);
 extern INSTR_T note_reloc1(INSTR_T code, const char * sym, int reloc, int pcrel);
 extern INSTR_T note_reloc2(INSTR_T code,
 		const char *symbol, int reloc, int value, int pcrel);
@@ -212,11 +212,11 @@ extern INSTR_T note_reloc2(INSTR_T code,
 /* types of expressions */
 typedef enum 
 {
-	ExprNodeBinop, // binary operator
-	ExprNodeUnop,  // unary  opertor
-	ExprNodeReloc, // a symbol, to be relocated
-	ExprNodeConstant // a constant value
-} ExprNodeType;
+	Expr_NodeBinop, // binary operator
+	Expr_NodeUnop,  // unary  opertor
+	Expr_Node_Reloc, // a symbol, to be relocated
+	Expr_NodeConstant // a constant value
+} Expr_NodeType;
 
 /* types of operators */
 typedef enum 
@@ -243,26 +243,26 @@ typedef union
 	const char *s_value;       /* if relocation symbol, the text */
 	int  i_value;        /* if constant, the value */
 	ExprOpType op_value; /* if operator, the value */
-} ExprNodeValue;
+} Expr_NodeValue;
 
 /* the actual expression node */
 struct expr_node_struct
 {
-	ExprNodeType type;
-	ExprNodeValue value;
-	ExprNode *LeftChild;
-	ExprNode *RightChild;
+	Expr_NodeType type;
+	Expr_NodeValue value;
+	Expr_Node *LeftChild;
+	Expr_Node *RightChild;
 };
 
 
 /* operations on the expression node */
-ExprNode *Expr_Node_Create(ExprNodeType type, 
-		         ExprNodeValue value, 
-			 ExprNode *LeftChild, 
-			 ExprNode *RightChild);
+Expr_Node *Expr_Node_Create(Expr_NodeType type, 
+		         Expr_NodeValue value, 
+			 Expr_Node *LeftChild, 
+			 Expr_Node *RightChild);
 
 /* generate the reloc structure as a series of instructions */
-INSTR_T ExprNodeGenReloc(ExprNode *head, 
+INSTR_T Expr_NodeGenReloc(Expr_Node *head, 
 		          int parent_reloc /* the real reloction type - depends on
 					      the assembly instruction
 					   */
@@ -279,7 +279,7 @@ INSTR_T ExprNodeGenReloc(ExprNode *head,
 #define NULL_CODE ((INSTR_T)0)
 
 #ifndef EXPR_VALUE
-#define EXPR_VALUE(x)  (((x)->type == ExprNodeConstant)?((x)->value.i_value):0)
+#define EXPR_VALUE(x)  (((x)->type == Expr_NodeConstant)?((x)->value.i_value):0)
 #endif
 #ifndef EXPR_SYMBOL
 #define EXPR_SYMBOL(x) ((x)->symbol)
@@ -338,7 +338,7 @@ void semantic_error_2(char *syntax);
 
 EXPR_T mkexpr(int, SYMBOL_T);
 
-extern void bfin_equals (ExprNode *sym);
+extern void bfin_equals (Expr_Node *sym);
 /* defined in bfin-lex.l */
 void set_start_state(void);
 

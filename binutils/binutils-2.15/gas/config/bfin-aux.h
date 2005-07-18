@@ -31,21 +31,21 @@ gen_dsp32shiftimm (int sopcde, REG_T dst0, int immag, REG_T src1,
                    int sop, int hls);
 
 INSTR_T
-gen_ldimmhalf (REG_T reg, int h, int s, int z, ExprNode *hword,
+gen_ldimmhalf (REG_T reg, int h, int s, int z, Expr_Node *hword,
                int reloc);
 
 INSTR_T
 gen_ldstidxi (REG_T ptr, REG_T reg, int w, int sz, int z,
-              ExprNode *offset);
+              Expr_Node *offset);
 
 INSTR_T
 gen_ldst (REG_T ptr, REG_T reg, int aop, int sz, int z, int w);
 
 INSTR_T
-gen_ldstii (REG_T ptr, REG_T reg, ExprNode *offset, int w, int op);
+gen_ldstii (REG_T ptr, REG_T reg, Expr_Node *offset, int w, int op);
 
 INSTR_T
-gen_ldstiifp (REG_T reg, ExprNode *offset, int w);
+gen_ldstiifp (REG_T reg, Expr_Node *offset, int w);
 
 INSTR_T
 gen_ldstpmod (REG_T ptr, REG_T reg, int aop, int w, REG_T idx);
@@ -93,10 +93,10 @@ INSTR_T
 gen_cc2dreg (int op, REG_T reg);
 
 INSTR_T
-gen_brcc (int t, int b, ExprNode *offset);
+gen_brcc (int t, int b, Expr_Node *offset);
 
 INSTR_T
-gen_ujump (ExprNode *offset);
+gen_ujump (Expr_Node *offset);
 
 INSTR_T
 gen_cactrl (REG_T reg, int a, int op);
@@ -105,11 +105,11 @@ INSTR_T
 gen_progctrl (int prgfunc, int poprnd);
 
 INSTR_T
-gen_loopsetup (ExprNode *soffset, REG_T c, int rop,
-               ExprNode *eoffset, REG_T reg);
+gen_loopsetup (Expr_Node *soffset, REG_T c, int rop,
+               Expr_Node *eoffset, REG_T reg);
 
 INSTR_T
-gen_loop (ExprNode *expr, REG_T reg, int rop, REG_T preg);
+gen_loop (Expr_Node *expr, REG_T reg, int rop, REG_T preg);
 
 INSTR_T
 gen_pushpopmultiple (int dr, int pr, int d, int p, int w);
@@ -119,7 +119,7 @@ INSTR_T
 gen_pushpopreg (REG_T reg, int w);
 
 INSTR_T
-gen_calla (ExprNode *addr, int s);
+gen_calla (Expr_Node *addr, int s);
 
 INSTR_T
 gen_linkage (int r, int framesize);

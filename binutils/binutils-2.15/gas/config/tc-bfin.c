@@ -304,6 +304,7 @@ md_parse_option (int c ATTRIBUTE_UNUSED, char *arg ATTRIBUTE_UNUSED)
 void
 md_show_usage (FILE * stream ATTRIBUTE_UNUSED)
 {
+  fprintf (stream, _(" BFIN specific command line options:\n"));
 }
 
 /* Perform machine-specific initializations.  */
@@ -488,14 +489,6 @@ symbolS *
 md_undefined_symbol (char *name ATTRIBUTE_UNUSED)
 {
   return (symbolS *) 0;
-}
-
-/* Write a value out to the object file,
-   using the appropriate endianness.  */
-void
-md_number_to_chars (char *buf, valueT val, int n)
-{
-  number_to_chars_littleendian (buf, val, n);
 }
 
 int
@@ -700,12 +693,10 @@ md_section_align (segment, size)
      segT segment;
      valueT size;
 {
-  int align = bfd_get_section_alignment (stdoutput, segment);
-
-  return ((size + (1 << align) - 1) & (-1 << align));
+  int boundary = bfd_get_section_alignment (stdoutput, segment);
+  return ((size + (1 << boundary) - 1) & (-1 << boundary));
 }
 
-/* define md_relax_frag OR TC_GENERIC_RELAX_TABLE  */
 
 /* Turn a string in input_line_pointer into a floating point constant of type
    type, and store the appropriate bytes in *litP.  The number of LITTLENUMS
@@ -800,7 +791,7 @@ tc_gen_reloc (asection * section ATTRIBUTE_UNUSED, fixS * fixp)
 
 
 /*
- * This should return the offset betweenthe address of a PC relative
+ * This should return the offset between the address of a PC relative
  * fixup and the position from which the PC relative adjustment should
  * be made.  This should return the length of an instruction.
  *
@@ -821,13 +812,9 @@ md_pcrel_from (fixP)
   return fixP->fx_frag->fr_address + fixP->fx_where;
 }
 
-/* Here we decide which fixups can be adjusted to make them relative
-   to the beginning of the section instead of the symbol.  Basically
-   we need to make sure that the dynamic relocations are done
-   correctly, so in some cases we force the original symbol to be
-   used.  */
 /* Return true if the fix can be handled by GAS, false if it must
    be passed through to the linker.  */
+
 bfd_boolean  
 bfin_fix_adjustable (fixS *fixP)
 {         
@@ -958,17 +945,6 @@ assembler_parser_init ()
   obstack_init (&mempool);
 }
 
-/* Maybe we need these for relax the brf/brt pcrel_10 instruction  */
-// const relax_typeS md_relax_table[] =
-// {
-//   {0, 0, 0, 0},                 /* State 0 => no more relaxation possible */
-//   {4088, -4096, 0, 2},          /* State 1: conditional branch (brt/brf) */
-//   {0x800000 - 8, -0x800000, 4, 0},      /* State 2: (brt/brf 6) & (ljump) */
-// };
-#define tc_unrecognized_line {		\
-   as_tsktsk("Now an unrecognized line found.\n"); }
-
-
 /*
  * Special extra functions that help bfin-parse.y perform its job.
  *
@@ -1006,10 +982,10 @@ conctcode (INSTR_T head, INSTR_T tail)
 }
 
 INSTR_T
-note_reloc (INSTR_T code, ExprNode * symbol, int reloc, int pcrel)
+note_reloc (INSTR_T code, Expr_Node * symbol, int reloc, int pcrel)
 {
   /* assert that the symbol is not an operator */
-  assert (symbol->type == ExprNodeReloc);
+  assert (symbol->type == Expr_Node_Reloc);
 
   return note_reloc1 (code, symbol->value.s_value, reloc, pcrel);
 
@@ -1054,12 +1030,12 @@ allocate (int n)
   return (void *) obstack_alloc (&mempool, n);
 }
 
-ExprNode *
-Expr_Node_Create (ExprNodeType type, ExprNodeValue value, ExprNode * LeftChild, ExprNode * RightChild)
+Expr_Node *
+Expr_Node_Create (Expr_NodeType type, Expr_NodeValue value, Expr_Node * LeftChild, Expr_Node * RightChild)
 {
 
 
-  ExprNode *node = (ExprNode *) allocate (sizeof (ExprNode));
+  Expr_Node *node = (Expr_Node *) allocate (sizeof (Expr_Node));
   node->type = type;
   node->value = value;
   node->LeftChild = LeftChild;
@@ -1069,9 +1045,11 @@ Expr_Node_Create (ExprNodeType type, ExprNodeValue value, ExprNode * LeftChild, 
 
 static const char *con = ".__constant";
 static const char *op = ".__operator";
-static INSTR_T ExprNodeGenRelocR (ExprNode * head);
+static INSTR_T Expr_Node_Gen_Reloc_R (Expr_Node * head);
+static INSTR_T Expr_Node_Gen_Reloc (Expr_Node *head, int parent_reloc);
+
 INSTR_T
-ExprNodeGenReloc (ExprNode * head, int parent_reloc)
+Expr_Node_Gen_Reloc (Expr_Node * head, int parent_reloc)
 {
   /* top level reloction expression generator VDSP style
    * if the relocation is just by itself, generate one item
@@ -1088,7 +1066,7 @@ ExprNodeGenReloc (ExprNode * head, int parent_reloc)
       //If it's 32 bit quantity then extra 16bit code needed to be add
       int value = 0;
 
-      if (head->type == ExprNodeConstant)
+      if (head->type == Expr_NodeConstant)
 	{
 	  /* if note1 is not null code, we have to generate a right aligned
 	   * value for the constant. Otherwise the reloc is a part of the
@@ -1124,30 +1102,30 @@ ExprNodeGenReloc (ExprNode * head, int parent_reloc)
 	  note1 = NULL_CODE;
 	}
     }
-  if (head->type == ExprNodeConstant)
+  if (head->type == Expr_NodeConstant)
     {
       // this has been handled.
       note = note1;
     }
-  else if (head->type == ExprNodeReloc)
+  else if (head->type == Expr_Node_Reloc)
     {
-      note = note_reloc1 (gencode(0), head->value.s_value, parent_reloc, pcrel);
+      note = note_reloc1 (gencode (0), head->value.s_value, parent_reloc, pcrel);
       if (note1 != NULL_CODE)
 	note = conscode (note1, note);
     }
   else
     {
       /* call the recursive function */
-      note = note_reloc1 (gencode(0), op, parent_reloc, pcrel);
+      note = note_reloc1 (gencode (0), op, parent_reloc, pcrel);
       if (note1 != NULL_CODE)
 	note = conscode (note1, note);
-      note = conctcode (ExprNodeGenRelocR (head), note);
+      note = conctcode (Expr_Node_Gen_Reloc_R (head), note);
     }
   return note;
 }
 
 static INSTR_T
-ExprNodeGenRelocR (ExprNode * head)
+Expr_Node_Gen_Reloc_R (Expr_Node * head)
 {
 
   INSTR_T note = 0;
@@ -1155,51 +1133,51 @@ ExprNodeGenRelocR (ExprNode * head)
 
   switch (head->type)
     {
-    case ExprNodeConstant:
-      note = conscode (note_reloc2 (gencode(0), con, BFD_ARELOC_BFIN_CONST, head->value.i_value, 0), NULL_CODE);
+    case Expr_NodeConstant:
+      note = conscode (note_reloc2 (gencode (0), con, BFD_ARELOC_BFIN_CONST, head->value.i_value, 0), NULL_CODE);
       break;
-    case ExprNodeReloc:
-      note = conscode (note_reloc (gencode(0), head, BFD_ARELOC_BFIN_PUSH, 0), NULL_CODE);
+    case Expr_Node_Reloc:
+      note = conscode (note_reloc (gencode (0), head, BFD_ARELOC_BFIN_PUSH, 0), NULL_CODE);
       break;
-    case ExprNodeBinop:
-      note1 = conctcode (ExprNodeGenRelocR (head->LeftChild), ExprNodeGenRelocR (head->RightChild));
+    case Expr_NodeBinop:
+      note1 = conctcode (Expr_Node_Gen_Reloc_R (head->LeftChild), Expr_Node_Gen_Reloc_R (head->RightChild));
       switch (head->value.op_value)
 	{
 	case ExprOpTypeAdd:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_ADD, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_ADD, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeSub:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_SUB, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_SUB, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeMult:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_MULT, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_MULT, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeDiv:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_DIV, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_DIV, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeMod:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_MOD, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_MOD, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeLsft:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_LSHIFT, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_LSHIFT, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeRsft:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_RSHIFT, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_RSHIFT, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeBAND:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_AND, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_AND, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeBOR:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_OR, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_OR, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeBXOR:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_XOR, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_XOR, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeLAND:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_LAND, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_LAND, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeLOR:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_LOR, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_LOR, 0), NULL_CODE));
 	  break;
 	default:
 	  fprintf (stderr, "%s:%d:Unkonwn operator found for arithmetic" " relocation", __FILE__, __LINE__);
@@ -1207,15 +1185,15 @@ ExprNodeGenRelocR (ExprNode * head)
 
 	}
       break;
-    case ExprNodeUnop:
-      note1 = conscode (ExprNodeGenRelocR (head->LeftChild), NULL_CODE);
+    case Expr_NodeUnop:
+      note1 = conscode (Expr_Node_Gen_Reloc_R (head->LeftChild), NULL_CODE);
       switch (head->value.op_value)
 	{
 	case ExprOpTypeNEG:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_NEG, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_NEG, 0), NULL_CODE));
 	  break;
 	case ExprOpTypeCOMP:
-	  note = conctcode (note1, conscode (note_reloc1 (gencode(0), op, BFD_ARELOC_BFIN_COMP, 0), NULL_CODE));
+	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_COMP, 0), NULL_CODE));
 	  break;
 	default:
 	  fprintf (stderr, "%s:%d:Unkonwn operator found for arithmetic" " relocation", __FILE__, __LINE__);
@@ -1259,25 +1237,22 @@ ExprNodeGenRelocR (ExprNode * head)
 #define GROUP(x) ((x->regno & CLASS_MASK) >> 4)
 
 #define GEN_OPCODE32()  \
-	conscode(            gencode(HI(c_code.opcode)), \
-				conscode(gencode(LO(c_code.opcode)), NULL_CODE) )
+	conscode (gencode (HI (c_code.opcode)), \
+	conscode (gencode (LO (c_code.opcode)), NULL_CODE))
 
 #define GEN_OPCODE16()  \
-	conscode(gencode(c_code.opcode), NULL_CODE)
-
-////////////////////////////////////////////////////////////////////////////
+	conscode (gencode (c_code.opcode), NULL_CODE)
 
 
-////////////////////////////////////////////////////////////////////////////
-//  32 BIT INSTRUCTIONS
-// {
+/*  32 BIT INSTRUCTIONS  */
 
-////////////////////////////////////////////////////////////////////////////
-// DSP32 instruction generation
+
+/* DSP32 instruction generation.  */
 
 INSTR_T
 gen_dsp32mac (int op1, int MM, int mmod, int w1, int P,
-	      int h01, int h11, int h00, int h10, int op0, REG_T dst, REG_T src0, REG_T src1, int w0)
+	      int h01, int h11, int h00, int h10, int op0,
+              REG_T dst, REG_T src0, REG_T src1, int w0)
 {
   INIT (DSP32Mac);
 
@@ -1309,7 +1284,8 @@ gen_dsp32mac (int op1, int MM, int mmod, int w1, int P,
 
 INSTR_T
 gen_dsp32mult (int op1, int MM, int mmod, int w1, int P,
-	       int h01, int h11, int h00, int h10, int op0, REG_T dst, REG_T src0, REG_T src1, int w0)
+	       int h01, int h11, int h00, int h10, int op0,
+               REG_T dst, REG_T src0, REG_T src1, int w0)
 {
   INIT (DSP32Mult);
 
@@ -1325,7 +1301,6 @@ gen_dsp32mult (int op1, int MM, int mmod, int w1, int P,
   ASSIGN (h10);
   ASSIGN (P);
 
-  // see above
   if (P)
     {
       dst->regno &= 0x06;
@@ -1339,7 +1314,8 @@ gen_dsp32mult (int op1, int MM, int mmod, int w1, int P,
 }
 
 INSTR_T
-gen_dsp32alu (int HL, int aopcde, int aop, int s, int x, REG_T dst0, REG_T dst1, REG_T src0, REG_T src1)
+gen_dsp32alu (int HL, int aopcde, int aop, int s, int x,
+              REG_T dst0, REG_T dst1, REG_T src0, REG_T src1)
 {
   INIT (DSP32Alu);
 
@@ -1357,7 +1333,8 @@ gen_dsp32alu (int HL, int aopcde, int aop, int s, int x, REG_T dst0, REG_T dst1,
 }
 
 INSTR_T
-gen_dsp32shift (int sopcde, REG_T dst0, REG_T src0, REG_T src1, int sop, int HLs)
+gen_dsp32shift (int sopcde, REG_T dst0, REG_T src0,
+                REG_T src1, int sop, int HLs)
 {
   INIT (DSP32Shift);
 
@@ -1373,7 +1350,8 @@ gen_dsp32shift (int sopcde, REG_T dst0, REG_T src0, REG_T src1, int sop, int HLs
 }
 
 INSTR_T
-gen_dsp32shiftimm (int sopcde, REG_T dst0, int immag, REG_T src1, int sop, int HLs)
+gen_dsp32shiftimm (int sopcde, REG_T dst0, int immag,
+                   REG_T src1, int sop, int HLs)
 {
   INIT (DSP32ShiftImm);
 
@@ -1387,13 +1365,12 @@ gen_dsp32shiftimm (int sopcde, REG_T dst0, int immag, REG_T src1, int sop, int H
 
   return GEN_OPCODE32 ();
 }
-///////////////////////////////////////////////////////////////////////////
 
-// LOOP SETUP
-
+/* LOOP SETUP  */
 
 INSTR_T
-gen_loopsetup (ExprNode * psoffset, REG_T c, int rop, ExprNode * peoffset, REG_T reg)
+gen_loopsetup (Expr_Node * psoffset, REG_T c, int rop,
+               Expr_Node * peoffset, REG_T reg)
 {
   int soffset, eoffset;
   INIT (LoopSetup);
@@ -1408,8 +1385,8 @@ gen_loopsetup (ExprNode * psoffset, REG_T c, int rop, ExprNode * peoffset, REG_T
 
   return
       conscode (gencode (HI (c_code.opcode)),
-		conctcode (ExprNodeGenReloc (psoffset, BFD_RELOC_BFIN_5_PCREL),
-			   conctcode (gencode (LO (c_code.opcode)), ExprNodeGenReloc (peoffset, BFD_RELOC_BFIN_11_PCREL))));
+		conctcode (Expr_Node_Gen_Reloc (psoffset, BFD_RELOC_BFIN_5_PCREL),
+			   conctcode (gencode (LO (c_code.opcode)), Expr_Node_Gen_Reloc (peoffset, BFD_RELOC_BFIN_11_PCREL))));
 
 }
 
@@ -1417,7 +1394,7 @@ gen_loopsetup (ExprNode * psoffset, REG_T c, int rop, ExprNode * peoffset, REG_T
 // CALL, LINK
 
 INSTR_T
-gen_calla (ExprNode * addr, int S)
+gen_calla (Expr_Node * addr, int S)
 {
   int val;
   int high_val;
@@ -1437,12 +1414,8 @@ gen_calla (ExprNode * addr, int S)
   high_val = val >> 16;
 
   return conscode (gencode (HI (c_code.opcode) | (high_val & 0xff)),
-                     ExprNodeGenReloc (addr, reloc));
+                     Expr_Node_Gen_Reloc (addr, reloc));
   }
-
-//  this_insn = gencode (c_code.opcode | LO (high_val));
-//  return conscode (this_insn, ExprNodeGenReloc (addr, reloc));
-//}
 
 INSTR_T
 gen_linkage (int R, int framesize)
@@ -1460,7 +1433,7 @@ gen_linkage (int R, int framesize)
 // LOAD / STORE
 
 INSTR_T
-gen_ldimmhalf (REG_T reg, int H, int S, int Z, ExprNode * phword, int reloc)
+gen_ldimmhalf (REG_T reg, int H, int S, int Z, Expr_Node * phword, int reloc)
 {
   int grp, hword;
   unsigned val = EXPR_VALUE (phword);
@@ -1476,11 +1449,11 @@ gen_ldimmhalf (REG_T reg, int H, int S, int Z, ExprNode * phword, int reloc)
   ASSIGN (grp);
   if (reloc == 2)
     {				//Relocation 5 , rN = <preg>
-      return conscode (gencode (HI (c_code.opcode)), ExprNodeGenReloc (phword, BFD_RELOC_BFIN_16_IMM));
+      return conscode (gencode (HI (c_code.opcode)), Expr_Node_Gen_Reloc (phword, BFD_RELOC_BFIN_16_IMM));
     }
   else if (reloc == 1)
     {
-      return conscode (gencode (HI (c_code.opcode)), ExprNodeGenReloc (phword, IS_H (*reg) ? BFD_RELOC_BFIN_16_HIGH : BFD_RELOC_BFIN_16_LOW));
+      return conscode (gencode (HI (c_code.opcode)), Expr_Node_Gen_Reloc (phword, IS_H (*reg) ? BFD_RELOC_BFIN_16_HIGH : BFD_RELOC_BFIN_16_LOW));
     }
   else
     {
@@ -1491,7 +1464,7 @@ gen_ldimmhalf (REG_T reg, int H, int S, int Z, ExprNode * phword, int reloc)
 }
 
 INSTR_T
-gen_ldstidxi (REG_T ptr, REG_T reg, int W, int sz, int Z, ExprNode * poffset)
+gen_ldstidxi (REG_T ptr, REG_T reg, int W, int sz, int Z, Expr_Node * poffset)
 {
   int offset;
   int value = 0;
@@ -1529,19 +1502,19 @@ gen_ldstidxi (REG_T ptr, REG_T reg, int W, int sz, int Z, ExprNode * poffset)
      The reloc case should automatically generate instruction
      if constant.
   */
-  if(poffset->type != ExprNodeConstant){
+  if(poffset->type != Expr_NodeConstant){
     /* a GOT relocation such as R0 = [P5 + symbol@GOT] */
     /* distinguish between R0 = [P5 + symbol@GOT] and
 			   P5 = [P5 + _current_shared_library_p5_offset_]
     */
     if(!strcmp(poffset->value.s_value, "_current_shared_library_p5_offset_")){
       return  conscode (gencode (HI (c_code.opcode)),
-			ExprNodeGenReloc(poffset, BFD_RELOC_16));
+			Expr_Node_Gen_Reloc(poffset, BFD_RELOC_16));
     }
     else
     {
       return  conscode (gencode (HI (c_code.opcode)),
-			ExprNodeGenReloc(poffset, BFD_RELOC_BFIN_GOT));
+			Expr_Node_Gen_Reloc(poffset, BFD_RELOC_BFIN_GOT));
     }
   }
   else{
@@ -1574,7 +1547,7 @@ gen_ldst (REG_T ptr, REG_T reg, int aop, int sz, int Z, int W)
 }
 
 INSTR_T
-gen_ldstii (REG_T ptr, REG_T reg, ExprNode * poffset, int W, int op)
+gen_ldstii (REG_T ptr, REG_T reg, Expr_Node * poffset, int W, int op)
 {
   int offset;
   int value = 0;
@@ -1612,7 +1585,7 @@ gen_ldstii (REG_T ptr, REG_T reg, ExprNode * poffset, int W, int op)
 }
 
 INSTR_T
-gen_ldstiifp (REG_T sreg, ExprNode * poffset, int W)
+gen_ldstiifp (REG_T sreg, Expr_Node * poffset, int W)
 {
   // set bit 4 if it's a Preg:
   int reg = (sreg->regno & CODE_MASK) | (IS_PREG (*sreg) ? 0x8 : 0x0);
@@ -1666,7 +1639,7 @@ gen_logi2op (int opc, int src, int dst)
 }
 
 INSTR_T
-gen_brcc (int T, int B, ExprNode * poffset)
+gen_brcc (int T, int B, Expr_Node * poffset)
 {
   int offset;
   INIT (BRCC);
@@ -1675,11 +1648,11 @@ gen_brcc (int T, int B, ExprNode * poffset)
   ASSIGN (B);
   offset = ((EXPR_VALUE (poffset) >> 1));
   ASSIGN (offset);
-  return conscode (gencode (c_code.opcode), ExprNodeGenReloc (poffset, BFD_RELOC_BFIN_10_PCREL));
+  return conscode (gencode (c_code.opcode), Expr_Node_Gen_Reloc (poffset, BFD_RELOC_BFIN_10_PCREL));
 }
 
 INSTR_T
-gen_ujump (ExprNode * poffset)
+gen_ujump (Expr_Node * poffset)
 {
   int offset;
   INIT (UJump);
@@ -1687,7 +1660,9 @@ gen_ujump (ExprNode * poffset)
   offset = ((EXPR_VALUE (poffset) >> 1));
   ASSIGN (offset);
 
-  return conscode (gencode (c_code.opcode), ExprNodeGenReloc (poffset, BFD_RELOC_BFIN_12_PCREL_JUMP_S));
+  return conscode (gencode (c_code.opcode),
+                   Expr_Node_Gen_Reloc (
+                       poffset, BFD_RELOC_BFIN_12_PCREL_JUMP_S));
 }
 
 INSTR_T
@@ -1720,7 +1695,6 @@ gen_compi2opp (REG_T dst, int src, int op)
   INIT (COMPI2opP);
 
   ASSIGN_R (dst);
-  //printf("Regiter ID: %d\n", dst->regno);
   ASSIGN (src);
   ASSIGN (op);
 
@@ -1965,12 +1939,12 @@ gen_multi_instr (INSTR_T dsp32, INSTR_T dsp16_grp1, INSTR_T dsp16_grp2)
   return dsp32;
 }
 INSTR_T
-gen_loop (ExprNode *expr, REG_T reg, int rop, REG_T preg)
+gen_loop (Expr_Node *expr, REG_T reg, int rop, REG_T preg)
 {
   const char *loopsym;
   char *lbeginsym, *lendsym;
-  ExprNodeValue lbeginval, lendval;
-  ExprNode *lbegin, *lend;
+  Expr_NodeValue lbeginval, lendval;
+  Expr_Node *lbegin, *lend;
 
   loopsym = expr->value.s_value;
   lbeginsym = (char *) xmalloc (strlen (loopsym) + strlen ("__BEGIN") + 1);
@@ -1988,8 +1962,8 @@ gen_loop (ExprNode *expr, REG_T reg, int rop, REG_T preg)
   lbeginval.s_value = lbeginsym;
   lendval.s_value = lendsym;
 
-  lbegin = Expr_Node_Create (ExprNodeReloc, lbeginval, NULL, NULL);
-  lend   = Expr_Node_Create (ExprNodeReloc, lendval, NULL, NULL);
+  lbegin = Expr_Node_Create (Expr_Node_Reloc, lbeginval, NULL, NULL);
+  lend   = Expr_Node_Create (Expr_Node_Reloc, lendval, NULL, NULL);
   return gen_loopsetup(lbegin, reg, rop, lend, preg);
 }
 
@@ -2046,7 +2020,7 @@ bfin_name_is_register (char *name)
 }
 
 void
-bfin_equals (ExprNode *sym)
+bfin_equals (Expr_Node *sym)
 {
   char *c;
 

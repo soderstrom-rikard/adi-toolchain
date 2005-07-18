@@ -33,6 +33,7 @@ extern void bfin_start_line_hook PARAMS ((void));
 extern bfd_boolean bfin_start_label PARAMS ((char *));
 
 #define md_start_line_hook()    bfin_start_line_hook()
+#define md_number_to_chars	number_to_chars_littleendian
 
 
 /* 
