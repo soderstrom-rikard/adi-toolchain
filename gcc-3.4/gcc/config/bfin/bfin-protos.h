@@ -47,7 +47,8 @@ extern int effective_address_32bit_p (rtx, Mmode);
 extern int symbolic_reference_mentioned_p (rtx);
 extern rtx bfin_gen_compare (rtx, Mmode);
 extern void expand_move (rtx *, Mmode);
-extern void bfin_expand_call (rtx, rtx, rtx, int);
+extern void bfin_expand_call (rtx, rtx, rtx, rtx, int);
+extern bool bfin_longcall_p (rtx, int);
 extern bool bfin_expand_strmov (rtx, rtx, rtx, rtx);
 
 extern int call_insn_operand (rtx, Mmode);
@@ -56,6 +57,7 @@ extern int symbolic_or_const_operand (rtx , enum machine_mode);
 extern int imm16bit_operand_p (rtx, Mmode);
 extern int reg_or_7bit_operand (rtx op, Mmode);
 extern int scale_by_operand (rtx, Mmode);
+extern int symbol_ref_operand (rtx, Mmode);
 extern int pos_scale_operand (rtx, Mmode);
 extern int regorlog2_operand (rtx, Mmode);
 extern int cc_operand (rtx, Mmode);
