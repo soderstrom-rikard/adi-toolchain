@@ -2069,9 +2069,9 @@
   [(set_attr "type" "sync")])
 
 (define_insn "trapifcc"
-  [(trap_if (reg:BI REG_CC) (const_int 2))]
+  [(trap_if (reg:BI REG_CC) (const_int 3))]
   ""
-  "if !cc jump 4 (bp); excpt 2;"
+  "if !cc jump 4 (bp); excpt 3;"
   [(set_attr "type" "misc")
    (set_attr "length" "4")])
 
