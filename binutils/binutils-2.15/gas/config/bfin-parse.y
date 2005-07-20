@@ -152,8 +152,8 @@
 	value_match(expr, bits, sign, mul, 1)
 #define IS_URANGE(bits, expr, sign, mul)    \
 	value_match(expr, bits, sign, mul, 0)
-#define IS_CONST(expr) (expr->type == Expr_NodeConstant)
-#define IS_RELOC(expr) (expr->type != Expr_NodeConstant)
+#define IS_CONST(expr) (expr->type == Expr_Node_Constant)
+#define IS_RELOC(expr) (expr->type != Expr_Node_Constant)
 #define IS_IMM(expr, bits)  value_match(expr, bits, 0, 1, 1)
 #define IS_UIMM(expr, bits)  value_match(expr, bits, 0, 1, 0)
 
@@ -186,8 +186,8 @@ extern FILE *errorf;
 extern INSTR_T insn;
 
 
-static Expr_Node * binary(ExprOpType,Expr_Node *,Expr_Node *);
-static Expr_Node * unary(ExprOpType,Expr_Node *);
+static Expr_Node * binary (Expr_Op_Type, Expr_Node *, Expr_Node *);
+static Expr_Node * unary  (Expr_Op_Type, Expr_Node *);
 
 static void notethat(char *format, ...);
 
@@ -218,8 +218,8 @@ int _semantic_error (char *syntax, int this_line)
   return -1;
 }
 
-static
-int _register_mismatch (int other_line)
+static int
+_register_mismatch (int other_line)
 {
   return _semantic_error ("Register mismatch", other_line);
 }
@@ -235,7 +235,7 @@ static int
 in_range_p (Expr_Node *expr, int from, int to, unsigned int mask)
 {
   int val = EXPR_VALUE (expr);
-  if (expr->type != Expr_NodeConstant)
+  if (expr->type != Expr_Node_Constant)
     return 0;
   if (val < from || val > to)
     return 0;
@@ -281,8 +281,8 @@ extern int yylex (void);
 //
 
 
-static
-void neg_value (Expr_Node *expr)
+static void
+neg_value (Expr_Node *expr)
 {
   expr->value.i_value = -expr->value.i_value;
 }
@@ -315,8 +315,8 @@ valid_dreg_pair (Register *reg1, Expr_Node *reg2)
 static int
 check_multfuncs (Macfunc *aa, Macfunc *ab)
 {
-  if ((!REG_EQUAL(aa->s0, ab->s0) && !REG_EQUAL(aa->s0, ab->s1))
-      || (!REG_EQUAL(aa->s1, ab->s1) && !REG_EQUAL(aa->s1, ab->s0)))
+  if ((!REG_EQUAL (aa->s0, ab->s0) && !REG_EQUAL (aa->s0, ab->s1))
+      || (!REG_EQUAL (aa->s1, ab->s1) && !REG_EQUAL (aa->s1, ab->s0)))
     return semantic_error ("Source multiplication register mismatch");
 
   return 0;
@@ -3100,7 +3100,7 @@ asm_1:
 	    return semantic_error ("Bad source register for STORE");
 
 	  if ($3.r0)
-	    tmp = unary (ExprOpTypeNEG, tmp);
+	    tmp = unary (Expr_Op_Type_NEG, tmp);
 
 	  if (in_range_p (tmp, 0, 63, 3))
 	    {
@@ -3110,7 +3110,7 @@ asm_1:
 	  else if ($2.regno == REG_FP && in_range_p (tmp, -128, 0, 3))
 	    {
 	      notethat("LDSTiiFP: dpregs = [ FP - uimm7m4 ]\n");
-	      tmp = unary (ExprOpTypeNEG, tmp);
+	      tmp = unary (Expr_Op_Type_NEG, tmp);
 	      $$ = LDSTIIFP (tmp, &$7, 1);
 	    }
 	  else if (in_range_p (tmp, -131072, 131071, 3))
@@ -3298,7 +3298,7 @@ asm_1:
 	    return semantic_error ("Bad destination register for LOAD");
 
 	  if ($5.r0)
-	    tmp = unary (ExprOpTypeNEG, tmp);
+	    tmp = unary (Expr_Op_Type_NEG, tmp);
 
 	  if(isgot){
 	      notethat("LDSTidxI: dpregs = [ pregs + sym@got ]\n");
@@ -3312,7 +3312,7 @@ asm_1:
 	  else if ($4.regno == REG_FP && in_range_p (tmp, -128, 0, 3))
 	    {
 	      notethat("LDSTiiFP: dpregs = [ FP - uimm7m4 ]\n");
-	      tmp = unary (ExprOpTypeNEG, tmp);
+	      tmp = unary (Expr_Op_Type_NEG, tmp);
 	      $$ = LDSTIIFP (tmp, &$1, 0);
 	    }
 	  else if (in_range_p (tmp, -131072, 131071, 3))
@@ -3365,10 +3365,9 @@ asm_1:
 	  bfin_equals ($1);
 	  $$ = 0;
 	}
-// }
-////////////////////////////////////////////////////////////////////////////
-// PushPopMultiple
-// {
+
+
+/*  PushPopMultiple */
 	| LBRACK _MINUS_MINUS REG RBRACK ASSIGN LPAREN REG COLON expr COMMA REG COLON expr RPAREN
 	{
 	  if ($3.regno != REG_SP)
@@ -3457,13 +3456,7 @@ asm_1:
 	    return semantic_error ("Bad register for PushPopReg");
 	}
 
-// PushPopReg: allregs = [ SP ++ ] is covered in the LDST section.
-// We no longer pre-'lex' the SP against other Pregs.
-
-// }
-
-////////////////////////////////////////////////////////////////////////////
-// linkage
+/* Linkage */
 
 	| LINK expr
 	{
@@ -3480,8 +3473,7 @@ asm_1:
 	}
 
 
-////////////////////////////////////////////////////////////////////////////
-// LSETUP
+/* LSETUP */
 
 	| LSETUP LPAREN expr COMMA expr RPAREN REG
 	{
@@ -4057,9 +4049,12 @@ ccstat:
 
 
 symbol: SYMBOL
-	{ Expr_NodeValue val; val.s_value = S_GET_NAME($1);
-	  $$ = Expr_Node_Create(Expr_Node_Reloc, val, NULL, NULL); }
-;
+	{
+	Expr_Node_Value val;
+	val.s_value = S_GET_NAME($1);
+	$$ = Expr_Node_Create (Expr_Node_Reloc, val, NULL, NULL);
+	}
+	;
 
 got :
 	symbol AT GOT
@@ -4076,59 +4071,93 @@ pltpc :
 ;
 
 eterm: NUMBER
-	{ Expr_NodeValue val; val.i_value = $1;
-	  $$ = Expr_Node_Create(Expr_NodeConstant, val, NULL, NULL); }
+	{
+	Expr_Node_Value val;
+	val.i_value = $1;
+	$$ = Expr_Node_Create (Expr_Node_Constant, val, NULL, NULL);
+	}
 	| symbol
-	{ $$ = $1; }
+	{
+	$$ = $1;
+	}
 	| LPAREN expr_1 RPAREN
-	{ $$ = $2; }
+	{
+	$$ = $2;
+	}
 	| TILDA expr_1
-	{ $$ = unary(ExprOpTypeCOMP,$2); }
+	{
+	$$ = unary (Expr_Op_Type_COMP, $2);
+	}
 	| MINUS expr_1 %prec TILDA
-	{ $$ = unary(ExprOpTypeNEG,$2); }
-;
+	{
+	$$ = unary (Expr_Op_Type_NEG, $2);
+	}
+	;
 
 expr: expr_1
 	{ $$ = $1; }
 ;
 
 expr_1: expr_1 STAR expr_1
-	{ $$ = binary(ExprOpTypeMult,$1,$3); }
+	{
+	$$ = binary (Expr_Op_Type_Mult, $1, $3);
+	}
 	| expr_1 SLASH expr_1
-	{ $$ = binary(ExprOpTypeDiv,$1,$3); }
+	{
+	$$ = binary (Expr_Op_Type_Div, $1, $3);
+	}
 	| expr_1 PERCENT expr_1
-	{ $$ = binary(ExprOpTypeMod,$1,$3); }
+	{
+	$$ = binary (Expr_Op_Type_Mod, $1, $3);
+	}
 	| expr_1 PLUS expr_1
-	{ $$ = binary(ExprOpTypeAdd,$1,$3); }
+	{
+	$$ = binary (Expr_Op_Type_Add, $1, $3);
+	}
 	| expr_1 MINUS expr_1
-	{ $$ = binary(ExprOpTypeSub,$1,$3); }
+	{
+	$$ = binary (Expr_Op_Type_Sub, $1, $3);
+	}
 	| expr_1 LESS_LESS expr_1
-	{ $$ = binary(ExprOpTypeLsft,$1,$3); }
+	{
+	$$ = binary (Expr_Op_Type_Lshift, $1, $3);	
+	}
 	| expr_1 GREATER_GREATER expr_1
-	{ $$ = binary(ExprOpTypeRsft,$1,$3); }
+	{
+	$$ = binary (Expr_Op_Type_Rshift, $1, $3);
+	}
 	| expr_1 AMPERSAND expr_1
-	{ $$ = binary(ExprOpTypeBAND,$1,$3); }
+	{
+	$$ = binary (Expr_Op_Type_BAND, $1, $3);
+	}
 	| expr_1 CARET expr_1
-	{ $$ = binary(ExprOpTypeLOR,$1,$3); }
+	{
+	$$ = binary (Expr_Op_Type_LOR, $1, $3);
+	}
 	| expr_1 BAR expr_1
-	{ $$ = binary(ExprOpTypeBOR,$1,$3); }
+	{
+	$$ = binary (Expr_Op_Type_BOR, $1, $3);
+	}
 	| eterm	
-	{ $$ = $1; }
-;
+	{
+	$$ = $1;
+	}
+	;
 
 
 %%
 
-EXPR_T mkexpr(int x, SYMBOL_T s)
+EXPR_T
+mkexpr (int x, SYMBOL_T s)
 {
-  EXPR_T e = (EXPR_T) ALLOCATE(sizeof (struct expression_cell));
+  EXPR_T e = (EXPR_T) ALLOCATE (sizeof (struct expression_cell));
   e->value = x;
   EXPR_SYMBOL(e) = s;
   return e;
 }
 
 static int
-value_match(Expr_Node *expr, int sz, int sign, int mul, int issigned)
+value_match (Expr_Node *expr, int sz, int sign, int mul, int issigned)
 {
   long umax = (1L << sz) - 1;
   long min = -1L << (sz - 1);
@@ -4138,17 +4167,19 @@ value_match(Expr_Node *expr, int sz, int sign, int mul, int issigned)
 
   if ((v % mul) != 0)
     {
-      fprintf(stderr, "ValueError: Must align to %d\n", mul);
+      error ("%s:%d: Value Error -- Must align to %d\n", __LINE__, __FILE__, mul); 
       return 0;
     }
 
   v /= mul;
 
-  if (sign) v = -v;
+  if (sign)
+    v = -v;
 
   if (issigned)
     {
       if (v >= min && v <= max) return 1;
+
 #ifdef DEBUG
       fprintf(stderr, "signed value %lx out of range\n", v * mul);
 #endif
@@ -4162,88 +4193,90 @@ value_match(Expr_Node *expr, int sz, int sign, int mul, int issigned)
   return 0;
 }
 
-/* Return the new expression structure that allows symbol operations
-   if the left and right children are constants, do the operation  */
-static Expr_Node *binary (ExprOpType op, Expr_Node *x, Expr_Node *y)
+/* Return the expression structure that allows symbol operations.
+   If the left and right children are constants, do the operation.  */
+static Expr_Node *
+binary (Expr_Op_Type op, Expr_Node *x, Expr_Node *y)
 {
-  if(x->type == Expr_NodeConstant && y->type == Expr_NodeConstant)
+  if (x->type == Expr_Node_Constant && y->type == Expr_Node_Constant)
     {
       switch (op)
 	{
-        case ExprOpTypeAdd: 
+        case Expr_Op_Type_Add: 
 	  x->value.i_value += y->value.i_value;
 	  break;
-        case ExprOpTypeSub: 
+        case Expr_Op_Type_Sub: 
 	  x->value.i_value -= y->value.i_value;
 	  break;
-        case ExprOpTypeMult: 
+        case Expr_Op_Type_Mult: 
 	  x->value.i_value *= y->value.i_value;
 	  break;
-        case ExprOpTypeDiv: 
+        case Expr_Op_Type_Div: 
 	  x->value.i_value /= y->value.i_value;
 	  break;
-        case ExprOpTypeMod: 
+        case Expr_Op_Type_Mod: 
 	  x->value.i_value %= y->value.i_value;
 	  break;
-        case ExprOpTypeLsft: 
+        case Expr_Op_Type_Lshift: 
 	  x->value.i_value <<= y->value.i_value;
 	  break;
-        case ExprOpTypeRsft: 
+        case Expr_Op_Type_Rshift: 
 	  x->value.i_value >>= y->value.i_value;
 	  break;
-        case ExprOpTypeBAND: 
+        case Expr_Op_Type_BAND: 
 	  x->value.i_value &= y->value.i_value;
 	  break;
-        case ExprOpTypeBOR: 
+        case Expr_Op_Type_BOR: 
 	  x->value.i_value |= y->value.i_value;
 	  break;
-        case ExprOpTypeBXOR: 
+        case Expr_Op_Type_BXOR: 
 	  x->value.i_value ^= y->value.i_value;
 	  break;
-        case ExprOpTypeLAND: 
+        case Expr_Op_Type_LAND: 
 	  x->value.i_value = x->value.i_value && y->value.i_value;
 	  break;
-        case ExprOpTypeLOR: 
+        case Expr_Op_Type_LOR: 
 	  x->value.i_value = x->value.i_value || y->value.i_value;
 	  break;
 
 	default:
-	  fprintf(stderr, "Internal compiler error at line %d in file %s\n", __LINE__, __FILE__);
+	  error ("%s:%d: Internal compiler error\n", __LINE__, __FILE__); 
 	}
-      return x; // should delete y
+      return x;
     }
   else
     {
     /* create a new expression structure */
-    Expr_NodeValue val;
+    Expr_Node_Value val;
     val.op_value = op;
-    return Expr_Node_Create(Expr_NodeBinop, val, x, y);
+    return Expr_Node_Create (Expr_Node_Binop, val, x, y);
   }
 }
 
-static Expr_Node * unary(ExprOpType op,Expr_Node * x) 
+static Expr_Node *
+unary (Expr_Op_Type op, Expr_Node *x) 
 {
-  if (x->type == Expr_NodeConstant)
+  if (x->type == Expr_Node_Constant)
     {
       switch (op)
 	{
-	case ExprOpTypeNEG: 
+	case Expr_Op_Type_NEG: 
 	  x->value.i_value = -x->value.i_value;
 	  break;
-	case ExprOpTypeCOMP:
+	case Expr_Op_Type_COMP:
 	  x->value.i_value = ~x->value.i_value;
 	  break;
 	default:
-	  fprintf(stderr, "Internal compiler error at line %d in file %s\n", __LINE__, __FILE__);
+	  error ("%s:%d: Internal compiler error\n", __LINE__, __FILE__); 
 	}
       return x;
     }
   else
     {
       /* create a new expression structure */
-      Expr_NodeValue val;
+      Expr_Node_Value val;
       val.op_value = op;
-      return Expr_Node_Create(Expr_NodeUnop, val, x, NULL);
+      return Expr_Node_Create (Expr_Node_Unop, val, x, NULL);
     }
 }
 

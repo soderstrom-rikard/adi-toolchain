@@ -1,3 +1,9 @@
+2005-07-20  Catherine Moore  <clm@cm00re.com>
+
+	* config/bfin-defs.h:  Formatting, naming and spacing updates.
+	* config/bfin-parse.y: Likewise.
+	* config/tc-bfin.c: Likewise.
+
 2005-07-18  Catherine Moore  <clm@cm00re.com>
 
 	* config/bfin-aux.h: Occurences of ExprNode changed

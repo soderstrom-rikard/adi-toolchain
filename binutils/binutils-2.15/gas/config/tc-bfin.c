@@ -570,12 +570,6 @@ md_apply_fix3 (fixP, valp, seg)
       break;
 
     case BFD_RELOC_BFIN_16_HIGH:
-/*      leave to linker to resolve this reloc
-        if (val) fixP->fx_addnumber = 1;
-	buf[lowbyte] = (val >> 16) & 0xff;
-        buf[highbyte] = (val >> 24) & 0xff;
-        buf[0] = buf[1] = 0;
-*/
       fixP->fx_addnumber = 0;
       not_yet_resolved = 1;	// absolute values not be resolved here
       break;
@@ -1031,15 +1025,15 @@ allocate (int n)
 }
 
 Expr_Node *
-Expr_Node_Create (Expr_NodeType type, Expr_NodeValue value, Expr_Node * LeftChild, Expr_Node * RightChild)
+Expr_Node_Create (Expr_Node_Type type, Expr_Node_Value value, Expr_Node *Left_Child, Expr_Node *Right_Child)
 {
 
 
   Expr_Node *node = (Expr_Node *) allocate (sizeof (Expr_Node));
   node->type = type;
   node->value = value;
-  node->LeftChild = LeftChild;
-  node->RightChild = RightChild;
+  node->Left_Child = Left_Child;
+  node->Right_Child = Right_Child;
   return node;
 }
 
@@ -1066,7 +1060,7 @@ Expr_Node_Gen_Reloc (Expr_Node * head, int parent_reloc)
       //If it's 32 bit quantity then extra 16bit code needed to be add
       int value = 0;
 
-      if (head->type == Expr_NodeConstant)
+      if (head->type == Expr_Node_Constant)
 	{
 	  /* if note1 is not null code, we have to generate a right aligned
 	   * value for the constant. Otherwise the reloc is a part of the
@@ -1102,7 +1096,7 @@ Expr_Node_Gen_Reloc (Expr_Node * head, int parent_reloc)
 	  note1 = NULL_CODE;
 	}
     }
-  if (head->type == Expr_NodeConstant)
+  if (head->type == Expr_Node_Constant)
     {
       // this has been handled.
       note = note1;
@@ -1133,50 +1127,50 @@ Expr_Node_Gen_Reloc_R (Expr_Node * head)
 
   switch (head->type)
     {
-    case Expr_NodeConstant:
+    case Expr_Node_Constant:
       note = conscode (note_reloc2 (gencode (0), con, BFD_ARELOC_BFIN_CONST, head->value.i_value, 0), NULL_CODE);
       break;
     case Expr_Node_Reloc:
       note = conscode (note_reloc (gencode (0), head, BFD_ARELOC_BFIN_PUSH, 0), NULL_CODE);
       break;
-    case Expr_NodeBinop:
-      note1 = conctcode (Expr_Node_Gen_Reloc_R (head->LeftChild), Expr_Node_Gen_Reloc_R (head->RightChild));
+    case Expr_Node_Binop:
+      note1 = conctcode (Expr_Node_Gen_Reloc_R (head->Left_Child), Expr_Node_Gen_Reloc_R (head->Right_Child));
       switch (head->value.op_value)
 	{
-	case ExprOpTypeAdd:
+	case Expr_Op_Type_Add:
 	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_ADD, 0), NULL_CODE));
 	  break;
-	case ExprOpTypeSub:
+	case Expr_Op_Type_Sub:
 	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_SUB, 0), NULL_CODE));
 	  break;
-	case ExprOpTypeMult:
+	case Expr_Op_Type_Mult:
 	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_MULT, 0), NULL_CODE));
 	  break;
-	case ExprOpTypeDiv:
+	case Expr_Op_Type_Div:
 	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_DIV, 0), NULL_CODE));
 	  break;
-	case ExprOpTypeMod:
+	case Expr_Op_Type_Mod:
 	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_MOD, 0), NULL_CODE));
 	  break;
-	case ExprOpTypeLsft:
+	case Expr_Op_Type_Lshift:
 	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_LSHIFT, 0), NULL_CODE));
 	  break;
-	case ExprOpTypeRsft:
+	case Expr_Op_Type_Rshift:
 	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_RSHIFT, 0), NULL_CODE));
 	  break;
-	case ExprOpTypeBAND:
+	case Expr_Op_Type_BAND:
 	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_AND, 0), NULL_CODE));
 	  break;
-	case ExprOpTypeBOR:
+	case Expr_Op_Type_BOR:
 	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_OR, 0), NULL_CODE));
 	  break;
-	case ExprOpTypeBXOR:
+	case Expr_Op_Type_BXOR:
 	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_XOR, 0), NULL_CODE));
 	  break;
-	case ExprOpTypeLAND:
+	case Expr_Op_Type_LAND:
 	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_LAND, 0), NULL_CODE));
 	  break;
-	case ExprOpTypeLOR:
+	case Expr_Op_Type_LOR:
 	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_LOR, 0), NULL_CODE));
 	  break;
 	default:
@@ -1185,20 +1179,18 @@ Expr_Node_Gen_Reloc_R (Expr_Node * head)
 
 	}
       break;
-    case Expr_NodeUnop:
-      note1 = conscode (Expr_Node_Gen_Reloc_R (head->LeftChild), NULL_CODE);
+    case Expr_Node_Unop:
+      note1 = conscode (Expr_Node_Gen_Reloc_R (head->Left_Child), NULL_CODE);
       switch (head->value.op_value)
 	{
-	case ExprOpTypeNEG:
+	case Expr_Op_Type_NEG:
 	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_NEG, 0), NULL_CODE));
 	  break;
-	case ExprOpTypeCOMP:
+	case Expr_Op_Type_COMP:
 	  note = conctcode (note1, conscode (note_reloc1 (gencode (0), op, BFD_ARELOC_BFIN_COMP, 0), NULL_CODE));
 	  break;
 	default:
 	  fprintf (stderr, "%s:%d:Unkonwn operator found for arithmetic" " relocation", __FILE__, __LINE__);
-
-
 	}
       break;
     default:
@@ -1502,7 +1494,7 @@ gen_ldstidxi (REG_T ptr, REG_T reg, int W, int sz, int Z, Expr_Node * poffset)
      The reloc case should automatically generate instruction
      if constant.
   */
-  if(poffset->type != Expr_NodeConstant){
+  if(poffset->type != Expr_Node_Constant){
     /* a GOT relocation such as R0 = [P5 + symbol@GOT] */
     /* distinguish between R0 = [P5 + symbol@GOT] and
 			   P5 = [P5 + _current_shared_library_p5_offset_]
@@ -1943,7 +1935,7 @@ gen_loop (Expr_Node *expr, REG_T reg, int rop, REG_T preg)
 {
   const char *loopsym;
   char *lbeginsym, *lendsym;
-  Expr_NodeValue lbeginval, lendval;
+  Expr_Node_Value lbeginval, lendval;
   Expr_Node *lbegin, *lend;
 
   loopsym = expr->value.s_value;
