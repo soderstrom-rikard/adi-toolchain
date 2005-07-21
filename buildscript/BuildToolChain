@@ -116,6 +116,7 @@ do
             ;;
         k) 
             if [ -d $OPTARG/uClibc ] ; then
+                UCLINUX_ROOT=$OPTARG
                 UCLIBC_SOURCE=$OPTARG/uClibc
                 KERNEL_SOURCE=$OPTARG/linux-2.6.x
                 if [ ! -d $KERNEL_SOURCE/arch/bfinnommu ] ; then
@@ -137,8 +138,8 @@ do
             fi	
             ;;
         o)
-            DIR_ELF_OUTPUT=$OPTARG-elf
-            DIR_uC_OUTPUT=$OPTARG-uclinux
+            DIR_ELF_OUTPUT=$OPTARG
+            DIR_uC_OUTPUT=$OPTARG
             ;;
         h)  
              echo "Usage : $APP_NAME -s SOURCE [-b BUILD]
@@ -699,22 +700,22 @@ if [ $KERNEL_SOURCE ] ; then
     ####################### Step 3 - build uClibc ################
     echo -n "*** Configuring uClibc             " ; date
     cd $UCLIBC_SOURCE
-    RUN="$MAKE oldconfig"
+    RUN="$MAKE oldconfig ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
     echo -n "*** Cleaning uClibc                " ; date
-    RUN="$MAKE clean"
+    RUN="$MAKE clean ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
     echo -n "*** Building uClibc                " ; date
-    RUN="$MAKE all CROSS=bfin-elf- KERNEL_SOURCE=$KERNEL_SOURCE"
+    RUN="$MAKE all CROSS=bfin-elf- KERNEL_SOURCE=$KERNEL_SOURCE ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
     echo -n "*** Installing uClibc              " ; date
-    RUN="$MAKE install PREFIX=$DIR_uC_OUTPUT/bfin-uclinux DEVEL_PREFIX=\"/\""
+    RUN="$MAKE install PREFIX=$DIR_uC_OUTPUT/bfin-uclinux DEVEL_PREFIX=\"/\" ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
