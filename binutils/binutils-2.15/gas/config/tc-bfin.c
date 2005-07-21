@@ -499,16 +499,17 @@ md_estimate_size_before_relax (fragS * fragP ATTRIBUTE_UNUSED,
 }
 
 void
-md_apply_fix3 (fixP, valp, seg)
+md_apply_fix3 (fixP, valueP, seg)
      fixS *fixP;
-     valueT *valp;
+     valueT *valueP;
      segT seg ATTRIBUTE_UNUSED;
 {
-  char *buf = fixP->fx_where + fixP->fx_frag->fr_literal;
+  char *where = fixP->fx_frag->fr_literal + fixP->fx_where;
+  //valueT value = *valueP;
 
-  int lowbyte = 0;		// bfin is little endian
-  int highbyte = 1;		// bfin is little endian
-  long val = *valp;
+  int lowbyte = 0;
+  int highbyte = 1;
+  long val = *valueP;
   int shift;
   int not_yet_resolved = 0;
 
@@ -517,11 +518,12 @@ md_apply_fix3 (fixP, valp, seg)
     {
     case BFD_RELOC_BFIN_GOT:
       fixP->fx_addnumber = 0;
-      buf[lowbyte] = 0;
-      buf[highbyte] |= 0 & 0x7f;
+      where[lowbyte] = 0;
+      where[highbyte] |= 0 & 0x7f;
       fixP->fx_no_overflow = 1;
       shift = 0;
       break;
+
     case BFD_RELOC_BFIN_10_PCREL:
       if (!val)
 	{
@@ -536,8 +538,8 @@ md_apply_fix3 (fixP, valp, seg)
 
       val /= 2;			// 11 bit offset even numbered, so we remove right bit
       shift = 1;
-      buf[lowbyte] = val & 0xff;
-      buf[highbyte] |= (val >> 8) & 0x3;
+      where[lowbyte] = val & 0xff;
+      where[highbyte] |= (val >> 8) & 0x3;
       break;
 
     case BFD_RELOC_BFIN_12_PCREL_JUMP:
@@ -558,8 +560,8 @@ md_apply_fix3 (fixP, valp, seg)
       fixP->fx_addnumber = 1;
       val /= 2;			// 13 bit offset even numbered, so we remove right bit
       shift = 1;
-      buf[lowbyte] = val & 0xff;
-      buf[highbyte] |= (val >> 8) & 0xf;
+      where[lowbyte] = val & 0xff;
+      where[highbyte] |= (val >> 8) & 0xf;
       break;
 
     case BFD_RELOC_BFIN_16_LOW:
@@ -588,10 +590,10 @@ md_apply_fix3 (fixP, valp, seg)
       val /= 2;			// 25 bit offset even numbered, so we remove right bit
       shift = 1;
       val++;			//
-      buf -= 2;			// we want to go back and fix.
-      buf[0] = val >> 16;
-      buf[2] = val >> 0;
-      buf[3] = val >> 8;
+      where -= 2;			// we want to go back and fix.
+      where[0] = val >> 16;
+      where[2] = val >> 0;
+      where[3] = val >> 8;
       break;
 
     case BFD_RELOC_BFIN_5_PCREL:	/* LSETUP (a, b) : "a" */
@@ -606,7 +608,7 @@ md_apply_fix3 (fixP, valp, seg)
       val /= 2;			// 5 bit unsigned even, so we remove right bit
       shift = 1;
 
-      *buf = (*buf & 0xf0) | (val & 0xf);
+      *where = (*where & 0xf0) | (val & 0xf);
       break;
 
     case BFD_RELOC_BFIN_11_PCREL:	/* LSETUP (a, b) : "b" */
@@ -622,32 +624,32 @@ md_apply_fix3 (fixP, valp, seg)
       val /= 2;			// 11 bit unsigned even, so we remove right bit
       shift = 1;
 
-      buf[lowbyte] = val & 0xff;
-      buf[highbyte] |= (val >> 8) & 0x3;
+      where[lowbyte] = val & 0xff;
+      where[highbyte] |= (val >> 8) & 0x3;
       break;
 
     case BFD_RELOC_8:
       if (val < -0x80 || val >= 0x7f)
 	as_bad_where (fixP->fx_file, fixP->fx_line, "rel too far BFD_RELOC_8");
-      *buf++ = val;
+      *where += val;
       break;
 
     case BFD_RELOC_32:
-      *buf++ = val >> 0;
-      *buf++ = val >> 8;
-      *buf++ = val >> 16;
-      *buf++ = val >> 24;
+      *where++ = val >> 0;
+      *where++ = val >> 8;
+      *where++ = val >> 16;
+      *where++ = val >> 24;
       break;
 
     case BFD_RELOC_BFIN_16_IMM:
     case BFD_RELOC_16:
-      *buf++ = val >> 0;
-      *buf++ = val >> 8;
+      *where++ = val >> 0;
+      *where++ = val >> 8;
       break;
 
     case BFD_RELOC_BFIN_PLTPC :
-      *buf++ = val >> 0;
-      *buf++ = val >> 8;
+      *where++ = val >> 0;
+      *where++ = val >> 8;
       break;
 
     case BFD_RELOC_VTABLE_INHERIT:
@@ -675,7 +677,7 @@ md_apply_fix3 (fixP, valp, seg)
     }
   if (shift != 0)
     {
-      val = *valp;
+      val = *valueP;
       if ((val & ((1 << shift) - 1)) != 0)
 	as_bad_where (fixP->fx_file, fixP->fx_line, "misaligned offset");
     }
@@ -1040,7 +1042,7 @@ Expr_Node_Create (Expr_Node_Type type, Expr_Node_Value value, Expr_Node *Left_Ch
 static const char *con = ".__constant";
 static const char *op = ".__operator";
 static INSTR_T Expr_Node_Gen_Reloc_R (Expr_Node * head);
-static INSTR_T Expr_Node_Gen_Reloc (Expr_Node *head, int parent_reloc);
+INSTR_T Expr_Node_Gen_Reloc (Expr_Node *head, int parent_reloc);
 
 INSTR_T
 Expr_Node_Gen_Reloc (Expr_Node * head, int parent_reloc)
@@ -1242,9 +1244,9 @@ Expr_Node_Gen_Reloc_R (Expr_Node * head)
 /* DSP32 instruction generation.  */
 
 INSTR_T
-gen_dsp32mac (int op1, int MM, int mmod, int w1, int P,
-	      int h01, int h11, int h00, int h10, int op0,
-              REG_T dst, REG_T src0, REG_T src1, int w0)
+bfin_gen_dsp32mac (int op1, int MM, int mmod, int w1, int P,
+	           int h01, int h11, int h00, int h10, int op0,
+                   REG_T dst, REG_T src0, REG_T src1, int w0)
 {
   INIT (DSP32Mac);
 
@@ -1260,8 +1262,8 @@ gen_dsp32mac (int op1, int MM, int mmod, int w1, int P,
   ASSIGN (h10);
   ASSIGN (P);
 
-  // If we have full reg assignments, mask out LSB to encode
-  // single or simultaneous even/odd register moves
+  /* If we have full reg assignments, mask out LSB to encode
+  single or simultaneous even/odd register moves.  */
   if (P)
     {
       dst->regno &= 0x06;
@@ -1275,9 +1277,9 @@ gen_dsp32mac (int op1, int MM, int mmod, int w1, int P,
 }
 
 INSTR_T
-gen_dsp32mult (int op1, int MM, int mmod, int w1, int P,
-	       int h01, int h11, int h00, int h10, int op0,
-               REG_T dst, REG_T src0, REG_T src1, int w0)
+bfin_gen_dsp32mult (int op1, int MM, int mmod, int w1, int P,
+	            int h01, int h11, int h00, int h10, int op0,
+                    REG_T dst, REG_T src0, REG_T src1, int w0)
 {
   INIT (DSP32Mult);
 
@@ -1306,7 +1308,7 @@ gen_dsp32mult (int op1, int MM, int mmod, int w1, int P,
 }
 
 INSTR_T
-gen_dsp32alu (int HL, int aopcde, int aop, int s, int x,
+bfin_gen_dsp32alu (int HL, int aopcde, int aop, int s, int x,
               REG_T dst0, REG_T dst1, REG_T src0, REG_T src1)
 {
   INIT (DSP32Alu);
@@ -1325,7 +1327,7 @@ gen_dsp32alu (int HL, int aopcde, int aop, int s, int x,
 }
 
 INSTR_T
-gen_dsp32shift (int sopcde, REG_T dst0, REG_T src0,
+bfin_gen_dsp32shift (int sopcde, REG_T dst0, REG_T src0,
                 REG_T src1, int sop, int HLs)
 {
   INIT (DSP32Shift);
@@ -1342,7 +1344,7 @@ gen_dsp32shift (int sopcde, REG_T dst0, REG_T src0,
 }
 
 INSTR_T
-gen_dsp32shiftimm (int sopcde, REG_T dst0, int immag,
+bfin_gen_dsp32shiftimm (int sopcde, REG_T dst0, int immag,
                    REG_T src1, int sop, int HLs)
 {
   INIT (DSP32ShiftImm);
@@ -1361,7 +1363,7 @@ gen_dsp32shiftimm (int sopcde, REG_T dst0, int immag,
 /* LOOP SETUP  */
 
 INSTR_T
-gen_loopsetup (Expr_Node * psoffset, REG_T c, int rop,
+bfin_gen_loopsetup (Expr_Node * psoffset, REG_T c, int rop,
                Expr_Node * peoffset, REG_T reg)
 {
   int soffset, eoffset;
@@ -1382,11 +1384,10 @@ gen_loopsetup (Expr_Node * psoffset, REG_T c, int rop,
 
 }
 
-///////////////////////////////////////////////////////////////////////////
-// CALL, LINK
+/*  Call, Link.  */
 
 INSTR_T
-gen_calla (Expr_Node * addr, int S)
+bfin_gen_calla (Expr_Node * addr, int S)
 {
   int val;
   int high_val;
@@ -1410,7 +1411,7 @@ gen_calla (Expr_Node * addr, int S)
   }
 
 INSTR_T
-gen_linkage (int R, int framesize)
+bfin_gen_linkage (int R, int framesize)
 {
   INIT (Linkage);
 
@@ -1421,11 +1422,10 @@ gen_linkage (int R, int framesize)
 }
 
 
-////////////////////////////////////////////////////////////////////////////
-// LOAD / STORE
+/* Load and Store.  */
 
 INSTR_T
-gen_ldimmhalf (REG_T reg, int H, int S, int Z, Expr_Node * phword, int reloc)
+bfin_gen_ldimmhalf (REG_T reg, int H, int S, int Z, Expr_Node * phword, int reloc)
 {
   int grp, hword;
   unsigned val = EXPR_VALUE (phword);
@@ -1456,7 +1456,7 @@ gen_ldimmhalf (REG_T reg, int H, int S, int Z, Expr_Node * phword, int reloc)
 }
 
 INSTR_T
-gen_ldstidxi (REG_T ptr, REG_T reg, int W, int sz, int Z, Expr_Node * poffset)
+bfin_gen_ldstidxi (REG_T ptr, REG_T reg, int W, int sz, int Z, Expr_Node * poffset)
 {
   int offset;
   int value = 0;
@@ -1514,11 +1514,9 @@ gen_ldstidxi (REG_T ptr, REG_T reg, int W, int sz, int Z, Expr_Node * poffset)
   }
 }
 
-// } END 32 BIT INSTRUCTIONS
-////////////////////////////////////////////////////////////////////////////
 
 INSTR_T
-gen_ldst (REG_T ptr, REG_T reg, int aop, int sz, int Z, int W)
+bfin_gen_ldst (REG_T ptr, REG_T reg, int aop, int sz, int Z, int W)
 {
   INIT (LDST);
 
@@ -1539,7 +1537,7 @@ gen_ldst (REG_T ptr, REG_T reg, int aop, int sz, int Z, int W)
 }
 
 INSTR_T
-gen_ldstii (REG_T ptr, REG_T reg, Expr_Node * poffset, int W, int op)
+bfin_gen_ldstii (REG_T ptr, REG_T reg, Expr_Node * poffset, int W, int op)
 {
   int offset;
   int value = 0;
@@ -1564,7 +1562,6 @@ gen_ldstii (REG_T ptr, REG_T reg, Expr_Node * poffset, int W, int op)
       break;
     }
 
-
   ASSIGN_R (ptr);
   ASSIGN_R (reg);
 
@@ -1577,7 +1574,7 @@ gen_ldstii (REG_T ptr, REG_T reg, Expr_Node * poffset, int W, int op)
 }
 
 INSTR_T
-gen_ldstiifp (REG_T sreg, Expr_Node * poffset, int W)
+bfin_gen_ldstiifp (REG_T sreg, Expr_Node * poffset, int W)
 {
   // set bit 4 if it's a Preg:
   int reg = (sreg->regno & CODE_MASK) | (IS_PREG (*sreg) ? 0x8 : 0x0);
@@ -1591,7 +1588,7 @@ gen_ldstiifp (REG_T sreg, Expr_Node * poffset, int W)
 }
 
 INSTR_T
-gen_ldstpmod (REG_T ptr, REG_T reg, int aop, int W, REG_T idx)
+bfin_gen_ldstpmod (REG_T ptr, REG_T reg, int aop, int W, REG_T idx)
 {
   INIT (LDSTpmod);
 
@@ -1605,7 +1602,7 @@ gen_ldstpmod (REG_T ptr, REG_T reg, int aop, int W, REG_T idx)
 }
 
 INSTR_T
-gen_dspldst (REG_T i, REG_T reg, int aop, int W, int m)
+bfin_gen_dspldst (REG_T i, REG_T reg, int aop, int W, int m)
 {
   INIT (DspLDST);
 
@@ -1619,7 +1616,7 @@ gen_dspldst (REG_T i, REG_T reg, int aop, int W, int m)
 }
 
 INSTR_T
-gen_logi2op (int opc, int src, int dst)
+bfin_gen_logi2op (int opc, int src, int dst)
 {
   INIT (LOGI2op);
 
@@ -1631,7 +1628,7 @@ gen_logi2op (int opc, int src, int dst)
 }
 
 INSTR_T
-gen_brcc (int T, int B, Expr_Node * poffset)
+bfin_gen_brcc (int T, int B, Expr_Node * poffset)
 {
   int offset;
   INIT (BRCC);
@@ -1644,7 +1641,7 @@ gen_brcc (int T, int B, Expr_Node * poffset)
 }
 
 INSTR_T
-gen_ujump (Expr_Node * poffset)
+bfin_gen_ujump (Expr_Node * poffset)
 {
   int offset;
   INIT (UJump);
@@ -1658,7 +1655,7 @@ gen_ujump (Expr_Node * poffset)
 }
 
 INSTR_T
-gen_alu2op (REG_T dst, REG_T src, int opc)
+bfin_gen_alu2op (REG_T dst, REG_T src, int opc)
 {
   INIT (ALU2op);
 
@@ -1670,7 +1667,7 @@ gen_alu2op (REG_T dst, REG_T src, int opc)
 }
 
 INSTR_T
-gen_compi2opd (REG_T dst, int src, int op)
+bfin_gen_compi2opd (REG_T dst, int src, int op)
 {
   INIT (COMPI2opD);
 
@@ -1682,7 +1679,7 @@ gen_compi2opd (REG_T dst, int src, int op)
 }
 
 INSTR_T
-gen_compi2opp (REG_T dst, int src, int op)
+bfin_gen_compi2opp (REG_T dst, int src, int op)
 {
   INIT (COMPI2opP);
 
@@ -1694,7 +1691,7 @@ gen_compi2opp (REG_T dst, int src, int op)
 }
 
 INSTR_T
-gen_dagmodik (REG_T i, int op)
+bfin_gen_dagmodik (REG_T i, int op)
 {
   INIT (DagMODik);
 
@@ -1705,7 +1702,7 @@ gen_dagmodik (REG_T i, int op)
 }
 
 INSTR_T
-gen_dagmodim (REG_T i, REG_T m, int op, int br)
+bfin_gen_dagmodim (REG_T i, REG_T m, int op, int br)
 {
   INIT (DagMODim);
 
@@ -1718,7 +1715,7 @@ gen_dagmodim (REG_T i, REG_T m, int op, int br)
 }
 
 INSTR_T
-gen_ptr2op (REG_T dst, REG_T src, int opc)
+bfin_gen_ptr2op (REG_T dst, REG_T src, int opc)
 {
   INIT (PTR2op);
 
@@ -1730,7 +1727,7 @@ gen_ptr2op (REG_T dst, REG_T src, int opc)
 }
 
 INSTR_T
-gen_comp3op (REG_T src0, REG_T src1, REG_T dst, int opc)
+bfin_gen_comp3op (REG_T src0, REG_T src1, REG_T dst, int opc)
 {
   INIT (COMP3op);
 
@@ -1743,7 +1740,7 @@ gen_comp3op (REG_T src0, REG_T src1, REG_T dst, int opc)
 }
 
 INSTR_T
-gen_ccflag (REG_T x, int y, int opc, int I, int G)
+bfin_gen_ccflag (REG_T x, int y, int opc, int I, int G)
 {
   INIT (CCflag);
 
@@ -1757,7 +1754,7 @@ gen_ccflag (REG_T x, int y, int opc, int I, int G)
 }
 
 INSTR_T
-gen_ccmv (REG_T src, REG_T dst, int T)
+bfin_gen_ccmv (REG_T src, REG_T dst, int T)
 {
   int s, d;
   INIT (CCmv);
@@ -1774,7 +1771,7 @@ gen_ccmv (REG_T src, REG_T dst, int T)
 }
 
 INSTR_T
-gen_cc2stat (int cbit, int op, int D)
+bfin_gen_cc2stat (int cbit, int op, int D)
 {
   INIT (CC2stat);
 
@@ -1786,7 +1783,7 @@ gen_cc2stat (int cbit, int op, int D)
 }
 
 INSTR_T
-gen_regmv (REG_T src, REG_T dst)
+bfin_gen_regmv (REG_T src, REG_T dst)
 {
   int gs, gd;
   INIT (RegMv);
@@ -1803,7 +1800,7 @@ gen_regmv (REG_T src, REG_T dst)
 }
 
 INSTR_T
-gen_cc2dreg (int op, REG_T reg)
+bfin_gen_cc2dreg (int op, REG_T reg)
 {
   INIT (CC2dreg);
 
@@ -1814,7 +1811,7 @@ gen_cc2dreg (int op, REG_T reg)
 }
 
 INSTR_T
-gen_progctrl (int prgfunc, int poprnd)
+bfin_gen_progctrl (int prgfunc, int poprnd)
 {
   INIT (ProgCtrl);
 
@@ -1825,7 +1822,7 @@ gen_progctrl (int prgfunc, int poprnd)
 }
 
 INSTR_T
-gen_cactrl (REG_T reg, int a, int op)
+bfin_gen_cactrl (REG_T reg, int a, int op)
 {
   INIT (CaCTRL);
 
@@ -1837,7 +1834,7 @@ gen_cactrl (REG_T reg, int a, int op)
 }
 
 INSTR_T
-gen_pushpopmultiple (int dr, int pr, int d, int p, int W)
+bfin_gen_pushpopmultiple (int dr, int pr, int d, int p, int W)
 {
   INIT (PushPopMultiple);
 
@@ -1851,7 +1848,7 @@ gen_pushpopmultiple (int dr, int pr, int d, int p, int W)
 }
 
 INSTR_T
-gen_pushpopreg (REG_T reg, int W)
+bfin_gen_pushpopreg (REG_T reg, int W)
 {
   int grp;
   INIT (PushPopReg);
@@ -1864,11 +1861,10 @@ gen_pushpopreg (REG_T reg, int W)
   return GEN_OPCODE16 ();
 }
 
-////////////////////////////////////////////////////////////////////////////
-// PSEUDO DEBUGGING SUPPORT
+/* Pseudo Debuggin Support.  */
 
 INSTR_T
-gen_pseudodbg (int fn, int reg, int grp)
+bfin_gen_pseudodbg (int fn, int reg, int grp)
 {
   INIT (PseudoDbg);
 
@@ -1880,7 +1876,7 @@ gen_pseudodbg (int fn, int reg, int grp)
 }
 
 INSTR_T
-gen_pseudodbg_assert (int dbgop, REG_T regtest, int expected)
+bfin_gen_pseudodbg_assert (int dbgop, REG_T regtest, int expected)
 {
   INIT (PseudoDbg_Assert);
 
@@ -1891,13 +1887,10 @@ gen_pseudodbg_assert (int dbgop, REG_T regtest, int expected)
   return GEN_OPCODE32 ();
 }
 
-////////////////////////////////////////////////////////////////////////////
-//
-// Multiple instruction generation
-//
+/* Multiple instruction generation.  */
 
 INSTR_T
-gen_multi_instr (INSTR_T dsp32, INSTR_T dsp16_grp1, INSTR_T dsp16_grp2)
+bfin_gen_multi_instr (INSTR_T dsp32, INSTR_T dsp16_grp1, INSTR_T dsp16_grp2)
 {
   INSTR_T walk;
 
@@ -1930,8 +1923,9 @@ gen_multi_instr (INSTR_T dsp32, INSTR_T dsp16_grp1, INSTR_T dsp16_grp2)
 
   return dsp32;
 }
+
 INSTR_T
-gen_loop (Expr_Node *expr, REG_T reg, int rop, REG_T preg)
+bfin_gen_loop (Expr_Node *expr, REG_T reg, int rop, REG_T preg)
 {
   const char *loopsym;
   char *lbeginsym, *lendsym;
@@ -1956,7 +1950,7 @@ gen_loop (Expr_Node *expr, REG_T reg, int rop, REG_T preg)
 
   lbegin = Expr_Node_Create (Expr_Node_Reloc, lbeginval, NULL, NULL);
   lend   = Expr_Node_Create (Expr_Node_Reloc, lendval, NULL, NULL);
-  return gen_loopsetup(lbegin, reg, rop, lend, preg);
+  return bfin_gen_loopsetup(lbegin, reg, rop, lend, preg);
 }
 
 bfd_boolean

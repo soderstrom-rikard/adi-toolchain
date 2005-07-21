@@ -1,3 +1,10 @@
+2005-07-21  Catherine Moore  <clm@cm00re.com>
+
+	* config/bfin-aux.h:  Formatting, naming and spacing updates.
+	* config/bfin-defs.h:  Likewise.
+	* config/bfin-parse.y:  Likewise.
+	* config/tc-bfin.c:  Likewise.
+
 2005-07-20  Catherine Moore  <clm@cm00re.com>
 
 	* config/bfin-defs.h:  Formatting, naming and spacing updates.

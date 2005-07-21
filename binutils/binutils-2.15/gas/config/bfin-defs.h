@@ -322,7 +322,7 @@ Expr_Node *Expr_Node_Create (Expr_Node_Type type,
 			 Expr_Node *Right_Child);
 
 /* generate the reloc structure as a series of instructions */
-INSTR_T Expr_Node_Gen_Reloc(Expr_Node *head, int parent_reloc);
+INSTR_T Expr_Node_Gen_Reloc (Expr_Node *head, int parent_reloc);
  
 #define MKREF(x)	mkexpr(0,x)
 #define ALLOCATE(x)	malloc(x)

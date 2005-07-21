@@ -39,113 +39,106 @@
 // See bfin-aux.c for the function calls
 
 #define DSP32ALU(aopcde, HL, dst1, dst0, src0, src1, s, x, aop) \
-	gen_dsp32alu(HL, aopcde, aop, s, x, dst0, dst1, src0, src1)
+	bfin_gen_dsp32alu (HL, aopcde, aop, s, x, dst0, dst1, src0, src1)
 
 #define DSP32MAC(op1, MM, mmod, w1, P, h01, h11, h00, h10, dst, op0, src0, src1, w0) \
-	gen_dsp32mac(op1, MM, mmod, w1, P, h01, h11, h00, h10, op0, \
-	             dst, src0, src1, w0)
+	bfin_gen_dsp32mac (op1, MM, mmod, w1, P, h01, h11, h00, h10, op0, \
+	                   dst, src0, src1, w0)
 
 #define DSP32MULT(op1, MM, mmod, w1, P, h01, h11, h00, h10, dst, op0, src0, src1, w0) \
-	gen_dsp32mult(op1, MM, mmod, w1, P, h01, h11, h00, h10, op0, \
-	              dst, src0, src1, w0)
+	bfin_gen_dsp32mult (op1, MM, mmod, w1, P, h01, h11, h00, h10, op0, \
+	                    dst, src0, src1, w0)
 
 #define DSP32SHIFT(sopcde, dst0, src0, src1, sop, hls)  \
-	gen_dsp32shift(sopcde, dst0, src0, src1, sop, hls)
+	bfin_gen_dsp32shift (sopcde, dst0, src0, src1, sop, hls)
 
 #define DSP32SHIFTIMM(sopcde, dst0, immag, src1, sop, hls)  \
-	gen_dsp32shiftimm(sopcde, dst0, immag, src1, sop, hls)
-
-////////////////////////////////////////////////////////////////////////////
-
-//#define LDIMMHALF(reg, h, s, z, hword) 
-//	gen_ldimmhalf(reg, h, s, z, hword, 0)
+	bfin_gen_dsp32shiftimm (sopcde, dst0, immag, src1, sop, hls)
 
 #define LDIMMHALF_R(reg, h, s, z, hword) \
-	gen_ldimmhalf(reg, h, s, z, hword, 1)
+	bfin_gen_ldimmhalf (reg, h, s, z, hword, 1)
 
 #define LDIMMHALF_R5(reg, h, s, z, hword) \
-        gen_ldimmhalf(reg, h, s, z, hword, 2)
+        bfin_gen_ldimmhalf (reg, h, s, z, hword, 2)
 
 #define LDSTIDXI(ptr, reg, w, sz, z, offset)  \
-	gen_ldstidxi(ptr, reg, w, sz, z, offset)
+	bfin_gen_ldstidxi (ptr, reg, w, sz, z, offset)
 
 #define LDST(ptr, reg, aop, sz, z, w)  \
-	gen_ldst(ptr, reg, aop, sz, z, w)
+	bfin_gen_ldst (ptr, reg, aop, sz, z, w)
 
 #define LDSTII(ptr, reg, offset, w, op)  \
-	gen_ldstii(ptr, reg, offset, w, op)
+	bfin_gen_ldstii (ptr, reg, offset, w, op)
 
 #define DSPLDST(i, m, reg, aop, w) \
-	gen_dspldst(i, reg, aop, w, m)
+	bfin_gen_dspldst (i, reg, aop, w, m)
 
 #define LDSTPMOD(ptr, reg, idx, aop, w) \
-	gen_ldstpmod(ptr, reg, aop, w, idx)
+	bfin_gen_ldstpmod (ptr, reg, aop, w, idx)
 
 #define LDSTIIFP(offset, reg, w)  \
-	gen_ldstiifp(reg, offset, w)
+	bfin_gen_ldstiifp (reg, offset, w)
 
 #define LOGI2OP(dst, src, opc) \
-	gen_logi2op(opc, src, dst.regno & CODE_MASK)
+	bfin_gen_logi2op (opc, src, dst.regno & CODE_MASK)
 
 #define ALU2OP(dst, src, opc)  \
-	gen_alu2op(dst, src, opc)
+	bfin_gen_alu2op (dst, src, opc)
 
 #define BRCC(t, b, offset) \
-	gen_brcc(t, b, offset)
+	bfin_gen_brcc (t, b, offset)
 
 #define UJUMP(offset) \
-	gen_ujump(offset)
+	bfin_gen_ujump (offset)
 
 #define PROGCTRL(prgfunc, poprnd) \
-	gen_progctrl(prgfunc, poprnd)
+	bfin_gen_progctrl (prgfunc, poprnd)
 
 #define PUSHPOPMULTIPLE(dr, pr, d, p, w) \
-	gen_pushpopmultiple(dr, pr, d, p, w)
+	bfin_gen_pushpopmultiple (dr, pr, d, p, w)
 
 #define PUSHPOPREG(reg, w) \
-	gen_pushpopreg(reg, w)
+	bfin_gen_pushpopreg (reg, w)
 
 #define CALLA(addr, s)  \
-	gen_calla(addr, s)
+	bfin_gen_calla (addr, s)
 
 #define LINKAGE(r, framesize) \
-	gen_linkage(r, framesize)
+	bfin_gen_linkage (r, framesize)
 
 #define COMPI2OPD(dst, src, op)  \
-	gen_compi2opd(dst, src, op)
+	bfin_gen_compi2opd (dst, src, op)
 
 #define COMPI2OPP(dst, src, op)  \
-	gen_compi2opp(dst, src, op)
+	bfin_gen_compi2opp (dst, src, op)
 
 #define DAGMODIK(i, op)  \
-	gen_dagmodik(i, op)
+	bfin_gen_dagmodik (i, op)
 
 #define DAGMODIM(i, m, op, br)  \
-	gen_dagmodim(i, m, op, br)
+	bfin_gen_dagmodim (i, m, op, br)
 
 #define COMP3OP(dst, src0, src1, opc)   \
-	gen_comp3op(src0, src1, dst, opc)
+	bfin_gen_comp3op (src0, src1, dst, opc)
 
 #define PTR2OP(dst, src, opc)   \
-	gen_ptr2op(dst, src, opc)
+	bfin_gen_ptr2op (dst, src, opc)
 
 #define CCFLAG(x, y, opc, i, g)  \
-	gen_ccflag(x, y, opc, i, g)
+	bfin_gen_ccflag (x, y, opc, i, g)
 
 #define CCMV(src, dst, t) \
-	gen_ccmv(src, dst, t)
+	bfin_gen_ccmv (src, dst, t)
 
 #define CACTRL(reg, a, op) \
-	gen_cactrl(reg, a, op)
+	bfin_gen_cactrl (reg, a, op)
 
 #define LOOPSETUP(soffset, c, rop, eoffset, reg) \
-	gen_loopsetup(soffset, c, rop, eoffset, reg)
+	bfin_gen_loopsetup (soffset, c, rop, eoffset, reg)
 
 // Auxiliaries: (TODO: move to bfin-defs.h)
 
 #define HL2(r1, r0)  (IS_H(r1) << 1 | IS_H(r0))
-
-
 #define IS_PLUS(o)       (o.r0 == 0)
 #define IS_MINUS(o)      (o.r0 == 1)
 #define IS_RANGE(bits, expr, sign, mul)    \
@@ -154,31 +147,29 @@
 	value_match(expr, bits, sign, mul, 0)
 #define IS_CONST(expr) (expr->type == Expr_Node_Constant)
 #define IS_RELOC(expr) (expr->type != Expr_Node_Constant)
-#define IS_IMM(expr, bits)  value_match(expr, bits, 0, 1, 1)
-#define IS_UIMM(expr, bits)  value_match(expr, bits, 0, 1, 0)
+#define IS_IMM(expr, bits)  value_match (expr, bits, 0, 1, 1)
+#define IS_UIMM(expr, bits)  value_match (expr, bits, 0, 1, 0)
 
 #define IS_LIMM(expr, bits) \
-	(value_match(expr, bits, 0, 1, 1))
+	(value_match (expr, bits, 0, 1, 1))
 
 #define IS_PCREL4(expr) \
-	(value_match(expr, 4, 0, 2, 0))
+	(value_match (expr, 4, 0, 2, 0))
 
 #define IS_LPPCREL10(expr) \
-	(value_match(expr, 10, 0, 2, 0))
+	(value_match (expr, 10, 0, 2, 0))
 
 #define IS_PCREL10(expr) \
-	(value_match(expr, 10, 0, 2, 1))
+	(value_match (expr, 10, 0, 2, 1))
 
 #define IS_PCREL12(expr) \
-	(value_match(expr, 12, 0, 2, 1))
+	(value_match (expr, 12, 0, 2, 1))
 
 #define IS_PCREL24(expr) \
-	(value_match(expr, 24, 0, 2, 1))
+	(value_match (expr, 24, 0, 2, 1))
 
 
-////////////////////////////////////////////////////////////////////////////
-
-static int value_match(Expr_Node *expr, int sz, int sign, int mul, int issigned);
+static int value_match (Expr_Node *expr, int sz, int sign, int mul, int issigned);
 
 int nerrors;
 int nwarnings;
@@ -189,7 +180,7 @@ extern INSTR_T insn;
 static Expr_Node * binary (Expr_Op_Type, Expr_Node *, Expr_Node *);
 static Expr_Node * unary  (Expr_Op_Type, Expr_Node *);
 
-static void notethat(char *format, ...);
+static void notethat (char *format, ...);
 
 char *current_inputline;
 extern char *yytext;
@@ -276,10 +267,7 @@ extern int yylex (void);
 #define pcrel24(x) ((EXPR_VALUE (x)) >> 1)
 
 
-////////////////////////////////////////////////////////////////////////////
-// Auxiliary functions
-//
-
+/* Auxiliary functions.  */
 
 static void
 neg_value (Expr_Node *expr)
@@ -323,21 +311,21 @@ check_multfuncs (Macfunc *aa, Macfunc *ab)
 }
 
 
-// check (vector) mac funcs and ops:
+/* check (vector) mac funcs and ops.  */
 
 static int
 check_macfuncs (Macfunc *aa, Opt_mode *opa,
 		Macfunc *ab, Opt_mode *opb)
 {
-  // Variables for swapping:
+  /* Variables for swapping.  */
   Macfunc mtmp;
   Opt_mode otmp;
 
-  // if a0macfunc comes before a1macfunc, swap them.
+  /* if a0macfunc comes before a1macfunc, swap them.  */
 	
   if (aa->n == 0)
     {
-      // (M) is not allowed here:
+      /*  (M) is not allowed here.  */
       if (opa->MM != 0)
 	return semantic_error ("(M) not allowed with A0MAC");
       if (ab->n != 1)
@@ -348,7 +336,6 @@ check_macfuncs (Macfunc *aa, Opt_mode *opa,
     }
   else
     {
-
       if (opb->MM != 0)
 	return semantic_error ("(M) not allowed with A0MAC");
       if (opa->mod != 0)
@@ -357,8 +344,8 @@ check_macfuncs (Macfunc *aa, Opt_mode *opa,
 	return semantic_error ("Vector AxMACs can't be same");
     }
 
-  // if both ops are != 3, we have multfuncs in both
-  // assignment_or_macfuncs
+  /*  If both ops are != 3, we have multfuncs in both
+  assignment_or_macfuncs.  */
   if (aa->op == ab->op && aa->op != 3)
     {
       if (check_multfuncs (aa, ab) < 0)
@@ -366,11 +353,10 @@ check_macfuncs (Macfunc *aa, Opt_mode *opa,
     }
   else
     {
-
-      // only one of the assign_macfuncs has a multfunc.
-      // Evil trick: Just 'OR' their source register codes:
-      // We can do that, because we know they were initialized to 0
-      // in the rules that don't use multfuncs.
+      /*  Only one of the assign_macfuncs has a multfunc.
+      Evil trick: Just 'OR' their source register codes:
+      We can do that, because we know they were initialized to 0
+      in the rules that don't use multfuncs.  */
       aa->s0.regno |= (ab->s0.regno & CODE_MASK);
       aa->s1.regno |= (ab->s1.regno & CODE_MASK);
     }
@@ -381,19 +367,19 @@ check_macfuncs (Macfunc *aa, Opt_mode *opa,
       if (aa->w && (aa->dst.regno - ab->dst.regno != 1))
 	return semantic_error ("Destination Dregs must differ by one");
     }
-  // We assign to full regs, thus obey even/odd rules:	
+  /* We assign to full regs, thus obey even/odd rules.  */
   else if ((aa->w && aa->P && IS_EVEN(aa->dst)) 
 	   || (ab->w && ab->P && !IS_EVEN(ab->dst)))
     return semantic_error ("Even/Odd register assignment mismatch");
-  // We assign to half regs, thus obey hi/low rules:	
+  /* We assign to half regs, thus obey hi/low rules.  */
   else if ( (aa->w && !aa->P && !IS_H(aa->dst)) 
 	    || (ab->w && !aa->P && IS_H(ab->dst)))
     return semantic_error ("High/Low register assignment mismatch");
 
-  // Make sure first macfunc has got both P flags ORed
+  /* Make sure first macfunc has got both P flags ORed.  */
   aa->P |= ab->P;
 
-  // Make sure mod flags get ORed, too
+  /* Make sure mod flags get ORed, too.  */
   opb->mod |= opa->mod;
   return 0;	
 }
@@ -402,9 +388,10 @@ check_macfuncs (Macfunc *aa, Opt_mode *opa,
 static int
 is_group1 (INSTR_T x)
 {
-  if ((x->value & 0xc000) == 0x8000  //dspLDST,LDSTpmod,LDST,LDSTiiFP,LDSTii
-      || (x->value == 0x0000))
+  /* Group1 is dpsLDST, LDSTpmod, LDST, LDSTiiFP, LDSTii.  */
+  if ((x->value & 0xc000) == 0x8000 || (x->value == 0x0000))
     return 1;
+
   return 0;
 }
 
@@ -427,9 +414,7 @@ is_group2 (INSTR_T x)
   Expr_Node *expr;
   SYMBOL_T symbol;
   long value;
-  // new encoding of registers
   Register reg;
-
   Macfunc macfunc;
   struct { int r0; int s0; int x0; int aop; } modcodes;
   struct { int r0; } r0;
@@ -628,7 +613,9 @@ is_group2 (INSTR_T x)
 %start asm_or_directive
 %%
 asm_or_directive:
-	{ INIT_ASM(); }
+	{
+	INIT_ASM();
+	}
 	asm
 	{
 	  insn = $2;
@@ -639,36 +626,36 @@ asm_or_directive:
 	  else
 	    return INSN_GENERATED;
 	}
-;
+	;
 
 asm: asm_1 SEMICOLON
-	// Parallel instructions:
+	/* Parallel instructions.  */
 	| asm_1 DOUBLE_BAR asm_1 DOUBLE_BAR asm_1 SEMICOLON
 	{
 	  if (($1->value & 0xf800) == 0xc000)
 	    {
 	      if (is_group1 ($3) && is_group2 ($5))
-		$$ = gen_multi_instr($1, $3, $5);
+		$$ = bfin_gen_multi_instr ($1, $3, $5);
 	      else if (is_group2 ($3) && is_group1 ($5))
-		$$ = gen_multi_instr($1, $5, $3);
+		$$ = bfin_gen_multi_instr ($1, $5, $3);
 	      else
 		return semantic_error ("Wrong 16 bit instructions groups, slot 2 and slot 3 must be 16-bit instrution group");
 	    }
 	  else if (($3->value & 0xf800) == 0xc000)
 	    {
 	      if (is_group1 ($1) && is_group2 ($5))
-		$$ = gen_multi_instr($3, $1, $5);
+		$$ = bfin_gen_multi_instr ($3, $1, $5);
 	      else if (is_group2 ($1) && is_group1 ($5))
-		$$ = gen_multi_instr($3, $5, $1);
+		$$ = bfin_gen_multi_instr ($3, $5, $1);
 	      else
 		return semantic_error ("Wrong 16 bit instructions groups, slot 1 and slot 3 must be 16-bit instrution group");
 	    }
 	  else if (($5->value & 0xf800) == 0xc000)
 	    {
 	      if (is_group1 ($1) && is_group2 ($3))
-		$$ = gen_multi_instr($5, $1, $3);
+		$$ = bfin_gen_multi_instr ($5, $1, $3);
 	      else if (is_group2 ($1) && is_group1 ($3))
-		$$ = gen_multi_instr($5, $3, $1);
+		$$ = bfin_gen_multi_instr ($5, $3, $1);
 	      else
 		return semantic_error ("Wrong 16 bit instructions groups, slot 1 and slot 2 must be 16-bit instrution group");
 	    }
@@ -681,42 +668,43 @@ asm: asm_1 SEMICOLON
 	  if (($1->value & 0xf800) == 0xc000)
 	    {
 	      if (is_group1 ($3))
-		$$ = gen_multi_instr($1, $3, 0);
+		$$ = bfin_gen_multi_instr ($1, $3, 0);
 	      else if (is_group2 ($3))
-		$$ = gen_multi_instr($1, 0, $3);
+		$$ = bfin_gen_multi_instr ($1, 0, $3);
 	      else
 		return semantic_error ("Wrong 16 bit instructions groups, slot 2 must be the 16-bit instruction group");
 	    }
 	  else if (($3->value & 0xf800) == 0xc000)
 	    {
 	      if (is_group1 ($1))
-		$$ = gen_multi_instr($3, $1, 0);
+		$$ = bfin_gen_multi_instr ($3, $1, 0);
 	      else if (is_group2 ($1))
-		$$ = gen_multi_instr($3, 0, $1);
+		$$ = bfin_gen_multi_instr ($3, 0, $1);
 	      else
 		return semantic_error ("Wrong 16 bit instructions groups, slot 1 must be the 16-bit instruction group");
 	    }
 	  else if (is_group1 ($1) && is_group2 ($3))
-	      $$ = gen_multi_instr(0, $1, $3);
+	      $$ = bfin_gen_multi_instr (0, $1, $3);
 	  else if (is_group2 ($1) && is_group1 ($3))
-	    $$ = gen_multi_instr(0, $3, $1);
+	    $$ = bfin_gen_multi_instr (0, $3, $1);
 	  else
 	    return semantic_error ("Wrong 16 bit instructions groups, slot 1 and slot 2 must be the 16-bit instruction group");
 	}
-	| error { $$ = 0; as_bad ("\nParse error.\n"); yyerrok; }  // recovery error
-;
+	| error
+	{
+	$$ = 0;
+	as_bad ("\nParse error.\n");
+	yyerrok;
+	}
+	;
 
-////////////////////////////////////////////////////////////////////////////
-// DSPMAC
-// {
+/* DSPMAC */
 
 asm_1:   
 	MNOP
 	{
-	  $$ = DSP32MAC (3, 0, 0, 0, 0, 0, 0, 0, 0,
-			 0, 3, 0, 0, 0);
+	  $$ = DSP32MAC (3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0);
 	}
-
 	| assign_macfunc opt_mode
 	{
 	  int op0, op1;
@@ -727,36 +715,40 @@ asm_1:
 	    {
 	      if ($2.MM) 
 		return semantic_error ("(m) not allowed with a0 unit");
-	      op1 = 3; op0 = $1.op;
-	      w1 = 0; w0 = $1.w;
-	      h00 = IS_H ($1.s0); h10 = IS_H ($1.s1);
+	      op1 = 3;
+	      op0 = $1.op;
+	      w1 = 0;
+              w0 = $1.w;
+	      h00 = IS_H ($1.s0);
+              h10 = IS_H ($1.s1);
 	      h01 = h11 = 0;
 	    }
 	  else
 	    {
-	      op1 = $1.op; op0 = 3;
-	      w1 = $1.w; w0 = 0;
+	      op1 = $1.op;
+	      op0 = 3;
+	      w1 = $1.w;
+              w0 = 0;
 	      h00 = h10 = 0;
-	      h01 = IS_H ($1.s0); h11 = IS_H ($1.s1);
+	      h01 = IS_H ($1.s0);
+              h11 = IS_H ($1.s1);
 	    }
-	  
 	  $$ = DSP32MAC (op1, $2.MM, $2.mod, w1, $1.P, h01, h11, h00, h10,
 			 &$1.dst, op0, &$1.s0, &$1.s1, w0);
 	}
 
-////////////////////////////////////////////////////////////////////////////
-// VECTOR MACs
-// }{
+
+/* VECTOR MACs */
 
 	| assign_macfunc opt_mode COMMA assign_macfunc opt_mode
 	{
 	  Register *dst;
 
-	  if (check_macfuncs(&$1, &$2, &$4, &$5) < 0) 
+	  if (check_macfuncs (&$1, &$2, &$4, &$5) < 0) 
 	    return -1;
-	  notethat("assign_macfunc (.), assign_macfunc (.)\n");
+	  notethat ("assign_macfunc (.), assign_macfunc (.)\n");
 
-	  if ($1.w)  // a1macfunc destination
+	  if ($1.w)
 	    dst = &$1.dst;
 	  else
 	    dst = &$4.dst;
@@ -766,58 +758,45 @@ asm_1:
 			 dst, $4.op, &$1.s0, &$1.s1, $4.w);
 	}
 
-// }
-////////////////////////////////////////////////////////////////////////////
-// DSPALU
-// { 
+/* DSPALU */
 
 	| DISALGNEXCPT
 	{
-	  notethat("dsp32alu: DISALGNEXCPT\n");
-
+	  notethat ("dsp32alu: DISALGNEXCPT\n");
 	  $$ = DSP32ALU (18, 0, 0, 0, 0, 0, 0, 0, 3);
 	}
-
 	| REG ASSIGN LPAREN a_plusassign REG_A RPAREN
 	{
 	  if (IS_DREG ($1) && !IS_A1 ($4) && IS_A1 ($5))
 	    {
-	      notethat("dsp32alu: dregs = ( A0 += A1 )\n");
+	      notethat ("dsp32alu: dregs = ( A0 += A1 )\n");
 	      $$ = DSP32ALU (11, 0, 0, &$1, 0, 0, 0, 0, 0);
 	    }
 	  else 
-	    return register_mismatch();
+	    return register_mismatch ();
 	}	
-
 	| HALF_REG ASSIGN LPAREN a_plusassign REG_A RPAREN
 	{
 	  if (!IS_A1 ($4) && IS_A1 ($5))
 	    {
-	      notethat("dsp32alu: dregs_half = ( A0 += A1 )\n");
+	      notethat ("dsp32alu: dregs_half = ( A0 += A1 )\n");
 	      $$ = DSP32ALU (11, IS_H ($1), 0, &$1, 0, 0, 0, 0, 1);
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
-
-/* 2 rules compacted */
 	| A_ZERO_DOT_H ASSIGN HALF_REG
 	{
-	  notethat("dsp32alu: A_ZERO_DOT_H = dregs_hi\n");
+	  notethat ("dsp32alu: A_ZERO_DOT_H = dregs_hi\n");
 	  $$ = DSP32ALU (9, IS_H ($3), 0, 0, &$3, 0, 0, 0, 0);
 	}
-
-/* 2 rules compacted */
 	| A_ONE_DOT_H ASSIGN HALF_REG
 	{
-	  notethat("dsp32alu: A_ZERO_DOT_H = dregs_hi\n");
-	  $$ = DSP32ALU (9, IS_H ($3), 0, 0, &$3, 0,
-			 0, 0, 2);
-
+	  notethat ("dsp32alu: A_ZERO_DOT_H = dregs_hi\n");
+	  $$ = DSP32ALU (9, IS_H ($3), 0, 0, &$3, 0, 0, 0, 2);
 	}
-
-	| LPAREN REG COMMA REG RPAREN ASSIGN BYTEOP16P LPAREN REG COLON expr COMMA
-	  REG COLON expr RPAREN aligndir
+	| LPAREN REG COMMA REG RPAREN ASSIGN BYTEOP16P LPAREN REG
+	  COLON expr COMMA REG COLON expr RPAREN aligndir
 	{
 	  if (!IS_DREG ($2) || !IS_DREG ($4))
 	    return semantic_error ("Dregs expected");
@@ -827,7 +806,7 @@ asm_1:
 	    return semantic_error ("Bad dreg pair");
 	  else
 	    {
-	      notethat("dsp32alu: (dregs , dregs ) = BYTEOP16P (dregs_pair , dregs_pair ) (half)\n");
+	      notethat ("dsp32alu: (dregs , dregs ) = BYTEOP16P (dregs_pair , dregs_pair ) (half)\n");
 	      $$ = DSP32ALU (21, 0, &$2, &$4, &$9, &$13, $17.r0, 0, 0);
 	    }
 	}
@@ -843,7 +822,7 @@ asm_1:
 	    return semantic_error ("Bad dreg pair");
 	  else
 	    {
-	      notethat("dsp32alu: (dregs , dregs ) = BYTEOP16M (dregs_pair , dregs_pair ) (aligndir)\n");
+	      notethat ("dsp32alu: (dregs , dregs ) = BYTEOP16M (dregs_pair , dregs_pair ) (aligndir)\n");
 	      $$ = DSP32ALU (21, 0, &$2, &$4, &$9, &$13, $17.r0, 0, 1);
 	    }
 	}
@@ -856,32 +835,30 @@ asm_1:
 	    return semantic_error ("Bad dreg pair");
 	  else
 	    {
-	      notethat("dsp32alu: (dregs , dregs ) = BYTEUNPACK dregs_pair (aligndir)\n");
+	      notethat ("dsp32alu: (dregs , dregs ) = BYTEUNPACK dregs_pair (aligndir)\n");
 	      $$ = DSP32ALU (24, 0, &$2, &$4, &$8, 0, $11.r0, 0, 1);
 	    }
 	}
-
 	| LPAREN REG COMMA REG RPAREN ASSIGN SEARCH REG LPAREN searchmod RPAREN
 	{
 	  if (IS_DREG ($2) && IS_DREG ($4) && IS_DREG ($8))
 	    {
-	      notethat("dsp32alu: (dregs , dregs ) = SEARCH dregs (searchmod)\n");
+	      notethat ("dsp32alu: (dregs , dregs ) = SEARCH dregs (searchmod)\n");
 	      $$ = DSP32ALU (13, 0, &$2, &$4, &$8, 0, 0, 0, $10.r0);
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
-
 	| REG ASSIGN A_ONE_DOT_L PLUS A_ONE_DOT_H COMMA
 	  REG ASSIGN A_ZERO_DOT_L PLUS A_ZERO_DOT_H
 	{
 	  if (IS_DREG ($1) && IS_DREG ($7))
 	    {
-	      notethat("dsp32alu: dregs = A1.l + A1.h, dregs = A0.l + A0.h  \n");
+	      notethat ("dsp32alu: dregs = A1.l + A1.h, dregs = A0.l + A0.h  \n");
 	      $$ = DSP32ALU (12, 0, &$1, &$7, 0, 0, 0, 0, 1);
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
 
 
@@ -890,14 +867,14 @@ asm_1:
 	  if (IS_DREG ($1) && IS_DREG ($7) && !REG_SAME ($3, $5)
 	      && IS_A1 ($9) && !IS_A1 ($11))
 	    {
-	      notethat("dsp32alu: dregs = A1 + A0 , dregs = A1 - A0 (amod1)\n");
+	      notethat ("dsp32alu: dregs = A1 + A0 , dregs = A1 - A0 (amod1)\n");
 	      $$ = DSP32ALU (17, 0, &$1, &$7, 0, 0, $12.s0, $12.x0, 0);
 	      
 	    }
 	  else if (IS_DREG ($1) && IS_DREG ($7) && !REG_SAME ($3, $5)
 		   && !IS_A1 ($9) && IS_A1 ($11))
 	    {
-	      notethat("dsp32alu: dregs = A0 + A1 , dregs = A0 - A1 (amod1)\n");
+	      notethat ("dsp32alu: dregs = A0 + A1 , dregs = A0 - A1 (amod1)\n");
 	      $$ = DSP32ALU (17, 0, &$1, &$7, 0, 0, $12.s0, $12.x0, 1);
 	    }
 	  else
@@ -912,7 +889,7 @@ asm_1:
 	  if (IS_DREG ($1) && IS_DREG ($3) && IS_DREG ($5)
 	      && REG_SAME ($3, $9) && REG_SAME ($5, $11))
 	    {
-	      notethat("dsp32alu: dregs = dregs + dregs,"
+	      notethat ("dsp32alu: dregs = dregs + dregs,"
 		       "dregs = dregs - dregs (amod1)\n");
 	      $$ = DSP32ALU (4, 0, &$1, &$7, &$3, &$5, $12.s0, $12.x0, 2);
 	    }
@@ -920,7 +897,7 @@ asm_1:
 	    return register_mismatch ();
 	}
 
-// Bar operations:
+/*  Bar Operations.  */
 
 	| REG ASSIGN REG op_bar_op REG COMMA REG ASSIGN REG op_bar_op REG amod2 
 	{
@@ -933,12 +910,12 @@ asm_1:
 	
 	  if ($4.r0 == 1 && $10.r0 == 2)
 	    {
-	      notethat("dsp32alu:  dregs = dregs .|. dregs , dregs = dregs .|. dregs (amod2)\n");
+	      notethat ("dsp32alu:  dregs = dregs .|. dregs , dregs = dregs .|. dregs (amod2)\n");
 	      $$ = DSP32ALU (1, 1, &$1, &$7, &$3, &$5, $12.s0, $12.x0, $12.r0);
 	    }
 	  else if ($4.r0 == 0 && $10.r0 == 3)
 	    {
-	      notethat("dsp32alu:  dregs = dregs .|. dregs , dregs = dregs .|. dregs (amod2)\n");
+	      notethat ("dsp32alu:  dregs = dregs .|. dregs , dregs = dregs .|. dregs (amod2)\n");
 	      $$ = DSP32ALU (1, 0, &$1, &$7, &$3, &$5, $12.s0, $12.x0, $12.r0);
 	    }
 	  else
@@ -953,13 +930,13 @@ asm_1:
 	    {
 	      if ($5.r0)
 		{
-		  notethat("dsp32alu: dregs = ABS dregs (v)\n");
+		  notethat ("dsp32alu: dregs = ABS dregs (v)\n");
 		  op = 6;
 		}
 	      else
 		{
-		  // Vector version of ABS
-		  notethat("dsp32alu: dregs = ABS dregs\n");
+		  /* Vector version of ABS.  */
+		  notethat ("dsp32alu: dregs = ABS dregs\n");
 		  op = 7;
 		}
 	      $$ = DSP32ALU (op, 0, 0, &$1, &$4, 0, 0, 0, 2);
@@ -967,30 +944,26 @@ asm_1:
 	  else
 	    return semantic_error ("Dregs expected");
 	}
-
-/* 4 rules compacted */
 	| a_assign ABS REG_A
 	{
-	  notethat("dsp32alu: Ax = ABS Ax\n");
+	  notethat ("dsp32alu: Ax = ABS Ax\n");
 	  $$ = DSP32ALU (16, IS_A1 ($1), 0, 0, 0, 0, 0, 0, IS_A1 ($3));
 	}
-
 	| A_ZERO_DOT_L ASSIGN HALF_REG
 	{
-	  if (IS_DREG_L($3))
+	  if (IS_DREG_L ($3))
 	    {
-	      notethat("dsp32alu: A0.l = reg_half\n");
+	      notethat ("dsp32alu: A0.l = reg_half\n");
 	      $$ = DSP32ALU (9, IS_H ($3), 0, 0, &$3, 0, 0, 0, 0);
 	    }
 	  else
 	    return semantic_error ("A0.l = Rx.l expected");
 	}
-
 	| A_ONE_DOT_L ASSIGN HALF_REG
 	{
-	  if (IS_DREG_L($3))
+	  if (IS_DREG_L ($3))
 	    {
-	      notethat("dsp32alu: A1.l = reg_half\n");
+	      notethat ("dsp32alu: A1.l = reg_half\n");
 	      $$ = DSP32ALU (9, IS_H ($3), 0, 0, &$3, 0, 0, 0, 2);
 	    }
 	  else
@@ -1001,7 +974,7 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_DREG ($5) && IS_DREG ($7))
 	    {
-	      notethat("dsp32shift: dregs = ALIGN8 (dregs , dregs )\n");
+	      notethat ("dsp32shift: dregs = ALIGN8 (dregs , dregs )\n");
 	      $$ = DSP32SHIFT (13, &$1, &$7, &$5, $3.r0, 0);
 	    }
 	  else
@@ -1018,7 +991,7 @@ asm_1:
 	    return semantic_error ("Bad dreg pair");
 	  else
 	    {
-	      notethat("dsp32alu: dregs = BYTEOP1P (dregs_pair , dregs_pair ) (T)\n");
+	      notethat ("dsp32alu: dregs = BYTEOP1P (dregs_pair , dregs_pair ) (T)\n");
 	      $$ = DSP32ALU (20, 0, 0, &$1, &$5, &$9, $13.s0, 0, $13.r0);
 	    }
 	}
@@ -1032,7 +1005,7 @@ asm_1:
 	    return semantic_error ("Bad dreg pair");
 	  else
 	    {
-	      notethat("dsp32alu: dregs = BYTEOP1P (dregs_pair , dregs_pair ) (T)\n");
+	      notethat ("dsp32alu: dregs = BYTEOP1P (dregs_pair , dregs_pair ) (T)\n");
 	      $$ = DSP32ALU (20, 0, 0, &$1, &$5, &$9, 0, 0, 0);
 	    }
 	}
@@ -1048,7 +1021,7 @@ asm_1:
 	    return semantic_error ("Bad dreg pair");
 	  else
 	    {
-	      notethat("dsp32alu: dregs = BYTEOP2P (dregs_pair , dregs_pair ) (rnd_op)\n");
+	      notethat ("dsp32alu: dregs = BYTEOP2P (dregs_pair , dregs_pair ) (rnd_op)\n");
 	      $$ = DSP32ALU (22, $13.r0, 0, &$1, &$5, &$9, $13.s0, $13.x0, $13.aop);
 	    }
 	}
@@ -1065,7 +1038,7 @@ asm_1:
 	    return semantic_error ("Bad dreg pair");
 	  else
 	    {
-	      notethat("dsp32alu: dregs = BYTEOP2P (dregs_pair , dregs_pair ) (rnd_op)\n");
+	      notethat ("dsp32alu: dregs = BYTEOP2P (dregs_pair , dregs_pair ) (rnd_op)\n");
 	      $$ = DSP32ALU (22, $13.r0, 0, &$1, &$5, &$9, $13.s0, 0, $13.x0);
 	    }
 	}
@@ -1081,7 +1054,7 @@ asm_1:
 	    return semantic_error ("Bad dreg pair");
 	  else
 	    {
-	      notethat("dsp32alu: dregs = BYTEOP3P (dregs_pair , dregs_pair ) (b3_op)\n");
+	      notethat ("dsp32alu: dregs = BYTEOP3P (dregs_pair , dregs_pair ) (b3_op)\n");
 	      $$ = DSP32ALU (23, $13.x0, 0, &$1, &$5, &$9, $13.s0, 0, 0);
 	    }
 	}
@@ -1090,8 +1063,8 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_DREG ($5) && IS_DREG ($7))
 	    {
-	      notethat("dsp32alu: dregs = BYTEPACK (dregs , dregs )\n");
-		$$ = DSP32ALU (24, 0, 0, &$1, &$5, &$7, 0, 0, 0);
+	      notethat ("dsp32alu: dregs = BYTEPACK (dregs , dregs )\n");
+	      $$ = DSP32ALU (24, 0, 0, &$1, &$5, &$7, 0, 0, 0);
 	    }
 	  else
 	    return semantic_error ("Dregs expected");
@@ -1100,9 +1073,9 @@ asm_1:
 	| HALF_REG ASSIGN HALF_REG ASSIGN SIGN LPAREN HALF_REG RPAREN STAR
 	  HALF_REG PLUS SIGN LPAREN HALF_REG RPAREN STAR HALF_REG 
 	{
-	  if (IS_HCOMPL($1, $3) && IS_HCOMPL($7, $14) && IS_HCOMPL($10, $17))
+	  if (IS_HCOMPL ($1, $3) && IS_HCOMPL ($7, $14) && IS_HCOMPL ($10, $17))
 	    {
-	      notethat("dsp32alu:	dregs_hi = dregs_lo ="
+	      notethat ("dsp32alu:	dregs_hi = dregs_lo ="
 		       "SIGN (dregs_hi) * dregs_hi + "
 		       "SIGN (dregs_lo) * dregs_lo \n");
 
@@ -1118,27 +1091,25 @@ asm_1:
 	      if ($6.aop == 0)
 		{
 	          /* No saturation flag specified, generate the 16 bit variant.  */
-		  notethat("COMP3op: dregs = dregs +- dregs\n");
+		  notethat ("COMP3op: dregs = dregs +- dregs\n");
 		  $$ = COMP3OP (&$1, &$3, &$5, $4.r0);
 		}
 	      else
 		{
 		 /* Saturation flag specified, generate the 32 bit variant.  */
-                 notethat("dsp32alu: dregs = dregs +- dregs (amod1)\n");
+                 notethat ("dsp32alu: dregs = dregs +- dregs (amod1)\n");
                  $$ = DSP32ALU (4, 0, 0, &$1, &$3, &$5, $6.s0, $6.x0, $4.r0);
 		}
 	    }
 	  else
 	    if (IS_PREG ($1) && IS_PREG ($3) && IS_PREG ($5) && $4.r0 == 0)
 	      {
-		notethat("COMP3op: pregs = pregs + pregs\n");
+		notethat ("COMP3op: pregs = pregs + pregs\n");
 		$$ = COMP3OP (&$1, &$3, &$5, 5);
 	      }
 	    else
 	      return semantic_error ("Dregs expected");
 	}
-
-/* 4 rules compacted */
 	| REG ASSIGN min_max LPAREN REG COMMA REG RPAREN vmod
 	{
 	  int op;
@@ -1150,7 +1121,7 @@ asm_1:
 	      else
 		op = 7;
 
-	      notethat("dsp32alu: dregs = {MIN|MAX} (dregs, dregs)\n");
+	      notethat ("dsp32alu: dregs = {MIN|MAX} (dregs, dregs)\n");
 	      $$ = DSP32ALU (op, 0, 0, &$1, &$5, &$7, 0, 0, $3.r0);
 	    }
 	  else
@@ -1159,35 +1130,32 @@ asm_1:
 
 	| a_assign MINUS REG_A
 	{
-	  notethat("dsp32alu: Ax = - Ax\n");
+	  notethat ("dsp32alu: Ax = - Ax\n");
 	  $$ = DSP32ALU (14, IS_A1 ($1), 0, 0, 0, 0, 0, 0, IS_A1 ($3));
 	}
-
-/* 16 rules compacted */
 	| HALF_REG ASSIGN HALF_REG plus_minus HALF_REG amod1
 	{
-	  notethat("dsp32alu: dregs_lo = dregs_lo +- dregs_lo (amod1)\n");
+	  notethat ("dsp32alu: dregs_lo = dregs_lo +- dregs_lo (amod1)\n");
 	  $$ = DSP32ALU (2 | $4.r0, IS_H ($1), 0, &$1, &$3, &$5,
 			 $6.s0, $6.x0, HL2 ($3, $5));
 	}
-
 	| a_assign a_assign expr
 	{
 	  if (EXPR_VALUE ($3) == 0 && !REG_SAME ($1, $2))
 	    {
-	      notethat("dsp32alu: A1 = A0 = 0\n");
+	      notethat ("dsp32alu: A1 = A0 = 0\n");
 	      $$ = DSP32ALU (8, 0, 0, 0, 0, 0, 0, 0, 2);
 	    }
 	  else
 	    return semantic_error ("Bad value, 0 expected");
 	}
 
-// saturating:
+	/* Saturating.  */
 	| a_assign REG_A LPAREN S RPAREN
 	{
 	  if (REG_SAME ($1, $2))
 	    {
-	      notethat("dsp32alu: Ax = Ax (S)\n");
+	      notethat ("dsp32alu: Ax = Ax (S)\n");
 	      $$ = DSP32ALU (8, 0, 0, 0, 0, 0, 1, 0, IS_A1 ($1));
 	    }
 	  else
@@ -1198,7 +1166,7 @@ asm_1:
 	{
 	  if (IS_DREG ($3))
 	    {
-	      notethat("dsp32alu: dregs_half = dregs (RND)\n");
+	      notethat ("dsp32alu: dregs_half = dregs (RND)\n");
 	      $$ = DSP32ALU (12, IS_H ($1), 0, &$1, &$3, 0, 0, 0, 3);
 	    }
 	  else
@@ -1209,7 +1177,7 @@ asm_1:
 	{
 	  if (IS_DREG ($3) && IS_DREG ($5))
 	    {
-	      notethat("dsp32alu: dregs_half = dregs (+-) dregs (RND12)\n");
+	      notethat ("dsp32alu: dregs_half = dregs (+-) dregs (RND12)\n");
 	      $$ = DSP32ALU (5, IS_H ($1), 0, &$1, &$3, &$5, 0, 0, $4.r0);
 	    }
 	  else
@@ -1220,7 +1188,7 @@ asm_1:
 	{
 	  if (IS_DREG ($3) && IS_DREG ($5))
 	    {
-	      notethat("dsp32alu: dregs_half = dregs -+ dregs (RND20)\n");
+	      notethat ("dsp32alu: dregs_half = dregs -+ dregs (RND20)\n");
 	      $$ = DSP32ALU (5, IS_H ($1), 0, &$1, &$3, &$5, 0, 1, $4.r0 | 2);
 	    }
 	  else
@@ -1231,7 +1199,7 @@ asm_1:
 	{
 	  if (!REG_SAME ($1, $2))
 	    {
-	      notethat("dsp32alu: An = Am\n");
+	      notethat ("dsp32alu: An = Am\n");
 	      $$ = DSP32ALU (8, 0, 0, 0, 0, 0, IS_A1 ($1), 0, 3);
 	    }
 	  else
@@ -1242,7 +1210,7 @@ asm_1:
 	{
 	  if (IS_DREG ($2))
 	    {
-	      notethat("dsp32alu: An = dregs\n");
+	      notethat ("dsp32alu: An = dregs\n");
 	      $$ = DSP32ALU (9, 0, 0, 0, &$2, 0, 1, 0, IS_A1 ($1) << 1);
 	    }
 	  else
@@ -1255,21 +1223,21 @@ asm_1:
 	    {
 	      if ($1.regno == REG_A0x && IS_DREG ($3))
 		{
-		  notethat("dsp32alu: A0.x = dregs_lo\n");
+		  notethat ("dsp32alu: A0.x = dregs_lo\n");
 		  $$ = DSP32ALU (9, 0, 0, 0, &$3, 0, 0, 0, 1);
 		}
 	      else if ($1.regno == REG_A1x && IS_DREG ($3))
 		{
-		  notethat("dsp32alu: A1.x = dregs_lo\n");
+		  notethat ("dsp32alu: A1.x = dregs_lo\n");
 		  $$ = DSP32ALU (9, 0, 0, 0, &$3, 0, 0, 0, 3);
 		}
 	      else if (IS_DREG ($1) && IS_DREG ($3))
 		{
-		  notethat("ALU2op: dregs = dregs_lo\n");
+		  notethat ("ALU2op: dregs = dregs_lo\n");
 		  $$ = ALU2OP (&$1, &$3, 10 | ($4.r0 ? 0: 1));   // dst, src, opc
 		}
 	      else
-		return register_mismatch();
+		return register_mismatch ();
 	    }
 	  else
 	    return semantic_error ("Low reg expected");
@@ -1277,7 +1245,7 @@ asm_1:
 
 	| HALF_REG ASSIGN expr
 	{
-	  notethat("LDIMMhalf: pregs_half = imm16\n");
+	  notethat ("LDIMMhalf: pregs_half = imm16\n");
 	  if (!IS_IMM ($3, 16) && !IS_UIMM ($3, 16))
 	    return semantic_error ("Constant out of range");
 	  $$ = LDIMMHALF_R (&$1, IS_H ($1), 0, 0, $3);
@@ -1285,7 +1253,7 @@ asm_1:
 
 	| a_assign expr
 	{
-	  notethat("dsp32alu: An = 0\n");
+	  notethat ("dsp32alu: An = 0\n");
 
 	  if (imm7 ($2) != 0)
 	    return semantic_error ("0 expected");
@@ -1301,19 +1269,18 @@ asm_1:
 	      // Default: (x)
 	      /* 7 bit immediate value if possible.
 		 We will check for that constant value for efficiency
-		 If it goes to reloc, it will be 16 bit
-	      */
-	      if (IS_CONST($3) && IS_IMM ($3, 7) && (IS_DREG ($1) || IS_PREG ($1)))
+		 If it goes to reloc, it will be 16 bit.  */
+	      if (IS_CONST ($3) && IS_IMM ($3, 7) && (IS_DREG ($1) || IS_PREG ($1)))
 		{
 		  /* if the expr is a relocation, generate it */
 		  if (IS_DREG ($1) && IS_IMM ($3, 7))
 		    {
-		      notethat("COMPI2opD: dregs = imm7 (x) \n");
+		      notethat ("COMPI2opD: dregs = imm7 (x) \n");
 		      $$ = COMPI2OPD (&$1, imm7 ($3), 0);
 		    }
 		  else if (IS_PREG ($1) && IS_IMM ($3, 7))
 		    {
-		      notethat("COMPI2opP: pregs = imm7 (x)\n");
+		      notethat ("COMPI2opP: pregs = imm7 (x)\n");
 		      $$ = COMPI2OPP (&$1, imm7 ($3), 0);
 		    }
 		  else
@@ -1321,17 +1288,17 @@ asm_1:
 		}
 	      else
 		{
-		  notethat("LDIMMhalf: regs = luimm16 (x)\n");
+		  notethat ("LDIMMhalf: regs = luimm16 (x)\n");
 		  /*      reg, H, S, Z  */
 		  $$ = LDIMMHALF_R5 (&$1, 0, 1, 0, $3);
 		} 
 	    }
 	  else
 	    {
-	      // (z)
-	      /* there is no 7 bit zero extended instruction */
-	      /* if the expr is a relocation, generate it */
-	      notethat("LDIMMhalf: regs = luimm16 (x)\n");
+	      /* (z)
+	      There is no 7 bit zero extended instruction.
+	      If the expr is a relocation, generate it.   */
+	      notethat ("LDIMMhalf: regs = luimm16 (x)\n");
 	      /*      reg, H, S, Z  */
 	      $$ = LDIMMHALF_R5 (&$1, 0, 0, 1, $3);
 	    }
@@ -1344,12 +1311,12 @@ asm_1:
 
 	  if (IS_DREG ($1) && $3.regno == REG_A0x)
 	    {
-	      notethat("dsp32alu: dregs_lo = A0.x\n");
+	      notethat ("dsp32alu: dregs_lo = A0.x\n");
 	      $$ = DSP32ALU (10, 0, 0, &$1, 0, 0, 0, 0, 0);
 	    }
 	  else if (IS_DREG ($1) && $3.regno == REG_A1x)
 	    {
-	      notethat("dsp32alu: dregs_lo = A1.x\n");
+	      notethat ("dsp32alu: dregs_lo = A1.x\n");
 	      $$ = DSP32ALU (10, 0, 0, &$1, 0, 0, 0, 0, 1);
 	    }
 	  else
@@ -1361,7 +1328,7 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3) && IS_DREG ($5))
 	    {
-	      notethat("dsp32alu: dregs = dregs .|. dregs (amod0)\n");
+	      notethat ("dsp32alu: dregs = dregs .|. dregs (amod0)\n");
 	      $$ = DSP32ALU (0, 0, 0, &$1, &$3, &$5, $6.s0, $6.x0, $4.r0);
 	    }
 	  else
@@ -1372,7 +1339,7 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3))
 	    {
-	      notethat("ALU2op: dregs = dregs_byte\n");
+	      notethat ("ALU2op: dregs = dregs_byte\n");
 	      $$ = ALU2OP (&$1, &$3, 12 | ($4.r0 ? 0: 1));   // dst, src, opc
 	    }
 	  else
@@ -1383,7 +1350,7 @@ asm_1:
 	{
 	  if (REG_SAME ($1, $3) && REG_SAME ($5, $7) && !REG_SAME ($1, $5))
 	    {
-	      notethat("dsp32alu: A1 = ABS A1 , A0 = ABS A0\n");
+	      notethat ("dsp32alu: A1 = ABS A1 , A0 = ABS A0\n");
 	      $$ = DSP32ALU (16, 0, 0, 0, 0, 0, 0, 0, 3);
 	    }
 	  else
@@ -1394,7 +1361,7 @@ asm_1:
 	{
 	  if (REG_SAME ($1, $3) && REG_SAME ($5, $7) && !REG_SAME ($1, $5))
 	    {
-	      notethat("dsp32alu: A1 = - A1 , A0 = - A0\n");
+	      notethat ("dsp32alu: A1 = - A1 , A0 = - A0\n");
 	      $$ = DSP32ALU (14, 0, 0, 0, 0, 0, 0, 0, 3);
 	    }
 	  else
@@ -1405,7 +1372,7 @@ asm_1:
 	{
 	  if (!IS_A1 ($1) && IS_A1 ($2))
 	    {
-	      notethat("dsp32alu: A0 -= A1\n");
+	      notethat ("dsp32alu: A0 -= A1\n");
 	      $$ = DSP32ALU (11, 0, 0, 0, 0, 0, $3.r0, 0, 3);
 	    }
 	  else
@@ -1416,12 +1383,12 @@ asm_1:
 	{
 	  if (IS_IREG ($1) && EXPR_VALUE ($3) == 4)
 	    {
-	      notethat("dagMODik: iregs -= 4\n");
+	      notethat ("dagMODik: iregs -= 4\n");
 	      $$ = DAGMODIK (&$1, 3);
 	    }
 	  else if (IS_IREG ($1) && EXPR_VALUE ($3) == 2)
 	    {
-	      notethat("dagMODik: iregs -= 2\n");
+	      notethat ("dagMODik: iregs -= 2\n");
 	      $$ = DAGMODIK (&$1, 1);
 	    }
 	  else
@@ -1432,13 +1399,13 @@ asm_1:
 	{
 	  if (IS_IREG ($1) && IS_MREG ($3))
 	    {
-	      notethat("dagMODim: iregs += mregs (opt_brev)\n");
+	      notethat ("dagMODim: iregs += mregs (opt_brev)\n");
 	      /*         i          m  op  br */
 	      $$ = DAGMODIM (&$1, &$3, 0, 1);
 	    }
 	  else if (IS_PREG ($1) && IS_PREG ($3))
 	    {
-	      notethat("PTR2op: pregs += pregs (BREV )\n");
+	      notethat ("PTR2op: pregs += pregs (BREV )\n");
 	      $$ = PTR2OP (&$1, &$3, 5);
 	    }
 	  else
@@ -1449,12 +1416,12 @@ asm_1:
 	{
 	  if (IS_IREG ($1) && IS_MREG ($3))
 	    {
-	      notethat("dagMODim: iregs -= mregs\n");
+	      notethat ("dagMODim: iregs -= mregs\n");
 	      $$ = DAGMODIM (&$1, &$3, 1, 0);
 	    }
 	  else if (IS_PREG ($1) && IS_PREG ($3))
 	    {
-	      notethat("PTR2op: pregs -= pregs\n");
+	      notethat ("PTR2op: pregs -= pregs\n");
 	      $$ = PTR2OP (&$1, &$3, 0);
 	    }
 	  else
@@ -1465,7 +1432,7 @@ asm_1:
 	{
 	  if (!IS_A1 ($1) && IS_A1 ($3))
 	    {
-	      notethat("dsp32alu: A0 += A1 (W32)\n");
+	      notethat ("dsp32alu: A0 += A1 (W32)\n");
 	      $$ = DSP32ALU (11, 0, 0, 0, 0, 0, $4.r0, 0, 2);
 	    }
 	  else
@@ -1476,7 +1443,7 @@ asm_1:
 	{
 	  if (IS_IREG ($1) && IS_MREG ($3))
 	    {
-	      notethat("dagMODim: iregs += mregs\n");
+	      notethat ("dagMODim: iregs += mregs\n");
 	      $$ = DAGMODIM (&$1, &$3, 0, 0);
 	    }
 	  else
@@ -1489,12 +1456,12 @@ asm_1:
 	    {
 	      if (EXPR_VALUE ($3) == 4)
 		{
-		  notethat("dagMODik: iregs += 4\n");
+		  notethat ("dagMODik: iregs += 4\n");
 		  $$ = DAGMODIK (&$1, 2);
 		}
 	      else if (EXPR_VALUE ($3) == 2)
 		{
-		  notethat("dagMODik: iregs += 2\n");
+		  notethat ("dagMODik: iregs += 2\n");
 		  $$ = DAGMODIK (&$1, 0);
 		}
 	      else
@@ -1502,12 +1469,12 @@ asm_1:
 	    }
 	  else if (IS_PREG ($1) && IS_IMM ($3, 7))
 	    {
-	      notethat("COMPI2opP: pregs += imm7\n");
+	      notethat ("COMPI2opP: pregs += imm7\n");
 	      $$ = COMPI2OPP (&$1, imm7 ($3), 1);
 	    }
 	  else if (IS_DREG ($1) && IS_IMM ($3, 7))
 	    {
-	      notethat("COMPI2opD: dregs += imm7\n");
+	      notethat ("COMPI2opD: dregs += imm7\n");
 	      $$ = COMPI2OPD (&$1, imm7 ($3), 1);
 	    }
 	  else
@@ -1518,7 +1485,7 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3))
 	    {
-	      notethat("ALU2op: dregs *= dregs\n");
+	      notethat ("ALU2op: dregs *= dregs\n");
 	      $$ = ALU2OP (&$1, &$3, 3);   // dst, src, opc
 	    }
 	  else
@@ -1533,7 +1500,7 @@ asm_1:
 	    return semantic_error ("Bad dreg pair");
 	  else
 	    {
-	      notethat("dsp32alu: SAA (dregs_pair , dregs_pair ) (aligndir)\n");
+	      notethat ("dsp32alu: SAA (dregs_pair , dregs_pair ) (aligndir)\n");
 	      $$ = DSP32ALU (18, 0, 0, 0, &$3, &$7, $11.r0, 0, 0);
 	    }
 	}
@@ -1542,7 +1509,7 @@ asm_1:
 	{
 	  if (REG_SAME ($1, $2) && REG_SAME ($7, $8) && !REG_SAME ($1, $7))
 	    {
-	      notethat("dsp32alu: A1 = A1 (S) , A0 = A0 (S)\n");
+	      notethat ("dsp32alu: A1 = A1 (S) , A0 = A0 (S)\n");
 	      $$ = DSP32ALU (8, 0, 0, 0, 0, 0, 1, 0, 2);
 	    }
 	  else
@@ -1556,12 +1523,12 @@ asm_1:
 	    {
 	      if (EXPR_VALUE ($9) == 1)
 		{
-		  notethat("ALU2op: dregs = (dregs + dregs) << 1\n");
+		  notethat ("ALU2op: dregs = (dregs + dregs) << 1\n");
 		  $$ = ALU2OP (&$1, &$6, 4);   // dst, src, opc
 		}
 	      else if (EXPR_VALUE ($9) == 2)
 		{
-		  notethat("ALU2op: dregs = (dregs + dregs) << 2\n");
+		  notethat ("ALU2op: dregs = (dregs + dregs) << 2\n");
 		  $$ = ALU2OP (&$1, &$6, 5);   // dst, src, opc
 		}
 	      else
@@ -1572,12 +1539,12 @@ asm_1:
 	    {
 	      if (EXPR_VALUE ($9) == 1)
 		{
-		  notethat("PTR2op: pregs = (pregs + pregs) << 1\n");
+		  notethat ("PTR2op: pregs = (pregs + pregs) << 1\n");
 		  $$ = PTR2OP (&$1, &$6, 6);
 		}
 	      else if (EXPR_VALUE ($9) == 2)
 		{
-		  notethat("PTR2op: pregs = (pregs + pregs) << 2\n");
+		  notethat ("PTR2op: pregs = (pregs + pregs) << 2\n");
 		  $$ = PTR2OP (&$1, &$6, 7);
 		}
 	      else
@@ -1587,46 +1554,39 @@ asm_1:
 	    return register_mismatch ();
 	}
 			
-				
-// }
-////////////////////////////////////////////////////////////////////////////
-// COMP3 CCFLAG
-// {
-
+/*  COMP3 CCFLAG  */
 	| REG ASSIGN REG BAR REG
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3) && IS_DREG ($5))
 	    {
-	      notethat("COMP3op: dregs = dregs | dregs\n");
+	      notethat ("COMP3op: dregs = dregs | dregs\n");
 	      $$ = COMP3OP (&$1, &$3, &$5, 3);
 	    }
 	  else
 	    return semantic_error ("Dregs expected");
 	}
-
 	| REG ASSIGN REG CARET REG
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3) && IS_DREG ($5))
 	    {
-	      notethat("COMP3op: dregs = dregs ^ dregs\n");
+	      notethat ("COMP3op: dregs = dregs ^ dregs\n");
 	      $$ = COMP3OP (&$1, &$3, &$5, 4);
 	    }
 	  else
 	    return semantic_error ("Dregs expected");
 	}
-
 	| REG ASSIGN REG PLUS LPAREN REG LESS_LESS expr RPAREN
 	{
 	  if (IS_PREG ($1) && IS_PREG ($3) && IS_PREG ($6))
 	    {
 	      if (EXPR_VALUE ($8) == 1)
 		{
-		  notethat("COMP3op: pregs = pregs + (pregs << 1)\n");
+		  notethat ("COMP3op: pregs = pregs + (pregs << 1)\n");
 		  $$ = COMP3OP (&$1, &$3, &$6, 6);
 		}
 	      else if (EXPR_VALUE ($8) == 2)
 		{
-		  notethat("COMP3op: pregs = pregs + (pregs << 2)\n");
+		  notethat ("COMP3op: pregs = pregs + (pregs << 2)\n");
 		  $$ = COMP3OP (&$1, &$3, &$6, 7);
 		}
 	      else
@@ -1635,98 +1595,86 @@ asm_1:
 	  else
 	    return semantic_error ("Dregs expected");
 	}
-
 	| CCREG ASSIGN REG_A _ASSIGN_ASSIGN REG_A
 	{
 	  if (!REG_SAME ($3, $5))
 	    {
-	      notethat("CCflag: CC = A0 == A1\n");
+	      notethat ("CCflag: CC = A0 == A1\n");
 	      $$ = CCFLAG (0, 0, 5, 0, 0);
 	    }
 	  else
 	    return semantic_error ("CC register expected");
 	}
-
 	| CCREG ASSIGN REG_A LESS_THAN REG_A
 	{
 	  if (!REG_SAME ($3, $5))
 	    {
-	      notethat("CCflag: CC = A0 < A1\n");
+	      notethat ("CCflag: CC = A0 < A1\n");
 	      $$ = CCFLAG (0, 0, 6, 0, 0);
 	    }
 	  else
 	    return register_mismatch ();
 	}
-
-/* 2 rules compacted */
 	| CCREG ASSIGN REG LESS_THAN REG iu_or_nothing
 	{
 	  if (REG_CLASS($3) == REG_CLASS($5))
 	    {
-	      notethat("CCflag: CC = dpregs < dpregs\n");
+	      notethat ("CCflag: CC = dpregs < dpregs\n");
 	      $$ = CCFLAG (&$3, $5.regno & CODE_MASK, $6.r0, 0, IS_PREG ($3) ? 1 : 0);
 	    }
 	  else
 	    return semantic_error ("Compare only of same register class");
 	}
-
-/* 2 rules compacted */
 	| CCREG ASSIGN REG LESS_THAN expr iu_or_nothing
 	{
 	  if (($6.r0 == 1 && IS_IMM ($5, 3))
 	      || ($6.r0 == 3 && IS_UIMM ($5, 3)))
 	    {
-	      notethat("CCflag: CC = dpregs < (u)imm3\n");
+	      notethat ("CCflag: CC = dpregs < (u)imm3\n");
 	      $$ = CCFLAG (&$3, imm3($5), $6.r0, 1, IS_PREG ($3) ? 1 : 0);
 	    }
 	  else
 	    return semantic_error ("Bad constant value");
 	}
-
 	| CCREG ASSIGN REG _ASSIGN_ASSIGN REG
 	{
 	  if (REG_CLASS($3) == REG_CLASS($5))
 	    {
-	      notethat("CCflag: CC = dpregs == dpregs\n");
+	      notethat ("CCflag: CC = dpregs == dpregs\n");
 	      $$ = CCFLAG (&$3, $5.regno & CODE_MASK, 0, 0, IS_PREG ($3) ? 1 : 0);
 	    } 
 	}
-
 	| CCREG ASSIGN REG _ASSIGN_ASSIGN expr
 	{
 	  if (IS_IMM ($5, 3))
 	    {
-	      notethat("CCflag: CC = dpregs == imm3\n");
+	      notethat ("CCflag: CC = dpregs == imm3\n");
 	      $$ = CCFLAG (&$3, imm3($5), 0, 1, IS_PREG ($3) ? 1 : 0);
 	    }
 	  else
 	    return semantic_error ("Bad constant range");
 	}
-
 	| CCREG ASSIGN REG_A _LESS_THAN_ASSIGN REG_A
 	{
 	  if (!REG_SAME ($3, $5))
 	    {
-	      notethat("CCflag: CC = A0 <= A1\n");
+	      notethat ("CCflag: CC = A0 <= A1\n");
 	      $$ = CCFLAG (0, 0, 7, 0, 0);
 	    }
 	  else
 	    return semantic_error ("CC register expected");
 	}
-
-/* 2 rules compacted */
 	| CCREG ASSIGN REG _LESS_THAN_ASSIGN REG iu_or_nothing
 	{
 	  if (REG_CLASS($3) == REG_CLASS($5))
 	    {
-	      notethat("CCflag: CC = pregs <= pregs (..)\n");
+	      notethat ("CCflag: CC = pregs <= pregs (..)\n");
 	      $$ = CCFLAG (&$3, $5.regno & CODE_MASK,
 			   1 + $6.r0, 0, IS_PREG ($3) ? 1 : 0);
 	    }
 	  else
 	    return semantic_error ("Compare only of same register class");
 	}
-
 	| CCREG ASSIGN REG _LESS_THAN_ASSIGN expr iu_or_nothing
 	{
 	  if (($6.r0 == 1 && IS_IMM ($5, 3))
@@ -1734,13 +1682,13 @@ asm_1:
 	    {
 	      if (IS_DREG ($3))
 		{
-		  notethat("CCflag: CC = dregs <= (u)imm3\n");
+		  notethat ("CCflag: CC = dregs <= (u)imm3\n");
 		  /*    x       y     opc     I     G   */
 		  $$ = CCFLAG (&$3, imm3($5), 1+$6.r0, 1, 0);
 		}
 	      else if (IS_PREG ($3))
 		{
-		  notethat("CCflag: CC = pregs <= (u)imm3\n");
+		  notethat ("CCflag: CC = pregs <= (u)imm3\n");
 		  /*    x       y     opc     I     G   */
 		  $$ = CCFLAG (&$3, imm3($5), 1+$6.r0, 1, 1);
 		}
@@ -1755,7 +1703,7 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3) && IS_DREG ($5))
 	    {
-	      notethat("COMP3op: dregs = dregs & dregs\n");
+	      notethat ("COMP3op: dregs = dregs & dregs\n");
 	      $$ = COMP3OP (&$1, &$3, &$5, 2);
 	    }
 	  else
@@ -1764,16 +1712,16 @@ asm_1:
 
 	| ccstat
 	{
-	  notethat("CC2stat operation\n");
-	  $$ = gen_cc2stat($1.r0, $1.x0, $1.s0); // cbit, op, D
+	  notethat ("CC2stat operation\n");
+	  $$ = bfin_gen_cc2stat ($1.r0, $1.x0, $1.s0);
 	}
 
 	| REG ASSIGN REG
 	{
 	  if (IS_ALLREG ($1) && IS_ALLREG ($3))
 	    {
-	      notethat("REGMV: allregs = allregs\n");
-	      $$ = gen_regmv(&$3, &$1);
+	      notethat ("REGMV: allregs = allregs\n");
+	      $$ = bfin_gen_regmv (&$3, &$1);
 	    }
 	  else
 	    return register_mismatch ();
@@ -1783,37 +1731,35 @@ asm_1:
 	{
 	  if (IS_DREG ($3))
 	    {
-	      notethat("CC2dreg: CC = dregs\n");
-	      $$ = gen_cc2dreg (1, &$3);
+	      notethat ("CC2dreg: CC = dregs\n");
+	      $$ = bfin_gen_cc2dreg (1, &$3);
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
 
 	| REG ASSIGN CCREG
 	{
 	  if (IS_DREG ($1))
 	    {
-	      notethat("CC2dreg: dregs = CC\n");
-	      $$ = gen_cc2dreg (0, &$1);
+	      notethat ("CC2dreg: dregs = CC\n");
+	      $$ = bfin_gen_cc2dreg (0, &$1);
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
 
 	| CCREG _ASSIGN_BANG CCREG
 	{
-	  notethat("CC2dreg: CC =! CC\n");
-	  $$ = gen_cc2dreg (3, 0);
+	  notethat ("CC2dreg: CC =! CC\n");
+	  $$ = bfin_gen_cc2dreg (3, 0);
 	}
 			
-////////////////////////////////////////////////////////////////////////////
-// DSPMULT
-// {
+/* DSPMULT */
 
 	| HALF_REG ASSIGN multfunc opt_mode
 	{
-	  notethat("dsp32mult: dregs_half = multfunc (opt_mode)\n");
+	  notethat ("dsp32mult: dregs_half = multfunc (opt_mode)\n");
 
 	  if (!IS_H ($1) && $4.MM)
 	    return semantic_error ("(M) not allowed with MAC0");
@@ -1834,13 +1780,13 @@ asm_1:
 
 	| REG ASSIGN multfunc opt_mode 
 	{
-	  // Odd registers can use (M)
+	  /* Odd registers can use (M).  */
 	  if (!IS_DREG ($1))
 	    return semantic_error ("Dreg expected");
 
-	  if (!IS_EVEN($1))
+	  if (!IS_EVEN ($1))
 	    {
-	      notethat("dsp32mult: dregs = multfunc (opt_mode)\n");
+	      notethat ("dsp32mult: dregs = multfunc (opt_mode)\n");
 
 	      $$ = DSP32MULT (0, $4.MM, $4.mod, 1, 1,
 			      IS_H ($3.s0), IS_H ($3.s1), 0, 0,
@@ -1848,7 +1794,7 @@ asm_1:
 	    }
 	  else if ($4.MM == 0)
 	    {
-	      notethat("dsp32mult: dregs = multfunc opt_mode\n");
+	      notethat ("dsp32mult: dregs = multfunc opt_mode\n");
 	      $$ = DSP32MULT (0, 0, $4.mod, 0, 1,
 			      0, 0, IS_H ($3.s0), IS_H ($3.s1), 
 			      &$1,  0, &$3.s0, &$3.s1, 1);
@@ -1862,12 +1808,12 @@ asm_1:
 	  if (!IS_DREG ($1) || !IS_DREG ($6)) 
 	    return semantic_error ("Dregs expected");
 
-	  if (check_multfuncs(&$3, &$8) < 0)
+	  if (check_multfuncs (&$3, &$8) < 0)
 	    return -1;
 
 	  if (IS_H ($1) && !IS_H ($6))
 	    {
-	      notethat("dsp32mult: dregs_hi = multfunc mxd_mod, "
+	      notethat ("dsp32mult: dregs_hi = multfunc mxd_mod, "
 		       "dregs_lo = multfunc opt_mode\n");
 	      $$ = DSP32MULT (0, $4.MM, $9.mod, 1, 0,
 			      IS_H ($3.s0), IS_H ($3.s1), IS_H ($8.s0), IS_H ($8.s1),
@@ -1888,12 +1834,12 @@ asm_1:
 	  if (!IS_DREG ($1) || !IS_DREG ($6)) 
 	    return semantic_error ("Dregs expected");
 
-	  if (check_multfuncs(&$3, &$8) < 0)
+	  if (check_multfuncs (&$3, &$8) < 0)
 	    return -1;
 
-	  notethat("dsp32mult: dregs = multfunc mxd_mod, "
+	  notethat ("dsp32mult: dregs = multfunc mxd_mod, "
 		   "dregs = multfunc opt_mode\n");
-	  if (IS_EVEN($1))
+	  if (IS_EVEN ($1))
 	    {
 	      if ($6.regno - $1.regno != 1 || $4.MM != 0)
 		return semantic_error ("Dest registers or mode mismatch");
@@ -1915,15 +1861,8 @@ asm_1:
 	    }
 	}
 
-// }
-////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////////
-// SHIFTs
-// {
-
-/* 2 rules compacted */
-	
+
+/* SHIFTs */
 	| a_assign ASHIFT REG_A BY HALF_REG
 	{
 	  if (!REG_SAME ($1, $3))
@@ -1931,7 +1870,7 @@ asm_1:
 
 	  if (IS_DREG ($5) && !IS_H ($5))
 	    {
-	      notethat("dsp32shift: A0 = ASHIFT A0 BY dregs_lo\n");
+	      notethat ("dsp32shift: A0 = ASHIFT A0 BY dregs_lo\n");
 	      $$ = DSP32SHIFT (3, 0, &$5, 0, 0, IS_A1 ($1));
 	    }
 	  else
@@ -1943,7 +1882,7 @@ asm_1:
 	{
 	  if (IS_DREG ($6) && !IS_H ($6))
 	    {
-	      notethat("dsp32shift: dregs_half = ASHIFT dregs_half BY dregs_lo\n");
+	      notethat ("dsp32shift: dregs_half = ASHIFT dregs_half BY dregs_lo\n");
 	      $$ = DSP32SHIFT (0, &$1, &$6, &$4, $7.s0, HL2 ($1, $4));
 	    }
 	  else
@@ -1958,7 +1897,7 @@ asm_1:
 
 	  if (IS_UIMM ($4, 5))
 	    {
-	      notethat("dsp32shiftimm: A0 = A0 << uimm5\n");
+	      notethat ("dsp32shiftimm: A0 = A0 << uimm5\n");
 	      $$ = DSP32SHIFTIMM (3, 0, imm5($4), 0, 0, IS_A1 ($1));
 	    }
 	  else
@@ -1972,13 +1911,13 @@ asm_1:
 	    {
 	      if ($6.r0)
 		{
-		  // vector ?
-		  notethat("dsp32shiftimm: dregs = dregs << expr (V, .)\n");
+		  /*  Vector?  */
+		  notethat ("dsp32shiftimm: dregs = dregs << expr (V, .)\n");
 		  $$ = DSP32SHIFTIMM (1, &$1, imm4 ($5), &$3, $6.s0 ? 1 : 2, 0);
 		}
 	      else
 		{
-		  notethat("dsp32shiftimm: dregs =  dregs << uimm5 (.)\n");
+		  notethat ("dsp32shiftimm: dregs =  dregs << uimm5 (.)\n");
 		  $$ = DSP32SHIFTIMM (2, &$1, imm6 ($5), &$3, $6.s0 ? 1 : 2, 0);
 		}
 	    }
@@ -1986,12 +1925,12 @@ asm_1:
 	    {
 	      if (EXPR_VALUE ($5) == 2)
 		{
-		  notethat("PTR2op: pregs = pregs << 2\n");
+		  notethat ("PTR2op: pregs = pregs << 2\n");
 		  $$ = PTR2OP (&$1, &$3, 1);
 		}
 	      else if (EXPR_VALUE ($5) == 1)
 		{
-		  notethat("COMP3op: pregs = pregs << 1\n");
+		  notethat ("COMP3op: pregs = pregs << 1\n");
 		  $$ = COMP3OP (&$1, &$3, &$3, 5);
 		}
 	      else
@@ -2000,13 +1939,11 @@ asm_1:
 	  else
 	    return semantic_error ("Bad shift value or register");
 	}
-
-/* 4 rules compacted */
 	| HALF_REG ASSIGN HALF_REG LESS_LESS expr
 	{
 	  if (IS_UIMM ($5, 4))
 	    {
-	      notethat("dsp32shiftimm: dregs_half = dregs_half << uimm4\n");
+	      notethat ("dsp32shiftimm: dregs_half = dregs_half << uimm4\n");
 	      $$ = DSP32SHIFTIMM (0x0, &$1, imm5 ($5), &$3, 2, HL2 ($1, $3));
 	    }
 	  else
@@ -2016,14 +1953,12 @@ asm_1:
 	{
 	  if (IS_UIMM ($5, 4))
 	    {
-	      notethat("dsp32shiftimm: dregs_half = dregs_half << uimm4\n");
+	      notethat ("dsp32shiftimm: dregs_half = dregs_half << uimm4\n");
 	      $$ = DSP32SHIFTIMM (0x0, &$1, imm5 ($5), &$3, $6.s0, HL2 ($1, $3));
 	    }
 	  else
 	    return semantic_error ("Bad shift value");
 	}
-
-/* 6 rules compacted */
 	| REG ASSIGN ASHIFT REG BY HALF_REG vsmod
 	{
 	  int op;
@@ -2033,14 +1968,14 @@ asm_1:
 	      if ($7.r0)
 		{
 		  op = 1;
-		  notethat("dsp32shift: dregs = ASHIFT dregs BY "
+		  notethat ("dsp32shift: dregs = ASHIFT dregs BY "
 			   "dregs_lo (V, .)\n");
 		}
 	      else
 		{
 		  
 		  op = 2;
-		  notethat("dsp32shift: dregs = ASHIFT dregs BY dregs_lo (.)\n");
+		  notethat ("dsp32shift: dregs = ASHIFT dregs BY dregs_lo (.)\n");
 		}
 	      $$ = DSP32SHIFT (op, &$1, &$6, &$4, $7.s0, 0);
 	    }
@@ -2048,13 +1983,12 @@ asm_1:
 	    return semantic_error ("Dregs expected");
 	}
 
-// EXPADJ
-/* 2 rules compacted */
+/*  EXPADJ */
 	| HALF_REG ASSIGN EXPADJ LPAREN REG COMMA HALF_REG RPAREN vmod
 	{
-	  if (IS_DREG_L($1) && IS_DREG_L($5) && IS_DREG_L($7))
+	  if (IS_DREG_L ($1) && IS_DREG_L ($5) && IS_DREG_L ($7))
 	    {
-	      notethat("dsp32shift: dregs_lo = EXPADJ (dregs , dregs_lo )\n");
+	      notethat ("dsp32shift: dregs_lo = EXPADJ (dregs , dregs_lo )\n");
 	      $$ = DSP32SHIFT (7, &$1, &$7, &$5, $9.r0, 0);
 	    }
 	  else
@@ -2064,27 +1998,27 @@ asm_1:
 
 	| HALF_REG ASSIGN EXPADJ LPAREN HALF_REG COMMA HALF_REG RPAREN
 	{
-	  if (IS_DREG_L($1) && IS_DREG_L($5) && IS_DREG_L($7))
+	  if (IS_DREG_L ($1) && IS_DREG_L ($5) && IS_DREG_L ($7))
 	    {
-	      notethat("dsp32shift: dregs_lo = EXPADJ (dregs_lo, dregs_lo)\n");
+	      notethat ("dsp32shift: dregs_lo = EXPADJ (dregs_lo, dregs_lo)\n");
 	      $$ = DSP32SHIFT (7, &$1, &$7, &$5, 2, 0);
 	    }
-	  else if (IS_DREG_L($1) && IS_DREG_H($5) && IS_DREG_L($7))
+	  else if (IS_DREG_L ($1) && IS_DREG_H ($5) && IS_DREG_L ($7))
 	    {
-	      notethat("dsp32shift: dregs_lo = EXPADJ (dregs_hi, dregs_lo)\n");
+	      notethat ("dsp32shift: dregs_lo = EXPADJ (dregs_hi, dregs_lo)\n");
 	      $$ = DSP32SHIFT (7, &$1, &$7, &$5, 3, 0);
 	    }
 	  else
 	    return semantic_error ("Bad shift value or register");
 	}
 
-// DEPOSIT
+/* DEPOSIT */
 
 	| REG ASSIGN DEPOSIT LPAREN REG COMMA REG RPAREN
 	{
 	  if (IS_DREG ($1) && IS_DREG ($5) && IS_DREG ($7))
 	    {
-	      notethat("dsp32shift: dregs = DEPOSIT (dregs , dregs )\n");
+	      notethat ("dsp32shift: dregs = DEPOSIT (dregs , dregs )\n");
 	      $$ = DSP32SHIFT (10, &$1, &$7, &$5, 2, 0);
 	    }
 	  else
@@ -2095,7 +2029,7 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_DREG ($5) && IS_DREG ($7))
 	    {
-	      notethat("dsp32shift: dregs = DEPOSIT (dregs , dregs ) (X)\n");
+	      notethat ("dsp32shift: dregs = DEPOSIT (dregs , dregs ) (X)\n");
 	      $$ = DSP32SHIFT (10, &$1, &$7, &$5, 3, 0);
 	    }
 	  else
@@ -2104,9 +2038,9 @@ asm_1:
 
 	| REG ASSIGN EXTRACT LPAREN REG COMMA HALF_REG RPAREN xpmod 
 	{
-	  if (IS_DREG ($1) && IS_DREG ($5) && IS_DREG_L($7))
+	  if (IS_DREG ($1) && IS_DREG ($5) && IS_DREG_L ($7))
 	    {
-	      notethat("dsp32shift: dregs = EXTRACT (dregs, dregs_lo ) (.)\n");
+	      notethat ("dsp32shift: dregs = EXTRACT (dregs, dregs_lo ) (.)\n");
 	      $$ = DSP32SHIFT (10, &$1, &$7, &$5, $9.r0, 0);
 	    }
 	  else
@@ -2120,19 +2054,17 @@ asm_1:
 
 	  if (IS_UIMM ($4, 5))
 	    {
-	      notethat("dsp32shiftimm: Ax = Ax >>> uimm5\n");
+	      notethat ("dsp32shiftimm: Ax = Ax >>> uimm5\n");
 	      $$ = DSP32SHIFTIMM (3, 0, -imm6($4), 0, 0, IS_A1 ($1));
 	    }
 	  else
 	    return semantic_error ("Shift value range error");
 	}
-
-/* 2 rules compacted */
 	| a_assign LSHIFT REG_A BY HALF_REG
 	{
-	  if (REG_SAME ($1, $3) && IS_DREG_L($5))
+	  if (REG_SAME ($1, $3) && IS_DREG_L ($5))
 	    {
-	      notethat("dsp32shift: Ax = LSHIFT Ax BY dregs_lo\n");
+	      notethat ("dsp32shift: Ax = LSHIFT Ax BY dregs_lo\n");
 	      $$ = DSP32SHIFT (3, 0, &$5, 0, 1, IS_A1 ($1));
 	    }
 	  else
@@ -2141,9 +2073,9 @@ asm_1:
 
 	| HALF_REG ASSIGN LSHIFT HALF_REG BY HALF_REG
 	{
-	  if (IS_DREG ($1) && IS_DREG ($4) && IS_DREG_L($6))
+	  if (IS_DREG ($1) && IS_DREG ($4) && IS_DREG_L ($6))
 	    {
-	      notethat("dsp32shift: dregs_lo = LSHIFT dregs_hi BY dregs_lo\n");
+	      notethat ("dsp32shift: dregs_lo = LSHIFT dregs_hi BY dregs_lo\n");
 	      $$ = DSP32SHIFT (0, &$1, &$6, &$4, 2, HL2 ($1, $4));
 	    }
 	  else
@@ -2152,9 +2084,9 @@ asm_1:
 
 	| REG ASSIGN LSHIFT REG BY HALF_REG vmod
 	{
-	  if (IS_DREG ($1) && IS_DREG ($4) && IS_DREG_L($6))
+	  if (IS_DREG ($1) && IS_DREG ($4) && IS_DREG_L ($6))
 	    {
-	      notethat("dsp32shift: dregs = LSHIFT dregs BY dregs_lo (V )\n");
+	      notethat ("dsp32shift: dregs = LSHIFT dregs BY dregs_lo (V )\n");
 	      $$ = DSP32SHIFT ($7.r0 ? 1: 2, &$1, &$6, &$4, 2, 0);
 	    }
 	  else
@@ -2163,9 +2095,9 @@ asm_1:
 
 	| REG ASSIGN SHIFT REG BY HALF_REG
 	{
-	  if (IS_DREG ($1) && IS_DREG ($4) && IS_DREG_L($6))
+	  if (IS_DREG ($1) && IS_DREG ($4) && IS_DREG_L ($6))
 	    {
-	      notethat("dsp32shift: dregs = SHIFT dregs BY dregs_lo\n");
+	      notethat ("dsp32shift: dregs = SHIFT dregs BY dregs_lo\n");
 	      $$ = DSP32SHIFT (2, &$1, &$6, &$4, 2, 0);
 	    }
 	  else
@@ -2174,9 +2106,9 @@ asm_1:
 
 	| a_assign REG_A GREATER_GREATER expr
 	{
-	  if (REG_SAME ($1, $2) && IS_IMM ($4, 6)>=0 )
+	  if (REG_SAME ($1, $2) && IS_IMM ($4, 6) >= 0)
 	    {
-	      notethat("dsp32shiftimm: Ax = Ax >> imm6\n");
+	      notethat ("dsp32shiftimm: Ax = Ax >> imm6\n");
 	      $$ = DSP32SHIFTIMM (3, 0, -imm6 ($4), 0, 1, IS_A1 ($1));
 	    }
 	  else
@@ -2189,51 +2121,48 @@ asm_1:
 	    {
 	      if (IS_DREG ($1) && IS_DREG ($3) && IS_UIMM ($5, 5))
 		{
-		  notethat("dsp32shiftimm: dregs = dregs >> uimm5 (V)\n");
+		  notethat ("dsp32shiftimm: dregs = dregs >> uimm5 (V)\n");
 		  $$ = DSP32SHIFTIMM (1, &$1, -uimm5 ($5), &$3, 2, 0);
 		}
 	      else
-		return register_mismatch();
+		return register_mismatch ();
 	    }
 	  else
 	    {
 	      if (IS_DREG ($1) && IS_DREG ($3) && IS_UIMM ($5, 5))
 		{
-		  notethat("dsp32shiftimm: dregs = dregs >> uimm5\n");
+		  notethat ("dsp32shiftimm: dregs = dregs >> uimm5\n");
 		  $$ = DSP32SHIFTIMM (2, &$1, -imm6($5), &$3, 2, 0);
 		}
 	      else if (IS_PREG ($1) && IS_PREG ($3) && EXPR_VALUE ($5) == 2)
 		{
-		  notethat("PTR2op: pregs = pregs >> 2\n");
+		  notethat ("PTR2op: pregs = pregs >> 2\n");
 		  $$ = PTR2OP (&$1, &$3, 3);
 		}
 	      else if (IS_PREG ($1) && IS_PREG ($3) && EXPR_VALUE ($5) == 1)
 		{
-		  notethat("PTR2op: pregs = pregs >> 1\n");
+		  notethat ("PTR2op: pregs = pregs >> 1\n");
 		  $$ = PTR2OP (&$1, &$3, 4);
 		}
 	      else
-		return register_mismatch();
+		return register_mismatch ();
 	    }
 	}
-
-/* 4 rules compacted */
 	| HALF_REG ASSIGN HALF_REG GREATER_GREATER expr
 	{
 	  if (IS_UIMM ($5, 5))
 	    {
-	      notethat("dsp32shiftimm:  dregs_half =  dregs_half >> uimm5\n");
+	      notethat ("dsp32shiftimm:  dregs_half =  dregs_half >> uimm5\n");
 	      $$ = DSP32SHIFTIMM (0, &$1, -uimm5 ($5), &$3, 2, HL2 ($1, $3));
 	    }
 	  else
 	    return register_mismatch ();
 	}
-
 	| HALF_REG ASSIGN HALF_REG _GREATER_GREATER_GREATER expr smod
 	{
 	  if (IS_UIMM ($5, 5))
 	    {
-	      notethat("dsp32shiftimm: dregs_half = dregs_half >>> uimm5\n");
+	      notethat ("dsp32shiftimm: dregs_half = dregs_half >>> uimm5\n");
 	      $$ = DSP32SHIFTIMM (0, &$1, -uimm5 ($5), &$3,
 				  $6.s0, HL2 ($1, $3));
 	    }
@@ -2248,13 +2177,13 @@ asm_1:
 	    {
 	      if ($6.r0)
 		{
-		  // Vector ?
-		  notethat("dsp32shiftimm: dregs  =  dregs >>> uimm5 (V, .)\n");
+		  /* Vector ?  */
+		  notethat ("dsp32shiftimm: dregs  =  dregs >>> uimm5 (V, .)\n");
 		  $$ = DSP32SHIFTIMM (1, &$1, -uimm5 ($5), &$3, $6.s0, 0);
 		}
 	      else
 		{
-		  notethat("dsp32shiftimm: dregs  =  dregs >>> uimm5 (.)\n");
+		  notethat ("dsp32shiftimm: dregs  =  dregs >>> uimm5 (.)\n");
 		  $$ = DSP32SHIFTIMM (2, &$1, -uimm5 ($5), &$3, $6.s0, 0);
 		}
 	    }
@@ -2264,9 +2193,9 @@ asm_1:
 
 	| HALF_REG ASSIGN ONES REG
 	{
-	  if (IS_DREG_L($1) && IS_DREG ($4))
+	  if (IS_DREG_L ($1) && IS_DREG ($4))
 	    {
-	      notethat("dsp32shift: dregs_lo = ONES dregs\n");
+	      notethat ("dsp32shift: dregs_lo = ONES dregs\n");
 	      $$ = DSP32SHIFT (6, &$1, 0, &$4, 3, 0);
 	    }
 	  else
@@ -2278,7 +2207,7 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_DREG ($5) && IS_DREG ($7))
 	    {
-	      notethat("dsp32shift: dregs = PACK (dregs_hi , dregs_hi )\n");
+	      notethat ("dsp32shift: dregs = PACK (dregs_hi , dregs_hi )\n");
 	      $$ = DSP32SHIFT (4, &$1, &$7, &$5, HL2 ($5, $7), 0);
 	    }
 	  else
@@ -2291,7 +2220,7 @@ asm_1:
 	      && $7.regno == REG_A0
 	      && IS_DREG ($9) && !IS_H ($1) && !IS_A1 ($7))
 	    {
-	      notethat("dsp32shift: dregs_lo = CC = BXORSHIFT (A0 , dregs )\n");
+	      notethat ("dsp32shift: dregs_lo = CC = BXORSHIFT (A0 , dregs )\n");
 	      $$ = DSP32SHIFT (11, &$1, &$9, 0, 0, 0);
 	    }
 	  else
@@ -2304,55 +2233,55 @@ asm_1:
 	      && $7.regno == REG_A0
 	      && IS_DREG ($9) && !IS_H ($1) && !IS_A1 ($7))
 	    {
-	      notethat("dsp32shift: dregs_lo = CC = BXOR (A0 , dregs)\n");
+	      notethat ("dsp32shift: dregs_lo = CC = BXOR (A0 , dregs)\n");
 	      $$ = DSP32SHIFT (11, &$1, &$9, 0, 1, 0);
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
 
 	| HALF_REG ASSIGN CCREG ASSIGN BXOR LPAREN REG_A COMMA REG_A COMMA CCREG RPAREN
 	{
 	  if (IS_DREG ($1) && !IS_H ($1) && !REG_SAME ($7, $9))
 	    {
-	      notethat("dsp32shift: dregs_lo = CC = BXOR (A0 , A1 , CC)\n");
+	      notethat ("dsp32shift: dregs_lo = CC = BXOR (A0 , A1 , CC)\n");
 	      $$ = DSP32SHIFT (12, &$1, 0, 0, 1, 0);
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
 
 	| a_assign ROT REG_A BY HALF_REG
 	{
-	  if (REG_SAME ($1, $3) && IS_DREG_L($5))
+	  if (REG_SAME ($1, $3) && IS_DREG_L ($5))
 	    {
-	      notethat("dsp32shift: Ax = ROT Ax BY dregs_lo\n");
+	      notethat ("dsp32shift: Ax = ROT Ax BY dregs_lo\n");
 	      $$ = DSP32SHIFT (3, 0, &$5, 0, 2, IS_A1 ($1));
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
 
 	| REG ASSIGN ROT REG BY HALF_REG
 	{
-	  if (IS_DREG ($1) && IS_DREG ($4) && IS_DREG_L($6))
+	  if (IS_DREG ($1) && IS_DREG ($4) && IS_DREG_L ($6))
 	    {
-	      notethat("dsp32shift: dregs = ROT dregs BY dregs_lo\n");
+	      notethat ("dsp32shift: dregs = ROT dregs BY dregs_lo\n");
 	      $$ = DSP32SHIFT (2, &$1, &$6, &$4, 3, 0);
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
 
 	| a_assign ROT REG_A BY expr 
 	{
 	  if (IS_IMM ($5, 6))
 	    {
-	      notethat("dsp32shiftimm: An = ROT An BY imm6\n");
+	      notethat ("dsp32shiftimm: An = ROT An BY imm6\n");
 	      $$ = DSP32SHIFTIMM (3, 0, imm6($5), 0, 2, IS_A1 ($1));
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
 
 	| REG ASSIGN ROT REG BY expr 
@@ -2362,81 +2291,81 @@ asm_1:
 	      $$ = DSP32SHIFTIMM (2, &$1, imm6 ($6), &$4, 3, IS_A1 ($1));
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
 
 	| HALF_REG ASSIGN SIGNBITS REG_A
 	{
-	  if (IS_DREG_L($1))
+	  if (IS_DREG_L ($1))
 	    {
-	      notethat("dsp32shift: dregs_lo = SIGNBITS An\n");
+	      notethat ("dsp32shift: dregs_lo = SIGNBITS An\n");
 	      $$ = DSP32SHIFT (6, &$1, 0, 0, IS_A1 ($4), 0);
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
 
 	| HALF_REG ASSIGN SIGNBITS REG
 	{
-	  if (IS_DREG_L($1) && IS_DREG ($4))
+	  if (IS_DREG_L ($1) && IS_DREG ($4))
 	    {
-	      notethat("dsp32shift: dregs_lo = SIGNBITS dregs\n");
+	      notethat ("dsp32shift: dregs_lo = SIGNBITS dregs\n");
 	      $$ = DSP32SHIFT (5, &$1, 0, &$4, 0, 0);
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
 
 	| HALF_REG ASSIGN SIGNBITS HALF_REG
 	{
-	  if (IS_DREG_L($1))
+	  if (IS_DREG_L ($1))
 	    {
-	      notethat("dsp32shift: dregs_lo = SIGNBITS dregs_lo\n");
+	      notethat ("dsp32shift: dregs_lo = SIGNBITS dregs_lo\n");
 	      $$ = DSP32SHIFT (5, &$1, 0, &$4, 1 + IS_H ($4), 0);
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
 	
 	// Silly. The ASR bit is just inverted here.
 	| HALF_REG ASSIGN VIT_MAX LPAREN REG RPAREN asr_asl 
 	{
-	  if (IS_DREG_L($1) && IS_DREG ($5))
+	  if (IS_DREG_L ($1) && IS_DREG ($5))
 	    {
-	      notethat("dsp32shift: dregs_lo = VIT_MAX (dregs) (..)\n");
+	      notethat ("dsp32shift: dregs_lo = VIT_MAX (dregs) (..)\n");
 	      $$ = DSP32SHIFT (9, &$1, 0, &$5, ($7.r0 ? 0 : 1), 0);
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
 
 	| REG ASSIGN VIT_MAX LPAREN REG COMMA REG RPAREN asr_asl 
 	{
 	  if (IS_DREG ($1) && IS_DREG ($5) && IS_DREG ($7))
 	    {
-	      notethat("dsp32shift: dregs = VIT_MAX (dregs, dregs) (ASR)\n");
+	      notethat ("dsp32shift: dregs = VIT_MAX (dregs, dregs) (ASR)\n");
 	      $$ = DSP32SHIFT (9, &$1, &$7, &$5, 2 | ($9.r0 ? 0 : 1), 0);
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
 
 	| BITMUX LPAREN REG COMMA REG COMMA REG_A RPAREN asr_asl
 	{
 	  if (IS_DREG ($3) && IS_DREG ($5) && !IS_A1 ($7))
 	    {
-	      notethat("dsp32shift: BITMUX (dregs , dregs , A0) (ASR)\n");
+	      notethat ("dsp32shift: BITMUX (dregs , dregs , A0) (ASR)\n");
 	      $$ = DSP32SHIFT (8, 0, &$3, &$5, $9.r0, 0);
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
 
 	| a_assign BXORSHIFT LPAREN REG_A COMMA REG_A COMMA CCREG RPAREN
 	{
 	  if (!IS_A1 ($1) && !IS_A1 ($4) && IS_A1 ($6))
 	    {
-	      notethat("dsp32shift: A0 = BXORSHIFT (A0 , A1 , CC )\n");
+	      notethat ("dsp32shift: A0 = BXORSHIFT (A0 , A1 , CC )\n");
 	      $$ = DSP32SHIFT (12, 0, 0, 0, 0, 0);
 	    }
 	  else
@@ -2454,11 +2383,11 @@ asm_1:
 	{
 	  if (IS_DREG ($3) && IS_UIMM ($5, 5))
 	    {
-	      notethat("LOGI2op: BITCLR (dregs , uimm5 )\n");
+	      notethat ("LOGI2op: BITCLR (dregs , uimm5 )\n");
 	      $$ = LOGI2OP ($3, uimm5 ($5), 4);
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
 
 // LOGI2op:	BITSET (dregs , uimm5 )
@@ -2466,11 +2395,11 @@ asm_1:
 	{
 	  if (IS_DREG ($3) && IS_UIMM ($5, 5))
 	    {
-	      notethat("LOGI2op: BITCLR (dregs , uimm5 )\n");
+	      notethat ("LOGI2op: BITCLR (dregs , uimm5 )\n");
 	      $$ = LOGI2OP ($3, uimm5 ($5), 2);
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
 
 // LOGI2op:	BITTGL (dregs , uimm5 )
@@ -2478,18 +2407,18 @@ asm_1:
 	{
 	  if (IS_DREG ($3) && IS_UIMM ($5, 5))
 	    {
-	      notethat("LOGI2op: BITCLR (dregs , uimm5 )\n");
+	      notethat ("LOGI2op: BITCLR (dregs , uimm5 )\n");
 	      $$ = LOGI2OP ($3, uimm5 ($5), 3);
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
 
 	| CCREG _ASSIGN_BANG BITTST LPAREN REG COMMA expr RPAREN
 	{
 	  if (IS_DREG ($5) && IS_UIMM ($7, 5))
 	    {
-	      notethat("LOGI2op: CC =! BITTST (dregs , uimm5 )\n");
+	      notethat ("LOGI2op: CC =! BITTST (dregs , uimm5 )\n");
 	      $$ = LOGI2OP ($5, uimm5 ($7), 0);
 	    }
 	  else
@@ -2500,7 +2429,7 @@ asm_1:
 	{
 	  if (IS_DREG ($5) && IS_UIMM ($7, 5))
 	    {
-	      notethat("LOGI2op: CC = BITTST (dregs , uimm5 )\n");
+	      notethat ("LOGI2op: CC = BITTST (dregs , uimm5 )\n");
 	      $$ = LOGI2OP ($5, uimm5 ($7), 1);
 	    }
 	  else
@@ -2512,11 +2441,11 @@ asm_1:
 	  if ((IS_DREG ($4) || IS_PREG ($4))
 	      && (IS_DREG ($6) || IS_PREG ($6)))
 	    {
-	      notethat("ccMV: IF ! CC gregs = gregs\n");
+	      notethat ("ccMV: IF ! CC gregs = gregs\n");
 	      $$ = CCMV (&$6, &$4, 0);
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
 
 	| IF CCREG REG ASSIGN REG
@@ -2524,18 +2453,18 @@ asm_1:
 	  if ((IS_DREG ($5) || IS_PREG ($5))
 	      && (IS_DREG ($3) || IS_PREG ($3)))
 	    {
-	      notethat("ccMV: IF CC gregs = gregs\n");
+	      notethat ("ccMV: IF CC gregs = gregs\n");
 	      $$ = CCMV (&$5, &$3, 1);
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
 
 	| IF BANG CCREG JUMP expr
 	{
 	  if (IS_PCREL10 ($5))
 	    {
-	      notethat("BRCC: IF !CC JUMP  pcrel11m2\n");
+	      notethat ("BRCC: IF !CC JUMP  pcrel11m2\n");
 	      $$ = BRCC (0, 0, $5);
 	    }
 	  else
@@ -2546,7 +2475,7 @@ asm_1:
 	{
 	  if (IS_PCREL10 ($5))
 	    {
-	      notethat("BRCC: IF !CC JUMP  pcrel11m2\n");
+	      notethat ("BRCC: IF !CC JUMP  pcrel11m2\n");
 	      $$ = BRCC (0, 1, $5); // use branch prediction
 	    }
 	  else
@@ -2557,7 +2486,7 @@ asm_1:
 	{
 	  if (IS_PCREL10 ($4))
 	    {
-	      notethat("BRCC: IF CC JUMP  pcrel11m2\n");
+	      notethat ("BRCC: IF CC JUMP  pcrel11m2\n");
 	      $$ = BRCC (1, 0, $4); // use branch prediction
 	    }
 	  else
@@ -2568,7 +2497,7 @@ asm_1:
 	{
 	  if (IS_PCREL10 ($4))
 	    {
-	      notethat("BRCC: IF !CC JUMP  pcrel11m2\n");
+	      notethat ("BRCC: IF !CC JUMP  pcrel11m2\n");
 	      $$ = BRCC (1, 1, $4); // use branch prediction
 	    }
 	  else
@@ -2576,61 +2505,61 @@ asm_1:
 	}
 	| NOP
 	{
-	  notethat("ProgCtrl: NOP\n");
+	  notethat ("ProgCtrl: NOP\n");
 	  $$ = PROGCTRL (0, 0);
 	}
 
 	| RTS
 	{
-	  notethat("ProgCtrl: RTS\n");
+	  notethat ("ProgCtrl: RTS\n");
 	  $$ = PROGCTRL (1, 0);
 	}
 
 	| RTI
 	{
-	  notethat("ProgCtrl: RTI\n");
+	  notethat ("ProgCtrl: RTI\n");
 	  $$ = PROGCTRL (1, 1);
 	}
 
 	| RTX
 	{
-	  notethat("ProgCtrl: RTX\n");
+	  notethat ("ProgCtrl: RTX\n");
 	  $$ = PROGCTRL (1, 2);
 	}
 
 	| RTN
 	{
-	  notethat("ProgCtrl: RTN\n");
+	  notethat ("ProgCtrl: RTN\n");
 	  $$ = PROGCTRL (1, 3);
 	}
 
 	| RTE
 	{
-	  notethat("ProgCtrl: RTE\n");
+	  notethat ("ProgCtrl: RTE\n");
 	  $$ = PROGCTRL (1, 4);
 	}
 
 	| IDLE
 	{
-	  notethat("ProgCtrl: IDLE\n");
+	  notethat ("ProgCtrl: IDLE\n");
 	  $$ = PROGCTRL (2, 0);
 	}
 
 	| CSYNC
 	{
-	  notethat("ProgCtrl: CSYNC\n");
+	  notethat ("ProgCtrl: CSYNC\n");
 	  $$ = PROGCTRL (2, 3);
 	}
 
 	| SSYNC
 	{
-	  notethat("ProgCtrl: SSYNC\n");
+	  notethat ("ProgCtrl: SSYNC\n");
 	  $$ = PROGCTRL (2, 4);
 	}
 
 	| EMUEXCPT
 	{
-	  notethat("ProgCtrl: EMUEXCPT\n");
+	  notethat ("ProgCtrl: EMUEXCPT\n");
 	  $$ = PROGCTRL (2, 5);
 	}
 
@@ -2638,7 +2567,7 @@ asm_1:
 	{
 	  if (IS_DREG ($2))
 	    {
-	      notethat("ProgCtrl: CLI dregs\n");
+	      notethat ("ProgCtrl: CLI dregs\n");
 	      $$ = PROGCTRL (3, $2.regno & CODE_MASK);
 	    }
 	  else
@@ -2649,7 +2578,7 @@ asm_1:
 	{
 	  if (IS_DREG ($2))
 	    {
-	      notethat("ProgCtrl: STI dregs\n");
+	      notethat ("ProgCtrl: STI dregs\n");
 	      $$ = PROGCTRL (4, $2.regno & CODE_MASK);
 	    }
 	  else
@@ -2660,7 +2589,7 @@ asm_1:
 	{
 	  if (IS_PREG ($3))
 	    {
-	      notethat("ProgCtrl: JUMP (pregs )\n");
+	      notethat ("ProgCtrl: JUMP (pregs )\n");
 	      $$ = PROGCTRL (5, $3.regno & CODE_MASK);
 	    }
 	  else
@@ -2671,7 +2600,7 @@ asm_1:
 	{
 	  if (IS_PREG ($3))
 	    {
-	      notethat("ProgCtrl: CALL (pregs )\n");
+	      notethat ("ProgCtrl: CALL (pregs )\n");
 	      $$ = PROGCTRL (6, $3.regno & CODE_MASK);
 	    }
 	  else
@@ -2682,7 +2611,7 @@ asm_1:
 	{
 	  if (IS_PREG ($5))
 	    {
-	      notethat("ProgCtrl: CALL (PC + pregs )\n");
+	      notethat ("ProgCtrl: CALL (PC + pregs )\n");
 	      $$ = PROGCTRL (7, $5.regno & CODE_MASK);
 	    }
 	  else
@@ -2693,7 +2622,7 @@ asm_1:
 	{
 	  if (IS_PREG ($5))
 	    {
-	      notethat("ProgCtrl: JUMP (PC + pregs )\n");
+	      notethat ("ProgCtrl: JUMP (PC + pregs )\n");
 	      $$ = PROGCTRL (8, $5.regno & CODE_MASK);
 	    }
 	  else
@@ -2704,7 +2633,7 @@ asm_1:
 	{
 	  if (IS_UIMM ($2, 4))
 	    {
-	      notethat("ProgCtrl: RAISE uimm4\n");
+	      notethat ("ProgCtrl: RAISE uimm4\n");
 	      $$ = PROGCTRL (9, uimm4 ($2));
 	    }
 	  else
@@ -2713,7 +2642,7 @@ asm_1:
 
 	| EXCPT expr
 	{
-		notethat("ProgCtrl: EMUEXCPT\n");
+		notethat ("ProgCtrl: EMUEXCPT\n");
 		$$ = PROGCTRL (10, uimm4 ($2));
 	}
 
@@ -2721,7 +2650,7 @@ asm_1:
 	{
 	  if (IS_PREG ($3))
 	    {
-	      notethat("ProgCtrl: TESTSET (pregs )\n");
+	      notethat ("ProgCtrl: TESTSET (pregs )\n");
 	      $$ = PROGCTRL (11, $3.regno & CODE_MASK);
 	    }
 	  else
@@ -2732,7 +2661,7 @@ asm_1:
 	{
 	  if (IS_PCREL12($2))
 	    {
-	      notethat("UJUMP: JUMP pcrel12\n");
+	      notethat ("UJUMP: JUMP pcrel12\n");
 	      $$ = UJUMP($2);
 	    }
 	  else
@@ -2743,7 +2672,7 @@ asm_1:
 	{
 	  if (IS_PCREL12($2))
 	    {
-	      notethat("UJUMP: JUMP_DOT_S pcrel12\n");
+	      notethat ("UJUMP: JUMP_DOT_S pcrel12\n");
 	      $$ = UJUMP($2);
 	    }
 	  else
@@ -2754,7 +2683,7 @@ asm_1:
 	{
 	  if (IS_PCREL24 ($2))
 	    {
-	      notethat("CALLa: jump.l pcrel24\n");
+	      notethat ("CALLa: jump.l pcrel24\n");
 	      $$ = CALLA ($2, 0);
 	    }
 	  else
@@ -2765,7 +2694,7 @@ asm_1:
 	{
 	  if (IS_PCREL24 ($2))
 	    {
-	      notethat("CALLa: jump.l pcrel24\n");
+	      notethat ("CALLa: jump.l pcrel24\n");
 	      $$ = CALLA ($2, 2);
 	    }
 	  else
@@ -2779,7 +2708,7 @@ asm_1:
 	{
 	  if (IS_PCREL24 ($2))
 	    {
-	      notethat("CALLa: CALL pcrel25m2\n");
+	      notethat ("CALLa: CALL pcrel25m2\n");
 	      $$ = CALLA ($2, 1);
 	    }
 	  else
@@ -2789,7 +2718,7 @@ asm_1:
 	{
 	  if (IS_PCREL24 ($2))
 	    {
-	      notethat("CALLa: CALL pcrel25m2\n");
+	      notethat ("CALLa: CALL pcrel25m2\n");
 	      $$ = CALLA ($2, 2);
 	    }
 	  else
@@ -2821,17 +2750,17 @@ asm_1:
 	    {
 	      if ($5.r0 == 0 && $5.s0 == 0 && $5.aop == 0)
 		{
-		  notethat("ALU2op: dregs = - dregs\n");
+		  notethat ("ALU2op: dregs = - dregs\n");
 		  $$ = ALU2OP (&$1, &$4, 14);   // dst, src, opc
 		}
 	      else if ($5.r0 == 1 && $5.s0 == 0 && $5.aop == 3)
 		{
-		  notethat("dsp32alu: dregs = - dregs (.)\n");
+		  notethat ("dsp32alu: dregs = - dregs (.)\n");
 		  $$ = DSP32ALU (15, 0, 0, &$1, &$4, 0, $5.s0, 0, 3);
 		}
 	      else
 		{
-		  notethat("dsp32alu: dregs = - dregs (.)\n");
+		  notethat ("dsp32alu: dregs = - dregs (.)\n");
 		  $$ = DSP32ALU (7, 0, 0, &$1, &$4, 0, $5.s0, 0, 3);
 		}
 	    }
@@ -2843,7 +2772,7 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_DREG ($4))
 	    {
-	      notethat("ALU2op: dregs = ~dregs\n");
+	      notethat ("ALU2op: dregs = ~dregs\n");
 	      $$ = ALU2OP (&$1, &$4, 15);   // dst, src, opc
 	    }
 	  else
@@ -2854,7 +2783,7 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3))
 	    {
-	      notethat("ALU2op: dregs >>= dregs\n");
+	      notethat ("ALU2op: dregs >>= dregs\n");
 	      $$ = ALU2OP (&$1, &$3, 1);   // dst, src, opc
 	    }
 	  else
@@ -2865,7 +2794,7 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_UIMM ($3, 5))
 	    {
-	      notethat("LOGI2op: dregs >>= uimm5\n");
+	      notethat ("LOGI2op: dregs >>= uimm5\n");
 	      $$ = LOGI2OP ($1, uimm5 ($3), 6);
 	    }
 	  else
@@ -2876,7 +2805,7 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3))
 	    {
-	      notethat("ALU2op: dregs >>>= dregs\n");
+	      notethat ("ALU2op: dregs >>>= dregs\n");
 	      $$ = ALU2OP (&$1, &$3, 0);   // dst, src, opc
 	    }
 	  else
@@ -2887,7 +2816,7 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3))
 	    {
-	      notethat("ALU2op: dregs <<= dregs\n");
+	      notethat ("ALU2op: dregs <<= dregs\n");
 	      $$ = ALU2OP (&$1, &$3, 2);   // dst, src, opc
 	    }
 	  else
@@ -2898,7 +2827,7 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_UIMM ($3, 5))
 	    {
-	      notethat("LOGI2op: dregs <<= uimm5\n");
+	      notethat ("LOGI2op: dregs <<= uimm5\n");
 	      $$ = LOGI2OP ($1, uimm5 ($3), 7);
 	    }
 	  else
@@ -2910,7 +2839,7 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_UIMM ($3, 5))
 	    {
-	      notethat("LOGI2op: dregs >>>= uimm5\n");
+	      notethat ("LOGI2op: dregs >>>= uimm5\n");
 	      $$ = LOGI2OP ($1, uimm5 ($3), 5);
 	    }
 	  else
@@ -2923,7 +2852,7 @@ asm_1:
 
 	| FLUSH LBRACK REG RBRACK
 	{
-	  notethat("CaCTRL: FLUSH [ pregs ]\n");
+	  notethat ("CaCTRL: FLUSH [ pregs ]\n");
 	  if (IS_PREG ($3))
 	    $$ = CACTRL (&$3, 0, 2);   // reg, a, op
 	  else
@@ -2934,7 +2863,7 @@ asm_1:
 	{
 	  if (IS_PREG ($3))
 	    {
-	      notethat("CaCTRL: FLUSH [ pregs ++ ]\n");
+	      notethat ("CaCTRL: FLUSH [ pregs ++ ]\n");
 	      $$ = CACTRL (&$3, 1, 2);   // reg, a, op
 	    }
 	  else
@@ -2945,7 +2874,7 @@ asm_1:
 	{
 	  if (IS_PREG ($3))
 	    {
-	      notethat("CaCTRL: FLUSHINV [ pregs ]\n");
+	      notethat ("CaCTRL: FLUSHINV [ pregs ]\n");
 	      $$ = CACTRL (&$3, 0, 1);   // reg, a, op
 	    }
 	  else
@@ -2956,7 +2885,7 @@ asm_1:
 	{
 	  if (IS_PREG ($3))
 	    {
-	      notethat("CaCTRL: FLUSHINV [ pregs ++ ]\n");
+	      notethat ("CaCTRL: FLUSHINV [ pregs ++ ]\n");
 	      $$ = CACTRL (&$3, 1, 1);   // reg, a, op
 	    }
 	  else
@@ -2968,7 +2897,7 @@ asm_1:
 	{
 	  if (IS_PREG ($3))
 	    {
-	      notethat("CaCTRL: IFLUSH [ pregs ]\n");
+	      notethat ("CaCTRL: IFLUSH [ pregs ]\n");
 	      $$ = CACTRL (&$3, 0, 3);   // reg, a, op
 	    }
 	  else
@@ -2979,7 +2908,7 @@ asm_1:
 	{
 	  if (IS_PREG ($3))
 	    {
-	      notethat("CaCTRL: IFLUSH [ pregs ++ ]\n");
+	      notethat ("CaCTRL: IFLUSH [ pregs ++ ]\n");
 	      $$ = CACTRL (&$3, 1, 3);   // reg, a, op
 	    }
 	  else
@@ -2990,7 +2919,7 @@ asm_1:
 	{
 	  if (IS_PREG ($3))
 	    {
-	      notethat("CaCTRL: PREFETCH [ pregs ]\n");
+	      notethat ("CaCTRL: PREFETCH [ pregs ]\n");
 	      $$ = CACTRL(&$3, 0, 0);
 	    }
 	  else
@@ -3001,7 +2930,7 @@ asm_1:
 	{
 	  if (IS_PREG ($3))
 	    {
-	      notethat("CaCTRL: PREFETCH [ pregs ++ ]\n");
+	      notethat ("CaCTRL: PREFETCH [ pregs ++ ]\n");
 	      $$ = CACTRL(&$3, 1, 0);
 	    }
 	  else
@@ -3017,11 +2946,11 @@ asm_1:
 	{
 	  if (IS_PREG ($3) && IS_DREG ($7))
 	    {
-	      notethat("LDST: B [ pregs <post_op> ] = dregs\n");
+	      notethat ("LDST: B [ pregs <post_op> ] = dregs\n");
 	      $$ = LDST (&$3, &$7, $4.x0, 2, 0, 1);
 	    }
 	  else
-	    return register_mismatch();
+	    return register_mismatch ();
 	}
 
 // LDSTidxI:	B [ pregs + imm16 ] = dregs */
@@ -3029,7 +2958,7 @@ asm_1:
 	{
 	  if (IS_PREG ($3) && IS_RANGE(16, $5, $4.r0, 1) && IS_DREG ($8))
 	    {
-	      notethat("LDST: B [ pregs + imm16 ] = dregs\n");
+	      notethat ("LDST: B [ pregs + imm16 ] = dregs\n");
 	      if ($4.r0)
 		neg_value($5);
 	      $$ = LDSTIDXI (&$3, &$8, 1, 2, 0, $5);
@@ -3044,12 +2973,12 @@ asm_1:
 	{
 	  if (IS_PREG ($3) && IS_URANGE (4, $5, $4.r0, 2) && IS_DREG ($8))
 	    {
-	      notethat("LDSTii: W [ pregs +- uimm5m2 ] = dregs\n");
+	      notethat ("LDSTii: W [ pregs +- uimm5m2 ] = dregs\n");
 	      $$ = LDSTII (&$3, &$8, $5, 1, 1); // ptr, reg, offset, W, op
 	    }
 	  else if (IS_PREG ($3) && IS_RANGE(16, $5, $4.r0, 2) && IS_DREG ($8))
 	    {
-	      notethat("LDSTidxI: W [ pregs + imm17m2 ] = dregs\n");
+	      notethat ("LDSTidxI: W [ pregs + imm17m2 ] = dregs\n");
 	      if ($4.r0)
 		neg_value ($5);
 	      $$ = LDSTIDXI (&$3, &$8, 1, 1, 0, $5);
@@ -3063,7 +2992,7 @@ asm_1:
 	{
 	  if (IS_PREG ($3) && IS_DREG ($7))
 	    {
-	      notethat("LDST: W [ pregs <post_op> ] = dregs\n");
+	      notethat ("LDST: W [ pregs <post_op> ] = dregs\n");
 	      $$ = LDST (&$3, &$7, $4.x0, 1, 0, 1);
 	    }
 	  else
@@ -3074,12 +3003,12 @@ asm_1:
 	{
 	  if (IS_IREG ($3))
 	    {
-	      notethat("dspLDST: W [ iregs <post_op> ] = dregs_half\n");
+	      notethat ("dspLDST: W [ iregs <post_op> ] = dregs_half\n");
 	      $$ = DSPLDST (&$3, 1 + IS_H ($7), &$7, $4.x0, 1);
 	    }
 	  else if ($4.x0 == 2 && IS_PREG ($3) && IS_DREG ($7))
 	    {
-	      notethat("LDSTpmod: W [ pregs <post_op>] = dregs_half\n");
+	      notethat ("LDSTpmod: W [ pregs <post_op>] = dregs_half\n");
 	      $$ = LDSTPMOD (&$3, &$7, &$3, 1 + IS_H ($7), 1);
 	      
 	    }
@@ -3104,18 +3033,18 @@ asm_1:
 
 	  if (in_range_p (tmp, 0, 63, 3))
 	    {
-	      notethat("LDSTii: dpregs = [ pregs + uimm6m4 ]\n");
+	      notethat ("LDSTii: dpregs = [ pregs + uimm6m4 ]\n");
 	      $$ = LDSTII (&$2, &$7, tmp, 1, ispreg ? 3 : 0);
 	    }
 	  else if ($2.regno == REG_FP && in_range_p (tmp, -128, 0, 3))
 	    {
-	      notethat("LDSTiiFP: dpregs = [ FP - uimm7m4 ]\n");
+	      notethat ("LDSTiiFP: dpregs = [ FP - uimm7m4 ]\n");
 	      tmp = unary (Expr_Op_Type_NEG, tmp);
 	      $$ = LDSTIIFP (tmp, &$7, 1);
 	    }
 	  else if (in_range_p (tmp, -131072, 131071, 3))
 	    {
-	      notethat("LDSTidxI: [ pregs + imm18m4 ] = dpregs\n");
+	      notethat ("LDSTidxI: [ pregs + imm18m4 ] = dpregs\n");
 	      $$ = LDSTIDXI (&$2, &$7, 1, 0, ispreg ? 1: 0, tmp);
 	    }
 	  else
@@ -3126,12 +3055,12 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_PREG ($5) && IS_URANGE (4, $7, $6.r0, 2))
 	    {
-	      notethat("LDSTii: dregs = W [ pregs + uimm4s2 ] (.)\n");
+	      notethat ("LDSTii: dregs = W [ pregs + uimm4s2 ] (.)\n");
 	      $$ = LDSTII (&$5, &$1, $7, 0, 1 << $9.r0);
 	    }
 	  else if (IS_DREG ($1) && IS_PREG ($5) && IS_RANGE(16, $7, $6.r0, 2))
 	    {
-	      notethat("LDSTidxI: dregs = W [ pregs + imm17m2 ] (.)\n");
+	      notethat ("LDSTidxI: dregs = W [ pregs + imm17m2 ] (.)\n");
 	      if ($6.r0)
 		neg_value($7);
 	      $$ = LDSTIDXI (&$5, &$1, 0, 1, $9.r0, $7);
@@ -3144,12 +3073,12 @@ asm_1:
 	{
 	  if (IS_IREG ($5))
 	    {
-	      notethat("dspLDST: dregs_half = W [ iregs ]\n");
+	      notethat ("dspLDST: dregs_half = W [ iregs ]\n");
 	      $$ = DSPLDST(&$5, 1 + IS_H ($1), &$1, $6.x0, 0);
 	    }
 	  else if ($6.x0 == 2 && IS_DREG ($1) && IS_PREG ($5))
 	    {
-	      notethat("LDSTpmod: dregs_half = W [ pregs ]\n");
+	      notethat ("LDSTpmod: dregs_half = W [ pregs ]\n");
 	      $$ = LDSTPMOD (&$5, &$1, &$5, 1 + IS_H ($1), 0);
 	    }
 	  else
@@ -3161,7 +3090,7 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_PREG ($5))
 	    {
-	      notethat("LDST: dregs = W [ pregs <post_op> ] (.)\n");
+	      notethat ("LDST: dregs = W [ pregs <post_op> ] (.)\n");
 	      $$ = LDST (&$5, &$1, $6.x0, 1, $8.r0, 0);
 	    }
 	  else
@@ -3172,7 +3101,7 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_PREG ($5) && IS_PREG ($7))
 	    {
-	      notethat("LDSTpmod: dregs = W [ pregs ++ pregs ] (.)\n");
+	      notethat ("LDSTpmod: dregs = W [ pregs ++ pregs ] (.)\n");
 	      $$ = LDSTPMOD (&$5, &$1, &$7, 3, $9.r0);
 	    }
 	  else
@@ -3183,7 +3112,7 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_PREG ($5) && IS_PREG ($7))
 	    {
-	      notethat("LDSTpmod: dregs_half = W [ pregs ++ pregs ]\n");
+	      notethat ("LDSTpmod: dregs_half = W [ pregs ++ pregs ]\n");
 	      $$ = LDSTPMOD (&$5, &$1, &$7, 1 + IS_H ($1), 0);
 	    }
 	  else
@@ -3194,17 +3123,17 @@ asm_1:
 	{
 	  if (IS_IREG ($2) && IS_DREG ($6))
 	    {
-	      notethat("dspLDST: [ iregs <post_op> ] = dregs\n");
+	      notethat ("dspLDST: [ iregs <post_op> ] = dregs\n");
 	      $$ = DSPLDST(&$2, 0, &$6, $3.x0, 1);
 	    }
 	  else if (IS_PREG ($2) && IS_DREG ($6))
 	    {
-	      notethat("LDST: [ pregs <post_op> ] = dregs\n");
+	      notethat ("LDST: [ pregs <post_op> ] = dregs\n");
 	      $$ = LDST (&$2, &$6, $3.x0, 0, 0, 1);
 	    }
 	  else if (IS_PREG ($2) && IS_PREG ($6))
 	    {
-	      notethat("LDST: [ pregs <post_op> ] = pregs\n");
+	      notethat ("LDST: [ pregs <post_op> ] = pregs\n");
 	      $$ = LDST (&$2, &$6, $3.x0, 0, 1, 1);
 	    }
 	  else
@@ -3218,12 +3147,12 @@ asm_1:
 
 	  if (IS_IREG ($2) && IS_MREG ($4))
 	    {
-	      notethat("dspLDST: [ iregs ++ mregs ] = dregs\n");
+	      notethat ("dspLDST: [ iregs ++ mregs ] = dregs\n");
 	      $$ = DSPLDST(&$2, $4.regno & CODE_MASK, &$7, 3, 1);
 	    }
 	  else if (IS_PREG ($2) && IS_PREG ($4))
 	    {
-	      notethat("LDSTpmod: [ pregs ++ pregs ] = dregs\n");
+	      notethat ("LDSTpmod: [ pregs ++ pregs ] = dregs\n");
 	      $$ = LDSTPMOD (&$2, &$7, &$4, 0, 1);
 	    }
 	  else
@@ -3236,7 +3165,7 @@ asm_1:
 	    return semantic_error ("Expect Dreg as last argument");
 	  if (IS_PREG ($3) && IS_PREG ($5))
 	    {
-	      notethat("LDSTpmod: W [ pregs ++ pregs ] = dregs_half\n");
+	      notethat ("LDSTpmod: W [ pregs ++ pregs ] = dregs_half\n");
 	      $$ = LDSTPMOD (&$3, &$8, &$5, 1 + IS_H ($8), 1);
 	    }
 	  else
@@ -3247,7 +3176,7 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_PREG ($5) && IS_RANGE(16, $7, $6.r0, 1))
 	    {
-	      notethat("LDSTidxI: dregs = B [ pregs + imm16 ] (%c)\n",
+	      notethat ("LDSTidxI: dregs = B [ pregs + imm16 ] (%c)\n",
 		       $9.r0 ? 'X' : 'Z');
 	      if ($6.r0)
 		neg_value($7);
@@ -3261,7 +3190,7 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_PREG ($5))
 	    {
-	      notethat("LDST: dregs = B [ pregs <post_op> ] (%c)\n",
+	      notethat ("LDST: dregs = B [ pregs <post_op> ] (%c)\n",
 		       $8.r0 ? 'X' : 'Z');
 	      $$ = LDST (&$5, &$1, $6.x0, 2, $8.r0, 0);
 	    }
@@ -3273,12 +3202,12 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_IREG ($4) && IS_MREG ($6))
 	    {
-	      notethat("dspLDST: dregs = [ iregs ++ mregs ]\n");
+	      notethat ("dspLDST: dregs = [ iregs ++ mregs ]\n");
 	      $$ = DSPLDST(&$4, $6.regno & CODE_MASK, &$1, 3, 0);
 	    }
 	  else if (IS_DREG ($1) && IS_PREG ($4) && IS_PREG ($6))
 	    {
-	      notethat("LDSTpmod: dregs = [ pregs ++ pregs ]\n");
+	      notethat ("LDSTpmod: dregs = [ pregs ++ pregs ]\n");
 	      $$ = LDSTPMOD (&$4, &$1, &$6, 0, 0);
 	    }
 	  else
@@ -3301,23 +3230,23 @@ asm_1:
 	    tmp = unary (Expr_Op_Type_NEG, tmp);
 
 	  if(isgot){
-	      notethat("LDSTidxI: dpregs = [ pregs + sym@got ]\n");
+	      notethat ("LDSTidxI: dpregs = [ pregs + sym@got ]\n");
 	      $$ = LDSTIDXI (&$4, &$1, 0, 0, ispreg ? 1: 0, tmp);
 	  }
 	  else if (in_range_p (tmp, 0, 63, 3))
 	    {
-	      notethat("LDSTii: dpregs = [ pregs + uimm7m4 ]\n");
+	      notethat ("LDSTii: dpregs = [ pregs + uimm7m4 ]\n");
 	      $$ = LDSTII (&$4, &$1, tmp, 0, ispreg ? 3 : 0);
 	    }
 	  else if ($4.regno == REG_FP && in_range_p (tmp, -128, 0, 3))
 	    {
-	      notethat("LDSTiiFP: dpregs = [ FP - uimm7m4 ]\n");
+	      notethat ("LDSTiiFP: dpregs = [ FP - uimm7m4 ]\n");
 	      tmp = unary (Expr_Op_Type_NEG, tmp);
 	      $$ = LDSTIIFP (tmp, &$1, 0);
 	    }
 	  else if (in_range_p (tmp, -131072, 131071, 3))
 	    {
-	      notethat("LDSTidxI: dpregs = [ pregs + imm18m4 ]\n");
+	      notethat ("LDSTidxI: dpregs = [ pregs + imm18m4 ]\n");
 	      $$ = LDSTIDXI (&$4, &$1, 0, 0, ispreg ? 1: 0, tmp);
 	      
 	    }
@@ -3330,12 +3259,12 @@ asm_1:
 	{
 	  if (IS_DREG ($1) && IS_IREG ($4))
 	    {
-	      notethat("dspLDST: dregs = [ iregs <post_op> ]\n");
+	      notethat ("dspLDST: dregs = [ iregs <post_op> ]\n");
 	      $$ = DSPLDST (&$4, 0, &$1, $5.x0, 0);
 	    }
 	  else if (IS_DREG ($1) && IS_PREG ($4))
 	    {
-	      notethat("LDST: dregs = [ pregs <post_op> ]\n");
+	      notethat ("LDST: dregs = [ pregs <post_op> ]\n");
 	      $$ = LDST (&$4, &$1, $5.x0, 0, 0, 0);
 	    }
 	  else if (IS_PREG ($1) && IS_PREG ($4))
@@ -3343,12 +3272,12 @@ asm_1:
 	      if (REG_SAME ($1, $4) && $5.x0 != 2)
 		return semantic_error ("Pregs can't be same");
 
-	      notethat("LDST: pregs = [ pregs <post_op> ]\n");
+	      notethat ("LDST: pregs = [ pregs <post_op> ]\n");
 	      $$ = LDST (&$4, &$1, $5.x0, 0, 1, 0);
 	    }
 	  else if ($4.regno == REG_SP && IS_ALLREG ($1) && $5.x0 == 0)
 	    {
-	      notethat("PushPopReg: allregs = [ SP ++ ]\n");
+	      notethat ("PushPopReg: allregs = [ SP ++ ]\n");
 	      $$ = PUSHPOPREG (&$1, 0);
 	    }
 	  else
@@ -3378,7 +3307,7 @@ asm_1:
 	      && $11.regno == REG_P5
 	      && (EXPR_VALUE ($13) >= 0 && EXPR_VALUE ($13) < 6))
 	    {
-	      notethat("PushPopMultiple: [ -- SP ] = (R7 : reglim , P5 : reglim )\n");
+	      notethat ("PushPopMultiple: [ -- SP ] = (R7 : reglim , P5 : reglim )\n");
 	      $$ = PUSHPOPMULTIPLE (imm5($9), imm5($13), 1, 1, 1);
 	    }
 	  else
@@ -3393,13 +3322,13 @@ asm_1:
 	  if ($7.regno == REG_R7
 	      && (EXPR_VALUE ($9) >= 0 && EXPR_VALUE ($9) < 8))
 	    {
-	      notethat("PushPopMultiple: [ -- SP ] = (R7 : reglim )\n");
+	      notethat ("PushPopMultiple: [ -- SP ] = (R7 : reglim )\n");
 	      $$ = PUSHPOPMULTIPLE (imm5($9), 0, 1, 0, 1);
 	    }
 	  else if ($7.regno == REG_P5
 		   && (EXPR_VALUE ($9) >= 0 && EXPR_VALUE ($9) < 6))
 	    {
-	      notethat("PushPopMultiple: [ -- SP ] = (P5 : reglim )\n");
+	      notethat ("PushPopMultiple: [ -- SP ] = (P5 : reglim )\n");
 	      $$ = PUSHPOPMULTIPLE (0, imm5($9), 0, 1, 1);
 	    }
 	  else
@@ -3414,7 +3343,7 @@ asm_1:
 	  if ($2.regno == REG_R7 && (EXPR_VALUE ($4) >= 0 && EXPR_VALUE ($4) < 8)  
 	      && $6.regno == REG_P5 && (EXPR_VALUE ($8) >= 0 && EXPR_VALUE ($8) < 6))
 	    {
-	      notethat("PushPopMultiple: (R7 : reglim , P5 : reglim ) = [ SP ++ ]\n");
+	      notethat ("PushPopMultiple: (R7 : reglim , P5 : reglim ) = [ SP ++ ]\n");
 	      $$ = PUSHPOPMULTIPLE (imm5($4), imm5($8), 1, 1, 0);
 	    }
 	  else
@@ -3429,13 +3358,13 @@ asm_1:
 	  if ($2.regno == REG_R7
 	      && EXPR_VALUE ($4) >= 0 && EXPR_VALUE ($4) < 8)
 	    {
-	      notethat("PushPopMultiple: (R7 : reglim ) = [ SP ++ ]\n");
+	      notethat ("PushPopMultiple: (R7 : reglim ) = [ SP ++ ]\n");
 	      $$ = PUSHPOPMULTIPLE (imm5($4), 0, 1, 0, 0);
 	    }
 	  else if ($2.regno == REG_P5
 		   && (EXPR_VALUE ($4) >= 0 && EXPR_VALUE ($4) < 6))
 	    {
-	      notethat("PushPopMultiple: (P5 : reglim ) = [ SP ++ ]\n");
+	      notethat ("PushPopMultiple: (P5 : reglim ) = [ SP ++ ]\n");
 	      $$ = PUSHPOPMULTIPLE (0, imm5($4), 0, 1, 0);
 	    }
 	  else
@@ -3449,7 +3378,7 @@ asm_1:
 
 	  if (IS_ALLREG ($6))
 	    {
-	      notethat("PushPopReg: [ -- SP ] = allregs\n");
+	      notethat ("PushPopReg: [ -- SP ] = allregs\n");
 	      $$ = PUSHPOPREG (&$6, 1);
 	    }
 	  else
@@ -3468,7 +3397,7 @@ asm_1:
 		
 	| UNLINK
 	{
-		notethat("linkage: UNLINK\n");
+		notethat ("linkage: UNLINK\n");
 		$$ = LINKAGE (1, 0);
 	}
 
@@ -3479,7 +3408,7 @@ asm_1:
 	{
 	  if (IS_PCREL4 ($3) && IS_LPPCREL10 ($5) && IS_CREG ($7))
 	    {
-	      notethat("LoopSetup: LSETUP (pcrel4 , lppcrel10 ) counters\n");
+	      notethat ("LoopSetup: LSETUP (pcrel4 , lppcrel10 ) counters\n");
 	      $$ = LOOPSETUP ($3, &$7, 0, $5, 0);
 	    }
 	  else
@@ -3491,7 +3420,7 @@ asm_1:
 	  if (IS_PCREL4 ($3) && IS_LPPCREL10 ($5)
 	      && IS_PREG ($9) && IS_CREG ($7))
 	    {
-	      notethat("LoopSetup: LSETUP (pcrel4 , lppcrel10 ) counters = pregs\n");
+	      notethat ("LoopSetup: LSETUP (pcrel4 , lppcrel10 ) counters = pregs\n");
 	      $$ = LOOPSETUP ($3, &$7, 1, $5, &$9);
 	    }
 	  else
@@ -3504,7 +3433,7 @@ asm_1:
 	      && IS_PREG ($9) && IS_CREG ($7) 
 	      && EXPR_VALUE ($11) == 1)
 	    {
-	      notethat("LoopSetup: LSETUP (pcrel4 , lppcrel10 ) counters = pregs >> 1\n");
+	      notethat ("LoopSetup: LSETUP (pcrel4 , lppcrel10 ) counters = pregs >> 1\n");
 	      $$ = LOOPSETUP ($3, &$7, 3, $5, &$9);
 	    }
 	  else
@@ -3518,14 +3447,14 @@ asm_1:
 	    return semantic_error ("Invalid expression in loop statement");
 	  if (!IS_CREG ($3))
             return semantic_error ("Invalid loop counter register");
-	$$ = gen_loop ($2, &$3, 0, 0);
+	$$ = bfin_gen_loop ($2, &$3, 0, 0);
 	}
 	| LOOP expr REG ASSIGN REG
 	{
 	  if (IS_RELOC ($2) && IS_PREG ($5) && IS_CREG ($3))
 	    {
-	      notethat("Loop: LOOP expr counters = pregs\n");
-	      $$ = gen_loop ($2, &$3, 1, &$5);
+	      notethat ("Loop: LOOP expr counters = pregs\n");
+	      $$ = bfin_gen_loop ($2, &$3, 1, &$5);
 	    }
 	  else
 	    return semantic_error ("Bad register or values for LOOP");
@@ -3534,65 +3463,60 @@ asm_1:
 	{
 	  if (IS_RELOC ($2) && IS_PREG ($5) && IS_CREG ($3) && EXPR_VALUE ($7) == 1)
 	    {
-	      notethat("Loop: LOOP expr counters = pregs >> 1\n");
-	      $$ = gen_loop ($2, &$3, 3, &$5);
+	      notethat ("Loop: LOOP expr counters = pregs >> 1\n");
+	      $$ = bfin_gen_loop ($2, &$3, 3, &$5);
 	    }
 	  else
 	    return semantic_error ("Bad register or values for LOOP");
 	}
-////////////////////////////////////////////////////////////////////////////
-// pseudoDEBUG
+/* pseudoDEBUG */
 
 	| DBG
 	{
-	  notethat("pseudoDEBUG: DBG\n");
-
-	  $$ = gen_pseudodbg(3, 7, 0);
+	  notethat ("pseudoDEBUG: DBG\n");
+	  $$ = bfin_gen_pseudodbg (3, 7, 0);
 	}
-
 	| DBG REG_A
 	{
-	  notethat("pseudoDEBUG: DBG REG_A\n");
-	  $$ = gen_pseudodbg(3, IS_A1 ($2), 0);
+	  notethat ("pseudoDEBUG: DBG REG_A\n");
+	  $$ = bfin_gen_pseudodbg (3, IS_A1 ($2), 0);
 	}
-
 	| DBG REG
 	{
-	  notethat("pseudoDEBUG: DBG allregs\n");
-	  $$ = gen_pseudodbg(0, $2.regno & CODE_MASK, $2.regno & CLASS_MASK);
+	  notethat ("pseudoDEBUG: DBG allregs\n");
+	  $$ = bfin_gen_pseudodbg (0, $2.regno & CODE_MASK, $2.regno & CLASS_MASK);
 	}
 
 	| DBGCMPLX LPAREN REG RPAREN
 	{
 	  if (!IS_DREG ($3))
 	    return semantic_error ("Dregs expected");
-
-	  notethat("pseudoDEBUG: DBGCMPLX (dregs )\n");
-	  $$ = gen_pseudodbg(3, 6, $3.regno & CODE_MASK);
+	  notethat ("pseudoDEBUG: DBGCMPLX (dregs )\n");
+	  $$ = bfin_gen_pseudodbg (3, 6, $3.regno & CODE_MASK);
 	}
 	
 	| DBGHALT
 	{
-	  notethat("psedoDEBUG: DBGHALT\n");
-	  $$ = gen_pseudodbg(3, 5, 0);
+	  notethat ("psedoDEBUG: DBGHALT\n");
+	  $$ = bfin_gen_pseudodbg (3, 5, 0);
 	}
 
 	| DBGA LPAREN HALF_REG COMMA expr RPAREN
 	{
-	  notethat("pseudodbg_assert: DBGA (dregs_lo , uimm16 )\n");
-	  $$ = gen_pseudodbg_assert (IS_H ($3), &$3, uimm16 ($5));
+	  notethat ("pseudodbg_assert: DBGA (dregs_lo , uimm16 )\n");
+	  $$ = bfin_gen_pseudodbg_assert (IS_H ($3), &$3, uimm16 ($5));
 	}
 		
 	| DBGAH LPAREN REG COMMA expr RPAREN
 	{
-	  notethat("pseudodbg_assert: DBGAH (dregs , uimm16 )\n");
-	  $$ = gen_pseudodbg_assert (3, &$3, uimm16 ($5));
+	  notethat ("pseudodbg_assert: DBGAH (dregs , uimm16 )\n");
+	  $$ = bfin_gen_pseudodbg_assert (3, &$3, uimm16 ($5));
 	}
 
 	| DBGAL LPAREN REG COMMA expr RPAREN
 	{
-	  notethat("psedodbg_assert: DBGAL (dregs , uimm16 )\n");
-	  $$ = gen_pseudodbg_assert (2, &$3, uimm16 ($5));
+	  notethat ("psedodbg_assert: DBGAL (dregs , uimm16 )\n");
+	  $$ = bfin_gen_pseudodbg_assert (2, &$3, uimm16 ($5));
 	}
 
 
@@ -3715,13 +3639,13 @@ vmod:
 	{ $$.r0 = 0; }
 	| LPAREN V RPAREN
 	{ $$.r0 = 1; }
-;
+	;
 
 smod:
 	{ $$.s0 = 0; }
 	| LPAREN S RPAREN
 	{ $$.s0 = 1; }
-;
+	;
 
 searchmod:
 	  GE
@@ -3732,45 +3656,69 @@ searchmod:
 	{ $$.r0 = 3; }
 	| LT
 	{ $$.r0 = 2; }
-;
+	;
 
 
 aligndir:
-	{ $$.r0 = 0; }
+	{
+	$$.r0 = 0;
+	}
 	| LPAREN R RPAREN
-	{ $$.r0 = 1; }
-;
+	{
+	$$.r0 = 1;
+	}
+	;
 
 byteop_mod:
 	LPAREN R RPAREN
-	{ $$.r0 = 0; $$.s0 = 1; }
+	{
+	$$.r0 = 0;
+	$$.s0 = 1;
+	}
 	| LPAREN MMOD RPAREN
-	{ if ($2 != M_T)
-	    return semantic_error ("Bad modifier");
-	  $$.r0 = 1; $$.s0 = 0; }
+	{
+	if ($2 != M_T)
+	  return semantic_error ("Bad modifier");
+	$$.r0 = 1;
+	$$.s0 = 0;
+	}
 	| LPAREN MMOD COMMA R RPAREN
-	{ if ($2 != M_T)
-	    return semantic_error ("Bad modifier");
-	  $$.r0 = 1; $$.s0 = 1; }
+	{
+	if ($2 != M_T)
+	  return semantic_error ("Bad modifier");
+	$$.r0 = 1;
+	$$.s0 = 1;
+	}
 	| LPAREN R COMMA MMOD RPAREN
-	{ if ($4 != M_T)
-	    return semantic_error ("Bad modifier");
-	  $$.r0 = 1; $$.s0 = 1; }
-;
+	{
+	if ($4 != M_T)
+	  return semantic_error ("Bad modifier");
+	$$.r0 = 1;
+	$$.s0 = 1;
+	}
+	;
 
 
 
 c_align:
 	ALIGN8
-	{ $$.r0 = 0; }
+	{
+	$$.r0 = 0;
+	}
 	| ALIGN16
-	{ $$.r0 = 1; }
+	{
+	$$.r0 = 1;
+	}
 	| ALIGN24
-	{ $$.r0 = 2; }
-;
+	{
+	$$.r0 = 2;
+	}
+	;
 
 w32_or_nothing:
-	{ $$.r0 = 0; }
+	{
+	$$.r0 = 0;
+	}
 	| LPAREN MMOD RPAREN
 	{
 	  if ($2 == M_W32)
@@ -3778,10 +3726,12 @@ w32_or_nothing:
 	  else
 	    return semantic_error ("Only (W32) allowed");
 	}
-;
+	;
 
 iu_or_nothing:
-	{ $$.r0 = 1; }
+	{
+	$$.r0 = 1;
+	}
 	| LPAREN MMOD RPAREN
 	{
 	  if ($2 == M_IU)
@@ -3789,37 +3739,51 @@ iu_or_nothing:
 	  else
 	    return semantic_error ("(IU) expected");
 	}
-;
+	;
 
 
-/* } */
-// Operators
-/* { */
+/* Operators.  */
 
 min_max:
 	MIN
-	{ $$.r0 = 1; }
+	{
+	$$.r0 = 1;
+	}
 	| MAX
-	{ $$.r0 = 0; }
-;
+	{
+	$$.r0 = 0;
+	}
+	;
  
 op_bar_op:
 	_PLUS_BAR_PLUS
-	{ $$.r0 = 0; }
+	{
+	$$.r0 = 0;
+	}
 	| _PLUS_BAR_MINUS
-	{ $$.r0 = 1; }
+	{
+	$$.r0 = 1;
+	}
 	| _MINUS_BAR_PLUS
-	{ $$.r0 = 2; }
+	{
+	$$.r0 = 2;
+	}
 	| _MINUS_BAR_MINUS
-	{ $$.r0 = 3; }
-;
+	{
+	$$.r0 = 3;
+	}
+	;
 
 plus_minus:
 	PLUS
-	{ $$.r0 = 0; }
+	{
+	$$.r0 = 0;
+	}
 	| MINUS
-	{ $$.r0 = 1; }
-;
+	{
+	$$.r0 = 1;
+	}
+	;
 
 rnd_op:
 	LPAREN RNDH RPAREN
@@ -3861,7 +3825,6 @@ rnd_op:
 	  $$.x0 = 0; // x
 	  $$.aop = 0; // aop
 	}
-
 	| LPAREN TH COMMA R RPAREN
 	{
 	  $$.r0 = 1; // HL
@@ -3869,7 +3832,6 @@ rnd_op:
 	  $$.x0 = 0; // x
 	  $$.aop = 1; // aop
 	}
-
 	| LPAREN RNDL COMMA R RPAREN
 	{
 	  $$.r0 = 0; // HL
@@ -3885,7 +3847,7 @@ rnd_op:
 	  $$.x0 = 0; // x
 	  $$.aop = 1;  // aop
 	}
-;
+	;
 
 b3_op:
 	LPAREN LO RPAREN
@@ -3893,7 +3855,6 @@ b3_op:
 	  $$.s0 = 0; // s
 	  $$.x0 = 0; // HL
 	}
-
 	| LPAREN HI RPAREN
 	{
 	  $$.s0 = 0; // s
@@ -3904,149 +3865,189 @@ b3_op:
 	  $$.s0 = 1; // s
 	  $$.x0 = 0; // HL
 	}
-
 	| LPAREN HI COMMA R RPAREN
 	{
 	  $$.s0 = 1; // s
 	  $$.x0 = 1; // HL
 	}
-;
+	;
 
 post_op:
-	{ $$.x0 = 2; }
+	{
+	$$.x0 = 2;
+	} 
 	| _PLUS_PLUS 
-	{ $$.x0 = 0; }
+	{
+	$$.x0 = 0;
+	}
 	| _MINUS_MINUS
-	{ $$.x0 = 1; }
-;
+	{
+	$$.x0 = 1;
+	}
+	;
 
-/* } */
-// Assignments, Macfuncs
-/* { */
+/* Assignments, Macfuncs.  */
 
 a_assign:
 	REG_A ASSIGN
-	{ $$ = $1; }
-;
+	{
+	$$ = $1;
+	}
+	;
 
 a_minusassign:
 	REG_A _MINUS_ASSIGN
-	{ $$ = $1; }
-;
+	{
+	$$ = $1;
+	}
+	;
 
 a_plusassign:
 	REG_A _PLUS_ASSIGN
-	{ $$ = $1; }
-;
+	{
+	$$ = $1;
+	}
+	;
 
 assign_macfunc:
 	REG ASSIGN REG_A
 	{
-	  $$.w = 1; $$.P = 1; $$.n = IS_A1 ($3);
-	  $$.op = 3; $$.dst = $1;
-	  $$.s0.regno = 0; $$.s1.regno = 0; // XXX
+	  $$.w = 1;
+          $$.P = 1;
+          $$.n = IS_A1 ($3);
+	  $$.op = 3;
+          $$.dst = $1;
+	  $$.s0.regno = 0;
+          $$.s1.regno = 0; // XXX
 
 	  if (IS_A1 ($3) && IS_EVEN ($1))
 	    return semantic_error ("Cannot move A1 to even register");
 	  else if (!IS_A1 ($3) && !IS_EVEN ($1))
 	    return semantic_error ("Cannot move A0 to odd register");
 	}
-
 	| a_macfunc
 	{
 	  $$ = $1;
 	  $$.w = 0; $$.P = 0;
 	  $$.dst.regno = 0;
 	}
-
 	| REG ASSIGN LPAREN a_macfunc RPAREN
 	{
 	  $$ = $4;
-	  $$.w = 1; $$.P = 1; $$.dst = $1;
+	  $$.w = 1;
+          $$.P = 1;
+          $$.dst = $1;
 	}
 
 	| HALF_REG ASSIGN LPAREN a_macfunc RPAREN
 	{
 	  $$ = $4;
-	  $$.w = 1; $$.P = 0; $$.dst = $1;
+	  $$.w = 1;
+	  $$.P = 0;
+          $$.dst = $1;
 	}
 
 	| HALF_REG ASSIGN REG_A
 	{
-	  $$.w = 1; $$.P = 0; $$.n = IS_A1 ($3);
-	  $$.op = 3; $$.dst = $1;
-	  $$.s0.regno = 0; $$.s1.regno = 0;
+	  $$.w = 1;
+	  $$.P = 0;
+	  $$.n = IS_A1 ($3);
+	  $$.op = 3;
+          $$.dst = $1;
+	  $$.s0.regno = 0;
+          $$.s1.regno = 0;
 
 	  if (IS_A1 ($3) && !IS_H ($1))
 	    return semantic_error ("Cannot move A1 to low half of register");
 	  else if (!IS_A1 ($3) && IS_H ($1))
 	    return semantic_error ("Cannot move A0 to high half of register");
 	}
-;
+	;
 
 a_macfunc:
 	a_assign multfunc
 	{
-	  $$.n = IS_A1 ($1); $$.op = 0;  $$.s0 = $2.s0; $$.s1 = $2.s1;
+	  $$.n = IS_A1 ($1);
+	  $$.op = 0;
+	  $$.s0 = $2.s0;
+	  $$.s1 = $2.s1;
 	}
 	| a_plusassign multfunc
 	{
-	  $$.n = IS_A1 ($1); $$.op = 1;  $$.s0 = $2.s0; $$.s1 = $2.s1;
+	  $$.n = IS_A1 ($1);
+	  $$.op = 1;
+	  $$.s0 = $2.s0;
+	  $$.s1 = $2.s1;
 	}
 	| a_minusassign multfunc
 	{
-	  $$.n = IS_A1 ($1); $$.op = 2;  $$.s0 = $2.s0; $$.s1 = $2.s1;
+	  $$.n = IS_A1 ($1);
+	  $$.op = 2;
+	  $$.s0 = $2.s0;
+	  $$.s1 = $2.s1;
 	}
-;
+	;
 
 multfunc:
 	HALF_REG STAR HALF_REG
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3))
 	    {
-	      $$.s0 = $1; $$.s1 = $3;
+	      $$.s0 = $1;
+              $$.s1 = $3;
 	    }
 	  else
 	    return semantic_error ("Multfunc expects Dregs");
 	}
-;
+	;
 
 cc_op:
 	ASSIGN
-	{ $$.r0 = 0; }
+	{
+	$$.r0 = 0;
+	}
 	| _BAR_ASSIGN
-	{ $$.r0 = 1; }
+	{
+	$$.r0 = 1;
+	}
 	| _AMPERSAND_ASSIGN
-	{ $$.r0 = 2; }
+	{
+	$$.r0 = 2;
+	}
 	| _CARET_ASSIGN
-	{ $$.r0 = 3; }
-;
+	{
+	$$.r0 = 3;
+	}
+	;
 
 ccstat:
 	CCREG cc_op MODIFIED_STATUS_REG
-	{ $$.r0 = $3.regno; $$.x0 = $2.r0; $$.s0 = 0; }
-
+	{
+	$$.r0 = $3.regno;
+	$$.x0 = $2.r0;
+	$$.s0 = 0;
+	}
 	| CCREG cc_op V
-	{ $$.r0 = 0x18; $$.x0 = $2.r0; $$.s0 = 0; }
-
+	{
+	$$.r0 = 0x18;
+	$$.x0 = $2.r0;
+	$$.s0 = 0;
+	}
 	| MODIFIED_STATUS_REG cc_op CCREG
-	{ $$.r0 = $1.regno; $$.x0 = $2.r0; $$.s0 = 1; }
-
+	{
+	$$.r0 = $1.regno;
+	$$.x0 = $2.r0;
+	$$.s0 = 1;
+	}
 	| V cc_op CCREG
-	{ $$.r0 = 0x18; $$.x0 = $2.r0; $$.s0 = 1; }
+	{
+	$$.r0 = 0x18;
+	$$.x0 = $2.r0;
+	$$.s0 = 1;
+	}
+	;
 
-;
-
-/* } */
-
-// Expressions / Symbols
-
-// Changed this such that expressions as:
-// 
-//    r0 = 2 + (1 << 4) * 3;
-//
-// are valid without brackets
-
+/* Expressions and Symbols */
 
 symbol: SYMBOL
 	{
@@ -4056,19 +4057,28 @@ symbol: SYMBOL
 	}
 	;
 
-got :
-	symbol AT GOT
-	{ $$ = $1; }
-;
+got:	symbol AT GOT
+	{
+	$$ = $1;
+	}
+	;
 
-got_or_expr: got {$$ = $1;}
-	| expr { $$ = $1; }
-;
+got_or_expr:	got
+	{
+	$$ = $1;
+	}
+	| expr
+	{
+	$$ = $1;
+	}
+	;
 
 pltpc :
 	symbol AT PLTPC
-	{ $$ = $1; }
-;
+	{
+	$$ = $1;
+	}
+	;
 
 eterm: NUMBER
 	{
@@ -4095,8 +4105,10 @@ eterm: NUMBER
 	;
 
 expr: expr_1
-	{ $$ = $1; }
-;
+	{
+	$$ = $1;
+	}
+	;
 
 expr_1: expr_1 STAR expr_1
 	{
@@ -4282,7 +4294,7 @@ unary (Expr_Op_Type op, Expr_Node *x)
 
 int debug_codeselection = 0;
 static void
-notethat(char *format, ...)
+notethat (char *format, ...)
 {
   va_list ap;
   va_start (ap, format);
