@@ -138,8 +138,8 @@ do
             fi	
             ;;
         o)
-            DIR_ELF_OUTPUT=$OPTARG
-            DIR_uC_OUTPUT=$OPTARG
+            DIR_ELF_OUTPUT=$OPTARG-elf
+            DIR_uC_OUTPUT=$OPTARG-uclinux
             ;;
         h)  
              echo "Usage : $APP_NAME -s SOURCE [-b BUILD]
