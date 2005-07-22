@@ -1185,6 +1185,20 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
   char buf[4];
   int i;
   long reg_r0, reg_r1, reg_r2;
+  int total_len = 0;
+
+  for (i = nargs - 1; i >= 0; i--)
+    {
+      struct type *value_type = VALUE_ENCLOSING_TYPE (args[i]);
+      int len = TYPE_LENGTH (value_type);
+      total_len += (len + 3) & ~3;
+    }
+
+  /* At least twelve bytes of stack space must be allocated for the function's
+     arguments, even for functions that have less than 12 bytes of argument
+     data.  */
+  if (total_len < 12)
+    sp -= 12 - total_len;
 
   /* Push arguments in reverse order.  */
   for (i = nargs - 1; i >= 0; i--)
