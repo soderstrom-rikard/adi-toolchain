@@ -34,7 +34,7 @@ extern bfd_boolean bfin_start_label PARAMS ((char *));
 
 #define md_start_line_hook()    bfin_start_line_hook()
 #define md_number_to_chars	number_to_chars_littleendian
-
+#define md_convert_frag(b,s,f)	as_fatal ("bfin convert_frag\n");
 
 /* 
  * Allow for [, ], etc...
@@ -56,4 +56,6 @@ extern bfd_boolean bfin_name_is_register PARAMS ((char *));
 #define TC_START_LABEL(ch ,ptr) (ch == ':' && bfin_start_label (ptr))
 #define tc_fix_adjustable(FIX) bfin_fix_adjustable (FIX)
 extern bfd_boolean bfin_fix_adjustable PARAMS ((struct fix *));
+
+#define TC_FORCE_RELOCATION(FIX) bfin_force_relocation (FIX)
 /* end of tc-bfin.h */

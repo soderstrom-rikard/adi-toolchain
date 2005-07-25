@@ -34,6 +34,7 @@ extern void yy_delete_buffer (YY_BUFFER_STATE b);
 static parse_state parse (char *line);
 void assembler_parser_init (void);
 static void s_bss PARAMS ((int));
+static int md_chars_to_number PARAMS ((unsigned char *, int));
 
 /* Global variables. */
 struct bfin_insn *insn;
@@ -498,6 +499,23 @@ md_estimate_size_before_relax (fragS * fragP ATTRIBUTE_UNUSED,
   return 0;
 }
 
+/* Convert from target byte order to host byte order.  */
+
+static int
+md_chars_to_number (val, n)
+     unsigned char *val;	/* Value in target byte order */
+     int n;			/* Number of bytes in the input */
+{
+  int retval;
+
+  for (retval = 0; n--;)
+    {
+      retval <<= 8;
+      retval |= val[n];
+    }
+  return retval;
+}
+
 void
 md_apply_fix3 (fixP, valueP, seg)
      fixS *fixP;
@@ -505,156 +523,119 @@ md_apply_fix3 (fixP, valueP, seg)
      segT seg ATTRIBUTE_UNUSED;
 {
   char *where = fixP->fx_frag->fr_literal + fixP->fx_where;
-  //valueT value = *valueP;
 
-  int lowbyte = 0;
-  int highbyte = 1;
-  long val = *valueP;
-  int shift;
-  int not_yet_resolved = 0;
+  long value = *valueP;
+  long newval;
 
-  shift = 0;
   switch (fixP->fx_r_type)
     {
     case BFD_RELOC_BFIN_GOT:
-      fixP->fx_addnumber = 0;
-      where[lowbyte] = 0;
-      where[highbyte] |= 0 & 0x7f;
       fixP->fx_no_overflow = 1;
-      shift = 0;
+      newval = md_chars_to_number (where, 2);
+      newval |= 0x0 & 0x7f;
+      md_number_to_chars (where, newval, 2);
       break;
 
     case BFD_RELOC_BFIN_10_PCREL:
-      if (!val)
-	{
-	  /* val = 0 is special */
-	  fixP->fx_addnumber = 0;
-	  break;
-	}
-      fixP->fx_addnumber = 1;
-      if (val < -1024 || val > 1022)
+      if (!value)
+	break;
+      if (value < -1024 || value > 1022)
 	as_bad_where (fixP->fx_file, fixP->fx_line,
                       "pcrel too far BFD_RELOC_BFIN_10");
 
-      val /= 2;			// 11 bit offset even numbered, so we remove right bit
-      shift = 1;
-      where[lowbyte] = val & 0xff;
-      where[highbyte] |= (val >> 8) & 0x3;
+      /* 11 bit offset even numbered, so we remove right bit.  */
+      value = value >> 1;
+      newval = md_chars_to_number (where, 2);
+      newval |= value & 0x03ff;
+      md_number_to_chars (where, newval, 2);
       break;
 
     case BFD_RELOC_BFIN_12_PCREL_JUMP:
     case BFD_RELOC_BFIN_12_PCREL_JUMP_S:
     case BFD_RELOC_12_PCREL:
+      if (!value)
+	break;
 
-      /* If fixP->fx_offset is non-zero, it's a zero offset pc-relative
-         relocation. We need to check it in other pc-relative
-         relocations.  */
-
-      if (!val && !fixP->fx_offset)
-	{
-	  fixP->fx_addnumber = 0;
-	  break;
-	}
-      if (val < -4096 || val > 4094)
+      if (value < -4096 || value > 4094)
 	as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_BFIN_12");
-      fixP->fx_addnumber = 1;
-      val /= 2;			// 13 bit offset even numbered, so we remove right bit
-      shift = 1;
-      where[lowbyte] = val & 0xff;
-      where[highbyte] |= (val >> 8) & 0xf;
+      /* 13 bit offset even numbered, so we remove right bit.  */
+      value = value >> 1;
+      newval = md_chars_to_number (where, 2);
+      newval |= value & 0xfff;
+      md_number_to_chars (where, newval, 2);
       break;
 
     case BFD_RELOC_BFIN_16_LOW:
-
-      fixP->fx_addnumber = 0;
-      not_yet_resolved = 1;	// absolute values not be resolved here
-
-      break;
-
     case BFD_RELOC_BFIN_16_HIGH:
-      fixP->fx_addnumber = 0;
-      not_yet_resolved = 1;	// absolute values not be resolved here
+      fixP->fx_done = FALSE;
       break;
 
     case BFD_RELOC_BFIN_24_PCREL_JUMP_L:
     case BFD_RELOC_BFIN_24_PCREL_CALL_X:
     case BFD_RELOC_24_PCREL:
-      if (!val)
-	{
-	  fixP->fx_addnumber = 0;
-	  break;
-	}
-      fixP->fx_addnumber = 1;
-      if (val < -16777216 || val > 16777214)
+      if (!value)
+	break;
+
+      if (value < -16777216 || value > 16777214)
 	as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_BFIN_24");
-      val /= 2;			// 25 bit offset even numbered, so we remove right bit
-      shift = 1;
-      val++;			//
-      where -= 2;			// we want to go back and fix.
-      where[0] = val >> 16;
-      where[2] = val >> 0;
-      where[3] = val >> 8;
+
+      /* 25 bit offset even numbered, so we remove right bit.  */
+      value = value >> 1;
+      value++;
+
+      md_number_to_chars (where - 2, value >> 16, 1);
+      md_number_to_chars (where, value, 1);
+      md_number_to_chars (where + 1, value >> 8, 1);
       break;
 
     case BFD_RELOC_BFIN_5_PCREL:	/* LSETUP (a, b) : "a" */
-      if (!val)
-	{
-	  fixP->fx_addnumber = 0;
-	  break;
-	}
-      fixP->fx_addnumber = 1;
-      if (val < 4 || val > 30)
+      if (!value)
+	break;
+      if (value < 4 || value > 30)
 	as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_BFIN_5");
-      val /= 2;			// 5 bit unsigned even, so we remove right bit
-      shift = 1;
-
-      *where = (*where & 0xf0) | (val & 0xf);
+      value = value >> 1;
+      newval = md_chars_to_number (where, 1);
+      newval = (newval & 0xf0) | (value & 0xf);
+      md_number_to_chars (where, newval, 1);
       break;
 
     case BFD_RELOC_BFIN_11_PCREL:	/* LSETUP (a, b) : "b" */
-      if (!val)
-	{
-	  fixP->fx_addnumber = 0;
-	  break;
-	}
-      fixP->fx_addnumber = 1;
-      val += 2;
-      if (val < 4 || val > 2046)
+      if (!value)
+	break;
+      value += 2;
+      if (value < 4 || value > 2046)
 	as_bad_where (fixP->fx_file, fixP->fx_line, "pcrel too far BFD_RELOC_BFIN_11_PCREL");
-      val /= 2;			// 11 bit unsigned even, so we remove right bit
-      shift = 1;
-
-      where[lowbyte] = val & 0xff;
-      where[highbyte] |= (val >> 8) & 0x3;
+      /* 11 bit unsigned even, so we remove right bit.  */
+      value = value >> 1;
+      newval = md_chars_to_number (where, 2);
+      newval |= value & 0x03ff;
+      md_number_to_chars (where, newval, 2);
       break;
 
     case BFD_RELOC_8:
-      if (val < -0x80 || val >= 0x7f)
+      if (value < -0x80 || value >= 0x7f)
 	as_bad_where (fixP->fx_file, fixP->fx_line, "rel too far BFD_RELOC_8");
-      *where += val;
-      break;
-
-    case BFD_RELOC_32:
-      *where++ = val >> 0;
-      *where++ = val >> 8;
-      *where++ = val >> 16;
-      *where++ = val >> 24;
+      md_number_to_chars (where, value, 1);
       break;
 
     case BFD_RELOC_BFIN_16_IMM:
     case BFD_RELOC_16:
-      *where++ = val >> 0;
-      *where++ = val >> 8;
+      if (value < -0x8000 || value >= 0x7fff)
+	as_bad_where (fixP->fx_file, fixP->fx_line, "rel too far BFD_RELOC_8");
+      md_number_to_chars (where, value, 2);
       break;
 
-    case BFD_RELOC_BFIN_PLTPC :
-      *where++ = val >> 0;
-      *where++ = val >> 8;
+    case BFD_RELOC_32:
+      md_number_to_chars (where, value, 4);
+      break;
+
+    case BFD_RELOC_BFIN_PLTPC:
+      md_number_to_chars (where, value, 2);
       break;
 
     case BFD_RELOC_VTABLE_INHERIT:
     case BFD_RELOC_VTABLE_ENTRY:
-      fixP->fx_done = 0;
+      fixP->fx_done = FALSE;
       break;
 
     default:
@@ -663,24 +644,11 @@ md_apply_fix3 (fixP, valueP, seg)
 	  fprintf (stderr, "Relocation %d not handled in gas." " Contact support.\n", fixP->fx_r_type);
 	  return;
 	}
-      not_yet_resolved = 1;
     }
-  // XXX
-  // <strubi>
-  // This might be a dirty hack. I don't know if it's appropriate,
-  // but once we have done the fixing, we don't want to have LD
-  // relocating anymore on these entries. We mark them as 'done'
-  // to not emit them to the relocation table.
-  if (!fixP->fx_addsy && !not_yet_resolved)
-    {
-      fixP->fx_done = TRUE;
-    }
-  if (shift != 0)
-    {
-      val = *valueP;
-      if ((val & ((1 << shift) - 1)) != 0)
-	as_bad_where (fixP->fx_file, fixP->fx_line, "misaligned offset");
-    }
+
+  if (!fixP->fx_addsy)
+    fixP->fx_done = TRUE;
+
 }
 
 /* Round up a section size to the appropriate boundary. */
@@ -747,13 +715,6 @@ md_atof (type, litP, sizeP)
     }
 
   return 0;
-}
-
-/* Convert a machine dependent frag.  We never generate these.  */
-void
-md_convert_frag (bfd * abfd ATTRIBUTE_UNUSED, asection * sec ATTRIBUTE_UNUSED, fragS * fragp ATTRIBUTE_UNUSED)
-{
-  abort ();
 }
 
 /* Translate internal representation of relocation info to BFD target format.  */
@@ -1059,7 +1020,7 @@ Expr_Node_Gen_Reloc (Expr_Node * head, int parent_reloc)
 
   if (parent_reloc)
     {
-      //If it's 32 bit quantity then extra 16bit code needed to be add
+      /*  If it's 32 bit quantity then extra 16bit code needed to be add.  */
       int value = 0;
 
       if (head->type == Expr_Node_Constant)
@@ -1072,16 +1033,16 @@ Expr_Node_Gen_Reloc (Expr_Node * head, int parent_reloc)
 	}
       switch (parent_reloc)
 	{
-	  // some reloctions will need to allocate extra words
+	  /*  Some reloctions will need to allocate extra words.  */
 	case BFD_RELOC_BFIN_16_IMM:
 	case BFD_RELOC_BFIN_16_LOW:
 	case BFD_RELOC_BFIN_16_HIGH:
 	  note1 = conscode (gencode (value), NULL_CODE);
-	  pcrel = 0;		// only these are not pc relative
+	  pcrel = 0;
 	  break;
 	case BFD_RELOC_BFIN_PLTPC:
 	  note1 = conscode (gencode (value), NULL_CODE);
-	  pcrel = 0;		// only these are not pc relative
+	  pcrel = 0;
 	  break;
 	case BFD_RELOC_16:
 	case BFD_RELOC_BFIN_GOT:
@@ -1436,7 +1397,6 @@ bfin_gen_ldimmhalf (REG_T reg, int H, int S, int Z, Expr_Node * phword, int relo
   ASSIGN (Z);
 
   ASSIGN_R (reg);
-  // determine group:
   grp = (GROUP (reg));
   ASSIGN (grp);
   if (reloc == 2)
@@ -2035,3 +1995,13 @@ bfin_start_label (char *ptr)
 
   return TRUE;
 } 
+
+int
+bfin_force_relocation (struct fix *fixp)
+{
+  if (fixp->fx_r_type ==BFD_RELOC_BFIN_16_LOW
+      || fixp->fx_r_type == BFD_RELOC_BFIN_16_HIGH)
+    return TRUE;
+
+  return generic_force_reloc (fixp);
+}

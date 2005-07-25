@@ -1,3 +1,12 @@
+2005-07-25  Catherine Moore  <clm@cm00re.com>
+
+	* config/tc-bfin.h (md_convert_frag):  Define.
+	(TC_FORCE_RELOCATION):  Define.
+	* config/tc-bfin.c (md_chars_to_number):  New.
+	(md_apply_fix3):  Rewritten.
+	(md_convert_frag):  Removed.
+	(bfin_force_relocation):  New.
+	
 2005-07-21  Catherine Moore  <clm@cm00re.com>
 
 	* config/bfin-aux.h:  Formatting, naming and spacing updates.
