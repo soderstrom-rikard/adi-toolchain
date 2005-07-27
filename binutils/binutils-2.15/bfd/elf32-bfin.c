@@ -817,9 +817,16 @@ reloc_stack_operate (unsigned int oper)
       }
     case R_div:
       {
-	value =
-	  reloc_stack[reloc_stack_tos - 2] / reloc_stack[reloc_stack_tos - 1];
-	reloc_stack_tos -= 2;
+	if (reloc_stack[reloc_stack_tos - 1] == 0)
+	  {
+	    _bfd_abort (__FILE__, __LINE__, _("Division by zero. "));
+	  }
+	else
+	  {
+	    value =
+	      reloc_stack[reloc_stack_tos - 2] / reloc_stack[reloc_stack_tos - 1];
+	    reloc_stack_tos -= 2;
+	  }
 	break;
       }
     case R_mod:

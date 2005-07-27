@@ -1,3 +1,8 @@
+2005-07-27  Catherine Moore  <clm@cm00re.com>
+
+	* elf32-bfin.c (reloc_stack_operate):  Report error if
+	dividing by zero.
+
 2005-07-17  Catherine Moore  <clm@cm00e.com>
 
 	* Makefile.am:  Add bfin support.
