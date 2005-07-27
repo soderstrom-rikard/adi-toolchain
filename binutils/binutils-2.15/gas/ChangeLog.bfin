@@ -1,3 +1,8 @@
+2005-07-27  Catherine Moore  <clm@cm00re.com>
+
+	* config/bfin-parse.y (binary):  Report error if dividing
+	by zero.
+
 2005-07-25  Catherine Moore  <clm@cm00re.com>
 
 	* config/tc-bfin.h (md_convert_frag):  Define.

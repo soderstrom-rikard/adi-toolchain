@@ -4224,7 +4224,10 @@ binary (Expr_Op_Type op, Expr_Node *x, Expr_Node *y)
 	  x->value.i_value *= y->value.i_value;
 	  break;
         case Expr_Op_Type_Div: 
-	  x->value.i_value /= y->value.i_value;
+	  if (y->value.i_value == 0)
+	    error ("Illegal Expression:  Division by zero.");
+	  else
+	    x->value.i_value /= y->value.i_value;
 	  break;
         case Expr_Op_Type_Mod: 
 	  x->value.i_value %= y->value.i_value;
