@@ -39,7 +39,7 @@
 /* Compile using library ID based shared libraries.
  * Set a specific ID using the -mshared-library-id=xxx option.
  */
-#define MASK_ID_SHARED_LIBRARY	(1<<18)
+#define MASK_ID_SHARED_LIBRARY	     0x04000000
 
 /* Run-time compilation parameters selecting different hardware subsets.  */
 

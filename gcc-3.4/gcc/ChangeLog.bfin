@@ -1,3 +1,7 @@
+2005-07-27  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.h (MASK_ID_SHARED_LIBRARY): Use a unique bit.
+
 2005-07-20  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (trapifcc): Use exception 3 instead of 2.
