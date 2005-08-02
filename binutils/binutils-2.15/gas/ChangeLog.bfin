@@ -1,5 +1,12 @@
 2005-08-02  Catherine Moore  <clm@cm00re.com>
 
+	* config/bfin-parse.y (semantic_error): Removed.
+	Change all callers to yyerror.
+	(register_mismatch): Likewise.
+	(yyerror): Reformat error messages for more readable output.
+	
+2005-08-02  Catherine Moore  <clm@cm00re.com>
+
 	* config/bfin-lex.l: Changes to conform to gnu coding
 	standards.  Resolve copyright issues.
 	* config/bfin-parse.y: Likewise.

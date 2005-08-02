@@ -184,7 +184,7 @@ static void notethat (char *format, ...);
 
 char *current_inputline;
 extern char *yytext;
-int yyerror(char *msg);
+int yyerror (char *msg);
 
 void error (char *format, ...)
 {
@@ -198,28 +198,18 @@ void error (char *format, ...)
     as_bad (buffer);
 }
 
-
-#define semantic_error(s) _semantic_error (s, __LINE__)
-#define register_mismatch() _register_mismatch (__LINE__)
-
-static
-int _semantic_error (char *syntax, int this_line)
-{
-  error ("\nSyntax error:<%d>:  `%s'\n", this_line, syntax);
-  return -1;
-}
-
-static int
-_register_mismatch (int other_line)
-{
-  return _semantic_error ("Register mismatch", other_line);
-}
-
 int
 yyerror (char *msg)
 {
-  error ("\n %s Input text was `%s'\n", msg, yytext);
-  return 0;	/* means successful	*/
+  if (msg[0] == '\0')
+    error ("%s", msg);
+
+  else if (yytext[0] != ';')
+    error ("%s. Input text was %s.", msg, yytext);
+  else
+    error ("%s.", msg);
+
+  return -1;
 }
 
 static int
@@ -280,19 +270,19 @@ valid_dreg_pair (Register *reg1, Expr_Node *reg2)
 {
   if (!IS_DREG (*reg1))
     {
-      semantic_error ("Dregs expected");
+      yyerror ("Dregs expected");
       return 0;
     }
 
   if (reg1->regno != 1 && reg1->regno != 3)
     {
-      semantic_error ("Bad register pair");
+      yyerror ("Bad register pair");
       return 0;
     }
 
   if (imm7 (reg2) != reg1->regno - 1)
     {
-      semantic_error ("Bad register pair");
+      yyerror ("Bad register pair");
       return 0;
     }
 
@@ -305,7 +295,7 @@ check_multiply_halfregs (Macfunc *aa, Macfunc *ab)
 {
   if ((!REG_EQUAL (aa->s0, ab->s0) && !REG_EQUAL (aa->s0, ab->s1))
       || (!REG_EQUAL (aa->s1, ab->s1) && !REG_EQUAL (aa->s1, ab->s0)))
-    return semantic_error ("Source multiplication register mismatch");
+    return yyerror ("Source multiplication register mismatch");
 
   return 0;
 }
@@ -327,9 +317,9 @@ check_macfuncs (Macfunc *aa, Opt_mode *opa,
     {
       /*  (M) is not allowed here.  */
       if (opa->MM != 0)
-	return semantic_error ("(M) not allowed with A0MAC");
+	return yyerror ("(M) not allowed with A0MAC");
       if (ab->n != 1)
-	return semantic_error ("Vector AxMACs can't be same");
+	return yyerror ("Vector AxMACs can't be same");
 
       mtmp = *aa; *aa = *ab; *ab = mtmp;
       otmp = *opa; *opa = *opb; *opb = otmp;
@@ -337,11 +327,11 @@ check_macfuncs (Macfunc *aa, Opt_mode *opa,
   else
     {
       if (opb->MM != 0)
-	return semantic_error ("(M) not allowed with A0MAC");
+	return yyerror ("(M) not allowed with A0MAC");
       if (opa->mod != 0)
-	return semantic_error ("Bad opt mode");
+	return yyerror ("Bad opt mode");
       if (ab->n != 0)
-	return semantic_error ("Vector AxMACs can't be same");
+	return yyerror ("Vector AxMACs can't be same");
     }
 
   /*  If both ops are != 3, we have multiply_halfregs in both
@@ -363,18 +353,18 @@ check_macfuncs (Macfunc *aa, Opt_mode *opa,
 
   if (aa->w == ab->w  && aa->P != ab->P)
     {
-      return semantic_error ("macfuncs must differ");
+      return yyerror ("macfuncs must differ");
       if (aa->w && (aa->dst.regno - ab->dst.regno != 1))
-	return semantic_error ("Destination Dregs must differ by one");
+	return yyerror ("Destination Dregs must differ by one");
     }
   /* We assign to full regs, thus obey even/odd rules.  */
   else if ((aa->w && aa->P && IS_EVEN(aa->dst)) 
 	   || (ab->w && ab->P && !IS_EVEN(ab->dst)))
-    return semantic_error ("Even/Odd register assignment mismatch");
+    return yyerror ("Even/Odd register assignment mismatch");
   /* We assign to half regs, thus obey hi/low rules.  */
   else if ( (aa->w && !aa->P && !IS_H(aa->dst)) 
 	    || (ab->w && !aa->P && IS_H(ab->dst)))
-    return semantic_error ("High/Low register assignment mismatch");
+    return yyerror ("High/Low register assignment mismatch");
 
   /* Make sure first macfunc has got both P flags ORed.  */
   aa->P |= ab->P;
@@ -638,7 +628,7 @@ asm: asm_1 SEMICOLON
 	      else if (is_group2 ($3) && is_group1 ($5))
 		$$ = bfin_gen_multi_instr ($1, $5, $3);
 	      else
-		return semantic_error ("Wrong 16 bit instructions groups, slot 2 and slot 3 must be 16-bit instrution group");
+		return yyerror ("Wrong 16 bit instructions groups, slot 2 and slot 3 must be 16-bit instrution group");
 	    }
 	  else if (($3->value & 0xf800) == 0xc000)
 	    {
@@ -647,7 +637,7 @@ asm: asm_1 SEMICOLON
 	      else if (is_group2 ($1) && is_group1 ($5))
 		$$ = bfin_gen_multi_instr ($3, $5, $1);
 	      else
-		return semantic_error ("Wrong 16 bit instructions groups, slot 1 and slot 3 must be 16-bit instrution group");
+		return yyerror ("Wrong 16 bit instructions groups, slot 1 and slot 3 must be 16-bit instrution group");
 	    }
 	  else if (($5->value & 0xf800) == 0xc000)
 	    {
@@ -656,7 +646,7 @@ asm: asm_1 SEMICOLON
 	      else if (is_group2 ($1) && is_group1 ($3))
 		$$ = bfin_gen_multi_instr ($5, $3, $1);
 	      else
-		return semantic_error ("Wrong 16 bit instructions groups, slot 1 and slot 2 must be 16-bit instrution group");
+		return yyerror ("Wrong 16 bit instructions groups, slot 1 and slot 2 must be 16-bit instrution group");
 	    }
 	  else
 	    error ("\nIllegal Multi Issue Construct, at least any one of the slot must be DSP32 instruction group\n");
@@ -671,7 +661,7 @@ asm: asm_1 SEMICOLON
 	      else if (is_group2 ($3))
 		$$ = bfin_gen_multi_instr ($1, 0, $3);
 	      else
-		return semantic_error ("Wrong 16 bit instructions groups, slot 2 must be the 16-bit instruction group");
+		return yyerror ("Wrong 16 bit instructions groups, slot 2 must be the 16-bit instruction group");
 	    }
 	  else if (($3->value & 0xf800) == 0xc000)
 	    {
@@ -680,19 +670,19 @@ asm: asm_1 SEMICOLON
 	      else if (is_group2 ($1))
 		$$ = bfin_gen_multi_instr ($3, 0, $1);
 	      else
-		return semantic_error ("Wrong 16 bit instructions groups, slot 1 must be the 16-bit instruction group");
+		return yyerror ("Wrong 16 bit instructions groups, slot 1 must be the 16-bit instruction group");
 	    }
 	  else if (is_group1 ($1) && is_group2 ($3))
 	      $$ = bfin_gen_multi_instr (0, $1, $3);
 	  else if (is_group2 ($1) && is_group1 ($3))
 	    $$ = bfin_gen_multi_instr (0, $3, $1);
 	  else
-	    return semantic_error ("Wrong 16 bit instructions groups, slot 1 and slot 2 must be the 16-bit instruction group");
+	    return yyerror ("Wrong 16 bit instructions groups, slot 1 and slot 2 must be the 16-bit instruction group");
 	}
 	| error
 	{
 	$$ = 0;
-	as_bad ("\nParse error.\n");
+	yyerror ("");
 	yyerrok;
 	}
 	;
@@ -713,7 +703,7 @@ asm_1:
 	  if ($1.n == 0)
 	    {
 	      if ($2.MM) 
-		return semantic_error ("(m) not allowed with a0 unit");
+		return yyerror ("(m) not allowed with a0 unit");
 	      op1 = 3;
 	      op0 = $1.op;
 	      w1 = 0;
@@ -772,7 +762,7 @@ asm_1:
 	      $$ = DSP32ALU (11, 0, 0, &$1, 0, 0, 0, 0, 0);
 	    }
 	  else 
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}	
 	| HALF_REG ASSIGN LPAREN a_plusassign REG_A RPAREN
 	{
@@ -782,7 +772,7 @@ asm_1:
 	      $$ = DSP32ALU (11, IS_H ($1), 0, &$1, 0, 0, 0, 0, 1);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 	| A_ZERO_DOT_H ASSIGN HALF_REG
 	{
@@ -798,11 +788,11 @@ asm_1:
 	  COLON expr COMMA REG COLON expr RPAREN aligndir
 	{
 	  if (!IS_DREG ($2) || !IS_DREG ($4))
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	  else if (!valid_dreg_pair (&$9, $11))
-	    return semantic_error ("Bad dreg pair");
+	    return yyerror ("Bad dreg pair");
 	  else if (!valid_dreg_pair (&$13, $15))
-	    return semantic_error ("Bad dreg pair");
+	    return yyerror ("Bad dreg pair");
 	  else
 	    {
 	      notethat ("dsp32alu: (dregs , dregs ) = BYTEOP16P (dregs_pair , dregs_pair ) (half)\n");
@@ -814,11 +804,11 @@ asm_1:
 	  REG COLON expr RPAREN aligndir 
 	{
 	  if (!IS_DREG ($2) || !IS_DREG($4))
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	  else if (!valid_dreg_pair (&$9, $11))
-	    return semantic_error ("Bad dreg pair");
+	    return yyerror ("Bad dreg pair");
 	  else if (!valid_dreg_pair (&$13, $15))
-	    return semantic_error ("Bad dreg pair");
+	    return yyerror ("Bad dreg pair");
 	  else
 	    {
 	      notethat ("dsp32alu: (dregs , dregs ) = BYTEOP16M (dregs_pair , dregs_pair ) (aligndir)\n");
@@ -829,9 +819,9 @@ asm_1:
 	| LPAREN REG COMMA REG RPAREN ASSIGN BYTEUNPACK REG COLON expr aligndir
 	{
 	  if (!IS_DREG ($2) || !IS_DREG ($4))
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	  else if (!valid_dreg_pair (&$8, $10))
-	    return semantic_error ("Bad dreg pair");
+	    return yyerror ("Bad dreg pair");
 	  else
 	    {
 	      notethat ("dsp32alu: (dregs , dregs ) = BYTEUNPACK dregs_pair (aligndir)\n");
@@ -846,7 +836,7 @@ asm_1:
 	      $$ = DSP32ALU (13, 0, &$2, &$4, &$8, 0, 0, 0, $10.r0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 	| REG ASSIGN A_ONE_DOT_L PLUS A_ONE_DOT_H COMMA
 	  REG ASSIGN A_ZERO_DOT_L PLUS A_ZERO_DOT_H
@@ -857,7 +847,7 @@ asm_1:
 	      $$ = DSP32ALU (12, 0, &$1, &$7, 0, 0, 0, 0, 1);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 
@@ -877,13 +867,13 @@ asm_1:
 	      $$ = DSP32ALU (17, 0, &$1, &$7, 0, 0, $12.s0, $12.x0, 1);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| REG ASSIGN REG plus_minus REG COMMA REG ASSIGN REG plus_minus REG amod1
 	{
 	  if ($4.r0 == $10.r0) 
-	    return semantic_error ("Operators must differ");
+	    return yyerror ("Operators must differ");
 
 	  if (IS_DREG ($1) && IS_DREG ($3) && IS_DREG ($5)
 	      && REG_SAME ($3, $9) && REG_SAME ($5, $11))
@@ -893,7 +883,7 @@ asm_1:
 	      $$ = DSP32ALU (4, 0, &$1, &$7, &$3, &$5, $12.s0, $12.x0, 2);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 /*  Bar Operations.  */
@@ -901,10 +891,10 @@ asm_1:
 	| REG ASSIGN REG op_bar_op REG COMMA REG ASSIGN REG op_bar_op REG amod2 
 	{
 	  if (!REG_SAME ($3, $9) || !REG_SAME ($5, $11))
-	    return semantic_error ("Differing source registers");
+	    return yyerror ("Differing source registers");
 
 	  if (!IS_DREG ($1) || !IS_DREG ($3) || !IS_DREG ($5) || !IS_DREG ($7)) 
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 
 	
 	  if ($4.r0 == 1 && $10.r0 == 2)
@@ -918,7 +908,7 @@ asm_1:
 	      $$ = DSP32ALU (1, 0, &$1, &$7, &$3, &$5, $12.s0, $12.x0, $12.r0);
 	    }
 	  else
-	    return semantic_error ("Bar operand mismatch");
+	    return yyerror ("Bar operand mismatch");
 	}
 
 	| REG ASSIGN ABS REG vmod
@@ -941,7 +931,7 @@ asm_1:
 	      $$ = DSP32ALU (op, 0, 0, &$1, &$4, 0, 0, 0, 2);
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 	| a_assign ABS REG_A
 	{
@@ -956,7 +946,7 @@ asm_1:
 	      $$ = DSP32ALU (9, IS_H ($3), 0, 0, &$3, 0, 0, 0, 0);
 	    }
 	  else
-	    return semantic_error ("A0.l = Rx.l expected");
+	    return yyerror ("A0.l = Rx.l expected");
 	}
 	| A_ONE_DOT_L ASSIGN HALF_REG
 	{
@@ -966,7 +956,7 @@ asm_1:
 	      $$ = DSP32ALU (9, IS_H ($3), 0, 0, &$3, 0, 0, 0, 2);
 	    }
 	  else
-	    return semantic_error ("A1.l = Rx.l expected");
+	    return yyerror ("A1.l = Rx.l expected");
 	}
 
 	| REG ASSIGN c_align LPAREN REG COMMA REG RPAREN
@@ -977,17 +967,17 @@ asm_1:
 	      $$ = DSP32SHIFT (13, &$1, &$7, &$5, $3.r0, 0);
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 
  	| REG ASSIGN BYTEOP1P LPAREN REG COLON expr COMMA REG COLON expr RPAREN byteop_mod
 	{
 	  if (!IS_DREG ($1))
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	  else if (!valid_dreg_pair (&$5, $7))
-	    return semantic_error ("Bad dreg pair");
+	    return yyerror ("Bad dreg pair");
 	  else if (!valid_dreg_pair (&$9, $11))
-	    return semantic_error ("Bad dreg pair");
+	    return yyerror ("Bad dreg pair");
 	  else
 	    {
 	      notethat ("dsp32alu: dregs = BYTEOP1P (dregs_pair , dregs_pair ) (T)\n");
@@ -997,11 +987,11 @@ asm_1:
  	| REG ASSIGN BYTEOP1P LPAREN REG COLON expr COMMA REG COLON expr RPAREN
 	{
 	  if (!IS_DREG ($1))
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	  else if (!valid_dreg_pair (&$5, $7))
-	    return semantic_error ("Bad dreg pair");
+	    return yyerror ("Bad dreg pair");
 	  else if (!valid_dreg_pair (&$9, $11))
-	    return semantic_error ("Bad dreg pair");
+	    return yyerror ("Bad dreg pair");
 	  else
 	    {
 	      notethat ("dsp32alu: dregs = BYTEOP1P (dregs_pair , dregs_pair ) (T)\n");
@@ -1013,11 +1003,11 @@ asm_1:
 	  rnd_op
 	{
 	  if (!IS_DREG ($1))
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	  else if (!valid_dreg_pair (&$5, $7))
-	    return semantic_error ("Bad dreg pair");
+	    return yyerror ("Bad dreg pair");
 	  else if (!valid_dreg_pair (&$9, $11))
-	    return semantic_error ("Bad dreg pair");
+	    return yyerror ("Bad dreg pair");
 	  else
 	    {
 	      notethat ("dsp32alu: dregs = BYTEOP2P (dregs_pair , dregs_pair ) (rnd_op)\n");
@@ -1030,11 +1020,11 @@ asm_1:
 	  rnd_op
 	{
 	  if (!IS_DREG ($1))
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	  else if (!valid_dreg_pair (&$5, $7))
-	    return semantic_error ("Bad dreg pair");
+	    return yyerror ("Bad dreg pair");
 	  else if (!valid_dreg_pair (&$9, $11))
-	    return semantic_error ("Bad dreg pair");
+	    return yyerror ("Bad dreg pair");
 	  else
 	    {
 	      notethat ("dsp32alu: dregs = BYTEOP2P (dregs_pair , dregs_pair ) (rnd_op)\n");
@@ -1046,11 +1036,11 @@ asm_1:
 	  b3_op
 	{
 	  if (!IS_DREG ($1))
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	  else if (!valid_dreg_pair (&$5, $7))
-	    return semantic_error ("Bad dreg pair");
+	    return yyerror ("Bad dreg pair");
 	  else if (!valid_dreg_pair (&$9, $11))
-	    return semantic_error ("Bad dreg pair");
+	    return yyerror ("Bad dreg pair");
 	  else
 	    {
 	      notethat ("dsp32alu: dregs = BYTEOP3P (dregs_pair , dregs_pair ) (b3_op)\n");
@@ -1066,7 +1056,7 @@ asm_1:
 	      $$ = DSP32ALU (24, 0, 0, &$1, &$5, &$7, 0, 0, 0);
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 
 	| HALF_REG ASSIGN HALF_REG ASSIGN SIGN LPAREN HALF_REG RPAREN STAR
@@ -1081,7 +1071,7 @@ asm_1:
 		$$ = DSP32ALU (12, 0, 0, &$1, &$7, &$10, 0, 0, 0);
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 	| REG ASSIGN REG plus_minus REG amod1 
 	{
@@ -1107,7 +1097,7 @@ asm_1:
 		$$ = COMP3OP (&$1, &$3, &$5, 5);
 	      }
 	    else
-	      return semantic_error ("Dregs expected");
+	      return yyerror ("Dregs expected");
 	}
 	| REG ASSIGN min_max LPAREN REG COMMA REG RPAREN vmod
 	{
@@ -1124,7 +1114,7 @@ asm_1:
 	      $$ = DSP32ALU (op, 0, 0, &$1, &$5, &$7, 0, 0, $3.r0);
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 
 	| a_assign MINUS REG_A
@@ -1146,7 +1136,7 @@ asm_1:
 	      $$ = DSP32ALU (8, 0, 0, 0, 0, 0, 0, 0, 2);
 	    }
 	  else
-	    return semantic_error ("Bad value, 0 expected");
+	    return yyerror ("Bad value, 0 expected");
 	}
 
 	/* Saturating.  */
@@ -1158,7 +1148,7 @@ asm_1:
 	      $$ = DSP32ALU (8, 0, 0, 0, 0, 0, 1, 0, IS_A1 ($1));
 	    }
 	  else
-	    return semantic_error ("Registers must be equal");
+	    return yyerror ("Registers must be equal");
 	}
 
 	| HALF_REG ASSIGN REG LPAREN RND RPAREN
@@ -1169,7 +1159,7 @@ asm_1:
 	      $$ = DSP32ALU (12, IS_H ($1), 0, &$1, &$3, 0, 0, 0, 3);
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 
 	| HALF_REG ASSIGN REG plus_minus REG LPAREN RND12 RPAREN
@@ -1180,7 +1170,7 @@ asm_1:
 	      $$ = DSP32ALU (5, IS_H ($1), 0, &$1, &$3, &$5, 0, 0, $4.r0);
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 
 	| HALF_REG ASSIGN REG plus_minus REG LPAREN RND20 RPAREN
@@ -1191,7 +1181,7 @@ asm_1:
 	      $$ = DSP32ALU (5, IS_H ($1), 0, &$1, &$3, &$5, 0, 1, $4.r0 | 2);
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 
 	| a_assign REG_A 
@@ -1202,7 +1192,7 @@ asm_1:
 	      $$ = DSP32ALU (8, 0, 0, 0, 0, 0, IS_A1 ($1), 0, 3);
 	    }
 	  else
-	    return semantic_error ("Accu reg arguments must differ");
+	    return yyerror ("Accu reg arguments must differ");
 	}
 
 	| a_assign REG
@@ -1213,7 +1203,7 @@ asm_1:
 	      $$ = DSP32ALU (9, 0, 0, 0, &$2, 0, 1, 0, IS_A1 ($1) << 1);
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 
 	| REG ASSIGN HALF_REG xpmod
@@ -1236,17 +1226,17 @@ asm_1:
 		  $$ = ALU2OP (&$1, &$3, 10 | ($4.r0 ? 0: 1));   // dst, src, opc
 		}
 	      else
-		return register_mismatch ();
+	        return yyerror ("Register mismatch");
 	    }
 	  else
-	    return semantic_error ("Low reg expected");
+	    return yyerror ("Low reg expected");
 	}
 
 	| HALF_REG ASSIGN expr
 	{
 	  notethat ("LDIMMhalf: pregs_half = imm16\n");
 	  if (!IS_IMM ($3, 16) && !IS_UIMM ($3, 16))
-	    return semantic_error ("Constant out of range");
+	    return yyerror ("Constant out of range");
 	  $$ = LDIMMHALF_R (&$1, IS_H ($1), 0, 0, $3);
 	}
 
@@ -1255,7 +1245,7 @@ asm_1:
 	  notethat ("dsp32alu: An = 0\n");
 
 	  if (imm7 ($2) != 0)
-	    return semantic_error ("0 expected");
+	    return yyerror ("0 expected");
 
 	  $$ = DSP32ALU (8, 0, 0, 0, 0, 0, 0, 0, IS_A1 ($1));
 	}
@@ -1283,7 +1273,7 @@ asm_1:
 		      $$ = COMPI2OPP (&$1, imm7 ($3), 0);
 		    }
 		  else
-		    return semantic_error ("Bad register or value for assigment");
+		    return yyerror ("Bad register or value for assigment");
 		}
 	      else
 		{
@@ -1306,7 +1296,7 @@ asm_1:
 	| HALF_REG ASSIGN REG
 	{
 	  if (IS_H ($1))
-	    return semantic_error ("Low reg expected");
+	    return yyerror ("Low reg expected");
 
 	  if (IS_DREG ($1) && $3.regno == REG_A0x)
 	    {
@@ -1319,7 +1309,7 @@ asm_1:
 	      $$ = DSP32ALU (10, 0, 0, &$1, 0, 0, 0, 0, 1);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 /* 4 rules compacted */
@@ -1331,7 +1321,7 @@ asm_1:
 	      $$ = DSP32ALU (0, 0, 0, &$1, &$3, &$5, $6.s0, $6.x0, $4.r0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| REG ASSIGN BYTE_DREG xpmod
@@ -1342,7 +1332,7 @@ asm_1:
 	      $$ = ALU2OP (&$1, &$3, 12 | ($4.r0 ? 0: 1));   // dst, src, opc
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| a_assign ABS REG_A COMMA a_assign ABS REG_A
@@ -1353,7 +1343,7 @@ asm_1:
 	      $$ = DSP32ALU (16, 0, 0, 0, 0, 0, 0, 0, 3);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| a_assign MINUS REG_A COMMA a_assign MINUS REG_A
@@ -1364,7 +1354,7 @@ asm_1:
 	      $$ = DSP32ALU (14, 0, 0, 0, 0, 0, 0, 0, 3);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| a_minusassign REG_A w32_or_nothing
@@ -1375,7 +1365,7 @@ asm_1:
 	      $$ = DSP32ALU (11, 0, 0, 0, 0, 0, $3.r0, 0, 3);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| REG _MINUS_ASSIGN expr
@@ -1391,7 +1381,7 @@ asm_1:
 	      $$ = DAGMODIK (&$1, 1);
 	    }
 	  else
-	    return semantic_error ("Register or value mismatch");
+	    return yyerror ("Register or value mismatch");
 	}
 
 	| REG _PLUS_ASSIGN REG LPAREN BREV RPAREN
@@ -1408,7 +1398,7 @@ asm_1:
 	      $$ = PTR2OP (&$1, &$3, 5);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| REG _MINUS_ASSIGN REG
@@ -1424,7 +1414,7 @@ asm_1:
 	      $$ = PTR2OP (&$1, &$3, 0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| REG_A _PLUS_ASSIGN REG_A w32_or_nothing
@@ -1435,7 +1425,7 @@ asm_1:
 	      $$ = DSP32ALU (11, 0, 0, 0, 0, 0, $4.r0, 0, 2);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| REG _PLUS_ASSIGN REG
@@ -1446,7 +1436,7 @@ asm_1:
 	      $$ = DAGMODIM (&$1, &$3, 0, 0);
 	    }
 	  else
-	    return semantic_error ("iregs += mregs expected");
+	    return yyerror ("iregs += mregs expected");
 	}
 
 	| REG _PLUS_ASSIGN expr
@@ -1464,7 +1454,7 @@ asm_1:
 		  $$ = DAGMODIK (&$1, 0);
 		}
 	      else
-		return semantic_error ("iregs += [ 2 | 4 ");
+		return yyerror ("iregs += [ 2 | 4 ");
 	    }
 	  else if (IS_PREG ($1) && IS_IMM ($3, 7))
 	    {
@@ -1477,7 +1467,7 @@ asm_1:
 	      $$ = COMPI2OPD (&$1, imm7 ($3), 1);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
  	| REG _STAR_ASSIGN REG
@@ -1488,15 +1478,15 @@ asm_1:
 	      $$ = ALU2OP (&$1, &$3, 3);   // dst, src, opc
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| SAA LPAREN REG COLON expr COMMA REG COLON expr RPAREN aligndir
 	{
 	  if (!valid_dreg_pair (&$3, $5))
-	    return semantic_error ("Bad dreg pair");
+	    return yyerror ("Bad dreg pair");
 	  else if (!valid_dreg_pair (&$7, $9))
-	    return semantic_error ("Bad dreg pair");
+	    return yyerror ("Bad dreg pair");
 	  else
 	    {
 	      notethat ("dsp32alu: SAA (dregs_pair , dregs_pair ) (aligndir)\n");
@@ -1512,7 +1502,7 @@ asm_1:
 	      $$ = DSP32ALU (8, 0, 0, 0, 0, 0, 1, 0, 2);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| REG ASSIGN LPAREN REG PLUS REG RPAREN LESS_LESS expr
@@ -1531,7 +1521,7 @@ asm_1:
 		  $$ = ALU2OP (&$1, &$6, 5);   // dst, src, opc
 		}
 	      else
-		return semantic_error ("Bad shift value");
+		return yyerror ("Bad shift value");
 	    }
 	  else if (IS_PREG ($1) && IS_PREG ($4) && IS_PREG ($6)
 		   && REG_SAME ($1, $4))
@@ -1547,10 +1537,10 @@ asm_1:
 		  $$ = PTR2OP (&$1, &$6, 7);
 		}
 	      else
-		return semantic_error ("Bad shift value");
+		return yyerror ("Bad shift value");
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 			
 /*  COMP3 CCFLAG  */
@@ -1562,7 +1552,7 @@ asm_1:
 	      $$ = COMP3OP (&$1, &$3, &$5, 3);
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 	| REG ASSIGN REG CARET REG
 	{
@@ -1572,7 +1562,7 @@ asm_1:
 	      $$ = COMP3OP (&$1, &$3, &$5, 4);
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 	| REG ASSIGN REG PLUS LPAREN REG LESS_LESS expr RPAREN
 	{
@@ -1589,10 +1579,10 @@ asm_1:
 		  $$ = COMP3OP (&$1, &$3, &$6, 7);
 		}
 	      else
-		  return semantic_error ("Bad shift value");
+		  return yyerror ("Bad shift value");
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 	| CCREG ASSIGN REG_A _ASSIGN_ASSIGN REG_A
 	{
@@ -1602,7 +1592,7 @@ asm_1:
 	      $$ = CCFLAG (0, 0, 5, 0, 0);
 	    }
 	  else
-	    return semantic_error ("CC register expected");
+	    return yyerror ("CC register expected");
 	}
 	| CCREG ASSIGN REG_A LESS_THAN REG_A
 	{
@@ -1612,7 +1602,7 @@ asm_1:
 	      $$ = CCFLAG (0, 0, 6, 0, 0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 	| CCREG ASSIGN REG LESS_THAN REG iu_or_nothing
 	{
@@ -1622,7 +1612,7 @@ asm_1:
 	      $$ = CCFLAG (&$3, $5.regno & CODE_MASK, $6.r0, 0, IS_PREG ($3) ? 1 : 0);
 	    }
 	  else
-	    return semantic_error ("Compare only of same register class");
+	    return yyerror ("Compare only of same register class");
 	}
 	| CCREG ASSIGN REG LESS_THAN expr iu_or_nothing
 	{
@@ -1633,7 +1623,7 @@ asm_1:
 	      $$ = CCFLAG (&$3, imm3($5), $6.r0, 1, IS_PREG ($3) ? 1 : 0);
 	    }
 	  else
-	    return semantic_error ("Bad constant value");
+	    return yyerror ("Bad constant value");
 	}
 	| CCREG ASSIGN REG _ASSIGN_ASSIGN REG
 	{
@@ -1651,7 +1641,7 @@ asm_1:
 	      $$ = CCFLAG (&$3, imm3($5), 0, 1, IS_PREG ($3) ? 1 : 0);
 	    }
 	  else
-	    return semantic_error ("Bad constant range");
+	    return yyerror ("Bad constant range");
 	}
 	| CCREG ASSIGN REG_A _LESS_THAN_ASSIGN REG_A
 	{
@@ -1661,7 +1651,7 @@ asm_1:
 	      $$ = CCFLAG (0, 0, 7, 0, 0);
 	    }
 	  else
-	    return semantic_error ("CC register expected");
+	    return yyerror ("CC register expected");
 	}
 	| CCREG ASSIGN REG _LESS_THAN_ASSIGN REG iu_or_nothing
 	{
@@ -1672,7 +1662,7 @@ asm_1:
 			   1 + $6.r0, 0, IS_PREG ($3) ? 1 : 0);
 	    }
 	  else
-	    return semantic_error ("Compare only of same register class");
+	    return yyerror ("Compare only of same register class");
 	}
 	| CCREG ASSIGN REG _LESS_THAN_ASSIGN expr iu_or_nothing
 	{
@@ -1692,10 +1682,10 @@ asm_1:
 		  $$ = CCFLAG (&$3, imm3($5), 1+$6.r0, 1, 1);
 		}
 	      else
-		return semantic_error ("Dreg or Preg expected");
+		return yyerror ("Dreg or Preg expected");
 	    }
 	  else
-	    return semantic_error ("Bad constant value");
+	    return yyerror ("Bad constant value");
 	}
 
 	| REG ASSIGN REG AMPERSAND REG
@@ -1706,7 +1696,7 @@ asm_1:
 	      $$ = COMP3OP (&$1, &$3, &$5, 2);
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 
 	| ccstat
@@ -1723,7 +1713,7 @@ asm_1:
 	      $$ = bfin_gen_regmv (&$3, &$1);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| CCREG ASSIGN REG
@@ -1734,7 +1724,7 @@ asm_1:
 	      $$ = bfin_gen_cc2dreg (1, &$3);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| REG ASSIGN CCREG
@@ -1745,7 +1735,7 @@ asm_1:
 	      $$ = bfin_gen_cc2dreg (0, &$1);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| CCREG _ASSIGN_BANG CCREG
@@ -1761,7 +1751,7 @@ asm_1:
 	  notethat ("dsp32mult: dregs_half = multiply_halfregs (opt_mode)\n");
 
 	  if (!IS_H ($1) && $4.MM)
-	    return semantic_error ("(M) not allowed with MAC0");
+	    return yyerror ("(M) not allowed with MAC0");
 
 	  if (IS_H ($1))
 	    {
@@ -1781,7 +1771,7 @@ asm_1:
 	{
 	  /* Odd registers can use (M).  */
 	  if (!IS_DREG ($1))
-	    return semantic_error ("Dreg expected");
+	    return yyerror ("Dreg expected");
 
 	  if (!IS_EVEN ($1))
 	    {
@@ -1799,14 +1789,14 @@ asm_1:
 			      &$1,  0, &$3.s0, &$3.s1, 1);
 	    }
 	  else
-	    return semantic_error ("Register or mode mismatch");
+	    return yyerror ("Register or mode mismatch");
 	}
 
 	| HALF_REG ASSIGN multiply_halfregs opt_mode COMMA
           HALF_REG ASSIGN multiply_halfregs opt_mode
 	{
 	  if (!IS_DREG ($1) || !IS_DREG ($6)) 
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 
 	  if (check_multiply_halfregs (&$3, &$8) < 0)
 	    return -1;
@@ -1826,13 +1816,13 @@ asm_1:
 			      &$1, 0, &$3.s0, &$3.s1, 1);
 	    }
 	  else
-	    return semantic_error ("Multfunc Register or mode mismatch");
+	    return yyerror ("Multfunc Register or mode mismatch");
 	}
 
 	| REG ASSIGN multiply_halfregs opt_mode COMMA REG ASSIGN multiply_halfregs opt_mode 
 	{
 	  if (!IS_DREG ($1) || !IS_DREG ($6)) 
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 
 	  if (check_multiply_halfregs (&$3, &$8) < 0)
 	    return -1;
@@ -1842,7 +1832,7 @@ asm_1:
 	  if (IS_EVEN ($1))
 	    {
 	      if ($6.regno - $1.regno != 1 || $4.MM != 0)
-		return semantic_error ("Dest registers or mode mismatch");
+		return yyerror ("Dest registers or mode mismatch");
 
 	      /*   op1       MM      mmod  */
 	      $$ = DSP32MULT (0, 0, $9.mod, 1, 1,
@@ -1853,7 +1843,7 @@ asm_1:
 	  else
 	    {
 	      if ($1.regno - $6.regno != 1)
-		return semantic_error ("Dest registers mismatch");
+		return yyerror ("Dest registers mismatch");
 	      
 	      $$ = DSP32MULT (0, $9.MM, $9.mod, 1, 1,
 			      IS_H ($3.s0), IS_H ($3.s1), IS_H ($8.s0), IS_H ($8.s1),
@@ -1866,7 +1856,7 @@ asm_1:
 	| a_assign ASHIFT REG_A BY HALF_REG
 	{
 	  if (!REG_SAME ($1, $3))
-	    return semantic_error ("Aregs must be same");
+	    return yyerror ("Aregs must be same");
 
 	  if (IS_DREG ($5) && !IS_H ($5))
 	    {
@@ -1874,7 +1864,7 @@ asm_1:
 	      $$ = DSP32SHIFT (3, 0, &$5, 0, 0, IS_A1 ($1));
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 
 /* 8 rules compacted */
@@ -1886,14 +1876,14 @@ asm_1:
 	      $$ = DSP32SHIFT (0, &$1, &$6, &$4, $7.s0, HL2 ($1, $4));
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 
 /* 2 rules compacted */
 	| a_assign REG_A LESS_LESS expr
 	{
 	  if (!REG_SAME ($1, $2))
-	    return semantic_error ("Aregs must be same");
+	    return yyerror ("Aregs must be same");
 
 	  if (IS_UIMM ($4, 5))
 	    {
@@ -1901,7 +1891,7 @@ asm_1:
 	      $$ = DSP32SHIFTIMM (3, 0, imm5($4), 0, 0, IS_A1 ($1));
 	    }
 	  else
-	    return semantic_error ("Bad shift value");
+	    return yyerror ("Bad shift value");
 	}
 
 /* 5 rules compacted */
@@ -1934,10 +1924,10 @@ asm_1:
 		  $$ = COMP3OP (&$1, &$3, &$3, 5);
 		}
 	      else
-		return semantic_error ("Bad shift value");
+		return yyerror ("Bad shift value");
 	    }
 	  else
-	    return semantic_error ("Bad shift value or register");
+	    return yyerror ("Bad shift value or register");
 	}
 	| HALF_REG ASSIGN HALF_REG LESS_LESS expr
 	{
@@ -1947,7 +1937,7 @@ asm_1:
 	      $$ = DSP32SHIFTIMM (0x0, &$1, imm5 ($5), &$3, 2, HL2 ($1, $3));
 	    }
 	  else
-	    return semantic_error ("Bad shift value");
+	    return yyerror ("Bad shift value");
 	}
 	| HALF_REG ASSIGN HALF_REG LESS_LESS expr smod 
 	{
@@ -1957,7 +1947,7 @@ asm_1:
 	      $$ = DSP32SHIFTIMM (0x0, &$1, imm5 ($5), &$3, $6.s0, HL2 ($1, $3));
 	    }
 	  else
-	    return semantic_error ("Bad shift value");
+	    return yyerror ("Bad shift value");
 	}
 	| REG ASSIGN ASHIFT REG BY HALF_REG vsmod
 	{
@@ -1980,7 +1970,7 @@ asm_1:
 	      $$ = DSP32SHIFT (op, &$1, &$6, &$4, $7.s0, 0);
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 
 /*  EXPADJ */
@@ -1992,7 +1982,7 @@ asm_1:
 	      $$ = DSP32SHIFT (7, &$1, &$7, &$5, $9.r0, 0);
 	    }
 	  else
-	    return semantic_error ("Bad shift value or register");
+	    return yyerror ("Bad shift value or register");
 	}
 
 
@@ -2009,7 +1999,7 @@ asm_1:
 	      $$ = DSP32SHIFT (7, &$1, &$7, &$5, 3, 0);
 	    }
 	  else
-	    return semantic_error ("Bad shift value or register");
+	    return yyerror ("Bad shift value or register");
 	}
 
 /* DEPOSIT */
@@ -2022,7 +2012,7 @@ asm_1:
 	      $$ = DSP32SHIFT (10, &$1, &$7, &$5, 2, 0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| REG ASSIGN DEPOSIT LPAREN REG COMMA REG RPAREN LPAREN X RPAREN
@@ -2033,7 +2023,7 @@ asm_1:
 	      $$ = DSP32SHIFT (10, &$1, &$7, &$5, 3, 0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| REG ASSIGN EXTRACT LPAREN REG COMMA HALF_REG RPAREN xpmod 
@@ -2044,13 +2034,13 @@ asm_1:
 	      $$ = DSP32SHIFT (10, &$1, &$7, &$5, $9.r0, 0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| a_assign REG_A _GREATER_GREATER_GREATER expr
 	{
 	  if (!REG_SAME ($1, $2))
-	    return semantic_error ("Aregs must be same");
+	    return yyerror ("Aregs must be same");
 
 	  if (IS_UIMM ($4, 5))
 	    {
@@ -2058,7 +2048,7 @@ asm_1:
 	      $$ = DSP32SHIFTIMM (3, 0, -imm6($4), 0, 0, IS_A1 ($1));
 	    }
 	  else
-	    return semantic_error ("Shift value range error");
+	    return yyerror ("Shift value range error");
 	}
 	| a_assign LSHIFT REG_A BY HALF_REG
 	{
@@ -2068,7 +2058,7 @@ asm_1:
 	      $$ = DSP32SHIFT (3, 0, &$5, 0, 1, IS_A1 ($1));
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| HALF_REG ASSIGN LSHIFT HALF_REG BY HALF_REG
@@ -2079,7 +2069,7 @@ asm_1:
 	      $$ = DSP32SHIFT (0, &$1, &$6, &$4, 2, HL2 ($1, $4));
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| REG ASSIGN LSHIFT REG BY HALF_REG vmod
@@ -2090,7 +2080,7 @@ asm_1:
 	      $$ = DSP32SHIFT ($7.r0 ? 1: 2, &$1, &$6, &$4, 2, 0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| REG ASSIGN SHIFT REG BY HALF_REG
@@ -2101,7 +2091,7 @@ asm_1:
 	      $$ = DSP32SHIFT (2, &$1, &$6, &$4, 2, 0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| a_assign REG_A GREATER_GREATER expr
@@ -2112,7 +2102,7 @@ asm_1:
 	      $$ = DSP32SHIFTIMM (3, 0, -imm6 ($4), 0, 1, IS_A1 ($1));
 	    }
 	  else
-	    return semantic_error ("Accu register expected");
+	    return yyerror ("Accu register expected");
 	}
 
 	| REG ASSIGN REG GREATER_GREATER expr vmod
@@ -2125,7 +2115,7 @@ asm_1:
 		  $$ = DSP32SHIFTIMM (1, &$1, -uimm5 ($5), &$3, 2, 0);
 		}
 	      else
-		return register_mismatch ();
+	        return yyerror ("Register mismatch");
 	    }
 	  else
 	    {
@@ -2145,7 +2135,7 @@ asm_1:
 		  $$ = PTR2OP (&$1, &$3, 4);
 		}
 	      else
-		return register_mismatch ();
+	        return yyerror ("Register mismatch");
 	    }
 	}
 	| HALF_REG ASSIGN HALF_REG GREATER_GREATER expr
@@ -2156,7 +2146,7 @@ asm_1:
 	      $$ = DSP32SHIFTIMM (0, &$1, -uimm5 ($5), &$3, 2, HL2 ($1, $3));
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 	| HALF_REG ASSIGN HALF_REG _GREATER_GREATER_GREATER expr smod
 	{
@@ -2167,7 +2157,7 @@ asm_1:
 				  $6.s0, HL2 ($1, $3));
 	    }
 	  else
-	    return semantic_error ("Register or modifier mismatch");
+	    return yyerror ("Register or modifier mismatch");
 	}
 
 
@@ -2188,7 +2178,7 @@ asm_1:
 		}
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| HALF_REG ASSIGN ONES REG
@@ -2199,7 +2189,7 @@ asm_1:
 	      $$ = DSP32SHIFT (6, &$1, 0, &$4, 3, 0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 /* 4 rules compacted */
@@ -2211,7 +2201,7 @@ asm_1:
 	      $$ = DSP32SHIFT (4, &$1, &$7, &$5, HL2 ($5, $7), 0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| HALF_REG ASSIGN CCREG ASSIGN BXORSHIFT LPAREN REG_A COMMA REG RPAREN 
@@ -2224,7 +2214,7 @@ asm_1:
 	      $$ = DSP32SHIFT (11, &$1, &$9, 0, 0, 0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| HALF_REG ASSIGN CCREG ASSIGN BXOR LPAREN REG_A COMMA REG RPAREN
@@ -2237,7 +2227,7 @@ asm_1:
 	      $$ = DSP32SHIFT (11, &$1, &$9, 0, 1, 0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| HALF_REG ASSIGN CCREG ASSIGN BXOR LPAREN REG_A COMMA REG_A COMMA CCREG RPAREN
@@ -2248,7 +2238,7 @@ asm_1:
 	      $$ = DSP32SHIFT (12, &$1, 0, 0, 1, 0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| a_assign ROT REG_A BY HALF_REG
@@ -2259,7 +2249,7 @@ asm_1:
 	      $$ = DSP32SHIFT (3, 0, &$5, 0, 2, IS_A1 ($1));
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| REG ASSIGN ROT REG BY HALF_REG
@@ -2270,7 +2260,7 @@ asm_1:
 	      $$ = DSP32SHIFT (2, &$1, &$6, &$4, 3, 0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| a_assign ROT REG_A BY expr 
@@ -2281,7 +2271,7 @@ asm_1:
 	      $$ = DSP32SHIFTIMM (3, 0, imm6($5), 0, 2, IS_A1 ($1));
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| REG ASSIGN ROT REG BY expr 
@@ -2291,7 +2281,7 @@ asm_1:
 	      $$ = DSP32SHIFTIMM (2, &$1, imm6 ($6), &$4, 3, IS_A1 ($1));
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| HALF_REG ASSIGN SIGNBITS REG_A
@@ -2302,7 +2292,7 @@ asm_1:
 	      $$ = DSP32SHIFT (6, &$1, 0, 0, IS_A1 ($4), 0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| HALF_REG ASSIGN SIGNBITS REG
@@ -2313,7 +2303,7 @@ asm_1:
 	      $$ = DSP32SHIFT (5, &$1, 0, &$4, 0, 0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| HALF_REG ASSIGN SIGNBITS HALF_REG
@@ -2324,7 +2314,7 @@ asm_1:
 	      $$ = DSP32SHIFT (5, &$1, 0, &$4, 1 + IS_H ($4), 0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 	
 	// Silly. The ASR bit is just inverted here.
@@ -2336,7 +2326,7 @@ asm_1:
 	      $$ = DSP32SHIFT (9, &$1, 0, &$5, ($7.r0 ? 0 : 1), 0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| REG ASSIGN VIT_MAX LPAREN REG COMMA REG RPAREN asr_asl 
@@ -2347,7 +2337,7 @@ asm_1:
 	      $$ = DSP32SHIFT (9, &$1, &$7, &$5, 2 | ($9.r0 ? 0 : 1), 0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| BITMUX LPAREN REG COMMA REG COMMA REG_A RPAREN asr_asl
@@ -2358,7 +2348,7 @@ asm_1:
 	      $$ = DSP32SHIFT (8, 0, &$3, &$5, $9.r0, 0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| a_assign BXORSHIFT LPAREN REG_A COMMA REG_A COMMA CCREG RPAREN
@@ -2369,7 +2359,7 @@ asm_1:
 	      $$ = DSP32SHIFT (12, 0, 0, 0, 0, 0);
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 
 
@@ -2387,7 +2377,7 @@ asm_1:
 	      $$ = LOGI2OP ($3, uimm5 ($5), 4);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 // LOGI2op:	BITSET (dregs , uimm5 )
@@ -2399,7 +2389,7 @@ asm_1:
 	      $$ = LOGI2OP ($3, uimm5 ($5), 2);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 // LOGI2op:	BITTGL (dregs , uimm5 )
@@ -2411,7 +2401,7 @@ asm_1:
 	      $$ = LOGI2OP ($3, uimm5 ($5), 3);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| CCREG _ASSIGN_BANG BITTST LPAREN REG COMMA expr RPAREN
@@ -2422,7 +2412,7 @@ asm_1:
 	      $$ = LOGI2OP ($5, uimm5 ($7), 0);
 	    }
 	  else
-	    return semantic_error ("Register mismatch or value error");
+	    return yyerror ("Register mismatch or value error");
 	}
 
 	| CCREG ASSIGN BITTST LPAREN REG COMMA expr RPAREN
@@ -2433,7 +2423,7 @@ asm_1:
 	      $$ = LOGI2OP ($5, uimm5 ($7), 1);
 	    }
 	  else
-	    return semantic_error ("Register mismatch or value error");
+	    return yyerror ("Register mismatch or value error");
 	}
 
 	| IF BANG CCREG REG ASSIGN REG
@@ -2445,7 +2435,7 @@ asm_1:
 	      $$ = CCMV (&$6, &$4, 0);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| IF CCREG REG ASSIGN REG
@@ -2457,7 +2447,7 @@ asm_1:
 	      $$ = CCMV (&$5, &$3, 1);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 	| IF BANG CCREG JUMP expr
@@ -2468,7 +2458,7 @@ asm_1:
 	      $$ = BRCC (0, 0, $5);
 	    }
 	  else
-	    return semantic_error ("Bad jump offset");
+	    return yyerror ("Bad jump offset");
 	}
 
 	| IF BANG CCREG JUMP expr LPAREN BP RPAREN
@@ -2479,7 +2469,7 @@ asm_1:
 	      $$ = BRCC (0, 1, $5); // use branch prediction
 	    }
 	  else
-	    return semantic_error ("Bad jump offset");
+	    return yyerror ("Bad jump offset");
 	}
 
 	| IF CCREG JUMP expr
@@ -2490,7 +2480,7 @@ asm_1:
 	      $$ = BRCC (1, 0, $4); // use branch prediction
 	    }
 	  else
-	    return semantic_error ("Bad jump offset");
+	    return yyerror ("Bad jump offset");
 	}
 
 	| IF CCREG JUMP expr LPAREN BP RPAREN
@@ -2501,7 +2491,7 @@ asm_1:
 	      $$ = BRCC (1, 1, $4); // use branch prediction
 	    }
 	  else
-	    return semantic_error ("Bad jump offset");
+	    return yyerror ("Bad jump offset");
 	}
 	| NOP
 	{
@@ -2571,7 +2561,7 @@ asm_1:
 	      $$ = PROGCTRL (3, $2.regno & CODE_MASK);
 	    }
 	  else
-	    return semantic_error ("Dreg expected for CLI");
+	    return yyerror ("Dreg expected for CLI");
 	}
 
 	| STI REG
@@ -2582,7 +2572,7 @@ asm_1:
 	      $$ = PROGCTRL (4, $2.regno & CODE_MASK);
 	    }
 	  else
-	    return semantic_error ("Dreg expected for STI");
+	    return yyerror ("Dreg expected for STI");
 	}
 
 	| JUMP LPAREN REG RPAREN
@@ -2593,7 +2583,7 @@ asm_1:
 	      $$ = PROGCTRL (5, $3.regno & CODE_MASK);
 	    }
 	  else
-	    return semantic_error ("Bad register for indirect jump");
+	    return yyerror ("Bad register for indirect jump");
 	}
 
 	| CALL LPAREN REG RPAREN
@@ -2604,7 +2594,7 @@ asm_1:
 	      $$ = PROGCTRL (6, $3.regno & CODE_MASK);
 	    }
 	  else
-	    return semantic_error ("Bad register for indirect call");
+	    return yyerror ("Bad register for indirect call");
 	}
 
 	| CALL LPAREN PC PLUS REG RPAREN
@@ -2615,7 +2605,7 @@ asm_1:
 	      $$ = PROGCTRL (7, $5.regno & CODE_MASK);
 	    }
 	  else
-	    return semantic_error ("Bad register for indirect call");
+	    return yyerror ("Bad register for indirect call");
 	}
 
 	| JUMP LPAREN PC PLUS REG RPAREN
@@ -2626,7 +2616,7 @@ asm_1:
 	      $$ = PROGCTRL (8, $5.regno & CODE_MASK);
 	    }
 	  else
-	    return semantic_error ("Bad register for indirect jump");
+	    return yyerror ("Bad register for indirect jump");
 	}
 
 	| RAISE expr
@@ -2637,7 +2627,7 @@ asm_1:
 	      $$ = PROGCTRL (9, uimm4 ($2));
 	    }
 	  else
-	    return semantic_error ("Bad value for RAISE");
+	    return yyerror ("Bad value for RAISE");
 	}
 
 	| EXCPT expr
@@ -2654,7 +2644,7 @@ asm_1:
 	      $$ = PROGCTRL (11, $3.regno & CODE_MASK);
 	    }
 	  else
-	    return semantic_error ("Preg expected");
+	    return yyerror ("Preg expected");
 	}
 
 	| JUMP expr
@@ -2665,7 +2655,7 @@ asm_1:
 	      $$ = UJUMP($2);
 	    }
 	  else
-	    return semantic_error ("Bad value for relative jump");
+	    return yyerror ("Bad value for relative jump");
 	}
 
 	| JUMP_DOT_S expr
@@ -2676,7 +2666,7 @@ asm_1:
 	      $$ = UJUMP($2);
 	    }
 	  else
-	    return semantic_error ("Bad value for relative jump");
+	    return yyerror ("Bad value for relative jump");
 	}
 
 	| JUMP_DOT_L expr
@@ -2687,7 +2677,7 @@ asm_1:
 	      $$ = CALLA ($2, 0);
 	    }
 	  else
-	    return semantic_error ("Bad value for long jump");
+	    return yyerror ("Bad value for long jump");
 	}
 
 	| JUMP_DOT_L pltpc
@@ -2698,7 +2688,7 @@ asm_1:
 	      $$ = CALLA ($2, 2);
 	    }
 	  else
-	    return semantic_error ("Bad value for long jump");
+	    return yyerror ("Bad value for long jump");
 	}
 
 
@@ -2712,7 +2702,7 @@ asm_1:
 	      $$ = CALLA ($2, 1);
 	    }
 	  else
-	    return semantic_error ("Bad call address");
+	    return yyerror ("Bad call address");
 	}
 	| CALL pltpc
 	{
@@ -2722,7 +2712,7 @@ asm_1:
 	      $$ = CALLA ($2, 2);
 	    }
 	  else
-	    return semantic_error ("Bad call address");
+	    return yyerror ("Bad call address");
 	}
 
 // ALU2ops
@@ -2732,7 +2722,7 @@ asm_1:
 	  if (IS_DREG ($3) && IS_DREG ($5))
 	    $$ = ALU2OP (&$3, &$5, 8);   // dst, src, opc
 	  else
-	    return semantic_error ("Bad registers for DIVQ");
+	    return yyerror ("Bad registers for DIVQ");
 	}
 
 	| DIVS LPAREN REG COMMA REG RPAREN
@@ -2740,7 +2730,7 @@ asm_1:
 	  if (IS_DREG ($3) && IS_DREG ($5))
 	    $$ = ALU2OP (&$3, &$5, 9);   // dst, src, opc
 	  else
-	    return semantic_error ("Bad registers for DIVS");
+	    return yyerror ("Bad registers for DIVS");
 	}
 
 /* 3 rules compacted */
@@ -2765,7 +2755,7 @@ asm_1:
 		}
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 
 	| REG ASSIGN TILDA REG
@@ -2776,7 +2766,7 @@ asm_1:
 	      $$ = ALU2OP (&$1, &$4, 15);   // dst, src, opc
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 
 	| REG _GREATER_GREATER_ASSIGN REG
@@ -2787,7 +2777,7 @@ asm_1:
 	      $$ = ALU2OP (&$1, &$3, 1);   // dst, src, opc
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 
 	| REG _GREATER_GREATER_ASSIGN expr
@@ -2798,7 +2788,7 @@ asm_1:
 	      $$ = LOGI2OP ($1, uimm5 ($3), 6);
 	    }
 	  else
-	    return semantic_error ("Dregs expected or value error");
+	    return yyerror ("Dregs expected or value error");
 	}
 
 	| REG _GREATER_GREATER_GREATER_THAN_ASSIGN REG
@@ -2809,7 +2799,7 @@ asm_1:
 	      $$ = ALU2OP (&$1, &$3, 0);   // dst, src, opc
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 
 	| REG _LESS_LESS_ASSIGN REG
@@ -2820,7 +2810,7 @@ asm_1:
 	      $$ = ALU2OP (&$1, &$3, 2);   // dst, src, opc
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 
 	| REG _LESS_LESS_ASSIGN expr
@@ -2831,7 +2821,7 @@ asm_1:
 	      $$ = LOGI2OP ($1, uimm5 ($3), 7);
 	    }
 	  else
-	    return semantic_error ("Dregs expected or const value error");
+	    return yyerror ("Dregs expected or const value error");
 	}
 
 
@@ -2843,7 +2833,7 @@ asm_1:
 	      $$ = LOGI2OP ($1, uimm5 ($3), 5);
 	    }
 	  else
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	}
 
 
@@ -2856,7 +2846,7 @@ asm_1:
 	  if (IS_PREG ($3))
 	    $$ = CACTRL (&$3, 0, 2);   // reg, a, op
 	  else
-	    return semantic_error ("Bad register(s) for FLUSH");
+	    return yyerror ("Bad register(s) for FLUSH");
 	}
 
 	| FLUSH LBRACK REG _PLUS_PLUS RBRACK
@@ -2867,7 +2857,7 @@ asm_1:
 	      $$ = CACTRL (&$3, 1, 2);   // reg, a, op
 	    }
 	  else
-	    return semantic_error ("Bad register(s) for FLUSH");
+	    return yyerror ("Bad register(s) for FLUSH");
 	}
 
 	| FLUSHINV LBRACK REG RBRACK
@@ -2878,7 +2868,7 @@ asm_1:
 	      $$ = CACTRL (&$3, 0, 1);   // reg, a, op
 	    }
 	  else
-	    return semantic_error ("Bad register(s) for FLUSH");
+	    return yyerror ("Bad register(s) for FLUSH");
 	}
 
 	| FLUSHINV LBRACK REG _PLUS_PLUS RBRACK
@@ -2889,7 +2879,7 @@ asm_1:
 	      $$ = CACTRL (&$3, 1, 1);   // reg, a, op
 	    }
 	  else
-	    return semantic_error ("Bad register(s) for FLUSH");
+	    return yyerror ("Bad register(s) for FLUSH");
 	}
 
 // CaCTRL:	IFLUSH [ pregs ]
@@ -2901,7 +2891,7 @@ asm_1:
 	      $$ = CACTRL (&$3, 0, 3);   // reg, a, op
 	    }
 	  else
-	    return semantic_error ("Bad register(s) for FLUSH");
+	    return yyerror ("Bad register(s) for FLUSH");
 	}
 
 	| IFLUSH LBRACK REG _PLUS_PLUS RBRACK
@@ -2912,7 +2902,7 @@ asm_1:
 	      $$ = CACTRL (&$3, 1, 3);   // reg, a, op
 	    }
 	  else
-	    return semantic_error ("Bad register(s) for FLUSH");
+	    return yyerror ("Bad register(s) for FLUSH");
 	}
 
 	| PREFETCH LBRACK REG RBRACK
@@ -2923,7 +2913,7 @@ asm_1:
 	      $$ = CACTRL(&$3, 0, 0);
 	    }
 	  else
-	    return semantic_error ("Bad register(s) for PREFETCH");
+	    return yyerror ("Bad register(s) for PREFETCH");
 	}
 
 	| PREFETCH LBRACK REG _PLUS_PLUS RBRACK
@@ -2934,7 +2924,7 @@ asm_1:
 	      $$ = CACTRL(&$3, 1, 0);
 	    }
 	  else
-	    return semantic_error ("Bad register(s) for PREFETCH");
+	    return yyerror ("Bad register(s) for PREFETCH");
 	}
 
 ////////////////////////////////////////////////////////////////////////////
@@ -2950,7 +2940,7 @@ asm_1:
 	      $$ = LDST (&$3, &$7, $4.x0, 2, 0, 1);
 	    }
 	  else
-	    return register_mismatch ();
+	    return yyerror ("Register mismatch");
 	}
 
 // LDSTidxI:	B [ pregs + imm16 ] = dregs */
@@ -2964,7 +2954,7 @@ asm_1:
 	      $$ = LDSTIDXI (&$3, &$8, 1, 2, 0, $5);
 	    }
 	  else
-	    return semantic_error ("Register mismatch or const size wrong");
+	    return yyerror ("Register mismatch or const size wrong");
 	}
 
 
@@ -2984,7 +2974,7 @@ asm_1:
 	      $$ = LDSTIDXI (&$3, &$8, 1, 1, 0, $5);
 	    }
 	  else
-	    return semantic_error ("Bad register(s) or wrong constant size");
+	    return yyerror ("Bad register(s) or wrong constant size");
 	}
 
 // LDST:	W [ pregs <post_op> ] = dregs
@@ -2996,7 +2986,7 @@ asm_1:
 	      $$ = LDST (&$3, &$7, $4.x0, 1, 0, 1);
 	    }
 	  else
-	    return semantic_error ("Bad register(s) for STORE");
+	    return yyerror ("Bad register(s) for STORE");
 	}
 
 	| W LBRACK REG post_op RBRACK ASSIGN HALF_REG
@@ -3013,7 +3003,7 @@ asm_1:
 	      
 	    }
 	  else
-	    return semantic_error ("Bad register(s) for STORE");
+	    return yyerror ("Bad register(s) for STORE");
 	}
 
 // LDSTiiFP:	[ FP - const ] = dpregs
@@ -3023,10 +3013,10 @@ asm_1:
 	  int ispreg = IS_PREG ($7);
 
 	  if (!IS_PREG ($2))
-	    return semantic_error ("Preg expected for indirect");
+	    return yyerror ("Preg expected for indirect");
 
 	  if (!IS_DREG ($7) && !ispreg)
-	    return semantic_error ("Bad source register for STORE");
+	    return yyerror ("Bad source register for STORE");
 
 	  if ($3.r0)
 	    tmp = unary (Expr_Op_Type_NEG, tmp);
@@ -3048,7 +3038,7 @@ asm_1:
 	      $$ = LDSTIDXI (&$2, &$7, 1, 0, ispreg ? 1: 0, tmp);
 	    }
 	  else
-	    return semantic_error ("Displacement out of range for store");
+	    return yyerror ("Displacement out of range for store");
 	}
 
 	| REG ASSIGN W LBRACK REG plus_minus expr RBRACK xpmod
@@ -3066,7 +3056,7 @@ asm_1:
 	      $$ = LDSTIDXI (&$5, &$1, 0, 1, $9.r0, $7);
 	    }
 	  else
-	    return semantic_error ("Bad register or constant for LOAD");
+	    return yyerror ("Bad register or constant for LOAD");
 	}	
 
 	| HALF_REG ASSIGN W LBRACK REG post_op RBRACK
@@ -3082,7 +3072,7 @@ asm_1:
 	      $$ = LDSTPMOD (&$5, &$1, &$5, 1 + IS_H ($1), 0);
 	    }
 	  else
-	    return semantic_error ("Bad register or post_op for LOAD");
+	    return yyerror ("Bad register or post_op for LOAD");
 	}
 
 
@@ -3094,7 +3084,7 @@ asm_1:
 	      $$ = LDST (&$5, &$1, $6.x0, 1, $8.r0, 0);
 	    }
 	  else
-	    return semantic_error ("Bad register for LOAD");
+	    return yyerror ("Bad register for LOAD");
 	}
 
 	| REG ASSIGN W LBRACK REG _PLUS_PLUS REG RBRACK xpmod
@@ -3105,7 +3095,7 @@ asm_1:
 	      $$ = LDSTPMOD (&$5, &$1, &$7, 3, $9.r0);
 	    }
 	  else
-	    return semantic_error ("Bad register for LOAD");
+	    return yyerror ("Bad register for LOAD");
 	}
 
 	| HALF_REG ASSIGN W LBRACK REG _PLUS_PLUS REG RBRACK
@@ -3116,7 +3106,7 @@ asm_1:
 	      $$ = LDSTPMOD (&$5, &$1, &$7, 1 + IS_H ($1), 0);
 	    }
 	  else
-	    return semantic_error ("Bad register for LOAD");
+	    return yyerror ("Bad register for LOAD");
 	}
 
 	| LBRACK REG post_op RBRACK ASSIGN REG
@@ -3137,13 +3127,13 @@ asm_1:
 	      $$ = LDST (&$2, &$6, $3.x0, 0, 1, 1);
 	    }
 	  else
-	    return semantic_error ("Bad register for STORE");
+	    return yyerror ("Bad register for STORE");
 	}
 
 	| LBRACK REG _PLUS_PLUS REG RBRACK ASSIGN REG
 	{
 	  if (! IS_DREG ($7))
-	    return semantic_error ("Expected Dreg for last argument");
+	    return yyerror ("Expected Dreg for last argument");
 
 	  if (IS_IREG ($2) && IS_MREG ($4))
 	    {
@@ -3156,20 +3146,20 @@ asm_1:
 	      $$ = LDSTPMOD (&$2, &$7, &$4, 0, 1);
 	    }
 	  else
-	    return semantic_error ("Bad register for STORE");
+	    return yyerror ("Bad register for STORE");
 	}
 			
 	| W LBRACK REG _PLUS_PLUS REG RBRACK ASSIGN HALF_REG
 	{
 	  if (!IS_DREG ($8))
-	    return semantic_error ("Expect Dreg as last argument");
+	    return yyerror ("Expect Dreg as last argument");
 	  if (IS_PREG ($3) && IS_PREG ($5))
 	    {
 	      notethat ("LDSTpmod: W [ pregs ++ pregs ] = dregs_half\n");
 	      $$ = LDSTPMOD (&$3, &$8, &$5, 1 + IS_H ($8), 1);
 	    }
 	  else
-	    return semantic_error ("Bad register for STORE");
+	    return yyerror ("Bad register for STORE");
 	}
 
 	| REG ASSIGN B LBRACK REG plus_minus expr RBRACK xpmod
@@ -3183,7 +3173,7 @@ asm_1:
 	      $$ = LDSTIDXI (&$5, &$1, 0, 2, $9.r0, $7);
 	    }
 	  else
-	    return semantic_error ("Bad register or value for LOAD");
+	    return yyerror ("Bad register or value for LOAD");
 	}
 
 	| REG ASSIGN B LBRACK REG post_op RBRACK xpmod
@@ -3195,7 +3185,7 @@ asm_1:
 	      $$ = LDST (&$5, &$1, $6.x0, 2, $8.r0, 0);
 	    }
 	  else
-	    return semantic_error ("Bad register for LOAD");
+	    return yyerror ("Bad register for LOAD");
 	}
 			
 	| REG ASSIGN LBRACK REG _PLUS_PLUS REG RBRACK
@@ -3211,7 +3201,7 @@ asm_1:
 	      $$ = LDSTPMOD (&$4, &$1, &$6, 0, 0);
 	    }
 	  else
-	    return semantic_error ("Bad register for LOAD");
+	    return yyerror ("Bad register for LOAD");
 	}
 
 	| REG ASSIGN LBRACK REG plus_minus got_or_expr RBRACK
@@ -3221,10 +3211,10 @@ asm_1:
 	  int isgot = IS_RELOC($6);
 
 	  if (!IS_PREG ($4))
-	    return semantic_error ("Preg expected for indirect");
+	    return yyerror ("Preg expected for indirect");
 
 	  if (!IS_DREG ($1) && !ispreg)
-	    return semantic_error ("Bad destination register for LOAD");
+	    return yyerror ("Bad destination register for LOAD");
 
 	  if ($5.r0)
 	    tmp = unary (Expr_Op_Type_NEG, tmp);
@@ -3251,7 +3241,7 @@ asm_1:
 	      
 	    }
 	  else
-	    return semantic_error ("Displacement out of range for load");
+	    return yyerror ("Displacement out of range for load");
 	}
 
 /* 3 rules compacted */
@@ -3270,7 +3260,7 @@ asm_1:
 	  else if (IS_PREG ($1) && IS_PREG ($4))
 	    {
 	      if (REG_SAME ($1, $4) && $5.x0 != 2)
-		return semantic_error ("Pregs can't be same");
+		return yyerror ("Pregs can't be same");
 
 	      notethat ("LDST: pregs = [ pregs <post_op> ]\n");
 	      $$ = LDST (&$4, &$1, $5.x0, 0, 1, 0);
@@ -3281,7 +3271,7 @@ asm_1:
 	      $$ = PUSHPOPREG (&$1, 0);
 	    }
 	  else
-	    return semantic_error ("Bad register or value");
+	    return yyerror ("Bad register or value");
 	}
 
 
@@ -3300,7 +3290,7 @@ asm_1:
 	| LBRACK _MINUS_MINUS REG RBRACK ASSIGN LPAREN REG COLON expr COMMA REG COLON expr RPAREN
 	{
 	  if ($3.regno != REG_SP)
-	    return semantic_error ("SP expected");
+	    return yyerror ("SP expected");
 
 	  if ($7.regno == REG_R7
 	      && (EXPR_VALUE ($9) >= 0 && EXPR_VALUE ($9) < 8)  
@@ -3311,13 +3301,13 @@ asm_1:
 	      $$ = PUSHPOPMULTIPLE (imm5($9), imm5($13), 1, 1, 1);
 	    }
 	  else
-	    return semantic_error ("Bad register for PushPopMultiple");
+	    return yyerror ("Bad register for PushPopMultiple");
 	}
 
 	| LBRACK _MINUS_MINUS REG RBRACK ASSIGN LPAREN REG COLON expr RPAREN
 	{
 	  if ($3.regno != REG_SP)
-	    return semantic_error ("SP expected");
+	    return yyerror ("SP expected");
 
 	  if ($7.regno == REG_R7
 	      && (EXPR_VALUE ($9) >= 0 && EXPR_VALUE ($9) < 8))
@@ -3332,13 +3322,13 @@ asm_1:
 	      $$ = PUSHPOPMULTIPLE (0, imm5($9), 0, 1, 1);
 	    }
 	  else
-	    return semantic_error ("Bad register for PushPopMultiple");
+	    return yyerror ("Bad register for PushPopMultiple");
 	}
 
 	| LPAREN REG COLON expr COMMA REG COLON expr RPAREN ASSIGN LBRACK REG _PLUS_PLUS RBRACK
 	{
 	  if ($12.regno != REG_SP)
-	    return semantic_error ("SP expected");
+	    return yyerror ("SP expected");
 
 	  if ($2.regno == REG_R7 && (EXPR_VALUE ($4) >= 0 && EXPR_VALUE ($4) < 8)  
 	      && $6.regno == REG_P5 && (EXPR_VALUE ($8) >= 0 && EXPR_VALUE ($8) < 6))
@@ -3347,13 +3337,13 @@ asm_1:
 	      $$ = PUSHPOPMULTIPLE (imm5($4), imm5($8), 1, 1, 0);
 	    }
 	  else
-	    return semantic_error ("Bad register range for PushPopMultiple");
+	    return yyerror ("Bad register range for PushPopMultiple");
 	}
 
 	| LPAREN REG COLON expr RPAREN ASSIGN LBRACK REG _PLUS_PLUS RBRACK
 	{
 	  if ($8.regno != REG_SP)
-	    return semantic_error ("SP expected");
+	    return yyerror ("SP expected");
 
 	  if ($2.regno == REG_R7
 	      && EXPR_VALUE ($4) >= 0 && EXPR_VALUE ($4) < 8)
@@ -3368,13 +3358,13 @@ asm_1:
 	      $$ = PUSHPOPMULTIPLE (0, imm5($4), 0, 1, 0);
 	    }
 	  else
-	    return semantic_error ("Bad register range for PushPopMultiple");
+	    return yyerror ("Bad register range for PushPopMultiple");
 	}
 
 	| LBRACK _MINUS_MINUS REG RBRACK ASSIGN REG
 	{
 	  if ($3.regno != REG_SP)
-	    return semantic_error ("SP expected");
+	    return yyerror ("SP expected");
 
 	  if (IS_ALLREG ($6))
 	    {
@@ -3382,7 +3372,7 @@ asm_1:
 	      $$ = PUSHPOPREG (&$6, 1);
 	    }
 	  else
-	    return semantic_error ("Bad register for PushPopReg");
+	    return yyerror ("Bad register for PushPopReg");
 	}
 
 /* Linkage */
@@ -3392,7 +3382,7 @@ asm_1:
 	  if (IS_URANGE (16, $2, 0, 4))
 	    $$ = LINKAGE (0, uimm16s4 ($2));
 	  else
-	    return semantic_error ("Bad constant for LINK");
+	    return yyerror ("Bad constant for LINK");
 	}
 		
 	| UNLINK
@@ -3412,7 +3402,7 @@ asm_1:
 	      $$ = LOOPSETUP ($3, &$7, 0, $5, 0);
 	    }
 	  else
-	    return semantic_error ("Bad register or values for LSETUP");
+	    return yyerror ("Bad register or values for LSETUP");
 	  
 	}
 	| LSETUP LPAREN expr COMMA expr RPAREN REG ASSIGN REG
@@ -3424,7 +3414,7 @@ asm_1:
 	      $$ = LOOPSETUP ($3, &$7, 1, $5, &$9);
 	    }
 	  else
-	    return semantic_error ("Bad register or values for LSETUP");
+	    return yyerror ("Bad register or values for LSETUP");
 	}
 
 	| LSETUP LPAREN expr COMMA expr RPAREN REG ASSIGN REG GREATER_GREATER expr
@@ -3437,16 +3427,16 @@ asm_1:
 	      $$ = LOOPSETUP ($3, &$7, 3, $5, &$9);
 	    }
 	  else
-	    return semantic_error ("Bad register or values for LSETUP");
+	    return yyerror ("Bad register or values for LSETUP");
 	}
 ////////////////////////////////////////////////////////////////////////////
 // LOOP
 	| LOOP expr REG
 	{
 	  if (!IS_RELOC ($2))
-	    return semantic_error ("Invalid expression in loop statement");
+	    return yyerror ("Invalid expression in loop statement");
 	  if (!IS_CREG ($3))
-            return semantic_error ("Invalid loop counter register");
+            return yyerror ("Invalid loop counter register");
 	$$ = bfin_gen_loop ($2, &$3, 0, 0);
 	}
 	| LOOP expr REG ASSIGN REG
@@ -3457,7 +3447,7 @@ asm_1:
 	      $$ = bfin_gen_loop ($2, &$3, 1, &$5);
 	    }
 	  else
-	    return semantic_error ("Bad register or values for LOOP");
+	    return yyerror ("Bad register or values for LOOP");
 	}
 	| LOOP expr REG ASSIGN REG GREATER_GREATER expr
 	{
@@ -3467,7 +3457,7 @@ asm_1:
 	      $$ = bfin_gen_loop ($2, &$3, 3, &$5);
 	    }
 	  else
-	    return semantic_error ("Bad register or values for LOOP");
+	    return yyerror ("Bad register or values for LOOP");
 	}
 /* pseudoDEBUG */
 
@@ -3490,7 +3480,7 @@ asm_1:
 	| DBGCMPLX LPAREN REG RPAREN
 	{
 	  if (!IS_DREG ($3))
-	    return semantic_error ("Dregs expected");
+	    return yyerror ("Dregs expected");
 	  notethat ("pseudoDEBUG: DBGCMPLX (dregs )\n");
 	  $$ = bfin_gen_pseudodbg (3, 6, $3.regno & CODE_MASK);
 	}
@@ -3790,21 +3780,21 @@ byteop_mod:
 	| LPAREN MMOD RPAREN
 	{
 	if ($2 != M_T)
-	  return semantic_error ("Bad modifier");
+	  return yyerror ("Bad modifier");
 	$$.r0 = 1;
 	$$.s0 = 0;
 	}
 	| LPAREN MMOD COMMA R RPAREN
 	{
 	if ($2 != M_T)
-	  return semantic_error ("Bad modifier");
+	  return yyerror ("Bad modifier");
 	$$.r0 = 1;
 	$$.s0 = 1;
 	}
 	| LPAREN R COMMA MMOD RPAREN
 	{
 	if ($4 != M_T)
-	  return semantic_error ("Bad modifier");
+	  return yyerror ("Bad modifier");
 	$$.r0 = 1;
 	$$.s0 = 1;
 	}
@@ -3836,7 +3826,7 @@ w32_or_nothing:
 	  if ($2 == M_W32)
 	    $$.r0 = 1;
 	  else
-	    return semantic_error ("Only (W32) allowed");
+	    return yyerror ("Only (W32) allowed");
 	}
 	;
 
@@ -3849,7 +3839,7 @@ iu_or_nothing:
 	  if ($2 == M_IU)
 	    $$.r0 = 3;
 	  else
-	    return semantic_error ("(IU) expected");
+	    return yyerror ("(IU) expected");
 	}
 	;
 
@@ -4033,9 +4023,9 @@ assign_macfunc:
           $$.s1.regno = 0; // XXX
 
 	  if (IS_A1 ($3) && IS_EVEN ($1))
-	    return semantic_error ("Cannot move A1 to even register");
+	    return yyerror ("Cannot move A1 to even register");
 	  else if (!IS_A1 ($3) && !IS_EVEN ($1))
-	    return semantic_error ("Cannot move A0 to odd register");
+	    return yyerror ("Cannot move A0 to odd register");
 	}
 	| a_macfunc
 	{
@@ -4070,9 +4060,9 @@ assign_macfunc:
           $$.s1.regno = 0;
 
 	  if (IS_A1 ($3) && !IS_H ($1))
-	    return semantic_error ("Cannot move A1 to low half of register");
+	    return yyerror ("Cannot move A1 to low half of register");
 	  else if (!IS_A1 ($3) && IS_H ($1))
-	    return semantic_error ("Cannot move A0 to high half of register");
+	    return yyerror ("Cannot move A0 to high half of register");
 	}
 	;
 
@@ -4109,7 +4099,7 @@ multiply_halfregs:
               $$.s1 = $3;
 	    }
 	  else
-	    return semantic_error ("Multfunc expects Dregs");
+	    return yyerror ("Dregs expected");
 	}
 	;
 
