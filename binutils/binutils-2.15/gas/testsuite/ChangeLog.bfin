@@ -1,3 +1,8 @@
+2005-08-02  Catherine Moore  <clm@cm00re.com>
+
+	* gas/bfin/expected_errors.l:  Change output to new format.
+	* gas/bfin/expected_move_errors.l: Likewise.
+
 2005-07-13  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* gas/bfin/parallel.s: Test parallel insn with order of 16/32 bit
