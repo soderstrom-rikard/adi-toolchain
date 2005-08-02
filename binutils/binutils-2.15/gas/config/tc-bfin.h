@@ -58,4 +58,10 @@ extern bfd_boolean bfin_name_is_register PARAMS ((char *));
 extern bfd_boolean bfin_fix_adjustable PARAMS ((struct fix *));
 
 #define TC_FORCE_RELOCATION(FIX) bfin_force_relocation (FIX)
+extern int bfin_force_relocation PARAMS ((struct fix *));
+
+/* Call md_pcrel_from_section(), not md_pcrel_from().  */
+#define MD_PCREL_FROM_SECTION(FIX, SEC) md_pcrel_from_section (FIX, SEC)
+extern long md_pcrel_from_section PARAMS ((struct fix *, segT));
+
 /* end of tc-bfin.h */

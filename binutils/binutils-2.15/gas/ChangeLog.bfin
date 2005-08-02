@@ -1,3 +1,18 @@
+2005-08-02  Catherine Moore  <clm@cm00re.com>
+
+	* config/bfin-lex.l: Changes to conform to gnu coding
+	standards.  Resolve copyright issues.
+	* config/bfin-parse.y: Likewise.
+	* config/tc-bfin.c: Changes to conform to gnu coding
+	standards.  Resolve copyright issues.
+	 (assembler_parse_init):  Removed.
+	(s_bss): Renamed to bfin_s_bss.
+	(tc_gen_reloc):  Rewritten.
+	(md_pcrel_from):  Rewritten to md_pcrel_from_section.
+	* config/tc-bfin.h (bfin_force_relocation):  Declare.
+	(MD_PCREL_FROM_SECTION): Define.
+	(md_pcrel_from_section): Declare.
+	
 2005-07-27  Catherine Moore  <clm@cm00re.com>
 
 	* config/bfin-parse.y (binary):  Report error if dividing

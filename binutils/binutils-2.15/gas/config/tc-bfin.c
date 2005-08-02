@@ -12,8 +12,6 @@
  *          and made minor changes for the 'new' parser.
  *  05/2004 Merged CVS code from ADI (LG/RRAP)
  *
- * TODO: source code cleanups. There are several insane
- *       ways of indenting...
  */
 
 #include "as.h"
@@ -32,8 +30,7 @@ typedef struct yy_buffer_state *YY_BUFFER_STATE;
 extern YY_BUFFER_STATE yy_scan_string (const char *yy_str);
 extern void yy_delete_buffer (YY_BUFFER_STATE b);
 static parse_state parse (char *line);
-void assembler_parser_init (void);
-static void s_bss PARAMS ((int));
+static void bfin_s_bss PARAMS ((int));
 static int md_chars_to_number PARAMS ((unsigned char *, int));
 
 /* Global variables. */
@@ -43,9 +40,7 @@ int last_insn_size;
 extern struct obstack mempool;
 FILE *errorf;
 
-/*
- * Registers list.
- */
+/* Registers list.  */
 struct bfin_reg_entry
 {
   const char *name;
@@ -199,14 +194,14 @@ static const struct bfin_reg_entry bfin_reg_info[] = {
   {"RETN", REG_RETN},
   {"RETE", REG_RETE},
   {"EMUDAT", REG_EMUDAT},
-  {0, 0}			// Terminator
+  {0, 0}
 };
 
 
 /*
  * Declare pseudo operands table.
  * ------------------------------
- * The table below lists the assebler directives allowed by NISA,
+ * The table below lists the assembler directives allowed by NISA,
  * which code handles the directive, and a short description of the
  * directive.  Even though some directives are handled by GAS, we may
  * need to handle it, to handle its "cousin" directives.  Note that not
@@ -245,7 +240,6 @@ static const struct bfin_reg_entry bfin_reg_info[] = {
  *                           This is supposed to be the equivalent of .byte.
  * .type           GAS       Defines type of label?
  * .var            TC        Not sure what the purpose of this is for!
- *                           ??? *** Ignore for now.  ***
  *
  */
 const pseudo_typeS md_pseudo_table[] = {
@@ -259,12 +253,12 @@ const pseudo_typeS md_pseudo_table[] = {
   {"p", s_ignore, 0},
   {"pdata", s_ignore, 0},
   {"var", s_ignore, 0},
-  {"bss", s_bss, 0},
+  {"bss", bfin_s_bss, 0},
   {0, 0, 0}
 };
 
 static void
-s_bss (int ignore ATTRIBUTE_UNUSED)
+bfin_s_bss (int ignore ATTRIBUTE_UNUSED)
 {
   register int temp;
 
@@ -326,7 +320,8 @@ md_begin ()
   record_alignment (bss_section, 2);
 #endif
 
-  assembler_parser_init ();
+  errorf = stderr;
+  obstack_init (&mempool);
 
 #ifdef DEBUG
   extern int debug_codeselection;
@@ -696,14 +691,14 @@ md_atof (type, litP, sizeP)
    /* FIXME: Some targets allow other format chars for bigger sizes here.  */
 
     default:
-      * sizeP = 0;
+      *sizeP = 0;
       return _("Bad call to md_atof()");
     }
 
   t = atof_ieee (input_line_pointer, type, words);
   if (t)
     input_line_pointer = t;
-  * sizeP = prec * sizeof (LITTLENUM_TYPE);
+  *sizeP = prec * sizeof (LITTLENUM_TYPE);
 
   *sizeP = prec * sizeof (LITTLENUM_TYPE);
   /* This loops outputs the LITTLENUMs in REVERSE order; in accord with
@@ -717,55 +712,56 @@ md_atof (type, litP, sizeP)
   return 0;
 }
 
-/* Translate internal representation of relocation info to BFD target format.  */
+
+/* If while processing a fixup, a reloc really needs to be created
+   then it is done here.  */
+
 arelent *
-tc_gen_reloc (asection * section ATTRIBUTE_UNUSED, fixS * fixp)
+tc_gen_reloc (seg, fixp)
+     asection *seg ATTRIBUTE_UNUSED;
+     fixS *fixp;
 {
   arelent *reloc;
 
-  reloc = (arelent *) xmalloc (sizeof (arelent));
-  reloc->sym_ptr_ptr = (asymbol **) xmalloc (sizeof (asymbol *));
+  reloc		      = (arelent *) xmalloc (sizeof (arelent));
+  reloc->sym_ptr_ptr  = (asymbol **) xmalloc (sizeof (asymbol *));
   *reloc->sym_ptr_ptr = symbol_get_bfdsym (fixp->fx_addsy);
-  reloc->address = fixp->fx_frag->fr_address + fixp->fx_where;
-
-#if DEBUG
-     printf("gen reloc addr:%08lx type:%d sym:%s\n",
-     reloc->address, fixp->fx_r_type, fixp->fx_addsy->bsym->name);
-     printf("   offset: %x\n", fixp->fx_offset);
-#endif
+  reloc->address      = fixp->fx_frag->fr_address + fixp->fx_where;
 
   reloc->addend = fixp->fx_offset;
-
   reloc->howto = bfd_reloc_type_lookup (stdoutput, fixp->fx_r_type);
 
-  if (reloc->howto == NULL)
+  if (reloc->howto == (reloc_howto_type *) NULL)
     {
-      as_bad_where (fixp->fx_file, fixp->fx_line, "Can not represent relocation in this object file format");
+      as_bad_where (fixp->fx_file, fixp->fx_line,
+		    /* xgettext:c-format  */
+		    _("reloc %d not supported by object file format"),
+		    (int) fixp->fx_r_type);
+
+      xfree (reloc);
+
       return NULL;
     }
+
   return reloc;
 }
 
+/*  The location from which a PC relative jump should be calculated,
+    given a PC relative reloc.  */
 
-/*
- * This should return the offset between the address of a PC relative
- * fixup and the position from which the PC relative adjustment should
- * be made.  This should return the length of an instruction.
- *
- * The location from which a PC relative jump should be calculated,
- * given a PC relative reloc.
-*/
 long
-md_pcrel_from (fixP)
+md_pcrel_from_section (fixP, sec)
      fixS *fixP;
+     segT sec;
 {
-  if (fixP->fx_addsy != (symbolS *) NULL && !S_IS_DEFINED (fixP->fx_addsy))
+  if (fixP->fx_addsy != (symbolS *) NULL
+      && (!S_IS_DEFINED (fixP->fx_addsy)
+      || S_GET_SEGMENT (fixP->fx_addsy) != sec))
     {
-      /* The symbol is undefined.  Let the linker figure it out.  */
+      /* The symbol is undefined (or is defined but not in this section).
+         Let the linker figure it out.  */
       return 0;
     }
-
-  /* Return the address of the delay slot.  */
   return fixP->fx_frag->fr_address + fixP->fx_where;
 }
 
@@ -894,14 +890,6 @@ bfin_start_line_hook ()
 
 }
 
-/*   sub routines   */
-void
-assembler_parser_init ()
-{
-  errorf = stderr;
-  obstack_init (&mempool);
-}
-
 /*
  * Special extra functions that help bfin-parse.y perform its job.
  *
@@ -976,9 +964,7 @@ gencode (unsigned long x)
 }
 
 int reloc;
-
 int ninsns;
-
 int count_insns;
 
 static void *
@@ -988,7 +974,10 @@ allocate (int n)
 }
 
 Expr_Node *
-Expr_Node_Create (Expr_Node_Type type, Expr_Node_Value value, Expr_Node *Left_Child, Expr_Node *Right_Child)
+Expr_Node_Create (Expr_Node_Type type,
+	          Expr_Node_Value value,
+                  Expr_Node *Left_Child,
+                  Expr_Node *Right_Child)
 {
 
 
@@ -1047,7 +1036,7 @@ Expr_Node_Gen_Reloc (Expr_Node * head, int parent_reloc)
 	case BFD_RELOC_16:
 	case BFD_RELOC_BFIN_GOT:
 	  note1 = conscode (gencode (value), NULL_CODE);
-	  pcrel = 0;		// only these are not pc relative
+	  pcrel = 0;
 	  break;
 	case BFD_RELOC_24_PCREL:
 	case BFD_RELOC_BFIN_24_PCREL_JUMP_L:
@@ -1060,10 +1049,7 @@ Expr_Node_Gen_Reloc (Expr_Node * head, int parent_reloc)
 	}
     }
   if (head->type == Expr_Node_Constant)
-    {
-      // this has been handled.
-      note = note1;
-    }
+    note = note1;
   else if (head->type == Expr_Node_Reloc)
     {
       note = note_reloc1 (gencode (0), head->value.s_value, parent_reloc, pcrel);

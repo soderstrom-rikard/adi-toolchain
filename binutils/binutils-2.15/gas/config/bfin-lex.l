@@ -28,12 +28,8 @@
 #include "as.h"
 
 static long parse_int (char **end);
-static int parse_halfreg(Register *r, int cl, char *hr);
-static int parse_reg(Register *r, int type, char *rt);
-
-// <strubi> some useful macros:
-// see bfin-defs.h
-// types: T_REG_R, T_REG_P, T_REG_A, T_REG_I, T_REG_B, T_REG_M
+static int parse_halfreg (Register *r, int cl, char *hr);
+static int parse_reg (Register *r, int type, char *rt);
 
 #define _REG yylval.reg
 
@@ -43,8 +39,7 @@ static int parse_reg(Register *r, int type, char *rt);
 /* Define Start States ... Actually we will use exclusion.
    If no start state is specified it should match any state
    and <INITIAL> would match some keyword rules only with
-   initial
-*/
+   initial.  */
 %s KEYWORD
 
 %%
@@ -104,15 +99,15 @@ static int parse_reg(Register *r, int type, char *rt);
 [eE][mM][uU][dD][aA][tT]	_REG.regno = REG_EMUDAT; return REG;
 [rR][aA][iI][sS][eE]		return RAISE;
 
-[rR][0-7]           return parse_reg(&yylval.reg, T_REG_R, yytext);
+[rR][0-7]           return parse_reg (&yylval.reg, T_REG_R, yytext);
 
 [rR]      return R;
 [pP][rR][nN][tT]                        return PRNT;
 [pP][cC]                                return PC;
 [pP][aA][cC][kK]                        return PACK;
 
-[pP][0-5]"."[lLhH]  return parse_halfreg(&yylval.reg, T_REG_P, yytext);
-[pP][0-5]           return parse_reg(&yylval.reg, T_REG_P, yytext);
+[pP][0-5]"."[lLhH]  return parse_halfreg (&yylval.reg, T_REG_P, yytext);
+[pP][0-5]           return parse_reg (&yylval.reg, T_REG_P, yytext);
 
 [oO][uU][tT][cC]                        return OUTC;
 [oO][nN][eE][sS]                        return ONES;
@@ -126,8 +121,8 @@ static int parse_reg(Register *r, int type, char *rt);
 [mM][iI][nN]                            return MIN;
 [mM][aA][xX]                            return MAX;
 
-[mM][0-3]"."[lLhH]  return parse_halfreg(&yylval.reg, T_REG_M, yytext);
-[mM][0-3]           return parse_reg(&yylval.reg, T_REG_M, yytext);
+[mM][0-3]"."[lLhH]  return parse_halfreg (&yylval.reg, T_REG_M, yytext);
+[mM][0-3]           return parse_reg (&yylval.reg, T_REG_M, yytext);
 
 [mM]                                    return M;
 [lL][tT]                                return LT;
@@ -145,20 +140,20 @@ static int parse_reg(Register *r, int type, char *rt);
 [lL][tT]1 _REG.regno = REG_LT1; return REG;
 [lL][bB]1 _REG.regno = REG_LB1; return REG;
 
-[lL][0-3]"."[lLhH]  return parse_halfreg(&yylval.reg, T_REG_L, yytext);
-[lL][0-3]           return parse_reg(&yylval.reg, T_REG_L, yytext);
+[lL][0-3]"."[lLhH]  return parse_halfreg (&yylval.reg, T_REG_L, yytext);
+[lL][0-3]           return parse_reg (&yylval.reg, T_REG_L, yytext);
 [lL][oO]                                return LO;
 [jJ][uU][mM][pP]"."[sS]                 { BEGIN 0; return JUMP_DOT_S;}
 [jJ][uU][mM][pP]"."[lL]                 { BEGIN 0; return JUMP_DOT_L;}
 [jJ][uU][mM][pP]                        { BEGIN 0; return JUMP;}
-[jJ][uU][mM][pP]"."[xX]                 { BEGIN 0; return JUMP_DOT_L; /* TODO: fix */}
+[jJ][uU][mM][pP]"."[xX]                 { BEGIN 0; return JUMP_DOT_L; }
 [iI][uU]                                yylval.value = M_IU;   return MMOD;
 [iI][sS][sS]2                           yylval.value = M_ISS2; return MMOD;
 [iI][sS]                                yylval.value = M_IS;   return MMOD;
 [iI][hH]                                yylval.value = M_IH;   return MMOD;
 [iI][fF]                                return IF;
-[iI][0-3]"."[lLhH]  return parse_halfreg(&yylval.reg, T_REG_I, yytext);
-[iI][0-3]           return parse_reg(&yylval.reg, T_REG_I, yytext);
+[iI][0-3]"."[lLhH]  return parse_halfreg (&yylval.reg, T_REG_I, yytext);
+[iI][0-3]           return parse_reg (&yylval.reg, T_REG_I, yytext);
 [hH][lL][tT]                            return HLT;
 [hH][iI]                                return HI;
 [gG][tT]                                return GT;
@@ -210,20 +205,20 @@ static int parse_reg(Register *r, int type, char *rt);
 [bB][iI][tT][sS][eE][tT]                return BITSET;
 [bB][iI][tT][mM][uU][xX]                return BITMUX;
 [bB][iI][tT][cC][lL][rR]                return BITCLR;
-[bB][0-3]"."[lLhH]  return parse_halfreg(&yylval.reg, T_REG_B, yytext);
-[bB][0-3]           return parse_reg(&yylval.reg, T_REG_B, yytext);
+[bB][0-3]"."[lLhH]  return parse_halfreg (&yylval.reg, T_REG_B, yytext);
+[bB][0-3]           return parse_reg (&yylval.reg, T_REG_B, yytext);
 [bB]                                    return B;
-[aA][zZ]  _REG.regno = S_AZ;   return MODIFIED_STATUS_REG;
-[aA][nN]  _REG.regno = S_AN;   return MODIFIED_STATUS_REG;
-[aA][qQ]  _REG.regno = S_AQ;   return MODIFIED_STATUS_REG;
-[aA][cC]0 _REG.regno = S_AC0;  return MODIFIED_STATUS_REG;
-[aA][cC]1 _REG.regno = S_AC1;  return MODIFIED_STATUS_REG;
-[aA][vV]0 _REG.regno = S_AV0;  return MODIFIED_STATUS_REG;
-[aA][vV]0[sS] _REG.regno = S_AV0S; return MODIFIED_STATUS_REG;
-[aA][vV]1 _REG.regno = S_AV1;  return MODIFIED_STATUS_REG;
-[aA][vV]1[sS] _REG.regno = S_AV1S; return MODIFIED_STATUS_REG;
-[vV] _REG.regno = S_V; return MODIFIED_STATUS_REG;
-[vV][sS]  _REG.regno = S_VS;   return MODIFIED_STATUS_REG;
+[aA][zZ]  _REG.regno = S_AZ;   return STATUS_REG;
+[aA][nN]  _REG.regno = S_AN;   return STATUS_REG;
+[aA][qQ]  _REG.regno = S_AQ;   return STATUS_REG;
+[aA][cC]0 _REG.regno = S_AC0;  return STATUS_REG;
+[aA][cC]1 _REG.regno = S_AC1;  return STATUS_REG;
+[aA][vV]0 _REG.regno = S_AV0;  return STATUS_REG;
+[aA][vV]0[sS] _REG.regno = S_AV0S; return STATUS_REG;
+[aA][vV]1 _REG.regno = S_AV1;  return STATUS_REG;
+[aA][vV]1[sS] _REG.regno = S_AV1S; return STATUS_REG;
+[vV] _REG.regno = S_V; return STATUS_REG;
+[vV][sS]  _REG.regno = S_VS;   return STATUS_REG;
 
 
 [aA][sS][tT][aA][tT]   _REG.regno = REG_ASTAT; return REG;
@@ -241,10 +236,10 @@ static int parse_reg(Register *r, int type, char *rt);
 abort                                   return ABORT;
 [aA]1"."[xX]    _REG.regno = REG_A1x; return REG;
 [aA]1"."[wW]    _REG.regno = REG_A1w; return REG;
-[aA]1           _REG.regno = REG_A1;  return REG_A11;
+[aA]1           _REG.regno = REG_A1;  return REG_A_DOUBLE_ONE;
 [aA]0"."[xX]    _REG.regno = REG_A0x; return REG;
 [aA]0"."[wW]    _REG.regno = REG_A0w; return REG;
-[aA]0           _REG.regno = REG_A0;  return REG_A00;
+[aA]0           _REG.regno = REG_A0;  return REG_A_DOUBLE_ZERO;
 [Gg][Oo][Tt]	return GOT;
 [Pp][Ll][Tt][Pp][Cc]	return PLTPC;
 
@@ -288,8 +283,8 @@ abort                                   return ABORT;
 "%"                     return PERCENT;
 "!"                     return BANG;
 ";"                     return SEMICOLON;
-"=!"					return _ASSIGN_BANG;
-"||"					return DOUBLE_BAR;
+"=!"			return _ASSIGN_BANG;
+"||"			return DOUBLE_BAR;
 "@"			return AT;
 <KEYWORD>[pP][rR][eE][fF][eE][tT][cC][hH]        return PREFETCH;
 <KEYWORD>[uU][nN][lL][iI][nN][kK]                return UNLINK;
@@ -298,46 +293,44 @@ abort                                   return ABORT;
 <KEYWORD>[iI][fF][lL][uU][sS][hH]                return IFLUSH;
 <KEYWORD>[fF][lL][uU][sS][hH][iI][nN][vV]        return FLUSHINV;
 <KEYWORD>[fF][lL][uU][sS][hH]                    return FLUSH;
-([0-9]+)|(0[xX][0-9a-fA-F]+)|([bhfodBHOFD]#[0-9a-fA-F]+)|(0.[0-9]+)  {
-         yylval.value = parse_int (&yytext);
-         return NUMBER;
-     }
-[A-Za-z_$.][A-Za-z0-9_$.]*      { 
-		yylval.symbol = symbol_find_or_make(yytext);
-		symbol_mark_used(yylval.symbol);
-		return SYMBOL; 
-		}
+([0-9]+)|(0[xX][0-9a-fA-F]+)|([bhfodBHOFD]#[0-9a-fA-F]+)|(0.[0-9]+) {
+    yylval.value = parse_int (&yytext);
+    return NUMBER;
+  }
+[A-Za-z_$.][A-Za-z0-9_$.]* { 
+    yylval.symbol = symbol_find_or_make (yytext);
+    symbol_mark_used (yylval.symbol);
+    return SYMBOL; 
+  }
 [0-9][bfBF] {
-		char *name;
-		char *ref = strdup (yytext);
-		if (ref[1] == 'b' || ref[1] == 'B')
-		{
-			name = fb_label_name((int)(ref[0]-'0'),0);
-			yylval.symbol = symbol_find (name);
+    char *name;
+    char *ref = strdup (yytext);
+    if (ref[1] == 'b' || ref[1] == 'B')
+      {
+        name = fb_label_name ((int) (ref[0] - '0'), 0);
+	yylval.symbol = symbol_find (name);
 
-			if ((yylval.symbol != NULL) && (S_IS_DEFINED (yylval.symbol)))
-			/* local labels are never absolute. don't waste time
-					   checking absoluteness. */
-			   return SYMBOL;
-			as_bad ("backw. ref to unknown label \"%d:\", 0 assumed.",
-						  (int)(ref[0]-'0')); 
-		}
-		else if (ref[1] == 'f' || ref[1] == 'F')
-		{
-			/*
-			* forward reference. expect symbol to be undefined or
-			* unknown. undefined: seen it before. unknown: never seen
-			* it before.
-			* construct a local label name, then an undefined symbol.
-			* don't create a xseg frag for it: caller may do that.
-			* just return it as never seen before.
-			*/
-			name = fb_label_name((int)(ref[0]-'0'),1);
-			yylval.symbol = symbol_find_or_make (name);
-			/* we have no need to check symbol properties. */
-			return SYMBOL;
-		}                                  
-	}                                  
+	if ((yylval.symbol != NULL)
+             && (S_IS_DEFINED (yylval.symbol)))
+          return SYMBOL;
+	as_bad ("backward reference to unknown label %d:", 
+						  (int) (ref[0] - '0')); 
+      }
+    else if (ref[1] == 'f' || ref[1] == 'F')
+      {
+        /* Forward reference.  Expect symbol to be undefined or
+           unknown.  undefined: seen it before.  unknown: never seen
+           it before.
+
+           Construct a local label name, then an undefined symbol.
+           Just return it as never seen before.  */
+
+        name = fb_label_name ((int) (ref[0] - '0'), 1);
+	yylval.symbol = symbol_find_or_make (name);
+	/* we have no need to check symbol properties. */
+	return SYMBOL;
+      }                                  
+  }                                  
 [ \t\n]                                    ;
 "/*".*"*/"                                 ;
 .                                          return yytext[0];
@@ -352,187 +345,210 @@ static long parse_int (char **end)
   char c;
   char *arg = *end;
 
-  while (*arg && *arg == ' ') arg++;
+  while (*arg && *arg == ' ')
+    arg++;
 
-  switch (*arg) {
-    case '1':    case '2':    case '3':    case '4':
-    case '5':    case '6':    case '7':    case '8':    case '9':
-      fmt = 'd';
-      break;
-
-    case '0':  /* Accept different formated integers hex octal and binary. */
-      {
-	c = *++arg; arg++;
-	if (c == 'x' || c == 'X') /* hex input */
-	  fmt = 'h';
-	else if (c == 'b' || c == 'B')
-	  fmt = 'b';
-	else if (c == '.')
-	  fmt = 'f';
-	else {             /* octal */
-	  arg--;
-	  fmt = 'o';
-	}
-	break;
-      }
-
-    case 'd':    case 'D':    case 'h':    case 'H':
-    case 'o':    case 'O':    case 'b':    case 'B':
-    case 'f':    case 'F':
-      {
-	fmt = *arg++;
-	if (*arg == '#')
-	  arg++;
-      }
-  }
-
-  switch (fmt) {
-  case 'h':  case 'H':
-    shiftvalue = 4;
-    char_bag = "0123456789ABCDEFabcdef";
-    break;
-
-  case 'o':  case 'O':
-    shiftvalue = 3;
-    char_bag = "01234567";
-    break;
-
-  case 'b':  case 'B':
-    shiftvalue = 1;
-    char_bag = "01";
-    break;
-
-/*
-The assembler allows for fractional constants to be created
-by either the 0.xxxx or the f#xxxx format 
-
-i.e.   0.5 would result in 0x4000
-
-note .5 would result in the identifier .5.
-
-The assembler converts to fractional format 1.15
-by the simple rule.
-
-
-value = (short)(finput*(1<<15))
-*/
-  case 'f':  case 'F':
-  {
-    float fval = 0.0;
-    float pos = 10.0;
-    while (1) {
-      int c;
-      c = *arg++;
-
-      if (c >= '0' && c <= '9') {
-        float digit = (c - '0') / pos;
-        fval = fval + digit;
-        pos = pos * 10.0;
-      }
-      else
-      {
-	*--arg = c;
-        value = (short) (fval * (1 << 15));
-        break;
-      }
-    }
-    *end = arg+1;
-    return value;
-  }
-
-  case 'd':  case 'D':
-  default:
-  {
-    while (1) {
-      int c;
-      c = *arg++;
-      if (c >= '0' && c <= '9')
-        value = (value * 10) + (c - '0');
-      else
-      {
-/* Constants that are suffixed with k|K are multiplied by 1024
-   This suffix is only allowed on decimal constants. */
-        if (c == 'k' || c == 'K')
-          value *= 1024;
-        else
-          *--arg = c;
-        break;
-      }
-    }
-    *end = arg+1;
-    return value;
-  }
-  }
-
-  while (not_done) {
-    char c;
-    c = *arg++;
-    if (c == 0 || !index (char_bag, c)) {
-      not_done = 0;
-      *--arg = c;
-    }
-    else
+  switch (*arg)
     {
-      if (c >= 'a' && c <= 'z')
-        c = c - ('a' - '9') + 1;
-      else if (c >= 'A' && c <= 'Z')
-        c = c - ('A' - '9') + 1;
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+        fmt = 'd';
+        break;
 
-      c -= '0';
+      case '0':  /* Accept different formated integers hex octal and binary. */
+        {
+	  c = *++arg;
+          arg++;
+	  if (c == 'x' || c == 'X') /* hex input */
+	    fmt = 'h';
+	  else if (c == 'b' || c == 'B')
+	    fmt = 'b';
+	  else if (c == '.')
+	    fmt = 'f';
+	  else
+            {             /* octal */
+	      arg--;
+	      fmt = 'o';
+	    }
+	  break;
+        }
 
-      value = (value << shiftvalue) + c;
+      case 'd':
+      case 'D':
+      case 'h':
+      case 'H':
+      case 'o':
+      case 'O':
+      case 'b':
+      case 'B':
+      case 'f':
+      case 'F':
+        {
+	  fmt = *arg++;
+	  if (*arg == '#')
+	    arg++;
+        }
     }
-  }
+
+  switch (fmt)
+    {
+      case 'h':
+      case 'H':
+        shiftvalue = 4;
+        char_bag = "0123456789ABCDEFabcdef";
+        break;
+
+      case 'o':
+      case 'O':
+        shiftvalue = 3;
+        char_bag = "01234567";
+        break;
+
+      case 'b':
+      case 'B':
+        shiftvalue = 1;
+        char_bag = "01";
+        break;
+
+/* The assembler allows for fractional constants to be created
+   by either the 0.xxxx or the f#xxxx format 
+
+   i.e.   0.5 would result in 0x4000
+
+   note .5 would result in the identifier .5.
+
+   The assembler converts to fractional format 1.15 by the simple rule:
+
+             value = (short) (finput * (1 << 15)) */
+
+      case 'f':
+      case 'F':
+        {
+          float fval = 0.0;
+          float pos = 10.0;
+          while (1)
+            {
+              int c;
+              c = *arg++;
+
+              if (c >= '0' && c <= '9')
+                {
+                  float digit = (c - '0') / pos;
+                  fval = fval + digit;
+                  pos = pos * 10.0;
+                }
+              else
+                {
+	          *--arg = c;
+                  value = (short) (fval * (1 << 15));
+                  break;
+                }
+            }
+          *end = arg+1;
+          return value;
+        }
+
+      case 'd':
+      case 'D':
+      default:
+        {
+          while (1)
+            {
+              int c;
+              c = *arg++;
+              if (c >= '0' && c <= '9')
+                value = (value * 10) + (c - '0');
+              else
+                {
+                  /* Constants that are suffixed with k|K are multiplied by 1024
+                     This suffix is only allowed on decimal constants. */
+                  if (c == 'k' || c == 'K')
+                    value *= 1024;
+                  else
+                    *--arg = c;
+                  break;
+                }
+            }
+          *end = arg+1;
+          return value;
+        }
+    }
+
+  while (not_done)
+    {
+      char c;
+      c = *arg++;
+      if (c == 0 || !index (char_bag, c))
+	{
+          not_done = 0;
+          *--arg = c;
+        }
+      else
+        {
+          if (c >= 'a' && c <= 'z')
+            c = c - ('a' - '9') + 1;
+          else if (c >= 'A' && c <= 'Z')
+            c = c - ('A' - '9') + 1;
+
+          c -= '0';
+          value = (value << shiftvalue) + c;
+        }
+    }
   *end = arg+1;
   return value;
 }
 
 
-static int parse_reg(Register *r, int cl, char *rt)
+static int parse_reg (Register *r, int cl, char *rt)
 {
-	// compose regno:
-	r->regno = cl | (rt[1] - '0');
-	return REG;
+  r->regno = cl | (rt[1] - '0');
+  return REG;
 }
 
-// Xn.Y
-
-static int parse_halfreg(Register *r, int cl, char *rt)
+static int parse_halfreg (Register *r, int cl, char *rt)
 {
-	r->regno = cl | (rt[1] - '0');
+  r->regno = cl | (rt[1] - '0');
 
-	switch (rt[3]) {
-		case 'b':
-		case 'B':
-			return BYTE_REG;
-		case 'l':
-		case 'L':
-			break;
-		case 'h':
-		case 'H':
-			r->regno |= F_REG_HIGH;
-			break;
-	}
+  switch (rt[3])
+    {
+      case 'b':
+      case 'B':
+	return BYTE_DREG;
 
-	return HALF_REG;
+      case 'l':
+      case 'L':
+	break;
+
+      case 'h':
+      case 'H':
+	r->regno |= F_REG_HIGH;
+	break;
+    }
+
+  return HALF_REG;
 }
 
-/* Our start state is KEYWORD as we have command keywords such as
-   PREFETCH.
-*/
+/* Our start state is KEYWORD as we have
+   command keywords such as PREFETCH.  */
+
 void 
-set_start_state(void)
+set_start_state (void)
 {
-	BEGIN KEYWORD;
+  BEGIN KEYWORD;
 }
-
 
 
 #ifndef yywrap
 int
 yywrap ()
 { 
-    return 1;
+  return 1;
 }
 #endif
-

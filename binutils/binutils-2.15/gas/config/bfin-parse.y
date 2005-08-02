@@ -301,7 +301,7 @@ valid_dreg_pair (Register *reg1, Expr_Node *reg2)
 }
 
 static int
-check_multfuncs (Macfunc *aa, Macfunc *ab)
+check_multiply_halfregs (Macfunc *aa, Macfunc *ab)
 {
   if ((!REG_EQUAL (aa->s0, ab->s0) && !REG_EQUAL (aa->s0, ab->s1))
       || (!REG_EQUAL (aa->s1, ab->s1) && !REG_EQUAL (aa->s1, ab->s0)))
@@ -344,19 +344,19 @@ check_macfuncs (Macfunc *aa, Opt_mode *opa,
 	return semantic_error ("Vector AxMACs can't be same");
     }
 
-  /*  If both ops are != 3, we have multfuncs in both
+  /*  If both ops are != 3, we have multiply_halfregs in both
   assignment_or_macfuncs.  */
   if (aa->op == ab->op && aa->op != 3)
     {
-      if (check_multfuncs (aa, ab) < 0)
+      if (check_multiply_halfregs (aa, ab) < 0)
 	return -1;
     }
   else
     {
-      /*  Only one of the assign_macfuncs has a multfunc.
+      /*  Only one of the assign_macfuncs has a half reg multiply
       Evil trick: Just 'OR' their source register codes:
       We can do that, because we know they were initialized to 0
-      in the rules that don't use multfuncs.  */
+      in the rules that don't use multiply_halfregs.  */
       aa->s0.regno |= (ab->s0.regno & CODE_MASK);
       aa->s1.regno |= (ab->s1.regno & CODE_MASK);
     }
@@ -443,8 +443,8 @@ is_group2 (INSTR_T x)
 // registers
 %token REG
 %token PC
-%token CCREG BYTE_REG
-%token REG_A00 REG_A11
+%token CCREG BYTE_DREG
+%token REG_A_DOUBLE_ZERO REG_A_DOUBLE_ONE
 %token A_ZERO_DOT_L A_ZERO_DOT_H A_ONE_DOT_L A_ONE_DOT_H
 %token HALF_REG
 
@@ -534,7 +534,7 @@ is_group2 (INSTR_T x)
 %token IF COMMA BY
 %token COLON SEMICOLON
 %token RPAREN LPAREN LBRACK RBRACK
-%token MODIFIED_STATUS_REG
+%token STATUS_REG
 %token MNOP
 %token SYMBOL NUMBER
 %token GOT AT PLTPC
@@ -542,61 +542,60 @@ is_group2 (INSTR_T x)
 /***************************************************************************/
 /* Types                                                                   */
 /***************************************************************************/
-%type<instr> asm
-%type<value> MMOD
-%type<mod> opt_mode
+%type <instr> asm
+%type <value> MMOD
+%type <mod> opt_mode
 
-// %type<expr> offset_expr
-%type<value> NUMBER
-%type<r0> aligndir
-%type<modcodes> byteop_mod
-%type<reg> a_assign
-%type<reg> a_plusassign
-%type<reg> a_minusassign
-%type<macfunc> multfunc
-%type<macfunc> assign_macfunc 
-%type<macfunc> a_macfunc 
-%type<expr> expr_1
-%type<instr> asm_1
-%type<r0> vmod
-%type<modcodes> vsmod
-%type<modcodes> ccstat
-%type<r0> cc_op
-%type<reg> CCREG
+%type <value> NUMBER
+%type <r0> aligndir
+%type <modcodes> byteop_mod
+%type <reg> a_assign
+%type <reg> a_plusassign
+%type <reg> a_minusassign
+%type <macfunc> multiply_halfregs
+%type <macfunc> assign_macfunc 
+%type <macfunc> a_macfunc 
+%type <expr> expr_1
+%type <instr> asm_1
+%type <r0> vmod
+%type <modcodes> vsmod
+%type <modcodes> ccstat
+%type <r0> cc_op
+%type <reg> CCREG
 
-%type<r0> searchmod
-%type<expr> symbol
-%type<symbol> SYMBOL
-%type<expr> eterm
-%type<reg> REG
-%type<reg> BYTE_REG
-%type<reg> REG_A00
-%type<reg> REG_A11
-%type<reg> REG_A
-%type<reg> MODIFIED_STATUS_REG 
-%type<expr> expr
-%type<r0> xpmod
-%type<r0> xpmod1
-%type<modcodes> smod 
-%type<modcodes> b3_op
-%type<modcodes> rnd_op
-%type<modcodes> post_op
-%type<reg> HALF_REG
-%type<r0> iu_or_nothing
-%type<r0> plus_minus
-%type<r0> asr_asl
-%type<r0> asr_asl_0
-%type<modcodes> sco
-%type<modcodes> amod0
-%type<modcodes> amod1
-%type<modcodes> amod2
-%type<r0> op_bar_op
-%type<r0> w32_or_nothing
-%type<r0> c_align
-%type<r0> min_max
-%type<expr> got
-%type<expr> got_or_expr
-%type<expr> pltpc
+%type <r0> searchmod
+%type <expr> symbol
+%type <symbol> SYMBOL
+%type <expr> eterm
+%type <reg> REG
+%type <reg> BYTE_DREG
+%type <reg> REG_A_DOUBLE_ZERO
+%type <reg> REG_A_DOUBLE_ONE
+%type <reg> REG_A
+%type <reg> STATUS_REG 
+%type <expr> expr
+%type <r0> xpmod
+%type <r0> xpmod1
+%type <modcodes> smod 
+%type <modcodes> b3_op
+%type <modcodes> rnd_op
+%type <modcodes> post_op
+%type <reg> HALF_REG
+%type <r0> iu_or_nothing
+%type <r0> plus_minus
+%type <r0> asr_asl
+%type <r0> asr_asl_0
+%type <modcodes> sco
+%type <modcodes> amod0
+%type <modcodes> amod1
+%type <modcodes> amod2
+%type <r0> op_bar_op
+%type <r0> w32_or_nothing
+%type <r0> c_align
+%type <r0> min_max
+%type <expr> got
+%type <expr> got_or_expr
+%type <expr> pltpc
 
 
 /* Precedence Rules */
@@ -1335,7 +1334,7 @@ asm_1:
 	    return register_mismatch ();
 	}
 
-	| REG ASSIGN BYTE_REG xpmod
+	| REG ASSIGN BYTE_DREG xpmod
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3))
 	    {
@@ -1757,9 +1756,9 @@ asm_1:
 			
 /* DSPMULT */
 
-	| HALF_REG ASSIGN multfunc opt_mode
+	| HALF_REG ASSIGN multiply_halfregs opt_mode
 	{
-	  notethat ("dsp32mult: dregs_half = multfunc (opt_mode)\n");
+	  notethat ("dsp32mult: dregs_half = multiply_halfregs (opt_mode)\n");
 
 	  if (!IS_H ($1) && $4.MM)
 	    return semantic_error ("(M) not allowed with MAC0");
@@ -1778,7 +1777,7 @@ asm_1:
 		}	
 	}
 
-	| REG ASSIGN multfunc opt_mode 
+	| REG ASSIGN multiply_halfregs opt_mode 
 	{
 	  /* Odd registers can use (M).  */
 	  if (!IS_DREG ($1))
@@ -1786,7 +1785,7 @@ asm_1:
 
 	  if (!IS_EVEN ($1))
 	    {
-	      notethat ("dsp32mult: dregs = multfunc (opt_mode)\n");
+	      notethat ("dsp32mult: dregs = multiply_halfregs (opt_mode)\n");
 
 	      $$ = DSP32MULT (0, $4.MM, $4.mod, 1, 1,
 			      IS_H ($3.s0), IS_H ($3.s1), 0, 0,
@@ -1794,7 +1793,7 @@ asm_1:
 	    }
 	  else if ($4.MM == 0)
 	    {
-	      notethat ("dsp32mult: dregs = multfunc opt_mode\n");
+	      notethat ("dsp32mult: dregs = multiply_halfregs opt_mode\n");
 	      $$ = DSP32MULT (0, 0, $4.mod, 0, 1,
 			      0, 0, IS_H ($3.s0), IS_H ($3.s1), 
 			      &$1,  0, &$3.s0, &$3.s1, 1);
@@ -1803,18 +1802,19 @@ asm_1:
 	    return semantic_error ("Register or mode mismatch");
 	}
 
-	| HALF_REG ASSIGN multfunc opt_mode COMMA HALF_REG ASSIGN multfunc opt_mode
+	| HALF_REG ASSIGN multiply_halfregs opt_mode COMMA
+          HALF_REG ASSIGN multiply_halfregs opt_mode
 	{
 	  if (!IS_DREG ($1) || !IS_DREG ($6)) 
 	    return semantic_error ("Dregs expected");
 
-	  if (check_multfuncs (&$3, &$8) < 0)
+	  if (check_multiply_halfregs (&$3, &$8) < 0)
 	    return -1;
 
 	  if (IS_H ($1) && !IS_H ($6))
 	    {
-	      notethat ("dsp32mult: dregs_hi = multfunc mxd_mod, "
-		       "dregs_lo = multfunc opt_mode\n");
+	      notethat ("dsp32mult: dregs_hi = multiply_halfregs mxd_mod, "
+		       "dregs_lo = multiply_halfregs opt_mode\n");
 	      $$ = DSP32MULT (0, $4.MM, $9.mod, 1, 0,
 			      IS_H ($3.s0), IS_H ($3.s1), IS_H ($8.s0), IS_H ($8.s1),
 			      &$1, 0, &$3.s0, &$3.s1, 1);
@@ -1829,16 +1829,16 @@ asm_1:
 	    return semantic_error ("Multfunc Register or mode mismatch");
 	}
 
-	| REG ASSIGN multfunc opt_mode COMMA REG ASSIGN multfunc opt_mode 
+	| REG ASSIGN multiply_halfregs opt_mode COMMA REG ASSIGN multiply_halfregs opt_mode 
 	{
 	  if (!IS_DREG ($1) || !IS_DREG ($6)) 
 	    return semantic_error ("Dregs expected");
 
-	  if (check_multfuncs (&$3, &$8) < 0)
+	  if (check_multiply_halfregs (&$3, &$8) < 0)
 	    return -1;
 
-	  notethat ("dsp32mult: dregs = multfunc mxd_mod, "
-		   "dregs = multfunc opt_mode\n");
+	  notethat ("dsp32mult: dregs = multiply_halfregs mxd_mod, "
+		   "dregs = multiply_halfregs opt_mode\n");
 	  if (IS_EVEN ($1))
 	    {
 	      if ($6.regno - $1.regno != 1 || $4.MM != 0)
@@ -3527,124 +3527,236 @@ asm_1:
 
 // Register rules
 
-REG_A:
-	REG_A00
-	{ $$ = $1; }
-	| REG_A11
-	{ $$ = $1; }
-;
+REG_A:	REG_A_DOUBLE_ZERO
+	{
+	$$ = $1;
+	}
+	| REG_A_DOUBLE_ONE
+	{
+	$$ = $1;
+	}
+	;
 
 
 // Modifiers
 /* { */
 
 opt_mode:
-	{ $$.MM = 0; $$.mod = 0; }
+	{
+	$$.MM = 0;
+	$$.mod = 0;
+	}
 	| LPAREN M COMMA MMOD RPAREN
-	{ $$.MM = 1; $$.mod = $4; }
+	{
+	$$.MM = 1;
+	$$.mod = $4;
+	}
 	| LPAREN MMOD COMMA M RPAREN
-	{ $$.MM = 1; $$.mod = $2; }
+	{
+	$$.MM = 1;
+	$$.mod = $2;
+	}
 	| LPAREN MMOD RPAREN
-	{ $$.MM = 0; $$.mod = $2; }
+	{
+	$$.MM = 0;
+	$$.mod = $2;
+	}
 	| LPAREN M RPAREN
-	{ $$.MM = 1; $$.mod = 0; }
-;
+	{
+	$$.MM = 1;
+	$$.mod = 0;
+	}
+	;
 
-asr_asl:
-	LPAREN ASL RPAREN
-	{ $$.r0 = 1; }
+asr_asl: LPAREN ASL RPAREN
+	{
+	$$.r0 = 1;
+	}
 	| LPAREN ASR RPAREN
-	{ $$.r0 = 0; }
-;
+	{
+	$$.r0 = 0;
+	}
+	;
 
 sco:
-	{ $$.s0 = 0; $$.x0 = 0; }
+	{
+	$$.s0 = 0;
+	$$.x0 = 0;
+	}
 	| S
-	{ $$.s0 = 1; $$.x0 = 0; }
+	{
+	$$.s0 = 1;
+	$$.x0 = 0;
+	}
 	| CO
-	{ $$.s0 = 0; $$.x0 = 1; }
+	{
+	$$.s0 = 0;
+	$$.x0 = 1;
+	}
 	| SCO
-	{ $$.s0 = 1; $$.x0 = 1; }
-;
+	{	
+	$$.s0 = 1;
+	$$.x0 = 1;
+	}
+	;
 
 asr_asl_0:
 	ASL
-	{ $$.r0 = 1; }
+	{
+	$$.r0 = 1;
+	}
 	| ASR
-	{ $$.r0 = 0; }
-;
+	{
+	$$.r0 = 0;
+	}
+	;
 
 amod0:
-	{ $$.s0 = 0; $$.x0 = 0; }
+	{
+	$$.s0 = 0;
+	$$.x0 = 0;
+	}
 	| LPAREN sco RPAREN
-	{ $$.s0 = $2.s0; $$.x0 = $2.x0; }
-;
-
+	{
+	$$.s0 = $2.s0;
+	$$.x0 = $2.x0;
+	}
+	;
 
 amod1:
-	{ $$.s0 = 0; $$.x0 = 0; $$.aop = 0; }
+	{
+	$$.s0 = 0;
+	$$.x0 = 0;
+	$$.aop = 0;
+	}
 	| LPAREN NS RPAREN
-	{ $$.s0 = 0; $$.x0 = 0; $$.aop = 1; }
+	{
+	$$.s0 = 0;
+	$$.x0 = 0;
+	$$.aop = 1;
+	}
 	| LPAREN S RPAREN
-	{ $$.s0 = 1; $$.x0 = 0; $$.aop = 1; }
-;
-
+	{
+	$$.s0 = 1;
+	$$.x0 = 0;
+	$$.aop = 1;
+	}
+	;
 
 amod2:
-	{ $$.r0 = 0; $$.s0 = 0; $$.x0 = 0; }
+	{
+	$$.r0 = 0;
+	$$.s0 = 0;
+	$$.x0 = 0;
+	}
 	| LPAREN asr_asl_0 RPAREN
-	{ $$.r0 = 2 + $2.r0; $$.s0 = 0; $$.x0 = 0; }
-
+	{
+	$$.r0 = 2 + $2.r0;
+	$$.s0 = 0;
+	$$.x0 = 0;
+	}
 	| LPAREN sco RPAREN
-	{ $$.r0 = 0; $$.s0 = $2.s0; $$.x0 = $2.x0; }
-
+	{
+	$$.r0 = 0;
+	$$.s0 = $2.s0;
+	$$.x0 = $2.x0;
+	}
 	| LPAREN asr_asl_0 COMMA sco RPAREN
-	{ $$.r0 = 2 + $2.r0; $$.s0 = $4.s0; $$.x0 = $4.x0; }
-
+	{
+	$$.r0 = 2 + $2.r0;
+	$$.s0 = $4.s0;
+	$$.x0 = $4.x0;
+	}
 	| LPAREN sco COMMA asr_asl_0 RPAREN
-	{ $$.r0 = 2 + $4.r0; $$.s0 = $2.s0; $$.x0 = $2.x0; }
-;
+	{
+	$$.r0 = 2 + $4.r0;
+	$$.s0 = $2.s0;
+	$$.x0 = $2.x0;
+	}
+	;
 
 xpmod:
-	{ $$.r0 = 0; }
+	{
+	$$.r0 = 0;
+	}
 	| LPAREN Z RPAREN
-	{ $$.r0 = 0; }
+	{
+	$$.r0 = 0;
+	}
 	| LPAREN X RPAREN
-	{ $$.r0 = 1; }
-;
+	{
+	$$.r0 = 1;
+	}
+	;
 
 xpmod1:
-	{ $$.r0 = 0; }
+	{
+	$$.r0 = 0;
+	}
 	| LPAREN X RPAREN
-	{ $$.r0 = 0; }
+	{
+	$$.r0 = 0;
+	}
 	| LPAREN Z RPAREN
-	{ $$.r0 = 1; }
-;
+	{
+	$$.r0 = 1;
+	}
+	;
 
 vsmod:
-	{ $$.r0 = 0; $$.s0 = 0; $$.aop = 0; }
+	{
+	$$.r0 = 0;
+	$$.s0 = 0;
+	$$.aop = 0;
+	}
 	| LPAREN NS RPAREN
-	{ $$.r0 = 0; $$.s0 = 0; $$.aop = 3; }
+	{
+	$$.r0 = 0;
+	$$.s0 = 0;
+	$$.aop = 3;
+	}
 	| LPAREN S RPAREN
-	{ $$.r0 = 0; $$.s0 = 1; $$.aop = 3; }
+	{
+	$$.r0 = 0;
+	$$.s0 = 1;
+	$$.aop = 3;
+	}
 	| LPAREN V RPAREN
-	{ $$.r0 = 1; $$.s0 = 0; $$.aop = 3; }
+	{
+	$$.r0 = 1;
+	$$.s0 = 0;
+	$$.aop = 3;
+	}
 	| LPAREN V COMMA S RPAREN
-	{ $$.r0 = 1; $$.s0 = 1; }
+	{
+	$$.r0 = 1;
+	$$.s0 = 1;
+	}
 	| LPAREN S COMMA V RPAREN
-	{ $$.r0 = 1; $$.s0 = 1; }
-;
+	{
+	$$.r0 = 1;
+	$$.s0 = 1;
+	}
+	;
 
 vmod:
-	{ $$.r0 = 0; }
+	{
+	$$.r0 = 0;
+	}
 	| LPAREN V RPAREN
-	{ $$.r0 = 1; }
+	{
+	$$.r0 = 1;
+	}
 	;
 
 smod:
-	{ $$.s0 = 0; }
+	{
+	$$.s0 = 0;
+	}
 	| LPAREN S RPAREN
-	{ $$.s0 = 1; }
+	{
+	$$.s0 = 1;
+	}
 	;
 
 searchmod:
@@ -3965,21 +4077,21 @@ assign_macfunc:
 	;
 
 a_macfunc:
-	a_assign multfunc
+	a_assign multiply_halfregs
 	{
 	  $$.n = IS_A1 ($1);
 	  $$.op = 0;
 	  $$.s0 = $2.s0;
 	  $$.s1 = $2.s1;
 	}
-	| a_plusassign multfunc
+	| a_plusassign multiply_halfregs
 	{
 	  $$.n = IS_A1 ($1);
 	  $$.op = 1;
 	  $$.s0 = $2.s0;
 	  $$.s1 = $2.s1;
 	}
-	| a_minusassign multfunc
+	| a_minusassign multiply_halfregs
 	{
 	  $$.n = IS_A1 ($1);
 	  $$.op = 2;
@@ -3988,7 +4100,7 @@ a_macfunc:
 	}
 	;
 
-multfunc:
+multiply_halfregs:
 	HALF_REG STAR HALF_REG
 	{
 	  if (IS_DREG ($1) && IS_DREG ($3))
@@ -4021,7 +4133,7 @@ cc_op:
 	;
 
 ccstat:
-	CCREG cc_op MODIFIED_STATUS_REG
+	CCREG cc_op STATUS_REG
 	{
 	$$.r0 = $3.regno;
 	$$.x0 = $2.r0;
@@ -4033,7 +4145,7 @@ ccstat:
 	$$.x0 = $2.r0;
 	$$.s0 = 0;
 	}
-	| MODIFIED_STATUS_REG cc_op CCREG
+	| STATUS_REG cc_op CCREG
 	{
 	$$.r0 = $1.regno;
 	$$.x0 = $2.r0;
