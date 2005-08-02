@@ -1,3 +1,9 @@
+2005-08-02  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* elf2flt.c: Merge in some newer code from mainline.  Reformat
+	a few things.  Undo some unnecessary long->int32 changes.
+	* flat.h (flat_hdr): Reformat.
+
 2005-07-20  Jie Zhang  <jie.zhang@analog.com>
 
 	Apply a patch from the mainline:
@@ -5,7 +11,7 @@
 	* elf2flt/ld-elf2flt.in: Find default linker script relative to
 	the path of the tools.
 
-2004-07-15  Bernd Schmidt  <bernd.schmidt@analog.com>
+2005-07-15  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* elf2flt.c (bfin_set_reloc): Support the stack section.
 	* elf2flt.ld (.stack): New section.

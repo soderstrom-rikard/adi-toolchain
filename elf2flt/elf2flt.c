@@ -48,6 +48,12 @@
 
 #if defined(TARGET_h8300)
 #include <elf/h8.h>      /* TARGET_* ELF support for the BFD library            */
+#elif defined(__CYGWIN__)
+#include "cygwin-elf.h"	/* Cygwin uses a local copy */
+#elif defined(TARGET_microblaze)
+#include <elf/microblaze.h>	/* TARGET_* ELF support for the BFD library */
+#elif defined(TARGET_bfin)
+#include "elf/bfin.h"
 #else
 #include <elf.h>      /* TARGET_* ELF support for the BFD library            */
 #endif
@@ -60,6 +66,9 @@
 #define PCREL24_MAGIC_OFFSET -1
 #endif
 
+#ifdef TARGET_e1
+#include <e1.h>
+#endif
 
 #ifdef TARGET_v850e
 #define TARGET_v850
@@ -79,6 +88,8 @@
 #define	ARCH	"h8300"
 #elif defined(TARGET_microblaze)
 #define ARCH	"microblaze"
+#elif defined(TARGET_e1)
+#define ARCH    "e1-coff"
 #elif defined(TARGET_bfin)
 #define ARCH	"bfin"
 #define FLAT_VERSION_5
@@ -87,7 +98,7 @@
 #error "Don't know how to support your CPU architecture??"
 #endif
 
-#if defined(TARGET_m68k) || defined(TARGET_bfin)
+#if defined(TARGET_m68k) || defined(TARGET_h8300) || defined(TARGET_bfin)
 /*
  * Define a maximum number of bytes allowed in the offset table.
  * We'll fail if the table is larger than this.
@@ -108,10 +119,6 @@
 #ifndef O_BINARY
 #define O_BINARY 0
 #endif
-
-#ifdef TARGET_bfin
-#include "elf/bfin.h"
-#endif //TARGET_bfin
 
 int verbose = 0;      /* extra output when running */
 int pic_with_got = 0; /* do elf/got processing with PIC code */
@@ -196,11 +203,11 @@ einfo (int type, const char *format, ...) {
 
 
 asymbol**
-get_symbols (bfd *abfd, int32_t *num)
+get_symbols (bfd *abfd, long *num)
 {
   int32_t storage_needed;
   asymbol **symbol_table;
-  int32_t number_of_symbols;
+  long number_of_symbols;
   
   storage_needed = bfd_get_symtab_upper_bound (abfd);
 	  
@@ -224,9 +231,9 @@ get_symbols (bfd *abfd, int32_t *num)
 
 
 int
-dump_symbols(asymbol **symbol_table, int32_t number_of_symbols)
+dump_symbols(asymbol **symbol_table, long number_of_symbols)
 {
-  int32_t i;
+  long i;
   printf("SYMBOL TABLE:\n");
   for (i=0; i<number_of_symbols; i++) {
 	printf("  NAME=%s  VALUE=0x%x\n", symbol_table[i]->name,
@@ -234,6 +241,20 @@ dump_symbols(asymbol **symbol_table, int32_t number_of_symbols)
   }
   printf("\n");
   return(0);
+}  
+
+long
+get_symbol_offset(char *name, asection *sec, asymbol **symbol_table, long number_of_symbols)
+{
+  long i;
+  for (i=0; i<number_of_symbols; i++) {
+    if (symbol_table[i]->section == sec) {
+      if (!strcmp(symbol_table[i]->name, name)) {
+        return symbol_table[i]->value;
+      }
+    }
+  }
+  return -1;
 }  
 
 
@@ -266,22 +287,21 @@ static asection *stack_sym_section = 0;
 static void
 reloc_stack_set_section(asection *section, const char *sym_section_name_in)
 {
-  /* TODO : we can add checks to make sure we do not
-     add different section names to the same arithmetic
-     expression.
-  */
-  strcpy(sym_section_name, sym_section_name_in);
-	stack_sym_section = section;
+    /* TODO : we can add checks to make sure we do not
+       add different section names to the same arithmetic
+       expression.  */
+    strcpy(sym_section_name, sym_section_name_in);
+    stack_sym_section = section;
 }
 
 static const char *
 reloc_stack_get_section_name()
 {
-  return sym_section_name;
+    return sym_section_name;
 }
 static asection *reloc_stack_get_section()
 {
-  return stack_sym_section;
+    return stack_sym_section;
 }
 
 #define is_reloc_stack_empty() ((reloc_stack_tos > 0)?0:1)
@@ -289,115 +309,85 @@ static asection *reloc_stack_get_section()
 static void
 reloc_stack_push(bfd_vma value)
 {
-  reloc_stack[reloc_stack_tos++] = value;
+    reloc_stack[reloc_stack_tos++] = value;
 }
 
 static bfd_vma
 reloc_stack_pop()
 {
-  return reloc_stack[--reloc_stack_tos];
+    return reloc_stack[--reloc_stack_tos];
 }
 
 static bfd_vma
 reloc_stack_operate(unsigned int oper)
 {
-  bfd_vma value;
-  switch(oper){
+    bfd_vma value;
+    switch(oper){
     case 0xE2 :
-    {
-      value = reloc_stack[reloc_stack_tos - 2] + reloc_stack[reloc_stack_tos - 1];
-      reloc_stack_tos -= 2;
-      break;
-    }
+	value = reloc_stack[reloc_stack_tos - 2] + reloc_stack[reloc_stack_tos - 1];
+	reloc_stack_tos -= 2;
+	break;
     case 0xE3 :
-    {
-      value = reloc_stack[reloc_stack_tos - 2] - reloc_stack[reloc_stack_tos - 1];
-      reloc_stack_tos -= 2;
-      break;
-    }
+	value = reloc_stack[reloc_stack_tos - 2] - reloc_stack[reloc_stack_tos - 1];
+	reloc_stack_tos -= 2;
+	break;
     case 0xE4 :
-    {
-      value = reloc_stack[reloc_stack_tos - 2] * reloc_stack[reloc_stack_tos - 1];
-      reloc_stack_tos -= 2;
-      break;
-    }
+	value = reloc_stack[reloc_stack_tos - 2] * reloc_stack[reloc_stack_tos - 1];
+	reloc_stack_tos -= 2;
+	break;
     case 0xE5 :
-    {
-      value = reloc_stack[reloc_stack_tos - 2] / reloc_stack[reloc_stack_tos - 1];
-      reloc_stack_tos -= 2;
-      break;
-    }
+	value = reloc_stack[reloc_stack_tos - 2] / reloc_stack[reloc_stack_tos - 1];
+	reloc_stack_tos -= 2;
+	break;
     case 0xE6 :
-    {
-      value = reloc_stack[reloc_stack_tos - 2] % reloc_stack[reloc_stack_tos - 1];
-      reloc_stack_tos -= 2;
-      break;
-    }
+	value = reloc_stack[reloc_stack_tos - 2] % reloc_stack[reloc_stack_tos - 1];
+	reloc_stack_tos -= 2;
+	break;
     case 0xE7 :
-    {
-      value = reloc_stack[reloc_stack_tos - 2] << reloc_stack[reloc_stack_tos - 1];
-      reloc_stack_tos -= 2;
-      break;
-    }
+	value = reloc_stack[reloc_stack_tos - 2] << reloc_stack[reloc_stack_tos - 1];
+	reloc_stack_tos -= 2;
+	break;
     case 0xE8 :
-    {
-      value = reloc_stack[reloc_stack_tos - 2] >> reloc_stack[reloc_stack_tos - 1];
-      reloc_stack_tos -= 2;
-      break;
-    }
+	value = reloc_stack[reloc_stack_tos - 2] >> reloc_stack[reloc_stack_tos - 1];
+	reloc_stack_tos -= 2;
+	break;
     case 0xE9 :
-    {
-      value = reloc_stack[reloc_stack_tos - 2] & reloc_stack[reloc_stack_tos - 1];
-      reloc_stack_tos -= 2;
-      break;
-    }
+	value = reloc_stack[reloc_stack_tos - 2] & reloc_stack[reloc_stack_tos - 1];
+	reloc_stack_tos -= 2;
+	break;
     case 0xEA :
-    {
-      value = reloc_stack[reloc_stack_tos - 2] | reloc_stack[reloc_stack_tos - 1];
-      reloc_stack_tos -= 2;
-      break;
-    }
+	value = reloc_stack[reloc_stack_tos - 2] | reloc_stack[reloc_stack_tos - 1];
+	reloc_stack_tos -= 2;
+	break;
     case 0xEB :
-    {
-      value = reloc_stack[reloc_stack_tos - 2] ^ reloc_stack[reloc_stack_tos - 1];
-      reloc_stack_tos -= 2;
-      break;
-    }
+	value = reloc_stack[reloc_stack_tos - 2] ^ reloc_stack[reloc_stack_tos - 1];
+	reloc_stack_tos -= 2;
+	break;
     case 0xEC :
-    {
-      value = reloc_stack[reloc_stack_tos - 2] && reloc_stack[reloc_stack_tos - 1];
-      reloc_stack_tos -= 2;
-      break;
-    }
+	value = reloc_stack[reloc_stack_tos - 2] && reloc_stack[reloc_stack_tos - 1];
+	reloc_stack_tos -= 2;
+	break;
     case 0xED :
-    {
-      value = reloc_stack[reloc_stack_tos - 2] || reloc_stack[reloc_stack_tos - 1];
-      reloc_stack_tos -= 2;
-      break;
-    }
+	value = reloc_stack[reloc_stack_tos - 2] || reloc_stack[reloc_stack_tos - 1];
+	reloc_stack_tos -= 2;
+	break;
     case 0xEF :
-    {
-      value = -reloc_stack[reloc_stack_tos - 1];
-      reloc_stack_tos --;
-      break;
-    }
+	value = -reloc_stack[reloc_stack_tos - 1];
+	reloc_stack_tos --;
+	break;
     case 0xF0 :
-    {
-      value = ~reloc_stack[reloc_stack_tos - 1];
-      reloc_stack_tos -= 1;
-      break;
-    }
+	value = ~reloc_stack[reloc_stack_tos - 1];
+	reloc_stack_tos -= 1;
+	break;
     default :
-    {
-       fprintf(stderr, "bfin relocation : Internal bug\n");
-       return 0;
+	fprintf(stderr, "bfin relocation : Internal bug\n");
+	return 0;
     }
-  }
 
-  // now push the new value back on stack
-  reloc_stack_push(value);
+    // now push the new value back on stack
+    reloc_stack_push(value);
 
-  return value;
+    return value;
 }
 
 /* FUNCTION : weak_und_symbol
@@ -407,17 +397,17 @@ static int
 weak_und_symbol(const char *reloc_section_name,
                 struct bfd_symbol *symbol)
 {
-  if(!((strstr (reloc_section_name, "text")) ||
-      (strstr (reloc_section_name, "data")) ||
-      (strstr (reloc_section_name, "bss")))){
-    if(symbol->flags & BSF_WEAK){
+    if(!((strstr (reloc_section_name, "text")) ||
+	 (strstr (reloc_section_name, "data")) ||
+	 (strstr (reloc_section_name, "bss")))){
+	if(symbol->flags & BSF_WEAK){
 #ifdef DEBUG_BFIN
-	fprintf(stderr, "found weak undefined symbol %s\n", symbol->name);
+	    fprintf(stderr, "found weak undefined symbol %s\n", symbol->name);
 #endif
-	return TRUE;
+	    return TRUE;
+	}
     }
-  }
-  return FALSE;
+    return FALSE;
 }
 
 static int
@@ -427,40 +417,40 @@ bfin_set_reloc (flat_v5_reloc_t *reloc,
 		struct bfd_symbol *symbol,
 		int sp, int hilo, int32_t offset)
 {
-  if (strstr (reloc_section_name, "text"))
-    reloc->reloc.type = FLAT_RELOC_TYPE_TEXT;
-  else if (strstr (reloc_section_name, "data"))
-    reloc->reloc.type = FLAT_RELOC_TYPE_DATA;
-  else if (strstr (reloc_section_name, "bss"))
-    reloc->reloc.type = FLAT_RELOC_TYPE_BSS;
-  else if (strstr (reloc_section_name, "stack"))
-    reloc->reloc.type = FLAT_RELOC_TYPE_STACK;
-  else if (symbol->flags & BSF_WEAK){
-    /* weak symbol support ... if a weak symbol is undefined at the
-         end of a final link, it should return 0 rather than error
-         We will assume text section for the moment.
-    */
-    reloc->reloc.type = FLAT_RELOC_TYPE_TEXT;
-  }
-  else if (strstr (reloc_section_name, "*ABS*")){
-    /* (A data section initialization of something in the shared libc's text section
-	does not resolve - i.e. a global pointer to function initialized with
-	a libc function).
-	The text section here is appropriate as the section information
-        of the shared library is lost. The loader will do some calcs.
-    */
-    reloc->reloc.type = FLAT_RELOC_TYPE_TEXT;
-  }
-  else
+    if (strstr (reloc_section_name, "text"))
+	reloc->reloc.type = FLAT_RELOC_TYPE_TEXT;
+    else if (strstr (reloc_section_name, "data"))
+	reloc->reloc.type = FLAT_RELOC_TYPE_DATA;
+    else if (strstr (reloc_section_name, "bss"))
+	reloc->reloc.type = FLAT_RELOC_TYPE_BSS;
+    else if (strstr (reloc_section_name, "stack"))
+	reloc->reloc.type = FLAT_RELOC_TYPE_STACK;
+    else if (symbol->flags & BSF_WEAK){
+	/* weak symbol support ... if a weak symbol is undefined at the
+	   end of a final link, it should return 0 rather than error
+	   We will assume text section for the moment.
+	*/
+	reloc->reloc.type = FLAT_RELOC_TYPE_TEXT;
+    }
+    else if (strstr (reloc_section_name, "*ABS*")){
+	/* (A data section initialization of something in the shared libc's text section
+	   does not resolve - i.e. a global pointer to function initialized with
+	   a libc function).
+	   The text section here is appropriate as the section information
+	   of the shared library is lost. The loader will do some calcs.
+	*/
+	reloc->reloc.type = FLAT_RELOC_TYPE_TEXT;
+    }
+    else
     {
-      printf ("Unknown Type - relocation for %s in bad section - %s\n", sym_name, reloc_section_name);
-      return 1;
+	printf ("Unknown Type - relocation for %s in bad section - %s\n", sym_name, reloc_section_name);
+	return 1;
     }
   
-  reloc->reloc.offset = offset;
-  reloc->reloc.hi_lo = hilo;
-  reloc->reloc.sp = sp;
-  return 0;
+    reloc->reloc.offset = offset;
+    reloc->reloc.hi_lo = hilo;
+    reloc->reloc.sp = sp;
+    return 0;
 
 }
 #endif
@@ -481,11 +471,7 @@ output_relocs (
 {
 #ifdef TARGET_bfin
   flat_v5_reloc_t 	*flat_relocs;
-  bfd_reloc_status_type flag ;
   bfd_size_type         addr;
-  bfd_vma               output_base;
-  reloc_howto_type      *howto;
-  const char *          reloc_section_name;
 #else
   uint32_t		*flat_relocs;
 #endif //TARGET_bfin
@@ -493,7 +479,7 @@ output_relocs (
   arelent		**relpp, **p, *q;
   const char		*sym_name, *section_name;
   unsigned char		*sectionp;
-  uint32_t		pflags;
+  unsigned long		pflags;
   char			addstr[16];
   int32_t			sym_addr, sym_vma, section_vma;
   int			relsize, relcount;
@@ -502,7 +488,7 @@ output_relocs (
   int			got_size = 0;
   int			bad_relocs = 0;
   asymbol		**symb;
-  int32_t			nsymb;
+  long			nsymb;
   
 #if 0
   printf("%s(%d): output_relocs(abs_bfd=%d,synbols=0x%x,number_of_symbols=%d"
@@ -695,10 +681,14 @@ dump_symbols(symbols, number_of_symbols);
 				rc = -1;
 				continue;
 			}
+#ifndef TARGET_bfin
 			/* Adjust the address to account for the GOT table which wasn't
 			 * present in the relative file link.
 			 */
-					
+			if (pic_with_got)
+			  q->address += got_size;
+#endif
+
 			/* A pointer to what's being relocated, used often
 			   below.  */
 			r_mem = sectionp + q->address;
@@ -707,7 +697,14 @@ dump_symbols(symbols, number_of_symbols);
 			 *	Fixup offset in the actual section.
 			 */
 			addstr[0] = 0;
-			sym_addr = (((*(q->sym_ptr_ptr))->value));
+#ifndef TARGET_e1
+  			if ((sym_addr = get_symbol_offset((char *) sym_name,
+			    sym_section, symbols, number_of_symbols)) == -1) {
+				sym_addr = 0;
+			}
+#else
+			sym_addr = (*(q->sym_ptr_ptr))->value;
+#endif			
 
 			if (use_resolved) {
 				/* Use the address of the symbol already in
@@ -928,7 +925,7 @@ dump_symbols(symbols, number_of_symbols);
 						bad_relocs++;
 						continue;
 					}
-					relocation_needed = 1;
+					relocation_needed = !bfd_is_abs_section(sym_section);
 					sym_addr = (*(q->sym_ptr_ptr))->value;
 					sym_vma = bfd_section_vma(abs_bfd, sym_section);
 					sym_addr += sym_vma + q->addend;
@@ -1008,11 +1005,28 @@ dump_symbols(symbols, number_of_symbols);
 					continue;
 				}
 				case R_MICROBLAZE_32:
-					relocation_needed = 1;
-					//sym_addr = (*(q->sym_ptr_ptr))->value;
+				{	
+					unsigned char *p = r_mem;
+					unsigned long offset;
+
+					/* grab any offset from the text */
+					offset = (p[0]<<24) + (p[1] << 16) + (p[2] << 8) + (p[3]);
 					sym_vma = bfd_section_vma(abs_bfd, sym_section);
-					sym_addr += sym_vma + q->addend;
+					/* This is a horrible kludge.  For some
+					   reason, *sometimes* the offset is in
+					   both addend and the code.  Detect
+					   it, and cancel the effect.  Otherwise
+					   the offset gets added twice - ouch.
+					   There should be a better test
+					   for this condition, based on the
+					   BFD data structures */
+					if(offset==q->addend)
+						offset=0;
+
+					sym_addr += offset + sym_vma + q->addend;
+					relocation_needed = 1;
 					break;
+				}
 
 				case R_MICROBLAZE_64_PCREL:
 					sym_vma = 0;
@@ -1195,27 +1209,27 @@ dump_symbols(symbols, number_of_symbols);
 				  reloc_stack_push(sym_addr);
 				  reloc_stack_set_section(sym_section, section_name);
 				  break;
-				case 0xE1 :
+				case 0xE1:
 				  /* const */
 				  reloc_stack_push(q->addend);
 				break;
-				case 0xE2 :
-				case 0xE3 :
-				case 0xE4 :
-				case 0xE5 :
-				case 0xE6 :
-				case 0xE7 :
-				case 0xE8 :
-				case 0xE9 :
-				case 0xEA :
-				case 0xEB :
-				case 0xEC :
-				case 0xED :
-				case 0xEE :
-				case 0xEF :
-				case 0xF0 :
-				case 0xF1 :
-				case 0xF2 :
+				case 0xE2:
+				case 0xE3:
+				case 0xE4:
+				case 0xE5:
+				case 0xE6:
+				case 0xE7:
+				case 0xE8:
+				case 0xE9:
+				case 0xEA:
+				case 0xEB:
+				case 0xEC:
+				case 0xED:
+				case 0xEE:
+				case 0xEF:
+				case 0xF0:
+				case 0xF1:
+				case 0xF2:
 				  reloc_stack_operate((*p)->howto->type);
 				  break;
 
@@ -1234,6 +1248,180 @@ dump_symbols(symbols, number_of_symbols);
 					break;
 #endif /* TARGET_sh */
 
+#ifdef TARGET_e1
+#define  htoe1l(x)              htonl(x)
+					
+#if 0 
+#define  DEBUG_E1
+#endif
+
+#ifdef   DEBUG_E1
+#define  DBG_E1                 printf
+#else
+#define  DBG_E1(x, ...  )
+#endif
+
+#define _32BITS_RELOC 0x00000000
+#define _30BITS_RELOC 0x80000000
+#define _28BITS_RELOC 0x40000000
+					{
+				char *p;
+				unsigned long   sec_vma, exist_val, S;
+				case R_E1_CONST31:
+						relocation_needed = 1;
+						DBG_E1("Handling Reloc <CONST31>\n");
+						sec_vma = bfd_section_vma(abs_bfd, sym_section);
+						DBG_E1("sec_vma : [0x%x], sym_addr : [0x%x], q->address : [0x%x]\n",
+										sec_vma, sym_addr, q->address);
+						sym_addr = sec_vma + sym_addr;
+						exist_val = *(unsigned long*)((unsigned long)sectionp + q->address + 2);        
+						DBG_E1("Orig:exist_val : [0x%08x]\n", exist_val);
+						exist_val = htoe1l(exist_val);
+						DBG_E1("HtoBE:exist_val : [0x%08x]\n", exist_val);
+						sym_addr += exist_val;
+						pflags = _30BITS_RELOC;
+						break;
+				case R_E1_CONST31_PCREL:
+						relocation_needed = 0;
+						DBG_E1("Handling Reloc <CONST31_PCREL>\n");
+						DBG_E1("DONT RELOCATE AT LOADING\n");
+						sec_vma = bfd_section_vma(abs_bfd, sym_section);
+						DBG_E1("sec_vma : [0x%x], sym_addr : [0x%x], q->address : [0x%x]\n",
+										sec_vma, sym_addr, q->address);
+						sym_addr =  sec_vma + sym_addr;
+						DBG_E1("sym_addr =  sec_vma + sym_addr : [0x%x]\n", sym_addr );
+
+						DBG_E1("q->address : 0x%x, section_vma : 0x%x\n", q->address,
+																		section_vma );
+						q->address = q->address + section_vma;
+						DBG_E1("q->address += section_vma : 0x%x\n", q->address );
+
+						if( (sym_addr = (sym_addr - q->address - 6)) < 0 )
+								DBG_E1("NEGATIVE OFFSET in PC Relative instruction\n");
+						DBG_E1( "sym_addr := sym_addr - q->address  - "
+								"sizeof(CONST31_PCREL): [0x%x]\n",
+								sym_addr );
+						exist_val = *(unsigned long*)((unsigned long)sectionp + q->address + 2);              
+						DBG_E1("Orig:exist_val : [0x%08x]\n", exist_val);
+						exist_val = htoe1l(exist_val);
+						DBG_E1("HtoBE:exist_val : [0x%08x]\n", exist_val);
+						sym_addr |= exist_val;
+						DBG_E1("sym_addr |=  exist_val) : [0x%x]\n", sym_addr );
+						break;
+				case R_E1_DIS29W_PCREL:
+						relocation_needed = 0;
+						DBG_E1("Handling Reloc <DIS29W_PCREL>\n");
+						DBG_E1("DONT RELOCATE AT LOADING\n");
+						sec_vma = bfd_section_vma(abs_bfd, sym_section);
+						DBG_E1("sec_vma : [0x%x], sym_addr : [0x%x], q->address : [0x%x]\n",
+										sec_vma, sym_addr, q->address);
+						sym_addr =  sec_vma + sym_addr;
+						DBG_E1("sym_addr =  sec_vma + sym_addr : [0x%x]\n", sym_addr );
+
+						DBG_E1("q->address : 0x%x, section_vma : 0x%x\n", q->address,
+																		section_vma );
+						q->address = q->address + section_vma;
+						DBG_E1("q->address += section_vma : 0x%x\n", q->address );
+
+						if( (sym_addr = (sym_addr - q->address - 6)) < 0 )
+								DBG_E1("NEGATIVE OFFSET in PC Relative instruction\n");
+						DBG_E1( "sym_addr := sym_addr - q->address  - "
+								"sizeof(CONST31_PCREL): [0x%x]\n",
+								sym_addr );
+						DBG_E1("sectionp:[0x%x], q->address:[0x%x]\n", sectionp, q->address );
+						exist_val = *(unsigned long*)((unsigned long)sectionp + q->address + 2);       
+						DBG_E1("Original:exist_val : [0x%08x]\n",exist_val);
+						exist_val = htoe1l(exist_val);
+						DBG_E1("HtoBE:exist_val : [0x%08x]\n",exist_val);
+						sym_addr += exist_val;
+						break;
+				case R_E1_DIS29W:
+						DBG_E1("Handling Reloc <DIS29W>\n");
+						goto DIS29_RELOCATION;
+				case R_E1_DIS29H:
+						DBG_E1("Handling Reloc <DIS29H>\n");
+						goto DIS29_RELOCATION;
+				case R_E1_DIS29B:
+						DBG_E1("Handling Reloc <DIS29B>\n");
+DIS29_RELOCATION:
+						relocation_needed = 1;
+						sec_vma = bfd_section_vma(abs_bfd, sym_section);
+						DBG_E1("sec_vma : [0x%x], sym_addr : [0x%08x]\n",
+										sec_vma, sym_addr);
+						sym_addr =  sec_vma + sym_addr;
+						DBG_E1("sym_addr =  sec_vma + sym_addr : [0x%08x]\n", sym_addr);
+						exist_val = *(unsigned long*)((unsigned long)sectionp + q->address + 2);                
+						DBG_E1("Orig:exist_val : [0x%08x]\n", exist_val);
+						exist_val = htoe1l(exist_val);
+						DBG_E1("HtoBE:exist_val : [0x%08x]\n", exist_val);
+						sym_addr +=  exist_val;
+						DBG_E1("sym_addr +=  exist_val : [0x%08x]\n", sym_addr);
+						pflags = _28BITS_RELOC;
+						break;
+				case R_E1_IMM32_PCREL:
+						relocation_needed = 0;
+						DBG_E1("Handling Reloc <IMM32_PCREL>\n");
+						DBG_E1("DONT RELOCATE AT LOADING\n");
+						sec_vma = bfd_section_vma(abs_bfd, sym_section);
+						DBG_E1("sec_vma : [0x%x], sym_addr : [0x%x]\n",
+										sec_vma, sym_addr);
+						sym_addr =  sec_vma + sym_addr;
+
+						DBG_E1("sym_addr =  sec_vma + sym_addr : [0x%x]\n", sym_addr );
+						DBG_E1("q->address : 0x%x, section_vma : 0x%x\n", q->address,
+																		section_vma );
+						q->address = q->address + section_vma;
+						DBG_E1("q->address += section_vma : 0x%x\n", q->address );
+
+						if( (sym_addr = (sym_addr - q->address - 6 )) < 0 )
+								DBG_E1("NEGATIVE OFFSET in PC Relative instruction\n");
+						DBG_E1( "sym_addr := sym_addr - q->address  - "
+								"sizeof(CONST31_PCREL): [0x%x]\n",
+								sym_addr );
+						DBG_E1("sectionp:[0x%x], q->address:[0x%x]\n", sectionp, q->address );
+						exist_val = *(unsigned long*)((unsigned long)sectionp + q->address + 2);                 
+ 						DBG_E1("Original:exist_val : [0x%08x]\n",exist_val);
+						exist_val = htoe1l(exist_val);
+						DBG_E1("HtoBE:exist_val : [0x%08x]\n",exist_val);
+						sym_addr += exist_val;
+						break;
+				case R_E1_IMM32:
+						relocation_needed = 1;
+						DBG_E1("Handling Reloc <IMM32>\n");
+						sec_vma = bfd_section_vma(abs_bfd, sym_section);
+						DBG_E1("sec_vma : [0x%x], sym_addr : [0x%x]\n",
+										sec_vma, sym_addr);
+						sym_addr =  sec_vma + sym_addr;
+						DBG_E1("sym_addr =  sec_vma + sym_addr : [0x%x]\n", sym_addr );
+						DBG_E1("sectionp:[0x%x], q->address:[0x%x]\n", sectionp, q->address );
+						exist_val = *(unsigned long*)((unsigned long)sectionp + q->address + 2);                     
+	 					DBG_E1("Original:exist_val : [0x%08x]\n",exist_val);
+						exist_val = htoe1l(exist_val);
+						DBG_E1("HtoBE:exist_val : [0x%08x]\n",exist_val);
+						sym_addr += exist_val;
+						pflags = _32BITS_RELOC;
+						break;
+				case R_E1_WORD:
+						relocation_needed = 1;
+						DBG_E1("Handling Reloc <WORD>\n");
+						sec_vma = bfd_section_vma(abs_bfd, sym_section);
+						DBG_E1("sec_vma : [0x%x], sym_addr : [0x%x]\n",
+										sec_vma, sym_addr);
+						sym_addr =  sec_vma + sym_addr;
+						DBG_E1("sym_addr =  sec_vma + sym_addr : [0x%x]\n", sym_addr );
+						exist_val = *(unsigned long*)((unsigned long)sectionp + q->address );
+						DBG_E1("Orig:exist_val : [0x%08x]\n", exist_val);
+						exist_val = htoe1l(exist_val);
+						DBG_E1("HtoBE:exist_val : [0x%08x]\n", exist_val);
+						sym_addr +=  exist_val;
+						DBG_E1("sym_addr +=  exist_val : [0x%08x]\n", sym_addr);
+						pflags = _32BITS_RELOC;
+						break;
+				}
+#undef _32BITS_RELOC
+#undef _30BITS_RELOC
+#undef _28BITS_RELOC
+#endif
 				default:
 					/* missing support for other types of relocs */
 					printf("ERROR: bad reloc type %d\n", (*p)->howto->type);
@@ -1293,49 +1481,76 @@ dump_symbols(symbols, number_of_symbols);
 				else
 					*(uint32_t *)r_mem = tmp.l;
 #elif defined(TARGET_bfin)
-           if(((*p)->howto->type == R_pcrel24) ||
-              ((*p)->howto->type == R_pcrel24_jump_l)	||
-              ((*p)->howto->type == R_pcrel24_jump_x) ||
-              ((*p)->howto->type == R_pcrel24_call_x)) {
-	     sym_addr += 2*-1*PCREL24_MAGIC_OFFSET;
-             *((unsigned short *)(sectionp+q->address)+1+PCREL24_MAGIC_OFFSET) = ((sym_addr)>>1) & 0xffff;
-             *((unsigned short *)(sectionp+q->address)+PCREL24_MAGIC_OFFSET) = 
-                       (0xff00 & *((unsigned short *) (sectionp+q->address)+PCREL24_MAGIC_OFFSET)) |
-                       (((sym_addr)>>17) & 0xff);
-           } else if((*p)->howto->type == R_byte4_data){
-             *((uint32_t *)(sectionp+q->address)) = sym_addr;
-           } else if(((*p)->howto->type == R_pcrel12_jump) ||
-              ((*p)->howto->type == R_pcrel12_jump_s)){
-              *((unsigned short *)(sectionp+q->address)) = 
-                        (0xf000 & *((unsigned short *)(sectionp+q->address)) |
-                        (((sym_addr)>>1)&0xfff));
-           } else if((*p)->howto->type == R_pcrel10) {
-              *((unsigned short *)(sectionp+q->address)) = 
-                        (~0x3ff & *((unsigned short *)(sectionp+q->address)) |
-                        (((sym_addr)>>1)&0x3ff));
-	   } else if (((*p)->howto->type == R_rimm16)  ||
-			((*p)->howto->type == R_huimm16 ||
-			(*p)->howto->type == R_luimm16)){
-		/* for l and h we set the lower 16 bits which is only when it will be used */
-	       *((unsigned short *) (sectionp + q->address)) = (unsigned short) sym_addr;
-	   } else if ((*p)->howto->type == R_pcrel5m2){
-              *((unsigned short *)(sectionp+q->address)) = 
-                        (0xfff0 & *((unsigned short *)(sectionp+q->address)) |
-                        (((sym_addr)>>1)&0xf));
-	   } else if ((*p)->howto->type == R_pcrel11){
-              *((unsigned short *)(sectionp+q->address)) = 
-                        (0xfc00 & *((unsigned short *)(sectionp+q->address)) |
-                        (((sym_addr)>>1)&0x3ff));
-	   }
-	   else if((0xE0 <= (*p)->howto->type) && (0xF3 >= (*p)->howto->type)){
+				if ((*p)->howto->type == R_pcrel24
+				    || (*p)->howto->type == R_pcrel24_jump_l
+				    || (*p)->howto->type == R_pcrel24_jump_x
+				    || (*p)->howto->type == R_pcrel24_call_x)
+				{
+				    sym_addr += 2*-1*PCREL24_MAGIC_OFFSET;
+				    *((unsigned short *)(sectionp + q->address) + 1 + PCREL24_MAGIC_OFFSET)
+					= (sym_addr >> 1) & 0xffff;
+				    *((unsigned short *)(sectionp + q->address) + PCREL24_MAGIC_OFFSET)
+					= ((0xff00 & *((unsigned short *) (sectionp + q->address) + PCREL24_MAGIC_OFFSET))
+					   | ((sym_addr >> 17) & 0xff));
+				} else if((*p)->howto->type == R_byte4_data) {
+				    *((uint32_t *)(sectionp + q->address)) = sym_addr;
+				} else if ((*p)->howto->type == R_pcrel12_jump
+					   || (*p)->howto->type == R_pcrel12_jump_s) {
+				    *((unsigned short *)(sectionp + q->address))
+					= ((0xf000 & *((unsigned short *)(sectionp + q->address)))
+					   | ((sym_addr >> 1) & 0xfff));
+				} else if((*p)->howto->type == R_pcrel10) {
+				    *((unsigned short *)(sectionp + q->address))
+					= ((~0x3ff & *((unsigned short *)(sectionp + q->address)))
+					   | ((sym_addr >> 1) & 0x3ff));
+				} else if ((*p)->howto->type == R_rimm16
+					   || (*p)->howto->type == R_huimm16
+					   || (*p)->howto->type == R_luimm16) {
+				    /* for l and h we set the lower 16 bits which is only when it will be used */
+				    *((unsigned short *) (sectionp + q->address)) = (unsigned short) sym_addr;
+				} else if ((*p)->howto->type == R_pcrel5m2) {
+				    *((unsigned short *)(sectionp + q->address))
+					= ((0xfff0 & *((unsigned short *)(sectionp + q->address)))
+					   | ((sym_addr >> 1) & 0xf));
+				} else if ((*p)->howto->type == R_pcrel11) {
+				    *((unsigned short *)(sectionp + q->address))
+					= ((0xfc00 & *((unsigned short *)(sectionp + q->address)))
+					   | ((sym_addr >> 1) & 0x3ff));
+				}
+				else if (0xE0 <= (*p)->howto->type && 0xF3 >= (*p)->howto->type) {
+				    //arith relocs dont generate a real relocation
+				}
+				else {
+				    printf("Blackfin relocation fail for reloc type: 0x%x\n", (*p)->howto->type);
+				}
 
-		//arith relocs dont generate a real relocation
-           }
-	   else {
-	    printf("Blackfin relocation fail for reloc type: 0x%x\n", (*p)->howto->type);
-          }					
-
-#else /* ! TARGET_arm && ! TARGET_bfin*/
+#elif defined(TARGET_e1)
+#define OPCODE_SIZE 2           /* Add 2 bytes, counting the opcode size*/
+				switch ((*p)->howto->type) {
+				case R_E1_CONST31:
+				case R_E1_CONST31_PCREL:
+				case R_E1_DIS29W_PCREL:
+				case R_E1_DIS29W:
+				case R_E1_DIS29H:
+				case R_E1_DIS29B:
+				case R_E1_IMM32_PCREL:
+				case R_E1_IMM32:
+						DBG_E1("In addr + 2:[0x%x] <- write [0x%x]\n",
+								(sectionp + q->address + 2), sym_addr );
+						*((unsigned long *) (sectionp + q->address + OPCODE_SIZE)) =
+						htonl(sym_addr);
+				break;
+				case R_E1_WORD:
+						DBG_E1("In addr : [0x%x] <- write [0x%x]\n",
+								(sectionp + q->address), sym_addr );
+						*((unsigned long *) (sectionp + q->address )) = htonl(sym_addr);
+				break;
+				default:
+						printf("ERROR:Unhandled Relocation. Exiting...\n");
+						exit(0);
+				break;
+				}
+#else /* ! TARGET_arm && ! TARGET_e1 && ! TARGET_bfin */
 
 				switch (q->howto->type) {
 #ifdef TARGET_v850
@@ -1366,15 +1581,16 @@ dump_symbols(symbols, number_of_symbols);
 #endif /* !TARGET_arm */
 			}
 #ifdef TARGET_bfin
-			else{
-	   			if (((*p)->howto->type == R_rimm16)  ||
-						((*p)->howto->type == R_huimm16 ||
-						(*p)->howto->type == R_luimm16)){
-					/* for l and h we set the lower 16 bits which is only when it will be used */
-	       				*((unsigned short *) (sectionp + q->address)) = (unsigned short) sym_addr;
-           			} else if((*p)->howto->type == R_byte4_data){
-             				*((uint32_t *)(sectionp+q->address)) = sym_addr;
-				}
+			else {
+			    if ((*p)->howto->type == R_rimm16
+				|| (*p)->howto->type == R_huimm16
+				|| (*p)->howto->type == R_luimm16)
+			    {
+				/* for l and h we set the lower 16 bits which is only when it will be used */
+				*((unsigned short *) (sectionp + q->address)) = (unsigned short) sym_addr;
+			    } else if ((*p)->howto->type == R_byte4_data) {
+				*((uint32_t *)(sectionp + q->address)) = sym_addr;
+			    }
 			}
 #endif
 
@@ -1393,12 +1609,38 @@ dump_symbols(symbols, number_of_symbols);
 #ifndef TARGET_bfin
 				flat_relocs = realloc(flat_relocs,
 					(flat_reloc_count + 1) * sizeof(uint32_t));
+#ifndef TARGET_e1
 				flat_relocs[flat_reloc_count] = pflags |
 					(section_vma + q->address);
 
 				if (verbose)
 					printf("reloc[%d] = 0x%x\n", flat_reloc_count,
 							section_vma + q->address);
+#else
+				switch ((*p)->howto->type) {
+				case R_E1_CONST31:
+				case R_E1_CONST31_PCREL:
+				case R_E1_DIS29W_PCREL:
+				case R_E1_DIS29W:
+				case R_E1_DIS29H:
+				case R_E1_DIS29B:
+				case R_E1_IMM32_PCREL:
+				case R_E1_IMM32:
+				flat_relocs[flat_reloc_count] = pflags |
+						(section_vma + q->address + OPCODE_SIZE);
+				if (verbose)
+						printf("RELOCATION TABLE : reloc[%d] = [0x%x]\n", flat_reloc_count,
+										 flat_relocs[flat_reloc_count] );
+				break;
+				case R_E1_WORD:
+				flat_relocs[flat_reloc_count] = pflags |
+						(section_vma + q->address);
+				if (verbose)
+						printf("RELOCATION TABLE : reloc[%d] = [0x%x]\n", flat_reloc_count,
+										 flat_relocs[flat_reloc_count] );
+				break;
+				}
+#endif
 				flat_reloc_count++;
 #endif //TARGET_bfin
 				relocation_needed = 0;
@@ -1426,92 +1668,6 @@ printf("%s(%d): symbol name=%s address=0x%x section=%s -> RELOC=0x%x\n",
   return flat_relocs;
 }
 
-
-
-#if 0
-/* shared lib symbols stuff */
-
-int32_t
-get_symbol(char *name, asection *sec, asymbol **symbol_table, int32_t number_of_symbols)
-{
-  int32_t i;
-  for (i=0; i<number_of_symbols; i++) {
-    if (symbol_table[i]->section == sec) {
-      if (!strcmp(symbol_table[i]->name, name)) {
-	return symbol_table[i]->value;
-      }
-    }
-  }
-  return -1;
-}  
-
-int
-output_offset_table(int fd, char *ename, bfd *abfd, asymbol **symbol_table, int32_t number_of_symbols)
-{
-  int32_t i;
-  FILE *ef;
-  char buf[80];
-  char libname[80];
-  int32_t etext_addr;
-  int32_t sym_addr;
-
-  int foobar = 0;
-  int count = 0;
-  signed short *tab = malloc(32768); /* we don't know how many yet*/
-
-  asection *text_section = bfd_get_section_by_name (abfd, ".text");
-
-  if (!(ef = fopen(ename, "r"))) {
-    fprintf (stderr,"Can't open %s\n",ename);
-    exit(1);
-  }
-
-  fgets(libname, 80, ef);
-
-  if (number_of_symbols < 0) {
-    fprintf (stderr,"Corrupt symbol table!\n");
-    exit(1);
-  }
-
-  if ((etext_addr = get_symbol("etext",
-			       text_section,
-			       symbol_table,
-			       number_of_symbols)) == -1) {
-    fprintf (stderr,"Can't find the symbol etext\n");
-    exit(1);
-  }
-
-  fgets(buf, 80, ef);
-  while (!feof(ef)) {
-    buf[strlen(buf)-1] = 0; /* Arrrgh! linefeeds */
-
-    if ((sym_addr = get_symbol(buf,
-			       text_section,
-			       symbol_table,
-			       number_of_symbols)) == -1) {
-      fprintf (stderr,"Can't find the symbol %s\n",buf);
-      foobar++;
-    } else {
-      tab[++count] = htons(sym_addr - etext_addr);
-    }
-    fgets(buf, 80, ef);
-  }
-
-  fclose(ef);
-
-  if (foobar) {
-    fprintf (stderr,"*** %d symbols not found\n",foobar);
-    exit(10);
-  }
-
-  strcpy((char *)&tab[++count],libname);
-  tab[0] = htons(count * 2);
-  write(fd, tab, count * 2 + strlen(libname) + 2);
-  return 0;
-}
-#endif
-
-
 static char * program;
 
 static void usage(void)
@@ -1537,7 +1693,7 @@ static void usage(void)
 
 
 /* Write NUM zeroes to STREAM.  */
-static void write_zeroes (uint32_t num, FILE *stream)
+static void write_zeroes (unsigned long num, FILE *stream)
 {
   char zeroes[1024];
   if (num > 0) {
@@ -1569,7 +1725,7 @@ int main(int argc, char *argv[])
 
 
   asymbol **symbol_table;
-  int32_t number_of_symbols;
+  long number_of_symbols;
 
   uint32_t data_len = 0;
   uint32_t bss_len = 0;
@@ -1586,6 +1742,7 @@ int main(int argc, char *argv[])
   
   struct flat_hdr hdr;
 
+  int gf_is_pipe = 0;
 
   program = argv[0];
   progname = argv[0];
@@ -1593,7 +1750,11 @@ int main(int argc, char *argv[])
   if (argc < 2)
   	usage();
   
+#ifndef TARGET_e1
   stack = 4096;
+#else /* We need plenty of stack for both of them (Aggregate and Register) */
+  stack = 0x2020;
+#endif
 
   while ((opt = getopt(argc, argv, "avzdrkp:s:o:R:")) != -1) {
     switch (opt) {
@@ -1695,6 +1856,8 @@ int main(int argc, char *argv[])
   /* Group output sections into text, data, and bss, and calc their sizes.  */
   for (s = abs_bfd->sections; s != NULL; s = s->next) {
     uint32_t *vma, *len;
+    bfd_size_type sec_size;
+    bfd_vma sec_vma;
 
     if (s->flags & SEC_CODE) {
       vma = &text_vma;
@@ -1708,14 +1871,16 @@ int main(int argc, char *argv[])
     } else
       continue;
 
-    if (s->vma < *vma) {
+    sec_size = bfd_section_size(abs_bfd, s);
+    sec_vma  = bfd_section_vma(abs_bfd, s);
+    if (sec_vma < *vma) {
       if (*len > 0)
-	*len += s->vma - *vma;
+	*len += sec_vma - *vma;
       else
-	*len = s->size;
-      *vma = s->vma;
-    } else if (s->vma + s->size > *vma + *len)
-      *len = s->vma + s->size - *vma;
+	*len = sec_size;
+      *vma = sec_vma;
+    } else if (sec_vma + sec_size > *vma + *len)
+      *len = sec_vma + sec_size - *vma;
   }
 
   if (text_len == 0) {
@@ -1733,7 +1898,7 @@ int main(int argc, char *argv[])
     if (s->flags & SEC_CODE) 
       if (bfd_get_section_contents(abs_bfd, s,
 				   text + (s->vma - text_vma), 0,
-				   s->size) == false)
+				   bfd_section_size(abs_bfd, s)) == false)
       {
 	fprintf(stderr, "read error section %s\n", s->name);
 	exit(2);
@@ -1766,7 +1931,7 @@ int main(int argc, char *argv[])
     if (s->flags & SEC_DATA) 
       if (bfd_get_section_contents(abs_bfd, s,
 				   data + (s->vma - data_vma), 0,
-				   s->size) == false)
+				   bfd_section_size(abs_bfd, s)) == false)
       {
 	fprintf(stderr, "read error section %s\n", s->name);
 	exit(2);
@@ -1800,16 +1965,13 @@ int main(int argc, char *argv[])
   /* Fill in the binflt_flat header */
   memcpy(hdr.magic,"bFLT",4);
   hdr.rev         = htonl(FLAT_VERSION);
-  hdr.entry       = htonl(sizeof(struct flat_hdr) + bfd_get_start_address(abs_bfd));
-  hdr.data_start  = htonl(sizeof(struct flat_hdr) + text_len);
-  hdr.data_end    = htonl(sizeof(struct flat_hdr) + text_len + data_len);
-  hdr.bss_end     = htonl(sizeof(struct flat_hdr) + text_len + data_len + bss_len);
+  hdr.entry       = htonl(sizeof (struct flat_hdr) + bfd_get_start_address(abs_bfd));
+  hdr.data_start  = htonl(sizeof (struct flat_hdr) + text_len);
+  hdr.data_end    = htonl(sizeof (struct flat_hdr) + text_len + data_len);
+  hdr.bss_end     = htonl(sizeof (struct flat_hdr) + text_len + data_len + bss_len);
   hdr.stack_size  = htonl(stack); /* FIXME */
-  hdr.reloc_start = htonl(sizeof(struct flat_hdr) + real_address_bits(data_vma) + data_len);
+  hdr.reloc_start = htonl(sizeof (struct flat_hdr) + real_address_bits(data_vma) + data_len);
   hdr.reloc_count = htonl(reloc_len);
-#if 0
-  hdr.flags       = htonl(FLAT_FLAG_RAM);
-#else
   hdr.flags       = htonl(0
 	  | (load_to_ram ? FLAT_FLAG_RAM : 0)
 	  | (ktrace ? FLAT_FLAG_KTRACE : 0)
@@ -1817,30 +1979,10 @@ int main(int argc, char *argv[])
 	  | (compress ? (compress == 2 ? FLAT_FLAG_GZDATA : FLAT_FLAG_GZIP) : 0)
 	  );
   hdr.build_date = htonl((uint32_t)time(NULL));
-#endif //TARGET_bfin
   bzero(hdr.filler, sizeof(hdr.filler));
 
-#if 0
-  {
-     int i, count = 10;
-     int* pint = (int*)reloc;
-     fprintf(stderr, "Before htonl conversion ... Printing first %d byte of reloc section:\n",4* count);
-     for(i = 0; i < count; i++)
-     fprintf(stderr, "0x%X ", *(pint+i));
-     fprintf(stderr, "\n");
-  } 
-#endif //0
   for (i=0; i<reloc_len; i++) reloc[i] = htonl(reloc[i]);
-#if 0
-  {
-     int i, count = 10;
-     int* pint = (int*)reloc;
-     fprintf(stderr, "Printing first %d byte of reloc section:\n",4* count);
-     for(i = 0; i < count; i++)
-     fprintf(stderr, "0x%X ", *(pint+i));
-     fprintf(stderr, "\n");
-  } 
-#endif //0
+
   if (verbose) {
     printf("SIZE: .text=0x%04x, .data=0x%04x, .bss=0x%04x",
 	text_len, data_len, bss_len);
@@ -1859,6 +2001,7 @@ int main(int argc, char *argv[])
     fprintf (stderr, "Can't open output file %s\n", ofile);
     exit(4);
   }
+
   write(fd, &hdr, sizeof(hdr));
   close(fd);
 
@@ -1877,7 +2020,7 @@ int main(int argc, char *argv[])
 
   gf = fopen(ofile, "a");
   if (!gf) {
-  	fprintf(stderr, "Can't opne file %s for writing\n", ofile); \
+  	fprintf(stderr, "Can't open file %s for writing\n", ofile); \
 	exit(4);
   }
 

@@ -37,26 +37,26 @@
  */
 
 struct flat_hdr {
-	char magic[4];
-	uint32_t rev;          /* version (as above) */
-	uint32_t entry;        /* Offset of first executable instruction
-	                               with text segment from beginning of file */
-	uint32_t data_start;   /* Offset of data segment from beginning of
-	                               file */
-	uint32_t data_end;     /* Offset of end of data segment
-	                               from beginning of file */
-	uint32_t bss_end;      /* Offset of end of bss segment from beginning
-	                               of file */
+    char magic[4];
+    uint32_t rev;          /* version (as above) */
+    uint32_t entry;        /* Offset of first executable instruction
+			      with text segment from beginning of file */
+    uint32_t data_start;   /* Offset of data segment from beginning of
+			      file */
+    uint32_t data_end;     /* Offset of end of data segment from beginning
+			      of file */
+    uint32_t bss_end;      /* Offset of end of bss segment from beginning
+			      of file */
 
-	/* (It is assumed that data_end through bss_end forms the bss segment.) */
+    /* (It is assumed that data_end through bss_end forms the bss segment.) */
 
-	uint32_t stack_size;   /* Size of stack, in bytes */
-	uint32_t reloc_start;  /* Offset of relocation records from
-	                               beginning of file */
-	uint32_t reloc_count;  /* Number of relocation records */
-	uint32_t flags;       
-        uint32_t build_date;  /* bfin changes added build_date */     
-	uint32_t filler[6];    /* Reservered, set to zero */
+    uint32_t stack_size;   /* Size of stack, in bytes */
+    uint32_t reloc_start;  /* Offset of relocation records from
+			      beginning of file */
+    uint32_t reloc_count;  /* Number of relocation records */
+    uint32_t flags;       
+    uint32_t build_date;   /* bfin changes added build_date */     
+    uint32_t filler[6];    /* Reservered, set to zero */
 };
 
 #define FLAT_FLAG_RAM    0x0001 /* load program entirely into RAM */
