@@ -185,26 +185,6 @@ struct flat_hdr {
  *
  */
 
-typedef union
-{
-  uint32_t	value;
-  struct {
-#if defined(__LITTLE_ENDIAN_BITFIELD)
-    uint32_t type  : 2;
-    uint32_t hi_lo : 1;
-    uint32_t sp    : 3;
-    int32_t offset  : 26;
-#elif defined(__BIG_ENDIAN_BITFIELD)
-    int32_t offset  : 26;
-    uint32_t sp    : 3;
-    uint32_t hi_lo : 1;
-    uint32_t type  : 2;
-#else
-#error "Unknown bitfield order for flat files."
-# endif
-	} reloc;
-} flat_v5_reloc_t;
-
 #define FLAT_RELOC_TYPE_TEXT 0
 #define FLAT_RELOC_TYPE_DATA 1
 #define FLAT_RELOC_TYPE_BSS 2
