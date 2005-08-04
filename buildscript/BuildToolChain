@@ -181,7 +181,7 @@ done
 ##### Check to make sure a old version of bfin-elf is not here #
 ORG_PATH=$PATH
 NEW_PATH=""
-RUN=`echo $PATH | sed {'s/:/ /g'}`
+RUN=`echo $PATH | sed 's/:/ /g'`
 for SEARCH in $RUN
 do 
     if [ -d $SEARCH ] ; then
