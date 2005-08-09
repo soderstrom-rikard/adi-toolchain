@@ -14,16 +14,6 @@
  * This code is subject to the GNU license. Please see www.gnu.org for
  * license details. This source code is provided AS IS, without warranty.
  *
- * TODO:
- *       - better syntax error reporting,
- *       - Valid opt_mode checking in DSP32MAC commands
- *       - More compacting of redundant code.
- *
- *       Parser:
- *       - allow splitting up of commands in multiple lines
- *       - enable better delimiter checks to prevent wrong parsing
- * 
- *
  */
 
 %{
@@ -138,9 +128,7 @@
 
 // Auxiliaries: (TODO: move to bfin-defs.h)
 
-#define HL2(r1, r0)  (IS_H(r1) << 1 | IS_H(r0))
-#define IS_PLUS(o)       (o.r0 == 0)
-#define IS_MINUS(o)      (o.r0 == 1)
+#define HL2(r1, r0)  (IS_H (r1) << 1 | IS_H (r0))
 #define IS_RANGE(bits, expr, sign, mul)    \
 	value_match(expr, bits, sign, mul, 1)
 #define IS_URANGE(bits, expr, sign, mul)    \
@@ -149,9 +137,6 @@
 #define IS_RELOC(expr) (expr->type != Expr_Node_Constant)
 #define IS_IMM(expr, bits)  value_match (expr, bits, 0, 1, 1)
 #define IS_UIMM(expr, bits)  value_match (expr, bits, 0, 1, 0)
-
-#define IS_LIMM(expr, bits) \
-	(value_match (expr, bits, 0, 1, 1))
 
 #define IS_PCREL4(expr) \
 	(value_match (expr, 4, 0, 2, 0))
@@ -171,14 +156,16 @@
 
 static int value_match (Expr_Node *expr, int sz, int sign, int mul, int issigned);
 
+#if 0
 int nerrors;
 int nwarnings;
+#endif
 extern FILE *errorf;
 extern INSTR_T insn;
 
 
-static Expr_Node * binary (Expr_Op_Type, Expr_Node *, Expr_Node *);
-static Expr_Node * unary  (Expr_Op_Type, Expr_Node *);
+static Expr_Node *binary (Expr_Op_Type, Expr_Node *, Expr_Node *);
+static Expr_Node *unary  (Expr_Op_Type, Expr_Node *);
 
 static void notethat (char *format, ...);
 
@@ -225,37 +212,20 @@ in_range_p (Expr_Node *expr, int from, int to, unsigned int mask)
 
 extern int yylex (void);
 
-#define uimm2(x) EXPR_VALUE (x)
-#define uimm3(x) EXPR_VALUE (x)
 #define imm3(x) EXPR_VALUE (x)
-#define pcrel4(x) ((EXPR_VALUE (x)) >> 1)
 #define imm4(x) EXPR_VALUE (x)
-#define uimm4s4(x) ((EXPR_VALUE (x)) >> 2)
 #define uimm4(x) EXPR_VALUE (x)
-#define uimm4s2(x) ((EXPR_VALUE (x)) >> 1)
-#define negimm5s4(x) ((EXPR_VALUE (x)) >> 2)
 #define imm5(x) EXPR_VALUE (x)
 #define uimm5(x) EXPR_VALUE (x)
 #define imm6(x) EXPR_VALUE (x)
 #define imm7(x) EXPR_VALUE (x)
-#define imm8(x) EXPR_VALUE (x)
-#define uimm8(x) EXPR_VALUE (x)
-#define pcrel8(x) ((EXPR_VALUE (x)) >> 1)
-#define uimm8s4(x) ((EXPR_VALUE (x)) >> 2)
-#define pcrel8s4(x) ((EXPR_VALUE (x)) >> 2)
-#define lppcrel10(x) ((EXPR_VALUE (x)) >> 1)
-#define pcrel10(x) ((EXPR_VALUE (x)) >> 1)
-#define pcrel12(x) ((EXPR_VALUE (x)) >> 1)
-#define imm16s4(x) ((EXPR_VALUE (x)) >> 2)
-#define luimm16(x) EXPR_VALUE (x)
 #define imm16(x) EXPR_VALUE (x)
-#define huimm16(x) EXPR_VALUE (x)
-#define rimm16(x) EXPR_VALUE (x)
-#define imm16s2(x) ((EXPR_VALUE (x)) >> 1)
 #define uimm16s4(x) ((EXPR_VALUE (x)) >> 2)
 #define uimm16(x) EXPR_VALUE (x)
-#define pcrel24(x) ((EXPR_VALUE (x)) >> 1)
 
+/* Return true if a value is inside a range.  */
+#define IN_RANGE(x, low, high) \
+  (((EXPR_VALUE(x)) >= (low)) && (EXPR_VALUE(x)) <= ((high)))
 
 /* Auxiliary functions.  */
 
@@ -358,12 +328,12 @@ check_macfuncs (Macfunc *aa, Opt_mode *opa,
 	return yyerror ("Destination Dregs must differ by one");
     }
   /* We assign to full regs, thus obey even/odd rules.  */
-  else if ((aa->w && aa->P && IS_EVEN(aa->dst)) 
-	   || (ab->w && ab->P && !IS_EVEN(ab->dst)))
+  else if ((aa->w && aa->P && IS_EVEN (aa->dst)) 
+	   || (ab->w && ab->P && !IS_EVEN (ab->dst)))
     return yyerror ("Even/Odd register assignment mismatch");
   /* We assign to half regs, thus obey hi/low rules.  */
-  else if ( (aa->w && !aa->P && !IS_H(aa->dst)) 
-	    || (ab->w && !aa->P && IS_H(ab->dst)))
+  else if ( (aa->w && !aa->P && !IS_H (aa->dst)) 
+	    || (ab->w && !aa->P && IS_H (ab->dst)))
     return yyerror ("High/Low register assignment mismatch");
 
   /* Make sure first macfunc has got both P flags ORed.  */
@@ -552,6 +522,8 @@ is_group2 (INSTR_T x)
 %type <modcodes> ccstat
 %type <r0> cc_op
 %type <reg> CCREG
+%type <reg> reg_with_postinc
+%type <reg> reg_with_predec
 
 %type <r0> searchmod
 %type <expr> symbol
@@ -599,18 +571,15 @@ is_group2 (INSTR_T x)
 %right ASSIGN
 
 %right TILDA BANG
-%start asm_or_directive
+%start statement
 %%
-asm_or_directive:
+statement: 
+	| asm
 	{
-	INIT_ASM();
-	}
-	asm
-	{
-	  insn = $2;
+	  insn = $1;
 	  if (insn == (INSTR_T) 0)
 	    return NO_INSN_GENERATED;
-	  else if (insn == (INSTR_T) -1)
+	  else if (insn == (INSTR_T) - 1)
 	    return SEMANTIC_ERROR;
 	  else
 	    return INSN_GENERATED;
@@ -1620,7 +1589,7 @@ asm_1:
 	      || ($6.r0 == 3 && IS_UIMM ($5, 3)))
 	    {
 	      notethat ("CCflag: CC = dpregs < (u)imm3\n");
-	      $$ = CCFLAG (&$3, imm3($5), $6.r0, 1, IS_PREG ($3) ? 1 : 0);
+	      $$ = CCFLAG (&$3, imm3 ($5), $6.r0, 1, IS_PREG ($3) ? 1 : 0);
 	    }
 	  else
 	    return yyerror ("Bad constant value");
@@ -1638,7 +1607,7 @@ asm_1:
 	  if (IS_IMM ($5, 3))
 	    {
 	      notethat ("CCflag: CC = dpregs == imm3\n");
-	      $$ = CCFLAG (&$3, imm3($5), 0, 1, IS_PREG ($3) ? 1 : 0);
+	      $$ = CCFLAG (&$3, imm3 ($5), 0, 1, IS_PREG ($3) ? 1 : 0);
 	    }
 	  else
 	    return yyerror ("Bad constant range");
@@ -1673,13 +1642,13 @@ asm_1:
 		{
 		  notethat ("CCflag: CC = dregs <= (u)imm3\n");
 		  /*    x       y     opc     I     G   */
-		  $$ = CCFLAG (&$3, imm3($5), 1+$6.r0, 1, 0);
+		  $$ = CCFLAG (&$3, imm3 ($5), 1 + $6.r0, 1, 0);
 		}
 	      else if (IS_PREG ($3))
 		{
 		  notethat ("CCflag: CC = pregs <= (u)imm3\n");
 		  /*    x       y     opc     I     G   */
-		  $$ = CCFLAG (&$3, imm3($5), 1+$6.r0, 1, 1);
+		  $$ = CCFLAG (&$3, imm3 ($5), 1 + $6.r0, 1, 1);
 		}
 	      else
 		return yyerror ("Dreg or Preg expected");
@@ -1888,7 +1857,7 @@ asm_1:
 	  if (IS_UIMM ($4, 5))
 	    {
 	      notethat ("dsp32shiftimm: A0 = A0 << uimm5\n");
-	      $$ = DSP32SHIFTIMM (3, 0, imm5($4), 0, 0, IS_A1 ($1));
+	      $$ = DSP32SHIFTIMM (3, 0, imm5 ($4), 0, 0, IS_A1 ($1));
 	    }
 	  else
 	    return yyerror ("Bad shift value");
@@ -2045,7 +2014,7 @@ asm_1:
 	  if (IS_UIMM ($4, 5))
 	    {
 	      notethat ("dsp32shiftimm: Ax = Ax >>> uimm5\n");
-	      $$ = DSP32SHIFTIMM (3, 0, -imm6($4), 0, 0, IS_A1 ($1));
+	      $$ = DSP32SHIFTIMM (3, 0, -imm6 ($4), 0, 0, IS_A1 ($1));
 	    }
 	  else
 	    return yyerror ("Shift value range error");
@@ -2122,7 +2091,7 @@ asm_1:
 	      if (IS_DREG ($1) && IS_DREG ($3) && IS_UIMM ($5, 5))
 		{
 		  notethat ("dsp32shiftimm: dregs = dregs >> uimm5\n");
-		  $$ = DSP32SHIFTIMM (2, &$1, -imm6($5), &$3, 2, 0);
+		  $$ = DSP32SHIFTIMM (2, &$1, -imm6 ($5), &$3, 2, 0);
 		}
 	      else if (IS_PREG ($1) && IS_PREG ($3) && EXPR_VALUE ($5) == 2)
 		{
@@ -2268,7 +2237,7 @@ asm_1:
 	  if (IS_IMM ($5, 6))
 	    {
 	      notethat ("dsp32shiftimm: An = ROT An BY imm6\n");
-	      $$ = DSP32SHIFTIMM (3, 0, imm6($5), 0, 2, IS_A1 ($1));
+	      $$ = DSP32SHIFTIMM (3, 0, imm6 ($5), 0, 2, IS_A1 ($1));
 	    }
 	  else
 	    return yyerror ("Register mismatch");
@@ -2649,10 +2618,10 @@ asm_1:
 
 	| JUMP expr
 	{
-	  if (IS_PCREL12($2))
+	  if (IS_PCREL12 ($2))
 	    {
 	      notethat ("UJUMP: JUMP pcrel12\n");
-	      $$ = UJUMP($2);
+	      $$ = UJUMP ($2);
 	    }
 	  else
 	    return yyerror ("Bad value for relative jump");
@@ -2660,7 +2629,7 @@ asm_1:
 
 	| JUMP_DOT_S expr
 	{
-	  if (IS_PCREL12($2))
+	  if (IS_PCREL12 ($2))
 	    {
 	      notethat ("UJUMP: JUMP_DOT_S pcrel12\n");
 	      $$ = UJUMP($2);
@@ -2849,12 +2818,12 @@ asm_1:
 	    return yyerror ("Bad register(s) for FLUSH");
 	}
 
-	| FLUSH LBRACK REG _PLUS_PLUS RBRACK
+	| FLUSH reg_with_postinc
 	{
-	  if (IS_PREG ($3))
+	  if (IS_PREG ($2))
 	    {
 	      notethat ("CaCTRL: FLUSH [ pregs ++ ]\n");
-	      $$ = CACTRL (&$3, 1, 2);   // reg, a, op
+	      $$ = CACTRL (&$2, 1, 2);   // reg, a, op
 	    }
 	  else
 	    return yyerror ("Bad register(s) for FLUSH");
@@ -2871,12 +2840,12 @@ asm_1:
 	    return yyerror ("Bad register(s) for FLUSH");
 	}
 
-	| FLUSHINV LBRACK REG _PLUS_PLUS RBRACK
+	| FLUSHINV reg_with_postinc
 	{
-	  if (IS_PREG ($3))
+	  if (IS_PREG ($2))
 	    {
 	      notethat ("CaCTRL: FLUSHINV [ pregs ++ ]\n");
-	      $$ = CACTRL (&$3, 1, 1);   // reg, a, op
+	      $$ = CACTRL (&$2, 1, 1);   // reg, a, op
 	    }
 	  else
 	    return yyerror ("Bad register(s) for FLUSH");
@@ -2894,12 +2863,12 @@ asm_1:
 	    return yyerror ("Bad register(s) for FLUSH");
 	}
 
-	| IFLUSH LBRACK REG _PLUS_PLUS RBRACK
+	| IFLUSH reg_with_postinc
 	{
-	  if (IS_PREG ($3))
+	  if (IS_PREG ($2))
 	    {
 	      notethat ("CaCTRL: IFLUSH [ pregs ++ ]\n");
-	      $$ = CACTRL (&$3, 1, 3);   // reg, a, op
+	      $$ = CACTRL (&$2, 1, 3);   // reg, a, op
 	    }
 	  else
 	    return yyerror ("Bad register(s) for FLUSH");
@@ -2910,18 +2879,18 @@ asm_1:
 	  if (IS_PREG ($3))
 	    {
 	      notethat ("CaCTRL: PREFETCH [ pregs ]\n");
-	      $$ = CACTRL(&$3, 0, 0);
+	      $$ = CACTRL (&$3, 0, 0);
 	    }
 	  else
 	    return yyerror ("Bad register(s) for PREFETCH");
 	}
 
-	| PREFETCH LBRACK REG _PLUS_PLUS RBRACK
+	| PREFETCH reg_with_postinc
 	{
-	  if (IS_PREG ($3))
+	  if (IS_PREG ($2))
 	    {
 	      notethat ("CaCTRL: PREFETCH [ pregs ++ ]\n");
-	      $$ = CACTRL(&$3, 1, 0);
+	      $$ = CACTRL (&$2, 1, 0);
 	    }
 	  else
 	    return yyerror ("Bad register(s) for PREFETCH");
@@ -2950,7 +2919,7 @@ asm_1:
 	    {
 	      notethat ("LDST: B [ pregs + imm16 ] = dregs\n");
 	      if ($4.r0)
-		neg_value($5);
+		neg_value ($5);
 	      $$ = LDSTIDXI (&$3, &$8, 1, 2, 0, $5);
 	    }
 	  else
@@ -3052,7 +3021,7 @@ asm_1:
 	    {
 	      notethat ("LDSTidxI: dregs = W [ pregs + imm17m2 ] (.)\n");
 	      if ($6.r0)
-		neg_value($7);
+		neg_value ($7);
 	      $$ = LDSTIDXI (&$5, &$1, 0, 1, $9.r0, $7);
 	    }
 	  else
@@ -3169,7 +3138,7 @@ asm_1:
 	      notethat ("LDSTidxI: dregs = B [ pregs + imm16 ] (%c)\n",
 		       $9.r0 ? 'X' : 'Z');
 	      if ($6.r0)
-		neg_value($7);
+		neg_value ($7);
 	      $$ = LDSTIDXI (&$5, &$1, 0, 2, $9.r0, $7);
 	    }
 	  else
@@ -3287,89 +3256,83 @@ asm_1:
 
 
 /*  PushPopMultiple */
-	| LBRACK _MINUS_MINUS REG RBRACK ASSIGN LPAREN REG COLON expr COMMA REG COLON expr RPAREN
+	| reg_with_predec ASSIGN LPAREN REG COLON expr COMMA REG COLON expr RPAREN
 	{
-	  if ($3.regno != REG_SP)
-	    return yyerror ("SP expected");
-
-	  if ($7.regno == REG_R7
-	      && (EXPR_VALUE ($9) >= 0 && EXPR_VALUE ($9) < 8)  
-	      && $11.regno == REG_P5
-	      && (EXPR_VALUE ($13) >= 0 && EXPR_VALUE ($13) < 6))
+	  if ($1.regno != REG_SP)
+	    yyerror ("Stack Pointer expected");
+	  if ($4.regno == REG_R7
+	      && IN_RANGE ($6, 0, 7)
+	      && $8.regno == REG_P5
+	      && IN_RANGE ($10, 0, 5))
 	    {
 	      notethat ("PushPopMultiple: [ -- SP ] = (R7 : reglim , P5 : reglim )\n");
-	      $$ = PUSHPOPMULTIPLE (imm5($9), imm5($13), 1, 1, 1);
+	      $$ = PUSHPOPMULTIPLE (imm5 ($6), imm5 ($10), 1, 1, 1);
 	    }
 	  else
 	    return yyerror ("Bad register for PushPopMultiple");
 	}
 
-	| LBRACK _MINUS_MINUS REG RBRACK ASSIGN LPAREN REG COLON expr RPAREN
+	| reg_with_predec ASSIGN LPAREN REG COLON expr RPAREN
 	{
-	  if ($3.regno != REG_SP)
-	    return yyerror ("SP expected");
+	  if ($1.regno != REG_SP)
+	    yyerror ("Stack Pointer expected");
 
-	  if ($7.regno == REG_R7
-	      && (EXPR_VALUE ($9) >= 0 && EXPR_VALUE ($9) < 8))
+	  if ($4.regno == REG_R7 && IN_RANGE ($6, 0, 7))
 	    {
 	      notethat ("PushPopMultiple: [ -- SP ] = (R7 : reglim )\n");
-	      $$ = PUSHPOPMULTIPLE (imm5($9), 0, 1, 0, 1);
+	      $$ = PUSHPOPMULTIPLE (imm5 ($6), 0, 1, 0, 1);
 	    }
-	  else if ($7.regno == REG_P5
-		   && (EXPR_VALUE ($9) >= 0 && EXPR_VALUE ($9) < 6))
+	  else if ($4.regno == REG_P5 && IN_RANGE ($6, 0, 6))
 	    {
 	      notethat ("PushPopMultiple: [ -- SP ] = (P5 : reglim )\n");
-	      $$ = PUSHPOPMULTIPLE (0, imm5($9), 0, 1, 1);
+	      $$ = PUSHPOPMULTIPLE (0, imm5 ($6), 0, 1, 1);
 	    }
 	  else
 	    return yyerror ("Bad register for PushPopMultiple");
 	}
 
-	| LPAREN REG COLON expr COMMA REG COLON expr RPAREN ASSIGN LBRACK REG _PLUS_PLUS RBRACK
+	| LPAREN REG COLON expr COMMA REG COLON expr RPAREN ASSIGN reg_with_postinc
 	{
-	  if ($12.regno != REG_SP)
-	    return yyerror ("SP expected");
-
-	  if ($2.regno == REG_R7 && (EXPR_VALUE ($4) >= 0 && EXPR_VALUE ($4) < 8)  
-	      && $6.regno == REG_P5 && (EXPR_VALUE ($8) >= 0 && EXPR_VALUE ($8) < 6))
+	  if ($11.regno != REG_SP)
+	    yyerror ("Stack Pointer expected");
+	  if ($2.regno == REG_R7 && (IN_RANGE ($4, 0, 7))
+	      && $6.regno == REG_P5 && (IN_RANGE ($8, 0, 6)))
 	    {
 	      notethat ("PushPopMultiple: (R7 : reglim , P5 : reglim ) = [ SP ++ ]\n");
-	      $$ = PUSHPOPMULTIPLE (imm5($4), imm5($8), 1, 1, 0);
+	      $$ = PUSHPOPMULTIPLE (imm5 ($4), imm5 ($8), 1, 1, 0);
 	    }
 	  else
 	    return yyerror ("Bad register range for PushPopMultiple");
 	}
 
-	| LPAREN REG COLON expr RPAREN ASSIGN LBRACK REG _PLUS_PLUS RBRACK
+	| LPAREN REG COLON expr RPAREN ASSIGN reg_with_postinc
 	{
-	  if ($8.regno != REG_SP)
-	    return yyerror ("SP expected");
+	  if ($7.regno != REG_SP)
+	    yyerror ("Stack Pointer expected");
 
-	  if ($2.regno == REG_R7
-	      && EXPR_VALUE ($4) >= 0 && EXPR_VALUE ($4) < 8)
+	  if ($2.regno == REG_R7 && IN_RANGE ($4, 0, 7))
 	    {
 	      notethat ("PushPopMultiple: (R7 : reglim ) = [ SP ++ ]\n");
-	      $$ = PUSHPOPMULTIPLE (imm5($4), 0, 1, 0, 0);
+	      $$ = PUSHPOPMULTIPLE (imm5 ($4), 0, 1, 0, 0);
 	    }
-	  else if ($2.regno == REG_P5
-		   && (EXPR_VALUE ($4) >= 0 && EXPR_VALUE ($4) < 6))
+	  else if ($2.regno == REG_P5 && IN_RANGE ($4, 0, 6))
 	    {
 	      notethat ("PushPopMultiple: (P5 : reglim ) = [ SP ++ ]\n");
-	      $$ = PUSHPOPMULTIPLE (0, imm5($4), 0, 1, 0);
+	      $$ = PUSHPOPMULTIPLE (0, imm5 ($4), 0, 1, 0);
 	    }
 	  else
 	    return yyerror ("Bad register range for PushPopMultiple");
 	}
 
-	| LBRACK _MINUS_MINUS REG RBRACK ASSIGN REG
+	| reg_with_predec ASSIGN REG
 	{
-	  if ($3.regno != REG_SP)
-	    return yyerror ("SP expected");
+	  if ($1.regno != REG_SP)
+	    yyerror ("Stack Pointer expected");
 
-	  if (IS_ALLREG ($6))
+	  if (IS_ALLREG ($3))
 	    {
 	      notethat ("PushPopReg: [ -- SP ] = allregs\n");
-	      $$ = PUSHPOPREG (&$6, 1);
+	      $$ = PUSHPOPREG (&$3, 1);
 	    }
 	  else
 	    return yyerror ("Bad register for PushPopReg");
@@ -3751,15 +3714,22 @@ smod:
 
 searchmod:
 	  GE
-	{ $$.r0 = 1; }
+	{
+	$$.r0 = 1;
+	}
 	| GT
-	{ $$.r0 = 0; }
+	{
+	$$.r0 = 0;
+	}
 	| LE
-	{ $$.r0 = 3; }
+	{
+	$$.r0 = 3;
+	}
 	| LT
-	{ $$.r0 = 2; }
+	{
+	$$.r0 = 2;
+	}
 	;
-
 
 aligndir:
 	{
@@ -3843,6 +3813,17 @@ iu_or_nothing:
 	}
 	;
 
+reg_with_predec: LBRACK _MINUS_MINUS REG RBRACK
+	{
+	$$ = $3;
+	}
+	;
+
+reg_with_postinc: LBRACK REG _PLUS_PLUS RBRACK
+	{
+	$$ = $2;
+	}
+	;
 
 /* Operators.  */
 

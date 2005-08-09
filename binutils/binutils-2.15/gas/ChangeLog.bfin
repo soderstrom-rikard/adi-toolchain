@@ -1,3 +1,20 @@
+2005-08-09  Catherine Moore  <clm@cm00re.com>
+
+	* config/bfin-defs.h:  Changes for gnu-coding standard
+	conformity.
+	(INIT_ASM):  Remove.
+	* config/bfin-parse.y:  Changes for gnu-coding standard
+	conformity.
+	(asm_or_directive):  Changed to asm.
+	(IN_RANGE): New.
+	(PushPopMultiple): Rewritten.  Use new rules reg_with_predec
+	and reg_with_postinc.  Use IN_RANGE macro.
+	(reg_with_predec): New rule.
+	(reg_with_postinc): New rule.
+	(IS_LIMM, uimm2, uimm3, pcrel4, uimm4s2, negimm5s4): Removed.
+	(imm8, uimm8, pcrel8s4, lppcrel10, pcrel10, pcrel12): Removed.
+	(imm16s4, luimm16, huimm16, rimm16, imm16s2, pcrel24): Removed.
+	
 2005-08-02  Catherine Moore  <clm@cm00re.com>
 
 	* config/bfin-parse.y (semantic_error): Removed.

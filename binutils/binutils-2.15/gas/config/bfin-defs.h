@@ -324,13 +324,9 @@ Expr_Node *Expr_Node_Create (Expr_Node_Type type,
 /* generate the reloc structure as a series of instructions */
 INSTR_T Expr_Node_Gen_Reloc (Expr_Node *head, int parent_reloc);
  
-#define MKREF(x)	mkexpr(0,x)
-#define ALLOCATE(x)	malloc(x)
+#define MKREF(x)	mkexpr (0,x)
+#define ALLOCATE(x)	malloc (x)
  
-#ifndef INIT_ASM
-#define INIT_ASM() { }
-#endif
-
 #define NULL_CODE ((INSTR_T) 0)
 
 #ifndef EXPR_VALUE
@@ -384,14 +380,14 @@ extern int debug_codeselection;
 
 void error (char *format, ...);
 void warn (char *format, ...);
-int  semantic_error(char *syntax);
-void semantic_error_2(char *syntax);
+int  semantic_error (char *syntax);
+void semantic_error_2 (char *syntax);
 
-EXPR_T mkexpr(int, SYMBOL_T);
+EXPR_T mkexpr (int, SYMBOL_T);
 
 extern void bfin_equals (Expr_Node *sym);
 /* defined in bfin-lex.l */
-void set_start_state(void);
+void set_start_state (void);
 
 #ifdef __cplusplus
 }
