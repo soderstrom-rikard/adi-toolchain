@@ -1,3 +1,9 @@
+2005-08-09  Catherine Moore  <clm@cm00re.com>
+
+	* elf32-bfin.c (bfin_relocate_section):  Set BSF_WEAK for
+	bfd_link_hash_defweak.  Set the symbol name for weak
+	references.
+
 2005-07-27  Catherine Moore  <clm@cm00re.com>
 
 	* elf32-bfin.c (reloc_stack_operate):  Report error if

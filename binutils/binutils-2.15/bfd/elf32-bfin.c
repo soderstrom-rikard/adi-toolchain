@@ -1648,7 +1648,6 @@ elf32_bfin_reloc_type_class (const Elf_Internal_Rela * rela)
       return reloc_class_normal;
     }
 }
-
 static bfd_boolean
 bfin_relocate_section (bfd * output_bfd,
 		       struct bfd_link_info *info,
@@ -1887,12 +1886,13 @@ bfin_relocate_section (bfd * output_bfd,
 		      symbol.section = h->root.u.def.section;
 		      symbol.name = h->root.root.string;
 		      symbol.value = h->root.u.def.value;
-		   }
-		  else if (h->root.type == bfd_link_hash_defweak
-                           || h->root.type == bfd_link_hash_undefweak)
-			 {
-			  symbol.flags |= BSF_WEAK;
-			 }
+		    }
+		  if (h->root.type == bfd_link_hash_defweak
+                      || h->root.type == bfd_link_hash_undefweak)
+		    {
+		      symbol.name = h->root.root.string;
+		      symbol.flags |= BSF_WEAK;
+		    }
 		}
 	      else
 		{
