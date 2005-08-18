@@ -1,3 +1,12 @@
+2005-08-18  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-tdep.c (bfin_next_bp_addr): Remove.
+	(bfin_software_single_step): Remove.
+	(bfin_gdbarch_init): Remove use of bfin_software_single_step ().
+	* config/bfin/tm-bfin.h (SOFTWARE_SINGLE_STEP_P): Remove.
+	(SOFTWARE_SINGLE_STEP): Remove.
+	(bfin_software_single_step): Remove decalaration.
+
 2005-07-22  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin-tdep.c (bfin_push_dummy_call): Allocate 12 bytes of stack space
