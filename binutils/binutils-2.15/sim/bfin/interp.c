@@ -826,10 +826,8 @@ sim_resume (sd, step, siggnal)
       step_once(sd, pollcount);
       step--;
     }
-    #if 0
-        /* Emulate a hardware single step ... raise an exception */
+    /* Emulate a hardware single step ... raise an exception */
     saved_state.exception = SIGTRAP;
-    #endif
   }
   else{
     while (saved_state.exception == 0)
