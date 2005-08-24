@@ -22,7 +22,6 @@
  */
 #ifdef OBJ_ELF
 #define TARGET_FORMAT		"elf32-bfin" 
-// #define TARGET_FORMAT           "elf32-little-bfin"
 #endif
 
 #define LISTING_HEADER "BFIN GAS "

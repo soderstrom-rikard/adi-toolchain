@@ -1,3 +1,11 @@
+2005-08-24  Catherine Moore  <clm@cm00re.com>
+
+	* config/tc-bfin.h: Remove comment.
+	* config/tc-bfin.c (bfin_start_line_hook): Deal with LSETUP(.
+	(bfin_name_is_register):  Check for lsetup(.
+	(bfin_start_label): Deal with multiple statements on one line.
+	Deal with lsetup(.
+
 2005-08-09  Catherine Moore  <clm@cm00re.com>
 
 	* config/bfin-defs.h:  Changes for gnu-coding standard
