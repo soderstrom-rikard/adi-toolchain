@@ -390,7 +390,7 @@ bfin_trap ()
 	bu32 arg2 = get_long (saved_state.memory, args + 8);
 	if (strcmp (arg0, ":tt") == 0)
 	  {
-	    DREG (0) = arg2 == 3 ? 0 : 1;
+	    DREG (0) = arg2 == 4 ? 0 : 1;
 	  }
 	else
 	  DREG (0) = callback->open (callback, arg0, arg1);
