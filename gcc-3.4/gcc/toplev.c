@@ -107,8 +107,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 extern int size_directive_output;
 extern tree last_assemble_variable_decl;
 
-extern void reg_alloc (void);
-
 static void general_init (const char *);
 static void do_compile (void);
 static void process_options (void);
@@ -2177,52 +2175,6 @@ rest_of_handle_machine_reorg (tree decl, rtx insns)
 }
 
 
-/* Run new register allocator.  Return TRUE if we must exit
-   rest_of_compilation upon return.  */
-static bool
-rest_of_handle_new_regalloc (tree decl, rtx insns)
-{
-  int failure;
-
-  delete_trivially_dead_insns (insns, max_reg_num ());
-  reg_alloc ();
-
-  timevar_pop (TV_LOCAL_ALLOC);
-  if (dump_file[DFI_lreg].enabled)
-    {
-      timevar_push (TV_DUMP);
-
-      close_dump_file (DFI_lreg, NULL, NULL);
-      timevar_pop (TV_DUMP);
-    }
-
-  /* XXX clean up the whole mess to bring live info in shape again.  */
-  timevar_push (TV_GLOBAL_ALLOC);
-  open_dump_file (DFI_greg, decl);
-
-  build_insn_chain (insns);
-  failure = reload (insns, 0);
-
-  timevar_pop (TV_GLOBAL_ALLOC);
-
-  if (dump_file[DFI_greg].enabled)
-    {
-      timevar_push (TV_DUMP);
-
-      dump_global_regs (rtl_dump_file);
-
-      close_dump_file (DFI_greg, print_rtl_with_bb, insns);
-      timevar_pop (TV_DUMP);
-    }
-
-  if (failure)
-    return true;
-
-  reload_completed = 1;
-
-  return false;
-}
-
 /* Run old register allocator.  Return TRUE if we must exit
    rest_of_compilation upon return.  */
 static bool
@@ -3416,16 +3368,8 @@ rest_of_compilation (tree decl)
   timevar_push (TV_LOCAL_ALLOC);
   open_dump_file (DFI_lreg, decl);
 
-  if (flag_new_regalloc)
-    {
-      if (rest_of_handle_new_regalloc (decl, insns))
-	goto exit_rest_of_compilation;
-    }
-  else
-    {
-      if (rest_of_handle_old_regalloc (decl, insns))
-	goto exit_rest_of_compilation;
-    }
+  if (rest_of_handle_old_regalloc (decl, insns))
+    goto exit_rest_of_compilation;
 
   ggc_collect ();
 
