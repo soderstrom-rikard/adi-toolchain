@@ -27,6 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "insn-config.h"
 #include "flags.h"
 #include "regs.h"
+#include "addresses.h"
 #include "hard-reg-set.h"
 #include "recog.h"
 #include "basic-block.h"
@@ -157,7 +158,7 @@ init_caller_save (void)
   for (i = 0; i < FIRST_PSEUDO_REGISTER; i++)
     if (TEST_HARD_REG_BIT
 	(reg_class_contents
-	 [(int) MODE_BASE_REG_CLASS (regno_save_mode [i][1])], i))
+	 [(int) base_reg_class (regno_save_mode [i][1], PLUS, CONST_INT)], i))
       break;
 
   if (i == FIRST_PSEUDO_REGISTER)

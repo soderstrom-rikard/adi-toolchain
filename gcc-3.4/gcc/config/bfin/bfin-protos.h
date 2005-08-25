@@ -49,6 +49,7 @@ extern rtx bfin_gen_compare (rtx, Mmode);
 extern void expand_move (rtx *, Mmode);
 extern void bfin_expand_call (rtx, rtx, rtx, rtx, int);
 extern bool bfin_longcall_p (rtx, int);
+extern bool bfin_dsp_memref_p (rtx);
 extern bool bfin_expand_strmov (rtx, rtx, rtx, rtx);
 
 extern int call_insn_operand (rtx, Mmode);

@@ -271,6 +271,8 @@ struct rtvec_def GTY(()) {
 /* Predicate yielding nonzero iff X is an rtl for a register.  */
 #define REG_P(X) (GET_CODE (X) == REG)
 
+#define MEM_P(X) (GET_CODE (X) == MEM)
+
 /* Predicate yielding nonzero iff X is a label insn.  */
 #define LABEL_P(X) (GET_CODE (X) == CODE_LABEL)
 
