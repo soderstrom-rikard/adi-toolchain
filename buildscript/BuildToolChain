@@ -37,7 +37,7 @@ APP_NAME=${APP_NAME#/}
 #TIMESTAMP=`date +%Y-%b-%d-%H-%M` # is YYYY_MMM_DD_HH_MM
 TIMESTAMP=`date +%Y%m%d`       # is YYYY_MMM_DD
 
-while getopts dpwvtT:s:b:k:o:m:h parameter
+while getopts dpwvtT:s:b:k:o:m:u:h parameter
 do
     case $parameter in
         p) 
@@ -161,6 +161,14 @@ do
                 exit
             fi
             ;;
+	u)
+	    if [ -f $OPTARG/tools/mkimage.c ] ; then
+		DIR_UBOOT=$OPTARG
+	    else
+		echo "Invalid U-Boot Path"
+		exit
+	    fi
+	    ;;
         b)  
             if [ -d $OPTARG ] ; then
                 DIR_BUILD=$OPTARG
@@ -321,6 +329,10 @@ if [ $KERNEL_SOURCE ] ; then
     else
         echo "$DIR_uC_OUTPUT already exists - cleaning"
         rm -rf $DIR_uC_OUTPUT/*
+    fi
+    if [ $DIR_UBOOT ] ; then
+      echo -n "Path to U-Boot Source       "
+      echo $DIR_UBOOT
     fi
 fi
 
@@ -921,18 +933,60 @@ if [ $KERNEL_SOURCE ] ; then
     (echo $RUN $LOGFILE ; ) | sh
     mv $DIR_uC_OUTPUT/bin/genext2fs $DIR_uC_OUTPUT/bin/bfin-elf-genext2fs
 
-
     for RUN in bfin-elf-genext2fs
     do
         if [ ! -f $DIR_ELF_OUTPUT/bin/$RUN ] ; then
-            echo "Elf2flt did not install properly : Missing $RUN"
+            echo "genext2fs did not install properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
             exit
        fi
     done
 
+    ######################## U-Boot ##############################
+    if [ $DIR_UBOOT ] ; then
+        echo -n "*** Building U-Boot to get Tools   " ; date
+        cd $DIR_UBOOT
 
+        echo -n "*** Cleaning U-Boot                " ; date
+        RUN="$MAKE distclean "
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh
+
+        RUN="$MAKE stamp_config"
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh
+
+        echo -n "*** Make U-Boot                    " ; date
+        RUN=$MAKE
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh
+
+        for RUN in mkimage gen_eth_addr
+        do
+            if [ ! -f $DIR_UBOOT/tools/$RUN ] ; then
+                echo "U-Boot did not build properly : Missing $RUN"
+                echo "Please report an error to http://blackfin.uclinux.org"
+                tail -10 $ACTUAL_LOGFILE
+                exit
+            fi
+        done
+
+        echo -n "*** Copying U-Boot Tools           " ; date
+        RUN="cp $DIR_UBOOT/tools/mkimage $DIR_uC_OUTPUT/bin/bfin-uclinux-mkimage; cp $DIR_UBOOT/tools/gen_eth_addr $DIR_uC_OUTPUT/bin/bfin-uclinux-gen_eth_addr;"
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh
+
+        for RUN in bfin-uclinux-mkimage bfin-uclinux-gen_eth_addr
+        do
+            if [ ! -f $DIR_uC_OUTPUT/bin/$RUN ] ; then
+                echo "U-Boot tools did not install properly : Missing $RUN"
+                echo "Please report an error to http://blackfin.uclinux.org"
+                tail -10 $ACTUAL_LOGFILE
+                exit
+           fi
+        done
+    fi
     ######################## Done ################################
 fi
 
