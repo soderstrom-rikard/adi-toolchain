@@ -96,6 +96,39 @@ do
                     #       Check gdbserver is available on the target
                     #       board.
 
+                    # Check if the tcp connections are recycled on both
+                    # target and host, which is needed to prevent the rsh
+                    # and rcp connection failures.
+
+                    echo -n "Checking /proc/sys/net/ipv4/tcp_tw_recycle on host ... "
+                    RUN=`cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
+                    if [ "x$RUN" == "x" ] ; then
+                        echo "NOT exist"
+                        echo "   Your host kernel does NOT support Sysctl"
+                        exit
+                    fi
+                    if [ "x$RUN" == "x0" ] ; then
+                        echo "0"
+                        echo "   Please run \"echo 1 > /proc/sys/net/ipv4/tcp_tw_recycle\" as root"
+                        exit
+                    else
+                        echo "1"
+                    fi
+
+                    echo -n "Checking /proc/sys/net/ipv4/tcp_tw_recycle on target ... "
+                    RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
+                    if [ "x$RUN" == "x" ] ; then
+                        echo "NOT exist"
+                        echo "   Please enable Sysctl when configure the kernel"
+                        exit
+                    fi
+                    if [ "x$RUN" == "x0" ] ; then
+                        echo "0. Set it to 1"
+                        rsh -l root $TARGET_IPADDR echo 1 \> /proc/sys/net/ipv4/tcp_tw_recycle
+                    else
+                        echo "1"
+                    fi
+
                     echo "Running tests on hardware"
                     echo "Target board IP address is $TARGET_IPADDR"
 		fi
