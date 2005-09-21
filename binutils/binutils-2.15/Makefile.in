@@ -9538,7 +9538,7 @@ check-gcc:
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd gcc && $(MAKE) $(FLAGS_TO_PASS)$(EXTRA_GCC_FLAGS) check)
+	(cd gcc && $(MAKE) $(FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS) check)
 
 @endif gcc
 
@@ -9552,7 +9552,7 @@ install-gcc: installdirs
 	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
 	$(SET_LIB_PATH) \
 	$(HOST_EXPORTS) \
-	(cd gcc && $(MAKE) $(FLAGS_TO_PASS)$(EXTRA_GCC_FLAGS) install)
+	(cd gcc && $(MAKE) $(FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS) install)
 
 @endif gcc
 
