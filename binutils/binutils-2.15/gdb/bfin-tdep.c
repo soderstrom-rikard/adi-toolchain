@@ -1271,79 +1271,42 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   struct gdbarch_tdep *tdep;
   struct gdbarch *gdbarch;
 
-  /* Try to deterimine the ABI of the object we are loading.  */
-
   /* If there is already a candidate, use it.  */
   arches = gdbarch_list_lookup_by_info (arches, &info);
   if (arches != NULL)
     return arches->gdbarch;
   gdbarch = gdbarch_alloc (&info, NULL);
-  
-  /* Offset from address of function to start of its code.  */
-  // deprecated ... not needed as entry point is function pointer
-  // use the address conversion routine convert_from_func_ptr_addr
-  // set_gdbarch_function_start_offset (gdbarch, 0);
-  set_gdbarch_skip_prologue (gdbarch, bfin_skip_prologue);
-  set_gdbarch_breakpoint_from_pc (gdbarch, bfin_breakpoint_from_pc);
-  /* stack grows downwards */
-  set_gdbarch_inner_than (gdbarch, core_addr_lessthan);
-  // Do not set parm boundary
-  // removed set_gdbarch_parm_boundary (gdbarch, 32);
 
-  set_gdbarch_believe_pcc_promotion (gdbarch, 1);
-  set_gdbarch_decr_pc_after_break (gdbarch, 2);
-  set_gdbarch_extract_return_value (gdbarch, bfin_extract_return_value);
-  set_gdbarch_store_return_value (gdbarch, bfin_store_return_value);
-
-  // removed set_gdbarch_frameless_function_invocation(gdbarch, bfin_frameless_func_invoke); 
-  set_gdbarch_frame_args_skip (gdbarch, FRAME_ARGS_SKIP);
-  set_gdbarch_register_type (gdbarch, bfin_register_type);
-  set_gdbarch_register_name (gdbarch, bfin_register_name);
-  
   set_gdbarch_num_regs(gdbarch, BFIN_NUM_REGS);
+  set_gdbarch_num_pseudo_regs (gdbarch, 0); 
   set_gdbarch_sp_regnum (gdbarch, BFIN_SP_REGNUM);
   set_gdbarch_pc_regnum(gdbarch, BFIN_PC_REGNUM);
-
+  set_gdbarch_dwarf2_reg_to_regnum (gdbarch, bfin_reg_to_regnum);
+  set_gdbarch_register_name (gdbarch, bfin_register_name);
+  set_gdbarch_register_type (gdbarch, bfin_register_type);
+  set_gdbarch_unwind_dummy_id (gdbarch, bfin_unwind_dummy_id);
   set_gdbarch_push_dummy_call (gdbarch, bfin_push_dummy_call);
   set_gdbarch_call_dummy_location (gdbarch, ON_STACK);
+  set_gdbarch_register_sim_regno (gdbarch, bfin_sim_regno);
+  set_gdbarch_get_longjmp_target (gdbarch, bfin_get_longjmp_target);
+  set_gdbarch_believe_pcc_promotion (gdbarch, 1);
   set_gdbarch_return_value (gdbarch, bfin_return_value);
+  set_gdbarch_extract_return_value (gdbarch, bfin_extract_return_value);
+  set_gdbarch_store_return_value (gdbarch, bfin_store_return_value);
+  set_gdbarch_skip_prologue (gdbarch, bfin_skip_prologue);
+  set_gdbarch_inner_than (gdbarch, core_addr_lessthan);
+  set_gdbarch_breakpoint_from_pc (gdbarch, bfin_breakpoint_from_pc);
+  set_gdbarch_decr_pc_after_break (gdbarch, 0);
+  set_gdbarch_unwind_pc (gdbarch, bfin_unwind_pc);
   set_gdbarch_frame_align(gdbarch, bfin_frame_align);
-  
-  /* Disassembly.  */
   set_gdbarch_print_insn (gdbarch, gdb_print_insn_bfin);
 
-  /* Frame unwinder.  */
-  set_gdbarch_unwind_dummy_id (gdbarch, bfin_unwind_dummy_id);
-  set_gdbarch_unwind_pc (gdbarch, bfin_unwind_pc);
-
-  /* Hook in the DWARF CFI frame unwinder.  */
-  set_gdbarch_dwarf2_reg_to_regnum (gdbarch, bfin_reg_to_regnum);
   frame_unwind_append_sniffer (gdbarch, dwarf2_frame_sniffer);
 
   frame_base_set_default (gdbarch, &bfin_frame_base);
 
-  set_gdbarch_get_longjmp_target (gdbarch, bfin_get_longjmp_target);
- 
-  // removed frame_unwind_append_predicate (gdbarch, bfin_sigtramp_frame_p);
-  // removed frame_unwind_append_predicate (gdbarch, bfin_frame_p);
-
-  /* currently dont expose psuedo regs
-     we may give out text_start, data_start, bss_start */
-  set_gdbarch_num_pseudo_regs (gdbarch, 0); 
-
-  /* Frame handling.  */
-  /* Frame unwinder.  */
-  set_gdbarch_frame_args_skip (gdbarch, 0);
-
-  /* Advance PC across function entry code.  */
-
-  /* Breakpoint manipulation.  PC will get decremented in kernel */
-  set_gdbarch_decr_pc_after_break (gdbarch, 0);
-
   frame_unwind_append_sniffer (gdbarch, bfin_linux_sigtramp_frame_sniffer);
   frame_unwind_append_sniffer (gdbarch, bfin_frame_sniffer);
-
-  set_gdbarch_register_sim_regno (gdbarch, bfin_sim_regno);
 
   return gdbarch;
 }
@@ -1356,7 +1319,6 @@ bfin_dump_tdep (struct gdbarch *current_gdbarch, struct ui_file *file)
 
   if (tdep == NULL)
     return;
-
 }
 
 
