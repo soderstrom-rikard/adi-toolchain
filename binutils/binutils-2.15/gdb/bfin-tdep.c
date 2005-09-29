@@ -1057,7 +1057,7 @@ gdb_print_insn_bfin (bfd_vma memaddr, disassemble_info *info)
 const unsigned char *
 bfin_breakpoint_from_pc (CORE_ADDR *pcptr, int *lenptr)
 {
-  static char bfin_breakpoint[] = REMOTE_BREAKPOINT;
+  static char bfin_breakpoint[] = {0xa1, 0x00};
   *lenptr = sizeof (bfin_breakpoint);
   return bfin_breakpoint;
 }

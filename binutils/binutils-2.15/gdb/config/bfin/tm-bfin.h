@@ -66,9 +66,5 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* Offset from SP to first arg on stack at first instruction of a function */
 #define SP_ARG0 (0)
 
-#if !defined (REMOTE_BREAKPOINT)
-#define REMOTE_BREAKPOINT {0xa1, 0x00}
-#endif
-
 #define GDB_MULTI_ARCH GDB_MULTI_ARCH_PARTIAL
 
