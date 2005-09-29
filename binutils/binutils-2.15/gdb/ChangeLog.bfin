@@ -1,5 +1,9 @@
 2005-09-29  Jie Zhang  <jie.zhang@analog.com>
 
+	* config/bfin/tm-bfin.h (SP_ARG0): Remove.
+
+2005-09-29  Jie Zhang  <jie.zhang@analog.com>
+
 	* config/bfin/tm-bfin.h (FRAME_NUM_ARGS): Remove.
 
 2005-09-29  Jie Zhang  <jie.zhang@analog.com>
