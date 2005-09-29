@@ -1,5 +1,9 @@
 2005-09-29  Jie Zhang  <jie.zhang@analog.com>
 
+	* config/bfin/tm-bfin.h (FRAME_NUM_ARGS): Remove.
+
+2005-09-29  Jie Zhang  <jie.zhang@analog.com>
+
 	* bfin-tdep.c (bfin_breakpoint_from_pc): Not use REMOTE_BREAKPOINT.
 	* config/bfin/tm-bfin.h (REMOTE_BREAKPOINT): Remove.
 

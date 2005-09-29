@@ -55,14 +55,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #include "solib.h"
 
-/* Need to research if this is possible, until then no
-*/
-#if !defined (FRAME_NUM_ARGS)
-/* #define FRAME_NUM_ARGS(val,fi) (val = -1)	 */
-#define FRAME_NUM_ARGS(fi)	-1
-#define FRAME_NUM_ARGS_P() (0)
-#endif
-
 /* Offset from SP to first arg on stack at first instruction of a function */
 #define SP_ARG0 (0)
 
