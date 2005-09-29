@@ -68,10 +68,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define FRAME_NUM_ARGS_P() (0)
 #endif
 
-/* Return number of bytes at start of arglist that are not really args.  */
-/* On a regular frame with a link command rets and old fp are stored     */
-#define FRAME_ARGS_SKIP 8
-
 /* Offset from SP to first arg on stack at first instruction of a function */
 #define SP_ARG0 (0)
 
