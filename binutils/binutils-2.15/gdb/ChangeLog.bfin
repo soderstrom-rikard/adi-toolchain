@@ -1,5 +1,9 @@
 2005-09-29  Jie Zhang  <jie.zhang@analog.com>
 
+	* config/bfin/tm-bfin.h (REGISTER_BYTE): Remove.
+
+2005-09-29  Jie Zhang  <jie.zhang@analog.com>
+
 	* bfin-tdep.c (bfin_gdbarch_init): Set frame_args_skip.
 	* config/bfin/tm-bfin.h (FRAME_ARGS_SKIP): Remove.
 

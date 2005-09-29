@@ -55,11 +55,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #include "solib.h"
 
-/* Index within `registers' of the first byte of the space for
-   register N.  */
-
-#define REGISTER_BYTE(N)  ((N)*4)
-
 /* Need to research if this is possible, until then no
 */
 #if !defined (FRAME_NUM_ARGS)
