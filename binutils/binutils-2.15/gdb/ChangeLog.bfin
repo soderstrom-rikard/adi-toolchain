@@ -1,5 +1,13 @@
 2005-09-29  Jie Zhang  <jie.zhang@analog.com>
 
+	* bfin-tdep.c: Don't include tm.h.
+	(NUM_PSEUDO_REGS): Remove.
+	* config/bfin/linux.mt: Clean up.
+	* config/bfin/linux.mh: Ditto.
+	* config/bfin/tm-bfin.h: Delete.
+
+2005-09-29  Jie Zhang  <jie.zhang@analog.com>
+
 	* config/bfin/tm-bfin.h (SP_ARG0): Remove.
 
 2005-09-29  Jie Zhang  <jie.zhang@analog.com>

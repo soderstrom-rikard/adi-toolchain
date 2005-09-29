@@ -32,7 +32,6 @@
      frameless case. A prologue may or maynot build a frame.
 */
 
-#define NUM_PSEUDO_REGS (3)
 #include "defs.h"
 #include "dwarf2-frame.h"
 #include "frame.h"
@@ -53,7 +52,6 @@
 #include "elf-bfd.h"
 #include "gdb_assert.h"
 #include "command.h"
-#include "tm.h"
 #include "sim-regno.h"
 #include "objfiles.h"
 #include "trad-frame.h"
