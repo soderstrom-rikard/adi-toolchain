@@ -1,5 +1,5 @@
-/* Common target dependent code for GDB on BFIN systems.
-   Copyright 2002, 2003 Free Software Foundation, Inc.
+/* Target-dependent code for Blackfin, for GDB, the GNU Debugger.
+   Copyright 2005 Free Software Foundation, Inc.
 
    This file is part of GDB.
 
@@ -18,7 +18,7 @@
    Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-/* Register numbers of various important registers.  Note that some of
+/* Register numbers of various important registers. Note that some of
    these values are "real" register numbers, and correspond to the
    general registers of the machine, and some are "phony" register
    numbers which are too large to be actual register numbers as far as
@@ -27,7 +27,7 @@
 
 enum gdb_regnum {
   BFIN_SYSCFG_REGNUM = 0,
-  //BFIN_ORIGR0_REGNUM, 
+  /* BFIN_ORIGR0_REGNUM, */
   BFIN_R0_REGNUM,
   BFIN_R1_REGNUM,
   BFIN_R2_REGNUM,
@@ -57,8 +57,8 @@ enum gdb_regnum {
   BFIN_L2_REGNUM,
   BFIN_L3_REGNUM,
   BFIN_B0_REGNUM,
-  BFIN_B1_REGNUM,         /* START MODIFIER REGISTER */
-  BFIN_B2_REGNUM,         /* END MODIFIER REGISTER */
+  BFIN_B1_REGNUM,
+  BFIN_B2_REGNUM,
   BFIN_B3_REGNUM,
   BFIN_A0_DOT_X_REGNUM,
   BFIN_AO_DOT_W_REGNUM,
@@ -72,20 +72,20 @@ enum gdb_regnum {
   BFIN_LB1_REGNUM,
   BFIN_ASTAT_REGNUM,
   BFIN_RESERVED_REGNUM,
-  BFIN_RETS_REGNUM, 	/* Subroutine address register */
-  BFIN_PC_REGNUM, 	/*actually RETI pc will be in ORIG_PC*/
+  BFIN_RETS_REGNUM,
+  BFIN_PC_REGNUM,	/* actually RETI pc will be in ORIG_PC */
   BFIN_RETX_REGNUM,
   BFIN_RETN_REGNUM,
   BFIN_RETE_REGNUM,
   BFIN_SEQSTAT_REGNUM,
-  BFIN_IPEND_REGNUM,        /* Subroutine address register */  
-  BFIN_ORIGPC_REGNUM,        /* Subroutine address register */  
-  BFIN_EXTRA1,        /* Extra "registers" for hacks 1. address of .text */
+  BFIN_IPEND_REGNUM,	/* Subroutine address register */  
+  BFIN_ORIGPC_REGNUM,	/* Subroutine address register */  
+  BFIN_EXTRA1,		/* Extra "registers" for hacks 1. address of .text */
   BFIN_EXTRA2,        
   BFIN_EXTRA3,       
 
-  // LAST ENTRY SHOULD NOT BE CHANGED
-  BFIN_NUM_REGS       /* 0 index, so this entry is size */
+  /* LAST ENTRY SHOULD NOT BE CHANGED.  */
+  BFIN_NUM_REGS		/* The number of all registers.  */
 };
 
 enum gcc_regnum {
@@ -147,25 +147,33 @@ enum gcc_regnum {
 /* Status registers are the same size as general purpose registers.
    Used for documentation purposes and code readability in this
    header.  */
-#define STATUS_REGISTER_SIZE	4
+#define STATUS_REGISTER_SIZE		4
 
-#define BFIN_LINUX_JB_PC 39         /*offset in setjump definition. defined in uClibc*/
-#define BFIN_LINUX_JB_ELEMENT_SIZE 4 /*register size*/
+/* Offset in setjump definition. Defined in uClibc. */
+#define BFIN_LINUX_JB_PC 39
 
+/* ??? */
+#define BFIN_LINUX_JB_ELEMENT_SIZE 4
 
 /* Target-dependent structure in gdbarch.  */
 struct gdbarch_tdep
 {
-  CORE_ADDR lowest_pc;		/* Lowest address at which instructions 
-				   will appear.  */
+  /* Lowest address at which instructions will appear.  */
+  CORE_ADDR lowest_pc;
 
-  const char *bfin_breakpoint;	/* Breakpoint pattern for an BFIN insn.  */
-  int bfin_breakpoint_size;	/* And its size.  */
+  /* Breakpoint pattern for an BFIN insn.  */
+  const char *bfin_breakpoint;
 
-  int jb_pc;			/* Offset to PC value in jump buffer. 
-				   If this is negative, longjmp support
-				   will be disabled.  */
-  size_t jb_elt_size;		/* And the size of each entry in the buf.  */
+  /* And its size.  */
+  int bfin_breakpoint_size;
+
+  /* Offset to PC value in jump buffer. If this is negative, longjmp
+     support will be disabled.  */
+  int jb_pc;
+
+  /* And the size of each entry in the buf.  */
+  size_t jb_elt_size;
+
   int struct_value_regnum;
 };
 
