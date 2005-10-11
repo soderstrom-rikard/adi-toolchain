@@ -1,3 +1,8 @@
+2005-10-11  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* libc/sys/bfin/crt0.S (start): Use __init and __fini instead of
+	_init, _fini.
+
 2005-06-24  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* libc/sys/bfin/crt0.S (start): Call ___setup_argv_and_call_main

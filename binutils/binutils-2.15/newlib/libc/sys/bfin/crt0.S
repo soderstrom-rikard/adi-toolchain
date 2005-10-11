@@ -24,14 +24,14 @@ clear_bss:
 	/* Need to set up standard file handles */
 	/*  Parse string at r1 */
 
-	p0.l = _init;
-	p0.h = _init; 
+	p0.l = __init;
+	p0.h = __init; 
 	call	(p0)
 
 	p0.l = _atexit;
 	p0.h = _atexit;
-	r0.l = _fini;
-	r0.h = _fini; 
+	r0.l = __fini;
+	r0.h = __fini; 
 	call	(p0)
 
 	p0.l = _initialise_monitor_handles;
