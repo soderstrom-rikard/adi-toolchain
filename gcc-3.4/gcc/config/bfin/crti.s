@@ -37,11 +37,17 @@ Boston, MA 02111-1307, USA.  */
 	.section .init
 	.globl  _init
 	.type   _init,@function
+	.globl  __init
+	.type   __init,@function
 _init:
+__init:
 	LINK 0;
 
 	.section .fini
 	.globl  _fini
 	.type   _fini,@function
+	.globl  __fini
+	.type   __fini,@function
 _fini:
+__fini:
 	LINK 0; 

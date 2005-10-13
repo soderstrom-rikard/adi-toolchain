@@ -1,3 +1,8 @@
+2005-10-11  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/crti.s (__init, __fini): Provide these as entry points as
+	well.
+
 2005-08-25  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* Makefile.in (OBJS-common): Delete ra.o, ra-build.o, ra-colorize.o,
