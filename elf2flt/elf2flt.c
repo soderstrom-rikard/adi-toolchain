@@ -62,10 +62,6 @@
 #include "flat.h"     /* Binary flat header description                      */
 #include "libiberty.h"
 
-#ifdef TARGET_bfin
-#define PCREL24_MAGIC_OFFSET -1
-#endif
-
 #ifdef TARGET_e1
 #include <e1.h>
 #endif
@@ -476,7 +472,7 @@ output_relocs (
   unsigned char		*sectionp;
   unsigned long		pflags;
   char			addstr[16];
-  int32_t			sym_addr, sym_vma, section_vma;
+  uint32_t		sym_addr, sym_vma, section_vma;
   int			relsize, relcount;
   int			flat_reloc_count;
   int			sym_reloc_size, rc;
@@ -1478,36 +1474,46 @@ DIS29_RELOCATION:
 				    || (*p)->howto->type == R_pcrel24_jump_x
 				    || (*p)->howto->type == R_pcrel24_call_x)
 				{
-				    sym_addr += 2*-1*PCREL24_MAGIC_OFFSET;
-				    *((unsigned short *)(sectionp + q->address) + 1 + PCREL24_MAGIC_OFFSET)
-					= (sym_addr >> 1) & 0xffff;
-				    *((unsigned short *)(sectionp + q->address) + PCREL24_MAGIC_OFFSET)
-					= ((0xff00 & *((unsigned short *) (sectionp + q->address) + PCREL24_MAGIC_OFFSET))
-					   | ((sym_addr >> 17) & 0xff));
+				    uint32_t val;
+
+				    val = ((sym_addr + 2) >> 1) & 0xffff;
+				    bfd_putl16 (val, sectionp + q->address);
+
+				    val = bfd_getl16 ((unsigned short *)(sectionp + q->address) - 1);
+				    val = (0xff00 & val) | (((sym_addr + 2) >> 17) & 0xff);
+				    bfd_putl16 (val, (unsigned short *)(sectionp + q->address) - 1);
 				} else if((*p)->howto->type == R_byte4_data) {
-				    *((uint32_t *)(sectionp + q->address)) = sym_addr;
+				    bfd_putl32 (sym_addr, sectionp + q->address);
 				} else if ((*p)->howto->type == R_pcrel12_jump
 					   || (*p)->howto->type == R_pcrel12_jump_s) {
-				    *((unsigned short *)(sectionp + q->address))
-					= ((0xf000 & *((unsigned short *)(sectionp + q->address)))
-					   | ((sym_addr >> 1) & 0xfff));
+				    uint32_t val;
+
+				    val = bfd_getl16 (sectionp + q->address);
+				    val = (0xf000 & val) | ((sym_addr >> 1) & 0xfff);
+				    bfd_putl16 (val, sectionp + q->address);
 				} else if((*p)->howto->type == R_pcrel10) {
-				    *((unsigned short *)(sectionp + q->address))
-					= ((~0x3ff & *((unsigned short *)(sectionp + q->address)))
-					   | ((sym_addr >> 1) & 0x3ff));
+				    uint32_t val;
+
+				    val = bfd_getl16 (sectionp + q->address);
+				    val = (~0x3ff & val) | ((sym_addr >> 1) & 0x3ff);
+				    bfd_putl16 (val, sectionp + q->address);
 				} else if ((*p)->howto->type == R_rimm16
 					   || (*p)->howto->type == R_huimm16
 					   || (*p)->howto->type == R_luimm16) {
 				    /* for l and h we set the lower 16 bits which is only when it will be used */
-				    *((unsigned short *) (sectionp + q->address)) = (unsigned short) sym_addr;
+				    bfd_putl16 (sym_addr, sectionp + q->address);
 				} else if ((*p)->howto->type == R_pcrel5m2) {
-				    *((unsigned short *)(sectionp + q->address))
-					= ((0xfff0 & *((unsigned short *)(sectionp + q->address)))
-					   | ((sym_addr >> 1) & 0xf));
+				    uint32_t val;
+
+				    val = bfd_getl16 (sectionp + q->address);
+				    val = (0xfff0 & val) | ((sym_addr >> 1) & 0xf);
+				    bfd_putl16 (val, sectionp + q->address);
 				} else if ((*p)->howto->type == R_pcrel11) {
-				    *((unsigned short *)(sectionp + q->address))
-					= ((0xfc00 & *((unsigned short *)(sectionp + q->address)))
-					   | ((sym_addr >> 1) & 0x3ff));
+				    uint32_t val;
+
+				    val = bfd_getl16 (sectionp + q->address);
+				    val = (0xfc00 & val) | ((sym_addr >> 1) & 0x3ff);
+				    bfd_putl16 (val, sectionp + q->address);
 				}
 				else if (0xE0 <= (*p)->howto->type && 0xF3 >= (*p)->howto->type) {
 				    //arith relocs dont generate a real relocation
@@ -1579,9 +1585,9 @@ DIS29_RELOCATION:
 				|| (*p)->howto->type == R_luimm16)
 			    {
 				/* for l and h we set the lower 16 bits which is only when it will be used */
-				*((unsigned short *) (sectionp + q->address)) = (unsigned short) sym_addr;
+				bfd_putl16 (sym_addr, sectionp + q->address);
 			    } else if ((*p)->howto->type == R_byte4_data) {
-				*((uint32_t *)(sectionp + q->address)) = sym_addr;
+				bfd_putl32 (sym_addr, sectionp + q->address);
 			    }
 			}
 #endif

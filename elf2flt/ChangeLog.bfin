@@ -1,3 +1,8 @@
+2005-10-16  Jie Zhang  <jie.zhang@analog.com>
+
+	* elf2flt.c (output_relocs): Use bfd_getlNN ()/bfd_putlNN ()
+	to read/write instructions for bfin port.
+
 2005-08-03  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* elf2flt.c (weak_und_symbol): Reformat.
