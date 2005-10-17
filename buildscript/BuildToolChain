@@ -152,8 +152,8 @@ do
                 UCLINUX_ROOT=$OPTARG
                 UCLIBC_SOURCE=$OPTARG/uClibc
                 KERNEL_SOURCE=$OPTARG/linux-2.6.x
-                if [ ! -d $KERNEL_SOURCE/arch/bfinnommu ] ; then
-                    echo "Can't find $KERNEL_SOURCE/arch/bfinnommu"
+                if [ ! -d $KERNEL_SOURCE/arch/blackfin ] ; then
+                    echo "Can't find $KERNEL_SOURCE/arch/blackfin"
                     exit
                 fi
             else
