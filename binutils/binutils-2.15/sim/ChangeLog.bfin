@@ -1,3 +1,8 @@
+2005-10-17  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/Makefile.in: Clean up.
+	* bfin/tconfig.in, bfin/un-syscall.h: Removed.
+
 2005-08-24  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin/interp.c (bfin_trap): Fix initialization of stdin/stdout in
