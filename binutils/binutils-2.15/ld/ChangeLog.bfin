@@ -1,5 +1,10 @@
 2005-10-18  Jie Zhang  <jie.zhang@analog.com>
 
+	* scripttempl/bfin.sc: Use __edata and __end instead of
+	_edata and _end.
+
+2005-10-18  Jie Zhang  <jie.zhang@analog.com>
+
 	* scripttempl/bfin.sc: Use __start as ENTRY symbol instead of _start.
 
 2005-10-17  Jie Zhang  <jie.zhang@analog.com>

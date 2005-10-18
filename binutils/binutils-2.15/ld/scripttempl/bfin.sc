@@ -325,8 +325,8 @@ cat <<EOF
   ${CREATE_SHLIB+${SBSS2}}
   ${SDATA}
   ${OTHER_SDATA_SECTIONS}
-  ${RELOCATING+_edata = .;}
-  ${RELOCATING+PROVIDE (edata = .);}
+  ${RELOCATING+__edata = .;}
+  ${RELOCATING+PROVIDE (_edata = .);}
   ${RELOCATING+__bss_start = .;}
   ${RELOCATING+${OTHER_BSS_SYMBOLS}}
   ${SBSS}
@@ -337,15 +337,15 @@ cat <<EOF
    *(.bss${RELOCATING+ .bss.* .gnu.linkonce.b.*})
    *(COMMON)
    /* Align here to ensure that the .bss section occupies space up to
-      _end.  Align after .bss to ensure correct alignment even if the
+      __end.  Align after .bss to ensure correct alignment even if the
       .bss section disappears because there are no input sections.  */
    ${RELOCATING+. = ALIGN(${ALIGNMENT});}
   }
   ${OTHER_BSS_SECTIONS}
   ${RELOCATING+. = ALIGN(${ALIGNMENT});}
-  ${RELOCATING+_end = .;}
+  ${RELOCATING+__end = .;}
   ${RELOCATING+${OTHER_BSS_END_SYMBOLS}}
-  ${RELOCATING+PROVIDE (end = .);}
+  ${RELOCATING+PROVIDE (_end = .);}
   ${RELOCATING+${DATA_SEGMENT_END}}
 
   /* Stabs debugging sections.  */
