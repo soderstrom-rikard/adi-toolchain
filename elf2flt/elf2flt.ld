@@ -1,5 +1,5 @@
 
-ENTRY (_start)
+ENTRY (__start)
 
 MEMORY {
 	flatmem : ORIGIN = 0x0, LENGTH = 0xffffff
