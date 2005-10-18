@@ -368,7 +368,7 @@ _getpid (int n)
 caddr_t
 _sbrk (int incr)
 {
-  extern char   end asm ("end");	/* Defined by the linker.  */
+  extern char   end;		/* Defined by the linker.  */
   static char * heap_end;
   char *        prev_heap_end;
 
