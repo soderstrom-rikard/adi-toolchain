@@ -65,7 +65,7 @@
 #
 #  Each of these can also have corresponding .rel.* and .rela.* sections.
 
-test -z "$ENTRY" && ENTRY=_start
+test -z "$ENTRY" && ENTRY=__start
 if [ -z "$MACHINE" ]; then OUTPUT_ARCH=${ARCH}; else OUTPUT_ARCH=${ARCH}:${MACHINE}; fi
 test -z "${ELFSIZE}" && ELFSIZE=32
 test -z "${ALIGNMENT}" && ALIGNMENT="${ELFSIZE} / 8"
