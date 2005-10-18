@@ -1,3 +1,9 @@
+2005-10-18  Jie Zhang  <jie.zhang@analog.com>
+
+	* libc/sys/bfin/crt0.S (start, _mainCRTStartup): Deleted.
+	(__start): Renamed from _start. Use __edata, __end, and L$L$clear_bss
+	instead of _edata, _end, and clear_bss respectively.
+
 2005-10-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* libc/sys/bfin/crt0.S (start): Use __init and __fini instead of

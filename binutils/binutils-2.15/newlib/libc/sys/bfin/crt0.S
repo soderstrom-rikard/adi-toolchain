@@ -1,24 +1,20 @@
 	.text
 	.align 	2
 
-	.global	_mainCRTStartup
-	.global	_start
-	.global	start
-start:
-_start:
-_mainCRTStartup:
+	.global	__start
+__start:
 
 	/* Start by setting up a stack */
 	/* Zero the memory in the .bss section.  */
 
-	p0.l = _edata;
-	p0.h = _edata;
-	p1.l = _end;
-	p1.h = _end;
+	p0.l = __edata;
+	p0.h = __edata;
+	p1.l = __end;
+	p1.h = __end;
 	p1 -= p0;
 	r0 = 0;
-	lsetup (clear_bss, clear_bss) lc0 = p1;
-clear_bss:
+	lsetup (L$L$clear_bss, L$L$clear_bss) lc0 = p1;
+L$L$clear_bss:
 	B [p0++] = r0;
 
 	/* Need to set up standard file handles */
