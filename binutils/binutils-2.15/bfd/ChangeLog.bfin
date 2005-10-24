@@ -1,3 +1,8 @@
+2005-10-24  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* elf32-bfin.c: Reorder code a bit and add punctuation to comments
+	to match FSF binutils.
+
 2005-08-09  Catherine Moore  <clm@cm00re.com>
 
 	* elf32-bfin.c (bfin_relocate_section):  Set BSF_WEAK for
