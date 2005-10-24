@@ -480,7 +480,7 @@ stamp-mk.com: vmsconf.sh Makefile
 	touch stamp-mk.com
 
 EXTRA_DIST = make-gas.com m68k-parse.c itbl-parse.c itbl-parse.h itbl-lex.c \
-        bfin-parse.c bfin-lex.c bfin-defs.h
+        bfin-parse.c bfin-parse.h bfin-lex.c
 
 diststuff: $(EXTRA_DIST) info
 
@@ -656,7 +656,7 @@ m68k-parse.h: ; @true
 $(srcdir)/config/m68k-parse.h: ; @true
 
 bfin-parse.c: $(srcdir)/config/bfin-parse.y
-	$(SHELL) $(YLWRAP) "$(YACC)" $(srcdir)/config/bfin-parse.y y.tab.c bfin-parse.c y.tab.h bfin-parse.tab.h -- -d
+	$(SHELL) $(YLWRAP) "$(YACC)" $(srcdir)/config/bfin-parse.y y.tab.c bfin-parse.c y.tab.h bfin-parse.h -- -d
 bfin-parse.o: bfin-parse.c $(srcdir)/config/bfin-defs.h
 
 # Don't let the .y.h rule clobber bfin-defs.h.

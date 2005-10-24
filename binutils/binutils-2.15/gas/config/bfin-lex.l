@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "bfin-defs.h"
-#include "bfin-parse.tab.h"
+#include "bfin-parse.h"
 #include "as.h"
 
 static long parse_int (char **end);
