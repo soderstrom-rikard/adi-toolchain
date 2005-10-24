@@ -1,5 +1,11 @@
 2005-10-24  Jie Zhang  <jie.zhang@analog.com>
 
+	Apply
+	2005-10-21  Nick Clifton  <nickc@redhat.com>
+	* bfin-dis.c: Tidy up code, removing redundant constructs.
+
+2005-10-24  Jie Zhang  <jie.zhang@analog.com>
+
 	* bfin-dis.c: Merge cleanups from FSF CVS.
 
 2005-10-15  Jie Zhang  <jie.zhang@analog.com>
