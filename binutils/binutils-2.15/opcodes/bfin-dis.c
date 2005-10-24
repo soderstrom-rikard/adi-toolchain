@@ -1,8 +1,20 @@
-/* 
- *   Copyright (c) 2000, 2001 Analog Devices Inc.
- *   Copyright (c) 2003 Metrowerks
- *
- */
+/* Disassemble ADI Blackfin Instructions.
+   Copyright 2005 Free Software Foundation, Inc.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston,
+   MA 02110-1301, USA.  */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -116,7 +128,7 @@ fmtconst (const_forms_t cf, TIword x, bfd_vma pc, disassemble_info * outf)
       return "";
     }
 
-  /* negative constants have an implied sign bit */
+  /* Negative constants have an implied sign bit.  */
   if (constant_formats[cf].negative)
     {
       int nb = constant_formats[cf].nbits + 1;
@@ -210,7 +222,7 @@ static char *reg_names[] =
 
 #define REGNAME(x) ((x) < REG_LASTREG ? (reg_names[x]) : "...... Illegal register .......")
 
-/* RL(0..7)  */
+/* RL(0..7).  */
 static enum machine_registers decode_dregs_lo[] =
 {
   REG_RL0, REG_RL1, REG_RL2, REG_RL3, REG_RL4, REG_RL5, REG_RL6, REG_RL7,
@@ -218,7 +230,7 @@ static enum machine_registers decode_dregs_lo[] =
 
 #define dregs_lo(x) REGNAME(decode_dregs_lo[(x) & 7])
 
-/* RH(0..7)  */
+/* RH(0..7).  */
 static enum machine_registers decode_dregs_hi[] =
 {
   REG_RH0, REG_RH1, REG_RH2, REG_RH3, REG_RH4, REG_RH5, REG_RH6, REG_RH7,
@@ -226,7 +238,7 @@ static enum machine_registers decode_dregs_hi[] =
 
 #define dregs_hi(x) REGNAME(decode_dregs_hi[(x) & 7])
 
-/* R(0..7)  */
+/* R(0..7).  */
 static enum machine_registers decode_dregs[] =
 {
   REG_R0, REG_R1, REG_R2, REG_R3, REG_R4, REG_R5, REG_R6, REG_R7,
@@ -234,7 +246,7 @@ static enum machine_registers decode_dregs[] =
 
 #define dregs(x) REGNAME(decode_dregs[(x) & 7])
 
-/* R BYTE(0..7)  */
+/* R BYTE(0..7).  */
 static enum machine_registers decode_dregs_byte[] =
 {
   REG_BR0, REG_BR1, REG_BR2, REG_BR3, REG_BR4, REG_BR5, REG_BR6, REG_BR7,
@@ -243,7 +255,7 @@ static enum machine_registers decode_dregs_byte[] =
 #define dregs_byte(x) REGNAME(decode_dregs_byte[(x) & 7])
 #define dregs_pair(x) REGNAME(decode_dregs_pair[(x) & 7])
 
-/* P(0..5) SP FP  */
+/* P(0..5) SP FP.  */
 static enum machine_registers decode_pregs[] =
 {
   REG_P0, REG_P1, REG_P2, REG_P3, REG_P4, REG_P5, REG_SP, REG_FP,
@@ -256,7 +268,7 @@ static enum machine_registers decode_pregs[] =
 #define accum_word(x)	REGNAME(decode_accum_word[(x) & 1])
 #define accum(x)	REGNAME(decode_accum[(x) & 1])
 
-/* I(0..3)   */
+/* I(0..3).  */
 static enum machine_registers decode_iregs[] =
 {
   REG_I0, REG_I1, REG_I2, REG_I3,
@@ -264,7 +276,7 @@ static enum machine_registers decode_iregs[] =
 
 #define iregs(x) REGNAME(decode_iregs[(x) & 3])
 
-/* M(0..3)   */
+/* M(0..3).  */
 static enum machine_registers decode_mregs[] =
 {
   REG_M0, REG_M1, REG_M2, REG_M3,
@@ -274,7 +286,7 @@ static enum machine_registers decode_mregs[] =
 #define bregs(x) REGNAME(decode_bregs[(x) & 3])
 #define lregs(x) REGNAME(decode_lregs[(x) & 3])
 
-/* dregs pregs  */
+/* dregs pregs.  */
 static enum machine_registers decode_dpregs[] =
 {
   REG_R0, REG_R1, REG_R2, REG_R3, REG_R4, REG_R5, REG_R6, REG_R7,
@@ -283,7 +295,7 @@ static enum machine_registers decode_dpregs[] =
 
 #define dpregs(x) REGNAME(decode_dpregs[(x) & 15])
 
-/* [dregs pregs] */
+/* [dregs pregs].  */
 static enum machine_registers decode_gregs[] =
 {
   REG_R0, REG_R1, REG_R2, REG_R3, REG_R4, REG_R5, REG_R6, REG_R7,
@@ -292,7 +304,7 @@ static enum machine_registers decode_gregs[] =
 
 #define gregs(x,i) REGNAME(decode_gregs[((i)<<3)|x])
 
-/* [dregs pregs (iregs mregs) (bregs lregs)]  */
+/* [dregs pregs (iregs mregs) (bregs lregs)].  */
 static enum machine_registers decode_regs[] =
 {
   REG_R0, REG_R1, REG_R2, REG_R3, REG_R4, REG_R5, REG_R6, REG_R7,
@@ -303,7 +315,7 @@ static enum machine_registers decode_regs[] =
 
 #define regs(x,i) REGNAME(decode_regs[((i)<<3)|x])
 
-/* [dregs pregs (iregs mregs) (bregs lregs) Low Half]  */
+/* [dregs pregs (iregs mregs) (bregs lregs) Low Half].  */
 static enum machine_registers decode_regs_lo[] =
 {
   REG_RL0, REG_RL1, REG_RL2, REG_RL3, REG_RL4, REG_RL5, REG_RL6, REG_RL7,
@@ -313,7 +325,7 @@ static enum machine_registers decode_regs_lo[] =
 };
 
 #define regs_lo(x,i) REGNAME(decode_regs_lo[((i)<<3)|x])
-/* [dregs pregs (iregs mregs) (bregs lregs) High Half]  */
+/* [dregs pregs (iregs mregs) (bregs lregs) High Half].  */
 static enum machine_registers decode_regs_hi[] =
 {
   REG_RH0, REG_RH1, REG_RH2, REG_RH3, REG_RH4, REG_RH5, REG_RH6, REG_RH7,
@@ -336,7 +348,7 @@ static enum machine_registers decode_statbits[] =
 #define ignore_bits(x)	REGNAME(decode_ignore_bits[(x) & 7])
 #define ccstat(x)	REGNAME(decode_ccstat[(x) & 0])
 
-/* LC0 LC1  */
+/* LC0 LC1.  */
 static enum machine_registers decode_counters[] =
 {
   REG_LC0, REG_LC1,
@@ -345,31 +357,8 @@ static enum machine_registers decode_counters[] =
 #define counters(x) REGNAME(decode_counters[(x) & 1])
 #define dregs2_sysregs1(x) REGNAME(decode_dregs2_sysregs1[(x) & 7])
 
-/* - - - - - - - - */
-static enum machine_registers decode_open[] =
-{
-  REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG,
-};
-
-#define open(x) REGNAME(decode_open[(x) & 7])
-
-/* LC0 LT0 LB0 LC1 LT1 LB1 CYCLES CYCLES2 */
-static enum machine_registers decode_sysregs2[] =
-{
-  REG_LC0, REG_LT0, REG_LB0, REG_LC1, REG_LT1, REG_LB1, REG_CYCLES, REG_CYCLES2,
-};
-
-#define sysregs2(x) REGNAME(decode_sysregs2[(x) & 7])
-
-/* USP SEQSTAT SYSCFG RETI RETX RETN RETE EMUDAT - */
-static enum machine_registers decode_sysregs3[] =
-{
-  REG_USP, REG_SEQSTAT, REG_SYSCFG, REG_RETI, REG_RETX, REG_RETN, REG_RETE, REG_EMUDAT, REG_LASTREG,
-};
-
-#define sysregs3(x) REGNAME(decode_sysregs3[(x) & 7])
-
-/* [dregs pregs (iregs mregs) (bregs lregs) 	         dregs2_sysregs1 open sysregs2 sysregs3] */
+/* [dregs pregs (iregs mregs) (bregs lregs)
+   dregs2_sysregs1 open sysregs2 sysregs3].  */
 static enum machine_registers decode_allregs[] =
 {
   REG_R0, REG_R1, REG_R2, REG_R3, REG_R4, REG_R5, REG_R6, REG_R7,
@@ -414,7 +403,7 @@ static enum machine_registers decode_allregs[] =
 #define pcrel24(x)	fmtconst(c_pcrel24, x, pc, outf)
 #define uimm16(x)	fmtconst(c_uimm16, x, 0, outf)
 
-/* (arch.pm)arch_disassembler_functions */
+/* (arch.pm)arch_disassembler_functions.  */
 #define notethat(x)
 
 #ifndef OUTS
@@ -641,7 +630,7 @@ decode_macfunc (int which, int op, int h0, int h1, int src0, int src1, disassemb
     a = "a0";
 
   if (op == 3)
-    {				// no macfunc, just assign
+    {
       OUTS (outf, a);
       return 0;
     }
@@ -3315,7 +3304,7 @@ decode_dsp32mult_0 (TIword iw0, TIword iw1, disassemble_info *outf)
     return 0;
   
   if (w1)
-    {			// odd dreg assignment
+    {
       OUTS (outf, P ? dregs (dst | 1) : dregs_hi (dst));
       OUTS (outf, " = ");
       decode_multfunc (h01, h11, src0, src1, outf);
