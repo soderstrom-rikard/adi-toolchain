@@ -969,8 +969,8 @@
 
 (define_insn "usmulhisi3"
   [(set (match_operand:SI 0 "register_operand" "=W")
-	(mult:SI (zero_extend:SI (match_operand:HI 1 "register_operand" "W"))
-		 (sign_extend:SI (match_operand:HI 2 "register_operand" "W"))))]
+	(mult:SI (zero_extend:SI (match_operand:HI 1 "register_operand" "d"))
+		 (sign_extend:SI (match_operand:HI 2 "register_operand" "d"))))]
   ""
   "%0 = %h2 * %h1 (IS,M);"
   [(set_attr "type" "dsp32")])
