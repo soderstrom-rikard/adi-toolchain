@@ -3,6 +3,12 @@
 	* elf32-bfin.c: Reorder code a bit and add punctuation to comments
 	to match FSF binutils.
 
+	* elf32-bfin.c (bfin_howto_table): Set src_mask to 0 for all relocs.
+	(bfin_imm16_reloc): Always add in the addend.  Don't fetch existing
+	contents from section.
+	(bfin_relocate_section): Rework so as to not call special_functions.
+	Handle the relocation stack here.  Treat pcrel24 relocs specially.
+
 2005-08-09  Catherine Moore  <clm@cm00re.com>
 
 	* elf32-bfin.c (bfin_relocate_section):  Set BSF_WEAK for
