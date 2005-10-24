@@ -1,3 +1,15 @@
+2005-10-24  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* expr.c (expand_expr_real): Use usmul_optab for widening
+	signed * unsigned multiplies.
+	* genopinit.c (optabs): Add usmul_widen_optab.
+	* optabs.c (init_optabs): Likewise.
+	* optabs.h (enum optab_index): Add OTI_usmul_widen.
+	(usmul_widen_optab): Define.
+	* config/bfin/bfin.md (usmulhisi3): New pattern.
+
+	* testsuite/gcc.c-torture/execute/usmul.c: New test.
+
 2005-10-17  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (n_dregs_to_save, n_pregs_to_save,
