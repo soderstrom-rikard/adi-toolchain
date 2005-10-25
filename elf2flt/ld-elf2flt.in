@@ -9,6 +9,8 @@
 # Copyright (C) 2002,2003 David McCullough <davidm@snapgear.com>
 # Copyright (C) 2000, Lineo. davidm@lineo.com
 #
+# This is Free Software, under the GNU Public Licence v2 or greater.
+#
 
 LINKER="$0.real"            # the original renamed-linker
 ELF2FLT="`expr $0 : '\(.*\)ld'`elf2flt"
@@ -28,12 +30,14 @@ if expr "$*" : ".*-elf2flt.*" > /dev/null
 then
 	ARG1=
 	ARG2=
-	OFILE=a.out
+	OFILE="a.out"
 	PIC=
 	SDIRS=
 	LDSCRIPT=
 	FINAL="yes"
+	FINAL_ONLY=
 	MOVDAT=
+	VERBOSE=
 
 	while [ $# -ne 0 ]
 	do
@@ -63,10 +67,19 @@ then
 
 		-EB)      ARG1="$ARG1 $1"; SDIRS="$SDIRS $1";; # arm big endian
 
+		-relax)   ;;                           # eat this for microblaze
+
 		-r|-Ur)   FINAL=""                     # this is not a final link
 		          ARG1="$ARG1 $1"
 				  ;;
 
+		-v)       ARG1="$ARG1 $1"
+				  VERBOSE="y"
+				  ;;
+
+		-m)       shift; EMUL="-m $1";;        # ld emulations for h8300
+		-m*)      EMUL=$1;;
+ 
 		*)        ARG1="$ARG1 $1"
 				  ;;
 		esac
@@ -75,12 +88,14 @@ then
 
 	if [ "$FINAL" = "yes" ]
 	then
+		[ "$VERBOSE" = "y" ] && set -x
+		ARG1="$ARG1 $FINAL_ONLY"
 		NEWLDSCRIPT=`mktemp /tmp/flt-XXXXXX`
 		SEDOP=" -e s/^R_RODAT// -e /^W_RODAT/d"
 		if [ "$MOVDAT" ]
 		then
-			$LINKER -r -d -o $OFILE.elf2flt $ARG1  || exit $?
-			if [ "`@target_alias@-objdump -h $OFILE.elf2flt | \
+			$LINKER -r -d -o "$OFILE.elf2flt" $ARG1  || exit $?
+			if [ "`@target_alias@-objdump -h "$OFILE.elf2flt" | \
 					egrep -A1 '[.]rodata' | grep RELOC`" ]
 			then
 				echo "warning: .rodata section contains relocations"
@@ -126,27 +141,27 @@ then
 
 		if [ "@got_check@" = "no" ]
 		then
-		 $LINKER $SDIRS -T $LDSCRIPT -Ur -d -o $OFILE.elf $ARG1       ||exit $?
-		 $LINKER $SDIRS -T $LDSCRIPT -o $OFILE.gdb $ARG1              ||exit $?
+		 $LINKER $EMUL $SDIRS -T $LDSCRIPT -Ur -d -o "$OFILE.elf" $ARG1       ||exit $?
+		 $LINKER $EMUL $SDIRS -T $LDSCRIPT -o "$OFILE.gdb" $ARG1              ||exit $?
 		else
-		 $LINKER -r -d -o $OFILE.elf2flt $ARG1                        ||exit $?
-		 $LINKER $SDIRS -T $LDSCRIPT -Ur -o $OFILE.elf $OFILE.elf2flt ||exit $?
-		 $LINKER $SDIRS -T $LDSCRIPT -q -o $OFILE.gdb $OFILE.elf2flt     ||exit $?
+		 $LINKER $EMUL -r -d -o "$OFILE.elf2flt" $ARG1                        ||exit $?
+		 $LINKER $EMUL $SDIRS -T $LDSCRIPT -Ur -o "$OFILE.elf" "$OFILE.elf2flt" ||exit $?
+		 $LINKER $EMUL $SDIRS -T $LDSCRIPT -q -o "$OFILE.gdb" "$OFILE.elf2flt"     ||exit $?
 		 rm -f $OFILE.elf2flt
 		fi
-		if grep _GLOBAL_OFFSET_TABLE_ $OFILE.gdb > /dev/null 
+		if grep _GLOBAL_OFFSET_TABLE_ "$OFILE.gdb" > /dev/null 
 		then
-			$ELF2FLT $FLTFLAGS -o $OFILE -p $OFILE.gdb $OFILE.gdb || exit $?
-			rm -f $OFILE.elf
+			$ELF2FLT $FLTFLAGS -o "$OFILE" -p "$OFILE.gdb" "$OFILE.gdb" || exit $?
+			rm -f "$OFILE.elf"
 		else
-			$ELF2FLT $FLTFLAGS -o $OFILE -r $OFILE.elf || exit $?
-			mv $OFILE.elf $OFILE.gdb
+			$ELF2FLT $FLTFLAGS -o "$OFILE" -r "$OFILE.elf" || exit $?
+			mv "$OFILE.elf" "$OFILE.gdb"
 		fi
 		rm -f "$NEWLDSCRIPT"
 		exit 0
 	fi
 
-	exec $LINKER -o $OFILE $ARG1
+	exec $LINKER -o "$OFILE" $ARG1
 fi
 
 #
