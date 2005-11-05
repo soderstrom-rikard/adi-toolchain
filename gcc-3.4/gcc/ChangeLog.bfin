@@ -1,3 +1,8 @@
+2005-11-06  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.md (rep_movsi, rep_movhi): Make LSETUP be followed
+	by the first instruction of the loop.
+
 2005-11-05  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.c (bfin_expand_strmov): Correctly move the trailing
