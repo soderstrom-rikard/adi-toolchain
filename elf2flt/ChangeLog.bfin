@@ -1,3 +1,14 @@
+2005-11-08  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* elf2flt.c (text_has_relocs): New variable.
+	(output_relocs): Don't ignore text sections even if pic_with_got.
+	Share code with TARGET_e1 to get symbol addresses from BFD rather
+	than looking them up ourselves.
+	Ignore R_got and R_byte2_data relocs; the linker will have produced
+	the correct output.  Set text_has_relocs as appropriate for other
+	relocs.
+	(main): If text_has_relocs, always set the load_to_ram flag.
+
 2005-10-18  Jie Zhang  <jie.zhang@analog.com>
 
 	* elf2flt.ld: Use __start as ENTRY symbol instead of _start.

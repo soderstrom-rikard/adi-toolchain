@@ -128,6 +128,9 @@ int use_resolved = 0; /* If true, get the value of symbol references from */
 		      /* versions of GNU ld will give you a fully resolved */
 		      /* output file with relocation entries).  */
 
+/* Set if the text section contains any relocations.  If it does, we must
+   set the load_to_ram flag.  */
+int text_has_relocs = 0; 
 const char *progname, *filename;
 int lineno;
 
@@ -543,7 +546,7 @@ dump_symbols(symbols, number_of_symbols);
 	 *	Only relocate things in the data sections if we are PIC/GOT.
 	 *	otherwise do text as well
 	 */
-	if (!pic_with_got && (a->flags & SEC_CODE))
+	if (a->flags & SEC_CODE)
 		sectionp = text + (a->vma - text_vma);
 	else if (a->flags & SEC_DATA)
 		sectionp = data + (a->vma - data_vma);
@@ -688,7 +691,7 @@ dump_symbols(symbols, number_of_symbols);
 			 *	Fixup offset in the actual section.
 			 */
 			addstr[0] = 0;
-#ifndef TARGET_e1
+#if !defined TARGET_e1 && !defined TARGET_bfin
   			if ((sym_addr = get_symbol_offset((char *) sym_name,
 			    sym_section, symbols, number_of_symbols)) == -1) {
 				sym_addr = 0;
@@ -1092,7 +1095,11 @@ dump_symbols(symbols, number_of_symbols);
 				  sym_addr -= q->address; // make it PC relative 
 				  // implicitly assumes code section and symbol section are same
 				  break;
-				
+				case R_got:
+				case R_byte2_data:
+				    /* Ignore these.  */
+				    break;
+
 				case R_rimm16:
 				    if (is_reloc_stack_empty ())
 				    {
@@ -1116,6 +1123,8 @@ dump_symbols(symbols, number_of_symbols);
 							0, FLAT_RELOC_PART_LO, 
 							section_vma + q->address))
 					bad_relocs++;
+				    if (a->flags & SEC_CODE)
+					text_has_relocs = 1;
 				    flat_reloc_count++;
 				    break;
 				    
@@ -1168,6 +1177,8 @@ dump_symbols(symbols, number_of_symbols);
 							sp, hi_lo,
 							section_vma + q->address))
 					bad_relocs++;
+				    if (a->flags & SEC_CODE)
+					text_has_relocs = 1;
 				    flat_reloc_count += reloc_count_incr;
 				    break;
 				}
@@ -1187,6 +1198,8 @@ dump_symbols(symbols, number_of_symbols);
 							2, FLAT_RELOC_PART_LO,
 							section_vma + q->address))
 					bad_relocs++;
+				    if (a->flags & SEC_CODE)
+					text_has_relocs = 1;
 
 				    flat_reloc_count++;
 				    break;
@@ -1971,7 +1984,7 @@ int main(int argc, char *argv[])
   hdr.reloc_start = htonl(sizeof (struct flat_hdr) + real_address_bits(data_vma) + data_len);
   hdr.reloc_count = htonl(reloc_len);
   hdr.flags       = htonl(0
-	  | (load_to_ram ? FLAT_FLAG_RAM : 0)
+	  | (load_to_ram || text_has_relocs ? FLAT_FLAG_RAM : 0)
 	  | (ktrace ? FLAT_FLAG_KTRACE : 0)
 	  | (pic_with_got ? FLAT_FLAG_GOTPIC : 0)
 	  | (compress ? (compress == 2 ? FLAT_FLAG_GZDATA : FLAT_FLAG_GZIP) : 0)
