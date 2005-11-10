@@ -1,3 +1,8 @@
+2005-11-10  Grace Pan  <grace.pan@analog.com>
+
+	* testsuite/gcc.dg/20021018-1.c : Leave the -fpic flag out for this 
+	case to be executed on blackfin.  
+
 2005-11-08  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/t-bfin-elf (MULTILIB_OPTIONS, MULTILIB_DEFAULTS,

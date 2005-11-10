@@ -1,5 +1,7 @@
 /* { dg-do run } */
 /* { dg-options "-O2 -fpic" } */
+// Flag -fpic doesn't work on blackfin, so leave it out here.
+/* { dg-options "-O2" { target bfin-*-* } } */
 
 extern void abort (void);
 extern void exit (int);
