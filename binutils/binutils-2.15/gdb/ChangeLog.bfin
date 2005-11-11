@@ -1,27 +1,20 @@
-2005-11-10  Jie Zhang  <jie.zhang@analog.com>
+2005-11-11  Jie Zhang  <jie.zhang@analog.com>
 
-	* testsuite/gdb.asm/asm-source.exp: Change _start to __start.
-	* testsuite/gdb.asm/asmsrc1.s: Ditto.
-
-2005-11-08  Jie Zhang  <jie.zhang@analog.com>
-
-	* gdb/bfin-tdep.c: Include "gdb/sim-bfin.h".
-	(bfin_sim_regno): Use enum constants from enum sim_bfin_regnum
-	instead of enum gdb_regnum.
-
-2005-11-03  Jie Zhang  <jie.zhang@analog.com>
-
-	* bfin-tdep.c (bfin_register_name_strings,
+	* bfin-tdep.c: Include "gdb/sim-bfin.h".
+	(bfin_register_name_strings,
 	map_gcc_gdb, bfin_linux_sigcontext_reg_offset,
 	bfin_linux_ucontext_reg_offset): Reorder.
 	(bfin_register_type): BFIN_USP_REGNUM is builtin_type_void_data_ptr.
 	BFIN_RETI/X/N/E_REGNUM are builtin_type_void_func_ptr.
 	(bfin_breakpoint_from_pc): Remove signedness warning.
-	(bfin_sim_regno): Not more need to check BFIN_ORIGPC_REGNUM.
+	(bfin_sim_regno): Use enum constants from enum sim_bfin_regnum
+	instead of enum gdb_regnum. Not more need to check BFIN_ORIGPC_REGNUM.
 	* bfin-tdep.h (enum gdb_regnum): Add BFIN_CYCLES_REGNUM and
 	BFIN_CYCLES2_REGNUM. Remove BFIN_RESERVED_REGNUM and
 	BFIN_ORIGPC_REGNUM. And reorder.
 	(enum gcc_regnum): Reorder.
+	* testsuite/gdb.asm/asm-source.exp: Change _start to __start.
+	* testsuite/gdb.asm/asmsrc1.s: Ditto.
 
 2005-10-08  Jie Zhang  <jie.zhang@analog.com>
 

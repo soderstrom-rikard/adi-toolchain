@@ -1,4 +1,4 @@
-2005-11-08  Jie Zhang  <jie.zhang@analog.com>
+2005-11-11  Jie Zhang  <jie.zhang@analog.com>
 
 	* sim/bfin/interp.c (sim_fetch_register, sim_store_register):
 	Use enum constants from enum sim_bfin_regnum instead of enum
