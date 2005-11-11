@@ -9,8 +9,8 @@ comment "asm-source.exp."
 comment	"This file is not linked with crt0."
 comment	"Provide very simplistic equivalent."
 	
-	.global _start
-gdbasm_declare _start
+	.global __start
+gdbasm_declare __start
 	gdbasm_startup
 	gdbasm_call main
 	gdbasm_exit0

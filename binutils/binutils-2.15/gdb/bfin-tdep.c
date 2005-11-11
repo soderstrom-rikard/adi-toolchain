@@ -52,6 +52,7 @@
 #include "sim-regno.h"
 #include "objfiles.h"
 #include "trad-frame.h"
+#include "gdb/sim-bfin.h"
 
 /* Macros used by prologue functions.  */
 #define P_LINKAGE             		0xE800  
@@ -154,14 +155,18 @@ static struct cmd_list_element *showbfincmdlist = NULL;
 /* Initial value: Register names used in BFIN's ISA documentation.  */
 
 static char *bfin_register_name_strings[] =
-{ "syscfg", /*"orig_r0",*/ "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", 
-  "p0", "p1", "p2", "p3", "p4", "p5","fp","usp",
+{
+  "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", 
+  "p0", "p1", "p2", "p3", "p4", "p5", "sp", "fp",
   "i0", "i1", "i2", "i3", "m0", "m1", "m2", "m3", 
-  "l0", "l1", "l2", "l3", "b0", "b1", "b2", "b3",
-  "a0x", "a0w", "a1x", "a1w",
-  "lc0", "lc1", "lt0", "lt1", "lb0", "lb1", 
-  "astat", "reserved", "rets", "pc", "retx", "retn", "rete", "seqstat",
-  "ipend", "orig_pc", "extra1", "extra2", "extra3" }; 
+  "b0", "b1", "b2", "b3", "l0", "l1", "l2", "l3",
+  "a0x", "a0w", "a1x", "a1w", "astat", "rets",
+  "lc0", "lt0", "lb0", "lc1", "lt1", "lb1", "cycles", "cycles2",
+  "usp", "seqstat", "syscfg", "reti", "retx", "retn", "rete",
+  "pc", "cc", "extra1", "extra2", "extra3",
+  "ipend"
+};
+
 
 #define NUM_BFIN_REGNAMES \
   (sizeof (bfin_register_name_strings) / sizeof (char *))
@@ -233,16 +238,16 @@ int map_gcc_gdb[] =
   BFIN_SP_REGNUM,
   BFIN_FP_REGNUM,
   BFIN_I0_REGNUM,
-  BFIN_B0_REGNUM,
-  BFIN_L0_REGNUM,
   BFIN_I1_REGNUM,
-  BFIN_L1_REGNUM,
-  BFIN_B1_REGNUM,
   BFIN_I2_REGNUM,
-  BFIN_B2_REGNUM,
-  BFIN_L2_REGNUM,
   BFIN_I3_REGNUM,
+  BFIN_B0_REGNUM,
+  BFIN_B1_REGNUM,
+  BFIN_B2_REGNUM,
   BFIN_B3_REGNUM,
+  BFIN_L0_REGNUM,
+  BFIN_L1_REGNUM,
+  BFIN_L2_REGNUM,
   BFIN_L3_REGNUM,
   BFIN_M0_REGNUM,
   BFIN_M1_REGNUM,
@@ -250,14 +255,15 @@ int map_gcc_gdb[] =
   BFIN_M3_REGNUM,
   BFIN_A0_DOT_X_REGNUM,
   BFIN_A1_DOT_X_REGNUM,
-  0,  /* Not defined, should get ??? in gdb.  */
+  BFIN_CC_REGNUM,
   BFIN_RETS_REGNUM,
-  BFIN_PC_REGNUM,
+  BFIN_RETI_REGNUM,
   BFIN_RETX_REGNUM,
   BFIN_RETN_REGNUM,
   BFIN_RETE_REGNUM,
   BFIN_ASTAT_REGNUM,
-  BFIN_SEQSTAT_REGNUM
+  BFIN_SEQSTAT_REGNUM,
+  BFIN_USP_REGNUM,
 };
 
 
@@ -279,12 +285,11 @@ int map_gcc_gdb[] =
 
 static int bfin_linux_sigcontext_reg_offset[BFIN_NUM_REGS] =
 {
-  -1,		/* syscfg */
   2 * 4,	/* %r0 */
   3 * 4,	/* %r1 */
-  -1,		/* %r2 */
-  -1,		/* %r3 */
-  -1,		/* %r4 */
+  10 * 4,	/* %r2 */
+  11 * 4,	/* %r3 */
+  12 * 4,	/* %r4 */
   -1,		/* %r5 */
   -1,		/* %r6 */
   -1,		/* %r7 */
@@ -294,8 +299,8 @@ static int bfin_linux_sigcontext_reg_offset[BFIN_NUM_REGS] =
   -1,		/* %p3 */
   -1,		/* %p4 */
   -1,		/* %p5 */
-  -1,		/* %fp */
   1 * 4,	/* %sp */
+  -1,		/* %fp */
   -1,		/* %i0 */
   -1,		/* %i1 */
   -1,		/* %i2 */
@@ -304,37 +309,41 @@ static int bfin_linux_sigcontext_reg_offset[BFIN_NUM_REGS] =
   -1,		/* %m1 */
   -1,		/* %m2 */
   -1,		/* %m3 */
-  -1,		/* %l0 */
-  -1,		/* %l1 */
-  -1,		/* %l2 */
-  -1,		/* %l3 */
   -1,		/* %b0 */
   -1,		/* %b1 */
   -1,		/* %b2 */
   -1,		/* %b3 */
+  -1,		/* %l0 */
+  -1,		/* %l1 */
+  -1,		/* %l2 */
+  -1,		/* %l3 */
   -1,		/* %a0x */
   -1,		/* %a0w */
   -1,		/* %a1x */
   -1,		/* %a1w */
-  -1,		/* %lc0 */
-  -1,		/* %lc1 */
-  -1,		/* %lt0 */
-  -1,		/* %lt1 */
-  -1,		/* %lb0 */
-  -1,		/* %lb1 */
   -1,		/* %astat */
-  -1,		/* %reserved */
   9 * 4,	/* %rets */
-  7 * 4,	/* %pc */
+  -1,		/* %lc0 */
+  -1,		/* %lt0 */
+  -1,		/* %lb0 */
+  -1,		/* %lc1 */
+  -1,		/* %lt1 */
+  -1,		/* %lb1 */
+  -1,		/* %cycles */
+  -1,		/* %cycles2 */
+  -1,		/* %usp */
+  6 * 4,	/* %seqstat */
+  -1,		/* syscfg */
+  7 * 4,	/* %reti */
   8 * 4,	/* %retx */
   -1,		/* %retn */
   -1,		/* %rete */
-  6 * 4,	/* %seqstat */
-  -1,		/* %ipend */
-  -1,		/* %origpc */
+  7 * 4,	/* %pc */
+  -1,		/* %cc */
   -1,		/* %extra1 */
   -1,		/* %extra2 */
-  -1		/* %extra3 */
+  -1,		/* %extra3 */
+  -1		/* %ipend */
 };
 
 
@@ -342,7 +351,6 @@ static int bfin_linux_sigcontext_reg_offset[BFIN_NUM_REGS] =
 
 static int bfin_linux_ucontext_reg_offset[BFIN_NUM_REGS] =
 {
-  -1,		/* syscfg */
   1 * 4,	/* %r0 */
   2 * 4,	/* %r1 */
   3 * 4,	/* %r2 */
@@ -357,8 +365,8 @@ static int bfin_linux_ucontext_reg_offset[BFIN_NUM_REGS] =
   12 * 4,	/* %p3 */
   13 * 4,	/* %p4 */
   14 * 4,	/* %p5 */
-  24 * 4,	/* %fp */
   15 * 4,	/* %sp */
+  24 * 4,	/* %fp */
   25 * 4,	/* %i0 */
   26 * 4,	/* %i1 */
   27 * 4,	/* %i2 */
@@ -367,37 +375,41 @@ static int bfin_linux_ucontext_reg_offset[BFIN_NUM_REGS] =
   30 * 4,	/* %m1 */
   31 * 4,	/* %m2 */
   32 * 4,	/* %m3 */
-  33 * 4,	/* %l0 */
-  34 * 4,	/* %l1 */
-  35 * 4,	/* %l2 */
-  36 * 4,	/* %l3 */
   37 * 4,	/* %b0 */
   38 * 4,	/* %b1 */
   39 * 4,	/* %b2 */
   40 * 4,	/* %b3 */
+  33 * 4,	/* %l0 */
+  34 * 4,	/* %l1 */
+  35 * 4,	/* %l2 */
+  36 * 4,	/* %l3 */
   18 * 4,	/* %a0x */
   16 * 4,	/* %a0w */
   19 * 4,	/* %a1x */
   17 * 4,	/* %a1w */
-  41 * 4,	/* %lc0 */
-  42 * 4,	/* %lc1 */
-  43 * 4,	/* %lt0 */
-  44 * 4,	/* %lt1 */
-  45 * 4,	/* %lb0 */
-  46 * 4,	/* %lb1 */
   20 * 4,	/* %astat */
-  -1,		/* %reserved */
   21 * 4,	/* %rets */
-  22 * 4,	/* %pc */
+  41 * 4,	/* %lc0 */
+  43 * 4,	/* %lt0 */
+  45 * 4,	/* %lb0 */
+  42 * 4,	/* %lc1 */
+  44 * 4,	/* %lt1 */
+  46 * 4,	/* %lb1 */
+  -1,		/* %cycles */
+  -1,		/* %cycles2 */
+  -1,		/* %usp */
+  47 * 4,	/* %seqstat */
+  -1,		/* syscfg */
+  22 * 4,	/* %reti */
   23 * 4,	/* %retx */
   -1,		/* %retn */
   -1,		/* %rete */
-  47 *-1,	/* %seqstat */
-  -1,		/* %ipend */
-  -1,		/* %origpc */
+  22 * 4,	/* %pc */
+  -1,		/* %cc */
   -1,		/* %extra1 */
   -1,		/* %extra2 */
-  -1		/* %extra3 */
+  -1,		/* %extra3 */
+  -1		/* %ipend */
 };
 
 /* Get info about saved registers in sigtramp.  */
@@ -867,10 +879,12 @@ bfin_skip_prologue (CORE_ADDR pc)
 static struct type *
 bfin_register_type (struct gdbarch *gdbarch, int regnum)
 {
-  if (regnum >= BFIN_P0_REGNUM && regnum <= BFIN_SP_REGNUM)
+  if ((regnum >= BFIN_P0_REGNUM && regnum <= BFIN_FP_REGNUM)
+      || regnum == BFIN_USP_REGNUM)
     return builtin_type_void_data_ptr;
 
-  if (regnum == BFIN_PC_REGNUM || regnum == BFIN_RETS_REGNUM)
+  if (regnum == BFIN_PC_REGNUM || regnum == BFIN_RETS_REGNUM
+      || (regnum >= BFIN_RETI_REGNUM && regnum <= BFIN_RETE_REGNUM))
     return builtin_type_void_func_ptr;
 
   return builtin_type_int32;
@@ -989,7 +1003,7 @@ gdb_print_insn_bfin (bfd_vma memaddr, disassemble_info *info)
 const unsigned char *
 bfin_breakpoint_from_pc (CORE_ADDR *pcptr, int *lenptr)
 {
-  static char bfin_breakpoint[] = {0xa1, 0x00};
+  static unsigned char bfin_breakpoint[] = {0xa1, 0x00};
   *lenptr = sizeof (bfin_breakpoint);
   return bfin_breakpoint;
 }
@@ -1154,20 +1168,22 @@ bfin_unwind_pc (struct gdbarch *gdbarch, struct frame_info *next_frame)
 static int
 bfin_sim_regno (int regno)
 {
-  /* For registers the simulator cannot understand return a neg value.  */
-
   switch (regno)
     {
-      case BFIN_SYSCFG_REGNUM :
-      case BFIN_RETX_REGNUM :
-      case BFIN_RETN_REGNUM :
-      case BFIN_RETE_REGNUM :
-      case BFIN_SEQSTAT_REGNUM :
-      case BFIN_IPEND_REGNUM :
-      case BFIN_ORIGPC_REGNUM :
-      case BFIN_EXTRA1 :
-      case BFIN_EXTRA2 :
-      case BFIN_EXTRA3 :
+      case SIM_BFIN_ASTAT_REGNUM :
+      case SIM_BFIN_CYCLES_REGNUM :
+      case SIM_BFIN_CYCLES2_REGNUM :
+      case SIM_BFIN_USP_REGNUM :
+      case SIM_BFIN_SEQSTAT_REGNUM :
+      case SIM_BFIN_SYSCFG_REGNUM :
+      case SIM_BFIN_RETI_REGNUM :
+      case SIM_BFIN_RETX_REGNUM :
+      case SIM_BFIN_RETN_REGNUM :
+      case SIM_BFIN_RETE_REGNUM :
+      case SIM_BFIN_EXTRA1 :
+      case SIM_BFIN_EXTRA2 :
+      case SIM_BFIN_EXTRA3 :
+      case SIM_BFIN_IPEND_REGNUM :
 	return SIM_REGNO_DOES_NOT_EXIST;
       default :
 	return regno;
