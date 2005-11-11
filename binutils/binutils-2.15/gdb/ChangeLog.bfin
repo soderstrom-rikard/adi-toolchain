@@ -1,5 +1,13 @@
 2005-11-11  Jie Zhang  <jie.zhang@analog.com>
 
+	Apply
+	2005-03-04  Daniel Jacobowitz  <dan@codesourcery.com>
+	* target.c (target_read_memory_partial): Always initialize
+	ERR.
+	(target_write_memory_partial): Likewise.
+
+2005-11-11  Jie Zhang  <jie.zhang@analog.com>
+
 	* bfin-tdep.c: Include "gdb/sim-bfin.h".
 	(bfin_register_name_strings,
 	map_gcc_gdb, bfin_linux_sigcontext_reg_offset,
