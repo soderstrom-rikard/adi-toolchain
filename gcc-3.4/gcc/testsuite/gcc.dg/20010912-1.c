@@ -1,5 +1,7 @@
 /* { dg-do run } */
 /* { dg-options "-O2 -fpic" } */
+// Flag -fpic doesn't work on blackfin, so leave it out here.
+/* { dg-options "-O2" { target bfin-*-* } } */
 /* { dg-warning "not supported" "PIC unsupported" { target cris-*-elf* cris-*-aout* mmix-*-* } 0 } */
 
 extern void abort (void);

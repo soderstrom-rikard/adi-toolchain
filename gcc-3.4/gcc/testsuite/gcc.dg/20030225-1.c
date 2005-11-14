@@ -5,6 +5,8 @@
    and Benjamin Herrenschmidt <benh@kernel.crashing.org>.  */
 /* { dg-do run } */
 /* { dg-options "-O2 -fPIC" } */
+// Flag -fPIC doesn't work on blackfin, so leave it out here.
+/* { dg-options "-O2" { target bfin-*-* } } */
 /* { dg-warning "not supported" "PIC unsupported" { target cris-*-elf* mmix-*-* } 0 } */
 
 
