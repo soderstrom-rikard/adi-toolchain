@@ -54,6 +54,11 @@ extern int target_flags;
       builtin_define ("BFIN");                  \
       builtin_define ("FRIO");                  \
       builtin_define ("frio");                  \
+      if (flag_pic)				\
+	{					\
+	  builtin_define ("__PIC__");		\
+	  builtin_define ("__pic__");		\
+	}					\
     }                                           \
   while (0)
 #endif
