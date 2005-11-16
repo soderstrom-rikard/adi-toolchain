@@ -2258,7 +2258,7 @@ remote_open_1 (char *name, int from_tty, struct target_ops *target,
       putpkt ("!");
       getpkt (buf, (rs->remote_packet_size), 0);
     }
-#ifdef SOLIB_CREATE_INFERIOR_HOOK
+
   /* FIXME: need a master target_open vector from which all
      remote_opens can be called, so that stuff like this can
      go there.  Failing that, the following code must be copied
@@ -2268,10 +2268,11 @@ remote_open_1 (char *name, int from_tty, struct target_ops *target,
   /* Set up to detect and load shared libraries. */
   if (exec_bfd) 	/* No use without an exec file. */
     {
+#ifdef SOLIB_CREATE_INFERIOR_HOOK
       SOLIB_CREATE_INFERIOR_HOOK (PIDGET (inferior_ptid));
+#endif
       remote_check_symbols (symfile_objfile);
     }
-#endif
 }
 
 /* This takes a program previously attached to and detaches it.  After

@@ -1,3 +1,8 @@
+2005-11-16  Jie Zhang  <jie.zhang@analog.com>
+
+	* remote.c (remote_open_1): Always call remote_check_symbols ()
+	with an exec file.
+
 2005-11-11  Jie Zhang  <jie.zhang@analog.com>
 
 	Apply
