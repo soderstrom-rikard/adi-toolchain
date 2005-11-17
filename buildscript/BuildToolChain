@@ -512,7 +512,7 @@ RUN="$MAKE distclean "
 
 echo -n "*** Configuring Elf Toolchain      " ; date
 RUN="$DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-elf \
-    --prefix=$DIR_ELF_OUTPUT --disable-libstdcxx-pch"
+    --prefix=$DIR_ELF_OUTPUT --disable-libstdcxx-pch --disable-symvers"
 (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 (echo $RUN $LOGFILE ; ) | sh
 
@@ -789,7 +789,8 @@ if [ $KERNEL_SOURCE ] ; then
 
     echo -n "*** Configuring uClinux toolchain  " ; date
     RUN="$DIR_BINUTILS_SOURCE/configure $HOST_TARGET --enable-threads=posix \
-         --target=bfin-uclinux --prefix=$DIR_uC_OUTPUT --disable-libstdcxx-pch"
+         --target=bfin-uclinux --prefix=$DIR_uC_OUTPUT \
+	 --disable-libstdcxx-pch --disable-symvers"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
