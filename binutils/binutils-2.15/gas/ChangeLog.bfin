@@ -1,3 +1,9 @@
+2005-11-18  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin-defs.h (IS_BREG, IS_LREG): New macros.
+	* config/bfin-parse.y (asm_1): Check register type for load immediate
+	instruction.
+
 2005-10-24  Jie Zhang  <jie.zhang@analog.com>
 
 	* Makefile.am (bfin-parse.h): Renamed from bfin-parse.tab.h.
