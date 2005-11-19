@@ -1,3 +1,9 @@
+2005-11-19  Jie Zhang  <jie.zhang@analog.com>
+
+	* testsuite/gdb.threads/print-threads.exp: Load binfile before each
+	runto_main.
+	(test_all_threads): Don't expect a whitespace after kill ().
+
 2005-11-16  Jie Zhang  <jie.zhang@analog.com>
 
 	* remote.c (remote_open_1): Always call remote_check_symbols ()

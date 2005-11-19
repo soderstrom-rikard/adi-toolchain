@@ -76,7 +76,7 @@ proc test_all_threads { name kill } {
 	    send_gdb "continue\n"
 	    exp_continue
 	}
-	-re "Breakpoint \[0-9\]+, .* kill \\(.*\\) .*$gdb_prompt" {
+	-re "Breakpoint \[0-9\]+, .* kill \\(.*\\).*$gdb_prompt" {
 	    set j [expr $j + 1]
 	    if { $kill == 1 } {
 		pass "Hit kill breakpoint, $j ($name)"
@@ -115,11 +115,13 @@ gdb_test "break thread_function" "Breakpoint \[0-9\]+ at 0x\[0-9a-f\]+: file .*p
 gdb_test "set var slow = 0" ""
 test_all_threads "fast" 0
 
+gdb_load ${binfile}
 runto_main
 gdb_test "break thread_function" "Breakpoint \[0-9\]+ at 0x\[0-9a-f\]+: file .*print-threads.c, line \[0-9\]*\\." "break thread_function (2)"
 gdb_test "set var slow = 1" ""
 test_all_threads "slow" 0
 
+gdb_load ${binfile}
 runto_main
 gdb_test "break thread_function" "Breakpoint \[0-9\]+ at 0x\[0-9a-f\]+: file .*print-threads.c, line \[0-9\]*\\." "break thread_function (3)"
 gdb_test "set var slow = 1" "" "set var slow = 1 (2)"
