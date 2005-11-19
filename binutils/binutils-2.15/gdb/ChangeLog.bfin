@@ -1,5 +1,12 @@
 2005-11-19  Jie Zhang  <jie.zhang@analog.com>
 
+	Apply
+	2004-11-30  Randolph Chung  <tausq@debian.org>
+	* gdb.threads/thread_check.exp: Use ${srcfile} for test program name
+	instead of "tbug".  Fix regexp to work properly with gdb_test.
+
+2005-11-19  Jie Zhang  <jie.zhang@analog.com>
+
 	* testsuite/gdb.threads/print-threads.exp: Load binfile before each
 	runto_main.
 	(test_all_threads): Don't expect a whitespace after kill ().
