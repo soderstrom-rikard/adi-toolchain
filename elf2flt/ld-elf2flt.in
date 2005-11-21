@@ -117,6 +117,7 @@ then
 				# Non application modules enter via main not _start
 				#    SEDOP="$SEDOP -e 's/ENTRY (_start)/ENTRY (main)/'"
 				SEDOP="$SEDOP -e s/\\(ENTRY.\\)(_start)/\1(lib_main)/"
+				SEDOP="$SEDOP -e s/\\(ENTRY.\\)(__start)/\1(lib_main)/"
 			fi
 
 			# Provide the magic parameter that defines the library data segment pointer offset
