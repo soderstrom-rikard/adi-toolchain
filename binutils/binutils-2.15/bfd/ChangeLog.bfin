@@ -1,3 +1,12 @@
+2005-11-22  Jie Zhang  <jie.zhang@analog.com>
+
+	Apply
+	2004-12-03  Jan Beulich  <jbeulich@novell.com>
+	* elf.c (elf_find_function): Don't use the last file symbol ever,
+	seen, but the last one seen prior to the symbol being reported.
+	Don't report a filename at all for global symbols when that might
+	be ambiguous/wrong.
+
 2005-10-24  Jie Zhang  <jie.zhang@analog.com>
 
 	* elf32-bfin.c (bfd_bfin_elf32_create_embedded_relocs): Fix signedness
