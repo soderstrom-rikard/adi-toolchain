@@ -690,7 +690,8 @@ scan_rtx (rtx insn, rtx *loc, enum reg_class class,
 
     case SET:
       scan_rtx (insn, &SET_SRC (x), class, action, OP_IN, 0);
-      scan_rtx (insn, &SET_DEST (x), class, action, OP_OUT, 0);
+      scan_rtx (insn, &SET_DEST (x), class, action, 
+		GET_CODE (PATTERN (insn)) == COND_EXEC ? OP_INOUT : OP_OUT, 0);
       return;
 
     case STRICT_LOW_PART:
@@ -715,7 +716,8 @@ scan_rtx (rtx insn, rtx *loc, enum reg_class class,
       abort ();
 
     case CLOBBER:
-      scan_rtx (insn, &SET_DEST (x), class, action, OP_OUT, 1);
+      scan_rtx (insn, &SET_DEST (x), class, action,
+		GET_CODE (PATTERN (insn)) == COND_EXEC ? OP_INOUT : OP_OUT, 1);
       return;
 
     case EXPR_LIST:
