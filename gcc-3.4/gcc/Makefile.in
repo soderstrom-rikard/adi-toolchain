@@ -863,7 +863,7 @@ OBJS-common = \
  insn-extract.o insn-opinit.o insn-output.o insn-peep.o insn-recog.o	   \
  integrate.o intl.o jump.o  langhooks.o lcm.o lists.o local-alloc.o  	   \
  loop.o optabs.o options.o opts.o params.o postreload.o predict.o	   \
- print-rtl.o print-tree.o value-prof.o					   \
+ print-rtl.o print-tree.o value-prof.o struct-equiv.o			   \
  profile.o 								   \
  real.o recog.o reg-stack.o regclass.o regmove.o regrename.o		   \
  reload.o reload1.o reorg.o resource.o rtl.o rtlanal.o rtl-error.o	   \
@@ -1731,6 +1731,10 @@ cfgcleanup.o : cfgcleanup.c $(CONFIG_H) $(SYSTEM_H) coretypes.h $(TM_H) \
    $(RTL_H) $(TIMEVAR_H) $(BASIC_BLOCK_H) hard-reg-set.h output.h flags.h \
    $(RECOG_H) toplev.h $(GGC_H) insn-config.h cselib.h $(TARGET_H) $(TM_P_H) \
    $(PARAMS_H)
+struct-equiv.o : struct-equiv.c $(CONFIG_H) $(SYSTEM_H) coretypes.h $(TM_H) \
+   $(RTL_H) $(TIMEVAR_H) $(BASIC_BLOCK_H) hard-reg-set.h output.h flags.h \
+   $(RECOG_H) toplev.h $(GGC_H) insn-config.h cselib.h $(TARGET_H) $(TM_P_H) \
+   $(PARAMS_H) $(EXPR_H)
 cfgloop.o : cfgloop.c $(CONFIG_H) $(SYSTEM_H) $(RTL_H) coretypes.h $(TM_H) \
    $(BASIC_BLOCK_H) hard-reg-set.h cfgloop.h flags.h
 cfgloopanal.o : cfgloopanal.c $(CONFIG_H) $(SYSTEM_H) $(RTL_H) \

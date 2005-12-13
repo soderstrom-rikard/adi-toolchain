@@ -649,4 +649,7 @@ extern bool try_redirect_by_replacing_jump (edge, basic_block, bool);
 
 #include "cfghooks.h"
 
+extern int flow_find_cross_jump (int, basic_block, basic_block, rtx *, rtx *);
+extern bool insns_match_p (int, rtx, rtx);
+
 #endif /* GCC_BASIC_BLOCK_H */

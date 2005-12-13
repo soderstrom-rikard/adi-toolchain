@@ -1,3 +1,16 @@
+2005-12-13  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	Apply:
+	2005-12-07  J"orn Rennecke <joern.rennecke@st.com>
+	Preparation for PR rtl-optimization/20070 / part1
+	* basic-block.h (insns_match_p, flow_find_cross_jump): Declare.
+	* cfgcleanup.c (merge_memattrs, insns_match_p,
+	flow_find_cross_jump): Move from here into..
+	* struct-equiv.c: New file.
+	(death_notes_match_p) New function, broken out of insns_match_p.
+	* Makefile.in (OBJS-common): Add struct-equiv.o.
+	(struct-equiv.o): New target.
+
 2005-12-08  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c: Include "cgraph.h".
