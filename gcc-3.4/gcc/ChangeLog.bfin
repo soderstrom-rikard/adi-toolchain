@@ -1,3 +1,10 @@
+2005-12-14  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	Also apply
+	2005-12-07  J"orn Rennecke <joern.rennecke@st.com>
+	* cfgcleanup.c (condjump_equiv_p): New function, broken out of
+	outgoing_edges_match.
+
 2005-12-13  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	Apply:

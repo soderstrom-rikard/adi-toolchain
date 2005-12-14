@@ -855,6 +855,107 @@ merge_blocks_move (edge e, basic_block b, basic_block c, int mode)
   return NULL;
 }
 
+static bool
+condjump_equiv_p (basic_block bb1, basic_block bb2)
+{
+  edge b1, f1, b2, f2;
+  bool reverse, match;
+  rtx set1, set2, cond1, cond2;
+  enum rtx_code code1, code2;
+
+  b1 = BRANCH_EDGE (bb1);
+  b2 = BRANCH_EDGE (bb2);
+  f1 = FALLTHRU_EDGE (bb1);
+  f2 = FALLTHRU_EDGE (bb2);
+
+  /* Get around possible forwarders on fallthru edges.  Other cases
+     should be optimized out already.  */
+  if (FORWARDER_BLOCK_P (f1->dest))
+    f1 = f1->dest->succ;
+
+  if (FORWARDER_BLOCK_P (f2->dest))
+    f2 = f2->dest->succ;
+
+  /* To simplify use of this function, return false if there are
+     unneeded forwarder blocks.  These will get eliminated later
+     during cleanup_cfg.  */
+  if (FORWARDER_BLOCK_P (f1->dest)
+      || FORWARDER_BLOCK_P (f2->dest)
+      || FORWARDER_BLOCK_P (b1->dest)
+      || FORWARDER_BLOCK_P (b2->dest))
+    return false;
+
+  if (f1->dest == f2->dest && b1->dest == b2->dest)
+    reverse = false;
+  else if (f1->dest == b2->dest && b1->dest == f2->dest)
+    reverse = true;
+  else
+    return false;
+
+  set1 = pc_set (BB_END (bb1));
+  set2 = pc_set (BB_END (bb2));
+  if ((XEXP (SET_SRC (set1), 1) == pc_rtx)
+      != (XEXP (SET_SRC (set2), 1) == pc_rtx))
+    reverse = !reverse;
+
+  cond1 = XEXP (SET_SRC (set1), 0);
+  cond2 = XEXP (SET_SRC (set2), 0);
+  code1 = GET_CODE (cond1);
+  if (reverse)
+    code2 = reversed_comparison_code (cond2, BB_END (bb2));
+  else
+    code2 = GET_CODE (cond2);
+
+  if (code2 == UNKNOWN)
+    return false;
+
+  /* Verify codes and operands match.  */
+  match = ((code1 == code2
+	    && rtx_renumbered_equal_p (XEXP (cond1, 0), XEXP (cond2, 0))
+	    && rtx_renumbered_equal_p (XEXP (cond1, 1), XEXP (cond2, 1)))
+	   || (code1 == swap_condition (code2)
+	       && rtx_renumbered_equal_p (XEXP (cond1, 1),
+					  XEXP (cond2, 0))
+	       && rtx_renumbered_equal_p (XEXP (cond1, 0),
+					  XEXP (cond2, 1))));
+
+  /* If we return true, we will join the blocks.  Which means that
+     we will only have one branch prediction bit to work with.  Thus
+     we require the existing branches to have probabilities that are
+     roughly similar.  */
+  if (match
+      && !optimize_size
+      && maybe_hot_bb_p (bb1)
+      && maybe_hot_bb_p (bb2))
+    {
+      int prob2;
+
+      if (b1->dest == b2->dest)
+	prob2 = b2->probability;
+      else
+	/* Do not use f2 probability as f2 may be forwarded.  */
+	prob2 = REG_BR_PROB_BASE - b2->probability;
+
+      /* Fail if the difference in probabilities is greater than 50%.
+	 This rules out two well-predicted branches with opposite
+	 outcomes.  */
+      if (abs (b1->probability - prob2) > REG_BR_PROB_BASE / 2)
+	{
+	  if (rtl_dump_file)
+	    fprintf (rtl_dump_file,
+		     "Outcomes of branch in bb %i and %i differs to much (%i %i)\n",
+		     bb1->index, bb2->index, b1->probability, prob2);
+
+	  return false;
+	}
+    }
+
+  if (rtl_dump_file && match)
+    fprintf (rtl_dump_file, "Conditionals in bb %i and %i match.\n",
+	     bb1->index, bb2->index);
+
+  return match;
+}
 /* Return true iff outgoing edges of BB1 and BB2 match, together with
    the branch instruction.  This means that if we commonize the control
    flow before end of the basic block, the semantic remains unchanged.
@@ -885,11 +986,6 @@ outgoing_edges_match (int mode, basic_block bb1, basic_block bb2)
       && any_condjump_p (BB_END (bb1))
       && onlyjump_p (BB_END (bb1)))
     {
-      edge b1, f1, b2, f2;
-      bool reverse, match;
-      rtx set1, set2, cond1, cond2;
-      enum rtx_code code1, code2;
-
       if (!bb2->succ
 	  || !bb2->succ->succ_next
 	  || bb2->succ->succ_next->succ_next
@@ -897,98 +993,7 @@ outgoing_edges_match (int mode, basic_block bb1, basic_block bb2)
 	  || !onlyjump_p (BB_END (bb2)))
 	return false;
 
-      b1 = BRANCH_EDGE (bb1);
-      b2 = BRANCH_EDGE (bb2);
-      f1 = FALLTHRU_EDGE (bb1);
-      f2 = FALLTHRU_EDGE (bb2);
-
-      /* Get around possible forwarders on fallthru edges.  Other cases
-         should be optimized out already.  */
-      if (FORWARDER_BLOCK_P (f1->dest))
-	f1 = f1->dest->succ;
-
-      if (FORWARDER_BLOCK_P (f2->dest))
-	f2 = f2->dest->succ;
-
-      /* To simplify use of this function, return false if there are
-	 unneeded forwarder blocks.  These will get eliminated later
-	 during cleanup_cfg.  */
-      if (FORWARDER_BLOCK_P (f1->dest)
-	  || FORWARDER_BLOCK_P (f2->dest)
-	  || FORWARDER_BLOCK_P (b1->dest)
-	  || FORWARDER_BLOCK_P (b2->dest))
-	return false;
-
-      if (f1->dest == f2->dest && b1->dest == b2->dest)
-	reverse = false;
-      else if (f1->dest == b2->dest && b1->dest == f2->dest)
-	reverse = true;
-      else
-	return false;
-
-      set1 = pc_set (BB_END (bb1));
-      set2 = pc_set (BB_END (bb2));
-      if ((XEXP (SET_SRC (set1), 1) == pc_rtx)
-	  != (XEXP (SET_SRC (set2), 1) == pc_rtx))
-	reverse = !reverse;
-
-      cond1 = XEXP (SET_SRC (set1), 0);
-      cond2 = XEXP (SET_SRC (set2), 0);
-      code1 = GET_CODE (cond1);
-      if (reverse)
-	code2 = reversed_comparison_code (cond2, BB_END (bb2));
-      else
-	code2 = GET_CODE (cond2);
-
-      if (code2 == UNKNOWN)
-	return false;
-
-      /* Verify codes and operands match.  */
-      match = ((code1 == code2
-		&& rtx_renumbered_equal_p (XEXP (cond1, 0), XEXP (cond2, 0))
-		&& rtx_renumbered_equal_p (XEXP (cond1, 1), XEXP (cond2, 1)))
-	       || (code1 == swap_condition (code2)
-		   && rtx_renumbered_equal_p (XEXP (cond1, 1),
-					      XEXP (cond2, 0))
-		   && rtx_renumbered_equal_p (XEXP (cond1, 0),
-					      XEXP (cond2, 1))));
-
-      /* If we return true, we will join the blocks.  Which means that
-	 we will only have one branch prediction bit to work with.  Thus
-	 we require the existing branches to have probabilities that are
-	 roughly similar.  */
-      if (match
-	  && !optimize_size
-	  && maybe_hot_bb_p (bb1)
-	  && maybe_hot_bb_p (bb2))
-	{
-	  int prob2;
-
-	  if (b1->dest == b2->dest)
-	    prob2 = b2->probability;
-	  else
-	    /* Do not use f2 probability as f2 may be forwarded.  */
-	    prob2 = REG_BR_PROB_BASE - b2->probability;
-
-	  /* Fail if the difference in probabilities is greater than 50%.
-	     This rules out two well-predicted branches with opposite
-	     outcomes.  */
-	  if (abs (b1->probability - prob2) > REG_BR_PROB_BASE / 2)
-	    {
-	      if (rtl_dump_file)
-		fprintf (rtl_dump_file,
-			 "Outcomes of branch in bb %i and %i differs to much (%i %i)\n",
-			 bb1->index, bb2->index, b1->probability, prob2);
-
-	      return false;
-	    }
-	}
-
-      if (rtl_dump_file && match)
-	fprintf (rtl_dump_file, "Conditionals in bb %i and %i match.\n",
-		 bb1->index, bb2->index);
-
-      return match;
+      return condjump_equiv_p (bb1, bb2);
     }
 
   /* Generic case - we are seeing a computed jump, table jump or trapping
