@@ -1703,6 +1703,7 @@ get_machine_name (unsigned e_machine)
     case EM_IQ2000:       	return "Vitesse IQ2000";
     case EM_XTENSA_OLD:
     case EM_XTENSA:		return "Tensilica Xtensa Processor";
+    case EM_BLACKFIN:		return "Analog Devices Blackfin";
     default:
       sprintf (buff, _("<unknown>: %x"), e_machine);
       return buff;
