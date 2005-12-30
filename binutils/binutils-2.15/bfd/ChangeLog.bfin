@@ -1,3 +1,10 @@
+2005-12-30  Jie Zhang  <jie.zhang@analog.com>
+
+	Apply
+	2005-12-27  Alan Modra  <amodra@bigpond.net.au>
+	* elf.c (elf_find_function): Don't ignore section syms.
+	Simplify filename logic.
+
 2005-11-22  Jie Zhang  <jie.zhang@analog.com>
 
 	Apply
