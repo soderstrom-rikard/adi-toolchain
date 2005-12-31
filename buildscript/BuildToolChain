@@ -204,13 +204,13 @@ do
 done
 
 ############ CHECK MAKE SET #####################################
-if [ ! $MAKE ] ; then
+if [ ! "$MAKE" ] ; then
     MAKE=make
 fi
 
 ############ Check and error if I can't find the things I need #
 
-for PREREQ in gcc $MAKE autoconf m4 automake gettext bison flex
+for PREREQ in gcc "$MAKE" autoconf m4 automake gettext bison flex
 do
     RUN=`$PREREQ --help 2>/dev/null | wc -l`
     if [ $RUN -eq 0 ] ; then
