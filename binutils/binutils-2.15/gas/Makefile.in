@@ -3087,7 +3087,8 @@ $(srcdir)/config/m68k-parse.h: ; @true
 
 bfin-parse.c: $(srcdir)/config/bfin-parse.y
 	$(SHELL) $(YLWRAP) "$(YACC)" $(srcdir)/config/bfin-parse.y y.tab.c bfin-parse.c y.tab.h bfin-parse.h -- -d
-bfin-parse.o: bfin-parse.c $(srcdir)/config/bfin-defs.h
+bfin-parse.h: bfin-parse.c
+bfin-parse.o: bfin-parse.c bfin-parse.h $(srcdir)/config/bfin-defs.h
 
 # Don't let the .y.h rule clobber bfin-defs.h.
 bfin-defs.h: ; @true
@@ -3095,7 +3096,7 @@ $(srcdir)/config/bfin-defs.h: ; @true
 
 bfin-lex.c: $(srcdir)/config/bfin-lex.l
 	$(SHELL) $(YLWRAP) "$(LEX)" $(srcdir)/config/bfin-lex.l lex.yy.c bfin-lex.c
-bfin-lex.o: bfin-lex.c $(srcdir)/config/bfin-defs.h
+bfin-lex.o: bfin-lex.c bfin-parse.h $(srcdir)/config/bfin-defs.h
 
 # The instruction table specification lexical analyzer and parser.
 

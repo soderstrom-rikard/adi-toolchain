@@ -1,3 +1,11 @@
+2006-01-01  Jie Zhang  <jie.zhang@analog.com>
+
+	Apply part of
+	2005-10-24  H.J. Lu  <hongjiu.lu@intel.com>
+	* Makefile.am (bfin-parse.tab.h): Removed.
+	(bfin-parse.h): Added.
+	* Makefile.in: Regenerated.
+
 2005-11-18  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin-defs.h (IS_BREG, IS_LREG): New macros.
