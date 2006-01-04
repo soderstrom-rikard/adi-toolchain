@@ -1,3 +1,8 @@
+2006-01-04  Jie Zhang  <jie.zhang@analog.com>
+
+	* po/*.gmo: Remove.
+	* c-parse.c, c-parse.y, gengtype-lex.c, gengtype-yacc.c: Remove.
+
 2005-12-14  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	Also apply
