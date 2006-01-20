@@ -1,3 +1,11 @@
+2006-01-20  Jie Zhang  <jie.zhang@analog.com>
+
+	Bug[#1041]
+	* config/bfin-parse.y (value_match): Use correct conversion
+	specifications in template string for __FILE__ and __LINE__.
+	(binary): Ditto.
+	(unary): Ditto.
+
 2006-01-01  Jie Zhang  <jie.zhang@analog.com>
 
 	Apply part of
