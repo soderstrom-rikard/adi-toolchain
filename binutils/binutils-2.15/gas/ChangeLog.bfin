@@ -1,5 +1,11 @@
 2006-01-20  Jie Zhang  <jie.zhang@analog.com>
 
+	Bug[#1042]
+	* config/bfin-parse.y (asm_1): Check value range for 16 bit immediate
+	in load immediate intruction.
+
+2006-01-20  Jie Zhang  <jie.zhang@analog.com>
+
 	Bug[#1041]
 	* config/bfin-parse.y (value_match): Use correct conversion
 	specifications in template string for __FILE__ and __LINE__.
