@@ -100,10 +100,10 @@ static inline int
 do_syscall (int reason, void * arg)
 {
   int value = 1;
-  asm volatile ("[--sp] = %1;[--sp] = %2;r1 = [sp++]; r0 = [sp++]; r2 = %3; raise 0; %0 = r0"
+  asm volatile ("[--sp] = %1;[--sp] = %2;r1 = [sp++]; r0 = [sp++]; raise 0; %0 = r0"
 		: "=r" (value) /* Outputs */
-		: "r" (reason), "r" (arg), "i" (AngelSWI) /* Inputs */
-		: "R0", "R1", "R2", "R3", "memory", "cc");
+		: "r" (reason), "r" (arg) /* Inputs */
+		: "R0", "R1", "memory", "cc");
   return value;
 }
 

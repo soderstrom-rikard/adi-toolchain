@@ -1,3 +1,7 @@
+2006-01-23  Jie Zhang  <jie.zhang@analog.com>
+
+	* libc/sys/bfin/syscalls.c (do_syscall): Not pass AngelSWI to syscall.
+
 2005-10-18  Jie Zhang  <jie.zhang@analog.com>
 
 	* libc/sys/bfin/syscalls.c (_sbrk): Use _end instead of end.
