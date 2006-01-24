@@ -1,3 +1,8 @@
+2006-01-24  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* sim/bfin/bfin-dis.c (min_2x16, max_2x16): New functions.
+	(decode_dsp32alu_0): Use them to support vector min/max.
+
 2005-12-12  Jie Zhang  <jie.zhang@analog.com>
 
 	* sim/bfin/bfin-dis.c, sim/bfin/bfin-sim.h, sim/bfin/interp.c:

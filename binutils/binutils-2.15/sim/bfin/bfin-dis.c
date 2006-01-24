@@ -179,6 +179,34 @@ max32 (bu32 a, bu32 b)
 }
 
 static bu32
+min2x16 (bu32 a, bu32 b)
+{
+  int val = a;
+  if ((bs16)a > (bs16)b)
+    val = (val & 0xFFFF0000) | (b & 0xFFFF);
+  if ((bs16)(a >> 16) > (bs16)(b >> 16))
+    val = (val & 0xFFFF) | (b & 0xFFFF0000);
+  saved_state.an = (bs16)val < 0 || (bs16)(val >> 16) < 0;
+  saved_state.az = (bs16)val == 0 || (bs16)(val >> 16) == 0;
+  saved_state.v = 0;
+  return val;
+}
+
+static bu32
+max2x16 (bu32 a, bu32 b)
+{
+  int val = a;
+  if ((bs16)a < (bs16)b)
+    val = (val & 0xFFFF0000) | (b & 0xFFFF);
+  if ((bs16)(a >> 16) < (bs16)(b >> 16))
+    val = (val & 0xFFFF) | (b & 0xFFFF0000);
+  saved_state.an = (bs16)val < 0 || (bs16)(val >> 16) < 0;
+  saved_state.az = (bs16)val == 0 || (bs16)(val >> 16) == 0;
+  saved_state.v = 0;
+  return val;
+}
+
+static bu32
 add_and_shift (bu32 a, bu32 b, int shift)
 {
   int v;
@@ -2222,9 +2250,9 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
   else if (aop == 2 && aopcde == 6)
     unhandled_instruction ("dregs = ABS dregs (V)");
   else if (aop == 1 && aopcde == 6)
-    unhandled_instruction ("dregs = MIN (dregs, dregs) (V)");
+    DREG (dst0) = min2x16 (DREG (src0), DREG (src1));
   else if (aop == 0 && aopcde == 6)
-    unhandled_instruction ("dregs = MAX (dregs, dregs) (V)");
+    DREG (dst0) = max2x16 (DREG (src0), DREG (src1));
   else if (HL == 1 && aopcde == 1)
     unhandled_instruction ("dregs = dregs +|- dregs, dregs = dregs -|+ dregs (amod0, amod2)");
   else if (aop == 0 && aopcde == 4)
