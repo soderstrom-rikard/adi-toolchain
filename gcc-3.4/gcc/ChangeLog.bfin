@@ -1,3 +1,9 @@
+2006-01-24  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (addv2hi3, subv2hi3, sminv2hi3, smaxv2hi3,
+	mulv2hi3, negv2hi2, absv2hi2): Pattern names fixed by appending the
+	necessary digit.
+
 2006-01-04  Jie Zhang  <jie.zhang@analog.com>
 
 	* po/*.gmo: Remove.
