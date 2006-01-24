@@ -3,6 +3,8 @@
 	* config/bfin/bfin.md (addv2hi3, subv2hi3, sminv2hi3, smaxv2hi3,
 	mulv2hi3, negv2hi2, absv2hi2): Pattern names fixed by appending the
 	necessary digit.
+	* config/bfin/bfin.c (enum bfin_builtins): Moved here from...
+	* config/bfin/bfin.h: ... here.
 
 2006-01-04  Jie Zhang  <jie.zhang@analog.com>
 
