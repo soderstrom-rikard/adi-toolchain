@@ -67,6 +67,13 @@ setflags_nz (bu32 val)
 }
 
 static void
+setflags_nz_2x16 (bu32 val)
+{
+  saved_state.an = (bs16)val < 0 || (bs16)(val >> 16) < 0;
+  saved_state.az = (bs16)val == 0 || (bs16)(val >> 16) == 0;
+}
+
+static void
 setflags_logical (bu32 val)
 {
   setflags_nz (val);
@@ -186,8 +193,7 @@ min2x16 (bu32 a, bu32 b)
     val = (val & 0xFFFF0000) | (b & 0xFFFF);
   if ((bs16)(a >> 16) > (bs16)(b >> 16))
     val = (val & 0xFFFF) | (b & 0xFFFF0000);
-  saved_state.an = (bs16)val < 0 || (bs16)(val >> 16) < 0;
-  saved_state.az = (bs16)val == 0 || (bs16)(val >> 16) == 0;
+  setflags_nz_2x16 (val);
   saved_state.v = 0;
   return val;
 }
@@ -200,8 +206,7 @@ max2x16 (bu32 a, bu32 b)
     val = (val & 0xFFFF0000) | (b & 0xFFFF);
   if ((bs16)(a >> 16) < (bs16)(b >> 16))
     val = (val & 0xFFFF) | (b & 0xFFFF0000);
-  saved_state.an = (bs16)val < 0 || (bs16)(val >> 16) < 0;
-  saved_state.az = (bs16)val == 0 || (bs16)(val >> 16) == 0;
+  setflags_nz_2x16 (val);
   saved_state.v = 0;
   return val;
 }
@@ -453,7 +458,7 @@ saturate_s16 (bu64 val)
     return 0x8000;
   if ((bs64)val > 0x7fff)
     return 0x7fff;
-  return val;
+  return val & 0xffff;
 }
 
 static bu32
@@ -2171,7 +2176,14 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
   else if (aop == 0 && HL == 0 && aopcde == 16)
     unhandled_instruction ("A0 = ABS A0");
   else if (aop == 3 && HL == 0 && aopcde == 15)
-    unhandled_instruction ("dregs = - dregs (V)");
+    {
+      /* Vector NEG.  */
+      bu32 hi = (-(bs16)(DREG (src0) >> 16)) << 16;
+      bu32 lo = (-(bs16)(DREG (src0) & 0xFFFF)) & 0xFFFF;
+      DREG (dst0) = hi | lo;
+      setflags_nz_2x16 (DREG (dst0));
+      saved_state.v = 0;
+    }
   else if (aop == 1 && HL == 1 && aopcde == 11)
     unhandled_instruction ("dregs_hi = (A0 += A1)");
   else if (aop == 2 && aopcde == 11 && s == 0)
@@ -2248,7 +2260,15 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
     /* dregs = MAX (dregs, dregs) */
     DREG (dst0) = max32 (DREG (src0), DREG (src1));
   else if (aop == 2 && aopcde == 6)
-    unhandled_instruction ("dregs = ABS dregs (V)");
+    {
+      /* Vector ABS.  */
+      bu32 in = DREG (src0);
+      bu32 hi = (in & 0x80000000 ? -(bs16)(in >> 16) : in >> 16) << 16;
+      bu32 lo = (in & 0x8000 ? -(bs16)(in & 0xFFFF) : in) & 0xFFFF;
+      DREG (dst0) = hi | lo;
+      setflags_nz_2x16 (DREG (dst0));
+      saved_state.v = 0;
+    }
   else if (aop == 1 && aopcde == 6)
     DREG (dst0) = min2x16 (DREG (src0), DREG (src1));
   else if (aop == 0 && aopcde == 6)
