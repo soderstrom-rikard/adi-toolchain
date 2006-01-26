@@ -1,3 +1,17 @@
+2006-01-26  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* elf2flt.c: Don't define FLAT_VERSION_5 for TARGET_bfin.
+	(bfin_set_reloc): Simplify by losing reloc types.  Only handle
+	stack relocs specially.  Lose useless hilo argument; all callers
+	changed.
+	(compare_relocs_bfd): New static variable.
+	(compare_relocs): New function.
+	(output_relocs): Sort relocs before processing them.
+	Keep track of highparts in persistent data relocs.  Add sym_vma to
+	symbol addresses.
+	* flat.h: Bring in line with mainline elf2flt by removing all
+	Blackfin (and other target) specific code.
+
 2005-11-08  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* elf2flt.c (text_has_relocs): New variable.

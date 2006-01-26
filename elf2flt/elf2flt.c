@@ -88,7 +88,6 @@
 #define ARCH    "e1-coff"
 #elif defined(TARGET_bfin)
 #define ARCH	"bfin"
-#define FLAT_VERSION_5
 #define false   0
 #else
 #error "Don't know how to support your CPU architecture??"
@@ -414,49 +413,48 @@ bfin_set_reloc (uint32_t *reloc,
 		const char *reloc_section_name, 
 		const char *sym_name,
 		struct bfd_symbol *symbol,
-		int sp, int hilo, int32_t offset)
+		int sp, int32_t offset)
 {
-    unsigned int type;
+    unsigned int type = 0;
     uint32_t val;
 
-    if (strstr (reloc_section_name, "text"))
-	type = FLAT_RELOC_TYPE_TEXT;
-    else if (strstr (reloc_section_name, "data"))
-	type = FLAT_RELOC_TYPE_DATA;
-    else if (strstr (reloc_section_name, "bss"))
-	type = FLAT_RELOC_TYPE_BSS;
-    else if (strstr (reloc_section_name, "stack"))
-	type = FLAT_RELOC_TYPE_STACK;
-    else if (symbol->flags & BSF_WEAK){
-	/* weak symbol support ... if a weak symbol is undefined at the
-	   end of a final link, it should return 0 rather than error
-	   We will assume text section for the moment.
-	*/
-	type = FLAT_RELOC_TYPE_TEXT;
+    if (strstr (reloc_section_name, "stack")) {
+	    if (verbose)
+		    printf ("Stack-relative reloc, offset %08lx\n", offset);
+	    /* This must be a stack_start reloc for stack checking.  */
+	    type = 1;
     }
-    else if (strstr (reloc_section_name, "*ABS*")){
-	/* (A data section initialization of something in the shared libc's text section
-	   does not resolve - i.e. a global pointer to function initialized with
-	   a libc function).
-	   The text section here is appropriate as the section information
-	   of the shared library is lost. The loader will do some calcs.
-	*/
-	type = FLAT_RELOC_TYPE_TEXT;
-    }
-    else
-    {
-	printf ("Unknown Type - relocation for %s in bad section - %s\n", sym_name, reloc_section_name);
-	return 1;
-    }
-
-    val = (offset & ((1 << 26) - 1)) << 6;
-    val |= (sp & (1 << 3) - 1) << 3;
-    val |= (hilo & 1) << 2;
-    val |= (type & (1 << 2) - 1);
+    val = (offset & ((1 << 26) - 1));
+    val |= (sp & (1 << 3) - 1) << 26;
+    val |= type << 29;
     *reloc = val;
     return 0;
 }
 #endif
+
+static bfd *compare_relocs_bfd;
+
+static int
+compare_relocs (const void *pa, const void *pb)
+{
+	const arelent *const *a = pa, *const *b = pb;
+	const arelent *ra = *a, *rb = *b;
+	unsigned long va, vb;
+	uint32_t a_vma, b_vma;
+	
+	if (!ra->sym_ptr_ptr || !*ra->sym_ptr_ptr)
+		return -1;
+	else if (!rb->sym_ptr_ptr || !*rb->sym_ptr_ptr)
+		return 1;
+
+	a_vma = bfd_section_vma(compare_relocs_bfd,
+				(*(ra->sym_ptr_ptr))->section);
+	b_vma = bfd_section_vma(compare_relocs_bfd,
+				(*(rb->sym_ptr_ptr))->section);
+	va = (*(ra->sym_ptr_ptr))->value + a_vma + ra->addend;
+	vb = (*(rb->sym_ptr_ptr))->value + b_vma + rb->addend;
+	return va - vb;
+}
 
 uint32_t *
 output_relocs (
@@ -483,6 +481,7 @@ output_relocs (
   int			bad_relocs = 0;
   asymbol		**symb;
   long			nsymb;
+  unsigned long		persistent_data = 0;
   
 #if 0
   printf("%s(%d): output_relocs(abs_bfd=%d,synbols=0x%x,number_of_symbols=%d"
@@ -584,6 +583,8 @@ dump_symbols(symbols, number_of_symbols);
 			__FILE__, __LINE__, r->name);
 		continue;
 	} else {
+		compare_relocs_bfd = abs_bfd;
+		qsort (relpp, relcount, sizeof *relpp, compare_relocs);
 		for (p = relpp; (relcount && (*p != NULL)); p++, relcount--) {
 			unsigned char *r_mem;
 			int relocation_needed = 0;
@@ -1101,17 +1102,16 @@ dump_symbols(symbols, number_of_symbols);
 				    break;
 
 				case R_rimm16:
+				case R_luimm16:
+				    sym_vma = bfd_section_vma(abs_bfd, sym_section);
 				    if (is_reloc_stack_empty ())
-				    {
-					sym_addr += q->addend;
-				    }
+					sym_addr += sym_vma + q->addend;
 				    else
-				    {
 					sym_addr = reloc_stack_pop ();
-				    }
-				    if(weak_und_symbol(sym_section->name, (*(q->sym_ptr_ptr))))
+
+				    if (weak_und_symbol(sym_section->name, (*(q->sym_ptr_ptr))))
 					continue;
-				    if(0xFFFF0000 & sym_addr){
+				    if (q->howto->type == R_rimm16 && (0xFFFF0000 & sym_addr)) {
 					fprintf (stderr, "Relocation overflow for rN = %s\n",sym_name);
 					bad_relocs++;
 				    }
@@ -1120,71 +1120,48 @@ dump_symbols(symbols, number_of_symbols);
 				    if (bfin_set_reloc (flat_relocs + flat_reloc_count, 
 							sym_section->name, sym_name,
 							(*(q->sym_ptr_ptr)),
-							0, FLAT_RELOC_PART_LO, 
-							section_vma + q->address))
+							0, section_vma + q->address))
 					bad_relocs++;
 				    if (a->flags & SEC_CODE)
 					text_has_relocs = 1;
 				    flat_reloc_count++;
 				    break;
 				    
-				case R_luimm16:
 				case R_huimm16:
 				{
-				    unsigned int sp;
-				    unsigned int reloc_count_incr;
-				    unsigned int hi_lo;
-
-				    if (q->howto->type == R_luimm16)
-					hi_lo = FLAT_RELOC_PART_LO;
-				    else
-					hi_lo = FLAT_RELOC_PART_HI;
-				
+				    sym_vma = bfd_section_vma(abs_bfd, sym_section);
 				    if (is_reloc_stack_empty ())
-					sym_addr += q->addend;
+					sym_addr += sym_vma + q->addend;
 				    else
 					sym_addr = reloc_stack_pop ();
 				    
-				    flat_relocs = (uint32_t *)
-					(realloc (flat_relocs, (flat_reloc_count + 2) * sizeof (uint32_t)));
-				    reloc_count_incr = 1;
 				    if (weak_und_symbol (sym_section->name, (*(q->sym_ptr_ptr))))
 					continue;
-				    if (0xFFFF0000 & sym_addr) {
-					/* value is > 16 bits - use an extra field */
-					/* see if we have already output that symbol */
-					/* reloc may be addend from symbol and       */
-					/* we can only store 16 bit offsets	     */
-					sp = 1;
-					if ((*(q->sym_ptr_ptr))->udata.i == 0
-					    || flat_relocs[(*(q->sym_ptr_ptr))->udata.i] != sym_addr
-					    || ((*(q->sym_ptr_ptr))->udata.i & 0xFFFF0000))
-					{
-					    reloc_count_incr = 2;
-					    flat_relocs[flat_reloc_count + 1] = sym_addr;
-					    (*(q->sym_ptr_ptr))->udata.i = flat_reloc_count + 1;
-					    sym_addr = 0; // indication to loader to read next
-					} else{
-					    sym_addr = (*(q->sym_ptr_ptr))->udata.i;
-					}
-				    } else {
-					sp = 0;
+
+				    flat_relocs = (uint32_t *)
+					(realloc (flat_relocs, (flat_reloc_count + 2) * sizeof (uint32_t)));
+				    if ((0xFFFF0000 & sym_addr) != persistent_data) {
+					    if (verbose)
+						    printf ("New persistent data for %08lx\n", sym_addr);
+					    persistent_data = 0xFFFF0000 & sym_addr;
+					    flat_relocs[flat_reloc_count++]
+						    = (sym_addr >> 16) | (3 << 26);
 				    }
 
 				    if (bfin_set_reloc (flat_relocs + flat_reloc_count, 
 							sym_section->name, sym_name,
 							(*(q->sym_ptr_ptr)),
-							sp, hi_lo,
-							section_vma + q->address))
+							1, section_vma + q->address))
 					bad_relocs++;
 				    if (a->flags & SEC_CODE)
 					text_has_relocs = 1;
-				    flat_reloc_count += reloc_count_incr;
+				    flat_reloc_count++;
 				    break;
 				}
 				case R_byte4_data:
+				    sym_vma = bfd_section_vma(abs_bfd, sym_section);
 				    if (is_reloc_stack_empty ())
-					sym_addr += q->addend;
+					sym_addr += sym_vma + q->addend;
 				    else
 					sym_addr = reloc_stack_pop ();
 				    if (weak_und_symbol (sym_section->name, (*(q->sym_ptr_ptr))))
@@ -1195,8 +1172,7 @@ dump_symbols(symbols, number_of_symbols);
 				    if (bfin_set_reloc (flat_relocs + flat_reloc_count,
 							sym_section->name, sym_name,
 							(*(q->sym_ptr_ptr)),
-							2, FLAT_RELOC_PART_LO,
-							section_vma + q->address))
+							2, section_vma + q->address))
 					bad_relocs++;
 				    if (a->flags & SEC_CODE)
 					text_has_relocs = 1;
