@@ -31,6 +31,9 @@
 	(bfin_expand_builtin): Use them; add code to support fractional math
 	builtins.
 
+	* simplify-rtx.c (simplify_subreg): Simplify some forms that combine
+	can pass us.
+
 2006-01-24  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (addv2hi3, subv2hi3, sminv2hi3, smaxv2hi3,
