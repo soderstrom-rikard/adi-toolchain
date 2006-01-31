@@ -5,6 +5,21 @@
 	* simplify-rtx.c (simplify_unary_operation, simplify_binary_operation):
 	Handle them.
 
+	* config/bfin/bfin.c (const01_operand, vec_shift_operand): New
+	functions.
+	* config/bfin/bfin-protos.h: Declare them.
+	* config/bfin/bfin.md (UNSPEC_FRMUL, UNSPEC_FRTMUL): New constants.
+	(ssaddsi3, sssubsi3, ssnegsi2, signbitssi2, smaxhi3, sminhi3, abshi2,
+	neghi2, ssneghi2, signbitshi2, movhi_low2high, movhi_high2high,
+	movhi_lwo2low, movhi_high2low, movhiv2hi_low, movhiv2hi_high,
+	composev2hi, movv2hi_hi, movv2hi_hi_low, movv2hi_hi_high, ssaddhi3,
+	sssubhi3, frmulhi3, frtmulhi3, ssaddv2hi3, sssubv2hi3, addsubv2hi3,
+	subaddv2hi3, ssaddsubv2hi3, sssubaddv2hi3, sublohiv2hi3, subhilov2hi3,
+	sssublohiv2hi3, sssubhilov2hi3, addlohiv2hi3, addhilov2hi3,
+	ssaddlohiv2hi3, ssaddhilov2hi3, frmulv2hi, frtmulv2hi, mulhisi_ll,
+	mulhisi_lh, mulhisi_hl, mulhisi_hh, ssnegv2hi2, ssashiftv2hi3,
+	ssashifthi3, lshiftv2hi3, lshifthi3): New patterns.
+
 2006-01-24  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (addv2hi3, subv2hi3, sminv2hi3, smaxv2hi3,

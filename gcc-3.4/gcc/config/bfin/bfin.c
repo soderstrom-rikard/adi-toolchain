@@ -1721,7 +1721,7 @@ symbolic_operand (rtx op, enum machine_mode mode)
 /* Returns 1 if OP is a plain constant or matched by symbolic_operand.  */
 
 int
-symbolic_or_const_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) 
+symbolic_or_const_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
 {
   if (GET_CODE (op) == CONST_INT || GET_CODE (op) == CONST_DOUBLE)
     return 1;
@@ -1731,9 +1731,23 @@ symbolic_or_const_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
 /* Returns 1 if OP is a SYMBOL_REF.  */
 
 int
-symbol_ref_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED) 
+symbol_ref_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
 {
   return GET_CODE (op) == SYMBOL_REF;
+}
+
+int
+const01_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
+{
+  return op == const0_rtx || op == const1_rtx;
+}
+
+int
+vec_shift_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
+{
+  if (GET_CODE (op) == CONST_INT)
+    return INTVAL (op) >= -16 && INTVAL (op) < 15;
+  return register_operand (op, mode);
 }
 
 bool

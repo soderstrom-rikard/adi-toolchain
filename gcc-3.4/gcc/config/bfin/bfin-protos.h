@@ -56,6 +56,8 @@ extern int call_insn_operand (rtx, Mmode);
 extern int symbolic_operand (rtx, Mmode);
 extern int symbolic_or_const_operand (rtx , enum machine_mode);
 extern int imm16bit_operand_p (rtx, Mmode);
+extern int const01_operand (rtx, Mmode);
+extern int vec_shift_operand (rtx, Mmode);
 extern int reg_or_7bit_operand (rtx op, Mmode);
 extern int scale_by_operand (rtx, Mmode);
 extern int symbol_ref_operand (rtx, Mmode);
