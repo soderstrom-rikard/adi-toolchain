@@ -1,3 +1,10 @@
+2006-01-31  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* rtl.def (SS_ASHIFT, SS_NEG): New codes.
+	* doc/rtl.texi: Document them.
+	* simplify-rtx.c (simplify_unary_operation, simplify_binary_operation):
+	Handle them.
+
 2006-01-24  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (addv2hi3, subv2hi3, sminv2hi3, smaxv2hi3,

@@ -1206,6 +1206,12 @@ DEF_RTL_EXPR(US_PLUS, "us_plus", "ee", 'c')
 /* Operand 0 minus operand 1, with signed saturation.  */
 DEF_RTL_EXPR(SS_MINUS, "ss_minus", "ee", '2')
 
+/* Negation with signed saturation.  */
+DEF_RTL_EXPR(SS_NEG, "ss_neg", "e", '1')
+
+/* Shift left with signed saturation.  */
+DEF_RTL_EXPR(SS_ASHIFT, "ss_ashift", "ee", '2')
+
 /* Operand 0 minus operand 1, with unsigned saturation.  */
 DEF_RTL_EXPR(US_MINUS, "us_minus", "ee", '2')
 
