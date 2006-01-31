@@ -34,6 +34,9 @@
 	* simplify-rtx.c (simplify_subreg): Simplify some forms that combine
 	can pass us.
 
+	* config/bfin/bfin.c (bfin_init_builtins): Revert a part of the patch
+	that's only needed in 4.x.
+
 2006-01-24  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (addv2hi3, subv2hi3, sminv2hi3, smaxv2hi3,
