@@ -20,6 +20,17 @@
 	mulhisi_lh, mulhisi_hl, mulhisi_hh, ssnegv2hi2, ssashiftv2hi3,
 	ssashifthi3, lshiftv2hi3, lshifthi3): New patterns.
 
+	* config/bfin/bfin.h (TARGET_CPP_CPU_BUILTINS): Define __ADSPBLACKFIN__.
+	* config/bfin/bfin.c: Include "optabs.h".
+	(enum blackfin_builtins): Expand with a lot of new codes.
+	(bfin_init_builtins): Initialize fractional math builtins.
+	(struct builtin_description): New struct.
+	(bdesc_2arg, bdesc_arg): New arrays.
+	(safe_vector_operand, bfin_expand_binop_builtin,
+	bfin_expand_unop_builtin): New functions.
+	(bfin_expand_builtin): Use them; add code to support fractional math
+	builtins.
+
 2006-01-24  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (addv2hi3, subv2hi3, sminv2hi3, smaxv2hi3,

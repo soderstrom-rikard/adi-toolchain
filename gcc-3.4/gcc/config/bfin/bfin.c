@@ -33,6 +33,7 @@
 #include "expr.h"
 #include "toplev.h"
 #include "recog.h"
+#include "optabs.h"
 #include "ggc.h"
 #include "integrate.h"
 #include "cgraph.h"
@@ -3105,6 +3106,51 @@ enum bfin_builtins
 {
   BFIN_BUILTIN_CSYNC,
   BFIN_BUILTIN_SSYNC,
+  BFIN_BUILTIN_COMPOSE_2X16,
+  BFIN_BUILTIN_EXTRACTLO,
+  BFIN_BUILTIN_EXTRACTHI,
+
+  BFIN_BUILTIN_SSADD_2X16,
+  BFIN_BUILTIN_SSSUB_2X16,
+  BFIN_BUILTIN_SSADDSUB_2X16,
+  BFIN_BUILTIN_SSSUBADD_2X16,
+  BFIN_BUILTIN_MULT_2X16,
+  BFIN_BUILTIN_MULTR_2X16,
+  BFIN_BUILTIN_NEG_2X16,
+  BFIN_BUILTIN_ABS_2X16,
+  BFIN_BUILTIN_MIN_2X16,
+  BFIN_BUILTIN_MAX_2X16,
+
+  BFIN_BUILTIN_SSADD_1X16,
+  BFIN_BUILTIN_SSSUB_1X16,
+  BFIN_BUILTIN_MULT_1X16,
+  BFIN_BUILTIN_MULTR_1X16,
+  BFIN_BUILTIN_NORM_1X16,
+  BFIN_BUILTIN_NEG_1X16,
+  BFIN_BUILTIN_ABS_1X16,
+  BFIN_BUILTIN_MIN_1X16,
+  BFIN_BUILTIN_MAX_1X16,
+
+  BFIN_BUILTIN_DIFFHL_2X16,
+  BFIN_BUILTIN_DIFFLH_2X16,
+
+  BFIN_BUILTIN_SSADD_1X32,
+  BFIN_BUILTIN_SSSUB_1X32,
+  BFIN_BUILTIN_NORM_1X32,
+  BFIN_BUILTIN_NEG_1X32,
+  BFIN_BUILTIN_MIN_1X32,
+  BFIN_BUILTIN_MAX_1X32,
+
+  BFIN_BUILTIN_MULHISILL,
+  BFIN_BUILTIN_MULHISILH,
+  BFIN_BUILTIN_MULHISIHL,
+  BFIN_BUILTIN_MULHISIHH,
+
+  BFIN_BUILTIN_LSHIFT_1X16,
+  BFIN_BUILTIN_LSHIFT_2X16,
+  BFIN_BUILTIN_SSASHIFT_1X16,
+  BFIN_BUILTIN_SSASHIFT_2X16,
+
   BFIN_BUILTIN_MAX
 };
 
@@ -3118,12 +3164,285 @@ do {								\
 static void
 bfin_init_builtins (void)
 {
+  tree V2HI_type_node = build_vector_type_for_mode (intHI_type_node, V2HImode);
   tree void_ftype_void
     = build_function_type (void_type_node, void_list_node);
+  tree short_ftype_short
+    = build_function_type_list (short_integer_type_node, short_integer_type_node,
+				NULL_TREE);
+  tree short_ftype_int_int
+    = build_function_type_list (short_integer_type_node, integer_type_node,
+				integer_type_node, NULL_TREE);
+  tree int_ftype_int_int
+    = build_function_type_list (integer_type_node, integer_type_node,
+				integer_type_node, NULL_TREE);
+  tree int_ftype_int
+    = build_function_type_list (integer_type_node, integer_type_node,
+				NULL_TREE);
+  tree short_ftype_int
+    = build_function_type_list (short_integer_type_node, integer_type_node,
+				NULL_TREE);
+  tree int_ftype_v2hi_v2hi
+    = build_function_type_list (integer_type_node, V2HI_type_node,
+				V2HI_type_node, NULL_TREE);
+  tree v2hi_ftype_v2hi_v2hi
+    = build_function_type_list (V2HI_type_node, V2HI_type_node,
+				V2HI_type_node, NULL_TREE);
+  tree v2hi_ftype_int_int
+    = build_function_type_list (V2HI_type_node, integer_type_node,
+				integer_type_node, NULL_TREE);
+  tree v2hi_ftype_v2hi_int
+    = build_function_type_list (V2HI_type_node, V2HI_type_node,
+				integer_type_node, NULL_TREE);
+  tree short_ftype_v2hi_v2hi
+    = build_function_type_list (V2HI_type_node, short_integer_type_node,
+				short_integer_type_node, NULL_TREE);
+  tree v2hi_ftype_v2hi
+    = build_function_type_list (V2HI_type_node, V2HI_type_node, NULL_TREE);
+  tree short_ftype_v2hi
+    = build_function_type_list (short_integer_type_node, V2HI_type_node,
+				NULL_TREE);
 
   /* Add the remaining MMX insns with somewhat more complicated types.  */
   def_builtin ("__builtin_bfin_csync", void_ftype_void, BFIN_BUILTIN_CSYNC);
   def_builtin ("__builtin_bfin_ssync", void_ftype_void, BFIN_BUILTIN_SSYNC);
+
+  def_builtin ("__builtin_compose_2x16", v2hi_ftype_int_int,
+	       BFIN_BUILTIN_COMPOSE_2X16);
+  def_builtin ("__builtin_extract_hi", short_ftype_v2hi,
+	       BFIN_BUILTIN_EXTRACTHI);
+  def_builtin ("__builtin_extract_lo", short_ftype_v2hi,
+	       BFIN_BUILTIN_EXTRACTLO);
+
+  def_builtin ("__builtin_min_fr2x16", v2hi_ftype_v2hi_v2hi,
+	       BFIN_BUILTIN_MIN_2X16);
+  def_builtin ("__builtin_max_fr2x16", v2hi_ftype_v2hi_v2hi,
+	       BFIN_BUILTIN_MAX_2X16);
+
+  def_builtin ("__builtin_add_fr2x16", v2hi_ftype_v2hi_v2hi,
+	       BFIN_BUILTIN_SSADD_2X16);
+  def_builtin ("__builtin_sub_fr2x16", v2hi_ftype_v2hi_v2hi,
+	       BFIN_BUILTIN_SSSUB_2X16);
+  def_builtin ("__builtin_dspaddsubsat", v2hi_ftype_v2hi_v2hi,
+	       BFIN_BUILTIN_SSADDSUB_2X16);
+  def_builtin ("__builtin_dspsubaddsat", v2hi_ftype_v2hi_v2hi,
+	       BFIN_BUILTIN_SSSUBADD_2X16);
+  def_builtin ("__builtin_mult_fr2x16", v2hi_ftype_v2hi_v2hi,
+	       BFIN_BUILTIN_MULT_2X16);
+  def_builtin ("__builtin_multr_fr2x16", v2hi_ftype_v2hi_v2hi,
+	       BFIN_BUILTIN_MULTR_2X16);
+  def_builtin ("__builtin_negate_fr2x16", v2hi_ftype_v2hi,
+	       BFIN_BUILTIN_NEG_2X16);
+  def_builtin ("__builtin_abs_fr2x16", v2hi_ftype_v2hi,
+	       BFIN_BUILTIN_ABS_2X16);
+
+  def_builtin ("__builtin_add_fr1x16", short_ftype_int_int,
+	       BFIN_BUILTIN_SSADD_1X16);
+  def_builtin ("__builtin_sub_fr1x16", short_ftype_int_int,
+	       BFIN_BUILTIN_SSSUB_1X16);
+  def_builtin ("__builtin_mult_fr1x16", short_ftype_int_int,
+	       BFIN_BUILTIN_MULT_1X16);
+  def_builtin ("__builtin_multr_fr1x16", short_ftype_int_int,
+	       BFIN_BUILTIN_MULTR_1X16);
+  def_builtin ("__builtin_negate_fr1x16", short_ftype_short,
+	       BFIN_BUILTIN_NEG_1X16);
+  def_builtin ("__builtin_abs_fr1x16", short_ftype_short,
+	       BFIN_BUILTIN_ABS_1X16);
+  def_builtin ("__builtin_norm_fr1x16", short_ftype_int,
+	       BFIN_BUILTIN_NORM_1X16);
+
+  def_builtin ("__builtin_diff_hl_fr2x16", short_ftype_v2hi,
+	       BFIN_BUILTIN_DIFFHL_2X16);
+  def_builtin ("__builtin_diff_lh_fr2x16", short_ftype_v2hi,
+	       BFIN_BUILTIN_DIFFLH_2X16);
+
+  def_builtin ("__builtin_mulhisill", int_ftype_v2hi_v2hi,
+	       BFIN_BUILTIN_MULHISILL);
+  def_builtin ("__builtin_mulhisihl", int_ftype_v2hi_v2hi,
+	       BFIN_BUILTIN_MULHISIHL);
+  def_builtin ("__builtin_mulhisilh", int_ftype_v2hi_v2hi,
+	       BFIN_BUILTIN_MULHISILH);
+  def_builtin ("__builtin_mulhisihh", int_ftype_v2hi_v2hi,
+	       BFIN_BUILTIN_MULHISIHH);
+
+  def_builtin ("__builtin_add_fr1x32", int_ftype_int_int,
+	       BFIN_BUILTIN_SSADD_1X32);
+  def_builtin ("__builtin_sub_fr1x32", int_ftype_int_int,
+	       BFIN_BUILTIN_SSSUB_1X32);
+  def_builtin ("__builtin_negate_fr1x32", int_ftype_int,
+	       BFIN_BUILTIN_NEG_1X32);
+  def_builtin ("__builtin_norm_fr1x32", short_ftype_int,
+	       BFIN_BUILTIN_NORM_1X32);
+
+  /* Shifts.  */
+  def_builtin ("__builtin_shl_fr1x16", short_ftype_int_int,
+	       BFIN_BUILTIN_SSASHIFT_1X16);
+  def_builtin ("__builtin_shl_fr2x16", v2hi_ftype_v2hi_int,
+	       BFIN_BUILTIN_SSASHIFT_2X16);
+  def_builtin ("__builtin_lshl_fr1x16", short_ftype_int_int,
+	       BFIN_BUILTIN_LSHIFT_1X16);
+  def_builtin ("__builtin_lshl_fr2x16", v2hi_ftype_v2hi_int,
+	       BFIN_BUILTIN_LSHIFT_2X16);
+}
+
+
+struct builtin_description
+{
+  const enum insn_code icode;
+  const char *const name;
+  const enum bfin_builtins code;
+  const enum rtx_code comparison;
+  const unsigned int flag;
+};
+
+static const struct builtin_description bdesc_2arg[] =
+{
+  { CODE_FOR_ssashiftv2hi3, "__builtin_shl_fr2x16", BFIN_BUILTIN_SSASHIFT_2X16, 0, 0 },
+  { CODE_FOR_ssashifthi3, "__builtin_shl_fr1x16", BFIN_BUILTIN_SSASHIFT_1X16, 0, 0 },
+  { CODE_FOR_lshiftv2hi3, "__builtin_lshl_fr2x16", BFIN_BUILTIN_LSHIFT_2X16, 0, 0 },
+  { CODE_FOR_lshifthi3, "__builtin_lshl_fr1x16", BFIN_BUILTIN_LSHIFT_1X16, 0, 0 },
+
+  { CODE_FOR_sminhi3, "__builtin_min_fr1x16", BFIN_BUILTIN_MIN_1X16, 0, 0 },
+  { CODE_FOR_smaxhi3, "__builtin_max_fr1x16", BFIN_BUILTIN_MAX_1X16, 0, 0 },
+  { CODE_FOR_ssaddhi3, "__builtin_add_fr1x16", BFIN_BUILTIN_SSADD_1X16, 0, 0 },
+  { CODE_FOR_sssubhi3, "__builtin_sub_fr1x16", BFIN_BUILTIN_SSSUB_1X16, 0, 0 },
+  { CODE_FOR_frtmulhi3, "__builtin_mult_fr1x16", BFIN_BUILTIN_MULT_1X16, 0, 0 },
+  { CODE_FOR_frmulhi3, "__builtin_multr_fr1x16", BFIN_BUILTIN_MULTR_1X16, 0, 0 },
+
+  { CODE_FOR_sminsi3, "__builtin_min_fr1x32", BFIN_BUILTIN_MIN_1X32, 0, 0 },
+  { CODE_FOR_smaxsi3, "__builtin_max_fr1x32", BFIN_BUILTIN_MAX_1X32, 0, 0 },
+  { CODE_FOR_ssaddsi3, "__builtin_add_fr1x32", BFIN_BUILTIN_SSADD_1X32, 0, 0 },
+  { CODE_FOR_sssubsi3, "__builtin_sub_fr1x32", BFIN_BUILTIN_SSSUB_1X32, 0, 0 },
+
+  { CODE_FOR_sminv2hi3, "__builtin_min_fr2x16", BFIN_BUILTIN_MIN_2X16, 0, 0 },
+  { CODE_FOR_smaxv2hi3, "__builtin_max_fr2x16", BFIN_BUILTIN_MAX_2X16, 0, 0 },
+  { CODE_FOR_ssaddv2hi3, "__builtin_add_fr2x16", BFIN_BUILTIN_SSADD_2X16, 0, 0 },
+  { CODE_FOR_sssubv2hi3, "__builtin_sub_fr2x16", BFIN_BUILTIN_SSSUB_2X16, 0, 0 },
+  { CODE_FOR_ssaddsubv2hi3, "__builtin_dspaddsubsat", BFIN_BUILTIN_SSADDSUB_2X16, 0, 0 },
+  { CODE_FOR_sssubaddv2hi3, "__builtin_dspsubaddsat", BFIN_BUILTIN_SSSUBADD_2X16, 0, 0 },
+  { CODE_FOR_frtmulv2hi, "__builtin_mult_fr2x16", BFIN_BUILTIN_MULT_2X16, 0, 0 },
+  { CODE_FOR_frmulv2hi, "__builtin_multr_fr2x16", BFIN_BUILTIN_MULTR_2X16, 0, 0 }
+};
+
+static const struct builtin_description bdesc_1arg[] =
+{
+  { CODE_FOR_signbitshi2, "__builtin_norm_fr1x16", BFIN_BUILTIN_NORM_1X16, 0, 0 },
+  { CODE_FOR_ssneghi2, "__builtin_negate_fr1x16", BFIN_BUILTIN_NEG_1X16, 0, 0 },
+  { CODE_FOR_abshi2, "__builtin_abs_fr1x16", BFIN_BUILTIN_ABS_1X16, 0, 0 },
+
+  { CODE_FOR_signbitssi2, "__builtin_norm_fr1x32", BFIN_BUILTIN_NORM_1X32, 0, 0 },
+  { CODE_FOR_ssnegsi2, "__builtin_negate_fr1x32", BFIN_BUILTIN_NEG_1X32, 0, 0 },
+
+  { CODE_FOR_movv2hi_hi_low, "__builtin_extract_lo", BFIN_BUILTIN_EXTRACTLO, 0, 0 },
+  { CODE_FOR_movv2hi_hi_high, "__builtin_extract_hi", BFIN_BUILTIN_EXTRACTHI, 0, 0 },
+  { CODE_FOR_ssnegv2hi2, "__builtin_negate_fr2x16", BFIN_BUILTIN_NEG_2X16, 0, 0 },
+  { CODE_FOR_absv2hi2, "__builtin_abs_fr2x16", BFIN_BUILTIN_ABS_2X16, 0, 0 }
+};
+
+/* Errors in the source file can cause expand_expr to return const0_rtx
+   where we expect a vector.  To avoid crashing, use one of the vector
+   clear instructions.  */
+static rtx
+safe_vector_operand (rtx x, enum machine_mode mode)
+{
+  if (x != const0_rtx)
+    return x;
+  x = gen_reg_rtx (SImode);
+
+  emit_insn (gen_movsi (x, CONST0_RTX (SImode)));
+  return gen_lowpart (mode, x);
+}
+
+/* Subroutine of bfin_expand_builtin to take care of binop insns.  */
+
+static rtx
+bfin_expand_binop_builtin (enum insn_code icode, tree arglist, rtx target)
+{
+  rtx pat;
+  tree arg0 = TREE_VALUE (arglist);
+  tree arg1 = TREE_VALUE (TREE_CHAIN (arglist));
+  rtx op0 = expand_expr (arg0, NULL_RTX, VOIDmode, 0);
+  rtx op1 = expand_expr (arg1, NULL_RTX, VOIDmode, 0);
+  enum machine_mode op0mode = GET_MODE (op0);
+  enum machine_mode op1mode = GET_MODE (op1);
+  enum machine_mode tmode = insn_data[icode].operand[0].mode;
+  enum machine_mode mode0 = insn_data[icode].operand[1].mode;
+  enum machine_mode mode1 = insn_data[icode].operand[2].mode;
+
+  if (VECTOR_MODE_P (mode0))
+    op0 = safe_vector_operand (op0, mode0);
+  if (VECTOR_MODE_P (mode1))
+    op1 = safe_vector_operand (op1, mode1);
+
+  if (! target
+      || GET_MODE (target) != tmode
+      || ! (*insn_data[icode].operand[0].predicate) (target, tmode))
+    target = gen_reg_rtx (tmode);
+
+  if (op0mode == SImode && mode0 == HImode)
+    {
+      op0mode = HImode;
+      op0 = gen_lowpart (HImode, op0);
+    }
+  if (op1mode == SImode && mode1 == HImode)
+    {
+      op1mode = HImode;
+      op1 = gen_lowpart (HImode, op1);
+    }
+  /* In case the insn wants input operands in modes different from
+     the result, abort.  */
+  gcc_assert ((op0mode == mode0 || op0mode == VOIDmode)
+	      && (op1mode == mode1 || op1mode == VOIDmode));
+
+  if (! (*insn_data[icode].operand[1].predicate) (op0, mode0))
+    op0 = copy_to_mode_reg (mode0, op0);
+  if (! (*insn_data[icode].operand[2].predicate) (op1, mode1))
+    op1 = copy_to_mode_reg (mode1, op1);
+
+  pat = GEN_FCN (icode) (target, op0, op1);
+  if (! pat)
+    return 0;
+
+  emit_insn (pat);
+  return target;
+}
+
+/* Subroutine of bfin_expand_builtin to take care of unop insns.  */
+
+static rtx
+bfin_expand_unop_builtin (enum insn_code icode, tree arglist,
+			  rtx target)
+{
+  rtx pat;
+  tree arg0 = TREE_VALUE (arglist);
+  rtx op0 = expand_expr (arg0, NULL_RTX, VOIDmode, 0);
+  enum machine_mode op0mode = GET_MODE (op0);
+  enum machine_mode tmode = insn_data[icode].operand[0].mode;
+  enum machine_mode mode0 = insn_data[icode].operand[1].mode;
+
+  if (! target
+      || GET_MODE (target) != tmode
+      || ! (*insn_data[icode].operand[0].predicate) (target, tmode))
+    target = gen_reg_rtx (tmode);
+
+  if (VECTOR_MODE_P (mode0))
+    op0 = safe_vector_operand (op0, mode0);
+
+  if (op0mode == SImode && mode0 == HImode)
+    {
+      op0mode = HImode;
+      op0 = gen_lowpart (HImode, op0);
+    }
+  gcc_assert (op0mode == mode0 || op0mode == VOIDmode);
+
+  if (! (*insn_data[icode].operand[1].predicate) (op0, mode0))
+    op0 = copy_to_mode_reg (mode0, op0);
+
+  pat = GEN_FCN (icode) (target, op0);
+  if (! pat)
+    return 0;
+  emit_insn (pat);
+  return target;
 }
 
 /* Expand an expression EXP that calls a built-in function,
@@ -3138,8 +3457,15 @@ bfin_expand_builtin (tree exp, rtx target ATTRIBUTE_UNUSED,
 		     enum machine_mode mode ATTRIBUTE_UNUSED,
 		     int ignore ATTRIBUTE_UNUSED)
 {
+  size_t i;
+  enum insn_code icode;
+  const struct builtin_description *d;
   tree fndecl = TREE_OPERAND (TREE_OPERAND (exp, 0), 0);
+  tree arglist = TREE_OPERAND (exp, 1);
   unsigned int fcode = DECL_FUNCTION_CODE (fndecl);
+  tree arg0;
+  rtx op0, pat;
+  enum machine_mode tmode, mode0;
 
   switch (fcode)
     {
@@ -3150,9 +3476,45 @@ bfin_expand_builtin (tree exp, rtx target ATTRIBUTE_UNUSED,
       emit_insn (gen_ssync ());
       return 0;
 
+    case BFIN_BUILTIN_DIFFHL_2X16:
+    case BFIN_BUILTIN_DIFFLH_2X16:
+      arg0 = TREE_VALUE (arglist);
+      op0 = expand_expr (arg0, NULL_RTX, VOIDmode, 0);
+      icode = (fcode == BFIN_BUILTIN_DIFFHL_2X16
+	       ? CODE_FOR_subhilov2hi3 : CODE_FOR_sublohiv2hi3);
+      tmode = insn_data[icode].operand[0].mode;
+      mode0 = insn_data[icode].operand[1].mode;
+
+      if (! target
+	  || GET_MODE (target) != tmode
+	  || ! (*insn_data[icode].operand[0].predicate) (target, tmode))
+	target = gen_reg_rtx (tmode);
+
+      if (VECTOR_MODE_P (mode0))
+	op0 = safe_vector_operand (op0, mode0);
+
+      if (! (*insn_data[icode].operand[1].predicate) (op0, mode0))
+	op0 = copy_to_mode_reg (mode0, op0);
+
+      pat = GEN_FCN (icode) (target, op0, op0);
+      if (! pat)
+	return 0;
+      emit_insn (pat);
+      return target;
+
     default:
-      gcc_unreachable ();
+      break;
     }
+
+  for (i = 0, d = bdesc_2arg; i < ARRAY_SIZE (bdesc_2arg); i++, d++)
+    if (d->code == fcode)
+      return bfin_expand_binop_builtin (d->icode, arglist, target);
+
+  for (i = 0, d = bdesc_1arg; i < ARRAY_SIZE (bdesc_1arg); i++, d++)
+    if (d->code == fcode)
+      return bfin_expand_unop_builtin (d->icode, arglist, target);
+
+  gcc_unreachable ();
 }
 
 #undef TARGET_INIT_BUILTINS

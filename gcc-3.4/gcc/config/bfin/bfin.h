@@ -51,6 +51,7 @@ extern int target_flags;
   do                                            \
     {                                           \
       builtin_define ("bfin");                  \
+      builtin_define ("__ADSPBLACKFIN__");	\
       builtin_define ("BFIN");                  \
       builtin_define ("FRIO");                  \
       builtin_define ("frio");                  \
