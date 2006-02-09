@@ -376,6 +376,12 @@ get_allreg (int grp, int reg)
       switch (fullreg)
 	{
 	case 39: return &saved_state.rets;
+	case 48: return &LC0REG;
+	case 49: return &LT0REG;
+	case 50: return &LB0REG;
+	case 51: return &LC1REG;
+	case 52: return &LT1REG;
+	case 53: return &LB1REG;
 	}
       return 0;
     }

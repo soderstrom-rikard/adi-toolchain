@@ -1,3 +1,8 @@
+2006-02-09  Jie Zhang  <jie.zhang@analog.com>
+
+	Task[T220]
+	* bfin-dis.c (get_allreg): Decode loop registers.
+
 2006-01-25  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* sim/bfin/bfin-dis.c (setflags_nz_2x16): New function.
