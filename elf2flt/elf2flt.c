@@ -1098,6 +1098,7 @@ dump_symbols(symbols, number_of_symbols);
 				  break;
 				case R_got:
 				case R_byte2_data:
+				case R_unused0:
 				    /* Ignore these.  */
 				    break;
 
