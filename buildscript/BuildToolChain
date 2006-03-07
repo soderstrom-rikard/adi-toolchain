@@ -48,6 +48,7 @@ do
             m4 --version |grep -i m4
             automake --version |grep -i automake
             gettext --version |grep -i gettext
+            msgfmt --version |grep -i msgfmt
             bison --version |grep -i bison
             flex --version
             echo $SHELL
@@ -210,7 +211,7 @@ fi
 
 ############ Check and error if I can't find the things I need #
 
-for PREREQ in gcc "$MAKE" autoconf m4 automake gettext bison flex
+for PREREQ in gcc "$MAKE" autoconf m4 automake gettext msgfmt bison flex
 do
     RUN=`$PREREQ --help 2>/dev/null | wc -l`
     if [ $RUN -eq 0 ] ; then
