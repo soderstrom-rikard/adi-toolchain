@@ -1,0 +1,3 @@
+2006-03-11  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/uclinux.h: Define _GNU_SOURCE in CPLUSPLUS_CPP_SPEC.
