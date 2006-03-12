@@ -95,10 +95,10 @@ __udivsi3:
 
 ___umodsi3:
 __umodsi3:
-        P1 = RETS;
-        CALL ___udivsi3;
+	[--SP] = RETS;
+	CALL ___udivsi3;
 	R0 = R3;
-	RETS = P1; 
-        RTS;
+	RETS = [SP++]; 
+	RTS;
 #endif
 

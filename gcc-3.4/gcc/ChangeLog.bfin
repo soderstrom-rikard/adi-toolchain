@@ -1,3 +1,7 @@
+2006-03-12  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/lib1funcs.asm (___umodsi3): Save RETS on the stack.
+
 2006-01-31  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* rtl.def (SS_ASHIFT, SS_NEG): New codes.
