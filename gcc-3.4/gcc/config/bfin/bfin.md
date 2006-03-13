@@ -1516,9 +1516,10 @@
 	 (match_operand 1 "general_operand" "g"))
    (use (match_operand 2 "" ""))]
   "! SIBLING_CALL_P (insn)
+   && !TARGET_ID_SHARED_LIBRARY
    && GET_CODE (operands[0]) == SYMBOL_REF
    && !bfin_longcall_p (operands[0], INTVAL (operands[2]))"
-  "call %G0;"
+  "call %0;"
   [(set_attr "type" "call")
    (set_attr "length" "4")])
 
@@ -1528,9 +1529,10 @@
    (use (match_operand 2 "" ""))
    (return)]
   "SIBLING_CALL_P (insn)
+   && !TARGET_ID_SHARED_LIBRARY
    && GET_CODE (operands[0]) == SYMBOL_REF
    && !bfin_longcall_p (operands[0], INTVAL (operands[2]))"
-  "jump.l %G0;"
+  "jump.l %0;"
   [(set_attr "type" "br")
    (set_attr "length" "4")])
 
@@ -1540,9 +1542,10 @@
 	      (match_operand 2 "general_operand" "g")))
    (use (match_operand 3 "" ""))]
   "! SIBLING_CALL_P (insn)
+   && !TARGET_ID_SHARED_LIBRARY
    && GET_CODE (operands[1]) == SYMBOL_REF
    && !bfin_longcall_p (operands[1], INTVAL (operands[3]))"
-  "call %G1;"
+  "call %1;"
   [(set_attr "type" "call")
    (set_attr "length" "4")])
 
@@ -1553,9 +1556,10 @@
    (use (match_operand 3 "" ""))
    (return)]
   "SIBLING_CALL_P (insn)
+   && !TARGET_ID_SHARED_LIBRARY
    && GET_CODE (operands[1]) == SYMBOL_REF
    && !bfin_longcall_p (operands[1], INTVAL (operands[3]))"
-  "jump.l %G1;"
+  "jump.l %1;"
   [(set_attr "type" "br")
    (set_attr "length" "4")])
 
