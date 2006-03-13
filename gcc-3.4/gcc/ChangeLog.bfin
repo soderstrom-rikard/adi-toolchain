@@ -1,3 +1,10 @@
+2006-03-13  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): If
+	TARGET_ID_SHARED_LIBRARY, define __ID_SHARED_LIB__.
+	* config/bfin/crti.S: Use it instead of __PIC__.
+	* config/bfin/crtn.S: Likewise.
+
 2006-03-12  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/lib1funcs.asm (___umodsi3): Save RETS on the stack.
