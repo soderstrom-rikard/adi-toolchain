@@ -658,7 +658,8 @@ $(srcdir)/config/m68k-parse.h: ; @true
 bfin-parse.c: $(srcdir)/config/bfin-parse.y
 	$(SHELL) $(YLWRAP) "$(YACC)" $(srcdir)/config/bfin-parse.y y.tab.c bfin-parse.c y.tab.h bfin-parse.h -- -d
 bfin-parse.h: bfin-parse.c
-bfin-parse.o: bfin-parse.c bfin-parse.h $(srcdir)/config/bfin-defs.h
+bfin-parse.o: bfin-parse.c bfin-parse.h $(srcdir)/config/bfin-defs.h \
+ $(INCDIR)/elf/common.h $(INCDIR)/elf/bfin.h $(BFDDIR)/libbfd.h
 
 # Don't let the .y.h rule clobber bfin-defs.h.
 bfin-defs.h: ; @true
@@ -1069,7 +1070,8 @@ DEPTC_bfin_elf = $(INCDIR)/symcat.h $(srcdir)/config/obj-elf.h \
   $(BFDDIR)/elf-bfd.h $(INCDIR)/elf/common.h $(INCDIR)/elf/internal.h \
   $(INCDIR)/elf/external.h $(INCDIR)/bfdlink.h $(srcdir)/config/tc-bfin.h \
   $(INCDIR)/safe-ctype.h subsegs.h $(INCDIR)/obstack.h \
-  $(INCDIR)/opcode/bfin.h $(srcdir)/config/bfin-defs.h
+  $(INCDIR)/opcode/bfin.h $(srcdir)/config/bfin-defs.h $(INCDIR)/elf/common.h \
+  $(INCDIR)/elf/bfin.h $(BFDDIR)/libbfd.h
 DEPTC_cris_aout = $(INCDIR)/symcat.h $(srcdir)/config/obj-aout.h \
   $(srcdir)/config/tc-cris.h $(BFDDIR)/libaout.h $(INCDIR)/bfdlink.h \
   $(INCDIR)/safe-ctype.h subsegs.h $(INCDIR)/obstack.h \

@@ -277,6 +277,7 @@ typedef enum
   Expr_Node_Binop,		/* binary operator */
   Expr_Node_Unop,		/* unary operator */
   Expr_Node_Reloc,		/* symbol to be relocated. */
+  Expr_Node_GOT_Reloc,		/* symbol to be relocated. */
   Expr_Node_Constant 		/* constant */
 } Expr_Node_Type;
 
