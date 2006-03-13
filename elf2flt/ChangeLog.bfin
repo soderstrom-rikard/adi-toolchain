@@ -1,3 +1,8 @@
+2006-03-13  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* flat.h (struct flat_hdr): Restore the use of uint32_t rather than
+	unsigned long.
+
 2006-02-14  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* elf2flt.c (output_relocs): Ignore R_unused0.
