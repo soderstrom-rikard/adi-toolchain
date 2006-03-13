@@ -233,8 +233,7 @@ HFILES = \
 	subsegs.h \
 	symbols.h \
 	tc.h \
-	write.h \
-        bfin-defs.h
+	write.h
 
 # CPU files in config.
 
@@ -244,6 +243,7 @@ TARGET_CPU_CFILES = \
 	config/tc-arc.c \
 	config/tc-arm.c \
 	config/tc-avr.c \
+	config/tc-bfin.c \
 	config/tc-cris.c \
 	config/tc-crx.c \
 	config/tc-d10v.c \
@@ -270,7 +270,6 @@ TARGET_CPU_CFILES = \
 	config/tc-mn10200.c \
 	config/tc-mn10300.c \
 	config/tc-msp430.c \
-        config/tc-bfin.c \
 	config/tc-ns32k.c \
 	config/tc-openrisc.c \
 	config/tc-or32.c \
@@ -298,6 +297,8 @@ TARGET_CPU_HFILES = \
 	config/tc-arc.h \
 	config/tc-arm.h \
 	config/tc-avr.h \
+	config/tc-bfin.h \
+	config/bfin-defs.h \
 	config/tc-cris.h \
 	config/tc-crx.h \
 	config/tc-d10v.h \
@@ -324,7 +325,6 @@ TARGET_CPU_HFILES = \
 	config/tc-mn10200.h \
 	config/tc-mn10300.h \
 	config/tc-msp430.h \
-        config/tc-bfin.h \
 	config/tc-ns32k.h \
 	config/tc-openrisc.h \
 	config/tc-or32.h \

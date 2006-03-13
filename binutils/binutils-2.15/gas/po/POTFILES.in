@@ -13,6 +13,7 @@ bit_fix.h
 cgen.h
 cond.c
 cond.c
+config/bfin-defs.h
 config/e-crisaout.c
 config/e-criself.c
 config/e-i386aout.c
@@ -50,6 +51,8 @@ config/tc-arm.c
 config/tc-arm.h
 config/tc-avr.c
 config/tc-avr.h
+config/tc-bfin.c
+config/tc-bfin.h
 config/tc-cris.c
 config/tc-cris.h
 config/tc-crx.c
