@@ -251,9 +251,6 @@ done
 NEW_PATH=$NEW_PATH:
 PATH=$NEW_PATH
 
-# Add output dir so when building uclibc, it can find the toolchain
-export PATH=$NEW_PATH:/$DIR_ELF_OUTPUT/bin:/$DIR_uC_OUTPUT/bin
-
 ############ SOURCE MUST PROVIDED WITH COMMAND LINE ARGUMENT ###
 if [ ! $DIR_SOURCE ] ; then
     echo "Usage : $APP_NAME -s SOURCE [-b BUILD]"
@@ -477,6 +474,10 @@ mkdir $DIR_BINUTILS_BUILD
 mkdir $DIR_GCC_BUILD
 mkdir $DIR_ELF2FLT_BUILD
 mkdir $DIR_GENEXT2FS_BUILD
+
+
+# Add output dir so when building uclibc, it can find the toolchain
+export PATH=$NEW_PATH:/$DIR_ELF_OUTPUT/bin:/$DIR_uC_OUTPUT/bin
 
 #################################################################
 ############## DONOT CHANGE ANYTHING BELOW THIS LINE ############
