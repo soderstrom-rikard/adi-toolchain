@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-09-16 23:00+0930\n"
+"POT-Creation-Date: 2006-03-13 00:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,23 +28,23 @@ msgstr ""
 msgid "Illegal limm reference in last instruction!\n"
 msgstr ""
 
-#: arm-dis.c:563
+#: arm-dis.c:565
 msgid "<illegal precision>"
 msgstr ""
 
 #. XXX - should break 'option' at following delimiter.
-#: arm-dis.c:1199
+#: arm-dis.c:1210
 #, c-format
 msgid "Unrecognised register name set: %s\n"
 msgstr ""
 
 #. XXX - should break 'option' at following delimiter.
-#: arm-dis.c:1207
+#: arm-dis.c:1218
 #, c-format
 msgid "Unrecognised disassembler option: %s\n"
 msgstr ""
 
-#: arm-dis.c:1376
+#: arm-dis.c:1391
 #, c-format
 msgid ""
 "\n"
@@ -94,13 +94,13 @@ msgstr ""
 msgid "Address 0x%x is out of bounds.\n"
 msgstr ""
 
-#: fr30-asm.c:323 frv-asm.c:967 ip2k-asm.c:574 iq2000-asm.c:460 m32r-asm.c:338
+#: fr30-asm.c:323 frv-asm.c:967 ip2k-asm.c:574 iq2000-asm.c:464 m32r-asm.c:338
 #: openrisc-asm.c:261 xstormy16-asm.c:284
 #, c-format
 msgid "Unrecognized field %d while parsing.\n"
 msgstr ""
 
-#: fr30-asm.c:372 frv-asm.c:1016 ip2k-asm.c:623 iq2000-asm.c:509
+#: fr30-asm.c:372 frv-asm.c:1016 ip2k-asm.c:623 iq2000-asm.c:513
 #: m32r-asm.c:387 openrisc-asm.c:310 xstormy16-asm.c:333
 msgid "missing mnemonic in syntax string"
 msgstr ""
@@ -108,43 +108,43 @@ msgstr ""
 #. We couldn't parse it.
 #: fr30-asm.c:507 fr30-asm.c:511 fr30-asm.c:598 fr30-asm.c:699 frv-asm.c:1151
 #: frv-asm.c:1155 frv-asm.c:1242 frv-asm.c:1343 ip2k-asm.c:758 ip2k-asm.c:762
-#: ip2k-asm.c:849 ip2k-asm.c:950 iq2000-asm.c:644 iq2000-asm.c:648
-#: iq2000-asm.c:735 iq2000-asm.c:836 m32r-asm.c:522 m32r-asm.c:526
+#: ip2k-asm.c:849 ip2k-asm.c:950 iq2000-asm.c:648 iq2000-asm.c:652
+#: iq2000-asm.c:739 iq2000-asm.c:840 m32r-asm.c:522 m32r-asm.c:526
 #: m32r-asm.c:613 m32r-asm.c:714 openrisc-asm.c:445 openrisc-asm.c:449
 #: openrisc-asm.c:536 openrisc-asm.c:637 xstormy16-asm.c:468
 #: xstormy16-asm.c:472 xstormy16-asm.c:559 xstormy16-asm.c:660
 msgid "unrecognized instruction"
 msgstr ""
 
-#: fr30-asm.c:554 frv-asm.c:1198 ip2k-asm.c:805 iq2000-asm.c:691
+#: fr30-asm.c:554 frv-asm.c:1198 ip2k-asm.c:805 iq2000-asm.c:695
 #: m32r-asm.c:569 openrisc-asm.c:492 xstormy16-asm.c:515
 #, c-format
 msgid "syntax error (expected char `%c', found `%c')"
 msgstr ""
 
-#: fr30-asm.c:564 frv-asm.c:1208 ip2k-asm.c:815 iq2000-asm.c:701
+#: fr30-asm.c:564 frv-asm.c:1208 ip2k-asm.c:815 iq2000-asm.c:705
 #: m32r-asm.c:579 openrisc-asm.c:502 xstormy16-asm.c:525
 #, c-format
 msgid "syntax error (expected char `%c', found end of instruction)"
 msgstr ""
 
-#: fr30-asm.c:592 frv-asm.c:1236 ip2k-asm.c:843 iq2000-asm.c:729
+#: fr30-asm.c:592 frv-asm.c:1236 ip2k-asm.c:843 iq2000-asm.c:733
 #: m32r-asm.c:607 openrisc-asm.c:530 xstormy16-asm.c:553
 msgid "junk at end of line"
 msgstr ""
 
-#: fr30-asm.c:698 frv-asm.c:1342 ip2k-asm.c:949 iq2000-asm.c:835
+#: fr30-asm.c:698 frv-asm.c:1342 ip2k-asm.c:949 iq2000-asm.c:839
 #: m32r-asm.c:713 openrisc-asm.c:636 xstormy16-asm.c:659
 msgid "unrecognized form of instruction"
 msgstr ""
 
-#: fr30-asm.c:710 frv-asm.c:1354 ip2k-asm.c:961 iq2000-asm.c:847
+#: fr30-asm.c:710 frv-asm.c:1354 ip2k-asm.c:961 iq2000-asm.c:851
 #: m32r-asm.c:725 openrisc-asm.c:648 xstormy16-asm.c:671
 #, c-format
 msgid "bad instruction `%.50s...'"
 msgstr ""
 
-#: fr30-asm.c:713 frv-asm.c:1357 ip2k-asm.c:964 iq2000-asm.c:850
+#: fr30-asm.c:713 frv-asm.c:1357 ip2k-asm.c:964 iq2000-asm.c:854
 #: m32r-asm.c:728 openrisc-asm.c:651 xstormy16-asm.c:674
 #, c-format
 msgid "bad instruction `%.50s'"
@@ -235,7 +235,7 @@ msgstr ""
 msgid "%02x\t\t*unknown*"
 msgstr ""
 
-#: i386-dis.c:1720
+#: i386-dis.c:1733
 msgid "<internal disassembler error>"
 msgstr ""
 
@@ -398,19 +398,19 @@ msgstr ""
 msgid "Attempt to find bit index of 0"
 msgstr ""
 
-#: iq2000-asm.c:110 iq2000-asm.c:141
+#: iq2000-asm.c:115 iq2000-asm.c:145
 msgid "immediate value cannot be register"
 msgstr ""
 
-#: iq2000-asm.c:120 iq2000-asm.c:151
+#: iq2000-asm.c:125 iq2000-asm.c:155
 msgid "immediate value out of range"
 msgstr ""
 
-#: iq2000-asm.c:180
+#: iq2000-asm.c:184
 msgid "21-bit offset out of range"
 msgstr ""
 
-#: iq2000-asm.c:205 iq2000-asm.c:235 iq2000-asm.c:272 iq2000-asm.c:305
+#: iq2000-asm.c:209 iq2000-asm.c:239 iq2000-asm.c:276 iq2000-asm.c:309
 #: openrisc-asm.c:96 openrisc-asm.c:155
 msgid "missing `)'"
 msgstr ""

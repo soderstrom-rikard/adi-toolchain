@@ -7,6 +7,7 @@ arc-opc.c
 arm-dis.c
 arm-opc.h
 avr-dis.c
+bfin-dis.c
 cgen-asm.c
 cgen-dis.c
 cgen-opc.c
