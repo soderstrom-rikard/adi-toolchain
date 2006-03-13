@@ -578,6 +578,7 @@ extern const bfd_target bfd_elf32_mcore_little_vec;
 extern const bfd_target bfd_elf32_mn10200_vec;
 extern const bfd_target bfd_elf32_mn10300_vec;
 extern const bfd_target bfd_elf32_bfin_vec;
+extern const bfd_target bfd_elf32_bfinfdpic_vec;
 extern const bfd_target bfd_elf32_msp430_vec;
 extern const bfd_target bfd_elf32_nbigmips_vec;
 extern const bfd_target bfd_elf32_nlittlemips_vec;
@@ -825,6 +826,8 @@ static const bfd_target * const _bfd_target_vector[] = {
 	&bfd_efi_app_ia64_vec,
 #endif
 	&bfd_elf32_avr_vec,
+	&bfd_elf32_bfin_vec,
+	&bfd_elf32_bfinfdpic_vec,
 
 	/* This, and other vectors, may not be used in any *.mt configuration.
 	   But that does not mean they are unnecessary.  If configured with
@@ -877,7 +880,6 @@ static const bfd_target * const _bfd_target_vector[] = {
 	&bfd_elf32_mcore_little_vec,
 	&bfd_elf32_mn10200_vec,
 	&bfd_elf32_mn10300_vec,
-        &bfd_elf32_bfin_vec,
 	&bfd_elf32_msp430_vec,
 #ifdef BFD64
 	&bfd_elf32_nbigmips_vec,

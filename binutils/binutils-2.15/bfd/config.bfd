@@ -914,6 +914,7 @@ case "${targ}" in
 
   bfin-*-*)
     targ_defvec=bfd_elf32_bfin_vec
+    targ_selvecs=bfd_elf32_bfinfdpic_vec
     targ_underscore=yes
     ;;
 
