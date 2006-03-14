@@ -824,6 +824,10 @@ if [ $KERNEL_SOURCE ] ; then
     ####################### Step 3 - build uClibc ################
     echo -n "*** Configuring uClibc             " ; date
     cd $UCLIBC_SOURCE
+
+    cp .config .config-saved-buildtoolchain
+    cp extra/Configs/Config.bfin.default .config
+
     RUN="$MAKE oldconfig ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
@@ -839,7 +843,7 @@ if [ $KERNEL_SOURCE ] ; then
     (echo $RUN $LOGFILE ; ) | sh
 
     echo -n "*** Installing uClibc              " ; date
-    RUN="$MAKE install PREFIX=$DIR_uC_OUTPUT/bfin-uclinux DEVEL_PREFIX=\"/\" ROOTDIR=$UCLINUX_ROOT"
+    RUN="$MAKE install PREFIX=$DIR_uC_OUTPUT/bfin-uclinux DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
@@ -852,9 +856,49 @@ if [ $KERNEL_SOURCE ] ; then
             echo "uClibc did not install properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
+	    mv .config-saved-buildtoolchain .config
             exit
         fi
     done
+
+    ####################### Step 3a - build FD-PIC uClibc ################
+    echo -n "*** Configuring uClibc for FD-PIC  " ; date
+
+    cp extra/Configs/Config.bfinfdpic.default .config
+
+    RUN="$MAKE oldconfig ROOTDIR=$UCLINUX_ROOT"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    echo -n "*** Cleaning uClibc                " ; date
+    RUN="$MAKE clean ROOTDIR=$UCLINUX_ROOT"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    echo -n "*** Building uClibc                " ; date
+    RUN="$MAKE all CROSS=bfin-elf- KERNEL_SOURCE=$KERNEL_SOURCE ROOTDIR=$UCLINUX_ROOT"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    echo -n "*** Installing uClibc              " ; date
+    RUN="$MAKE install PREFIX=$DIR_uC_OUTPUT/bfin-uclinux DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ ROOTDIR=$UCLINUX_ROOT"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    # Need a way to look at uClibc make system , and see what libs
+    # should be created
+    for RUN in crt0.o libc.a libcrypt.a libm.a libnsl.a libresolv.a \
+               libutil.a
+    do
+        if [ ! -f $DIR_uC_OUTPUT/bfin-uclinux/lib/$RUN ] ; then
+            echo "FD-PIC uClibc did not install properly : Missing $RUN"
+            echo "Please report an error to http://blackfin.uclinux.org"
+            tail -10 $ACTUAL_LOGFILE
+            exit
+        fi
+    done
+
+    mv .config-saved-buildtoolchain .config
 
     ####################### Done Step 3  #########################
 
