@@ -609,10 +609,6 @@ RUN="$MAKE install"
 (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 (echo $RUN $LOGFILE ; ) | sh
 
-if [ -h $DIR_GCC_SOURCE/newlib ] ; then
-    rm $DIR_GCC_SOURCE/newlib
-fi
-
 for RUN in bfin-elf-addr2line bfin-elf-c++filt bfin-elf-gdbtui          \
            bfin-elf-objdump bfin-elf-size bfin-elf-ar bfin-elf-cpp      \
            bfin-elf-gccbug bfin-elf-ld bfin-elf-ranlib bfin-elf-strings \
@@ -688,6 +684,11 @@ if [ $CHECK_ON_SIMULATOR ] ; then
         tail -$TAIL $FILE
     done
 
+fi
+
+# We cannot remove newlib symlink until the bfin-elf tests finishs.
+if [ -h $DIR_GCC_SOURCE/newlib ] ; then
+    rm $DIR_GCC_SOURCE/newlib
 fi
 
 ####################### Done Step 1  #########################
