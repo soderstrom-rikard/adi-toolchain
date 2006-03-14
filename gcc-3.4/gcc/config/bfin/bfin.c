@@ -1130,7 +1130,7 @@ bfin_dsp_memref_p (rtx x)
   if (! MEM_P (x))
     return false;
   x = XEXP (x, 0);
-  if (GET_CODE (x) == POST_INC || GET_CODE (x) == PRE_INC
+  if (GET_CODE (x) == POST_INC || GET_CODE (x) == POST_DEC
       || GET_CODE (x) == PRE_INC || GET_CODE (x) == PRE_DEC)
     x = XEXP (x, 0);
   return IREG_P (x);

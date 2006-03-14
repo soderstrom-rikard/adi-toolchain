@@ -38,6 +38,8 @@
 	* config/bfin/crti.s (__init, __fini): If __BFIN_FDPIC__, save P3.
 	* config/bfin/crtn.s: Likewise, restore it.
 
+	* config/bfin/bfin.c (bfin_dsp_memref_p): Test all four autoinc codes.
+
 2006-03-13  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): If
