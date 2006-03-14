@@ -1771,7 +1771,10 @@ int main(int argc, char *argv[])
       use_resolved = 1;
       break;
     case 's':
-      stack = atoi(optarg);
+      if((optarg[1] == 'x') || (optarg[1] == 'X'))
+      	stack = strtol(optarg, (char **)NULL, 16);
+      else
+      	stack = strtol(optarg, (char **)NULL, 10);
       break;
     case 'R':
       rel_file = optarg;

@@ -339,7 +339,12 @@ main(int argc, char *argv[])
 		case 'R': ramload = -1;             break;
 		case 'k': ktrace = 1;               break;
 		case 'K': ktrace = -1;              break;
-		case 's': stacksize = atoi(optarg); break;
+		case 's': 
+			if((optarg[1] == 'x') || (optarg[1] == 'X'))
+                                stacksize = strtol(optarg, (char **)NULL, 16);
+                        else
+                                stacksize = strtol(optarg, (char **)NULL, 10);
+			break;
 		case 'o': ofile = optarg;           break;
 		default:
 			usage("invalid option");
