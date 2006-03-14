@@ -623,6 +623,34 @@ do
     fi
 done
 
+if [ -e $DIR_SOURCE/libdsp/Makefile ] ; then
+    echo -n "*** Building libdsp                " ; date
+
+    cd $DIR_SOURCE/libdsp
+    RUN="$MAKE clean"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    RUN="CROSS=bfin-elf- $MAKE"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    if [ ! -e $DIR_SOURCE/libdsp/libdsp.a ] ; then
+        echo "The ELF toolchain did not build libdsp.a properly - report an error"
+        tail -10 $ACTUAL_LOGFILE
+        exit
+    fi
+
+    echo -n "*** Installing libdsp               " ; date
+    RUN="cp $DIR_SOURCE/libdsp/libdsp.a $DIR_ELF_OUTPUT/bfin-elf/lib/libdsp.a"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    cd $DIR_SOURCE/libdsp
+    RUN="$MAKE clean"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+fi
 
 if [ $CHECK_ON_SIMULATOR ] ; then
     echo "*** Testing on simulator            "
@@ -898,6 +926,35 @@ if [ $KERNEL_SOURCE ] ; then
     RUN="$MAKE install "
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
+
+    if [ -e $DIR_SOURCE/libdsp/Makefile ] ; then
+        echo -n "*** Building libdsp                " ; date
+    
+        cd $DIR_SOURCE/libdsp
+        RUN="$MAKE clean"
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh
+    
+        RUN="CROSS=bfin-uclinux- $MAKE"
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh
+    
+        if [ ! -e $DIR_SOURCE/libdsp/libdsp.a ] ; then
+            echo "The uClinux toolchain did not build libdsp.a properly - report an error"
+            tail -10 $ACTUAL_LOGFILE
+            exit
+        fi
+    
+        echo -n "*** Installing libdsp               " ; date
+        RUN="cp $DIR_SOURCE/libdsp/libdsp.a $DIR_uC_OUTPUT/bfin-uclinux/lib/libdsp.a"
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh
+
+        cd $DIR_SOURCE/libdsp
+        RUN="$MAKE clean"
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh
+    fi
 
     ####################### Test bfin-uclinux #######################
 
