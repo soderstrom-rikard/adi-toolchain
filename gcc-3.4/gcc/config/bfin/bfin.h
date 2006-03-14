@@ -41,6 +41,9 @@
  */
 #define MASK_ID_SHARED_LIBRARY	     0x04000000
 
+#define MASK_FDPIC		     0x08000000 /* use FD-PIC ABI */
+#define MASK_INLINE_PLT		     0x10000000
+
 /* Run-time compilation parameters selecting different hardware subsets.  */
 
 extern int target_flags;
@@ -60,6 +63,8 @@ extern int target_flags;
 	  builtin_define ("__PIC__");		\
 	  builtin_define ("__pic__");		\
 	}					\
+      if (TARGET_FDPIC)				\
+	builtin_define ("__BFIN_FDPIC__");	\
       if (TARGET_ID_SHARED_LIBRARY)		\
 	builtin_define ("__ID_SHARED_LIB__");	\
     }                                           \
@@ -70,9 +75,39 @@ extern int target_flags;
 #define CC1_SPEC ""
 #endif
 
-#ifndef ASM_SPEC
-#define ASM_SPEC ""
+#define DRIVER_SELF_SPECS SUBTARGET_DRIVER_SELF_SPECS	"\
+ %{mfdpic:%{!fpic:%{!fpie:%{!fPIC:%{!fPIE:\
+   	    %{!fno-pic:%{!fno-pie:%{!fno-PIC:%{!fno-PIE:-fpie}}}}}}}} \
+	  %{!mno-inline-plt:%{O*:%{!O0:%{!Os:%{fpic|fPIC:-minline-plt} \
+                    %{!fpic:%{!fPIC:%{!O:%{!O1:%{!O2:-minline-plt}}}}}}}}}} \
+"
+#ifndef SUBTARGET_DRIVER_SELF_SPECS
+# define SUBTARGET_DRIVER_SELF_SPECS
 #endif
+
+/* A C string constant that tells the GCC driver program options to pass to
+   the assembler.  It can also specify how to translate options you give to GNU
+   CC into options for GCC to pass to the assembler.  See the file `sun3.h'
+   for an example of this.
+
+   Do not define this macro if it does not need to do anything.
+
+   Defined in svr4.h.  */
+#undef  ASM_SPEC
+#define ASM_SPEC "\
+%{G*} %{v} %{n} %{T} %{Ym,*} %{Yd,*} %{Wa,*:%*} \
+    %{mno-fdpic:-mnopic} %{mfdpic}"
+
+#define LINK_SPEC "\
+%{h*} %{v:-V} \
+%{b} \
+%{mfdpic:-melf32bfinfd -z text} \
+%{static:-dn -Bstatic} \
+%{shared:-Bdynamic} \
+%{symbolic:-Bsymbolic} \
+%{G*} \
+%{YP,*} \
+%{Qy:} %{!Qn:-Qy}"
 
 #undef  LIB_SPEC
 #define LIB_SPEC "-lc"
@@ -87,6 +122,8 @@ extern int target_flags;
 #define TARGET_LONG_CALLS	       (target_flags & MASK_LONG_CALLS)
 #define TARGET_NO_UNDERSCORE	       (target_flags & MASK_NO_UNDERSCORE)
 #define TARGET_ID_SHARED_LIBRARY       (target_flags & MASK_ID_SHARED_LIBRARY)
+#define TARGET_FDPIC		       (target_flags & MASK_FDPIC)
+#define TARGET_INLINE_PLT	       (target_flags & MASK_INLINE_PLT)
 
 #define TARGET_HAS_SYMBOLIC_ADDRESSES  (0)
 #define TARGET_MOVE                    (1)
@@ -117,6 +154,12 @@ extern int target_flags;
     "Do not generate conditional moves"},				\
   { "long-calls",	         MASK_LONG_CALLS,			\
     "Don't generate PC-relative calls, use indirection"},		\
+  { "fdpic",		         MASK_FDPIC,				\
+    "Enable Function Descriptor PIC mode"},				\
+  { "inline-plt",	         MASK_INLINE_PLT,			\
+    "Enable inlining of PLT in function calls"},			\
+  { "no-inline-plt",	         -MASK_INLINE_PLT,			\
+    "Disable inlining of PLT in function calls"},			\
   { "no-cmov",			-MASK_LONG_CALLS,			\
     "Don't use long calls by default"},					\
   { "specld-anomaly",		 MASK_SPECLD_ANOMALY,			\
@@ -225,6 +268,10 @@ extern const char *bfin_library_id_string;
      this macro is not defined, it is up to the machine-dependent files
      to allocate such a register (if necessary). */
 #define PIC_OFFSET_TABLE_REGNUM (REG_P5)
+
+#define FDPIC_FPTR_REGNO REG_P1
+#define FDPIC_REGNO REG_P3
+#define OUR_FDPIC_REG	get_hard_reg_initial_val (SImode, FDPIC_REGNO)
 
 /* A static chain register for nested functions.  We need to use a
    call-clobbered register for this.  */
@@ -412,7 +459,9 @@ extern const char *bfin_library_id_string;
 #define CONDITIONAL_REGISTER_USAGE			\
   {							\
     conditional_register_usage();                       \
-    if (flag_pic)					\
+    if (TARGET_FDPIC)					\
+      call_used_regs[FDPIC_REGNO] = 1;			\
+    if (!TARGET_FDPIC && flag_pic)			\
       {							\
 	fixed_regs[PIC_OFFSET_TABLE_REGNUM] = 1;	\
 	call_used_regs[PIC_OFFSET_TABLE_REGNUM] = 1;	\
@@ -456,6 +505,8 @@ enum reg_class
   EVEN_DREGS,
   ODD_DREGS,
   DREGS,
+  FDPIC_REGS,
+  FDPIC_FPTR_REGS,
   PREGS_CLOBBERED,
   PREGS,
   IPREGS,
@@ -487,6 +538,8 @@ enum reg_class
    "EVEN_DREGS",	\
    "ODD_DREGS",		\
    "DREGS",		\
+   "FDPIC_REGS",	\
+   "FDPIC_FPTR_REGS",	\
    "PREGS_CLOBBERED",	\
    "PREGS",		\
    "IPREGS",		\
@@ -526,6 +579,8 @@ enum reg_class
     { 0x00000055,    0 },		/* EVEN_DREGS */   \
     { 0x000000aa,    0 },		/* ODD_DREGS */   \
     { 0x000000ff,    0 },		/* DREGS */   \
+    { 0x00000800,    0x000 },		/* FDPIC_REGS */   \
+    { 0x00000200,    0x000 },		/* FDPIC_FPTR_REGS */   \
     { 0x00004700,    0x800 },		/* PREGS_CLOBBERED */   \
     { 0x0000ff00,    0x800 },		/* PREGS */   \
     { 0x000fff00,    0x800 },		/* IPREGS */	\
@@ -556,6 +611,8 @@ enum reg_class
 
 #define REG_CLASS_FROM_LETTER(LETTER)	\
   ((LETTER) == 'a' ? PREGS :            \
+   (LETTER) == 'Z' ? FDPIC_REGS :	\
+   (LETTER) == 'Y' ? FDPIC_FPTR_REGS :	\
    (LETTER) == 'd' ? DREGS : 		\
    (LETTER) == 'z' ? PREGS_CLOBBERED :	\
    (LETTER) == 'D' ? EVEN_DREGS : 	\

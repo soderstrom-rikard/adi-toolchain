@@ -1,3 +1,43 @@
+2006-03-14  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (legitimize_pic_address): Use different unspecs
+	if TARGET_FDPIC.
+	(n_pregs_to_save): Ignore PIC_OFFSET_TABLE_REGNUM if TARGET_FDPIC.
+	(print_operand): Handle the new unspecs.
+	(emit_pic_move): If TARGET_FDPIC, abort if we're after reload, and
+	use original value of the FD-PIC reg when calling
+	legitimze_pic_address.
+	(bfin_expand_call): If TARGET_FDPIC, handle function descriptors,
+	and set up the FD-PIC register for the call.
+	(bfin_assemble_integer): New function.
+	(TARGET_ASM_INTEGER): New macro.
+	* config/bfin/bfin.h (MASK_FDPIC, MASK_INLINE_PLT, TARGET_FDPIC,
+	TARGET_INLINE_PLT, DRIVER_SELF_SPECS, SUBTARGET_DRIVER_SELF_SPECS):
+	New macros.
+	(ASM_SPEC, LINK_SPEC): Copied from FR-V and adapted.
+	(TARGET_CPU_CPP_BUILTINS): Define __BFIN_FDPIC__ if TARGET_FDPIC.
+	(TARGET_SWITCHES): Add -mfdpic, -minline-plt.
+	(FDPIC_FPTR_REGNO, FDPIC_REGNO, OUR_FDPIC_REG): New macros.
+	(CONDITIONAL_REGISTER_USAGE): P3 is call clobbered if TARGET_FDPIC,
+	and PIC_OFFSET_TABLE_REGNUM is ignored.
+	(REG_CLASS_CONTENTS, REG_CLASS_NAMES, enum reg_class): Add FDPIC_REGS
+	and FDPIC_FPTR_REGS.
+	(REG_CLASS_FROM_LETTER): 'Z' and 'Y' are FDPIC_REGS and
+	FDPIC_FPTR_REGS.
+	* config/bfin/bfin.md (UNSPEC_MOVE_FDPIC, UNSPEC_FUNCDESC_GOT17M4,
+	UNSPEC_VOLATILE_LOAD_FUNCDESC): New constants.
+	(load_funcdescsi, call_symbol_fdpic, sibcall_symbol_fdpic,
+	call_value_symbol_fdpic, sibcall_value_symbol_fdpic, call_insn_fdpic,
+	sibcall_insn_fdpic, call_value_insn_fdpic, sibcall_value_insn_fdpic):
+	New patterns.
+	* config/bfin/t-bfin-elf (EXTRA_PARTS): Add crtbeginS.o and crtendS.o.
+	(EXTRA_MULTILIB_PARTS): Likewise.
+	(MULTILIB_OPTIONS, MULTILIB_EXCEPTIONS): Build a mfdpic multilib.
+	* config/bfin/uclinux.h (CRT_CALL_STATIC_FUNCTION): New macro.
+	* config/bfin/elf.h (CRT_CALL_STATIC_FUNCTION): Likewise.
+	* config/bfin/crti.s (__init, __fini): If __BFIN_FDPIC__, save P3.
+	* config/bfin/crtn.s: Likewise, restore it.
+
 2006-03-13  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): If
