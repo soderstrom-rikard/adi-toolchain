@@ -1,11 +1,9 @@
-CROSS=bfin-uclinux-
 CC=$(CROSS)gcc
 AR=$(CROSS)ar
 RANLIB=$(CROSS)ranlib
 STRIPTOOL=$(CROSS)strip
 RM=rm
 
-CFLAGS=
 
 LIBDSP=libdsp.a
 LIBRARIES=$(LIBDSP)
