@@ -44,6 +44,10 @@
 #define MASK_FDPIC		     0x08000000 /* use FD-PIC ABI */
 #define MASK_INLINE_PLT		     0x10000000
 
+#define MASK_FAST_FP                 0x20000000
+
+#define LIBGCC_SPEC "%{mfast-fp:-lbffastfp} -lgcc"
+
 /* Run-time compilation parameters selecting different hardware subsets.  */
 
 extern int target_flags;
@@ -124,6 +128,7 @@ extern int target_flags;
 #define TARGET_ID_SHARED_LIBRARY       (target_flags & MASK_ID_SHARED_LIBRARY)
 #define TARGET_FDPIC		       (target_flags & MASK_FDPIC)
 #define TARGET_INLINE_PLT	       (target_flags & MASK_INLINE_PLT)
+#define TARGET_FAST_FP		       (target_flags & MASK_FAST_FP)
 
 #define TARGET_HAS_SYMBOLIC_ADDRESSES  (0)
 #define TARGET_MOVE                    (1)
@@ -180,6 +185,8 @@ extern int target_flags;
     "Disable ID based shared library" },				\
   { "no-underscore",		MASK_NO_UNDERSCORE,			\
     "No underscore fro local label definition"},			\
+  { "fast-fp",			MASK_FAST_FP,				\
+    "Link with the fast floating-point library"},			\
   { "", MASK_CMOV | MASK_CSYNC_ANOMALY | MASK_SPECLD_ANOMALY,		\
     "default: cmov, csync-anomaly, specld-anomaly"}}
 

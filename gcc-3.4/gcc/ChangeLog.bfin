@@ -1,3 +1,10 @@
+2006-03-15  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.h (TARGET_FAST_FP, MASK_FAST_FP): New.
+	(LIBGCC_SPEC): Let libbffastfp override libgcc if -mfast-fp.
+	* doc/invoke.texi (Option Summary): Mention -mfast-fp.
+	(Blackfin Options): Document -mfast-fp.
+
 2006-03-14  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (legitimize_pic_address): Use different unspecs
@@ -40,6 +47,7 @@
 
 	* config/bfin/bfin.c (bfin_dsp_memref_p): Test all four autoinc codes.
 
+>>>>>>> 1.171
 2006-03-13  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): If
