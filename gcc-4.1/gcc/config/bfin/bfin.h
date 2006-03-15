@@ -30,6 +30,8 @@
 /* Print subsidiary information on the compiler version in use.  */
 #define TARGET_VERSION fprintf (stderr, " (BlackFin bfin)")
 
+#define LIBGCC_SPEC "%{mfast-fp:-lbffastfp} -lgcc"
+
 /* Run-time compilation parameters selecting different hardware subsets.  */
 
 extern int target_flags;
