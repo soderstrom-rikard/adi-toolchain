@@ -5,8 +5,9 @@ STRIPTOOL=$(CROSS)strip
 RM=rm
 
 
-LIBDSP=libdsp.a
-LIBRARIES=$(LIBDSP)
+LIBBFFASTFP=libbffastfp.a
+LIBBFDSP=# libbfdsp.a
+LIBRARIES=$(LIBBFFASTFP) $(LIBBFDSP)
 
 SOURCES=fpadd.asm fpsub.asm fpmult.asm fpdiv.asm \
 	addfl64.asm subfl64.asm mulfl64.asm divfl64.asm
@@ -16,14 +17,14 @@ OBJS=$(SOURCES:.asm=.o)
 all: $(LIBRARIES)
 
 
-$(LIBDSP): $(OBJS)
-	$(AR) $(ARFLAGS) $(LIBDSP) $(OBJS) 
-	$(RANLIB) $(LIBDSP)
+$(LIBBFFASTFP): $(OBJS)
+	$(AR) $(ARFLAGS) $(LIBBFFASTFP) $(OBJS) 
+	$(RANLIB) $(LIBBFFASTFP)
 
 $(OBJS): %.o: %.asm
 	$(CC) $(CFLAGS) -x assembler-with-cpp -c $< -o $@
 	$(STRIPTOOL) -x -R .note -R .comment $*.o
 
 clean:
-	$(RM) -f $(OBJS) $(LIBDSP)
+	$(RM) -f $(OBJS) $(LIBBFFASTFP)
 
