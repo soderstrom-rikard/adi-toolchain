@@ -635,14 +635,14 @@ if [ -e $DIR_SOURCE/libdsp/Makefile ] ; then
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
-    if [ ! -e $DIR_SOURCE/libdsp/libdsp.a ] ; then
-        echo "The ELF toolchain did not build libdsp.a properly - report an error"
+    if [ ! -e $DIR_SOURCE/libdsp/libbffastfp.a ] ; then
+        echo "The ELF toolchain did not build libbffastfp.a properly - report an error"
         tail -10 $ACTUAL_LOGFILE
         exit
     fi
 
     echo -n "*** Installing libdsp               " ; date
-    RUN="cp $DIR_SOURCE/libdsp/libdsp.a $DIR_ELF_OUTPUT/bfin-elf/lib/libdsp.a"
+    RUN="cp $DIR_SOURCE/libdsp/libbffastfp.a $DIR_ELF_OUTPUT/bfin-elf/lib/libbffastfp.a"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
@@ -983,14 +983,14 @@ if [ $KERNEL_SOURCE ] ; then
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh
     
-        if [ ! -e $DIR_SOURCE/libdsp/libdsp.a ] ; then
-            echo "The uClinux toolchain did not build libdsp.a properly - report an error"
+        if [ ! -e $DIR_SOURCE/libdsp/libbffastfp.a ] ; then
+            echo "The uClinux toolchain did not build libbffastfp.a properly - report an error"
             tail -10 $ACTUAL_LOGFILE
             exit
         fi
     
         echo -n "*** Installing libdsp               " ; date
-        RUN="cp $DIR_SOURCE/libdsp/libdsp.a $DIR_uC_OUTPUT/bfin-uclinux/lib/libdsp.a"
+        RUN="cp $DIR_SOURCE/libdsp/libbffastfp.a $DIR_uC_OUTPUT/bfin-uclinux/lib/libbffastfp.a"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh
 
