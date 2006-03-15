@@ -47,7 +47,6 @@
 
 	* config/bfin/bfin.c (bfin_dsp_memref_p): Test all four autoinc codes.
 
->>>>>>> 1.171
 2006-03-13  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): If
