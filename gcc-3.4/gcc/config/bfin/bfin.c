@@ -3386,6 +3386,8 @@ struct builtin_description
 
 static const struct builtin_description bdesc_2arg[] =
 {
+  { CODE_FOR_composev2hi, "__builtin_compose_2x16", BFIN_BUILTIN_COMPOSE_2X16, 0, 0 },
+
   { CODE_FOR_ssashiftv2hi3, "__builtin_shl_fr2x16", BFIN_BUILTIN_SSASHIFT_2X16, 0, 0 },
   { CODE_FOR_ssashifthi3, "__builtin_shl_fr1x16", BFIN_BUILTIN_SSASHIFT_1X16, 0, 0 },
   { CODE_FOR_lshiftv2hi3, "__builtin_lshl_fr2x16", BFIN_BUILTIN_LSHIFT_2X16, 0, 0 },

@@ -1096,6 +1096,7 @@ do {                                              \
 /* Define the codes that are matched by predicates in bfin.c.  */
 #define PREDICATE_CODES                                                	\
   {"cc_operand", {REG}},				        	\
+  {"const01_operand", {CONST_INT}},			        	\
   {"bfin_cbranch_operator", {EQ, NE}},					\
   {"rhs_andsi3_operand", {SUBREG, REG, ADDRESSOF, CONST_INT}},		\
   {"call_insn_operand", {SUBREG, REG, SYMBOL_REF}},			\
@@ -1108,6 +1109,7 @@ do {                                              \
   {"positive_immediate_operand", {CONST_INT}},				\
   {"reg_or_7bit_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},		\
   {"regorlog2_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},          	\
+  {"vec_shift_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},          	\
 
 /* Describing Relative Costs of Operations */
 
