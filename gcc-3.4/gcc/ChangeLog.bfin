@@ -3,6 +3,10 @@
 	* system.h (gcc_unreachable, gcc_assert): Define here.
 	* config/bfin/bfin.c: Not here.
 
+	Move over a patch from mainline:
+	2005-01-03  Richard Henderson  <rth@redhat.com>
+	* simplify-rtx.c (simplify_binary_operation): Handle VEC_CONCAT.
+
 2006-03-15  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.h (TARGET_FAST_FP, MASK_FAST_FP): New.

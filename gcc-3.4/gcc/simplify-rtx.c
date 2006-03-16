@@ -1226,6 +1226,41 @@ simplify_binary_operation (enum rtx_code code, enum machine_mode mode,
       return gen_rtx_CONST_VECTOR (mode, v);
     }
 
+  if (VECTOR_MODE_P (mode)
+      && code == VEC_CONCAT
+      && CONSTANT_P (op0) && CONSTANT_P (op1))
+    {
+      unsigned n_elts = GET_MODE_NUNITS (mode);
+      rtvec v = rtvec_alloc (n_elts);
+
+      gcc_assert (n_elts >= 2);
+      if (n_elts == 2)
+	{
+	  gcc_assert (GET_CODE (op0) != CONST_VECTOR);
+	  gcc_assert (GET_CODE (op1) != CONST_VECTOR);
+
+	  RTVEC_ELT (v, 0) = op0;
+	  RTVEC_ELT (v, 1) = op1;
+	}
+      else
+	{
+	  unsigned op0_n_elts = GET_MODE_NUNITS (GET_MODE (op0));
+	  unsigned op1_n_elts = GET_MODE_NUNITS (GET_MODE (op1));
+	  unsigned i;
+
+	  gcc_assert (GET_CODE (op0) == CONST_VECTOR);
+	  gcc_assert (GET_CODE (op1) == CONST_VECTOR);
+	  gcc_assert (op0_n_elts + op1_n_elts == n_elts);
+
+	  for (i = 0; i < op0_n_elts; ++i)
+	    RTVEC_ELT (v, i) = XVECEXP (op0, 0, i);
+	  for (i = 0; i < op1_n_elts; ++i)
+	    RTVEC_ELT (v, op0_n_elts+i) = XVECEXP (op1, 0, i);
+	}
+
+      return gen_rtx_CONST_VECTOR (mode, v);
+    }
+
   if (GET_MODE_CLASS (mode) == MODE_FLOAT
       && GET_CODE (trueop0) == CONST_DOUBLE
       && GET_CODE (trueop1) == CONST_DOUBLE
