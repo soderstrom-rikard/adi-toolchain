@@ -1,28 +1,36 @@
+2006-03-16  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin/bfin-dis.c (ashiftrt, lshiftrt): Accept new arg SIZE, use it
+	to implement shifts of variable size types.  All callers changed.
+	(lshift): Likewise.  Also accept new arg SATURATE and saturate if
+	it is set.
+	(decode_dsp32shiftimm0): Handle DREG halfword shifts.
+
 2006-02-09  Jie Zhang  <jie.zhang@analog.com>
 
 	Task[T220]
-	* bfin-dis.c (get_allreg): Decode loop registers.
+	* bfin/bfin-dis.c (get_allreg): Decode loop registers.
 
 2006-01-25  Bernd Schmidt  <bernd.schmidt@analog.com>
 
-	* sim/bfin/bfin-dis.c (setflags_nz_2x16): New function.
+	* bfin/bfin-dis.c (setflags_nz_2x16): New function.
 	(min_2x16, max_2x16): Use it here.
 	(decode_dsp32alu_0): Add vector NEG and ABS.
 	(saturate_s16): Mask off top bits.
 
 2006-01-24  Bernd Schmidt  <bernd.schmidt@analog.com>
 
-	* sim/bfin/bfin-dis.c (min_2x16, max_2x16): New functions.
+	* bfin/bfin-dis.c (min_2x16, max_2x16): New functions.
 	(decode_dsp32alu_0): Use them to support vector min/max.
 
 2005-12-12  Jie Zhang  <jie.zhang@analog.com>
 
-	* sim/bfin/bfin-dis.c, sim/bfin/bfin-sim.h, sim/bfin/interp.c:
+	* bfin/bfin-dis.c, sim/bfin/bfin-sim.h, sim/bfin/interp.c:
 	Much clean up.
 
 2005-11-11  Jie Zhang  <jie.zhang@analog.com>
 
-	* sim/bfin/interp.c (sim_fetch_register, sim_store_register):
+	* bfin/interp.c (sim_fetch_register, sim_store_register):
 	Use enum constants from enum sim_bfin_regnum instead of enum
 	gdb_regnum.
 

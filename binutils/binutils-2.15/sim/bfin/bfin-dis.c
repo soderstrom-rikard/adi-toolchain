@@ -82,11 +82,11 @@ setflags_logical (bu32 val)
 }
 
 static bu32
-ashiftrt (bu32 val, int cnt)
+ashiftrt (bu32 val, int cnt, int size)
 {
-  int real_cnt = cnt > 32 ? 32 : cnt;
-  bu32 sgn = ~((val >> 31) - 1);
-  int sgncnt = 32 - real_cnt;
+  int real_cnt = cnt > size ? size : cnt;
+  bu32 sgn = ~((val >> (size - 1)) - 1);
+  int sgncnt = size - real_cnt;
   if (sgncnt > 16)
     sgn <<= 16, sgncnt -= 16;
   sgn <<= sgncnt;
@@ -94,7 +94,7 @@ ashiftrt (bu32 val, int cnt)
     val >>= 16, real_cnt -= 16;
   val >>= real_cnt;
   val |= sgn;
-  saved_state.an = val >> 31;
+  saved_state.an = val >> (size - 1);
   saved_state.az = val == 0;
   /* @@@ */
   saved_state.v = 0;
@@ -102,26 +102,43 @@ ashiftrt (bu32 val, int cnt)
 }
 
 static bu32
-lshiftrt (bu32 val, int cnt)
+lshiftrt (bu32 val, int cnt, int size)
 {
-  int real_cnt = cnt > 32 ? 32 : cnt;
+  int real_cnt = cnt > size ? size : cnt;
   if (real_cnt > 16)
     val >>= 16, real_cnt -= 16;
   val >>= real_cnt;
-  saved_state.an = val >> 31;
+  saved_state.an = val >> (size - 1);
   saved_state.az = val == 0;
   saved_state.v = 0;
   return val;
 }
 
 static bu32
-lshift (bu32 val, int cnt)
+lshift (bu32 val, int cnt, int size, int saturate)
 {
-  int real_cnt = cnt > 32 ? 32 : cnt;
+  int real_cnt = cnt > size ? size : cnt;
+  int mask_cnt = size - real_cnt;
+  bu32 sgn = ~((val >> (size - 1)) - 1);
+  bu32 masked;
+  bu32 mask = ~0;
+  if (mask_cnt > 16)
+    mask <<= 16, sgn <<= 16, mask_cnt -= 16;
+  mask <<= mask_cnt;
+  sgn <<= mask_cnt;
+  masked = val & mask;
+
   if (real_cnt > 16)
     val <<= 16, real_cnt -= 16;
   val <<= real_cnt;
-  saved_state.an = val >> 31;
+  if (saturate && sgn != masked)
+    {
+      if (size == 32)
+	val = sgn == 0 ? 0x7fffffff : 0x80000000;
+      else
+	val = sgn == 0 ? 0x7fff : 0x8000;
+    }
+  saved_state.an = val >> (size - 1);
   saved_state.az = val == 0;
   saved_state.v = 0;
   return val;
@@ -1025,13 +1042,13 @@ decode_ALU2op_0 (bu16 iw0)
 
   if (opc == 0)
     /* dregs >>>= dregs */
-    DREG (dst) = ashiftrt (DREG (dst), DREG (src));
+    DREG (dst) = ashiftrt (DREG (dst), DREG (src), 32);
   else if (opc == 1)
     /* dregs >>= dregs */
-    DREG (dst) = lshiftrt (DREG (dst), DREG (src));
+    DREG (dst) = lshiftrt (DREG (dst), DREG (src), 32);
   else if (opc == 2)
     /* dregs <<= dregs */
-    DREG (dst) = lshift (DREG (dst), DREG (src));
+    DREG (dst) = lshift (DREG (dst), DREG (src), 32, 0);
   else if (opc == 3)
     /* dregs *= dregs */
     DREG (dst) *= DREG (src);
@@ -1158,13 +1175,13 @@ decode_LOGI2op_0 (bu16 iw0)
     }
   else if (opc == 5)
     /* dregs >>>= uimm5 */
-    DREG (dst) = ashiftrt (DREG (dst), uimm5 (src));
+    DREG (dst) = ashiftrt (DREG (dst), uimm5 (src), 32);
   else if (opc == 6)
     /* dregs >>= uimm5 */
-    DREG (dst) = lshiftrt (DREG (dst), uimm5 (src));
+    DREG (dst) = lshiftrt (DREG (dst), uimm5 (src), 32);
   else if (opc == 7)
     /* dregs <<= uimm5 */
-    DREG (dst) = lshift (DREG (dst), uimm5 (src));
+    DREG (dst) = lshift (DREG (dst), uimm5 (src), 32, 0);
 
   PCREG += 2;
 }
@@ -2448,31 +2465,33 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
   int M = ((iw0 >> 11) & 0x1);
   int sopcde = ((iw0 >> 0) & 0x1f);
   int HLs = ((iw1 >> 12) & 0x3);
+  int bit8 = immag >> 5;
 
-  if (HLs == 0 && sop == 0 && sopcde == 0)
-    unhandled_instruction ("dregs_lo = dregs_lo << uimm5");
-  else if (HLs == 1 && sop == 0 && sopcde == 0)
-    unhandled_instruction ("dregs_lo = dregs_hi << uimm5");
-  else if (HLs == 2 && sop == 0 && sopcde == 0)
-    unhandled_instruction ("dregs_hi = dregs_lo << uimm5");
-  else if (HLs == 3 && sop == 0 && sopcde == 0)
-    unhandled_instruction ("dregs_hi = dregs_hi << uimm5");
-  else if (HLs == 0 && sop == 1 && sopcde == 0)
-    unhandled_instruction ("dregs_lo = dregs_lo << imm5 (S)");
-  else if (HLs == 1 && sop == 1 && sopcde == 0)
-    unhandled_instruction ("dregs_lo = dregs_hi << imm5 (S)");
-  else if (HLs == 2 && sop == 1 && sopcde == 0)
-    unhandled_instruction ("dregs_hi = dregs_lo << imm5 (S)");
-  else if (HLs == 3 && sop == 1 && sopcde == 0)
-    unhandled_instruction ("dregs_hi = dregs_hi << imm5 (S)");
-  else if (HLs == 0 && sop == 2 && sopcde == 0)
-    unhandled_instruction ("dregs_lo = dregs_lo >> uimm5");
-  else if (HLs == 1 && sop == 2 && sopcde == 0)
-    unhandled_instruction ("dregs_lo = dregs_hi >> uimm5");
-  else if (HLs == 2 && sop == 2 && sopcde == 0)
-    unhandled_instruction ("dregs_hi = dregs_lo >> uimm5");
-  else if (HLs == 3 && sop == 2 && sopcde == 0)
-    unhandled_instruction ("dregs_hi = dregs_hi >> uimm5");
+  if (sopcde == 0)
+    {
+      bu16 in = DREG (src1) >> ((HLs & 1) ? 16 : 0);
+      bu16 result;
+      if (sop == 0 && bit8)
+	result = ashiftrt (in, newimmag, 16);
+      else if (sop == 1 && bit8)
+	result = lshift (in, immag, 16, 1);
+      else if (sop == 2 && bit8)
+	result = lshiftrt (in, newimmag, 16);
+      else if (sop == 2)
+	result = lshift (in, immag, 16, 0);
+      else
+	unhandled_instruction ("illegal DSP shift");
+      if (HLs & 2)
+	{
+	  DREG (dst0) &= 0xFFFF;
+	  DREG (dst0) |= result << 16;
+	}
+      else
+	{
+	  DREG (dst0) &= 0xFFFF0000;
+	  DREG (dst0) |= result;
+	}
+    }
   else if (sop == 2 && sopcde == 3 && HLs == 1)
     unhandled_instruction ("A1 = ROT A1 BY imm6");
   else if (sop == 0 && sopcde == 3 && HLs == 0)
@@ -2498,9 +2517,9 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       int count = imm6 (newimmag);
       /* dregs = dregs >> imm6 */
       if (count < 0)
-	DREG (dst0) = lshift (DREG (src1), -count);
+	DREG (dst0) = lshift (DREG (src1), -count, 32, 0);
       else
-	DREG (dst0) = lshiftrt (DREG (src1), count);
+	DREG (dst0) = lshiftrt (DREG (src1), count, 32);
     }
   else if (sop == 3 && sopcde == 2)
     {
@@ -2528,9 +2547,9 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       int count = imm6 (newimmag);
       /* dregs = dregs >>> imm6 */
       if (count < 0)
-	DREG (dst0) = lshift (DREG (src1), -count);
+	DREG (dst0) = lshift (DREG (src1), -count, 32, 0);
       else
-	DREG (dst0) = ashiftrt (DREG (src1), count);
+	DREG (dst0) = ashiftrt (DREG (src1), count, 32);
     }
   else
     illegal_instruction ();
