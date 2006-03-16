@@ -1,3 +1,8 @@
+2006-03-16  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin-dis.c (decode_dsp32shiftimm_0): Simplify and correct the
+	logic to identify halfword shifts.
+
 2005-10-24  Jie Zhang  <jie.zhang@analog.com>
 
 	Apply
