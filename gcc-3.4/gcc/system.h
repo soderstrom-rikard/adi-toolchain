@@ -521,6 +521,9 @@ extern int snprintf (char *, size_t, const char *, ...);
 #define __builtin_expect(a, b) (a)
 #endif
 
+#define gcc_assert(X) do { if (! (X)) abort(); } while (0)
+#define gcc_unreachable abort
+
 /* Provide some sort of boolean type.  We use stdbool.h if it's
   available.  This must be after all inclusion of system headers,
   as some of them will mess us up.  */

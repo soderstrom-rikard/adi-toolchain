@@ -40,10 +40,6 @@
 #include "bfin-protos.h"
 #include "gt-bfin.h"
 
-/* To be deleted when we move to gcc4.  */
-#define gcc_assert(X) do { if (! (X)) abort(); } while (0)
-#define gcc_unreachable abort
-
 /* Test and compare insns in bfin.md store the information needed to
    generate branch and scc insns here.  */
 rtx bfin_compare_op0, bfin_compare_op1;

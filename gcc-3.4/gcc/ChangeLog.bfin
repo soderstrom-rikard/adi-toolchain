@@ -1,3 +1,8 @@
+2006-03-16  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* system.h (gcc_unreachable, gcc_assert): Define here.
+	* config/bfin/bfin.c: Not here.
+
 2006-03-15  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.h (TARGET_FAST_FP, MASK_FAST_FP): New.
