@@ -95,6 +95,7 @@ case "${host_cpu}" in
 	;;
   bfin)
 	machine_dir=bfin
+	newlib_cflags="${newlib_cflags} -DCOMPACT_CTYPE"
 	;;
   crx*)
 	machine_dir=crx

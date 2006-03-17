@@ -1,3 +1,8 @@
+2006-03-17  Jie Zhang  <jie.zhang@analog.com>
+
+	* configure.host (newlib_cflags): When host is bfin add
+	-DCOMPACT_CTYPE.
+
 2006-01-23  Jie Zhang  <jie.zhang@analog.com>
 
 	* libc/sys/bfin/syscalls.c (do_syscall): Not pass AngelSWI to syscall.
