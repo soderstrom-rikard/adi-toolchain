@@ -3,6 +3,9 @@
 	* config/bfin/bfin.c (override_options): Disable flag_pic if not
 	TARGET_FDPIC or TARGET_ID_SHARED_LIBRARIES.
 
+	* config/bfin/bfin.md (movv2hi_insn): Now a define_and_split; changed
+	to accept CONST_VECTORs.  Add some constraints for optional reloads.
+
 2006-03-16  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* system.h (gcc_unreachable, gcc_assert): Define here.
