@@ -123,14 +123,30 @@
    (UNSPEC_FRMUL 6)
    ;; Signed fractional multiply with truncation (T option)
    (UNSPEC_FRTMUL 7)
-   (UNSPEC_MOVE_FDPIC 8)
-   (UNSPEC_FUNCDESC_GOT17M4 9)])
+   ;; Multiply or MAC with extra CONST_INT operand specifying the macflag
+   (UNSPEC_MUL_WITH_FLAG 8)
+   (UNSPEC_MAC_WITH_FLAG 9)
+   (UNSPEC_MOVE_FDPIC 10)
+   (UNSPEC_FUNCDESC_GOT17M4 11)])
 
 (define_constants
   [(UNSPEC_VOLATILE_EH_RETURN 0)
    (UNSPEC_VOLATILE_CSYNC 1)
    (UNSPEC_VOLATILE_SSYNC 2)
    (UNSPEC_VOLATILE_LOAD_FUNCDESC 3)])
+
+(define_constants
+  [(MACFLAG_NONE 0)
+   (MACFLAG_T 1)
+   (MACFLAG_FU 2)
+   (MACFLAG_TFU 3)
+   (MACFLAG_IS 4)
+   (MACFLAG_IU 5)
+   (MACFLAG_W32 6)
+   (MACFLAG_M 7)
+   (MACFLAG_S2RND 8)
+   (MACFLAG_ISS2 9)
+   (MACFLAG_IH 10)])
 
 (define_attr "type"
   "move,mvi,mcld,mcst,dsp32,mult,alu0,shft,brcc,br,call,misc,sync,compare,dummy"
@@ -370,6 +386,28 @@
    %w0 = %1; %x0 = %1;"
   [(set_attr "type" "move,mcst,mcld")])
 
+(define_insn "load_accumulator"
+  [(set (match_operand:PDI 0 "register_operand" "=e")
+        (sign_extend:PDI (match_operand:SI 1 "register_operand" "d")))]
+  ""
+  "%0 = %1;"
+  [(set_attr "type" "move")])
+
+(define_insn_and_split "load_accumulator_pair"
+  [(set (match_operand:V2PDI 0 "register_operand" "=e")
+        (sign_extend:V2PDI (vec_concat:V2SI
+			    (match_operand:SI 1 "register_operand" "d")
+			    (match_operand:SI 2 "register_operand" "d"))))]
+  ""
+  "#"
+  "reload_completed"
+  [(set (match_dup 3) (sign_extend:PDI (match_dup 1)))
+   (set (match_dup 4) (sign_extend:PDI (match_dup 2)))]
+{
+  operands[3] = gen_rtx_REG (PDImode, REGNO (operands[0]));
+  operands[4] = gen_rtx_REG (PDImode, REGNO (operands[0]) + 1);
+})
+
 (define_insn "*pushsi_insn"
   [(set (mem:SI (pre_dec:SI (reg:SI REG_SP)))
         (match_operand:SI 0 "register_operand" "xy"))]
@@ -505,6 +543,34 @@
     }
 })
 
+;; Extracting and storing halfwords.
+(define_insn "*movsi_insv"
+  [(set (zero_extract:SI (match_operand 0 "register_operand" "+d,x")
+			 (const_int 16)
+			 (const_int 16))
+	(match_operand:SI 1 "nonmemory_operand" "d,n"))]
+  ""
+  "@
+   %d0 = %h1 << 0;
+   %d0 = %1;"
+  [(set_attr "type" "dsp32,mvi")])
+
+(define_expand "insv"
+  [(set (zero_extract:SI (match_operand:SI 0 "register_operand" "")
+			 (match_operand:SI 1 "immediate_operand" "")
+			 (match_operand:SI 2 "immediate_operand" ""))
+        (match_operand:SI 3 "nonmemory_operand" ""))]
+  ""
+{
+  if (INTVAL (operands[1]) != 16 || INTVAL (operands[2]) != 16)
+    FAIL;
+
+  /* From mips.md: insert_bit_field doesn't verify that our source
+     matches the predicate, so check it again here.  */
+  if (! register_operand (operands[0], VOIDmode))
+    FAIL;
+})
+
 ;; This is the main "hook" for PIC code.  When generating
 ;; PIC, movsi is responsible for determining when the source address
 ;; needs PIC relocation and appropriately calling legitimize_pic_address
@@ -605,7 +671,7 @@
 ;; Note that the asm instruction is defined by the manual to take an unsigned
 ;; constant, but it doesn't matter to the assembler, and the compiler only
 ;; deals with sign-extended constants.  Hence "Ksh".
-(define_insn "*movstricthi"
+(define_insn "movstricthi_1"
   [(set (strict_low_part (match_operand:HI 0 "register_operand" "+x"))
 	(match_operand:HI 1 "immediate_operand" "Ksh"))]
   ""
@@ -2341,7 +2407,7 @@
 			(parallel [(const_int 0)]))))]
   ""
   "%d0 = %h2 << 0;"
-  [(set_attr "type" "move")])
+  [(set_attr "type" "dsp32")])
 
 (define_insn "movhi_high2high"
   [(set (match_operand:V2HI 0 "register_operand" "=d")
@@ -2352,7 +2418,7 @@
 			(parallel [(const_int 1)]))))]
   ""
   "%d0 = %d2 << 0;"
-  [(set_attr "type" "move")])
+  [(set_attr "type" "dsp32")])
 
 (define_insn "movhi_low2low"
   [(set (match_operand:V2HI 0 "register_operand" "=d")
@@ -2363,7 +2429,7 @@
 			(parallel [(const_int 1)]))))]
   ""
   "%h0 = %h2 << 0;"
-  [(set_attr "type" "move")])
+  [(set_attr "type" "dsp32")])
 
 (define_insn "movhi_high2low"
   [(set (match_operand:V2HI 0 "register_operand" "=d")
@@ -2374,7 +2440,7 @@
 			(parallel [(const_int 1)]))))]
   ""
   "%h0 = %d2 << 0;"
-  [(set_attr "type" "move")])
+  [(set_attr "type" "dsp32")])
 
 (define_insn "movhiv2hi_low"
   [(set (match_operand:V2HI 0 "register_operand" "=d")
@@ -2384,7 +2450,7 @@
 			(parallel [(const_int 1)]))))]
   ""
   "%h0 = %h2 << 0;"
-  [(set_attr "type" "move")])
+  [(set_attr "type" "dsp32")])
 
 (define_insn "movhiv2hi_high"
   [(set (match_operand:V2HI 0 "register_operand" "=d")
@@ -2394,7 +2460,7 @@
 	 (match_operand:HI 2 "register_operand" "d")))]
   ""
   "%d0 = %h2 << 0;"
-  [(set_attr "type" "move")])
+  [(set_attr "type" "dsp32")])
 
 ;; No earlyclobber on alternative two since our sequence ought to be safe.
 ;; The order of operands is intentional to match the VDSP builtin (high word
@@ -2405,7 +2471,7 @@
 			 (match_operand:HI 1 "register_operand" "d,d")))]
   ""
   "@
-   %d0 = %h2;
+   %d0 = %h2 << 0;
    #"
   "reload_completed"
   [(set (match_dup 0)
@@ -2417,10 +2483,11 @@
 	 (match_dup 1)
 	 (vec_select:HI (match_dup 0) (parallel [(const_int 1)]))))]
   ""
-  [(set_attr "type" "move")])
+  [(set_attr "type" "dsp32")])
 
 ; Like composev2hi, but operating on elements of V2HI vectors.
-; Useful on its own, and as a combiner bridge for frmulv2hi_parts.
+; Useful on its own, and as a combiner bridge for the multiply and
+; mac patterns.
 (define_insn "packv2hi"
   [(set (match_operand:V2HI 0 "register_operand" "=d,d,d,d")
 	(vec_concat:V2HI (vec_select:HI
@@ -2478,24 +2545,6 @@
 		     (match_operand:HI 2 "register_operand" "d")))]
   ""
   "%h0 = %h1 - %h2 (S);"
-  [(set_attr "type" "dsp32")])
-
-(define_insn "frmulhi3"
-  [(set (match_operand:HI 0 "register_operand" "=d")
-	(unspec:HI [(match_operand:HI 1 "register_operand" "d")
-		    (match_operand:HI 2 "register_operand" "d")]
-		   UNSPEC_FRMUL))]
-  ""
-  "%h0 = %h1 * %h2;"
-  [(set_attr "type" "dsp32")])
-
-(define_insn "frtmulhi3"
-  [(set (match_operand:HI 0 "register_operand" "=d")
-	(unspec:HI [(match_operand:HI 1 "register_operand" "d")
-		    (match_operand:HI 2 "register_operand" "d")]
-		   UNSPEC_FRTMUL))]
-  ""
-  "%h0 = %h1 * %h2 (T);"
   [(set_attr "type" "dsp32")])
 
 ;; V2HI vector insns
@@ -2680,6 +2729,103 @@
   "%0 = MAX (%1, %2) (V);"
   [(set_attr "type" "dsp32")])
 
+;; Multiplications.
+
+;; The Blackfin allows a lot of different options, and we need many patterns to
+;; cover most of the hardware's abilities.
+;; There are a few simple patterns using MULT rtx codes, but most of them use
+;; an unspec with a const_int operand that determines which flag to use in the
+;; instruction.
+;; There are variants for single and parallel multiplications.
+;; There are variants which just use 16 bit lowparts as inputs, and variants
+;; which allow the user to choose just which halves to use as input values.
+;; There are variants which set D registers, variants which set accumulators,
+;; variants which set both, some of them optionally using the accumulators as
+;; inputs for multiply-accumulate operations.
+
+(define_insn "flag_mulhi"
+  [(set (match_operand:HI 0 "register_operand" "=d")
+	(unspec:HI [(match_operand:HI 1 "register_operand" "d")
+		    (match_operand:HI 2 "register_operand" "d")
+		    (match_operand 3 "const_int_operand" "n")]
+		   UNSPEC_MUL_WITH_FLAG))]
+  ""
+  "%h0 = %h1 * %h2 %M3;"
+  [(set_attr "type" "dsp32")])
+
+(define_insn "flag_mulhisi_parts"
+  [(set (match_operand:SI 0 "register_operand" "=d")
+	(unspec:SI [(vec_select:HI
+		     (match_operand:V2HI 1 "register_operand" "d")
+		     (parallel [(match_operand:SI 3 "const01_operand" "P0P1")]))
+		    (vec_select:HI
+		     (match_operand:V2HI 2 "register_operand" "d")
+		     (parallel [(match_operand:SI 4 "const01_operand" "P0P1")]))
+		    (match_operand 5 "const_int_operand" "n")]
+		   UNSPEC_MUL_WITH_FLAG))]
+  ""
+{
+  const char *templates[] = {
+    "%0 = %h1 * %h2 %M5;",
+    "%0 = %d1 * %h2 %M5;",
+    "%0 = %h1 * %d2 %M5;",
+    "%0 = %d1 * %d2 %M5;" };
+  int alt = INTVAL (operands[3]) + (INTVAL (operands[4]) << 1);
+  return templates[alt];
+}
+  [(set_attr "type" "dsp32")])
+
+(define_insn "flag_machi"
+  [(set (match_operand:HI 0 "register_operand" "=d")
+	(unspec:HI [(match_operand:HI 1 "register_operand" "d")
+		    (match_operand:HI 2 "register_operand" "d")
+		    (match_operand 3 "register_operand" "A")
+		    (match_operand 4 "const01_operand" "P0P1")
+		    (match_operand 5 "const_int_operand" "n")]
+		   UNSPEC_MAC_WITH_FLAG))
+   (set (match_operand:PDI 6 "register_operand" "=A")
+	(unspec:PDI [(match_dup 1) (match_dup 2) (match_dup 3)
+		     (match_dup 4) (match_dup 5)]
+		    UNSPEC_MAC_WITH_FLAG))]
+  ""
+  "%h0 = A0 %b4 %h1 * %h2 %M6;"
+  [(set_attr "type" "dsp32")])
+
+(define_insn "flag_machi_acconly"
+  [(set (match_operand:PDI 0 "register_operand" "=e")
+	(unspec:PDI [(match_operand:HI 1 "register_operand" "d")
+		     (match_operand:HI 2 "register_operand" "d")
+		     (match_operand 3 "register_operand" "A")
+		     (match_operand 4 "const01_operand" "P0P1")
+		     (match_operand 5 "const_int_operand" "n")]
+		    UNSPEC_MAC_WITH_FLAG))]
+  ""
+  "%0 %b4 %h1 * %h2 %M6;"
+  [(set_attr "type" "dsp32")])
+
+(define_insn "flag_macinithi"
+  [(set (match_operand:HI 0 "register_operand" "=d")
+	(unspec:HI [(match_operand:HI 1 "register_operand" "d")
+		    (match_operand:HI 2 "register_operand" "d")
+		    (match_operand 3 "const_int_operand" "n")]
+		   UNSPEC_MAC_WITH_FLAG))
+   (set (match_operand:PDI 4 "register_operand" "=A")
+	(unspec:PDI [(match_dup 1) (match_dup 2) (match_dup 3)]
+		    UNSPEC_MAC_WITH_FLAG))]
+  ""
+  "%h0 = A0 = %h1 * %h2 %M3;"
+  [(set_attr "type" "dsp32")])
+
+(define_insn "flag_macinit1hi"
+  [(set (match_operand:PDI 0 "register_operand" "=e")
+	(unspec:PDI [(match_operand:HI 1 "register_operand" "d")
+		     (match_operand:HI 2 "register_operand" "d")
+		     (match_operand 3 "const_int_operand" "n")]
+		    UNSPEC_MAC_WITH_FLAG))]
+  ""
+  "%0 = %h1 * %h2 %M3;"
+  [(set_attr "type" "dsp32")])
+
 (define_insn "mulv2hi3"
   [(set (match_operand:V2HI 0 "register_operand" "=d")
 	(mult:V2HI (match_operand:V2HI 1 "register_operand" "d")
@@ -2688,25 +2834,17 @@
   "%h0 = %h1 * %h2, %d0 = %d1 * %d2 (IS);"
   [(set_attr "type" "dsp32")])
 
-(define_insn "frmulv2hi"
+(define_insn "flag_mulv2hi"
   [(set (match_operand:V2HI 0 "register_operand" "=d")
 	(unspec:V2HI [(match_operand:V2HI 1 "register_operand" "d")
-		      (match_operand:V2HI 2 "register_operand" "d")]
-		     UNSPEC_FRMUL))]
+		      (match_operand:V2HI 2 "register_operand" "d")
+		      (match_operand 3 "const_int_operand" "n")]
+		     UNSPEC_MUL_WITH_FLAG))]
   ""
-  "%h0 = %h1 * %h2, %d0 = %d1 * %d2;"
+  "%h0 = %h1 * %h2, %d0 = %d1 * %d2 %M3;"
   [(set_attr "type" "dsp32")])
 
-(define_insn "frtmulv2hi"
-  [(set (match_operand:V2HI 0 "register_operand" "=d")
-	(unspec:V2HI [(match_operand:V2HI 1 "register_operand" "d")
-		      (match_operand:V2HI 2 "register_operand" "d")]
-		     UNSPEC_FRTMUL))]
-  ""
-  "%h0 = %h1 * %h2, %d0 = %d1 * %d2 (T);"
-  [(set_attr "type" "dsp32")])
-
-(define_insn "frmulv2hi_parts"
+(define_insn "flag_mulv2hi_parts"
   [(set (match_operand:V2HI 0 "register_operand" "=d")
 	(unspec:V2HI [(vec_concat:V2HI
 		       (vec_select:HI
@@ -2719,34 +2857,42 @@
 		       (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
 			(parallel [(match_operand:SI 5 "const01_operand" "P0P1")]))
 		       (vec_select:HI (match_dup 2)
-			(parallel [(match_operand:SI 6 "const01_operand" "P0P1")])))]
-		     UNSPEC_FRMUL))]
+			(parallel [(match_operand:SI 6 "const01_operand" "P0P1")])))
+		      (match_operand 7 "const_int_operand" "n")]
+		     UNSPEC_MUL_WITH_FLAG))]
   ""
 {
   const char *templates[] = {
-    "%h0 = %h1 * %h2, %d0 = %h1 * %h2;",
-    "%h0 = %d1 * %h2, %d0 = %h1 * %h2;",
-    "%h0 = %h1 * %h2, %d0 = %d1 * %h2;",
-    "%h0 = %d1 * %h2, %d0 = %d1 * %h2;",
-    "%h0 = %h1 * %d2, %d0 = %h1 * %h2;",
-    "%h0 = %d1 * %d2, %d0 = %h1 * %h2;",
-    "%h0 = %h1 * %d2, %d0 = %d1 * %h2;",
-    "%h0 = %d1 * %d2, %d0 = %d1 * %h2;",
-    "%h0 = %h1 * %h2, %d0 = %h1 * %d2;",
-    "%h0 = %d1 * %h2, %d0 = %h1 * %d2;",
-    "%h0 = %h1 * %h2, %d0 = %d1 * %d2;",
-    "%h0 = %d1 * %h2, %d0 = %d1 * %d2;",
-    "%h0 = %h1 * %d2, %d0 = %h1 * %d2;",
-    "%h0 = %d1 * %d2, %d0 = %h1 * %d2;",
-    "%h0 = %h1 * %d2, %d0 = %d1 * %d2;",
-    "%h0 = %d1 * %d2, %d0 = %d1 * %d2;" };
+    "%h0 = %h1 * %h2, %d0 = %h1 * %h2 %M7;",
+    "%h0 = %d1 * %h2, %d0 = %h1 * %h2 %M7;",
+    "%h0 = %h1 * %h2, %d0 = %d1 * %h2 %M7;",
+    "%h0 = %d1 * %h2, %d0 = %d1 * %h2 %M7;",
+    "%h0 = %h1 * %d2, %d0 = %h1 * %h2 %M7;",
+    "%h0 = %d1 * %d2, %d0 = %h1 * %h2 %M7;",
+    "%h0 = %h1 * %d2, %d0 = %d1 * %h2 %M7;",
+    "%h0 = %d1 * %d2, %d0 = %d1 * %h2 %M7;",
+    "%h0 = %h1 * %h2, %d0 = %h1 * %d2 %M7;",
+    "%h0 = %d1 * %h2, %d0 = %h1 * %d2 %M7;",
+    "%h0 = %h1 * %h2, %d0 = %d1 * %d2 %M7;",
+    "%h0 = %d1 * %h2, %d0 = %d1 * %d2 %M7;",
+    "%h0 = %h1 * %d2, %d0 = %h1 * %d2 %M7;",
+    "%h0 = %d1 * %d2, %d0 = %h1 * %d2 %M7;",
+    "%h0 = %h1 * %d2, %d0 = %d1 * %d2 %M7;",
+    "%h0 = %d1 * %d2, %d0 = %d1 * %d2 %M7;" };
   int alt = (INTVAL (operands[3]) + (INTVAL (operands[4]) << 1)
 	     + (INTVAL (operands[5]) << 2)  + (INTVAL (operands[6]) << 3));
   return templates[alt];
 }
   [(set_attr "type" "dsp32")])
 
-(define_insn "frtmulv2hi_parts"
+;; A slightly complicated pattern.
+;; Operand 0 is the halfword output; operand 11 is the accumulator output
+;; Halfword inputs are operands 1 and 2; operands 3, 4, 5 and 6 specify which
+;; parts of these 2x16 bit registers to use.
+;; Operand 7 is the accumulator input.
+;; Operands 8/9 specify whether low/high parts are mac (0) or msu (1)
+;; Operand 10 is the macflag to be used.
+(define_insn "flag_macv2hi_parts"
   [(set (match_operand:V2HI 0 "register_operand" "=d")
 	(unspec:V2HI [(vec_concat:V2HI
 		       (vec_select:HI
@@ -2759,27 +2905,177 @@
 		       (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
 			(parallel [(match_operand:SI 5 "const01_operand" "P0P1")]))
 		       (vec_select:HI (match_dup 2)
-			(parallel [(match_operand:SI 6 "const01_operand" "P0P1")])))]
-		     UNSPEC_FRTMUL))]
+			(parallel [(match_operand:SI 6 "const01_operand" "P0P1")])))
+		      (match_operand:V2PDI 7 "register_operand" "e")
+		      (match_operand 8 "const01_operand" "P0P1")
+		      (match_operand 9 "const01_operand" "P0P1")
+		      (match_operand 10 "const_int_operand" "n")]
+		     UNSPEC_MAC_WITH_FLAG))
+   (set (match_operand:V2PDI 11 "register_operand" "=e")
+	(unspec:V2PDI [(vec_concat:V2HI
+			(vec_select:HI (match_dup 1) (parallel [(match_dup 3)]))
+			(vec_select:HI (match_dup 1) (parallel [(match_dup 4)])))
+		       (vec_concat:V2HI
+			(vec_select:HI (match_dup 2) (parallel [(match_dup 5)]))
+			(vec_select:HI (match_dup 2) (parallel [(match_dup 5)])))
+		       (match_dup 7) (match_dup 8) (match_dup 9) (match_dup 10)]
+		      UNSPEC_MAC_WITH_FLAG))]
   ""
 {
   const char *templates[] = {
-    "%h0 = %h1 * %h2, %d0 = %h1 * %h2; (T)",
-    "%h0 = %d1 * %h2, %d0 = %h1 * %h2; (T)",
-    "%h0 = %h1 * %h2, %d0 = %d1 * %h2; (T)",
-    "%h0 = %d1 * %h2, %d0 = %d1 * %h2; (T)",
-    "%h0 = %h1 * %d2, %d0 = %h1 * %h2; (T)",
-    "%h0 = %d1 * %d2, %d0 = %h1 * %h2; (T)",
-    "%h0 = %h1 * %d2, %d0 = %d1 * %h2; (T)",
-    "%h0 = %d1 * %d2, %d0 = %d1 * %h2; (T)",
-    "%h0 = %h1 * %h2, %d0 = %h1 * %d2; (T)",
-    "%h0 = %d1 * %h2, %d0 = %h1 * %d2; (T)",
-    "%h0 = %h1 * %h2, %d0 = %d1 * %d2; (T)",
-    "%h0 = %d1 * %h2, %d0 = %d1 * %d2; (T)",
-    "%h0 = %h1 * %d2, %d0 = %h1 * %d2; (T)",
-    "%h0 = %d1 * %d2, %d0 = %h1 * %d2; (T)",
-    "%h0 = %h1 * %d2, %d0 = %d1 * %d2; (T)",
-    "%h0 = %d1 * %d2, %d0 = %d1 * %d2; (T)" };
+    "%h0 = A0 %b8 %h1 * %h2, %d0 = A1 %b9 %h1 * %h2 %M10;",
+    "%h0 = A0 %b8 %d1 * %h2, %d0 = A1 %b9 %h1 * %h2 %M10;",
+    "%h0 = A0 %b8 %h1 * %h2, %d0 = A1 %b9 %d1 * %h2 %M10;",
+    "%h0 = A0 %b8 %d1 * %h2, %d0 = A1 %b9 %d1 * %h2 %M10;",
+    "%h0 = A0 %b8 %h1 * %d2, %d0 = A1 %b9 %h1 * %h2 %M10;",
+    "%h0 = A0 %b8 %d1 * %d2, %d0 = A1 %b9 %h1 * %h2 %M10;",
+    "%h0 = A0 %b8 %h1 * %d2, %d0 = A1 %b9 %d1 * %h2 %M10;",
+    "%h0 = A0 %b8 %d1 * %d2, %d0 = A1 %b9 %d1 * %h2 %M10;",
+    "%h0 = A0 %b8 %h1 * %h2, %d0 = A1 %b9 %h1 * %d2 %M10;",
+    "%h0 = A0 %b8 %d1 * %h2, %d0 = A1 %b9 %h1 * %d2 %M10;",
+    "%h0 = A0 %b8 %h1 * %h2, %d0 = A1 %b9 %d1 * %d2 %M10;",
+    "%h0 = A0 %b8 %d1 * %h2, %d0 = A1 %b9 %d1 * %d2 %M10;",
+    "%h0 = A0 %b8 %h1 * %d2, %d0 = A1 %b9 %h1 * %d2 %M10;",
+    "%h0 = A0 %b8 %d1 * %d2, %d0 = A1 %b9 %h1 * %d2 %M10;",
+    "%h0 = A0 %b8 %h1 * %d2, %d0 = A1 %b9 %d1 * %d2 %M10;",
+    "%h0 = A0 %b8 %d1 * %d2, %d0 = A1 %b9 %d1 * %d2 %M10;" };
+  int alt = (INTVAL (operands[3]) + (INTVAL (operands[4]) << 1)
+	     + (INTVAL (operands[5]) << 2)  + (INTVAL (operands[6]) << 3));
+  return templates[alt];
+}
+  [(set_attr "type" "dsp32")])
+
+(define_insn "flag_macv2hi_parts_acconly"
+  [(set (match_operand:V2PDI 0 "register_operand" "=e")
+	(unspec:V2PDI [(vec_concat:V2HI
+			(vec_select:HI
+			 (match_operand:V2HI 1 "register_operand" "d")
+			 (parallel [(match_operand:SI 3 "const01_operand" "P0P1")]))
+			(vec_select:HI
+			 (match_dup 1)
+			 (parallel [(match_operand:SI 4 "const01_operand" "P0P1")])))
+		       (vec_concat:V2HI
+			(vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
+				       (parallel [(match_operand:SI 5 "const01_operand" "P0P1")]))
+			(vec_select:HI (match_dup 2)
+				       (parallel [(match_operand:SI 6 "const01_operand" "P0P1")])))
+		       (match_operand:V2PDI 7 "register_operand" "e")
+		       (match_operand 8 "const01_operand" "P0P1")
+		       (match_operand 9 "const01_operand" "P0P1")
+		       (match_operand 10 "const_int_operand" "n")]
+		      UNSPEC_MAC_WITH_FLAG))]
+  ""
+{
+  const char *templates[] = {
+    "A0 %b8 %h1 * %h2, A1 %b9 %h1 * %h2 %M10;",
+    "A0 %b8 %d1 * %h2, A1 %b9 %h1 * %h2 %M10;",
+    "A0 %b8 %h1 * %h2, A1 %b9 %d1 * %h2 %M10;",
+    "A0 %b8 %d1 * %h2, A1 %b9 %d1 * %h2 %M10;",
+    "A0 %b8 %h1 * %d2, A1 %b9 %h1 * %h2 %M10;",
+    "A0 %b8 %d1 * %d2, A1 %b9 %h1 * %h2 %M10;",
+    "A0 %b8 %h1 * %d2, A1 %b9 %d1 * %h2 %M10;",
+    "A0 %b8 %d1 * %d2, A1 %b9 %d1 * %h2 %M10;",
+    "A0 %b8 %h1 * %h2, A1 %b9 %h1 * %d2 %M10;",
+    "A0 %b8 %d1 * %h2, A1 %b9 %h1 * %d2 %M10;",
+    "A0 %b8 %h1 * %h2, A1 %b9 %d1 * %d2 %M10;",
+    "A0 %b8 %d1 * %h2, A1 %b9 %d1 * %d2 %M10;",
+    "A0 %b8 %h1 * %d2, A1 %b9 %h1 * %d2 %M10;",
+    "A0 %b8 %d1 * %d2, A1 %b9 %h1 * %d2 %M10;",
+    "A0 %b8 %h1 * %d2, A1 %b9 %d1 * %d2 %M10;",
+    "A0 %b8 %d1 * %d2, A1 %b9 %d1 * %d2 %M10;" };
+  int alt = (INTVAL (operands[3]) + (INTVAL (operands[4]) << 1)
+	     + (INTVAL (operands[5]) << 2)  + (INTVAL (operands[6]) << 3));
+  return templates[alt];
+}
+  [(set_attr "type" "dsp32")])
+
+;; Same as above, but initializing the accumulators and therefore a couple fewer
+;; necessary operands.
+(define_insn "flag_macinitv2hi_parts"
+  [(set (match_operand:V2HI 0 "register_operand" "=d")
+	(unspec:V2HI [(vec_concat:V2HI
+		       (vec_select:HI
+			(match_operand:V2HI 1 "register_operand" "d")
+			(parallel [(match_operand:SI 3 "const01_operand" "P0P1")]))
+		       (vec_select:HI
+			(match_dup 1)
+			(parallel [(match_operand:SI 4 "const01_operand" "P0P1")])))
+		      (vec_concat:V2HI
+		       (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
+			(parallel [(match_operand:SI 5 "const01_operand" "P0P1")]))
+		       (vec_select:HI (match_dup 2)
+			(parallel [(match_operand:SI 6 "const01_operand" "P0P1")])))
+		      (match_operand 7 "const_int_operand" "n")]
+		     UNSPEC_MAC_WITH_FLAG))
+   (set (match_operand:V2PDI 8 "register_operand" "=e")
+	(unspec:V2PDI [(vec_concat:V2HI
+			(vec_select:HI (match_dup 1) (parallel [(match_dup 3)]))
+			(vec_select:HI (match_dup 1) (parallel [(match_dup 4)])))
+		       (vec_concat:V2HI
+			(vec_select:HI (match_dup 2) (parallel [(match_dup 5)]))
+			(vec_select:HI (match_dup 2) (parallel [(match_dup 5)])))
+		       (match_dup 7)]
+		      UNSPEC_MAC_WITH_FLAG))]
+  ""
+{
+  const char *templates[] = {
+    "%h0 = A0 = %h1 * %h2, %d0 = A1 = %h1 * %h2 %M7;",
+    "%h0 = A0 = %d1 * %h2, %d0 = A1 = %h1 * %h2 %M7;",
+    "%h0 = A0 = %h1 * %h2, %d0 = A1 = %d1 * %h2 %M7;",
+    "%h0 = A0 = %d1 * %h2, %d0 = A1 = %d1 * %h2 %M7;",
+    "%h0 = A0 = %h1 * %d2, %d0 = A1 = %h1 * %h2 %M7;",
+    "%h0 = A0 = %d1 * %d2, %d0 = A1 = %h1 * %h2 %M7;",
+    "%h0 = A0 = %h1 * %d2, %d0 = A1 = %d1 * %h2 %M7;",
+    "%h0 = A0 = %d1 * %d2, %d0 = A1 = %d1 * %h2 %M7;",
+    "%h0 = A0 = %h1 * %h2, %d0 = A1 = %h1 * %d2 %M7;",
+    "%h0 = A0 = %d1 * %h2, %d0 = A1 = %h1 * %d2 %M7;",
+    "%h0 = A0 = %h1 * %h2, %d0 = A1 = %d1 * %d2 %M7;",
+    "%h0 = A0 = %d1 * %h2, %d0 = A1 = %d1 * %d2 %M7;",
+    "%h0 = A0 = %h1 * %d2, %d0 = A1 = %h1 * %d2 %M7;",
+    "%h0 = A0 = %d1 * %d2, %d0 = A1 = %h1 * %d2 %M7;",
+    "%h0 = A0 = %h1 * %d2, %d0 = A1 = %d1 * %d2 %M7;",
+    "%h0 = A0 = %d1 * %d2, %d0 = A1 = %d1 * %d2 %M7;" };
+  int alt = (INTVAL (operands[3]) + (INTVAL (operands[4]) << 1)
+	     + (INTVAL (operands[5]) << 2)  + (INTVAL (operands[6]) << 3));
+  return templates[alt];
+}
+  [(set_attr "type" "dsp32")])
+
+(define_insn "flag_macinit1v2hi_parts"
+  [(set (match_operand:V2PDI 0 "register_operand" "=e")
+	(unspec:V2PDI [(vec_concat:V2HI
+		       (vec_select:HI
+			(match_operand:V2HI 1 "register_operand" "d")
+			(parallel [(match_operand:SI 3 "const01_operand" "P0P1")]))
+		       (vec_select:HI
+			(match_dup 1)
+			(parallel [(match_operand:SI 4 "const01_operand" "P0P1")])))
+		      (vec_concat:V2HI
+		       (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
+			(parallel [(match_operand:SI 5 "const01_operand" "P0P1")]))
+		       (vec_select:HI (match_dup 2)
+			(parallel [(match_operand:SI 6 "const01_operand" "P0P1")])))
+		      (match_operand 7 "const_int_operand" "n")]
+		     UNSPEC_MAC_WITH_FLAG))]
+  ""
+{
+  const char *templates[] = {
+    "A0 = %h1 * %h2, A1 = %h1 * %h2 %M7;",
+    "A0 = %d1 * %h2, A1 = %h1 * %h2 %M7;",
+    "A0 = %h1 * %h2, A1 = %d1 * %h2 %M7;",
+    "A0 = %d1 * %h2, A1 = %d1 * %h2 %M7;",
+    "A0 = %h1 * %d2, A1 = %h1 * %h2 %M7;",
+    "A0 = %d1 * %d2, A1 = %h1 * %h2 %M7;",
+    "A0 = %h1 * %d2, A1 = %d1 * %h2 %M7;",
+    "A0 = %d1 * %d2, A1 = %d1 * %h2 %M7;",
+    "A0 = %h1 * %h2, A1 = %h1 * %d2 %M7;",
+    "A0 = %d1 * %h2, A1 = %h1 * %d2 %M7;",
+    "A0 = %h1 * %h2, A1 = %d1 * %d2 %M7;",
+    "A0 = %d1 * %h2, A1 = %d1 * %d2 %M7;",
+    "A0 = %h1 * %d2, A1 = %h1 * %d2 %M7;",
+    "A0 = %d1 * %d2, A1 = %h1 * %d2 %M7;",
+    "A0 = %h1 * %d2, A1 = %d1 * %d2 %M7;",
+    "A0 = %d1 * %d2, A1 = %d1 * %d2 %M7;" };
   int alt = (INTVAL (operands[3]) + (INTVAL (operands[4]) << 1)
 	     + (INTVAL (operands[5]) << 2)  + (INTVAL (operands[6]) << 3));
   return templates[alt];

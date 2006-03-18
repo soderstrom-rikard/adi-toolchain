@@ -1,3 +1,41 @@
+2006-03-18  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* genmodes.c (make_vector_mode): Allow making VECTOR_MODE_INT of a
+	MODE_PARTIAL_INT mode.
+	* config/bfin/bfin-modes.def: Add V2PDI.
+	* config/bfin/bfin.c (print_operand): Add macflag and mac/msu modifiers
+	for CONST_INTs.
+	(hard_regno_mode_ok): V2PDImode is ok for accumulators.
+	(enum bfin_builtins): Add BFIN_BUILTIN_CPLX_MUL_16,
+	BFIN_BUILTIN_CPLX_MAC_16, BFIN_BUILTIN_CPLX_MSU_16.
+	(bfin_init_builtins): Make them.
+	(bfin_expand_builtin): Handle them.
+	(bdesc_2arg): Add them.  Also change fractional multiplies to use new
+	patterns.
+	(struct builtin_description): Lose unused members comparison and flag.
+	Add new macflag member.  All users changed.
+	(bfin_expand_binop_builtin): New arg macflag.  If not -1, use it as
+	third input operand to the generated insn.  All callers changed.
+	* config/bfin/bfin.h (CLASS_MAX_NREGS, HARD_REGNO_NREGS): Handle
+	V2PDImode.
+	* config/bfin/bfin.md (UNSPEC_MUL_WITH_FLAG, UNSPEC_MAC_WITH_FLAG):
+	New constants.
+	(MACFLAG_NONE, MACFLAG_T, MACFLAG_FU, MACFLAG_TFU, MACFLAG_IS,
+	MACFLAG_IU, MACFLAG_W32, MACFLAG_M, MACFLAG_S2RND, MACFLAG_ISS2,
+	MACFLAG_IH): Likewise.
+	(load_accumulator, load_accumulator_pair): New patterns.
+	(movsi_insv, insv): New patterns.
+	(movstricthi_1): Renamed from "*movstricthi".
+	(movhi_low2high, movhi_high2high, movhi_low2low, movhi_high2low,
+	movhiv2hi_low, movhi2vhi_high, movv2hi_hi): Adjust type to dsp32.
+	(composev2hi): Likewise, also use shift by zero here.
+	(frmulhi3, frtmulhi3, frmulv2hi, frtmulv2hi): Remove patterns, replace
+	with...
+	(flag_mulhi, flag_mulhisi_parts, flag_machi, flag_machi_acconly,
+	flag_macinithi, flag_macinit1hi, flag_mulv2hi, flag_mulv2hi_parts,
+	flag_macv2hi_parts, flag_macv2hi_parts_acconly, flag_macinitv2hi_parts,
+	flag_macinit1v2hi_parts): New patterns.
+
 2006-03-17  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (override_options): Disable flag_pic if not
