@@ -21,3 +21,5 @@
 
 /* PDImode for the 40 bit accumulators.  */
 PARTIAL_INT_MODE (DI);
+/* And a vector of two of these.  */
+VECTOR_MODE (INT, PDI, 2);
