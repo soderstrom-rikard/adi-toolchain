@@ -1,3 +1,13 @@
+2006-03-19  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_init_builtins): Lose short_ftype_v2hi_v2hi,
+	build int_ftype_short_short instead.  Also make __builtin_mult_fr1x32.
+	(bdesc_2arg): Use -1 as macflag for non-multiplications.  Add
+	__builtin_mult_fr1x32.
+	* config/bfin/bfin.md (flag_mulhisi): New pattern.
+	(flag_machi, flag_macinithi, flag_macv2hi_parts, flag_macinitv2hi_parts):
+	Fix syntax errors in assembler templates.
+
 2006-03-18  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* genmodes.c (make_vector_mode): Allow making VECTOR_MODE_INT of a

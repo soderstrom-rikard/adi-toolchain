@@ -2753,6 +2753,16 @@
   "%h0 = %h1 * %h2 %M3;"
   [(set_attr "type" "dsp32")])
 
+(define_insn "flag_mulhisi"
+  [(set (match_operand:SI 0 "register_operand" "=d")
+	(unspec:SI [(match_operand:HI 1 "register_operand" "d")
+		    (match_operand:HI 2 "register_operand" "d")
+		    (match_operand 3 "const_int_operand" "n")]
+		   UNSPEC_MUL_WITH_FLAG))]
+  ""
+  "%0 = %h1 * %h2 %M3;"
+  [(set_attr "type" "dsp32")])
+
 (define_insn "flag_mulhisi_parts"
   [(set (match_operand:SI 0 "register_operand" "=d")
 	(unspec:SI [(vec_select:HI
@@ -2788,7 +2798,7 @@
 		     (match_dup 4) (match_dup 5)]
 		    UNSPEC_MAC_WITH_FLAG))]
   ""
-  "%h0 = A0 %b4 %h1 * %h2 %M6;"
+  "%h0 = (A0 %b4 %h1 * %h2) %M6;"
   [(set_attr "type" "dsp32")])
 
 (define_insn "flag_machi_acconly"
@@ -2813,7 +2823,7 @@
 	(unspec:PDI [(match_dup 1) (match_dup 2) (match_dup 3)]
 		    UNSPEC_MAC_WITH_FLAG))]
   ""
-  "%h0 = A0 = %h1 * %h2 %M3;"
+  "%h0 = (A0 = %h1 * %h2) %M3;"
   [(set_attr "type" "dsp32")])
 
 (define_insn "flag_macinit1hi"
@@ -2923,22 +2933,22 @@
   ""
 {
   const char *templates[] = {
-    "%h0 = A0 %b8 %h1 * %h2, %d0 = A1 %b9 %h1 * %h2 %M10;",
-    "%h0 = A0 %b8 %d1 * %h2, %d0 = A1 %b9 %h1 * %h2 %M10;",
-    "%h0 = A0 %b8 %h1 * %h2, %d0 = A1 %b9 %d1 * %h2 %M10;",
-    "%h0 = A0 %b8 %d1 * %h2, %d0 = A1 %b9 %d1 * %h2 %M10;",
-    "%h0 = A0 %b8 %h1 * %d2, %d0 = A1 %b9 %h1 * %h2 %M10;",
-    "%h0 = A0 %b8 %d1 * %d2, %d0 = A1 %b9 %h1 * %h2 %M10;",
-    "%h0 = A0 %b8 %h1 * %d2, %d0 = A1 %b9 %d1 * %h2 %M10;",
-    "%h0 = A0 %b8 %d1 * %d2, %d0 = A1 %b9 %d1 * %h2 %M10;",
-    "%h0 = A0 %b8 %h1 * %h2, %d0 = A1 %b9 %h1 * %d2 %M10;",
-    "%h0 = A0 %b8 %d1 * %h2, %d0 = A1 %b9 %h1 * %d2 %M10;",
-    "%h0 = A0 %b8 %h1 * %h2, %d0 = A1 %b9 %d1 * %d2 %M10;",
-    "%h0 = A0 %b8 %d1 * %h2, %d0 = A1 %b9 %d1 * %d2 %M10;",
-    "%h0 = A0 %b8 %h1 * %d2, %d0 = A1 %b9 %h1 * %d2 %M10;",
-    "%h0 = A0 %b8 %d1 * %d2, %d0 = A1 %b9 %h1 * %d2 %M10;",
-    "%h0 = A0 %b8 %h1 * %d2, %d0 = A1 %b9 %d1 * %d2 %M10;",
-    "%h0 = A0 %b8 %d1 * %d2, %d0 = A1 %b9 %d1 * %d2 %M10;" };
+    "%h0 = (A0 %b8 %h1 * %h2), %d0 = (A1 %b9 %h1 * %h2) %M10;",
+    "%h0 = (A0 %b8 %d1 * %h2), %d0 = (A1 %b9 %h1 * %h2) %M10;",
+    "%h0 = (A0 %b8 %h1 * %h2), %d0 = (A1 %b9 %d1 * %h2) %M10;",
+    "%h0 = (A0 %b8 %d1 * %h2), %d0 = (A1 %b9 %d1 * %h2) %M10;",
+    "%h0 = (A0 %b8 %h1 * %d2), %d0 = (A1 %b9 %h1 * %h2) %M10;",
+    "%h0 = (A0 %b8 %d1 * %d2), %d0 = (A1 %b9 %h1 * %h2) %M10;",
+    "%h0 = (A0 %b8 %h1 * %d2), %d0 = (A1 %b9 %d1 * %h2) %M10;",
+    "%h0 = (A0 %b8 %d1 * %d2), %d0 = (A1 %b9 %d1 * %h2) %M10;",
+    "%h0 = (A0 %b8 %h1 * %h2), %d0 = (A1 %b9 %h1 * %d2) %M10;",
+    "%h0 = (A0 %b8 %d1 * %h2), %d0 = (A1 %b9 %h1 * %d2) %M10;",
+    "%h0 = (A0 %b8 %h1 * %h2), %d0 = (A1 %b9 %d1 * %d2) %M10;",
+    "%h0 = (A0 %b8 %d1 * %h2), %d0 = (A1 %b9 %d1 * %d2) %M10;",
+    "%h0 = (A0 %b8 %h1 * %d2), %d0 = (A1 %b9 %h1 * %d2) %M10;",
+    "%h0 = (A0 %b8 %d1 * %d2), %d0 = (A1 %b9 %h1 * %d2) %M10;",
+    "%h0 = (A0 %b8 %h1 * %d2), %d0 = (A1 %b9 %d1 * %d2) %M10;",
+    "%h0 = (A0 %b8 %d1 * %d2), %d0 = (A1 %b9 %d1 * %d2) %M10;" };
   int alt = (INTVAL (operands[3]) + (INTVAL (operands[4]) << 1)
 	     + (INTVAL (operands[5]) << 2)  + (INTVAL (operands[6]) << 3));
   return templates[alt];
@@ -3019,22 +3029,22 @@
   ""
 {
   const char *templates[] = {
-    "%h0 = A0 = %h1 * %h2, %d0 = A1 = %h1 * %h2 %M7;",
-    "%h0 = A0 = %d1 * %h2, %d0 = A1 = %h1 * %h2 %M7;",
-    "%h0 = A0 = %h1 * %h2, %d0 = A1 = %d1 * %h2 %M7;",
-    "%h0 = A0 = %d1 * %h2, %d0 = A1 = %d1 * %h2 %M7;",
-    "%h0 = A0 = %h1 * %d2, %d0 = A1 = %h1 * %h2 %M7;",
-    "%h0 = A0 = %d1 * %d2, %d0 = A1 = %h1 * %h2 %M7;",
-    "%h0 = A0 = %h1 * %d2, %d0 = A1 = %d1 * %h2 %M7;",
-    "%h0 = A0 = %d1 * %d2, %d0 = A1 = %d1 * %h2 %M7;",
-    "%h0 = A0 = %h1 * %h2, %d0 = A1 = %h1 * %d2 %M7;",
-    "%h0 = A0 = %d1 * %h2, %d0 = A1 = %h1 * %d2 %M7;",
-    "%h0 = A0 = %h1 * %h2, %d0 = A1 = %d1 * %d2 %M7;",
-    "%h0 = A0 = %d1 * %h2, %d0 = A1 = %d1 * %d2 %M7;",
-    "%h0 = A0 = %h1 * %d2, %d0 = A1 = %h1 * %d2 %M7;",
-    "%h0 = A0 = %d1 * %d2, %d0 = A1 = %h1 * %d2 %M7;",
-    "%h0 = A0 = %h1 * %d2, %d0 = A1 = %d1 * %d2 %M7;",
-    "%h0 = A0 = %d1 * %d2, %d0 = A1 = %d1 * %d2 %M7;" };
+    "%h0 = (A0 = %h1 * %h2), %d0 = (A1 = %h1 * %h2) %M7;",
+    "%h0 = (A0 = %d1 * %h2), %d0 = (A1 = %h1 * %h2) %M7;",
+    "%h0 = (A0 = %h1 * %h2), %d0 = (A1 = %d1 * %h2) %M7;",
+    "%h0 = (A0 = %d1 * %h2), %d0 = (A1 = %d1 * %h2) %M7;",
+    "%h0 = (A0 = %h1 * %d2), %d0 = (A1 = %h1 * %h2) %M7;",
+    "%h0 = (A0 = %d1 * %d2), %d0 = (A1 = %h1 * %h2) %M7;",
+    "%h0 = (A0 = %h1 * %d2), %d0 = (A1 = %d1 * %h2) %M7;",
+    "%h0 = (A0 = %d1 * %d2), %d0 = (A1 = %d1 * %h2) %M7;",
+    "%h0 = (A0 = %h1 * %h2), %d0 = (A1 = %h1 * %d2) %M7;",
+    "%h0 = (A0 = %d1 * %h2), %d0 = (A1 = %h1 * %d2) %M7;",
+    "%h0 = (A0 = %h1 * %h2), %d0 = (A1 = %d1 * %d2) %M7;",
+    "%h0 = (A0 = %d1 * %h2), %d0 = (A1 = %d1 * %d2) %M7;",
+    "%h0 = (A0 = %h1 * %d2), %d0 = (A1 = %h1 * %d2) %M7;",
+    "%h0 = (A0 = %d1 * %d2), %d0 = (A1 = %h1 * %d2) %M7;",
+    "%h0 = (A0 = %h1 * %d2), %d0 = (A1 = %d1 * %d2) %M7;",
+    "%h0 = (A0 = %d1 * %d2), %d0 = (A1 = %d1 * %d2) %M7;" };
   int alt = (INTVAL (operands[3]) + (INTVAL (operands[4]) << 1)
 	     + (INTVAL (operands[5]) << 2)  + (INTVAL (operands[6]) << 3));
   return templates[alt];
