@@ -899,7 +899,9 @@ if [ $KERNEL_SOURCE ] ; then
     done
 
     mv .config-saved-buildtoolchain .config
-
+    # Make sure subsequent builds don't have leftover FD-PIC bits.
+    make oldconfig
+    make clean
     ####################### Done Step 3  #########################
 
     ####################### Step 4 - build bfin-uclinux ################
