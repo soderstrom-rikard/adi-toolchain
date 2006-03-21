@@ -35,6 +35,7 @@ Software Foundation, 51 Franklin Street, Fifth Floor, Boston, MA
 #include "expr.h"
 #include "optabs.h"
 #include "regs.h"
+#include "addresses.h"
 #include "basic-block.h"
 #include "reload.h"
 #include "recog.h"
@@ -1373,7 +1374,7 @@ maybe_fix_stack_asms (void)
 
 		case 'p':
 		  cls = (int) reg_class_subunion[cls]
-		    [(int) MODE_BASE_REG_CLASS (VOIDmode)];
+		      [(int) base_reg_class (VOIDmode, ADDRESS, SCRATCH)];
 		  break;
 
 		case 'g':
@@ -1384,7 +1385,7 @@ maybe_fix_stack_asms (void)
 		default:
 		  if (EXTRA_ADDRESS_CONSTRAINT (c, p))
 		    cls = (int) reg_class_subunion[cls]
-		      [(int) MODE_BASE_REG_CLASS (VOIDmode)];
+		      [(int) base_reg_class (VOIDmode, ADDRESS, SCRATCH)];
 		  else
 		    cls = (int) reg_class_subunion[cls]
 		      [(int) REG_CLASS_FROM_CONSTRAINT (c, p)];
