@@ -1,3 +1,11 @@
+2006-03-22  Jie Zhang  <jie.zhang@analog.com>
+
+	* Makefile.in (LDFLAGS): Don't add -static.
+	* configure.in (--with-libintl): Add.
+	* configure: Regenerate.
+	* elf2flt.c: Include arch specific elf.h.
+	* flat.h: Include <stdint.h>.
+
 2006-03-13  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* flat.h (struct flat_hdr): Restore the use of uint32_t rather than

@@ -46,47 +46,40 @@
 /* from $(INSTALLDIR)/include       */
 #include <bfd.h>      /* Main header file for the BFD library                */
 
-#if defined(TARGET_h8300)
-#include <elf/h8.h>      /* TARGET_* ELF support for the BFD library            */
-#elif defined(__CYGWIN__)
-#include "cygwin-elf.h"	/* Cygwin uses a local copy */
-#elif defined(TARGET_microblaze)
-#include <elf/microblaze.h>	/* TARGET_* ELF support for the BFD library */
-#elif defined(TARGET_bfin)
-#include "elf/bfin.h"
-#else
-#include <elf.h>      /* TARGET_* ELF support for the BFD library            */
-#endif
-
 /* from uClinux-x.x.x/include/linux */
 #include "flat.h"     /* Binary flat header description                      */
 #include "libiberty.h"
-
-#ifdef TARGET_e1
-#include <e1.h>
-#endif
 
 #ifdef TARGET_v850e
 #define TARGET_v850
 #endif
 
 #if defined(TARGET_m68k)
+#include <elf/m68k.h>
 #define	ARCH	"m68k/coldfire"
 #elif defined(TARGET_arm)
+#include <elf/arm.h>
 #define	ARCH	"arm"
 #elif defined(TARGET_sparc)
+#include <elf/sparc.h>
 #define	ARCH	"sparc"
 #elif defined(TARGET_v850)
+#include <elf/v850.h>
 #define	ARCH	"v850"
 #elif defined(TARGET_sh)
+#include <elf/sh.h>
 #define	ARCH	"sh"
 #elif defined(TARGET_h8300)
+#include <elf/h8300.h>
 #define	ARCH	"h8300"
 #elif defined(TARGET_microblaze)
+#include <elf/microblaze.h>
 #define ARCH	"microblaze"
 #elif defined(TARGET_e1)
+#include <e1.h>
 #define ARCH    "e1-coff"
 #elif defined(TARGET_bfin)
+#include <elf/bfin.h>
 #define ARCH	"bfin"
 #define false   0
 #else

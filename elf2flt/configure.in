@@ -13,6 +13,12 @@ AC_ARG_WITH(libiberty,
 	[ ac_libiberty=NONE ]
 )
 
+AC_ARG_WITH(libintl,
+	[ --with-libintl=<file>  path to libintl.a library to use ],
+	[ ac_libintl=$withval ],
+	[ ac_libintl=NONE ]
+)
+
 AC_ARG_WITH(bfd-include-dir,
 	[ --with-bfd-include-dir=<dir>  include path for correct bfd.h ],
 	[ ac_bfd_include_dir=$withval ],
@@ -39,6 +45,12 @@ AC_PROG_CC
 AC_PROG_INSTALL
 
 dnl Checks for libraries.
+if test "$ac_libintl" = "NONE"; then
+  AC_CHECK_LIB(intl, objalloc_create)
+  ac_libintl=auto
+else
+  LIBS="$ac_libintl $LIBS"
+fi
 if test "$ac_libiberty" = "NONE"; then
   AC_CHECK_LIB(iberty, objalloc_create)
   ac_libiberty=auto
@@ -62,14 +74,14 @@ if test "$ac_binutils_include_dir" != "NONE"; then
   binutils_include_dir="-I$ac_binutils_include_dir"
 fi
 
-if test "$ac_libbfd" = "NONE" -o "$ac_libiberty" = "NONE" ; then
+if test "$ac_libbfd" = "NONE" -o "$ac_libiberty" = "NONE" -o "$ac_libintl" = "NONE"; then
 	echo
-	echo "You need to specify the location of the libfd.a and libiberty.a"
+	echo "You need to specify the location of the libfd.a, libiberty.a and libintl.a"
 	echo "host libraries from the binutils package."
 	echo
 	echo "Run configure again specifying these options:"
 	echo
-	echo "  ./configure --target=<ARCH> --with-bfd-include-dir=<dir> --with-libbfd=<libbfd.a> --with-libiberty=<libiberty.a>"
+	echo "  ./configure --target=<ARCH> --with-bfd-include-dir=<dir> --with-libbfd=<libbfd.a> --with-libiberty=<libiberty.a> --with-libintl=<libintl.a>"
 	echo
 	exit 1
 fi
@@ -83,7 +95,7 @@ if test "$ac_bfd_include_dir" = "NONE" ; then
 	echo
 	echo "Run configure again specifying these options:"
 	echo
-	echo "  ./configure --target=<ARCH> --with-bfd-include-dir=<dir> --with-libbfd=<libbfd.a> --with-libiberty=<libiberty.a>"
+	echo "  ./configure --target=<ARCH> --with-bfd-include-dir=<dir> --with-libbfd=<libbfd.a> --with-libiberty=<libiberty.a> --with-libintl=<libintl.a>"
 	echo
 	exit 1
 fi
