@@ -734,6 +734,7 @@ RUN="$MAKE distclean "
 RUN="$DIR_ELF2FLT_SOURCE/configure $HOST_TARGET --target=bfin-elf \
      --with-libbfd=$DIR_BINUTILS_BUILD/bfd/libbfd.a               \
      --with-libiberty=$DIR_ELF_OUTPUT/lib/libiberty.a             \
+     --with-libintl=$DIR_BINUTILS_BUILD/intl/libintl.a               \
      --with-bfd-include-dir=$DIR_BINUTILS_BUILD/bfd               \
      --with-binutils-include-dir=$DIR_BINUTILS_SOURCE/include     \
      --prefix=$DIR_ELF_OUTPUT --program-suffix= "
@@ -957,6 +958,7 @@ if [ $KERNEL_SOURCE ] ; then
          --target=bfin-uclinux                                     \
          --with-libbfd=$DIR_BINUTILS_BUILD/bfd/libbfd.a            \
          --with-libiberty=$DIR_uC_OUTPUT/lib/libiberty.a           \
+         --with-libintl=$DIR_BINUTILS_BUILD/intl/libintl.a            \
          --with-bfd-include-dir=$DIR_BINUTILS_BUILD/bfd            \
          --with-binutils-include-dir=$DIR_BINUTILS_SOURCE/include  \
          --prefix=$DIR_uC_OUTPUT --program-suffix= "
