@@ -1,3 +1,10 @@
+2006-03-24  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	Move over some patches from 3.4.
+
+	2006-03-12  Bernd Schmidt  <bernd.schmidt@analog.com>
+	* config/bfin/lib1funcs.asm (___umodsi3): Save RETS on the stack.
+
 2006-03-23  Jie Zhang  <jie.zhang@analog.com>
 
 	Apply
