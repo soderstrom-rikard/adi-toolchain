@@ -32,6 +32,40 @@
 
 #define LIBGCC_SPEC "%{mfast-fp:-lbffastfp} -lgcc"
 
+#define DRIVER_SELF_SPECS SUBTARGET_DRIVER_SELF_SPECS	"\
+ %{mfdpic:%{!fpic:%{!fpie:%{!fPIC:%{!fPIE:\
+   	    %{!fno-pic:%{!fno-pie:%{!fno-PIC:%{!fno-PIE:-fpie}}}}}}}} \
+	  %{!mno-inline-plt:%{O*:%{!O0:%{!Os:%{fpic|fPIC:-minline-plt} \
+                    %{!fpic:%{!fPIC:%{!O:%{!O1:%{!O2:-minline-plt}}}}}}}}}} \
+"
+#ifndef SUBTARGET_DRIVER_SELF_SPECS
+# define SUBTARGET_DRIVER_SELF_SPECS
+#endif
+
+/* A C string constant that tells the GCC driver program options to pass to
+   the assembler.  It can also specify how to translate options you give to GNU
+   CC into options for GCC to pass to the assembler.  See the file `sun3.h'
+   for an example of this.
+
+   Do not define this macro if it does not need to do anything.
+
+   Defined in svr4.h.  */
+#undef  ASM_SPEC
+#define ASM_SPEC "\
+%{G*} %{v} %{n} %{T} %{Ym,*} %{Yd,*} %{Wa,*:%*} \
+    %{mno-fdpic:-mnopic} %{mfdpic}"
+
+#define LINK_SPEC "\
+%{h*} %{v:-V} \
+%{b} \
+%{mfdpic:-melf32bfinfd -z text} \
+%{static:-dn -Bstatic} \
+%{shared:-Bdynamic} \
+%{symbolic:-Bsymbolic} \
+%{G*} \
+%{YP,*} \
+%{Qy:} %{!Qn:-Qy}"
+
 /* Run-time compilation parameters selecting different hardware subsets.  */
 
 extern int target_flags;
@@ -121,6 +155,10 @@ extern const char *bfin_library_id_string;
      this macro is not defined, it is up to the machine-dependent files
      to allocate such a register (if necessary). */
 #define PIC_OFFSET_TABLE_REGNUM (REG_P5)
+
+#define FDPIC_FPTR_REGNO REG_P1
+#define FDPIC_REGNO REG_P3
+#define OUR_FDPIC_REG	get_hard_reg_initial_val (SImode, FDPIC_REGNO)
 
 /* A static chain register for nested functions.  We need to use a
    call-clobbered register for this.  */
@@ -308,7 +346,9 @@ extern const char *bfin_library_id_string;
 #define CONDITIONAL_REGISTER_USAGE			\
   {							\
     conditional_register_usage();                       \
-    if (flag_pic)					\
+    if (TARGET_FDPIC)					\
+      call_used_regs[FDPIC_REGNO] = 1;			\
+    if (!TARGET_FDPIC && flag_pic)			\
       {							\
 	fixed_regs[PIC_OFFSET_TABLE_REGNUM] = 1;	\
 	call_used_regs[PIC_OFFSET_TABLE_REGNUM] = 1;	\
@@ -352,6 +392,8 @@ enum reg_class
   EVEN_DREGS,
   ODD_DREGS,
   DREGS,
+  FDPIC_REGS,
+  FDPIC_FPTR_REGS,
   PREGS_CLOBBERED,
   PREGS,
   IPREGS,
@@ -383,6 +425,8 @@ enum reg_class
    "EVEN_DREGS",	\
    "ODD_DREGS",		\
    "DREGS",		\
+   "FDPIC_REGS",	\
+   "FDPIC_FPTR_REGS",	\
    "PREGS_CLOBBERED",	\
    "PREGS",		\
    "IPREGS",		\
@@ -422,6 +466,8 @@ enum reg_class
     { 0x00000055,    0 },		/* EVEN_DREGS */   \
     { 0x000000aa,    0 },		/* ODD_DREGS */   \
     { 0x000000ff,    0 },		/* DREGS */   \
+    { 0x00000800,    0x000 },		/* FDPIC_REGS */   \
+    { 0x00000200,    0x000 },		/* FDPIC_FPTR_REGS */   \
     { 0x00004700,    0x800 },		/* PREGS_CLOBBERED */   \
     { 0x0000ff00,    0x800 },		/* PREGS */   \
     { 0x000fff00,    0x800 },		/* IPREGS */	\
@@ -464,6 +510,8 @@ enum reg_class
 
 #define REG_CLASS_FROM_LETTER(LETTER)	\
   ((LETTER) == 'a' ? PREGS :            \
+   (LETTER) == 'Z' ? FDPIC_REGS :	\
+   (LETTER) == 'Y' ? FDPIC_FPTR_REGS :	\
    (LETTER) == 'd' ? DREGS : 		\
    (LETTER) == 'z' ? PREGS_CLOBBERED :	\
    (LETTER) == 'D' ? EVEN_DREGS : 	\

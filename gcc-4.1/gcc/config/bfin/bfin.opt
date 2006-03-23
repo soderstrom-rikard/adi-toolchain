@@ -51,3 +51,11 @@ Avoid generating pc-relative calls; use indirection
 mfast-fp
 Target Report Mask(FAST_FP)
 Link with the fast floating-point library
+
+mfdpic
+Target Report Mask(FDPIC)
+Enable Function Descriptor PIC mode
+
+minline-plt
+Target Report Mask(INLINE_PLT)
+Enable inlining of PLT in function calls

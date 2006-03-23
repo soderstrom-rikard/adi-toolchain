@@ -13,4 +13,11 @@
 #undef  LIB_SPEC
 #define LIB_SPEC "%{pthread:-lpthread} -lc"
 
+#ifdef __BFIN_FDPIC__
+#define CRT_CALL_STATIC_FUNCTION(SECTION_OP, FUNC)	\
+asm (SECTION_OP); \
+asm ("P3 = [SP + 20];\n\tcall " USER_LABEL_PREFIX #FUNC ";"); \
+asm (TEXT_SECTION_ASM_OP);
+#endif
+
 #define NO_IMPLICIT_EXTERN_C

@@ -123,12 +123,15 @@
    ;; Signed fractional multiply (no options)
    (UNSPEC_FRMUL 6)
    ;; Signed fractional multiply with truncation (T option)
-   (UNSPEC_FRTMUL 7)])
+   (UNSPEC_FRTMUL 7)
+   (UNSPEC_MOVE_FDPIC 8)
+   (UNSPEC_FUNCDESC_GOT17M4 9)])
 
 (define_constants
   [(UNSPEC_VOLATILE_EH_RETURN 0)
    (UNSPEC_VOLATILE_CSYNC 1)
-   (UNSPEC_VOLATILE_SSYNC 2)])
+   (UNSPEC_VOLATILE_SSYNC 2)
+   (UNSPEC_VOLATILE_LOAD_FUNCDESC 3)])
 
 (define_attr "type"
   "move,mvi,mcld,mcst,dsp32,mult,alu0,shft,brcc,br,call,misc,sync,compare,dummy"
@@ -1411,6 +1414,19 @@
 
 ;;  Call instructions..
 
+;; The explicit MEM inside the UNSPEC prevents the compiler from moving
+;; the load before a branch after a NULL test, or before a store that
+;; initializes a function descriptor.
+
+(define_insn_and_split "load_funcdescsi"
+  [(set (match_operand:SI 0 "register_operand" "=a")
+	(unspec_volatile:SI [(mem:SI (match_operand:SI 1 "address_operand" "p"))]
+			    UNSPEC_VOLATILE_LOAD_FUNCDESC))]
+  ""
+  "#"
+  "reload_completed"
+  [(set (match_dup 0) (mem:SI (match_dup 1)))])
+
 (define_expand "call"
   [(parallel [(call (match_operand:SI 0 "" "")
 		    (match_operand 1 "" ""))
@@ -1455,15 +1471,111 @@
   DONE;
 })
 
+(define_insn "*call_symbol_fdpic"
+  [(call (mem:SI (match_operand:SI 0 "symbol_ref_operand" "Q"))
+	 (match_operand 1 "general_operand" "g"))
+   (use (match_operand:SI 2 "register_operand" "Z"))
+   (use (match_operand 3 "" ""))]
+  "! SIBLING_CALL_P (insn)
+   && GET_CODE (operands[0]) == SYMBOL_REF
+   && !bfin_longcall_p (operands[0], INTVAL (operands[3]))"
+  "call %0;"
+  [(set_attr "type" "call")
+   (set_attr "length" "4")])
+
+(define_insn "*sibcall_symbol_fdpic"
+  [(call (mem:SI (match_operand:SI 0 "symbol_ref_operand" "Q"))
+	 (match_operand 1 "general_operand" "g"))
+   (use (match_operand:SI 2 "register_operand" "Z"))
+   (use (match_operand 3 "" ""))
+   (return)]
+  "SIBLING_CALL_P (insn)
+   && GET_CODE (operands[0]) == SYMBOL_REF
+   && !bfin_longcall_p (operands[0], INTVAL (operands[3]))"
+  "jump.l %0;"
+  [(set_attr "type" "br")
+   (set_attr "length" "4")])
+
+(define_insn "*call_value_symbol_fdpic"
+  [(set (match_operand 0 "register_operand" "=d")
+        (call (mem:SI (match_operand:SI 1 "symbol_ref_operand" "Q"))
+	      (match_operand 2 "general_operand" "g")))
+   (use (match_operand:SI 3 "register_operand" "Z"))
+   (use (match_operand 4 "" ""))]
+  "! SIBLING_CALL_P (insn)
+   && GET_CODE (operands[1]) == SYMBOL_REF
+   && !bfin_longcall_p (operands[1], INTVAL (operands[4]))"
+  "call %1;"
+  [(set_attr "type" "call")
+   (set_attr "length" "4")])
+
+(define_insn "*sibcall_value_symbol_fdpic"
+  [(set (match_operand 0 "register_operand" "=d")
+         (call (mem:SI (match_operand:SI 1 "symbol_ref_operand" "Q"))
+	       (match_operand 2 "general_operand" "g")))
+   (use (match_operand:SI 3 "register_operand" "Z"))
+   (use (match_operand 4 "" ""))
+   (return)]
+  "SIBLING_CALL_P (insn)
+   && GET_CODE (operands[1]) == SYMBOL_REF
+   && !bfin_longcall_p (operands[1], INTVAL (operands[4]))"
+  "jump.l %1;"
+  [(set_attr "type" "br")
+   (set_attr "length" "4")])
+
+(define_insn "*call_insn_fdpic"
+  [(call (mem:SI (match_operand:SI 0 "register_no_elim_operand" "Y"))
+	 (match_operand 1 "general_operand" "g"))
+   (use (match_operand:SI 2 "register_operand" "Z"))
+   (use (match_operand 3 "" ""))]
+  "! SIBLING_CALL_P (insn)"
+  "call (%0);"
+  [(set_attr "type" "call")
+   (set_attr "length" "2")])
+
+(define_insn "*sibcall_insn_fdpic"
+  [(call (mem:SI (match_operand:SI 0 "register_no_elim_operand" "Y"))
+	 (match_operand 1 "general_operand" "g"))
+   (use (match_operand:SI 2 "register_operand" "Z"))
+   (use (match_operand 3 "" ""))
+   (return)]
+  "SIBLING_CALL_P (insn)"
+  "jump (%0);"
+  [(set_attr "type" "br")
+   (set_attr "length" "2")])
+
+(define_insn "*call_value_insn_fdpic"
+  [(set (match_operand 0 "register_operand" "=d")
+        (call (mem:SI (match_operand:SI 1 "register_no_elim_operand" "Y"))
+	      (match_operand 2 "general_operand" "g")))
+   (use (match_operand:SI 3 "register_operand" "Z"))
+   (use (match_operand 4 "" ""))]
+  "! SIBLING_CALL_P (insn)"
+  "call (%1);"
+  [(set_attr "type" "call")
+   (set_attr "length" "2")])
+
+(define_insn "*sibcall_value_insn_fdpic"
+  [(set (match_operand 0 "register_operand" "=d")
+         (call (mem:SI (match_operand:SI 1 "register_no_elim_operand" "Y"))
+	       (match_operand 2 "general_operand" "g")))
+   (use (match_operand:SI 3 "register_operand" "Z"))
+   (use (match_operand 4 "" ""))
+   (return)]
+  "SIBLING_CALL_P (insn)"
+  "jump (%1);"
+  [(set_attr "type" "br")
+   (set_attr "length" "2")])
+
 (define_insn "*call_symbol"
   [(call (mem:SI (match_operand:SI 0 "symbol_ref_operand" "Q"))
 	 (match_operand 1 "general_operand" "g"))
    (use (match_operand 2 "" ""))]
   "! SIBLING_CALL_P (insn)
-   && !flag_pic
+   && !TARGET_ID_SHARED_LIBRARY
    && GET_CODE (operands[0]) == SYMBOL_REF
    && !bfin_longcall_p (operands[0], INTVAL (operands[2]))"
-  "call %G0;"
+  "call %0;"
   [(set_attr "type" "call")
    (set_attr "length" "4")])
 
@@ -1473,10 +1585,10 @@
    (use (match_operand 2 "" ""))
    (return)]
   "SIBLING_CALL_P (insn)
-   && !flag_pic
+   && !TARGET_ID_SHARED_LIBRARY
    && GET_CODE (operands[0]) == SYMBOL_REF
    && !bfin_longcall_p (operands[0], INTVAL (operands[2]))"
-  "jump.l %G0;"
+  "jump.l %0;"
   [(set_attr "type" "br")
    (set_attr "length" "4")])
 
@@ -1486,10 +1598,10 @@
 	      (match_operand 2 "general_operand" "g")))
    (use (match_operand 3 "" ""))]
   "! SIBLING_CALL_P (insn)
-   && !flag_pic
+   && !TARGET_ID_SHARED_LIBRARY
    && GET_CODE (operands[1]) == SYMBOL_REF
    && !bfin_longcall_p (operands[1], INTVAL (operands[3]))"
-  "call %G1;"
+  "call %1;"
   [(set_attr "type" "call")
    (set_attr "length" "4")])
 
@@ -1500,10 +1612,10 @@
    (use (match_operand 3 "" ""))
    (return)]
   "SIBLING_CALL_P (insn)
-   && !flag_pic
+   && !TARGET_ID_SHARED_LIBRARY
    && GET_CODE (operands[1]) == SYMBOL_REF
    && !bfin_longcall_p (operands[1], INTVAL (operands[3]))"
-  "jump.l %G1;"
+  "jump.l %1;"
   [(set_attr "type" "br")
    (set_attr "length" "4")])
 
