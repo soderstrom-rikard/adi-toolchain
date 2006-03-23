@@ -111,7 +111,8 @@ extern int target_flags;
 %{symbolic:-Bsymbolic} \
 %{G*} \
 %{YP,*} \
-%{Qy:} %{!Qn:-Qy}"
+%{Qy:} %{!Qn:-Qy} \
+-init __init -fini __fini "
 
 #undef  LIB_SPEC
 #define LIB_SPEC "-lc"

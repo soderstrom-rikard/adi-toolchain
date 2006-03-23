@@ -1,3 +1,10 @@
+2006-03-23  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/uclinux.h (STARTFILE_SPEC): Don't link crt1.o if
+	"-shared".
+	* config/bfin/bfin.h (LINK_SPEC): Add linker options to allow it to
+	find __init and __fini.
+
 2006-03-19  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_init_builtins): Lose short_ftype_v2hi_v2hi,
