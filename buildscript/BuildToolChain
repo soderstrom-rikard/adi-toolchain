@@ -739,7 +739,7 @@ RUN="$DIR_ELF2FLT_SOURCE/configure $HOST_TARGET --target=bfin-elf \
      --prefix=$DIR_ELF_OUTPUT --program-suffix= "
 
 if [ -e $DIR_BINUTILS_BUILD/intl/libintl.a ] ; then
-    RUN=$RUN "--with-libintl=$DIR_BINUTILS_BUILD/intl/libintl.a"
+    RUN="$RUN --with-libintl=$DIR_BINUTILS_BUILD/intl/libintl.a"
 fi
 
 (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
@@ -972,7 +972,7 @@ if [ $KERNEL_SOURCE ] ; then
          --prefix=$DIR_uC_OUTPUT --program-suffix= "
 
     if [ -e $DIR_BINUTILS_BUILD/intl/libintl.a ] ; then
-        RUN=$RUN "--with-libintl=$DIR_BINUTILS_BUILD/intl/libintl.a"
+        RUN="$RUN --with-libintl=$DIR_BINUTILS_BUILD/intl/libintl.a"
     fi
 
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
