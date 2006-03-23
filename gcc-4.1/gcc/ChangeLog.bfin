@@ -1,3 +1,10 @@
+2006-03-23  Jie Zhang  <jie.zhang@analog.com>
+
+	Apply
+	2005-12-01  Nathan Sidwell  <nathan@codesourcery.com>
+	* config/ms1/ms1.c (ms1_reorg_hazard): Don't count noop moves.
+	* vec.h (VEC_block_remove): New.
+
 2006-03-22  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.h (ASM_FORMAT_PRIVATE_NAME): Remove.
