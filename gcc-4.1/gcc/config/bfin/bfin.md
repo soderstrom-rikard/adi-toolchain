@@ -2133,7 +2133,7 @@
 	 (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
 			(parallel [(const_int 0)]))))]
   ""
-  "%d0 = %h2;"
+  "%d0 = %h2 << 0;"
   [(set_attr "type" "move")])
 
 (define_insn "movhi_high2high"
@@ -2144,7 +2144,7 @@
 	 (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
 			(parallel [(const_int 1)]))))]
   ""
-  "%d0 = %d2;"
+  "%d0 = %d2 << 0;"
   [(set_attr "type" "move")])
 
 (define_insn "movhi_low2low"
@@ -2155,7 +2155,7 @@
 	 (vec_select:HI (match_operand:V2HI 1 "register_operand" "0")
 			(parallel [(const_int 1)]))))]
   ""
-  "%h0 = %h2;"
+  "%h0 = %h2 << 0;"
   [(set_attr "type" "move")])
 
 (define_insn "movhi_high2low"
@@ -2166,7 +2166,7 @@
 	 (vec_select:HI (match_operand:V2HI 1 "register_operand" "0")
 			(parallel [(const_int 1)]))))]
   ""
-  "%h0 = %d2;"
+  "%h0 = %d2 << 0;"
   [(set_attr "type" "move")])
 
 (define_insn "movhiv2hi_low"
@@ -2176,7 +2176,7 @@
 	 (vec_select:HI (match_operand:V2HI 1 "register_operand" "0")
 			(parallel [(const_int 1)]))))]
   ""
-  "%h0 = %h2;"
+  "%h0 = %h2 << 0;"
   [(set_attr "type" "move")])
 
 (define_insn "movhiv2hi_high"
@@ -2186,14 +2186,16 @@
 			(parallel [(const_int 0)]))
 	 (match_operand:HI 2 "register_operand" "d")))]
   ""
-  "%d0 = %h2;"
+  "%d0 = %h2 << 0;"
   [(set_attr "type" "move")])
 
 ;; No earlyclobber on alternative two since our sequence ought to be safe.
+;; The order of operands is intentional to match the VDSP builtin (high word
+;; is passed first).
 (define_insn_and_split "composev2hi"
   [(set (match_operand:V2HI 0 "register_operand" "=d,d")
-	(vec_concat:V2HI (match_operand:HI 1 "register_operand" "0,d")
-			 (match_operand:HI 2 "register_operand" "d,d")))]
+	(vec_concat:V2HI (match_operand:HI 2 "register_operand" "0,d")
+			 (match_operand:HI 1 "register_operand" "d,d")))]
   ""
   "@
    %d0 = %h2;
@@ -2206,9 +2208,27 @@
    (set (match_dup 0)
 	(vec_concat:V2HI
 	 (match_dup 1)
-	 (vec_select:HI (match_dup 0) (parallel [(const_int 0)]))))]
+	 (vec_select:HI (match_dup 0) (parallel [(const_int 1)]))))]
   ""
   [(set_attr "type" "move")])
+
+; Like composev2hi, but operating on elements of V2HI vectors.
+; Useful on its own, and as a combiner bridge for frmulv2hi_parts.
+(define_insn "packv2hi"
+  [(set (match_operand:V2HI 0 "register_operand" "=d,d,d,d")
+	(vec_concat:V2HI (vec_select:HI
+			  (match_operand:V2HI 1 "register_operand" "d,d,d,d")
+			  (parallel [(match_operand 3 "const01_operand" "P0,P1,P0,P1")]))
+			 (vec_select:HI
+			  (match_operand:V2HI 2 "register_operand" "d,d,d,d")
+			  (parallel [(match_operand 4 "const01_operand" "P0,P0,P1,P1")]))))]
+  ""
+  "@
+   %0 = PACK (%h2,%h1);
+   %0 = PACK (%h2,%d1);
+   %0 = PACK (%d2,%h1);
+   %0 = PACK (%d2,%d1);"
+  [(set_attr "type" "dsp32")])
 
 (define_insn "movv2hi_hi"
   [(set (match_operand:HI 0 "register_operand" "=d,d,d")
@@ -2217,8 +2237,8 @@
   ""
   "@
    /* optimized out */
-   %h0 = %h1;
-   %h0 = %d1;"
+   %h0 = %h1 << 0;
+   %h0 = %d1 << 0;"
   [(set_attr "type" "dsp32")])
 
 (define_expand "movv2hi_hi_low"
@@ -2479,26 +2499,85 @@
   "%h0 = %h1 * %h2, %d0 = %d1 * %d2 (T);"
   [(set_attr "type" "dsp32")])
 
-;(define_insn "frmulv2hi_parts"
-;  [(set (match_operand:V2HI 0 "register_operand" "=d")
-;	(unspec:V2HI [(vec_concat:V2HI
-;		       (vec_select:HI
-;			(match_operand:V2HI 1 "register_operand" "d")
-;			(parallel [(match_operand:SI 3 "const01_operand" "P0P1")]))
-;		       (vec_select:HI
-;			(match_operand:V2HI 2 "register_operand" "d")
-;			(parallel [(match_operand:SI 4 "const01_operand" "P0P1")])))
-;		      (vec_concat:V2HI
-;		       (vec_select:HI
-;			(match_dup 1)
-;			(parallel [(match_operand:SI 5 "const01_operand" "P0P1")]))
-;		       (vec_select:HI
-;			(match_dup 2)
-;			(parallel [(match_operand:SI 6 "const01_operand" "P0P1")])))]
-;		     UNSPEC_FRMUL))]
-;  ""
-;  "%h0 = %h1 * %h2, %d0 = %d1 * %d2;"
-;  [(set_attr "type" "dsp32")])
+(define_insn "frmulv2hi_parts"
+  [(set (match_operand:V2HI 0 "register_operand" "=d")
+	(unspec:V2HI [(vec_concat:V2HI
+		       (vec_select:HI
+			(match_operand:V2HI 1 "register_operand" "d")
+			(parallel [(match_operand:SI 3 "const01_operand" "P0P1")]))
+		       (vec_select:HI
+			(match_dup 1)
+			(parallel [(match_operand:SI 4 "const01_operand" "P0P1")])))
+		      (vec_concat:V2HI
+		       (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
+			(parallel [(match_operand:SI 5 "const01_operand" "P0P1")]))
+		       (vec_select:HI (match_dup 2)
+			(parallel [(match_operand:SI 6 "const01_operand" "P0P1")])))]
+		     UNSPEC_FRMUL))]
+  ""
+{
+  const char *templates[] = {
+    "%h0 = %h1 * %h2, %d0 = %h1 * %h2;",
+    "%h0 = %d1 * %h2, %d0 = %h1 * %h2;",
+    "%h0 = %h1 * %h2, %d0 = %d1 * %h2;",
+    "%h0 = %d1 * %h2, %d0 = %d1 * %h2;",
+    "%h0 = %h1 * %d2, %d0 = %h1 * %h2;",
+    "%h0 = %d1 * %d2, %d0 = %h1 * %h2;",
+    "%h0 = %h1 * %d2, %d0 = %d1 * %h2;",
+    "%h0 = %d1 * %d2, %d0 = %d1 * %h2;",
+    "%h0 = %h1 * %h2, %d0 = %h1 * %d2;",
+    "%h0 = %d1 * %h2, %d0 = %h1 * %d2;",
+    "%h0 = %h1 * %h2, %d0 = %d1 * %d2;",
+    "%h0 = %d1 * %h2, %d0 = %d1 * %d2;",
+    "%h0 = %h1 * %d2, %d0 = %h1 * %d2;",
+    "%h0 = %d1 * %d2, %d0 = %h1 * %d2;",
+    "%h0 = %h1 * %d2, %d0 = %d1 * %d2;",
+    "%h0 = %d1 * %d2, %d0 = %d1 * %d2;" };
+  int alt = (INTVAL (operands[3]) + (INTVAL (operands[4]) << 1)
+	     + (INTVAL (operands[5]) << 2)  + (INTVAL (operands[6]) << 3));
+  return templates[alt];
+}
+  [(set_attr "type" "dsp32")])
+
+(define_insn "frtmulv2hi_parts"
+  [(set (match_operand:V2HI 0 "register_operand" "=d")
+	(unspec:V2HI [(vec_concat:V2HI
+		       (vec_select:HI
+			(match_operand:V2HI 1 "register_operand" "d")
+			(parallel [(match_operand:SI 3 "const01_operand" "P0P1")]))
+		       (vec_select:HI
+			(match_dup 1)
+			(parallel [(match_operand:SI 4 "const01_operand" "P0P1")])))
+		      (vec_concat:V2HI
+		       (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
+			(parallel [(match_operand:SI 5 "const01_operand" "P0P1")]))
+		       (vec_select:HI (match_dup 2)
+			(parallel [(match_operand:SI 6 "const01_operand" "P0P1")])))]
+		     UNSPEC_FRTMUL))]
+  ""
+{
+  const char *templates[] = {
+    "%h0 = %h1 * %h2, %d0 = %h1 * %h2; (T)",
+    "%h0 = %d1 * %h2, %d0 = %h1 * %h2; (T)",
+    "%h0 = %h1 * %h2, %d0 = %d1 * %h2; (T)",
+    "%h0 = %d1 * %h2, %d0 = %d1 * %h2; (T)",
+    "%h0 = %h1 * %d2, %d0 = %h1 * %h2; (T)",
+    "%h0 = %d1 * %d2, %d0 = %h1 * %h2; (T)",
+    "%h0 = %h1 * %d2, %d0 = %d1 * %h2; (T)",
+    "%h0 = %d1 * %d2, %d0 = %d1 * %h2; (T)",
+    "%h0 = %h1 * %h2, %d0 = %h1 * %d2; (T)",
+    "%h0 = %d1 * %h2, %d0 = %h1 * %d2; (T)",
+    "%h0 = %h1 * %h2, %d0 = %d1 * %d2; (T)",
+    "%h0 = %d1 * %h2, %d0 = %d1 * %d2; (T)",
+    "%h0 = %h1 * %d2, %d0 = %h1 * %d2; (T)",
+    "%h0 = %d1 * %d2, %d0 = %h1 * %d2; (T)",
+    "%h0 = %h1 * %d2, %d0 = %d1 * %d2; (T)",
+    "%h0 = %d1 * %d2, %d0 = %d1 * %d2; (T)" };
+  int alt = (INTVAL (operands[3]) + (INTVAL (operands[4]) << 1)
+	     + (INTVAL (operands[5]) << 2)  + (INTVAL (operands[6]) << 3));
+  return templates[alt];
+}
+  [(set_attr "type" "dsp32")])
 
 (define_insn "mulhisi_ll"
   [(set (match_operand:SI 0 "register_operand" "=d")
@@ -2626,5 +2705,4 @@
    %0 = %1 >> %2 (V);
    %0 = %1 << %2 (V);"
   [(set_attr "type" "dsp32")])
-
 

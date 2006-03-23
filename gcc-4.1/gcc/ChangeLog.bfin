@@ -2,6 +2,14 @@
 
 	Move over some patches from 3.4.
 
+	* config/bfin/bfin.c (bdesc_2arg): Add __builtin_compose_2x16.
+	* config/bfin/bfin.md (movhi_low2high, movhi_high2high, movhi_low2low,
+	movhi_high2low, movhiv2hi_low, movhi2vhi_high, movv2hi_hi): Use
+	halfword shifts by zero instead of nonexistant register moves.
+	(copmosev2hi): Swap operands 1 and 2.  Fix wrong vec_select in split.
+	(packv2hi): New pattern.
+	(frmulv2hi_parts, frtmulv2hi_parts): New patterns.
+
 	* simplify-rtx.c (simplify_subreg): Simplify some forms that combine
 	can pass us.
 
