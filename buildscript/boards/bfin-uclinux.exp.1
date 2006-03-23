@@ -7,8 +7,8 @@ process_multilib_options ""
 set_board_info compiler  "[find_gcc]"
 # -s80000 is for gcc.dg/dg.exp/trampoline-1.c
 set_board_info ldflags "-Wl,-elf2flt=-s80000";
-set_board_info rsh_prog /usr/bin/rsh
-set_board_info rcp_prog /usr/bin/rcp
+set_board_info rsh_prog rsh
+set_board_info rcp_prog rcp
 set_board_info protocol standard
 set_board_info username root
 set_board_info use_gdb_stub 1
