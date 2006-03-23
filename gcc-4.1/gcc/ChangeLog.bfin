@@ -2,6 +2,9 @@
 
 	Move over some patches from 3.4.
 
+	* simplify-rtx.c (simplify_subreg): Simplify some forms that combine
+	can pass us.
+
 	* config/bfin/bfin.h (TARGET_CPP_CPU_BUILTINS): Define __ADSPBLACKFIN__.
 	* config/bfin/bfin.c: Include "optabs.h".
 	(enum blackfin_builtins): Expand with a lot of new codes.

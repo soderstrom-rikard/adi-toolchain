@@ -3899,6 +3899,22 @@ simplify_subreg (enum machine_mode outermode, rtx op,
       return NULL_RTX;
     }
 
+  /* Combine can feed us (subreg:M1 (ashiftrt:M2 (ashift X N) N)), which we
+     can simplify to (subreg X) if (m2_size - N) >= m1_size.  */
+  if (GET_CODE (op) == ASHIFTRT
+      && GET_CODE (XEXP (op, 1)) == CONST_INT
+      && GET_CODE (XEXP (op, 0)) == ASHIFT
+      && GET_MODE_SIZE (outermode) < GET_MODE_SIZE (innermode)
+      && subreg_lowpart_offset (outermode, innermode) == byte
+      && rtx_equal_p (XEXP (op, 1), XEXP (XEXP (op, 0), 1)))
+    {
+      rtx subop = XEXP (XEXP (op, 0), 0);
+      HOST_WIDE_INT nbits = INTVAL (XEXP (op, 1));
+      int intact_bits = GET_MODE_BITSIZE (innermode) - nbits;
+      if (intact_bits >= GET_MODE_BITSIZE (outermode))
+	op = subop;
+    }
+
   /* SUBREG of a hard register => just change the register number
      and/or mode.  If the hard register is not valid in that mode,
      suppress this simplification.  If the hard register is the stack,
