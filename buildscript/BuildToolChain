@@ -905,8 +905,13 @@ if [ $KERNEL_SOURCE ] ; then
 
     mv .config-saved-buildtoolchain .config
     # Make sure subsequent builds don't have leftover FD-PIC bits.
-    make oldconfig
-    make clean
+    echo -n "*** Cleaning uClibc                " ; date
+    RUN="$MAKE oldconfig"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+    RUN="$MAKE clean"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
     ####################### Done Step 3  #########################
 
     ####################### Step 4 - build bfin-uclinux ################
