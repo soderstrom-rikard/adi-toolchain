@@ -42,6 +42,7 @@ extern int target_flags;
   do                                            \
     {                                           \
       builtin_define ("bfin");                  \
+      builtin_define ("__ADSPBLACKFIN__");	\
       builtin_define ("BFIN");                  \
       if (flag_pic)				\
 	{					\

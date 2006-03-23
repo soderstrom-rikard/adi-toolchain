@@ -2,6 +2,17 @@
 
 	Move over some patches from 3.4.
 
+	* config/bfin/bfin.h (TARGET_CPP_CPU_BUILTINS): Define __ADSPBLACKFIN__.
+	* config/bfin/bfin.c: Include "optabs.h".
+	(enum blackfin_builtins): Expand with a lot of new codes.
+	(bfin_init_builtins): Initialize fractional math builtins.
+	(struct builtin_description): New struct.
+	(bdesc_2arg, bdesc_arg): New arrays.
+	(safe_vector_operand, bfin_expand_binop_builtin,
+	bfin_expand_unop_builtin): New functions.
+	(bfin_expand_builtin): Use them; add code to support fractional math
+	builtins.
+
 	* config/bfin/predicates.md (const01_operand, vec_shift_operand): New
 	predicates.
 	* config/bfin/bfin.md (UNSPEC_FRMUL, UNSPEC_FRTMUL): New constants.
