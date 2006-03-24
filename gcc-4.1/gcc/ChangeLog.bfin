@@ -2,6 +2,11 @@
 
 	Move over some patches from 3.4.
 
+	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): If
+	TARGET_ID_SHARED_LIBRARY, define __ID_SHARED_LIB__.
+	* config/bfin/crti.S: Use it instead of __PIC__.
+	* config/bfin/crtn.S: Likewise.
+
 	* config/bfin/bfin.md (movv2hi_insn): Now a define_and_split; changed
 	to accept CONST_VECTORs.  Add some constraints for optional reloads.
 
