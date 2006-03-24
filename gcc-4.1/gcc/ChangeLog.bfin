@@ -2,6 +2,9 @@
 
 	Move over some patches from 3.4.
 
+	* config/bfin/bfin.md (movv2hi_insn): Now a define_and_split; changed
+	to accept CONST_VECTORs.  Add some constraints for optional reloads.
+
 	* config/bfin/uclinux.h (STARTFILE_SPEC): Don't link crt1.o if
 	"-shared".
 	* config/bfin/bfin.h (LINK_SPEC): Add linker options to allow it to

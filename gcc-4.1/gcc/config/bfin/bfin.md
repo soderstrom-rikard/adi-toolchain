@@ -450,14 +450,28 @@
   [(set_attr "type" "move,move,mvi,mvi,mvi,*,mcld,mcst")
    (set_attr "length" "2,2,2,4,4,*,*,*")])
 
-(define_insn "*movv2hi_insn"
-  [(set (match_operand:V2HI 0 "nonimmediate_operand" "=da,d,m")
-        (match_operand:V2HI 1 "general_operand" "d,m,d"))]
+(define_insn_and_split "*movv2hi_insn"
+  [(set (match_operand:V2HI 0 "nonimmediate_operand" "=da,da,d,dm")
+        (match_operand:V2HI 1 "general_operand" "i,di,md,d"))]
 
   "GET_CODE (operands[0]) != MEM || GET_CODE (operands[1]) != MEM"
-  "%0 = %1;"
-  [(set_attr "type" "move,mcld,mcst")
-   (set_attr "length" "2,*,*")])
+  "@
+   #
+   %0 = %1;
+   %0 = %1;
+   %0 = %1;"
+  "reload_completed && GET_CODE (operands[1]) == CONST_VECTOR"
+  [(set (match_dup 0) (high:SI (match_dup 2)))
+   (set (match_dup 0) (lo_sum:SI (match_dup 0) (match_dup 3)))]
+{
+  HOST_WIDE_INT intval = INTVAL (XVECEXP (operands[1], 0, 1)) << 16;
+  intval |= INTVAL (XVECEXP (operands[1], 0, 0));
+  
+  operands[0] = gen_rtx_REG (SImode, REGNO (operands[0]));
+  operands[2] = operands[3] = GEN_INT (trunc_int_for_mode (intval, SImode));
+}
+  [(set_attr "type" "move,move,mcld,mcst")
+   (set_attr "length" "2,2,*,*")])
 
 (define_insn "*movhi_insn"
   [(set (match_operand:HI 0 "nonimmediate_operand" "=x,da,x,d,mr")
