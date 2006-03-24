@@ -64,7 +64,8 @@
 %{symbolic:-Bsymbolic} \
 %{G*} \
 %{YP,*} \
-%{Qy:} %{!Qn:-Qy}"
+%{Qy:} %{!Qn:-Qy} \
+-init __init -fini __fini "
 
 /* Run-time compilation parameters selecting different hardware subsets.  */
 

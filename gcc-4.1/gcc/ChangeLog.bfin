@@ -2,6 +2,11 @@
 
 	Move over some patches from 3.4.
 
+	* config/bfin/uclinux.h (STARTFILE_SPEC): Don't link crt1.o if
+	"-shared".
+	* config/bfin/bfin.h (LINK_SPEC): Add linker options to allow it to
+	find __init and __fini.
+
 	* config/bfin/bfin.c (bfin_init_builtins): Lose short_ftype_v2hi_v2hi,
 	build int_ftype_short_short instead.  Also make __builtin_mult_fr1x32.
 	(bdesc_2arg): Use -1 as macflag for non-multiplications.  Add
