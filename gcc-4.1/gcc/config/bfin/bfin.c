@@ -3156,8 +3156,8 @@ bfin_init_builtins (void)
   tree v2hi_ftype_v2hi_int
     = build_function_type_list (V2HI_type_node, V2HI_type_node,
 				integer_type_node, NULL_TREE);
-  tree short_ftype_v2hi_v2hi
-    = build_function_type_list (V2HI_type_node, short_integer_type_node,
+  tree int_ftype_short_short
+    = build_function_type_list (integer_type_node, short_integer_type_node,
 				short_integer_type_node, NULL_TREE);
   tree v2hi_ftype_v2hi
     = build_function_type_list (V2HI_type_node, V2HI_type_node, NULL_TREE);
@@ -3235,7 +3235,7 @@ bfin_init_builtins (void)
 	       BFIN_BUILTIN_NEG_1X32);
   def_builtin ("__builtin_norm_fr1x32", short_ftype_int,
 	       BFIN_BUILTIN_NORM_1X32);
-  def_builtin ("__builtin_mult_fr1x32", int_ftype_int_int,
+  def_builtin ("__builtin_mult_fr1x32", int_ftype_short_short,
 	       BFIN_BUILTIN_MULT_1X32);
 
   /* Shifts.  */
@@ -3268,30 +3268,31 @@ struct builtin_description
 
 static const struct builtin_description bdesc_2arg[] =
 {
-  { CODE_FOR_composev2hi, "__builtin_compose_2x16", BFIN_BUILTIN_COMPOSE_2X16, 0 },
+  { CODE_FOR_composev2hi, "__builtin_compose_2x16", BFIN_BUILTIN_COMPOSE_2X16, -1 },
 
-  { CODE_FOR_ssashiftv2hi3, "__builtin_shl_fr2x16", BFIN_BUILTIN_SSASHIFT_2X16, 0 },
-  { CODE_FOR_ssashifthi3, "__builtin_shl_fr1x16", BFIN_BUILTIN_SSASHIFT_1X16, 0 },
-  { CODE_FOR_lshiftv2hi3, "__builtin_lshl_fr2x16", BFIN_BUILTIN_LSHIFT_2X16, 0 },
-  { CODE_FOR_lshifthi3, "__builtin_lshl_fr1x16", BFIN_BUILTIN_LSHIFT_1X16, 0 },
+  { CODE_FOR_ssashiftv2hi3, "__builtin_shl_fr2x16", BFIN_BUILTIN_SSASHIFT_2X16, -1 },
+  { CODE_FOR_ssashifthi3, "__builtin_shl_fr1x16", BFIN_BUILTIN_SSASHIFT_1X16, -1 },
+  { CODE_FOR_lshiftv2hi3, "__builtin_lshl_fr2x16", BFIN_BUILTIN_LSHIFT_2X16, -1 },
+  { CODE_FOR_lshifthi3, "__builtin_lshl_fr1x16", BFIN_BUILTIN_LSHIFT_1X16, -1 },
 
-  { CODE_FOR_sminhi3, "__builtin_min_fr1x16", BFIN_BUILTIN_MIN_1X16, 0 },
-  { CODE_FOR_smaxhi3, "__builtin_max_fr1x16", BFIN_BUILTIN_MAX_1X16, 0 },
-  { CODE_FOR_ssaddhi3, "__builtin_add_fr1x16", BFIN_BUILTIN_SSADD_1X16, 0 },
-  { CODE_FOR_sssubhi3, "__builtin_sub_fr1x16", BFIN_BUILTIN_SSSUB_1X16, 0 },
+  { CODE_FOR_sminhi3, "__builtin_min_fr1x16", BFIN_BUILTIN_MIN_1X16, -1 },
+  { CODE_FOR_smaxhi3, "__builtin_max_fr1x16", BFIN_BUILTIN_MAX_1X16, -1 },
+  { CODE_FOR_ssaddhi3, "__builtin_add_fr1x16", BFIN_BUILTIN_SSADD_1X16, -1 },
+  { CODE_FOR_sssubhi3, "__builtin_sub_fr1x16", BFIN_BUILTIN_SSSUB_1X16, -1 },
 
-  { CODE_FOR_sminsi3, "__builtin_min_fr1x32", BFIN_BUILTIN_MIN_1X32, 0 },
-  { CODE_FOR_smaxsi3, "__builtin_max_fr1x32", BFIN_BUILTIN_MAX_1X32, 0 },
-  { CODE_FOR_ssaddsi3, "__builtin_add_fr1x32", BFIN_BUILTIN_SSADD_1X32, 0 },
-  { CODE_FOR_sssubsi3, "__builtin_sub_fr1x32", BFIN_BUILTIN_SSSUB_1X32, 0 },
+  { CODE_FOR_sminsi3, "__builtin_min_fr1x32", BFIN_BUILTIN_MIN_1X32, -1 },
+  { CODE_FOR_smaxsi3, "__builtin_max_fr1x32", BFIN_BUILTIN_MAX_1X32, -1 },
+  { CODE_FOR_ssaddsi3, "__builtin_add_fr1x32", BFIN_BUILTIN_SSADD_1X32, -1 },
+  { CODE_FOR_sssubsi3, "__builtin_sub_fr1x32", BFIN_BUILTIN_SSSUB_1X32, -1 },
 
-  { CODE_FOR_sminv2hi3, "__builtin_min_fr2x16", BFIN_BUILTIN_MIN_2X16, 0 },
-  { CODE_FOR_smaxv2hi3, "__builtin_max_fr2x16", BFIN_BUILTIN_MAX_2X16, 0 },
-  { CODE_FOR_ssaddv2hi3, "__builtin_add_fr2x16", BFIN_BUILTIN_SSADD_2X16, 0 },
-  { CODE_FOR_sssubv2hi3, "__builtin_sub_fr2x16", BFIN_BUILTIN_SSSUB_2X16, 0 },
-  { CODE_FOR_ssaddsubv2hi3, "__builtin_dspaddsubsat", BFIN_BUILTIN_SSADDSUB_2X16, 0 },
-  { CODE_FOR_sssubaddv2hi3, "__builtin_dspsubaddsat", BFIN_BUILTIN_SSSUBADD_2X16, 0 },
+  { CODE_FOR_sminv2hi3, "__builtin_min_fr2x16", BFIN_BUILTIN_MIN_2X16, -1 },
+  { CODE_FOR_smaxv2hi3, "__builtin_max_fr2x16", BFIN_BUILTIN_MAX_2X16, -1 },
+  { CODE_FOR_ssaddv2hi3, "__builtin_add_fr2x16", BFIN_BUILTIN_SSADD_2X16, -1 },
+  { CODE_FOR_sssubv2hi3, "__builtin_sub_fr2x16", BFIN_BUILTIN_SSSUB_2X16, -1 },
+  { CODE_FOR_ssaddsubv2hi3, "__builtin_dspaddsubsat", BFIN_BUILTIN_SSADDSUB_2X16, -1 },
+  { CODE_FOR_sssubaddv2hi3, "__builtin_dspsubaddsat", BFIN_BUILTIN_SSSUBADD_2X16, -1 },
 
+  { CODE_FOR_flag_mulhisi, "__builtin_mult_fr1x32", BFIN_BUILTIN_MULT_1X32, MACFLAG_NONE },
   { CODE_FOR_flag_mulhi, "__builtin_mult_fr1x16", BFIN_BUILTIN_MULT_1X16, MACFLAG_T },
   { CODE_FOR_flag_mulhi, "__builtin_multr_fr1x16", BFIN_BUILTIN_MULTR_1X16, MACFLAG_NONE },
   { CODE_FOR_flag_mulv2hi, "__builtin_mult_fr2x16", BFIN_BUILTIN_MULT_2X16, MACFLAG_T },
