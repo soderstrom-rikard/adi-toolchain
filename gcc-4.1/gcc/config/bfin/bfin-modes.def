@@ -23,3 +23,5 @@
 PARTIAL_INT_MODE (DI);
 
 VECTOR_MODE (INT, HI, 2); /* V2HI */
+VECTOR_MODE (INT, SI, 2); /* V2SI - occasionally used.  */
+VECTOR_MODE (INT, PDI, 2); /* V2PDI */

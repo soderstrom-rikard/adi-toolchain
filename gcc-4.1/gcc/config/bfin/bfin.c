@@ -1279,9 +1279,60 @@ print_operand (FILE *file, rtx x, char code)
 	  break;
 
 	case CONST_INT:
+	  if (code == 'M')
+	    {
+	      switch (INTVAL (x))
+		{
+		case MACFLAG_NONE:
+		  break;
+		case MACFLAG_FU:
+		  fputs ("(FU)", file);
+		  break;
+		case MACFLAG_T:
+		  fputs ("(T)", file);
+		  break;
+		case MACFLAG_TFU:
+		  fputs ("(TFU)", file);
+		  break;
+		case MACFLAG_W32:
+		  fputs ("(W32)", file);
+		  break;
+		case MACFLAG_IS:
+		  fputs ("(IS)", file);
+		  break;
+		case MACFLAG_IU:
+		  fputs ("(IU)", file);
+		  break;
+		case MACFLAG_IH:
+		  fputs ("(IH)", file);
+		  break;
+		case MACFLAG_M:
+		  fputs ("(M)", file);
+		  break;
+		case MACFLAG_ISS2:
+		  fputs ("(ISS2)", file);
+		  break;
+		case MACFLAG_S2RND:
+		  fputs ("(S2RND)", file);
+		  break;
+		default:
+		  gcc_unreachable ();
+		}
+	      break;
+	    }
+	  else if (code == 'b')
+	    {
+	      if (INTVAL (x) == 0)
+		fputs ("+=", file);
+	      else if (INTVAL (x) == 1)
+		fputs ("-=", file);
+	      else
+		gcc_unreachable ();
+	      break;
+	    }
 	  /* Moves to half registers with d or h modifiers always use unsigned
 	     constants.  */
-	  if (code == 'd')
+	  else if (code == 'd')
 	    x = GEN_INT ((INTVAL (x) >> 16) & 0xffff);
 	  else if (code == 'h')
 	    x = GEN_INT (INTVAL (x) & 0xffff);
@@ -1731,7 +1782,7 @@ hard_regno_mode_ok (int regno, enum machine_mode mode)
     return D_REGNO_P (regno);
   if (class == CCREGS)
     return mode == BImode;
-  if (mode == PDImode)
+  if (mode == PDImode || mode == V2PDImode)
     return regno == REG_A0 || regno == REG_A1;
   if (mode == SImode
       && TEST_HARD_REG_BIT (reg_class_contents[PROLOGUE_REGS], regno))
@@ -3043,6 +3094,7 @@ enum bfin_builtins
   BFIN_BUILTIN_NEG_1X32,
   BFIN_BUILTIN_MIN_1X32,
   BFIN_BUILTIN_MAX_1X32,
+  BFIN_BUILTIN_MULT_1X32,
 
   BFIN_BUILTIN_MULHISILL,
   BFIN_BUILTIN_MULHISILH,
@@ -3053,6 +3105,10 @@ enum bfin_builtins
   BFIN_BUILTIN_LSHIFT_2X16,
   BFIN_BUILTIN_SSASHIFT_1X16,
   BFIN_BUILTIN_SSASHIFT_2X16,
+
+  BFIN_BUILTIN_CPLX_MUL_16,
+  BFIN_BUILTIN_CPLX_MAC_16,
+  BFIN_BUILTIN_CPLX_MSU_16,
 
   BFIN_BUILTIN_MAX
 };
@@ -3091,6 +3147,9 @@ bfin_init_builtins (void)
   tree v2hi_ftype_v2hi_v2hi
     = build_function_type_list (V2HI_type_node, V2HI_type_node,
 				V2HI_type_node, NULL_TREE);
+  tree v2hi_ftype_v2hi_v2hi_v2hi
+    = build_function_type_list (V2HI_type_node, V2HI_type_node,
+				V2HI_type_node, V2HI_type_node, NULL_TREE);
   tree v2hi_ftype_int_int
     = build_function_type_list (V2HI_type_node, integer_type_node,
 				integer_type_node, NULL_TREE);
@@ -3176,6 +3235,8 @@ bfin_init_builtins (void)
 	       BFIN_BUILTIN_NEG_1X32);
   def_builtin ("__builtin_norm_fr1x32", short_ftype_int,
 	       BFIN_BUILTIN_NORM_1X32);
+  def_builtin ("__builtin_mult_fr1x32", int_ftype_int_int,
+	       BFIN_BUILTIN_MULT_1X32);
 
   /* Shifts.  */
   def_builtin ("__builtin_shl_fr1x16", short_ftype_int_int,
@@ -3186,6 +3247,14 @@ bfin_init_builtins (void)
 	       BFIN_BUILTIN_LSHIFT_1X16);
   def_builtin ("__builtin_lshl_fr2x16", v2hi_ftype_v2hi_int,
 	       BFIN_BUILTIN_LSHIFT_2X16);
+
+  /* Complex numbers.  */
+  def_builtin ("__builtin_cmplx_mul", v2hi_ftype_v2hi_v2hi,
+	       BFIN_BUILTIN_CPLX_MUL_16);
+  def_builtin ("__builtin_cmplx_mac", v2hi_ftype_v2hi_v2hi_v2hi,
+	       BFIN_BUILTIN_CPLX_MAC_16);
+  def_builtin ("__builtin_cmplx_msu", v2hi_ftype_v2hi_v2hi_v2hi,
+	       BFIN_BUILTIN_CPLX_MSU_16);
 }
 
 
@@ -3194,54 +3263,54 @@ struct builtin_description
   const enum insn_code icode;
   const char *const name;
   const enum bfin_builtins code;
-  const enum rtx_code comparison;
-  const unsigned int flag;
+  int macflag;
 };
 
 static const struct builtin_description bdesc_2arg[] =
 {
-  { CODE_FOR_composev2hi, "__builtin_compose_2x16", BFIN_BUILTIN_COMPOSE_2X16, 0, 0 },
+  { CODE_FOR_composev2hi, "__builtin_compose_2x16", BFIN_BUILTIN_COMPOSE_2X16, 0 },
 
-  { CODE_FOR_ssashiftv2hi3, "__builtin_shl_fr2x16", BFIN_BUILTIN_SSASHIFT_2X16, 0, 0 },
-  { CODE_FOR_ssashifthi3, "__builtin_shl_fr1x16", BFIN_BUILTIN_SSASHIFT_1X16, 0, 0 },
-  { CODE_FOR_lshiftv2hi3, "__builtin_lshl_fr2x16", BFIN_BUILTIN_LSHIFT_2X16, 0, 0 },
-  { CODE_FOR_lshifthi3, "__builtin_lshl_fr1x16", BFIN_BUILTIN_LSHIFT_1X16, 0, 0 },
+  { CODE_FOR_ssashiftv2hi3, "__builtin_shl_fr2x16", BFIN_BUILTIN_SSASHIFT_2X16, 0 },
+  { CODE_FOR_ssashifthi3, "__builtin_shl_fr1x16", BFIN_BUILTIN_SSASHIFT_1X16, 0 },
+  { CODE_FOR_lshiftv2hi3, "__builtin_lshl_fr2x16", BFIN_BUILTIN_LSHIFT_2X16, 0 },
+  { CODE_FOR_lshifthi3, "__builtin_lshl_fr1x16", BFIN_BUILTIN_LSHIFT_1X16, 0 },
 
-  { CODE_FOR_sminhi3, "__builtin_min_fr1x16", BFIN_BUILTIN_MIN_1X16, 0, 0 },
-  { CODE_FOR_smaxhi3, "__builtin_max_fr1x16", BFIN_BUILTIN_MAX_1X16, 0, 0 },
-  { CODE_FOR_ssaddhi3, "__builtin_add_fr1x16", BFIN_BUILTIN_SSADD_1X16, 0, 0 },
-  { CODE_FOR_sssubhi3, "__builtin_sub_fr1x16", BFIN_BUILTIN_SSSUB_1X16, 0, 0 },
-  { CODE_FOR_frtmulhi3, "__builtin_mult_fr1x16", BFIN_BUILTIN_MULT_1X16, 0, 0 },
-  { CODE_FOR_frmulhi3, "__builtin_multr_fr1x16", BFIN_BUILTIN_MULTR_1X16, 0, 0 },
+  { CODE_FOR_sminhi3, "__builtin_min_fr1x16", BFIN_BUILTIN_MIN_1X16, 0 },
+  { CODE_FOR_smaxhi3, "__builtin_max_fr1x16", BFIN_BUILTIN_MAX_1X16, 0 },
+  { CODE_FOR_ssaddhi3, "__builtin_add_fr1x16", BFIN_BUILTIN_SSADD_1X16, 0 },
+  { CODE_FOR_sssubhi3, "__builtin_sub_fr1x16", BFIN_BUILTIN_SSSUB_1X16, 0 },
 
-  { CODE_FOR_sminsi3, "__builtin_min_fr1x32", BFIN_BUILTIN_MIN_1X32, 0, 0 },
-  { CODE_FOR_smaxsi3, "__builtin_max_fr1x32", BFIN_BUILTIN_MAX_1X32, 0, 0 },
-  { CODE_FOR_ssaddsi3, "__builtin_add_fr1x32", BFIN_BUILTIN_SSADD_1X32, 0, 0 },
-  { CODE_FOR_sssubsi3, "__builtin_sub_fr1x32", BFIN_BUILTIN_SSSUB_1X32, 0, 0 },
+  { CODE_FOR_sminsi3, "__builtin_min_fr1x32", BFIN_BUILTIN_MIN_1X32, 0 },
+  { CODE_FOR_smaxsi3, "__builtin_max_fr1x32", BFIN_BUILTIN_MAX_1X32, 0 },
+  { CODE_FOR_ssaddsi3, "__builtin_add_fr1x32", BFIN_BUILTIN_SSADD_1X32, 0 },
+  { CODE_FOR_sssubsi3, "__builtin_sub_fr1x32", BFIN_BUILTIN_SSSUB_1X32, 0 },
 
-  { CODE_FOR_sminv2hi3, "__builtin_min_fr2x16", BFIN_BUILTIN_MIN_2X16, 0, 0 },
-  { CODE_FOR_smaxv2hi3, "__builtin_max_fr2x16", BFIN_BUILTIN_MAX_2X16, 0, 0 },
-  { CODE_FOR_ssaddv2hi3, "__builtin_add_fr2x16", BFIN_BUILTIN_SSADD_2X16, 0, 0 },
-  { CODE_FOR_sssubv2hi3, "__builtin_sub_fr2x16", BFIN_BUILTIN_SSSUB_2X16, 0, 0 },
-  { CODE_FOR_ssaddsubv2hi3, "__builtin_dspaddsubsat", BFIN_BUILTIN_SSADDSUB_2X16, 0, 0 },
-  { CODE_FOR_sssubaddv2hi3, "__builtin_dspsubaddsat", BFIN_BUILTIN_SSSUBADD_2X16, 0, 0 },
-  { CODE_FOR_frtmulv2hi, "__builtin_mult_fr2x16", BFIN_BUILTIN_MULT_2X16, 0, 0 },
-  { CODE_FOR_frmulv2hi, "__builtin_multr_fr2x16", BFIN_BUILTIN_MULTR_2X16, 0, 0 }
+  { CODE_FOR_sminv2hi3, "__builtin_min_fr2x16", BFIN_BUILTIN_MIN_2X16, 0 },
+  { CODE_FOR_smaxv2hi3, "__builtin_max_fr2x16", BFIN_BUILTIN_MAX_2X16, 0 },
+  { CODE_FOR_ssaddv2hi3, "__builtin_add_fr2x16", BFIN_BUILTIN_SSADD_2X16, 0 },
+  { CODE_FOR_sssubv2hi3, "__builtin_sub_fr2x16", BFIN_BUILTIN_SSSUB_2X16, 0 },
+  { CODE_FOR_ssaddsubv2hi3, "__builtin_dspaddsubsat", BFIN_BUILTIN_SSADDSUB_2X16, 0 },
+  { CODE_FOR_sssubaddv2hi3, "__builtin_dspsubaddsat", BFIN_BUILTIN_SSSUBADD_2X16, 0 },
+
+  { CODE_FOR_flag_mulhi, "__builtin_mult_fr1x16", BFIN_BUILTIN_MULT_1X16, MACFLAG_T },
+  { CODE_FOR_flag_mulhi, "__builtin_multr_fr1x16", BFIN_BUILTIN_MULTR_1X16, MACFLAG_NONE },
+  { CODE_FOR_flag_mulv2hi, "__builtin_mult_fr2x16", BFIN_BUILTIN_MULT_2X16, MACFLAG_T },
+  { CODE_FOR_flag_mulv2hi, "__builtin_multr_fr2x16", BFIN_BUILTIN_MULTR_2X16, MACFLAG_NONE }
 };
 
 static const struct builtin_description bdesc_1arg[] =
 {
-  { CODE_FOR_signbitshi2, "__builtin_norm_fr1x16", BFIN_BUILTIN_NORM_1X16, 0, 0 },
-  { CODE_FOR_ssneghi2, "__builtin_negate_fr1x16", BFIN_BUILTIN_NEG_1X16, 0, 0 },
-  { CODE_FOR_abshi2, "__builtin_abs_fr1x16", BFIN_BUILTIN_ABS_1X16, 0, 0 },
+  { CODE_FOR_signbitshi2, "__builtin_norm_fr1x16", BFIN_BUILTIN_NORM_1X16, 0 },
+  { CODE_FOR_ssneghi2, "__builtin_negate_fr1x16", BFIN_BUILTIN_NEG_1X16, 0 },
+  { CODE_FOR_abshi2, "__builtin_abs_fr1x16", BFIN_BUILTIN_ABS_1X16, 0 },
 
-  { CODE_FOR_signbitssi2, "__builtin_norm_fr1x32", BFIN_BUILTIN_NORM_1X32, 0, 0 },
-  { CODE_FOR_ssnegsi2, "__builtin_negate_fr1x32", BFIN_BUILTIN_NEG_1X32, 0, 0 },
+  { CODE_FOR_signbitssi2, "__builtin_norm_fr1x32", BFIN_BUILTIN_NORM_1X32, 0 },
+  { CODE_FOR_ssnegsi2, "__builtin_negate_fr1x32", BFIN_BUILTIN_NEG_1X32, 0 },
 
-  { CODE_FOR_movv2hi_hi_low, "__builtin_extract_lo", BFIN_BUILTIN_EXTRACTLO, 0, 0 },
-  { CODE_FOR_movv2hi_hi_high, "__builtin_extract_hi", BFIN_BUILTIN_EXTRACTHI, 0, 0 },
-  { CODE_FOR_ssnegv2hi2, "__builtin_negate_fr2x16", BFIN_BUILTIN_NEG_2X16, 0, 0 },
-  { CODE_FOR_absv2hi2, "__builtin_abs_fr2x16", BFIN_BUILTIN_ABS_2X16, 0, 0 }
+  { CODE_FOR_movv2hi_hi_low, "__builtin_extract_lo", BFIN_BUILTIN_EXTRACTLO, 0 },
+  { CODE_FOR_movv2hi_hi_high, "__builtin_extract_hi", BFIN_BUILTIN_EXTRACTHI, 0 },
+  { CODE_FOR_ssnegv2hi2, "__builtin_negate_fr2x16", BFIN_BUILTIN_NEG_2X16, 0 },
+  { CODE_FOR_absv2hi2, "__builtin_abs_fr2x16", BFIN_BUILTIN_ABS_2X16, 0 }
 };
 
 /* Errors in the source file can cause expand_expr to return const0_rtx
@@ -3258,10 +3327,12 @@ safe_vector_operand (rtx x, enum machine_mode mode)
   return gen_lowpart (mode, x);
 }
 
-/* Subroutine of bfin_expand_builtin to take care of binop insns.  */
+/* Subroutine of bfin_expand_builtin to take care of binop insns.  MACFLAG is -1
+   if this is a normal binary op, or one of the MACFLAG_xxx constants.  */
 
 static rtx
-bfin_expand_binop_builtin (enum insn_code icode, tree arglist, rtx target)
+bfin_expand_binop_builtin (enum insn_code icode, tree arglist, rtx target,
+			   int macflag)
 {
   rtx pat;
   tree arg0 = TREE_VALUE (arglist);
@@ -3304,7 +3375,10 @@ bfin_expand_binop_builtin (enum insn_code icode, tree arglist, rtx target)
   if (! (*insn_data[icode].operand[2].predicate) (op1, mode1))
     op1 = copy_to_mode_reg (mode1, op1);
 
-  pat = GEN_FCN (icode) (target, op0, op1);
+  if (macflag == -1)
+    pat = GEN_FCN (icode) (target, op0, op1);
+  else
+    pat = GEN_FCN (icode) (target, op0, op1, GEN_INT (macflag));
   if (! pat)
     return 0;
 
@@ -3368,8 +3442,8 @@ bfin_expand_builtin (tree exp, rtx target ATTRIBUTE_UNUSED,
   tree fndecl = TREE_OPERAND (TREE_OPERAND (exp, 0), 0);
   tree arglist = TREE_OPERAND (exp, 1);
   unsigned int fcode = DECL_FUNCTION_CODE (fndecl);
-  tree arg0;
-  rtx op0, pat;
+  tree arg0, arg1, arg2;
+  rtx op0, op1, op2, accvec, pat, tmp1, tmp2;
   enum machine_mode tmode, mode0;
 
   switch (fcode)
@@ -3407,13 +3481,79 @@ bfin_expand_builtin (tree exp, rtx target ATTRIBUTE_UNUSED,
       emit_insn (pat);
       return target;
 
+    case BFIN_BUILTIN_CPLX_MUL_16:
+      arg0 = TREE_VALUE (arglist);
+      arg1 = TREE_VALUE (TREE_CHAIN (arglist));
+      op0 = expand_expr (arg0, NULL_RTX, VOIDmode, 0);
+      op1 = expand_expr (arg1, NULL_RTX, VOIDmode, 0);
+      accvec = gen_reg_rtx (V2PDImode);
+
+      if (! target
+	  || GET_MODE (target) != V2HImode
+	  || ! (*insn_data[icode].operand[0].predicate) (target, V2HImode))
+	target = gen_reg_rtx (tmode);
+      if (! register_operand (op0, GET_MODE (op0)))
+	op0 = copy_to_mode_reg (GET_MODE (op0), op0);
+      if (! register_operand (op1, GET_MODE (op1)))
+	op1 = copy_to_mode_reg (GET_MODE (op1), op1);
+
+      emit_insn (gen_flag_macinit1v2hi_parts (accvec, op0, op1, const0_rtx,
+					      const0_rtx, const0_rtx,
+					      const1_rtx, GEN_INT (MACFLAG_NONE)));
+      emit_insn (gen_flag_macv2hi_parts (target, op0, op1, const1_rtx,
+					 const1_rtx, const1_rtx,
+					 const0_rtx, accvec, const1_rtx, const0_rtx,
+					 GEN_INT (MACFLAG_NONE), accvec));
+
+      return target;
+
+    case BFIN_BUILTIN_CPLX_MAC_16:
+    case BFIN_BUILTIN_CPLX_MSU_16:
+      arg0 = TREE_VALUE (arglist);
+      arg1 = TREE_VALUE (TREE_CHAIN (arglist));
+      arg2 = TREE_VALUE (TREE_CHAIN (TREE_CHAIN (arglist)));
+      op0 = expand_expr (arg0, NULL_RTX, VOIDmode, 0);
+      op1 = expand_expr (arg1, NULL_RTX, VOIDmode, 0);
+      op2 = expand_expr (arg2, NULL_RTX, VOIDmode, 0);
+      accvec = gen_reg_rtx (V2PDImode);
+
+      if (! target
+	  || GET_MODE (target) != V2HImode
+	  || ! (*insn_data[icode].operand[0].predicate) (target, V2HImode))
+	target = gen_reg_rtx (tmode);
+      if (! register_operand (op0, GET_MODE (op0)))
+	op0 = copy_to_mode_reg (GET_MODE (op0), op0);
+      if (! register_operand (op1, GET_MODE (op1)))
+	op1 = copy_to_mode_reg (GET_MODE (op1), op1);
+
+      tmp1 = gen_reg_rtx (SImode);
+      tmp2 = gen_reg_rtx (SImode);
+      emit_insn (gen_ashlsi3 (tmp1, gen_lowpart (SImode, op2), GEN_INT (16)));
+      emit_move_insn (tmp2, gen_lowpart (SImode, op2));
+      emit_insn (gen_movstricthi_1 (gen_lowpart (HImode, tmp2), const0_rtx));
+      emit_insn (gen_load_accumulator_pair (accvec, tmp1, tmp2));
+      emit_insn (gen_flag_macv2hi_parts_acconly (accvec, op0, op1, const0_rtx,
+						 const0_rtx, const0_rtx,
+						 const1_rtx, accvec, const0_rtx,
+						 const0_rtx,
+						 GEN_INT (MACFLAG_W32)));
+      tmp1 = (fcode == BFIN_BUILTIN_CPLX_MAC_16 ? const1_rtx : const0_rtx);
+      tmp2 = (fcode == BFIN_BUILTIN_CPLX_MAC_16 ? const0_rtx : const1_rtx);
+      emit_insn (gen_flag_macv2hi_parts (target, op0, op1, const1_rtx,
+					 const1_rtx, const1_rtx,
+					 const0_rtx, accvec, tmp1, tmp2,
+					 GEN_INT (MACFLAG_NONE), accvec));
+
+      return target;
+
     default:
       break;
     }
 
   for (i = 0, d = bdesc_2arg; i < ARRAY_SIZE (bdesc_2arg); i++, d++)
     if (d->code == fcode)
-      return bfin_expand_binop_builtin (d->icode, arglist, target);
+      return bfin_expand_binop_builtin (d->icode, arglist, target,
+					d->macflag);
 
   for (i = 0, d = bdesc_1arg; i < ARRAY_SIZE (bdesc_1arg); i++, d++)
     if (d->code == fcode)
