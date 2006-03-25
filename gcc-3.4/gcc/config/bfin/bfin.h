@@ -107,7 +107,7 @@ extern int target_flags;
 %{b} \
 %{mfdpic:-melf32bfinfd -z text} \
 %{static:-dn -Bstatic} \
-%{shared:-Bdynamic} \
+%{shared:-G -Bdynamic} \
 %{symbolic:-Bsymbolic} \
 %{G*} \
 %{YP,*} \

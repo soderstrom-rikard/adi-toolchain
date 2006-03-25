@@ -6,6 +6,10 @@
 	* config/bfin/bfin.c (bfin_legitimate_constant_p): New function.
 	(legitimize_pic_address): Lose bogus code involving constant pools.
 
+	* config/bfin/elf.h (STARTFILE_SPEC): Don't link crt0.o if "-shared".
+	* config/bfin/bfin.h (LINK_SPEC): Pass down "-G" to the linker
+	when creating shared libraries.
+
 2006-03-23  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/uclinux.h (STARTFILE_SPEC): Don't link crt1.o if
