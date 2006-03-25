@@ -718,7 +718,7 @@ static reloc_howto_type bfin_howto_table [] =
 	 FALSE),		/* pcrel_offset.  */
 
 
-  /* A 12-bit signed operand with the GOT offset for the address of
+  /* A 18-bit signed operand with the GOT offset for the address of
      the symbol.  */
   HOWTO (R_BFIN_GOT17M4,        /* type */
 	 2,			/* rightshift */
@@ -791,7 +791,7 @@ static reloc_howto_type bfin_howto_table [] =
 	 0,			/* bitpos */
 	 complain_overflow_signed, /* complain_on_overflow */
 	 bfd_elf_generic_reloc,	/* special_function */
-	 "R_BFIN_FUNCDESC_GOT12", /* name */
+	 "R_BFIN_FUNCDESC_GOT17M4", /* name */
 	 FALSE,			/* partial_inplace */
 	 0xffff,	        /* src_mask */
 	 0xffff,	        /* dst_mask */
@@ -854,7 +854,7 @@ static reloc_howto_type bfin_howto_table [] =
 	 0,			/* bitpos */
 	 complain_overflow_signed, /* complain_on_overflow */
 	 bfd_elf_generic_reloc,	/* special_function */
-	 "R_BFIN_FUNCDESC_GOTOFF12", /* name */
+	 "R_BFIN_FUNCDESC_GOTOFF17M4", /* name */
 	 FALSE,			/* partial_inplace */
 	 0xffff,	        /* src_mask */
 	 0xffff,	        /* dst_mask */
@@ -902,7 +902,7 @@ static reloc_howto_type bfin_howto_table [] =
 	 0,			/* bitpos */
 	 complain_overflow_signed, /* complain_on_overflow */
 	 bfd_elf_generic_reloc,	/* special_function */
-	 "R_BFIN_GOTOFF12",	/* name */
+	 "R_BFIN_GOTOFF17M4",	/* name */
 	 FALSE,			/* partial_inplace */
 	 0xffff,	        /* src_mask */
 	 0xffff,	        /* dst_mask */
@@ -1226,25 +1226,20 @@ struct bfinfdpic_relocs_info
   /* The fields above are used to identify an entry.  The fields below
      contain information on how an entry is used and, later on, which
      locations it was assigned.  */
-  /* The following 3 fields record whether the symbol+addend above was
-     ever referenced with a GOT relocation.  The 12 suffix indicates a
-     GOT12 relocation; los is used for GOTLO relocations that are not
-     matched by a GOTHI relocation; hilo is used for GOTLO/GOTHI
-     pairs.  */
-  unsigned got12:1;
-  unsigned gotlos:1;
+  /* The following 2 fields record whether the symbol+addend above was
+     ever referenced with a GOT relocation.  The 17M4 suffix indicates a
+     GOT17M4 relocation; hilo is used for GOTLO/GOTHI pairs.  */
+  unsigned got17m4:1;
   unsigned gothilo:1;
   /* Whether a FUNCDESC relocation references symbol+addend.  */
   unsigned fd:1;
   /* Whether a FUNCDESC_GOT relocation references symbol+addend.  */
-  unsigned fdgot12:1;
-  unsigned fdgotlos:1;
+  unsigned fdgot17m4:1;
   unsigned fdgothilo:1;
   /* Whether a FUNCDESC_GOTOFF relocation references symbol+addend.  */
-  unsigned fdgoff12:1;
-  unsigned fdgofflos:1;
+  unsigned fdgoff17m4:1;
   unsigned fdgoffhilo:1;
-  /* Whether symbol+addend is referenced with GOTOFF12, GOTOFFLO or
+  /* Whether symbol+addend is referenced with GOTOFF17M4, GOTOFFLO or
      GOTOFFHI relocations.  The addend doesn't really matter, since we
      envision that this will only be used to check whether the symbol
      is mapped to the same segment as the got.  */
@@ -1260,8 +1255,8 @@ struct bfinfdpic_relocs_info
   unsigned plt:1;
   /* Whether a function descriptor should be created in this link unit
      for symbol+addend.  Should be implied by something like:
-     (plt || fdgotoff12 || fdgotofflos || fdgotofflohi
-      || ((fd || fdgot12 || fdgotlos || fdgothilo)
+     (plt || fdgotoff17m4 || fdgotofflohi
+      || ((fd || fdgot17m4 || fdgothilo)
           && (symndx != -1 || BFINFDPIC_FUNCDESC_LOCAL (info, d.h))))  */
   unsigned privfd:1;
   /* Whether a lazy PLT entry is needed for this symbol+addend.
@@ -1393,15 +1388,12 @@ inline static void
 bfinfdpic_pic_merge_early_relocs_info (struct bfinfdpic_relocs_info *e2,
 				      struct bfinfdpic_relocs_info const *e1)
 {
-  e2->got12 |= e1->got12;
-  e2->gotlos |= e1->gotlos;
+  e2->got17m4 |= e1->got17m4;
   e2->gothilo |= e1->gothilo;
   e2->fd |= e1->fd;
-  e2->fdgot12 |= e1->fdgot12;
-  e2->fdgotlos |= e1->fdgotlos;
+  e2->fdgot17m4 |= e1->fdgot17m4;
   e2->fdgothilo |= e1->fdgothilo;
-  e2->fdgoff12 |= e1->fdgoff12;
-  e2->fdgofflos |= e1->fdgofflos;
+  e2->fdgoff17m4 |= e1->fdgoff17m4;
   e2->fdgoffhilo |= e1->fdgoffhilo;
   e2->gotoff |= e1->gotoff;
   e2->call |= e1->call;
@@ -1878,7 +1870,7 @@ _bfinfdpic_emit_got_relocs_plt_entries (struct bfinfdpic_relocs_info *entry,
       if (entry->fd_entry >= -(1 << (18 - 1))
 	  && entry->fd_entry + 4 < (1 << (18 - 1)))
 	{
-	  /* lddi @(gr15, fd_entry), gr14 */
+	  /* P1 = [P3 + fd_entry]; P3 = [P3 + fd_entry + 4] */
 	  bfd_put_32 (output_bfd,
 		      0xe519 | ((entry->fd_entry << 14) & 0xFFFF0000),
 		      plt_code);
@@ -1889,36 +1881,22 @@ _bfinfdpic_emit_got_relocs_plt_entries (struct bfinfdpic_relocs_info *entry,
 	}
       else
 	{
-	  if (entry->fd_entry >= -(1 << (18 - 1))
-	      && entry->fd_entry < (1 << (18 - 1)))
-	    {
-	      /* setlos lo(fd_entry), gr14 */
-	      bfd_put_32 (output_bfd,
-			  0x9cfc0000
-			  | (entry->fd_entry & (((bfd_vma)1 << 16) - 1)),
-			  plt_code);
-	      plt_code += 4;
-	    }
-	  else
-	    {
-	      /* sethi.p hi(fd_entry), gr14
-		 setlo lo(fd_entry), gr14 */
-	      bfd_put_32 (output_bfd,
-			  0x1cf80000
-			  | ((entry->fd_entry >> 16)
-			     & (((bfd_vma)1 << 16) - 1)),
-			  plt_code);
-	      bfd_put_32 (output_bfd,
-			  0x9cf40000
-			  | (entry->fd_entry & (((bfd_vma)1 << 16) - 1)),
-			  plt_code);
-	      plt_code += 8;
-	    }
-	  /* ldd @(gr14,gr15),gr14 */
-	  bfd_put_32 (output_bfd, 0x9c08e14f, plt_code);
-	  plt_code += 4;
+	  /* P1.L = fd_entry; P1.H = fd_entry;
+	     P3 = P3 + P1;
+	     P1 = [P3];
+	     P3 = [P3 + 4];  */
+	  bfd_put_32 (output_bfd,
+		      0xe109 | (entry->fd_entry << 16),
+		      plt_code);
+	  bfd_put_32 (output_bfd,
+		      0xe149 | (entry->fd_entry & 0xFFFF0000),
+		      plt_code + 4);
+	  bfd_put_16 (output_bfd, 0x5ad9, plt_code + 8);
+	  bfd_put_16 (output_bfd, 0x9159, plt_code + 10);
+	  bfd_put_16 (output_bfd, 0xac5b, plt_code + 12);
+	  plt_code += 14;
 	}
-      /* jmpl @(gr14,gr0) */
+      /* JUMP (P1) */
       bfd_put_16 (output_bfd, 0x0051, plt_code);
     }
 
@@ -1939,11 +1917,10 @@ _bfinfdpic_emit_got_relocs_plt_entries (struct bfinfdpic_relocs_info *entry,
 
       if (entry->lzplt_entry == resolverStub_addr)
 	{
-	  /* This is a lazy PLT entry that includes a resolver call.  */
-	  /* P2 = [P3]; */
-	  /* R3 = [P3 + 4]; */
-	  /* ldd @(gr15,gr0), gr4
-	     jmpl @(gr4,gr0)  */
+	  /* This is a lazy PLT entry that includes a resolver call.
+	     P2 = [P3];
+	     R3 = [P3 + 4];
+	     JUMP (P2);  */
 	  bfd_put_32 (output_bfd,
 		      0xa05b915a,
 		      lzplt_code);
@@ -1951,7 +1928,7 @@ _bfinfdpic_emit_got_relocs_plt_entries (struct bfinfdpic_relocs_info *entry,
 	}
       else
 	{
-	  /* bra  resolverStub */
+	  /* JUMP.S  resolverStub */
 	  bfd_put_16 (output_bfd,
 		      0x2000
 		      | (((resolverStub_addr - entry->lzplt_entry)
@@ -2772,7 +2749,7 @@ bfinfdpic_relocate_section (bfd * output_bfd,
 	case R_BFIN_FUNCDESC_GOTOFF17M4:
 	case R_BFIN_FUNCDESC_GOTOFFHI:
 	case R_BFIN_FUNCDESC_GOTOFFLO:
-	  /* Note that we only want GOTOFFHI, not GOTOFFLO or GOTOFF12
+	  /* Note that we only want GOTOFFHI, not GOTOFFLO or GOTOFF17M4
 	     here, since we do want to apply the addend to the others.
 	     Note that we've applied the addend to GOTOFFHI before we
 	     shifted it right.  */
@@ -3559,12 +3536,12 @@ struct _bfinfdpic_dynamic_got_info
 {
   /* Several bits of information about the current link.  */
   struct bfd_link_info *info;
-  /* Total size needed for GOT entries within the 12-, 16- or 32-bit
+  /* Total size needed for GOT entries within the 18- or 32-bit
      ranges.  */
-  bfd_vma got12, gotlos, gothilo;
-  /* Total size needed for function descriptor entries within the 12-,
-     16- or 32-bit ranges.  */
-  bfd_vma fd12, fdlos, fdhilo;
+  bfd_vma got17m4, gothilo;
+  /* Total size needed for function descriptor entries within the 18-
+     or 32-bit ranges.  */
+  bfd_vma fd17m4, fdhilo;
   /* Total size needed function descriptor entries referenced in PLT
      entries, that would be profitable to place in offsets close to
      the PIC register.  */
@@ -3590,10 +3567,8 @@ _bfinfdpic_count_got_plt_entries (void **entryp, void *dinfo_)
   unsigned relocs = 0, fixups = 0;
 
   /* Allocate space for a GOT entry pointing to the symbol.  */
-  if (entry->got12)
-    dinfo->got12 += 4;
-  else if (entry->gotlos)
-    dinfo->gotlos += 4;
+  if (entry->got17m4)
+    dinfo->got17m4 += 4;
   else if (entry->gothilo)
     dinfo->gothilo += 4;
   else
@@ -3602,10 +3577,8 @@ _bfinfdpic_count_got_plt_entries (void **entryp, void *dinfo_)
 
   /* Allocate space for a GOT entry pointing to the function
      descriptor.  */
-  if (entry->fdgot12)
-    dinfo->got12 += 4;
-  else if (entry->fdgotlos)
-    dinfo->gotlos += 4;
+  if (entry->fdgot17m4)
+    dinfo->got17m4 += 4;
   else if (entry->fdgothilo)
     dinfo->gothilo += 4;
   else
@@ -3618,8 +3591,8 @@ _bfinfdpic_count_got_plt_entries (void **entryp, void *dinfo_)
     && entry->symndx == -1 && ! BFINFDPIC_SYM_LOCAL (dinfo->info, entry->d.h)
     && elf_hash_table (dinfo->info)->dynamic_sections_created;
   entry->privfd = entry->plt
-    || entry->fdgoff12 || entry->fdgofflos || entry->fdgoffhilo
-    || ((entry->fd || entry->fdgot12 || entry->fdgotlos || entry->fdgothilo)
+    || entry->fdgoff17m4 || entry->fdgoffhilo
+    || ((entry->fd || entry->fdgot17m4 || entry->fdgothilo)
 	&& (entry->symndx != -1
 	    || BFINFDPIC_FUNCDESC_LOCAL (dinfo->info, entry->d.h)));
   entry->lazyplt = entry->privfd
@@ -3628,10 +3601,8 @@ _bfinfdpic_count_got_plt_entries (void **entryp, void *dinfo_)
     && elf_hash_table (dinfo->info)->dynamic_sections_created;
 
   /* Allocate space for a function descriptor.  */
-  if (entry->fdgoff12)
-    dinfo->fd12 += 8;
-  else if (entry->fdgofflos)
-    dinfo->fdlos += 8;
+  if (entry->fdgoff17m4)
+    dinfo->fd17m4 += 8;
   else if (entry->privfd && entry->plt)
     dinfo->fdplt += 8;
   else if (entry->privfd)
@@ -3701,7 +3672,7 @@ struct _bfinfdpic_dynamic_got_plt_info
   {
     bfd_signed_vma max, cur, odd, fdcur, min;
     bfd_vma fdplt;
-  } got12, gotlos, gothilo;
+  } got17m4, gothilo;
 };
 
 /* Determine the positive and negative ranges to be used by each
@@ -3716,13 +3687,13 @@ struct _bfinfdpic_dynamic_got_plt_info
 
 inline static bfd_signed_vma
 _bfinfdpic_compute_got_alloc_data (struct _bfinfdpic_dynamic_got_alloc_data *gad,
-				  bfd_signed_vma fdcur,
-				  bfd_signed_vma odd,
-				  bfd_signed_vma cur,
-				  bfd_vma got,
-				  bfd_vma fd,
-				  bfd_vma fdplt,
-				  bfd_vma wrap)
+				   bfd_signed_vma fdcur,
+				   bfd_signed_vma odd,
+				   bfd_signed_vma cur,
+				   bfd_vma got,
+				   bfd_vma fd,
+				   bfd_vma fdplt,
+				   bfd_vma wrap)
 {
   bfd_signed_vma wrapmin = -wrap;
 
@@ -3877,33 +3848,22 @@ _bfinfdpic_assign_got_entries (void **entryp, void *info_)
   struct bfinfdpic_relocs_info *entry = *entryp;
   struct _bfinfdpic_dynamic_got_plt_info *dinfo = info_;
 
-  if (entry->got12)
-    entry->got_entry = _bfinfdpic_get_got_entry (&dinfo->got12);
-  else if (entry->gotlos)
-    entry->got_entry = _bfinfdpic_get_got_entry (&dinfo->gotlos);
+  if (entry->got17m4)
+    entry->got_entry = _bfinfdpic_get_got_entry (&dinfo->got17m4);
   else if (entry->gothilo)
     entry->got_entry = _bfinfdpic_get_got_entry (&dinfo->gothilo);
 
-  if (entry->fdgot12)
-    entry->fdgot_entry = _bfinfdpic_get_got_entry (&dinfo->got12);
-  else if (entry->fdgotlos)
-    entry->fdgot_entry = _bfinfdpic_get_got_entry (&dinfo->gotlos);
+  if (entry->fdgot17m4)
+    entry->fdgot_entry = _bfinfdpic_get_got_entry (&dinfo->got17m4);
   else if (entry->fdgothilo)
     entry->fdgot_entry = _bfinfdpic_get_got_entry (&dinfo->gothilo);
 
-  if (entry->fdgoff12)
-    entry->fd_entry = _bfinfdpic_get_fd_entry (&dinfo->got12);
-  else if (entry->plt && dinfo->got12.fdplt)
+  if (entry->fdgoff17m4)
+    entry->fd_entry = _bfinfdpic_get_fd_entry (&dinfo->got17m4);
+  else if (entry->plt && dinfo->got17m4.fdplt)
     {
-      dinfo->got12.fdplt -= 8;
-      entry->fd_entry = _bfinfdpic_get_fd_entry (&dinfo->got12);
-    }
-  else if (entry->fdgofflos)
-    entry->fd_entry = _bfinfdpic_get_fd_entry (&dinfo->gotlos);
-  else if (entry->plt && dinfo->gotlos.fdplt)
-    {
-      dinfo->gotlos.fdplt -= 8;
-      entry->fd_entry = _bfinfdpic_get_fd_entry (&dinfo->gotlos);
+      dinfo->got17m4.fdplt -= 8;
+      entry->fd_entry = _bfinfdpic_get_fd_entry (&dinfo->got17m4);
     }
   else if (entry->plt)
     {
@@ -3930,15 +3890,10 @@ _bfinfdpic_assign_plt_entries (void **entryp, void *info_)
      one.  */
   if (entry->privfd && entry->fd_entry == 0)
     {
-      if (dinfo->got12.fdplt)
+      if (dinfo->got17m4.fdplt)
 	{
-	  entry->fd_entry = _bfinfdpic_get_fd_entry (&dinfo->got12);
-	  dinfo->got12.fdplt -= 8;
-	}
-      else if (dinfo->gotlos.fdplt)
-	{
-	  entry->fd_entry = _bfinfdpic_get_fd_entry (&dinfo->gotlos);
-	  dinfo->gotlos.fdplt -= 8;
+	  entry->fd_entry = _bfinfdpic_get_fd_entry (&dinfo->got17m4);
+	  dinfo->got17m4.fdplt -= 8;
 	}
       else
 	{
@@ -3962,9 +3917,6 @@ _bfinfdpic_assign_plt_entries (void **entryp, void *info_)
       if (entry->fd_entry >= -(1 << (18 - 1))
 	  && entry->fd_entry + 4 < (1 << (18 - 1)))
 	size = 10;
-      else if (entry->fd_entry >= -(1 << (16 - 1))
-	       && entry->fd_entry < (1 << (16 - 1)))
-	size = 12;
       else
 	size = 16;
 
@@ -4085,14 +4037,12 @@ elf32_bfinfdpic_size_dynamic_sections (bfd *output_bfd,
 		 &gpinfo.g);
 
   odd = 12;
-  /* Compute the total size taken by entries in the 12-bit and 16-bit
-     ranges, to tell how many PLT function descriptors we can bring
-     into the 12-bit range without causing the 16-bit range to
-     overflow.  */
-  limit = odd + gpinfo.g.got12 + gpinfo.g.gotlos
-    + gpinfo.g.fd12 + gpinfo.g.fdlos;
-  if (limit < (bfd_vma)1 << 16)
-    limit = ((bfd_vma)1 << 16) - limit;
+  /* Compute the total size taken by entries in the 18-bit range,
+     to tell how many PLT function descriptors we can bring into it
+     without causing it to overflow.  */
+  limit = odd + gpinfo.g.got17m4 + gpinfo.g.fd17m4;
+  if (limit < (bfd_vma)1 << 18)
+    limit = ((bfd_vma)1 << 18) - limit;
   else
     limit = 0;
   if (gpinfo.g.fdplt < limit)
@@ -4100,30 +4050,21 @@ elf32_bfinfdpic_size_dynamic_sections (bfd *output_bfd,
 
   /* Determine the ranges of GOT offsets that we can use for each
      range of addressing modes.  */
-  odd = _bfinfdpic_compute_got_alloc_data (&gpinfo.got12,
+  odd = _bfinfdpic_compute_got_alloc_data (&gpinfo.got17m4,
 					  0,
 					  odd,
 					  16,
-					  gpinfo.g.got12,
-					  gpinfo.g.fd12,
+					  gpinfo.g.got17m4,
+					  gpinfo.g.fd17m4,
 					  limit,
-					  (bfd_vma)1 << (12-1));
-  odd = _bfinfdpic_compute_got_alloc_data (&gpinfo.gotlos,
-					  gpinfo.got12.min,
-					  odd,
-					  gpinfo.got12.max,
-					  gpinfo.g.gotlos,
-					  gpinfo.g.fdlos,
-					  gpinfo.g.fdplt - gpinfo.got12.fdplt,
-					  (bfd_vma)1 << (16-1));
+					  (bfd_vma)1 << (18-1));
   odd = _bfinfdpic_compute_got_alloc_data (&gpinfo.gothilo,
-					  gpinfo.gotlos.min,
+					  gpinfo.got17m4.min,
 					  odd,
-					  gpinfo.gotlos.max,
+					  gpinfo.got17m4.max,
 					  gpinfo.g.gothilo,
 					  gpinfo.g.fdhilo,
-					  gpinfo.g.fdplt - gpinfo.got12.fdplt
-					  - gpinfo.gotlos.fdplt,
+					  gpinfo.g.fdplt - gpinfo.got17m4.fdplt,
 					  (bfd_vma)1 << (32-1));
 
   /* Now assign (most) GOT offsets.  */
@@ -4767,7 +4708,7 @@ bfinfdpic_check_relocs (bfd *abfd, struct bfd_link_info *info,
 	  break;
 
 	case R_BFIN_GOT17M4:
-	  picrel->got12 = 1;
+	  picrel->got17m4 = 1;
 	  break;
 
 	case R_BFIN_GOTHI:
@@ -4776,7 +4717,7 @@ bfinfdpic_check_relocs (bfd *abfd, struct bfd_link_info *info,
 	  break;
 
 	case R_BFIN_FUNCDESC_GOT17M4:
-	  picrel->fdgot12 = 1;
+	  picrel->fdgot17m4 = 1;
 	  break;
 
 	case R_BFIN_FUNCDESC_GOTHI:
@@ -4791,7 +4732,7 @@ bfinfdpic_check_relocs (bfd *abfd, struct bfd_link_info *info,
 	  break;
 
 	case R_BFIN_FUNCDESC_GOTOFF17M4:
-	  picrel->fdgoff12 = 1;
+	  picrel->fdgoff17m4 = 1;
 	  break;
 
 	case R_BFIN_FUNCDESC_GOTOFFHI:
@@ -5520,129 +5461,6 @@ bfin_size_dynamic_sections (bfd * output_bfd ATTRIBUTE_UNUSED,
 #undef add_dynamic_entry
 
   return TRUE;
-}
-
-/* Given a .data section and a .emreloc in-memory section, store
-   relocation information into the .emreloc section which can be
-   used at runtime to relocate the section.  This is called by the
-   linker when the --embedded-relocs switch is used.  This is called
-   after the add_symbols entry point has been called for all the
-   objects, and before the final_link entry point is called.  */
-
-bfd_boolean
-bfd_bfin_elf32_create_embedded_relocs (
-     bfd *abfd,
-     struct bfd_link_info *info,
-     asection *datasec,
-     asection *relsec,
-     char **errmsg)
-{
-  Elf_Internal_Shdr *symtab_hdr;
-  Elf_Internal_Sym *isymbuf = NULL;
-  Elf_Internal_Rela *internal_relocs = NULL;
-  Elf_Internal_Rela *irel, *irelend;
-  bfd_byte *p;
-  bfd_size_type amt;
-
-  BFD_ASSERT (! info->relocatable);
-
-  *errmsg = NULL;
-
-  if (datasec->reloc_count == 0)
-    return TRUE;
-
-  symtab_hdr = &elf_tdata (abfd)->symtab_hdr;
-
-  /* Get a copy of the native relocations.  */
-  internal_relocs = (_bfd_elf_link_read_relocs
-		     (abfd, datasec, (PTR) NULL, (Elf_Internal_Rela *) NULL,
-		      info->keep_memory));
-  if (internal_relocs == NULL)
-    goto error_return;
-
-  amt = (bfd_size_type) datasec->reloc_count * 12;
-  relsec->contents = (bfd_byte *) bfd_alloc (abfd, amt);
-  if (relsec->contents == NULL)
-    goto error_return;
-
-  p = relsec->contents;
-
-  irelend = internal_relocs + datasec->reloc_count;
-  for (irel = internal_relocs; irel < irelend; irel++, p += 12)
-    {
-      asection *targetsec;
-
-      /* We are going to write a four byte longword into the runtime
-       reloc section.  The longword will be the address in the data
-       section which must be relocated.  It is followed by the name
-       of the target section NUL-padded or truncated to 8
-       characters.  */
-
-      /* We can only relocate absolute longword relocs at run time.  */
-      if (ELF32_R_TYPE (irel->r_info) != (int) R_byte4_data)
-	{
-	  *errmsg = _("unsupported reloc type");
-	  bfd_set_error (bfd_error_bad_value);
-	  goto error_return;
-	}
-
-      /* Get the target section referred to by the reloc.  */
-      if (ELF32_R_SYM (irel->r_info) < symtab_hdr->sh_info)
-	{
-	  /* A local symbol.  */
-	  Elf_Internal_Sym *isym;
-
-	  /* Read this BFD's local symbols if we haven't done so already.  */
-	  if (isymbuf == NULL)
-	    {
-	      isymbuf = (Elf_Internal_Sym *) symtab_hdr->contents;
-	      if (isymbuf == NULL)
-		isymbuf = bfd_elf_get_elf_syms (abfd, symtab_hdr,
-						symtab_hdr->sh_info, 0,
-						NULL, NULL, NULL);
-	      if (isymbuf == NULL)
-		goto error_return;
-	    }
-
-	  isym = isymbuf + ELF32_R_SYM (irel->r_info);
-	  targetsec = bfd_section_from_elf_index (abfd, isym->st_shndx);
-	}
-      else
-	{
-	  unsigned long indx;
-	  struct elf_link_hash_entry *h;
-
-	  /* An external symbol.  */
-	  indx = ELF32_R_SYM (irel->r_info) - symtab_hdr->sh_info;
-	  h = elf_sym_hashes (abfd)[indx];
-	  BFD_ASSERT (h != NULL);
-	  if (h->root.type == bfd_link_hash_defined
-	      || h->root.type == bfd_link_hash_defweak)
-	    targetsec = h->root.u.def.section;
-	  else
-	    targetsec = NULL;
-	}
-
-      bfd_put_32 (abfd, irel->r_offset + datasec->output_offset, p);
-      memset (p + 4, 0, 8);
-      if (targetsec != NULL)
-	strncpy ((char *) p + 4, targetsec->output_section->name, 8);
-    }
-
-  if (isymbuf != NULL && symtab_hdr->contents != (unsigned char *) isymbuf)
-    free (isymbuf);
-  if (internal_relocs != NULL
-      && elf_section_data (datasec)->relocs != internal_relocs)
-    free (internal_relocs);
-  return TRUE;
-
-error_return:
-  if (isymbuf != NULL && symtab_hdr->contents != (unsigned char *) isymbuf)
-    free (isymbuf);
-  if (internal_relocs != NULL
-      && elf_section_data (datasec)->relocs != internal_relocs)
-    free (internal_relocs);
-  return FALSE;
 }
 
 #define TARGET_LITTLE_SYM		bfd_elf32_bfin_vec

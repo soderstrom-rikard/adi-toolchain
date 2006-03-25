@@ -1,3 +1,15 @@
+2006-03-25  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* elf32-bfin.c (struct bfinfdpic_relocs_info): Lose the "los"
+	variants and delete all users.  Rename "12" variants to "17m4", and
+	change all users.
+	(struct _bfinfdpic_dynamic_got_info): Likewise.
+	(_bfinfdpic_emit_got_relocs_plt_entries): Support large PLT entries
+	properly.
+	(elf32_bfinfdpic_size_dynamic_sections): Use correct limits for the
+	Blackfin.
+	(bfd_bfin_elf32_create_embedded_relocs): Delete unused function.
+
 2006-03-13  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config.bfd (bfin-*-*): Add bfd_elf32_bfinfdpic_vec.
