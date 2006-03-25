@@ -37,6 +37,7 @@ extern int log2constp (unsigned HOST_WIDE_INT);
 extern int highbits_operand (rtx, Mmode);
 
 extern rtx legitimize_address (rtx, rtx, Mmode);
+extern bool bfin_legitimate_constant_p (rtx);
 extern int hard_regno_mode_ok (int, Mmode);
 extern int function_arg_partial_nregs (CUMULATIVE_ARGS *, Mmode, tree, int);
 extern void init_cumulative_args (CUMULATIVE_ARGS *, tree, rtx);	  

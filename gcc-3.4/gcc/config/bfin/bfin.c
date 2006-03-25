@@ -126,52 +126,47 @@ legitimize_pic_address (rtx orig, rtx reg, rtx picreg)
 
   if (GET_CODE (addr) == SYMBOL_REF || GET_CODE (addr) == LABEL_REF)
     {
-      if (GET_CODE (addr) == SYMBOL_REF && CONSTANT_POOL_ADDRESS_P (addr))
-	reg = new = orig;
+      int unspec;
+      if (TARGET_ID_SHARED_LIBRARY)
+	unspec = UNSPEC_MOVE_PIC;
+      else if (GET_CODE (addr) == SYMBOL_REF
+	       && SYMBOL_REF_FUNCTION_P (addr))
+	{
+#if 0
+	  if (frv_local_funcdesc_p (sym))
+	    unspec = UNSPEC_FUNCDESC_GOTOFF12;
+	  else
+#endif
+	    unspec = UNSPEC_FUNCDESC_GOT17M4;
+	}
       else
 	{
-	  int unspec;
-	  if (TARGET_ID_SHARED_LIBRARY)
-	    unspec = UNSPEC_MOVE_PIC;
-	  else if (GET_CODE (addr) == SYMBOL_REF
-		   && SYMBOL_REF_FUNCTION_P (addr))
-	    {
-#if 0
-	      if (frv_local_funcdesc_p (sym))
-		unspec = UNSPEC_FUNCDESC_GOTOFF12;
-	      else
-#endif
-		unspec = UNSPEC_FUNCDESC_GOT17M4;
-	    }
-	  else
-	    {
-	      unspec = UNSPEC_MOVE_FDPIC;
-	    }
-
-	  if (reg == 0)
-	    {
-	      if (no_new_pseudos)
-		abort ();
-	      reg = gen_reg_rtx (Pmode);
-	    }
-
-	  if (flag_pic == 2)
-	    {
-	      emit_insn (gen_movsi_high_pic (reg, addr));
-	      emit_insn (gen_movsi_low_pic (reg, reg, addr));
-	      emit_insn (gen_addsi3 (reg, reg, picreg));
-	      new = gen_rtx_MEM (Pmode, reg);
-	    }
-	  else
-	    {
-	      rtx tmp = gen_rtx_UNSPEC (Pmode, gen_rtvec (1, addr),
-					unspec);
-	      new = gen_rtx_MEM (Pmode,
-				 gen_rtx_PLUS (Pmode, picreg,
-					       tmp));
-	    }
-	  emit_move_insn (reg, new);
+	  unspec = UNSPEC_MOVE_FDPIC;
 	}
+
+      if (reg == 0)
+	{
+	  if (no_new_pseudos)
+	    abort ();
+	  reg = gen_reg_rtx (Pmode);
+	}
+
+      if (flag_pic == 2)
+	{
+	  emit_insn (gen_movsi_high_pic (reg, addr));
+	  emit_insn (gen_movsi_low_pic (reg, reg, addr));
+	  emit_insn (gen_addsi3 (reg, reg, picreg));
+	  new = gen_rtx_MEM (Pmode, reg);
+	}
+      else
+	{
+	  rtx tmp = gen_rtx_UNSPEC (Pmode, gen_rtvec (1, addr),
+				    unspec);
+	  new = gen_rtx_MEM (Pmode,
+			     gen_rtx_PLUS (Pmode, picreg,
+					   tmp));
+	}
+      emit_move_insn (reg, new);
       if (picreg == pic_offset_table_rtx)
 	current_function_uses_pic_offset_table = 1;
       return reg;
@@ -2468,6 +2463,39 @@ bfin_legitimate_address_p (enum machine_mode mode, rtx x, int strict)
     break;
   }
   return false;
+}
+
+/* Ensure that for any constant of the form symbol + offset, the offset
+   remains within the object.  Any other constants are ok.
+   This ensures that flat binaries never have to deal with relocations
+   crossing section boundaries.  */
+
+bool
+bfin_legitimate_constant_p (rtx x)
+{
+  rtx sym;
+  HOST_WIDE_INT offset;
+
+  if (GET_CODE (x) != CONST)
+    return true;
+
+  x = XEXP (x, 0);
+  gcc_assert (GET_CODE (x) == PLUS);
+
+  sym = XEXP (x, 0);
+  x = XEXP (x, 1);
+  if (GET_CODE (sym) != SYMBOL_REF
+      || GET_CODE (x) != CONST_INT)
+    return true;
+  offset = INTVAL (x);
+
+  if (SYMBOL_REF_DECL (sym) == 0)
+    return true;
+  if (offset < 0
+      || offset >= int_size_in_bytes (TREE_TYPE (SYMBOL_REF_DECL (sym))))
+    return false;
+
+  return true;
 }
 
 static bool

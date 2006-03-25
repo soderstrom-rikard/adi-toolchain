@@ -1,3 +1,11 @@
+2006-03-25  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.h (LEGITIMATE_CONSTANT_P): Use new function
+	bfin_legitimate_constant_p.
+	* config/bfin/bfin-protos.h (bfin_legitimate_constant_p): Declare.
+	* config/bfin/bfin.c (bfin_legitimate_constant_p): New function.
+	(legitimize_pic_address): Lose bogus code involving constant pools.
+
 2006-03-23  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/uclinux.h (STARTFILE_SPEC): Don't link crt1.o if
