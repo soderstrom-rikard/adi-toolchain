@@ -1,3 +1,11 @@
+2006-03-25  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.h (LEGITIMATE_CONSTANT_P): Use new function
+	bfin_legitimate_constant_p.
+	* config/bfin/bfin-protos.h (bfin_legitimate_constant_p): Declare.
+	* config/bfin/bfin.c (bfin_legitimate_constant_p): New function.
+	(legitimize_pic_address): Lose bogus code involving constant pools.
+
 2006-03-24  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	Move over some patches from 3.4.
