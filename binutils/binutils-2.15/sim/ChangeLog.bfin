@@ -1,3 +1,15 @@
+2006-03-27  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/bfin-sim.h (saved_state_type): Replace a0 with a0x and a0w,
+	a1 with a1x and a1w.
+	(A0REG, A1REG): Remove.
+	(A0XREG, A0WREG, A1XREG, A1WREG): New.
+	* bfin/bfin-dis.c (decode_macfunc, decode_dsp32alu_0): Change
+	accordingly.
+	* bfin/interp.c (bfin_extract_unsigned_integer): New.
+	(bfin_store_unsigned_integer): New.
+	(sim_fetch_register, sim_store_register): Change accordingly.
+
 2006-03-16  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin/bfin-dis.c (ashiftrt, lshiftrt): Accept new arg SIZE, use it

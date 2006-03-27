@@ -16,7 +16,7 @@ typedef signed64 bs64;
 typedef struct
 {
   bu32 dpregs[16], iregs[4], mregs[4], bregs[4], lregs[4];
-  bu64 a0, a1;
+  bu32 a0x, a0w, a1x, a1w;
   bu32 lt[2], lc[2], lb[2];
   int ac0, ac0_copy, ac1, an, aq;
   int av0, av0s, av1, av1s, az, cc, v, v_copy, vs;
@@ -47,8 +47,10 @@ extern saved_state_type saved_state;
 #define MREG(x)		(saved_state.mregs[x])
 #define BREG(x)		(saved_state.bregs[x])
 #define LREG(x)		(saved_state.lregs[x])
-#define A0REG		(saved_state.a0)
-#define A1REG		(saved_state.a1)
+#define A0XREG		(saved_state.a0x)
+#define A0WREG		(saved_state.a0w)
+#define A1XREG		(saved_state.a1x)
+#define A1WREG		(saved_state.a1w)
 #define CCREG		(saved_state.cc)
 #define LC0REG		(saved_state.lc[0])
 #define LT0REG		(saved_state.lt[0])

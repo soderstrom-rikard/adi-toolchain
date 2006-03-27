@@ -570,8 +570,12 @@ static bu32
 decode_macfunc (int which, int op, int h0, int h1, int src0, int src1,
 		int mmod, int MM, int fullword)
 {
-  bu64 *accum = which ? &A1REG : &A0REG;
-  bu64 acc = *accum & 0xFFFFFFFFFFull;
+  bu32 *ax, *aw;
+  bu64 acc;
+ 
+  ax = which ? &A1XREG : &A0XREG;
+  aw = which ? &A1WREG : &A0WREG;
+  acc = (((bu64)*ax << 32) | ((bu64)*aw)) & 0xFFFFFFFFFFull;
 
   /* Sign extend accumulator if necessary.  */
   if (mmod == 0 || mmod == M_T || mmod == M_IS || mmod == M_ISS2
@@ -586,13 +590,13 @@ decode_macfunc (int which, int op, int h0, int h1, int src0, int src1,
       switch (op)
 	{
 	case 0:
-	  *accum = res;
+	  acc = res;
 	  break;
 	case 1:
-	  *accum = acc + res;
+	  acc = acc + res;
 	  break;
 	case 2:
-	  *accum = acc - res;
+	  acc = acc - res;
 	  break;
 	}
 
@@ -604,21 +608,20 @@ decode_macfunc (int which, int op, int h0, int h1, int src0, int src1,
 	case M_IS:
 	case M_ISS2:
 	case M_S2RND:
-	  if ((bs64)*accum < -0x8000000000ll)
-	    *accum = -0x8000000000ull;
-	  else if ((bs64)*accum >= 0x7fffffffffll)
-	    *accum = 0x7fffffffffull;
+	  if ((bs64)acc < -0x8000000000ll)
+	    acc = -0x8000000000ull;
+	  else if ((bs64)acc >= 0x7fffffffffll)
+	    acc = 0x7fffffffffull;
 	  break;
 	case M_TFU:
 	case M_FU:
 	case M_IU:
-	  if (*accum > 0xFFFFFFFFFFull)
-	    *accum = 0xFFFFFFFFFFull;
+	  if (acc > 0xFFFFFFFFFFull)
+	    acc = 0xFFFFFFFFFFull;
 	  break;
 	default:
 	  abort ();
 	}
-      acc = *accum;
     }
 
   return extract_mult (acc, mmod, fullword);
@@ -2158,18 +2161,27 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
   else if (aop == 0 && aopcde == 22 && HL == 0)
     unhandled_instruction ("dregs = BYTEOP2P (dregs_pair, dregs_pair) (RNDL,aligndir)");
   else if (aop == 0 && s == 0 && aopcde == 8)
-    /* A0 = 0 */
-    saved_state.a0 = 0;
+    {
+      /* A0 = 0 */
+      saved_state.a0x = 0;
+      saved_state.a0w = 0;
+    }
   else if (aop == 0 && s == 1 && aopcde == 8)
     unhandled_instruction ("A0 = A0 (S)");
   else if (aop == 1 && s == 0 && aopcde == 8)
-    /* A1 = 0 */
-    saved_state.a1 = 0;
+    {
+      /* A1 = 0 */
+      saved_state.a1x = 0;
+      saved_state.a1w = 0;
+    }
   else if (aop == 1 && s == 1 && aopcde == 8)
     unhandled_instruction ("A1 = A1 (S)");
   else if (aop == 2 && s == 0 && aopcde == 8)
-    /* A1 = A0 = 0 */
-    saved_state.a1 = saved_state.a0 = 0;
+    {
+      /* A1 = A0 = 0 */
+      saved_state.a1x = saved_state.a0x = 0;
+      saved_state.a1w = saved_state.a0w = 0;
+    }
   else if (aop == 2 && s == 1 && aopcde == 8)
     unhandled_instruction ("A1 = A1 (S) , A0 = A0 (S)");
   else if (aop == 3 && s == 0 && aopcde == 8)

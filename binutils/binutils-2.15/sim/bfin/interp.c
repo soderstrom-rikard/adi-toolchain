@@ -476,10 +476,40 @@ sim_set_callbacks (host_callback *p)
   callback = p;
 }
 
+static bu32
+bfin_extract_unsigned_integer (unsigned char *addr, int len)
+{
+  bu32 retval;
+  unsigned char * p;
+  unsigned char * startaddr = (unsigned char *)addr;
+  unsigned char * endaddr = startaddr + len;
+ 
+  retval = 0;
+
+  for (p = endaddr; p > startaddr;)
+    retval = (retval << 8) | *--p;
+ 
+  return retval;
+}
+
+static void
+bfin_store_unsigned_integer (unsigned char *addr, int len, bu32 val)
+{
+  unsigned char *p;
+  unsigned char *startaddr = addr;
+  unsigned char *endaddr = startaddr + len;
+
+  for (p = startaddr; p < endaddr;)
+    {
+      *p++ = val & 0xff;
+      val >>= 8;
+    }
+}
+
 int
 sim_fetch_register (SIM_DESC sd, int rn, unsigned char *memory, int length)
 {
-  int value;
+  bu32 value;
 
   init_pointers ();
   switch (rn)
@@ -517,10 +547,10 @@ sim_fetch_register (SIM_DESC sd, int rn, unsigned char *memory, int length)
     case SIM_BFIN_L2_REGNUM : value = LREG(2); break;
     case SIM_BFIN_L3_REGNUM : value = LREG(3); break;
     case SIM_BFIN_RETS_REGNUM : value = RETSREG; break;
-    case SIM_BFIN_A0_DOT_X_REGNUM : value = A0REG; break;
-    case SIM_BFIN_AO_DOT_W_REGNUM : value = A0REG; break;
-    case SIM_BFIN_A1_DOT_X_REGNUM : value = A1REG; break;
-    case SIM_BFIN_A1_DOT_W_REGNUM : value = A1REG; break;
+    case SIM_BFIN_A0_DOT_X_REGNUM : value = A0XREG; break;
+    case SIM_BFIN_AO_DOT_W_REGNUM : value = A0WREG; break;
+    case SIM_BFIN_A1_DOT_X_REGNUM : value = A1XREG; break;
+    case SIM_BFIN_A1_DOT_W_REGNUM : value = A1WREG; break;
     case SIM_BFIN_LC0_REGNUM : value = LC0REG; break;
     case SIM_BFIN_LT0_REGNUM : value = LT0REG; break;
     case SIM_BFIN_LB0_REGNUM : value = LB0REG; break;
@@ -534,14 +564,17 @@ sim_fetch_register (SIM_DESC sd, int rn, unsigned char *memory, int length)
       break;
   }
 
-  *(int *)memory = value;
+  bfin_store_unsigned_integer (memory, 4, value);
+
   return -1; // disables size checking in gdb
 }
 
 int
 sim_store_register (SIM_DESC sd, int rn, unsigned char *memory, int length)
 {
-  int value = *(int *)memory;
+  bu32 value;
+
+  value = bfin_extract_unsigned_integer (memory, 4);
 
   init_pointers ();
   switch (rn)
@@ -579,10 +612,10 @@ sim_store_register (SIM_DESC sd, int rn, unsigned char *memory, int length)
     case SIM_BFIN_L2_REGNUM : LREG(2) = value; break;
     case SIM_BFIN_L3_REGNUM : LREG(3) = value; break;
     case SIM_BFIN_RETS_REGNUM : RETSREG = value; break;
-    case SIM_BFIN_A0_DOT_X_REGNUM : A0REG = value; break;
-    case SIM_BFIN_AO_DOT_W_REGNUM : A0REG = value; break;
-    case SIM_BFIN_A1_DOT_X_REGNUM : A1REG = value; break;
-    case SIM_BFIN_A1_DOT_W_REGNUM : A1REG = value; break;
+    case SIM_BFIN_A0_DOT_X_REGNUM : A0XREG = value; break;
+    case SIM_BFIN_AO_DOT_W_REGNUM : A0WREG = value; break;
+    case SIM_BFIN_A1_DOT_X_REGNUM : A1XREG = value; break;
+    case SIM_BFIN_A1_DOT_W_REGNUM : A1WREG = value; break;
     case SIM_BFIN_LC0_REGNUM : LC0REG = value; break;
     case SIM_BFIN_LT0_REGNUM : LT0REG = value; break;
     case SIM_BFIN_LB0_REGNUM : LB0REG = value; break;
