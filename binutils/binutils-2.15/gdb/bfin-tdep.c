@@ -728,47 +728,18 @@ bfin_frame_prev_register (struct frame_info *next_frame, void **this_cache,
       if (valuep)
 	{
 	  /* Read the value in from memory.  */
-
-	  if(regnum == BFIN_PC_REGNUM)
-	    {
-	      int *pi = (int *) valuep;
-
-	      if (cache->frameless_pc_value)
-		{
-		  /* Blackfin stores the value of the return pc on
-		     a register not a stack. A LINK command will
-		     save it on the stack.  */
-		  *pi = *addrp;
-		}
-	      else
-		*pi = read_memory_integer (*addrp, 4);
-	    }
-	  else if (regnum == BFIN_FP_REGNUM)
-	    {
-	      int *pi = (int *) valuep;
-
-	      if (cache->frameless_pc_value)
-		{
-		  /* Blackfin stores the value of the return pc on
-		     a register not a stack. A LINK command will
-		     save it on the stack.  */
-#ifdef _DEBUG
-		  fprintf(stderr, "returning frameless %x\n", *addrp);
-#endif
-		  *pi = *addrp;
-		}
-	      else
-		*pi = read_memory_integer (*addrp, 4);
-	    }
-	  else
-	    read_memory (*addrp, valuep,
-			 register_size (current_gdbarch, regnum));
+	  read_memory (*addrp, valuep,
+		       register_size (current_gdbarch, regnum));
 	}
       return;
     }
 
-  frame_register_unwind (next_frame, regnum,
-			 optimizedp, lvalp, addrp, realnump, valuep);
+  *optimizedp = 0;
+  *lvalp = lval_register;
+  *addrp = 0;
+  *realnump = regnum;
+  if (valuep)
+    frame_unwind_register (next_frame, (*realnump), valuep);
 }
 
 CORE_ADDR

@@ -1,3 +1,8 @@
+2006-03-27  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-tdep.c (bfin_frame_prev_register): Correctly get the content
+	of register.
+
 2006-03-24  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin-tdep.c (bfin_linux_sigcontext_reg_offset): Updated for the
