@@ -39,7 +39,7 @@ TIMESTAMP=`date +%Y%m%d`       # is YYYY_MMM_DD
 
 GCC_VERSION=3.4
 
-while getopts dpwvtT:s:b:k:o:m:c:u:h parameter
+while getopts dipwvtT:s:b:k:o:m:c:u:h parameter
 do
     case $parameter in
         p) 
@@ -186,6 +186,9 @@ do
                 DIR_BUILD=${DIR_BUILD%/}
             fi	
             ;;
+	i)
+	    BUILD_TARGET_BINUTILS=1
+	    ;;
         o)
             DIR_ELF_OUTPUT=$OPTARG-elf
             DIR_uC_OUTPUT=$OPTARG-uclinux
@@ -203,6 +206,7 @@ do
 -o OUTPUT        Output directory (leave blank to use build dir)
 -m MAKE          Default make (leave blank to use system make)
 -c GCC_VERSION   GCC version (default 3.4)
+-i               Build binutils libraries for use on the target.
 -v               Verbose
 -h               Help"
              exit
@@ -892,10 +896,10 @@ if [ $KERNEL_SOURCE ] ; then
 
     # Need a way to look at uClibc make system , and see what libs
     # should be created
-    for RUN in crt0.o libc.a libcrypt.a libm.a libnsl.a libresolv.a \
-               libutil.a
+    for RUN in crt1.o libc.so libcrypt.so libm.so libnsl.so libresolv.so \
+               libutil.so
     do
-        if [ ! -f $DIR_uC_OUTPUT/bfin-uclinux/lib/$RUN ] ; then
+        if [ ! -f $DIR_uC_OUTPUT/bfin-uclinux/lib/mfdpic/$RUN ] ; then
             echo "FD-PIC uClibc did not install properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
@@ -1192,6 +1196,62 @@ $DIR_ELF_OUTPUT/bin/bfin-elf-gcc -v
 if [ $KERNEL_SOURCE ] ; then
     echo "*** Testing 'bfin-uclinux-gcc -v'"
     $DIR_uC_OUTPUT/bin/bfin-uclinux-gcc -v
+fi
+
+########################### Target binutils ########################
+
+
+if [ $BUILD_TARGET_BINUTILS ]; then
+
+echo -n "*** Building target libbfd (flat)  " ; date
+
+mkdir $DIR_BINUTILS_BUILD
+cd $DIR_BINUTILS_BUILD
+
+RUN="CC=$DIR_uC_OUTPUT/bin/bfin-uclinux-gcc LDFLAGS=-Wl,-elf2flt \
+    $DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-uclinux \
+    --host=bfin-uclinux --build=`$DIR_BINUTILS_SOURCE/config.guess` \
+    --disable-shared --prefix=$DIR_uC_OUTPUT \
+    --libdir=$DIR_uC_OUTPUT/lib --without-newlib"
+(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+(echo $RUN $LOGFILE ; ) | sh
+
+RUN="$MAKE all-bfd all-opcodes all-libiberty"
+(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+(echo $RUN $LOGFILE ; ) | sh
+
+echo -n "*** Installing target libbfd       " ; date
+RUN="$MAKE install-bfd install-opcodes install-libiberty"
+(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+(echo $RUN $LOGFILE ; ) | sh
+
+echo -n "*** Building target libbfd (fdpic) " ; date
+
+rm -rf $DIR_BINUTILS_BUILD
+mkdir $DIR_BINUTILS_BUILD
+cd $DIR_BINUTILS_BUILD
+
+# Don't add -mfdpic to CFLAGS, since BFD tries to build a few files with the
+# host compiler.
+RUN="CC='$DIR_uC_OUTPUT/bin/bfin-uclinux-gcc -mfdpic' \
+    $DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-uclinux \
+    --host=bfin-uclinux --build=`$DIR_BINUTILS_SOURCE/config.guess` \
+    --disable-shared --prefix=$DIR_uC_OUTPUT \
+    --libdir=$DIR_uC_OUTPUT/lib/mfdpic --without-newlib"
+(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+(echo $RUN $LOGFILE ; ) | sh
+
+RUN="$MAKE all-bfd all-opcodes all-libiberty"
+(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+(echo $RUN $LOGFILE ; ) | sh
+
+echo -n "*** Installing target libbfd       " ; date
+RUN="$MAKE install-bfd install-opcodes install-libiberty"
+(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+(echo $RUN $LOGFILE ; ) | sh
+
+rm -rf $DIR_BINUTILS_BUILD
+
 fi
 
 echo -n "*** Done                       " ; date
