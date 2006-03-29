@@ -1,3 +1,8 @@
+2006-03-29  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_init_builtins, bdesc_1arg, bdesc_2arg):
+	Rename builtins to use __builtin_bfin_ prefix.
+
 2006-03-25  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (LEGITIMATE_CONSTANT_P): Use new function

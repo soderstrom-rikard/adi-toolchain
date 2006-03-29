@@ -3387,91 +3387,91 @@ bfin_init_builtins (void)
   def_builtin ("__builtin_bfin_csync", void_ftype_void, BFIN_BUILTIN_CSYNC);
   def_builtin ("__builtin_bfin_ssync", void_ftype_void, BFIN_BUILTIN_SSYNC);
 
-  def_builtin ("__builtin_compose_2x16", v2hi_ftype_int_int,
+  def_builtin ("__builtin_bfin_compose_2x16", v2hi_ftype_int_int,
 	       BFIN_BUILTIN_COMPOSE_2X16);
-  def_builtin ("__builtin_extract_hi", short_ftype_v2hi,
+  def_builtin ("__builtin_bfin_extract_hi", short_ftype_v2hi,
 	       BFIN_BUILTIN_EXTRACTHI);
-  def_builtin ("__builtin_extract_lo", short_ftype_v2hi,
+  def_builtin ("__builtin_bfin_extract_lo", short_ftype_v2hi,
 	       BFIN_BUILTIN_EXTRACTLO);
 
-  def_builtin ("__builtin_min_fr2x16", v2hi_ftype_v2hi_v2hi,
+  def_builtin ("__builtin_bfin_min_fr2x16", v2hi_ftype_v2hi_v2hi,
 	       BFIN_BUILTIN_MIN_2X16);
-  def_builtin ("__builtin_max_fr2x16", v2hi_ftype_v2hi_v2hi,
+  def_builtin ("__builtin_bfin_max_fr2x16", v2hi_ftype_v2hi_v2hi,
 	       BFIN_BUILTIN_MAX_2X16);
 
-  def_builtin ("__builtin_add_fr2x16", v2hi_ftype_v2hi_v2hi,
+  def_builtin ("__builtin_bfin_add_fr2x16", v2hi_ftype_v2hi_v2hi,
 	       BFIN_BUILTIN_SSADD_2X16);
-  def_builtin ("__builtin_sub_fr2x16", v2hi_ftype_v2hi_v2hi,
+  def_builtin ("__builtin_bfin_sub_fr2x16", v2hi_ftype_v2hi_v2hi,
 	       BFIN_BUILTIN_SSSUB_2X16);
-  def_builtin ("__builtin_dspaddsubsat", v2hi_ftype_v2hi_v2hi,
+  def_builtin ("__builtin_bfin_dspaddsubsat", v2hi_ftype_v2hi_v2hi,
 	       BFIN_BUILTIN_SSADDSUB_2X16);
-  def_builtin ("__builtin_dspsubaddsat", v2hi_ftype_v2hi_v2hi,
+  def_builtin ("__builtin_bfin_dspsubaddsat", v2hi_ftype_v2hi_v2hi,
 	       BFIN_BUILTIN_SSSUBADD_2X16);
-  def_builtin ("__builtin_mult_fr2x16", v2hi_ftype_v2hi_v2hi,
+  def_builtin ("__builtin_bfin_mult_fr2x16", v2hi_ftype_v2hi_v2hi,
 	       BFIN_BUILTIN_MULT_2X16);
-  def_builtin ("__builtin_multr_fr2x16", v2hi_ftype_v2hi_v2hi,
+  def_builtin ("__builtin_bfin_multr_fr2x16", v2hi_ftype_v2hi_v2hi,
 	       BFIN_BUILTIN_MULTR_2X16);
-  def_builtin ("__builtin_negate_fr2x16", v2hi_ftype_v2hi,
+  def_builtin ("__builtin_bfin_negate_fr2x16", v2hi_ftype_v2hi,
 	       BFIN_BUILTIN_NEG_2X16);
-  def_builtin ("__builtin_abs_fr2x16", v2hi_ftype_v2hi,
+  def_builtin ("__builtin_bfin_abs_fr2x16", v2hi_ftype_v2hi,
 	       BFIN_BUILTIN_ABS_2X16);
 
-  def_builtin ("__builtin_add_fr1x16", short_ftype_int_int,
+  def_builtin ("__builtin_bfin_add_fr1x16", short_ftype_int_int,
 	       BFIN_BUILTIN_SSADD_1X16);
-  def_builtin ("__builtin_sub_fr1x16", short_ftype_int_int,
+  def_builtin ("__builtin_bfin_sub_fr1x16", short_ftype_int_int,
 	       BFIN_BUILTIN_SSSUB_1X16);
-  def_builtin ("__builtin_mult_fr1x16", short_ftype_int_int,
+  def_builtin ("__builtin_bfin_mult_fr1x16", short_ftype_int_int,
 	       BFIN_BUILTIN_MULT_1X16);
-  def_builtin ("__builtin_multr_fr1x16", short_ftype_int_int,
+  def_builtin ("__builtin_bfin_multr_fr1x16", short_ftype_int_int,
 	       BFIN_BUILTIN_MULTR_1X16);
-  def_builtin ("__builtin_negate_fr1x16", short_ftype_short,
+  def_builtin ("__builtin_bfin_negate_fr1x16", short_ftype_short,
 	       BFIN_BUILTIN_NEG_1X16);
-  def_builtin ("__builtin_abs_fr1x16", short_ftype_short,
+  def_builtin ("__builtin_bfin_abs_fr1x16", short_ftype_short,
 	       BFIN_BUILTIN_ABS_1X16);
-  def_builtin ("__builtin_norm_fr1x16", short_ftype_int,
+  def_builtin ("__builtin_bfin_norm_fr1x16", short_ftype_int,
 	       BFIN_BUILTIN_NORM_1X16);
 
-  def_builtin ("__builtin_diff_hl_fr2x16", short_ftype_v2hi,
+  def_builtin ("__builtin_bfin_diff_hl_fr2x16", short_ftype_v2hi,
 	       BFIN_BUILTIN_DIFFHL_2X16);
-  def_builtin ("__builtin_diff_lh_fr2x16", short_ftype_v2hi,
+  def_builtin ("__builtin_bfin_diff_lh_fr2x16", short_ftype_v2hi,
 	       BFIN_BUILTIN_DIFFLH_2X16);
 
-  def_builtin ("__builtin_mulhisill", int_ftype_v2hi_v2hi,
+  def_builtin ("__builtin_bfin_mulhisill", int_ftype_v2hi_v2hi,
 	       BFIN_BUILTIN_MULHISILL);
-  def_builtin ("__builtin_mulhisihl", int_ftype_v2hi_v2hi,
+  def_builtin ("__builtin_bfin_mulhisihl", int_ftype_v2hi_v2hi,
 	       BFIN_BUILTIN_MULHISIHL);
-  def_builtin ("__builtin_mulhisilh", int_ftype_v2hi_v2hi,
+  def_builtin ("__builtin_bfin_mulhisilh", int_ftype_v2hi_v2hi,
 	       BFIN_BUILTIN_MULHISILH);
-  def_builtin ("__builtin_mulhisihh", int_ftype_v2hi_v2hi,
+  def_builtin ("__builtin_bfin_mulhisihh", int_ftype_v2hi_v2hi,
 	       BFIN_BUILTIN_MULHISIHH);
 
-  def_builtin ("__builtin_add_fr1x32", int_ftype_int_int,
+  def_builtin ("__builtin_bfin_add_fr1x32", int_ftype_int_int,
 	       BFIN_BUILTIN_SSADD_1X32);
-  def_builtin ("__builtin_sub_fr1x32", int_ftype_int_int,
+  def_builtin ("__builtin_bfin_sub_fr1x32", int_ftype_int_int,
 	       BFIN_BUILTIN_SSSUB_1X32);
-  def_builtin ("__builtin_negate_fr1x32", int_ftype_int,
+  def_builtin ("__builtin_bfin_negate_fr1x32", int_ftype_int,
 	       BFIN_BUILTIN_NEG_1X32);
-  def_builtin ("__builtin_norm_fr1x32", short_ftype_int,
+  def_builtin ("__builtin_bfin_norm_fr1x32", short_ftype_int,
 	       BFIN_BUILTIN_NORM_1X32);
-  def_builtin ("__builtin_mult_fr1x32", int_ftype_short_short,
+  def_builtin ("__builtin_bfin_mult_fr1x32", int_ftype_short_short,
 	       BFIN_BUILTIN_MULT_1X32);
 
   /* Shifts.  */
-  def_builtin ("__builtin_shl_fr1x16", short_ftype_int_int,
+  def_builtin ("__builtin_bfin_shl_fr1x16", short_ftype_int_int,
 	       BFIN_BUILTIN_SSASHIFT_1X16);
-  def_builtin ("__builtin_shl_fr2x16", v2hi_ftype_v2hi_int,
+  def_builtin ("__builtin_bfin_shl_fr2x16", v2hi_ftype_v2hi_int,
 	       BFIN_BUILTIN_SSASHIFT_2X16);
-  def_builtin ("__builtin_lshl_fr1x16", short_ftype_int_int,
+  def_builtin ("__builtin_bfin_lshl_fr1x16", short_ftype_int_int,
 	       BFIN_BUILTIN_LSHIFT_1X16);
-  def_builtin ("__builtin_lshl_fr2x16", v2hi_ftype_v2hi_int,
+  def_builtin ("__builtin_bfin_lshl_fr2x16", v2hi_ftype_v2hi_int,
 	       BFIN_BUILTIN_LSHIFT_2X16);
 
   /* Complex numbers.  */
-  def_builtin ("__builtin_cmplx_mul", v2hi_ftype_v2hi_v2hi,
+  def_builtin ("__builtin_bfin_cmplx_mul", v2hi_ftype_v2hi_v2hi,
 	       BFIN_BUILTIN_CPLX_MUL_16);
-  def_builtin ("__builtin_cmplx_mac", v2hi_ftype_v2hi_v2hi_v2hi,
+  def_builtin ("__builtin_bfin_cmplx_mac", v2hi_ftype_v2hi_v2hi_v2hi,
 	       BFIN_BUILTIN_CPLX_MAC_16);
-  def_builtin ("__builtin_cmplx_msu", v2hi_ftype_v2hi_v2hi_v2hi,
+  def_builtin ("__builtin_bfin_cmplx_msu", v2hi_ftype_v2hi_v2hi_v2hi,
 	       BFIN_BUILTIN_CPLX_MSU_16);
 }
 
@@ -3486,50 +3486,50 @@ struct builtin_description
 
 static const struct builtin_description bdesc_2arg[] =
 {
-  { CODE_FOR_composev2hi, "__builtin_compose_2x16", BFIN_BUILTIN_COMPOSE_2X16, -1 },
+  { CODE_FOR_composev2hi, "__builtin_bfin_compose_2x16", BFIN_BUILTIN_COMPOSE_2X16, -1 },
 
-  { CODE_FOR_ssashiftv2hi3, "__builtin_shl_fr2x16", BFIN_BUILTIN_SSASHIFT_2X16, -1 },
-  { CODE_FOR_ssashifthi3, "__builtin_shl_fr1x16", BFIN_BUILTIN_SSASHIFT_1X16, -1 },
-  { CODE_FOR_lshiftv2hi3, "__builtin_lshl_fr2x16", BFIN_BUILTIN_LSHIFT_2X16, -1 },
-  { CODE_FOR_lshifthi3, "__builtin_lshl_fr1x16", BFIN_BUILTIN_LSHIFT_1X16, -1 },
+  { CODE_FOR_ssashiftv2hi3, "__builtin_bfin_shl_fr2x16", BFIN_BUILTIN_SSASHIFT_2X16, -1 },
+  { CODE_FOR_ssashifthi3, "__builtin_bfin_shl_fr1x16", BFIN_BUILTIN_SSASHIFT_1X16, -1 },
+  { CODE_FOR_lshiftv2hi3, "__builtin_bfin_lshl_fr2x16", BFIN_BUILTIN_LSHIFT_2X16, -1 },
+  { CODE_FOR_lshifthi3, "__builtin_bfin_lshl_fr1x16", BFIN_BUILTIN_LSHIFT_1X16, -1 },
 
-  { CODE_FOR_sminhi3, "__builtin_min_fr1x16", BFIN_BUILTIN_MIN_1X16, -1 },
-  { CODE_FOR_smaxhi3, "__builtin_max_fr1x16", BFIN_BUILTIN_MAX_1X16, -1 },
-  { CODE_FOR_ssaddhi3, "__builtin_add_fr1x16", BFIN_BUILTIN_SSADD_1X16, -1 },
-  { CODE_FOR_sssubhi3, "__builtin_sub_fr1x16", BFIN_BUILTIN_SSSUB_1X16, -1 },
+  { CODE_FOR_sminhi3, "__builtin_bfin_min_fr1x16", BFIN_BUILTIN_MIN_1X16, -1 },
+  { CODE_FOR_smaxhi3, "__builtin_bfin_max_fr1x16", BFIN_BUILTIN_MAX_1X16, -1 },
+  { CODE_FOR_ssaddhi3, "__builtin_bfin_add_fr1x16", BFIN_BUILTIN_SSADD_1X16, -1 },
+  { CODE_FOR_sssubhi3, "__builtin_bfin_sub_fr1x16", BFIN_BUILTIN_SSSUB_1X16, -1 },
 
-  { CODE_FOR_sminsi3, "__builtin_min_fr1x32", BFIN_BUILTIN_MIN_1X32, -1 },
-  { CODE_FOR_smaxsi3, "__builtin_max_fr1x32", BFIN_BUILTIN_MAX_1X32, -1 },
-  { CODE_FOR_ssaddsi3, "__builtin_add_fr1x32", BFIN_BUILTIN_SSADD_1X32, -1 },
-  { CODE_FOR_sssubsi3, "__builtin_sub_fr1x32", BFIN_BUILTIN_SSSUB_1X32, -1 },
+  { CODE_FOR_sminsi3, "__builtin_bfin_min_fr1x32", BFIN_BUILTIN_MIN_1X32, -1 },
+  { CODE_FOR_smaxsi3, "__builtin_bfin_max_fr1x32", BFIN_BUILTIN_MAX_1X32, -1 },
+  { CODE_FOR_ssaddsi3, "__builtin_bfin_add_fr1x32", BFIN_BUILTIN_SSADD_1X32, -1 },
+  { CODE_FOR_sssubsi3, "__builtin_bfin_sub_fr1x32", BFIN_BUILTIN_SSSUB_1X32, -1 },
 
-  { CODE_FOR_sminv2hi3, "__builtin_min_fr2x16", BFIN_BUILTIN_MIN_2X16, -1 },
-  { CODE_FOR_smaxv2hi3, "__builtin_max_fr2x16", BFIN_BUILTIN_MAX_2X16, -1 },
-  { CODE_FOR_ssaddv2hi3, "__builtin_add_fr2x16", BFIN_BUILTIN_SSADD_2X16, -1 },
-  { CODE_FOR_sssubv2hi3, "__builtin_sub_fr2x16", BFIN_BUILTIN_SSSUB_2X16, -1 },
-  { CODE_FOR_ssaddsubv2hi3, "__builtin_dspaddsubsat", BFIN_BUILTIN_SSADDSUB_2X16, -1 },
-  { CODE_FOR_sssubaddv2hi3, "__builtin_dspsubaddsat", BFIN_BUILTIN_SSSUBADD_2X16, -1 },
+  { CODE_FOR_sminv2hi3, "__builtin_bfin_min_fr2x16", BFIN_BUILTIN_MIN_2X16, -1 },
+  { CODE_FOR_smaxv2hi3, "__builtin_bfin_max_fr2x16", BFIN_BUILTIN_MAX_2X16, -1 },
+  { CODE_FOR_ssaddv2hi3, "__builtin_bfin_add_fr2x16", BFIN_BUILTIN_SSADD_2X16, -1 },
+  { CODE_FOR_sssubv2hi3, "__builtin_bfin_sub_fr2x16", BFIN_BUILTIN_SSSUB_2X16, -1 },
+  { CODE_FOR_ssaddsubv2hi3, "__builtin_bfin_dspaddsubsat", BFIN_BUILTIN_SSADDSUB_2X16, -1 },
+  { CODE_FOR_sssubaddv2hi3, "__builtin_bfin_dspsubaddsat", BFIN_BUILTIN_SSSUBADD_2X16, -1 },
 
-  { CODE_FOR_flag_mulhisi, "__builtin_mult_fr1x32", BFIN_BUILTIN_MULT_1X32, MACFLAG_NONE },
-  { CODE_FOR_flag_mulhi, "__builtin_mult_fr1x16", BFIN_BUILTIN_MULT_1X16, MACFLAG_T },
-  { CODE_FOR_flag_mulhi, "__builtin_multr_fr1x16", BFIN_BUILTIN_MULTR_1X16, MACFLAG_NONE },
-  { CODE_FOR_flag_mulv2hi, "__builtin_mult_fr2x16", BFIN_BUILTIN_MULT_2X16, MACFLAG_T },
-  { CODE_FOR_flag_mulv2hi, "__builtin_multr_fr2x16", BFIN_BUILTIN_MULTR_2X16, MACFLAG_NONE }
+  { CODE_FOR_flag_mulhisi, "__builtin_bfin_mult_fr1x32", BFIN_BUILTIN_MULT_1X32, MACFLAG_NONE },
+  { CODE_FOR_flag_mulhi, "__builtin_bfin_mult_fr1x16", BFIN_BUILTIN_MULT_1X16, MACFLAG_T },
+  { CODE_FOR_flag_mulhi, "__builtin_bfin_multr_fr1x16", BFIN_BUILTIN_MULTR_1X16, MACFLAG_NONE },
+  { CODE_FOR_flag_mulv2hi, "__builtin_bfin_mult_fr2x16", BFIN_BUILTIN_MULT_2X16, MACFLAG_T },
+  { CODE_FOR_flag_mulv2hi, "__builtin_bfin_multr_fr2x16", BFIN_BUILTIN_MULTR_2X16, MACFLAG_NONE }
 };
 
 static const struct builtin_description bdesc_1arg[] =
 {
-  { CODE_FOR_signbitshi2, "__builtin_norm_fr1x16", BFIN_BUILTIN_NORM_1X16, 0 },
-  { CODE_FOR_ssneghi2, "__builtin_negate_fr1x16", BFIN_BUILTIN_NEG_1X16, 0 },
-  { CODE_FOR_abshi2, "__builtin_abs_fr1x16", BFIN_BUILTIN_ABS_1X16, 0 },
+  { CODE_FOR_signbitshi2, "__builtin_bfin_norm_fr1x16", BFIN_BUILTIN_NORM_1X16, 0 },
+  { CODE_FOR_ssneghi2, "__builtin_bfin_negate_fr1x16", BFIN_BUILTIN_NEG_1X16, 0 },
+  { CODE_FOR_abshi2, "__builtin_bfin_abs_fr1x16", BFIN_BUILTIN_ABS_1X16, 0 },
 
-  { CODE_FOR_signbitssi2, "__builtin_norm_fr1x32", BFIN_BUILTIN_NORM_1X32, 0 },
-  { CODE_FOR_ssnegsi2, "__builtin_negate_fr1x32", BFIN_BUILTIN_NEG_1X32, 0 },
+  { CODE_FOR_signbitssi2, "__builtin_bfin_norm_fr1x32", BFIN_BUILTIN_NORM_1X32, 0 },
+  { CODE_FOR_ssnegsi2, "__builtin_bfin_negate_fr1x32", BFIN_BUILTIN_NEG_1X32, 0 },
 
-  { CODE_FOR_movv2hi_hi_low, "__builtin_extract_lo", BFIN_BUILTIN_EXTRACTLO, 0 },
-  { CODE_FOR_movv2hi_hi_high, "__builtin_extract_hi", BFIN_BUILTIN_EXTRACTHI, 0 },
-  { CODE_FOR_ssnegv2hi2, "__builtin_negate_fr2x16", BFIN_BUILTIN_NEG_2X16, 0 },
-  { CODE_FOR_absv2hi2, "__builtin_abs_fr2x16", BFIN_BUILTIN_ABS_2X16, 0 }
+  { CODE_FOR_movv2hi_hi_low, "__builtin_bfin_extract_lo", BFIN_BUILTIN_EXTRACTLO, 0 },
+  { CODE_FOR_movv2hi_hi_high, "__builtin_bfin_extract_hi", BFIN_BUILTIN_EXTRACTHI, 0 },
+  { CODE_FOR_ssnegv2hi2, "__builtin_bfin_negate_fr2x16", BFIN_BUILTIN_NEG_2X16, 0 },
+  { CODE_FOR_absv2hi2, "__builtin_bfin_abs_fr2x16", BFIN_BUILTIN_ABS_2X16, 0 }
 };
 
 /* Errors in the source file can cause expand_expr to return const0_rtx
