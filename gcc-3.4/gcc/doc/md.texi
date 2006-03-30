@@ -1823,7 +1823,7 @@ Odd-numbered accumulator register.
 @item b
 I register
 
-@item B
+@item h
 B register
 
 @item f
