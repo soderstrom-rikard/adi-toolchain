@@ -832,6 +832,12 @@ rm -rf $DIR_GCC_BUILD/*
 ########################### Step 2 - done ####################
 
 if [ $KERNEL_SOURCE ] ; then
+    echo -n "*** Configuring uClinux            " ; date
+    cd $UCLINUX_ROOT
+    RUN="$MAKE AnalogDevices/BF537-STAMP_config"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+    
     ####################### Step 3 - build uClibc ################
     echo -n "*** Configuring uClibc             " ; date
     cd $UCLIBC_SOURCE
@@ -1186,6 +1192,13 @@ if [ $KERNEL_SOURCE ] ; then
         done
     fi
     ######################## Done ################################
+
+    echo -n "*** Cleaning uClinux               " ; date
+    cd $UCLINUX_ROOT
+    RUN="$MAKE distclean"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
 fi
 
 rm -rf $DIR_GENEXT2FS_BUILD
