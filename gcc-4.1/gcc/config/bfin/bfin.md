@@ -46,7 +46,7 @@
 ;     e  (a0, a1)
 ;     b  (i0..i3)
 ;     f  (m0..m3)
-;     B
+;     h  (b0..b3)
 ;     c (i0..i3,m0..m3) CIRCREGS
 ;     C (CC)            CCREGS
 ;

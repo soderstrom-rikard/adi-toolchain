@@ -1,3 +1,10 @@
+2006-03-31  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.h (REG_CLASS_FROM_LETTER): Change the letter
+	for BREGS from 'B' to 'h'.
+	* config/bfin/bfin.md: Change comment accordingly.
+	* doc/md.texi: Update accordingly.
+
 2006-03-30  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.c (single_move_for_strmov): Renamed to...

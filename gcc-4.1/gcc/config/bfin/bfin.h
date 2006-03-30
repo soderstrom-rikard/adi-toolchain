@@ -525,7 +525,7 @@ enum reg_class
    (LETTER) == 'A' ? EVEN_AREGS : 	\
    (LETTER) == 'B' ? ODD_AREGS : 	\
    (LETTER) == 'b' ? IREGS :            \
-   (LETTER) == 'B' ? BREGS :            \
+   (LETTER) == 'h' ? BREGS :            \
    (LETTER) == 'f' ? MREGS : 		\
    (LETTER) == 'c' ? CIRCREGS :         \
    (LETTER) == 'C' ? CCREGS : 		\
