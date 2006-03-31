@@ -45,7 +45,7 @@ extern HOST_WIDE_INT bfin_initial_elimination_offset (int, int);
 extern int effective_address_32bit_p (rtx, Mmode);
 extern int symbolic_reference_mentioned_p (rtx);
 extern rtx bfin_gen_compare (rtx, Mmode);
-extern void expand_move (rtx *, Mmode);
+extern bool expand_move (rtx *, Mmode);
 extern void bfin_expand_call (rtx, rtx, rtx, rtx, int);
 extern bool bfin_longcall_p (rtx, int);
 extern bool bfin_dsp_memref_p (rtx);
