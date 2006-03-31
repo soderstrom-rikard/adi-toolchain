@@ -1,6 +1,13 @@
 /*
 ** Floating point comparison.
-** Copyright (C) Analog Devices, Inc. 2002. All Rights Reserved.
+** Copyright (C) 2002-2006 Analog Devices, Inc.
+**
+** This file is subject to the terms and conditions of the GNU Library General  
+** Public License. See the file "COPYING.LIB" in the main directory of this  
+** archive for more details.  
+**
+** Non-LGPL License also available as part of VisualDSP++  
+** http://www.analog.com/processors/resources/crosscore/visualDspDevSoftware.html
 */
 
 .text;

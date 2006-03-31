@@ -1,10 +1,16 @@
 /*
-** Copyright (C) 2003-2004 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003-2006 Analog Devices, Inc.
+**
+** This file is subject to the terms and conditions of the GNU Library General  
+** Public License. See the file "COPYING.LIB" in the main directory of this  
+** archive for more details.  
+**
+** Non-LGPL License also available as part of VisualDSP++  
+** http://www.analog.com/processors/resources/crosscore/visualDspDevSoftware.html
 **
 ** Convert an IEEE double-precision floating point 64-bit number
 ** into a 64-bit unsigned integer, using round-to-zero.
 ** unsigned long long __fixunsdfdi (double);
-**
 */
 
 #define CARRY AC0

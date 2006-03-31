@@ -1,5 +1,12 @@
 /*
-** Copyright (C) 2003-2005 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003-2006 Analog Devices, Inc.
+**
+** This file is subject to the terms and conditions of the GNU Library General  
+** Public License. See the file "COPYING.LIB" in the main directory of this  
+** archive for more details.  
+**
+** Non-LGPL License also available as part of VisualDSP++  
+** http://www.analog.com/processors/resources/crosscore/visualDspDevSoftware.html
 **
 ** Addition of two double-precision IEEE floating-point
 ** numbers. R0=low(X), R1=high(X), R2=low(Y), [SP+12]=high(y).
