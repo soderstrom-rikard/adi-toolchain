@@ -1,3 +1,10 @@
+2006-04-01  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.h (REG_CLASS_FROM_LETTER): Change the letter
+	for BREGS from 'h' to 'v'.
+	* config/bfin/bfin.md: Change comment accordingly.
+	* doc/md.texi: Update accordingly.
+
 2006-03-31  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_cannot_force_const_mem): New function.
