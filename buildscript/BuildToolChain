@@ -1227,8 +1227,8 @@ cd $DIR_BINUTILS_BUILD
 RUN="CC=$DIR_uC_OUTPUT/bin/bfin-uclinux-gcc LDFLAGS=-Wl,-elf2flt \
     $DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-uclinux \
     --host=bfin-uclinux --build=`$DIR_BINUTILS_SOURCE/config.guess` \
-    --disable-shared --prefix=$DIR_uC_OUTPUT \
-    --libdir=$DIR_uC_OUTPUT/lib --without-newlib"
+    --disable-shared --prefix=$DIR_uC_OUTPUT/bfin-uclinux --disable-nls \
+    --without-newlib"
 (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 (echo $RUN $LOGFILE ; ) | sh
 
@@ -1252,12 +1252,12 @@ cd $DIR_BINUTILS_BUILD
 RUN="CC='$DIR_uC_OUTPUT/bin/bfin-uclinux-gcc -mfdpic' \
     $DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-uclinux \
     --host=bfin-uclinux --build=`$DIR_BINUTILS_SOURCE/config.guess` \
-    --disable-shared --prefix=$DIR_uC_OUTPUT \
-    --libdir=$DIR_uC_OUTPUT/lib/mfdpic --without-newlib"
+    --disable-shared --prefix=$DIR_uC_OUTPUT/bfin-uclinux --disable-nls \
+    --libdir=$DIR_uC_OUTPUT/bfin-uclinux/lib/mfdpic --without-newlib"
 (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 (echo $RUN $LOGFILE ; ) | sh
 
-RUN="$MAKE all-bfd all-opcodes all-libiberty"
+RUN="$MAKE all-bfd all-opcodes all-intl all-libiberty"
 (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 (echo $RUN $LOGFILE ; ) | sh
 
