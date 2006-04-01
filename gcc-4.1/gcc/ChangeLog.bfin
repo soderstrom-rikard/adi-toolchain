@@ -1,3 +1,13 @@
+2006-04-01  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.h (REG_CLASS_FROM_LETTER): Rename constraint 'h'
+	to 'v', 'l' to 'u'.
+	* config/bfin/bfin.md: Change comment accordingly.
+	(define_insn loop_end): Replace 'h' with 'v'.
+	(lsetup_with_autoinit): Replace 'l' with 'u'. 
+	(lsetup_without_autoinit): Ditto.
+	* md.texi: Record this change.
+	
 2006-03-31  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_cannot_force_const_mem): New function.

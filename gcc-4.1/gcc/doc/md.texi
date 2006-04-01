@@ -2161,7 +2161,7 @@ Odd-numbered accumulator register.
 @item b
 I register
 
-@item h
+@item v
 B register
 
 @item f
@@ -2179,7 +2179,7 @@ LT0 or LT1.
 @item k
 LC0 or LC1.
 
-@item l
+@item u
 LB0 or LB1.
 
 @item x

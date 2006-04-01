@@ -46,12 +46,12 @@
 ;     e  (a0, a1)
 ;     b  (i0..i3)
 ;     f  (m0..m3)
-;     h  (b0..b3)
-;     c (i0..i3,m0..m3) CIRCREGS
-;     C (CC)            CCREGS
+;     v  (b0..b3)
+;     c  (i0..i3,m0..m3) CIRCREGS
+;     C  (CC)            CCREGS
 ;     t  (lt0,lt1)
 ;     k  (lc0,lc1)
-;     l  (lb0,lb1)
+;     u  (lb0,lb1)
 ;
 
 ;; Define constants for hard registers.
@@ -1554,7 +1554,7 @@
 
 (define_insn "loop_end"
   [(set (pc)
-	(if_then_else (ne (match_operand:SI 0 "nonimmediate_operand" "+a*d,*b*h*f,m")
+	(if_then_else (ne (match_operand:SI 0 "nonimmediate_operand" "+a*d,*b*v*f,m")
 			  (const_int 1))
 		      (label_ref (match_operand 1 "" ""))
 		      (pc)))
@@ -1596,7 +1596,7 @@
 (define_insn "lsetup_with_autoinit"
   [(set (match_operand:SI 0 "lt_register_operand" "=t")
 	(label_ref (match_operand 1 "" "")))
-   (set (match_operand:SI 2 "lb_register_operand" "=l")
+   (set (match_operand:SI 2 "lb_register_operand" "=u")
 	(label_ref (match_operand 3 "" "")))
    (set (match_operand:SI 4 "lc_register_operand" "=k")
 	(match_operand:SI 5 "register_operand" "a"))]
@@ -1607,7 +1607,7 @@
 (define_insn "lsetup_without_autoinit"
   [(set (match_operand:SI 0 "lt_register_operand" "=t")
 	(label_ref (match_operand 1 "" "")))
-   (set (match_operand:SI 2 "lb_register_operand" "=l")
+   (set (match_operand:SI 2 "lb_register_operand" "=u")
 	(label_ref (match_operand 3 "" "")))
    (use (match_operand:SI 4 "lc_register_operand" "k"))]
   ""
