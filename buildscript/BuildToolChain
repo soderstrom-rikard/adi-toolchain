@@ -1162,7 +1162,7 @@ if [ $KERNEL_SOURCE ] ; then
         (echo $RUN $LOGFILE ; ) | sh
 
         echo -n "*** Make U-Boot                    " ; date
-        RUN=$MAKE
+        RUN="$MAKE tools "
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh
 
@@ -1190,6 +1190,12 @@ if [ $KERNEL_SOURCE ] ; then
                 exit
            fi
         done
+
+        echo -n "*** Cleaning U-Boot                " ; date
+        RUN="$MAKE distclean "
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh
+
     fi
     ######################## Done ################################
 
