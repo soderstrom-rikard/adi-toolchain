@@ -1324,7 +1324,7 @@
 	(neg:HI (match_operand:HI 1 "register_operand" "d")))]
   ""
   "%0 = -%1 (V);"
-  [(set_attr "type" "alu0")])
+  [(set_attr "type" "dsp32")])
 
 (define_insn "ssneghi2"
   [(set (match_operand:HI 0 "register_operand" "=d")

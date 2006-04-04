@@ -1,3 +1,7 @@
+2006-04-04  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (neghi2): Set correct type.
+
 2006-04-01  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.h (REG_CLASS_FROM_LETTER): Rename constraint 'h'
