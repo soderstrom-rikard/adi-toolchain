@@ -731,22 +731,19 @@ bfin_frame_prev_register (struct frame_info *next_frame, void **this_cache,
 
 	  if(regnum == BFIN_PC_REGNUM)
 	    {
-	      int *pi = (int *) valuep;
-
 	      if (cache->frameless_pc_value)
 		{
 		  /* Blackfin stores the value of the return pc on
 		     a register not a stack. A LINK command will
 		     save it on the stack.  */
-		  *pi = *addrp;
+		  store_unsigned_integer (valuep, 4, *addrp);
 		}
 	      else
-		*pi = read_memory_integer (*addrp, 4);
+		store_unsigned_integer (valuep, 4,
+				read_memory_unsigned_integer (*addrp, 4));
 	    }
 	  else if (regnum == BFIN_FP_REGNUM)
 	    {
-	      int *pi = (int *) valuep;
-
 	      if (cache->frameless_pc_value)
 		{
 		  /* Blackfin stores the value of the return pc on
@@ -755,10 +752,11 @@ bfin_frame_prev_register (struct frame_info *next_frame, void **this_cache,
 #ifdef _DEBUG
 		  fprintf(stderr, "returning frameless %x\n", *addrp);
 #endif
-		  *pi = *addrp;
+		  store_unsigned_integer (valuep, 4, *addrp);
 		}
 	      else
-		*pi = read_memory_integer (*addrp, 4);
+		store_unsigned_integer (valuep, 4,
+				read_memory_unsigned_integer (*addrp, 4));
 	    }
 	  else
 	    read_memory (*addrp, valuep,

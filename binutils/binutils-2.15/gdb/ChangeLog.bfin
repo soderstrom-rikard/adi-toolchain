@@ -1,5 +1,10 @@
 2006-04-04  Jie Zhang  <jie.zhang@analog.com>
 
+	* bfin-tdep.c (bfin_frame_prev_register): Not store value
+	directly via pointer. Call store_unsigned_integer () instead.
+
+2006-04-04  Jie Zhang  <jie.zhang@analog.com>
+
 	Revert
 	2006-03-27  Jie Zhang  <jie.zhang@analog.com>
 	* bfin-tdep.c (bfin_frame_prev_register): Correctly get the content
