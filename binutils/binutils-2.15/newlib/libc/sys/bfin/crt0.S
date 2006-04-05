@@ -17,29 +17,45 @@ __start:
 L$L$clear_bss:
 	B [p0++] = r0;
 
+#ifdef __BFIN_FDPIC__
+	/* Set up GOT pointer.  */
+	P0.L = __ROFIXUP_END__;
+	P0.H = __ROFIXUP_END__;
+	P4 = [P0 - 4];
+#endif
+
 	/* Need to set up standard file handles */
 	/*  Parse string at r1 */
 
 	p0.l = __init;
 	p0.h = __init; 
+	P3 = P4; 
 	call	(p0)
 
 	p0.l = _atexit;
 	p0.h = _atexit;
+#ifdef __BFIN_FDPIC__
+	r0 = [P4 + __fini@FUNCDESC_GOT17M4]  ; 
+	P3 = P4; 
+#else
 	r0.l = __fini;
-	r0.h = __fini; 
+	r0.h = __fini;
+#endif
 	call	(p0)
 
 	p0.l = _initialise_monitor_handles;
 	p0.h = _initialise_monitor_handles;
+	P3 = P4; 
 	call	(p0)
 
 	p0.l = ___setup_argv_and_call_main;
 	p0.h = ___setup_argv_and_call_main; 
+	P3 = P4; 
 	call	(p0)
 
 	p0.l = _exit;
 	p0.h = _exit; 
+	P3 = P4; 
 	jump	(p0)		/* Should not return.  */
 
 	.data

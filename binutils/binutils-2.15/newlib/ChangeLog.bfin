@@ -1,3 +1,7 @@
+2005-10-11  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* libc/sys/bfin/crt0.S (start): Support FD-PIC binaries.
+
 2006-03-17  Jie Zhang  <jie.zhang@analog.com>
 
 	* configure.host (newlib_cflags): When host is bfin add
