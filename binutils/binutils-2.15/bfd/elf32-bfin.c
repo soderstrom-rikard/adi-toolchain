@@ -3393,22 +3393,6 @@ _bfin_create_got_section (bfd *abfd, struct bfd_link_info *info)
       flags = BSF_GLOBAL | BSF_WEAK;
     }
 
-  /* Define _gp in .rofixup, for FDPIC, or .got otherwise.  If it
-     turns out that we're linking with a different linker script, the
-     linker script will override it.  */
-  bh = NULL;
-  if (!(_bfd_generic_link_add_one_symbol
-	(info, abfd, "_gp", flags, s, offset, (const char *) NULL, FALSE,
-	 bed->collect, &bh)))
-    return FALSE;
-  h = (struct elf_link_hash_entry *) bh;
-  h->def_regular = 1;
-  h->type = STT_OBJECT;
-
-  /* Machine-specific: we want the symbol for executables as well.  */
-  if (IS_FDPIC (abfd) && ! bfd_elf_link_record_dynamic_symbol (info, h))
-    return FALSE;
-
   return TRUE;
 }
 

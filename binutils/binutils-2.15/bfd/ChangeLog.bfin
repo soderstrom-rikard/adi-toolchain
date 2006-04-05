@@ -2,6 +2,9 @@
 
 	* reloc.c: Use ENUM for first FD-PIC reloc; add ENUMDOC for the lot.
 
+	* elf32-bfin.c (_bfin_create_got_section): Don't generate a _gp
+	symbol.
+
 2006-03-25  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* elf32-bfin.c (struct bfinfdpic_relocs_info): Lose the "los"
