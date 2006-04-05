@@ -43,12 +43,11 @@ __divsi3:
 ___modsi3:
 __modsi3:
         [--SP] = RETS;
-	/* P1 and P2 are preserved by divsi3 and udivsi3.  */
-	P1 = R0;
-	P2 = R1;
+	[--SP] = R0;
+	[--SP] = R1;
         CALL ___divsi3;
-	R1 = P1;
-	R2 = P2;
+	R2 = [SP++];
+	R1 = [SP++];
 	R2 *= R0;
 	R0 = R1 - R2;
 	RETS = [SP++];
