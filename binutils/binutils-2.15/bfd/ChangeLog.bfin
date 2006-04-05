@@ -1,3 +1,7 @@
+2006-04-05  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* reloc.c: Use ENUM for first FD-PIC reloc; add ENUMDOC for the lot.
+
 2006-03-25  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* elf32-bfin.c (struct bfinfdpic_relocs_info): Lose the "los"
