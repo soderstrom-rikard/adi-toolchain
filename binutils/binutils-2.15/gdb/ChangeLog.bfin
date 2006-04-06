@@ -1,3 +1,31 @@
+2006-04-06  Jie Zhang  <jie.zhang@analog.com>
+
+	* Makefile.in (elf_bfin_h): New.
+	(bfin-tdep.o): Add dependence.
+	(solib-bfin.o): New target.
+	* bfin-tdep.c (elf/bfin.h): Include.
+	(infcall.h): Include.
+	(bfin_register_name_strings): Add "fdpic_exec" and "fdpic_interp".
+	(bfin_abi): New.
+	(find_func_descr): New.
+	(bfin_convert_from_func_ptr_addr): New.
+	(bfin_push_dummy_call): Deal with FDPIC function descriptor.
+	And set FDPIC register before function call.
+	(bfin_fdpic_loadmap_addresses): New.
+	(bfin_gdbarch_init): Set abi according to elf flags.
+	Call set_gdbarch_convert_from_func_ptr_addr () for FDPIC ABI.
+	* bfin-tdep.h (enum gdb_regnum): Add BFIN_FDPIC_EXEC_REGNUM and
+	BFIN_FDPIC_INTERP_REGNUM.
+	(enum bfin_abi): New.
+	(struct gdbarch_tdep): Add new field bfin_abi.
+	(print_insn_bfin): Fix declaration.
+	(bfin_fdpic_loadmap_addresses): Declare.
+	(bfin_fdpic_find_global_pointer): Declare.
+	(bfin_fdpic_find_canonical_descriptor): Declare.
+	* solib-bfin.c: New file.
+	* config/bfin/linux.mt (TDEPFILES): Add solib.o and solib-bfin.o.
+	(DEPRECATED_TM_FILE): New.
+
 2006-04-04  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin-tdep.c (bfin_frame_prev_register): Not store value

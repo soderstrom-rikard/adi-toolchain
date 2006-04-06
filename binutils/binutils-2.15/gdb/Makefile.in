@@ -577,6 +577,7 @@ elf_reloc_macros_h =	$(INCLUDE_DIR)/elf/reloc-macros.h
 elf_sh_h =	$(INCLUDE_DIR)/elf/sh.h
 elf_arm_h =	$(INCLUDE_DIR)/elf/arm.h $(elf_reloc_macros_h)
 elf_bfd_h =	$(BFD_SRC)/elf-bfd.h
+elf_bfin_h =	$(INCLUDE_DIR)/elf/bfin.h $(elf_reloc_macros_h)
 elf_frv_h =	$(INCLUDE_DIR)/elf/frv.h $(elf_reloc_macros_h)
 libaout_h =	$(BFD_SRC)/libaout.h
 libbfd_h =	$(BFD_SRC)/libbfd.h
@@ -2278,7 +2279,7 @@ monitor.o: monitor.c $(defs_h) $(gdbcore_h) $(target_h) $(gdb_string_h) \
 	$(command_h) $(serial_h) $(monitor_h) $(gdbcmd_h) $(inferior_h) \
 	$(gdb_regex_h) $(srec_h) $(regcache_h)
 bfin-tdep.o: bfin-tdep.c $(gdbcmd_h) $(gdbcore_h) $(inferior_h) $(defs_h) \
-        $(gdbcore_h)
+        $(gdbcore_h) $(elf_bfin_h)
 nbsd-tdep.o: nbsd-tdep.c $(defs_h) $(gdb_string_h) $(solib_svr4_h)
 nlmread.o: nlmread.c $(defs_h) $(bfd_h) $(symtab_h) $(symfile_h) \
 	$(objfiles_h) $(buildsym_h) $(stabsread_h) $(block_h)
@@ -2498,6 +2499,9 @@ solib.o: solib.c $(defs_h) $(gdb_string_h) $(symtab_h) $(bfd_h) $(symfile_h) \
 	$(gdb_regex_h) $(inferior_h) $(environ_h) $(language_h) $(gdbcmd_h) \
 	$(completer_h) $(filenames_h) $(exec_h) $(solist_h) $(observer_h) \
 	$(readline_h)
+solib-bfin.o: solib-bfin.c $(defs_h) $(gdb_string_h) $(inferior_h) \
+	$(gdbcore_h) $(solist_h) $(bfin_tdep_h) $(objfiles_h) $(symtab_h) \
+	$(language_h) $(command_h) $(gdbcmd_h) $(elf_bfin_h)
 solib-frv.o: solib-frv.c $(defs_h) $(gdb_string_h) $(inferior_h) \
 	$(gdbcore_h) $(solist_h) $(frv_tdep_h) $(objfiles_h) $(symtab_h) \
 	$(language_h) $(command_h) $(gdbcmd_h) $(elf_frv_h)

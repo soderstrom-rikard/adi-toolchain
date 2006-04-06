@@ -88,6 +88,9 @@ enum gdb_regnum {
   BFIN_EXTRA2,		/* Address of .data section.  */
   BFIN_EXTRA3,		/* Address of .bss section.  */
 
+  BFIN_FDPIC_EXEC_REGNUM,
+  BFIN_FDPIC_INTERP_REGNUM,
+
   /* MMRs */
   BFIN_IPEND_REGNUM,
 
@@ -162,9 +165,19 @@ enum gcc_regnum {
 /* ??? */
 #define BFIN_LINUX_JB_ELEMENT_SIZE 4
 
+/* The ABIs for Blackfin.  */
+enum bfin_abi
+{
+  BFIN_ABI_FLAT,
+  BFIN_ABI_FDPIC
+};
+
 /* Target-dependent structure in gdbarch.  */
 struct gdbarch_tdep
 {
+  /* Which ABI is in use?  */
+  enum bfin_abi bfin_abi;
+
   /* Lowest address at which instructions will appear.  */
   CORE_ADDR lowest_pc;
 
@@ -185,5 +198,20 @@ struct gdbarch_tdep
 };
 
 /* in opcodes/bfin-dis.c */
-extern int print_insn_bfin (bfd_vma pc, disassemble_info *outf);
+extern int print_insn_bfin (bfd_vma pc, struct disassemble_info *outf);
 
+/* Fetch the interpreter and executable loadmap addresses (for shared
+   library support) for the FDPIC ABI.  Return 0 if successful, -1 if
+   not.  (E.g, -1 will be returned if the ABI isn't the FDPIC ABI.)  */
+extern int bfin_fdpic_loadmap_addresses (struct gdbarch *gdbarch,
+					 CORE_ADDR *interp_addr,
+					 CORE_ADDR *exec_addr);
+
+/* Given a function entry point, find and return the GOT address for the
+   containing load module.  */
+CORE_ADDR bfin_fdpic_find_global_pointer (CORE_ADDR addr);
+
+/* Given a function entry point, find and return the canonical descriptor
+   for that function, if one exists.  If no canonical descriptor could
+   be found, return 0.  */
+CORE_ADDR bfin_fdpic_find_canonical_descriptor (CORE_ADDR entry_point);

@@ -53,6 +53,8 @@
 #include "objfiles.h"
 #include "trad-frame.h"
 #include "gdb/sim-bfin.h"
+#include "elf/bfin.h"
+#include "infcall.h"
 
 /* Macros used by prologue functions.  */
 #define P_LINKAGE             		0xE800  
@@ -163,7 +165,7 @@ static char *bfin_register_name_strings[] =
   "a0x", "a0w", "a1x", "a1w", "astat", "rets",
   "lc0", "lt0", "lb0", "lc1", "lt1", "lb1", "cycles", "cycles2",
   "usp", "seqstat", "syscfg", "reti", "retx", "retn", "rete",
-  "pc", "cc", "extra1", "extra2", "extra3",
+  "pc", "cc", "extra1", "extra2", "extra3", "fdpic_exec", "fdpic_interp",
   "ipend"
 };
 
@@ -422,6 +424,12 @@ struct bfin_linux_sigtramp_info
   /* Offset of registers in `struct sigcontext'.  */
   int *sc_reg_offset;
 };
+
+static enum bfin_abi
+bfin_abi (struct gdbarch *gdbarch)
+{
+  return gdbarch_tdep (gdbarch)->bfin_abi;
+}
 
 /* Return non-zero if PC points into the signal trampoline.  For the
    sake of bfin_linux_get_sigtramp_info.  */
@@ -897,6 +905,45 @@ bfin_frame_saved_pc (struct frame_info *frame)
   return read_memory_unsigned_integer (get_frame_base (frame) + RETS_OFFSET, 4);
 }
 
+static CORE_ADDR
+find_func_descr (struct gdbarch *gdbarch, CORE_ADDR entry_point)
+{
+  CORE_ADDR descr;
+  char valbuf[4];
+
+  descr = bfin_fdpic_find_canonical_descriptor (entry_point);
+
+  if (descr != 0)
+    return descr;
+
+  /* Construct a non-canonical descriptor from space allocated on
+     the stack.  */
+
+  descr = value_as_long (value_allocate_space_in_inferior (8));
+  store_unsigned_integer (valbuf, 4, entry_point);
+  write_memory (descr, valbuf, 4);
+  store_unsigned_integer (valbuf, 4,
+                          bfin_fdpic_find_global_pointer (entry_point));
+  write_memory (descr + 4, valbuf, 4);
+  return descr;
+}
+
+static CORE_ADDR
+bfin_convert_from_func_ptr_addr (struct gdbarch *gdbarch, CORE_ADDR addr,
+				 struct target_ops *targ)
+{
+  CORE_ADDR entry_point;
+  CORE_ADDR got_address;
+
+  entry_point = get_target_memory_unsigned (targ, addr, 4);
+  got_address = get_target_memory_unsigned (targ, addr + 4, 4);
+
+  if (got_address == bfin_fdpic_find_global_pointer (entry_point))
+    return entry_point;
+  else
+    return addr;
+}
+
 /* We currently only support passing parameters in integer registers.  This
    conforms with GCC's default model.  Several other variants exist and
    we should probably support some of them based on the selected ABI.  */
@@ -912,6 +959,8 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
   int i;
   long reg_r0, reg_r1, reg_r2;
   int total_len = 0;
+  enum bfin_abi abi = bfin_abi (gdbarch);
+  CORE_ADDR func_addr = find_function_addr (function, NULL);
 
   for (i = nargs - 1; i >= 0; i--)
     {
@@ -932,10 +981,26 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
   for (i = nargs - 1; i >= 0; i--)
     {
       struct type *value_type = VALUE_ENCLOSING_TYPE (args[i]);
+      struct type *arg_type = check_typedef (value_type);
       int len = TYPE_LENGTH (value_type);
       int container_len = (len + 3) & ~3;
       sp -= container_len;
-      write_memory (sp, VALUE_CONTENTS_ALL (args[i]), container_len);
+
+      if (abi == BFIN_ABI_FDPIC
+	  && len == 4
+	  && TYPE_CODE (arg_type) == TYPE_CODE_PTR
+	  && TYPE_CODE (TYPE_TARGET_TYPE (arg_type)) == TYPE_CODE_FUNC)
+	{
+	  CORE_ADDR descr;
+
+	  /* The FDPIC ABI requires function descriptors to be passed instead
+	     of entry points.  */
+	  descr = extract_unsigned_integer (VALUE_CONTENTS (args[i]), 4);
+	  descr = find_func_descr (gdbarch, descr);
+	  write_memory_unsigned_integer (sp, 4, descr);
+	}
+      else
+	write_memory (sp, VALUE_CONTENTS_ALL (args[i]), container_len);
     }
 
   /* initialize R0, R1 and R2 to the first 3 words of paramters */
@@ -963,6 +1028,14 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
 
   store_unsigned_integer (buf, 4, bp_addr);
   regcache_cooked_write (regcache, BFIN_RETS_REGNUM, buf);
+
+  if (abi == BFIN_ABI_FDPIC)
+    {
+      /* Set the GOT register for the FDPIC ABI.  */
+      regcache_cooked_write_unsigned
+	(regcache, BFIN_P3_REGNUM,
+         bfin_fdpic_find_global_pointer (func_addr));
+    }
 
   /* Finally, update the stack pointer.  */
 
@@ -1194,6 +1267,35 @@ bfin_frame_align (struct gdbarch *gdbarch, CORE_ADDR address)
   return (address & ~0x3);
 }
 
+/* Fetch the interpreter and executable loadmap addresses (for shared
+   library support) for the FDPIC ABI.  Return 0 if successful, -1 if
+   not.  (E.g, -1 will be returned if the ABI isn't the FDPIC ABI.)  */
+int
+bfin_fdpic_loadmap_addresses (struct gdbarch *gdbarch, CORE_ADDR *interp_addr,
+			      CORE_ADDR *exec_addr)
+{
+  if (bfin_abi (gdbarch) != BFIN_ABI_FDPIC)
+    return -1;
+  else
+    {
+      if (interp_addr != NULL)
+	{
+	  ULONGEST val;
+	  regcache_cooked_read_unsigned (current_regcache,
+					 BFIN_FDPIC_INTERP_REGNUM, &val);
+	  *interp_addr = val;
+	}
+      if (exec_addr != NULL)
+	{
+	  ULONGEST val;
+	  regcache_cooked_read_unsigned (current_regcache,
+					BFIN_FDPIC_EXEC_REGNUM, &val);
+	  *exec_addr = val;
+	}
+      return 0;
+    }
+}
+
 /* Initialize the current architecture based on INFO.  If possible,
    re-use an architecture from ARCHES, which is a list of
    architectures already created during this debugging session.
@@ -1206,14 +1308,35 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
 {
   struct gdbarch_tdep *tdep;
   struct gdbarch *gdbarch;
+  int elf_flags;
+  enum bfin_abi abi;
+
+  /* Extract the ELF flags, if available.  */
+  if (info.abfd && bfd_get_flavour (info.abfd) == bfd_target_elf_flavour)
+    elf_flags = elf_elfheader (info.abfd)->e_flags;
+  else
+    elf_flags = 0;
+
+  if (elf_flags & EF_BFIN_FDPIC)
+    abi = BFIN_ABI_FDPIC;
+  else
+    abi = BFIN_ABI_FLAT;
 
   /* If there is already a candidate, use it.  */
 
-  arches = gdbarch_list_lookup_by_info (arches, &info);
-  if (arches != NULL)
-    return arches->gdbarch;
+  for (arches = gdbarch_list_lookup_by_info (arches, &info);
+       arches != NULL;
+       arches = gdbarch_list_lookup_by_info (arches->next, &info))
+    {
+      if (gdbarch_tdep (arches->gdbarch)->bfin_abi != abi)
+	continue;
+      return arches->gdbarch;
+    }
 
-  gdbarch = gdbarch_alloc (&info, NULL);
+  tdep = XMALLOC (struct gdbarch_tdep);
+  gdbarch = gdbarch_alloc (&info, tdep);
+
+  tdep->bfin_abi = abi;
 
   set_gdbarch_num_regs (gdbarch, BFIN_NUM_REGS);
   set_gdbarch_num_pseudo_regs (gdbarch, 0); 
@@ -1246,6 +1369,11 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
 
   frame_unwind_append_sniffer (gdbarch, bfin_linux_sigtramp_frame_sniffer);
   frame_unwind_append_sniffer (gdbarch, bfin_frame_sniffer);
+
+
+  if (bfin_abi (gdbarch) == BFIN_ABI_FDPIC)
+    set_gdbarch_convert_from_func_ptr_addr (gdbarch,
+					    bfin_convert_from_func_ptr_addr);
 
   return gdbarch;
 }
