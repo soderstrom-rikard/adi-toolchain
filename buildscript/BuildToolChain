@@ -818,7 +818,7 @@ RUN="$DIR_GENEXT2FS_SOURCE/configure --prefix=$DIR_ELF_OUTPUT"
 (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 (echo $RUN $LOGFILE ; ) | sh
 
-echo -n "*** Make Elf genetx2fs             " ; date
+echo -n "*** Make Elf genext2fs             " ; date
 RUN=$MAKE
 (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 (echo $RUN $LOGFILE ; ) | sh
@@ -862,6 +862,13 @@ done
 if [ $KERNEL_SOURCE ] ; then
     echo -n "*** Configuring uClinux            " ; date
     cd $UCLINUX_ROOT
+
+    # Save the previous configuration
+    cp .config saved-config-toplevel 2>/dev/null
+    cp linux-2.6.x/.config saved-config-linux 2>/dev/null
+    cp uClibc/.config saved-config-uClibc 2>/dev/null
+    cp config/.config saved-config-user 2>/dev/null
+
     RUN="$MAKE AnalogDevices/BF537-STAMP_config"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
@@ -870,7 +877,6 @@ if [ $KERNEL_SOURCE ] ; then
     echo -n "*** Configuring uClibc             " ; date
     cd $UCLIBC_SOURCE
 
-    cp .config .config-saved-buildtoolchain
     cp extra/Configs/Config.bfin.default .config
 
     RUN="$MAKE oldconfig ROOTDIR=$UCLINUX_ROOT"
@@ -901,7 +907,10 @@ if [ $KERNEL_SOURCE ] ; then
             echo "uClibc did not install properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
-	    mv .config-saved-buildtoolchain .config
+	    mv saved-config-toplevel .config 2>/dev/null
+    	    mv saved-config-linux linux-2.6.x/.config 2>/dev/null
+	    mv saved-config-uClibc uClibc/.config 2>/dev/null
+	    mv saved-config-user config/.config 2>/dev/null
             exit
         fi
     done
@@ -939,19 +948,24 @@ if [ $KERNEL_SOURCE ] ; then
             echo "FD-PIC uClibc did not install properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
+	    mv saved-config-toplevel .config 2>/dev/null
+	    mv saved-config-linux linux-2.6.x/.config 2>/dev/null
+	    mv saved-config-uClibc uClibc/.config 2>/dev/null
+	    mv saved-config-user config/.config 2>/dev/null
             exit
         fi
     done
 
-    mv .config-saved-buildtoolchain .config
-    # Make sure subsequent builds don't have leftover FD-PIC bits.
-    echo -n "*** Cleaning uClibc                " ; date
-    RUN="$MAKE oldconfig"
+    echo -n "*** Cleaning uClinux               " ; date
+    cd $UCLINUX_ROOT
+    RUN="$MAKE distclean"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
-    RUN="$MAKE clean"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+
+    mv saved-config-toplevel .config 2>/dev/null
+    mv saved-config-linux linux-2.6.x/.config 2>/dev/null
+    mv saved-config-uClibc uClibc/.config 2>/dev/null
+    mv saved-config-user config/.config 2>/dev/null
 
     ####################### Done Step 3  #########################
 
@@ -1069,7 +1083,7 @@ if [ $KERNEL_SOURCE ] ; then
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
-    echo -n "*** Make uClinux genetx2fs         " ; date
+    echo -n "*** Make uClinux genext2fs         " ; date
     RUN=$MAKE
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
@@ -1151,12 +1165,6 @@ if [ $KERNEL_SOURCE ] ; then
 
     fi
     ######################## Done ################################
-
-    echo -n "*** Cleaning uClinux               " ; date
-    cd $UCLINUX_ROOT
-    RUN="$MAKE distclean"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
 
 fi
 
