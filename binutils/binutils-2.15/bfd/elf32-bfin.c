@@ -2002,7 +2002,7 @@ bfin_check_relocs (bfd * abfd,
 
 	case R_got:
 	  if (h != NULL
-	      && strcmp (h->root.root.string, "_GLOBAL_OFFSET_TABLE_") == 0)
+	      && strcmp (h->root.root.string, "__GLOBAL_OFFSET_TABLE_") == 0)
 	    break;
 	  /* Fall through.  */
 
@@ -2944,7 +2944,7 @@ bfin_relocate_section (bfd * output_bfd,
 	  /* Relocation is to the address of the entry for this symbol
 	     in the global offset table.  */
 	  if (h != NULL
-	      && strcmp (h->root.root.string, "_GLOBAL_OFFSET_TABLE_") == 0)
+	      && strcmp (h->root.root.string, "__GLOBAL_OFFSET_TABLE_") == 0)
 	    goto do_default;
 	  /* Fall through.  */
 	  /* Relocation is the offset of the entry for this symbol in
@@ -3337,7 +3337,7 @@ _bfin_create_got_section (bfd *abfd, struct bfd_link_info *info)
 	 a global offset table.  */
       bh = NULL;
       if (!(_bfd_generic_link_add_one_symbol
-	    (info, abfd, "_GLOBAL_OFFSET_TABLE_", BSF_GLOBAL, s,
+	    (info, abfd, "__GLOBAL_OFFSET_TABLE_", BSF_GLOBAL, s,
 	     bed->got_symbol_offset, (const char *) NULL, FALSE,
 	     bed->collect, &bh)))
 	return FALSE;
@@ -3437,7 +3437,7 @@ elf32_bfinfdpic_create_dynamic_sections (bfd *abfd, struct bfd_link_info *info)
       struct bfd_link_hash_entry *bh = NULL;
 
       if (! (_bfd_generic_link_add_one_symbol
-	     (info, abfd, "_PROCEDURE_LINKAGE_TABLE_", BSF_GLOBAL, s, 0, NULL,
+	     (info, abfd, "__PROCEDURE_LINKAGE_TABLE_", BSF_GLOBAL, s, 0, NULL,
 	      FALSE, get_elf_backend_data (abfd)->collect, &bh)))
 	return FALSE;
       h = (struct elf_link_hash_entry *) bh;
@@ -5126,8 +5126,8 @@ fprintf(stderr, "*** check this relocation %s\n", __FUNCTION__);
       BFD_ASSERT (0);
     }
   /* Mark _DYNAMIC and _GLOBAL_OFFSET_TABLE_ as absolute.  */
-  if (strcmp (h->root.root.string, "_DYNAMIC") == 0
-      || strcmp (h->root.root.string, "_GLOBAL_OFFSET_TABLE_") == 0)
+  if (strcmp (h->root.root.string, "__DYNAMIC") == 0
+      || strcmp (h->root.root.string, "__GLOBAL_OFFSET_TABLE_") == 0)
     sym->st_shndx = SHN_ABS;
 
   return TRUE;
