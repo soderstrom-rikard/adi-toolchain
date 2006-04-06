@@ -27,6 +27,7 @@
 #
 ###############################################################
 
+
 APP_NAME=$0
 DIR_APP=`dirname $APP_NAME`
 DIR_BOARDS=$DIR_APP/boards/
@@ -37,7 +38,7 @@ APP_NAME=${APP_NAME#/}
 #TIMESTAMP=`date +%Y-%b-%d-%H-%M` # is YYYY_MMM_DD_HH_MM
 TIMESTAMP=`date +%Y%m%d`       # is YYYY_MMM_DD
 
-GCC_VERSION=3.4
+GCC_VERSIONS=
 
 while getopts dipwvtT:s:b:k:o:m:c:u:h parameter
 do
@@ -152,7 +153,7 @@ do
             ;;
 
 	c)
-	    GCC_VERSION=$OPTARG
+	    GCC_VERSIONS="$GCC_VERSIONS $OPTARG"
 	    ;;
 
         k) 
@@ -205,7 +206,7 @@ do
 -b BUILD  	 Build directory (leave blank to use current dir)
 -o OUTPUT        Output directory (leave blank to use build dir)
 -m MAKE          Default make (leave blank to use system make)
--c GCC_VERSION   GCC version (default 3.4)
+-c GCC_VERSION   GCC version (default 3.4).  Can be given multiple times.
 -i               Build binutils libraries for use on the target.
 -v               Verbose
 -h               Help"
@@ -216,6 +217,11 @@ do
              exit	
     esac
 done
+
+if [ -z "$GCC_VERSIONS" ]; then
+    GCC_VERSIONS=3.4
+fi
+echo "Building gcc versions $GCC_VERSIONS"
 
 ############ CHECK MAKE SET #####################################
 if [ ! "$MAKE" ] ; then
@@ -401,14 +407,6 @@ if [ ! -d $DIR_BINUTILS_SOURCE ] ; then
     exit
 fi
 
-echo -n "Path to gcc dir             "
-DIR_GCC_SOURCE=$DIR_SOURCE/gcc-$GCC_VERSION
-echo $DIR_GCC_SOURCE
-if [ ! -d $DIR_GCC_SOURCE ] ; then
-    echo "Can't find gcc source at $DIR_GCC_SOURCE"
-    exit
-fi
-
 echo -n "Path to elf2flt dir         "
 DIR_ELF2FLT_SOURCE=$DIR_SOURCE/elf2flt
 echo $DIR_ELF2FLT_SOURCE
@@ -463,19 +461,16 @@ fi
 ############ RELATIVE PATH TO BUILD DIR ################
 
 DIR_BINUTILS_BUILD=$DIR_BUILD/binutils_build
-DIR_GCC_BUILD=$DIR_BUILD/gcc_build
 DIR_ELF2FLT_BUILD=$DIR_BUILD/elf2flt_build
 DIR_GENEXT2FS_BUILD=$DIR_BUILD/genext2fs_build
 
 echo "Removing old build dir"
 
 rm -rf $DIR_BINUTILS_BUILD
-rm -rf $DIR_GCC_BUILD
 rm -rf $DIR_ELF2FLT_BUILD
 rm -rf $DIR_GENEXT2FS_BUILD
 
 mkdir $DIR_BINUTILS_BUILD
-mkdir $DIR_GCC_BUILD
 mkdir $DIR_ELF2FLT_BUILD
 mkdir $DIR_GENEXT2FS_BUILD
 
@@ -486,6 +481,142 @@ export PATH=$NEW_PATH:/$DIR_ELF_OUTPUT/bin:/$DIR_uC_OUTPUT/bin
 #################################################################
 ############## DONOT CHANGE ANYTHING BELOW THIS LINE ############
 #################################################################
+
+# Some helpful functions
+build_gcc ()
+{
+    echo -n "Path to gcc dir             "
+    DIR_GCC_SOURCE=$DIR_SOURCE/gcc-$1
+    echo $DIR_GCC_SOURCE
+
+    DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$1
+    rm -rf $DIR_GCC_BUILD
+    mkdir $DIR_GCC_BUILD
+
+    if [ ! -d $DIR_GCC_SOURCE ] ; then
+        echo "Can't find gcc source at $DIR_GCC_SOURCE"
+        exit
+    fi
+
+    if [ -h $DIR_GCC_SOURCE/newlib ] ; then
+        rm $DIR_GCC_SOURCE/newlib
+    fi
+
+    if [ $2 = "elf" ]; then
+        echo "*** Linking files from $DIR_BINUTILS_SOURCE/newlib to $DIR_GCC_SOURCE"
+        ln -snf $DIR_BINUTILS_SOURCE/newlib $DIR_GCC_SOURCE/
+        # check to make sure the copies were made
+        if [ ! -d $DIR_GCC_SOURCE/newlib ] ; then
+            echo "*** ERROR : can not link in $DIR_GCC_SOURCE"
+            echo -n "*** ERROR : running as user "
+            whoami
+            ls -ld $DIR_GCC_SOURCE
+            exit
+        fi
+    fi
+
+    cd $DIR_GCC_BUILD
+
+    echo -n "*** Configuring GCC                " ; date
+    RUN="$DIR_GCC_SOURCE/configure $HOST_TARGET --target=bfin-$2 \
+      --prefix=$3 $4 --disable-libstdcxx-pch \
+      --disable-symvers --disable-libssp"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    echo -n "*** Building GCC                   " ; date
+    RUN=$MAKE
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    for RUN in cc1 cc1plus collect2 cpp g++ gcov xgcc
+    do
+        if [ ! -f $DIR_GCC_BUILD/gcc/$RUN ] ; then
+            echo "gcc did not build properly : Missing $RUN"
+            echo "Please report an error to http://blackfin.uclinux.org"
+            tail -10 $ACTUAL_LOGFILE
+            exit
+        fi
+    done
+
+    echo -n "*** Installing GCC                 " ; date
+    RUN="$MAKE install"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    for RUN in bfin-$2-addr2line bfin-$2-c++filt bfin-$2-gdbtui          \
+               bfin-$2-objdump bfin-$2-size bfin-$2-ar bfin-$2-cpp      \
+               bfin-$2-gccbug bfin-$2-ld bfin-$2-ranlib bfin-$2-strings \
+               bfin-$2-as bfin-$2-g++ bfin-$2-gcov bfin-$2-nm           \
+               bfin-$2-readelf bfin-$2-strip bfin-$2-c++ bfin-$2-gcc    \
+               bfin-$2-gdb bfin-$2-objcopy bfin-$2-run
+    do
+        if [ ! -f $3/bin/$RUN ] ; then
+            echo "The toolchain did not install properly - report an error"
+            tail -10 $ACTUAL_LOGFILE
+            exit
+        fi
+    done
+}
+
+run_tests ()
+{
+    echo -n "***  Running tests on binutils     " ; date
+    cd $DIR_BINUTILS_BUILD/binutils
+    ( echo "$MAKE check " $LOGFILE ; ) | sh
+
+    cp $DIR_BINUTILS_BUILD/binutils/binutils.sum \
+       $1/binutils.sum
+    cp $DIR_BINUTILS_BUILD/binutils/binutils.log \
+       $1/binutils.log
+
+    echo -n "***  Running tests on gas          " ; date
+    cd $DIR_BINUTILS_BUILD/gas
+    ( echo "$MAKE check " $LOGFILE ; ) | sh
+
+    cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.sum \
+       $1/gas.sum
+    cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.log \
+       $1/gas.log
+
+    echo -n "***  Running tests on gdb          " ; date
+    cd $DIR_BINUTILS_BUILD/gdb
+    ( echo "$MAKE check " $LOGFILE ; ) | sh
+
+    cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.sum \
+       $1/gdb.sum
+    cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.log \
+       $1/gdb.log
+
+    echo -n "***  Running tests on gcc          " ; date
+    for GCC_VERSION in $GCC_VERSIONS; do
+        DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
+        cd $DIR_GCC_BUILD/gcc
+        ( echo "$MAKE check " $LOGFILE ; ) | sh
+        cp $DIR_GCC_BUILD/gcc/testsuite/gcc.sum \
+           $1/gcc-$GCC_VERSION.sum
+        cp $DIR_GCC_BUILD/gcc/testsuite/gcc.log \
+           $1/gcc-$GCC_VERSION.log
+        cp $DIR_GCC_BUILD/gcc/testsuite/g++.sum \
+           $1/g++-$GCC_VERSION.sum
+        cp $DIR_GCC_BUILD/gcc/testsuite/g++.log \
+           $1/g++-$GCC_VERSION.log
+    done
+
+    echo -n "***  Done testing on simulator - results        " ; date
+
+    for FILE in $1/gas*.sum \
+                $1/binutils*.sum \
+                $1/gdb*.sum \
+                $1/gcc*.sum \
+                $1/g++*.sum
+    do
+        START=`grep -n Summary $FILE | sed 's/:/ /' | awk '{print $1}'`
+        END=`wc -l $FILE | awk '{print $1}'`
+        TAIL=$((END - START + 1))
+        tail -$TAIL $FILE
+    done
+}
 
 ###################### Setting up test  ##########################
 
@@ -571,62 +702,8 @@ RUN="$MAKE install-binutils install-gas install-ld install-sim install-gdb"
 (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 (echo $RUN $LOGFILE ; ) | sh
 
-if [ -h $DIR_GCC_SOURCE/newlib ] ; then
-    rm $DIR_GCC_SOURCE/newlib
-fi
-
-echo "*** Linking files from $DIR_BINUTILS_SOURCE/newlib to $DIR_GCC_SOURCE"
-ln -snf $DIR_BINUTILS_SOURCE/newlib $DIR_GCC_SOURCE/
-# check to make sure the copies were made
-if [ ! -d $DIR_GCC_SOURCE/newlib ] ; then
-    echo "*** ERROR : can not link in $DIR_GCC_SOURCE"
-    echo -n "*** ERROR : running as user "
-    whoami
-    ls -ld $DIR_GCC_SOURCE
-    exit
-fi
-
-cd $DIR_GCC_BUILD
-
-echo -n "*** Configuring Elf GCC            " ; date
-RUN="$DIR_GCC_SOURCE/configure $HOST_TARGET --target=bfin-elf \
-    --prefix=$DIR_ELF_OUTPUT --with-newlib --disable-libstdcxx-pch \
-    --disable-symvers --disable-libssp"
-(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-(echo $RUN $LOGFILE ; ) | sh
-
-echo -n "*** Building Elf GCC               " ; date
-RUN=$MAKE
-(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-(echo $RUN $LOGFILE ; ) | sh
-
-for RUN in cc1 cc1plus collect2 cpp g++ gcov xgcc
-do
-    if [ ! -f $DIR_GCC_BUILD/gcc/$RUN ] ; then
-        echo "gcc did not build properly : Missing $RUN"
-        echo "Please report an error to http://blackfin.uclinux.org"
-        tail -10 $ACTUAL_LOGFILE
-        exit
-    fi
-done
-
-echo -n "*** Installing Elf GCC             " ; date
-RUN="$MAKE install"
-(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-(echo $RUN $LOGFILE ; ) | sh
-
-for RUN in bfin-elf-addr2line bfin-elf-c++filt bfin-elf-gdbtui          \
-           bfin-elf-objdump bfin-elf-size bfin-elf-ar bfin-elf-cpp      \
-           bfin-elf-gccbug bfin-elf-ld bfin-elf-ranlib bfin-elf-strings \
-           bfin-elf-as bfin-elf-g++ bfin-elf-gcov bfin-elf-nm           \
-           bfin-elf-readelf bfin-elf-strip bfin-elf-c++ bfin-elf-gcc    \
-           bfin-elf-gdb bfin-elf-objcopy bfin-elf-run
-do
-    if [ ! -f $DIR_ELF_OUTPUT/bin/$RUN ] ; then
-        echo "The ELF toolchain did not install properly - report an error"
-        tail -10 $ACTUAL_LOGFILE
-        exit
-    fi
+for GCC_VERSION in $GCC_VERSIONS; do
+  build_gcc $GCC_VERSION elf $DIR_ELF_OUTPUT "--with-newlib"
 done
 
 if [ -e $DIR_SOURCE/libdsp/Makefile ] ; then
@@ -661,69 +738,16 @@ fi
 if [ $CHECK_ON_SIMULATOR ] ; then
     echo "*** Testing on simulator            "
 
-    echo -n "***  Running tests on binutils-elf " ; date
-    cd $DIR_BINUTILS_BUILD/binutils
-    ( echo "$MAKE check " $LOGFILE ; ) | sh
-
-    echo -n "***  Running tests on gas-elf      " ; date
-    cd $DIR_BINUTILS_BUILD/gas
-    ( echo "$MAKE check " $LOGFILE ; ) | sh
-
-    echo -n "***  Running tests on gdb-elf      " ; date
-    cd $DIR_BINUTILS_BUILD/gdb
-    ( echo "$MAKE check " $LOGFILE ; ) | sh
-
-    echo -n "***  Running tests on gcc-elf      " ; date
-    cd $DIR_GCC_BUILD/gcc
-    ( echo "$MAKE check " $LOGFILE ; ) | sh
-
-    echo -n "***  Done testing on simulator - results        " ; date
-
-    cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.sum \
-       $DIR_TEST_SIM_RESULTS/gas.sum
-    cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.log \
-       $DIR_TEST_SIM_RESULTS/gas.log
-    cp $DIR_GCC_BUILD/gcc/testsuite/gcc.sum \
-       $DIR_TEST_SIM_RESULTS/gcc.sum
-    cp $DIR_GCC_BUILD/gcc/testsuite/gcc.log \
-       $DIR_TEST_SIM_RESULTS/gcc.log
-    cp $DIR_GCC_BUILD/gcc/testsuite/g++.sum \
-       $DIR_TEST_SIM_RESULTS/g++.sum
-    cp $DIR_GCC_BUILD/gcc/testsuite/g++.log \
-       $DIR_TEST_SIM_RESULTS/g++.log
-    cp $DIR_BINUTILS_BUILD/binutils/binutils.sum \
-       $DIR_TEST_SIM_RESULTS/binutils.sum
-    cp $DIR_BINUTILS_BUILD/binutils/binutils.log \
-       $DIR_TEST_SIM_RESULTS/binutils.log
-    cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.sum \
-       $DIR_TEST_SIM_RESULTS/gdb.sum
-    cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.log \
-       $DIR_TEST_SIM_RESULTS/gdb.log
-
-    cd $DIR_BINUTILS_BUILD
-    for FILE in ./gas/testsuite/gas.sum ./binutils/binutils.sum \
-                ./gdb/testsuite/gdb.sum
-    do
-        START=`grep -n Summary $FILE | sed 's/:/ /' | awk '{print $1}'`
-        END=`wc -l $FILE | awk '{print $1}'`
-        TAIL=$((END - START + 1))
-        tail -$TAIL $FILE
-    done
-    cd $DIR_GCC_BUILD
-    for FILE in ./gcc/testsuite/gcc.sum ./gcc/testsuite/g++.sum
-    do
-        START=`grep -n Summary $FILE | sed 's/:/ /' | awk '{print $1}'`
-        END=`wc -l $FILE | awk '{print $1}'`
-        TAIL=$((END - START + 1))
-        tail -$TAIL $FILE
-    done
-
+    run_tests $DIR_TEST_SIM_RESULTS
 fi
 
 # We cannot remove newlib symlink until the bfin-elf tests finishs.
-if [ -h $DIR_GCC_SOURCE/newlib ] ; then
-    rm $DIR_GCC_SOURCE/newlib
-fi
+for GCC_VERSION in $GCC_VERSIONS; do
+  DIR_GCC_SOURCE=$DIR_SOURCE/gcc-$GCC_VERSION
+  if [ -h $DIR_GCC_SOURCE/newlib ] ; then
+      rm $DIR_GCC_SOURCE/newlib
+  fi
+done
 
 ####################### Done Step 1  #########################
 
@@ -828,7 +852,11 @@ done
 rm -rf $DIR_GENEXT2FS_BUILD/*
 rm -rf $DIR_ELF2FLT_BUILD/*
 rm -rf $DIR_BINUTILS_BUILD/*
-rm -rf $DIR_GCC_BUILD/*
+for GCC_VERSION in $GCC_VERSIONS; do
+    DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
+    rm -rf $DIR_GCC_BUILD/*
+done
+
 ########################### Step 2 - done ####################
 
 if [ $KERNEL_SOURCE ] ; then
@@ -946,26 +974,10 @@ if [ $KERNEL_SOURCE ] ; then
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
-    cd $DIR_GCC_BUILD
+    for GCC_VERSION in $GCC_VERSIONS; do
+      build_gcc $GCC_VERSION uclinux $DIR_uC_OUTPUT "--enable-threads=posix"
+    done
 
-    echo -n "*** Configuring uClinux GCC        " ; date
-    RUN="$DIR_GCC_SOURCE/configure $HOST_TARGET --enable-threads=posix \
-         --target=bfin-uclinux --prefix=$DIR_uC_OUTPUT \
-	 --disable-libstdcxx-pch --disable-symvers --disable-libssp"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
-
-    echo -n "*** Building uClinux GCC           " ; date
-    RUN="$MAKE"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
-
-    echo -n "*** Installing uClinux GCC         " ; date
-    RUN="$MAKE install"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
-
-    
     ######################## build elf2flt ##########################
 
     echo -n "*** Building uClinux elf2flt       " ; date
@@ -1040,66 +1052,7 @@ if [ $KERNEL_SOURCE ] ; then
         cd $DIR_BINUTILS_BUILD
         ( echo "$MAKE clean " $LOGFILE ; ) | sh
 
-        echo -n "***  Running tests on binutils-uclinux " ; date
-        cd $DIR_BINUTILS_BUILD/binutils
-        ( echo "$MAKE check " $LOGFILE ; ) | sh
-    
-        echo -n "***  Running tests on gas-uclinux      " ; date
-        cd $DIR_BINUTILS_BUILD/gas
-        ( echo "$MAKE check " $LOGFILE ; ) | sh
-    
-        echo -n "***  Running tests on gdb-uclinux      " ; date
-        cd $DIR_BINUTILS_BUILD/gdb
-        ( echo "$MAKE check " $LOGFILE ; ) | sh
-    
-        cd $DIR_GCC_BUILD
-        ( echo "$MAKE clean " $LOGFILE ; ) | sh
-
-        echo -n "***  Running tests on gcc-uclinux      " ; date
-        cd $DIR_GCC_BUILD/gcc
-        ( echo "$MAKE check " $LOGFILE ; ) | sh
-    
-        echo -n "***  Done testing on hardware - results " ; date
-    
-        cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.sum \
-           $DIR_TEST_HW_RESULTS/gas.sum
-        cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.log \
-           $DIR_TEST_HW_RESULTS/gas.log
-        cp $DIR_GCC_BUILD/gcc/testsuite/gcc.sum \
-           $DIR_TEST_HW_RESULTS/gcc.sum
-        cp $DIR_GCC_BUILD/gcc/testsuite/gcc.log \
-           $DIR_TEST_HW_RESULTS/gcc.log
-        cp $DIR_GCC_BUILD/gcc/testsuite/g++.sum \
-           $DIR_TEST_HW_RESULTS/g++.sum
-        cp $DIR_GCC_BUILD/gcc/testsuite/g++.log \
-           $DIR_TEST_HW_RESULTS/g++.log
-        cp $DIR_BINUTILS_BUILD/binutils/binutils.sum \
-           $DIR_TEST_HW_RESULTS/binutils.sum
-        cp $DIR_BINUTILS_BUILD/binutils/binutils.log \
-           $DIR_TEST_HW_RESULTS/binutils.log
-        cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.sum \
-           $DIR_TEST_HW_RESULTS/gdb.sum
-        cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.log \
-           $DIR_TEST_HW_RESULTS/gdb.log
-    
-        cd $DIR_BINUTILS_BUILD
-        for FILE in ./gas/testsuite/gas.sum ./binutils/binutils.sum \
-                    ./gdb/testsuite/gdb.sum
-        do
-            START=`grep -n Summary $FILE | sed 's/:/ /' | awk '{print $1}'`
-            END=`wc -l $FILE | awk '{print $1}'`
-            TAIL=$((END - START + 1))
-            tail -$TAIL $FILE
-        done
-        cd $DIR_GCC_BUILD
-        for FILE in ./gcc/testsuite/gcc.sum ./gcc/testsuite/g++.sum
-        do
-            START=`grep -n Summary $FILE | sed 's/:/ /' | awk '{print $1}'`
-            END=`wc -l $FILE | awk '{print $1}'`
-            TAIL=$((END - START + 1))
-            tail -$TAIL $FILE
-        done
-
+	run_tests $DIR_TEST_HW_RESULTS
     fi
 
     ########################### genext2fs ########################
@@ -1209,7 +1162,10 @@ fi
 
 rm -rf $DIR_GENEXT2FS_BUILD
 rm -rf $DIR_BINUTILS_BUILD
-rm -rf $DIR_GCC_BUILD
+for GCC_VERSION in $GCC_VERSIONS; do
+    DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
+    rm -rf $DIR_GCC_BUILD/*
+done
 rm -rf $DIR_ELF2FLT_BUILD
 
 echo "*** Testing 'bfin-elf-gcc -v'"
