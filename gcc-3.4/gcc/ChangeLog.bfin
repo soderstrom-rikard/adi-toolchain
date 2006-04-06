@@ -1,3 +1,11 @@
+2006-04-06  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	Backport
+	2004-02-24  Alexandre Oliva  <aoliva@redhat.com>
+	* reload.c (CONST_POOL_OK_P): New macro.
+	(find_reloads): Use it to decide whether a constant can be forced
+	into memory.
+
 2006-04-05  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_legitimate_address_p): Disallow
