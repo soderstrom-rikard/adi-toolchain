@@ -3605,12 +3605,12 @@ bfin_expand_binop_builtin (enum insn_code icode, tree arglist, rtx target,
       || ! (*insn_data[icode].operand[0].predicate) (target, tmode))
     target = gen_reg_rtx (tmode);
 
-  if (op0mode == SImode && mode0 == HImode)
+  if ((op0mode == SImode || op0mode == VOIDmode) && mode0 == HImode)
     {
       op0mode = HImode;
       op0 = gen_lowpart (HImode, op0);
     }
-  if (op1mode == SImode && mode1 == HImode)
+  if ((op1mode == SImode || op1mode == VOIDmode) && mode1 == HImode)
     {
       op1mode = HImode;
       op1 = gen_lowpart (HImode, op1);

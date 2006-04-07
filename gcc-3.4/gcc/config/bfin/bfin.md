@@ -459,7 +459,7 @@
    (set (match_dup 0) (lo_sum:SI (match_dup 0) (match_dup 3)))]
 {
   HOST_WIDE_INT intval = INTVAL (XVECEXP (operands[1], 0, 1)) << 16;
-  intval |= INTVAL (XVECEXP (operands[1], 0, 0));
+  intval |= INTVAL (XVECEXP (operands[1], 0, 0)) & 0xFFFF;
   
   operands[0] = gen_rtx_REG (SImode, REGNO (operands[0]));
   operands[2] = operands[3] = GEN_INT (trunc_int_for_mode (intval, SImode));
@@ -1323,14 +1323,14 @@
   [(set (match_operand:HI 0 "register_operand" "=d")
 	(neg:HI (match_operand:HI 1 "register_operand" "d")))]
   ""
-  "%0 = -%1 (V);"
+  "%0 = -%1;"
   [(set_attr "type" "dsp32")])
 
 (define_insn "ssneghi2"
   [(set (match_operand:HI 0 "register_operand" "=d")
 	(ss_neg:HI (match_operand:HI 1 "register_operand" "d")))]
   ""
-  "%0 = -%1 (V,S);"
+  "%0 = -%1 (V);"
   [(set_attr "type" "dsp32")])
 
 (define_insn "signbitshi2"
@@ -3143,18 +3143,11 @@
   "%0 = %d1 * %d2 (IS);"
   [(set_attr "type" "dsp32")])
 
-(define_insn "negv2hi2"
-  [(set (match_operand:V2HI 0 "register_operand" "=d")
-	(neg:V2HI (match_operand:V2HI 1 "register_operand" "d")))]
-  ""
-  "%0 = - %1 (V);"
-  [(set_attr "type" "dsp32")])
-
 (define_insn "ssnegv2hi2"
   [(set (match_operand:V2HI 0 "register_operand" "=d")
 	(ss_neg:V2HI (match_operand:V2HI 1 "register_operand" "d")))]
   ""
-  "%0 = - %1 (V,S);"
+  "%0 = - %1 (V);"
   [(set_attr "type" "dsp32")])
 
 (define_insn "absv2hi2"

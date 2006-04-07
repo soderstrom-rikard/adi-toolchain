@@ -1,3 +1,12 @@
+2006-04-07  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_expand_binop_builtin): Also truncate
+	constants to HImode if input operands have that mode.
+	* config/bfin/bfin.md (negv2hi2): Removed.
+	(ss_negv2hi2): Use just '(V)' modifier.
+	(neghi2): Lose modifier.
+	(movv2hi_insn): Mask off unwanted bits of lower part constant.
+
 2006-04-05  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_legitimate_address_p): Disallow
