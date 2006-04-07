@@ -23,7 +23,9 @@
 .global ___ltdf2;
 .type ___ltdf2, STT_FUNC;
 ___ltdf2:
+	[--SP] = RETS;
 	CALL.X	___cmpdf2;
+	RETS = [SP++];
 	CC = R0 < 0;
 	R0 = CC;
 	RTS;

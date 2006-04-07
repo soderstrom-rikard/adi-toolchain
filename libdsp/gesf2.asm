@@ -26,7 +26,9 @@ ___gesf2:
 	R2 = R1;
 	R1 = R0;
 	R0 = R2;
+	[--SP] = RETS;
 	CALL.X	___cmpsf2;
+	RETS = [SP++];
 	CC = R0 <= 0;
 	R0 = CC;
 	RTS;

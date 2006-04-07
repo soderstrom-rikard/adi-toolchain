@@ -23,7 +23,9 @@
 .global ___eqsf2;
 .type ___eqsf2, STT_FUNC;
 ___eqsf2:
+	[--SP] = RETS;
 	CALL.X	___cmpsf2;
+	RETS = [SP++];
 	CC = R0 == 0;
 	R0 = CC;
 	RTS;

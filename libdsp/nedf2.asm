@@ -23,7 +23,11 @@
 .global ___nedf2;
 .type ___nedf2, STT_FUNC;
 ___nedf2:
+	LINK 16;
+	P0 = [FP + 20];
+	[SP + 12] = P0;
 	CALL.X	___cmpdf2;
+	UNLINK;
 	CC = R0 == 0;
 	CC = !CC;
 	R0 = CC;

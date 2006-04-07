@@ -23,7 +23,11 @@
 .global ___ledf2;
 .type ___ledf2, STT_FUNC;
 ___ledf2:
+	LINK 16;
+	P0 = [FP + 20];
+	[SP + 12] = P0;
 	CALL.X	___cmpdf2;
+	UNLINK;
 	CC = R0 <= 0;
 	R0 = CC;
 	RTS;

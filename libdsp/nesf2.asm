@@ -24,7 +24,9 @@
 .global ___nesf2;
 .type ___nesf2, STT_FUNC;
 ___nesf2:
+	[--SP] = RETS;
 	CALL.X	___cmpsf2;
+	RETS = [SP++];
 	CC = R0 == 0;
 	CC = !CC;
 	R0 = CC;

@@ -23,7 +23,9 @@
 .global ___lesf2;
 .type ___lesf2, STT_FUNC;
 ___lesf2:
+	[--SP] = RETS;
 	CALL.X	___cmpsf2;
+	RETS = [SP++];
 	CC = R0 <= 0;
 	R0 = CC;
 	RTS;

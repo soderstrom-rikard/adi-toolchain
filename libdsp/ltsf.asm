@@ -23,7 +23,9 @@
 .global ___ltsf2;
 .type ___ltsf2, STT_FUNC;
 ___ltsf2:
+	[--SP] = RETS;
 	CALL.X	___cmpsf2;
+	RETS = [SP++];
 	CC = R0 < 0;
 	R0 = CC;
 	RTS;
