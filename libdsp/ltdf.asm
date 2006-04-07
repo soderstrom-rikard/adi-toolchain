@@ -23,9 +23,11 @@
 .global ___ltdf2;
 .type ___ltdf2, STT_FUNC;
 ___ltdf2:
-	[--SP] = RETS;
+	LINK 16;
+	P0 = [FP + 20];
+	[SP + 12] = P0;
 	CALL.X	___cmpdf2;
-	RETS = [SP++];
+	UNLINK;
 	CC = R0 < 0;
 	R0 = CC;
 	RTS;
