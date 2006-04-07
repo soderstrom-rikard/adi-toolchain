@@ -1,3 +1,11 @@
+2006-04-07  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin/bfin-dis.c (add32, sub32): New arg SAT.  All callers changed.
+	Saturate if it's set.
+	(add16, sub16, signbits): New functions.
+	(get_allreg): Support a[01][xw].
+	(decode_dsp32alu_0, decode_dsp32shift_0): Many new insns supported.
+
 2006-03-27  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/bfin-sim.h (saved_state_type): Replace a0 with a0x and a0w,

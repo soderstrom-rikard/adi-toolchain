@@ -145,13 +145,19 @@ lshift (bu32 val, int cnt, int size, int saturate)
 }
 
 static bu32
-add32 (bu32 a, bu32 b, int carry)
+add32 (bu32 a, bu32 b, int carry, int sat)
 {
   int flgs = a >> 31;
   int flgo = b >> 31;
   bu32 v = a + b;
   int flgn = v >> 31;
   int overflow = (flgs ^ flgn) & (flgo ^ flgn);
+  if (sat && overflow)
+    {
+      v = flgn ? 0x7fffffff : 0x80000000;
+      /* Saturating insns are documented as not setting overflow.  */
+      overflow = 0;
+    }
   saved_state.an = flgn;
   saved_state.vs |= overflow;
   saved_state.v = overflow;
@@ -163,13 +169,19 @@ add32 (bu32 a, bu32 b, int carry)
 }
 
 static bu32
-sub32 (bu32 a, bu32 b, int carry)
+sub32 (bu32 a, bu32 b, int carry, int sat)
 {
   int flgs = a >> 31;
   int flgo = b >> 31;
   bu32 v = a - b;
   int flgn = v >> 31;
   int overflow = (flgs ^ flgo) & (flgn ^ flgs);
+  if (sat && overflow)
+    {
+      v = flgn ? 0x7fffffff : 0x80000000;
+      /* Saturating insns are documented as not setting overflow.  */
+      overflow = 0;
+    }
   saved_state.an = flgn;
   saved_state.vs |= overflow;
   saved_state.v = overflow;
@@ -177,6 +189,54 @@ sub32 (bu32 a, bu32 b, int carry)
   saved_state.az = v == 0;
   if (carry)
     saved_state.ac0 = b <= a;
+  return v;
+}
+
+static bu32
+add16 (bu32 a, bu32 b, int *carry, int sat)
+{
+  int flgs = (a >> 15) & 1;
+  int flgo = (b >> 15) & 1;
+  bu32 v = a + b;
+  int flgn = (v >> 15) & 1;
+  int overflow = (flgs ^ flgn) & (flgo ^ flgn);
+  if (sat && overflow)
+    {
+      v = flgn ? 0x7fff : 0x8000;
+      /* Saturating insns are documented as not setting overflow.  */
+      overflow = 0;
+    }
+  saved_state.an = flgn;
+  saved_state.vs |= overflow;
+  saved_state.v = overflow;
+  saved_state.v_internal |= overflow;
+  saved_state.az = v == 0;
+  if (carry)
+    *carry = (bu16)~a < (bu16)b;
+  return v & 0xffff;
+}
+
+static bu32
+sub16 (bu32 a, bu32 b, int *carry, int sat)
+{
+  int flgs = (a >> 15) & 1;
+  int flgo = (b >> 15) & 1;
+  bu32 v = a - b;
+  int flgn = (v >> 15) & 1;
+  int overflow = (flgs ^ flgo) & (flgn ^ flgs);
+  if (sat && overflow)
+    {
+      v = flgn ? 0x7fff : 0x8000;
+      /* Saturating insns are documented as not setting overflow.  */
+      overflow = 0;
+    }
+  saved_state.an = flgn;
+  saved_state.vs |= overflow;
+  saved_state.v = overflow;
+  saved_state.v_internal |= overflow;
+  saved_state.az = v == 0;
+  if (carry)
+    *carry = (bu16)b <= (bu16)a;
   return v;
 }
 
@@ -233,7 +293,7 @@ add_and_shift (bu32 a, bu32 b, int shift)
 {
   int v;
   saved_state.v_internal = 0;
-  v = add32 (a, b, 0);
+  v = add32 (a, b, 0, 0);
   while (shift-- > 0)
     {
       int x = v >> 30;
@@ -391,7 +451,11 @@ get_allreg (int grp, int reg)
     case 7: return &LREG (reg & 3); break;
     default:
       switch (fullreg)
-	{
+	{	
+	case 32: return &saved_state.a0x;
+	case 33: return &saved_state.a0w;
+	case 34: return &saved_state.a1x;
+	case 35: return &saved_state.a1w;
 	case 39: return &saved_state.rets;
 	case 48: return &LC0REG;
 	case 49: return &LT0REG;
@@ -516,6 +580,24 @@ trunc16 (bu64 val)
   bu64 sgnbits = val & 0xff00000000000000ull;
   val >>= 16;
   return val | sgnbits;
+}
+
+static int
+signbits (bu64 val, int size)
+{
+  bu64 mask = (bu64)1 << (size - 1);
+  bu64 bit = val & mask;
+  int count = 0;
+  for (;;)
+    {
+      mask >>= 1;
+      bit >>= 1;
+      if (mask == 0)
+	return count;
+      if ((val & mask) != bit)
+	return count;
+      count++;
+    }
 }
 
 /* Extract a 16 or 32 bit value from a 64 bit multiplication result.
@@ -1203,10 +1285,10 @@ decode_COMP3op_0 (bu16 iw0)
 
   if (opc == 0)
     /* dregs = dregs + dregs */
-    DREG (dst) = add32 (DREG (src0), DREG (src1), 1);
+    DREG (dst) = add32 (DREG (src0), DREG (src1), 1, 0);
   else if (opc == 1)
     /* dregs = dregs - dregs */
-    DREG (dst) = sub32 (DREG (src0), DREG (src1), 1);
+    DREG (dst) = sub32 (DREG (src0), DREG (src1), 1, 0);
   else if (opc == 2)
     {
       /* dregs = dregs & dregs */
@@ -1251,7 +1333,7 @@ decode_COMPI2opD_0 (bu16 iw0)
   if (op == 0)
     DREG (dst) = imm7 (isrc);
   else if (op == 1)
-    DREG (dst) = add32 (DREG (dst), imm7 (isrc), 1);
+    DREG (dst) = add32 (DREG (dst), imm7 (isrc), 1, 0);
   PCREG += 2;
 }
 
@@ -2106,40 +2188,38 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
     unhandled_instruction ("dregs_lo = dregs + dregs (RND20)");
   else if (x == 0 && HL == 1 && aop == 1 && aopcde == 5)
     unhandled_instruction ("dregs_hi = dregs - dregs (RND12)");
-  else if (HL == 1 && aop == 0 && aopcde == 2)
-    unhandled_instruction ("dregs_hi = dregs_lo + dregs_lo amod1");
-  else if (HL == 1 && aop == 1 && aopcde == 2)
-    unhandled_instruction ("dregs_hi = dregs_lo + dregs_hi amod1");
-  else if (HL == 1 && aop == 2 && aopcde == 2)
-    unhandled_instruction ("dregs_hi = dregs_hi + dregs_lo amod1");
-  else if (HL == 1 && aop == 3 && aopcde == 2)
-    unhandled_instruction ("dregs_hi = dregs_hi + dregs_hi amod1");
-  else if (HL == 0 && aop == 0 && aopcde == 3)
-    unhandled_instruction ("dregs_lo = dregs_lo - dregs_lo amod1");
-  else if (HL == 0 && aop == 1 && aopcde == 3)
-    unhandled_instruction ("dregs_lo = dregs_lo - dregs_hi amod1");
-  else if (HL == 0 && aop == 3 && aopcde == 2)
-    unhandled_instruction ("dregs_lo = dregs_hi + dregs_hi amod1");
-  else if (HL == 1 && aop == 0 && aopcde == 3)
-    unhandled_instruction ("dregs_hi = dregs_lo - dregs_lo amod1");
-  else if (HL == 1 && aop == 1 && aopcde == 3)
-    unhandled_instruction ("dregs_hi = dregs_lo - dregs_hi amod1");
-  else if (HL == 1 && aop == 2 && aopcde == 3)
-    unhandled_instruction ("dregs_hi = dregs_hi - dregs_lo amod1");
-  else if (HL == 1 && aop == 3 && aopcde == 3)
-    unhandled_instruction ("dregs_hi = dregs_hi - dregs_hi amod1");
-  else if (HL == 0 && aop == 2 && aopcde == 2)
-    unhandled_instruction ("dregs_lo = dregs_hi + dregs_lo amod1");
-  else if (HL == 0 && aop == 1 && aopcde == 2)
-    unhandled_instruction ("dregs_lo = dregs_lo + dregs_hi amod1");
-  else if (HL == 0 && aop == 2 && aopcde == 3)
-    unhandled_instruction ("dregs_lo = dregs_hi - dregs_lo amod1");
-  else if (HL == 0 && aop == 3 && aopcde == 3)
-    unhandled_instruction ("dregs_lo = dregs_hi - dregs_hi amod1");
-  else if (HL == 0 && aop == 0 && aopcde == 2)
-    unhandled_instruction ("dregs_lo = dregs_lo + dregs_lo amod1");
+  else if (aopcde == 2 || aopcde == 3)
+    {
+      bu32 s1 = DREG (src0);
+      bu32 s2 = DREG (src1);
+      bu16 val;
+      if (aop & 1)
+	s2 >>= 16;
+      if (aop & 2)
+	s1 >>= 16;
+      if (aopcde == 2)
+	val = add16 (s1, s2, &saved_state.ac0, s);
+      else
+	val = sub16 (s1, s2, &saved_state.ac0, s);
+      if (HL)
+	DREG (dst0) = (DREG (dst0) & 0xFFFF) | (val << 16);
+      else
+	DREG (dst0) = (DREG (dst0) & 0xFFFF0000) | val;
+    }
   else if (aop == 0 && aopcde == 9 && s == 1)
-    unhandled_instruction ("A0 = dregs");
+    {
+      saved_state.a0w = DREG (src0);
+      saved_state.a0x = -(saved_state.a1w >> 31);
+    }
+  else if (aop == 1 && aopcde == 9 && s == 0)
+    saved_state.a0x = (bs32)(bs8)DREG (src0);
+  else if (aop == 2 && aopcde == 9 && s == 1)
+    {
+      saved_state.a1w = DREG (src0);
+      saved_state.a1x = -(saved_state.a1w >> 31);
+    }
+  else if (aop == 3 && aopcde == 9 && s == 0)
+    saved_state.a1x = (bs32)(bs8)DREG (src0);
   else if (aop == 3 && aopcde == 11 && s == 0)
     unhandled_instruction ("A0 -= A1");
   else if (aop == 3 && aopcde == 11 && s == 1)
@@ -2167,7 +2247,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       saved_state.a0w = 0;
     }
   else if (aop == 0 && s == 1 && aopcde == 8)
-    unhandled_instruction ("A0 = A0 (S)");
+    saved_state.a0x = -(saved_state.a0w >> 31);
   else if (aop == 1 && s == 0 && aopcde == 8)
     {
       /* A1 = 0 */
@@ -2175,7 +2255,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       saved_state.a1w = 0;
     }
   else if (aop == 1 && s == 1 && aopcde == 8)
-    unhandled_instruction ("A1 = A1 (S)");
+    saved_state.a1x = -(saved_state.a1w >> 31);
   else if (aop == 2 && s == 0 && aopcde == 8)
     {
       /* A1 = A0 = 0 */
@@ -2183,27 +2263,30 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       saved_state.a1w = saved_state.a0w = 0;
     }
   else if (aop == 2 && s == 1 && aopcde == 8)
-    unhandled_instruction ("A1 = A1 (S) , A0 = A0 (S)");
+    {
+      saved_state.a0x = -(saved_state.a0w >> 31);
+      saved_state.a1x = -(saved_state.a1w >> 31);
+    }
   else if (aop == 3 && s == 0 && aopcde == 8)
-    unhandled_instruction ("A0 = A1");
+    {
+      saved_state.a0x = saved_state.a1x;
+      saved_state.a0w = saved_state.a1w;
+    }
   else if (aop == 3 && s == 1 && aopcde == 8)
-    unhandled_instruction ("A1 = A0");
-  else if (aop == 1 && aopcde == 9 && s == 0)
-    unhandled_instruction ("A0.x = dregs_lo");
+    {
+      saved_state.a1x = saved_state.a0x;
+      saved_state.a1w = saved_state.a0w;
+    }
   else if (aop == 1 && HL == 0 && aopcde == 11)
     unhandled_instruction ("dregs_lo = (A0 += A1)");
   else if (aop == 3 && HL == 0 && aopcde == 16)
     unhandled_instruction ("A1 = ABS A1, A0 = ABS A0");
   else if (aop == 0 && aopcde == 23 && HL == 1)
     unhandled_instruction ("dregs = BYTEOP3P (dregs_pair, dregs_pair) (HI,R)");
-  else if (aop == 3 && aopcde == 9 && s == 0)
-    unhandled_instruction ("A1.x = dregs_lo");
   else if (aop == 1 && HL == 1 && aopcde == 16)
     unhandled_instruction ("A1 = ABS A1");
   else if (aop == 0 && HL == 1 && aopcde == 16)
     unhandled_instruction ("A1 = ABS A0");
-  else if (aop == 2 && aopcde == 9 && s == 1)
-    unhandled_instruction ("A1 = dregs");
   else if (HL == 0 && aop == 3 && aopcde == 12)
     unhandled_instruction ("dregs_lo = dregs (RND)");
   else if (aop == 1 && HL == 0 && aopcde == 16)
@@ -2241,26 +2324,53 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
     unhandled_instruction ("A1 = - A1");
   else if (aop == 0 && aopcde == 12)
     unhandled_instruction ("dregs_hi=dregs_lo=SIGN(dregs_hi)*dregs_hi + SIGN(dregs_lo)*dregs_lo)");
-  else if (aop == 2 && aopcde == 0)
-    unhandled_instruction ("dregs = dregs -|+ dregs amod0");
+  else if (aopcde == 0)
+    {
+      /* dregs = dregs +-|+- dregs amod0 */
+      bu32 s0 = DREG (src0);
+      bu32 s1 = DREG (src1);
+      bu32 s0h = s0 >> 16;
+      bu32 s0l = s0 & 0xFFFF;
+      bu32 s1h = s1 >> 16;
+      bu32 s1l = s1 & 0xFFFF;
+      bu32 t0, t1;
+      if (aop & 2)
+	t0 = sub16 (s0h, s1h, &saved_state.ac1, s);
+      else
+	t0 = add16 (s0h, s1h, &saved_state.ac1, s);
+      if (aop & 1)
+	t1 = sub16 (s0l, s1l, &saved_state.ac0, s);
+      else
+	t1 = add16 (s0l, s1l, &saved_state.ac0, s);
+      t0 &= 0xFFFF;
+      t1 &= 0xFFFF;
+      if (x)
+	DREG (dst0) = (t1 << 16) | t0;
+      else
+	DREG (dst0) = (t0 << 16) | t1;
+    }
   else if (aop == 1 && aopcde == 12)
     unhandled_instruction ("dregs = A1.L + A1.H , dregs = A0.L + A0.H");
-  else if (aop == 2 && aopcde == 4)
-    unhandled_instruction ("dregs = dregs + dregs , dregs = dregs - dregs amod1");
   else if (HL == 0 && aopcde == 1)
     unhandled_instruction ("dregs = dregs +|+ dregs , dregs = dregs -|- dregs (amod0, amod2)");
   else if (aop == 0 && aopcde == 11)
     unhandled_instruction ("dregs = (A0 += A1)");
   else if (aop == 0 && aopcde == 10)
-    unhandled_instruction ("dregs_lo = A0.x");
+    {
+      DREG (dst0) &= 0xFFFF0000;
+      DREG (dst0) |= saved_state.a0x & 0xFFFF;
+    }
   else if (aop == 1 && aopcde == 10)
-    unhandled_instruction ("dregs_lo = A1.x");
-  else if (aop == 1 && aopcde == 0)
-    unhandled_instruction ("dregs = dregs +|- dregs amod0");
-  else if (aop == 3 && aopcde == 0)
-    unhandled_instruction ("dregs = dregs -|- dregs amod0");
+    {
+      DREG (dst0) &= 0xFFFF0000;
+      DREG (dst0) |= saved_state.a1x & 0xFFFF;
+    }
+  else if (aop == 0 && aopcde == 4)
+    DREG (dst0) = add32 (DREG (src0), DREG (src1), 1, s);
   else if (aop == 1 && aopcde == 4)
-    unhandled_instruction ("dregs = dregs - dregs amod1");
+    DREG (dst0) = sub32 (DREG (src0), DREG (src1), 1, s);
+  else if (aop == 2 && aopcde == 4)
+    unhandled_instruction ("dregs = dregs + dregs , dregs = dregs - dregs amod1");
   else if (aop == 0 && aopcde == 17)
     unhandled_instruction ("dregs = A1 + A0, dregs = A1 - A0 amod1");
   else if (aop == 1 && aopcde == 17)
@@ -2277,6 +2387,12 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
     unhandled_instruction ("(dregs, dregs) = BYTEOP16P (dregs_pair, dregs_pair) aligndir");
   else if (aop == 1 && aopcde == 21)
     unhandled_instruction ("(dregs, dregs) = BYTEOP16M (dregs_pair, dregs_pair) aligndir");
+  else if (aop == 1 && aopcde == 7)
+    /* dregs = MIN (dregs, dregs) */
+    DREG (dst0) = min32 (DREG (src0), DREG (src1));
+  else if (aop == 0 && aopcde == 7)
+    /* dregs = MAX (dregs, dregs) */
+    DREG (dst0) = max32 (DREG (src0), DREG (src1));
   else if (aop == 2 && aopcde == 7)
     {
       bu32 val = DREG (src0);
@@ -2288,12 +2404,20 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       setflags_logical (val);
       DREG (dst0) = val;
     }
-  else if (aop == 1 && aopcde == 7)
-    /* dregs = MIN (dregs, dregs) */
-    DREG (dst0) = min32 (DREG (src0), DREG (src1));
-  else if (aop == 0 && aopcde == 7)
-    /* dregs = MAX (dregs, dregs) */
-    DREG (dst0) = max32 (DREG (src0), DREG (src1));
+  else if (aop == 3 && aopcde == 7)
+    {
+      bu32 val = DREG (src0);
+      /* dregs = - dregs (opt_sat) */
+      saved_state.v = val == 0x8000;
+      if (saved_state.v)
+	saved_state.vs = 1;
+      if (val == 0x80000000)
+	val = 0x7fffffff;
+      else
+	val = -val;
+      setflags_logical (val);
+      DREG (dst0) = val;
+    }
   else if (aop == 2 && aopcde == 6)
     {
       /* Vector ABS.  */
@@ -2310,10 +2434,6 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
     DREG (dst0) = max2x16 (DREG (src0), DREG (src1));
   else if (HL == 1 && aopcde == 1)
     unhandled_instruction ("dregs = dregs +|- dregs, dregs = dregs -|+ dregs (amod0, amod2)");
-  else if (aop == 0 && aopcde == 4)
-    unhandled_instruction ("dregs = dregs + dregs amod1");
-  else if (aop == 0 && aopcde == 0)
-    unhandled_instruction ("dregs = dregs +|+ dregs amod0");
   else if (aop == 0 && aopcde == 24)
     unhandled_instruction ("dregs = BYTEPACK (dregs, dregs)");
   else if (aop == 1 && aopcde == 24)
@@ -2381,12 +2501,23 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
     unhandled_instruction ("dregs = ASHIFT dregs BY dregs_lo (V,S)");
   else if (sop == 0 && sopcde == 1)
     unhandled_instruction ("dregs = ASHIFT dregs BY dregs_lo (V)");
-  else if (sop == 0 && sopcde == 2)
-    unhandled_instruction ("dregs = ASHIFT dregs BY dregs_lo");
-  else if (sop == 1 && sopcde == 2)
-    unhandled_instruction ("dregs = ASHIFT dregs BY dregs_lo (S)");
-  else if (sop == 2 && sopcde == 2)
-    unhandled_instruction ("dregs = SHIFT dregs BY dregs_lo");
+  else if ((sop == 0 || sop == 1 || sop == 2) && sopcde == 2)
+    {
+      /* dregs = [LA]SHIFT dregs BY dregs_lo (opt_S) */
+      bu32 v = DREG (src1);
+      bs32 shft = (bs16)DREG (src0);
+      if (shft < 0)
+	{
+	  if (sop == 2)
+	    DREG (dst0) = lshiftrt (v, -shft, 32);
+	  else
+	    DREG (dst0) = ashiftrt (v, -shft, 32);
+	}
+      else
+	{
+	  DREG (dst0) = lshift (v, shft, 32, sop == 1);
+	}
+    }
   else if (sop == 3 && sopcde == 2)
     unhandled_instruction ("dregs = ROT dregs BY dregs_lo");
   else if (sop == 2 && sopcde == 1)
@@ -2400,15 +2531,36 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
   else if (sop == 3 && sopcde == 4)
     unhandled_instruction ("dregs = PACK (dregs_hi, dregs_hi)");
   else if (sop == 0 && sopcde == 5)
-    unhandled_instruction ("dregs_lo = SIGNBITS dregs");
+    {
+      DREG (dst0) &= 0xFFFF0000;
+      DREG (dst0) |= signbits (DREG (src0), 32);
+    }
   else if (sop == 1 && sopcde == 5)
-    unhandled_instruction ("dregs_lo = SIGNBITS dregs_lo");
+    {
+      DREG (dst0) &= 0xFFFF0000;
+      DREG (dst0) |= signbits (DREG (src0), 16);
+    }
   else if (sop == 2 && sopcde == 5)
-    unhandled_instruction ("dregs_lo = SIGNBITS dregs_hi");
+    {
+      DREG (dst0) &= 0xFFFF0000;
+      DREG (dst0) |= signbits (DREG (src0) >> 16, 16);
+    }
   else if (sop == 0 && sopcde == 6)
-    unhandled_instruction ("dregs_lo = SIGNBITS A0");
+    {
+      bu64 acc0 = saved_state.a0x;
+      acc0 <<= 32;
+      acc0 |= saved_state.a0w;
+      DREG (dst0) &= 0xFFFF0000;
+      DREG (dst0) |= signbits (acc0, 40);
+    }
   else if (sop == 1 && sopcde == 6)
-    unhandled_instruction ("dregs_lo = SIGNBITS A1");
+    {
+      bu64 acc1 = saved_state.a1x;
+      acc1 <<= 32;
+      acc1 |= saved_state.a1w;
+      DREG (dst0) &= 0xFFFF0000;
+      DREG (dst0) |= signbits (acc1, 40);
+    }
   else if (sop == 3 && sopcde == 6)
     unhandled_instruction ("dregs_lo = ONES dregs");
   else if (sop == 0 && sopcde == 7)
@@ -2432,13 +2584,57 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
   else if (sop == 3 && sopcde == 9)
     unhandled_instruction ("dregs = VIT_MAX (dregs, dregs) (ASR)");
   else if (sop == 0 && sopcde == 10)
-    unhandled_instruction ("dregs = EXTRACT (dregs, dregs_lo) (Z)");
+    {
+      /* dregs = EXTRACT (dregs, dregs_lo) (Z) */
+      bu32 v = DREG (src0);
+      bu32 x = DREG (src1);
+      bu32 mask = (1 << (v & 0x1f)) - 1;
+      x >>= ((v >> 8) & 0x1f);
+      DREG (dst0) = x & mask;
+      setflags_logical (DREG (dst0));
+    }
   else if (sop == 1 && sopcde == 10)
-    unhandled_instruction ("dregs = EXTRACT (dregs, dregs_lo) (X)");
+    {
+      /* dregs = EXTRACT (dregs, dregs_lo) (X) */
+      bu32 v = DREG (src0);
+      bu32 x = DREG (src1);
+      bu32 sgn = (1 << (v & 0x1f)) >> 1;
+      bu32 mask = (1 << (v & 0x1f)) - 1;
+      x >>= ((v >> 8) & 0x1f);
+      x &= mask;
+      if (x & sgn)
+	x |= ~mask;
+      DREG (dst0) = x;
+      setflags_logical (DREG (dst0));
+    }
   else if (sop == 2 && sopcde == 10)
-    unhandled_instruction ("dregs = DEPOSIT (dregs, dregs)");
+    {
+      /* dregs = DEPOSIT (dregs, dregs) */
+      bu32 v = DREG (src0);
+      bu32 x = DREG (src1);
+      bu32 mask = (1 << (v & 0x1f)) - 1;
+      bu32 fgnd = (v >> 16) & mask;
+      int shft = ((v >> 8) & 0x1f);
+      fgnd <<= shft;
+      mask <<= shft;
+      x &= ~mask;
+      DREG (dst0) = x | fgnd;
+      setflags_logical (DREG (dst0));
+    }
   else if (sop == 3 && sopcde == 10)
-    unhandled_instruction ("dregs = DEPOSIT (dregs, dregs) (X)");
+    {
+      /* dregs = DEPOSIT (dregs, dregs) */
+      bu32 v = DREG (src0);
+      bu32 x = DREG (src1);
+      bu32 mask = (1 << (v & 0x1f)) - 1;
+      bu32 fgnd = ((bs32)(bs16)(v >> 16)) & mask;
+      int shft = ((v >> 8) & 0x1f);
+      fgnd <<= shft;
+      mask <<= shft;
+      x &= ~mask;
+      DREG (dst0) = x | fgnd;
+      setflags_logical (DREG (dst0));
+    }
   else if (sop == 0 && sopcde == 11)
     unhandled_instruction ("dregs_lo = CC = BXORSHIFT (A0, dregs)");
   else if (sop == 1 && sopcde == 11)
