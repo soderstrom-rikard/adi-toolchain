@@ -388,7 +388,6 @@ void semantic_error_2 (char *syntax);
 
 EXPR_T mkexpr (int, SYMBOL_T);
 
-extern void bfin_equals (Expr_Node *sym);
 /* defined in bfin-lex.l */
 void set_start_state (void);
 

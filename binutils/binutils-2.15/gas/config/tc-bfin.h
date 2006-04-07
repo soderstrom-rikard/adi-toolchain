@@ -43,9 +43,10 @@ extern bfd_boolean bfin_start_label PARAMS ((char *));
 #define TC_EOL_IN_INSN(PTR) (bfin_eol_in_insn(PTR) ? 1 : 0)
 extern bfd_boolean bfin_eol_in_insn PARAMS ((char *));
 
-/* The instruction is permitted to contain an = character.  */
-#define TC_EQUAL_IN_INSN(C, NAME, PTR) (bfin_name_is_register (NAME) ? 1 : 0)
-extern bfd_boolean bfin_name_is_register PARAMS ((char *));
+/* Cheat that all instructions contain an = character.
+   So GAS will not get a chance to accept SYMBOL = EXPR; .  */
+#define TC_EQUAL_IN_INSN(C, NAME, PTR) 1
+
 #define NOP_OPCODE 0x0000 
 
 #define LOCAL_LABELS_FB 1
