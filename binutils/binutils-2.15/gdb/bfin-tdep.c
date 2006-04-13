@@ -658,7 +658,7 @@ bfin_frame_cache (struct frame_info *next_frame, void **this_cache)
       cache->saved_regs[i] += cache->base;
 
   cache->pc = frame_func_unwind (next_frame) ;
-  if (cache->pc == frame_pc_unwind (next_frame))
+  if (cache->pc == 0 || cache->pc == frame_pc_unwind (next_frame))
     {
       /* Either there is no prologue (frameless function) or we are at
 	 the start of a function. In short we do not have a frame.

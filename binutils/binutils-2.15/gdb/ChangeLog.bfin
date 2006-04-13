@@ -1,3 +1,8 @@
+2006-04-13  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-tdep.c (bfin_frame_cache): if frame_func_unwind () return
+	0, we do not have a frame.
+
 2006-04-06  Jie Zhang  <jie.zhang@analog.com>
 
 	* Makefile.in (elf_bfin_h): New.
