@@ -84,7 +84,6 @@ process_file(char *ifile, char *ofile)
 	new_flags = old_flags = ntohl(old_hdr.flags);
 	new_stack = old_stack = ntohl(old_hdr.stack_size);
 	new_hdr = old_hdr;
-#ifndef TARGET_bfin
 	if (compress == 1) {
 		new_flags |= FLAT_FLAG_GZIP;
 		new_flags &= ~FLAT_FLAG_GZDATA;
@@ -93,7 +92,6 @@ process_file(char *ifile, char *ofile)
 		new_flags &= ~FLAT_FLAG_GZIP;
 	} else if (compress < 0)
 		new_flags &= ~(FLAT_FLAG_GZIP|FLAT_FLAG_GZDATA);
-#endif //TARGET_bfin
 	
 	if (ramload > 0)
 		new_flags |= FLAT_FLAG_RAM;
@@ -115,9 +113,7 @@ process_file(char *ifile, char *ofile)
 		printf("    Magic:        %4.4s\n", old_hdr.magic);
 		printf("    Rev:          %d\n",    ntohl(old_hdr.rev));
 
-#ifndef TARGET_bfin
 		t = (time_t) htonl(old_hdr.build_date);
-#endif //TARGET_bfin
 
 		printf("    Build Date:   %s",      t?ctime(&t):"not specified\n");
 		printf("    Entry:        0x%x\n",  ntohl(old_hdr.entry));
@@ -135,12 +131,8 @@ process_file(char *ifile, char *ofile)
 				printf("Has-PIC-GOT ");
 			if (old_flags & FLAT_FLAG_GZIP)
 				printf("Gzip-Compressed ");
-#ifndef TARGET_bfin
-
 			if (old_flags & FLAT_FLAG_GZDATA)
 				printf("Gzip-Data-Compressed ");
-#endif //TARGET_bfin
-
 			if (old_flags & FLAT_FLAG_KTRACE)
 				printf("Kernel-Traced-Load ");
 			printf(")\n");
@@ -158,11 +150,8 @@ process_file(char *ifile, char *ofile)
 		strcat(tfile, (old_flags & FLAT_FLAG_KTRACE) ? "k" : "");
 		strcat(tfile, (old_flags & FLAT_FLAG_RAM) ? "r" : "");
 		strcat(tfile, (old_flags & FLAT_FLAG_GOTPIC) ? "p" : "");
-
-#ifndef TARGET_bfin	
 		strcat(tfile, (old_flags & FLAT_FLAG_GZIP) ? "z" :
 					((old_flags & FLAT_FLAG_GZDATA) ? "d" : ""));
-#endif //TARGET_bfin
 
 		printf("-%-3.3s ", tfile);
 		printf("%3d ", ntohl(old_hdr.rev));
@@ -220,8 +209,6 @@ process_file(char *ifile, char *ofile)
 	 * get ourselves a fully uncompressed copy of the text/data/relocs
 	 * so that we can manipulate it more easily
 	 */
-
-#ifndef TARGET_bfin
 	if (old_flags & (FLAT_FLAG_GZIP|FLAT_FLAG_GZDATA)) {
 		FILE *tfp;
 
@@ -267,7 +254,6 @@ process_file(char *ifile, char *ofile)
 		sprintf(cmd, "gzip -9 -f >> %s", tfile);
 		ofp = popen(cmd, "w");
 	}
-#endif //TARGET_bfin
 
 	if (!ofp) { /* can only happen if using gzip/gunzip */
 		fprintf(stderr, "Can't run cmd %s\n", cmd);
