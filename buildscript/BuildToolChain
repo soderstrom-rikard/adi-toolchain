@@ -520,7 +520,7 @@ build_gcc ()
     echo -n "*** Configuring GCC                " ; date
     RUN="$DIR_GCC_SOURCE/configure $HOST_TARGET --target=bfin-$2 \
       --prefix=$3 $4 --disable-libstdcxx-pch \
-      --disable-symvers --disable-libssp"
+      --disable-symvers --disable-libssp  --enable-version-specific-runtime-libs"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
