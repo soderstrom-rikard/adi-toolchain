@@ -1,3 +1,8 @@
+2006-04-26  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-tdep.h (enum gcc_regnum): Add hardware loop registers.
+	* bfin-tdep.c (map_gcc_gdb[]): Map these registers from GCC to GDB.
+
 2006-04-13  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin-tdep.c (bfin_frame_cache): if frame_func_unwind () return
