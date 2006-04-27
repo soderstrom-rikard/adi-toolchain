@@ -46,8 +46,6 @@
 
 #define MASK_FAST_FP                 0x20000000
 
-#define LIBGCC_SPEC "%{mfast-fp:-lbffastfp} -lgcc"
-
 /* Run-time compilation parameters selecting different hardware subsets.  */
 
 extern int target_flags;
@@ -87,7 +85,7 @@ extern int target_flags;
 "
 
 #define LINK_GCC_C_SEQUENCE_SPEC \
-  "%{mfdpic:%{!static: %L} %{static: %G %L %G}} \
+  "%{mfast-fp:-lbffastfp} %{mfdpic:%{!static: %L} %{static: %G %L %G}} \
   %{!mfdpic:%G %L %G}"
 
 #ifndef SUBTARGET_DRIVER_SELF_SPECS
