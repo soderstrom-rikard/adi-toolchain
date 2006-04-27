@@ -8,6 +8,9 @@
 	* config/bfin/bfin.c (override_options): Disable -fpic if not
 	TARGET_ID_SHARED_LIBRARY or TARGET_FDPIC.
 
+	* config/bfin/bfin.h (LIBGCC_SPEC): Delete.
+	(LINK_GCC_C_SEQUENCE_SPEC): Put -mfast-fp code here.
+
 2006-04-07  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_expand_binop_builtin): Also truncate
