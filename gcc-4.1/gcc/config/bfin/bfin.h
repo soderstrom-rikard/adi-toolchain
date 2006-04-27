@@ -38,6 +38,11 @@
 	  %{!mno-inline-plt:%{O*:%{!O0:%{!Os:%{fpic|fPIC:-minline-plt} \
                     %{!fpic:%{!fPIC:%{!O:%{!O1:%{!O2:-minline-plt}}}}}}}}}} \
 "
+
+#define LINK_GCC_C_SEQUENCE_SPEC \
+  "%{mfdpic:%{!static: %L} %{static: %G %L %G}} \
+  %{!mfdpic:%G %L %G}"
+
 #ifndef SUBTARGET_DRIVER_SELF_SPECS
 # define SUBTARGET_DRIVER_SELF_SPECS
 #endif

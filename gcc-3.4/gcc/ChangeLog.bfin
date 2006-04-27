@@ -1,3 +1,10 @@
+2006-04-27  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.h (LINK_GCC_C_SEQUENCE_SPEC): If -mfdpic, all
+	of libgcc is in libc, so don't explicitly link with -lgcc.
+	* config/bfin/t-bfin-elf (CRTSTUFF_T_CFLAGS, TARGET_LIBGCC2_CFLAGS):
+	Define to use -fpic.
+
 2006-04-07  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_expand_binop_builtin): Also truncate
