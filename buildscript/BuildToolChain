@@ -557,6 +557,9 @@ build_gcc ()
             exit
         fi
     done
+    VERSION=`$3/bin/bfin-$2-gcc -v 2>&1 | grep gcc.vers | sed -e 's,gcc.version.,,'`
+    ln $3/bin/bfin-$2-g++ $3/bin/bfin-$2-g++-$VERSION
+    ln $3/bin/bfin-$2-c++ $3/bin/bfin-$2-c++-$VERSION
 }
 
 run_tests ()
