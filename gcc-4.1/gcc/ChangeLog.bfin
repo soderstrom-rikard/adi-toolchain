@@ -5,6 +5,9 @@
 	* config/bfin/t-bfin-elf (CRTSTUFF_T_CFLAGS, TARGET_LIBGCC2_CFLAGS):
 	Define to use -fpic.
 
+	* config/bfin/bfin.c (override_options): Disable -fpic if not
+	TARGET_ID_SHARED_LIBRARY or TARGET_FDPIC.
+
 2006-04-07  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_expand_binop_builtin): Also truncate

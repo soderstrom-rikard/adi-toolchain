@@ -2003,6 +2003,11 @@ override_options (void)
   if (TARGET_FDPIC)
     targetm.asm_out.unaligned_op.si = 0;
 
+  /* Silently turn off flag_pic if not doing FDPIC or ID shared libraries,
+     since we don't support it and it'll just break.  */
+  if (flag_pic && !TARGET_FDPIC && !TARGET_ID_SHARED_LIBRARY)
+    flag_pic = 0;
+
   flag_schedule_insns = 0;
 
   init_machine_status = bfin_init_machine_status;
