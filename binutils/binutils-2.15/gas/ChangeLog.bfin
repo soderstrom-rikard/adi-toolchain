@@ -1,3 +1,8 @@
+2006-05-01  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/tc-bfin.c (bfin_start_line_hook): Bump line counters
+	if needed.
+
 2006-04-07  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin-defs.h (bfin_equals): Remove declaration.
