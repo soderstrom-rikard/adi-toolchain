@@ -489,7 +489,7 @@
 {
   HOST_WIDE_INT intval = INTVAL (XVECEXP (operands[1], 0, 1)) << 16;
   intval |= INTVAL (XVECEXP (operands[1], 0, 0)) & 0xFFFF;
-  
+
   operands[0] = gen_rtx_REG (SImode, REGNO (operands[0]));
   operands[2] = operands[3] = GEN_INT (trunc_int_for_mode (intval, SImode));
 }
@@ -2557,7 +2557,7 @@
 (define_insn "movv2hi_hi"
   [(set (match_operand:HI 0 "register_operand" "=d,d,d")
 	(vec_select:HI (match_operand:V2HI 1 "register_operand" "0,d,d")
-		       (parallel [(match_operand:SI 2 "const01_operand" "P0,P0,P1")])))]
+		       (parallel [(match_operand 2 "const01_operand" "P0,P0,P1")])))]
   ""
   "@
    /* optimized out */
@@ -2817,10 +2817,10 @@
   [(set (match_operand:SI 0 "register_operand" "=d")
 	(unspec:SI [(vec_select:HI
 		     (match_operand:V2HI 1 "register_operand" "d")
-		     (parallel [(match_operand:SI 3 "const01_operand" "P0P1")]))
+		     (parallel [(match_operand 3 "const01_operand" "P0P1")]))
 		    (vec_select:HI
 		     (match_operand:V2HI 2 "register_operand" "d")
-		     (parallel [(match_operand:SI 4 "const01_operand" "P0P1")]))
+		     (parallel [(match_operand 4 "const01_operand" "P0P1")]))
 		    (match_operand 5 "const_int_operand" "n")]
 		   UNSPEC_MUL_WITH_FLAG))]
   ""
@@ -2909,15 +2909,15 @@
 	(unspec:V2HI [(vec_concat:V2HI
 		       (vec_select:HI
 			(match_operand:V2HI 1 "register_operand" "d")
-			(parallel [(match_operand:SI 3 "const01_operand" "P0P1")]))
+			(parallel [(match_operand 3 "const01_operand" "P0P1")]))
 		       (vec_select:HI
 			(match_dup 1)
-			(parallel [(match_operand:SI 4 "const01_operand" "P0P1")])))
+			(parallel [(match_operand 4 "const01_operand" "P0P1")])))
 		      (vec_concat:V2HI
 		       (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
-			(parallel [(match_operand:SI 5 "const01_operand" "P0P1")]))
+			(parallel [(match_operand 5 "const01_operand" "P0P1")]))
 		       (vec_select:HI (match_dup 2)
-			(parallel [(match_operand:SI 6 "const01_operand" "P0P1")])))
+			(parallel [(match_operand 6 "const01_operand" "P0P1")])))
 		      (match_operand 7 "const_int_operand" "n")]
 		     UNSPEC_MUL_WITH_FLAG))]
   ""
@@ -2957,15 +2957,15 @@
 	(unspec:V2HI [(vec_concat:V2HI
 		       (vec_select:HI
 			(match_operand:V2HI 1 "register_operand" "d")
-			(parallel [(match_operand:SI 3 "const01_operand" "P0P1")]))
+			(parallel [(match_operand 3 "const01_operand" "P0P1")]))
 		       (vec_select:HI
 			(match_dup 1)
-			(parallel [(match_operand:SI 4 "const01_operand" "P0P1")])))
+			(parallel [(match_operand 4 "const01_operand" "P0P1")])))
 		      (vec_concat:V2HI
 		       (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
-			(parallel [(match_operand:SI 5 "const01_operand" "P0P1")]))
+			(parallel [(match_operand 5 "const01_operand" "P0P1")]))
 		       (vec_select:HI (match_dup 2)
-			(parallel [(match_operand:SI 6 "const01_operand" "P0P1")])))
+			(parallel [(match_operand 6 "const01_operand" "P0P1")])))
 		      (match_operand:V2PDI 7 "register_operand" "e")
 		      (match_operand 8 "const01_operand" "P0P1")
 		      (match_operand 9 "const01_operand" "P0P1")
@@ -3010,15 +3010,15 @@
 	(unspec:V2PDI [(vec_concat:V2HI
 			(vec_select:HI
 			 (match_operand:V2HI 1 "register_operand" "d")
-			 (parallel [(match_operand:SI 3 "const01_operand" "P0P1")]))
+			 (parallel [(match_operand 3 "const01_operand" "P0P1")]))
 			(vec_select:HI
 			 (match_dup 1)
-			 (parallel [(match_operand:SI 4 "const01_operand" "P0P1")])))
+			 (parallel [(match_operand 4 "const01_operand" "P0P1")])))
 		       (vec_concat:V2HI
 			(vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
-				       (parallel [(match_operand:SI 5 "const01_operand" "P0P1")]))
+				       (parallel [(match_operand 5 "const01_operand" "P0P1")]))
 			(vec_select:HI (match_dup 2)
-				       (parallel [(match_operand:SI 6 "const01_operand" "P0P1")])))
+				       (parallel [(match_operand 6 "const01_operand" "P0P1")])))
 		       (match_operand:V2PDI 7 "register_operand" "e")
 		       (match_operand 8 "const01_operand" "P0P1")
 		       (match_operand 9 "const01_operand" "P0P1")
@@ -3056,15 +3056,15 @@
 	(unspec:V2HI [(vec_concat:V2HI
 		       (vec_select:HI
 			(match_operand:V2HI 1 "register_operand" "d")
-			(parallel [(match_operand:SI 3 "const01_operand" "P0P1")]))
+			(parallel [(match_operand 3 "const01_operand" "P0P1")]))
 		       (vec_select:HI
 			(match_dup 1)
-			(parallel [(match_operand:SI 4 "const01_operand" "P0P1")])))
+			(parallel [(match_operand 4 "const01_operand" "P0P1")])))
 		      (vec_concat:V2HI
 		       (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
-			(parallel [(match_operand:SI 5 "const01_operand" "P0P1")]))
+			(parallel [(match_operand 5 "const01_operand" "P0P1")]))
 		       (vec_select:HI (match_dup 2)
-			(parallel [(match_operand:SI 6 "const01_operand" "P0P1")])))
+			(parallel [(match_operand 6 "const01_operand" "P0P1")])))
 		      (match_operand 7 "const_int_operand" "n")]
 		     UNSPEC_MAC_WITH_FLAG))
    (set (match_operand:V2PDI 8 "register_operand" "=e")
@@ -3106,15 +3106,15 @@
 	(unspec:V2PDI [(vec_concat:V2HI
 		       (vec_select:HI
 			(match_operand:V2HI 1 "register_operand" "d")
-			(parallel [(match_operand:SI 3 "const01_operand" "P0P1")]))
+			(parallel [(match_operand 3 "const01_operand" "P0P1")]))
 		       (vec_select:HI
 			(match_dup 1)
-			(parallel [(match_operand:SI 4 "const01_operand" "P0P1")])))
+			(parallel [(match_operand 4 "const01_operand" "P0P1")])))
 		      (vec_concat:V2HI
 		       (vec_select:HI (match_operand:V2HI 2 "register_operand" "d")
-			(parallel [(match_operand:SI 5 "const01_operand" "P0P1")]))
+			(parallel [(match_operand 5 "const01_operand" "P0P1")]))
 		       (vec_select:HI (match_dup 2)
-			(parallel [(match_operand:SI 6 "const01_operand" "P0P1")])))
+			(parallel [(match_operand 6 "const01_operand" "P0P1")])))
 		      (match_operand 7 "const_int_operand" "n")]
 		     UNSPEC_MAC_WITH_FLAG))]
   ""

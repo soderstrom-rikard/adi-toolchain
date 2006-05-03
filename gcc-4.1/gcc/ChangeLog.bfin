@@ -1,3 +1,11 @@
+2006-05-03  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/predicates.md (const01_rtx): Tell generator programs
+	that this only matches CONST_INTs.  All users changed to VOIDmode
+	operands.
+	* config/bfin/bfin.c (bfin_rtx_costs): Some costs for vector
+	operations, to allow combine to do more work.
+
 2006-04-27  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (LINK_GCC_C_SEQUENCE_SPEC): If -mfdpic, all
