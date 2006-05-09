@@ -41,7 +41,7 @@ set testfile "basics"
 set srcfile ${testfile}.c
 set binfile ${objdir}/${subdir}/${testfile}
 
-if [istarget "*-*-uclinux*"] {
+if [target_info exists use_binfmt_flat] {
     set symfile "${binfile}.gdb"
 } else {
     set symfile ${binfile}

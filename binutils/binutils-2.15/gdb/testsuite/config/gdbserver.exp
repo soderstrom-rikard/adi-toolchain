@@ -214,7 +214,7 @@ proc gdb_load { arg } {
     set gdbport [lindex $res 1]
 
     if { $arg != "" } {
-	if [istarget "*-*-uclinux*"] {
+	if [target_info exists use_binfmt_flat] {
 	    if [gdb_file_cmd "$arg.gdb"] {
 		return -1
 	    }

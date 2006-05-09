@@ -1,5 +1,15 @@
 2006-05-09  Jie Zhang  <jie.zhang@analog.com>
 
+	* config/gdbserver.exp (gdb_load): Append .gdb to the file name
+	before passed to gdb_file_cmd if [target_info exists use_binfmt_flat].
+	* lib/mi-support.exp (mi_gdb_load): Likewise.
+	* gdb.base/dump.exp (symfile): Added and used as symbol file.
+	* gdb.mi/mi-basics.exp (symfile): Likewise.
+	* gdb.mi/mi-cli.exp: Do the test of set $pc to 0.
+	* gdb.mi/mi2-cli.exp: Likewise.
+
+2006-05-09  Jie Zhang  <jie.zhang@analog.com>
+
 	* bfin-tdep.c (bfin_linux_pc_in_sigtramp): Check pc before read
 	memory.
 	(bfin_register_type): Only use builtin_type_void_func_ptr for
