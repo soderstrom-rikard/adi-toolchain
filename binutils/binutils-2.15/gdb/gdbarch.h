@@ -1433,6 +1433,11 @@ typedef const struct regset * (gdbarch_regset_from_core_section_ftype) (struct g
 extern const struct regset * gdbarch_regset_from_core_section (struct gdbarch *gdbarch, const char *sect_name, size_t sect_size);
 extern void set_gdbarch_regset_from_core_section (struct gdbarch *gdbarch, gdbarch_regset_from_core_section_ftype *regset_from_core_section);
 
+/* Query the remote side for the text, data and bss offsets */
+
+extern int gdbarch_use_get_offsets (struct gdbarch *gdbarch);
+extern void set_gdbarch_use_get_offsets (struct gdbarch *gdbarch, int use_get_offsets);
+
 extern struct gdbarch_tdep *gdbarch_tdep (struct gdbarch *gdbarch);
 
 

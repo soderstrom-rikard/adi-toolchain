@@ -230,6 +230,7 @@ struct gdbarch
   gdbarch_register_reggroup_p_ftype *register_reggroup_p;
   gdbarch_fetch_pointer_argument_ftype *fetch_pointer_argument;
   gdbarch_regset_from_core_section_ftype *regset_from_core_section;
+  int use_get_offsets;
 };
 
 
@@ -357,6 +358,7 @@ struct gdbarch startup_gdbarch =
   default_register_reggroup_p,  /* register_reggroup_p */
   0,  /* fetch_pointer_argument */
   0,  /* regset_from_core_section */
+  1,  /* use_get_offsets */
   /* startup_gdbarch() */
 };
 
@@ -447,6 +449,7 @@ gdbarch_alloc (const struct gdbarch_info *info,
   current_gdbarch->coff_make_msymbol_special = default_coff_make_msymbol_special;
   current_gdbarch->name_of_malloc = "malloc";
   current_gdbarch->register_reggroup_p = default_register_reggroup_p;
+  current_gdbarch->use_get_offsets = 1;
   /* gdbarch_alloc() */
 
   return current_gdbarch;
@@ -613,6 +616,7 @@ verify_gdbarch (struct gdbarch *current_gdbarch)
   /* Skip verify of register_reggroup_p, invalid_p == 0 */
   /* Skip verify of fetch_pointer_argument, has predicate */
   /* Skip verify of regset_from_core_section, has predicate */
+  /* Skip verify of use_get_offsets, invalid_p == 0 */
   buf = ui_file_xstrdup (log, &dummy);
   make_cleanup (xfree, buf);
   if (strlen (buf) > 0)
@@ -1614,6 +1618,9 @@ gdbarch_dump (struct gdbarch *current_gdbarch, struct ui_file *file)
   fprintf_unfiltered (file,
                       "gdbarch_dump: unwind_sp = <0x%lx>\n",
                       (long) current_gdbarch->unwind_sp);
+  fprintf_unfiltered (file,
+                      "gdbarch_dump: use_get_offsets = %s\n",
+                      paddr_d (current_gdbarch->use_get_offsets));
 #ifdef VALUE_TO_REGISTER
   fprintf_unfiltered (file,
                       "gdbarch_dump: %s # %s\n",
@@ -3711,6 +3718,23 @@ set_gdbarch_regset_from_core_section (struct gdbarch *gdbarch,
                                       gdbarch_regset_from_core_section_ftype regset_from_core_section)
 {
   gdbarch->regset_from_core_section = regset_from_core_section;
+}
+
+int
+gdbarch_use_get_offsets (struct gdbarch *gdbarch)
+{
+  gdb_assert (gdbarch != NULL);
+  /* Skip verify of use_get_offsets, invalid_p == 0 */
+  if (gdbarch_debug >= 2)
+    fprintf_unfiltered (gdb_stdlog, "gdbarch_use_get_offsets called\n");
+  return gdbarch->use_get_offsets;
+}
+
+void
+set_gdbarch_use_get_offsets (struct gdbarch *gdbarch,
+                             int use_get_offsets)
+{
+  gdbarch->use_get_offsets = use_get_offsets;
 }
 
 

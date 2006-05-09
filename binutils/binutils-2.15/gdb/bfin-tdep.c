@@ -1381,6 +1381,9 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
     set_gdbarch_convert_from_func_ptr_addr (gdbarch,
 					    bfin_convert_from_func_ptr_addr);
 
+  if (bfin_abi (gdbarch) == BFIN_ABI_FDPIC)
+    set_gdbarch_use_get_offsets (gdbarch, 0);
+
   return gdbarch;
 }
 

@@ -1,3 +1,13 @@
+2006-05-09  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-tdep.c (bfin_gdbarch_init): For Blackfin FDPIC ABI, don't
+	use get_offsets ().
+	* gdbarch.sh (function_list): Add use_get_offsets.
+	* gdbarch.c: Regenerated.
+	* gdbarch.h: Regenerated.
+	* remote.c (remote_start_remote): Only call get_offsets () when
+	arch can use it.
+
 2006-04-26  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin-tdep.h (enum gcc_regnum): Add hardware loop registers.

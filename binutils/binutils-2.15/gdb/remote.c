@@ -2007,7 +2007,9 @@ remote_start_remote (struct ui_out *uiout, void *dummy)
 
   inferior_ptid = remote_current_thread (inferior_ptid);
 
-  get_offsets ();		/* Get text, data & bss offsets */
+  /* Get text, data & bss offsets */
+  if (gdbarch_use_get_offsets (current_gdbarch))
+    get_offsets ();
 
   putpkt ("?");			/* initiate a query from remote machine */
   immediate_quit--;
