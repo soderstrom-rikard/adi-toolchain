@@ -5,8 +5,8 @@ load_generic_config "gdbserver"
 process_multilib_options ""
 
 set_board_info compiler  "[find_gcc]"
-# -s80000 is for gcc.dg/dg.exp/trampoline-1.c
-set_board_info ldflags "";
+set_board_info cflags "-mfdpic"
+set_board_info ldflags "-mfdpic";
 set_board_info rsh_prog rsh
 set_board_info rcp_prog rcp
 set_board_info protocol standard
@@ -15,13 +15,18 @@ set_board_info use_gdb_stub 1
 set_board_info noargs 1
 
 set_board_info gcc,no_trampolines 1
-set_board_info gcc,stack_size 80000
+set_board_info gcc,stack_size 0x20000
 
 # set_board_info gdb,socketport "2345"
 set_board_info gdb,do_reload_on_run 1
 set_board_info gdb,noinferiorio 1
 set_board_info gdb,nofileio 1
 set_board_info gdb,no_hardware_watchpoints 1
+set_board_info gdb,skip_huge_test 1
+
+# When testing, set solib-absolute-prefix or solib-search-path in gdbinitfile
+# And uncomment the following line
+# set GDBFLAGS "-nx --command gdbinitfile"
 
 # BuildToolchain will append hostname
 # set_board_info hostname 192.168.0.110
