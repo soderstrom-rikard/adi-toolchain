@@ -446,7 +446,9 @@ bfin_linux_pc_in_sigtramp (CORE_ADDR pc)
   char buf[12];
   unsigned long insn0, insn1, insn2;
 
-  if (deprecated_read_memory_nobpt (pc - 4, buf, sizeof (buf)))
+  if (pc < 4
+      || pc >= (CORE_ADDR) 0x7ffffff8
+      || deprecated_read_memory_nobpt (pc - 4, buf, sizeof (buf)))
     return 0;
 
   insn1 = extract_unsigned_integer (buf + 4, 4);
@@ -895,8 +897,7 @@ bfin_register_type (struct gdbarch *gdbarch, int regnum)
       || regnum == BFIN_USP_REGNUM)
     return builtin_type_void_data_ptr;
 
-  if (regnum == BFIN_PC_REGNUM || regnum == BFIN_RETS_REGNUM
-      || (regnum >= BFIN_RETI_REGNUM && regnum <= BFIN_RETE_REGNUM))
+  if (regnum == BFIN_PC_REGNUM)
     return builtin_type_void_func_ptr;
 
   return builtin_type_int32;

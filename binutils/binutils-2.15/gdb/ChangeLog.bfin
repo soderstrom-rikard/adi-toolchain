@@ -1,5 +1,12 @@
 2006-05-09  Jie Zhang  <jie.zhang@analog.com>
 
+	* bfin-tdep.c (bfin_linux_pc_in_sigtramp): Check pc before read
+	memory.
+	(bfin_register_type): Only use builtin_type_void_func_ptr for
+	PC register.
+
+2006-05-09  Jie Zhang  <jie.zhang@analog.com>
+
 	* bfin-tdep.c (bfin_gdbarch_init): For Blackfin FDPIC ABI, don't
 	use get_offsets ().
 	* gdbarch.sh (function_list): Add use_get_offsets.
