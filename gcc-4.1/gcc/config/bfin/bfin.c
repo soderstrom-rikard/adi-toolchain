@@ -1748,7 +1748,8 @@ bfin_expand_call (rtx retval, rtx fnaddr, rtx callarg1, rtx cookie, int sibcall)
 
   if (TARGET_FDPIC)
     {
-      if (GET_CODE (callee) != SYMBOL_REF)
+      if (GET_CODE (callee) != SYMBOL_REF
+	  || bfin_longcall_p (callee, INTVAL (cookie)))
 	{
 	  rtx addr = callee;
 	  if (! address_operand (addr, Pmode))
