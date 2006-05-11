@@ -1,3 +1,10 @@
+2006-05-11  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.c (bfin_expand_call): Deal with long call
+	for FDPIC.
+	* testsuite/gcc.dg/bfin-longcall-3.c: New testcase.
+	* testsuite/gcc.dg/bfin-longcall-4.c: New testcase.
+
 2006-04-27  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (LINK_GCC_C_SEQUENCE_SPEC): If -mfdpic, all
