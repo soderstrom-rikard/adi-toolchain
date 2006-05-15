@@ -1,5 +1,13 @@
 2006-05-15  Jie Zhang  <jie.zhang@analog.com>
 
+	* config/bfin/bfin.h (TRAMPOLINE_SIZE): Set to 30 if FDPIC,
+	otherwise 18.
+	(TRAMPOLINE_TEMPLATE): Deal with FDPIC case.
+	* config/bfin/bfin.c (initialize_trampoline): Deal with
+	FDPIC case.
+
+2006-05-15  Jie Zhang  <jie.zhang@analog.com>
+
 	* config/bfin/bfin.c (legitimize_pic_address): Comment out
 	the code for -fPIC.
 
