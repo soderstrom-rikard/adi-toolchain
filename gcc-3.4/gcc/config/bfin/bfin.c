@@ -2008,10 +2008,16 @@ hard_regno_mode_ok (int regno, enum machine_mode mode)
     return mode == BImode;
   if (mode == PDImode || mode == V2PDImode)
     return regno == REG_A0 || regno == REG_A1;
+
+  /* Allow all normal 32 bit regs, except REG_M3, in case regclass ever comes
+     up with a bad register class (such as ALL_REGS) for DImode.  */
+  if (mode == DImode)
+    return regno < REG_M3;
+
   if (mode == SImode
       && TEST_HARD_REG_BIT (reg_class_contents[PROLOGUE_REGS], regno))
     return 1;
-      
+
   return TEST_HARD_REG_BIT (reg_class_contents[MOST_REGS], regno);
 }
 
@@ -2019,7 +2025,7 @@ hard_regno_mode_ok (int regno, enum machine_mode mode)
    one in class CLASS2.  A cost of 2 is the default.  */
 
 int
-bfin_register_move_cost (enum machine_mode mode ATTRIBUTE_UNUSED,
+bfin_register_move_cost (enum machine_mode mode,
 			 enum reg_class class1, enum reg_class class2)
 {
   /* If optimizing for size, always prefer reg-reg over reg-memory moves.  */
@@ -2032,6 +2038,15 @@ bfin_register_move_cost (enum machine_mode mode ATTRIBUTE_UNUSED,
   if (class1 == DREGS && class2 != DREGS)
     return 2 * 2;
 
+  if (GET_MODE_CLASS (mode) == MODE_INT)
+    {
+      /* Discourage trying to use the accumulators.  */
+      if (TEST_HARD_REG_BIT (reg_class_contents[class1], REG_A0)
+	  || TEST_HARD_REG_BIT (reg_class_contents[class1], REG_A1)
+	  || TEST_HARD_REG_BIT (reg_class_contents[class2], REG_A0)
+	  || TEST_HARD_REG_BIT (reg_class_contents[class2], REG_A1))
+	return 20;
+    }
   return 2;
 }
 
