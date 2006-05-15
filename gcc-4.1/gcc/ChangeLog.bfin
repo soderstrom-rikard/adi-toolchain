@@ -1,5 +1,10 @@
 2006-05-15  Jie Zhang  <jie.zhang@analog.com>
 
+	* testsuite/gcc.dg/bfin-longcall-3.c (abort): Declare.
+	* testsuite/gcc.dg/bfin-longcall-4.c (abort): Declare.
+
+2006-05-15  Jie Zhang  <jie.zhang@analog.com>
+
 	* config/bfin/bfin.c (legitimize_pic_address): Comment out
 	the code for -fPIC.
 

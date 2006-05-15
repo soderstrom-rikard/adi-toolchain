@@ -2,6 +2,8 @@
 /* { dg-do run { target bfin-*-* } } */
 /* { dg-options "-O2 -mlong-calls" } */
 
+extern void abort (void);
+
 int __attribute__((longcall, noinline))
 foo (int a, int b)
 {
