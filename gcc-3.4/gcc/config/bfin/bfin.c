@@ -2169,6 +2169,12 @@ override_options (void)
   if (TARGET_ID_SHARED_LIBRARY && TARGET_FDPIC)
       error ("ID shared libraries and FD-PIC mode can't be used together.");
 
+  if (TARGET_FDPIC && profile_arc_flag)
+    {
+      warning ("-fprofile-arcs is not supported for FDPIC in GCC 3.4.");
+      profile_arc_flag = 0;
+    }
+
   /* There is no single unaligned SI op for PIC code.  Sometimes we
      need to use ".4byte" and sometimes we need to use ".picptr".
      See frv_assemble_integer for details.  */

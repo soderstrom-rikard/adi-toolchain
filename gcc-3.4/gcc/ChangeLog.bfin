@@ -1,5 +1,10 @@
 2006-05-15  Jie Zhang  <jie.zhang@analog.com>
 
+	* config/bfin/bfin.c (override_options): Warning on -fprofile-arcs
+	and clear it if FDPIC.
+
+2006-05-15  Jie Zhang  <jie.zhang@analog.com>
+
 	* config/bfin/bfin.h (TRAMPOLINE_SIZE): Set to 30 if FDPIC,
 	otherwise 18.
 	(TRAMPOLINE_TEMPLATE): Deal with FDPIC case.
