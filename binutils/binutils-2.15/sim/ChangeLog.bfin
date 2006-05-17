@@ -1,3 +1,14 @@
+2006-05-17  Marc Hoffman  <mmh@pleasantst.com>
+
+	* bfin/bfin-dis.c (dagadd): New.
+	(dagsub): New.
+	(addadd16): New.
+	(subsub16): New.
+	(decode_dagMODim_0): Deal with DAG arithmetic instructions.
+	(decode_dagMODik_0): Likewise.
+	(decode_dspLDST_0): Take care of DAG circular buffer.
+	(decode_dsp32alu_0): Deal with one quad 16-bit instruction.
+
 2006-04-07  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin/bfin-dis.c (add32, sub32): New arg SAT.  All callers changed.

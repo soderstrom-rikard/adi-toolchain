@@ -81,6 +81,62 @@ setflags_logical (bu32 val)
   saved_state.v = 0;
 }
 
+static int
+dagadd (int dagno, bs32 modify)
+{
+  bs32 i, l, b, val;
+
+  i = IREG (dagno);
+  l = LREG (dagno);
+  b = BREG (dagno);
+  val = i;
+
+  if (l)
+    {
+      if (i + modify - b - l < 0 && modify > 0
+	  || i + modify - b >= 0 && modify < 0
+	  || modify == 0)
+	val = i + modify;
+      else if (i + modify - b - l >= 0 && modify > 0)
+	val = i + modify - l;
+      else if (i + modify - b < 0 && modify < 0)
+	val = i + modify + l;
+    }
+  else
+    val = i + modify;
+
+  STORE (IREG (dagno), val);
+  return val;
+}
+
+static int
+dagsub (int dagno, bs32 modify)
+{
+  bs32 i, l, b, val;
+
+  i = IREG (dagno);
+  l = LREG (dagno);
+  b = BREG (dagno);
+  val = i;
+
+  if (l)
+    {
+      if (i - modify - b - l < 0 && modify < 0
+	  || i - modify - b >= 0 && modify > 0
+	  || modify == 0)
+	val = i - modify;
+      else if (i - modify - b - l >= 0 && modify < 0)
+	val = i - modify - l;
+      else if (i - modify - b < 0 && modify > 0)
+	val = i - modify + l;
+    }
+  else
+    val = i - modify;
+
+  STORE (IREG (dagno), val);
+  return val;
+}
+
 static bu32
 ashiftrt (bu32 val, int cnt, int size)
 {
@@ -238,6 +294,32 @@ sub16 (bu32 a, bu32 b, int *carry, int sat)
   if (carry)
     *carry = (bu16)b <= (bu16)a;
   return v;
+}
+
+static bu32
+addadd16 (bu32 a, bu32 b, int sat, int x)
+{
+  int c0 = 0, c1 = 0;
+  bu32 x0, x1;
+  x0 = add16 ((a >> 16) & 0xffff, (b >> 16) & 0xffff, &c0, sat) & 0xffff;
+  x1 = add16 (a & 0xffff, b & 0xffff, &c1, sat) & 0xffff;
+  if (x == 0)
+    return (x0 << 16) | x1;
+  else
+    return (x1 << 16) | x0;
+}
+
+static bu32
+subsub16 (bu32 a, bu32 b, int sat, int x)
+{
+  int c0 = 0, c1 = 0;
+  bu32 x0, x1;
+  x0 = sub16 ((a >> 16) & 0xffff, (b >> 16) & 0xffff, &c0, sat) & 0xffff;
+  x1 = sub16 (a & 0xffff, b & 0xffff, &c1, sat) & 0xffff;
+  if (x == 0)
+    return (x0 << 16) | x1;
+  else
+    return (x1 << 16) | x0;
 }
 
 static bu32
@@ -1477,9 +1559,11 @@ decode_dagMODim_0 (bu16 iw0)
   if (op == 0 && br == 1)
     unhandled_instruction ("iregs += mregs (BREV)");
   else if (op == 0)
-    unhandled_instruction ("iregs += mregs");
+    /* iregs += mregs */
+    dagadd (i, MREG (m));
   else if (op == 1)
-    unhandled_instruction ("iregs -= mregs");
+    /* iregs -= mregs */
+    dagsub (i, MREG (m));
   else
     illegal_instruction ();
   PCREG += 2;
@@ -1496,13 +1580,17 @@ decode_dagMODik_0 (bu16 iw0)
   int op = ((iw0 >> 2) & 0x3);
 
   if (op == 0)
-    unhandled_instruction ("iregs += 2");
+    /* iregs += 2 */
+    dagadd (i, 2);
   else if (op == 1)
-    unhandled_instruction ("iregs -= 2");
+    /* iregs -= 2 */
+    dagsub (i, 2);
   else if (op == 2)
-    unhandled_instruction ("iregs += 4");
+    /* iregs += 4 */
+    dagadd (i, 4);
   else if (op == 3)
-    unhandled_instruction ("iregs -= 4");
+    /* iregs -= 4 */
+    dagsub (i, 4);
   else
     illegal_instruction ();
   PCREG += 2;
@@ -1526,42 +1614,42 @@ decode_dspLDST_0 (bu16 iw0)
     {
       /* dregs = [iregs++] */
       addr = IREG (i);
-      STORE (IREG (i), addr + 4);
+      dagadd (i, 4);
       STORE (DREG (reg), get_long (saved_state.memory, addr));
     }
   else if (aop == 0 && W == 0 && m == 1)
     {
       /* dregs_lo = W[iregs++] */
       addr = IREG (i);
-      STORE (IREG (i), addr + 2);
+      dagadd (i, 2);
       STORE (DREG (reg), (DREG (reg) & 0xFFFF0000) | get_word (saved_state.memory, addr));
     }
   else if (aop == 0 && W == 0 && m == 2)
     {
       /* dregs_hi = W[iregs++] */
       addr = IREG (i);
-      STORE (IREG (i), addr + 2);
+      dagadd (i, 2);
       STORE (DREG (reg), (DREG (reg) & 0xFFFF) | (get_word (saved_state.memory, addr) << 16));
     }
   else if (aop == 1 && W == 0 && m == 0)
     {
       /* dregs = [iregs--] */
       addr = IREG (i);
-      STORE (IREG (i), addr - 4);
+      dagsub (i, 4);
       STORE (DREG (reg), get_long (saved_state.memory, addr));
     }
   else if (aop == 1 && W == 0 && m == 1)
     {
       /* dregs_lo = W[iregs--] */
       addr = IREG (i);
-      STORE (IREG (i), addr - 2);
+      dagsub (i, 2);
       STORE (DREG (reg), (DREG (reg) & 0xFFFF0000) | get_word (saved_state.memory, addr));
     }
   else if (aop == 1 && W == 0 && m == 2)
     {
       /* dregs_hi = W[iregs--] */
       addr = IREG (i);
-      STORE (IREG (i), addr - 2);
+      dagsub (i, 2);
       STORE (DREG (reg), (DREG (reg) & 0xFFFF) | (get_word (saved_state.memory, addr) << 16));
     }
   else if (aop == 2 && W == 0 && m == 0)
@@ -1586,42 +1674,42 @@ decode_dspLDST_0 (bu16 iw0)
     {
       /* [iregs++] = dregs */
       addr = IREG (i);
-      STORE (IREG (i), addr + 4);
+      dagadd (i, 4);
       put_long (saved_state.memory, addr, DREG (reg));
     }
   else if (aop == 0 && W == 1 && m == 1)
     {
       /* W[iregs++] = dregs_lo */
       addr = IREG (i);
-      STORE (IREG (i), addr + 2);
+      dagadd (i, 2);
       put_word (saved_state.memory, addr, DREG (reg));
     }
   else if (aop == 0 && W == 1 && m == 2)
     {
       /* W[iregs++] = dregs_hi */
       addr = IREG (i);
-      STORE (IREG (i), addr + 2);
+      dagadd (i, 2);
       put_word (saved_state.memory, addr, DREG (reg) >> 16);
     }
   else if (aop == 1 && W == 1 && m == 0)
     {
       /* [iregs--] = dregs */
       addr = IREG (i);
-      STORE (IREG (i), addr - 4);
+      dagsub (i, 4);
       put_long (saved_state.memory, addr, DREG (reg));
     }
   else if (aop == 1 && W == 1 && m == 1)
     {
       /* W[iregs--] = dregs_lo */
       addr = IREG (i);
-      STORE (IREG (i), addr - 2);
+      dagsub (i, 2);
       put_word (saved_state.memory, addr, DREG (reg));
     }
   else if (aop == 1 && W == 1 && m == 2)
     {
       /* W[iregs--] = dregs_hi */
       addr = IREG (i);
-      STORE (IREG (i), addr - 2);
+      dagsub (i, 2);
       put_word (saved_state.memory, addr, DREG (reg) >> 16);
     }
   else if (aop == 2 && W == 1 && m == 0)
@@ -1646,14 +1734,14 @@ decode_dspLDST_0 (bu16 iw0)
     {
       /* dregs = [iregs ++ mregs] */
       addr = IREG (i);
-      STORE (IREG (i), addr + MREG (m));
+      dagadd (i, MREG (m));
       STORE (DREG (reg), get_long (saved_state.memory, addr));
     }
   else if (aop == 3 && W == 1)
     {
       /* [iregs ++ mregs] = dregs */
       addr = IREG (i);
-      STORE (IREG (i), addr + MREG (m));
+      dagadd(i, MREG (m));
       put_long (saved_state.memory, addr, DREG (reg));
     }
   else
@@ -2352,7 +2440,20 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
   else if (aop == 1 && aopcde == 12)
     unhandled_instruction ("dregs = A1.L + A1.H , dregs = A0.L + A0.H");
   else if (HL == 0 && aopcde == 1)
-    unhandled_instruction ("dregs = dregs +|+ dregs , dregs = dregs -|- dregs (amod0, amod2)");
+    {
+      if (aop == 0)
+	{
+	  /* dregs = dregs +|+ dregs, dregs = dregs -|- dregs (amod0) */
+	  bu32 d0, d1;
+	  d1 = addadd16 (DREG (src0), DREG (src1), s, x);
+	  d0 = subsub16 (DREG (src0), DREG (src1), s, x);
+	  STORE (DREG (dst0), d0);
+	  STORE (DREG (dst1), d1);
+	}
+      else
+	unhandled_instruction
+	  ("dregs = dregs +|+ dregs, dregs = dregs -|- dregs (amod0, amod2)");
+    }
   else if (aop == 0 && aopcde == 11)
     unhandled_instruction ("dregs = (A0 += A1)");
   else if (aop == 0 && aopcde == 10)
