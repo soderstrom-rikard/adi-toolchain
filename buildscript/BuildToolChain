@@ -871,6 +871,7 @@ if [ $KERNEL_SOURCE ] ; then
     cp linux-2.6.x/.config saved-config-linux 2>/dev/null
     cp uClibc/.config saved-config-uClibc 2>/dev/null
     cp config/.config saved-config-user 2>/dev/null
+    cp -a config.arch saved-config-arch 2>/dev/null
 
     RUN="$MAKE AnalogDevices/BF537-STAMP_config"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
@@ -914,6 +915,7 @@ if [ $KERNEL_SOURCE ] ; then
             mv saved-config-linux linux-2.6.x/.config 2>/dev/null
             mv saved-config-uClibc uClibc/.config 2>/dev/null
             mv saved-config-user config/.config 2>/dev/null
+            mv saved-config-arch config.arch 2>/dev/null
             exit
         fi
     done
@@ -955,6 +957,7 @@ if [ $KERNEL_SOURCE ] ; then
             mv saved-config-linux linux-2.6.x/.config 2>/dev/null
             mv saved-config-uClibc uClibc/.config 2>/dev/null
             mv saved-config-user config/.config 2>/dev/null
+            mv saved-config-arch config.arch 2>/dev/null
             exit
         fi
     done
@@ -972,6 +975,7 @@ if [ $KERNEL_SOURCE ] ; then
     mv saved-config-linux linux-2.6.x/.config 2>/dev/null
     mv saved-config-uClibc uClibc/.config 2>/dev/null
     mv saved-config-user config/.config 2>/dev/null
+    mv saved-config-arch config.arch 2>/dev/null
 
     ####################### Done Step 3  #########################
 
