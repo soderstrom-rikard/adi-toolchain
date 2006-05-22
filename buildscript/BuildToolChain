@@ -965,6 +965,9 @@ if [ $KERNEL_SOURCE ] ; then
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
+    # Move system include dirs to a place where GCC can find them.
+    mv $DIR_uC_OUTPUT/bfin-uclinux/include $DIR_uC_OUTPUT/bfin-uclinux/sys-include
+
     mv saved-config-toplevel .config 2>/dev/null
     mv saved-config-linux linux-2.6.x/.config 2>/dev/null
     mv saved-config-uClibc uClibc/.config 2>/dev/null
