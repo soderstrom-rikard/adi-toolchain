@@ -2196,10 +2196,10 @@ override_options (void)
   if (TARGET_FDPIC)
     targetm.asm_out.unaligned_op.si = 0;
 
-  /* Silently turn off flag_pic if not doing FDPIC or ID shared libraries,
+  /* Error if flag_pic but not doing FDPIC or ID shared libraries,
      since we don't support it and it'll just break.  */
   if (flag_pic && !TARGET_FDPIC && !TARGET_ID_SHARED_LIBRARY)
-    flag_pic = 0;
+    error ("-fpic specified without -mshared-library-id or -mid-shared-library");
 
   flag_schedule_insns = 0;
 }
