@@ -1,3 +1,11 @@
+2006-05-24  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/bfin-dis.c (rnd16): Use unbiased rounding. Correctly do sign
+	extension.
+	(trunc16): Correctly do sign extension.
+	(decode_macfun): Store result to accmulators.
+	(decode_dsp32alu_0): Only do cross for subsub.
+
 2006-05-17  Marc Hoffman  <mmh@pleasantst.com>
 
 	* bfin/bfin-dis.c (dagadd): New.

@@ -649,9 +649,14 @@ saturate_u16 (bu64 val)
 static bu64
 rnd16 (bu64 val)
 {
-  bu64 sgnbits = val & 0xff00000000000000ull;
-  /* @@@ Should honour rounding mode.  Can this overflow?  */
-  val += 0x8000;
+  bu64 sgnbits;
+
+  /* FIXME: Should honour rounding mode.  */
+  if ((val & 0xffff) > 0x8000
+      || ((val & 0xffff) == 0x8000 && (val & 0x10000)))
+    val += 0x8000;
+
+  sgnbits = val & 0xffff000000000000ull;
   val >>= 16;
   return val | sgnbits;
 }
@@ -659,7 +664,7 @@ rnd16 (bu64 val)
 static bu64
 trunc16 (bu64 val)
 {
-  bu64 sgnbits = val & 0xff00000000000000ull;
+  bu64 sgnbits = val & 0xffff000000000000ull;
   val >>= 16;
   return val | sgnbits;
 }
@@ -786,6 +791,17 @@ decode_macfunc (int which, int op, int h0, int h1, int src0, int src1,
 	default:
 	  abort ();
 	}
+    }
+
+  if (which)
+    {
+      STORE (A1XREG, (acc >> 32) & 0xff);
+      STORE (A1WREG, acc & 0xffffffff);
+    }
+  else
+    {
+      STORE (A0XREG, (acc >> 32) & 0xff);
+      STORE (A0WREG, acc & 0xffffffff);
     }
 
   return extract_mult (acc, mmod, fullword);
@@ -2445,7 +2461,7 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
 	{
 	  /* dregs = dregs +|+ dregs, dregs = dregs -|- dregs (amod0) */
 	  bu32 d0, d1;
-	  d1 = addadd16 (DREG (src0), DREG (src1), s, x);
+	  d1 = addadd16 (DREG (src0), DREG (src1), s, 0);
 	  d0 = subsub16 (DREG (src0), DREG (src1), s, x);
 	  STORE (DREG (dst0), d0);
 	  STORE (DREG (dst1), d1);
