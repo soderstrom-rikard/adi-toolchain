@@ -1,3 +1,8 @@
+2006-05-25  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin-parse.y (asm_1): Better check and deal with
+	vector and scalar Multiply 16-Bit Operands instructions.
+
 2006-05-01  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/tc-bfin.c (bfin_start_line_hook): Bump line counters
