@@ -82,11 +82,8 @@ extern int target_flags;
    	    %{!fno-pic:%{!fno-pie:%{!fno-PIC:%{!fno-PIE:-fpie}}}}}}}} \
 	  %{!mno-inline-plt:%{O*:%{!O0:%{!Os:%{fpic|fPIC:-minline-plt} \
                     %{!fpic:%{!fPIC:%{!O:%{!O1:%{!O2:-minline-plt}}}}}}}}}} \
+ %{!mfdpic:-static-libgcc} \
 "
-
-#define LINK_GCC_C_SEQUENCE_SPEC \
-  "%{mfast-fp:-lbffastfp} %{mfdpic:%{!static: %L} %{static: %G %L %G}} \
-  %{!mfdpic:%G %L %G}"
 
 #ifndef SUBTARGET_DRIVER_SELF_SPECS
 # define SUBTARGET_DRIVER_SELF_SPECS
@@ -119,6 +116,8 @@ extern int target_flags;
 
 #undef  LIB_SPEC
 #define LIB_SPEC "-lc"
+
+#define LIBGCC_SPEC "%{mfast-fp:-lbffastfp} -lgcc"
 
 /* Don't create frame pointers for leaf functions */
 #define TARGET_OMIT_LEAF_FRAME_POINTER (target_flags & MASK_OMIT_LEAF_FRAME_POINTER)
