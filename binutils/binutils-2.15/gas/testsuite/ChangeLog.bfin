@@ -1,3 +1,8 @@
+2006-05-25  Jie Zhang  <jie.zhang@analog.com>
+
+	* gas/bfin/vector2.s, gas/bfin/vector2.d: Test to ensure (m) is not
+	thrown away.
+
 2006-03-16  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* gas/bfin/shift2.s: Add new tests.
