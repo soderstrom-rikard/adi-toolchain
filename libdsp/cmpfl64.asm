@@ -34,6 +34,24 @@
 
 .text;
 .align 2;
+.global ___eqdf2;
+.type ___eqdf2, STT_FUNC;
+___eqdf2:
+.global ___gedf2;
+.type ___gedf2, STT_FUNC;
+___gedf2:
+.global ___gtdf2;
+.type ___gtdf2, STT_FUNC;
+___gtdf2:
+.global ___ledf2;
+.type ___ledf2, STT_FUNC;
+___ledf2:
+.global ___ltdf2;
+.type ___ltdf2, STT_FUNC;
+___ltdf2:
+.global ___nedf2;
+.type ___nedf2, STT_FUNC;
+___nedf2:
 .global ___cmpdf2;
 .type ___cmpdf2, STT_FUNC;
 ___cmpdf2:
@@ -125,4 +143,9 @@ ___cmpdf2:
 	R0 = R1;
 	RTS;
 	.size ___cmpdf2, .-___cmpdf2;
-
+	.size ___eqdf2, .-___eqdf2;
+	.size ___gedf2, .-___gedf2;
+	.size ___gtdf2, .-___gtdf2;
+	.size ___ledf2, .-___ledf2;
+	.size ___ltdf2, .-___ltdf2;
+	.size ___nedf2, .-___nedf2;

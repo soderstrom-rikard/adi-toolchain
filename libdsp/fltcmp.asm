@@ -21,6 +21,24 @@
 
 .text;
 .align 2;
+.global ___eqsf2;
+.type ___eqsf2, STT_FUNC;
+___eqsf2:
+.global ___gesf2;
+.type ___gesf2, STT_FUNC;
+___gesf2:
+.global ___gtsf2;
+.type ___gtsf2, STT_FUNC;
+___gtsf2:
+.global ___lesf2;
+.type ___lesf2, STT_FUNC;
+___lesf2:
+.global ___ltsf2;
+.type ___ltsf2, STT_FUNC;
+___ltsf2:
+.global ___nesf2;
+.type ___nesf2, STT_FUNC;
+___nesf2:
 .type ___cmpsf2, STT_FUNC;
 .global ___cmpsf2;
 ___cmpsf2:
@@ -80,4 +98,9 @@ res:
 nan:
 	RTS;
 	.size ___cmpsf2, .-___cmpsf2;
-
+	.size ___eqsf2, .-___eqsf2;
+	.size ___gesf2, .-___gesf2;
+	.size ___gtsf2, .-___gtsf2;
+	.size ___lesf2, .-___lesf2;
+	.size ___ltsf2, .-___ltsf2;
+	.size ___nesf2, .-___nesf2;

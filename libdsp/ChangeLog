@@ -1,0 +1,19 @@
+2006-05-26  Jie Zhang  <jie.zhang@analog.com>
+
+	* eqdf2.asm: Remove.
+	* gedf2.asm: Remove.
+	* gtdf2.asm: Remove.
+	* ledf2.asm: Remove.
+	* nedf2.asm: Remove.
+	* eqsf2.asm: Remove.
+	* gesf2.asm: Remove.
+	* gtsf2.asm: Remove.
+	* lesf2.asm: Remove.
+	* nesf2.asm: Remove.
+	* ltdf.asm: Remove.
+	* ltsf.asm: Remove.
+	* Makefile: Not compile all above removed files.
+	* cmpfl64.asm: Define __eqdf2, __gedf2, __gtdf2, __ledf2, __ltdf2
+	and __nedf2 same as __cmpdf2.
+	* fltcmp.asm: Define __eqsf2, __gesf2, __gtsf2, __lesf2, __ltsf2
+	and __nesf2 same as __cmpsf2.
