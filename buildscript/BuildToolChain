@@ -544,6 +544,7 @@ build_gcc ()
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
+    # some basic sanity checks
     for RUN in bfin-$2-addr2line bfin-$2-c++filt bfin-$2-gdbtui          \
                bfin-$2-objdump bfin-$2-size bfin-$2-ar bfin-$2-cpp      \
                bfin-$2-gccbug bfin-$2-ld bfin-$2-ranlib bfin-$2-strings \
@@ -560,6 +561,12 @@ build_gcc ()
     VERSION=`$3/bin/bfin-$2-gcc -v 2>&1 | grep gcc.vers | sed -e 's,gcc.version.,,'`
     ln $3/bin/bfin-$2-g++ $3/bin/bfin-$2-g++-$VERSION
     ln $3/bin/bfin-$2-c++ $3/bin/bfin-$2-c++-$VERSION
+
+    echo "*** Testing 'bfin-$2-gcc -v'"
+    if ! $3/bin/bfin-$2-gcc -v ; then
+        echo "The toolchain did not install properly - report an error"
+        exit
+    fi
 }
 
 run_tests ()
@@ -1185,14 +1192,6 @@ for GCC_VERSION in $GCC_VERSIONS; do
     rm -rf $DIR_GCC_BUILD/*
 done
 rm -rf $DIR_ELF2FLT_BUILD
-
-echo "*** Testing 'bfin-elf-gcc -v'"
-$DIR_ELF_OUTPUT/bin/bfin-elf-gcc -v
-
-if [ $KERNEL_SOURCE ] ; then
-    echo "*** Testing 'bfin-uclinux-gcc -v'"
-    $DIR_uC_OUTPUT/bin/bfin-uclinux-gcc -v
-fi
 
 ########################### Target binutils ########################
 
