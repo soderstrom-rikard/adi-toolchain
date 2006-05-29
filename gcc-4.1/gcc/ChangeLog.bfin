@@ -1,3 +1,8 @@
+2006-05-29  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/uclinux.h (LINUX_TARGET_OS_CPP_BUILTINS,
+	TARGET_OS_CPP_BUILTINS): New macros.
+
 2006-05-23  Jie Zhang  <jie.zhang@analog.com>
 
 	* config.gcc (bfin*-uclinux*): Add bfin/t-slibgcc-elf to tmake_file.
