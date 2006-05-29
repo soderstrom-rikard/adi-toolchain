@@ -1,3 +1,8 @@
+2006-05-29  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/uclinux.h (LINUX_TARGET_OS_CPP_BUILTINS,
+	TARGET_OS_CPP_BUILTINS): New macros.
+
 2006-05-25  Jie Zhang  <jie.zhang@analog.com>
 
 	* config.gcc (bfin*-uclinux*): Add bfin/t-slibgcc-elf to tmake_file.
@@ -44,7 +49,6 @@
 	* config/bfin/bfin.c (legitimize_pic_address): Comment out
 	the code for -fPIC.
 
->>>>>>> 1.199
 2006-05-11  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.c (bfin_expand_call): Deal with long call
