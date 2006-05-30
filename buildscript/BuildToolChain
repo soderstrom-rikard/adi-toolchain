@@ -734,7 +734,7 @@ if [ -e $DIR_SOURCE/libdsp/Makefile ] ; then
         exit
     fi
 
-    echo -n "*** Installing libdsp                " ; date
+    echo -n "*** Installing libdsp              " ; date
     RUN="cp $DIR_SOURCE/libdsp/libbffastfp.a $DIR_ELF_OUTPUT/bfin-elf/lib/libbffastfp.a"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
