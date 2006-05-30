@@ -1062,7 +1062,7 @@ if [ $KERNEL_SOURCE ] ; then
             exit
         fi
 
-        echo -n "*** Installing libdsp               " ; date
+        echo -n "*** Installing libdsp              " ; date
         RUN="cp $DIR_SOURCE/libdsp/libbffastfp.a $DIR_uC_OUTPUT/bfin-uclinux/lib/libbffastfp.a"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh
@@ -1249,4 +1249,4 @@ rm -rf $DIR_BINUTILS_BUILD
 
 fi
 
-echo -n "*** Done                       " ; date
+echo -n "*** Done                           " ; date
