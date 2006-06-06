@@ -1668,6 +1668,9 @@ size_binop (enum tree_code code, tree arg0, tree arg1)
 {
   tree type = TREE_TYPE (arg0);
 
+  if (arg0 == error_mark_node || arg1 == error_mark_node)
+    return error_mark_node;
+
   gcc_assert (TREE_CODE (type) == INTEGER_TYPE && TYPE_IS_SIZETYPE (type)
 	      && type == TREE_TYPE (arg1));
 
@@ -1686,9 +1689,6 @@ size_binop (enum tree_code code, tree arg0, tree arg1)
       /* Handle general case of two integer constants.  */
       return int_const_binop (code, arg0, arg1, 0);
     }
-
-  if (arg0 == error_mark_node || arg1 == error_mark_node)
-    return error_mark_node;
 
   return fold_build2 (code, type, arg0, arg1);
 }
@@ -4935,10 +4935,10 @@ fold_truthop (enum tree_code code, tree truth_type, tree lhs, tree rhs)
       l_const = fold_convert (lntype, l_const);
       l_const = unextend (l_const, ll_bitsize, ll_unsignedp, ll_and_mask);
       l_const = const_binop (LSHIFT_EXPR, l_const, size_int (xll_bitpos), 0);
-      if (! integer_zerop (const_binop (BIT_AND_EXPR, l_const,
-					fold_build1 (BIT_NOT_EXPR,
-						     lntype, ll_mask),
-					0)))
+      if (integer_nonzerop (const_binop (BIT_AND_EXPR, l_const,
+					 fold_build1 (BIT_NOT_EXPR,
+						      lntype, ll_mask),
+					 0)))
 	{
 	  warning (0, "comparison is always %d", wanted_code == NE_EXPR);
 
@@ -4950,10 +4950,10 @@ fold_truthop (enum tree_code code, tree truth_type, tree lhs, tree rhs)
       r_const = fold_convert (lntype, r_const);
       r_const = unextend (r_const, rl_bitsize, rl_unsignedp, rl_and_mask);
       r_const = const_binop (LSHIFT_EXPR, r_const, size_int (xrl_bitpos), 0);
-      if (! integer_zerop (const_binop (BIT_AND_EXPR, r_const,
-					fold_build1 (BIT_NOT_EXPR,
-						     lntype, rl_mask),
-					0)))
+      if (integer_nonzerop (const_binop (BIT_AND_EXPR, r_const,
+					 fold_build1 (BIT_NOT_EXPR,
+						      lntype, rl_mask),
+					 0)))
 	{
 	  warning (0, "comparison is always %d", wanted_code == NE_EXPR);
 
@@ -8897,8 +8897,9 @@ fold_binary (enum tree_code code, tree type, tree op0, tree op1)
 
       /* If this is a comparison of two exprs that look like an
 	 ARRAY_REF of the same object, then we can fold this to a
-	 comparison of the two offsets.  */
-      if (TREE_CODE_CLASS (code) == tcc_comparison)
+	 comparison of the two offsets.  This is only safe for
+	 EQ_EXPR and NE_EXPR because of overflow issues.  */
+      if (code == EQ_EXPR || code == NE_EXPR)
 	{
 	  tree base0, offset0, base1, offset1;
 
@@ -10110,7 +10111,9 @@ fold_ternary (enum tree_code code, tree type, tree op0, tree op1, tree op2)
       if (integer_zerop (op2)
 	  && truth_value_p (TREE_CODE (arg0))
 	  && truth_value_p (TREE_CODE (arg1)))
-	return fold_build2 (TRUTH_ANDIF_EXPR, type, arg0, arg1);
+	return fold_build2 (TRUTH_ANDIF_EXPR, type,
+			    fold_convert (type, arg0),
+			    arg1);
 
       /* Convert A ? B : 1 into !A || B if A and B are truth values.  */
       if (integer_onep (op2)
@@ -10120,7 +10123,9 @@ fold_ternary (enum tree_code code, tree type, tree op0, tree op1, tree op2)
 	  /* Only perform transformation if ARG0 is easily inverted.  */
 	  tem = invert_truthvalue (arg0);
 	  if (TREE_CODE (tem) != TRUTH_NOT_EXPR)
-	    return fold_build2 (TRUTH_ORIF_EXPR, type, tem, arg1);
+	    return fold_build2 (TRUTH_ORIF_EXPR, type,
+				fold_convert (type, tem),
+				arg1);
 	}
 
       /* Convert A ? 0 : B into !A && B if A and B are truth values.  */
@@ -10131,14 +10136,18 @@ fold_ternary (enum tree_code code, tree type, tree op0, tree op1, tree op2)
 	  /* Only perform transformation if ARG0 is easily inverted.  */
 	  tem = invert_truthvalue (arg0);
 	  if (TREE_CODE (tem) != TRUTH_NOT_EXPR)
-	    return fold_build2 (TRUTH_ANDIF_EXPR, type, tem, op2);
+	    return fold_build2 (TRUTH_ANDIF_EXPR, type,
+				fold_convert (type, tem),
+				op2);
 	}
 
       /* Convert A ? 1 : B into A || B if A and B are truth values.  */
       if (integer_onep (arg1)
 	  && truth_value_p (TREE_CODE (arg0))
 	  && truth_value_p (TREE_CODE (op2)))
-	return fold_build2 (TRUTH_ORIF_EXPR, type, arg0, op2);
+	return fold_build2 (TRUTH_ORIF_EXPR, type,
+			    fold_convert (type, arg0),
+			    op2);
 
       return NULL_TREE;
 
@@ -10785,6 +10794,9 @@ multiple_of_p (tree type, tree top, tree bottom)
 int
 tree_expr_nonnegative_p (tree t)
 {
+  if (t == error_mark_node)
+    return 0;
+
   if (TYPE_UNSIGNED (TREE_TYPE (t)))
     return 1;
 
