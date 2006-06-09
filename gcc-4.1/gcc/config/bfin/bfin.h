@@ -30,14 +30,16 @@
 /* Print subsidiary information on the compiler version in use.  */
 #define TARGET_VERSION fprintf (stderr, " (BlackFin bfin)")
 
-#define LIBGCC_SPEC "%{mfast-fp:-lbffastfp} -lgcc"
-
 #define DRIVER_SELF_SPECS SUBTARGET_DRIVER_SELF_SPECS	"\
  %{mfdpic:%{!fpic:%{!fpie:%{!fPIC:%{!fPIE:\
    	    %{!fno-pic:%{!fno-pie:%{!fno-PIC:%{!fno-PIE:-fpie}}}}}}}} \
 	  %{!mno-inline-plt:%{O*:%{!O0:%{!Os:%{fpic|fPIC:-minline-plt} \
                     %{!fpic:%{!fPIC:%{!O:%{!O1:%{!O2:-minline-plt}}}}}}}}}} \
 "
+
+#define LINK_GCC_C_SEQUENCE_SPEC \
+  "%{mfast-fp:-lbffastfp} %{mfdpic:%{!static: %L} %{static: %G %L %G}} \
+  %{!mfdpic:%G %L %G}"
 
 #ifndef SUBTARGET_DRIVER_SELF_SPECS
 # define SUBTARGET_DRIVER_SELF_SPECS
