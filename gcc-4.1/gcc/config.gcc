@@ -758,7 +758,7 @@ bfin*-elf*)
         ;;
 bfin*-uclinux*)
 	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h bfin/uclinux.h"
-        tmake_file="bfin/t-slibgcc-elf bfin/t-bfin-elf"
+        tmake_file=bfin/t-bfin-elf
         use_collect2=no
         ;;
 bfin*-*)

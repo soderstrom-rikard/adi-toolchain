@@ -37,7 +37,6 @@
    	    %{!fno-pic:%{!fno-pie:%{!fno-PIC:%{!fno-PIE:-fpie}}}}}}}} \
 	  %{!mno-inline-plt:%{O*:%{!O0:%{!Os:%{fpic|fPIC:-minline-plt} \
                     %{!fpic:%{!fPIC:%{!O:%{!O1:%{!O2:-minline-plt}}}}}}}}}} \
- %{!mfdpic:-static-libgcc} \
 "
 
 #ifndef SUBTARGET_DRIVER_SELF_SPECS
