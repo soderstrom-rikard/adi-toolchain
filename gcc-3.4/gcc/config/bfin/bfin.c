@@ -151,7 +151,6 @@ legitimize_pic_address (rtx orig, rtx reg, rtx picreg)
 	  reg = gen_reg_rtx (Pmode);
 	}
 
-#if 0
       if (flag_pic == 2)
 	{
 	  emit_insn (gen_movsi_high_pic (reg, addr));
@@ -160,7 +159,6 @@ legitimize_pic_address (rtx orig, rtx reg, rtx picreg)
 	  new = gen_rtx_MEM (Pmode, reg);
 	}
       else
-#endif
 	{
 	  rtx tmp = gen_rtx_UNSPEC (Pmode, gen_rtvec (1, addr),
 				    unspec);
@@ -2196,10 +2194,10 @@ override_options (void)
   if (TARGET_FDPIC)
     targetm.asm_out.unaligned_op.si = 0;
 
-  /* Error if flag_pic but not doing FDPIC or ID shared libraries,
+  /* Silently turn off flag_pic if not doing FDPIC or ID shared libraries,
      since we don't support it and it'll just break.  */
   if (flag_pic && !TARGET_FDPIC && !TARGET_ID_SHARED_LIBRARY)
-    error ("-fpic specified without -mshared-library-id or -mid-shared-library");
+    flag_pic = 0;
 
   flag_schedule_insns = 0;
 }
