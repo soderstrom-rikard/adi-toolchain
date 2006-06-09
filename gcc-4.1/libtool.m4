@@ -788,12 +788,6 @@ sysv4 | sysv4.2uw2* | sysv4.3* | sysv5*)
     ;;
   esac
   ;;
-uclinux*)
-  case $host_cpu in
-  bfin* )
-    lt_cv_deplibs_check_method=pass_all ;;
-  esac
-  ;;
 esac
 ])
 file_magic_cmd=$lt_cv_file_magic_cmd

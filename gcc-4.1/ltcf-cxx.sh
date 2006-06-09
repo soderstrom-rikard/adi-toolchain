@@ -701,9 +701,6 @@ case $host_os in
   tpf*)
     ld_shlibs=yes
     ;;
-  uclinux*)
-    # Assume g++ or compatible
-    ;;
   unixware*)
     # FIXME: insert proper C++ library support
     ld_shlibs=no
