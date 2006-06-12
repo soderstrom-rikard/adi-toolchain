@@ -2040,12 +2040,16 @@ override_options (void)
   if (TARGET_ID_SHARED_LIBRARY && TARGET_FDPIC)
       error ("ID shared libraries and FD-PIC mode can't be used together.");
 
-
   /* There is no single unaligned SI op for PIC code.  Sometimes we
      need to use ".4byte" and sometimes we need to use ".picptr".
      See frv_assemble_integer for details.  */
   if (TARGET_FDPIC)
     targetm.asm_out.unaligned_op.si = 0;
+
+  /* Silently turn off flag_pic if not doing FDPIC or ID shared libraries,
+     since we don't support it and it'll just break.  */
+  if (flag_pic && !TARGET_FDPIC && !TARGET_ID_SHARED_LIBRARY)
+    flag_pic = 0;
 
   flag_schedule_insns = 0;
 
