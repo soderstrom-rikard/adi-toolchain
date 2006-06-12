@@ -40,7 +40,7 @@ TIMESTAMP=`date +%Y%m%d`       # is YYYY_MMM_DD
 
 GCC_VERSIONS=
 
-while getopts dipwvtT:s:b:k:o:m:c:u:h parameter
+while getopts dipwvtST:C:s:b:k:o:m:c:u:h parameter
 do
     case $parameter in
         p)
@@ -85,6 +85,9 @@ do
                 exit
             fi
             ;;
+	S)
+	    SKIP_ELF=true
+	    ;;
         T)
             RUN=`runtest --help 2>/dev/null | wc -l`
             if [ "$RUN" -gt 1 ] ; then
@@ -190,11 +193,16 @@ do
         i)
             BUILD_TARGET_BINUTILS=1
             ;;
+	C)
+	    UCLIBC_CONFIG_FILE=$OPTARG
+	    ;;
         o)
             DIR_ELF_OUTPUT=$OPTARG-elf
             DIR_uC_OUTPUT=$OPTARG-uclinux
             ;;
         h)
+# We don't document the -S option - it's for advanced users who know what
+# they are doing.  For maximum reproducibility, not using it is better.
              echo "Usage : $APP_NAME -s SOURCE [-b BUILD]
 -p               Check prerequisites
 -d               Date Stamp all output files
@@ -208,6 +216,7 @@ do
 -m MAKE          Default make (leave blank to use system make)
 -c GCC_VERSION   GCC version (default 3.4).  Can be given multiple times.
 -i               Build binutils libraries for use on the target.
+-C FILE          Use FILE as uClibc config file, rather than the default.
 -v               Verbose
 -h               Help"
              exit
@@ -329,9 +338,10 @@ if [ ! -d $DIR_ELF_OUTPUT ] ; then
         echo "Invalid output directory"
         exit
     fi
-else
+else if [ "x$SKIP_ELF" = "x" ]; then
     echo "$DIR_ELF_OUTPUT already exists - cleaning"
     rm -rf $DIR_ELF_OUTPUT/*
+fi
 fi
 
 if [ $KERNEL_SOURCE ] ; then
@@ -650,70 +660,186 @@ if [ "x$CHECK_ON_SIMULATOR" != "x" -o "x$CHECK_ON_HARDWARE" != "x" ] ; then
     export DEJAGNU=$DIR_BUILD/boards/site.exp
 fi
 
-################ Step 1 - ELF Toolchain #########################
+if [ "x$SKIP_ELF" = "x" ]; then
 
-cd $DIR_BINUTILS_BUILD
+    ################ Step 1 - ELF Toolchain #########################
+    cd $DIR_BINUTILS_BUILD
 
-echo -n "*** Configuring Elf Binutils & GDB " ; date
-RUN="$DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-elf \
-    --prefix=$DIR_ELF_OUTPUT --without-newlib"
-(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-(echo $RUN $LOGFILE ; ) | sh
+    echo -n "*** Configuring Elf Binutils & GDB " ; date
+    RUN="$DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-elf \
+        --prefix=$DIR_ELF_OUTPUT --without-newlib"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
 
-echo -n "*** Building Elf Binutils & GDB    " ; date
-RUN="$MAKE all-binutils all-gas all-ld all-sim all-gdb"
-(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-(echo $RUN $LOGFILE ; ) | sh
+    echo -n "*** Building Elf Binutils & GDB    " ; date
+    RUN="$MAKE all-binutils all-gas all-ld all-sim all-gdb"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
 
-for RUN in addr2line ar cxxfilt libtool nm-new objcopy objdump ranlib \
-           readelf size strings strip-new
-do
-    if [ ! -f $DIR_BINUTILS_BUILD/binutils/$RUN ] ; then
-        echo "BinUtils did not build properly : Missing $RUN"
-        echo "Please report an error to http://blackfin.uclinux.org"
-        tail -10 $ACTUAL_LOGFILE
-        exit
+    for RUN in addr2line ar cxxfilt libtool nm-new objcopy objdump ranlib \
+               readelf size strings strip-new
+    do
+        if [ ! -f $DIR_BINUTILS_BUILD/binutils/$RUN ] ; then
+            echo "BinUtils did not build properly : Missing $RUN"
+            echo "Please report an error to http://blackfin.uclinux.org"
+            tail -10 $ACTUAL_LOGFILE
+            exit
+        fi
+    done
+
+    for RUN in as-new libtool
+    do
+        if [ ! -f $DIR_BINUTILS_BUILD/gas/$RUN ] ; then
+            echo "Gas did not build properly : Missing $RUN"
+            echo "Please report an error to http://blackfin.uclinux.org"
+            tail -10 $ACTUAL_LOGFILE
+            exit
+        fi
+    done
+
+    for RUN in ld-new
+    do
+        if [ ! -f $DIR_BINUTILS_BUILD/ld/$RUN ] ; then
+            echo "Ld did not build properly : Missing $RUN"
+            echo "Please report an error to http://blackfin.uclinux.org"
+            tail -10 $ACTUAL_LOGFILE
+            exit
+      fi
+    done
+
+    for RUN in gdb gdbtui
+    do
+        if [ ! -f $DIR_BINUTILS_BUILD/gdb/$RUN ] ; then
+            echo "gdb did not build properly : Missing $RUN"
+            echo "Please report an error to http://blackfin.uclinux.org"
+            tail -10 $ACTUAL_LOGFILE
+            exit
+        fi
+    done
+
+    cd $DIR_BINUTILS_BUILD
+    echo -n "*** Installing Elf Binutils & GDB  " ; date
+    RUN="$MAKE install-binutils install-gas install-ld install-sim install-gdb"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    for GCC_VERSION in $GCC_VERSIONS; do
+      build_gcc $GCC_VERSION elf $DIR_ELF_OUTPUT "--with-newlib"
+    done
+
+    ######################## Step 2 - build elf2flt ##############
+
+    echo -n "*** Building Elf elf2flt           " ; date
+    cd $DIR_ELF2FLT_BUILD
+
+    echo -n "*** Cleaning Elf elf2flt           " ; date
+    RUN="$MAKE distclean "
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    RUN="$DIR_ELF2FLT_SOURCE/configure $HOST_TARGET --target=bfin-elf \
+         --with-libbfd=$DIR_BINUTILS_BUILD/bfd/libbfd.a               \
+         --with-libiberty=$DIR_ELF_OUTPUT/lib/libiberty.a             \
+         --with-bfd-include-dir=$DIR_BINUTILS_BUILD/bfd               \
+         --with-binutils-include-dir=$DIR_BINUTILS_SOURCE/include     \
+         --prefix=$DIR_ELF_OUTPUT --program-suffix= "
+
+    if [ -e $DIR_BINUTILS_BUILD/intl/libintl.a ] ; then
+        RUN="$RUN --with-libintl=$DIR_BINUTILS_BUILD/intl/libintl.a"
     fi
-done
 
-for RUN in as-new libtool
-do
-    if [ ! -f $DIR_BINUTILS_BUILD/gas/$RUN ] ; then
-        echo "Gas did not build properly : Missing $RUN"
-        echo "Please report an error to http://blackfin.uclinux.org"
-        tail -10 $ACTUAL_LOGFILE
-        exit
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    echo -n "*** Make Elf elf2flt               " ; date
+    RUN=$MAKE
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    for RUN in elf2flt  flthdr
+    do
+        if [ ! -f $DIR_ELF2FLT_BUILD/$RUN ] ; then
+            echo "Elf2flt did not build properly : Missing $RUN"
+            echo "Please report an error to http://blackfin.uclinux.org"
+            tail -10 $ACTUAL_LOGFILE
+            exit
+        fi
+    done
+
+    echo -n "*** Installing Elf elf2flt         " ; date
+    RUN="$MAKE install"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    for RUN in bfin-elf-elf2flt bfin-elf-flthdr
+    do
+        if [ ! -f $DIR_ELF_OUTPUT/bin/$RUN ] ; then
+            echo "Elf2flt did not install properly : Missing $RUN"
+            echo "Please report an error to http://blackfin.uclinux.org"
+            tail -10 $ACTUAL_LOGFILE
+            exit
+       fi
+    done
+
+    ########################### genext2fs ########################
+
+    echo -n "*** Building Elf genext2fs         " ; date
+    cd $DIR_GENEXT2FS_BUILD
+
+    echo -n "*** Cleaning Elf genext2fs         " ; date
+    RUN="$MAKE distclean "
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    RUN="$DIR_GENEXT2FS_SOURCE/configure --prefix=$DIR_ELF_OUTPUT"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    echo -n "*** Make Elf genext2fs             " ; date
+    RUN=$MAKE
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    for RUN in genext2fs
+    do
+        if [ ! -f $DIR_GENEXT2FS_BUILD/$RUN ] ; then
+            echo "genext2fs did not build properly : Missing $RUN"
+            echo "Please report an error to http://blackfin.uclinux.org"
+            tail -10 $ACTUAL_LOGFILE
+            exit
+        fi
+    done
+
+    echo -n "*** Installing Elf genext2fs       " ; date
+    RUN="$MAKE install"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+    mv $DIR_ELF_OUTPUT/bin/genext2fs $DIR_ELF_OUTPUT/bin/bfin-elf-genext2fs
+
+    for RUN in bfin-elf-genext2fs
+    do
+        if [ ! -f $DIR_ELF_OUTPUT/bin/$RUN ] ; then
+            echo "Elf2flt did not install properly : Missing $RUN"
+            echo "Please report an error to http://blackfin.uclinux.org"
+            tail -10 $ACTUAL_LOGFILE
+            exit
+       fi
+    done
+
+    ########################### Step 2 - done ####################
+
+    if [ $CHECK_ON_SIMULATOR ] ; then
+	echo "*** Testing on simulator            "
+	run_tests $DIR_TEST_SIM_RESULTS
     fi
-done
+fi
 
-for RUN in ld-new
-do
-    if [ ! -f $DIR_BINUTILS_BUILD/ld/$RUN ] ; then
-        echo "Ld did not build properly : Missing $RUN"
-        echo "Please report an error to http://blackfin.uclinux.org"
-        tail -10 $ACTUAL_LOGFILE
-        exit
-    fi
-done
-
-for RUN in gdb gdbtui
-do
-    if [ ! -f $DIR_BINUTILS_BUILD/gdb/$RUN ] ; then
-        echo "gdb did not build properly : Missing $RUN"
-        echo "Please report an error to http://blackfin.uclinux.org"
-        tail -10 $ACTUAL_LOGFILE
-        exit
-    fi
-done
-
-cd $DIR_BINUTILS_BUILD
-echo -n "*** Installing Elf Binutils & GDB  " ; date
-RUN="$MAKE install-binutils install-gas install-ld install-sim install-gdb"
-(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-(echo $RUN $LOGFILE ; ) | sh
-
+rm -rf $DIR_GENEXT2FS_BUILD/*
+rm -rf $DIR_ELF2FLT_BUILD/*
+rm -rf $DIR_BINUTILS_BUILD/*
 for GCC_VERSION in $GCC_VERSIONS; do
-  build_gcc $GCC_VERSION elf $DIR_ELF_OUTPUT "--with-newlib"
+    DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
+    rm -rf $DIR_GCC_BUILD/*
 done
 
 if [ -e $DIR_SOURCE/libdsp/Makefile ] ; then
@@ -745,12 +871,6 @@ if [ -e $DIR_SOURCE/libdsp/Makefile ] ; then
     (echo $RUN $LOGFILE ; ) | sh
 fi
 
-if [ $CHECK_ON_SIMULATOR ] ; then
-    echo "*** Testing on simulator            "
-
-    run_tests $DIR_TEST_SIM_RESULTS
-fi
-
 # We cannot remove newlib symlink until the bfin-elf tests finishs.
 for GCC_VERSION in $GCC_VERSIONS; do
   DIR_GCC_SOURCE=$DIR_SOURCE/gcc-$GCC_VERSION
@@ -761,113 +881,6 @@ done
 
 ####################### Done Step 1  #########################
 
-######################## Step 2 - build elf2flt ##############
-
-echo -n "*** Building Elf elf2flt           " ; date
-cd $DIR_ELF2FLT_BUILD
-
-echo -n "*** Cleaning Elf elf2flt           " ; date
-RUN="$MAKE distclean "
-(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-(echo $RUN $LOGFILE ; ) | sh
-
-RUN="$DIR_ELF2FLT_SOURCE/configure $HOST_TARGET --target=bfin-elf \
-     --with-libbfd=$DIR_BINUTILS_BUILD/bfd/libbfd.a               \
-     --with-libiberty=$DIR_ELF_OUTPUT/lib/libiberty.a             \
-     --with-bfd-include-dir=$DIR_BINUTILS_BUILD/bfd               \
-     --with-binutils-include-dir=$DIR_BINUTILS_SOURCE/include     \
-     --prefix=$DIR_ELF_OUTPUT --program-suffix= "
-
-if [ -e $DIR_BINUTILS_BUILD/intl/libintl.a ] ; then
-    RUN="$RUN --with-libintl=$DIR_BINUTILS_BUILD/intl/libintl.a"
-fi
-
-(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-(echo $RUN $LOGFILE ; ) | sh
-
-echo -n "*** Make Elf elf2flt               " ; date
-RUN=$MAKE
-(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-(echo $RUN $LOGFILE ; ) | sh
-
-for RUN in elf2flt  flthdr
-do
-    if [ ! -f $DIR_ELF2FLT_BUILD/$RUN ] ; then
-        echo "Elf2flt did not build properly : Missing $RUN"
-        echo "Please report an error to http://blackfin.uclinux.org"
-        tail -10 $ACTUAL_LOGFILE
-        exit
-    fi
-done
-
-echo -n "*** Installing Elf elf2flt         " ; date
-RUN="$MAKE install"
-(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-(echo $RUN $LOGFILE ; ) | sh
-
-for RUN in bfin-elf-elf2flt bfin-elf-flthdr
-do
-    if [ ! -f $DIR_ELF_OUTPUT/bin/$RUN ] ; then
-        echo "Elf2flt did not install properly : Missing $RUN"
-        echo "Please report an error to http://blackfin.uclinux.org"
-        tail -10 $ACTUAL_LOGFILE
-        exit
-   fi
-done
-########################### genext2fs ########################
-
-echo -n "*** Building Elf genext2fs         " ; date
-cd $DIR_GENEXT2FS_BUILD
-
-echo -n "*** Cleaning Elf genext2fs         " ; date
-RUN="$MAKE distclean "
-(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-(echo $RUN $LOGFILE ; ) | sh
-
-RUN="$DIR_GENEXT2FS_SOURCE/configure --prefix=$DIR_ELF_OUTPUT"
-(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-(echo $RUN $LOGFILE ; ) | sh
-
-echo -n "*** Make Elf genext2fs             " ; date
-RUN=$MAKE
-(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-(echo $RUN $LOGFILE ; ) | sh
-
-for RUN in genext2fs
-do
-    if [ ! -f $DIR_GENEXT2FS_BUILD/$RUN ] ; then
-        echo "genext2fs did not build properly : Missing $RUN"
-        echo "Please report an error to http://blackfin.uclinux.org"
-        tail -10 $ACTUAL_LOGFILE
-        exit
-    fi
-done
-
-echo -n "*** Installing Elf genext2fs       " ; date
-RUN="$MAKE install"
-(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-(echo $RUN $LOGFILE ; ) | sh
-mv $DIR_ELF_OUTPUT/bin/genext2fs $DIR_ELF_OUTPUT/bin/bfin-elf-genext2fs
-
-for RUN in bfin-elf-genext2fs
-do
-    if [ ! -f $DIR_ELF_OUTPUT/bin/$RUN ] ; then
-        echo "Elf2flt did not install properly : Missing $RUN"
-        echo "Please report an error to http://blackfin.uclinux.org"
-        tail -10 $ACTUAL_LOGFILE
-        exit
-   fi
-done
-
-rm -rf $DIR_GENEXT2FS_BUILD/*
-rm -rf $DIR_ELF2FLT_BUILD/*
-rm -rf $DIR_BINUTILS_BUILD/*
-for GCC_VERSION in $GCC_VERSIONS; do
-    DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
-    rm -rf $DIR_GCC_BUILD/*
-done
-
-########################### Step 2 - done ####################
 
 if [ $KERNEL_SOURCE ] ; then
     echo -n "*** Configuring uClinux            " ; date
@@ -888,11 +901,23 @@ if [ $KERNEL_SOURCE ] ; then
     echo -n "*** Configuring uClibc             " ; date
     cd $UCLIBC_SOURCE
 
-    cp extra/Configs/Config.bfin.default .config
+    if [ "x$UCLIBC_CONFIG_FILE" = "x" ]; then
+      cp extra/Configs/Config.bfin.default .config
+    else
+      cp $UCLIBC_CONFIG_FILE .tmp.config.provided
+      rm -f .config
+      echo 'TARGET_bfin=y' >>.config
+      cat .tmp.config.provided | grep -v '^\(TARGET\|HAVE_NO_SHARED\|HAVE_NO_PIC\|DOPIC\|HAVE_SHARED\|TARGET_SUBARCH\|BUILD_UCLIBC_LDSO\|SUPPORT_LD_DEBUG\|FORCE_SHAREABLE_TEXT_SEGMENTS\|RUNTIME_\|DEVEL_\|MULTILIB\)' >>.config
+      echo 'RUNTIME_PREFIX="/runtime"' >>.config
+      echo 'DEVEL_PREFIX="/"' >>.config
+      echo 'MULTILIB=""' >>.config
+    fi
 
     RUN="$MAKE oldconfig ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
+
+    cp .config .config-used-for-bfin
 
     echo -n "*** Cleaning uClibc                " ; date
     RUN="$MAKE clean ROOTDIR=$UCLINUX_ROOT"
@@ -930,11 +955,22 @@ if [ $KERNEL_SOURCE ] ; then
     ####################### Step 3a - build FD-PIC uClibc ################
     echo -n "*** Configuring uClibc for FD-PIC  " ; date
 
-    cp extra/Configs/Config.bfinfdpic.default .config
+    if [ "x$UCLIBC_CONFIG_FILE" = "x" ]; then
+      cp extra/Configs/Config.bfinfdpic.default .config
+    else
+      echo 'TARGET_bfinfdpic=y' >>.config
+      cat .tmp.config.provided | grep -v '^\(TARGET\|HAVE_NO_SHARED\|HAVE_NO_PIC\|DOPIC\|HAVE_SHARED\|TARGET_SUBARCH\|BUILD_UCLIBC_LDSO\|SUPPORT_LD_DEBUG\|FORCE_SHAREABLE_TEXT_SEGMENTS\|RUNTIME_\|DEVEL_\|MULTILIB\)' >>.config
+      echo 'RUNTIME_PREFIX="/runtime"' >>.config
+      echo 'DEVEL_PREFIX="/"' >>.config
+      echo 'MULTILIB="mfdpic"' >>.config
+      rm -f .tmp.config.provided
+    fi
 
     RUN="$MAKE oldconfig ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
+
+    cp .config .config-used-for-bfinfdpic
 
     echo -n "*** Cleaning uClibc                " ; date
     RUN="$MAKE clean ROOTDIR=$UCLINUX_ROOT"
