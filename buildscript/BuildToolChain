@@ -1119,9 +1119,9 @@ if [ $KERNEL_SOURCE ] ; then
     RUN="$MAKE install"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
-    mv $DIR_uC_OUTPUT/bin/genext2fs $DIR_uC_OUTPUT/bin/bfin-uclinux-genext2fs
+    mv $DIR_uC_OUTPUT/bin/genext2fs $DIR_uC_OUTPUT/bin/bfin-elf-genext2fs
 
-    for RUN in bfin-uclinux-genext2fs
+    for RUN in bfin-elf-genext2fs
     do
         if [ ! -f $DIR_ELF_OUTPUT/bin/$RUN ] ; then
             echo "genext2fs did not install properly : Missing $RUN"
