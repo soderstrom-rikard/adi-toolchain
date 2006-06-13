@@ -530,7 +530,8 @@ build_gcc ()
     echo -n "*** Configuring GCC                " ; date
     RUN="$DIR_GCC_SOURCE/configure $HOST_TARGET --target=bfin-$2 \
       --prefix=$3 $4 --disable-libstdcxx-pch \
-      --disable-symvers --disable-libssp  --enable-version-specific-runtime-libs"
+      --disable-symvers --disable-libssp --enable-version-specific-runtime-libs"
+
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
@@ -1011,8 +1012,9 @@ if [ $KERNEL_SOURCE ] ; then
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
-    # Move system include dirs to a place where GCC can find them.
-    mv $DIR_uC_OUTPUT/bfin-uclinux/include $DIR_uC_OUTPUT/bfin-uclinux/sys-include
+    # Move system include dirs into the sysroot.
+    mkdir $DIR_uC_OUTPUT/bfin-uclinux/runtime/usr
+    mv $DIR_uC_OUTPUT/bfin-uclinux/include $DIR_uC_OUTPUT/bfin-uclinux/runtime/usr/
 
     mv saved-config-toplevel .config 2>/dev/null
     mv saved-config-linux linux-2.6.x/.config 2>/dev/null
@@ -1027,7 +1029,8 @@ if [ $KERNEL_SOURCE ] ; then
 
     echo -n "*** Configuring uClinux Binutils & GDB" ; date
     RUN="$DIR_BINUTILS_SOURCE/configure $HOST_TARGET \
-         --target=bfin-uclinux --prefix=$DIR_uC_OUTPUT"
+         --target=bfin-uclinux --prefix=$DIR_uC_OUTPUT \
+         --with-sysroot=$DIR_uC_OUTPUT/bfin-uclinux/runtime"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
@@ -1042,7 +1045,9 @@ if [ $KERNEL_SOURCE ] ; then
     (echo $RUN $LOGFILE ; ) | sh
 
     for GCC_VERSION in $GCC_VERSIONS; do
-      build_gcc $GCC_VERSION uclinux $DIR_uC_OUTPUT "--enable-threads=posix"
+      build_gcc $GCC_VERSION uclinux $DIR_uC_OUTPUT \
+          "--enable-threads=posix \
+           --with-sysroot=$DIR_uC_OUTPUT/bfin-uclinux/runtime"
     done
 
     ######################## build elf2flt ##########################
