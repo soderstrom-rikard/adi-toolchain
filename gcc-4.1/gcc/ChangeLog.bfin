@@ -1,5 +1,10 @@
 2006-06-15  Jie Zhang  <jie.zhang@analog.com>
 
+	* crtstuff.c (USE_PT_GNU_EH_FRAME): Not define for if __UCLIBC__
+	is defined.
+
+2006-06-15  Jie Zhang  <jie.zhang@analog.com>
+
 	* config/bfin/bfin.md (eh_return): Call emit_jump_insn instead of
 	emit_insn to emit eh_return_internal instruction.
 	(eh_return_internal): Explicitly set pc.
