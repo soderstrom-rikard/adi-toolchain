@@ -151,6 +151,7 @@ legitimize_pic_address (rtx orig, rtx reg, rtx picreg)
 	  reg = gen_reg_rtx (Pmode);
 	}
 
+#if 0
       if (flag_pic == 2)
 	{
 	  emit_insn (gen_movsi_high_pic (reg, addr));
@@ -159,6 +160,7 @@ legitimize_pic_address (rtx orig, rtx reg, rtx picreg)
 	  new = gen_rtx_MEM (Pmode, reg);
 	}
       else
+#endif
 	{
 	  rtx tmp = gen_rtx_UNSPEC (Pmode, gen_rtvec (1, addr),
 				    unspec);
