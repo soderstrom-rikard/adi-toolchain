@@ -1,3 +1,8 @@
+2006-06-17  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.c (MAX_LOOP_LENGTH): Define to be 2042 instead
+	of 4096.
+
 2006-06-15  Jie Zhang  <jie.zhang@analog.com>
 
 	* crtstuff.c (USE_PT_GNU_EH_FRAME): Not define for if __UCLIBC__

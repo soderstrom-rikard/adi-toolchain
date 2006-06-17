@@ -2831,7 +2831,7 @@ bfin_hardware_loop (void)
 #define MAX_LOOP_DEPTH 2
 
 /* Maxium size of a loop.  */
-#define MAX_LOOP_LENGTH 4096
+#define MAX_LOOP_LENGTH 2042
 
 /* We need to keep a vector of loops */
 typedef struct loop_info *loop_info;
