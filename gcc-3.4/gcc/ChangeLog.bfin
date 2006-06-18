@@ -1,3 +1,9 @@
+2006-06-18  Jie Zhang  <jie.zhang@analog.com>
+
+	Revert
+	2006-06-05  Jie Zhang  <jie.zhang@analog.com>
+	* config/bfin/bfin.h (SIZE_TYPE): Redefine to "unsigned int".
+
 2006-06-15  Jie Zhang  <jie.zhang@analog.com>
 
 	* crtstuff.c (USE_PT_GNU_EH_FRAME): Not define for if __UCLIBC__
