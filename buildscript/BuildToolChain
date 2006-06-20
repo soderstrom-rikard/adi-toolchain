@@ -614,6 +614,9 @@ run_tests ()
         DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
         cd $DIR_GCC_BUILD/gcc
         ( echo "$MAKE check " $LOGFILE ; ) | sh
+
+        if [ $GCC_VERSION = 3.4 ] ; then
+
         cp $DIR_GCC_BUILD/gcc/testsuite/gcc.sum \
            $1/gcc-$GCC_VERSION.sum
         cp $DIR_GCC_BUILD/gcc/testsuite/gcc.log \
@@ -622,9 +625,23 @@ run_tests ()
            $1/g++-$GCC_VERSION.sum
         cp $DIR_GCC_BUILD/gcc/testsuite/g++.log \
            $1/g++-$GCC_VERSION.log
+
+        elif [ $GCC_VERSION = 4.1 ] ; then
+
+        cp $DIR_GCC_BUILD/gcc/testsuite/gcc/gcc.sum \
+           $1/gcc-$GCC_VERSION.sum
+        cp $DIR_GCC_BUILD/gcc/testsuite/gcc/gcc.log \
+           $1/gcc-$GCC_VERSION.log
+        cp $DIR_GCC_BUILD/gcc/testsuite/g++/g++.sum \
+           $1/g++-$GCC_VERSION.sum
+        cp $DIR_GCC_BUILD/gcc/testsuite/g++/g++.log \
+           $1/g++-$GCC_VERSION.log
+
+        fi
+
     done
 
-    echo -n "***  Done testing on simulator - results        " ; date
+    echo -n "***  Done testing  - results        " ; date
 
     for FILE in $1/gas*.sum \
                 $1/binutils*.sum \
