@@ -29,7 +29,7 @@ case "$target_triplet" in {
 	set target_list { bfin-sim }
     }
     { bfin-*-uclinux* } {
-	set target_list { bfin-uclinux }
+	set target_list { bfin-uclinux bfin-uclinux-fdpic{fdpic} }
     }
     default {
 	set target_list { "unix" }
