@@ -363,6 +363,8 @@ if [ $KERNEL_SOURCE ] ; then
     if [ $DIR_UBOOT ] ; then
       echo -n "Path to U-Boot Source       "
       echo $DIR_UBOOT
+    else
+      echo "U-Boot Source not specified: addon utilties (like 'mkimage') will not be built"
     fi
 fi
 
