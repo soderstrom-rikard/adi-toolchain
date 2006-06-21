@@ -651,10 +651,7 @@ run_tests ()
                 $1/gcc*.sum \
                 $1/g++*.sum
     do
-        START=`grep -n Summary $FILE | sed 's/:/ /' | awk '{print $1}'`
-        END=`wc -l $FILE | awk '{print $1}'`
-        TAIL=$((END - START + 1))
-        tail -$TAIL $FILE
+        egrep "=== .* ===|^# of" $FILE
     done
 }
 
