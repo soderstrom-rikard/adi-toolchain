@@ -52,6 +52,8 @@ then
 			 
 		-shared-lib-id)
 		          shift; SHARED_ID="$1";;      # Shared library ID
+		-shared|-G)
+			  WANT_SHARED=1;;              # Shared library ID
 
 		-o)       shift; OFILE="$1";;          # the final outfile
 		-o*)      OFILE="`expr \"$1\" : '-o\(.*\)'`";;
@@ -87,6 +89,14 @@ then
 		shift
 	done
 
+	if [ $WANT_SHARED ]
+	then
+		if [ -z "$SHARED_ID" ]
+		then
+			echo "-shared used without passing a shared library ID"
+			exit 1
+		fi
+	fi
 	if [ "$FINAL" = "yes" ]
 	then
 		[ "$VERBOSE" = "y" ] && set -x
