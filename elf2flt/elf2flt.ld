@@ -100,19 +100,19 @@ R_RODAT		*(.gnu.linkonce.r*)
 		LONG(0)
 		__DTOR_END__ = .;
 
-		PROVIDE (__preinit_array_start = .);
+		PROVIDE (___preinit_array_start = .);
 		KEEP (*(.preinit_array))
-		PROVIDE (__preinit_array_end = .);
+		PROVIDE (___preinit_array_end = .);
 
-		PROVIDE (__init_array_start = .);
+		PROVIDE (___init_array_start = .);
 		KEEP (*(SORT(.init_array.*)))
 		KEEP (*(.init_array))
-		PROVIDE (__init_array_end = .);
+		PROVIDE (___init_array_end = .);
 
-		PROVIDE (__fini_array_start = .);
+		PROVIDE (___fini_array_start = .);
 		KEEP (*(.fini_array))
 		KEEP (*(SORT(.fini_array.*)))
-		PROVIDE (__fini_array_end = .);
+		PROVIDE (___fini_array_end = .);
 
 		. = ALIGN(0x10) ; 
 		_edata = . ;
@@ -144,6 +144,7 @@ R_RODAT		*(.gnu.linkonce.r*)
 	}
 
 	.junk 0 : { *(.rel*) *(.rela*) }
+	/DISCARD/ : { *(.note.GNU-stack) }
 	/* Stabs debugging sections.    */
 	.stab 0 : { *(.stab) }
 	.stabstr 0 : { *(.stabstr) }
