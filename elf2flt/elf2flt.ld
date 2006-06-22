@@ -6,6 +6,7 @@ MEMORY {
 }
 
 SECTIONS {
+
 	.text 0x0 : {
 		. = . + 4;
 		. = ALIGN(0x4) ;
@@ -24,6 +25,7 @@ SECTIONS {
 W_RODAT		*(.rodata)
 W_RODAT		*(.rodata1)
 W_RODAT		*(.rodata.*)
+W_RODAT		*(.gnu.linkonce.r*)
 
 		/* This is special code area at the end of the normal
 		   text section.  It contains a small lookup table at
@@ -37,6 +39,7 @@ W_RODAT		*(.rodata.*)
 		. = ALIGN(0x20) ;
 		_etext = . ;
 	} > flatmem
+
 	.data : {
 		. = ALIGN(0x4) ;
 		_sdata = . ;
@@ -48,24 +51,42 @@ W_RODAT		*(.rodata.*)
 		. = ALIGN(0x20) ; 
 		LONG(-1)
 		. = ALIGN(0x20) ; 
-		*(.gnu.linkonce.r*)
+R_RODAT		*(.rodata)
+R_RODAT		*(.rodata1)
+R_RODAT		*(.rodata.*)
+R_RODAT		*(.gnu.linkonce.r*)
 		*(.data)
 		*(.data1)
 		*(.data.*)
 		*(.gnu.linkonce.d*)
 		*(.data1)
-R_RODAT		*(.rodata)
-R_RODAT		*(.rodata1)
-R_RODAT		*(.rodata.*)
 		*(.eh_frame)
 		*(.gcc_except_table)
+
+		/* Microblaze has .sdata and .sbss (small bss).  They must
+		   be contiguous, so please don't move any of this. JW */
+		_ssrw = . ;			
 		*(.sdata) 
 		*(.sdata.*)
+		*(.sbss)			/* Don't move this! */
+		_essrw = . ;
+
+		_ssrw_size = _essrw - _ssrw;
+		PROVIDE(_SDA_BASE_ = _ssrw + (_ssrw_size / 2));
+
 		*(.gnu.linkonce.s.*)
 		*(__libc_atexit)
 		*(__libc_subinit)
 		*(__libc_subfreeres)
 		*(.note.ABI-tag)
+
+		/* microblaze-specific read-only small data area
+		   and associated locating symbols */
+		_ssro = . ;
+		*(.sdata2)
+		_essro = . ;
+		_ssro_size = _essro - _ssro;
+		PROVIDE(_SDA2_BASE_ = _ssro + (_ssro_size / 2));
 
 		. = ALIGN(4) ;
 		__CTOR_LIST__ = .;
@@ -79,9 +100,24 @@ R_RODAT		*(.rodata.*)
 		LONG(0)
 		__DTOR_END__ = .;
 
+		PROVIDE (__preinit_array_start = .);
+		KEEP (*(.preinit_array))
+		PROVIDE (__preinit_array_end = .);
+
+		PROVIDE (__init_array_start = .);
+		KEEP (*(SORT(.init_array.*)))
+		KEEP (*(.init_array))
+		PROVIDE (__init_array_end = .);
+
+		PROVIDE (__fini_array_start = .);
+		KEEP (*(.fini_array))
+		KEEP (*(SORT(.fini_array.*)))
+		PROVIDE (__fini_array_end = .);
+
 		. = ALIGN(0x10) ; 
 		_edata = . ;
 	} > flatmem
+
 	.bss : {
 		. = ALIGN(0x4) ;
 		_sbss = ALIGN(0x4) ;
@@ -101,10 +137,12 @@ R_RODAT		*(.rodata.*)
 		_end = . ;
 		end = . ;
 	} > flatmem
+
 	.stack : {
 		. = ALIGN(0x4);
 		__stack_start = .;
 	}
+
 	.junk 0 : { *(.rel*) *(.rela*) }
 	/* Stabs debugging sections.    */
 	.stab 0 : { *(.stab) }
