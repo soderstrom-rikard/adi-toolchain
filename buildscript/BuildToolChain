@@ -602,15 +602,6 @@ run_tests ()
     cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.log \
        $1/gas.log
 
-    echo -n "***  Running tests on gdb          " ; date
-    cd $DIR_BINUTILS_BUILD/gdb
-    ( echo "$MAKE check " $LOGFILE ; ) | sh
-
-    cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.sum \
-       $1/gdb.sum
-    cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.log \
-       $1/gdb.log
-
     echo -n "***  Running tests on gcc          " ; date
     for GCC_VERSION in $GCC_VERSIONS; do
         DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
@@ -642,6 +633,16 @@ run_tests ()
         fi
 
     done
+
+    echo -n "***  Running tests on gdb          " ; date
+    cd $DIR_BINUTILS_BUILD/gdb
+    ( echo "$MAKE check " $LOGFILE ; ) | sh
+
+    cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.sum \
+       $1/gdb.sum
+    cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.log \
+       $1/gdb.log
+
 
     echo -n "***  Done testing  - results        " ; date
 
