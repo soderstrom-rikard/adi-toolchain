@@ -1711,7 +1711,7 @@
 	 (match_operand 1 "general_operand" "g"))
    (use (match_operand 2 "" ""))]
   "! SIBLING_CALL_P (insn)
-   && !TARGET_ID_SHARED_LIBRARY
+   && (!TARGET_ID_SHARED_LIBRARY || TARGET_LEAF_ID_SHARED_LIBRARY)
    && GET_CODE (operands[0]) == SYMBOL_REF
    && !bfin_longcall_p (operands[0], INTVAL (operands[2]))"
   "call %0;"
@@ -1724,7 +1724,7 @@
    (use (match_operand 2 "" ""))
    (return)]
   "SIBLING_CALL_P (insn)
-   && !TARGET_ID_SHARED_LIBRARY
+   && (!TARGET_ID_SHARED_LIBRARY || TARGET_LEAF_ID_SHARED_LIBRARY)
    && GET_CODE (operands[0]) == SYMBOL_REF
    && !bfin_longcall_p (operands[0], INTVAL (operands[2]))"
   "jump.l %0;"
@@ -1737,7 +1737,7 @@
 	      (match_operand 2 "general_operand" "g")))
    (use (match_operand 3 "" ""))]
   "! SIBLING_CALL_P (insn)
-   && !TARGET_ID_SHARED_LIBRARY
+   && (!TARGET_ID_SHARED_LIBRARY || TARGET_LEAF_ID_SHARED_LIBRARY)
    && GET_CODE (operands[1]) == SYMBOL_REF
    && !bfin_longcall_p (operands[1], INTVAL (operands[3]))"
   "call %1;"
@@ -1751,7 +1751,7 @@
    (use (match_operand 3 "" ""))
    (return)]
   "SIBLING_CALL_P (insn)
-   && !TARGET_ID_SHARED_LIBRARY
+   && (!TARGET_ID_SHARED_LIBRARY || TARGET_LEAF_ID_SHARED_LIBRARY)
    && GET_CODE (operands[1]) == SYMBOL_REF
    && !bfin_longcall_p (operands[1], INTVAL (operands[3]))"
   "jump.l %1;"

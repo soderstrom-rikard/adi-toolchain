@@ -46,6 +46,11 @@
 
 #define MASK_FAST_FP                 0x20000000
 
+/* Used for an ID shared library not referencing any others.  Can
+   also be used for XIP binaries.  */
+#define MASK_LEAF_ID_SHARED_LIBRARY  0x40000000
+#define MASK_SEP_DATA		     0x80000000
+
 /* Run-time compilation parameters selecting different hardware subsets.  */
 
 extern int target_flags;
@@ -78,6 +83,7 @@ extern int target_flags;
 #endif
 
 #define DRIVER_SELF_SPECS SUBTARGET_DRIVER_SELF_SPECS	"\
+ %{mleaf-id-shared-library:%{!mid-shared-library:-mid-shared-library}} \
  %{mfdpic:%{!fpic:%{!fpie:%{!fPIC:%{!fPIE:\
    	    %{!fno-pic:%{!fno-pie:%{!fno-PIC:%{!fno-PIE:-fpie}}}}}}}} \
 	  %{!mno-inline-plt:%{O*:%{!O0:%{!Os:%{fpic|fPIC:-minline-plt} \
@@ -130,6 +136,8 @@ extern int target_flags;
 #define TARGET_LONG_CALLS	       (target_flags & MASK_LONG_CALLS)
 #define TARGET_NO_UNDERSCORE	       (target_flags & MASK_NO_UNDERSCORE)
 #define TARGET_ID_SHARED_LIBRARY       (target_flags & MASK_ID_SHARED_LIBRARY)
+#define TARGET_LEAF_ID_SHARED_LIBRARY  (target_flags & MASK_LEAF_ID_SHARED_LIBRARY)
+#define TARGET_SEP_DATA		       (target_flags & MASK_SEP_DATA)
 #define TARGET_FDPIC		       (target_flags & MASK_FDPIC)
 #define TARGET_INLINE_PLT	       (target_flags & MASK_INLINE_PLT)
 #define TARGET_FAST_FP		       (target_flags & MASK_FAST_FP)
@@ -183,11 +191,19 @@ extern int target_flags;
     "Non GNU Profiling"},						\
   { "no-profile",		-MASK_PROFILE,				\
     "NO Non GNU profiling"},						\
-  { "id-shared-library", MASK_ID_SHARED_LIBRARY,			\
+  { "id-shared-library",	 MASK_ID_SHARED_LIBRARY,		\
     "Enable ID based shared library" },					\
-  { "no-id-shared-library", -MASK_ID_SHARED_LIBRARY,			\
+  { "no-id-shared-library",	-MASK_ID_SHARED_LIBRARY,		\
     "Disable ID based shared library" },				\
-  { "no-underscore",		MASK_NO_UNDERSCORE,			\
+  { "leaf-id-shared-library",	 MASK_LEAF_ID_SHARED_LIBRARY,		\
+    "This ID based shared library does not reference any others" },	\
+  { "no-leaf-id-shared-library",-MASK_LEAF_ID_SHARED_LIBRARY,		\
+    "This ID based shared library may reference others" },		\
+  { "sep-data",			 MASK_SEP_DATA,				\
+    "Enable separate data segment" },					\
+  { "no-sep-data",		-MASK_SEP_DATA,				\
+    "Disable separate data segment" },					\
+  { "no-underscore",		 MASK_NO_UNDERSCORE,			\
     "No underscore fro local label definition"},			\
   { "fast-fp",			MASK_FAST_FP,				\
     "Link with the fast floating-point library"},			\
