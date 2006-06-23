@@ -9,7 +9,7 @@
 #
 if ![info exists tool] {
     set run_multiple_targets 0;
-} elseif { $tool == "g++" || $tool == "gcc" || $tool == "gdb" || $tool == "libg++" || $tool == "libstdc++" || $tool == "libio" || $tool == "binutils" } {
+} elseif { $tool == "g++" || $tool == "gcc" || $tool == "gdb" || $tool == "libg++" || $tool == "libstdc++" || $tool == "libio" || $tool == "binutils" || $tool == "gas" || $tool == "ld" } {
     set run_multiple_targets 1;
 } else {
     set run_multiple_targets 0;
