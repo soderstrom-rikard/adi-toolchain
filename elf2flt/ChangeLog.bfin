@@ -1,3 +1,12 @@
+2006-06-23  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* elf2flt.c (RELOC_STACK_SIZE, reloc_stack, reloc_stack_tos, sym_section_name,
+	stack_sym_section, reloc_stack_set_section,
+	reloc_stack_get_section_name, reloc_stack_get_section,
+	is_reloc_stack_empty, reloc_stack_push, reloc_stack_pop,
+	reloc_stack_operate): Delete.
+	(output_relocs): Delete all support for stack relocs.
+
 2006-03-22  Jie Zhang  <jie.zhang@analog.com>
 
 	* Makefile.in (LDFLAGS): Don't add -static.
