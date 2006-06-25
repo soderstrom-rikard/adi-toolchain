@@ -25,31 +25,31 @@
 /*
   The following set of defines, describe the commandline api.
 */
-#define MASK_OMIT_LEAF_FRAME_POINTER 0x00000800 /* omit leaf frame pointers */
-#define MASK_CSYNC_ANOMALY           0x00010000
-#define MASK_SPECLD_ANOMALY          0x00020000
-#define MASK_SIMPLE_RTM              0x00040000
-#define MASK_LOW_64K           	     0x00080000
-#define MASK_CMOV	             0x00200000 /* use conditional moves */
-#define MASK_LONG_CALLS	             0x00400000 /* use long calls */
-#define MASK_PROFILE		     0x01000000 /* Instrument for NON GNU
+#define MASK_OMIT_LEAF_FRAME_POINTER 0x00000001 /* omit leaf frame pointers */
+#define MASK_CSYNC_ANOMALY           0x00000002
+#define MASK_SPECLD_ANOMALY          0x00000004
+#define MASK_SIMPLE_RTM              0x00000008
+#define MASK_LOW_64K           	     0x00000010
+#define MASK_CMOV	             0x00000020 /* use conditional moves */
+#define MASK_LONG_CALLS	             0x00000040 /* use long calls */
+#define MASK_PROFILE		     0x00000080 /* Instrument for NON GNU
 						 * profiling */
-#define MASK_NO_UNDERSCORE	     0x02000000 /* lacal label without underscore */
+#define MASK_NO_UNDERSCORE	     0x00000100 /* lacal label without underscore */
 
 /* Compile using library ID based shared libraries.
  * Set a specific ID using the -mshared-library-id=xxx option.
  */
-#define MASK_ID_SHARED_LIBRARY	     0x04000000
+#define MASK_ID_SHARED_LIBRARY	     0x00000200
 
-#define MASK_FDPIC		     0x08000000 /* use FD-PIC ABI */
-#define MASK_INLINE_PLT		     0x10000000
+#define MASK_FDPIC		     0x00000400 /* use FD-PIC ABI */
+#define MASK_INLINE_PLT		     0x00000800
 
-#define MASK_FAST_FP                 0x20000000
+#define MASK_FAST_FP                 0x00001000
 
 /* Used for an ID shared library not referencing any others.  Can
    also be used for XIP binaries.  */
-#define MASK_LEAF_ID_SHARED_LIBRARY  0x40000000
-#define MASK_SEP_DATA		     0x80000000
+#define MASK_LEAF_ID_SHARED_LIBRARY  0x00002000
+#define MASK_SEP_DATA		     0x00004000
 
 /* Run-time compilation parameters selecting different hardware subsets.  */
 

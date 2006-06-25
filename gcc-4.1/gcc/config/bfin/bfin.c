@@ -2037,9 +2037,6 @@ override_options (void)
   if (bfin_lib_id_given && ! TARGET_ID_SHARED_LIBRARY)
     error ("-mshared-library-id= specified without -mid-shared-library");
 
-  if (TARGET_ID_SHARED_LIBRARY && flag_pic == 0)
-    flag_pic = 1;
-
   if (TARGET_ID_SHARED_LIBRARY && TARGET_FDPIC)
       error ("ID shared libraries and FD-PIC mode can't be used together.");
 
@@ -2050,6 +2047,9 @@ override_options (void)
   /* ... internally, however, it's nearly the same.  */
   if (TARGET_SEP_DATA)
     target_flags |= MASK_ID_SHARED_LIBRARY | MASK_LEAF_ID_SHARED_LIBRARY;
+
+  if (TARGET_ID_SHARED_LIBRARY && flag_pic == 0)
+    flag_pic = 1;
 
   /* There is no single unaligned SI op for PIC code.  Sometimes we
      need to use ".4byte" and sometimes we need to use ".picptr".

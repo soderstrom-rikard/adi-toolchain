@@ -1,3 +1,14 @@
+2006-06-24  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (override_options): Reorder checks for
+	-mid-shared-library and -msep-data.
+	* config/bfin/bfin.h (MASK_OMIT_LEAF_FRAME_POINTER, MASK_CSYNC_ANOMALY,
+	MASK_SPECLD_ANOMALY, MASK_SIMPLE_RTM, MASK_LOW_64K, MASK_CMOV,
+	MASK_LONG_CALLS, MASK_PROFILE, MASK_NO_UNDERSCORE,
+	MASK_ID_SHARED_LIBRARY, MASK_FDPIC, MASK_INLINE_PLT, MASK_FAST_FP,
+	MASK_LEAF_ID_SHARED_LIBRARY, MASK_SEP_DATA): Renumber to avoid
+	using a negative mask.
+
 2006-06-23  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (call_symbol, call_value_symbol, sibcall_symbol,

@@ -2179,9 +2179,6 @@ override_options (void)
       asprintf ((char **)&bfin_library_id_string, "%d", (id * -4) - 4);
     }
 
-  if (TARGET_ID_SHARED_LIBRARY && flag_pic == 0)
-    flag_pic = 1;
-
   if (TARGET_ID_SHARED_LIBRARY && TARGET_FDPIC)
       error ("ID shared libraries and FD-PIC mode can't be used together.");
 
@@ -2192,6 +2189,9 @@ override_options (void)
   /* ... internally, however, it's nearly the same.  */
   if (TARGET_SEP_DATA)
     target_flags |= MASK_ID_SHARED_LIBRARY | MASK_LEAF_ID_SHARED_LIBRARY;
+
+  if (TARGET_ID_SHARED_LIBRARY && flag_pic == 0)
+    flag_pic = 1;
 
   if (TARGET_FDPIC && profile_arc_flag)
     {
