@@ -495,6 +495,13 @@ export PATH=$NEW_PATH:/$DIR_ELF_OUTPUT/bin:/$DIR_uC_OUTPUT/bin
 #################################################################
 
 # Some helpful functions
+die_with_log ()
+{
+    echo "Build error.  Last logfile entries:"
+    tail -10 $ACTUAL_LOGFILE
+    exit 1;
+}
+
 build_gcc ()
 {
     echo -n "Path to gcc dir             "
@@ -535,12 +542,12 @@ build_gcc ()
       --disable-symvers --disable-libssp --enable-version-specific-runtime-libs"
 
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
     echo -n "*** Building GCC                   " ; date
     RUN=$MAKE
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
     for RUN in cc1 cc1plus collect2 cpp g++ gcov xgcc
     do
@@ -555,7 +562,7 @@ build_gcc ()
     echo -n "*** Installing GCC                 " ; date
     RUN="$MAKE install"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
     # some basic sanity checks
     for RUN in bfin-$2-addr2line bfin-$2-c++filt bfin-$2-gdbtui          \
@@ -687,12 +694,12 @@ if [ "x$SKIP_ELF" = "x" ]; then
     RUN="$DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-elf \
         --prefix=$DIR_ELF_OUTPUT --without-newlib"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
     echo -n "*** Building Elf Binutils & GDB    " ; date
     RUN="$MAKE all-binutils all-gas all-ld all-sim all-gdb"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
     for RUN in addr2line ar cxxfilt libtool nm-new objcopy objdump ranlib \
                readelf size strings strip-new
@@ -750,11 +757,6 @@ if [ "x$SKIP_ELF" = "x" ]; then
     echo -n "*** Building Elf elf2flt           " ; date
     cd $DIR_ELF2FLT_BUILD
 
-    echo -n "*** Cleaning Elf elf2flt           " ; date
-    RUN="$MAKE distclean "
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
-
     RUN="$DIR_ELF2FLT_SOURCE/configure $HOST_TARGET --target=bfin-elf \
          --with-libbfd=$DIR_BINUTILS_BUILD/bfd/libbfd.a               \
          --with-libiberty=$DIR_ELF_OUTPUT/lib/libiberty.a             \
@@ -767,12 +769,12 @@ if [ "x$SKIP_ELF" = "x" ]; then
     fi
 
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
     echo -n "*** Make Elf elf2flt               " ; date
     RUN=$MAKE
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
     for RUN in elf2flt  flthdr
     do
@@ -787,7 +789,7 @@ if [ "x$SKIP_ELF" = "x" ]; then
     echo -n "*** Installing Elf elf2flt         " ; date
     RUN="$MAKE install"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
     for RUN in bfin-elf-elf2flt bfin-elf-flthdr
     do
@@ -804,19 +806,14 @@ if [ "x$SKIP_ELF" = "x" ]; then
     echo -n "*** Building Elf genext2fs         " ; date
     cd $DIR_GENEXT2FS_BUILD
 
-    echo -n "*** Cleaning Elf genext2fs         " ; date
-    RUN="$MAKE distclean "
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
-
     RUN="$DIR_GENEXT2FS_SOURCE/configure --prefix=$DIR_ELF_OUTPUT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
     echo -n "*** Make Elf genext2fs             " ; date
     RUN=$MAKE
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
     for RUN in genext2fs
     do
@@ -831,7 +828,7 @@ if [ "x$SKIP_ELF" = "x" ]; then
     echo -n "*** Installing Elf genext2fs       " ; date
     RUN="$MAKE install"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
     mv $DIR_ELF_OUTPUT/bin/genext2fs $DIR_ELF_OUTPUT/bin/bfin-elf-genext2fs
 
     for RUN in bfin-elf-genext2fs
