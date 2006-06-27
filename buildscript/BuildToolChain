@@ -1263,7 +1263,7 @@ if [ $KERNEL_SOURCE ] ; then
         done
 
         echo -n "*** Copying U-Boot Tools           " ; date
-        RUN="cp $DIR_UBOOT/tools/mkimage $DIR_uC_OUTPUT/bin/bfin-uclinux-mkimage; cp $DIR_UBOOT/tools/gen_eth_addr $DIR_uC_OUTPUT/bin/bfin-uclinux-gen_eth_addr;"
+        RUN="cp $DIR_UBOOT/tools/mkimage $DIR_uC_OUTPUT/bin/bfin-uclinux-mkimage; cp $DIR_UBOOT/tools/gen_eth_addr $DIR_uC_OUTPUT/bin/bfin-uclinux-gen_eth_addr"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh
 
