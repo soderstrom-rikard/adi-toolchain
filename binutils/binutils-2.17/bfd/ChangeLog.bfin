@@ -1,0 +1,13 @@
+2006-04-26  Jie Zhang  <jie.zhang@analog.com>
+
+	* elf32-bfin.c (bfinfdpic_relocate_section): Clear reloc for
+	deteted entries in .eh_frame section.
+
+2006-04-06  Jie Zhang  <jie.zhang@analog.com>
+
+	* elf32-bfin.c (bfin_check_relocs): Use __GLOBAL_OFFSET_TABLE_
+	instead of _GLOBAL_OFFSET_TABLE_.
+	(bfin_relocate_section): Ditto.
+	(_bfin_create_got_section): Ditto.
+	(elf32_bfinfdpic_create_dynamic_sections): Ditto.
+	(bfin_finish_dynamic_symbol): Ditto.

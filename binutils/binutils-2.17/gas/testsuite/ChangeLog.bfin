@@ -1,0 +1,4 @@
+2006-05-25  Jie Zhang  <jie.zhang@analog.com>
+
+	* gas/bfin/vector2.s, gas/bfin/vector2.d: Test to ensure (m) is not
+	thrown away.
