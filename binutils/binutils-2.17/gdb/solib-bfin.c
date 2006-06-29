@@ -16,8 +16,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 
 #include "defs.h"
@@ -341,6 +341,9 @@ open_symbol_file_object (void *from_ttyp)
 /* Cached value for lm_base(), below.  */
 static CORE_ADDR lm_base_cache = 0;
 
+/* Link map address for main module.  */
+static CORE_ADDR main_lm_addr = 0;
+
 /* Return the address from which the link map chain may be found.  On
    the BFIN, this may be found in a number of ways.  Assuming that the
    main executable has already been relocated, the easiest way to find
@@ -416,6 +419,21 @@ bfin_current_sos (void)
   struct so_list *sos_head = NULL;
   struct so_list **sos_next_ptr = &sos_head;
 
+  /* Make sure that the main executable has been relocated.  This is
+     required in order to find the address of the global offset table,
+     which in turn is used to find the link map info.  (See lm_base()
+     for details.)
+
+     Note that the relocation of the main executable is also performed
+     by SOLIB_CREATE_INFERIOR_HOOK(), however, this hook is called too
+     late in order to be of benefit to SOLIB_ADD.  SOLIB_ADD eventually
+     calls this this function, bfin_current_sos, and also precedes the call
+     to SOLIB_CREATE_INFERIOR_HOOK().   (See post_create_inferior() in
+     infcmd.c.)  */
+  if (main_executable_lm_info == 0)
+    bfin_relocate_main_executable ();
+
+  /* Fetch the GOT corresponding to the main executable.  */
   mgot = main_got ();
 
   /* Locate the address of the first link map struct.  */
@@ -435,7 +453,7 @@ bfin_current_sos (void)
 
       if (target_read_memory (lm_addr, (gdb_byte *) &lm_buf, sizeof (lm_buf)) != 0)
 	{
-	  warning ("bfin_current_sos: Unable to read link map entry.  Shared object chain may be incomplete.");
+	  warning (_("bfin_current_sos: Unable to read link map entry.  Shared object chain may be incomplete."));
 	  break;
 	}
 
@@ -459,7 +477,7 @@ bfin_current_sos (void)
 	  loadmap = fetch_loadmap (addr);
 	  if (loadmap == NULL)
 	    {
-	      warning ("bfin_current_sos: Unable to fetch load map.  Shared object chain may be incomplete.");
+	      warning (_("bfin_current_sos: Unable to fetch load map.  Shared object chain may be incomplete."));
 	      break;
 	    }
 
@@ -479,7 +497,7 @@ bfin_current_sos (void)
 	  
 	  if (errcode != 0)
 	    {
-	      warning ("bfin_current_sos: Can't read pathname for link map entry: %s\n",
+	      warning (_("bfin_current_sos: Can't read pathname for link map entry: %s\n"),
 		       safe_strerror (errcode));
 	    }
 	  else
@@ -492,6 +510,10 @@ bfin_current_sos (void)
 
 	  *sos_next_ptr = sop;
 	  sos_next_ptr = &sop->next;
+	}
+      else
+	{
+	  main_lm_addr = lm_addr;
 	}
 
       lm_addr = extract_unsigned_integer (lm_buf.l_next, sizeof (lm_buf.l_next));
@@ -546,9 +568,9 @@ displacement_from_map (struct int_elf32_fdpic_loadmap *map,
 static void
 enable_break_failure_warning (void)
 {
-  warning ("Unable to find dynamic linker breakpoint function.\n"
-           "GDB will be unable to debug shared library initializers\n"
-	   "and track explicitly loaded dynamic code.");
+  warning (_("Unable to find dynamic linker breakpoint function.\n"
+	     "GDB will be unable to debug shared library initializers\n"
+	     "and track explicitly loaded dynamic code."));
 }
 
 /*
@@ -651,7 +673,8 @@ enable_break2 (void)
       /* Make sure the dynamic linker is really a useful object.  */
       if (!bfd_check_format (tmp_bfd, bfd_object))
 	{
-	  warning ("Unable to grok dynamic linker %s as an object file", buf);
+	  warning (_("Unable to grok dynamic linker %s as an object file"),
+		   buf);
 	  enable_break_failure_warning ();
 	  bfd_close (tmp_bfd);
 	  return 0;
@@ -661,7 +684,7 @@ enable_break2 (void)
                                             &interp_loadmap_addr, 0);
       if (status < 0)
 	{
-	  warning ("Unable to determine dynamic linker loadmap address\n");
+	  warning (_("Unable to determine dynamic linker loadmap address\n"));
 	  enable_break_failure_warning ();
 	  bfd_close (tmp_bfd);
 	  return 0;
@@ -675,8 +698,8 @@ enable_break2 (void)
       ldm = fetch_loadmap (interp_loadmap_addr);
       if (ldm == NULL)
 	{
-	  warning ("Unable to load dynamic linker loadmap at address %s\n",
-	           hex_string_custom (interp_loadmap_addr, 8));
+	  warning (_("Unable to load dynamic linker loadmap at address %s\n"),
+		   hex_string_custom (interp_loadmap_addr, 8));
 	  enable_break_failure_warning ();
 	  bfd_close (tmp_bfd);
 	  return 0;
@@ -708,7 +731,7 @@ enable_break2 (void)
       addr = bfd_lookup_symbol (tmp_bfd, "__dl_debug_addr");
       if (addr == 0)
 	{
-	  warning ("Could not find symbol _dl_debug_addr in dynamic linker");
+	  warning (_("Could not find symbol _dl_debug_addr in dynamic linker"));
 	  enable_break_failure_warning ();
 	  bfd_close (tmp_bfd);
 	  return 0;
@@ -729,8 +752,8 @@ enable_break2 (void)
       /* Fetch the address of the r_debug struct.  */
       if (target_read_memory (addr, addr_buf, sizeof addr_buf) != 0)
 	{
-	  warning ("Unable to fetch contents of _dl_debug_addr (at address %s) from dynamic linker",
-	           hex_string_custom (addr, 8));
+	  warning (_("Unable to fetch contents of _dl_debug_addr (at address %s) from dynamic linker"),
+		   hex_string_custom (addr, 8));
 	}
       addr = extract_unsigned_integer (addr_buf, sizeof addr_buf);
 
@@ -738,8 +761,8 @@ enable_break2 (void)
          _dl_debug_addr.  */
       if (target_read_memory (addr + 8, addr_buf, sizeof addr_buf) != 0)
 	{
-	  warning ("Unable to fetch _dl_debug_addr->r_brk (at address %s) from dynamic linker",
-	           hex_string_custom (addr + 8, 8));
+	  warning (_("Unable to fetch _dl_debug_addr->r_brk (at address %s) from dynamic linker"),
+		   hex_string_custom (addr + 8, 8));
 	  enable_break_failure_warning ();
 	  bfd_close (tmp_bfd);
 	  return 0;
@@ -749,8 +772,8 @@ enable_break2 (void)
       /* Now fetch the function entry point.  */
       if (target_read_memory (addr, addr_buf, sizeof addr_buf) != 0)
 	{
-	  warning ("Unable to fetch _dl_debug_addr->.r_brk entry point (at address %s) from dynamic linker",
-	           hex_string_custom (addr, 8));
+	  warning (_("Unable to fetch _dl_debug_addr->.r_brk entry point (at address %s) from dynamic linker"),
+		   hex_string_custom (addr, 8));
 	  enable_break_failure_warning ();
 	  bfd_close (tmp_bfd);
 	  return 0;
@@ -832,7 +855,7 @@ enable_break (void)
 static void
 bfin_special_symbol_handling (void)
 {
-  /* Nothing needed (yet) for FRV. */
+  /* Nothing needed (yet) for BFIN. */
 }
 
 static void
@@ -857,7 +880,7 @@ bfin_relocate_main_executable (void)
   /* Fetch the loadmap located at ``exec_addr''.  */
   ldm = fetch_loadmap (exec_addr);
   if (ldm == NULL)
-    error ("Unable to load the executable's loadmap.");
+    error (_("Unable to load the executable's loadmap."));
 
   if (main_executable_lm_info)
     xfree (main_executable_lm_info);
@@ -940,7 +963,7 @@ bfin_solib_create_inferior_hook (void)
   /* Enable shared library breakpoints.  */
   if (!enable_break ())
     {
-      warning ("shared library handler failed to enable breakpoint");
+      warning (_("shared library handler failed to enable breakpoint"));
       return;
     }
 }
@@ -951,6 +974,15 @@ bfin_clear_solib (void)
   lm_base_cache = 0;
   enable_break1_done = 0;
   enable_break2_done = 0;
+  main_lm_addr = 0;
+  if (main_executable_lm_info != 0)
+    {
+      xfree (main_executable_lm_info->map);
+      xfree (main_executable_lm_info->dyn_syms);
+      xfree (main_executable_lm_info->dyn_relocs);
+      xfree (main_executable_lm_info);
+      main_executable_lm_info = 0;
+    }
 }
 
 static void
@@ -1029,7 +1061,7 @@ bfin_fdpic_find_global_pointer (CORE_ADDR addr)
   return main_got ();
 }
 
-/* Forward declarations for frv_fdpic_find_canonical_descriptor().  */
+/* Forward declarations for bfin_fdpic_find_canonical_descriptor().  */
 static CORE_ADDR find_canonical_descriptor_in_load_object
   (CORE_ADDR, CORE_ADDR, char *, bfd *, struct lm_info *);
 
@@ -1098,6 +1130,10 @@ find_canonical_descriptor_in_load_object
 
   /* Nothing to do if no bfd.  */
   if (abfd == 0)
+    return 0;
+
+  /* Nothing to do if no link map.  */
+  if (lm == 0)
     return 0;
 
   /* We want to scan the dynamic relocs for R_BFIN_FUNCDESC relocations.
