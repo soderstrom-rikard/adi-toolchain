@@ -922,11 +922,12 @@ if [ $KERNEL_SOURCE ] ; then
       cp $UCLIBC_CONFIG_FILE .tmp.config.provided
       rm -f .config
       echo 'TARGET_bfin=y' >>.config
-      cat .tmp.config.provided | grep -v '^\(TARGET\|HAVE_NO_SHARED\|HAVE_NO_PIC\|DOPIC\|HAVE_SHARED\|TARGET_SUBARCH\|BUILD_UCLIBC_LDSO\|SUPPORT_LD_DEBUG\|FORCE_SHAREABLE_TEXT_SEGMENTS\|BUILD_UCLIBC_SHARED_FLAT\|RUNTIME_\|DEVEL_\|MULTILIB\)' >>.config
+      cat .tmp.config.provided | grep -v '^\(TARGET\|HAVE_NO_SHARED\|HAVE_NO_PIC\|DOPIC\|HAVE_SHARED\|TARGET_SUBARCH\|BUILD_UCLIBC_LDSO\|SUPPORT_LD_DEBUG\|FORCE_SHAREABLE_TEXT_SEGMENTS\|BUILD_UCLIBC_SHARED_FLAT\|BUILD_UCLIBC_SEP_DATA\|RUNTIME_\|DEVEL_\|MULTILIB\)' >>.config
       echo 'RUNTIME_PREFIX="/runtime"' >>.config
       echo 'DEVEL_PREFIX="/"' >>.config
       echo 'MULTILIB=""' >>.config
       echo '# BUILD_UCLIBC_SHARED_FLAT is not set' >>.config
+      echo '# BUILD_UCLIBC_SEP_DATA is not set' >>.config
     fi
 
     RUN="$MAKE oldconfig ROOTDIR=$UCLINUX_ROOT"
@@ -968,7 +969,53 @@ if [ $KERNEL_SOURCE ] ; then
         fi
     done
 
-    #################### Step 3a - build shared flat uClibc ##############
+    #################### Step 3b - build sep-data uClibc ##############
+    echo -n "*** Configuring sep-data uClibc    " ; date
+
+    grep -v '\(MULTILIB\|BUILD_UCLIBC_SEP_DATA\)' <.config-used-for-bfin >.config
+    echo 'BUILD_UCLIBC_SEP_DATA=y' >>.config
+    echo 'MULTILIB="msep-data"' >>.config
+
+    RUN="$MAKE oldconfig ROOTDIR=$UCLINUX_ROOT"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    cp .config .config-used-for-bfin-shared-flat
+
+    echo -n "*** Cleaning uClibc                " ; date
+    RUN="$MAKE clean ROOTDIR=$UCLINUX_ROOT"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    echo -n "*** Building uClibc                " ; date
+    RUN="$MAKE all CROSS=bfin-elf- KERNEL_SOURCE=$KERNEL_SOURCE ROOTDIR=$UCLINUX_ROOT"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    echo -n "*** Installing uClibc              " ; date
+    RUN="$MAKE install PREFIX=$DIR_uC_OUTPUT/bfin-uclinux DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ ROOTDIR=$UCLINUX_ROOT"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    # Need a way to look at uClibc make system , and see what libs
+    # should be created
+    for RUN in crt0.o libc.a libcrypt.a libm.a libnsl.a libresolv.a \
+               libutil.a
+    do
+        if [ ! -f $DIR_uC_OUTPUT/bfin-uclinux/lib/msep-data/$RUN ] ; then
+            echo "sep-data uClibc did not install properly : Missing $RUN"
+            echo "Please report an error to http://blackfin.uclinux.org"
+            tail -10 $ACTUAL_LOGFILE
+            mv saved-config-toplevel .config 2>/dev/null
+            mv saved-config-linux linux-2.6.x/.config 2>/dev/null
+            mv saved-config-uClibc uClibc/.config 2>/dev/null
+            mv saved-config-user config/.config 2>/dev/null
+            mv saved-config-arch config.arch 2>/dev/null
+            exit
+        fi
+    done
+
+    #################### Step 3b - build shared flat uClibc ##############
     echo -n "*** Configuring shared flat uClibc " ; date
 
     grep -v '\(BUILD_UCLIBC_SHARED_FLAT\MULTILIB\)' <.config-used-for-bfin >.config
@@ -1002,7 +1049,7 @@ if [ $KERNEL_SOURCE ] ; then
                libutil.a
     do
         if [ ! -f $DIR_uC_OUTPUT/bfin-uclinux/lib/mid-shared-library/$RUN ] ; then
-            echo "FD-PIC uClibc did not install properly : Missing $RUN"
+            echo "Shared flat uClibc did not install properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
             mv saved-config-toplevel .config 2>/dev/null
@@ -1014,7 +1061,7 @@ if [ $KERNEL_SOURCE ] ; then
         fi
     done
 
-    ####################### Step 3b - build FD-PIC uClibc ################
+    ####################### Step 3c - build FD-PIC uClibc ################
     echo -n "*** Configuring uClibc for FD-PIC  " ; date
 
     if [ "x$UCLIBC_CONFIG_FILE" = "x" ]; then
@@ -1022,7 +1069,7 @@ if [ $KERNEL_SOURCE ] ; then
     else
       echo 'TARGET_bfinfdpic=y' >>.config
       cat .tmp.config.provided | grep -v '^\(TARGET\|HAVE_NO_SHARED\|HAVE_NO_PIC\|DOPIC\|HAVE_SHARED\|TARGET_SUBARCH\|BUILD_UCLIBC_LDSO\|SUPPORT_LD_DEBUG\|FORCE_SHAREABLE_TEXT_SEGMENTS\|BUILD_UCLIBC_SHARED_FLAT\|RUNTIME_\|DEVEL_\|MULTILIB\)' >>.config
-      echo 'RUNTIME_PREFIX="/runtime"' >>.config
+      echo 'RUNTIME_PREFIX="/runtime"' >>.config\
       echo 'DEVEL_PREFIX="/"' >>.config
       echo 'MULTILIB="mfdpic"' >>.config
       rm -f .tmp.config.provided
