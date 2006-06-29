@@ -1011,6 +1011,14 @@ bfin_push_dummy_call (struct gdbarch *gdbarch,
 
   regcache_cooked_write_unsigned (regcache, BFIN_RETS_REGNUM, bp_addr);
 
+  if (abi == BFIN_ABI_FDPIC)
+    {
+      /* Set the GOT register for the FDPIC ABI.  */
+      regcache_cooked_write_unsigned
+	(regcache, BFIN_P3_REGNUM,
+         bfin_fdpic_find_global_pointer (func_addr));
+    }
+
   /* Finally, update the stack pointer.  */
 
   regcache_cooked_write_unsigned (regcache, BFIN_SP_REGNUM, sp);

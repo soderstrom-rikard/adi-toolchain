@@ -1044,6 +1044,14 @@ bfin_push_dummy_call (struct gdbarch *gdbarch, struct value * function,
          bfin_fdpic_find_global_pointer (func_addr));
     }
 
+  if (abi == BFIN_ABI_FDPIC)
+    {
+      /* Set the GOT register for the FDPIC ABI.  */
+      regcache_cooked_write_unsigned
+	(regcache, BFIN_P3_REGNUM,
+         bfin_fdpic_find_global_pointer (func_addr));
+    }
+
   /* Finally, update the stack pointer.  */
 
   store_unsigned_integer (buf, 4, sp);

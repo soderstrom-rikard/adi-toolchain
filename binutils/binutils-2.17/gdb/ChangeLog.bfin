@@ -1,0 +1,4 @@
+2006-06-29  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-tdep.c (bfin_push_dummy_call): Set the GOT register for the
+	FD-PIC ABI.

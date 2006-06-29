@@ -1,3 +1,8 @@
+2006-06-29  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-tdep.c (bfin_push_dummy_call): Set the GOT register for the
+	FD-PIC ABI.
+
 2006-05-09  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/gdbserver.exp (gdb_load): Append .gdb to the file name
