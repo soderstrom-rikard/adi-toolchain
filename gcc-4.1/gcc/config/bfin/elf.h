@@ -12,6 +12,9 @@
 #undef  ENDFILE_SPEC
 #define ENDFILE_SPEC	"crtend%O%s crtn%O%s"
 
+#undef  LIB_SPEC
+#define LIB_SPEC "-lc"
+
 #undef USER_LABEL_PREFIX
 #define USER_LABEL_PREFIX "_"
 
