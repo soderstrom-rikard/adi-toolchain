@@ -422,7 +422,7 @@ Objective-C and Objective-C++ Dialects}.
 @emph{Blackfin Options}
 @gccoptlist{-momit-leaf-frame-pointer  -mno-omit-leaf-frame-pointer @gol
 -mspecld-anomaly  -mno-specld-anomaly  -mcsync-anomaly  -mno-csync-anomaly @gol
--mlow-64k -mno-low64k  -mid-shared-library @gol
+-mlow-64k -mno-low64k  -mstack-check-l1  -mid-shared-library @gol
 -mno-id-shared-library  -mshared-library-id=@var{n} @gol
 -mleaf-id-shared-library  -mno-leaf-id-shared-library @gol
 -msep-data  -mno-sep-data  -mlong-calls  -mno-long-calls  -mfast-fp}
@@ -7622,6 +7622,11 @@ the entire program fits into the low 64k of memory.
 @item -mno-low-64k
 @opindex mno-low-64k
 Assume that the program is arbitrarily large.  This is the default.
+
+@item -mstack-check-l1
+@opindex mstack-check-l1
+Do stack checking using information placed into L1 scratchpad memory by the
+uClinux kernel.
 
 @item -mid-shared-library
 @opindex mid-shared-library

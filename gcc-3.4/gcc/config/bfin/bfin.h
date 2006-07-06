@@ -51,6 +51,8 @@
 #define MASK_LEAF_ID_SHARED_LIBRARY  0x00002000
 #define MASK_SEP_DATA		     0x00004000
 
+#define MASK_STACK_CHECK_L1	     0x00008000
+
 /* Run-time compilation parameters selecting different hardware subsets.  */
 
 extern int target_flags;
@@ -141,6 +143,7 @@ extern int target_flags;
 #define TARGET_FDPIC		       (target_flags & MASK_FDPIC)
 #define TARGET_INLINE_PLT	       (target_flags & MASK_INLINE_PLT)
 #define TARGET_FAST_FP		       (target_flags & MASK_FAST_FP)
+#define TARGET_STACK_CHECK_L1	       (target_flags & MASK_STACK_CHECK_L1)
 
 #define TARGET_HAS_SYMBOLIC_ADDRESSES  (0)
 #define TARGET_MOVE                    (1)
@@ -205,6 +208,10 @@ extern int target_flags;
     "Disable separate data segment" },					\
   { "no-underscore",		 MASK_NO_UNDERSCORE,			\
     "No underscore fro local label definition"},			\
+  { "stack-check-l1",	         MASK_STACK_CHECK_L1,			\
+    "Use stack checking using bounds in L1 scratch memory"},		\
+  { "no-stack-check-l1",	-MASK_STACK_CHECK_L1,			\
+    "Do not use machine-dependent stack checking."},			\
   { "fast-fp",			MASK_FAST_FP,				\
     "Link with the fast floating-point library"},			\
   { "", MASK_CMOV | MASK_CSYNC_ANOMALY | MASK_SPECLD_ANOMALY,		\
