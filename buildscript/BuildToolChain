@@ -908,9 +908,17 @@ if [ $KERNEL_SOURCE ] ; then
     cp config/.config saved-config-user 2>/dev/null
     cp -a config.arch saved-config-arch 2>/dev/null
 
+    # Make sure the kernel is in a safe state
     RUN="$MAKE AnalogDevices/BF537-STAMP_config"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
+
+    cd linux-2.6.x
+    RUN="$MAKE CROSS_COMPILE=bfin-elf- prepare"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+    cd ..
+
 
     ####################### Step 3 - build uClibc ################
     echo -n "*** Configuring uClibc             " ; date
