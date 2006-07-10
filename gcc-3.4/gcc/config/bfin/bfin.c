@@ -3799,11 +3799,12 @@ bfin_expand_builtin (tree exp, rtx target ATTRIBUTE_UNUSED,
       op0 = expand_expr (arg0, NULL_RTX, VOIDmode, 0);
       op1 = expand_expr (arg1, NULL_RTX, VOIDmode, 0);
       accvec = gen_reg_rtx (V2PDImode);
+      icode = CODE_FOR_flag_macv2hi_parts;
 
       if (! target
 	  || GET_MODE (target) != V2HImode
 	  || ! (*insn_data[icode].operand[0].predicate) (target, V2HImode))
-	target = gen_reg_rtx (tmode);
+	target = gen_reg_rtx (V2HImode);
       if (! register_operand (op0, GET_MODE (op0)))
 	op0 = copy_to_mode_reg (GET_MODE (op0), op0);
       if (! register_operand (op1, GET_MODE (op1)))
@@ -3828,11 +3829,12 @@ bfin_expand_builtin (tree exp, rtx target ATTRIBUTE_UNUSED,
       op1 = expand_expr (arg1, NULL_RTX, VOIDmode, 0);
       op2 = expand_expr (arg2, NULL_RTX, VOIDmode, 0);
       accvec = gen_reg_rtx (V2PDImode);
+      icode = CODE_FOR_flag_macv2hi_parts;
 
       if (! target
 	  || GET_MODE (target) != V2HImode
 	  || ! (*insn_data[icode].operand[0].predicate) (target, V2HImode))
-	target = gen_reg_rtx (tmode);
+	target = gen_reg_rtx (V2HImode);
       if (! register_operand (op0, GET_MODE (op0)))
 	op0 = copy_to_mode_reg (GET_MODE (op0), op0);
       if (! register_operand (op1, GET_MODE (op1)))
