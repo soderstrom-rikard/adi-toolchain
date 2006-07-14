@@ -1,3 +1,18 @@
+2006-07-14  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_issue_rate): New function.
+	(TARGET_SCHED_ISSUE_RATE): New macro.
+	* config/bfin/bfin.md (slot0,slot1,slot2,store,pregs): New CPU unit
+	definitions.
+	(core): Now a define_reservation.
+	(alu): Remove some insn types from this reservation.
+	(dsp32, load32, loadp, loadi, store32, storep, storei, multi): New
+	insn reservations.
+	(absence_sets): Two new absence sets to enforce slot ordering.
+	(popsi_insn): Set addrtype.
+	* config/bfin/predicates.md (mem_p_address_operand,
+	mem_i_address_operand): New predicates.
+
 2006-07-10  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_expand_builtin): Fix some uninitialized
