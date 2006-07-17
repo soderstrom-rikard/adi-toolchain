@@ -2812,6 +2812,7 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
     {
       bu16 in = DREG (src1) >> ((HLs & 1) ? 16 : 0);
       bu16 result;
+      bu32 v;
       if (sop == 0 && bit8)
 	result = ashiftrt (in, newimmag, 16);
       else if (sop == 1 && bit8)
@@ -2822,16 +2823,11 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
 	result = lshift (in, immag, 16, 0);
       else
 	unhandled_instruction ("illegal DSP shift");
+      v = DREG (dst0);
       if (HLs & 2)
-	{
-	  DREG (dst0) &= 0xFFFF;
-	  DREG (dst0) |= result << 16;
-	}
+	STORE (DREG (dst0), (v & 0xFFFF) | (result << 16));
       else
-	{
-	  DREG (dst0) &= 0xFFFF0000;
-	  DREG (dst0) |= result;
-	}
+	STORE (DREG (dst0), (v & 0xFFFF0000) | result);
     }
   else if (sop == 2 && sopcde == 3 && HLs == 1)
     unhandled_instruction ("A1 = ROT A1 BY imm6");
@@ -2858,9 +2854,9 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
       int count = imm6 (newimmag);
       /* dregs = dregs >> imm6 */
       if (count < 0)
-	DREG (dst0) = lshift (DREG (src1), -count, 32, 0);
+	STORE (DREG (dst0), lshift (DREG (src1), -count, 32, 0));
       else
-	DREG (dst0) = lshiftrt (DREG (src1), count, 32);
+	STORE (DREG (dst0), lshiftrt (DREG (src1), count, 32));
     }
   else if (sop == 3 && sopcde == 2)
     {
@@ -2879,18 +2875,20 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
 	  result = t == 32 ? 0 : srcval << t;
 	  result |= t == 1 ? 0 : srcval >> (33 - t);
 	  result |= oldcc << (t - 1);
-	  DREG (dst0) = result;
+	  STORE (DREG (dst0), result);
 	  CCREG = (srcval >> (32 - t)) & 1;
 	}
+      else
+	STORE (DREG (dst0), DREG (src1));
     }
   else if (sop == 0 && sopcde == 2)
     {
       int count = imm6 (newimmag);
       /* dregs = dregs >>> imm6 */
       if (count < 0)
-	DREG (dst0) = lshift (DREG (src1), -count, 32, 0);
+	STORE (DREG (dst0), lshift (DREG (src1), -count, 32, 0));
       else
-	DREG (dst0) = ashiftrt (DREG (src1), count, 32);
+	STORE (DREG (dst0), ashiftrt (DREG (src1), count, 32));
     }
   else
     illegal_instruction ();
