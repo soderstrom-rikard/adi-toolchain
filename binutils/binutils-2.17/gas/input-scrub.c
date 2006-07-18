@@ -343,7 +343,7 @@ input_scrub_next_buffer (char **bufp)
     {
       register char *p;		/* Find last newline.  */
 
-      for (p = limit - 1; *p != '\n'; --p)
+      for (p = limit - 1; *p != '\n' || TC_EOL_IN_INSN (p); --p)
 	;
       ++p;
 
@@ -369,7 +369,7 @@ input_scrub_next_buffer (char **bufp)
 	      return NULL;
 	    }
 
-	  for (p = limit - 1; *p != '\n'; --p)
+	  for (p = limit - 1; *p != '\n' || TC_EOL_IN_INSN (p); --p)
 	    ;
 	  ++p;
 	}
