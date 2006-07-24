@@ -938,14 +938,14 @@ if [ $KERNEL_SOURCE ] ; then
       echo '# BUILD_UCLIBC_SEP_DATA is not set' >>.config
     fi
 
-    RUN="$MAKE oldconfig ROOTDIR=$UCLINUX_ROOT"
+    RUN="$MAKE oldconfig CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
     cp .config .config-used-for-bfin
 
     echo -n "*** Cleaning uClibc                " ; date
-    RUN="$MAKE clean ROOTDIR=$UCLINUX_ROOT"
+    RUN="$MAKE clean CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
@@ -955,7 +955,7 @@ if [ $KERNEL_SOURCE ] ; then
     (echo $RUN $LOGFILE ; ) | sh
 
     echo -n "*** Installing uClibc              " ; date
-    RUN="$MAKE install PREFIX=$DIR_uC_OUTPUT/bfin-uclinux DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ ROOTDIR=$UCLINUX_ROOT"
+    RUN="$MAKE install CROSS=bfin-elf- PREFIX=$DIR_uC_OUTPUT/bfin-uclinux DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
@@ -984,14 +984,14 @@ if [ $KERNEL_SOURCE ] ; then
     echo 'BUILD_UCLIBC_SEP_DATA=y' >>.config
     echo 'MULTILIB="msep-data"' >>.config
 
-    RUN="$MAKE oldconfig ROOTDIR=$UCLINUX_ROOT"
+    RUN="$MAKE oldconfig CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
     cp .config .config-used-for-bfin-shared-flat
 
     echo -n "*** Cleaning uClibc                " ; date
-    RUN="$MAKE clean ROOTDIR=$UCLINUX_ROOT"
+    RUN="$MAKE clean CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
@@ -1001,7 +1001,7 @@ if [ $KERNEL_SOURCE ] ; then
     (echo $RUN $LOGFILE ; ) | sh
 
     echo -n "*** Installing uClibc              " ; date
-    RUN="$MAKE install PREFIX=$DIR_uC_OUTPUT/bfin-uclinux DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ ROOTDIR=$UCLINUX_ROOT"
+    RUN="$MAKE install CROSS=bfin-elf- PREFIX=$DIR_uC_OUTPUT/bfin-uclinux DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
@@ -1030,14 +1030,14 @@ if [ $KERNEL_SOURCE ] ; then
     echo 'BUILD_UCLIBC_SHARED_FLAT=y' >>.config
     echo 'MULTILIB="mid-shared-library"' >>.config
 
-    RUN="$MAKE oldconfig ROOTDIR=$UCLINUX_ROOT"
+    RUN="$MAKE oldconfig CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
     cp .config .config-used-for-bfin-shared-flat
 
     echo -n "*** Cleaning uClibc                " ; date
-    RUN="$MAKE clean ROOTDIR=$UCLINUX_ROOT"
+    RUN="$MAKE clean CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
@@ -1047,7 +1047,7 @@ if [ $KERNEL_SOURCE ] ; then
     (echo $RUN $LOGFILE ; ) | sh
 
     echo -n "*** Installing uClibc              " ; date
-    RUN="$MAKE install PREFIX=$DIR_uC_OUTPUT/bfin-uclinux DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ ROOTDIR=$UCLINUX_ROOT"
+    RUN="$MAKE install CROSS=bfin-elf- PREFIX=$DIR_uC_OUTPUT/bfin-uclinux DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
@@ -1083,14 +1083,14 @@ if [ $KERNEL_SOURCE ] ; then
       rm -f .tmp.config.provided
     fi
 
-    RUN="$MAKE oldconfig ROOTDIR=$UCLINUX_ROOT"
+    RUN="$MAKE oldconfig CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
     cp .config .config-used-for-bfinfdpic
 
     echo -n "*** Cleaning uClibc                " ; date
-    RUN="$MAKE clean ROOTDIR=$UCLINUX_ROOT"
+    RUN="$MAKE clean CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
@@ -1100,7 +1100,7 @@ if [ $KERNEL_SOURCE ] ; then
     (echo $RUN $LOGFILE ; ) | sh
 
     echo -n "*** Installing uClibc              " ; date
-    RUN="$MAKE install PREFIX=$DIR_uC_OUTPUT/bfin-uclinux DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ ROOTDIR=$UCLINUX_ROOT"
+    RUN="$MAKE install CROSS=bfin-elf- PREFIX=$DIR_uC_OUTPUT/bfin-uclinux DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
