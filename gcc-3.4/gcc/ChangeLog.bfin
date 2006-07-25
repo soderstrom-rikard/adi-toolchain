@@ -1,3 +1,11 @@
+2006-07-25  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (REG_LT0, REG_LT1, REG_LB0, REG_LB1, REG_LC0,
+	REG_LC1): New constants.
+	* config/bfin/bfin.h (FIRST_PSEUDO_REGISTER): Now 50.
+	(REGISTER_NAMES, FIXED_REGISTERS, CALL_USED_REGISTERS): Add
+	hardware loop regs.
+
 2006-07-10  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_expand_builtin): Fix some uninitialized

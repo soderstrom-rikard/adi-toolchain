@@ -419,7 +419,7 @@ extern const char *bfin_library_id_string;
    5  return address registers RETS/I/X/N/E
    1  arithmetic status register (ASTAT).  */
 
-#define FIRST_PSEUDO_REGISTER 44
+#define FIRST_PSEUDO_REGISTER 50
 
 #define PREG_P(X) (REG_P (X) && P_REGNO_P (REGNO (X)))
 #define IREG_P(X) (REG_P (X) && I_REGNO_P (REGNO (X)))
@@ -437,7 +437,8 @@ extern const char *bfin_library_id_string;
   "A0", "A1", \
   "CC", \
   "RETS", "RETI", "RETX", "RETN", "RETE", "ASTAT", "SEQSTAT", "USP", \
-  "ARGP" \
+  "ARGP", \
+  "LT0", "LT1", "LC0", "LC1", "LB0", "LB1" \
 }
 
 #define SHORT_REGISTER_NAMES { \
@@ -468,7 +469,9 @@ extern const char *bfin_library_id_string;
 /*i0 i1 i2 i3 b0 b1 b2 b3   l0 l1 l2 l3 m0 m1 m2 m3 */ \
   0, 0, 0, 0, 0, 0, 0, 0,   1, 1, 1, 1, 0, 0, 0, 0,    \
 /*a0 a1 cc rets/i/x/n/e     astat seqstat usp argp */ \
-  0, 0, 1, 1, 1, 1, 1, 1,   1, 1, 1, 1	 \
+  0, 0, 1, 1, 1, 1, 1, 1,   1, 1, 1, 1, 1, 1, 1, 1,    \
+/*lb0/1 */ \
+  1, 1  \
 }
 
 /* 1 for registers not available across function calls.
@@ -484,7 +487,9 @@ extern const char *bfin_library_id_string;
 /*i0 i1 i2 i3 b0 b1 b2 b3   l0 l1 l2 l3 m0 m1 m2 m3 */ \
   1, 1, 1, 1, 1, 1, 1, 1,   1, 1, 1, 1, 1, 1, 1, 1,   \
 /*a0 a1 cc rets/i/x/n/e     astat seqstat usp argp */ \
-  1, 1, 1, 1, 1, 1, 1, 1,   1, 1, 1, 1	 \
+  1, 1, 1, 1, 1, 1, 1, 1,   1, 1, 1, 1, 1, 1, 1, 1, \
+/*lb0/1 */ \
+  1, 1  \
 }
 
 /* Order in which to allocate registers.  Each register must be
@@ -501,7 +506,8 @@ extern const char *bfin_library_id_string;
   REG_L0, REG_L1, REG_L2, REG_L3, REG_M0, REG_M1, REG_M2, REG_M3, \
   REG_RETS, REG_RETI, REG_RETX, REG_RETN, REG_RETE,		  \
   REG_ASTAT, REG_SEQSTAT, REG_USP, 				  \
-  REG_CC, REG_ARGP						  \
+  REG_CC, REG_ARGP,						  \
+  REG_LT0, REG_LT1, REG_LC0, REG_LC1, REG_LB0, REG_LB1		  \
 }
 
 /* Macro to conditionally modify fixed_regs/call_used_regs.  */

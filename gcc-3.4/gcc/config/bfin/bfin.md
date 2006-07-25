@@ -107,8 +107,15 @@
    (REG_ASTAT 40)
    (REG_SEQSTAT 41)
    (REG_USP 42)
+ 
+   (REG_ARGP 43)
 
-   (REG_ARGP 43)])
+   (REG_LT0 44)
+   (REG_LT1 45)
+   (REG_LC0 46)
+   (REG_LC1 47)
+   (REG_LB0 48)
+   (REG_LB1 49)])
 
 ;; Constants used in UNSPECs and UNSPEC_VOLATILEs.
 
