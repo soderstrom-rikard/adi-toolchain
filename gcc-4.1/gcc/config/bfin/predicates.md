@@ -74,6 +74,11 @@
   return 1;
 })
 
+;; Return nonzero if OP is a D register.
+(define_predicate "d_register_operand"
+  (and (match_code "reg")
+       (match_test "D_REGNO_P (REGNO (op))")))
+
 ;; Return nonzero if OP is a LC register.
 (define_predicate "lc_register_operand"
   (and (match_code "reg")
