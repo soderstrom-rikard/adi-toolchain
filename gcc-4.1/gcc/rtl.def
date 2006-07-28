@@ -96,8 +96,15 @@ DEF_RTL_EXPR(INSN_LIST, "insn_list", "ue", RTX_EXTRA)
 /* SEQUENCE appears in the result of a `gen_...' function
    for a DEFINE_EXPAND that wants to make several insns.
    Its elements are the bodies of the insns that should be made.
-   `emit_insn' takes the SEQUENCE apart and makes separate insns.  */
+   `emit_insn' takes the SEQUENCE apart and makes separate insns.
+   Delayed branch scheduling may also generate insns that contain a
+   SEQUENCE at the top level.  */
 DEF_RTL_EXPR(SEQUENCE, "sequence", "E", RTX_EXTRA)
+
+/* Similar to the use of SEQUENCE for delayed branch sequences, this
+   describes a set of RTL insns that will form a single multi-issue
+   instruction at the assembly level.  */
+DEF_RTL_EXPR(BUNDLE, "bundle", "E", RTX_EXTRA)
 
 /* Refers to the address of its argument.  This is only used in alias.c.  */
 DEF_RTL_EXPR(ADDRESS, "address", "e", RTX_MATCH)

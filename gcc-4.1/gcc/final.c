@@ -429,7 +429,7 @@ get_attr_length_1 (rtx insn ATTRIBUTE_UNUSED,
 
 	else if (GET_CODE (body) == ASM_INPUT || asm_noperands (body) >= 0)
 	  length = asm_insn_count (body) * fallback_fn (insn);
-	else if (GET_CODE (body) == SEQUENCE)
+	else if (GET_CODE (body) == SEQUENCE || GET_CODE (body) == BUNDLE)
 	  for (i = 0; i < XVECLEN (body, 0); i++)
 	    length += get_attr_length (XVECEXP (body, 0, i));
 	else
@@ -1058,14 +1058,13 @@ shorten_branches (rtx first ATTRIBUTE_UNUSED)
 	}
       else if (GET_CODE (body) == ASM_INPUT || asm_noperands (body) >= 0)
 	insn_lengths[uid] = asm_insn_count (body) * insn_default_length (insn);
-      else if (GET_CODE (body) == SEQUENCE)
+      else if (GET_CODE (body) == SEQUENCE || GET_CODE (body) == BUNDLE)
 	{
 	  int i;
-	  int const_delay_slots;
+	  int const_delay_slots = 0;
 #ifdef DELAY_SLOTS
-	  const_delay_slots = const_num_delay_slots (XVECEXP (body, 0, 0));
-#else
-	  const_delay_slots = 0;
+	  if (GET_CODE (body) == SEQUENCE)
+	    const_delay_slots = const_num_delay_slots (XVECEXP (body, 0, 0));
 #endif
 	  /* Inside a delay slot sequence, we do not do any branch shortening
 	     if the shortening could change the number of delay slots
@@ -1267,7 +1266,8 @@ shorten_branches (rtx first ATTRIBUTE_UNUSED)
 	  if (! (varying_length[uid]))
 	    {
 	      if (NONJUMP_INSN_P (insn)
-		  && GET_CODE (PATTERN (insn)) == SEQUENCE)
+		  && (GET_CODE (PATTERN (insn)) == SEQUENCE
+		      || GET_CODE (PATTERN (insn)) == BUNDLE))
 		{
 		  int i;
 
@@ -1288,7 +1288,9 @@ shorten_branches (rtx first ATTRIBUTE_UNUSED)
 	      continue;
 	    }
 
-	  if (NONJUMP_INSN_P (insn) && GET_CODE (PATTERN (insn)) == SEQUENCE)
+	  if (NONJUMP_INSN_P (insn)
+	      && (GET_CODE (PATTERN (insn)) == SEQUENCE
+		  || GET_CODE (PATTERN (insn)) == BUNDLE))
 	    {
 	      int i;
 
@@ -1614,7 +1616,7 @@ final (rtx first, FILE *file, int optimize)
 	insn_current_address = INSN_ADDRESSES (INSN_UID (insn));
 #endif /* HAVE_ATTR_length */
 
-      insn = final_scan_insn (insn, file, optimize, 0, &seen);
+      insn = final_scan_insn (insn, file, optimize, 0, &seen, 0);
     }
 }
 
@@ -1683,7 +1685,7 @@ output_alternate_entry_point (FILE *file, rtx insn)
 
 rtx
 final_scan_insn (rtx insn, FILE *file, int optimize ATTRIBUTE_UNUSED,
-		 int nopeepholes ATTRIBUTE_UNUSED, int *seen)
+		 int nopeepholes ATTRIBUTE_UNUSED, int *seen, int nolinenos)
 {
 #ifdef HAVE_cc0
   rtx set;
@@ -2084,7 +2086,7 @@ final_scan_insn (rtx insn, FILE *file, int optimize ATTRIBUTE_UNUSED,
 	  }
 	/* Output this line note if it is the first or the last line
 	   note in a row.  */
-	if (notice_source_line (insn))
+	if (!nolinenos && notice_source_line (insn))
 	  {
 	    (*debug_hooks->source_line) (last_linenum, last_filename);
 	  }
@@ -2149,7 +2151,7 @@ final_scan_insn (rtx insn, FILE *file, int optimize ATTRIBUTE_UNUSED,
 	    app_on = 0;
 	  }
 
-	if (GET_CODE (body) == SEQUENCE)
+	if (GET_CODE (body) == SEQUENCE || GET_CODE (body) == BUNDLE)
 	  {
 	    /* A delayed-branch sequence */
 	    int i;
@@ -2160,8 +2162,11 @@ final_scan_insn (rtx insn, FILE *file, int optimize ATTRIBUTE_UNUSED,
 	       This is needed for delayed calls: see execute_cfa_program().  */
 #if defined (DWARF2_UNWIND_INFO)
 	    if (dwarf2out_do_frame ())
-	      for (i = 1; i < XVECLEN (body, 0); i++)
-		dwarf2out_frame_debug (XVECEXP (body, 0, i), false);
+	      {
+		i = GET_CODE (body) == BUNDLE ? 0 : 1;
+		for (; i < XVECLEN (body, 0); i++)
+		  dwarf2out_frame_debug (XVECEXP (body, 0, i), false);
+	      }
 #endif
 
 	    /* The first insn in this SEQUENCE might be a JUMP_INSN that will
@@ -2169,7 +2174,7 @@ final_scan_insn (rtx insn, FILE *file, int optimize ATTRIBUTE_UNUSED,
 	       thought unnecessary.  If that happens, cancel this sequence
 	       and cause that insn to be restored.  */
 
-	    next = final_scan_insn (XVECEXP (body, 0, 0), file, 0, 1, seen);
+	    next = final_scan_insn (XVECEXP (body, 0, 0), file, 0, 1, seen, 0);
 	    if (next != XVECEXP (body, 0, 1))
 	      {
 		final_sequence = 0;
@@ -2183,7 +2188,8 @@ final_scan_insn (rtx insn, FILE *file, int optimize ATTRIBUTE_UNUSED,
 		/* We loop in case any instruction in a delay slot gets
 		   split.  */
 		do
-		  insn = final_scan_insn (insn, file, 0, 1, seen);
+		  insn = final_scan_insn (insn, file, 0, 1, seen,
+					  GET_CODE (body) == BUNDLE);
 		while (insn != next);
 	      }
 #ifdef DBR_OUTPUT_SEQEND
@@ -2370,7 +2376,7 @@ final_scan_insn (rtx insn, FILE *file, int optimize ATTRIBUTE_UNUSED,
 
 		for (note = NEXT_INSN (insn); note != next;
 		     note = NEXT_INSN (note))
-		  final_scan_insn (note, file, optimize, nopeepholes, seen);
+		  final_scan_insn (note, file, optimize, nopeepholes, seen, nolinenos);
 
 		/* Put the notes in the proper position for a later
 		   rescan.  For example, the SH target can do this
