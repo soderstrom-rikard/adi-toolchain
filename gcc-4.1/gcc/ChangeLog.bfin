@@ -9,6 +9,17 @@
 	add in extra cost of reg+reg addition.  Don't start scanning valid
 	offsets at 1; use value based on BIGGEST_ALIGNMENT.
 
+	* ifcvt.c (condition_clobbered): New static variable.
+	(note_clobbers_of_cond, sequence_clobbers_condition_p): New static
+	functions.
+	(noce_try_cmove_arith): Use sequence_clobbers_condition_p.
+	* config/bfin/bfin.md (andnotsi): New pattern.
+	(andsi_insn): Now a define_insn_and_split; new alternative to handle
+	and with 1.  Clobber CC.
+	(andsi3): Clobber CC.
+	* config/bfin/predicates.md (const1_operand): New predicate.
+	(rhs_andsi3_operand): Allow constant 1.
+	
 2006-07-28  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* rtl.def (BUNDLE): New rtx code.

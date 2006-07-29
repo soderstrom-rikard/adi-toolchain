@@ -617,6 +617,38 @@ static int noce_try_minmax (struct noce_if_info *);
 static int noce_try_abs (struct noce_if_info *);
 static int noce_try_sign_mask (struct noce_if_info *);
 
+/* Used for communication with sequence_clobbers_condition_p.  */
+static int condition_clobbered;
+
+/* Set the variable CONDITION_CLOBBERED to 1 if INSN clobbers the
+   condition which is passed through DATA.  Called via note_stores
+   from sequence_clobbers_condition_p.  */
+
+static int
+note_clobbers_of_cond (rtx x, rtx pat, void *data)
+{
+  rtx cond = (rtx) data;
+  if (reg_overlap_mentioned_p (x, cond))
+    condition_clobbered = 1;
+}
+
+/* Return nonzero if we find that any instruction in the sequence SEQ can
+   clobber the condition COND.  */
+
+static int
+sequence_clobbers_condition_p (rtx seq, rtx cond)
+{
+  condition_clobbered = 0;
+  while (seq)
+    {
+      note_stores (PATTERN (seq), note_clobbers_of_cond, (void *) cond);
+      if (condition_clobbered)
+	return 1;
+      seq = NEXT_INSN (seq);
+    }
+  return 0;
+}
+
 /* Helper function for noce_try_store_flag*.  */
 
 static rtx
@@ -1427,6 +1459,9 @@ noce_try_cmove_arith (struct noce_if_info *if_info)
       if (recog_memoized (tmp) < 0)
 	goto end_seq_and_fail;
     }
+
+  if (sequence_clobbers_condition_p (get_insns (), if_info->cond))
+    goto end_seq_and_fail;
 
   target = noce_emit_cmove (if_info, x, code, XEXP (if_info->cond, 0),
 			    XEXP (if_info->cond, 1), a, b);

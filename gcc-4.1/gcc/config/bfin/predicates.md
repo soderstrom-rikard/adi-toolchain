@@ -40,7 +40,7 @@
 (define_predicate "rhs_andsi3_operand"
   (ior (match_operand 0 "register_operand")
        (and (match_code "const_int")
-	    (match_test "log2constp (~INTVAL (op)) || INTVAL (op) == 255 || INTVAL (op) == 65535"))))
+	    (match_test "log2constp (~INTVAL (op)) || INTVAL (op) == 255 || INTVAL (op) == 65535 || INTVAL (op) == 1"))))
 
 ;; Return nonzero if OP is a register or a constant with exactly one bit
 ;; set.
@@ -57,6 +57,10 @@
 (define_predicate "const01_operand"
   (and (match_code "const_int")
        (match_test "op == const0_rtx || op == const1_rtx")))
+
+(define_predicate "const1_operand"
+  (and (match_code "const_int")
+       (match_test "op == const1_rtx")))
 
 (define_predicate "vec_shift_operand"
   (ior (and (match_code "const_int")

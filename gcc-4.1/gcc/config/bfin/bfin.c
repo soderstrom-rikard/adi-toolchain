@@ -2529,6 +2529,12 @@ bfin_rtx_costs (rtx x, int code, int outer_code, int *total)
 	*total = 2 * cost2;
       return false;
 
+    case EQ:
+    case NE:
+      if (GET_MODE (x) == BImode)
+	*total = cost2;
+      return true;
+
     case MULT:
       if (GET_MODE_SIZE (GET_MODE (x)) <= UNITS_PER_WORD)
 	*total = COSTS_N_INSNS (3);

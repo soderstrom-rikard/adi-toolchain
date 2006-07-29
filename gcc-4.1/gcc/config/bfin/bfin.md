@@ -1263,22 +1263,48 @@
    (set (match_dup 0)
 	(ne:SI (reg:BI REG_CC) (const_int 0)))])
 
-(define_insn "*andsi_insn"
-  [(set (match_operand:SI 0 "register_operand" "=d,d,d,d")
-	(and:SI (match_operand:SI 1 "register_operand" "%0,d,d,d")
-		(match_operand:SI 2 "rhs_andsi3_operand" "L,M1,M2,d")))]
+
+(define_insn_and_split "*andnotsi"
+  [(set (match_operand:SI 0 "register_operand" "=d")
+	(and:SI (not:SI (match_operand:SI 1 "register_operand" "d"))
+		(match_operand:SI 2 "const1_operand" "P1")))
+   (clobber (reg:BI REG_CC))]
+  ""
+  "#"
+  "GET_CODE (operands[2]) == CONST_INT && INTVAL (operands[2]) == 1"
+  [(set (reg:BI REG_CC)
+	(eq:BI (zero_extract:SI (match_dup 1) (const_int 1) (match_dup 3))
+	       (const_int 0)))
+   (set (match_dup 0)
+	(ne:SI (reg:BI REG_CC) (const_int 0)))]
+  "operands[3] = GEN_INT (exact_log2 (INTVAL (operands[2])));")
+
+(define_insn_and_split "*andsi_insn"
+  [(set (match_operand:SI 0 "register_operand" "=d,d,d,d,d")
+	(and:SI (match_operand:SI 1 "register_operand" "%0,d,d,d,d")
+		(match_operand:SI 2 "rhs_andsi3_operand" "L,M1,M2,P1,d")))
+   (clobber (reg:BI REG_CC))]
   ""
   "@
    BITCLR (%0,%Y2);
    %0 = %T1 (Z);
    %0 = %h1 (Z);
+   #
    %0 = %1 & %2;"
+  "GET_CODE (operands[2]) == CONST_INT && INTVAL (operands[2]) == 1"
+  [(set (reg:BI REG_CC)
+	(ne:BI (zero_extract:SI (match_dup 1) (const_int 1) (match_dup 3))
+	       (const_int 0)))
+   (set (match_dup 0)
+	(ne:SI (reg:BI REG_CC) (const_int 0)))]
+  "operands[3] = GEN_INT (exact_log2 (INTVAL (operands[2])));"
   [(set_attr "type" "alu0")])
 
 (define_expand "andsi3"
-  [(set (match_operand:SI 0 "register_operand" "")
-	(and:SI (match_operand:SI 1 "register_operand" "")
-		(match_operand:SI 2 "general_operand" "")))]
+  [(parallel [(set (match_operand:SI 0 "register_operand" "")
+		   (and:SI (match_operand:SI 1 "register_operand" "")
+			   (match_operand:SI 2 "general_operand" "")))
+	      (clobber (reg:BI REG_CC))])]
   ""
 {
   if (highbits_operand (operands[2], SImode))
