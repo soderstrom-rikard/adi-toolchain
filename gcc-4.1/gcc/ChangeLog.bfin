@@ -1,3 +1,14 @@
+2006-07-29  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* tree-flow.h (multiplier_allowed_in_address_p): Fix prototype.
+	* tree-ssa-loop-ivopts.c (multiplier_allowed_in_address_p): New
+	arg MODE.  All callers changed.  Use proper mode for memory references
+	instead of Pmode.
+	(get_address_cost): New arg MEM_MODE.  All callers changed.  Use it
+	for all memory references.  If we have an out-of-range offset, don't
+	add in extra cost of reg+reg addition.  Don't start scanning valid
+	offsets at 1; use value based on BIGGEST_ALIGNMENT.
+
 2006-07-28  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* rtl.def (BUNDLE): New rtx code.
