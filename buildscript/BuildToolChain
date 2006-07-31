@@ -435,6 +435,13 @@ if [ ! -d $DIR_GENEXT2FS_SOURCE ] ; then
     exit
 fi
 
+echo -n "Path to cramfs-tools        "
+DIR_CRAMFS_SOURCE=$DIR_SOURCE/cramfs-1.1
+echo $DIR_CRAMFS_SOURCE
+if [ ! -d $DIR_CRAMFS_SOURCE ] ; then
+    echo "Can't find cramfs-1.1 source at $DIR_CRAMFS_SOURCE"
+    exit
+fi
 
 ###################### set up log file ###########################
 
@@ -475,16 +482,19 @@ fi
 DIR_BINUTILS_BUILD=$DIR_BUILD/binutils_build
 DIR_ELF2FLT_BUILD=$DIR_BUILD/elf2flt_build
 DIR_GENEXT2FS_BUILD=$DIR_BUILD/genext2fs_build
+DIR_CRAMFS_BUILD=$DIR_BUILD/cramfs_build
 
 echo "Removing old build dir"
 
 rm -rf $DIR_BINUTILS_BUILD
 rm -rf $DIR_ELF2FLT_BUILD
 rm -rf $DIR_GENEXT2FS_BUILD
+rm -rf $DIR_CRAMFS_BUILD
 
-mkdir $DIR_BINUTILS_BUILD
-mkdir $DIR_ELF2FLT_BUILD
-mkdir $DIR_GENEXT2FS_BUILD
+mkdir -p $DIR_BINUTILS_BUILD
+mkdir -p $DIR_ELF2FLT_BUILD
+mkdir -p $DIR_GENEXT2FS_BUILD
+mkdir -p $DIR_CRAMFS_BUILD
 
 
 # Add output dir so when building uclibc, it can find the toolchain
@@ -752,95 +762,6 @@ if [ "x$SKIP_ELF" = "x" ]; then
       build_gcc $GCC_VERSION elf $DIR_ELF_OUTPUT "--with-newlib"
     done
 
-    ######################## Step 2 - build elf2flt ##############
-
-    echo -n "*** Building Elf elf2flt           " ; date
-    cd $DIR_ELF2FLT_BUILD
-
-    RUN="$DIR_ELF2FLT_SOURCE/configure $HOST_TARGET --target=bfin-elf \
-         --with-libbfd=$DIR_BINUTILS_BUILD/bfd/libbfd.a               \
-         --with-libiberty=$DIR_ELF_OUTPUT/lib/libiberty.a             \
-         --with-bfd-include-dir=$DIR_BINUTILS_BUILD/bfd               \
-         --with-binutils-include-dir=$DIR_BINUTILS_SOURCE/include     \
-         --prefix=$DIR_ELF_OUTPUT --program-suffix= "
-
-    if [ -e $DIR_BINUTILS_BUILD/intl/libintl.a ] ; then
-        RUN="$RUN --with-libintl=$DIR_BINUTILS_BUILD/intl/libintl.a"
-    fi
-
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
-
-    echo -n "*** Make Elf elf2flt               " ; date
-    RUN=$MAKE
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
-
-    for RUN in elf2flt  flthdr
-    do
-        if [ ! -f $DIR_ELF2FLT_BUILD/$RUN ] ; then
-            echo "Elf2flt did not build properly : Missing $RUN"
-            echo "Please report an error to http://blackfin.uclinux.org"
-            tail -10 $ACTUAL_LOGFILE
-            exit
-        fi
-    done
-
-    echo -n "*** Installing Elf elf2flt         " ; date
-    RUN="$MAKE install"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
-
-    for RUN in bfin-elf-elf2flt bfin-elf-flthdr
-    do
-        if [ ! -f $DIR_ELF_OUTPUT/bin/$RUN ] ; then
-            echo "Elf2flt did not install properly : Missing $RUN"
-            echo "Please report an error to http://blackfin.uclinux.org"
-            tail -10 $ACTUAL_LOGFILE
-            exit
-       fi
-    done
-
-    ########################### genext2fs ########################
-
-    echo -n "*** Building Elf genext2fs         " ; date
-    cd $DIR_GENEXT2FS_BUILD
-
-    RUN="$DIR_GENEXT2FS_SOURCE/configure --prefix=$DIR_ELF_OUTPUT"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
-
-    echo -n "*** Make Elf genext2fs             " ; date
-    RUN=$MAKE
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
-
-    for RUN in genext2fs
-    do
-        if [ ! -f $DIR_GENEXT2FS_BUILD/$RUN ] ; then
-            echo "genext2fs did not build properly : Missing $RUN"
-            echo "Please report an error to http://blackfin.uclinux.org"
-            tail -10 $ACTUAL_LOGFILE
-            exit
-        fi
-    done
-
-    echo -n "*** Installing Elf genext2fs       " ; date
-    RUN="$MAKE install"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
-    mv $DIR_ELF_OUTPUT/bin/genext2fs $DIR_ELF_OUTPUT/bin/bfin-elf-genext2fs
-
-    for RUN in bfin-elf-genext2fs
-    do
-        if [ ! -f $DIR_ELF_OUTPUT/bin/$RUN ] ; then
-            echo "Elf2flt did not install properly : Missing $RUN"
-            echo "Please report an error to http://blackfin.uclinux.org"
-            tail -10 $ACTUAL_LOGFILE
-            exit
-       fi
-    done
-
     ########################### Step 2 - done ####################
 
     if [ $CHECK_ON_SIMULATOR ] ; then
@@ -852,6 +773,8 @@ fi
 rm -rf $DIR_GENEXT2FS_BUILD/*
 rm -rf $DIR_ELF2FLT_BUILD/*
 rm -rf $DIR_BINUTILS_BUILD/*
+rm -rf $DIR_CRAMFS_BUILD/*
+
 for GCC_VERSION in $GCC_VERSIONS; do
     DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
     rm -rf $DIR_GCC_BUILD/*
@@ -1276,12 +1199,54 @@ if [ $KERNEL_SOURCE ] ; then
     RUN="$MAKE install"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
-    mv $DIR_uC_OUTPUT/bin/genext2fs $DIR_uC_OUTPUT/bin/bfin-elf-genext2fs
+    mv $DIR_uC_OUTPUT/bin/genext2fs $DIR_uC_OUTPUT/bin/bfin-uclinux-genext2fs
 
-    for RUN in bfin-elf-genext2fs
+    for RUN in bfin-uclinux-genext2fs
     do
-        if [ ! -f $DIR_ELF_OUTPUT/bin/$RUN ] ; then
+        if [ ! -f $DIR_uC_OUTPUT/bin/$RUN ] ; then
             echo "genext2fs did not install properly : Missing $RUN"
+            echo "Please report an error to http://blackfin.uclinux.org"
+            tail -10 $ACTUAL_LOGFILE
+            exit
+       fi
+    done
+
+    ########################### cramfs ########################
+
+    echo -n "*** Building uClinux cramfs-tools  " ; date
+    cd $DIR_CRAMFS_SOURCE
+
+    echo -n "*** Cleaning uClinux cramfs-tools  " ; date
+    RUN="$MAKE distclean "
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    echo -n "*** Make uClinux cramfs-tools      " ; date
+    RUN=$MAKE
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    for RUN in mkcramfs cramfsck
+    do
+        if [ ! -f $DIR_CRAMFS_SOURCE/$RUN ] ; then
+            echo "cramfs did not build properly : Missing $RUN"
+            echo "Please report an error to http://blackfin.uclinux.org"
+            tail -10 $ACTUAL_LOGFILE
+            exit
+        fi
+    done
+
+    echo -n "*** Installing uClinux cramfs-tools " ; date
+    RUN="$MAKE install"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+    mv $DIR_CRAMFS_SOURCE/mkcramfs $DIR_uC_OUTPUT/bin/bfin-uclinux-mkcramfs
+    mv $DIR_CRAMFS_SOURCE/cramfsck $DIR_uC_OUTPUT/bin/bfin-uclinux-cramfsck
+
+    for RUN in bfin-uclinux-mkcramfs bfin-uclinux-cramfsck
+    do
+        if [ ! -f $DIR_uC_OUTPUT/bin/$RUN ] ; then
+            echo "cramfs did not install properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
             exit
