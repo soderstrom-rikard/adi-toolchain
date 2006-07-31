@@ -1667,7 +1667,7 @@
 			    (const_int -1)))
 	      (unspec [(const_int 0)] UNSPEC_LSETUP_END)
 	      (clobber (match_scratch:SI 5 ""))])]
-  ""
+  "!optimize_size"
   {bfin_hardware_loop ();})
 
 (define_insn "loop_end"

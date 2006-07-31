@@ -1,7 +1,9 @@
-2006-07-30  Bernd Schmidt  <bernd.schmidt@analog.com>
+2006-07-31  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_rtx_costs): Handle more cases to get better
 	results from the combiner.
+	* config/bfin/bfin.md (doloop_end): Don't use this when optimizing for
+	size.
 
 2006-07-29  Bernd Schmidt  <bernd.schmidt@analog.com>
 
