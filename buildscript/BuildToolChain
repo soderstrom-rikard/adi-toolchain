@@ -85,9 +85,9 @@ do
                 exit
             fi
             ;;
-	S)
-	    SKIP_ELF=true
-	    ;;
+        S)
+            SKIP_ELF=true
+            ;;
         T)
             RUN=`runtest --help 2>/dev/null | wc -l`
             if [ "$RUN" -gt 1 ] ; then
@@ -193,9 +193,9 @@ do
         i)
             BUILD_TARGET_BINUTILS=1
             ;;
-	C)
-	    UCLIBC_CONFIG_FILE=$OPTARG
-	    ;;
+        C)
+            UCLIBC_CONFIG_FILE=$OPTARG
+            ;;
         o)
             DIR_ELF_OUTPUT=$OPTARG-elf
             DIR_uC_OUTPUT=$OPTARG-uclinux
@@ -224,7 +224,7 @@ do
              ;;
         *)
              echo "Try \`$APP_NAME -h' for more information."
-             exit	
+             exit
     esac
 done
 
