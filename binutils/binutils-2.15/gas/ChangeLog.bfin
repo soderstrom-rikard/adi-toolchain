@@ -1,3 +1,8 @@
+2006-07-31  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* input-scrub.c (input_scrub_next_buffer): Null-terminate buffer
+	before calling TC_EOL_IN_INSN.
+
 2006-07-18  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* input-scrub.c (input_scrub_next_buffer): Check TC_EOL_IN_INSN.
