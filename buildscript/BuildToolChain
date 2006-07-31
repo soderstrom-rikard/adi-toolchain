@@ -213,6 +213,7 @@ do
 -u SOURCE        Uboot Source directory
 -b BUILD         Build directory (leave blank to use current dir)
 -o OUTPUT        Output directory (leave blank to use build dir)
+-S               Skip building elf toolchain (check to see if already built)
 -m MAKE          Default make (leave blank to use system make)
 -c GCC_VERSION   GCC version (default 3.4).  Can be given multiple times.
 -i               Build binutils libraries for use on the target.
@@ -365,6 +366,16 @@ if [ $KERNEL_SOURCE ] ; then
       echo $DIR_UBOOT
     else
       echo "U-Boot Source not specified: addon utilties (like 'mkimage') will not be built"
+    fi
+    if [ -z "$UCLIBC_CONFIG_FILE" ]; then
+      echo "Path to uClibc Config files    $KERNEL_SOURCE/uClibc/extra/Configs/"
+    else
+      if [ -f $UCLIBC_CONFIG_FILE ]; then
+        echo "Path to uClibc config files    $UCLIBC_CONFIG_FILE"
+      else
+        echo "Can't find uClibc config file at $UCLIBC_CONFIG_FILE"
+        exit
+      fi
     fi
 fi
 
@@ -673,6 +684,76 @@ run_tests ()
     done
 }
 
+# 1st argument is the dir to check for installed libs
+#
+build_uClibc()
+{
+    echo -n "*** Cleaning uClibc                " ; date
+    RUN="$MAKE clean CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    echo -n "*** Building uClibc                " ; date
+    LOCAL=`grep "UCLIBC_HAS_LOCALE=y" .config`
+    if [ -z "$LOCAL" ] ; then
+        RUN="$MAKE all CROSS=bfin-elf- KERNEL_SOURCE=$KERNEL_SOURCE ROOTDIR=$UCLINUX_ROOT"
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    else
+        echo -n "*** Building Locale                " ; date
+        RUN="$MAKE headers CROSS=bfin-elf- KERNEL_SOURCE=$KERNEL_SOURCE ROOTDIR=$UCLINUX_ROOT"
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh
+
+        cd ./extra/locale
+	RUN="$MAKE clean"
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh || die_with_log
+
+        if [ ! -f ./codesets.txt ] ; then
+            echo "      Creating codesets.txt"
+            find ./charmaps -name "*.pairs" > ./codesets.txt
+        fi
+        if [ ! -f ./locales.txt ] ; then
+            echo "      Creating locales.txt"
+            cp ./LOCALES ./locales.txt
+        fi
+
+        RUN="$MAKE CROSS=bfin-elf-"
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh || die_with_log
+        cd ../..
+
+        RUN="$MAKE all CROSS=bfin-elf- KERNEL_SOURCE=$KERNEL_SOURCE ROOTDIR=$UCLINUX_ROOT"
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    fi
+
+    echo -n "*** Installing uClibc              " ; date
+    RUN="$MAKE install CROSS=bfin-elf- PREFIX=$DIR_uC_OUTPUT/bfin-uclinux DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ ROOTDIR=$UCLINUX_ROOT"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    # Need a way to look at uClibc make system , and see what libs
+    # should be created
+    for RUN in crt0.o libc.a libcrypt.a libm.a libnsl.a libresolv.a \
+               libutil.a
+    do
+	FILE=$DIR_uC_OUTPUT/bfin-uclinux/lib/$1$RUN
+        if [ ! -f $FILE ] ; then
+            echo "uClibc $1 did not install properly : Missing $RUN"
+            echo "Please report an error to http://blackfin.uclinux.org"
+            tail -10 $ACTUAL_LOGFILE
+            mv saved-config-toplevel .config 2>/dev/null
+            mv saved-config-linux linux-2.6.x/.config 2>/dev/null
+            mv saved-config-uClibc uClibc/.config 2>/dev/null
+            mv saved-config-user config/.config 2>/dev/null
+            mv saved-config-arch config.arch 2>/dev/null
+            exit
+        fi
+    done
+}
+
 ###################### Setting up test  ##########################
 
 if [ "x$CHECK_ON_SIMULATOR" != "x" -o "x$CHECK_ON_HARDWARE" != "x" ] ; then
@@ -896,7 +977,7 @@ if [ $KERNEL_SOURCE ] ; then
     echo -n "*** Configuring uClibc             " ; date
     cd $UCLIBC_SOURCE
 
-    if [ "x$UCLIBC_CONFIG_FILE" = "x" ]; then
+    if [ -z "$UCLIBC_CONFIG_FILE" ]; then
       cp extra/Configs/Config.bfin.default .config
     else
       cp $UCLIBC_CONFIG_FILE .tmp.config.provided
@@ -916,38 +997,7 @@ if [ $KERNEL_SOURCE ] ; then
 
     cp .config .config-used-for-bfin
 
-    echo -n "*** Cleaning uClibc                " ; date
-    RUN="$MAKE clean CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
-
-    echo -n "*** Building uClibc                " ; date
-    RUN="$MAKE all CROSS=bfin-elf- KERNEL_SOURCE=$KERNEL_SOURCE ROOTDIR=$UCLINUX_ROOT"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
-
-    echo -n "*** Installing uClibc              " ; date
-    RUN="$MAKE install CROSS=bfin-elf- PREFIX=$DIR_uC_OUTPUT/bfin-uclinux DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ ROOTDIR=$UCLINUX_ROOT"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
-
-    # Need a way to look at uClibc make system , and see what libs
-    # should be created
-    for RUN in crt0.o libc.a libcrypt.a libm.a libnsl.a libresolv.a \
-               libutil.a
-    do
-        if [ ! -f $DIR_uC_OUTPUT/bfin-uclinux/lib/$RUN ] ; then
-            echo "uClibc did not install properly : Missing $RUN"
-            echo "Please report an error to http://blackfin.uclinux.org"
-            tail -10 $ACTUAL_LOGFILE
-            mv saved-config-toplevel .config 2>/dev/null
-            mv saved-config-linux linux-2.6.x/.config 2>/dev/null
-            mv saved-config-uClibc uClibc/.config 2>/dev/null
-            mv saved-config-user config/.config 2>/dev/null
-            mv saved-config-arch config.arch 2>/dev/null
-            exit
-        fi
-    done
+    build_uClibc
 
     #################### Step 3b - build sep-data uClibc ##############
     echo -n "*** Configuring sep-data uClibc    " ; date
@@ -962,38 +1012,7 @@ if [ $KERNEL_SOURCE ] ; then
 
     cp .config .config-used-for-bfin-shared-flat
 
-    echo -n "*** Cleaning uClibc                " ; date
-    RUN="$MAKE clean CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
-
-    echo -n "*** Building uClibc                " ; date
-    RUN="$MAKE all CROSS=bfin-elf- KERNEL_SOURCE=$KERNEL_SOURCE ROOTDIR=$UCLINUX_ROOT"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
-
-    echo -n "*** Installing uClibc              " ; date
-    RUN="$MAKE install CROSS=bfin-elf- PREFIX=$DIR_uC_OUTPUT/bfin-uclinux DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ ROOTDIR=$UCLINUX_ROOT"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
-
-    # Need a way to look at uClibc make system , and see what libs
-    # should be created
-    for RUN in crt0.o libc.a libcrypt.a libm.a libnsl.a libresolv.a \
-               libutil.a
-    do
-        if [ ! -f $DIR_uC_OUTPUT/bfin-uclinux/lib/msep-data/$RUN ] ; then
-            echo "sep-data uClibc did not install properly : Missing $RUN"
-            echo "Please report an error to http://blackfin.uclinux.org"
-            tail -10 $ACTUAL_LOGFILE
-            mv saved-config-toplevel .config 2>/dev/null
-            mv saved-config-linux linux-2.6.x/.config 2>/dev/null
-            mv saved-config-uClibc uClibc/.config 2>/dev/null
-            mv saved-config-user config/.config 2>/dev/null
-            mv saved-config-arch config.arch 2>/dev/null
-            exit
-        fi
-    done
+    build_uClibc msep-data/
 
     #################### Step 3b - build shared flat uClibc ##############
     echo -n "*** Configuring shared flat uClibc " ; date
@@ -1008,43 +1027,12 @@ if [ $KERNEL_SOURCE ] ; then
 
     cp .config .config-used-for-bfin-shared-flat
 
-    echo -n "*** Cleaning uClibc                " ; date
-    RUN="$MAKE clean CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
-
-    echo -n "*** Building uClibc                " ; date
-    RUN="$MAKE all CROSS=bfin-elf- KERNEL_SOURCE=$KERNEL_SOURCE ROOTDIR=$UCLINUX_ROOT"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
-
-    echo -n "*** Installing uClibc              " ; date
-    RUN="$MAKE install CROSS=bfin-elf- PREFIX=$DIR_uC_OUTPUT/bfin-uclinux DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ ROOTDIR=$UCLINUX_ROOT"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
-
-    # Need a way to look at uClibc make system , and see what libs
-    # should be created
-    for RUN in crt0.o libc.a libcrypt.a libm.a libnsl.a libresolv.a \
-               libutil.a
-    do
-        if [ ! -f $DIR_uC_OUTPUT/bfin-uclinux/lib/mid-shared-library/$RUN ] ; then
-            echo "Shared flat uClibc did not install properly : Missing $RUN"
-            echo "Please report an error to http://blackfin.uclinux.org"
-            tail -10 $ACTUAL_LOGFILE
-            mv saved-config-toplevel .config 2>/dev/null
-            mv saved-config-linux linux-2.6.x/.config 2>/dev/null
-            mv saved-config-uClibc uClibc/.config 2>/dev/null
-            mv saved-config-user config/.config 2>/dev/null
-            mv saved-config-arch config.arch 2>/dev/null
-            exit
-        fi
-    done
+    build_uClibc mid-shared-library/
 
     ####################### Step 3c - build FD-PIC uClibc ################
     echo -n "*** Configuring uClibc for FD-PIC  " ; date
 
-    if [ "x$UCLIBC_CONFIG_FILE" = "x" ]; then
+    if [ -z "$UCLIBC_CONFIG_FILE" ]; then
       cp extra/Configs/Config.bfinfdpic.default .config
     else
       echo 'TARGET_bfinfdpic=y' >>.config
@@ -1061,38 +1049,9 @@ if [ $KERNEL_SOURCE ] ; then
 
     cp .config .config-used-for-bfinfdpic
 
-    echo -n "*** Cleaning uClibc                " ; date
-    RUN="$MAKE clean CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    build_uClibc mfdpic/
 
-    echo -n "*** Building uClibc                " ; date
-    RUN="$MAKE all CROSS=bfin-elf- KERNEL_SOURCE=$KERNEL_SOURCE ROOTDIR=$UCLINUX_ROOT"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
-
-    echo -n "*** Installing uClibc              " ; date
-    RUN="$MAKE install CROSS=bfin-elf- PREFIX=$DIR_uC_OUTPUT/bfin-uclinux DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ ROOTDIR=$UCLINUX_ROOT"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
-
-    # Need a way to look at uClibc make system , and see what libs
-    # should be created
-    for RUN in crt1.o libc.so libcrypt.so libm.so libnsl.so libresolv.so \
-               libutil.so
-    do
-        if [ ! -f $DIR_uC_OUTPUT/bfin-uclinux/lib/mfdpic/$RUN ] ; then
-            echo "FD-PIC uClibc did not install properly : Missing $RUN"
-            echo "Please report an error to http://blackfin.uclinux.org"
-            tail -10 $ACTUAL_LOGFILE
-            mv saved-config-toplevel .config 2>/dev/null
-            mv saved-config-linux linux-2.6.x/.config 2>/dev/null
-            mv saved-config-uClibc uClibc/.config 2>/dev/null
-            mv saved-config-user config/.config 2>/dev/null
-            mv saved-config-arch config.arch 2>/dev/null
-            exit
-        fi
-    done
+    ######################### Done with uClibc ###########################
 
     echo -n "*** Cleaning uClinux               " ; date
     cd $UCLINUX_ROOT
