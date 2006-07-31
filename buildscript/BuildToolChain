@@ -762,6 +762,55 @@ if [ "x$SKIP_ELF" = "x" ]; then
       build_gcc $GCC_VERSION elf $DIR_ELF_OUTPUT "--with-newlib"
     done
 
+    ######################## Step 2 - build elf2flt ##############
+
+    echo -n "*** Building Elf elf2flt           " ; date
+    cd $DIR_ELF2FLT_BUILD
+
+    RUN="$DIR_ELF2FLT_SOURCE/configure $HOST_TARGET --target=bfin-elf \
+         --with-libbfd=$DIR_BINUTILS_BUILD/bfd/libbfd.a               \
+         --with-libiberty=$DIR_ELF_OUTPUT/lib/libiberty.a             \
+         --with-bfd-include-dir=$DIR_BINUTILS_BUILD/bfd               \
+         --with-binutils-include-dir=$DIR_BINUTILS_SOURCE/include     \
+         --prefix=$DIR_ELF_OUTPUT --program-suffix= "
+
+    if [ -e $DIR_BINUTILS_BUILD/intl/libintl.a ] ; then
+        RUN="$RUN --with-libintl=$DIR_BINUTILS_BUILD/intl/libintl.a"
+    fi
+
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+
+    echo -n "*** Make Elf elf2flt               " ; date
+    RUN=$MAKE
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+
+    for RUN in elf2flt  flthdr
+    do
+        if [ ! -f $DIR_ELF2FLT_BUILD/$RUN ] ; then
+            echo "Elf2flt did not build properly : Missing $RUN"
+            echo "Please report an error to http://blackfin.uclinux.org"
+            tail -10 $ACTUAL_LOGFILE
+            exit
+        fi
+    done
+
+    echo -n "*** Installing Elf elf2flt         " ; date
+    RUN="$MAKE install"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+
+    for RUN in bfin-elf-elf2flt bfin-elf-flthdr
+    do
+        if [ ! -f $DIR_ELF_OUTPUT/bin/$RUN ] ; then
+            echo "Elf2flt did not install properly : Missing $RUN"
+            echo "Please report an error to http://blackfin.uclinux.org"
+            tail -10 $ACTUAL_LOGFILE
+            exit
+       fi
+    done
+
     ########################### Step 2 - done ####################
 
     if [ $CHECK_ON_SIMULATOR ] ; then
