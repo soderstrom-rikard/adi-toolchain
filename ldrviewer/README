@@ -1,0 +1,27 @@
+-------
+ ABOUT 
+-------
+
+ldrviewer is a simple command line program for handling LDR files.  LDR files 
+are a Visual DSP invention for running code on the Blackfin CPU.  Sometimes 
+we need to handle these things in the world of Linux as it is the native 
+executable format for the Blackfin CPU.
+
+
+------
+ HELP
+------
+
+Support: http://blackfin.uclinux.org/forum/forum.php?forum_id=39
+Bugs: http://blackfin.uclinux.org/tracker/index.php?group_id=17&atid=141
+
+
+------------
+ REFERENCES 
+------------
+
+VisualDSP++ 4.0 Loader Manual:
+http://www.analog.com/UploadedFiles/Associated_Docs/438698055513140_loader_man.pdf
+
+ADSP-BF537 Blackfin Processor Hardware Reference:
+http://www.analog.com/UploadedFiles/Data_Sheets/369013884ADSP_BF534_536_537_b.pdf

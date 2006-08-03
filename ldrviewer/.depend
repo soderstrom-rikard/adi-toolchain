@@ -1,0 +1,3 @@
+helpers.o: helpers.c headers.h
+ldr.o: ldr.c headers.h helpers.h ldr.h
+ldrviewer.o: ldrviewer.c headers.h helpers.h ldr.h

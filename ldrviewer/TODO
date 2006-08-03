@@ -1,0 +1,9 @@
+Replace assert()s with friendly error messages
+
+Add support for reading LDR files in Intel hex format:
+	ldr.c _ldr_read_hex()
+
+Add support for reading LDR files in Motorola s-record format:
+	ldr.c _ldr_read_srec()
+
+Document/comment more things
