@@ -145,6 +145,7 @@ EMUL_EXTRA_OFILES = @EMUL_EXTRA_OFILES@
 EXEEXT = @EXEEXT@
 GMOFILES = @GMOFILES@
 GMSGFMT = @GMSGFMT@
+GREP = @GREP@
 GT_NO = @GT_NO@
 GT_YES = @GT_YES@
 HDEFINES = @HDEFINES@
@@ -213,9 +214,8 @@ VERSION = @VERSION@
 WARN_CFLAGS = @WARN_CFLAGS@
 XGETTEXT = @XGETTEXT@
 YACC = `if [ -f ../bison/bison ]; then echo ../bison/bison -y -L$(srcdir)/../bison/; else echo @YACC@; fi`
+YFLAGS = -d
 ac_ct_CC = @ac_ct_CC@
-ac_ct_RANLIB = @ac_ct_RANLIB@
-ac_ct_STRIP = @ac_ct_STRIP@
 am__fastdepCC_FALSE = @am__fastdepCC_FALSE@
 am__fastdepCC_TRUE = @am__fastdepCC_TRUE@
 am__include = @am__include@
@@ -232,6 +232,7 @@ build_vendor = @build_vendor@
 datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
+dvidir = @dvidir@
 exec_prefix = @exec_prefix@
 host = @host@
 host_alias = @host_alias@
@@ -245,12 +246,15 @@ install_sh = @install_sh@
 l = @l@
 libdir = @libdir@
 libexecdir = @libexecdir@
+localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
+pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
+psdir = @psdir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
@@ -263,7 +267,6 @@ use_sysroot = @use_sysroot@
 AUTOMAKE_OPTIONS = cygnus dejagnu
 SUBDIRS = po
 tooldir = $(exec_prefix)/$(target_alias)
-YFLAGS = -d
 AM_CFLAGS = $(WARN_CFLAGS)
 
 # We put the scripts in the directory $(scriptdir)/ldscripts.
@@ -878,10 +881,13 @@ dist-info: $(INFO_DEPS)
 	    $(srcdir)/*) base=`echo "$$base" | sed "s|^$$srcdirstrip/||"`;; \
 	  esac; \
 	  if test -f $$base; then d=.; else d=$(srcdir); fi; \
-	  for file in $$d/$$base*; do \
-	    relfile=`expr "$$file" : "$$d/\(.*\)"`; \
-	    test -f $(distdir)/$$relfile || \
-	      cp -p $$file $(distdir)/$$relfile; \
+	  base_i=`echo "$$base" | sed 's|\.info$$||;s|$$|.i|'`; \
+	  for file in $$d/$$base $$d/$$base-[0-9] $$d/$$base-[0-9][0-9] $$d/$$base_i[0-9] $$d/$$base_i[0-9][0-9]; do \
+	    if test -f $$file; then \
+	      relfile=`expr "$$file" : "$$d/\(.*\)"`; \
+	      test -f $(distdir)/$$relfile || \
+		cp -p $$file $(distdir)/$$relfile; \
+	    else :; fi; \
 	  done; \
 	done
 
@@ -1441,7 +1447,7 @@ eelf32bfin.c: $(srcdir)/emulparams/bfin.sh \
   $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
 	${GENSCRIPTS} elf32bfin "$(tdir_elf32bfin)" bfin
 eelf32bfinfd.c: $(srcdir)/emulparams/elf32bfinfd.sh $(srcdir)/emulparams/bfin.sh \
-  $(srcdir)/emultempl/elf32.em \
+  $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/bfinfdelf.em \
   $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
 	${GENSCRIPTS} elf32bfinfd "$(tdir_elf32bfinfd)" elf32bfinfd
 eelf32_dlx.c: $(srcdir)/emulparams/elf32_dlx.sh \

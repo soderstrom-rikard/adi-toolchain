@@ -1,0 +1,4 @@
+2006-08-04  Jie Zhang  <jie.zhang@analog.com>
+
+	* elf/bfin.h (EF_BFIN_CODE_IN_L1): Define.
+	(EF_BFIN_DATA_IN_L1): Define.

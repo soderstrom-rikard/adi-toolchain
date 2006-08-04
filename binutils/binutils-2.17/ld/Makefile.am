@@ -630,7 +630,7 @@ eelf32bfin.c: $(srcdir)/emulparams/bfin.sh \
   $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
 	${GENSCRIPTS} elf32bfin "$(tdir_elf32bfin)" bfin
 eelf32bfinfd.c: $(srcdir)/emulparams/elf32bfinfd.sh $(srcdir)/emulparams/bfin.sh \
-  $(srcdir)/emultempl/elf32.em \
+  $(srcdir)/emultempl/elf32.em $(srcdir)/emultempl/bfinfdelf.em \
   $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
 	${GENSCRIPTS} elf32bfinfd "$(tdir_elf32bfinfd)" elf32bfinfd
 eelf32_dlx.c: $(srcdir)/emulparams/elf32_dlx.sh \

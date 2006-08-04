@@ -5517,6 +5517,22 @@ error_return:
     free (internal_relocs);
   return FALSE;
 }
+
+/* Set by ld emulation if --code-in-l1.  */
+bfd_boolean elf32_bfinfdpic_code_in_l1 = 0;
+
+/* Set by ld emulation if --data-in-l1.  */
+bfd_boolean elf32_bfinfdpic_data_in_l1 = 0;
+
+static void
+elf32_bfinfdpic_final_write_processing (bfd *abfd,
+					bfd_boolean linker ATTRIBUTE_UNUSED)
+{
+  if (elf32_bfinfdpic_code_in_l1)
+    elf_elfheader (abfd)->e_flags |= EF_BFIN_CODE_IN_L1;
+  if (elf32_bfinfdpic_data_in_l1)
+    elf_elfheader (abfd)->e_flags |= EF_BFIN_DATA_IN_L1;
+}
 
 #define TARGET_LITTLE_SYM		bfd_elf32_bfin_vec
 #define TARGET_LITTLE_NAME		"elf32-bfin"
@@ -5628,6 +5644,10 @@ error_return:
 #undef elf_backend_encode_eh_address
 #define elf_backend_encode_eh_address \
 		bfinfdpic_elf_encode_eh_address
+
+#undef elf_backend_final_write_processing
+#define elf_backend_final_write_processing \
+		elf32_bfinfdpic_final_write_processing
 
 #undef elf_backend_may_use_rel_p
 #define elf_backend_may_use_rel_p       1

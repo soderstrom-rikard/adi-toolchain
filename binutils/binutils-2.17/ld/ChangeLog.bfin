@@ -1,0 +1,5 @@
+2006-08-04  Jie Zhang  <jie.zhang@analog.com>
+
+	* Makefile.am (eelf32bfinfd.c): Depend on bfinfdelf.em.
+	* emulparams/elf32bfinfd.sh (EXTRA_EM_FILE): Set.
+	* emultempl/bfinfdelf.em: New.

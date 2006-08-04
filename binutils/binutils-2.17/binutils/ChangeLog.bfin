@@ -1,0 +1,4 @@
+2006-08-04  Jie Zhang  <jie.zhang@analog.com>
+
+	* readelf.c (get_machine_flags): Deal with Blackfin specific
+	flags.
