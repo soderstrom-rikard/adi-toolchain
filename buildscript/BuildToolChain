@@ -38,9 +38,10 @@ APP_NAME=${APP_NAME#/}
 #TIMESTAMP=`date +%Y-%b-%d-%H-%M` # is YYYY_MMM_DD_HH_MM
 TIMESTAMP=`date +%Y%m%d`       # is YYYY_MMM_DD
 
+BINUTILS_VERSION=2.15
 GCC_VERSIONS=
 
-while getopts dipwvtST:C:s:b:k:o:m:c:u:h parameter
+while getopts dipwvtST:C:s:b:k:o:m:B:c:u:h parameter
 do
     case $parameter in
         p)
@@ -155,6 +156,10 @@ do
             fi
             ;;
 
+        B)
+            BINUTILS_VERSION="$OPTARG"
+            ;;
+
         c)
             GCC_VERSIONS="$GCC_VERSIONS $OPTARG"
             ;;
@@ -215,6 +220,7 @@ do
 -o OUTPUT        Output directory (leave blank to use build dir)
 -S               Skip building elf toolchain (check to see if already built)
 -m MAKE          Default make (leave blank to use system make)
+-B BINUTILS_VER  Binutils version (default 2.15).  Can be given once.
 -c GCC_VERSION   GCC version (default 3.4).  Can be given multiple times.
 -i               Build binutils libraries for use on the target.
 -C FILE          Use FILE as uClibc config file, rather than the default.
@@ -423,7 +429,7 @@ if [ $CHECK_ON_HARDWARE ] ; then
 fi
 
 echo -n "Path to binutils dir        "
-DIR_BINUTILS_SOURCE=$DIR_SOURCE/binutils/binutils-2.15
+DIR_BINUTILS_SOURCE=$DIR_SOURCE/binutils/binutils-$BINUTILS_VERSION
 echo $DIR_BINUTILS_SOURCE
 if [ ! -d $DIR_BINUTILS_SOURCE ] ; then
     echo "Can't find binutils source at $DIR_BINUTILS_SOURCE"
