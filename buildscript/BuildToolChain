@@ -230,7 +230,7 @@ do
              ;;
         *)
              echo "Try \`$APP_NAME -h' for more information."
-             exit
+             exit 1
     esac
 done
 
