@@ -374,7 +374,7 @@ if [ $KERNEL_SOURCE ] ; then
       echo "U-Boot Source not specified: addon utilties (like 'mkimage') will not be built"
     fi
     if [ -z "$UCLIBC_CONFIG_FILE" ]; then
-      echo "Path to uClibc Config files $UCLINUX_ROOT/uClibc/extra/Configs/"
+      echo "Path to uClibc Config files $UCLIBC_SOURCE/extra/Configs/"
     else
       if [ -f $UCLIBC_CONFIG_FILE ]; then
         echo "Path to uClibc config files $UCLIBC_CONFIG_FILE"
