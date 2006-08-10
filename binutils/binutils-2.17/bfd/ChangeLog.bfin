@@ -1,3 +1,14 @@
+2006-08-10  Jie Zhang  <jie.zhang@analog.com>
+
+	* elf32-bfin.c (elf32_bfinfdpic_code_in_l1): Rename to
+	(elf32_bfin_code_in_l1): this.
+	(elf32_bfinfdpic_data_in_l1): Rename to
+	(elf32_bfin_data_in_l1): this.
+	(elf32_bfinfdpic_final_write_processing): Rename to
+	(elf32_bfin_final_write_processing): this.
+	(elf_backend_final_write_processing): Redefine as
+	elf32_bfin_final_write_processing.
+
 2006-08-04  Jie Zhang  <jie.zhang@analog.com>
 
 	* elf32-bfin.c (elf32_bfinfdpic_code_in_l1): New variable.

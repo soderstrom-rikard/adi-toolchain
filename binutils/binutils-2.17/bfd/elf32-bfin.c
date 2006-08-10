@@ -1095,6 +1095,22 @@ bfin_reloc_type_lookup (bfd * abfd ATTRIBUTE_UNUSED,
 
 }
 
+/* Set by ld emulation if --code-in-l1.  */
+bfd_boolean elf32_bfin_code_in_l1 = 0;
+
+/* Set by ld emulation if --data-in-l1.  */
+bfd_boolean elf32_bfin_data_in_l1 = 0;
+
+static void
+elf32_bfin_final_write_processing (bfd *abfd,
+				   bfd_boolean linker ATTRIBUTE_UNUSED)
+{
+  if (elf32_bfin_code_in_l1)
+    elf_elfheader (abfd)->e_flags |= EF_BFIN_CODE_IN_L1;
+  if (elf32_bfin_data_in_l1)
+    elf_elfheader (abfd)->e_flags |= EF_BFIN_DATA_IN_L1;
+}
+
 /* Return TRUE if the name is a local label.
    bfin local labels begin with L$.  */
 static bfd_boolean
@@ -5518,21 +5534,6 @@ error_return:
   return FALSE;
 }
 
-/* Set by ld emulation if --code-in-l1.  */
-bfd_boolean elf32_bfinfdpic_code_in_l1 = 0;
-
-/* Set by ld emulation if --data-in-l1.  */
-bfd_boolean elf32_bfinfdpic_data_in_l1 = 0;
-
-static void
-elf32_bfinfdpic_final_write_processing (bfd *abfd,
-					bfd_boolean linker ATTRIBUTE_UNUSED)
-{
-  if (elf32_bfinfdpic_code_in_l1)
-    elf_elfheader (abfd)->e_flags |= EF_BFIN_CODE_IN_L1;
-  if (elf32_bfinfdpic_data_in_l1)
-    elf_elfheader (abfd)->e_flags |= EF_BFIN_DATA_IN_L1;
-}
 
 #define TARGET_LITTLE_SYM		bfd_elf32_bfin_vec
 #define TARGET_LITTLE_NAME		"elf32-bfin"
@@ -5577,6 +5578,8 @@ elf32_bfinfdpic_final_write_processing (bfd *abfd,
                                         elf32_bfin_set_private_flags
 #define bfd_elf32_bfd_print_private_bfd_data \
                                         elf32_bfin_print_private_bfd_data
+#define elf_backend_final_write_processing \
+					elf32_bfin_final_write_processing
 #define elf_backend_reloc_type_class    elf32_bfin_reloc_type_class
 #define elf_backend_can_gc_sections 1
 #define elf_backend_can_refcount 1
@@ -5644,10 +5647,6 @@ elf32_bfinfdpic_final_write_processing (bfd *abfd,
 #undef elf_backend_encode_eh_address
 #define elf_backend_encode_eh_address \
 		bfinfdpic_elf_encode_eh_address
-
-#undef elf_backend_final_write_processing
-#define elf_backend_final_write_processing \
-		elf32_bfinfdpic_final_write_processing
 
 #undef elf_backend_may_use_rel_p
 #define elf_backend_may_use_rel_p       1

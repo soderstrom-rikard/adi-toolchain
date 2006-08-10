@@ -26,10 +26,10 @@ cat >>e${EMULATION_NAME}.c <<EOF
 #include "elf-bfd.h"
 
 /* Whether to put code in Blackfin L1 SRAM.  */
-extern bfd_boolean elf32_bfinfdpic_code_in_l1;
+extern bfd_boolean elf32_bfin_code_in_l1;
 
 /* Whether to put (writable) data in Blackfin L1 SRAM.  */
-extern bfd_boolean elf32_bfinfdpic_data_in_l1;
+extern bfd_boolean elf32_bfin_data_in_l1;
 
 EOF
 
@@ -56,9 +56,9 @@ PARSE_AND_LIST_OPTIONS='
 
 PARSE_AND_LIST_ARGS_CASES='
     case OPTION_CODE_IN_L1:
-      elf32_bfinfdpic_code_in_l1 = TRUE;
+      elf32_bfin_code_in_l1 = TRUE;
       break;
     case OPTION_DATA_IN_L1:
-      elf32_bfinfdpic_data_in_l1 = TRUE;
+      elf32_bfin_data_in_l1 = TRUE;
       break;
 '

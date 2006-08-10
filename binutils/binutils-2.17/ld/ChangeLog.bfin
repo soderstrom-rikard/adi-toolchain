@@ -1,3 +1,13 @@
+2006-08-10  Jie Zhang  <jie.zhang@analog.com>
+
+	* Makefile.am (eelf32bfin.c): Depend on bfin.em.
+	(eelf32bfinfd.c): Depend on bfin.em instead of bfinfdelf.em.
+	* Makefile.in: Regenerated.
+	* emulparams/bfin.sh (EXTRA_EM_FILE): Set.
+	* emulparams/elf32bfinfd.sh (EXTRA_EM_FILE): Reset to bfin.
+	* emultempl/bfin.em: New.
+	* emultempl/bfinfdelf.em: Remove.
+
 2006-08-04  Jie Zhang  <jie.zhang@analog.com>
 
 	* Makefile.am (eelf32bfinfd.c): Depend on bfinfdelf.em.
