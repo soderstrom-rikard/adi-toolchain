@@ -246,15 +246,21 @@ fi
 
 ############ Check and error if I can't find the things I need #
 
-for PREREQ in gcc "$MAKE" autoconf m4 automake gettext msgfmt bison flex
+for PREREQ in which ln mv cp rm grep echo mkdir tail gcc \
+              "$MAKE" autoconf m4 automake gettext msgfmt \
+              bison flex
 do
-    RUN=`$PREREQ --help 2>/dev/null | wc -l`
+    RUN=`which -a $PREREQ | wc -w`
     if [ $RUN -eq 0 ] ; then
         echo "Can not find $PREREQ"
         exit
+    else if [ $RUN -gt 1 ] ; then
+        echo -n "Found multiple versions of $PREREQ, using the one at "
+	which $PREREQ
+        fi
     fi
 done
-
+exit
 ##### Check to make sure a old version of bfin-elf is not here #
 ORG_PATH=$PATH
 NEW_PATH=""
