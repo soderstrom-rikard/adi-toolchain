@@ -260,7 +260,7 @@ do
         fi
     fi
 done
-exit
+
 ##### Check to make sure a old version of bfin-elf is not here #
 ORG_PATH=$PATH
 NEW_PATH=""
