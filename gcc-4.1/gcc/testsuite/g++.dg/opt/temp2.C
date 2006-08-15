@@ -1,5 +1,5 @@
 // { dg-do run }
-
+/* { dg-skip-if "comment" { bfin-*-* } { "*" } { "" } } */
 // Copyright (C) 2006 Free Software Foundation, Inc.
 
 // Originally from PR 16681, found also in init/array15.C
