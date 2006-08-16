@@ -1,3 +1,20 @@
+2006-08-16  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (struct loop_info): New members block_bitmap and
+	bad.
+	(struct loop_work and related VEC declarations): Delete.
+	(bfin_dump_loops): Print out new member bad.
+	(bfin_bb_in_loop): Use plain bitmap test.  Don't recurse.
+	(bfin_scan_loop): Don't recurse.
+	(bfin_optimize_loop): Don't use a loop depth of -1 to indicate bad
+	loops.  No longer need to update outer loops if the current one is
+	found bad.
+	(bfin_discover_loop): New function, mostly split from bfin_reorg_loops,
+	but changed not to check for nesting.  Also changed to use the new bad
+	flag.
+	(bfin_reorg_loops): Use bfin_discover_loop to find single loops one at a
+	time.  Use bitmap based test to discover loop nesting.
+
 2006-08-04  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_function_ok_for_sibcall): Handle some
