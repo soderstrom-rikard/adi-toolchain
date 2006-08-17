@@ -826,11 +826,16 @@ struct elf_backend_data
      return the number of additional program segments which this BFD
      will need.  It should return -1 on error.  */
   int (*elf_backend_additional_program_headers)
-    (bfd *);
+    (bfd *, struct bfd_link_info *);
 
   /* This function is called to modify an existing segment map in a
      backend specific fashion.  */
   bfd_boolean (*elf_backend_modify_segment_map)
+    (bfd *, struct bfd_link_info *);
+
+  /* This function is called to modify program headers just before
+     they are written.  */
+  bfd_boolean (*elf_backend_modify_program_headers)
     (bfd *, struct bfd_link_info *);
 
   /* This function is called during section garbage collection to
@@ -1562,7 +1567,7 @@ extern bfd_boolean _bfd_elf_find_inliner_info
 #define _bfd_elf_read_minisymbols _bfd_generic_read_minisymbols
 #define _bfd_elf_minisymbol_to_symbol _bfd_generic_minisymbol_to_symbol
 extern int _bfd_elf_sizeof_headers
-  (bfd *, bfd_boolean);
+  (bfd *, struct bfd_link_info *);
 extern bfd_boolean _bfd_elf_new_section_hook
   (bfd *, asection *);
 extern bfd_boolean _bfd_elf_init_reloc_shdr
@@ -1850,9 +1855,11 @@ extern bfd_boolean bfd_elf_gc_common_final_link
 extern bfd_boolean bfd_elf_reloc_symbol_deleted_p
   (bfd_vma, void *);
 
-extern struct elf_segment_map *
-_bfd_elf_make_dynamic_segment
+extern struct elf_segment_map * _bfd_elf_make_dynamic_segment
   (bfd *, asection *);
+
+extern bfd_boolean _bfd_elf_map_sections_to_segments
+  (bfd *, struct bfd_link_info *);
 
 /* Exported interface for writing elf corefile notes. */
 extern char *elfcore_write_note

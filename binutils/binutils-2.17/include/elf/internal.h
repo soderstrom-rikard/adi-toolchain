@@ -235,12 +235,17 @@ struct elf_segment_map
   unsigned long p_flags;
   /* Program segment physical address.  */
   bfd_vma p_paddr;
+  /* Program segment alignment.  */
+  bfd_vma p_align;
   /* Whether the p_flags field is valid; if not, the flags are based
      on the section flags.  */
   unsigned int p_flags_valid : 1;
   /* Whether the p_paddr field is valid; if not, the physical address
      is based on the section lma values.  */
   unsigned int p_paddr_valid : 1;
+  /* Whether the p_align field is valid; if not, PT_LOAD segment
+     alignment is based on the default maximum page size.  */
+  unsigned int p_align_valid : 1;
   /* Whether this segment includes the file header.  */
   unsigned int includes_filehdr : 1;
   /* Whether this segment includes the program headers.  */

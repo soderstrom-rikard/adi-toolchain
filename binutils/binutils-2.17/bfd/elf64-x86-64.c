@@ -676,11 +676,14 @@ elf64_x86_64_copy_indirect_symbol (struct bfd_link_info *info,
 static bfd_boolean
 elf64_x86_64_mkobject (bfd *abfd)
 {
-  bfd_size_type amt = sizeof (struct elf64_x86_64_obj_tdata);
-  abfd->tdata.any = bfd_zalloc (abfd, amt);
   if (abfd->tdata.any == NULL)
-    return FALSE;
-  return TRUE;
+    {
+      bfd_size_type amt = sizeof (struct elf64_x86_64_obj_tdata);
+      abfd->tdata.any = bfd_zalloc (abfd, amt);
+      if (abfd->tdata.any == NULL)
+	return FALSE;
+    }
+  return bfd_elf_mkobject (abfd);
 }
 
 static bfd_boolean
@@ -3594,7 +3597,8 @@ elf64_x86_64_merge_symbol (struct bfd_link_info *info ATTRIBUTE_UNUSED,
 }
 
 static int
-elf64_x86_64_additional_program_headers (bfd *abfd)
+elf64_x86_64_additional_program_headers (bfd *abfd,
+					 struct bfd_link_info *info ATTRIBUTE_UNUSED)
 {
   asection *s;
   int count = 0; 

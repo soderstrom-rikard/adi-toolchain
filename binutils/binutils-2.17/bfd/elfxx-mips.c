@@ -9142,7 +9142,8 @@ _bfd_mips_elf_final_write_processing (bfd *abfd,
    segments.  */
 
 int
-_bfd_mips_elf_additional_program_headers (bfd *abfd)
+_bfd_mips_elf_additional_program_headers (bfd *abfd,
+					  struct bfd_link_info *info ATTRIBUTE_UNUSED)
 {
   asection *s;
   int ret = 0;
@@ -9233,6 +9234,8 @@ _bfd_mips_elf_modify_segment_map (bfd *abfd,
 		     || (*pm)->p_type == PT_INTERP))
 	    pm = &(*pm)->next;
 
+	  if (*pm == NULL || (*pm)->p_type != PT_MIPS_OPTIONS)
+	    {
 	  amt = sizeof (struct elf_segment_map);
 	  options_segment = bfd_zalloc (abfd, amt);
 	  options_segment->next = *pm;
@@ -9243,6 +9246,7 @@ _bfd_mips_elf_modify_segment_map (bfd *abfd,
 	  options_segment->sections[0] = s;
 	  *pm = options_segment;
 	}
+    }
     }
   else
     {

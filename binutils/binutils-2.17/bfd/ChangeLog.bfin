@@ -1,3 +1,162 @@
+2006-08-17  Jie Zhang  <jie.zhang@analog.com>
+
+	2006-06-23  Alan Modra  <amodra@bigpond.net.au>
+	PR ld/2754
+	* elf.c (bfd_elf_mkobject): Don't alloc if already done.  Set
+	program_header_size to -1.
+	(_bfd_elf_map_sections_to_segments): Adjust program_header_size check.
+	(assign_file_positions_for_load_sections ): Likewise.
+	(_bfd_elf_sizeof_headers): Use saved program_header_size if
+	available.
+	* elf32-arm.c (elf32_arm_mkobject): Call bfd_elf_mkobject, don't
+	alloc if already done.
+	* elf32-i386.c (elf_i386_mkobject): Likewise.
+	* elf32-ppc.c (ppc_elf_mkobject): Likewise.
+	* elf32-s390.c (elf_s390_mkobject): Likewise.
+	* elf32-sh.c (sh_elf_mkobject): Likewise.
+	* elf64-alpha.c (elf64_alpha_mkobject): Likewise.
+	* elf64-ppc.c (ppc64_elf_mkobject): Likewise.
+	* elf64-s390.c (elf_s390_mkobject): Likewise.
+	* elf64-x86-64.c (elf64_x86_64_mkobject): Likewise.
+	* elfxx-sparc.c (_bfd_sparc_elf_mkobject): Likewise.
+
+	2006-06-21  Alan Modra  <amodra@bigpond.net.au>
+	* elf-bfd.h (struct elf_backend_data): Add
+	elf_backend_modify_program_headers.
+	* elfxx-target.h (elf_backend_modify_program_headers): Define.
+	(elfNN_bed): Init new field.
+	* elf.c (elf_modify_segment_map): Remove comment.
+	(assign_file_positions_for_load_sections): Only call
+	elf_modify_segment_map for objcopy/strip.
+	(assign_file_positions_except_relocs): Call
+	elf_backend_modify_program_headers.
+	* elf32-frv.c (elf32_frvfdpic_always_size_sections): Don't make
+	.stack section.
+	(elf32_frvfdpic_modify_segment_map): Delete.
+	(elf32_frvfdpic_modify_program_headers): New.
+	(elf_backend_modify_segment_map): Don't define.
+	(elf_backend_modify_program_headers): Define.
+	* elf32-bfin.c (elf32_bfinfdpic_always_size_sections): Don't make
+	.stack section.
+	(elf32_bfinfdpic_modify_segment_map): Delete.
+	(elf32_bfinfdpic_modify_program_headers): New.
+	(elf_backend_modify_segment_map): Don't define.
+	(elf_backend_modify_program_headers): Define.
+	* elfxx-ia64.c (elfNN_ia64_modify_program_headers): New function.
+	Split out from..
+	(elfNN_ia64_modify_segment_map): ..here.
+	(elf_backend_modify_program_headers): Define.
+
+	2006-06-20  Alan Modra  <amodra@bigpond.net.au>
+	* elf-bfd.h: Formatting.
+	(_bfd_elf_map_sections_to_segments): Declare.
+	* elf-eh-frame.c (_bfd_elf_discard_section_eh_frame_hdr): Don't
+	clear program_header_size.
+	* elf.c (get_program_header_size): Move.  Don't use or set saved
+	program_header_size here.
+	(elf_modify_segment_map): New function.  Split out from..
+	(assign_file_positions_for_load_sections): ..here.  Assert
+	header size is correct.  Remove dead code.
+	(_bfd_elf_map_sections_to_segments): Rename from
+	map_sections_to_segments.  Make global.  Use get_program_header_size
+	when we need estimate of header size.  Call elf_modify_segment_map.
+	Set program_header_size.
+	(print_segment_map): Delete.
+	(_bfd_elf_sizeof_headers): If segment_map available, get the
+	actual size.
+	* elf32-arm.c (elf32_arm_symbian_modify_segment_map): Make safe
+	for calling more than once.
+	* elf32-bfin.c (elf32_bfinfdpic_modify_segment_map): Likewise.
+	* elf32-frv.c (elf32_frvfdpic_modify_segment_map): Likewise.
+	* elfxx-mips.c (_bfd_mips_elf_modify_segment_map): Likewise.
+	* elf32-i370.c (elf_backend_add_symbol_hook): Delete.
+	(elf_backend_additional_program_headers): Delete.
+	(elf_backend_modify_segment_map): Delete.
+	* elf64-hppa.c (elf64_hppa_modify_segment_map): Convert to ISO C.
+	* elfxx-ia64.c (elfNN_ia64_modify_segment_map): Likewise.
+	* doc/bfdint.texi: Delete SIZEOF_HEADERS difficulties.
+
+	2006-06-19  Alan Modra  <amodra@bigpond.net.au>
+	* elf-bfd.h (struct elf_backend_data): Add bfd_link_info pointer
+	parameter.
+	(_bfd_elf_sizeof_headers): Replace bfd_boolean param with
+	bfd_link_info pointer.
+	* targets.c (struct bfd_target <_bfd_sizeof_headers>): Likewise.
+	* bfd.c (bfd_sizeof_headers): Tweak param name.
+	* aout-adobe.c (aout_adobe_sizeof_headers): Adjust.
+	* aoutx.h (NAME (aout, sizeof_headers)): Adjust.
+	* binary.c (binary_sizeof_headers): Adjust.
+	* bout.c (b_out_sizeof_headers): Adjust.
+	* coff-rs6000.c (_bfd_xcoff_sizeof_headers): Adjust.
+	* coff64-rs6000.c (xcoff64_sizeof_headers): Adjust.
+	* coffgen.c (coff_sizeof_headers): Adjust.
+	* ecoff.c (_bfd_ecoff_sizeof_headers): Adjust.
+	(ecoff_compute_section_file_positions): Adjust.
+	(_bfd_ecoff_write_object_contents): Adjust.
+	* elf.c (get_program_header_size, _bfd_elf_sizeof_headers): Adjust.
+	* elf32-arm.c (elf32_arm_additional_program_headers): Adjust.
+	* elf32-i370.c (elf_backend_additional_program_headers): Adjust.
+	* elf32-ppc.c (ppc_elf_additional_program_headers): Adjust.
+	* elf64-hppa.c (elf64_hppa_additional_program_headers): Adjust.
+	* elf64-x86-64.c (elf64_x86_64_additional_program_headers): Adjust.
+	* elfxx-ia64.c (elfNN_ia64_additional_program_headers): Adjust.
+	* elfxx-mips.c (_bfd_mips_elf_additional_program_headers): Adjust.
+	* elfxx-mips.h (_bfd_mips_elf_additional_program_headers): Adjust.
+	* i386msdos.c: Convert to ISO C.
+	(msdos_sizeof_headers): Adjust.
+	* i386os9k.c: Convert to ISO C.
+	(os9k_sizeof_headers): Adjust.
+	* ieee.c (ieee_sizeof_headers): Adjust.
+	* ihex.c (ihex_sizeof_headers): Adjust.
+	* libaout.h (NAME (aout, sizeof_headers)): Adjust.
+	* libbfd-in.h (_bfd_nolink_sizeof_headers): Adjust.
+	* libcoff-in.h (coff_sizeof_headers): Adjust.
+	* libecoff.h (_bfd_ecoff_sizeof_headers): Adjust.
+	* mach-o.c (bfd_mach_o_sizeof_headers): Adjust.
+	* mmo.c (mmo_sizeof_headers): Adjust.
+	* oasys.c (oasys_sizeof_headers): Adjust.
+	* pdp11.c (NAME (aout, sizeof_headers)): Adjust.
+	* pef.c (bfd_pef_sizeof_headers): Adjust.
+	* ppcboot.c (ppcboot_sizeof_headers): Adjust.
+	* som.c (som_sizeof_headers): Adjust.
+	* srec.c (srec_sizeof_headers): Adjust.
+	* tekhex.c (tekhex_sizeof_headers): Adjust.
+	* versados.c (versados_sizeof_headers): Adjust.
+	* vms.c (vms_sizeof_headers): Adjust.
+	* xcoff-target.h (_bfd_xcoff_sizeof_headers): Adjust.
+	* xsym.c (bfd_sym_sizeof_headers): Adjust.
+	* xsym.h (bfd_sym_sizeof_headers): Adjust.
+	* bfd-in2.h: Regenerate.
+	* libbfd.h: Regenerate.
+	* libcoff.h: Regenerate.
+
+	2006-05-27  Alan Modra  <amodra@bigpond.net.au>
+		    H.J. Lu  <hongjiu.lu@intel.com>
+	* elf.c (assign_file_positions_for_load_sections): Retrieve
+	maxpagesize from m->p_align if it is valid.  Set p_vaddr,
+	p_paddr and p_align earlier.  Revert 2006-05-19 change to p_align.
+	(copy_elf_program_header): Copy p_align.  Set p_align_valid.
+
+	2006-05-19  Alan Modra  <amodra@bigpond.net.au>
+	* elf.c (elf_fake_sections): Formatting.
+	(assign_file_positions_for_load_sections): Only add SEC_ALLOC
+	sections to p_memsz.  Remove hack for PT_NOTE sections.  Allow
+	section alignment to increase p_align for PT_LOAD.
+	(assign_file_positions_for_non_load_sections): Remove ARM BPABI
+	hack for PT_DYNAMIC.  Instead, set p_filesz for all segments
+	other than PT_LOAD, and PT_NOTE in core.
+
+	2006-05-17  Alan Modra  <amodra@bigpond.net.au>
+	* elf.c (assign_file_positions_for_segments): Split into..
+	(assign_file_positions_for_load_sections): ..this, and..
+	(assign_file_positions_for_non_load_sections): ..this new function,..
+	(assign_file_positions_except_relocs): ..writing program headers here.
+
+	2006-04-21  Alan Modra  <amodra@bigpond.net.au>
+	* elf.c (assign_file_positions_except_relocs): Move code setting
+	file position of non-loaded sections..
+	(assign_file_positions_for_segments): ..to here.
+
 2006-08-10  Jie Zhang  <jie.zhang@analog.com>
 
 	* elf32-bfin.c (elf32_bfinfdpic_code_in_l1): Rename to

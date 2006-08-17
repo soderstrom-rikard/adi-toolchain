@@ -1,0 +1,4 @@
+2006-08-17  Jie Zhang  <jie.zhang@analog.com>
+
+	2006-05-27  H.J. Lu  <hongjiu.lu@intel.com>
+	* internal.h (struct elf_segment_map): Add p_align and p_align_valid.

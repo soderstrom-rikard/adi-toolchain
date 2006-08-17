@@ -1630,11 +1630,14 @@ struct elf32_arm_obj_tdata
 static bfd_boolean
 elf32_arm_mkobject (bfd *abfd)
 {
-  bfd_size_type amt = sizeof (struct elf32_arm_obj_tdata);
-  abfd->tdata.any = bfd_zalloc (abfd, amt);
   if (abfd->tdata.any == NULL)
-    return FALSE;
-  return TRUE;
+    {
+      bfd_size_type amt = sizeof (struct elf32_arm_obj_tdata);
+      abfd->tdata.any = bfd_zalloc (abfd, amt);
+      if (abfd->tdata.any == NULL)
+	return FALSE;
+    }
+  return bfd_elf_mkobject (abfd);
 }
 
 /* The ARM linker needs to keep track of the number of relocs that it
@@ -8040,7 +8043,8 @@ elf32_arm_modify_segment_map (bfd *abfd,
 /* We may add a PT_ARM_EXIDX program header.  */
 
 static int
-elf32_arm_additional_program_headers (bfd *abfd)
+elf32_arm_additional_program_headers (bfd *abfd,
+				      struct bfd_link_info *info ATTRIBUTE_UNUSED)
 {
   asection *sec;
 
@@ -8298,9 +8302,16 @@ elf32_arm_symbian_modify_segment_map (bfd *abfd,
   dynsec = bfd_get_section_by_name (abfd, ".dynamic");
   if (dynsec)
     {
+      for (m = elf_tdata (abfd)->segment_map; m != NULL; m = m->next)
+	if (m->p_type == PT_DYNAMIC)
+	  break;
+
+      if (m == NULL)
+	{
       m = _bfd_elf_make_dynamic_segment (abfd, dynsec);
       m->next = elf_tdata (abfd)->segment_map;
       elf_tdata (abfd)->segment_map = m;
+    }
     }
 
   /* Also call the generic arm routine.  */
