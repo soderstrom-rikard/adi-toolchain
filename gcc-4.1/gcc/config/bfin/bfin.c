@@ -3233,31 +3233,6 @@ bfin_optimize_loop (loop_info loop)
       goto bad_loop;
     }
 
-  /* Make sure we only have one entry point.  */
-  if (EDGE_COUNT (loop->head->preds) == 2)
-    {
-      loop->predecessor = EDGE_PRED (loop->head, 0)->src;
-      if (loop->predecessor == loop->tail)
-	/* We wanted the other predecessor.  */
-	loop->predecessor = EDGE_PRED (loop->head, 1)->src;
-
-      /* We can only place a loop insn on a fall through edge of a
-	 single exit block.  */
-      if (EDGE_COUNT (loop->predecessor->succs) != 1
-	  || !(EDGE_SUCC (loop->predecessor, 0)->flags & EDGE_FALLTHRU)
-	  /* If loop->predecessor is in loop, loop->head is not really
-	     the head of the loop.  */
-	  || bfin_bb_in_loop (loop, loop->predecessor))
-	loop->predecessor = NULL;
-    }
-
-  if (loop->predecessor == NULL)
-    {
-      if (dump_file)
-	fprintf (dump_file, ";; loop %d has bad predecessor\n", loop->loop_no);
-      goto bad_loop;
-    }
-
   /* Get the loop iteration register.  */
   iter_reg = loop->iter_reg;
 
@@ -3571,7 +3546,6 @@ bfin_discover_loop (loop_info loop, basic_block tail_bb, rtx tail_insn)
   loop->end_label = NULL_RTX;
   loop->bad = 0;
 
-
   VEC_safe_push (basic_block, heap, works, loop->head);
 
   while (VEC_iterate (basic_block, works, dwork++, bb))
@@ -3581,6 +3555,9 @@ bfin_discover_loop (loop_info loop, basic_block tail_bb, rtx tail_insn)
       if (bb == EXIT_BLOCK_PTR)
 	{
 	  /* We've reached the exit block.  The loop must be bad. */
+	  if (dump_file)
+	    fprintf (dump_file,
+		     ";; Loop is bad - reached exit block while scanning\n");
 	  loop->bad = 1;
 	  break;
 	}
@@ -3598,6 +3575,10 @@ bfin_discover_loop (loop_info loop, basic_block tail_bb, rtx tail_insn)
 	{
 	  FOR_EACH_EDGE (e, ei, bb->succs)
 	    {
+	      basic_block succ = EDGE_SUCC (bb, ei.index)->dest;
+	      if (!REGNO_REG_SET_P (succ->il.rtl->global_live_at_start,
+				    REGNO (loop->iter_reg)))
+		continue;
 	      if (!VEC_space (basic_block, works, 1))
 		{
 		  if (dwork)
@@ -3608,11 +3589,59 @@ bfin_discover_loop (loop_info loop, basic_block tail_bb, rtx tail_insn)
 		  else
 		    VEC_reserve (basic_block, heap, works, 1);
 		}
-	      VEC_quick_push (basic_block, works,
-			      EDGE_SUCC (bb, ei.index)->dest);
+	      VEC_quick_push (basic_block, works, succ);
 	    }
 	}
     }
+
+  if (!loop->bad)
+    {
+      /* Make sure we only have one entry point.  */
+      if (EDGE_COUNT (loop->head->preds) == 2)
+	{
+	  loop->predecessor = EDGE_PRED (loop->head, 0)->src;
+	  if (loop->predecessor == loop->tail)
+	    /* We wanted the other predecessor.  */
+	    loop->predecessor = EDGE_PRED (loop->head, 1)->src;
+
+	  /* We can only place a loop insn on a fall through edge of a
+	     single exit block.  */
+	  if (EDGE_COUNT (loop->predecessor->succs) != 1
+	      || !(EDGE_SUCC (loop->predecessor, 0)->flags & EDGE_FALLTHRU)
+	      /* If loop->predecessor is in loop, loop->head is not really
+		 the head of the loop.  */
+	      || bfin_bb_in_loop (loop, loop->predecessor))
+	    loop->predecessor = NULL;
+	}
+
+      if (loop->predecessor == NULL)
+	{
+	  if (dump_file)
+	    fprintf (dump_file, ";; loop has bad predecessor\n");
+	  loop->bad = 1;
+	}
+    }
+
+#ifdef ENABLE_CHECKING
+  /* Make sure nothing jumps into this loop.  This shouldn't happen as we
+     wouldn't have generated the counted loop patterns in such a case.
+     However, this test must be done after the test above to detect loops
+     with invalid headers.  */
+  if (!loop->bad)
+    for (dwork = 0; VEC_iterate (basic_block, loop->blocks, dwork, bb); dwork++)
+      {
+	edge e;
+	edge_iterator ei;
+	if (bb == loop->head)
+	  continue;
+	FOR_EACH_EDGE (e, ei, bb->preds)
+	  {
+	    basic_block pred = EDGE_PRED (bb, ei.index)->src;
+	    if (!bfin_bb_in_loop (loop, pred))
+	      abort ();
+	  }
+      }
+#endif
   VEC_free (basic_block, heap, works);
 }
 
@@ -3652,14 +3681,14 @@ bfin_reorg_loops (FILE *dump_file)
 	  loop->block_bitmap = BITMAP_ALLOC (&stack);
 	  bb->aux = loop;
 
-	  bfin_discover_loop (loop, bb, tail);
-
 	  if (dump_file)
 	    {
 	      fprintf (dump_file, ";; potential loop %d ending at\n",
 		       loop->loop_no);
 	      print_rtl_single (dump_file, tail);
 	    }
+
+	  bfin_discover_loop (loop, bb, tail);
 	}
     }
 

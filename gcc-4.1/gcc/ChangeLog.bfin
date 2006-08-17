@@ -1,3 +1,14 @@
+2006-08-17  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_optimize_loop): Move some validity checks
+	from here...
+	(bfin_discover_loop): ... to here.  Narrow the amount of basic blocks
+	added to a loop; any block that doesn't have the loop counter register
+	live at the start isn't part of the loop.
+	[ENABLE_CHECKING]: Additional sanity check to make sure nothing jumps
+	into the loop.
+	(bfin_reorg_loops): Move debugging output a bit.
+
 2006-08-16  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (struct loop_info): New members block_bitmap and
