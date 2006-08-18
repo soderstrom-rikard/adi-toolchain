@@ -1,3 +1,7 @@
+2006-08-18  Jie Zhang  <jie.zhang@analog.com>
+
+	* elf.c (_bfd_elf_map_sections_to_segments): Formatting.
+
 2006-08-17  Jie Zhang  <jie.zhang@analog.com>
 
 	2006-06-23  Alan Modra  <amodra@bigpond.net.au>
