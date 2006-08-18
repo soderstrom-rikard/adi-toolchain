@@ -91,6 +91,7 @@ enum option_values
   OPTION_RETAIN_SYMBOLS_FILE,
   OPTION_RPATH,
   OPTION_RPATH_LINK,
+  OPTION_SEP_CODE,
   OPTION_SHARED,
   OPTION_SONAME,
   OPTION_SORT_COMMON,
@@ -445,6 +446,8 @@ static const struct ld_option ld_options[] =
     '\0', NULL, N_("Create a position independent executable"), ONE_DASH },
   { {"pic-executable", no_argument, NULL, OPTION_PIE},
     '\0', NULL, NULL, TWO_DASHES },
+  { {"sep-code", no_argument, NULL, OPTION_SEP_CODE},
+    '\0', NULL, N_("Put code into separate segment"), TWO_DASHES },
   { {"sort-common", no_argument, NULL, OPTION_SORT_COMMON},
     '\0', NULL, N_("Sort common symbols by size"), TWO_DASHES },
   { {"sort_common", no_argument, NULL, OPTION_SORT_COMMON},
@@ -1088,6 +1091,9 @@ parse_args (unsigned argc, char **argv)
 	    }
 	  else
 	    einfo (_("%P%F: -pie not supported\n"));
+	  break;
+	case OPTION_SEP_CODE:
+	  link_info.sep_code = TRUE;
 	  break;
 	case 'h':		/* Used on Solaris.  */
 	case OPTION_SONAME:

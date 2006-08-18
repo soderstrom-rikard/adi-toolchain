@@ -1,5 +1,10 @@
 2006-08-18  Jie Zhang  <jie.zhang@analog.com>
 
+	* elf.c (_bfd_elf_map_sections_to_segments): Not put executable sections
+	into the same segment with other readonly sections if --sep-code.
+
+2006-08-18  Jie Zhang  <jie.zhang@analog.com>
+
 	* elf.c (_bfd_elf_map_sections_to_segments): Formatting.
 
 2006-08-17  Jie Zhang  <jie.zhang@analog.com>

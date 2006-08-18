@@ -3738,6 +3738,7 @@ _bfd_elf_map_sections_to_segments (bfd *abfd, struct bfd_link_info *info)
       asection **hdrpp;
       bfd_boolean phdr_in_segment = TRUE;
       bfd_boolean writable;
+      bfd_boolean executable;
       int tls_count = 0;
       asection *first_tls = NULL;
       asection *dynsec, *eh_frame_hdr;
@@ -3809,6 +3810,7 @@ _bfd_elf_map_sections_to_segments (bfd *abfd, struct bfd_link_info *info)
       phdr_index = 0;
       maxpagesize = bed->maxpagesize;
       writable = FALSE;
+      executable = FALSE;
       dynsec = bfd_get_section_by_name (abfd, ".dynamic");
       if (dynsec != NULL
 	  && (dynsec->flags & SEC_LOAD) == 0)
@@ -3890,6 +3892,14 @@ _bfd_elf_map_sections_to_segments (bfd *abfd, struct bfd_link_info *info)
 		 ends precisely on a page boundary.  */
 	      new_segment = TRUE;
 	    }
+	  else if (info->sep_code
+		   && ((! executable && (hdr->flags & SEC_CODE) != 0)
+		       || (executable && (hdr->flags & SEC_CODE) == 0)))
+	    {
+	      /* We don't want to put a executable section in a non-executable
+		 segment.  */
+	      new_segment = TRUE;
+	    }
 	  else
 	    {
 	      /* Otherwise, we can use the same segment.  */
@@ -3900,6 +3910,8 @@ _bfd_elf_map_sections_to_segments (bfd *abfd, struct bfd_link_info *info)
 	    {
 	      if ((hdr->flags & SEC_READONLY) == 0)
 		writable = TRUE;
+	      if ((hdr->flags & SEC_CODE) != 0)
+		executable = TRUE;
 	      last_hdr = hdr;
 	      /* .tbss sections effectively have zero size.  */
 	      if ((hdr->flags & (SEC_THREAD_LOCAL | SEC_LOAD))
@@ -3924,6 +3936,11 @@ _bfd_elf_map_sections_to_segments (bfd *abfd, struct bfd_link_info *info)
 	    writable = TRUE;
 	  else
 	    writable = FALSE;
+
+	  if ((hdr->flags & SEC_CODE) != 0)
+	    executable = TRUE;
+	  else
+	    executable = FALSE;
 
 	  last_hdr = hdr;
 	  /* .tbss sections effectively have zero size.  */
