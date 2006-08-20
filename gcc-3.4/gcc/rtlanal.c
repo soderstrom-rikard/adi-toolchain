@@ -671,6 +671,12 @@ count_occurrences (rtx x, rtx find, int count_dest)
     case CC0:
       return 0;
 
+    case EXPR_LIST:
+      count = count_occurrences (XEXP (x, 0), find, count_dest);
+      if (XEXP (x, 1))
+	count += count_occurrences (XEXP (x, 1), find, count_dest);
+      return count;
+	
     case MEM:
       if (GET_CODE (find) == MEM && rtx_equal_p (x, find))
 	return 1;

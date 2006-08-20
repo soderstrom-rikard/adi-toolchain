@@ -1,3 +1,10 @@
+2006-08-20  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* reload1.c (delete_output_reload): Count occurrences in
+	CALL_INSN_FUNCTION_USAGE.
+	* rtlanal.c (count_occurrences): Handle EXPR_LIST nodes without
+	crashing at the end of the list.
+
 2006-08-04  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_function_ok_for_sibcall): Handle some
