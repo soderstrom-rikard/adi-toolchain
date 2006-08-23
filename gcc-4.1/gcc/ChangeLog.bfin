@@ -1,3 +1,10 @@
+2006-08-23  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (plus_or_minus, pm_op, pm_optab): New code macro
+	definitions.
+	(<pm_optab>si_insn32): New 32 bit reg-reg add/subtract pattern.
+	(corresponding splitter): New.
+	
 2006-08-22  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/uclinux.h (STARTFILE_SPEC): Link Scrt1.o if -pie.
