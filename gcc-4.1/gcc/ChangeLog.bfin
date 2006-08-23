@@ -4,7 +4,9 @@
 	definitions.
 	(<pm_optab>si_insn32): New 32 bit reg-reg add/subtract pattern.
 	(corresponding splitter): New.
-	
+
+	* config/bfin/bfin.md (rotl16, rotlsi3, rotrsi3): New patterns.
+
 2006-08-22  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/uclinux.h (STARTFILE_SPEC): Link Scrt1.o if -pie.
