@@ -6,10 +6,12 @@ Copyright (C) 2001-2003, SnapGear (www.snapgear.com)
 davidm@snapgear.com
 gerg@snapgear.com
 
+This is Free Software, under the GNU Public Licence v2 or greater.  See
+LICENSE.TXT for more details.
 
 Elf2flt with PIC, ZFLAT and full reloc support. Currently supported
-targets include: m68k/ColdFire, ARM, Sparc, NEC v850, h8300 and SuperH.
-
+targets include: m68k/ColdFire, ARM, Sparc, NEC v850, MicroBlaze, 
+h8300 and SuperH.
 
 COMPILING:
 
@@ -41,7 +43,7 @@ flat.h      - header from uClinux kernel sources
 elf2flt.ld  - an example linker script that works for C/C++ and uClinux
 ld-elf2flt  - A linker replacement that implements a -elf2flt option for the
               linker and runs elf2flt automatically for you.  It auto
-              detects PIC/non-PIC code and adjusts it's option accordingly.
+              detects PIC/non-PIC code and adjusts its option accordingly.
               It uses the environment variable FLTFLAGS when running
               elf2flt.  It runs /.../m68k-elf-ld.real to do the actual
               linking.

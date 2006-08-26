@@ -6,7 +6,11 @@
  * ELF format file handling. Extended relocation support for all of
  * text and data.
  *
+ * (c) 2006  Support the -a (use_resolved) option for TARGET_arm.
+ *           Shaun Jackman <sjackman@gmail.com>
+ * (c) 2004, Nios II support, Wentao Xu <wentao@microtronix.com>
  * (c) 2003, H8 support, ktrace <davidm@snapgear.com>
+ * (c) 2003-2004, MicroBlaze support, John Williams <jwilliams@itee.uq.edu.au>
  * (c) 2001-2003, arm/arm-pic/arm-big-endian support <davidm@snapgear.com>
  * (c) 2001, v850 changes, Mile Bader <miles@lsi.nec.co.jp>
  * (c) 2003, SuperH support, Paul Mundt <lethal@linux-sh.org>
@@ -40,8 +44,13 @@
 #include <unistd.h>   /* Userland prototypes of the Unix std system calls    */
 #include <fcntl.h>    /* Flag value for file handling functions              */
 #include <time.h>
-
+#ifndef WIN32
 #include <netinet/in.h> /* Consts and structs defined by the internet system */
+#define	BINARY_FILE_OPTS
+#else
+#include <winsock2.h>
+#define	BINARY_FILE_OPTS "b"
+#endif
 
 /* from $(INSTALLDIR)/include       */
 #include <bfd.h>      /* Main header file for the BFD library                */
@@ -268,7 +277,6 @@ add_com_to_bss(asymbol **symbol_table, int32_t number_of_symbols, int32_t bss_le
 }  
 
 #ifdef TARGET_bfin
-
 /* FUNCTION : weak_und_symbol
    ABSTRACT : return true if symbol is weak and undefined.
 */
@@ -386,7 +394,7 @@ dump_symbols(symbols, number_of_symbols);
    * Also note that both the relocatable and absolute versions have this
    * terminator even though the relocatable one doesn't have the GOT!
    */
-  if (pic_with_got) {
+  if (pic_with_got && !use_resolved) {
     uint32_t *lp = (uint32_t *)data;
     /* Should call ntohl(*lp) here but is isn't going to matter */
     while (*lp != 0xffffffff) lp++;
@@ -403,8 +411,6 @@ dump_symbols(symbols, number_of_symbols);
     }
 #endif
   }
-
-//#define DEBUG_BFIN
 
   for (a = abs_bfd->sections; (a != (asection *) NULL); a = a->next) {
   	section_vma = bfd_section_vma(abs_bfd, a);
@@ -481,7 +487,7 @@ dump_symbols(symbols, number_of_symbols);
 				continue;
 			}
 #endif /* TARGET_microblaze */
-			   
+
 #ifdef TARGET_v850
 			/* Skip this relocation entirely if possible (we
 			   do this early, before doing any other
@@ -551,7 +557,7 @@ dump_symbols(symbols, number_of_symbols);
 			/* Adjust the address to account for the GOT table which wasn't
 			 * present in the relative file link.
 			 */
-			if (pic_with_got)
+			if (pic_with_got && !use_resolved)
 			  q->address += got_size;
 #endif
 
@@ -571,7 +577,6 @@ dump_symbols(symbols, number_of_symbols);
 #else
 			sym_addr = (*(q->sym_ptr_ptr))->value;
 #endif			
-
 			if (use_resolved) {
 				/* Use the address of the symbol already in
 				   the program text.  How this is handled may
@@ -685,12 +690,19 @@ dump_symbols(symbols, number_of_symbols);
 							+ (r_mem[2] << 16)
 							+ (r_mem[3] << 24);
 					relocation_needed = 1;
+					break;
+
+				bad_resolved_reloc:
+					printf("ERROR: reloc type %s unsupported in this context\n",
+					       q->howto->name);
+					bad_relocs++;
+					break;
 				}
 			} else {
 				/* Calculate the sym address ourselves.  */
 				sym_reloc_size = bfd_get_reloc_size(q->howto);
 
-#if !defined(TARGET_h8300) && !defined(TARGET_bfin)
+#if !defined(TARGET_h8300) && !defined(TARGET_e1) && !defined(TARGET_bfin) && !defined(TARGET_m68k)
 				if (sym_reloc_size != 4) {
 					printf("ERROR: bad reloc type %d size=%d for symbol=%s\n",
 							(*p)->howto->type, sym_reloc_size, sym_name);
@@ -708,6 +720,7 @@ dump_symbols(symbols, number_of_symbols);
 					sym_vma = bfd_section_vma(abs_bfd, sym_section);
 					sym_addr += sym_vma + q->addend;
 					break;
+				case R_68K_PC16:
 				case R_68K_PC32:
 					sym_vma = 0;
 					sym_addr += sym_vma + q->addend;
@@ -791,6 +804,7 @@ dump_symbols(symbols, number_of_symbols);
 						bad_relocs++;
 						continue;
 					}
+					/* Absolute symbol done not relocation */
 					relocation_needed = !bfd_is_abs_section(sym_section);
 					sym_addr = (*(q->sym_ptr_ptr))->value;
 					sym_vma = bfd_section_vma(abs_bfd, sym_section);
@@ -893,7 +907,6 @@ dump_symbols(symbols, number_of_symbols);
 					relocation_needed = 1;
 					break;
 				}
-
 				case R_MICROBLAZE_64_PCREL:
 					sym_vma = 0;
 					//sym_addr = (*(q->sym_ptr_ptr))->value;
@@ -910,6 +923,166 @@ dump_symbols(symbols, number_of_symbols);
 
 #endif /* TARGET_microblaze */
 					
+#ifdef TARGET_nios2
+#define  htoniosl(x)	(x)
+#define  niostohl(x)	(x)
+			switch ((*p)->howto->type) 
+			{
+				case R_NIOS2_BFD_RELOC_32:
+					relocation_needed = 1;
+					pflags = (FLAT_NIOS2_R_32 << 28);
+					sym_vma = bfd_section_vma(abs_bfd, sym_section);
+					sym_addr += sym_vma + q->addend;
+					/* modify target, in target order */
+					*(unsigned long *)r_mem = htoniosl(sym_addr);
+					break;
+				case R_NIOS2_CALL26:
+				{
+					unsigned long exist_val;
+					relocation_needed = 1;
+					pflags = (FLAT_NIOS2_R_CALL26 << 28);
+					sym_vma = bfd_section_vma(abs_bfd, sym_section);
+					sym_addr += sym_vma + q->addend;
+					
+					/* modify target, in target order */
+					// exist_val = niostohl(*(unsigned long *)r_mem);
+					exist_val = ((sym_addr >> 2) << 6);
+					*(unsigned long *)r_mem = htoniosl(exist_val);
+					break;
+				}
+				case R_NIOS2_HIADJ16:
+				case R_NIOS2_HI16:
+				{
+					unsigned long exist_val;
+					int r2_type;
+					/* handle the adjacent HI/LO pairs */
+					if (relcount == 0)
+						r2_type = R_NIOS2_NONE;
+					else
+						r2_type = p[1]->howto->type;
+					if ((r2_type == R_NIOS2_LO16)
+					    && (p[0]->sym_ptr_ptr == p[1]->sym_ptr_ptr)
+					    && (p[0]->addend == p[1]->addend)) 
+					    {
+							unsigned char * r2_mem = sectionp + p[1]->address;
+							if (p[1]->address - q->address!=4)
+								printf("Err: HI/LO not adjacent %d\n", p[1]->address - q->address);
+							relocation_needed = 1;
+							pflags = (q->howto->type == R_NIOS2_HIADJ16) 
+								? FLAT_NIOS2_R_HIADJ_LO : FLAT_NIOS2_R_HI_LO;
+							pflags <<= 28;
+						
+							sym_vma = bfd_section_vma(abs_bfd, sym_section);
+							sym_addr += sym_vma + q->addend;
+
+							/* modify high 16 bits, in target order */
+							exist_val = niostohl(*(unsigned long *)r_mem);
+							exist_val =  ((exist_val >> 22) << 22) | (exist_val & 0x3f);
+							if (q->howto->type == R_NIOS2_HIADJ16)
+								exist_val |= ((((sym_addr >> 16) + ((sym_addr >> 15) & 1)) & 0xFFFF) << 6);
+							else
+								exist_val |= (((sym_addr >> 16) & 0xFFFF) << 6);
+							*(unsigned long *)r_mem = htoniosl(exist_val);
+
+							/* modify low 16 bits, in target order */
+							exist_val = niostohl(*(unsigned long *)r2_mem);
+							exist_val =  ((exist_val >> 22) << 22) | (exist_val & 0x3f);
+							exist_val |= ((sym_addr & 0xFFFF) << 6);
+							*(unsigned long *)r2_mem = htoniosl(exist_val);
+						
+						} else 
+							goto NIOS2_RELOC_ERR;
+					}
+					break;
+
+				case R_NIOS2_GPREL:
+				{
+					unsigned long exist_val, temp;
+					//long gp = get_symbol_offset("_gp", sym_section, symbols, number_of_symbols);
+					long gp = get_gp_value(symbols, number_of_symbols);
+					if (gp == -1) {
+						printf("Err: unresolved symbol _gp when relocating %s\n", sym_name);
+						goto NIOS2_RELOC_ERR;
+					}
+					/* _gp holds a absolute value, otherwise the ld cannot generate correct code */
+					sym_vma = bfd_section_vma(abs_bfd, sym_section);
+					//printf("sym=%x, %d, _gp=%x, %d\n", sym_addr+sym_vma, sym_addr+sym_vma, gp, gp);
+					sym_addr += sym_vma + q->addend;
+					sym_addr -= gp;
+					//printf("sym - _gp=%x, %d\n", sym_addr, sym_addr);
+					/* modify the target, in target order (little_endian) */
+					exist_val = niostohl(*(unsigned long *)r_mem);
+					temp = ((exist_val >> 6) & 0x3ff0000) | (sym_addr & 0xffff);
+					temp <<= 6;
+					temp |= (exist_val & 0x3f);
+					*(unsigned long *)r_mem = htoniosl(temp);
+					if (verbose)
+						printf("omit: offset=0x%x symbol=%s%s "
+								"section=%s size=%d "
+								"fixup=0x%x (reloc=0x%x) GPREL\n", 
+								q->address, sym_name, addstr,
+								section_name, sym_reloc_size,
+								sym_addr, section_vma + q->address);
+					continue;
+				}
+				case R_NIOS2_PCREL16:
+				{
+					unsigned long exist_val;
+					sym_vma = 0;
+					sym_addr += sym_vma + q->addend;
+					sym_addr -= (q->address + 4);
+					/* modify the target, in target order (little_endian) */
+					exist_val = niostohl(*(unsigned long *)r_mem);
+					exist_val =  ((exist_val >> 22) << 22) | (exist_val & 0x3f);
+					exist_val |= ((sym_addr & 0xFFFF) << 6);
+					*(unsigned long *)r_mem = htoniosl(exist_val);
+					if (verbose)
+						printf("omit: offset=0x%x symbol=%s%s "
+								"section=%s size=%d "
+								"fixup=0x%x (reloc=0x%x) PCREL\n", 
+								q->address, sym_name, addstr,
+								section_name, sym_reloc_size,
+								sym_addr, section_vma + q->address);
+					continue;
+				}
+
+				case R_NIOS2_LO16:
+					/* check if this is actually the 2nd half of a pair */
+					if ((p > relpp)
+						&& ((p[-1]->howto->type == R_NIOS2_HIADJ16) 
+							|| (p[-1]->howto->type == R_NIOS2_HI16))
+					    && (p[-1]->sym_ptr_ptr == p[0]->sym_ptr_ptr)
+					    && (p[-1]->addend == p[0]->addend)) {
+						if (verbose)
+							printf("omit: offset=0x%x symbol=%s%s "
+								"section=%s size=%d LO16\n", 
+								q->address, sym_name, addstr,
+								section_name, sym_reloc_size);
+						continue;
+					}
+
+					/* error, fall through */
+
+				case R_NIOS2_S16:
+				case R_NIOS2_U16:
+				case R_NIOS2_CACHE_OPX:
+				case R_NIOS2_IMM5:
+				case R_NIOS2_IMM6:
+				case R_NIOS2_IMM8:
+				case R_NIOS2_BFD_RELOC_16:
+				case R_NIOS2_BFD_RELOC_8:
+				case R_NIOS2_GNU_VTINHERIT:
+				case R_NIOS2_GNU_VTENTRY:
+				case R_NIOS2_UJMP:
+				case R_NIOS2_CJMP:
+				case R_NIOS2_CALLR:
+NIOS2_RELOC_ERR:
+					printf("Err: unexpected reloc type %s(%d)\n", q->howto->name, q->howto->type);
+					bad_relocs++;
+					continue;
+			}
+#endif /* TARGET_nios2 */
+
 #ifdef TARGET_sparc
 				case R_SPARC_32:
 				case R_SPARC_UA32:
@@ -1274,17 +1447,20 @@ DIS29_RELOCATION:
 
 				tmp.l = *(uint32_t *)r_mem;
 				hl = tmp.c[i0] | (tmp.c[i1] << 8) | (tmp.c[i2] << 16);
-				if (((*p)->howto->type != R_ARM_PC24) &&
-				    ((*p)->howto->type != R_ARM_PLT32))
+				if (use_resolved ||
+					(((*p)->howto->type != R_ARM_PC24) &&
+					((*p)->howto->type != R_ARM_PLT32)))
 					hl |= (tmp.c[i3] << 24);
 				else if (tmp.c[i2] & 0x80)
 					hl |= 0xff000000; /* sign extend */
-				hl += sym_addr;
+				if (!use_resolved)
+					hl += sym_addr;
 				tmp.c[i0] = hl & 0xff;
 				tmp.c[i1] = (hl >> 8) & 0xff;
 				tmp.c[i2] = (hl >> 16) & 0xff;
-				if (((*p)->howto->type != R_ARM_PC24) &&
-				    ((*p)->howto->type != R_ARM_PLT32))
+				if (use_resolved ||
+					(((*p)->howto->type != R_ARM_PC24) &&
+					((*p)->howto->type != R_ARM_PLT32)))
 					tmp.c[i3] = (hl >> 24) & 0xff;
 				if ((*p)->howto->type == R_ARM_ABS32)
 					*(uint32_t *)r_mem = htonl(hl);
@@ -1388,6 +1564,28 @@ DIS29_RELOCATION:
 					   loaders knows about it.  */
 					break;
 #endif /* TARGET_V850 */
+
+#ifdef TARGET_nios2
+				case R_NIOS2_BFD_RELOC_32:
+				case R_NIOS2_CALL26:
+				case R_NIOS2_HIADJ16:
+				case R_NIOS2_HI16:
+					/* do nothing */
+					break;
+#endif /* TARGET_nios2 */
+
+#if defined(TARGET_m68k)
+				case R_68K_PC16:
+					if (sym_addr < -0x8000 || sym_addr > 0x7fff) {
+						fprintf (stderr, "Relocation overflow for R_68K_PC16 relocation against %s\n", sym_name);
+						bad_relocs++;
+					} else {
+						r_mem[0] = (sym_addr >>  8) & 0xff;
+						r_mem[1] =  sym_addr        & 0xff;
+					}
+					break;
+#endif
+
 				default:
 					/* The alignment of the build host
 					   might be stricter than that of the
@@ -1543,7 +1741,6 @@ int main(int argc, char *argv[])
   char  cmd[1024];
   FILE *gf = NULL;
 
-
   asymbol **symbol_table;
   long number_of_symbols;
 
@@ -1555,6 +1752,8 @@ int main(int argc, char *argv[])
   uint32_t data_vma = ~0;
   uint32_t bss_vma = ~0;
   uint32_t text_vma = ~0;
+
+  uint32_t text_offs;
 
   void *text;
   void *data;
@@ -1570,6 +1769,14 @@ int main(int argc, char *argv[])
   if (argc < 2)
   	usage();
   
+  if (sizeof(hdr) != 64) {
+    fprintf(stderr,
+	    "Potential flat header incompatibility detected\n"
+	    "header size should be 64 but is %d\n",
+	    sizeof(hdr));
+    exit(64);
+  }
+
 #ifndef TARGET_e1
   stack = 4096;
 #else /* We need plenty of stack for both of them (Aggregate and Register) */
@@ -1696,6 +1903,7 @@ int main(int argc, char *argv[])
 
     sec_size = bfd_section_size(abs_bfd, s);
     sec_vma  = bfd_section_vma(abs_bfd, s);
+
     if (sec_vma < *vma) {
       if (*len > 0)
 	*len += sec_vma - *vma;
@@ -1719,9 +1927,9 @@ int main(int argc, char *argv[])
   /* Read in all text sections.  */
   for (s = abs_bfd->sections; s != NULL; s = s->next)
     if (s->flags & SEC_CODE) 
-      if (bfd_get_section_contents(abs_bfd, s,
+      if (!bfd_get_section_contents(abs_bfd, s,
 				   text + (s->vma - text_vma), 0,
-				   bfd_section_size(abs_bfd, s)) == false)
+				   bfd_section_size(abs_bfd, s)))
       {
 	fprintf(stderr, "read error section %s\n", s->name);
 	exit(2);
@@ -1738,9 +1946,7 @@ int main(int argc, char *argv[])
 
   if ((text_vma + text_len) != data_vma) {
     if ((text_vma + text_len) > data_vma) {
-      //printf("ERROR: text=0x%x overlaps data=0x%x ?\n", text_len, data_vma);
-       printf("ERROR: Text_vma=0x%x\tText_len=%d\tData_vma=0x%x\tData_len=%d\n",
-		       text_vma, text_len, data_vma, data_len);
+      printf("ERROR: text=0x%x overlaps data=0x%x ?\n", text_len, data_vma);
       exit(1);
     }
     if (verbose)
@@ -1752,9 +1958,9 @@ int main(int argc, char *argv[])
   /* Read in all data sections.  */
   for (s = abs_bfd->sections; s != NULL; s = s->next)
     if (s->flags & SEC_DATA) 
-      if (bfd_get_section_contents(abs_bfd, s,
+      if (!bfd_get_section_contents(abs_bfd, s,
 				   data + (s->vma - data_vma), 0,
-				   bfd_section_size(abs_bfd, s)) == false)
+				   bfd_section_size(abs_bfd, s)))
       {
 	fprintf(stderr, "read error section %s\n", s->name);
 	exit(2);
@@ -1766,8 +1972,8 @@ int main(int argc, char *argv[])
   if (verbose)
     printf("BSS  -> vma=0x%x len=0x%x\n", bss_vma, bss_len);
 
-  if ((text_vma + text_len + data_len) != bss_vma) {
-    if ((text_vma + text_len + data_len) > bss_vma) {
+  if ((data_vma + data_len) != bss_vma) {
+    if ((data_vma + data_len) > bss_vma) {
       printf("ERROR: text=0x%x + data=0x%x overlaps bss=0x%x ?\n", text_len,
 	  		data_len, bss_vma);
       exit(1);
@@ -1775,7 +1981,7 @@ int main(int argc, char *argv[])
     if (verbose)
       printf("WARNING: bss=0x%x does not directly follow text=0x%x + data=0x%x(0x%x)\n",
       		bss_vma, text_len, data_len, text_len + data_len);
-      data_len = bss_vma - data_vma;
+    data_len = bss_vma - data_vma;
   }
 
   reloc = (uint32_t *)
@@ -1784,6 +1990,8 @@ int main(int argc, char *argv[])
 
   if (reloc == NULL && verbose)
     printf("No relocations in code!\n");
+
+  text_offs = real_address_bits(text_vma);
 
   /* Fill in the binflt_flat header */
   memcpy(hdr.magic,"bFLT",4);
@@ -1834,14 +2042,19 @@ int main(int argc, char *argv[])
   sprintf(cmd, "gzip -f -9 >> %s", ofile);
 
 #define	START_COMPRESSOR do { \
-		if (gf) fclose(gf); \
-		if (!(gf = popen(cmd, "w"))) { \
+		if (gf) \
+			if (gf_is_pipe) \
+				pclose(gf); \
+			else \
+				fclose(gf); \
+		if (!(gf = popen(cmd, "w" BINARY_FILE_OPTS))) { \
 			fprintf(stderr, "Can't run cmd %s\n", cmd); \
 			exit(4); \
 		} \
+		gf_is_pipe = 1; \
 	} while (0)
 
-  gf = fopen(ofile, "a");
+  gf = fopen(ofile, "ab");	/* Add 'b' to support non-posix (ie windows) */
   if (!gf) {
   	fprintf(stderr, "Can't open file %s for writing\n", ofile); \
 	exit(4);
@@ -1852,8 +2065,8 @@ int main(int argc, char *argv[])
 
   /* Fill in any hole at the beginning of the text segment.  */
   if (verbose)
-	  printf("ZERO before text len=0x%x\n", real_address_bits(text_vma));
-  write_zeroes(real_address_bits(text_vma), gf);
+	  printf("ZERO before text len=0x%x\n", text_offs);
+  write_zeroes(text_offs, gf);
 
   /* Write the text segment.  */
   fwrite(text, text_len, 1, gf);
@@ -1861,18 +2074,27 @@ int main(int argc, char *argv[])
   if (compress == 2)
   	START_COMPRESSOR;
 
-  /* Fill in any hole at the beginning of the data segment.  */
-  /* this is text relative so we don't need to mask any bits */
-  if (verbose)
-	  printf("ZERO before data len=0x%x\n", data_vma - (text_vma + text_len));
-  write_zeroes(data_vma - (text_vma + text_len), gf);
   /* Write the data segment.  */
   fwrite(data, data_len, 1, gf);
 
   if (reloc)
     fwrite(reloc, reloc_len * 4, 1, gf);
 
+  if(gf_is_pipe)
+    pclose(gf);
+  else
   fclose(gf);
 
   exit(0);
 }
+
+
+/*
+ * this __MUST__ be at the VERY end of the file - do NOT move!!
+ *
+ * Local Variables:
+ * c-basic-offset: 4
+ * tab-width: 8
+ * end:
+ * vi: tabstop=8 shiftwidth=4 textwidth=79 noexpandtab
+ */

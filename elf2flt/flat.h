@@ -1,10 +1,13 @@
 /*
- * Copyright (C) 2002-2003  David McCullough <davidm@snapgear.com>
+ * Copyright (C) 2002-2005  David McCullough <davidm@snapgear.com>
  * Copyright (C) 1998       Kenneth Albanowski <kjahds@kjahds.com>
  *                          The Silver Hammer Group, Ltd.
  *
  * This file provides the definitions and structures needed to
  * support uClinux flat-format executables.
+ *
+ * This is Free Software, under the GNU Public Licence v2 or greater.
+ *
  */
 
 #ifndef _LINUX_FLAT_H
@@ -70,7 +73,7 @@ struct flat_hdr {
 
 #include <asm/byteorder.h>
 
-#define	OLD_FLAT_VERSION			0x00000002L
+#define	OLD_FLAT_VERSION		0x00000002L
 #define OLD_FLAT_RELOC_TYPE_TEXT	0
 #define OLD_FLAT_RELOC_TYPE_DATA	1
 #define OLD_FLAT_RELOC_TYPE_BSS		2
