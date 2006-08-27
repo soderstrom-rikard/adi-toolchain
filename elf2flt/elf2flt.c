@@ -645,7 +645,7 @@ dump_symbols(symbols, number_of_symbols);
 								+ lo;
 						}
 					} else
-						goto bad_v850_reloc_err;
+						goto bad_resolved_reloc;
 					break;
 
 				case R_V850_LO16:
@@ -659,16 +659,107 @@ dump_symbols(symbols, number_of_symbols);
 					    && (p[-1]->addend == p[0]->addend))
 						break; /* not an error */
 					else
-						goto bad_v850_reloc_err;
+						goto bad_resolved_reloc;
 
 				case R_V850_HI16:
-				bad_v850_reloc_err:
-					printf("ERROR: reloc type %s unsupported in this context\n",
-					       q->howto->name);
-					bad_relocs++;
+					goto bad_resolved_reloc;
+				default:
+					goto good_32bit_resolved_reloc;
+#elif defined(TARGET_arm)
+				case R_ARM_ABS32:
+					relocation_needed = 1;
 					break;
-#endif /* TARGET_V850 */
+				case R_ARM_REL32:
+				case R_ARM_THM_PC11:
+				case R_ARM_THM_PC22:
+					relocation_needed = 0;
+					break;
+				default:
+					goto bad_resolved_reloc;
+#elif defined(TARGET_m68k)
+				case R_68K_32:
+					goto good_32bit_resolved_reloc;
+				case R_68K_PC32:
+				case R_68K_PC16:
+					/* The linker has already resolved
+					   PC relocs for us.  In PIC links,
+					   the symbol must be in the data
+					   segment.  */
+				case R_68K_NONE:
+					continue;
+				default:
+					goto bad_resolved_reloc;
+#elif defined TARGET_bfin
+				case R_rimm16:
+				case R_luimm16:
+				    sym_vma = bfd_section_vma(abs_bfd, sym_section);
+				    sym_addr += sym_vma + q->addend;
 
+				    if (weak_und_symbol(sym_section->name, (*(q->sym_ptr_ptr))))
+					continue;
+				    if (q->howto->type == R_rimm16 && (0xFFFF0000 & sym_addr)) {
+					fprintf (stderr, "Relocation overflow for rN = %s\n",sym_name);
+					bad_relocs++;
+				    }
+				    flat_relocs = (uint32_t *)
+					(realloc (flat_relocs, (flat_reloc_count + 1) * sizeof (uint32_t)));
+				    if (bfin_set_reloc (flat_relocs + flat_reloc_count, 
+							sym_section->name, sym_name,
+							(*(q->sym_ptr_ptr)),
+							0, section_vma + q->address))
+					bad_relocs++;
+				    if (a->flags & SEC_CODE)
+					text_has_relocs = 1;
+				    flat_reloc_count++;
+				    break;
+				    
+				case R_huimm16:
+				    sym_vma = bfd_section_vma(abs_bfd, sym_section);
+				    sym_addr += sym_vma + q->addend;
+
+				    if (weak_und_symbol (sym_section->name, (*(q->sym_ptr_ptr))))
+					continue;
+
+				    flat_relocs = (uint32_t *)
+					(realloc (flat_relocs, (flat_reloc_count + 2) * sizeof (uint32_t)));
+				    if ((0xFFFF0000 & sym_addr) != persistent_data) {
+					    if (verbose)
+						    printf ("New persistent data for %08lx\n", sym_addr);
+					    persistent_data = 0xFFFF0000 & sym_addr;
+					    flat_relocs[flat_reloc_count++]
+						    = (sym_addr >> 16) | (3 << 26);
+				    }
+
+				    if (bfin_set_reloc (flat_relocs + flat_reloc_count, 
+							sym_section->name, sym_name,
+							(*(q->sym_ptr_ptr)),
+							1, section_vma + q->address))
+					bad_relocs++;
+				    if (a->flags & SEC_CODE)
+					text_has_relocs = 1;
+				    flat_reloc_count++;
+				    break;
+
+				case R_byte4_data:
+				    sym_vma = bfd_section_vma(abs_bfd, sym_section);
+				    sym_addr += sym_vma + q->addend;
+
+				    if (weak_und_symbol (sym_section->name, (*(q->sym_ptr_ptr))))
+					continue;
+
+				    flat_relocs = (uint32_t *) 
+					(realloc (flat_relocs, (flat_reloc_count + 1) * sizeof (uint32_t)));
+				    if (bfin_set_reloc (flat_relocs + flat_reloc_count,
+							sym_section->name, sym_name,
+							(*(q->sym_ptr_ptr)),
+							2, section_vma + q->address))
+					bad_relocs++;
+				    if (a->flags & SEC_CODE)
+					text_has_relocs = 1;
+
+				    flat_reloc_count++;
+				    break;
+#else
 				default:
 					/* The default is to assume that the
 					   relocation is relative and has
@@ -677,6 +768,9 @@ dump_symbols(symbols, number_of_symbols);
 					   give an error by default, and
 					   require `safe' relocations to be
 					   enumberated explicitly?).  */
+					goto good_32bit_resolved_reloc;
+#endif
+				good_32bit_resolved_reloc:
 					if (bfd_big_endian (abs_bfd))
 						sym_addr =
 							(r_mem[0] << 24)
@@ -1125,98 +1219,7 @@ NIOS2_RELOC_ERR:
 						);
 					break;
 #endif /* TARGET_sparc */
-#ifdef TARGET_bfin
-				case R_pcrel12_jump:
-				case R_pcrel12_jump_s:
-				case R_pcrel24:
-				case R_pcrel24_jump_l:
-				case R_pcrel24_jump_x:
-				case R_pcrel24_call_x:
-				case R_pcrel10:
-				case R_pcrel11:
-				case R_pcrel5m2:
-				  sym_addr += q->addend;// get the symbol addr
-				  sym_vma = bfd_section_vma(abs_bfd, sym_section);
-				  sym_addr -= q->address; // make it PC relative 
-				  // implicitly assumes code section and symbol section are same
-				  break;
-				case R_got:
-				case R_byte2_data:
-				case R_unused0:
-				    /* Ignore these.  */
-				    break;
 
-				case R_rimm16:
-				case R_luimm16:
-				    sym_vma = bfd_section_vma(abs_bfd, sym_section);
-				    sym_addr += sym_vma + q->addend;
-
-				    if (weak_und_symbol(sym_section->name, (*(q->sym_ptr_ptr))))
-					continue;
-				    if (q->howto->type == R_rimm16 && (0xFFFF0000 & sym_addr)) {
-					fprintf (stderr, "Relocation overflow for rN = %s\n",sym_name);
-					bad_relocs++;
-				    }
-				    flat_relocs = (uint32_t *)
-					(realloc (flat_relocs, (flat_reloc_count + 1) * sizeof (uint32_t)));
-				    if (bfin_set_reloc (flat_relocs + flat_reloc_count, 
-							sym_section->name, sym_name,
-							(*(q->sym_ptr_ptr)),
-							0, section_vma + q->address))
-					bad_relocs++;
-				    if (a->flags & SEC_CODE)
-					text_has_relocs = 1;
-				    flat_reloc_count++;
-				    break;
-				    
-				case R_huimm16:
-				{
-				    sym_vma = bfd_section_vma(abs_bfd, sym_section);
-				    sym_addr += sym_vma + q->addend;
-
-				    if (weak_und_symbol (sym_section->name, (*(q->sym_ptr_ptr))))
-					continue;
-
-				    flat_relocs = (uint32_t *)
-					(realloc (flat_relocs, (flat_reloc_count + 2) * sizeof (uint32_t)));
-				    if ((0xFFFF0000 & sym_addr) != persistent_data) {
-					    if (verbose)
-						    printf ("New persistent data for %08lx\n", sym_addr);
-					    persistent_data = 0xFFFF0000 & sym_addr;
-					    flat_relocs[flat_reloc_count++]
-						    = (sym_addr >> 16) | (3 << 26);
-				    }
-
-				    if (bfin_set_reloc (flat_relocs + flat_reloc_count, 
-							sym_section->name, sym_name,
-							(*(q->sym_ptr_ptr)),
-							1, section_vma + q->address))
-					bad_relocs++;
-				    if (a->flags & SEC_CODE)
-					text_has_relocs = 1;
-				    flat_reloc_count++;
-				    break;
-				}
-				case R_byte4_data:
-				    sym_vma = bfd_section_vma(abs_bfd, sym_section);
-				    sym_addr += sym_vma + q->addend;
-
-				    if (weak_und_symbol (sym_section->name, (*(q->sym_ptr_ptr))))
-					continue;
-
-				    flat_relocs = (uint32_t *) 
-					(realloc (flat_relocs, (flat_reloc_count + 1) * sizeof (uint32_t)));
-				    if (bfin_set_reloc (flat_relocs + flat_reloc_count,
-							sym_section->name, sym_name,
-							(*(q->sym_ptr_ptr)),
-							2, section_vma + q->address))
-					bad_relocs++;
-				    if (a->flags & SEC_CODE)
-					text_has_relocs = 1;
-
-				    flat_reloc_count++;
-				    break;
-#endif //TARGET_bfin
 
 #ifdef TARGET_sh
 				case R_SH_DIR32:
@@ -1466,60 +1469,6 @@ DIS29_RELOCATION:
 					*(uint32_t *)r_mem = htonl(hl);
 				else
 					*(uint32_t *)r_mem = tmp.l;
-#elif defined(TARGET_bfin)
-				if ((*p)->howto->type == R_pcrel24
-				    || (*p)->howto->type == R_pcrel24_jump_l
-				    || (*p)->howto->type == R_pcrel24_jump_x
-				    || (*p)->howto->type == R_pcrel24_call_x)
-				{
-				    uint32_t val;
-
-				    val = ((sym_addr + 2) >> 1) & 0xffff;
-				    bfd_putl16 (val, sectionp + q->address);
-
-				    val = bfd_getl16 ((unsigned short *)(sectionp + q->address) - 1);
-				    val = (0xff00 & val) | (((sym_addr + 2) >> 17) & 0xff);
-				    bfd_putl16 (val, (unsigned short *)(sectionp + q->address) - 1);
-				} else if((*p)->howto->type == R_byte4_data) {
-				    bfd_putl32 (sym_addr, sectionp + q->address);
-				} else if ((*p)->howto->type == R_pcrel12_jump
-					   || (*p)->howto->type == R_pcrel12_jump_s) {
-				    uint32_t val;
-
-				    val = bfd_getl16 (sectionp + q->address);
-				    val = (0xf000 & val) | ((sym_addr >> 1) & 0xfff);
-				    bfd_putl16 (val, sectionp + q->address);
-				} else if((*p)->howto->type == R_pcrel10) {
-				    uint32_t val;
-
-				    val = bfd_getl16 (sectionp + q->address);
-				    val = (~0x3ff & val) | ((sym_addr >> 1) & 0x3ff);
-				    bfd_putl16 (val, sectionp + q->address);
-				} else if ((*p)->howto->type == R_rimm16
-					   || (*p)->howto->type == R_huimm16
-					   || (*p)->howto->type == R_luimm16) {
-				    /* for l and h we set the lower 16 bits which is only when it will be used */
-				    bfd_putl16 (sym_addr, sectionp + q->address);
-				} else if ((*p)->howto->type == R_pcrel5m2) {
-				    uint32_t val;
-
-				    val = bfd_getl16 (sectionp + q->address);
-				    val = (0xfff0 & val) | ((sym_addr >> 1) & 0xf);
-				    bfd_putl16 (val, sectionp + q->address);
-				} else if ((*p)->howto->type == R_pcrel11) {
-				    uint32_t val;
-
-				    val = bfd_getl16 (sectionp + q->address);
-				    val = (0xfc00 & val) | ((sym_addr >> 1) & 0x3ff);
-				    bfd_putl16 (val, sectionp + q->address);
-				}
-				else if (0xE0 <= (*p)->howto->type && 0xF3 >= (*p)->howto->type) {
-				    //arith relocs dont generate a real relocation
-				}
-				else {
-				    printf("Blackfin relocation fail for reloc type: 0x%x\n", (*p)->howto->type);
-				}
-
 #elif defined(TARGET_e1)
 #define OPCODE_SIZE 2           /* Add 2 bytes, counting the opcode size*/
 				switch ((*p)->howto->type) {
@@ -1545,6 +1494,16 @@ DIS29_RELOCATION:
 						printf("ERROR:Unhandled Relocation. Exiting...\n");
 						exit(0);
 				break;
+				}
+#elif defined TARGET_bfin
+				if ((*p)->howto->type == R_rimm16
+				    || (*p)->howto->type == R_huimm16
+				    || (*p)->howto->type == R_luimm16)
+				{
+					/* for l and h we set the lower 16 bits which is only when it will be used */
+					bfd_putl16 (sym_addr, sectionp + q->address);
+				} else if ((*p)->howto->type == R_byte4_data) {
+					bfd_putl32 (sym_addr, sectionp + q->address);
 				}
 #else /* ! TARGET_arm && ! TARGET_e1 && ! TARGET_bfin */
 
@@ -1598,19 +1557,6 @@ DIS29_RELOCATION:
 				}
 #endif /* !TARGET_arm */
 			}
-#ifdef TARGET_bfin
-			else {
-			    if ((*p)->howto->type == R_rimm16
-				|| (*p)->howto->type == R_huimm16
-				|| (*p)->howto->type == R_luimm16)
-			    {
-				/* for l and h we set the lower 16 bits which is only when it will be used */
-				bfd_putl16 (sym_addr, sectionp + q->address);
-			    } else if ((*p)->howto->type == R_byte4_data) {
-				bfd_putl32 (sym_addr, sectionp + q->address);
-			    }
-			}
-#endif
 
 			if (verbose)
 				printf("  RELOC[%d]: offset=0x%x symbol=%s%s "
