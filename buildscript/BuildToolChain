@@ -59,7 +59,7 @@ do
             /bin/sh --version |grep -i version
             echo "runtest is only required for testing"
             runtest --version
-            exit
+            exit 0
             ;;
         m)
             MAKE=$OPTARG
@@ -83,7 +83,7 @@ do
                 echo "Running tests on simulator"
             else
                 echo "Can't find dejagnu's runtest"
-                exit
+                exit 1
             fi
             ;;
         S)
@@ -95,7 +95,7 @@ do
                 TARGET_IPADDR=`expr "$OPTARG" : "\([0-9]*\.[0-9]*\.[0-9]*\.[0-9]*\)"`
                 if [ "x$TARGET_IPADDR" = "x" ] ; then
                     echo "Target ip address in wrong format"
-                    exit
+                    exit 1
                 else
                     CHECK_ON_HARDWARE=1
 
@@ -113,12 +113,12 @@ do
                     if [ "x$RUN" == "x" ] ; then
                         echo "NOT exist"
                         echo "   Your host kernel does NOT support Sysctl"
-                        exit
+                        exit 1
                     fi
                     if [ "x$RUN" == "x0" ] ; then
                         echo "0"
                         echo "   Please run \"echo 1 > /proc/sys/net/ipv4/tcp_tw_recycle\" as root"
-                        exit
+                        exit 1
                     else
                         echo "1"
                     fi
@@ -128,7 +128,7 @@ do
                     if [ "x$RUN" == "x" ] ; then
                         echo "NOT exist"
                         echo "   Please enable Sysctl when configure the kernel"
-                        exit
+                        exit 1
                     fi
                     if [ "x$RUN" == "x0" ] ; then
                         echo "0. Set it to 1"
@@ -142,7 +142,7 @@ do
                 fi
             else
                 echo "Can't find dejagnu's runtest"
-                exit
+                exit 1
             fi
             ;;
 
@@ -152,7 +152,7 @@ do
                 DIR_SOURCE=${DIR_SOURCE%/}
             else
                 echo "Invalid Source Path"
-                exit
+                exit 1
             fi
             ;;
 
@@ -171,11 +171,11 @@ do
                 KERNEL_SOURCE=$OPTARG/linux-2.6.x
                 if [ ! -d $KERNEL_SOURCE/arch/blackfin ] ; then
                     echo "Can't find $KERNEL_SOURCE/arch/blackfin"
-                    exit
+                    exit 1
                 fi
             else
                 echo "Invalid Kernel path : $OPTARG"
-                exit
+                exit 1
             fi
             ;;
         u)
@@ -183,7 +183,7 @@ do
                 DIR_UBOOT=$OPTARG
             else
                 echo "Invalid U-Boot Path"
-                exit
+                exit 1
             fi
             ;;
         b)
@@ -226,7 +226,7 @@ do
 -C FILE          Use FILE as uClibc config file, rather than the default.
 -v               Verbose
 -h               Help"
-             exit
+             exit 0
              ;;
         *)
              echo "Try \`$APP_NAME -h' for more information."
@@ -253,7 +253,7 @@ do
     RUN=`which -a $PREREQ | wc -w`
     if [ $RUN -eq 0 ] ; then
         echo "Can not find $PREREQ"
-        exit
+        exit 1
     else if [ $RUN -gt 1 ] ; then
         echo -n "Found multiple versions of $PREREQ, using the one at "
 	which $PREREQ
@@ -287,7 +287,7 @@ PATH=$NEW_PATH
 if [ ! $DIR_SOURCE ] ; then
     echo "Usage : $APP_NAME -s SOURCE [-b BUILD]"
     echo "                  -h for help"
-    exit
+    exit 1
 fi
 
 ############ ABSOLUTE PATH TO SOURCE DIRECTORIES ################
@@ -298,7 +298,7 @@ if [ -d /.$DIR_SOURCE ] ; then
 else
     echo "Invalid Toolchain Source Path"
     echo $DIR_SOURCE
-    exit
+    exit 1
 fi
 if [ $KERNEL_SOURCE ] ; then
     if [ -d /.$KERNEL_SOURCE ] ; then
@@ -307,7 +307,7 @@ if [ $KERNEL_SOURCE ] ; then
     else
         echo "Invalid Kernel Source Path"
         echo $DIR_SOURCE
-        exit
+        exit 1
     fi
 fi
 
@@ -321,7 +321,7 @@ if [ $DIR_BUILD ] ; then
         mkdir -p $DIR_BUILD
         if [ ! -d /.$DIR_BUILD ] ; then
             echo "Invalid Build Path"
-            exit
+            exit 1
         fi
     fi
 else
@@ -349,7 +349,7 @@ if [ ! -d $DIR_ELF_OUTPUT ] ; then
     mkdir -p $DIR_ELF_OUTPUT
     if [ ! -d /.$DIR_ELF_OUTPUT ] ; then
         echo "Invalid output directory"
-        exit
+        exit 1
     fi
 else if [ "x$SKIP_ELF" = "x" ]; then
     echo "$DIR_ELF_OUTPUT already exists - cleaning"
@@ -367,7 +367,7 @@ if [ $KERNEL_SOURCE ] ; then
         mkdir -p $DIR_uC_OUTPUT
         if [ ! -d $DIR_uC_OUTPUT ] ; then
             echo "Invalid output directory"
-            exit
+            exit 1
         fi
     else
         echo "$DIR_uC_OUTPUT already exists - cleaning"
@@ -386,7 +386,7 @@ if [ $KERNEL_SOURCE ] ; then
         echo "Path to uClibc config files $UCLIBC_CONFIG_FILE"
       else
         echo "Can't find uClibc config file at $UCLIBC_CONFIG_FILE"
-        exit
+        exit 1
       fi
     fi
 fi
@@ -439,7 +439,7 @@ DIR_BINUTILS_SOURCE=$DIR_SOURCE/binutils/binutils-$BINUTILS_VERSION
 echo $DIR_BINUTILS_SOURCE
 if [ ! -d $DIR_BINUTILS_SOURCE ] ; then
     echo "Can't find binutils source at $DIR_BINUTILS_SOURCE"
-    exit
+    exit 1
 fi
 
 echo -n "Path to elf2flt dir         "
@@ -447,7 +447,7 @@ DIR_ELF2FLT_SOURCE=$DIR_SOURCE/elf2flt
 echo $DIR_ELF2FLT_SOURCE
 if [ ! -d $DIR_ELF2FLT_SOURCE ] ; then
     echo "Can't find elf2flt source at $DIR_ELF2FLT_SOURCE"
-    exit
+    exit 1
 fi
 
 echo -n "Path to genext2fs           "
@@ -455,7 +455,7 @@ DIR_GENEXT2FS_SOURCE=$DIR_SOURCE/genext2fs
 echo $DIR_GENEXT2FS_SOURCE
 if [ ! -d $DIR_GENEXT2FS_SOURCE ] ; then
     echo "Can't find genext2fs source at $DIR_GENEXT2FS_SOURCE"
-    exit
+    exit 1
 fi
 
 echo -n "Path to cramfs-tools        "
@@ -463,7 +463,7 @@ DIR_CRAMFS_SOURCE=$DIR_SOURCE/cramfs-1.1
 echo $DIR_CRAMFS_SOURCE
 if [ ! -d $DIR_CRAMFS_SOURCE ] ; then
     echo "Can't find cramfs-1.1 source at $DIR_CRAMFS_SOURCE"
-    exit
+    exit 1
 fi
 
 ###################### set up log file ###########################
@@ -532,7 +532,7 @@ die_with_log ()
 {
     echo "Build error.  Last logfile entries:"
     tail -10 $ACTUAL_LOGFILE
-    exit 1;
+    exit 1
 }
 
 build_gcc ()
@@ -547,7 +547,7 @@ build_gcc ()
 
     if [ ! -d $DIR_GCC_SOURCE ] ; then
         echo "Can't find gcc source at $DIR_GCC_SOURCE"
-        exit
+        exit 1
     fi
 
     if [ -h $DIR_GCC_SOURCE/newlib ] ; then
@@ -563,7 +563,7 @@ build_gcc ()
             echo -n "*** ERROR : running as user "
             whoami
             ls -ld $DIR_GCC_SOURCE
-            exit
+            exit 1
         fi
     fi
 
@@ -588,7 +588,7 @@ build_gcc ()
             echo "gcc did not build properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
-            exit
+            exit 1
         fi
     done
 
@@ -608,7 +608,7 @@ build_gcc ()
         if [ ! -f $3/bin/$RUN ] ; then
             echo "The toolchain did not install properly - report an error"
             tail -10 $ACTUAL_LOGFILE
-            exit
+            exit 1
         fi
     done
     VERSION=`$3/bin/bfin-$2-gcc -v 2>&1 | grep gcc.vers | sed -e 's,gcc.version.,,' -e 's, .ADI.*$,,'`
@@ -618,7 +618,7 @@ build_gcc ()
     echo "*** Testing 'bfin-$2-gcc -v'"
     if ! $3/bin/bfin-$2-gcc -v ; then
         echo "The toolchain did not install properly - report an error"
-        exit
+        exit 1
     fi
 }
 
@@ -761,7 +761,7 @@ build_uClibc()
             mv saved-config-uClibc uClibc/.config 2>/dev/null
             mv saved-config-user config/.config 2>/dev/null
             mv saved-config-arch config.arch 2>/dev/null
-            exit
+            exit 1
         fi
     done
 }
@@ -811,7 +811,7 @@ if [ "x$SKIP_ELF" = "x" ]; then
             echo "BinUtils did not build properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
-            exit
+            exit 1
         fi
     done
 
@@ -821,7 +821,7 @@ if [ "x$SKIP_ELF" = "x" ]; then
             echo "Gas did not build properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
-            exit
+            exit 1
         fi
     done
 
@@ -831,7 +831,7 @@ if [ "x$SKIP_ELF" = "x" ]; then
             echo "Ld did not build properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
-            exit
+            exit 1
       fi
     done
 
@@ -841,7 +841,7 @@ if [ "x$SKIP_ELF" = "x" ]; then
             echo "gdb did not build properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
-            exit
+            exit 1
         fi
     done
 
@@ -885,7 +885,7 @@ if [ "x$SKIP_ELF" = "x" ]; then
             echo "Elf2flt did not build properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
-            exit
+            exit 1
         fi
     done
 
@@ -900,7 +900,7 @@ if [ "x$SKIP_ELF" = "x" ]; then
             echo "Elf2flt did not install properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
-            exit
+            exit 1
        fi
     done
 
@@ -937,7 +937,7 @@ if [ -e $DIR_SOURCE/libdsp/Makefile ] ; then
     if [ ! -e $DIR_SOURCE/libdsp/libbffastfp.a ] ; then
         echo "The ELF toolchain did not build libbffastfp.a properly - report an error"
         tail -10 $ACTUAL_LOGFILE
-        exit
+        exit 1
     fi
 
     echo -n "*** Installing libdsp              " ; date
@@ -1159,7 +1159,7 @@ if [ $KERNEL_SOURCE ] ; then
         if [ ! -e $DIR_SOURCE/libdsp/libbffastfp.a ] ; then
             echo "The uClinux toolchain did not build libbffastfp.a properly - report an error"
             tail -10 $ACTUAL_LOGFILE
-            exit
+            exit 1
         fi
 
         echo -n "*** Installing libdsp              " ; date
@@ -1211,7 +1211,7 @@ if [ $KERNEL_SOURCE ] ; then
             echo "genext2fs did not build properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
-            exit
+            exit 1
         fi
     done
 
@@ -1227,7 +1227,7 @@ if [ $KERNEL_SOURCE ] ; then
             echo "genext2fs did not install properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
-            exit
+            exit 1
        fi
     done
 
@@ -1252,7 +1252,7 @@ if [ $KERNEL_SOURCE ] ; then
             echo "cramfs did not build properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
-            exit
+            exit 1
         fi
     done
 
@@ -1269,7 +1269,7 @@ if [ $KERNEL_SOURCE ] ; then
             echo "cramfs did not install properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
-            exit
+            exit 1
        fi
     done
 
@@ -1298,7 +1298,7 @@ if [ $KERNEL_SOURCE ] ; then
                 echo "U-Boot did not build properly : Missing $RUN"
                 echo "Please report an error to http://blackfin.uclinux.org"
                 tail -10 $ACTUAL_LOGFILE
-                exit
+                exit 1
             fi
         done
 
@@ -1313,7 +1313,7 @@ if [ $KERNEL_SOURCE ] ; then
                 echo "U-Boot tools did not install properly : Missing $RUN"
                 echo "Please report an error to http://blackfin.uclinux.org"
                 tail -10 $ACTUAL_LOGFILE
-                exit
+                exit 1
            fi
         done
 
