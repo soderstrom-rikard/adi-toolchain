@@ -1839,7 +1839,16 @@ bfin_expand_call (rtx retval, rtx fnaddr, rtx callarg1, rtx cookie, int sibcall)
 	  || bfin_longcall_p (callee, INTVAL (cookie))
 	  || (GET_CODE (callee) == SYMBOL_REF
 	      && !SYMBOL_REF_LOCAL_P (callee)
-	      && TARGET_INLINE_PLT))
+	      && TARGET_INLINE_PLT)
+	  || (DECL_SECTION_NAME (cfun->decl) != NULL_TREE
+	      && strcmp (TREE_STRING_POINTER (DECL_SECTION_NAME (cfun->decl)),
+			 ".l1.text") == 0)
+	  || (GET_CODE (callee) == SYMBOL_REF
+	      && SYMBOL_REF_DECL (callee) && DECL_P (SYMBOL_REF_DECL (callee))
+	      && DECL_SECTION_NAME (SYMBOL_REF_DECL (callee)) != NULL_TREE
+	      && strcmp (TREE_STRING_POINTER (DECL_SECTION_NAME
+					      (SYMBOL_REF_DECL (callee))),
+			 ".l1.text") == 0))
 	{
 	  rtx addr = callee;
 	  if (! address_operand (addr, Pmode))
