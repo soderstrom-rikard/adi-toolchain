@@ -3,6 +3,10 @@
 	* config/bfin/bfin.c (override_options): Disable -fstack-limit for
 	FD-PIC.
 
+	* config/bfin/bfin.c (print_operand): New modifier 'N' for constants.
+	* config/bfin/bfin.md (ssashiftv2hi3, ssashifthi3, lshiftv2hi3,
+	lshifthi3): Use it, and fix the order of alternatives.
+
 2006-08-20  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* reload1.c (delete_output_reload): Count occurrences in
