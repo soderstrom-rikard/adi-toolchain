@@ -1,3 +1,21 @@
+2006-09-01  Jie Zhang  <jie.zhang@analog.com>
+
+	Reverse
+	2006-08-31  Jie Zhang  <jie.zhang@analog.com>
+	* config/bfin/bfin.c (bfin_expand_call): Inline PLT when calling
+	from or into .l1.text section.
+
+	* config/bfin/bfin.c (bfin_expand_call): Inline PLT when calling
+	from or into functions with l1_text attribute.
+	(bfin_handle_l1_text_attribute): New.
+	(bfin_handle_l1_data_attribute): New.
+	(bfin_attribute_table): Add attributes: l1_text, l1_data,
+	l1_data_A and l1_data_B.
+	* doc/extend.texi (node Function Attributes): Document l1_text
+	function attribute.
+	(Variable Attributes): Add Blackfin subsection. Document l1_data,
+	l1_data_A and l1_data_B variable attributes.
+
 2006-08-31  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.c (bfin_expand_call): Inline PLT when calling
