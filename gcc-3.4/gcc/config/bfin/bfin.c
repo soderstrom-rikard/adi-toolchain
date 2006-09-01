@@ -2220,6 +2220,12 @@ override_options (void)
   if (stack_limit_rtx && TARGET_STACK_CHECK_L1)
     error ("Can't use multiple stack checking methods together.");
 
+  if (stack_limit_rtx && TARGET_FDPIC)
+    {
+      warning ("-fstack-limit- options are ignored with -mfdpic; use -mstack-check-l1");
+      stack_limit_rtx = NULL_RTX;
+    }
+
   if (TARGET_ID_SHARED_LIBRARY && TARGET_FDPIC)
     error ("ID shared libraries and FD-PIC mode can't be used together.");
 
