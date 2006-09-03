@@ -1876,14 +1876,17 @@ get_offsets (void)
   memcpy (offs, symfile_objfile->section_offsets,
 	  SIZEOF_N_SECTION_OFFSETS (symfile_objfile->num_sections));
 
-  offs->offsets[SECT_OFF_TEXT (symfile_objfile)] = text_addr;
+  if (SECT_OFF_TEXT (symfile_objfile) != -1)
+    offs->offsets[SECT_OFF_TEXT (symfile_objfile)] = text_addr;
 
   /* This is a temporary kludge to force data and bss to use the same offsets
      because that's what nlmconv does now.  The real solution requires changes
      to the stub and remote.c that I don't have time to do right now.  */
 
-  offs->offsets[SECT_OFF_DATA (symfile_objfile)] = data_addr;
-  offs->offsets[SECT_OFF_BSS (symfile_objfile)] = data_addr;
+  if (SECT_OFF_DATA (symfile_objfile) != -1)
+    offs->offsets[SECT_OFF_DATA (symfile_objfile)] = data_addr;
+  if (SECT_OFF_BSS (symfile_objfile) != -1)
+    offs->offsets[SECT_OFF_BSS (symfile_objfile)] = data_addr;
 
   objfile_relocate (symfile_objfile, offs);
 }
