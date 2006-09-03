@@ -1,5 +1,9 @@
 2006-09-03  Jie Zhang  <jie.zhang@analog.com>
 
+	* gdb.asm/asm-source.exp: Skip this test for bfin-uclinux fdpic.
+
+2006-09-03  Jie Zhang  <jie.zhang@analog.com>
+
 	* gdb.asm/asm-source.exp: Append -elf2flt to link-flags
 	if use_binfmt_flat for bfin-uclinux.
 	* gdb.asm/bfin.inc (gdbasm_exit0): Use EXCPT instead of
