@@ -242,8 +242,14 @@ proc gdbserver_load { host_exec child_args } {
     set gdbport [lindex $res 1]
 
     if { $host_exec != "" } {
-	if [gdb_file_cmd $host_exec] {
-	    return -1
+	if [target_info exists use_binfmt_flat] {
+	    if [gdb_file_cmd "$host_exec.gdb"] {
+		return -1
+	    }
+	} else {
+	    if [gdb_file_cmd $host_exec] {
+		return -1
+	    }
 	}
     }
     gdb_target_cmd $protocol $gdbport

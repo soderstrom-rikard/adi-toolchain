@@ -58,7 +58,9 @@ switch -glob -- [istarget] {
     "bfin-*-uclinux" {
         set asm-arch bfin
 	set debug-flags "-g"
-        append link-flags " -Wl,-elf2flt"
+	if [target_info exists use_binfmt_flat] {
+	    append link-flags " -elf2flt"
+	}
     }
     "d10v-*-*" {
         set asm-arch d10v

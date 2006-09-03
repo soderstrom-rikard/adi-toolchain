@@ -1,0 +1,11 @@
+2006-09-03  Jie Zhang  <jie.zhang@analog.com>
+
+	* gdb.asm/asm-source.exp: Append -elf2flt to link-flags
+	if use_binfmt_flat for bfin-uclinux.
+	* gdb.asm/bfin.inc (gdbasm_exit0): Use EXCPT instead of
+	RAISE.
+	(gdbasm_startup): Add LINK instruction.
+	* gdb.base/dump.exp: Deal with flat format.
+	* gdb.mi/mi-basics.exp: Likewise.
+	* lib/gdbserver-support.exp: Likewise.
+	* lib/mi-support.exp: Likewise.

@@ -40,6 +40,13 @@ if [mi_gdb_start separate-inferior-tty] {
 set testfile "basics"
 set srcfile ${testfile}.c
 set binfile ${objdir}/${subdir}/${testfile}
+
+if [target_info exists use_binfmt_flat] {
+    set symfile "${binfile}.gdb"
+} else {
+    set symfile ${binfile}
+}
+
 set escapedobjdir [string_to_regexp ${objdir}]
 set escapedsrcdir [string_to_regexp ${srcdir}]
 
@@ -85,6 +92,7 @@ proc test_mi_interpreter_selection {} {
 proc test_exec_and_symbol_mi_operatons {} {
     global mi_gdb_prompt
     global binfile
+    global symfile
 
     # Load symbols and specify executable on a single operation
     # Tests:
@@ -92,7 +100,7 @@ proc test_exec_and_symbol_mi_operatons {} {
 
     # Can't use mi_gdb_test as if this doesn't work,
     #  we must give up on the whole test file
-    send_gdb "-file-exec-and-symbols ${binfile}\n"
+    send_gdb "-file-exec-and-symbols ${symfile}\n"
     gdb_expect {
            -re "\[\r\n\]*\\\^done\r\n$mi_gdb_prompt$" \
                { pass "file-exec-and-symbols operation" }
@@ -116,11 +124,11 @@ proc test_exec_and_symbol_mi_operatons {} {
 #            "\\\^done" \
 #            "file-clear operation"
 
-    mi_gdb_test "-file-exec-file ${binfile}" \
+    mi_gdb_test "-file-exec-file ${symfile}" \
              "\\\^done" \
              "file-exec-file operation"
 
-    mi_gdb_test "-file-symbol-file ${binfile}" \
+    mi_gdb_test "-file-symbol-file ${symfile}" \
              "\\\^done" \
              "file-symbol-file operation"
 

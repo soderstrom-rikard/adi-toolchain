@@ -466,7 +466,11 @@ proc mi_gdb_load { arg } {
 
     # ``gdb_unload''
     if { $arg != "" } {
-	mi_gdb_file_cmd $arg
+	if [target_info exists use_binfmt_flat] {
+	    mi_gdb_file_cmd "$arg.gdb"
+	} else {
+	    mi_gdb_file_cmd $arg
+	}
     }
 
     # ``load''

@@ -23,12 +23,14 @@
 	comment "exit (0)"
 	.macro gdbasm_exit0
 	R0 = 0;
-	RAISE 0;
+	EXCPT 0;
+	NOP;
 	.endm
 
 	comment "crt0 startup"
 	.macro gdbasm_startup
 	FP = 0;
+	LINK 0xc;
 	.endm
 
 	comment "Declare a data variable"
