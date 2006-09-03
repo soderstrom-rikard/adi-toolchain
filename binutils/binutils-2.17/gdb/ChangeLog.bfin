@@ -1,3 +1,7 @@
+2006-09-03  Jie Zhang  <jie.zhang@analog.com>
+
+	* symfile.c (place_section): Subtract VMA when calculating offsets.
+
 2006-06-29  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin-tdep.c (bfin_push_dummy_call): Set the GOT register for the

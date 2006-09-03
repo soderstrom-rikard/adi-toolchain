@@ -530,7 +530,7 @@ place_section (bfd *abfd, asection *sect, void *obj)
     }
   while (!done);
 
-  offsets[sect->index] = start_addr;
+  offsets[sect->index] = start_addr - bfd_section_vma (abfd, sect);
   arg->lowest = start_addr + bfd_get_section_size (sect);
 
   exec_set_section_address (bfd_get_filename (abfd), sect->index, start_addr);
