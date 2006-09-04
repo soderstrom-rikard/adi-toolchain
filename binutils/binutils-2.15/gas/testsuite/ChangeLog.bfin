@@ -1,3 +1,9 @@
+2006-09-04  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* gas/bfin/expected_errors.s, gas/bfin/expected_errors.l: Add test
+	for mismatched half registers in vector multipy-accumulate
+	instructions.
+
 2006-05-25  Jie Zhang  <jie.zhang@analog.com>
 
 	* gas/bfin/vector2.s, gas/bfin/vector2.d: Test to ensure (m) is not
