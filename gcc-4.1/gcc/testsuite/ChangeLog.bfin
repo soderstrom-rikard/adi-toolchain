@@ -1,6 +1,15 @@
 2006-09-04  Jie Zhang  <jie.zhang@analog.com>
 
 	Apply
+	2006-06-05  Steve Ellcey  <sje@cup.hp.com>
+	Backport from mainline:
+	2006-04-23  David Edelsohn  <edelsohn@gnu.org>
+	* g++.dg/opt/pr15551.C: Include cstdio.
+	(main): Use remove instead of unlink.
+
+2006-09-04  Jie Zhang  <jie.zhang@analog.com>
+
+	Apply
 	2006-07-24  Roger Sayle  <roger@eyesopen.com>
 	Backport from mainline
 	* gcc.dg/fold-cond-1.c: Increase test case portability by checking
