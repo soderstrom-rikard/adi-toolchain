@@ -14,6 +14,9 @@ set_board_info username root
 set_board_info use_gdb_stub 1
 set_board_info noargs 1
 
+# Path to the gdbserver executable, if required.
+set_board_info gdb_server_prog "gdbserver"
+
 set_board_info gcc,no_trampolines 1
 # Advertise slightly less than we actually have since a few testcases
 # really push the limit.
@@ -25,6 +28,9 @@ set_board_info gdb,noinferiorio 1
 set_board_info gdb,nofileio 1
 set_board_info gdb,no_hardware_watchpoints 1
 set_board_info gdb,skip_huge_test 1
+# Set gdb,nosignals to avoid a kernel bug
+set_board_info gdb,nosignals 1
 
 # BuildToolchain will append hostname
 # set_board_info hostname 192.168.0.110
+# set_board_info sockethost 192.168.0.110:
