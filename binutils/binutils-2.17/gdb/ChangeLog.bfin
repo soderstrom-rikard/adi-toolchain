@@ -1,3 +1,17 @@
+2006-09-04  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-tdep.c (bfin_register_name_strings): Rename extra1 to
+	text_addr, extra2 to text_end_addr, extra3 to data_addr.
+	(bfin_linux_sigcontext_reg_offset): Change comments accordingly.
+	(bfin_linux_ucontext_reg_offset): Likewise.
+	(bfin_sim_regno): Rename SIM_BFIN_EXTRA1 to SIM_BFIN_TEXT_ADDR,
+	SIM_BFIN_EXTRA2 to SIM_BFIN_TEXT_END_ADDR, SIM_BFIN_EXTRA3 to
+	SIM_BFIN_DATA_ADDR.
+	* bfin-tdep.h (enum gdb_regnum): Rename BFIN_EXTRA1 to BFIN_TEXT_ADDR,
+	BFIN_EXTRA2 to BFIN_TEXT_END_ADDR, BFIN_EXTRA3 to BFIN_DATA_ADDR.
+	* regformats/reg-bfin.dat: Rename extra1 to text_addr, extra2 to
+	text_end_addr, extra3 to data_addr.
+
 2006-09-03  Jie Zhang  <jie.zhang@analog.com>
 
 	* remote.c (get_offsets): Set the offsets of text section

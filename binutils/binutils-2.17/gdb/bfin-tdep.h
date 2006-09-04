@@ -79,9 +79,9 @@ enum gdb_regnum {
   /* Pseudo Registers */
   BFIN_PC_REGNUM,
   BFIN_CC_REGNUM,
-  BFIN_EXTRA1,		/* Address of .text section.  */
-  BFIN_EXTRA2,		/* Address of .data section.  */
-  BFIN_EXTRA3,		/* Address of .bss section.  */
+  BFIN_TEXT_ADDR,		/* Address of .text section.  */
+  BFIN_TEXT_END_ADDR,		/* Address of the end of .text section.  */
+  BFIN_DATA_ADDR,		/* Address of .data section.  */
 
   BFIN_FDPIC_EXEC_REGNUM,
   BFIN_FDPIC_INTERP_REGNUM,
@@ -90,7 +90,7 @@ enum gdb_regnum {
   BFIN_IPEND_REGNUM,
 
   /* LAST ENTRY SHOULD NOT BE CHANGED.  */
-  BFIN_NUM_REGS		/* The number of all registers.  */
+  BFIN_NUM_REGS			/* The number of all registers.  */
 };
 
 enum gcc_regnum {

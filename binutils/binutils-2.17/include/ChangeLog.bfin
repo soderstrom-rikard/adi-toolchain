@@ -1,3 +1,9 @@
+2006-09-04  Jie Zhang  <jie.zhang@analog.com>
+
+	* gdb/sim-bfin.h (enum sim_bfin_regnum): Rename SIM_BFIN_EXTRA1 to
+	SIM_BFIN_TEXT_ADDR, SIM_BFIN_EXTRA2 to SIM_BFIN_TEXT_END_ADDR,
+	SIM_BFIN_EXTRA3 to SIM_BFIN_DATA_ADDR.
+
 2006-08-18  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfdlink.h (struct bfd_link_info): Add sep_code.

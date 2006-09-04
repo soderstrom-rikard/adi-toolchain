@@ -140,7 +140,8 @@ static char *bfin_register_name_strings[] =
   "a0x", "a0w", "a1x", "a1w", "astat", "rets",
   "lc0", "lt0", "lb0", "lc1", "lt1", "lb1", "cycles", "cycles2",
   "usp", "seqstat", "syscfg", "reti", "retx", "retn", "rete",
-  "pc", "cc", "extra1", "extra2", "extra3", "fdpic_exec", "fdpic_interp",
+  "pc", "cc",
+  "text_addr", "text_end_addr", "data_addr", "fdpic_exec", "fdpic_interp",
   "ipend"
 };
 
@@ -323,9 +324,9 @@ static int bfin_linux_sigcontext_reg_offset[BFIN_NUM_REGS] =
   -1,		/* %rete */
   40 * 4,	/* %pc */
   -1,		/* %cc */
-  -1,		/* %extra1 */
-  -1,		/* %extra2 */
-  -1,		/* %extra3 */
+  -1,		/* %text_addr */
+  -1,		/* %text_end_addr */
+  -1,		/* %data_addr */
   -1		/* %ipend */
 };
 
@@ -389,9 +390,9 @@ static int bfin_linux_ucontext_reg_offset[BFIN_NUM_REGS] =
   -1,		/* %rete */
   22 * 4,	/* %pc */
   -1,		/* %cc */
-  -1,		/* %extra1 */
-  -1,		/* %extra2 */
-  -1,		/* %extra3 */
+  -1,		/* %text_addr */
+  -1,		/* %text_end_addr*/
+  -1,		/* %data_addr*/
   -1		/* %ipend */
 };
 
@@ -1202,9 +1203,9 @@ bfin_sim_regno (int regno)
     case SIM_BFIN_RETX_REGNUM:
     case SIM_BFIN_RETN_REGNUM:
     case SIM_BFIN_RETE_REGNUM:
-    case SIM_BFIN_EXTRA1:
-    case SIM_BFIN_EXTRA2:
-    case SIM_BFIN_EXTRA3:
+    case SIM_BFIN_TEXT_ADDR:
+    case SIM_BFIN_TEXT_END_ADDR:
+    case SIM_BFIN_DATA_ADDR:
     case SIM_BFIN_IPEND_REGNUM:
       return SIM_REGNO_DOES_NOT_EXIST;
     default:

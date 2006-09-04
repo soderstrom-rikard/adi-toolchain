@@ -1,0 +1,8 @@
+2006-09-04  Jie Zhang  <jie.zhang@analog.com>
+
+	* linux-bfin-low.c (bfin_regmap): Rename PT_EXTRA1 to PT_TEXT_ADDR,
+	PT_EXTRA2 to PT_TEXT_END_ADDR, PT_EXTRA3 to PT_DATA_ADDR.
+	* linux-low.c (PT_TEXT_ADDR): Define for BFIN.
+	(PT_TEXT_END_ADDR): Likewise.
+	(PT_DATA_ADDR): Likewise.
+
