@@ -235,7 +235,7 @@ do
 done
 
 if [ -z "$GCC_VERSIONS" ]; then
-    GCC_VERSIONS=4.1
+    GCC_VERSIONS=3.4
 fi
 echo "Building gcc versions $GCC_VERSIONS"
 
