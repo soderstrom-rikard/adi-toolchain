@@ -298,9 +298,10 @@ check_macfuncs (Macfunc *aa, Opt_mode *opa,
 	return yyerror ("Vector AxMACs can't be same");
     }
 
-  /*  If both ops are != 3, we have multiply_halfregs in both
+  /*  If both ops are one of 0, 1, or 2, we have multiply_halfregs in both
   assignment_or_macfuncs.  */
-  if (aa->op == ab->op && aa->op != 3)
+  if (aa->op < 3 && aa->op >=0
+      && ab->op < 3 && ab->op >= 0)
     {
       if (check_multiply_halfregs (aa, ab) < 0)
 	return -1;
@@ -1730,7 +1731,7 @@ asm_1:
 	      $$ = DSP32MULT (0, 0, $4.mod, 0, 0,
 			      0, 0, IS_H ($3.s0), IS_H ($3.s1), 
 			      &$1, 0, &$3.s0, &$3.s1, 1);
-		}	
+	    }
 	}
 
 	| REG ASSIGN multiply_halfregs opt_mode 
@@ -1738,6 +1739,9 @@ asm_1:
 	  /* Odd registers can use (M).  */
 	  if (!IS_DREG ($1))
 	    return yyerror ("Dreg expected");
+
+	  if (IS_EVEN ($1) && $4.MM)
+	    return yyerror ("(M) not allowed with MAC0");
 
 	  if (!IS_EVEN ($1))
 	    {
@@ -1747,15 +1751,13 @@ asm_1:
 			      IS_H ($3.s0), IS_H ($3.s1), 0, 0,
 			      &$1, 0, &$3.s0, &$3.s1, 0);
 	    }
-	  else if ($4.MM == 0)
+	  else
 	    {
 	      notethat ("dsp32mult: dregs = multiply_halfregs opt_mode\n");
 	      $$ = DSP32MULT (0, 0, $4.mod, 0, 1,
 			      0, 0, IS_H ($3.s0), IS_H ($3.s1), 
 			      &$1,  0, &$3.s0, &$3.s1, 1);
 	    }
-	  else
-	    return yyerror ("Register or mode mismatch");
 	}
 
 	| HALF_REG ASSIGN multiply_halfregs opt_mode COMMA
@@ -1764,57 +1766,56 @@ asm_1:
 	  if (!IS_DREG ($1) || !IS_DREG ($6)) 
 	    return yyerror ("Dregs expected");
 
+	  if (!IS_HCOMPL($1, $6))
+	    return yyerror ("Dest registers mismatch");
+
 	  if (check_multiply_halfregs (&$3, &$8) < 0)
 	    return -1;
 
-	  if (IS_H ($1) && !IS_H ($6))
-	    {
-	      notethat ("dsp32mult: dregs_hi = multiply_halfregs mxd_mod, "
-		       "dregs_lo = multiply_halfregs opt_mode\n");
-	      $$ = DSP32MULT (0, $4.MM, $9.mod, 1, 0,
-			      IS_H ($3.s0), IS_H ($3.s1), IS_H ($8.s0), IS_H ($8.s1),
-			      &$1, 0, &$3.s0, &$3.s1, 1);
-	    }
-	  else if (!IS_H ($1) && IS_H ($6) && $4.MM == 0)
-	    {
-	      $$ = DSP32MULT (0, $9.MM, $9.mod, 1, 0,
-			      IS_H ($8.s0), IS_H ($8.s1), IS_H ($3.s0), IS_H ($3.s1),
-			      &$1, 0, &$3.s0, &$3.s1, 1);
-	    }
+	  if ((!IS_H ($1) && $4.MM)
+	      || (!IS_H ($6) && $9.MM))
+	    return yyerror ("(M) not allowed with MAC0");
+
+	  notethat ("dsp32mult: dregs_hi = multiply_halfregs mxd_mod, "
+		    "dregs_lo = multiply_halfregs opt_mode\n");
+
+	  if (IS_H ($1))
+	    $$ = DSP32MULT (0, $4.MM, $9.mod, 1, 0,
+			    IS_H ($3.s0), IS_H ($3.s1), IS_H ($8.s0), IS_H ($8.s1),
+			    &$1, 0, &$3.s0, &$3.s1, 1);
 	  else
-	    return yyerror ("Multfunc Register or mode mismatch");
+	    $$ = DSP32MULT (0, $9.MM, $9.mod, 1, 0,
+			    IS_H ($8.s0), IS_H ($8.s1), IS_H ($3.s0), IS_H ($3.s1),
+			    &$1, 0, &$3.s0, &$3.s1, 1);
 	}
 
-	| REG ASSIGN multiply_halfregs opt_mode COMMA REG ASSIGN multiply_halfregs opt_mode 
+	| REG ASSIGN multiply_halfregs opt_mode COMMA REG ASSIGN multiply_halfregs opt_mode
 	{
 	  if (!IS_DREG ($1) || !IS_DREG ($6)) 
 	    return yyerror ("Dregs expected");
 
+	  if ((IS_EVEN ($1) && $6.regno - $1.regno != 1)
+	      || (IS_EVEN ($6) && $1.regno - $6.regno != 1))
+	    return yyerror ("Dest registers mismatch");
+
 	  if (check_multiply_halfregs (&$3, &$8) < 0)
 	    return -1;
 
+	  if ((IS_EVEN ($1) && $4.MM)
+	      || (IS_EVEN ($6) && $9.MM))
+	    return yyerror ("(M) not allowed with MAC0");
+
 	  notethat ("dsp32mult: dregs = multiply_halfregs mxd_mod, "
 		   "dregs = multiply_halfregs opt_mode\n");
-	  if (IS_EVEN ($1))
-	    {
-	      if ($6.regno - $1.regno != 1 || $4.MM != 0)
-		return yyerror ("Dest registers or mode mismatch");
 
-	      /*   op1       MM      mmod  */
-	      $$ = DSP32MULT (0, 0, $9.mod, 1, 1,
-			      IS_H ($8.s0), IS_H ($8.s1), IS_H ($3.s0), IS_H ($3.s1),
-			      &$1, 0, &$3.s0, &$3.s1, 1);
-	      
-	    }
+	  if (IS_EVEN ($1))
+	    $$ = DSP32MULT (0, $9.MM, $9.mod, 1, 1,
+			    IS_H ($8.s0), IS_H ($8.s1), IS_H ($3.s0), IS_H ($3.s1),
+			    &$1, 0, &$3.s0, &$3.s1, 1);
 	  else
-	    {
-	      if ($1.regno - $6.regno != 1)
-		return yyerror ("Dest registers mismatch");
-	      
-	      $$ = DSP32MULT (0, $9.MM, $9.mod, 1, 1,
-			      IS_H ($3.s0), IS_H ($3.s1), IS_H ($8.s0), IS_H ($8.s1),
-			      &$1, 0, &$3.s0, &$3.s1, 1);
-	    }
+	    $$ = DSP32MULT (0, $4.MM, $9.mod, 1, 1,
+			    IS_H ($3.s0), IS_H ($3.s1), IS_H ($8.s0), IS_H ($8.s1),
+			    &$1, 0, &$3.s0, &$3.s1, 1);
 	}
 
 
@@ -3220,16 +3221,6 @@ asm_1:
 	    }
 	  else
 	    return yyerror ("Bad register or value");
-	}
-
-
-
-/* Expression Assignment.  */
-
-	| expr ASSIGN expr
-	{
-	  bfin_equals ($1);
-	  $$ = 0;
 	}
 
 
