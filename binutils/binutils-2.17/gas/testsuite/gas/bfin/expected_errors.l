@@ -8,3 +8,4 @@
 .*:10: Error: Bad constant value.
 .*:11: Error: Bad constant value.
 .*:13: Error: Dregs expected. Input text was R3.L.
+.*:15: Error: Source multiplication register mismatch. Input text was \).
