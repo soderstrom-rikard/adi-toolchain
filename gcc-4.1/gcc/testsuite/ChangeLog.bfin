@@ -1,3 +1,8 @@
+2006-09-05  Jie Zhang  <jie.zhang@analog.com>
+
+	* lib/target-supports.exp (check_profiling_available): Set
+	profiling_available_saved to 0 for bfin-*-*.
+
 2006-09-04  Jie Zhang  <jie.zhang@analog.com>
 
 	Apply
