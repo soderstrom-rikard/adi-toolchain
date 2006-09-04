@@ -38,7 +38,7 @@ APP_NAME=${APP_NAME#/}
 #TIMESTAMP=`date +%Y-%b-%d-%H-%M` # is YYYY_MMM_DD_HH_MM
 TIMESTAMP=`date +%Y%m%d`       # is YYYY_MMM_DD
 
-BINUTILS_VERSION=2.15
+BINUTILS_VERSION=2.17
 GCC_VERSIONS=
 
 while getopts dipwvtST:C:s:b:k:o:m:B:c:u:h parameter
