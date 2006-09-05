@@ -1,3 +1,7 @@
+2006-09-06  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.h (FUNCTION_PROFILER): Use correct label prefix.
+
 2006-09-01  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (override_options): Disable -fstack-limit for

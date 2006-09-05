@@ -1431,7 +1431,7 @@ do { 						\
 
 #define FUNCTION_PROFILER(FILE, LABELNO) \
   do {\
-    fprintf (FILE, "\tP1.l =LP$%d; P1.h =LP$%d; call mcount;\n", \
+    fprintf (FILE, "\tP1.l =L$LP$%d; P1.h =L$LP$%d; call mcount;\n", \
        LABELNO, LABELNO);\
   } while(0)
 
