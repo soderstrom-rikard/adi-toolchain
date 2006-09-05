@@ -1,3 +1,9 @@
+2006-09-05  Jie Zhang  <jie.zhang@analog.com>
+
+	* gas/bfin/expected_errors.l, gas/bfin/expected_errors.s: Add
+	tests for bad options of "multiply and multipy-accumulate to
+	accumulator" instructions.
+
 2006-09-04  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* gas/bfin/expected_errors.s, gas/bfin/expected_errors.l: Add test
