@@ -9,3 +9,9 @@
 .*:11: Error: Bad constant value.
 .*:13: Error: Dregs expected. Input text was R3.L.
 .*:15: Error: Source multiplication register mismatch. Input text was \).
+.*:17: Error: bad option.
+.*:18: Error: bad option.
+.*:19: Error: bad option.
+.*:20: Error: bad option.
+.*:21: Error: bad option.
+.*:22: Error: bad option.
