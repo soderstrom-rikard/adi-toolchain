@@ -32,6 +32,12 @@ set binfile ${objdir}/${subdir}/${testfile}
 
 remote_exec build "rm -f ${binfile}"
 
+# Are we on a target board?  No support for downloading shared libraries
+# to a target yet.
+if ![isnative] then {
+    return 0
+}
+
 # get the value of gcc_compiled
 if [get_compiler_info ${binfile}] {
     return -1

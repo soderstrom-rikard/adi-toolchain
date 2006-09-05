@@ -1,3 +1,9 @@
+2006-09-05  Jie Zhang  <jie.zhang@analog.com>
+
+	Backport from FSF CVS.
+	2006-06-22  Daniel Jacobowitz  <dan@codesourcery.com>
+	* gdb.base/gdb1555.exp: Skip if not native.
+
 2006-09-03  Jie Zhang  <jie.zhang@analog.com>
 
 	* gdb.asm/asm-source.exp: Skip this test for bfin-uclinux fdpic.
