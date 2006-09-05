@@ -270,6 +270,10 @@ check_multiply_halfregs (Macfunc *aa, Macfunc *ab)
 static int
 check_macfunc_option (Macfunc *a, Opt_mode *opt)
 {
+  /* Default option is always valid.  */
+  if (opt->mod == 0)
+    return 0;
+
   if ((a->op == 3 && a->w == 1 && a->P == 1
        && opt->mod != M_FU && opt->mod != M_S2RND && opt->mod != M_ISS2)
       || (a->op == 3 && a->w == 1 && a->P == 0
