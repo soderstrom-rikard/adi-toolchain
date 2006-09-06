@@ -1,5 +1,10 @@
 2006-09-06  Jie Zhang  <jie.zhang@analog.com>
 
+	* config/bfin-parse.y (check_macfuncs): Fix comparison always true
+	warnings.
+
+2006-09-06  Jie Zhang  <jie.zhang@analog.com>
+
 	* config/bfin-parse.y (check_macfunc_option): Default option
 	is always valid.
 

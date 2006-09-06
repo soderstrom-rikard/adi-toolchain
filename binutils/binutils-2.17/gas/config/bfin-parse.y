@@ -329,8 +329,8 @@ check_macfuncs (Macfunc *aa, Opt_mode *opa,
 
   /*  If both ops are one of 0, 1, or 2, we have multiply_halfregs in both
   assignment_or_macfuncs.  */
-  if (aa->op < 3 && aa->op >=0
-      && ab->op < 3 && ab->op >= 0)
+  if ((aa->op == 0 || aa->op == 1 || aa->op == 2)
+      && (ab->op == 0 || ab->op == 1 || ab->op == 2))
     {
       if (check_multiply_halfregs (aa, ab) < 0)
 	return -1;
