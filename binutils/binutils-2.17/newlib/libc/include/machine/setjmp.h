@@ -21,6 +21,10 @@ _BEGIN_STD_C
 #define	_JBLEN	13
 #endif
 
+#ifdef bfin
+#define _JBLEN  40
+#endif
+
 /* necv70 was 9 as well. */
 
 #ifdef __mc68000__

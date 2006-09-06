@@ -1,0 +1,4 @@
+2006-09-06  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* libc/include/machine/setjmp.h (_JBLEN): Define for bfin.
+
