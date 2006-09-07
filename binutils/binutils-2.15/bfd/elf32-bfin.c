@@ -5456,6 +5456,14 @@ bfin_size_dynamic_sections (bfd * output_bfd ATTRIBUTE_UNUSED,
 
   return TRUE;
 }
+
+struct bfd_elf_special_section const elf32_bfin_special_sections[] =
+{
+  { ".l1.text",		8, -2, SHT_PROGBITS, SHF_ALLOC + SHF_EXECINSTR },
+  { ".l1.data",		8, -2, SHT_PROGBITS, SHF_ALLOC + SHF_WRITE },
+  { NULL,		0,  0, 0,            0 }
+};
+
 
 #define TARGET_LITTLE_SYM		bfd_elf32_bfin_vec
 #define TARGET_LITTLE_NAME		"elf32-bfin"
@@ -5502,6 +5510,7 @@ bfin_size_dynamic_sections (bfd * output_bfd ATTRIBUTE_UNUSED,
                                         elf32_bfin_print_private_bfd_data
 #define elf_backend_reloc_type_class    elf32_bfin_reloc_type_class
 #define elf_backend_can_gc_sections 1
+#define elf_backend_special_sections	elf32_bfin_special_sections
 #define elf_backend_can_refcount 1
 #define elf_backend_want_got_plt 0
 #define elf_backend_plt_readonly 1
