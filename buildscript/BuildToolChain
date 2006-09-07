@@ -1117,7 +1117,7 @@ if [ $KERNEL_SOURCE ] ; then
     RUN="$DIR_ELF2FLT_SOURCE/configure $HOST_TARGET                \
          --target=bfin-uclinux                                     \
          --with-libbfd=$DIR_BINUTILS_BUILD/bfd/libbfd.a            \
-         --with-libiberty=$DIR_uC_OUTPUT/lib/libiberty.a           \
+         --with-libiberty=$DIR_BINUTILS_BUILD/libiberty/libiberty.a   \
          --with-bfd-include-dir=$DIR_BINUTILS_BUILD/bfd            \
          --with-binutils-include-dir=$DIR_BINUTILS_SOURCE/include  \
          --prefix=$DIR_uC_OUTPUT --program-suffix= "
