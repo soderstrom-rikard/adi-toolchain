@@ -339,40 +339,34 @@ else
     HOST_TARGET=""
 fi
 
+mk_output_dir()
+{
+    echo -n "Path to $1 output dir  "
+    echo $2
+    if [ ! -d $2 ] ; then
+        mkdir -p $2
+        if [ ! -d $2 ] ; then
+            echo "Invalid output directory"
+            exit 1
+        fi
+    else if [ x$3 = "x" ]; then
+        echo "$2 already exists - cleaning"
+        rm -rf $2/*
+    fi
+    fi
+}
+
 ############ RELATIVE PATH TO SOURCE DIRECTORIES ################
 if [ ! $DIR_ELF_OUTPUT ] ; then
     DIR_ELF_OUTPUT=$DIR_BUILD/out-elf
 fi
-echo -n "Path to elf output dir      "
-echo $DIR_ELF_OUTPUT
-if [ ! -d $DIR_ELF_OUTPUT ] ; then
-    mkdir -p $DIR_ELF_OUTPUT
-    if [ ! -d /.$DIR_ELF_OUTPUT ] ; then
-        echo "Invalid output directory"
-        exit 1
-    fi
-else if [ "x$SKIP_ELF" = "x" ]; then
-    echo "$DIR_ELF_OUTPUT already exists - cleaning"
-    rm -rf $DIR_ELF_OUTPUT/*
-fi
-fi
+mk_output_dir "elf" $DIR_ELF_OUTPUT $SKIP_ELF
 
 if [ $KERNEL_SOURCE ] ; then
     if [ ! $DIR_uC_OUTPUT ] ; then
         DIR_uC_OUTPUT=$DIR_BUILD/out-uclinux
     fi
-    echo -n "Path to uClinux output dir  "
-    echo $DIR_uC_OUTPUT
-    if [ ! -d $DIR_uC_OUTPUT ] ; then
-        mkdir -p $DIR_uC_OUTPUT
-        if [ ! -d $DIR_uC_OUTPUT ] ; then
-            echo "Invalid output directory"
-            exit 1
-        fi
-    else
-        echo "$DIR_uC_OUTPUT already exists - cleaning"
-        rm -rf $DIR_uC_OUTPUT/*
-    fi
+    mk_output_dir "uClinux" $DIR_uC_OUTPUT ""
     if [ $DIR_UBOOT ] ; then
       echo -n "Path to U-Boot Source       "
       echo $DIR_UBOOT
@@ -700,20 +694,21 @@ run_tests ()
 #
 build_uClibc()
 {
+    ARGS="CROSS=bfin-elf- PREFIX=$2 DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ KERNEL_SOURCE=$KERNEL_SOURCE ROOTDIR=$UCLINUX_ROOT"
     echo -n "*** Cleaning uClibc                " ; date
-    RUN="$MAKE clean CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
+    RUN="$MAKE clean $ARGS"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
     echo -n "*** Building uClibc                " ; date
     LOCAL=`grep "UCLIBC_HAS_LOCALE=y" .config`
     if [ -z "$LOCAL" ] ; then
-        RUN="$MAKE all CROSS=bfin-elf- KERNEL_SOURCE=$KERNEL_SOURCE ROOTDIR=$UCLINUX_ROOT"
+        RUN="$MAKE all $ARGS"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh || die_with_log
     else
         echo -n "*** Building Locale                " ; date
-        RUN="$MAKE headers CROSS=bfin-elf- KERNEL_SOURCE=$KERNEL_SOURCE ROOTDIR=$UCLINUX_ROOT"
+        RUN="$MAKE headers $ARGS"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh
 
@@ -731,27 +726,27 @@ build_uClibc()
             cp ./LOCALES ./locales.txt
         fi
 
-        RUN="$MAKE CROSS=bfin-elf-"
+        RUN="$MAKE $ARGS"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh || die_with_log
         cd ../..
 
-        RUN="$MAKE all CROSS=bfin-elf- KERNEL_SOURCE=$KERNEL_SOURCE ROOTDIR=$UCLINUX_ROOT"
+        RUN="$MAKE all $ARGS"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh || die_with_log
     fi
 
     echo -n "*** Installing uClibc              " ; date
-    RUN="$MAKE install CROSS=bfin-elf- PREFIX=$DIR_uC_OUTPUT/bfin-uclinux DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ ROOTDIR=$UCLINUX_ROOT"
+    RUN="$MAKE install $ARGS"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
     # Need a way to look at uClibc make system , and see what libs
     # should be created
-    for RUN in crt0.o libc.a libcrypt.a libm.a libnsl.a libresolv.a \
+    for RUN in crt1.o libc.a libcrypt.a libm.a libnsl.a libresolv.a \
                libutil.a
     do
-	FILE=$DIR_uC_OUTPUT/bfin-uclinux/lib/$1$RUN
+	FILE=$2/lib/$1$RUN
         if [ ! -f $FILE ] ; then
             echo "uClibc $1 did not install properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
@@ -862,7 +857,7 @@ if [ "x$SKIP_ELF" = "x" ]; then
 
     RUN="$DIR_ELF2FLT_SOURCE/configure $HOST_TARGET --target=bfin-elf \
          --with-libbfd=$DIR_BINUTILS_BUILD/bfd/libbfd.a               \
-         --with-libiberty=$DIR_ELF_OUTPUT/lib/libiberty.a             \
+         --with-libiberty=$DIR_BINUTILS_BUILD/libiberty/libiberty.a   \
          --with-bfd-include-dir=$DIR_BINUTILS_BUILD/bfd               \
          --with-binutils-include-dir=$DIR_BINUTILS_SOURCE/include     \
          --prefix=$DIR_ELF_OUTPUT --program-suffix= "
@@ -1009,7 +1004,7 @@ if [ $KERNEL_SOURCE ] ; then
 
     cp .config .config-used-for-bfin
 
-    build_uClibc
+    build_uClibc "" $DIR_uC_OUTPUT/bfin-uclinux
 
     #################### Step 3b - build sep-data uClibc ##############
     echo -n "*** Configuring sep-data uClibc    " ; date
@@ -1024,7 +1019,7 @@ if [ $KERNEL_SOURCE ] ; then
 
     cp .config .config-used-for-bfin-shared-flat
 
-    build_uClibc msep-data/
+    build_uClibc msep-data/ $DIR_uC_OUTPUT/bfin-uclinux
 
     #################### Step 3b - build shared flat uClibc ##############
     echo -n "*** Configuring shared flat uClibc " ; date
@@ -1039,7 +1034,7 @@ if [ $KERNEL_SOURCE ] ; then
 
     cp .config .config-used-for-bfin-shared-flat
 
-    build_uClibc mid-shared-library/
+    build_uClibc mid-shared-library/ $DIR_uC_OUTPUT/bfin-uclinux
 
     ####################### Step 3c - build FD-PIC uClibc ################
     echo -n "*** Configuring uClibc for FD-PIC  " ; date
@@ -1061,7 +1056,7 @@ if [ $KERNEL_SOURCE ] ; then
 
     cp .config .config-used-for-bfinfdpic
 
-    build_uClibc mfdpic/
+    build_uClibc mfdpic/ $DIR_uC_OUTPUT/bfin-uclinux
 
     ######################### Done with uClibc ###########################
 
@@ -1090,17 +1085,17 @@ if [ $KERNEL_SOURCE ] ; then
     RUN="$DIR_BINUTILS_SOURCE/configure $HOST_TARGET \
          --target=bfin-uclinux --prefix=$DIR_uC_OUTPUT \
          --with-sysroot=$DIR_uC_OUTPUT/bfin-uclinux/runtime"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh || die_with_log
     (echo $RUN $LOGFILE ; ) | sh
 
     echo -n "*** Building uClinux Binutils & GDB   " ; date
     RUN="$MAKE all-binutils all-gas all-ld all-sim all-gdb"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh || die_with_log
     (echo $RUN $LOGFILE ; ) | sh
 
     echo -n "*** Installing uClinux Binutils & GDB " ; date
     RUN="$MAKE install-binutils install-gas install-ld install-sim install-gdb"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh || die_with_log
     (echo $RUN $LOGFILE ; ) | sh
 
     for GCC_VERSION in $GCC_VERSIONS; do
@@ -1132,16 +1127,16 @@ if [ $KERNEL_SOURCE ] ; then
     fi
 
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
     echo -n "*** Building uClinux elf2flt       " ; date
     RUN="$MAKE"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh || die_with_log
     (echo $RUN $LOGFILE ; ) | sh
 
     echo -n "*** Installing uClinux elf2flt     " ; date
     RUN="$MAKE install "
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh || die_with_log
     (echo $RUN $LOGFILE ; ) | sh
 
     if [ -e $DIR_SOURCE/libdsp/Makefile ] ; then
