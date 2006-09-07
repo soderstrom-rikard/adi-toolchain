@@ -1,3 +1,8 @@
+2006-09-06  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_expand_prologue): Use trunc_int_for_mode
+	to get address of scratchpad memory.
+
 2006-09-06  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.h (FUNCTION_PROFILER): Use correct label prefix.

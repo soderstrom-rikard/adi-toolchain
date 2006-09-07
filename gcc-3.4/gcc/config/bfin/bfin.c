@@ -953,7 +953,7 @@ bfin_expand_prologue (void)
       if (!lim)
 	{
 	  rtx p1reg = gen_rtx_REG (Pmode, REG_P1);
-	  emit_move_insn (p2reg, GEN_INT (0xFFB00000));
+	  emit_move_insn (p2reg, GEN_INT (trunc_int_for_mode (0xFFB00000, SImode)));
 #if 0
 	  /* First step: update maximum stack usage.  */
 	  emit_move_insn (p1reg, gen_rtx_MEM (Pmode, plus_constant (p2reg, 4)));
