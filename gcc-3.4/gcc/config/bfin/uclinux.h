@@ -4,7 +4,7 @@
 
 #undef  STARTFILE_SPEC
 #define STARTFILE_SPEC \
-  "%{!shared: crt1%O%s} crti%O%s crtbegin%O%s crtlibid%O%s"
+  "%{!shared: %{pie:Scrt1%O%s;:crt1%O%s}} crti%O%s crtbegin%O%s crtlibid%O%s"
 
 #undef  ENDFILE_SPEC
 #define ENDFILE_SPEC \
