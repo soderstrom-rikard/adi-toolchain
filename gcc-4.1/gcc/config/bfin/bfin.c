@@ -1837,18 +1837,30 @@ bfin_expand_call (rtx retval, rtx fnaddr, rtx callarg1, rtx cookie, int sibcall)
 
   if (TARGET_FDPIC)
     {
+      int caller_has_l1_text, callee_has_l1_text;
+
+      caller_has_l1_text = callee_has_l1_text = 0;
+
+      if (lookup_attribute ("l1_text",
+			    DECL_ATTRIBUTES (cfun->decl)) != NULL_TREE)
+	caller_has_l1_text = 1;
+
+      if (GET_CODE (callee) == SYMBOL_REF
+	  && SYMBOL_REF_DECL (callee) && DECL_P (SYMBOL_REF_DECL (callee))
+	  && lookup_attribute
+	       ("l1_text",
+		DECL_ATTRIBUTES (SYMBOL_REF_DECL (callee))) != NULL_TREE)
+	callee_has_l1_text = 1;
+
       if (GET_CODE (callee) != SYMBOL_REF
 	  || bfin_longcall_p (callee, INTVAL (cookie))
 	  || (GET_CODE (callee) == SYMBOL_REF
 	      && !SYMBOL_REF_LOCAL_P (callee)
 	      && TARGET_INLINE_PLT)
-	  || lookup_attribute ("l1_text",
-			       DECL_ATTRIBUTES (cfun->decl)) != NULL_TREE
-	  || (GET_CODE (callee) == SYMBOL_REF
-	      && SYMBOL_REF_DECL (callee) && DECL_P (SYMBOL_REF_DECL (callee))
-	      && lookup_attribute
-		   ("l1_text",
-		    DECL_ATTRIBUTES (SYMBOL_REF_DECL (callee))) != NULL_TREE))
+	  || caller_has_l1_text != callee_has_l1_text
+	  || (caller_has_l1_text && callee_has_l1_text
+	      && (GET_CODE (callee) != SYMBOL_REF
+		  || !SYMBOL_REF_LOCAL_P (callee))))
 	{
 	  rtx addr = callee;
 	  if (! address_operand (addr, Pmode))

@@ -1,3 +1,9 @@
+2006-09-09  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.c (bfin_expand_call): Don't emit inline PLT
+	if both caller and caller have l1_text attribute and the callee
+	is static function.
+
 2006-09-06  Jie Zhang  <jie.zhang@analog.com>
 
 	Backport from GCC 4.1 tree

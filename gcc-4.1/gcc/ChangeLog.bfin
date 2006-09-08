@@ -1,3 +1,9 @@
+2006-09-09  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.c (bfin_expand_call): Don't emit inline PLT
+	if both caller and caller have l1_text attribute and the callee
+	is static function.
+
 2006-09-06  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_expand_prologue): Use trunc_int_for_mode
