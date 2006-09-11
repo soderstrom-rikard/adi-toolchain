@@ -41,7 +41,7 @@ TIMESTAMP=`date +%Y%m%d`       # is YYYY_MMM_DD
 BINUTILS_VERSION=2.17
 GCC_VERSIONS=
 
-while getopts dipwvtST:C:s:b:k:o:m:B:c:u:h parameter
+while getopts dipwvtST:C:s:b:k:o:m:B:c:u:r:h parameter
 do
     case $parameter in
         p)
@@ -85,6 +85,13 @@ do
                 echo "Can't find dejagnu's runtest"
                 exit 1
             fi
+            ;;
+        r) 
+            if [ ! -d $OPTARG ] ; then
+                echo "Can't find old test results in $OPTARG"
+                exit 1
+            fi
+            RESULTS2COMPARE=$OPTARG
             ;;
         S)
             SKIP_ELF=true
@@ -213,6 +220,7 @@ do
 -d               Date Stamp all output files
 -t               Test components on simulator
 -T TARGET_IPADDR Test components on hardware
+-r RESULTS_DIR   Compare current tests to old results
 -s SOURCE        Toolchain Source directory (builds bfin-elf-gcc)
 -k SOURCE        Kernel Source directory    (builds bfin-uclinux-gcc)
 -u SOURCE        Uboot Source directory
@@ -412,6 +420,20 @@ if [ $CHECK_ON_SIMULATOR ] ; then
         rm -rf $DIR_TEST_SIM_RESULTS/*
     fi
     echo "  on simulator: $DIR_TEST_SIM_RESULTS"
+    if [ $RESULTS2COMPARE ] ; then
+        if [ ! -d $RESULTS2COMPARE/simulator ] ; then
+            echo "Can't find simulator results in $RESULTS2COMPARE/simulator"
+            exit 1
+        else
+            echo "    checking simulator results against $RESULTS2COMPARE/simulator"
+        fi
+        for GCC_VERSION in $GCC_VERSIONS; do
+            if [ ! -f $DIR_SOURCE/gcc-$GCC_VERSION/contrib/compare_tests ] ; then
+                echo "Can't find $DIR_SOURCE/gcc-$GCC_VERSION/contrib/compare_tests"
+                exit 1
+            fi
+        done
+    fi
 fi
 
 if [ $CHECK_ON_HARDWARE ] ; then
@@ -426,6 +448,20 @@ if [ $CHECK_ON_HARDWARE ] ; then
         rm -rf $DIR_TEST_HW_RESULTS/*
     fi
     echo "  on hardware: $DIR_TEST_HW_RESULTS"
+    if [ $RESULTS2COMPARE ] ; then
+        if [ ! -d $RESULTS2COMPARE/hardware ] ; then
+            echo "Can't find hardware results in $RESULTS2COMPARE/hardware"
+            exit 1
+        else
+            echo "    checking hardware results against $RESULTS2COMPARE/hardware"
+        fi
+        for GCC_VERSION in $GCC_VERSIONS; do
+            if [ ! -f $DIR_SOURCE/gcc-$GCC_VERSION/contrib/compare_tests ] ; then
+                echo "Can't find $DIR_SOURCE/gcc-$GCC_VERSION/contrib/compare_tests"
+                exit 1
+            fi
+        done
+    fi
 fi
 
 echo -n "Path to binutils dir        "
@@ -623,18 +659,18 @@ run_tests ()
     ( echo "$MAKE check " $LOGFILE ; ) | sh
 
     cp $DIR_BINUTILS_BUILD/binutils/binutils.sum \
-       $1/binutils.sum
+       $1/binutils-$BINUTILS_VERSION.sum
     cp $DIR_BINUTILS_BUILD/binutils/binutils.log \
-       $1/binutils.log
+       $1/binutils-$BINUTILS_VERSION.log
 
     echo -n "***  Running tests on gas          " ; date
     cd $DIR_BINUTILS_BUILD/gas
     ( echo "$MAKE check " $LOGFILE ; ) | sh
 
     cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.sum \
-       $1/gas.sum
+       $1/gas-$BINUTILS_VERSION.sum
     cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.log \
-       $1/gas.log
+       $1/gas-$BINUTILS_VERSION.log
 
     echo -n "***  Running tests on gcc          " ; date
     for GCC_VERSION in $GCC_VERSIONS; do
@@ -673,20 +709,29 @@ run_tests ()
     ( echo "$MAKE check " $LOGFILE ; ) | sh
 
     cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.sum \
-       $1/gdb.sum
+       $1/gdb-$BINUTILS_VERSION-$GCC_VERSION.sum
     cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.log \
-       $1/gdb.log
+       $1/gdb-$BINUTILS_VERSION-$GCC_VERSION.log
 
 
-    echo -n "***  Done testing  - results        " ; date
+    echo -n "***  Done testing  - results       " ; date
 
-    for FILE in $1/gas*.sum \
-                $1/binutils*.sum \
-                $1/gdb*.sum \
-                $1/gcc*.sum \
-                $1/g++*.sum
+    for FILE in gas-$BINUTILS_VERSION.sum \
+                binutils-$BINUTILS_VERSION.sum \
+                gdb-$BINUTILS_VERSION-$GCC_VERSION.sum \
+                gcc-$GCC_VERSION.sum \
+                g++-$GCC_VERSION.sum
     do
-        egrep "=== .* ===|^# of" $FILE
+        egrep "=== .*y ===|^# of" $1/$FILE
+        if [ $RESULTS2COMPARE ] ; then
+            if [ -f $RESULTS2COMPARE/$2/$FILE ] ; then
+                echo "Comparing $1/$FILE to $RESULTS2COMPARE/$2/$FILE"
+                $DIR_SOURCE/gcc-$GCC_VERSION/contrib/compare_tests \
+                    $1/$FILE $RESULTS2COMPARE/$2/$FILE
+            else
+                echo "Could not fine $RESULTS2COMPARE/$2/$FILE to compare"
+            fi
+        fi
     done
 }
 
@@ -903,7 +948,7 @@ if [ "x$SKIP_ELF" = "x" ]; then
 
     if [ $CHECK_ON_SIMULATOR ] ; then
 	echo "*** Testing on simulator            "
-	run_tests $DIR_TEST_SIM_RESULTS
+	run_tests $DIR_TEST_SIM_RESULTS simulator
     fi
 fi
 
@@ -1178,7 +1223,7 @@ if [ $KERNEL_SOURCE ] ; then
         cd $DIR_BINUTILS_BUILD
         ( echo "$MAKE clean " $LOGFILE ; ) | sh
 
-        run_tests $DIR_TEST_HW_RESULTS
+        run_tests $DIR_TEST_HW_RESULTS hardware
     fi
 
     ########################### genext2fs ########################
