@@ -647,10 +647,6 @@ deprecated_read_memory_nobpt (CORE_ADDR memaddr, gdb_byte *myaddr,
   CORE_ADDR bp_addr = 0;
   int bp_size = 0;
 
-  if (BREAKPOINT_FROM_PC (&bp_addr, &bp_size) == NULL)
-    /* No breakpoints on this machine. */
-    return target_read_memory (memaddr, myaddr, len);
-
   ALL_BP_LOCATIONS (b)
   {
     if (b->owner->type == bp_none)

@@ -1054,9 +1054,25 @@ gdb_print_insn_bfin (bfd_vma memaddr, disassemble_info *info)
 const unsigned char *
 bfin_breakpoint_from_pc (CORE_ADDR *pcptr, int *lenptr)
 {
-  static unsigned char bfin_breakpoint[] = {0xa1, 0x00};
-  *lenptr = sizeof (bfin_breakpoint);
-  return bfin_breakpoint;
+  unsigned short iw;
+  static unsigned char bfin_breakpoint_16bit[] = {0xa1, 0x00};
+  static unsigned char bfin_breakpoint_32bit[] = {0xa1, 0x00, 0x00, 0x00};
+
+
+  iw = read_memory_unsigned_integer (*pcptr, 2);
+
+  if ((iw & 0xf000) >= 0xc000)
+    {
+      /* 32-bit instruction.  */
+      *lenptr = sizeof (bfin_breakpoint_32bit);
+      return bfin_breakpoint_32bit;
+    }
+  else
+    {
+      /* 16-bit instruction.  */
+      *lenptr = sizeof (bfin_breakpoint_16bit);
+      return bfin_breakpoint_16bit;
+    }
 }
 
 static void

@@ -4379,11 +4379,12 @@ remote_insert_breakpoint (struct bp_target_info *bp_tgt)
     {
       char *p = rs->buf;
 
+      BREAKPOINT_FROM_PC (&bp_tgt->placed_address, &bp_tgt->placed_size);
+      addr = (ULONGEST) remote_address_masked (bp_tgt->placed_address);
+
       *(p++) = 'Z';
       *(p++) = '0';
       *(p++) = ',';
-      BREAKPOINT_FROM_PC (&bp_tgt->placed_address, &bp_tgt->placed_size);
-      addr = (ULONGEST) remote_address_masked (bp_tgt->placed_address);
       p += hexnumstr (p, addr);
       sprintf (p, ",%d", bp_tgt->placed_size);
 

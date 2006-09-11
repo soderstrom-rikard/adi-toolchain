@@ -1,3 +1,12 @@
+2006-09-11  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-tdep.c (bfin_breakpoint_from_pc): Use "EXCPT 0x1; NOP;"
+	as breakpoint for 32-bit instruction.
+	* breakpoint.c (deprecated_read_memory_nobpt): Don't call
+	BREAKPOINT_FROM_PC to check if machine has breakpoints
+	* remote.c (remote_insert_breakpoint): Move calling of
+	BREAKPOINT_FROM_PC to avoid corruption of packet buffer.
+
 2006-09-04  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin-tdep.c (bfin_register_name_strings): Rename extra1 to
