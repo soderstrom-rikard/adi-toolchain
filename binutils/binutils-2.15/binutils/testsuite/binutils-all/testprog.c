@@ -1,6 +1,7 @@
 /* This program is used to test objcopy, readelf and strip.  */
 
 extern int strcmp (char *, const char *);
+extern int printf (const char *, ...);
 
 int common;
 int global = 1;
