@@ -818,9 +818,11 @@ if [ "x$CHECK_ON_SIMULATOR" != "x" -o "x$CHECK_ON_HARDWARE" != "x" ] ; then
     fi
     if [ $CHECK_ON_HARDWARE ] ; then
         (cat $DIR_BOARDS/bfin-uclinux.exp.1; \
-         echo "set_board_info hostname $TARGET_IPADDR") > $DIR_BUILD/boards/bfin-uclinux.exp
+         echo "set_board_info hostname $TARGET_IPADDR") > $DIR_BUILD/boards/bfin-uclinux.exp \
+         echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-uclinux.exp
         (cat $DIR_BOARDS/bfin-uclinux.exp.2; \
-         echo "set_board_info hostname $TARGET_IPADDR") > $DIR_BUILD/boards/bfin-uclinux-fdpic.exp
+         echo "set_board_info hostname $TARGET_IPADDR") > $DIR_BUILD/boards/bfin-uclinux-fdpic.exp \
+         echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-uclinux-fdpic.exp
     fi
     (cat $DIR_BOARDS/site.exp.1; \
      echo "lappend boards_dir \"$DIR_BUILD/boards\""; \
