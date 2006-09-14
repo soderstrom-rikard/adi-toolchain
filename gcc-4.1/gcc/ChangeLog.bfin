@@ -3,6 +3,11 @@
 	* config/bfin/bfin.h (DRIVER_SELF_SPECS): Don't auto-enable
 	-minline-plt.
 
+	* config/bfin/bfin.c (bfin_rtx_costs): Handle UDIV, UMOD.
+	* params.def (PARAM_MAX_ITERATIONS_COMPUTATION_COST): New.
+	* loop-doloop.c (doloop_optimize): Use it to limit costs of
+	expanding the number of iterations.
+
 2006-09-09  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.c (bfin_expand_call): Don't emit inline PLT

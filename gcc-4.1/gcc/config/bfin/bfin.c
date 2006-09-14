@@ -2702,6 +2702,11 @@ bfin_rtx_costs (rtx x, int code, int outer_code, int *total)
 	}
       return true;
 
+    case UDIV:
+    case UMOD:
+      *total = 20 * cost2;
+      return true;
+
     case VEC_CONCAT:
     case VEC_SELECT:
       if (outer_code == SET)
