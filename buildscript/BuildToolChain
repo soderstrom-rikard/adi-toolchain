@@ -1113,10 +1113,17 @@ if [ $KERNEL_SOURCE ] ; then
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
+    echo -n "*** Cleaning uClibc                " ; date
+    cd $UCLIBC_SOURCE
+    RUN="$MAKE CROSS=bfin-elf- distclean"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
     # Move system include dirs into the sysroot.
     mkdir $DIR_uC_OUTPUT/bfin-uclinux/runtime/usr
     mv $DIR_uC_OUTPUT/bfin-uclinux/include $DIR_uC_OUTPUT/bfin-uclinux/runtime/usr/
 
+    cd $UCLINUX_ROOT
     mv saved-config-toplevel .config 2>/dev/null
     mv saved-config-linux linux-2.6.x/.config 2>/dev/null
     mv saved-config-uClibc uClibc/.config 2>/dev/null
