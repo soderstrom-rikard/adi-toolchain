@@ -1,3 +1,8 @@
+2006-09-14  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.h (DRIVER_SELF_SPECS): Don't auto-enable
+	-minline-plt.
+
 2006-09-09  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.c (bfin_expand_call): Don't emit inline PLT
