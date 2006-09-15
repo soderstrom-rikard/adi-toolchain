@@ -1828,6 +1828,20 @@ reg_or_7bit_operand (rtx op, enum machine_mode mode)
   return 0;
 }
 
+/* Return nonzero if OP is a register or, when negated, a 7 bit signed
+   constant.  */
+
+int
+reg_or_neg7bit_operand (rtx op, enum machine_mode mode)
+{
+  if (register_operand (op, mode))
+    return 1;
+  if (GET_CODE (op) == CONST_INT
+      && CONST_7BIT_IMM_P (-INTVAL (op)))
+    return 1;
+  return 0;
+}
+
 /* Used for secondary reloads, this function returns 1 if OP is of the
    form (plus (fp) (const_int)).  */
 

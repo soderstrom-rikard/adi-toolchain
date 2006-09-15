@@ -1,3 +1,12 @@
+2006-09-15  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (subsi3): Lose expander, change previously
+	unnamed pattern into subsi3.  Use correct constraints/predicates.
+	* config/bfin/bfin.h (CONST_OK_FOR_K): Handle "KN7".
+	(CONST_NEG7BIT_IMM_P): New macro.
+	(PREDICATE_CODES): Add reg_or_neg7bit_operand_p.
+	* config/bfin/bfin.c (reg_or_neg7bit_operand_p): New function.
+
 2006-09-14  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (DRIVER_SELF_SPECS): Don't auto-enable

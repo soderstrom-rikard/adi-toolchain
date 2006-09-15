@@ -1156,6 +1156,7 @@ do {                                              \
   {"pos_scale_operand", {CONST_INT}},                                  	\
   {"positive_immediate_operand", {CONST_INT}},				\
   {"reg_or_7bit_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},		\
+  {"reg_or_neg7bit_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},	\
   {"regorlog2_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},          	\
   {"vec_shift_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},          	\
 
@@ -1203,6 +1204,7 @@ do {                                              \
 #define CONST_16BIT_IMM_P(VALUE) ((VALUE) >= -32768 && (VALUE) <= 32767)
 #define CONST_16UBIT_IMM_P(VALUE) ((VALUE) >= 0 && (VALUE) <= 65535)
 #define CONST_7BIT_IMM_P(VALUE) ((VALUE) >= -64 && (VALUE) <= 63)
+#define CONST_NEG7BIT_IMM_P(VALUE) ((VALUE) >= -63 && (VALUE) <= 64)
 #define CONST_7NBIT_IMM_P(VALUE) ((VALUE) >= -64 && (VALUE) <= 0)
 #define CONST_5UBIT_IMM_P(VALUE) ((VALUE) >= 0 && (VALUE) <= 31)
 #define CONST_4BIT_IMM_P(VALUE) ((VALUE) >= -8 && (VALUE) <= 7)
@@ -1238,6 +1240,9 @@ do {                                              \
 	: 0)						\
      : (STR)[1] == 'n'					\
      ? ((STR)[2] == '7' ? CONST_7NBIT_IMM_P (VALUE)	\
+	: 0)						\
+     : (STR)[1] == 'N'					\
+     ? ((STR)[2] == '7' ? CONST_NEG7BIT_IMM_P (VALUE)	\
 	: 0)						\
      : 0)
 
