@@ -26,7 +26,7 @@
 #define LDR_FLAG_IGNORE   0x0010
 #define LDR_FLAG_FINAL    0x8000
 
-/* BF537 flags */
+/* BF537 flags; See page 19-14 of BF537 HRM */
 #define LDR_FLAG_RESVECT     0x0002
 #define LDR_FLAG_PPORT_MASK  0x0600
 #define LDR_FLAG_PPORT_NONE  0x0000
