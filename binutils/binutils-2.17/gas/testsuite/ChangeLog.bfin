@@ -1,3 +1,7 @@
+2006-09-19  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* gas/bfin/load.s, gas/bfin/load.d: Add constant folding tests.
+
 2006-09-05  Jie Zhang  <jie.zhang@analog.com>
 
 	* gas/bfin/expected_errors.l, gas/bfin/expected_errors.s: Add
