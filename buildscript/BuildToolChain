@@ -987,6 +987,25 @@ if [ -e $DIR_SOURCE/libdsp/Makefile ] ; then
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
+    RUN="$MAKE clean"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    RUN="CROSS=bfin-elf- $MAKE CFLAGS=-mfdpic"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    if [ ! -e $DIR_SOURCE/libdsp/libbffastfp.a ] ; then
+        echo "The ELF toolchain did not build libbffastfp.a properly - report an error"
+        tail -10 $ACTUAL_LOGFILE
+        exit 1
+    fi
+
+    echo -n "*** Installing libdsp              " ; date
+    RUN="cp $DIR_SOURCE/libdsp/libbffastfp.a $DIR_ELF_OUTPUT/bfin-elf/lib/mfdpic/libbffastfp.a"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
     cd $DIR_SOURCE/libdsp
     RUN="$MAKE clean"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
@@ -1194,30 +1213,13 @@ if [ $KERNEL_SOURCE ] ; then
     (echo $RUN $LOGFILE ; ) | sh
 
     if [ -e $DIR_SOURCE/libdsp/Makefile ] ; then
-        echo -n "*** Building libdsp                " ; date
+        echo -n "*** Installing uClinux libdsp      " ; date
 
-        cd $DIR_SOURCE/libdsp
-        RUN="$MAKE clean"
+        RUN="cp $DIR_ELF_OUTPUT/bfin-elf/lib/libbffastfp.a $DIR_uC_OUTPUT/bfin-uclinux/lib/"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh
 
-        RUN="CROSS=bfin-uclinux- $MAKE"
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo $RUN $LOGFILE ; ) | sh
-
-        if [ ! -e $DIR_SOURCE/libdsp/libbffastfp.a ] ; then
-            echo "The uClinux toolchain did not build libbffastfp.a properly - report an error"
-            tail -10 $ACTUAL_LOGFILE
-            exit 1
-        fi
-
-        echo -n "*** Installing libdsp              " ; date
-        RUN="cp $DIR_SOURCE/libdsp/libbffastfp.a $DIR_uC_OUTPUT/bfin-uclinux/lib/libbffastfp.a"
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo $RUN $LOGFILE ; ) | sh
-
-        cd $DIR_SOURCE/libdsp
-        RUN="$MAKE clean"
+        RUN="cp $DIR_ELF_OUTPUT/bfin-elf/lib/mfdpic/libbffastfp.a $DIR_uC_OUTPUT/bfin-uclinux/lib/mfdpic/"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh
     fi
