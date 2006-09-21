@@ -5,7 +5,13 @@
 ldrviewer is a simple command line program for handling LDR files.  LDR files 
 are a Visual DSP invention for running code on the Blackfin CPU.  Sometimes 
 we need to handle these things in the world of Linux as it is the native 
-executable format for the Blackfin CPU.
+executable format for the boot rom built into the Blackfin CPU.
+
+To put it simply, LDRs are just a container format for DXEs (which are just a
+fancy name for programs in the Blackfin binary object code format).  A single
+LDR is made up of an arbitrary number of DXEs and a single DXE is made up of
+an arbitrary number of blocks (each block contains starting address and some
+flags).
 
 
 ------
