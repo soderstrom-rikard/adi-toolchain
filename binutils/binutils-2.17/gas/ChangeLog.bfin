@@ -1,3 +1,8 @@
+2006-09-22  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-lex.c, bfin-parse.c, bfin-parse.h, itbl-lex.c, itbl-parse.c,
+	itbl-parse.h m68k-parse.c: Remove generated files from CVS.
+
 2006-09-18  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin-parse.y (binary): Change sub of const to add of negated
