@@ -34,15 +34,16 @@
 #define LDR_FLAG_PPORT_PORTG 0x0400
 #define LDR_FLAG_PPORT_PORTH 0x0600
 #define LDR_FLAG_PFLAG_MASK  0x01E0
+#define LDR_FLAG_PFLAG_SHIFT 5
 
 #define LDR_BLOCK_HEADER_LEN (sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint16_t))
 typedef struct {
-	size_t offset;
-	uint32_t target_address;
-	uint32_t byte_count;
-	uint16_t flags;
-	uint8_t header[LDR_BLOCK_HEADER_LEN];
-	uint8_t *data;
+	size_t offset;                            /* file offset */
+	uint32_t target_address;                  /* blackfin memory address to load block */
+	uint32_t byte_count;                      /* number of bytes in block */
+	uint16_t flags;                           /* flags to control behavior */
+	uint8_t header[LDR_BLOCK_HEADER_LEN];     /* buffer for previous three members */
+	uint8_t *data;                            /* buffer for block data */
 } BLOCK;
 
 typedef struct {
@@ -55,11 +56,19 @@ typedef struct {
 	size_t num_dxes;
 } LDR;
 
+struct ldr_create_options {
+	char *init_file;
+	int resvec;
+	char port;
+	int gpio;
+};
+
 
 LDR *ldr_read(const char *);
 void ldr_free(LDR *);
 int ldr_print(LDR *);
 int ldr_dump(const char *, LDR *);
 int ldr_send(LDR *, const char *);
+int ldr_create(char **, struct ldr_create_options *);
 
 #endif

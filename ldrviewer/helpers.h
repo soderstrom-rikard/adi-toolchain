@@ -22,7 +22,7 @@
 # define VERSION "cvs"
 #endif
 
-extern int verbose, quiet;
+extern int force, verbose, quiet;
 
 extern const char *argv0;
 
@@ -40,5 +40,6 @@ extern const char *argv0;
 
 void *xmalloc(size_t);
 void *xrealloc(void *, size_t);
+int parse_bool(const char *);
 
 #endif

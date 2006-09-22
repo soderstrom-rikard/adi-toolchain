@@ -1,3 +1,4 @@
-helpers.o: helpers.c headers.h
-ldr.o: ldr.c headers.h helpers.h ldr.h
+helpers.o: helpers.c headers.h helpers.h
+ldr.o: ldr.c headers.h helpers.h ldr.h dxes.h dxe_jump.h \
+  blackfin_defines.h dxe_sdram_init.h
 ldrviewer.o: ldrviewer.c headers.h helpers.h ldr.h

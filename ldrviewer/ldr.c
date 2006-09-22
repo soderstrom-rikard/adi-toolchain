@@ -18,6 +18,7 @@
 #include "headers.h"
 #include "helpers.h"
 #include "ldr.h"
+#include "dxes.h"
 
 struct ldr_flag {
 	uint16_t flag;
@@ -76,14 +77,20 @@ static LDR *_ldr_read_bin(FILE *fp)
 	ldr->num_dxes = 0;
 	d = 0;
 
-	while (!feof(fp)) {
+	do {
 		fread(header, LDR_BLOCK_HEADER_LEN, 1, fp);
+		if (feof(fp))
+			break;
 		memcpy(&flags, header+8, sizeof(flags));
 		if (flags & LDR_FLAG_IGNORE) {
 			ldr->dxes = xrealloc(ldr->dxes, (++ldr->num_dxes) * sizeof(DXE));
 			dxe = &ldr->dxes[d++];
 			dxe->num_blocks = 0;
 			dxe->blocks = NULL;
+		} else if (ldr->dxes == NULL) {
+			printf("Invalid block header in LDR!\n");
+			free(ldr);
+			return NULL;
 		}
 
 		++dxe->num_blocks;
@@ -105,7 +112,7 @@ static LDR *_ldr_read_bin(FILE *fp)
 			break;
 
 		pos += block->byte_count + sizeof(block->header);
-	}
+	} while (1);
 
 	return ldr;
 }
@@ -196,6 +203,7 @@ void ldr_free(LDR *ldr)
 int ldr_print(LDR *ldr)
 {
 	size_t i, d, b;
+	uint16_t pport;
 
 	if (ldr == NULL)
 		return -1;
@@ -226,17 +234,16 @@ int ldr_print(LDR *ldr)
 			for (i = 0; ldr_common_flag_list[i].desc; ++i)
 				if (block->flags & ldr_common_flag_list[i].flag)
 					printf("%s ", ldr_common_flag_list[i].desc);
-			if (block->flags & LDR_FLAG_RESVECT) {
-				uint16_t pport;
-				pport = block->flags & LDR_FLAG_PPORT_MASK;
-				if (pport)
-					for (i = 0; ldr_bf537_flag_list[i].desc; ++i)
-						if (pport == ldr_bf537_flag_list[i].flag)
-							printf("%s ", ldr_bf537_flag_list[i].desc);
-				pport = (block->flags & LDR_FLAG_PFLAG_MASK) >> 5;
-				if (pport)
-					printf("gpio%i ", pport);
-			}
+
+			pport = block->flags & LDR_FLAG_PPORT_MASK;
+			if (pport)
+				for (i = 0; ldr_bf537_flag_list[i].desc; ++i)
+					if (pport == ldr_bf537_flag_list[i].flag)
+						printf("%s ", ldr_bf537_flag_list[i].desc);
+			pport = (block->flags & LDR_FLAG_PFLAG_MASK) >> LDR_FLAG_PFLAG_SHIFT;
+			if (pport)
+				printf("gpio%i ", pport);
+
 			printf(")\n");
 		}
 	}
@@ -250,27 +257,48 @@ int ldr_print(LDR *ldr)
  */
 int ldr_dump(const char *base, LDR *ldr)
 {
-	char filename[1024];
-	FILE *fp;
+	char file_dxe[1024], file_block[1024];
+	FILE *fp_dxe, *fp_block;
 	size_t d, b;
+	uint32_t next_block_addr;
 
 	if (ldr == NULL)
 		return -1;
 
 	for (d = 0; d < ldr->num_dxes; ++d) {
-		snprintf(filename, sizeof(filename), "%s-%zi.dxe", base, d);
+		snprintf(file_dxe, sizeof(file_dxe), "%s-%zi.dxe", base, d);
 		if (!quiet)
-			printf("  Dumping DXE %zi to %s\n", d, filename);
-		fp = fopen(filename, "w");
-		if (fp == NULL) {
-			perror("Unable to open output");
+			printf("  Dumping DXE %zi to %s\n", d, file_dxe);
+		fp_dxe = fopen(file_dxe, "w");
+		if (fp_dxe == NULL) {
+			perror("Unable to open DXE output");
 			return -1;
 		}
+
+		next_block_addr = 0;
+		fp_block = NULL;
 		for (b = 0; b < ldr->dxes[d].num_blocks; ++b) {
 			BLOCK *block = &(ldr->dxes[d].blocks[b]);
-			fwrite(block->data, 1, block->byte_count, fp);
+			fwrite(block->data, 1, block->byte_count, fp_dxe);
+
+			if (fp_block != NULL && next_block_addr != block->target_address) {
+				fclose(fp_block);
+				fp_block = NULL;
+			}
+			if (fp_block == NULL) {
+				snprintf(file_block, sizeof(file_block), "%s-%zi.dxe-%zi.block", base, d, b+1);
+				if (!quiet)
+					printf("    Dumping block %zi to %s\n", b+1, file_block);
+				fp_block = fopen(file_block, "w");
+				if (fp_block == NULL)
+					perror("Unable to open block output");
+			}
+			if (fp_block != NULL) {
+				fwrite(block->data, 1, block->byte_count, fp_block);
+				next_block_addr = block->target_address + block->byte_count;
+			}
 		}
-		fclose(fp);
+		fclose(fp_dxe);
 	}
 
 	return 0;
@@ -398,4 +426,152 @@ canned_failure:
 		       "Quick tip: run 'ldrviewer <ldr> <tty> && minicom'\n");
 
 	return 0;
+}
+
+/*
+ * ldr_create()
+ */
+#define LDR_ADDR_IGNORE  0xFF800040
+#define LDR_ADDR_INIT    0xFFA00000
+#define LDR_ADDR_SDRAM   0x1000 /* XXX: should make this configurable */
+#define LDR_BLOCK_SIZE   0x8000 /* XXX: should make this configurable */
+static void _ldr_write_block(const int fd, BLOCK b)
+{
+	ldr_make_little_endian_32(b.target_address);
+	ldr_make_little_endian_32(b.byte_count);
+	ldr_make_little_endian_16(b.flags);
+	write(fd, &b.target_address, sizeof(b.target_address));
+	write(fd, &b.byte_count, sizeof(b.byte_count));
+	write(fd, &b.flags, sizeof(b.flags));
+	if (b.data)
+		write(fd, b.data, b.byte_count);
+}
+#define _ldr_quick_write_block(fd, _target_address, _byte_count, _flags, _data) \
+	do { \
+		BLOCK b; \
+		b.target_address = _target_address; \
+		b.byte_count = _byte_count; \
+		b.flags = _flags; \
+		b.data = _data; \
+		_ldr_write_block(fd, b); \
+	} while (0)
+static int _ldr_copy_file_to_block(int out_fd, const char *file, uint32_t addr, uint16_t flags)
+{
+	FILE *in_fp;
+	char *data;
+	size_t bytes_written, cnt, cnt_left;
+	struct stat st;
+	uint32_t filesize;
+	uint16_t out_flags = (flags & ~LDR_FLAG_FINAL);
+
+	in_fp = fopen(file, "r");
+	if (in_fp == NULL)
+		return -1;
+
+	data = xmalloc(LDR_BLOCK_SIZE);
+
+	fstat(fileno(in_fp), &st);
+	filesize = st.st_size;
+	bytes_written = 0;
+	cnt_left = 0;
+
+	while (bytes_written < filesize) {
+		if (cnt_left == 0) {
+			if (filesize < LDR_BLOCK_SIZE)
+				cnt_left = filesize;
+			else if (filesize - bytes_written < LDR_BLOCK_SIZE)
+				cnt_left = filesize - bytes_written;
+			else
+				cnt_left = LDR_BLOCK_SIZE;
+			if ((flags & LDR_FLAG_FINAL) && (bytes_written + LDR_BLOCK_SIZE >= filesize))
+				out_flags = flags;
+			_ldr_quick_write_block(out_fd, addr, cnt_left, out_flags, NULL);
+			cnt_left = LDR_BLOCK_SIZE;
+			addr += LDR_BLOCK_SIZE;
+		}
+
+		cnt = fread(data, 1, cnt_left, in_fp);
+		if (cnt) {
+			bytes_written += cnt;
+			cnt_left -= cnt;
+			write(out_fd, data, cnt);
+		}
+	} while (!feof(in_fp));
+
+	free(data);
+
+	return 0;
+}
+int ldr_create(char **filelist, struct ldr_create_options *opts)
+{
+	uint16_t base_flags;
+	uint8_t *jump_bin = dxe_jump_code(LDR_ADDR_SDRAM);
+	uint8_t *sdram_init_bin = dxe_sdram_init_code(mem_SDRRC, mem_SDBCTL, mem_SDGCTL);
+	const char *outfile = filelist[0];
+	size_t i = 0;
+	int fd;
+
+	fd = open(outfile, O_WRONLY|O_CREAT| (force?0:O_EXCL), 00660);
+	if (fd == -1)
+		return -1;
+
+	setbuf(stdout, NULL);
+
+	base_flags = (opts->resvec ? LDR_FLAG_RESVECT : 0);
+	base_flags |= (opts->gpio << LDR_FLAG_PFLAG_SHIFT) & LDR_FLAG_PFLAG_MASK;
+	switch (toupper(opts->port)) {
+		case 'F': base_flags |= LDR_FLAG_PPORT_PORTF; break;
+		case 'G': base_flags |= LDR_FLAG_PPORT_PORTG; break;
+		case 'H': base_flags |= LDR_FLAG_PPORT_PORTH; break;
+		default:  base_flags |= LDR_FLAG_PPORT_NONE; break;
+	}
+	if (!quiet)
+		printf(" Base flags: 0x%X\n", base_flags);
+
+	/* first write out the DXE to init the hardware */
+	if (opts->init_file == (char*)-1) {
+		if (!quiet)
+			printf(" Adding basic init DXE 'sdram init' ... ");
+		_ldr_quick_write_block(fd, LDR_ADDR_IGNORE, 0x4, base_flags|LDR_FLAG_IGNORE, (uint8_t*)"\0\0\0\0");
+		_ldr_quick_write_block(fd, LDR_ADDR_INIT, DXE_SDRAM_INIT_CODE_SIZE, base_flags|LDR_FLAG_INIT, sdram_init_bin);
+		if (!quiet)
+			printf("OK!\n");
+	} else if (opts->init_file != NULL) {
+		if (!quiet)
+			printf(" Adding custom init DXE '%s' ... ", opts->init_file);
+		_ldr_quick_write_block(fd, LDR_ADDR_IGNORE, 0x4, base_flags|LDR_FLAG_IGNORE, (uint8_t*)"\0\0\0\0");
+		if (_ldr_copy_file_to_block(fd, opts->init_file, LDR_ADDR_INIT, base_flags|LDR_FLAG_INIT) == -1) {
+			printf("Unable to copy '%s' to output\n", opts->init_file);
+			return -1;
+		}
+		if (!quiet)
+			printf("OK!\n");
+	}
+
+	/* then write out one DXE per file given to us */
+	while (filelist[++i]) {
+		if (!quiet)
+			printf(" Adding DXE '%s' ... ", filelist[i]);
+
+		/* write out two blocks: ignore followed by jump code */
+		if (!quiet)
+			printf("[jump block] ");
+		_ldr_quick_write_block(fd, LDR_ADDR_IGNORE, 4, base_flags|LDR_FLAG_IGNORE, (uint8_t*)"\0\0\0\0");
+		_ldr_quick_write_block(fd, LDR_ADDR_INIT, DXE_JUMP_CODE_SIZE, base_flags, jump_bin);
+
+		/* write out third (and last block) for the actual file */
+		if (!quiet)
+			printf("[file blocks] ");
+		if (_ldr_copy_file_to_block(fd, filelist[i], LDR_ADDR_SDRAM, base_flags|(filelist[i+1] == NULL ? LDR_FLAG_FINAL : 0)) == -1) {
+			printf("Unable to copy '%s' to output\n", filelist[i]);
+			return -1;
+		}
+
+		if (!quiet)
+			printf("OK!\n");
+	}
+
+	close(fd);
+
+	return (i > 1 ? 0 : 1);
 }
