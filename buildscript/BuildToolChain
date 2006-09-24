@@ -722,7 +722,7 @@ run_tests ()
                 gcc-$GCC_VERSION.sum \
                 g++-$GCC_VERSION.sum
     do
-        egrep "=== .*y ===|^# of" $1/$FILE
+        egrep "=== .*Sum.* ===|^# of" $1/$FILE
         if [ $RESULTS2COMPARE ] ; then
             if [ -f $RESULTS2COMPARE/$2/$FILE ] ; then
                 echo "Comparing $1/$FILE to $RESULTS2COMPARE/$2/$FILE"
