@@ -496,6 +496,14 @@ if [ ! -d $DIR_CRAMFS_SOURCE ] ; then
     exit 1
 fi
 
+echo -n "Path to ldrviewer           "
+DIR_LDRVIEWER_SOURCE=$DIR_SOURCE/ldrviewer
+echo $DIR_LDRVIEWER_SOURCE
+if [ ! -d $DIR_LDRVIEWER_SOURCE ] ; then
+    echo "Can't find ldrviewer source at $DIR_LDRVIEWER_SOURCE"
+    exit 1
+fi
+
 ###################### set up log file ###########################
 
 if [ $DATE_STAMP ] ; then
@@ -1324,7 +1332,46 @@ if [ $KERNEL_SOURCE ] ; then
        fi
     done
 
+	######################## ldrviewer ###########################
+
+    echo -n "*** Building uClinux ldrviewer      " ; date
+    cd $DIR_LDRVIEWER_SOURCE
+
+    echo -n "*** Cleaning uClinux ldrviewer      " ; date
+    RUN="$MAKE clean "
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    echo -n "*** Make uClinux ldrviewer          " ; date
+    RUN=$MAKE
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
+
+    for RUN in ldrviewer
+    do
+        if [ ! -f $DIR_LDRVIEWER_SOURCE/$RUN ] ; then
+            echo "ldrviewer did not build properly : Missing $RUN"
+            echo "Please report an error to http://blackfin.uclinux.org"
+            tail -10 $ACTUAL_LOGFILE
+            exit 1
+        fi
+    done
+
+    echo -n "*** Installing uClinux ldrviewer    " ; date
+    mv $DIR_LDRVIEWER_SOURCE/ldrviewer $DIR_uC_OUTPUT/bin/bfin-uclinux-ldrviewer
+
+    for RUN in bfin-uclinux-ldrviewer
+    do
+        if [ ! -f $DIR_uC_OUTPUT/bin/$RUN ] ; then
+            echo "ldrviewer did not install properly : Missing $RUN"
+            echo "Please report an error to http://blackfin.uclinux.org"
+            tail -10 $ACTUAL_LOGFILE
+            exit 1
+       fi
+    done
+
     ######################## U-Boot ##############################
+
     if [ $DIR_UBOOT ] ; then
         echo -n "*** Building U-Boot to get Tools   " ; date
         cd $DIR_UBOOT
