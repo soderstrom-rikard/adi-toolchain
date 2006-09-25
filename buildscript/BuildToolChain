@@ -340,10 +340,8 @@ fi
 ############ Determine if Cygwin ################################
 if uname -o 2>/dev/null | grep -i "Cygwin" > /dev/null ; then
     CYGWIN=cygwin-
-    EXE=.".exe"
     HOST_TARGET="--host=i386-pc-cygwin32"
 else
-    EXE=""
     HOST_TARGET=""
 fi
 
@@ -854,11 +852,13 @@ if [ "x$SKIP_ELF" = "x" ]; then
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
+    eval `grep ^EXEEXT= $DIR_BINUTILS_BUILD/binutils/config.log`
+
     for RUN in addr2line ar cxxfilt nm-new objcopy objdump ranlib \
                readelf size strings strip-new
     do
-        if [ ! -f $DIR_BINUTILS_BUILD/binutils/$RUN ] ; then
-            echo "Binutils did not build properly : Missing $RUN"
+        if [ ! -f $DIR_BINUTILS_BUILD/binutils/$RUN$EXEEXT ] ; then
+            echo "Binutils did not build properly : Missing $RUN$EXEEXT"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
             exit 1
@@ -867,8 +867,8 @@ if [ "x$SKIP_ELF" = "x" ]; then
 
     for RUN in as-new
     do
-        if [ ! -f $DIR_BINUTILS_BUILD/gas/$RUN ] ; then
-            echo "Gas did not build properly : Missing $RUN"
+        if [ ! -f $DIR_BINUTILS_BUILD/gas/$RUN$EXEEXT ] ; then
+            echo "Gas did not build properly : Missing $RUN$EXEEXT"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
             exit 1
@@ -877,8 +877,8 @@ if [ "x$SKIP_ELF" = "x" ]; then
 
     for RUN in ld-new
     do
-        if [ ! -f $DIR_BINUTILS_BUILD/ld/$RUN ] ; then
-            echo "Ld did not build properly : Missing $RUN"
+        if [ ! -f $DIR_BINUTILS_BUILD/ld/$RUN$EXEEXT ] ; then
+            echo "Ld did not build properly : Missing $RUN$EXEEXT"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
             exit 1
@@ -887,8 +887,8 @@ if [ "x$SKIP_ELF" = "x" ]; then
 
     for RUN in gdb gdbtui
     do
-        if [ ! -f $DIR_BINUTILS_BUILD/gdb/$RUN ] ; then
-            echo "gdb did not build properly : Missing $RUN"
+        if [ ! -f $DIR_BINUTILS_BUILD/gdb/$RUN$EXEEXT ] ; then
+            echo "gdb did not build properly : Missing $RUN$EXEEXT"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
             exit 1
