@@ -854,18 +854,18 @@ if [ "x$SKIP_ELF" = "x" ]; then
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
-    for RUN in addr2line ar cxxfilt libtool nm-new objcopy objdump ranlib \
+    for RUN in addr2line ar cxxfilt nm-new objcopy objdump ranlib \
                readelf size strings strip-new
     do
         if [ ! -f $DIR_BINUTILS_BUILD/binutils/$RUN ] ; then
-            echo "BinUtils did not build properly : Missing $RUN"
+            echo "Binutils did not build properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
             exit 1
         fi
     done
 
-    for RUN in as-new libtool
+    for RUN in as-new
     do
         if [ ! -f $DIR_BINUTILS_BUILD/gas/$RUN ] ; then
             echo "Gas did not build properly : Missing $RUN"
