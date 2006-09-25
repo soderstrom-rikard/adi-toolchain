@@ -1,0 +1,3 @@
+2006-09-25  Jie Zhang  <jie.zhang@analog.com>
+
+	* g++.dg/other/packed1.C: Mark xfail for bfin-*-*.
