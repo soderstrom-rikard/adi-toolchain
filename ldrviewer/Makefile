@@ -4,7 +4,11 @@
 # Licensed under the GPL-2, see the file COPYING in this dir
 #
 
-CFLAGS  += -Wall -Wextra
+cc-option = $(shell $(CC) $(CFLAGS) $(1) -S -o /dev/null -xc /dev/null \
+              > /dev/null 2>&1 && echo "$(1)" || echo "$(2)")
+
+WFLAGS  := $(call cc-option,-Wall,) $(call cc-option,-Wextra,)
+CFLAGS  += $(WFLAGS)
 LDFLAGS += $(CFLAGS)
 
 DESTDIR :=
