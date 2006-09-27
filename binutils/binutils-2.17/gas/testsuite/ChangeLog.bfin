@@ -1,3 +1,9 @@
+2006-09-27  Jie Zhang  <jie.zhang@analog.com>
+
+	* gas/bfin/vector2.d, gas/bfin/vector2.s: Test if both scalar
+	instructions of vector instruction correctly share the same mode
+	option.
+
 2006-09-19  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* gas/bfin/load.s, gas/bfin/load.d: Add constant folding tests.

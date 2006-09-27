@@ -360,15 +360,17 @@ check_macfuncs (Macfunc *aa, Opt_mode *opa,
 	    || (ab->w && !aa->P && IS_H (ab->dst)))
     return yyerror ("High/Low register assignment mismatch");
 
+  /* Make sure mod flags get ORed, too.  */
+  opb->mod |= opa->mod;
+
   /* Check option.  */
-  if (check_macfunc_option (ab, opb) < 0)
+  if (check_macfunc_option (aa, opb) < 0
+      && check_macfunc_option (ab, opb) < 0)
     return -1;
 
   /* Make sure first macfunc has got both P flags ORed.  */
   aa->P |= ab->P;
 
-  /* Make sure mod flags get ORed, too.  */
-  opb->mod |= opa->mod;
   return 0;	
 }
 
