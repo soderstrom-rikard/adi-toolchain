@@ -59,6 +59,16 @@ if [istarget sh64*-*-elf] {
     set ldflags "-e _start -mshelf32 $ldflags"
 }
 
+if [istarget bfin-*-*] {
+    set ldflags "-e _start $ldflags"
+
+    if { [istarget bfin-*-uclinux]
+	 && ! [board_info [target_info name] exists use_binfmt_flat] } {
+	set cflags "-mfdpic $cflags"
+	set ldflags "-melf32bfinfd -z text $ldflags"
+    }
+}
+
 # If we don't have g++ for the target, mark all tests as untested.
 if { [which $CXX] == 0 } {
     foreach testitem $seltests {
