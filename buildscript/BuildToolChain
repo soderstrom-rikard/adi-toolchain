@@ -41,7 +41,7 @@ TIMESTAMP=`date +%Y%m%d`       # is YYYY_MMM_DD
 BINUTILS_VERSION=2.17
 GCC_VERSIONS=
 
-while getopts dipwvtST:C:s:b:k:o:m:B:c:u:r:h parameter
+while getopts dipwvtST:C:s:b:k:o:m:B:c:u:r:l::h parameter
 do
     case $parameter in
         p)
@@ -162,7 +162,25 @@ do
                 exit 1
             fi
             ;;
-
+        l)
+            TMP=`echo $OPTARG | grep c`
+            if [ -n "$TMP" ] ; then
+                TMP=`echo $OPTARG | sed {s/\,/\ /}`
+                for RUN in $TMP
+                do
+                    if [ "$RUN" == "c" ] ; then
+                         LANGUAGE=" --enable-languages=$OPTARG"
+                    fi
+                done
+                if [ -z $LANGUAGE ] ; then
+                    echo  "Must Build C Compiler $OPTARG"
+                    exit 1
+                fi
+            else
+                echo "Can't understand Language argeument $OPTARG"
+                exit 1
+            fi
+            ;;
         B)
             BINUTILS_VERSION="$OPTARG"
             ;;
@@ -245,7 +263,14 @@ done
 if [ -z "$GCC_VERSIONS" ]; then
     GCC_VERSIONS=3.4
 fi
-echo "Building gcc versions $GCC_VERSIONS"
+echo -n "Building gcc versions $GCC_VERSIONS "
+
+if [ -z "$LANGUAGE" ] ; then 
+    LANGUAGE=" --enable-languages=c,c++"
+    echo
+else
+    echo $LANGUAGE
+fi
 
 ############ CHECK MAKE SET #####################################
 if [ ! "$MAKE" ] ; then
@@ -607,7 +632,7 @@ build_gcc ()
 
     echo -n "*** Configuring GCC                " ; date
     RUN="$DIR_GCC_SOURCE/configure $HOST_TARGET --target=bfin-$2 \
-      --prefix=$3 $4 --disable-libstdcxx-pch \
+      --prefix=$3 $4 --disable-libstdcxx-pch $LANGUAGE\
       --disable-symvers --disable-libssp --enable-version-specific-runtime-libs"
 
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
@@ -618,7 +643,14 @@ build_gcc ()
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
-    for RUN in cc1 cc1plus collect2 cpp g++ gcov xgcc
+    TMP=`echo $LANGUAGE | grep c++`
+    if [ -n "$TMP" ] ; then
+        FILE="cc1 cc1plus collect2 cpp g++ gcov xgcc"
+    else
+        FILE="cc1 collect2 gcov xgcc"
+    fi
+
+    for RUN in $FILE
     do
         if [ ! -f $DIR_GCC_BUILD/gcc/$RUN ] ; then
             echo "gcc did not build properly : Missing $RUN"
