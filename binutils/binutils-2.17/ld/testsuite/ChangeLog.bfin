@@ -1,3 +1,9 @@
+2006-09-28  Jie Zhang  <jie.zhang@analog.com>
+
+	* ld-selective/selective.exp: Set proper cflags and ldflags for
+	bfin targets.
+	* lib/ld-lib.exp (is_elf_format): Return 1 for bfin-*-uclinux.
+
 2006-08-17  Jie Zhang  <jie.zhang@analog.com>
 
 	2006-06-20  Alan Modra  <amodra@bigpond.net.au>
