@@ -29,7 +29,7 @@
 #define WORKING_DOT_WORD
 
 extern void bfin_start_line_hook PARAMS ((void));
-extern bfd_boolean bfin_start_label PARAMS ((char *));
+extern bfd_boolean bfin_start_label PARAMS ((char *, char *));
 
 #define md_start_line_hook()    bfin_start_line_hook()
 #define md_number_to_chars	number_to_chars_littleendian
@@ -53,7 +53,7 @@ extern bfd_boolean bfin_eol_in_insn PARAMS ((char *));
 
 #define DOUBLESLASH_LINE_COMMENTS
 
-#define TC_START_LABEL(ch ,ptr) (ch == ':' && bfin_start_label (ptr))
+#define TC_START_LABEL(c, s, ptr) (c == ':' && bfin_start_label (s, ptr))
 #define tc_fix_adjustable(FIX) bfin_fix_adjustable (FIX)
 extern bfd_boolean bfin_fix_adjustable PARAMS ((struct fix *));
 

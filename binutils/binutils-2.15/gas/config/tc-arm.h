@@ -118,7 +118,7 @@ struct fix;
 #define ARM_SET_INTERWORK(s,t)  ((t) ? ARM_SET_FLAG (s, ARM_FLAG_INTERWORK) : ARM_RESET_FLAG (s, ARM_FLAG_INTERWORK))
 #define THUMB_SET_FUNC(s,t)     ((t) ? ARM_SET_FLAG (s, THUMB_FLAG_FUNC)    : ARM_RESET_FLAG (s, THUMB_FLAG_FUNC))
 
-#define TC_START_LABEL(C,STR)            (c == ':' || (c == '/' && arm_data_in_code ()))
+#define TC_START_LABEL(C,S,STR)            (C == ':' || (C == '/' && arm_data_in_code ()))
 #define tc_canonicalize_symbol_name(str) arm_canonicalize_symbol_name (str);
 #define obj_adjust_symtab() 		 arm_adjust_symtab ()
 #define tc_aout_pre_write_hook(x)	 {;}	/* not used */
