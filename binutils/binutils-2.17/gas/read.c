@@ -43,7 +43,7 @@ Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA
 #include "dw2gencfi.h"
 
 #ifndef TC_START_LABEL
-#define TC_START_LABEL(x,y) (x == ':')
+#define TC_START_LABEL(x,y,z) (x == ':')
 #endif
 
 /* Set by the object-format or the target.  */
@@ -757,7 +757,7 @@ read_a_source_file (char *name)
 		 S points to the beginning of the symbol.
 		   [In case of pseudo-op, s->'.'.]
 		 Input_line_pointer->'\0' where c was.  */
-	      if (TC_START_LABEL (c, input_line_pointer))
+	      if (TC_START_LABEL (c, s, input_line_pointer))
 		{
 		  if (flag_m68k_mri)
 		    {
