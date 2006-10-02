@@ -667,14 +667,18 @@ build_gcc ()
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
     # some basic sanity checks
-    for RUN in bfin-$2-addr2line bfin-$2-c++filt bfin-$2-gdbtui          \
-               bfin-$2-objdump bfin-$2-size bfin-$2-ar bfin-$2-cpp      \
-               bfin-$2-gccbug bfin-$2-ld bfin-$2-ranlib bfin-$2-strings \
-               bfin-$2-as bfin-$2-g++ bfin-$2-gcov bfin-$2-nm           \
-               bfin-$2-readelf bfin-$2-strip bfin-$2-c++ bfin-$2-gcc    \
-               bfin-$2-gdb bfin-$2-objcopy bfin-$2-run
+    TMP=`echo $LANGUAGE | grep c++`
+    if [ -n "$TMP" ] ; then
+        FILE="g++ c++"
+    else
+        FILE=""
+    fi
+    for RUN in addr2line ar as c++filt gcov ld nm objdump \
+               objcopy ranlib readelf size strings strip \
+               gdb gdbtui run \
+               cpp gcc gccbug $FILE
     do
-        if [ ! -f $3/bin/$RUN ] ; then
+        if [ ! -f $3/bin/bfin-$2-$RUN ] ; then
             echo "The toolchain did not install properly - report an error"
             tail -10 $ACTUAL_LOGFILE
             exit 1
