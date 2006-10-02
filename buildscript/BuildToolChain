@@ -249,6 +249,7 @@ do
 -B BINUTILS_VER  Binutils version (default 2.15).  Can be given once.
 -c GCC_VERSION   GCC version (default 3.4).  Can be given multiple times.
 -i               Build binutils libraries for use on the target.
+-l LANGS         Only build specified gcc languages.
 -C FILE          Use FILE as uClibc config file, rather than the default.
 -v               Verbose
 -h               Help"
