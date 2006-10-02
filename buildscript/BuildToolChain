@@ -684,9 +684,11 @@ build_gcc ()
             exit 1
         fi
     done
-    VERSION=`$3/bin/bfin-$2-gcc -v 2>&1 | grep gcc.vers | sed -e 's,gcc.version.,,' -e 's, .ADI.*$,,'`
-    ln $3/bin/bfin-$2-g++ $3/bin/bfin-$2-g++-$VERSION
-    ln $3/bin/bfin-$2-c++ $3/bin/bfin-$2-c++-$VERSION
+    if [ -n "$TMP" ] ; then
+        VERSION=`$3/bin/bfin-$2-gcc -v 2>&1 | grep gcc.vers | sed -e 's,gcc.version.,,' -e 's, .ADI.*$,,'`
+        ln $3/bin/bfin-$2-g++ $3/bin/bfin-$2-g++-$VERSION
+        ln $3/bin/bfin-$2-c++ $3/bin/bfin-$2-c++-$VERSION
+    fi
 
     echo "*** Testing 'bfin-$2-gcc -v'"
     if ! $3/bin/bfin-$2-gcc -v ; then
