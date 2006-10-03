@@ -495,6 +495,7 @@ if [ ! -d $DIR_BINUTILS_SOURCE ] ; then
     echo "Can't find binutils source at $DIR_BINUTILS_SOURCE"
     exit 1
 fi
+BUILD_TARGET="--build=`$DIR_BINUTILS_SOURCE/config.guess`"
 
 echo -n "Path to elf2flt dir         "
 DIR_ELF2FLT_SOURCE=$DIR_SOURCE/elf2flt
@@ -632,7 +633,7 @@ build_gcc ()
     cd $DIR_GCC_BUILD
 
     echo -n "*** Configuring GCC                " ; date
-    RUN="$DIR_GCC_SOURCE/configure $HOST_TARGET --target=bfin-$2 \
+    RUN="$DIR_GCC_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-$2 \
       --prefix=$3 $4 --disable-libstdcxx-pch $LANGUAGE\
       --disable-symvers --disable-libssp --enable-version-specific-runtime-libs"
 
@@ -881,7 +882,7 @@ if [ "x$SKIP_ELF" = "x" ]; then
     cd $DIR_BINUTILS_BUILD
 
     echo -n "*** Configuring Elf Binutils & GDB " ; date
-    RUN="$DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-elf \
+    RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-elf \
         --prefix=$DIR_ELF_OUTPUT --without-newlib"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
@@ -949,7 +950,7 @@ if [ "x$SKIP_ELF" = "x" ]; then
     echo -n "*** Building Elf elf2flt           " ; date
     cd $DIR_ELF2FLT_BUILD
 
-    RUN="$DIR_ELF2FLT_SOURCE/configure $HOST_TARGET --target=bfin-elf \
+    RUN="$DIR_ELF2FLT_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-elf \
          --with-libbfd=$DIR_BINUTILS_BUILD/bfd/libbfd.a               \
          --with-libiberty=$DIR_BINUTILS_BUILD/libiberty/libiberty.a   \
          --with-bfd-include-dir=$DIR_BINUTILS_BUILD/bfd               \
@@ -1202,7 +1203,7 @@ if [ $KERNEL_SOURCE ] ; then
     cd $DIR_BINUTILS_BUILD
 
     echo -n "*** Configuring uClinux Binutils & GDB" ; date
-    RUN="$DIR_BINUTILS_SOURCE/configure $HOST_TARGET \
+    RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET \
          --target=bfin-uclinux --prefix=$DIR_uC_OUTPUT \
          --with-sysroot=$DIR_uC_OUTPUT/bfin-uclinux/runtime"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh || die_with_log
@@ -1234,7 +1235,7 @@ if [ $KERNEL_SOURCE ] ; then
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
-    RUN="$DIR_ELF2FLT_SOURCE/configure $HOST_TARGET                \
+    RUN="$DIR_ELF2FLT_SOURCE/configure $BUILD_TARGET $HOST_TARGET                \
          --target=bfin-uclinux                                     \
          --with-libbfd=$DIR_BINUTILS_BUILD/bfd/libbfd.a            \
          --with-libiberty=$DIR_BINUTILS_BUILD/libiberty/libiberty.a   \
@@ -1484,7 +1485,7 @@ cd $DIR_BINUTILS_BUILD
 
 RUN="CC=$DIR_uC_OUTPUT/bin/bfin-uclinux-gcc LDFLAGS=-Wl,-elf2flt \
     $DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-uclinux \
-    --host=bfin-uclinux --build=`$DIR_BINUTILS_SOURCE/config.guess` \
+    --host=bfin-uclinux $BUILD_TARGET \
     --disable-shared --prefix=$DIR_uC_OUTPUT/bfin-uclinux --disable-nls \
     --without-newlib"
 (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
@@ -1509,7 +1510,7 @@ cd $DIR_BINUTILS_BUILD
 # host compiler.
 RUN="CC='$DIR_uC_OUTPUT/bin/bfin-uclinux-gcc -mfdpic' \
     $DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-uclinux \
-    --host=bfin-uclinux --build=`$DIR_BINUTILS_SOURCE/config.guess` \
+    --host=bfin-uclinux $BUILD_TARGET \
     --disable-shared --prefix=$DIR_uC_OUTPUT/bfin-uclinux --disable-nls \
     --libdir=$DIR_uC_OUTPUT/bfin-uclinux/lib/mfdpic --without-newlib"
 (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
