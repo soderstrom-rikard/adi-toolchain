@@ -15,3 +15,5 @@
 .*:20: Error: bad option.
 .*:21: Error: bad option.
 .*:22: Error: bad option.
+.*:23: Error: Bad opt mode.
+.*:24: Error: Bad opt mode.
