@@ -289,7 +289,7 @@ check_macfunc_option (Macfunc *a, Opt_mode *opt)
 	  && opt->mod != M_FU && opt->mod != M_IS && opt->mod != M_IU
 	  && opt->mod != M_T && opt->mod != M_TFU && opt->mod != M_S2RND
 	  && opt->mod != M_ISS2 && opt->mod != M_IH))
-    return yyerror ("bad option");
+    return -1;
 
   return 0;
 }
@@ -303,6 +303,11 @@ check_macfuncs (Macfunc *aa, Opt_mode *opa,
   /* Variables for swapping.  */
   Macfunc mtmp;
   Opt_mode otmp;
+
+  /* The option mode should be put at the end of the second instruction
+     of the vector except M, which should follow MAC1 instruction.  */
+  if (opa->mod != 0)
+    return yyerror ("Bad opt mode");
 
   /* If a0macfunc comes before a1macfunc, swap them.  */
 	
@@ -321,8 +326,6 @@ check_macfuncs (Macfunc *aa, Opt_mode *opa,
     {
       if (opb->MM != 0)
 	return yyerror ("(M) not allowed with A0MAC");
-      if (opa->mod != 0)
-	return yyerror ("Bad opt mode");
       if (ab->n != 0)
 	return yyerror ("Vector AxMACs can't be same");
     }
@@ -366,7 +369,7 @@ check_macfuncs (Macfunc *aa, Opt_mode *opa,
   /* Check option.  */
   if (check_macfunc_option (aa, opb) < 0
       && check_macfunc_option (ab, opb) < 0)
-    return -1;
+    return yyerror ("bad option");
 
   /* Make sure first macfunc has got both P flags ORed.  */
   aa->P |= ab->P;
@@ -697,7 +700,7 @@ asm_1:
 	  int h00, h10, h01, h11;
 
 	  if (check_macfunc_option (&$1, &$2) < 0)
-	    return -1;
+	    return yyerror ("bad option");
 
 	  if ($1.n == 0)
 	    {

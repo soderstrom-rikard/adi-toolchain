@@ -1,3 +1,12 @@
+2006-10-09  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin-parse.y (check_macfunc_option): Return -1 instead of
+	yyerror ().
+	(check_macfuncs): Only allow option mode at the end of the second
+	instruction of the vector. Return yyerror () if the option mode isn't
+	applicable to either instruction of the vector.
+	(asm_1): Return yyerror () if the option mode isn't applicable.
+
 2006-09-29  Jie Zhang  <jie.zhang@analog.com>
 
 	* read.c (TC_START_LABEL): Add a new augument.

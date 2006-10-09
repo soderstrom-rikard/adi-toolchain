@@ -476,4 +476,5 @@ Disassembly of section .text:
  750:	54 c0 23 04 	R0.H = \(a1 = R4.L \* R3.L\) \(M\), a0 = R4.H \* R3.L \(T\);
  754:	44 c0 23 04 	R0.H = \(a1 = R4.L \* R3.L\), a0 = R4.H \* R3.L \(T\);
  758:	54 c0 23 04 	R0.H = \(a1 = R4.L \* R3.L\) \(M\), a0 = R4.H \* R3.L \(T\);
+ 75c:	41 c0 3c e2 	a1 \+= R7.H \* R4.H, R0.L = \(a0 = R7.L \* R4.H\) \(T\);
 

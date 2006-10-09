@@ -1,3 +1,11 @@
+2006-10-09  Jie Zhang  <jie.zhang@analog.com>
+
+	* gas/bfin/expected_errors.s: Add new vector instruction option
+	mode tests.
+	* gas/bfin/expected_errors.l: Adjust accordingly.
+	* gas/bfin/vector2.s: Add new vector instruction option mode test.
+	* gas/bfin/vector2.d: Adjust accordingly.
+
 2006-09-29  Jie Zhang  <jie.zhang@analog.com>
 
 	* gas/bfin/stack2.s: Add pop multiple instruction with a label
