@@ -1,5 +1,5 @@
 
-/* Cetjmp for the Blackfin project
+/* Setjmp for the Blackfin project
  *
  * Copyright (C) 2003,  Metrowerks
  * Based on code from Analog Devices.
@@ -16,7 +16,7 @@
 .align 4;
 
 ___sigsetjmp:
-	[--SP] = P0;	/* Save P0 */
+	[--SP] = P0;		/* Save P0 */
 	P0 = R0;
 	R0 = [SP++];	
 	[P0 + 0x00] = R0;	/* Save saved P0 */
@@ -96,9 +96,9 @@ ___sigsetjmp:
 
 	R0 = [P0 + 0x20];
 	CC = R1 == 1;
-	IF CC JUMP finished;
+	IF CC JUMP L$L$finished;
 	CALL ___sigjmp_save; 
-finished:
+L$L$finished:
 	R0 = 0;
 	RTS;
 ___sigsetjmp.end:

@@ -1,3 +1,55 @@
+2006-10-12  Jie Zhang  <jie.zhang@analog.com>
+
+	* libc/machine/bfin/Makefile.am (lib_a_SOURCES): Add setjmp.S.
+	* libc/machine/bfin/Makefile.in: Regenerate.
+	* libc/machine/bfin/configure.in: Change from arm to bfin in comment.
+	* libc/machine/bfin/configure: Regenerate.
+	* libc/machine/bfin/setjmp.S: Fix a typo. Line up comment.
+	Localize label.
+	* libc/machine/bfin/machine/endian.h: Add comment.
+	* libc/machine/bfin/machine/param.h: Ditto.
+	* libc/sys/bfin/Makefile.am (lib_a_SOURCES): Add crt0.S.
+	* libc/sys/bfin/Makefile.in: Regenerate.
+	* libc/sys/bfin/crt0.S (__start): Don't call initialise_monitor_handles.
+	(__stack_base__): Remove.
+	(HeapBase): Ditto.
+	(HeapLimit): Ditto.
+	(StackLimit): Ditto.
+	(CommandLine): Ditto.
+	* libc/sys/bfin/swi.h: Remove.
+	* libc/sys/bfin/syscalls.c (swi.h): Don't include.
+	(CHECK_INIT): Remove.
+	(FILE_HANDLE_OFFSET): Ditto.
+	(std_files_checked): Ditto.
+	(monitor_stdin): Ditto.
+	(monitor_stdout): Ditto.
+	(monitor_stderr): Ditto.
+	(typedef poslog): Ditto.
+	(MAX_OPEN_FILES): Ditto.
+	(openfiles): Ditto.
+	(findslot): Ditto.
+	(remap_handle): Ditto.
+	(initialise_monitor_handles): Ditto.
+	(get_errno): Ditto.
+	(error): Ditto.
+	(wrap): Ditto.
+	(_swiread): Ditto.
+	(_swilseek): Ditto.
+	(_swiwrite): Ditto.
+	(_swiopen): Ditto.
+	(_swiclose): Ditto.
+	(_read): Simplify.
+	(_lseek): Ditto.
+	(_write): Ditto.
+	(_open): Ditto.
+	(_close): Ditto.
+	(_exit): Ditto.
+	(_getpid): Remove unused line.
+	(_sbrk): Fix indent and remove unused line.
+	(_stat): Call _close instead of _swiclose.
+	(_gettimeofday): Rewrite.
+	(_times): Ditto.
+
 2006-09-06  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* libc/include/machine/setjmp.h (_JBLEN): Define for bfin.

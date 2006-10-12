@@ -43,11 +43,6 @@ L$L$clear_bss:
 #endif
 	call	(p0)
 
-	p0.l = _initialise_monitor_handles;
-	p0.h = _initialise_monitor_handles;
-	P3 = P4; 
-	call	(p0)
-
 	p0.l = ___setup_argv_and_call_main;
 	p0.h = ___setup_argv_and_call_main; 
 	P3 = P4; 
@@ -57,12 +52,4 @@ L$L$clear_bss:
 	p0.h = _exit; 
 	P3 = P4; 
 	jump	(p0)		/* Should not return.  */
-
-	.data
-/*  Data returned by monitor SWI.  */
-.global	__stack_base__
-HeapBase:	.dd	0
-HeapLimit:	.dd	0
-__stack_base__:	.dd	0
-StackLimit:	.dd	0
-CommandLine:	.space	256,0	/*  Maximum length of 255 chars handled.  */
+	nop;

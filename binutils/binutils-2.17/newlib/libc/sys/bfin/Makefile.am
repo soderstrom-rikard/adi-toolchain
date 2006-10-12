@@ -6,7 +6,7 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 noinst_LIBRARIES = lib.a
 
-lib_a_SOURCES = libcfunc.c syscalls.c
+lib_a_SOURCES = crt0.S libcfunc.c syscalls.c
 
 all: crt0.o
 
