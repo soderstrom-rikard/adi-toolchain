@@ -1,3 +1,7 @@
+2006-10-12  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/tc-bfin.c (bfin_gen_loop): Remove loop symbol.
+
 2006-10-11  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/tc-bfin.c (bfin_start_line_hook): Localize the labels
