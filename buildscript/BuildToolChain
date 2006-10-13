@@ -169,10 +169,10 @@ do
                 for RUN in $TMP
                 do
                     if [ "$RUN" == "c" ] ; then
-                         LANGUAGE=" --enable-languages=$OPTARG"
+                         BFIN_LANGS=" --enable-languages=$OPTARG"
                     fi
                 done
-                if [ -z $LANGUAGE ] ; then
+                if [ -z $BFIN_LANGS ] ; then
                     echo  "Must Build C Compiler $OPTARG"
                     exit 1
                 fi
@@ -266,11 +266,11 @@ if [ -z "$GCC_VERSIONS" ]; then
 fi
 echo -n "Building gcc versions $GCC_VERSIONS "
 
-if [ -z "$LANGUAGE" ] ; then 
-    LANGUAGE=" --enable-languages=c,c++"
+if [ -z "$BFIN_LANGS" ] ; then 
+    BFIN_LANGS=" --enable-languages=c,c++"
     echo
 else
-    echo $LANGUAGE
+    echo $BFIN_LANGS
 fi
 
 ############ CHECK MAKE SET #####################################
@@ -634,7 +634,7 @@ build_gcc ()
 
     echo -n "*** Configuring GCC                " ; date
     RUN="$DIR_GCC_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-$2 \
-      --prefix=$3 $4 --disable-libstdcxx-pch $LANGUAGE\
+      --prefix=$3 $4 --disable-libstdcxx-pch $BFIN_LANGS\
       --disable-symvers --disable-libssp --enable-version-specific-runtime-libs"
 
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
@@ -645,7 +645,7 @@ build_gcc ()
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
-    TMP=`echo $LANGUAGE | grep c++`
+    TMP=`echo $BFIN_LANGS | grep c++`
     if [ -n "$TMP" ] ; then
         FILE="cc1 cc1plus collect2 cpp g++ gcov xgcc"
     else
@@ -668,7 +668,7 @@ build_gcc ()
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
     # some basic sanity checks
-    TMP=`echo $LANGUAGE | grep c++`
+    TMP=`echo $BFIN_LANGS | grep c++`
     if [ -n "$TMP" ] ; then
         FILE="g++ c++"
     else
