@@ -676,7 +676,7 @@ build_gcc ()
     fi
     for RUN in addr2line ar as c++filt gcov ld nm objdump \
                objcopy ranlib readelf size strings strip \
-               gdb gdbtui run \
+               gdb run \
                cpp gcc gccbug $FILE
     do
         if [ ! -f $3/bin/bfin-$2-$RUN ] ; then
@@ -925,7 +925,7 @@ if [ "x$SKIP_ELF" = "x" ]; then
       fi
     done
 
-    for RUN in gdb gdbtui
+    for RUN in gdb
     do
         if [ ! -f $DIR_BINUTILS_BUILD/gdb/$RUN$EXEEXT ] ; then
             echo "gdb did not build properly : Missing $RUN$EXEEXT"
