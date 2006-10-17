@@ -41,7 +41,7 @@ TIMESTAMP=`date +%Y%m%d`       # is YYYY_MMM_DD
 BINUTILS_VERSION=2.17
 GCC_VERSIONS=
 
-while getopts dipwvtST:C:s:b:k:o:m:B:c:u:r:l:h parameter
+while getopts dipwvtST:C:s:b:k:o:m:B:c:u:r:l:H:h parameter
 do
     case $parameter in
         p)
@@ -188,7 +188,9 @@ do
         c)
             GCC_VERSIONS="$GCC_VERSIONS $OPTARG"
             ;;
-
+        H)
+            HOST_TARGET="--host=$OPTARG"
+            ;;
         k)
             if [ -d $OPTARG/uClibc ] ; then
                 UCLINUX_ROOT=$OPTARG
@@ -248,6 +250,7 @@ do
 -m MAKE          Default make (leave blank to use system make)
 -B BINUTILS_VER  Binutils version (default 2.15).  Can be given once.
 -c GCC_VERSION   GCC version (default 3.4).  Can be given multiple times.
+-H HOST          Build toolchain to run on HOST.
 -i               Build binutils libraries for use on the target.
 -l LANGS         Only build specified gcc languages.
 -C FILE          Use FILE as uClibc config file, rather than the default.
@@ -295,15 +298,19 @@ do
     fi
 done
 
-##### Check to make sure a old version of bfin-elf is not here #
+##### Check to make sure a old version of bfin-elf is not here
+##### Unless we are cross-compiling our toolchain, then we need the
+##### old toolchain in our PATH ...
 ORG_PATH=$PATH
 NEW_PATH=""
 RUN=`echo $PATH | sed 's/:/ /g'`
+FOUND=0
 for SEARCH in $RUN
 do
     if [ -d $SEARCH ] ; then
-        FIND=`find $SEARCH -maxdepth 1 -name bfin-elf-gcc -o -name bfin-uclinux-gcc |wc -c`
+        FIND=`find $SEARCH/ -maxdepth 1 -name bfin-elf-gcc -o -name bfin-uclinux-gcc |wc -c`
         if [ $FIND -gt 1 ] ; then
+            FOUND=1
             echo "Removing $SEARCH from the PATH"
         else
             if [ $NEW_PATH ] ; then
@@ -314,8 +321,14 @@ do
         fi
     fi
 done
-NEW_PATH=$NEW_PATH:
-PATH=$NEW_PATH
+if [ -z "$HOST_TARGET" ] ; then
+    NEW_PATH=$NEW_PATH:
+    PATH=$NEW_PATH
+elif [ "$FOUND" = "0" ] ; then
+    echo "You need an existing Blackfin cross-compiler"
+    echo " in order to cross-compile a cross-compiler."
+    exit 1
+fi
 
 ############ SOURCE MUST PROVIDED WITH COMMAND LINE ARGUMENT ###
 if [ ! $DIR_SOURCE ] ; then
@@ -361,14 +374,6 @@ if [ $DIR_BUILD ] ; then
 else
     echo -n "Build will be done in       "
     echo ${DIR_BUILD=`pwd`}
-fi
-
-############ Determine if Cygwin ################################
-if uname -o 2>/dev/null | grep -i "Cygwin" > /dev/null ; then
-    CYGWIN=cygwin-
-    HOST_TARGET="--host=i386-pc-cygwin32"
-else
-    HOST_TARGET=""
 fi
 
 mk_output_dir()
@@ -496,6 +501,9 @@ if [ ! -d $DIR_BINUTILS_SOURCE ] ; then
     exit 1
 fi
 BUILD_TARGET="--build=`$DIR_BINUTILS_SOURCE/config.guess`"
+if [ -z "$HOST_TARGET" ] ; then
+    HOST_TARGET="--host=`$DIR_BINUTILS_SOURCE/config.guess`"
+fi
 
 echo -n "Path to elf2flt dir         "
 DIR_ELF2FLT_SOURCE=$DIR_SOURCE/elf2flt
