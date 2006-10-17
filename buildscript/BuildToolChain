@@ -663,7 +663,7 @@ build_gcc ()
     done
 
     echo -n "*** Installing GCC                 " ; date
-    RUN="$MAKE install"
+    RUN="$MAKE -j1 install"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
