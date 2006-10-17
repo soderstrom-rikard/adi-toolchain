@@ -1,0 +1,107 @@
+Test Run By rgetz on Sun Oct 15 21:45:57 2006
+Target is bfin-unknown-uclinux
+Host   is x86_64-unknown-linux-gnu
+
+		=== binutils tests ===
+
+Schedule of variations:
+    bfin-uclinux
+    bfin-uclinux-fdpic/fdpic
+
+Running target bfin-uclinux
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/ar.exp ...
+PASS: ar long file names
+PASS: ar symbol table
+PASS: ar argument parsing
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/dlltool.exp ...
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/hppa/objdump.exp ...
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/m68k/objdump.exp ...
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/nm.exp ...
+PASS: nm (no arguments)
+PASS: nm -g
+PASS: nm -P
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/objcopy.exp ...
+PASS: objcopy (simple copy)
+PASS: objcopy -O srec
+PASS: objcopy --set-start
+PASS: objcopy --adjust-start
+PASS: objcopy --adjust-vma
+PASS: objcopy --adjust-section-vma +
+PASS: objcopy --adjust-section-vma =
+PASS: strip
+PASS: strip with saving a symbol
+FAIL: simple objcopy of executable
+FAIL: run objcopy of executable
+ERROR: remote_download to build of tmpdir/copyprog to tmpdir/striprog: cp: cannot stat `tmpdir/copyprog': No such file or directory
+UNRESOLVED: run stripped executable
+ERROR: remote_download to build of tmpdir/copyprog to tmpdir/striprog: cp: cannot stat `tmpdir/copyprog': No such file or directory
+UNRESOLVED: run stripped executable with saving a symbol
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/objdump.exp ...
+PASS: objdump -i
+PASS: objdump -f
+PASS: objdump -h
+PASS: objdump -t
+PASS: objdump -r
+PASS: objdump -s
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/readelf.exp ...
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/size.exp ...
+PASS: size (no arguments)
+PASS: size -A
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/vax/objdump.exp ...
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/windres/windres.exp ...
+
+		=== binutils Summary for bfin-uclinux ===
+
+# of expected passes		23
+# of unexpected failures	2
+# of unresolved testcases	2
+Running target bfin-uclinux-fdpic/fdpic
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/ar.exp ...
+PASS: ar long file names
+PASS: ar symbol table
+PASS: ar argument parsing
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/dlltool.exp ...
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/hppa/objdump.exp ...
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/m68k/objdump.exp ...
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/nm.exp ...
+PASS: nm (no arguments)
+PASS: nm -g
+PASS: nm -P
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/objcopy.exp ...
+PASS: objcopy (simple copy)
+PASS: objcopy -O srec
+PASS: objcopy --set-start
+PASS: objcopy --adjust-start
+PASS: objcopy --adjust-vma
+PASS: objcopy --adjust-section-vma +
+PASS: objcopy --adjust-section-vma =
+PASS: strip
+PASS: strip with saving a symbol
+FAIL: simple objcopy of executable
+FAIL: run objcopy of executable
+FAIL: run stripped executable
+FAIL: run stripped executable with saving a symbol
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/objdump.exp ...
+PASS: objdump -i
+PASS: objdump -f
+PASS: objdump -h
+PASS: objdump -t
+PASS: objdump -r
+PASS: objdump -s
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/readelf.exp ...
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/size.exp ...
+PASS: size (no arguments)
+PASS: size -A
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/vax/objdump.exp ...
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/windres/windres.exp ...
+
+		=== binutils Summary for bfin-uclinux-fdpic/fdpic ===
+
+# of expected passes		23
+# of unexpected failures	4
+
+		=== binutils Summary ===
+
+# of expected passes		46
+# of unexpected failures	6
+# of unresolved testcases	2

@@ -1,0 +1,60 @@
+Test Run By rgetz on Sun Oct 15 20:29:23 2006
+Target is bfin-unknown-elf
+Host   is x86_64-unknown-linux-gnu
+
+		=== binutils tests ===
+
+Schedule of variations:
+    bfin-sim
+
+Running target bfin-sim
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/ar.exp ...
+PASS: ar long file names
+PASS: ar symbol table
+PASS: ar argument parsing
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/dlltool.exp ...
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/hppa/objdump.exp ...
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/m68k/objdump.exp ...
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/nm.exp ...
+PASS: nm (no arguments)
+PASS: nm -g
+PASS: nm -P
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/objcopy.exp ...
+PASS: objcopy (simple copy)
+PASS: objcopy -O srec
+PASS: objcopy --set-start
+PASS: objcopy --adjust-start
+PASS: objcopy --adjust-vma
+PASS: objcopy --adjust-section-vma +
+PASS: objcopy --adjust-section-vma =
+PASS: strip
+PASS: strip with saving a symbol
+PASS: simple objcopy of executable
+PASS: run objcopy of executable
+PASS: run stripped executable
+PASS: run stripped executable with saving a symbol
+PASS: objcopy (ELF unknown section type)
+PASS: objcopy (ELF group)
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/objdump.exp ...
+PASS: objdump -i
+PASS: objdump -f
+PASS: objdump -h
+PASS: objdump -t
+PASS: objdump -r
+PASS: objdump -s
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/readelf.exp ...
+PASS: finding out ELF size with readelf -h
+PASS: readelf -h
+PASS: readelf -S
+PASS: readelf -s
+PASS: readelf -r
+PASS: readelf -wi
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/size.exp ...
+PASS: size (no arguments)
+PASS: size -A
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/vax/objdump.exp ...
+Running /home/rgetz/testcvs/gcc/binutils/binutils-2.17/binutils/testsuite/binutils-all/windres/windres.exp ...
+
+		=== binutils Summary ===
+
+# of expected passes		35
