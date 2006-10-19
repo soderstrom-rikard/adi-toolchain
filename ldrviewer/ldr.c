@@ -386,8 +386,8 @@ canned_failure:
 
 	printf("Checking autobaud ... ");
 	if (autobaud[0] != 0xBF || autobaud[3] != 0x00) {
-		printf("Failed: wanted {0xBF,..,..,0x00} but got {0x%02X,..,..,0x%02X}\n",
-			autobaud[0], autobaud[3]);
+		printf("Failed: wanted {0xBF,..,..,0x00} but got {0x%02X,[0x%02X],[0x%02X],0x%02X}\n",
+			autobaud[0], autobaud[1], autobaud[2], autobaud[3]);
 		return -1;
 	}
 	printf("OK!\n");
