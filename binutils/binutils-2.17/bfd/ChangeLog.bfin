@@ -1,3 +1,16 @@
+2006-09-26  Jie Zhang  <jie.zhang@analog.com>
+
+	Apply
+	2006-09-26  H.J. Lu  <hongjiu.lu@intel.com>
+	PR ld/3223
+	PR ld/3267
+	* elf.c (assign_file_positions_for_non_load_sections): Don't
+	warn zero size allocated sections.
+	2006-10-06  H.J. Lu  <hongjiu.lu@intel.com>
+	PR ld/3314
+	* elf.c (assign_file_positions_for_non_load_sections): Don't
+	page align empty SHF_ALLOC sections.
+
 2006-09-22  Jie Zhang  <jie.zhang@analog.com>
 
 	* elf32-bfin.c (struct bfinfdpic_relocs_info): Make got17m4,
