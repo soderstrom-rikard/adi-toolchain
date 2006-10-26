@@ -63,10 +63,10 @@ extern int target_flags;
   do                                            \
     {                                           \
       builtin_define ("bfin");                  \
-      builtin_define ("__ADSPBLACKFIN__");	\
       builtin_define ("BFIN");                  \
-      builtin_define ("FRIO");                  \
-      builtin_define ("frio");                  \
+      builtin_define ("__bfin__");              \
+      builtin_define ("__BFIN__");              \
+      builtin_define ("__ADSPBLACKFIN__");	\
       if (flag_pic)				\
 	{					\
 	  builtin_define ("__PIC__");		\

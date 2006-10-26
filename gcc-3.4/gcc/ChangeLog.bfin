@@ -1,3 +1,8 @@
+2006-10-26  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): Define __bfin__
+	and __BFIN__. Don't define frio and FRIO.
+
 2006-09-15  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (subsi3): Lose expander, change previously
