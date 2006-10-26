@@ -62,10 +62,8 @@ extern int target_flags;
 #define TARGET_CPU_CPP_BUILTINS()               \
   do                                            \
     {                                           \
-      builtin_define ("bfin");                  \
-      builtin_define ("BFIN");                  \
-      builtin_define ("__bfin__");              \
-      builtin_define ("__BFIN__");              \
+      builtin_define_std ("bfin");              \
+      builtin_define_std ("BFIN");              \
       builtin_define ("__ADSPBLACKFIN__");	\
       if (flag_pic)				\
 	{					\
