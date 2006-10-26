@@ -1,5 +1,10 @@
 2006-10-26  Jie Zhang  <jie.zhang@analog.com>
 
+	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): Define __bfin__
+	and __BFIN__.
+
+2006-10-26  Jie Zhang  <jie.zhang@analog.com>
+
 	* gcc.c (process_command): Treat -b as normal switch if its argument
 	has no dash.
 
