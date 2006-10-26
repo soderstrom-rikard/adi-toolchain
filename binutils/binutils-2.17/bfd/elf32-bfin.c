@@ -3570,9 +3570,7 @@ elf32_bfinfdpic_create_dynamic_sections (bfd *abfd, struct bfd_link_info *info)
      copy relocs.  */
       if (! info->shared)
 	{
-	  s = bfd_make_section (abfd,
-				(bed->default_use_rela_p
-				 ? ".rela.bss" : ".rel.bss"));
+	  s = bfd_make_section (abfd, ".rela.bss");
 	  if (s == NULL
 	      || ! bfd_set_section_flags (abfd, s, flags | SEC_READONLY)
 	      || ! bfd_set_section_alignment (abfd, s, bed->s->log_file_align))
@@ -4267,6 +4265,15 @@ elf32_bfinfdpic_size_dynamic_sections (bfd *output_bfd,
 					    sizeof (Elf32_External_Rel)))
 	  return FALSE;
     }
+
+
+  s = bfd_get_section_by_name (dynobj, ".rela.bss");
+  if (s && s->size == 0)
+    s->flags |= SEC_EXCLUDE;
+
+  s = bfd_get_section_by_name (dynobj, ".rel.plt");
+  if (s && s->size == 0)
+    s->flags |= SEC_EXCLUDE;
 
   return TRUE;
 }
