@@ -117,7 +117,7 @@
 #define __IEEE_LITTLE_ENDIAN
 #endif
 
-#ifdef bfin
+#ifdef __BFIN__
 #define __IEEE_LITTLE_ENDIAN
 #endif
 
