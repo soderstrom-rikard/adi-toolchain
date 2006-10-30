@@ -21,7 +21,7 @@ _BEGIN_STD_C
 #define	_JBLEN	13
 #endif
 
-#ifdef bfin
+#ifdef __BFIN__
 #define _JBLEN  40
 #endif
 

@@ -1,3 +1,8 @@
+2006-10-30  Jie Zhang  <jie.zhang@analog.com>
+
+	* libc/include/machine/ieeefp.h: Use __BFIN__ instead of BFIN.
+	* libc/include/machine/setjmp.h: Use __BFIN__ instead of bfin.
+
 2006-10-12  Jie Zhang  <jie.zhang@analog.com>
 
 	* libc/machine/bfin/Makefile.am (lib_a_SOURCES): Add setjmp.S.
