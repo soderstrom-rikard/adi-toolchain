@@ -1098,7 +1098,7 @@ if [ $KERNEL_SOURCE ] ; then
     cd linux-2.6.x
     RUN="$MAKE CROSS_COMPILE=bfin-elf- prepare"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
     cd ..
 
 
