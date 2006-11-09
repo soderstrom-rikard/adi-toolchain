@@ -122,7 +122,7 @@ extern int target_flags;
 -init __init -fini __fini "
 
 #undef  LIB_SPEC
-#define LIB_SPEC "-lc"
+#define LIB_SPEC "--start-group -lc -lsim --end-group"
 
 /* Don't create frame pointers for leaf functions */
 #define TARGET_OMIT_LEAF_FRAME_POINTER (target_flags & MASK_OMIT_LEAF_FRAME_POINTER)
