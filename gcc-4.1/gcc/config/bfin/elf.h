@@ -13,7 +13,7 @@
 #define ENDFILE_SPEC	"crtend%O%s crtn%O%s"
 
 #undef  LIB_SPEC
-#define LIB_SPEC "-lc"
+#define LIB_SPEC "--start-group -lc -lsim --end-group"
 
 #undef USER_LABEL_PREFIX
 #define USER_LABEL_PREFIX "_"
