@@ -1,5 +1,29 @@
 2006-11-09  Jie Zhang  <jie.zhang@analog.com>
 
+	* bfin/bfin-dis.c (decode_REGMV_0): Deal with move from/into ASTAT.
+	* bfin/bfin-sim.h (typedef struct saved_state_type): Add rnd_mod.
+	(AZ_BIT): Define.
+	(AN_BIT): Define.
+	(AC0_COPY_BIT): Define.
+	(V_COPY_BIT): Define.
+	(CC_BIT): Define.
+	(AQ_BIT): Define.
+	(RND_MOD_BIT): Define.
+	(AC0_BIT): Define.
+	(AC1_BIT): Define.
+	(AV0_BIT): Define.
+	(AV0S_BIT): Define.
+	(AV1_BIT): Define.
+	(AV1S_BIT): Define.
+	(V_BIT): Define.
+	(VS_BIT): Define.
+	(ASTAT): Define.
+	(SET_ASTAT): Define.
+	* bfin/interp.c (sim_fetch_register): Deal with ASTAT.
+	(sim_store_register): Deal with ASTAT.
+
+2006-11-09  Jie Zhang  <jie.zhang@analog.com>
+
 	* bfin/Makefile.in (NL_TARGET): Set.
 	* bfin/interp.c (syscall.h): Don't include.
 	(targ-vals.h): Include.

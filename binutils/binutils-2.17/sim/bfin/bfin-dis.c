@@ -1220,11 +1220,22 @@ decode_REGMV_0 (bu16 iw0)
   int gd = ((iw0 >> 9) & 0x7);
   bu32 *srcreg = get_allreg (gs, src);
   bu32 *dstreg = get_allreg (gd, dst);
-  
-  if (srcreg == 0 || dstreg == 0)
-    unhandled_instruction ("reg move");
+  bu32 value;
 
-  *dstreg = *srcreg;
+  if (gs == 4 && src == 6)
+    value = ASTAT;
+  else if (srcreg == 0)
+    unhandled_instruction ("reg move");
+  else
+    value = *srcreg;
+
+  if (gd == 4 && dst == 6)
+    SET_ASTAT (value);
+  else if (dstreg == 0)
+    unhandled_instruction ("reg move");
+  else
+    *dstreg = value;
+
   PCREG += 2;
 }
 

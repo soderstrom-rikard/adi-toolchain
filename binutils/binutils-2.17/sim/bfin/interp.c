@@ -562,6 +562,7 @@ sim_fetch_register (SIM_DESC sd, int rn, unsigned char *memory, int length)
     case SIM_BFIN_L1_REGNUM : value = LREG(1); break;
     case SIM_BFIN_L2_REGNUM : value = LREG(2); break;
     case SIM_BFIN_L3_REGNUM : value = LREG(3); break;
+    case SIM_BFIN_ASTAT_REGNUM : value = ASTAT; break;
     case SIM_BFIN_RETS_REGNUM : value = RETSREG; break;
     case SIM_BFIN_A0_DOT_X_REGNUM : value = A0XREG; break;
     case SIM_BFIN_AO_DOT_W_REGNUM : value = A0WREG; break;
@@ -627,6 +628,7 @@ sim_store_register (SIM_DESC sd, int rn, unsigned char *memory, int length)
     case SIM_BFIN_L1_REGNUM : LREG(1) = value; break;
     case SIM_BFIN_L2_REGNUM : LREG(2) = value; break;
     case SIM_BFIN_L3_REGNUM : LREG(3) = value; break;
+    case SIM_BFIN_ASTAT_REGNUM : SET_ASTAT (value); break;
     case SIM_BFIN_RETS_REGNUM : RETSREG = value; break;
     case SIM_BFIN_A0_DOT_X_REGNUM : A0XREG = value; break;
     case SIM_BFIN_AO_DOT_W_REGNUM : A0WREG = value; break;

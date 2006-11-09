@@ -42,6 +42,7 @@ typedef struct
   bu32 lt[2], lc[2], lb[2];
   int ac0, ac0_copy, ac1, an, aq;
   int av0, av0s, av1, av1s, az, cc, v, v_copy, vs;
+  int rnd_mod;
   int v_internal;
   bu32 pc, rets;
 
@@ -82,6 +83,59 @@ extern saved_state_type saved_state;
 #define LB1REG		(saved_state.lb[1])
 #define RETSREG		(saved_state.rets)
 #define PCREG		(saved_state.pc)
+
+#define AZ_BIT		0
+#define AN_BIT		1
+#define AC0_COPY_BIT	2
+#define V_COPY_BIT	3
+#define CC_BIT		5
+#define AQ_BIT		6
+#define RND_MOD_BIT	8
+#define AC0_BIT		12
+#define AC1_BIT		13
+#define AV0_BIT		16
+#define AV0S_BIT	17
+#define AV1_BIT		18
+#define AV1S_BIT	19
+#define V_BIT		24
+#define VS_BIT		25
+
+#define ASTAT		(saved_state.az >> AZ_BIT \
+			 | saved_state.an >> AN_BIT \
+			 | saved_state.ac0_copy >> AC0_COPY_BIT \
+			 | saved_state.v_copy >> V_COPY_BIT \
+			 | saved_state.cc >> CC_BIT \
+			 | saved_state.aq >> AQ_BIT \
+			 | saved_state.rnd_mod >> RND_MOD_BIT \
+			 | saved_state.ac0 >> AC0_BIT \
+			 | saved_state.ac1 >> AC1_BIT \
+			 | saved_state.av0 >> AV0_BIT \
+			 | saved_state.av0s >> AV0S_BIT \
+			 | saved_state.av1 >> AV1_BIT \
+			 | saved_state.av1s >> AV1S_BIT \
+			 | saved_state.v >> V_BIT \
+			 | saved_state.vs >> VS_BIT)
+
+#define SET_ASTAT(a)						\
+  do								\
+    {								\
+      saved_state.az = a >> AZ_BIT & 1;				\
+      saved_state.an = a >> AN_BIT & 1;				\
+      saved_state.ac0_copy = a >> AC0_COPY_BIT & 1;		\
+      saved_state.v_copy = a >> V_COPY_BIT & 1;			\
+      saved_state.cc = a >> CC_BIT & 1;				\
+      saved_state.aq = a >> AQ_BIT & 1;				\
+      saved_state.rnd_mod = a >> RND_MOD_BIT & 1;		\
+      saved_state.ac0 = a >> AC0_BIT & 1;			\
+      saved_state.ac1 = a >> AC1_BIT & 1;			\
+      saved_state.av0 = a >> AV0_BIT & 1;			\
+      saved_state.av0s = a >> AV0S_BIT & 1;			\
+      saved_state.av1 = a >> AV1_BIT & 1;			\
+      saved_state.av1s = a >> AV1S_BIT & 1;			\
+      saved_state.v = a >> V_BIT & 1;				\
+      saved_state.vs = a >> VS_BIT & 1;				\
+    }								\
+  while (0)
 
 extern int did_jump;
 
