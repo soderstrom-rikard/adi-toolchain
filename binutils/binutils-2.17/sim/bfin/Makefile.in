@@ -17,6 +17,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA 02110-1301, USA.
 
+# This selects the bfin newlib/libgloss syscall definitions.
+NL_TARGET = -DNL_TARGET_bfin
+
 ## COMMON_PRE_CONFIG_FRAG
 
 SIM_OBJS = interp.o bfin-dis.o sim-load.o

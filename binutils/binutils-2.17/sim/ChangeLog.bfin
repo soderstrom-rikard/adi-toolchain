@@ -1,3 +1,15 @@
+2006-11-09  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/Makefile.in (NL_TARGET): Set.
+	* bfin/interp.c (syscall.h): Don't include.
+	(targ-vals.h): Include.
+	(bfin_trap): Use TARGET_SYS_exit instead of SYS_exit.
+	Likewise for SYS_open, SYS_write, SYS_read, SYS_kill, SYS_close,
+	SYS_argc, SYS_argnlen, SYS_argn and SYS_time.
+	* bfin/syscall.h: Remove.
+	* common/gennltvals.sh: Add bfin.
+	* common/nltvals.def: Regenerate.
+
 2006-07-17  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin/bfin-dis.c (decode_dsp32shiftimm_0): Properly handle rotation

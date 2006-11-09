@@ -32,10 +32,7 @@
 #include "gdb/callback.h"
 #include "bfin-sim.h"
 #include "gdb/sim-bfin.h"
-
-/* This file is local - if newlib changes, then so should this.  */
-#include "syscall.h"
-
+#include "targ-vals.h"
 #include <math.h>
 
 #ifdef _WIN32
@@ -127,11 +124,11 @@ bfin_trap ()
 
   switch (sys)
     {
-    case SYS_exit:
+    case TARGET_SYS_exit:
       saved_state.exception = SIGQUIT;
       DREG (0) = get_long (saved_state.memory, args);
       return;
-    case SYS_open:
+    case TARGET_SYS_open:
       {
 	char *arg0 = (char *)(saved_state.memory + get_long (saved_state.memory, args));
 	bu32 arg1 = get_long (saved_state.memory, args + 4);
@@ -143,7 +140,7 @@ bfin_trap ()
       }
       return;
 
-    case SYS_write:
+    case TARGET_SYS_write:
       {
 	bu32 arg0 = get_long (saved_state.memory, args);
 	char *arg1 = (char *)(saved_state.memory + get_long (saved_state.memory, args + 4));
@@ -152,7 +149,7 @@ bfin_trap ()
       }
       return;
 
-    case SYS_read:
+    case TARGET_SYS_read:
       {
 	bu32 arg0 = get_long (saved_state.memory, args);
 	char *arg1 = (char *)(saved_state.memory + get_long (saved_state.memory, args + 4));
@@ -161,17 +158,18 @@ bfin_trap ()
       }
       return;
       
-    case SYS_kill:
+    case TARGET_SYS_kill:
       printf ("Killing with signal %d\n", get_long (saved_state.memory, args + 4));
       raise (SIGABRT);
 
-    case SYS_close:
+    case TARGET_SYS_close:
       DREG (0) = callback->close (callback, get_long (saved_state.memory, args));
       return;
-    case SYS_argc:
+
+    case TARGET_SYS_argc:
       DREG (0) = count_argc (prog_argv);
       break;
-    case SYS_argnlen:
+    case TARGET_SYS_argnlen:
       {
 	bu32 arg0 = get_long (saved_state.memory, args);
 	if (arg0 < count_argc (prog_argv))
@@ -180,7 +178,7 @@ bfin_trap ()
 	  DREG (0) = -1;
       }
       return;
-    case SYS_argn:
+    case TARGET_SYS_argn:
       {
 	bu32 arg0 = get_long (saved_state.memory, args);
 	char *arg1 = (char *)(saved_state.memory + get_long (saved_state.memory, args + 4));
@@ -195,7 +193,8 @@ bfin_trap ()
 	  DREG (0) = -1;
       }
       return;
-    case SYS_time:
+
+    case TARGET_SYS_time:
       DREG (0) = get_now ();
       return;
     default:
