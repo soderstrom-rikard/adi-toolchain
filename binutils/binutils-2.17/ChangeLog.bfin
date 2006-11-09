@@ -1,0 +1,5 @@
+2006-11-09  Jie Zhang  <jie.zhang@analog.com>
+
+	* configure.in: Remove target-libgloss from noconfigdirs for
+	bfin-*-*.
+	* configure: Regenerate.

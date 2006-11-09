@@ -1,21 +1,29 @@
-
-/* Setjmp for the Blackfin project
+/*
+ * setjmp for the Blackfin processor
  *
- * Copyright (C) 2003,  Metrowerks
- * Based on code from Analog Devices.
+ * Copyright (C) 2006 Analog Devices, Inc.
  *
- * This file is subject to the terms and conditions of the GNU Lesser
- * General Public License.  See the file COPYING.LIB in the main
- * directory of this archive for more details.
- *
+ * The authors hereby grant permission to use, copy, modify, distribute,
+ * and license this software and its documentation for any purpose, provided
+ * that existing copyright notices are retained in all copies and that this
+ * notice is included verbatim in any distributions. No written agreement,
+ * license, or royalty fee is required for any of the authorized uses.
+ * Modifications to this software may be copyrighted by their authors
+ * and need not follow the licensing terms described here, provided that
+ * the new terms are clearly indicated on the first page of each file where
+ * they apply.
  */
+
+
 #define _ASM
 #define _SETJMP_H
 
-.globl ___sigsetjmp;
+.text;
 .align 4;
+.globl _setjmp;
+.type _setjmp, STT_FUNC;
 
-___sigsetjmp:
+_setjmp:
 	[--SP] = P0;		/* Save P0 */
 	P0 = R0;
 	R0 = [SP++];	
@@ -94,11 +102,7 @@ ___sigsetjmp:
 	R0 = RETS;
 	[P0 + 0x9C] = R0;
 
-	R0 = [P0 + 0x20];
-	CC = R1 == 1;
-	IF CC JUMP L$L$finished;
-	CALL ___sigjmp_save; 
-L$L$finished:
 	R0 = 0;
+
 	RTS;
-___sigsetjmp.end:
+.size _setjmp, .-_setjmp;

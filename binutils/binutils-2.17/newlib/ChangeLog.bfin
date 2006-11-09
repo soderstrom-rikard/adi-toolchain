@@ -1,3 +1,27 @@
+2006-11-09  Jie Zhang  <jie.zhang@analog.com>
+
+	* configure.host: Set sys_dir to empty for bfin-*-*.
+	* configure: Regenerate.
+	* libc/machine/bfin/Makefile.am (lib_a_SOURCES): Remove access.c.
+	Add longjmp.S.
+	* libc/machine/bfin/Makefile.in: Regenerate.
+	* libc/machine/bfin/access.c: Remove.
+	* libc/machine/bfin/longjmp.S: New.
+	* libc/machine/bfin/setjmp.S: Update Copyright.
+	(___sigsetjmp): Renamed to ...
+	(_setjmp): ... this. And do some code clean up.
+	* libc/machine/bfin/machine/endian.h: Remove.
+	* libc/machine/bfin/machine/param.h: Remove.
+	* libc/sys/bfin/Makefile.am: Remove.
+	* libc/sys/bfin/Makefile.in: Remove.
+	* libc/sys/bfin/aclocal.m4: Remove.
+	* libc/sys/bfin/configure: Remove.
+	* libc/sys/bfin/configure.in: Remove.
+	* libc/sys/bfin/crt0.S: Move to libgloss.
+	* libc/sys/bfin/libcfunc.c: Remove.
+	* libc/sys/bfin/syscalls.c: Move to libgloss.
+	* libc/sys/bfin/sys/syscall.h: Remove.
+
 2006-10-30  Jie Zhang  <jie.zhang@analog.com>
 
 	* libc/include/machine/ieeefp.h: Use __BFIN__ instead of BFIN.

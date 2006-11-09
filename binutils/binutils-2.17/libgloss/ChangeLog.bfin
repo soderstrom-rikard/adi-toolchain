@@ -1,0 +1,12 @@
+2006-11-09  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/configure.in: New.
+	* bfin/configure: Generate.
+	* bfin/crt0.S: Moved from newlib. Update Copyright. Clean up code.
+	* bfin/Makefile.in: New.
+	* bfin/syscalls.c: Moved from newlib. Update Copyright. Clean up code.
+	* configure.in: Add support for bfin-*-*.
+	* configure: Regenerate.
+	* syscall.h (SYS_argc): Define.
+	(SYS_argnlen): Define.
+	(SYS_argn): Define.

@@ -330,7 +330,7 @@ case "${host}" in
 	fi
 	;;
   bfin-*-*)
-	sys_dir=bfin
+	sys_dir=
 	;;
   crx*)
 	sys_dir=
