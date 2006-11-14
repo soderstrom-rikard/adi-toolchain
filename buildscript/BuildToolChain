@@ -663,10 +663,12 @@ build_gcc ()
         FILE="cc1 collect2 gcov xgcc"
     fi
 
+    eval `grep ^EXEEXT= $DIR_GCC_BUILD/gcc/config.log`
+
     for RUN in $FILE
     do
-        if [ ! -f $DIR_GCC_BUILD/gcc/$RUN ] ; then
-            echo "gcc did not build properly : Missing $RUN"
+        if [ ! -f $DIR_GCC_BUILD/gcc/$RUN$EXEEXT ] ; then
+            echo "gcc did not build properly : Missing $RUN$EXEEXT"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
             exit 1
@@ -688,24 +690,18 @@ build_gcc ()
     for RUN in addr2line ar as c++filt gcov ld nm objdump \
                objcopy ranlib readelf size strings strip \
                gdb run \
-               cpp gcc gccbug $FILE
+               cpp gcc $FILE
     do
-        if [ ! -f $3/bin/bfin-$2-$RUN ] ; then
-            echo "The toolchain did not install properly - report an error"
+        if [ ! -f $3/bin/bfin-$2-$RUN$EXEEXT ] ; then
+            echo "The toolchain ($RUN$EXEEXT) did not install properly - report an error"
             tail -10 $ACTUAL_LOGFILE
             exit 1
         fi
     done
     if [ -n "$TMP" ] ; then
         VERSION=`$3/bin/bfin-$2-gcc -v 2>&1 | grep gcc.vers | sed -e 's,gcc.version.,,' -e 's, .ADI.*$,,'`
-        ln $3/bin/bfin-$2-g++ $3/bin/bfin-$2-g++-$VERSION
-        ln $3/bin/bfin-$2-c++ $3/bin/bfin-$2-c++-$VERSION
-    fi
-
-    echo "*** Testing 'bfin-$2-gcc -v'"
-    if ! $3/bin/bfin-$2-gcc -v ; then
-        echo "The toolchain did not install properly - report an error"
-        exit 1
+        ln $3/bin/bfin-$2-g++$EXEEXT $3/bin/bfin-$2-g++-$VERSION$EXEEXT
+        ln $3/bin/bfin-$2-c++$EXEEXT $3/bin/bfin-$2-c++-$VERSION$EXEEXT
     fi
 }
 
@@ -815,7 +811,7 @@ build_uClibc()
         (echo $RUN $LOGFILE ; ) | sh
 
         cd ./extra/locale
-	RUN="$MAKE clean"
+        RUN="$MAKE clean"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
@@ -848,7 +844,7 @@ build_uClibc()
     for RUN in crt1.o libc.a libcrypt.a libm.a libnsl.a libresolv.a \
                libutil.a
     do
-	FILE=$2/lib/$1$RUN
+        FILE=$2/lib/$1$RUN
         if [ ! -f $FILE ] ; then
             echo "uClibc $1 did not install properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
@@ -980,10 +976,12 @@ if [ "x$SKIP_ELF" = "x" ]; then
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
-    for RUN in elf2flt  flthdr
+    eval `grep ^EXEEXT= $DIR_ELF2FLT_BUILD/config.log`
+
+    for RUN in elf2flt flthdr
     do
-        if [ ! -f $DIR_ELF2FLT_BUILD/$RUN ] ; then
-            echo "Elf2flt did not build properly : Missing $RUN"
+        if [ ! -f $DIR_ELF2FLT_BUILD/$RUN$EXEEXT ] ; then
+            echo "Elf2flt did not build properly : Missing $RUN$EXEEXT"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
             exit 1
@@ -997,8 +995,8 @@ if [ "x$SKIP_ELF" = "x" ]; then
 
     for RUN in bfin-elf-elf2flt bfin-elf-flthdr
     do
-        if [ ! -f $DIR_ELF_OUTPUT/bin/$RUN ] ; then
-            echo "Elf2flt did not install properly : Missing $RUN"
+        if [ ! -f $DIR_ELF_OUTPUT/bin/$RUN$EXEEXT ] ; then
+            echo "Elf2flt did not install properly : Missing $RUN$EXEEXT"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
             exit 1
