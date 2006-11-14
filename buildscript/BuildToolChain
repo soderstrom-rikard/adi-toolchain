@@ -328,6 +328,9 @@ elif [ "$FOUND" = "0" ] ; then
     echo "You need an existing Blackfin cross-compiler"
     echo " in order to cross-compile a cross-compiler."
     exit 1
+else
+    PATH=$ORG_PATH
+    NEW_PATH=$ORG_PATH
 fi
 
 ############ SOURCE MUST PROVIDED WITH COMMAND LINE ARGUMENT ###
