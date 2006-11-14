@@ -507,6 +507,10 @@ BUILD_TARGET="--build=`$DIR_BINUTILS_SOURCE/config.guess`"
 if [ -z "$HOST_TARGET" ] ; then
     HOST_TARGET="--host=`$DIR_BINUTILS_SOURCE/config.guess`"
 fi
+case $HOST_TARGET in
+    --host=mingw*) BINUTILS_EXTRA_CONF="--disable-nls";;
+    *)             BINUTILS_EXTRA_CONF="";;
+esac
 
 echo -n "Path to elf2flt dir         "
 DIR_ELF2FLT_SOURCE=$DIR_SOURCE/elf2flt
@@ -890,7 +894,7 @@ if [ "x$SKIP_ELF" = "x" ]; then
 
     echo -n "*** Configuring Elf Binutils & GDB " ; date
     RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-elf \
-        --prefix=$DIR_ELF_OUTPUT --without-newlib"
+        --prefix=$DIR_ELF_OUTPUT --without-newlib $BINUTILS_EXTRA_CONF"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
@@ -1214,7 +1218,7 @@ if [ $KERNEL_SOURCE ] ; then
     echo -n "*** Configuring uClinux Binutils & GDB" ; date
     RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET \
          --target=bfin-uclinux --prefix=$DIR_uC_OUTPUT \
-         --with-sysroot=$DIR_uC_OUTPUT/bfin-uclinux/runtime"
+         --with-sysroot=$DIR_uC_OUTPUT/bfin-uclinux/runtime $BINUTILS_EXTRA_CONF"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
