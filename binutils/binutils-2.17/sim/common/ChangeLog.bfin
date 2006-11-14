@@ -1,0 +1,3 @@
+2006-11-07  Thiemo Seufer  <ths@mips.com>
+
+	* gentmap.c: Fix compile time warning.
