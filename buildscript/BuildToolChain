@@ -1217,18 +1217,18 @@ if [ $KERNEL_SOURCE ] ; then
     RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET \
          --target=bfin-uclinux --prefix=$DIR_uC_OUTPUT \
          --with-sysroot=$DIR_uC_OUTPUT/bfin-uclinux/runtime"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh || die_with_log
-    (echo $RUN $LOGFILE ; ) | sh
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
     echo -n "*** Building uClinux Binutils & GDB   " ; date
     RUN="$MAKE all-binutils all-gas all-ld all-sim all-gdb"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh || die_with_log
-    (echo $RUN $LOGFILE ; ) | sh
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
     echo -n "*** Installing uClinux Binutils & GDB " ; date
     RUN="$MAKE install-binutils install-gas install-ld install-sim install-gdb"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh || die_with_log
-    (echo $RUN $LOGFILE ; ) | sh
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
     for GCC_VERSION in $GCC_VERSIONS; do
       build_gcc $GCC_VERSION uclinux $DIR_uC_OUTPUT \
@@ -1263,13 +1263,13 @@ if [ $KERNEL_SOURCE ] ; then
 
     echo -n "*** Building uClinux elf2flt       " ; date
     RUN="$MAKE"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh || die_with_log
-    (echo $RUN $LOGFILE ; ) | sh
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
     echo -n "*** Installing uClinux elf2flt     " ; date
     RUN="$MAKE install "
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh || die_with_log
-    (echo $RUN $LOGFILE ; ) | sh
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
     if [ -e $DIR_SOURCE/libdsp/Makefile ] ; then
         echo -n "*** Installing uClinux libdsp      " ; date
