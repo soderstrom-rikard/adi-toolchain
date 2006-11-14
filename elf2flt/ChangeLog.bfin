@@ -1,3 +1,8 @@
+2006-11-14  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* flthdr.c: Add support for WIN32/MINGW based on upstream CVS.
+	* elf2flt.c: Likewise.
+
 2006-08-27  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* elf2flt.c (output_relocs): Move all Blackfin-specific code to the

@@ -12,10 +12,23 @@
 #include <time.h>
 
 /* macros for conversion between host and (internet) network byte order */
+#ifndef WIN32
 #include <netinet/in.h> /* Consts and structs defined by the internet system */
+#define BINARY_FILE_OPTS
+#else
+#include <winsock2.h>
+#define BINARY_FILE_OPTS "b"
+#endif
 
 /* from uClinux-x.x.x/include/linux */
 #include "flat.h"     /* Binary flat header description                      */
+
+#if defined(__MINGW32__)
+#include <getopt.h>
+
+#define mkstemp(p) mktemp(p)
+
+#endif
 
 /****************************************************************************/
 
@@ -67,7 +80,7 @@ process_file(char *ifile, char *ofile)
 
 	*tfile = *tfile2 = '\0';
 
-	if ((ifp = fopen(ifile, "r")) == NULL) {
+	if ((ifp = fopen(ifile, "r" BINARY_FILE_OPTS)) == NULL) {
 		fprintf(stderr, "Cannot open %s\n", ifile);
 		return;
 	}
@@ -199,7 +212,7 @@ process_file(char *ifile, char *ofile)
 
 	strcpy(tfile, "/tmp/flatXXXXXX");
 	mkstemp(tfile);
-	if ((ofp = fopen(tfile, "w")) == NULL) {
+	if ((ofp = fopen(tfile, "w" BINARY_FILE_OPTS)) == NULL) {
 		fprintf(stderr, "Failed to open %s for writing\n", tfile);
 		unlink(tfile);
 		unlink(tfile2);
@@ -224,7 +237,7 @@ process_file(char *ifile, char *ofile)
 		mkstemp(tfile2);
 		
 		if (old_flags & FLAT_FLAG_GZDATA) {
-			tfp = fopen(tfile2, "w");
+			tfp = fopen(tfile2, "w" BINARY_FILE_OPTS);
 			if (!tfp) {
 				fprintf(stderr, "Failed to open %s for writing\n", tfile2);
 				exit(1);
@@ -235,12 +248,12 @@ process_file(char *ifile, char *ofile)
 		}
 
 		sprintf(cmd, "gunzip >> %s", tfile2);
-		tfp = popen(cmd, "w");
+		tfp = popen(cmd, "w" BINARY_FILE_OPTS);
 		transferr(ifp, tfp, -1);
 		fclose(tfp);
 
 		fclose(ifp);
-		ifp = fopen(tfile2, "r");
+		ifp = fopen(tfile2, "r" BINARY_FILE_OPTS);
 		if (!ifp) {
 			fprintf(stderr, "Failed to open %s for reading\n", tfile2);
 			unlink(tfile);
@@ -253,14 +266,14 @@ process_file(char *ifile, char *ofile)
 		printf("zflat %s --> %s\n", ifile, ofile);
 		fclose(ofp);
 		sprintf(cmd, "gzip -9 -f >> %s", tfile);
-		ofp = popen(cmd, "w");
+		ofp = popen(cmd, "w" BINARY_FILE_OPTS);
 	} else if (new_flags & FLAT_FLAG_GZDATA) {
 		printf("zflat-data %s --> %s\n", ifile, ofile);
 		transferr(ifp, ofp, ntohl(new_hdr.data_start) -
 				sizeof(struct flat_hdr));
 		fclose(ofp);
 		sprintf(cmd, "gzip -9 -f >> %s", tfile);
-		ofp = popen(cmd, "w");
+		ofp = popen(cmd, "w" BINARY_FILE_OPTS);
 	}
 
 	if (!ofp) { /* can only happen if using gzip/gunzip */
