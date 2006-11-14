@@ -28,5 +28,5 @@ INCLUDE = bfin-sim.h
 
 ## COMMON_POST_CONFIG_FRAG
 
-interp.o: interp.c $(INCLUDE)
+interp.o: interp.c targ-vals.h $(INCLUDE)
 bfin-dis.o: bfin-dis.c $(INCLUDE)
