@@ -46,19 +46,25 @@ do
     case $parameter in
         p)
             echo "Check http://gcc.gnu.org/install/prerequisites.html for more information"
-            gcc --version |grep -i gcc
-            make --version |grep -i make
-            autoconf --version |grep -i autoconf
-            m4 --version |grep -i m4
-            automake --version |grep -i automake
-            gettext --version |grep -i gettext
-            msgfmt --version |grep -i msgfmt
-            bison --version |grep -i bison
-            flex --version
+            for file in autoconf automake bison flex gcc gettext grep ln m4 make makeinfo msgfmt
+            do
+                RUN=`which -a $file | wc -w`
+                if [ $RUN -eq 0 ] ; then
+                    echo "Can not find $file"
+                else
+                   $file --version | grep -i $file
+                fi
+            done
+            for file in /bin/sh runtest
+            do
+                RUN=`which -a $file | wc -w`
+                if [ $RUN -eq 0 ] ; then
+                    echo "Can not find $file"
+                else
+                    $file --version | grep -i version
+                fi
+            done
             echo $SHELL
-            /bin/sh --version |grep -i version
-            echo "runtest is only required for testing"
-            runtest --version
             exit 0
             ;;
         m)
