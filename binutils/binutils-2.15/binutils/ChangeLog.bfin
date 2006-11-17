@@ -1,8 +1,0 @@
-2005-12-30  Jie Zhang  <jie.zhang@analog.com>
-
-	* readelf.c (get_machine_name): Add case for Blackfin.
-
-2005-01-07  Catherine Moore  <clm@cm00re.com>
-
-	* readelf.c: Include elf/bfin.h.
-	 (dump_relocations): Add support for EM_BLACKFIN.

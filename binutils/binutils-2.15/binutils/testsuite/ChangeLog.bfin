@@ -1,3 +1,0 @@
-2006-09-12  Jie Zhang  <jie.zhang@analog.com>
-
-	* binutils-all/testprog.c: Declare printf ().
