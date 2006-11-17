@@ -1,3 +1,0 @@
-2005-09-21  Bernd Schmidt  <bernd.schmidt@analog.com>
-
-	* Makefile.in (install_gcc, check_gcc): Add missing space in rule.
