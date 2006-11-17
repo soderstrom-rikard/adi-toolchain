@@ -254,7 +254,7 @@ do
 -o OUTPUT        Output directory (leave blank to use build dir)
 -S               Skip building elf toolchain (check to see if already built)
 -m MAKE          Default make (leave blank to use system make)
--B BINUTILS_VER  Binutils version (default 2.15).  Can be given once.
+-B BINUTILS_VER  Binutils version (default 2.17).  Can be given once.
 -c GCC_VERSION   GCC version (default 3.4).  Can be given multiple times.
 -H HOST          Build toolchain to run on HOST.
 -i               Build binutils libraries for use on the target.
