@@ -634,13 +634,13 @@ build_gcc ()
         exit 1
     fi
 
-    if [ -h $DIR_GCC_SOURCE/newlib ] ; then
-        rm $DIR_GCC_SOURCE/newlib
-    fi
+    rm -f $DIR_GCC_SOURCE/newlib
+    rm -f $DIR_GCC_SOURCE/libgloss
 
     if [ $2 = "elf" ]; then
         echo "*** Linking files from $DIR_BINUTILS_SOURCE/newlib to $DIR_GCC_SOURCE"
         ln -snf $DIR_BINUTILS_SOURCE/newlib $DIR_GCC_SOURCE/
+        ln -snf $DIR_BINUTILS_SOURCE/libgloss $DIR_GCC_SOURCE/
         # check to make sure the copies were made
         if [ ! -d $DIR_GCC_SOURCE/newlib ] ; then
             echo "*** ERROR : can not link in $DIR_GCC_SOURCE"
