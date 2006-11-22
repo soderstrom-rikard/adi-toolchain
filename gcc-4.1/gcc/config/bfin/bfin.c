@@ -1728,7 +1728,9 @@ emit_pic_move (rtx *operands, enum machine_mode mode ATTRIBUTE_UNUSED)
 					  : pic_offset_table_rtx);
 }
 
-/* Expand a move operation in mode MODE.  The operands are in OPERANDS.  */
+/* Expand a move operation in mode MODE.  The operands are in OPERANDS.
+   Returns true if no further code must be generated, false if the caller
+   should generate an insn to move OPERANDS[1] to OPERANDS[0].  */
 
 bool
 expand_move (rtx *operands, enum machine_mode mode)
@@ -2059,6 +2061,7 @@ secondary_input_reload_class (enum reg_class class, enum machine_mode mode,
     return DREGS;
   if (x_class == CCREGS && class != DREGS)
     return DREGS;
+
   /* All registers other than AREGS can load arbitrary constants.  The only
      case that remains is MEM.  */
   if (code == MEM)
@@ -2467,6 +2470,20 @@ bfin_legitimate_address_p (enum machine_mode mode, rtx x, int strict)
   return false;
 }
 
+/* Decide whether we can force certain constants to memory.  If we
+   decide we can't, the caller should be able to cope with it in
+   another way.  */
+
+static bool
+bfin_cannot_force_const_mem (rtx x ATTRIBUTE_UNUSED)
+{
+  /* We have only one class of non-legitimate constants, and our movsi
+     expander knows how to handle them.  Dropping these constants into the
+     data section would only shift the problem - we'd still get relocs
+     outside the object, in the data section rather than the text section.  */
+  return true;
+}
+
 /* Ensure that for any constant of the form symbol + offset, the offset
    remains within the object.  Any other constants are ok.
    This ensures that flat binaries never have to deal with relocations
@@ -2497,16 +2514,6 @@ bfin_legitimate_constant_p (rtx x)
       || offset >= int_size_in_bytes (TREE_TYPE (SYMBOL_REF_DECL (sym))))
     return false;
 
-  return true;
-}
-
-static bool
-bfin_cannot_force_const_mem (rtx x ATTRIBUTE_UNUSED)
-{
-  /* We have only one class of non-legitimate constants, and our movsi
-     expander knows how to handle them.  Dropping these constants into the
-     data section would only shift the problem - we'd still get relocs
-     outside the object, in the data section rather than the text section.  */
   return true;
 }
 
@@ -3009,6 +3016,8 @@ bfin_expand_movmem (rtx dst, rtx src, rtx count_exp, rtx align_exp)
   return false;
 }
 
+/* Implement TARGET_SCHED_ISSUE_RATE.  */
+
 static int
 bfin_issue_rate (void)
 {
@@ -3057,18 +3066,18 @@ bfin_hardware_loop (void)
   cfun->machine->has_hardware_loops++;
 }
 
-/* Maxium loop nesting depth.  */
+/* Maximum loop nesting depth.  */
 #define MAX_LOOP_DEPTH 2
 
-/* Maxium size of a loop.  */
+/* Maximum size of a loop.  */
 #define MAX_LOOP_LENGTH 2042
 
 /* We need to keep a vector of loops */
 typedef struct loop_info *loop_info;
-DEF_VEC_P(basic_block);
 DEF_VEC_P (loop_info);
-DEF_VEC_ALLOC_P(basic_block,heap);
+DEF_VEC_P (basic_block);
 DEF_VEC_ALLOC_P (loop_info,heap);
+DEF_VEC_ALLOC_P (basic_block,heap);
 
 /* Information about a loop we have found (or are in the process of
    finding).  */
@@ -4332,9 +4341,9 @@ const struct attribute_spec bfin_attribute_table[] =
   { NULL, 0, 0, false, false, false, NULL }
 };
 
-/* Implementation of TARGET_ASM_INTEGER.  In the FRV case we need to
-   use ".picptr" to generate safe relocations for PIC code.  We also
-   need a fixup entry for aligned (non-debugging) code.  */
+/* Implementation of TARGET_ASM_INTEGER.  When using FD-PIC, we need to
+   tell the assembler to generate pointers to function descriptors in
+   some cases.  */
 
 static bool
 bfin_assemble_integer (rtx value, unsigned int size, int aligned_p)

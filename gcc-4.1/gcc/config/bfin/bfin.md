@@ -130,18 +130,14 @@
    (UNSPEC_MOVE_PIC 3)
    (UNSPEC_LIBRARY_OFFSET 4)
    (UNSPEC_PUSH_MULTIPLE 5)
-   ;; Signed fractional multiply (no options)
-   (UNSPEC_FRMUL 6)
-   ;; Signed fractional multiply with truncation (T option)
-   (UNSPEC_FRTMUL 7)
    ;; Multiply or MAC with extra CONST_INT operand specifying the macflag
-   (UNSPEC_MUL_WITH_FLAG 8)
-   (UNSPEC_MAC_WITH_FLAG 9)
-   (UNSPEC_MOVE_FDPIC 10)
-   (UNSPEC_FUNCDESC_GOT17M4 11)
-   (UNSPEC_LSETUP_END 12)
+   (UNSPEC_MUL_WITH_FLAG 6)
+   (UNSPEC_MAC_WITH_FLAG 7)
+   (UNSPEC_MOVE_FDPIC 8)
+   (UNSPEC_FUNCDESC_GOT17M4 9)
+   (UNSPEC_LSETUP_END 10)
    ;; Distinguish a 32 bit version of an insn from a 16 bit version.
-   (UNSPEC_32BIT 13)])
+   (UNSPEC_32BIT 11)])
 
 (define_constants
   [(UNSPEC_VOLATILE_EH_RETURN 0)

@@ -1,3 +1,10 @@
+2006-11-22  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c: Cosmetic changes throughout to match mainline
+	version.
+	* config/bfin/bfin.md (UNSPEC_FRMUL, UNSPEC_FRTMUL): Delete constant
+	definitions.
+
 2006-11-14  Michael Frysinger  <michael.frysinger@analog.com>
 
 	Backport from mainline:
