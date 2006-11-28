@@ -41,7 +41,7 @@ TIMESTAMP=`date +%Y%m%d`       # is YYYY_MMM_DD
 BINUTILS_VERSION=2.17
 GCC_VERSIONS=
 
-while getopts dipwvtST:C:s:b:k:o:m:B:c:u:r:l:H:h parameter
+while getopts dpwvtST:C:s:b:k:o:m:B:c:u:r:l:H:h parameter
 do
     case $parameter in
         p)
@@ -228,9 +228,6 @@ do
                 DIR_BUILD=${DIR_BUILD%/}
             fi
             ;;
-        i)
-            BUILD_TARGET_BINUTILS=1
-            ;;
         C)
             UCLIBC_CONFIG_FILE=$OPTARG
             ;;
@@ -257,7 +254,6 @@ do
 -B BINUTILS_VER  Binutils version (default 2.17).  Can be given once.
 -c GCC_VERSION   GCC version (default 3.4).  Can be given multiple times.
 -H HOST          Build toolchain to run on HOST.
--i               Build binutils libraries for use on the target.
 -l LANGS         Only build specified gcc languages.
 -C FILE          Use FILE as uClibc config file, rather than the default.
 -v               Verbose
@@ -1495,8 +1491,6 @@ rm -rf $DIR_ELF2FLT_BUILD
 ########################### Target binutils ########################
 
 
-if [ $BUILD_TARGET_BINUTILS ]; then
-
 echo -n "*** Building target libbfd (flat)  " ; date
 
 mkdir $DIR_BINUTILS_BUILD
@@ -1545,7 +1539,5 @@ RUN="$MAKE install-bfd install-opcodes install-libiberty"
 (echo $RUN $LOGFILE ; ) | sh
 
 rm -rf $DIR_BINUTILS_BUILD
-
-fi
 
 echo -n "*** Done                           " ; date
