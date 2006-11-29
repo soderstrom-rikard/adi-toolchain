@@ -30,6 +30,7 @@
 #include "sysdep.h"
 #include "bfd.h"
 #include "gdb/callback.h"
+#include "gdb/signals.h"
 #include "bfin-sim.h"
 #include "gdb/sim-bfin.h"
 #include "targ-vals.h"
@@ -38,18 +39,6 @@
 #ifdef _WIN32
 #include <float.h>		/* Needed for _isnan().  */
 #define isnan _isnan
-#endif
-
-#ifndef SIGBUS
-#define SIGBUS SIGSEGV
-#endif
-
-#ifndef SIGQUIT
-#define SIGQUIT SIGTERM
-#endif
-
-#ifndef SIGTRAP
-#define SIGTRAP 5
 #endif
 
 /* Define the rate at which the simulator should poll the host
@@ -97,7 +86,7 @@ raise_exception (int x)
 void
 raise_buserror ()
 {
-  raise_exception (SIGBUS);
+  raise_exception (TARGET_SIGNAL_BUS);
 }
 
 static int
@@ -125,7 +114,7 @@ bfin_trap ()
   switch (sys)
     {
     case TARGET_SYS_exit:
-      saved_state.exception = SIGQUIT;
+      saved_state.exception = TARGET_SIGNAL_QUIT;
       DREG (0) = get_long (saved_state.memory, args);
       return;
     case TARGET_SYS_open:
@@ -205,7 +194,7 @@ bfin_trap ()
 void
 control_c (int sig)
 {
-  raise_exception (SIGINT);
+  raise_exception (TARGET_SIGNAL_INT);
 }
 
 /* Set the memory size to the power of two provided. */
@@ -246,7 +235,7 @@ init_pointers ()
 int
 sim_stop (SIM_DESC sd)
 {
-  raise_exception (SIGINT);
+  raise_exception (TARGET_SIGNAL_INT);
   return 1;
 }
 
@@ -301,7 +290,7 @@ sim_resume (SIM_DESC sd, int step, int siggnal)
 	  step--;
 	}
       /* Emulate a hardware single step ... raise an exception */
-      saved_state.exception = SIGTRAP;
+      saved_state.exception = TARGET_SIGNAL_TRAP;
     }
   else
     while (saved_state.exception == 0)
@@ -352,7 +341,7 @@ sim_trace (SIM_DESC sd)
 void
 sim_stop_reason (SIM_DESC sd, enum sim_stop *reason, int *sigrc)
 {
-  if (saved_state.exception == SIGQUIT)
+  if (saved_state.exception == TARGET_SIGNAL_QUIT)
     {
       *reason = sim_exited;
       *sigrc = DREG (0);

@@ -1,3 +1,19 @@
+2006-11-29  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/bfin-dis.c (gdb/signals.h): Include it.
+	(SIGTRAP): Don't define.
+	(decode_ProgCtrl_0): Use TARGET_SIGNAL_*.
+	* bfin/interp.c (gdb/signals.h): Include it.
+	(SIGBUS): Don't define.
+	(SIGQUIT): Likewise.
+	(SIGTRAP): Likewise.
+	(raise_exception): Use TARGET_SIGNAL_*.
+	(bfin_trap): Likewise.
+	(control_c): Likewise.
+	(sim_stop): Likewise.
+	(sim_resume): Likewise.
+	(sim_stop_reason): Likewise.
+	
 2006-11-28  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* bfin/bfin-dis.c [SIGTRAP]: Define to 5 if not already defined.

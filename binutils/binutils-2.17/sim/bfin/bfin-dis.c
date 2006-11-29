@@ -25,12 +25,10 @@
 #include <string.h>
 #include <signal.h>
 
+#include "gdb/signals.h"
 #include "opcode/bfin.h"
 #include "bfin-sim.h"
 
-#ifndef SIGTRAP
-# define SIGTRAP 5
-#endif
 
 #define M_S2RND 1
 #define M_T     2
@@ -899,7 +897,7 @@ decode_ProgCtrl_0 (bu16 iw0)
     {
       /* EXCPT uimm4 */
       if(uimm4 (poprnd) == 1)
-        raise_exception(SIGTRAP);
+        raise_exception(TARGET_SIGNAL_TRAP);
       else
 	unhandled_instruction ("unhandled exception");
     }
