@@ -28,6 +28,10 @@
 #include "opcode/bfin.h"
 #include "bfin-sim.h"
 
+#ifndef SIGTRAP
+# define SIGTRAP 5
+#endif
+
 #define M_S2RND 1
 #define M_T     2
 #define M_W32   3
