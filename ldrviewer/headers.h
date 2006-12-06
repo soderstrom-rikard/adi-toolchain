@@ -30,7 +30,12 @@
 #include <getopt.h>
 #include <termios.h>
 #include <sys/stat.h>
-#include <endian.h>
+
+#if defined(__linux__)
+# include <endian.h>
+#elif defined(__FreeBSD__)
+# include <sys/endian.h>
+#endif
 
 #ifndef BYTE_ORDER
 # error unable to detect endian
