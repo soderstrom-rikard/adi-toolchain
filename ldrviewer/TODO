@@ -6,4 +6,6 @@ Add support for reading LDR files in Motorola s-record format:
 
 Allow people creating LDR images to specify SDRAM specs.
 
+Rename to "ldr-utils"
+
 Document/comment more things
