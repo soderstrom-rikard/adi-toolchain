@@ -3,6 +3,15 @@
 	* config/bfin/bfin.c (bfin_valid_add): Fix the logic that ensures
 	multiword accesses are in range.
 
+	* config/bfin/bfin.c (effective_address_32bit_p): Return true for
+	anything involving the GOT.
+	(bfin_adjust_cost): Don't take the REGNO of a MEM.
+	(trapping_loads_p): Look inside the pattern of an insn to find the
+	SET.
+	* config/bfin/bfin.md (attr "type"): Add movcc.
+	(insn_reservation "alu"): Likewise.
+	(movsicc_insn1, movsicc_insn2): Change type to movcc.
+
 2006-11-22  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c: Cosmetic changes throughout to match mainline
