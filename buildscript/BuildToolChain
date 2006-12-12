@@ -38,6 +38,7 @@ APP_NAME=${APP_NAME#/}
 #TIMESTAMP=`date +%Y-%b-%d-%H-%M` # is YYYY_MMM_DD_HH_MM
 TIMESTAMP=`date +%Y%m%d`       # is YYYY_MMM_DD
 
+PREREQ_FILE="autoconf automake bison flex gcc gettext grep ln m4 make makeinfo msgfmt which mv cp rm grep echo mkdir tail"
 BINUTILS_VERSION=2.17
 GCC_VERSIONS=
 
@@ -46,7 +47,7 @@ do
     case $parameter in
         p)
             echo "Check http://gcc.gnu.org/install/prerequisites.html for more information"
-            for file in autoconf automake bison flex gcc gettext grep ln m4 make makeinfo msgfmt
+            for file in $PREREQ_FILE
             do
                 RUN=`which -a $file | wc -w`
                 if [ $RUN -eq 0 ] ; then
@@ -285,9 +286,7 @@ fi
 
 ############ Check and error if I can't find the things I need #
 
-for PREREQ in which ln mv cp rm grep echo mkdir tail gcc \
-              "$MAKE" autoconf m4 automake gettext msgfmt \
-              bison flex
+for PREREQ in $PREREQ_FILE $MAKE
 do
     RUN=`which -a $PREREQ | wc -w`
     if [ $RUN -eq 0 ] ; then
