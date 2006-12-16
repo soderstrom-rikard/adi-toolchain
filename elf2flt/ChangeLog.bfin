@@ -1,3 +1,7 @@
+2006-12-16  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* Makefile.in: Drop -s flag to $(INSTALL).
+
 2006-11-14  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* flthdr.c: Add support for WIN32/MINGW based on upstream CVS.
