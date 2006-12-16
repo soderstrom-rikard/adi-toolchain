@@ -40,3 +40,24 @@ int parse_bool(const char *boo)
 		return 0;
 	err("Invalid boolean: '%s'", boo);
 }
+
+ssize_t read_retry(int fd, void *buf, size_t count)
+{
+	ssize_t ret = 0, temp_ret;
+	while (count > 0) {
+		temp_ret = read(fd, buf, count);
+		if (temp_ret > 0) {
+			ret += temp_ret;
+			buf += temp_ret;
+			count -= temp_ret;
+		} else if (temp_ret == 0) {
+			break;
+		} else {
+			if (errno == EINTR)
+				continue;
+			ret = -1;
+			break;
+		}
+	}
+	return ret;
+}

@@ -41,5 +41,6 @@ extern const char *argv0;
 void *xmalloc(size_t);
 void *xrealloc(void *, size_t);
 int parse_bool(const char *);
+ssize_t read_retry(int, void *, size_t);
 
 #endif

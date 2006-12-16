@@ -379,7 +379,7 @@ canned_failure:
 	printf("OK!\n");
 
 	printf("Trying to read autobaud ... ");
-	ret = read(fd, autobaud, 4);
+	ret = read_retry(fd, autobaud, 4);
 	if (ret != 4)
 		goto canned_failure;
 	printf("OK!\n");

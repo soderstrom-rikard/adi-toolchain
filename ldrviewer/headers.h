@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+#include <errno.h>
 #include <assert.h>
 #include <stdint.h>
 #include <sys/types.h>
