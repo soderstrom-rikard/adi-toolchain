@@ -341,6 +341,40 @@ static inline size_t _tty_get_baud(const int fd)
 }
 
 /*
+ * _tty_init()
+ * Make sure the tty we're going to be working with is properly setup.
+ *  - make sure we are not running in ICANON mode
+ *  - set speed to 115200 so transfers go fast
+ */
+#define DEFAULT_SPEED B115200 /*B57600*/
+static inline int _tty_init(const int fd)
+{
+	struct termios term;
+	if (verbose)
+		printf("[getattr] ");
+	if (tcgetattr(fd, &term))
+		return 1;
+	term.c_iflag &= ~(BRKINT | ICRNL);
+	term.c_iflag |= (IGNBRK | IXOFF);
+	term.c_oflag &= ~(OPOST | ONLCR);
+	term.c_lflag &= ~(ISIG | ICANON | ECHO | IEXTEN);
+	if (verbose)
+		printf("[setattr] ");
+	if (tcsetattr(fd, TCSANOW, &term))
+		return 1;
+	if (verbose)
+		printf("[speed] ");
+	if (cfgetispeed(&term) != DEFAULT_SPEED || cfgetospeed(&term) != DEFAULT_SPEED) {
+		/* TODO: add a runtime switch for users to control this */
+		if (cfsetispeed(&term, DEFAULT_SPEED) || cfsetospeed(&term, DEFAULT_SPEED))
+			return 1;
+		if (tcsetattr(fd, TCSANOW, &term))
+			return 1;
+	}
+	return 0;
+}
+
+/*
  * ldr_send()
  * Transmit the specified ldr over the serial line to a BF537.  Used when
  * you want to boot over the UART.
@@ -371,6 +405,12 @@ canned_failure:
 		return -1;
 	}
 	printf("OK!\n");
+
+	printf("Configuring terminal I/O ... ");
+	if (_tty_init(fd))
+		perror("skipping");
+	else
+		printf("OK!\n");
 
 	printf("Trying to send autobaud ... ");
 	ret = write(fd, "@", 1);
