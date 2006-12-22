@@ -43,7 +43,7 @@ struct ldr_flag ldr_bf537_flag_list[] = {
 };
 
 /*
- *
+ * Parse a string like 'BF###' or just '###' into an acceptable cpu integer
  */
 int str2bfcpu(const char *cpu)
 {

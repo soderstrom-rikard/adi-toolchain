@@ -1,3 +1,22 @@
+/*
+ * File:         elf.c
+ * Author:       Mike Frysinger <michael.frysinger@analog.com>
+ *
+ * Description:  Abstract away ELF details here
+ *
+ * Rev:          $Id$
+ *
+ * Modified:     Copyright 2006 Analog Devices Inc.
+ *
+ * Bugs:         Enter bugs at http://blackfin.uclinux.org/
+ *
+ * Licensed under the GPL-2, see the file COPYING in this dir
+ */
+
+/* TODO: this only handles 32bit ELFs
+ * TODO: this only handles 1 ELF at a time (do_reverse_endian is per-process, not per-elf)
+ */
+
 #include "headers.h"
 #include "helpers.h"
 #include "elf.h"
