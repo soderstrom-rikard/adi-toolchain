@@ -29,6 +29,7 @@ extern const char *argv0;
 #define warn(fmt, args...) \
 	fprintf(stderr, "%s: " fmt "\n", argv0 , ## args) 
 #define warnf(fmt, args...) warn("%s(): " fmt, __FUNCTION__ , ## args)
+#define warnp(fmt, args...) warn(fmt ": %s" , ## args , strerror(errno))
 #define _err(wfunc, fmt, args...) \
 	do { \
 		wfunc(fmt, ## args); \
@@ -36,6 +37,7 @@ extern const char *argv0;
 	} while (0)
 #define err(fmt, args...) _err(warn, fmt, ## args)
 #define errf(fmt, args...) _err(warnf, fmt, ## args)
+#define errp(fmt, args...) _err(warnp, fmt , ## args)
 
 
 void *xmalloc(size_t);

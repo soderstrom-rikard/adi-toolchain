@@ -57,12 +57,13 @@ typedef struct {
 } LDR;
 
 struct ldr_create_options {
-	char *init_file;
+	int cpu;
 	int resvec;
 	char port;
 	int gpio;
 };
 
+int str2bfcpu(const char *cpu);
 
 LDR *ldr_read(const char *);
 void ldr_free(LDR *);

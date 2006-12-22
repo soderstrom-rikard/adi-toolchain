@@ -1,4 +1,5 @@
+elf.o: elf.c headers.h helpers.h elf.h
 helpers.o: helpers.c headers.h helpers.h
 ldr.o: ldr.c headers.h helpers.h ldr.h dxes.h dxe_jump.h \
-  blackfin_defines.h dxe_sdram_init.h
+  blackfin_defines.h dxe_sdram_init.h elf.h
 ldrviewer.o: ldrviewer.c headers.h helpers.h ldr.h

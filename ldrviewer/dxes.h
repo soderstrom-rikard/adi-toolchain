@@ -18,6 +18,5 @@
 #define __DXES_H__
 
 #include "dxe_jump.h"
-#include "dxe_sdram_init.h"
 
 #endif

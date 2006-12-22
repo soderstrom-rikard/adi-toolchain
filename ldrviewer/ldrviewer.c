@@ -63,7 +63,7 @@ static struct option_help const opts_help[] = {
 	{"Show details of a LDR",         "<ldrs>"},
 	{"Break DXEs out of LDR",         "<ldrs>"},
 	{"Load LDR over UART to a BF537", "<ldr> <tty>"},
-	{"Create LDR from binaries",      "<ldr> <bins>"},
+	{"Create LDR from binaries",      "<ldr> <elfs>"},
 	{"Ignore errors",                 NULL},
 	{"Make a lot of noise",           NULL},
 	{"Only show errors",              NULL},
@@ -73,10 +73,9 @@ static struct option_help const opts_help[] = {
 };
 #define show_usage(status) show_some_usage(long_opts, opts_help, PARSE_FLAGS, status)
 
-#define CREATE_PARSE_FLAGS "i:rp:g:h"
+#define CREATE_PARSE_FLAGS "rp:g:hC:"
 static struct option const create_long_opts[] = {
-	/*{"cpu",       a_argument, NULL, 'C'},*/
-	{"init",      a_argument, NULL, 'i'},
+	{"cpu",       a_argument, NULL, 'C'},
 	{"resvec",   no_argument, NULL, 'r'},
 	{"port",      a_argument, NULL, 'p'},
 	{"gpio",      a_argument, NULL, 'g'},
@@ -84,8 +83,7 @@ static struct option const create_long_opts[] = {
 	{NULL,       no_argument, NULL, 0x0}
 };
 static struct option_help const create_opts_help[] = {
-	/*{"Select target CPU type",        "<BFXXX>"},*/
-	{"Control optional init code",    "<NONE|file>"},
+	{"Select target CPU type",        "<BFXXX>"},
 	{"Enable resvec bit",             NULL},
 	{"Select port for HWAIT signal",  "<F|G|H>"},
 	{"Select GPIO for HWAIT signal",  "<#>"},
@@ -139,7 +137,7 @@ static void create_ldr(int argc, char *argv[])
 {
 	int i;
 	struct ldr_create_options opts = {
-		.init_file = (char*)-1,
+		.cpu = 0,
 		.resvec = 0,
 		.port = '?',
 		.gpio = 0,
@@ -148,7 +146,7 @@ static void create_ldr(int argc, char *argv[])
 	optind = 0;
 	while ((i=getopt_long(argc, argv, CREATE_PARSE_FLAGS, create_long_opts, NULL)) != -1) {
 		switch (i) {
-			case 'i': opts.init_file = (strcmp("NONE", optarg) == 0 ? NULL : optarg); break;
+			case 'C': opts.cpu = str2bfcpu(optarg); break;
 			case 'r': opts.resvec = 1; break;
 			case 'p': opts.port = toupper(optarg[0]); break;
 			case 'g': opts.gpio = atoi(optarg); break;
@@ -159,7 +157,9 @@ static void create_ldr(int argc, char *argv[])
 		}
 	}	
 	if (argc < optind + 2)
-		err("Create requires at least two arguments: <ldr> <bins>");
+		err("Create requires at least two arguments: <ldr> <elfs>");
+	if (opts.cpu < 0)
+		err("Invalid CPU selection '%i'.", opts.cpu);
 	if (strchr("?FGH", opts.port) == NULL)
 		err("Invalid PORT '%c'.  Valid PORT values are 'F', 'G', and 'H'.", opts.port);
 	if (opts.gpio < 0 || opts.gpio > 16)

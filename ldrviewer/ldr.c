@@ -19,6 +19,7 @@
 #include "helpers.h"
 #include "ldr.h"
 #include "dxes.h"
+#include "elf.h"
 
 struct ldr_flag {
 	uint16_t flag;
@@ -41,6 +42,36 @@ struct ldr_flag ldr_bf537_flag_list[] = {
 	{ 0, 0 }
 };
 
+/*
+ *
+ */
+int str2bfcpu(const char *cpu)
+{
+	int cpunum;
+	char tmp;
+
+	if (strlen(cpu) >= 2 && (cpu[0] == 'B' || cpu[0] == 'b') && (cpu[1] == 'F' || cpu[1] == 'f'))
+		cpu += 2;
+	if (sscanf(cpu, "%i%c", &cpunum, &tmp) == 2)
+		return -1;
+	if (sscanf(cpu, "%i", &cpunum) != 1)
+		return -2;
+
+	switch (cpunum) {
+		case 531:
+		case 532: 
+		case 533:
+		case 534:
+		case 535:
+		case 536:
+		case 537:
+		case 561:
+			return cpunum;
+	}
+
+	return -cpunum;
+}
+
 
 /*
  * _ldr_read_bin()
@@ -62,6 +93,9 @@ struct ldr_flag ldr_bf537_flag_list[] = {
  * [data]
  * If the zero flag is set, there is no actual data section, otherwise
  * the data block will be [byte count] bytes long.
+ *
+ * TODO: The BF561 has a 4 byte global header prefixed to the LDR
+ *       which we do not handle here.
  */
 static LDR *_ldr_read_bin(FILE *fp)
 {
@@ -473,8 +507,8 @@ canned_failure:
  */
 #define LDR_ADDR_IGNORE  0xFF800040
 #define LDR_ADDR_INIT    0xFFA00000
-#define LDR_ADDR_SDRAM   0x1000 /* XXX: should make this configurable */
-#define LDR_BLOCK_SIZE   0x8000 /* XXX: should make this configurable */
+#define LDR_ADDR_SDRAM   0x1000 /* TODO: should make this configurable */
+#define LDR_BLOCK_SIZE   0x8000 /* TODO: should make this configurable */
 static void _ldr_write_block(const int fd, BLOCK b)
 {
 	ldr_make_little_endian_32(b.target_address);
@@ -483,8 +517,11 @@ static void _ldr_write_block(const int fd, BLOCK b)
 	write(fd, &b.target_address, sizeof(b.target_address));
 	write(fd, &b.byte_count, sizeof(b.byte_count));
 	write(fd, &b.flags, sizeof(b.flags));
-	if (b.data)
-		write(fd, b.data, b.byte_count);
+	if (b.data) {
+		ssize_t ret = write(fd, b.data, b.byte_count);
+		if (ret < 0)
+			printf("[write() failed: %s] ", strerror(errno));
+	}
 }
 #define _ldr_quick_write_block(fd, _target_address, _byte_count, _flags, _data) \
 	do { \
@@ -546,12 +583,14 @@ int ldr_create(char **filelist, struct ldr_create_options *opts)
 {
 	uint16_t base_flags;
 	uint8_t *jump_bin = dxe_jump_code(LDR_ADDR_SDRAM);
-	uint8_t *sdram_init_bin = dxe_sdram_init_code(mem_SDRRC, mem_SDBCTL, mem_SDGCTL);
+	elfobj *elf;
+	uint8_t *dxe_init_start, *dxe_init_end;
 	const char *outfile = filelist[0];
+	char *tmpfile;
 	size_t i = 0;
 	int fd;
 
-	fd = open(outfile, O_WRONLY|O_CREAT| (force?0:O_EXCL), 00660);
+	fd = open(outfile, O_WRONLY|O_CREAT|O_TRUNC| (force?0:O_EXCL), 00660);
 	if (fd == -1)
 		return -1;
 
@@ -568,30 +607,59 @@ int ldr_create(char **filelist, struct ldr_create_options *opts)
 	if (!quiet)
 		printf(" Base flags: 0x%X\n", base_flags);
 
-	/* first write out the DXE to init the hardware */
-	if (opts->init_file == (char*)-1) {
-		if (!quiet)
-			printf(" Adding basic init DXE 'sdram init' ... ");
-		_ldr_quick_write_block(fd, LDR_ADDR_IGNORE, 0x4, base_flags|LDR_FLAG_IGNORE, (uint8_t*)"\0\0\0\0");
-		_ldr_quick_write_block(fd, LDR_ADDR_INIT, DXE_SDRAM_INIT_CODE_SIZE, base_flags|LDR_FLAG_INIT, sdram_init_bin);
-		if (!quiet)
-			printf("OK!\n");
-	} else if (opts->init_file != NULL) {
-		if (!quiet)
-			printf(" Adding custom init DXE '%s' ... ", opts->init_file);
-		_ldr_quick_write_block(fd, LDR_ADDR_IGNORE, 0x4, base_flags|LDR_FLAG_IGNORE, (uint8_t*)"\0\0\0\0");
-		if (_ldr_copy_file_to_block(fd, opts->init_file, LDR_ADDR_INIT, base_flags|LDR_FLAG_INIT) == -1) {
-			printf("Unable to copy '%s' to output\n", opts->init_file);
-			return -1;
-		}
-		if (!quiet)
-			printf("OK!\n");
+	if (opts->cpu == 561) {
+		/* BF561 requires a 4 byte 'global' header for external memory */
+		/* TODO: allow users to control this */
+		uint8_t bf561_global_block[4] = { 0xDF, 0x00, 0x00, 0xA0 };
+		if (write(fd, bf561_global_block, 4) != 4)
+			errp("Could not write 4 byte global header for BF561");
 	}
 
-	/* then write out one DXE per file given to us */
+	/* write out one DXE per ELF given to us */
 	while (filelist[++i]) {
 		if (!quiet)
 			printf(" Adding DXE '%s' ... ", filelist[i]);
+
+		/* TODO: for the BF561, we need to output a 32bit byte count DXE block */
+		if (opts->cpu == 561) {
+			/*
+			_ldr_quick_write_block(fd, LDR_ADDR_IGNORE, 0x4, base_flags|LDR_FLAG_IGNORE, buf);
+			*/
+			printf("[Skipping 32bit byte count DXE block] ");
+		}
+
+		/* if the ELF has ldr init markers, let's pull the code out */
+		elf = elf_open(filelist[i]);
+		if (elf == NULL) {
+			printf(" '%s' is not an ELF!\n", filelist[i]);
+			continue;
+		}
+		dxe_init_start = elf_lookup_symbol(elf, "dxe_init_start");
+		dxe_init_end = elf_lookup_symbol(elf, "dxe_init_end");
+		if (dxe_init_start != dxe_init_end) {
+			if (!quiet)
+				printf("[init block %zi] ", (size_t)(dxe_init_end - dxe_init_start));
+			_ldr_quick_write_block(fd, LDR_ADDR_IGNORE, 0x4, base_flags|LDR_FLAG_IGNORE, (uint8_t*)"\0\0\0\0");
+			_ldr_quick_write_block(fd, LDR_ADDR_INIT, (dxe_init_end-dxe_init_start), base_flags|LDR_FLAG_INIT, dxe_init_start);
+		}
+		elf_close(elf);
+
+		/* convert the ELF to a binary */
+		tmpfile = xmalloc(strlen(filelist[i])+sizeof(".tmp..bin"));
+		sprintf(tmpfile, ".tmp.%s.bin", filelist[i]);
+		if (fork()) {
+			int status;
+			wait(&status);
+			if (status) {
+				printf("[objcopy exit (%i)] ", status);
+				free(tmpfile);
+				return -1;
+			}
+		} else {
+			execlp("bfin-uclinux-objcopy", "bfin-uclinux-objcopy", "-O", "binary", filelist[i], tmpfile, NULL);
+			printf("[objcopy failed (%s)] ", strerror(errno));
+			exit(1);
+		}
 
 		/* write out two blocks: ignore followed by jump code */
 		if (!quiet)
@@ -602,10 +670,15 @@ int ldr_create(char **filelist, struct ldr_create_options *opts)
 		/* write out third (and last block) for the actual file */
 		if (!quiet)
 			printf("[file blocks] ");
-		if (_ldr_copy_file_to_block(fd, filelist[i], LDR_ADDR_SDRAM, base_flags|(filelist[i+1] == NULL ? LDR_FLAG_FINAL : 0)) == -1) {
+		if (_ldr_copy_file_to_block(fd, tmpfile, LDR_ADDR_SDRAM, base_flags|(filelist[i+1] == NULL ? LDR_FLAG_FINAL : 0)) == -1) {
 			printf("Unable to copy '%s' to output\n", filelist[i]);
+			unlink(tmpfile);
+			free(tmpfile);
 			return -1;
 		}
+
+		unlink(tmpfile);
+		free(tmpfile);
 
 		if (!quiet)
 			printf("OK!\n");
