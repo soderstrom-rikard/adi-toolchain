@@ -1435,12 +1435,11 @@ if [ $KERNEL_SOURCE ] ; then
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh
 
-        RUN="$MAKE stamp_config"
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo $RUN $LOGFILE ; ) | sh
-
+        # the actual config file here doesnt matter since we
+        # just want to build the mkimage and gen_eth_addr tools
+        touch include/config.mk
         echo -n "*** Make U-Boot                    " ; date
-        RUN="$MAKE tools "
+        RUN="$MAKE tools BIN_FILES='mkimage gen_eth_addr' "
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh
 
