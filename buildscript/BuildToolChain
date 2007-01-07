@@ -802,8 +802,7 @@ run_tests ()
 build_uClibc()
 {
     ARGS="CROSS=bfin-elf- PREFIX=$2 DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ KERNEL_SOURCE=$KERNEL_SOURCE ROOTDIR=$UCLINUX_ROOT"
-    #ARGS="CROSS=bfin-elf- PREFIX=$2 DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ KERNEL_SOURCE=$DIR_KBUILD_OUTPUT/usr 
-ROOTDIR=$UCLINUX_ROOT"
+    #ARGS="CROSS=bfin-elf- PREFIX=$2 DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ KERNEL_SOURCE=$DIR_KBUILD_OUTPUT/usr ROOTDIR=$UCLINUX_ROOT"
     echo -n "*** Cleaning uClibc                " ; date
     RUN="$MAKE clean $ARGS"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
