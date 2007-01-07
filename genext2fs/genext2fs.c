@@ -4,6 +4,8 @@
 // ext2 filesystem generator for embedded systems
 // Copyright (C) 2000 Xavier Bestel <xavier.bestel@free.fr>
 //
+// Please direct support requests to genext2fs-devel@lists.sourceforge.net
+//
 // 'du' portions taken from coreutils/du.c in busybox:
 //	Copyright (C) 1999,2000 by Lineo, inc. and John Beppu
 //	Copyright (C) 1999,2000,2001 by John Beppu <beppu@codepoet.org>
@@ -51,22 +53,90 @@
 // 			along with -q, -P, -U
 
 
-#define _GNU_SOURCE
+#include <config.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <dirent.h>
-#include <libgen.h>
+
+#if HAVE_SYS_TYPES_H
+# include <sys/types.h>
+#endif
+
+#if HAVE_SYS_STAT_H
+# include <sys/stat.h>
+#endif
+
+#if STDC_HEADERS
+# include <stdlib.h>
+# include <stddef.h>
+#else
+# if HAVE_STDLIB_H
+#  include <stdlib.h>
+# endif
+# if HAVE_STDDEF_H
+#  include <stddef.h>
+# endif
+#endif
+
+#if HAVE_STRING_H
+# if !STDC_HEADERS && HAVE_MEMORY_H
+#  include <memory.h>
+# endif
+# include <string.h>
+#endif
+
+#if HAVE_STRINGS_H
+# include <strings.h>
+#endif
+
+#if HAVE_INTTYPES_H
+# include <inttypes.h>
+#else
+# if HAVE_STDINT_H
+#  include <stdint.h>
+# endif
+#endif
+
+#if HAVE_UNISTD_H
+# include <unistd.h>
+#endif
+
+#if HAVE_DIRENT_H
+# include <dirent.h>
+# define NAMLEN(dirent) strlen((dirent)->d_name)
+#else
+# define dirent direct
+# define NAMLEN(dirent) (dirent)->d_namlen
+# if HAVE_SYS_NDIR_H
+#  include <sys/ndir.h>
+# endif
+# if HAVE_SYS_DIR_H
+#  include <sys/dir.h>
+# endif
+# if HAVE_NDIR_H
+#  include <ndir.h>
+# endif
+#endif
+
+#if HAVE_LIBGEN_H
+# include <libgen.h>
+#endif
+
 #include <stdarg.h>
-#include <unistd.h>
-#include <sys/stat.h>
 #include <assert.h>
 #include <time.h>
 #include <ctype.h>
 #include <errno.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <getopt.h>
+
+#if HAVE_FCNTL_H
+# include <fcntl.h>
+#endif
+
+#if HAVE_GETOPT_H
+# include <getopt.h>
+#endif
+
+#if HAVE_LIMITS_H
+# include <limits.h>
+#endif
 
 struct stats {
 	unsigned long nblocks;
@@ -77,6 +147,7 @@ struct stats {
 
 #define BLOCKSIZE         1024
 #define BLOCKS_PER_GROUP  8192
+#define INODES_PER_GROUP  8192
 /* Percentage of blocks that are reserved.*/
 #define RESERVED_BLOCKS       5/100
 #define MAX_RESERVED_BLOCKS  25/100
@@ -157,7 +228,9 @@ struct stats {
 /* Defines for accessing group details */
 
 // Number of groups in the filesystem
-#define GRP_NBGROUPS(fs) (((fs)->sb.s_blocks_count+(fs)->sb.s_blocks_per_group-1)/(fs)->sb.s_blocks_per_group)
+#define GRP_NBGROUPS(fs) \
+	(((fs)->sb.s_blocks_count - fs->sb.s_first_data_block + \
+	  (fs)->sb.s_blocks_per_group - 1) / (fs)->sb.s_blocks_per_group)
 
 // Get group block bitmap (bbm) given the group number
 #define GRP_GET_GROUP_BBM(fs,grp) ( get_blk((fs),(fs)->gd[(grp)].bg_block_bitmap) )
@@ -203,36 +276,21 @@ typedef unsigned int uint32;
 // overruns. the following macros use it if available or use a
 // hacky workaround
 // moreover it will define a snprintf() like a sprintf(), i.e.
-// without the buffer overrun checking,
-// and the correct getcwd() size argument for automatic allocation,
-// which of course is not the same on Solaris, old glibc and new
-// glibc ...
+// without the buffer overrun checking, to work around bugs in
+// older solaris. Note that this is still not very portable, in that
+// the return value cannot be trusted.
 
-#ifdef __GNUC__
-#if (defined(__sun) && defined(__SVR4)) || defined __APPLE__
-#define SCANF_PREFIX "511"
-#define SCANF_STRING(s) (s = malloc(512))
-#ifdef __APPLE__
-#define GETCWD_SIZE 0
+#if SCANF_CAN_MALLOC
+# define SCANF_PREFIX "a"
+# define SCANF_STRING(s) (&s)
 #else
-#define GETCWD_SIZE 4096
-#define SNPRINTF_STORAGE_CLASS inline
-#endif // defined __APPLE__
-#else
-#define SCANF_PREFIX "a"
-#define SCANF_STRING(s) (&s)
-#define GETCWD_SIZE 0
-#endif // (defined(__sun) && defined(__SVR4)) || defined __APPLE__
-#else
-#define SCANF_PREFIX "511"
-#define SCANF_STRING(s) (s = malloc(512))
-#define GETCWD_SIZE -1
-#define SNPRINTF_STORAGE_CLASS static inline
-#endif // defined __GNUC__
+# define SCANF_PREFIX "511"
+# define SCANF_STRING(s) (s = malloc(512))
+#endif /* SCANF_CAN_MALLOC */
 
-#ifdef SNPRINTF_STORAGE_CLASS
-SNPRINTF_STORAGE_CLASS int
-snprintf(char *str, size_t n, const char *fmt, ...)
+#if PREFER_PORTABLE_SNPRINTF
+static inline int
+portable_snprintf(char *str, size_t n, const char *fmt, ...)
 {
 	int ret;
 	va_list ap;
@@ -241,52 +299,84 @@ snprintf(char *str, size_t n, const char *fmt, ...)
 	va_end(ap);
 	return ret;
 }
-#endif // defined SNPRINTF_STORAGE_CLASS
+# define SNPRINTF portable_snprintf
+#else
+# define SNPRINTF snprintf
+#endif /* PREFER_PORTABLE_SNPRINTF */
 
-#if defined(__APPLE__) && defined(__GNUC__)
-// getline() replacement for Darwin, might work on other systems
-// written according to the getline man page included with Debian Linux
+#if !HAVE_GETLINE
+// getline() replacement for Darwin and Solaris etc.
+// This code uses backward seeks (unless rchunk is set to 1) which can't work
+// on pipes etc. However, add2fs_from_file() only calls getline() for
+// regular files, so a larger rchunk and backward seeks are okay.
+
 ssize_t 
-getline(char **lineptr, size_t *n, FILE *stream)
+getdelim(char **lineptr, size_t *n, int delim, FILE *stream)
 {
-	char *buf = *lineptr;	// could be NULL, in which case we allocate
-	size_t bufsize = *n;	// current buffer size, adjust if we (re)alloc
+	char *p;                    // reads stored here
+	size_t const rchunk = 512;  // number of bytes to read
+	size_t const mchunk = 512;  // number of extra bytes to malloc
+	size_t m = rchunk + 1;      // initial buffer size
 	
-	char *temp = NULL;
-	size_t tempsize = 0;
-	
-	// temp is not a C string and we don't own the buffer it points into
-	// must copy into a malloced buffer and NULL terminate
-	temp = fgetln(stream, &tempsize);
-	if(!temp) return -1;
-	
-	tempsize++; // adjust for NULL terminator
-	if(buf) {
-		// check if we have to reallocate
-		if(bufsize < tempsize) {
-			bufsize = tempsize;
-			buf = (char*)realloc(buf, tempsize);
-			if(!buf) return -1;
+	if (*lineptr) {
+		if (*n < m) {
+			*lineptr = (char*)realloc(*lineptr, m);
+			if (!*lineptr) return -1;
+			*n = m;
 		}
 	} else {
-		bufsize = tempsize;
-		buf = (char*)malloc(bufsize);
-		if(!buf) return -1;
+		*lineptr = (char*)malloc(m);
+		if (!*lineptr) return -1;
+		*n = m;
 	}
-	
-	memcpy(buf, temp, tempsize-1);
-	buf[tempsize-1] = '\0';
-	
-	// give new pointer and size back, nondestructive if we didn't change anything..
-	*n = bufsize;
-	*lineptr = buf;
-	
-	return (ssize_t)(tempsize-1);	// don't include the NULL terminator, per getline man page
+
+	m = 0; // record length including seperator
+
+	do {
+		size_t i;     // number of bytes read etc
+		size_t j = 0; // number of bytes searched
+
+		p = *lineptr + m;
+
+		i = fread(p, 1, rchunk, stream);
+		if (i < rchunk && ferror(stream))
+			return -1;
+		while (j < i) {
+			++j;
+			if (*p++ == (char)delim) {
+				*p = '\0';
+				if (j != i) {
+					if (fseek(stream, j - i, SEEK_CUR))
+						return -1;
+					if (feof(stream))
+						clearerr(stream);
+				}
+				m += j;
+				return m;
+			}
+		}
+
+		m += j;
+		if (feof(stream)) {
+			if (m) return m;
+			if (!i) return -1;
+		}
+
+		// allocate space for next read plus possible null terminator
+		i = ((m + (rchunk + 1 > mchunk ? rchunk + 1 : mchunk) +
+		      mchunk - 1) / mchunk) * mchunk;
+		if (i != *n) {
+			*lineptr = (char*)realloc(*lineptr, i);
+			if (!*lineptr) return -1;
+			*n = i;
+		}
+	} while (1);
 }
-#endif
+#define getline(a,b,c) getdelim(a,b,'\n',c)
+#endif /* HAVE_GETLINE */
 
 // Convert a numerical string to a float, and multiply the result by an
-// SI-style multiplier if provided; supported multipliers are Ki, Mi, Gi, k, M
+// IEC or SI multiplier if provided; supported multipliers are Ki, Mi, Gi, k, M
 // and G.
 
 float
@@ -296,7 +386,11 @@ SI_atof(const char *nptr)
 	float m = 1;
 	char *suffixptr;
 
+#if HAVE_STRTOF
 	f = strtof(nptr, &suffixptr);
+#else
+	f = (float)strtod(nptr, &suffixptr);
+#endif /* HAVE_STRTOF */
 
 	if (*suffixptr) {
 		if (!strcmp(suffixptr, "Ki"))
@@ -677,7 +771,6 @@ is_hardlink(ino_t inode)
 	for(i = 0; i < hdlinks.count; i++) {
 		if(hdlinks.hdl[i].src_inode == inode)
 			return i;
-		
 	}
 	return -1;		
 }
@@ -699,7 +792,7 @@ free_workblk(block b)
 }
 
 /* Rounds qty upto a multiple of siz. siz should be a power of 2 */
-static uint32
+static inline uint32
 rndup(uint32 qty, uint32 siz)
 {
 	return (qty + (siz - 1)) & ~(siz - 1);
@@ -772,9 +865,8 @@ alloc_blk(filesystem *fs, uint32 nod)
 	uint32 bk=0;
 	uint32 grp,nbgroups;
 
-	grp = nod/fs->sb.s_inodes_per_group;
-	nbgroups = ( fs->sb.s_blocks_count - fs->sb.s_first_data_block + fs->sb.s_blocks_per_group -1 ) / 
-					fs->sb.s_blocks_per_group;
+	grp = GRP_GROUP_OF_INODE(fs,nod);
+	nbgroups = GRP_NBGROUPS(fs);
 	if(!(bk = allocate(get_blk(fs,fs->gd[grp].bg_block_bitmap), 0))) {
 		for(grp=0;grp<nbgroups && !bk;grp++)
 			bk=allocate(get_blk(fs,fs->gd[grp].bg_block_bitmap),0);
@@ -806,11 +898,10 @@ free_blk(filesystem *fs, uint32 bk)
 static uint32
 alloc_nod(filesystem *fs)
 {
-	uint32 nod=0,best_group=0;
+	uint32 nod,best_group=0;
 	uint32 grp,nbgroups,avefreei;
 
-	nbgroups = ( fs->sb.s_blocks_count - fs->sb.s_first_data_block + fs->sb.s_blocks_per_group -1 ) / 
-					fs->sb.s_blocks_per_group;
+	nbgroups = GRP_NBGROUPS(fs);
 
 	/* Distribute inodes amongst all the blocks                           */
 	/* For every block group with more than average number of free inodes */
@@ -818,8 +909,9 @@ alloc_nod(filesystem *fs)
 	/* Idea from find_group_dir in fs/ext2/ialloc.c in 2.4.19 kernel      */
 	/* We do it for all inodes.                                           */
 	avefreei  =  fs->sb.s_free_inodes_count / nbgroups;
-	for(grp=0;grp<nbgroups && !nod;grp++) {
-		if (fs->gd[grp].bg_free_inodes_count < avefreei)
+	for(grp=0; grp<nbgroups; grp++) {
+		if (fs->gd[grp].bg_free_inodes_count < avefreei ||
+		    fs->gd[grp].bg_free_inodes_count == 0)
 			continue;
 		if (!best_group || 
 			fs->gd[grp].bg_free_blocks_count > fs->gd[best_group].bg_free_blocks_count)
@@ -851,8 +943,8 @@ print_bm(block b, uint32 max)
 }
 
 // initalize a blockwalker (iterator for blocks list)
-static void
-init_bw(filesystem *fs, uint32 nod, blockwalker *bw)
+static inline void
+init_bw(blockwalker *bw)
 {
 	bw->bnum = 0;
 	bw->bpdir = EXT2_INIT_BLOCK;
@@ -1104,37 +1196,39 @@ extend_blk(filesystem *fs, uint32 nod, block b, int amount)
 	int create = amount;
 	blockwalker bw, lbw;
 	uint32 bk;
-	init_bw(fs, nod, &bw);
+	init_bw(&bw);
 	if(amount < 0)
 	{
-		int i;
+		uint32 i;
 		for(i = 0; i < get_nod(fs, nod)->i_blocks / INOBLK + amount; i++)
 			walk_bw(fs, nod, &bw, 0, 0);
 		while(walk_bw(fs, nod, &bw, &create, 0) != WALK_END)
 			/*nop*/;
 		get_nod(fs, nod)->i_blocks += amount * INOBLK;
-		return;
 	}
-	lbw = bw;
-	while((bk = walk_bw(fs, nod, &bw, 0, 0)) != WALK_END)
-		lbw = bw;
-	bw = lbw;
-	while(create)
+	else
 	{
-		int i, copyb = 0;
-		if(!(fs->sb.s_reserved[200] & OP_HOLES))
-			copyb = 1;
-		else
-			for(i = 0; i < BLOCKSIZE / 4; i++)
-				if(((int32*)(b + BLOCKSIZE * (amount - create)))[i])
-				{
-					copyb = 1;
-					break;
-				}
-		if((bk = walk_bw(fs, nod, &bw, &create, !copyb)) == WALK_END)
-			break;
-		if(copyb)
-			memcpy(get_blk(fs, bk), b + BLOCKSIZE * (amount - create - 1), BLOCKSIZE);
+		lbw = bw;
+		while((bk = walk_bw(fs, nod, &bw, 0, 0)) != WALK_END)
+			lbw = bw;
+		bw = lbw;
+		while(create)
+		{
+			int i, copyb = 0;
+			if(!(fs->sb.s_reserved[200] & OP_HOLES))
+				copyb = 1;
+			else
+				for(i = 0; i < BLOCKSIZE / 4; i++)
+					if(((int32*)(b + BLOCKSIZE * (amount - create)))[i])
+					{
+						copyb = 1;
+						break;
+					}
+			if((bk = walk_bw(fs, nod, &bw, &create, !copyb)) == WALK_END)
+				break;
+			if(copyb)
+				memcpy(get_blk(fs, bk), b + BLOCKSIZE * (amount - create - 1), BLOCKSIZE);
+		}
 	}
 }
 
@@ -1161,7 +1255,7 @@ add2dir(filesystem *fs, uint32 dnod, uint32 nod, const char* name)
 	reclen = sizeof(directory) + rndup(nlen, 4);
 	if(reclen > BLOCKSIZE)
 		error_msg_and_die("bad name '%s' (too long)", name);
-	init_bw(fs, dnod, &bw);
+	init_bw(&bw);
 	while((bk = walk_bw(fs, dnod, &bw, 0, 0)) != WALK_END) // for all blocks in dir
 	{
 		b = get_blk(fs, bk);
@@ -1196,7 +1290,8 @@ add2dir(filesystem *fs, uint32 dnod, uint32 nod, const char* name)
 		}
 	}
 	// we found no free entry in the directory, so we add a block
-	b = get_workblk();
+	if(!(b = get_workblk()))
+		error_msg_and_die("get_workblk() failed.");
 	d = (directory*)b;
 	d->d_inode = nod;
 	node = get_nod(fs, nod);
@@ -1216,7 +1311,7 @@ find_dir(filesystem *fs, uint32 nod, const char * name)
 	blockwalker bw;
 	uint32 bk;
 	int nlen = strlen(name);
-	init_bw(fs, nod, &bw);
+	init_bw(&bw);
 	while((bk = walk_bw(fs, nod, &bw, 0, 0)) != WALK_END)
 	{
 		directory *d;
@@ -1257,7 +1352,7 @@ find_path(filesystem *fs, uint32 nod, const char * name)
 
 // create a simple inode
 static uint32
-mknod_fs(filesystem *fs, uint32 parent_nod, const char *name, uint32 mode, uint16 uid, uint16 gid, uint8 major, uint8 minor, uint32 ctime, uint32 mtime)
+mknod_fs(filesystem *fs, uint32 parent_nod, const char *name, uint16 mode, uint16 uid, uint16 gid, uint8 major, uint8 minor, uint32 ctime, uint32 mtime)
 {
 	uint32 nod;
 	inode *node;
@@ -1332,13 +1427,10 @@ mkfile_fs(filesystem *fs, uint32 parent_nod, const char *name, uint32 mode, size
 	extend_blk(fs, nod, 0, - (int)get_nod(fs, nod)->i_blocks / INOBLK);
 	get_nod(fs, nod)->i_size = size;
 	if (size) {
-		if(!(b = (uint8*)malloc(rndup(size, BLOCKSIZE))))
+		if(!(b = (uint8*)calloc(rndup(size, BLOCKSIZE), 1)))
 			error_msg_and_die("not enough mem to read file '%s'", name);
-		memset(b, 0,rndup(size, BLOCKSIZE));
 		if(f)
 			fread(b, size, 1, f); // FIXME: ugly. use mmap() ...
-		else
-			memset(b, 0, size); // .. or handle b = 0
 		extend_blk(fs, nod, b, rndup(size, BLOCKSIZE) / BLOCKSIZE);
 		free(b);
 	}
@@ -1398,7 +1490,7 @@ get_mode(struct stat *st)
 */
 
 static void
-add2fs_from_file(filesystem *fs, uint32 this_nod, FILE * fh, int squash_uids, int squash_perms, uint32 fs_timestamp, struct stats *stats)
+add2fs_from_file(filesystem *fs, uint32 this_nod, FILE * fh, uint32 fs_timestamp, struct stats *stats)
 {
 	unsigned long mode, uid, gid, major, minor;
 	unsigned long start, increment, count;
@@ -1435,60 +1527,65 @@ add2fs_from_file(filesystem *fs, uint32 this_nod, FILE * fh, int squash_uids, in
 				error_msg("device table line %d skipped: bad format for entry '%s'", lineno, path);
 			continue;
 		}
-		if(stats)
+		mode &= FM_IMASK;
+		path2 = strdup(path);
+		name = basename(path);
+		dir = dirname(path2);
+		if((!strcmp(name, ".")) || (!strcmp(name, "..")))
 		{
-			stats->ninodes += count ? count : 1;
+			error_msg("device table line %d skipped", lineno);
+			continue;
 		}
-		else
+		if(fs)
 		{
-			mode &= FM_IMASK;
-			path2 = strdup(path);
-			name = basename(path);
-			dir = dirname(path2);
 			if(!(nod = find_path(fs, this_nod, dir)))
 			{
 				error_msg("device table line %d skipped: can't find directory '%s' to create '%s''", lineno, dir, name);
 				continue;
 			}
-			if((!strcmp(name, ".")) || (!strcmp(name, "..")))
-			{
-				error_msg("device table line %d skipped", lineno);
+		}
+		else
+			nod = 0;
+		switch (type)
+		{
+			case 'd':
+				mode |= FM_IFDIR;
+				break;
+			case 'f':
+				mode |= FM_IFREG;
+				break;
+			case 'p':
+				mode |= FM_IFIFO;
+				break;
+			case 's':
+				mode |= FM_IFSOCK;
+				break;
+			case 'c':
+				mode |= FM_IFCHR;
+				break;
+			case 'b':
+				mode |= FM_IFBLK;
+				break;
+			default:
+				error_msg("device table line %d skipped: bad type '%c' for entry '%s'", lineno, type, name);
 				continue;
-			}
-	
-			switch (type)
-			{
-				case 'd':
-					mode |= FM_IFDIR;
-					break;
-				case 'f':
-					mode |= FM_IFREG;
-					break;
-				case 'p':
-					mode |= FM_IFIFO;
-					break;
-				case 's':
-					mode |= FM_IFSOCK;
-					break;
-				case 'c':
-					mode |= FM_IFCHR;
-					break;
-				case 'b':
-					mode |= FM_IFBLK;
-					break;
-				default:
-					error_msg("device table line %d skipped: bad type '%c' for entry '%s'", lineno, type, name);
-					continue;
-			}
+		}
+		if(stats) {
+			if(count > 0)
+				stats->ninodes += count - start;
+			else
+				stats->ninodes++;
+		} else {
 			if(count > 0)
 			{
 				char *dname;
-				unsigned i, len;
+				unsigned long i;
+				unsigned len;
 				len = strlen(name) + 10;
 				dname = malloc(len + 1);
 				for(i = start; i < count; i++)
 				{
-					snprintf(dname, len, "%s%u", name, i);
+					SNPRINTF(dname, len, "%s%lu", name, i);
 					mknod_fs(fs, nod, dname, mode, uid, gid, major, minor + (i * increment - start), ctime, mtime);
 				}
 				free(dname);
@@ -1516,7 +1613,7 @@ add2fs_from_dir(filesystem *fs, uint32 this_nod, int squash_uids, int squash_per
 	DIR *dh;
 	struct dirent *dent;
 	struct stat st;
-	uint8 *b;
+	char *lnk;
 	uint32 save_nod;
 
 	if(!(dh = opendir(".")))
@@ -1546,19 +1643,21 @@ add2fs_from_dir(filesystem *fs, uint32 this_nod, int squash_uids, int squash_per
 				case S_IFCHR:
 				case S_IFBLK:
 				case S_IFIFO:
+				case S_IFSOCK:
 					stats->ninodes++;
 					break;
 				case S_IFDIR:
 					stats->ninodes++;
 					if(chdir(dent->d_name) < 0)
 						perror_msg_and_die(dent->d_name);
-					add2fs_from_dir(fs, nod, squash_uids, squash_perms, fs_timestamp, stats);
+					add2fs_from_dir(fs, this_nod, squash_uids, squash_perms, fs_timestamp, stats);
 					chdir("..");
 					break;
 				default:
 					break;
 			}
-		else {
+		else
+		{
 			save_nod = 0;
 			/* Check for hardlinks */
 			if (!S_ISDIR(st.st_mode) && !S_ISLNK(st.st_mode) && st.st_nlink > 1) {
@@ -1572,12 +1671,14 @@ add2fs_from_dir(filesystem *fs, uint32 this_nod, int squash_uids, int squash_per
 			}
 			switch(st.st_mode & S_IFMT)
 			{
+#if HAVE_STRUCT_STAT_ST_RDEV
 				case S_IFCHR:
 					nod = mknod_fs(fs, this_nod, name, mode|FM_IFCHR, uid, gid, st.st_rdev >> 8, st.st_rdev & 0xff, ctime, mtime);
 					break;
 				case S_IFBLK:
 					nod = mknod_fs(fs, this_nod, name, mode|FM_IFBLK, uid, gid, st.st_rdev >> 8, st.st_rdev & 0xff, ctime, mtime);
 					break;
+#endif
 				case S_IFIFO:
 					nod = mknod_fs(fs, this_nod, name, mode|FM_IFIFO, uid, gid, 0, 0, ctime, mtime);
 					break;
@@ -1585,9 +1686,9 @@ add2fs_from_dir(filesystem *fs, uint32 this_nod, int squash_uids, int squash_per
 					nod = mknod_fs(fs, this_nod, name, mode|FM_IFSOCK, uid, gid, 0, 0, ctime, mtime);
 					break;
 				case S_IFLNK:
-					b = xreadlink(dent->d_name);
-					mklink_fs(fs, this_nod, name, st.st_size, b, uid, gid, ctime, mtime);
-					free(b);
+					lnk = xreadlink(dent->d_name);
+					mklink_fs(fs, this_nod, name, st.st_size, (uint8*)lnk, uid, gid, ctime, mtime);
+					free(lnk);
 					break;
 				case S_IFREG:
 					fh = xfopen(dent->d_name, "r");
@@ -1626,10 +1727,11 @@ add2fs_from_dir(filesystem *fs, uint32 this_nod, int squash_uids, int squash_per
 static void
 swap_goodblocks(filesystem *fs, inode *nod)
 {
-	int i,j,done=0;
+	uint32 i,j;
+	int done=0;
 	uint32 *b,*b2;
 
-	int nblk = nod->i_blocks / INOBLK;
+	uint32 nblk = nod->i_blocks / INOBLK;
 	if((nod->i_size && !nblk) || ((nod->i_mode & FM_IFBLK) == FM_IFBLK) || ((nod->i_mode & FM_IFCHR) == FM_IFCHR))
 		for(i = 0; i <= EXT2_TIND_BLOCK; i++)
 			nod->i_block[i] = swab32(nod->i_block[i]);
@@ -1682,10 +1784,11 @@ swap_goodblocks(filesystem *fs, inode *nod)
 static void
 swap_badblocks(filesystem *fs, inode *nod)
 {
-	int i,j,done=0;
+	uint32 i,j;
+	int done=0;
 	uint32 *b,*b2;
 
-	int nblk = nod->i_blocks / INOBLK;
+	uint32 nblk = nod->i_blocks / INOBLK;
 	if((nod->i_size && !nblk) || ((nod->i_mode & FM_IFBLK) == FM_IFBLK) || ((nod->i_mode & FM_IFCHR) == FM_IFCHR))
 		for(i = 0; i <= EXT2_TIND_BLOCK; i++)
 			nod->i_block[i] = swab32(nod->i_block[i]);
@@ -1727,7 +1830,7 @@ swap_badblocks(filesystem *fs, inode *nod)
 static void
 swap_goodfs(filesystem *fs)
 {
-	int i;
+	uint32 i;
 	for(i = 1; i < fs->sb.s_inodes_count; i++)
 	{
 		inode *nod = get_nod(fs, i);
@@ -1735,7 +1838,7 @@ swap_goodfs(filesystem *fs)
 		{
 			blockwalker bw;
 			uint32 bk;
-			init_bw(fs, i, &bw);
+			init_bw(&bw);
 			while((bk = walk_bw(fs, i, &bw, 0, 0)) != WALK_END)
 			{
 				directory *d;
@@ -1756,7 +1859,7 @@ swap_goodfs(filesystem *fs)
 static void
 swap_badfs(filesystem *fs)
 {
-	int i;
+	uint32 i;
 	swap_sb(&fs->sb);
 	for(i=0;i<GRP_NBGROUPS(fs);i++)
 		swap_gd(&(fs->gd[i]));
@@ -1769,7 +1872,7 @@ swap_badfs(filesystem *fs)
 		{
 			blockwalker bw;
 			uint32 bk;
-			init_bw(fs, i, &bw);
+			init_bw(&bw);
 			while((bk = walk_bw(fs, i, &bw, 0, 0)) != WALK_END)
 			{
 				directory *d;
@@ -1786,45 +1889,47 @@ swap_badfs(filesystem *fs)
 static filesystem *
 init_fs(int nbblocks, int nbinodes, int nbresrvd, int holes, uint32 fs_timestamp)
 {
-	int i;
+	uint32 i;
 	filesystem *fs;
 	directory *d;
 	uint8 * b;
-	uint32 nod;
+	uint32 nod, first_block;
 	uint32 nbgroups,nbinodes_per_group,overhead_per_group,free_blocks,
-		free_blocks_per_group,nbblocks_per_group;
-	uint32 gd,itbl,ibmpos,bbmpos,itblpos;
-	int j;
+		free_blocks_per_group,nbblocks_per_group,min_nbgroups;
+	uint32 gdsz,itblsz,bbmpos,ibmpos,itblpos;
+	uint32 j;
 	uint8 *bbm,*ibm;
 	inode *itab0;
 	
 	if(nbresrvd < 0)
-		error_msg_and_die("reserved blocks value is invalid");
-	if(nbinodes < 12)
-		error_msg_and_die("too few inodes");
+		error_msg_and_die("reserved blocks value is invalid. Note: options have changed, see --help or the man page.");
+	if(nbinodes < EXT2_FIRST_INO - 1 + (nbresrvd ? 1 : 0))
+		error_msg_and_die("too few inodes. Note: options have changed, see --help or the man page.");
 	if(nbblocks < 8)
-		error_msg_and_die("too few blocks");
+		error_msg_and_die("too few blocks. Note: options have changed, see --help or the man page.");
 
-	/* nbblocks is the total number of blocks in the filesystem. First
-	 * calculate the size of each group assuming each group has
-	 * BLOCKS_PER_GROUP blocks (which is the maximum). Then recalculate
-	 * blocks per group so that each group (except possibly the last one)
-	 * has the same number of blocks. nbinodes is the total number of
-	 * inodes in the system. These are divided between all groups.
-	 * Then calculate the overhead blocks - inode table blocks, bitmap
-	 * blocks, group descriptor blocks etc. 
+	/* nbinodes is the total number of inodes in the system.
+	 * a block group can have no more than 8192 inodes.
 	 */
-	
-	nbgroups = (nbblocks + BLOCKS_PER_GROUP - 1) / BLOCKS_PER_GROUP;
-	nbblocks_per_group = rndup((nbblocks + nbgroups - 1)/nbgroups, 8);
+	min_nbgroups = (nbinodes + INODES_PER_GROUP - 1) / INODES_PER_GROUP;
+
+	/* nbblocks is the total number of blocks in the filesystem.
+	 * a block group can have no more than 8192 blocks.
+	 */
+	first_block = (BLOCKSIZE == 1024);
+	nbgroups = (nbblocks - first_block + BLOCKS_PER_GROUP - 1) / BLOCKS_PER_GROUP;
+	if(nbgroups < min_nbgroups) nbgroups = min_nbgroups;
+	nbblocks_per_group = rndup((nbblocks - first_block + nbgroups - 1)/nbgroups, 8);
 	nbinodes_per_group = rndup((nbinodes + nbgroups - 1)/nbgroups,
 						(BLOCKSIZE/sizeof(inode)));
 	if (nbinodes_per_group < 16)
 		nbinodes_per_group = 16; //minimum number b'cos the first 10 are reserved
 
-	gd = rndup(nbgroups*sizeof(groupdescriptor),BLOCKSIZE)/BLOCKSIZE;
-	itbl = nbinodes_per_group * sizeof(inode)/BLOCKSIZE;
-	overhead_per_group = 3 /*sb,ibm,bbm*/ + itbl + gd;
+	gdsz = rndup(nbgroups*sizeof(groupdescriptor),BLOCKSIZE)/BLOCKSIZE;
+	itblsz = nbinodes_per_group * sizeof(inode)/BLOCKSIZE;
+	overhead_per_group = 3 /*sb,bbm,ibm*/ + gdsz + itblsz;
+	if((uint32)nbblocks - 1 < overhead_per_group * nbgroups)
+		error_msg_and_die("too much overhead, try fewer inodes or more blocks. Note: options have changed, see --help or the man page.");
 	free_blocks = nbblocks - overhead_per_group*nbgroups - 1 /*boot block*/;
 	free_blocks_per_group = nbblocks_per_group - overhead_per_group;
 
@@ -1837,7 +1942,7 @@ init_fs(int nbblocks, int nbinodes, int nbresrvd, int holes, uint32 fs_timestamp
 	fs->sb.s_r_blocks_count = nbresrvd;
 	fs->sb.s_free_blocks_count = free_blocks;
 	fs->sb.s_free_inodes_count = fs->sb.s_inodes_count - EXT2_FIRST_INO + 1;
-	fs->sb.s_first_data_block = (BLOCKSIZE == 1024);
+	fs->sb.s_first_data_block = first_block;
 	fs->sb.s_log_block_size = BLOCKSIZE >> 11;
 	fs->sb.s_log_frag_size = BLOCKSIZE >> 11;
 	fs->sb.s_blocks_per_group = nbblocks_per_group;
@@ -1848,11 +1953,10 @@ init_fs(int nbblocks, int nbinodes, int nbresrvd, int holes, uint32 fs_timestamp
 	fs->sb.s_lastcheck = fs_timestamp;
 
 	// set up groupdescriptors
-	for(i = 0,bbmpos=2+gd,ibmpos=3+gd,itblpos =4+gd;
+	for(i=0, bbmpos=gdsz+2, ibmpos=bbmpos+1, itblpos=ibmpos+1;
 		i<nbgroups;
-		i++, bbmpos += nbblocks_per_group,ibmpos += nbblocks_per_group, 
-		itblpos += nbblocks_per_group)  {
-		
+		i++, bbmpos+=nbblocks_per_group, ibmpos+=nbblocks_per_group, itblpos+=nbblocks_per_group)
+	{
 		if(free_blocks > free_blocks_per_group) {
 			fs->gd[i].bg_free_blocks_count = free_blocks_per_group;
 			free_blocks -= free_blocks_per_group;
@@ -1890,6 +1994,7 @@ init_fs(int nbblocks, int nbinodes, int nbresrvd, int holes, uint32 fs_timestamp
 		//non-filesystem inodes
 		for(j = fs->sb.s_inodes_per_group+1; j <= BLOCKSIZE * 8; j++)
 			allocate(ibm, j);
+
 		//system inodes
 		if(i == 0)
 			for(j = 1; j < EXT2_FIRST_INO; j++)
@@ -1909,7 +2014,8 @@ init_fs(int nbblocks, int nbinodes, int nbresrvd, int holes, uint32 fs_timestamp
 	itab0[EXT2_ROOT_INO-1].i_size = BLOCKSIZE;
 	itab0[EXT2_ROOT_INO-1].i_links_count = 2;
 
-	b = get_workblk();
+	if(!(b = get_workblk()))
+		error_msg_and_die("get_workblk() failed.");
 	d = (directory*)b;
 	d->d_inode = EXT2_ROOT_INO;
 	d->d_rec_len = sizeof(directory)+4;
@@ -1956,7 +2062,7 @@ load_fs(FILE * fh, int swapit)
 {
 	size_t fssize;
 	filesystem *fs;
-	if((fseek(fh, 0, SEEK_END) < 0) || ((fssize = ftell(fh)) < 0))
+	if((fseek(fh, 0, SEEK_END) < 0) || ((ssize_t)(fssize = ftell(fh)) == -1))
 		perror_msg_and_die("input filesystem image");
 	rewind(fh);
 	fssize = (fssize + BLOCKSIZE - 1) / BLOCKSIZE;
@@ -1985,7 +2091,7 @@ flist_blocks(filesystem *fs, uint32 nod, FILE *fh)
 {
 	blockwalker bw;
 	uint32 bk;
-	init_bw(fs, nod, &bw);
+	init_bw(&bw);
 	while((bk = walk_bw(fs, nod, &bw, 0, 0)) != WALK_END)
 		fprintf(fh, " %d", bk);
 	fprintf(fh, "\n");
@@ -1998,7 +2104,7 @@ list_blocks(filesystem *fs, uint32 nod)
 	int bn = 0;
 	blockwalker bw;
 	uint32 bk;
-	init_bw(fs, nod, &bw);
+	init_bw(&bw);
 	printf("blocks in inode %d:", nod);
 	while((bk = walk_bw(fs, nod, &bw, 0, 0)) != WALK_END)
 		printf(" %d", bk), bn++;
@@ -2012,7 +2118,7 @@ write_blocks(filesystem *fs, uint32 nod, FILE* f)
 	blockwalker bw;
 	uint32 bk;
 	int32 fsize = get_nod(fs, nod)->i_size;
-	init_bw(fs, nod, &bw);
+	init_bw(&bw);
 	while((bk = walk_bw(fs, nod, &bw, 0, 0)) != WALK_END)
 	{
 		if(fsize <= 0)
@@ -2023,41 +2129,6 @@ write_blocks(filesystem *fs, uint32 nod, FILE* f)
 	}
 }
 
-// hexdumps blocks to a FILE*
-static void
-hexdump_blocks(filesystem *fs, uint32 nod, FILE* f)
-{
-	blockwalker bw;
-	uint32 bk;
-	uint8 *b;
-	int32 fsize = get_nod(fs, nod)->i_size;
-	init_bw(fs, nod, &bw);
-	printf("block: offset: data:                                ascii:\n");
-	while((bk = walk_bw(fs, nod, &bw, 0, 0)) != WALK_END)
-	{
-		int i, j;
-		if(fsize <= 0)
-			error_msg_and_die("wrong size while saving inode %d", nod);
-		b = get_blk(fs, bk);
-		for(i = 0; i < 64; i++)
-		{
-			int dmp = 0;
-			for(j = 0; j < 4; j++)
-				if(*(int32*)&b[i * 16 + j * 4])
-					dmp = 1;
-			if(!dmp)
-				continue;
-			printf("%5d:    %03X:", bk, i * 16);
-			for(j = 0; j < 4; j++)
-				printf(" %08x", *(int32*)&b[i * 16 + j * 4]);
-			printf("  ");
-			for(j = 0; j < 16; j++)
-				printf("%c", (b[i * 16 + j] >= ' ' && b[i * 16 + j] < 127) ? b[i * 16 + j] : ' ');
-			printf("\n");
-		}
-		fsize -= BLOCKSIZE;
-	}
-}
 
 // print block/char device minor and major
 static void
@@ -2075,7 +2146,7 @@ print_dir(filesystem *fs, uint32 nod)
 {
 	blockwalker bw;
 	uint32 bk;
-	init_bw(fs, nod, &bw);
+	init_bw(&bw);
 	printf("directory for inode %d:\n", nod);
 	while((bk = walk_bw(fs, nod, &bw, 0, 0)) != WALK_END)
 	{
@@ -2239,7 +2310,7 @@ print_inode(filesystem *fs, uint32 nod)
 static void
 print_fs(filesystem *fs)
 {
-	int i;
+	uint32 i;
 	uint8 *ibm;
 
 	printf("%d blocks (%d free, %d reserved), first data block: %d\n",
@@ -2255,7 +2326,7 @@ print_fs(filesystem *fs)
 	     fs->sb.s_blocks_per_group, fs->sb.s_frags_per_group,
 	     fs->sb.s_inodes_per_group);
 	printf("Size of inode table: %d blocks\n",
-			fs->sb.s_inodes_per_group * sizeof(inode)/BLOCKSIZE);
+		(int)(fs->sb.s_inodes_per_group * sizeof(inode) / BLOCKSIZE));
 	for (i = 0; i < GRP_NBGROUPS(fs); i++) {
 		printf("Group No: %d\n", i+1);
 		printf("block bitmap: block %d,inode bitmap: block %d, inode table: block %d\n",
@@ -2275,7 +2346,7 @@ print_fs(filesystem *fs)
 static void
 dump_fs(filesystem *fs, FILE * fh, int swapit)
 {
-	int nbblocks = fs->sb.s_blocks_count;
+	uint32 nbblocks = fs->sb.s_blocks_count;
 	fs->sb.s_reserved[200] = 0;
 	if(swapit)
 		swap_goodfs(fs);
@@ -2283,6 +2354,55 @@ dump_fs(filesystem *fs, FILE * fh, int swapit)
 		perror_msg_and_die("output filesystem image");
 	if(swapit)
 		swap_badfs(fs);
+}
+
+static void
+populate_fs(filesystem *fs, char **dopt, int didx, int squash_uids, int squash_perms, uint32 fs_timestamp, struct stats *stats)
+{
+	int i;
+	for(i = 0; i < didx; i++)
+	{
+		struct stat st;
+		FILE *fh;
+		int pdir;
+		char *pdest;
+		uint32 nod = EXT2_ROOT_INO;
+		if(fs)
+			if((pdest = strchr(dopt[i], ':')))
+			{
+				*(pdest++) = 0;
+				if(!(nod = find_path(fs, EXT2_ROOT_INO, pdest)))
+					error_msg_and_die("path %s not found in filesystem", pdest);
+			}
+		stat(dopt[i], &st);
+		switch(st.st_mode & S_IFMT)
+		{
+			case S_IFREG:
+				fh = xfopen(dopt[i], "r");
+				add2fs_from_file(fs, nod, fh, fs_timestamp, stats);
+				fclose(fh);
+				break;
+			case S_IFDIR:
+				if((pdir = open(".", O_RDONLY)) < 0)
+					perror_msg_and_die(".");
+				if(chdir(dopt[i]) < 0)
+					perror_msg_and_die(dopt[i]);
+				add2fs_from_dir(fs, nod, squash_uids, squash_perms, fs_timestamp, stats);
+				if(fchdir(pdir) < 0)
+					perror_msg_and_die("fchdir");
+				if(close(pdir) < 0)
+					perror_msg_and_die("close");
+				break;
+			default:
+				error_msg_and_die("%s is neither a file nor a directory", dopt[i]);
+		}
+	}
+}
+
+static void
+showversion(void)
+{
+	printf("genext2fs " VERSION "\n");
 }
 
 static void
@@ -2295,8 +2415,8 @@ showhelp(void)
 	"  -D, --devtable <file>\n"
 	"  -b, --size-in-blocks <blocks>\n"
 	"  -i, --bytes-per-inode <bytes per inode>\n"
-	"  -I, --number-of-inodes <number of inodes>\n"
-	"  -r, --reserved-blocks <number of reserved blocks>\n"
+	"  -N, --number-of-inodes <number of inodes>\n"
+	"  -m, --reserved-percentage <percentage of blocks to reserve>\n"
 	"  -g, --block-map <path>     Generate a block map file for this path.\n"
 	"  -e, --fill-value <value>   Fill unallocated blocks with value.\n"
 	"  -z, --allow-holes          Allow files with holes.\n"
@@ -2305,6 +2425,7 @@ showhelp(void)
 	"  -U, --squash-uids          Squash owners making all files be owned by root.\n"
 	"  -P, --squash-perms         Squash permissions on all files.\n"
 	"  -h, --help\n"
+	"  -V, --version\n"
 	"  -v, --verbose\n\n"
 	"Report bugs to genext2fs-devel@lists.sourceforge.net\n", app_name);
 }
@@ -2323,10 +2444,9 @@ main(int argc, char **argv)
 	int nbblocks = -1;
 	int nbinodes = -1;
 	int nbresrvd = -1;
-	int tmp_nbblocks = -1;
-	int tmp_nbinodes = -1;
 	float bytes_per_inode = -1;
-	uint32 fs_timestamp = -1;
+	float reserved_frac = -1;
+	int fs_timestamp = -1;
 	char * fsout = "-";
 	char * fsin = 0;
 	char * dopt[MAX_DOPT];
@@ -2345,21 +2465,15 @@ main(int argc, char **argv)
 	int c;
 	struct stats stats;
 
-	app_name = argv[0];
-	if (argc == 1)
-	{
-		showhelp();
-		exit(0);
-	}
-
+#if HAVE_GETOPT_LONG
 	struct option longopts[] = {
 	  { "starting-image",	required_argument,	NULL, 'x' },
 	  { "root",		required_argument,	NULL, 'd' },
 	  { "devtable",		required_argument,	NULL, 'D' },
 	  { "size-in-blocks",	required_argument,	NULL, 'b' },
 	  { "bytes-per-inode",	required_argument,	NULL, 'i' },
-	  { "number-of-inodes",	required_argument,	NULL, 'I' },
-	  { "reserved-blocks",	required_argument,	NULL, 'r' },
+	  { "number-of-inodes",	required_argument,	NULL, 'N' },
+	  { "reserved-percentage", required_argument,	NULL, 'm' },
 	  { "block-map",	required_argument,	NULL, 'g' },
 	  { "fill-value",	required_argument,	NULL, 'e' },
 	  { "allow-holes",	no_argument, 		NULL, 'z' },
@@ -2368,11 +2482,19 @@ main(int argc, char **argv)
 	  { "squash-uids",	no_argument,		NULL, 'U' },
 	  { "squash-perms",	no_argument,		NULL, 'P' },
 	  { "help",		no_argument,		NULL, 'h' },
+	  { "version",		no_argument,		NULL, 'V' },
 	  { "verbose",		no_argument,		NULL, 'v' },
 	  { 0, 0, 0, 0}
 	} ;
 
-	while((c = getopt_long(argc, argv, "x:d:D:b:I:i:r:g:e:zfqUPhv", longopts, NULL)) != EOF) {
+	app_name = argv[0];
+
+	while((c = getopt_long(argc, argv, "x:d:D:b:i:N:m:g:e:zfqUPhVv", longopts, NULL)) != EOF) {
+#else
+	app_name = argv[0];
+
+	while((c = getopt(argc, argv,      "x:d:D:b:i:N:m:g:e:zfqUPhVv")) != EOF) {
+#endif /* HAVE_GETOPT_LONG */
 		switch(c)
 		{
 			case 'x':
@@ -2388,11 +2510,11 @@ main(int argc, char **argv)
 			case 'i':
 				bytes_per_inode = SI_atof(optarg);
 				break;
-			case 'I':
+			case 'N':
 				nbinodes = SI_atof(optarg);
 				break;
-			case 'r':
-				nbresrvd = SI_atof(optarg);
+			case 'm':
+				reserved_frac = SI_atof(optarg) / 100;
 				break;
 			case 'g':
 				gopt[gidx++] = optarg;
@@ -2419,18 +2541,23 @@ main(int argc, char **argv)
 			case 'h':
 				showhelp();
 				exit(0);
+			case 'V':
+				showversion();
+				exit(0);
 			case 'v':
 				verbose = 1;
+				showversion();
 				break;
 			default:
-				exit(1);
+				error_msg_and_die("Note: options have changed, see --help or the man page.");
 		}
 	}
 
 	if(optind < (argc - 1))
-		error_msg_and_die("too many arguments");
-	if(optind == (argc - 1))
-		fsout = argv[optind];
+		error_msg_and_die("Too many arguments. Try --help or else see the man page.");
+	if(optind > (argc - 1))
+		error_msg_and_die("Not enough arguments. Try --help or else see the man page.");
+	fsout = argv[optind];
 
 	hdlinks.hdl = (struct hdlink_s *)malloc(hdlink_cnt * sizeof(struct hdlink_s));
 	if (!hdlinks.hdl)
@@ -2450,113 +2577,43 @@ main(int argc, char **argv)
 	}
 	else
 	{
-		stats.ninodes = 0;
-		stats.nblocks = 0;
-#if 0
-		for(i = 0; i < didx; i++)
-		{
-			struct stat st;
-			FILE *fh;
-			char *pdir, *pdest;
-			uint32 nod = EXT2_ROOT_INO;
-			if((pdest = strchr(dopt[i], ':')))
-				*pdest = 0;
-			stat(dopt[i], &st);
-			switch(st.st_mode & S_IFMT)
-			{
-				case S_IFREG:
-					fh = xfopen(dopt[i], "r");
-					add2fs_from_file(fs, nod, fh, squash_uids, squash_perms, 0, &stats);
-					fclose(fh);
-					break;
-				case S_IFDIR:
-					if(!(pdir = getcwd(0, GETCWD_SIZE)))
-						perror_msg_and_die(dopt[i]);
-					if(chdir(dopt[i]) < 0)
-						perror_msg_and_die(dopt[i]);
-					add2fs_from_dir(fs, nod, squash_uids, squash_perms, 0, &stats);
-					if(chdir(pdir) < 0)
-						perror_msg_and_die(pdir);
-					free(pdir);
-					break;
-				default:
-					error_msg_and_die("%s is neither a file nor a directory", dopt[i]);
-			}
-			if(pdest)
-				*pdest = ':';
-		}
+		if(reserved_frac == -1)
+			nbresrvd = nbblocks * RESERVED_BLOCKS;
+		else 
+			nbresrvd = nbblocks * reserved_frac;
 
-		tmp_nbblocks = stats.nblocks; // FIXME: should add space taken by inodes too
-		if(tmp_nbblocks > nbblocks)
-		{
-			fprintf(stderr, "number of blocks too low, increasing to %d\n",tmp_nbblocks);
-			nbblocks = tmp_nbblocks;
-		}
+		stats.ninodes = EXT2_FIRST_INO - 1 + (nbresrvd ? 1 : 0);
+		stats.nblocks = 0;
+
+		populate_fs(NULL, dopt, didx, squash_uids, squash_perms, fs_timestamp, &stats);
+
+		if(nbinodes == -1)
+			nbinodes = stats.ninodes;
+		else
+			if(stats.ninodes > (unsigned long)nbinodes)
+			{
+				fprintf(stderr, "number of inodes too low, increasing to %ld\n", stats.ninodes);
+				nbinodes = stats.ninodes;
+			}
 
 		if(bytes_per_inode != -1) {
-			tmp_nbinodes = nbblocks * BLOCKSIZE / bytes_per_inode;
+			int tmp_nbinodes = nbblocks * BLOCKSIZE / bytes_per_inode;
 			if(tmp_nbinodes > nbinodes)
 				nbinodes = tmp_nbinodes;
 		}
-
-		tmp_nbinodes = stats.ninodes + EXT2_FIRST_INO + 1;
-		if(tmp_nbinodes > nbinodes)
-		{
-			fprintf(stderr, "number of inodes too low, increasing to %d\n",tmp_nbinodes);
-			nbinodes = tmp_nbinodes;
-		}
-#else
-		if(nbinodes == -1) {
-			if(bytes_per_inode == -1)
-				nbinodes = nbblocks / 8;
-			else
-				nbinodes = nbblocks * BLOCKSIZE / bytes_per_inode;
-		}
-#endif
-		if(nbresrvd == -1)
-			nbresrvd = nbblocks * RESERVED_BLOCKS;
 		if(fs_timestamp == -1)
 			fs_timestamp = time(NULL);
 		fs = init_fs(nbblocks, nbinodes, nbresrvd, holes, fs_timestamp);
 	}
-	for(i = 0; i < didx; i++)
-	{
-		struct stat st;
-		FILE *fh;
-		char *pdir, *pdest;
-		uint32 nod = EXT2_ROOT_INO;
-		if((pdest = strchr(dopt[i], ':')))
-		{
-			*(pdest++) = 0;
-			if(!(nod = find_path(fs, EXT2_ROOT_INO, pdest)))
-				error_msg_and_die("path %s not found in filesystem", pdest);
-		}
-		stat(dopt[i], &st);
-		switch(st.st_mode & S_IFMT)
-		{
-			case S_IFREG:
-				fh = xfopen(dopt[i], "r");
-				add2fs_from_file(fs, nod, fh, squash_uids, squash_perms, fs_timestamp, NULL );
-				fclose(fh);
-				break;
-			case S_IFDIR:
-				if(!(pdir = getcwd(0, GETCWD_SIZE)))
-					perror_msg_and_die(dopt[i]);
-				if(chdir(dopt[i]) < 0)
-					perror_msg_and_die(dopt[i]);
-				add2fs_from_dir(fs, nod, squash_uids, squash_perms, fs_timestamp, NULL );
-				if(chdir(pdir) < 0)
-					perror_msg_and_die(pdir);
-				free(pdir);
-				break;
-			default:
-				error_msg_and_die("%s is neither a file nor a directory", dopt[i]);
-		}
+	
+	populate_fs(fs, dopt, didx, squash_uids, squash_perms, fs_timestamp, NULL);
+
+	if(emptyval) {
+		uint32 b;
+		for(b = 1; b < fs->sb.s_blocks_count; b++)
+			if(!allocated(GRP_GET_BLOCK_BITMAP(fs,b),GRP_BBM_OFFSET(fs,b)))
+				memset(get_blk(fs, b), emptyval, BLOCKSIZE);
 	}
-	if(emptyval)
-		for(i = 1; i < fs->sb.s_blocks_count; i++)
-			if(!allocated(GRP_GET_BLOCK_BITMAP(fs,i),GRP_BBM_OFFSET(fs,i)))
-				memset(get_blk(fs, i), emptyval, BLOCKSIZE);
 	if(verbose)
 		print_fs(fs);
 	for(i = 0; i < gidx; i++)
@@ -2569,7 +2626,7 @@ main(int argc, char **argv)
 			error_msg_and_die("path %s not found in filesystem", gopt[i]);
 		while((p = strchr(gopt[i], '/')))
 			*p = '_';
-		snprintf(fname, MAX_FILENAME-1, "%s.blk", gopt[i]);
+		SNPRINTF(fname, MAX_FILENAME-1, "%s.blk", gopt[i]);
 		fh = xfopen(fname, "w");
 		fprintf(fh, "%d:", get_nod(fs, nod)->i_size);
 		flist_blocks(fs, nod, fh);

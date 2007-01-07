@@ -2,7 +2,7 @@
 .\" First parameter, NAME, should be all caps
 .\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
 .\" other parameters are allowed: see man(7), man(1)
-.TH GENEXT2FS 8 "February 22, 2005"
+.TH GENEXT2FS 8 "August 19, 2006"
 .\" Please adjust this date whenever revising the manpage.
 .\"
 .\" Some roff macros, for reference:
@@ -28,6 +28,13 @@ you become the superuser to make device nodes.
 
 The filesystem image is created in the file \fIoutput-image\fP. If not
 specified, it is sent to stdout.
+
+By default, the maximum number of inodes in the filesystem is the minimum
+number required to accommodate the initial contents.
+In this way, a minimal filesystem (typically read-only) can be created with
+minimal free inodes.
+If required, free inodes can be added by passing the relevant options.
+The filesystem image size in blocks can be minimised by trial and error.
 .SH OPTIONS
 .TP
 .BI "\-x, \-\-starting\-image image"
@@ -50,14 +57,14 @@ All specified inodes receive the mtime of \fBspec-file\fP itself.
 .BI "\-b, \-\-size\-in\-blocks blocks"
 Size of the image in blocks.
 .TP
-.BI "\-I, \-\-number\-of\-inodes inodes"
+.BI "\-N, \-\-number\-of\-inodes inodes"
 Maximum number of inodes.
 .TP
 .BI "\-i, \-\-bytes\-per\-inode ratio"
 Used to calculate the maximum number of inodes from the available blocks.
 .TP
-.BI "\-r, \-\-reserved\-blocks reserved"
-Number of reserved blocks. Reserving 0 blocks will prevent creation of the "lost+found" directory.
+.BI "\-m, \-\-reserved\-percentage"
+Number of reserved blocks as a percentage of size. Reserving 0 blocks will prevent creation of the "lost+found" directory.
 .TP
 .BI "\-g, \-\-block\-map path"
 Generate a block map file for this path.
@@ -84,6 +91,9 @@ Squash permissions of inodes added using the -d option. Analogous to
 .TP
 .BI "\-v, \-\-verbose"
 Print resulting filesystem structure.
+.TP
+.BI "\-V, \-\-version"
+Print genext2fs version.
 .TP
 .BI "\-h, \-\-help"
 Display help.
@@ -154,7 +164,7 @@ node /dev/mem (major 1, minor 1), and also creates /dev/tty,
 .BR mkfs(8),
 .BR genromfs(8),
 .BR mkisofs(8),
-.BR mk.jffs2
+.BR mkfs.jffs2(1)
 .br
 .SH AUTHOR
 This manual page was written by David Kimdon <dwhedon@debian.org>,
