@@ -408,6 +408,10 @@ if [ $KERNEL_SOURCE ] ; then
         DIR_uC_OUTPUT=$DIR_BUILD/out-uclinux
     fi
     mk_output_dir "uClinux" $DIR_uC_OUTPUT ""
+    if [ ! $DIR_KBUILD_OUTPUT ] ; then
+        DIR_KBUILD_OUTPUT=$DIR_BUILD/kernel_build
+    fi
+    mk_output_dir "kernel" $DIR_KBUILD_OUTPUT ""
     if [ $DIR_UBOOT ] ; then
       echo -n "Path to U-Boot Source       "
       echo $DIR_UBOOT
@@ -798,6 +802,8 @@ run_tests ()
 build_uClibc()
 {
     ARGS="CROSS=bfin-elf- PREFIX=$2 DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ KERNEL_SOURCE=$KERNEL_SOURCE ROOTDIR=$UCLINUX_ROOT"
+    #ARGS="CROSS=bfin-elf- PREFIX=$2 DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ KERNEL_SOURCE=$DIR_KBUILD_OUTPUT/usr 
+ROOTDIR=$UCLINUX_ROOT"
     echo -n "*** Cleaning uClibc                " ; date
     RUN="$MAKE clean $ARGS"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
@@ -1103,10 +1109,10 @@ if [ $KERNEL_SOURCE ] ; then
 
     cd linux-2.6.x
     RUN="$MAKE CROSS_COMPILE=bfin-elf- prepare"
+    #RUN="$MAKE headers_install INSTALL_HDR_PATH=$DIR_KBUILD_OUTPUT/usr KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
     cd ..
-
 
     ####################### Step 3 - build uClibc ################
     echo -n "*** Configuring uClibc             " ; date
