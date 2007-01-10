@@ -368,7 +368,7 @@ int rresvport(int *alport)
 }
 libc_hidden_def(rresvport)
 
-static int  __check_rhosts_file = 1;
+int  __check_rhosts_file = 1;
 
 int ruserok(rhost, superuser, ruser, luser)
 	const char *rhost, *ruser, *luser;
