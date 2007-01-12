@@ -82,6 +82,9 @@ extern struct elf_resolve * _dl_add_elf_hash_table(const char * libname,
 
 extern char * _dl_find_hash(const char * name, struct dyn_elf * rpnt1,
 			    struct elf_resolve *mytpnt, int type_class);
+extern char * _dl_find_hash_mod(const char * name, struct dyn_elf * rpnt,
+				struct elf_resolve *mytpnt, int type_class,
+				struct elf_resolve **tpntp);
 
 extern int _dl_linux_dynamic_link(void);
 
