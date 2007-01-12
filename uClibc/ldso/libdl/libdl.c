@@ -416,7 +416,20 @@ void *dlsym(void *vhandle, const char *name)
 	ElfW(Addr) from;
 	struct dyn_elf *rpnt;
 	void *ret;
-
+	char tmp_buf[80];
+	char *name2 = tmp_buf;
+#ifndef __UCLIBC_NO_UNDERSCORES__
+	/* Nastiness to support underscore prefixes.  */
+	size_t nlen = strlen (name) + 1;
+	if (nlen + 1 > sizeof (tmp_buf))
+	    name2 = malloc (nlen + 1);
+	if (name2 == 0) {
+	    _dl_error_number = LD_ERROR_MMAP_FAILED;
+	    return 0;
+	}
+	name2[0] = '_';
+	memcpy (name2 + 1, name, nlen);
+#endif
 	handle = (struct dyn_elf *) vhandle;
 
 	/* First of all verify that we have a real handle
@@ -430,7 +443,8 @@ void *dlsym(void *vhandle, const char *name)
 				break;
 		if (!rpnt) {
 			_dl_error_number = LD_BAD_HANDLE;
-			return NULL;
+			ret = NULL;
+			goto out;
 		}
 	} else if (handle == RTLD_NEXT) {
 		/*
@@ -459,6 +473,9 @@ void *dlsym(void *vhandle, const char *name)
 	 */
 	if (!ret)
 		_dl_error_number = LD_NO_SYMBOL;
+out:
+	if (name2 != tmp_buf)
+		free (name2);
 	return ret;
 }
 
