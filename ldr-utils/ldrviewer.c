@@ -33,7 +33,7 @@ static void show_some_usage(struct option const opts[], struct option_help const
 {
 	unsigned long i;
 
-	printf("Usage: ldrviewer [options] <-s|-d|-l|-c> [command options] <arguments>\n\n");
+	printf("Usage: ldr [options] <-s|-d|-l|-c> [command options] <arguments>\n\n");
 	printf("Options: -[%s]\n", flags);
 	for (i=0; opts[i].name; ++i)
 		printf("  -%c, --%-7s %-14s * %s\n",
@@ -175,7 +175,7 @@ static void create_ldr(int argc, char *argv[])
 
 static void show_version(void)
 {
-	printf("ldrviewer-%s: %s compiled %s\n%s\n",
+	printf("ldr-utils-%s: %s compiled %s\n%s\n",
 	       VERSION, __FILE__, __DATE__, rcsid);
 	exit(EXIT_SUCCESS);
 }

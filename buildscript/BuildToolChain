@@ -541,11 +541,11 @@ if [ ! -d $DIR_CRAMFS_SOURCE ] ; then
     exit 1
 fi
 
-echo -n "Path to ldrviewer           "
-DIR_LDRVIEWER_SOURCE=$DIR_SOURCE/ldrviewer
-echo $DIR_LDRVIEWER_SOURCE
-if [ ! -d $DIR_LDRVIEWER_SOURCE ] ; then
-    echo "Can't find ldrviewer source at $DIR_LDRVIEWER_SOURCE"
+echo -n "Path to ldr-utils           "
+DIR_LDR_UTILS_SOURCE=$DIR_SOURCE/ldr-utils
+echo $DIR_LDR_UTILS_SOURCE
+if [ ! -d $DIR_LDR_UTILS_SOURCE ] ; then
+    echo "Can't find ldr-utils source at $DIR_LDR_UTILS_SOURCE"
     exit 1
 fi
 
@@ -1391,38 +1391,38 @@ if [ $KERNEL_SOURCE ] ; then
        fi
     done
 
-	######################## ldrviewer ###########################
+	######################## ldr-utils ###########################
 
-    echo -n "*** Building uClinux ldrviewer      " ; date
-    cd $DIR_LDRVIEWER_SOURCE
+    echo -n "*** Building uClinux ldr-utils      " ; date
+    cd $DIR_LDR_UTILS_SOURCE
 
-    echo -n "*** Cleaning uClinux ldrviewer      " ; date
+    echo -n "*** Cleaning uClinux ldr-utils      " ; date
     RUN="$MAKE clean "
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
-    echo -n "*** Make uClinux ldrviewer          " ; date
+    echo -n "*** Make uClinux ldr-utils          " ; date
     RUN=$MAKE
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
-    for RUN in ldrviewer
+    for RUN in ldr-utils
     do
-        if [ ! -f $DIR_LDRVIEWER_SOURCE/$RUN ] ; then
-            echo "ldrviewer did not build properly : Missing $RUN"
+        if [ ! -f $DIR_LDR_UTILS_SOURCE/$RUN ] ; then
+            echo "ldr-utils did not build properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
             exit 1
         fi
     done
 
-    echo -n "*** Installing uClinux ldrviewer    " ; date
-    mv $DIR_LDRVIEWER_SOURCE/ldrviewer $DIR_uC_OUTPUT/bin/bfin-uclinux-ldrviewer
+    echo -n "*** Installing uClinux ldr-utils    " ; date
+    mv $DIR_LDR_UTILS_SOURCE/ldr $DIR_uC_OUTPUT/bin/bfin-uclinux-ldr
 
-    for RUN in bfin-uclinux-ldrviewer
+    for RUN in bfin-uclinux-ldr
     do
         if [ ! -f $DIR_uC_OUTPUT/bin/$RUN ] ; then
-            echo "ldrviewer did not install properly : Missing $RUN"
+            echo "ldr-utils did not install properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
             exit 1

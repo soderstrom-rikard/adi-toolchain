@@ -1,5 +1,5 @@
 #
-# Makefile for ldrviewer
+# Makefile for ldr-utils
 #
 # Licensed under the GPL-2, see the file COPYING in this dir
 #
@@ -16,9 +16,9 @@ DESTDIR :=
 PREFIX  := /usr
 BINDIR  := $(PREFIX)/bin
 
-all: ldrviewer
+all: ldr
 
-ldrviewer: ldrviewer.o ldr.o helpers.o elf.o
+ldr: ldrviewer.o ldr.o helpers.o elf.o
 
 .depend: $(wildcard *.c *.h)
 	$(CC) $(CPPFLAGS) -MM *.c > .depend
@@ -26,10 +26,10 @@ ldrviewer: ldrviewer.o ldr.o helpers.o elf.o
 INSTALL := install -g 0 -o 0
 install:
 	$(INSTALL) -m 755 -d $(DESTDIR)$(BINDIR)
-	$(INSTALL) -m 755 ldrviewer $(DESTDIR)$(BINDIR)
+	$(INSTALL) -m 755 ldr $(DESTDIR)$(BINDIR)
 
 clean:
-	rm -f *.o *.gdb *.elf ldrviewer
+	rm -f *.o *.gdb *.elf ldr
 
 -include .depend
 

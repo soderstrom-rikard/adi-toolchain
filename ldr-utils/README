@@ -2,7 +2,7 @@
  ABOUT 
 -------
 
-ldrviewer is a simple command line program for handling LDR files.  LDR files 
+ldr-utils is a simple command line program for handling LDR files.  LDR files 
 are a Visual DSP invention for running code on the Blackfin CPU.  Sometimes 
 we need to handle these things in the world of Linux as it is the native 
 executable format for the boot rom built into the Blackfin CPU.
