@@ -70,14 +70,19 @@ const char *_dl_progname = UCLIBC_LDSO;      /* The name of the executable being
 /* Forward function declarations */
 static int _dl_suid_ok(void);
 
+void _dl_debug_state(void);
+rtld_hidden_proto (_dl_debug_state, noinline);
+
 /*
  * This stub function is used by some debuggers.  The idea is that they
  * can set an internal breakpoint on it, so that we are notified when the
  * address mapping is changed in some way.
  */
-void _dl_debug_state(void);
 void _dl_debug_state()
 {
+	/* Make sure GCC doesn't recognize this function as pure, to avoid
+	   having the calls optimized away.  */
+	asm ("");
 }
 
 static unsigned char *_dl_malloc_addr = 0;	/* Lets _dl_malloc use the already allocated memory page */
@@ -990,3 +995,4 @@ _dl_free (void *p) {
 
 #include "dl-hash.c"
 #include "dl-elf.c"
+rtld_hidden_def (_dl_debug_state);
