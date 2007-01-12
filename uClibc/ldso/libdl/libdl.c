@@ -466,7 +466,7 @@ void *dlsym(void *vhandle, const char *name)
 		}
 	}
 
-	ret = _dl_find_hash((char*)name, handle, NULL, 0);
+	ret = _dl_find_hash(name2, handle, NULL, 0);
 
 	/*
 	 * Nothing found.
