@@ -502,7 +502,7 @@ if [ $CHECK_ON_HARDWARE ] ; then
 fi
 
 echo -n "Path to binutils dir        "
-DIR_BINUTILS_SOURCE=$DIR_SOURCE/binutils/binutils-$BINUTILS_VERSION
+DIR_BINUTILS_SOURCE=$DIR_SOURCE/binutils-$BINUTILS_VERSION
 echo $DIR_BINUTILS_SOURCE
 if [ ! -d $DIR_BINUTILS_SOURCE ] ; then
     echo "Can't find binutils source at $DIR_BINUTILS_SOURCE"
