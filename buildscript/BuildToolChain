@@ -1406,7 +1406,7 @@ if [ $KERNEL_SOURCE ] ; then
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
-    for RUN in ldr-utils
+    for RUN in ldr
     do
         if [ ! -f $DIR_LDR_UTILS_SOURCE/$RUN ] ; then
             echo "ldr-utils did not build properly : Missing $RUN"
