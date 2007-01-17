@@ -16,6 +16,9 @@ LINKER="$0.real"            # the original renamed-linker
 ELF2FLT="`expr $0 : '\(.*\)ld'`elf2flt"
 NM="`expr $0 : '\(.*\)ld'`nm"
 TOOLDIR="`dirname $0`"      # let gcc find the tools for us
+OBJCOPY="`expr $0 : '\(.*\)ld'`objcopy"
+[ -f "$OBJCOPY" ] || OBJCOPY="$TOOLDIR/../../bin/@target_alias@-objcopy"
+OBJDUMP="`expr $OBJCOPY : '\(.*\)objcopy'`objdump"
 LDSCRIPTPATH="@binutils_ldscript_dir@"	# and the scripts
 SHARED_ID=""
 NEWLDSCRIPT=""
@@ -104,10 +107,11 @@ then
 		ARG1="$ARG1 $FINAL_ONLY"
 		NEWLDSCRIPT=`mktemp /tmp/flt-XXXXXX`
 		SEDOP=" -e s/^R_RODAT// -e /^W_RODAT/d"
+		OBJCOPYOP=""
 		if [ "$MOVDAT" ]
 		then
 			$LINKER -r -d -o "$OFILE.elf2flt" $ARG1  || exit $?
-			if [ "`@target_alias@-objdump -h "$OFILE.elf2flt" | \
+			if [ "`$OBJDUMP -h "$OFILE.elf2flt" | \
 					egrep -A1 '[.]rodata' | grep RELOC`" ]
 			then
 				echo "warning: .rodata section contains relocations"
@@ -130,6 +134,7 @@ then
 				#    SEDOP="$SEDOP -e 's/ENTRY (_start)/ENTRY (main)/'"
 				SEDOP="$SEDOP -e s/\\(ENTRY.\\)(_start)/\1(lib_main)/"
 				SEDOP="$SEDOP -e s/\\(ENTRY.\\)(__start)/\1(lib_main)/"
+				OBJCOPYOP="--localize-hidden --weaken"
 			fi
 
 			# Provide the magic parameter that defines the library data segment pointer offset
@@ -182,6 +187,10 @@ then
 			$ELF2FLT $FLTFLAGS -o "$OFILE" -p "$OFILE.gdb" "$RFILE" || exit $?
 		else
 			$ELF2FLT $FLTFLAGS -o "$OFILE" -r "$RFILE" || exit $?
+		fi
+		if [ "$OBJCOPYOP" ]
+		then
+		  $OBJCOPY $OBJCOPYOP "$OFILE.gdb" ||exit $?
 		fi
 		[ "$RFILE" = "$OFILE.gdb" ] || rm -f "$RFILE"  # not needed for any reason
 		rm -f "$NEWLDSCRIPT"
