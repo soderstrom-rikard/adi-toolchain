@@ -4,8 +4,7 @@
 #
 # TARGET_alpha is not set
 # TARGET_arm is not set
-# TARGET_bfin is not set
-TARGET_bfinfdpic=y
+TARGET_bfin=y
 # TARGET_cris is not set
 # TARGET_e1 is not set
 # TARGET_frv is not set
@@ -78,6 +77,7 @@ MALLOC=y
 UCLIBC_DYNAMIC_ATEXIT=y
 # COMPAT_ATEXIT is not set
 # UCLIBC_SUSV3_LEGACY is not set
+# UCLIBC_SUSV3_LEGACY_MACROS is not set
 # UCLIBC_HAS_SHADOW is not set
 # UCLIBC_HAS_PROGRAM_INVOCATION_NAME is not set
 UCLIBC_HAS___PROGNAME=y
