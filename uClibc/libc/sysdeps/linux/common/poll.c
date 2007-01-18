@@ -19,10 +19,33 @@
 
 #include <sys/syscall.h>
 #include <sys/poll.h>
+#include <signal.h>
 
 extern __typeof(poll) __libc_poll;
 
-#ifdef __NR_poll
+#ifdef __NR_ppoll
+# define __NR___libc_ppoll __NR_ppoll
+_syscall5(int, __libc_ppoll, struct pollfd *, fds, unsigned long int, nfds, 
+	struct timespec *, timeout, const sigset_t *, sigmask,
+        unsigned long, sigsetsize);
+
+int __libc_poll(struct pollfd *ufds, unsigned long int nfds, int timeout)
+{
+        int result;
+        struct timespec ts;
+
+        ts.tv_sec = timeout/1000;
+        ts.tv_nsec = timeout*1000*1000;
+
+        result = __libc_ppoll(ufds, nfds, &ts, 0, 0);
+
+        return result;
+}
+libc_hidden_proto(ppoll)
+weak_alias(__libc_ppoll,ppoll)
+libc_hidden_weak(ppoll)
+
+#elif defined __NR_poll
 # define __NR___libc_poll __NR_poll
 _syscall3(int, __libc_poll, struct pollfd *, fds,
 	unsigned long int, nfds, int, timeout);
