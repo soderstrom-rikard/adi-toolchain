@@ -1,0 +1,9 @@
+2007-01-19  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	Add several patches from buildroot.
+	* configure: Add a hack to make a configure test for complex numbers
+	fail if __UCLIBC__.
+	* include/ext/rope: Undefine index in case libc defines it as a macro.
+	* libstdc++-v3/include/ext/ropeimpl.h: Likewise.
+	* include/c_std/std_cstdio.h: Enable a block guarded by
+	_GLIBCXX_USE_C99 for __UCLIBC__ as well.
