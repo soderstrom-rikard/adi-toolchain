@@ -215,9 +215,12 @@ ifeq ($(HAVE_SHARED),y)
 	done
 	if [ -f $(top_builddir)lib/libc.so -a -f $(PREFIX)$(RUNTIME_PREFIX)lib/$(SHARED_MAJORNAME) ] ; then \
 		$(RM) $(PREFIX)$(DEVEL_PREFIX)lib/libc.so; \
-		sed -e 's:$(NONSHARED_LIBNAME):$(PREFIX)$(DEVEL_PREFIX)lib/$(MULTILIB)/$(NONSHARED_LIBNAME):' \
-		    -e 's:$(SHARED_MAJORNAME):$(PREFIX)$(RUNTIME_PREFIX)lib/$(SHARED_MAJORNAME):' \
-		    -e 's:$(UCLIBC_LDSO):$(PREFIX)$(RUNTIME_PREFIX)lib/$(UCLIBC_LDSO):' \
+		n1=$(PREFIX)$(DEVEL_PREFIX)lib/$(MULTILIB)/$(NONSHARED_LIBNAME); \
+		n2=$(PREFIX)$(RUNTIME_PREFIX)lib/$(SHARED_MAJORNAME); \
+		n3=$(PREFIX)$(RUNTIME_PREFIX)lib/$(UCLIBC_LDSO); \
+		sed -e s:$(NONSHARED_LIBNAME):$$n1: \
+		    -e s:$(SHARED_MAJORNAME):$$n2: \
+		    -e s:$(UCLIBC_LDSO):$$n3: \
 		    $(top_builddir)lib/libc.so > $(PREFIX)$(DEVEL_PREFIX)lib/$(MULTILIB)/libc.so; \
 	fi
 ifeq ($(UCLIBC_HAS_THREADS),y)
