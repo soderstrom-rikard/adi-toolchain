@@ -226,11 +226,12 @@ void _dl_get_ready_to_run(struct elf_resolve *tpnt, DL_LOADADDR_TYPE load_addr,
 	if (argv[0]) {
 		_dl_progname = argv[0];
 	}
-
+#if 0
 	if (_start == (void *) auxvt[AT_ENTRY].a_un.a_val) {
 		_dl_dprintf(_dl_debug_file, "Standalone execution is not supported yet\n");
 		_dl_exit(1);
 	}
+#endif
 
 	/* Start to build the tables of the modules that are required for
 	 * this beast to run.  We start with the basic executable, and then
