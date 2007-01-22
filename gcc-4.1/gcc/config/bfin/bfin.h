@@ -86,8 +86,11 @@ extern int target_flags;
 	  builtin_define ("__PIC__");		\
 	  builtin_define ("__pic__");		\
 	}					\
-      if (TARGET_FDPIC)		\
-	builtin_define ("__BFIN_FDPIC__");	\
+      if (TARGET_FDPIC)				\
+	{					\
+	  builtin_define ("__BFIN_FDPIC__");	\
+	  builtin_define ("__FDPIC__");		\
+	}					\
       if (TARGET_ID_SHARED_LIBRARY)		\
 	builtin_define ("__ID_SHARED_LIB__");	\
     }                                           \

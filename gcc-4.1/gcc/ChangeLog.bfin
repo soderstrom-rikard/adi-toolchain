@@ -6,6 +6,9 @@
 	* config/bfin/linux.h: New file.
 	* config/bfin/libgcc-bfin.ver: New file.
 
+	* config/bfin/bfin.h (TARGET_CPP_CPU_BUILTINS): Define __FDPIC__ in
+	addition to __BFIN_FDPIC__.
+
 2006-12-08  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_valid_add): Fix the logic that ensures
