@@ -1248,7 +1248,6 @@ if [ $KERNEL_SOURCE ] ; then
 
     echo -n "*** Building uClinux elf2flt       " ; date
     cd $DIR_ELF2FLT_BUILD
-    touch * # fix autotool timestamps
 
     echo -n "*** Cleaning uClinux elf2flt       " ; date
     RUN="$MAKE distclean "
@@ -1309,7 +1308,6 @@ if [ $KERNEL_SOURCE ] ; then
 
     echo -n "*** Building uClinux genext2fs     " ; date
     cd $DIR_GENEXT2FS_BUILD
-    touch * # fix autotool timestamps
 
     echo -n "*** Cleaning uClinux genext2fs     " ; date
     RUN="$MAKE distclean "
