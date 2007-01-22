@@ -1,4 +1,12 @@
-2006-12-08  Bernd Schmidt  <bernd.schmidt@analog.com
+2007-01-19  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config.gcc (bfin*-linux-uclibc*): New target.
+	* config/bfin/t-bfin-linux: New file.
+	* config/bfin/t-bfin-uclinux: New file.
+	* config/bfin/linux.h: New file.
+	* config/bfin/libgcc-bfin.ver: New file.
+
+2006-12-08  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_valid_add): Fix the logic that ensures
 	multiword accesses are in range.
