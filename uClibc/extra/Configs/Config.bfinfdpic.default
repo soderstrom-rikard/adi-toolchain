@@ -170,7 +170,7 @@ UCLIBC_BUILD_RELRO=y
 #
 # uClibc development/debugging options
 #
-CROSS_COMPILER_PREFIX="bfin-uclinux-"
+CROSS_COMPILER_PREFIX="bfin-elf-"
 # DODEBUG is not set
 # DODEBUG_PT is not set
 DOSTRIP=y
