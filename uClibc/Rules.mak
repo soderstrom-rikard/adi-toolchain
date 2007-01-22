@@ -288,6 +288,18 @@ ifeq ($(TARGET_ARCH),powerpc)
 	CPU_CFLAGS-$(PPC_HAS_REL16)+= -DHAVE_ASM_PPC_REL16
 endif
 
+ifeq ($(TARGET_ARCH),bfin)
+ifeq ($(UCLIBC_FORMAT_FDPIC_ELF),y)
+	CPU_CFLAGS-y:=-mfdpic
+	CPU_LDFLAGS-y += -melf32bfinfd
+	PICFLAG:=-fpic
+	PIEFLAG_NAME:=-fpie
+endif
+ifeq ($(UCLIBC_FORMAT_SHARED_FLAT),y)
+	CPU_CFLAGS-y := -mid-shared-library
+endif
+endif
+
 ifeq ($(TARGET_ARCH),frv)
 	CPU_LDFLAGS-$(CONFIG_FRV)+=-melf32frvfd
 	# Using -pie causes the program to have an interpreter, which is
