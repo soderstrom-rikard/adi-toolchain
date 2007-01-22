@@ -85,6 +85,7 @@ avr-*-*)		targ_emul=avr2
 			;;
 bfin-*-elf)		targ_emul=elf32bfin; targ_extra_emuls="elf32bfinfd" ;;
 bfin-*-uclinux*)	targ_emul=elf32bfin; targ_extra_emuls="elf32bfinfd" ;;
+bfin-*-linux-uclibc*)	targ_emul=elf32bfin; targ_extra_emuls="elf32bfinfd" ;;
 cr16c-*-elf*)           targ_emul=elf32cr16c
 			;;
 cris-*-*aout*)		targ_emul=crisaout
