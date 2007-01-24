@@ -235,6 +235,7 @@ do
         o)
             DIR_ELF_OUTPUT=$OPTARG-elf
             DIR_uC_OUTPUT=$OPTARG-uclinux
+            DIR_LINUX_OUTPUT=$OPTARG-linux-uclibc
             ;;
         h)
 # We don't document the -S option - it's for advanced users who know what
@@ -403,33 +404,6 @@ if [ ! $DIR_ELF_OUTPUT ] ; then
 fi
 mk_output_dir "elf" $DIR_ELF_OUTPUT $SKIP_ELF
 
-if [ $KERNEL_SOURCE ] ; then
-    if [ ! $DIR_uC_OUTPUT ] ; then
-        DIR_uC_OUTPUT=$DIR_BUILD/out-uclinux
-    fi
-    mk_output_dir "uClinux" $DIR_uC_OUTPUT ""
-    if [ ! $DIR_KBUILD_OUTPUT ] ; then
-        DIR_KBUILD_OUTPUT=$DIR_BUILD/kernel_build
-    fi
-    mk_output_dir "kernel" $DIR_KBUILD_OUTPUT ""
-    if [ $DIR_UBOOT ] ; then
-      echo -n "Path to U-Boot Source       "
-      echo $DIR_UBOOT
-    else
-      echo "U-Boot Source not specified: addon utilties (like 'mkimage') will not be built"
-    fi
-    if [ -z "$UCLIBC_CONFIG_FILE" ]; then
-      echo "Path to uClibc Config files $UCLIBC_SOURCE/extra/Configs/"
-    else
-      if [ -f $UCLIBC_CONFIG_FILE ]; then
-        echo "Path to uClibc config files $UCLIBC_CONFIG_FILE"
-      else
-        echo "Can't find uClibc config file at $UCLIBC_CONFIG_FILE"
-        exit 1
-      fi
-    fi
-fi
-
 DIR_LOG=$DIR_BUILD/logs
 if [ ! -d $DIR_LOG ] ; then
     mkdir $DIR_LOG
@@ -549,6 +523,35 @@ if [ ! -d $DIR_LDR_UTILS_SOURCE ] ; then
     exit 1
 fi
 
+if [ $KERNEL_SOURCE ] ; then
+    if [ ! $DIR_uC_OUTPUT ] ; then
+        DIR_uC_OUTPUT=$DIR_BUILD/out-uclinux
+        DIR_LINUX_OUTPUT=$DIR_BUILD/out-linux-uclibc
+    fi
+    mk_output_dir "uClinux" $DIR_uC_OUTPUT ""
+    mk_output_dir "linux-uClibc" $DIR_LINUX_OUTPUT ""
+    if [ ! $DIR_KBUILD_OUTPUT ] ; then
+        DIR_KBUILD_OUTPUT=$DIR_BUILD/kernel_build
+    fi
+    mk_output_dir "kernel" $DIR_KBUILD_OUTPUT ""
+    if [ $DIR_UBOOT ] ; then
+      echo -n "Path to U-Boot Source       "
+      echo $DIR_UBOOT
+    else
+      echo "U-Boot Source not specified: addon utilties (like 'mkimage') will not be built"
+    fi
+    if [ -z "$UCLIBC_CONFIG_FILE" ]; then
+      echo "Path to uClibc Config files $UCLIBC_SOURCE/extra/Configs/"
+    else
+      if [ -f $UCLIBC_CONFIG_FILE ]; then
+        echo "Path to uClibc config files $UCLIBC_CONFIG_FILE"
+      else
+        echo "Can't find uClibc config file at $UCLIBC_CONFIG_FILE"
+        exit 1
+      fi
+    fi
+fi
+
 ###################### set up log file ###########################
 
 if [ $DATE_STAMP ] ; then
@@ -604,7 +607,7 @@ mkdir -p $DIR_CRAMFS_BUILD
 
 
 # Add output dir so when building uclibc, it can find the toolchain
-export PATH=$NEW_PATH:/$DIR_ELF_OUTPUT/bin:/$DIR_uC_OUTPUT/bin
+export PATH=$NEW_PATH:/$DIR_ELF_OUTPUT/bin:/$DIR_uC_OUTPUT/bin:/$DIR_LINUX_OUTPUT/bin
 
 #################################################################
 ############## DONOT CHANGE ANYTHING BELOW THIS LINE ############
@@ -1191,6 +1194,10 @@ if [ $KERNEL_SOURCE ] ; then
 
     build_uClibc mfdpic/ $DIR_uC_OUTPUT/bfin-uclinux
 
+    grep -v 'MULTILIB' <.config-used-for-bfinfdpic >.config
+    echo 'MULTILIB=""' >>.config
+    build_uClibc "" $DIR_LINUX_OUTPUT/bfin-linux-uclibc
+
     ######################### Done with uClibc ###########################
 
     echo -n "*** Cleaning uClinux               " ; date
@@ -1206,8 +1213,10 @@ if [ $KERNEL_SOURCE ] ; then
     (echo $RUN $LOGFILE ; ) | sh
 
     # Move system include dirs into the sysroot.
-    mkdir $DIR_uC_OUTPUT/bfin-uclinux/runtime/usr
-    mv $DIR_uC_OUTPUT/bfin-uclinux/include $DIR_uC_OUTPUT/bfin-uclinux/runtime/usr/
+    mkdir -p $DIR_uC_OUTPUT/bfin-uclinux/runtime/usr/include
+    (cd $DIR_uC_OUTPUT/bfin-uclinux/ ; tar cf - include) | (cd $DIR_uC_OUTPUT/bfin-uclinux/runtime/usr; tar xf - )
+    mkdir -p $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime/usr/include
+    (cd $DIR_uC_OUTPUT/bfin-uclinux/ ; tar cf - include) | (cd $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime/usr ; tar xf - )
 
     cd $UCLINUX_ROOT
     mv saved-config-toplevel .config 2>/dev/null
@@ -1244,6 +1253,33 @@ if [ $KERNEL_SOURCE ] ; then
            --with-sysroot=$DIR_uC_OUTPUT/bfin-uclinux/runtime"
     done
 
+    ####################### Step 4a - build bfin-linux-uclibc ################
+    rm -rf $DIR_BINUTILS_BUILD
+    mkdir $DIR_BINUTILS_BUILD
+    cd $DIR_BINUTILS_BUILD
+
+    echo -n "*** Configuring linux-uclibc Binutils & GDB" ; date
+    RUN="$DIR_BINUTILS_SOURCE/configure $HOST_TARGET \
+         --target=bfin-linux-uclibc --prefix=$DIR_LINUX_OUTPUT \
+         --with-sysroot=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime $BINUTILS_EXTRA_CONF"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+
+    echo -n "*** Building linux-uclibc binutils    " ; date
+    RUN="$MAKE all-binutils all-gas all-ld all-sim all-gdb"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+
+    echo -n "*** Installing linux-uclibc binutils  " ; date
+    RUN="$MAKE install-binutils install-gas install-ld install-sim install-gdb"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+
+    for GCC_VERSION in $GCC_VERSIONS; do
+    	build_gcc $GCC_VERSION linux-uclibc $DIR_LINUX_OUTPUT \
+	  "--enable-threads=posix --enable-shared \
+	   --with-sysroot=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime" 
+    done
     ######################## build elf2flt ##########################
 
     echo -n "*** Building uClinux elf2flt       " ; date
