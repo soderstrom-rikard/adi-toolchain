@@ -1,3 +1,7 @@
+2007-01-25  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config.gcc (bfin*-uclinux*): Use t-bfin-uclinux.
+
 2007-01-24  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/uclinux.h (STARTFILE_SPEC): Add crtreloc.o.
