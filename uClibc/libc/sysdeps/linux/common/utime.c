@@ -19,7 +19,6 @@ _syscall2(int, utime, const char *, file, const struct utimbuf *, times);
 #include <sys/time.h>
 
 libc_hidden_proto(utimes)
-libc_hidden_proto(gettimeofday)
 
 int utime(const char *file, const struct utimbuf *times)
 {
@@ -30,13 +29,8 @@ int utime(const char *file, const struct utimbuf *times)
 		timevals[1].tv_usec = 0L;
 		timevals[0].tv_sec = (long int) times->actime;
 		timevals[1].tv_sec = (long int) times->modtime;
-	} else {
-		if (gettimeofday(&timevals[0], NULL) < 0) {
-			return -1;
-		}
-		timevals[1] = timevals[0];
 	}
-	return utimes(file, timevals);
+	return utimes(file, times ? timevals : NULL);
 }
 #endif
 libc_hidden_def(utime)
