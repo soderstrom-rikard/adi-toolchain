@@ -201,7 +201,6 @@ do
         k)
             if [ -d $OPTARG/uClibc ] ; then
                 UCLINUX_ROOT=$OPTARG
-                UCLIBC_SOURCE=$OPTARG/uClibc
                 KERNEL_SOURCE=$OPTARG/linux-2.6.x
                 if [ ! -d $KERNEL_SOURCE/arch/blackfin ] ; then
                     echo "Can't find $KERNEL_SOURCE/arch/blackfin"
@@ -499,6 +498,14 @@ if [ ! -d $DIR_ELF2FLT_SOURCE ] ; then
     exit 1
 fi
 
+echo -n "Path to uClibc dir          "
+UCLIBC_SOURCE=$DIR_SOURCE/uClibc
+echo $UCLIBC_SOURCE
+if [ ! -d $UCLIBC_SOURCE ] ; then
+    echo "Can't find uClibc source at $UCLIBC_SOURCE"
+    exit 1
+fi
+
 echo -n "Path to genext2fs           "
 DIR_GENEXT2FS_SOURCE=$DIR_SOURCE/genext2fs
 echo $DIR_GENEXT2FS_SOURCE
@@ -664,7 +671,7 @@ build_gcc ()
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
     echo -n "*** Building GCC                   " ; date
-    RUN=$MAKE
+    RUN="$MAKE -j3"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
@@ -804,8 +811,8 @@ run_tests ()
 #
 build_uClibc()
 {
-    ARGS="CROSS=bfin-elf- PREFIX=$2 DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ KERNEL_SOURCE=$KERNEL_SOURCE ROOTDIR=$UCLINUX_ROOT"
-    #ARGS="CROSS=bfin-elf- PREFIX=$2 DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ KERNEL_SOURCE=$DIR_KBUILD_OUTPUT/usr ROOTDIR=$UCLINUX_ROOT"
+    #ARGS="CROSS=bfin-elf- PREFIX=$2 DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ KERNEL_SOURCE=$KERNEL_SOURCE ROOTDIR=$UCLINUX_ROOT"
+    ARGS="CROSS=bfin-elf- PREFIX=$2 DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ KERNEL_SOURCE=$DIR_KBUILD_OUTPUT/usr ROOTDIR=$UCLINUX_ROOT"
     echo -n "*** Cleaning uClibc                " ; date
     RUN="$MAKE clean $ARGS"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
@@ -1100,7 +1107,6 @@ if [ $KERNEL_SOURCE ] ; then
     # Save the previous configuration
     cp .config saved-config-toplevel 2>/dev/null
     cp linux-2.6.x/.config saved-config-linux 2>/dev/null
-    cp uClibc/.config saved-config-uClibc 2>/dev/null
     cp config/.config saved-config-user 2>/dev/null
     cp -a config.arch saved-config-arch 2>/dev/null
 
@@ -1111,7 +1117,9 @@ if [ $KERNEL_SOURCE ] ; then
 
     cd linux-2.6.x
     RUN="$MAKE CROSS_COMPILE=bfin-elf- prepare"
-    #RUN="$MAKE headers_install INSTALL_HDR_PATH=$DIR_KBUILD_OUTPUT/usr KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    RUN="$MAKE CROSS_COMPILE=bfin-elf- headers_install INSTALL_HDR_PATH=$DIR_KBUILD_OUTPUT/usr KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
     cd ..
@@ -1126,14 +1134,16 @@ if [ $KERNEL_SOURCE ] ; then
       cp $UCLIBC_CONFIG_FILE .tmp.config.provided
       rm -f .config
       echo 'TARGET_bfin=y' >>.config
-      cat .tmp.config.provided | grep -v '^\(TARGET\|HAVE_NO_SHARED\|HAVE_NO_PIC\|DOPIC\|HAVE_SHARED\|TARGET_SUBARCH\|BUILD_UCLIBC_LDSO\|SUPPORT_LD_DEBUG\|FORCE_SHAREABLE_TEXT_SEGMENTS\|BUILD_UCLIBC_SHARED_FLAT\|BUILD_UCLIBC_SEP_DATA\|RUNTIME_\|DEVEL_\|MULTILIB\)' >>.config
+      cat .tmp.config.provided | grep -v '^\(TARGET\|HAVE_NO_SHARED\|HAVE_NO_PIC\|DOPIC\|HAVE_SHARED\|TARGET_SUBARCH\|BUILD_UCLIBC_LDSO\|SUPPORT_LD_DEBUG\|FORCE_SHAREABLE_TEXT_SEGMENTS\|RUNTIME_\|DEVEL_\|MULTILIB\|KERNEL_HEADERS\)' | grep -v UCLIBC_FORMAT_ >>.config
       echo 'RUNTIME_PREFIX="/runtime"' >>.config
       echo 'DEVEL_PREFIX="/"' >>.config
       echo 'MULTILIB=""' >>.config
-      echo '# BUILD_UCLIBC_SHARED_FLAT is not set' >>.config
-      echo '# BUILD_UCLIBC_SEP_DATA is not set' >>.config
     fi
-
+    echo 'UCLIBC_FORMAT_FLAT=y' >>.config
+    echo '# UCLIBC_FORMAT_FDPIC_ELF is not set' >>.config
+    echo '# UCLIBC_FORMAT_SHARED_FLAT is not set' >>.config
+    echo '# UCLIBC_FORMAT_FLAT_SEP_DATA is not set' >>.config
+    echo "KERNEL_HEADERS=\"$DIR_KBUILD_OUTPUT/usr/include\"" >>.config
     RUN="$MAKE oldconfig CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
@@ -1145,8 +1155,11 @@ if [ $KERNEL_SOURCE ] ; then
     #################### Step 3b - build sep-data uClibc ##############
     echo -n "*** Configuring sep-data uClibc    " ; date
 
-    grep -v '\(MULTILIB\|BUILD_UCLIBC_SEP_DATA\)' <.config-used-for-bfin >.config
-    echo 'BUILD_UCLIBC_SEP_DATA=y' >>.config
+    grep -v '\(MULTILIB\|UCLIBC_FORMAT_\)' <.config-used-for-bfin >.config
+    echo 'UCLIBC_FORMAT_FLAT_SEP_DATA=y' >>.config
+    echo '# UCLIBC_FORMAT_FDPIC_ELF is not set' >>.config
+    echo '# UCLIBC_FORMAT_SHARED_FLAT is not set' >>.config
+    echo '# UCLIBC_FORMAT_FLAT is not set' >>.config
     echo 'MULTILIB="msep-data"' >>.config
 
     RUN="$MAKE oldconfig CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
@@ -1160,8 +1173,11 @@ if [ $KERNEL_SOURCE ] ; then
     #################### Step 3b - build shared flat uClibc ##############
     echo -n "*** Configuring shared flat uClibc " ; date
 
-    grep -v '\(BUILD_UCLIBC_SHARED_FLAT\MULTILIB\)' <.config-used-for-bfin >.config
-    echo 'BUILD_UCLIBC_SHARED_FLAT=y' >>.config
+    grep -v '\(MULTILIB\|UCLIBC_FORMAT_\)' <.config-used-for-bfin >.config
+    echo 'UCLIBC_FORMAT_SHARED_FLAT=y' >>.config
+    echo '# UCLIBC_FORMAT_FDPIC_ELF is not set' >>.config
+    echo '# UCLIBC_FORMAT_FLAT is not set' >>.config
+    echo '# UCLIBC_FORMAT_FLAT_SEP_DATA is not set' >>.config
     echo 'MULTILIB="mid-shared-library"' >>.config
 
     RUN="$MAKE oldconfig CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
@@ -1178,13 +1194,17 @@ if [ $KERNEL_SOURCE ] ; then
     if [ -z "$UCLIBC_CONFIG_FILE" ]; then
       cp extra/Configs/Config.bfinfdpic.default .config
     else
-      echo 'TARGET_bfinfdpic=y' >>.config
-      cat .tmp.config.provided | grep -v '^\(TARGET\|HAVE_NO_SHARED\|HAVE_NO_PIC\|DOPIC\|HAVE_SHARED\|TARGET_SUBARCH\|BUILD_UCLIBC_LDSO\|SUPPORT_LD_DEBUG\|FORCE_SHAREABLE_TEXT_SEGMENTS\|BUILD_UCLIBC_SHARED_FLAT\|RUNTIME_\|DEVEL_\|MULTILIB\)' >>.config
+      cat .tmp.config.provided | grep -v '^\(TARGET\|HAVE_NO_SHARED\|HAVE_NO_PIC\|DOPIC\|HAVE_SHARED\|TARGET_SUBARCH\|BUILD_UCLIBC_LDSO\|SUPPORT_LD_DEBUG\|FORCE_SHAREABLE_TEXT_SEGMENTS\|RUNTIME_\|DEVEL_\|MULTILIB\|KERNEL_HEADERS\)' |grep -v UCLIBC_FORMAT_ >>.config
       echo 'RUNTIME_PREFIX="/runtime"' >>.config
       echo 'DEVEL_PREFIX="/"' >>.config
       echo 'MULTILIB="mfdpic"' >>.config
       rm -f .tmp.config.provided
     fi
+    echo 'UCLIBC_FORMAT_FDPIC_ELF=y' >>.config
+    echo '# UCLIBC_FORMAT_FLAT is not set' >>.config
+    echo '# UCLIBC_FORMAT_SHARED_FLAT is not set' >>.config
+    echo '# UCLIBC_FORMAT_FLAT_SEP_DATA is not set' >>.config
+    echo "KERNEL_HEADERS=\"$DIR_KBUILD_OUTPUT/usr/include\"" >>.config
 
     RUN="$MAKE oldconfig CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
@@ -1197,6 +1217,11 @@ if [ $KERNEL_SOURCE ] ; then
     grep -v 'MULTILIB' <.config-used-for-bfinfdpic >.config
     echo 'MULTILIB=""' >>.config
     build_uClibc "" $DIR_LINUX_OUTPUT/bfin-linux-uclibc
+
+    mkdir -p $DIR_uC_OUTPUT/bfin-uclinux/runtime
+    mkdir -p $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime
+    cp -r $DIR_KBUILD_OUTPUT/usr $DIR_uC_OUTPUT/bfin-uclinux/runtime/
+    cp -r $DIR_KBUILD_OUTPUT/usr $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime/
 
     ######################### Done with uClibc ###########################
 
@@ -1221,7 +1246,6 @@ if [ $KERNEL_SOURCE ] ; then
     cd $UCLINUX_ROOT
     mv saved-config-toplevel .config 2>/dev/null
     mv saved-config-linux linux-2.6.x/.config 2>/dev/null
-    mv saved-config-uClibc uClibc/.config 2>/dev/null
     mv saved-config-user config/.config 2>/dev/null
     mv saved-config-arch config.arch 2>/dev/null
 
@@ -1498,6 +1522,9 @@ if [ $KERNEL_SOURCE ] ; then
 
         echo -n "*** Copying U-Boot Tools           " ; date
         RUN="cp $DIR_UBOOT/tools/mkimage $DIR_uC_OUTPUT/bin/bfin-uclinux-mkimage; cp $DIR_UBOOT/tools/gen_eth_addr $DIR_uC_OUTPUT/bin/bfin-uclinux-gen_eth_addr"
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh
+        RUN="cp $DIR_UBOOT/tools/mkimage $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-mkimage; cp $DIR_UBOOT/tools/gen_eth_addr $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-gen_eth_addr"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh
 
