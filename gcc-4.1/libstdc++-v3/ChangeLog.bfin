@@ -1,3 +1,23 @@
+2007-01-23  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/os/uclibc/ctype_base.h: New file.
+	* config/os/uclibc/ctype_inline.h: New file.
+	* config/os/uclibc/ctype_noninline.h: New file.
+	* config/os/uclibc/os_defines.h: New file.
+
+	* config/locale/uclibc/c++locale_internal.h: New file.
+	* config/locale/uclibc/codecvt_members.cc: New file.
+	* config/locale/uclibc/messages_members.cc: New file.
+	* config/locale/uclibc/numeric_members.cc: New file.
+	* config/locale/uclibc/c_locale.cc: New file.
+	* config/locale/uclibc/collate_members.cc: New file.
+	* config/locale/uclibc/messages_members.h: New file.
+	* config/locale/uclibc/time_members.cc: New file.
+	* config/locale/uclibc/c_locale.h: New file.
+	* config/locale/uclibc/ctype_members.cc: New file.
+	* config/locale/uclibc/monetary_members.cc: New file.
+	* config/locale/uclibc/time_members.h: New file.
+
 2007-01-19  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	Add several patches from buildroot.
