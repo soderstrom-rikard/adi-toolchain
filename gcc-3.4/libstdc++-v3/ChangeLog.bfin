@@ -1,5 +1,6 @@
 2007-01-26  Bernd Schmidt  <bernd.schmidt@analog.com>
 
+	Add several patches from buildroot.
 	* config/os/uclibc/ctype_base.h: New file.
 	* config/os/uclibc/ctype_inline.h: New file.
 	* config/os/uclibc/ctype_noninline.h: New file.
@@ -17,3 +18,6 @@
 	* config/locale/uclibc/ctype_members.cc: New file.
 	* config/locale/uclibc/monetary_members.cc: New file.
 	* config/locale/uclibc/time_members.h: New file.
+
+	* include/ext/rope: Undefine index in case libc defines it as a macro.
+	* libstdc++-v3/include/ext/ropeimpl.h: Likewise.
