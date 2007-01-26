@@ -1283,7 +1283,7 @@ if [ $KERNEL_SOURCE ] ; then
     cd $DIR_BINUTILS_BUILD
 
     echo -n "*** Configuring linux-uclibc Binutils & GDB" ; date
-    RUN="$DIR_BINUTILS_SOURCE/configure $HOST_TARGET \
+    RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET \
          --target=bfin-linux-uclibc --prefix=$DIR_LINUX_OUTPUT \
          --with-sysroot=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime $BINUTILS_EXTRA_CONF"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
