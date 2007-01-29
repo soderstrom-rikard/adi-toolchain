@@ -449,15 +449,22 @@ fi
 if [ $CHECK_ON_HARDWARE ] ; then
     if [ $DATE_STAMP ] ; then
         DIR_TEST_HW_RESULTS=$DIR_TEST_RESULTS/hardware-$TIMESTAMP
+        DIR_TEST_HW2_RESULTS=$DIR_TEST_RESULTS/hardware-fdpic-$TIMESTAMP
     else
         DIR_TEST_HW_RESULTS=$DIR_TEST_RESULTS/hardware
+        DIR_TEST_HW2_RESULTS=$DIR_TEST_RESULTS/hardware-fdpic
     fi
     if [ ! -d $DIR_TEST_HW_RESULTS ] ; then
         mkdir $DIR_TEST_HW_RESULTS
     else
         rm -rf $DIR_TEST_HW_RESULTS/*
     fi
-    echo "  on hardware: $DIR_TEST_HW_RESULTS"
+    if [ ! -d $DIR_TEST_HW2_RESULTS ] ; then
+        mkdir $DIR_TEST_HW2_RESULTS
+    else
+        rm -rf $DIR_TEST_HW2_RESULTS/*
+    fi
+    echo "  on hardware: $DIR_TEST_HW_RESULTS, $DIR_TEST_HW2_RESULTS"
     if [ $RESULTS2COMPARE ] ; then
         if [ ! -d $RESULTS2COMPARE/hardware ] ; then
             echo "Can't find hardware results in $RESULTS2COMPARE/hardware"
@@ -893,9 +900,9 @@ if [ "x$CHECK_ON_SIMULATOR" != "x" -o "x$CHECK_ON_HARDWARE" != "x" ] ; then
         (cat $DIR_BOARDS/bfin-uclinux.exp.1; \
          echo "set_board_info hostname $TARGET_IPADDR"; \
          echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-uclinux.exp
-        (cat $DIR_BOARDS/bfin-uclinux.exp.2; \
+        (cat $DIR_BOARDS/bfin-linux-uclibc.exp.1; \
          echo "set_board_info hostname $TARGET_IPADDR"; \
-         echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-uclinux-fdpic.exp
+         echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-linux-uclibc.exp
     fi
     (cat $DIR_BOARDS/site.exp.1; \
      echo "lappend boards_dir \"$DIR_BUILD/boards\""; \
@@ -1277,33 +1284,6 @@ if [ $KERNEL_SOURCE ] ; then
            --with-sysroot=$DIR_uC_OUTPUT/bfin-uclinux/runtime"
     done
 
-    ####################### Step 4a - build bfin-linux-uclibc ################
-    rm -rf $DIR_BINUTILS_BUILD
-    mkdir $DIR_BINUTILS_BUILD
-    cd $DIR_BINUTILS_BUILD
-
-    echo -n "*** Configuring linux-uclibc Binutils & GDB" ; date
-    RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET \
-         --target=bfin-linux-uclibc --prefix=$DIR_LINUX_OUTPUT \
-         --with-sysroot=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime $BINUTILS_EXTRA_CONF"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
-
-    echo -n "*** Building linux-uclibc binutils    " ; date
-    RUN="$MAKE all-binutils all-gas all-ld all-sim all-gdb"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
-
-    echo -n "*** Installing linux-uclibc binutils  " ; date
-    RUN="$MAKE install-binutils install-gas install-ld install-sim install-gdb"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
-
-    for GCC_VERSION in $GCC_VERSIONS; do
-    	build_gcc $GCC_VERSION linux-uclibc $DIR_LINUX_OUTPUT \
-	  "--enable-threads=posix --enable-shared \
-	   --with-sysroot=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime" 
-    done
     ######################## build elf2flt ##########################
 
     echo -n "*** Building uClinux elf2flt       " ; date
@@ -1362,7 +1342,48 @@ if [ $KERNEL_SOURCE ] ; then
         cd $DIR_BINUTILS_BUILD
         ( echo "$MAKE clean " $LOGFILE ; ) | sh
 
-        run_tests $DIR_TEST_HW_RESULTS hardware
+        run_tests $DIR_TEST_HW_RESULTS hardware-fdpic
+    fi
+
+    ####################### Step 4a - build bfin-linux-uclibc ################
+    rm -rf $DIR_BINUTILS_BUILD
+    mkdir $DIR_BINUTILS_BUILD
+    cd $DIR_BINUTILS_BUILD
+
+    echo -n "*** Configuring linux-uclibc Binutils & GDB" ; date
+    RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET \
+         --target=bfin-linux-uclibc --prefix=$DIR_LINUX_OUTPUT \
+         --with-sysroot=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime $BINUTILS_EXTRA_CONF"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+
+    echo -n "*** Building linux-uclibc binutils    " ; date
+    RUN="$MAKE all-binutils all-gas all-ld all-sim all-gdb"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+
+    echo -n "*** Installing linux-uclibc binutils  " ; date
+    RUN="$MAKE install-binutils install-gas install-ld install-sim install-gdb"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+
+    for GCC_VERSION in $GCC_VERSIONS; do
+    	build_gcc $GCC_VERSION linux-uclibc $DIR_LINUX_OUTPUT \
+	  "--enable-threads=posix --enable-shared \
+	   --with-sysroot=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime" 
+    done
+
+    ##################### Test bfin-linux-uclibc #####################
+
+    if [ $CHECK_ON_HARDWARE ] ; then
+        echo "*** Testing linux-uclibc on hw     "
+
+        # Remove all tools from build directory. Thus the installed ones
+        # are tested. This way gcc will use ld wrapper provided by elf2flt.
+        cd $DIR_BINUTILS_BUILD
+        ( echo "$MAKE clean " $LOGFILE ; ) | sh
+
+        run_tests $DIR_TEST_HW2_RESULTS hardware
     fi
 
     ########################### genext2fs ########################
