@@ -3,6 +3,20 @@
 	* config/bfin/bfin.md (doloop_end): Fail for loops that can iterate
 	2^32-1 or more times unless flag_unsafe_loop_optimizations.
 
+	* config/bfin/bfin.c: Include "cfglayout.h".
+	(MAX_LSETUP_DISTANCE): New macro.
+	(struct loop_info): New members incoming, incoming_src and
+	incoming_dest.  Delete member predecessor.
+	(length_for_loop): New function.
+	(bfin_optimize_loop): Handle more different loop structures.
+	(bfin_discover_loop): Rework detection of predecessor blocks by
+	examining incoming edges.
+	(bfin_discover_loops, bfin_free_loops): New functions, broken out of
+	bfin_reorg_loops.
+	(bfin_reorder_loops): New function.
+	(bfin_reorg_loops): Use these three new functions.
+	(bfin_reorg): Always call compute_bb_for_insn.
+
 2007-01-26  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin-protos.h (bfin_expand_epilogue): Add a third
