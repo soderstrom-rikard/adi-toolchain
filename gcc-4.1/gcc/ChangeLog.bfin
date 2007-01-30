@@ -1,3 +1,8 @@
+2007-01-30  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (doloop_end): Fail for loops that can iterate
+	2^32-1 or more times unless flag_unsafe_loop_optimizations.
+
 2007-01-26  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin-protos.h (bfin_expand_epilogue): Add a third
