@@ -34,6 +34,9 @@ MD5PROG = md5sum
 # (Default to avoid splitting info files by setting the threshold high.)
 MAKEINFOFLAGS = --split-size=5000000
 
+# (Default to avoid splitting info files by setting the threshold high.)
+MAKEINFOFLAGS = --split-size=5000000
+
 # pwd command to use.  Allow user to override default by setting PWDCMD in
 # the environment to account for automounters.  The make variable must not
 # be called PWDCMD, otherwise the value set here is passed to make
@@ -50,8 +53,8 @@ DEVO_SUPPORT= README Makefile.in configure configure.in \
 	config.guess config.sub config move-if-change \
 	COPYING COPYING.LIB install-sh config-ml.in symlink-tree \
 	mkinstalldirs ltconfig ltmain.sh missing ylwrap \
-	libtool.m4 gettext.m4 ltcf-c.sh ltcf-cxx.sh ltcf-gcj.sh \
-	Makefile.def Makefile.tpl src-release
+	libtool.m4 ltcf-c.sh ltcf-cxx.sh ltcf-gcj.sh \
+	Makefile.def Makefile.tpl src-release config.rpath
 
 # Files in devo/etc used in any net release.
 # ChangeLog omitted because it may refer to files which are not in this
@@ -270,7 +273,7 @@ gnats.tar.bz2: $(DIST_SUPPORT) $(GNATS_SUPPORT_DIRS) gnats
 		SUPPORT_FILES="$(GNATS_SUPPORT_DIRS)"
 
 .PHONY: gdb.tar.bz2
-GDB_SUPPORT_DIRS= bfd include libiberty opcodes readline sim
+GDB_SUPPORT_DIRS= bfd include libiberty opcodes readline sim intl
 gdb.tar.bz2: $(DIST_SUPPORT) $(GDB_SUPPORT_DIRS) gdb
 	$(MAKE) -f $(SELF) gdb-taz TOOL=gdb \
 		MD5PROG="$(MD5PROG)" \

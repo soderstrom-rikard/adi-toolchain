@@ -9,7 +9,7 @@ END-INFO-DIR-ENTRY
    This file documents the GNU debugger GDB.
 
    This is the Ninth Edition, of `Debugging with GDB: the GNU
-Source-Level Debugger' for GDB Version 6.5.
+Source-Level Debugger' for GDB Version 6.6.
 
    Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
 1998,
@@ -36,7 +36,7 @@ Debugging with GDB
 
 This file describes GDB, the GNU symbolic debugger.
 
-   This is the Ninth Edition, for GDB Version 6.5.
+   This is the Ninth Edition, for GDB Version 6.6.
 
    Copyright (C) 1988-2006 Free Software Foundation, Inc.
 
@@ -402,6 +402,11 @@ Jacobowitz, Jeff Johnston, Mark Kettenis, Theodore A. Roth, Kei
 Sakamoto, Yoshinori Sato, Michael Snyder, Corinna Vinschen, and Ulrich
 Weigand.
 
+   Christian Zankel, Ross Morley, Bob Wilson, and Maxim Grigoriev from
+Tensilica, Inc. contributed support for Xtensa processors.  Others who
+have worked on the Xtensa port of GDB in the past include Steve Tjiang,
+John Newlin, and Scott Foehner.
+
 
 File: gdb.info,  Node: Sample Session,  Next: Invocation,  Prev: Summary,  Up: Top
 
@@ -436,7 +441,7 @@ string to `<UNQUOTE>', the same procedure fails to define a new synonym
 
      define(baz,defn(<QUOTE>foo<UNQUOTE>))
      baz
-     C-d
+     Ctrl-d
      m4: End of input: 0: fatal error: EOF in string
 
 Let us use GDB to try to see what is going on.
@@ -448,7 +453,7 @@ Let us use GDB to try to see what is going on.
      There is absolutely no warranty for GDB; type "show warranty"
       for details.
 
-     GDB 6.5, Copyright 1999 Free Software Foundation, Inc...
+     GDB 6.6, Copyright 1999 Free Software Foundation, Inc...
      (gdb)
 
 GDB reads only enough symbol data to know where to find the rest when
@@ -604,7 +609,7 @@ Success!  The new quotes now work just as well as the default ones.  The
 problem seems to have been just the two typos defining the wrong
 lengths.  We allow `m4' exit by giving it an EOF as input:
 
-     C-d
+     Ctrl-d
      Program exited normally.
 
 The message `Program exited normally.' is from GDB; it indicates `m4'
@@ -623,7 +628,7 @@ This chapter discusses how to start GDB, and how to get out of it.  The
 essentials are:
    * type `gdb' to start GDB.
 
-   * type `quit' or `C-d' to exit.
+   * type `quit' or `Ctrl-d' to exit.
 
 * Menu:
 
@@ -1022,11 +1027,11 @@ File: gdb.info,  Node: Quitting GDB,  Next: Shell Commands,  Prev: Invoking GDB,
 `quit [EXPRESSION]'
 `q'
      To exit GDB, use the `quit' command (abbreviated `q'), or type an
-     end-of-file character (usually `C-d').  If you do not supply
+     end-of-file character (usually `Ctrl-d').  If you do not supply
      EXPRESSION, GDB will terminate normally; otherwise it will
      terminate using the result of EXPRESSION as the error code.
 
-   An interrupt (often `C-c') does not exit from GDB, but rather
+   An interrupt (often `Ctrl-c') does not exit from GDB, but rather
 terminates the action of any GDB command that is in progress and
 returns to GDB command level.  It is safe to type the interrupt
 character at any time because GDB does not allow it to take effect
@@ -1150,8 +1155,8 @@ generates this sort of display.
 nothing.  This is useful mainly in command files (*note Command files:
 Command Files.).
 
-   The `C-o' binding is useful for repeating a complex sequence of
-commands.  This command accepts the current line, like `RET', and then
+   The `Ctrl-o' binding is useful for repeating a complex sequence of
+commands.  This command accepts the current line, like <RET>, and then
 fetches the next line relative to the current line from the history for
 editing.
 
@@ -2100,10 +2105,10 @@ command.
 
 
    To quit debugging one of the forked processes, you can either detach
-from it by using the `detach-fork' command (allowing it to run
+from it by using the `detach fork' command (allowing it to run
 independently), or delete (and kill) it using the `delete fork' command.
 
-`detach-fork FORK-ID'
+`detach fork FORK-ID'
      Detach from the process identified by GDB fork number FORK-ID, and
      remove it from the fork list.  The process will be allowed to run
      independently.
@@ -2285,11 +2290,13 @@ in shared library routines that are not called directly by the program
 (for example, routines that are arguments in a `pthread_create' call).
 
    A "watchpoint" is a special breakpoint that stops your program when
-the value of an expression changes.  You must use a different command
-to set watchpoints (*note Setting watchpoints: Set Watchpoints.), but
-aside from that, you can manage a watchpoint like any other breakpoint:
-you enable, disable, and delete both breakpoints and watchpoints using
-the same commands.
+the value of an expression changes.  The expression may be a value of a
+variable, or it could involve values of one or more variables combined
+by operators, such as `a + b'.  This is sometimes called "data
+breakpoints".  You must use a different command to set watchpoints
+(*note Setting watchpoints: Set Watchpoints.), but aside from that, you
+can manage a watchpoint like any other breakpoint: you enable, disable,
+and delete both breakpoints and watchpoints using the same commands.
 
    You can arrange to have values from your program displayed
 automatically whenever GDB stops at a breakpoint.  *Note Automatic
@@ -2469,7 +2476,9 @@ variables.
 `info break [N]'
 `info watchpoints [N]'
      Print a table of all breakpoints, watchpoints, and catchpoints set
-     and not deleted, with the following columns for each breakpoint:
+     and not deleted.  Optional argument N means print information only
+     about the specified breakpoint (or watchpoint or catchpoint).  For
+     each breakpoint, following columns are printed:
 
     _Breakpoint Numbers_
 
@@ -2583,7 +2592,19 @@ File: gdb.info,  Node: Set Watchpoints,  Next: Set Catchpoints,  Prev: Set Break
 
 You can use a watchpoint to stop execution whenever the value of an
 expression changes, without having to predict a particular place where
-this may happen.
+this may happen.  (This is sometimes called a "data breakpoint".)  The
+expression may be as simple as the value of a single variable, or as
+complex as many variables combined by operators.  Examples include:
+
+   * A reference to the value of a single variable.
+
+   * An address cast to an appropriate data type.  For example, `*(int
+     *)0x12345678' will watch a 4-byte region at the specified address
+     (assuming an `int' occupies 4 bytes).
+
+   * An arbitrarily complex expression, such as `a*b + c/d'.  The
+     expression can use any operators valid in the program's native
+     language (*note Languages::).
 
    Depending on your system, watchpoints may be implemented in software
 or hardware.  GDB does software watchpointing by single-stepping your
@@ -2597,8 +2618,12 @@ targets, GDB includes support for hardware watchpoints, which do not
 slow down the running of your program.
 
 `watch EXPR'
-     Set a watchpoint for an expression.  GDB will break when EXPR is
-     written into by the program and its value changes.
+     Set a watchpoint for an expression.  GDB will break when the
+     expression EXPR is written into by the program and its value
+     changes.  The simplest (and the most popular) use of this command
+     is to watch the value of a single variable:
+
+          (gdb) watch foo
 
 `rwatch EXPR'
      Set a watchpoint that will break when the value of EXPR is read by
@@ -2671,6 +2696,11 @@ be printed only when the program is resumed:
      Hardware watchpoint NUM: Could not insert watchpoint
 
 If this happens, delete or disable some of the watchpoints.
+
+   Watching complex expressions that reference many variables can also
+exhaust the resources available for hardware-assisted watchpoints.
+That's because GDB needs to watch every variable in the expression with
+separately allocated resources.
 
    The SPARClite DSU will generate traps when a program accesses some
 data or instruction address that is assigned to the debug registers.
@@ -3444,7 +3474,7 @@ File: gdb.info,  Node: Signals,  Next: Thread Stops,  Prev: Continuing and Stepp
 A signal is an asynchronous event that can happen in a program.  The
 operating system defines the possible kinds of signals, and gives each
 kind a name and a number.  For example, in Unix `SIGINT' is the signal
-a program gets when you type an interrupt character (often `C-c');
+a program gets when you type an interrupt character (often `Ctrl-c');
 `SIGSEGV' is the signal a program gets from referencing a place in
 memory far away from all the areas in use; `SIGALRM' occurs when the
 alarm clock timer goes off (which happens only if your program has
@@ -3474,14 +3504,18 @@ settings with the `handle' command.
      told to handle each one.  You can use this to see the signal
      numbers of all the defined types of signals.
 
+`info signals SIG'
+     Similar, but print information only about the specified signal
+     number.
+
      `info handle' is an alias for `info signals'.
 
-`handle SIGNAL KEYWORDS...'
+`handle SIGNAL [KEYWORDS...]'
      Change the way GDB handles signal SIGNAL.  SIGNAL can be the
      number of a signal or its name (with or without the `SIG' at the
      beginning); a list of signal numbers of the form `LOW-HIGH'; or
-     the word `all', meaning all the known signals.  The KEYWORDS say
-     what change to make.
+     the word `all', meaning all the known signals.  Optional arguments
+     KEYWORDS, described below, say what change to make.
 
    The keywords allowed by the `handle' command can be abbreviated.
 Their full names are:
@@ -3748,7 +3782,7 @@ on up the stack.
      frames in the stack.
 
      You can stop the backtrace at any time by typing the system
-     interrupt character, normally `C-c'.
+     interrupt character, normally `Ctrl-c'.
 
 `backtrace N'
 `bt N'
@@ -3759,9 +3793,11 @@ on up the stack.
      Similar, but print only the outermost N frames.
 
 `backtrace full'
-     Print the values of the local variables also.
-
 `bt full'
+`bt full N'
+`bt full -N'
+     Print the values of the local variables also.  N specifies the
+     number of frames to print, as described above.
 
    The names `where' and `info stack' (abbreviated `info s') are
 additional aliases for `backtrace'.
@@ -4260,6 +4296,50 @@ in that order.  To add other directories, use the `directory' command.
    The search path is used to find both program source files and GDB
 script files (read using the `-command' option and `source' command).
 
+   In addition to the source path, GDB provides a set of commands that
+manage a list of source path substitution rules.  A "substitution rule"
+specifies how to rewrite source directories stored in the program's
+debug information in case the sources were moved to a different
+directory between compilation and debugging.  A rule is made of two
+strings, the first specifying what needs to be rewritten in the path,
+and the second specifying how it should be rewritten.  In *Note set
+substitute-path::, we name these two parts FROM and TO respectively.
+GDB does a simple string replacement of FROM with TO at the start of
+the directory part of the source file name, and uses that result
+instead of the original file name to look up the sources.
+
+   Using the previous example, suppose the `foo-1.0' tree has been
+moved from `/usr/src' to `/mnt/cross', then you can tell GDB to replace
+`/usr/src' in all source path names with `/mnt/cross'.  The first
+lookup will then be `/mnt/cross/foo-1.0/lib/foo.c' in place of the
+original location of `/usr/src/foo-1.0/lib/foo.c'.  To define a source
+path substitution rule, use the `set substitute-path' command (*note
+set substitute-path::).
+
+   To avoid unexpected substitution results, a rule is applied only if
+the FROM part of the directory name ends at a directory separator.  For
+instance, a rule substituting  `/usr/source' into `/mnt/cross' will be
+applied to `/usr/source/foo-1.0' but not to `/usr/sourceware/foo-2.0'.
+And because the substitution is applied only at the begining of the
+directory name, this rule will not be applied to
+`/root/usr/source/baz.c' either.
+
+   In many cases, you can achieve the same result using the `directory'
+command.  However, `set substitute-path' can be more efficient in the
+case where the sources are organized in a complex tree with multiple
+subdirectories.  With the `directory' command, you need to add each
+subdirectory of your project.  If you moved the entire tree while
+preserving its internal organization, then `set substitute-path' allows
+you to direct the debugger to all the sources with one single command.
+
+   `set substitute-path' is also more than just a shortcut command.
+The source path is only used if the file at the original location no
+longer exists.  On the other hand, `set substitute-path' modifies the
+debugger behavior to look at the rewritten location instead.  So, if
+for any reason a source file that is not relevant to your executable is
+located at the original location, a substitution rule is the only
+method available to point GDB at the new location.
+
 `directory DIRNAME ...'
 
 `dir DIRNAME ...'
@@ -4283,6 +4363,51 @@ script files (read using the `-command' option and `source' command).
 
 `show directories'
      Print the source path: show which directories it contains.
+
+`set substitute-path FROM TO'
+     Define a source path substitution rule, and add it at the end of
+     the current list of existing substitution rules.  If a rule with
+     the same FROM was already defined, then the old rule is also
+     deleted.
+
+     For example, if the file `/foo/bar/baz.c' was moved to
+     `/mnt/cross/baz.c', then the command
+
+          (gdb) set substitute-path /usr/src /mnt/cross
+
+     will tell GDB to replace `/usr/src' with `/mnt/cross', which will
+     allow GDB to find the file `baz.c' even though it was moved.
+
+     In the case when more than one substitution rule have been defined,
+     the rules are evaluated one by one in the order where they have
+     been defined.  The first one matching, if any, is selected to
+     perform the substitution.
+
+     For instance, if we had entered the following commands:
+
+          (gdb) set substitute-path /usr/src/include /mnt/include
+          (gdb) set substitute-path /usr/src /mnt/src
+
+     GDB would then rewrite `/usr/src/include/defs.h' into
+     `/mnt/include/defs.h' by using the first rule.  However, it would
+     use the second rule to rewrite `/usr/src/lib/foo.c' into
+     `/mnt/src/lib/foo.c'.
+
+`unset substitute-path [path]'
+     If a path is specified, search the current list of substitution
+     rules for a rule that would rewrite that path.  Delete that rule
+     if found.  A warning is emitted by the debugger if no rule could
+     be found.
+
+     If no path is specified, then all substitution rules are deleted.
+
+`show substitute-path [path]'
+     If a path is specified, then print the source path substitution
+     rule which would rewrite that path, if any.
+
+     If no path is specified, then print all existing source path
+     substitution rules.
+
 
    If your source path is cluttered with directories that are no longer
 of interest, GDB may sometimes cause confusion by finding the wrong
@@ -5568,8 +5693,8 @@ identified by an integer tag; the meanings are well-known but
 system-specific.  Depending on the configuration and operating system
 facilities, GDB may be able to show you this information.  For remote
 targets, this functionality may further depend on the remote stub's
-support of the `qPart:auxv:read' packet, see *Note auxiliary vector:
-Remote configuration.
+support of the `qXfer:auxv:read' packet, see *Note qXfer auxiliary
+vector read::.
 
 `info auxv'
      Display the auxiliary vector of the inferior, which can be either a
@@ -5589,7 +5714,10 @@ File: gdb.info,  Node: Memory Region Attributes,  Next: Dump/Restore Files,  Pre
 "Memory region attributes" allow you to describe special handling
 required by regions of your target's memory.  GDB uses attributes to
 determine whether to allow certain types of memory accesses; whether to
-use specific width accesses; and whether to cache target memory.
+use specific width accesses; and whether to cache target memory.  By
+default the description of memory regions is fetched from the target
+(if the current target supports this), but the user can override the
+fetched regions.
 
    Defined memory regions can be individually enabled and disabled.
 When a memory region is disabled, GDB uses the default attributes when
@@ -5605,6 +5733,11 @@ to enable, disable, or remove a memory region, you specify that number.
      Note that UPPER == 0 is a special case: it is treated as the the
      target's maximum memory address.  (0xffff on 16 bit targets,
      0xffffffff on 32 bit targets, etc.)
+
+`mem auto'
+     Discard any user changes to the memory regions and use
+     target-supplied regions, if available, or no regions if the target
+     does not support.
 
 `delete mem NUMS...'
      Remove memory regions NUMS... from the list of regions monitored
@@ -7301,158 +7434,4 @@ with a language explicitly:
 
 `info extensions'
      List all the filename extensions and the associated languages.
-
-
-File: gdb.info,  Node: Checks,  Next: Supported languages,  Prev: Show,  Up: Languages
-
-12.3 Type and range checking
-============================
-
-     _Warning:_ In this release, the GDB commands for type and range
-     checking are included, but they do not yet have any effect.  This
-     section documents the intended facilities.
-
-   Some languages are designed to guard you against making seemingly
-common errors through a series of compile- and run-time checks.  These
-include checking the type of arguments to functions and operators, and
-making sure mathematical overflows are caught at run time.  Checks such
-as these help to ensure a program's correctness once it has been
-compiled by eliminating type mismatches, and providing active checks
-for range errors when your program is running.
-
-   GDB can check for conditions like the above if you wish.  Although
-GDB does not check the statements in your program, it can check
-expressions entered directly into GDB for evaluation via the `print'
-command, for example.  As with the working language, GDB can also
-decide whether or not to check automatically based on your program's
-source language.  *Note Supported languages: Supported languages, for
-the default settings of supported languages.
-
-* Menu:
-
-* Type Checking::               An overview of type checking
-* Range Checking::              An overview of range checking
-
-
-File: gdb.info,  Node: Type Checking,  Next: Range Checking,  Up: Checks
-
-12.3.1 An overview of type checking
------------------------------------
-
-Some languages, such as Modula-2, are strongly typed, meaning that the
-arguments to operators and functions have to be of the correct type,
-otherwise an error occurs.  These checks prevent type mismatch errors
-from ever causing any run-time problems.  For example,
-
-     1 + 2 => 3
-but
-     error--> 1 + 2.3
-
-   The second example fails because the `CARDINAL' 1 is not
-type-compatible with the `REAL' 2.3.
-
-   For the expressions you use in GDB commands, you can tell the GDB
-type checker to skip checking; to treat any mismatches as errors and
-abandon the expression; or to only issue warnings when type mismatches
-occur, but evaluate the expression anyway.  When you choose the last of
-these, GDB evaluates expressions like the second example above, but
-also issues a warning.
-
-   Even if you turn type checking off, there may be other reasons
-related to type that prevent GDB from evaluating an expression.  For
-instance, GDB does not know how to add an `int' and a `struct foo'.
-These particular type errors have nothing to do with the language in
-use, and usually arise from expressions, such as the one described
-above, which make little sense to evaluate anyway.
-
-   Each language defines to what degree it is strict about type.  For
-instance, both Modula-2 and C require the arguments to arithmetical
-operators to be numbers.  In C, enumerated types and pointers can be
-represented as numbers, so that they are valid arguments to mathematical
-operators.  *Note Supported languages: Supported languages, for further
-details on specific languages.
-
-   GDB provides some additional commands for controlling the type
-checker:
-
-`set check type auto'
-     Set type checking on or off based on the current working language.
-     *Note Supported languages: Supported languages, for the default
-     settings for each language.
-
-`set check type on'
-`set check type off'
-     Set type checking on or off, overriding the default setting for the
-     current working language.  Issue a warning if the setting does not
-     match the language default.  If any type mismatches occur in
-     evaluating an expression while type checking is on, GDB prints a
-     message and aborts evaluation of the expression.
-
-`set check type warn'
-     Cause the type checker to issue warnings, but to always attempt to
-     evaluate the expression.  Evaluating the expression may still be
-     impossible for other reasons.  For example, GDB cannot add numbers
-     and structures.
-
-`show type'
-     Show the current setting of the type checker, and whether or not
-     GDB is setting it automatically.
-
-
-File: gdb.info,  Node: Range Checking,  Prev: Type Checking,  Up: Checks
-
-12.3.2 An overview of range checking
-------------------------------------
-
-In some languages (such as Modula-2), it is an error to exceed the
-bounds of a type; this is enforced with run-time checks.  Such range
-checking is meant to ensure program correctness by making sure
-computations do not overflow, or indices on an array element access do
-not exceed the bounds of the array.
-
-   For expressions you use in GDB commands, you can tell GDB to treat
-range errors in one of three ways: ignore them, always treat them as
-errors and abandon the expression, or issue warnings but evaluate the
-expression anyway.
-
-   A range error can result from numerical overflow, from exceeding an
-array index bound, or when you type a constant that is not a member of
-any type.  Some languages, however, do not treat overflows as an error.
-In many implementations of C, mathematical overflow causes the result
-to "wrap around" to lower values--for example, if M is the largest
-integer value, and S is the smallest, then
-
-     M + 1 => S
-
-   This, too, is specific to individual languages, and in some cases
-specific to individual compilers or machines.  *Note Supported
-languages: Supported languages, for further details on specific
-languages.
-
-   GDB provides some additional commands for controlling the range
-checker:
-
-`set check range auto'
-     Set range checking on or off based on the current working language.
-     *Note Supported languages: Supported languages, for the default
-     settings for each language.
-
-`set check range on'
-`set check range off'
-     Set range checking on or off, overriding the default setting for
-     the current working language.  A warning is issued if the setting
-     does not match the language default.  If a range error occurs and
-     range checking is on, then a message is printed and evaluation of
-     the expression is aborted.
-
-`set check range warn'
-     Output messages when the GDB range checker detects a range error,
-     but attempt to evaluate the expression anyway.  Evaluating the
-     expression may still be impossible for other reasons, such as
-     accessing memory that the process does not own (a typical example
-     from many Unix systems).
-
-`show range'
-     Show the current setting of the range checker, and whether or not
-     it is being set automatically by GDB.
 

@@ -170,6 +170,53 @@ and `setjmp' handling are two common cases.
    When you want to make GDB work "native" on a particular machine, you
 have to include all three kinds of information.
 
+2.4 Source Tree Structure
+=========================
+
+The GDB source directory has a mostly flat structure--there are only a
+few subdirectories.  A file's name usually gives a hint as to what it
+does; for example, `stabsread.c' reads stabs, `dwarfread.c' reads
+DWARF, etc.
+
+   Files that are related to some common task have names that share
+common substrings.  For example, `*-thread.c' files deal with debugging
+threads on various platforms; `*read.c' files deal with reading various
+kinds of symbol and object files; `inf*.c' files deal with direct
+control of the "inferior program" (GDB parlance for the program being
+debugged).
+
+   There are several dozens of files in the `*-tdep.c' family.  `tdep'
+stands for "target-dependent code"--each of these files implements
+debug support for a specific target architecture (sparc, mips, etc).
+Usually, only one of these will be used in a specific GDB configuration
+(sometimes two, closely related).
+
+   Similarly, there are many `*-nat.c' files, each one for native
+debugging on a specific system (e.g., `sparc-linux-nat.c' is for native
+debugging of Sparc machines running the Linux kernel).
+
+   The few subdirectories of the source tree are:
+
+`cli'
+     Code that implements "CLI", the GDB Command-Line Interpreter.
+     *Note Command Interpreter: User Interface.
+
+`gdbserver'
+     Code for the GDB remote server.
+
+`gdbtk'
+     Code for Insight, the GDB TK-based GUI front-end.
+
+`mi'
+     The "GDB/MI", the GDB Machine Interface interpreter.
+
+`signals'
+     Target signal translation code.
+
+`tui'
+     Code for "TUI", the GDB Text-mode full-screen User Interface.
+     *Note TUI: User Interface.
+
 
 File: gdbint.info,  Node: Algorithms,  Next: User Interface,  Prev: Overall Structure,  Up: Top
 
@@ -225,7 +272,7 @@ prologue analyzer disassembles the function's machine code starting
 from its entry point, and looks for instructions that allocate frame
 space, save the stack pointer in a frame pointer register, save
 registers, and so on.  Obviously, this can't be done accurately in
-general, but it's tractible to do well enough to be very helpful.
+general, but it's tractable to do well enough to be very helpful.
 Prologue analysis predates the GNU toolchain's support for CFI; at one
 time, prologue analysis was the only mechanism GDB used for stack
 unwinding at all, when the function calling conventions didn't specify
@@ -325,7 +372,7 @@ for an approach that will be easier to understand and maintain.  In the
 approach described above:
 
    * It's easier to see that the analyzer is correct: you just see
-     whether the analyzer properly (albiet conservatively) simulates
+     whether the analyzer properly (albeit conservatively) simulates
      the effect of each instruction.
 
    * It's easier to extend the analyzer: you can add support for new
@@ -760,7 +807,7 @@ the state of registers and memory, and may include external state such
 as the state of open files and devices.
 
    There are a number of ways in which checkpoints may be implemented
-in gdb, eg. as corefiles, as forked processes, and as some opaque
+in gdb, e.g. as corefiles, as forked processes, and as some opaque
 method implemented on the target side.
 
    A corefile can be used to save an image of target memory and register
@@ -773,7 +820,7 @@ well as some subset of external (kernel) state.  This method is used to
 implement checkpoints on Linux, and in principle might be used on other
 systems.
 
-   Some targets, eg. simulators, might have their own built-in method
+   Some targets, e.g. simulators, might have their own built-in method
 for saving checkpoints, and gdb might be able to take advantage of that
 capability without necessarily knowing any details of how it is done.
 
@@ -2345,7 +2392,39 @@ each BFD architecture.
      architecture, a warning will be issued and the debugging session
      will continue with the defaults already established for GDBARCH.
 
-9.2 Registers and Memory
+9.2 Initializing a New Architecture
+===================================
+
+Each `gdbarch' is associated with a single BFD architecture, via a
+`bfd_arch_ARCH' constant.  The `gdbarch' is registered by a call to
+`register_gdbarch_init', usually from the file's `_initialize_FILENAME'
+routine, which will be automatically called during GDB startup.  The
+arguments are a BFD architecture constant and an initialization
+function.
+
+   The initialization function has this type:
+
+     static struct gdbarch *
+     ARCH_gdbarch_init (struct gdbarch_info INFO,
+                              struct gdbarch_list *ARCHES)
+
+   The INFO argument contains parameters used to select the correct
+architecture, and ARCHES is a list of architectures which have already
+been created with the same `bfd_arch_ARCH' value.
+
+   The initialization function should first make sure that INFO is
+acceptable, and return `NULL' if it is not.  Then, it should search
+through ARCHES for an exact match to INFO, and return one if found.
+Lastly, if no exact match was found, it should create a new
+architecture based on INFO and return it.
+
+   Only information in INFO should be used to choose the new
+architecture.  Historically, INFO could be sparse, and defaults would
+be collected from the first element on ARCHES.  However, GDB now fills
+in INFO more thoroughly, so new `gdbarch' initialization functions
+should not take defaults from ARCHES.
+
+9.3 Registers and Memory
 ========================
 
 GDB's model of the target machine is rather simple.  GDB assumes the
@@ -2361,7 +2440,7 @@ in the `REGISTER_NAME' and related macros.
    GDB can handle big-endian, little-endian, and bi-endian
 architectures.
 
-9.3 Pointers Are Not Always Addresses
+9.4 Pointers Are Not Always Addresses
 =====================================
 
 On almost all 32-bit architectures, the representation of a pointer is
@@ -2478,7 +2557,7 @@ simple unsigned byte addresses.
      This function may safely assume that TYPE is either a pointer or a
      C++ reference type.
 
-9.4 Address Classes
+9.5 Address Classes
 ===================
 
 Sometimes information about different kinds of addresses is available
@@ -2558,7 +2637,7 @@ pointers, GDB might show the following behavior:
      (gdb) ptype short_ptr_var
      type = int * @short
 
-9.5 Raw and Virtual Register Representations
+9.6 Raw and Virtual Register Representations
 ============================================
 
 _Maintainer note: This section is pretty much obsolete.  The
@@ -2657,7 +2736,7 @@ conversions between the raw and virtual format:
      Note that REGISTER_CONVERT_TO_VIRTUAL and REGISTER_CONVERT_TO_RAW
      take their REG and TYPE arguments in different orders.
 
-9.6 Using Different Register and Memory Data Representations
+9.7 Using Different Register and Memory Data Representations
 ============================================================
 
 _Maintainer's note: The way GDB manipulates registers is undergoing
@@ -2724,16 +2803,16 @@ representations of a data type:
           type *TYPE, char *BUF)
      See `mips-tdep.c'.  It does not do what you want.
 
-9.7 Frame Interpretation
+9.8 Frame Interpretation
 ========================
 
-9.8 Inferior Call Setup
+9.9 Inferior Call Setup
 =======================
 
-9.9 Compiler Characteristics
-============================
+9.10 Compiler Characteristics
+=============================
 
-9.10 Target Conditionals
+9.11 Target Conditionals
 ========================
 
 This section describes the macros that you can use to define the target
@@ -3667,7 +3746,7 @@ machine.
      "malloc".
 
 
-9.11 Adding a New Target
+9.12 Adding a New Target
 ========================
 
 The following files add a target to GDB:
@@ -3719,7 +3798,7 @@ facilities that are unusual (extra symbol table info; the breakpoint
 instruction needed; etc.).  Then write a `ARCH/tm-OS.h' that just
 `#include's `tm-ARCH.h' and `config/tm-OS.h'.
 
-9.12 Converting an existing Target Architecture to Multi-arch
+9.13 Converting an existing Target Architecture to Multi-arch
 =============================================================
 
 This section describes the current accepted best practice for converting
@@ -3751,7 +3830,7 @@ process may be more complicated and less clear.  The developer is
 expected to use their judgment and is encouraged to seek advice as
 needed.
 
-9.12.1 Preparation
+9.13.1 Preparation
 ------------------
 
 The first step is to establish control.  Build (with `-Werror' enabled)
@@ -3761,7 +3840,7 @@ debugger can be compared.
    At no stage can the test results regress or GDB stop compiling with
 `-Werror'.
 
-9.12.2 Add the multi-arch initialization code
+9.13.2 Add the multi-arch initialization code
 ---------------------------------------------
 
 The objective of this step is to establish the basic multi-arch
@@ -3804,7 +3883,7 @@ framework.  It involves
      `config/ARCH/tm-ARCH.h'.
 
 
-9.12.3 Update multi-arch incompatible mechanisms
+9.13.3 Update multi-arch incompatible mechanisms
 ------------------------------------------------
 
 Some mechanisms do not work with multi-arch.  They include:
@@ -3815,7 +3894,7 @@ Some mechanisms do not work with multi-arch.  They include:
 At this stage you could also consider converting the macros into
 functions.
 
-9.12.4 Prepare for multi-arch level to one
+9.13.4 Prepare for multi-arch level to one
 ------------------------------------------
 
 Temporally set `GDB_MULTI_ARCH' to `GDB_MULTI_ARCH_PARTIAL' and then
@@ -3832,7 +3911,7 @@ into functions (patch(es)).
 methods and wrap the corresponding macros in `#if !GDB_MULTI_ARCH'
 (patch(es)).
 
-9.12.5 Set multi-arch level one
+9.13.5 Set multi-arch level one
 -------------------------------
 
 Change the value of `GDB_MULTI_ARCH' to GDB_MULTI_ARCH_PARTIAL (a
@@ -3841,18 +3920,18 @@ single patch).
    Any problems with throwing "the switch" should have been fixed
 already.
 
-9.12.6 Convert remaining macros
+9.13.6 Convert remaining macros
 -------------------------------
 
 Suggest converting macros into functions (and setting the corresponding
 architecture method) in small batches.
 
-9.12.7 Set multi-arch level to two
+9.13.7 Set multi-arch level to two
 ----------------------------------
 
 This should go smoothly.
 
-9.12.8 Delete the TM file
+9.13.8 Delete the TM file
 -------------------------
 
 The `tm-ARCH.h' can be deleted.  `ARCH.mt' and `configure.in' updated.
@@ -3879,13 +3958,60 @@ control over a process or a serial port.  GDB includes some 30-40
 different target vectors; however, each configuration of GDB includes
 only a few of them.
 
-10.1 File Targets
-=================
+* Menu:
+
+* Managing Execution State::
+* Existing Targets::
+
+
+File: gdbint.info,  Node: Managing Execution State,  Next: Existing Targets,  Up: Target Vector Definition
+
+10.1 Managing Execution State
+=============================
+
+A target vector can be completely inactive (not pushed on the target
+stack), active but not running (pushed, but not connected to a fully
+manifested inferior), or completely active (pushed, with an accessible
+inferior).  Most targets are only completely inactive or completely
+active, but some support persistant connections to a target even when
+the target has exited or not yet started.
+
+   For example, connecting to the simulator using `target sim' does not
+create a running program.  Neither registers nor memory are accessible
+until `run'.  Similarly, after `kill', the program can not continue
+executing.  But in both cases GDB remains connected to the simulator,
+and target-specific commands are directed to the simulator.
+
+   A target which only supports complete activation should push itself
+onto the stack in its `to_open' routine (by calling `push_target'), and
+unpush itself from the stack in its `to_mourn_inferior' routine (by
+calling `unpush_target').
+
+   A target which supports both partial and complete activation should
+still call `push_target' in `to_open', but not call `unpush_target' in
+`to_mourn_inferior'.  Instead, it should call either
+`target_mark_running' or `target_mark_exited' in its `to_open',
+depending on whether the target is fully active after connection.  It
+should also call `target_mark_running' any time the inferior becomes
+fully active (e.g. in `to_create_inferior' and `to_attach'), and
+`target_mark_exited' when the inferior becomes inactive (in
+`to_mourn_inferior').  The target should also make sure to call
+`target_mourn_inferior' from its `to_kill', to return the target to
+inactive state.
+
+
+File: gdbint.info,  Node: Existing Targets,  Prev: Managing Execution State,  Up: Target Vector Definition
+
+10.2 Existing Targets
+=====================
+
+10.2.1 File Targets
+-------------------
 
 Both executables and core files have target vectors.
 
-10.2 Standard Protocol and Remote Stubs
-=======================================
+10.2.2 Standard Protocol and Remote Stubs
+-----------------------------------------
 
 GDB's file `remote.c' talks a serial protocol to code that runs in the
 target system.  GDB provides several sample "stubs" that can be
@@ -3926,17 +4052,17 @@ of the debugger/stub.
    From reading the stub, it's probably not obvious how breakpoints
 work.  They are simply done by deposit/examine operations from GDB.
 
-10.3 ROM Monitor Interface
-==========================
+10.2.3 ROM Monitor Interface
+----------------------------
 
-10.4 Custom Protocols
-=====================
+10.2.4 Custom Protocols
+-----------------------
 
-10.5 Transport Layer
-====================
+10.2.5 Transport Layer
+----------------------
 
-10.6 Builtin Simulator
-======================
+10.2.6 Builtin Simulator
+------------------------
 
 
 File: gdbint.info,  Node: Native Debugging,  Next: Support Libraries,  Prev: Target Vector Definition,  Up: Top
@@ -4313,7 +4439,175 @@ Regex conditionals.
 
 `sparc'
 
-12.7 include
+12.7 Array Containers
+=====================
+
+Often it is necessary to manipulate a dynamic array of a set of
+objects.  C forces some bookkeeping on this, which can get cumbersome
+and repetative.  The `vec.h' file contains macros for defining and
+using a typesafe vector type.  The functions defined will be inlined
+when compiling, and so the abstraction cost should be zero.  Domain
+checks are added to detect programming errors.
+
+   An example use would be an array of symbols or section information.
+The array can be grown as symbols are read in (or preallocated), and
+the accessor macros provided keep care of all the necessary
+bookkeeping.  Because the arrays are type safe, there is no danger of
+accidentally mixing up the contents.  Think of these as C++ templates,
+but implemented in C.
+
+   Because of the different behavior of structure objects, scalar
+objects and of pointers, there are three flavors of vector, one for
+each of these variants.  Both the structure object and pointer variants
+pass pointers to objects around -- in the former case the pointers are
+stored into the vector and in the latter case the pointers are
+dereferenced and the objects copied into the vector.  The scalar object
+variant is suitable for `int'-like objects, and the vector elements are
+returned by value.
+
+   There are both `index' and `iterate' accessors.  The iterator
+returns a boolean iteration condition and updates the iteration
+variable passed by reference.  Because the iterator will be inlined,
+the address-of can be optimized away.
+
+   The vectors are implemented using the trailing array idiom, thus they
+are not resizeable without changing the address of the vector object
+itself.  This means you cannot have variables or fields of vector type
+-- always use a pointer to a vector.  The one exception is the final
+field of a structure, which could be a vector type.  You will have to
+use the `embedded_size' & `embedded_init' calls to create such objects,
+and they will probably not be resizeable (so don't use the "safe"
+allocation variants).  The trailing array idiom is used (rather than a
+pointer to an array of data), because, if we allow `NULL' to also
+represent an empty vector, empty vectors occupy minimal space in the
+structure containing them.
+
+   Each operation that increases the number of active elements is
+available in "quick" and "safe" variants.  The former presumes that
+there is sufficient allocated space for the operation to succeed (it
+dies if there is not).  The latter will reallocate the vector, if
+needed.  Reallocation causes an exponential increase in vector size.
+If you know you will be adding N elements, it would be more efficient
+to use the reserve operation before adding the elements with the
+"quick" operation.  This will ensure there are at least as many
+elements as you ask for, it will exponentially increase if there are
+too few spare slots.  If you want reserve a specific number of slots,
+but do not want the exponential increase (for instance, you know this
+is the last allocation), use a negative number for reservation.  You
+can also create a vector of a specific size from the get go.
+
+   You should prefer the push and pop operations, as they append and
+remove from the end of the vector. If you need to remove several items
+in one go, use the truncate operation.  The insert and remove
+operations allow you to change elements in the middle of the vector.
+There are two remove operations, one which preserves the element
+ordering `ordered_remove', and one which does not `unordered_remove'.
+The latter function copies the end element into the removed slot,
+rather than invoke a memmove operation.  The `lower_bound' function
+will determine where to place an item in the array using insert that
+will maintain sorted order.
+
+   If you need to directly manipulate a vector, then the `address'
+accessor will return the address of the start of the vector.  Also the
+`space' predicate will tell you whether there is spare capacity in the
+vector.  You will not normally need to use these two functions.
+
+   Vector types are defined using a `DEF_VEC_{O,P,I}(TYPENAME)' macro.
+Variables of vector type are declared using a `VEC(TYPENAME)' macro.
+The characters `O', `P' and `I' indicate whether TYPENAME is an object
+(`O'), pointer (`P') or integral (`I') type.  Be careful to pick the
+correct one, as you'll get an awkward and inefficient API if you use
+the wrong one.  There is a check, which results in a compile-time
+warning, for the `P' and `I' versions, but there is no check for the
+`O' versions, as that is not possible in plain C.
+
+   An example of their use would be,
+
+     DEF_VEC_P(tree);   // non-managed tree vector.
+
+     struct my_struct {
+       VEC(tree) *v;      // A (pointer to) a vector of tree pointers.
+     };
+
+     struct my_struct *s;
+
+     if (VEC_length(tree, s->v)) { we have some contents }
+     VEC_safe_push(tree, s->v, decl); // append some decl onto the end
+     for (ix = 0; VEC_iterate(tree, s->v, ix, elt); ix++)
+       { do something with elt }
+
+   The `vec.h' file provides details on how to invoke the various
+accessors provided.  They are enumerated here:
+
+`VEC_length'
+     Return the number of items in the array,
+
+`VEC_empty'
+     Return true if the array has no elements.
+
+`VEC_last'
+`VEC_index'
+     Return the last or arbitrary item in the array.
+
+`VEC_iterate'
+     Access an array element and indicate whether the array has been
+     traversed.
+
+`VEC_alloc'
+`VEC_free'
+     Create and destroy an array.
+
+`VEC_embedded_size'
+`VEC_embedded_init'
+     Helpers for embedding an array as the final element of another
+     struct.
+
+`VEC_copy'
+     Duplicate an array.
+
+`VEC_space'
+     Return the amount of free space in an array.
+
+`VEC_reserve'
+     Ensure a certain amount of free space.
+
+`VEC_quick_push'
+`VEC_safe_push'
+     Append to an array, either assuming the space is available, or
+     making sure that it is.
+
+`VEC_pop'
+     Remove the last item from an array.
+
+`VEC_truncate'
+     Remove several items from the end of an array.
+
+`VEC_safe_grow'
+     Add several items to the end of an array.
+
+`VEC_replace'
+     Overwrite an item in the array.
+
+`VEC_quick_insert'
+`VEC_safe_insert'
+     Insert an item into the middle of the array.  Either the space must
+     already exist, or the space is created.
+
+`VEC_ordered_remove'
+`VEC_unordered_remove'
+     Remove an item from the array, preserving order or not.
+
+`VEC_block_remove'
+     Remove a set of items from the array.
+
+`VEC_address'
+     Provide the address of the first element.
+
+`VEC_lower_bound'
+     Binary search the array.
+
+
+12.8 include
 ============
 
 
@@ -5372,31 +5666,30 @@ Create the branch
      $  echo $u $V $D
      5.1 5_2 2002-03-03
      $  echo cvs -f -d :ext:sources.redhat.com:/cvs/src rtag \
-     -D $D-gmt gdb_$V-$D-branchpoint insight+dejagnu
+     -D $D-gmt gdb_$V-$D-branchpoint insight
      cvs -f -d :ext:sources.redhat.com:/cvs/src rtag
-     -D 2002-03-03-gmt gdb_5_2-2002-03-03-branchpoint insight+dejagnu
+     -D 2002-03-03-gmt gdb_5_2-2002-03-03-branchpoint insight
      $  ^echo ^^
      ...
      $  echo cvs -f -d :ext:sources.redhat.com:/cvs/src rtag \
-     -b -r gdb_$V-$D-branchpoint gdb_$V-branch insight+dejagnu
+     -b -r gdb_$V-$D-branchpoint gdb_$V-branch insight
      cvs -f -d :ext:sources.redhat.com:/cvs/src rtag \
-     -b -r gdb_5_2-2002-03-03-branchpoint gdb_5_2-branch insight+dejagnu
+     -b -r gdb_5_2-2002-03-03-branchpoint gdb_5_2-branch insight
      $  ^echo ^^
      ...
      $
 
-   * by using `-D YYYY-MM-DD-gmt' the branch is forced to an exact
+   * By using `-D YYYY-MM-DD-gmt', the branch is forced to an exact
      date/time.
 
-   * the trunk is first taged so that the branch point can easily be
-     found
+   * The trunk is first tagged so that the branch point can easily be
+     found.
 
-   * Insight (which includes GDB) and dejagnu are all tagged at the
-     same time
+   * Insight, which includes GDB, is tagged at the same time.
 
-   * `version.in' gets bumped to avoid version number conflicts
+   * `version.in' gets bumped to avoid version number conflicts.
 
-   * the reading of `.cvsrc' is disabled using `-f'
+   * The reading of `.cvsrc' is disabled using `-f'.
 
 Update `version.in'
 -------------------
@@ -5420,10 +5713,10 @@ Update `version.in'
      $  cvs -f commit version.in
 
    * `0000-00-00' is used as a date to pump prime the version.in update
-     mechanism
+     mechanism.
 
    * `.90' and the previous branch version are used as fairly arbitrary
-     initial branch version number
+     initial branch version number.
 
 Update the web and news pages
 -----------------------------
@@ -5436,9 +5729,9 @@ Tweak cron to track the new branch
 The file `gdbadmin/cron/crontab' contains gdbadmin's cron table.  This
 file needs to be updated so that:
 
-   * a daily timestamp is added to the file `version.in'
+   * A daily timestamp is added to the file `version.in'.
 
-   * the new branch is included in the snapshot process
+   * The new branch is included in the snapshot process.
 
 See the file `gdbadmin/cron/README' for how to install the updated cron
 table.
@@ -5473,13 +5766,13 @@ list are alerted._
 
    The announcement should include:
 
-   * the branch tag
+   * The branch tag.
 
-   * how to check out the branch using CVS
+   * How to check out the branch using CVS.
 
-   * the date/number of weeks until the release
+   * The date/number of weeks until the release.
 
-   * the branch commit policy still holds.
+   * The branch commit policy still holds.
 
 17.5 Stabilize the branch
 =========================
@@ -5536,7 +5829,7 @@ Notes:
 Check out the relevant modules:
 ...............................
 
-     $  for m in gdb insight dejagnu
+     $  for m in gdb insight
      do
      ( mkdir -p $m && cd $m && cvs -q -f -d /cvs/src co -P -r $b $m )
      done
@@ -5569,11 +5862,11 @@ Update relevant files.
 `gdb/README'
      You'll need to update:
 
-        * the version
+        * The version.
 
-        * the update date
+        * The update date.
 
-        * who did it
+        * Who did it.
 
           $  emacs gdb/src/gdb/README
           ...
@@ -5602,21 +5895,6 @@ Update relevant files.
           $  cp gdb/src/gdb/version.in insight/src/gdb/version.in
           $  cp gdb/src/gdb/ChangeLog insight/src/gdb/ChangeLog
 
-`dejagnu/src/dejagnu/configure.in'
-     Dejagnu is more complicated.  The version number is a parameter to
-     `AM_INIT_AUTOMAKE'.  Tweak it to read something like gdb-5.1.91.
-
-     Don't forget to re-generate `configure'.
-
-     Don't forget to include a `ChangeLog' entry.
-
-          $  emacs dejagnu/src/dejagnu/configure.in
-          ...
-          c-x 4 a
-          ...
-          c-x c-s c-x c-c
-          $  ( cd  dejagnu/src/dejagnu && autoconf )
-
 
 Do the dirty work
 .................
@@ -5627,7 +5905,6 @@ This is identical to the process used to create the daily snapshot.
      do
      ( cd $m/src && gmake -f src-release $m.tar )
      done
-     $  ( m=dejagnu; cd $m/src && gmake -f src-release $m.tar.bz2 )
 
    If the top level source directory does not have `src-release' (GDB
 version 5.3.1 or earlier), try these commands instead:
@@ -5636,7 +5913,6 @@ version 5.3.1 or earlier), try these commands instead:
      do
      ( cd $m/src && gmake -f Makefile.in $m.tar )
      done
-     $  ( m=dejagnu; cd $m/src && gmake -f Makefile.in $m.tar.bz2 )
 
 Check the source files
 ......................
@@ -5668,7 +5944,7 @@ Create compressed versions of the release
      $  cp */src/*.tar .
      $  cp */src/*.bz2 .
      $  ls -F
-     dejagnu/ dejagnu-gdb-5.2.tar.bz2 gdb/ gdb-5.2.tar insight/ insight-5.2.tar
+     gdb/ gdb-5.2.tar insight/ insight-5.2.tar
      $  for m in gdb insight
      do
      bzip2 -v -9 -c $m-$v.tar > $m-$v.tar.bz2
@@ -5754,20 +6030,20 @@ Update the web pages.
 
 `htdocs/download/ANNOUNCEMENT'
      This file, which is posted as the official announcement, includes:
-        * General announcement
+        * General announcement.
 
         * News.  If making an M.N.1 release, retain the news from
           earlier M.N release.
 
-        * Errata
+        * Errata.
 
 `htdocs/index.html'
 `htdocs/news/index.html'
 `htdocs/download/index.html'
      These files include:
-        * announcement of the most recent release
+        * Announcement of the most recent release.
 
-        * news entry (remember to update both the top level and the
+        * News entry (remember to update both the top level and the
           news directory).
      These pages also need to be regenerate using `index.sh'.
 
@@ -5845,8 +6121,7 @@ Something like:
      $  ( cd insight/src/gdb && cvs -f -q update )
      $  ( cd insight/src && cvs -f -q tag gdb_5_2-$d-release )
 
-   Insight is used since that contains more of the release than GDB
-(`dejagnu' doesn't get tagged but I think we can live with that).
+   Insight is used since that contains more of the release than GDB.
 
 Mention the release on the trunk
 ................................
@@ -5902,10 +6177,9 @@ rarely sufficient; users typically use only a small subset of the
 available commands, and it has proven all too common for a change to
 cause a significant regression that went unnoticed for some time.
 
-   The GDB testsuite uses the DejaGNU testing framework.  DejaGNU is
-built using `Tcl' and `expect'.  The tests themselves are calls to
-various `Tcl' procs; the framework runs all the procs and summarizes
-the passes and fails.
+   The GDB testsuite uses the DejaGNU testing framework.  The tests
+themselves are calls to various `Tcl' procs; the framework runs all the
+procs and summarizes the passes and fails.
 
 18.1 Using the Testsuite
 ========================

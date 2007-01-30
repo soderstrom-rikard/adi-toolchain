@@ -32,15 +32,12 @@ static void m32c_info_to_howto_rela
   (bfd *, arelent *, Elf_Internal_Rela *);
 static bfd_boolean m32c_elf_relocate_section 
   (bfd *, struct bfd_link_info *, bfd *, asection *, bfd_byte *, Elf_Internal_Rela *, Elf_Internal_Sym *, asection **);
-static bfd_boolean m32c_elf_gc_sweep_hook
-  (bfd *, struct bfd_link_info *, asection *, const Elf_Internal_Rela *);
-static asection * m32c_elf_gc_mark_hook
-  (asection *, struct bfd_link_info *, Elf_Internal_Rela *, struct elf_link_hash_entry *, Elf_Internal_Sym *);
 static bfd_boolean m32c_elf_check_relocs
   (bfd *, struct bfd_link_info *, asection *, const Elf_Internal_Rela *);
 static bfd_boolean m32c_elf_relax_delete_bytes (bfd *, asection *, bfd_vma, int);
 #ifdef DEBUG
-static char * m32c_get_reloc (long reloc);
+char * m32c_get_reloc (long reloc);
+void dump_symtab (bfd *, void *, void *);
 #endif
 static bfd_boolean m32c_elf_relax_section
 (bfd *abfd, asection *sec, struct bfd_link_info *link_info, bfd_boolean *again);
@@ -571,62 +568,6 @@ m32c_elf_relocate_section
   return TRUE;
 }
 
-/* Return the section that should be marked against GC for a given
-   relocation.  */
-
-static asection *
-m32c_elf_gc_mark_hook
-    (asection *                   sec,
-     struct bfd_link_info *       info ATTRIBUTE_UNUSED,
-     Elf_Internal_Rela *          rel,
-     struct elf_link_hash_entry * h,
-     Elf_Internal_Sym *           sym)
-{
-  if (h != NULL)
-    {
-      switch (ELF32_R_TYPE (rel->r_info))
-	{
-	default:
-	  switch (h->root.type)
-	    {
-	    case bfd_link_hash_defined:
-	    case bfd_link_hash_defweak:
-	      return h->root.u.def.section;
-
-	    case bfd_link_hash_common:
-	      return h->root.u.c.p->section;
-
-	    default:
-	      break;
-	    }
-	}
-    }
-  else
-    {
-      if (!(elf_bad_symtab (sec->owner)
-	    && ELF_ST_BIND (sym->st_info) != STB_LOCAL)
-	  && ! ((sym->st_shndx <= 0 || sym->st_shndx >= SHN_LORESERVE)
-		&& sym->st_shndx != SHN_COMMON))
-	{
-	  return bfd_section_from_elf_index (sec->owner, sym->st_shndx);
-	}
-    }
-
-  return NULL;
-}
-
-/* Update the got entry reference counts for the section being removed.  */
-
-static bfd_boolean
-m32c_elf_gc_sweep_hook
-    (bfd *                     abfd ATTRIBUTE_UNUSED,
-     struct bfd_link_info *    info ATTRIBUTE_UNUSED,
-     asection *                sec ATTRIBUTE_UNUSED,
-     const Elf_Internal_Rela * relocs ATTRIBUTE_UNUSED)
-{
-  return TRUE;
-}
-
 /* We support 16-bit pointers to code above 64k by generating a thunk
    below 64k containing a JMP instruction to the final address.  */
  
@@ -690,16 +631,11 @@ m32c_elf_check_relocs
 	      splt = bfd_get_section_by_name (dynobj, ".plt");
 	      if (splt == NULL)
 		{
-		  splt = bfd_make_section (dynobj, ".plt");
+		  flagword flags = (SEC_ALLOC | SEC_LOAD | SEC_HAS_CONTENTS
+				    | SEC_IN_MEMORY | SEC_LINKER_CREATED
+				    | SEC_READONLY | SEC_CODE);
+		  splt = bfd_make_section_with_flags (dynobj, ".plt", flags);
 		  if (splt == NULL
-		      || ! bfd_set_section_flags (dynobj, splt,
-						  (SEC_ALLOC
-						   | SEC_LOAD
-						   | SEC_HAS_CONTENTS
-						   | SEC_IN_MEMORY
-						   | SEC_LINKER_CREATED
-						   | SEC_READONLY
-						   | SEC_CODE))
 		      || ! bfd_set_section_alignment (dynobj, splt, 1))
 		    return FALSE;
 		}
@@ -936,7 +872,7 @@ m32c_elf_object_p (bfd *abfd)
  
 
 #ifdef DEBUG
-static void
+void
 dump_symtab (bfd * abfd, void *internal_syms, void *external_syms)
 {
   size_t locsymcount;
@@ -977,7 +913,6 @@ dump_symtab (bfd * abfd, void *internal_syms, void *external_syms)
 	{
 	case STT_FUNC: st_info_str = "STT_FUNC";
 	case STT_SECTION: st_info_str = "STT_SECTION";
-	case STT_SRELC: st_info_str = "STT_SRELC";
 	case STT_FILE: st_info_str = "STT_FILE";
 	case STT_OBJECT: st_info_str = "STT_OBJECT";
 	case STT_TLS: st_info_str = "STT_TLS";
@@ -1022,7 +957,7 @@ dump_symtab (bfd * abfd, void *internal_syms, void *external_syms)
     free (external_syms);
 }
 
-static char *
+char *
 m32c_get_reloc (long reloc)
 {
   if (0 <= reloc && reloc < R_M32C_max)
@@ -2055,8 +1990,6 @@ m32c_elf_relax_delete_bytes
 #define elf_info_to_howto			m32c_info_to_howto_rela
 #define elf_backend_object_p			m32c_elf_object_p
 #define elf_backend_relocate_section		m32c_elf_relocate_section
-#define elf_backend_gc_mark_hook		m32c_elf_gc_mark_hook
-#define elf_backend_gc_sweep_hook		m32c_elf_gc_sweep_hook
 #define elf_backend_check_relocs                m32c_elf_check_relocs
 #define elf_backend_object_p			m32c_elf_object_p
 #define elf_symbol_leading_char                 ('_')

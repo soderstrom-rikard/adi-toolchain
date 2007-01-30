@@ -140,8 +140,7 @@ _bfd_ecoff_mkobject_hook (bfd *abfd, void * filehdr, void * aouthdr)
 /* Initialize a new section.  */
 
 bfd_boolean
-_bfd_ecoff_new_section_hook (bfd *abfd ATTRIBUTE_UNUSED,
-			     asection *section)
+_bfd_ecoff_new_section_hook (bfd *abfd, asection *section)
 {
   unsigned int i;
   static struct
@@ -181,7 +180,7 @@ _bfd_ecoff_new_section_hook (bfd *abfd ATTRIBUTE_UNUSED,
      uncertain about .init on some systems and I don't know how shared
      libraries work.  */
 
-  return TRUE;
+  return _bfd_generic_new_section_hook (abfd, section);
 }
 
 /* Determine the machine architecture and type.  This is called from
@@ -2862,7 +2861,7 @@ _bfd_ecoff_slurp_armap (bfd *abfd)
      bfd_slurp_armap, but that seems inappropriate since no other
      target uses this format.  Instead, we check directly for a COFF
      armap.  */
-  if (strneq (nextname, "/               ", 16))
+  if (CONST_STRNEQ (nextname, "/               "))
     return bfd_slurp_armap (abfd);
 
   /* See if the first element is an armap.  */

@@ -9,7 +9,7 @@ END-INFO-DIR-ENTRY
    This file documents the GNU debugger GDB.
 
    This is the Ninth Edition, of `Debugging with GDB: the GNU
-Source-Level Debugger' for GDB Version 6.5.
+Source-Level Debugger' for GDB Version 6.6.
 
    Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
 1998,
@@ -27,6 +27,160 @@ with the Back-Cover Texts as in (a) below.
 freedom to copy and modify this GNU Manual, like GNU software.  Copies
 published by the Free Software Foundation raise funds for GNU
 development."
+
+
+File: gdb.info,  Node: Checks,  Next: Supported languages,  Prev: Show,  Up: Languages
+
+12.3 Type and range checking
+============================
+
+     _Warning:_ In this release, the GDB commands for type and range
+     checking are included, but they do not yet have any effect.  This
+     section documents the intended facilities.
+
+   Some languages are designed to guard you against making seemingly
+common errors through a series of compile- and run-time checks.  These
+include checking the type of arguments to functions and operators, and
+making sure mathematical overflows are caught at run time.  Checks such
+as these help to ensure a program's correctness once it has been
+compiled by eliminating type mismatches, and providing active checks
+for range errors when your program is running.
+
+   GDB can check for conditions like the above if you wish.  Although
+GDB does not check the statements in your program, it can check
+expressions entered directly into GDB for evaluation via the `print'
+command, for example.  As with the working language, GDB can also
+decide whether or not to check automatically based on your program's
+source language.  *Note Supported languages: Supported languages, for
+the default settings of supported languages.
+
+* Menu:
+
+* Type Checking::               An overview of type checking
+* Range Checking::              An overview of range checking
+
+
+File: gdb.info,  Node: Type Checking,  Next: Range Checking,  Up: Checks
+
+12.3.1 An overview of type checking
+-----------------------------------
+
+Some languages, such as Modula-2, are strongly typed, meaning that the
+arguments to operators and functions have to be of the correct type,
+otherwise an error occurs.  These checks prevent type mismatch errors
+from ever causing any run-time problems.  For example,
+
+     1 + 2 => 3
+but
+     error--> 1 + 2.3
+
+   The second example fails because the `CARDINAL' 1 is not
+type-compatible with the `REAL' 2.3.
+
+   For the expressions you use in GDB commands, you can tell the GDB
+type checker to skip checking; to treat any mismatches as errors and
+abandon the expression; or to only issue warnings when type mismatches
+occur, but evaluate the expression anyway.  When you choose the last of
+these, GDB evaluates expressions like the second example above, but
+also issues a warning.
+
+   Even if you turn type checking off, there may be other reasons
+related to type that prevent GDB from evaluating an expression.  For
+instance, GDB does not know how to add an `int' and a `struct foo'.
+These particular type errors have nothing to do with the language in
+use, and usually arise from expressions, such as the one described
+above, which make little sense to evaluate anyway.
+
+   Each language defines to what degree it is strict about type.  For
+instance, both Modula-2 and C require the arguments to arithmetical
+operators to be numbers.  In C, enumerated types and pointers can be
+represented as numbers, so that they are valid arguments to mathematical
+operators.  *Note Supported languages: Supported languages, for further
+details on specific languages.
+
+   GDB provides some additional commands for controlling the type
+checker:
+
+`set check type auto'
+     Set type checking on or off based on the current working language.
+     *Note Supported languages: Supported languages, for the default
+     settings for each language.
+
+`set check type on'
+`set check type off'
+     Set type checking on or off, overriding the default setting for the
+     current working language.  Issue a warning if the setting does not
+     match the language default.  If any type mismatches occur in
+     evaluating an expression while type checking is on, GDB prints a
+     message and aborts evaluation of the expression.
+
+`set check type warn'
+     Cause the type checker to issue warnings, but to always attempt to
+     evaluate the expression.  Evaluating the expression may still be
+     impossible for other reasons.  For example, GDB cannot add numbers
+     and structures.
+
+`show type'
+     Show the current setting of the type checker, and whether or not
+     GDB is setting it automatically.
+
+
+File: gdb.info,  Node: Range Checking,  Prev: Type Checking,  Up: Checks
+
+12.3.2 An overview of range checking
+------------------------------------
+
+In some languages (such as Modula-2), it is an error to exceed the
+bounds of a type; this is enforced with run-time checks.  Such range
+checking is meant to ensure program correctness by making sure
+computations do not overflow, or indices on an array element access do
+not exceed the bounds of the array.
+
+   For expressions you use in GDB commands, you can tell GDB to treat
+range errors in one of three ways: ignore them, always treat them as
+errors and abandon the expression, or issue warnings but evaluate the
+expression anyway.
+
+   A range error can result from numerical overflow, from exceeding an
+array index bound, or when you type a constant that is not a member of
+any type.  Some languages, however, do not treat overflows as an error.
+In many implementations of C, mathematical overflow causes the result
+to "wrap around" to lower values--for example, if M is the largest
+integer value, and S is the smallest, then
+
+     M + 1 => S
+
+   This, too, is specific to individual languages, and in some cases
+specific to individual compilers or machines.  *Note Supported
+languages: Supported languages, for further details on specific
+languages.
+
+   GDB provides some additional commands for controlling the range
+checker:
+
+`set check range auto'
+     Set range checking on or off based on the current working language.
+     *Note Supported languages: Supported languages, for the default
+     settings for each language.
+
+`set check range on'
+`set check range off'
+     Set range checking on or off, overriding the default setting for
+     the current working language.  A warning is issued if the setting
+     does not match the language default.  If a range error occurs and
+     range checking is on, then a message is printed and evaluation of
+     the expression is aborted.
+
+`set check range warn'
+     Output messages when the GDB range checker detects a range error,
+     but attempt to evaluate the expression anyway.  Evaluating the
+     expression may still be impossible for other reasons, such as
+     accessing memory that the process does not own (a typical example
+     from many Unix systems).
+
+`show range'
+     Show the current setting of the range checker, and whether or not
+     it is being set automatically by GDB.
 
 
 File: gdb.info,  Node: Supported languages,  Next: Unsupported languages,  Prev: Checks,  Up: Languages
@@ -2807,7 +2961,6 @@ available architectures with the `set architecture' command.
 * Target Commands::             Commands for managing targets
 * Byte Order::                  Choosing target byte order
 * Remote::                      Remote debugging
-* KOD::                         Kernel Object Display
 
 
 File: gdb.info,  Node: Active Targets,  Next: Target Commands,  Up: Targets
@@ -2938,18 +3091,7 @@ your configuration may have more or fewer targets.
 
    Many remote targets require you to download the executable's code
 once you've successfully established a connection.  You may wish to
-control various aspects of this process, such as the size of the data
-chunks used by GDB to download program parts to the remote target.
-
-`set download-write-size SIZE'
-     Set the write size used when downloading a program.  Only used when
-     downloading a program onto a remote target.  Specify zero or a
-     negative value to disable blocked writes.  The actual size of each
-     transfer is also limited by the size of the target packet and the
-     memory cache.
-
-`show download-write-size'
-     Show the current value of the write size.
+control various aspects of this process.
 
 `set hash'
      This command controls whether a hash mark `#' is displayed while
@@ -2985,6 +3127,9 @@ chunks used by GDB to download program parts to the remote target.
      load address when you link the program; for other formats, like
      a.out, the object file format specifies a fixed address.
 
+     Depending on the remote side capabilities, GDB may be able to load
+     programs into flash memory.
+
      `load' does not repeat if you press <RET> again after using it.
 
 
@@ -3018,7 +3163,7 @@ data on the host, and that they have absolutely no effect on the target
 system.
 
 
-File: gdb.info,  Node: Remote,  Next: KOD,  Prev: Byte Order,  Up: Targets
+File: gdb.info,  Node: Remote,  Prev: Byte Order,  Up: Targets
 
 16.4 Remote debugging
 =====================
@@ -3044,44 +3189,6 @@ arbitrary commands to the remote monitor:
 
 `remote COMMAND'
      Send an arbitrary COMMAND string to the remote monitor.
-
-
-File: gdb.info,  Node: KOD,  Prev: Remote,  Up: Targets
-
-16.5 Kernel Object Display
-==========================
-
-Some targets support kernel object display.  Using this facility, GDB
-communicates specially with the underlying operating system and can
-display information about operating system-level objects such as
-mutexes and other synchronization objects.  Exactly which objects can be
-displayed is determined on a per-OS basis.
-
-   Use the `set os' command to set the operating system.  This tells
-GDB which kernel object display module to initialize:
-
-     (gdb) set os cisco
-
-   The associated command `show os' displays the operating system set
-with the `set os' command; if no operating system has been set, `show
-os' will display an empty string `""'.
-
-   If `set os' succeeds, GDB will display some information about the
-operating system, and will create a new `info' command which can be
-used to query the target.  The `info' command is named after the
-operating system:
-
-     (gdb) info cisco
-     List of Cisco Kernel Objects
-     Object     Description
-     any        Any and all objects
-
-   Further subcommands can be used to query about particular objects
-known by the kernel.
-
-   There is currently no way to determine whether a given operating
-system is supported other than to try setting it with `set os NAME',
-where NAME is the name of the operating system you want to try.
 
 
 File: gdb.info,  Node: Remote Debugging,  Next: Configurations,  Prev: Targets,  Up: Top
@@ -3174,7 +3281,7 @@ commands to examine and change data and to step and continue the remote
 program.
 
    Whenever GDB is waiting for the remote program, if you type the
-interrupt character (often <C-C>), GDB attempts to stop the program.
+interrupt character (often `Ctrl-c'), GDB attempts to stop the program.
 This may or may not succeed, depending in part on the hardware and the
 serial drivers the remote system uses.  If you type the interrupt
 character once again, GDB displays this prompt:
@@ -3314,8 +3421,8 @@ File: gdb.info,  Node: Remote configuration,  Next: remote stub,  Prev: Server, 
 
 This section documents the configuration options available when
 debugging remote programs.  For the options related to the File I/O
-extensions of the remote protocol, see *Note system-call-allowed: The
-system call.
+extensions of the remote protocol, see *Note system-call-allowed:
+system.
 
 `set remoteaddresssize BITS'
      Set the maximum size of address in a memory packet to the specified
@@ -3336,10 +3443,10 @@ system call.
 
 `set remotebreak'
      If set to on, GDB sends a `BREAK' signal to the remote when you
-     press the <Ctrl-C> key to interrupt the program running on the
-     remote.  If set to off, GDB sends the `Ctrl-C' character instead.
-     The default is off, since most remote systems expect to see
-     `Ctrl-C' as the interrupt signal.
+     type `Ctrl-c' to interrupt the program running on the remote.  If
+     set to off, GDB sends the `Ctrl-C' character instead.  The default
+     is off, since most remote systems expect to see `Ctrl-C' as the
+     interrupt signal.
 
 `show remotebreak'
      Show whether GDB sends `BREAK' or `Ctrl-C' to interrupt the remote
@@ -3386,102 +3493,38 @@ system call.
      Restrict GDB to using LIMIT remote hardware breakpoint or
      watchpoints.  A limit of -1, the default, is treated as unlimited.
 
-`set remote fetch-register-packet'
-`set remote set-register-packet'
-`set remote P-packet'
-`set remote p-packet'
-     Determine whether GDB can set and fetch registers from the remote
-     target using the `P' packets.  The default depends on the remote
-     stub's support of the `P' packets (GDB queries the stub when this
-     packet is first required).
+   The GDB remote protocol autodetects the packets supported by your
+debugging stub.  If you need to override the autodetection, you can use
+these commands to enable or disable individual packets.  Each packet
+can be set to `on' (the remote target supports this packet), `off' (the
+remote target does not support this packet), or `auto' (detect remote
+target support for this packet).  They all default to `auto'.  For more
+information about each packet, see *Note Remote Protocol::.
 
-`show remote fetch-register-packet'
-`show remote set-register-packet'
-`show remote P-packet'
-`show remote p-packet'
-     Show the current setting of using the `P' packets for setting and
-     fetching registers from the remote target.
+   During normal use, you should not have to use any of these commands.
+If you do, that may be a bug in your remote debugging stub, or a bug in
+GDB.  You may want to report the problem to the GDB developers.
 
-`set remote binary-download-packet'
-`set remote X-packet'
-     Determine whether GDB sends downloads in binary mode using the `X'
-     packets.  The default is on.
+   The available settings are:
 
-`show remote binary-download-packet'
-`show remote X-packet'
-     Show the current setting of using the `X' packets for binary
-     downloads.
-
-`set remote read-aux-vector-packet'
-     Set the use of the remote protocol's `qPart:auxv:read' (target
-     auxiliary vector read) request.  This request is used to fetch the
-     remote target's "auxiliary vector", see *Note Auxiliary Vector: OS
-     Information.  The default setting depends on the remote stub's
-     support of this request (GDB queries the stub when this request is
-     first required).  *Note qPart: General Query Packets, for more
-     information about this request.
-
-`show remote read-aux-vector-packet'
-     Show the current setting of use of the `qPart:auxv:read' request.
-
-`set remote symbol-lookup-packet'
-     Set the use of the remote protocol's `qSymbol' (target symbol
-     lookup) request.  This request is used to communicate symbol
-     information to the remote target, e.g., whenever a new shared
-     library is loaded by the remote (*note shared libraries: Files.).
-     The default setting depends on the remote stub's support of this
-     request (GDB queries the stub when this request is first required).
-     *Note qSymbol: General Query Packets, for more information about
-     this request.
-
-`show remote symbol-lookup-packet'
-     Show the current setting of use of the `qSymbol' request.
-
-`set remote verbose-resume-packet'
-     Set the use of the remote protocol's `vCont' (descriptive resume)
-     request.  This request is used to resume specific threads in the
-     remote target, and to single-step or signal them.  The default
-     setting depends on the remote stub's support of this request (GDB
-     queries the stub when this request is first required).  This
-     setting affects debugging of multithreaded programs: if `vCont'
-     cannot be used, GDB might be unable to single-step a specific
-     thread, especially under `set scheduler-locking off'; it is also
-     impossible to pause a specific thread.  *Note vCont: Packets, for
-     more details.
-
-`show remote verbose-resume-packet'
-     Show the current setting of use of the `vCont' request
-
-`set remote software-breakpoint-packet'
-`set remote hardware-breakpoint-packet'
-`set remote write-watchpoint-packet'
-`set remote read-watchpoint-packet'
-`set remote access-watchpoint-packet'
-`set remote Z-packet'
-     These commands enable or disable the use of `Z' packets for
-     setting breakpoints and watchpoints in the remote target.  The
-     default depends on the remote stub's support of the `Z' packets
-     (GDB queries the stub when each packet is first required).  The
-     command `set remote Z-packet', kept for back-compatibility, turns
-     on or off all the features that require the use of `Z' packets.
-
-`show remote software-breakpoint-packet'
-`show remote hardware-breakpoint-packet'
-`show remote write-watchpoint-packet'
-`show remote read-watchpoint-packet'
-`show remote access-watchpoint-packet'
-`show remote Z-packet'
-     Show the current setting of `Z' packets usage.
-
-`set remote get-thread-local-storage-address'
-     This command enables or disables the use of the `qGetTLSAddr' (Get
-     Thread Local Storage Address) request packet.  The default depends
-     on whether the remote stub supports this request.  *Note
-     qGetTLSAddr: General Query Packets, for more details about this
-     packet.
-
-`show remote get-thread-local-storage-address'
-     Show the current setting of `qGetTLSAddr' packet usage.
+Command Name           Remote Packet  Related Features
+`fetch-register-packet'`p'            `info registers'
+`set-register-packet'  `P'            `set'
+`binary-download-packet'`X'            `load', `set'
+`read-aux-vector-packet'`qXfer:auxv:read'`info auxv'
+`symbol-lookup-packet' `qSymbol'      Detecting multiple
+                                      threads
+`verbose-resume-packet'`vCont'        Stepping or resuming
+                                      multiple threads
+`software-breakpoint-packet'`Z0'           `break'
+`hardware-breakpoint-packet'`Z1'           `hbreak'
+`write-watchpoint-packet'`Z2'           `watch'
+`read-watchpoint-packet'`Z3'           `rwatch'
+`access-watchpoint-packet'`Z4'           `awatch'
+`get-thread-local-storage-address-packet'`qGetTLSAddr'  Displaying `__thread'
+                                      variables
+`supported-packets'    `qSupported'   Remote communications
+                                      parameters
 
 
 File: gdb.info,  Node: remote stub,  Prev: Remote configuration,  Up: Remote Debugging
@@ -4074,6 +4117,18 @@ that have no debugging symbols.
      This command loads symbols from a dll similarly to add-sym command
      but without the need to specify a base address.
 
+`set cygwin-exceptions MODE'
+     If MODE is `on', GDB will break on exceptions that happen inside
+     the Cygwin DLL.  If MODE is `off', GDB will delay recognition of
+     exceptions, and may ignore some exceptions which seem to be caused
+     by internal Cygwin DLL "bookkeeping".  This option is meant
+     primarily for debugging the Cygwin DLL itself; the default value
+     is `off' to avoid annoying GDB users with false `SIGSEGV' signals.
+
+`show cygwin-exceptions'
+     Displays whether GDB will break on exceptions that happen inside
+     the Cygwin DLL itself.
+
 `set new-console MODE'
      If MODE is `on' the debuggee will be started in a new console on
      next start.  If MODE is `off'i, the debuggee will be started in
@@ -4086,7 +4141,7 @@ that have no debugging symbols.
 `set new-group MODE'
      This boolean value controls whether the debuggee should start a
      new group or stay in the same group as the debugger.  This affects
-     the way the Windows OS handles Ctrl-C.
+     the way the Windows OS handles `Ctrl-C'.
 
 `show new-group'
      Displays current value of new-group boolean.
@@ -4784,7 +4839,7 @@ executable file without downloading, use the GDB commands `file' or
       the conditions.
      There is absolutely no warranty for GDB; type "show warranty"
      for details.
-     GDB 6.5, Copyright 1992 Free Software Foundation, Inc...
+     GDB 6.6, Copyright 1992 Free Software Foundation, Inc...
      (gdb) target hms
      Connected to remote H8/300 HMS system.
      (gdb) load t.x
@@ -4804,7 +4859,7 @@ available on your development board; for example, if your program hangs,
 you can't send an interrupt--but you can press the RESET switch!
 
    Use the RESET button on the development board
-   * to interrupt your program (don't use `ctl-C' on the DOS host--it
+   * to interrupt your program (don't use `Ctrl-c' on the DOS host--it
      has no way to pass an interrupt signal to the development board);
      and
 
@@ -5463,8 +5518,8 @@ ST2000 environment:
      Connect the controlling terminal to the STDBUG command monitor.
      When you are done interacting with STDBUG, typing either of two
      character sequences gets you back to the GDB command prompt:
-     `<RET>~.' (Return, followed by tilde and period) or `<RET>~<C-d>'
-     (Return, followed by tilde and control-D).
+     `<RET> ~ .' (Return, followed by tilde and period) or `<RET> ~
+     Ctrl-d' (Return, followed by tilde and control-D).
 
 
 File: gdb.info,  Node: Z8000,  Next: AVR,  Prev: ST2000,  Up: Embedded Processors
@@ -6177,6 +6232,20 @@ commands, you can disable this "feature":
      Displays state of confirmation requests.
 
 
+   If you need to debug user-defined commands or sourced files you may
+find it useful to enable "command tracing".  In this mode each command
+will be printed as it is executed, prefixed with one or more `+'
+symbols, the quantity denoting the call depth of each command.
+
+`set trace-commands on'
+     Enable command tracing.
+
+`set trace-commands off'
+     Disable command tracing.
+
+`show trace-commands'
+     Display the current state of command tracing.
+
 
 File: gdb.info,  Node: Debugging Output,  Prev: Messages/Warnings,  Up: Controlling GDB
 
@@ -6495,7 +6564,7 @@ the last command, as it would from the terminal.
    You can request the execution of a command file with the `source'
 command:
 
-`source FILENAME'
+`source [`-v'] FILENAME'
      Execute the command file FILENAME.
 
    The lines in a command file are generally executed sequentially,
@@ -6506,6 +6575,10 @@ file and control is returned to the console.
 
    GDB searches for FILENAME in the current directory and then on the
 search path (specified with the `directory' command).
+
+   If `-v', for verbose mode, is given then GDB displays each command
+as it is executed.  The option must be given before FILENAME, and is
+interpreted as part of the filename anywhere else.
 
    Commands that would ask for confirmation if used interactively
 proceed without asking when used in a command file.  Many GDB commands
@@ -6887,7 +6960,7 @@ and the GDB standard mode.
 scrolling.  This means they are available for readline when the active
 window is the command window.  When the command window does not have
 the focus, it is necessary to use other readline key bindings such as
-<C-p>, <C-n>, <C-b> and <C-f>.
+`C-p', `C-n', `C-b' and `C-f'.
 
 
 File: gdb.info,  Node: TUI Single Key Mode,  Next: TUI Commands,  Prev: TUI Keys,  Up: TUI
@@ -6934,8 +7007,8 @@ commands.
 that was pressed is inserted in the editing buffer so that it is
 possible to type most GDB commands without interaction with the TUI
 _SingleKey_ mode.  Once the command is entered the TUI _SingleKey_ mode
-is restored.  The only way to permanently leave this mode is by hitting
-<q> or `<C-x> <s>'.
+is restored.  The only way to permanently leave this mode is by typing
+`q' or `C-x s'.
 
 
 File: gdb.info,  Node: TUI Commands,  Next: TUI Configuration,  Prev: TUI Single Key Mode,  Up: TUI
@@ -6976,7 +7049,7 @@ mode, using these commands will automatically switch in the TUI mode.
      another window.
 
 `refresh'
-     Refresh the screen.  This is similar to using <C-L> key.
+     Refresh the screen.  This is similar to typing `C-L'.
 
 `tui reg float'
      Show the floating point registers in the register window.
@@ -7156,8 +7229,8 @@ addition to the standard Shell mode commands:
      Go down the number of frames indicated by the numeric argument,
      like the GDB `down' command.
 
-   In any source file, the Emacs command `C-x SPC' (`gud-break') tells
-GDB to set a breakpoint on the source line point is on.
+   In any source file, the Emacs command `C-x <SPC>' (`gud-break')
+tells GDB to set a breakpoint on the source line point is on.
 
    If you type `M-x speedbar', then Emacs displays a separate frame
 which shows a backtrace when the GDB I/O buffer is current.  Move point
@@ -7201,7 +7274,8 @@ component of a larger system.
 written in the form of a reference manual.
 
    Note that GDB/MI is still under construction, so some of the
-features described below are incomplete and subject to change.
+features described below are incomplete and subject to change (*note
+GDB/MI Development and Front Ends: GDB/MI Development and Front Ends.).
 
 Notation and Terminology
 ========================
@@ -7221,28 +7295,26 @@ This chapter uses the following notation:
 
    * `"STRING"' means a literal STRING.
 
-Acknowledgments
-===============
-
-In alphabetic order: Andrew Cagney, Fernando Nasser, Stan Shebs and
-Elena Zannoni.
-
 * Menu:
 
 * GDB/MI Command Syntax::
 * GDB/MI Compatibility with CLI::
+* GDB/MI Development and Front Ends::
 * GDB/MI Output Records::
+* GDB/MI Simple Examples::
 * GDB/MI Command Description Format::
-* GDB/MI Breakpoint Table Commands::
-* GDB/MI Data Manipulation::
-* GDB/MI Program Control::
-* GDB/MI Miscellaneous Commands::
-* GDB/MI Stack Manipulation::
-* GDB/MI Symbol Query::
-* GDB/MI Target Manipulation::
+* GDB/MI Breakpoint Commands::
+* GDB/MI Program Context::
 * GDB/MI Thread Commands::
-* GDB/MI Tracepoint Commands::
+* GDB/MI Program Execution::
+* GDB/MI Stack Manipulation::
 * GDB/MI Variable Objects::
+* GDB/MI Data Manipulation::
+* GDB/MI Tracepoint Commands::
+* GDB/MI Symbol Query::
+* GDB/MI File Commands::
+* GDB/MI Target Manipulation::
+* GDB/MI Miscellaneous Commands::
 
 
 File: gdb.info,  Node: GDB/MI Command Syntax,  Next: GDB/MI Compatibility with CLI,  Up: GDB/MI
@@ -7254,7 +7326,6 @@ File: gdb.info,  Node: GDB/MI Command Syntax,  Next: GDB/MI Compatibility with C
 
 * GDB/MI Input Syntax::
 * GDB/MI Output Syntax::
-* GDB/MI Simple Examples::
 
 
 File: gdb.info,  Node: GDB/MI Input Syntax,  Next: GDB/MI Output Syntax,  Up: GDB/MI Command Syntax
@@ -7316,7 +7387,7 @@ Notes:
    * We want it to be easy to spot a MI operation.
 
 
-File: gdb.info,  Node: GDB/MI Output Syntax,  Next: GDB/MI Simple Examples,  Prev: GDB/MI Input Syntax,  Up: GDB/MI Command Syntax
+File: gdb.info,  Node: GDB/MI Output Syntax,  Prev: GDB/MI Input Syntax,  Up: GDB/MI Command Syntax
 
 24.1.2 GDB/MI Output Syntax
 ---------------------------
@@ -7437,78 +7508,64 @@ Notes:
 about the various output records.
 
 
-File: gdb.info,  Node: GDB/MI Simple Examples,  Prev: GDB/MI Output Syntax,  Up: GDB/MI Command Syntax
-
-24.1.3 Simple Examples of GDB/MI Interaction
---------------------------------------------
-
-This subsection presents several simple examples of interaction using
-the GDB/MI interface.  In these examples, `->' means that the following
-line is passed to GDB/MI as input, while `<-' means the output received
-from GDB/MI.
-
-Target Stop
-...........
-
-Here's an example of stopping the inferior process:
-
-     -> -stop
-     <- (gdb)
-
-and later:
-
-     <- *stop,reason="stop",address="0x123",source="a.c:123"
-     <- (gdb)
-
-Simple CLI Command
-..................
-
-Here's an example of a simple CLI command being passed through GDB/MI
-and on to the CLI.
-
-     -> print 1+2
-     <- &"print 1+2\n"
-     <- ~"$1 = 3\n"
-     <- ^done
-     <- (gdb)
-
-Command With Side Effects
-.........................
-
-     -> -symbol-file xyz.exe
-     <- *breakpoint,nr="3",address="0x123",source="a.c:123"
-     <- (gdb)
-
-A Bad Command
-.............
-
-Here's what happens if you pass a non-existent command:
-
-     -> -rubbish
-     <- ^error,msg="Undefined MI command: rubbish"
-     <- (gdb)
-
-
-File: gdb.info,  Node: GDB/MI Compatibility with CLI,  Next: GDB/MI Output Records,  Prev: GDB/MI Command Syntax,  Up: GDB/MI
+File: gdb.info,  Node: GDB/MI Compatibility with CLI,  Next: GDB/MI Development and Front Ends,  Prev: GDB/MI Command Syntax,  Up: GDB/MI
 
 24.2 GDB/MI Compatibility with CLI
 ==================================
 
-To help users familiar with GDB's existing CLI interface, GDB/MI
-accepts existing CLI commands.  As specified by the syntax, such
-commands can be directly entered into the GDB/MI interface and GDB will
-respond.
+For the developers convenience CLI commands can be entered directly,
+but there may be some unexpected behaviour.  For example, commands that
+query the user will behave as if the user replied yes, breakpoint
+command lists are not executed and some CLI commands, such as `if',
+`when' and `define', prompt for further input with `>', which is not
+valid MI output.
 
-   This mechanism is provided as an aid to developers of GDB/MI clients
-and not as a reliable interface into the CLI.  Since the command is
-being interpreteted in an environment that assumes GDB/MI behaviour,
-the exact output of such commands is likely to end up being an
-un-supported hybrid of GDB/MI and CLI output.
+   This feature may be removed at some stage in the future and it is
+recommended that front ends use the `-interpreter-exec' command (*note
+-interpreter-exec::).
 
 
-File: gdb.info,  Node: GDB/MI Output Records,  Next: GDB/MI Command Description Format,  Prev: GDB/MI Compatibility with CLI,  Up: GDB/MI
+File: gdb.info,  Node: GDB/MI Development and Front Ends,  Next: GDB/MI Output Records,  Prev: GDB/MI Compatibility with CLI,  Up: GDB/MI
 
-24.3 GDB/MI Output Records
+24.3 GDB/MI Development and Front Ends
+======================================
+
+The application which takes the MI output and presents the state of the
+program being debugged to the user is called a "front end".
+
+   Although GDB/MI is still incomplete, it is currently being used by a
+variety of front ends to GDB.  This makes it difficult to introduce new
+functionality without breaking existing usage.  This section tries to
+minimize the problems by describing how the protocol might change.
+
+   Some changes in MI need not break a carefully designed front end, and
+for these the MI version will remain unchanged.  The following is a
+list of changes that may occur within one level, so front ends should
+parse MI output in a way that can handle them:
+
+   * New MI commands may be added.
+
+   * New fields may be added to the output of any MI command.
+
+
+   If the changes are likely to break front ends, the MI version level
+will be increased by one.  This will allow the front end to parse the
+output according to the MI version.  Apart from mi0, new versions of
+GDB will not support old versions of MI and it will be the
+responsibility of the front end to work with the new one.
+
+   The best way to avoid unexpected changes in MI that might break your
+front end is to make your project known to GDB developers and follow
+development on <gdb@sourceware.org> and <gdb-patches@sourceware.org>.
+There is also the mailing list <dmi-discuss@lists.freestandards.org>,
+hosted by the Free Standards Group, which has the aim of creating a a
+more general MI protocol called Debugger Machine Interface (DMI) that
+will become a standard for all debuggers, not just GDB.  
+
+
+File: gdb.info,  Node: GDB/MI Output Records,  Next: GDB/MI Simple Examples,  Prev: GDB/MI Development and Front Ends,  Up: GDB/MI
+
+24.4 GDB/MI Output Records
 ==========================
 
 * Menu:
@@ -7520,7 +7577,7 @@ File: gdb.info,  Node: GDB/MI Output Records,  Next: GDB/MI Command Description 
 
 File: gdb.info,  Node: GDB/MI Result Records,  Next: GDB/MI Stream Records,  Up: GDB/MI Output Records
 
-24.3.1 GDB/MI Result Records
+24.4.1 GDB/MI Result Records
 ----------------------------
 
 In addition to a number of out-of-band notifications, the response to a
@@ -7534,14 +7591,21 @@ GDB/MI command includes one of the following result indications:
      The asynchronous operation was successfully started.  The target is
      running.
 
+`"^connected"'
+     GDB has connected to a remote target.
+
 `"^error" "," C-STRING'
      The operation failed.  The `C-STRING' contains the corresponding
      error message.
 
+`"^exit"'
+     GDB has terminated.
+
+
 
 File: gdb.info,  Node: GDB/MI Stream Records,  Next: GDB/MI Out-of-band Records,  Prev: GDB/MI Result Records,  Up: GDB/MI Output Records
 
-24.3.2 GDB/MI Stream Records
+24.4.2 GDB/MI Stream Records
 ----------------------------
 
 GDB internally maintains a number of output streams: the console, the
@@ -7561,7 +7625,9 @@ or a quoted C string (which does not contain an implicit newline).
 
 `"@" STRING-OUTPUT'
      The target output stream contains any textual output from the
-     running target.
+     running target.  This is only present when GDB's event loop is
+     truly asynchronous, which is currently only the case for remote
+     targets.
 
 `"&" STRING-OUTPUT'
      The log stream contains debugging messages being produced by GDB's
@@ -7570,7 +7636,7 @@ or a quoted C string (which does not contain an implicit newline).
 
 File: gdb.info,  Node: GDB/MI Out-of-band Records,  Prev: GDB/MI Stream Records,  Up: GDB/MI Output Records
 
-24.3.3 GDB/MI Out-of-band Records
+24.4.3 GDB/MI Out-of-band Records
 ---------------------------------
 
 "Out-of-band" records are used to notify the GDB/MI client of
@@ -7623,17 +7689,77 @@ In particular, the EXEC-ASYNC-OUTPUT records.
      A signal was received by the inferior.
 
 
-File: gdb.info,  Node: GDB/MI Command Description Format,  Next: GDB/MI Breakpoint Table Commands,  Prev: GDB/MI Output Records,  Up: GDB/MI
+File: gdb.info,  Node: GDB/MI Simple Examples,  Next: GDB/MI Command Description Format,  Prev: GDB/MI Output Records,  Up: GDB/MI
 
-24.4 GDB/MI Command Description Format
+24.5 Simple Examples of GDB/MI Interaction
+==========================================
+
+This subsection presents several simple examples of interaction using
+the GDB/MI interface.  In these examples, `->' means that the following
+line is passed to GDB/MI as input, while `<-' means the output received
+from GDB/MI.
+
+   Note the the line breaks shown in the examples are here only for
+readability, they don't appear in the real output.
+
+Setting a breakpoint
+--------------------
+
+Setting a breakpoint generates synchronous output which contains
+detailed information of the breakpoint.
+
+     -> -break-insert main
+     <- ^done,bkpt={number="1",type="breakpoint",disp="keep",
+         enabled="y",addr="0x08048564",func="main",file="myprog.c",
+         fullname="/home/nickrob/myprog.c",line="68",times="0"}
+     <- (gdb)
+
+Program Execution
+-----------------
+
+Program execution generates asynchronous records and MI gives the
+reason that execution stopped.
+
+     -> -exec-run
+     <- ^running
+     <- (gdb)
+     <- *stopped,reason="breakpoint-hit",bkptno="1",thread-id="0",
+        frame={addr="0x08048564",func="main",
+        args=[{name="argc",value="1"},{name="argv",value="0xbfc4d4d4"}],
+        file="myprog.c",fullname="/home/nickrob/myprog.c",line="68"}
+     <- (gdb)
+     -> -exec-continue
+     <- ^running
+     <- (gdb)
+     <- *stopped,reason="exited-normally"
+     <- (gdb)
+
+Quitting GDB
+------------
+
+Quitting GDB just prints the result class `^exit'.
+
+     -> (gdb)
+     <- -gdb-exit
+     <- ^exit
+
+A Bad Command
+-------------
+
+Here's what happens if you pass a non-existent command:
+
+     -> -rubbish
+     <- ^error,msg="Undefined MI command: rubbish"
+     <- (gdb)
+
+
+File: gdb.info,  Node: GDB/MI Command Description Format,  Next: GDB/MI Breakpoint Commands,  Prev: GDB/MI Simple Examples,  Up: GDB/MI
+
+24.6 GDB/MI Command Description Format
 ======================================
 
 The remaining sections describe blocks of commands.  Each block of
 commands is laid out in a fashion similar to this section.
-
-   Note the the line breaks shown in the examples are here only for
-readability.  They don't appear in the real output.  Also note that the
-commands with a non-available example (N.A.) are not yet implemented.
 
 Motivation
 ----------
@@ -7666,523 +7792,7 @@ The corresponding GDB CLI command(s), if any.
 Example
 .......
 
-
-File: gdb.info,  Node: GDB/MI Breakpoint Table Commands,  Next: GDB/MI Data Manipulation,  Prev: GDB/MI Command Description Format,  Up: GDB/MI
-
-24.5 GDB/MI Breakpoint table commands
-=====================================
-
-This section documents GDB/MI commands for manipulating breakpoints.
-
-The `-break-after' Command
---------------------------
-
-Synopsis
-........
-
-      -break-after NUMBER COUNT
-
-   The breakpoint number NUMBER is not in effect until it has been hit
-COUNT times.  To see how this is reflected in the output of the
-`-break-list' command, see the description of the `-break-list' command
-below.
-
-GDB Command
-...........
-
-The corresponding GDB command is `ignore'.
-
-Example
-.......
-
-     (gdb)
-     -break-insert main
-     ^done,bkpt={number="1",addr="0x000100d0",file="hello.c",
-     fullname="/home/foo/hello.c",line="5",times="0"}
-     (gdb)
-     -break-after 1 3
-     ~
-     ^done
-     (gdb)
-     -break-list
-     ^done,BreakpointTable={nr_rows="1",nr_cols="6",
-     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
-     {width="14",alignment="-1",col_name="type",colhdr="Type"},
-     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
-     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
-     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
-     {width="40",alignment="2",col_name="what",colhdr="What"}],
-     body=[bkpt={number="1",type="breakpoint",disp="keep",enabled="y",
-     addr="0x000100d0",func="main",file="hello.c",fullname="/home/foo/hello.c",
-     line="5",times="0",ignore="3"}]}
-     (gdb)
-
-The `-break-condition' Command
-------------------------------
-
-Synopsis
-........
-
-      -break-condition NUMBER EXPR
-
-   Breakpoint NUMBER will stop the program only if the condition in
-EXPR is true.  The condition becomes part of the `-break-list' output
-(see the description of the `-break-list' command below).
-
-GDB Command
-...........
-
-The corresponding GDB command is `condition'.
-
-Example
-.......
-
-     (gdb)
-     -break-condition 1 1
-     ^done
-     (gdb)
-     -break-list
-     ^done,BreakpointTable={nr_rows="1",nr_cols="6",
-     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
-     {width="14",alignment="-1",col_name="type",colhdr="Type"},
-     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
-     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
-     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
-     {width="40",alignment="2",col_name="what",colhdr="What"}],
-     body=[bkpt={number="1",type="breakpoint",disp="keep",enabled="y",
-     addr="0x000100d0",func="main",file="hello.c",fullname="/home/foo/hello.c",
-     line="5",cond="1",times="0",ignore="3"}]}
-     (gdb)
-
-The `-break-delete' Command
----------------------------
-
-Synopsis
-........
-
-      -break-delete ( BREAKPOINT )+
-
-   Delete the breakpoint(s) whose number(s) are specified in the
-argument list.  This is obviously reflected in the breakpoint list.
-
-GDB command
-...........
-
-The corresponding GDB command is `delete'.
-
-Example
-.......
-
-     (gdb)
-     -break-delete 1
-     ^done
-     (gdb)
-     -break-list
-     ^done,BreakpointTable={nr_rows="0",nr_cols="6",
-     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
-     {width="14",alignment="-1",col_name="type",colhdr="Type"},
-     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
-     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
-     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
-     {width="40",alignment="2",col_name="what",colhdr="What"}],
-     body=[]}
-     (gdb)
-
-The `-break-disable' Command
-----------------------------
-
-Synopsis
-........
-
-      -break-disable ( BREAKPOINT )+
-
-   Disable the named BREAKPOINT(s).  The field `enabled' in the break
-list is now set to `n' for the named BREAKPOINT(s).
-
-GDB Command
-...........
-
-The corresponding GDB command is `disable'.
-
-Example
-.......
-
-     (gdb)
-     -break-disable 2
-     ^done
-     (gdb)
-     -break-list
-     ^done,BreakpointTable={nr_rows="1",nr_cols="6",
-     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
-     {width="14",alignment="-1",col_name="type",colhdr="Type"},
-     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
-     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
-     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
-     {width="40",alignment="2",col_name="what",colhdr="What"}],
-     body=[bkpt={number="2",type="breakpoint",disp="keep",enabled="n",
-     addr="0x000100d0",func="main",file="hello.c",fullname="/home/foo/hello.c",
-     line="5",times="0"}]}
-     (gdb)
-
-The `-break-enable' Command
----------------------------
-
-Synopsis
-........
-
-      -break-enable ( BREAKPOINT )+
-
-   Enable (previously disabled) BREAKPOINT(s).
-
-GDB Command
-...........
-
-The corresponding GDB command is `enable'.
-
-Example
-.......
-
-     (gdb)
-     -break-enable 2
-     ^done
-     (gdb)
-     -break-list
-     ^done,BreakpointTable={nr_rows="1",nr_cols="6",
-     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
-     {width="14",alignment="-1",col_name="type",colhdr="Type"},
-     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
-     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
-     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
-     {width="40",alignment="2",col_name="what",colhdr="What"}],
-     body=[bkpt={number="2",type="breakpoint",disp="keep",enabled="y",
-     addr="0x000100d0",func="main",file="hello.c",fullname="/home/foo/hello.c",
-     line="5",times="0"}]}
-     (gdb)
-
-The `-break-info' Command
--------------------------
-
-Synopsis
-........
-
-      -break-info BREAKPOINT
-
-   Get information about a single breakpoint.
-
-GDB command
-...........
-
-The corresponding GDB command is `info break BREAKPOINT'.
-
-Example
-.......
-
-N.A.
-
-The `-break-insert' Command
----------------------------
-
-Synopsis
-........
-
-      -break-insert [ -t ] [ -h ] [ -r ]
-         [ -c CONDITION ] [ -i IGNORE-COUNT ]
-         [ -p THREAD ] [ LINE | ADDR ]
-
-If specified, LINE, can be one of:
-
-   * function
-
-   * filename:linenum
-
-   * filename:function
-
-   * *address
-
-   The possible optional parameters of this command are:
-
-`-t'
-     Insert a temporary breakpoint.
-
-`-h'
-     Insert a hardware breakpoint.
-
-`-c CONDITION'
-     Make the breakpoint conditional on CONDITION.
-
-`-i IGNORE-COUNT'
-     Initialize the IGNORE-COUNT.
-
-`-r'
-     Insert a regular breakpoint in all the functions whose names match
-     the given regular expression.  Other flags are not applicable to
-     regular expresson.
-
-Result
-......
-
-The result is in the form:
-
-     ^done,bkpt={number="NUMBER",type="TYPE",disp="del"|"keep",
-     enabled="y"|"n",addr="HEX",func="FUNCNAME",file="FILENAME",
-     fullname="FULL_FILENAME",line="LINENO",times="TIMES"}
-
-where NUMBER is the GDB number for this breakpoint, FUNCNAME is the
-name of the function where the breakpoint was inserted, FILENAME is the
-name of the source file which contains this function, LINENO is the
-source line number within that file and TIMES the number of times that
-the breakpoint has been hit (always 0 for -break-insert but may be
-greater for -break-info or -break-list which use the same output).
-
-   Note: this format is open to change.
-
-GDB Command
-...........
-
-The corresponding GDB commands are `break', `tbreak', `hbreak',
-`thbreak', and `rbreak'.
-
-Example
-.......
-
-     (gdb)
-     -break-insert main
-     ^done,bkpt={number="1",addr="0x0001072c",file="recursive2.c",
-     fullname="/home/foo/recursive2.c,line="4",times="0"}
-     (gdb)
-     -break-insert -t foo
-     ^done,bkpt={number="2",addr="0x00010774",file="recursive2.c",
-     fullname="/home/foo/recursive2.c,line="11",times="0"}
-     (gdb)
-     -break-list
-     ^done,BreakpointTable={nr_rows="2",nr_cols="6",
-     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
-     {width="14",alignment="-1",col_name="type",colhdr="Type"},
-     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
-     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
-     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
-     {width="40",alignment="2",col_name="what",colhdr="What"}],
-     body=[bkpt={number="1",type="breakpoint",disp="keep",enabled="y",
-     addr="0x0001072c", func="main",file="recursive2.c",
-     fullname="/home/foo/recursive2.c,"line="4",times="0"},
-     bkpt={number="2",type="breakpoint",disp="del",enabled="y",
-     addr="0x00010774",func="foo",file="recursive2.c",
-     fullname="/home/foo/recursive2.c",line="11",times="0"}]}
-     (gdb)
-     -break-insert -r foo.*
-     ~int foo(int, int);
-     ^done,bkpt={number="3",addr="0x00010774",file="recursive2.c,
-     "fullname="/home/foo/recursive2.c",line="11",times="0"}
-     (gdb)
-
-The `-break-list' Command
--------------------------
-
-Synopsis
-........
-
-      -break-list
-
-   Displays the list of inserted breakpoints, showing the following
-fields:
-
-`Number'
-     number of the breakpoint
-
-`Type'
-     type of the breakpoint: `breakpoint' or `watchpoint'
-
-`Disposition'
-     should the breakpoint be deleted or disabled when it is hit: `keep'
-     or `nokeep'
-
-`Enabled'
-     is the breakpoint enabled or no: `y' or `n'
-
-`Address'
-     memory location at which the breakpoint is set
-
-`What'
-     logical location of the breakpoint, expressed by function name,
-     file name, line number
-
-`Times'
-     number of times the breakpoint has been hit
-
-   If there are no breakpoints or watchpoints, the `BreakpointTable'
-`body' field is an empty list.
-
-GDB Command
-...........
-
-The corresponding GDB command is `info break'.
-
-Example
-.......
-
-     (gdb)
-     -break-list
-     ^done,BreakpointTable={nr_rows="2",nr_cols="6",
-     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
-     {width="14",alignment="-1",col_name="type",colhdr="Type"},
-     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
-     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
-     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
-     {width="40",alignment="2",col_name="what",colhdr="What"}],
-     body=[bkpt={number="1",type="breakpoint",disp="keep",enabled="y",
-     addr="0x000100d0",func="main",file="hello.c",line="5",times="0"},
-     bkpt={number="2",type="breakpoint",disp="keep",enabled="y",
-     addr="0x00010114",func="foo",file="hello.c",fullname="/home/foo/hello.c",
-     line="13",times="0"}]}
-     (gdb)
-
-   Here's an example of the result when there are no breakpoints:
-
-     (gdb)
-     -break-list
-     ^done,BreakpointTable={nr_rows="0",nr_cols="6",
-     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
-     {width="14",alignment="-1",col_name="type",colhdr="Type"},
-     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
-     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
-     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
-     {width="40",alignment="2",col_name="what",colhdr="What"}],
-     body=[]}
-     (gdb)
-
-The `-break-watch' Command
---------------------------
-
-Synopsis
-........
-
-      -break-watch [ -a | -r ]
-
-   Create a watchpoint.  With the `-a' option it will create an
-"access" watchpoint, i.e. a watchpoint that triggers either on a read
-from or on a write to the memory location.  With the `-r' option, the
-watchpoint created is a "read" watchpoint, i.e. it will trigger only
-when the memory location is accessed for reading.  Without either of
-the options, the watchpoint created is a regular watchpoint, i.e. it
-will trigger when the memory location is accessed for writing.  *Note
-Setting watchpoints: Set Watchpoints.
-
-   Note that `-break-list' will report a single list of watchpoints and
-breakpoints inserted.
-
-GDB Command
-...........
-
-The corresponding GDB commands are `watch', `awatch', and `rwatch'.
-
-Example
-.......
-
-Setting a watchpoint on a variable in the `main' function:
-
-     (gdb)
-     -break-watch x
-     ^done,wpt={number="2",exp="x"}
-     (gdb)
-     -exec-continue
-     ^running
-     ^done,reason="watchpoint-trigger",wpt={number="2",exp="x"},
-     value={old="-268439212",new="55"},
-     frame={func="main",args=[],file="recursive2.c",
-     fullname="/home/foo/bar/recursive2.c",line="5"}
-     (gdb)
-
-   Setting a watchpoint on a variable local to a function.  GDB will
-stop the program execution twice: first for the variable changing
-value, then for the watchpoint going out of scope.
-
-     (gdb)
-     -break-watch C
-     ^done,wpt={number="5",exp="C"}
-     (gdb)
-     -exec-continue
-     ^running
-     ^done,reason="watchpoint-trigger",
-     wpt={number="5",exp="C"},value={old="-276895068",new="3"},
-     frame={func="callee4",args=[],
-     file="../../../devo/gdb/testsuite/gdb.mi/basics.c",
-     fullname="/home/foo/bar/devo/gdb/testsuite/gdb.mi/basics.c",line="13"}
-     (gdb)
-     -exec-continue
-     ^running
-     ^done,reason="watchpoint-scope",wpnum="5",
-     frame={func="callee3",args=[{name="strarg",
-     value="0x11940 \"A string argument.\""}],
-     file="../../../devo/gdb/testsuite/gdb.mi/basics.c",
-     fullname="/home/foo/bar/devo/gdb/testsuite/gdb.mi/basics.c",line="18"}
-     (gdb)
-
-   Listing breakpoints and watchpoints, at different points in the
-program execution.  Note that once the watchpoint goes out of scope, it
-is deleted.
-
-     (gdb)
-     -break-watch C
-     ^done,wpt={number="2",exp="C"}
-     (gdb)
-     -break-list
-     ^done,BreakpointTable={nr_rows="2",nr_cols="6",
-     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
-     {width="14",alignment="-1",col_name="type",colhdr="Type"},
-     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
-     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
-     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
-     {width="40",alignment="2",col_name="what",colhdr="What"}],
-     body=[bkpt={number="1",type="breakpoint",disp="keep",enabled="y",
-     addr="0x00010734",func="callee4",
-     file="../../../devo/gdb/testsuite/gdb.mi/basics.c",
-     fullname="/home/foo/devo/gdb/testsuite/gdb.mi/basics.c"line="8",times="1"},
-     bkpt={number="2",type="watchpoint",disp="keep",
-     enabled="y",addr="",what="C",times="0"}]}
-     (gdb)
-     -exec-continue
-     ^running
-     ^done,reason="watchpoint-trigger",wpt={number="2",exp="C"},
-     value={old="-276895068",new="3"},
-     frame={func="callee4",args=[],
-     file="../../../devo/gdb/testsuite/gdb.mi/basics.c",
-     fullname="/home/foo/bar/devo/gdb/testsuite/gdb.mi/basics.c",line="13"}
-     (gdb)
-     -break-list
-     ^done,BreakpointTable={nr_rows="2",nr_cols="6",
-     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
-     {width="14",alignment="-1",col_name="type",colhdr="Type"},
-     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
-     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
-     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
-     {width="40",alignment="2",col_name="what",colhdr="What"}],
-     body=[bkpt={number="1",type="breakpoint",disp="keep",enabled="y",
-     addr="0x00010734",func="callee4",
-     file="../../../devo/gdb/testsuite/gdb.mi/basics.c",
-     fullname="/home/foo/devo/gdb/testsuite/gdb.mi/basics.c",line="8",times="1"},
-     bkpt={number="2",type="watchpoint",disp="keep",
-     enabled="y",addr="",what="C",times="-5"}]}
-     (gdb)
-     -exec-continue
-     ^running
-     ^done,reason="watchpoint-scope",wpnum="2",
-     frame={func="callee3",args=[{name="strarg",
-     value="0x11940 \"A string argument.\""}],
-     file="../../../devo/gdb/testsuite/gdb.mi/basics.c",
-     fullname="/home/foo/bar/devo/gdb/testsuite/gdb.mi/basics.c",line="18"}
-     (gdb)
-     -break-list
-     ^done,BreakpointTable={nr_rows="1",nr_cols="6",
-     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
-     {width="14",alignment="-1",col_name="type",colhdr="Type"},
-     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
-     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
-     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
-     {width="40",alignment="2",col_name="what",colhdr="What"}],
-     body=[bkpt={number="1",type="breakpoint",disp="keep",enabled="y",
-     addr="0x00010734",func="callee4",
-     file="../../../devo/gdb/testsuite/gdb.mi/basics.c",
-     fullname="/home/foo/devo/gdb/testsuite/gdb.mi/basics.c",line="8",
-     times="1"}]}
-     (gdb)
+Example(s) formatted for readability.  Some of the described commands
+have not been implemented yet and these are labeled N.A. (not
+available).
 

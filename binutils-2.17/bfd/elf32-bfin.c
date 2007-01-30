@@ -2000,15 +2000,12 @@ bfin_check_relocs (bfd * abfd,
 	      srelgot = bfd_get_section_by_name (dynobj, ".rela.got");
 	      if (srelgot == NULL)
 		{
-		  srelgot = bfd_make_section (dynobj, ".rela.got");
+		  flagword flags = (SEC_ALLOC | SEC_LOAD | SEC_HAS_CONTENTS
+				    | SEC_IN_MEMORY | SEC_LINKER_CREATED
+				    | SEC_READONLY);
+		  srelgot = bfd_make_section_with_flags (dynobj, ".rela.got",
+							 flags);
 		  if (srelgot == NULL
-		      || !bfd_set_section_flags (dynobj, srelgot,
-						 (SEC_ALLOC
-						  | SEC_LOAD
-						  | SEC_HAS_CONTENTS
-						  | SEC_IN_MEMORY
-						  | SEC_LINKER_CREATED
-						  | SEC_READONLY))
 		      || !bfd_set_section_alignment (dynobj, srelgot, 2))
 		    return FALSE;
 		}
@@ -2588,6 +2585,8 @@ bfinfdpic_relocate_section (bfd * output_bfd,
 					    input_section->output_section)
 		     & (SEC_ALLOC | SEC_LOAD)) == (SEC_ALLOC | SEC_LOAD))
 		  {
+		    bfd_vma offset;
+
 		    if (_bfinfdpic_osec_readonly_p (output_bfd,
 						   input_section
 						   ->output_section))
@@ -2598,15 +2597,23 @@ bfinfdpic_relocate_section (bfd * output_bfd,
 			   name, input_bfd, input_section, rel->r_offset);
 			return FALSE;
 		      }
-		    _bfinfdpic_add_dyn_reloc (output_bfd,
-					      bfinfdpic_gotrel_section (info),
-					      _bfd_elf_section_offset
-					      (output_bfd, info,
-					       input_section, rel->r_offset)
-					      + input_section
-					      ->output_section->vma
-					      + input_section->output_offset,
-					      r_type, dynindx, addend, picrel);
+		    offset = _bfd_elf_section_offset (output_bfd, info,
+						      input_section, rel->r_offset);
+		    /* Only output a reloc for a not deleted entry.  */
+		    if (offset >= (bfd_vma) -2)
+		      _bfinfdpic_add_dyn_reloc (output_bfd,
+						bfinfdpic_gotrel_section (info),
+						0,
+						R_unused0,
+						dynindx, addend, picrel);
+		    else
+		      _bfinfdpic_add_dyn_reloc (output_bfd,
+						bfinfdpic_gotrel_section (info),
+						offset + input_section
+						->output_section->vma
+						+ input_section->output_offset,
+						r_type,
+						dynindx, addend, picrel);
 		  }
 		else if (osec)
 		  addend += osec->output_section->vma;
@@ -3125,39 +3132,20 @@ bfin_relocate_section (bfd * output_bfd,
 
 static asection *
 bfin_gc_mark_hook (asection * sec,
-		   struct bfd_link_info *info ATTRIBUTE_UNUSED,
+		   struct bfd_link_info *info,
 		   Elf_Internal_Rela * rel,
 		   struct elf_link_hash_entry *h,
                    Elf_Internal_Sym * sym)
 {
   if (h != NULL)
-    {
-      switch (ELF32_R_TYPE (rel->r_info))
-	{
+    switch (ELF32_R_TYPE (rel->r_info))
+      {
+      case R_BFIN_GNU_VTINHERIT:
+      case R_BFIN_GNU_VTENTRY:
+	return NULL;
+      }
 
-	case R_BFIN_GNU_VTINHERIT:
-	case R_BFIN_GNU_VTENTRY:
-	  break;
-
-	default:
-	  switch (h->root.type)
-	    {
-	    default:
-	      break;
-
-	    case bfd_link_hash_defined:
-	    case bfd_link_hash_defweak:
-	      return h->root.u.def.section;
-
-	    case bfd_link_hash_common:
-	      return h->root.u.c.p->section;
-	    }
-	}
-    }
-  else
-    return bfd_section_from_elf_index (sec->owner, sym->st_shndx);
-
-  return NULL;
+  return _bfd_elf_gc_mark_hook (sec, info, rel, h, sym);
 }
 
 
@@ -3497,9 +3485,8 @@ elf32_bfinfdpic_create_dynamic_sections (bfd *abfd, struct bfd_link_info *info)
   if (bed->plt_readonly)
     pltflags |= SEC_READONLY;
 
-  s = bfd_make_section (abfd, ".plt");
+  s = bfd_make_section_with_flags (abfd, ".plt", pltflags);
   if (s == NULL
-      || ! bfd_set_section_flags (abfd, s, pltflags)
       || ! bfd_set_section_alignment (abfd, s, bed->plt_alignment))
     return FALSE;
   /* Blackfin-specific: remember it.  */
@@ -3526,9 +3513,8 @@ elf32_bfinfdpic_create_dynamic_sections (bfd *abfd, struct bfd_link_info *info)
     }
 
   /* Blackfin-specific: we want rel relocations for the plt.  */
-  s = bfd_make_section (abfd, ".rel.plt");
+  s = bfd_make_section_with_flags (abfd, ".rel.plt", flags | SEC_READONLY);
   if (s == NULL
-      || ! bfd_set_section_flags (abfd, s, flags | SEC_READONLY)
       || ! bfd_set_section_alignment (abfd, s, bed->s->log_file_align))
     return FALSE;
   /* Blackfin-specific: remember it.  */
@@ -3552,9 +3538,9 @@ elf32_bfinfdpic_create_dynamic_sections (bfd *abfd, struct bfd_link_info *info)
 	 image and use a R_*_COPY reloc to tell the dynamic linker to
 	 initialize them at run time.  The linker script puts the .dynbss
 	 section into the .bss section of the final image.  */
-      s = bfd_make_section (abfd, ".dynbss");
-      if (s == NULL
-	  || ! bfd_set_section_flags (abfd, s, SEC_ALLOC | SEC_LINKER_CREATED))
+      s = bfd_make_section_with_flags (abfd, ".dynbss",
+				       SEC_ALLOC | SEC_LINKER_CREATED);
+      if (s == NULL)
 	return FALSE;
 
       /* The .rel[a].bss section holds copy relocs.  This section is not
@@ -3570,9 +3556,10 @@ elf32_bfinfdpic_create_dynamic_sections (bfd *abfd, struct bfd_link_info *info)
      copy relocs.  */
       if (! info->shared)
 	{
-	  s = bfd_make_section (abfd, ".rela.bss");
+	  s = bfd_make_section_with_flags (abfd,
+					   ".rela.bss",
+					   flags | SEC_READONLY);
 	  if (s == NULL
-	      || ! bfd_set_section_flags (abfd, s, flags | SEC_READONLY)
 	      || ! bfd_set_section_alignment (abfd, s, bed->s->log_file_align))
 	    return FALSE;
 	}
@@ -5158,7 +5145,7 @@ bfin_finish_dynamic_symbol (bfd * output_bfd,
 	  && (info->symbolic
 	      || h->dynindx == -1 || h->forced_local) && h->def_regular)
 	{
-fprintf(stderr, "*** check this relocation %s\n", __FUNCTION__);
+	  fprintf(stderr, "*** check this relocation %s\n", __FUNCTION__);
 	  rela.r_info = ELF32_R_INFO (0, R_pcrel24);
 	  rela.r_addend = bfd_get_signed_32 (output_bfd,
 					     (sgot->contents
@@ -5421,7 +5408,7 @@ bfin_size_dynamic_sections (bfd * output_bfd ATTRIBUTE_UNUSED,
 
       strip = FALSE;
 
-       if (strncmp (name, ".rela", 5) == 0)
+       if (CONST_STRNEQ (name, ".rela"))
 	{
 	  if (s->size == 0)
 	    {
@@ -5445,7 +5432,7 @@ bfin_size_dynamic_sections (bfd * output_bfd ATTRIBUTE_UNUSED,
 	      s->reloc_count = 0;
 	    }
 	}
-      else if (strncmp (name, ".got", 4) != 0)
+      else if (! CONST_STRNEQ (name, ".got"))
 	{
 	  /* It's not one of our sections, so don't allocate space.  */
 	  continue;

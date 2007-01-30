@@ -29,7 +29,9 @@
 #ifndef bfd_elfNN_close_and_cleanup
 #define	bfd_elfNN_close_and_cleanup _bfd_elf_close_and_cleanup
 #endif
-#define bfd_elfNN_bfd_free_cached_info _bfd_generic_bfd_free_cached_info
+#ifndef bfd_elfNN_bfd_free_cached_info
+#define bfd_elfNN_bfd_free_cached_info _bfd_free_cached_info
+#endif
 #ifndef bfd_elfNN_get_section_contents
 #define bfd_elfNN_get_section_contents _bfd_generic_get_section_contents
 #endif
@@ -129,7 +131,7 @@
 #define elf_backend_gc_mark_dynamic_ref	bfd_elf_gc_mark_dynamic_ref_symbol
 #endif
 #ifndef elf_backend_gc_mark_hook
-#define elf_backend_gc_mark_hook	NULL
+#define elf_backend_gc_mark_hook	_bfd_elf_gc_mark_hook
 #endif
 #ifndef elf_backend_gc_sweep_hook
 #define elf_backend_gc_sweep_hook	NULL
@@ -292,6 +294,10 @@
 #define ELF_MINPAGESIZE ELF_MAXPAGESIZE
 #endif
 
+#ifndef ELF_COMMONPAGESIZE
+#define ELF_COMMONPAGESIZE ELF_MAXPAGESIZE
+#endif
+
 #ifndef ELF_DYNAMIC_SEC_FLAGS
 /* Note that we set the SEC_IN_MEMORY flag for these sections.  */
 #define ELF_DYNAMIC_SEC_FLAGS			\
@@ -375,6 +381,10 @@
 #ifndef elf_backend_size_dynamic_sections
 #define elf_backend_size_dynamic_sections 0
 #endif
+#ifndef elf_backend_init_index_section
+#define elf_backend_init_index_section \
+ ((void (*) (bfd *, struct bfd_link_info *)) bfd_void)
+#endif
 #ifndef elf_backend_relocate_section
 #define elf_backend_relocate_section	0
 #endif
@@ -413,6 +423,9 @@
 #endif
 #ifndef elf_backend_print_symbol_all
 #define elf_backend_print_symbol_all		NULL
+#endif
+#ifndef elf_backend_output_arch_local_syms
+#define elf_backend_output_arch_local_syms	NULL
 #endif
 #ifndef elf_backend_output_arch_syms
 #define elf_backend_output_arch_syms		NULL
@@ -554,15 +567,20 @@
 #define elf_backend_merge_symbol NULL
 #endif
 
+#ifndef elf_backend_hash_symbol
+#define elf_backend_hash_symbol _bfd_elf_hash_symbol
+#endif
+
 extern const struct elf_size_info _bfd_elfNN_size_info;
 
 #ifndef INCLUDED_TARGET_FILE
-static const struct elf_backend_data elfNN_bed =
+static struct elf_backend_data elfNN_bed =
 {
   ELF_ARCH,			/* arch */
   ELF_MACHINE_CODE,		/* elf_machine_code */
   ELF_MAXPAGESIZE,		/* maxpagesize */
   ELF_MINPAGESIZE,		/* minpagesize */
+  ELF_COMMONPAGESIZE,		/* commonpagesize */
   ELF_DYNAMIC_SEC_FLAGS,	/* dynamic_sec_flags */
   elf_info_to_howto,
   elf_info_to_howto_rel,
@@ -589,6 +607,7 @@ static const struct elf_backend_data elfNN_bed =
   elf_backend_adjust_dynamic_symbol,
   elf_backend_always_size_sections,
   elf_backend_size_dynamic_sections,
+  elf_backend_init_index_section,
   elf_backend_relocate_section,
   elf_backend_finish_dynamic_symbol,
   elf_backend_finish_dynamic_sections,
@@ -602,6 +621,7 @@ static const struct elf_backend_data elfNN_bed =
   elf_backend_gc_sweep_hook,
   elf_backend_post_process_headers,
   elf_backend_print_symbol_all,
+  elf_backend_output_arch_local_syms,
   elf_backend_output_arch_syms,
   elf_backend_copy_indirect_symbol,
   elf_backend_hide_symbol,
@@ -632,6 +652,7 @@ static const struct elf_backend_data elfNN_bed =
   elf_backend_common_section_index,
   elf_backend_common_section,
   elf_backend_merge_symbol,
+  elf_backend_hash_symbol,
   elf_backend_link_order_error_handler,
   elf_backend_relplt_name,
   ELF_MACHINE_ALT1,

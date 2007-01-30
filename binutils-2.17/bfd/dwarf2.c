@@ -874,24 +874,45 @@ concat_filename (struct line_info_table *table, unsigned int file)
 
   filename = table->files[file - 1].name;
 
-  if (! IS_ABSOLUTE_PATH (filename))
+  if (!IS_ABSOLUTE_PATH (filename))
     {
-      char *dirname = (table->files[file - 1].dir
-		       ? table->dirs[table->files[file - 1].dir - 1]
-		       : table->comp_dir);
+      char *dirname = NULL;
+      char *subdirname = NULL;
+      char *name;
+      size_t len;
 
-      /* Not all tools set DW_AT_comp_dir, so dirname may be unknown.
-	 The best we can do is return the filename part.  */
-      if (dirname != NULL)
+      if (table->files[file - 1].dir)
+	subdirname = table->dirs[table->files[file - 1].dir - 1];
+
+      if (!subdirname || !IS_ABSOLUTE_PATH (subdirname))
+	dirname = table->comp_dir;
+
+      if (!dirname)
 	{
-	  unsigned int len = strlen (dirname) + strlen (filename) + 2;
-	  char * name;
+	  dirname = subdirname;
+	  subdirname = NULL;
+	}
 
+      if (!dirname)
+	return strdup (filename);
+
+      len = strlen (dirname) + strlen (filename) + 2;
+
+      if (subdirname)
+	{
+	  len += strlen (subdirname) + 1;
+	  name = bfd_malloc (len);
+	  if (name)
+	    sprintf (name, "%s/%s/%s", dirname, subdirname, filename);
+	}
+      else
+	{
 	  name = bfd_malloc (len);
 	  if (name)
 	    sprintf (name, "%s/%s", dirname, filename);
-	  return name;
 	}
+
+      return name;
     }
 
   return strdup (filename);
@@ -1117,7 +1138,6 @@ decode_line_info (struct comp_unit *unit, struct dwarf2_debug *stash)
       unsigned int line = 1;
       unsigned int column = 0;
       int is_stmt = lh.default_is_stmt;
-      int basic_block = 0;
       int end_sequence = 0;
       /* eraxxon@alumni.rice.edu: Against the DWARF2 specs, some
 	 compilers generate address sequences that are wildly out of
@@ -1142,7 +1162,6 @@ decode_line_info (struct comp_unit *unit, struct dwarf2_debug *stash)
 	      line += lh.line_base + (adj_opcode % lh.line_range);
 	      /* Append row to matrix using current values.  */
 	      add_line_info (table, address, filename, line, column, 0);
-	      basic_block = 1;
 	      if (address < low_pc)
 		low_pc = address;
 	      if (address > high_pc)
@@ -1214,7 +1233,6 @@ decode_line_info (struct comp_unit *unit, struct dwarf2_debug *stash)
 	      break;
 	    case DW_LNS_copy:
 	      add_line_info (table, address, filename, line, column, 0);
-	      basic_block = 0;
 	      if (address < low_pc)
 		low_pc = address;
 	      if (address > high_pc)
@@ -1250,7 +1268,6 @@ decode_line_info (struct comp_unit *unit, struct dwarf2_debug *stash)
 	      is_stmt = (!is_stmt);
 	      break;
 	    case DW_LNS_set_basic_block:
-	      basic_block = 1;
 	      break;
 	    case DW_LNS_const_add_pc:
 	      address += lh.minimum_instruction_length
@@ -1625,7 +1642,7 @@ read_rangelist (struct comp_unit *unit, struct arange *arange, bfd_uint64_t offs
       if (low_pc == -1UL && high_pc != -1UL)
 	base_address = high_pc;
       else
-	  arange_add (unit->abfd, arange, base_address + low_pc, base_address + high_pc);
+	arange_add (unit->abfd, arange, base_address + low_pc, base_address + high_pc);
     }
 }
 
@@ -2185,7 +2202,7 @@ find_debug_info (bfd *abfd, asection *after_sec)
       if (strcmp (msec->name, DWARF2_DEBUG_INFO) == 0)
 	return msec;
 
-      if (strncmp (msec->name, GNU_LINKONCE_INFO, strlen (GNU_LINKONCE_INFO)) == 0)
+      if (CONST_STRNEQ (msec->name, GNU_LINKONCE_INFO))
 	return msec;
 
       msec = msec->next;
