@@ -18,6 +18,8 @@
 	(bfin_reorg): Always call compute_bb_for_insn.
 
 	* loop-iv.c (determine_max_iter): Move function before its only user.
+	(simplify_using_initial_values): Return if the expression becomes
+	invalid due to altered regs.
 
 2007-01-26  Jie Zhang  <jie.zhang@analog.com>
 
