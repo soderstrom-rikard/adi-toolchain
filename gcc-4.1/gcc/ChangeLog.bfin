@@ -17,6 +17,8 @@
 	(bfin_reorg_loops): Use these three new functions.
 	(bfin_reorg): Always call compute_bb_for_insn.
 
+	* loop-iv.c (determine_max_iter): Move function before its only user.
+
 2007-01-26  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin-protos.h (bfin_expand_epilogue): Add a third
