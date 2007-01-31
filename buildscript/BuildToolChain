@@ -253,7 +253,7 @@ do
 -S               Skip building elf toolchain (check to see if already built)
 -m MAKE          Default make (leave blank to use system make)
 -B BINUTILS_VER  Binutils version (default 2.17).  Can be given once.
--c GCC_VERSION   GCC version (default 3.4).  Can be given multiple times.
+-c GCC_VERSION   GCC version (default 4.1).  Can be given multiple times.
 -H HOST          Build toolchain to run on HOST.
 -l LANGS         Only build specified gcc languages.
 -C FILE          Use FILE as uClibc config file, rather than the default.
@@ -268,7 +268,7 @@ do
 done
 
 if [ -z "$GCC_VERSIONS" ]; then
-    GCC_VERSIONS=3.4
+    GCC_VERSIONS=4.1
 fi
 echo -n "Building gcc versions $GCC_VERSIONS "
 
