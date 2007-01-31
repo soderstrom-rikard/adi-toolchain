@@ -1840,7 +1840,7 @@ section_already_linked (bfd *abfd, asection *sec, void *data)
     }
 
   if (!(abfd->flags & DYNAMIC))
-    bfd_section_already_linked (abfd, sec, &link_info);
+    bfd_section_already_linked (abfd, sec);
 }
 
 /* The wild routines.

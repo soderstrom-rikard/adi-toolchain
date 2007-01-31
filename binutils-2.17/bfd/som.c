@@ -1,6 +1,6 @@
 /* bfd back-end for HP PA-RISC SOM objects.
    Copyright 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-   2000, 2001, 2002, 2003, 2004, 2005, 2006
+   2000, 2001, 2002, 2003, 2004, 2005
    Free Software Foundation, Inc.
 
    Contributed by the Center for Software Science at the
@@ -4374,12 +4374,12 @@ som_slurp_symbol_table (bfd *abfd)
 	  && sym->symbol.name[strlen (sym->symbol.name) - 1] == '$'
 	  && !strcmp (sym->symbol.name, sym->symbol.section->name))
 	sym->symbol.flags |= BSF_SECTION_SYM;
-      else if (CONST_STRNEQ (sym->symbol.name, "L$0\002"))
+      else if (!strncmp (sym->symbol.name, "L$0\002", 4))
 	{
 	  sym->symbol.flags |= BSF_SECTION_SYM;
 	  sym->symbol.name = sym->symbol.section->name;
 	}
-      else if (CONST_STRNEQ (sym->symbol.name, "L$0\001"))
+      else if (!strncmp (sym->symbol.name, "L$0\001", 4))
 	sym->symbol.flags |= BSF_DEBUGGING;
 
       /* Note increment at bottom of loop, since we skip some symbols
@@ -4959,18 +4959,15 @@ extern const bfd_target som_vec;
 static bfd_boolean
 som_new_section_hook (bfd *abfd, asection *newsect)
 {
-  if (!newsect->used_by_bfd)
-    {
-      bfd_size_type amt = sizeof (struct som_section_data_struct);
+  bfd_size_type amt = sizeof (struct som_section_data_struct);
 
-      newsect->used_by_bfd = bfd_zalloc (abfd, amt);
-      if (!newsect->used_by_bfd)
-	return FALSE;
-    }
+  newsect->used_by_bfd = bfd_zalloc (abfd, amt);
+  if (!newsect->used_by_bfd)
+    return FALSE;
   newsect->alignment_power = 3;
 
   /* We allow more than three sections internally.  */
-  return _bfd_generic_new_section_hook (abfd, newsect);
+  return TRUE;
 }
 
 /* Copy any private info we understand from the input symbol
@@ -5653,7 +5650,7 @@ som_slurp_armap (bfd *abfd)
     return FALSE;
 
   /* For archives without .o files there is no symbol table.  */
-  if (! CONST_STRNEQ (nextname, "/               "))
+  if (strncmp (nextname, "/               ", 16))
     {
       bfd_has_map (abfd) = FALSE;
       return TRUE;

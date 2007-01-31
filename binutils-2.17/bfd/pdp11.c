@@ -1111,27 +1111,32 @@ NAME (aout, new_section_hook) (bfd *abfd, asection *newsect)
   if (bfd_get_format (abfd) == bfd_object)
     {
       if (obj_textsec (abfd) == NULL
-	  && !strcmp (newsect->name, ".text"))
+	  && ! strcmp (newsect->name, ".text"))
 	{
 	  obj_textsec(abfd)= newsect;
 	  newsect->target_index = N_TEXT;
+	  return TRUE;
 	}
-      else if (obj_datasec (abfd) == NULL
-	       && !strcmp (newsect->name, ".data"))
-	{
-	  obj_datasec (abfd) = newsect;
-	  newsect->target_index = N_DATA;
-	}
-      else if (obj_bsssec (abfd) == NULL
-	       && !strcmp (newsect->name, ".bss"))
-	{
-	  obj_bsssec (abfd) = newsect;
-	  newsect->target_index = N_BSS;
-	}
-    }
+
+    if (obj_datasec (abfd) == NULL
+	&& ! strcmp (newsect->name, ".data"))
+      {
+	obj_datasec (abfd) = newsect;
+	newsect->target_index = N_DATA;
+	return TRUE;
+      }
+
+    if (obj_bsssec (abfd) == NULL
+	&& !strcmp (newsect->name, ".bss"))
+      {
+	obj_bsssec (abfd) = newsect;
+	newsect->target_index = N_BSS;
+	return TRUE;
+      }
+  }
 
   /* We allow more than three sections internally.  */
-  return _bfd_generic_new_section_hook (abfd, newsect);
+  return TRUE;
 }
 
 bfd_boolean

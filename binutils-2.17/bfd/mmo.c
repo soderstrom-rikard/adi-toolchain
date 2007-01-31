@@ -1,5 +1,5 @@
 /* BFD back-end for mmo objects (MMIX-specific object-format).
-   Copyright 2001, 2002, 2003, 2004, 2005, 2006
+   Copyright 2001, 2002, 2003, 2004, 2005
    Free Software Foundation, Inc.
    Written by Hans-Peter Nilsson (hp@bitrange.com).
    Infrastructure and other bits originally copied from srec.c and
@@ -2007,21 +2007,19 @@ mmo_scan (bfd *abfd)
    we point out the shape of allocated section contents.  */
 
 static bfd_boolean
-mmo_new_section_hook (bfd *abfd, asection *newsect)
+mmo_new_section_hook (bfd *abfd ATTRIBUTE_UNUSED, asection *newsect)
 {
+  /* We zero-fill all fields and assume NULL is represented by an all
+     zero-bit pattern.  */
+  newsect->used_by_bfd =
+    bfd_zalloc (abfd, sizeof (struct mmo_section_data_struct));
+
   if (!newsect->used_by_bfd)
-    {
-      /* We zero-fill all fields and assume NULL is represented by an all
-	 zero-bit pattern.  */
-      newsect->used_by_bfd
-	= bfd_zalloc (abfd, sizeof (struct mmo_section_data_struct));
-      if (!newsect->used_by_bfd)
-	return FALSE;
-    }
+    return FALSE;
 
   /* Always align to at least 32-bit words.  */
   newsect->alignment_power = 2;
-  return _bfd_generic_new_section_hook (abfd, newsect);
+  return TRUE;
 }
 
 /* We already have section contents loaded for sections that have
@@ -2421,10 +2419,10 @@ mmo_internal_write_section (bfd *abfd, asection *sec)
       bfd_set_error (bfd_error_bad_value);
       return FALSE;
     }
-  else if (CONST_STRNEQ (sec->name, MMIX_OTHER_SPEC_SECTION_PREFIX))
+  else if (strncmp (sec->name, MMIX_OTHER_SPEC_SECTION_PREFIX,
+		    strlen (MMIX_OTHER_SPEC_SECTION_PREFIX)) == 0)
     {
       int n = atoi (sec->name + strlen (MMIX_OTHER_SPEC_SECTION_PREFIX));
-
       mmo_write_tetra_raw (abfd, (LOP << 24) | (LOP_SPEC << 16) | n);
       return (! abfd->tdata.mmo_data->have_error
 	      && mmo_write_chunk_list (abfd, mmo_section_data (sec)->head));

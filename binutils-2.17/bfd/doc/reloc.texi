@@ -674,20 +674,6 @@ SPARC little endian relocation
 @deffnx {} BFD_RELOC_SPARC_TLS_TPOFF64
 SPARC TLS relocations
 @end deffn
-@deffn {} BFD_RELOC_SPU_IMM7
-@deffnx {} BFD_RELOC_SPU_IMM8
-@deffnx {} BFD_RELOC_SPU_IMM10
-@deffnx {} BFD_RELOC_SPU_IMM10W
-@deffnx {} BFD_RELOC_SPU_IMM16
-@deffnx {} BFD_RELOC_SPU_IMM16W
-@deffnx {} BFD_RELOC_SPU_IMM18
-@deffnx {} BFD_RELOC_SPU_PCREL9a
-@deffnx {} BFD_RELOC_SPU_PCREL9b
-@deffnx {} BFD_RELOC_SPU_PCREL16
-@deffnx {} BFD_RELOC_SPU_LO16
-@deffnx {} BFD_RELOC_SPU_HI16
-SPU Relocations.
-@end deffn
 @deffn {} BFD_RELOC_ALPHA_GPDISP_HI16
 Alpha ECOFF and ELF relocations.  Some of these treat the symbol or
 "addend" in some special way.
@@ -1166,16 +1152,6 @@ pc-relative or some form of GOT-indirect relocation.
 @deffn {} BFD_RELOC_ARM_PREL31
 31-bit PC relative address.
 @end deffn
-@deffn {} BFD_RELOC_ARM_MOVW
-@deffnx {} BFD_RELOC_ARM_MOVT
-@deffnx {} BFD_RELOC_ARM_MOVW_PCREL
-@deffnx {} BFD_RELOC_ARM_MOVT_PCREL
-@deffnx {} BFD_RELOC_ARM_THUMB_MOVW
-@deffnx {} BFD_RELOC_ARM_THUMB_MOVT
-@deffnx {} BFD_RELOC_ARM_THUMB_MOVW_PCREL
-@deffnx {} BFD_RELOC_ARM_THUMB_MOVT_PCREL
-Low and High halfword relocations for MOVW and MOVT instructions.
-@end deffn
 @deffn {} BFD_RELOC_ARM_JUMP_SLOT
 @deffnx {} BFD_RELOC_ARM_GLOB_DAT
 @deffnx {} BFD_RELOC_ARM_GOT32
@@ -1195,40 +1171,9 @@ Relocations for setting up GOTs and PLTs for shared libraries.
 @deffnx {} BFD_RELOC_ARM_TLS_LE32
 ARM thread-local storage relocations.
 @end deffn
-@deffn {} BFD_RELOC_ARM_ALU_PC_G0_NC
-@deffnx {} BFD_RELOC_ARM_ALU_PC_G0
-@deffnx {} BFD_RELOC_ARM_ALU_PC_G1_NC
-@deffnx {} BFD_RELOC_ARM_ALU_PC_G1
-@deffnx {} BFD_RELOC_ARM_ALU_PC_G2
-@deffnx {} BFD_RELOC_ARM_LDR_PC_G0
-@deffnx {} BFD_RELOC_ARM_LDR_PC_G1
-@deffnx {} BFD_RELOC_ARM_LDR_PC_G2
-@deffnx {} BFD_RELOC_ARM_LDRS_PC_G0
-@deffnx {} BFD_RELOC_ARM_LDRS_PC_G1
-@deffnx {} BFD_RELOC_ARM_LDRS_PC_G2
-@deffnx {} BFD_RELOC_ARM_LDC_PC_G0
-@deffnx {} BFD_RELOC_ARM_LDC_PC_G1
-@deffnx {} BFD_RELOC_ARM_LDC_PC_G2
-@deffnx {} BFD_RELOC_ARM_ALU_SB_G0_NC
-@deffnx {} BFD_RELOC_ARM_ALU_SB_G0
-@deffnx {} BFD_RELOC_ARM_ALU_SB_G1_NC
-@deffnx {} BFD_RELOC_ARM_ALU_SB_G1
-@deffnx {} BFD_RELOC_ARM_ALU_SB_G2
-@deffnx {} BFD_RELOC_ARM_LDR_SB_G0
-@deffnx {} BFD_RELOC_ARM_LDR_SB_G1
-@deffnx {} BFD_RELOC_ARM_LDR_SB_G2
-@deffnx {} BFD_RELOC_ARM_LDRS_SB_G0
-@deffnx {} BFD_RELOC_ARM_LDRS_SB_G1
-@deffnx {} BFD_RELOC_ARM_LDRS_SB_G2
-@deffnx {} BFD_RELOC_ARM_LDC_SB_G0
-@deffnx {} BFD_RELOC_ARM_LDC_SB_G1
-@deffnx {} BFD_RELOC_ARM_LDC_SB_G2
-ARM group relocations.
-@end deffn
 @deffn {} BFD_RELOC_ARM_IMMEDIATE
 @deffnx {} BFD_RELOC_ARM_ADRL_IMMEDIATE
 @deffnx {} BFD_RELOC_ARM_T32_IMMEDIATE
-@deffnx {} BFD_RELOC_ARM_T32_ADD_IMM
 @deffnx {} BFD_RELOC_ARM_T32_IMM12
 @deffnx {} BFD_RELOC_ARM_T32_ADD_PC12
 @deffnx {} BFD_RELOC_ARM_SHIFT_IMM
@@ -1843,21 +1788,9 @@ of 32 bit value) into 8 bit immediate value of LDI insn.
 This is a 16 bit reloc for the AVR that stores 8 bit value (usually
 command address) into 8 bit immediate value of LDI insn.
 @end deffn
-@deffn {} BFD_RELOC_AVR_LO8_LDI_GS
-This is a 16 bit reloc for the AVR that stores 8 bit value 
-(command address) into 8 bit immediate value of LDI insn. If the address
-is beyond the 128k boundary, the linker inserts a jump stub for this reloc
-in the lower 128k.
-@end deffn
 @deffn {} BFD_RELOC_AVR_HI8_LDI_PM
 This is a 16 bit reloc for the AVR that stores 8 bit value (high 8 bit
 of command address) into 8 bit immediate value of LDI insn.
-@end deffn
-@deffn {} BFD_RELOC_AVR_HI8_LDI_GS
-This is a 16 bit reloc for the AVR that stores 8 bit value (high 8 bit
-of command address) into 8 bit immediate value of LDI insn.  If the address
-is beyond the 128k boundary, the linker inserts a jump stub for this reloc
-below 128k.
 @end deffn
 @deffn {} BFD_RELOC_AVR_HH8_LDI_PM
 This is a 16 bit reloc for the AVR that stores 8 bit value (most high 8 bit
@@ -1998,31 +1931,6 @@ s390 tls relocations.
 @deffnx {} BFD_RELOC_390_GOTPLT20
 @deffnx {} BFD_RELOC_390_TLS_GOTIE20
 Long displacement extension.
-@end deffn
-@deffn {} BFD_RELOC_SCORE_DUMMY1
-Score relocations
-@end deffn
-@deffn {} BFD_RELOC_SCORE_GPREL15
-Low 16 bit for load/store
-@end deffn
-@deffn {} BFD_RELOC_SCORE_DUMMY2
-@deffnx {} BFD_RELOC_SCORE_JMP
-This is a 24-bit reloc with the right 1 bit assumed to be 0
-@end deffn
-@deffn {} BFD_RELOC_SCORE_BRANCH
-This is a 19-bit reloc with the right 1 bit assumed to be 0
-@end deffn
-@deffn {} BFD_RELOC_SCORE16_JMP
-This is a 11-bit reloc with the right 1 bit assumed to be 0
-@end deffn
-@deffn {} BFD_RELOC_SCORE16_BRANCH
-This is a 8-bit reloc with the right 1 bit assumed to be 0
-@end deffn
-@deffn {} BFD_RELOC_SCORE_GOT15
-@deffnx {} BFD_RELOC_SCORE_GOT_LO16
-@deffnx {} BFD_RELOC_SCORE_CALL15
-@deffnx {} BFD_RELOC_SCORE_DUMMY_HI16
-Undocumented Score relocs
 @end deffn
 @deffn {} BFD_RELOC_IP2K_FR9
 Scenix IP2K - 9-bit register number / data address

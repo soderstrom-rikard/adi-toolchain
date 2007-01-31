@@ -175,8 +175,10 @@ _bfd_link_section_stabs (bfd *abfd,
        prepared to handle them.  */
     return TRUE;
 
-  if (bfd_is_abs_section (stabsec->output_section)
-      || bfd_is_abs_section (stabstrsec->output_section))
+  if ((stabsec->output_section != NULL
+       && bfd_is_abs_section (stabsec->output_section))
+      || (stabstrsec->output_section != NULL
+	  && bfd_is_abs_section (stabstrsec->output_section)))
     /* At least one of the sections is being discarded from the
        link, so we should just ignore them.  */
     return TRUE;
@@ -185,8 +187,6 @@ _bfd_link_section_stabs (bfd *abfd,
 
   if (sinfo->stabstr == NULL)
     {
-      flagword flags;
-
       /* Initialize the stabs information we need to keep track of.  */
       first = TRUE;
       sinfo->strings = _bfd_stringtab_init ();
@@ -198,12 +198,11 @@ _bfd_link_section_stabs (bfd *abfd,
 				 stab_link_includes_newfunc,
 				 sizeof (struct stab_link_includes_entry)))
 	goto error_return;
-      flags = (SEC_HAS_CONTENTS | SEC_READONLY | SEC_DEBUGGING
-	       | SEC_LINKER_CREATED);
-      sinfo->stabstr = bfd_make_section_anyway_with_flags (abfd, ".stabstr",
-							   flags);
+      sinfo->stabstr = bfd_make_section_anyway (abfd, ".stabstr");
       if (sinfo->stabstr == NULL)
 	goto error_return;
+      sinfo->stabstr->flags |= (SEC_HAS_CONTENTS | SEC_READONLY
+				| SEC_DEBUGGING | SEC_LINKER_CREATED);
     }
 
   /* Initialize the information we are going to store for this .stab
@@ -431,7 +430,7 @@ _bfd_link_section_stabs (bfd *abfd,
 		    ++nest;
 		  else if (incl_type == (int) N_EXCL)
 		    /* Keep existing exclusion marks.  */
-		    continue;
+		    continue;   
 		  else if (nest == 0)
 		    {
 		      *incl_pstridx = (bfd_size_type) -1;
@@ -456,8 +455,8 @@ _bfd_link_section_stabs (bfd *abfd,
      for that section.  */
   stabsec->size = (count - skip) * STABSIZE;
   if (stabsec->size == 0)
-    stabsec->flags |= SEC_EXCLUDE | SEC_KEEP;
-  stabstrsec->flags |= SEC_EXCLUDE | SEC_KEEP;
+    stabsec->flags |= SEC_EXCLUDE;
+  stabstrsec->flags |= SEC_EXCLUDE;
   sinfo->stabstr->size = _bfd_stringtab_size (sinfo->strings);
 
   /* Calculate the `cumulative_skips' array now that stabs have been
@@ -609,7 +608,7 @@ _bfd_discard_section_stabs (bfd *abfd,
   /* Shrink the stabsec as needed.  */
   stabsec->size -= skip * STABSIZE;
   if (stabsec->size == 0)
-    stabsec->flags |= SEC_EXCLUDE | SEC_KEEP;
+    stabsec->flags |= SEC_EXCLUDE;
 
   /* Recalculate the `cumulative_skips' array now that stabs have been
      deleted for this section.  */

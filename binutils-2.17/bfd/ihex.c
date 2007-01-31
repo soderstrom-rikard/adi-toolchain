@@ -1,6 +1,6 @@
 /* BFD back-end for Intel Hex objects.
-   Copyright 1995, 1996, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-   2006 Free Software Foundation, Inc.
+   Copyright 1995, 1996, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
+   Free Software Foundation, Inc.
    Written by Ian Lance Taylor of Cygnus Support <ian@cygnus.com>.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -355,7 +355,6 @@ ihex_scan (bfd *abfd)
 		  char secbuf[20];
 		  char *secname;
 		  bfd_size_type amt;
-		  flagword flags;
 
 		  sprintf (secbuf, ".sec%d", bfd_count_sections (abfd) + 1);
 		  amt = strlen (secbuf) + 1;
@@ -363,10 +362,10 @@ ihex_scan (bfd *abfd)
 		  if (secname == NULL)
 		    goto error_return;
 		  strcpy (secname, secbuf);
-		  flags = SEC_HAS_CONTENTS | SEC_LOAD | SEC_ALLOC;
-		  sec = bfd_make_section_with_flags (abfd, secname, flags);
+		  sec = bfd_make_section (abfd, secname);
 		  if (sec == NULL)
 		    goto error_return;
+		  sec->flags = SEC_HAS_CONTENTS | SEC_LOAD | SEC_ALLOC;
 		  sec->vma = extbase + segbase + addr;
 		  sec->lma = extbase + segbase + addr;
 		  sec->size = len;
@@ -554,6 +553,7 @@ ihex_read_section (bfd *abfd, asection *section, bfd_byte *contents)
     {
       char hdr[8];
       unsigned int len;
+      bfd_vma addr;
       unsigned int type;
       unsigned int i;
 
@@ -568,6 +568,7 @@ ihex_read_section (bfd *abfd, asection *section, bfd_byte *contents)
 	goto error_return;
 
       len = HEX2 (hdr);
+      addr = HEX4 (hdr + 2);
       type = HEX2 (hdr + 6);
 
       /* We should only see type 0 records here.  */

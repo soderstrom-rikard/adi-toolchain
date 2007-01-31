@@ -115,33 +115,9 @@ _bfd_new_bfd_contained_in (bfd *obfd)
 void
 _bfd_delete_bfd (bfd *abfd)
 {
-  if (abfd->memory)
-    {
-      bfd_hash_table_free (&abfd->section_htab);
-      objalloc_free ((struct objalloc *) abfd->memory);
-    }
+  bfd_hash_table_free (&abfd->section_htab);
+  objalloc_free ((struct objalloc *) abfd->memory);
   free (abfd);
-}
-
-/* Free objalloc memory.  */
-
-bfd_boolean
-_bfd_free_cached_info (bfd *abfd)
-{
-  if (abfd->memory)
-    {
-      bfd_hash_table_free (&abfd->section_htab);
-      objalloc_free ((struct objalloc *) abfd->memory);
-
-      abfd->sections = NULL;
-      abfd->section_last = NULL;
-      abfd->outsymbols = NULL;
-      abfd->tdata.any = NULL;
-      abfd->usrdata = NULL;
-      abfd->memory = NULL;
-    }
-
-  return TRUE;
 }
 
 /*
@@ -1345,7 +1321,6 @@ bfd_create_gnu_debuglink_section (bfd *abfd, const char *filename)
 {
   asection *sect;
   bfd_size_type debuglink_size;
-  flagword flags;
 
   if (abfd == NULL || filename == NULL)
     {
@@ -1364,10 +1339,15 @@ bfd_create_gnu_debuglink_section (bfd *abfd, const char *filename)
       return NULL;
     }
 
-  flags = SEC_HAS_CONTENTS | SEC_READONLY | SEC_DEBUGGING;
-  sect = bfd_make_section_with_flags (abfd, GNU_DEBUGLINK, flags);
+  sect = bfd_make_section (abfd, GNU_DEBUGLINK);
   if (sect == NULL)
     return NULL;
+
+  if (! bfd_set_section_flags (abfd, sect,
+			       SEC_HAS_CONTENTS | SEC_READONLY | SEC_DEBUGGING))
+    /* XXX Should we delete the section from the bfd ?  */
+    return NULL;
+
 
   debuglink_size = strlen (filename) + 1;
   debuglink_size += 3;

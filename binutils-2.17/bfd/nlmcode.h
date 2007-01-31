@@ -1,6 +1,6 @@
 /* NLM (NetWare Loadable Module) executable support for BFD.
    Copyright 1993, 1994, 1995, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006 Free Software Foundation, Inc.
+   2005 Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, using ELF support as the
    template.
@@ -138,13 +138,14 @@ add_bfd_section (bfd *abfd,
 {
   asection *newsect;
 
-  newsect = bfd_make_section_with_flags (abfd, name, flags);
+  newsect = bfd_make_section (abfd, name);
   if (newsect == NULL)
     return FALSE;
 
   newsect->vma = 0;		/* NLM's are relocatable.  */
   newsect->size = size;
   newsect->filepos = offset;
+  newsect->flags = flags;
   newsect->alignment_power = bfd_log2 ((bfd_vma) 0);	/* FIXME */
 
   return TRUE;
@@ -174,7 +175,7 @@ nlm_swap_auxiliary_headers_in (bfd *abfd)
 	return FALSE;
       if (bfd_seek (abfd, position, SEEK_SET) != 0)
 	return FALSE;
-      if (CONST_STRNEQ (tempstr, "VeRsIoN#"))
+      if (strncmp (tempstr, "VeRsIoN#", 8) == 0)
 	{
 	  Nlm_External_Version_Header thdr;
 
@@ -196,7 +197,7 @@ nlm_swap_auxiliary_headers_in (bfd *abfd)
 	  nlm_version_header (abfd)->day =
 	    get_word (abfd, (bfd_byte *) thdr.day);
 	}
-      else if (CONST_STRNEQ (tempstr, "MeSsAgEs"))
+      else if (strncmp (tempstr, "MeSsAgEs", 8) == 0)
 	{
 	  Nlm_External_Extended_Header thdr;
 
@@ -264,7 +265,7 @@ nlm_swap_auxiliary_headers_in (bfd *abfd)
 	  nlm_extended_header (abfd)->reserved5 =
 	    get_word (abfd, (bfd_byte *) thdr.reserved5);
 	}
-      else if (CONST_STRNEQ (tempstr, "CoPyRiGhT="))
+      else if (strncmp (tempstr, "CoPyRiGhT=", 10) == 0)
 	{
 	  amt = sizeof (nlm_copyright_header (abfd)->stamp);
 	  if (bfd_bread ((void *) nlm_copyright_header (abfd)->stamp,
@@ -280,7 +281,7 @@ nlm_swap_auxiliary_headers_in (bfd *abfd)
 			amt, abfd) != amt)
 	    return FALSE;
 	}
-      else if (CONST_STRNEQ (tempstr, "CuStHeAd"))
+      else if (strncmp (tempstr, "CuStHeAd", 8) == 0)
 	{
 	  Nlm_External_Custom_Header thdr;
 	  bfd_size_type hdrLength;
@@ -345,7 +346,7 @@ nlm_swap_auxiliary_headers_in (bfd *abfd)
 	  /* If we have found a Cygnus header, process it.  Otherwise,
 	     just save the associated data without trying to interpret
 	     it.  */
-	  if (CONST_STRNEQ (dataStamp, "CyGnUsEx"))
+	  if (strncmp (dataStamp, "CyGnUsEx", 8) == 0)
 	    {
 	      file_ptr pos;
 	      bfd_byte *contents;
@@ -364,7 +365,7 @@ nlm_swap_auxiliary_headers_in (bfd *abfd)
 	      if (bfd_seek (abfd, pos, SEEK_SET) != 0)
 		return FALSE;
 
-	      LITMEMCPY (nlm_cygnus_ext_header (abfd), "CyGnUsEx");
+	      memcpy (nlm_cygnus_ext_header (abfd), "CyGnUsEx", 8);
 	      nlm_cygnus_ext_header (abfd)->offset = dataOffset;
 	      nlm_cygnus_ext_header (abfd)->length = dataLength;
 
@@ -645,7 +646,7 @@ nlm_swap_auxiliary_headers_out (bfd *abfd)
     {
       Nlm_External_Version_Header thdr;
 
-      LITMEMCPY (thdr.stamp, "VeRsIoN#");
+      memcpy (thdr.stamp, "VeRsIoN#", 8);
       put_word (abfd, (bfd_vma) nlm_version_header (abfd)->majorVersion,
 		(bfd_byte *) thdr.majorVersion);
       put_word (abfd, (bfd_vma) nlm_version_header (abfd)->minorVersion,
@@ -672,7 +673,7 @@ nlm_swap_auxiliary_headers_out (bfd *abfd)
     {
       Nlm_External_Copyright_Header thdr;
 
-      LITMEMCPY (thdr.stamp, "CoPyRiGhT=");
+      memcpy (thdr.stamp, "CoPyRiGhT=", 10);
       amt = sizeof (thdr.stamp);
       if (bfd_bwrite ((void *) thdr.stamp, amt, abfd) != amt)
 	return FALSE;
@@ -694,7 +695,7 @@ nlm_swap_auxiliary_headers_out (bfd *abfd)
     {
       Nlm_External_Extended_Header thdr;
 
-      LITMEMCPY (thdr.stamp, "MeSsAgEs");
+      memcpy (thdr.stamp, "MeSsAgEs", 8);
       put_word (abfd,
 		(bfd_vma) nlm_extended_header (abfd)->languageID,
 		(bfd_byte *) thdr.languageID);
@@ -797,7 +798,7 @@ nlm_swap_auxiliary_headers_out (bfd *abfd)
 
       ds = find_nonzero (nlm_custom_header (abfd)->dataStamp,
 			 sizeof (nlm_custom_header (abfd)->dataStamp));
-      LITMEMCPY (thdr.stamp, "CuStHeAd");
+      memcpy (thdr.stamp, "CuStHeAd", 8);
       hdrLength = (2 * NLM_TARGET_LONG_SIZE + (ds ? 8 : 0)
 		   + nlm_custom_header (abfd)->hdrLength);
       put_word (abfd, hdrLength, thdr.length);
@@ -831,14 +832,14 @@ nlm_swap_auxiliary_headers_out (bfd *abfd)
     {
       Nlm_External_Custom_Header thdr;
 
-      LITMEMCPY (thdr.stamp, "CuStHeAd");
+      memcpy (thdr.stamp, "CuStHeAd", 8);
       put_word (abfd, (bfd_vma) 2 * NLM_TARGET_LONG_SIZE + 8,
 		(bfd_byte *) thdr.length);
       put_word (abfd, (bfd_vma) nlm_cygnus_ext_header (abfd)->offset,
 		(bfd_byte *) thdr.dataOffset);
       put_word (abfd, (bfd_vma) nlm_cygnus_ext_header (abfd)->length,
 		(bfd_byte *) thdr.dataLength);
-      LITMEMCPY (thdr.dataStamp, "CyGnUsEx");
+      memcpy (thdr.dataStamp, "CyGnUsEx", 8);
       amt = sizeof (thdr);
       if (bfd_bwrite ((void *) &thdr, amt, abfd) != amt)
 	return FALSE;

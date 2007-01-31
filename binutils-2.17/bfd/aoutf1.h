@@ -566,7 +566,6 @@ sunos4_core_file_p (bfd *abfd)
       struct internal_sunos_core internal_sunos_core;
       char external_core[1];
     } *mergem;
-  flagword flags;
 
   if (bfd_bread ((void *) longbuf, (bfd_size_type) sizeof (longbuf), abfd)
       != sizeof (longbuf))
@@ -628,30 +627,27 @@ sunos4_core_file_p (bfd *abfd)
   abfd->tdata.sun_core_data->hdr = core;
 
   /* Create the sections.  */
-  flags = SEC_ALLOC + SEC_LOAD + SEC_HAS_CONTENTS;
-  core_stacksec (abfd) = bfd_make_section_anyway_with_flags (abfd, ".stack",
-							     flags);
+  core_stacksec (abfd) = bfd_make_section_anyway (abfd, ".stack");
   if (core_stacksec (abfd) == NULL)
     /* bfd_release frees everything allocated after it's arg.  */
     goto loser;
 
-  flags = SEC_ALLOC + SEC_LOAD + SEC_HAS_CONTENTS;
-  core_datasec (abfd) = bfd_make_section_anyway_with_flags (abfd, ".data",
-							    flags);
+  core_datasec (abfd) = bfd_make_section_anyway (abfd, ".data");
   if (core_datasec (abfd) == NULL)
     goto loser;
 
-  flags = SEC_HAS_CONTENTS;
-  core_regsec (abfd) = bfd_make_section_anyway_with_flags (abfd, ".reg",
-							   flags);
+  core_regsec (abfd) = bfd_make_section_anyway (abfd, ".reg");
   if (core_regsec (abfd) == NULL)
     goto loser;
 
-  flags = SEC_HAS_CONTENTS;
-  core_reg2sec (abfd) = bfd_make_section_anyway_with_flags (abfd, ".reg2",
-							    flags);
+  core_reg2sec (abfd) = bfd_make_section_anyway (abfd, ".reg2");
   if (core_reg2sec (abfd) == NULL)
     goto loser;
+
+  core_stacksec (abfd)->flags = SEC_ALLOC + SEC_LOAD + SEC_HAS_CONTENTS;
+  core_datasec (abfd)->flags = SEC_ALLOC + SEC_LOAD + SEC_HAS_CONTENTS;
+  core_regsec (abfd)->flags = SEC_HAS_CONTENTS;
+  core_reg2sec (abfd)->flags = SEC_HAS_CONTENTS;
 
   core_stacksec (abfd)->size = core->c_ssize;
   core_datasec (abfd)->size = core->c_dsize;

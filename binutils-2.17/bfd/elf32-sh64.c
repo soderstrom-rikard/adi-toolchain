@@ -1,5 +1,5 @@
 /* SuperH SH64-specific support for 32-bit ELF
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006
+   Copyright 2000, 2001, 2002, 2003, 2004, 2005
    Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -115,16 +115,13 @@ static void sh64_find_section_for_address
 static bfd_boolean
 sh64_elf_new_section_hook (bfd *abfd, asection *sec)
 {
-  if (!sec->used_by_bfd)
-    {
-      struct _sh64_elf_section_data *sdata;
-      bfd_size_type amt = sizeof (*sdata);
+  struct _sh64_elf_section_data *sdata;
+  bfd_size_type amt = sizeof (*sdata);
 
-      sdata = bfd_zalloc (abfd, amt);
-      if (sdata == NULL)
-	return FALSE;
-      sec->used_by_bfd = sdata;
-    }
+  sdata = (struct _sh64_elf_section_data *) bfd_zalloc (abfd, amt);
+  if (sdata == NULL)
+    return FALSE;
+  sec->used_by_bfd = sdata;
 
   return _bfd_elf_new_section_hook (abfd, sec);
 }
@@ -742,9 +739,9 @@ static void
 sh64_elf_merge_symbol_attribute (struct elf_link_hash_entry *h,
 				 const Elf_Internal_Sym *isym,
 				 bfd_boolean definition,
-				 bfd_boolean dynamic ATTRIBUTE_UNUSED)
+				 bfd_boolean dynamic)
 {
-  if ((isym->st_other & ~ELF_ST_VISIBILITY (-1)) != 0)
+  if (isym->st_other != 0 && dynamic)
     {
       unsigned char other;
 
@@ -759,8 +756,8 @@ sh64_elf_merge_symbol_attribute (struct elf_link_hash_entry *h,
 
 static const struct bfd_elf_special_section sh64_elf_special_sections[] =
 {
-  { STRING_COMMA_LEN (".cranges"), 0, SHT_PROGBITS, 0 },
-  { NULL,                       0, 0, 0,            0 }
+  { ".cranges", 8, 0, SHT_PROGBITS, 0 },
+  { NULL,       0, 0, 0,            0 }
 };
 
 #undef	TARGET_BIG_SYM
@@ -785,7 +782,6 @@ static const struct bfd_elf_special_section sh64_elf_special_sections[] =
 #define	TARGET_LITTLE_NAME	"elf32-sh64l-nbsd"
 #undef	ELF_MAXPAGESIZE
 #define	ELF_MAXPAGESIZE		0x10000
-#undef	ELF_COMMONPAGESIZE
 #undef	elf_symbol_leading_char
 #define	elf_symbol_leading_char	0
 #undef	elf32_bed
@@ -804,8 +800,6 @@ static const struct bfd_elf_special_section sh64_elf_special_sections[] =
 #define	TARGET_LITTLE_NAME	"elf32-sh64-linux"
 #undef	elf32_bed
 #define	elf32_bed		elf32_sh64_lin_bed
-#undef	ELF_COMMONPAGESIZE
-#define	ELF_COMMONPAGESIZE	0x1000
 
 #include "elf32-target.h"
 

@@ -92,8 +92,7 @@ processors[] =
   { bfd_mach_arm_4,  "strongarm1100" },
   { bfd_mach_arm_XScale, "xscale" },
   { bfd_mach_arm_ep9312, "ep9312" },
-  { bfd_mach_arm_iWMMXt, "iwmmxt" },
-  { bfd_mach_arm_iWMMXt2, "iwmmxt2" }
+  { bfd_mach_arm_iWMMXt, "iwmmxt" }
 };
 
 static bfd_boolean
@@ -138,8 +137,7 @@ static const bfd_arch_info_type arch_info_struct[] =
   N (bfd_mach_arm_5TE,    "armv5te", FALSE, & arch_info_struct[9]),
   N (bfd_mach_arm_XScale, "xscale",  FALSE, & arch_info_struct[10]),
   N (bfd_mach_arm_ep9312, "ep9312",  FALSE, & arch_info_struct[11]),
-  N (bfd_mach_arm_iWMMXt, "iwmmxt",  FALSE, & arch_info_struct[12]),
-  N (bfd_mach_arm_iWMMXt2, "iwmmxt2", FALSE, NULL)
+  N (bfd_mach_arm_iWMMXt,"iwmmxt",  FALSE, NULL)
 };
 
 const bfd_arch_info_type bfd_arm_arch =
@@ -181,9 +179,7 @@ bfd_arm_merge_machines (bfd *ibfd, bfd *obfd)
      Intel XScale binary, since these architecture have co-processors which
      will not both be present on the same physical hardware.  */
   else if (in == bfd_mach_arm_ep9312
-	   && (out == bfd_mach_arm_XScale
-	       || out == bfd_mach_arm_iWMMXt
-	       || out == bfd_mach_arm_iWMMXt2))
+	   && (out == bfd_mach_arm_XScale || out == bfd_mach_arm_iWMMXt))
     {
       _bfd_error_handler (_("\
 ERROR: %B is compiled for the EP9312, whereas %B is compiled for XScale"),
@@ -192,9 +188,7 @@ ERROR: %B is compiled for the EP9312, whereas %B is compiled for XScale"),
       return FALSE;
     }
   else if (out == bfd_mach_arm_ep9312
-	   && (in == bfd_mach_arm_XScale
-	       || in == bfd_mach_arm_iWMMXt
-	       || in == bfd_mach_arm_iWMMXt2))
+	   && (in == bfd_mach_arm_XScale || in == bfd_mach_arm_iWMMXt))
     {
       _bfd_error_handler (_("\
 ERROR: %B is compiled for the EP9312, whereas %B is compiled for XScale"),
@@ -315,7 +309,6 @@ bfd_arm_update_notes (bfd *abfd, const char *note_section)
     case bfd_mach_arm_XScale:  expected = "XScale"; break;
     case bfd_mach_arm_ep9312:  expected = "ep9312"; break;
     case bfd_mach_arm_iWMMXt:  expected = "iWMMXt"; break;
-    case bfd_mach_arm_iWMMXt2: expected = "iWMMXt2"; break;
     }
 
   if (strcmp (arch_string, expected) != 0)
@@ -362,8 +355,7 @@ architectures[] =
   { "armv5te", bfd_mach_arm_5TE },
   { "XScale",  bfd_mach_arm_XScale },
   { "ep9312",  bfd_mach_arm_ep9312 },
-  { "iWMMXt",  bfd_mach_arm_iWMMXt },
-  { "iWMMXt2", bfd_mach_arm_iWMMXt2 }
+  { "iWMMXt",  bfd_mach_arm_iWMMXt }
 };
 
 /* Extract the machine number stored in a note section.  */
@@ -410,22 +402,14 @@ bfd_arm_get_mach_from_notes (bfd *abfd, const char *note_section)
 }
 
 bfd_boolean
-bfd_is_arm_special_symbol_name (const char * name, int type)
+bfd_is_arm_mapping_symbol_name (const char * name)
 {
   /* The ARM compiler outputs several obsolete forms.  Recognize them
-     in addition to the standard $a, $t and $d.  We are somewhat loose
-     in what we accept here, since the full set is not documented.  */
-  if (!name || name[0] != '$')
-    return FALSE;
-  if (name[1] == 'a' || name[1] == 't' || name[1] == 'd')
-    type &= BFD_ARM_SPECIAL_SYM_TYPE_MAP;
-  else if (name[1] == 'm' || name[1] == 'f' || name[1] == 'p')
-    type &= BFD_ARM_SPECIAL_SYM_TYPE_TAG;
-  else if (name[1] >= 'a' && name[1] <= 'z')
-    type &= BFD_ARM_SPECIAL_SYM_TYPE_OTHER;
-  else
-    return FALSE;
-
-  return (type != 0 && (name[2] == 0 || name[2] == '.'));
+     in addition to the standard $a, $t and $d.  */
+  return (name != NULL)
+    && (name[0] == '$')
+    && ((name[1] == 'a') || (name[1] == 't') || (name[1] == 'd')
+	|| (name[1] == 'm') || (name[1] == 'f') || (name[1] == 'p'))
+    && (name[2] == 0 || name[2] == '.');
 }
 

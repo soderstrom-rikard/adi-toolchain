@@ -1080,6 +1080,7 @@ get_section_entry (bfd *abfd, ieee_data_type *ieee, unsigned int index)
       sprintf (tmp, " fsec%4d", index);
       section = bfd_make_section (abfd, tmp);
       ieee->section_table[index] = section;
+      section->flags = SEC_NO_FLAGS;
       section->target_index = index;
       ieee->section_table[index] = section;
     }
@@ -1267,15 +1268,14 @@ ieee_slurp_debug (bfd *abfd)
   ieee_data_type *ieee = IEEE_DATA (abfd);
   asection *sec;
   file_ptr debug_end;
-  flagword flags;
 
   if (ieee->w.r.debug_information_part == 0)
     return TRUE;
 
-  flags = SEC_DEBUGGING | SEC_HAS_CONTENTS;
-  sec = bfd_make_section_with_flags (abfd, ".debug", flags);
+  sec = bfd_make_section (abfd, ".debug");
   if (sec == NULL)
     return FALSE;
+  sec->flags |= SEC_DEBUGGING | SEC_HAS_CONTENTS;
   sec->filepos = ieee->w.r.debug_information_part;
 
   debug_end = ieee_part_after (ieee, ieee->w.r.debug_information_part);
@@ -1875,8 +1875,8 @@ ieee_object_p (bfd *abfd)
 	    family[9] = '\0';
 	  }
       }
-    else if ((CONST_STRNEQ (processor, "cpu32")) /* CPU32 and CPU32+  */
-	     || (CONST_STRNEQ (processor, "CPU32")))
+    else if ((strncmp (processor, "cpu32", 5) == 0) /* CPU32 and CPU32+ */
+	     || (strncmp (processor, "CPU32", 5) == 0))
       strcpy (family, "68332");
     else
       {
@@ -2014,15 +2014,12 @@ ieee_print_symbol (bfd *abfd,
 static bfd_boolean
 ieee_new_section_hook (bfd *abfd, asection *newsect)
 {
+  newsect->used_by_bfd = bfd_alloc (abfd, (bfd_size_type) sizeof (ieee_per_section_type));
   if (!newsect->used_by_bfd)
-    {
-      newsect->used_by_bfd = bfd_alloc (abfd, sizeof (ieee_per_section_type));
-      if (!newsect->used_by_bfd)
-	return FALSE;
-    }
+    return FALSE;
   ieee_per_section (newsect)->data = NULL;
   ieee_per_section (newsect)->section = newsect;
-  return _bfd_generic_new_section_hook (abfd, newsect);
+  return TRUE;
 }
 
 static long
