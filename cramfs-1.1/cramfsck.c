@@ -226,7 +226,7 @@ static void test_super(int *start, size_t *length) {
 static void test_crc(int start)
 {
 	void *buf;
-	u32 crc;
+	__u32 crc;
 
 	if (!(super.flags & CRAMFS_FLAG_FSID_VERSION_2)) {
 #ifdef INCLUDE_FS_TESTS
@@ -337,8 +337,8 @@ static struct cramfs_inode *cramfs_iget(struct cramfs_inode * i)
 		inode->uid=bswap_16(i->uid);
 		inode->size=bswap_32(i->size << 8);
 		inode->gid=i->gid;
-		inode->namelen = bswap_32(((u32*)i)[2]) >> 26;
-		inode->offset = bswap_32(((u32*)i)[2]) & 0x3FFFFFFF;
+		inode->namelen = bswap_32(((__u32*)i)[2]) >> 26;
+		inode->offset = bswap_32(((__u32*)i)[2]) & 0x3FFFFFFF;
 	}
 	return inode;
 }
@@ -400,7 +400,7 @@ static void do_uncompress(char *path, int fd, unsigned long offset, unsigned lon
 
 	do {
 		unsigned long out = PAGE_CACHE_SIZE;
-		unsigned long next = CRAMFS_32(*(u32 *) romfs_read(offset));
+		unsigned long next = CRAMFS_32(*(__u32 *) romfs_read(offset));
 
 		if (next > end_data) {
 			end_data = next;
@@ -563,7 +563,7 @@ static void do_symlink(char *path, struct cramfs_inode *i)
 {
 	unsigned long offset = i->offset << 2;
 	unsigned long curr = offset + 4;
-	unsigned long next = CRAMFS_32(*(u32 *) romfs_read(offset));
+	unsigned long next = CRAMFS_32(*(__u32 *) romfs_read(offset));
 	unsigned long size;
 
 	if (offset == 0) {

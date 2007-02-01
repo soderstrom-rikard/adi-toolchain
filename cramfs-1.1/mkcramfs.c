@@ -109,7 +109,7 @@ static int image_length = 0;
  *
  * If opt_verbose is 1, be verbose.  If it is higher, be even more verbose.
  */
-static u32 opt_edition = 0;
+static __u32 opt_edition = 0;
 static int opt_errors = 0;
 static int opt_holes = 0;
 static int opt_pad = 0;
@@ -433,10 +433,10 @@ static unsigned int parse_directory(struct entry *root_entry, const char *name, 
 			namelen = CRAMFS_MAXPATHLEN;
 			warn_namelen = 1;
 			/* the first lost byte must not be a trail byte */
-			while ((entry->name[namelen] & 0xc0) == 0x80) {
+			if (entry->name[namelen] < 0x80 || !namelen) {
 				namelen--;
 				/* are we reasonably certain it was UTF-8 ? */
-				if (entry->name[namelen] < 0x80 || !namelen) {
+				if (!(entry->name[namelen] & 0x80) || !namelen) {
 					error_msg_and_die("cannot truncate filenames not encoded in UTF-8");
 				}
 			}
@@ -516,23 +516,23 @@ static void fix_inode(struct cramfs_inode *inode)
 	inode->uid = (inode->uid >> 8) | ((inode->uid&0xff)<<8);
 	inode->size = (inode->size >> 16) | (inode->size&0xff00) |
 		((inode->size&0xff)<<16);
-	((u32*)inode)[2] = wswap(inode->offset | (inode->namelen<<26));
+	((__u32*)inode)[2] = wswap(inode->offset | (inode->namelen<<26));
 }
 
-static void fix_offset(struct cramfs_inode *inode, u32 offset)
+static void fix_offset(struct cramfs_inode *inode, __u32 offset)
 {
-	u32 tmp = wswap(((u32*)inode)[2]);
-	((u32*)inode)[2] = wswap((offset >> 2) | (tmp&0xfc000000));
+	__u32 tmp = wswap(((__u32*)inode)[2]);
+	((__u32*)inode)[2] = wswap((offset >> 2) | (tmp&0xfc000000));
 }
 
-static void fix_block_pointer(u32 *p)
+static void fix_block_pointer(__u32 *p)
 {
 	*p = wswap(*p);
 }
 
 static void fix_super(struct cramfs_super *super)
 {
-	u32 *p = (u32*)super;
+	__u32 *p = (__u32*)super;
 
 	/* fix superblock fields */
 	p[0] = wswap(p[0]);	/* magic */
@@ -541,7 +541,7 @@ static void fix_super(struct cramfs_super *super)
 	p[3] = wswap(p[3]);	/* future */
 
 	/* fix filesystem info fields */
-	p = (u32*)&super->fsid;
+	p = (__u32*)&super->fsid;
 	p[0] = wswap(p[0]);	/* crc */
 	p[1] = wswap(p[1]);	/* edition */
 	p[2] = wswap(p[2]);	/* blocks */
@@ -785,8 +785,8 @@ static unsigned int do_compress(char *base, unsigned int offset, struct entry *e
 			error_msg_and_die("AIEEE: block \"compressed\" to > 2*blocklength (%ld)\n", len);
 		}
 
-		*(u32 *) (base + offset) = curr;
-		if (swap_endian) fix_block_pointer((u32*)(base + offset));
+		*(__u32 *) (base + offset) = curr;
+		if (swap_endian) fix_block_pointer((__u32*)(base + offset));
 		offset += 4;
 	} while (size);
 
@@ -1188,7 +1188,7 @@ int main(int argc, char **argv)
 	/* initial guess (upper-bound) of required filesystem size */
 	ssize_t fslen_ub = sizeof(struct cramfs_super);
 	char const *dirname, *outfile;
-	u32 crc;
+	__u32 crc;
 	int c;			/* for getopt */
 	char *ep;		/* for strtoul */
 	FILE *devtable = NULL;
