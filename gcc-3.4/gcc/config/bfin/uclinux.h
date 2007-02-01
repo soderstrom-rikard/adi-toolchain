@@ -2,6 +2,10 @@
  * Copyright (c) 2005 by Analog Devices, Inc. All Rights Reserved.
  */
 
+/* The GNU C++ standard library requires that these macros be defined.  */
+#undef CPLUSPLUS_CPP_SPEC
+#define CPLUSPLUS_CPP_SPEC "-D_GNU_SOURCE %(cpp)"
+
 #undef  STARTFILE_SPEC
 #define STARTFILE_SPEC \
   "%{!shared: %{pie:Scrt1%O%s;:crt1%O%s}} crti%O%s crtbegin%O%s crtlibid%O%s"

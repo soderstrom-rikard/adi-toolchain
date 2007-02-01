@@ -1,3 +1,15 @@
+2007-02-01  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.h (TARGET_CPP_CPU_BUILTINS): Define __FDPIC__ in
+	addition to __BFIN_FDPIC__.
+	* config/bfin/uclinux.h (CPLUSPLUS_CPP_SPEC): Define _GNU_SOURCE.
+	* config/bfin/t-bfin-linux: New file.
+	* config/bfin/t-bfin-uclinux: New file.
+	* config/bfin/linux.h: New file.
+	* config/bfin/libgcc-bfin.ver: New file.
+	* config.gcc (bfin*-linux-uclibc*): New configuration.
+	(bfin*-uclinux*): Use t-bfin-uclinux instead of t-bfin-elf.
+
 2006-11-14  Michael Frysinger  <michael.frysinger@analog.com>
 
 	Backport from mainline:
