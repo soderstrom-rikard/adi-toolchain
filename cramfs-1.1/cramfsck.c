@@ -56,6 +56,10 @@
 #include "linux/cramfs_fs.h"
 #include <zlib.h>
 
+#if !defined(MAP_ANONYMOUS) && defined(MAP_ANON)
+# define MAP_ANONYMOUS MAP_ANON
+#endif
+
 #define BLKGETSIZE	_IO(0x12,96) /* return device size /512 (long *arg) */
 
 /* Exit codes used by fsck-type programs */

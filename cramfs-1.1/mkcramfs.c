@@ -53,6 +53,10 @@
 #include <dmalloc.h>
 #endif
 
+#if !defined(MAP_ANONYMOUS) && defined(MAP_ANON)
+# define MAP_ANONYMOUS MAP_ANON
+#endif
+
 /* Exit codes used by mkfs-type programs */
 #define MKFS_OK          0	/* No errors */
 #define MKFS_ERROR       8	/* Operational error */
