@@ -98,7 +98,7 @@ extern void setup_incoming_varargs (CUMULATIVE_ARGS *, enum machine_mode, tree,
 				    int *, int);
 
 extern void bfin_expand_prologue (void);
-extern void bfin_expand_epilogue (int, int);
+extern void bfin_expand_epilogue (int, int, bool);
 extern int push_multiple_operation (rtx, Mmode);
 extern int pop_multiple_operation (rtx, Mmode);
 extern void output_push_multiple (rtx, rtx *);
