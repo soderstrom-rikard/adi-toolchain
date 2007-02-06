@@ -13,6 +13,9 @@
 
 	* doc/md.texi (usmulqihi3, usmulhisi3, usmulsidi3): Document.
 
+	* config/bfin/bfin.c (bfin_optimize_loop): Test the right length
+	variable when determining if LSETUP is in range.
+
 2007-02-01  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* loop-iv.c (implies_p): Detect additional cases where A implies B.

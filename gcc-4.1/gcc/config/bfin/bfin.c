@@ -3389,7 +3389,7 @@ bfin_optimize_loop (loop_info loop)
 	  goto bad_loop;
 	}
 
-      if (loop->length > MAX_LSETUP_DISTANCE)
+      if (length > MAX_LSETUP_DISTANCE)
 	{
 	  if (dump_file)
 	    fprintf (dump_file, ";; loop %d lsetup too far away\n", loop->loop_no);
