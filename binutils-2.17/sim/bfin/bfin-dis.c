@@ -2668,14 +2668,16 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
     unhandled_instruction ("dregs = ROT dregs BY dregs_lo");
   else if (sop == 2 && sopcde == 1)
     unhandled_instruction ("dregs = SHIFT dregs BY dregs_lo (V)");
-  else if (sop == 0 && sopcde == 4)
-    unhandled_instruction ("dregs = PACK (dregs_lo, dregs_lo)");
-  else if (sop == 1 && sopcde == 4)
-    unhandled_instruction ("dregs = PACK (dregs_lo, dregs_hi)");
-  else if (sop == 2 && sopcde == 4)
-    unhandled_instruction ("dregs = PACK (dregs_hi, dregs_lo)");
-  else if (sop == 3 && sopcde == 4)
-    unhandled_instruction ("dregs = PACK (dregs_hi, dregs_hi)");
+  else if (sopcde == 4)
+    {
+      bu32 sv0 = DREG (src0);
+      bu32 sv1 = DREG (src1);
+      if (sop & 1)
+	sv0 >>= 16;
+      if (sop & 2)
+	sv1 >>= 16;
+      DREG (dst0) = (sv1 << 16) | (sv0 & 0xFFFF);
+    }
   else if (sop == 0 && sopcde == 5)
     {
       DREG (dst0) &= 0xFFFF0000;
