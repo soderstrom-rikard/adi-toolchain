@@ -3858,7 +3858,7 @@
 	 (ss_ashift:V2HI (match_dup 1) (match_dup 2))))]
   ""
   "@
-   %0 = ASHIFT %1 BY %2 (V, S)%!
+   %0 = ASHIFT %1 BY %h2 (V, S)%!
    %0 = %1 << %2 (V,S)%!
    %0 = %1 >>> %N2 (V,S)%!"
   [(set_attr "type" "dsp32")])
@@ -3872,7 +3872,7 @@
 	 (ss_ashift:HI (match_dup 1) (match_dup 2))))]
   ""
   "@
-   %0 = ASHIFT %1 BY %2 (V, S)%!
+   %0 = ASHIFT %1 BY %h2 (V, S)%!
    %0 = %1 << %2 (V,S)%!
    %0 = %1 >>> %N2 (V,S)%!"
   [(set_attr "type" "dsp32")])
@@ -3886,7 +3886,7 @@
 	 (ashift:V2HI (match_dup 1) (match_dup 2))))]
   ""
   "@
-   %0 = LSHIFT %1 BY %2 (V)%!
+   %0 = LSHIFT %1 BY %h2 (V)%!
    %0 = %1 << %2 (V)%!
    %0 = %1 >> %N2 (V)%!"
   [(set_attr "type" "dsp32")])
@@ -3900,7 +3900,7 @@
 	 (ashift:HI (match_dup 1) (match_dup 2))))]
   ""
   "@
-   %0 = LSHIFT %1 BY %2 (V)%!
+   %0 = LSHIFT %1 BY %h2 (V)%!
    %0 = %1 << %2 (V)%!
    %0 = %1 >> %N2 (V)%!"
   [(set_attr "type" "dsp32")])

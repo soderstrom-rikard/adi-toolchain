@@ -1,3 +1,8 @@
+2007-02-07  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (ssashiftv2hi3, ssashifthi3, lshiftv2hi3,
+	lshifthi3): Fix output template to use half reg for operand 2.
+
 2007-02-06  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* calls.c (emit_library_call_value_1): Handle partial registers
