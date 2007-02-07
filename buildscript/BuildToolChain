@@ -199,15 +199,9 @@ do
             HOST_TARGET="--host=$OPTARG"
             ;;
         k)
-            if [ -d $OPTARG/uClibc ] ; then
-                UCLINUX_ROOT=$OPTARG
-                KERNEL_SOURCE=$OPTARG/linux-2.6.x
-                if [ ! -d $KERNEL_SOURCE/arch/blackfin ] ; then
-                    echo "Can't find $KERNEL_SOURCE/arch/blackfin"
-                    exit 1
-                fi
-            else
-                echo "Invalid Kernel path : $OPTARG"
+            KERNEL_SOURCE=$OPTARG
+            if [ ! -d $KERNEL_SOURCE/arch/blackfin ] ; then
+                echo "Can't find $KERNEL_SOURCE/arch/blackfin"
                 exit 1
             fi
             ;;
@@ -818,8 +812,7 @@ run_tests ()
 #
 build_uClibc()
 {
-    #ARGS="CROSS=bfin-elf- PREFIX=$2 DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ KERNEL_SOURCE=$KERNEL_SOURCE ROOTDIR=$UCLINUX_ROOT"
-    ARGS="CROSS=bfin-elf- PREFIX=$2 DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ KERNEL_SOURCE=$DIR_KBUILD_OUTPUT/usr ROOTDIR=$UCLINUX_ROOT"
+    ARGS="CROSS=bfin-elf- PREFIX=$2 DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ KERNEL_SOURCE=$DIR_KBUILD_OUTPUT/usr"
     echo -n "*** Cleaning uClibc                " ; date
     RUN="$MAKE clean $ARGS"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
@@ -876,11 +869,6 @@ build_uClibc()
             echo "uClibc $1 did not install properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
-            mv saved-config-toplevel .config 2>/dev/null
-            mv saved-config-linux linux-2.6.x/.config 2>/dev/null
-            mv saved-config-uClibc uClibc/.config 2>/dev/null
-            mv saved-config-user config/.config 2>/dev/null
-            mv saved-config-arch config.arch 2>/dev/null
             exit 1
         fi
     done
@@ -1109,24 +1097,9 @@ done
 
 if [ $KERNEL_SOURCE ] ; then
     echo -n "*** Configuring uClinux            " ; date
-    cd $UCLINUX_ROOT
 
-    # Save the previous configuration
-    cp .config saved-config-toplevel 2>/dev/null
-    cp linux-2.6.x/.config saved-config-linux 2>/dev/null
-    cp config/.config saved-config-user 2>/dev/null
-    cp -a config.arch saved-config-arch 2>/dev/null
-
-    # Make sure the kernel is in a safe state
-    RUN="$MAKE AnalogDevices/BF537-STAMP_config"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
-
-    cd linux-2.6.x
-    RUN="$MAKE CROSS_COMPILE=bfin-elf- prepare"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
-    RUN="$MAKE CROSS_COMPILE=bfin-elf- headers_install INSTALL_HDR_PATH=$DIR_KBUILD_OUTPUT/usr KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT"
+    cd $KERNEL_SOURCE
+    RUN="$MAKE -j1 CROSS_COMPILE=bfin-elf- headers_check headers_install INSTALL_HDR_PATH=$DIR_KBUILD_OUTPUT/usr KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
     cd ..
@@ -1151,7 +1124,7 @@ if [ $KERNEL_SOURCE ] ; then
     echo '# UCLIBC_FORMAT_SHARED_FLAT is not set' >>.config
     echo '# UCLIBC_FORMAT_FLAT_SEP_DATA is not set' >>.config
     echo "KERNEL_HEADERS=\"$DIR_KBUILD_OUTPUT/usr/include\"" >>.config
-    RUN="$MAKE oldconfig CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
+    RUN="$MAKE oldconfig CROSS=bfin-elf-"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
@@ -1169,7 +1142,7 @@ if [ $KERNEL_SOURCE ] ; then
     echo '# UCLIBC_FORMAT_FLAT is not set' >>.config
     echo 'MULTILIB="msep-data"' >>.config
 
-    RUN="$MAKE oldconfig CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
+    RUN="$MAKE oldconfig CROSS=bfin-elf-"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
@@ -1187,7 +1160,7 @@ if [ $KERNEL_SOURCE ] ; then
     echo '# UCLIBC_FORMAT_FLAT_SEP_DATA is not set' >>.config
     echo 'MULTILIB="mid-shared-library"' >>.config
 
-    RUN="$MAKE oldconfig CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
+    RUN="$MAKE oldconfig CROSS=bfin-elf-"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
@@ -1213,7 +1186,7 @@ if [ $KERNEL_SOURCE ] ; then
     echo '# UCLIBC_FORMAT_FLAT_SEP_DATA is not set' >>.config
     echo "KERNEL_HEADERS=\"$DIR_KBUILD_OUTPUT/usr/include\"" >>.config
 
-    RUN="$MAKE oldconfig CROSS=bfin-elf- ROOTDIR=$UCLINUX_ROOT"
+    RUN="$MAKE oldconfig CROSS=bfin-elf-"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
@@ -1232,11 +1205,8 @@ if [ $KERNEL_SOURCE ] ; then
 
     ######################### Done with uClibc ###########################
 
-    echo -n "*** Cleaning uClinux               " ; date
-    cd $UCLINUX_ROOT
-    RUN="$MAKE distclean"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    echo -n "*** Cleaning kernel                " ; date
+    rm -rf "$DIR_KBUILD_OUTPUT"
 
     echo -n "*** Cleaning uClibc                " ; date
     cd $UCLIBC_SOURCE
@@ -1249,12 +1219,6 @@ if [ $KERNEL_SOURCE ] ; then
     (cd $DIR_uC_OUTPUT/bfin-uclinux/ ; tar cf - include) | (cd $DIR_uC_OUTPUT/bfin-uclinux/runtime/usr; tar xf - )
     mkdir -p $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime/usr/include
     (cd $DIR_uC_OUTPUT/bfin-uclinux/ ; tar cf - include) | (cd $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime/usr ; tar xf - )
-
-    cd $UCLINUX_ROOT
-    mv saved-config-toplevel .config 2>/dev/null
-    mv saved-config-linux linux-2.6.x/.config 2>/dev/null
-    mv saved-config-user config/.config 2>/dev/null
-    mv saved-config-arch config.arch 2>/dev/null
 
     ####################### Done Step 3  #########################
 
