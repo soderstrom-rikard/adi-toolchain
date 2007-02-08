@@ -1102,6 +1102,7 @@ if [ $KERNEL_SOURCE ] ; then
     RUN="$MAKE -j1 CROSS_COMPILE=bfin-elf- headers_check headers_install INSTALL_HDR_PATH=$DIR_KBUILD_OUTPUT/usr KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    find "$DIR_KBUILD_OUTPUT" -type f -name '.check.*' -print0 | xargs -0 rm -f
     cd ..
 
     ####################### Step 3 - build uClibc ################
