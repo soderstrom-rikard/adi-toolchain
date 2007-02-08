@@ -1,3 +1,8 @@
+2007-02-08  Jie Zhang  <jie.zhang@analog.com>
+
+	* linux-bfin-low.c: Don't include asm/asm-offsets.h, include
+	asm/ptrace.h instead.
+
 2006-09-04  Jie Zhang  <jie.zhang@analog.com>
 
 	* linux-bfin-low.c (bfin_regmap): Rename PT_EXTRA1 to PT_TEXT_ADDR,
