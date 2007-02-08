@@ -16,7 +16,7 @@
  * Once the end-case word has been identified, breaks out of the
  * loop to check more carefully (same as the unaligned case).
  */
-
+#include <features.h>
 .text
 
 .align 2
