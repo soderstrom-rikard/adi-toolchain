@@ -156,7 +156,7 @@ struct termios
 #endif
 #define  B57600   0010001
 #define  B115200  0010002
-#if 0 /* limited on uClibc, keep in sync w/ cfsetspeed.c */
+#if 1 /* limited on uClibc, keep in sync w/ cfsetspeed.c */
 #define  B230400  0010003
 #define  B460800  0010004
 #define  B500000  0010005
