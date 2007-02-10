@@ -674,7 +674,8 @@ build_gcc ()
     echo -n "*** Configuring GCC                " ; date
     RUN="$DIR_GCC_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-$2 \
       --prefix=$3 $4 --disable-libstdcxx-pch $BFIN_LANGS\
-      --disable-symvers --disable-libssp --enable-version-specific-runtime-libs"
+      --disable-symvers --disable-libssp \
+      --enable-version-specific-runtime-libs --enable-__cxa_atexit"
 
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
