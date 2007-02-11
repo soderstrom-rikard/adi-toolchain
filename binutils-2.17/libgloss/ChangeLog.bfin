@@ -1,4 +1,86 @@
-2006-11-09  Jie Zhang  <jie.zhang@analog.com>
+2007-02-11  Jie Zhang  <jie.zhang@analog.com>
+
+	* libnosys/configure.in (MISSING_SYSCALL_NAMES): Don't define
+	for bfin.
+	* libnosys/configure: Regenerated.
+	* bfin/Makefile.in: (top_srcdir): Define.
+	(mkinstalldirs): Define.
+	(BOARD_SCRIPTS): Define.
+	(BOARD_LDFLAGS): Define.
+	(BOARD_BSP): Define.
+	(BOARD_CRT0S): Define.
+	(BOARD_OBJS): Define.
+	(BOARD_TEST): Define.
+	(BOARD_INSTALL): Define.
+	(all): Add ${BOARD_CRT0S} and ${BOARD_BSP}.
+	(crt532.o): New target.
+	(clean mostlyclean): Add ${BOARD_BSP}.
+	(install): Add ${BOARD_INSTALL}.
+	(install-sim): Reformat.
+	(install-board): New target.
+	* bfin/basiccrt.S: New.
+	* bfin/bf531.ld: New.
+	* bfin/bf532.ld: New.
+	* bfin/bf533.ld: New.
+	* bfin/bf537.ld: New.
+	* bfin/bfin-common-sc.ld: New.
+	* bfin/include/cdefBF522.h: New.
+	* bfin/include/cdefBF525.h: New.
+	* bfin/include/cdefBF527.h: New.
+	* bfin/include/cdefBF531.h: New.
+	* bfin/include/cdefBF532.h: New.
+	* bfin/include/cdefBF533.h: New.
+	* bfin/include/cdefBF534.h: New.
+	* bfin/include/cdefBF535.h: New.
+	* bfin/include/cdefBF536.h: New.
+	* bfin/include/cdefBF537.h: New.
+	* bfin/include/cdefBF538.h: New.
+	* bfin/include/cdefBF539.h: New.
+	* bfin/include/cdefBF53x.h: New.
+	* bfin/include/cdefBF541.h: New.
+	* bfin/include/cdefBF542.h: New.
+	* bfin/include/cdefBF544.h: New.
+	* bfin/include/cdefBF548.h: New.
+	* bfin/include/cdefBF549.h: New.
+	* bfin/include/cdefBF561.h: New.
+	* bfin/include/cdefBF566.h: New.
+	* bfin/include/cdef_LPBlackfin.h: New.
+	* bfin/include/cplb.h: New.
+	* bfin/include/cplbtab.h: New.
+	* bfin/include/defBF522.h: New.
+	* bfin/include/defBF525.h: New.
+	* bfin/include/defBF527.h: New.
+	* bfin/include/defBF531.h: New.
+	* bfin/include/defBF532.h: New.
+	* bfin/include/defBF533.h: New.
+	* bfin/include/defBF534.h: New.
+	* bfin/include/defBF535.h: New.
+	* bfin/include/defBF536.h: New.
+	* bfin/include/defBF537.h: New.
+	* bfin/include/defBF538.h: New.
+	* bfin/include/defBF539.h: New.
+	* bfin/include/defBF53x.h: New.
+	* bfin/include/defBF541.h: New.
+	* bfin/include/defBF542.h: New.
+	* bfin/include/defBF544.h: New.
+	* bfin/include/defBF548.h: New.
+	* bfin/include/defBF549.h: New.
+	* bfin/include/defBF561.h: New.
+	* bfin/include/defBF566.h: New.
+	* bfin/include/defblackfin.h: New.
+	* bfin/include/def_LPBlackfin.h: New.
+	* bfin/include/sysreg.h: New.
+	* bfin/include/sys/_adi_platform.h: New
+	* bfin/include/sys/event.h: New
+	* bfin/include/sys/exception.h: New
+	* bfin/include/sys/platform.h: New
+	* bfin/include/sys/regs.h: New
+	* bfin/include/sys/anomaly_macros_rtl.h: New
+	* bfin/include/sys/excause.h: New
+	* bfin/include/sys/major.h: New
+	* bfin/include/sys/pll.h: New
+
+2007-02-11  Jie Zhang  <jie.zhang@analog.com>
 
 	* libnosys/_exit.c (_exit): Cause exception 0 for Blackfin.
 	Prevent division by zero from being optimized away.
