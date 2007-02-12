@@ -1,3 +1,10 @@
+2007-02-12  Jie Zhang  <jie.zhang@analog.com>
+
+	* gcc.c-torture/execute/multi-ix.c: Disable the test if
+	STACK_SIZE is too small.
+	* gcc.c-torture/execute/20040313-1.c: Allow for small
+	STACK_SIZE.
+
 2006-09-25  Jie Zhang  <jie.zhang@analog.com>
 
 	* g++.dg/other/packed1.C: Mark xfail for bfin-*-*.

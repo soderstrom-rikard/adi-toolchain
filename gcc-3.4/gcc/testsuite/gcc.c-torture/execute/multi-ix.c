@@ -136,7 +136,8 @@ f (int n)
 int
 main ()
 {
-  f (1);
+  if (sizeof (l) >= 40 * sizeof(int))
+    f (1);
   exit (0);
 }
 
