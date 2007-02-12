@@ -1,5 +1,18 @@
 2007-02-12  Jie Zhang  <jie.zhang@analog.com>
 
+	* config/bfin/bfin-protos.h (enum bfin_cpu): Add
+	BFIN_CPU_BF534 and BFIN_CPU_BF536.
+	* config/bfin/elf.h (STARTFILE_SPEC): Support
+	bf534 and bf536.
+	(LIB_SPEC): Likewise.
+	* config/bfin/bfin.c (override_options): Handle
+	-mcpu=bf534 and -mcpu=bf536.
+	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS):
+	Support bf534 and bf536.
+	* doc/invoke.texi (Blackfin Options): Document it.
+
+2007-02-12  Jie Zhang  <jie.zhang@analog.com>
+
 	* config/bfin/bfin-protos.h (enum bfin_cpu): New.
 	(bfin_cpu_t): Typedef of enum bfin_cpu.
 	(bfin_cpu_type): New declaration.

@@ -16,7 +16,8 @@
 #undef  STARTFILE_SPEC
 #define STARTFILE_SPEC "\
 %{msim:%{!shared:crt0%O%s}} \
-%{!msim:%{mcpu=bf531|mcpu=bf532|mcpu=bf533|mcpu=bf537:crt532%O%s} \
+%{!msim:%{mcpu=bf531|mcpu=bf532|mcpu=bf533 \
+	  |mcpu=bf534|mcpu=bf536|mcpu=bf537:crt532%O%s} \
 	%{!mcpu=*:crt532%O%s}} \
 crti%O%s crtbegin%O%s crtlibid%O%s"
 
@@ -25,7 +26,8 @@ crti%O%s crtbegin%O%s crtlibid%O%s"
 
 #define LIB_SPEC "--start-group -lc %{msim:-lsim}%{!msim:-lnosys} --end-group \
 %{!T*:%{!msim:%{mcpu=bf531:-Tbf531.ld}%{mcpu=bf532:-Tbf532.ld} \
-	      %{mcpu=bf533:-Tbf533.ld}%{mcpu=bf537:-Tbf537.ld} \
+	      %{mcpu=bf533:-Tbf533.ld}%{mcpu=bf537:-Tbf534.ld} \
+	      %{mcpu=bf533:-Tbf536.ld}%{mcpu=bf537:-Tbf537.ld} \
 	      %{!mcpu=*:-Tbf532.ld}}}"
 
 #undef USER_LABEL_PREFIX

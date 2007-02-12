@@ -2309,6 +2309,10 @@ override_options (void)
 	bfin_cpu_type = BFIN_CPU_BF532;
       else if (strcmp (bfin_cpu_string, "bf533") == 0)
 	bfin_cpu_type = BFIN_CPU_BF533;
+      else if (strcmp (bfin_cpu_string, "bf534") == 0)
+	bfin_cpu_type = BFIN_CPU_BF534;
+      else if (strcmp (bfin_cpu_string, "bf536") == 0)
+	bfin_cpu_type = BFIN_CPU_BF536;
       else if (strcmp (bfin_cpu_string, "bf537") == 0)
 	bfin_cpu_type = BFIN_CPU_BF537;
       else
