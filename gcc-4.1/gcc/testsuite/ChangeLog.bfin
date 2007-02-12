@@ -1,3 +1,11 @@
+2007-02-12  Jie Zhang  <jie.zhang@analog.com>
+
+	* gcc.c-torture/execute/multi-ix.c: Disable the test if
+	STACK_SIZE is too small.
+	* gcc.c-torture/execute/20040313-1.c: Allow for small
+	STACK_SIZE.
+	* gcc.c-torture/execute/20040811-1.c: Likewise.
+
 2007-01-23  Jie Zhang  <jie.zhang@analog.com>
 
 	Backport from mainline:
