@@ -2149,6 +2149,10 @@ bfin_handle_option (size_t code, const char *arg, int value)
 	bfin_cpu_type = BFIN_CPU_BF532;
       else if (strcmp (arg, "bf533") == 0)
 	bfin_cpu_type = BFIN_CPU_BF533;
+      else if (strcmp (arg, "bf534") == 0)
+	bfin_cpu_type = BFIN_CPU_BF534;
+      else if (strcmp (arg, "bf536") == 0)
+	bfin_cpu_type = BFIN_CPU_BF536;
       else if (strcmp (arg, "bf537") == 0)
 	bfin_cpu_type = BFIN_CPU_BF537;
       else
