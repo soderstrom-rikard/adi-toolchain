@@ -3675,7 +3675,6 @@ bfin_optimize_loop (loop_info loop)
       seq = emit_label_before (gen_label_rtx (), seq);
 
       new_bb = create_basic_block (seq, seq_end, loop->head->prev_bb);
-      //      block_label (new_bb);
       FOR_EACH_EDGE (e, ei, loop->incoming)
 	{
 	  if (!(e->flags & EDGE_FALLTHRU)
