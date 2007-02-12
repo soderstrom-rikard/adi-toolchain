@@ -1,3 +1,7 @@
+2007-02-12  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/linux.h (STARTFILE_SPEC): Don't try to use crtbeginT.o.
+
 2007-02-12  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin-protos.h (enum bfin_cpu): Add

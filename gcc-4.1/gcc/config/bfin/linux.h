@@ -31,7 +31,7 @@ asm (TEXT_SECTION_ASM_OP);
 #undef STARTFILE_SPEC
 #define STARTFILE_SPEC \
   "%{!shared: %{pg|p|profile:gcrt1.o%s;pie:Scrt1.o%s;:crt1.o%s}} crtreloc.o%s \
-   crti.o%s %{static:crtbeginT.o%s;shared|pie:crtbeginS.o%s;:crtbegin.o%s}"
+   crti.o%s %{shared|pie:crtbeginS.o%s;:crtbegin.o%s}"
 
 #undef LINK_SPEC
 #define LINK_SPEC "\
