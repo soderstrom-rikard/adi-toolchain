@@ -587,7 +587,7 @@ in the following sections.
 -mcall-prologues  -mno-tablejump  -mtiny-stack}
 
 @emph{Blackfin Options}
-@gccoptlist{-momit-leaf-frame-pointer  -mno-omit-leaf-frame-pointer @gol
+@gccoptlist{-mcpu=@var{cpu} -msim -momit-leaf-frame-pointer  -mno-omit-leaf-frame-pointer @gol
 -mspecld-anomaly  -mno-specld-anomaly  -mcsync-anomaly  -mno-csync-anomaly @gol
 -mlow-64k -mno-low64k  -mstack-check-l1  -mid-shared-library @gol
 -mno-id-shared-library  -mshared-library-id=@var{n} @gol
@@ -9963,6 +9963,21 @@ Generate code for the 210 processor.
 @cindex Blackfin Options
 
 @table @gcctabopt
+@item -mcpu=@var{cpu}
+@opindex mcpu=
+Specifies the name of the target Blackfin processor. Currently, @var{cpu}
+can be one of @samp{bf531}, @samp{bf532}, @samp{bf533}, @samp{bf537}.
+Without this option, @samp{bf532} is used as the processor by default.
+The corresponding predefined processor macros for @var{cpu} is to
+be defined. And for @samp{bfin-elf} toolchain, this causes the hardware BSP
+provided by libgloss to be linked in if @samp{-msim} is not given.
+
+@item -msim
+@opindex msim
+Specifies that the program will be run on the simulator. This causes
+the simulator BSP provided by libgloss to be linked in. This option
+has effect only for @samp{bfin-elf} toolchain.
+
 @item -momit-leaf-frame-pointer
 @opindex momit-leaf-frame-pointer
 Don't keep the frame pointer in a register for leaf functions.  This

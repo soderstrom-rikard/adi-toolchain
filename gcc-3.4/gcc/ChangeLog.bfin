@@ -1,3 +1,23 @@
+2007-02-12  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin-protos.h (enum bfin_cpu): New.
+	(bfin_cpu_t): Typedef of enum bfin_cpu.
+	(bfin_cpu_type): New declaration.
+	* config/bfin/elf.h (STARTFILE_SPEC): Add support for
+	-msim and -mcpu= options.
+	(LIB_SPEC): Likewise.
+	* config/bfin/bfin.c (bfin_cpu_string): Define.
+	(bfin_cpu_type): Define.
+	(override_options): Handle -mcpu= option.
+	* config/bfin/bfin.h (DEFAULT_CPU_TYPE): Define as BFIN_CPU_BF532.
+	(TARGET_CPU_CPP_BUILTINS): Define __ADSPBF531__, __ADSPBF532__,
+	__ADSPBF533__ or __ADSPBF537__ according to the cpu type.
+	(LIB_SPEC): Remove.
+	(TARGET_SWITCHES): Add option -msim.
+	(bfin_cpu_string): Declare.
+	(TARGET_OPTIONS): Add option -mcpu=.
+	* doc/invoke.texi (Blackfin Options): Document -mcpu and -msim.
+
 2007-02-08  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (ssashiftv2hi3, ssashifthi3, lshiftv2hi3,

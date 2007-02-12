@@ -57,6 +57,10 @@
 
 extern int target_flags;
 
+#ifndef DEFAULT_CPU_TYPE
+#define DEFAULT_CPU_TYPE BFIN_CPU_BF532
+#endif
+
 /* Predefinition in the preprocessor for this target machine */
 #ifndef TARGET_CPU_CPP_BUILTINS
 #define TARGET_CPU_CPP_BUILTINS()               \
@@ -65,6 +69,24 @@ extern int target_flags;
       builtin_define_std ("bfin");              \
       builtin_define_std ("BFIN");              \
       builtin_define ("__ADSPBLACKFIN__");	\
+      builtin_define ("__ADSPLPBLACKFIN__");	\
+						\
+      switch (bfin_cpu_type)			\
+	{					\
+	case BFIN_CPU_BF531:			\
+	  builtin_define ("__ADSPBF531__");	\
+	  break;				\
+	case BFIN_CPU_BF532:			\
+	  builtin_define ("__ADSPBF532__");	\
+	  break;				\
+	case BFIN_CPU_BF533:			\
+	  builtin_define ("__ADSPBF533__");	\
+	  break;				\
+	case BFIN_CPU_BF537:			\
+	  builtin_define ("__ADSPBF537__");	\
+	  break;				\
+	}					\
+						\
       if (flag_pic)				\
 	{					\
 	  builtin_define ("__PIC__");		\
@@ -123,9 +145,6 @@ extern int target_flags;
 %{YP,*} \
 %{Qy:} %{!Qn:-Qy} \
 -init __init -fini __fini "
-
-#undef  LIB_SPEC
-#define LIB_SPEC "--start-group -lc -lsim --end-group"
 
 /* Don't create frame pointers for leaf functions */
 #define TARGET_OMIT_LEAF_FRAME_POINTER (target_flags & MASK_OMIT_LEAF_FRAME_POINTER)
@@ -213,8 +232,12 @@ extern int target_flags;
     "Do not use machine-dependent stack checking."},			\
   { "fast-fp",			MASK_FAST_FP,				\
     "Link with the fast floating-point library"},			\
+  { "sim",			0,					\
+    "Use simulator runtime"},						\
   { "", MASK_CMOV | MASK_CSYNC_ANOMALY | MASK_SPECLD_ANOMALY,		\
     "default: cmov, csync-anomaly, specld-anomaly"}}
+
+extern const char *bfin_cpu_string;
 
 /* This macro is similar to `TARGET_SWITCHES' but defines names of
    command options that have values.  Its definition is an
@@ -226,7 +249,10 @@ extern int target_flags;
    option if the fixed part matches.  The actual option name is made
    by appending `-m' to the specified name.  */
 #define TARGET_OPTIONS							\
-{ { "shared-library-id=",	&bfin_library_id_string,		\
+{									\
+  { "cpu=",			&bfin_cpu_string,			\
+    "Specify the name of the Blackfin processor", 0},			\
+  { "shared-library-id=",	&bfin_library_id_string,		\
     "ID of shared library to build", 0}					\
 }
 

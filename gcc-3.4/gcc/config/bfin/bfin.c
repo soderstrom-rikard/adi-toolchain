@@ -59,7 +59,11 @@ const char *byte_reg_names[]   =  BYTE_REGISTER_NAMES;
 
 static int arg_regs[] = FUNCTION_ARG_REGISTERS;
 
+const char *bfin_cpu_string;
 const char *bfin_library_id_string;
+
+/* -mcpu support */
+bfin_cpu_t bfin_cpu_type = DEFAULT_CPU_TYPE;
 
 static void
 bfin_globalize_label (FILE *stream, const char *name)
@@ -2296,6 +2300,22 @@ override_options (void)
       /* From now on, bfin_library_id_string will contain the library offset.  */
       asprintf ((char **)&bfin_library_id_string, "%d", (id * -4) - 4);
     }
+
+  if (bfin_cpu_string)
+    {
+      if (strcmp (bfin_cpu_string, "bf531") == 0)
+	bfin_cpu_type = BFIN_CPU_BF531;
+      else if (strcmp (bfin_cpu_string, "bf532") == 0)
+	bfin_cpu_type = BFIN_CPU_BF532;
+      else if (strcmp (bfin_cpu_string, "bf533") == 0)
+	bfin_cpu_type = BFIN_CPU_BF533;
+      else if (strcmp (bfin_cpu_string, "bf537") == 0)
+	bfin_cpu_type = BFIN_CPU_BF537;
+      else
+	error ("`%s' not supported", bfin_cpu_string);
+    }
+  else
+    bfin_cpu_type = BFIN_CPU_BF532;
 
   if (stack_limit_rtx && TARGET_STACK_CHECK_L1)
     error ("Can't use multiple stack checking methods together.");
