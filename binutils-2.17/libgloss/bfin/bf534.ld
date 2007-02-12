@@ -1,6 +1,6 @@
 /*
  * The default linker stript for standalone executable running on
- * ADSP-BF537 processor.
+ * ADSP-BF534 processor.
  *
  * Copyright (C) 2007 Analog Devices, Inc.
  *

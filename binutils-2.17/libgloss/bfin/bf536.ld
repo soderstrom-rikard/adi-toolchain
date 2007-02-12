@@ -1,6 +1,6 @@
 /*
  * The default linker stript for standalone executable running on
- * ADSP-BF537 processor.
+ * ADSP-BF536 processor.
  *
  * Copyright (C) 2007 Analog Devices, Inc.
  *
@@ -20,8 +20,8 @@ MEMORY
   MEM_L1_CODE : ORIGIN = 0xFFA00000, LENGTH = 0xC000
   MEM_L1_CODE_CACHE : ORIGIN = 0xFFA10000, LENGTH = 0x4000
   MEM_L1_SCRATCH : ORIGIN = 0xFFB00000, LENGTH = 0x1000
-  MEM_L1_DATA_B : ORIGIN = 0xFF900000, LENGTH = 0x8000
-  MEM_L1_DATA_A : ORIGIN = 0xFF800000, LENGTH = 0x8000
+  MEM_L1_DATA_B : ORIGIN = 0xFF904000, LENGTH = 0x4000
+  MEM_L1_DATA_A : ORIGIN = 0xFF804000, LENGTH = 0x4000
 }
 
 INCLUDE bfin-common-sc.ld
