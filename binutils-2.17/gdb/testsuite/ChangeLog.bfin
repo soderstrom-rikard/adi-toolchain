@@ -1,3 +1,7 @@
+2007-02-12  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin.exp: New.
+
 2006-09-05  Jie Zhang  <jie.zhang@analog.com>
 
 	Backport from FSF CVS.
