@@ -91,6 +91,9 @@ extern int target_flags;
 	case BFIN_CPU_BF537:			\
 	  builtin_define ("__ADSPBF537__");	\
 	  break;				\
+	case BFIN_CPU_BF561:			\
+	  builtin_define ("__ADSPBF561__");	\
+	  break;				\
 	}					\
 						\
       if (flag_pic)				\
