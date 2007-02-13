@@ -20,8 +20,8 @@ crti%O%s crtbegin%O%s crtlibid%O%s"
 #undef  LIB_SPEC
 #define LIB_SPEC "--start-group -lc %{msim:-lsim}%{!msim:-lnosys} --end-group \
 %{!T*:%{!msim:%{mcpu=bf531:-Tbf531.ld}%{mcpu=bf532:-Tbf532.ld} \
-	      %{mcpu=bf533:-Tbf533.ld}%{mcpu=bf537:-Tbf534.ld} \
-	      %{mcpu=bf533:-Tbf536.ld}%{mcpu=bf537:-Tbf537.ld} \
+	      %{mcpu=bf533:-Tbf533.ld}%{mcpu=bf534:-Tbf534.ld} \
+	      %{mcpu=bf536:-Tbf536.ld}%{mcpu=bf537:-Tbf537.ld} \
 	      %{!mcpu=*:-Tbf532.ld}}}"
 
 #undef USER_LABEL_PREFIX
