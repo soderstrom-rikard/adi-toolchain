@@ -7589,7 +7589,9 @@ size.
 @opindex mcpu=
 Specifies the name of the target Blackfin processor. Currently, @var{cpu}
 can be one of @samp{bf531}, @samp{bf532}, @samp{bf533},
-@samp{bf534}, @samp{bf536}, @samp{bf537}.
+@samp{bf534}, @samp{bf536}, @samp{bf537}, @samp{bf561}.
+Support for @samp{bf561} is incomplete. For @samp{bf561},
+Only the processor macro is defined.
 Without this option, @samp{bf532} is used as the processor by default.
 The corresponding predefined processor macros for @var{cpu} is to
 be defined. And for @samp{bfin-elf} toolchain, this causes the hardware BSP

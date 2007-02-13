@@ -1,5 +1,12 @@
 2007-02-13  Jie Zhang  <jie.zhang@analog.com>
 
+	* config/bfin/bfin-protos.h (enum bfin_cpu): Add bf561 support.
+	* config/bfin/bfin.c (bfin_handle_option): Likewise.
+	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): Likewise.
+	* doc/invoke.texi (Blackfin Options): Document it.
+
+2007-02-13  Jie Zhang  <jie.zhang@analog.com>
+
 	* config/bfin/lib1funcs.asm (___divsi3): Port from VisualDSP 4.5
 	November 2006 update.
 	(___modsi3): Update.

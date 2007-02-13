@@ -2155,6 +2155,11 @@ bfin_handle_option (size_t code, const char *arg, int value)
 	bfin_cpu_type = BFIN_CPU_BF536;
       else if (strcmp (arg, "bf537") == 0)
 	bfin_cpu_type = BFIN_CPU_BF537;
+      else if (strcmp (arg, "bf561") == 0)
+	{
+	  warning (0, "bf561 support is incomplete yet.");
+	  bfin_cpu_type = BFIN_CPU_BF561;
+	}
       else
 	return false;
       return true;
