@@ -1,3 +1,8 @@
+2007-02-14  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/locale/uclibc/c_locale.h (__convert_from_v): Match caller's
+	expectations of not using the size argument if !_GLIBCXX_USE_C99.
+
 2007-01-23  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/os/uclibc/ctype_base.h: New file.

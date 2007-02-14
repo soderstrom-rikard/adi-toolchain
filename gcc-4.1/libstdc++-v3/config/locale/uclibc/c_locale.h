@@ -102,7 +102,11 @@ namespace std
 # endif
 #endif
 
+#ifdef _GLIBCXX_USE_C99
       const int __ret = std::snprintf(__out, __size, __fmt, __prec, __v);
+#else
+      const int __ret = std::sprintf(__out, __fmt, __prec, __v);
+#endif
 
 #ifdef __UCLIBC_HAS_XLOCALE__
       __gnu_cxx::__uselocale(__old);
