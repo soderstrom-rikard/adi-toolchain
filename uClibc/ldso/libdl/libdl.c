@@ -30,12 +30,13 @@
  */
 
 
-#include <ldso.h>
 #include <stdio.h>
 #include <string.h>
 
 
 #ifdef SHARED
+
+#include <ldso.h>
 
 /* When libdl is loaded as a shared library, we need to load in
  * and use a pile of symbols from ldso... */
@@ -66,15 +67,21 @@ extern void _dl_perform_mips_global_got_relocations(struct elf_resolve *tpnt, in
 extern char *_dl_debug;
 #endif
 
-
 #else /* SHARED */
+
+#define _dl_malloc malloc
+#define _dl_free free
 
 /* When libdl is linked as a static library, we need to replace all
  * the symbols that otherwise would have been loaded in from ldso... */
+#undef __SUPPORT_LD_DEBUG__
+
+#include <ldso.h>
 
 #ifdef __SUPPORT_LD_DEBUG__
 char *_dl_debug  = 0;
 #endif
+
 const char *_dl_progname       = "";        /* Program name */
 void *(*_dl_malloc_function)(size_t);
 void (*_dl_free_function) (void *p);
@@ -84,6 +91,7 @@ int _dl_errno                  = 0;         /* We can't use the real errno in ld
 size_t _dl_pagesize            = PAGE_SIZE; /* Store the page size for use later */
 /* This global variable is also to communicate with debuggers such as gdb. */
 struct r_debug *_dl_debug_addr = NULL;
+
 
 #include "../ldso/dl-debug.c"
 #include LDSO_ELFINTERP
@@ -101,6 +109,7 @@ struct r_debug *_dl_debug_addr = NULL;
 #else
 # define _dl_if_debug_print(fmt, args...)
 #endif
+
 
 static int do_dlclose(void *, int need_fini);
 
