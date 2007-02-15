@@ -208,16 +208,16 @@ ifeq ($(HAVE_SHARED),y)
 		$(LN) -sf $(RUNTIME_PREFIX_LIB_FROM_DEVEL_PREFIX_LIB)$$i.$(MAJOR_VERSION) \
 		$(PREFIX)$(DEVEL_PREFIX)lib/$(MULTILIB)/$$i; \
 	done
-	for i in `find lib/ -type l -name 'ld-*.so*' | \
-	sed -e 's/lib\///'` ; do \
-		$(LN) -sf $(RUNTIME_PREFIX_LIB_FROM_DEVEL_PREFIX_LIB)$$i \
-		$(PREFIX)$(DEVEL_PREFIX)lib/$(MULTILIB)/$$i; \
-	done
+#	for i in `find lib/ -type l -name 'ld-*.so*' | \
+#	sed -e 's/lib\///'` ; do \
+#		$(LN) -sf $(RUNTIME_PREFIX_LIB_FROM_DEVEL_PREFIX_LIB)$$i \
+#		$(PREFIX)$(DEVEL_PREFIX)lib/$(MULTILIB)/$$i; \
+#	done
 	if [ -f $(top_builddir)lib/libc.so -a -f $(PREFIX)$(RUNTIME_PREFIX)lib/$(SHARED_MAJORNAME) ] ; then \
 		$(RM) $(PREFIX)$(DEVEL_PREFIX)lib/libc.so; \
-		n1=$(PREFIX)$(DEVEL_PREFIX)lib/$(MULTILIB)/$(NONSHARED_LIBNAME); \
-		n2=$(PREFIX)$(RUNTIME_PREFIX)lib/$(SHARED_MAJORNAME); \
-		n3=$(PREFIX)$(RUNTIME_PREFIX)lib/$(UCLIBC_LDSO); \
+		n1=$(DEVEL_PREFIX)lib/$(MULTILIB)/$(NONSHARED_LIBNAME); \
+		n2=$(RUNTIME_PREFIX)lib/$(SHARED_MAJORNAME); \
+		n3=$(RUNTIME_PREFIX)lib/$(UCLIBC_LDSO); \
 		sed -e s:$(NONSHARED_LIBNAME):$$n1: \
 		    -e s:$(SHARED_MAJORNAME):$$n2: \
 		    -e s:$(UCLIBC_LDSO):$$n3: \

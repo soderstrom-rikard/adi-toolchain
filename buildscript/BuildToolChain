@@ -673,7 +673,7 @@ build_gcc ()
 
     echo -n "*** Configuring GCC                " ; date
     RUN="$DIR_GCC_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-$2 \
-      --prefix=$3 $4 --disable-libstdcxx-pch $BFIN_LANGS\
+      --prefix=$3 $4 --disable-libstdcxx-pch $BFIN_LANGS \
       --disable-symvers --disable-libssp \
       --enable-version-specific-runtime-libs --enable-__cxa_atexit"
 
@@ -821,7 +821,7 @@ run_tests ()
 #
 build_uClibc()
 {
-    ARGS="CROSS=bfin-elf- PREFIX=$2 DEVEL_PREFIX=\"/\" RUNTIME_PREFIX=/runtime/ KERNEL_SOURCE=$DIR_KBUILD_OUTPUT/usr"
+    ARGS="CROSS=bfin-elf- DEVEL_PREFIX=/usr/ RUNTIME_PREFIX=/"
     echo -n "*** Cleaning uClibc                " ; date
     RUN="$MAKE clean $ARGS"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
@@ -830,7 +830,7 @@ build_uClibc()
     echo -n "*** Building uClibc                " ; date
     LOCAL=`grep "UCLIBC_HAS_LOCALE=y" .config`
     if [ -z "$LOCAL" ] ; then
-        RUN="$MAKE all $ARGS"
+        RUN="$MAKE $ARGS"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh || die_with_log
     else
@@ -864,7 +864,7 @@ build_uClibc()
     fi
 
     echo -n "*** Installing uClibc              " ; date
-    RUN="$MAKE install $ARGS"
+    RUN="$MAKE install DESTDIR=$2/runtime $ARGS"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
@@ -873,7 +873,7 @@ build_uClibc()
     for RUN in crt1.o libc.a libcrypt.a libm.a libnsl.a libresolv.a \
                libutil.a
     do
-        FILE=$2/lib/$1$RUN
+        FILE=$2/runtime/usr/lib/$1$RUN
         if [ ! -f $FILE ] ; then
             echo "uClibc $1 did not install properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
@@ -1105,13 +1105,13 @@ done
 
 
 if [ $KERNEL_SOURCE ] ; then
-    echo -n "*** Configuring uClinux            " ; date
+    echo -n "*** Configuring Linux Kernel       " ; date
 
     cd $KERNEL_SOURCE
-    RUN="$MAKE -j1 CROSS_COMPILE=bfin-elf- headers_check headers_install INSTALL_HDR_PATH=$DIR_KBUILD_OUTPUT/usr KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT"
+    RUN="$MAKE -j1 headers_check headers_install INSTALL_HDR_PATH=$DIR_KBUILD_OUTPUT/usr KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
-    find "$DIR_KBUILD_OUTPUT" -type f -name '.check.*' -print0 | xargs -0 rm -f
+    find "$DIR_KBUILD_OUTPUT/usr" -type f -name '.check.*' -print0 | xargs -0 rm -f
     cd ..
 
     ####################### Step 3 - build uClibc ################
@@ -1125,8 +1125,8 @@ if [ $KERNEL_SOURCE ] ; then
       rm -f .config
       echo 'TARGET_bfin=y' >>.config
       cat .tmp.config.provided | grep -v '^\(TARGET\|HAVE_NO_SHARED\|HAVE_NO_PIC\|DOPIC\|HAVE_SHARED\|TARGET_SUBARCH\|BUILD_UCLIBC_LDSO\|SUPPORT_LD_DEBUG\|FORCE_SHAREABLE_TEXT_SEGMENTS\|RUNTIME_\|DEVEL_\|MULTILIB\|KERNEL_HEADERS\)' | grep -v UCLIBC_FORMAT_ >>.config
-      echo 'RUNTIME_PREFIX="/runtime"' >>.config
-      echo 'DEVEL_PREFIX="/"' >>.config
+      echo 'RUNTIME_PREFIX="/"' >>.config
+      echo 'DEVEL_PREFIX="/usr/"' >>.config
       echo 'MULTILIB=""' >>.config
     fi
     echo 'UCLIBC_FORMAT_FLAT=y' >>.config
@@ -1186,13 +1186,13 @@ if [ $KERNEL_SOURCE ] ; then
     else
       echo "TARGET_bfin=y" >>.config
       cat .tmp.config.provided | grep -v '^\(TARGET\|HAVE_NO_SHARED\|HAVE_NO_PIC\|DOPIC\|HAVE_SHARED\|TARGET_SUBARCH\|BUILD_UCLIBC_LDSO\|SUPPORT_LD_DEBUG\|FORCE_SHAREABLE_TEXT_SEGMENTS\|RUNTIME_\|DEVEL_\|MULTILIB\|KERNEL_HEADERS\|LDSO_RUNPATH\|SHARED_LIB_LOADER_PREFIX\)' |grep -v UCLIBC_FORMAT_ >>.config
-      echo 'RUNTIME_PREFIX="/runtime"' >>.config
-      echo 'DEVEL_PREFIX="/"' >>.config
+      echo 'RUNTIME_PREFIX="/"' >>.config
+      echo 'DEVEL_PREFIX="/usr/"' >>.config
       echo 'MULTILIB="mfdpic"' >>.config
       echo 'FORCE_SHAREABLE_TEXT_SEGMENTS=y' >>.config
       echo 'LDSO_RUNPATH=y' >>.config
       echo 'DOPIC=y' >>.config
-      echo 'SHARED_LIB_LOADER_PREFIX="$(DEVEL_PREFIX)/lib"' >>.config
+      echo 'SHARED_LIB_LOADER_PREFIX="/lib"' >>.config
       echo 'SUPPORT_LD_DEBUG=y' >>.config
       rm -f .tmp.config.provided
     fi
@@ -1214,12 +1214,12 @@ if [ $KERNEL_SOURCE ] ; then
     echo 'MULTILIB=""' >>.config
     build_uClibc "" $DIR_LINUX_OUTPUT/bfin-linux-uclibc
 
+    ######################### Done with uClibc ###########################
+
     mkdir -p $DIR_uC_OUTPUT/bfin-uclinux/runtime
     mkdir -p $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime
-    cp -r $DIR_KBUILD_OUTPUT/usr $DIR_uC_OUTPUT/bfin-uclinux/runtime/
-    cp -r $DIR_KBUILD_OUTPUT/usr $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime/
-
-    ######################### Done with uClibc ###########################
+    cp -r $DIR_KBUILD_OUTPUT/usr $DIR_uC_OUTPUT/bfin-uclinux/runtime || exit 1
+    cp -r $DIR_KBUILD_OUTPUT/usr $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime || exit 1
 
     echo -n "*** Cleaning kernel                " ; date
     rm -rf "$DIR_KBUILD_OUTPUT"
@@ -1229,12 +1229,6 @@ if [ $KERNEL_SOURCE ] ; then
     RUN="$MAKE CROSS=bfin-elf- distclean"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
-
-    # Move system include dirs into the sysroot.
-    mkdir -p $DIR_uC_OUTPUT/bfin-uclinux/runtime/usr/include
-    (cd $DIR_uC_OUTPUT/bfin-uclinux/ ; tar cf - include) | (cd $DIR_uC_OUTPUT/bfin-uclinux/runtime/usr; tar xf - )
-    mkdir -p $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime/usr/include
-    (cd $DIR_uC_OUTPUT/bfin-uclinux/ ; tar cf - include) | (cd $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime/usr ; tar xf - )
 
     ####################### Done Step 3  #########################
 
@@ -1258,11 +1252,13 @@ if [ $KERNEL_SOURCE ] ; then
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
+    ln -s runtime/usr/include $DIR_uC_OUTPUT/bfin-uclinux/sys-include
     for GCC_VERSION in $GCC_VERSIONS; do
       build_gcc $GCC_VERSION uclinux $DIR_uC_OUTPUT \
           "--enable-threads=posix \
            --with-sysroot=$DIR_uC_OUTPUT/bfin-uclinux/runtime"
     done
+    rm -f $DIR_uC_OUTPUT/bfin-uclinux/sys-include
 
     ######################## build elf2flt ##########################
 
@@ -1347,11 +1343,13 @@ if [ $KERNEL_SOURCE ] ; then
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
+    ln -s runtime/usr/include $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
     for GCC_VERSION in $GCC_VERSIONS; do
     	build_gcc $GCC_VERSION linux-uclibc $DIR_LINUX_OUTPUT \
 	  "--enable-threads=posix --enable-shared \
-	   --with-sysroot=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime" 
+	   --with-sysroot=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime"
     done
+    rm -f $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
 
     ##################### Test bfin-linux-uclibc #####################
 
