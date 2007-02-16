@@ -296,7 +296,7 @@ ifeq ($(UCLIBC_FORMAT_FDPIC_ELF),y)
 	PIEFLAG_NAME:=-fpie
 endif
 ifeq ($(UCLIBC_FORMAT_SHARED_FLAT),y)
-	CPU_CFLAGS-y := -mid-shared-library -mleaf-id-shared-library
+	CPU_CFLAGS-y := -mid-shared-library
 endif
 endif
 
