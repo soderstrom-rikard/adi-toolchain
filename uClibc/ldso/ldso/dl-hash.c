@@ -146,6 +146,8 @@ char *_dl_find_hash_mod(const char *name, struct dyn_elf *rpnt,
 	for (; rpnt; rpnt = rpnt->next) {
 		tpnt = rpnt->dyn;
 
+		if (!tpnt)
+			continue;
 		if (!(tpnt->rtld_flags & RTLD_GLOBAL) && mytpnt) {
 			if (mytpnt == tpnt)
 				;

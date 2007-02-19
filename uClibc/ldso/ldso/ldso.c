@@ -107,57 +107,6 @@ uintptr_t __guard attribute_relro;
 # endif
 #endif
 
-static void _dl_run_array_forward(unsigned long array, unsigned long size,
-                                  DL_LOADADDR_TYPE loadaddr)
-{
-	if (array != 0) {
-		unsigned int j;
-		unsigned int jm;
-		ElfW(Addr) *addrs;
-		jm = size / sizeof (ElfW(Addr));
-		addrs = (ElfW(Addr) *) DL_RELOC_ADDR(loadaddr, array);
-		for (j = 0; j < jm; ++j) {
-			void (*dl_elf_func) (void);
-			dl_elf_func = (void (*)(void)) (intptr_t) addrs[j];
-			DL_CALL_FUNC_AT_ADDR (dl_elf_func, loadaddr, (void (*)(void)));
-		}
-	}
-}
-
-void _dl_run_init_array(struct elf_resolve *tpnt);
-void _dl_run_init_array(struct elf_resolve *tpnt)
-{
-	_dl_run_array_forward(tpnt->dynamic_info[DT_INIT_ARRAY],
-			      tpnt->dynamic_info[DT_INIT_ARRAYSZ],
-			      tpnt->loadaddr);
-}
-
-void _dl_app_init_array(void);
-void _dl_app_init_array(void)
-{
-	_dl_run_init_array(_dl_loaded_modules);
-}
-
-void _dl_run_fini_array(struct elf_resolve *tpnt);
-void _dl_run_fini_array(struct elf_resolve *tpnt)
-{
-	if (tpnt->dynamic_info[DT_FINI_ARRAY]) {
-		ElfW(Addr) *array = (ElfW(Addr) *) DL_RELOC_ADDR(tpnt->loadaddr, tpnt->dynamic_info[DT_FINI_ARRAY]);
-		unsigned int i = (tpnt->dynamic_info[DT_FINI_ARRAYSZ] / sizeof(ElfW(Addr)));
-		while (i-- > 0) {
-			void (*dl_elf_func) (void);
-			dl_elf_func = (void (*)(void)) (intptr_t) array[i];
-			DL_CALL_FUNC_AT_ADDR (dl_elf_func, tpnt->loadaddr, (void (*)(void)));
-		}
-	}
-}
-
-void _dl_app_fini_array(void);
-void _dl_app_fini_array(void)
-{
-	_dl_run_fini_array(_dl_loaded_modules);
-}
-
 static void __attribute__ ((destructor)) __attribute_used__ _dl_fini(void)
 {
 	int i;

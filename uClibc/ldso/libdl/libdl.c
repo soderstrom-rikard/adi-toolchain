@@ -179,6 +179,15 @@ void *dlopen(const char *libname, int flag)
 	if (!libname)
 		return _dl_symbol_tables;
 
+#ifndef SHARED
+	/* When statically linked, the first time we dlopen a DSO
+	 * we have to initialize the _dl_symbol_table.
+	 */ 
+	if (_dl_symbol_tables == NULL) {
+		_dl_symbol_tables = (struct dyn_elf *) _dl_malloc(sizeof(struct dyn_elf));
+		_dl_memset(_dl_symbol_tables, 0, sizeof(struct dyn_elf));
+	}
+#endif
 	_dl_map_cache();
 
 	/*
@@ -194,7 +203,7 @@ void *dlopen(const char *libname, int flag)
 		tfrom = NULL;
 		for (dpnt = _dl_symbol_tables; dpnt; dpnt = dpnt->next) {
 			tpnt = dpnt->dyn;
-			if (DL_ADDR_IN_LOADADDR(from, tpnt, tfrom))
+			if (tpnt && DL_ADDR_IN_LOADADDR(from, tpnt, tfrom))
 				tfrom = tpnt;
 		}
 	}
@@ -386,7 +395,7 @@ void *dlopen(const char *libname, int flag)
 		}
 	}
 
-#ifdef SHARED
+#if 1 /* def SHARED */
 	/* Run the ctors and setup the dtors */
 	for (i = nlist; i; --i) {
 		tpnt = init_fini_list[i-1];
@@ -468,7 +477,7 @@ void *dlsym(void *vhandle, const char *name)
 		tfrom = NULL;
 		for (rpnt = _dl_symbol_tables; rpnt; rpnt = rpnt->next) {
 			tpnt = rpnt->dyn;
-			if (DL_ADDR_IN_LOADADDR(from, tpnt, tfrom)) {
+			if (tpnt && DL_ADDR_IN_LOADADDR(from, tpnt, tfrom)) {
 				tfrom = tpnt;
 				handle = rpnt->next;
 			}
@@ -541,7 +550,7 @@ static int do_dlclose(void *vhandle, int need_fini)
 			    && need_fini &&
 			    !(tpnt->init_flag & FINI_FUNCS_CALLED)) {
 				tpnt->init_flag |= FINI_FUNCS_CALLED;
-#ifdef SHARED
+#if 1 /* def SHARED */
 				_dl_run_fini_array(tpnt);
 #endif
 
