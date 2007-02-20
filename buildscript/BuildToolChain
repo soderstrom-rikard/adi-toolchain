@@ -1413,17 +1413,8 @@ if [ $KERNEL_SOURCE ] ; then
     RUN="$MAKE install"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
-    mv $DIR_uC_OUTPUT/bin/genext2fs $DIR_uC_OUTPUT/bin/bfin-uclinux-genext2fs
-
-    for RUN in bfin-uclinux-genext2fs
-    do
-        if [ ! -f $DIR_uC_OUTPUT/bin/$RUN ] ; then
-            echo "genext2fs did not install properly : Missing $RUN"
-            echo "Please report an error to http://blackfin.uclinux.org"
-            tail -10 $ACTUAL_LOGFILE
-            exit 1
-       fi
-    done
+    cp $DIR_uC_OUTPUT/bin/genext2fs $DIR_uC_OUTPUT/bin/bfin-uclinux-genext2fs || exit 1
+    mv $DIR_uC_OUTPUT/bin/genext2fs $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-genext2fs || exit 1
 
     ########################### cramfs ########################
 
@@ -1454,18 +1445,10 @@ if [ $KERNEL_SOURCE ] ; then
     RUN="$MAKE install"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
-    mv $DIR_CRAMFS_SOURCE/mkcramfs $DIR_uC_OUTPUT/bin/bfin-uclinux-mkcramfs
-    mv $DIR_CRAMFS_SOURCE/cramfsck $DIR_uC_OUTPUT/bin/bfin-uclinux-cramfsck
-
-    for RUN in bfin-uclinux-mkcramfs bfin-uclinux-cramfsck
-    do
-        if [ ! -f $DIR_uC_OUTPUT/bin/$RUN ] ; then
-            echo "cramfs did not install properly : Missing $RUN"
-            echo "Please report an error to http://blackfin.uclinux.org"
-            tail -10 $ACTUAL_LOGFILE
-            exit 1
-       fi
-    done
+    cp $DIR_CRAMFS_SOURCE/mkcramfs $DIR_uC_OUTPUT/bin/bfin-uclinux-mkcramfs
+    cp $DIR_CRAMFS_SOURCE/cramfsck $DIR_uC_OUTPUT/bin/bfin-uclinux-cramfsck
+    mv $DIR_CRAMFS_SOURCE/mkcramfs $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-mkcramfs
+    mv $DIR_CRAMFS_SOURCE/cramfsck $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-cramfsck
 
 	######################## ldr-utils ###########################
 
@@ -1493,17 +1476,8 @@ if [ $KERNEL_SOURCE ] ; then
     done
 
     echo -n "*** Installing uClinux ldr-utils    " ; date
-    mv $DIR_LDR_UTILS_SOURCE/ldr $DIR_uC_OUTPUT/bin/bfin-uclinux-ldr
-
-    for RUN in bfin-uclinux-ldr
-    do
-        if [ ! -f $DIR_uC_OUTPUT/bin/$RUN ] ; then
-            echo "ldr-utils did not install properly : Missing $RUN"
-            echo "Please report an error to http://blackfin.uclinux.org"
-            tail -10 $ACTUAL_LOGFILE
-            exit 1
-       fi
-    done
+    cp $DIR_LDR_UTILS_SOURCE/ldr $DIR_uC_OUTPUT/bin/bfin-uclinux-ldr || exit 1
+    mv $DIR_LDR_UTILS_SOURCE/ldr $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-ldr || exit 1
 
     ######################## U-Boot ##############################
 
