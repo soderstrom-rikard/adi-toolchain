@@ -1108,7 +1108,7 @@ if [ $KERNEL_SOURCE ] ; then
     echo -n "*** Configuring Linux Kernel       " ; date
 
     cd $KERNEL_SOURCE
-    RUN="$MAKE -j1 headers_check headers_install INSTALL_HDR_PATH=$DIR_KBUILD_OUTPUT/usr KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT"
+    RUN="$MAKE -j1 headers_check headers_install INSTALL_HDR_PATH=$DIR_KBUILD_OUTPUT/usr KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT CROSS_COMPILE=bfin-elf-"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
     find "$DIR_KBUILD_OUTPUT/usr" -type f -name '.check.*' -print0 | xargs -0 rm -f
@@ -1296,18 +1296,6 @@ if [ $KERNEL_SOURCE ] ; then
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
-    if [ -e $DIR_SOURCE/libdsp/Makefile ] ; then
-        echo -n "*** Installing uClinux libdsp      " ; date
-
-        RUN="cp $DIR_ELF_OUTPUT/bfin-elf/lib/libbffastfp.a $DIR_uC_OUTPUT/bfin-uclinux/lib/"
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo $RUN $LOGFILE ; ) | sh
-
-        RUN="cp $DIR_ELF_OUTPUT/bfin-elf/lib/mfdpic/libbffastfp.a $DIR_uC_OUTPUT/bfin-uclinux/lib/mfdpic/"
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo $RUN $LOGFILE ; ) | sh
-    fi
-
     ####################### Test bfin-uclinux #######################
 
     if [ $CHECK_ON_HARDWARE ] ; then
@@ -1362,6 +1350,20 @@ if [ $KERNEL_SOURCE ] ; then
         ( echo "$MAKE clean " $LOGFILE ; ) | sh
 
         run_tests $DIR_TEST_HW2_RESULTS hardware
+    fi
+
+    ##################### Install libbffastfp.a #####################
+
+    if [ -e $DIR_SOURCE/libdsp/Makefile ] ; then
+        echo -n "*** Installing uClinux libdsp      " ; date
+
+        RUN="cp $DIR_ELF_OUTPUT/bfin-elf/lib/libbffastfp.a $DIR_uC_OUTPUT/bfin-uclinux/lib/"
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh
+
+        RUN="cp $DIR_ELF_OUTPUT/bfin-elf/lib/mfdpic/libbffastfp.a $DIR_LINUX_OUTPUT/bfin-linux-uclibc/lib/"
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh
     fi
 
     ########################### genext2fs ########################
@@ -1588,11 +1590,11 @@ cd $DIR_BINUTILS_BUILD
 
 # Don't add -mfdpic to CFLAGS, since BFD tries to build a few files with the
 # host compiler.
-RUN="CC='$DIR_uC_OUTPUT/bin/bfin-uclinux-gcc -mfdpic' \
-    $DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-uclinux \
-    --host=bfin-uclinux $BUILD_TARGET \
-    --disable-shared --prefix=$DIR_uC_OUTPUT/bfin-uclinux --disable-nls \
-    --libdir=$DIR_uC_OUTPUT/bfin-uclinux/lib/mfdpic --without-newlib"
+RUN="CC='$DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-gcc' \
+    $DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-linux-uclibc \
+    --host=bfin-linux-uclibc $BUILD_TARGET \
+    --disable-shared --prefix=$DIR_LINUX_OUTPUT/bfin-linux-uclibc --disable-nls \
+    --without-newlib"
 (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 (echo $RUN $LOGFILE ; ) | sh
 
