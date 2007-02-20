@@ -92,7 +92,7 @@ size_t _dl_pagesize            = PAGE_SIZE; /* Store the page size for use later
 /* This global variable is also to communicate with debuggers such as gdb. */
 struct r_debug *_dl_debug_addr = NULL;
 
-
+#include "../ldso/dl-array.c"
 #include "../ldso/dl-debug.c"
 #include LDSO_ELFINTERP
 #include "../ldso/dl-hash.c"
