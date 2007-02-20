@@ -42,7 +42,7 @@ PREREQ_FILE="autoconf automake bison flex gcc gettext grep ln m4 make makeinfo m
 BINUTILS_VERSION=2.17
 GCC_VERSIONS=
 
-while getopts dpwvtST:C:s:b:k:o:m:B:c:u:r:l:H:h parameter
+while getopts dpwvtST:C:s:b:k:K:o:m:B:c:u:r:l:H:h parameter
 do
     case $parameter in
         p)
@@ -205,6 +205,14 @@ do
                 exit 1
             fi
             ;;
+        K)
+            KERNEL_SOURCE=$OPTARG
+            DIR_KBUILD_OUTPUT=$OPTARG
+            if [ ! -d $KERNEL_SOURCE/usr/include/linux ] ; then
+                echo "Can't find kernel headers"
+                exit 1
+            fi
+            ;;
         u)
             if [ -f $OPTARG/tools/mkimage.c ] ; then
                 DIR_UBOOT=$OPTARG
@@ -241,6 +249,7 @@ do
 -r RESULTS_DIR   Compare current tests to old results
 -s SOURCE        Toolchain Source directory (builds bfin-elf-gcc)
 -k SOURCE        Kernel Source directory    (builds bfin-uclinux-gcc)
+-K SOURCE        Kernel Header directory (may be specified instead of source)
 -u SOURCE        Uboot Source directory
 -b BUILD         Build directory (leave blank to use current dir)
 -o OUTPUT        Output directory (leave blank to use build dir)
@@ -548,8 +557,8 @@ if [ $KERNEL_SOURCE ] ; then
     mk_output_dir "linux-uClibc" $DIR_LINUX_OUTPUT ""
     if [ ! $DIR_KBUILD_OUTPUT ] ; then
         DIR_KBUILD_OUTPUT=$DIR_BUILD/kernel_build
+        mk_output_dir "kernel" $DIR_KBUILD_OUTPUT ""
     fi
-    mk_output_dir "kernel" $DIR_KBUILD_OUTPUT ""
     if [ $DIR_UBOOT ] ; then
       echo -n "Path to U-Boot Source       "
       echo $DIR_UBOOT
@@ -1105,14 +1114,16 @@ done
 
 
 if [ $KERNEL_SOURCE ] ; then
-    echo -n "*** Configuring Linux Kernel       " ; date
+    if [ "$DIR_KBUILD_OUTPUT" != "$KERNEL_SOURCE" ]; then
+	echo -n "*** Configuring Linux Kernel       " ; date
 
-    cd $KERNEL_SOURCE
-    RUN="$MAKE -j1 headers_check headers_install INSTALL_HDR_PATH=$DIR_KBUILD_OUTPUT/usr KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT CROSS_COMPILE=bfin-elf-"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
-    find "$DIR_KBUILD_OUTPUT/usr" -type f -name '.check.*' -print0 | xargs -0 rm -f
-    cd ..
+	cd $KERNEL_SOURCE
+	RUN="$MAKE -j1 headers_check headers_install INSTALL_HDR_PATH=$DIR_KBUILD_OUTPUT/usr KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT CROSS_COMPILE=bfin-elf-"
+	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+	(echo $RUN $LOGFILE ; ) | sh || die_with_log
+	find "$DIR_KBUILD_OUTPUT/usr" -type f -name '.check.*' -print0 | xargs -0 rm -f
+	cd ..
+    fi
 
     ####################### Step 3 - build uClibc ################
     echo -n "*** Configuring uClibc             " ; date
@@ -1221,8 +1232,10 @@ if [ $KERNEL_SOURCE ] ; then
     cp -r $DIR_KBUILD_OUTPUT/usr $DIR_uC_OUTPUT/bfin-uclinux/runtime || exit 1
     cp -r $DIR_KBUILD_OUTPUT/usr $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime || exit 1
 
-    echo -n "*** Cleaning kernel                " ; date
-    rm -rf "$DIR_KBUILD_OUTPUT"
+    if [ "$DIR_KBUILD_OUTPUT" != "$KERNEL_SOURCE" ]; then
+	echo -n "*** Cleaning kernel                " ; date
+	rm -rf "$DIR_KBUILD_OUTPUT"
+    fi
 
     echo -n "*** Cleaning uClibc                " ; date
     cd $UCLIBC_SOURCE
