@@ -44,3 +44,4 @@ asm (TEXT_SECTION_ASM_OP);
     }						\
   while (0)
 
+#define SUBTARGET_FDPIC_NOT_SUPPORTED

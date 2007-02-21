@@ -1,3 +1,9 @@
+2007-02-20  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/uclinux.h (SUBTARGET_FDPIC_NOT_SUPPORTED): New macro.
+	* config/bfin/bfin.c (override_options): Test it and sorry out if
+	TARGET_FDPIC is also set.
+
 2007-02-14  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_output_mi_thunk): Use R3 as scratch reg
