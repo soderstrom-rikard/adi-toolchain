@@ -2,6 +2,7 @@
 
 	* Applied gcc-core-4.1.1-4.1.2.diff.
 	* Applied gcc-g++-4.1.1-4.1.2.diff.
+	* Applied gcc-testsuite-4.1.1-4.1.2.diff.
 
 2006-11-09  Jie Zhang  <jie.zhang@analog.com>
 
