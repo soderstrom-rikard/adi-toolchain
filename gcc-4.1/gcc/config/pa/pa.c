@@ -1879,6 +1879,7 @@ emit_move_sequence (rtx *operands, enum machine_mode mode, rtx scratch_reg)
 	     because PLUS uses an 11-bit immediate and the insn sequence
 	     generated is not as efficient as the one using HIGH/LO_SUM.  */
 	  if (GET_CODE (operand1) == CONST_INT
+	      && GET_MODE_BITSIZE (mode) <= BITS_PER_WORD
 	      && GET_MODE_BITSIZE (mode) <= HOST_BITS_PER_WIDE_INT
 	      && !insert)
 	    {
@@ -2323,12 +2324,11 @@ output_move_double (rtx *operands)
       else if (GET_CODE (addr) == PLUS
 	       && GET_CODE (XEXP (addr, 0)) == MULT)
 	{
+	  rtx xoperands[4];
 	  rtx high_reg = gen_rtx_SUBREG (SImode, operands[0], 0);
 
 	  if (!reg_overlap_mentioned_p (high_reg, addr))
 	    {
-	      rtx xoperands[3];
-
 	      xoperands[0] = high_reg;
 	      xoperands[1] = XEXP (addr, 1);
 	      xoperands[2] = XEXP (XEXP (addr, 0), 0);
@@ -2339,8 +2339,6 @@ output_move_double (rtx *operands)
 	    }
 	  else
 	    {
-	      rtx xoperands[3];
-
 	      xoperands[0] = high_reg;
 	      xoperands[1] = XEXP (addr, 1);
 	      xoperands[2] = XEXP (XEXP (addr, 0), 0);
@@ -4322,8 +4320,10 @@ return_addr_rtx (int count, rtx frameaddr)
 		 GEN_INT (0x00011820), NE, NULL_RTX, SImode, 1);
   emit_jump_insn (gen_bne (label));
 
+  /* 0xe0400002 must be specified as -532676606 so that it won't be
+     rejected as an invalid immediate operand on 64-bit hosts.  */
   emit_cmp_insn (gen_rtx_MEM (SImode, plus_constant (ins, 12)),
-		 GEN_INT (0xe0400002), NE, NULL_RTX, SImode, 1);
+		 GEN_INT (-532676606), NE, NULL_RTX, SImode, 1);
 
   /* If there is no export stub then just use the value saved from
      the return pointer register.  */

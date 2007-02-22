@@ -96,6 +96,7 @@ Software Foundation, 51 Franklin Street, Fifth Floor, Boston, MA
           %{m31:-dynamic-linker " ELF31_DYNAMIC_LINKER "} \
           %{m64:-dynamic-linker " ELF64_DYNAMIC_LINKER "}}}}"
 
+#define CPP_SPEC "%{posix:-D_POSIX_SOURCE} %{pthread:-D_REENTRANT}"
 
 #define TARGET_ASM_FILE_END file_end_indicate_exec_stack
 

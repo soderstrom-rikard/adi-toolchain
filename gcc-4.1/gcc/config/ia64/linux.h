@@ -51,6 +51,7 @@ do {						\
       %{!dynamic-linker:-dynamic-linker " ELF_DYNAMIC_LINKER "}} \
       %{static:-static}}"
 
+#define CPP_SPEC "%{posix:-D_POSIX_SOURCE} %{pthread:-D_REENTRANT}"
 
 #define JMP_BUF_SIZE  76
 

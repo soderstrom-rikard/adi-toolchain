@@ -1135,9 +1135,11 @@ rs6000_override_options (const char *default_cpu)
 	 {"801", PROCESSOR_MPCCORE, POWERPC_BASE_MASK | MASK_SOFT_FLOAT},
 	 {"821", PROCESSOR_MPCCORE, POWERPC_BASE_MASK | MASK_SOFT_FLOAT},
 	 {"823", PROCESSOR_MPCCORE, POWERPC_BASE_MASK | MASK_SOFT_FLOAT},
-	 {"8540", PROCESSOR_PPC8540, POWERPC_BASE_MASK | MASK_PPC_GFXOPT},
+	 {"8540", PROCESSOR_PPC8540,
+	  POWERPC_BASE_MASK | MASK_PPC_GFXOPT | MASK_STRICT_ALIGN},
 	 /* 8548 has a dummy entry for now.  */
-	 {"8548", PROCESSOR_PPC8540, POWERPC_BASE_MASK | MASK_PPC_GFXOPT},
+	 {"8548", PROCESSOR_PPC8540,
+	  POWERPC_BASE_MASK | MASK_PPC_GFXOPT | MASK_STRICT_ALIGN},
 	 {"860", PROCESSOR_MPCCORE, POWERPC_BASE_MASK | MASK_SOFT_FLOAT},
 	 {"970", PROCESSOR_POWER4,
 	  POWERPC_7400_MASK | MASK_PPC_GPOPT | MASK_MFCRF | MASK_POWERPC64},
@@ -1160,6 +1162,9 @@ rs6000_override_options (const char *default_cpu)
 	 {"power5+", PROCESSOR_POWER5,
 	  POWERPC_BASE_MASK | MASK_POWERPC64 | MASK_PPC_GFXOPT
 	  | MASK_MFCRF | MASK_POPCNTB | MASK_FPRND},
+ 	 {"power6", PROCESSOR_POWER5,
+	  POWERPC_7400_MASK | MASK_POWERPC64 | MASK_MFCRF | MASK_POPCNTB
+	  | MASK_FPRND},
 	 {"powerpc", PROCESSOR_POWERPC, POWERPC_BASE_MASK},
 	 {"powerpc64", PROCESSOR_POWERPC64,
 	  POWERPC_BASE_MASK | MASK_PPC_GFXOPT | MASK_POWERPC64},
@@ -1183,7 +1188,7 @@ rs6000_override_options (const char *default_cpu)
 
   enum {
     POWER_MASKS = MASK_POWER | MASK_POWER2 | MASK_MULTIPLE | MASK_STRING,
-    POWERPC_MASKS = (POWERPC_BASE_MASK | MASK_PPC_GPOPT
+    POWERPC_MASKS = (POWERPC_BASE_MASK | MASK_PPC_GPOPT | MASK_STRICT_ALIGN
 		     | MASK_PPC_GFXOPT | MASK_POWERPC64 | MASK_ALTIVEC
 		     | MASK_MFCRF | MASK_POPCNTB | MASK_FPRND)
   };
@@ -2076,6 +2081,22 @@ num_insns_constant (rtx op, enum machine_mode mode)
 }
 
 
+/* Interpret element ELT of the CONST_VECTOR OP as an integer value.
+   If the mode of OP is MODE_VECTOR_INT, this simply returns the
+   corresponding element of the vector, but for V4SFmode and V2SFmode,
+   the corresponding "float" is interpreted as an SImode integer.  */
+
+static HOST_WIDE_INT
+const_vector_elt_as_int (rtx op, unsigned int elt)
+{
+  rtx tmp = CONST_VECTOR_ELT (op, elt);
+  if (GET_MODE (op) == V4SFmode
+      || GET_MODE (op) == V2SFmode)
+    tmp = gen_lowpart (SImode, tmp);
+  return INTVAL (tmp);
+}
+
+
 /* Return true if OP can be synthesized with a particular vspltisb, vspltish 
    or vspltisw instruction.  OP is a CONST_VECTOR.  Which instruction is used
    depends on STEP and COPIES, one of which will be 1.  If COPIES > 1,
@@ -2094,8 +2115,7 @@ vspltis_constant (rtx op, unsigned step, unsigned copies)
   unsigned bitsize = GET_MODE_BITSIZE (inner);
   unsigned mask = GET_MODE_MASK (inner);
 
-  rtx last = CONST_VECTOR_ELT (op, nunits - 1);
-  HOST_WIDE_INT val = INTVAL (last);
+  HOST_WIDE_INT val = const_vector_elt_as_int (op, nunits - 1);
   HOST_WIDE_INT splat_val = val;
   HOST_WIDE_INT msb_val = val > 0 ? 0 : -1;
 
@@ -2135,7 +2155,7 @@ vspltis_constant (rtx op, unsigned step, unsigned copies)
       else
 	desired_val = msb_val;
 
-      if (desired_val != INTVAL (CONST_VECTOR_ELT (op, i)))
+      if (desired_val != const_vector_elt_as_int (op, i))
 	return false;
     }
 
@@ -2514,18 +2534,28 @@ build_mask64_2_operands (rtx in, rtx *out)
 bool
 invalid_e500_subreg (rtx op, enum machine_mode mode)
 {
-  /* Reject (subreg:SI (reg:DF)).  */
-  if (GET_CODE (op) == SUBREG
+  if (TARGET_E500_DOUBLE)
+    {
+      /* Reject (subreg:SI (reg:DF)).  */
+      if (GET_CODE (op) == SUBREG
+	  && mode == SImode
+	  && REG_P (SUBREG_REG (op))
+	  && GET_MODE (SUBREG_REG (op)) == DFmode)
+	return true;
+
+      /* Reject (subreg:DF (reg:DI)).  */
+      if (GET_CODE (op) == SUBREG
+	  && mode == DFmode
+	  && REG_P (SUBREG_REG (op))
+	  && GET_MODE (SUBREG_REG (op)) == DImode)
+	return true;
+    }
+
+  if (TARGET_SPE
+      && GET_CODE (op) == SUBREG
       && mode == SImode
       && REG_P (SUBREG_REG (op))
-      && GET_MODE (SUBREG_REG (op)) == DFmode)
-    return true;
-
-  /* Reject (subreg:DF (reg:DI)).  */
-  if (GET_CODE (op) == SUBREG
-      && mode == DFmode
-      && REG_P (SUBREG_REG (op))
-      && GET_MODE (SUBREG_REG (op)) == DImode)
+      && SPE_VECTOR_MODE (GET_MODE (SUBREG_REG (op))))
     return true;
 
   return false;
@@ -3352,6 +3382,7 @@ rs6000_legitimize_reload_address (rtx x, enum machine_mode mode,
 
   if (GET_CODE (x) == SYMBOL_REF
       && !ALTIVEC_VECTOR_MODE (mode)
+      && !SPE_VECTOR_MODE (mode)
 #if TARGET_MACHO
       && DEFAULT_ABI == ABI_DARWIN
       && (flag_pic || MACHO_DYNAMIC_NO_PIC_P)
@@ -3453,6 +3484,7 @@ rs6000_legitimate_address (enum machine_mode mode, rtx x, int reg_ok_strict)
   if ((GET_CODE (x) == PRE_INC || GET_CODE (x) == PRE_DEC)
       && !ALTIVEC_VECTOR_MODE (mode)
       && !SPE_VECTOR_MODE (mode)
+      && mode != TFmode
       /* Restrict addressing for DI because of our SUBREG hackery.  */
       && !(TARGET_E500_DOUBLE && (mode == DFmode || mode == DImode))
       && TARGET_UPDATE
@@ -3541,15 +3573,20 @@ rs6000_hard_regno_nregs (int regno, enum machine_mode mode)
   if (FP_REGNO_P (regno))
     return (GET_MODE_SIZE (mode) + UNITS_PER_FP_WORD - 1) / UNITS_PER_FP_WORD;
 
-  if (TARGET_E500_DOUBLE && mode == DFmode)
-    return 1;
-
   if (SPE_SIMD_REGNO_P (regno) && TARGET_SPE && SPE_VECTOR_MODE (mode))
     return (GET_MODE_SIZE (mode) + UNITS_PER_SPE_WORD - 1) / UNITS_PER_SPE_WORD;
 
   if (ALTIVEC_REGNO_P (regno))
     return
       (GET_MODE_SIZE (mode) + UNITS_PER_ALTIVEC_WORD - 1) / UNITS_PER_ALTIVEC_WORD;
+
+  /* The value returned for SCmode in the E500 double case is 2 for
+     ABI compatibility; storing an SCmode value in a single register
+     would require function_arg and rs6000_spe_function_arg to handle
+     SCmode so as to pass the value correctly in a pair of
+     registers.  */
+  if (TARGET_E500_DOUBLE && FLOAT_MODE_P (mode) && mode != SCmode)
+    return (GET_MODE_SIZE (mode) + UNITS_PER_FP_WORD - 1) / UNITS_PER_FP_WORD;
 
   return (GET_MODE_SIZE (mode) + UNITS_PER_WORD - 1) / UNITS_PER_WORD;
 }
@@ -3919,8 +3956,7 @@ rs6000_emit_move (rtx dest, rtx source, enum machine_mode mode)
 
   /* 128-bit constant floating-point values on Darwin should really be
      loaded as two parts.  */
-  if (!TARGET_IEEEQUAD
-      && TARGET_HARD_FLOAT && TARGET_FPRS && TARGET_LONG_DOUBLE_128
+  if (!TARGET_IEEEQUAD && TARGET_LONG_DOUBLE_128
       && mode == TFmode && GET_CODE (operands[1]) == CONST_DOUBLE)
     {
       /* DImode is used, not DFmode, because simplify_gen_subreg doesn't
@@ -4388,7 +4424,12 @@ function_arg_padding (enum machine_mode mode, tree type)
    of an argument with the specified mode and type.  If it is not defined,
    PARM_BOUNDARY is used for all arguments.
 
-   V.4 wants long longs to be double word aligned.
+   V.4 wants long longs and doubles to be double word aligned.  Just
+   testing the mode size is a boneheaded way to do this as it means
+   that other types such as complex int are also double word aligned.
+   However, we're stuck with this because changing the ABI might break
+   existing library interfaces.
+
    Doubleword align SPE vectors.
    Quadword align Altivec vectors.
    Quadword align large synthetic vector types.   */
@@ -4396,7 +4437,11 @@ function_arg_padding (enum machine_mode mode, tree type)
 int
 function_arg_boundary (enum machine_mode mode, tree type)
 {
-  if (DEFAULT_ABI == ABI_V4 && GET_MODE_SIZE (mode) == 8)
+  if (DEFAULT_ABI == ABI_V4
+      && (GET_MODE_SIZE (mode) == 8
+	  || (TARGET_HARD_FLOAT
+	      && TARGET_FPRS
+	      && mode == TFmode)))
     return 64;
   else if (SPE_VECTOR_MODE (mode)
 	   || (type && TREE_CODE (type) == VECTOR_TYPE
@@ -5892,10 +5937,10 @@ rs6000_gimplify_va_arg (tree valist, tree type, tree *pre_p, tree *post_p)
       t = build1 (LABEL_EXPR, void_type_node, lab_false);
       append_to_statement_list (t, pre_p);
 
-      if (n_reg > 2)
+      if ((n_reg == 2 && reg != gpr) || n_reg > 2)
 	{
 	  /* Ensure that we don't find any more args in regs.
-	     Alignment has taken care of the n_reg == 2 case.  */
+	     Alignment has taken care of the n_reg == 2 gpr case.  */
 	  t = build (MODIFY_EXPR, TREE_TYPE (reg), reg, size_int (8));
 	  gimplify_and_add (t, pre_p);
 	}
@@ -5924,6 +5969,27 @@ rs6000_gimplify_va_arg (tree valist, tree type, tree *pre_p, tree *post_p)
     {
       t = build1 (LABEL_EXPR, void_type_node, lab_over);
       append_to_statement_list (t, pre_p);
+    }
+
+  if (STRICT_ALIGNMENT
+      && (TYPE_ALIGN (type)
+	  > (unsigned) BITS_PER_UNIT * (align < 4 ? 4 : align)))
+    {
+      /* The value (of type complex double, for example) may not be
+	 aligned in memory in the saved registers, so copy via a
+	 temporary.  (This is the same code as used for SPARC.)  */
+      tree tmp = create_tmp_var (type, "va_arg_tmp");
+      tree dest_addr = build_fold_addr_expr (tmp);
+
+      tree copy = build_function_call_expr
+	(implicit_built_in_decls[BUILT_IN_MEMCPY],
+	 tree_cons (NULL_TREE, dest_addr,
+		    tree_cons (NULL_TREE, addr,
+			       tree_cons (NULL_TREE, size_int (rsize * 4),
+					  NULL_TREE))));
+
+      gimplify_and_add (copy, pre_p);
+      addr = dest_addr;
     }
 
   addr = fold_convert (ptrtype, addr);
@@ -9694,12 +9760,12 @@ effects of instruction do not correspond to semantics of RTL insn.  */
 int
 insvdi_rshift_rlwimi_p (rtx sizeop, rtx startop, rtx shiftop)
 {
-  if (INTVAL (startop) < 64
-      && INTVAL (startop) > 32
-      && (INTVAL (sizeop) + INTVAL (startop) < 64)
-      && (INTVAL (sizeop) + INTVAL (startop) > 33)
-      && (INTVAL (sizeop) + INTVAL (startop) + INTVAL (shiftop) < 96)
-      && (INTVAL (sizeop) + INTVAL (startop) + INTVAL (shiftop) >= 64)
+  if (INTVAL (startop) > 32
+      && INTVAL (startop) < 64
+      && INTVAL (sizeop) > 1
+      && INTVAL (sizeop) + INTVAL (startop) < 64
+      && INTVAL (shiftop) > 0
+      && INTVAL (sizeop) + INTVAL (shiftop) < 32
       && (64 - (INTVAL (shiftop) & 63)) >= INTVAL (sizeop))
     return 1;
 
@@ -10681,7 +10747,8 @@ print_operand (FILE *file, rtx x, int code)
 
 	tmp = XEXP (x, 0);
 
-	if (TARGET_E500)
+	/* Ugly hack because %y is overloaded.  */
+	if (TARGET_E500 && GET_MODE_SIZE (GET_MODE (x)) == 8)
 	  {
 	    /* Handle [reg].  */
 	    if (GET_CODE (tmp) == REG)
@@ -12335,6 +12402,8 @@ rs6000_split_multireg_move (rtx dst, rtx src)
     reg_mode = DFmode;
   else if (ALTIVEC_REGNO_P (reg))
     reg_mode = V16QImode;
+  else if (TARGET_E500_DOUBLE && mode == TFmode)
+    reg_mode = DFmode;
   else
     reg_mode = word_mode;
   reg_mode_size = GET_MODE_SIZE (reg_mode);
