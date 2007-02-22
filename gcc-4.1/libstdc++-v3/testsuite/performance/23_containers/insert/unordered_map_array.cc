@@ -1,6 +1,4 @@
-// Control various target specific ABI tweaks.  Generic version.
-
-// Copyright (C) 2004, 2006 Free Software Foundation, Inc.
+// Copyright (C) 2006 Free Software Foundation, Inc.
 //
 // This file is part of the GNU ISO C++ Library.  This library is free
 // software; you can redistribute it and/or modify it under the
@@ -27,30 +25,37 @@
 // invalidate any other reasons why the executable file might be covered by
 // the GNU General Public License.
 
-#ifndef _CXXABI_TWEAKS_H
-#define _CXXABI_TWEAKS_H 1
+#include <tr1/unordered_map>
+#include <testsuite_performance.h>
 
-#ifdef __cplusplus
-namespace __cxxabiv1
+typedef std::tr1::unordered_map<int, int> map_type;
+typedef std::tr1::unordered_map<int, map_type> matrix_type;
+
+int main()
 {
-  extern "C" 
-  {
-#endif
+  using namespace __gnu_test;
 
-  // The generic ABI uses the first byte of a 64-bit guard variable.
-#define _GLIBCXX_GUARD_TEST(x) (*(char *) (x) != 0)
-#define _GLIBCXX_GUARD_SET(x) *(char *) (x) = 1
-  __extension__ typedef int __guard __attribute__((mode (__DI__)));
+  time_counter time;
+  resource_counter resource;
 
-  // __cxa_vec_ctor has void return type.
-  typedef void __cxa_vec_ctor_return_type;
-#define _GLIBCXX_CXA_VEC_CTOR_RETURN(x) return
-  // Constructors and destructors do not return a value.
-  typedef void __cxa_cdtor_return_type;
+  const int sz = 1000;
 
-#ifdef __cplusplus
-  }
-} // namespace __cxxabiv1
-#endif
+  matrix_type matrix;
 
-#endif 
+  start_counters(time, resource);
+  for (int iter = 0; iter < 50; ++iter)
+    {
+      for (int i = 0; i < sz; ++i)
+	{
+	  for (int j = 0; j < sz; ++j)
+	    {
+	      map_type& row = matrix[i / 4];
+	      ++row[j / 4];
+	    }
+	}
+    }
+  stop_counters(time, resource);
+  report_performance(__FILE__, "", time, resource);
+
+  return 0;
+}
