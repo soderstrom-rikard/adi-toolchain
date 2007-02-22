@@ -1,3 +1,14 @@
+2007-02-08  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/t-bfin-elf (LIB1ASMFUNCS): Add _umulsi3_highpart and
+	_smulsi3_highpart.
+	* config/bfin/t-bfin-linux (LIB1ASMFUNCS): Likewise.
+	* config/bfin/t-bfin-uclinux (LIB1ASMFUNCS): Likewise.
+	* config/bfin/lib1funcs.asm (___umulsi3_highpart, ___smulsi3_highpart):
+	New functions.
+	* config/bfin/bfin.md (smulsi3_highpart, umulsi3_highpart): New
+	patterns.
+
 2007-02-20  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/uclinux.h (SUBTARGET_FDPIC_NOT_SUPPORTED): New macro.
