@@ -34,8 +34,12 @@ int __libc_poll(struct pollfd *ufds, unsigned long int nfds, int timeout)
         int result;
         struct timespec ts;
 
-        ts.tv_sec = timeout/1000;
-        ts.tv_nsec = timeout*1000*1000;
+	if(timeout >= 0) {
+	        ts.tv_sec = timeout / 1000;
+        	ts.tv_nsec = (timeout % 1000) *1000;
+	} else {
+	        ts.tv_sec = -1;
+	}
 
         result = __libc_ppoll(ufds, nfds, &ts, 0, 0);
 
