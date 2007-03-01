@@ -41,8 +41,9 @@ TIMESTAMP=`date +%Y%m%d`       # is YYYY_MMM_DD
 PREREQ_FILE="autoconf automake bison flex gcc gettext grep ln m4 make makeinfo msgfmt which mv cp rm grep echo mkdir tail"
 BINUTILS_VERSION=2.17
 GCC_VERSIONS=
+NUM_JOBS=0
 
-while getopts dpwvtST:C:s:b:k:K:o:m:B:c:u:r:l:H:h parameter
+while getopts dpwvtST:C:s:b:k:K:o:m:j:B:c:u:r:l:H:h parameter
 do
     case $parameter in
         p)
@@ -238,6 +239,9 @@ do
             DIR_uC_OUTPUT=$OPTARG-uclinux
             DIR_LINUX_OUTPUT=$OPTARG-linux-uclibc
             ;;
+	j)
+	    NUM_JOBS=$OPTARG
+	    ;;
         h)
 # We don't document the -S option - it's for advanced users who know what
 # they are doing.  For maximum reproducibility, not using it is better.
@@ -255,6 +259,7 @@ do
 -o OUTPUT        Output directory (leave blank to use build dir)
 -S               Skip building elf toolchain (check to see if already built)
 -m MAKE          Default make (leave blank to use system make)
+-j NUM           Pass -j NUM to make
 -B BINUTILS_VER  Binutils version (default 2.17).  Can be given once.
 -c GCC_VERSION   GCC version (default 4.1).  Can be given multiple times.
 -H HOST          Build toolchain to run on HOST.
@@ -286,13 +291,15 @@ fi
 if [ ! "$MAKE" ] ; then
     MAKE=make
 fi
-NUM_JOBS=`grep -sc processor /proc/cpuinfo`
-if [ -n "$NUM_JOBS" ] ; then
-	NUM_JOBS="-j`expr $NUM_JOBS '*' 2`"
-else
-	NUM_JOBS="-j2"
+if [ "$NUM_JOBS" -eq "0" ] ; then
+	NUM_JOBS=`grep -sc "^processor" /proc/cpuinfo`
+	if [ -n "$NUM_JOBS" ] ; then
+		NUM_JOBS=`expr $NUM_JOBS '*' 2`
+	else
+		NUM_JOBS=2
+	fi
 fi
-export MAKEFLAGS="$NUM_JOBS $MAKEFLAGS"
+export MAKEFLAGS="-j$NUM_JOBS $MAKEFLAGS"
 echo "Utilizing make: $MAKE $MAKEFLAGS"
 
 ############ Check and error if I can't find the things I need #
