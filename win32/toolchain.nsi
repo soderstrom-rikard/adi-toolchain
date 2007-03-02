@@ -1,4 +1,4 @@
-; Installer for Blackfin Toolchain
+; Installer for Windows Blackfin Toolchain
 ; http://blackfin.uclinux.org/
 
 !define PRODUCT_NAME "Blackfin Toolchain"
@@ -9,10 +9,11 @@
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 
 SetCompressor lzma
-SetCompress off
 
 !include "env-path.nsh"
 !include "MUI.nsh"
+
+; http://nsis.sourceforge.net/Docs/Modern%20UI/Readme.html
 
 !define MUI_ABORTWARNING
 !define MUI_ICON "favicon.ico"
@@ -23,6 +24,10 @@ SetCompress off
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
+
+!define MUI_FINISHPAGE_LINK "Blackfin Open Source Website"
+!define MUI_FINISHPAGE_LINK_LOCATION "http://blackfin.uclinux.org/"
+!define MUI_FINISHPAGE_SHOWREADME "README.txt"
 !insertmacro MUI_PAGE_FINISH
 
 !insertmacro MUI_UNPAGE_CONFIRM
@@ -30,9 +35,9 @@ SetCompress off
 
 !insertmacro MUI_LANGUAGE "English"
 
-InstallDir "$PROGRAMFILES\${PRODUCT_NAME}\${PRODUCT_VERSION}"
+InstallDir "$PROGRAMFILES\Analog Devices\GNU Toolchain\${PRODUCT_VERSION}"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
-Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
+Name "ADI ${PRODUCT_NAME} ${PRODUCT_VERSION}"
 OutFile "blackfin-toolchain-win32-${PRODUCT_VERSION}.exe"
 ShowInstDetails show
 ShowUnInstDetails show
@@ -45,19 +50,30 @@ Section "bfin-${tuple}" Sec${libc}
   Call AddToPath
 SectionEnd
 !macroend
-
 !insertmacro BlackfinInstall "elf" "NEWLIB"
-!insertmacro BlackfinInstall "uclinux" "FLAT"
+;!insertmacro BlackfinInstall "uclinux" "FLAT"
 !insertmacro BlackfinInstall "linux-uclibc" "FDPIC"
+
+Section "Examples" SecExamples
+  SetOutPath "$INSTDIR\examples"
+  File /r "..\examples\*"
+SectionEnd
 
 LangString DESC_SecNEWLIB ${LANG_ENGLISH} "Blackfin Toolchain for running on bare metal (no operating system)"
 LangString DESC_SecFLAT ${LANG_ENGLISH} "Blackfin Toolchain for generating FLAT binaries to run under Linux"
 LangString DESC_SecFDPIC ${LANG_ENGLISH} "Blackfin Toolchain for generating shared FDPIC ELF binaries to run under Linux"
+LangString DESC_SecExamples ${LANG_ENGLISH} "Some simple example programs"
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${SecNEWLIB} $(DESC_SecNEWLIB)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecFLAT} $(DESC_SecFLAT)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecFDPIC} $(DESC_SecFDPIC)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecExamples} $(DESC_SecExamples)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
+
+Section -Misc
+  SetOutPath "$INSTDIR"
+  File "GPL-2.txt" "README.txt"
+SectionEnd
 
 Section -Post
   WriteUninstaller "$INSTDIR\uninst.exe"
