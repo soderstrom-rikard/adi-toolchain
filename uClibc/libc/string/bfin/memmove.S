@@ -21,9 +21,12 @@
 
 .align 2
 
-.global _memmove
-.type _memmove, STT_FUNC
-_memmove:
+	/* We have to bypass the libc-symbols.h machinery to make sure we get
+	   a weak symbol for memcpy (some crummy gcc tests want to redefine
+	   it).  */
+.global ___GI_memmove
+.type ___GI_memmove, STT_FUNC
+___GI_memmove:
 	I1 = P3;
 	P0 = R0;              // P0 = To address
 	P3 = R1;              // P3 = From Address
@@ -90,6 +93,9 @@ ol_e:		R1 = B[P3--] (Z);
 no_loop:	B[P0] = R1;
 	P3 = I1;
 	RTS;
-.size _memmove,.-_memmove
+.size ___GI_memmove,.-___GI_memmove
 
-libc_hidden_def (memmove)
+.hidden ___GI_memmove
+.weak _memmove
+.set _memmove,___GI_memmove
+
