@@ -43,7 +43,7 @@ BINUTILS_VERSION=2.17
 GCC_VERSIONS=
 NUM_JOBS=0
 
-while getopts dpwvtST:C:s:b:k:K:o:m:j:B:c:u:r:l:H:h parameter
+while getopts dpwvtST:C:s:b:k:K:o:O:m:j:B:c:u:r:l:H:h parameter
 do
     case $parameter in
         p)
@@ -239,6 +239,11 @@ do
             DIR_uC_OUTPUT=$OPTARG-uclinux
             DIR_LINUX_OUTPUT=$OPTARG-linux-uclibc
             ;;
+        O)
+            DIR_ELF_OUTPUT=$OPTARG
+            DIR_uC_OUTPUT=$OPTARG
+            DIR_LINUX_OUTPUT=$OPTARG
+            ;;
 	j)
 	    NUM_JOBS=$OPTARG
 	    ;;
@@ -256,7 +261,8 @@ do
 -K SOURCE        Kernel Header directory (may be specified instead of source)
 -u SOURCE        Uboot Source directory
 -b BUILD         Build directory (leave blank to use current dir)
--o OUTPUT        Output directory (leave blank to use build dir)
+-o OUTPUT        Output directory prefix (leave blank to use build dir)
+-O OUTPUT        Output directory (leave blank to use build dir)
 -S               Skip building elf toolchain (check to see if already built)
 -m MAKE          Default make (leave blank to use system make)
 -j NUM           Pass -j NUM to make
