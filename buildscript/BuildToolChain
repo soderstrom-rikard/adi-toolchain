@@ -754,6 +754,148 @@ build_gcc ()
     fi
 }
 
+# If $1 is newer than $2, return 1. Otherwise, return 0.
+
+is_newer ()
+{
+    MAJOR1=`echo $1 | sed 's/\([0-9]*\).*/\1/'`
+    MINOR1=`echo $1 | sed 's/[0-9]*.\([0-9]*\).*/\1/'`
+    PATCH1=`echo $1 | sed 's/[0-9]*.[0-9]*.\([0-9]*\).*/\1/'`
+    MAJOR2=`echo $2 | sed 's/\([0-9]*\).*/\1/'`
+    MINOR2=`echo $2 | sed 's/[0-9]*.\([0-9]*\).*/\1/'`
+    PATCH2=`echo $2 | sed 's/[0-9]*.[0-9]*.\([0-9]*\).*/\1/'`
+
+    if [ -z "$MAJOR1" -o -z "$MINOR1" -o -z "$PATCH1" -o -z "$MAJOR2" -o -z "$MINOR2" -o -z "$PATCH2" ]; then
+	return 0;
+    fi
+
+    if [ "$MAJOR1" -lt "$MAJOR2" ]; then
+	return 0;
+    elif [ "$MAJOR1" -gt "$MAJOR2" ]; then
+	return 1;
+    elif [ "$MINOR1" -lt "$MINOR2" ]; then
+	return 0;
+    elif [ "$MINOR1" -gt "$MINOR2" ]; then
+	return 1;
+    elif [ "$PATCH1" -lt "$PATCH2" ]; then
+	return 0;
+    elif [ "$PATCH1" -gt "$PATCH2" ]; then
+	return 1;
+    else
+	return 0;
+    fi
+}
+
+# If $1 is compatible with $2, return 1. Otherwise, return 0.
+
+is_compat ()
+{
+    MAJOR1=`echo $1 | sed 's/\([0-9]*\).*/\1/'`
+    MINOR1=`echo $1 | sed 's/[0-9]*.\([0-9]*\).*/\1/'`
+    PATCH1=`echo $1 | sed 's/[0-9]*.[0-9]*.\([0-9]*\).*/\1/'`
+    MAJOR2=`echo $2 | sed 's/\([0-9]*\).*/\1/'`
+    MINOR2=`echo $2 | sed 's/[0-9]*.\([0-9]*\).*/\1/'`
+    PATCH2=`echo $2 | sed 's/[0-9]*.[0-9]*.\([0-9]*\).*/\1/'`
+
+    if [ -z "$MAJOR1" -o -z "$MINOR1" -o -z "$PATCH1" -o -z "$MAJOR2" -o -z "$MINOR2" -o -z "$PATCH2" ]; then
+	return 0;
+    fi
+
+    if [ "$MAJOR1" -eq "$MAJOR2" -a "$MINOR1" -eq "$MINOR2" ]; then
+	return 1;
+    else
+	return 0;
+    fi
+}
+
+# Install shared libstdc++ libraries into sysroot direcotory
+# 1st argument is the toolchain install directory
+# 2nd argument is the toolchain name
+
+install_libstdcpps ()
+{
+    LIBSTDCPPS=`find $1 -type f -name libstdc++.so.* | tr '\n' ' '`
+
+    while [ -n "$LIBSTDCPPS" ]; do
+	LIBSTDCPPS2=""
+	COMPAT_LIBSTDCPPS=""
+	NEWEST_VERSION=""
+	NEWEST_LIBSTDCPP=""
+	for LIBSTDCPP in $LIBSTDCPPS; do
+	    LIBSTDCPP_DIR=`dirname $LIBSTDCPP`
+	    LIBSTDCPP_NAME=`basename $LIBSTDCPP`
+	    LIBSTDCPP_VERSION=`echo $LIBSTDCPP_NAME | sed 's/libstdc++.so.\([0-9]*.[0-9]*.[0-9]*\).*/\1/'`
+	
+	    if [ -z "$NEWEST_VERSION" ]; then
+		NEWEST_VERSION=$LIBSTDCPP_VERSION
+		NEWEST_LIBSTDCPP=$LIBSTDCPP
+		COMPAT_LIBSTDCPPS=$LIBSTDCPP
+		continue
+	    fi
+
+	    is_compat $LIBSTDCPP_VERSION $NEWEST_VERSION
+	    if [ $? -eq 1 ]; then
+		COMPAT_LIBSTDCPPS="$COMPAT_LIBSTDCPPS $LIBSTDCPP"
+
+		is_newer $LIBSTDCPP_VERSION $NEWEST_VERSION
+		if [ $? -eq 1 ]; then
+		    NEWEST_VERSION=$LIBSTDCPP_VERSION
+		    NEWEST_LIBSTDCPP=$LIBSTDCPP
+		fi
+	    else
+		LIBSTDCPPS2="$LIBSTDCPPS2 $LIBSTDCPP"
+	    fi
+	done
+
+	MAJOR_NUM=`echo $LIBSTDCPP_VERSION | sed 's/\([0-9]*\).*/\1/'`
+	echo "Installing $NEWEST_LIBSTDCPP"
+	cp $NEWEST_LIBSTDCPP $1/$2/runtime/lib
+	ln -s `basename $NEWEST_LIBSTDCPP` $1/$2/runtime/lib/libstdc++.so.$MAJOR_NUM 
+	for LIBSTDCPP in $COMPAT_LIBSTDCPPS; do
+	    rm -f `dirname $LIBSTDCPP`/libstdc++.so*
+	    ln -s ../../../../$2/runtime/lib/`basename $NEWEST_LIBSTDCPP` `dirname $LIBSTDCPP`/libstdc++.so
+	done
+
+	LIBSTDCPPS=$LIBSTDCPPS2
+    done
+}
+
+# Install shared libgcc libraries into sysroot direcotory
+# 1st argument is the toolchain install directory
+# 2nd argument is the toolchain name
+# FIXME: Only libgcc_s.so.1 is handled
+
+install_libgccs ()
+{
+    LIBGCCS=`find $1 -type f -name libgcc_s.so.1 | tr '\n' ' '`
+
+    NEWEST_VERSION=""
+    NEWEST_LIBGCC=""
+    for LIBGCC in $LIBGCCS; do
+	LIBGCC_DIR=`dirname $LIBGCC`
+	GCC_VERSION=`basename $LIBGCC_DIR`
+	
+	if [ -z "$NEWEST_VERSION" ]; then
+	   NEWEST_VERSION=$GCC_VERSION
+	   NEWEST_LIBGCC=$LIBGCC
+	   continue
+	fi
+
+	is_newer $GCC_VERSION $NEWEST_VERSION
+	if [ $? -eq 1 ]; then
+	    NEWEST_VERSION=$LIBGCC_VERSION
+	    NEWEST_LIBGCC=$LIBGCC
+	fi
+    done
+
+    echo "Installing $NEWEST_LIBGCC"
+    cp $NEWEST_LIBGCC $1/$2/runtime/lib
+    for LIBGCC in $LIBGCCS; do
+	rm -f `dirname $LIBGCC`/libgcc_s.so*
+	ln -s ../../../../$2/runtime/lib/libgcc_s.so.1 `dirname $LIBGCC`/libgcc_s.so
+    done
+}
+
 run_tests ()
 {
     echo -n "***  Running tests on binutils     " ; date
@@ -1362,6 +1504,9 @@ if [ $KERNEL_SOURCE ] ; then
 	   --with-sysroot=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime"
     done
     rm -f $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
+
+    install_libstdcpps $DIR_LINUX_OUTPUT bfin-linux-uclibc
+    install_libgccs $DIR_LINUX_OUTPUT bfin-linux-uclibc
 
     ##################### Test bfin-linux-uclibc #####################
 
