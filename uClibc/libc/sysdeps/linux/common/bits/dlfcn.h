@@ -25,8 +25,10 @@
 #define RTLD_LAZY	0x00001	/* Lazy function call binding.  */
 #define RTLD_NOW	0x00002	/* Immediate function call binding.  */
 #define	RTLD_BINDING_MASK   0x3	/* Mask of binding time value.  */
+#if 0 /* Not supported in uClibc.  */
 #define RTLD_NOLOAD	0x00004	/* Do not load the object.  */
 #define RTLD_DEEPBIND	0x00008	/* Use deep binding.  */
+#endif
 
 /* If the following bit is set in the MODE argument to `dlopen',
    the symbols of the loaded object and its dependencies are made
