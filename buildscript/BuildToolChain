@@ -1358,7 +1358,6 @@ if [ $KERNEL_SOURCE ] ; then
       cat .tmp.config.provided | grep -v '^\(TARGET\|HAVE_NO_SHARED\|HAVE_NO_PIC\|DOPIC\|HAVE_SHARED\|TARGET_SUBARCH\|BUILD_UCLIBC_LDSO\|SUPPORT_LD_DEBUG\|FORCE_SHAREABLE_TEXT_SEGMENTS\|RUNTIME_\|DEVEL_\|MULTILIB\|KERNEL_HEADERS\|LDSO_RUNPATH\|SHARED_LIB_LOADER_PREFIX\)' |grep -v UCLIBC_FORMAT_ >>.config
       echo 'RUNTIME_PREFIX="/"' >>.config
       echo 'DEVEL_PREFIX="/usr/"' >>.config
-      echo 'MULTILIB="mfdpic"' >>.config
       echo 'FORCE_SHAREABLE_TEXT_SEGMENTS=y' >>.config
       echo 'LDSO_RUNPATH=y' >>.config
       echo 'DOPIC=y' >>.config
@@ -1378,10 +1377,6 @@ if [ $KERNEL_SOURCE ] ; then
 
     cp .config .config-used-for-bfinfdpic
 
-    build_uClibc mfdpic/ $DIR_uC_OUTPUT/bfin-uclinux
-
-    grep -v 'MULTILIB' <.config-used-for-bfinfdpic >.config
-    echo 'MULTILIB=""' >>.config
     build_uClibc "" $DIR_LINUX_OUTPUT/bfin-linux-uclibc
 
     ######################### Done with uClibc ###########################

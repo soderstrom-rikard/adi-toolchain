@@ -182,4 +182,3 @@ WARNINGS="-Wall"
 # EXTRA_WARNINGS is not set
 # DOMULTI is not set
 # UCLIBC_MJN3_ONLY is not set
-MULTILIB="mfdpic"
