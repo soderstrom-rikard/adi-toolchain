@@ -1,0 +1,27 @@
+---------------------------------------------------------------
+Guide for Building and Packaging the Windows Blackfin Toolchain
+---------------------------------------------------------------
+
+This requires compiling the toolchain in Linux, but building the final package
+in Windows.  We're looking into how to actually build the package from Linux,
+but until then you're stuck using Windows for part of this.
+
+-------------
+ Linux Steps
+-------------
+
+Generate the Blackfin toolchain to run on Windows.  See this document:
+	http://docs.blackfin.uclinux.org/doku.php?id=toolchain:canadian-cross
+
+---------------
+ Windows Steps
+---------------
+
+Install the Nullsoft Scriptable Install System:
+	http://nsis.sourceforge.net/
+
+Transfer the compiled toolchain from the Linux system to the Windows system.
+
+Load up the toolchain.nsi script into the NSIS compiler and compile the
+package.  You should be left with an installer in the same directory.  Give
+it a spin to make sure it works.
