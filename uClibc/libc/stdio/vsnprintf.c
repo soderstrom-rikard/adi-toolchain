@@ -70,7 +70,7 @@ int vsnprintf(char *__restrict buf, size_t size,
 	}
 	return rv;
 }
-libc_hidden_def(vsnprintf)
+libc_hidden_weak(vsnprintf)
 
 #elif defined(__USE_OLD_VFPRINTF__)
 
@@ -127,7 +127,7 @@ int vsnprintf(char *__restrict buf, size_t size,
 	}
 	return rv;
 }
-libc_hidden_def(vsnprintf)
+libc_hidden_weak(vsnprintf)
 
 #elif defined(__UCLIBC_HAS_GLIBC_CUSTOM_STREAMS__)
 
@@ -207,7 +207,7 @@ int vsnprintf(char *__restrict buf, size_t size,
 
 	return rv;
 }
-libc_hidden_def(vsnprintf)
+libc_hidden_weak(vsnprintf)
 
 #else
 #warning Skipping vsnprintf since no buffering, no custom streams, and not old vfprintf!
