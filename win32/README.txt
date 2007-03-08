@@ -21,7 +21,7 @@ is certainly not an IDE, so do not expect some GUI system to help you edit code
 or manage your projects.  If you want something like that, there are plenty of
 options out there to satisfy you:
     - Eclipse: http://docs.blackfin.uclinux.org/doku.php?id=using_eclipse
-    - Visual DSP++: http://www.analog.com/en/epProd/0,2878,VISUALDSPBF,00.html
+    - VisualDSP++: http://www.analog.com/en/epProd/0,2878,VISUALDSPBF,00.html
     - Visual Studio: http://msdn.microsoft.com/vstudio/
 
 For some examples on how to use this toolchain, please see this wiki page:
@@ -29,6 +29,11 @@ For some examples on how to use this toolchain, please see this wiki page:
 
 For help using this toolchain, please use our toolchain forums:
     http://blackfin.uclinux.org/gf/project/toolchain/forum
+
+The installer takes care of changing your Windows PATH environment variables so
+they should show up automatically in new applications.  You should not need to
+change your environment yourself.  If you don't know what environment variables
+are, don't worry about as it's taken care of for you.
 
 You can find the release notes for our toolchain on our documentation wiki:
     http://docs.blackfin.uclinux.org/doku.php?id=toolchain_release_notes
