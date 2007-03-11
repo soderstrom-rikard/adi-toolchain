@@ -102,7 +102,7 @@ ___fixdfsi:
 	R3 = LSHIFT R0 BY R3.L;
 	R1 <<= R2;
 	R0 <<= R2;
-	R0 = R1 | R3;
+	R1 = R1 | R3;
 
 .check_sign:
 
@@ -110,8 +110,8 @@ ___fixdfsi:
 	// whether this is really a negative number.
 
 	CC = P0 < 0;		// Check sign
-	R1 = -R0;
-	IF CC R0 = R1;
+	R0 = -R1;
+	IF !CC R0 = R1;
 
 .ret_zero:
 	RTS;

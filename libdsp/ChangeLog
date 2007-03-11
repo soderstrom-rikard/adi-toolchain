@@ -1,3 +1,8 @@
+2007-03-11  Jie Zhang  <jie.zhang@analog.com>
+
+	* f64toi32z.asm (___fixdfsi): Put the result of left shifting
+	into R1.
+
 2006-05-26  Jie Zhang  <jie.zhang@analog.com>
 
 	* eqdf2.asm: Remove.
