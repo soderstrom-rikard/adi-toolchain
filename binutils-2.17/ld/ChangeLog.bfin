@@ -1,6 +1,6 @@
 2007-03-14  Jie Zhang  <jie.zhang@analog.com>
 
-	* emulparams/bfin.sh (OTHER_BSS_SYMBOLS): Define ___bss_start__.
+	* emulparams/bfin.sh (OTHER_BSS_SYMBOLS): Define ___bss_start.
 
 2007-02-15  Bernd Schmidt  <bernd.schmidt@analog.com>
 
