@@ -1,3 +1,11 @@
+2007-03-15  Jie Zhang  <jie.zhang@analog.com>
+
+	* scripttempl/elf.sc: Add ${USER_LABEL_PREFIX} before __bss_start.
+
+	Revert
+	2007-03-14  Jie Zhang  <jie.zhang@analog.com>
+	* emulparams/bfin.sh (OTHER_BSS_SYMBOLS): Define ___bss_start.
+
 2007-03-14  Jie Zhang  <jie.zhang@analog.com>
 
 	* emulparams/bfin.sh (OTHER_BSS_SYMBOLS): Define ___bss_start.
