@@ -1,3 +1,10 @@
+2007-03-15  Jie Zhang  <jie.zhang@analog.com>
+
+	* gcc.dg/cleanup-8.c: Enable this test on *-*-uclinux* target.
+	* gcc.dg/cleanup-9.c: Likewise.
+	* gcc.dg/cleanup-10.c: Likewise.
+	* gcc.dg/cleanup-11.c: Likewise.
+
 2007-02-12  Jie Zhang  <jie.zhang@analog.com>
 
 	* gcc.c-torture/execute/multi-ix.c: Disable the test if

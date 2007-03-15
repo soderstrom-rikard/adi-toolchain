@@ -1,3 +1,18 @@
+2007-03-15  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-tdep.c (P_SIGNAL_INS_1): Define to 0x00ADE128.
+	(P_RT_SIGNAL_INS_1): Remove.
+	(IS_SIGTRAMP): Define to the trampoline for rt_sigreturn.
+	(IS_RT_SIGTRAMP): Remove.
+	(SIGCONTEXT_OFFSET): Define to 168.
+	(UCONTEXT_OFFSET): Remove.
+	(bfin_linux_sigcontext_reg_offset): Adjust for the new struct
+	sigcontext.
+	(bfin_linux_ucontext_reg_offset): Remove.
+	(bfin_linux_pc_in_sigtramp): Don't use IS_RT_SIGTRAMP.
+	(bfin_linux_get_sigtramp_info): Don't use
+	bfin_linux_ucontext_reg_offset.
+
 2006-11-27  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* value.h (lookup_only_internalvar): New prototype.

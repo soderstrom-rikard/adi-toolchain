@@ -1686,12 +1686,12 @@ bfin*-elf*)
         use_collect2=no
         ;;  
 bfin*-uclinux*)
-	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h bfin/uclinux.h"
+	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h bfin/uclinux.h bfin/linux-unwind.h"
         tmake_file=bfin/t-bfin-uclinux
         use_collect2=no
         ;;  
 bfin*-linux-uclibc*)
-	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h linux.h bfin/linux.h"
+	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h linux.h bfin/linux.h bfin/linux-unwind.h"
         tmake_file="t-slibgcc-elf-ver bfin/t-bfin-linux"
         use_collect2=no
         ;;

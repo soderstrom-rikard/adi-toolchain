@@ -1,3 +1,9 @@
+2007-03-15  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/linux-unwind.h: New file.
+	* config/bfin/linux.h (MD_UNWIND_SUPPORT): Define.
+	* config/bfin/uclinux.h (MD_UNWIND_SUPPORT): Define.
+
 2007-03-12  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/linux.h (LINK_GCC_C_SEQUENCE_SPEC): Make sure

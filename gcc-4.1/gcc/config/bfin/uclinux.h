@@ -45,3 +45,5 @@ asm (TEXT_SECTION_ASM_OP);
   while (0)
 
 #define SUBTARGET_FDPIC_NOT_SUPPORTED
+
+#define MD_UNWIND_SUPPORT "config/bfin/linux-unwind.h"

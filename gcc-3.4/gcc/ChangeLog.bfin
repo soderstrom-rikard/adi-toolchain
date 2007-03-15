@@ -1,3 +1,9 @@
+2007-03-15  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/linux-unwind.h: New file.
+	* config.gcc (tm_file): Add bfin/linux-unwind.h for bfin*-uclinux*
+	and bfin*-linux-uclibc*.
+
 2007-03-12  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/linux.h (LINK_GCC_C_SEQUENCE_SPEC): Make sure
