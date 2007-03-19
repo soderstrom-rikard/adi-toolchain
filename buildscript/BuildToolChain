@@ -1080,6 +1080,10 @@ if [ "x$SKIP_ELF" = "x" ]; then
     ################ Step 1 - ELF Toolchain #########################
     cd $DIR_BINUTILS_BUILD
 
+    # Blackfin doesn't utilize xml memory maps so disable this for now
+    # to avoid the ABI differences between systems
+    export ac_cv_libexpat=no
+
     echo -n "*** Configuring Elf Binutils & GDB " ; date
     RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-elf \
         --prefix=$DIR_ELF_OUTPUT --without-newlib $BINUTILS_EXTRA_CONF"
@@ -1402,6 +1406,10 @@ if [ $KERNEL_SOURCE ] ; then
     ####################### Step 4 - build bfin-uclinux ################
     cd $DIR_BINUTILS_BUILD
 
+    # Blackfin doesn't utilize xml memory maps so disable this for now
+    # to avoid the ABI differences between systems
+    export ac_cv_libexpat=no
+
     echo -n "*** Configuring uClinux Binutils & GDB" ; date
     RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET \
          --target=bfin-uclinux --prefix=$DIR_uC_OUTPUT \
@@ -1480,6 +1488,10 @@ if [ $KERNEL_SOURCE ] ; then
     rm -rf $DIR_BINUTILS_BUILD
     mkdir $DIR_BINUTILS_BUILD
     cd $DIR_BINUTILS_BUILD
+
+    # Blackfin doesn't utilize xml memory maps so disable this for now
+    # to avoid the ABI differences between systems
+    export ac_cv_libexpat=no
 
     echo -n "*** Configuring linux-uclibc Binutils & GDB" ; date
     RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET \
