@@ -7,7 +7,6 @@ mainmenu "uClibc C Library Configuration"
 
 choice
 	prompt "Target Architecture"
-	default TARGET_i386
 	help
 	  Stuff
 
@@ -181,6 +180,11 @@ if TARGET_x86_64
 source "extra/Configs/Config.x86_64"
 endif
 
+config TARGET_SUBARCH
+	string
+	default "e500" if CONFIG_E500
+	default "classic" if CONFIG_CLASSIC
+	default ""
 
 source "extra/Configs/Config.in.arch"
 
@@ -1421,6 +1425,12 @@ config CROSS_COMPILER_PREFIX
 	  The prefix used to execute your cross-compiling toolchain.  For 
 	  example, if you run 'arm-linux-uclibc-gcc' to compile something, 
 	  then enter 'arm-linux-uclibc-' here.
+
+config UCLIBC_EXTRA_CFLAGS
+	string "Enter any extra CFLAGS to use to build uClibc"
+	default ""
+	help
+	  Add any additional CFLAGS to be used to build uClibc.
 
 config DODEBUG
 	bool "Build uClibc with debugging symbols"

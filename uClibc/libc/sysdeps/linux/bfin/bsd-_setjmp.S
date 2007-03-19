@@ -92,6 +92,6 @@ __setjmp:
 
 	R0 = [P0 + 0x20];
 	R1 = 0;
-	JUMP.L ___sigjmp_save; 
+	JUMP.L ___sigjmp_save;
 
 .size __setjmp,.-__setjmp

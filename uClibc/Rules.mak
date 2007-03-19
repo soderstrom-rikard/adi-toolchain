@@ -47,6 +47,10 @@ STRIP_FLAGS ?= -x -R .note -R .comment
 # Select the compiler needed to build binaries for your development system
 HOSTCC     = gcc
 BUILD_CFLAGS = -O2 -Wall
+export ARCH := $(shell uname -m | sed -e s/i.86/i386/ -e s/sun.*/sparc/ -e s/sparc.*/sparc/ \
+				  -e s/arm.*/arm/ -e s/sa110/arm/ -e s/sh.*/sh/ \
+				  -e s/s390x/s390/ -e s/parisc.*/hppa/ \
+				  -e s/ppc.*/powerpc/ -e s/mips.*/mips/ )
 
 
 #---------------------------------------------------------
@@ -62,6 +66,8 @@ endif
 # Make certain these contain a final "/", but no "//"s.
 TARGET_ARCH:=$(shell grep -s '^TARGET_ARCH' $(top_builddir)/.config | sed -e 's/^TARGET_ARCH=//' -e 's/"//g')
 TARGET_ARCH:=$(strip $(subst ",, $(strip $(TARGET_ARCH))))
+TARGET_SUBARCH:=$(shell grep -s '^TARGET_SUBARCH' $(top_builddir)/.config | sed -e 's/^TARGET_SUBARCH=//' -e 's/"//g')
+TARGET_SUBARCH:=$(strip $(subst ",, $(strip $(TARGET_SUBARCH))))
 RUNTIME_PREFIX:=$(strip $(subst //,/, $(subst ,/, $(subst ",, $(strip $(RUNTIME_PREFIX))))))
 DEVEL_PREFIX:=$(strip $(subst //,/, $(subst ,/, $(subst ",, $(strip $(DEVEL_PREFIX))))))
 KERNEL_HEADERS:=$(strip $(subst //,/, $(subst ,/, $(subst ",, $(strip $(KERNEL_HEADERS))))))
@@ -286,6 +292,8 @@ ifeq ($(TARGET_ARCH),powerpc)
 	PIEFLAG_NAME:=-fpie
 	PPC_HAS_REL16:=$(shell echo -e "\t.text\n\taddis 11,30,_GLOBAL_OFFSET_TABLE_-.@ha" | $(CC) -c -x assembler -o /dev/null -  2> /dev/null && echo -n y || echo -n n)
 	CPU_CFLAGS-$(PPC_HAS_REL16)+= -DHAVE_ASM_PPC_REL16
+	CPU_CFLAGS-$(CONFIG_E500) += "-D__NO_MATH_INLINES -D__NO_LONG_DOUBLE_MATH"
+
 endif
 
 ifeq ($(TARGET_ARCH),bfin)
@@ -344,6 +352,7 @@ XWARNINGS=$(subst ",, $(strip $(WARNINGS))) -Wstrict-prototypes -fno-strict-alia
 ifeq ($(EXTRA_WARNINGS),y)
 XWARNINGS+=-Wnested-externs -Wshadow -Wmissing-noreturn -Wmissing-format-attribute -Wformat=2
 XWARNINGS+=-Wmissing-prototypes -Wmissing-declarations
+XWARNINGS+=-Wnonnull -Wundef
 # works only w/ gcc-3.4 and up, can't be checked for gcc-3.x w/ check_gcc()
 #XWARNINGS+=-Wdeclaration-after-statement
 endif
@@ -363,6 +372,10 @@ endif
 CFLAGS := -include $(top_builddir)include/libc-symbols.h \
 	$(XWARNINGS) $(CPU_CFLAGS) $(SSP_CFLAGS) \
 	-fno-builtin -nostdinc -I$(top_builddir)include -I.
+
+ifneq ($(strip $(UCLIBC_EXTRA_CFLAGS)),"")
+CFLAGS += $(subst ",, $(UCLIBC_EXTRA_CFLAGS))
+endif
 
 LDADD_LIBFLOAT=
 ifeq ($(UCLIBC_HAS_SOFT_FLOAT),y)
@@ -389,8 +402,7 @@ ifneq ($(HAVE_SHARED),y)
 CFLAGS += -DSTATIC
 endif
 
-# only i386 is known to work if compile.S gets -D__ASSEMBLER__
-#CFLAGS += $(call check_gcc,-std=c99,)
+CFLAGS += $(call check_gcc,-std=gnu99,)
 
 LDFLAGS_NOSTRIP:=$(CPU_LDFLAGS-y) -shared --warn-common --warn-once -z combreloc
 # binutils-2.16.1 warns about ignored sections, 2.16.91.0.3 and newer are ok

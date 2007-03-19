@@ -20,15 +20,14 @@
    and invokes a function in the right context after its all over.  */
 
 #include <features.h>
-#include <asm/unistd.h>
-#define _ERRNO_H	1
+#include <sys/syscall.h>
+#define _ERRNO_H
 #include <bits/errno.h>
-#define _SYSCALL_H
 #include <bits/sysnum.h>
 
 
 #ifdef __HAVE_SHARED__ 
-#define PLTJMP(_x)	_x##@PLT
+#define PLTJMP(_x)	_x@PLT
 #else
 #define PLTJMP(_x)	_x
 #endif

@@ -79,7 +79,16 @@ extern char *_dl_debug;
 #include <ldso.h>
 
 #ifdef __SUPPORT_LD_DEBUG__
+/* Needed for 'strstr' prototype' */
+#include <string.h>
 char *_dl_debug  = 0;
+char *_dl_debug_symbols   = 0;
+char *_dl_debug_move      = 0;
+char *_dl_debug_reloc     = 0;
+char *_dl_debug_detail    = 0;
+char *_dl_debug_nofixups  = 0;
+char *_dl_debug_bindings  = 0;
+int   _dl_debug_file      = 2;
 #endif
 
 const char *_dl_progname       = "";        /* Program name */
@@ -187,7 +196,24 @@ void *dlopen(const char *libname, int flag)
 		_dl_symbol_tables = (struct dyn_elf *) _dl_malloc(sizeof(struct dyn_elf));
 		_dl_memset(_dl_symbol_tables, 0, sizeof(struct dyn_elf));
 	}
+# ifdef __SUPPORT_LD_DEBUG__
+	_dl_debug = getenv("LD_DEBUG");
+	if (_dl_debug) {
+		if (_dl_strstr(_dl_debug, "all")) {
+			_dl_debug_detail = _dl_debug_move = _dl_debug_symbols
+				= _dl_debug_reloc = _dl_debug_bindings = _dl_debug_nofixups = (void*)1;
+		} else {
+			_dl_debug_detail   = strstr(_dl_debug, "detail");
+			_dl_debug_move     = strstr(_dl_debug, "move");
+			_dl_debug_symbols  = strstr(_dl_debug, "sym");
+			_dl_debug_reloc    = strstr(_dl_debug, "reloc");
+			_dl_debug_nofixups = strstr(_dl_debug, "nofix");
+			_dl_debug_bindings = strstr(_dl_debug, "bind");
+		}
+	}
+# endif	
 #endif
+
 	_dl_map_cache();
 
 	/*
@@ -213,6 +239,11 @@ void *dlopen(const char *libname, int flag)
 	now_flag = (flag & RTLD_NOW) ? RTLD_NOW : 0;
 	if (getenv("LD_BIND_NOW"))
 		now_flag = RTLD_NOW;
+
+#ifndef SHARED
+	/* When statically linked, the _dl_library_path is not yet initialized */
+	_dl_library_path = getenv("LD_LIBRARY_PATH");
+#endif	
 
 	/* Try to load the specified library */
 	_dl_if_debug_print("Trying to dlopen '%s', RTLD_GLOBAL:%d RTLD_NOW:%d\n",
@@ -274,35 +305,30 @@ void *dlopen(const char *libname, int flag)
 
 				tpnt1->rtld_flags |= (flag & RTLD_GLOBAL);
 
-				if (tpnt1->usage_count == 1) {
-					tpnt1->init_flag |= DL_OPENED;
-					/* This list is for dlsym() and relocation */
-					dyn_ptr->next = (struct dyn_elf *) malloc(sizeof(struct dyn_elf));
-					_dl_memset (dyn_ptr->next, 0, sizeof (struct dyn_elf));
-					dyn_ptr = dyn_ptr->next;
-					dyn_ptr->dyn = tpnt1;
-				}
-				if (tpnt1->init_flag & DL_OPENED) {
-					/* Used to record RTLD_LOCAL scope */
-					tmp = alloca(sizeof(struct init_fini_list));
-					tmp->tpnt = tpnt1;
-					tmp->next = runp->tpnt->init_fini;
-					runp->tpnt->init_fini = tmp;
+				/* This list is for dlsym() and relocation */
+				dyn_ptr->next = (struct dyn_elf *) malloc(sizeof(struct dyn_elf));
+				_dl_memset (dyn_ptr->next, 0, sizeof (struct dyn_elf));
+				dyn_ptr = dyn_ptr->next;
+				dyn_ptr->dyn = tpnt1;
+				/* Used to record RTLD_LOCAL scope */
+				tmp = alloca(sizeof(struct init_fini_list));
+				tmp->tpnt = tpnt1;
+				tmp->next = runp->tpnt->init_fini;
+				runp->tpnt->init_fini = tmp;
 
-					for (tmp=dep_list; tmp; tmp = tmp->next) {
-						if (tpnt1 == tmp->tpnt) { /* if match => cirular dependency, drop it */
-							_dl_if_debug_print("Circular dependency, skipping '%s',\n",
-									tmp->tpnt->libname);
-							tpnt1->usage_count--;
-							break;
-						}
+				for (tmp=dep_list; tmp; tmp = tmp->next) {
+					if (tpnt1 == tmp->tpnt) { /* if match => cirular dependency, drop it */
+						_dl_if_debug_print("Circular dependency, skipping '%s',\n",
+								   tmp->tpnt->libname);
+						tpnt1->usage_count--;
+						break;
 					}
-					if (!tmp) { /* Don't add if circular dependency detected */
-						runp2->next = alloca(sizeof(*runp));
-						runp2 = runp2->next;
-						runp2->tpnt = tpnt1;
-						runp2->next = NULL;
-					}
+				}
+				if (!tmp) { /* Don't add if circular dependency detected */
+					runp2->next = alloca(sizeof(*runp));
+					runp2 = runp2->next;
+					runp2->tpnt = tpnt1;
+					runp2->next = NULL;
 				}
 			}
 		}
@@ -484,7 +510,10 @@ void *dlsym(void *vhandle, const char *name)
 		}
 	}
 
-	ret = _dl_find_hash(name2, handle, NULL, ELF_RTYPE_CLASS_DLSYM);
+	tpnt = NULL;
+	if (handle == _dl_symbol_tables)
+	   tpnt = handle->dyn; /* Only search RTLD_GLOBAL objs if global object */
+	ret = _dl_find_hash(name2, handle, tpnt, ELF_RTYPE_CLASS_DLSYM);
 
 	/*
 	 * Nothing found.

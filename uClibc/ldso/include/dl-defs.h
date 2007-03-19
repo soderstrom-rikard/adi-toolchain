@@ -219,4 +219,9 @@ typedef struct {
 # define DL_MAP_SEGMENT(EPNT, PPNT, INFILE, FLAGS) 0
 #endif
 
+/* An alignment value for a memory block returned by _dl_malloc. */
+#ifndef DL_MALLOC_ALIGN
+# define DL_MALLOC_ALIGN (__WORDSIZE / 8)
+#endif
+
 #endif	/* _LD_DEFS_H */

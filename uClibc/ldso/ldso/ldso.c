@@ -79,11 +79,12 @@ rtld_hidden_proto (_dl_debug_state, noinline);
  * can set an internal breakpoint on it, so that we are notified when the
  * address mapping is changed in some way.
  */
-void _dl_debug_state()
+void _dl_debug_state(void)
 {
 	/* Make sure GCC doesn't recognize this function as pure, to avoid
-	   having the calls optimized away.  */
-	asm ("");
+	   having the calls optimized away.
+	 */
+	__asm__ ("");
 }
 
 static unsigned char *_dl_malloc_addr = 0;	/* Lets _dl_malloc use the already allocated memory page */
@@ -149,6 +150,7 @@ void _dl_get_ready_to_run(struct elf_resolve *tpnt, DL_LOADADDR_TYPE load_addr,
 	unsigned long *_dl_envp;		/* The environment address */
 	ElfW(Addr) relro_addr = 0;
 	size_t relro_size = 0;
+	struct stat st;
 
 	/* Wahoo!!! We managed to make a function call!  Get malloc
 	 * setup so we can use _dl_dprintf() to print debug noise
@@ -451,7 +453,7 @@ void _dl_get_ready_to_run(struct elf_resolve *tpnt, DL_LOADADDR_TYPE load_addr,
 					else
 #endif
 					{
-						_dl_dprintf(_dl_debug_file, "%s: can't load " "library '%s'\n", _dl_progname, str);
+						_dl_dprintf(2, "%s: can't load " "library '%s'\n", _dl_progname, str);
 						_dl_exit(15);
 					}
 				} else {
@@ -494,7 +496,7 @@ void _dl_get_ready_to_run(struct elf_resolve *tpnt, DL_LOADADDR_TYPE load_addr,
 		}
 
 		if ((fd = _dl_open(LDSO_PRELOAD, O_RDONLY, 0)) < 0) {
-			_dl_dprintf(_dl_debug_file, "%s: can't open file '%s'\n",
+			_dl_dprintf(2, "%s: can't open file '%s'\n",
 				    _dl_progname, LDSO_PRELOAD);
 			break;
 		}
@@ -503,7 +505,7 @@ void _dl_get_ready_to_run(struct elf_resolve *tpnt, DL_LOADADDR_TYPE load_addr,
 					     PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
 		_dl_close(fd);
 		if (preload == (caddr_t) -1) {
-			_dl_dprintf(_dl_debug_file, "%s:%i: can't map '%s'\n",
+			_dl_dprintf(2, "%s:%i: can't map '%s'\n",
 				    _dl_progname, __LINE__, LDSO_PRELOAD);
 			break;
 		}
@@ -542,7 +544,7 @@ void _dl_get_ready_to_run(struct elf_resolve *tpnt, DL_LOADADDR_TYPE load_addr,
 				else
 #endif
 				{
-					_dl_dprintf(_dl_debug_file, "%s: can't load library '%s'\n", _dl_progname, cp2);
+					_dl_dprintf(2, "%s: can't load library '%s'\n", _dl_progname, cp2);
 					_dl_exit(15);
 				}
 			} else {
@@ -595,7 +597,7 @@ void _dl_get_ready_to_run(struct elf_resolve *tpnt, DL_LOADADDR_TYPE load_addr,
 					} else
 #endif
 					{
-						_dl_dprintf(_dl_debug_file, "%s: can't load library '%s'\n", _dl_progname, lpntstr);
+						_dl_dprintf(2, "%s: can't load library '%s'\n", _dl_progname, lpntstr);
 						_dl_exit(16);
 					}
 				}
@@ -683,6 +685,10 @@ void _dl_get_ready_to_run(struct elf_resolve *tpnt, DL_LOADADDR_TYPE load_addr,
 					      (unsigned long)tpnt->dynamic_addr,
 					      0);
 
+		if (_dl_stat(tpnt->libname, &st) >= 0) {
+			tpnt->st_dev = st.st_dev;
+			tpnt->st_ino = st.st_ino;
+		} 
 		tpnt->n_phent = epnt->e_phnum;
 		tpnt->ppnt = myppnt;
 		for (j = 0; j < epnt->e_phnum; j++, myppnt++) {
@@ -874,14 +880,6 @@ static int _dl_suid_ok(void)
 	return 0;
 }
 
-union __align_type
-{
-  long long ll;
-  double d;
-  void *p;
-  void (*fp)(void);
-};
-
 void *_dl_malloc(size_t size)
 {
 	void *retval;
@@ -915,7 +913,7 @@ void *_dl_malloc(size_t size)
 		_dl_mmap_zero = _dl_malloc_addr = _dl_mmap((void *) 0, rounded_size,
 				PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 		if (_dl_mmap_check_error(_dl_mmap_zero)) {
-			_dl_dprintf(_dl_debug_file, "%s: mmap of a spare page failed!\n", _dl_progname);
+			_dl_dprintf(2, "%s: mmap of a spare page failed!\n", _dl_progname);
 			_dl_exit(20);
 		}
 	}
@@ -923,18 +921,11 @@ void *_dl_malloc(size_t size)
 	_dl_malloc_addr += size;
 
 	/*
-	 * Align memory to the maximum alignment required for any type
-	 * in the target platform.  Some platforms require this,
-	 * others simply get better performance.
+	 * Align memory to DL_MALLOC_ALIGN byte boundary.  Some
+	 * platforms require this, others simply get better
+	 * performance.
 	 */
-	{
-	    int align = __alignof__(union __align_type);
-	    if (align < sizeof (size_t))
-		align = sizeof (size_t);
-	    align--;
-	    _dl_malloc_addr = (unsigned char *)
-		(((unsigned long) _dl_malloc_addr + align) & ~align);
-	}
+	_dl_malloc_addr = (unsigned char *) (((unsigned long) _dl_malloc_addr + DL_MALLOC_ALIGN - 1) & ~(DL_MALLOC_ALIGN - 1));
 	return retval;
 }
 
