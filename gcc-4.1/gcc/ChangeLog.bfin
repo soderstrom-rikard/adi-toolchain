@@ -1,5 +1,10 @@
 2007-03-22  Jie Zhang  <jie.zhang@analog.com>
 
+	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): Define
+	__NO_BUILTIN if -fno-builtin.
+
+2007-03-22  Jie Zhang  <jie.zhang@analog.com>
+
 	* config/bfin/bfin.md (composev2hi): Put operands into vector
 	with correct order.
 
