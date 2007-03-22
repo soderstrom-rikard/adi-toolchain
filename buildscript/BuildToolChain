@@ -758,6 +758,11 @@ build_gcc ()
         ln $3/bin/bfin-$2-g++$EXEEXT $3/bin/bfin-$2-g++-$VERSION$EXEEXT
         ln $3/bin/bfin-$2-c++$EXEEXT $3/bin/bfin-$2-c++-$VERSION$EXEEXT
     fi
+
+    # make sure the tcl baggage that comes with insight doesnt pollute our PATH.
+    # note this isnt an issue as insight statically links in all of the TCL stuff
+    # it actually needs and does not use these binaries at runtime.
+    rm -f $3/bin/tclsh* $3/bin/wish*
 }
 
 # If $1 is newer than $2, return 1. Otherwise, return 0.
