@@ -1,0 +1,5 @@
+2007-03-23  Jie Zhang  <jie.zhang@analog.com>
+
+	* itk/Makefile.in (install-libraries): Depends on installdirs.
+	* itcl/Makefile.in (install-libraries): Likewise.
+
