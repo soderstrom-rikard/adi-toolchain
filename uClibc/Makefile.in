@@ -262,7 +262,6 @@ ifeq ($(UCLIBC_FORMAT_SHARED_FLAT),y)
 			  $(PREFIX)$(DEVEL_PREFIX)lib/$(MULTILIB); \
 		fi; \
 	done
-	$(INSTALL) -m 755 lib/libc.gdb $(PREFIX)$(RUNTIME_PREFIX)lib/lib1.so
 endif
 
 # Installs run-time libraries
@@ -278,6 +277,10 @@ ifeq ($(HAVE_SHARED),y)
 		$(INSTALL) -m 755 lib/$(UCLIBC_LDSO_NAME)-$(MAJOR_VERSION).$(MINOR_VERSION).$(SUBLEVEL).so \
 			$(PREFIX)$(RUNTIME_PREFIX)lib; \
 	fi
+endif
+ifeq ($(UCLIBC_FORMAT_SHARED_FLAT),y)
+	$(INSTALL) -d $(PREFIX)$(RUNTIME_PREFIX)lib
+	$(INSTALL) -m 755 lib/libc.gdb $(PREFIX)$(RUNTIME_PREFIX)lib/lib1.so
 endif
 
 utils:
