@@ -126,8 +126,8 @@ test:
 	$(TCLSH_PROG) `@CYGPATH@ $(srcdir)/tests/all.tcl` \
 		-exedir `@CYGPATH@ $(TK_SRC_DIR)/unix` $(TESTFLAGS)
 
-install-libraries:
-	@$(MKINSTALLDIRS) $(SCRIPT_INSTALL_DIR) $(LIB_INSTALL_DIR)
+install-libraries: installdirs
+	@$(MKINSTALLDIRS) $(LIB_INSTALL_DIR)
 	@rm -f $(LIB_INSTALL_DIR)/iwidgets
 # REDHAT LOCAL
 #	$(LN_S) $(SCRIPT_INSTALL_DIR) $(LIB_INSTALL_DIR)/iwidgets
@@ -144,7 +144,7 @@ install-libraries:
 	    $(INSTALL_DATA) $$i $(SCRIPT_INSTALL_DIR); \
 	    done;
 
-install-demos:
+install-demos: installdirs
 	@$(MKINSTALLDIRS) $(SCRIPT_INSTALL_DIR)/demos/images $(SCRIPT_INSTALL_DIR)/demos/html
 	@echo "Installing demos from $(srcdir)/demos into $(SCRIPT_INSTALL_DIR)/demos"
 	@for i in $(srcdir)/demos/*; \
@@ -168,7 +168,7 @@ install-demos:
 	    fi; \
 	    done;
 
-install-doc:
+install-doc: installdirs
 	@$(MKINSTALLDIRS) $(MAN_INSTALL_DIR)
 	@echo "Installing man pages from $(TOP_DIR)/doc into $(MAN_INSTALL_DIR)"
 	@cd $(TOP_DIR)/doc; for i in *.n; \
@@ -180,6 +180,9 @@ install-doc:
 	    chmod 444 $(MAN_INSTALL_DIR)/`basename iwidgets_$$i`; \
 	    done;
 	$(INSTALL_DATA) $(srcdir)/license.terms $(SCRIPT_INSTALL_DIR)
+
+installdirs:
+	$(MKINSTALLDIRS) $(SCRIPT_INSTALL_DIR)
 
 Makefile: $(srcdir)/Makefile.in
 	$(SHELL) config.status
@@ -195,5 +198,8 @@ depend:
 
 configure: configure.in
 	autoconf
+
+.PHONY: info all install test install-libraries install-demos install-doc \
+installdirs clean depend distclean
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
