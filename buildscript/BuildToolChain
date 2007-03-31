@@ -287,7 +287,9 @@ fi
 echo -n "Building gcc versions $GCC_VERSIONS "
 
 if [ -z "$BFIN_LANGS" ] ; then 
-    BFIN_LANGS=" --enable-languages=c,c++"
+    # Don't set a default here ... let the build system
+    # figure out the defaults by loading all languages.
+    #BFIN_LANGS=" --enable-languages=c,c++"
     echo
 else
     echo $BFIN_LANGS
@@ -689,13 +691,16 @@ build_gcc ()
             ls -ld $DIR_GCC_SOURCE
             exit 1
         fi
+        EXTRA_GCC_CONF="--enable-languages=c,c++"
+    else
+        EXTRA_GCC_CONF=""
     fi
 
     cd $DIR_GCC_BUILD
 
     echo -n "*** Configuring GCC                " ; date
     RUN="$DIR_GCC_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-$2 \
-      --prefix=$3 $4 --disable-libstdcxx-pch $BFIN_LANGS \
+      --prefix=$3 $4 --disable-libstdcxx-pch $BFIN_LANGS $EXTRA_GCC_CONF \
       --disable-symvers --disable-libssp \
       --enable-version-specific-runtime-libs --enable-__cxa_atexit"
 
