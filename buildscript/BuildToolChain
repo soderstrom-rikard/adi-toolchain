@@ -1395,14 +1395,24 @@ if [ $KERNEL_SOURCE ] ; then
 
     ######################### Done with uClibc ###########################
 
+    echo -n "*** Building uClibc host utils     " ; date
+    RUN="$MAKE -C utils hostutils $ARGS"
+    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    mkdir -p $DIR_ELF_OUTPUT/bin $DIR_uC_OUTPUT/bin $DIR_LINUX_OUTPUT/bin
+    for RUN in ldconfig ldd ; do
+        cp utils/${RUN}.host $DIR_ELF_OUTPUT/bin/bfin-elf-${RUN} || exit 1
+        cp utils/${RUN}.host $DIR_uC_OUTPUT/bin/bfin-uclinux-${RUN} || exit 1
+        cp utils/${RUN}.host $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-${RUN} || exit 1
+    done
+
     mkdir -p $DIR_uC_OUTPUT/bfin-uclinux/runtime
     mkdir -p $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime
     cp -r $DIR_KBUILD_OUTPUT/usr $DIR_uC_OUTPUT/bfin-uclinux/runtime || exit 1
     cp -r $DIR_KBUILD_OUTPUT/usr $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime || exit 1
 
     if [ "$DIR_KBUILD_OUTPUT" != "$KERNEL_SOURCE" ]; then
-	echo -n "*** Cleaning kernel                " ; date
-	rm -rf "$DIR_KBUILD_OUTPUT"
+        echo -n "*** Cleaning kernel                " ; date
+        rm -rf "$DIR_KBUILD_OUTPUT"
     fi
 
     echo -n "*** Cleaning uClibc                " ; date
