@@ -1,5 +1,5 @@
 /* memcpy.S
- * Copyright (C) 2003, 2005, 2006 Analog Devices Inc., All Rights Reserved.
+ * Copyright (C) 2003-2007 Analog Devices Inc., All Rights Reserved.
  *
  * This file is subject to the terms and conditions of the GNU Library General
  * Public License. See the file "COPYING.LIB" in the main directory of this
@@ -8,6 +8,8 @@
  * Non-LGPL License also available as part of VisualDSP++
  * http://www.analog.com/processors/resources/crosscore/visualDspDevSoftware.html
  */
+
+#include <sysdep.h>
 
 /* void *memcpy(void *dest, const void *src, size_t n);
  * R0 = To Address (dest) (leave unchanged to form result)
@@ -21,56 +23,99 @@
 
 .align 2
 
-	/* We have to bypass the libc-symbols.h machinery to make sure we get
-	   a weak symbol for memcpy (some crummy gcc tests want to redefine
-	   it).  */
+/* We have to bypass the libc-symbols.h machinery to make sure we get
+ * a weak symbol for memcpy (some crummy gcc tests want to redefine it).
+ */
 .global ___GI_memcpy
 .type ___GI_memcpy, STT_FUNC
 ___GI_memcpy:
-	[--SP] = P3;
-	P0 = R0;              // P0 = To address
-	P3 = R1;              // P3 = From Address
-	P2 = R2 ;             // P2 = count
-	CC = R2 <= 7(IU);
-	IF CC JUMP  too_small;
-	I0 = R1;
-	R3 = R1 | R0;         // OR addresses together
-	R3 <<= 30;            // check bottom two bits
-	CC =  AZ;             // AZ set if zero.
-	IF !CC JUMP  bytes ;  // Jump if addrs not aligned.
-	P1 = P2 >> 2;         // count = n/4
-	P1 += -1;
-	R3 =  3;
-	R2 = R2 & R3;         // remainder
-	P2 = R2;              // set remainder
-	R1 = [I0++];
-#if !defined(__WORKAROUND_AVOID_DAG1)
-	LSETUP (quad_loop , quad_loop) LC0=P1;
-quad_loop:		MNOP || [P0++] = R1 || R1 = [I0++];
-#else
-	LSETUP (quad_loop_s , quad_loop_e) LC0=P1;
-quad_loop_s:	[P0++] = R1;
-quad_loop_e:	R1 = [I0++];
-#endif
-	[P0++] = R1;
+	CC = R2 <=  0;	/* length not positive? */
+	IF CC JUMP .L_P1L2147483647;	/* Nothing to do */
 
-	CC = P2 == 0;         // any remaining bytes?
-	P3 = I0;	      // Ammend P3 for remaining copy
-	IF !CC JUMP bytes;
-	P3 = [SP++];
+	P0 = R0 ;	/* dst*/
+	P1 = R1 ;	/* src*/
+	P2 = R2 ;	/* length */
+
+	/* check for overlapping data */
+	CC = R1 < R0;	/* src < dst */
+	IF !CC JUMP .Lno_overlap;
+	R3 = R1 + R2;
+	CC = R0 < R3;	/* and dst < src+len */
+	IF CC JUMP .Lhas_overlap;
+
+.Lno_overlap:
+	/* Check for aligned data.*/
+
+	R3 = R1 | R0;
+	R0 = 0x3;
+	R3 = R3 & R0;
+	CC = R3;	/* low bits set on either address? */
+	IF CC JUMP .Lnot_aligned;
+
+	/* Both addresses are word-aligned, so we can copy
+	at least part of the data using word copies.*/
+	P2 = P2 >> 2;
+	CC = P2 <= 2;
+	IF !CC JUMP .Lmore_than_seven;
+	/* less than eight bytes... */
+	P2 = R2;
+	LSETUP(.Lthree_start, .Lthree_end) LC0=P2;
+	R0 = R1;	/* setup src address for return */
+.Lthree_start:
+	R3 = B[P1++] (X);
+.Lthree_end:
+	B[P0++] = R3;
+
 	RTS;
 
-too_small:
-	CC = P2 == 0;           //Check zero count
-	IF CC JUMP finished;    // very unlikely
+.Lmore_than_seven:
+	/* There's at least eight bytes to copy. */
+	P2 += -1;	/* because we unroll one iteration */
+	LSETUP(.Lword_loop, .Lword_loop) LC0=P2;
+	R0 = R1;
+	I1 = P1;
+	R3 = [I1++];
+.Lword_loop:
+	MNOP || [P0++] = R3 || R3 = [I1++];
 
-bytes:
-	LSETUP (byte_loop_s , byte_loop_e) LC0=P2;
-byte_loop_s:	R1 = B[P3++](Z);
-byte_loop_e:	B[P0++] = R1;
+	[P0++] = R3;
+	/* Any remaining bytes to copy? */
+	R3 = 0x3;
+	R3 = R2 & R3;
+	CC = R3 == 0;
+	P1 = I1;	/* in case there's something left, */
+	IF !CC JUMP .Lbytes_left;
+	RTS;
+.Lbytes_left:	P2 = R3;
+.Lnot_aligned:
+	/* From here, we're copying byte-by-byte. */
+	LSETUP (.Lbyte_start, .Lbyte_end) LC0=P2;
+	R0 = R1;	/* Save src address for return */
+.Lbyte_start:
+	R1 = B[P1++] (X);
+.Lbyte_end:
+	B[P0++] = R1;
 
-finished:
-	P3 = [SP++];
+.L_P1L2147483647:
+	RTS;
+
+.Lhas_overlap:
+	/* Need to reverse the copying, because the
+	 * dst would clobber the src.
+	 * Don't bother to work out alignment for
+	 * the reverse case.
+	 */
+	R0 = R1;	/* save src for later. */
+	P0 = P0 + P2;
+	P0 += -1;
+	P1 = P1 + P2;
+	P1 += -1;
+	LSETUP(.Lover_start, .Lover_end) LC0=P2;
+.Lover_start:
+	R1 = B[P1--] (X);
+.Lover_end:
+	B[P0--] = R1;
+
 	RTS;
 .size ___GI_memcpy,.-___GI_memcpy
 
