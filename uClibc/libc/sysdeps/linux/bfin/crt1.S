@@ -53,7 +53,7 @@ Cambridge, MA 02139, USA.  */
 
 __start:
 
-#if defined(__BFIN_FDPIC__) && !defined(__pie__)
+#if defined(__BFIN_FDPIC__) && !defined(L_Scrt1)
 	/* P0 contains a pointer to the program's load map.  */
 	call	.Lcall;
 .Lcall:
