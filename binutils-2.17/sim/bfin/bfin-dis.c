@@ -53,7 +53,7 @@ struct store {
   bu32 val;
 };
 
-struct store stores[10];
+struct store stores[20];
 int n_stores;
 
 #define STORE(X,Y) do { \
@@ -568,9 +568,13 @@ get_allreg (int grp, int reg)
     }
 }
 
-/* Perform a multiplication, sign- or zero-extending the result to 64 bit.  */
+/* Perform a multiplication of D registers SRC0 and SRC1, sign- or
+   zero-extending the result to 64 bit.  H0 and H1 determine whether the
+   high part or the low part of the source registers is used.  Store 1 in
+   *PSAT if saturation occurs, 0 otherwise.  */
 static bu64
-decode_multfunc (int h0, int h1, int src0, int src1, int mmod, int MM)
+decode_multfunc (int h0, int h1, int src0, int src1, int mmod, int MM,
+		 int *psat)
 {
   bu32 s0 = DREG (src0), s1 = DREG (src1);
   bu32 sgn0, sgn1;
@@ -612,10 +616,11 @@ decode_multfunc (int h0, int h1, int src0, int src1, int mmod, int MM)
 
   val = s0 * s1;
   /* Perform shift correction if appropriate for the mode.  */
+  *psat = 0;
   if (mmod == 0 || mmod == M_T || mmod == M_S2RND)
     {
       if (val == 0x40000000)
-	val = 0x7fffffff;
+	val = 0x7fffffff, *psat = 1;
       else
 	val <<= 1;
     }
@@ -759,7 +764,8 @@ decode_macfunc (int which, int op, int h0, int h1, int src0, int src1,
 {
   bu32 *ax, *aw;
   bu64 acc;
- 
+  int sat = 0;
+
   ax = which ? &A1XREG : &A0XREG;
   aw = which ? &A1WREG : &A0WREG;
   acc = (((bu64)*ax << 32) | ((bu64)*aw)) & 0xFFFFFFFFFFull;
@@ -771,8 +777,8 @@ decode_macfunc (int which, int op, int h0, int h1, int src0, int src1,
 
   if (op != 3)
     {
-      bu64 res = decode_multfunc (h0, h1, src0, src1, mmod, MM);
-
+      bu64 res = decode_multfunc (h0, h1, src0, src1, mmod, MM,
+				  &sat);
       /* Perform accumulation.  */
       switch (op)
 	{
@@ -796,15 +802,15 @@ decode_macfunc (int which, int op, int h0, int h1, int src0, int src1,
 	case M_ISS2:
 	case M_S2RND:
 	  if ((bs64)acc < -0x8000000000ll)
-	    acc = -0x8000000000ull;
+	    acc = -0x8000000000ull, sat = 1;
 	  else if ((bs64)acc >= 0x7fffffffffll)
-	    acc = 0x7fffffffffull;
+	    acc = 0x7fffffffffull, sat = 1;
 	  break;
 	case M_TFU:
 	case M_FU:
 	case M_IU:
 	  if (acc > 0xFFFFFFFFFFull)
-	    acc = 0xFFFFFFFFFFull;
+	    acc = 0xFFFFFFFFFFull, sat = 1;
 	  break;
 	default:
 	  abort ();
@@ -815,11 +821,15 @@ decode_macfunc (int which, int op, int h0, int h1, int src0, int src1,
     {
       STORE (A1XREG, (acc >> 32) & 0xff);
       STORE (A1WREG, acc & 0xffffffff);
+      STORE (saved_state.av1, sat);
+      STORE (saved_state.av1s, saved_state.av1s | sat);
     }
   else
     {
       STORE (A0XREG, (acc >> 32) & 0xff);
       STORE (A0WREG, acc & 0xffffffff);
+      STORE (saved_state.av0, sat);
+      STORE (saved_state.av0s, saved_state.av0s | sat);
     }
 
   return extract_mult (acc, mmod, fullword);
@@ -2241,13 +2251,19 @@ decode_dsp32mult_0 (bu16 iw0, bu16 iw1, bu32 pc)
 
   if (w1)
     {
-      bu64 r = decode_multfunc (h01, h11, src0, src1, mmod, MM);
+      int sat;
+      bu64 r = decode_multfunc (h01, h11, src0, src1, mmod, MM, &sat);
+      STORE (saved_state.av1, sat);
+      STORE (saved_state.av1s, saved_state.av1s | sat);
       res1 = extract_mult (r, mmod, P);
     }
 
   if (w0)
     {
-      bu64 r = decode_multfunc (h00, h10, src0, src1, mmod, 0);
+      int sat;
+      bu64 r = decode_multfunc (h00, h10, src0, src1, mmod, 0, &sat);
+      STORE (saved_state.av0, sat);
+      STORE (saved_state.av0s, saved_state.av0s | sat);
       res0 = extract_mult (r, mmod, P);
     }
 
@@ -2410,8 +2426,6 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       saved_state.a1x = saved_state.a0x;
       saved_state.a1w = saved_state.a0w;
     }
-  else if (aop == 1 && HL == 0 && aopcde == 11)
-    unhandled_instruction ("dregs_lo = (A0 += A1)");
   else if (aop == 3 && HL == 0 && aopcde == 16)
     unhandled_instruction ("A1 = ABS A1, A0 = ABS A0");
   else if (aop == 0 && aopcde == 23 && HL == 1)
@@ -2435,8 +2449,6 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       setflags_nz_2x16 (DREG (dst0));
       saved_state.v = 0;
     }
-  else if (aop == 1 && HL == 1 && aopcde == 11)
-    unhandled_instruction ("dregs_hi = (A0 += A1)");
   else if (aop == 2 && aopcde == 11 && s == 0)
     unhandled_instruction ("A0 += A1");
   else if (aop == 2 && aopcde == 11 && s == 1)
@@ -2499,8 +2511,42 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
 	unhandled_instruction
 	  ("dregs = dregs +|+ dregs, dregs = dregs -|- dregs (amod0, amod2)");
     }
+  else if (aop == 1 && HL == 0 && aopcde == 11)
+    unhandled_instruction ("dregs_lo = (A0 += A1)");
+  else if (aop == 1 && HL == 1 && aopcde == 11)
+    unhandled_instruction ("dregs_hi = (A0 += A1)");
   else if (aop == 0 && aopcde == 11)
-    unhandled_instruction ("dregs = (A0 += A1)");
+    { 
+      bu64 acc0 = saved_state.a0x;
+      bu64 acc1 = saved_state.a1x;
+      /* Sign extend accumulator values before adding.  */
+      if (acc0 & 0x80)
+	acc0 |= -0x80;
+      else
+	acc0 &= 0xFF;
+      if (acc1 & 0x80)
+	acc1 |= -0x80;
+      else
+	acc1 &= 0xFF;
+      acc0 <<= 32;
+      acc0 |= saved_state.a0w;
+      acc1 <<= 32;
+      acc1 |= saved_state.a1w;
+      acc0 += acc1;
+
+      if ((bs64)acc0 < -0x8000000000ll)
+	acc0 = -0x8000000000ull;
+      else if ((bs64)acc0 >= 0x7fffffffffll)
+	acc0 = 0x7fffffffffull;
+      STORE (A0XREG, (acc0 >> 32) & 0xff);
+      STORE (A0WREG, acc0 & 0xffffffff);
+      if ((bs64)acc0 < -0x80000000ll)
+	STORE (DREG (dst0), 0x80000000);
+      else if ((bs64)acc0 > 0x7fffffff)
+	STORE (DREG (dst0), 0x7fffffff);
+      else
+	STORE (DREG (dst0), acc0);
+    }
   else if (aop == 0 && aopcde == 10)
     {
       DREG (dst0) &= 0xFFFF0000;
@@ -2846,12 +2892,55 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
     }
   else if (sop == 2 && sopcde == 3 && HLs == 1)
     unhandled_instruction ("A1 = ROT A1 BY imm6");
-  else if (sop == 0 && sopcde == 3 && HLs == 0)
-    unhandled_instruction ("A0 = A0 << imm6");
-  else if (sop == 0 && sopcde == 3 && HLs == 1)
-    unhandled_instruction ("A1 = A1 << imm6");
-  else if (sop == 1 && sopcde == 3 && HLs == 0)
-    unhandled_instruction ("A0 = A0 >> imm6");
+  else if (sop == 0 && sopcde == 3 && bit8 == 0)
+    unhandled_instruction ("An = An << imm6");
+  else if (sop == 0 && sopcde == 3 && bit8 == 1)
+    {
+      bu64 acc = HLs ? saved_state.a1x : saved_state.a0x;
+      /* Arithmetic shift, so shift in sign bit copies.  */
+      if (acc & 0x80)
+	acc |= -0x100;
+      else
+	acc &= 0xFF;
+      acc <<= 32;
+      acc |= HLs ? saved_state.a1w : saved_state.a0w;
+      acc >>= uimm5 (newimmag);
+      /* Sign extend again.  */
+      if (acc & (1ULL << 39))
+	acc |= -(1ULL << 39);
+      else
+	acc &= ~(-(1ULL << 39));
+      if (HLs)
+	{
+	  STORE (A1XREG, acc >> 32);
+	  STORE (A1WREG, acc & 0xFFFFFFFF);
+	}
+      else
+	{
+	  STORE (A0XREG, acc >> 32);
+	  STORE (A0WREG, acc & 0xFFFFFFFF);
+	}
+    }
+  else if (sop == 1 && sopcde == 3)
+    {
+      bu64 acc = HLs ? saved_state.a1x : saved_state.a0x;
+      /* Logical shift, so shift in zeroes.  */
+      acc &= 0xFF;
+      acc <<= 32;
+      acc |= HLs ? saved_state.a1w : saved_state.a0w;
+
+      acc >>= uimm5 (newimmag);
+      if (HLs)
+	{
+	  saved_state.a1x = acc >> 32;
+	  saved_state.a1w = acc;
+	}
+      else
+	{
+	  saved_state.a0x = acc >> 32;
+	  saved_state.a0w = acc;
+	}
+    }
   else if (sop == 1 && sopcde == 3 && HLs == 1)
     unhandled_instruction ("A1 = A1 >> imm6");
   else if (sop == 2 && sopcde == 3 && HLs == 0)

@@ -1,4 +1,14 @@
-2007-02--7  Bernd Schmidt  <bernd.schmidt@analog.com>
+2007-04-11  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin/bfin-dis.c (stores): Increase size.
+	(decode_multfunc): New argument PSAT.  Store overflow bit there.  All
+	callers changed.
+	(decode_macfunc): When saturating, set appropriate flag bits.
+	(decode_dsp32mult_0): Likewise.
+	(decode_dsp32alu_0): Handle "Dn = (A0 += A1)" instruction and
+	accumulator right shifts.
+
+2007-02-07  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin/bfin-dis.c (decode_dsp32shift_0): Support the PACK instruction.
 
