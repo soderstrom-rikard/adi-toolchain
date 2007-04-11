@@ -263,6 +263,7 @@ ifeq ($(TARGET_ARCH),sh64)
 endif
 
 ifeq ($(TARGET_ARCH),h8300)
+	SYMBOL_PREFIX=_
 	CPU_LDFLAGS-$(CONFIG_H8300H)+= -ms8300h
 	CPU_LDFLAGS-$(CONFIG_H8S)   += -ms8300s
 	CPU_CFLAGS-$(CONFIG_H8300H) += -mh -mint32
@@ -297,6 +298,7 @@ ifeq ($(TARGET_ARCH),powerpc)
 endif
 
 ifeq ($(TARGET_ARCH),bfin)
+	SYMBOL_PREFIX=_
 ifeq ($(UCLIBC_FORMAT_FDPIC_ELF),y)
 	CPU_CFLAGS-y:=-mfdpic
 	CPU_LDFLAGS-y += -melf32bfinfd
@@ -317,6 +319,18 @@ ifeq ($(TARGET_ARCH),frv)
 	# which would break as well, but -Bsymbolic comes to the rescue.
 	export LDPIEFLAG:=-shared -Bsymbolic
 	UCLIBC_LDSO=ld.so.1
+endif
+
+ifdef ($(TARGET_ARCH),i960)
+      SYMBOL_PREFIX=_
+endif
+
+ifdef ($(TARGET_ARCH),microblaze)
+      SYMBOL_PREFIX=_
+endif
+
+ifdef ($(TARGET_ARCH),v850)
+      SYMBOL_PREFIX=_
 endif
 
 # Keep the check_gcc from being needlessly executed
@@ -506,6 +520,10 @@ CFLAGS+=-isystem $(shell $(CC) -print-file-name=include)
 
 ifneq ($(DOASSERTS),y)
 CFLAGS+=-DNDEBUG
+endif
+
+ifneq ($(SYMBOL_PREFIX),_)
+CFLAGS+=-D__UCLIBC_NO_UNDERSCORES__
 endif
 
 # Keep the check_as from being needlessly executed
