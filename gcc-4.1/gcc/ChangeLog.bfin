@@ -1,3 +1,12 @@
+2007-04-11  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin-protos.h (bfin_expand_movmem): Renamed from
+	bfin_expand_strmov.
+	* config/bfin/bfin.c (bfin_expand_prologue, bfin_delegitimize_address,
+	bfin_function_ok_for_sibcall, split_load_immediate,
+	bfin_reorder_loops): Remove unused variables.
+	(initialize_trampoline): Don't use old-style function definition.
+
 2007-03-22  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): Define

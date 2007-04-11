@@ -967,7 +967,6 @@ bfin_load_pic_reg (rtx dest)
 void
 bfin_expand_prologue (void)
 {
-  rtx insn;
   HOST_WIDE_INT frame_size = get_frame_size ();
   rtx spreg = gen_rtx_REG (Pmode, REG_SP);
   e_funkind fkind = funkind (TREE_TYPE (current_function_decl));
@@ -991,13 +990,7 @@ bfin_expand_prologue (void)
 
       if (!lim)
 	{
-	  rtx p1reg = gen_rtx_REG (Pmode, REG_P1);
 	  emit_move_insn (p2reg, GEN_INT (trunc_int_for_mode (0xFFB00000, SImode)));
-#if 0
-	  /* First step: update maximum stack usage.  */
-	  emit_move_insn (p1reg, gen_rtx_MEM (Pmode, plus_constant (p2reg, 4)));
-#endif
-	  /* Now, normal stack checking.  */
 	  emit_move_insn (p2reg, gen_rtx_MEM (Pmode, p2reg));
 	  lim = p2reg;
 	}
@@ -1124,7 +1117,7 @@ legitimize_address (rtx x ATTRIBUTE_UNUSED, rtx oldx ATTRIBUTE_UNUSED,
 static rtx
 bfin_delegitimize_address (rtx orig_x)
 {
-  rtx x = orig_x, y;
+  rtx x = orig_x;
 
   if (GET_CODE (x) != MEM)
     return orig_x;
@@ -1730,7 +1723,6 @@ bfin_function_ok_for_sibcall (tree decl ATTRIBUTE_UNUSED,
 
   {
     struct cgraph_local_info *this_func, *called_func;
-    rtx addr, insn;
  
     this_func = cgraph_local_info (current_function_decl);
     called_func = cgraph_local_info (decl);
@@ -1743,8 +1735,7 @@ bfin_function_ok_for_sibcall (tree decl ATTRIBUTE_UNUSED,
    code.  CXT is an RTX for the static chain value for the function.  */
 
 void
-initialize_trampoline (tramp, fnaddr, cxt)
-     rtx tramp, fnaddr, cxt;
+initialize_trampoline (rtx tramp, rtx fnaddr, rtx cxt)
 {
   rtx t1 = copy_to_reg (fnaddr);
   rtx t2 = copy_to_reg (cxt);
@@ -2422,7 +2413,6 @@ split_load_immediate (rtx operands[])
   int num_zero = shiftr_zero (&shifted);
   int num_compl_zero = shiftr_zero (&shifted_compl);
   unsigned int regno = REGNO (operands[0]);
-  enum reg_class class1 = REGNO_REG_CLASS (regno);
 
   /* This case takes care of single-bit set/clear constants, which we could
      also implement with BITSET/BITCLR.  */
@@ -4025,7 +4015,6 @@ bfin_reorder_loops (loop_info loops, FILE *dump_file)
     {
       unsigned index;
       basic_block bb;
-      basic_block loop_end = loop->tail;
       edge e;
       edge_iterator ei;
 
