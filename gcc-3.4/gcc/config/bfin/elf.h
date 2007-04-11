@@ -4,8 +4,6 @@
  */
 
 
-#define OBJECT_FORMAT_ELF
-
 #define LOCAL_LABEL_PREFIX "L$"
 
 #undef ASM_GENERATE_INTERNAL_LABEL

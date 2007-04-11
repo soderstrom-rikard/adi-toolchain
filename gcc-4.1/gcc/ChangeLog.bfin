@@ -1,3 +1,20 @@
+2007-04-11  Jie Zhang  <jie.zhang@analog.com>
+
+	* config.gcc (tm_file): Add linux.h for bfin*-uclinux*.
+	* config/bfin/linux.h (CPLUSPLUS_CPP_SPEC): Don't define.
+	(CRT_CALL_STATIC_FUNCTION): Likewise.
+	(NO_IMPLICIT_EXTERN_C): Likewise.
+	(TARGET_OS_CPP_BUILTINS): Define as LINUX_TARGET_OS_CPP_BUILTINS.
+	* config/bfin/elf.h (OBJECT_FORMAT_ELF): Don't define.
+	* config/bfin/uclinux.h (CPLUSPLUS_CPP_SPEC): Don't define.
+	(STARTFILE_SPEC): Remove mfdpic.
+	(ENDFILE_SPEC): Don't define.
+	(LIB_SPEC): Likewise.
+	(CRT_CALL_STATIC_FUNCTION): Likewise.
+	(NO_IMPLICIT_EXTERN_C): Likewise.
+	(LINUX_TARGET_OS_CPP_BUILTINS): Likewise.
+	(TARGET_OS_CPP_BUILTINS): Define as LINUX_TARGET_OS_CPP_BUILTINS.
+
 2007-04-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin-protos.h (bfin_expand_movmem): Renamed from
