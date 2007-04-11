@@ -1,0 +1,151 @@
+#!/bin/sh
+USER=/home/test
+CHECKOUT=$USER/checkouts
+TOOLCHAINBUILD=$USER/test_scripts/toolchain/toolchain-build
+TOOLCHAIN_SCRIPTS=$USER/test_scripts/toolchain
+SVN_SERVER=10.99.22.20
+HOST_IP=10.100.4.174
+TARGET_IP=10.100.4.50
+BASELINE=standard
+LASTRUN=lastrun
+THISRUN=thisrun
+COMPARE_PATH=compare
+
+##### Do Not Edit Below This Line ####### 
+
+QUIT=2
+
+## check out toolchain
+if [ ! -d $CHECKOUT ] ; then
+  mkdir -p $CHECKOUT
+fi
+if [ ! -d $TOOLCHAINBUILD ] ; then
+  mkdir -p $TOOLCHAINBUILD
+fi
+if [ ! -d $CHECKOUT/kernel ] ; then
+  mkdir -p $CHECKOUT/kernel
+fi
+if [ ! -d $TOOLCHAIN_SCRIPTS/latest ] ; then
+  mkdir -p $TOOLCHAIN_SCRIPTS/latest
+fi
+if [ ! -d $TOOLCHAIN_SCRIPTS/latest/simulator ] ; then
+  mkdir -p $TOOLCHAIN_SCRIPTS/latest/simulator
+fi
+if [ ! -d $TOOLCHAIN_SCRIPTS/latest/hardware ] ; then
+  mkdir -p $TOOLCHAIN_SCRIPTS/latest/hardware
+fi
+
+while [ $QUIT -gt 1 ]
+do
+
+  echo -n "Removing checkouts   " ; date
+  
+  rm -rf $CHECKOUT/kernel/*
+  cd $CHECKOUT/kernel
+  echo -n "Checking out kernel     " ; date
+  svn checkout --ignore-externals  --username anonymous svn://$SVN_SERVER/uclinux-dist/trunk uclinux-dist  1>/dev/null 2>/dev/null
+  svn checkout --username anonymous svn://$SVN_SERVER/linux-kernel/trunk uclinux-dist/linux-2.6.x   1>/dev/null 2>/dev/null
+
+  cd $CHECKOUT
+  rm -rf $CHECKOUT/u-boot
+  echo -n "Checking out u-boot     " ; date
+  svn checkout --username anonymous svn://$SVN_SERVER/u-boot/trunk u-boot 1>/dev/null 2>/dev/null
+  
+
+  rm -rf $CHECKOUT/toolchain
+  echo -n "Checking out toolchain     " ; date
+  svn checkout --username anonymous svn://$SVN_SERVER/toolchain/trunk toolchain 1>/dev/null 2>/dev/null
+
+  cd $USER/test_scripts/
+  $USER/test_scripts/restart_board.exp
+#  $USER/test_scripts/reset_board.exp
+
+  ## build and run the tests
+  TIMESTAMP=`date +%Y_%b_%d_%H_%M`
+  BUILD=$TOOLCHAINBUILD/toolchain-$TIMESTAMP
+  mkdir -p $BUILD
+
+  rm -rf $TOOLCHAIN_SCRIPTS/latest/*
+  sleep 10
+  ln -snf $TOOLCHAINBUILD/$BASELINE  $TOOLCHAINBUILD/$COMPARE_PATH
+  sleep 10
+
+  ## build toolchain and do the simulator and hardware tests here.
+ cd $CHECKOUT/toolchain/buildscript 
+ ./BuildToolChain -t  -T $TARGET_IP -j 1 -w -s $CHECKOUT/toolchain -b $BUILD -k $CHECKOUT/kernel/uclinux-dist/linux-2.6.x -u $CHECKOUT/u-boot/u-boot-1.1.6  -c 4.1
+   
+  # if this is the first time to run the test - set this to the standard
+  if [ ! -d $TOOLCHAINBUILD/$BASELINE ] ; then
+    ln -s $BUILD $TOOLCHAINBUILD/$BASELINE
+  fi
+      
+  ## compare the tests with the default
+  COMPARE=$CHECKOUT/toolchain/gcc-3.4/contrib/compare_tests
+  chmod +x $COMPARE
+  
+  cd $TOOLCHAIN_SCRIPTS
+ 
+  ## compare with the standard results on simulator
+
+  $TOOLCHAIN_SCRIPTS/compare_test_results $TOOLCHAINBUILD/$BASELINE/tests/simulator $BUILD/tests/simulator $COMPARE > $BUILD/tests/simulator.diff
+
+  ## compared with the standard results on the board. 
+ 
+  $TOOLCHAIN_SCRIPTS/compare_test_results $TOOLCHAINBUILD/$BASELINE/tests/hardware $BUILD/tests/hardware $COMPARE > $BUILD/tests/hardware.diff
+
+  $TOOLCHAIN_SCRIPTS/compare_test_results $TOOLCHAINBUILD/$BASELINE/tests/hardware-fdpic $BUILD/tests/hardware-fdpic $COMPARE > $BUILD/tests/hardware-fdpic.diff
+
+ sleep 30
+ # build an up-to-date kernel with up-to-date uClibc
+ export PATH=$BUILD/out-uclinux/bin:$BUILD/out-elf/bin:$BUILD/out-linux-uclibc/bin:$PATH
+ echo -e "PATH is $PATH \n"
+ echo "##### The Toolchain is:"
+ $BUILD/out-uclinux/bin/bfin-uclinux-gcc -v
+ echo
+ rm -f $TOOLCHAIN_SCRIPTS/build_toolchain_kernel_log
+ $TOOLCHAIN_SCRIPTS/build_toolchain_kernel.exp BF537-STAMP  1>/dev/null 2>/dev/null
+ cp $CHECKOUT/kernel/uclinux-dist/images/linux $BUILD
+ cp $TOOLCHAIN_SCRIPTS/build_toolchain_kernel_log $BUILD
+ cp $CHECKOUT/kernel/uclinux-dist/images/linux /tftpboot
+
+ cp $TOOLCHAIN_SCRIPTS/toolchain_test_log $BUILD
+
+ sleep 100
+ cp -r  $BUILD/tests/*  $TOOLCHAIN_SCRIPTS/latest
+
+  ## get rid of the dates,and compare the warning file
+  echo "sed 's/toolchain-$TIMESTAMP/$BASELINE/g' $BUILD/logs/warn > $BUILD/logs/warn.1" | sh
+  rm -f $BUILD/logs/warn 
+  grep -v "all automaton generation" $BUILD/logs/warn.1 > $BUILD/logs/warn
+  grep -v "DFA minimization" $BUILD/logs/warn > $BUILD/logs/warn.1
+  grep -v "building DFA" $BUILD/logs/warn.1 > $BUILD/logs/warn
+  rm $BUILD/logs/warn.1
+
+  diff -u $TOOLCHAINBUILD/$BASELINE/logs/warn $BUILD/logs/warn > $BUILD/logs/warn.diff
+  RUN=`cat $BUILD/logs/warn.diff |wc -c`
+  if [ "$RUN" -gt 1 ] ; then
+ #  mail -s "toolchain warnings" $NOTIFY < $BUILD/logs/warn.diff
+   QUIT=0
+  else
+ #  mail -s "toolchain warnings no changes" $NOTIFY < $BUILD/logs/warn.diff
+   rm $BUILD/logs/warn.diff
+  fi
+
+  ## get rid of the dates, and compare the log file
+  echo "sed 's/toolchain-$TIMESTAMP/$BASELINE/g' $BUILD/logs/log > $BUILD/logs/log.1" | sh
+  grep -v "Test Run By" $BUILD/logs/log.1 > $BUILD/logs/log
+  rm $BUILD/logs/log.1
+  
+  diff -u $TOOLCHAINBUILD/$BASELINE/logs/log $BUILD/logs/log > $BUILD/logs/log.diff
+  RUN=`cat $BUILD/logs/log.diff |wc -c`
+  if [ "$RUN" -gt 1 ] ; then
+  # mail -s "toolchain log" $NOTIFY < $BUILD/logs/log.diff
+   QUIT=0
+  else
+  # mail -s "toolchain log no changes" $NOTIFY < $BUILD/logs/log.diff
+   rm $BUILD/logs/log.diff
+  fi
+
+ sleep 300  
+ QUIT=0
+done
