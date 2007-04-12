@@ -164,7 +164,7 @@ DEVEL_PREFIX="/usr"
 CROSS_COMPILER_PREFIX="bfin-elf-"
 # DODEBUG is not set
 # DODEBUG_PT is not set
-DOSTRIP=y
+# DOSTRIP is not set
 # DOASSERTS is not set
 # UCLIBC_MALLOC_DEBUGGING is not set
 WARNINGS="-Wall"

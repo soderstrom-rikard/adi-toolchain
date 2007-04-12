@@ -173,7 +173,7 @@ UCLIBC_BUILD_RELRO=y
 CROSS_COMPILER_PREFIX="bfin-elf-"
 # DODEBUG is not set
 # DODEBUG_PT is not set
-DOSTRIP=y
+# DOSTRIP is not set
 # DOASSERTS is not set
 SUPPORT_LD_DEBUG=y
 # SUPPORT_LD_DEBUG_EARLY is not set
