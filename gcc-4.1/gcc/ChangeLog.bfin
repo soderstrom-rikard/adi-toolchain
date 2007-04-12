@@ -23,6 +23,10 @@
 	* config/bfin/bfin.md (umulsi3_highpart, smulsi3_highpart): Emit
 	inline sequences when not optimizing for size.
 
+	* config/bfin/bfin.md (movhi_low2high, movhi_high2high, movhi_low2low,
+	movhi_high2low): Delete, merge functionality into...
+	(packv2hi): ... this pattern.
+
 2007-04-11  Jie Zhang  <jie.zhang@analog.com>
 
 	* config.gcc (tm_file): Add linux.h for bfin*-uclinux*.
