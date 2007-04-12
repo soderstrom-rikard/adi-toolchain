@@ -18,6 +18,11 @@
 	(flag_macinit1hi): Tighten constraints.
 	(flag_mul_macv2hi_parts_acconly): New pattern.
 
+	* config/bfin/lib1funcs.asm (___umulsi3_highpart, __smulsi3_highpart):
+	Use a more efficient implementation.
+	* config/bfin/bfin.md (umulsi3_highpart, smulsi3_highpart): Emit
+	inline sequences when not optimizing for size.
+
 2007-04-11  Jie Zhang  <jie.zhang@analog.com>
 
 	* config.gcc (tm_file): Add linux.h for bfin*-uclinux*.
