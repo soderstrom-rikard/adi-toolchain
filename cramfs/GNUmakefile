@@ -4,6 +4,12 @@ CPPFLAGS = -I.
 LDLIBS = -lz
 PROGS = mkcramfs cramfsck
 
+ENDIAN := $(shell ./detectendian.sh)
+ifeq ($(ENDIAN),)
+$(error unable to detect endianness)
+endif
+CPPFLAGS += $(ENDIAN)
+
 all: $(PROGS)
 
 distclean clean:

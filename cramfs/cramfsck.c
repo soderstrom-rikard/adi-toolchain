@@ -30,7 +30,7 @@
  * 2000/07/15: Daniel Quinlan (initial support for block devices)
  * 2002/01/10: Daniel Quinlan (additional checks, test more return codes,
  *                            use read if mmap fails, standardize messages)
- * 2004/09/01: Alfonso Acosta (Add swapping support)
+ * 2002/02/22: Brad Bozarth   (add support for big-endian systems)
  */
 
 /* compile-time options */
@@ -52,15 +52,9 @@
 #include <utime.h>
 #include <sys/ioctl.h>
 #define _LINUX_STRING_H_
-#include <byteswap.h>
-#include "linux/cramfs_fs.h"
+#include <linux/fs.h>
+#include <linux/cramfs_fs.h>
 #include <zlib.h>
-
-#if !defined(MAP_ANONYMOUS) && defined(MAP_ANON)
-# define MAP_ANONYMOUS MAP_ANON
-#endif
-
-#define BLKGETSIZE	_IO(0x12,96) /* return device size /512 (long *arg) */
 
 /* Exit codes used by fsck-type programs */
 #define FSCK_OK          0	/* No errors */
@@ -80,10 +74,9 @@ static int fd;			/* ROM image file descriptor */
 static char *filename;		/* ROM image filename */
 struct cramfs_super super;	/* just find the cramfs superblock once */
 static int opt_verbose = 0;	/* 1 = verbose (-v), 2+ = very verbose (-vv) */
-static int need_swapping = 0;   /* fs and host dont have the same endianness */
 #ifdef INCLUDE_FS_TESTS
 static int opt_extract = 0;		/* extract cramfs (-x) */
-static char *extract_dir = "/";	/* extraction directory (-x) */
+static char *extract_dir = "root";	/* extraction directory (-x) */
 static uid_t euid;			/* effective UID */
 
 /* (cramfs_super + start) <= start_dir < end_dir <= start_data <= end_data */
@@ -91,9 +84,6 @@ static unsigned long start_dir = ~0UL;	/* start of first non-root inode */
 static unsigned long end_dir = 0;	/* end of the directory structure */
 static unsigned long start_data = ~0UL;	/* start of the data (256 MB = max) */
 static unsigned long end_data = 0;	/* end of the data */
-
-/* access 32 byte variables */
-#define CRAMFS_32(x)  (need_swapping ? bswap_32(x) : x)
 
 /* Guarantee access to at least 8kB at a time */
 #define ROMBUFFER_BITS	13
@@ -166,21 +156,16 @@ static void test_super(int *start, size_t *length) {
 	}
 
 	if (*length < sizeof(struct cramfs_super)) {
-		die(FSCK_UNCORRECTED, 0, "filesystem smaller than a cramfs superblock!");
+		die(FSCK_UNCORRECTED, 0, "file length too short");
 	}
 
 	/* find superblock */
 	if (read(fd, &super, sizeof(super)) != sizeof(super)) {
 		die(FSCK_ERROR, 1, "read failed: %s", filename);
 	}
-	if (super.magic == CRAMFS_MAGIC) {
+	if (super.magic == CRAMFS_32(CRAMFS_MAGIC)) {
 		*start = 0;
 	}
-	else if (super.magic == bswap_32(CRAMFS_MAGIC)) {
-		*start = 0;
-		need_swapping = 1;
-	}
-
 	else if (*length >= (PAD_SIZE + sizeof(super))) {
 		lseek(fd, PAD_SIZE, SEEK_SET);
 		if (read(fd, &super, sizeof(super)) != sizeof(super)) {
@@ -195,15 +180,15 @@ static void test_super(int *start, size_t *length) {
 	if (super.magic != CRAMFS_32(CRAMFS_MAGIC)) {
 		die(FSCK_UNCORRECTED, 0, "superblock magic not found");
 	}
-	if (need_swapping){
-		super.size = bswap_32(super.size);
-		super.flags = bswap_32(super.flags);
-		super.future = bswap_32(super.future);
-		super.fsid.crc = bswap_32(super.fsid.crc);
-		super.fsid.edition = bswap_32(super.fsid.edition);
-		super.fsid.blocks = bswap_32(super.fsid.blocks);
-		super.fsid.files = bswap_32(super.fsid.files); 
-	}	
+#if __BYTE_ORDER == __BIG_ENDIAN
+	super.size = CRAMFS_32(super.size);
+	super.flags = CRAMFS_32(super.flags);
+	super.future = CRAMFS_32(super.future);
+	super.fsid.crc = CRAMFS_32(super.fsid.crc);
+	super.fsid.edition = CRAMFS_32(super.fsid.edition);
+	super.fsid.blocks = CRAMFS_32(super.fsid.blocks);
+	super.fsid.files = CRAMFS_32(super.fsid.files);
+#endif /* __BYTE_ORDER == __BIG_ENDIAN */
 	if (super.flags & ~CRAMFS_SUPPORTED_FLAGS) {
 		die(FSCK_ERROR, 0, "unsupported filesystem features");
 	}
@@ -215,8 +200,7 @@ static void test_super(int *start, size_t *length) {
 			die(FSCK_UNCORRECTED, 0, "zero file count");
 		}
 		if (*length < super.size) {
-			die(FSCK_UNCORRECTED, 0, "file length too short, %lu is smaller than %lu",
-				*length, super.size);
+			die(FSCK_UNCORRECTED, 0, "file length too short");
 		}
 		else if (*length > super.size) {
 			fprintf(stderr, "warning: file extends past end of filesystem\n");
@@ -230,7 +214,7 @@ static void test_super(int *start, size_t *length) {
 static void test_crc(int start)
 {
 	void *buf;
-	__u32 crc;
+	u32 crc;
 
 	if (!(super.flags & CRAMFS_FLAG_FSID_VERSION_2)) {
 #ifdef INCLUDE_FS_TESTS
@@ -239,10 +223,7 @@ static void test_crc(int start)
 		die(FSCK_USAGE, 0, "unable to test CRC: old cramfs format");
 #endif /* not INCLUDE_FS_TESTS */
 	}
-	else if (need_swapping) {
-       /* crc checking in this case would mean  translating the whole file */
-		return;
-	}
+
 	crc = crc32(0L, Z_NULL, 0);
 
 	buf = mmap(NULL, super.size, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
@@ -296,11 +277,11 @@ static void test_crc(int start)
 #ifdef INCLUDE_FS_TESTS
 static void print_node(char type, struct cramfs_inode *i, char *name)
 {
-	char info[11];
+	char info[10];
 
 	if (S_ISCHR(i->mode) || (S_ISBLK(i->mode))) {
 		/* major/minor numbers can be as high as 2^12 or 4096 */
-		snprintf(info, 11, "%4d,%4d", major(i->size), minor(i->size));
+		snprintf(info, 10, "%4d,%4d", major(i->size), minor(i->size));
 	}
 	else {
 		/* size be as high as 2^24 or 16777216 */
@@ -325,25 +306,23 @@ static void *romfs_read(unsigned long offset)
 	return read_buffer + (offset & ROMBUFFERMASK);
 }
 
-static struct cramfs_inode *cramfs_iget(struct cramfs_inode * i)
+static struct cramfs_inode *cramfs_iget(struct cramfs_inode *i)
 {
-#define wswap(x)    (((x)>>24) | (((x)>>8)&0xff00) | (((x)&0xff00)<<8) | (((x)&0xff)<<24))
 	struct cramfs_inode *inode = malloc(sizeof(struct cramfs_inode));
 
 	if (!inode) {
 		die(FSCK_ERROR, 1, "malloc failed");
 	}
-	if(!need_swapping) {
-		*inode = *i;
-	}
-	else { 
-		inode->mode=bswap_16(i->mode);
-		inode->uid=bswap_16(i->uid);
-		inode->size=bswap_32(i->size << 8);
-		inode->gid=i->gid;
-		inode->namelen = bswap_32(((__u32*)i)[2]) >> 26;
-		inode->offset = bswap_32(((__u32*)i)[2]) & 0x3FFFFFFF;
-	}
+#if __BYTE_ORDER == __BIG_ENDIAN
+	inode->mode = CRAMFS_16(i->mode);
+	inode->uid = CRAMFS_16(i->uid);
+	inode->size = CRAMFS_24(i->size);
+	inode->gid = i->gid;
+	inode->namelen = CRAMFS_GET_NAMELEN(i);
+	inode->offset = CRAMFS_GET_OFFSET(i);
+#else /* not __BYTE_ORDER == __BIG_ENDIAN */
+	*inode = *i;
+#endif /* not __BYTE_ORDER == __BIG_ENDIAN */
 	return inode;
 }
 
@@ -355,24 +334,6 @@ static struct cramfs_inode *iget(unsigned int ino)
 static void iput(struct cramfs_inode *inode)
 {
 	free(inode);
-}
-
-/*
- * Return the offset of the root directory
- */
-static struct cramfs_inode *read_super(void)
-{
-	struct cramfs_inode *root = cramfs_iget(&super.root);
-	unsigned long offset = root->offset << 2; 
-	if (!S_ISDIR(root->mode))
-		die(FSCK_UNCORRECTED, 0, "root inode is not directory");
-	if (!(super.flags & CRAMFS_FLAG_SHIFTED_ROOT_OFFSET) &&
-	    ((offset != sizeof(struct cramfs_super)) &&
-	     (offset != PAD_SIZE + sizeof(struct cramfs_super))))
-	{
-		die(FSCK_UNCORRECTED, 0, "bad root offset (%lu)", offset);
-	}
-	return root;
 }
 
 static int uncompress_block(void *src, int len)
@@ -404,7 +365,7 @@ static void do_uncompress(char *path, int fd, unsigned long offset, unsigned lon
 
 	do {
 		unsigned long out = PAGE_CACHE_SIZE;
-		unsigned long next = CRAMFS_32(*(__u32 *) romfs_read(offset));
+		unsigned long next = CRAMFS_32(*(u32 *) romfs_read(offset));
 
 		if (next > end_data) {
 			end_data = next;
@@ -485,10 +446,8 @@ static void do_directory(char *path, struct cramfs_inode *i)
 	}
 	/* TODO: Do we need to check end_dir for empty case? */
 	memcpy(newpath, path, pathlen);
-	if (pathlen > 1) {
-	    newpath[pathlen] = '/';
-	    pathlen++;
-	}
+	newpath[pathlen] = '/';
+	pathlen++;
 	if (opt_verbose) {
 		print_node('d', i, path);
 	}
@@ -567,7 +526,7 @@ static void do_symlink(char *path, struct cramfs_inode *i)
 {
 	unsigned long offset = i->offset << 2;
 	unsigned long curr = offset + 4;
-	unsigned long next = CRAMFS_32(*(__u32 *) romfs_read(offset));
+	unsigned long next = CRAMFS_32(*(u32 *) romfs_read(offset));
 	unsigned long size;
 
 	if (offset == 0) {
@@ -671,8 +630,18 @@ static void expand_fs(char *path, struct cramfs_inode *inode)
 static void test_fs(int start)
 {
 	struct cramfs_inode *root;
+	unsigned long root_offset;
 
-	root = read_super();
+	root = cramfs_iget(&super.root);
+	root_offset = root->offset << 2;
+	if (!S_ISDIR(root->mode))
+		die(FSCK_UNCORRECTED, 0, "root inode is not directory");
+	if (!(super.flags & CRAMFS_FLAG_SHIFTED_ROOT_OFFSET) &&
+	    ((root_offset != sizeof(struct cramfs_super)) &&
+	     (root_offset != PAD_SIZE + sizeof(struct cramfs_super))))
+	{
+		die(FSCK_UNCORRECTED, 0, "bad root offset (%lu)", root_offset);
+	}
 	umask(0);
 	euid = geteuid();
 	stream.next_in = NULL;
