@@ -548,10 +548,10 @@ if [ ! -d $DIR_GENEXT2FS_SOURCE ] ; then
 fi
 
 echo -n "Path to cramfs-tools        "
-DIR_CRAMFS_SOURCE=$DIR_SOURCE/cramfs-1.1
+DIR_CRAMFS_SOURCE=$DIR_SOURCE/cramfs
 echo $DIR_CRAMFS_SOURCE
 if [ ! -d $DIR_CRAMFS_SOURCE ] ; then
-    echo "Can't find cramfs-1.1 source at $DIR_CRAMFS_SOURCE"
+    echo "Can't find cramfs source at $DIR_CRAMFS_SOURCE"
     exit 1
 fi
 
