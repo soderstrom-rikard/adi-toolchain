@@ -293,7 +293,7 @@ int map_cache(void)
 	}
 
 	cache_size = st.st_size;
-	cache_addr = (caddr_t) mmap(0, cache_size, PROT_READ, MAP_SHARED, fd, 0);
+	cache_addr = (caddr_t) mmap(0, cache_size, PROT_READ, MAP_ANONYMOUS, fd, 0);
 	close(fd);
 	if (cache_addr == MAP_FAILED) {
 		fprintf(stderr, "ldd: can't map cache '%s'\n", LDSO_CACHE);
