@@ -557,14 +557,14 @@ struct elf_resolve *_dl_load_elf_shared_library(int secure,
 				   So instead of desperately call mmap and fail,
 				   we set status to MAP_FAILED to save a call
 				   to mmap ().  */
-#ifndef __ARCH_HAS_MMU__
+#ifndef __ARCH_USE_MMU__
 				if (piclib2map == 0)
 #endif
 				  status = (char *) _dl_mmap
 				    (tryaddr, size, LXFLAGS(ppnt->p_flags),
 				     flags | (piclib2map ? MAP_FIXED : 0),
 				     infile, ppnt->p_offset & OFFS_ALIGN);
-#ifndef __ARCH_HAS_MMU__
+#ifndef __ARCH_USE_MMU__
 				else
 				  status = MAP_FAILED;
 #endif
