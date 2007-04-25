@@ -1665,6 +1665,7 @@ if [ $KERNEL_SOURCE ] ; then
     done
 
     echo -n "*** Installing uClinux ldr-utils    " ; date
+    cp $DIR_LDR_UTILS_SOURCE/ldr $DIR_ELF_OUTPUT/bin/bfin-elf-ldr || exit 1
     cp $DIR_LDR_UTILS_SOURCE/ldr $DIR_uC_OUTPUT/bin/bfin-uclinux-ldr || exit 1
     mv $DIR_LDR_UTILS_SOURCE/ldr $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-ldr || exit 1
 
