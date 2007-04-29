@@ -2337,7 +2337,7 @@ override_options (void)
 	bfin_cpu_type = BFIN_CPU_BF537;
       else if (strcmp (bfin_cpu_string, "bf561") == 0)
 	{
-	  warning (0, "bf561 support is incomplete yet.");
+	  warning ("bf561 support is incomplete yet.");
 	  bfin_cpu_type = BFIN_CPU_BF561;
 	}
       else
