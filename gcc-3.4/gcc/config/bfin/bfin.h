@@ -1192,6 +1192,7 @@ do {                                              \
       {CONST_INT, CONST_DOUBLE, CONST, SYMBOL_REF, LABEL_REF}},		\
   {"scale_by_operand", {CONST_INT}},					\
   {"pos_scale_operand", {CONST_INT}},                                  	\
+  {"reg_or_const_int_operand", {SUBREG, REG, ADDRESSOF, CONST_INT}},	\
   {"positive_immediate_operand", {CONST_INT}},				\
   {"reg_or_7bit_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},		\
   {"reg_or_neg7bit_operand", {CONST_INT, SUBREG, REG, ADDRESSOF}},	\

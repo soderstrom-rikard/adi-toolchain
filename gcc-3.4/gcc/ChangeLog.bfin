@@ -1,3 +1,11 @@
+2007-04-29  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* rtl.def (SS_ABS): Fix error in last change.
+	* config/bfin/bfin.c (reg_or_const_int_operand): New function.
+	* config/bfin/bfin.h (PREDICATE_CODES): Add it.
+	* config/bfin/bfin.md (flag_mul_macv2hi_parts_acconly_andcc0): Moved
+	to proper place after patch got misapplied.
+
 2007-04-28  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* rtl.def (SS_ABS): New code.

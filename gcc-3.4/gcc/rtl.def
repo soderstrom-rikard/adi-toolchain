@@ -1210,7 +1210,7 @@ DEF_RTL_EXPR(SS_MINUS, "ss_minus", "ee", '2')
 DEF_RTL_EXPR(SS_NEG, "ss_neg", "e", '1')
 
 /* Absolute value with signed saturation.  */
-DEF_RTL_EXPR(SS_ABS, "ss_abs", "e", RTX_UNARY)
+DEF_RTL_EXPR(SS_ABS, "ss_abs", "e", '1')
 
 /* Shift left with signed saturation.  */
 DEF_RTL_EXPR(SS_ASHIFT, "ss_ashift", "ee", '2')

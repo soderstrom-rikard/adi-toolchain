@@ -1831,6 +1831,15 @@ scale_by_operand (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
   return 0;
 }
 
+int
+reg_or_const_int_operand (rtx op, enum machine_mode mode)
+{
+  if (GET_CODE (op) == CONST_INT)
+    return true;
+
+  return register_operand (op, mode);
+}
+
 /* Return nonzero if OP is a constant that consists of two parts; lower
    bits all zero and upper bits all ones.  In this case, we can perform
    an AND operation with a sequence of two shifts.  Don't return nonzero
