@@ -568,6 +568,34 @@ get_allreg (int grp, int reg)
     }
 }
 
+static bu64
+get_extended_acc0 (void)
+{
+  bu64 acc0 = saved_state.a0x;
+  /* Sign extend accumulator values before adding.  */
+  if (acc0 & 0x80)
+    acc0 |= -0x80;
+  else
+    acc0 &= 0xFF;
+  acc0 <<= 32;
+  acc0 |= saved_state.a0w;
+  return acc0;
+}
+
+static bu64
+get_extended_acc1 (void)
+{
+  bu64 acc1 = saved_state.a1x;
+  /* Sign extend accumulator values before adding.  */
+  if (acc1 & 0x80)
+    acc1 |= -0x80;
+  else
+    acc1 &= 0xFF;
+  acc1 <<= 32;
+  acc1 |= saved_state.a1w;
+  return acc1;
+}
+
 /* Perform a multiplication of D registers SRC0 and SRC1, sign- or
    zero-extending the result to 64 bit.  H0 and H1 determine whether the
    high part or the low part of the source registers is used.  Store 1 in
@@ -2395,21 +2423,25 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       saved_state.a0x = 0;
       saved_state.a0w = 0;
     }
-  else if (aop == 0 && s == 1 && aopcde == 8)
-    saved_state.a0x = -(saved_state.a0w >> 31);
   else if (aop == 1 && s == 0 && aopcde == 8)
     {
       /* A1 = 0 */
       saved_state.a1x = 0;
       saved_state.a1w = 0;
     }
-  else if (aop == 1 && s == 1 && aopcde == 8)
-    saved_state.a1x = -(saved_state.a1w >> 31);
   else if (aop == 2 && s == 0 && aopcde == 8)
     {
       /* A1 = A0 = 0 */
       saved_state.a1x = saved_state.a0x = 0;
       saved_state.a1w = saved_state.a0w = 0;
+    }
+  else if (aop == 0 && s == 1 && aopcde == 8)
+    {
+      saved_state.a0x = -(saved_state.a0w >> 31);
+    }
+  else if (aop == 1 && s == 1 && aopcde == 8)
+    {
+      saved_state.a1x = -(saved_state.a1w >> 31);
     }
   else if (aop == 2 && s == 1 && aopcde == 8)
     {
@@ -2449,10 +2481,6 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       setflags_nz_2x16 (DREG (dst0));
       saved_state.v = 0;
     }
-  else if (aop == 2 && aopcde == 11 && s == 0)
-    unhandled_instruction ("A0 += A1");
-  else if (aop == 2 && aopcde == 11 && s == 1)
-    unhandled_instruction ("A0 += A1 (W32)");
   else if (aop == 3 && HL == 0 && aopcde == 14)
     unhandled_instruction ("A1 = - A1 , A0 = - A0");
   else if (HL == 1 && aop == 3 && aopcde == 12)
@@ -2515,37 +2543,29 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
     unhandled_instruction ("dregs_lo = (A0 += A1)");
   else if (aop == 1 && HL == 1 && aopcde == 11)
     unhandled_instruction ("dregs_hi = (A0 += A1)");
-  else if (aop == 0 && aopcde == 11)
-    { 
-      bu64 acc0 = saved_state.a0x;
-      bu64 acc1 = saved_state.a1x;
-      /* Sign extend accumulator values before adding.  */
-      if (acc0 & 0x80)
-	acc0 |= -0x80;
-      else
-	acc0 &= 0xFF;
-      if (acc1 & 0x80)
-	acc1 |= -0x80;
-      else
-	acc1 &= 0xFF;
-      acc0 <<= 32;
-      acc0 |= saved_state.a0w;
-      acc1 <<= 32;
-      acc1 |= saved_state.a1w;
-      acc0 += acc1;
+  else if ((aop == 0 || aop == 2) && aopcde == 11)
+    {
+      bu64 acc0 = get_extended_acc0 ();
+      bu64 acc1 = get_extended_acc1 ();
 
+      acc0 += acc1;
       if ((bs64)acc0 < -0x8000000000ll)
 	acc0 = -0x8000000000ull;
       else if ((bs64)acc0 >= 0x7fffffffffll)
 	acc0 = 0x7fffffffffull;
       STORE (A0XREG, (acc0 >> 32) & 0xff);
       STORE (A0WREG, acc0 & 0xffffffff);
-      if ((bs64)acc0 < -0x80000000ll)
-	STORE (DREG (dst0), 0x80000000);
-      else if ((bs64)acc0 > 0x7fffffff)
-	STORE (DREG (dst0), 0x7fffffff);
-      else
-	STORE (DREG (dst0), acc0);
+      if (aop == 2 && s == 1)
+	unhandled_instruction ("A0 += A1 (W32)");
+      if (aop == 0)
+	{
+	  if ((bs64)acc0 < -0x80000000ll)
+	    STORE (DREG (dst0), 0x80000000);
+	  else if ((bs64)acc0 > 0x7fffffff)
+	    STORE (DREG (dst0), 0x7fffffff);
+	  else
+	    STORE (DREG (dst0), acc0);
+	}
     }
   else if (aop == 0 && aopcde == 10)
     {
@@ -2896,14 +2916,8 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
     unhandled_instruction ("An = An << imm6");
   else if (sop == 0 && sopcde == 3 && bit8 == 1)
     {
-      bu64 acc = HLs ? saved_state.a1x : saved_state.a0x;
       /* Arithmetic shift, so shift in sign bit copies.  */
-      if (acc & 0x80)
-	acc |= -0x100;
-      else
-	acc &= 0xFF;
-      acc <<= 32;
-      acc |= HLs ? saved_state.a1w : saved_state.a0w;
+      bu64 acc = HLs ? get_extended_acc1 () : get_extended_acc0 ();
       acc >>= uimm5 (newimmag);
       /* Sign extend again.  */
       if (acc & (1ULL << 39))

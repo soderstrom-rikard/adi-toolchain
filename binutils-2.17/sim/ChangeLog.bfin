@@ -1,3 +1,10 @@
+2007-04-30  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin/bfin-dis.c (get_extended_acc0, get_extended_acc1): New
+	functions.
+	(decode_dsp32shiftimm_0): Use them.
+	(decode_dsp32alu_0): Likewise.  Add more variants of "A0 += A1".
+
 2007-04-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin/bfin-dis.c (stores): Increase size.
