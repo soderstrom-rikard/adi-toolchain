@@ -1,3 +1,9 @@
+2007-05-09  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.h (LOCAL_ALIGNMENT): Define.
+	* config/bfin/bfin.c (bfin_local_alignment): New function.
+	* config/bfin/bfin-protos.h (bfin_local_alignment): Declare it.
+
 2007-05-03  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (addpdi3, us_truncpdisi2): New patterns.
