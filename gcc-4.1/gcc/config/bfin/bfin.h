@@ -960,6 +960,7 @@ do {                                              \
    in one reasonably fast instruction.  */
 #define MOVE_MAX UNITS_PER_WORD
 
+#define MOVE_RATIO 5
 
 /* STORAGE LAYOUT: target machine storage layout
    Define this macro as a C expression which is nonzero if accessing
