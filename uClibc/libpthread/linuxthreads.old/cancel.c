@@ -212,3 +212,5 @@ extern const int __pthread_provide_wrappers;
 static const int * const __pthread_require_wrappers =
   &__pthread_provide_wrappers;
 #endif
+
+PTHREAD_STATIC_FN_REQUIRE (pthread_create)

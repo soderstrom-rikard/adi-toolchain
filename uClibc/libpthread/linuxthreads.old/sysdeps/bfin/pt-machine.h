@@ -47,4 +47,10 @@ testandset (int *spinlock)
   return res;
 }
 
+#ifdef SHARED
+# define PTHREAD_STATIC_FN_REQUIRE(name)
+#else
+# define PTHREAD_STATIC_FN_REQUIRE(name) __asm (".globl " "_"#name);
+#endif
+
 #endif /* pt-machine.h */
