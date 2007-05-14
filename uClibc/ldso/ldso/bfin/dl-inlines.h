@@ -18,7 +18,7 @@ License along with uClibc; see the file COPYING.LIB.  If not, write to
 the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139,
 USA.  */
 
-#include <bits/bfin_sram.h>
+#include <bfin_sram.h>
 
 #ifndef _dl_assert
 # define _dl_assert(expr)
