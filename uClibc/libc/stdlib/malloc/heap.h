@@ -51,9 +51,12 @@ struct heap
 #ifdef HEAP_USE_LOCKING
 # define HEAP_INIT 		{ 0, PTHREAD_MUTEX_INITIALIZER }
 # define HEAP_INIT_WITH_FA(fa)	{ &fa._fa, PTHREAD_MUTEX_INITIALIZER }
+# define HEAP_INIT_RECURSIVE_WITH_FA(fa) \
+  { &fa._fa, PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP }
 #else
 # define HEAP_INIT 		{ 0 }
 # define HEAP_INIT_WITH_FA(fa) 	{ &fa._fa }
+# define HEAP_INIT_RECURSIVE_WITH_FA(fa) { &fa._fa }
 #endif
 
 /* A free-list area `header'.  These are actually stored at the _ends_ of

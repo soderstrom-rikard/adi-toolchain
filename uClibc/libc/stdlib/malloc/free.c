@@ -125,6 +125,9 @@ free_to_heap (void *mem, struct heap *heap)
 			start, end - start);
 
       prev_mmb = 0;
+
+      __malloc_lock_mmb ();
+
       mmb = __malloc_mmapped_blocks;
       while (mmb
 	     && ((mmb_end = (mmb_start = (unsigned long)mmb->mem) + mmb->size)
@@ -169,30 +172,13 @@ free_to_heap (void *mem, struct heap *heap)
 	      /* Start searching again from the end of this block.  */
 	      start = mmb_end;
 
-	      /* We have to unlock the heap before we recurse to free the mmb
-		 descriptor, because we might be unmapping from the mmb
-		 heap.  */
-	      __heap_unlock (heap);
-
 	      /* Release the descriptor block we used.  */
 	      free_to_heap (mmb, &__malloc_mmb_heap);
 
 	      /* Do the actual munmap.  */
 	      munmap ((void *)mmb_start, mmb_end - mmb_start);
 
-	      __heap_lock (heap);
-
-#  ifdef __UCLIBC_HAS_THREADS__
-	      /* In a multi-threaded program, it's possible that PREV_MMB has
-		 been invalidated by another thread when we released the
-		 heap lock to do the munmap system call, so just start over
-		 from the beginning of the list.  It sucks, but oh well;
-		 it's probably not worth the bother to do better.  */
-	      prev_mmb = 0;
-	      mmb = __malloc_mmapped_blocks;
-#  else
 	      mmb = next_mmb;
-#  endif
 	    }
 	  else
 	    {
@@ -202,6 +188,8 @@ free_to_heap (void *mem, struct heap *heap)
 
 	  MALLOC_MMB_DEBUG_INDENT (-1);
 	}
+
+      __malloc_unlock_mmb ();
 
       if (start != end)
 	/* Hmm, well there's something we couldn't unmap, so put it back

@@ -52,6 +52,19 @@ extern size_t __pagesize;
 # define MALLOC_USE_SBRK
 #endif
 
+/* Locking for multithreaded apps.  */
+#ifdef __UCLIBC_HAS_THREADS__
+
+# include <pthread.h>
+# include <bits/uClibc_pthread.h>
+
+# define MALLOC_USE_LOCKING
+
+typedef pthread_mutex_t malloc_mutex_t;
+# define MALLOC_MUTEX_INIT	PTHREAD_MUTEX_INITIALIZER
+# define MALLOC_RECURSIVE_MUTEX_INIT \
+	PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP
+#endif /* __UCLIBC_HAS_THREADS__ */
 
 /* The current implementation of munmap in uClinux doesn't work correctly:
    it requires that ever call to munmap exactly match a corresponding call
@@ -78,6 +91,15 @@ extern struct malloc_mmb *__malloc_mmapped_blocks;
    them from the main heap, but that tends to cause heap fragmentation in
    annoying ways.  */
 extern struct heap __malloc_mmb_heap;
+
+# ifdef MALLOC_USE_LOCKING
+extern malloc_mutex_t __malloc_mmb_lock;
+#  define __malloc_lock_mmb()	__pthread_mutex_lock (&__malloc_mmb_lock)
+#  define __malloc_unlock_mmb()	__pthread_mutex_unlock (&__malloc_mmb_lock)
+# else /* !MALLOC_USE_LOCKING */
+#  define __malloc_lock_mmb()	(void)0
+#  define __malloc_unlock_mmb()	(void)0
+# endif /* MALLOC_USE_LOCKING */
 
 /* Define MALLOC_MMB_DEBUGGING to cause malloc to emit debugging info about
    about mmap block allocation/freeing by the `uclinux broken munmap' code
@@ -130,18 +152,9 @@ extern int __malloc_mmb_debug;
 #define MALLOC_SIZE(addr)	(*(size_t *)MALLOC_BASE(addr))
 
 
-/* Locking for multithreaded apps.  */
-#ifdef __UCLIBC_HAS_THREADS__
 
-# include <pthread.h>
-# include <bits/uClibc_pthread.h>
-
-# define MALLOC_USE_LOCKING
-
-typedef pthread_mutex_t malloc_mutex_t;
-# define MALLOC_MUTEX_INIT	PTHREAD_MUTEX_INITIALIZER
-
-# ifdef MALLOC_USE_SBRK
+#ifdef MALLOC_USE_SBRK
+# ifdef MALLOC_USE_LOCKING
 /* This lock is used to serialize uses of the `sbrk' function (in both
    malloc and free, sbrk may be used several times in succession, and
    things will break if these multiple calls are interleaved with another
@@ -149,16 +162,16 @@ typedef pthread_mutex_t malloc_mutex_t;
 extern malloc_mutex_t __malloc_sbrk_lock;
 #  define __malloc_lock_sbrk()	__pthread_mutex_lock (&__malloc_sbrk_lock)
 #  define __malloc_unlock_sbrk() __pthread_mutex_unlock (&__malloc_sbrk_lock)
-# endif /* MALLOC_USE_SBRK */
 
-#else /* !__UCLIBC_HAS_THREADS__ */
+
+# else /* !MALLOC_USE_LOCKING */
 
 /* Without threads, mutex operations are a nop.  */
-# define __malloc_lock_sbrk()	(void)0
-# define __malloc_unlock_sbrk()	(void)0
+#  define __malloc_lock_sbrk()		(void)0
+#  define __malloc_unlock_sbrk()	(void)0
 
-#endif /* __UCLIBC_HAS_THREADS__ */
-
+# endif /* MALLOC_USE_LOCKING */
+#endif /* MALLOC_USE_SBRK */
 
 /* branch-prediction macros; they may already be defined by libc.  */
 #ifndef likely

@@ -30,7 +30,7 @@ struct heap __malloc_heap = HEAP_INIT_WITH_FA (initial_fa);
 
 #if defined(MALLOC_USE_LOCKING) && defined(MALLOC_USE_SBRK)
 /* A lock protecting our use of sbrk.  */
-malloc_mutex_t __malloc_sbrk_lock;
+malloc_mutex_t __malloc_sbrk_lock = MALLOC_MUTEX_INIT;
 #endif /* MALLOC_USE_LOCKING && MALLOC_USE_SBRK */
 
 
@@ -43,7 +43,11 @@ struct malloc_mmb *__malloc_mmapped_blocks = 0;
    them from the main heap, but that tends to cause heap fragmentation in
    annoying ways.  */
 HEAP_DECLARE_STATIC_FREE_AREA (initial_mmb_fa, 48); /* enough for 3 mmbs */
-struct heap __malloc_mmb_heap = HEAP_INIT_WITH_FA (initial_mmb_fa);
+struct heap __malloc_mmb_heap = HEAP_INIT_RECURSIVE_WITH_FA (initial_mmb_fa);
+
+#ifdef MALLOC_USE_LOCKING
+malloc_mutex_t __malloc_mmb_lock = MALLOC_RECURSIVE_MUTEX_INIT;
+#endif /* MALLOC_USE_LOCKING */
 #endif /* __UCLIBC_UCLINUX_BROKEN_MUNMAP__ */
 
 
@@ -139,6 +143,9 @@ malloc_from_heap (size_t size, struct heap *heap)
 	  __heap_unlock (heap);
 
 #if !defined(MALLOC_USE_SBRK) && defined(__UCLIBC_UCLINUX_BROKEN_MUNMAP__)
+
+	  __malloc_lock_mmb ();
+
 	  /* Insert a record of BLOCK in sorted order into the
 	     __malloc_mmapped_blocks list.  */
 
@@ -157,6 +164,8 @@ malloc_from_heap (size_t size, struct heap *heap)
 	    prev_mmb->next = new_mmb;
 	  else
 	    __malloc_mmapped_blocks = new_mmb;
+
+	  __malloc_unlock_mmb ();
 
 	  MALLOC_MMB_DEBUG (0, "new mmb at 0x%x: 0x%x[%d]",
 			    (unsigned)new_mmb,
