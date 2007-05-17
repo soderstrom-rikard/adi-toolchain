@@ -518,9 +518,14 @@ BUILD_TARGET="--build=`$DIR_BINUTILS_SOURCE/config.guess`"
 if [ -z "$HOST_TARGET" ] ; then
     HOST_TARGET="--host=`$DIR_BINUTILS_SOURCE/config.guess`"
 fi
+
+# libintl / libiconv handling in binutils-2.17 is broken for
+# extraneous hosts ... it's been fixed in binutils-2.18, so
+# once we update to that, we should be able to re-enable NLS
 case $HOST_TARGET in
-    --host=mingw*) BINUTILS_EXTRA_CONF="--disable-nls";;
-    *)             BINUTILS_EXTRA_CONF="";;
+    --host=mingw*)   BINUTILS_EXTRA_CONF="--disable-nls";;
+    --host=*darwin*) BINUTILS_EXTRA_CONF="--disable-nls";;
+    *)               BINUTILS_EXTRA_CONF="";;
 esac
 
 echo -n "Path to elf2flt dir         "
