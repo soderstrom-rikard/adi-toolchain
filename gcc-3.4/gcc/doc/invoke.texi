@@ -9977,7 +9977,7 @@ be defined. And for @samp{bfin-elf} toolchain, this causes the hardware BSP
 provided by libgloss to be linked in if @option{-msim} is not given.
 
 @item -msi-revision=@var{version}
-@opindex var=
+@opindex msi-revision=
 Specifies the silicon revision of the target Blackfin processor. Any
 workarounds available for the targeted silicon revision will be enabled.
 If @var{version} is @samp{none}, no workarounds are enabled.
@@ -9987,6 +9987,8 @@ hexadecimal digits representing the major and minor numbers in the silicon
 revision. If @var{version} is @samp{none}, the @code{__SILICON_REVISION__}
 is not defined. If @var{version} is @samp{any}, the
 @code{__SILICON_REVISION__} is defined to be @code{0xffff}.
+If this option is not used, GCC assumes the latest known silicon revision of
+the targeted Blackfin processor.
 
 @item -msim
 @opindex msim
