@@ -91,6 +91,76 @@ static int bfin_flag_schedule_insns2;
 /* -mcpu support */
 bfin_cpu_t bfin_cpu_type = DEFAULT_CPU_TYPE;
 
+/* -msi-revision support. There are three special values:
+   -1      not set explicitly in commandline
+   -2      -msi-revision=none.
+   0xffff  -msi-revision=any.  */
+int bfin_si_revision = -1;
+
+/* The workarounds enabled */
+unsigned int bfin_workarounds = 0;
+
+struct bfin_cpu
+{
+  const char *name;
+  bfin_cpu_t type;
+  int si_revision;
+  unsigned int workarounds;
+};
+
+struct bfin_cpu bfin_cpus[] =
+{
+  {"bf531", BFIN_CPU_BF531, 0x0005,
+   WA_SPECULATIVE_LOADS},
+  {"bf531", BFIN_CPU_BF531, 0x0004,
+   WA_SPECULATIVE_LOADS | WA_SPECULATIVE_SYNCS},
+  {"bf531", BFIN_CPU_BF531, 0x0003,
+   WA_SPECULATIVE_LOADS | WA_SPECULATIVE_SYNCS},
+
+  {"bf532", BFIN_CPU_BF532, 0x0005,
+   WA_SPECULATIVE_LOADS},
+  {"bf532", BFIN_CPU_BF532, 0x0004,
+   WA_SPECULATIVE_LOADS | WA_SPECULATIVE_SYNCS},
+  {"bf532", BFIN_CPU_BF532, 0x0003,
+   WA_SPECULATIVE_LOADS | WA_SPECULATIVE_SYNCS},
+
+  {"bf533", BFIN_CPU_BF533, 0x0005,
+   WA_SPECULATIVE_LOADS},
+  {"bf533", BFIN_CPU_BF533, 0x0004,
+   WA_SPECULATIVE_LOADS | WA_SPECULATIVE_SYNCS},
+  {"bf533", BFIN_CPU_BF533, 0x0003,
+   WA_SPECULATIVE_LOADS | WA_SPECULATIVE_SYNCS},
+
+  {"bf534", BFIN_CPU_BF534, 0x0003,
+   WA_SPECULATIVE_LOADS},
+  {"bf534", BFIN_CPU_BF534, 0x0002,
+   WA_SPECULATIVE_LOADS | WA_SPECULATIVE_SYNCS},
+  {"bf534", BFIN_CPU_BF534, 0x0001,
+   WA_SPECULATIVE_LOADS | WA_SPECULATIVE_SYNCS},
+
+  {"bf536", BFIN_CPU_BF536, 0x0003,
+   WA_SPECULATIVE_LOADS},
+  {"bf536", BFIN_CPU_BF536, 0x0002,
+   WA_SPECULATIVE_LOADS | WA_SPECULATIVE_SYNCS},
+  {"bf536", BFIN_CPU_BF536, 0x0001,
+   WA_SPECULATIVE_LOADS | WA_SPECULATIVE_SYNCS},
+
+  {"bf537", BFIN_CPU_BF537, 0x0003,
+   WA_SPECULATIVE_LOADS},
+  {"bf537", BFIN_CPU_BF537, 0x0002,
+   WA_SPECULATIVE_LOADS | WA_SPECULATIVE_SYNCS},
+  {"bf537", BFIN_CPU_BF537, 0x0001,
+   WA_SPECULATIVE_LOADS | WA_SPECULATIVE_SYNCS},
+
+  {"bf561", BFIN_CPU_BF561, 0x0005, 0},
+  {"bf561", BFIN_CPU_BF561, 0x0003,
+   WA_SPECULATIVE_LOADS | WA_SPECULATIVE_SYNCS},
+  {"bf561", BFIN_CPU_BF561, 0x0002,
+   WA_SPECULATIVE_LOADS | WA_SPECULATIVE_SYNCS},
+
+  {NULL, 0, 0, 0}
+};
+
 int splitting_for_sched;
 
 static void
@@ -2149,6 +2219,8 @@ secondary_output_reload_class (enum reg_class class, enum machine_mode mode,
 static bool
 bfin_handle_option (size_t code, const char *arg, int value)
 {
+  int i;
+
   switch (code)
     {
     case OPT_mshared_library_id_:
@@ -2159,25 +2231,37 @@ bfin_handle_option (size_t code, const char *arg, int value)
       return true;
 
     case OPT_mcpu_:
-      if (strcmp (arg, "bf531") == 0)
-	bfin_cpu_type = BFIN_CPU_BF531;
-      else if (strcmp (arg, "bf532") == 0)
-	bfin_cpu_type = BFIN_CPU_BF532;
-      else if (strcmp (arg, "bf533") == 0)
-	bfin_cpu_type = BFIN_CPU_BF533;
-      else if (strcmp (arg, "bf534") == 0)
-	bfin_cpu_type = BFIN_CPU_BF534;
-      else if (strcmp (arg, "bf536") == 0)
-	bfin_cpu_type = BFIN_CPU_BF536;
-      else if (strcmp (arg, "bf537") == 0)
-	bfin_cpu_type = BFIN_CPU_BF537;
-      else if (strcmp (arg, "bf561") == 0)
-	{
-	  warning (0, "bf561 support is incomplete yet.");
-	  bfin_cpu_type = BFIN_CPU_BF561;
-	}
+      for (i = 0; bfin_cpus[i].name != NULL; i++)
+	if (strcmp (arg, bfin_cpus[i].name) == 0)
+	  {
+	    bfin_cpu_type = bfin_cpus[i].type;
+	    if (bfin_cpu_type == BFIN_CPU_BF561)
+	      warning (0, "bf561 support is incomplete yet.");
+	    return true;
+	  }
+      return false;
+
+    case OPT_msi_revision_:
+      if (strcmp (arg, "none") == 0)
+	bfin_si_revision = -2;
+      else if (strcmp (arg, "any") == 0)
+	bfin_si_revision = 0xffff;
       else
-	return false;
+	{
+	  unsigned int si_major, si_minor;
+	  int len, arglen;
+
+	  arglen = strlen (arg);
+
+	  if (sscanf (arg, "%u.%u%n", &si_major, &si_minor, &len) != 2
+	      || len != arglen
+	      || si_major > 0xff || si_minor > 0xff)
+	    {
+	      error ("-msi-revision=%s is not valid", arg);
+	      return false;
+	    }
+	  bfin_si_revision = (si_major << 8) | si_minor;
+	}
       return true;
 
     default:
@@ -2195,11 +2279,59 @@ bfin_init_machine_status (void)
   return f;
 }
 
+static void
+bfin_check_si_revision (void)
+{
+  int i, si_revision_bad;
+  unsigned int all_workarounds;
+
+  if (bfin_si_revision == -2)
+    return;
+
+  for (i = 0; bfin_cpus[i].type != bfin_cpu_type; i++);
+
+  if (bfin_si_revision == -1)
+    bfin_si_revision = bfin_cpus[i].si_revision;
+
+  si_revision_bad = 1;
+  all_workarounds = 0;
+  for (; bfin_cpus[i].type == bfin_cpu_type; i++)
+    {
+      if (bfin_si_revision == bfin_cpus[i].si_revision)
+	{
+	  si_revision_bad = 0;
+	  bfin_workarounds |= bfin_cpus[i].workarounds;
+	}
+      all_workarounds |= bfin_cpus[i].workarounds;
+    }
+
+  if (bfin_si_revision == 0xffff)
+    {
+      si_revision_bad = 0;
+      bfin_workarounds |= all_workarounds;
+    }
+
+  if (si_revision_bad)
+    error ("bad silicon revision");
+}
+
 /* Implement the macro OVERRIDE_OPTIONS.  */
 
 void
 override_options (void)
 {
+  bfin_check_si_revision ();
+
+  if (bfin_csync_anomaly == 1)
+    bfin_workarounds |= WA_SPECULATIVE_SYNCS;
+  else if (bfin_csync_anomaly == 0)
+    bfin_workarounds &= ~WA_SPECULATIVE_SYNCS;
+
+  if (bfin_specld_anomaly == 1)
+    bfin_workarounds |= WA_SPECULATIVE_LOADS;
+  else if (bfin_specld_anomaly == 0)
+    bfin_workarounds &= ~WA_SPECULATIVE_LOADS;
+
   if (TARGET_OMIT_LEAF_FRAME_POINTER)
     flag_omit_frame_pointer = 1;
 
@@ -3353,14 +3485,14 @@ length_for_loop (rtx insn)
   int length = 0;
   if (JUMP_P (insn) && any_condjump_p (insn) && !optimize_size)
     {
-      if (TARGET_CSYNC_ANOMALY)
+      if (ENABLE_WA_SPECULATIVE_SYNCS)
 	length = 8;
-      else if (TARGET_SPECLD_ANOMALY)
+      else if (ENABLE_WA_SPECULATIVE_LOADS)
 	length = 6;
     }
   else if (LABEL_P (insn))
     {
-      if (TARGET_CSYNC_ANOMALY)
+      if (ENABLE_WA_SPECULATIVE_SYNCS)
 	length = 4;
     }
 
@@ -4345,7 +4477,7 @@ bfin_reorg (void)
   if (cfun->machine->has_hardware_loops)
     bfin_reorg_loops (dump_file);
 
-  if (! TARGET_SPECLD_ANOMALY && ! TARGET_CSYNC_ANOMALY)
+  if (! ENABLE_WA_SPECULATIVE_LOADS && ! ENABLE_WA_SPECULATIVE_SYNCS)
     return;
 
   /* First pass: find predicted-false branches; if something after them
@@ -4381,12 +4513,12 @@ bfin_reorg (void)
 	  if (cycles_since_jump < INT_MAX)
 	    cycles_since_jump++;
 
-	  if (type == TYPE_MCLD && TARGET_SPECLD_ANOMALY)
+	  if (type == TYPE_MCLD && ENABLE_WA_SPECULATIVE_LOADS)
 	    {
 	      if (trapping_loads_p (insn))
 		delay_needed = 3;
 	    }
-	  else if (type == TYPE_SYNC && TARGET_CSYNC_ANOMALY)
+	  else if (type == TYPE_SYNC && ENABLE_WA_SPECULATIVE_SYNCS)
 	    delay_needed = 4;
 
 	  if (delay_needed > cycles_since_jump)
@@ -4417,7 +4549,7 @@ bfin_reorg (void)
     }
   /* Second pass: for predicted-true branches, see if anything at the
      branch destination needs extra nops.  */
-  if (! TARGET_CSYNC_ANOMALY)
+  if (! ENABLE_WA_SPECULATIVE_SYNCS)
     return;
 
   for (insn = get_insns (); insn; insn = NEXT_INSN (insn))
@@ -4450,7 +4582,7 @@ bfin_reorg (void)
 		  if (cycles_since_jump < INT_MAX)
 		    cycles_since_jump++;
 
-		  if (type == TYPE_SYNC && TARGET_CSYNC_ANOMALY)
+		  if (type == TYPE_SYNC && ENABLE_WA_SPECULATIVE_SYNCS)
 		    delay_needed = 2;
 
 		  if (delay_needed > cycles_since_jump)

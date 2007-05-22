@@ -1,3 +1,12 @@
+2007-05-22  Jie Zhang  <jie.zhang@analog.com>
+
+	* gcc.target/bfin/bfin.exp: New.
+	* gcc.target/bfin/{workarounds-any.c, workarounds-none.c,
+	workarounds-1.c, workarounds-2.c, workarounds-3.c,
+	workarounds-4.c, mcpu-bfin531.c, mcpu-bfin532.c,
+	mcpu-bfin533.c, mcpu-bfin534.c, mcpu-bfin536.c,
+	mcpu-bfin537.c, mcpu-bfin561.c, mcpu-default.c}: New tests.
+
 2007-03-15  Jie Zhang  <jie.zhang@analog.com>
 
 	* gcc.dg/cleanup-8.c: Enable this test on *-*-uclinux* target.

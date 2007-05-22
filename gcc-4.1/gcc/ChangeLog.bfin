@@ -1,3 +1,35 @@
+2007-05-22  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.opt (msi-revision=): New option.
+	(mcsync-anomaly): Use Var instead of Mask.
+	(mspecld-anomaly): Likewise.
+	* config/bfin/bfin-protos.h (enum bfin_cpu_type): Renamed from
+	(enum bfin_cpu): ... this.
+	(bfin_si_revision): Declare.
+	(bfin_workarounds): Declare.
+	(WA_SPECULATIVE_LOADS): Define.
+	(ENABLE_WA_SPECULATIVE_LOADS): Define.
+	(WA_SPECULATIVE_SYNCS): Define.
+	(ENABLE_WA_SPECULATIVE_SYNCS): Define.
+	* config/bfin/bfin.c (bfin_si_revision): Define.
+	(bfin_workarounds): Define.
+	(struct bfin_cpu): New.
+	(bfin_cpus): New.
+	(bfin_handle_option): Deal with -msi-revision= option and rewrite
+	-mcpu=.
+	(bfin_check_si_revision): New.
+	(override_options): Call bfin_check_si_revision () and set
+	bfin_workarounds.
+	(length_for_loop): Replace TARGET_CSYNC_ANOMALY with
+	ENABLE_WA_SPECULATIVE_SYNCS, TARGET_SPECLD_ANOMALY with
+	ENABLE_WA_SPECULATIVE_LOADS.
+	(bfin_reorg): Likewise.
+	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): Define
+	__SILICON_REVISION__ and __WORKAROUND_* macros if needed.
+	(TARGET_DEFAULT): Define as 0.
+	* doc/invoke.texi (Blackfin Options): Document -msi-revision.
+	Neither -mspecld-anomaly nor -mcsync-anomaly is enabled anymore.
+
 2007-05-10  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (MOVE_RATIO): Define.

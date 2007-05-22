@@ -112,7 +112,23 @@ extern int target_flags;
 	  break;				\
 	}					\
 						\
-      if (flag_pic)				\
+      if (bfin_si_revision != -2)		\
+	{					\
+	  /* space of 0xnnnn and a NUL */	\
+	  char *buf = alloca (7);		\
+						\
+	  sprintf (buf, "0x%04x", bfin_si_revision);			\
+	  builtin_define_with_value ("__SILICON_REVISION__", buf, 0);	\
+	}								\
+      									\
+      if (bfin_workarounds)						\
+	builtin_define ("__WORKAROUNDS_ENABLED");			\
+      if (ENABLE_WA_SPECULATIVE_LOADS)					\
+	builtin_define ("__WORKAROUND_SPECULATIVE_LOADS");		\
+      if (ENABLE_WA_SPECULATIVE_SYNCS)					\
+	builtin_define ("__WORKAROUND_SPECULATIVE_SYNCS");		\
+      									\
+      if (flag_pic)							\
 	{					\
 	  builtin_define ("__PIC__");		\
 	  builtin_define ("__pic__");		\
@@ -133,7 +149,7 @@ extern int target_flags;
 /* Generate DSP instructions, like DSP halfword loads */
 #define TARGET_DSP			(1)
 
-#define TARGET_DEFAULT (MASK_SPECLD_ANOMALY | MASK_CSYNC_ANOMALY)
+#define TARGET_DEFAULT 0
 
 /* Maximum number of library ids we permit */
 #define MAX_LIBRARY_ID 255

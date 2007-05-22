@@ -24,7 +24,7 @@
 #define GCC_BFIN_PROTOS_H
 
 /* CPU type.  */
-typedef enum bfin_cpu
+typedef enum bfin_cpu_type
 {
   BFIN_CPU_BF531,
   BFIN_CPU_BF532,
@@ -37,6 +37,22 @@ typedef enum bfin_cpu
 
 /* Value of -mcpu= */
 extern bfin_cpu_t bfin_cpu_type;
+
+/* Value of -msi-revision= */
+extern int bfin_si_revision;
+
+extern unsigned int bfin_workarounds;
+
+/* For the anomaly 05-00-0245 */
+#define WA_SPECULATIVE_LOADS 0x00000001
+#define ENABLE_WA_SPECULATIVE_LOADS \
+  (bfin_workarounds & WA_SPECULATIVE_LOADS)
+
+/* For the anomaly 05-00-0244 */
+#define WA_SPECULATIVE_SYNCS 0x00000002
+#define ENABLE_WA_SPECULATIVE_SYNCS \
+  (bfin_workarounds & WA_SPECULATIVE_SYNCS)
+
 
 #define Mmode enum machine_mode
 

@@ -27,6 +27,10 @@ mcpu=
 Target RejectNegative Joined
 Specify the name of the target CPU
 
+msi-revision=
+Target RejectNegative Joined
+Specify the silicon revision of the target CPU
+
 momit-leaf-frame-pointer
 Target Report Mask(OMIT_LEAF_FRAME_POINTER)
 Omit frame pointer for leaf functions
@@ -36,12 +40,12 @@ Target Report Mask(LOW_64K)
 Program is entirely located in low 64k of memory
 
 mcsync-anomaly
-Target Report Mask(CSYNC_ANOMALY)
+Target Report Var(bfin_csync_anomaly) Init(-1)
 Work around a hardware anomaly by adding a number of NOPs before a
 CSYNC or SSYNC instruction.
 
 mspecld-anomaly
-Target Report Mask(SPECLD_ANOMALY)
+Target Report Var(bfin_specld_anomaly) Init(-1)
 Avoid speculative loads to work around a hardware anomaly.
 
 mid-shared-library

@@ -26,8 +26,6 @@
   The following set of defines, describe the commandline api.
 */
 #define MASK_OMIT_LEAF_FRAME_POINTER 0x00000001 /* omit leaf frame pointers */
-#define MASK_CSYNC_ANOMALY           0x00000002
-#define MASK_SPECLD_ANOMALY          0x00000004
 #define MASK_SIMPLE_RTM              0x00000008
 #define MASK_LOW_64K           	     0x00000010
 #define MASK_CMOV	             0x00000020 /* use conditional moves */
@@ -96,7 +94,23 @@ extern int target_flags;
 	  break;				\
 	}					\
 						\
-      if (flag_pic)				\
+      if (bfin_si_revision != -2)		\
+	{					\
+	  /* space of 0xnnnn and a NUL */	\
+	  char *buf = alloca (7);		\
+						\
+	  sprintf (buf, "0x%04x", bfin_si_revision);			\
+	  builtin_define_with_value ("__SILICON_REVISION__", buf, 0);	\
+	}								\
+      									\
+      if (bfin_workarounds)						\
+	builtin_define ("__WORKAROUNDS_ENABLED");			\
+      if (ENABLE_WA_SPECULATIVE_LOADS)					\
+	builtin_define ("__WORKAROUND_SPECULATIVE_LOADS");		\
+      if (ENABLE_WA_SPECULATIVE_SYNCS)					\
+	builtin_define ("__WORKAROUND_SPECULATIVE_SYNCS");		\
+      									\
+      if (flag_pic)							\
 	{					\
 	  builtin_define ("__PIC__");		\
 	  builtin_define ("__pic__");		\
@@ -162,8 +176,6 @@ extern int target_flags;
 #define TARGET_DEBUG_ARG	       (target_flags & MASK_DEBUG_ARGS)
 #define TARGET_SIMPLE_RTM              (target_flags & MASK_SIMPLE_RTM)
 #define TARGET_LOW_64K                 (target_flags & MASK_LOW_64K)
-#define TARGET_SPECLD_ANOMALY	       (target_flags & MASK_SPECLD_ANOMALY)
-#define TARGET_CSYNC_ANOMALY	       (target_flags & MASK_CSYNC_ANOMALY)
 #define TARGET_LONG_CALLS	       (target_flags & MASK_LONG_CALLS)
 #define TARGET_NO_UNDERSCORE	       (target_flags & MASK_NO_UNDERSCORE)
 #define TARGET_ID_SHARED_LIBRARY       (target_flags & MASK_ID_SHARED_LIBRARY)
@@ -211,14 +223,6 @@ extern int target_flags;
     "Disable inlining of PLT in function calls"},			\
   { "no-cmov",			-MASK_LONG_CALLS,			\
     "Don't use long calls by default"},					\
-  { "specld-anomaly",		 MASK_SPECLD_ANOMALY,			\
-    "Avoid speculative loads"},						\
-  { "no-specld-anomaly",	-MASK_SPECLD_ANOMALY,			\
-    "Do not generate extra code to avoid speculative loads"},		\
-  { "csync-anomaly",		 MASK_CSYNC_ANOMALY,			\
-    "Avoid CSYNC/SSYNC after conditional jumps"},			\
-  { "no-csync-anomaly",		-MASK_CSYNC_ANOMALY,			\
-    "Do not generate extra code to avoid CSYNC/SSYNC after condjumps"},	\
   { "profile",		         MASK_PROFILE,				\
     "Non GNU Profiling"},						\
   { "no-profile",		-MASK_PROFILE,				\
@@ -245,10 +249,13 @@ extern int target_flags;
     "Link with the fast floating-point library"},			\
   { "sim",			0,					\
     "Use simulator runtime"},						\
-  { "", MASK_CMOV | MASK_CSYNC_ANOMALY | MASK_SPECLD_ANOMALY,		\
-    "default: cmov, csync-anomaly, specld-anomaly"}}
+  { "", MASK_CMOV,							\
+    "default: cmov"}}
 
 extern const char *bfin_cpu_string;
+extern const char *bfin_si_revision_string;
+extern const char *bfin_specld_anomaly;
+extern const char *bfin_csync_anomaly;
 
 /* This macro is similar to `TARGET_SWITCHES' but defines names of
    command options that have values.  Its definition is an
@@ -263,8 +270,18 @@ extern const char *bfin_cpu_string;
 {									\
   { "cpu=",			&bfin_cpu_string,			\
     "Specify the name of the Blackfin processor", 0},			\
+  { "si-revision=",		&bfin_si_revision_string,		\
+    "Specify the silicon revision of the Blackfin processor", 0},	\
   { "shared-library-id=",	&bfin_library_id_string,		\
-    "ID of shared library to build", 0}					\
+    "ID of shared library to build", 0},				\
+  { "specld-anomaly",		&bfin_specld_anomaly,			\
+    "Avoid speculative loads", "1"},					\
+  { "no-specld-anomaly",	&bfin_specld_anomaly,			\
+    "Do not generate extra code to avoid speculative loads", "0"},	\
+  { "csync-anomaly",		&bfin_csync_anomaly,			\
+    "Avoid CSYNC/SSYNC after conditional jumps", "1"},			\
+  { "no-csync-anomaly",		&bfin_csync_anomaly,			\
+    "Do not generate extra code to avoid CSYNC/SSYNC after condjumps", "0"} \
 }
 
 /* Maximum number of library ids we permit */

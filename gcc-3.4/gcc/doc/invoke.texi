@@ -587,7 +587,8 @@ in the following sections.
 -mcall-prologues  -mno-tablejump  -mtiny-stack}
 
 @emph{Blackfin Options}
-@gccoptlist{-mcpu=@var{cpu} -msim -momit-leaf-frame-pointer  -mno-omit-leaf-frame-pointer @gol
+@gccoptlist{-mcpu=@var{cpu} -msi-revision=@var{version}
+-msim -momit-leaf-frame-pointer  -mno-omit-leaf-frame-pointer @gol
 -mspecld-anomaly  -mno-specld-anomaly  -mcsync-anomaly  -mno-csync-anomaly @gol
 -mlow-64k -mno-low64k  -mstack-check-l1  -mid-shared-library @gol
 -mno-id-shared-library  -mshared-library-id=@var{n} @gol
@@ -9973,7 +9974,19 @@ Only the processor macro is defined.
 Without this option, @samp{bf532} is used as the processor by default.
 The corresponding predefined processor macros for @var{cpu} is to
 be defined. And for @samp{bfin-elf} toolchain, this causes the hardware BSP
-provided by libgloss to be linked in if @samp{-msim} is not given.
+provided by libgloss to be linked in if @option{-msim} is not given.
+
+@item -msi-revision=@var{version}
+@opindex var=
+Specifies the silicon revision of the target Blackfin processor. Any
+workarounds available for the targeted silicon revision will be enabled.
+If @var{version} is @samp{none}, no workarounds are enabled.
+If @var{version} is @samp{any}, all workarounds for the targeted processor
+will be enabled. The @code{__SILICON_REVISION__} macro is defined to two
+hexadecimal digits representing the major and minor numbers in the silicon
+revision. If @var{version} is @samp{none}, the @code{__SILICON_REVISION__}
+is not defined. If @var{version} is @samp{any}, the
+@code{__SILICON_REVISION__} is defined to be @code{0xffff}.
 
 @item -msim
 @opindex msim
@@ -9992,8 +10005,8 @@ which might make debugging harder.
 @item -mspecld-anomaly
 @opindex mspecld-anomaly
 When enabled, the compiler will ensure that the generated code does not
-contain speculative loads after jump instructions.  This option is enabled
-by default.
+contain speculative loads after jump instructions. If this option is used,
+@code{__WORKAROUND_SPECULATIVE_LOADS} is defined.
 
 @item -mno-specld-anomaly
 @opindex mno-specld-anomaly
@@ -10003,7 +10016,7 @@ Don't generate extra code to prevent speculative loads from occurring.
 @opindex mcsync-anomaly
 When enabled, the compiler will ensure that the generated code does not
 contain CSYNC or SSYNC instructions too soon after conditional branches.
-This option is enabled by default.
+If this option is used, @code{__WORKAROUND_SPECULATIVE_SYNCS} is defined.
 
 @item -mno-csync-anomaly
 @opindex mno-csync-anomaly
