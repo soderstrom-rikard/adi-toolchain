@@ -1,5 +1,10 @@
 2007-05-22  Jie Zhang  <jie.zhang@analog.com>
 
+	* doc/invoke.texi (Blackfin Options): Fix opindex of
+	-msi-revision=. And document the default behavior of it.
+
+2007-05-22  Jie Zhang  <jie.zhang@analog.com>
+
 	* config/bfin/bfin.opt (msi-revision=): New option.
 	(mcsync-anomaly): Use Var instead of Mask.
 	(mspecld-anomaly): Likewise.
