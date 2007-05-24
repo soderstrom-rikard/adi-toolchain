@@ -53,6 +53,10 @@
 #include <dmalloc.h>
 #endif
 
+#ifndef MAP_ANONYMOUS
+# define MAP_ANONYMOUS MAP_ANON
+#endif
+
 /* Exit codes used by mkfs-type programs */
 #define MKFS_OK          0	/* No errors */
 #define MKFS_ERROR       8	/* Operational error */
@@ -368,7 +372,7 @@ static int cramsort (const void *a, const void *b)
 		       (*(const struct dirent **) b)->d_name);
 }
 
-static unsigned int parse_directory(struct entry *root_entry, const char *name, struct entry **prev, loff_t *fslen_ub)
+static unsigned int parse_directory(struct entry *root_entry, const char *name, struct entry **prev, off_t *fslen_ub)
 {
 	struct dirent **dirlist;
 	int totalsize = 0, dircount, dirindex;
@@ -844,7 +848,7 @@ static struct entry *find_filesystem_entry(struct entry *dir, char *name, mode_t
 }
 
 void modify_entry(char *full_path, unsigned long uid, unsigned long gid, 
-	unsigned long mode, unsigned long rdev, struct entry *root, loff_t *fslen_ub)
+	unsigned long mode, unsigned long rdev, struct entry *root, off_t *fslen_ub)
 {
 	char *name, *path, *full;
 	struct entry *curr, *parent, *entry, *prev;
@@ -978,7 +982,7 @@ inline int snprintf(char *str, size_t n, const char *fmt, ...)
     block, fifo, or directory does not exist, it will be created.
 */
 
-static int interpret_table_entry(char *line, struct entry *root, loff_t *fslen_ub)
+static int interpret_table_entry(char *line, struct entry *root, off_t *fslen_ub)
 {
 	char type, *name = NULL;
 	unsigned long mode = 0755, uid = 0, gid = 0, major = 0, minor = 0;
@@ -1034,7 +1038,7 @@ static int interpret_table_entry(char *line, struct entry *root, loff_t *fslen_u
 	return 0;
 }
 
-static int parse_device_table(FILE *file, struct entry *root, loff_t *fslen_ub)
+static int parse_device_table(FILE *file, struct entry *root, off_t *fslen_ub)
 {
 	char *line;
 	int status = 0;
@@ -1134,7 +1138,7 @@ int main(int argc, char **argv)
 	ssize_t offset, written;
 	int fd;
 	/* initial guess (upper-bound) of required filesystem size */
-	loff_t fslen_ub = sizeof(struct cramfs_super);
+	off_t fslen_ub = sizeof(struct cramfs_super);
 	char const *dirname, *outfile;
 	u32 crc;
 	int c;			/* for getopt */

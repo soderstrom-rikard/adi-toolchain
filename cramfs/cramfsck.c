@@ -48,12 +48,15 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
-#include <sys/sysmacros.h>
 #include <utime.h>
 #include <sys/ioctl.h>
 #define _LINUX_STRING_H_
 #include "linux/cramfs_fs.h"
 #include <zlib.h>
+
+#ifndef MAP_ANONYMOUS
+# define MAP_ANONYMOUS MAP_ANON
+#endif
 
 #define BLKGETSIZE	_IO(0x12,96) /* return device size /512 (long *arg) */
 
