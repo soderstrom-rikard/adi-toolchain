@@ -27,7 +27,8 @@
 
 extern long int testandset (int *spinlock);
 
-#include <asm/unistd.h>
+#include <asm/fixed_code.h>
+
 /* Spinlock implementation; required.  */
 /* The semantics of the TESTSET instruction cannot be guaranteed. We cannot
    easily move all locks used by linux kernel to non-cacheable memory.
@@ -38,13 +39,35 @@ extern long int testandset (int *spinlock);
 PT_EI long int
 testandset (int *spinlock)
 {
-  long int res;
-  asm volatile ("R0 = %2; P0 = %4; EXCPT 0; %0 = R0;"
-                : "=d" (res), "=m" (*spinlock)
-                : "d" (spinlock), "m" (*spinlock),
-		  "ida" (__NR_bfin_spinlock)
-                :"R0", "P0", "cc");
-  return res;
+    long int res;
+
+    asm volatile ("R1 = 1; P0 = %2; CALL (%4); %0 = R0;"
+		  : "=d" (res), "=m" (*spinlock)
+		  : "da" (spinlock), "m" (*spinlock),
+		  "a" (ATOMIC_XCHG32)
+		  :"R0", "R1", "P0", "RETS", "cc", "memory");
+
+    return res;
+}
+
+#define HAS_COMPARE_AND_SWAP
+PT_EI int
+__compare_and_swap (long int *p, long int oldval, long int newval)
+{
+    long int readval;
+    asm volatile ("P0 = %2;\n\t"
+		  "R1 = %3;\n\t"
+		  "R2 = %4;\n\t"
+		  "CALL (%5);\n\t"
+		  "%0 = R0;\n\t"
+		  : "=da" (readval), "=m" (*p)
+		  : "da" (p),
+		  "da" (oldval),
+		  "da" (newval),
+		  "a" (ATOMIC_CAS32),
+		  "m" (*p)
+		  : "P0", "R0", "R1", "R2", "RETS", "memory", "cc");
+    return readval == oldval;
 }
 
 #ifdef SHARED
