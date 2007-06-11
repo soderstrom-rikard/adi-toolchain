@@ -1296,7 +1296,7 @@ if [ $KERNEL_SOURCE ] ; then
 	echo -n "*** Configuring Linux Kernel       " ; date
 
 	cd $KERNEL_SOURCE
-	RUN="$MAKE -j1 headers_check headers_install INSTALL_HDR_PATH=$DIR_KBUILD_OUTPUT/usr KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT CROSS_COMPILE=bfin-elf-"
+	RUN="$MAKE -j1 headers_check headers_install INSTALL_HDR_PATH=$DIR_KBUILD_OUTPUT/usr KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT CROSS_COMPILE=bfin-elf- ARCH=blackfin"
 	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 	(echo $RUN $LOGFILE ; ) | sh || die_with_log
 	find "$DIR_KBUILD_OUTPUT/usr" -type f -name '.check.*' -print0 | xargs -0 rm -f
