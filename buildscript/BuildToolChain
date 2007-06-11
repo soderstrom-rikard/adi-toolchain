@@ -1004,7 +1004,7 @@ run_tests ()
 #
 build_uClibc()
 {
-    ARGS="V=1 CROSS=bfin-elf- DEVEL_PREFIX=/usr/ RUNTIME_PREFIX=/ ARCH_CFLAGS='-g'"
+    ARGS="V=1 CROSS=bfin-elf- DEVEL_PREFIX=/usr/ RUNTIME_PREFIX=/ ARCH_CFLAGS='-g -O2'"
     echo -n "*** Cleaning uClibc                " ; date
     RUN="$MAKE clean $ARGS"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
