@@ -1,3 +1,9 @@
+2007-06-11  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (movdi_insn, movsi_insn, movv2hi_insn,
+	movhi_insn, movqi_insn, movsf_insn, movdf_insn): Don't allow constant
+	to memory moves.
+	
 2007-05-22  Jie Zhang  <jie.zhang@analog.com>
 
 	* doc/invoke.texi (Blackfin Options): Fix opindex of
