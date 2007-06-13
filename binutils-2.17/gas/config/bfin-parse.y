@@ -1594,23 +1594,23 @@ asm_1:
 	}
 	| CCREG ASSIGN REG_A _ASSIGN_ASSIGN REG_A
 	{
-	  if (!REG_SAME ($3, $5))
+	  if ($3.regno == REG_A0 && $5.regno == REG_A1)
 	    {
 	      notethat ("CCflag: CC = A0 == A1\n");
 	      $$ = CCFLAG (0, 0, 5, 0, 0);
 	    }
 	  else
-	    return yyerror ("CC register expected");
+	    return yyerror ("AREGs are in bad order or same");
 	}
 	| CCREG ASSIGN REG_A LESS_THAN REG_A
 	{
-	  if (!REG_SAME ($3, $5))
+	  if ($3.regno == REG_A0 && $5.regno == REG_A1)
 	    {
 	      notethat ("CCflag: CC = A0 < A1\n");
 	      $$ = CCFLAG (0, 0, 6, 0, 0);
 	    }
 	  else
-	    return yyerror ("Register mismatch");
+	    return yyerror ("AREGs are in bad order or same");
 	}
 	| CCREG ASSIGN REG LESS_THAN REG iu_or_nothing
 	{
@@ -1639,7 +1639,9 @@ asm_1:
 	    {
 	      notethat ("CCflag: CC = dpregs == dpregs\n");
 	      $$ = CCFLAG (&$3, $5.regno & CODE_MASK, 0, 0, IS_PREG ($3) ? 1 : 0);
-	    } 
+	    }
+	  else
+	    return yyerror ("Compare only of same register class");
 	}
 	| CCREG ASSIGN REG _ASSIGN_ASSIGN expr
 	{
@@ -1653,13 +1655,13 @@ asm_1:
 	}
 	| CCREG ASSIGN REG_A _LESS_THAN_ASSIGN REG_A
 	{
-	  if (!REG_SAME ($3, $5))
+	  if ($3.regno == REG_A0 && $5.regno == REG_A1)
 	    {
 	      notethat ("CCflag: CC = A0 <= A1\n");
 	      $$ = CCFLAG (0, 0, 7, 0, 0);
 	    }
 	  else
-	    return yyerror ("CC register expected");
+	    return yyerror ("AREGs are in bad order or same");
 	}
 	| CCREG ASSIGN REG _LESS_THAN_ASSIGN REG iu_or_nothing
 	{
