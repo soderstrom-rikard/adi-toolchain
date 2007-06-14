@@ -1,3 +1,9 @@
+2007-06-14  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* configure.in: Don't add target-libmudflap to noconfigdirs for
+	uclinux targets.
+	* configure: Regenerate.
+
 2007-02-22  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* Applied gcc-core-4.1.1-4.1.2.diff.

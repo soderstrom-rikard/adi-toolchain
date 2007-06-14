@@ -341,7 +341,7 @@ no)
     ;;
 "")
     case "${target}" in
-    *-*-linux*-gnu | *-*-gnu* | *-*-k*bsd*-gnu | *-*-linux-uclibc*)
+    *-*-linux*-gnu | *-*-gnu* | *-*-k*bsd*-gnu | *-*-linux-uclibc* | *-*-uclinux*)
         # Enable libmudflap by default in GNU and friends.
 	;;
     *-*-freebsd*)
