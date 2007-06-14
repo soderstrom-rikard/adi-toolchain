@@ -124,8 +124,10 @@
 /* We support the Timeouts option.  */
 #define _POSIX_TIMEOUTS	200112L
 
-/* We support spinlocks.  */
+/* We don't support spinlocks.  */
+#if 0
 #define _POSIX_SPIN_LOCKS	200112L
+#endif
 
 /* The `spawn' function family is supported.  */
 #define _POSIX_SPAWN	200112L
