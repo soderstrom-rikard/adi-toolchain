@@ -118,6 +118,14 @@ if test "$ac_bfd_include_dir" = "NONE" ; then
 	exit 1
 fi
 
+SYMBOL_PREFIX=
+case $target in
+	bfin*)
+		SYMBOL_PREFIX=_
+		;;
+esac
+
+
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS(fcntl.h unistd.h bfd.h)
@@ -139,6 +147,7 @@ AC_SUBST(binutils_include_dir)
 AC_SUBST(binutils_ldscript_dir)
 AC_SUBST(got_check)
 AC_SUBST(emit_relocs)
+AC_SUBST(SYMBOL_PREFIX)
 
-AC_OUTPUT(Makefile ld-elf2flt)
+AC_OUTPUT(Makefile ld-elf2flt elf2flt.ld)
 
