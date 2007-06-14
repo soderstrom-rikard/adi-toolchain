@@ -1,0 +1,79 @@
+#include <blackfin.h>
+
+#define PORTG 0xFFC01594
+#define PORTG_FER 0xFFC01580
+#define PORTG_MUX 0xFFC0159C
+#define PORTG_DIR_SET 0xFFC01590
+#define PORTG_CLEAR 0xFFC0158C
+#define pPORTG ((volatile unsigned short *)PORTG)
+#define pPORTG_FER ((volatile unsigned short *)PORTG_FER)
+#define pPORTG_MUX ((volatile unsigned short *)PORTG_MUX)
+#define pPORTG_DIR_SET ((volatile unsigned short *)PORTG_DIR_SET)
+#define pPORTG_CLEAR ((volatile unsigned short *)PORTG_CLEAR)
+
+#define BLINK_FAST      2000
+#define BLINK_SLOW      (BLINK_FAST * 2)
+
+typedef enum LEDS_tag{
+	LED1 = 0x40,
+	LED2 = 0x80,
+	LED3 = 0x100,
+	LED4 = 0x200,
+	LED5 = 0x400,
+	LED6 = 0x800,
+	LAST_LED = 0x1000
+}enLED;
+
+void Delay(unsigned long ulMs)
+{
+	while (ulMs--)
+		asm("nop");
+}
+
+void Init_LEDs(void)
+{
+	*pPORTG_FER &= ~0x0FC0;
+	*pPORTG_MUX &= ~0x0FC0;
+	*pPORTG_DIR_SET = 0x0FC0;
+	*pPORTG_CLEAR = 0x0FC0;
+}
+
+void ClearSet_LED(const enLED led, const int bState)
+{
+	if (bState == 0)
+		*pPORTG &= ~(led); /* clear */
+	else if (bState == 1)
+		*pPORTG |= led; /* set */
+	else
+		*pPORTG ^= led; /* toggle */
+}
+
+void ClearSet_LED_Bank(const int enleds, const int iState)
+{
+	enLED n;
+	int nTempState = iState;
+
+	for (n = LED1; n < LAST_LED; (n <<= 1)) {
+		if (n & enleds)
+			ClearSet_LED(n, (nTempState & 0x3));
+		nTempState >>= 2;
+	}
+}
+
+void LED_Bar(const int iSpeed)
+{
+	enLED n;
+	for (n = LED1; n < LAST_LED; (n <<= 1)) {
+		ClearSet_LED(n, 3);
+		Delay(iSpeed);
+	}
+}
+
+int main(void)
+{
+	Init_LEDs();
+	ClearSet_LED_Bank(-1, 0x0000);
+	while (1)
+		LED_Bar(BLINK_SLOW);
+	return 0;
+}
