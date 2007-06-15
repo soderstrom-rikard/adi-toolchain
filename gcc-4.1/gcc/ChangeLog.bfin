@@ -1,3 +1,9 @@
+2007-06-15  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/elf.h (ASM_GENERATE_INTERNAL_LABEL): Delete.
+	* config/bfin/bfin.c (TARGET_ASM_INTERNAL_LABEL): Delete.
+	(bfin_internal_label): Delete.
+
 2007-06-14  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/uclinux.h (MFWRAP_SPEC): New.
