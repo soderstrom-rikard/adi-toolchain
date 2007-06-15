@@ -1,15 +1,17 @@
 #include <blackfin.h>
 
-#define PORTG 0xFFC01594
-#define PORTG_FER 0xFFC01580
-#define PORTG_MUX 0xFFC0159C
-#define PORTG_DIR_SET 0xFFC01590
-#define PORTG_CLEAR 0xFFC0158C
-#define pPORTG ((volatile unsigned short *)PORTG)
-#define pPORTG_FER ((volatile unsigned short *)PORTG_FER)
-#define pPORTG_MUX ((volatile unsigned short *)PORTG_MUX)
-#define pPORTG_DIR_SET ((volatile unsigned short *)PORTG_DIR_SET)
-#define pPORTG_CLEAR ((volatile unsigned short *)PORTG_CLEAR)
+#define PORTG_FER        0xFFC01580
+#define PORTG_DIR_CLEAR  0xFFC01584
+#define PORTG_CLEAR      0xFFC0158C
+#define PORTG_DIR_SET    0xFFC01590
+#define PORTG            0xFFC01594
+#define PORTG_MUX        0xFFC0159C
+#define pPORTG_FER       ((volatile unsigned short *)PORTG_FER)
+#define pPORTG_DIR_CLEAR ((volatile unsigned short *)PORTG_DIR_CLEAR)
+#define pPORTG_CLEAR     ((volatile unsigned short *)PORTG_CLEAR)
+#define pPORTG_DIR_SET   ((volatile unsigned short *)PORTG_DIR_SET)
+#define pPORTG           ((volatile unsigned short *)PORTG)
+#define pPORTG_MUX       ((volatile unsigned int   *)PORTG_MUX)
 
 #define BLINK_FAST      2000
 #define BLINK_SLOW      (BLINK_FAST * 2)
@@ -26,7 +28,8 @@ typedef enum LEDS_tag{
 
 void Delay(unsigned long ulMs)
 {
-	while (ulMs--)
+	unsigned long sleep = ulMs * 5000;
+	while (sleep--)
 		asm("nop");
 }
 
@@ -41,11 +44,11 @@ void Init_LEDs(void)
 void ClearSet_LED(const enLED led, const int bState)
 {
 	if (bState == 0)
-		*pPORTG &= ~(led); /* clear */
+		*pPORTG_DIR_CLEAR &= ~(led); /* clear */
 	else if (bState == 1)
-		*pPORTG |= led; /* set */
+		*pPORTG_DIR_CLEAR |= led; /* set */
 	else
-		*pPORTG ^= led; /* toggle */
+		*pPORTG_DIR_CLEAR ^= led; /* toggle */
 }
 
 void ClearSet_LED_Bank(const int enleds, const int iState)
