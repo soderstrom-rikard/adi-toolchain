@@ -31,6 +31,7 @@
 #define TARGET_VERSION fprintf (stderr, " (BlackFin bfin)")
 
 #define DRIVER_SELF_SPECS SUBTARGET_DRIVER_SELF_SPECS	"\
+ %{!mcpu=*:-mcpu=bf532} \
  %{mleaf-id-shared-library:%{!mid-shared-library:-mid-shared-library}} \
  %{mfdpic:%{!fpic:%{!fpie:%{!fPIC:%{!fPIE:\
    	    %{!fno-pic:%{!fno-pie:%{!fno-PIC:%{!fno-PIE:-fpie}}}}}}}}} \
@@ -79,11 +80,11 @@ extern int target_flags;
 
 /* Predefinition in the preprocessor for this target machine */
 #ifndef TARGET_CPU_CPP_BUILTINS
-#define TARGET_CPU_CPP_BUILTINS()               \
-  do                                            \
-    {                                           \
-      builtin_define_std ("bfin");              \
-      builtin_define_std ("BFIN");              \
+#define TARGET_CPU_CPP_BUILTINS()		\
+  do						\
+    {						\
+      builtin_define_std ("bfin");		\
+      builtin_define_std ("BFIN");		\
       builtin_define ("__ADSPBLACKFIN__");	\
       builtin_define ("__ADSPLPBLACKFIN__");	\
 						\
@@ -112,7 +113,7 @@ extern int target_flags;
 	  break;				\
 	}					\
 						\
-      if (bfin_si_revision != -2)		\
+      if (bfin_si_revision != -1)		\
 	{					\
 	  /* space of 0xnnnn and a NUL */	\
 	  char *buf = alloca (7);		\
@@ -120,15 +121,15 @@ extern int target_flags;
 	  sprintf (buf, "0x%04x", bfin_si_revision);			\
 	  builtin_define_with_value ("__SILICON_REVISION__", buf, 0);	\
 	}								\
-      									\
+									\
       if (bfin_workarounds)						\
 	builtin_define ("__WORKAROUNDS_ENABLED");			\
       if (ENABLE_WA_SPECULATIVE_LOADS)					\
 	builtin_define ("__WORKAROUND_SPECULATIVE_LOADS");		\
       if (ENABLE_WA_SPECULATIVE_SYNCS)					\
 	builtin_define ("__WORKAROUND_SPECULATIVE_SYNCS");		\
-      									\
-      if (flag_pic)							\
+						\
+      if (flag_pic)				\
 	{					\
 	  builtin_define ("__PIC__");		\
 	  builtin_define ("__pic__");		\
@@ -138,11 +139,14 @@ extern int target_flags;
 	  builtin_define ("__BFIN_FDPIC__");	\
 	  builtin_define ("__FDPIC__");		\
 	}					\
-      if (TARGET_ID_SHARED_LIBRARY)		\
+      /* We don't want __ID_SHARED_LIB__	\
+	 to be defined. */			\
+      if (TARGET_ID_SHARED_LIBRARY		\
+	  && !TARGET_SEP_DATA)			\
 	builtin_define ("__ID_SHARED_LIB__");	\
       if (flag_no_builtin)			\
 	builtin_define ("__NO_BUILTIN");	\
-    }                                           \
+    }						\
   while (0)
 #endif
 

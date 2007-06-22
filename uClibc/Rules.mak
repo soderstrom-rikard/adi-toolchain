@@ -308,6 +308,9 @@ endif
 ifeq ($(UCLIBC_FORMAT_SHARED_FLAT),y)
 	CPU_CFLAGS-y := -mid-shared-library
 endif
+ifeq ($(UCLIBC_FORMAT_FLAT_SEP_DATA),y)
+	CPU_CFLAGS-y := -msep-data
+endif
 endif
 
 ifeq ($(TARGET_ARCH),frv)

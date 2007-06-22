@@ -92,10 +92,9 @@ static int bfin_flag_schedule_insns2;
 bfin_cpu_t bfin_cpu_type = DEFAULT_CPU_TYPE;
 
 /* -msi-revision support. There are three special values:
-   -1      not set explicitly in commandline
-   -2      -msi-revision=none.
+   -1      -msi-revision=none.
    0xffff  -msi-revision=any.  */
-int bfin_si_revision = -1;
+int bfin_si_revision;
 
 /* The workarounds enabled */
 unsigned int bfin_workarounds = 0;
@@ -2219,8 +2218,6 @@ secondary_output_reload_class (enum reg_class class, enum machine_mode mode,
 static bool
 bfin_handle_option (size_t code, const char *arg, int value)
 {
-  int i;
-
   switch (code)
     {
     case OPT_mshared_library_id_:
@@ -2231,38 +2228,77 @@ bfin_handle_option (size_t code, const char *arg, int value)
       return true;
 
     case OPT_mcpu_:
-      for (i = 0; bfin_cpus[i].name != NULL; i++)
-	if (strcmp (arg, bfin_cpus[i].name) == 0)
+      {
+	const char *p, *q;
+	int i;
+
+	i = 0;
+	while ((p = bfin_cpus[i].name) != NULL)
 	  {
-	    bfin_cpu_type = bfin_cpus[i].type;
-	    if (bfin_cpu_type == BFIN_CPU_BF561)
-	      warning (0, "bf561 support is incomplete yet.");
-	    return true;
+	    if (strncmp (arg, p, strlen (p)) == 0)
+	      break;
+	    i++;
 	  }
-      return false;
 
-    case OPT_msi_revision_:
-      if (strcmp (arg, "none") == 0)
-	bfin_si_revision = -2;
-      else if (strcmp (arg, "any") == 0)
-	bfin_si_revision = 0xffff;
-      else
-	{
-	  unsigned int si_major, si_minor;
-	  int len, arglen;
+	if (p == NULL)
+	  {
+	    error ("-mcpu=%s is not valid", arg);
+	    return false;
+	  }
 
-	  arglen = strlen (arg);
+	bfin_cpu_type = bfin_cpus[i].type;
 
-	  if (sscanf (arg, "%u.%u%n", &si_major, &si_minor, &len) != 2
-	      || len != arglen
-	      || si_major > 0xff || si_minor > 0xff)
-	    {
-	      error ("-msi-revision=%s is not valid", arg);
-	      return false;
-	    }
-	  bfin_si_revision = (si_major << 8) | si_minor;
-	}
-      return true;
+	q = arg + strlen (p);
+
+	if (*q == '\0')
+	  {
+	    bfin_si_revision = bfin_cpus[i].si_revision;
+	    bfin_workarounds |= bfin_cpus[i].workarounds;
+	  }
+	else if (strcmp (q, "-none") == 0)
+	  bfin_si_revision = -1;
+      	else if (strcmp (q, "-any") == 0)
+	  {
+	    bfin_si_revision = 0xffff;
+	    while (bfin_cpus[i].type == bfin_cpu_type)
+	      {
+		bfin_workarounds |= bfin_cpus[i].workarounds;
+		i++;
+	      }
+	  }
+	else
+	  {
+	    unsigned int si_major, si_minor;
+	    int rev_len, n;
+
+	    rev_len = strlen (q);
+
+	    if (sscanf (q, "-%u.%u%n", &si_major, &si_minor, &n) != 2
+		|| n != rev_len
+		|| si_major > 0xff || si_minor > 0xff)
+	      {
+	      invalid_silicon_revision:
+		error ("-mcpu=%s has invalid silicon revision", arg);
+		return false;
+	      }
+
+	    bfin_si_revision = (si_major << 8) | si_minor;
+
+	    while (bfin_cpus[i].type == bfin_cpu_type
+		   && bfin_cpus[i].si_revision != bfin_si_revision)
+	      i++;
+
+	    if (bfin_cpus[i].type != bfin_cpu_type)
+	      goto invalid_silicon_revision;
+
+	    bfin_workarounds |= bfin_cpus[i].workarounds;
+	  }
+
+	if (bfin_cpu_type == BFIN_CPU_BF561)
+	  warning (0, "bf561 support is incomplete yet.");
+
+	return true;
+      }
 
     default:
       return true;
@@ -2279,49 +2315,11 @@ bfin_init_machine_status (void)
   return f;
 }
 
-static void
-bfin_check_si_revision (void)
-{
-  int i, si_revision_bad;
-  unsigned int all_workarounds;
-
-  if (bfin_si_revision == -2)
-    return;
-
-  for (i = 0; bfin_cpus[i].type != bfin_cpu_type; i++);
-
-  if (bfin_si_revision == -1)
-    bfin_si_revision = bfin_cpus[i].si_revision;
-
-  si_revision_bad = 1;
-  all_workarounds = 0;
-  for (; bfin_cpus[i].type == bfin_cpu_type; i++)
-    {
-      if (bfin_si_revision == bfin_cpus[i].si_revision)
-	{
-	  si_revision_bad = 0;
-	  bfin_workarounds |= bfin_cpus[i].workarounds;
-	}
-      all_workarounds |= bfin_cpus[i].workarounds;
-    }
-
-  if (bfin_si_revision == 0xffff)
-    {
-      si_revision_bad = 0;
-      bfin_workarounds |= all_workarounds;
-    }
-
-  if (si_revision_bad)
-    error ("bad silicon revision");
-}
-
 /* Implement the macro OVERRIDE_OPTIONS.  */
 
 void
 override_options (void)
 {
-  bfin_check_si_revision ();
-
   if (bfin_csync_anomaly == 1)
     bfin_workarounds |= WA_SPECULATIVE_SYNCS;
   else if (bfin_csync_anomaly == 0)

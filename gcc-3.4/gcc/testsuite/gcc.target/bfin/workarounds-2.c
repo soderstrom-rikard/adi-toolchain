@@ -1,4 +1,4 @@
-/* Test for -mcpu= -msi-revision=.  */
+/* Test for -mcpu=.  */
 /* { dg-do preprocess } */
 /* { dg-options "-mno-specld-anomaly -mcpu=bf537" } */
 

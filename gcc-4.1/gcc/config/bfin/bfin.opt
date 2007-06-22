@@ -27,10 +27,6 @@ mcpu=
 Target RejectNegative Joined
 Specify the name of the target CPU
 
-msi-revision=
-Target RejectNegative Joined
-Specify the silicon revision of the target CPU
-
 momit-leaf-frame-pointer
 Target Report Mask(OMIT_LEAF_FRAME_POINTER)
 Omit frame pointer for leaf functions

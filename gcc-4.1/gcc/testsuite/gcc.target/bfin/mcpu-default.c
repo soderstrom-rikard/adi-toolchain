@@ -1,6 +1,5 @@
-/* Test for -mcpu= -msi-revision=.  */
+/* Test for -mcpu=.  */
 /* { dg-do preprocess } */
-/* { dg-options "-mcpu=bf532" } */
 
 #ifndef __ADSPBF532__
 #error "__ADSPBF532__ is not defined"

@@ -835,49 +835,75 @@ is_compat ()
 
 install_libstdcpps ()
 {
-    LIBSTDCPPS=`find $1 -type f -name libstdc++.so.* | tr '\n' ' '`
+    GCCS=`find $1 -name bfin-linux-uclibc-gcc-* | tr '\n' ' '`
 
-    while [ -n "$LIBSTDCPPS" ]; do
-	LIBSTDCPPS2=""
-	COMPAT_LIBSTDCPPS=""
+    while [ -n "$GCCS" ]; do
+	GCCS2=""
+	COMPAT_GCCS=""
 	NEWEST_VERSION=""
-	NEWEST_LIBSTDCPP=""
-	for LIBSTDCPP in $LIBSTDCPPS; do
+	NEWEST_GCC=""
+
+	for GCC in $GCCS; do
+	    LIBSTDCPP=`$GCC --print-file-name=libstdc++.so`
+	    LIBSTDCPP=`readlink -f $LIBSTDCPP`
 	    LIBSTDCPP_DIR=`dirname $LIBSTDCPP`
 	    LIBSTDCPP_NAME=`basename $LIBSTDCPP`
 	    LIBSTDCPP_VERSION=`echo $LIBSTDCPP_NAME | sed 's/libstdc++.so.\([0-9]*.[0-9]*.[0-9]*\).*/\1/'`
 	
 	    if [ -z "$NEWEST_VERSION" ]; then
 		NEWEST_VERSION=$LIBSTDCPP_VERSION
-		NEWEST_LIBSTDCPP=$LIBSTDCPP
-		COMPAT_LIBSTDCPPS=$LIBSTDCPP
+		NEWEST_GCC=$GCC
+		COMPAT_GCCS=$GCC
 		continue
 	    fi
 
 	    is_compat $LIBSTDCPP_VERSION $NEWEST_VERSION
 	    if [ $? -eq 1 ]; then
-		COMPAT_LIBSTDCPPS="$COMPAT_LIBSTDCPPS $LIBSTDCPP"
+		COMPAT_GCCS="$COMPAT_GCCS $GCC"
 
 		is_newer $LIBSTDCPP_VERSION $NEWEST_VERSION
 		if [ $? -eq 1 ]; then
 		    NEWEST_VERSION=$LIBSTDCPP_VERSION
-		    NEWEST_LIBSTDCPP=$LIBSTDCPP
+		    NEWEST_GCC=$GCC
 		fi
 	    else
-		LIBSTDCPPS2="$LIBSTDCPPS2 $LIBSTDCPP"
+		GCCS2="$GCCS2 $GCC"
 	    fi
 	done
 
-	MAJOR_NUM=`echo $LIBSTDCPP_VERSION | sed 's/\([0-9]*\).*/\1/'`
-	echo "Installing $NEWEST_LIBSTDCPP"
-	cp $NEWEST_LIBSTDCPP $1/$2/runtime/lib
-	ln -s `basename $NEWEST_LIBSTDCPP` $1/$2/runtime/lib/libstdc++.so.$MAJOR_NUM 
-	for LIBSTDCPP in $COMPAT_LIBSTDCPPS; do
-	    rm -f `dirname $LIBSTDCPP`/libstdc++.so*
-	    ln -s ../../../../$2/runtime/lib/`basename $NEWEST_LIBSTDCPP` `dirname $LIBSTDCPP`/libstdc++.so
+	echo "Installing shared libstdc++ from $NEWEST_GCC"
+
+	MULTILIBS=`$NEWEST_GCC --print-multi-lib`
+
+	for ml in $MULTILIBS; do
+
+	    dir=`echo ${ml} | sed -e 's/;.*$//'`
+	    flags=`echo ${ml} | sed -e 's/^[^;]*;//' -e 's/@/ -/g'`
+	    if [ "$dir" = "." ]; then
+		dir2=
+	    else
+		dir2=`echo ${dir} | sed -e 's|[^/]*|..|g'`/
+	    fi
+
+	    LIBSTDCPP=`$NEWEST_GCC $flags --print-file-name=libstdc++.so`
+	    LIBSTDCPP=`readlink -f $LIBSTDCPP`
+	    LIBSTDCPP_DIR=`dirname $LIBSTDCPP`
+	    LIBSTDCPP_NAME=`basename $LIBSTDCPP`
+	    LIBSTDCPP_VERSION=`echo $LIBSTDCPP_NAME | sed 's/libstdc++.so.\([0-9]*.[0-9]*.[0-9]*\).*/\1/'`
+	    MAJOR_NUM=`echo $LIBSTDCPP_VERSION | sed 's/\([0-9]*\).*/\1/'`
+
+	    cp $LIBSTDCPP $1/$2/runtime/$dir/lib
+	    ln -s $LIBSTDCPP_NAME $1/$2/runtime/$dir/lib/libstdc++.so.$MAJOR_NUM 
+
+	    for G in $COMPAT_GCCS; do
+		L=`$G $flags --print-file-name=libstdc++.so`
+		rm -f `dirname $L`/libstdc++.so*
+		ln -s ../../../../$dir2$2/runtime/$dir/lib/$LIBSTDCPP_NAME `dirname $L`/libstdc++.so
+	    done
+
 	done
 
-	LIBSTDCPPS=$LIBSTDCPPS2
+	GCCS=$GCCS2
     done
 }
 
@@ -888,32 +914,65 @@ install_libstdcpps ()
 
 install_libgccs ()
 {
-    LIBGCCS=`find $1 -type f -name libgcc_s.so.1 | tr '\n' ' '`
+    GCCS=`find $1 -name bfin-linux-uclibc-gcc-* | tr '\n' ' '`
 
     NEWEST_VERSION=""
-    NEWEST_LIBGCC=""
-    for LIBGCC in $LIBGCCS; do
+    NEWEST_GCC=""
+    for GCC in $GCCS; do
+	LIBGCC=`$GCC --print-file-name=libgcc_s.so`
 	LIBGCC_DIR=`dirname $LIBGCC`
 	GCC_VERSION=`basename $LIBGCC_DIR`
 	
 	if [ -z "$NEWEST_VERSION" ]; then
 	   NEWEST_VERSION=$GCC_VERSION
-	   NEWEST_LIBGCC=$LIBGCC
+	   NEWEST_GCC=$GCC
 	   continue
 	fi
 
 	is_newer $GCC_VERSION $NEWEST_VERSION
 	if [ $? -eq 1 ]; then
-	    NEWEST_VERSION=$LIBGCC_VERSION
-	    NEWEST_LIBGCC=$LIBGCC
+	    NEWEST_VERSION=$GCC_VERSION
+	    NEWEST_GCC=$GCC
 	fi
     done
 
-    echo "Installing $NEWEST_LIBGCC"
-    cp $NEWEST_LIBGCC $1/$2/runtime/lib
-    for LIBGCC in $LIBGCCS; do
-	rm -f `dirname $LIBGCC`/libgcc_s.so*
-	ln -s ../../../../$2/runtime/lib/libgcc_s.so.1 `dirname $LIBGCC`/libgcc_s.so
+    echo "Installing libgcc_s from $NEWEST_GCC"
+
+    MULTILIBS=`$NEWEST_GCC --print-multi-lib`
+
+    for ml in $MULTILIBS; do
+
+	dir=`echo ${ml} | sed -e 's/;.*$//'`
+	flags=`echo ${ml} | sed -e 's/^[^;]*;//' -e 's/@/ -/g'`
+
+	LIBGCC=`$NEWEST_GCC $flags --print-file-name=libgcc_s_$dir.so`
+	if [ ! -e $LIBGCC ]; then
+	    LIBGCC=`$NEWEST_GCC $flags --print-file-name=libgcc_s.so`
+	fi
+	if [ ! -e $LIBGCC ]; then
+            echo "No libgcc_s.so for $NEWEST_GCC - report an error"
+            tail -10 $ACTUAL_LOGFILE
+            exit 1
+	fi
+	    
+	LIBGCC=`readlink -f $LIBGCC`
+	LIBGCC_DIR=`dirname $LIBGCC`
+	LIBGCC_NAME=`basename $LIBGCC`
+
+	cp $LIBGCC $1/$2/runtime/$dir/lib
+
+	for G in $GCCS; do
+	    L=`$G $flags --print-file-name=libgcc_s_$dir.so`
+	    dir2=
+	    if [ ! -e $L ]; then
+		L=`$G $flags --print-file-name=libgcc_s.so`
+		if [ "$dir" != "." ]; then
+		    dir2=`echo ${dir} | sed -e 's|[^/]*|..|g'`/
+		fi
+	    fi
+	    rm -f $L*
+	    ln -s ../../../../$dir2$2/runtime/$dir/lib/$LIBGCC_NAME $L
+	done
     done
 }
 
@@ -1000,8 +1059,6 @@ run_tests ()
     done
 }
 
-# 1st argument is the dir to check for installed libs
-#
 build_uClibc()
 {
     ARGS="V=1 CROSS=bfin-elf- DEVEL_PREFIX=/usr/ RUNTIME_PREFIX=/ ARCH_CFLAGS='-g -O2'"
@@ -1047,7 +1104,7 @@ build_uClibc()
     fi
 
     echo -n "*** Installing uClibc              " ; date
-    RUN="$MAKE install DESTDIR=$2/runtime $ARGS"
+    RUN="$MAKE install DESTDIR=$1/runtime SUFFIX=$2 $ARGS"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
@@ -1056,9 +1113,9 @@ build_uClibc()
     for RUN in crt1.o libc.a libcrypt.a libm.a libnsl.a libresolv.a \
                libutil.a
     do
-        FILE=$2/runtime/usr/lib/$1$RUN
+        FILE=$1/runtime/$2/usr/lib/$3/$RUN
         if [ ! -f $FILE ] ; then
-            echo "uClibc $1 did not install properly : Missing $RUN"
+            echo "uClibc $1/runtime/$2/usr/lib/$3 did not install properly : Missing $RUN"
             echo "Please report an error to http://blackfin.uclinux.org"
             tail -10 $ACTUAL_LOGFILE
             exit 1
@@ -1303,104 +1360,141 @@ if [ $KERNEL_SOURCE ] ; then
 	cd ..
     fi
 
+
     ####################### Step 3 - build uClibc ################
-    echo -n "*** Configuring uClibc             " ; date
     cd $UCLIBC_SOURCE
 
-    if [ -z "$UCLIBC_CONFIG_FILE" ]; then
-      cp extra/Configs/Config.bfin.default .config
-    else
-      cp $UCLIBC_CONFIG_FILE .tmp.config.provided
-      rm -f .config
-      cat .tmp.config.provided | grep -v '^\(# \|\)\(HAVE_NO_SHARED\|HAVE_NO_PIC\|DOPIC\|HAVE_SHARED\|TARGET_SUBARCH\|BUILD_UCLIBC_LDSO\|SUPPORT_LD_DEBUG\|FORCE_SHAREABLE_TEXT_SEGMENTS\|RUNTIME_\|DEVEL_\|MULTILIB\|KERNEL_HEADERS\)' | grep -v UCLIBC_FORMAT_ >>.config
-      echo 'RUNTIME_PREFIX="/"' >>.config
-      echo 'DEVEL_PREFIX="/usr/"' >>.config
-      echo 'MULTILIB=""' >>.config
+    if [ -n "$UCLIBC_CONFIG_FILE" ]; then
+      cp $UCLIBC_CONFIG_FILE .config.provided
+      mv -f .config .config.bk
+      cat .tmp.config.provided | grep -v '^\(# \|\)\(HAVE_NO_SHARED\|HAVE_NO_PIC\|DOPIC\|HAVE_SHARED\|TARGET_SUBARCH\|BUILD_UCLIBC_LDSO\|SUPPORT_LD_DEBUG\|FORCE_SHAREABLE_TEXT_SEGMENTS\|RUNTIME_\|DEVEL_\|MULTILIB\|KERNEL_HEADERS\|LDSO_RUNPATH\|SHARED_LIB_LOADER_PREFIX\)' |grep -v UCLIBC_FORMAT_ >.config.in
+      echo 'RUNTIME_PREFIX="/"' >>.config.in
+      echo 'DEVEL_PREFIX="/usr/"' >>.config.in
     fi
-    echo 'UCLIBC_FORMAT_FLAT=y' >>.config
-    echo '# UCLIBC_FORMAT_FDPIC_ELF is not set' >>.config
-    echo '# UCLIBC_FORMAT_SHARED_FLAT is not set' >>.config
-    echo '# UCLIBC_FORMAT_FLAT_SEP_DATA is not set' >>.config
-    echo "KERNEL_HEADERS=\"$DIR_KBUILD_OUTPUT/usr/include\"" >>.config
-    RUN="$MAKE oldconfig CROSS=bfin-elf-"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
 
-    cp .config .config-used-for-bfin
+    MULTILIBS=`bfin-elf-gcc --print-multi-lib`
 
-    build_uClibc "" $DIR_uC_OUTPUT/bfin-uclinux
+    for ml in $MULTILIBS; do
 
-    #################### Step 3b - build sep-data uClibc ##############
-    echo -n "*** Configuring sep-data uClibc    " ; date
+	dir=`echo ${ml} | sed -e 's/;.*$//'`
+	suffix=`echo ${dir} | sed -e 's/\//_/g'`
+	flags=`echo ${ml} | sed -e 's/^[^;]*;//' -e 's/@/ -/g'`
 
-    grep -v '\(MULTILIB\|UCLIBC_FORMAT_\)' <.config-used-for-bfin >.config
-    echo 'UCLIBC_FORMAT_FLAT_SEP_DATA=y' >>.config
-    echo '# UCLIBC_FORMAT_FDPIC_ELF is not set' >>.config
-    echo '# UCLIBC_FORMAT_SHARED_FLAT is not set' >>.config
-    echo '# UCLIBC_FORMAT_FLAT is not set' >>.config
-    echo 'MULTILIB="msep-data"' >>.config
+	echo "*** Configuring uClibc for ${dir}  "
+	echo -n "                                   " ; date
 
-    RUN="$MAKE oldconfig CROSS=bfin-elf-"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+	if echo "${flags}" | grep -q mfdpic; then
 
-    cp .config .config-used-for-bfin-shared-flat
+	    dir2=`echo ${dir} | sed -e 's/mfdpic//' -e 's|/$||'`
 
-    build_uClibc msep-data/ $DIR_uC_OUTPUT/bfin-uclinux
+	    if [ -z "$UCLIBC_CONFIG_FILE" ]; then
+		cp extra/Configs/Config.bfinfdpic.default .config
+	    else
+		cp .config.in .config
+		echo 'FORCE_SHAREABLE_TEXT_SEGMENTS=y' >>.config
+		echo 'LDSO_LDD_SUPPORT=y' >>.config
+		echo 'LDSO_CACHE_SUPPORT=y' >>.config
+		echo '# LDSO_RUNPATH is not set' >>.config
+		echo 'HAVE_SHARED=y' >>.config
+		echo 'UCLIBC_BUILD_RELRO=y' >>.config
+		echo 'UCLIBC_STATIC_LDCONFIG=y' >>.config
+		echo 'DOPIC=y' >>.config
+		echo 'LDSO_BASE_FILENAME="ld.so"' >>.config
+		echo 'SHARED_LIB_LOADER_PREFIX="/lib"' >>.config
+		echo 'SUPPORT_LD_DEBUG=y' >>.config
+	    fi
+	    echo 'UCLIBC_FORMAT_FDPIC_ELF=y' >>.config
+	    echo '# UCLIBC_FORMAT_FLAT is not set' >>.config
+	    echo '# UCLIBC_FORMAT_SHARED_FLAT is not set' >>.config
+	    echo '# UCLIBC_FORMAT_FLAT_SEP_DATA is not set' >>.config
+	    echo "KERNEL_HEADERS=\"$DIR_KBUILD_OUTPUT/usr/include\"" >>.config
+	    echo "MULTILIB=\"\"" >>.config
+	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
 
-    #################### Step 3b - build shared flat uClibc ##############
-    echo -n "*** Configuring shared flat uClibc " ; date
+	    RUN="$MAKE oldconfig CROSS=bfin-elf-"
+	    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+	    (echo $RUN $LOGFILE ; ) | sh
 
-    grep -v '\(MULTILIB\|UCLIBC_FORMAT_\)' <.config-used-for-bfin >.config
-    echo 'UCLIBC_FORMAT_SHARED_FLAT=y' >>.config
-    echo '# UCLIBC_FORMAT_FDPIC_ELF is not set' >>.config
-    echo '# UCLIBC_FORMAT_FLAT is not set' >>.config
-    echo '# UCLIBC_FORMAT_FLAT_SEP_DATA is not set' >>.config
-    echo 'MULTILIB="mid-shared-library"' >>.config
+	    cp .config .config-used-for_${suffix}
 
-    RUN="$MAKE oldconfig CROSS=bfin-elf-"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+	    build_uClibc $DIR_LINUX_OUTPUT/bfin-linux-uclibc "${dir2}" ""
 
-    cp .config .config-used-for-bfin-shared-flat
+	elif echo "${flags}" | grep -q msep-data; then   
 
-    build_uClibc mid-shared-library/ $DIR_uC_OUTPUT/bfin-uclinux
+	    if [ -z "$UCLIBC_CONFIG_FILE" ]; then
+		cp extra/Configs/Config.bfin.default .config
+	    else
+		cp .config.in .config
+	    fi
+	    echo 'UCLIBC_FORMAT_FLAT_SEP_DATA=y' >>.config
+	    echo '# UCLIBC_FORMAT_FDPIC_ELF is not set' >>.config
+	    echo '# UCLIBC_FORMAT_SHARED_FLAT is not set' >>.config
+	    echo '# UCLIBC_FORMAT_FLAT is not set' >>.config
+	    echo "KERNEL_HEADERS=\"$DIR_KBUILD_OUTPUT/usr/include\"" >>.config
+	    echo "MULTILIB=\"${dir}\"" >>.config
+	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
 
-    ####################### Step 3c - build FD-PIC uClibc ################
-    echo -n "*** Configuring uClibc for FD-PIC  " ; date
+	    RUN="$MAKE oldconfig CROSS=bfin-elf-"
+	    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+	    (echo $RUN $LOGFILE ; ) | sh
 
-    if [ -z "$UCLIBC_CONFIG_FILE" ]; then
-      cp extra/Configs/Config.bfinfdpic.default .config
-    else
-      cat .tmp.config.provided | grep -v '^\(# \|\)\(HAVE_NO_SHARED\|HAVE_NO_PIC\|DOPIC\|HAVE_SHARED\|TARGET_SUBARCH\|BUILD_UCLIBC_LDSO\|SUPPORT_LD_DEBUG\|FORCE_SHAREABLE_TEXT_SEGMENTS\|RUNTIME_\|DEVEL_\|MULTILIB\|KERNEL_HEADERS\|LDSO_RUNPATH\|SHARED_LIB_LOADER_PREFIX\)' |grep -v UCLIBC_FORMAT_ >.config
-      echo 'RUNTIME_PREFIX="/"' >>.config
-      echo 'DEVEL_PREFIX="/usr/"' >>.config
-      echo 'FORCE_SHAREABLE_TEXT_SEGMENTS=y' >>.config
-      echo 'LDSO_LDD_SUPPORT=y' >>.config
-      echo 'LDSO_CACHE_SUPPORT=y' >>.config
-      echo '# LDSO_RUNPATH is not set' >>.config
-      echo 'HAVE_SHARED=y' >>.config
-      echo 'UCLIBC_BUILD_RELRO=y' >>.config
-      echo 'UCLIBC_STATIC_LDCONFIG=y' >>.config
-      echo 'DOPIC=y' >>.config
-      echo 'LDSO_BASE_FILENAME="ld.so"' >>.config
-      echo 'SHARED_LIB_LOADER_PREFIX="/lib"' >>.config
-      echo 'SUPPORT_LD_DEBUG=y' >>.config
-      rm -f .tmp.config.provided
-    fi
-    echo 'UCLIBC_FORMAT_FDPIC_ELF=y' >>.config
-    echo '# UCLIBC_FORMAT_FLAT is not set' >>.config
-    echo '# UCLIBC_FORMAT_SHARED_FLAT is not set' >>.config
-    echo '# UCLIBC_FORMAT_FLAT_SEP_DATA is not set' >>.config
-    echo "KERNEL_HEADERS=\"$DIR_KBUILD_OUTPUT/usr/include\"" >>.config
+	    cp .config .config-used-for_${suffix}
 
-    RUN="$MAKE oldconfig CROSS=bfin-elf-"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+	    build_uClibc $DIR_uC_OUTPUT/bfin-uclinux "" "${dir}"
 
-    cp .config .config-used-for-bfinfdpic
+	elif echo "${flags}" | grep -q mleaf-id-shared-library; then
 
-    build_uClibc "" $DIR_LINUX_OUTPUT/bfin-linux-uclibc
+	    echo "FIXME: leaf-id-shared-library uClibc is not built"
+
+	elif echo "${flags}" | grep -q mid-shared-library; then
+
+	    if [ -z "$UCLIBC_CONFIG_FILE" ]; then
+		cp extra/Configs/Config.bfin.default .config
+	    else
+		cp .config.in .config
+	    fi
+	    echo 'UCLIBC_FORMAT_SHARED_FLAT=y' >>.config
+	    echo '# UCLIBC_FORMAT_FDPIC_ELF is not set' >>.config
+	    echo '# UCLIBC_FORMAT_FLAT is not set' >>.config
+	    echo '# UCLIBC_FORMAT_FLAT_SEP_DATA is not set' >>.config
+	    echo "KERNEL_HEADERS=\"$DIR_KBUILD_OUTPUT/usr/include\"" >>.config
+	    echo "MULTILIB=\"${dir}\"" >>.config
+	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
+
+	    RUN="$MAKE oldconfig CROSS=bfin-elf-"
+	    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+	    (echo $RUN $LOGFILE ; ) | sh
+
+	    cp .config .config-used-for_${suffix}
+
+	    build_uClibc $DIR_uC_OUTPUT/bfin-uclinux "" "${dir}"
+
+	else
+
+	    # Vanila FLAT format
+	    if [ -z "$UCLIBC_CONFIG_FILE" ]; then
+		cp extra/Configs/Config.bfin.default .config
+	    else
+		cp .config.in .config
+	    fi
+	    echo 'UCLIBC_FORMAT_FLAT=y' >>.config
+	    echo '# UCLIBC_FORMAT_FDPIC_ELF is not set' >>.config
+	    echo '# UCLIBC_FORMAT_SHARED_FLAT is not set' >>.config
+	    echo '# UCLIBC_FORMAT_FLAT_SEP_DATA is not set' >>.config
+	    echo "KERNEL_HEADERS=\"$DIR_KBUILD_OUTPUT/usr/include\"" >>.config
+	    echo "MULTILIB=\"${dir}\"" >>.config
+	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
+
+	    RUN="$MAKE oldconfig CROSS=bfin-elf-"
+	    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+	    (echo $RUN $LOGFILE ; ) | sh
+
+	    cp .config .config-used-for_${suffix}
+
+	    build_uClibc $DIR_uC_OUTPUT/bfin-uclinux "" "${dir}"
+
+	fi
+    done
 
     ######################### Done with uClibc ###########################
 

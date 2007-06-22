@@ -66,7 +66,7 @@ BOARD_SCRIPTS	= bfin-common-sc.ld \
 	bf534.ld bf536.ld bf537.ld
 BOARD_LDFLAGS	=
 BOARD_BSP	= # We actually use libnosys.a
-BOARD_CRT0S	= crt532.o
+BOARD_CRT0S	= basiccrt.o
 BOARD_OBJS	=
 BOARD_TEST	=
 BOARD_INSTALL	= install-board
@@ -74,6 +74,7 @@ BOARD_INSTALL	= install-board
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
 
+INCLUDES += -I$(srcdir)/include
 #
 # build a test program for each target board. Just trying to get
 # it to link is a good test, so we ignore all the errors for now.
@@ -90,13 +91,8 @@ ${SIM_BSP}: ${OBJS} ${SIM_OBJS}
 #
 #
 #
-.c.S:
-	${CC} ${CFLAGS_FOR_TARGET} -c $<
-
 crt0.o: crt0.S
-
-crt532.o: basiccrt.S
-	${CC} -mcpu=bf532 -I${srcdir}/include ${CFLAGS_FOR_TARGET} -c $< -o $@
+basiccrt.o: basiccrt.S
 
 clean mostlyclean:
 	rm -f a.out core *.i *.o ${SIM_BSP} ${BOARD_BSP}

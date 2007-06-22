@@ -1,3 +1,39 @@
+2007-06-22  Jie Zhang  <jie.zhang@analog.com>
+
+	Apply
+	2007-03-06  Richard Sandiford  <richard@codesourcery.com>
+	* configure.ac: Allow tm_file to contain build-directory files.
+	* configure: Regenerate.
+
+	* config.gcc (bfin*-linux-uclibc*): Add ./linux-sysroot-suffix.h
+	to tm_file.
+	* config/bfin/t-bfin-elf (EXTRA_PARTS): Remove.
+	(MULTILIB_OPTIONS, MULTILIB_DIRNAMES, MULTILIB_MATCHES,
+	MULTILIB_EXCEPTIONS): Redefine with new multilibs.
+	* doc/invoke.texi (Blackfin Options): Document silicon
+	revision part of -mcpu option. Remove -msi-revision.
+	* config/bfin/print-sysroot-suffix.sh: New.
+	* config/bfin/elf.h (STARTFILE_SPEC): Rename crt532.o to basiccrt.o.
+	(LIB_SPEC): Add %s to the linker scripts.
+	* config/bfin/bfin.c (bfin_si_revision_string): Remove. 
+	(bfin_si_revision): Don't initialize.
+	(bfin_check_si_revision): Remove.
+	(override_options): Handle new -mcpu option.
+	Remove -msi-revision related code.
+	Don't call bfin_check_si_revision ().
+	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): Don't define
+	__ID_SHARED_LIB__ when -msep-data.
+	(DRIVER_SELF_SPECS): Add -mcpu=bf532 if	no -mcpu option.
+	(bfin_si_revision_string): Don't declare.
+	(TARGET_OPTIONS): Remove -msi-revision.
+	* config/bfin/t-bfin-uclinux (EXTRA_PARTS): Remove.
+	(MULTILIB_OPTIONS, MULTILIB_DIRNAMES, MULTILIB_MATCHES,
+	MULTILIB_EXCEPTIONS): Redefine with new multilibs.
+	* config/bfin/t-bfin-linux (EXTRA_PARTS): Remove.
+	(MULTILIB_OPTIONS, MULTILIB_DIRNAMES, MULTILIB_MATCHES,
+	MULTILIB_EXCEPTIONS): Redefine with new multilibs.
+	(linux-sysroot-suffix.h): New target.
+
 2007-05-22  Jie Zhang  <jie.zhang@analog.com>
 
 	* doc/invoke.texi (Blackfin Options): Fix opindex of

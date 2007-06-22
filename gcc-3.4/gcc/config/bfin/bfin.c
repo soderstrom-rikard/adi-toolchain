@@ -60,7 +60,6 @@ const char *byte_reg_names[]   =  BYTE_REGISTER_NAMES;
 static int arg_regs[] = FUNCTION_ARG_REGISTERS;
 
 const char *bfin_cpu_string;
-const char *bfin_si_revision_string;
 const char *bfin_specld_anomaly = "";
 const char *bfin_csync_anomaly = "";
 const char *bfin_library_id_string;
@@ -69,10 +68,9 @@ const char *bfin_library_id_string;
 bfin_cpu_t bfin_cpu_type = DEFAULT_CPU_TYPE;
 
 /* -msi-revision support. There are three special values:
-   -1      not set explicitly in commandline
-   -2      -msi-revision=none.
+   -1      -msi-revision=none.
    0xffff  -msi-revision=any.  */
-int bfin_si_revision = -1;
+int bfin_si_revision;
 
 /* The workarounds enabled */
 unsigned int bfin_workarounds = 0;
@@ -2384,42 +2382,6 @@ secondary_output_reload_class (enum reg_class class, enum machine_mode mode,
   return secondary_input_reload_class (class, mode, x);
 }
 
-static void
-bfin_check_si_revision (void)
-{
-  int i, si_revision_bad;
-  unsigned int all_workarounds;
-
-  if (bfin_si_revision == -2)
-    return;
-
-  for (i = 0; bfin_cpus[i].type != bfin_cpu_type; i++);
-
-  if (bfin_si_revision == -1)
-    bfin_si_revision = bfin_cpus[i].si_revision;
-
-  si_revision_bad = 1;
-  all_workarounds = 0;
-  for (; bfin_cpus[i].type == bfin_cpu_type; i++)
-    {
-      if (bfin_si_revision == bfin_cpus[i].si_revision)
-	{
-	  si_revision_bad = 0;
-	  bfin_workarounds |= bfin_cpus[i].workarounds;
-	}
-      all_workarounds |= bfin_cpus[i].workarounds;
-    }
-
-  if (bfin_si_revision == 0xffff)
-    {
-      si_revision_bad = 0;
-      bfin_workarounds |= all_workarounds;
-    }
-
-  if (si_revision_bad)
-    error ("bad silicon revision");
-}
-
 /* For macro `OVERRIDE_OPTIONS' */
 
 void
@@ -2427,48 +2389,74 @@ override_options (void)
 {
   if (bfin_cpu_string)
     {
+      const char *p, *q;
       int i;
 
-      for (i = 0; bfin_cpus[i].name != NULL; i++)
-	if (strcmp (bfin_cpu_string, bfin_cpus[i].name) == 0)
-	  {
-	    bfin_cpu_type = bfin_cpus[i].type;
-	    if (bfin_cpu_type == BFIN_CPU_BF561)
-	      warning (0, "bf561 support is incomplete yet.");
+      i = 0;
+      while ((p = bfin_cpus[i].name) != NULL)
+	{
+	  if (strncmp (bfin_cpu_string, p, strlen (p)) == 0)
 	    break;
-	  }
+	  i++;
+	}
 
-      if (bfin_cpus[i].name == NULL)
-	error ("`%s' not supported", bfin_cpu_string);
-    }
-  else
-    bfin_cpu_type = BFIN_CPU_BF532;
+      if (p == NULL)
+	{
+	  error ("-mcpu=%s is not valid", bfin_cpu_string);
+	  return;
+	}
 
-  if (bfin_si_revision_string)
-    {
-      if (strcmp (bfin_si_revision_string, "none") == 0)
-	bfin_si_revision = -2;
-      else if (strcmp (bfin_si_revision_string, "any") == 0)
-	bfin_si_revision = 0xffff;
+      bfin_cpu_type = bfin_cpus[i].type;
+
+      q = bfin_cpu_string + strlen (p);
+
+      if (*q == '\0')
+	{
+	  bfin_si_revision = bfin_cpus[i].si_revision;
+	  bfin_workarounds |= bfin_cpus[i].workarounds;
+	}
+      else if (strcmp (q, "-none") == 0)
+	bfin_si_revision = -1;
+      else if (strcmp (q, "-any") == 0)
+	{
+	  bfin_si_revision = 0xffff;
+	  while (bfin_cpus[i].type == bfin_cpu_type)
+	    {
+	      bfin_workarounds |= bfin_cpus[i].workarounds;
+	      i++;
+	    }
+	}
       else
 	{
 	  unsigned int si_major, si_minor;
-	  int len, arglen;
+	  int rev_len, n;
 
-	  arglen = strlen (bfin_si_revision_string);
+	  rev_len = strlen (q);
 
-	  if (sscanf (bfin_si_revision_string,
-		      "%u.%u%n",
-		      &si_major, &si_minor, &len) != 2
-	      || len != arglen
+	  if (sscanf (q, "-%u.%u%n", &si_major, &si_minor, &n) != 2
+	      || n != rev_len
 	      || si_major > 0xff || si_minor > 0xff)
-	    error ("-msi-revision=%s is not valid", bfin_si_revision_string);
+	    {
+	    invalid_silicon_revision:
+	      error ("-mcpu=%s has invalid silicon revision", bfin_cpu_string);
+	      return;
+	    }
 
 	  bfin_si_revision = (si_major << 8) | si_minor;
-	}
-    }
 
-  bfin_check_si_revision ();
+	  while (bfin_cpus[i].type == bfin_cpu_type
+		 && bfin_cpus[i].si_revision != bfin_si_revision)
+	    i++;
+
+	  if (bfin_cpus[i].type != bfin_cpu_type)
+	    goto invalid_silicon_revision;
+
+	  bfin_workarounds |= bfin_cpus[i].workarounds;
+	}
+
+      if (bfin_cpu_type == BFIN_CPU_BF561)
+	warning (0, "bf561 support is incomplete yet.");
+    }
 
   if (bfin_csync_anomaly[0] == '1')
     bfin_workarounds |= WA_SPECULATIVE_SYNCS;

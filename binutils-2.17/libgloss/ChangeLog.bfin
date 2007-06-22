@@ -1,3 +1,16 @@
+2007-06-22  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/bf531.ld: Don't include bfin-common-sc.ld.
+	* bfin/bf532.ld: Likewise.
+	* bfin/bf533.ld: Likewise.
+	* bfin/bf534.ld: Likewise.
+	* bfin/bf536.ld: Likewise.
+	* bfin/bf537.ld: Likewise.
+	* bfin/Makefile.in: Rename crt532.o to basiccrt.o.
+	Add -I$(srcdir)/include in INCLUDES.
+	(.c.S): Remove.
+	(crt532.o): Use the default commands.
+
 2007-02-12  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/bf534.ld: New.

@@ -1,3 +1,21 @@
+2007-06-22  Jie Zhang  <jie.zhang@analog.com>
+
+	* gcc.target/bfin/workaround-any.c: Remove -msi-revision from
+	dg-options and append silicon revision to -mcpu. Adjust comments.
+	* gcc.target/bfin/workaround-none.c: Likewise.
+	* gcc.target/bfin/workaround-1.c: Likewise.
+	* gcc.target/bfin/workaround-2.c: Likewise.
+	* gcc.target/bfin/workaround-3.c: Likewise
+	* gcc.target/bfin/workaround-4.c: Likewise.
+	* gcc.target/bfin/mcpu-bf531.c: Likewise.
+	* gcc.target/bfin/mcpu-bf532.c: Likewise.
+	* gcc.target/bfin/mcpu-bf533.c: Likewise.
+	* gcc.target/bfin/mcpu-bf534.c: Likewise.
+	* gcc.target/bfin/mcpu-bf536.c: Likewise.
+	* gcc.target/bfin/mcpu-bf537.c: Likewise.
+	* gcc.target/bfin/mcpu-bf561.c: Likewise.
+	* gcc.target/bfin/mcpu-default.c: Likewise.
+
 2007-05-22  Jie Zhang  <jie.zhang@analog.com>
 
 	* gcc.target/bfin/bfin.exp: New.
