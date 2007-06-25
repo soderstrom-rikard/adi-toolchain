@@ -1030,6 +1030,9 @@ run_tests ()
 
     echo -n "***  Running tests on gdb          " ; date
     cd $DIR_BINUTILS_BUILD/gdb
+    # make clean before testing since insight cannot run
+    # in the build directory.
+    ( echo "$MAKE clean " $LOGFILE ; ) | sh
     ( echo "$MAKE check " $LOGFILE ; ) | sh
 
     cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.sum \
