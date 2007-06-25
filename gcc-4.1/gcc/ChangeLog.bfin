@@ -1,3 +1,14 @@
+2007-06-25  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin-protos.h (enum bfin_cpu_type): Add
+	BFIN_CPU_BF548 and BFIN_CPU_BF549.
+	* config/bfin/bfin.c (bfin_cpus[]): Add bf548 and bf549.
+	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): Define
+	__ADSPBF548__ for bf548, __ADSPBF549__ for bf549,
+	and __ADSPBF54x__ for both.
+	* doc/invoke.texi (Blackfin Options): Document that
+	-mcpu now accept bf548 and bf549.
+
 2007-06-22  Jie Zhang  <jie.zhang@analog.com>
 
 	Apply
