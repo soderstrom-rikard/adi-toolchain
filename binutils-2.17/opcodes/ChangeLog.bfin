@@ -1,3 +1,8 @@
+2007-07-10  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-dis.c (decode_dsp32mac_0): Decode (IU) option for
+	multiply and multiply-accumulate to data register instruction.
+
 2007-04-27  Robin Getz  <robin.getz@analog.com>
 
 	* bfin-dis.c (bu32): Typedef.

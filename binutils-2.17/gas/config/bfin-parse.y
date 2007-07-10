@@ -284,7 +284,7 @@ check_macfunc_option (Macfunc *a, Opt_mode *opt)
 	  && opt->mod != M_FU && opt->mod != M_IS && opt->mod != M_W32)
       || (a->w == 1 && a->P == 1
 	  && opt->mod != M_FU && opt->mod != M_IS && opt->mod != M_S2RND
-	  && opt->mod != M_ISS2)
+	  && opt->mod != M_ISS2 && opt->mod != M_IU)
       || (a->w == 1 && a->P == 0
 	  && opt->mod != M_FU && opt->mod != M_IS && opt->mod != M_IU
 	  && opt->mod != M_T && opt->mod != M_TFU && opt->mod != M_S2RND

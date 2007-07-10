@@ -1,3 +1,8 @@
+2007-07-10  Jie Zhang  <jie.zhang@analog.com>
+
+	* gas/bfin/arithmetic.s, gas/bfin/arithmetic.d: Add check
+	for this option.
+
 2007-06-13  Jie Zhang  <jie.zhang@analog.com>
 
 	* gas/bfin/expected_comparison_errors.l: New test.

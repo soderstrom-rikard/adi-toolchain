@@ -1,3 +1,9 @@
+2007-07-10  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin-parse.y (check_macfunc_option): Allow (IU)
+	option for multiply and multiply-accumulate to data register
+	instruction.
+
 2007-06-13  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin-parse.y (asm_1): Check AREGS in comparison
