@@ -1,5 +1,10 @@
 2007-07-10  Jie Zhang  <jie.zhang@analog.com>
 
+	* gas/bfin/expected_errors.l, gas/bfin/expected_errors.s:
+	Add check for mismatch of accumulator and data register.
+
+2007-07-10  Jie Zhang  <jie.zhang@analog.com>
+
 	* gas/bfin/arithmetic.s, gas/bfin/arithmetic.d: Add check
 	for this option.
 
