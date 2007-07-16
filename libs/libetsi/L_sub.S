@@ -1,0 +1,41 @@
+// **************************************************************************
+//
+//	Analog Devices Blackfin ETSI Implementation. 
+// 	Copyright (C). 2002 Analog Devices Inc., All Rights Reserved.
+//
+// **************************************************************************
+.file_attr libGroup=libetsi.h;
+.file_attr libName=libetsi;
+.file_attr libFunc=L_sub;
+.file_attr FuncName=_L_sub;
+.file_attr libFunc=_L_sub;
+.file_attr prefersMem=any;
+.file_attr prefersMemNum="50";
+        .section program;
+.epctext:
+        .align 2;
+_L_sub:
+	R0 = R0 - R1 (S);
+#if __SET_ETSI_FLAGS
+#if !defined(__ADSPLPBLACKFIN__)
+	CC = AV0;
+#else
+	CC=V;
+#endif
+	IF !CC JUMP no_overflow (bp);
+	I0.L = _Overflow;
+	I0.H = _Overflow;
+	R1 = 0x1;
+	[I0] = R1;
+no_overflow:
+#endif
+	RTS;
+._L_sub.end:
+        .global _L_sub;
+        .type _L_sub,STT_FUNC;
+#if __SET_ETSI_FLAGS
+	.extern _Overflow;
+	.type _Overflow,STT_OBJECT;
+#endif
+.epctext.end:
+        .section data1;

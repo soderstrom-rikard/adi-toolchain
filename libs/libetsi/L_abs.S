@@ -1,0 +1,27 @@
+// **************************************************************************
+//
+//	Analog Devices Blackfin ETSI Implementation. 
+// 	Copyright (C). 2002 Analog Devices Inc., All Rights Reserved.
+//
+// **************************************************************************
+.file_attr libGroup=libetsi.h;
+.file_attr libName=libetsi;
+.file_attr libFunc=L_abs;
+.file_attr FuncName=_L_abs;
+.file_attr libFunc=_L_abs;
+.file_attr prefersMem=any;
+.file_attr prefersMemNum="50";
+	.section program;
+.epctext:
+	.align 2;
+_L_abs:
+		R0 = ABS R0;
+		RTS;
+._L_abs.end:
+	.global _L_abs;
+	.type _L_abs,STT_FUNC;
+
+.epctext.end:
+
+	.section data1;
+
