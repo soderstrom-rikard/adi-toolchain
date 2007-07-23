@@ -1,5 +1,10 @@
 /**************************************************************************
-  Copyright(c) 2000-2006 Analog Devices Inc.
+  Copyright (C) 2000-2006 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
 ***************************************************************************
   File Name      : cfir_fr16.asm
   Include File   : filter.h
@@ -28,7 +33,7 @@
 #define __WORKAROUND_BF532_ANOMALY38__
 #endif
 
-.section  program;
+.text;
 .global    __cfir_fr16;
 
 .align 2;
@@ -105,4 +110,4 @@ FIR_END:       MNOP || R3=[I1++M1] ||[I3++]=R1;
 RET_END:
             RTS;
 
-.__cfir_fr16.end:
+.size __cfir_fr16, .-__cfir_fr16

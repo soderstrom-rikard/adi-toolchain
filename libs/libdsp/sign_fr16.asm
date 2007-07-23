@@ -1,6 +1,10 @@
 /*****************************************************************
-	Copyright(c) 2000-2004 Analog Devices Inc. IPDC BANGALORE, India.
-	All rights reserved
+	Copyright (C) 2000-2004 Analog Devices, Inc.
+	This file is subject to the terms and conditions of the GNU Lesser
+	General Public License. See the file COPYING.LIB for more details.
+
+	Non-LGPL License is also available as part of VisualDSP++
+	from Analog Devices, Inc.
  *****************************************************************				  
 
     File name   :   copysign_fr16.asm
@@ -22,6 +26,8 @@
 	Code size		:	12 bytes
  *******************************************************************/	
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = math_bf.h;
 .file_attr libGroup      = math.h;
 .file_attr libFunc       = __copysign_fr16;
@@ -31,7 +37,9 @@
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __copysign_fr16;
 
-.section  program;
+#endif
+
+.text;
 .align 2;
 .global __copysign_fr16;
 __copysign_fr16:
@@ -41,7 +49,7 @@ __copysign_fr16:
 		CC = R1 < 0;			// IF POSITIVE RETURN ABS(INPUT)
    		IF CC R0 = R2;			// IF NEGATIVE, Y = -ABS(CLIP VALUE)  
 		RTS;
-.__copysign_fr16.end:		
+.size __copysign_fr16, .-__copysign_fr16
 
 
 

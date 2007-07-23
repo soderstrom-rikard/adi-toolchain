@@ -1,10 +1,17 @@
 /*
-** Copyright (C) 2005 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2005 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 **
 ** Float32 add.  Addition of two non-IEEE-754 64-bit floats (32.32 format)
 **
 ** [ man, exp ] add( [ man, exp ], [ man, exp ] )
 */
+
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libdsp;
@@ -12,6 +19,8 @@
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = _add_fl32;
+
+#endif
 
 
 #if defined(__ADSPBLACKFIN__) && !defined(__ADSPLPBLACKFIN__)
@@ -23,7 +32,7 @@
 #define OVERFLOW V
 #endif
 
-.section program;
+.text;
 .align 2;
 _add_fl32:
 	P0 = R6;
@@ -74,6 +83,6 @@ overflow:
 	R1 = ROT R1 BY -1;	// Rotate bit into mantissa
 	R0 += 1;		// Increase exponent
 	RTS;
-._add_fl32.end:
+.size _add_fl32, .-_add_fl32
 .global _add_fl32;
 .type _add_fl32, STT_FUNC;

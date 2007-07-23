@@ -1,6 +1,9 @@
-// Copyright (C) 2000, 2001 Analog Devices Inc., All Rights Reserved.
-// This contains Development IP as defined in the ADI/Intel
-// Collaboration Agreement (ADI/Intel Confidential)
+// Copyright (C) 2000, 2001 Analog Devices, Inc.
+// This file is subject to the terms and conditions of the GNU Lesser
+// General Public License. See the file COPYING.LIB for more details.
+//
+// Non-LGPL License is also available as part of VisualDSP++
+// from Analog Devices, Inc.
 
 /****************************************************************************
   Func name   : min

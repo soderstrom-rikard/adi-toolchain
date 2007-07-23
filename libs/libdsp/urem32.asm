@@ -1,5 +1,10 @@
 /***************************************************************************
-Copyright (c) 2000-2006 Analog Devices Inc. All rights reserved.	
+Copyright (C) 2000-2006 Analog Devices, Inc.
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License. See the file COPYING.LIB for more details.
+
+Non-LGPL License is also available as part of VisualDSP++
+from Analog Devices, Inc.
 
 ****************************************************************************
   File name :  urem32.asm 
@@ -36,6 +41,8 @@ Special cases :
 
 ****************************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = integer_support;
 .file_attr libName = libdsp;
 .file_attr prefersMem    = internal;
@@ -43,7 +50,9 @@ Special cases :
 .file_attr libFunc = ___urem32;
 .file_attr FuncName      = ___urem32;
 
-.section  program;
+#endif
+
+.text;
 .align 2;
 
 .global ___urem32;
@@ -79,4 +88,4 @@ RETURN_ZERO_VAL:
 	R0 = 0;
 RETURN_R0:
 	RTS;
-.___urem32.end:
+.size ___urem32, .-___urem32

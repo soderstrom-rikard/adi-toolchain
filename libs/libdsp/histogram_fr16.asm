@@ -1,6 +1,10 @@
 /*****************************************************************************
-  Copyright(c) 2000-2004 Analog Devices Inc.
-  All rights reserved
+  Copyright (C) 2000-2004 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
 ******************************************************************************
   File Name      : histogram_fr16.asm
   Include File   : stats.h
@@ -33,6 +37,8 @@
   Code Size      : 144 Bytes
 ******************************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup = stats.h;
 .file_attr libName = libdsp;
 .file_attr prefersMem = internal;
@@ -41,7 +47,9 @@
 .file_attr libFunc  = __histogram_fr16;
 .file_attr FuncName = __histogram_fr16;
 
-.section  program;
+#endif
+
+.text;
 .global   __histogram_fr16;
 
 .extern ___udiv32;
@@ -169,4 +177,4 @@ HISTO_RETURN:      RETS = [SP++];          // POP RETS, P3, R7-R4 FROM STACK
                    (R7:4) = [SP++];        
                    RTS;
 
-.__histogram_fr16.end:
+.size __histogram_fr16, .-__histogram_fr16

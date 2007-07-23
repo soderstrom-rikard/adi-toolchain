@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2000-2005 Analog Devices Inc.  
-  All rights reserved
+  Copyright (C) 2000-2005 Analog Devices, Inc.  
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
 ******************************************************************************
   File Name      : mean_fr16.asm
   Include File   : stats.h
@@ -19,6 +23,8 @@
   Code size      : 34 Bytes  (exluding ___div32)
 ******************************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = stats.h;
 .file_attr libFunc       = __mean_fr16;
 .file_attr libFunc       = mean_fr16;
@@ -27,11 +33,13 @@
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __mean_fr16;
 
+#endif
+
 #if defined(__ADSPLPBLACKFIN__) && defined(__WORKAROUND_SPECULATIVE_LOADS)
 #define __WORKAROUND_BF532_ANOMALY_050000245
 #endif
 
-.section program;
+.text;
 .global  __mean_fr16;
 
 .extern  ___div32;
@@ -63,4 +71,4 @@ MEAN_START:           R0 = R0 + R2 (S) || R2 = W[P1++](X);
 RET_ZERO:          R0 = 0;                 // RETURN ZERO IF N <= 0 
                    RTS;
 
-.__mean_fr16.end:
+.size __mean_fr16, .-__mean_fr16

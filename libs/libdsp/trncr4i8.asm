@@ -1,11 +1,18 @@
 /*
-** Copyright (C) Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 **
 ** Convert float to signed long long (R4 to I8).
 **
 ** !!NOTE- Uses non-standard clobber set in compiler:
 **         DefaultClobMinusPABIMandLoopRegs
 */
+
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
 .file_attr libGroup      = integer_support;
 .file_attr libGroup      = floating_point_support;
@@ -15,6 +22,8 @@
 .file_attr libFunc = __float32_to_longlong64;
 .file_attr FuncName      = __float32_to_longlong64;
 
+#endif
+
 #if defined(__ADSPBLACKFIN__) && !defined(__ADSPLPBLACKFIN__)
 /* __ADSPBF535__ core only */
 #define CARRY AC
@@ -22,7 +31,7 @@
 #define CARRY AC0
 #endif
 
-.section program;
+.text;
 .align 2;
 
 __float32_to_longlong64:
@@ -116,6 +125,6 @@ need_neg:
 	R1 = R1 - R2;
 	RTS;
 
-.__float32_to_longlong64.end:
+.size __float32_to_longlong64, .-__float32_to_longlong64
 .global __float32_to_longlong64;
 .type __float32_to_longlong64, STT_FUNC;

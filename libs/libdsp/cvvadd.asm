@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2000-2005 Analog Devices Inc. IPDC BANGALORE, India. 
-  All rights reserved
+  Copyright (C) 2000-2005 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
  ******************************************************************************
   File Name      : cvvadd.asm
   Module Name    : Vector Library
@@ -23,6 +27,8 @@
   DATE           : 21-02-01
 ******************************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = vector.h;
 .file_attr libFunc       = __cvecvadd_fr16;
 .file_attr libFunc       = cvecvadd_fr16;
@@ -34,11 +40,13 @@
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __cvecvadd_fr16;
 
+#endif
+
 #if defined(__ADSPLPBLACKFIN__) && defined(__WORKAROUND_SPECULATIVE_LOADS)
 #define __WORKAROUND_BF532_ANOMALY_050000245
 #endif
 
-.section program;
+.text;
 .global __cvecvadd_fr16;
 .align 2;
 
@@ -66,4 +74,4 @@ END_CVVADD:  [P2++] = R3 || R2 = [I0++]; // STORE RESULT IN OUTPUT VECTOR
 RET_ZERO:
         RTS;
 
-.__cvecvadd_fr16.end:
+.size __cvecvadd_fr16, .-__cvecvadd_fr16

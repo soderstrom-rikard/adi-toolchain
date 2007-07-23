@@ -1,8 +1,13 @@
 /************************************************************************
  *
- * subfl32.s : $Revision: 1.6 $
+ * subfl32.s
  *
- * (c) Copyright 2000-2005 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 2000-2005 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -10,12 +15,16 @@
 ** Subtract 2 64-bit non-IEEE floating point numbers
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libdsp;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
 .file_attr libFunc = _sub_fl32;
 .file_attr FuncName      = _sub_fl32;
+
+#endif
 
 #if defined(__ADSPBLACKFIN__) && !defined(__ADSPLPBLACKFIN__)
 /* __ADSPBF535__ core only */
@@ -26,7 +35,7 @@
 #define OVERFLOW V
 #endif
 
-.section program;
+.text;
 
 .align 2;
 
@@ -91,7 +100,7 @@ overflow:
    R1 = ROT R1 BY -1;  // Rotate bit into mantissa
    R0 += 1;            // Increase exponent
    RTS;
-._sub_fl32.end:
+.size _sub_fl32, .-_sub_fl32
 .global _sub_fl32;
 .type _sub_fl32, STT_FUNC;
 

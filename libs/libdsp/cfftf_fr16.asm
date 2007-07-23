@@ -1,8 +1,13 @@
 /*************************************************************************
  *
- * cfftf_fr16.asm : $Revision: 1.7 $
+ * cfftf_fr16.asm
  *
- * (c) Copyright 2003-2006 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 2003-2006 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -168,7 +173,7 @@ _______________________________________________________________________________
 .file_attr FuncName      = __cfftf_fr16;
 #endif
 
-.section program;
+.text;
 .align 2;
 .global      __cfftf_fr16;
 
@@ -437,4 +442,4 @@ CFFTF_EXIT:
         L3 = 0;
         RTS;
 
-.__cfftf_fr16.end:
+.size __cfftf_fr16, .-__cfftf_fr16

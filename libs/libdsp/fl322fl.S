@@ -1,6 +1,15 @@
+/* Copyright (C) 2007 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
+ */
 /*
 ** Convert float32 to float.
 */
+
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libdsp;
@@ -9,7 +18,9 @@
 .file_attr libFunc = _fl32_to_fl;
 .file_attr FuncName      = _fl32_to_fl;
 
-.section program;
+#endif
+
+.text;
 .align 2;
 
 _fl32_to_fl:
@@ -51,6 +62,6 @@ minusone:
 	R1.H = 0x4000;
 	R1.L = 0;
 	JUMP assemble;
-._fl32_to_fl.end:
+.size _fl32_to_fl, .-_fl32_to_fl
 .global _fl32_to_fl;
 .type _fl32_to_fl, STT_FUNC;

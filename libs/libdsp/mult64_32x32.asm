@@ -1,8 +1,15 @@
 /*
-** Copyright (C) 2002-2005 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2002-2005 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 ** signed long long multiplication:
 ** long long mult64_32x32(int, int)
 */
+
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
 .file_attr libGroup      = integer_support;
 .file_attr libName = libdsp;
@@ -11,7 +18,9 @@
 .file_attr libFunc = ___mult64_32x32;
 .file_attr FuncName      = ___mult64_32x32;
 
-.section/DOUBLEANY program;
+#endif
+
+.text;
 .align 2;
 ___mult64_32x32:
 
@@ -31,7 +40,7 @@ ___mult64_32x32:
 	R0 = PACK(R3.L,R2.L);			// low word = (y<<16) | l0*l1
 	RTS;
 
-.___mult64_32x32.end:
+.size ___mult64_32x32, .-___mult64_32x32
 .global ___mult64_32x32;
 .type ___mult64_32x32,STT_FUNC;
 

@@ -1,5 +1,10 @@
 /******************************************************************************
- Copyright(c) 2001-2004 Analog Devices Inc.
+ Copyright (C) 2001-2004 Analog Devices, Inc.
+ This file is subject to the terms and conditions of the GNU Lesser
+ General Public License. See the file COPYING.LIB for more details.
+
+ Non-LGPL License is also available as part of VisualDSP++
+ from Analog Devices, Inc.
 *******************************************************************************
 
 File Name      : a_expand.asm
@@ -30,6 +35,8 @@ Registers Used : R0 - Current input value, and work register
 *******************************************************************************
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = filter.h;
 .file_attr libFunc       = __a_expand;
 .file_attr libFunc       = a_expand;
@@ -38,7 +45,9 @@ Registers Used : R0 - Current input value, and work register
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __a_expand;
 
-.section         program;
+#endif
+
+.text;
 .global          __a_expand;
 .align 2;
 
@@ -99,4 +108,4 @@ LOOP_FINISH:
       (R7:5) = [SP++];                      // Restore registers
       RTS;
 
-.__a_expand.end:
+.size __a_expand, .-__a_expand

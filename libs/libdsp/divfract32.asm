@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2000-2004 Analog Devices Inc. 
-  All rights reserved
+  Copyright (C) 2000-2004 Analog Devices, Inc. 
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
  ******************************************************************************
   File Name      : divfract32.asm
   Module Name    : Library support routine
@@ -23,6 +27,8 @@
 ******************************************************************************/
 
 /* Called by autocoh_fr16 */
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = stats.h;
 .file_attr libFunc       = __autocoh_fr16;
 .file_attr libFunc       = autocoh_fr16;
@@ -42,7 +48,9 @@
 .file_attr libFunc = __divfract32;
 .file_attr FuncName      = __divfract32;
 
-.section  program;
+#endif
+
+.text;
 .global   __divfract32;
 
 .align 2;
@@ -77,7 +85,7 @@ SUB_END:             R2 <<= 1;             // NUMERATOR SHIFTED FOR CALCULATING
                    R5 = [SP++];             
                    RTS;
 
-.__divfract32.end:
+.size __divfract32, .-__divfract32
 
 
 

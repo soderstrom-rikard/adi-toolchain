@@ -1,6 +1,10 @@
 /*****************************************************************
-  Copyright(c) 2000-2005 Analog Devices Inc. IPDC BANGALORE, India.
-  All rights reserved
+  Copyright (C) 2000-2005 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
  *****************************************************************  
 
     File name   : cvecvmult_fr16.asm  
@@ -26,6 +30,8 @@
 
  *******************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = vector.h;
 .file_attr libFunc       = __cvecvmlt_fr16;
 .file_attr libFunc       = cvecvmlt_fr16;
@@ -33,6 +39,8 @@
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __cvecvmlt_fr16;
+
+#endif
 
 
 #if defined(__ADSPLPBLACKFIN__) && defined(__WORKAROUND_AVOID_DAG1)
@@ -43,7 +51,7 @@
 #define __WORKAROUND_BF532_ANOMALY_050000245
 #endif
 
-.section  program;
+.text;
 .align 2;
 .global __cvecvmlt_fr16;
 __cvecvmlt_fr16:
@@ -116,4 +124,4 @@ vv_end:
 FINISH:
         RTS;
 
-.__cvecvmlt_fr16.end:
+.size __cvecvmlt_fr16, .-__cvecvmlt_fr16

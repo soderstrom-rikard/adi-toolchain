@@ -2,8 +2,13 @@
  *
  * math_const.h 
  *
- * (c) Copyright 2002-2007 Analog Devices, Inc.  All rights reserved.
- * $Revision: 1.11 $
+ * Copyright (C) 2002-2007 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
+ *
  ************************************************************************/
 
 #ifndef _MATH_CONST_H

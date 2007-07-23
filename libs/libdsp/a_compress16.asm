@@ -1,5 +1,10 @@
 /******************************************************************************
- Copyright(c) 2001-2004 Analog Devices Inc.
+ Copyright (C) 2001-2004 Analog Devices, Inc.
+ This file is subject to the terms and conditions of the GNU Lesser
+ General Public License. See the file COPYING.LIB for more details.
+
+ Non-LGPL License is also available as part of VisualDSP++
+ from Analog Devices, Inc.
 *******************************************************************************
 
 File Name      : a_compress.asm
@@ -32,6 +37,8 @@ Registers Used : R0 - Current input data
 *******************************************************************************
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = filter.h;
 .file_attr libFunc       = __a_compress;
 .file_attr libFunc       = a_compress;
@@ -40,7 +47,9 @@ Registers Used : R0 - Current input data
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __a_compress;
 
-.section         program;
+#endif
+
+.text;
 .global          __a_compress;
 .align 2;
 
@@ -109,4 +118,4 @@ LOOP_FINISH:
       (R7:4) = [SP++];                      // Restore registers  
       RTS;
 
-.__a_compress.end:
+.size __a_compress, .-__a_compress

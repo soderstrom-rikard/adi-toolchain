@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2000-2006 Analog Devices Inc.
-  All rights reserved
+  Copyright (C) 2000-2006 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
 ******************************************************************************
   File Name      : rfft2d_fr16.asm
   Include File   : filter.h
@@ -59,6 +63,8 @@
   Code size      : 732 Bytes
 ******************************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = filter.h;
 .file_attr libFunc       = __rfft2d_fr16;
 .file_attr libName       = libdsp;
@@ -66,7 +72,9 @@
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __rfft2d_fr16;
 
-.section program;
+#endif
+
+.text;
 .global  __rfft2d_fr16;
 
 .align 2;
@@ -472,4 +480,4 @@ Terminate:
        (R7:4, P5:3) = [SP++];               //Restore preserved registers
        RTS;                                 //Return
 
-.__rfft2d_fr16.end:
+.size __rfft2d_fr16, .-__rfft2d_fr16

@@ -1,6 +1,10 @@
 /*****************************************************************
-	Copyright(c) 2000-2004 Analog Devices Inc. IPDC BANGALORE, India.
-	All rights reserved
+	Copyright (C) 2000-2004 Analog Devices, Inc.
+	This file is subject to the terms and conditions of the GNU Lesser
+	General Public License. See the file COPYING.LIB for more details.
+
+	Non-LGPL License is also available as part of VisualDSP++
+	from Analog Devices, Inc.
  *****************************************************************				  
 
     File name   :   clip_fr16.asm 
@@ -24,6 +28,8 @@
 
  *******************************************************************/	
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = math_bf.h;
 .file_attr libGroup      = math.h;
 .file_attr libFunc       = __clip_fr16;
@@ -33,7 +39,9 @@
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __clip_fr16;
 
-.section  program;
+#endif
+
+.text;
 .align 2;
 .global __clip_fr16;
 __clip_fr16:
@@ -47,4 +55,4 @@ __clip_fr16:
 		CC = R3 < R1;			// CHECK IF ABS(CLIP) < ABS(INPUT)
 		IF CC R0 = R2;			// IF TRUE RETURN INPUT
 		RTS;				
-.__clip_fr16.end:
+.size __clip_fr16, .-__clip_fr16

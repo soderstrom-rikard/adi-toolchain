@@ -1,6 +1,9 @@
-// Copyright (C) 2002-2006 Analog Devices Inc., All Rights Reserved.
-// This contains Development IP as defined in the ADI/Intel
-// Collaboration Agreement (ADI/Intel Confidential)
+// Copyright (C) 2002-2006 Analog Devices, Inc.
+// This file is subject to the terms and conditions of the GNU Lesser
+// General Public License. See the file COPYING.LIB for more details.
+//
+// Non-LGPL License is also available as part of VisualDSP++
+// from Analog Devices, Inc.
 
 /******************************************************************************
   File Name      : twidfftrad2_fr16.c
@@ -17,7 +20,6 @@
                    The twiddle factor stored in complex array 'w'
                    will have cosine and -sine values.
 
-  $Revision: 1.7 $
 *******************************************************************************/
 
 #if !defined(__NO_LIBRARY_ATTRIBUTES__)

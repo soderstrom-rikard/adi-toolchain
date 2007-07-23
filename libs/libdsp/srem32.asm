@@ -1,5 +1,10 @@
 /***************************************************************************
-Copyright (c) 2000-2006 Analog Devices Inc. All rights reserved.	
+Copyright (C) 2000-2006 Analog Devices, Inc.
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License. See the file COPYING.LIB for more details.
+
+Non-LGPL License is also available as part of VisualDSP++
+from Analog Devices, Inc.
 
 ****************************************************************************
   File name :  srem32.asm 
@@ -34,6 +39,8 @@ Special cases :
 
 **************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = integer_support;
 .file_attr libName = libdsp;
 .file_attr prefersMem    = internal;
@@ -41,7 +48,9 @@ Special cases :
 .file_attr libFunc = ___rem32;
 .file_attr FuncName      = ___rem32;
 
-.section  program;
+#endif
+
+.text;
 .align 2;
 
 .global ___rem32;
@@ -81,4 +90,4 @@ RETURN_ZERO:
 	R0 = 0;
 RETURN_R0:
 	RTS;
-.___rem32.end:
+.size ___rem32, .-___rem32

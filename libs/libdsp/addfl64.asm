@@ -1,5 +1,19 @@
 /*
-** Copyright (C) 2003-2006 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003-2006 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU General
+** Public License. See the file COPYING for more details.
+**
+** In addition to the permissions in the GNU General Public License,
+** Analog Devices gives you unlimited permission to link the
+** compiled version of this file into combinations with other programs,
+** and to distribute those combinations without any restriction coming
+** from the use of this file.  (The General Public License restrictions
+** do apply in other respects; for example, they cover modification of
+** the file, and distribution when not linked into a combine
+** executable.)
+**
+** Non-GPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 **
 ** Addition of two double-precision IEEE floating-point
 ** numbers. R0=low(X), R1=high(X), R2=low(Y), [SP+12]=high(y).
@@ -15,12 +29,16 @@
 */
 
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libf64ieee;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc = ___float64_add;
-.file_attr FuncName      = ___float64_add;
+.file_attr libFunc = ___adddf3;
+.file_attr FuncName      = ___adddf3;
+
+#endif
 
 #if defined(__ADSPBLACKFIN__) && !defined(__ADSPLPBLACKFIN__)
 /* __ADSPBF535__ core only */
@@ -55,12 +73,12 @@
    _rtmp = CC; \
    _r3 = _r3 + _rtmp
 
-.section program;
+.text;
 .align 2;
 
-___float64_add:
+___adddf3:
    R3 = [SP+12];			// Recover high(Y)
-___float64_add_inregs:
+___adddf3_inregs:
    [--SP] = (R7:4);
 
 	R6 = R1 << 1;			// Remove sign of X
@@ -659,10 +677,10 @@ ___float64_add_inregs:
 	R1 <<= 20;
    JUMP .rtn;
 
-.___float64_add.end:
-.___float64_add_inregs.end:
+.size ___adddf3, .-___adddf3
+.size ___adddf3_inregs, .-___adddf3_inregs
 
-.global ___float64_add;
-.type ___float64_add, STT_FUNC;
-.global ___float64_add_inregs;
-.type ___float64_add_inregs, STT_FUNC;
+.global ___adddf3;
+.type ___adddf3, STT_FUNC;
+.global ___adddf3_inregs;
+.type ___adddf3_inregs, STT_FUNC;

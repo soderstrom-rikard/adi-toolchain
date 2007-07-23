@@ -1,5 +1,10 @@
 /*****************************************************************************
-Copyright(c) 2000-2004 Analog Devices Inc.
+Copyright (C) 2000-2004 Analog Devices, Inc.
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License. See the file COPYING.LIB for more details.
+
+Non-LGPL License is also available as part of VisualDSP++
+from Analog Devices, Inc.
 ******************************************************************************
   File Name      : autocorr_fr16.asm
   Include File   : stats.h
@@ -20,6 +25,8 @@ Copyright(c) 2000-2004 Analog Devices Inc.
   Code Size      : 126 Bytes
 ******************************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = stats.h;
 .file_attr libFunc       = __autocorr_fr16;
 .file_attr libFunc       = autocorr_fr16;
@@ -28,7 +35,9 @@ Copyright(c) 2000-2004 Analog Devices Inc.
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __autocorr_fr16;
 
-.section  program;
+#endif
+
+.text;
 .global   __autocorr_fr16;
 
 .align 2;
@@ -100,7 +109,7 @@ AUTO_END:            I0 = I3;              // GET THE BASE ADDRESS
 
 RET_ZERO:          RTS;                    // RETURN
 
-.__autocorr_fr16.end:
+.size __autocorr_fr16, .-__autocorr_fr16
 
 .extern __divfract32;
 

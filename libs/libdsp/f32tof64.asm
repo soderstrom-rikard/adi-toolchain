@@ -1,5 +1,19 @@
 /*
-** Copyright (C) 2003-2004 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003-2004 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU General
+** Public License. See the file COPYING for more details.
+**
+** In addition to the permissions in the GNU General Public License,
+** Analog Devices gives you unlimited permission to link the
+** compiled version of this file into combinations with other programs,
+** and to distribute those combinations without any restriction coming
+** from the use of this file.  (The General Public License restrictions
+** do apply in other respects; for example, they cover modification of
+** the file, and distribution when not linked into a combine
+** executable.)
+**
+** Non-GPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 **
 ** Convert an IEEE single-precision floating point number
 ** to an IEEE double-precision floating point number.
@@ -12,17 +26,21 @@
 ** If you change this clobber set rembember to change SOFTFLOAT
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libf64ieee;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc = ___float32_to_float64;
-.file_attr FuncName      = ___float32_to_float64;
+.file_attr libFunc = ___extendsfdf2;
+.file_attr FuncName      = ___extendsfdf2;
 
-.section program;
+#endif
+
+.text;
 .align 2;
 
-___float32_to_float64:
+___extendsfdf2:
 
 	// Check for some unusual numbers first.
 
@@ -97,9 +115,9 @@ ___float32_to_float64:
 	R0 <<= 9;
 	RTS;
 
-.___float32_to_float64.end:
+.size ___extendsfdf2, .-___extendsfdf2
 
-.global ___float32_to_float64;
-.type ___float32_to_float64, STT_FUNC;
-.global .___float32_to_float64.end;
-.type .___float32_to_float64.end, STT_FUNC;
+.global ___extendsfdf2;
+.type ___extendsfdf2, STT_FUNC;
+.global .___extendsfdf2.end;
+.type .___extendsfdf2.end, STT_FUNC;

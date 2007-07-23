@@ -1,5 +1,19 @@
 /*
-** Copyright (C) 2003-2004 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003-2004 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU General
+** Public License. See the file COPYING for more details.
+**
+** In addition to the permissions in the GNU General Public License,
+** Analog Devices gives you unlimited permission to link the
+** compiled version of this file into combinations with other programs,
+** and to distribute those combinations without any restriction coming
+** from the use of this file.  (The General Public License restrictions
+** do apply in other respects; for example, they cover modification of
+** the file, and distribution when not linked into a combine
+** executable.)
+**
+** Non-GPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 **
 ** long double floating-point comparison.
 **
@@ -16,17 +30,27 @@
 ** int __float64_cmp(long double, long double)
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libf64ieee;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc = ___float64_cmp;
-.file_attr FuncName      = ___float64_cmp;
+.file_attr libFunc = ___cmpdf2;
+.file_attr FuncName      = ___cmpdf2;
 
-.section program;
+#endif
+
+.text;
 .align 2;
 
-___float64_cmp:
+___cmpdf2:
+___eqdf2:
+___gedf2:
+___gtdf2:
+___ledf2:
+___ltdf2:
+___nedf2:
 	P0 = R4;		// Grab some workspace.
 
 	// NaNs are represented as all-ones exponent, and
@@ -114,7 +138,25 @@ ___float64_cmp:
 	R4 = P0;
 	R0 = R1;
 	RTS;
-.___float64_cmp.end:
+.size ___cmpdf2, .-___cmpdf2
+.size ___eqdf2, .-___eqdf2
+.size ___gedf2, .-___gedf2
+.size ___gtdf2, .-___gtdf2
+.size ___ledf2, .-___ledf2
+.size ___ltdf2, .-___ltdf2
+.size ___nedf2, .-___nedf2
 
-.global ___float64_cmp;
-.type ___float64_cmp, STT_FUNC;
+.global ___cmpdf2;
+.global ___eqdf2;
+.global ___gedf2;
+.global ___gtdf2;
+.global ___ledf2;
+.global ___ltdf2;
+.global ___nedf2;
+.type ___cmpdf2, STT_FUNC;
+.type ___eqdf2, STT_FUNC;
+.type ___gedf2, STT_FUNC;
+.type ___gtdf2, STT_FUNC;
+.type ___ledf2, STT_FUNC;
+.type ___ltdf2, STT_FUNC;
+.type ___nedf2, STT_FUNC;

@@ -2,7 +2,12 @@
  *
  * libetsi.h
  *
- * (c) Copyright 2001-2007 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 2001-2007 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -51,8 +56,7 @@
 		fract32 L_add(fract32 _a, fract32 _b);
       fract32 L_negate(fract32 _a);
 #ifdef RENAME_ETSI_NEGATE
-#pragma linkage_name _negate
-		fract16 etsi_negate(fract16 _a);
+		fract16 etsi_negate(fract16 _a) asm ("_negate");
 #else
 		fract16 negate(fract16 _a);
 #endif

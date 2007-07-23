@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2000-2007 Analog Devices Inc. 
-  All rights reserved
+  Copyright (C) 2000-2007 Analog Devices, Inc. 
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
 ******************************************************************************
   File Name      : sdiv32.asm
   Module Name    : Runtime Support
@@ -15,6 +19,8 @@
 
 ******************************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup=integer_support;
 .file_attr libName=libdsp;
 .file_attr prefersMem=internal;
@@ -22,7 +28,9 @@
 .file_attr libFunc=___div32;
 .file_attr FuncName=___div32;
 
-.section  program;
+#endif
+
+.text;
 .global ___div32;
 .type   ___div32,STT_FUNC;
 
@@ -198,4 +206,4 @@ ___div32:
   R0 = 0;
   RTS;
 
-.___div32.end:
+.size ___div32, .-___div32

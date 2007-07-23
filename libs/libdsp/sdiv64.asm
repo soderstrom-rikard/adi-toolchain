@@ -1,5 +1,10 @@
 /*
-** Copyright (c) 2003-2006 Analog Devices Inc. All rights reserved.
+** Copyright (C) 2003-2006 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 ** Signed long long division.
 **
 ** !!NOTE- Uses non-standard clobber set in compiler:
@@ -27,7 +32,7 @@
 #define CARRY AC0
 #endif
 
-.section  program;
+.text;
 .global ___divdi3;
 .type   ___divdi3,STT_FUNC;
 .extern ___lshftli
@@ -334,4 +339,4 @@ ___divdi3 :
    (R7:4, P5:3) = [SP++];
    RTS;
 
-.___divdi3.end:
+.size ___divdi3, .-___divdi3

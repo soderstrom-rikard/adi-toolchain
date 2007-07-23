@@ -1,5 +1,19 @@
 /*
-** Copyright (C) 2003-2006 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003-2006 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU General
+** Public License. See the file COPYING for more details.
+**
+** In addition to the permissions in the GNU General Public License,
+** Analog Devices gives you unlimited permission to link the
+** compiled version of this file into combinations with other programs,
+** and to distribute those combinations without any restriction coming
+** from the use of this file.  (The General Public License restrictions
+** do apply in other respects; for example, they cover modification of
+** the file, and distribution when not linked into a combine
+** executable.)
+**
+** Non-GPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 **
 ** 64-bit floating-point division.
 **
@@ -14,12 +28,16 @@
 **         DefaultClobMinusLoop1Regs
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libf64ieee;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc = ___float64_div;
-.file_attr FuncName      = ___float64_div;
+.file_attr libFunc = ___divdf3;
+.file_attr FuncName      = ___divdf3;
+
+#endif
 
 #define  MAXBIASEXP 0x7FE 
 
@@ -30,10 +48,10 @@
 #define CARRY AC0
 #endif
 
-.section program;
+.text;
 .align 2;
 
-___float64_div:
+___divdf3:
 	R3 = [SP+12];			// Recover high half of Y.
 	[--SP] = (R7:4);		// Claim some workspace.
 
@@ -393,7 +411,7 @@ ___float64_div:
 	R4 = 0;			// Exponent now zero;
 	JUMP .rounding;
 	
-.___float64_div.end:
+.size ___divdf3, .-___divdf3
 
-.global ___float64_div;
-.type ___float64_div, STT_FUNC;
+.global ___divdf3;
+.type ___divdf3, STT_FUNC;

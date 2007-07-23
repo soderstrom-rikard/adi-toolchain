@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2000-2004 Analog Devices Inc. IPDC BANGALORE, India.
-  All rights reserved
+  Copyright (C) 2000-2004 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
  ******************************************************************************
 
   File Name    : conv2d3x3.asm
@@ -31,6 +35,8 @@ Code size   :  172 bytes
 
 ******************************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = filter.h;
 .file_attr libFunc       = __conv2d3x3_fr16;
 .file_attr libFunc       = conv2d3x3_fr16;
@@ -39,7 +45,9 @@ Code size   :  172 bytes
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __conv2d3x3_fr16;
 
-.section        program;
+#endif
+
+.text;
 .global        __conv2d3x3_fr16;
 .align         2;
 
@@ -133,4 +141,4 @@ Terminate:
         L3 = 0;
         RTS;                 // Return
 
-.__conv2d3x3_fr16.end:
+.size __conv2d3x3_fr16, .-__conv2d3x3_fr16

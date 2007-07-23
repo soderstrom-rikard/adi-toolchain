@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2000-2004 Analog Devices Inc. IPDC BANGALORE, India.
-  All rights reserved
+  Copyright (C) 2000-2004 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
  ******************************************************************************
   File name   :   tan_fr16.asm
 
@@ -31,6 +35,8 @@
 
 **************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = math_bf.h;
 .file_attr libGroup      = math.h;
 .file_attr libFunc       = __tan_fr16;
@@ -42,12 +48,14 @@
 
 .file_attr FuncName      = __tan_fr16;
 
-.section data1;
+#endif
+
+.data;
  .align 4;
  .tancoef0:
- .byte2 = 0X0000,0x4000,0x3fff,0x1B78,0xf9de,0xFF61;
+ .short 0X0000,0x4000,0x3fff,0x1B78,0xf9de,0xFF61;
 
-.section  program;
+.text;
 .global __tan_fr16;
 .align 2;
 
@@ -107,4 +115,4 @@ RET_ERROR:
       R0 = 0;                            // RETURN 0 FOR A DOMAIN ERROR
       RTS;
 
-.__tan_fr16.end:
+.size __tan_fr16, .-__tan_fr16

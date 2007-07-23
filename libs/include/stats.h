@@ -2,8 +2,13 @@
  *
  * stats.h
  *
- * (c) Copyright 1996-2007 Analog Devices, Inc.  All rights reserved.
- * $Revision: 1.11 $
+ * Copyright (C) 1996-2007 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
+ *
  ************************************************************************/
 
 #pragma once
@@ -36,29 +41,27 @@
  * 
  */
 
-#pragma linkage_name __autocoh_fr16
         void autocoh_fr16 ( const fract16 _samples[], 
                             int _sample_length, int _lags, 
-                            fract16 _coherence[] );
+                            fract16 _coherence[] ) asm ("__autocoh_fr16");
 
-#pragma linkage_name __autocohf
         void autocohf ( const float _samples[], 
                         int _sample_length, int _lags,
-                        float _coherence[] );
+                        float _coherence[] ) asm ("__autocohf");
 
-#pragma linkage_name __autocohd
         void autocohd ( const long double _samples[], 
                         int _sample_length, int _lags,
-                        long double _coherence[] );
+                        long double _coherence[] ) asm ("__autocohd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __autocohf
-#else
-#pragma linkage_name __autocohd
-#endif
         void autocoh ( const double _samples[], 
                        int _sample_length, int _lags,
-                       double _coherence[]);
+                       double _coherence[]) asm ("__autocohf");
+#else
+        void autocoh ( const double _samples[], 
+                       int _sample_length, int _lags,
+                       double _coherence[]) asm ("__autocohd");
+#endif
 
 
 
@@ -68,29 +71,27 @@
  * 
  */
 
-#pragma linkage_name __autocorr_fr16
         void autocorr_fr16 ( const fract16 _samples[], 
                              int _sample_length, int _lags,
-                             fract16 _correlation[] );
+                             fract16 _correlation[] ) asm ("__autocorr_fr16");
 
-#pragma linkage_name __autocorrf
         void autocorrf ( const float _samples[],
                          int _sample_length, int _lags,
-                         float _correlation[] );
+                         float _correlation[] ) asm ("__autocorrf");
 
-#pragma linkage_name __autocorrd
         void autocorrd ( const long double _samples[], 
                          int _sample_length, int _lags,
-                         long double _correlation[] );
+                         long double _correlation[] ) asm ("__autocorrd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __autocorrf
-#else
-#pragma linkage_name __autocorrd
-#endif
         void autocorr ( const double _samples[], 
                         int _sample_length, int _lags,
-                        double _correlation[] );
+                        double _correlation[] ) asm ("__autocorrf");
+#else
+        void autocorr ( const double _samples[], 
+                        int _sample_length, int _lags,
+                        double _correlation[] ) asm ("__autocorrd");
+#endif
 
 
 
@@ -100,33 +101,32 @@
  * 
  */
 
-#pragma linkage_name __crosscoh_fr16
         void crosscoh_fr16 ( const fract16 _samples_x[], 
                              const fract16 _samples_y[], 
                              int _sample_length, int _lags,
-                             fract16 _coherence[] );
+                             fract16 _coherence[] ) asm ("__crosscoh_fr16");
 
-#pragma linkage_name __crosscohf
         void crosscohf ( const float _samples_x[], 
                          const float _samples_y[], 
                          int _sample_length, int _lags,
-                         float _coherence[] );
+                         float _coherence[] ) asm ("__crosscohf");
 
-#pragma linkage_name __crosscohd
         void crosscohd ( const long double _samples_x[], 
                          const long double _samples_y[],
                          int _sample_length, int _lags,
-                         long double _coherence[] );
+                         long double _coherence[] ) asm ("__crosscohd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __crosscohf
-#else
-#pragma linkage_name __crosscohd
-#endif
         void crosscoh ( const double _samples_x[], 
                         const double _samples_y[],
                         int _sample_length, int _lags,
-                        double _coherence[] );
+                        double _coherence[] ) asm ("__crosscohf");
+#else
+        void crosscoh ( const double _samples_x[], 
+                        const double _samples_y[],
+                        int _sample_length, int _lags,
+                        double _coherence[] ) asm ("__crosscohd");
+#endif
 
 
 
@@ -136,33 +136,32 @@
  * 
  */
 
-#pragma linkage_name __crosscorr_fr16
         void crosscorr_fr16 ( const fract16 _samples_x[], 
                               const fract16 _samples_y[], 
                               int _sample_length, int _lags,
-                              fract16 _correlation[]);
+                              fract16 _correlation[]) asm ("__crosscorr_fr16");
 
-#pragma linkage_name __crosscorrf
         void crosscorrf ( const float _samples_x[], 
                           const float _samples_y[],
                           int _sample_length, int _lags, 
-                          float _correlation[]);
+                          float _correlation[]) asm ("__crosscorrf");
 
-#pragma linkage_name __crosscorrd
         void crosscorrd ( const long double _samples_x[], 
                           const long double _samples_y[],
                           int _sample_length, int _lags,
-                          long double _correlation[] );
+                          long double _correlation[] ) asm ("__crosscorrd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __crosscorrf
-#else
-#pragma linkage_name __crosscorrd
-#endif
         void crosscorr ( const double _samples_x[],
                          const double _samples_y[],
                          int _sample_length, int _lags,
-                         double _correlation[] );
+                         double _correlation[] ) asm ("__crosscorrf");
+#else
+        void crosscorr ( const double _samples_x[],
+                         const double _samples_y[],
+                         int _sample_length, int _lags,
+                         double _correlation[] ) asm ("__crosscorrd");
+#endif
 
 
 
@@ -172,33 +171,32 @@
  * 
  */
 
-#pragma linkage_name __histogram_fr16
         void histogram_fr16 ( const fract16 _samples_x[], 
                               int _histogram_x[], 
                               fract16 _max_sample, fract16 _min_sample, 
-                              int _sample_length, int _bin_count );
+                              int _sample_length, int _bin_count ) asm ("__histogram_fr16");
 
-#pragma linkage_name __histogramf
         void histogramf ( const float _samples_x[], 
                           int _histogram_x[], 
                           float _max_sample, float _min_sample, 
-                          int _sample_length, int _bin_count );
+                          int _sample_length, int _bin_count ) asm ("__histogramf");
 
-#pragma linkage_name __histogramd
         void histogramd ( const long double _samples_x[], 
                           int _histogram_x[],
                           long double _max_sample, long double _min_sample, 
-                          int _sample_length, int _bin_count );
+                          int _sample_length, int _bin_count ) asm ("__histogramd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __histogramf
-#else
-#pragma linkage_name __histogramd
-#endif
         void histogram ( const double _samples_x[],
                           int _histogram_x[],
                           double _max_sample, double _min_sample,
-                          int _sample_length, int _bin_count );
+                          int _sample_length, int _bin_count ) asm ("__histogramf");
+#else
+        void histogram ( const double _samples_x[],
+                          int _histogram_x[],
+                          double _max_sample, double _min_sample,
+                          int _sample_length, int _bin_count ) asm ("__histogramd");
+#endif
 
 
 
@@ -208,21 +206,17 @@
  * 
  */
 
-#pragma linkage_name __mean_fr16
-        fract16 mean_fr16 (const fract16 _samples[], int _sample_length);
+        fract16 mean_fr16 (const fract16 _samples[], int _sample_length) asm ("__mean_fr16");
 
-#pragma linkage_name __meanf
-        float meanf (const float _samples[], int _sample_length);
+        float meanf (const float _samples[], int _sample_length) asm ("__meanf");
 
-#pragma linkage_name __meand
-        long double meand (const long double _samples[], int _sample_length);
+        long double meand (const long double _samples[], int _sample_length) asm ("__meand");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __meanf
+        double mean (const double _samples[], int _sample_length) asm ("__meanf");
 #else
-#pragma linkage_name __meand
+        double mean (const double _samples[], int _sample_length) asm ("__meand");
 #endif
-        double mean (const double _samples[], int _sample_length);
 
 
 
@@ -232,21 +226,17 @@
  * 
  */
 
-#pragma linkage_name __rms_fr16
-        fract16 rms_fr16 (const fract16 _samples[], int _sample_length);
+        fract16 rms_fr16 (const fract16 _samples[], int _sample_length) asm ("__rms_fr16");
 
-#pragma linkage_name __rmsf
-        float rmsf (const float _samples[], int _sample_length);
+        float rmsf (const float _samples[], int _sample_length) asm ("__rmsf");
 
-#pragma linkage_name __rmsd
-        long double rmsd (const long double _samples[], int _sample_length);
+        long double rmsd (const long double _samples[], int _sample_length) asm ("__rmsd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __rmsf
+        double rms (const double _samples[], int _sample_length) asm ("__rmsf");
 #else
-#pragma linkage_name __rmsd
+        double rms (const double _samples[], int _sample_length) asm ("__rmsd");
 #endif
-        double rms (const double _samples[], int _sample_length);
 
 
 
@@ -256,21 +246,17 @@
  * 
  */
 
-#pragma linkage_name __var_fr16
-        fract16 var_fr16 (const fract16 _samples[], int _sample_length);
+        fract16 var_fr16 (const fract16 _samples[], int _sample_length) asm ("__var_fr16");
 
-#pragma linkage_name __varf
-        float varf (const float _samples[], int _sample_length);
+        float varf (const float _samples[], int _sample_length) asm ("__varf");
 
-#pragma linkage_name __vard
-        long double vard (const long double _samples[], int _sample_length);
+        long double vard (const long double _samples[], int _sample_length) asm ("__vard");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __varf
+        double var (const double _samples[], int _sample_length) asm ("__varf");
 #else
-#pragma linkage_name __vard
+        double var (const double _samples[], int _sample_length) asm ("__vard");
 #endif
-        double var (const double _samples[], int _sample_length);
 
 
 
@@ -280,22 +266,18 @@
  * 
  */
 
-#pragma linkage_name __zero_cross_fr16
-        int zero_cross_fr16 (const fract16 _samples[], int _sample_length);
+        int zero_cross_fr16 (const fract16 _samples[], int _sample_length) asm ("__zero_cross_fr16");
 
-#pragma linkage_name __zero_crossf
-        int zero_crossf (const float _samples[], int _sample_length);
+        int zero_crossf (const float _samples[], int _sample_length) asm ("__zero_crossf");
 
-#pragma linkage_name __zero_crossd
-        int zero_crossd (const long double _samples[], int _sample_length);
+        int zero_crossd (const long double _samples[], int _sample_length) asm ("__zero_crossd");
 
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __zero_crossf
+        int zero_cross (const double _samples[], int _sample_length) asm ("__zero_crossf");
 #else
-#pragma linkage_name __zero_crossd
+        int zero_cross (const double _samples[], int _sample_length) asm ("__zero_crossd");
 #endif
-        int zero_cross (const double _samples[], int _sample_length);
 
 
 

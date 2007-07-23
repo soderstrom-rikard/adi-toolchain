@@ -1,24 +1,29 @@
 /*
 ** Float16 multiply.  Takes 2 non-IEEE-754 floats and multiplies them (16.16)
 **
-** Copyright (C) 2004-2006 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2004-2006 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 */
 
 #if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
 .file_attr libGroup      = floating_point_support;
 .file_attr libName       = libf64fast;
-.file_attr FuncName      = ___float32_mul;
-.file_attr libFunc       = ___float32_mul;
+.file_attr FuncName      = ___mulsf3;
+.file_attr libFunc       = ___mulsf3;
 
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
 
 #endif
 
-.section program;
+.text;
 .align 2;
-___float32_mul:
+___mulsf3:
 	R2.L = R0.L + R1.L (NS);
 	R0 = R0.H * R1.H;		// Produce 32-bit result first
 	R0.L = R0.L - R0.L (NS);	// And lose bottom bits of precision
@@ -39,6 +44,6 @@ ___float32_mul:
 
 	RTS;
 
-.___float32_mul.end:
-.global ___float32_mul;
-.type ___float32_mul, STT_FUNC;
+.size ___mulsf3, .-___mulsf3
+.global ___mulsf3;
+.type ___mulsf3, STT_FUNC;

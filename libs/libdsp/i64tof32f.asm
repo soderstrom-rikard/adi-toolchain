@@ -1,8 +1,15 @@
 /*
-** Copyright (C) 2003-2004 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003-2004 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 **
 ** Convert a 64-bit signed integer to a non-IEEE 32-bit floating point.
 */
+
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
 .file_attr libGroup      = floating_point_support;
 .file_attr libGroup      = integer_support;
@@ -12,7 +19,9 @@
 .file_attr libFunc = ___int64_to_float32;
 .file_attr FuncName      = ___int64_to_float32;
 
-.section program;
+#endif
+
+.text;
 .align 2;
 
 ___int64_to_float32:
@@ -95,6 +104,6 @@ ___int64_to_float32:
 	// 32 bits of zeros.
 	R0.L = 31;
 	RTS;
-.___int64_to_float32.end:
+.size ___int64_to_float32, .-___int64_to_float32
 .global ___int64_to_float32;
 .type ___int64_to_float32, STT_FUNC;

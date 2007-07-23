@@ -1,7 +1,14 @@
 /*
 ** Convert a float to a float16.
-** Copyright (C) 2003 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 */
+
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
 .file_attr libGroup      = float16.h;
 .file_attr libFunc       = fl_to_fl16;
@@ -11,7 +18,9 @@
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = _fl_to_fl16;
 
-.section program;
+#endif
+
+.text;
 .align 2;
 _fl_to_fl16:
 	R1 = R0 << 1;
@@ -40,7 +49,7 @@ _fl_to_fl16:
 	R0.L = R2.L >> 0;	// move the exponent in.
 finished:
 	RTS;
-._fl_to_fl16.end:
+.size _fl_to_fl16, .-_fl_to_fl16
 .global _fl_to_fl16;
 .type _fl_to_fl16, STT_FUNC;
 

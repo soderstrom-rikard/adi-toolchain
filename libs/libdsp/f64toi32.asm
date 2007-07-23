@@ -1,11 +1,18 @@
 /*
-** Copyright (C) 2003-2004 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003-2004 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 **
 ** Convert an IEEE double-precision floating point 64-bit number
 ** into a 32-bit signed integer, using round-to-nearest.
 ** int __float64_to_int32(long double);
 **
 */
+
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
 .file_attr libGroup      = integer_support;
 .file_attr libGroup      = floating_point_support;
@@ -15,7 +22,9 @@
 .file_attr libFunc = ___float64_to_int32;
 .file_attr FuncName      = ___float64_to_int32;
 
-.section program;
+#endif
+
+.text;
 .align 2;
 ___float64_to_int32:
 	// Check for zero.
@@ -198,7 +207,7 @@ ___float64_to_int32:
 	IF CC R0 = R1;
 	RTS;
 
-.___float64_to_int32.end:
+.size ___float64_to_int32, .-___float64_to_int32
 
 .global ___float64_to_int32;
 .type ___float64_to_int32, STT_FUNC;

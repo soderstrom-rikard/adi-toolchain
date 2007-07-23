@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2000-2006 Analog Devices Inc. IPDC BANGALORE, India. 
-  All rights reserved
+  Copyright (C) 2000-2006 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
 ******************************************************************************
   File Name      : vssub.asm
   Module Name    : vector scalar subtraction
@@ -35,7 +39,7 @@
 .file_attr FuncName      = __vecssub_fr16;
 #endif
 
-.section      program;
+.text;
 .global       __vecssub_fr16;
 .align 2;
 
@@ -63,4 +67,4 @@ ST_VSSUB:   R3.L = R0.L - R1.L(S) || R0 = W[P0++] (Z) || W[I0++] = R3.L;
 RET_ZERO:
         RTS;
 
-.__vecssub_fr16.end:
+.size __vecssub_fr16, .-__vecssub_fr16

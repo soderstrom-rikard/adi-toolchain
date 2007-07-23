@@ -1,8 +1,13 @@
 /************************************************************************
  *
- * filter.h : $Revision: 1.16 $
- * (c) Copyright 1996-2006 Analog Devices, Inc.  All rights reserved.
- * $Revision: 1.16 $
+ * filter.h
+ * Copyright (C) 1996-2006 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
+ *
  ************************************************************************/
 #pragma once
 #ifndef __NO_BUILTIN
@@ -100,10 +105,9 @@ typedef struct
  * 
  */
 
-#pragma linkage_name __fir_fr16
         void fir_fr16 (const fract16 _input[], 
                        fract16 _output[], int _length, 
-                       _fir_fr16_state *_filter_state);
+                       _fir_fr16_state *_filter_state) asm ("__fir_fr16");
 
 
 
@@ -114,10 +118,9 @@ typedef struct
  * 
  */
 
-#pragma linkage_name __iir_fr16
         void iir_fr16 (const fract16 _input[], 
                        fract16 _output[], int _length, 
-                       _iir_fr16_state *_filter_state);
+                       _iir_fr16_state *_filter_state) asm ("__iir_fr16");
 
 
 
@@ -127,15 +130,13 @@ typedef struct
  *
  */
 
-#pragma linkage_name __iirdf1_fr16
         void iirdf1_fr16 (const fract16 _input[], 
                           fract16 _output[], int _length,
-                          _iirdf1_fr16_state *_filter_state);
+                          _iirdf1_fr16_state *_filter_state) asm ("__iirdf1_fr16");
 
 
-#pragma linkage_name __coeff_iirdf1_fr16
         void coeff_iirdf1_fr16 (const float _acoeff[], const float _bcoeff[],
-                                fract16 _coeff[], int _nstages);
+                                fract16 _coeff[], int _nstages) asm ("__coeff_iirdf1_fr16");
 
 
 /* * * *        cfir      * * * *
@@ -144,10 +145,9 @@ typedef struct
  * 
  */
 
-#pragma linkage_name __cfir_fr16
         void cfir_fr16 (const complex_fract16 _input[], 
                         complex_fract16 _output[], int _length,
-                        _cfir_fr16_state *_filter_state);
+                        _cfir_fr16_state *_filter_state) asm ("__cfir_fr16");
 
 
 
@@ -158,10 +158,9 @@ typedef struct
  * 
  */
 
-#pragma linkage_name __fir_decima_fr16
         void fir_decima_fr16 (const fract16 _input[], 
                               fract16 _output[], int _length, 
-                              _fir_fr16_state *_filter_state);
+                              _fir_fr16_state *_filter_state) asm ("__fir_decima_fr16");
 
 
 
@@ -172,10 +171,9 @@ typedef struct
  * 
  */
 
-#pragma linkage_name __fir_interp_fr16
         void fir_interp_fr16 (const fract16 _input[], 
                               fract16 _output[], int _length,
-                              _fir_fr16_state *_filter_state);
+                              _fir_fr16_state *_filter_state) asm ("__fir_interp_fr16");
 
 
 
@@ -186,10 +184,9 @@ typedef struct
  * 
  */
 
-#pragma linkage_name __convolve_fr16
         void convolve_fr16 (const fract16 _input_x[], int _length_x, 
                             const fract16 _input_y[], int _length_y, 
-                            fract16 _output[]);
+                            fract16 _output[]) asm ("__convolve_fr16");
 
 
 
@@ -200,12 +197,11 @@ typedef struct
  * 
  */
 
-#pragma linkage_name __conv2d_fr16
         void conv2d_fr16 (const fract16 _input_x[], 
                           int _rows_x, int _columns_x, 
                           const fract16 _input_y[], 
                           int _rows_y, int _columns_y,
-                          fract16 _output[]);
+                          fract16 _output[]) asm ("__conv2d_fr16");
 
 
 
@@ -216,11 +212,10 @@ typedef struct
  * 
  */
 
-#pragma linkage_name __conv2d3x3_fr16
         void conv2d3x3_fr16 (const fract16 _input_x[],  
                              int _rows_x, int _columns_x,
                              const fract16 _input_y[], 
-                             fract16 _output[]);
+                             fract16 _output[]) asm ("__conv2d3x3_fr16");
 
 
 
@@ -233,17 +228,14 @@ typedef struct
  *    twidfftf_fr16    3/4 n sized twiddle table (use in Radix4 FFTF <cos/-sin>
  */
 
-#pragma linkage_name __twidfftrad2_fr16
         void twidfftrad2_fr16 (complex_fract16 _twiddle_table[], 
-                               int _fft_size);
+                               int _fft_size) asm ("__twidfftrad2_fr16");
 
-#pragma linkage_name __twidfft2d_fr16
         void twidfft2d_fr16 (complex_fract16 _twiddle_table[], 
-                             int _fft_size);
+                             int _fft_size) asm ("__twidfft2d_fr16");
 
-#pragma linkage_name __twidfftf_fr16
         void twidfftf_fr16 (complex_fract16 _twiddle_table[], 
-                            int _fft_size);
+                            int _fft_size) asm ("__twidfftf_fr16");
 
 
 
@@ -252,11 +244,10 @@ typedef struct
  *    Fast N point radix 4 complex input FFT
  *
  */
-#pragma linkage_name __cfftf_fr16
         void cfftf_fr16(const complex_fract16 _input[], 
                         complex_fract16 _output[],
                         const complex_fract16 _twiddle_table[], 
-                        int _twiddle_stride, int _fft_size);
+                        int _twiddle_stride, int _fft_size) asm ("__cfftf_fr16");
 
 
 
@@ -267,20 +258,18 @@ typedef struct
  */
 
 #if defined __USE_FFT_REL45__
-#pragma linkage_name __cfftN_fr16
         void cfft_fr16 (const complex_fract16 _input[],
                         complex_fract16 _temp[],
                         complex_fract16 _output[],
                         const complex_fract16 _twiddle_table[],
                         int _twiddle_stride, int _fft_size,
-                        int _block_exponent, int _scale_method);
+                        int _block_exponent, int _scale_method) asm ("__cfftN_fr16");
 #else
-#pragma linkage_name __cfftN_scaling_fr16
         void cfft_fr16 (const complex_fract16 _input[], 
                         complex_fract16 _output[], 
                         const complex_fract16 _twiddle_table[], 
                         int _twiddle_stride, int _fft_size, 
-                        int* _block_exponent, int _scale_method);
+                        int* _block_exponent, int _scale_method) asm ("__cfftN_scaling_fr16");
 #endif /* __USE_FFT_REL45__ */
 
 
@@ -292,20 +281,18 @@ typedef struct
  */
 
 #if defined __USE_FFT_REL45__
-#pragma linkage_name __rfftN_fr16
         void rfft_fr16 (const fract16 _input[], 
                         complex_fract16 _temp[],
                         complex_fract16 _output[],
                         const complex_fract16 _twiddle_table[],
                         int _twiddle_stride, int _fft_size,
-                        int _block_exponent, int _scale_method);
+                        int _block_exponent, int _scale_method) asm ("__rfftN_fr16");
 #else
-#pragma linkage_name __rfftN_scaling_fr16
         void rfft_fr16 (const fract16 _input[],
                         complex_fract16 _output[],
                         const complex_fract16 _twiddle_table[],
                         int _twiddle_stride, int _fft_size,
-                        int* _block_exponent, int _scale_method);
+                        int* _block_exponent, int _scale_method) asm ("__rfftN_scaling_fr16");
 #endif /* __USE_FFT_REL45__ */
 
 
@@ -317,20 +304,18 @@ typedef struct
  */
 
 #if defined __USE_FFT_REL45__
-#pragma linkage_name __ifftN_fr16
         void ifft_fr16 (const complex_fract16 _input[], 
                         complex_fract16 _temp[],
                         complex_fract16 _output[],
                         const complex_fract16 _twiddle_table[],
                         int _twiddle_stride, int _fft_size,
-                        int _block_exponent, int _scale_method);
+                        int _block_exponent, int _scale_method) asm ("__ifftN_fr16");
 #else
-#pragma linkage_name __ifftN_scaling_fr16
         void ifft_fr16 (const complex_fract16 _input[],
                         complex_fract16 _output[],
                         const complex_fract16 _twiddle_table[],
                         int _twiddle_stride, int _fft_size,
-                        int* _block_exponent, int _scale_method);
+                        int* _block_exponent, int _scale_method) asm ("__ifftN_scaling_fr16");
 #endif /* __USE_FFT_REL45__ */
 
 
@@ -340,13 +325,12 @@ typedef struct
  * 
  */
 
-#pragma linkage_name __cfft2d_fr16
         void cfft2d_fr16 (const complex_fract16 *_input, 
                           complex_fract16 *_temp,
                           complex_fract16 *_output,
                           const complex_fract16 _twiddle_table[],
                           int _twiddle_stride, int _fft_size,
-                          int _block_exponent, int _scale_method); 
+                          int _block_exponent, int _scale_method) asm ("__cfft2d_fr16"); 
 
 
 
@@ -357,13 +341,12 @@ typedef struct
  * 
  */
 
-#pragma linkage_name __rfft2d_fr16
         void rfft2d_fr16 (const fract16 *_input, 
                           complex_fract16 *_temp,
                           complex_fract16 *_output,
                           const complex_fract16 _twiddle_table[],
                           int _twiddle_stride, int _fft_size,
-                          int _block_exponent, int _scale_method);
+                          int _block_exponent, int _scale_method) asm ("__rfft2d_fr16");
 
 
 
@@ -374,13 +357,12 @@ typedef struct
  * 
  */
 
-#pragma linkage_name __ifft2d_fr16
         void ifft2d_fr16 (const complex_fract16 *_input, 
                           complex_fract16 *_temp,
                           complex_fract16 *_output,
                           const complex_fract16 _twiddle_table[],
                           int _twiddle_stride, int _fft_size,
-                          int _block_exponent, int _scale_method);
+                          int _block_exponent, int _scale_method) asm ("__ifft2d_fr16");
 
 
 
@@ -391,8 +373,7 @@ typedef struct
  * 
  */
 
-#pragma linkage_name __a_compress
-        void a_compress (const short _input[], short _output[], int _length);
+        void a_compress (const short _input[], short _output[], int _length) asm ("__a_compress");
 
 
 
@@ -403,8 +384,7 @@ typedef struct
  * 
  */
 
-#pragma linkage_name __a_expand
-        void a_expand (const short _input[], short _output[], int _length);
+        void a_expand (const short _input[], short _output[], int _length) asm ("__a_expand");
 
 
 
@@ -415,8 +395,7 @@ typedef struct
  * 
  */
 
-#pragma linkage_name __mu_compress
-        void mu_compress (const short _input[], short _output[], int _length);
+        void mu_compress (const short _input[], short _output[], int _length) asm ("__mu_compress");
 
 
 
@@ -427,8 +406,7 @@ typedef struct
  * 
  */
 
-#pragma linkage_name __mu_expand
-        void mu_expand (const short _input[], short _output[], int _length);
+        void mu_expand (const short _input[], short _output[], int _length) asm ("__mu_expand");
 
 
 
@@ -456,13 +434,11 @@ typedef struct
        *        3/4 n sized twiddle table (use in Radix4 FFT) <cos/sin>
        */
 
-#pragma linkage_name __twidfft_fr16
         void twidfft_fr16 (complex_fract16 _twiddle_table[],
-                           int _fft_size);
+                           int _fft_size) asm ("__twidfft_fr16");
 
-#pragma linkage_name __twidfftrad4_fr16
         void twidfftrad4_fr16 (complex_fract16 _twiddle_table[],
-                               int _fft_size);
+                               int _fft_size) asm ("__twidfftrad4_fr16");
 
 
       /* * * *        radix-4 ffts   * * * *
@@ -471,29 +447,26 @@ typedef struct
        *
        */
 
-#pragma linkage_name __cfftrad4_fr16
         void cfftrad4_fr16 (const complex_fract16 _input[],
                             complex_fract16 _temp[],
                             complex_fract16 _output[],
                             const complex_fract16 _twiddle_table[],
                             int _twiddle_stride, int _fft_size,
-                            int _block_exponent, int _scale_method);
+                            int _block_exponent, int _scale_method) asm ("__cfftrad4_fr16");
 
-#pragma linkage_name __rfftrad4_fr16
         void rfftrad4_fr16 (const fract16 _input[],
                             complex_fract16 _temp[],
                             complex_fract16 _output[],
                             const complex_fract16 _twiddle_table[],
                             int _twiddle_stride, int _fft_size,
-                            int _block_exponent, int _scale_method);
+                            int _block_exponent, int _scale_method) asm ("__rfftrad4_fr16");
 
-#pragma linkage_name __ifftrad4_fr16
         void ifftrad4_fr16 (const complex_fract16 _input[],
                             complex_fract16 _temp[],
                             complex_fract16 _output[],
                             const complex_fract16 _twiddle_table[],
                             int _twiddle_stride, int _fft_size,
-                            int _block_exponent, int _scale_method);
+                            int _block_exponent, int _scale_method) asm ("__ifftrad4_fr16");
 
 #ifdef __cplusplus
  }      /* end extern "C" */

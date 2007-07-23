@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2001-2004 Analog Devices Inc.
-  All rights reserved
+  Copyright (C) 2001-2004 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
 ******************************************************************************
   File Name      : atan2_fr16.asm
   Include File   : math.h
@@ -44,6 +48,8 @@
   Code size      : 166 Bytes
 ******************************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = math.h;
 .file_attr libGroup      = math_bf.h;
 .file_attr libFunc       = __atan2_fr16;
@@ -61,16 +67,18 @@
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __atan2_fr16;
 
+#endif
 
 
-.section  data1;
+
+.data;
 
 .align 2;
 .atan2coef:
-.byte2 =  0x28BE, 0xFFFB, 0xF2AE, 0xFE6E, 0x0D5B, 0xF691, 0x023F;
+.short 0x28BE, 0xFFFB, 0xF2AE, 0xFE6E, 0x0D5B, 0xF691, 0x023F;
  
 
-.section  program;
+.text;
 .global   __atan2_fr16;
 
 .align 2;
@@ -153,7 +161,7 @@ RET:      R0 = R0.L (X);                 // ENSURE RESULT IS SIGN-EXTENDED
           (R7:5) = [SP++];               // POP R7-R5
           RTS;
 
-.__atan2_fr16.end: 
+.size __atan2_fr16, .-__atan2_fr16
 
 .extern  __div16;
 

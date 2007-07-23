@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2000-2004 Analog Devices Inc. IPDC BANGALORE, India. 
-  All rights reserved
+  Copyright (C) 2000-2004 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
  ******************************************************************************
   File name   :  atan.asm
 
@@ -26,6 +30,8 @@
   
   DATE           : 26-02-01
 **************************************************************/
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = math.h;
 .file_attr libGroup      = math_bf.h;
 .file_attr libFunc       = __atan_fr16;
@@ -35,12 +41,14 @@
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __atan_fr16;
 
-.section data1;
+#endif
+
+.data;
  .align 2;
  .atancoef:
- .byte2 = 0x7FE3,0x0192,0xCD26,0x1361,0x0758,0xFB34 ;
+ .short 0x7FE3,0x0192,0xCD26,0x1361,0x0758,0xFB34 ;
  
-.section  program;
+.text;
 .global __atan_fr16;
 .align 2;
 
@@ -79,7 +87,7 @@ RET_NEG_MAX:    R0 = -25735;					// RETURN 0X9B78
 
 RET_POS_MAX:    R0 = 0X6488;					// RETURN 0X6488		
                 RTS; 
-.__atan_fr16.end:
+.size __atan_fr16, .-__atan_fr16
               
 
 		

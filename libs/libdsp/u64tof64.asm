@@ -1,5 +1,19 @@
 /*
-   Copyright (C) 2003-2005 Analog Devices, Inc. All Rights Reserved.
+   Copyright (C) 2003-2005 Analog Devices, Inc.
+   This file is subject to the terms and conditions of the GNU General
+   Public License. See the file COPYING for more details.
+
+   In addition to the permissions in the GNU General Public License,
+   Analog Devices gives you unlimited permission to link the
+   compiled version of this file into combinations with other programs,
+   and to distribute those combinations without any restriction coming
+   from the use of this file.  (The General Public License restrictions
+   do apply in other respects; for example, they cover modification of
+   the file, and distribution when not linked into a combine
+   executable.)
+
+   Non-GPL License is also available as part of VisualDSP++
+   from Analog Devices, Inc.
 
    Convert unsigned long long to IEEE double-precision 64-bit
    floating point.
@@ -39,13 +53,17 @@
       case that the rounding caused an overflow of R1, 2.
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = integer_support;
 .file_attr libGroup      = floating_point_support;
 .file_attr libName       = libf64ieee;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc       = ___unsigned_int64_to_float64;
-.file_attr FuncName      = ___unsigned_int64_to_float64;
+.file_attr libFunc       = ___floatundidf;
+.file_attr FuncName      = ___floatundidf;
+
+#endif
 
 #if defined(__ADSPBLACKFIN__) && !defined(__ADSPLPBLACKFIN__)
 /* __ADSPBF535__ core only */
@@ -54,10 +72,10 @@
 #define CARRY AC0
 #endif
 
-.section program;
+.text;
 .align 2;
 
-___unsigned_int64_to_float64:
+___floatundidf:
         // 1)
         CC = R1 == 0;
         IF CC JUMP .is_32bit;
@@ -115,13 +133,13 @@ ___unsigned_int64_to_float64:
         RTS;
 
 .is_32bit:
-        JUMP.X ___unsigned_int32_to_float64;
+        JUMP.X ___floatunsidf;
 
-.___unsigned_int64_to_float64.end:
+.size ___floatundidf, .-___floatundidf
 
 
-.global ___unsigned_int64_to_float64;
-.type ___unsigned_int64_to_float64,STT_FUNC;
-.global .___unsigned_int64_to_float64.end;
-.type .___unsigned_int64_to_float64.end,STT_FUNC;
-.extern ___unsigned_int32_to_float64;
+.global ___floatundidf;
+.type ___floatundidf,STT_FUNC;
+.global .___floatundidf.end;
+.type .___floatundidf.end,STT_FUNC;
+.extern ___floatunsidf;

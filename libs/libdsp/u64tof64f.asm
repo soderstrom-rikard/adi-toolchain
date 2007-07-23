@@ -1,5 +1,10 @@
 /*
-** Copyright (C) 2003-2004 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003-2004 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 **
 ** Convert 64-bit unsigned integer to 64-bit non-IEEE floating point.
 **
@@ -9,18 +14,22 @@
 ** result in R1:0.
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = integer_support;
 .file_attr libGroup      = floating_point_support;
 .file_attr libName       = libf64fast;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc       = ___unsigned_int64_to_float64;
-.file_attr FuncName      = ___unsigned_int64_to_float64;
+.file_attr libFunc       = ___floatundidf;
+.file_attr FuncName      = ___floatundidf;
 
-.section program;
+#endif
+
+.text;
 .align 2;
 
-___unsigned_int64_to_float64:
+___floatundidf:
 
 	// An unsigned 64-bit int has 64 bits of significand,
 	// Whereas the high-half of our
@@ -117,6 +126,6 @@ ___unsigned_int64_to_float64:
 	R0 = R0 - R2 (S);
 
 	RTS;
-.___unsigned_int64_to_float64.end:
-.global ___unsigned_int64_to_float64;
-.type ___unsigned_int64_to_float64, STT_FUNC;
+.size ___floatundidf, .-___floatundidf
+.global ___floatundidf;
+.type ___floatundidf, STT_FUNC;

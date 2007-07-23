@@ -1,5 +1,19 @@
 /*
-   Copyright (C) 2003-2005 Analog Devices, Inc. All Rights Reserved.
+   Copyright (C) 2003-2005 Analog Devices, Inc.
+   This file is subject to the terms and conditions of the GNU General
+   Public License. See the file COPYING for more details.
+
+   In addition to the permissions in the GNU General Public License,
+   Analog Devices gives you unlimited permission to link the
+   compiled version of this file into combinations with other programs,
+   and to distribute those combinations without any restriction coming
+   from the use of this file.  (The General Public License restrictions
+   do apply in other respects; for example, they cover modification of
+   the file, and distribution when not linked into a combine
+   executable.)
+
+   Non-GPL License is also available as part of VisualDSP++
+   from Analog Devices, Inc.
   
    Convert signed long long to IEEE double-precision 64-bit
    floating point.
@@ -47,8 +61,8 @@
 .file_attr libGroup      = floating_point_support;
 .file_attr libGroup      = integer_support;
 .file_attr libName       = libf64ieee;
-.file_attr FuncName      = ___int64_to_float64;
-.file_attr libFunc       = ___int64_to_float64;
+.file_attr FuncName      = ___floatdidf;
+.file_attr libFunc       = ___floatdidf;
 
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
@@ -62,10 +76,10 @@
 #define CARRY AC0
 #endif
 
-.section program;
+.text;
 .align 2;
 
-___int64_to_float64:
+___floatdidf:
         // Check whether this is a 32-bit value, sign-extended
         // to 64-bits. If so, it's easier to call a different
         // conversion function.
@@ -141,14 +155,14 @@ ___int64_to_float64:
         R7 = P1;
         RTS;
 .is_32bit:
-        JUMP.X ___int32_to_float64;
+        JUMP.X ___floatsidf;
 
-.___int64_to_float64.end:
+.size ___floatdidf, .-___floatdidf
 
 
-.global ___int64_to_float64;
-.type ___int64_to_float64,STT_FUNC;
-.global .___int64_to_float64.end;
-.type .___int64_to_float64.end,STT_FUNC;
-.extern ___unsigned_int32_to_float64;
-.extern ___int32_to_float64;
+.global ___floatdidf;
+.type ___floatdidf,STT_FUNC;
+.global .___floatdidf.end;
+.type .___floatdidf.end,STT_FUNC;
+.extern ___floatunsidf;
+.extern ___floatsidf;

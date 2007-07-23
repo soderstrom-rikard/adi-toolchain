@@ -1,5 +1,19 @@
 /*
-** Copyright (C) 2003-2005 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003-2005 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU General
+** Public License. See the file COPYING for more details.
+**
+** In addition to the permissions in the GNU General Public License,
+** Analog Devices gives you unlimited permission to link the
+** compiled version of this file into combinations with other programs,
+** and to distribute those combinations without any restriction coming
+** from the use of this file.  (The General Public License restrictions
+** do apply in other respects; for example, they cover modification of
+** the file, and distribution when not linked into a combine
+** executable.)
+**
+** Non-GPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 **
 ** Convert an unsigned integer 32-bit value into an IEEE
 ** double-precision floating point value.
@@ -12,18 +26,22 @@
 ** i64tof64.asm and u64tof64.asm
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = integer_support;
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libf64ieee;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc = ___unsigned_int32_to_float64;
-.file_attr FuncName      = ___unsigned_int32_to_float64;
+.file_attr libFunc = ___floatunsidf;
+.file_attr FuncName      = ___floatunsidf;
 
-.section program;
+#endif
+
+.text;
 .align 2;
 
-___unsigned_int32_to_float64:
+___floatunsidf:
         // Check for zero first.
 
         CC = R0 == 0;
@@ -65,9 +83,9 @@ ___unsigned_int32_to_float64:
         R2 <<= 20;              // and position for exponent; sign is positive.
         R1 = R1 + R2;           // and include exponent.
         RTS;
-.___unsigned_int32_to_float64.end:
+.size ___floatunsidf, .-___floatunsidf
 
-.global ___unsigned_int32_to_float64;
-.type ___unsigned_int32_to_float64,STT_FUNC;
-.global .___unsigned_int32_to_float64.end;
-.type .___unsigned_int32_to_float64.end,STT_FUNC;
+.global ___floatunsidf;
+.type ___floatunsidf,STT_FUNC;
+.global .___floatunsidf.end;
+.type .___floatunsidf.end,STT_FUNC;

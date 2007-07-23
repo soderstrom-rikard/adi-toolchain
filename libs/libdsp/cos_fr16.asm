@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2000-2004 Analog Devices Inc. IPDC BANGALORE, India.
-  All rights reserved
+  Copyright (C) 2000-2004 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
  ******************************************************************************
   File name   :   cos_fr16.asm
 
@@ -25,6 +29,8 @@
   DATE           : 26-02-01
 
 **************************************************************/
+
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
 .file_attr libGroup      = math.h;
 .file_attr libGroup      = math_bf.h;
@@ -61,7 +67,11 @@
 .file_attr libFunc       = acos_fr16;
 .file_attr FuncName      = __acos_fr16;
 /* Called by __cos16_2PIx */
+
+#endif
 /* __cos16_2PIx: called by gen_blackman_fr16 */
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = window.h;
 .file_attr libFunc       = gen_blackman_fr16;
 .file_attr libFunc       = __gen_blackman_fr16;
@@ -84,12 +94,14 @@
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __cos_fr16;
 
-.section data1;
+#endif
+
+.data;
  .align 2;
  .coscoef:
- .byte2 = 0x6480,0x0059,0xD54D,0x0252,0x0388;
+ .short 0x6480,0x0059,0xD54D,0x0252,0x0388;
 
-.section  program;
+.text;
 .global __cos_fr16;
 .align 2;
 
@@ -118,4 +130,4 @@ COSEND:   A0 += R0.H * R3.L || R3 = W[P0++] (Z);
       R0 = R2.L(X);             // COPY OUTPUT VALUE TO R0
       RTS;
 
-.__cos_fr16.end:
+.size __cos_fr16, .-__cos_fr16

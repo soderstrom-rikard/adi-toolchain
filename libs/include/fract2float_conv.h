@@ -2,7 +2,12 @@
  *
  * fract2float_conv.h
  *
- * (c) Copyright 2000-2007 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 2000-2007 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -33,7 +38,7 @@ extern "C" {
 
     static fract32 fr16_to_fr32(fract16 _x);
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
     static fract32 fr16_to_fr32(fract16 _x) {
        /* convert a fract16 to a fract32 */
        unsigned int val = ((unsigned int)(_x)) << 16;
@@ -42,7 +47,7 @@ extern "C" {
 
     static fract16 fr32_to_fr16(fract32 _x);
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
     static fract16 fr32_to_fr16(fract32 _x) {
        /* Convert a fract32 to a fract16. */
        unsigned int val = (unsigned int)_x >> 16;

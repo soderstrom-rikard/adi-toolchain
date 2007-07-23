@@ -1,5 +1,19 @@
 /*
-** Copyright (C) 2003-2006 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003-2006 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU General
+** Public License. See the file COPYING for more details.
+**
+** In addition to the permissions in the GNU General Public License,
+** Analog Devices gives you unlimited permission to link the
+** compiled version of this file into combinations with other programs,
+** and to distribute those combinations without any restriction coming
+** from the use of this file.  (The General Public License restrictions
+** do apply in other respects; for example, they cover modification of
+** the file, and distribution when not linked into a combine
+** executable.)
+**
+** Non-GPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 **
 ** 64-bit IEEE floating point multiplication.
 **
@@ -16,12 +30,16 @@
 ** softfloat
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libf64ieee;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc = ___float64_mul;
-.file_attr FuncName      = ___float64_mul;
+.file_attr libFunc = ___muldf3;
+.file_attr FuncName      = ___muldf3;
+
+#endif
 
 #if defined(__ADSPBLACKFIN__) && !defined(__ADSPLPBLACKFIN__)
 /* __ADSPBF535__ core only */
@@ -32,10 +50,10 @@
 
 #define MAXBIASEXP 0x7FE
 
-.section program;
+.text;
 .align 2;
 
-___float64_mul:
+___muldf3:
 	R3 = [SP+12];		// Restore other half of Y.
 	[--SP] = (R7:4);	// claim some workspace.
 
@@ -445,7 +463,7 @@ ___float64_mul:
 	R1 = R0;
 	JUMP .sign_result;
 
-.___float64_mul.end:
+.size ___muldf3, .-___muldf3
 
-.global ___float64_mul;
-.type ___float64_mul, STT_FUNC;
+.global ___muldf3;
+.type ___muldf3, STT_FUNC;

@@ -1,5 +1,10 @@
 /*
-** Copyright (C) 2003-2004 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003-2004 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 **
 ** 64-bit non-IEEE floating point multiplication.
 **
@@ -9,17 +14,21 @@
 ** in R1:0.
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libf64fast;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc = ___float64_mul;
-.file_attr FuncName      = ___float64_mul;
+.file_attr libFunc = ___muldf3;
+.file_attr FuncName      = ___muldf3;
 
-.section program;
+#endif
+
+.text;
 .align 2;
 
-___float64_mul:
+___muldf3:
 	R3 = [SP+12];		// Get high half of Y.
 
 	// Check for zero
@@ -66,7 +75,7 @@ ___float64_mul:
 	R0 = 0;
 	R1 = R0;
 	RTS;
-.___float64_mul.end:
+.size ___muldf3, .-___muldf3
 
-.global ___float64_mul;
-.type ___float64_mul, STT_FUNC;
+.global ___muldf3;
+.type ___muldf3, STT_FUNC;

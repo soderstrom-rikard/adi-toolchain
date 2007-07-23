@@ -1,8 +1,22 @@
 /************************************************************************
  *
- * fltsif.asm : $Revision: 1.16 $
+ * fltsif.asm
  *
- * (c) Copyright 2000-2005 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 2000-2005 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU General
+ * Public License. See the file COPYING for more details.
+ *
+ * In addition to the permissions in the GNU General Public License,
+ * Analog Devices gives you unlimited permission to link the
+ * compiled version of this file into combinations with other programs,
+ * and to distribute those combinations without any restriction coming
+ * from the use of this file.  (The General Public License restrictions
+ * do apply in other respects; for example, they cover modification of
+ * the file, and distribution when not linked into a combine
+ * executable.)
+ *
+ * Non-GPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -28,18 +42,22 @@
    softfloat
 #endif
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = floating_point_support;
 .file_attr libGroup      = integer_support;
 .file_attr libName = libdsp;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc = ___int32_to_float32;
-.file_attr FuncName      = ___int32_to_float32;
+.file_attr libFunc = ___floatsisf;
+.file_attr FuncName      = ___floatsisf;
 
-.section program;
+#endif
+
+.text;
 
 .align 2;
-___int32_to_float32:
+___floatsisf:
         R1 = R0 << 1;
         CC = AZ;                        // input either 0x0 or 0x80000000 ?
         IF CC JUMP .ret_min_or_zero;
@@ -85,10 +103,10 @@ ___int32_to_float32:
         IF !CC R0 = R1;                 // Input was zero 
         RTS;
 
-.___int32_to_float32.end:
+.size ___floatsisf, .-___floatsisf
 
-.global ___int32_to_float32;
-.global .___int32_to_float32.end;
-.type ___int32_to_float32, STT_FUNC;
+.global ___floatsisf;
+.global .___floatsisf.end;
+.type ___floatsisf, STT_FUNC;
 
 // end of file

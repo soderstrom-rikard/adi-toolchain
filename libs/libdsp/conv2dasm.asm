@@ -1,6 +1,10 @@
 /****************************************************************************************
-  Copyright(c) 2000-2005 Analog Devices Inc. IPDC BANGALORE, India. 
-  All rights reserved
+  Copyright (C) 2000-2005 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
  ****************************************************************************************
  
   File Name 	: conv2d.asm
@@ -72,6 +76,8 @@
 
 /***************************************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = filter.h;
 .file_attr libFunc       = __conv2d_fr16;
 .file_attr libFunc       = conv2d_fr16;
@@ -80,7 +86,9 @@
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __conv2d_fr16;
 
-.section 				program;
+#endif
+
+.text;
 .global					__conv2d_fr16;
 .align                  2;
 
@@ -208,5 +216,5 @@ __conv2d_fr16:
 		
 		(R7:4, P5:3) = [SP++];     //Pop up the saved registers.
 		RTS;          			   //Returns
-.__conv2d_fr16.end:         
+.size __conv2d_fr16, .-__conv2d_fr16
 		

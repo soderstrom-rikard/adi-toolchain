@@ -1,5 +1,10 @@
 /* 
-** Copyright (C) 2003-2005 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003-2005 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 **
 ** 64-bit non-IEEE floating point subtraction (and addition).
 **
@@ -9,20 +14,24 @@
 ** in R1:0.
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = floating_point_support;
 .file_attr libName       = libf64fast;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc       = ___float64_sub;
-.file_attr FuncName      = ___float64_sub;
-.file_attr libFunc       = ___float64_add;
-.file_attr FuncName      = ___float64_add;
+.file_attr libFunc       = ___subdf3;
+.file_attr FuncName      = ___subdf3;
+.file_attr libFunc       = ___adddf3;
+.file_attr FuncName      = ___adddf3;
+
+#endif
 
 
-.section program;
+.text;
 .align 2;
 
-___float64_sub:
+___subdf3:
 	R3 = [SP+12];		// Get high half of Y
 	P0 = R7;		// Workspace
 	// Arrange for R = X - Y to be done as R = X + -Y
@@ -35,7 +44,7 @@ ___float64_sub:
 #endif
 	JUMP .common;
 
-___float64_add:
+___adddf3:
 	R3 = [SP+12];		// Get high half of Y
 	P0 = R7;		// Workspace
 
@@ -112,9 +121,9 @@ ___float64_add:
 	R0 = R2;
 	R7 = P0;		// Restore
 	RTS;
-.___float64_sub.end:
+.size ___subdf3, .-___subdf3
 
-.global ___float64_sub;
-.global ___float64_add;
-.type ___float64_sub, STT_FUNC;
-.type ___float64_add, STT_FUNC;
+.global ___subdf3;
+.global ___adddf3;
+.type ___subdf3, STT_FUNC;
+.type ___adddf3, STT_FUNC;

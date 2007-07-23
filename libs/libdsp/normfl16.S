@@ -1,7 +1,14 @@
 /*
 ** Normalise a float16.
-** Copyright (C) 2003 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 */
+
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libdsp;
@@ -10,7 +17,9 @@
 .file_attr libFunc = _norm_fl16;
 .file_attr FuncName      = _norm_fl16;
 
-.section program;
+#endif
+
+.text;
 .align 2;
 
 _norm_fl16:
@@ -22,7 +31,7 @@ _norm_fl16:
 	CC = R1 == 0;
 	IF CC R0 = R1;
 	RTS;
-._norm_fl16.end:
+.size _norm_fl16, .-_norm_fl16
 .global _norm_fl16;
 .type _norm_fl16, STT_FUNC;
 

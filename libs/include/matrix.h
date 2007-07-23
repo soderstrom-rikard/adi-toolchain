@@ -2,8 +2,13 @@
  *
  * matrix.h
  *
- * (c) Copyright 1996-2005 Analog Devices, Inc.  All rights reserved.
- * $Revision: 1.12 $
+ * Copyright (C) 1996-2005 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
+ *
  ************************************************************************/
 
 #pragma once
@@ -222,37 +227,37 @@
  *
  */
 
-#pragma linkage_name __matmmltf
         void matmmltf (const float _matrix_x[], 
                        int _rows_x, int _columns_x, 
                        const float _matrix_y[], 
                        int _columns_y, 
-                       float _product[]);
+                       float _product[]) asm ("__matmmltf");
 
-#pragma linkage_name __matmmltd
         void matmmltd (const long double _matrix_x[], 
                        int _rows_x, int _columns_x,
                        const long double _matrix_y[], 
                        int _columns_y, 
-                       long double _product[]);
+                       long double _product[]) asm ("__matmmltd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __matmmltf
-#else
-#pragma linkage_name __matmmltd
-#endif
         void matmmlt (const double _matrix_x[],
                       int _rows_x, int _columns_x,
                       const double _matrix_y[],
                       int _columns_y,
-                      double _product[]); 
+                      double _product[]) asm ("__matmmltf");
+#else
+        void matmmlt (const double _matrix_x[],
+                      int _rows_x, int _columns_x,
+                      const double _matrix_y[],
+                      int _columns_y,
+                      double _product[]) asm ("__matmmltd");
+#endif 
 
-#pragma linkage_name __matmmlt_fr16
         void matmmlt_fr16 (const fract16 _matrix_x[], 
                            int _rows_x, int _columns_x, 
                            const fract16 _matrix_y[], 
                            int _columns_y,
-                           fract16 _product[]);
+                           fract16 _product[]) asm ("__matmmlt_fr16");
 
 
 
@@ -450,38 +455,38 @@
  * 
  */
 
-#pragma linkage_name __cmatmmltf
         void cmatmmltf (const complex_float _matrix_a[], 
                         int _rows_a, int _columns_a, 
                         const complex_float _matrix_b[], 
                         int _columns_b, 
-                        complex_float _product[]);
+                        complex_float _product[]) asm ("__cmatmmltf");
 
-#pragma linkage_name __cmatmmltd
         void cmatmmltd (const complex_long_double _matrix_a[], 
                         int _rows_a, int _columns_a,
                         const complex_long_double _matrix_b[], 
                         int _columns_b,
-                        complex_long_double _product[]);
+                        complex_long_double _product[]) asm ("__cmatmmltd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __cmatmmltf
-#else
-#pragma linkage_name __cmatmmltd
-#endif
         void cmatmmlt (const complex_double _matrix_a[], 
                        int _rows_a, int _columns_a, 
                        const complex_double _matrix_b[], 
                        int _columns_b, 
-                       complex_double _product[]);
+                       complex_double _product[]) asm ("__cmatmmltf");
+#else
+        void cmatmmlt (const complex_double _matrix_a[], 
+                       int _rows_a, int _columns_a, 
+                       const complex_double _matrix_b[], 
+                       int _columns_b, 
+                       complex_double _product[]) asm ("__cmatmmltd");
+#endif
 
 
-#pragma linkage_name __cmatmmlt_fr16
         void cmatmmlt_fr16 (const complex_fract16 _matrix_a[], 
                             int _rows_a, int _columns_a, 
                             const complex_fract16 _matrix_b[], 
                             int _columns_b, 
-                            complex_fract16 _product[]);
+                            complex_fract16 _product[]) asm ("__cmatmmlt_fr16");
 
 
 
@@ -492,30 +497,28 @@
  * 
  */
 
-#pragma linkage_name __transpmf
         void transpmf (const float _matrix[], 
                        int _rows, int _columns, 
-                       float _transpose[]);
+                       float _transpose[]) asm ("__transpmf");
 
-#pragma linkage_name __transpmd
         void transpmd (const long double _matrix[], 
                        int _rows, int _columns, 
-                       long double _transpose[]);
+                       long double _transpose[]) asm ("__transpmd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __transpmf
-#else
-#pragma linkage_name __transpmd
-#endif
         void transpm (const double _matrix[], 
                       int _rows, int _columns, 
-                      double _transpose[]);
+                      double _transpose[]) asm ("__transpmf");
+#else
+        void transpm (const double _matrix[], 
+                      int _rows, int _columns, 
+                      double _transpose[]) asm ("__transpmd");
+#endif
 
 
-#pragma linkage_name __transpm_fr16
         void transpm_fr16 (const fract16 _matrix[], 
                            int _rows, int _columns, 
-                           fract16 _transpose[]);
+                           fract16 _transpose[]) asm ("__transpm_fr16");
 
 
 

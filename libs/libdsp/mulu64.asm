@@ -1,5 +1,10 @@
 /*
-** Copyright (C) 2002-2005 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2002-2005 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 ** unsigned long long multiplication:
 ** unsigned long long muli64(unsigned long long, unsigned long long)
 **
@@ -9,6 +14,8 @@
 ** Note that any changes to the clobber set also affects remu64.asm
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = integer_support;
 .file_attr libName = libdsp;
 .file_attr prefersMem    = internal;
@@ -16,7 +23,9 @@
 .file_attr libFunc = ___mullu3;
 .file_attr FuncName      = ___mullu3;
 
-.section program;
+#endif
+
+.text;
 .align 2;
 ___mullu3:
 	// We are using normal stores rather than pushes to allow
@@ -49,6 +58,6 @@ ___mullu3:
         R1 = R5 | R3;
         R5 = [SP++];
         RTS;
-.___mullu3.end:
+.size ___mullu3, .-___mullu3
 .global ___mullu3;
 .type ___mullu3, STT_FUNC;

@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2006-2007 Analog Devices Inc.
-  All rights reserved
+  Copyright (C) 2006-2007 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
  ******************************************************************************
 
   Implementation : radix-2 complex Fast Fourier Transform
@@ -223,7 +227,7 @@
 #define  _SIZE_TEMP_DATA   (_CONST_ONE + 4)
 
 
-.section program;
+.text;
 #if defined(__RADIX_4_FFT)
 .global  __cfftrad4_fr16;
 #else  /* Radix-2 FFT */
@@ -802,8 +806,8 @@ __cfftN_scaling_fr16:
         RTS;                           // Return
 
 #if defined(__RADIX_4_FFT)
-.__cfftrad4_fr16.end:
+.size __cfftrad4_fr16, .-__cfftrad4_fr16
 #else  /* Radix-2 FFT */
-.__cfftN_fr16.end:
-.__cfftN_scaling_fr16.end:
+.size __cfftN_fr16, .-__cfftN_fr16
+.size __cfftN_scaling_fr16, .-__cfftN_scaling_fr16
 #endif

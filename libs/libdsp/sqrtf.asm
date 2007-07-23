@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2006 Analog Devices Inc.
-  All rights reserved
+  Copyright (C) 2006 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
 ******************************************************************************
   File Name      : sqrtf.asm
   Include File   : math.h
@@ -76,7 +80,7 @@
 
 #endif
 
-.section program;
+.text;
 .global  __sqrtf;
 
 .extern  ___SQRT_Seed_Table;
@@ -222,4 +226,4 @@ _ErrSqrtf:
        r0 = 0;
        rts;
 
-.__sqrtf.end:
+.size __sqrtf, .-__sqrtf

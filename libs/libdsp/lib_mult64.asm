@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2006 Analog Devices Inc.
-  All rights reserved
+  Copyright (C) 2006 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
 ******************************************************************************
   File Name      : lib_mult64.asm
   Label name     : ___SQRT_Mult64
@@ -76,7 +80,7 @@
 
 #endif
 
-.section/DOUBLEANY  program;
+.text;
 .global   ___SQRT_Mult64;
 
 .align 2;
@@ -160,4 +164,4 @@ ___SQRT_Mult64:
 
         rts;
 
-.___SQRT_Mult64.end:
+.size ___SQRT_Mult64, .-___SQRT_Mult64

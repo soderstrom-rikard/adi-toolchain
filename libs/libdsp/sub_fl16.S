@@ -1,8 +1,15 @@
 /*
 ** Float16 subtract. Subtracts 2 non-IEEE-754 floats (16.16).
 **
-** Copyright (C) 2003 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 */
+
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libdsp;
@@ -11,6 +18,8 @@
 .file_attr libFunc = _sub_fl16;
 .file_attr FuncName      = _sub_fl16;
 
+#endif
+
 #if defined(__ADSPBLACKFIN__) && !defined(__ADSPLPBLACKFIN__)
 /* __ADSPBF535__ core only */
 #define CARRY AC
@@ -18,7 +27,7 @@
 #define CARRY AC0
 #endif
 
-.section program;
+.text;
 .align 2;
 
 _sub_fl16:
@@ -87,6 +96,6 @@ overflow:
 	R0 += 1;		// increment exponent (may change mantissa)
 	R0.H = R2.H >> 0;	// but we overwrite with new mantissa anyway.
 	RTS;
-._sub_fl16.end:
+.size _sub_fl16, .-_sub_fl16
 .global _sub_fl16;
 .type _sub_fl16, STT_FUNC;

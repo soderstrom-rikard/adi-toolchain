@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2000-2006 Analog Devices Inc.
-  All rights reserved
+  Copyright (C) 2000-2006 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
 ******************************************************************************
   File Name      : ifft2d_fr16.asm
   Include File   : filter.h
@@ -59,6 +63,8 @@
   Code size      : 736 Bytes
 ******************************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup = filter.h;
 .file_attr libName = libdsp;
 .file_attr prefersMem = internal;
@@ -67,7 +73,9 @@
 .file_attr libFunc  = ifft2d_fr16;
 .file_attr FuncName = __ifft2d_fr16;
 
-.section program;
+#endif
+
+.text;
 .global  __ifft2d_fr16;
 
 .align 2;
@@ -464,4 +472,4 @@ Terminate:
        (R7:4, P5:3) = [SP++];               //Restore preserved registers
        RTS;                                 //Return
 
-.__ifft2d_fr16.end:
+.size __ifft2d_fr16, .-__ifft2d_fr16

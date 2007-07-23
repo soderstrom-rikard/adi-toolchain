@@ -2,7 +2,12 @@
  *
  * math_bf.h
  *
- * (c) Copyright 2002-2006 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 2002-2006 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -46,114 +51,94 @@ _C_LIB_DECL
 /* * * *        acos     * * * *
  *    Arc cosine
  */
-#pragma linkage_name __acos_fr16
-        fract16 acos_fr16 (fract16 _x);
+        fract16 acos_fr16 (fract16 _x) asm ("__acos_fr16");
 
 
 /* * * *        alog     * * * *
  *    Natural anti-log
  */
-#pragma linkage_name __alogf
-        float alogf (float _x);
+        float alogf (float _x) asm ("__alogf");
 
-#pragma linkage_name __alogd
-        long double alogd (long double _x);
+        long double alogd (long double _x) asm ("__alogd");
 
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __alogf
-        double alog (double _x);
+        double alog (double _x) asm ("__alogf");
 #else
-#pragma linkage_name __alogd
-        double alog (double _x);
+        double alog (double _x) asm ("__alogd");
 #endif
 
 
 /* * * *        alog10   * * * *
  *    Base-10 anti-log
  */
-#pragma linkage_name __alog10f
-        float alog10f (float _x);
+        float alog10f (float _x) asm ("__alog10f");
 
-#pragma linkage_name __alog10d
-        long double alog10d (long double _x);
+        long double alog10d (long double _x) asm ("__alog10d");
 
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __alog10f
-        double alog10 (double _x);
+        double alog10 (double _x) asm ("__alog10f");
 #else
-#pragma linkage_name __alog10d
-        double alog10 (double _x);
+        double alog10 (double _x) asm ("__alog10d");
 #endif
 
 
 /* * * *        asin     * * * *
  *    Arc sine
  */
-#pragma linkage_name __asin_fr16
-        fract16 asin_fr16 (fract16 _x);
+        fract16 asin_fr16 (fract16 _x) asm ("__asin_fr16");
 
 
 /* * * *        atan     * * * *
  *    Arc tangent
  */
-#pragma linkage_name __atan_fr16
-        fract16 atan_fr16 (fract16 _x);
+        fract16 atan_fr16 (fract16 _x) asm ("__atan_fr16");
 
 
 /* * * *        atan2    * * * *
  *    Arc tangent of quotient
  */
-#pragma linkage_name __atan2_fr16
-        fract16 atan2_fr16 (fract16 _x, fract16 _y);
+        fract16 atan2_fr16 (fract16 _x, fract16 _y) asm ("__atan2_fr16");
 
 
 /* * * *        cos      * * * *
  *    Cosine
  */
-#pragma linkage_name __cos_fr16
-        fract16 cos_fr16 (fract16 _x);
+        fract16 cos_fr16 (fract16 _x) asm ("__cos_fr16");
 
 
 /* * * *        rsqrt    * * * *
  *    Inverse Square Root
  */
-#pragma linkage_name __rsqrtf
-        float rsqrtf (float _x);
+        float rsqrtf (float _x) asm ("__rsqrtf");
 
-#pragma linkage_name __rsqrtd
-        long double rsqrtd (long double _x);
+        long double rsqrtd (long double _x) asm ("__rsqrtd");
 
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __rsqrtf
-        double rsqrt (double _x);
+        double rsqrt (double _x) asm ("__rsqrtf");
 #else
-#pragma linkage_name __rsqrtd
-        double rsqrt (double _x);
+        double rsqrt (double _x) asm ("__rsqrtd");
 #endif
 
 
 /* * * *        sin      * * * *
  *    Sine
  */
-#pragma linkage_name __sin_fr16
-        fract16 sin_fr16 (fract16 _x);
+        fract16 sin_fr16 (fract16 _x) asm ("__sin_fr16");
 
 
 /* * * *        sqrt     * * * *
  *    Square Root
  */
-#pragma linkage_name __sqrt_fr16
-        fract16 sqrt_fr16 (fract16 _x);
+        fract16 sqrt_fr16 (fract16 _x) asm ("__sqrt_fr16");
 
 
 /* * * *        tan      * * * *
  *    Tangent
  */
-#pragma linkage_name __tan_fr16
-        fract16 tan_fr16 (fract16 _x);
+        fract16 tan_fr16 (fract16 _x) asm ("__tan_fr16");
 
 
 /* * * *        max      * * * *
@@ -162,7 +147,7 @@ _C_LIB_DECL
 
 #if !defined(__NO_BUILTIN)
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
         static float fmaxf(float _x, float _y) 
                 { float res;
                   if (_x > _y) {
@@ -175,7 +160,7 @@ _C_LIB_DECL
 
 #ifdef __DOUBLES_ARE_FLOATS__
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
         static float fmax(double _x, double _y) 
                 { float res;
                   if (_x > _y) {
@@ -187,47 +172,40 @@ _C_LIB_DECL
                 }
 #endif 
 #else 
-#pragma linkage_name __fmaxf
-        float fmaxf(float _x, float _y);
+        float fmaxf(float _x, float _y) asm ("__fmaxf");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __fmaxf
-        double fmax(double _x, double _y);
+        double fmax(double _x, double _y) asm ("__fmaxf");
 #endif
 #endif
 
-#pragma linkage_name __fmaxd
-        long double fmaxd(long double _x, long double _y);
+        long double fmaxd(long double _x, long double _y) asm ("__fmaxd");
 
 #if !defined( __DOUBLES_ARE_FLOATS__)
-#pragma linkage_name __fmaxd
-        double fmax(double _x, double _y);
+        double fmax(double _x, double _y) asm ("__fmaxd");
 #endif
 
 
 #if !defined(__NO_BUILTIN) 
         int __builtin_max(int, int);
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
         static int max(int _x, int _y) 
                 { return __builtin_max(_x,_y); }
 
         long __builtin_lmax(long, long);
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
         static long lmax(long _x, long _y)
           { return __builtin_lmax(_x, _y); }
 #else
-#pragma linkage_name __max
-        int max (int _x, int _y);
+        int max (int _x, int _y) asm ("__max");
 
-#pragma linkage_name __max
-        long lmax (long _x, long _y);
+        long lmax (long _x, long _y) asm ("__max");
 
 #endif /* NO_BUILTIN */
 
-#pragma linkage_name __llmax
-        long long  llmax (long long  _x, long long  _y);
+        long long  llmax (long long  _x, long long  _y) asm ("__llmax");
 
 
 /* * * *        min      * * * *
@@ -236,7 +214,7 @@ _C_LIB_DECL
 
 #if !defined(__NO_BUILTIN) 
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
         static float fminf(float _x, float _y) 
                 { float res;
                   if (_x < _y) {
@@ -249,7 +227,7 @@ _C_LIB_DECL
 
 #ifdef __DOUBLES_ARE_FLOATS__
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
         static float fmin(double _x, double _y) 
                 { float res;
                   if (_x < _y) {
@@ -261,101 +239,83 @@ _C_LIB_DECL
                 }
 #endif
 #else
-#pragma linkage_name __fminf
-        float fminf(float _x, float _y);
+        float fminf(float _x, float _y) asm ("__fminf");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __fminf
-        double fmin(double _x, double _y);
+        double fmin(double _x, double _y) asm ("__fminf");
 #endif
 #endif
 
-#pragma linkage_name __fmind
-        long double fmind(long double _x, long double _y);
+        long double fmind(long double _x, long double _y) asm ("__fmind");
 
 #if !defined(__DOUBLES_ARE_FLOATS__)
-#pragma linkage_name __fmind
-        double fmin(double _x, double _y);
+        double fmin(double _x, double _y) asm ("__fmind");
 #endif
 
 
 #if !defined(__NO_BUILTIN)
         int __builtin_min(int, int);
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
         static int min(int _x, int _y) 
                 { return __builtin_min(_x,_y); }
 
         long __builtin_lmin(long, long);
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
         static long lmin(long _x, long _y)
                 { return __builtin_lmin(_x,_y); }
 #else
-#pragma linkage_name __min
-        int min (int _x, int _y);
+        int min (int _x, int _y) asm ("__min");
 
-#pragma linkage_name __min
-        long lmin (long _x, long _y);
+        long lmin (long _x, long _y) asm ("__min");
 #endif
 
-#pragma linkage_name __llmin
-        long long  llmin (long long  _x, long long  _y);
+        long long  llmin (long long  _x, long long  _y) asm ("__llmin");
 
 
 /* * * *        clip     * * * *
  *    Clip value to limit
  *
  */
-#pragma linkage_name __fclipf
-        float fclipf (float _value, float _limit);
+        float fclipf (float _value, float _limit) asm ("__fclipf");
 
-#pragma linkage_name __fclipd
-        long double fclipd (long double _value, long double _limit);
+        long double fclipd (long double _value, long double _limit) asm ("__fclipd");
 
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __fclipf
+        double fclip (double _value, double _limit) asm ("__fclipf");
 #else
-#pragma linkage_name __fclipd
+        double fclip (double _value, double _limit) asm ("__fclipd");
 #endif
-        double fclip (double _value, double _limit);
 
 
-#pragma linkage_name __clip_fr16
-        fract16 clip_fr16 (fract16 _value, fract16 _limit);
+        fract16 clip_fr16 (fract16 _value, fract16 _limit) asm ("__clip_fr16");
 
 
-#pragma linkage_name __clip
-        int clip (int _value, int _limit);
+        int clip (int _value, int _limit) asm ("__clip");
 
         long lclip (long _value, long _limit);
 
-#pragma linkage_name __llclip
-        long long  llclip (long long  _value, long long  _limit);
+        long long  llclip (long long  _value, long long  _limit) asm ("__llclip");
 
 
 /* * * *        copysign   * * * *
  *    Copy Sign of y (=reference) to x (=value)
  */
-#pragma linkage_name __copysignf
-        float copysignf (float _x, float _y);
+        float copysignf (float _x, float _y) asm ("__copysignf");
 
-#pragma linkage_name __copysignd
-        long double copysignd (long double _x, long double _y);
+        long double copysignd (long double _x, long double _y) asm ("__copysignd");
 
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __copysignf
-        double copysign (double _x, double _y);
+        double copysign (double _x, double _y) asm ("__copysignf");
 #else
-#pragma linkage_name __copysignd
-        double copysign (double _x, double _y);
+        double copysign (double _x, double _y) asm ("__copysignd");
 #endif
 
 
-#pragma linkage_name __copysign_fr16
-        fract16 copysign_fr16 (fract16 _x, fract16 _y);
+        fract16 copysign_fr16 (fract16 _x, fract16 _y) asm ("__copysign_fr16");
 
 
 /* * * *        countones  * * * *
@@ -363,23 +323,20 @@ _C_LIB_DECL
  */
 #if !defined(__NO_BUILTIN)
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
         static int countones (int _x) 
                 { return (int)__builtin_ones(_x); }
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
         static int lcountones (long _x) 
                 { return (int)__builtin_ones((int)_x); }
 #else
-#pragma linkage_name __countones
-        int countones (int _x);
+        int countones (int _x) asm ("__countones");
 
-#pragma linkage_name __lcountones
-        int lcountones (long _x);
+        int lcountones (long _x) asm ("__lcountones");
 #endif /* __NO_BUILTIN */
 
-#pragma linkage_name __llcountones
-        int  llcountones (long long  _x);
+        int  llcountones (long long  _x) asm ("__llcountones");
 
 
 /* * * *        isinf      * * * *
@@ -387,7 +344,7 @@ _C_LIB_DECL
  */
 #if !defined(__NO_BUILTIN)
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
         static int isinff(float _x) {
                 union { float _xx; unsigned long _l; } _v;
                 _v._xx = _x;
@@ -396,7 +353,7 @@ _C_LIB_DECL
 
 #ifdef __DOUBLES_ARE_FLOATS__
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
         static int isinf(double _x) {
                 union { double _xx; unsigned long _l; } _v;
                 _v._xx = _x;
@@ -404,8 +361,7 @@ _C_LIB_DECL
         }
 #endif
 #else
-#pragma linkage_name _isinf
-        int isinff(float _x);
+        int isinff(float _x) asm ("_isinf");
 
 #ifdef __DOUBLES_ARE_FLOATS__
         int isinf(double _x);
@@ -413,12 +369,10 @@ _C_LIB_DECL
 #endif /* !__NO_BUILTIN */
 
 
-#pragma linkage_name _isinfd
-        int isinfd(long double _x);
+        int isinfd(long double _x) asm ("_isinfd");
 
 #if !defined(__DOUBLES_ARE_FLOATS__)
-#pragma linkage_name _isinfd
-        int isinf(double _x);
+        int isinf(double _x) asm ("_isinfd");
 #endif
 
 
@@ -427,7 +381,7 @@ _C_LIB_DECL
  */
 #if !defined(__NO_BUILTIN)
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
         static int isnanf(float _x) {
                 union { float _xx; unsigned long _l; } _v;
                 _v._xx = _x;
@@ -436,7 +390,7 @@ _C_LIB_DECL
 
 #ifdef __DOUBLES_ARE_FLOATS__
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
         static int isnan(double _x) {
                 union { double _xx; unsigned long _l; } _v;
                 _v._xx = _x;
@@ -444,8 +398,7 @@ _C_LIB_DECL
         }
 #endif
 #else
-#pragma linkage_name _isnan
-        int isnanf(float _x);
+        int isnanf(float _x) asm ("_isnan");
 
 #ifdef __DOUBLES_ARE_FLOATS__
         int isnan(double _x);
@@ -453,12 +406,10 @@ _C_LIB_DECL
 #endif /* !__NO_BUILTIN */
 
 
-#pragma linkage_name _isnand
-        int isnand(long double _x);
+        int isnand(long double _x) asm ("_isnand");
 
 #if !defined(__DOUBLES_ARE_FLOATS__)
-#pragma linkage_name _isnand
-        int isnan(double _x);
+        int isnan(double _x) asm ("_isnand");
 #endif
 
 

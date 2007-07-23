@@ -1,5 +1,19 @@
 /*
-** Copyright (C) 2003-2004 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003-2004 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU General
+** Public License. See the file COPYING for more details.
+**
+** In addition to the permissions in the GNU General Public License,
+** Analog Devices gives you unlimited permission to link the
+** compiled version of this file into combinations with other programs,
+** and to distribute those combinations without any restriction coming
+** from the use of this file.  (The General Public License restrictions
+** do apply in other respects; for example, they cover modification of
+** the file, and distribution when not linked into a combine
+** executable.)
+**
+** Non-GPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 **
 ** Convert an IEEE double-precision floating point 64-bit number
 ** into a 64-bit unsigned integer, using round-to-zero.
@@ -9,18 +23,22 @@
 **         DefaultClobMinusPABIMandLoopRegs
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = integer_support;
 .file_attr libGroup      = floating_point_support;
 .file_attr libName       = libf64ieee;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc       = ___float64_to_unsigned_int64_round_to_zero;
-.file_attr FuncName      = ___float64_to_unsigned_int64_round_to_zero;
+.file_attr libFunc       = ___fixunsdfdi;
+.file_attr FuncName      = ___fixunsdfdi;
+
+#endif
 
 
-.section program;
+.text;
 .align 2;
-___float64_to_unsigned_int64_round_to_zero:
+___fixunsdfdi:
 	// Check for zero.
 
 	R2 = R1 << 1;
@@ -164,10 +182,10 @@ ___float64_to_unsigned_int64_round_to_zero:
 	R0 = 0;
 	JUMP .ret_inf;
 
-.___float64_to_unsigned_int64_round_to_zero.end:
+.size ___fixunsdfdi, .-___fixunsdfdi
 
-.global ___float64_to_unsigned_int64_round_to_zero;
-.type ___float64_to_unsigned_int64_round_to_zero, STT_FUNC;
-.global .___float64_to_unsigned_int64_round_to_zero.end;
-.type .___float64_to_unsigned_int64_round_to_zero.end, STT_FUNC;
+.global ___fixunsdfdi;
+.type ___fixunsdfdi, STT_FUNC;
+.global .___fixunsdfdi.end;
+.type .___fixunsdfdi.end, STT_FUNC;
 

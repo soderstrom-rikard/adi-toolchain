@@ -1,5 +1,10 @@
 /*
-** Copyright (C) Analog Devices Inc, All Rights Reserved.
+** Copyright (C) Analog Devices, Inc,
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 **
 ** long long remainder.
 **
@@ -10,12 +15,16 @@
 **
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = integer_support;
 .file_attr libName = libdsp;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
 .file_attr libFunc = ___moddi3;
 .file_attr FuncName      = ___moddi3;
+
+#endif
 
 #if defined(__ADSPBLACKFIN__) && !defined(__ADSPLPBLACKFIN__)
 /* __ADSPBF535__ core only */
@@ -24,7 +33,7 @@
 #define CARRY AC0
 #endif
 
-.section program;
+.text;
 
 .align 2;
 
@@ -57,7 +66,7 @@ return_x:
 	RTS;
 
 
-.___moddi3.end:
+.size ___moddi3, .-___moddi3
 .global ___moddi3;
 .type ___moddi3, STT_FUNC;
 .extern ___divdi3;

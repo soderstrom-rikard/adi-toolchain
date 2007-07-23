@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2000-2005 Analog Devices Inc.
-  All rights reserved
+  Copyright (C) 2000-2005 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
  ******************************************************************************
   File Name      : matmmlt_fr16.asm
   Include File   : matrix.h
@@ -39,6 +43,8 @@
 
  *******************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = matrix.h;
 .file_attr libFunc       = __matmmlt_fr16;
 .file_attr libFunc       = matmmlt_fr16;
@@ -47,11 +53,13 @@
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __matmmlt_fr16;
 
+#endif
+
 #if defined(__ADSPLPBLACKFIN__) && defined(__WORKAROUND_AVOID_DAG1)
 #define __WORKAROUND_BF532_ANOMALY38__
 #endif
 
-.section  program;
+.text;
 .global   __matmmlt_fr16;
 
 .align 2;
@@ -140,4 +148,4 @@ MLT_STOP:
                    (P5:4) = [SP++];
                    RTS;
 
-.__matmmlt_fr16.end:
+.size __matmmlt_fr16, .-__matmmlt_fr16

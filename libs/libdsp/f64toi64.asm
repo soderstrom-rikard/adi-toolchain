@@ -1,5 +1,10 @@
 /*
-** Copyright (C) 2003-2004 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003-2004 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 **
 ** Convert an IEEE double-precision floating point 64-bit number
 ** into a 64-bit signed integer, using round-to-nearest.
@@ -9,6 +14,8 @@
 **         DefaultClobMinusABIMandLoopRegs
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = integer_support;
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libf64ieee;
@@ -17,6 +24,8 @@
 .file_attr libFunc = ___float64_to_int64;
 .file_attr FuncName      = ___float64_to_int64;
 
+#endif
+
 #if defined(__ADSPBLACKFIN__) && !defined(__ADSPLPBLACKFIN__)
 /* __ADSPBF535__ core only */
 #define CARRY AC
@@ -24,7 +33,7 @@
 #define CARRY AC0
 #endif
 
-.section program;
+.text;
 .align 2;
 ___float64_to_int64:
 	// Check for zero.
@@ -243,7 +252,7 @@ ___float64_to_int64:
 	IF CC R1 = R3;
 	RTS;
 
-.___float64_to_int64.end:
+.size ___float64_to_int64, .-___float64_to_int64
 
 .global ___float64_to_int64;
 .type ___float64_to_int64, STT_FUNC;

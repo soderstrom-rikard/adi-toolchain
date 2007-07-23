@@ -1,10 +1,17 @@
 /************************************************************************
  *
- * mulfl32.s : $Revision: 1.6 $
+ * mulfl32.s
  *
- * (c) Copyright 2000-2003 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 2000-2003 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  ************************************************************************/
+
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libdsp;
@@ -12,6 +19,8 @@
 .file_attr prefersMemNum = "30";
 .file_attr libFunc = _mul_fl32;
 .file_attr FuncName      = _mul_fl32;
+
+#endif
 
 /*
 ** Takes 2 non-IEEE 32.32 floats and multiplies them
@@ -24,7 +33,7 @@
 #define OVERFLOW V
 #endif
 
-.section program;
+.text;
 .align 2;
 _mul_fl32:
    R3 = [SP+12];   // get mantissa of second input
@@ -57,7 +66,7 @@ _mul_fl32:
    CC = R1 == 0;
    IF CC R0 = R1;
    RTS;
-._mul_fl32.end:
+.size _mul_fl32, .-_mul_fl32
 .global _mul_fl32;
 .type _mul_fl32, STT_FUNC;
 

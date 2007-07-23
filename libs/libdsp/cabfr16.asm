@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2000-2006 Analog Devices Inc. IPDC BANGALORE, India. 
-  All rights reserved
+  Copyright (C) 2000-2006 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
 ******************************************************************************
   File Name      : cabfr16.asm
   Module Name    : complex absolute fraction
@@ -14,6 +18,8 @@
   Code Size      : 108 bytes
 ******************************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = complex.h;
 .file_attr libFunc       = __cabs_fr16;
 .file_attr libFunc       = cabs_fr16;
@@ -26,7 +32,9 @@
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __cabs_fr16;
 
-.section     program;
+#endif
+
+.text;
 .global    __cabs_fr16;
 .align 2;  
 
@@ -96,7 +104,7 @@ RE_EQ_IMG:   R2=0x5a82;               // CONSTANT VALUE =0.707
 RE_EQ_IMG_EXIT:
              RTS;
 
-.__cabs_fr16.end:
+.size __cabs_fr16, .-__cabs_fr16
 
 .extern __div16;
 .extern __sqrt_fr16;

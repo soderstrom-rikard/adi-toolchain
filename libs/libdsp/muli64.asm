@@ -1,5 +1,10 @@
 /*
-** Copyright (C) 2002-2005 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2002-2005 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 ** signed long long multiplication:
 ** long long muli64(long long, long long)
 **
@@ -9,6 +14,8 @@
 ** Note that any changes to the clobber set also affects remi64.asm
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = integer_support;
 .file_attr libName = libdsp;
 .file_attr prefersMem    = internal;
@@ -16,7 +23,9 @@
 .file_attr libFunc = ___mulli3;
 .file_attr FuncName      = ___mulli3;
 
-.section program;
+#endif
+
+.text;
 .align 2;
 ___mulli3:
 	// We're using post-modify stores to allow multi-issuing,
@@ -49,6 +58,6 @@ ___mulli3:
         R1 = R5 | R3;
         R5 = [SP++];
         RTS;
-.___mulli3.end:
+.size ___mulli3, .-___mulli3
 .global ___mulli3;
 .type ___mulli3, STT_FUNC;

@@ -1,5 +1,10 @@
 /*
-** Copyright (C) 2003-2004 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003-2004 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 **
 ** Convert 64-bit signed integer to 64-bit non-IEEE floating point.
 **
@@ -9,18 +14,22 @@
 ** result in R1:0.
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = floating_point_support;
 .file_attr libGroup      = integer_support;
 .file_attr libName = libf64fast;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc = ___int64_to_float64;
-.file_attr FuncName      = ___int64_to_float64;
+.file_attr libFunc = ___floatdidf;
+.file_attr FuncName      = ___floatdidf;
 
-.section program;
+#endif
+
+.text;
 .align 2;
 
-___int64_to_float64:
+___floatdidf:
 
 	// A signed 64-bit int has 63 bits of significand,
 	// and a sign bit. Whereas the high-half of our
@@ -110,6 +119,6 @@ ___int64_to_float64:
 	// 32 bits of zeros.
 	R0 = 31;
 	RTS;
-.___int64_to_float64.end:
-.global ___int64_to_float64;
-.type ___int64_to_float64, STT_FUNC;
+.size ___floatdidf, .-___floatdidf
+.global ___floatdidf;
+.type ___floatdidf, STT_FUNC;

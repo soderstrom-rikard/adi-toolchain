@@ -1,8 +1,13 @@
 /*****************************************************************************
  *
- * fir_interp16.asm : $Revision $
+ * fir_interp16.asm
  *
- * (c) Copyright 2000-2006 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 2000-2006 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  *****************************************************************************/
 
@@ -217,7 +222,7 @@
 .global  __fir_interp_fr16;
 .type    __fir_interp_fr16,STT_FUNC;
 
-.section/DOUBLEANY program;
+.text;
 .align 2;
 
 __fir_interp_fr16:
@@ -493,4 +498,4 @@ RESTORE_RETURN:
     (R7:5,P5:3) = [SP++];
     RTS;
 
-.__fir_interp_fr16.end:
+.size __fir_interp_fr16, .-__fir_interp_fr16

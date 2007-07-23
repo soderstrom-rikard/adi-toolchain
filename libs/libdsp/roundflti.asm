@@ -1,8 +1,13 @@
 /************************************************************************
  *
- * roundflti.asm : $Revision: 1.9 $
+ * roundflti.asm
  *
- * (c) Copyright 2000-2003 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 2000-2003 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -19,6 +24,8 @@
            DefaultClobMinusPABIMandLoopRegs
 #endif
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = integer_support;
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libdsp;
@@ -27,7 +34,9 @@
 .file_attr libFunc = __float32_to_int32;
 .file_attr FuncName      = __float32_to_int32;
 
-.section program;
+#endif
+
+.text;
 
 .global __float32_to_int32;
 
@@ -99,6 +108,6 @@ COMM_RET:
 return_zero_int:                // If we jump here R0==0
    RTS;   
 
-   .__float32_to_int32.end:
+   .size __float32_to_int32, .-__float32_to_int32
 
 // end of file

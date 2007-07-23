@@ -1,8 +1,22 @@
 /************************************************************************
  *
- * fpadd.asm : $Revision: 1.20 $
+ * fpadd.asm
  *
- * (c) Copyright 2000-2007 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 2000-2007 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU General
+ * Public License. See the file COPYING for more details.
+ *
+ * In addition to the permissions in the GNU General Public License,
+ * Analog Devices gives you unlimited permission to link the
+ * compiled version of this file into combinations with other programs,
+ * and to distribute those combinations without any restriction coming
+ * from the use of this file.  (The General Public License restrictions
+ * do apply in other respects; for example, they cover modification of
+ * the file, and distribution when not linked into a combine
+ * executable.)
+ *
+ * Non-GPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -15,14 +29,18 @@
 // 31                                    0
 // seee eeee emmm mmmm mmmm mmmm mmmm mmmm
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libdsp;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc = ___float32_add;
-.file_attr FuncName      = ___float32_add;
-.file_attr libFunc = ___float32_sub;
-.file_attr FuncName      = ___float32_sub;
+.file_attr libFunc = ___addsf3;
+.file_attr FuncName      = ___addsf3;
+.file_attr libFunc = ___subsf3;
+.file_attr FuncName      = ___subsf3;
+
+#endif
 
 // !!NOTE- Uses non-standard clobber set in compiler:
 //         DefaultClobMinusABIMandLoopRegs
@@ -31,7 +49,7 @@
 // pragma regs_clobbered in softfloat.
 
 
-.section program;
+.text;
 .align 2;
 
 // Bits in R7 (flag reg)
@@ -54,10 +72,10 @@
 
 #define MAXBIASEXP 0xFE
 
-___float32_sub:
+___subsf3:
         BITTGL(R1,31);          // Flip sign bit of Y, fall through to add
 .align 2;
-___float32_add:
+___addsf3:
 
 	// Extract and compare the two exponents. Since there are
 	// 23 bits of mantissa, if the difference between exponents (D)
@@ -441,9 +459,9 @@ no_shift:
 	R6 = 0;
 	JUMP .back_from_norm_denorm;
 
-.___float32_add.end:
-.___float32_sub.end:
-.global ___float32_add;
-.type ___float32_add, STT_FUNC;
-.global ___float32_sub;
-.type ___float32_sub, STT_FUNC;
+.size ___addsf3, .-___addsf3
+.size ___subsf3, .-___subsf3
+.global ___addsf3;
+.type ___addsf3, STT_FUNC;
+.global ___subsf3;
+.type ___subsf3, STT_FUNC;

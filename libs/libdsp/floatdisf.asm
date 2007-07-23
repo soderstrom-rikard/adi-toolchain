@@ -1,5 +1,10 @@
 /*
-   Copyright (C) 2003-2005 Analog Devices, Inc. All Rights Reserved.
+   Copyright (C) 2003-2005 Analog Devices, Inc.
+   This file is subject to the terms and conditions of the GNU Lesser
+   General Public License. See the file COPYING.LIB for more details.
+
+   Non-LGPL License is also available as part of VisualDSP++
+   from Analog Devices, Inc.
   
    Convert a signed long long to a float (i.e. I8 to R4)
   
@@ -9,6 +14,8 @@
            DefaultClobMinusPABIMandLoopRegs
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = floating_point_support;
 .file_attr libGroup      = integer_support;
 .file_attr libName = libdsp;
@@ -17,6 +24,8 @@
 .file_attr libFunc = __longlong64_to_float32;
 .file_attr FuncName      = __longlong64_to_float32;
 
+#endif
+
 #if defined(__ADSPBLACKFIN__) && !defined(__ADSPLPBLACKFIN__)
 /* __ADSPBF535__ core only */
 #define CARRY AC
@@ -24,7 +33,7 @@
 #define CARRY AC0
 #endif
 
-.section program;
+.text;
 
 .align 2;
 __longlong64_to_float32:
@@ -147,19 +156,19 @@ no_neg:
 i4tor4:
    // The input value is a 32-bit value, sign-extended to
    // a 64-bit value. So just convert as a normal int-to-float.
-   JUMP.X ___int32_to_float32;
+   JUMP.X ___floatsisf;
 
 u4tor4:
    // The input value is a 32-bit unsigned value, zero-extended
 	// to a 64-bit value. So convert that to a real.
-   JUMP.X ___unsigned_int32_to_float32;
+   JUMP.X ___floatunsisf;
 
 
-.__longlong64_to_float32.end:
+.size __longlong64_to_float32, .-__longlong64_to_float32
 .global __longlong64_to_float32;
 .global .__longlong64_to_float32.end;
 .type __longlong64_to_float32, STT_FUNC;
 
-.extern ___int32_to_float32;
-.extern ___unsigned_int32_to_float32;
+.extern ___floatsisf;
+.extern ___floatunsisf;
 

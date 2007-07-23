@@ -1,19 +1,28 @@
 /*
 ** Float16 division.  Divides 2 non-IEEE-754 floating point numbers (16.16)
 **
-** Copyright (C) 2005 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2005 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 */
+
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
 .file_attr libGroup      = floating_point_support;
 .file_attr libName       = libf64fast;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc       = ___float32_div;
-.file_attr FuncName      = ___float32_div;
+.file_attr libFunc       = ___divsf3;
+.file_attr FuncName      = ___divsf3;
 
-.section program;
+#endif
+
+.text;
 .align 2;
-___float32_div:
+___divsf3:
 	P0 = R7;	// store for later
 
 	// Identities
@@ -103,6 +112,6 @@ div_by_zero:
 	BITSET(R0,31);		// R0 = 0x80000000
 	R7 = P0;
 	RTS;
-.___float32_div.end:
-.global ___float32_div;
-.type ___float32_div, STT_FUNC;
+.size ___divsf3, .-___divsf3
+.global ___divsf3;
+.type ___divsf3, STT_FUNC;

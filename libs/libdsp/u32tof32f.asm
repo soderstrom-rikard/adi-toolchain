@@ -1,20 +1,29 @@
 /*
 ** Convert 32-bit unsigned integer to non-IEEE 32-bit floating point.
-** Copyright (C) 2004 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2004 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 */
+
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
 .file_attr libGroup      = integer_support;
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libf64fast;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc = ___unsigned_int32_to_float32;
-.file_attr FuncName      = ___unsigned_int32_to_float32;
+.file_attr libFunc = ___floatunsisf;
+.file_attr FuncName      = ___floatunsisf;
 
-.section program;
+#endif
+
+.text;
 .align 2;
 
-___unsigned_int32_to_float32:
+___floatunsisf:
 
 	CC = R0 == 0;
 	IF CC JUMP .ret_zero;
@@ -39,7 +48,7 @@ ___unsigned_int32_to_float32:
 
 .ret_zero:
 	RTS;
-.___unsigned_int32_to_float32.end:
-.global ___unsigned_int32_to_float32;
-.type ___unsigned_int32_to_float32, STT_FUNC;
+.size ___floatunsisf, .-___floatunsisf
+.global ___floatunsisf;
+.type ___floatunsisf, STT_FUNC;
 

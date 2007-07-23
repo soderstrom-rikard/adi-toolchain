@@ -2,10 +2,20 @@
  *
  * yvals.h
  *
- * (c) Copyright 2002-2007 Analog Devices, Inc.  All rights reserved.
- * (c) Copyright 1992-2005 by P.J. Plauger.  ALL RIGHTS RESERVED.
+ * Copyright (C) 2002-2007 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
+ * Copyright (C) 1992-2005 by P.J. Plauger.  ALL RIGHTS RESERVED.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  * Consult your license regarding permissions and restrictions.
- * $Revision: 1.23 $
+ *
  ************************************************************************/
 
 #pragma once

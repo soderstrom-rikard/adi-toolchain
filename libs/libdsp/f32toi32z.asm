@@ -1,8 +1,22 @@
 /************************************************************************
  *
- * f32toi32z.asm : $Revision: 1.10 $
+ * f32toi32z.asm
  *
- * (c) Copyright 2003-2004 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 2003-2004 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU General
+ * Public License. See the file COPYING for more details.
+ *
+ * In addition to the permissions in the GNU General Public License,
+ * Analog Devices gives you unlimited permission to link the
+ * compiled version of this file into combinations with other programs,
+ * and to distribute those combinations without any restriction coming
+ * from the use of this file.  (The General Public License restrictions
+ * do apply in other respects; for example, they cover modification of
+ * the file, and distribution when not linked into a combine
+ * executable.)
+ *
+ * Non-GPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -29,18 +43,22 @@
     regs_clobbered in f32toi32r.c in SOFTFLOAT
 #endif
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = floating_point_support;
 .file_attr libGroup      = integer_support;
 .file_attr libName = libdsp;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";     
-.file_attr libFunc = ___float32_to_int32_round_to_zero;
-.file_attr FuncName      = ___float32_to_int32_round_to_zero;
+.file_attr libFunc = ___fixsfsi;
+.file_attr FuncName      = ___fixsfsi;
 
-.section program;
+#endif
+
+.text;
 
 .align 2;
-___float32_to_int32_round_to_zero:
+___fixsfsi:
          
      
                                      // Check for zero input
@@ -100,9 +118,9 @@ ___float32_to_int32_round_to_zero:
                                      // We just return zero.
    R0 = 0;
    RTS;
-.___float32_to_int32_round_to_zero.end:
+.size ___fixsfsi, .-___fixsfsi
 
-.global ___float32_to_int32_round_to_zero;
-.type ___float32_to_int32_round_to_zero, STT_FUNC;
+.global ___fixsfsi;
+.type ___fixsfsi, STT_FUNC;
 
 // end of file

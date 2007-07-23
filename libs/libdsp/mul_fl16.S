@@ -1,7 +1,12 @@
 /*
 ** Float16 multiply.  Takes 2 non-IEEE-754 floats and multiplies them (16.16)
 **
-** Copyright (C) 2003-2006 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003-2006 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 */
 
 #if !defined(__NO_LIBRARY_ATTRIBUTES__)
@@ -16,7 +21,7 @@
 
 #endif
 
-.section program;
+.text;
 .align 2;
 _mul_fl16:
 	R2.L = R0.L + R1.L (NS);
@@ -39,6 +44,6 @@ _mul_fl16:
 
 	RTS;
 
-._mul_fl16.end:
+.size _mul_fl16, .-_mul_fl16
 .global _mul_fl16;
 .type _mul_fl16, STT_FUNC;

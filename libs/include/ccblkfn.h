@@ -6,7 +6,12 @@
  *
  * ccblkfn.h
  *
- * (c) Copyright 2001-2007 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 2001-2007 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -162,7 +167,7 @@ static int __divq(int _x, int _y, int *_paq) {
 #ifdef __AVOID_CLI_ANOMALY__
 
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 static int cli(void) {
   int r, reti;
   __asm volatile("%0 = RETI; RETI = [SP++];\n" : "=d" (reti));
@@ -265,7 +270,7 @@ extern int __builtin_testset(char *_s);
 extern void __builtin_untestset(char *_s);
 
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 static void adi_acquire_lock(testset_t *_t) {
   int  tVal;
 
@@ -286,7 +291,7 @@ static void adi_acquire_lock(testset_t *_t) {
 }
 
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 static int adi_try_lock(testset_t *_t) {
   __builtin_csync();
 #ifdef __WORKAROUND_L2_TESTSET_STALL
@@ -297,7 +302,7 @@ static int adi_try_lock(testset_t *_t) {
 }
 
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 static void adi_release_lock(testset_t *_t) {
   __builtin_untestset((char *) _t);
   __builtin_ssync();
@@ -306,13 +311,13 @@ static void adi_release_lock(testset_t *_t) {
 /* Legacy routines - will be depracated */
 
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 static void claim_atomic_access(testset_t *_t) {
   adi_acquire_lock(_t);
 }
 
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 static void release_atomic_access(testset_t *_t) {
   adi_release_lock(_t);
 }
@@ -322,7 +327,7 @@ static void release_atomic_access(testset_t *_t) {
 #include <cdefBF561.h>
 
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 static int adi_core_id(void) {
   /* Returns the Core ID: 0 for coreA, 1 for coreB
   ** This method is actually quicker than extracting the relevant
@@ -332,7 +337,7 @@ static int adi_core_id(void) {
 }
 
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 static void adi_core_b_enable(void)
 {
         /* clearing bit 5 releases Core B and allows it to run. */
@@ -346,13 +351,13 @@ static void adi_core_b_enable(void)
 */
 
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 static int adi_core_id(void) {
   return 0;
 }
 
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 static void adi_core_b_enable(void)
 {
   /* do nothing */

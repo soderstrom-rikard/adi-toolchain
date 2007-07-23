@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2000-2006 Analog Devices
-  All rights reserved
+  Copyright (C) 2000-2006 Analog Devices
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
 *******************************************************************************
 
   Description :   This program implements a biquad, transposed Direct Form II,
@@ -101,7 +105,7 @@
 #define __WORKAROUND_BF532_ANOMALY_050000245
 #endif
 
-.section  program;
+.text;
 .global __iir_fr16;
 .align 2;
 __iir_fr16:
@@ -423,4 +427,4 @@ _iir_LAST:
         (R7:6) = [SP++];            // Pop R7-R6
         RTS;
 
-.__iir_fr16.end:
+.size __iir_fr16, .-__iir_fr16

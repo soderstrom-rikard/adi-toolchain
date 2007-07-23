@@ -1,8 +1,22 @@
 /************************************************************************
  *
- * fltuif.asm : $Revision: 1.16 $
+ * fltuif.asm
  *
- * (c) Copyright 2000-2005 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 2000-2005 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU General
+ * Public License. See the file COPYING for more details.
+ *
+ * In addition to the permissions in the GNU General Public License,
+ * Analog Devices gives you unlimited permission to link the
+ * compiled version of this file into combinations with other programs,
+ * and to distribute those combinations without any restriction coming
+ * from the use of this file.  (The General Public License restrictions
+ * do apply in other respects; for example, they cover modification of
+ * the file, and distribution when not linked into a combine
+ * executable.)
+ *
+ * Non-GPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -31,17 +45,21 @@
 
 #endif
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libdsp;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc = ___unsigned_int32_to_float32;
-.file_attr FuncName      = ___unsigned_int32_to_float32;
+.file_attr libFunc = ___floatunsisf;
+.file_attr FuncName      = ___floatunsisf;
 
-.section program;
+#endif
+
+.text;
 
 .align 2;
-___unsigned_int32_to_float32:
+___floatunsisf:
    /* 
    ** We check our input value (R0) for zero, and return zero if it's zero.
    */
@@ -134,10 +152,10 @@ ___unsigned_int32_to_float32:
 
 .return_zero:
    RTS;
-.___unsigned_int32_to_float32.end:
+.size ___floatunsisf, .-___floatunsisf
 
-.global ___unsigned_int32_to_float32;
-.global .___unsigned_int32_to_float32.end;
-.type ___unsigned_int32_to_float32, STT_FUNC;
+.global ___floatunsisf;
+.global .___floatunsisf.end;
+.type ___floatunsisf, STT_FUNC;
 
 // end of file

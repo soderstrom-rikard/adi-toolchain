@@ -2,8 +2,13 @@
  *
  * vector.h
  *
- * (c) Copyright 1996-2005 Analog Devices, Inc.  All rights reserved.
- * $Revision: 1.11 $
+ * Copyright (C) 1996-2005 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
+ *
  ************************************************************************/
 
 #pragma once
@@ -35,25 +40,22 @@
  * 
  */
 
-#pragma linkage_name __vecsaddf
         void vecsaddf (const float _vector[], float _scalar, 
-                       float _sum[], int _length);
+                       float _sum[], int _length) asm ("__vecsaddf");
 
-#pragma linkage_name __vecsaddd
         void vecsaddd (const long double _vector[], long double _scalar,
-                       long double _sum[], int _length);
+                       long double _sum[], int _length) asm ("__vecsaddd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __vecsaddf
-#else
-#pragma linkage_name __vecsaddd
-#endif
         void vecsadd (const double _vector[], double _scalar, 
-                      double _sum[], int _length);
+                      double _sum[], int _length) asm ("__vecsaddf");
+#else
+        void vecsadd (const double _vector[], double _scalar, 
+                      double _sum[], int _length) asm ("__vecsaddd");
+#endif
 
-#pragma linkage_name __vecsadd_fr16
         void vecsadd_fr16 (const fract16 _vector[], fract16 _scalar, 
-                           fract16 _sum[], int _length);
+                           fract16 _sum[], int _length) asm ("__vecsadd_fr16");
 
 
 
@@ -64,25 +66,22 @@
  * 
  */
 
-#pragma linkage_name __vecssubf
         void vecssubf (const float _vector[], float _scalar, 
-                       float _difference[], int _length);
+                       float _difference[], int _length) asm ("__vecssubf");
 
-#pragma linkage_name __vecssubd
         void vecssubd (const long double _vector[], long double _scalar,
-                       long double _difference[], int _length);
+                       long double _difference[], int _length) asm ("__vecssubd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __vecssubf
-#else
-#pragma linkage_name __vecssubd
-#endif
         void vecssub (const double _vector[], double _scalar, 
-                      double _difference[], int _length);
+                      double _difference[], int _length) asm ("__vecssubf");
+#else
+        void vecssub (const double _vector[], double _scalar, 
+                      double _difference[], int _length) asm ("__vecssubd");
+#endif
 
-#pragma linkage_name __vecssub_fr16
         void vecssub_fr16 (const fract16 _vector[], fract16 _scalar, 
-                           fract16 _difference[], int _length);
+                           fract16 _difference[], int _length) asm ("__vecssub_fr16");
 
 
 
@@ -93,26 +92,23 @@
  * 
  */
 
-#pragma linkage_name __vecsmltf
         void vecsmltf (const float _vector[], float _scalar, 
-                       float _product[], int _length);
+                       float _product[], int _length) asm ("__vecsmltf");
 
-#pragma linkage_name __vecsmltd
         void vecsmltd (const long double _vector[], long double _scalar,
-                       long double _product[], int _length);
+                       long double _product[], int _length) asm ("__vecsmltd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __vecsmltf
-#else
-#pragma linkage_name __vecsmltd
-#endif
         void vecsmlt (const double _vector[], double _scalar, 
-                      double _product[], int _length);
+                      double _product[], int _length) asm ("__vecsmltf");
+#else
+        void vecsmlt (const double _vector[], double _scalar, 
+                      double _product[], int _length) asm ("__vecsmltd");
+#endif
 
 
-#pragma linkage_name __vecsmlt_fr16
         void vecsmlt_fr16 (const fract16 _vector[], fract16 _scalar, 
-                           fract16 _product[], int _length);
+                           fract16 _product[], int _length) asm ("__vecsmlt_fr16");
 
 
 
@@ -123,29 +119,27 @@
  * 
  */
 
-#pragma linkage_name __vecvaddf
         void vecvaddf (const float _vector_x[], 
                        const float _vector_y[], 
-                       float _sum[], int _length);
+                       float _sum[], int _length) asm ("__vecvaddf");
 
-#pragma linkage_name __vecvaddd
         void vecvaddd (const long double _vector_x[], 
                        const long double _vector_y[],
-                       long double _sum[], int _length);
+                       long double _sum[], int _length) asm ("__vecvaddd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __vecvaddf
-#else
-#pragma linkage_name __vecvaddd
-#endif
         void vecvadd (const double _vector_x[], 
                       const double _vector_y[], 
-                      double _sum[], int _length);
+                      double _sum[], int _length) asm ("__vecvaddf");
+#else
+        void vecvadd (const double _vector_x[], 
+                      const double _vector_y[], 
+                      double _sum[], int _length) asm ("__vecvaddd");
+#endif
 
-#pragma linkage_name __vecvadd_fr16
         void vecvadd_fr16 (const fract16 _vector_x[], 
                            const fract16 _vector_y[], 
-                           fract16 _sum[], int _length);
+                           fract16 _sum[], int _length) asm ("__vecvadd_fr16");
 
 
 
@@ -156,29 +150,27 @@
  * 
  */
 
-#pragma linkage_name __vecvsubf
         void vecvsubf (const float _vector_x[], 
                        const float _vector_y[], 
-                       float _difference[], int _length);
+                       float _difference[], int _length) asm ("__vecvsubf");
 
-#pragma linkage_name __vecvsubd
         void vecvsubd (const long double _vector_x[], 
                        const long double _vector_y[],
-                       long double _difference[], int _length);
+                       long double _difference[], int _length) asm ("__vecvsubd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __vecvsubf
-#else
-#pragma linkage_name __vecvsubd
-#endif
         void vecvsub (const double _vector_x[], 
                       const double _vector_y[], 
-                      double _difference[], int _length);
+                      double _difference[], int _length) asm ("__vecvsubf");
+#else
+        void vecvsub (const double _vector_x[], 
+                      const double _vector_y[], 
+                      double _difference[], int _length) asm ("__vecvsubd");
+#endif
 
-#pragma linkage_name __vecvsub_fr16
         void vecvsub_fr16 (const fract16 _vector_x[], 
                            const fract16 _vector_y[], 
-                           fract16 _difference[], int _length);
+                           fract16 _difference[], int _length) asm ("__vecvsub_fr16");
 
 
 
@@ -189,29 +181,27 @@
  * 
  */
 
-#pragma linkage_name __vecvmltf
         void vecvmltf (const float _vector_x[], 
                        const float _vector_y[], 
-                       float _product[], int _length);
+                       float _product[], int _length) asm ("__vecvmltf");
 
-#pragma linkage_name __vecvmltd
         void vecvmltd (const long double _vector_x[], 
                        const long double _vector_y[],
-                       long double _product[], int _length);
+                       long double _product[], int _length) asm ("__vecvmltd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __vecvmltf
-#else
-#pragma linkage_name __vecvmltd
-#endif
         void vecvmlt (const double _vector_x[], 
                       const double _vector_y[], 
-                      double _product[], int _length);
+                      double _product[], int _length) asm ("__vecvmltf");
+#else
+        void vecvmlt (const double _vector_x[], 
+                      const double _vector_y[], 
+                      double _product[], int _length) asm ("__vecvmltd");
+#endif
 
-#pragma linkage_name __vecvmlt_fr16
         void vecvmlt_fr16 (const fract16 _vector_x[], 
                            const fract16 _vector_y[], 
-                           fract16 _product[], int _length);
+                           fract16 _product[], int _length) asm ("__vecvmlt_fr16");
 
 
 
@@ -222,29 +212,27 @@
  * 
  */
 
-#pragma linkage_name __vecdotf
         float vecdotf (const float _vector_x[], 
                        const float _vector_y[], 
-                       int _length);
+                       int _length) asm ("__vecdotf");
 
-#pragma linkage_name __vecdotd
         long double vecdotd (const long double _vector_x[], 
                              const long double _vector_y[], 
-                             int _length);
+                             int _length) asm ("__vecdotd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __vecdotf
-#else
-#pragma linkage_name __vecdotd
-#endif
         double vecdot (const double _vector_x[], 
                        const double _vector_y[], 
-                       int _length);
+                       int _length) asm ("__vecdotf");
+#else
+        double vecdot (const double _vector_x[], 
+                       const double _vector_y[], 
+                       int _length) asm ("__vecdotd");
+#endif
 
-#pragma linkage_name __vecdot_fr16
         fract16 vecdot_fr16 (const fract16 _vector_x[], 
                              const fract16 _vector_y[], 
-                             int _length);
+                             int _length) asm ("__vecdot_fr16");
 
 
 
@@ -255,22 +243,18 @@
  * 
  */
 
-#pragma linkage_name __vecmaxf
-        float vecmaxf (const float _vector[], int _length);
+        float vecmaxf (const float _vector[], int _length) asm ("__vecmaxf");
 
-#pragma linkage_name __vecmaxd
-        long double vecmaxd (const long double _vector[], int _length);
+        long double vecmaxd (const long double _vector[], int _length) asm ("__vecmaxd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __vecmaxf
+        double vecmax (const double _vector[], int _length) asm ("__vecmaxf");
 #else
-#pragma linkage_name __vecmaxd
+        double vecmax (const double _vector[], int _length) asm ("__vecmaxd");
 #endif
-        double vecmax (const double _vector[], int _length);
 
 
-#pragma linkage_name __vecmax_fr16
-        fract16 vecmax_fr16 (const fract16 _vector[], int _length);
+        fract16 vecmax_fr16 (const fract16 _vector[], int _length) asm ("__vecmax_fr16");
 
 
 
@@ -281,22 +265,18 @@
  * 
  */
 
-#pragma linkage_name __vecminf
-        float vecminf (const float _vector[], int _length);
+        float vecminf (const float _vector[], int _length) asm ("__vecminf");
 
-#pragma linkage_name __vecmind
-        long double vecmind (const long double _vector[], int _length);
+        long double vecmind (const long double _vector[], int _length) asm ("__vecmind");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __vecminf
+        double vecmin (const double _vector[], int _length) asm ("__vecminf");
 #else
-#pragma linkage_name __vecmind
+        double vecmin (const double _vector[], int _length) asm ("__vecmind");
 #endif
-        double vecmin (const double _vector[], int _length);
 
 
-#pragma linkage_name __vecmin_fr16
-        fract16 vecmin_fr16 (const fract16 _vector[], int _length);
+        fract16 vecmin_fr16 (const fract16 _vector[], int _length) asm ("__vecmin_fr16");
 
 
 
@@ -307,21 +287,17 @@
  * 
  */
 
-#pragma linkage_name __vecmaxlocf
-        int vecmaxlocf (const float _vector[], int _length);
+        int vecmaxlocf (const float _vector[], int _length) asm ("__vecmaxlocf");
 
-#pragma linkage_name __vecmaxlocd
-        int vecmaxlocd (const long double _vector[], int _length);
+        int vecmaxlocd (const long double _vector[], int _length) asm ("__vecmaxlocd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __vecmaxlocf
+        int vecmaxloc (const double _vector[], int _length) asm ("__vecmaxlocf");
 #else
-#pragma linkage_name __vecmaxlocd
+        int vecmaxloc (const double _vector[], int _length) asm ("__vecmaxlocd");
 #endif
-        int vecmaxloc (const double _vector[], int _length);
 
-#pragma linkage_name __vecmaxloc_fr16
-        int vecmaxloc_fr16 (const fract16 _vector[], int _length);
+        int vecmaxloc_fr16 (const fract16 _vector[], int _length) asm ("__vecmaxloc_fr16");
 
 
 
@@ -332,21 +308,17 @@
  * 
  */
 
-#pragma linkage_name __vecminlocf
-        int vecminlocf (const float _vector[], int _length);
+        int vecminlocf (const float _vector[], int _length) asm ("__vecminlocf");
 
-#pragma linkage_name __vecminlocd
-        int vecminlocd (const long double _vector[], int _length);
+        int vecminlocd (const long double _vector[], int _length) asm ("__vecminlocd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __vecminlocf
+        int vecminloc (const double _vector[], int _length) asm ("__vecminlocf");
 #else
-#pragma linkage_name __vecminlocd
+        int vecminloc (const double _vector[], int _length) asm ("__vecminlocd");
 #endif
-        int vecminloc (const double _vector[], int _length);
 
-#pragma linkage_name __vecminloc_fr16
-        int vecminloc_fr16 (const fract16 _vector[], int _length);
+        int vecminloc_fr16 (const fract16 _vector[], int _length) asm ("__vecminloc_fr16");
 
 
 
@@ -357,29 +329,27 @@
  * 
  */
 
-#pragma linkage_name __cvecsaddf
         void cvecsaddf (const complex_float _vector[], 
                         complex_float _scalar, 
-                        complex_float _sum[], int _length);
+                        complex_float _sum[], int _length) asm ("__cvecsaddf");
 
-#pragma linkage_name __cvecsaddd
         void cvecsaddd (const complex_long_double _vector[], 
                         complex_long_double _scalar,
-                        complex_long_double _sum[], int _length);
+                        complex_long_double _sum[], int _length) asm ("__cvecsaddd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __cvecsaddf
-#else
-#pragma linkage_name __cvecsaddd
-#endif
         void cvecsadd (const complex_double _vector[], 
                        complex_double _scalar, 
-                       complex_double _sum[], int _length);
+                       complex_double _sum[], int _length) asm ("__cvecsaddf");
+#else
+        void cvecsadd (const complex_double _vector[], 
+                       complex_double _scalar, 
+                       complex_double _sum[], int _length) asm ("__cvecsaddd");
+#endif
 
-#pragma linkage_name __cvecsadd_fr16
         void cvecsadd_fr16 (const complex_fract16 _vector[], 
                             complex_fract16 _scalar, 
-                            complex_fract16 _sum[], int _length);
+                            complex_fract16 _sum[], int _length) asm ("__cvecsadd_fr16");
 
 
 
@@ -390,29 +360,27 @@
  * 
  */
 
-#pragma linkage_name __cvecssubf
         void cvecssubf (const complex_float _vector[], 
                         complex_float _scalar, 
-                        complex_float _difference[], int _length);
+                        complex_float _difference[], int _length) asm ("__cvecssubf");
 
-#pragma linkage_name __cvecssubd
         void cvecssubd (const complex_long_double _vector[], 
                         complex_long_double _scalar,
-                        complex_long_double _difference[], int _length);
+                        complex_long_double _difference[], int _length) asm ("__cvecssubd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __cvecssubf
-#else
-#pragma linkage_name __cvecssubd
-#endif
         void cvecssub (const complex_double _vector[], 
                        complex_double _scalar, 
-                       complex_double _difference[], int _length);
+                       complex_double _difference[], int _length) asm ("__cvecssubf");
+#else
+        void cvecssub (const complex_double _vector[], 
+                       complex_double _scalar, 
+                       complex_double _difference[], int _length) asm ("__cvecssubd");
+#endif
 
-#pragma linkage_name __cvecssub_fr16
         void cvecssub_fr16 (const complex_fract16 _vector[], 
                             complex_fract16 _scalar, 
-                            complex_fract16 _difference[], int _length);
+                            complex_fract16 _difference[], int _length) asm ("__cvecssub_fr16");
 
 
 
@@ -423,29 +391,27 @@
  * 
  */
 
-#pragma linkage_name __cvecsmltf
         void cvecsmltf (const complex_float _vector[], 
                         complex_float _scalar, 
-                        complex_float _product[], int _length);
+                        complex_float _product[], int _length) asm ("__cvecsmltf");
 
-#pragma linkage_name __cvecsmltd
         void cvecsmltd (const complex_long_double _vector[], 
                         complex_long_double _scalar,
-                        complex_long_double _product[], int _length);
+                        complex_long_double _product[], int _length) asm ("__cvecsmltd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __cvecsmltf
-#else
-#pragma linkage_name __cvecsmltd
-#endif
         void cvecsmlt (const complex_double _vector[], 
                        complex_double _scalar, 
-                       complex_double _product[], int _length);
+                       complex_double _product[], int _length) asm ("__cvecsmltf");
+#else
+        void cvecsmlt (const complex_double _vector[], 
+                       complex_double _scalar, 
+                       complex_double _product[], int _length) asm ("__cvecsmltd");
+#endif
 
-#pragma linkage_name __cvecsmlt_fr16
         void cvecsmlt_fr16 (const complex_fract16 _vector[], 
                             complex_fract16 _scalar, 
-                            complex_fract16 _product[], int _length);
+                            complex_fract16 _product[], int _length) asm ("__cvecsmlt_fr16");
 
 
 
@@ -456,29 +422,27 @@
  * 
  */
 
-#pragma linkage_name __cvecvaddf
         void cvecvaddf (const complex_float _vector_a[], 
                         const complex_float _vector_b[], 
-                        complex_float _sum[], int _length);
+                        complex_float _sum[], int _length) asm ("__cvecvaddf");
 
-#pragma linkage_name __cvecvaddd
         void cvecvaddd (const complex_long_double _vector_a[], 
                         const complex_long_double _vector_b[],
-                        complex_long_double _sum[], int _length);
+                        complex_long_double _sum[], int _length) asm ("__cvecvaddd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __cvecvaddf
-#else
-#pragma linkage_name __cvecvaddd
-#endif
         void cvecvadd (const complex_double _vector_a[], 
                        const complex_double _vector_b[], 
-                       complex_double _sum[], int _length);
+                       complex_double _sum[], int _length) asm ("__cvecvaddf");
+#else
+        void cvecvadd (const complex_double _vector_a[], 
+                       const complex_double _vector_b[], 
+                       complex_double _sum[], int _length) asm ("__cvecvaddd");
+#endif
 
-#pragma linkage_name __cvecvadd_fr16
         void cvecvadd_fr16 (const complex_fract16 _vector_a[], 
                             const complex_fract16 _vector_b[], 
-                            complex_fract16 _sum[], int _length);
+                            complex_fract16 _sum[], int _length) asm ("__cvecvadd_fr16");
 
 
 
@@ -489,29 +453,27 @@
  * 
  */
 
-#pragma linkage_name __cvecvsubf
         void cvecvsubf (const complex_float _vector_a[], 
                         const complex_float _vector_b[], 
-                        complex_float _difference[], int _length);
+                        complex_float _difference[], int _length) asm ("__cvecvsubf");
 
-#pragma linkage_name __cvecvsubd
         void cvecvsubd (const complex_long_double _vector_a[], 
                         const complex_long_double _vector_b[],
-                        complex_long_double _difference[], int _length);
+                        complex_long_double _difference[], int _length) asm ("__cvecvsubd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __cvecvsubf
-#else
-#pragma linkage_name __cvecvsubd
-#endif
         void cvecvsub (const complex_double _vector_a[], 
                        const complex_double _vector_b[], 
-                       complex_double _difference[], int _length);
+                       complex_double _difference[], int _length) asm ("__cvecvsubf");
+#else
+        void cvecvsub (const complex_double _vector_a[], 
+                       const complex_double _vector_b[], 
+                       complex_double _difference[], int _length) asm ("__cvecvsubd");
+#endif
 
-#pragma linkage_name __cvecvsub_fr16
         void cvecvsub_fr16 (const complex_fract16 _vector_a[], 
                             const complex_fract16 _vector_b[], 
-                            complex_fract16 _difference[], int _length);
+                            complex_fract16 _difference[], int _length) asm ("__cvecvsub_fr16");
 
 
 
@@ -522,29 +484,27 @@
  * 
  */
 
-#pragma linkage_name __cvecvmltf
         void cvecvmltf (const complex_float _vector_a[], 
                         const complex_float _vector_b[], 
-                        complex_float _product[], int _length);
+                        complex_float _product[], int _length) asm ("__cvecvmltf");
 
-#pragma linkage_name __cvecvmltd
         void cvecvmltd (const complex_long_double _vector_a[], 
                         const complex_long_double _vector_b[],
-                        complex_long_double _product[], int _length);
+                        complex_long_double _product[], int _length) asm ("__cvecvmltd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __cvecvmltf
-#else
-#pragma linkage_name __cvecvmltd
-#endif
         void cvecvmlt (const complex_double _vector_a[], 
                        const complex_double _vector_b[], 
-                       complex_double _product[], int _length);
+                       complex_double _product[], int _length) asm ("__cvecvmltf");
+#else
+        void cvecvmlt (const complex_double _vector_a[], 
+                       const complex_double _vector_b[], 
+                       complex_double _product[], int _length) asm ("__cvecvmltd");
+#endif
 
-#pragma linkage_name __cvecvmlt_fr16
         void cvecvmlt_fr16 (const complex_fract16 _vector_a[], 
                             const complex_fract16 _vector_b[], 
-                            complex_fract16 _product[], int _length);
+                            complex_fract16 _product[], int _length) asm ("__cvecvmlt_fr16");
 
 
 
@@ -555,29 +515,27 @@
  * 
  */
 
-#pragma linkage_name __cvecdotf
         complex_float cvecdotf (const complex_float _vector_a[], 
                                 const complex_float _vector_b[], 
-                                int _length);
+                                int _length) asm ("__cvecdotf");
 
-#pragma linkage_name __cvecdotd
         complex_long_double cvecdotd (const complex_long_double _vector_a[],
                                       const complex_long_double _vector_b[], 
-                                      int _length);
+                                      int _length) asm ("__cvecdotd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma linkage_name __cvecdotf
-#else
-#pragma linkage_name __cvecdotd
-#endif
         complex_double cvecdot (const complex_double _vector_a[], 
                                 const complex_double _vector_b[], 
-                                int _length);
+                                int _length) asm ("__cvecdotf");
+#else
+        complex_double cvecdot (const complex_double _vector_a[], 
+                                const complex_double _vector_b[], 
+                                int _length) asm ("__cvecdotd");
+#endif
 
-#pragma linkage_name __cvecdot_fr16
         complex_fract16 cvecdot_fr16 (const complex_fract16 _vector_a[], 
                                       const complex_fract16 _vector_b[], 
-                                      int _length);
+                                      int _length) asm ("__cvecdot_fr16");
 
 
 

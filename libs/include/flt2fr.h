@@ -6,7 +6,12 @@
  *
  * flt2fr.h
  *
- * (c) Copyright 1998-2006 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 1998-2006 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -86,7 +91,7 @@
 
 /* Function to convert floating point data into fract16 data */
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 fract16  float_to_fract16(float _x)
 { 
   float val = ( ( _x * _TERM_A + _TERM_B ) * 32768.0 );
@@ -96,7 +101,7 @@ fract16  float_to_fract16(float _x)
 
 /* Function to convert fract16 data into floating point data */
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 float  fract16_to_float(fract16 _x16)
 { 
   return ( (double)_x16 * _TERM_a * _INV_2_POW_15 + _TERM_b );

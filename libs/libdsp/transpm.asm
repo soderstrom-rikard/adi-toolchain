@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2005-2006 Analog Devices Inc.  
-  All rights reserved
+  Copyright (C) 2005-2006 Analog Devices, Inc.  
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
 ******************************************************************************
   File Name      : transpm.asm
   Include File   : matrix.h
@@ -48,7 +52,7 @@
 #define __WORKAROUND_BF532_ANOMALY38__
 #endif
 
-.section program;
+.text;
 .global  __transpmf;
 
 .align 2;
@@ -117,4 +121,4 @@ SINGLE:
 DONE:
         RTS;
 
-.__transpmf.end:
+.size __transpmf, .-__transpmf

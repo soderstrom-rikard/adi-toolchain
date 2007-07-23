@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2000-2004 Analog Devices Inc. IPDC BANGALORE, India.
-  All rights reserved
+  Copyright (C) 2000-2004 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
  ******************************************************************************
   File name   :   acos_fr16.asm
 
@@ -33,6 +37,8 @@
 
 **************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = math.h;
 .file_attr libGroup      = math_bf.h;
 .file_attr libFunc       = __acos_fr16;
@@ -42,17 +48,19 @@
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __acos_fr16;
 
-.section data1;
+#endif
+
+.data;
  .align 2;
  .acoscoef0:
- .byte2 = 0x513F,0x0413,0xF39C,0x4D9B,0x9672,0x4139;
+ .short 0x513F,0x0413,0xF39C,0x4D9B,0x9672,0x4139;
  .acoscoef1:
- .byte2 = 0x2BB6,0xAD97,0x5DC0;
+ .short 0x2BB6,0xAD97,0x5DC0;
  .acoscoef2:
- .byte2 = 0x2DA3,0x9F04,0x4F95;
+ .short 0x2DA3,0x9F04,0x4F95;
 
 
-.section  program;
+.text;
 .global __acos_fr16;
 .align 2;
 
@@ -132,4 +140,4 @@ RET_MAX:
       R0 = 0X7FFF;                       // RETURN RESULT
       RTS;
 
-.__acos_fr16.end:
+.size __acos_fr16, .-__acos_fr16

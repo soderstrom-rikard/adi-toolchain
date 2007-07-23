@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2000-2004 Analog Devices Inc. IPDC BANGALORE, India.
-  All rights reserved
+  Copyright (C) 2000-2004 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
  ******************************************************************************
   File name   :  sin_fr16.asm
 
@@ -24,35 +28,61 @@
   DATE           : 26-02-01
 
 **************************************************************/
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = math_bf.h;
 .file_attr libGroup      = math.h;
 .file_attr libFunc       = __sin_fr16;
 .file_attr libFunc       = sin_fr16;
 .file_attr FuncName      = __sin_fr16;
 
+
+#endif
 /* Called by polar_fr16 */
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = complex.h;
 .file_attr libFunc       = polar_fr16;
 .file_attr libFunc       = __polar_fr16;
 
+
+#endif
 /* Called by twidfft_fr16 */
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup = filter.h;
 .file_attr libFunc  = twidfft_fr16;
 .file_attr libFunc  = __twidfft_fr16;
 
+
+#endif
 /* Called by twidfft2d_fr16 */
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libFunc  = twidfft2d_fr16;
 .file_attr libFunc  = __twidfft2d_fr16;
 
+
+#endif
 /* Called by twidfftf_fr16 */
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libFunc  = twidfftf_fr16;
 .file_attr libFunc  = __twidfftf_fr16;
 
+
+#endif
 /* Called by twidfftrad2_fr16 */
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libFunc  = twidfftrad2_fr16;
 .file_attr libFunc  = __twidfftrad2_fr16;
 
+
+#endif
 /* Called by twidfftrad4_fr16 */
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libFunc  = twidfftrad4_fr16;
 .file_attr libFunc  = __twidfftrad4_fr16;
 
@@ -60,15 +90,17 @@
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
 
+#endif
 
 
 
-.section data1;
+
+.data;
  .align 2;
  .sincoef:
- .byte2 = 0x6480,0x0059,0xD54D,0x0252,0x0388;
+ .short 0x6480,0x0059,0xD54D,0x0252,0x0388;
 
-.section  program;
+.text;
 .global __sin_fr16;
 .align 2;
 
@@ -99,4 +131,4 @@ SINEND:   A0 += R1.H * R0.L || R0 = W[P1++] (Z);
       IF !CC R0 = R2;             // USE NON_NEGATED OUTPUT IF INPUT >= ZERO
 
       RTS;
-.__sin_fr16.end:
+.size __sin_fr16, .-__sin_fr16

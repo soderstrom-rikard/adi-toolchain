@@ -1,8 +1,13 @@
 /*****************************************************************************
  *
- * sqrt_fr16.asm : $Revision: 1.10 $
+ * sqrt_fr16.asm
  *
- * (c) Copyright 2000-2007 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 2000-2007 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  *****************************************************************************/
 
@@ -93,16 +98,22 @@
 
 #define  N_SEEDS   5
 
-.SECTION/DOUBLEANY constdata;
+.section .rodata;
 .ALIGN 2;
-.BYTE2 .sqrtcoef0[N_SEEDS] = 0x2D41,0xD2CE,0xE7E8,0xF848,0xAC7C; 
-.BYTE2 .sqrtcoef1[N_SEEDS] = 0x2D42,0x2D31,0xEA5D,0x1021,0xF89E;
+	.type	.sqrtcoef0, @object
+	.size	.sqrtcoef0, (N_SEEDS) * 2
+.sqrtcoef0:
+	.short 0x2D41,0xD2CE,0xE7E8,0xF848,0xAC7C;
+	.type	.sqrtcoef1, @object
+	.size	.sqrtcoef1, (N_SEEDS) * 2
+.sqrtcoef1:
+	.short 0x2D42,0x2D31,0xEA5D,0x1021,0xF89E;
 
 
 .GLOBAL  __sqrt_fr16;
 .TYPE    __sqrt_fr16, STT_FUNC;
 
-.SECTION/DOUBLEANY program;
+.text;
 .ALIGN 2;
 
 __sqrt_fr16:
@@ -167,4 +178,4 @@ __sqrt_fr16:
 .done: R0 = 0;                         // Set return value for x <= 0
        RTS;
 
-.__sqrt_fr16.end:
+.size __sqrt_fr16, .-__sqrt_fr16

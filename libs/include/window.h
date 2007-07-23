@@ -2,8 +2,13 @@
  *
  * window.h
  *
- * (c) Copyright 1996-2007 Analog Devices, Inc.  All rights reserved.
- * $Revision: 1.11 $
+ * Copyright (C) 1996-2007 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
+ *
  ************************************************************************/
 
 #pragma once
@@ -32,10 +37,9 @@
  * 
  */
 
-#pragma linkage_name __gen_bartlett_fr16
         void gen_bartlett_fr16 (fract16 _bartlett_window[], 
                                 int _window_stride, 
-                                int _window_size);
+                                int _window_size) asm ("__gen_bartlett_fr16");
 
 
 
@@ -46,10 +50,9 @@
  * 
  */
 
-#pragma linkage_name __gen_blackman_fr16
         void gen_blackman_fr16 (fract16 _blackman_window[],
                                 int _window_stride,
-                                int _window_size);
+                                int _window_size) asm ("__gen_blackman_fr16");
 
 
 
@@ -60,11 +63,10 @@
  * 
  */
 
-#pragma linkage_name __gen_gaussian_fr16
         void gen_gaussian_fr16 (fract16 _gaussian_window[],
                                 float _alpha,
                                 int _window_stride,
-                                int _window_size);
+                                int _window_size) asm ("__gen_gaussian_fr16");
 
 
 /* * * *        gen_hamming      * * * *
@@ -73,10 +75,9 @@
  * 
  */
 
-#pragma linkage_name __gen_hamming_fr16
         void gen_hamming_fr16 (fract16 _hamming_window[],
                                int _window_stride,
-                               int _window_size);
+                               int _window_size) asm ("__gen_hamming_fr16");
 
 
 
@@ -86,10 +87,9 @@
  * 
  */
 
-#pragma linkage_name __gen_hanning_fr16
         void gen_hanning_fr16 (fract16 _hanning_window[],
                                int _window_stride,
-                               int _window_size);
+                               int _window_size) asm ("__gen_hanning_fr16");
 
 
 
@@ -99,10 +99,9 @@
  * 
  */
 
-#pragma linkage_name __gen_harris_fr16
         void gen_harris_fr16 (fract16 _harris_window[],
                               int _window_stride,
-                              int _window_size);
+                              int _window_size) asm ("__gen_harris_fr16");
 
 
 
@@ -112,11 +111,10 @@
  * 
  */
 
-#pragma linkage_name __gen_kaiser_fr16
         void gen_kaiser_fr16 (fract16 _kaiser_window[], 
                               float _beta,
                               int _window_stride,
-                              int _window_size);
+                              int _window_size) asm ("__gen_kaiser_fr16");
 
 
 
@@ -126,10 +124,9 @@
  * 
  */
 
-#pragma linkage_name __gen_rectangular_fr16
         void gen_rectangular_fr16 (fract16 _rectangular_window[],
                                    int _window_stride,
-                                   int _window_size);
+                                   int _window_size) asm ("__gen_rectangular_fr16");
 
 
 
@@ -139,10 +136,9 @@
  * 
  */
 
-#pragma linkage_name __gen_triangle_fr16
         void gen_triangle_fr16 (fract16 _triangle_window[],
                                 int _window_stride,
-                                int _window_size);
+                                int _window_size) asm ("__gen_triangle_fr16");
 
 
 
@@ -152,10 +148,9 @@
  * 
  */
 
-#pragma linkage_name __gen_vonhann_fr16
         void gen_vonhann_fr16 (fract16 _vonhann_window[],
                                int _window_stride,
-                               int _window_size);
+                               int _window_size) asm ("__gen_vonhann_fr16");
 
 
 

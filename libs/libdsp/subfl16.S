@@ -1,15 +1,24 @@
 /*
 ** Float16 subtract. Subtracts 2 non-IEEE-754 floats (16.16).
 **
-** Copyright (C) 2005 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2005 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 */
+
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
 .file_attr libGroup      = floating_point_support;
 .file_attr libName       = libf64fast;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc       = ___float32_sub;
-.file_attr FuncName      = ___float32_sub;
+.file_attr libFunc       = ___subsf3;
+.file_attr FuncName      = ___subsf3;
+
+#endif
 
 #if defined(__ADSPBLACKFIN__) && !defined(__ADSPLPBLACKFIN__)
 /* __ADSPBF535__ core only */
@@ -18,10 +27,10 @@
 #define CARRY AC0
 #endif
 
-.section program;
+.text;
 .align 2;
 
-___float32_sub:
+___subsf3:
 	// Compare exponents
 	R2.L = R0.L - R1.L (NS);
 	R2 = R2.L (X);
@@ -87,6 +96,6 @@ overflow:
 	R0 += 1;		// increment exponent (may change mantissa)
 	R0.H = R2.H >> 0;	// but we overwrite with new mantissa anyway.
 	RTS;
-.___float32_sub.end:
-.global ___float32_sub;
-.type ___float32_sub, STT_FUNC;
+.size ___subsf3, .-___subsf3
+.global ___subsf3;
+.type ___subsf3, STT_FUNC;

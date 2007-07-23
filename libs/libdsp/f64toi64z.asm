@@ -3,19 +3,37 @@
 ** into a 64-bit signed integer, using round-to-zero.
 ** long long __float64_to_int64_round_to_zero(long double);
 **
-** Copyright (C) 2003 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU General
+** Public License. See the file COPYING for more details.
+**
+** In addition to the permissions in the GNU General Public License,
+** Analog Devices gives you unlimited permission to link the
+** compiled version of this file into combinations with other programs,
+** and to distribute those combinations without any restriction coming
+** from the use of this file.  (The General Public License restrictions
+** do apply in other respects; for example, they cover modification of
+** the file, and distribution when not linked into a combine
+** executable.)
+**
+** Non-GPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 **
 ** !!NOTE- Uses non-standard clobber set in compiler:
 **         DefaultClobMinusABIMandLoopRegs
 */
+
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
 .file_attr libGroup      = integer_support;
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libf64ieee;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc = ___float64_to_int64_round_to_zero;
-.file_attr FuncName      = ___float64_to_int64_round_to_zero;
+.file_attr libFunc = ___fixdfdi;
+.file_attr FuncName      = ___fixdfdi;
+
+#endif
 
 #if defined(__ADSPBLACKFIN__) && !defined(__ADSPLPBLACKFIN__)
 /* __ADSPBF535__ core only */
@@ -24,9 +42,9 @@
 #define CARRY AC0
 #endif
 
-.section program;
+.text;
 .align 2;
-___float64_to_int64_round_to_zero:
+___fixdfdi:
 	// Check for zero.
 
 	R2 = R1 << 1;
@@ -188,9 +206,9 @@ ___float64_to_int64_round_to_zero:
 	R0 = 0;
 	JUMP .ret_inf;
 
-.___float64_to_int64_round_to_zero.end:
+.size ___fixdfdi, .-___fixdfdi
 
-.global ___float64_to_int64_round_to_zero;
-.type ___float64_to_int64_round_to_zero, STT_FUNC;
-.global .___float64_to_int64_round_to_zero.end;
-.type .___float64_to_int64_round_to_zero.end, STT_FUNC;
+.global ___fixdfdi;
+.type ___fixdfdi, STT_FUNC;
+.global .___fixdfdi.end;
+.type .___fixdfdi.end, STT_FUNC;

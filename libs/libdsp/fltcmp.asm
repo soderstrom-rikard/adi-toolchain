@@ -1,18 +1,42 @@
 /*
 ** Floating point comparison.
-** Copyright (C) Analog Devices, Inc. 2002. All Rights Reserved.
+** Copyright (C) Analog Devices, Inc. 2002.
+** This file is subject to the terms and conditions of the GNU General
+** Public License. See the file COPYING for more details.
+**
+** In addition to the permissions in the GNU General Public License,
+** Analog Devices gives you unlimited permission to link the
+** compiled version of this file into combinations with other programs,
+** and to distribute those combinations without any restriction coming
+** from the use of this file.  (The General Public License restrictions
+** do apply in other respects; for example, they cover modification of
+** the file, and distribution when not linked into a combine
+** executable.)
+**
+** Non-GPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 */
+
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libdsp;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc = ___float32_cmp;
-.file_attr FuncName      = ___float32_cmp;
+.file_attr libFunc = ___cmpsf2;
+.file_attr FuncName      = ___cmpsf2;
 
-.section program;
+#endif
+
+.text;
 .align 2;
-___float32_cmp:
+___cmpsf2:
+___eqsf2:
+___gesf2:
+___gtsf2:
+___lesf2:
+___ltsf2:
+___nesf2:
 	// Test for NaNs, which must compare as not-equal,
 	// no matter to what they are compared.
 	// A NaN has an exponent of 255, and a non-zero
@@ -68,7 +92,25 @@ res:
 	R0 = R2;
 nan:
 	RTS;
-.___float32_cmp.end:
-.type ___float32_cmp, STT_FUNC;
-.global ___float32_cmp;
+.size ___cmpsf2, .-___cmpsf2
+.size ___eqsf2, .-___eqsf2
+.size ___gesf2, .-___gesf2
+.size ___gtsf2, .-___gtsf2
+.size ___lesf2, .-___lesf2
+.size ___ltsf2, .-___ltsf2
+.size ___nesf2, .-___nesf2
+.type ___cmpsf2, STT_FUNC;
+.type ___eqsf2, STT_FUNC;
+.type ___gesf2, STT_FUNC;
+.type ___gtsf2, STT_FUNC;
+.type ___lesf2, STT_FUNC;
+.type ___ltsf2, STT_FUNC;
+.type ___nesf2, STT_FUNC;
+.global ___cmpsf2;
+.global ___eqsf2;
+.global ___gesf2;
+.global ___gtsf2;
+.global ___lesf2;
+.global ___ltsf2;
+.global ___nesf2;
 

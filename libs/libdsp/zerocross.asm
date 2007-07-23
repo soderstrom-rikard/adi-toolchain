@@ -1,5 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2000-2006 Analog Devices Inc.  All rights reserved
+  Copyright (C) 2000-2006 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
 *******************************************************************************
   File Name      : zerocross.asm
   Include File   : stats.h
@@ -32,6 +37,8 @@
   Code size      : 76 Bytes 
 ******************************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = stats.h;
 .file_attr libFunc       = zero_cross_fr16;
 .file_attr libFunc       = __zero_cross_fr16;
@@ -40,7 +47,9 @@
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __zero_cross_fr16;
 
-.section  program;
+#endif
+
+.text;
 .global   __zero_cross_fr16;
 
 .align 2;
@@ -86,5 +95,5 @@ __zero_cross_fr16:
 .ret_zero: 
    RTS;
 
-.__zero_cross_fr16.end:
+.size __zero_cross_fr16, .-__zero_cross_fr16
 

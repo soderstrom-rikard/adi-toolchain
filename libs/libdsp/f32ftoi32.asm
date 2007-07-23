@@ -1,7 +1,14 @@
 /*
 ** Convert non-IEEE 32-bit floating point to 32-bit integer.
-** Copyright (C) 2004 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2004 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 */
+
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
 .file_attr libGroup      = floating_point_support;
 .file_attr libGroup      = integer_support;
@@ -17,7 +24,9 @@
 .file_attr FuncName      = __float32_to_int32_round_to_zero;
 .file_attr FuncName      = __float32_to_unsigned_int32_round_to_zero;
 
-.section program;
+#endif
+
+.text;
 .align 2;
 
 __float32_to_int32:
@@ -65,10 +74,10 @@ __float32_to_unsigned_int32_round_to_zero:
 	R0 >>>= R1;
 .ret_zero:
 	RTS;
-.__float32_to_int32.end:
-.__float32_to_unsigned_int32.end:
-.__float32_to_int32_round_to_zero.end:
-.__float32_to_unsigned_int32_round_to_zero.end:
+.size __float32_to_int32, .-__float32_to_int32
+.size __float32_to_unsigned_int32, .-__float32_to_unsigned_int32
+.size __float32_to_int32_round_to_zero, .-__float32_to_int32_round_to_zero
+.size __float32_to_unsigned_int32_round_to_zero, .-__float32_to_unsigned_int32_round_to_zero
 .global __float32_to_int32;
 .global __float32_to_unsigned_int32;
 .global __float32_to_int32_round_to_zero;

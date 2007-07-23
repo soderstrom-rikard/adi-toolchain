@@ -2,7 +2,12 @@
  *
  * iirdf1_fr16.asm
  *
- * (c) Copyright 2004-2006 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 2004-2006 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -124,7 +129,7 @@
 #endif
 
 
-.section        program;
+.text;
 .align 2;
 
 .global         __iirdf1_fr16;
@@ -222,4 +227,4 @@ iir_return:
         L1 = 0;
         rts;
 
-.__iirdf1_fr16.end:
+.size __iirdf1_fr16, .-__iirdf1_fr16

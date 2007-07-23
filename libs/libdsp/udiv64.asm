@@ -1,5 +1,10 @@
 /*
-** Copyright (C) 2003-2006 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003-2006 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 ** unsigned long long division.
 **
 ** !!NOTE- Uses non-standard clobber set in compiler:
@@ -8,12 +13,16 @@
 ** Note that any changes to the clobber set also affects remu64.s
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup=integer_support;
 .file_attr libName=libdsp;
 .file_attr prefersMem=internal;
 .file_attr prefersMemNum="30";
 .file_attr libFunc=___udivdi3;
 .file_attr FuncName=___udivdi3;
+
+#endif
 
 #if defined(__ADSPBLACKFIN__) && !defined(__ADSPLPBLACKFIN__)
 /* __ADSPBF535__ core only */
@@ -22,7 +31,7 @@
 #define CARRY AC0
 #endif
 
-.section program;
+.text;
 
 .global ___udivdi3;
 .type   ___udivdi3,STT_FUNC;
@@ -286,4 +295,4 @@ x_msb_clear:
    (R7:4, P5:3) = [SP++];
    RTS;
    
-.___udivdi3.end:
+.size ___udivdi3, .-___udivdi3

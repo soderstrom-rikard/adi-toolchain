@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2000-2005 Analog Devices Inc.
-  All rights reserved
+  Copyright (C) 2000-2005 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
 ******************************************************************************
   File Name      : vmaxloc.asm
   Include File   : vector.h
@@ -25,6 +29,8 @@
   Code size      : 118 Bytes
 ******************************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = vector.h;
 .file_attr libFunc       = vecmaxloc_fr16;
 .file_attr libFunc       = __vecmaxloc_fr16;
@@ -33,11 +39,13 @@
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __vecmaxloc_fr16;
 
+#endif
+
 #if defined(__ADSPLPBLACKFIN__) && defined(__WORKAROUND_SPECULATIVE_LOADS)
 #define __WORKAROUND_BF532_ANOMALY_050000245
 #endif
 
-.section  program;
+.text;
 .global __vecmaxloc_fr16;
 
 .align 2;
@@ -145,4 +153,4 @@ END_VMAXLOC_16:   IF CC R0 = R2;
        JUMP DONE16;
 
 
-.__vecmaxloc_fr16.end:
+.size __vecmaxloc_fr16, .-__vecmaxloc_fr16

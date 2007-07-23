@@ -1,8 +1,13 @@
 /*************************************************************************
  *
- * convolve_asm.asm : $Revision: 1.10 $
+ * convolve_asm.asm
  *
- * (c) Copyright 2000-2007 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 2000-2007 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -142,7 +147,7 @@
 #endif
 
 
-.SECTION  program;
+.text;
 .ALIGN 2;
 .GLOBAL   __convolve_fr16;
 
@@ -349,4 +354,4 @@ __convolve_fr16:
       JUMP .done;
 
 
-.__convolve_fr16.end:
+.size __convolve_fr16, .-__convolve_fr16

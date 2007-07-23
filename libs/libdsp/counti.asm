@@ -1,8 +1,13 @@
 /*****************************************************************************
  *
- * counti.asm : $Revision
+ * counti.asm
  *
- * (c) Copyright 2006 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 2006 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  *****************************************************************************/
 
@@ -86,7 +91,7 @@
 
 #endif
 
-      .section/DOUBLEANY program;
+      .text;
       .align 2;
 
       .global __countones;
@@ -103,5 +108,5 @@ __lcountones:
 
       RTS;
 
-.__lcountones.end:
-.__countones.end:
+.size __lcountones, .-__lcountones
+.size __countones, .-__countones

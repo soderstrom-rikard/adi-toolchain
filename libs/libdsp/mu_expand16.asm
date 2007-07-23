@@ -1,5 +1,10 @@
 /*******************************************************************************************
-Copyright(c) 2000-2004 Analog Devices Inc.
+Copyright (C) 2000-2004 Analog Devices, Inc.
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License. See the file COPYING.LIB for more details.
+
+Non-LGPL License is also available as part of VisualDSP++
+from Analog Devices, Inc.
 ********************************************************************************************
 File Name      : mu_expand.asm
 Function Name  : __mu_expand
@@ -13,6 +18,8 @@ Code Size      : 74 bytes
 Modified on 27-04-2001 for removing the special case for input data (127) which is not required
 **********************************************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = filter.h;
 .file_attr libFunc       = __mu_expand;
 .file_attr libFunc       = mu_expand;
@@ -21,7 +28,9 @@ Modified on 27-04-2001 for removing the special case for input data (127) which 
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __mu_expand;
 
-.section			program;
+#endif
+
+.text;
 .global			 __mu_expand;
 .align 2;
 
@@ -52,4 +61,4 @@ CHK_SIGN:		CC=R3==0;		   // CHECK FOR SIGN
 EXP_END:		W[I1++]=R0.L;	   // STORE THE RESULT
 				(R7:4)=[SP++];     // POP R7-R4 FROM STACK
                 RTS;
-.__mu_expand.end:
+.size __mu_expand, .-__mu_expand

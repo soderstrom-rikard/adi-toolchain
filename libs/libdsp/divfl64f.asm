@@ -1,5 +1,10 @@
 /*
-** Copyright (C) 2003-2004 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2003-2004 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 **
 ** 64-bit floating point division of non-IEEE numbers.
 **
@@ -11,17 +16,21 @@
 ** long double __float64_div(long double, long double);
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libf64fast;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc = ___float64_div;
-.file_attr FuncName      = ___float64_div;
+.file_attr libFunc = ___divdf3;
+.file_attr FuncName      = ___divdf3;
 
-.section program;
+#endif
+
+.text;
 .align 2;
 
-___float64_div:
+___divdf3:
 	R3 = [SP+12];		// recover high half of Y
 	R0 = R0 - R2 (S);	// subtract exponents.
 	I0 = R0;		// save for later
@@ -90,7 +99,7 @@ ___float64_div:
 	R0 = R0 + R2;		// If negative, R0 => 0x80000000
 	RTS;
 
-.___float64_div.end:
+.size ___divdf3, .-___divdf3
 
-.global ___float64_div;
-.type ___float64_div, STT_FUNC;
+.global ___divdf3;
+.type ___divdf3, STT_FUNC;

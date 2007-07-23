@@ -1,6 +1,19 @@
 /******************************************************************************
-  Copyright(c) 2000-2006 Analog Devices Inc. IPDC BANGALORE, India. 
-  All rights reserved
+  Copyright (C) 2000-2006 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU General
+  Public License. See the file COPYING for more details.
+
+  In addition to the permissions in the GNU General Public License,
+  Analog Devices gives you unlimited permission to link the
+  compiled version of this file into combinations with other programs,
+  and to distribute those combinations without any restriction coming
+  from the use of this file.  (The General Public License restrictions
+  do apply in other respects; for example, they cover modification of
+  the file, and distribution when not linked into a combine
+  executable.)
+
+  Non-GPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
 ******************************************************************************
   File Name      : fpdiv32.asm
   Module Name    : floating point division
@@ -36,25 +49,29 @@
 
 ********************************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libdsp;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc = ___float32_div;
-.file_attr FuncName      = ___float32_div;
+.file_attr libFunc = ___divsf3;
+.file_attr FuncName      = ___divsf3;
+
+#endif
 
 #define BIASEXP 		0x7F
 #define MAXBIASEXP 254
 #define EXP_EXTRACT 	0x1708  
 #define MANT_EXTRACT	0x17
 #define ONE             0x3f80000
-.section	program;
+.text;
 .align 2;
 
-.global   ___float32_div;
-.type ___float32_div, STT_FUNC;
+.global   ___divsf3;
+.type ___divsf3, STT_FUNC;
 
-___float32_div:
+___divsf3:
 	// The sign bit of the result is the XOR of the operands'
 	// sign bits. This is always true, even if the result is
 	// zero, unless the result is a NaN.
@@ -336,6 +353,6 @@ not_denorm:
 	(R7:4)=[SP++];			// Pop R7-R4 from stack
 	RTS;
 
-.___float32_div.end:
-.global .___float32_div.end;
+.size ___divsf3, .-___divsf3
+.global .___divsf3.end;
 

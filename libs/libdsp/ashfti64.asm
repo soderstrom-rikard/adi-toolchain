@@ -1,11 +1,18 @@
 /*
-** Copyright (C) 2002-2003 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2002-2003 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 ** Arithmetic shift, on signed long long.
 ** inline long long __ashrdi3 (long long  ll1, int i1);
 **
 ** !!NOTE- Uses non-standard clobber set in compiler:
 **         DefaultClobMinusPABIMandLoopRegs
 */
+
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
 .file_attr libGroup      = integer_support;
 .file_attr libName = libdsp;
@@ -14,7 +21,9 @@
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = ___ashftli;
 
-.section program;
+#endif
+
+.text;
 
 .align 2;
 ___ashftli:
@@ -120,6 +129,6 @@ allsign:
 	R0 = R1;
 	RTS;
 
-.___ashftli.end:
+.size ___ashftli, .-___ashftli
 .global ___ashftli;
 .type ___ashftli, STT_FUNC;

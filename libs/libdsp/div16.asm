@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2000-2004 Analog Devices Inc. 
-  All rights reserved
+  Copyright (C) 2000-2004 Analog Devices, Inc. 
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
  ******************************************************************************
   File Name      : div16.asm
   Module Name    : Library Support Routine
@@ -21,6 +25,8 @@
   Cycle Count    : 35 Cycles  (BF532, Cycle Accurate Simulator)
   Code Size      : 32 Bytes.
 ******************************************************************************/
+
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
 .file_attr libFunc       = __div16;
 /* Called by atan2_fr16 */
@@ -48,7 +54,9 @@
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __div16;
 
-.section program;
+#endif
+
+.text;
 .global  __div16;
 
 .align 2;
@@ -71,5 +79,5 @@ DIV_START:           DIVQ (R0, R1);          // DIVQ IS DONE FOR 15 TIMES
                    IF CC R0 = R1;            // NEGATE RESULT IF FLAG R2 SET
 
                    RTS;  
-.__div16.end:
+.size __div16, .-__div16
 

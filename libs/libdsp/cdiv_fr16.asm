@@ -1,8 +1,13 @@
 /************************************************************************
  *
- * cdiv_fr16.asm : $Revision: 1.9 $
+ * cdiv_fr16.asm
  *
- * (c) Copyright 2000-2004 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 2000-2004 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -23,6 +28,8 @@
   Code Size      : 94 Bytes.
 #endif
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = complex.h;
 .file_attr libFunc       = __cdiv_fr16;
 .file_attr libFunc       = cdiv_fr16;
@@ -31,7 +38,9 @@
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __cdiv_fr16;
 
-.section program;
+#endif
+
+.text;
 
 .global  __cdiv_fr16;
 
@@ -102,4 +111,4 @@ CDIV_ERR:
       R0 = R0 -|- R0;         // SET RESULT (0,0)
       RTS;
 
-     .__cdiv_fr16.end:
+     .size __cdiv_fr16, .-__cdiv_fr16

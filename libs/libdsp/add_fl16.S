@@ -2,8 +2,15 @@
 ** Float16 add.  Takes two non-IEEE-754 floating point numbers (16.16) and
 ** adds them.
 **
-** Copyright (C) 2005 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2005 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 */
+
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
 .file_attr libGroup      = float16.h;
 .file_attr libFunc       = _add_fl16;
@@ -13,6 +20,8 @@
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = _add_fl16;
 
+#endif
+
 #if defined(__ADSPBLACKFIN__) && !defined(__ADSPLPBLACKFIN__)
 /* __ADSPBF535__ core only */
 #define CARRY AC
@@ -20,7 +29,7 @@
 #define CARRY AC0
 #endif
 
-.section program;
+.text;
 .align 2;
 _add_fl16:
 	// Compare exponents
@@ -71,6 +80,6 @@ overflow:
 	R2 += 1;		// increase exponent
 	R0.L = R2.L >> 0;	// put changed exponent back
 	RTS;
-._add_fl16.end:
+.size _add_fl16, .-_add_fl16
 .global _add_fl16;
 .type _add_fl16, STT_FUNC;

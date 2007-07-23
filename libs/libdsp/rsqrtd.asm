@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2006 Analog Devices Inc.
-  All rights reserved
+  Copyright (C) 2006 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
 ******************************************************************************
   File Name      : rsqrtd.asm
   Include File   : math_bf.h
@@ -58,18 +62,24 @@
 #define  _OFFSET_TEMP      16            // .byte4 _Temp[3];
 #define  _OFFSET_EXPONENT  28            // .byte4 _Exponent;
 
-.section/DOUBLEANY constdata;
+.section .rodata;
 
 /* Const data */
 
 .align 2;
-.byte2 _Zero = 0;
+	.type	_Zero, @object
+	.size	_Zero, 2
+_Zero:
+	.short 0;
 
 .align 4;
-.byte4 _OnePtFive = 0x30000000;
+	.type	_OnePtFive, @object
+	.size	_OnePtFive, 4
+_OnePtFive:
+	.long 0x30000000;
 
 
-.section/DOUBLEANY program;
+.text;
 .global  __rsqrtd;
 
 .extern  ___SQRT_Mult64;
@@ -250,4 +260,4 @@ _ErrRsqrtd:
 
        rts;
 
-.__rsqrtd.end: 
+.size __rsqrtd, .-__rsqrtd

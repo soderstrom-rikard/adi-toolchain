@@ -1,5 +1,10 @@
 /*****************************************************************************
-Copyright(c) 2000-2004 Analog Devices Inc.
+Copyright (C) 2000-2004 Analog Devices, Inc.
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License. See the file COPYING.LIB for more details.
+
+Non-LGPL License is also available as part of VisualDSP++
+from Analog Devices, Inc.
 ******************************************************************************
   File Name      : crosscoh_fr16.asm
   Include File   : stats.h
@@ -25,6 +30,8 @@ Copyright(c) 2000-2004 Analog Devices Inc.
   Code size      : 198 bytes
 ******************************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = stats.h;
 .file_attr libFunc       = __crosscoh_fr16;
 .file_attr libFunc       = crosscoh_fr16;
@@ -33,7 +40,9 @@ Copyright(c) 2000-2004 Analog Devices Inc.
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __crosscoh_fr16;
 
-.section  program;
+#endif
+
+.text;
 
 .global   __crosscoh_fr16;
 .extern   __divfract32;
@@ -133,4 +142,4 @@ ERROR_RETURN:      SP += 12;               // NEED TO ADJUST SP =>
                                            // 2 MISSED READS FROM STACK
                    JUMP RET_RETURN;
 
-.__crosscoh_fr16.end:
+.size __crosscoh_fr16, .-__crosscoh_fr16

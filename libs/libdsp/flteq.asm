@@ -1,5 +1,10 @@
 /*
-** Copyright (C) 2005 Analog Devices, Inc. All Rights Reserved.
+** Copyright (C) 2005 Analog Devices, Inc.
+** This file is subject to the terms and conditions of the GNU Lesser
+** General Public License. See the file COPYING.LIB for more details.
+**
+** Non-LGPL License is also available as part of VisualDSP++
+** from Analog Devices, Inc.
 **
 ** This is the internal function implementing IEEE single-precision
 ** floating-point equality comparison. This functions is for compiler
@@ -16,6 +21,8 @@
 **         DefaultClobMinusPABIMandLoopRegs
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libdsp;
 .file_attr prefersMem    = internal;
@@ -23,7 +30,9 @@
 .file_attr libFunc = ___float32_adi_eq;
 .file_attr FuncName      = ___float32_adi_eq;
 
-.section program;
+#endif
+
+.text;
 .align 2;
 
 ___float32_adi_eq:
@@ -50,6 +59,6 @@ ___float32_adi_eq:
 .ret:
 	RTS;
 
-.___float32_adi_eq.end:
+.size ___float32_adi_eq, .-___float32_adi_eq
 .type ___float32_adi_eq, STT_FUNC;
 .global ___float32_adi_eq;

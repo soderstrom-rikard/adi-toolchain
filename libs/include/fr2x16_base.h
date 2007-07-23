@@ -7,7 +7,12 @@
  *
  * fr2x16_base.h
  *
- * (c) Copyright 2000-2006 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 2000-2006 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -56,7 +61,7 @@ fract16 sum_fr2x16(fract2x16 _x);
  * Input: two fract16 values
  * Returns: {_x,_y} */
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 static fract2x16 compose_fr2x16(fract16 _x, fract16 _y) {
 	return compose_2x16(_x,_y);
 }
@@ -67,7 +72,7 @@ static fract2x16 compose_fr2x16(fract16 _x, fract16 _y) {
  */
 
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 static fract16 high_of_fr2x16(fract2x16 _x) {
   return high_of_2x16(_x);
 }
@@ -78,7 +83,7 @@ static fract16 high_of_fr2x16(fract2x16 _x) {
  */
 
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 static fract16 low_of_fr2x16(fract2x16 _x) {
   return low_of_2x16(_x);
 }

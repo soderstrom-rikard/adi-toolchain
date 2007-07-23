@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2006 Analog Devices Inc.
-  All rights reserved
+  Copyright (C) 2006 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
  ******************************************************************************
 
   Implementation : FIR based decimation filter 
@@ -136,7 +140,7 @@
 #define   OFFSET_NUM_COEFFS   12
 #define   OFFSET_DECIMATION   16
 
-.section  program;
+.text;
 .global   __fir_decima_fr16;
 
 .align 2;
@@ -324,4 +328,4 @@ _fir_decima_end:
 
         RTS;
 
-.__fir_decima_fr16.end:
+.size __fir_decima_fr16, .-__fir_decima_fr16

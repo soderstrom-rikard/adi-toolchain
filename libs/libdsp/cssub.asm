@@ -1,6 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2000-2006 Analog Devices Inc.
-  All rights reserved
+  Copyright (C) 2000-2006 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
  ******************************************************************************
   File Name      : cssub.asm
   Module Name    : complex vector scalar subtraction
@@ -38,7 +42,7 @@
 .file_attr FuncName      = __cvecssub_fr16;
 #endif
 
-.section program;
+.text;
 .global __cvecssub_fr16;
 .align 2;
 
@@ -67,4 +71,4 @@ ST_CSSUB:  R3 = R2 -|- R1(S) || R2=[P0++] || [I0++] = R3;
 RET_ZERO:
         RTS;
 
-.__cvecssub_fr16.end:
+.size __cvecssub_fr16, .-__cvecssub_fr16

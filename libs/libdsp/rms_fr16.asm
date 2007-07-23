@@ -1,8 +1,13 @@
 /*****************************************************************************
  *
- * rms_fr16.asm : $Revision
+ * rms_fr16.asm
  *
- * (c) Copyright 2000-2006 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 2000-2006 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  *****************************************************************************/
 
@@ -104,7 +109,7 @@
 .GLOBAL  __rms_fr16;
 .TYPE    __rms_fr16,STT_FUNC;
 
-.SECTION/DOUBLEANY program;
+.text;
 .ALIGN 2;
 
 __rms_fr16:
@@ -228,4 +233,4 @@ __rms_fr16:
       R0 = 0x7FFF;
       JUMP .exit;
 
-.__rms_fr16.end:
+.size __rms_fr16, .-__rms_fr16

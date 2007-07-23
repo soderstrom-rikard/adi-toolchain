@@ -1,5 +1,10 @@
 /******************************************************************************
-  Copyright(c) 2000-2006 Analog Devices Inc.  All rights reserved
+  Copyright (C) 2000-2006 Analog Devices, Inc.
+  This file is subject to the terms and conditions of the GNU Lesser
+  General Public License. See the file COPYING.LIB for more details.
+
+  Non-LGPL License is also available as part of VisualDSP++
+  from Analog Devices, Inc.
 *******************************************************************************
   File Name      : zero_crossf.asm
   Include File   : stats.h
@@ -37,6 +42,8 @@
   Code size      : 76 Bytes 
 ******************************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = stats.h;
 .file_attr libFunc       = zero_crossf;
 .file_attr libFunc       = __zero_crossf;
@@ -46,7 +53,9 @@
 .file_attr prefersMemNum = "30";
 .file_attr FuncName      = __zero_crossf;
 
-.section  program;
+#endif
+
+.text;
 .global   __zero_crossf;
 
 .align 2;
@@ -90,5 +99,5 @@ END_LOOP: R1 = R2;              // Copy new sign to old sign
 RET_ZERO: 
    RTS;
 
-.__zero_crossf.end:
+.size __zero_crossf, .-__zero_crossf
 

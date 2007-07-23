@@ -1,5 +1,19 @@
 /***************************************************************************
-Copyright (c) 2000-2006 Analog Devices Inc. All rights reserved.	
+Copyright (C) 2000-2006 Analog Devices, Inc.
+This file is subject to the terms and conditions of the GNU General
+Public License. See the file COPYING for more details.
+
+In addition to the permissions in the GNU General Public License,
+Analog Devices gives you unlimited permission to link the
+compiled version of this file into combinations with other programs,
+and to distribute those combinations without any restriction coming
+from the use of this file.  (The General Public License restrictions
+do apply in other respects; for example, they cover modification of
+the file, and distribution when not linked into a combine
+executable.)
+
+Non-GPL License is also available as part of VisualDSP++
+from Analog Devices, Inc.
 
 ****************************************************************************
   File name :  fpmult.asm 
@@ -34,12 +48,16 @@ Copyright (c) 2000-2006 Analog Devices Inc. All rights reserved.
 
 **************************************************************/
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = floating_point_support;
 .file_attr libName = libdsp;
 .file_attr prefersMem    = internal;
 .file_attr prefersMemNum = "30";
-.file_attr libFunc = ___float32_mul;
-.file_attr FuncName      = ___float32_mul;
+.file_attr libFunc = ___mulsf3;
+.file_attr FuncName      = ___mulsf3;
+
+#endif
 
 #define  BIASEXP    127
 #define  MAXBIASEXP 254
@@ -50,12 +68,12 @@ Copyright (c) 2000-2006 Analog Devices Inc. All rights reserved.
 #define CARRYFLAG	AC0
 #endif
 
-.section  program;
+.text;
 .align 2;
 
-.global ___float32_mul;
-.type ___float32_mul, STT_FUNC;
-___float32_mul:
+.global ___mulsf3;
+.type ___mulsf3, STT_FUNC;
+___mulsf3:
 	R2 = R0^R1;				/* sign of the result of X * Y */   
 	P0 = R2;					/* Store sign  */
 	R2 = R0 << 1;			/* Remove the sign bit of X */
@@ -234,4 +252,4 @@ denorm:
 	(R7:4) = [SP++];		/* Pop registers R4-R7 */
 	RTS;
 
-.___float32_mul.end:
+.size ___mulsf3, .-___mulsf3

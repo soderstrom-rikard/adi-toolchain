@@ -1,5 +1,10 @@
 /*
- Copyright (C) 2003-2005 Analog Devices, Inc. All Rights Reserved.
+ Copyright (C) 2003-2005 Analog Devices, Inc.
+ This file is subject to the terms and conditions of the GNU Lesser
+ General Public License. See the file COPYING.LIB for more details.
+
+ Non-LGPL License is also available as part of VisualDSP++
+ from Analog Devices, Inc.
 
  Convert an unsigned long long to a float (i.e. I8 to R4)
 
@@ -12,6 +17,8 @@
            DefaultClobMinusPABIMandLoopRegs
 */
 
+#if !defined(__NO_LIBRARY_ATTRIBUTES__)
+
 .file_attr libGroup      = floating_point_support;
 .file_attr libGroup      = integer_support;
 .file_attr libName       = libdsp;
@@ -20,13 +27,15 @@
 .file_attr libFunc       = __unsigned_longlong64_to_float32;
 .file_attr FuncName      = __unsigned_longlong64_to_float32;
 
-.section program;
+#endif
+
+.text;
 
 .align 2;
 __unsigned_longlong64_to_float32:
    /* 
    ** If our long long is really an 32 bit integer, call the support routine
-   ** ___unsigned_int32_to_float32.
+   ** ___floatunsisf.
    */
    CC = R1 == 0;           // is this an I8 or I4?
    IF CC JUMP u4tor4;
@@ -123,12 +132,12 @@ u4tor4:
    /* The input value is a 32-bit unsigned value, zero-extended
    ** to a 64-bit value. So convert that to a real.
    */
-   JUMP.X ___unsigned_int32_to_float32;
+   JUMP.X ___floatunsisf;
 
-.__unsigned_longlong64_to_float32.end:
+.size __unsigned_longlong64_to_float32, .-__unsigned_longlong64_to_float32
 .global __unsigned_longlong64_to_float32;
 .global .__unsigned_longlong64_to_float32.end;
 .type __unsigned_longlong64_to_float32, STT_FUNC;
 
-.extern ___unsigned_int32_to_float32;
+.extern ___floatunsisf;
 

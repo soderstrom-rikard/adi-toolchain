@@ -6,7 +6,12 @@
  *
  * i2x16_base.h
  *
- * (c) Copyright 2000-2006 Analog Devices, Inc.  All rights reserved.
+ * Copyright (C) 2000-2006 Analog Devices, Inc.
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License. See the file COPYING.LIB for more details.
+ *
+ * Non-LGPL License is also available as part of VisualDSP++
+ * from Analog Devices, Inc.
  *
  ************************************************************************/
 
@@ -34,17 +39,17 @@ extern "C" {
  */
 
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 static int2x16 compose_i2x16(short _x, short _y) {
 	return compose_2x16(_x, _y);
 }
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 static short high_of_i2x16(int2x16 _x) {
 	return high_of_2x16(_x);
 }
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 static short low_of_i2x16(int2x16 _x) {
 	return low_of_2x16(_x);
 }
@@ -59,17 +64,17 @@ static short low_of_i2x16(int2x16 _x) {
 #if (defined(__ADSPBLACKFIN__) || defined(__ADSPTS__)) && !defined(__NO_BUILTIN)
 
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 static int2x16 add_i2x16(int2x16 _x, int2x16 _y) {
 	return __builtin_add_i2x16(_x, _y);
 }
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 static int2x16 sub_i2x16(int2x16 _x, int2x16 _y) {
 	return __builtin_sub_i2x16(_x, _y);
 }
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 static int2x16 mult_i2x16(int2x16 _x, int2x16 _y) {
 	return __builtin_mult_i2x16(_x, _y);
 }
@@ -88,14 +93,14 @@ int2x16 mult_i2x16(int2x16, int2x16);
 
 #ifdef __ADSPTS__
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 static int sum_i2x16(int2x16 _x) {
 	return __builtin_sum_i2x16(_x);
 }
 #else
 
 #pragma inline
-#pragma always_inline
+__attribute__ ((always_inline))
 static int sum_i2x16(int2x16 _x) {
 	return (int)high_of_i2x16(_x)+low_of_i2x16(_x);
 }

@@ -1,5 +1,10 @@
 /******************************************************************************
-Copyright(c) 2000-2006 Analog Devices Inc.
+Copyright (C) 2000-2006 Analog Devices, Inc.
+This file is subject to the terms and conditions of the GNU Lesser
+General Public License. See the file COPYING.LIB for more details.
+
+Non-LGPL License is also available as part of VisualDSP++
+from Analog Devices, Inc.
 *******************************************************************************
 File Name      : fir_fr16.asm
 Function Name  : __fir
@@ -65,7 +70,7 @@ Cycle Counts   : Even Taps, Even no. inputs:  64 + Ni/2*(3 + Nc)
 #define __WORKAROUND_BF532_ANOMALY38__
 #endif
 
-.section program;
+.text;
 .global    __fir_fr16;
 
 .align 2;
@@ -347,4 +352,4 @@ _fir_fr16_RET_END:
        (R7:4,P5:4)=[SP++];        //POP R7-R4,P5-P4 FROM STACK
        RTS;
 
-.__fir_fr16.end:
+.size __fir_fr16, .-__fir_fr16
