@@ -190,7 +190,7 @@ __rms_fr16:
                                  */
 
       R1 += 1;                      /* Round scaling reqd          */
-      BITCLR(R1,BITPOS(BIT0_MASK)); /*       to next even multiple */
+      BITCLR(R1,0); /*       to next even multiple */
 
    /* Check for overflow
    **

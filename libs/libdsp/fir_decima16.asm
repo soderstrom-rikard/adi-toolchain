@@ -221,7 +221,7 @@ _fir_decima_div:
 
 #if defined(__WORKAROUND_BF532_ANOMALY_050000245)
         NOP;
-#endif;
+#endif
 
 
         /* Loop for num outputs - 1 */

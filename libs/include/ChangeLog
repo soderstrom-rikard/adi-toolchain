@@ -1,0 +1,3 @@
+2007-07-23  Jie Zhang  <jie.zhang@analog.com>
+
+	* yvals.h: Don't check __EDG_VERSION__.

@@ -120,11 +120,11 @@ __sqrt_fr16:
        CC = R0 <= 0;                   // Check for <= 0 
        IF CC JUMP .done;               // Return 0 for x <= 0 
 
-       P1.L = LO(.sqrtcoef0);          // Pointer to coefficients 0
-       P1.H = HI(.sqrtcoef0);
+       P1.L = .sqrtcoef0;          // Pointer to coefficients 0
+       P1.H = .sqrtcoef0;
 
-       P2 = .sqrtcoef1 - .sqrtcoef0;
-       P2 = P2 + P1;                   // Pointer to coefficients 1
+       P2.L = .sqrtcoef1;          // Pointer to coefficients 1
+       P2.H = .sqrtcoef1;
 
        R3.L = SIGNBITS R0.L;           // Signbits(x) - 1
        R2.L = R3.L >> 1;

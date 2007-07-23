@@ -200,8 +200,10 @@ Standard C++ with export -- include/export include
    typedef long unsigned int _Sizet;
 #endif
 
+#if 0
 #ifndef __EDG_VERSION__
 #  error __EDG_VERSION__ not defined??
+#endif
 #endif
 
 #if 0

@@ -62,7 +62,7 @@ complex_fract16 _polar_fr16(fract16 mag, fract16 phase )
    //    a.real = mag * cos(0) = mag
    //    a.imag = mag * sin(0) = 0
    //
-   if( (phase == 0x0) || (phase == 0x8000) )
+   if( (phase == 0x0) || (phase == 0xffff8000) )
    {
      result.re = mag;
      result.im = 0x0;

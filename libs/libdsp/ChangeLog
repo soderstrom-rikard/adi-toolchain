@@ -1,0 +1,8 @@
+2007-07-23  Jie Zhang  <jie.zhang@analog.com>
+
+	* fir_decima16.asm: Remove trailing ; of #endif.
+	* polar16.c (_polar_fr16): The least short is 0xffff8000
+	instead of 0x8000.
+	* sqrt_fr16.asm: Don't use HI and LO.
+	* rms_fr16.asm: Replace BITPOS(BIT0_MASK) with 0.
+
