@@ -1,0 +1,3 @@
+2007-07-24  Jie Zhang  <jie.zhang@analog.com>
+
+	* Makefile: Only install complex.h when libc doesn't have it.

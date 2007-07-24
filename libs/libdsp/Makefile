@@ -136,6 +136,7 @@ LIBBFDSP_CSRCS = \
 	autocorr.c \
 	autocorrd.c \
 	cadd16.c \
+	caddd.c \
 	cartesian16.c \
 	cartesian.c \
 	cartesiand.c \
@@ -145,6 +146,7 @@ LIBBFDSP_CSRCS = \
 	cmatmmlt.c \
 	cmatmmltd.c \
 	cmlt16.c \
+	cmltd.c \
 	coeff_iirdf1_fr16.c \
 	conj16.c \
 	copysignd.c \
@@ -261,9 +263,18 @@ LIBBFFASTFP_ASRCS = \
 	u32tof64.asm \
 	u64tof64.asm
 
-LIBDSP_OBJS = $(LIBDSP_ASRCS:%.asm=%.o) $(LIBDSP_SSRCS:%.S=%.o) $(LIBDSP_CSRCS:%.c=%.o)
-LIBF64IEEE_OBJS = $(LIBF64IEEE_ASRCS:%.asm=%.o)
-LIB64FAST_OBJS = $(LIB64FAST_ASRCS:%.asm=%.o) $(LIB64FAST_SSRCS:%.S=%.o)
+LIBC_CMATH_CSRCS = \
+	arg.c \
+	argd.c \
+	cabs.c \
+	cabsd.c \
+	cexp.c \
+	cexpd.c \
+	conjd.c
+
+ifneq ($(LIBC_HAS_NO_CMATH),)
+LIBBFDSP_CSRCS += $(LIBC_CMATH_CSRCS)
+endif
 
 LIBBFDSP_OBJS = $(LIBBFDSP_ASRCS:%.asm=%.o) $(LIBBFDSP_SSRCS:%.S=%.o) $(LIBBFDSP_CSRCS:%.c=%.o)
 LIBBFFASTFP_OBJS = $(LIBBFFASTFP_ASRCS:%.asm=%.o)
@@ -274,20 +285,24 @@ CFLAGS = $(MULTILIB_FLAGS) -O2 -D__NO_LIBRARY_ATTRIBUTES__ -I../include -fno-bui
 
 all: $(LIBS)
 
-libbfdsp.a: $(LIBBFDSP_OBJS)
-	$(AR) $(ARFLAGS) $@ $^
+libbfdsp.a: libbfdsp.a($(LIBBFDSP_OBJS))
 
-libbffastfp.a: $(LIBBFFASTFP_OBJS)
-	$(AR) $(ARFLAGS) $@ $^
+libbffastfp.a: libbffastfp.a($(LIBBFFASTFP_OBJS))
 
-%.o: %.asm
-	$(CC) $(CFLAGS) -x assembler-with-cpp -c $< -o $@
+(%.o): %.asm
+	$(CC) $(CFLAGS) -x assembler-with-cpp -c $< -o $*.o
+	$(AR) r $@ $*.o
+	rm $*.o
 
-%.o: %.S
-	$(CC) $(CFLAGS) -c $< -o $@
+(%.o): %.S
+	$(CC) $(CFLAGS) -c $< -o $*.o
+	$(AR) r $@ $*.o
+	rm $*.o
 
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+(%.o): %.c
+	$(CC) $(CFLAGS) -c $< -o $*.o
+	$(AR) r $@ $*.o
+	rm $*.o
 
 install: $(addprefix $(inst_libdir)/, $(LIBS))
 

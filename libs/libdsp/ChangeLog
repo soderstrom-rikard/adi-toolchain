@@ -1,3 +1,9 @@
+2007-07-24  Jie Zhang  <jie.zhang@analog.com>
+
+	* Makefile: Only build and archive complex fuctions when
+	libc doesn't have them.
+	Fix the rules for updating archive members.
+
 2007-07-23  Jie Zhang  <jie.zhang@analog.com>
 
 	* fir_decima16.asm: Remove trailing ; of #endif.
