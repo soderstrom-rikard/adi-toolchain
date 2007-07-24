@@ -14,13 +14,6 @@
  * they apply.
  */
 
-/*******************************************************************************
-**
-** This include file contains a list of macro "defines" to enable the programmer
-** to use symbolic names for the ADSP-BF522 peripherals.
-**  
-*******************************************************************************/
-
 #ifndef _CDEF_BF522_H
 #define _CDEF_BF522_H
 
@@ -30,10 +23,9 @@
 /* include core specific register pointer definitions */
 #include <cdef_LPBlackfin.h>
 
-#if 0
-/* Not yet available - awaiting input on register definitions for this part */
-/* include header that was auto-generated from the ArchDef XML for the ADSP-BF522 */
-#include <sys/XML_cdefBF522.h>
-#endif
+/* SYSTEM & MMR ADDRESS DEFINITIONS FOR ADSP-BF522 */
+
+/* include cdefBF52x_base.h for the set of #defines that are common to all ADSP-BF52x processors */
+#include <cdefBF52x_base.h>
 
 #endif /* _CDEF_BF522_H */

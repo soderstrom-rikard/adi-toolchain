@@ -1,3 +1,49 @@
+2007-07-24  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/include/defBF52x_base.h: New file.
+	* bfin/include/defBF54x_base.h: New file.
+	* bfin/include/cdefBF52x_base.h: New file.
+	* bfin/include/cdefBF54x_base.h: New file.
+	* bfin/include/sys/mc_typedef.h: New file.
+	* bfin/include/cdefBF522.h: Update to VDSP5.0-0705161.
+	* bfin/include/cdefBF525.h: Likewise.
+	* bfin/include/cdefBF527.h: Likewise.
+	* bfin/include/cdefBF532.h: Likewise.
+	* bfin/include/cdefBF534.h: Likewise.
+	* bfin/include/cdefBF539.h: Likewise.
+	* bfin/include/cdefBF541.h: Likewise.
+	* bfin/include/cdefBF542.h: Likewise.
+	* bfin/include/cdefBF544.h: Likewise.
+	* bfin/include/cdefBF548.h: Likewise.
+	* bfin/include/cdefBF549.h: Likewise.
+	* bfin/include/cdefBF561.h: Likewise.
+	* bfin/include/defBF522.h: Likewise.
+	* bfin/include/defBF525.h: Likewise.
+	* bfin/include/defBF527.h: Likewise.
+	* bfin/include/defBF532.h: Likewise.
+	* bfin/include/defBF534.h: Likewise.
+	* bfin/include/defBF537.h: Likewise.
+	* bfin/include/defBF538.h: Likewise.
+	* bfin/include/defBF539.h: Likewise.
+	* bfin/include/defBF541.h: Likewise.
+	* bfin/include/defBF542.h: Likewise.
+	* bfin/include/defBF544.h: Likewise.
+	* bfin/include/defBF548.h: Likewise.
+	* bfin/include/defBF549.h: Likewise.
+	* bfin/include/defBF561.h: Likewise.
+	* bfin/include/defblackfin.h: Likewise.
+	* bfin/include/def_LPBlackfin.h: Likewise.
+	* bfin/include/cplbtab.h: Likewise.
+	* bfin/include/sysreg.h: Likewise.
+	* bfin/include/sys/exception.h: Likewise.
+	* bfin/include/sys/_adi_platform.h: Likewise.
+	* bfin/include/sys/anomaly_macros_rtl.h: Likewise.
+	* bfin/include/sys/pll.h: Likewise.
+	* bfin/include/sys/major.h: Remove.
+	* bfin/include/sys/regs.h: Remove.
+	* bfin/include/cdefBF566.h: Remove.
+	* bfin/include/defBF566.h: Remove.
+
 2007-06-22  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/bf531.ld: Don't include bfin-common-sc.ld.

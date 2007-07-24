@@ -158,7 +158,7 @@
 **     BF561 - 0.0-0.3 (fixed 0.4) 
 */
 #if defined(__ADI_LIB_BUILD__)
-#  define __BUILDBF53123 1 // building one single library for BF531/2/3
+#  define __BUILDBF53123 1 /* building one single library for BF531/2/3 */
 #else
 #  define __BUILDBF53123 0 
 #endif
@@ -179,17 +179,17 @@
       defined(__ADSPBF533__) || defined(__ADSPBF561__)) && \
      (defined(__SILICON_REVISION__) && \
       (__SILICON_REVISION__ == 0xffff || __SILICON_REVISION__ == 0x3)))
-// check at RT for 0.4 revs when doing 204 workaround
+/* check at RT for 0.4 revs when doing 204 workaround */
 #  define WA_05000204_CHECK_AVOID_FOR_REV <=3
 #elif ((defined(__ADSPBF534__) || defined(__ADSPBF536__) || \
         defined(__ADSPBF537__) || defined(__ADSPBF538__) || \
         defined(__ADSPBF539__)) && \
      (defined(__SILICON_REVISION__) && \
       (__SILICON_REVISION__ == 0xffff || __SILICON_REVISION__ == 0x0)))
-// check at RT for 0.4 revs when doing 204 workaround
+/* check at RT for 0.4 revs when doing 204 workaround */
 #  define WA_05000204_CHECK_AVOID_FOR_REV <1
 #else
-// do not check at RT for 0.4 revs when doing 204 workaround
+/* do not check at RT for 0.4 revs when doing 204 workaround */
 #endif
 
 /* 05-00-0258 - "Instruction Cache is corrupted when bit 9 and 12 of
@@ -205,7 +205,6 @@
  * BF531/2/3 - 0.0-0.4 (fixed 0.5)
  * BF534/6/7/8/9 - 0.0-0.2 (fixed 0.3)
  * BF561 - 0.0-0.4 (fixed 0.5)
- * BF566 - 0.0 (fixed 0.1)
  * BF535/AD6532/AD6900 - all revs
  */
 
@@ -261,7 +260,6 @@
  * BF531/2/3 - rev 0.0-0.4 (fixed 0.5)
  * BF534/6/7/8/9 - rev 0.0-0.2 (fixed 0.3)
  * BF561 - rev 0.0-0.4 (fixed 0.5)
- * BF566 - rev 0.0-0.1 (fixed 0.1)
  *
  */
 
@@ -302,4 +300,23 @@
 	  defined(__ADSPBF533__) || defined(__ADSPBF538__) || \
 	  defined(__ADSPBF539__)))
   
+/* 05-00-0283 - "A system MMR write is stalled indefinitely when killed in a
+ * particular stage".
+ *
+ * Where an interrupt occurs killing a stalled system MMR write, and the ISR
+ * executes an SSYNC, execution execution may stall indefinitely".
+ *
+ * The workaround is to execute a mispredicted jump over a dummy MMR read,
+ * thus killing the read. Also to avoid a system MMR write in two slots
+ * after a not predicted conditional jump.
+ *
+ * This problem impacts:
+ * BF531/2/3 - all revs
+ * BF534/6/7/8/9 - all revs
+ * BF561/6 - all revs
+ */
+
+#define WA_05000283 \
+ defined(__ADSPLPBLACKFIN__) && defined(__SILICON_REVISION__)
+
 

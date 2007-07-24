@@ -23,7 +23,8 @@
 /* include core specific register pointer definitions */
 #include <cdef_LPBlackfin.h>
 
-/* include header that was auto-generated from the ArchDef XML for the ADSP-BF541 */
-#include <sys/XML_cdefBF541.h>
+/** ADSP-BF541 is a non-existent processor -- no additional #defines **/
+
+#define                           pCHIPID ((volatile unsigned long *)CHIPID)
 
 #endif /* _CDEF_BF541_H */

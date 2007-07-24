@@ -1,5 +1,5 @@
 /*
- * cdefBF534.h
+ * cdefBF52x_base.h
  *
  * Copyright (C) 2007 Analog Devices, Inc.
  *
@@ -14,14 +14,12 @@
  * they apply.
  */
 
-#ifndef _CDEF_BF534_H
-#define _CDEF_BF534_H
+#ifndef _CDEF_BF52X_H
+#define _CDEF_BF52X_H
 
-/* Include all Core registers and bit definitions 									*/
-#include <defBF534.h>
+#include <defBF52x_base.h>
 
-/* Include core specific register pointer definitions 								*/
-#include <cdef_LPBlackfin.h>
+/* ==== begin from cdefBF534.h ==== */
 
 #ifndef _PTR_TO_VOL_VOID_PTR
 #ifndef _USE_LEGACY_CDEF_BEHAVIOUR
@@ -44,15 +42,34 @@
 /* System Interrupt Controller (0xFFC00100 - 0xFFC001FF)							*/
 #define pSWRST 			((volatile unsigned short *)SWRST)
 #define pSYSCR 			((volatile unsigned short *)SYSCR)
+
 #define	pSIC_RVECT		(_PTR_TO_VOL_VOID_PTR SIC_RVECT)
-#define pSIC_IMASK 		((volatile unsigned long  *)SIC_IMASK)
+#define pSIC_IMASK0 		((volatile unsigned long  *)SIC_IMASK0)
+/* legacy register name (below) provided for backwards code compatibility */
+#define pSIC_IMASK 		((volatile unsigned long  *)SIC_IMASK0)
+
 #define pSIC_IAR0 		((volatile unsigned long  *)SIC_IAR0)
 #define pSIC_IAR1 		((volatile unsigned long  *)SIC_IAR1)
 #define pSIC_IAR2 		((volatile unsigned long  *)SIC_IAR2)
 #define pSIC_IAR3 		((volatile unsigned long  *)SIC_IAR3)
-#define pSIC_ISR 		((volatile unsigned long  *)SIC_ISR)
-#define pSIC_IWR 		((volatile unsigned long  *)SIC_IWR)
 
+#define pSIC_ISR0 		((volatile unsigned long  *)SIC_ISR0)
+/* legacy register name (below) provided for backwards code compatibility */
+#define pSIC_ISR 		((volatile unsigned long  *)SIC_ISR0)
+
+#define pSIC_IWR0 		((volatile unsigned long  *)SIC_IWR0)
+/* legacy register name (below) provided for backwards code compatibility */
+#define pSIC_IWR 		((volatile unsigned long  *)SIC_IWR0)
+
+/* SIC Additions to ADSP-BF52x (0xFFC0014C - 0xFFC00162) */
+
+#define pSIC_IMASK1             ((volatile unsigned long  *)SIC_IMASK1)
+#define pSIC_IAR4               ((volatile unsigned long  *)SIC_IAR4)
+#define pSIC_IAR5               ((volatile unsigned long  *)SIC_IAR5)
+#define pSIC_IAR6               ((volatile unsigned long  *)SIC_IAR6)
+#define pSIC_IAR7               ((volatile unsigned long  *)SIC_IAR7)
+#define pSIC_ISR1               ((volatile unsigned long  *)SIC_ISR1)
+#define pSIC_IWR1               ((volatile unsigned long  *)SIC_IWR1)
 
 /* Watchdog Timer		(0xFFC00200 - 0xFFC002FF)									*/
 #define pWDOG_CTL 		((volatile unsigned short *)WDOG_CTL)
@@ -544,426 +561,7 @@
 #define pUART1_SCR 		((volatile unsigned short *)UART1_SCR)
 #define pUART1_GCTL 		((volatile unsigned short *)UART1_GCTL)
 
-
-/* CAN Controller		(0xFFC02A00 - 0xFFC02FFF)								*/
-/* For Mailboxes 0-15 */
-#define pCAN_MC1		((volatile unsigned short *)CAN_MC1)
-#define pCAN_MD1		((volatile unsigned short *)CAN_MD1)
-#define pCAN_TRS1		((volatile unsigned short *)CAN_TRS1)
-#define pCAN_TRR1		((volatile unsigned short *)CAN_TRR1)
-#define pCAN_TA1		((volatile unsigned short *)CAN_TA1)
-#define pCAN_AA1		((volatile unsigned short *)CAN_AA1)
-#define pCAN_RMP1		((volatile unsigned short *)CAN_RMP1)
-#define pCAN_RML1		((volatile unsigned short *)CAN_RML1)
-#define pCAN_MBTIF1		((volatile unsigned short *)CAN_MBTIF1)
-#define pCAN_MBRIF1		((volatile unsigned short *)CAN_MBRIF1)
-#define pCAN_MBIM1		((volatile unsigned short *)CAN_MBIM1)
-#define pCAN_RFH1		((volatile unsigned short *)CAN_RFH1)
-#define pCAN_OPSS1		((volatile unsigned short *)CAN_OPSS1)
-
-/* For Mailboxes 16-31 */
-#define pCAN_MC2		((volatile unsigned short *)CAN_MC2)
-#define pCAN_MD2		((volatile unsigned short *)CAN_MD2)
-#define pCAN_TRS2		((volatile unsigned short *)CAN_TRS2)
-#define pCAN_TRR2		((volatile unsigned short *)CAN_TRR2)
-#define pCAN_TA2		((volatile unsigned short *)CAN_TA2)
-#define pCAN_AA2		((volatile unsigned short *)CAN_AA2)
-#define pCAN_RMP2		((volatile unsigned short *)CAN_RMP2)
-#define pCAN_RML2		((volatile unsigned short *)CAN_RML2)
-#define pCAN_MBTIF2		((volatile unsigned short *)CAN_MBTIF2)
-#define pCAN_MBRIF2		((volatile unsigned short *)CAN_MBRIF2)
-#define pCAN_MBIM2		((volatile unsigned short *)CAN_MBIM2)
-#define pCAN_RFH2		((volatile unsigned short *)CAN_RFH2)
-#define pCAN_OPSS2		((volatile unsigned short *)CAN_OPSS2)
-
-#define pCAN_CLOCK		((volatile unsigned short *)CAN_CLOCK)
-#define pCAN_TIMING		((volatile unsigned short *)CAN_TIMING)
-#define pCAN_DEBUG		((volatile unsigned short *)CAN_DEBUG)
-#define pCAN_STATUS		((volatile unsigned short *)CAN_STATUS)
-#define pCAN_CEC		((volatile unsigned short *)CAN_CEC)
-#define pCAN_GIS		((volatile unsigned short *)CAN_GIS)
-#define pCAN_GIM		((volatile unsigned short *)CAN_GIM)
-#define pCAN_GIF		((volatile unsigned short *)CAN_GIF)
-#define pCAN_CONTROL		((volatile unsigned short *)CAN_CONTROL)
-#define pCAN_INTR		((volatile unsigned short *)CAN_INTR)
-#define pCAN_MBTD		((volatile unsigned short *)CAN_MBTD)
-#define pCAN_EWR		((volatile unsigned short *)CAN_EWR)
-#define pCAN_ESR		((volatile unsigned short *)CAN_ESR)
-#define pCAN_UCREG		((volatile unsigned short *)CAN_UCREG)
-#define pCAN_UCCNT		((volatile unsigned short *)CAN_UCCNT)
-#define pCAN_UCRC		((volatile unsigned short *)CAN_UCRC)
-#define pCAN_UCCNF		((volatile unsigned short *)CAN_UCCNF)
-
-/* Mailbox Acceptance Masks */
-#define pCAN_AM00L		((volatile unsigned short *)CAN_AM00L)
-#define pCAN_AM00H		((volatile unsigned short *)CAN_AM00H)
-#define pCAN_AM01L		((volatile unsigned short *)CAN_AM01L)
-#define pCAN_AM01H		((volatile unsigned short *)CAN_AM01H)
-#define pCAN_AM02L		((volatile unsigned short *)CAN_AM02L)
-#define pCAN_AM02H		((volatile unsigned short *)CAN_AM02H)
-#define pCAN_AM03L		((volatile unsigned short *)CAN_AM03L)
-#define pCAN_AM03H		((volatile unsigned short *)CAN_AM03H)
-#define pCAN_AM04L		((volatile unsigned short *)CAN_AM04L)
-#define pCAN_AM04H		((volatile unsigned short *)CAN_AM04H)
-#define pCAN_AM05L		((volatile unsigned short *)CAN_AM05L)
-#define pCAN_AM05H		((volatile unsigned short *)CAN_AM05H)
-#define pCAN_AM06L		((volatile unsigned short *)CAN_AM06L)
-#define pCAN_AM06H		((volatile unsigned short *)CAN_AM06H)
-#define pCAN_AM07L		((volatile unsigned short *)CAN_AM07L)
-#define pCAN_AM07H		((volatile unsigned short *)CAN_AM07H)
-#define pCAN_AM08L		((volatile unsigned short *)CAN_AM08L)
-#define pCAN_AM08H		((volatile unsigned short *)CAN_AM08H)
-#define pCAN_AM09L		((volatile unsigned short *)CAN_AM09L)
-#define pCAN_AM09H		((volatile unsigned short *)CAN_AM09H)
-#define pCAN_AM10L		((volatile unsigned short *)CAN_AM10L)
-#define pCAN_AM10H		((volatile unsigned short *)CAN_AM10H)
-#define pCAN_AM11L		((volatile unsigned short *)CAN_AM11L)
-#define pCAN_AM11H		((volatile unsigned short *)CAN_AM11H)
-#define pCAN_AM12L		((volatile unsigned short *)CAN_AM12L)
-#define pCAN_AM12H		((volatile unsigned short *)CAN_AM12H)
-#define pCAN_AM13L		((volatile unsigned short *)CAN_AM13L)
-#define pCAN_AM13H		((volatile unsigned short *)CAN_AM13H)
-#define pCAN_AM14L		((volatile unsigned short *)CAN_AM14L)
-#define pCAN_AM14H		((volatile unsigned short *)CAN_AM14H)
-#define pCAN_AM15L		((volatile unsigned short *)CAN_AM15L)
-#define pCAN_AM15H		((volatile unsigned short *)CAN_AM15H)
-
-#define pCAN_AM16L		((volatile unsigned short *)CAN_AM16L)
-#define pCAN_AM16H		((volatile unsigned short *)CAN_AM16H)
-#define pCAN_AM17L		((volatile unsigned short *)CAN_AM17L)
-#define pCAN_AM17H		((volatile unsigned short *)CAN_AM17H)
-#define pCAN_AM18L		((volatile unsigned short *)CAN_AM18L)
-#define pCAN_AM18H		((volatile unsigned short *)CAN_AM18H)
-#define pCAN_AM19L		((volatile unsigned short *)CAN_AM19L)
-#define pCAN_AM19H		((volatile unsigned short *)CAN_AM19H)
-#define pCAN_AM20L		((volatile unsigned short *)CAN_AM20L)
-#define pCAN_AM20H		((volatile unsigned short *)CAN_AM20H)
-#define pCAN_AM21L		((volatile unsigned short *)CAN_AM21L)
-#define pCAN_AM21H		((volatile unsigned short *)CAN_AM21H)
-#define pCAN_AM22L		((volatile unsigned short *)CAN_AM22L)
-#define pCAN_AM22H		((volatile unsigned short *)CAN_AM22H)
-#define pCAN_AM23L		((volatile unsigned short *)CAN_AM23L)
-#define pCAN_AM23H		((volatile unsigned short *)CAN_AM23H)
-#define pCAN_AM24L		((volatile unsigned short *)CAN_AM24L)
-#define pCAN_AM24H		((volatile unsigned short *)CAN_AM24H)
-#define pCAN_AM25L		((volatile unsigned short *)CAN_AM25L)
-#define pCAN_AM25H		((volatile unsigned short *)CAN_AM25H)
-#define pCAN_AM26L		((volatile unsigned short *)CAN_AM26L)
-#define pCAN_AM26H		((volatile unsigned short *)CAN_AM26H)
-#define pCAN_AM27L		((volatile unsigned short *)CAN_AM27L)
-#define pCAN_AM27H		((volatile unsigned short *)CAN_AM27H)
-#define pCAN_AM28L		((volatile unsigned short *)CAN_AM28L)
-#define pCAN_AM28H		((volatile unsigned short *)CAN_AM28H)
-#define pCAN_AM29L		((volatile unsigned short *)CAN_AM29L)
-#define pCAN_AM29H		((volatile unsigned short *)CAN_AM29H)
-#define pCAN_AM30L		((volatile unsigned short *)CAN_AM30L)
-#define pCAN_AM30H		((volatile unsigned short *)CAN_AM30H)
-#define pCAN_AM31L		((volatile unsigned short *)CAN_AM31L)
-#define pCAN_AM31H		((volatile unsigned short *)CAN_AM31H)
-
-/* CAN Acceptance Mask Area Macros	*/
-#define pCAN_AM_L(x)		((volatile unsigned short *)CAN_AM_L(x))
-#define pCAN_AM_H(x)		((volatile unsigned short *)CAN_AM_H(x))
-
-/* Mailbox Registers */
-#define pCAN_MB00_ID1		((volatile unsigned short *)CAN_MB00_ID1)
-#define pCAN_MB00_ID0		((volatile unsigned short *)CAN_MB00_ID0)
-#define pCAN_MB00_TIMESTAMP	((volatile unsigned short *)CAN_MB00_TIMESTAMP)
-#define pCAN_MB00_LENGTH	((volatile unsigned short *)CAN_MB00_LENGTH)
-#define pCAN_MB00_DATA3		((volatile unsigned short *)CAN_MB00_DATA3)
-#define pCAN_MB00_DATA2		((volatile unsigned short *)CAN_MB00_DATA2)
-#define pCAN_MB00_DATA1		((volatile unsigned short *)CAN_MB00_DATA1)
-#define pCAN_MB00_DATA0		((volatile unsigned short *)CAN_MB00_DATA0)
-
-#define pCAN_MB01_ID1		((volatile unsigned short *)CAN_MB01_ID1)
-#define pCAN_MB01_ID0		((volatile unsigned short *)CAN_MB01_ID0)
-#define pCAN_MB01_TIMESTAMP	((volatile unsigned short *)CAN_MB01_TIMESTAMP)
-#define pCAN_MB01_LENGTH	((volatile unsigned short *)CAN_MB01_LENGTH)
-#define pCAN_MB01_DATA3		((volatile unsigned short *)CAN_MB01_DATA3)
-#define pCAN_MB01_DATA2		((volatile unsigned short *)CAN_MB01_DATA2)
-#define pCAN_MB01_DATA1		((volatile unsigned short *)CAN_MB01_DATA1)
-#define pCAN_MB01_DATA0		((volatile unsigned short *)CAN_MB01_DATA0)
-
-#define pCAN_MB02_ID1		((volatile unsigned short *)CAN_MB02_ID1)
-#define pCAN_MB02_ID0		((volatile unsigned short *)CAN_MB02_ID0)
-#define pCAN_MB02_TIMESTAMP	((volatile unsigned short *)CAN_MB02_TIMESTAMP)
-#define pCAN_MB02_LENGTH	((volatile unsigned short *)CAN_MB02_LENGTH)
-#define pCAN_MB02_DATA3		((volatile unsigned short *)CAN_MB02_DATA3)
-#define pCAN_MB02_DATA2		((volatile unsigned short *)CAN_MB02_DATA2)
-#define pCAN_MB02_DATA1		((volatile unsigned short *)CAN_MB02_DATA1)
-#define pCAN_MB02_DATA0		((volatile unsigned short *)CAN_MB02_DATA0)
-
-#define pCAN_MB03_ID1		((volatile unsigned short *)CAN_MB03_ID1)
-#define pCAN_MB03_ID0		((volatile unsigned short *)CAN_MB03_ID0)
-#define pCAN_MB03_TIMESTAMP	((volatile unsigned short *)CAN_MB03_TIMESTAMP)
-#define pCAN_MB03_LENGTH	((volatile unsigned short *)CAN_MB03_LENGTH)
-#define pCAN_MB03_DATA3		((volatile unsigned short *)CAN_MB03_DATA3)
-#define pCAN_MB03_DATA2		((volatile unsigned short *)CAN_MB03_DATA2)
-#define pCAN_MB03_DATA1		((volatile unsigned short *)CAN_MB03_DATA1)
-#define pCAN_MB03_DATA0		((volatile unsigned short *)CAN_MB03_DATA0)
-
-#define pCAN_MB04_ID1		((volatile unsigned short *)CAN_MB04_ID1)
-#define pCAN_MB04_ID0		((volatile unsigned short *)CAN_MB04_ID0)
-#define pCAN_MB04_TIMESTAMP	((volatile unsigned short *)CAN_MB04_TIMESTAMP)
-#define pCAN_MB04_LENGTH	((volatile unsigned short *)CAN_MB04_LENGTH)
-#define pCAN_MB04_DATA3		((volatile unsigned short *)CAN_MB04_DATA3)
-#define pCAN_MB04_DATA2		((volatile unsigned short *)CAN_MB04_DATA2)
-#define pCAN_MB04_DATA1		((volatile unsigned short *)CAN_MB04_DATA1)
-#define pCAN_MB04_DATA0		((volatile unsigned short *)CAN_MB04_DATA0)
-
-#define pCAN_MB05_ID1		((volatile unsigned short *)CAN_MB05_ID1)
-#define pCAN_MB05_ID0		((volatile unsigned short *)CAN_MB05_ID0)
-#define pCAN_MB05_TIMESTAMP	((volatile unsigned short *)CAN_MB05_TIMESTAMP)
-#define pCAN_MB05_LENGTH	((volatile unsigned short *)CAN_MB05_LENGTH)
-#define pCAN_MB05_DATA3		((volatile unsigned short *)CAN_MB05_DATA3)
-#define pCAN_MB05_DATA2		((volatile unsigned short *)CAN_MB05_DATA2)
-#define pCAN_MB05_DATA1		((volatile unsigned short *)CAN_MB05_DATA1)
-#define pCAN_MB05_DATA0		((volatile unsigned short *)CAN_MB05_DATA0)
-
-#define pCAN_MB06_ID1		((volatile unsigned short *)CAN_MB06_ID1)
-#define pCAN_MB06_ID0		((volatile unsigned short *)CAN_MB06_ID0)
-#define pCAN_MB06_TIMESTAMP	((volatile unsigned short *)CAN_MB06_TIMESTAMP)
-#define pCAN_MB06_LENGTH	((volatile unsigned short *)CAN_MB06_LENGTH)
-#define pCAN_MB06_DATA3		((volatile unsigned short *)CAN_MB06_DATA3)
-#define pCAN_MB06_DATA2		((volatile unsigned short *)CAN_MB06_DATA2)
-#define pCAN_MB06_DATA1		((volatile unsigned short *)CAN_MB06_DATA1)
-#define pCAN_MB06_DATA0		((volatile unsigned short *)CAN_MB06_DATA0)
-
-#define pCAN_MB07_ID1		((volatile unsigned short *)CAN_MB07_ID1)
-#define pCAN_MB07_ID0		((volatile unsigned short *)CAN_MB07_ID0)
-#define pCAN_MB07_TIMESTAMP	((volatile unsigned short *)CAN_MB07_TIMESTAMP)
-#define pCAN_MB07_LENGTH	((volatile unsigned short *)CAN_MB07_LENGTH)
-#define pCAN_MB07_DATA3		((volatile unsigned short *)CAN_MB07_DATA3) 
-#define pCAN_MB07_DATA2		((volatile unsigned short *)CAN_MB07_DATA2)
-#define pCAN_MB07_DATA1		((volatile unsigned short *)CAN_MB07_DATA1)
-#define pCAN_MB07_DATA0		((volatile unsigned short *)CAN_MB07_DATA0)
-
-#define pCAN_MB08_ID1		((volatile unsigned short *)CAN_MB08_ID1)		
-#define pCAN_MB08_ID0		((volatile unsigned short *)CAN_MB08_ID0)		
-#define pCAN_MB08_TIMESTAMP	((volatile unsigned short *)CAN_MB08_TIMESTAMP)	
-#define pCAN_MB08_LENGTH	((volatile unsigned short *)CAN_MB08_LENGTH)	
-#define pCAN_MB08_DATA3		((volatile unsigned short *)CAN_MB08_DATA3)	
-#define pCAN_MB08_DATA2		((volatile unsigned short *)CAN_MB08_DATA2)	
-#define pCAN_MB08_DATA1		((volatile unsigned short *)CAN_MB08_DATA1)	
-#define pCAN_MB08_DATA0		((volatile unsigned short *)CAN_MB08_DATA0)	
-
-#define pCAN_MB09_ID1		((volatile unsigned short *)CAN_MB09_ID1)	
-#define pCAN_MB09_ID0		((volatile unsigned short *)CAN_MB09_ID0)	
-#define pCAN_MB09_TIMESTAMP	((volatile unsigned short *)CAN_MB09_TIMESTAMP)	
-#define pCAN_MB09_LENGTH	((volatile unsigned short *)CAN_MB09_LENGTH)	
-#define pCAN_MB09_DATA3		((volatile unsigned short *)CAN_MB09_DATA3)	
-#define pCAN_MB09_DATA2		((volatile unsigned short *)CAN_MB09_DATA2)	
-#define pCAN_MB09_DATA1		((volatile unsigned short *)CAN_MB09_DATA1)	
-#define pCAN_MB09_DATA0		((volatile unsigned short *)CAN_MB09_DATA0)	
-
-#define pCAN_MB10_ID1		((volatile unsigned short *)CAN_MB10_ID1)	
-#define pCAN_MB10_ID0		((volatile unsigned short *)CAN_MB10_ID0)	
-#define pCAN_MB10_TIMESTAMP	((volatile unsigned short *)CAN_MB10_TIMESTAMP)	
-#define pCAN_MB10_LENGTH	((volatile unsigned short *)CAN_MB10_LENGTH)	
-#define pCAN_MB10_DATA3		((volatile unsigned short *)CAN_MB10_DATA3)	
-#define pCAN_MB10_DATA2		((volatile unsigned short *)CAN_MB10_DATA2)	
-#define pCAN_MB10_DATA1		((volatile unsigned short *)CAN_MB10_DATA1)	
-#define pCAN_MB10_DATA0		((volatile unsigned short *)CAN_MB10_DATA0)	
-
-#define pCAN_MB11_ID1		((volatile unsigned short *)CAN_MB11_ID1)	
-#define pCAN_MB11_ID0		((volatile unsigned short *)CAN_MB11_ID0)	
-#define pCAN_MB11_TIMESTAMP	((volatile unsigned short *)CAN_MB11_TIMESTAMP)	
-#define pCAN_MB11_LENGTH	((volatile unsigned short *)CAN_MB11_LENGTH)	
-#define pCAN_MB11_DATA3		((volatile unsigned short *)CAN_MB11_DATA3)	
-#define pCAN_MB11_DATA2		((volatile unsigned short *)CAN_MB11_DATA2)	
-#define pCAN_MB11_DATA1		((volatile unsigned short *)CAN_MB11_DATA1)	
-#define pCAN_MB11_DATA0		((volatile unsigned short *)CAN_MB11_DATA0)	
-
-#define pCAN_MB12_ID1		((volatile unsigned short *)CAN_MB12_ID1)
-#define pCAN_MB12_ID0		((volatile unsigned short *)CAN_MB12_ID0)
-#define pCAN_MB12_TIMESTAMP	((volatile unsigned short *)CAN_MB12_TIMESTAMP)
-#define pCAN_MB12_LENGTH	((volatile unsigned short *)CAN_MB12_LENGTH)
-#define pCAN_MB12_DATA3		((volatile unsigned short *)CAN_MB12_DATA3)
-#define pCAN_MB12_DATA2		((volatile unsigned short *)CAN_MB12_DATA2)
-#define pCAN_MB12_DATA1		((volatile unsigned short *)CAN_MB12_DATA1)
-#define pCAN_MB12_DATA0		((volatile unsigned short *)CAN_MB12_DATA0)
-
-#define pCAN_MB13_ID1		((volatile unsigned short *)CAN_MB13_ID1)
-#define pCAN_MB13_ID0		((volatile unsigned short *)CAN_MB13_ID0)
-#define pCAN_MB13_TIMESTAMP	((volatile unsigned short *)CAN_MB13_TIMESTAMP)
-#define pCAN_MB13_LENGTH	((volatile unsigned short *)CAN_MB13_LENGTH)
-#define pCAN_MB13_DATA3		((volatile unsigned short *)CAN_MB13_DATA3)
-#define pCAN_MB13_DATA2		((volatile unsigned short *)CAN_MB13_DATA2)
-#define pCAN_MB13_DATA1		((volatile unsigned short *)CAN_MB13_DATA1)
-#define pCAN_MB13_DATA0		((volatile unsigned short *)CAN_MB13_DATA0)
-
-#define pCAN_MB14_ID1		((volatile unsigned short *)CAN_MB14_ID1)
-#define pCAN_MB14_ID0		((volatile unsigned short *)CAN_MB14_ID0)
-#define pCAN_MB14_TIMESTAMP	((volatile unsigned short *)CAN_MB14_TIMESTAMP)
-#define pCAN_MB14_LENGTH	((volatile unsigned short *)CAN_MB14_LENGTH)
-#define pCAN_MB14_DATA3		((volatile unsigned short *)CAN_MB14_DATA3)
-#define pCAN_MB14_DATA2		((volatile unsigned short *)CAN_MB14_DATA2)
-#define pCAN_MB14_DATA1		((volatile unsigned short *)CAN_MB14_DATA1)
-#define pCAN_MB14_DATA0		((volatile unsigned short *)CAN_MB14_DATA0)
-
-#define pCAN_MB15_ID1		((volatile unsigned short *)CAN_MB15_ID1)
-#define pCAN_MB15_ID0		((volatile unsigned short *)CAN_MB15_ID0)
-#define pCAN_MB15_TIMESTAMP	((volatile unsigned short *)CAN_MB15_TIMESTAMP)
-#define pCAN_MB15_LENGTH	((volatile unsigned short *)CAN_MB15_LENGTH)
-#define pCAN_MB15_DATA3		((volatile unsigned short *)CAN_MB15_DATA3)
-#define pCAN_MB15_DATA2		((volatile unsigned short *)CAN_MB15_DATA2)
-#define pCAN_MB15_DATA1		((volatile unsigned short *)CAN_MB15_DATA1)
-#define pCAN_MB15_DATA0		((volatile unsigned short *)CAN_MB15_DATA0)
-
-#define pCAN_MB16_ID1		((volatile unsigned short *)CAN_MB16_ID1)
-#define pCAN_MB16_ID0		((volatile unsigned short *)CAN_MB16_ID0)
-#define pCAN_MB16_TIMESTAMP	((volatile unsigned short *)CAN_MB16_TIMESTAMP)
-#define pCAN_MB16_LENGTH	((volatile unsigned short *)CAN_MB16_LENGTH)
-#define pCAN_MB16_DATA3		((volatile unsigned short *)CAN_MB16_DATA3)
-#define pCAN_MB16_DATA2		((volatile unsigned short *)CAN_MB16_DATA2)
-#define pCAN_MB16_DATA1		((volatile unsigned short *)CAN_MB16_DATA1)
-#define pCAN_MB16_DATA0		((volatile unsigned short *)CAN_MB16_DATA0)
-
-#define pCAN_MB17_ID1		((volatile unsigned short *)CAN_MB17_ID1)
-#define pCAN_MB17_ID0		((volatile unsigned short *)CAN_MB17_ID0)
-#define pCAN_MB17_TIMESTAMP	((volatile unsigned short *)CAN_MB17_TIMESTAMP)
-#define pCAN_MB17_LENGTH	((volatile unsigned short *)CAN_MB17_LENGTH)
-#define pCAN_MB17_DATA3		((volatile unsigned short *)CAN_MB17_DATA3)
-#define pCAN_MB17_DATA2		((volatile unsigned short *)CAN_MB17_DATA2)
-#define pCAN_MB17_DATA1		((volatile unsigned short *)CAN_MB17_DATA1)
-#define pCAN_MB17_DATA0		((volatile unsigned short *)CAN_MB17_DATA0)
-
-#define pCAN_MB18_ID1		((volatile unsigned short *)CAN_MB18_ID1)
-#define pCAN_MB18_ID0		((volatile unsigned short *)CAN_MB18_ID0)
-#define pCAN_MB18_TIMESTAMP	((volatile unsigned short *)CAN_MB18_TIMESTAMP)
-#define pCAN_MB18_LENGTH	((volatile unsigned short *)CAN_MB18_LENGTH)
-#define pCAN_MB18_DATA3		((volatile unsigned short *)CAN_MB18_DATA3)
-#define pCAN_MB18_DATA2		((volatile unsigned short *)CAN_MB18_DATA2)
-#define pCAN_MB18_DATA1		((volatile unsigned short *)CAN_MB18_DATA1)
-#define pCAN_MB18_DATA0		((volatile unsigned short *)CAN_MB18_DATA0)
-
-#define pCAN_MB19_ID1		((volatile unsigned short *)CAN_MB19_ID1)
-#define pCAN_MB19_ID0		((volatile unsigned short *)CAN_MB19_ID0)
-#define pCAN_MB19_TIMESTAMP	((volatile unsigned short *)CAN_MB19_TIMESTAMP)
-#define pCAN_MB19_LENGTH	((volatile unsigned short *)CAN_MB19_LENGTH)
-#define pCAN_MB19_DATA3		((volatile unsigned short *)CAN_MB19_DATA3)
-#define pCAN_MB19_DATA2		((volatile unsigned short *)CAN_MB19_DATA2)
-#define pCAN_MB19_DATA1		((volatile unsigned short *)CAN_MB19_DATA1)
-#define pCAN_MB19_DATA0		((volatile unsigned short *)CAN_MB19_DATA0)
-
-#define pCAN_MB20_ID1		((volatile unsigned short *)CAN_MB20_ID1)
-#define pCAN_MB20_ID0		((volatile unsigned short *)CAN_MB20_ID0)
-#define pCAN_MB20_TIMESTAMP	((volatile unsigned short *)CAN_MB20_TIMESTAMP)
-#define pCAN_MB20_LENGTH	((volatile unsigned short *)CAN_MB20_LENGTH)
-#define pCAN_MB20_DATA3		((volatile unsigned short *)CAN_MB20_DATA3)
-#define pCAN_MB20_DATA2		((volatile unsigned short *)CAN_MB20_DATA2)
-#define pCAN_MB20_DATA1		((volatile unsigned short *)CAN_MB20_DATA1)
-#define pCAN_MB20_DATA0		((volatile unsigned short *)CAN_MB20_DATA0)
-
-#define pCAN_MB21_ID1		((volatile unsigned short *)CAN_MB21_ID1)
-#define pCAN_MB21_ID0		((volatile unsigned short *)CAN_MB21_ID0)
-#define pCAN_MB21_TIMESTAMP	((volatile unsigned short *)CAN_MB21_TIMESTAMP)
-#define pCAN_MB21_LENGTH	((volatile unsigned short *)CAN_MB21_LENGTH)
-#define pCAN_MB21_DATA3		((volatile unsigned short *)CAN_MB21_DATA3)
-#define pCAN_MB21_DATA2		((volatile unsigned short *)CAN_MB21_DATA2)
-#define pCAN_MB21_DATA1		((volatile unsigned short *)CAN_MB21_DATA1)
-#define pCAN_MB21_DATA0		((volatile unsigned short *)CAN_MB21_DATA0)
-
-#define pCAN_MB22_ID1		((volatile unsigned short *)CAN_MB22_ID1)
-#define pCAN_MB22_ID0		((volatile unsigned short *)CAN_MB22_ID0)
-#define pCAN_MB22_TIMESTAMP	((volatile unsigned short *)CAN_MB22_TIMESTAMP)
-#define pCAN_MB22_LENGTH	((volatile unsigned short *)CAN_MB22_LENGTH)
-#define pCAN_MB22_DATA3		((volatile unsigned short *)CAN_MB22_DATA3)
-#define pCAN_MB22_DATA2		((volatile unsigned short *)CAN_MB22_DATA2)
-#define pCAN_MB22_DATA1		((volatile unsigned short *)CAN_MB22_DATA1)
-#define pCAN_MB22_DATA0		((volatile unsigned short *)CAN_MB22_DATA0)
-
-#define pCAN_MB23_ID1		((volatile unsigned short *)CAN_MB23_ID1)
-#define pCAN_MB23_ID0		((volatile unsigned short *)CAN_MB23_ID0)
-#define pCAN_MB23_TIMESTAMP	((volatile unsigned short *)CAN_MB23_TIMESTAMP)
-#define pCAN_MB23_LENGTH	((volatile unsigned short *)CAN_MB23_LENGTH)
-#define pCAN_MB23_DATA3		((volatile unsigned short *)CAN_MB23_DATA3)
-#define pCAN_MB23_DATA2		((volatile unsigned short *)CAN_MB23_DATA2)
-#define pCAN_MB23_DATA1		((volatile unsigned short *)CAN_MB23_DATA1)
-#define pCAN_MB23_DATA0		((volatile unsigned short *)CAN_MB23_DATA0)
-
-#define pCAN_MB24_ID1		((volatile unsigned short *)CAN_MB24_ID1)
-#define pCAN_MB24_ID0		((volatile unsigned short *)CAN_MB24_ID0)
-#define pCAN_MB24_TIMESTAMP	((volatile unsigned short *)CAN_MB24_TIMESTAMP)
-#define pCAN_MB24_LENGTH	((volatile unsigned short *)CAN_MB24_LENGTH)
-#define pCAN_MB24_DATA3		((volatile unsigned short *)CAN_MB24_DATA3)
-#define pCAN_MB24_DATA2		((volatile unsigned short *)CAN_MB24_DATA2)
-#define pCAN_MB24_DATA1		((volatile unsigned short *)CAN_MB24_DATA1)
-#define pCAN_MB24_DATA0		((volatile unsigned short *)CAN_MB24_DATA0)
-
-#define pCAN_MB25_ID1		((volatile unsigned short *)CAN_MB25_ID1)
-#define pCAN_MB25_ID0		((volatile unsigned short *)CAN_MB25_ID0)
-#define pCAN_MB25_TIMESTAMP	((volatile unsigned short *)CAN_MB25_TIMESTAMP)
-#define pCAN_MB25_LENGTH	((volatile unsigned short *)CAN_MB25_LENGTH)
-#define pCAN_MB25_DATA3		((volatile unsigned short *)CAN_MB25_DATA3)
-#define pCAN_MB25_DATA2		((volatile unsigned short *)CAN_MB25_DATA2)
-#define pCAN_MB25_DATA1		((volatile unsigned short *)CAN_MB25_DATA1)
-#define pCAN_MB25_DATA0		((volatile unsigned short *)CAN_MB25_DATA0)
-
-#define pCAN_MB26_ID1		((volatile unsigned short *)CAN_MB26_ID1)
-#define pCAN_MB26_ID0		((volatile unsigned short *)CAN_MB26_ID0)
-#define pCAN_MB26_TIMESTAMP	((volatile unsigned short *)CAN_MB26_TIMESTAMP)
-#define pCAN_MB26_LENGTH	((volatile unsigned short *)CAN_MB26_LENGTH)
-#define pCAN_MB26_DATA3		((volatile unsigned short *)CAN_MB26_DATA3)
-#define pCAN_MB26_DATA2		((volatile unsigned short *)CAN_MB26_DATA2)
-#define pCAN_MB26_DATA1		((volatile unsigned short *)CAN_MB26_DATA1)
-#define pCAN_MB26_DATA0		((volatile unsigned short *)CAN_MB26_DATA0)
-
-#define pCAN_MB27_ID1		((volatile unsigned short *)CAN_MB27_ID1)
-#define pCAN_MB27_ID0		((volatile unsigned short *)CAN_MB27_ID0)
-#define pCAN_MB27_TIMESTAMP	((volatile unsigned short *)CAN_MB27_TIMESTAMP)
-#define pCAN_MB27_LENGTH	((volatile unsigned short *)CAN_MB27_LENGTH)
-#define pCAN_MB27_DATA3		((volatile unsigned short *)CAN_MB27_DATA3)
-#define pCAN_MB27_DATA2		((volatile unsigned short *)CAN_MB27_DATA2)
-#define pCAN_MB27_DATA1		((volatile unsigned short *)CAN_MB27_DATA1)
-#define pCAN_MB27_DATA0		((volatile unsigned short *)CAN_MB27_DATA0)
-
-#define pCAN_MB28_ID1		((volatile unsigned short *)CAN_MB28_ID1)
-#define pCAN_MB28_ID0		((volatile unsigned short *)CAN_MB28_ID0)
-#define pCAN_MB28_TIMESTAMP	((volatile unsigned short *)CAN_MB28_TIMESTAMP)
-#define pCAN_MB28_LENGTH	((volatile unsigned short *)CAN_MB28_LENGTH)
-#define pCAN_MB28_DATA3		((volatile unsigned short *)CAN_MB28_DATA3)
-#define pCAN_MB28_DATA2		((volatile unsigned short *)CAN_MB28_DATA2)
-#define pCAN_MB28_DATA1		((volatile unsigned short *)CAN_MB28_DATA1)
-#define pCAN_MB28_DATA0		((volatile unsigned short *)CAN_MB28_DATA0)
-
-#define pCAN_MB29_ID1		((volatile unsigned short *)CAN_MB29_ID1)
-#define pCAN_MB29_ID0		((volatile unsigned short *)CAN_MB29_ID0)
-#define pCAN_MB29_TIMESTAMP	((volatile unsigned short *)CAN_MB29_TIMESTAMP)
-#define pCAN_MB29_LENGTH	((volatile unsigned short *)CAN_MB29_LENGTH)
-#define pCAN_MB29_DATA3		((volatile unsigned short *)CAN_MB29_DATA3)
-#define pCAN_MB29_DATA2		((volatile unsigned short *)CAN_MB29_DATA2)
-#define pCAN_MB29_DATA1		((volatile unsigned short *)CAN_MB29_DATA1)
-#define pCAN_MB29_DATA0		((volatile unsigned short *)CAN_MB29_DATA0)
-
-#define pCAN_MB30_ID1		((volatile unsigned short *)CAN_MB30_ID1)
-#define pCAN_MB30_ID0		((volatile unsigned short *)CAN_MB30_ID0)
-#define pCAN_MB30_TIMESTAMP	((volatile unsigned short *)CAN_MB30_TIMESTAMP)
-#define pCAN_MB30_LENGTH	((volatile unsigned short *)CAN_MB30_LENGTH)
-#define pCAN_MB30_DATA3		((volatile unsigned short *)CAN_MB30_DATA3)
-#define pCAN_MB30_DATA2		((volatile unsigned short *)CAN_MB30_DATA2)
-#define pCAN_MB30_DATA1		((volatile unsigned short *)CAN_MB30_DATA1)
-#define pCAN_MB30_DATA0		((volatile unsigned short *)CAN_MB30_DATA0)
-
-#define pCAN_MB31_ID1		((volatile unsigned short *)CAN_MB31_ID1)
-#define pCAN_MB31_ID0		((volatile unsigned short *)CAN_MB31_ID0)
-#define pCAN_MB31_TIMESTAMP	((volatile unsigned short *)CAN_MB31_TIMESTAMP)
-#define pCAN_MB31_LENGTH	((volatile unsigned short *)CAN_MB31_LENGTH)
-#define pCAN_MB31_DATA3		((volatile unsigned short *)CAN_MB31_DATA3)
-#define pCAN_MB31_DATA2		((volatile unsigned short *)CAN_MB31_DATA2)
-#define pCAN_MB31_DATA1		((volatile unsigned short *)CAN_MB31_DATA1)
-#define pCAN_MB31_DATA0		((volatile unsigned short *)CAN_MB31_DATA0)
-
-/* CAN Mailbox Area Macros		*/
-#define pCAN_MB_ID1(x)		((volatile unsigned short *)CAN_MB_ID1(x))
-#define pCAN_MB_ID0(x)		((volatile unsigned short *)CAN_MB_ID0(x))
-#define pCAN_MB_TIMESTAMP(x)	((volatile unsigned short *)CAN_MB_TIMESTAMP(x))
-#define pCAN_MB_LENGTH(x)	((volatile unsigned short *)CAN_MB_LENGTH(x))
-#define pCAN_MB_DATA3(x)	((volatile unsigned short *)CAN_MB_DATA3(x))
-#define pCAN_MB_DATA2(x)	((volatile unsigned short *)CAN_MB_DATA2(x))
-#define pCAN_MB_DATA1(x)	((volatile unsigned short *)CAN_MB_DATA1(x))
-#define pCAN_MB_DATA0(x)	((volatile unsigned short *)CAN_MB_DATA0(x))
-
+/* Omit CAN register sets from the cdefBF534.h (CAN is not in the ADSP-BF52x processor) */
 
 /* Pin Control Registers	(0xFFC03200 - 0xFFC032FF)								*/
 #define pPORTF_FER		((volatile unsigned short *)PORTF_FER)
@@ -989,4 +587,81 @@
 #define pHMDMA1_ECOUNT		((volatile unsigned short *)HMDMA1_ECOUNT)
 #define pHMDMA1_BCOUNT		((volatile unsigned short *)HMDMA1_BCOUNT)
 
-#endif /* _CDEF_BF534_H */
+/* ==== end from cdefBF534.h ==== */
+
+/* GPIO PIN mux (0xFFC03210 - OxFFC03288) */
+
+#define                        pPORTF_MUX ((volatile unsigned short *)PORTF_MUX)
+#define                        pPORTG_MUX ((volatile unsigned short *)PORTG_MUX)
+#define                        pPORTH_MUX ((volatile unsigned short *)PORTH_MUX)
+
+#define                      pPORTF_DRIVE ((volatile unsigned short *)PORTF_DRIVE)
+#define                      pPORTG_DRIVE ((volatile unsigned short *)PORTG_DRIVE)
+#define                      pPORTH_DRIVE ((volatile unsigned short *)PORTH_DRIVE)
+#define                       pPORTF_SLEW ((volatile unsigned short *)PORTF_SLEW)
+#define                       pPORTG_SLEW ((volatile unsigned short *)PORTG_SLEW)
+#define                       pPORTH_SLEW ((volatile unsigned short *)PORTH_SLEW)
+#define                 pPORTF_HYSTERISIS ((volatile unsigned short *)PORTF_HYSTERISIS)
+#define                 pPORTG_HYSTERISIS ((volatile unsigned short *)PORTG_HYSTERISIS)
+#define                 pPORTH_HYSTERISIS ((volatile unsigned short *)PORTH_HYSTERISIS)
+#define                   pMISCPORT_DRIVE ((volatile unsigned short *)MISCPORT_DRIVE)
+#define                    pMISCPORT_SLEW ((volatile unsigned short *)MISCPORT_SLEW)
+#define              pMISCPORT_HYSTERISIS ((volatile unsigned short *)MISCPORT_HYSTERISIS)
+
+/* HOST Port Registers */
+
+#define                     pHOST_CONTROL ((volatile unsigned short *)HOST_CONTROL)
+#define                      pHOST_STATUS ((volatile unsigned short *)HOST_STATUS)
+#define                     pHOST_TIMEOUT ((volatile unsigned short *)HOST_TIMEOUT)
+
+/* Counter Registers */
+
+#define                       pCNT_CONFIG ((volatile unsigned short *)CNT_CONFIG)
+#define                        pCNT_IMASK ((volatile unsigned short *)CNT_IMASK)
+#define                       pCNT_STATUS ((volatile unsigned short *)CNT_STATUS)
+#define                      pCNT_COMMAND ((volatile unsigned short *)CNT_COMMAND)
+#define                     pCNT_DEBOUNCE ((volatile unsigned short *)CNT_DEBOUNCE)
+#define                      pCNT_COUNTER ((volatile unsigned long *)CNT_COUNTER)
+#define                          pCNT_MAX ((volatile unsigned long *)CNT_MAX)
+#define                          pCNT_MIN ((volatile unsigned long *)CNT_MIN)
+
+/* OTP/FUSE Registers */
+
+#define                      pOTP_CONTROL ((volatile unsigned short *)OTP_CONTROL)
+#define                          pOTP_BEN ((volatile unsigned short *)OTP_BEN)
+#define                       pOTP_STATUS ((volatile unsigned short *)OTP_STATUS)
+#define                       pOTP_TIMING ((volatile unsigned long *)OTP_TIMING)
+
+/* Security Registers */
+
+#define                    pSECURE_SYSSWT ((volatile unsigned long *)SECURE_SYSSWT)
+#define                   pSECURE_CONTROL ((volatile unsigned short *)SECURE_CONTROL)
+#define                    pSECURE_STATUS ((volatile unsigned short *)SECURE_STATUS)
+
+/* OTP Read/Write Data Buffer Registers */
+
+#define                        pOTP_DATA0 ((volatile unsigned long *)OTP_DATA0)
+#define                        pOTP_DATA1 ((volatile unsigned long *)OTP_DATA1)
+#define                        pOTP_DATA2 ((volatile unsigned long *)OTP_DATA2)
+#define                        pOTP_DATA3 ((volatile unsigned long *)OTP_DATA3)
+
+/* NFC Registers */
+
+#define                          pNFC_CTL ((volatile unsigned short *)NFC_CTL)
+#define                         pNFC_STAT ((volatile unsigned short *)NFC_STAT)
+#define                      pNFC_IRQSTAT ((volatile unsigned short *)NFC_IRQSTAT)
+#define                      pNFC_IRQMASK ((volatile unsigned short *)NFC_IRQMASK)
+#define                         pNFC_ECC0 ((volatile unsigned short *)NFC_ECC0)
+#define                         pNFC_ECC1 ((volatile unsigned short *)NFC_ECC1)
+#define                         pNFC_ECC2 ((volatile unsigned short *)NFC_ECC2)
+#define                         pNFC_ECC3 ((volatile unsigned short *)NFC_ECC3)
+#define                        pNFC_COUNT ((volatile unsigned short *)NFC_COUNT)
+#define                          pNFC_RST ((volatile unsigned short *)NFC_RST)
+#define                        pNFC_PGCTL ((volatile unsigned short *)NFC_PGCTL)
+#define                         pNFC_READ ((volatile unsigned short *)NFC_READ)
+#define                         pNFC_ADDR ((volatile unsigned short *)NFC_ADDR)
+#define                          pNFC_CMD ((volatile unsigned short *)NFC_CMD)
+#define                      pNFC_DATA_WR ((volatile unsigned short *)NFC_DATA_WR)
+#define                      pNFC_DATA_RD ((volatile unsigned short *)NFC_DATA_RD)
+
+#endif /* _CDEF_BF52X_H */

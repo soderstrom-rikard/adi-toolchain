@@ -14,19 +14,14 @@
  * they apply.
  */
 
-/*******************************************************************************
-**
-** This include file contains a list of macro "defines" to enable the programmer
-** to use symbolic names for register-access and bit-manipulation.
-**  
-**/
 #ifndef _DEF_BF541_H
 #define _DEF_BF541_H
 
 /* Include all Core registers and bit definitions */
 #include <def_LPBlackfin.h>
 
-/* Include header that was auto-generated from the ArchDef XML for the ADSP-BF541 */
-#include <sys/XML_defBF541.h>
+/** ADSP-BF541 is a non-existent processor -- no additional #defines **/
+
+#define                           CHIPID  0xffc00014   
 
 #endif /* _DEF_BF541_H */

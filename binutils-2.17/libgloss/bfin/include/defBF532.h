@@ -25,6 +25,10 @@
 /* include all Core registers and bit definitions */
 #include <def_LPBlackfin.h>
 
+#ifdef _MISRA_RULES
+#pragma diag(push)
+#pragma diag(suppress:misra_rule_19_7)
+#endif /* _MISRA_RULES */
 
 /*********************************************************************************** */
 /* System MMR Register Map */
@@ -395,8 +399,11 @@
 #define STOPCK_OFF			0x0008  /* Core clock off */
 #define STOPCK				0x0008	/* Core Clock Off									*/
 #define PDWN				0x0020  /* Put the PLL in a Deep Sleep state */
-#define	IN_DELAY			0x0040	/* Add 200ps Delay To EBIU Input Latches			*/
-#define	OUT_DELAY			0x0080	/* Add 200ps Delay To EBIU Output Signals			*/
+#if !defined(__ADSPBF538__)
+/* this file is included in defBF538.h but IN_DELAY/OUT_DELAY are different */
+# define IN_DELAY        0x0040  /* Add 200ps Delay To EBIU Input Latches */
+# define OUT_DELAY       0x0080  /* Add 200ps Delay To EBIU Output Signals */
+#endif
 #define BYPASS				0x0100  /* Bypass the PLL */
 /* PLL_CTL Macros (Only Use With Logic OR While Setting Lower Order Bits)			*/
 #define	SET_MSEL(x)		(((x)&0x3F) << 0x9)	/* Set MSEL = 0-63 --> VCO = CLKIN*MSEL		*/
@@ -540,7 +547,7 @@
 
 /* Watchdog Timer WDOG_CTL Register Masks */
 
-#define WDEV(x)			((x<<1) & 0x0006) 	/* event generated on roll over */
+#define WDEV(x)			(((x)<<1) & 0x0006) 	/* event generated on roll over */
 #define WDEV_RESET		0x0000 				/* generate reset event on roll over */
 #define WDEV_NMI		0x0002 				/* generate NMI event on roll over */
 #define WDEV_GPI		0x0004 				/* generate GP IRQ on roll over */
@@ -561,7 +568,7 @@
 #define WDOG_NONE 		WDEV_NONE
 
 #define TMR_EN 			WDEN
-#define TMR_DIS 		WDDIS
+#define WDOG_DISABLE	WDDIS
 #define TRO 			WDRO
 
 #define ICTL_P0			0x01
@@ -1348,5 +1355,9 @@
 #define SDRS			0x00000008 /* SDRAM is in reset state */
 #define SDEASE			0x00000010 /* SDRAM EAB sticky error status - W1C */
 #define BGSTAT			0x00000020 /* Bus granted */
+
+#ifdef _MISRA_RULES
+#pragma diag(pop)
+#endif /* _MISRA_RULES */
 
 #endif /* _DEF_BF532_H */

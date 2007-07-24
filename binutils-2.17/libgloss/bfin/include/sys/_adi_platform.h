@@ -39,8 +39,6 @@
 #include <cdefBF539.h>
 #elif defined (__ADSPBF561__)
 #include <cdefBF561.h>
-#elif defined (__ADSPBF566__)
-#include <cdefBF566.h>
 #elif defined (__AD6531__)
 #include <cdefAD6531.h>
 #elif defined (__AD6532__)
@@ -59,9 +57,7 @@
 #include <cdefBF525.h>
 #elif defined (__ADSPBF527__)
 #include <cdefBF527.h>
-#elif defined (__ADSPBF541__)
-#include <cdefBF541.h>
-#elif defined (__ADSPBF542__)
+#elif defined (__ADSPBF542__) || defined (__ADSPBF541__)
 #include <cdefBF542.h>
 #elif defined (__ADSPBF544__)
 #include <cdefBF544.h>
@@ -96,8 +92,6 @@
 #include <defBF539.h>
 #elif defined (__ADSPBF561__)
 #include <defBF561.h>
-#elif defined (__ADSPBF566__)
-#include <defBF566.h>
 #elif defined (__AD6531__)
 #include <defAD6531.h>
 #elif defined (__AD6532__)
@@ -116,9 +110,7 @@
 #include <defBF525.h>
 #elif defined (__ADSPBF527__)
 #include <defBF527.h>
-#elif defined (__ADSPBF541__)
-#include <defBF541.h>
-#elif defined (__ADSPBF542__)
+#elif defined (__ADSPBF542__) || defined (__ADSPBF541__)
 #include <defBF542.h>
 #elif defined (__ADSPBF544__)
 #include <defBF544.h>

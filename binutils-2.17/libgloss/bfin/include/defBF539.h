@@ -14,12 +14,6 @@
  * they apply.
  */
 
-/*******************************************************************************
-**
-** This include file contains a list of macro "defines" to enable the programmer
-** to use symbolic names for Stirling peripherals.
-**
-*/
 #ifndef _DEF_BF539_H
 #define _DEF_BF539_H
 
@@ -1452,8 +1446,8 @@
 #define	VLEV_120		0x00D0	/* 		VLEV = 1.20 V (-5% - +10% Accuracy)	*/
 
 #define	WAKE			0x0100	/* Enable RTC/Reset Wakeup From Hibernate	*/
-#define	MXVRWE			0x0200	/* Enable MXVR Wakeup From Hibernate	*/
-#define	CANWE			0x0400	/* Enable CAN Wakeup From Hibernate */
+#define	CANWE			0x0200	/* Enable CAN Wakeup From Hibernate */
+#define	MXVRWE			0x0400	/* Enable MXVR Wakeup From Hibernate	*/
 #define	SCKELOW			0x8000	/* Do Not Drive SCKE High During Reset After Hibernate */
 
 /* SWRST Mask */
@@ -1630,7 +1624,7 @@
 
 /* ********* WATCHDOG TIMER MASKS ******************** */
 /* Watchdog Timer WDOG_CTL Register Masks */
-#define WDEV(x)			((x<<1) & 0x0006) 	/* event generated on roll over */
+#define WDEV(x)			(((x)<<1) & 0x0006) 	/* event generated on roll over */
 #define WDEV_RESET		0x0000 				/* generate reset event on roll over */
 #define WDEV_NMI		0x0002 				/* generate NMI event on roll over */
 #define WDEV_GPI		0x0004 				/* generate GP IRQ on roll over */
@@ -1651,7 +1645,7 @@
 #define WDOG_NONE 		WDEV_NONE
 
 #define TMR_EN 			WDEN
-#define TMR_DIS 		WDDIS
+#define WDOG_DISABLE		WDDIS
 #define TRO 			WDRO
 
 #define ICTL_P0			0x01

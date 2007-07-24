@@ -43,7 +43,7 @@
 #define pVR_CTL 		((volatile unsigned short *)VR_CTL)
 #define pPLL_STAT 		((volatile unsigned short *)PLL_STAT)
 #define pPLL_LOCKCNT 	((volatile unsigned short *)PLL_LOCKCNT)
-#define pCHIPID			((volatile unsigned short *)CHIPID)
+#define pCHIPID			((volatile unsigned long *)CHIPID)
 
 
 /* System Interrupt Controller */
@@ -236,7 +236,7 @@
 #define pDMA0_PERIPHERAL_MAP 	((volatile unsigned short *)DMA0_PERIPHERAL_MAP)
 
 #define pDMA1_CONFIG 			((volatile unsigned short *)DMA1_CONFIG)
-#define pDMA1_NEXT_DESC_PTR 	((volatile void **)DMA1_NEXT_DESC_PTR)
+#define pDMA1_NEXT_DESC_PTR 	(_PTR_TO_VOL_VOID_PTR DMA1_NEXT_DESC_PTR)
 #define pDMA1_START_ADDR 		(_PTR_TO_VOL_VOID_PTR DMA1_START_ADDR)
 #define pDMA1_X_COUNT 			((volatile unsigned short *)DMA1_X_COUNT)
 #define pDMA1_Y_COUNT 			((volatile unsigned short *)DMA1_Y_COUNT)

@@ -45,6 +45,7 @@
 #define pVR_CTL 	(volatile unsigned short *)VR_CTL
 #define pPLL_STAT 	(volatile unsigned short *)PLL_STAT
 #define pPLL_LOCKCNT 	(volatile unsigned short *)PLL_LOCKCNT
+#define pCHIPID ((volatile unsigned long*)CHIPID)
 
 /* System Reset and Interrupt Controller registers for core A (0xFFC0 0100-0xFFC0 01FF) */
 #define pSICA_SWRST 	(volatile unsigned short *)SICA_SWRST

@@ -1,5 +1,5 @@
 /*
- * cdefBF566.h
+ * mc_typedef.h
  *
  * Copyright (C) 2007 Analog Devices, Inc.
  *
@@ -14,21 +14,22 @@
  * they apply.
  */
 
-#ifndef _CDEFBF566_H
-#define _CDEFBF566_H
+#pragma once
+#ifndef __NO_BUILTIN
+#pragma system_header /* sys/mc_typedef.h */
+#endif
 
-#include <defBF566.h>
-#include <sys/XML_cdefBF566.h>
+/* Define testset_t. */
 
-#ifndef _PTR_TO_VOL_VOID_PTR
-#ifndef _USE_LEGACY_CDEF_BEHAVIOUR
-#define _PTR_TO_VOL_VOID_PTR (void * volatile *)
+#ifndef _SYS_MC_TYPEDEF_H
+#define _SYS_MC_TYPEDEF_H
+
+#if !defined(__ADSPLPBLACKFIN__)
+typedef volatile unsigned char testset_t; 
+#elif defined(__WORKAROUND_TESTSET_ALIGN) /* require 32-bit aligned address */
+typedef volatile unsigned int testset_t;
 #else
-#define _PTR_TO_VOL_VOID_PTR (volatile void **)
+typedef volatile unsigned short testset_t;
 #endif
-#endif
-/* legacy names from def_LPBlackfin.h */
-#define pSRAM_BASE_ADDRESS ( _PTR_TO_VOL_VOID_PTR SRAM_BASE_ADDRESS)
-#define pDCPLB_FAULT_STATUS ((volatile unsigned long *)DCPLB_FAULT_STATUS)
 
-#endif /* _CDEFBF566_H */
+#endif /* _SYS_MC_TYPEDEF_H */

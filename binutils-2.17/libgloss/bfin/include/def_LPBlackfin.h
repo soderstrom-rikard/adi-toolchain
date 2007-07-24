@@ -19,10 +19,18 @@
 #ifndef _DEF_LPBLACKFIN_H
 #define _DEF_LPBLACKFIN_H
 
+#ifdef _MISRA_RULES
+#pragma diag(push)
+#pragma diag(suppress:misra_rule_19_4)
+#pragma diag(suppress:misra_rule_19_7)
+#endif /* _MISRA_RULES */
+
+
 #if !defined(__ADSPLPBLACKFIN__)
 #warning def_LPBlackfin.h should only be included for 532 compatible chips.
 #endif
-#define MK_BMSK_( x ) (1<<x)    /* Make a bit mask from a bit position */
+/* ensure macro params bracketed to avoid unexpected evaluations. (GA), MISRA Rule 19.10 */
+#define MK_BMSK_( x ) (1<<(x))    /* Make a bit mask from a bit position */
 
 /*********************************************************************************** */
 /* System Register Bits */
@@ -429,7 +437,8 @@
 #define TEST_MB1			   0x00010000  /* Select Mini-Bank 1 */
 #define TEST_MB2			   0x00020000  /* Select Mini-Bank 2 */
 #define TEST_MB3			   0x00030000  /* Select Mini-Bank 3 */
-#define TEST_SET(x)		       ((x << 5) & 0x03E0)  /* Set Index 0->31 */
+/* ensure macro params bracketed to avoid unexpected evaluations. (GA) MISRA Rule 19.10 */
+#define TEST_SET(x)		       (((x) << 5) & 0x03E0)  /* Set Index 0->31 */
 #define TEST_WAY0			   0x00000000  /* Access Way0 */
 #define TEST_WAY1			   0x04000000  /* Access Way1 */
 /*** ITEST_COMMAND only */
@@ -438,5 +447,9 @@
 /*** DTEST_COMMAND only */
 #define TEST_BNKSELA		   0x00000000  /* Access SuperBank A */
 #define TEST_BNKSELB		   0x00800000  /* Access SuperBank B */
+
+#ifdef _MISRA_RULES
+#pragma diag(pop)
+#endif /* _MISRA_RULES */
 
 #endif /* _DEF_LPBLACKFIN_H */

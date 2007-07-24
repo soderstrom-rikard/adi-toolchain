@@ -23,6 +23,13 @@
 /* Include all MMR and bit defines common to BF534 */
 #include <defBF534.h>
 
+#ifdef _MISRA_RULES
+#pragma diag(push)
+#pragma diag(suppress:misra_rule_19_4)
+#pragma diag(suppress:misra_rule_19_7)
+#endif /* _MISRA_RULES */
+
+
 /************************************************************************************
 ** Define EMAC Section Unique to BF536/BF537
 *************************************************************************************/
@@ -386,6 +393,9 @@
 #define	TX_LT1024_CNT	0x00100000	/* 512-1023-Byte TX Frames Sent					*/
 #define	TX_GE1024_CNT	0x00200000	/* 1024-Max-Byte TX Frames Sent					*/
 #define	TX_ABORT_CNT	0x00400000	/* TX Frames Aborted							*/
+#ifdef _MISRA_RULES
+#pragma diag(pop)
+#endif /* _MISRA_RULES */
 
 #endif /* _DEF_BF537_H */
 

@@ -19,10 +19,18 @@
 #ifndef _DEF_BLACKFIN_H
 #define _DEF_BLACKFIN_H
 
+#ifdef _MISRA_RULES
+#pragma diag(push)
+#pragma diag(suppress:misra_rule_19_4)
+#pragma diag(suppress:misra_rule_19_7)
+#endif /* _MISRA_RULES */
+
+
 #if defined(__ADSPLPBLACKFIN__)
 #warning defblackfin.h should only be included for 535 compatible chips.
 #endif
-#define MK_BMSK_( x ) (1<<x)    /* Make a bit mask from a bit position */
+/* Macro parameters should be enclosed in parantheses to avoid incorrect expression evaluation. MISRA Rule 19.10 */
+#define MK_BMSK_( x ) (1<<(x))    /* Make a bit mask from a bit position */
 
 /*********************************************************************************** */
 /* System Register Bits */
@@ -429,5 +437,9 @@
 #define ASTAT_AC    MK_BMSK_(ASTAT_AC0_COPY_P)
 #define ASTAT_AV1   MK_BMSK_(ASTAT_V_COPY_P)
 #endif
+
+#ifdef _MISRA_RULES
+#pragma diag(pop)
+#endif /* _MISRA_RULES */
 
 #endif /* _DEF_BLACKFIN_H */

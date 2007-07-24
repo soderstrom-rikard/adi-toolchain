@@ -25,18 +25,24 @@
 /* include all Core registers and bit definitions */
 #include <def_LPBlackfin.h>
 
+#ifdef _MISRA_RULES
+#pragma diag(push)
+#pragma diag(suppress:misra_rule_19_4)
+#pragma diag(suppress:misra_rule_19_7)
+#endif /* _MISRA_RULES */
 
 /*********************************************************************************** */
 /* System MMR Register Map */
 /*********************************************************************************** */
 
-/*// Clock and System Control (0xFFC00000 - 0xFFC000FF) */
+/* Clock and System Control (0xFFC00000 - 0xFFC000FF) */
 
 #define PLL_CTL                0xFFC00000       /* PLL Control register (16-bit) */
 #define PLL_DIV			        0xFFC00004		/* PLL Divide Register (16-bit) */
 #define VR_CTL			        0xFFC00008		/* Voltage Regulator Control Register (16-bit) */
 #define PLL_STAT               0xFFC0000C       /* PLL Status register (16-bit) */
 #define PLL_LOCKCNT            0xFFC00010   	/* PLL Lock Count register (16-bit) */
+#define CHIPID                  0xFFC00014      /* Device ID Register */
 
 /* System Reset and Interrupt Controller registers for core A (0xFFC0 0100-0xFFC0 01FF) */
 #define SICA_SWRST              0xFFC00100      /* Software Reset register */
@@ -913,7 +919,7 @@
   
 /* Watchdog Timer WDOG_CTL Register Masks */
   
-#define WDEV(x) ((x<<1) & 0x0006) /* event generated on roll over */
+#define WDEV(x) (((x)<<1) & 0x0006) /* event generated on roll over */
 #define WDEV_RESET 0x0000 /* generate reset event on roll over */
 #define WDEV_NMI 0x0002 /* generate NMI event on roll over */
 #define WDEV_GPI 0x0004 /* generate GP IRQ on roll over */
@@ -936,7 +942,7 @@
 #define WDOG_NONE WDEV_NONE
 
 #define TMR_EN WDEN
-#define TMR_DIS WDDIS
+#define WDOG_DISABLE  WDDIS
 #define TRO WDRO
 
 
@@ -993,7 +999,7 @@
 #define ERBFI_P	0x00
 
 /* UART_IIR Register */
-#define STATUS(x)	((x << 1) & 0x06)
+#define STATUS(x)	(((x) << 1) & 0x06)
 #define NINT		0x01
 #define STATUS_P1	0x02
 #define STATUS_P0	0x01
@@ -1088,7 +1094,7 @@
 #define SKIP_EO              0x00000400  /* PPI Skip Even/Odd Elements */
 #define DLENGTH              0x00003800  /* PPI Data Length  */
 #define DLEN_8		     0x0	     /* PPI Data Length mask for DLEN=8 */
-#define DLEN(x)	(((x-9) & 0x07) << 11)  /* PPI Data Length (only works for x=10-->x=16) */
+#define DLEN(x)	((((x)-9) & 0x07) << 11)  /* PPI Data Length (only works for x=10-->x=16) */
 #define POL                  0x0000C000  /* PPI Signal Polarities       */
 
 
@@ -1317,7 +1323,7 @@
 #define CLK_SEL		0x0080
 #define TOGGLE_HI	0x0100
 #define EMU_RUN		0x0200
-#define ERR_TYP(x)	((x & 0x03) << 14)
+#define ERR_TYP(x)	(((x) & 0x03) << 14)
 
 #define TMODE_P0		0x00
 #define TMODE_P1		0x01
@@ -1732,6 +1738,8 @@
 #define SDEASE		    0x00000010 /* SDRAM EAB sticky error status - W1C */
 #define BGSTAT			0x00000020 /* Bus granted */
 
-
+#ifdef _MISRA_RULES
+#pragma diag(pop)
+#endif /* _MISRA_RULES */
 
 #endif /* _DEF_BF561_H */

@@ -14,11 +14,6 @@
  * they apply.
  */
 
-/*
-** This include file contains a list of macro "defines" to enable the 
-** programmer to use symbolic names for ADSP-BF538 peripherals.
-*/
-
 #ifndef _DEF_BF538_H
 #define _DEF_BF538_H
 
@@ -27,6 +22,14 @@
 
 /* Include all System registers and bit definitions common to ADSP-BF532 */
 #include <defBF532.h>
+
+#ifdef _MISRA_RULES
+#pragma diag(push)
+#pragma diag(suppress:misra_rule_19_4)
+#pragma diag(suppress:misra_rule_19_6)
+#pragma diag(suppress:misra_rule_19_7)
+#endif /* _MISRA_RULES */
+
 
 /********************************************************************************
  * System MMR Register Map
@@ -996,22 +999,15 @@
 /* ********************* PLL AND RESET MASKS ****************************************/
 
 /* PLL_CTL Masks (IN_DELAY and OUT_DELAY bit field definitions differ from BF533/BF532/BF531) */
-#ifdef IN_DELAY
-#undef IN_DELAY
 #define IN_DELAY			0x0014  /* EBIU Input Delay Select */
-#endif
-
-#ifdef OUT_DELAY
-#undef OUT_DELAY
 #define OUT_DELAY			0x00C0  /* EBIU Output Delay Select */
-#endif
 
 #define SET_OUT_DELAY(x)	(((x)&0x03) << 0x6)
 #define SET_IN_DELAY(x)		((((x)&0x02) << 0x3) | (((x)&0x01) << 0x2))
 
 /* VR_CTL Masks	(Additional WakeUp Events) */
-#define	CANWE				0x0400	/* Enable CAN Wakeup From Hibernate */
-#define	GPWE				0x0200	/* Enable General-Purpose Wakeup From Hibernate */
+#define	CANWE				0x0200	/* Enable CAN Wakeup From Hibernate */
+#define	GPWE				0x0400	/* Enable General-Purpose Wakeup From Hibernate */
 
 
 /* **********************  SYSTEM INTERRUPT CONTROLLER MASKS **********************	*/
@@ -1908,5 +1904,9 @@
 #define TOVL_ERR0        TOVF_ERR0
 #define TOVL_ERR1        TOVF_ERR1
 #define TOVL_ERR2        TOVF_ERR2
+
+#ifdef _MISRA_RULES
+#pragma diag(pop)
+#endif /* _MISRA_RULES */
 
 #endif /* _DEF_BF538_H */

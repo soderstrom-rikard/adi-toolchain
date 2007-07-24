@@ -22,6 +22,11 @@
 #ifndef _PLL_H
 #define _PLL_H
 
+#ifdef _MISRA_RULES
+#pragma diag(push)
+#pragma diag(suppress:misra_rule_6_3)
+#endif /* _MISRA_RULES */
+
 #define NO_STARTUP_SET 0
 #define MAX_IN_STARTUP 1
 
@@ -66,6 +71,10 @@ int pll_set_system_vco(int _msel, int _df, int _lockcnt);
 #endif
 
 #endif /* _LANGUAGE_C */
+
+#ifdef _MISRA_RULES
+#pragma diag(pop)
+#endif /* _MISRA_RULES */
 
 #endif /* _PLL_H */
 

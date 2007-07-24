@@ -22,6 +22,18 @@
 #ifndef _EXCEPTION_H
 #define _EXCEPTION_H
 
+#ifdef _MISRA_RULES
+#pragma diag(push)
+#pragma diag(suppress:misra_rule_5_7)
+#pragma diag(suppress:misra_rule_6_3)
+#pragma diag(suppress:misra_rule_19_4)
+#pragma diag(suppress:misra_rule_19_7)
+#pragma diag(suppress:misra_rule_19_10)
+#pragma diag(suppress:misra_rule_19_13)
+#endif /* _MISRA_RULES */
+
+
+
 /*
 ** Definitions for user-friendly interrupt handling.
 */
@@ -174,9 +186,9 @@ typedef struct {
   used, and form the context of the ISR. They contain real values, and
   if modified, will be restored using their new values. */
 
+  int fp;
   int p5, p4, p3, p2, p1, p0;
   int r7, r6, r5, r4, r3, r2, r1, r0;
-  int fp;
   int astat;
 } interrupt_regs;
 
@@ -231,19 +243,19 @@ EX_HANDLER(interrupt,NAME)
 ** Must be called from immediately with the interrupt handler.
 */
 
-void get_interrupt_info(interrupt_kind, interrupt_info *);
+void get_interrupt_info(interrupt_kind int_kind, interrupt_info *int_info);
 
 /*
 ** Diagnostics function for reporting unexpected events.
 */
 
-void _ex_report_event(interrupt_info *);
+void _ex_report_event(interrupt_info *int_info);
 
 /*
 ** Register an interrupt handler within the EVT.
 ** Return previous value if there was one.
 */
-ex_handler_fn register_handler(interrupt_kind, ex_handler_fn);
+ex_handler_fn register_handler(interrupt_kind int_kind, ex_handler_fn handler);
 
 /*
 ** Some magic values for registering default and null handlers.
@@ -287,5 +299,9 @@ int raise_interrupt(interrupt_kind kind, int which,
 #ifdef __cplusplus
   } /* extern "C" */
 #endif
+
+#ifdef _MISRA_RULES
+#pragma diag(pop)
+#endif /* _MISRA_RULES */
 
 #endif /* _EXCEPTION_H */
