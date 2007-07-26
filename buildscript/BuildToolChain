@@ -1865,13 +1865,14 @@ rm -rf $DIR_ELF2FLT_BUILD
 
 ########################### Target binutils ########################
 
+export PATH=$DIR_uC_OUTPUT/bin:$DIR_LINUX_OUTPUT/bin:$PATH
 
 echo -n "*** Building target libbfd (flat)  " ; date
 
 mkdir $DIR_BINUTILS_BUILD
 cd $DIR_BINUTILS_BUILD
 
-RUN="CC=$DIR_uC_OUTPUT/bin/bfin-uclinux-gcc LDFLAGS=-Wl,-elf2flt \
+RUN="LDFLAGS=-Wl,-elf2flt \
     $DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-uclinux \
     --host=bfin-uclinux $BUILD_TARGET \
     --disable-shared --prefix=$DIR_uC_OUTPUT/bfin-uclinux --disable-nls \
@@ -1896,8 +1897,7 @@ cd $DIR_BINUTILS_BUILD
 
 # Don't add -mfdpic to CFLAGS, since BFD tries to build a few files with the
 # host compiler.
-RUN="CC='$DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-gcc' \
-    $DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-linux-uclibc \
+RUN="$DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-linux-uclibc \
     --host=bfin-linux-uclibc $BUILD_TARGET \
     --disable-shared --prefix=$DIR_LINUX_OUTPUT/bfin-linux-uclibc --disable-nls \
     --without-newlib"
