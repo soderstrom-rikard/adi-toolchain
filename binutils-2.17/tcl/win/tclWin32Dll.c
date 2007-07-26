@@ -41,8 +41,8 @@ static HINSTANCE hInstance;	/* HINSTANCE of this DLL. */
 static int platformId;		/* Running under NT, or 95/98? */
 
 #ifdef HAVE_NO_SEH
-static void *ESP;
-static void *EBP;
+static void *ESP __attribute__ ((used));
+static void *EBP __attribute__ ((used));
 #endif /* HAVE_NO_SEH */
 
 /*

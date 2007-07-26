@@ -122,8 +122,8 @@ static Tcl_ChannelType fileChannelType = {
 };
 
 #ifdef HAVE_NO_SEH
-static void *ESP;
-static void *EBP;
+static void *ESP __attribute__ ((used));
+static void *EBP __attribute__ ((used));
 #endif /* HAVE_NO_SEH */
 
 
