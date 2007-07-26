@@ -43,7 +43,7 @@ BINUTILS_VERSION=2.17
 GCC_VERSIONS=
 NUM_JOBS=0
 
-while getopts dpwvtST:C:s:b:k:K:o:O:m:j:B:c:u:r:l:H:h parameter
+while getopts dpwvtST:C:s:b:k:K:o:O:m:j:a:e:B:c:u:r:l:H:h parameter
 do
     case $parameter in
         p)
@@ -247,6 +247,12 @@ do
 	j)
 	    NUM_JOBS=$OPTARG
 	    ;;
+        a)
+            SILICON_TYPE=$OPTARG
+            ;;
+        e)
+            SILICON_VERSION=$OPTARG
+            ;;
         h)
 # We don't document the -S option - it's for advanced users who know what
 # they are doing.  For maximum reproducibility, not using it is better.
@@ -1141,6 +1147,7 @@ if [ "x$CHECK_ON_SIMULATOR" != "x" -o "x$CHECK_ON_HARDWARE" != "x" ] ; then
          echo "set_board_info hostname $TARGET_IPADDR"; \
          echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-uclinux.exp
         (cat $DIR_BOARDS/bfin-linux-uclibc.exp.1; \
+         echo "set_board_info cflags \"-mcpu=$SILICON_TYPE-$SILICON_VERSION\"";\
          echo "set_board_info hostname $TARGET_IPADDR"; \
          echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-linux-uclibc.exp
     fi
