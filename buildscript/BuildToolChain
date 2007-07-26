@@ -43,7 +43,7 @@ BINUTILS_VERSION=2.17
 GCC_VERSIONS=
 NUM_JOBS=0
 
-while getopts dpwvtST:C:s:b:k:K:o:O:m:j:a:e:B:c:u:r:l:H:h parameter
+while getopts dpwvXtST:C:s:b:k:K:o:O:m:j:a:e:B:c:u:r:l:H:h parameter
 do
     case $parameter in
         p)
@@ -244,9 +244,12 @@ do
             DIR_uC_OUTPUT=$OPTARG
             DIR_LINUX_OUTPUT=$OPTARG
             ;;
-	j)
-	    NUM_JOBS=$OPTARG
-	    ;;
+        j)
+            NUM_JOBS=$OPTARG
+            ;;
+        X)
+            WITHOUT_X=true
+            ;;
         a)
             SILICON_TYPE=$OPTARG
             ;;
@@ -277,6 +280,7 @@ do
 -H HOST          Build toolchain to run on HOST.
 -l LANGS         Only build specified gcc languages.
 -C FILE          Use FILE as uClibc config file, rather than the default.
+-X               Disable all graphical utilities
 -v               Verbose
 -h               Help"
              exit 0
@@ -534,6 +538,10 @@ case $HOST_TARGET in
     *)               BINUTILS_EXTRA_CONF="";;
 esac
 
+if [ -n "${WITHOUT_X}" ] ; then
+    BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-gdbtk"
+fi
+
 echo -n "Path to elf2flt dir         "
 DIR_ELF2FLT_SOURCE=$DIR_SOURCE/elf2flt
 echo $DIR_ELF2FLT_SOURCE
@@ -754,9 +762,12 @@ build_gcc ()
     else
         FILE=""
     fi
+    if [ -z "${WITHOUT_X}" ] ; then
+        FILE="${FILE} insight"
+    fi
     for RUN in addr2line ar as c++filt gcov ld nm objdump \
                objcopy ranlib readelf size strings strip \
-               gdb insight run \
+               gdb run \
                cpp gcc $FILE
     do
         if [ ! -f $3/bin/bfin-$2-$RUN$EXEEXT ] ; then
@@ -1210,7 +1221,12 @@ if [ "x$SKIP_ELF" = "x" ]; then
       fi
     done
 
-    for RUN in gdb insight
+    if [ -z "${WITHOUT_X}" ] ; then
+        FILE="insight"
+    else
+        FILE=""
+    fi
+    for RUN in gdb $FILE
     do
         if [ ! -f $DIR_BINUTILS_BUILD/gdb/$RUN$EXEEXT ] ; then
             echo "gdb did not build properly : Missing $RUN$EXEEXT"
