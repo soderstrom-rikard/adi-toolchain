@@ -1,12 +1,10 @@
 ; Installer for Windows Blackfin Toolchain
 ; http://blackfin.uclinux.org/
 
-!ifndef VERSION
-!define VERSION "SVN"
-!endif
-
 !define PRODUCT_NAME "Blackfin Toolchain"
-!define PRODUCT_VERSION VERSION
+!ifndef PRODUCT_VERSION
+!define PRODUCT_VERSION "SVN"
+!endif
 !define PRODUCT_PUBLISHER "Analog Devices, Inc."
 !define PRODUCT_WEB_SITE "http://blackfin.uclinux.org/"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
