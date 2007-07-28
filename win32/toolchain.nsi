@@ -1,8 +1,12 @@
 ; Installer for Windows Blackfin Toolchain
 ; http://blackfin.uclinux.org/
 
+!ifndef VERSION
+!define VERSION "SVN"
+!endif
+
 !define PRODUCT_NAME "Blackfin Toolchain"
-!define PRODUCT_VERSION "2007R1"
+!define PRODUCT_VERSION VERSION
 !define PRODUCT_PUBLISHER "Analog Devices, Inc."
 !define PRODUCT_WEB_SITE "http://blackfin.uclinux.org/"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -51,7 +55,7 @@ Section "bfin-${tuple}" Sec${libc}
 SectionEnd
 !macroend
 !insertmacro BlackfinInstall "elf" "NEWLIB"
-;!insertmacro BlackfinInstall "uclinux" "FLAT"
+!insertmacro BlackfinInstall "uclinux" "FLAT"
 !insertmacro BlackfinInstall "linux-uclibc" "FDPIC"
 
 Section "Examples" SecExamples
