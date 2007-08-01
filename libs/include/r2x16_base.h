@@ -41,17 +41,17 @@ extern "C" {
 #pragma inline
 __attribute__ ((always_inline))
 static raw2x16 compose_2x16(_raw16 _x, _raw16 _y) {
-	return __builtin_compose_2x16(_x, _y);
+	return __builtin_bfin_compose_2x16(_x, _y);
 }
 #pragma inline
 __attribute__ ((always_inline))
 static  _raw16 high_of_2x16(raw2x16 _x) {
-	return __builtin_extract_hi(_x);
+	return __builtin_bfin_extract_hi(_x);
 }
 #pragma inline
 __attribute__ ((always_inline))
 static  _raw16 low_of_2x16(raw2x16 _x) {
-	return __builtin_extract_lo(_x);
+	return __builtin_bfin_extract_lo(_x);
 }
 
 #else

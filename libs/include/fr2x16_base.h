@@ -44,7 +44,7 @@ extern "C" {
 
 #pragma inline
 static fract16 sum_fr2x16(fract2x16 _x) {
-  return __builtin_sum_fr2x16(_x);
+  return __builtin_bfin_sum_fr2x16(_x);
 }
 
 #else

@@ -1,3 +1,15 @@
+2007-08-01  Jie Zhang  <jie.zhang@analog.com>
+
+	* math_bf.h: Processed with c_fix_builtins.sed.
+	* ccblkfn.h: Likewise.
+	* i2x16_base.h: Likewise.
+	* fr2x16_base.h: Likewise.
+	* fr2x16_math.h: Likewise.
+	* video.h: Likewise.
+	* fract_math.h: Likewise.
+	* r2x16_base.h: Likewise.
+	* fract_complex.h: Likewise.
+
 2007-07-24  Jie Zhang  <jie.zhang@analog.com>
 
 	* complex.h: Split Blackfin extension and fraction complex

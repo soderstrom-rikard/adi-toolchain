@@ -187,17 +187,17 @@ __attribute__ ((always_inline))
 
 
 #if !defined(__NO_BUILTIN) 
-        int __builtin_max(int, int);
+        int __builtin_bfin_max(int, int);
 #pragma inline
 __attribute__ ((always_inline))
         static int max(int _x, int _y) 
-                { return __builtin_max(_x,_y); }
+                { return __builtin_bfin_max(_x,_y); }
 
-        long __builtin_lmax(long, long);
+        long __builtin_bfin_lmax(long, long);
 #pragma inline
 __attribute__ ((always_inline))
         static long lmax(long _x, long _y)
-          { return __builtin_lmax(_x, _y); }
+          { return __builtin_bfin_lmax(_x, _y); }
 #else
         int max (int _x, int _y) asm ("__max");
 
@@ -254,17 +254,17 @@ __attribute__ ((always_inline))
 
 
 #if !defined(__NO_BUILTIN)
-        int __builtin_min(int, int);
+        int __builtin_bfin_min(int, int);
 #pragma inline
 __attribute__ ((always_inline))
         static int min(int _x, int _y) 
-                { return __builtin_min(_x,_y); }
+                { return __builtin_bfin_min(_x,_y); }
 
-        long __builtin_lmin(long, long);
+        long __builtin_bfin_lmin(long, long);
 #pragma inline
 __attribute__ ((always_inline))
         static long lmin(long _x, long _y)
-                { return __builtin_lmin(_x,_y); }
+                { return __builtin_bfin_lmin(_x,_y); }
 #else
         int min (int _x, int _y) asm ("__min");
 
@@ -325,11 +325,11 @@ __attribute__ ((always_inline))
 #pragma inline
 __attribute__ ((always_inline))
         static int countones (int _x) 
-                { return (int)__builtin_ones(_x); }
+                { return (int)__builtin_bfin_ones(_x); }
 #pragma inline
 __attribute__ ((always_inline))
         static int lcountones (long _x) 
-                { return (int)__builtin_ones((int)_x); }
+                { return (int)__builtin_bfin_ones((int)_x); }
 #else
         int countones (int _x) asm ("__countones");
 

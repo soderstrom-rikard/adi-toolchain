@@ -66,17 +66,17 @@ static short low_of_i2x16(int2x16 _x) {
 #pragma inline
 __attribute__ ((always_inline))
 static int2x16 add_i2x16(int2x16 _x, int2x16 _y) {
-	return __builtin_add_i2x16(_x, _y);
+	return __builtin_bfin_add_i2x16(_x, _y);
 }
 #pragma inline
 __attribute__ ((always_inline))
 static int2x16 sub_i2x16(int2x16 _x, int2x16 _y) {
-	return __builtin_sub_i2x16(_x, _y);
+	return __builtin_bfin_sub_i2x16(_x, _y);
 }
 #pragma inline
 __attribute__ ((always_inline))
 static int2x16 mult_i2x16(int2x16 _x, int2x16 _y) {
-	return __builtin_mult_i2x16(_x, _y);
+	return __builtin_bfin_mult_i2x16(_x, _y);
 }
 
 #else
@@ -95,7 +95,7 @@ int2x16 mult_i2x16(int2x16, int2x16);
 #pragma inline
 __attribute__ ((always_inline))
 static int sum_i2x16(int2x16 _x) {
-	return __builtin_sum_i2x16(_x);
+	return __builtin_bfin_sum_i2x16(_x);
 }
 #else
 

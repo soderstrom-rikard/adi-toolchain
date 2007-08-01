@@ -30,8 +30,8 @@ int  _llcountones( long long  a )
   int  onecount;
 
   v.bb = a;
-  onecount  = __builtin_ones((int) v.b[0]);
-  onecount += __builtin_ones((int) v.b[1]);
+  onecount  = __builtin_bfin_ones((int) v.b[0]);
+  onecount += __builtin_bfin_ones((int) v.b[1]);
 
   return  onecount;
 

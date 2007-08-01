@@ -56,13 +56,13 @@ extern "C" {
 #pragma inline
 __attribute__ ((always_inline))
 static fract2x16 add_fr2x16(fract2x16 _x, fract2x16 _y)
-  { return __builtin_add_fr2x16(_x,_y); }
+  { return __builtin_bfin_add_fr2x16(_x,_y); }
 
 /* Performs 16-bit addition of the two input parameters (_x+_y) */
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 add_fr1x16(fract16 _x, fract16 _y)
-  { return __builtin_add_fr1x16(_x,_y); }
+  { return __builtin_bfin_add_fr1x16(_x,_y); }
 
 /* Subtracts two packed fracts.
  * Input: _x{a,b} _y{c,d}
@@ -70,13 +70,13 @@ static fract16 add_fr1x16(fract16 _x, fract16 _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract2x16 sub_fr2x16(fract2x16 _x, fract2x16 _y)
-  { return __builtin_sub_fr2x16(_x,_y); }
+  { return __builtin_bfin_sub_fr2x16(_x,_y); }
 
 /* Performs 16-bit subtraction of the two input parameters (_x-_y) */
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 sub_fr1x16(fract16 _x, fract16 _y)
-  { return __builtin_sub_fr1x16(_x,_y); }
+  { return __builtin_bfin_sub_fr1x16(_x,_y); }
 
 /* Multiplies two packed fracts.  Truncates the results to 16 bits.
  * Inputs: _x{a,b} _y{c,d}
@@ -84,14 +84,14 @@ static fract16 sub_fr1x16(fract16 _x, fract16 _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract2x16 mult_fr2x16(fract2x16 _x, fract2x16 _y)
-  { return __builtin_mult_fr2x16(_x,_y); }
+  { return __builtin_bfin_mult_fr2x16(_x,_y); }
 
 /* Performs 16-bit multiplication of the input parameters (_x*_y). 
  * The result is truncated to 16 bits. */
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 mult_fr1x16(fract16 _x, fract16 _y)
-  { return __builtin_mult_fr1x16(_x,_y); }
+  { return __builtin_bfin_mult_fr1x16(_x,_y); }
 
 /* Multiplies two packed fracts.  Rounds the result to 16 bits.  Whether the 
  * rounding is biased or unbiased depends on what the RND_MOD bit in the ASTAT 
@@ -101,7 +101,7 @@ static fract16 mult_fr1x16(fract16 _x, fract16 _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract2x16 multr_fr2x16(fract2x16 _x, fract2x16 _y)
-  { return __builtin_multr_fr2x16(_x,_y); }
+  { return __builtin_bfin_multr_fr2x16(_x,_y); }
 
 /* Performs a 16-bit fractional multiplication (_x*_y) of the two input 
  * parameters. The result is rounded to 16 bits. Whether the rounding is biased
@@ -109,7 +109,7 @@ static fract2x16 multr_fr2x16(fract2x16 _x, fract2x16 _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 multr_fr1x16(fract16 _x, fract16 _y) 
-  { return __builtin_multr_fr1x16(_x,_y); }
+  { return __builtin_bfin_multr_fr1x16(_x,_y); }
 
 /* Negates both 16 bit fracts in the packed fract.  If one of the fract16 values 
  * is 0x8000, saturation occurs and 0x7fff is the result of the negation.
@@ -118,14 +118,14 @@ static fract16 multr_fr1x16(fract16 _x, fract16 _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract2x16 negate_fr2x16(fract2x16 _x)
-  { return __builtin_negate_fr2x16(_x); }
+  { return __builtin_bfin_negate_fr2x16(_x); }
 
 /* Returns the 16-bit result of the negation of the input parameter (-_x).  If 
  * the input is 0x8000, saturation occurs and 0x7fff is returned. */
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 negate_fr1x16(fract16 _x)
-  { return (fract16)__builtin_negate_fr2x16((int)_x); }
+  { return (fract16)__builtin_bfin_negate_fr2x16((int)_x); }
 
 /* Arithmetically shifts both fract16s in the fract2x16 left by _y places,and 
  * returns the packed result.  The empty bits are zero filled.  If shft is 
@@ -140,7 +140,7 @@ static fract16 negate_fr1x16(fract16 _x)
 #pragma inline
 __attribute__ ((always_inline))
 static fract2x16 shl_fr2x16(fract2x16 _x, int _y)
-  { return __builtin_shl_fr2x16(_x,(short)_y); }
+  { return __builtin_bfin_shl_fr2x16(_x,(short)_y); }
 
 /* Arithmetically shifts both fract16s in the fract2x16 left by _y places,and 
  * returns the packed result.  The empty bits are zero filled.  If shft is 
@@ -155,7 +155,7 @@ static fract2x16 shl_fr2x16(fract2x16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract2x16 shl_fr2x16_clip(fract2x16 _x, int _y)
-	{ return __builtin_shl_fr2x16(_x,(fract16)__builtin_max(__builtin_min(_y,15),-16)); }
+	{ return __builtin_bfin_shl_fr2x16(_x,(fract16)__builtin_bfin_max(__builtin_bfin_min(_y,15),-16)); }
 
 /* Arithmetically shifts the src variable left by _y places.  The empty bits 
  * are zero filled. If shft is negative, the shift is to the right by abs(_y)
@@ -168,7 +168,7 @@ static fract2x16 shl_fr2x16_clip(fract2x16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 shl_fr1x16(fract16 _x, int _y)
-  { return __builtin_shl_fr1x16(_x,(short)_y); }
+  { return __builtin_bfin_shl_fr1x16(_x,(short)_y); }
 
 /* Arithmetically shifts the src variable left by _y places.  The empty bits 
  * are zero filled. If shft is negative, the shift is to the right by abs(shft)
@@ -180,7 +180,7 @@ static fract16 shl_fr1x16(fract16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 shl_fr1x16_clip(fract16 _x, int _y)
-  { return __builtin_shl_fr1x16(_x,(fract16)__builtin_max(__builtin_min(_y,15),-16)); }
+  { return __builtin_bfin_shl_fr1x16(_x,(fract16)__builtin_bfin_max(__builtin_bfin_min(_y,15),-16)); }
 
 /* Arithmetically shifts both fract16s in the fract2x16 right by shft places 
  * with sign extension, and returns the packed result.  If shft is negative, 
@@ -197,7 +197,7 @@ static fract16 shl_fr1x16_clip(fract16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract2x16 shr_fr2x16(fract2x16 _x, int _y)
-  { return __builtin_shr_fr2x16(_x,(short)_y); }
+  { return __builtin_bfin_shr_fr2x16(_x,(short)_y); }
 
 /* Arithmetically shifts both fract16s in the fract2x16 right by shft places 
  * with sign extension, and returns the packed result.  If shft is negative, 
@@ -210,7 +210,7 @@ static fract2x16 shr_fr2x16(fract2x16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract2x16 shr_fr2x16_clip(fract2x16 _x, int _y)
-  { return __builtin_shr_fr2x16(_x,(short)__builtin_max(__builtin_min(_y,16),-15)); }
+  { return __builtin_bfin_shr_fr2x16(_x,(short)__builtin_bfin_max(__builtin_bfin_min(_y,16),-15)); }
 
 /* Arithmetically shifts the src variable right by shft places with sign 
  * extension.  If shft is negative, the shift is to the left by abs(_y) places, 
@@ -223,7 +223,7 @@ static fract2x16 shr_fr2x16_clip(fract2x16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 shr_fr1x16(fract16 _x, int _y)
-  { return (fract16)__builtin_shr_fr1x16(_x,(short)_y); }
+  { return (fract16)__builtin_bfin_shr_fr1x16(_x,(short)_y); }
 
 /* Arithmetically shifts the src variable right by shft places with sign 
  * extension.  If shft is negative, the shift is to the left by abs(_y) places, 
@@ -235,7 +235,7 @@ static fract16 shr_fr1x16(fract16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 shr_fr1x16_clip(fract16 _x, int _y)
-  { return (fract16)__builtin_shr_fr1x16(_x,(fract16)__builtin_max(__builtin_min(_y,16),-15)); }
+  { return (fract16)__builtin_bfin_shr_fr1x16(_x,(fract16)__builtin_bfin_max(__builtin_bfin_min(_y,16),-15)); }
 
 
 /* Logically shifts both fract16s in the fract2x16 right by shft places.  There
@@ -248,7 +248,7 @@ static fract16 shr_fr1x16_clip(fract16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract2x16 shrl_fr2x16(fract2x16 _x, int _y)
-	{ return __builtin_shrl_fr2x16(_x,(short)_y); }
+	{ return __builtin_bfin_shrl_fr2x16(_x,(short)_y); }
 
 /* Logically shifts both fract16s in the fract2x16 right by shft places.  There
  * is no sign extension and no saturation - the empty bits are zero filled.
@@ -259,7 +259,7 @@ static fract2x16 shrl_fr2x16(fract2x16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract2x16 shrl_fr2x16_clip(fract2x16 _x, int _y)
-	{ return __builtin_shrl_fr2x16(_x,(short)__builtin_max(__builtin_min(_y,16),-15)); }
+	{ return __builtin_bfin_shrl_fr2x16(_x,(short)__builtin_bfin_max(__builtin_bfin_min(_y,16),-15)); }
 
 
 /* Logically shifts a fract16 right by shft places.  There is no sign extension
@@ -272,7 +272,7 @@ static fract2x16 shrl_fr2x16_clip(fract2x16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 shrl_fr1x16(fract16 _x, int _y)
-	{ return (fract16)__builtin_shrl_fr2x16((int)_x,(short)_y); }
+	{ return (fract16)__builtin_bfin_shrl_fr2x16((int)_x,(short)_y); }
 
 /* Logically shifts a fract16 right by _x places.  There is no sign extension
  * and no saturation - the empty bits are zero filled.
@@ -283,7 +283,7 @@ static fract16 shrl_fr1x16(fract16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 shrl_fr1x16_clip(fract16 _x, int _y)
-	{ return (fract16)__builtin_shrl_fr2x16((int)_x,(short)__builtin_max(__builtin_min(_y,16),-15)); }
+	{ return (fract16)__builtin_bfin_shrl_fr2x16((int)_x,(short)__builtin_bfin_max(__builtin_bfin_min(_y,16),-15)); }
 
 
 
@@ -297,13 +297,13 @@ static fract16 shrl_fr1x16_clip(fract16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract32 add_fr1x32(fract32 _x, fract32 _y)
-  { return __builtin_add_fr1x32(_x,_y); }
+  { return __builtin_bfin_add_fr1x32(_x,_y); }
 
 /* Performs 32-bit subtraction of the two input parameters (_x-_y). */
 #pragma inline
 __attribute__ ((always_inline))
 static fract32 sub_fr1x32(fract32 _x, fract32 _y)
-  { return __builtin_sub_fr1x32(_x,_y); }
+  { return __builtin_bfin_sub_fr1x32(_x,_y); }
 
 /* Performs 32-bit multiplication of the input parameters (_x*_y).  
  * The result (which is calculated internally with an accuracy of 40 bits) 
@@ -311,7 +311,7 @@ static fract32 sub_fr1x32(fract32 _x, fract32 _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract32 mult_fr1x32x32(fract32 _x, fract32 _y)
-  { return __builtin_mult_fr1x32x32(_x,_y); }
+  { return __builtin_bfin_mult_fr1x32x32(_x,_y); }
 
 /* Performs 32-bit non-saturating multiplication of the input parameters 
  * (_x*_y). This is somewhat faster than mult_fr1x32x32. The result (which is 
@@ -320,7 +320,7 @@ static fract32 mult_fr1x32x32(fract32 _x, fract32 _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract32 mult_fr1x32x32NS(fract32 _x, fract32 _y)
-  { return __builtin_mult_fr1x32x32NS(_x,_y); }
+  { return __builtin_bfin_mult_fr1x32x32NS(_x,_y); }
 
 /* Returns the 32-bit value that is the absolute value of the input parameter.
  * Where the input is 0x80000000, saturation occurs and 0x7fffffff is returned.
@@ -328,27 +328,27 @@ static fract32 mult_fr1x32x32NS(fract32 _x, fract32 _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract32 abs_fr1x32(fract32 _x)
-  { return __builtin_abs_fr1x32(_x); }
+  { return __builtin_bfin_abs_fr1x32(_x); }
 
 /* Returns the 32-bit result of the negation of the input parameter (-_x).  If
  * the input is 0x80000000, saturation occurs and 0x7fffffff is returned.  */
 #pragma inline
 __attribute__ ((always_inline))
 static fract32 negate_fr1x32(fract32 _x) {
-  return __builtin_negate_fr1x32(_x);
+  return __builtin_bfin_negate_fr1x32(_x);
 }
 
 /* Returns the minimum of the two input parameters */
 #pragma inline
 __attribute__ ((always_inline))
 static fract32 min_fr1x32(fract32 _x, fract32 _y)
-  { return __builtin_min_fr1x32(_x,_y); }
+  { return __builtin_bfin_min_fr1x32(_x,_y); }
 
 /* Returns the maximum of the two input parameters */
 #pragma inline
 __attribute__ ((always_inline))
 static fract32 max_fr1x32(fract32 _x, fract32 _y)
-  { return __builtin_max_fr1x32(_x,_y); }
+  { return __builtin_bfin_max_fr1x32(_x,_y); }
 
 /* Arithmetically shifts the src variable left by shft places.  The empty bits 
  * are zero filled. If shft is negative, the shift is to the right by abs(shft)
@@ -361,7 +361,7 @@ static fract32 max_fr1x32(fract32 _x, fract32 _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract32 shl_fr1x32(fract32 _x, int _y)
-  { return __builtin_shl_fr1x32(_x,(short)_y); }
+  { return __builtin_bfin_shl_fr1x32(_x,(short)_y); }
 
 /* Arithmetically shifts the src variable left by shft places.  The empty bits 
  * are zero filled. If shft is negative, the shift is to the right by abs(_y)
@@ -373,7 +373,7 @@ static fract32 shl_fr1x32(fract32 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract32 shl_fr1x32_clip(fract32 _x, int _y)
-	{ return __builtin_shl_fr1x32(_x,(fract16)__builtin_max(__builtin_min(_y,31),-32)); }
+	{ return __builtin_bfin_shl_fr1x32(_x,(fract16)__builtin_bfin_max(__builtin_bfin_min(_y,31),-32)); }
 
 /* Arithmetically shifts the src variable right by shft places with sign 
  * extension.  If shft is negative, the shift is to the left by abs(_y) places, 
@@ -386,7 +386,7 @@ static fract32 shl_fr1x32_clip(fract32 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract32 shr_fr1x32(fract32 _x, int _y)
-  { return __builtin_shr_fr1x32(_x,(short)_y); }
+  { return __builtin_bfin_shr_fr1x32(_x,(short)_y); }
 
 /* Arithmetically shifts the src variable right by shft places with sign 
  * extension.  If shft is negative, the shift is to the left by abs(_y) places, 
@@ -398,14 +398,14 @@ static fract32 shr_fr1x32(fract32 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract32 shr_fr1x32_clip(fract32 _x, int _y)
-	{ return __builtin_shr_fr1x32(_x,(short)__builtin_max(__builtin_min(_y,32),-31)); }
+	{ return __builtin_bfin_shr_fr1x32(_x,(short)__builtin_bfin_max(__builtin_bfin_min(_y,32),-31)); }
 
 /* Performs a fractional multiplication on two 16-bit fractions, returning the 
  * 32-bit result. There will be loss of precision. */
 #pragma inline
 __attribute__ ((always_inline))
 static fract32 mult_fr1x32(fract16 _x, fract16 _y)
-  { return __builtin_mult_fr1x32(_x,_y); }
+  { return __builtin_bfin_mult_fr1x32(_x,_y); }
 
 /*****************************/
 /*                           */
@@ -430,7 +430,7 @@ static fract16 sat_fr1x32(fract32 _x)
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 round_fr1x32(fract32 _x)
-  { return __builtin_round_fr1x32(_x); }
+  { return __builtin_bfin_round_fr1x32(_x); }
 
 /* Returns the number of left shifts required to normalize the input variable 
  * so that it is either in the interval 0x40000000 to 0x7fffffff, or in the 
@@ -445,7 +445,7 @@ static fract16 round_fr1x32(fract32 _x)
 #pragma inline
 __attribute__ ((always_inline))
 static int norm_fr1x32(fract32 _x)
-  { return (int)__builtin_norm_fr1x32(_x); }
+  { return (int)__builtin_bfin_norm_fr1x32(_x); }
 
 /* Returns the number of left shifts required to normalize the input variable 
  * so that it is either in the interval 0x4000 to 0x7fff, or in the interval
@@ -460,7 +460,7 @@ static int norm_fr1x32(fract32 _x)
 #pragma inline
 __attribute__ ((always_inline))
 static int norm_fr1x16(fract16 _x)
-  { return (int)__builtin_norm_fr1x16(_x); } 
+  { return (int)__builtin_bfin_norm_fr1x16(_x); } 
 
 /* This function returns the top 16 bits of _x, i.e. it truncates _x to 16
  * bits.  */
@@ -475,37 +475,37 @@ static fract16 trunc_fr1x32(fract32 _x)
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 abs_fr16 (fract16 _x)
-  { return (fract16)__builtin_abs_fr2x16 ((int)_x); }
+  { return (fract16)__builtin_bfin_abs_fr2x16 ((int)_x); }
 
 /* Returns the 16-bit value that is the absolute value of the input parameter.
  * Where the input is 0x8000, saturation occurs and 0x7fff is returned. */
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 abs_fr1x16 (fract16 _x)
-  { return (fract16)__builtin_abs_fr2x16((int)_x); }
+  { return (fract16)__builtin_bfin_abs_fr2x16((int)_x); }
 
 /* Returns the maximum of the two input parameters. */
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 max_fr16 (fract16 _x, fract16 _y)
-  { return (fract16)__builtin_max_fr2x16 ((int)_x,(int)_y); }
+  { return (fract16)__builtin_bfin_max_fr2x16 ((int)_x,(int)_y); }
 
 /* Returns the maximum of the two input parameters. */
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 min_fr16 (fract16 _x, fract16 _y)
-  { return (fract16)__builtin_min_fr2x16 ((int)_x, (int)_y); }
+  { return (fract16)__builtin_bfin_min_fr2x16 ((int)_x, (int)_y); }
 
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 max_fr1x16 (fract16 _x, fract16 _y)
-  { return (fract16)__builtin_max_fr2x16 ((int)_x, (int)_y); }
+  { return (fract16)__builtin_bfin_max_fr2x16 ((int)_x, (int)_y); }
 
 /* Returns the maximum of the two input parameters. */
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 min_fr1x16 (fract16 _x, fract16 _y)
-  { return (fract16)__builtin_min_fr2x16 ((int)_x, (int)_y); }
+  { return (fract16)__builtin_bfin_min_fr2x16 ((int)_x, (int)_y); }
 
 /*********************/
 /*                   */
@@ -683,9 +683,9 @@ static fract16 div_s(fract16 _a, fract16 _b) {
   }
   else {
     x <<= 16;
-    x = __builtin_divs(x, y, &aq);
+    x = __builtin_bfin_divs(x, y, &aq);
     for (i=0; i<15; i++) {
-      x = __builtin_divq(x, y, &aq);
+      x = __builtin_bfin_divq(x, y, &aq);
     }
     rtn = (fract16) x;
   }

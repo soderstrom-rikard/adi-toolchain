@@ -1,3 +1,7 @@
+2007-08-01  Jie Zhang  <jie.zhang@analog.com>
+
+	* countll.c: Processed with c_fix_builtins.sed.
+
 2007-07-24  Jie Zhang  <jie.zhang@analog.com>
 
 	* Makefile: Only build and archive complex fuctions when

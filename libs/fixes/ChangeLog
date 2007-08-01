@@ -1,0 +1,4 @@
+2007-08-01  Jie Zhang  <jie.zhang@analog.com>
+
+	* c_fix_builtins.sed: New.
+	* fix.sh: Add c_fix_builtins.sed.

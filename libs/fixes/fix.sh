@@ -32,7 +32,8 @@ A_FIXES="a_fix_section.sed \
 
 C_FIXES="c_fix_linkage_name.sed \
 	c_fix_linkage_name2.sed \
-	c_fix_pragmas.sed"
+	c_fix_pragmas.sed \
+	c_fix_builtins.sed"
 
 FIXES="fix_cvs_keywords.sed"
 
