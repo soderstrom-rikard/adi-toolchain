@@ -1,3 +1,8 @@
+2007-08-01  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-tdep.c (IS_SIGTRAMP): Remove.
+	(bfin_linux_pc_in_sigtramp): Avoid reading illegal memory.
+
 2007-03-15  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin-tdep.c (P_SIGNAL_INS_1): Define to 0x00ADE128.

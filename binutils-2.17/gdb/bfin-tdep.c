@@ -249,12 +249,6 @@ int map_gcc_gdb[] =
 };
 
 
-/* Check whether insn1 and insn2 are parts of a signal trampoline.  */
-
-#define IS_SIGTRAMP(insn1, insn2)	\
- /* P0=0xad (X); EXCPT 0x0 */		\
- ((insn1 == P_SIGNAL_INS_1) && ((insn2 & P_SIGNAL_INS_2) == P_SIGNAL_INS_2))
-
 #define SIGCONTEXT_OFFSET	168
 
 
@@ -346,28 +340,37 @@ bfin_abi (struct gdbarch *gdbarch)
 static int
 bfin_linux_pc_in_sigtramp (struct frame_info *next_frame, CORE_ADDR pc)
 {
-  gdb_byte buf[12];
-  unsigned long insn0, insn1, insn2;
+  gdb_byte buf[10];
+  gdb_byte *p;
+  unsigned long insn1, insn2;
 
-  if (pc < 4
-      || pc >= (CORE_ADDR) 0x7ffffff8
-      || !safe_frame_unwind_memory (next_frame, pc - 4, buf, sizeof (buf)))
+  if (pc > (CORE_ADDR) 0x7ffffffe
+      || !safe_frame_unwind_memory (next_frame, pc, buf + 4, 2))
     return 0;
 
-  insn1 = extract_unsigned_integer (buf + 4, 4);
-  insn2 = extract_unsigned_integer (buf + 8, 4);
+  insn1 = extract_unsigned_integer (buf + 4, 2);
 
-  if (IS_SIGTRAMP (insn1, insn2))
-    return 1;
+  if (insn1 == (P_SIGNAL_INS_1 & 0xffff))
+    {
+      if (pc > (CORE_ADDR) 0x7ffffffa
+	  || !safe_frame_unwind_memory (next_frame, pc + 2, buf + 6, 4))
+	return 0;
+      p = buf + 4;
+    }
+  else if (insn1 == P_SIGNAL_INS_2)
+    {
+      if (pc < (CORE_ADDR) 4
+	  || !safe_frame_unwind_memory (next_frame, pc - 4, buf, 4))
+	return 0;
+      p = buf;
+    }
+  else
+    return 0;
 
-  insn0 = extract_unsigned_integer (buf, 4);
-  if (IS_SIGTRAMP (insn0, insn1))
-    return 1;
+  insn1 = extract_unsigned_integer (p, 4);
+  insn2 = extract_unsigned_integer (p + 4, 2);
 
-  insn0 = ((insn0 << 16) & 0xffffffff) | (insn1 >> 16);
-  insn1 = ((insn1 << 16) & 0xffffffff) | (insn2 >> 16);
-
-  if (IS_SIGTRAMP (insn0, insn1))
+  if (insn1 == P_SIGNAL_INS_1 && insn2 == P_SIGNAL_INS_2)
     return 1;
 
   return 0;
