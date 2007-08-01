@@ -67,6 +67,7 @@ extern const struct floatformat *default_double_format (struct gdbarch *gdbarch)
 
 extern CORE_ADDR core_addr_identity (CORE_ADDR addr);
 extern gdbarch_convert_from_func_ptr_addr_ftype convert_from_func_ptr_addr_identity;
+extern gdbarch_convert_from_addr_func_ptr_ftype convert_from_addr_func_ptr_identity;
 
 /* No-op conversion of reg to regnum. */
 

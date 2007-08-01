@@ -844,6 +844,17 @@ bfin_convert_from_func_ptr_addr (struct gdbarch *gdbarch, CORE_ADDR addr,
     return addr;
 }
 
+static CORE_ADDR
+bfin_convert_from_addr_func_ptr (struct gdbarch *gdbarch, CORE_ADDR addr,
+				 struct target_ops *targ)
+{
+  CORE_ADDR descr;
+
+  descr = find_func_descr (gdbarch, addr);
+
+  return descr;
+}
+
 /* We currently only support passing parameters in integer registers.  This
    conforms with GCC's default model.  Several other variants exist and
    we should probably support some of them based on the selected ABI.  */
@@ -890,22 +901,7 @@ bfin_push_dummy_call (struct gdbarch *gdbarch,
       int len = TYPE_LENGTH (value_type);
       int container_len = (len + 3) & ~3;
       sp -= container_len;
-
-      if (abi == BFIN_ABI_FDPIC
-	  && len == 4
-	  && TYPE_CODE (arg_type) == TYPE_CODE_PTR
-	  && TYPE_CODE (TYPE_TARGET_TYPE (arg_type)) == TYPE_CODE_FUNC)
-	{
-	  CORE_ADDR descr;
-
-	  /* The FDPIC ABI requires function descriptors to be passed instead
-	     of entry points.  */
-	  descr = extract_unsigned_integer (value_contents (args[i]), 4);
-	  descr = find_func_descr (gdbarch, descr);
-	  write_memory_unsigned_integer (sp, 4, descr);
-	}
-      else
-	write_memory (sp, value_contents_writeable (args[i]), container_len);
+      write_memory (sp, value_contents_writeable (args[i]), container_len);
     }
 
   /* initialize R0, R1 and R2 to the first 3 words of paramters */
@@ -1254,8 +1250,12 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
 
 
   if (bfin_abi (gdbarch) == BFIN_ABI_FDPIC)
-    set_gdbarch_convert_from_func_ptr_addr (gdbarch,
-					    bfin_convert_from_func_ptr_addr);
+    {
+      set_gdbarch_convert_from_func_ptr_addr (gdbarch,
+					      bfin_convert_from_func_ptr_addr);
+      set_gdbarch_convert_from_addr_func_ptr (gdbarch,
+					      bfin_convert_from_addr_func_ptr);
+    }
 
   if (bfin_abi (gdbarch) == BFIN_ABI_FDPIC)
     set_gdbarch_use_get_offsets (gdbarch, 0);

@@ -866,12 +866,18 @@ struct value *
 value_coerce_function (struct value *arg1)
 {
   struct value *retval;
+  CORE_ADDR addr;
 
   if (VALUE_LVAL (arg1) != lval_memory)
     error (_("Attempt to take address of value not located in memory."));
 
+  addr = VALUE_ADDRESS (arg1) + value_offset (arg1);
+  addr = gdbarch_convert_from_addr_func_ptr (current_gdbarch,
+					     addr,
+					     &current_target);
+					     
   retval = value_from_pointer (lookup_pointer_type (value_type (arg1)),
-			       (VALUE_ADDRESS (arg1) + value_offset (arg1)));
+			       addr);
   return retval;
 }
 

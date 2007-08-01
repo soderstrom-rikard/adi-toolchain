@@ -1,5 +1,20 @@
 2007-08-01  Jie Zhang  <jie.zhang@analog.com>
 
+	* gdbarch.sh (convert_from_addr_func_ptr): New method.
+	* gdbarch.c: Regenerated.
+	* gdbarch.h: Regenerated.
+	* bfin-tdep.c (bfin_convert_from_addr_func_ptr): New.
+	(bfin_push_dummy_call): No need to deal with function pointer
+	argument specially for FDPIC ABI.
+	(bfin_gdbarch_init): Init gdbarch_convert_from_addr_func_ptr
+	for FDPIC ABI.
+	* valops.c (value_coerce_function): Call
+	gdbarch_convert_from_addr_func_ptr.
+	* arch-utils.h (convert_from_addr_func_ptr_identity): Declare.
+	* arch-utils.c (convert_from_addr_func_ptr_identity): New.
+
+2007-08-01  Jie Zhang  <jie.zhang@analog.com>
+
 	* bfin-tdep.c (IS_SIGTRAMP): Remove.
 	(bfin_linux_pc_in_sigtramp): Avoid reading illegal memory.
 

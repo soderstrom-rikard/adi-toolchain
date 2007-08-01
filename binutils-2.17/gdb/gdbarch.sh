@@ -588,6 +588,7 @@ m::int:stabs_argument_has_addr:struct type *type:type::default_stabs_argument_ha
 v:=:int:frame_red_zone_size
 #
 m::CORE_ADDR:convert_from_func_ptr_addr:CORE_ADDR addr, struct target_ops *targ:addr, targ::convert_from_func_ptr_addr_identity::0
+m::CORE_ADDR:convert_from_addr_func_ptr:CORE_ADDR addr, struct target_ops *targ:addr, targ::convert_from_addr_func_ptr_identity::0
 # On some machines there are bits in addresses which are not really
 # part of the address, but are used by the kernel, the hardware, etc.
 # for special purposes.  ADDR_BITS_REMOVE takes out any such bits so

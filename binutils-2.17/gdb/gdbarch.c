@@ -213,6 +213,7 @@ struct gdbarch
   gdbarch_stabs_argument_has_addr_ftype *stabs_argument_has_addr;
   int frame_red_zone_size;
   gdbarch_convert_from_func_ptr_addr_ftype *convert_from_func_ptr_addr;
+  gdbarch_convert_from_addr_func_ptr_ftype *convert_from_addr_func_ptr;
   gdbarch_addr_bits_remove_ftype *addr_bits_remove;
   gdbarch_smash_text_address_ftype *smash_text_address;
   gdbarch_software_single_step_ftype *software_single_step;
@@ -339,6 +340,7 @@ struct gdbarch startup_gdbarch =
   default_stabs_argument_has_addr,  /* stabs_argument_has_addr */
   0,  /* frame_red_zone_size */
   convert_from_func_ptr_addr_identity,  /* convert_from_func_ptr_addr */
+  convert_from_addr_func_ptr_identity,  /* convert_from_addr_func_ptr */
   0,  /* addr_bits_remove */
   0,  /* smash_text_address */
   0,  /* software_single_step */
@@ -439,6 +441,7 @@ gdbarch_alloc (const struct gdbarch_info *info,
   current_gdbarch->remote_translate_xfer_address = generic_remote_translate_xfer_address;
   current_gdbarch->stabs_argument_has_addr = default_stabs_argument_has_addr;
   current_gdbarch->convert_from_func_ptr_addr = convert_from_func_ptr_addr_identity;
+  current_gdbarch->convert_from_addr_func_ptr = convert_from_addr_func_ptr_identity;
   current_gdbarch->addr_bits_remove = core_addr_identity;
   current_gdbarch->smash_text_address = core_addr_identity;
   current_gdbarch->skip_trampoline_code = generic_skip_trampoline_code;
@@ -593,6 +596,7 @@ verify_gdbarch (struct gdbarch *current_gdbarch)
   /* Skip verify of deprecated_reg_struct_has_addr, has predicate */
   /* Skip verify of stabs_argument_has_addr, invalid_p == 0 */
   /* Skip verify of convert_from_func_ptr_addr, invalid_p == 0 */
+  /* Skip verify of convert_from_addr_func_ptr, invalid_p == 0 */
   /* Skip verify of addr_bits_remove, invalid_p == 0 */
   /* Skip verify of smash_text_address, invalid_p == 0 */
   /* Skip verify of software_single_step, has predicate */
@@ -815,6 +819,9 @@ gdbarch_dump (struct gdbarch *current_gdbarch, struct ui_file *file)
   fprintf_unfiltered (file,
                       "gdbarch_dump: construct_inferior_arguments = <0x%lx>\n",
                       (long) current_gdbarch->construct_inferior_arguments);
+  fprintf_unfiltered (file,
+                      "gdbarch_dump: convert_from_addr_func_ptr = <0x%lx>\n",
+                      (long) current_gdbarch->convert_from_addr_func_ptr);
   fprintf_unfiltered (file,
                       "gdbarch_dump: convert_from_func_ptr_addr = <0x%lx>\n",
                       (long) current_gdbarch->convert_from_func_ptr_addr);
@@ -3237,6 +3244,23 @@ set_gdbarch_convert_from_func_ptr_addr (struct gdbarch *gdbarch,
                                         gdbarch_convert_from_func_ptr_addr_ftype convert_from_func_ptr_addr)
 {
   gdbarch->convert_from_func_ptr_addr = convert_from_func_ptr_addr;
+}
+
+CORE_ADDR
+gdbarch_convert_from_addr_func_ptr (struct gdbarch *gdbarch, CORE_ADDR addr, struct target_ops *targ)
+{
+  gdb_assert (gdbarch != NULL);
+  gdb_assert (gdbarch->convert_from_addr_func_ptr != NULL);
+  if (gdbarch_debug >= 2)
+    fprintf_unfiltered (gdb_stdlog, "gdbarch_convert_from_addr_func_ptr called\n");
+  return gdbarch->convert_from_addr_func_ptr (gdbarch, addr, targ);
+}
+
+void
+set_gdbarch_convert_from_addr_func_ptr (struct gdbarch *gdbarch,
+                                        gdbarch_convert_from_addr_func_ptr_ftype convert_from_addr_func_ptr)
+{
+  gdbarch->convert_from_addr_func_ptr = convert_from_addr_func_ptr;
 }
 
 CORE_ADDR
