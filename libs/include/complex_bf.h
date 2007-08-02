@@ -48,7 +48,7 @@
  *
  */
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static complex_float caddf (complex_float _a,
                                     complex_float _b)
@@ -64,7 +64,7 @@ __attribute__ ((always_inline))
 
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static complex_double cadd (complex_double _a,
                                     complex_double _b)
@@ -89,7 +89,7 @@ __attribute__ ((always_inline))
  *
  */
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static complex_float csubf (complex_float _a,
                                     complex_float _b)
@@ -104,7 +104,7 @@ __attribute__ ((always_inline))
                                    complex_long_double _b) asm ("__csubd");
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static complex_double csub (complex_double _a,
                                     complex_double _b)
@@ -128,7 +128,7 @@ __attribute__ ((always_inline))
  *
  */
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static complex_float cmltf (complex_float _a,
                                     complex_float _b)
@@ -144,7 +144,7 @@ __attribute__ ((always_inline))
 
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static complex_double cmlt (complex_double _a,
                                     complex_double _b)

@@ -37,7 +37,7 @@ extern "C" {
 #endif
 
     static fract32 fr16_to_fr32(fract16 _x);
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
     static fract32 fr16_to_fr32(fract16 _x) {
        /* convert a fract16 to a fract32 */
@@ -46,7 +46,7 @@ __attribute__ ((always_inline))
     }
 
     static fract16 fr32_to_fr16(fract32 _x);
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
     static fract16 fr32_to_fr16(fract32 _x) {
        /* Convert a fract32 to a fract16. */

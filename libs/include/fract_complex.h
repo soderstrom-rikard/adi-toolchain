@@ -78,7 +78,7 @@
     (R).re = __builtin_bfin_extract_lo(X); \
     (R).im = __builtin_bfin_extract_hi(X); \
   }
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static complex_fract16 cadd_fr16 (complex_fract16 _a,
                                           complex_fract16 _b)
@@ -103,7 +103,7 @@ __attribute__ ((always_inline))
 
 
 #if defined(__ADSPBLACKFIN__) && !defined(__NO_BUILTIN)
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static complex_fract16 csub_fr16 (complex_fract16 _a,
                                           complex_fract16 _b)
@@ -129,7 +129,7 @@ __attribute__ ((always_inline))
 
 
 #if defined(__ADSPBLACKFIN__) && !defined(__NO_BUILTIN)
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static complex_fract16 cmlt_fr16 (complex_fract16 _a,
                                           complex_fract16 _b)
@@ -144,7 +144,7 @@ __attribute__ ((always_inline))
 #endif
 
 #if defined(__ADSPBLACKFIN__) && !defined(__NO_BUILTIN)
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         /*  Complex fract16 multiply accumulate operation with 32-bit internal
          **  saturation.
@@ -160,7 +160,7 @@ __attribute__ ((always_inline))
            return r;
         }
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         /*  Complex fract16 multiply subtract operation with 32-bit internal
          **  saturation.
@@ -176,7 +176,7 @@ __attribute__ ((always_inline))
            return r;
         }
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         /*  Complex fract16 multiply accumulate operation with 40-bit internal
          **  saturation.
@@ -192,7 +192,7 @@ __attribute__ ((always_inline))
            return r;
         }
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         /*  Complex fract16 multiply subtract operation with 40-bit internal
          **  saturation.
@@ -208,7 +208,7 @@ __attribute__ ((always_inline))
            return r;
         }
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
          static fract16 csqu_add_fr16 (complex_fract16 _c)
          {
@@ -217,7 +217,7 @@ __attribute__ ((always_inline))
                                __builtin_bfin_mult_fr1x16(_c.im, _c.im));
          }
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
          static fract32 csqu_add_fr32 (complex_fract16 _c)
          {
@@ -225,7 +225,7 @@ __attribute__ ((always_inline))
                                         __builtin_bfin_mult_fr1x32(_c.im,_c.im));
          }
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
          static fract16 cdst_fr16 (complex_fract16 _x,
                                    complex_fract16 _y)
@@ -239,7 +239,7 @@ __attribute__ ((always_inline))
                                   __builtin_bfin_sub_fr1x16(_x.im,_y.im)));
          }
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
          static fract32 cdst_fr32 (complex_fract16 _x,
                                    complex_fract16 _y)
@@ -254,7 +254,7 @@ __attribute__ ((always_inline))
          }
 
 /* Other builtins */
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static complex_fract16 csqu_fr16 (complex_fract16 _a)
         {
@@ -337,7 +337,7 @@ extern long long  __builtin_bfin_conj_fr32 (long long _a);
 extern int        __builtin_bfin_csqu_fr16 (int _a);
 extern long long  __builtin_bfin_compose_i64 (int _a, int _b);
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static complex_fract32 ccompose_fr32 (fract32 _real, fract32 _imag)
         {
@@ -347,21 +347,21 @@ __attribute__ ((always_inline))
            return _x;
         }
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static fract32 real_fr32 (complex_fract32 _a)
         {
            return _a.re;
         }
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static fract32 imag_fr32 (complex_fract32 _a)
         {
            return _a.im;
         }
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static complex_fract32 cadd_fr32 (complex_fract32 _a,
                                           complex_fract32 _b)
@@ -372,7 +372,7 @@ __attribute__ ((always_inline))
            return _x;
         }
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static complex_fract32 csub_fr32 (complex_fract32 _a,
                                           complex_fract32 _b)
@@ -383,7 +383,7 @@ __attribute__ ((always_inline))
            return _x;
         }
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static complex_fract32 conj_fr32 (complex_fract32 _a)
         {

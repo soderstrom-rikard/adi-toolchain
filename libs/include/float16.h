@@ -89,7 +89,7 @@ float fl16_to_fl(float16);
 
 #else
 
-#pragma inline
+__inline__
 float16 fr16_to_fl16(fract16 fr)
 {
    float16 fl = { 0 };
@@ -103,7 +103,7 @@ float16 fr16_to_fl16(fract16 fr)
    return fl;
 }
 
-#pragma inline
+__inline__
 fract16 fl16_to_fr16(float16 fl)
 {
    fract16 fraction = fl.s.m;
@@ -112,7 +112,7 @@ fract16 fl16_to_fr16(float16 fl)
    return shl_fr1x16(fraction, (int)exponent);
 }
 
-#pragma inline
+__inline__
 static float16 norm_fl16(float16 fl)
 {
    if (fl.s.m != 0) {
@@ -125,7 +125,7 @@ static float16 norm_fl16(float16 fl)
    return fl;
 }
 
-#pragma inline
+__inline__
 float16 add_fl16(float16 x, float16 y)
 {
    int d = x.s.e - y.s.e;
@@ -157,7 +157,7 @@ float16 add_fl16(float16 x, float16 y)
    return fl;
 }
 
-#pragma inline
+__inline__
 float16 sub_fl16(float16 x, float16 y)
 {
    int d = x.s.e - y.s.e;
@@ -189,7 +189,7 @@ float16 sub_fl16(float16 x, float16 y)
    return fl;
 }
 
-#pragma inline
+__inline__
 float16 mul_fl16(float16 x, float16 y)
 {
    float16 fl;
@@ -206,7 +206,7 @@ float16 mul_fl16(float16 x, float16 y)
    return fl;
 }
 
-#pragma inline
+__inline__
 float16 div_fl16(float16 x, float16 y)
 {
    int i;
@@ -265,21 +265,21 @@ float16 div_fl16(float16 x, float16 y)
    return fl;
 }
 
-#pragma inline
+__inline__
 float16 negate_fl16(float16 fl)
 {
    fl.s.m = -fl.s.m;
    return fl;
 }
 
-#pragma inline
+__inline__
 float16 abs_fl16(float16 fl)
 {
    fl.s.m = abs_fr1x16(fl.s.m);
    return fl;
 }
 
-#pragma inline
+__inline__
 int cmp_fl16(float16 x, float16 y)
 {
    /* x < y  => negative
@@ -317,7 +317,7 @@ int cmp_fl16(float16 x, float16 y)
    return res;
 }
 
-#pragma inline
+__inline__
 float16 fl_to_fl16(float f)
 {
    float16 fl;
@@ -349,7 +349,7 @@ float16 fl_to_fl16(float f)
    return fl;
 }
 
-#pragma inline
+__inline__
 int fits_in_fl16(float f)
 {
    float16 fl;
@@ -357,7 +357,7 @@ int fits_in_fl16(float f)
    return (fl.u & 0xffu) == 0;
 }
 
-#pragma inline
+__inline__
 float fl16_to_fl(float16 fl)
 {
    unsigned long exponent, sign;

@@ -82,7 +82,7 @@ if [ ! -e $1 ]; then
 elif [ -f $1 ]; then
 	fix_one_file $1
 elif [ -d $1 ]; then
-	FILES=`find $1 -type f`
+	FILES=`find $1 -type f \( -name '*.h' -o -name '*.c' -o -name '*.asm' -o -name '*.S' \) | grep -v '\.svn'`
 	for file in $FILES
 	do
 		fix_one_file $file

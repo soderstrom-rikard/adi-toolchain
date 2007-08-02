@@ -66,7 +66,7 @@
  *
  */
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static complex_float conjf (complex_float _a)
             {complex_float _c; _c.re = _a.re; _c.im = - _a.im; return _c;}
@@ -75,7 +75,7 @@ __attribute__ ((always_inline))
 
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static complex_double conj (complex_double _a)
         {

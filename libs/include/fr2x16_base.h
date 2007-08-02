@@ -42,7 +42,7 @@ extern "C" {
 
 #if !defined(__NO_BUILTIN)
 
-#pragma inline
+__inline__
 static fract16 sum_fr2x16(fract2x16 _x) {
   return __builtin_bfin_sum_fr2x16(_x);
 }
@@ -60,7 +60,7 @@ fract16 sum_fr2x16(fract2x16 _x);
 /* Takes two fract16 values, and returns a fract2x16 value.
  * Input: two fract16 values
  * Returns: {_x,_y} */
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static fract2x16 compose_fr2x16(fract16 _x, fract16 _y) {
 	return compose_2x16(_x,_y);
@@ -71,7 +71,7 @@ static fract2x16 compose_fr2x16(fract16 _x, fract16 _y) {
  * Returns: a.
  */
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static fract16 high_of_fr2x16(fract2x16 _x) {
   return high_of_2x16(_x);
@@ -82,7 +82,7 @@ static fract16 high_of_fr2x16(fract2x16 _x) {
  * Returns: b
  */
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static fract16 low_of_fr2x16(fract2x16 _x) {
   return low_of_2x16(_x);

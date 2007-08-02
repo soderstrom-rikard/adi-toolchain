@@ -1,5 +1,22 @@
 2007-08-02  Jie Zhang  <jie.zhang@analog.com>
 
+	* math_bf.h: Processed with c_fix_pragmas.sed.
+	* i2x16_base.h: Likewise.
+	* complex.h: Likewise.
+	* float16.h: Likewise.
+	* i2x16_math.h: Likewise.
+	* fr2x16_base.h: Likewise.
+	* fract2float_conv.h: Likewise.
+	* flt2fr.h: Likewise.
+	* fr2x16_math.h: Likewise.
+	* matrix.h: Likewise.
+	* fract_math.h: Likewise.
+	* r2x16_base.h: Likewise.
+	* complex_bf.h: Likewise.
+	* fract_complex.h: Likewise.
+
+2007-08-02  Jie Zhang  <jie.zhang@analog.com>
+
 	* math_bf.h (_C_STD_BEGIN): Don't use.
 	(_C_LIB_DECL): Don't use.
 	(_END_C_LIB_DECL): Don't use.

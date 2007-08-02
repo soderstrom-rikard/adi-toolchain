@@ -38,17 +38,17 @@ extern "C" {
 
 #if !defined(__NO_BUILTIN)
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static raw2x16 compose_2x16(_raw16 _x, _raw16 _y) {
 	return __builtin_bfin_compose_2x16(_x, _y);
 }
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static  _raw16 high_of_2x16(raw2x16 _x) {
 	return __builtin_bfin_extract_hi(_x);
 }
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static  _raw16 low_of_2x16(raw2x16 _x) {
 	return __builtin_bfin_extract_lo(_x);
@@ -56,20 +56,20 @@ static  _raw16 low_of_2x16(raw2x16 _x) {
 
 #else
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static raw2x16 compose_2x16(_raw16 _x, _raw16 _y) {
 /* Casting and variable u required for MISRA compliance */
         unsigned int u = (((unsigned int)_x << 16) | ((unsigned int)_y & 0xFFFFU));
 	return (raw2x16)u;
 }
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static  _raw16 high_of_2x16(raw2x16 _x) {
         unsigned int u = ((unsigned int)_x >> 16);
 	return (_raw16)u;
 }
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static _raw16 low_of_2x16(raw2x16 _x) {
 	unsigned u = ((unsigned int)_x & 0xFFFFU);

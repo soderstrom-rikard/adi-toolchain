@@ -90,7 +90,7 @@
 #define  _INV_2_POW_15    (1.0 / 32768.0)
 
 /* Function to convert floating point data into fract16 data */
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 fract16  float_to_fract16(float _x)
 { 
@@ -100,7 +100,7 @@ fract16  float_to_fract16(float _x)
 
 
 /* Function to convert fract16 data into floating point data */
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 float  fract16_to_float(fract16 _x16)
 { 

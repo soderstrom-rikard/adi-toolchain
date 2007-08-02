@@ -45,18 +45,18 @@ extern "C" {
  * max({a,b},{c,d})	=> { max(a,c), max(b,d) }
  */
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static int2x16 abs_i2x16(int2x16 _x) {
 	return compose_2x16((short)abs((int)high_of_i2x16(_x)), (short)abs((int)low_of_i2x16(_x)));
 }
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static int2x16 min_i2x16(int2x16 _x, int2x16 _y) {
 	return compose_2x16((short)min((int)high_of_i2x16(_x), (int)high_of_i2x16(_y)),
                        (short)min((int)low_of_i2x16(_x), (int)low_of_i2x16(_y)));
 }
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static int2x16 max_i2x16(int2x16 _x, int2x16 _y) {
 	return compose_2x16((short)max((int)high_of_i2x16(_x), (int)high_of_i2x16(_y)),
@@ -71,22 +71,22 @@ static int2x16 max_i2x16(int2x16 _x, int2x16 _y) {
  * hh({a,b},{c,d})	=> b*d
  */
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static long int mult_ll_i2x16(int2x16 _x, int2x16 _y) {
 	return (long int)low_of_i2x16(_x)*(long int)low_of_i2x16(_y);
 }
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static long int mult_hl_i2x16(int2x16 _x, int2x16 _y) {
 	return (long int)high_of_i2x16(_x)*(long int)low_of_i2x16(_y);
 }
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static long int mult_lh_i2x16(int2x16 _x, int2x16 _y) {
 	return (long int)low_of_i2x16(_x)*(long int)high_of_i2x16(_y);
 }
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static long int mult_hh_i2x16(int2x16 _x, int2x16 _y) {
 	return (long int)high_of_i2x16(_x)*(long int)high_of_i2x16(_y);

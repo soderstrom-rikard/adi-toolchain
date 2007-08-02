@@ -145,7 +145,7 @@ extern "C" {
  */
 
 #if !defined(__NO_BUILTIN)
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static float fmaxf(float _x, float _y) 
                 { float res;
@@ -158,7 +158,7 @@ __attribute__ ((always_inline))
                 }
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static float fmax(double _x, double _y) 
                 { float res;
@@ -186,12 +186,12 @@ __attribute__ ((always_inline))
 
 
 #if !defined(__NO_BUILTIN) 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static int max(int _x, int _y) 
                 { return __builtin_bfin_max(_x,_y); }
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static long lmax(long _x, long _y)
           { return __builtin_bfin_lmax(_x, _y); }
@@ -210,7 +210,7 @@ __attribute__ ((always_inline))
  */
 
 #if !defined(__NO_BUILTIN) 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static float fminf(float _x, float _y) 
                 { float res;
@@ -223,7 +223,7 @@ __attribute__ ((always_inline))
                 }
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static float fmin(double _x, double _y) 
                 { float res;
@@ -251,12 +251,12 @@ __attribute__ ((always_inline))
 
 
 #if !defined(__NO_BUILTIN)
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static int min(int _x, int _y) 
                 { return __builtin_bfin_min(_x,_y); }
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static long lmin(long _x, long _y)
                 { return __builtin_bfin_lmin(_x,_y); }
@@ -317,11 +317,11 @@ __attribute__ ((always_inline))
  *    Count number of 1 bits (parity)
  */
 #if !defined(__NO_BUILTIN)
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static int countones (int _x) 
                 { return (int)__builtin_bfin_ones(_x); }
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static int lcountones (long _x) 
                 { return (int)__builtin_bfin_ones((int)_x); }
@@ -338,7 +338,7 @@ __attribute__ ((always_inline))
  *      Is number +/- Infinity?
  */
 #if !defined(__NO_BUILTIN)
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static int isinff(float _x) {
                 union { float _xx; unsigned long _l; } _v;
@@ -347,7 +347,7 @@ __attribute__ ((always_inline))
         }
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static int isinf(double _x) {
                 union { double _xx; unsigned long _l; } _v;
@@ -375,7 +375,7 @@ __attribute__ ((always_inline))
  *      Is number Not A Number?
  */
 #if !defined(__NO_BUILTIN)
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static int isnanf(float _x) {
                 union { float _xx; unsigned long _l; } _v;
@@ -384,7 +384,7 @@ __attribute__ ((always_inline))
         }
 
 #ifdef __DOUBLES_ARE_FLOATS__
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
         static int isnan(double _x) {
                 union { double _xx; unsigned long _l; } _v;

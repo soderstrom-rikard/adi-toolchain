@@ -38,17 +38,17 @@ extern "C" {
  * Composition and extraction
  */
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static int2x16 compose_i2x16(short _x, short _y) {
 	return compose_2x16(_x, _y);
 }
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static short high_of_i2x16(int2x16 _x) {
 	return high_of_2x16(_x);
 }
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static short low_of_i2x16(int2x16 _x) {
 	return low_of_2x16(_x);
@@ -63,17 +63,17 @@ static short low_of_i2x16(int2x16 _x) {
 
 #if (defined(__ADSPBLACKFIN__) || defined(__ADSPTS__)) && !defined(__NO_BUILTIN)
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static int2x16 add_i2x16(int2x16 _x, int2x16 _y) {
 	return __builtin_bfin_add_i2x16(_x, _y);
 }
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static int2x16 sub_i2x16(int2x16 _x, int2x16 _y) {
 	return __builtin_bfin_sub_i2x16(_x, _y);
 }
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static int2x16 mult_i2x16(int2x16 _x, int2x16 _y) {
 	return __builtin_bfin_mult_i2x16(_x, _y);
@@ -92,14 +92,14 @@ int2x16 mult_i2x16(int2x16, int2x16);
  */
 
 #ifdef __ADSPTS__
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static int sum_i2x16(int2x16 _x) {
 	return __builtin_bfin_sum_i2x16(_x);
 }
 #else
 
-#pragma inline
+__inline__
 __attribute__ ((always_inline))
 static int sum_i2x16(int2x16 _x) {
 	return (int)high_of_i2x16(_x)+low_of_i2x16(_x);

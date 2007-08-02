@@ -12,10 +12,10 @@
 #
 #   #pragam align n
 #   #pragma always_inline
+#   #pragma inline
 #
 # are transformed.
 #
-#   #pragma inline
 #   #pragma once
 #   #pragma system_header
 #
@@ -23,3 +23,4 @@
 
 s/^#pragam align \([0-9]*\)[ 	]*$/__attribute__ ((aligned (\1)))/
 s/^#pragma always_inline[ 	]*$/__attribute__ ((always_inline))/
+s/^#pragma inline[ 	]*$/__inline__/
