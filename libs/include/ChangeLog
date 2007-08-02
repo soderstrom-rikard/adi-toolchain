@@ -1,5 +1,12 @@
 2007-08-02  Jie Zhang  <jie.zhang@analog.com>
 
+	* math_bf.h (_C_STD_BEGIN): Don't use.
+	(_C_LIB_DECL): Don't use.
+	(_END_C_LIB_DECL): Don't use.
+	(_C_STD_END): Don't use.
+
+2007-08-02  Jie Zhang  <jie.zhang@analog.com>
+
 	* yvals.h: Remove.
 	* math_bf.h: Don't include yvals.h.
 

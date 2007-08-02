@@ -43,8 +43,9 @@
 #endif /* _MISRA_RULES */
 
 
-_C_STD_BEGIN
-_C_LIB_DECL
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* * * *        acos     * * * *
  *    Arc cosine
@@ -408,8 +409,9 @@ __attribute__ ((always_inline))
 
 
 
-_END_C_LIB_DECL
-_C_STD_END
+#ifdef __cplusplus
+}
+#endif
 
 #ifdef _MISRA_RULES
 #pragma diag(pop)
