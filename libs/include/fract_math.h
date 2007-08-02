@@ -21,7 +21,7 @@
 #define _FRACT_MATH_H
 
 #include <fract_typedef.h>
-#include <ccblkfn.h>
+#include <gcc.h>
 #include <fr2x16_math.h>
 
 #ifdef _MISRA_RULES
@@ -125,7 +125,7 @@ static fract2x16 negate_fr2x16(fract2x16 _x)
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 negate_fr1x16(fract16 _x)
-  { return (fract16)__builtin_bfin_negate_fr2x16((int)_x); }
+  { return __builtin_bfin_negate_fr1x16(_x); }
 
 /* Arithmetically shifts both fract16s in the fract2x16 left by _y places,and 
  * returns the packed result.  The empty bits are zero filled.  If shft is 
@@ -140,7 +140,7 @@ static fract16 negate_fr1x16(fract16 _x)
 #pragma inline
 __attribute__ ((always_inline))
 static fract2x16 shl_fr2x16(fract2x16 _x, int _y)
-  { return __builtin_bfin_shl_fr2x16(_x,(short)_y); }
+  { return __builtin_bfin_shl_fr2x16(_x,_y); }
 
 /* Arithmetically shifts both fract16s in the fract2x16 left by _y places,and 
  * returns the packed result.  The empty bits are zero filled.  If shft is 
@@ -155,7 +155,7 @@ static fract2x16 shl_fr2x16(fract2x16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract2x16 shl_fr2x16_clip(fract2x16 _x, int _y)
-	{ return __builtin_bfin_shl_fr2x16(_x,(fract16)__builtin_bfin_max(__builtin_bfin_min(_y,15),-16)); }
+	{ return __builtin_bfin_shl_fr2x16(_x,__builtin_bfin_max(__builtin_bfin_min(_y,15),-16)); }
 
 /* Arithmetically shifts the src variable left by _y places.  The empty bits 
  * are zero filled. If shft is negative, the shift is to the right by abs(_y)
@@ -168,7 +168,7 @@ static fract2x16 shl_fr2x16_clip(fract2x16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 shl_fr1x16(fract16 _x, int _y)
-  { return __builtin_bfin_shl_fr1x16(_x,(short)_y); }
+  { return __builtin_bfin_shl_fr1x16(_x,_y); }
 
 /* Arithmetically shifts the src variable left by _y places.  The empty bits 
  * are zero filled. If shft is negative, the shift is to the right by abs(shft)
@@ -180,7 +180,7 @@ static fract16 shl_fr1x16(fract16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 shl_fr1x16_clip(fract16 _x, int _y)
-  { return __builtin_bfin_shl_fr1x16(_x,(fract16)__builtin_bfin_max(__builtin_bfin_min(_y,15),-16)); }
+  { return __builtin_bfin_shl_fr1x16(_x,__builtin_bfin_max(__builtin_bfin_min(_y,15),-16)); }
 
 /* Arithmetically shifts both fract16s in the fract2x16 right by shft places 
  * with sign extension, and returns the packed result.  If shft is negative, 
@@ -197,7 +197,7 @@ static fract16 shl_fr1x16_clip(fract16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract2x16 shr_fr2x16(fract2x16 _x, int _y)
-  { return __builtin_bfin_shr_fr2x16(_x,(short)_y); }
+  { return __builtin_bfin_shr_fr2x16(_x,_y); }
 
 /* Arithmetically shifts both fract16s in the fract2x16 right by shft places 
  * with sign extension, and returns the packed result.  If shft is negative, 
@@ -210,7 +210,7 @@ static fract2x16 shr_fr2x16(fract2x16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract2x16 shr_fr2x16_clip(fract2x16 _x, int _y)
-  { return __builtin_bfin_shr_fr2x16(_x,(short)__builtin_bfin_max(__builtin_bfin_min(_y,16),-15)); }
+  { return __builtin_bfin_shr_fr2x16(_x,__builtin_bfin_max(__builtin_bfin_min(_y,16),-15)); }
 
 /* Arithmetically shifts the src variable right by shft places with sign 
  * extension.  If shft is negative, the shift is to the left by abs(_y) places, 
@@ -223,7 +223,7 @@ static fract2x16 shr_fr2x16_clip(fract2x16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 shr_fr1x16(fract16 _x, int _y)
-  { return (fract16)__builtin_bfin_shr_fr1x16(_x,(short)_y); }
+  { return __builtin_bfin_shr_fr1x16(_x,_y); }
 
 /* Arithmetically shifts the src variable right by shft places with sign 
  * extension.  If shft is negative, the shift is to the left by abs(_y) places, 
@@ -235,7 +235,7 @@ static fract16 shr_fr1x16(fract16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 shr_fr1x16_clip(fract16 _x, int _y)
-  { return (fract16)__builtin_bfin_shr_fr1x16(_x,(fract16)__builtin_bfin_max(__builtin_bfin_min(_y,16),-15)); }
+  { return __builtin_bfin_shr_fr1x16(_x,__builtin_bfin_max(__builtin_bfin_min(_y,16),-15)); }
 
 
 /* Logically shifts both fract16s in the fract2x16 right by shft places.  There
@@ -248,7 +248,7 @@ static fract16 shr_fr1x16_clip(fract16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract2x16 shrl_fr2x16(fract2x16 _x, int _y)
-	{ return __builtin_bfin_shrl_fr2x16(_x,(short)_y); }
+	{ return __builtin_bfin_lshr_fr2x16(_x,_y); }
 
 /* Logically shifts both fract16s in the fract2x16 right by shft places.  There
  * is no sign extension and no saturation - the empty bits are zero filled.
@@ -259,7 +259,7 @@ static fract2x16 shrl_fr2x16(fract2x16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract2x16 shrl_fr2x16_clip(fract2x16 _x, int _y)
-	{ return __builtin_bfin_shrl_fr2x16(_x,(short)__builtin_bfin_max(__builtin_bfin_min(_y,16),-15)); }
+	{ return __builtin_bfin_lshr_fr2x16(_x,__builtin_bfin_max(__builtin_bfin_min(_y,16),-15)); }
 
 
 /* Logically shifts a fract16 right by shft places.  There is no sign extension
@@ -272,7 +272,7 @@ static fract2x16 shrl_fr2x16_clip(fract2x16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 shrl_fr1x16(fract16 _x, int _y)
-	{ return (fract16)__builtin_bfin_shrl_fr2x16((int)_x,(short)_y); }
+	{ return __builtin_bfin_lshr_fr1x16(_x,_y); }
 
 /* Logically shifts a fract16 right by _x places.  There is no sign extension
  * and no saturation - the empty bits are zero filled.
@@ -283,7 +283,7 @@ static fract16 shrl_fr1x16(fract16 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 shrl_fr1x16_clip(fract16 _x, int _y)
-	{ return (fract16)__builtin_bfin_shrl_fr2x16((int)_x,(short)__builtin_bfin_max(__builtin_bfin_min(_y,16),-15)); }
+	{ return __builtin_bfin_lshr_fr1x16(_x,__builtin_bfin_max(__builtin_bfin_min(_y,16),-15)); }
 
 
 
@@ -361,7 +361,7 @@ static fract32 max_fr1x32(fract32 _x, fract32 _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract32 shl_fr1x32(fract32 _x, int _y)
-  { return __builtin_bfin_shl_fr1x32(_x,(short)_y); }
+  { return __builtin_bfin_shl_fr1x32(_x,_y); }
 
 /* Arithmetically shifts the src variable left by shft places.  The empty bits 
  * are zero filled. If shft is negative, the shift is to the right by abs(_y)
@@ -373,7 +373,7 @@ static fract32 shl_fr1x32(fract32 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract32 shl_fr1x32_clip(fract32 _x, int _y)
-	{ return __builtin_bfin_shl_fr1x32(_x,(fract16)__builtin_bfin_max(__builtin_bfin_min(_y,31),-32)); }
+	{ return __builtin_bfin_shl_fr1x32(_x,__builtin_bfin_max(__builtin_bfin_min(_y,31),-32)); }
 
 /* Arithmetically shifts the src variable right by shft places with sign 
  * extension.  If shft is negative, the shift is to the left by abs(_y) places, 
@@ -386,7 +386,7 @@ static fract32 shl_fr1x32_clip(fract32 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract32 shr_fr1x32(fract32 _x, int _y)
-  { return __builtin_bfin_shr_fr1x32(_x,(short)_y); }
+  { return __builtin_bfin_shr_fr1x32(_x,_y); }
 
 /* Arithmetically shifts the src variable right by shft places with sign 
  * extension.  If shft is negative, the shift is to the left by abs(_y) places, 
@@ -398,7 +398,7 @@ static fract32 shr_fr1x32(fract32 _x, int _y)
 #pragma inline
 __attribute__ ((always_inline))
 static fract32 shr_fr1x32_clip(fract32 _x, int _y)
-	{ return __builtin_bfin_shr_fr1x32(_x,(short)__builtin_bfin_max(__builtin_bfin_min(_y,32),-31)); }
+	{ return __builtin_bfin_shr_fr1x32(_x,__builtin_bfin_max(__builtin_bfin_min(_y,32),-31)); }
 
 /* Performs a fractional multiplication on two 16-bit fractions, returning the 
  * 32-bit result. There will be loss of precision. */
@@ -475,37 +475,37 @@ static fract16 trunc_fr1x32(fract32 _x)
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 abs_fr16 (fract16 _x)
-  { return (fract16)__builtin_bfin_abs_fr2x16 ((int)_x); }
+  { return __builtin_bfin_abs_fr1x16 (_x); }
 
 /* Returns the 16-bit value that is the absolute value of the input parameter.
  * Where the input is 0x8000, saturation occurs and 0x7fff is returned. */
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 abs_fr1x16 (fract16 _x)
-  { return (fract16)__builtin_bfin_abs_fr2x16((int)_x); }
+  { return __builtin_bfin_abs_fr1x16(_x); }
 
 /* Returns the maximum of the two input parameters. */
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 max_fr16 (fract16 _x, fract16 _y)
-  { return (fract16)__builtin_bfin_max_fr2x16 ((int)_x,(int)_y); }
+  { return __builtin_bfin_max_fr1x16 (_x,_y); }
 
 /* Returns the maximum of the two input parameters. */
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 min_fr16 (fract16 _x, fract16 _y)
-  { return (fract16)__builtin_bfin_min_fr2x16 ((int)_x, (int)_y); }
+  { return __builtin_bfin_min_fr1x16 (_x, _y); }
 
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 max_fr1x16 (fract16 _x, fract16 _y)
-  { return (fract16)__builtin_bfin_max_fr2x16 ((int)_x, (int)_y); }
+  { return __builtin_bfin_max_fr1x16 (_x, _y); }
 
 /* Returns the maximum of the two input parameters. */
 #pragma inline
 __attribute__ ((always_inline))
 static fract16 min_fr1x16 (fract16 _x, fract16 _y)
-  { return (fract16)__builtin_bfin_min_fr2x16 ((int)_x, (int)_y); }
+  { return __builtin_bfin_min_fr1x16 (_x, _y); }
 
 /*********************/
 /*                   */

@@ -20,6 +20,7 @@
 #define __FRACT_COMPLEX_DEFINED
 
 #include <complex_typedef.h>
+#include <fr2x16_math.h>
 
 #ifdef _MISRA_RULES
 #pragma diag(push)
@@ -83,7 +84,7 @@ __attribute__ ((always_inline))
                                           complex_fract16 _b)
         {
            complex_fract16 r;
-           int i = __builtin_bfin_cmplx_add(COMPFRACT(_a), COMPFRACT(_b));
+           fract2x16 i = __builtin_bfin_cmplx_add(COMPFRACT(_a), COMPFRACT(_b));
            EXTRFRACT(r,i);
            return r;
         }
@@ -108,7 +109,7 @@ __attribute__ ((always_inline))
                                           complex_fract16 _b)
         {
            complex_fract16 r;
-           int i = __builtin_bfin_cmplx_sub(COMPFRACT(_a), COMPFRACT(_b));
+           fract2x16 i = __builtin_bfin_cmplx_sub(COMPFRACT(_a), COMPFRACT(_b));
            EXTRFRACT(r,i);
            return r;
         }
@@ -134,7 +135,7 @@ __attribute__ ((always_inline))
                                           complex_fract16 _b)
         {
            complex_fract16 r;
-           int i = __builtin_bfin_cmplx_mul(COMPFRACT(_a), COMPFRACT(_b));
+           fract2x16 i = __builtin_bfin_cmplx_mul(COMPFRACT(_a), COMPFRACT(_b));
            EXTRFRACT(r,i);
            return r;
         }
@@ -153,7 +154,7 @@ __attribute__ ((always_inline))
                                           complex_fract16 _b)
         {
            complex_fract16 r;
-           int i = __builtin_bfin_cmplx_mac(COMPFRACT(_sum),
+           fract2x16 i = __builtin_bfin_cmplx_mac(COMPFRACT(_sum),
            COMPFRACT(_a), COMPFRACT(_b));
            EXTRFRACT(r,i);
            return r;
@@ -169,7 +170,7 @@ __attribute__ ((always_inline))
                                           complex_fract16 _b)
         {
            complex_fract16 r;
-           int i = __builtin_bfin_cmplx_msu(COMPFRACT(_sum),
+           fract2x16 i = __builtin_bfin_cmplx_msu(COMPFRACT(_sum),
            COMPFRACT(_a), COMPFRACT(_b));
            EXTRFRACT(r,i);
            return r;
@@ -185,7 +186,7 @@ __attribute__ ((always_inline))
                                               complex_fract16 _b)
         {
            complex_fract16 r;
-           int i = __builtin_bfin_cmplx_mac_s40(COMPFRACT(_sum),
+           fract2x16 i = __builtin_bfin_cmplx_mac_s40(COMPFRACT(_sum),
            COMPFRACT(_a), COMPFRACT(_b));
            EXTRFRACT(r,i);
            return r;
@@ -201,7 +202,7 @@ __attribute__ ((always_inline))
                                               complex_fract16 _b)
         {
            complex_fract16 r;
-           int i = __builtin_bfin_cmplx_msu_s40(COMPFRACT(_sum),
+           fract2x16 i = __builtin_bfin_cmplx_msu_s40(COMPFRACT(_sum),
            COMPFRACT(_a), COMPFRACT(_b));
            EXTRFRACT(r,i);
            return r;
@@ -211,9 +212,9 @@ __attribute__ ((always_inline))
 __attribute__ ((always_inline))
          static fract16 csqu_add_fr16 (complex_fract16 _c)
          {
-            return (fract16)__builtin_bfin_add_fr2x16(
-                               __builtin_bfin_mult_fr2x16((int)_c.re, (int)_c.re),
-                               __builtin_bfin_mult_fr2x16((int)_c.im, (int)_c.im));
+            return __builtin_bfin_add_fr1x16(
+                               __builtin_bfin_mult_fr1x16(_c.re, _c.re),
+                               __builtin_bfin_mult_fr1x16(_c.im, _c.im));
          }
 
 #pragma inline
@@ -229,13 +230,13 @@ __attribute__ ((always_inline))
          static fract16 cdst_fr16 (complex_fract16 _x,
                                    complex_fract16 _y)
          {
-            return (fract16)__builtin_bfin_add_fr2x16(
-                               __builtin_bfin_mult_fr2x16(
-                                  __builtin_bfin_sub_fr2x16((int)_x.re,(int)_y.re),
-                                  __builtin_bfin_sub_fr2x16((int)_x.re,(int)_y.re)),
-                               __builtin_bfin_mult_fr2x16(
-                                  __builtin_bfin_sub_fr2x16((int)_x.im,(int)_y.im),
-                                  __builtin_bfin_sub_fr2x16((int)_x.im,(int)_y.im)));
+            return __builtin_bfin_add_fr1x16(
+                               __builtin_bfin_mult_fr1x16(
+                                  __builtin_bfin_sub_fr1x16(_x.re,_y.re),
+                                  __builtin_bfin_sub_fr1x16(_x.re,_y.re)),
+                               __builtin_bfin_mult_fr1x16(
+                                  __builtin_bfin_sub_fr1x16(_x.im,_y.im),
+                                  __builtin_bfin_sub_fr1x16(_x.im,_y.im)));
          }
 
 #pragma inline
@@ -245,12 +246,23 @@ __attribute__ ((always_inline))
          {
             return __builtin_bfin_add_fr1x32(
                       __builtin_bfin_mult_fr1x32(
-                         (fract16)__builtin_bfin_sub_fr2x16((int)_x.re,(int)_y.re),
-                         (fract16)__builtin_bfin_sub_fr2x16((int)_x.re,(int)_y.re)),
+                         __builtin_bfin_sub_fr1x16(_x.re,_y.re),
+                         __builtin_bfin_sub_fr1x16(_x.re,_y.re)),
                       __builtin_bfin_mult_fr1x32(
-                         (fract16)__builtin_bfin_sub_fr2x16((int)_x.im,(int)_y.im),
-                         (fract16)__builtin_bfin_sub_fr2x16((int)_x.im,(int)_y.im)));
+                         __builtin_bfin_sub_fr1x16(_x.im,_y.im),
+                         __builtin_bfin_sub_fr1x16(_x.im,_y.im)));
          }
+
+/* Other builtins */
+#pragma inline
+__attribute__ ((always_inline))
+        static complex_fract16 csqu_fr16 (complex_fract16 _a)
+        {
+           complex_fract16 _x;
+           fract2x16 i = __builtin_bfin_csqu_fr16(COMPFRACT(_a));
+	   EXTRFRACT(_x,i);
+           return _x;
+        }
 
 #undef COMPFRACT
 #undef EXTRFRACT
@@ -329,27 +341,24 @@ extern long long  __builtin_bfin_compose_i64 (int _a, int _b);
 __attribute__ ((always_inline))
         static complex_fract32 ccompose_fr32 (fract32 _real, fract32 _imag)
         {
-           composite_complex_fract32 _x;
-           _x.raw = __builtin_bfin_compose_i64(_real,_imag);
-           return _x.x;
+           complex_fract32 _x;
+           _x.re = _real;
+	   _x.im = _imag;
+           return _x;
         }
 
 #pragma inline
 __attribute__ ((always_inline))
         static fract32 real_fr32 (complex_fract32 _a)
         {
-           composite_complex_fract32 _x;
-           _x.x.re = _a.re; _x.x.im = _a.im;
-           return __builtin_bfin_real_fr32(_x.raw);
+           return _a.re;
         }
 
 #pragma inline
 __attribute__ ((always_inline))
         static fract32 imag_fr32 (complex_fract32 _a)
         {
-           composite_complex_fract32 _x;
-           _x.x.re = _a.re; _x.x.im = _a.im;
-           return __builtin_bfin_imag_fr32(_x.raw);
+           return _a.im;
         }
 
 #pragma inline
@@ -357,11 +366,10 @@ __attribute__ ((always_inline))
         static complex_fract32 cadd_fr32 (complex_fract32 _a,
                                           complex_fract32 _b)
         {
-           composite_complex_fract32 _x,_y;
-           _x.x.re = _a.re; _x.x.im = _a.im;
-           _y.x.re = _b.re; _y.x.im = _b.im;
-           _y.raw = __builtin_bfin_cadd_fr32(_x.raw,_y.raw);
-           return _y.x;
+           complex_fract32 _x;
+           _x.re = __builtin_bfin_add_fr1x32 (_a.re, _b.re);
+           _x.im = __builtin_bfin_add_fr1x32 (_a.im, _b.im);
+           return _x;
         }
 
 #pragma inline
@@ -369,35 +377,24 @@ __attribute__ ((always_inline))
         static complex_fract32 csub_fr32 (complex_fract32 _a,
                                           complex_fract32 _b)
         {
-           composite_complex_fract32 _x, _y;
-           _x.x.re = _a.re; _x.x.im = _a.im;
-           _y.x.re = _b.re; _y.x.im = _b.im;
-           _y.raw =  __builtin_bfin_csub_fr32(_x.raw,_y.raw);
-           return _y.x;
+           complex_fract32 _x;
+           _x.re = __builtin_bfin_sub_fr1x32 (_a.re, _b.re);
+           _x.im = __builtin_bfin_sub_fr1x32 (_a.im, _b.im);
+           return _x;
         }
 
 #pragma inline
 __attribute__ ((always_inline))
         static complex_fract32 conj_fr32 (complex_fract32 _a)
         {
-           composite_complex_fract32 _x;
-           _x.x.re = _a.re; _x.x.im = _a.im;
-           _x.raw = __builtin_bfin_conj_fr32(_x.raw);
-           return _x.x;
+           complex_fract32 _x;
+           _x.im = __builtin_bfin_sub_fr1x32(0, _a.im);
+           _x.re = _a.re;
+           return _x;
         }
 
 extern complex_fract32 cmul_fr32 (complex_fract32 _a, complex_fract32 _b);
 
-/* Other builtins */
-#pragma inline
-__attribute__ ((always_inline))
-        static complex_fract16 csqu_fr16 (complex_fract16 _a)
-        {
-           composite_complex_fract16 _x;
-           _x.x.re = _a.re; _x.x.im = _a.im;
-           _x.raw = __builtin_bfin_csqu_fr16(_x.raw);
-           return _x.x;
-        }
 #endif /* !__NO_BUILTIN */
 
 #ifdef __cplusplus

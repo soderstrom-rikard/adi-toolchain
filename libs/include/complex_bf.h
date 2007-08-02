@@ -207,44 +207,6 @@ __attribute__ ((always_inline))
 
 
 
-/* * * *        cexp      * * * *
- *
- *    Complex exponential e^x, where x is a real number
- *
- */
-
-        complex_float cexpf (float _x) asm ("__cexpf");
-
-        complex_long_double cexpd (long double _x) asm ("__cexpd");
-
-
-#ifdef __DOUBLES_ARE_FLOATS__
-        complex_double cexp (double _x) asm ("__cexpf");
-#else
-        complex_double cexp (double _x) asm ("__cexpd");
-#endif
-
-
-
-
-/* * * *        arg      * * * *
- *
- *    Get phase of complex number
- *
- */
-
-        float argf (complex_float _a) asm ("__argf");
-
-        long double argd (complex_long_double _a) asm ("__argd");
-
-
-#ifdef __DOUBLES_ARE_FLOATS__
-        double arg (complex_double _a) asm ("__argf");
-#else
-        double arg (complex_double _a) asm ("__argd");
-#endif
-
-
 
 
 

@@ -25,6 +25,9 @@
 typedef char  _raw8;
 typedef short _raw16;
 typedef int   _raw32;
+#if !defined(__NO_BUILTIN)
+typedef short __v2hi __attribute__ ((vector_size (4)));
+#endif
 
 #elif defined(__ADSPTS__)
 

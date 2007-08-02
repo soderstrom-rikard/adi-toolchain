@@ -1,3 +1,56 @@
+2007-08-02  Jie Zhang  <jie.zhang@analog.com>
+
+	* math_bf.h: Don't include ccblkfn.h.
+	Include gcc.h instead.
+	(__builtin_bfin_max): Don't declare.
+	(__builtin_bfin_lmax): Likewise.
+	(__builtin_bfin_min): Likewise.
+	(__builtin_bfin_lmin): Likewise.
+	* r2x16_typedef.h (raw2x16): Typedef as __v2hi if
+	__NO_BUILTIN is not defined.
+	* raw_typedef.h (__v2hi): Typedef if __NO_BUILTIN is not
+	defined.
+	* gcc.h: New.
+	* ccblkfn.h: Remove.
+	* fract_math.h: Don't include ccblkfn.h.
+	Include gcc.h instead.
+	(shl_fr2x16): Don't cast the second argument when calls
+	corresponding builtin function.
+	(shl_fr2x16_clip): Likewise.
+	(shl_fr1x16): Likewise.
+	(shl_fr1x16_clip): Likewise.
+	(shr_fr2x16): Likewise.
+	(shr_fr2x16_clip): Likewise.
+	(shr_fr1x16): Likewise.
+	(shr_fr1x16_clip): Likewise.
+	(shrl_fr2x16): Likewise.
+	(shrl_fr2x16_clip): Likewise.
+	(shl_fr1x32): Likewise.
+	(shl_fr1x32_clip): Likewise.
+	(shr_fr1x32): Likewise.
+	(shr_fr1x32_clip): Likewise.
+	(negate_fr1x16): Call fr1x16 builtin instead of fr2x16 one.
+	(shrl_fr1x16): Likewise.
+	(shrl_fr1x16_clip): Likewise.
+	(abs_fr16): Likewise.
+	(abs_fr1x16): Likewise.
+	(max_fr16): Likewise.
+	(min_fr16): Likewise.
+	(max_fr1x16): Likewise.
+	(min_fr1x16): Likewise.
+	* complex_bf.h (cexpf): Remove declaration.
+	(cexpd): Likewise.
+	(cexp): Likewise.
+	(argf): Likewise.
+	(argd): Likewise.
+	(arg): Likewise.
+	* fract_complex.h: Include fr2x16_math.h.
+	(cadd_fr16): Use fract2x16 as the result type of builtin
+	function.
+	(csub_fr16): Likewise.
+	(cmlt_fr16): Likewise.
+	(cmac_fr16): Likewise.
+
 2007-08-01  Jie Zhang  <jie.zhang@analog.com>
 
 	* math_bf.h: Processed with c_fix_builtins.sed.

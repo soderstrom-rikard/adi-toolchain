@@ -32,7 +32,7 @@
 
 #include <fract_typedef.h>
 #include <fract_math.h>
-#include <ccblkfn.h>
+#include <gcc.h>
 
 #ifdef _MISRA_RULES
 #pragma diag(push)
@@ -187,13 +187,11 @@ __attribute__ ((always_inline))
 
 
 #if !defined(__NO_BUILTIN) 
-        int __builtin_bfin_max(int, int);
 #pragma inline
 __attribute__ ((always_inline))
         static int max(int _x, int _y) 
                 { return __builtin_bfin_max(_x,_y); }
 
-        long __builtin_bfin_lmax(long, long);
 #pragma inline
 __attribute__ ((always_inline))
         static long lmax(long _x, long _y)
@@ -254,13 +252,11 @@ __attribute__ ((always_inline))
 
 
 #if !defined(__NO_BUILTIN)
-        int __builtin_bfin_min(int, int);
 #pragma inline
 __attribute__ ((always_inline))
         static int min(int _x, int _y) 
                 { return __builtin_bfin_min(_x,_y); }
 
-        long __builtin_bfin_lmin(long, long);
 #pragma inline
 __attribute__ ((always_inline))
         static long lmin(long _x, long _y)
