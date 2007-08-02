@@ -1,0 +1,153 @@
+<?xml version="1.0" standalone="yes"?>
+
+<!-- ***************************************************************************** -->
+<!-- ******* ADSP-EDN-core.xml                                                     -->
+<!-- ******* Common definition file for core registers for Edinborough processors  -->
+<!-- ******* Uppermost elements:                                                   -->
+<!-- ******* 	<register-core-definitions>                                        -->
+<!-- ******* Copyright 2004 Analog Devices, Inc.  All rights reserved.             -->
+<!-- ***************************************************************************** -->
+
+<visualdsp-core-xml schema-version="1" name="ADSP-EDN-core.xml">
+
+<version file-version="1.36"/>
+
+<!-- ************************************************************************ -->
+<!-- ******* validation (schema)                                              -->
+<!-- ************************************************************************ -->
+
+<!-- ************************************************************************ -->
+<!-- ******* Core register set                                                -->
+<!-- ******* Do not ever change the order of the registers in this list!!!!!  -->
+<!-- ******* The emulator/JTAG depends on its fixed order.                    -->
+<!-- ************************************************************************ -->
+
+<register-core-definitions>
+<register name="PC" group="PC Counters" mask="FFFFFFFF" type="CORE" description="Program Counter" bit-size="32" compiler-id="256"/>
+<register name="R0" group="Data Register File" mask="FFFFFFFF" type="CORE" description="Data register" bit-size="32" compiler-id="0"/>
+<register name="R1" group="Data Register File" mask="FFFFFFFF" type="CORE" description="Data register" bit-size="32" compiler-id="1"/>
+<register name="R2" group="Data Register File" mask="FFFFFFFF" type="CORE" description="Data register" bit-size="32" compiler-id="2"/>
+<register name="R3" group="Data Register File" mask="FFFFFFFF" type="CORE" description="Data register" bit-size="32" compiler-id="3"/>
+<register name="R4" group="Data Register File" mask="FFFFFFFF" type="CORE" description="Data register" bit-size="32" compiler-id="4"/>
+<register name="R5" group="Data Register File" mask="FFFFFFFF" type="CORE" description="Data register" bit-size="32" compiler-id="5"/>
+<register name="R6" group="Data Register File" mask="FFFFFFFF" type="CORE" description="Data register" bit-size="32" compiler-id="6"/>
+<register name="R7" group="Data Register File" mask="FFFFFFFF" type="CORE" description="Data register" bit-size="32" compiler-id="7"/>
+<register name="R0.L" parent="R0" bit-position="0" type="CORE" description="Data register (low order)" bit-size="16"/>
+<register name="R1.L" parent="R1" bit-position="0" type="CORE" description="Data register (low order)" bit-size="16"/>
+<register name="R2.L" parent="R2" bit-position="0" type="CORE" description="Data register (low order)" bit-size="16"/>
+<register name="R3.L" parent="R3" bit-position="0" type="CORE" description="Data register (low order)" bit-size="16"/>
+<register name="R4.L" parent="R4" bit-position="0" type="CORE" description="Data register (low order)" bit-size="16"/>
+<register name="R5.L" parent="R5" bit-position="0" type="CORE" description="Data register (low order)" bit-size="16"/>
+<register name="R6.L" parent="R6" bit-position="0" type="CORE" description="Data register (low order)" bit-size="16"/>
+<register name="R7.L" parent="R7" bit-position="0" type="CORE" description="Data register (low order)" bit-size="16"/>
+<register name="R0.H" parent="R0" bit-position="16" type="CORE" description="Data register (high order)" bit-size="16"/>
+<register name="R1.H" parent="R1" bit-position="16" type="CORE" description="Data register (high order)" bit-size="16"/>
+<register name="R2.H" parent="R2" bit-position="16" type="CORE" description="Data register (high order)" bit-size="16"/>
+<register name="R3.H" parent="R3" bit-position="16" type="CORE" description="Data register (high order)" bit-size="16"/>
+<register name="R4.H" parent="R4" bit-position="16" type="CORE" description="Data register (high order)" bit-size="16"/>
+<register name="R5.H" parent="R5" bit-position="16" type="CORE" description="Data register (high order)" bit-size="16"/>
+<register name="R6.H" parent="R6" bit-position="16" type="CORE" description="Data register (high order)" bit-size="16"/>
+<register name="R7.H" parent="R7" bit-position="16" type="CORE" description="Data register (high order)" bit-size="16"/>
+<register name="R0.B" parent="R0" bit-position="0" type="CORE" description="Data register (byte)" bit-size="8"/>
+<register name="R1.B" parent="R1" bit-position="0" type="CORE" description="Data register (byte)" bit-size="8"/>
+<register name="R2.B" parent="R2" bit-position="0" type="CORE" description="Data register (byte)" bit-size="8"/>
+<register name="R3.B" parent="R3" bit-position="0" type="CORE" description="Data register (byte)" bit-size="8"/>
+<register name="R4.B" parent="R4" bit-position="0" type="CORE" description="Data register (byte)" bit-size="8"/>
+<register name="R5.B" parent="R5" bit-position="0" type="CORE" description="Data register (byte)" bit-size="8"/>
+<register name="R6.B" parent="R6" bit-position="0" type="CORE" description="Data register (byte)" bit-size="8"/>
+<register name="R7.B" parent="R7" bit-position="0" type="CORE" description="Data register (byte)" bit-size="8"/>
+<register name="I0" group="DAG Registers" mask="FFFFFFFF" type="CORE" description="Index address register" bit-size="32" compiler-id="16"/>
+<register name="I1" group="DAG Registers" mask="FFFFFFFF" type="CORE" description="Index address register" bit-size="32" compiler-id="17"/>
+<register name="I2" group="DAG Registers" mask="FFFFFFFF" type="CORE" description="Index address register" bit-size="32" compiler-id="18"/>
+<register name="I3" group="DAG Registers" mask="FFFFFFFF" type="CORE" description="Index address register" bit-size="32" compiler-id="19"/>
+<register name="M0" group="DAG Registers" mask="FFFFFFFF" type="CORE" description="Modify value register" bit-size="32" compiler-id="20"/>
+<register name="M1" group="DAG Registers" mask="FFFFFFFF" type="CORE" description="Modify value register" bit-size="32" compiler-id="21"/>
+<register name="M2" group="DAG Registers" mask="FFFFFFFF" type="CORE" description="Modify value register" bit-size="32" compiler-id="22"/>
+<register name="M3" group="DAG Registers" mask="FFFFFFFF" type="CORE" description="Modify value register" bit-size="32" compiler-id="23"/>
+<register name="L0" group="DAG Registers" mask="FFFFFFFF" type="CORE" description="Length value register" bit-size="32" compiler-id="28"/>
+<register name="L1" group="DAG Registers" mask="FFFFFFFF" type="CORE" description="Length value register" bit-size="32" compiler-id="29"/>
+<register name="L2" group="DAG Registers" mask="FFFFFFFF" type="CORE" description="Length value register" bit-size="32" compiler-id="30"/>
+<register name="L3" group="DAG Registers" mask="FFFFFFFF" type="CORE" description="Length value register" bit-size="32" compiler-id="31"/>
+<register name="B0" group="DAG Registers" mask="FFFFFFFF" type="CORE" description="Base address register" bit-size="32" compiler-id="24"/>
+<register name="B1" group="DAG Registers" mask="FFFFFFFF" type="CORE" description="Base address register" bit-size="32" compiler-id="25"/>
+<register name="B2" group="DAG Registers" mask="FFFFFFFF" type="CORE" description="Base address register" bit-size="32" compiler-id="26"/>
+<register name="B3" group="DAG Registers" mask="FFFFFFFF" type="CORE" description="Base address register" bit-size="32" compiler-id="27"/>
+<register name="SP" group="Stack/Frame Pointers" mask="FFFFFFFF" type="CORE" description="Stack Pointer register points to last used location on the runtime stack" bit-size="32" compiler-id="14"/>
+<register name="USP" group="Stack/Frame Pointers" mask="FFFFFFFF" type="CORE" description="User Stack Pointer" bit-size="32"/>
+<register name="FP" group="Stack/Frame Pointers" mask="FFFFFFFF" type="CORE" description="Frame Pointer register used to point to the current procedure's activation record" bit-size="32" compiler-id="15"/>
+<register name="ASTAT" group="Arithmetic Status" mask="FFFFFFFF" type="CORE" description="Arithmetic status register" bit-size="32" compiler-id="32"/>
+<register name="AZ" parent="ASTAT" bit-position="0" type="" description="Zero result" bit-size="1"/>
+<register name="AN" parent="ASTAT" bit-position="1" type="" description="Negative result" bit-size="1"/>
+<register name="AC0" parent="ASTAT" bit-position="12" type="" description="ALU0 carry" bit-size="1"/>
+<register name="AC1" parent="ASTAT" bit-position="13" type="" description="ALU1 carry" bit-size="1"/>
+<register name="AV0" parent="ASTAT" bit-position="16" type="" description="A0 overflow" bit-size="1"/>
+<register name="AV1" parent="ASTAT" bit-position="18" type="" description="A1 overflow" bit-size="1"/>
+<register name="CC" parent="ASTAT" bit-position="5" type="" description="Condition code" bit-size="1" compiler-id="35"/>
+<register name="AQ" parent="ASTAT" bit-position="6" type="" description="Quotient bit" bit-size="1"/>
+<register name="VS" parent="ASTAT" bit-position="25" type="" description="Sticky DAG overflow" bit-size="1"/>
+<register name="V" parent="ASTAT" bit-position="24" type="" description="DAG overflow" bit-size="1"/>
+<register name="AV1S" parent="ASTAT" bit-position="19" type="" description="Sticky A1 overflow" bit-size="1"/>
+<register name="AV0S" parent="ASTAT" bit-position="17" type="" description="Sticky A0 overflow" bit-size="1"/>
+<register name="RND_MOD" parent="ASTAT" bit-position="8" type="" description="Rounding mode" bit-size="1"/>
+<register name="SYSCFG" group="System Configuration" mask="FFFF" type="CORE" description="System configuration register" bit-size="16"/>
+<register name="SSSTEP" parent="SYSCFG" bit-position="0" type="" description="Supervisor Single Step" bit-size="1"/>
+<register name="CCEN" parent="SYSCFG" bit-position="1" type="" description="Cycle-Counter Enable" bit-size="1"/>
+<register name="SNEN" parent="SYSCFG" bit-position="2" type="" description="Self-Nesting Interrupt Enable" bit-size="1"/>
+<register name="SEQSTAT" group="Sequencer Status" mask="FFFFFFFF" type="CORE" description="Sequencer Status" bit-size="32" compiler-id="33"/>
+<register name="EXCAUSE" parent="SEQSTAT" bit-position="0" type="" description="Last executed exception" bit-size="6"/>
+<register name="IDLE_REQ" parent="SEQSTAT" bit-position="12" type="" description="IDLE state request" bit-size="1"/>
+<register name="SFTRESET" parent="SEQSTAT" bit-position="13" type="" description="Software triggered reset" bit-size="1"/>
+<register name="HWERRCAUSE" parent="SEQSTAT" bit-position="14" type="" description="Cause of last hardware error" bit-size="5"/>
+<register name="LC0" group="Loop Counters" mask="FFFFFFFF" type="CORE" description="Loop Counter" bit-size="32" compiler-id="38"/>
+<register name="LT0" group="Loop Counters" mask="FFFFFFFF" type="CORE" description="Loop Top" bit-size="32" compiler-id="39"/>
+<register name="LB0" group="Loop Counters" mask="FFFFFFFF" type="CORE" description="Loop Bottom" bit-size="32" compiler-id="40"/>
+<register name="LC1" group="Loop Counters" mask="FFFFFFFF" type="CORE" description="Loop Counter" bit-size="32" compiler-id="41"/>
+<register name="LT1" group="Loop Counters" mask="FFFFFFFF" type="CORE" description="Loop Top" bit-size="32" compiler-id="42"/>
+<register name="LB1" group="Loop Counters" mask="FFFFFFFF" type="CORE" description="Loop Bottom" bit-size="32" compiler-id="43"/>
+<register name="RETS" group="Sequencer" mask="FFFFFFFF" type="CORE" description="Subroutine return" bit-size="32" compiler-id="34"/>
+<register name="RETI" group="Sequencer" mask="FFFFFFFF" type="CORE" description="Interrupt return" bit-size="32"/>
+<register name="RETX" group="Sequencer" mask="FFFFFFFF" type="CORE" description="Exception return" bit-size="32"/>
+<!-- emulator targets populate the PC register from RETE so define it as its parent -->
+<register name="RETE" parent="PC" bit-position="0" mask="FFFFFFFF" type="" description="Emulation return" bit-size="32" target="EMU"/>
+<register name="RETN" group="Sequencer" mask="FFFFFFFF" type="CORE" description="NMI return" bit-size="32"/>
+<register name="A0" group="Accumulators" mask="FFFFFFFFFF" type="CORE" description="40-bit accumulator register"  bit-size="40"/>
+<register name="A1" group="Accumulators" mask="FFFFFFFFFF" type="CORE" description="40-bit accumulator register"  bit-size="40"/>
+<register name="A0.X" parent="A0" bit-position="32" type="" description="Accumulator register (8-bit extension)"  bit-size="8"/>
+<register name="A1.X" parent="A1" bit-position="32" type="" description="Accumulator register (8-bit extension)"  bit-size="8"/>
+<register name="A0.W" parent="A0" bit-position="0"  type="" description="Accumulator register (lower 32-bits)"    bit-size="32"/>
+<register name="A1.W" parent="A1" bit-position="0"  type="" description="Accumulator register (lower 32-bits)"    bit-size="32"/>
+<register name="A0.L" parent="A0" bit-position="0"  type="" description="Accumulator register (16-bit low half)"  bit-size="16"/>
+<register name="A1.L" parent="A1" bit-position="0"  type="" description="Accumulator register (16-bit low half)"  bit-size="16"/>
+<register name="A0.H" parent="A0" bit-position="16" type="" description="Accumulator register (16-bit high half)" bit-size="16"/>
+<register name="A1.H" parent="A1" bit-position="16" type="" description="Accumulator register (16-bit high half)" bit-size="16"/>
+<register name="P0" group="P Registers" mask="FFFFFFFF" type="CORE" description="Pointer register (p-register)" bit-size="32" compiler-id="8"/>
+<register name="P1" group="P Registers" mask="FFFFFFFF" type="CORE" description="Pointer register (p-register)" bit-size="32" compiler-id="9"/>
+<register name="P2" group="P Registers" mask="FFFFFFFF" type="CORE" description="Pointer register (p-register)" bit-size="32" compiler-id="10"/>
+<register name="P3" group="P Registers" mask="FFFFFFFF" type="CORE" description="Pointer register (p-register)" bit-size="32" compiler-id="11"/>
+<register name="P4" group="P Registers" mask="FFFFFFFF" type="CORE" description="Pointer register (p-register)" bit-size="32" compiler-id="12"/>
+<register name="P5" group="P Registers" mask="FFFFFFFF" type="CORE" description="Pointer register (p-register)" bit-size="32" compiler-id="13"/>
+<register name="CYCLES" group="Cycles" mask="FFFFFFFF" type="CORE" description="Execution cycle count register (least significant 32 of 64 bits)" bit-size="32"/>
+<register name="CYCLES2" group="Cycles" mask="FFFFFFFF" type="CORE" description="Execution cycle count register (most significant 32 of 64 bits)" bit-size="32"/>
+<register name="WPIACTL"  group="Extended Registers" description="" bit-size="32" read-address="0xFFE07000" write-address="0xFFE07000" type="IO" def-comment="Watchpoint Control Registers (0xFFE07000 - 0xFFE07200)"/>
+<register name="WPIA0"    group="Extended Registers" description="" bit-size="32" read-address="0xFFE07040" write-address="0xFFE07040" type="IO" cdef-type="ADDR"/>
+<register name="WPIA1"    group="Extended Registers" description="" bit-size="32" read-address="0xFFE07044" write-address="0xFFE07044" type="IO" cdef-type="ADDR"/>
+<register name="WPIA2"    group="Extended Registers" description="" bit-size="32" read-address="0xFFE07048" write-address="0xFFE07048" type="IO" cdef-type="ADDR"/>
+<register name="WPIA3"    group="Extended Registers" description="" bit-size="32" read-address="0xFFE0704C" write-address="0xFFE0704C" type="IO" cdef-type="ADDR"/>
+<register name="WPIA4"    group="Extended Registers" description="" bit-size="32" read-address="0xFFE07050" write-address="0xFFE07050" type="IO" cdef-type="ADDR"/>
+<register name="WPIA5"    group="Extended Registers" description="" bit-size="32" read-address="0xFFE07054" write-address="0xFFE07054" type="IO" cdef-type="ADDR"/>
+<register name="WPIACNT0" group="Extended Registers" description="" bit-size="32" read-address="0xFFE07080" write-address="0xFFE07080" type="IO"/>
+<register name="WPIACNT1" group="Extended Registers" description="" bit-size="32" read-address="0xFFE07084" write-address="0xFFE07084" type="IO"/>
+<register name="WPIACNT2" group="Extended Registers" description="" bit-size="32" read-address="0xFFE07088" write-address="0xFFE07088" type="IO"/>
+<register name="WPIACNT3" group="Extended Registers" description="" bit-size="32" read-address="0xFFE0708C" write-address="0xFFE0708C" type="IO"/>
+<register name="WPIACNT4" group="Extended Registers" description="" bit-size="32" read-address="0xFFE07090" write-address="0xFFE07090" type="IO"/>
+<register name="WPIACNT5" group="Extended Registers" description="" bit-size="32" read-address="0xFFE07094" write-address="0xFFE07094" type="IO"/>
+<register name="WPDACTL"  group="Extended Registers" description="" bit-size="32" read-address="0xFFE07100" write-address="0xFFE07100" type="IO"/>
+<register name="WPDA0"    group="Extended Registers" description="" bit-size="32" read-address="0xFFE07140" write-address="0xFFE07140" type="IO" cdef-type="ADDR"/>
+<register name="WPDA1"    group="Extended Registers" description="" bit-size="32" read-address="0xFFE07144" write-address="0xFFE07144" type="IO" cdef-type="ADDR"/>
+<register name="WPDACNT0" group="Extended Registers" description="" bit-size="32" read-address="0xFFE07180" write-address="0xFFE07180" type="IO"/>
+<register name="WPDACNT1" group="Extended Registers" description="" bit-size="32" read-address="0xFFE07184" write-address="0xFFE07184" type="IO"/>
+<register name="WPSTAT"   group="Extended Registers" description="" bit-size="32" read-address="0xFFE07200" write-address="0xFFE07200" type="IO"/>
+
+</register-core-definitions>
+
+</visualdsp-core-xml>

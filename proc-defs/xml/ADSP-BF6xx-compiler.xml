@@ -1,0 +1,104 @@
+<?xml version="1.0" standalone="yes"?>
+<visualdsp-compiler-xml schema-version="1" name="ADSP-BF6xx-compiler.xml">
+
+<!-- *********************************************************************** -->
+<!-- ******* ADSP-BF6xx-compiler.xml                                         -->
+<!-- ******* Copyright 2006 Analog Devices, Inc.  All rights reserved.       -->
+<!-- *********************************************************************** -->
+
+<!-- ***************************************** -->
+<!-- ******* common information                -->
+<!-- ***************************************** -->
+
+<version file-version="0.3"/>
+
+<architecture name="ADSP-BF6xx" maps-to="ADSP-BF6xx" machine-id="134" machine-id-mnemonic="EM_BF6xx" default-ldf="BlackfinSPX/ldf/ADSP-BF6xx.ldf"/>
+
+<silicon-revisions command-line-default="0.0">
+	<silicon revision="none" lib-path="BlackfinSPX/lib">
+        </silicon>
+	<silicon revision="0.0" lib-path="BlackfinSPX/lib">
+	</silicon>
+</silicon-revisions>
+
+<feature-macros>
+	<macro name="__ADSPBLACKFIN__" value="1"/>
+	<macro name="__ADSPBF6xx__" value="1"/>
+</feature-macros>
+
+<!-- ***************************************** -->
+<!-- ******* assembler specific information    -->
+<!-- ***************************************** -->
+<!-- ******* the flags-compiler is so the assembler knows how to invoke the  -->
+<!-- ******* C compiler when C structs in assembly features are present in   -->
+<!-- ******* an assembly program.                                            -->
+<!-- ***************************************** -->
+
+<assembler default-include-path="BlackfinSPX/include" flags-compiler="-proc ADSP-BF6xx"/>
+
+	<!-- ***************************************************** -->
+	<!-- ** cross-referenced via the workaround *-ix above  ** -->
+	<!-- ** in the workarounds per silicon revision.        ** -->
+	<!-- ***************************************************** -->
+
+<anomaly-dictionary>
+</anomaly-dictionary>
+
+<!-- ***************************************** -->
+<!-- ******* compiler specific information     -->
+<!-- ***************************************** -->
+
+<compiler>
+
+	<!-- *************************************************************** -->
+	<!-- ** uses <architecture>, <silicon-revisions> and              ** -->
+	<!-- ** <feature-macros> from above. (shared with assembler)      ** -->
+	<!-- *************************************************************** -->
+
+	<compiler-assertions>
+		<assertion name="system" value="embedded"/>
+		<assertion name="machine" value="adspspx"/>
+		<assertion name="cpu" value="adspspx"/>
+		<assertion name="compiler" value="ccblkfn"/>
+	</compiler-assertions>
+
+	<compiler-includes>
+		<path name="BlackfinSPX/include"/>
+	</compiler-includes>
+
+	<compiler-reserved-registers>
+		<register name="m3" compiler-flag="-D__M3_RESERVED__" linker-flag="-MDM3_RESERVED"/>
+	</compiler-reserved-registers>
+
+	<compiler-flags-compiler>
+	</compiler-flags-compiler>
+
+	<compiler-flags-asm>
+		<flags name="-proc"/>
+		<flags name="ADSP-BF6xx"/>
+		<flags name="-stallcheck=none"/>
+		<flags name="-w5500"/>
+	</compiler-flags-asm>
+
+	<compiler-flags-linker>
+		<flags name="-proc"/>
+		<flags name="ADSP-BF6xx"/>
+	</compiler-flags-linker>
+
+	<!-- ************************************************** -->
+	<!-- ** do not include .exe suffix on tools paths as ** -->
+	<!-- ** driver will append when building for Windows ** -->
+	<!-- ************************************************** -->
+
+	<compiler-location-tools
+		driver-path="ccblkfn"
+		assembler-path="easmspx"
+		compiler-path="BlackfinSPX/etc/compiler"
+		prelinker-path="BlackfinSPX/etc/prelinker"
+		demangler-path="BlackfinSPX/etc/demangler"
+		ipasolver-path="BlackfinSPX/etc/ipa"
+		pgo-path="BlackfinSPX/etc/pgo"/>
+
+</compiler>
+
+</visualdsp-compiler-xml>

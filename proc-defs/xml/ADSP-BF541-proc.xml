@@ -1,0 +1,717 @@
+<?xml version="1.0" standalone="yes"?>
+
+<!-- ************************************************************************ -->
+<!-- ******* ADSP-BF541-proc.xml                                              -->
+<!-- ******* Common definition file for registers, windows and memory         -->
+<!-- ******* Uppermost elements:                                              -->
+<!-- ******* 	<register-core-definitions>                                   -->
+<!-- ******* 	<register-extended-definitions>                               -->
+<!-- ******* 	<register-reset-definitions>                                  -->
+<!-- ******* 	<format-definitions>                                          -->
+<!-- ******* 	<register-window-definitions>                                 -->
+<!-- ******* 	<memory-window-definitions>                                   -->
+<!-- ******* 	<memory-definitions>                                          -->
+<!-- ******* Copyright 2006 Analog Devices, Inc.  All rights reserved.        -->
+<!-- ************************************************************************ -->
+
+<visualdsp-proc-xml schema-version="1" name="ADSP-BF541-proc.xml">
+
+<version file-version="1.04"/>
+
+<!-- ************************************************************************ -->
+<!-- ******* Register set                                                     -->
+<!-- ************************************************************************ -->
+
+	<!-- *********************************************** -->
+	<!-- Where to obtain the <register-core-definitions> -->
+	<!-- *********************************************** -->
+<register-core-file name="ADSP-EDN-core.xml" prefix="EDN"/>
+
+	<!-- ********************************************************** -->
+	<!-- This is a placeholder only until we get ADSP-BF541         -->
+	<!-- cleanly removed. Just treat it as an ADSP-BF542 in the     -->
+	<!-- meantime.                                                  -->
+	<!-- ********************************************************** -->
+<register-extended-file name="ADSP-EDN-BF542-extended.xml"/>
+
+<register-extended-definitions>
+
+	<!-- ********************************************************** -->
+	<!-- These are additional CORE MMR ones for the core windows    -->
+	<!-- that were defined in the other EDN-*-extended XML          -->
+	<!-- definitions but were not in ADSP-EDN-BF54x-extended.xml    -->
+	<!-- (first cut). These are subject to review for the final     -->
+	<!-- version for VisualDSP++ 4.5 Update 3.                      --> 
+	<!-- (They were copied from ADSP-EDN-BF538-extended.xml)        -->
+	<!-- ********************************************************** --> 
+
+	<!-- Debug Registers (see below also for DSPID) -->
+	<register name="CHIPID" group="Extended Registers" description="" bit-size="32" read-address="0xFFC00014" write-address="0xFFC00014" mask="FFFFFFFF" type="IO" def-comment="Debug/MP/Emulation Registers (0xFFC00014 - 0xFFC00014)"/>
+
+	<!-- System Reset and Interrupt Control Registers -->
+	<register name="SWRST" group="System Reset and Interrupt Control Registers" read-address="0xFFC00100" write-address="0xFFC00100" mask="FFFF" type="IO" description="Software Reset Register" bit-size="16" def-comment="System Reset and Interrupt Controller (0xFFC00100 - 0xFFC001FF)"/>
+	<register name="SYSCR" group="System Reset and Interrupt Control Registers" read-address="0xFFC00104" write-address="0xFFC00104" mask="FFFF" type="IO" description="System Configuration register" bit-size="16"/>
+
+	<!-- ************************************************************************ -->
+	<!-- ******* Core MMRs (0xFFE00000 - 0xFFFFFFFF)                              -->
+	<!-- ************************************************************************ -->
+
+	<!-- L1 Data Memory Controller Registers -->
+	<register name="SRAM_BASE_ADDR"   group="L1 Data Memory Registers" read-address="0xFFE00000" write-address="0xFFE00000" mask="FFFFFFFF" type="IO" description="SRAM Base Address (Read Only)" bit-size="32" cdef-type="ADDR" def-comment="Data Cache &amp; SRAM Memory"/>
+	<register name="DMEM_CONTROL"     group="L1 Data Memory Registers" read-address="0xFFE00004" write-address="0xFFE00004" mask="FFFFFFFF" type="IO" description="Data memory control" bit-size="32"/>
+	<register name="DCPLB_STATUS"     group="L1 Data Memory Registers" read-address="0xFFE00008" write-address="0xFFE00008" mask="FFFFFFFF" type="IO" description="Data Cache Programmable Look-Aside Buffer Status" bit-size="32"/>
+	<register name="DCPLB_FAULT_ADDR" group="L1 Data Memory Registers" read-address="0xFFE0000C" write-address="0xFFE0000C" mask="FFFFFFFF" type="IO" description="Data Cache Programmable Look-Aside Buffer Fault Address" bit-size="32" cdef-type="ADDR"/>
+	<register name="DCPLB_ADDR0"      group="L1 Data Memory Registers" read-address="0xFFE00100" write-address="0xFFE00100" mask="FFFFFFFF" type="IO" description="Data Cache Protection Lookaside Buffer 0" bit-size="32" cdef-type="ADDR"/>
+	<register name="DCPLB_ADDR1"      group="L1 Data Memory Registers" read-address="0xFFE00104" write-address="0xFFE00104" mask="FFFFFFFF" type="IO" description="Data Cache Protection Lookaside Buffer 1" bit-size="32" cdef-type="ADDR"/>
+	<register name="DCPLB_ADDR2"      group="L1 Data Memory Registers" read-address="0xFFE00108" write-address="0xFFE00108" mask="FFFFFFFF" type="IO" description="Data Cache Protection Lookaside Buffer 2" bit-size="32" cdef-type="ADDR"/>
+	<register name="DCPLB_ADDR3"      group="L1 Data Memory Registers" read-address="0xFFE0010C" write-address="0xFFE0010C" mask="FFFFFFFF" type="IO" description="Data Cache Protection Lookaside Buffer 3" bit-size="32" cdef-type="ADDR"/>
+	<register name="DCPLB_ADDR4"      group="L1 Data Memory Registers" read-address="0xFFE00110" write-address="0xFFE00110" mask="FFFFFFFF" type="IO" description="Data Cache Protection Lookaside Buffer 4" bit-size="32" cdef-type="ADDR"/>
+	<register name="DCPLB_ADDR5"      group="L1 Data Memory Registers" read-address="0xFFE00114" write-address="0xFFE00114" mask="FFFFFFFF" type="IO" description="Data Cache Protection Lookaside Buffer 5" bit-size="32" cdef-type="ADDR"/>
+	<register name="DCPLB_ADDR6"      group="L1 Data Memory Registers" read-address="0xFFE00118" write-address="0xFFE00118" mask="FFFFFFFF" type="IO" description="Data Cache Protection Lookaside Buffer 6" bit-size="32" cdef-type="ADDR"/>
+	<register name="DCPLB_ADDR7"      group="L1 Data Memory Registers" read-address="0xFFE0011C" write-address="0xFFE0011C" mask="FFFFFFFF" type="IO" description="Data Cache Protection Lookaside Buffer 7" bit-size="32" cdef-type="ADDR"/>
+	<register name="DCPLB_ADDR8"      group="L1 Data Memory Registers" read-address="0xFFE00120" write-address="0xFFE00120" mask="FFFFFFFF" type="IO" description="Data Cache Protection Lookaside Buffer 8" bit-size="32" cdef-type="ADDR"/>
+	<register name="DCPLB_ADDR9"      group="L1 Data Memory Registers" read-address="0xFFE00124" write-address="0xFFE00124" mask="FFFFFFFF" type="IO" description="Data Cache Protection Lookaside Buffer 9" bit-size="32" cdef-type="ADDR"/>
+	<register name="DCPLB_ADDR10"     group="L1 Data Memory Registers" read-address="0xFFE00128" write-address="0xFFE00128" mask="FFFFFFFF" type="IO" description="Data Cache Protection Lookaside Buffer 10" bit-size="32" cdef-type="ADDR"/>
+	<register name="DCPLB_ADDR11"     group="L1 Data Memory Registers" read-address="0xFFE0012C" write-address="0xFFE0012C" mask="FFFFFFFF" type="IO" description="Data Cache Protection Lookaside Buffer 11" bit-size="32" cdef-type="ADDR"/>
+	<register name="DCPLB_ADDR12"     group="L1 Data Memory Registers" read-address="0xFFE00130" write-address="0xFFE00130" mask="FFFFFFFF" type="IO" description="Data Cache Protection Lookaside Buffer 12" bit-size="32" cdef-type="ADDR"/>
+	<register name="DCPLB_ADDR13"     group="L1 Data Memory Registers" read-address="0xFFE00134" write-address="0xFFE00134" mask="FFFFFFFF" type="IO" description="Data Cache Protection Lookaside Buffer 13" bit-size="32" cdef-type="ADDR"/>
+	<register name="DCPLB_ADDR14"     group="L1 Data Memory Registers" read-address="0xFFE00138" write-address="0xFFE00138" mask="FFFFFFFF" type="IO" description="Data Cache Protection Lookaside Buffer 14" bit-size="32" cdef-type="ADDR"/>
+	<register name="DCPLB_ADDR15"     group="L1 Data Memory Registers" read-address="0xFFE0013C" write-address="0xFFE0013C" mask="FFFFFFFF" type="IO" description="Data Cache Protection Lookaside Buffer 15" bit-size="32" cdef-type="ADDR"/>
+	<register name="DCPLB_DATA0"      group="L1 Data Memory Registers" read-address="0xFFE00200" write-address="0xFFE00200" mask="FFFFFFFF" type="IO" description="Data Cache 0 Status" bit-size="32"/>
+	<register name="DCPLB_DATA1"      group="L1 Data Memory Registers" read-address="0xFFE00204" write-address="0xFFE00204" mask="FFFFFFFF" type="IO" description="Data Cache 1 Status" bit-size="32"/>
+	<register name="DCPLB_DATA2"      group="L1 Data Memory Registers" read-address="0xFFE00208" write-address="0xFFE00208" mask="FFFFFFFF" type="IO" description="Data Cache 2 Status" bit-size="32"/>
+	<register name="DCPLB_DATA3"      group="L1 Data Memory Registers" read-address="0xFFE0020C" write-address="0xFFE0020C" mask="FFFFFFFF" type="IO" description="Data Cache 3 Status" bit-size="32"/>
+	<register name="DCPLB_DATA4"      group="L1 Data Memory Registers" read-address="0xFFE00210" write-address="0xFFE00210" mask="FFFFFFFF" type="IO" description="Data Cache 4 Status" bit-size="32"/>
+	<register name="DCPLB_DATA5"      group="L1 Data Memory Registers" read-address="0xFFE00214" write-address="0xFFE00214" mask="FFFFFFFF" type="IO" description="Data Cache 5 Status" bit-size="32"/>
+	<register name="DCPLB_DATA6"      group="L1 Data Memory Registers" read-address="0xFFE00218" write-address="0xFFE00218" mask="FFFFFFFF" type="IO" description="Data Cache 6 Status" bit-size="32"/>
+	<register name="DCPLB_DATA7"      group="L1 Data Memory Registers" read-address="0xFFE0021C" write-address="0xFFE0021C" mask="FFFFFFFF" type="IO" description="Data Cache 7 Status" bit-size="32"/>
+	<register name="DCPLB_DATA8"      group="L1 Data Memory Registers" read-address="0xFFE00220" write-address="0xFFE00220" mask="FFFFFFFF" type="IO" description="Data Cache 8 Status" bit-size="32"/>
+	<register name="DCPLB_DATA9"      group="L1 Data Memory Registers" read-address="0xFFE00224" write-address="0xFFE00224" mask="FFFFFFFF" type="IO" description="Data Cache 9 Status" bit-size="32"/>
+	<register name="DCPLB_DATA10"     group="L1 Data Memory Registers" read-address="0xFFE00228" write-address="0xFFE00228" mask="FFFFFFFF" type="IO" description="Data Cache 10 Status" bit-size="32"/>
+	<register name="DCPLB_DATA11"     group="L1 Data Memory Registers" read-address="0xFFE0022C" write-address="0xFFE0022C" mask="FFFFFFFF" type="IO" description="Data Cache 11 Status" bit-size="32"/>
+	<register name="DCPLB_DATA12"     group="L1 Data Memory Registers" read-address="0xFFE00230" write-address="0xFFE00230" mask="FFFFFFFF" type="IO" description="Data Cache 12 Status" bit-size="32"/>
+	<register name="DCPLB_DATA13"     group="L1 Data Memory Registers" read-address="0xFFE00234" write-address="0xFFE00234" mask="FFFFFFFF" type="IO" description="Data Cache 13 Status" bit-size="32"/>
+	<register name="DCPLB_DATA14"     group="L1 Data Memory Registers" read-address="0xFFE00238" write-address="0xFFE00238" mask="FFFFFFFF" type="IO" description="Data Cache 14 Status" bit-size="32"/>
+	<register name="DCPLB_DATA15"     group="L1 Data Memory Registers" read-address="0xFFE0023C" write-address="0xFFE0023C" mask="FFFFFFFF" type="IO" description="Data Cache 15 Status" bit-size="32"/>
+	<register name="DTEST_COMMAND"    group="L1 Data Memory Registers" read-address="0xFFE00300" write-address="0xFFE00300" mask="FFFFFFFF" type="IO" description="Data Test Command Register" bit-size="32"/>
+	<register name="DTEST_DATA0"      group="L1 Data Memory Registers" read-address="0xFFE00400" write-address="0xFFE00400" mask="FFFFFFFF" type="IO" description="Data Test Data Register" bit-size="32"/>
+	<register name="DTEST_DATA1"      group="L1 Data Memory Registers" read-address="0xFFE00404" write-address="0xFFE00404" mask="FFFFFFFF" type="IO" description="Data Test Data Register" bit-size="32"/>
+
+		<!-- L1 Data Memory Controller Child Registers -->
+		<register name="PORT_PREF1"          parent="DMEM_CONTROL" bit-position="13" bit-size="1"/>
+		<register name="PORT_PREF0"          parent="DMEM_CONTROL" bit-position="12" bit-size="1"/>
+		<register name="DCBS"                parent="DMEM_CONTROL" bit-position="4"  bit-size="1"/>
+		<register name="DMC"                 parent="DMEM_CONTROL" bit-position="2"  bit-size="2"/>
+		<register name="ENDCPLB"             parent="DMEM_CONTROL" bit-position="1"  bit-size="1"/>
+		<register name="ENDM"                parent="DMEM_CONTROL" bit-position="0"  bit-size="1"/>
+		<register name="DATA_FAULT_ILLADDR"  parent="DCPLB_STATUS" bit-position="19" bit-size="1"/>
+		<register name="FAULT_DAG"           parent="DCPLB_STATUS" bit-position="18" bit-size="1"/>
+		<register name="DATA_FAULT_USERSUPV" parent="DCPLB_STATUS" bit-position="17" bit-size="1"/>
+		<register name="FAULT_READWRITE"     parent="DCPLB_STATUS" bit-position="16" bit-size="1"/>
+		<register name="DATA_FAULT"          parent="DCPLB_STATUS" bit-position="0"  bit-size="16"/>
+
+	<!-- L1 Instruction Memory Controller Registers -->
+	<register name="IMEM_CONTROL"     group="L1 Code Memory Registers" read-address="0xFFE01004" write-address="0xFFE01004" mask="FFFFFFFF" type="IO" description="Instruction Memory Control" bit-size="32" def-comment="Instruction Cache &amp; SRAM Memory (0xFFE01004 - 0xFFE01404)"/>
+	<register name="ICPLB_STATUS"     group="L1 Code Memory Registers" read-address="0xFFE01008" write-address="0xFFE01008" mask="FFFFFFFF" type="IO" description="Instruction Cache Programmable Look-Aside Buffer Status" bit-size="32"/>
+
+	<register name="ICPLB_FAULT_ADDR" group="L1 Code Memory Registers" read-address="0xFFE0100C" write-address="0xFFE0100C" mask="FFFFFFFF" type="IO" description="Instruction Cache Programmable Look-Aside Buffer Fault Address" bit-size="32" cdef-type="ADDR"/>
+	<register name="ICPLB_ADDR0"      group="L1 Code Memory Registers" read-address="0xFFE01100" write-address="0xFFE01100" mask="FFFFFFFF" type="IO" description="Instruction Cacheability Protection Lookaside Buffer 0" bit-size="32" cdef-type="ADDR"/>
+	<register name="ICPLB_ADDR1"      group="L1 Code Memory Registers" read-address="0xFFE01104" write-address="0xFFE01104" mask="FFFFFFFF" type="IO" description="Instruction Cacheability Protection Lookaside Buffer 1" bit-size="32" cdef-type="ADDR"/>
+	<register name="ICPLB_ADDR2"      group="L1 Code Memory Registers" read-address="0xFFE01108" write-address="0xFFE01108" mask="FFFFFFFF" type="IO" description="Instruction Cacheability Protection Lookaside Buffer 2" bit-size="32" cdef-type="ADDR"/>
+	<register name="ICPLB_ADDR3"      group="L1 Code Memory Registers" read-address="0xFFE0110C" write-address="0xFFE0110C" mask="FFFFFFFF" type="IO" description="Instruction Cacheability Protection Lookaside Buffer 3" bit-size="32" cdef-type="ADDR"/>
+	<register name="ICPLB_ADDR4"      group="L1 Code Memory Registers" read-address="0xFFE01110" write-address="0xFFE01110" mask="FFFFFFFF" type="IO" description="Instruction Cacheability Protection Lookaside Buffer 4" bit-size="32" cdef-type="ADDR"/>
+	<register name="ICPLB_ADDR5"      group="L1 Code Memory Registers" read-address="0xFFE01114" write-address="0xFFE01114" mask="FFFFFFFF" type="IO" description="Instruction Cacheability Protection Lookaside Buffer 5" bit-size="32" cdef-type="ADDR"/>
+	<register name="ICPLB_ADDR6"      group="L1 Code Memory Registers" read-address="0xFFE01118" write-address="0xFFE01118" mask="FFFFFFFF" type="IO" description="Instruction Cacheability Protection Lookaside Buffer 6" bit-size="32" cdef-type="ADDR"/>
+	<register name="ICPLB_ADDR7"      group="L1 Code Memory Registers" read-address="0xFFE0111C" write-address="0xFFE0111C" mask="FFFFFFFF" type="IO" description="Instruction Cacheability Protection Lookaside Buffer 7" bit-size="32" cdef-type="ADDR"/>
+	<register name="ICPLB_ADDR8"      group="L1 Code Memory Registers" read-address="0xFFE01120" write-address="0xFFE01120" mask="FFFFFFFF" type="IO" description="Instruction Cacheability Protection Lookaside Buffer 8" bit-size="32" cdef-type="ADDR"/>
+	<register name="ICPLB_ADDR9"      group="L1 Code Memory Registers" read-address="0xFFE01124" write-address="0xFFE01124" mask="FFFFFFFF" type="IO" description="Instruction Cacheability Protection Lookaside Buffer 9" bit-size="32" cdef-type="ADDR"/>
+	<register name="ICPLB_ADDR10" 	  group="L1 Code Memory Registers" read-address="0xFFE01128" write-address="0xFFE01128" mask="FFFFFFFF" type="IO" description="Instruction Cacheability Protection Lookaside Buffer 10" bit-size="32" cdef-type="ADDR"/>
+	<register name="ICPLB_ADDR11" 	  group="L1 Code Memory Registers" read-address="0xFFE0112C" write-address="0xFFE0112C" mask="FFFFFFFF" type="IO" description="Instruction Cacheability Protection Lookaside Buffer 11" bit-size="32" cdef-type="ADDR"/>
+	<register name="ICPLB_ADDR12" 	  group="L1 Code Memory Registers" read-address="0xFFE01130" write-address="0xFFE01130" mask="FFFFFFFF" type="IO" description="Instruction Cacheability Protection Lookaside Buffer 12" bit-size="32" cdef-type="ADDR"/>
+	<register name="ICPLB_ADDR13" 	  group="L1 Code Memory Registers" read-address="0xFFE01134" write-address="0xFFE01134" mask="FFFFFFFF" type="IO" description="Instruction Cacheability Protection Lookaside Buffer 13" bit-size="32" cdef-type="ADDR"/>
+	<register name="ICPLB_ADDR14" 	  group="L1 Code Memory Registers" read-address="0xFFE01138" write-address="0xFFE01138" mask="FFFFFFFF" type="IO" description="Instruction Cacheability Protection Lookaside Buffer 14" bit-size="32" cdef-type="ADDR"/>
+	<register name="ICPLB_ADDR15" 	  group="L1 Code Memory Registers" read-address="0xFFE0113C" write-address="0xFFE0113C" mask="FFFFFFFF" type="IO" description="Instruction Cacheability Protection Lookaside Buffer 15" bit-size="32" cdef-type="ADDR"/>
+	<register name="ICPLB_DATA0" 	  group="L1 Code Memory Registers" read-address="0xFFE01200" write-address="0xFFE01200" mask="FFFFFFFF" type="IO" description="Instruction Cache 0 Status" bit-size="32"/>
+	<register name="ICPLB_DATA1" 	  group="L1 Code Memory Registers" read-address="0xFFE01204" write-address="0xFFE01204" mask="FFFFFFFF" type="IO" description="Instruction Cache 1 Status" bit-size="32"/>
+	<register name="ICPLB_DATA2" 	  group="L1 Code Memory Registers" read-address="0xFFE01208" write-address="0xFFE01208" mask="FFFFFFFF" type="IO" description="Instruction Cache 2 Status" bit-size="32"/>
+	<register name="ICPLB_DATA3" 	  group="L1 Code Memory Registers" read-address="0xFFE0120C" write-address="0xFFE0120C" mask="FFFFFFFF" type="IO" description="Instruction Cache 3 Status" bit-size="32"/>
+	<register name="ICPLB_DATA4" 	  group="L1 Code Memory Registers" read-address="0xFFE01210" write-address="0xFFE01210" mask="FFFFFFFF" type="IO" description="Instruction Cache 4 Status" bit-size="32"/>
+	<register name="ICPLB_DATA5" 	  group="L1 Code Memory Registers" read-address="0xFFE01214" write-address="0xFFE01214" mask="FFFFFFFF" type="IO" description="Instruction Cache 5 Status" bit-size="32"/>
+	<register name="ICPLB_DATA6" 	  group="L1 Code Memory Registers" read-address="0xFFE01218" write-address="0xFFE01218" mask="FFFFFFFF" type="IO" description="Instruction Cache 6 Status" bit-size="32"/>
+	<register name="ICPLB_DATA7" 	  group="L1 Code Memory Registers" read-address="0xFFE0121C" write-address="0xFFE0121C" mask="FFFFFFFF" type="IO" description="Instruction Cache 7 Status" bit-size="32"/>
+	<register name="ICPLB_DATA8" 	  group="L1 Code Memory Registers" read-address="0xFFE01220" write-address="0xFFE01220" mask="FFFFFFFF" type="IO" description="Instruction Cache 8 Status" bit-size="32"/>
+	<register name="ICPLB_DATA9" 	  group="L1 Code Memory Registers" read-address="0xFFE01224" write-address="0xFFE01224" mask="FFFFFFFF" type="IO" description="Instruction Cache 9 Status" bit-size="32"/>
+	<register name="ICPLB_DATA10" 	  group="L1 Code Memory Registers" read-address="0xFFE01228" write-address="0xFFE01228" mask="FFFFFFFF" type="IO" description="Instruction Cache 10 Status" bit-size="32"/>
+	<register name="ICPLB_DATA11" 	  group="L1 Code Memory Registers" read-address="0xFFE0122C" write-address="0xFFE0122C" mask="FFFFFFFF" type="IO" description="Instruction Cache 11 Status" bit-size="32"/>
+	<register name="ICPLB_DATA12" 	  group="L1 Code Memory Registers" read-address="0xFFE01230" write-address="0xFFE01230" mask="FFFFFFFF" type="IO" description="Instruction Cache 12 Status" bit-size="32"/>
+	<register name="ICPLB_DATA13" 	  group="L1 Code Memory Registers" read-address="0xFFE01234" write-address="0xFFE01234" mask="FFFFFFFF" type="IO" description="Instruction Cache 13 Status" bit-size="32"/>
+	<register name="ICPLB_DATA14" 	  group="L1 Code Memory Registers" read-address="0xFFE01238" write-address="0xFFE01238" mask="FFFFFFFF" type="IO" description="Instruction Cache 14 Status" bit-size="32"/>
+	<register name="ICPLB_DATA15" 	  group="L1 Code Memory Registers" read-address="0xFFE0123C" write-address="0xFFE0123C" mask="FFFFFFFF" type="IO" description="Instruction Cache 15 Status" bit-size="32"/>
+	<register name="ITEST_COMMAND"    group="L1 Code Memory Registers" read-address="0xFFE01300" write-address="0xFFE01300" mask="FFFFFFFF" type="IO" description="Instruction Test Command Register" bit-size="32"/>
+	<register name="ITEST_DATA0"      group="L1 Code Memory Registers" read-address="0xFFE01400" write-address="0xFFE01400" mask="FFFFFFFF" type="IO" description="Instruction Test Data Register" bit-size="32"/>
+	<register name="ITEST_DATA1"      group="L1 Code Memory Registers" read-address="0xFFE01404" write-address="0xFFE01404" mask="FFFFFFFF" type="IO" description="Instruction Test Data Register" bit-size="32"/>
+
+		<!-- L1 Instruction Memory Controller Child Registers -->
+		<register name="LRUPRIORST"          parent="IMEM_CONTROL" bit-position="13" bit-size="1"/>
+		<register name="ILOC"                parent="IMEM_CONTROL" bit-position="3"  bit-size="4"/>
+		<register name="IMC"                 parent="IMEM_CONTROL" bit-position="2"  bit-size="1"/>
+		<register name="ENICPLB"             parent="IMEM_CONTROL" bit-position="1"  bit-size="1"/>
+		<register name="CODE_FAULT_ILLADDR"  parent="ICPLB_STATUS" bit-position="19" bit-size="1"/>
+		<register name="CODE_FAULT_USERSUPV" parent="ICPLB_STATUS" bit-position="17" bit-size="1"/>
+		<register name="CODE_FAULT"          parent="ICPLB_STATUS" bit-position="0"  bit-size="16"/>
+
+	<!-- Interrupt Controller Registers -->
+	<register name="EVT0"  group="Event Vector Registers" read-address="0xFFE02000" write-address="0xFFE02000" mask="FFFFFFFF" type="IO" description="Event Vector 0 ESR Address" bit-size="32" cdef-type="ADDR" def-comment="Event/Interrupt Controller Registers (0xFFE02000 - 0xFFE02110)"/>
+	<register name="EVT1"  group="Event Vector Registers" read-address="0xFFE02004" write-address="0xFFE02004" mask="FFFFFFFF" type="IO" description="Event Vector 1 ESR Address" bit-size="32" cdef-type="ADDR"/>
+	<register name="EVT2"  group="Event Vector Registers" read-address="0xFFE02008" write-address="0xFFE02008" mask="FFFFFFFF" type="IO" description="Event Vector 2 ESR Address" bit-size="32" cdef-type="ADDR"/>
+	<register name="EVT3"  group="Event Vector Registers" read-address="0xFFE0200C" write-address="0xFFE0200C" mask="FFFFFFFF" type="IO" description="Event Vector 3 ESR Address" bit-size="32" cdef-type="ADDR"/>
+	<register name="EVT4"  group="Event Vector Registers" read-address="0xFFE02010" write-address="0xFFE02010" mask="FFFFFFFF" type="IO" description="Event Vector 4 ESR Address" bit-size="32" cdef-type="ADDR"/>
+	<register name="EVT5"  group="Event Vector Registers" read-address="0xFFE02014" write-address="0xFFE02014" mask="FFFFFFFF" type="IO" description="Event Vector 5 ESR Address" bit-size="32" cdef-type="ADDR"/>
+	<register name="EVT6"  group="Event Vector Registers" read-address="0xFFE02018" write-address="0xFFE02018" mask="FFFFFFFF" type="IO" description="Event Vector 6 ESR Address" bit-size="32" cdef-type="ADDR"/>
+	<register name="EVT7"  group="Event Vector Registers" read-address="0xFFE0201C" write-address="0xFFE0201C" mask="FFFFFFFF" type="IO" description="Event Vector 7 ESR Address" bit-size="32" cdef-type="ADDR"/>
+	<register name="EVT8"  group="Event Vector Registers" read-address="0xFFE02020" write-address="0xFFE02020" mask="FFFFFFFF" type="IO" description="Event Vector 8 ESR Address" bit-size="32" cdef-type="ADDR"/>
+	<register name="EVT9"  group="Event Vector Registers" read-address="0xFFE02024" write-address="0xFFE02024" mask="FFFFFFFF" type="IO" description="Event Vector 9 ESR Address" bit-size="32" cdef-type="ADDR"/>
+	<register name="EVT10" group="Event Vector Registers" read-address="0xFFE02028" write-address="0xFFE02028" mask="FFFFFFFF" type="IO" description="Event Vector 10 ESR Address" bit-size="32" cdef-type="ADDR"/>
+	<register name="EVT11" group="Event Vector Registers" read-address="0xFFE0202C" write-address="0xFFE0202C" mask="FFFFFFFF" type="IO" description="Event Vector 11 ESR Address" bit-size="32" cdef-type="ADDR"/>
+	<register name="EVT12" group="Event Vector Registers" read-address="0xFFE02030" write-address="0xFFE02030" mask="FFFFFFFF" type="IO" description="Event Vector 12 ESR Address" bit-size="32" cdef-type="ADDR"/>
+	<register name="EVT13" group="Event Vector Registers" read-address="0xFFE02034" write-address="0xFFE02034" mask="FFFFFFFF" type="IO" description="Event Vector 13 ESR Address" bit-size="32" cdef-type="ADDR"/>
+	<register name="EVT14" group="Event Vector Registers" read-address="0xFFE02038" write-address="0xFFE02038" mask="FFFFFFFF" type="IO" description="Event Vector 14 ESR Address" bit-size="32" cdef-type="ADDR"/>
+	<register name="EVT15" group="Event Vector Registers" read-address="0xFFE0203C" write-address="0xFFE0203C" mask="FFFFFFFF" type="IO" description="Event Vector 15 ESR Address" bit-size="32" cdef-type="ADDR"/>
+
+	<register name="ILAT" group="Interrupt Controller" read-address="0xFFE0210C" write-address="0xFFE0210C" mask="FFFFFFFF" type="IO" description="Interrupt Latch Register" bit-size="32"/>
+		<register name="ILATbit0"  parent="ILAT" bit-position="0"  type="" description="child register" bit-size="1"/>
+		<register name="ILATbit1"  parent="ILAT" bit-position="1"  type="" description="child register" bit-size="1"/>
+		<register name="ILATbit2"  parent="ILAT" bit-position="2"  type="" description="child register" bit-size="1"/>
+		<register name="ILATbit3"  parent="ILAT" bit-position="3"  type="" description="child register" bit-size="1"/>
+		<register name="ILATbit5"  parent="ILAT" bit-position="5"  type="" description="child register" bit-size="1"/>
+		<register name="ILATbit6"  parent="ILAT" bit-position="6"  type="" description="child register" bit-size="1"/>
+		<register name="ILATbit7"  parent="ILAT" bit-position="7"  type="" description="child register" bit-size="1"/>
+		<register name="ILATbit8"  parent="ILAT" bit-position="8"  type="" description="child register" bit-size="1"/>
+		<register name="ILATbit9"  parent="ILAT" bit-position="9"  type="" description="child register" bit-size="1"/>
+		<register name="ILATbit10" parent="ILAT" bit-position="10" type="" description="child register" bit-size="1"/>
+		<register name="ILATbit11" parent="ILAT" bit-position="11" type="" description="child register" bit-size="1"/>
+		<register name="ILATbit12" parent="ILAT" bit-position="12" type="" description="child register" bit-size="1"/>
+		<register name="ILATbit13" parent="ILAT" bit-position="13" type="" description="child register" bit-size="1"/>
+		<register name="ILATbit14" parent="ILAT" bit-position="14" type="" description="child register" bit-size="1"/>
+		<register name="ILATbit15" parent="ILAT" bit-position="15" type="" description="child register" bit-size="1"/>
+
+	<register name="IMASK" group="Interrupt Controller" read-address="0xFFE02104" write-address="0xFFE02104" mask="FFFFFFFF" type="IO" description="Interrupt Mask Register" bit-size="32"/>
+		<register name="IMASKbit0"  parent="IMASK" bit-position="0"  type="" description="child register" bit-size="1"/>
+		<register name="IMASKbit1"  parent="IMASK" bit-position="1"  type="" description="child register" bit-size="1"/>
+		<register name="IMASKbit2"  parent="IMASK" bit-position="2"  type="" description="child register" bit-size="1"/>
+		<register name="IMASKbit3"  parent="IMASK" bit-position="3"  type="" description="child register" bit-size="1"/>
+		<register name="IMASKbit4"  parent="IMASK" bit-position="4"  type="" description="child register" bit-size="1"/>
+		<register name="IMASKbit5"  parent="IMASK" bit-position="5"  type="" description="child register" bit-size="1"/>
+		<register name="IMASKbit6"  parent="IMASK" bit-position="6"  type="" description="child register" bit-size="1"/>
+		<register name="IMASKbit7"  parent="IMASK" bit-position="7"  type="" description="child register" bit-size="1"/>
+		<register name="IMASKbit8"  parent="IMASK" bit-position="8"  type="" description="child register" bit-size="1"/>
+		<register name="IMASKbit9"  parent="IMASK" bit-position="9"  type="" description="child register" bit-size="1"/>
+		<register name="IMASKbit10" parent="IMASK" bit-position="10" type="" description="child register" bit-size="1"/>
+		<register name="IMASKbit11" parent="IMASK" bit-position="11" type="" description="child register" bit-size="1"/>
+		<register name="IMASKbit12" parent="IMASK" bit-position="12" type="" description="child register" bit-size="1"/>
+		<register name="IMASKbit13" parent="IMASK" bit-position="13" type="" description="child register" bit-size="1"/>
+		<register name="IMASKbit14" parent="IMASK" bit-position="14" type="" description="child register" bit-size="1"/>
+		<register name="IMASKbit15" parent="IMASK" bit-position="15" type="" description="child register" bit-size="1"/>
+
+	<register name="IPEND" group="Interrupt Controller" read-address="0xFFE02108" write-address="0xFFE02108" mask="FFFFFFFF" type="IO" description="Interrupt Pending Register" bit-size="32"/>
+		<register name="IPENDbit0"  parent="IPEND" bit-position="0"  type="" description="child register" bit-size="1"/>
+		<register name="IPENDbit1"  parent="IPEND" bit-position="1"  type="" description="child register" bit-size="1"/>
+		<register name="IPENDbit2"  parent="IPEND" bit-position="2"  type="" description="child register" bit-size="1"/>
+		<register name="IPENDbit3"  parent="IPEND" bit-position="3"  type="" description="child register" bit-size="1"/>
+		<register name="IPENDbit4"  parent="IPEND" bit-position="4"  type="" description="child register" bit-size="1"/>
+		<register name="IPENDbit5"  parent="IPEND" bit-position="5"  type="" description="child register" bit-size="1"/>
+		<register name="IPENDbit6"  parent="IPEND" bit-position="6"  type="" description="child register" bit-size="1"/>
+		<register name="IPENDbit7"  parent="IPEND" bit-position="7"  type="" description="child register" bit-size="1"/>
+		<register name="IPENDbit8"  parent="IPEND" bit-position="8"  type="" description="child register" bit-size="1"/>
+		<register name="IPENDbit9"  parent="IPEND" bit-position="9"  type="" description="child register" bit-size="1"/>
+		<register name="IPENDbit10" parent="IPEND" bit-position="10" type="" description="child register" bit-size="1"/>
+		<register name="IPENDbit11" parent="IPEND" bit-position="11" type="" description="child register" bit-size="1"/>
+		<register name="IPENDbit12" parent="IPEND" bit-position="12" type="" description="child register" bit-size="1"/>
+		<register name="IPENDbit13" parent="IPEND" bit-position="13" type="" description="child register" bit-size="1"/>
+		<register name="IPENDbit14" parent="IPEND" bit-position="14" type="" description="child register" bit-size="1"/>
+		<register name="IPENDbit15" parent="IPEND" bit-position="15" type="" description="child register" bit-size="1"/>
+
+	<register name="IPRIO" group="Interrupt Controller" read-address="0xFFE02110" write-address="0xFFE02110" mask="FFFFFFFF" type="IO" description="Interrupt Priority Register" bit-size="32"/>
+
+	<!-- Debug Registers (see also above for CHIPID) -->
+	<register name="DSPID" group="Extended Registers" read-address="0xFFE05000" write-address="0xFFE05000" type="IO" target="EMU" description="" bit-size="32" def-comment="Debug/MP/Emulation Registers (0xFFE05000 - 0xFFE05008)"/>
+
+</register-extended-definitions>
+
+<!-- ************************************************************************ -->
+<!-- ******* Grouping of formats that are applied to register windows         -->
+<!-- ************************************************************************ -->
+
+<format-definitions>
+
+<!-- All is every data format (numeric and character), but no disassembly -->
+<format-grouping name="All">
+	<format option="Hexadecimal"/>
+	<format option="Binary"/>
+	<format option="Octal"/>
+	<format option="Signed Integer"/>
+	<format option="Unsigned Integer"/>
+	<format option="Floating Point 32 bit"/>
+	<format option="Signed Fractional"/>
+	<format option="Unsigned Fractional"/>
+	<format option="Signed Integer 32 bit"/>
+	<format option="Signed Integer 16 bit"/>
+	<format option="Unsigned Integer 32 bit"/>
+	<format option="Unsigned Integer 16 bit"/>
+	<format option="Signed Fractional 32 bit"/>
+	<format option="Signed Fractional 16 bit"/>
+	<format option="Unsigned Fractional 32 bit"/>
+	<format option="Unsigned Fractional 16 bit"/>
+	<format option="Hex32"/>
+	<format option="Hex16"/>
+	<format option="Hex8"/>
+	<format option="Binary 32 bit"/>
+	<format option="Binary 16 bit"/>
+	<format option="Binary 8 bit"/>
+	<format option="Character"/>
+</format-grouping>
+</format-definitions>
+
+<!-- ************************************************************************ -->
+<!-- ******* Register Windows                                                 -->
+<!-- ************************************************************************ -->
+
+<register-window-definitions help-chm="\procfrio.chm::/html/">
+
+	<!-- ****************************************** -->
+	<!-- **        Core Register Windows         ** -->
+	<!-- ** Define in reverse alphabetical order ** -->
+	<!-- ****************************************** -->
+
+<window name="Sequencer Status" menu="&amp;Register:&amp;Core:Status:Sequencer Status" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0xF" help-tag="HID_Sequencer_Status_Window.htm">
+	<register name="SEQSTAT"    type="NORMAL" x="8" y="0"/>
+	<register name="EXCAUSE"    type="NORMAL" x="10" y="2"/>
+	<register name="IDLE_REQ"   type="NORMAL" x="10" y="3"/>
+	<register name="SFTRESET"   type="NORMAL" x="10" y="4"/>
+	<register name="HWERRCAUSE" type="NORMAL" x="10" y="5"/>
+</window>
+<window name="Arithmetic Status" menu="&amp;Register:&amp;Core:Status:Arithmetic Status" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD039" help-tag="HID_Arithmetic_Status_Window532.htm">
+	<register name="ASTAT"   type="NORMAL" x="5" y="1"/>
+	<register name="AZ"      type="NORMAL" x="7" y="2"/>
+	<register name="AN"      type="NORMAL" x="7" y="3"/>
+	<register name="CC"      type="NORMAL" x="7" y="4"/>
+	<register name="AQ"      type="NORMAL" x="7" y="5"/>
+	<register name="RND_MOD" type="NORMAL" x="7" y="6"/>
+	<register name="AC0"     type="NORMAL" x="7" y="7"/>
+	<register name="AC1"     type="NORMAL" x="7" y="8"/>
+	<register name="AV0"     type="NORMAL" x="20" y="2"/>
+	<register name="AV0S"    type="NORMAL" x="20" y="3"/>
+	<register name="AV1"     type="NORMAL" x="20" y="4"/>
+	<register name="AV1S"    type="NORMAL" x="20" y="5"/>
+	<register name="V"       type="NORMAL" x="20" y="6"/>
+	<register name="VS"      type="NORMAL" x="20" y="7"/>
+</window>
+<window name="System Configuration" menu="&amp;Register:&amp;Core:System Configuration" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x9" help-tag="HID_System_Configuration.htm">
+	<register name="System Configuration Register" type="NODATA" x="0" y="0"/>
+	<register name="SYSCFG" type="NODATA" x="0" y="1"/>
+	<register name="SYSCFG" type="NOLABEL" x="8" y="1"/>
+	<register name="SSSTEP Supervisor Single Step" type="NODATA" x="3" y="2"/>
+	<register name="SSSTEP" type="NOLABEL" x="40" y="2"/>
+	<register name="CCEN   Cycle Counter Enable" type="NODATA" x="3" y="3"/>
+	<register name="CCEN" type="NOLABEL" x="40" y="3"/>
+	<register name="SNEN   Self-Nesting Interrupt Enable" type="NODATA" x="3" y="4"/>
+	<register name="SNEN" type="NOLABEL" x="40" y="4"/>
+	<register name="Software Reset Register" type="NODATA" x="0" y="6"/>
+	<register name="SWRST" type="NODATA" x="0" y="7"/>
+	<register name="SWRST" type="NOLABEL" x="8" y="7"/>
+	<register name="System Reset Configuration Register" type="NODATA" x="0" y="9"/>
+	<register name="SYSCR" type="NODATA" x="0" y="10"/>
+	<register name="SYSCR" type="NOLABEL" x="8" y="10"/>
+</window>
+
+<window name="Stack/Frame Pointers" menu="&amp;Register:&amp;Core:Stack/Frame Pointers" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0xA" help-tag="HID_Stack_Frame_Pointers.htm">
+	<register name="SP"  type="NORMAL" x="5" y="0"/>
+	<register name="USP" type="NORMAL" x="5" y="1"/>
+	<register name="FP"  type="NORMAL" x="5" y="2"/>
+</window>
+<window name="Sequencer" menu="&amp;Register:&amp;Core:Sequencer" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x7" help-tag="HID_Sequencer_Window.htm">
+	<register name="RETS" type="NORMAL" x="5" y="0"/>
+	<register name="RETI" type="NORMAL" x="5" y="1"/>
+	<register name="RETX" type="NORMAL" x="5" y="2"/>
+	<register name="RETE" type="NORMAL" x="5" y="3"/>
+	<register name="RETN" type="NORMAL" x="5" y="4"/>
+</window>
+<window name="Phase Locked Loop" menu="&amp;Register:&amp;Core:PLL Register File" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD03A" help-tag="PLL_Register_File_Window.htm">
+	<register name="PLL_CTL" type="NORMAL" x="11" y="0"/>
+	<register name="PLL_DIV" type="NORMAL" x="11" y="1"/>
+	<register name="VR_CTL" type="NORMAL" x="11" y="2"/>
+	<register name="PLL_STAT" type="NORMAL" x="11" y="3"/>
+	<register name="PLL_LOCKCNT" type="NORMAL" x="11" y="4"/>
+</window>
+<window name="PC Counters" menu="&amp;Register:&amp;Core:PC Counters" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x19" help-tag="HID_PC_Window.htm">
+	<register name="PC" type="NORMAL" x="8" y="0"/>
+</window>
+<window name="P Registers" menu="&amp;Register:&amp;Core:P Registers" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0xB" help-tag="HID_P_Registers.htm">
+	<register name="P0" type="NORMAL" x="5" y="0"/>
+	<register name="P1" type="NORMAL" x="5" y="1"/>
+	<register name="P2" type="NORMAL" x="5" y="2"/>
+	<register name="P3" type="NORMAL" x="5" y="3"/>
+	<register name="P4" type="NORMAL" x="5" y="4"/>
+	<register name="P5" type="NORMAL" x="5" y="5"/>
+</window>
+<window name="Loop Counters" menu="&amp;Register:&amp;Core:Loop Counters" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x13" help-tag="HID_Loop_Counters_Window.htm">
+	<register name="LC0" type="NORMAL" x="5" y="0"/>
+	<register name="LT0" type="NORMAL" x="5" y="1"/>
+	<register name="LB0" type="NORMAL" x="5" y="2"/>
+	<register name="LC1" type="NORMAL" x="5" y="4"/>
+	<register name="LT1" type="NORMAL" x="5" y="5"/>
+	<register name="LB1" type="NORMAL" x="5" y="6"/>
+</window>
+<window name="L1 Data Memory Registers" menu="&amp;Register:&amp;Core:L1 Data Memory Registers" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x1B" help-tag="HID_L1_Data.htm">
+	<register name="SRAM_BASE_ADDR"      type="NODATA"  x="0"  y="0"/>
+	<register name="SRAM_BASE_ADDR"      type="NOLABEL" x="18" y="0"/>
+	<register name="DMEM_CONTROL"        type="NODATA"  x="0"  y="2"/>
+	<register name="DMEM_CONTROL"        type="NOLABEL" x="18" y="2"/>
+	<register name="PORT_PREF1"          type="NODATA"  x="2"  y="3"/>
+	<register name="PORT_PREF1"          type="NOLABEL" x="20" y="3"/>
+	<register name="PORT_PREF0"          type="NODATA"  x="2"  y="4"/>
+	<register name="PORT_PREF0"          type="NOLABEL" x="20" y="4"/>
+	<register name="DCBS"                type="NODATA"  x="2"  y="5"/>
+	<register name="DCBS"                type="NOLABEL" x="20" y="5"/>
+	<register name="DMC"                 type="NODATA"  x="2"  y="6"/>
+	<register name="DMC"                 type="NOLABEL" x="20" y="6"/>
+	<register name="ENDCPLB"             type="NODATA"  x="2"  y="7"/>
+	<register name="ENDCPLB"             type="NOLABEL" x="20" y="7"/>
+	<register name="ENDM"                type="NODATA"  x="2"  y="8"/>
+	<register name="ENDM"                type="NOLABEL" x="20" y="8"/>
+	<register name="DCPLB_STATUS"        type="NODATA"  x="0"  y="10"/>
+	<register name="DCPLB_STATUS"        type="NOLABEL" x="18" y="10"/>
+	<register name="FAULT"               type="NODATA"  x="2"  y="11"/>
+	<register name="DATA_FAULT"          type="NOLABEL" x="20" y="11"/>
+	<register name="FAULT_READWRITE"     type="NODATA"  x="2"  y="12"/>
+	<register name="FAULT_READWRITE"     type="NOLABEL" x="20" y="12"/>
+	<register name="FAULT_USERSUPV"      type="NODATA"  x="2"  y="13"/>
+	<register name="DATA_FAULT_USERSUPV" type="NOLABEL" x="20" y="13"/>
+	<register name="FAULT_DAG"           type="NODATA"  x="2"  y="14"/>
+	<register name="FAULT_DAG"           type="NOLABEL" x="20" y="14"/>
+	<register name="FAULT_ILLADDR"       type="NODATA"  x="2"  y="15"/>
+	<register name="DATA_FAULT_ILLADDR"  type="NOLABEL" x="20" y="15"/>
+	<register name="DCPLB_FAULT_ADDR"    type="NODATA"  x="0"  y="17"/>
+	<register name="DCPLB_FAULT_ADDR"    type="NOLABEL" x="18" y="17"/>
+	<register name="DCPLB_ADDR0"     type="NORMAL"  x="18" y="19"/>
+	<register name="DCPLB_ADDR1"     type="NORMAL"  x="18" y="20"/>
+	<register name="DCPLB_ADDR2"     type="NORMAL"  x="18" y="21"/>
+	<register name="DCPLB_ADDR3"     type="NORMAL"  x="18" y="22"/>
+	<register name="DCPLB_ADDR4"     type="NORMAL"  x="18" y="23"/>
+	<register name="DCPLB_ADDR5"     type="NORMAL"  x="18" y="24"/>
+	<register name="DCPLB_ADDR6"     type="NORMAL"  x="18" y="25"/>
+	<register name="DCPLB_ADDR7"     type="NORMAL"  x="18" y="26"/>
+	<register name="DCPLB_ADDR8"     type="NORMAL"  x="18" y="27"/>
+	<register name="DCPLB_ADDR9"     type="NORMAL"  x="18" y="28"/>
+	<register name="DCPLB_ADDR10"    type="NORMAL"  x="18" y="29"/>
+	<register name="DCPLB_ADDR11"    type="NORMAL"  x="18" y="30"/>
+	<register name="DCPLB_ADDR12"    type="NORMAL"  x="18" y="31"/>
+	<register name="DCPLB_ADDR13"    type="NORMAL"  x="18" y="32"/>
+	<register name="DCPLB_ADDR14"    type="NORMAL"  x="18" y="33"/>
+	<register name="DCPLB_ADDR15"    type="NORMAL"  x="18" y="34"/>
+	<register name="DCPLB_DATA0"     type="NORMAL"  x="42" y="19"/>
+	<register name="DCPLB_DATA1"     type="NORMAL"  x="42" y="20"/>
+	<register name="DCPLB_DATA2"     type="NORMAL"  x="42" y="21"/>
+	<register name="DCPLB_DATA3"     type="NORMAL"  x="42" y="22"/>
+	<register name="DCPLB_DATA4"     type="NORMAL"  x="42" y="23"/>
+	<register name="DCPLB_DATA5"     type="NORMAL"  x="42" y="24"/>
+	<register name="DCPLB_DATA6"     type="NORMAL"  x="42" y="25"/>
+	<register name="DCPLB_DATA7"     type="NORMAL"  x="42" y="26"/>
+	<register name="DCPLB_DATA8"     type="NORMAL"  x="42" y="27"/>
+	<register name="DCPLB_DATA9"     type="NORMAL"  x="42" y="28"/>
+	<register name="DCPLB_DATA10"    type="NORMAL"  x="42" y="29"/>
+	<register name="DCPLB_DATA11"    type="NORMAL"  x="42" y="30"/>
+	<register name="DCPLB_DATA12"    type="NORMAL"  x="42" y="31"/>
+	<register name="DCPLB_DATA13"    type="NORMAL"  x="42" y="32"/>
+	<register name="DCPLB_DATA14"    type="NORMAL"  x="42" y="33"/>
+	<register name="DCPLB_DATA15"    type="NORMAL"  x="42" y="34"/>
+	<register name="DTEST_COMMAND"   type="NODATA"  x="0" y="36"/>
+	<register name="DTEST_COMMAND"   type="NOLABEL" x="18" y="36"/>
+	<register name="DTEST_DATA0"     type="NODATA"  x="0"  y="37"/>
+	<register name="DTEST_DATA0"     type="NOLABEL" x="18" y="37"/>
+	<register name="DTEST_DATA1"     type="NODATA"  x="0"  y="38"/>
+	<register name="DTEST_DATA1"     type="NOLABEL" x="18" y="38"/>
+</window>
+<window name="L1 Code Memory Registers" menu="&amp;Register:&amp;Core:L1 Code Memory Registers" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x1C" help-tag="HID_L1_Code.htm">
+	<register name="IMEM_CONTROL" type="NODATA" x="0" y="0"/>
+	<register name="IMEM_CONTROL" type="NOLABEL" x="18" y="0"/>
+	<register name="LRUPRIORST" type="NODATA" x="2" y="1"/>
+	<register name="LRUPRIORST" type="NOLABEL" x="18" y="1"/>
+	<register name="ILOC" type="NODATA" x="2" y="2"/>
+	<register name="ILOC" type="NOLABEL" x="20" y="2"/>
+	<register name="IMC" type="NODATA" x="2" y="3"/>
+	<register name="IMC" type="NOLABEL" x="20" y="3"/>
+	<register name="ENICPLB" type="NODATA" x="2" y="4"/>
+	<register name="ENICPLB" type="NOLABEL" x="20" y="4"/>
+	<register name="ICPLB_STATUS" type="NODATA" x="0" y="7"/>
+	<register name="ICPLB_STATUS" type="NOLABEL" x="18" y="7"/>
+	<register name="FAULT_ILLADDR" type="NODATA" x="2" y="8"/>
+	<register name="CODE_FAULT_ILLADDR" type="NOLABEL" x="20" y="8"/>
+	<register name="FAULT_USERSUPV" type="NODATA" x="2" y="9"/>
+	<register name="CODE_FAULT_USERSUPV" type="NOLABEL" x="20" y="9"/>
+	<register name="FAULT" type="NODATA" x="2" y="10"/>
+	<register name="CODE_FAULT" type="NOLABEL" x="20" y="10"/>
+	<register name="ICPLB_FAULT_ADDR" type="NODATA" x="0" y="12"/>
+	<register name="ICPLB_FAULT_ADDR" type="NOLABEL" x="18" y="12"/>
+	<register name="ICPLB_ADDR0" type="NORMAL" x="18" y="14"/>
+	<register name="ICPLB_ADDR1" type="NORMAL" x="18" y="15"/>
+	<register name="ICPLB_ADDR2" type="NORMAL" x="18" y="16"/>
+	<register name="ICPLB_ADDR3" type="NORMAL" x="18" y="17"/>
+	<register name="ICPLB_ADDR4" type="NORMAL" x="18" y="18"/>
+	<register name="ICPLB_ADDR5" type="NORMAL" x="18" y="19"/>
+	<register name="ICPLB_ADDR6" type="NORMAL" x="18" y="20"/>
+	<register name="ICPLB_ADDR7" type="NORMAL" x="18" y="21"/>
+	<register name="ICPLB_ADDR8" type="NORMAL" x="18" y="22"/>
+	<register name="ICPLB_ADDR9" type="NORMAL" x="18" y="23"/>
+	<register name="ICPLB_ADDR10" type="NORMAL" x="18" y="24"/>
+	<register name="ICPLB_ADDR11" type="NORMAL" x="18" y="25"/>
+	<register name="ICPLB_ADDR12" type="NORMAL" x="18" y="26"/>
+	<register name="ICPLB_ADDR13" type="NORMAL" x="18" y="27"/>
+	<register name="ICPLB_ADDR14" type="NORMAL" x="18" y="28"/>
+	<register name="ICPLB_ADDR15" type="NORMAL" x="18" y="29"/>
+	<register name="ICPLB_DATA0" type="NORMAL" x="42" y="14"/>
+	<register name="ICPLB_DATA1" type="NORMAL" x="42" y="15"/>
+	<register name="ICPLB_DATA2" type="NORMAL" x="42" y="16"/>
+	<register name="ICPLB_DATA3" type="NORMAL" x="42" y="17"/>
+	<register name="ICPLB_DATA4" type="NORMAL" x="42" y="18"/>
+	<register name="ICPLB_DATA5" type="NORMAL" x="42" y="19"/>
+	<register name="ICPLB_DATA6" type="NORMAL" x="42" y="20"/>
+	<register name="ICPLB_DATA7" type="NORMAL" x="42" y="21"/>
+	<register name="ICPLB_DATA8" type="NORMAL" x="42" y="22"/>
+	<register name="ICPLB_DATA9" type="NORMAL" x="42" y="23"/>
+	<register name="ICPLB_DATA10" type="NORMAL" x="42" y="24"/>
+	<register name="ICPLB_DATA11" type="NORMAL" x="42" y="25"/>
+	<register name="ICPLB_DATA12" type="NORMAL" x="42" y="26"/>
+	<register name="ICPLB_DATA13" type="NORMAL" x="42" y="27"/>
+	<register name="ICPLB_DATA14" type="NORMAL" x="42" y="28"/>
+	<register name="ICPLB_DATA15" type="NORMAL" x="42" y="29"/>
+	<register name="ITEST_COMMAND" type="NODATA" x="0" y="31"/>
+	<register name="ITEST_COMMAND" type="NOLABEL" x="18" y="31"/>
+	<register name="ITEST_DATA0" type="NODATA" x="0" y="32"/>
+	<register name="ITEST_DATA0" type="NOLABEL" x="18" y="32"/>
+	<register name="ITEST_DATA1" type="NODATA" x="0" y="33"/>
+	<register name="ITEST_DATA1" type="NOLABEL" x="18" y="33"/>
+</window>
+<window name="Interrupt Controller" menu="&amp;Register:&amp;Core:Interrupt Controller" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x6" help-tag="HID_Interrupt_Controller.htm">
+
+	<register name="IPRIO" type="NORMAL" x="20" y="0"/>
+
+	<register name="0 = EMU"     type="NODATA" x="1" y="5"/>
+	<register name="1 = RST"     type="NODATA" x="1" y="6"/>
+	<register name="2 = NMI"     type="NODATA" x="1" y="7"/>
+	<register name="3 = EVX"     type="NODATA" x="1" y="8"/>
+	<register name="4 = GBLDIS"  type="NODATA" x="1" y="9"/>
+	<register name="5 = IVHW"    type="NODATA" x="1" y="10"/>
+	<register name="6 = IVTMR"   type="NODATA" x="1" y="11"/>
+	<register name="7 = IVG7"    type="NODATA" x="1" y="12"/>
+	<register name="8 = IVG8"    type="NODATA" x="1" y="13"/>
+	<register name="9 = IVG9"    type="NODATA" x="1" y="14"/>
+	<register name="10 = IVG10"  type="NODATA" x="0" y="15"/>
+	<register name="11 = IVG11"  type="NODATA" x="0" y="16"/>
+	<register name="12 = IVG12"  type="NODATA" x="0" y="17"/>
+	<register name="13 = IVG13"  type="NODATA" x="0" y="18"/>
+	<register name="14 = IVG14"  type="NODATA" x="0" y="19"/>
+	<register name="15 = IVG15"  type="NODATA" x="0" y="20"/>
+
+	<register name="ILAT"      type="NODATA"  x="14" y="2"/>
+	<register name="ILAT"      type="NOLABEL" x="12"  y="3"/>
+	<register name="ILATbit0"  type="NOLABEL" x="16" y="5"/>
+	<register name="ILATbit1"  type="NOLABEL" x="16" y="6"/>
+	<register name="ILATbit2"  type="NOLABEL" x="16" y="7"/>
+	<register name="ILATbit3"  type="NOLABEL" x="16" y="8"/>
+	<register name="[unused]"  type="NODATA"  x="13" y="9"/>
+	<register name="ILATbit5"  type="NOLABEL" x="16" y="10"/>
+	<register name="ILATbit6"  type="NOLABEL" x="16" y="11"/>
+	<register name="ILATbit7"  type="NOLABEL" x="16" y="12"/>
+	<register name="ILATbit8"  type="NOLABEL" x="16" y="13"/>
+	<register name="ILATbit9"  type="NOLABEL" x="16" y="14"/>
+	<register name="ILATbit10" type="NOLABEL" x="16" y="15"/>
+	<register name="ILATbit11" type="NOLABEL" x="16" y="16"/>
+	<register name="ILATbit12" type="NOLABEL" x="16" y="17"/>
+	<register name="ILATbit13" type="NOLABEL" x="16" y="18"/>
+	<register name="ILATbit14" type="NOLABEL" x="16" y="19"/>
+	<register name="ILATbit15" type="NOLABEL" x="16" y="20"/>
+
+	<register name="IMASK"      type="NODATA"  x="24" y="2"/>
+	<register name="IMASK"      type="NOLABEL" x="23" y="3"/>
+	<register name="IMASKbit0"  type="NOLABEL" x="26" y="5"/>
+	<register name="IMASKbit1"  type="NOLABEL" x="26" y="6"/>
+	<register name="IMASKbit2"  type="NOLABEL" x="26" y="7"/>
+	<register name="IMASKbit3"  type="NOLABEL" x="26" y="8"/>
+	<register name="IMASKbit4"  type="NOLABEL" x="26" y="9"/>
+	<register name="IMASKbit5"  type="NOLABEL" x="26" y="10"/>
+	<register name="IMASKbit6"  type="NOLABEL" x="26" y="11"/>
+	<register name="IMASKbit7"  type="NOLABEL" x="26" y="12"/>
+	<register name="IMASKbit8"  type="NOLABEL" x="26" y="13"/>
+	<register name="IMASKbit9"  type="NOLABEL" x="26" y="14"/>
+	<register name="IMASKbit10" type="NOLABEL" x="26" y="15"/>
+	<register name="IMASKbit11" type="NOLABEL" x="26" y="16"/>
+	<register name="IMASKbit12" type="NOLABEL" x="26" y="17"/>
+	<register name="IMASKbit13" type="NOLABEL" x="26" y="18"/>
+	<register name="IMASKbit14" type="NOLABEL" x="26" y="19"/>
+	<register name="IMASKbit15" type="NOLABEL" x="26" y="20"/>
+
+	<register name="IPEND"      type="NODATA"  x="34" y="2"/>
+	<register name="IPEND"      type="NOLABEL" x="33" y="3"/>
+	<register name="IPENDbit0"  type="NOLABEL" x="36" y="5"/>
+	<register name="IPENDbit1"  type="NOLABEL" x="36" y="6"/>
+	<register name="IPENDbit2"  type="NOLABEL" x="36" y="7"/>
+	<register name="IPENDbit3"  type="NOLABEL" x="36" y="8"/>
+	<register name="IPENDbit4"  type="NOLABEL" x="36" y="9"/>
+	<register name="IPENDbit5"  type="NOLABEL" x="36" y="10"/>
+	<register name="IPENDbit6"  type="NOLABEL" x="36" y="11"/>
+	<register name="IPENDbit7"  type="NOLABEL" x="36" y="12"/>
+	<register name="IPENDbit8"  type="NOLABEL" x="36" y="13"/>
+	<register name="IPENDbit9"  type="NOLABEL" x="36" y="14"/>
+	<register name="IPENDbit10" type="NOLABEL" x="36" y="15"/>
+	<register name="IPENDbit11" type="NOLABEL" x="36" y="16"/>
+	<register name="IPENDbit12" type="NOLABEL" x="36" y="17"/>
+	<register name="IPENDbit13" type="NOLABEL" x="36" y="18"/>
+	<register name="IPENDbit14" type="NOLABEL" x="36" y="19"/>
+	<register name="IPENDbit15" type="NOLABEL" x="36" y="20"/>
+</window>
+<window name="Event Vector Registers" menu="&amp;Register:&amp;Core:Event Vector Registers" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x1D" help-tag="Event_Vector_Registers_Window.htm">
+	<register name="EVT0"  type="NORMAL" x="7" y="0"/>
+	<register name="EVT1"  type="NORMAL" x="7" y="1"/>
+	<register name="EVT2"  type="NORMAL" x="7" y="2"/>
+	<register name="EVT3"  type="NORMAL" x="7" y="3"/>
+	<register name="EVT4"  type="NORMAL" x="7" y="4"/>
+	<register name="EVT5"  type="NORMAL" x="7" y="5"/>
+	<register name="EVT6"  type="NORMAL" x="7" y="6"/>
+	<register name="EVT7"  type="NORMAL" x="7" y="7"/>
+	<register name="EVT8"  type="NORMAL" x="7" y="8"/>
+	<register name="EVT9"  type="NORMAL" x="7" y="9"/>
+	<register name="EVT10" type="NORMAL" x="7" y="10"/>
+	<register name="EVT11" type="NORMAL" x="7" y="11"/>
+	<register name="EVT12" type="NORMAL" x="7" y="12"/>
+	<register name="EVT13" type="NORMAL" x="7" y="13"/>
+	<register name="EVT14" type="NORMAL" x="7" y="14"/>
+	<register name="EVT15" type="NORMAL" x="7" y="15"/>
+</window>
+<window name="Product Identification Registers" menu="&amp;Register:&amp;Core:Product ID" description="" format="Hexadecimal" format-selection="All" help-id="0x001E" help-tag="DSP_ID_Register_Window.htm">
+	<register name="DSPID" type="NORMAL" x="15" y="0"/>
+	<register name="CHIPID" type="NORMAL" x="15" y="1"/>
+</window>
+<window name="Data Register File" menu="&amp;Register:&amp;Core:Data Register File" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0xD" help-tag="HID_Data_Register_File.htm">
+	<register name="Whole" type="NODATA" x="5" y="0"/>
+	<register name="High" type="NODATA" x="20" y="0"/>
+	<register name="Low" type="NODATA" x="30" y="0"/>
+	<register name="Byte" type="NODATA" x="40" y="0"/>
+	<register name="R0" type="NORMAL" x="5" y="1"/>
+	<register name="R1" type="NORMAL" x="5" y="2"/>
+	<register name="R2" type="NORMAL" x="5" y="3"/>
+	<register name="R3" type="NORMAL" x="5" y="4"/>
+	<register name="R4" type="NORMAL" x="5" y="5"/>
+	<register name="R5" type="NORMAL" x="5" y="6"/>
+	<register name="R6" type="NORMAL" x="5" y="7"/>
+	<register name="R7" type="NORMAL" x="5" y="8"/>
+	<register name="R0.H" type="NOLABEL" x="20" y="1"/>
+	<register name="R1.H" type="NOLABEL" x="20" y="2"/>
+	<register name="R2.H" type="NOLABEL" x="20" y="3"/>
+	<register name="R3.H" type="NOLABEL" x="20" y="4"/>
+	<register name="R4.H" type="NOLABEL" x="20" y="5"/>
+	<register name="R5.H" type="NOLABEL" x="20" y="6"/>
+	<register name="R6.H" type="NOLABEL" x="20" y="7"/>
+	<register name="R7.H" type="NOLABEL" x="20" y="8"/>
+	<register name="R0.L" type="NOLABEL" x="30" y="1"/>
+	<register name="R1.L" type="NOLABEL" x="30" y="2"/>
+	<register name="R2.L" type="NOLABEL" x="30" y="3"/>
+	<register name="R3.L" type="NOLABEL" x="30" y="4"/>
+	<register name="R4.L" type="NOLABEL" x="30" y="5"/>
+	<register name="R5.L" type="NOLABEL" x="30" y="6"/>
+	<register name="R6.L" type="NOLABEL" x="30" y="7"/>
+	<register name="R7.L" type="NOLABEL" x="30" y="8"/>
+	<register name="R0.B" type="NOLABEL" x="40" y="1"/>
+	<register name="R1.B" type="NOLABEL" x="40" y="2"/>
+	<register name="R2.B" type="NOLABEL" x="40" y="3"/>
+	<register name="R3.B" type="NOLABEL" x="40" y="4"/>
+	<register name="R4.B" type="NOLABEL" x="40" y="5"/>
+	<register name="R5.B" type="NOLABEL" x="40" y="6"/>
+	<register name="R6.B" type="NOLABEL" x="40" y="7"/>
+	<register name="R7.B" type="NOLABEL" x="40" y="8"/>
+</window>
+<window name="DAG Registers" menu="&amp;Register:&amp;Core:DAG Registers" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0xC" help-tag="HID_DAG_Registers.htm">
+	<register name="I Regs" type="NODATA" x="5" y="0"/>
+	<register name="M Regs" type="NODATA" x="17" y="0"/>
+	<register name="L Regs" type="NODATA" x="29" y="0"/>
+	<register name="B Regs" type="NODATA" x="41" y="0"/>
+	<register name="I0" type="NORMAL" x="5" y="1"/>
+	<register name="I1" type="NORMAL" x="5" y="2"/>
+	<register name="I2" type="NORMAL" x="5" y="3"/>
+	<register name="I3" type="NORMAL" x="5" y="4"/>
+	<register name="M0" type="NORMAL" x="17" y="1"/>
+	<register name="M1" type="NORMAL" x="17" y="2"/>
+	<register name="M2" type="NORMAL" x="17" y="3"/>
+	<register name="M3" type="NORMAL" x="17" y="4"/>
+	<register name="L0" type="NORMAL" x="29" y="1"/>
+	<register name="L1" type="NORMAL" x="29" y="2"/>
+	<register name="L2" type="NORMAL" x="29" y="3"/>
+	<register name="L3" type="NORMAL" x="29" y="4"/>
+	<register name="B0" type="NORMAL" x="41" y="1"/>
+	<register name="B1" type="NORMAL" x="41" y="2"/>
+	<register name="B2" type="NORMAL" x="41" y="3"/>
+	<register name="B3" type="NORMAL" x="41" y="4"/>
+</window>
+<window name="Cycles" menu="&amp;Register:&amp;Core:Cycles" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x12" help-tag="HID_Cycles_Window.htm">
+	<register name="CYCLES"  type="NORMAL" x="8" y="0"/>
+	<register name="CYCLES2" type="NORMAL" x="8" y="1"/>
+</window>
+<window name="Core Timer Register File" menu="&amp;Register:&amp;Core:Core Timer Register File" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x8" help-tag="HID_Timers_Window.htm">
+	<register name="TCNTL"    type="NORMAL" x="9"  y="0"/>
+	<register name="TINT"     type="NORMAL" x="15" y="1"/>
+	<register name="TAUTORLD" type="NORMAL" x="27" y="1"/>
+	<register name="TMREN"    type="NORMAL" x="35" y="1"/>
+	<register name="TMPWR"    type="NORMAL" x="43" y="1"/>
+	<register name="TPERIOD"  type="NORMAL" x="9"  y="3"/>
+	<register name="TSCALE"   type="NORMAL" x="9"  y="4"/>
+	<register name="TCOUNT"   type="NORMAL" x="9"  y="5"/>
+</window>
+<window name="Accumulators" menu="&amp;Register:&amp;Core:Accumulators" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x18" help-tag="HID_Accumulators.htm">
+	<register name="A0"   type="NORMAL" x="5"  y="0"/>
+	<register name="A0.W" type="NORMAL" x="5"  y="1"/>
+	<register name="A0.X" type="NORMAL" x="5"  y="2"/>
+	<register name="A0.L" type="NORMAL" x="5"  y="3"/>
+	<register name="A0.H" type="NORMAL" x="5"  y="4"/>
+	<register name="A1"   type="NORMAL" x="25" y="0"/>
+	<register name="A1.W" type="NORMAL" x="25" y="1"/>
+	<register name="A1.X" type="NORMAL" x="25" y="2"/>
+	<register name="A1.L" type="NORMAL" x="25" y="3"/>
+	<register name="A1.H" type="NORMAL" x="25" y="4"/>
+</window>
+
+	<!-- ****************************************** -->
+	<!-- **     Peripheral Register Windows      ** -->
+	<!-- ** Define in reverse alphabetical order ** -->
+	<!-- ****************************************** -->
+
+</register-window-definitions>
+
+
+<!-- ************************************************************************ -->
+<!-- ******* Memory Window Definitions                                        -->
+<!-- ************************************************************************ -->
+
+<memory-window-definitions help-chm="\procfrio.chm::/html/">
+<window name="BLACKFIN Memory" menu="&amp;Memory:&amp;BLACKFIN Memory" address="0xFF804000" left="0" top="0" right="400" bottom="200" title="BLACKFIN Memory" track="" format="Hexadecimal" format-selection="All" help-id="0x15" help-tag="HID_FRIO_Memory.htm"/>
+</memory-window-definitions>
+
+<!-- ************************************************************************ -->
+<!-- ******* Memory Definitions                                               -->
+<!-- ************************************************************************ -->
+
+<memory-definitions>
+</memory-definitions>
+
+	<!-- **************************************************************** -->
+	<!-- *** To add register reset definitions, use the XML file for a    -->
+	<!-- *** processor that has an EZ-KIT as a guide. For example:        -->
+	<!-- *** Search for register-reset-definitions in ADSP-BF537-proc.xml -->
+	<!-- *** (located near the bottom of the file).                       -->
+	<!-- **************************************************************** -->
+
+	<!-- **************************************************************** -->
+	<!-- **** Customizations: If you make changes to this file, make a    -->
+	<!-- **** copy of your customized file to facilitate future upgrades. -->
+	<!-- **************************************************************** -->
+
+</visualdsp-proc-xml>
