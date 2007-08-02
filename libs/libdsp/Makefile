@@ -42,6 +42,8 @@ LIBBFDSP_ASRCS = \
 	fir_interp16.asm \
 	floatdisf.asm \
 	floatdiuf.asm \
+	fract24_8mul.asm \
+	fract28_4mul.asm \
 	histogram_fr16.asm \
 	ifft2d_fr16.asm \
 	ifft_fr16.asm \

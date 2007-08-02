@@ -1,3 +1,10 @@
+2007-08-02  Jie Zhang  <jie.zhang@analog.com>
+
+	* Makefile (LIBBFDSP_ASRCS): Add fract28_4mul.asm and
+	fract24_8mul.asm.
+	* fract28_4mul.asm: New.
+	* fract24_8mul.asm: New.
+
 2007-08-01  Jie Zhang  <jie.zhang@analog.com>
 
 	* countll.c: Processed with c_fix_builtins.sed.

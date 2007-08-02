@@ -144,6 +144,11 @@ __inline__
                                          fract16 _product[])
             {vecsmlt_fr16 (_matrix, _scalar, _product, _rows*_columns);}
 
+      void MatrixMultVec3x1Frac28_4(fract32 A[][3], fract32 B[], fract32 Res[]);                          
+
+      void MatrixMultVec3x1Frac24_8(fract32 A[][3], fract32 B[], fract32 Res[]);
+
+      void MatrixMultVec4x1Frac24_8(fract32 A[][4], fract32 B[], fract32 Res[]);
 
 
 

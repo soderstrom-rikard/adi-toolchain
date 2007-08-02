@@ -407,6 +407,29 @@ __attribute__ ((always_inline))
 static fract32 mult_fr1x32(fract16 _x, fract16 _y)
   { return __builtin_bfin_mult_fr1x32(_x,_y); }
 
+/*   Function
+ *    long fract24_8mul_asm(fract32 A, fract32 B);
+ *
+ *   Description   : calculates 24.8 Fractional multiplication
+ *    fract32 A       : 24.8 fractional number
+ *    fract32 B       : 24.8 fractional number
+ *    return-value : 24.8 fractional number
+*/
+
+fract32 fract24_8mul_asm(fract32, fract32);
+
+
+/*   Function
+ *    long fract28_4mul_asm(fract32 A, fract32 B);
+ *
+ *   Description   : calculates 28.4 Fractional multiplication
+ *    fract32 A       : 28.4 fractional number
+ *    fract32 B       : 28.4 fractional number
+ *    return-value : 28.4 fractional number
+*/
+
+fract32 fract28_4mul_asm(fract32, fract32);
+
 /*****************************/
 /*                           */
 /*   Conversion operations   */

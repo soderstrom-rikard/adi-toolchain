@@ -1,5 +1,13 @@
 2007-08-02  Jie Zhang  <jie.zhang@analog.com>
 
+	* matrix.h (MatrixMultVec3x1Frac28_4): Declare.
+	(MatrixMultVec3x1Frac24_8): Declare.
+	(MatrixMultVec4x1Frac24_8): Declare.
+	* fract_math.h (fract24_8mul_asm): Declare.
+	(fract28_4mul_asm): Declare.
+
+2007-08-02  Jie Zhang  <jie.zhang@analog.com>
+
 	* math_bf.h: Processed with c_fix_pragmas.sed.
 	* i2x16_base.h: Likewise.
 	* complex.h: Likewise.
