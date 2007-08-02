@@ -1,5 +1,9 @@
 2007-08-02  Jie Zhang  <jie.zhang@analog.com>
 
+	* Makefile (headers): Remove yvals.h.
+
+2007-08-02  Jie Zhang  <jie.zhang@analog.com>
+
 	* Makefile (headers): Remove ccblkfn.h. Add gcc.h.
 
 2007-07-24  Jie Zhang  <jie.zhang@analog.com>

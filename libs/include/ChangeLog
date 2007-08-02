@@ -1,5 +1,10 @@
 2007-08-02  Jie Zhang  <jie.zhang@analog.com>
 
+	* yvals.h: Remove.
+	* math_bf.h: Don't include yvals.h.
+
+2007-08-02  Jie Zhang  <jie.zhang@analog.com>
+
 	* math_bf.h: Don't include ccblkfn.h.
 	Include gcc.h instead.
 	(__builtin_bfin_max): Don't declare.

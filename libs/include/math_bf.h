@@ -28,8 +28,6 @@
 #ifndef  _MATH_BF_H
 #define  _MATH_BF_H
 
-#include <yvals.h>
-
 #include <fract_typedef.h>
 #include <fract_math.h>
 #include <gcc.h>
