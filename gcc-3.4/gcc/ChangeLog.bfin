@@ -1,3 +1,8 @@
+2007-08-03  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.c (bfin_expand_builtin): Fix the argument
+	order of __builtin_bfin_cmplx_mac and __builtin_bfin_cmplx_msu.
+
 2007-06-25  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin-protos.h (enum bfin_cpu_type): Add
