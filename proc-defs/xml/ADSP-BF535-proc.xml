@@ -1330,7 +1330,7 @@
 	<register name="EVT14" type="NORMAL" x="7" y="15"/>
 	<register name="EVT15" type="NORMAL" x="7" y="16"/>
 </window>
-+<window name="Sequencer Status" menu="&amp;Register:&amp;Core:Status:Sequencer Status" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0xF" help-tag="HID_Sequencer_Status_Window.htm">
+<window name="Sequencer Status" menu="&amp;Register:&amp;Core:Status:Sequencer Status" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0xF" help-tag="HID_Sequencer_Status_Window.htm">
 	<register name="SEQSTAT" type="NORMAL" x="8" y="0"/>
 	<register name="EXCAUSE" type="NORMAL" x="10" y="2"/>
 	<!--register name="OMODE" type="NORMAL" x="10" y="3"/-->

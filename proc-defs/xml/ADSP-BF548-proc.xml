@@ -5206,7 +5206,7 @@
 	<register name="INPDIS"     type="NORMAL" x="10" y="10" />
 </window>
 
-<window name="Counter Command Registers" menu="&amp;Register:&amp;Peripherals:Counter:COMMAND" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\BF54x-PHWR.chm::/FILE_H_IDH_BF54X_REG_CNT_COMMAND.html" >N
+<window name="Counter Command Registers" menu="&amp;Register:&amp;Peripherals:Counter:COMMAND" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\BF54x-PHWR.chm::/FILE_H_IDH_BF54X_REG_CNT_COMMAND.html" >
 	<register name="CNT_COMMAND" type="NORMAL" x="11" y="0" />
 	<register name="W1LCNT"      type="NORMAL" x="11" y="2" />
 	<register name="W1LMIN"      type="NORMAL" x="11" y="3" />

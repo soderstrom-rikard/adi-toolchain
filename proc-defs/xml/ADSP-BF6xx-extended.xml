@@ -182,11 +182,11 @@
 <register name="MDMAFLX0_IRQSTAT_D_PauseChanAct" parent="MDMAFLX0_IRQSTAT_D" bit-position="8" type="" description="child register" bit-size="1"/>
 <register name="MDMAFLX0_IRQSTAT_D_EndPauseAct" parent="MDMAFLX0_IRQSTAT_D" bit-position="9" type="" description="child register" bit-size="1"/>
 <register name="MDMAFLX0_IRQSTAT_D_ExtPerCmdInt" parent="MDMAFLX0_IRQSTAT_D" bit-position="10" type="" description="child register" bit-size="1"/>
-	//[11] reserved
+<!--	//[11] reserved -->
 <register name="MDMAFLX0_IRQSTAT_D_ErrCause" parent="MDMAFLX0_IRQSTAT_D" bit-position="12" type="" description="child register" bit-size="3"/>
-	//[15] reserved
+<!--	//[15] reserved -->
 <register name="MDMAFLX0_IRQSTAT_D_WrkUnitCnt" parent="MDMAFLX0_IRQSTAT_D" bit-position="16" type="" description="child register" bit-size="8"/>
-	//[24:31] reserved
+<!--	//[24:31] reserved -->
 <register name="MDMAFLX0_CURXCOUNT_D" group="MEMDMA0 Destination Registers" read-address="0xFFC00E30" write-address="0xFFC00E30" mask="FFFF" type="IO" description="" bit-size="32"/>
 <register name="MDMAFLX0_CURYCOUNT_D" group="MEMDMA0 Destination Registers" read-address="0xFFC00E38" write-address="0xFFC00E38" mask="FFFF" type="IO" description="" bit-size="32"/>
 <register name="MDMAFLX0_NxtDscPNTR_S"  parent="MDMA_S0_NEXT_DESC_PTR" bit-position="0"  type="IO" description="" bit-size="32"/>
@@ -227,11 +227,11 @@
 <register name="MDMAFLX0_IRQSTAT_S_PauseChanAct" parent="MDMAFLX0_IRQSTAT_S" bit-position="8" type="" description="child register" bit-size="1"/>
 <register name="MDMAFLX0_IRQSTAT_S_EndPauseAct" parent="MDMAFLX0_IRQSTAT_S" bit-position="9" type="" description="child register" bit-size="1"/>
 <register name="MDMAFLX0_IRQSTAT_S_ExtPerCmdInt" parent="MDMAFLX0_IRQSTAT_S" bit-position="10" type="" description="child register" bit-size="1"/>
-	//[11] reserved
+<!--	//[11] reserved -->
 <register name="MDMAFLX0_IRQSTAT_S_ErrCause" parent="MDMAFLX0_IRQSTAT_S" bit-position="12" type="" description="child register" bit-size="3"/>
-	//[15] reserved
+<!--	//[15] reserved -->
 <register name="MDMAFLX0_IRQSTAT_S_WrkUnitCnt" parent="MDMAFLX0_IRQSTAT_S" bit-position="16" type="" description="child register" bit-size="8"/>
-	//[24:31] reserved
+<!--	//[24:31] reserved -->
 <register name="MDMAFLX0_CURXCOUNT_S" group="MEMDMA0 Source Registers" read-address="0xFFC00E70" write-address="0xFFC00E70" mask="FFFF" type="IO" description="" bit-size="32"/>
 <register name="MDMAFLX0_CURYCOUNT_S" group="MEMDMA0 Source Registers" read-address="0xFFC00E78" write-address="0xFFC00E78" mask="FFFF" type="IO" description="" bit-size="32"/>
 <register name="MDMAFLX1_DMACNFG_D" group="MEMDMA1 Destination Registers" read-address="0xFFC00E88" write-address="0xFFC00E88" mask="FFFF" type="IO" description="" bit-size="32"/>
@@ -268,11 +268,11 @@
 <register name="MDMAFLX1_IRQSTAT_D_PauseChanAct" parent="MDMAFLX1_IRQSTAT_D" bit-position="8" type="" description="child register" bit-size="1"/>
 <register name="MDMAFLX1_IRQSTAT_D_EndPauseAct" parent="MDMAFLX1_IRQSTAT_D" bit-position="9" type="" description="child register" bit-size="1"/>
 <register name="MDMAFLX1_IRQSTAT_D_ExtPerCmdInt" parent="MDMAFLX1_IRQSTAT_D" bit-position="10" type="" description="child register" bit-size="1"/>
-	//[11] reserved
+<!--	//[11] reserved -->
 <register name="MDMAFLX1_IRQSTAT_D_ErrCause" parent="MDMAFLX1_IRQSTAT_D" bit-position="12" type="" description="child register" bit-size="3"/>
-	//[15] reserved
+<!--	//[15] reserved -->
 <register name="MDMAFLX1_IRQSTAT_D_WrkUnitCnt" parent="MDMAFLX1_IRQSTAT_D" bit-position="16" type="" description="child register" bit-size="8"/>
-	//[24:31] reserved
+<!--	//[24:31] reserved -->
 <register name="MDMAFLX1_CURXCOUNT_D" group="MEMDMA1 Destination Registers" read-address="0xFFC00EB0" write-address="0xFFC00EB0" mask="FFFF" type="IO" description="" bit-size="32"/>
 <register name="MDMAFLX1_CURYCOUNT_D" group="MEMDMA1 Destination Registers" read-address="0xFFC00EB8" write-address="0xFFC00EB8" mask="FFFF" type="IO" description="" bit-size="32"/>
 <register name="MDMAFLX1_NxtDscPNTR_S"  parent="MDMA_S1_NEXT_DESC_PTR"  bit-position="0"  type="IO" description="" bit-size="32"/>
@@ -313,11 +313,11 @@
 <register name="MDMAFLX1_IRQSTAT_S_PauseChanAct" parent="MDMAFLX1_IRQSTAT_S" bit-position="8" type="" description="child register" bit-size="1"/>
 <register name="MDMAFLX1_IRQSTAT_S_EndPauseAct" parent="MDMAFLX1_IRQSTAT_S" bit-position="9" type="" description="child register" bit-size="1"/>
 <register name="MDMAFLX1_IRQSTAT_S_ExtPerCmdInt" parent="MDMAFLX1_IRQSTAT_S" bit-position="10" type="" description="child register" bit-size="1"/>
-	//[11] reserved
+<!--	//[11] reserved -->
 <register name="MDMAFLX1_IRQSTAT_S_ErrCause" parent="MDMAFLX1_IRQSTAT_S" bit-position="12" type="" description="child register" bit-size="3"/>
-	//[15] reserved
+<!--	//[15] reserved -->
 <register name="MDMAFLX1_IRQSTAT_S_WrkUnitCnt" parent="MDMAFLX1_IRQSTAT_S" bit-position="16" type="" description="child register" bit-size="8"/>
-	//[24:31] reserved
+<!--	//[24:31] reserved -->
 <register name="MDMAFLX1_CURXCOUNT_S" group="MEMDMA1 Source Registers" read-address="0xFFC00EF0" write-address="0xFFC00EF0" mask="FFFF" type="IO" description="" bit-size="32"/>
 <register name="MDMAFLX1_CURYCOUNT_S" group="MEMDMA1 Source Registers" read-address="0xFFC00EF8" write-address="0xFFC00EF8" mask="FFFF" type="IO" description="" bit-size="32"/>
 <register name="TIMER0_CONFIG"  group="Timer Registers" description="" bit-size="16" read-address="0xFFC00600" write-address="0xFFC00600" mask="FFFF" type="IO"/>

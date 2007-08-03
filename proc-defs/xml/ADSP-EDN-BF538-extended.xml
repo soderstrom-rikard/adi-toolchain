@@ -425,15 +425,15 @@
 
 
 		<!-- DMA0 Channel 2 Registers -->
-		<register name="DMA2_NEXT_DESC_PTR"  group="DMA2 (DMA0 Ch-2) Registers" read-address="0xFFC00C80" write-address="0xFFC00C80" mask="FFFFFFFF" type="IO" description="" bit-size="32" cdef-type="ADDR"/>/>
-		<register name="DMA2_START_ADDR"     group="DMA2 (DMA0 Ch-2) Registers" read-address="0xFFC00C84" write-address="0xFFC00C84" mask="FFFFFFFF" type="IO" description="" bit-size="32" cdef-type="ADDR"/>/>
+		<register name="DMA2_NEXT_DESC_PTR"  group="DMA2 (DMA0 Ch-2) Registers" read-address="0xFFC00C80" write-address="0xFFC00C80" mask="FFFFFFFF" type="IO" description="" bit-size="32" cdef-type="ADDR"/>
+		<register name="DMA2_START_ADDR"     group="DMA2 (DMA0 Ch-2) Registers" read-address="0xFFC00C84" write-address="0xFFC00C84" mask="FFFFFFFF" type="IO" description="" bit-size="32" cdef-type="ADDR"/>
 		<register name="DMA2_CONFIG"         group="DMA2 (DMA0 Ch-2) Registers" read-address="0xFFC00C88" write-address="0xFFC00C88" mask="FFFF" type="IO" description="" bit-size="16"/>
 		<register name="DMA2_X_COUNT"        group="DMA2 (DMA0 Ch-2) Registers" read-address="0xFFC00C90" write-address="0xFFC00C90" mask="FFFF" type="IO" description="" bit-size="16"/>
 		<register name="DMA2_X_MODIFY"       group="DMA2 (DMA0 Ch-2) Registers" read-address="0xFFC00C94" write-address="0xFFC00C94" mask="FFFF" type="IO" description="" bit-size="16" cdef-type="SIGNED"/>
 		<register name="DMA2_Y_COUNT"        group="DMA2 (DMA0 Ch-2) Registers" read-address="0xFFC00C98" write-address="0xFFC00C98" mask="FFFF" type="IO" description="" bit-size="16"/>
 		<register name="DMA2_Y_MODIFY"       group="DMA2 (DMA0 Ch-2) Registers" read-address="0xFFC00C9C" write-address="0xFFC00C9C" mask="FFFF" type="IO" description="" bit-size="16" cdef-type="SIGNED"/>
-		<register name="DMA2_CURR_DESC_PTR"  group="DMA2 (DMA0 Ch-2) Registers" read-address="0xFFC00CA0" write-address="0xFFC00CA0" mask="FFFFFFFF" type="IO" description="" bit-size="32" cdef-type="ADDR"/>/>
-		<register name="DMA2_CURR_ADDR"      group="DMA2 (DMA0 Ch-2) Registers" read-address="0xFFC00CA4" write-address="0xFFC00CA4" mask="FFFFFFFF" type="IO" description="" bit-size="32" cdef-type="ADDR"/>/>
+		<register name="DMA2_CURR_DESC_PTR"  group="DMA2 (DMA0 Ch-2) Registers" read-address="0xFFC00CA0" write-address="0xFFC00CA0" mask="FFFFFFFF" type="IO" description="" bit-size="32" cdef-type="ADDR"/>
+		<register name="DMA2_CURR_ADDR"      group="DMA2 (DMA0 Ch-2) Registers" read-address="0xFFC00CA4" write-address="0xFFC00CA4" mask="FFFFFFFF" type="IO" description="" bit-size="32" cdef-type="ADDR"/>
 		<register name="DMA2_IRQ_STATUS"     group="DMA2 (DMA0 Ch-2) Registers" read-address="0xFFC00CA8" write-address="0xFFC00CA8" mask="FFFF" type="IO" description="" bit-size="16"/>
 		<register name="DMA2_PERIPHERAL_MAP" group="DMA2 (DMA0 Ch-2) Registers" read-address="0xFFC00CAC" write-address="0xFFC00CAC" mask="FFFF" type="IO" description="" bit-size="16"/>
 		<register name="DMA2_CURR_X_COUNT"   group="DMA2 (DMA0 Ch-2) Registers" read-address="0xFFC00CB0" write-address="0xFFC00CB0" mask="FFFF" type="IO" description="" bit-size="16"/>
