@@ -1,0 +1,4 @@
+CC = bfin-uclinux-gcc
+CFLAGS = -O2 -g -Wall
+LDFLAGS = -Wl,-elf2flt  
+LIBS = -lbfdsp -lm 
