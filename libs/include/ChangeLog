@@ -1,5 +1,11 @@
 2007-08-03  Jie Zhang  <jie.zhang@analog.com>
 
+	* cycle_count_bf.h (_GET_CYCLE_COUNT): Use constraint "a"
+	instead of "p" for P register.
+	(_STOP_CYCLE_COUNT): Likewise.
+
+2007-08-03  Jie Zhang  <jie.zhang@analog.com>
+
 	* xcycle_count.h: Processed with fix sed scripts.
 	* cycle_count.h: Likewise.
 	* cycle_count_bf.h: Likewise.

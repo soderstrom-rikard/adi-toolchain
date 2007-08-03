@@ -115,7 +115,7 @@
                                                 "r1 = CYCLES2; \n"  \
                                                 "[%0]   = r2;  \n"  \
                                                 "[%0+4] = r1;  \n"  \
-                                                : : "p" (&(_CURR_COUNT)) \
+                                                : : "a" (&(_CURR_COUNT)) \
                                                 : "r1", "r2" );     \
                              } while (0)
 
@@ -134,7 +134,7 @@
                                                 "r1 = CYCLES2; \n"  \
                                                 "[%0]   = r2;  \n"  \
                                                 "[%0+4] = r1;  \n"  \
-                                                : : "p" (&(_CURR_COUNT))  \
+                                                : : "a" (&(_CURR_COUNT))  \
                                                 : "r1", "r2" );           \
                                   (_CURR_COUNT) = (_CURR_COUNT) - (_START_COUNT); \
                                   (_CURR_COUNT) -= (_cycle_t) 4;                  \
