@@ -1,3 +1,8 @@
+2007-08-03  Jie Zhang  <jie.zhang@analog.com>
+
+	* Makefile (headers): Add cycle_count.h, cycle_count_bf.h,
+	and xcycle_count.h
+
 2007-08-02  Jie Zhang  <jie.zhang@analog.com>
 
 	* Makefile (headers): Remove yvals.h.
