@@ -116,7 +116,7 @@
                                                 "[%0]   = r2;  \n"  \
                                                 "[%0+4] = r1;  \n"  \
                                                 : : "a" (&(_CURR_COUNT)) \
-                                                : "r1", "r2" );     \
+                                                : "R1", "R2" );     \
                              } while (0)
 
 #if defined( DO_CYCLE_COUNTS )
@@ -135,7 +135,7 @@
                                                 "[%0]   = r2;  \n"  \
                                                 "[%0+4] = r1;  \n"  \
                                                 : : "a" (&(_CURR_COUNT))  \
-                                                : "r1", "r2" );           \
+                                                : "R1", "R2" );           \
                                   (_CURR_COUNT) = (_CURR_COUNT) - (_START_COUNT); \
                                   (_CURR_COUNT) -= (_cycle_t) 4;                  \
                              } while (0)                        
