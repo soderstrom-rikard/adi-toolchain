@@ -3,7 +3,7 @@
 
 set -e
 
-output="../kernel/debug-mmrs.c"
+output="debug-mmrs.c"
 
 cd "$(dirname "${0}")"
 
@@ -62,20 +62,20 @@ static int __init bfin_init_mmr_debugfs(void)
 		return -1;
 EOF
 
-for f in ArchDef/ADSP-BF*-proc.xml ; do
+for f in ../xml/ADSP-BF*-proc.xml ; do
 	unset parent
 
 	echo "Processing ${f}"
 
 	procnum=${f}
-	procnum=${procnum#ArchDef/ADSP-}
+	procnum=${procnum#*/ADSP-}
 	procnum=${procnum%-proc.xml}
 
 	# dont bother outputting code for procs we dont support
-	if ! grep -qs "^config ${procnum}" ../Kconfig ; then
-		echo "   ... skipping ${procnum}"
-		continue
-	fi
+	#if ! grep -qs "^config ${procnum}" ../Kconfig ; then
+	#	echo "   ... skipping ${procnum}"
+	#	continue
+	#fi
 
 cat << EOF >> ${output}
 
@@ -87,7 +87,7 @@ cat << EOF >> ${output}
 	if (USE_${procnum}) {
 EOF
 
-	xsltproc debug-mmrs.xsl ${f} | LC_ALL="C" sort | \
+	xsltproc ../xsl/debug-mmrs.xsl ${f} | LC_ALL="C" sort | \
 	while read line ; do
 		IFS=";"
 		set -- ${line}
@@ -109,11 +109,11 @@ EOF
 
 		if [[ ${mmr_read} == ${mmr_write} ]] ; then
 cat << EOF >> ${output}
-		debugfs_create_u${bits}("${mmr_name}", 0600, parent, (u${bits}*)${mmr_read});
+		debugfs_create_x${bits}("${mmr_name}", 0600, parent, (u${bits}*)${mmr_read});
 EOF
 		else
 cat << EOF >> ${output}
-		debugfs_create_rw_u${bits}("${mmr_name}", 0600, parent, (u${bits}*)${mmr_read}, (u${bits}*)${mmr_write});
+		debugfs_create_rw_x${bits}("${mmr_name}", 0600, parent, (u${bits}*)${mmr_read}, (u${bits}*)${mmr_write});
 EOF
 		fi
 	done
