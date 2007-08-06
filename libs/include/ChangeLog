@@ -1,3 +1,12 @@
+2007-08-06  Jie Zhang  <jie.zhang@analog.com>
+
+	* math_bf.h (isinff): Remove.
+	(isinf): Remove.
+	(isinfd): Remove.
+	(isnanf): Remove.
+	(isnan): Remove.
+	(isnand): Remove.
+
 2007-08-03  Jie Zhang  <jie.zhang@analog.com>
 
 	* cycle_count_bf.h (_GET_CYCLE_COUNT): Use constraints "R1"
