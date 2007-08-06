@@ -1,3 +1,9 @@
+2007-08-06  Jie Zhang  <jie.zhang@analog.com>
+
+	* gdb.base/cursal.exp: Adjust for use_binfmt_flat.
+	* gdb.base/charset.exp: Explicitly set breakpoint
+	on charset.c.
+
 2007-02-12  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin.exp: New.

@@ -34,7 +34,12 @@ if {[gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable {debug
 gdb_exit
 gdb_start
 gdb_reinitialize_dir $srcdir/$subdir
-gdb_file_cmd ${binfile}
+if [target_info exists use_binfmt_flat] {
+    gdb_file_cmd ${binfile}.gdb
+} else {
+    gdb_file_cmd ${binfile}
+}
+
 gdb_test "set listsize 1" \
     ".*"
 
