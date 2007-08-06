@@ -1,3 +1,15 @@
+2007-08-06  Jie Zhang  <jie.zhang@analog.com>
+
+	Apply
+	2007-07-24  Ulrich Weigand  <uweigand@de.ibm.com>
+	* target.c (memory_xfer_partial): Accesses to unmapped overlay
+	sections should always go to the executable file.
+
+	2007-07-01  Daniel Jacobowitz  <dan@codesourcery.com>
+	PR symtab/2161
+	* target.c (memory_xfer_partial): Do not continue past targets with
+	all memory.
+
 2007-08-01  Jie Zhang  <jie.zhang@analog.com>
 
 	* gdbarch.sh (convert_from_addr_func_ptr): New method.
