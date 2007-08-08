@@ -5,8 +5,9 @@ set_board_info target_install {bfin-elf}
 # of routines needed by the tool to communicate with the board.
 load_generic_config "bfin"
 
-# No multilib options needed by default.
-process_multilib_options ""
+# multilib_flags should be set to a proper -mcpu= option when
+# testing on hardware.
+set_board_info multilib_flags ""
 
 # We only support newlib on this target. We assume that all multilib
 # options have been specified before we get here.

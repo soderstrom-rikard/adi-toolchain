@@ -2,7 +2,9 @@
 
 load_generic_config "gdbserver"
 
-process_multilib_options ""
+# multilib_flags should be set to a proper -mcpu= option when
+# testing on hardware.
+set_board_info multilib_flags ""
 
 set_board_info compiler  "[find_gcc]"
 # -s80000 is for gcc.dg/dg.exp/trampoline-1.c
