@@ -1,3 +1,25 @@
+2007-08-08  Jie Zhang  <jie.zhang@analog.com>
+
+	* gcc.target/bfin/bfin.exp (dg-bfin-options): New.
+	(DEFAULT_CFLAGS): Remove.
+	* gcc.target/bfin/mcpu-bf531.c: Use dg-bfin-options instead
+	of dg-options.
+	* gcc.target/bfin/mcpu-bf532.c: Likewise.
+	* gcc.target/bfin/mcpu-bf533.c: Likewise.
+	* gcc.target/bfin/mcpu-bf534.c: Likewise.
+	* gcc.target/bfin/mcpu-bf536.c: Likewise.
+	* gcc.target/bfin/mcpu-bf537.c: Likewise.
+	* gcc.target/bfin/mcpu-bf548.c: Likewise.
+	* gcc.target/bfin/mcpu-bf549.c: Likewise.
+	* gcc.target/bfin/mcpu-bf561.c: Likewise.
+	* gcc.target/bfin/mcpu-default.c: Likewise.
+	* gcc.target/bfin/workarounds-any.c: Likewise.
+	* gcc.target/bfin/workarounds-none.c: Likewise.
+	* gcc.target/bfin/workarounds-1.c: Likewise.
+	* gcc.target/bfin/workarounds-2.c: Likewise.
+	* gcc.target/bfin/workarounds-3.c: Likewise.
+	* gcc.target/bfin/workarounds-4.c: Likewise.
+
 2007-06-22  Jie Zhang  <jie.zhang@analog.com>
 
 	* gcc.target/bfin/workaround-any.c: Remove -msi-revision from

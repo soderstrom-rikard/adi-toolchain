@@ -1,5 +1,6 @@
 /* Test for -mcpu=.  */
 /* { dg-do preprocess } */
+/* { dg-bfin-options "" } */
 
 #ifndef __ADSPBF532__
 #error "__ADSPBF532__ is not defined"

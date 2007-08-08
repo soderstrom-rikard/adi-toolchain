@@ -1,6 +1,6 @@
 /* Test for -mcpu=.  */
 /* { dg-do preprocess } */
-/* { dg-options "-mcpu=bf549" } */
+/* { dg-bfin-options "-mcpu=bf549" } */
 
 #ifndef __ADSPBF549__
 #error "__ADSPBF549__ is not defined"

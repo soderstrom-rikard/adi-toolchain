@@ -1,6 +1,6 @@
 /* Test for -mcpu=.  */
 /* { dg-do preprocess } */
-/* { dg-options "-mno-specld-anomaly -mcpu=bf537" } */
+/* { dg-bfin-options "-mno-specld-anomaly -mcpu=bf537" } */
 
 #ifndef __ADSPBF537__
 #error "__ADSPBF537__ is not defined"
