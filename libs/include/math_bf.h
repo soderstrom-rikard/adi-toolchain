@@ -144,47 +144,6 @@ extern "C" {
  *    Maximum value
  */
 
-#if !defined(__NO_BUILTIN)
-__inline__
-__attribute__ ((always_inline))
-        static float fmaxf(float _x, float _y) 
-                { float res;
-                  if (_x > _y) {
-                   res = _x;
-                  } else {
-                   res = _y;
-                  }
-                  return res;
-                }
-
-#ifdef __DOUBLES_ARE_FLOATS__
-__inline__
-__attribute__ ((always_inline))
-        static float fmax(double _x, double _y) 
-                { float res;
-                  if (_x > _y) {
-                   res = (float)_x;
-                  } else {
-                   res = (float)_y;
-                  }
-                  return res;
-                }
-#endif 
-#else 
-        float fmaxf(float _x, float _y) asm ("__fmaxf");
-
-#ifdef __DOUBLES_ARE_FLOATS__
-        double fmax(double _x, double _y) asm ("__fmaxf");
-#endif
-#endif
-
-        long double fmaxd(long double _x, long double _y) asm ("__fmaxd");
-
-#if !defined( __DOUBLES_ARE_FLOATS__)
-        double fmax(double _x, double _y) asm ("__fmaxd");
-#endif
-
-
 #if !defined(__NO_BUILTIN) 
 __inline__
 __attribute__ ((always_inline))
@@ -208,47 +167,6 @@ __attribute__ ((always_inline))
 /* * * *        min      * * * *
  *    Minimum value
  */
-
-#if !defined(__NO_BUILTIN) 
-__inline__
-__attribute__ ((always_inline))
-        static float fminf(float _x, float _y) 
-                { float res;
-                  if (_x < _y) {
-                   res = _x;
-                  } else {
-                   res = _y;
-                  }
-                  return res;
-                }
-
-#ifdef __DOUBLES_ARE_FLOATS__
-__inline__
-__attribute__ ((always_inline))
-        static float fmin(double _x, double _y) 
-                { float res;
-                  if (_x < _y) {
-                   res = (float)_x;
-                  } else {
-                   res = (float)_y;
-                  }
-                  return res;
-                }
-#endif
-#else
-        float fminf(float _x, float _y) asm ("__fminf");
-
-#ifdef __DOUBLES_ARE_FLOATS__
-        double fmin(double _x, double _y) asm ("__fminf");
-#endif
-#endif
-
-        long double fmind(long double _x, long double _y) asm ("__fmind");
-
-#if !defined(__DOUBLES_ARE_FLOATS__)
-        double fmin(double _x, double _y) asm ("__fmind");
-#endif
-
 
 #if !defined(__NO_BUILTIN)
 __inline__

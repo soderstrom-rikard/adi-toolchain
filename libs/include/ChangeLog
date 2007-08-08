@@ -1,3 +1,12 @@
+2007-08-08  Jie Zhang  <jie.zhang@analog.com>
+
+	* math_bf.h (fmaxf): Remove.
+	(fmax): Remove.
+	(fmaxd): Remove.
+	(fminf): Remove.
+	(fmin): Remove.
+	(fmind): Remove.
+
 2007-08-06  Jie Zhang  <jie.zhang@analog.com>
 
 	* math_bf.h (isinff): Remove.
