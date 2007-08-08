@@ -1,3 +1,24 @@
+2007-08-08  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin-protos.h (enum bfin_cpu_type): Add
+	BFIN_CPU_BF522, BFIN_CPU_BF525, BFIN_CPU_BF527,
+	BFIN_CPU_BF538, BFIN_CPU_BF539, BFIN_CPU_BF542,
+	and BFIN_CPU_BF544.
+	* config/bfin/elf.h (LIB_SPEC): Use proper linker script
+	for bf522, bf525, bf527, bf538, bf539, bf542, bf544,
+	bf548, and bf549.
+	* config/bfin/bfin.c (bfin_cpus[]): Add bf522, bf525,
+	bf527, bf538, bf539, bf542, and bf544.
+	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): Define
+	__ADSPBF522__ for bf522, __ADSPBF525__ for bf525,
+	__ADSPBF527__ for bf527, __ADSPBF538__ for bf538,
+	__ADSPBF539__ for bf539, __ADSPBF542__ for bf542,
+	__ADSPBF544__ for bf544, __ADSPBF52x__ for all bf52x,
+	and __ADSPBF54x__ for bf54x.
+	* doc/invoke.texi (Blackfin Options): Document that
+	-mcpu now accept bf522, bf525, bf527, bf538, bf539,
+	bf542 and bf544.
+
 2007-08-03  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.c (enum bfin_builtins): Add BFIN_BUILTIN_ONES,

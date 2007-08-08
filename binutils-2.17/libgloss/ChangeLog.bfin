@@ -1,3 +1,18 @@
+2007-08-08  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/bf522.ld: New.
+	* bfin/bf525.ld: New.
+	* bfin/bf527.ld: New.
+	* bfin/bf538.ld: New.
+	* bfin/bf539.ld: New.
+	* bfin/bf542.ld: New.
+	* bfin/bf544.ld: New.
+	* bfin/bf548.ld: New.
+	* bfin/bf549.ld: New.
+	* bfin/Makefile.in (BOARD_SCRIPTS): Add bf522.ld, bf525.ld,
+	bf527.ld, bf538.ld, bf539.ld, bf542.ld, bf544.ld, bf548.ld,
+	and bf549.ld.
+
 2007-07-24  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/include/defBF52x_base.h: New file.

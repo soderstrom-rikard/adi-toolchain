@@ -1,5 +1,15 @@
 2007-08-08  Jie Zhang  <jie.zhang@analog.com>
 
+	* gcc.target/bfin/mcpu-bf522.c: New test.
+	* gcc.target/bfin/mcpu-bf525.c: New test.
+	* gcc.target/bfin/mcpu-bf527.c: New test.
+	* gcc.target/bfin/mcpu-bf538.c: New test.
+	* gcc.target/bfin/mcpu-bf539.c: New test.
+	* gcc.target/bfin/mcpu-bf542.c: New test.
+	* gcc.target/bfin/mcpu-bf544.c: New test.
+
+2007-08-08  Jie Zhang  <jie.zhang@analog.com>
+
 	* gcc.target/bfin/bfin.exp (dg-bfin-options): New.
 	(DEFAULT_CFLAGS): Remove.
 	* gcc.target/bfin/mcpu-bf531.c: Use dg-bfin-options instead
