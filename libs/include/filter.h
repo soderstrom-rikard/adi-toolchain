@@ -19,7 +19,7 @@
 
 
 #include <fract_typedef.h>
-#include <complex.h>
+#include <complex_bf.h>
 
 #ifdef _MISRA_RULES
 #pragma diag(push)

@@ -20,7 +20,7 @@
 #define __MATRIX_DEFINED
 
 #include <fract_typedef.h>
-#include <complex.h>
+#include <complex_bf.h>
 #include <vector.h>
 
 #ifdef _MISRA_RULES

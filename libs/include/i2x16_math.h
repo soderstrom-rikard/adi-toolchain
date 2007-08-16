@@ -23,7 +23,7 @@
 #include <i2x16_typedef.h>
 #include <i2x16_base.h>
 #include <stdlib.h>
-#include <math.h>
+#include <math_bf.h>
 
 #ifdef _MISRA_RULES
 #pragma diag(push)

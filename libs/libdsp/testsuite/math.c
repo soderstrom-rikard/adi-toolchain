@@ -1,6 +1,6 @@
 
 #include <stdio.h>
-#include <math.h>
+#include <math_bf.h>
 
 int main()
 {

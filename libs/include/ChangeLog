@@ -1,3 +1,16 @@
+2007-08-16  Jie Zhang  <jie.zhang@analog.com>
+
+	* math_bf.h (alogf): Don't declare.
+	(alogd): Likewise.
+	(alog): Likewise.
+	(alog10f): Likewise.
+	(alog10d): Likewise.
+	(alog10): Likewise.
+	* i2x16_math.h: Inlude math_bf.h instead of math.h.
+	* vector.h: Include complex_bf.h instead of complex.h
+	* matrix.h: Likewise.
+	* filter.h: Likewise.
+
 2007-08-08  Jie Zhang  <jie.zhang@analog.com>
 
 	* math_bf.h (fmaxf): Remove.

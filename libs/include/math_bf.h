@@ -19,10 +19,6 @@
 /*
    This header file contains all ADSP Blackfin specific
    Analog extensions to the ANSI header file math.h.
-
-   The header file is included by math.h by default.
-   To disable the extensions, compile with the option:
-        -D__NO_ANSI_EXTENSIONS__
  */
    
 #ifndef  _MATH_BF_H
@@ -51,36 +47,6 @@ extern "C" {
  *    Arc cosine
  */
         fract16 acos_fr16 (fract16 _x) asm ("__acos_fr16");
-
-
-/* * * *        alog     * * * *
- *    Natural anti-log
- */
-        float alogf (float _x) asm ("__alogf");
-
-        long double alogd (long double _x) asm ("__alogd");
-
-
-#ifdef __DOUBLES_ARE_FLOATS__
-        double alog (double _x) asm ("__alogf");
-#else
-        double alog (double _x) asm ("__alogd");
-#endif
-
-
-/* * * *        alog10   * * * *
- *    Base-10 anti-log
- */
-        float alog10f (float _x) asm ("__alog10f");
-
-        long double alog10d (long double _x) asm ("__alog10d");
-
-
-#ifdef __DOUBLES_ARE_FLOATS__
-        double alog10 (double _x) asm ("__alog10f");
-#else
-        double alog10 (double _x) asm ("__alog10d");
-#endif
 
 
 /* * * *        asin     * * * *
