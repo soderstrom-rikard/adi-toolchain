@@ -283,28 +283,25 @@ LIBBFFASTFP_OBJS = $(LIBBFFASTFP_ASRCS:%.asm=%.o)
 
 LIBS = libbfdsp.a libbffastfp.a
 
+ARFLAGS = cru
 CFLAGS = $(MULTILIB_FLAGS) -O2 -D__NO_LIBRARY_ATTRIBUTES__ -I../include -fno-builtin
 
 all: $(LIBS)
 
-libbfdsp.a: libbfdsp.a($(LIBBFDSP_OBJS))
+libbfdsp.a: $(LIBBFDSP_OBJS)
+	$(AR) $(ARFLAGS) libbfdsp.a $(LIBBFDSP_OBJS)
 
-libbffastfp.a: libbffastfp.a($(LIBBFFASTFP_OBJS))
+libbffastfp.a: $(LIBBFFASTFP_OBJS)
+	$(AR) $(ARFLAGS) libbffastfp.a $(LIBBFFASTFP_OBJS)
 
-(%.o): %.asm
+%.o: %.asm
 	$(CC) $(CFLAGS) -x assembler-with-cpp -c $< -o $*.o
-	$(AR) r $@ $*.o
-	rm $*.o
 
-(%.o): %.S
+%.o: %.S
 	$(CC) $(CFLAGS) -c $< -o $*.o
-	$(AR) r $@ $*.o
-	rm $*.o
 
-(%.o): %.c
+%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $*.o
-	$(AR) r $@ $*.o
-	rm $*.o
 
 install: $(addprefix $(inst_libdir)/, $(LIBS))
 

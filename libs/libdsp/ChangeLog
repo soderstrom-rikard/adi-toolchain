@@ -1,3 +1,15 @@
+2007-08-20  Jie Zhang  <jie.zhang@analog.com>
+
+	* Makefile (ARFLAGS): New.
+	(libbfdsp.a): Make it from object files.
+	(libbffastfp.a): Likewise.
+	((%.o): %.asm): Remove.
+	(%.o: %.asm): New rule.
+	((%.o): %.S): Remove.
+	(%.o: %.S): New rule.
+	((%.o): %.c): Remove.
+	(%.o: %.c): New rule.
+
 2007-08-02  Jie Zhang  <jie.zhang@analog.com>
 
 	* Makefile (LIBBFDSP_ASRCS): Add fract28_4mul.asm and

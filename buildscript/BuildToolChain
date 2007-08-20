@@ -1848,6 +1848,12 @@ if [ -e $DIR_SOURCE/libs/Makefile ] ; then
 	    fi
 	fi
 
+	# LIBC_HAS_NO_CMATH=1 will add several more files to libbfdsp.a.
+	# For file systems with low resolution timestamp, like ext2/3,
+	# sometimes, libbfdsp.a will not be updated correctly.
+	# Remove it instead of make clean can save much time.
+	rm $DIR_SOURCE/libs/libdsp/libbfdsp.a
+
 	RUN="$MAKE LIBC_HAS_NO_CMATH=1 MULTILIB_FLAGS=\"$flags\""
 	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 	(echo $RUN $LOGFILE ; ) | sh
