@@ -1,3 +1,9 @@
+2007-08-23  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/tc-bfin.c (bfin_fix_adjustable): Adjust
+	BFD_RELOC_BFIN_GOT, BFD_RELOC_BFIN_GOT17M4 and
+	BFD_RELOC_BFIN_FUNCDESC_GOT17M4.
+
 2007-07-10  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin-parse.y (check_macfuncs): Don't check
