@@ -1838,7 +1838,8 @@ if [ -e $DIR_SOURCE/libs/Makefile ] ; then
 
 	if [ $KERNEL_SOURCE ] ; then
 	    if echo "${flags}" | grep -q mfdpic; then
-		RUN="$MAKE install DESTDIR=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime USR=/usr SUFFIX=/$dir MULTILIB="
+		dir2=`echo ${dir} | sed -e 's/mfdpic//' -e 's|/$||'`
+		RUN="$MAKE install DESTDIR=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime USR=/usr SUFFIX=/$dir2 MULTILIB="
 		(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 		(echo $RUN $LOGFILE ; ) | sh
 	    else
