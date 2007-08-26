@@ -16,7 +16,7 @@
 
 <visualdsp-proc-xml schema-version="1" name="ADSP-BF548-proc.xml">
 
-<version file-version="1.44" />
+<version file-version="1.48" />
 
 <!-- ************************************************************************ -->
 <!-- ******* Register set                                                     -->
@@ -2508,13 +2508,13 @@
 	<register name="NFC_IRQMASK"  type="NODATA"  x="2"  y="2" />
 	<register name="MASK_BUSYIRQ" type="NODATA"  x="2"  y="3" />
 	<register name="MASK_WBOVF"   type="NODATA"  x="2"  y="4" />
-	<register name="MASK_WBEMPTY" type="NODATA"  x="2"  y="5" />
+	<register name="MASK_WBEDGE"  type="NODATA"  x="2"  y="5" />
 	<register name="MASK_RDRDY"   type="NODATA"  x="2"  y="6" />
 	<register name="MASK_WRDONE"  type="NODATA"  x="2"  y="7" />
 	<register name="NFC_IRQMASK"  type="NOLABEL" x="15" y="2" />
 	<register name="MASK_BUSYIRQ" type="NOLABEL" x="15" y="3" />
 	<register name="MASK_WBOVF"   type="NOLABEL" x="15" y="4" />
-	<register name="MASK_WBEMPTY" type="NOLABEL" x="15" y="5" />
+	<register name="MASK_WBEDGE"  type="NOLABEL" x="15" y="5" />
 	<register name="MASK_RDRDY"   type="NOLABEL" x="15" y="6" />
 	<register name="MASK_WRDONE"  type="NOLABEL" x="15" y="7" />
 </window>

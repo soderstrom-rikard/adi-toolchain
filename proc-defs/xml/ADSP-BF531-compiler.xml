@@ -13,7 +13,7 @@
 <!-- ******* common information                -->
 <!-- ***************************************** -->
 
-<version file-version="0.103"/>
+<version file-version="0.104"/>
 
 <architecture name="ADSP-BF531" maps-to="ADSP-BF532" machine-id="34" machine-id-mnemonic="EM_21532" default-ldf="Blackfin/ldf/ADSP-BF531.ldf"/>
 

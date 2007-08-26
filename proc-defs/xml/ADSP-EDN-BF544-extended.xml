@@ -1,6 +1,6 @@
 <visualdsp-extended-xml schema-version="1" name="ADSP-EDN-BF544-extended.xml">
 
-<version file-version="1.45" />
+<version file-version="1.47" />
 
 <!-- ******************************************************************* -->
 <!-- ADSP-BF54x register and bit definitions file                        -->
@@ -2206,7 +2206,7 @@
 <register name="NFC_IRQMASK" group="NFC" mask="FFFF" description="NAND Interrupt Mask Register" bit-size="16" read-address="0xFFC03B0C" write-address="0xFFC03B0C" type="IO" target="EMU" />
 	<register name="MASK_BUSYIRQ" parent="NFC_IRQMASK" bit-position="0" bit-size="1" target="EMU" description="Mask Not Busy IRQ"/>
 	<register name="MASK_WBOVF"   parent="NFC_IRQMASK" bit-position="1" bit-size="1" target="EMU" description="Mask Write Buffer Overflow"/>
-	<register name="MASK_WBEMPTY" parent="NFC_IRQMASK" bit-position="2" bit-size="1" target="EMU" description="Mask Write Buffer Empty"/>
+	<register name="MASK_WBEDGE"  parent="NFC_IRQMASK" bit-position="2" bit-size="1" target="EMU" description="Mask Write Buffer Edge Detect"/>
 	<register name="MASK_RDRDY"   parent="NFC_IRQMASK" bit-position="3" bit-size="1" target="EMU" description="Mask Read Data Ready"/>
 	<register name="MASK_WRDONE"  parent="NFC_IRQMASK" bit-position="4" bit-size="1" target="EMU" description="Mask Write Done"/>
 
