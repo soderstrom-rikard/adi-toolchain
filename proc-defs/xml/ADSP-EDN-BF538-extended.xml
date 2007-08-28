@@ -57,12 +57,12 @@
 		<register name="WDOG_STAT" group="Watchdog Timer Registers" read-address="0xFFC00208" write-address="0xFFC00208" type="IO" description="Watchdog Status Register" bit-size="32" target="EMU" />
 
 		<!-- Realtime Clock Registers -->
-		<register name="RTC_STAT"  group="Realtime Clock Registers" read-address="0xFFC00300" write-address="0xFFC00300" type="IO" description="" bit-size="32" def-comment="Real Time Clock (0xFFC00300 - 0xFFC003FF)"/>
-		<register name="RTC_ICTL"  group="Realtime Clock Registers" read-address="0xFFC00304" write-address="0xFFC00304" type="IO" description="" bit-size="16"/>
-		<register name="RTC_ISTAT" group="Realtime Clock Registers" read-address="0xFFC00308" write-address="0xFFC00308" type="IO" description="" bit-size="16"/>
-		<register name="RTC_SWCNT" group="Realtime Clock Registers" read-address="0xFFC0030C" write-address="0xFFC0030C" type="IO" description="" bit-size="16"/>
-		<register name="RTC_ALARM" group="Realtime Clock Registers" read-address="0xFFC00310" write-address="0xFFC00310" type="IO" description="" bit-size="32"/>
-		<register name="RTC_PREN"  group="Realtime Clock Registers" read-address="0xFFC00314" write-address="0xFFC00314" type="IO" description="" bit-size="16"/>
+		<register name="RTC_STAT"  group="RTC" read-address="0xFFC00300" write-address="0xFFC00300" type="IO" description="" bit-size="32" def-comment="Real Time Clock (0xFFC00300 - 0xFFC003FF)"/>
+		<register name="RTC_ICTL"  group="RTC" read-address="0xFFC00304" write-address="0xFFC00304" type="IO" description="" bit-size="16"/>
+		<register name="RTC_ISTAT" group="RTC" read-address="0xFFC00308" write-address="0xFFC00308" type="IO" description="" bit-size="16"/>
+		<register name="RTC_SWCNT" group="RTC" read-address="0xFFC0030C" write-address="0xFFC0030C" type="IO" description="" bit-size="16"/>
+		<register name="RTC_ALARM" group="RTC" read-address="0xFFC00310" write-address="0xFFC00310" type="IO" description="" bit-size="32"/>
+		<register name="RTC_PREN"  group="RTC" read-address="0xFFC00314" write-address="0xFFC00314" type="IO" description="" bit-size="16"/>
 
 		<!-- UART0 Registers -->
 		<register name="UART0_THR"  group="UART0 Registers" read-address="0xFFC00400" write-address="0xFFC00400" mask="FFFF" type="IO" description="" bit-size="16" def-comment="UART0 (0xFFC00400 - 0xFFC004FF)"/>

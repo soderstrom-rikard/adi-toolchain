@@ -577,12 +577,12 @@
 		<register name="WDOG_STAT" group="Extended Registers" description="Watchdog Status Register" bit-size="32" read-address="0xFFC00208" write-address="0xFFC00208" type="IO" target="EMU"/>
 
 		<!-- Realtime Clock Registers -->
-		<register name="RTC_STAT"  group="Extended Registers" description="" bit-size="32" read-address="0xFFC00300" write-address="0xFFC00300" type="IO" def-comment="Real Time Clock (0xFFC00300 - 0xFFC003FF)"/>
-		<register name="RTC_ICTL"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC00304" write-address="0xFFC00304" type="IO" />
-		<register name="RTC_ISTAT" group="Extended Registers" description="" bit-size="16" read-address="0xFFC00308" write-address="0xFFC00308" type="IO" />
-		<register name="RTC_SWCNT" group="Extended Registers" description="" bit-size="16" read-address="0xFFC0030C" write-address="0xFFC0030C" type="IO" />
-		<register name="RTC_ALARM" group="Extended Registers" description="" bit-size="32" read-address="0xFFC00310" write-address="0xFFC00310" type="IO" />
-		<register name="RTC_PREN"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC00314" write-address="0xFFC00314" type="IO" />
+		<register name="RTC_STAT"  group="RTC" description="" bit-size="32" read-address="0xFFC00300" write-address="0xFFC00300" type="IO" def-comment="Real Time Clock (0xFFC00300 - 0xFFC003FF)"/>
+		<register name="RTC_ICTL"  group="RTC" description="" bit-size="16" read-address="0xFFC00304" write-address="0xFFC00304" type="IO" />
+		<register name="RTC_ISTAT" group="RTC" description="" bit-size="16" read-address="0xFFC00308" write-address="0xFFC00308" type="IO" />
+		<register name="RTC_SWCNT" group="RTC" description="" bit-size="16" read-address="0xFFC0030C" write-address="0xFFC0030C" type="IO" />
+		<register name="RTC_ALARM" group="RTC" description="" bit-size="32" read-address="0xFFC00310" write-address="0xFFC00310" type="IO" />
+		<register name="RTC_PREN"  group="RTC" description="" bit-size="16" read-address="0xFFC00314" write-address="0xFFC00314" type="IO" />
 
 		<!-- mispelled Tar 19815 register name="ERR_COR" Parent="PPI_STATUS"  description="" bit-size="1" BitPosition="15"/-->
 

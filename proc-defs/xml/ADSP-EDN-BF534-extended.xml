@@ -40,12 +40,12 @@
 <register name="WDOG_CNT"  group="Extended Registers" read-address="0xFFC00204" write-address="0xFFC00204" mask="FFFFFFFF" type="IO" description="Watchdog Count Register" bit-size="32" target="EMU" />
 <register name="WDOG_STAT" group="Extended Registers" read-address="0xFFC00208" write-address="0xFFC00208" mask="FFFFFFFF" type="IO" description="Watchdog Status Register" bit-size="32" target="EMU" />
 
-<register name="RTC_STAT"  group="Extended Registers" read-address="0xFFC00300" write-address="0xFFC00300" mask="FFFFFFFF" type="IO" description="RTC Status Register" bit-size="32" def-comment="Real Time Clock (0xFFC00300 - 0xFFC003FF)"/>
-<register name="RTC_ICTL"  group="Extended Registers" read-address="0xFFC00304" write-address="0xFFC00304" mask="FFFF"     type="IO" description="RTC Interrupt Control Register" bit-size="16"/>
-<register name="RTC_ISTAT" group="Extended Registers" read-address="0xFFC00308" write-address="0xFFC00308" mask="FFFF"     type="IO" description="RTC Interrupt Status Register" bit-size="16"/>
-<register name="RTC_SWCNT" group="Extended Registers" read-address="0xFFC0030C" write-address="0xFFC0030C" mask="FFFF"     type="IO" description="RTC Stopwatch Count Register" bit-size="16"/>
-<register name="RTC_ALARM" group="Extended Registers" read-address="0xFFC00310" write-address="0xFFC00310" mask="FFFFFFFF" type="IO" description="RTC Alarm Time Register" bit-size="32"/>
-<register name="RTC_PREN"  group="Extended Registers" read-address="0xFFC00314" write-address="0xFFC00314" mask="FFFF"     type="IO" description="RTC Prescaler Enable Register" bit-size="16"/>
+<register name="RTC_STAT"  group="RTC" read-address="0xFFC00300" write-address="0xFFC00300" mask="FFFFFFFF" type="IO" description="RTC Status Register" bit-size="32" def-comment="Real Time Clock (0xFFC00300 - 0xFFC003FF)"/>
+<register name="RTC_ICTL"  group="RTC" read-address="0xFFC00304" write-address="0xFFC00304" mask="FFFF"     type="IO" description="RTC Interrupt Control Register" bit-size="16"/>
+<register name="RTC_ISTAT" group="RTC" read-address="0xFFC00308" write-address="0xFFC00308" mask="FFFF"     type="IO" description="RTC Interrupt Status Register" bit-size="16"/>
+<register name="RTC_SWCNT" group="RTC" read-address="0xFFC0030C" write-address="0xFFC0030C" mask="FFFF"     type="IO" description="RTC Stopwatch Count Register" bit-size="16"/>
+<register name="RTC_ALARM" group="RTC" read-address="0xFFC00310" write-address="0xFFC00310" mask="FFFFFFFF" type="IO" description="RTC Alarm Time Register" bit-size="32"/>
+<register name="RTC_PREN"  group="RTC" read-address="0xFFC00314" write-address="0xFFC00314" mask="FFFF"     type="IO" description="RTC Prescaler Enable Register" bit-size="16"/>
 
 	<!--******************-->
 	<!-- UART0 Controller -->
