@@ -128,25 +128,25 @@
 <register name="P5" group="P Registers" mask="FFFFFFFF" type="CORE" description="Pointer register (p-register)" bit-size="32" compiler-id="13"/>
 <register name="CYCLES" group="Cycles" mask="FFFFFFFF" type="CORE" description="Execution cycle count register (least significant 32 of 64 bits)" bit-size="32"/>
 <register name="CYCLES2" group="Cycles" mask="FFFFFFFF" type="CORE" description="Execution cycle count register (most significant 32 of 64 bits)" bit-size="32"/>
-<register name="WPIACTL"  group="Extended Registers" description="" bit-size="32" read-address="0xFFE07000" write-address="0xFFE07000" type="IO" def-comment="Watchpoint Control Registers (0xFFE07000 - 0xFFE07200)"/>
-<register name="WPIA0"    group="Extended Registers" description="" bit-size="32" read-address="0xFFE07040" write-address="0xFFE07040" type="IO" cdef-type="ADDR"/>
-<register name="WPIA1"    group="Extended Registers" description="" bit-size="32" read-address="0xFFE07044" write-address="0xFFE07044" type="IO" cdef-type="ADDR"/>
-<register name="WPIA2"    group="Extended Registers" description="" bit-size="32" read-address="0xFFE07048" write-address="0xFFE07048" type="IO" cdef-type="ADDR"/>
-<register name="WPIA3"    group="Extended Registers" description="" bit-size="32" read-address="0xFFE0704C" write-address="0xFFE0704C" type="IO" cdef-type="ADDR"/>
-<register name="WPIA4"    group="Extended Registers" description="" bit-size="32" read-address="0xFFE07050" write-address="0xFFE07050" type="IO" cdef-type="ADDR"/>
-<register name="WPIA5"    group="Extended Registers" description="" bit-size="32" read-address="0xFFE07054" write-address="0xFFE07054" type="IO" cdef-type="ADDR"/>
-<register name="WPIACNT0" group="Extended Registers" description="" bit-size="32" read-address="0xFFE07080" write-address="0xFFE07080" type="IO"/>
-<register name="WPIACNT1" group="Extended Registers" description="" bit-size="32" read-address="0xFFE07084" write-address="0xFFE07084" type="IO"/>
-<register name="WPIACNT2" group="Extended Registers" description="" bit-size="32" read-address="0xFFE07088" write-address="0xFFE07088" type="IO"/>
-<register name="WPIACNT3" group="Extended Registers" description="" bit-size="32" read-address="0xFFE0708C" write-address="0xFFE0708C" type="IO"/>
-<register name="WPIACNT4" group="Extended Registers" description="" bit-size="32" read-address="0xFFE07090" write-address="0xFFE07090" type="IO"/>
-<register name="WPIACNT5" group="Extended Registers" description="" bit-size="32" read-address="0xFFE07094" write-address="0xFFE07094" type="IO"/>
-<register name="WPDACTL"  group="Extended Registers" description="" bit-size="32" read-address="0xFFE07100" write-address="0xFFE07100" type="IO"/>
-<register name="WPDA0"    group="Extended Registers" description="" bit-size="32" read-address="0xFFE07140" write-address="0xFFE07140" type="IO" cdef-type="ADDR"/>
-<register name="WPDA1"    group="Extended Registers" description="" bit-size="32" read-address="0xFFE07144" write-address="0xFFE07144" type="IO" cdef-type="ADDR"/>
-<register name="WPDACNT0" group="Extended Registers" description="" bit-size="32" read-address="0xFFE07180" write-address="0xFFE07180" type="IO"/>
-<register name="WPDACNT1" group="Extended Registers" description="" bit-size="32" read-address="0xFFE07184" write-address="0xFFE07184" type="IO"/>
-<register name="WPSTAT"   group="Extended Registers" description="" bit-size="32" read-address="0xFFE07200" write-address="0xFFE07200" type="IO"/>
+<register name="WPIACTL"  group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE07000" write-address="0xFFE07000" type="IO" def-comment="Watchpoint Control Registers (0xFFE07000 - 0xFFE07200)"/>
+<register name="WPIA0"    group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE07040" write-address="0xFFE07040" type="IO" cdef-type="ADDR"/>
+<register name="WPIA1"    group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE07044" write-address="0xFFE07044" type="IO" cdef-type="ADDR"/>
+<register name="WPIA2"    group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE07048" write-address="0xFFE07048" type="IO" cdef-type="ADDR"/>
+<register name="WPIA3"    group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE0704C" write-address="0xFFE0704C" type="IO" cdef-type="ADDR"/>
+<register name="WPIA4"    group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE07050" write-address="0xFFE07050" type="IO" cdef-type="ADDR"/>
+<register name="WPIA5"    group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE07054" write-address="0xFFE07054" type="IO" cdef-type="ADDR"/>
+<register name="WPIACNT0" group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE07080" write-address="0xFFE07080" type="IO"/>
+<register name="WPIACNT1" group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE07084" write-address="0xFFE07084" type="IO"/>
+<register name="WPIACNT2" group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE07088" write-address="0xFFE07088" type="IO"/>
+<register name="WPIACNT3" group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE0708C" write-address="0xFFE0708C" type="IO"/>
+<register name="WPIACNT4" group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE07090" write-address="0xFFE07090" type="IO"/>
+<register name="WPIACNT5" group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE07094" write-address="0xFFE07094" type="IO"/>
+<register name="WPDACTL"  group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE07100" write-address="0xFFE07100" type="IO"/>
+<register name="WPDA0"    group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE07140" write-address="0xFFE07140" type="IO" cdef-type="ADDR"/>
+<register name="WPDA1"    group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE07144" write-address="0xFFE07144" type="IO" cdef-type="ADDR"/>
+<register name="WPDACNT0" group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE07180" write-address="0xFFE07180" type="IO"/>
+<register name="WPDACNT1" group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE07184" write-address="0xFFE07184" type="IO"/>
+<register name="WPSTAT"   group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE07200" write-address="0xFFE07200" type="IO"/>
 
 </register-core-definitions>
 

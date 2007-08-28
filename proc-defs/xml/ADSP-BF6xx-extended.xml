@@ -536,26 +536,26 @@
 		<register name="TBUF"     group="Extended Registers" description="Trace Buffer" bit-size="32" read-address="0xFFE06100" write-address="0xFFE06100" type="IO" target="EMU" cdef-type="ADDR"/>
 
 		<!-- Watchpoint and Patch Registers -->
-		<register name="WPIACTL01"  group="Extended Registers" description="" bit-size="32" read-address="0xFFF08700" write-address="0xFFF08700" type="IO" target="EMU" def-comment="Watchpoint Control Registers "/>
-		<register name="WPIACTL23"  group="Extended Registers" description="" bit-size="32" read-address="0xFFF08704" write-address="0xFFF08704" type="IO" target="EMU" def-comment="Watchpoint Control Registers "/>
-		<register name="WPIACTL45"  group="Extended Registers" description="" bit-size="32" read-address="0xFFF08708" write-address="0xFFF08708" type="IO" target="EMU" def-comment="Watchpoint Control Registers "/>
-		<register name="WPDACTL"  group="Extended Registers" description="" bit-size="32" read-address="0xFFF0870C" write-address="0xFFF0870C" type="IO" target="EMU" def-comment="Watchpoint Control Regis(0xFFE07000 - 0xFFE07200)"/>
-		<register name="WPIA0"    group="Extended Registers" description="" bit-size="32" read-address="0xFFF08740" write-address="0xFFF08740" type="IO" target="EMU" cdef-type="ADDR"/>
-		<register name="WPIA1"    group="Extended Registers" description="" bit-size="32" read-address="0xFFF08744" write-address="0xFFF08744" type="IO" target="EMU" cdef-type="ADDR"/>
-		<register name="WPIA2"    group="Extended Registers" description="" bit-size="32" read-address="0xFFF08748" write-address="0xFFF08748" type="IO" target="EMU" cdef-type="ADDR"/>
-		<register name="WPIA3"    group="Extended Registers" description="" bit-size="32" read-address="0xFFF0874C" write-address="0xFFF0874C" type="IO" target="EMU" cdef-type="ADDR"/>
-		<register name="WPIA4"    group="Extended Registers" description="" bit-size="32" read-address="0xFFF08750" write-address="0xFFF08750" type="IO" target="EMU" cdef-type="ADDR"/>
-		<register name="WPIA5"    group="Extended Registers" description="" bit-size="32" read-address="0xFFF08754" write-address="0xFFF08754" type="IO" target="EMU" cdef-type="ADDR"/>
-		<register name="WPDA0"    group="Extended Registers" description="" bit-size="32" read-address="0xFFF08758" write-address="0xFFF08758" type="IO" target="EMU" cdef-type="ADDR"/>
-		<register name="WPDA1"    group="Extended Registers" description="" bit-size="32" read-address="0xFFF0875C" write-address="0xFFF0875C" type="IO" target="EMU" cdef-type="ADDR"/>
-		<register name="WPIACNT0" group="Extended Registers" description="" bit-size="32" read-address="0xFFF08780" write-address="0xFFF08780" type="IO" target="EMU"/>
-		<register name="WPIACNT1" group="Extended Registers" description="" bit-size="32" read-address="0xFFF08784" write-address="0xFFF08784" type="IO" target="EMU"/>
-		<register name="WPIACNT2" group="Extended Registers" description="" bit-size="32" read-address="0xFFF08788" write-address="0xFFF08788" type="IO" target="EMU"/>
-		<register name="WPIACNT3" group="Extended Registers" description="" bit-size="32" read-address="0xFFF0878C" write-address="0xFFF0878C" type="IO" target="EMU"/>
-		<register name="WPIACNT4" group="Extended Registers" description="" bit-size="32" read-address="0xFFF08790" write-address="0xFFF08790" type="IO" target="EMU"/>
-		<register name="WPIACNT5" group="Extended Registers" description="" bit-size="32" read-address="0xFFF08794" write-address="0xFFF08794" type="IO" target="EMU"/>
-		<register name="WPDACNT0" group="Extended Registers" description="" bit-size="32" read-address="0xFFF08798" write-address="0xFFF08798" type="IO" target="EMU"/>
-		<register name="WPDACNT1" group="Extended Registers" description="" bit-size="32" read-address="0xFFF0879C" write-address="0xFFF0879C" type="IO" target="EMU"/>	
+		<register name="WPIACTL01"  group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFF08700" write-address="0xFFF08700" type="IO" target="EMU" def-comment="Watchpoint Control Registers "/>
+		<register name="WPIACTL23"  group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFF08704" write-address="0xFFF08704" type="IO" target="EMU" def-comment="Watchpoint Control Registers "/>
+		<register name="WPIACTL45"  group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFF08708" write-address="0xFFF08708" type="IO" target="EMU" def-comment="Watchpoint Control Registers "/>
+		<register name="WPDACTL"  group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFF0870C" write-address="0xFFF0870C" type="IO" target="EMU" def-comment="Watchpoint Control Regis(0xFFE07000 - 0xFFE07200)"/>
+		<register name="WPIA0"    group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFF08740" write-address="0xFFF08740" type="IO" target="EMU" cdef-type="ADDR"/>
+		<register name="WPIA1"    group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFF08744" write-address="0xFFF08744" type="IO" target="EMU" cdef-type="ADDR"/>
+		<register name="WPIA2"    group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFF08748" write-address="0xFFF08748" type="IO" target="EMU" cdef-type="ADDR"/>
+		<register name="WPIA3"    group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFF0874C" write-address="0xFFF0874C" type="IO" target="EMU" cdef-type="ADDR"/>
+		<register name="WPIA4"    group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFF08750" write-address="0xFFF08750" type="IO" target="EMU" cdef-type="ADDR"/>
+		<register name="WPIA5"    group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFF08754" write-address="0xFFF08754" type="IO" target="EMU" cdef-type="ADDR"/>
+		<register name="WPDA0"    group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFF08758" write-address="0xFFF08758" type="IO" target="EMU" cdef-type="ADDR"/>
+		<register name="WPDA1"    group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFF0875C" write-address="0xFFF0875C" type="IO" target="EMU" cdef-type="ADDR"/>
+		<register name="WPIACNT0" group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFF08780" write-address="0xFFF08780" type="IO" target="EMU"/>
+		<register name="WPIACNT1" group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFF08784" write-address="0xFFF08784" type="IO" target="EMU"/>
+		<register name="WPIACNT2" group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFF08788" write-address="0xFFF08788" type="IO" target="EMU"/>
+		<register name="WPIACNT3" group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFF0878C" write-address="0xFFF0878C" type="IO" target="EMU"/>
+		<register name="WPIACNT4" group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFF08790" write-address="0xFFF08790" type="IO" target="EMU"/>
+		<register name="WPIACNT5" group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFF08794" write-address="0xFFF08794" type="IO" target="EMU"/>
+		<register name="WPDACNT0" group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFF08798" write-address="0xFFF08798" type="IO" target="EMU"/>
+		<register name="WPDACNT1" group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFF0879C" write-address="0xFFF0879C" type="IO" target="EMU"/>	
 
 	
 		
