@@ -572,9 +572,9 @@
 		<!-- ***************************************************** -->
 
 		<!-- Watchdog Timer Registers -->
-		<register name="WDOG_CTL"  group="Extended Registers" description="Watchdog Control Register" bit-size="16" read-address="0xFFC00200" write-address="0xFFC00200" type="IO" target="EMU" def-comment="Watchdog Timer (0xFFC00200 - 0xFFC002FF)"/>
-		<register name="WDOG_CNT"  group="Extended Registers" description="Watchdog Count Register" bit-size="32" read-address="0xFFC00204" write-address="0xFFC00204" type="IO" target="EMU"/>
-		<register name="WDOG_STAT" group="Extended Registers" description="Watchdog Status Register" bit-size="32" read-address="0xFFC00208" write-address="0xFFC00208" type="IO" target="EMU"/>
+		<register name="WDOG_CTL"  group="Watchdog" description="Watchdog Control Register" bit-size="16" read-address="0xFFC00200" write-address="0xFFC00200" type="IO" target="EMU" def-comment="Watchdog Timer (0xFFC00200 - 0xFFC002FF)"/>
+		<register name="WDOG_CNT"  group="Watchdog" description="Watchdog Count Register" bit-size="32" read-address="0xFFC00204" write-address="0xFFC00204" type="IO" target="EMU"/>
+		<register name="WDOG_STAT" group="Watchdog" description="Watchdog Status Register" bit-size="32" read-address="0xFFC00208" write-address="0xFFC00208" type="IO" target="EMU"/>
 
 		<!-- Realtime Clock Registers -->
 		<register name="RTC_STAT"  group="RTC" description="" bit-size="32" read-address="0xFFC00300" write-address="0xFFC00300" type="IO" def-comment="Real Time Clock (0xFFC00300 - 0xFFC003FF)"/>

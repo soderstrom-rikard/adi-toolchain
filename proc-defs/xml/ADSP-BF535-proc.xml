@@ -721,9 +721,9 @@
 		<!-- ***************************************************** -->
 
 		<!-- Watchdog Timer Registers -->
-		<register name="WDOG_CTL"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC01000" write-address="0xFFC01000" type="IO" target="EMU"/>
-		<register name="WDOG_CNT"  group="Extended Registers" description="" bit-size="32" read-address="0xFFC01004" write-address="0xFFC01004" type="IO" target="EMU"/>
-		<register name="WDOG_STAT" group="Extended Registers" description="" bit-size="32"  read-address="0xFFC01008" write-address="0xFFC01008" type="IO" target="EMU"/>
+		<register name="WDOG_CTL"  group="Watchdog" description="" bit-size="16" read-address="0xFFC01000" write-address="0xFFC01000" type="IO" target="EMU"/>
+		<register name="WDOG_CNT"  group="Watchdog" description="" bit-size="32" read-address="0xFFC01004" write-address="0xFFC01004" type="IO" target="EMU"/>
+		<register name="WDOG_STAT" group="Watchdog" description="" bit-size="32"  read-address="0xFFC01008" write-address="0xFFC01008" type="IO" target="EMU"/>
 
 		<!-- Real-Time Clock Registers -->
 		<register name="RTC_STAT"  group="Extended Registers" description="" bit-size="32" read-address="0xFFC01400" write-address="0xFFC01400" type="IO" target="EMU"/>

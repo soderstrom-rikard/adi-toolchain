@@ -52,9 +52,9 @@
 		<register name="SIC_IAR6"  group="System Reset and Interrupt Control Registers" read-address="0xFFC0013C" write-address="0xFFC0013C" mask="FFFFFFFF" type="IO" description="Interrupt Assignment Register 6" bit-size="32"/>
 
 		<!-- Watchdog Timer Registers -->
-		<register name="WDOG_CTL"  group="Watchdog Timer Registers" read-address="0xFFC00200" write-address="0xFFC00200" type="IO" description="Watchdog Control Register" bit-size="16" def-comment="Watchdog Timer (0xFFC00200 - 0xFFC002FF)" target="EMU" />
-		<register name="WDOG_CNT"  group="Watchdog Timer Registers" read-address="0xFFC00204" write-address="0xFFC00204" type="IO" description="Watchdog Count Register" bit-size="32" target="EMU" />
-		<register name="WDOG_STAT" group="Watchdog Timer Registers" read-address="0xFFC00208" write-address="0xFFC00208" type="IO" description="Watchdog Status Register" bit-size="32" target="EMU" />
+		<register name="WDOG_CTL"  group="Watchdog" read-address="0xFFC00200" write-address="0xFFC00200" type="IO" description="Watchdog Control Register" bit-size="16" def-comment="Watchdog Timer (0xFFC00200 - 0xFFC002FF)" target="EMU" />
+		<register name="WDOG_CNT"  group="Watchdog" read-address="0xFFC00204" write-address="0xFFC00204" type="IO" description="Watchdog Count Register" bit-size="32" target="EMU" />
+		<register name="WDOG_STAT" group="Watchdog" read-address="0xFFC00208" write-address="0xFFC00208" type="IO" description="Watchdog Status Register" bit-size="32" target="EMU" />
 
 		<!-- Realtime Clock Registers -->
 		<register name="RTC_STAT"  group="RTC" read-address="0xFFC00300" write-address="0xFFC00300" type="IO" description="" bit-size="32" def-comment="Real Time Clock (0xFFC00300 - 0xFFC003FF)"/>

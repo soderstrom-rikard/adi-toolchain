@@ -2033,9 +2033,9 @@
 
 <!-- Proc HWR, chap 12, WDOG TIMER Registers Definitions  -->
 
-<register name="WDOG_CTL" group="WDOG" mask="FFFF" description="Watchdog Control Register" bit-size="16" read-address="0xFFC00200" write-address="0xFFC00200" type="IO" def-comment="Watchdog Timer Registers" target="EMU" />
-<register name="WDOG_CNT" group="WDOG" mask="FFFFFFFF" description="Watchdog Count Register" bit-size="32" read-address="0xFFC00204" write-address="0xFFC00204" type="IO" target="EMU" />
-<register name="WDOG_STAT" group="WDOG" mask="FFFFFFFF" description="Watchdog Status Register" bit-size="32" read-address="0xFFC00208" write-address="0xFFC00208" type="IO" target="EMU" />
+<register name="WDOG_CTL" group="Watchdog" mask="FFFF" description="Watchdog Control Register" bit-size="16" read-address="0xFFC00200" write-address="0xFFC00200" type="IO" def-comment="Watchdog Timer Registers" target="EMU" />
+<register name="WDOG_CNT" group="Watchdog" mask="FFFFFFFF" description="Watchdog Count Register" bit-size="32" read-address="0xFFC00204" write-address="0xFFC00204" type="IO" target="EMU" />
+<register name="WDOG_STAT" group="Watchdog" mask="FFFFFFFF" description="Watchdog Status Register" bit-size="32" read-address="0xFFC00208" write-address="0xFFC00208" type="IO" target="EMU" />
 
 
 

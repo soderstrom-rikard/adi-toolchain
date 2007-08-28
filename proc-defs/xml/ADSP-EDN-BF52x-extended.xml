@@ -42,9 +42,9 @@
 <register name="SIC_ISR1"   group="System Interrupt Controller Register File" read-address="0xFFC00160" write-address="0xFFC00160" mask="FFFFFFFF" type="IO" description="Interrupt Status register" bit-size="32" />
 <register name="SIC_IWR1"   group="System Interrupt Controller Register File" read-address="0xFFC00164" write-address="0xFFC00164" mask="FFFFFFFF" type="IO" description="Interrupt Wakeup register" bit-size="32" />
 
-<register name="WDOG_CTL"  group="Extended Registers" read-address="0xFFC00200" write-address="0xFFC00200" mask="FFFF"     type="IO" description="Watchdog Control Register" bit-size="16" def-comment="Watchdog Timer (0xFFC00200 - 0xFFC002FF)" target="EMU" />
-<register name="WDOG_CNT"  group="Extended Registers" read-address="0xFFC00204" write-address="0xFFC00204" mask="FFFFFFFF" type="IO" description="Watchdog Count Register" bit-size="32" target="EMU" />
-<register name="WDOG_STAT" group="Extended Registers" read-address="0xFFC00208" write-address="0xFFC00208" mask="FFFFFFFF" type="IO" description="Watchdog Status Register" bit-size="32" target="EMU" />
+<register name="WDOG_CTL"  group="Watchdog" read-address="0xFFC00200" write-address="0xFFC00200" mask="FFFF"     type="IO" description="Watchdog Control Register" bit-size="16" def-comment="Watchdog Timer (0xFFC00200 - 0xFFC002FF)" target="EMU" />
+<register name="WDOG_CNT"  group="Watchdog" read-address="0xFFC00204" write-address="0xFFC00204" mask="FFFFFFFF" type="IO" description="Watchdog Count Register" bit-size="32" target="EMU" />
+<register name="WDOG_STAT" group="Watchdog" read-address="0xFFC00208" write-address="0xFFC00208" mask="FFFFFFFF" type="IO" description="Watchdog Status Register" bit-size="32" target="EMU" />
 
 <register name="RTC_STAT"  group="RTC" read-address="0xFFC00300" write-address="0xFFC00300" mask="FFFFFFFF" type="IO" description="RTC Status Register" bit-size="32" def-comment="Real Time Clock (0xFFC00300 - 0xFFC003FF)"/>
 <register name="RTC_ICTL"  group="RTC" read-address="0xFFC00304" write-address="0xFFC00304" mask="FFFF"     type="IO" description="RTC Interrupt Control Register" bit-size="16"/>
