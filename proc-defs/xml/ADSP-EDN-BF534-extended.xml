@@ -1609,22 +1609,22 @@
 <register name="ITEST_DATA0" group="L1 Code Memory Registers" read-address="0xFFE01400" write-address="0xFFE01400" mask="FFFFFFFF" type="IO" description="Instruction Test Data Register" bit-size="32"/>
 <register name="ITEST_DATA1" group="L1 Code Memory Registers" read-address="0xFFE01404" write-address="0xFFE01404" mask="FFFFFFFF" type="IO" description="Instruction Test Data Register" bit-size="32"/>
 
-<register name="EVT0" group="Event Vector Registers" read-address="0xFFE02000" write-address="0xFFE02000" mask="FFFFFFFF" type="IO" description="Event Vector 0 ESR Address" bit-size="32" cdef-type="ADDR" def-comment="Event/Interrupt Controller Registers (0xFFE02000 - 0xFFE02110)"/>
-<register name="EVT1" group="Event Vector Registers" read-address="0xFFE02004" write-address="0xFFE02004" mask="FFFFFFFF" type="IO" description="Event Vector 1 ESR Address" bit-size="32" cdef-type="ADDR"/>
-<register name="EVT2" group="Event Vector Registers" read-address="0xFFE02008" write-address="0xFFE02008" mask="FFFFFFFF" type="IO" description="Event Vector 2 ESR Address" bit-size="32" cdef-type="ADDR"/>
-<register name="EVT3" group="Event Vector Registers" read-address="0xFFE0200C" write-address="0xFFE0200C" mask="FFFFFFFF" type="IO" description="Event Vector 3 ESR Address" bit-size="32" cdef-type="ADDR"/>
-<register name="EVT4" group="Event Vector Registers" read-address="0xFFE02010" write-address="0xFFE02010" mask="FFFFFFFF" type="IO" description="Event Vector 4 ESR Address" bit-size="32" cdef-type="ADDR"/>
-<register name="EVT5" group="Event Vector Registers" read-address="0xFFE02014" write-address="0xFFE02014" mask="FFFFFFFF" type="IO" description="Event Vector 5 ESR Address" bit-size="32" cdef-type="ADDR"/>
-<register name="EVT6" group="Event Vector Registers" read-address="0xFFE02018" write-address="0xFFE02018" mask="FFFFFFFF" type="IO" description="Event Vector 6 ESR Address" bit-size="32" cdef-type="ADDR"/>
-<register name="EVT7" group="Event Vector Registers" read-address="0xFFE0201C" write-address="0xFFE0201C" mask="FFFFFFFF" type="IO" description="Event Vector 7 ESR Address" bit-size="32" cdef-type="ADDR"/>
-<register name="EVT8" group="Event Vector Registers" read-address="0xFFE02020" write-address="0xFFE02020" mask="FFFFFFFF" type="IO" description="Event Vector 8 ESR Address" bit-size="32" cdef-type="ADDR"/>
-<register name="EVT9" group="Event Vector Registers" read-address="0xFFE02024" write-address="0xFFE02024" mask="FFFFFFFF" type="IO" description="Event Vector 9 ESR Address" bit-size="32" cdef-type="ADDR"/>
-<register name="EVT10" group="Event Vector Registers" read-address="0xFFE02028" write-address="0xFFE02028" mask="FFFFFFFF" type="IO" description="Event Vector 10 ESR Address" bit-size="32" cdef-type="ADDR"/>
-<register name="EVT11" group="Event Vector Registers" read-address="0xFFE0202C" write-address="0xFFE0202C" mask="FFFFFFFF" type="IO" description="Event Vector 11 ESR Address" bit-size="32" cdef-type="ADDR"/>
-<register name="EVT12" group="Event Vector Registers" read-address="0xFFE02030" write-address="0xFFE02030" mask="FFFFFFFF" type="IO" description="Event Vector 12 ESR Address" bit-size="32" cdef-type="ADDR"/>
-<register name="EVT13" group="Event Vector Registers" read-address="0xFFE02034" write-address="0xFFE02034" mask="FFFFFFFF" type="IO" description="Event Vector 13 ESR Address" bit-size="32" cdef-type="ADDR"/>
-<register name="EVT14" group="Event Vector Registers" read-address="0xFFE02038" write-address="0xFFE02038" mask="FFFFFFFF" type="IO" description="Event Vector 14 ESR Address" bit-size="32" cdef-type="ADDR"/>
-<register name="EVT15" group="Event Vector Registers" read-address="0xFFE0203C" write-address="0xFFE0203C" mask="FFFFFFFF" type="IO" description="Event Vector 15 ESR Address" bit-size="32" cdef-type="ADDR"/>
+<register name="EVT0" group="Event Vectors" read-address="0xFFE02000" write-address="0xFFE02000" mask="FFFFFFFF" type="IO" description="Event Vector 0 ESR Address" bit-size="32" cdef-type="ADDR" def-comment="Event/Interrupt Controller Registers (0xFFE02000 - 0xFFE02110)"/>
+<register name="EVT1" group="Event Vectors" read-address="0xFFE02004" write-address="0xFFE02004" mask="FFFFFFFF" type="IO" description="Event Vector 1 ESR Address" bit-size="32" cdef-type="ADDR"/>
+<register name="EVT2" group="Event Vectors" read-address="0xFFE02008" write-address="0xFFE02008" mask="FFFFFFFF" type="IO" description="Event Vector 2 ESR Address" bit-size="32" cdef-type="ADDR"/>
+<register name="EVT3" group="Event Vectors" read-address="0xFFE0200C" write-address="0xFFE0200C" mask="FFFFFFFF" type="IO" description="Event Vector 3 ESR Address" bit-size="32" cdef-type="ADDR"/>
+<register name="EVT4" group="Event Vectors" read-address="0xFFE02010" write-address="0xFFE02010" mask="FFFFFFFF" type="IO" description="Event Vector 4 ESR Address" bit-size="32" cdef-type="ADDR"/>
+<register name="EVT5" group="Event Vectors" read-address="0xFFE02014" write-address="0xFFE02014" mask="FFFFFFFF" type="IO" description="Event Vector 5 ESR Address" bit-size="32" cdef-type="ADDR"/>
+<register name="EVT6" group="Event Vectors" read-address="0xFFE02018" write-address="0xFFE02018" mask="FFFFFFFF" type="IO" description="Event Vector 6 ESR Address" bit-size="32" cdef-type="ADDR"/>
+<register name="EVT7" group="Event Vectors" read-address="0xFFE0201C" write-address="0xFFE0201C" mask="FFFFFFFF" type="IO" description="Event Vector 7 ESR Address" bit-size="32" cdef-type="ADDR"/>
+<register name="EVT8" group="Event Vectors" read-address="0xFFE02020" write-address="0xFFE02020" mask="FFFFFFFF" type="IO" description="Event Vector 8 ESR Address" bit-size="32" cdef-type="ADDR"/>
+<register name="EVT9" group="Event Vectors" read-address="0xFFE02024" write-address="0xFFE02024" mask="FFFFFFFF" type="IO" description="Event Vector 9 ESR Address" bit-size="32" cdef-type="ADDR"/>
+<register name="EVT10" group="Event Vectors" read-address="0xFFE02028" write-address="0xFFE02028" mask="FFFFFFFF" type="IO" description="Event Vector 10 ESR Address" bit-size="32" cdef-type="ADDR"/>
+<register name="EVT11" group="Event Vectors" read-address="0xFFE0202C" write-address="0xFFE0202C" mask="FFFFFFFF" type="IO" description="Event Vector 11 ESR Address" bit-size="32" cdef-type="ADDR"/>
+<register name="EVT12" group="Event Vectors" read-address="0xFFE02030" write-address="0xFFE02030" mask="FFFFFFFF" type="IO" description="Event Vector 12 ESR Address" bit-size="32" cdef-type="ADDR"/>
+<register name="EVT13" group="Event Vectors" read-address="0xFFE02034" write-address="0xFFE02034" mask="FFFFFFFF" type="IO" description="Event Vector 13 ESR Address" bit-size="32" cdef-type="ADDR"/>
+<register name="EVT14" group="Event Vectors" read-address="0xFFE02038" write-address="0xFFE02038" mask="FFFFFFFF" type="IO" description="Event Vector 14 ESR Address" bit-size="32" cdef-type="ADDR"/>
+<register name="EVT15" group="Event Vectors" read-address="0xFFE0203C" write-address="0xFFE0203C" mask="FFFFFFFF" type="IO" description="Event Vector 15 ESR Address" bit-size="32" cdef-type="ADDR"/>
 
 <register name="ILAT" group="Interrupt Controller" read-address="0xFFE0210C" write-address="0xFFE0210C" mask="FFFFFFFF" type="IO" description="Interrupt Latch Register" bit-size="32"/>
 	<register name="ILATbit0"  parent="ILAT" bit-position="0"  type="" description="child register" bit-size="1"/>

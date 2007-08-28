@@ -413,7 +413,7 @@
 	<register name="ITEST_DATA1" type="NODATA" x="0" y="33"/>
 	<register name="ITEST_DATA1" type="NOLABEL" x="18" y="33"/>
 </window>
-<window name="Event Vector Registers" menu="&amp;Register:&amp;Core:Event Vector Registers" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0x1D" help-tag="Event_Vector_Registers_Window.htm">
+<window name="Event Vectors" menu="&amp;Register:&amp;Core:Event Vector Registers" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0x1D" help-tag="Event_Vector_Registers_Window.htm">
 	<register name="EVT0" type="NORMAL" x="7" y="1"/>
 	<register name="EVT1" type="NORMAL" x="7" y="2"/>
 	<register name="EVT2" type="NORMAL" x="7" y="3"/>
