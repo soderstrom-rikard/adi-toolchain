@@ -19,8 +19,9 @@
 	<xsl:apply-templates select="document(@name)"/>
 </xsl:template>
 
-<xsl:template match="register-extended-definitions/register">
+<xsl:template match="register-extended-definitions/register|register-core-definitions/register">
 	<xsl:if test="string-length(@bit-position) = 0">
+	<xsl:if test="@type != 'CORE'">
 
 	<xsl:call-template name="replace-string">
 		<xsl:with-param name="text" select="@group" />
@@ -39,22 +40,6 @@
 	<xsl:text>&newline;</xsl:text>
 
 	</xsl:if>
-</xsl:template>
-
-<xsl:template match="register-core-definitions/register">
-	<xsl:if test="string-length(@bit-position) = 0">
-
-	<xsl:text>Core</xsl:text>
-	<xsl:text>&sep;</xsl:text>
-	<xsl:value-of select="@name"/>
-	<xsl:text>&sep;</xsl:text>
-	<xsl:value-of select="@read-address"/>
-	<xsl:text>&sep;</xsl:text>
-	<xsl:value-of select="@write-address"/>
-	<xsl:text>&sep;</xsl:text>
-	<xsl:value-of select="@bit-size"/>
-	<xsl:text>&newline;</xsl:text>
-
 	</xsl:if>
 </xsl:template>
 
