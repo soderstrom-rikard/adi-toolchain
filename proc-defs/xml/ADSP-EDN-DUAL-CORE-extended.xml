@@ -22,11 +22,11 @@
 
 <register-extended-definitions>
 
-	<register name="PLL_CTL"     group="PLL Register File" read-address="0xFFC00000" write-address="0xFFC00000" mask="FFFFFFFF" type="IO" description="" bit-size="16" def-comment="Clock and System Control"/>
-	<register name="PLL_DIV"     group="PLL Register File" read-address="0xFFC00004" write-address="0xFFC00004" mask="FFFFFFFF" type="IO" description="" bit-size="16"/>
-	<register name="VR_CTL"      group="PLL Register File" read-address="0xFFC00008" write-address="0xFFC00008" mask="FFFFFFFF" type="IO" description="" bit-size="16"/>
-	<register name="PLL_STAT"    group="PLL Register File" read-address="0xFFC0000C" write-address="0xFFC0000C" mask="FFFFFFFF" type="IO" description="" bit-size="16"/>
-	<register name="PLL_LOCKCNT" group="PLL Register File" read-address="0xFFC00010" write-address="0xFFC00010" mask="FFFFFFFF" type="IO" description="" bit-size="16"/>
+	<register name="PLL_CTL"     group="PLL" read-address="0xFFC00000" write-address="0xFFC00000" mask="FFFFFFFF" type="IO" description="" bit-size="16" def-comment="Clock and System Control"/>
+	<register name="PLL_DIV"     group="PLL" read-address="0xFFC00004" write-address="0xFFC00004" mask="FFFFFFFF" type="IO" description="" bit-size="16"/>
+	<register name="VR_CTL"      group="PLL" read-address="0xFFC00008" write-address="0xFFC00008" mask="FFFFFFFF" type="IO" description="" bit-size="16"/>
+	<register name="PLL_STAT"    group="PLL" read-address="0xFFC0000C" write-address="0xFFC0000C" mask="FFFFFFFF" type="IO" description="" bit-size="16"/>
+	<register name="PLL_LOCKCNT" group="PLL" read-address="0xFFC00010" write-address="0xFFC00010" mask="FFFFFFFF" type="IO" description="" bit-size="16"/>
 
 	<register name="CHIPID"      group="Extended Registers" description="" bit-size="32" read-address="0xFFC00014" write-address="0xFFC00014" type="IO" mask="FFFFFFFF" />
 

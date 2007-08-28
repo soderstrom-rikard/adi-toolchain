@@ -758,13 +758,13 @@
 <register name="PPI_DELAY" group="PPI" read-address="0xFFC0100C" write-address="0xFFC0100C" mask="FFFF" type="IO" description="" bit-size="16"/>
 <register name="PPI_COUNT" group="PPI" read-address="0xFFC01008" write-address="0xFFC01008" mask="FFFF" type="IO" description="" bit-size="16"/>
 <register name="PPI_FRAME" group="PPI" read-address="0xFFC01010" write-address="0xFFC01010" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="PLL_CTL" group="PLL Register File" read-address="0xFFC00000" write-address="0xFFC00000" mask="FFFF" type="IO" description="PLL Control register (16-bit)" bit-size="16" def-comment="Clock and System Control (0xFFC00000 - 0xFFC000FF)"/>
-<register name="PLL_DIV" group="PLL Register File" read-address="0xFFC00004" write-address="0xFFC00004" mask="FFFF" type="IO" description="PLL Divide Register (16-bit)" bit-size="16"/>
-<register name="VR_CTL" group="PLL Register File" read-address="0xFFC00008" write-address="0xFFC00008" mask="FFFF" type="IO" description="Voltage Regulator Control Register (16-bit)" bit-size="16"/>
-<register name="PLL_STAT" group="PLL Register File" read-address="0xFFC0000C" write-address="0xFFC0000C" mask="FFFF" type="IO" description="PLL Status register (16-bit)" bit-size="16"/>
-<register name="PLL_LOCKCNT" group="PLL Register File" read-address="0xFFC00010" write-address="0xFFC00010" mask="FFFF" type="IO" description="PLL Lock Count register (16-bit)" bit-size="16"/>
-<register name="SWRST" group="PLL Register File" read-address="0xFFC00100" write-address="0xFFC00100" mask="FFFFFFFF" type="IO" description="Software Reset Register (16-bit)" bit-size="32"/>
-<register name="SYSCR" group="PLL Register File" read-address="0xFFC00104" write-address="0xFFC00104" mask="FFFFFFFF" type="IO" description="System Configuration register" bit-size="32"/>
+<register name="PLL_CTL" group="PLL" read-address="0xFFC00000" write-address="0xFFC00000" mask="FFFF" type="IO" description="PLL Control register (16-bit)" bit-size="16" def-comment="Clock and System Control (0xFFC00000 - 0xFFC000FF)"/>
+<register name="PLL_DIV" group="PLL" read-address="0xFFC00004" write-address="0xFFC00004" mask="FFFF" type="IO" description="PLL Divide Register (16-bit)" bit-size="16"/>
+<register name="VR_CTL" group="PLL" read-address="0xFFC00008" write-address="0xFFC00008" mask="FFFF" type="IO" description="Voltage Regulator Control Register (16-bit)" bit-size="16"/>
+<register name="PLL_STAT" group="PLL" read-address="0xFFC0000C" write-address="0xFFC0000C" mask="FFFF" type="IO" description="PLL Status register (16-bit)" bit-size="16"/>
+<register name="PLL_LOCKCNT" group="PLL" read-address="0xFFC00010" write-address="0xFFC00010" mask="FFFF" type="IO" description="PLL Lock Count register (16-bit)" bit-size="16"/>
+<register name="SWRST" group="PLL" read-address="0xFFC00100" write-address="0xFFC00100" mask="FFFFFFFF" type="IO" description="Software Reset Register (16-bit)" bit-size="32"/>
+<register name="SYSCR" group="PLL" read-address="0xFFC00104" write-address="0xFFC00104" mask="FFFFFFFF" type="IO" description="System Configuration register" bit-size="32"/>
 <!-- ************************************************************************ -->
 <!-- ******* end sim dump / begin emu 3.5 XML (not already defined above)     -->
 <!-- ************************************************************************ -->

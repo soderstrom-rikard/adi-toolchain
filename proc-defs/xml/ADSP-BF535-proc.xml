@@ -682,12 +682,12 @@
 <register name="UART1_TX_NEXT_DESCR" group="UART" read-address="0xFFC01F0A" write-address="0xFFC01F0A" mask="FFFF" type="IO" description="" bit-size="16"/>
 <register name="UART1_TX_DESCR_RDY" group="UART" read-address="0xFFC01F0C" write-address="0xFFC01F0C" mask="FFFF" type="IO" description="" bit-size="16"/>
 <register name="UART1_TX_IRQSTAT" group="UART" read-address="0xFFC01F0E" write-address="0xFFC01F0E" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="PLL_CTL" group="PLL Register File" read-address="0xFFC00400" write-address="0xFFC00400" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
-<register name="PLL_STAT" group="PLL Register File" read-address="0xFFC00404" write-address="0xFFC00404" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
-<register name="PLL_LOCKCNT" group="PLL Register File" read-address="0xFFC00406" write-address="0xFFC00406" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
-<register name="PLL_IOCK" group="PLL Register File" read-address="0xFFC00408" write-address="0xFFC00408" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SWRST" group="PLL Register File" read-address="0xFFC00410" write-address="0xFFC00410" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
-<register name="SYSCR" group="PLL Register File" read-address="0xFFC00414" write-address="0xFFC00414" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
+<register name="PLL_CTL" group="PLL" read-address="0xFFC00400" write-address="0xFFC00400" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
+<register name="PLL_STAT" group="PLL" read-address="0xFFC00404" write-address="0xFFC00404" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
+<register name="PLL_LOCKCNT" group="PLL" read-address="0xFFC00406" write-address="0xFFC00406" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
+<register name="PLL_IOCK" group="PLL" read-address="0xFFC00408" write-address="0xFFC00408" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SWRST" group="PLL" read-address="0xFFC00410" write-address="0xFFC00410" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
+<register name="SYSCR" group="PLL" read-address="0xFFC00414" write-address="0xFFC00414" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
 		<!-- ***************************************************** -->
 		<!-- define all Core MMRs here   (0xffe00000 - 0xffffffff) -->
 		<!-- ***************************************************** -->
