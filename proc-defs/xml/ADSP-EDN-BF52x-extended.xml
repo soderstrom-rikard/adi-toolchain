@@ -163,61 +163,61 @@
 <register name="PORTFIO_BOTH"  group="Port I/O" read-address="0xFFC0073C" write-address="0xFFC0073C" mask="FFFF" type="IO" description="Port F I/O Set on BOTH Edges Register" bit-size="16" target="EMU" />
 <register name="PORTFIO_INEN"  group="Port I/O" read-address="0xFFC00740" write-address="0xFFC00740" mask="FFFF" type="IO" description="Port F I/O Input Enable Register " bit-size="16" target="EMU" />
 
-<register name="SPORT0_TCR1"    group="SPORT registers" read-address="0xFFC00800" write-address="0xFFC00800" mask="FFFF" type="IO" description="SPORT0 Transmit Configuration 1 Register" bit-size="16" def-comment="SPORT0 Controller (0xFFC00800 - 0xFFC008FF)"/>
-<register name="SPORT0_TCR2"    group="SPORT registers" read-address="0xFFC00804" write-address="0xFFC00804" mask="FFFF" type="IO" description="SPORT0 Transmit Configuration 2 Register" bit-size="16"/>
-<register name="SPORT0_TCLKDIV" group="SPORT registers" read-address="0xFFC00808" write-address="0xFFC00808" mask="FFFF" type="IO" description="SPORT0 Transmit Clock Divider" bit-size="16"/>
-<register name="SPORT0_TFSDIV"  group="SPORT registers" read-address="0xFFC0080C" write-address="0xFFC0080C" mask="FFFF" type="IO" description="SPORT0 Transmit Frame Sync Divider" bit-size="16"/>
+<register name="SPORT0_TCR1"    group="SPORT" read-address="0xFFC00800" write-address="0xFFC00800" mask="FFFF" type="IO" description="SPORT0 Transmit Configuration 1 Register" bit-size="16" def-comment="SPORT0 Controller (0xFFC00800 - 0xFFC008FF)"/>
+<register name="SPORT0_TCR2"    group="SPORT" read-address="0xFFC00804" write-address="0xFFC00804" mask="FFFF" type="IO" description="SPORT0 Transmit Configuration 2 Register" bit-size="16"/>
+<register name="SPORT0_TCLKDIV" group="SPORT" read-address="0xFFC00808" write-address="0xFFC00808" mask="FFFF" type="IO" description="SPORT0 Transmit Clock Divider" bit-size="16"/>
+<register name="SPORT0_TFSDIV"  group="SPORT" read-address="0xFFC0080C" write-address="0xFFC0080C" mask="FFFF" type="IO" description="SPORT0 Transmit Frame Sync Divider" bit-size="16"/>
 
-<register name="SPORT0_TX"   group="SPORT registers" read-address="0xFFC00810" write-address="0xFFC00810" mask="FFFFFFFF" type="IO" description="SPORT0 TX Data Register" bit-size="32"/>
-<register name="SPORT0_RX"   group="SPORT registers" read-address="0xFFC00818" write-address="0xFFC00818" mask="FFFFFFFF" type="IO" description="SPORT0 RX Data Register" bit-size="32"/>
+<register name="SPORT0_TX"   group="SPORT" read-address="0xFFC00810" write-address="0xFFC00810" mask="FFFFFFFF" type="IO" description="SPORT0 TX Data Register" bit-size="32"/>
+<register name="SPORT0_RX"   group="SPORT" read-address="0xFFC00818" write-address="0xFFC00818" mask="FFFFFFFF" type="IO" description="SPORT0 RX Data Register" bit-size="32"/>
 
-<register name="SPORT0_RCR1"    group="SPORT registers" read-address="0xFFC00820" write-address="0xFFC00820" mask="FFFF" type="IO" description="SPORT0 Transmit Configuration 1 Register" bit-size="16"/>
-<register name="SPORT0_RCR2"    group="SPORT registers" read-address="0xFFC00824" write-address="0xFFC00824" mask="FFFF" type="IO" description="SPORT0 Transmit Configuration 2 Register" bit-size="16"/>
-<register name="SPORT0_RCLKDIV" group="SPORT registers" read-address="0xFFC00828" write-address="0xFFC00828" mask="FFFF" type="IO" description="SPORT0 Receive Clock Divider" bit-size="16"/>
-<register name="SPORT0_RFSDIV"  group="SPORT registers" read-address="0xFFC0082C" write-address="0xFFC0082C" mask="FFFF" type="IO" description="SPORT0 Receive Frame Sync Divider" bit-size="16"/>
+<register name="SPORT0_RCR1"    group="SPORT" read-address="0xFFC00820" write-address="0xFFC00820" mask="FFFF" type="IO" description="SPORT0 Transmit Configuration 1 Register" bit-size="16"/>
+<register name="SPORT0_RCR2"    group="SPORT" read-address="0xFFC00824" write-address="0xFFC00824" mask="FFFF" type="IO" description="SPORT0 Transmit Configuration 2 Register" bit-size="16"/>
+<register name="SPORT0_RCLKDIV" group="SPORT" read-address="0xFFC00828" write-address="0xFFC00828" mask="FFFF" type="IO" description="SPORT0 Receive Clock Divider" bit-size="16"/>
+<register name="SPORT0_RFSDIV"  group="SPORT" read-address="0xFFC0082C" write-address="0xFFC0082C" mask="FFFF" type="IO" description="SPORT0 Receive Frame Sync Divider" bit-size="16"/>
 
-<register name="SPORT0_STAT"  group="SPORT registers" read-address="0xFFC00830" write-address="0xFFC00830" mask="FFFF" type="IO" description="SPORT0 Status Register" bit-size="16"/>
-<register name="SPORT0_CHNL"  group="SPORT registers" read-address="0xFFC00834" write-address="0xFFC00834" mask="FFFF" type="IO" description="SPORT0 Current Channel Register" bit-size="16"/>
-<register name="SPORT0_MCMC1" group="SPORT registers" read-address="0xFFC00838" write-address="0xFFC00838" mask="FFFF" type="IO" description="SPORT0 Multi-Channel Configuration Register 1" bit-size="16"/>
-<register name="SPORT0_MCMC2" group="SPORT registers" read-address="0xFFC0083C" write-address="0xFFC0083C" mask="FFFF" type="IO" description="SPORT0 Multi-Channel Configuration Register 2" bit-size="16"/>
+<register name="SPORT0_STAT"  group="SPORT" read-address="0xFFC00830" write-address="0xFFC00830" mask="FFFF" type="IO" description="SPORT0 Status Register" bit-size="16"/>
+<register name="SPORT0_CHNL"  group="SPORT" read-address="0xFFC00834" write-address="0xFFC00834" mask="FFFF" type="IO" description="SPORT0 Current Channel Register" bit-size="16"/>
+<register name="SPORT0_MCMC1" group="SPORT" read-address="0xFFC00838" write-address="0xFFC00838" mask="FFFF" type="IO" description="SPORT0 Multi-Channel Configuration Register 1" bit-size="16"/>
+<register name="SPORT0_MCMC2" group="SPORT" read-address="0xFFC0083C" write-address="0xFFC0083C" mask="FFFF" type="IO" description="SPORT0 Multi-Channel Configuration Register 2" bit-size="16"/>
 
-<register name="SPORT0_MTCS0" group="SPORT registers" read-address="0xFFC00840" write-address="0xFFC00840" mask="FFFFFFFF" type="IO" description="SPORT0 Multi-Channel Transmit Select Register 0" bit-size="32"/>
-<register name="SPORT0_MTCS1" group="SPORT registers" read-address="0xFFC00844" write-address="0xFFC00844" mask="FFFFFFFF" type="IO" description="SPORT0 Multi-Channel Transmit Select Register 1" bit-size="32"/>
-<register name="SPORT0_MTCS2" group="SPORT registers" read-address="0xFFC00848" write-address="0xFFC00848" mask="FFFFFFFF" type="IO" description="SPORT0 Multi-Channel Transmit Select Register 2" bit-size="32"/>
-<register name="SPORT0_MTCS3" group="SPORT registers" read-address="0xFFC0084C" write-address="0xFFC0084C" mask="FFFFFFFF" type="IO" description="SPORT0 Multi-Channel Transmit Select Register 3" bit-size="32"/>
+<register name="SPORT0_MTCS0" group="SPORT" read-address="0xFFC00840" write-address="0xFFC00840" mask="FFFFFFFF" type="IO" description="SPORT0 Multi-Channel Transmit Select Register 0" bit-size="32"/>
+<register name="SPORT0_MTCS1" group="SPORT" read-address="0xFFC00844" write-address="0xFFC00844" mask="FFFFFFFF" type="IO" description="SPORT0 Multi-Channel Transmit Select Register 1" bit-size="32"/>
+<register name="SPORT0_MTCS2" group="SPORT" read-address="0xFFC00848" write-address="0xFFC00848" mask="FFFFFFFF" type="IO" description="SPORT0 Multi-Channel Transmit Select Register 2" bit-size="32"/>
+<register name="SPORT0_MTCS3" group="SPORT" read-address="0xFFC0084C" write-address="0xFFC0084C" mask="FFFFFFFF" type="IO" description="SPORT0 Multi-Channel Transmit Select Register 3" bit-size="32"/>
 
-<register name="SPORT0_MRCS0" group="SPORT registers" read-address="0xFFC00850" write-address="0xFFC00850" mask="FFFFFFFF" type="IO" description="SPORT0 Multi-Channel Receive Select Register 0" bit-size="32"/>
-<register name="SPORT0_MRCS1" group="SPORT registers" read-address="0xFFC00854" write-address="0xFFC00854" mask="FFFFFFFF" type="IO" description="SPORT0 Multi-Channel Receive Select Register 1" bit-size="32"/>
-<register name="SPORT0_MRCS2" group="SPORT registers" read-address="0xFFC00858" write-address="0xFFC00858" mask="FFFFFFFF" type="IO" description="SPORT0 Multi-Channel Receive Select Register 2" bit-size="32"/>
-<register name="SPORT0_MRCS3" group="SPORT registers" read-address="0xFFC0085C" write-address="0xFFC0085C" mask="FFFFFFFF" type="IO" description="SPORT0 Multi-Channel Receive Select Register 3" bit-size="32"/>
+<register name="SPORT0_MRCS0" group="SPORT" read-address="0xFFC00850" write-address="0xFFC00850" mask="FFFFFFFF" type="IO" description="SPORT0 Multi-Channel Receive Select Register 0" bit-size="32"/>
+<register name="SPORT0_MRCS1" group="SPORT" read-address="0xFFC00854" write-address="0xFFC00854" mask="FFFFFFFF" type="IO" description="SPORT0 Multi-Channel Receive Select Register 1" bit-size="32"/>
+<register name="SPORT0_MRCS2" group="SPORT" read-address="0xFFC00858" write-address="0xFFC00858" mask="FFFFFFFF" type="IO" description="SPORT0 Multi-Channel Receive Select Register 2" bit-size="32"/>
+<register name="SPORT0_MRCS3" group="SPORT" read-address="0xFFC0085C" write-address="0xFFC0085C" mask="FFFFFFFF" type="IO" description="SPORT0 Multi-Channel Receive Select Register 3" bit-size="32"/>
 
-<register name="SPORT1_TCR1"    group="SPORT registers" read-address="0xFFC00900" write-address="0xFFC00900" mask="FFFF" type="IO" description="SPORT1 Transmit Configuration 1 Register" bit-size="16" def-comment="SPORT1 Controller (0xFFC00900 - 0xFFC009FF)"/>
-<register name="SPORT1_TCR2"    group="SPORT registers" read-address="0xFFC00904" write-address="0xFFC00904" mask="FFFF" type="IO" description="SPORT1 Transmit Configuration 2 Register" bit-size="16"/>
-<register name="SPORT1_TCLKDIV" group="SPORT registers" read-address="0xFFC00908" write-address="0xFFC00908" mask="FFFF" type="IO" description="SPORT1 Transmit Clock Divider" bit-size="16"/>
-<register name="SPORT1_TFSDIV"  group="SPORT registers" read-address="0xFFC0090C" write-address="0xFFC0090C" mask="FFFF" type="IO" description="SPORT1 Transmit Frame Sync Divider" bit-size="16"/>
+<register name="SPORT1_TCR1"    group="SPORT" read-address="0xFFC00900" write-address="0xFFC00900" mask="FFFF" type="IO" description="SPORT1 Transmit Configuration 1 Register" bit-size="16" def-comment="SPORT1 Controller (0xFFC00900 - 0xFFC009FF)"/>
+<register name="SPORT1_TCR2"    group="SPORT" read-address="0xFFC00904" write-address="0xFFC00904" mask="FFFF" type="IO" description="SPORT1 Transmit Configuration 2 Register" bit-size="16"/>
+<register name="SPORT1_TCLKDIV" group="SPORT" read-address="0xFFC00908" write-address="0xFFC00908" mask="FFFF" type="IO" description="SPORT1 Transmit Clock Divider" bit-size="16"/>
+<register name="SPORT1_TFSDIV"  group="SPORT" read-address="0xFFC0090C" write-address="0xFFC0090C" mask="FFFF" type="IO" description="SPORT1 Transmit Frame Sync Divider" bit-size="16"/>
 
-<register name="SPORT1_TX" group="SPORT registers" read-address="0xFFC00910" write-address="0xFFC00910" mask="FFFFFFFF" type="IO" description="SPORT1 TX Data Register" bit-size="32"/>
-<register name="SPORT1_RX" group="SPORT registers" read-address="0xFFC00918" write-address="0xFFC00918" mask="FFFFFFFF" type="IO" description="SPORT1 RX Data Register" bit-size="32"/>
+<register name="SPORT1_TX" group="SPORT" read-address="0xFFC00910" write-address="0xFFC00910" mask="FFFFFFFF" type="IO" description="SPORT1 TX Data Register" bit-size="32"/>
+<register name="SPORT1_RX" group="SPORT" read-address="0xFFC00918" write-address="0xFFC00918" mask="FFFFFFFF" type="IO" description="SPORT1 RX Data Register" bit-size="32"/>
 
-<register name="SPORT1_RCR1"    group="SPORT registers" read-address="0xFFC00920" write-address="0xFFC00920" mask="FFFF" type="IO" description="SPORT1 Transmit Configuration 1 Register" bit-size="16"/>
-<register name="SPORT1_RCR2"    group="SPORT registers" read-address="0xFFC00924" write-address="0xFFC00924" mask="FFFF" type="IO" description="SPORT1 Transmit Configuration 2 Register" bit-size="16"/>
-<register name="SPORT1_RCLKDIV" group="SPORT registers" read-address="0xFFC00928" write-address="0xFFC00928" mask="FFFF" type="IO" description="SPORT1 Receive Clock Divider" bit-size="16"/>
-<register name="SPORT1_RFSDIV"  group="SPORT registers" read-address="0xFFC0092C" write-address="0xFFC0092C" mask="FFFF" type="IO" description="SPORT1 Receive Frame Sync Divider" bit-size="16"/>
+<register name="SPORT1_RCR1"    group="SPORT" read-address="0xFFC00920" write-address="0xFFC00920" mask="FFFF" type="IO" description="SPORT1 Transmit Configuration 1 Register" bit-size="16"/>
+<register name="SPORT1_RCR2"    group="SPORT" read-address="0xFFC00924" write-address="0xFFC00924" mask="FFFF" type="IO" description="SPORT1 Transmit Configuration 2 Register" bit-size="16"/>
+<register name="SPORT1_RCLKDIV" group="SPORT" read-address="0xFFC00928" write-address="0xFFC00928" mask="FFFF" type="IO" description="SPORT1 Receive Clock Divider" bit-size="16"/>
+<register name="SPORT1_RFSDIV"  group="SPORT" read-address="0xFFC0092C" write-address="0xFFC0092C" mask="FFFF" type="IO" description="SPORT1 Receive Frame Sync Divider" bit-size="16"/>
 
-<register name="SPORT1_STAT" group="SPORT registers" read-address="0xFFC00930" write-address="0xFFC00930" mask="FFFF" type="IO" description="SPORT1 Status Register" bit-size="16"/>
-<register name="SPORT1_CHNL" group="SPORT registers" read-address="0xFFC00934" write-address="0xFFC00934" mask="FFFF" type="IO" description="SPORT1 Current Channel Register" bit-size="16"/>
-<register name="SPORT1_MCMC1" group="SPORT registers" read-address="0xFFC00938" write-address="0xFFC00938" mask="FFFF" type="IO" description="SPORT1 Multi-Channel Configuration Register 1" bit-size="16"/>
-<register name="SPORT1_MCMC2" group="SPORT registers" read-address="0xFFC0093C" write-address="0xFFC0093C" mask="FFFF" type="IO" description="SPORT1 Multi-Channel Configuration Register 2" bit-size="16"/>
+<register name="SPORT1_STAT" group="SPORT" read-address="0xFFC00930" write-address="0xFFC00930" mask="FFFF" type="IO" description="SPORT1 Status Register" bit-size="16"/>
+<register name="SPORT1_CHNL" group="SPORT" read-address="0xFFC00934" write-address="0xFFC00934" mask="FFFF" type="IO" description="SPORT1 Current Channel Register" bit-size="16"/>
+<register name="SPORT1_MCMC1" group="SPORT" read-address="0xFFC00938" write-address="0xFFC00938" mask="FFFF" type="IO" description="SPORT1 Multi-Channel Configuration Register 1" bit-size="16"/>
+<register name="SPORT1_MCMC2" group="SPORT" read-address="0xFFC0093C" write-address="0xFFC0093C" mask="FFFF" type="IO" description="SPORT1 Multi-Channel Configuration Register 2" bit-size="16"/>
 
-<register name="SPORT1_MTCS0" group="SPORT registers" read-address="0xFFC00940" write-address="0xFFC00940" mask="FFFFFFFF" type="IO" description="SPORT1 Multi-Channel Transmit Select Register 0" bit-size="32"/>
-<register name="SPORT1_MTCS1" group="SPORT registers" read-address="0xFFC00944" write-address="0xFFC00944" mask="FFFFFFFF" type="IO" description="SPORT1 Multi-Channel Transmit Select Register 1" bit-size="32"/>
-<register name="SPORT1_MTCS2" group="SPORT registers" read-address="0xFFC00948" write-address="0xFFC00948" mask="FFFFFFFF" type="IO" description="SPORT1 Multi-Channel Transmit Select Register 2" bit-size="32"/>
-<register name="SPORT1_MTCS3" group="SPORT registers" read-address="0xFFC0094C" write-address="0xFFC0094C" mask="FFFFFFFF" type="IO" description="SPORT1 Multi-Channel Transmit Select Register 3" bit-size="32"/>
+<register name="SPORT1_MTCS0" group="SPORT" read-address="0xFFC00940" write-address="0xFFC00940" mask="FFFFFFFF" type="IO" description="SPORT1 Multi-Channel Transmit Select Register 0" bit-size="32"/>
+<register name="SPORT1_MTCS1" group="SPORT" read-address="0xFFC00944" write-address="0xFFC00944" mask="FFFFFFFF" type="IO" description="SPORT1 Multi-Channel Transmit Select Register 1" bit-size="32"/>
+<register name="SPORT1_MTCS2" group="SPORT" read-address="0xFFC00948" write-address="0xFFC00948" mask="FFFFFFFF" type="IO" description="SPORT1 Multi-Channel Transmit Select Register 2" bit-size="32"/>
+<register name="SPORT1_MTCS3" group="SPORT" read-address="0xFFC0094C" write-address="0xFFC0094C" mask="FFFFFFFF" type="IO" description="SPORT1 Multi-Channel Transmit Select Register 3" bit-size="32"/>
 
-<register name="SPORT1_MRCS0" group="SPORT registers" read-address="0xFFC00950" write-address="0xFFC00950" mask="FFFFFFFF" type="IO" description="SPORT1 Multi-Channel Receive Select Register 0" bit-size="32"/>
-<register name="SPORT1_MRCS1" group="SPORT registers" read-address="0xFFC00954" write-address="0xFFC00954" mask="FFFFFFFF" type="IO" description="SPORT1 Multi-Channel Receive Select Register 1" bit-size="32"/>
-<register name="SPORT1_MRCS2" group="SPORT registers" read-address="0xFFC00958" write-address="0xFFC00958" mask="FFFFFFFF" type="IO" description="SPORT1 Multi-Channel Receive Select Register 2" bit-size="32"/>
-<register name="SPORT1_MRCS3" group="SPORT registers" read-address="0xFFC0095C" write-address="0xFFC0095C" mask="FFFFFFFF" type="IO" description="SPORT1 Multi-Channel Receive Select Register 3" bit-size="32"/>
+<register name="SPORT1_MRCS0" group="SPORT" read-address="0xFFC00950" write-address="0xFFC00950" mask="FFFFFFFF" type="IO" description="SPORT1 Multi-Channel Receive Select Register 0" bit-size="32"/>
+<register name="SPORT1_MRCS1" group="SPORT" read-address="0xFFC00954" write-address="0xFFC00954" mask="FFFFFFFF" type="IO" description="SPORT1 Multi-Channel Receive Select Register 1" bit-size="32"/>
+<register name="SPORT1_MRCS2" group="SPORT" read-address="0xFFC00958" write-address="0xFFC00958" mask="FFFFFFFF" type="IO" description="SPORT1 Multi-Channel Receive Select Register 2" bit-size="32"/>
+<register name="SPORT1_MRCS3" group="SPORT" read-address="0xFFC0095C" write-address="0xFFC0095C" mask="FFFFFFFF" type="IO" description="SPORT1 Multi-Channel Receive Select Register 3" bit-size="32"/>
 
 		<!-- External Bus Interface Unit Registers -->
 <register name="EBIU_AMGCTL"  group="External Bus Interface Unit" bit-size="16" read-address="0xFFC00A00" write-address="0xFFC00A00" type="IO" description="Asynchronous Memory Global Control Register" def-header="Asynchronous Memory Controller - External Bus Interface Unit" def-comment="External Bus Interface Unit (0xFFC00A00 - 0xFFC00AFF)" target="EMU"/>

@@ -809,94 +809,94 @@
 		<register name="FIO_BOTH"    group="Extended Registers" description="" bit-size="16" read-address="0xFFC02418" write-address="0xFFC02418" type="IO" target="EMU"/>
 
 		<!-- SPORT0 Controller Registers -->
-		<register name="SPORT0_TX_CONFIG"        group="Extended Registers" description="" bit-size="16" read-address="0xFFC02800" write-address="0xFFC02800" type="IO" target="EMU"/>
-		<register name="SPORT0_RX_CONFIG"        group="Extended Registers" description="" bit-size="16" read-address="0xFFC02802" write-address="0xFFC02802" type="IO" target="EMU"/>
-		<register name="SPORT0_TX"               group="Extended Registers" description="" bit-size="16" read-address="0xFFC02804" write-address="0xFFC02804" type="IO" target="EMU"/>
-		<register name="SPORT0_RX"               group="Extended Registers" description="" bit-size="16" read-address="0xFFC02806" write-address="0xFFC02806" type="IO" target="EMU"/>
-		<register name="SPORT0_TSCLKDIV"         group="Extended Registers" description="" bit-size="16" read-address="0xFFC02808" write-address="0xFFC02808" type="IO" target="EMU"/>
-		<register name="SPORT0_RSCLKDIV"         group="Extended Registers" description="" bit-size="16" read-address="0xFFC0280A" write-address="0xFFC0280A" type="IO" target="EMU"/>
-		<register name="SPORT0_TFSDIV"           group="Extended Registers" description="" bit-size="16" read-address="0xFFC0280C" write-address="0xFFC0280C" type="IO" target="EMU"/>
-		<register name="SPORT0_RFSDIV"           group="Extended Registers" description="" bit-size="16" read-address="0xFFC0280E" write-address="0xFFC0280E" type="IO" target="EMU"/>
-		<register name="SPORT0_STAT"             group="Extended Registers" description="" bit-size="16" read-address="0xFFC02810" write-address="0xFFC02810" type="IO" target="EMU"/>
-		<register name="SPORT0_MTCS0"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02812" write-address="0xFFC02812" type="IO" target="EMU"/>
-		<register name="SPORT0_MTCS1"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02814" write-address="0xFFC02814" type="IO" target="EMU"/>
-		<register name="SPORT0_MTCS2"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02816" write-address="0xFFC02816" type="IO" target="EMU"/>
-		<register name="SPORT0_MTCS3"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02818" write-address="0xFFC02818" type="IO" target="EMU"/>
-		<register name="SPORT0_MTCS4"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC0281A" write-address="0xFFC0281A" type="IO" target="EMU"/>
-		<register name="SPORT0_MTCS5"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC0281C" write-address="0xFFC0281C" type="IO" target="EMU"/>
-		<register name="SPORT0_MTCS6"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC0281E" write-address="0xFFC0281E" type="IO" target="EMU"/>
-		<register name="SPORT0_MTCS7"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02820" write-address="0xFFC02820" type="IO" target="EMU"/>
-		<register name="SPORT0_MRCS0"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02822" write-address="0xFFC02822" type="IO" target="EMU"/>
-		<register name="SPORT0_MRCS1"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02824" write-address="0xFFC02824" type="IO" target="EMU"/>
-		<register name="SPORT0_MRCS2"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02826" write-address="0xFFC02826" type="IO" target="EMU"/>
-		<register name="SPORT0_MRCS3"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02828" write-address="0xFFC02828" type="IO" target="EMU"/>
-		<register name="SPORT0_MRCS4"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC0282A" write-address="0xFFC0282A" type="IO" target="EMU"/>
-		<register name="SPORT0_MRCS5"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC0282C" write-address="0xFFC0282C" type="IO" target="EMU"/>
-		<register name="SPORT0_MRCS6"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC0282E" write-address="0xFFC0282E" type="IO" target="EMU"/>
-		<register name="SPORT0_MRCS7"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02830" write-address="0xFFC02830" type="IO" target="EMU"/>
-		<register name="SPORT0_MCMC1"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02832" write-address="0xFFC02832" type="IO" target="EMU"/>
-		<register name="SPORT0_MCMC2"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02834" write-address="0xFFC02834" type="IO" target="EMU"/>
-		<register name="SPORT0_CURR_PTR_RX"      group="Extended Registers" description="" bit-size="16" read-address="0xFFC02A00" write-address="0xFFC02A00" type="IO" target="EMU"/>
-		<register name="SPORT0_CONFIG_DMA_RX"    group="Extended Registers" description="" bit-size="16" read-address="0xFFC02A02" write-address="0xFFC02A02" type="IO" target="EMU"/>
-		<register name="SPORT0_START_ADDR_HI_RX" group="Extended Registers" description="" bit-size="16" read-address="0xFFC02A04" write-address="0xFFC02A04" type="IO" target="EMU"/>
-		<register name="SPORT0_START_ADDR_LO_RX" group="Extended Registers" description="" bit-size="16" read-address="0xFFC02A06" write-address="0xFFC02A06" type="IO" target="EMU"/>
-		<register name="SPORT0_COUNT_RX"         group="Extended Registers" description="" bit-size="16" read-address="0xFFC02A08" write-address="0xFFC02A08" type="IO" target="EMU"/>
-		<register name="SPORT0_NEXT_DESCR_RX"    group="Extended Registers" description="" bit-size="16" read-address="0xFFC02A0A" write-address="0xFFC02A0A" type="IO" target="EMU"/>
-		<register name="SPORT0_DESCR_RDY_RX"     group="Extended Registers" description="" bit-size="16" read-address="0xFFC02A0C" write-address="0xFFC02A0C" type="IO" target="EMU"/>
-		<register name="SPORT0_IRQSTAT_RX"       group="Extended Registers" description="" bit-size="16" read-address="0xFFC02A0E" write-address="0xFFC02A0E" type="IO" target="EMU"/>
-		<register name="SPORT0_CURR_PTR_TX"      group="Extended Registers" description="" bit-size="16" read-address="0xFFC02B00" write-address="0xFFC02B00" type="IO" target="EMU"/>
-		<register name="SPORT0_CONFIG_DMA_TX"    group="Extended Registers" description="" bit-size="16" read-address="0xFFC02B02" write-address="0xFFC02B02" type="IO" target="EMU"/>
-		<register name="SPORT0_START_ADDR_HI_TX" group="Extended Registers" description="" bit-size="16" read-address="0xFFC02B04" write-address="0xFFC02B04" type="IO" target="EMU"/>
-		<register name="SPORT0_START_ADDR_LO_TX" group="Extended Registers" description="" bit-size="16" read-address="0xFFC02B06" write-address="0xFFC02B06" type="IO" target="EMU"/>
-		<register name="SPORT0_COUNT_TX"         group="Extended Registers" description="" bit-size="16" read-address="0xFFC02B08" write-address="0xFFC02B08" type="IO" target="EMU"/>
-		<register name="SPORT0_NEXT_DESCR_TX"    group="Extended Registers" description="" bit-size="16" read-address="0xFFC02B0A" write-address="0xFFC02B0A" type="IO" target="EMU"/>
-		<register name="SPORT0_DESCR_RDY_TX"     group="Extended Registers" description="" bit-size="16" read-address="0xFFC02B0C" write-address="0xFFC02B0C" type="IO" target="EMU"/>
-		<register name="SPORT0_IRQSTAT_TX"       group="Extended Registers" description="" bit-size="16" read-address="0xFFC02B0E" write-address="0xFFC02B0E" type="IO" target="EMU"/>
+		<register name="SPORT0_TX_CONFIG"        group="SPORT" description="" bit-size="16" read-address="0xFFC02800" write-address="0xFFC02800" type="IO" target="EMU"/>
+		<register name="SPORT0_RX_CONFIG"        group="SPORT" description="" bit-size="16" read-address="0xFFC02802" write-address="0xFFC02802" type="IO" target="EMU"/>
+		<register name="SPORT0_TX"               group="SPORT" description="" bit-size="16" read-address="0xFFC02804" write-address="0xFFC02804" type="IO" target="EMU"/>
+		<register name="SPORT0_RX"               group="SPORT" description="" bit-size="16" read-address="0xFFC02806" write-address="0xFFC02806" type="IO" target="EMU"/>
+		<register name="SPORT0_TSCLKDIV"         group="SPORT" description="" bit-size="16" read-address="0xFFC02808" write-address="0xFFC02808" type="IO" target="EMU"/>
+		<register name="SPORT0_RSCLKDIV"         group="SPORT" description="" bit-size="16" read-address="0xFFC0280A" write-address="0xFFC0280A" type="IO" target="EMU"/>
+		<register name="SPORT0_TFSDIV"           group="SPORT" description="" bit-size="16" read-address="0xFFC0280C" write-address="0xFFC0280C" type="IO" target="EMU"/>
+		<register name="SPORT0_RFSDIV"           group="SPORT" description="" bit-size="16" read-address="0xFFC0280E" write-address="0xFFC0280E" type="IO" target="EMU"/>
+		<register name="SPORT0_STAT"             group="SPORT" description="" bit-size="16" read-address="0xFFC02810" write-address="0xFFC02810" type="IO" target="EMU"/>
+		<register name="SPORT0_MTCS0"            group="SPORT" description="" bit-size="16" read-address="0xFFC02812" write-address="0xFFC02812" type="IO" target="EMU"/>
+		<register name="SPORT0_MTCS1"            group="SPORT" description="" bit-size="16" read-address="0xFFC02814" write-address="0xFFC02814" type="IO" target="EMU"/>
+		<register name="SPORT0_MTCS2"            group="SPORT" description="" bit-size="16" read-address="0xFFC02816" write-address="0xFFC02816" type="IO" target="EMU"/>
+		<register name="SPORT0_MTCS3"            group="SPORT" description="" bit-size="16" read-address="0xFFC02818" write-address="0xFFC02818" type="IO" target="EMU"/>
+		<register name="SPORT0_MTCS4"            group="SPORT" description="" bit-size="16" read-address="0xFFC0281A" write-address="0xFFC0281A" type="IO" target="EMU"/>
+		<register name="SPORT0_MTCS5"            group="SPORT" description="" bit-size="16" read-address="0xFFC0281C" write-address="0xFFC0281C" type="IO" target="EMU"/>
+		<register name="SPORT0_MTCS6"            group="SPORT" description="" bit-size="16" read-address="0xFFC0281E" write-address="0xFFC0281E" type="IO" target="EMU"/>
+		<register name="SPORT0_MTCS7"            group="SPORT" description="" bit-size="16" read-address="0xFFC02820" write-address="0xFFC02820" type="IO" target="EMU"/>
+		<register name="SPORT0_MRCS0"            group="SPORT" description="" bit-size="16" read-address="0xFFC02822" write-address="0xFFC02822" type="IO" target="EMU"/>
+		<register name="SPORT0_MRCS1"            group="SPORT" description="" bit-size="16" read-address="0xFFC02824" write-address="0xFFC02824" type="IO" target="EMU"/>
+		<register name="SPORT0_MRCS2"            group="SPORT" description="" bit-size="16" read-address="0xFFC02826" write-address="0xFFC02826" type="IO" target="EMU"/>
+		<register name="SPORT0_MRCS3"            group="SPORT" description="" bit-size="16" read-address="0xFFC02828" write-address="0xFFC02828" type="IO" target="EMU"/>
+		<register name="SPORT0_MRCS4"            group="SPORT" description="" bit-size="16" read-address="0xFFC0282A" write-address="0xFFC0282A" type="IO" target="EMU"/>
+		<register name="SPORT0_MRCS5"            group="SPORT" description="" bit-size="16" read-address="0xFFC0282C" write-address="0xFFC0282C" type="IO" target="EMU"/>
+		<register name="SPORT0_MRCS6"            group="SPORT" description="" bit-size="16" read-address="0xFFC0282E" write-address="0xFFC0282E" type="IO" target="EMU"/>
+		<register name="SPORT0_MRCS7"            group="SPORT" description="" bit-size="16" read-address="0xFFC02830" write-address="0xFFC02830" type="IO" target="EMU"/>
+		<register name="SPORT0_MCMC1"            group="SPORT" description="" bit-size="16" read-address="0xFFC02832" write-address="0xFFC02832" type="IO" target="EMU"/>
+		<register name="SPORT0_MCMC2"            group="SPORT" description="" bit-size="16" read-address="0xFFC02834" write-address="0xFFC02834" type="IO" target="EMU"/>
+		<register name="SPORT0_CURR_PTR_RX"      group="SPORT" description="" bit-size="16" read-address="0xFFC02A00" write-address="0xFFC02A00" type="IO" target="EMU"/>
+		<register name="SPORT0_CONFIG_DMA_RX"    group="SPORT" description="" bit-size="16" read-address="0xFFC02A02" write-address="0xFFC02A02" type="IO" target="EMU"/>
+		<register name="SPORT0_START_ADDR_HI_RX" group="SPORT" description="" bit-size="16" read-address="0xFFC02A04" write-address="0xFFC02A04" type="IO" target="EMU"/>
+		<register name="SPORT0_START_ADDR_LO_RX" group="SPORT" description="" bit-size="16" read-address="0xFFC02A06" write-address="0xFFC02A06" type="IO" target="EMU"/>
+		<register name="SPORT0_COUNT_RX"         group="SPORT" description="" bit-size="16" read-address="0xFFC02A08" write-address="0xFFC02A08" type="IO" target="EMU"/>
+		<register name="SPORT0_NEXT_DESCR_RX"    group="SPORT" description="" bit-size="16" read-address="0xFFC02A0A" write-address="0xFFC02A0A" type="IO" target="EMU"/>
+		<register name="SPORT0_DESCR_RDY_RX"     group="SPORT" description="" bit-size="16" read-address="0xFFC02A0C" write-address="0xFFC02A0C" type="IO" target="EMU"/>
+		<register name="SPORT0_IRQSTAT_RX"       group="SPORT" description="" bit-size="16" read-address="0xFFC02A0E" write-address="0xFFC02A0E" type="IO" target="EMU"/>
+		<register name="SPORT0_CURR_PTR_TX"      group="SPORT" description="" bit-size="16" read-address="0xFFC02B00" write-address="0xFFC02B00" type="IO" target="EMU"/>
+		<register name="SPORT0_CONFIG_DMA_TX"    group="SPORT" description="" bit-size="16" read-address="0xFFC02B02" write-address="0xFFC02B02" type="IO" target="EMU"/>
+		<register name="SPORT0_START_ADDR_HI_TX" group="SPORT" description="" bit-size="16" read-address="0xFFC02B04" write-address="0xFFC02B04" type="IO" target="EMU"/>
+		<register name="SPORT0_START_ADDR_LO_TX" group="SPORT" description="" bit-size="16" read-address="0xFFC02B06" write-address="0xFFC02B06" type="IO" target="EMU"/>
+		<register name="SPORT0_COUNT_TX"         group="SPORT" description="" bit-size="16" read-address="0xFFC02B08" write-address="0xFFC02B08" type="IO" target="EMU"/>
+		<register name="SPORT0_NEXT_DESCR_TX"    group="SPORT" description="" bit-size="16" read-address="0xFFC02B0A" write-address="0xFFC02B0A" type="IO" target="EMU"/>
+		<register name="SPORT0_DESCR_RDY_TX"     group="SPORT" description="" bit-size="16" read-address="0xFFC02B0C" write-address="0xFFC02B0C" type="IO" target="EMU"/>
+		<register name="SPORT0_IRQSTAT_TX"       group="SPORT" description="" bit-size="16" read-address="0xFFC02B0E" write-address="0xFFC02B0E" type="IO" target="EMU"/>
 
 		<!-- SPORT1 Controller Registers -->
-		<register name="SPORT1_TX_CONFIG"        group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C00" write-address="0xFFC02C00" type="IO" target="EMU"/>
-		<register name="SPORT1_RX_CONFIG"        group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C02" write-address="0xFFC02C02" type="IO" target="EMU"/>
-		<register name="SPORT1_TX"               group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C04" write-address="0xFFC02C04" type="IO" target="EMU"/>
-		<register name="SPORT1_RX"               group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C06" write-address="0xFFC02C06" type="IO" target="EMU"/>
-		<register name="SPORT1_TSCLKDIV"         group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C08" write-address="0xFFC02C08" type="IO" target="EMU"/>
-		<register name="SPORT1_RSCLKDIV"         group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C0A" write-address="0xFFC02C0A" type="IO" target="EMU"/>
-		<register name="SPORT1_TFSDIV"           group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C0C" write-address="0xFFC02C0C" type="IO" target="EMU"/>
-		<register name="SPORT1_RFSDIV"           group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C0E" write-address="0xFFC02C0E" type="IO" target="EMU"/>
-		<register name="SPORT1_STAT"             group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C10" write-address="0xFFC02C10" type="IO" target="EMU"/>
-		<register name="SPORT1_MTCS0"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C12" write-address="0xFFC02C12" type="IO" target="EMU"/>
-		<register name="SPORT1_MTCS1"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C14" write-address="0xFFC02C14" type="IO" target="EMU"/>
-		<register name="SPORT1_MTCS2"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C16" write-address="0xFFC02C16" type="IO" target="EMU"/>
-		<register name="SPORT1_MTCS3"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C18" write-address="0xFFC02C18" type="IO" target="EMU"/>
-		<register name="SPORT1_MTCS4"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C1A" write-address="0xFFC02C1A" type="IO" target="EMU"/>
-		<register name="SPORT1_MTCS5"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C1C" write-address="0xFFC02C1C" type="IO" target="EMU"/>
-		<register name="SPORT1_MTCS6"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C1E" write-address="0xFFC02C1E" type="IO" target="EMU"/>
-		<register name="SPORT1_MTCS7"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C20" write-address="0xFFC02C20" type="IO" target="EMU"/>
-		<register name="SPORT1_MRCS0"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C22" write-address="0xFFC02C22" type="IO" target="EMU"/>
-		<register name="SPORT1_MRCS1"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C24" write-address="0xFFC02C24" type="IO" target="EMU"/>
-		<register name="SPORT1_MRCS2"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C26" write-address="0xFFC02C26" type="IO" target="EMU"/>
-		<register name="SPORT1_MRCS3"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C28" write-address="0xFFC02C28" type="IO" target="EMU"/>
-		<register name="SPORT1_MRCS4"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C2A" write-address="0xFFC02C2A" type="IO" target="EMU"/>
-		<register name="SPORT1_MRCS5"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C2C" write-address="0xFFC02C2C" type="IO" target="EMU"/>
-		<register name="SPORT1_MRCS6"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C2E" write-address="0xFFC02C2E" type="IO" target="EMU"/>
-		<register name="SPORT1_MRCS7"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C30" write-address="0xFFC02C30" type="IO" target="EMU"/>
-		<register name="SPORT1_MCMC1"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C32" write-address="0xFFC02C32" type="IO" target="EMU"/>
-		<register name="SPORT1_MCMC2"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC02C34" write-address="0xFFC02C34" type="IO" target="EMU"/>
-		<register name="SPORT1_CURR_PTR_RX"      group="Extended Registers" description="" bit-size="16" read-address="0xFFC02E00" write-address="0xFFC02E00" type="IO" target="EMU"/>
-		<register name="SPORT1_CONFIG_DMA_RX"    group="Extended Registers" description="" bit-size="16" read-address="0xFFC02E02" write-address="0xFFC02E02" type="IO" target="EMU"/>
-		<register name="SPORT1_START_ADDR_HI_RX" group="Extended Registers" description="" bit-size="16" read-address="0xFFC02E04" write-address="0xFFC02E04" type="IO" target="EMU"/>
-		<register name="SPORT1_START_ADDR_LO_RX" group="Extended Registers" description="" bit-size="16" read-address="0xFFC02E06" write-address="0xFFC02E06" type="IO" target="EMU"/>
-		<register name="SPORT1_COUNT_RX"         group="Extended Registers" description="" bit-size="16" read-address="0xFFC02E08" write-address="0xFFC02E08" type="IO" target="EMU"/>
-		<register name="SPORT1_NEXT_DESCR_RX"    group="Extended Registers" description="" bit-size="16" read-address="0xFFC02E0A" write-address="0xFFC02E0A" type="IO" target="EMU"/>
-		<register name="SPORT1_DESCR_RDY_RX"     group="Extended Registers" description="" bit-size="16" read-address="0xFFC02E0C" write-address="0xFFC02E0C" type="IO" target="EMU"/>
-		<register name="SPORT1_IRQSTAT_RX"       group="Extended Registers" description="" bit-size="16" read-address="0xFFC02E0E" write-address="0xFFC02E0E" type="IO" target="EMU"/>
-		<register name="SPORT1_CURR_PTR_TX"      group="Extended Registers" description="" bit-size="16" read-address="0xFFC02F00" write-address="0xFFC02F00" type="IO" target="EMU"/>
-		<register name="SPORT1_CONFIG_DMA_TX"    group="Extended Registers" description="" bit-size="16" read-address="0xFFC02F02" write-address="0xFFC02F02" type="IO" target="EMU"/>
-		<register name="SPORT1_START_ADDR_HI_TX" group="Extended Registers" description="" bit-size="16" read-address="0xFFC02F04" write-address="0xFFC02F04" type="IO" target="EMU"/>
-		<register name="SPORT1_START_ADDR_LO_TX" group="Extended Registers" description="" bit-size="16" read-address="0xFFC02F06" write-address="0xFFC02F06" type="IO" target="EMU"/>
-		<register name="SPORT1_COUNT_TX"         group="Extended Registers" description="" bit-size="16" read-address="0xFFC02F08" write-address="0xFFC02F08" type="IO" target="EMU"/>
-		<register name="SPORT1_NEXT_DESCR_TX"    group="Extended Registers" description="" bit-size="16" read-address="0xFFC02F0A" write-address="0xFFC02F0A" type="IO" target="EMU"/>
-		<register name="SPORT1_DESCR_RDY_TX"     group="Extended Registers" description="" bit-size="16" read-address="0xFFC02F0C" write-address="0xFFC02F0C" type="IO" target="EMU"/>
-		<register name="SPORT1_IRQSTAT_TX"       group="Extended Registers" description="" bit-size="16" read-address="0xFFC02F0E" write-address="0xFFC02F0E" type="IO" target="EMU"/>
+		<register name="SPORT1_TX_CONFIG"        group="SPORT" description="" bit-size="16" read-address="0xFFC02C00" write-address="0xFFC02C00" type="IO" target="EMU"/>
+		<register name="SPORT1_RX_CONFIG"        group="SPORT" description="" bit-size="16" read-address="0xFFC02C02" write-address="0xFFC02C02" type="IO" target="EMU"/>
+		<register name="SPORT1_TX"               group="SPORT" description="" bit-size="16" read-address="0xFFC02C04" write-address="0xFFC02C04" type="IO" target="EMU"/>
+		<register name="SPORT1_RX"               group="SPORT" description="" bit-size="16" read-address="0xFFC02C06" write-address="0xFFC02C06" type="IO" target="EMU"/>
+		<register name="SPORT1_TSCLKDIV"         group="SPORT" description="" bit-size="16" read-address="0xFFC02C08" write-address="0xFFC02C08" type="IO" target="EMU"/>
+		<register name="SPORT1_RSCLKDIV"         group="SPORT" description="" bit-size="16" read-address="0xFFC02C0A" write-address="0xFFC02C0A" type="IO" target="EMU"/>
+		<register name="SPORT1_TFSDIV"           group="SPORT" description="" bit-size="16" read-address="0xFFC02C0C" write-address="0xFFC02C0C" type="IO" target="EMU"/>
+		<register name="SPORT1_RFSDIV"           group="SPORT" description="" bit-size="16" read-address="0xFFC02C0E" write-address="0xFFC02C0E" type="IO" target="EMU"/>
+		<register name="SPORT1_STAT"             group="SPORT" description="" bit-size="16" read-address="0xFFC02C10" write-address="0xFFC02C10" type="IO" target="EMU"/>
+		<register name="SPORT1_MTCS0"            group="SPORT" description="" bit-size="16" read-address="0xFFC02C12" write-address="0xFFC02C12" type="IO" target="EMU"/>
+		<register name="SPORT1_MTCS1"            group="SPORT" description="" bit-size="16" read-address="0xFFC02C14" write-address="0xFFC02C14" type="IO" target="EMU"/>
+		<register name="SPORT1_MTCS2"            group="SPORT" description="" bit-size="16" read-address="0xFFC02C16" write-address="0xFFC02C16" type="IO" target="EMU"/>
+		<register name="SPORT1_MTCS3"            group="SPORT" description="" bit-size="16" read-address="0xFFC02C18" write-address="0xFFC02C18" type="IO" target="EMU"/>
+		<register name="SPORT1_MTCS4"            group="SPORT" description="" bit-size="16" read-address="0xFFC02C1A" write-address="0xFFC02C1A" type="IO" target="EMU"/>
+		<register name="SPORT1_MTCS5"            group="SPORT" description="" bit-size="16" read-address="0xFFC02C1C" write-address="0xFFC02C1C" type="IO" target="EMU"/>
+		<register name="SPORT1_MTCS6"            group="SPORT" description="" bit-size="16" read-address="0xFFC02C1E" write-address="0xFFC02C1E" type="IO" target="EMU"/>
+		<register name="SPORT1_MTCS7"            group="SPORT" description="" bit-size="16" read-address="0xFFC02C20" write-address="0xFFC02C20" type="IO" target="EMU"/>
+		<register name="SPORT1_MRCS0"            group="SPORT" description="" bit-size="16" read-address="0xFFC02C22" write-address="0xFFC02C22" type="IO" target="EMU"/>
+		<register name="SPORT1_MRCS1"            group="SPORT" description="" bit-size="16" read-address="0xFFC02C24" write-address="0xFFC02C24" type="IO" target="EMU"/>
+		<register name="SPORT1_MRCS2"            group="SPORT" description="" bit-size="16" read-address="0xFFC02C26" write-address="0xFFC02C26" type="IO" target="EMU"/>
+		<register name="SPORT1_MRCS3"            group="SPORT" description="" bit-size="16" read-address="0xFFC02C28" write-address="0xFFC02C28" type="IO" target="EMU"/>
+		<register name="SPORT1_MRCS4"            group="SPORT" description="" bit-size="16" read-address="0xFFC02C2A" write-address="0xFFC02C2A" type="IO" target="EMU"/>
+		<register name="SPORT1_MRCS5"            group="SPORT" description="" bit-size="16" read-address="0xFFC02C2C" write-address="0xFFC02C2C" type="IO" target="EMU"/>
+		<register name="SPORT1_MRCS6"            group="SPORT" description="" bit-size="16" read-address="0xFFC02C2E" write-address="0xFFC02C2E" type="IO" target="EMU"/>
+		<register name="SPORT1_MRCS7"            group="SPORT" description="" bit-size="16" read-address="0xFFC02C30" write-address="0xFFC02C30" type="IO" target="EMU"/>
+		<register name="SPORT1_MCMC1"            group="SPORT" description="" bit-size="16" read-address="0xFFC02C32" write-address="0xFFC02C32" type="IO" target="EMU"/>
+		<register name="SPORT1_MCMC2"            group="SPORT" description="" bit-size="16" read-address="0xFFC02C34" write-address="0xFFC02C34" type="IO" target="EMU"/>
+		<register name="SPORT1_CURR_PTR_RX"      group="SPORT" description="" bit-size="16" read-address="0xFFC02E00" write-address="0xFFC02E00" type="IO" target="EMU"/>
+		<register name="SPORT1_CONFIG_DMA_RX"    group="SPORT" description="" bit-size="16" read-address="0xFFC02E02" write-address="0xFFC02E02" type="IO" target="EMU"/>
+		<register name="SPORT1_START_ADDR_HI_RX" group="SPORT" description="" bit-size="16" read-address="0xFFC02E04" write-address="0xFFC02E04" type="IO" target="EMU"/>
+		<register name="SPORT1_START_ADDR_LO_RX" group="SPORT" description="" bit-size="16" read-address="0xFFC02E06" write-address="0xFFC02E06" type="IO" target="EMU"/>
+		<register name="SPORT1_COUNT_RX"         group="SPORT" description="" bit-size="16" read-address="0xFFC02E08" write-address="0xFFC02E08" type="IO" target="EMU"/>
+		<register name="SPORT1_NEXT_DESCR_RX"    group="SPORT" description="" bit-size="16" read-address="0xFFC02E0A" write-address="0xFFC02E0A" type="IO" target="EMU"/>
+		<register name="SPORT1_DESCR_RDY_RX"     group="SPORT" description="" bit-size="16" read-address="0xFFC02E0C" write-address="0xFFC02E0C" type="IO" target="EMU"/>
+		<register name="SPORT1_IRQSTAT_RX"       group="SPORT" description="" bit-size="16" read-address="0xFFC02E0E" write-address="0xFFC02E0E" type="IO" target="EMU"/>
+		<register name="SPORT1_CURR_PTR_TX"      group="SPORT" description="" bit-size="16" read-address="0xFFC02F00" write-address="0xFFC02F00" type="IO" target="EMU"/>
+		<register name="SPORT1_CONFIG_DMA_TX"    group="SPORT" description="" bit-size="16" read-address="0xFFC02F02" write-address="0xFFC02F02" type="IO" target="EMU"/>
+		<register name="SPORT1_START_ADDR_HI_TX" group="SPORT" description="" bit-size="16" read-address="0xFFC02F04" write-address="0xFFC02F04" type="IO" target="EMU"/>
+		<register name="SPORT1_START_ADDR_LO_TX" group="SPORT" description="" bit-size="16" read-address="0xFFC02F06" write-address="0xFFC02F06" type="IO" target="EMU"/>
+		<register name="SPORT1_COUNT_TX"         group="SPORT" description="" bit-size="16" read-address="0xFFC02F08" write-address="0xFFC02F08" type="IO" target="EMU"/>
+		<register name="SPORT1_NEXT_DESCR_TX"    group="SPORT" description="" bit-size="16" read-address="0xFFC02F0A" write-address="0xFFC02F0A" type="IO" target="EMU"/>
+		<register name="SPORT1_DESCR_RDY_TX"     group="SPORT" description="" bit-size="16" read-address="0xFFC02F0C" write-address="0xFFC02F0C" type="IO" target="EMU"/>
+		<register name="SPORT1_IRQSTAT_TX"       group="SPORT" description="" bit-size="16" read-address="0xFFC02F0E" write-address="0xFFC02F0E" type="IO" target="EMU"/>
 
 		<!-- SPI0 Controller Registers -->
 		<register name="SPI0_CTL"           group="Extended Registers" description="" bit-size="16" read-address="0xFFC03000" write-address="0xFFC03000" type="IO" target="EMU"/>
