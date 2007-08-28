@@ -1309,9 +1309,9 @@
 	<register name="TBUF"     group="Trace Unit" description="Trace Buffer"                  read-address="0xFFE06100" write-address="0xFFE06100" mask="FFFFFFFF" type="IO" bit-size="32" cdef-type="ADDR"/>
 
 		<!-- Performance Monitor Registers -->
-		<register name="PFCTL"   group="Extended Registers" description="" bit-size="32" read-address="0xFFE08000" write-address="0xFFE08000" type="IO" def-comment="Performance Monitor Registers (0xFFE08000 - 0xFFE08104)"/>
-		<register name="PFCNTR0" group="Extended Registers" description="" bit-size="32" read-address="0xFFE08100" write-address="0xFFE08100" type="IO"/>
-		<register name="PFCNTR1" group="Extended Registers" description="" bit-size="32" read-address="0xFFE08104" write-address="0xFFE08104" type="IO"/>
+		<register name="PFCTL"   group="Performance Monitor" description="" bit-size="32" read-address="0xFFE08000" write-address="0xFFE08000" type="IO" def-comment="Performance Monitor Registers (0xFFE08000 - 0xFFE08104)"/>
+		<register name="PFCNTR0" group="Performance Monitor" description="" bit-size="32" read-address="0xFFE08100" write-address="0xFFE08100" type="IO"/>
+		<register name="PFCNTR1" group="Performance Monitor" description="" bit-size="32" read-address="0xFFE08104" write-address="0xFFE08104" type="IO"/>
 
 	<!-- SPORT0 children not in use and they have not been verified against BF534 HRM -->
 

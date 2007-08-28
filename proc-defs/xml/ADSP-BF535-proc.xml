@@ -711,9 +711,9 @@
 
 
 		<!-- Performance Monitor Registers -->
-		<register name="PFCTL"   group="Extended Registers" description="" bit-size="32" read-address="0xFFE08000" write-address="0xFFE08000" type="IO"/>
-		<register name="PFCNTR0" group="Extended Registers" description="" bit-size="32" read-address="0xFFE08100" write-address="0xFFE08100" type="IO"/>
-		<register name="PFCNTR1" group="Extended Registers" description="" bit-size="32" read-address="0xFFE08104" write-address="0xFFE08104" type="IO"/>
+		<register name="PFCTL"   group="Performance Monitor" description="" bit-size="32" read-address="0xFFE08000" write-address="0xFFE08000" type="IO"/>
+		<register name="PFCNTR0" group="Performance Monitor" description="" bit-size="32" read-address="0xFFE08100" write-address="0xFFE08100" type="IO"/>
+		<register name="PFCNTR1" group="Performance Monitor" description="" bit-size="32" read-address="0xFFE08104" write-address="0xFFE08104" type="IO"/>
 
 
 		<!-- ***************************************************** -->
@@ -726,12 +726,12 @@
 		<register name="WDOG_STAT" group="Watchdog" description="" bit-size="32"  read-address="0xFFC01008" write-address="0xFFC01008" type="IO" target="EMU"/>
 
 		<!-- Real-Time Clock Registers -->
-		<register name="RTC_STAT"  group="Extended Registers" description="" bit-size="32" read-address="0xFFC01400" write-address="0xFFC01400" type="IO" target="EMU"/>
-		<register name="RTC_ICTL"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC01404" write-address="0xFFC01404" type="IO" target="EMU"/>
-		<register name="RTC_ISTAT" group="Extended Registers" description="" bit-size="16" read-address="0xFFC01408" write-address="0xFFC01408" type="IO" target="EMU"/>
-		<register name="RTC_SWCNT" group="Extended Registers" description="" bit-size="16" read-address="0xFFC0140C" write-address="0xFFC0140C" type="IO" target="EMU"/>
-		<register name="RTC_ALARM" group="Extended Registers" description="" bit-size="32" read-address="0xFFC01410" write-address="0xFFC01410" type="IO" target="EMU"/>
-		<register name="RTC_FAST"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC01414" write-address="0xFFC01414" type="IO" target="EMU"/>
+		<register name="RTC_STAT"  group="RTC" description="" bit-size="32" read-address="0xFFC01400" write-address="0xFFC01400" type="IO" target="EMU"/>
+		<register name="RTC_ICTL"  group="RTC" description="" bit-size="16" read-address="0xFFC01404" write-address="0xFFC01404" type="IO" target="EMU"/>
+		<register name="RTC_ISTAT" group="RTC" description="" bit-size="16" read-address="0xFFC01408" write-address="0xFFC01408" type="IO" target="EMU"/>
+		<register name="RTC_SWCNT" group="RTC" description="" bit-size="16" read-address="0xFFC0140C" write-address="0xFFC0140C" type="IO" target="EMU"/>
+		<register name="RTC_ALARM" group="RTC" description="" bit-size="32" read-address="0xFFC01410" write-address="0xFFC01410" type="IO" target="EMU"/>
+		<register name="RTC_FAST"  group="RTC" description="" bit-size="16" read-address="0xFFC01414" write-address="0xFFC01414" type="IO" target="EMU"/>
 
 		<!-- UART0 Controller Registers -->
 		<register name="UART0_IRCR"             group="UART" description="" bit-size="16" read-address="0xFFC01810" write-address="0xFFC01810" type="IO" target="EMU"/>

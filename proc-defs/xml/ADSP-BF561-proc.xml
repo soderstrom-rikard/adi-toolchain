@@ -214,9 +214,9 @@
 	<register name="TBUF"     group="Trace Unit" description="" bit-size="32" read-address="0xFFE06100" write-address="0xFFE06100" type="IO" />
 
 	<!-- Performance Monitor Registers -->
-	<register name="PFCTL"   group="Extended Registers" description="" bit-size="32" read-address="0xFFE08000" write-address="0xFFE08000" type="IO" />
-	<register name="PFCNTR0" group="Extended Registers" description="" bit-size="32" read-address="0xFFE08100" write-address="0xFFE08100" type="IO" />
-	<register name="PFCNTR1" group="Extended Registers" description="" bit-size="32" read-address="0xFFE08104" write-address="0xFFE08104" type="IO" />
+	<register name="PFCTL"   group="Performance Monitor" description="" bit-size="32" read-address="0xFFE08000" write-address="0xFFE08000" type="IO" />
+	<register name="PFCNTR0" group="Performance Monitor" description="" bit-size="32" read-address="0xFFE08100" write-address="0xFFE08100" type="IO" />
+	<register name="PFCNTR1" group="Performance Monitor" description="" bit-size="32" read-address="0xFFE08104" write-address="0xFFE08104" type="IO" />
 
 
 <!-- ************************************************************************ -->
