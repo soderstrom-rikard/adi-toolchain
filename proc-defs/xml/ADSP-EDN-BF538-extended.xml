@@ -1509,40 +1509,40 @@
 		<register name="ERR_NCOR" parent="PPI_STATUS"  bit-position="15" bit-size="1"/>
 
 		<!-- Two-Wire Interface 0 (I2C) Registers -->
-		<register name="TWI0_CLKDIV"      group="TWI Controller Registers" read-address="0xFFC01400" write-address="0xFFC01400" mask="FFFF" type="IO" target="EMU" description="Serial Clock Divider Register" bit-size="16" def-comment="Two-Wire Interface 0 (0xFFC01400 - 0xFFC014FF)"/>
-		<register name="TWI0_CONTROL"     group="TWI Controller Registers" read-address="0xFFC01404" write-address="0xFFC01404" mask="FFFF" type="IO" target="EMU" description="TWIO Master Internal Time Reference Register" bit-size="16"/>
-		<register name="TWI0_SLAVE_CTRL"  group="TWI Controller Registers" read-address="0xFFC01408" write-address="0xFFC01408" mask="FFFF" type="IO" target="EMU" description="Slave Mode Control Register" bit-size="16"/>
-		<register name="TWI0_SLAVE_STAT"  group="TWI Controller Registers" read-address="0xFFC0140C" write-address="0xFFC0140C" mask="FFFF" type="IO" target="EMU" description="Slave Mode Status Register" bit-size="16"/>
-		<register name="TWI0_SLAVE_ADDR"  group="TWI Controller Registers" read-address="0xFFC01410" write-address="0xFFC01410" mask="FFFF" type="IO" target="EMU" description="Slave Mode Address Register" bit-size="16"/>
-		<register name="TWI0_MASTER_CTRL" group="TWI Controller Registers" read-address="0xFFC01414" write-address="0xFFC01414" mask="FFFF" type="IO" target="EMU" description="Master Mode Control Register" bit-size="16"/>
-		<register name="TWI0_MASTER_STAT" group="TWI Controller Registers" read-address="0xFFC01418" write-address="0xFFC01418" mask="FFFF" type="IO" target="EMU" description="Master Mode Status Register" bit-size="16"/>
-		<register name="TWI0_MASTER_ADDR" group="TWI Controller Registers" read-address="0xFFC0141C" write-address="0xFFC0141C" mask="FFFF" type="IO" target="EMU" description="Master Mode Address Register" bit-size="16"/>
-		<register name="TWI0_INT_STAT"    group="TWI Controller Registers" read-address="0xFFC01420" write-address="0xFFC01420" mask="FFFF" type="IO" target="EMU" description="TWIO Master Interrupt Register" bit-size="16"/>
-		<register name="TWI0_INT_MASK"    group="TWI Controller Registers" read-address="0xFFC01424" write-address="0xFFC01424" mask="FFFF" type="IO" target="EMU" description="TWIO Master Interrupt Mask Register" bit-size="16"/>
-		<register name="TWI0_FIFO_CTRL"   group="TWI Controller Registers" read-address="0xFFC01428" write-address="0xFFC01428" mask="FFFF" type="IO" target="EMU" description="FIFO Control Register" bit-size="16"/>
-		<register name="TWI0_FIFO_STAT"   group="TWI Controller Registers" read-address="0xFFC0142C" write-address="0xFFC0142C" mask="FFFF" type="IO" target="EMU" description="FIFO Status Register" bit-size="16"/>
-		<register name="TWI0_XMT_DATA8"   group="TWI Controller Registers" read-address="0xFFC01480" write-address="0xFFC01480" mask="FFFF" type="IO" target="EMU" description="FIFO Transmit Data Single Byte Register" bit-size="16"/>
-		<register name="TWI0_XMT_DATA16"  group="TWI Controller Registers" read-address="0xFFC01484" write-address="0xFFC01484" mask="FFFF" type="IO" target="EMU" description="FIFO Transmit Data Double Byte Register" bit-size="16"/>
-		<register name="TWI0_RCV_DATA8"   group="TWI Controller Registers" read-address="0xFFC01488" write-address="0xFFC01488" mask="FFFF" type="IO" target="EMU" description="FIFO Receive Data Single Byte Register" bit-size="16"/>
-		<register name="TWI0_RCV_DATA16"  group="TWI Controller Registers" read-address="0xFFC0148C" write-address="0xFFC0148C" mask="FFFF" type="IO" target="EMU" description="FIFO Receive Data Double Byte Register" bit-size="16"/>
+		<register name="TWI0_CLKDIV"      group="TWI" read-address="0xFFC01400" write-address="0xFFC01400" mask="FFFF" type="IO" target="EMU" description="Serial Clock Divider Register" bit-size="16" def-comment="Two-Wire Interface 0 (0xFFC01400 - 0xFFC014FF)"/>
+		<register name="TWI0_CONTROL"     group="TWI" read-address="0xFFC01404" write-address="0xFFC01404" mask="FFFF" type="IO" target="EMU" description="TWIO Master Internal Time Reference Register" bit-size="16"/>
+		<register name="TWI0_SLAVE_CTRL"  group="TWI" read-address="0xFFC01408" write-address="0xFFC01408" mask="FFFF" type="IO" target="EMU" description="Slave Mode Control Register" bit-size="16"/>
+		<register name="TWI0_SLAVE_STAT"  group="TWI" read-address="0xFFC0140C" write-address="0xFFC0140C" mask="FFFF" type="IO" target="EMU" description="Slave Mode Status Register" bit-size="16"/>
+		<register name="TWI0_SLAVE_ADDR"  group="TWI" read-address="0xFFC01410" write-address="0xFFC01410" mask="FFFF" type="IO" target="EMU" description="Slave Mode Address Register" bit-size="16"/>
+		<register name="TWI0_MASTER_CTRL" group="TWI" read-address="0xFFC01414" write-address="0xFFC01414" mask="FFFF" type="IO" target="EMU" description="Master Mode Control Register" bit-size="16"/>
+		<register name="TWI0_MASTER_STAT" group="TWI" read-address="0xFFC01418" write-address="0xFFC01418" mask="FFFF" type="IO" target="EMU" description="Master Mode Status Register" bit-size="16"/>
+		<register name="TWI0_MASTER_ADDR" group="TWI" read-address="0xFFC0141C" write-address="0xFFC0141C" mask="FFFF" type="IO" target="EMU" description="Master Mode Address Register" bit-size="16"/>
+		<register name="TWI0_INT_STAT"    group="TWI" read-address="0xFFC01420" write-address="0xFFC01420" mask="FFFF" type="IO" target="EMU" description="TWIO Master Interrupt Register" bit-size="16"/>
+		<register name="TWI0_INT_MASK"    group="TWI" read-address="0xFFC01424" write-address="0xFFC01424" mask="FFFF" type="IO" target="EMU" description="TWIO Master Interrupt Mask Register" bit-size="16"/>
+		<register name="TWI0_FIFO_CTRL"   group="TWI" read-address="0xFFC01428" write-address="0xFFC01428" mask="FFFF" type="IO" target="EMU" description="FIFO Control Register" bit-size="16"/>
+		<register name="TWI0_FIFO_STAT"   group="TWI" read-address="0xFFC0142C" write-address="0xFFC0142C" mask="FFFF" type="IO" target="EMU" description="FIFO Status Register" bit-size="16"/>
+		<register name="TWI0_XMT_DATA8"   group="TWI" read-address="0xFFC01480" write-address="0xFFC01480" mask="FFFF" type="IO" target="EMU" description="FIFO Transmit Data Single Byte Register" bit-size="16"/>
+		<register name="TWI0_XMT_DATA16"  group="TWI" read-address="0xFFC01484" write-address="0xFFC01484" mask="FFFF" type="IO" target="EMU" description="FIFO Transmit Data Double Byte Register" bit-size="16"/>
+		<register name="TWI0_RCV_DATA8"   group="TWI" read-address="0xFFC01488" write-address="0xFFC01488" mask="FFFF" type="IO" target="EMU" description="FIFO Receive Data Single Byte Register" bit-size="16"/>
+		<register name="TWI0_RCV_DATA16"  group="TWI" read-address="0xFFC0148C" write-address="0xFFC0148C" mask="FFFF" type="IO" target="EMU" description="FIFO Receive Data Double Byte Register" bit-size="16"/>
 
 		<!-- Two-Wire Interface 1 (I2C) Registers -->
-		<register name="TWI1_CLKDIV"      group="TWI Controller Registers" read-address="0xFFC02200" write-address="0xFFC02200" mask="FFFF" type="IO" target="EMU" description="Serial Clock Divider Register" bit-size="16" def-comment="Two-Wire Interface 1 (0xFFC02200 - 0xFFC022FF)"/>
-		<register name="TWI1_CONTROL"     group="TWI Controller Registers" read-address="0xFFC02204" write-address="0xFFC02204" mask="FFFF" type="IO" target="EMU" description="TWI1 Master Internal Time Reference Register" bit-size="16"/>
-		<register name="TWI1_SLAVE_CTRL"  group="TWI Controller Registers" read-address="0xFFC02208" write-address="0xFFC02208" mask="FFFF" type="IO" target="EMU" description="Slave Mode Control Register" bit-size="16"/>
-		<register name="TWI1_SLAVE_STAT"  group="TWI Controller Registers" read-address="0xFFC0220C" write-address="0xFFC0220C" mask="FFFF" type="IO" target="EMU" description="Slave Mode Status Register" bit-size="16"/>
-		<register name="TWI1_SLAVE_ADDR"  group="TWI Controller Registers" read-address="0xFFC02210" write-address="0xFFC02210" mask="FFFF" type="IO" target="EMU" description="Slave Mode Address Register" bit-size="16"/>
-		<register name="TWI1_MASTER_CTRL" group="TWI Controller Registers" read-address="0xFFC02214" write-address="0xFFC02214" mask="FFFF" type="IO" target="EMU" description="Master Mode Control Register" bit-size="16"/>
-		<register name="TWI1_MASTER_STAT" group="TWI Controller Registers" read-address="0xFFC02218" write-address="0xFFC02218" mask="FFFF" type="IO" target="EMU" description="Master Mode Status Register" bit-size="16"/>
-		<register name="TWI1_MASTER_ADDR" group="TWI Controller Registers" read-address="0xFFC0221C" write-address="0xFFC0221C" mask="FFFF" type="IO" target="EMU" description="Master Mode Address Register" bit-size="16"/>
-		<register name="TWI1_INT_STAT"    group="TWI Controller Registers" read-address="0xFFC02220" write-address="0xFFC02220" mask="FFFF" type="IO" target="EMU" description="TWI1 Master Interrupt Register" bit-size="16"/>
-		<register name="TWI1_INT_MASK"    group="TWI Controller Registers" read-address="0xFFC02224" write-address="0xFFC02224" mask="FFFF" type="IO" target="EMU" description="TWI1 Master Interrupt Mask Register" bit-size="16"/>
-		<register name="TWI1_FIFO_CTRL"   group="TWI Controller Registers" read-address="0xFFC02228" write-address="0xFFC02228" mask="FFFF" type="IO" target="EMU" description="FIFO Control Register" bit-size="16"/>
-		<register name="TWI1_FIFO_STAT"   group="TWI Controller Registers" read-address="0xFFC0222C" write-address="0xFFC0222C" mask="FFFF" type="IO" target="EMU" description="FIFO Status Register" bit-size="16"/>
-		<register name="TWI1_XMT_DATA8"   group="TWI Controller Registers" read-address="0xFFC02280" write-address="0xFFC02280" mask="FFFF" type="IO" target="EMU" description="FIFO Transmit Data Single Byte Register" bit-size="16"/>
-		<register name="TWI1_XMT_DATA16"  group="TWI Controller Registers" read-address="0xFFC02284" write-address="0xFFC02284" mask="FFFF" type="IO" target="EMU" description="FIFO Transmit Data Double Byte Register" bit-size="16"/>
-		<register name="TWI1_RCV_DATA8"   group="TWI Controller Registers" read-address="0xFFC02288" write-address="0xFFC02288" mask="FFFF" type="IO" target="EMU" description="FIFO Receive Data Single Byte Register" bit-size="16"/>
-		<register name="TWI1_RCV_DATA16"  group="TWI Controller Registers" read-address="0xFFC0228C" write-address="0xFFC0228C" mask="FFFF" type="IO" target="EMU" description="FIFO Receive Data Double Byte Register" bit-size="16"/>
+		<register name="TWI1_CLKDIV"      group="TWI" read-address="0xFFC02200" write-address="0xFFC02200" mask="FFFF" type="IO" target="EMU" description="Serial Clock Divider Register" bit-size="16" def-comment="Two-Wire Interface 1 (0xFFC02200 - 0xFFC022FF)"/>
+		<register name="TWI1_CONTROL"     group="TWI" read-address="0xFFC02204" write-address="0xFFC02204" mask="FFFF" type="IO" target="EMU" description="TWI1 Master Internal Time Reference Register" bit-size="16"/>
+		<register name="TWI1_SLAVE_CTRL"  group="TWI" read-address="0xFFC02208" write-address="0xFFC02208" mask="FFFF" type="IO" target="EMU" description="Slave Mode Control Register" bit-size="16"/>
+		<register name="TWI1_SLAVE_STAT"  group="TWI" read-address="0xFFC0220C" write-address="0xFFC0220C" mask="FFFF" type="IO" target="EMU" description="Slave Mode Status Register" bit-size="16"/>
+		<register name="TWI1_SLAVE_ADDR"  group="TWI" read-address="0xFFC02210" write-address="0xFFC02210" mask="FFFF" type="IO" target="EMU" description="Slave Mode Address Register" bit-size="16"/>
+		<register name="TWI1_MASTER_CTRL" group="TWI" read-address="0xFFC02214" write-address="0xFFC02214" mask="FFFF" type="IO" target="EMU" description="Master Mode Control Register" bit-size="16"/>
+		<register name="TWI1_MASTER_STAT" group="TWI" read-address="0xFFC02218" write-address="0xFFC02218" mask="FFFF" type="IO" target="EMU" description="Master Mode Status Register" bit-size="16"/>
+		<register name="TWI1_MASTER_ADDR" group="TWI" read-address="0xFFC0221C" write-address="0xFFC0221C" mask="FFFF" type="IO" target="EMU" description="Master Mode Address Register" bit-size="16"/>
+		<register name="TWI1_INT_STAT"    group="TWI" read-address="0xFFC02220" write-address="0xFFC02220" mask="FFFF" type="IO" target="EMU" description="TWI1 Master Interrupt Register" bit-size="16"/>
+		<register name="TWI1_INT_MASK"    group="TWI" read-address="0xFFC02224" write-address="0xFFC02224" mask="FFFF" type="IO" target="EMU" description="TWI1 Master Interrupt Mask Register" bit-size="16"/>
+		<register name="TWI1_FIFO_CTRL"   group="TWI" read-address="0xFFC02228" write-address="0xFFC02228" mask="FFFF" type="IO" target="EMU" description="FIFO Control Register" bit-size="16"/>
+		<register name="TWI1_FIFO_STAT"   group="TWI" read-address="0xFFC0222C" write-address="0xFFC0222C" mask="FFFF" type="IO" target="EMU" description="FIFO Status Register" bit-size="16"/>
+		<register name="TWI1_XMT_DATA8"   group="TWI" read-address="0xFFC02280" write-address="0xFFC02280" mask="FFFF" type="IO" target="EMU" description="FIFO Transmit Data Single Byte Register" bit-size="16"/>
+		<register name="TWI1_XMT_DATA16"  group="TWI" read-address="0xFFC02284" write-address="0xFFC02284" mask="FFFF" type="IO" target="EMU" description="FIFO Transmit Data Double Byte Register" bit-size="16"/>
+		<register name="TWI1_RCV_DATA8"   group="TWI" read-address="0xFFC02288" write-address="0xFFC02288" mask="FFFF" type="IO" target="EMU" description="FIFO Receive Data Single Byte Register" bit-size="16"/>
+		<register name="TWI1_RCV_DATA16"  group="TWI" read-address="0xFFC0228C" write-address="0xFFC0228C" mask="FFFF" type="IO" target="EMU" description="FIFO Receive Data Double Byte Register" bit-size="16"/>
 
 		<!-- Controller Area Network (CAN) Registers  -->
 		<register name="CAN_MC1"    group="CAN Controller Registers" read-address="0xFFC02A00" write-address="0xFFC02A00" mask="FFFF" type="IO" description="Mailbox config reg 1" bit-size="16" def-comment="CAN Controller Registers (0xFFC02A00 - 0xFFC02FFF) for Mailboxes 0-15" target="EMU" />
