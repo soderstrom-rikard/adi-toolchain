@@ -2142,9 +2142,9 @@
 		<register name="DSPID" group="Extended Registers" read-address="0xFFE05000" write-address="0xFFE05000" type="IO" target="EMU" description="" bit-size="32" def-comment="Debug/MP/Emulation Registers (0xFFE05000 - 0xFFE05008)"/>
 
 		<!-- Trace Unit Registers -->
-		<register name="TBUFCTL"  group="Trace Registers" read-address="0xFFE06000" write-address="0xFFE06000" type="IO" description="Trace Buffer Control Register" bit-size="32" def-comment="Trace Buffer Registers (0xFFE06000 - 0xFFE06100)"/>
-		<register name="TBUFSTAT" group="Trace Registers" read-address="0xFFE06004" write-address="0xFFE06004" type="IO" description="Trace Buffer Status Register" bit-size="32"/>
-		<register name="TBUF"     group="Trace Registers" read-address="0xFFE06100" write-address="0xFFE06100" type="IO" description="Trace Buffer" bit-size="32" cdef-type="ADDR"/>
+		<register name="TBUFCTL"  group="Trace Unit" read-address="0xFFE06000" write-address="0xFFE06000" type="IO" description="Trace Buffer Control Register" bit-size="32" def-comment="Trace Buffer Registers (0xFFE06000 - 0xFFE06100)"/>
+		<register name="TBUFSTAT" group="Trace Unit" read-address="0xFFE06004" write-address="0xFFE06004" type="IO" description="Trace Buffer Status Register" bit-size="32"/>
+		<register name="TBUF"     group="Trace Unit" read-address="0xFFE06100" write-address="0xFFE06100" type="IO" description="Trace Buffer" bit-size="32" cdef-type="ADDR"/>
 
 		<!-- Performance Monitor Registers -->
 		<register name="PFCTL"   group="Performance Monitor Registers" read-address="0xFFE08000" write-address="0xFFE08000" type="IO" description="" bit-size="32" def-comment="Performance Monitor Registers (0xFFE08000 - 0xFFE08104)"/>

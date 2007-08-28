@@ -705,9 +705,9 @@
 		<register name="CHIPID" group="Extended Registers" description="" bit-size="32" read-address="0xFFC048C0" write-address="0xFFC048C0" mask="FFFFFFFF" type="IO"/>
 
 		<!-- Trace Unit Registers -->
-		<register name="TBUFCTL"  group="Extended Registers" description="" bit-size="32" read-address="0xFFE06000" write-address="0xFFE06000" type="IO"/>
-		<register name="TBUFSTAT" group="Extended Registers" description="" bit-size="32" read-address="0xFFE06004" write-address="0xFFE06004" type="IO"/>
-		<register name="TBUF"     group="Extended Registers" description="" bit-size="32" read-address="0xFFE06100" write-address="0xFFE06100" type="IO"/>
+		<register name="TBUFCTL"  group="Trace Unit" description="" bit-size="32" read-address="0xFFE06000" write-address="0xFFE06000" type="IO"/>
+		<register name="TBUFSTAT" group="Trace Unit" description="" bit-size="32" read-address="0xFFE06004" write-address="0xFFE06004" type="IO"/>
+		<register name="TBUF"     group="Trace Unit" description="" bit-size="32" read-address="0xFFE06100" write-address="0xFFE06100" type="IO"/>
 
 
 		<!-- Performance Monitor Registers -->

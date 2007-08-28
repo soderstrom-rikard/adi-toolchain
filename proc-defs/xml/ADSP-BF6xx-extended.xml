@@ -531,9 +531,9 @@
 		<register name="DSPID"   group="Extended Registers" description="" bit-size="32" read-address="0xFFE05000" write-address="0xFFE05000" type="IO" target="EMU" def-comment="Debug/MP/Emulation Registers (0xFFE05000 - 0xFFE05008)"/>
 
 		<!-- Trace Unit Registers -->
-		<register name="TBUFCTL"  group="Extended Registers" description="Trace Buffer Control Register" bit-size="32" read-address="0xFFF08400" write-address="0xFFF08400" type="IO" target="EMU" def-comment="Trace Buffer Registers (0xFFE06000 - 0xFFE06100)"/>
-		<register name="TBUFSTAT" group="Extended Registers" description="Trace Buffer Status Register" bit-size="32" read-address="0xFFE06004" write-address="0xFFE06004" type="IO" target="EMU"/>
-		<register name="TBUF"     group="Extended Registers" description="Trace Buffer" bit-size="32" read-address="0xFFE06100" write-address="0xFFE06100" type="IO" target="EMU" cdef-type="ADDR"/>
+		<register name="TBUFCTL"  group="Trace Unit" description="Trace Buffer Control Register" bit-size="32" read-address="0xFFF08400" write-address="0xFFF08400" type="IO" target="EMU" def-comment="Trace Buffer Registers (0xFFE06000 - 0xFFE06100)"/>
+		<register name="TBUFSTAT" group="Trace Unit" description="Trace Buffer Status Register" bit-size="32" read-address="0xFFE06004" write-address="0xFFE06004" type="IO" target="EMU"/>
+		<register name="TBUF"     group="Trace Unit" description="Trace Buffer" bit-size="32" read-address="0xFFE06100" write-address="0xFFE06100" type="IO" target="EMU" cdef-type="ADDR"/>
 
 		<!-- Watchpoint and Patch Registers -->
 		<register name="WPIACTL01"  group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFF08700" write-address="0xFFF08700" type="IO" target="EMU" def-comment="Watchpoint Control Registers "/>
