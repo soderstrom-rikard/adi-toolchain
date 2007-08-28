@@ -4185,18 +4185,18 @@
 
 <!-- Proc Periph HWR,  chap 12, UART Register Definitions -->
 
-<register name="UART0_DLL"       group="UART0" read-address="0xFFC00400" write-address="0xFFC00400" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Divisor Latch Low Byte" def-comment="UART0 Registers" />
-<register name="UART0_DLH"       group="UART0" read-address="0xFFC00404" write-address="0xFFC00404" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Divisor Latch High Byte" />
-<register name="UART0_GCTL"      group="UART0" read-address="0xFFC00408" write-address="0xFFC00408" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Global Control Register" />
-<register name="UART0_LCR"       group="UART0" read-address="0xFFC0040C" write-address="0xFFC0040C" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Line Control Register" />
-<register name="UART0_MCR"       group="UART0" read-address="0xFFC00410" write-address="0xFFC00410" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Modem Control Register" />
-<register name="UART0_LSR"       group="UART0" read-address="0xFFC00414" write-address="0xFFC00414" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Line Status Register" />
-<register name="UART0_MSR"       group="UART0" read-address="0xFFC00418" write-address="0xFFC00418" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Modem Status Register" />
-<register name="UART0_SCR"       group="UART0" read-address="0xFFC0041C" write-address="0xFFC0041C" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Scratch Register" />
-<register name="UART0_IER_SET"   group="UART0" read-address="0xFFC00420" write-address="0xFFC00420" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Interrupt Enable Register Set" />
-<register name="UART0_IER_CLEAR" group="UART0" read-address="0xFFC00424" write-address="0xFFC00424" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Interrupt Enable Register Clear" />
-<register name="UART0_THR"       group="UART0" read-address="0xFFC00428" write-address="0xFFC00428" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Transmit Hold Register" />
-<register name="UART0_RBR"       group="UART0" read-address="0xFFC0042C" write-address="0xFFC0042C" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Receive Buffer Register" />
+<register name="UART0_DLL"       group="UART" read-address="0xFFC00400" write-address="0xFFC00400" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Divisor Latch Low Byte" def-comment="UART0 Registers" />
+<register name="UART0_DLH"       group="UART" read-address="0xFFC00404" write-address="0xFFC00404" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Divisor Latch High Byte" />
+<register name="UART0_GCTL"      group="UART" read-address="0xFFC00408" write-address="0xFFC00408" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Global Control Register" />
+<register name="UART0_LCR"       group="UART" read-address="0xFFC0040C" write-address="0xFFC0040C" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Line Control Register" />
+<register name="UART0_MCR"       group="UART" read-address="0xFFC00410" write-address="0xFFC00410" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Modem Control Register" />
+<register name="UART0_LSR"       group="UART" read-address="0xFFC00414" write-address="0xFFC00414" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Line Status Register" />
+<register name="UART0_MSR"       group="UART" read-address="0xFFC00418" write-address="0xFFC00418" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Modem Status Register" />
+<register name="UART0_SCR"       group="UART" read-address="0xFFC0041C" write-address="0xFFC0041C" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Scratch Register" />
+<register name="UART0_IER_SET"   group="UART" read-address="0xFFC00420" write-address="0xFFC00420" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Interrupt Enable Register Set" />
+<register name="UART0_IER_CLEAR" group="UART" read-address="0xFFC00424" write-address="0xFFC00424" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Interrupt Enable Register Clear" />
+<register name="UART0_THR"       group="UART" read-address="0xFFC00428" write-address="0xFFC00428" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Transmit Hold Register" />
+<register name="UART0_RBR"       group="UART" read-address="0xFFC0042C" write-address="0xFFC0042C" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Receive Buffer Register" />
 
 	<register name="UART0_IREN"     parent="UART0_GCTL"      bit-position="1" bit-size="1" target="EMU" />
 	<register name="UART0_TPOLC"    parent="UART0_GCTL"      bit-position="2" bit-size="1" target="EMU" />
@@ -4252,18 +4252,18 @@
 	<register name="UART0_ETFI_C"   parent="UART0_IER_CLEAR" bit-position="5" bit-size="1" target="EMU" />
 	<register name="UART0_ERFCI_C"  parent="UART0_IER_CLEAR" bit-position="6" bit-size="1" target="EMU" />
 
-<register name="UART1_DLL"       group="UART1" read-address="0xFFC02000" write-address="0xFFC02000" type="IO" target="EMU" mask="FFFF" description="Divisor Latch Low Byte" bit-size="16" def-comment="UART1 Registers" />
-<register name="UART1_DLH"       group="UART1" read-address="0xFFC02004" write-address="0xFFC02004" type="IO" target="EMU" mask="FFFF" description="Divisor Latch High Byte" bit-size="16" />
-<register name="UART1_GCTL"      group="UART1" read-address="0xFFC02008" write-address="0xFFC02008" type="IO" target="EMU" mask="FFFF" description="Global Control Register" bit-size="16" />
-<register name="UART1_LCR"       group="UART1" read-address="0xFFC0200C" write-address="0xFFC0200C" type="IO" target="EMU" mask="FFFF" description="Line Control Register" bit-size="16" />
-<register name="UART1_MCR"       group="UART1" read-address="0xFFC02010" write-address="0xFFC02010" type="IO" target="EMU" mask="FFFF" description="Modem Control Register" bit-size="16" />
-<register name="UART1_LSR"       group="UART1" read-address="0xFFC02014" write-address="0xFFC02014" type="IO" target="EMU" mask="FFFF" description="Line Status Register" bit-size="16" />
-<register name="UART1_MSR"       group="UART1" read-address="0xFFC02018" write-address="0xFFC02018" type="IO" target="EMU" mask="FFFF" description="Modem Status Register" bit-size="16" />
-<register name="UART1_SCR"       group="UART1" read-address="0xFFC0201C" write-address="0xFFC0201C" type="IO" target="EMU" mask="FFFF" description="Scratch Register" bit-size="16" />
-<register name="UART1_IER_SET"   group="UART1" read-address="0xFFC02020" write-address="0xFFC02020" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Set" bit-size="16" />
-<register name="UART1_IER_CLEAR" group="UART1" read-address="0xFFC02024" write-address="0xFFC02024" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Clear" bit-size="16" />
-<register name="UART1_THR"       group="UART1" read-address="0xFFC02028" write-address="0xFFC02028" type="IO" target="EMU" mask="FFFF" description="Transmit Hold Register" bit-size="16" />
-<register name="UART1_RBR"       group="UART1" read-address="0xFFC0202C" write-address="0xFFC0202C" type="IO" target="EMU" mask="FFFF" description="Receive Buffer Register" bit-size="16" />
+<register name="UART1_DLL"       group="UART" read-address="0xFFC02000" write-address="0xFFC02000" type="IO" target="EMU" mask="FFFF" description="Divisor Latch Low Byte" bit-size="16" def-comment="UART1 Registers" />
+<register name="UART1_DLH"       group="UART" read-address="0xFFC02004" write-address="0xFFC02004" type="IO" target="EMU" mask="FFFF" description="Divisor Latch High Byte" bit-size="16" />
+<register name="UART1_GCTL"      group="UART" read-address="0xFFC02008" write-address="0xFFC02008" type="IO" target="EMU" mask="FFFF" description="Global Control Register" bit-size="16" />
+<register name="UART1_LCR"       group="UART" read-address="0xFFC0200C" write-address="0xFFC0200C" type="IO" target="EMU" mask="FFFF" description="Line Control Register" bit-size="16" />
+<register name="UART1_MCR"       group="UART" read-address="0xFFC02010" write-address="0xFFC02010" type="IO" target="EMU" mask="FFFF" description="Modem Control Register" bit-size="16" />
+<register name="UART1_LSR"       group="UART" read-address="0xFFC02014" write-address="0xFFC02014" type="IO" target="EMU" mask="FFFF" description="Line Status Register" bit-size="16" />
+<register name="UART1_MSR"       group="UART" read-address="0xFFC02018" write-address="0xFFC02018" type="IO" target="EMU" mask="FFFF" description="Modem Status Register" bit-size="16" />
+<register name="UART1_SCR"       group="UART" read-address="0xFFC0201C" write-address="0xFFC0201C" type="IO" target="EMU" mask="FFFF" description="Scratch Register" bit-size="16" />
+<register name="UART1_IER_SET"   group="UART" read-address="0xFFC02020" write-address="0xFFC02020" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Set" bit-size="16" />
+<register name="UART1_IER_CLEAR" group="UART" read-address="0xFFC02024" write-address="0xFFC02024" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Clear" bit-size="16" />
+<register name="UART1_THR"       group="UART" read-address="0xFFC02028" write-address="0xFFC02028" type="IO" target="EMU" mask="FFFF" description="Transmit Hold Register" bit-size="16" />
+<register name="UART1_RBR"       group="UART" read-address="0xFFC0202C" write-address="0xFFC0202C" type="IO" target="EMU" mask="FFFF" description="Receive Buffer Register" bit-size="16" />
 
 	<register name="UART1_IREN"     parent="UART1_GCTL"      bit-position="1" bit-size="1" target="EMU" />
 	<register name="UART1_TPOLC"    parent="UART1_GCTL"      bit-position="2" bit-size="1" target="EMU" />
@@ -4319,18 +4319,18 @@
 	<register name="UART1_ETFI_C"   parent="UART1_IER_CLEAR" bit-position="5" bit-size="1" target="EMU" />
 	<register name="UART1_ERFCI_C"  parent="UART1_IER_CLEAR" bit-position="6" bit-size="1" target="EMU" />
 
-<register name="UART2_DLL"       group="UART2" read-address="0xFFC02100" write-address="0xFFC02100" type="IO" target="EMU" def-comment="UART2 Registers" mask="FFFF" description="Divisor Latch Low Byte" bit-size="16" />
-<register name="UART2_DLH"       group="UART2" read-address="0xFFC02104" write-address="0xFFC02104" type="IO" target="EMU" mask="FFFF" description="Divisor Latch High Byte" bit-size="16" />
-<register name="UART2_GCTL"      group="UART2" read-address="0xFFC02108" write-address="0xFFC02108" type="IO" target="EMU" mask="FFFF" description="Global Control Register" bit-size="16" />
-<register name="UART2_LCR"       group="UART2" read-address="0xFFC0210C" write-address="0xFFC0210C" type="IO" target="EMU" mask="FFFF" description="Line Control Register" bit-size="16" />
-<register name="UART2_MCR"       group="UART2" read-address="0xFFC02110" write-address="0xFFC02110" type="IO" target="EMU" mask="FFFF" description="Modem Control Register" bit-size="16" />
-<register name="UART2_LSR"       group="UART2" read-address="0xFFC02114" write-address="0xFFC02114" type="IO" target="EMU" mask="FFFF" description="Line Status Register" bit-size="16" />
-<register name="UART2_MSR"       group="UART2" read-address="0xFFC02118" write-address="0xFFC02118" type="IO" target="EMU" mask="FFFF" description="Modem Status Register" bit-size="16" />
-<register name="UART2_SCR"       group="UART2" read-address="0xFFC0211C" write-address="0xFFC0211C" type="IO" target="EMU" mask="FFFF" description="Scratch Register" bit-size="16" />
-<register name="UART2_IER_SET"   group="UART2" read-address="0xFFC02120" write-address="0xFFC02120" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Set" bit-size="16" />
-<register name="UART2_IER_CLEAR" group="UART2" read-address="0xFFC02124" write-address="0xFFC02124" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Clear" bit-size="16" />
-<register name="UART2_THR"       group="UART2" read-address="0xFFC02128" write-address="0xFFC02128" type="IO" target="EMU" mask="FFFF" description="Transmit Hold Register" bit-size="16" />
-<register name="UART2_RBR"       group="UART2" read-address="0xFFC0212C" write-address="0xFFC0212C" type="IO" target="EMU" mask="FFFF" description="Receive Buffer Register" bit-size="16" />
+<register name="UART2_DLL"       group="UART" read-address="0xFFC02100" write-address="0xFFC02100" type="IO" target="EMU" def-comment="UART2 Registers" mask="FFFF" description="Divisor Latch Low Byte" bit-size="16" />
+<register name="UART2_DLH"       group="UART" read-address="0xFFC02104" write-address="0xFFC02104" type="IO" target="EMU" mask="FFFF" description="Divisor Latch High Byte" bit-size="16" />
+<register name="UART2_GCTL"      group="UART" read-address="0xFFC02108" write-address="0xFFC02108" type="IO" target="EMU" mask="FFFF" description="Global Control Register" bit-size="16" />
+<register name="UART2_LCR"       group="UART" read-address="0xFFC0210C" write-address="0xFFC0210C" type="IO" target="EMU" mask="FFFF" description="Line Control Register" bit-size="16" />
+<register name="UART2_MCR"       group="UART" read-address="0xFFC02110" write-address="0xFFC02110" type="IO" target="EMU" mask="FFFF" description="Modem Control Register" bit-size="16" />
+<register name="UART2_LSR"       group="UART" read-address="0xFFC02114" write-address="0xFFC02114" type="IO" target="EMU" mask="FFFF" description="Line Status Register" bit-size="16" />
+<register name="UART2_MSR"       group="UART" read-address="0xFFC02118" write-address="0xFFC02118" type="IO" target="EMU" mask="FFFF" description="Modem Status Register" bit-size="16" />
+<register name="UART2_SCR"       group="UART" read-address="0xFFC0211C" write-address="0xFFC0211C" type="IO" target="EMU" mask="FFFF" description="Scratch Register" bit-size="16" />
+<register name="UART2_IER_SET"   group="UART" read-address="0xFFC02120" write-address="0xFFC02120" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Set" bit-size="16" />
+<register name="UART2_IER_CLEAR" group="UART" read-address="0xFFC02124" write-address="0xFFC02124" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Clear" bit-size="16" />
+<register name="UART2_THR"       group="UART" read-address="0xFFC02128" write-address="0xFFC02128" type="IO" target="EMU" mask="FFFF" description="Transmit Hold Register" bit-size="16" />
+<register name="UART2_RBR"       group="UART" read-address="0xFFC0212C" write-address="0xFFC0212C" type="IO" target="EMU" mask="FFFF" description="Receive Buffer Register" bit-size="16" />
 
 	<register name="UART2_IREN"     parent="UART2_GCTL"      bit-position="1" bit-size="1" target="EMU" />
 	<register name="UART2_TPOLC"    parent="UART2_GCTL"      bit-position="2" bit-size="1" target="EMU" />
@@ -4389,18 +4389,18 @@
 
 <!-- Proc Periph HWR, chap  12, UART Register Definitions (UART3) -->
 
-<register name="UART3_DLL"       group="UART3" read-address="0xFFC03100" write-address="0xFFC03100" type="IO" target="EMU" mask="FFFF" description="Divisor Latch Low Byte" bit-size="16" def-comment="UART3 Registers" />
-<register name="UART3_DLH"       group="UART3" read-address="0xFFC03104" write-address="0xFFC03104" type="IO" target="EMU" mask="FFFF" description="Divisor Latch High Byte" bit-size="16" />
-<register name="UART3_GCTL"      group="UART3" read-address="0xFFC03108" write-address="0xFFC03108" type="IO" target="EMU" mask="FFFF" description="Global Control Register" bit-size="16" />
-<register name="UART3_LCR"       group="UART3" read-address="0xFFC0310C" write-address="0xFFC0310C" type="IO" target="EMU" mask="FFFF" description="Line Control Register" bit-size="16" />
-<register name="UART3_MCR"       group="UART3" read-address="0xFFC03110" write-address="0xFFC03110" type="IO" target="EMU" mask="FFFF" description="Modem Control Register" bit-size="16" />
-<register name="UART3_LSR"       group="UART3" read-address="0xFFC03114" write-address="0xFFC03114" type="IO" target="EMU" mask="FFFF" description="Line Status Register" bit-size="16" />
-<register name="UART3_MSR"       group="UART3" read-address="0xFFC03118" write-address="0xFFC03118" type="IO" target="EMU" mask="FFFF" description="Modem Status Register" bit-size="16" />
-<register name="UART3_SCR"       group="UART3" read-address="0xFFC0311C" write-address="0xFFC0311C" type="IO" target="EMU" mask="FFFF" description="Scratch Register" bit-size="16" />
-<register name="UART3_IER_SET"   group="UART3" read-address="0xFFC03120" write-address="0xFFC03120" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Set" bit-size="16" />
-<register name="UART3_IER_CLEAR" group="UART3" read-address="0xFFC03124" write-address="0xFFC03124" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Clear" bit-size="16" />
-<register name="UART3_THR"       group="UART3" read-address="0xFFC03128" write-address="0xFFC03128" type="IO" target="EMU" mask="FFFF" description="Transmit Hold Register" bit-size="16" />
-<register name="UART3_RBR"       group="UART3" read-address="0xFFC0312C" write-address="0xFFC0312C" type="IO" target="EMU" mask="FFFF" description="Receive Buffer Register" bit-size="16" />
+<register name="UART3_DLL"       group="UART" read-address="0xFFC03100" write-address="0xFFC03100" type="IO" target="EMU" mask="FFFF" description="Divisor Latch Low Byte" bit-size="16" def-comment="UART3 Registers" />
+<register name="UART3_DLH"       group="UART" read-address="0xFFC03104" write-address="0xFFC03104" type="IO" target="EMU" mask="FFFF" description="Divisor Latch High Byte" bit-size="16" />
+<register name="UART3_GCTL"      group="UART" read-address="0xFFC03108" write-address="0xFFC03108" type="IO" target="EMU" mask="FFFF" description="Global Control Register" bit-size="16" />
+<register name="UART3_LCR"       group="UART" read-address="0xFFC0310C" write-address="0xFFC0310C" type="IO" target="EMU" mask="FFFF" description="Line Control Register" bit-size="16" />
+<register name="UART3_MCR"       group="UART" read-address="0xFFC03110" write-address="0xFFC03110" type="IO" target="EMU" mask="FFFF" description="Modem Control Register" bit-size="16" />
+<register name="UART3_LSR"       group="UART" read-address="0xFFC03114" write-address="0xFFC03114" type="IO" target="EMU" mask="FFFF" description="Line Status Register" bit-size="16" />
+<register name="UART3_MSR"       group="UART" read-address="0xFFC03118" write-address="0xFFC03118" type="IO" target="EMU" mask="FFFF" description="Modem Status Register" bit-size="16" />
+<register name="UART3_SCR"       group="UART" read-address="0xFFC0311C" write-address="0xFFC0311C" type="IO" target="EMU" mask="FFFF" description="Scratch Register" bit-size="16" />
+<register name="UART3_IER_SET"   group="UART" read-address="0xFFC03120" write-address="0xFFC03120" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Set" bit-size="16" />
+<register name="UART3_IER_CLEAR" group="UART" read-address="0xFFC03124" write-address="0xFFC03124" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Clear" bit-size="16" />
+<register name="UART3_THR"       group="UART" read-address="0xFFC03128" write-address="0xFFC03128" type="IO" target="EMU" mask="FFFF" description="Transmit Hold Register" bit-size="16" />
+<register name="UART3_RBR"       group="UART" read-address="0xFFC0312C" write-address="0xFFC0312C" type="IO" target="EMU" mask="FFFF" description="Receive Buffer Register" bit-size="16" />
 
 	<register name="UART3_IREN"     parent="UART3_GCTL"      bit-position="1" bit-size="1" target="EMU" />
 	<register name="UART3_TPOLC"    parent="UART3_GCTL"      bit-position="2" bit-size="1" target="EMU" />

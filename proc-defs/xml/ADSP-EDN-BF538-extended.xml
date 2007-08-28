@@ -65,43 +65,43 @@
 		<register name="RTC_PREN"  group="RTC" read-address="0xFFC00314" write-address="0xFFC00314" type="IO" description="" bit-size="16"/>
 
 		<!-- UART0 Registers -->
-		<register name="UART0_THR"  group="UART0 Registers" read-address="0xFFC00400" write-address="0xFFC00400" mask="FFFF" type="IO" description="" bit-size="16" def-comment="UART0 (0xFFC00400 - 0xFFC004FF)"/>
-		<register name="UART0_RBR"  group="UART0 Registers" read-address="0xFFC00400" write-address="0xFFC00400" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART0_DLL"  group="UART0 Registers" read-address="0xFFC00400" write-address="0xFFC00400" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART0_DLH"  group="UART0 Registers" read-address="0xFFC00404" write-address="0xFFC00404" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART0_IER"  group="UART0 Registers" read-address="0xFFC00404" write-address="0xFFC00404" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART0_IIR"  group="UART0 Registers" read-address="0xFFC00408" write-address="0xFFC00408" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART0_LCR"  group="UART0 Registers" read-address="0xFFC0040C" write-address="0xFFC0040C" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART0_MCR"  group="UART0 Registers" read-address="0xFFC00410" write-address="0xFFC00410" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART0_LSR"  group="UART0 Registers" read-address="0xFFC00414" write-address="0xFFC00414" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART0_SCR"  group="UART0 Registers" read-address="0xFFC0041C" write-address="0xFFC0041C" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART0_GCTL" group="UART0 Registers" read-address="0xFFC00424" write-address="0xFFC00424" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART0_THR"  group="UART" read-address="0xFFC00400" write-address="0xFFC00400" mask="FFFF" type="IO" description="" bit-size="16" def-comment="UART0 (0xFFC00400 - 0xFFC004FF)"/>
+		<register name="UART0_RBR"  group="UART" read-address="0xFFC00400" write-address="0xFFC00400" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART0_DLL"  group="UART" read-address="0xFFC00400" write-address="0xFFC00400" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART0_DLH"  group="UART" read-address="0xFFC00404" write-address="0xFFC00404" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART0_IER"  group="UART" read-address="0xFFC00404" write-address="0xFFC00404" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART0_IIR"  group="UART" read-address="0xFFC00408" write-address="0xFFC00408" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART0_LCR"  group="UART" read-address="0xFFC0040C" write-address="0xFFC0040C" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART0_MCR"  group="UART" read-address="0xFFC00410" write-address="0xFFC00410" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART0_LSR"  group="UART" read-address="0xFFC00414" write-address="0xFFC00414" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART0_SCR"  group="UART" read-address="0xFFC0041C" write-address="0xFFC0041C" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART0_GCTL" group="UART" read-address="0xFFC00424" write-address="0xFFC00424" mask="FFFF" type="IO" description="" bit-size="16"/>
 
 		<!-- UART1 Controller Registers -->
-		<register name="UART1_THR"  group="UART1 Registers" read-address="0xFFC02000" write-address="0xFFC02000" mask="FFFF" type="IO" description="" bit-size="16" def-comment="UART1 (0xFFC02000 - 0xFFC020FF)"/>
-		<register name="UART1_RBR"  group="UART1 Registers" read-address="0xFFC02000" write-address="0xFFC02000" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART1_DLL"  group="UART1 Registers" read-address="0xFFC02000" write-address="0xFFC02000" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART1_DLH"  group="UART1 Registers" read-address="0xFFC02004" write-address="0xFFC02004" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART1_IER"  group="UART1 Registers" read-address="0xFFC02004" write-address="0xFFC02004" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART1_IIR"  group="UART1 Registers" read-address="0xFFC02008" write-address="0xFFC02008" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART1_LCR"  group="UART1 Registers" read-address="0xFFC0200C" write-address="0xFFC0200C" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART1_MCR"  group="UART1 Registers" read-address="0xFFC02010" write-address="0xFFC02010" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART1_LSR"  group="UART1 Registers" read-address="0xFFC02014" write-address="0xFFC02014" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART1_SCR"  group="UART1 Registers" read-address="0xFFC0201C" write-address="0xFFC0201C" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART1_GCTL" group="UART1 Registers" read-address="0xFFC02024" write-address="0xFFC02024" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART1_THR"  group="UART" read-address="0xFFC02000" write-address="0xFFC02000" mask="FFFF" type="IO" description="" bit-size="16" def-comment="UART1 (0xFFC02000 - 0xFFC020FF)"/>
+		<register name="UART1_RBR"  group="UART" read-address="0xFFC02000" write-address="0xFFC02000" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART1_DLL"  group="UART" read-address="0xFFC02000" write-address="0xFFC02000" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART1_DLH"  group="UART" read-address="0xFFC02004" write-address="0xFFC02004" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART1_IER"  group="UART" read-address="0xFFC02004" write-address="0xFFC02004" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART1_IIR"  group="UART" read-address="0xFFC02008" write-address="0xFFC02008" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART1_LCR"  group="UART" read-address="0xFFC0200C" write-address="0xFFC0200C" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART1_MCR"  group="UART" read-address="0xFFC02010" write-address="0xFFC02010" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART1_LSR"  group="UART" read-address="0xFFC02014" write-address="0xFFC02014" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART1_SCR"  group="UART" read-address="0xFFC0201C" write-address="0xFFC0201C" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART1_GCTL" group="UART" read-address="0xFFC02024" write-address="0xFFC02024" mask="FFFF" type="IO" description="" bit-size="16"/>
 
 		<!-- UART2 Controller Registers -->
-		<register name="UART2_THR"  group="UART2 Registers" read-address="0xFFC02100" write-address="0xFFC02100" mask="FFFF" type="IO" description="" bit-size="16" def-comment="UART2 (0xFFC02100 - 0xFFC021FF)"/>
-		<register name="UART2_RBR"  group="UART2 Registers" read-address="0xFFC02100" write-address="0xFFC02100" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART2_DLL"  group="UART2 Registers" read-address="0xFFC02100" write-address="0xFFC02100" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART2_DLH"  group="UART2 Registers" read-address="0xFFC02104" write-address="0xFFC02104" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART2_IER"  group="UART2 Registers" read-address="0xFFC02104" write-address="0xFFC02104" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART2_IIR"  group="UART2 Registers" read-address="0xFFC02108" write-address="0xFFC02108" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART2_LCR"  group="UART2 Registers" read-address="0xFFC0210C" write-address="0xFFC0210C" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART2_MCR"  group="UART2 Registers" read-address="0xFFC02110" write-address="0xFFC02110" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART2_LSR"  group="UART2 Registers" read-address="0xFFC02114" write-address="0xFFC02114" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART2_SCR"  group="UART2 Registers" read-address="0xFFC0211C" write-address="0xFFC0211C" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="UART2_GCTL" group="UART2 Registers" read-address="0xFFC02124" write-address="0xFFC02124" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART2_THR"  group="UART" read-address="0xFFC02100" write-address="0xFFC02100" mask="FFFF" type="IO" description="" bit-size="16" def-comment="UART2 (0xFFC02100 - 0xFFC021FF)"/>
+		<register name="UART2_RBR"  group="UART" read-address="0xFFC02100" write-address="0xFFC02100" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART2_DLL"  group="UART" read-address="0xFFC02100" write-address="0xFFC02100" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART2_DLH"  group="UART" read-address="0xFFC02104" write-address="0xFFC02104" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART2_IER"  group="UART" read-address="0xFFC02104" write-address="0xFFC02104" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART2_IIR"  group="UART" read-address="0xFFC02108" write-address="0xFFC02108" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART2_LCR"  group="UART" read-address="0xFFC0210C" write-address="0xFFC0210C" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART2_MCR"  group="UART" read-address="0xFFC02110" write-address="0xFFC02110" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART2_LSR"  group="UART" read-address="0xFFC02114" write-address="0xFFC02114" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART2_SCR"  group="UART" read-address="0xFFC0211C" write-address="0xFFC0211C" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="UART2_GCTL" group="UART" read-address="0xFFC02124" write-address="0xFFC02124" mask="FFFF" type="IO" description="" bit-size="16"/>
 
 		<!-- SPI0 Controller Registers -->
 		<register name="SPI0_CTL"    group="SPI0 Registers" read-address="0xFFC00500" write-address="0xFFC00500" type="IO" target="EMU" description="" bit-size="16" def-comment="SPI0 (0xFFC00500 - 0xFFC005FF)"/>

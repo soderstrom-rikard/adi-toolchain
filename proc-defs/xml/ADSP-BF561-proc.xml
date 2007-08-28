@@ -254,21 +254,21 @@
 		<register name="WPSTAT"   group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE07200" write-address="0xFFE07200" type="IO" target="EMU"/>
 
 		<!-- UART Controller Registers -->
-		<register name="UART_THR"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC00400" write-address="0xFFC00400" type="IO" target="EMU"/>
-		<register name="UART_RBR"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC00400" write-address="0xFFC00400" type="IO" target="EMU"/>
-		<register name="UART_DLL"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC00400" write-address="0xFFC00400" type="IO" target="EMU"/>
-		<register name="UART_DLH"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC00404" write-address="0xFFC00404" type="IO" target="EMU"/>
-		<register name="UART_IER"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC00404" write-address="0xFFC00404" type="IO" target="EMU"/>
-		<register name="UART_IIR"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC00408" write-address="0xFFC00408" type="IO" target="EMU"/>
-		<register name="UART_LCR"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC0040C" write-address="0xFFC0040C" type="IO" target="EMU"/>
-		<register name="UART_MCR"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC00410" write-address="0xFFC00410" type="IO" target="EMU"/>
-		<register name="UART_LSR"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC00414" write-address="0xFFC00414" type="IO" target="EMU"/>
-		<register name="UART_MSR"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC00418" write-address="0xFFC00418" type="IO" target="EMU"/>
-		<register name="UART_SCR"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC0041C" write-address="0xFFC0041C" type="IO" target="EMU"/>
-		<register name="UART_GCTL" group="Extended Registers" description="" bit-size="16" read-address="0xFFC00424" write-address="0xFFC00424" type="IO" target="EMU"/>
+		<register name="UART_THR"  group="UART" description="" bit-size="16" read-address="0xFFC00400" write-address="0xFFC00400" type="IO" target="EMU"/>
+		<register name="UART_RBR"  group="UART" description="" bit-size="16" read-address="0xFFC00400" write-address="0xFFC00400" type="IO" target="EMU"/>
+		<register name="UART_DLL"  group="UART" description="" bit-size="16" read-address="0xFFC00400" write-address="0xFFC00400" type="IO" target="EMU"/>
+		<register name="UART_DLH"  group="UART" description="" bit-size="16" read-address="0xFFC00404" write-address="0xFFC00404" type="IO" target="EMU"/>
+		<register name="UART_IER"  group="UART" description="" bit-size="16" read-address="0xFFC00404" write-address="0xFFC00404" type="IO" target="EMU"/>
+		<register name="UART_IIR"  group="UART" description="" bit-size="16" read-address="0xFFC00408" write-address="0xFFC00408" type="IO" target="EMU"/>
+		<register name="UART_LCR"  group="UART" description="" bit-size="16" read-address="0xFFC0040C" write-address="0xFFC0040C" type="IO" target="EMU"/>
+		<register name="UART_MCR"  group="UART" description="" bit-size="16" read-address="0xFFC00410" write-address="0xFFC00410" type="IO" target="EMU"/>
+		<register name="UART_LSR"  group="UART" description="" bit-size="16" read-address="0xFFC00414" write-address="0xFFC00414" type="IO" target="EMU"/>
+		<register name="UART_MSR"  group="UART" description="" bit-size="16" read-address="0xFFC00418" write-address="0xFFC00418" type="IO" target="EMU"/>
+		<register name="UART_SCR"  group="UART" description="" bit-size="16" read-address="0xFFC0041C" write-address="0xFFC0041C" type="IO" target="EMU"/>
+		<register name="UART_GCTL" group="UART" description="" bit-size="16" read-address="0xFFC00424" write-address="0xFFC00424" type="IO" target="EMU"/>
 
 		<!-- UART Controller Registers to match proc dll names -->
-		<register name="UART_GBL"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC00424" write-address="0xFFC00424" type="IO" target="EMU"/>
+		<register name="UART_GBL"  group="UART" description="" bit-size="16" read-address="0xFFC00424" write-address="0xFFC00424" type="IO" target="EMU"/>
 
 			<!-- External Bus Interface Unit Registers -->
 	<register name="EBIU_AMGCTL"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC00A00" write-address="0xFFC00A00" type="IO" def-header="Asynchronous Memory Controller - External Bus Interface Unit" />

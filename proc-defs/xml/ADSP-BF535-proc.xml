@@ -562,19 +562,19 @@
 <register name="SIC_IMASK" group="System Interrupt Controller Register File" read-address="0xFFC00C10" write-address="0xFFC00C10" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
 <register name="SIC_ISR" group="System Interrupt Controller Register File" read-address="0xFFC00C14" write-address="0xFFC00C14" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
 <register name="SIC_IWR" group="System Interrupt Controller Register File" read-address="0xFFC00C18" write-address="0xFFC00C18" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
-<register name="UART0_THR" group="UART0" read-address="0xFFC01800" write-address="0xFFC01800" mask="FFFF" type="IO" description="Transmit Holding" bit-size="16"/>
-<register name="UART0_RBR" group="UART0" read-address="0xFFC01800" write-address="0xFFC01800" mask="FFFF" type="IO" description="Receive Buffer" bit-size="16"/>
-<register name="UART0_DLL" group="UART0" read-address="0xFFC01800" write-address="0xFFC01800" mask="FFFF" type="IO" description="Divisor Latch (Low-Byte)" bit-size="16"/>
-<register name="UART0_IER" group="UART0" read-address="0xFFC01802" write-address="0xFFC01802" mask="FFFF" type="IO" description="Interrupt Enable" bit-size="16"/>
+<register name="UART0_THR" group="UART" read-address="0xFFC01800" write-address="0xFFC01800" mask="FFFF" type="IO" description="Transmit Holding" bit-size="16"/>
+<register name="UART0_RBR" group="UART" read-address="0xFFC01800" write-address="0xFFC01800" mask="FFFF" type="IO" description="Receive Buffer" bit-size="16"/>
+<register name="UART0_DLL" group="UART" read-address="0xFFC01800" write-address="0xFFC01800" mask="FFFF" type="IO" description="Divisor Latch (Low-Byte)" bit-size="16"/>
+<register name="UART0_IER" group="UART" read-address="0xFFC01802" write-address="0xFFC01802" mask="FFFF" type="IO" description="Interrupt Enable" bit-size="16"/>
 <register name="UART0_IER_ERBFI" parent="UART0_IER" bit-position="0" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART0_IER_ETBEI" parent="UART0_IER" bit-position="1" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART0_IER_ELSI"  parent="UART0_IER" bit-position="2" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART0_IER_EDDSI" parent="UART0_IER" bit-position="3" type="IO" description="child register" bit-size="1" target="SIM"/>
-<register name="UART0_DLH" group="UART0" read-address="0xFFC01802" write-address="0xFFC01802" mask="FFFF" type="IO" description="Divisor Latch (High-Byte)" bit-size="16"/>
-<register name="UART0_IIR" group="UART0" read-address="0xFFC01804" write-address="0xFFC01804" mask="FFFF" type="IO" description="Interrupt Identification" bit-size="16"/>
+<register name="UART0_DLH" group="UART" read-address="0xFFC01802" write-address="0xFFC01802" mask="FFFF" type="IO" description="Divisor Latch (High-Byte)" bit-size="16"/>
+<register name="UART0_IIR" group="UART" read-address="0xFFC01804" write-address="0xFFC01804" mask="FFFF" type="IO" description="Interrupt Identification" bit-size="16"/>
 <register name="UART0_IIR_NINT" parent="UART0_IIR" bit-position="0" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART0_IIR_STATUS" parent="UART0_IIR" bit-position="1" type="IO" description="child register" bit-size="2" target="SIM"/>
-<register name="UART0_LCR" group="UART0" read-address="0xFFC01806" write-address="0xFFC01806" mask="FFFF" type="IO" description="Line Control" bit-size="16"/>
+<register name="UART0_LCR" group="UART" read-address="0xFFC01806" write-address="0xFFC01806" mask="FFFF" type="IO" description="Line Control" bit-size="16"/>
 <register name="UART0_LCR_WLS" parent="UART0_LCR" bit-position="0" type="IO" description="child register" bit-size="2" target="SIM"/>
 <register name="UART0_LCR_STOP" parent="UART0_LCR" bit-position="2" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART0_LCR_PEN" parent="UART0_LCR" bit-position="3" type="IO" description="child register" bit-size="1" target="SIM"/>
@@ -582,13 +582,13 @@
 <register name="UART0_LCR_StickyParity" parent="UART0_LCR" bit-position="5" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART0_LCR_BRK" parent="UART0_LCR" bit-position="6" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART0_LCR_DLAB" parent="UART0_LCR" bit-position="7" type="IO" description="child register" bit-size="1" target="SIM"/>
-<register name="UART0_MCR" group="UART0" read-address="0xFFC01808" write-address="0xFFC01808" mask="FFFF" type="IO" description="Module Control" bit-size="16"/>
+<register name="UART0_MCR" group="UART" read-address="0xFFC01808" write-address="0xFFC01808" mask="FFFF" type="IO" description="Module Control" bit-size="16"/>
 <register name="UART0_MCR_DTR" parent="UART0_MCR" bit-position="0" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART0_MCR_RTS" parent="UART0_MCR" bit-position="1" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART0_MCR_OUT2" parent="UART0_MCR" bit-position="2" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART0_MCR_OUT1" parent="UART0_MCR" bit-position="3" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART0_MCR_LoopBack" parent="UART0_MCR" bit-position="4" type="IO" description="child register" bit-size="1" target="SIM"/>
-<register name="UART0_LSR" group="UART0" read-address="0xFFC0180A" write-address="0xFFC0180A" mask="FFFF" type="IO" description="Line Status" bit-size="16"/>
+<register name="UART0_LSR" group="UART" read-address="0xFFC0180A" write-address="0xFFC0180A" mask="FFFF" type="IO" description="Line Status" bit-size="16"/>
 <register name="UART0_LSR_DR" parent="UART0_LSR" bit-position="0" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART0_LSR_OE" parent="UART0_LSR" bit-position="1" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART0_LSR_PE" parent="UART0_LSR" bit-position="2" type="IO" description="child register" bit-size="1" target="SIM"/>
@@ -596,7 +596,7 @@
 <register name="UART0_LSR_BI" parent="UART0_LSR" bit-position="4" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART0_LSR_THRE" parent="UART0_LSR" bit-position="5" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART0_LSR_TEMT" parent="UART0_LSR" bit-position="6" type="IO" description="child register" bit-size="1" target="SIM"/>
-<register name="UART0_MSR" group="UART0" read-address="0xFFC0180C" write-address="0xFFC0180C" mask="FFFF" type="IO" description="MSR Modem Status" bit-size="16"/>
+<register name="UART0_MSR" group="UART" read-address="0xFFC0180C" write-address="0xFFC0180C" mask="FFFF" type="IO" description="MSR Modem Status" bit-size="16"/>
 <register name="UART0_MSR_DCTS" parent="UART0_MSR" bit-position="0" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART0_MSR_DDSR" parent="UART0_MSR" bit-position="1" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART0_MSR_TERI" parent="UART0_MSR" bit-position="2" type="IO" description="child register" bit-size="1" target="SIM"/>
@@ -605,36 +605,36 @@
 <register name="UART0_MSR_DSR" parent="UART0_MSR" bit-position="5" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART0_MSR_RI" parent="UART0_MSR" bit-position="6" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART0_MSR_DCD" parent="UART0_MSR" bit-position="7" type="IO" description="child register" bit-size="1" target="SIM"/>
-<register name="UART0_SCR" group="UART0" read-address="0xFFC0180E" write-address="0xFFC0180E" mask="FFFF" type="IO" description="SCR Scratch" bit-size="16"/>
-<register name="UART0_RX_CURR_PTR" group="UART0" read-address="0xFFC01A00" write-address="0xFFC01A00" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART0_RX_CONFIG_DMA" group="UART0" read-address="0xFFC01A02" write-address="0xFFC01A02" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART0_RX_START_PG" group="UART0" read-address="0xFFC01A04" write-address="0xFFC01A04" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART0_RX_START_ADDR" group="UART0" read-address="0xFFC01A06" write-address="0xFFC01A06" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART0_RX_COUNT" group="UART0" read-address="0xFFC01A08" write-address="0xFFC01A08" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART0_RX_NEXT_DESCR" group="UART0" read-address="0xFFC01A0A" write-address="0xFFC01A0A" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART0_RX_DESCR_RDY" group="UART0" read-address="0xFFC01A0C" write-address="0xFFC01A0C" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART0_RX_IRQSTAT" group="UART0" read-address="0xFFC01A0E" write-address="0xFFC01A0E" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART0_TX_CURR_PTR" group="UART0" read-address="0xFFC01B00" write-address="0xFFC01B00" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART0_TX_CONFIG_DMA" group="UART0" read-address="0xFFC01B02" write-address="0xFFC01B02" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART0_TX_START_PG" group="UART0" read-address="0xFFC01B04" write-address="0xFFC01B04" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART0_TX_START_ADDR" group="UART0" read-address="0xFFC01B06" write-address="0xFFC01B06" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART0_TX_COUNT" group="UART0" read-address="0xFFC01B08" write-address="0xFFC01B08" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART0_TX_NEXT_DESCR" group="UART0" read-address="0xFFC01B0A" write-address="0xFFC01B0A" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART0_TX_DESCR_RDY" group="UART0" read-address="0xFFC01B0C" write-address="0xFFC01B0C" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART0_TX_IRQSTAT" group="UART0" read-address="0xFFC01B0E" write-address="0xFFC01B0E" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART1_THR" group="UART1" read-address="0xFFC01C00" write-address="0xFFC01C00" mask="FFFF" type="IO" description="Transmit Holding" bit-size="16"/>
-<register name="UART1_RBR" group="UART1" read-address="0xFFC01C00" write-address="0xFFC01C00" mask="FFFF" type="IO" description="Receive Buffer" bit-size="16"/>
-<register name="UART1_DLL" group="UART1" read-address="0xFFC01C00" write-address="0xFFC01C00" mask="FFFF" type="IO" description="Divisor Latch (Low-Byte)" bit-size="16"/>
-<register name="UART1_IER" group="UART1" read-address="0xFFC01C02" write-address="0xFFC01C02" mask="FFFF" type="IO" description="Interrupt Enable" bit-size="16"/>
+<register name="UART0_SCR" group="UART" read-address="0xFFC0180E" write-address="0xFFC0180E" mask="FFFF" type="IO" description="SCR Scratch" bit-size="16"/>
+<register name="UART0_RX_CURR_PTR" group="UART" read-address="0xFFC01A00" write-address="0xFFC01A00" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART0_RX_CONFIG_DMA" group="UART" read-address="0xFFC01A02" write-address="0xFFC01A02" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART0_RX_START_PG" group="UART" read-address="0xFFC01A04" write-address="0xFFC01A04" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART0_RX_START_ADDR" group="UART" read-address="0xFFC01A06" write-address="0xFFC01A06" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART0_RX_COUNT" group="UART" read-address="0xFFC01A08" write-address="0xFFC01A08" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART0_RX_NEXT_DESCR" group="UART" read-address="0xFFC01A0A" write-address="0xFFC01A0A" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART0_RX_DESCR_RDY" group="UART" read-address="0xFFC01A0C" write-address="0xFFC01A0C" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART0_RX_IRQSTAT" group="UART" read-address="0xFFC01A0E" write-address="0xFFC01A0E" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART0_TX_CURR_PTR" group="UART" read-address="0xFFC01B00" write-address="0xFFC01B00" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART0_TX_CONFIG_DMA" group="UART" read-address="0xFFC01B02" write-address="0xFFC01B02" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART0_TX_START_PG" group="UART" read-address="0xFFC01B04" write-address="0xFFC01B04" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART0_TX_START_ADDR" group="UART" read-address="0xFFC01B06" write-address="0xFFC01B06" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART0_TX_COUNT" group="UART" read-address="0xFFC01B08" write-address="0xFFC01B08" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART0_TX_NEXT_DESCR" group="UART" read-address="0xFFC01B0A" write-address="0xFFC01B0A" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART0_TX_DESCR_RDY" group="UART" read-address="0xFFC01B0C" write-address="0xFFC01B0C" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART0_TX_IRQSTAT" group="UART" read-address="0xFFC01B0E" write-address="0xFFC01B0E" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART1_THR" group="UART" read-address="0xFFC01C00" write-address="0xFFC01C00" mask="FFFF" type="IO" description="Transmit Holding" bit-size="16"/>
+<register name="UART1_RBR" group="UART" read-address="0xFFC01C00" write-address="0xFFC01C00" mask="FFFF" type="IO" description="Receive Buffer" bit-size="16"/>
+<register name="UART1_DLL" group="UART" read-address="0xFFC01C00" write-address="0xFFC01C00" mask="FFFF" type="IO" description="Divisor Latch (Low-Byte)" bit-size="16"/>
+<register name="UART1_IER" group="UART" read-address="0xFFC01C02" write-address="0xFFC01C02" mask="FFFF" type="IO" description="Interrupt Enable" bit-size="16"/>
 <register name="UART1_IER_ERBFI" parent="UART1_IER" bit-position="0" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART1_IER_ETBEI" parent="UART1_IER" bit-position="1" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART1_IER_ELSI"  parent="UART1_IER" bit-position="2" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART1_IER_EDDSI" parent="UART1_IER" bit-position="3" type="IO" description="child register" bit-size="1" target="SIM"/>
-<register name="UART1_DLH" group="UART1" read-address="0xFFC01C02" write-address="0xFFC01C02" mask="FFFF" type="IO" description="Divisor Latch (High-Byte)" bit-size="16"/>
-<register name="UART1_IIR" group="UART1" read-address="0xFFC01C04" write-address="0xFFC01C04" mask="FFFF" type="IO" description="Interrupt Identification" bit-size="16"/>
+<register name="UART1_DLH" group="UART" read-address="0xFFC01C02" write-address="0xFFC01C02" mask="FFFF" type="IO" description="Divisor Latch (High-Byte)" bit-size="16"/>
+<register name="UART1_IIR" group="UART" read-address="0xFFC01C04" write-address="0xFFC01C04" mask="FFFF" type="IO" description="Interrupt Identification" bit-size="16"/>
 <register name="UART1_IIR_NINT" parent="UART1_IIR" bit-position="0" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART1_IIR_STATUS" parent="UART1_IIR" bit-position="1" type="IO" description="child register" bit-size="2" target="SIM"/>
-<register name="UART1_LCR" group="UART1" read-address="0xFFC01C06" write-address="0xFFC01C06" mask="FFFF" type="IO" description="Line Control" bit-size="16"/>
+<register name="UART1_LCR" group="UART" read-address="0xFFC01C06" write-address="0xFFC01C06" mask="FFFF" type="IO" description="Line Control" bit-size="16"/>
 <register name="UART1_LCR_WLS" parent="UART1_LCR" bit-position="0" type="IO" description="child register" bit-size="2" target="SIM"/>
 <register name="UART1_LCR_STOP" parent="UART1_LCR" bit-position="2" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART1_LCR_PEN" parent="UART1_LCR" bit-position="3" type="IO" description="child register" bit-size="1" target="SIM"/>
@@ -642,13 +642,13 @@
 <register name="UART1_LCR_StickyParity" parent="UART1_LCR" bit-position="5" type="IO" description="child register" bit-size="1"/>
 <register name="UART1_LCR_BRK" parent="UART1_LCR" bit-position="6" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART1_LCR_DLAB" parent="UART1_LCR" bit-position="7" type="IO" description="child register" bit-size="1" target="SIM"/>
-<register name="UART1_MCR" group="UART1" read-address="0xFFC01C08" write-address="0xFFC01C08" mask="FFFF" type="IO" description="Module Control" bit-size="16"/>
+<register name="UART1_MCR" group="UART" read-address="0xFFC01C08" write-address="0xFFC01C08" mask="FFFF" type="IO" description="Module Control" bit-size="16"/>
 <register name="UART1_MCR_DTR" parent="UART1_MCR" bit-position="0" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART1_MCR_RTS" parent="UART1_MCR" bit-position="1" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART1_MCR_OUT2" parent="UART1_MCR" bit-position="2" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART1_MCR_OUT1" parent="UART1_MCR" bit-position="3" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART1_MCR_LoopBack" parent="UART1_MCR" bit-position="4" type="IO" description="child register" bit-size="1" target="SIM"/>
-<register name="UART1_LSR" group="UART1" read-address="0xFFC01C0A" write-address="0xFFC01C0A" mask="FFFF" type="IO" description="Line Status" bit-size="16"/>
+<register name="UART1_LSR" group="UART" read-address="0xFFC01C0A" write-address="0xFFC01C0A" mask="FFFF" type="IO" description="Line Status" bit-size="16"/>
 <register name="UART1_LSR_DR" parent="UART1_LSR" bit-position="0" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART1_LSR_OE" parent="UART1_LSR" bit-position="1" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART1_LSR_PE" parent="UART1_LSR" bit-position="2" type="IO" description="child register" bit-size="1" target="SIM"/>
@@ -656,7 +656,7 @@
 <register name="UART1_LSR_BI" parent="UART1_LSR" bit-position="4" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART1_LSR_THRE" parent="UART1_LSR" bit-position="5" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART1_LSR_TEMT" parent="UART1_LSR" bit-position="6" type="IO" description="child register" bit-size="1" target="SIM"/>
-<register name="UART1_MSR" group="UART1" read-address="0xFFC01C0C" write-address="0xFFC01C0C" mask="FFFF" type="IO" description="MSR Modem Status" bit-size="16"/>
+<register name="UART1_MSR" group="UART" read-address="0xFFC01C0C" write-address="0xFFC01C0C" mask="FFFF" type="IO" description="MSR Modem Status" bit-size="16"/>
 <register name="UART1_MSR_DCTS" parent="UART1_MSR" bit-position="0" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART1_MSR_DDSR" parent="UART1_MSR" bit-position="1" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART1_MSR_TERI" parent="UART1_MSR" bit-position="2" type="IO" description="child register" bit-size="1" target="SIM"/>
@@ -665,23 +665,23 @@
 <register name="UART1_MSR_DSR" parent="UART1_MSR" bit-position="5" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART1_MSR_RI" parent="UART1_MSR" bit-position="6" type="IO" description="child register" bit-size="1" target="SIM"/>
 <register name="UART1_MSR_DCD" parent="UART1_MSR" bit-position="7" type="IO" description="child register" bit-size="1" target="SIM"/>
-<register name="UART1_SCR" group="UART1" read-address="0xFFC01C0E" write-address="0xFFC01C0E" mask="FFFF" type="IO" description="SCR Scratch" bit-size="16"/>
-<register name="UART1_RX_CURR_PTR" group="UART1" read-address="0xFFC01E00" write-address="0xFFC01E00" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART1_RX_CONFIG_DMA" group="UART1" read-address="0xFFC01E02" write-address="0xFFC01E02" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART1_RX_START_PG" group="UART1" read-address="0xFFC01E04" write-address="0xFFC01E04" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART1_RX_START_ADDR" group="UART1" read-address="0xFFC01E06" write-address="0xFFC01E06" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART1_RX_COUNT" group="UART1" read-address="0xFFC01E08" write-address="0xFFC01E08" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART1_RX_NEXT_DESCR" group="UART1" read-address="0xFFC01E0A" write-address="0xFFC01E0A" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART1_RX_DESCR_RDY" group="UART1" read-address="0xFFC01E0C" write-address="0xFFC01E0C" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART1_RX_IRQSTAT" group="UART1" read-address="0xFFC01E0E" write-address="0xFFC01E0E" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART1_TX_CURR_PTR" group="UART1" read-address="0xFFC01F00" write-address="0xFFC01F00" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART1_TX_CONFIG_DMA" group="UART1" read-address="0xFFC01F02" write-address="0xFFC01F02" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART1_TX_START_PG" group="UART1" read-address="0xFFC01F04" write-address="0xFFC01F04" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART1_TX_START_ADDR" group="UART1" read-address="0xFFC01F06" write-address="0xFFC01F06" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART1_TX_COUNT" group="UART1" read-address="0xFFC01F08" write-address="0xFFC01F08" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART1_TX_NEXT_DESCR" group="UART1" read-address="0xFFC01F0A" write-address="0xFFC01F0A" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART1_TX_DESCR_RDY" group="UART1" read-address="0xFFC01F0C" write-address="0xFFC01F0C" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="UART1_TX_IRQSTAT" group="UART1" read-address="0xFFC01F0E" write-address="0xFFC01F0E" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART1_SCR" group="UART" read-address="0xFFC01C0E" write-address="0xFFC01C0E" mask="FFFF" type="IO" description="SCR Scratch" bit-size="16"/>
+<register name="UART1_RX_CURR_PTR" group="UART" read-address="0xFFC01E00" write-address="0xFFC01E00" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART1_RX_CONFIG_DMA" group="UART" read-address="0xFFC01E02" write-address="0xFFC01E02" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART1_RX_START_PG" group="UART" read-address="0xFFC01E04" write-address="0xFFC01E04" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART1_RX_START_ADDR" group="UART" read-address="0xFFC01E06" write-address="0xFFC01E06" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART1_RX_COUNT" group="UART" read-address="0xFFC01E08" write-address="0xFFC01E08" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART1_RX_NEXT_DESCR" group="UART" read-address="0xFFC01E0A" write-address="0xFFC01E0A" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART1_RX_DESCR_RDY" group="UART" read-address="0xFFC01E0C" write-address="0xFFC01E0C" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART1_RX_IRQSTAT" group="UART" read-address="0xFFC01E0E" write-address="0xFFC01E0E" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART1_TX_CURR_PTR" group="UART" read-address="0xFFC01F00" write-address="0xFFC01F00" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART1_TX_CONFIG_DMA" group="UART" read-address="0xFFC01F02" write-address="0xFFC01F02" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART1_TX_START_PG" group="UART" read-address="0xFFC01F04" write-address="0xFFC01F04" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART1_TX_START_ADDR" group="UART" read-address="0xFFC01F06" write-address="0xFFC01F06" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART1_TX_COUNT" group="UART" read-address="0xFFC01F08" write-address="0xFFC01F08" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART1_TX_NEXT_DESCR" group="UART" read-address="0xFFC01F0A" write-address="0xFFC01F0A" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART1_TX_DESCR_RDY" group="UART" read-address="0xFFC01F0C" write-address="0xFFC01F0C" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="UART1_TX_IRQSTAT" group="UART" read-address="0xFFC01F0E" write-address="0xFFC01F0E" mask="FFFF" type="IO" description="" bit-size="16"/>
 <register name="PLL_CTL" group="PLL Register File" read-address="0xFFC00400" write-address="0xFFC00400" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
 <register name="PLL_STAT" group="PLL Register File" read-address="0xFFC00404" write-address="0xFFC00404" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
 <register name="PLL_LOCKCNT" group="PLL Register File" read-address="0xFFC00406" write-address="0xFFC00406" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
@@ -734,41 +734,41 @@
 		<register name="RTC_FAST"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC01414" write-address="0xFFC01414" type="IO" target="EMU"/>
 
 		<!-- UART0 Controller Registers -->
-		<register name="UART0_IRCR"             group="Extended Registers" description="" bit-size="16" read-address="0xFFC01810" write-address="0xFFC01810" type="IO" target="EMU"/>
-		<register name="UART0_CURR_PTR_RX"      group="Extended Registers" description="" bit-size="16" read-address="0xFFC01A00" write-address="0xFFC01A00" type="IO" target="EMU"/>
-		<register name="UART0_CONFIG_RX"        group="Extended Registers" description="" bit-size="16" read-address="0xFFC01A02" write-address="0xFFC01A02" type="IO" target="EMU"/>
-		<register name="UART0_START_ADDR_HI_RX" group="Extended Registers" description="" bit-size="16" read-address="0xFFC01A04" write-address="0xFFC01A04" type="IO" target="EMU"/>
-		<register name="UART0_START_ADDR_LO_RX" group="Extended Registers" description="" bit-size="16" read-address="0xFFC01A06" write-address="0xFFC01A06" type="IO" target="EMU"/>
-		<register name="UART0_COUNT_RX"         group="Extended Registers" description="" bit-size="16" read-address="0xFFC01A08" write-address="0xFFC01A08" type="IO" target="EMU"/>
-		<register name="UART0_NEXT_DESCR_RX"    group="Extended Registers" description="" bit-size="16" read-address="0xFFC01A0A" write-address="0xFFC01A0A" type="IO" target="EMU"/>
-		<register name="UART0_DESCR_RDY_RX"     group="Extended Registers" description="" bit-size="16" read-address="0xFFC01A0C" write-address="0xFFC01A0C" type="IO" target="EMU"/>
-		<register name="UART0_IRQSTAT_RX"       group="Extended Registers" description="" bit-size="16" read-address="0xFFC01A0E" write-address="0xFFC01A0E" type="IO" target="EMU"/>
-		<register name="UART0_CURR_PTR_TX"      group="Extended Registers" description="" bit-size="16" read-address="0xFFC01B00" write-address="0xFFC01B00" type="IO" target="EMU"/>
-		<register name="UART0_CONFIG_TX"        group="Extended Registers" description="" bit-size="16" read-address="0xFFC01B02" write-address="0xFFC01B02" type="IO" target="EMU"/>
-		<register name="UART0_START_ADDR_HI_TX" group="Extended Registers" description="" bit-size="16" read-address="0xFFC01B04" write-address="0xFFC01B04" type="IO" target="EMU"/>
-		<register name="UART0_START_ADDR_LO_TX" group="Extended Registers" description="" bit-size="16" read-address="0xFFC01B06" write-address="0xFFC01B06" type="IO" target="EMU"/>
-		<register name="UART0_COUNT_TX"         group="Extended Registers" description="" bit-size="16" read-address="0xFFC01B08" write-address="0xFFC01B08" type="IO" target="EMU"/>
-		<register name="UART0_NEXT_DESCR_TX"    group="Extended Registers" description="" bit-size="16" read-address="0xFFC01B0A" write-address="0xFFC01B0A" type="IO" target="EMU"/>
-		<register name="UART0_DESCR_RDY_TX"     group="Extended Registers" description="" bit-size="16" read-address="0xFFC01B0C" write-address="0xFFC01B0C" type="IO" target="EMU"/>
-		<register name="UART0_IRQSTAT_TX"       group="Extended Registers" description="" bit-size="16" read-address="0xFFC01B0E" write-address="0xFFC01B0E" type="IO" target="EMU"/>
+		<register name="UART0_IRCR"             group="UART" description="" bit-size="16" read-address="0xFFC01810" write-address="0xFFC01810" type="IO" target="EMU"/>
+		<register name="UART0_CURR_PTR_RX"      group="UART" description="" bit-size="16" read-address="0xFFC01A00" write-address="0xFFC01A00" type="IO" target="EMU"/>
+		<register name="UART0_CONFIG_RX"        group="UART" description="" bit-size="16" read-address="0xFFC01A02" write-address="0xFFC01A02" type="IO" target="EMU"/>
+		<register name="UART0_START_ADDR_HI_RX" group="UART" description="" bit-size="16" read-address="0xFFC01A04" write-address="0xFFC01A04" type="IO" target="EMU"/>
+		<register name="UART0_START_ADDR_LO_RX" group="UART" description="" bit-size="16" read-address="0xFFC01A06" write-address="0xFFC01A06" type="IO" target="EMU"/>
+		<register name="UART0_COUNT_RX"         group="UART" description="" bit-size="16" read-address="0xFFC01A08" write-address="0xFFC01A08" type="IO" target="EMU"/>
+		<register name="UART0_NEXT_DESCR_RX"    group="UART" description="" bit-size="16" read-address="0xFFC01A0A" write-address="0xFFC01A0A" type="IO" target="EMU"/>
+		<register name="UART0_DESCR_RDY_RX"     group="UART" description="" bit-size="16" read-address="0xFFC01A0C" write-address="0xFFC01A0C" type="IO" target="EMU"/>
+		<register name="UART0_IRQSTAT_RX"       group="UART" description="" bit-size="16" read-address="0xFFC01A0E" write-address="0xFFC01A0E" type="IO" target="EMU"/>
+		<register name="UART0_CURR_PTR_TX"      group="UART" description="" bit-size="16" read-address="0xFFC01B00" write-address="0xFFC01B00" type="IO" target="EMU"/>
+		<register name="UART0_CONFIG_TX"        group="UART" description="" bit-size="16" read-address="0xFFC01B02" write-address="0xFFC01B02" type="IO" target="EMU"/>
+		<register name="UART0_START_ADDR_HI_TX" group="UART" description="" bit-size="16" read-address="0xFFC01B04" write-address="0xFFC01B04" type="IO" target="EMU"/>
+		<register name="UART0_START_ADDR_LO_TX" group="UART" description="" bit-size="16" read-address="0xFFC01B06" write-address="0xFFC01B06" type="IO" target="EMU"/>
+		<register name="UART0_COUNT_TX"         group="UART" description="" bit-size="16" read-address="0xFFC01B08" write-address="0xFFC01B08" type="IO" target="EMU"/>
+		<register name="UART0_NEXT_DESCR_TX"    group="UART" description="" bit-size="16" read-address="0xFFC01B0A" write-address="0xFFC01B0A" type="IO" target="EMU"/>
+		<register name="UART0_DESCR_RDY_TX"     group="UART" description="" bit-size="16" read-address="0xFFC01B0C" write-address="0xFFC01B0C" type="IO" target="EMU"/>
+		<register name="UART0_IRQSTAT_TX"       group="UART" description="" bit-size="16" read-address="0xFFC01B0E" write-address="0xFFC01B0E" type="IO" target="EMU"/>
 
 		<!-- UART1 Controller Registers -->
-		<register name="UART1_CURR_PTR_RX"      group="Extended Registers" description="" bit-size="16" read-address="0xFFC01E00" write-address="0xFFC01E00" type="IO" target="EMU"/>
-		<register name="UART1_CONFIG_RX"        group="Extended Registers" description="" bit-size="16" read-address="0xFFC01E02" write-address="0xFFC01E02" type="IO" target="EMU"/>
-		<register name="UART1_START_ADDR_HI_RX" group="Extended Registers" description="" bit-size="16" read-address="0xFFC01E04" write-address="0xFFC01E04" type="IO" target="EMU"/>
-		<register name="UART1_START_ADDR_LO_RX" group="Extended Registers" description="" bit-size="16" read-address="0xFFC01E06" write-address="0xFFC01E06" type="IO" target="EMU"/>
-		<register name="UART1_COUNT_RX"         group="Extended Registers" description="" bit-size="16" read-address="0xFFC01E08" write-address="0xFFC01E08" type="IO" target="EMU"/>
-		<register name="UART1_NEXT_DESCR_RX"    group="Extended Registers" description="" bit-size="16" read-address="0xFFC01E0A" write-address="0xFFC01E0A" type="IO" target="EMU"/>
-		<register name="UART1_DESCR_RDY_RX"     group="Extended Registers" description="" bit-size="16" read-address="0xFFC01E0C" write-address="0xFFC01E0C" type="IO" target="EMU"/>
-		<register name="UART1_IRQSTAT_RX"       group="Extended Registers" description="" bit-size="16" read-address="0xFFC01E0E" write-address="0xFFC01E0E" type="IO" target="EMU"/>
-		<register name="UART1_CURR_PTR_TX"      group="Extended Registers" description="" bit-size="16" read-address="0xFFC01F00" write-address="0xFFC01F00" type="IO" target="EMU"/>
-		<register name="UART1_CONFIG_TX"        group="Extended Registers" description="" bit-size="16" read-address="0xFFC01F02" write-address="0xFFC01F02" type="IO" target="EMU"/>
-		<register name="UART1_START_ADDR_HI_TX" group="Extended Registers" description="" bit-size="16" read-address="0xFFC01F04" write-address="0xFFC01F04" type="IO" target="EMU"/>
-		<register name="UART1_START_ADDR_LO_TX" group="Extended Registers" description="" bit-size="16" read-address="0xFFC01F06" write-address="0xFFC01F06" type="IO" target="EMU"/>
-		<register name="UART1_COUNT_TX"         group="Extended Registers" description="" bit-size="16" read-address="0xFFC01F08" write-address="0xFFC01F08" type="IO" target="EMU"/>
-		<register name="UART1_NEXT_DESCR_TX"    group="Extended Registers" description="" bit-size="16" read-address="0xFFC01F0A" write-address="0xFFC01F0A" type="IO" target="EMU"/>
-		<register name="UART1_DESCR_RDY_TX"     group="Extended Registers" description="" bit-size="16" read-address="0xFFC01F0C" write-address="0xFFC01F0C" type="IO" target="EMU"/>
-		<register name="UART1_IRQSTAT_TX"       group="Extended Registers" description="" bit-size="16" read-address="0xFFC01F0E" write-address="0xFFC01F0E" type="IO" target="EMU"/>
+		<register name="UART1_CURR_PTR_RX"      group="UART" description="" bit-size="16" read-address="0xFFC01E00" write-address="0xFFC01E00" type="IO" target="EMU"/>
+		<register name="UART1_CONFIG_RX"        group="UART" description="" bit-size="16" read-address="0xFFC01E02" write-address="0xFFC01E02" type="IO" target="EMU"/>
+		<register name="UART1_START_ADDR_HI_RX" group="UART" description="" bit-size="16" read-address="0xFFC01E04" write-address="0xFFC01E04" type="IO" target="EMU"/>
+		<register name="UART1_START_ADDR_LO_RX" group="UART" description="" bit-size="16" read-address="0xFFC01E06" write-address="0xFFC01E06" type="IO" target="EMU"/>
+		<register name="UART1_COUNT_RX"         group="UART" description="" bit-size="16" read-address="0xFFC01E08" write-address="0xFFC01E08" type="IO" target="EMU"/>
+		<register name="UART1_NEXT_DESCR_RX"    group="UART" description="" bit-size="16" read-address="0xFFC01E0A" write-address="0xFFC01E0A" type="IO" target="EMU"/>
+		<register name="UART1_DESCR_RDY_RX"     group="UART" description="" bit-size="16" read-address="0xFFC01E0C" write-address="0xFFC01E0C" type="IO" target="EMU"/>
+		<register name="UART1_IRQSTAT_RX"       group="UART" description="" bit-size="16" read-address="0xFFC01E0E" write-address="0xFFC01E0E" type="IO" target="EMU"/>
+		<register name="UART1_CURR_PTR_TX"      group="UART" description="" bit-size="16" read-address="0xFFC01F00" write-address="0xFFC01F00" type="IO" target="EMU"/>
+		<register name="UART1_CONFIG_TX"        group="UART" description="" bit-size="16" read-address="0xFFC01F02" write-address="0xFFC01F02" type="IO" target="EMU"/>
+		<register name="UART1_START_ADDR_HI_TX" group="UART" description="" bit-size="16" read-address="0xFFC01F04" write-address="0xFFC01F04" type="IO" target="EMU"/>
+		<register name="UART1_START_ADDR_LO_TX" group="UART" description="" bit-size="16" read-address="0xFFC01F06" write-address="0xFFC01F06" type="IO" target="EMU"/>
+		<register name="UART1_COUNT_TX"         group="UART" description="" bit-size="16" read-address="0xFFC01F08" write-address="0xFFC01F08" type="IO" target="EMU"/>
+		<register name="UART1_NEXT_DESCR_TX"    group="UART" description="" bit-size="16" read-address="0xFFC01F0A" write-address="0xFFC01F0A" type="IO" target="EMU"/>
+		<register name="UART1_DESCR_RDY_TX"     group="UART" description="" bit-size="16" read-address="0xFFC01F0C" write-address="0xFFC01F0C" type="IO" target="EMU"/>
+		<register name="UART1_IRQSTAT_TX"       group="UART" description="" bit-size="16" read-address="0xFFC01F0E" write-address="0xFFC01F0E" type="IO" target="EMU"/>
 
 		<!-- Timer Registers -->
 		<register name="TIMER0_STATUS"     group="Extended Registers" description="" bit-size="16" read-address="0xFFC02000" write-address="0xFFC02000" type="IO" target="EMU"/>

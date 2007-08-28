@@ -56,18 +56,18 @@
 	<!--******************-->
 	<!-- UART0 Controller -->
 	<!--******************-->
-<register name="UART0_THR"  group="UART0" read-address="0xFFC00400" write-address="0xFFC00400" mask="FFFF" type="IO" description="Transmit Holding register" bit-size="16" def-comment="UART0 Controller (0xFFC00400 - 0xFFC004FF)"/>
-<register name="UART0_RBR"  group="UART0" read-address="0xFFC00400" write-address="0xFFC00400" mask="FFFF" type="IO" description="Receive Buffer register" bit-size="16"/>
-<register name="UART0_DLL"  group="UART0" read-address="0xFFC00400" write-address="0xFFC00400" mask="FFFF" type="IO" description="Divisor Latch (Low-Byte)" bit-size="16"/>
-<register name="UART0_IER"  group="UART0" read-address="0xFFC00404" write-address="0xFFC00404" mask="FFFF" type="IO" description="Interrupt Enable Register" bit-size="16"/>
-<register name="UART0_DLH"  group="UART0" read-address="0xFFC00404" write-address="0xFFC00404" mask="FFFF" type="IO" description="Divisor Latch (High-Byte)" bit-size="16"/>
-<register name="UART0_IIR"  group="UART0" read-address="0xFFC00408" write-address="0xFFC00408" mask="FFFF" type="IO" description="Interrupt Identification Register" bit-size="16"/>
-<register name="UART0_LCR"  group="UART0" read-address="0xFFC0040C" write-address="0xFFC0040C" mask="FFFF" type="IO" description="Line Control Register" bit-size="16"/>
-<register name="UART0_MCR"  group="UART0" read-address="0xFFC00410" write-address="0xFFC00410" mask="FFFF" type="IO" description="Modem Control Register" bit-size="16"/>
-<register name="UART0_LSR"  group="UART0" read-address="0xFFC00414" write-address="0xFFC00414" mask="FFFF" type="IO" description="Line Status Register" bit-size="16"/>
-<register name="UART0_MSR"  group="UART0" read-address="0xFFC00418" write-address="0xFFC00418" mask="FFFF" type="IO" description="Modem Status Register" bit-size="16"/>
-<register name="UART0_SCR"  group="UART0" read-address="0xFFC0041C" write-address="0xFFC0041C" mask="FFFF" type="IO" description="SCR Scratch Register" bit-size="16"/>
-<register name="UART0_GCTL" group="UART0" read-address="0xFFC00424" write-address="0xFFC00424" mask="FFFF" type="IO" description="Global Control Register" bit-size="16"/>
+<register name="UART0_THR"  group="UART" read-address="0xFFC00400" write-address="0xFFC00400" mask="FFFF" type="IO" description="Transmit Holding register" bit-size="16" def-comment="UART0 Controller (0xFFC00400 - 0xFFC004FF)"/>
+<register name="UART0_RBR"  group="UART" read-address="0xFFC00400" write-address="0xFFC00400" mask="FFFF" type="IO" description="Receive Buffer register" bit-size="16"/>
+<register name="UART0_DLL"  group="UART" read-address="0xFFC00400" write-address="0xFFC00400" mask="FFFF" type="IO" description="Divisor Latch (Low-Byte)" bit-size="16"/>
+<register name="UART0_IER"  group="UART" read-address="0xFFC00404" write-address="0xFFC00404" mask="FFFF" type="IO" description="Interrupt Enable Register" bit-size="16"/>
+<register name="UART0_DLH"  group="UART" read-address="0xFFC00404" write-address="0xFFC00404" mask="FFFF" type="IO" description="Divisor Latch (High-Byte)" bit-size="16"/>
+<register name="UART0_IIR"  group="UART" read-address="0xFFC00408" write-address="0xFFC00408" mask="FFFF" type="IO" description="Interrupt Identification Register" bit-size="16"/>
+<register name="UART0_LCR"  group="UART" read-address="0xFFC0040C" write-address="0xFFC0040C" mask="FFFF" type="IO" description="Line Control Register" bit-size="16"/>
+<register name="UART0_MCR"  group="UART" read-address="0xFFC00410" write-address="0xFFC00410" mask="FFFF" type="IO" description="Modem Control Register" bit-size="16"/>
+<register name="UART0_LSR"  group="UART" read-address="0xFFC00414" write-address="0xFFC00414" mask="FFFF" type="IO" description="Line Status Register" bit-size="16"/>
+<register name="UART0_MSR"  group="UART" read-address="0xFFC00418" write-address="0xFFC00418" mask="FFFF" type="IO" description="Modem Status Register" bit-size="16"/>
+<register name="UART0_SCR"  group="UART" read-address="0xFFC0041C" write-address="0xFFC0041C" mask="FFFF" type="IO" description="SCR Scratch Register" bit-size="16"/>
+<register name="UART0_GCTL" group="UART" read-address="0xFFC00424" write-address="0xFFC00424" mask="FFFF" type="IO" description="Global Control Register" bit-size="16"/>
 
 	<!-- these child bits are not displayed in the windows but I will leave them for possible use in the future -->
 	<register name="UART0_IER_ERBFI"   parent="UART0_IER" bit-position="0" bit-size="1"/>
