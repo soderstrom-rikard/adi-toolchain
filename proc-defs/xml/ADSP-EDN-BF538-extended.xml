@@ -264,11 +264,11 @@
 		<register name="SPORT3_MRCS3"   group="SPORT" read-address="0xFFC0265C" write-address="0xFFC0265C" mask="FFFF" type="IO" description="" bit-size="16"/>
 
 		<!-- External Bus Interface Unit Registers -->
-		<register name="EBIU_AMGCTL"  group="External Bus Interface Unit" bit-size="16" read-address="0xFFC00A00" write-address="0xFFC00A00" type="IO" description="Asynchronous Memory Global Control Register" def-header="Asynchronous Memory Controller - External Bus Interface Unit" def-comment="External Bus Interface Unit (0xFFC00A00 - 0xFFC00AFF)" target="EMU"/>
+		<register name="EBIU_AMGCTL"  group="EBIU" bit-size="16" read-address="0xFFC00A00" write-address="0xFFC00A00" type="IO" description="Asynchronous Memory Global Control Register" def-header="Asynchronous Memory Controller - External Bus Interface Unit" def-comment="External Bus Interface Unit (0xFFC00A00 - 0xFFC00AFF)" target="EMU"/>
 			<register name="AMCKEN" parent="EBIU_AMGCTL" bit-position="0" description="" bit-size="1" target="EMU"/>
 			<register name="AMBEN"  parent="EBIU_AMGCTL" bit-position="1" description="" bit-size="3" target="EMU"/>
 			<register name="CDPRIO" parent="EBIU_AMGCTL" bit-position="8" description="" bit-size="1" target="EMU"/>
-		<register name="EBIU_AMBCTL0" group="External Bus Interface Unit" bit-size="32" read-address="0xFFC00A04" write-address="0xFFC00A04" type="IO" description="Asynchronous Memory Bank Control Register 0" target="EMU"/>
+		<register name="EBIU_AMBCTL0" group="EBIU" bit-size="32" read-address="0xFFC00A04" write-address="0xFFC00A04" type="IO" description="Asynchronous Memory Bank Control Register 0" target="EMU"/>
 			<register name="B0RDYEN"  parent="EBIU_AMBCTL0" bit-position="0" type="" description="" bit-size="1" target="EMU"/>
 			<register name="B0RDYPOL" parent="EBIU_AMBCTL0" bit-position="1" type="" description="" bit-size="1" target="EMU"/>
 			<register name="B0TT"     parent="EBIU_AMBCTL0" bit-position="2" type="" description="" bit-size="2" target="EMU"/>
@@ -283,7 +283,7 @@
 			<register name="B1HT"     parent="EBIU_AMBCTL0" bit-position="22" type="" description="" bit-size="2" target="EMU"/>
 			<register name="B1RAT"    parent="EBIU_AMBCTL0" bit-position="24" type="" description="" bit-size="4" target="EMU"/>
 			<register name="B1WAT"    parent="EBIU_AMBCTL0" bit-position="28" type="" description="" bit-size="4" target="EMU"/>
-		<register name="EBIU_AMBCTL1" group="External Bus Interface Unit" description="Asynchronous Memory Bank Control Register 1" bit-size="32" read-address="0xFFC00A08" write-address="0xFFC00A08" type="IO" target="EMU"/>
+		<register name="EBIU_AMBCTL1" group="EBIU" description="Asynchronous Memory Bank Control Register 1" bit-size="32" read-address="0xFFC00A08" write-address="0xFFC00A08" type="IO" target="EMU"/>
 			<register name="B2RDYEN"  parent="EBIU_AMBCTL0" bit-position="0"  description="" bit-size="1" target="EMU"/>
 			<register name="B2RDYPOL" parent="EBIU_AMBCTL0" bit-position="1"  description="" bit-size="1" target="EMU"/>
 			<register name="B2TT"     parent="EBIU_AMBCTL0" bit-position="2"  description="" bit-size="2" target="EMU"/>
@@ -298,7 +298,7 @@
 			<register name="B3HT"     parent="EBIU_AMBCTL0" bit-position="22" description="" bit-size="2" target="EMU"/>
 			<register name="B3RAT"    parent="EBIU_AMBCTL0" bit-position="24" description="" bit-size="4" target="EMU"/>
 			<register name="B3WAT"    parent="EBIU_AMBCTL0" bit-position="28" description="" bit-size="4" target="EMU"/>
-		<register name="EBIU_SDGCTL"  group="External Bus Interface Unit" description="SDRAM Global Control Register" bit-size="32" read-address="0xFFC00A10" write-address="0xFFC00A10" type="IO" def-comment="SDRAM Controller External Bus Interface Unit (0xFFC00A00 - 0xFFC00AFF)"/>
+		<register name="EBIU_SDGCTL"  group="EBIU" description="SDRAM Global Control Register" bit-size="32" read-address="0xFFC00A10" write-address="0xFFC00A10" type="IO" def-comment="SDRAM Controller External Bus Interface Unit (0xFFC00A00 - 0xFFC00AFF)"/>
 			<register name="SCTLE"    parent="EBIU_SDGCTL" bit-position="0" type="" description="" bit-size="1"/>
 			<register name="CL"       parent="EBIU_SDGCTL" bit-position="2" type="" description="" bit-size="2"/>
 			<register name="PASR"     parent="EBIU_SDGCTL" bit-position="4" type="" description="" bit-size="2"/>
@@ -315,19 +315,19 @@
 			<register name="EMREN"    parent="EBIU_SDGCTL" bit-position="28" type="" description="" bit-size="1"/>
 			<register name="TCSR"     parent="EBIU_SDGCTL" bit-position="29" type="" description="" bit-size="1"/>
 			<register name="CDDBG"    parent="EBIU_SDGCTL" bit-position="30" type="" description="" bit-size="1"/>
-		<register name="EBIU_SDBCTL"  group="External Bus Interface Unit" description="SDRAM Bank Control Register" bit-size="16" read-address="0xFFC00A14" write-address="0xFFC00A14" type="IO" />
+		<register name="EBIU_SDBCTL"  group="EBIU" description="SDRAM Bank Control Register" bit-size="16" read-address="0xFFC00A14" write-address="0xFFC00A14" type="IO" />
 			<register name="EBE"      parent="EBIU_SDBCTL" bit-position="0" type="" description="" bit-size="1"/>
 			<register name="EBSZ"     parent="EBIU_SDBCTL" bit-position="1" type="" description="" bit-size="2"/>
 			<register name="EBCAW"    parent="EBIU_SDBCTL" bit-position="4" type="" description="" bit-size="2"/>
 
-		<register name="EBIU_SDRRC"   group="External Bus Interface Unit" read-address="0xFFC00A18" write-address="0xFFC00A18" mask="FFFF"     type="IO" description="SDRAM Refresh Rate Control Register" bit-size="16"/>
+		<register name="EBIU_SDRRC"   group="EBIU" read-address="0xFFC00A18" write-address="0xFFC00A18" mask="FFFF"     type="IO" description="SDRAM Refresh Rate Control Register" bit-size="16"/>
 			<register name="SDCI"     parent="EBIU_SDRRC" bit-position="0" type="" description="" bit-size="1"/>
 			<register name="SDSRA"    parent="EBIU_SDRRC" bit-position="1" type="" description="" bit-size="1"/>
 			<register name="SDPUA"    parent="EBIU_SDRRC" bit-position="2" type="" description="" bit-size="1"/>
 			<register name="SDRS"     parent="EBIU_SDRRC" bit-position="3" type="" description="" bit-size="1"/>
 			<register name="SDEASE"   parent="EBIU_SDRRC" bit-position="4" type="" description="" bit-size="1"/>
 			<register name="BGSTAT"   parent="EBIU_SDRRC" bit-position="5" type="" description="" bit-size="1"/>
-		<register name="EBIU_SDSTAT"  group="External Bus Interface Unit" read-address="0xFFC00A1C" write-address="0xFFC00A1C" mask="FFFF"     type="IO" description="SDRAM Status Register" bit-size="16"/>
+		<register name="EBIU_SDSTAT"  group="EBIU" read-address="0xFFC00A1C" write-address="0xFFC00A1C" mask="FFFF"     type="IO" description="SDRAM Status Register" bit-size="16"/>
 
 	<register name="DMA0_TC_PER" legacy-name="DMA0_TCPER" group="DMA Traffic Control" description="Traffic Control Periods" bit-size="16" read-address="0xFFC00B0C" write-address="0xFFC00B0C" type="IO" def-comment="DMA0 Traffic Control" />
 		<register name="DMA0_TC_PER_DCB_TRAFFIC_PERIOD"      parent="DMA0_TC_PER" bit-position="0"  type="" description="" bit-size="4"/>

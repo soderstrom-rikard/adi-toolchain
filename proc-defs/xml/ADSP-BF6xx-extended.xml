@@ -731,11 +731,11 @@
 		<register name="MDMA_S1_CURR_Y_COUNT"   group="MEMDMA1 Source Registers" description="" bit-size="32" read-address="0xFFC00EF8" write-address="0xFFC00EF8" type="IO" target="EMU"/>
 
 		<!-- External Bus Interface Unit Registers -->
-		<register name="EBIU_AMGCTL"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC00A00" write-address="0xFFC00A00" type="IO" def-header="Asynchronous Memory Controller - External Bus Interface Unit" target="EMU"/>
+		<register name="EBIU_AMGCTL"  group="EBIU" description="" bit-size="16" read-address="0xFFC00A00" write-address="0xFFC00A00" type="IO" def-header="Asynchronous Memory Controller - External Bus Interface Unit" target="EMU"/>
 	<register name="AMCKEN" parent="EBUI_AMGCTL" bit-position="0" type="" description="" bit-size="1" target="EMU"/>
 	<register name="AMBEN" parent="EBUI_AMGCTL" bit-position="1" type="" description="" bit-size="3" target="EMU"/>
 	<register name="CDPRIO" parent="EBUI_AMGCTL" bit-position="8" type="" description="" bit-size="1" target="EMU"/>
-		<register name="EBIU_AMBCTL0" group="Extended Registers" description="" bit-size="32" read-address="0xFFC00A04" write-address="0xFFC00A04" type="IO" target="EMU"/>
+		<register name="EBIU_AMBCTL0" group="EBIU" description="" bit-size="32" read-address="0xFFC00A04" write-address="0xFFC00A04" type="IO" target="EMU"/>
 	<register name="B0RDYEN" parent="EBUI_AMBCTL0" bit-position="0" type="" description="" bit-size="1" target="EMU"/>
 	<register name="B0RDYPOL" parent="EBUI_AMBCTL0" bit-position="1" type="" description="" bit-size="1" target="EMU"/>
 	<register name="B0TT" parent="EBUI_AMBCTL0" bit-position="2" type="" description="" bit-size="2" target="EMU"/>
@@ -750,7 +750,7 @@
 	<register name="B1HT" parent="EBUI_AMBCTL0" bit-position="22" type="" description="" bit-size="2" target="EMU"/>
 	<register name="B1RAT" parent="EBUI_AMBCTL0" bit-position="24" type="" description="" bit-size="4" target="EMU"/>
 	<register name="B1WAT" parent="EBUI_AMBCTL0" bit-position="28" type="" description="" bit-size="4" target="EMU"/>
-		<register name="EBIU_AMBCTL1" group="Extended Registers" description="" bit-size="32" read-address="0xFFC00A08" write-address="0xFFC00A08" type="IO" target="EMU"/>
+		<register name="EBIU_AMBCTL1" group="EBIU" description="" bit-size="32" read-address="0xFFC00A08" write-address="0xFFC00A08" type="IO" target="EMU"/>
 	<register name="B2RDYEN" parent="EBUI_AMBCTL0" bit-position="0" type="" description="" bit-size="1" target="EMU"/>
 	<register name="B2RDYPOL" parent="EBUI_AMBCTL0" bit-position="1" type="" description="" bit-size="1" target="EMU"/>
 	<register name="B2TT" parent="EBUI_AMBCTL0" bit-position="2" type="" description="" bit-size="2" target="EMU"/>
@@ -765,7 +765,7 @@
 	<register name="B3HT" parent="EBUI_AMBCTL0" bit-position="22" type="" description="" bit-size="2" target="EMU"/>
 	<register name="B3RAT" parent="EBUI_AMBCTL0" bit-position="24" type="" description="" bit-size="4" target="EMU"/>
 	<register name="B3WAT" parent="EBUI_AMBCTL0" bit-position="28" type="" description="" bit-size="4" target="EMU"/>
-		<register name="EBIU_SDGCTL"  group="Extended Registers" description="" bit-size="32" read-address="0xFFC00A10" write-address="0xFFC00A10" type="IO" def-comment="SDRAM Controller External Bus Interface Unit (0xFFC00A00 - 0xFFC00AFF)"/>
+		<register name="EBIU_SDGCTL"  group="EBIU" description="" bit-size="32" read-address="0xFFC00A10" write-address="0xFFC00A10" type="IO" def-comment="SDRAM Controller External Bus Interface Unit (0xFFC00A00 - 0xFFC00AFF)"/>
 	<register name="SCTLE" parent="EBUI_SDGCTL" bit-position="0" type="" description="" bit-size="1"/>
 	<register name="CL" parent="EBUI_SDGCTL" bit-position="2" type="" description="" bit-size="2"/>
 	<register name="PASR" parent="EBUI_SDGCTL" bit-position="4" type="" description="" bit-size="2"/>
@@ -782,12 +782,12 @@
 	<register name="EMREN" parent="EBUI_SDGCTL" bit-position="28" type="" description="" bit-size="1"/>
 	<register name="TCSR" parent="EBUI_SDGCTL" bit-position="29" type="" description="" bit-size="1"/>
 	<register name="CDDBG" parent="EBUI_SDGCTL" bit-position="30" type="" description="" bit-size="1"/>
-		<register name="EBIU_SDBCTL"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC00A14" write-address="0xFFC00A14" type="IO" />
+		<register name="EBIU_SDBCTL"  group="EBIU" description="" bit-size="16" read-address="0xFFC00A14" write-address="0xFFC00A14" type="IO" />
 	<register name="EBE" parent="EBUI_SDBCTL" bit-position="0" type="" description="" bit-size="1"/>
 	<register name="EBSZ" parent="EBUI_SDBCTL" bit-position="1" type="" description="" bit-size="2"/>
 	<register name="EBCAW" parent="EBUI_SDBCTL" bit-position="4" type="" description="" bit-size="2"/>
-		<register name="EBIU_SDRRC"   group="Extended Registers" description="" bit-size="16" read-address="0xFFC00A18" write-address="0xFFC00A18" type="IO" />
-		<register name="EBIU_SDSTAT"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC00A1C" write-address="0xFFC00A1C" type="IO" />
+		<register name="EBIU_SDRRC"   group="EBIU" description="" bit-size="16" read-address="0xFFC00A18" write-address="0xFFC00A18" type="IO" />
+		<register name="EBIU_SDSTAT"  group="EBIU" description="" bit-size="16" read-address="0xFFC00A1C" write-address="0xFFC00A1C" type="IO" />
 	<register name="SDCI" parent="EBUI_SDRRC" bit-position="0" type="" description="" bit-size="1"/>
 	<register name="SDSRA" parent="EBUI_SDRRC" bit-position="1" type="" description="" bit-size="1"/>
 	<register name="SDPUA" parent="EBUI_SDRRC" bit-position="2" type="" description="" bit-size="1"/>

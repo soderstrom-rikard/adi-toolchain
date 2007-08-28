@@ -947,9 +947,9 @@
 		<register name="MDS_DI"   group="Extended Registers" description="" bit-size="16" read-address="0xFFC0390E" write-address="0xFFC0390E" type="IO" target="EMU"/>
 
 		<!-- Asynchronous Memory Controller Registers -->
-		<register name="EBIU_AMGCTL"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC03C00" write-address="0xFFC03C00" type="IO" target="EMU"/>
-		<register name="EBIU_AMBCTL0" group="Extended Registers" description="" bit-size="32" read-address="0xFFC03C04" write-address="0xFFC03C04" type="IO" target="EMU"/>
-		<register name="EBIU_AMBCTL1" group="Extended Registers" description="" bit-size="32" read-address="0xFFC03C08" write-address="0xFFC03C08" type="IO" target="EMU"/>
+		<register name="EBIU_AMGCTL"  group="EBIU" description="" bit-size="16" read-address="0xFFC03C00" write-address="0xFFC03C00" type="IO" target="EMU"/>
+		<register name="EBIU_AMBCTL0" group="EBIU" description="" bit-size="32" read-address="0xFFC03C04" write-address="0xFFC03C04" type="IO" target="EMU"/>
+		<register name="EBIU_AMBCTL1" group="EBIU" description="" bit-size="32" read-address="0xFFC03C08" write-address="0xFFC03C08" type="IO" target="EMU"/>
 
 		<!-- System DMA Registers -->
 		<register name="DMA_DBP"   group="Extended Registers" description="" bit-size="16" read-address="0xFFC04880" write-address="0xFFC04880" type="IO" target="EMU"/>
@@ -958,10 +958,10 @@
 
 
 		<!-- SDRAM Controller Registers -->
-		<register name="EBIU_SDGCTL" group="Extended Registers" description="" bit-size="32" read-address="0xFFC04C00" write-address="0xFFC04C00" type="IO" target="EMU"/>
-		<register name="EBIU_SDBCTL" group="Extended Registers" description="" bit-size="32" read-address="0xFFC04C04" write-address="0xFFC04C04" type="IO" target="EMU"/>
-		<register name="EBIU_SDRRC"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC04C0A" write-address="0xFFC04C0A" type="IO" target="EMU"/>
-		<register name="EBIU_SDSTAT" group="Extended Registers" description="" bit-size="16" read-address="0xFFC04C0E" write-address="0xFFC04C0E" type="IO" target="EMU"/>
+		<register name="EBIU_SDGCTL" group="EBIU" description="" bit-size="32" read-address="0xFFC04C00" write-address="0xFFC04C00" type="IO" target="EMU"/>
+		<register name="EBIU_SDBCTL" group="EBIU" description="" bit-size="32" read-address="0xFFC04C04" write-address="0xFFC04C04" type="IO" target="EMU"/>
+		<register name="EBIU_SDRRC"  group="EBIU" description="" bit-size="16" read-address="0xFFC04C0A" write-address="0xFFC04C0A" type="IO" target="EMU"/>
+		<register name="EBIU_SDSTAT" group="EBIU" description="" bit-size="16" read-address="0xFFC04C0E" write-address="0xFFC04C0E" type="IO" target="EMU"/>
 
 </register-extended-definitions>
 
