@@ -814,13 +814,13 @@
 		<!-- mispelled Tar 19815 register name="ERR_COR" Parent="PPI_STATUS"  description="" bit-size="1" BitPosition="15"/-->
 
 		<!-- SPI Controller Registers -->
-		<register name="SPI_CTL"    group="Extended Registers" description="" bit-size="16" read-address="0xFFC00500" write-address="0xFFC00500" type="IO" target="EMU"/>
-		<register name="SPI_FLG"    group="Extended Registers" description="" bit-size="16" read-address="0xFFC00504" write-address="0xFFC00504" type="IO" target="EMU"/>
-		<register name="SPI_STAT"   group="Extended Registers" description="" bit-size="16" read-address="0xFFC00508" write-address="0xFFC00508" type="IO" target="EMU"/>
-		<register name="SPI_TDBR"   group="Extended Registers" description="" bit-size="16" read-address="0xFFC0050C" write-address="0xFFC0050C" type="IO" target="EMU"/>
-		<register name="SPI_RDBR"   group="Extended Registers" description="" bit-size="16" read-address="0xFFC00510" write-address="0xFFC00510" type="IO" target="EMU"/>
-		<register name="SPI_BAUD"   group="Extended Registers" description="" bit-size="16" read-address="0xFFC00514" write-address="0xFFC00514" type="IO" target="EMU"/>
-		<register name="SPI_SHADOW" group="Extended Registers" description="" bit-size="16" read-address="0xFFC00518" write-address="0xFFC00518" type="IO" target="EMU"/>
+		<register name="SPI_CTL"    group="SPI" description="" bit-size="16" read-address="0xFFC00500" write-address="0xFFC00500" type="IO" target="EMU"/>
+		<register name="SPI_FLG"    group="SPI" description="" bit-size="16" read-address="0xFFC00504" write-address="0xFFC00504" type="IO" target="EMU"/>
+		<register name="SPI_STAT"   group="SPI" description="" bit-size="16" read-address="0xFFC00508" write-address="0xFFC00508" type="IO" target="EMU"/>
+		<register name="SPI_TDBR"   group="SPI" description="" bit-size="16" read-address="0xFFC0050C" write-address="0xFFC0050C" type="IO" target="EMU"/>
+		<register name="SPI_RDBR"   group="SPI" description="" bit-size="16" read-address="0xFFC00510" write-address="0xFFC00510" type="IO" target="EMU"/>
+		<register name="SPI_BAUD"   group="SPI" description="" bit-size="16" read-address="0xFFC00514" write-address="0xFFC00514" type="IO" target="EMU"/>
+		<register name="SPI_SHADOW" group="SPI" description="" bit-size="16" read-address="0xFFC00518" write-address="0xFFC00518" type="IO" target="EMU"/>
 
 		<!-- Programmable Flag Registers -->
 		<register name="FIO_FLAG_D"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC00700" write-address="0xFFC00700" type="IO" target="EMU"/>

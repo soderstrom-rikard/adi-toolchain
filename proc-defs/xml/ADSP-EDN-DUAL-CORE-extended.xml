@@ -31,21 +31,21 @@
 	<register name="CHIPID"      group="Extended Registers" description="" bit-size="32" read-address="0xFFC00014" write-address="0xFFC00014" type="IO" mask="FFFFFFFF" />
 
 	<!-- SPI Controller Registers -->
-	<register name="SPI_CTL"    group="Extended Registers" description="" bit-size="16" read-address="0xFFC00500" write-address="0xFFC00500" type="IO" target="EMU"/>
-	<register name="SPI_FLG"    group="Extended Registers" description="" bit-size="16" read-address="0xFFC00504" write-address="0xFFC00504" type="IO" target="EMU"/>
-	<register name="SPI_STAT"   group="Extended Registers" description="" bit-size="16" read-address="0xFFC00508" write-address="0xFFC00508" type="IO" target="EMU"/>
-	<register name="SPI_TDBR"   group="Extended Registers" description="" bit-size="16" read-address="0xFFC0050C" write-address="0xFFC0050C" type="IO" target="EMU"/>
-	<register name="SPI_RDBR"   group="Extended Registers" description="" bit-size="16" read-address="0xFFC00510" write-address="0xFFC00510" type="IO" target="EMU"/>
-	<register name="SPI_BAUD"   group="Extended Registers" description="" bit-size="16" read-address="0xFFC00514" write-address="0xFFC00514" type="IO" target="EMU"/>
-	<register name="SPI_SHADOW" group="Extended Registers" description="" bit-size="16" read-address="0xFFC00518" write-address="0xFFC00518" type="IO" target="EMU"/>
+	<register name="SPI_CTL"    group="SPI" description="" bit-size="16" read-address="0xFFC00500" write-address="0xFFC00500" type="IO" target="EMU"/>
+	<register name="SPI_FLG"    group="SPI" description="" bit-size="16" read-address="0xFFC00504" write-address="0xFFC00504" type="IO" target="EMU"/>
+	<register name="SPI_STAT"   group="SPI" description="" bit-size="16" read-address="0xFFC00508" write-address="0xFFC00508" type="IO" target="EMU"/>
+	<register name="SPI_TDBR"   group="SPI" description="" bit-size="16" read-address="0xFFC0050C" write-address="0xFFC0050C" type="IO" target="EMU"/>
+	<register name="SPI_RDBR"   group="SPI" description="" bit-size="16" read-address="0xFFC00510" write-address="0xFFC00510" type="IO" target="EMU"/>
+	<register name="SPI_BAUD"   group="SPI" description="" bit-size="16" read-address="0xFFC00514" write-address="0xFFC00514" type="IO" target="EMU"/>
+	<register name="SPI_SHADOW" group="SPI" description="" bit-size="16" read-address="0xFFC00518" write-address="0xFFC00518" type="IO" target="EMU"/>
 
 	<!-- Watchdog Timer Registers -->
-	<register name="WDOGA_CTL"  group="Watchdog Timer" description="" bit-size="16" read-address="0xFFC00200" write-address="0xFFC00200" type="IO" target="EMU" def-comment="Watchdog Timer Registers for Core A"/>
-	<register name="WDOGA_CNT"  group="Watchdog Timer" description="" bit-size="32" read-address="0xFFC00204" write-address="0xFFC00204" type="IO" target="EMU"/>
-	<register name="WDOGA_STAT" group="Watchdog Timer" description="" bit-size="32" read-address="0xFFC00208" write-address="0xFFC00208" type="IO" target="EMU"/>
-	<register name="WDOGB_CTL"  group="Watchdog Timer" description="" bit-size="16" read-address="0xFFC01200" write-address="0xFFC01200" type="IO" target="EMU" def-comment="Watchdog Timer Registers for Core B"/>
-	<register name="WDOGB_CNT"  group="Watchdog Timer" description="" bit-size="32" read-address="0xFFC01204" write-address="0xFFC01204" type="IO" target="EMU"/>
-	<register name="WDOGB_STAT" group="Watchdog Timer" description="" bit-size="32" read-address="0xFFC01208" write-address="0xFFC01208" type="IO" target="EMU"/>
+	<register name="WDOGA_CTL"  group="Watchdog" description="" bit-size="16" read-address="0xFFC00200" write-address="0xFFC00200" type="IO" target="EMU" def-comment="Watchdog Timer Registers for Core A"/>
+	<register name="WDOGA_CNT"  group="Watchdog" description="" bit-size="32" read-address="0xFFC00204" write-address="0xFFC00204" type="IO" target="EMU"/>
+	<register name="WDOGA_STAT" group="Watchdog" description="" bit-size="32" read-address="0xFFC00208" write-address="0xFFC00208" type="IO" target="EMU"/>
+	<register name="WDOGB_CTL"  group="Watchdog" description="" bit-size="16" read-address="0xFFC01200" write-address="0xFFC01200" type="IO" target="EMU" def-comment="Watchdog Timer Registers for Core B"/>
+	<register name="WDOGB_CNT"  group="Watchdog" description="" bit-size="32" read-address="0xFFC01204" write-address="0xFFC01204" type="IO" target="EMU"/>
+	<register name="WDOGB_STAT" group="Watchdog" description="" bit-size="32" read-address="0xFFC01208" write-address="0xFFC01208" type="IO" target="EMU"/>
 
 	<!--***************************************************-->
 	<!--***  DMA 1 Control Registers - Channels 0 - 11  ***-->

@@ -342,34 +342,34 @@
 <register name="SPT1_TX_NEXT_DESCR" group="SPT1" read-address="0xFFC02F0A" write-address="0xFFC02F0A" mask="FFFF" type="IO" description="" bit-size="16"/>
 <register name="SPT1_TX_DESCR_RDY" group="SPT1" read-address="0xFFC02F0C" write-address="0xFFC02F0C" mask="FFFF" type="IO" description="" bit-size="16"/>
 <register name="SPT1_TX_IRQSTAT" group="SPT1" read-address="0xFFC02F0E" write-address="0xFFC02F0E" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI0_SPICTL" group="SPI0" read-address="0xFFC03000" write-address="0xFFC03000" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI0_SPIFLG" group="SPI0" read-address="0xFFC03002" write-address="0xFFC03002" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI0_SPIST" group="SPI0" read-address="0xFFC03004" write-address="0xFFC03004" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI0_TDBR" group="SPI0" read-address="0xFFC03006" write-address="0xFFC03006" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI0_RDBR" group="SPI0" read-address="0xFFC03008" write-address="0xFFC03008" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI0_SPIBAUD" group="SPI0" read-address="0xFFC0300A" write-address="0xFFC0300A" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI0_DMACURR" group="SPI0" read-address="0xFFC03200" write-address="0xFFC03200" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI0_DMACONF" group="SPI0" read-address="0xFFC03202" write-address="0xFFC03202" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI0_DMASPAGE" group="SPI0" read-address="0xFFC03204" write-address="0xFFC03204" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI0_DMASADD" group="SPI0" read-address="0xFFC03206" write-address="0xFFC03206" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI0_DMACNT" group="SPI0" read-address="0xFFC03208" write-address="0xFFC03208" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI0_DMANEXT" group="SPI0" read-address="0xFFC0320A" write-address="0xFFC0320A" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI0_DMADRDY" group="SPI0" read-address="0xFFC0320C" write-address="0xFFC0320C" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI0_DMAIRQ" group="SPI0" read-address="0xFFC0320E" write-address="0xFFC0320E" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI1_SPICTL" group="SPI1" read-address="0xFFC03400" write-address="0xFFC03400" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI1_SPIFLG" group="SPI1" read-address="0xFFC03402" write-address="0xFFC03402" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI1_SPIST" group="SPI1" read-address="0xFFC03404" write-address="0xFFC03404" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI1_TDBR" group="SPI1" read-address="0xFFC03406" write-address="0xFFC03406" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI1_RDBR" group="SPI1" read-address="0xFFC03408" write-address="0xFFC03408" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI1_SPIBAUD" group="SPI1" read-address="0xFFC0340A" write-address="0xFFC0340A" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI1_DMACURR" group="SPI1" read-address="0xFFC03600" write-address="0xFFC03600" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI1_DMACONF" group="SPI1" read-address="0xFFC03602" write-address="0xFFC03602" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI1_DMASPAGE" group="SPI1" read-address="0xFFC03604" write-address="0xFFC03604" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI1_DMASADD" group="SPI1" read-address="0xFFC03606" write-address="0xFFC03606" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI1_DMACNT" group="SPI1" read-address="0xFFC03608" write-address="0xFFC03608" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI1_DMANEXT" group="SPI1" read-address="0xFFC0360A" write-address="0xFFC0360A" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI1_DMADRDY" group="SPI1" read-address="0xFFC0360C" write-address="0xFFC0360C" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SPI1_DMAIRQ" group="SPI1" read-address="0xFFC0360E" write-address="0xFFC0360E" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI0_SPICTL" group="SPI" read-address="0xFFC03000" write-address="0xFFC03000" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI0_SPIFLG" group="SPI" read-address="0xFFC03002" write-address="0xFFC03002" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI0_SPIST" group="SPI" read-address="0xFFC03004" write-address="0xFFC03004" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI0_TDBR" group="SPI" read-address="0xFFC03006" write-address="0xFFC03006" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI0_RDBR" group="SPI" read-address="0xFFC03008" write-address="0xFFC03008" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI0_SPIBAUD" group="SPI" read-address="0xFFC0300A" write-address="0xFFC0300A" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI0_DMACURR" group="SPI" read-address="0xFFC03200" write-address="0xFFC03200" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI0_DMACONF" group="SPI" read-address="0xFFC03202" write-address="0xFFC03202" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI0_DMASPAGE" group="SPI" read-address="0xFFC03204" write-address="0xFFC03204" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI0_DMASADD" group="SPI" read-address="0xFFC03206" write-address="0xFFC03206" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI0_DMACNT" group="SPI" read-address="0xFFC03208" write-address="0xFFC03208" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI0_DMANEXT" group="SPI" read-address="0xFFC0320A" write-address="0xFFC0320A" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI0_DMADRDY" group="SPI" read-address="0xFFC0320C" write-address="0xFFC0320C" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI0_DMAIRQ" group="SPI" read-address="0xFFC0320E" write-address="0xFFC0320E" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI1_SPICTL" group="SPI" read-address="0xFFC03400" write-address="0xFFC03400" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI1_SPIFLG" group="SPI" read-address="0xFFC03402" write-address="0xFFC03402" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI1_SPIST" group="SPI" read-address="0xFFC03404" write-address="0xFFC03404" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI1_TDBR" group="SPI" read-address="0xFFC03406" write-address="0xFFC03406" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI1_RDBR" group="SPI" read-address="0xFFC03408" write-address="0xFFC03408" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI1_SPIBAUD" group="SPI" read-address="0xFFC0340A" write-address="0xFFC0340A" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI1_DMACURR" group="SPI" read-address="0xFFC03600" write-address="0xFFC03600" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI1_DMACONF" group="SPI" read-address="0xFFC03602" write-address="0xFFC03602" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI1_DMASPAGE" group="SPI" read-address="0xFFC03604" write-address="0xFFC03604" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI1_DMASADD" group="SPI" read-address="0xFFC03606" write-address="0xFFC03606" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI1_DMACNT" group="SPI" read-address="0xFFC03608" write-address="0xFFC03608" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI1_DMANEXT" group="SPI" read-address="0xFFC0360A" write-address="0xFFC0360A" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI1_DMADRDY" group="SPI" read-address="0xFFC0360C" write-address="0xFFC0360C" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SPI1_DMAIRQ" group="SPI" read-address="0xFFC0360E" write-address="0xFFC0360E" mask="FFFF" type="IO" description="" bit-size="16"/>
 <register name="USBD_ID" group="USBD" read-address="0xFFC04400" write-address="0xFFC04400" mask="FFFF" type="IO" description="" bit-size="16"/>
 <register name="USBD_FRM" group="USBD" read-address="0xFFC04402" write-address="0xFFC04402" mask="FFFF" type="IO" description="" bit-size="16"/>
 <register name="USBD_FRMAT" group="USBD" read-address="0xFFC04404" write-address="0xFFC04404" mask="FFFF" type="IO" description="" bit-size="16"/>
@@ -899,34 +899,34 @@
 		<register name="SPORT1_IRQSTAT_TX"       group="SPORT" description="" bit-size="16" read-address="0xFFC02F0E" write-address="0xFFC02F0E" type="IO" target="EMU"/>
 
 		<!-- SPI0 Controller Registers -->
-		<register name="SPI0_CTL"           group="Extended Registers" description="" bit-size="16" read-address="0xFFC03000" write-address="0xFFC03000" type="IO" target="EMU"/>
-		<register name="SPI0_FLG"           group="Extended Registers" description="" bit-size="16" read-address="0xFFC03002" write-address="0xFFC03002" type="IO" target="EMU"/>
-		<register name="SPI0_ST"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC03004" write-address="0xFFC03004" type="IO" target="EMU"/>
-		<register name="SPI0_BAUD"          group="Extended Registers" description="" bit-size="16" read-address="0xFFC0300A" write-address="0xFFC0300A" type="IO" target="EMU"/>
-		<register name="SPI0_SHADOW"        group="Extended Registers" description="" bit-size="16" read-address="0xFFC0300C" write-address="0xFFC0300C" type="IO" target="EMU"/>
-		<register name="SPI0_CURR_PTR"      group="Extended Registers" description="" bit-size="16" read-address="0xFFC03200" write-address="0xFFC03200" type="IO" target="EMU"/>
-		<register name="SPI0_CONFIG"        group="Extended Registers" description="" bit-size="16" read-address="0xFFC03202" write-address="0xFFC03202" type="IO" target="EMU"/>
-		<register name="SPI0_START_ADDR_HI" group="Extended Registers" description="" bit-size="16" read-address="0xFFC03204" write-address="0xFFC03204" type="IO" target="EMU"/>
-		<register name="SPI0_START_ADDR_LO" group="Extended Registers" description="" bit-size="16" read-address="0xFFC03206" write-address="0xFFC03206" type="IO" target="EMU"/>
-		<register name="SPI0_COUNT"         group="Extended Registers" description="" bit-size="16" read-address="0xFFC03208" write-address="0xFFC03208" type="IO" target="EMU"/>
-		<register name="SPI0_NEXT_DESCR"    group="Extended Registers" description="" bit-size="16" read-address="0xFFC0320A" write-address="0xFFC0320A" type="IO" target="EMU"/>
-		<register name="SPI0_DESCR_RDY"     group="Extended Registers" description="" bit-size="16" read-address="0xFFC0320C" write-address="0xFFC0320C" type="IO" target="EMU"/>
-		<register name="SPI0_DMA_INT"       group="Extended Registers" description="" bit-size="16" read-address="0xFFC0320E" write-address="0xFFC0320E" type="IO" target="EMU"/>
+		<register name="SPI0_CTL"           group="SPI" description="" bit-size="16" read-address="0xFFC03000" write-address="0xFFC03000" type="IO" target="EMU"/>
+		<register name="SPI0_FLG"           group="SPI" description="" bit-size="16" read-address="0xFFC03002" write-address="0xFFC03002" type="IO" target="EMU"/>
+		<register name="SPI0_ST"            group="SPI" description="" bit-size="16" read-address="0xFFC03004" write-address="0xFFC03004" type="IO" target="EMU"/>
+		<register name="SPI0_BAUD"          group="SPI" description="" bit-size="16" read-address="0xFFC0300A" write-address="0xFFC0300A" type="IO" target="EMU"/>
+		<register name="SPI0_SHADOW"        group="SPI" description="" bit-size="16" read-address="0xFFC0300C" write-address="0xFFC0300C" type="IO" target="EMU"/>
+		<register name="SPI0_CURR_PTR"      group="SPI" description="" bit-size="16" read-address="0xFFC03200" write-address="0xFFC03200" type="IO" target="EMU"/>
+		<register name="SPI0_CONFIG"        group="SPI" description="" bit-size="16" read-address="0xFFC03202" write-address="0xFFC03202" type="IO" target="EMU"/>
+		<register name="SPI0_START_ADDR_HI" group="SPI" description="" bit-size="16" read-address="0xFFC03204" write-address="0xFFC03204" type="IO" target="EMU"/>
+		<register name="SPI0_START_ADDR_LO" group="SPI" description="" bit-size="16" read-address="0xFFC03206" write-address="0xFFC03206" type="IO" target="EMU"/>
+		<register name="SPI0_COUNT"         group="SPI" description="" bit-size="16" read-address="0xFFC03208" write-address="0xFFC03208" type="IO" target="EMU"/>
+		<register name="SPI0_NEXT_DESCR"    group="SPI" description="" bit-size="16" read-address="0xFFC0320A" write-address="0xFFC0320A" type="IO" target="EMU"/>
+		<register name="SPI0_DESCR_RDY"     group="SPI" description="" bit-size="16" read-address="0xFFC0320C" write-address="0xFFC0320C" type="IO" target="EMU"/>
+		<register name="SPI0_DMA_INT"       group="SPI" description="" bit-size="16" read-address="0xFFC0320E" write-address="0xFFC0320E" type="IO" target="EMU"/>
 
 		<!-- SPI1 Controller Registers -->
-		<register name="SPI1_CTL"           group="Extended Registers" description="" bit-size="16" read-address="0xFFC03400" write-address="0xFFC03400" type="IO" target="EMU"/>
-		<register name="SPI1_FLG"           group="Extended Registers" description="" bit-size="16" read-address="0xFFC03402" write-address="0xFFC03402" type="IO" target="EMU"/>
-		<register name="SPI1_ST"            group="Extended Registers" description="" bit-size="16" read-address="0xFFC03404" write-address="0xFFC03404" type="IO" target="EMU"/>
-		<register name="SPI1_BAUD"          group="Extended Registers" description="" bit-size="16" read-address="0xFFC0340A" write-address="0xFFC0340A" type="IO" target="EMU"/>
-		<register name="SPI1_SHADOW"        group="Extended Registers" description="" bit-size="16" read-address="0xFFC0340C" write-address="0xFFC0340C" type="IO" target="EMU"/>
-		<register name="SPI1_CURR_PTR"      group="Extended Registers" description="" bit-size="16" read-address="0xFFC03600" write-address="0xFFC03600" type="IO" target="EMU"/>
-		<register name="SPI1_CONFIG"        group="Extended Registers" description="" bit-size="16" read-address="0xFFC03602" write-address="0xFFC03602" type="IO" target="EMU"/>
-		<register name="SPI1_START_ADDR_HI" group="Extended Registers" description="" bit-size="16" read-address="0xFFC03604" write-address="0xFFC03604" type="IO" target="EMU"/>
-		<register name="SPI1_START_ADDR_LO" group="Extended Registers" description="" bit-size="16" read-address="0xFFC03606" write-address="0xFFC03606" type="IO" target="EMU"/>
-		<register name="SPI1_COUNT"         group="Extended Registers" description="" bit-size="16" read-address="0xFFC03608" write-address="0xFFC03608" type="IO" target="EMU"/>
-		<register name="SPI1_NEXT_DESCR"    group="Extended Registers" description="" bit-size="16" read-address="0xFFC0360A" write-address="0xFFC0360A" type="IO" target="EMU"/>
-		<register name="SPI1_DESCR_RDY"     group="Extended Registers" description="" bit-size="16" read-address="0xFFC0360C" write-address="0xFFC0360C" type="IO" target="EMU"/>
-		<register name="SPI1_DMA_INT"       group="Extended Registers" description="" bit-size="16" read-address="0xFFC0360E" write-address="0xFFC0360E" type="IO" target="EMU"/>
+		<register name="SPI1_CTL"           group="SPI" description="" bit-size="16" read-address="0xFFC03400" write-address="0xFFC03400" type="IO" target="EMU"/>
+		<register name="SPI1_FLG"           group="SPI" description="" bit-size="16" read-address="0xFFC03402" write-address="0xFFC03402" type="IO" target="EMU"/>
+		<register name="SPI1_ST"            group="SPI" description="" bit-size="16" read-address="0xFFC03404" write-address="0xFFC03404" type="IO" target="EMU"/>
+		<register name="SPI1_BAUD"          group="SPI" description="" bit-size="16" read-address="0xFFC0340A" write-address="0xFFC0340A" type="IO" target="EMU"/>
+		<register name="SPI1_SHADOW"        group="SPI" description="" bit-size="16" read-address="0xFFC0340C" write-address="0xFFC0340C" type="IO" target="EMU"/>
+		<register name="SPI1_CURR_PTR"      group="SPI" description="" bit-size="16" read-address="0xFFC03600" write-address="0xFFC03600" type="IO" target="EMU"/>
+		<register name="SPI1_CONFIG"        group="SPI" description="" bit-size="16" read-address="0xFFC03602" write-address="0xFFC03602" type="IO" target="EMU"/>
+		<register name="SPI1_START_ADDR_HI" group="SPI" description="" bit-size="16" read-address="0xFFC03604" write-address="0xFFC03604" type="IO" target="EMU"/>
+		<register name="SPI1_START_ADDR_LO" group="SPI" description="" bit-size="16" read-address="0xFFC03606" write-address="0xFFC03606" type="IO" target="EMU"/>
+		<register name="SPI1_COUNT"         group="SPI" description="" bit-size="16" read-address="0xFFC03608" write-address="0xFFC03608" type="IO" target="EMU"/>
+		<register name="SPI1_NEXT_DESCR"    group="SPI" description="" bit-size="16" read-address="0xFFC0360A" write-address="0xFFC0360A" type="IO" target="EMU"/>
+		<register name="SPI1_DESCR_RDY"     group="SPI" description="" bit-size="16" read-address="0xFFC0360C" write-address="0xFFC0360C" type="IO" target="EMU"/>
+		<register name="SPI1_DMA_INT"       group="SPI" description="" bit-size="16" read-address="0xFFC0360E" write-address="0xFFC0360E" type="IO" target="EMU"/>
 
 		<!-- Memory DMA Controller Registers -->
 		<register name="MDD_DCP"  group="Extended Registers" description="" bit-size="16" read-address="0xFFC03800" write-address="0xFFC03800" type="IO" target="EMU"/>

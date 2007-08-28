@@ -104,31 +104,31 @@
 		<register name="UART2_GCTL" group="UART" read-address="0xFFC02124" write-address="0xFFC02124" mask="FFFF" type="IO" description="" bit-size="16"/>
 
 		<!-- SPI0 Controller Registers -->
-		<register name="SPI0_CTL"    group="SPI0 Registers" read-address="0xFFC00500" write-address="0xFFC00500" type="IO" target="EMU" description="" bit-size="16" def-comment="SPI0 (0xFFC00500 - 0xFFC005FF)"/>
-		<register name="SPI0_FLG"    group="SPI0 Registers" read-address="0xFFC00504" write-address="0xFFC00504" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="SPI0_STAT"   group="SPI0 Registers" read-address="0xFFC00508" write-address="0xFFC00508" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="SPI0_TDBR"   group="SPI0 Registers" read-address="0xFFC0050C" write-address="0xFFC0050C" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="SPI0_RDBR"   group="SPI0 Registers" read-address="0xFFC00510" write-address="0xFFC00510" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="SPI0_BAUD"   group="SPI0 Registers" read-address="0xFFC00514" write-address="0xFFC00514" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="SPI0_SHADOW" group="SPI0 Registers" read-address="0xFFC00518" write-address="0xFFC00518" type="IO" target="EMU" description="" bit-size="16"/>
+		<register name="SPI0_CTL"    group="SPI" read-address="0xFFC00500" write-address="0xFFC00500" type="IO" target="EMU" description="" bit-size="16" def-comment="SPI0 (0xFFC00500 - 0xFFC005FF)"/>
+		<register name="SPI0_FLG"    group="SPI" read-address="0xFFC00504" write-address="0xFFC00504" type="IO" target="EMU" description="" bit-size="16"/>
+		<register name="SPI0_STAT"   group="SPI" read-address="0xFFC00508" write-address="0xFFC00508" type="IO" target="EMU" description="" bit-size="16"/>
+		<register name="SPI0_TDBR"   group="SPI" read-address="0xFFC0050C" write-address="0xFFC0050C" type="IO" target="EMU" description="" bit-size="16"/>
+		<register name="SPI0_RDBR"   group="SPI" read-address="0xFFC00510" write-address="0xFFC00510" type="IO" target="EMU" description="" bit-size="16"/>
+		<register name="SPI0_BAUD"   group="SPI" read-address="0xFFC00514" write-address="0xFFC00514" type="IO" target="EMU" description="" bit-size="16"/>
+		<register name="SPI0_SHADOW" group="SPI" read-address="0xFFC00518" write-address="0xFFC00518" type="IO" target="EMU" description="" bit-size="16"/>
 
 		<!-- SPI1 Controller Registers -->
-		<register name="SPI1_CTL"    group="SPI1 Registers" read-address="0xFFC02300" write-address="0xFFC02300" type="IO" target="EMU" description="" bit-size="16" def-comment="SPI1 (0xFFC02300 - 0xFFC023FF)"/>
-		<register name="SPI1_FLG"    group="SPI1 Registers" read-address="0xFFC02304" write-address="0xFFC02304" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="SPI1_STAT"   group="SPI1 Registers" read-address="0xFFC02308" write-address="0xFFC02308" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="SPI1_TDBR"   group="SPI1 Registers" read-address="0xFFC0230C" write-address="0xFFC0230C" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="SPI1_RDBR"   group="SPI1 Registers" read-address="0xFFC02310" write-address="0xFFC02310" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="SPI1_BAUD"   group="SPI1 Registers" read-address="0xFFC02314" write-address="0xFFC02314" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="SPI1_SHADOW" group="SPI1 Registers" read-address="0xFFC02318" write-address="0xFFC02318" type="IO" target="EMU" description="" bit-size="16"/>
+		<register name="SPI1_CTL"    group="SPI" read-address="0xFFC02300" write-address="0xFFC02300" type="IO" target="EMU" description="" bit-size="16" def-comment="SPI1 (0xFFC02300 - 0xFFC023FF)"/>
+		<register name="SPI1_FLG"    group="SPI" read-address="0xFFC02304" write-address="0xFFC02304" type="IO" target="EMU" description="" bit-size="16"/>
+		<register name="SPI1_STAT"   group="SPI" read-address="0xFFC02308" write-address="0xFFC02308" type="IO" target="EMU" description="" bit-size="16"/>
+		<register name="SPI1_TDBR"   group="SPI" read-address="0xFFC0230C" write-address="0xFFC0230C" type="IO" target="EMU" description="" bit-size="16"/>
+		<register name="SPI1_RDBR"   group="SPI" read-address="0xFFC02310" write-address="0xFFC02310" type="IO" target="EMU" description="" bit-size="16"/>
+		<register name="SPI1_BAUD"   group="SPI" read-address="0xFFC02314" write-address="0xFFC02314" type="IO" target="EMU" description="" bit-size="16"/>
+		<register name="SPI1_SHADOW" group="SPI" read-address="0xFFC02318" write-address="0xFFC02318" type="IO" target="EMU" description="" bit-size="16"/>
 
 		<!-- SPI2 Controller Registers -->
-		<register name="SPI2_CTL"    group="SPI2 Registers" read-address="0xFFC02400" write-address="0xFFC02400" type="IO" target="EMU" description="" bit-size="16" def-comment="SPI2 (0xFFC02400 - 0xFFC024FF)"/>
-		<register name="SPI2_FLG"    group="SPI2 Registers" read-address="0xFFC02404" write-address="0xFFC02404" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="SPI2_STAT"   group="SPI2 Registers" read-address="0xFFC02408" write-address="0xFFC02408" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="SPI2_TDBR"   group="SPI2 Registers" read-address="0xFFC0240C" write-address="0xFFC0240C" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="SPI2_RDBR"   group="SPI2 Registers" read-address="0xFFC02410" write-address="0xFFC02410" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="SPI2_BAUD"   group="SPI2 Registers" read-address="0xFFC02414" write-address="0xFFC02414" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="SPI2_SHADOW" group="SPI2 Registers" read-address="0xFFC02418" write-address="0xFFC02418" type="IO" target="EMU" description="" bit-size="16"/>
+		<register name="SPI2_CTL"    group="SPI" read-address="0xFFC02400" write-address="0xFFC02400" type="IO" target="EMU" description="" bit-size="16" def-comment="SPI2 (0xFFC02400 - 0xFFC024FF)"/>
+		<register name="SPI2_FLG"    group="SPI" read-address="0xFFC02404" write-address="0xFFC02404" type="IO" target="EMU" description="" bit-size="16"/>
+		<register name="SPI2_STAT"   group="SPI" read-address="0xFFC02408" write-address="0xFFC02408" type="IO" target="EMU" description="" bit-size="16"/>
+		<register name="SPI2_TDBR"   group="SPI" read-address="0xFFC0240C" write-address="0xFFC0240C" type="IO" target="EMU" description="" bit-size="16"/>
+		<register name="SPI2_RDBR"   group="SPI" read-address="0xFFC02410" write-address="0xFFC02410" type="IO" target="EMU" description="" bit-size="16"/>
+		<register name="SPI2_BAUD"   group="SPI" read-address="0xFFC02414" write-address="0xFFC02414" type="IO" target="EMU" description="" bit-size="16"/>
+		<register name="SPI2_SHADOW" group="SPI" read-address="0xFFC02418" write-address="0xFFC02418" type="IO" target="EMU" description="" bit-size="16"/>
 
 		<!-- Timer Controller Registers -->
 		<register name="TIMER0_CONFIG"  group="Timer Registers" read-address="0xFFC00600" write-address="0xFFC00600" mask="FFFF"     type="IO" description="" bit-size="16" def-comment="Timers 0-2 (0xFFC00600 - 0xFFC006FF)"/>
