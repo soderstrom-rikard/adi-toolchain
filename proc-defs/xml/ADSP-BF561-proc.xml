@@ -163,7 +163,7 @@
 <register name="SICB_IAR6"   group="SICB Register File" read-address="0xFFC0113C" write-address="0xFFC0113C" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
 <register name="SICB_IAR7"   group="SICB Register File" read-address="0xFFC01140" write-address="0xFFC01140" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
 
-<register name="PPI0_CONTROL" group="PPI0" read-address="0xFFC01000" write-address="0xFFC01000" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="PPI0_CONTROL" group="PPI" read-address="0xFFC01000" write-address="0xFFC01000" mask="FFFF" type="IO" description="" bit-size="16"/>
 <register name="PORT_EN_0" parent="PPI0_CONTROL" bit-position="0" type="" description="child register" bit-size="1"/>
 <register name="PORT_DIR_0" parent="PPI0_CONTROL" bit-position="1" type="" description="child register" bit-size="1"/>
 <register name="XFR_TYPE_0" parent="PPI0_CONTROL" bit-position="2" type="" description="child register" bit-size="2"/>
@@ -175,17 +175,17 @@
 <register name="SKIP_EO_0" parent="PPI0_CONTROL" bit-position="10" type="" description="child register" bit-size="1"/>
 <register name="DLEN_0" parent="PPI0_CONTROL" bit-position="11" type="" description="child register" bit-size="3"/>
 <register name="POL_0" parent="PPI0_CONTROL" bit-position="14" type="" description="child register" bit-size="2"/>
-<register name="PPI0_STATUS" group="PPI0" read-address="0xFFC01004" write-address="0xFFC01004" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="PPI0_STATUS" group="PPI" read-address="0xFFC01004" write-address="0xFFC01004" mask="FFFF" type="IO" description="" bit-size="16"/>
 <register name="FLD_0" parent="PPI0_STATUS" bit-position="10" type="" description="child register" bit-size="1"/>
 <register name="FT_ERR_0" parent="PPI0_STATUS" bit-position="11" type="" description="child register" bit-size="1"/>
 <register name="OVR_0" parent="PPI0_STATUS" bit-position="12" type="" description="child register" bit-size="1"/>
 <register name="UNDR_0" parent="PPI0_STATUS" bit-position="13" type="" description="child register" bit-size="1"/>
 <register name="ERR_DET_0" parent="PPI0_STATUS" bit-position="14" type="" description="child register" bit-size="1"/>
 <register name="ERR_NCOR_0" parent="PPI0_STATUS" bit-position="15" type="" description="child register" bit-size="1"/>
-<register name="PPI0_DELAY" group="PPI0" read-address="0xFFC0100C" write-address="0xFFC0100C" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="PPI0_COUNT" group="PPI0" read-address="0xFFC01008" write-address="0xFFC01008" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="PPI0_FRAME" group="PPI0" read-address="0xFFC01010" write-address="0xFFC01010" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="PPI1_CONTROL" group="PPI1" read-address="0xFFC01300" write-address="0xFFC01300" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="PPI0_DELAY" group="PPI" read-address="0xFFC0100C" write-address="0xFFC0100C" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="PPI0_COUNT" group="PPI" read-address="0xFFC01008" write-address="0xFFC01008" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="PPI0_FRAME" group="PPI" read-address="0xFFC01010" write-address="0xFFC01010" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="PPI1_CONTROL" group="PPI" read-address="0xFFC01300" write-address="0xFFC01300" mask="FFFF" type="IO" description="" bit-size="16"/>
 <register name="PORT_EN_1" parent="PPI1_CONTROL" bit-position="0" type="" description="child register" bit-size="1"/>
 <register name="PORT_DIR_1" parent="PPI1_CONTROL" bit-position="1" type="" description="child register" bit-size="1"/>
 <register name="XFR_TYPE_1" parent="PPI1_CONTROL" bit-position="2" type="" description="child register" bit-size="2"/>
@@ -197,16 +197,16 @@
 <register name="SKIP_EO_1" parent="PPI1_CONTROL" bit-position="10" type="" description="child register" bit-size="1"/>
 <register name="DLEN_1" parent="PPI1_CONTROL" bit-position="11" type="" description="child register" bit-size="3"/>
 <register name="POL_1" parent="PPI1_CONTROL" bit-position="14" type="" description="child register" bit-size="2"/>
-<register name="PPI1_STATUS" group="PPI1" read-address="0xFFC01304" write-address="0xFFC01304" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="PPI1_STATUS" group="PPI" read-address="0xFFC01304" write-address="0xFFC01304" mask="FFFF" type="IO" description="" bit-size="16"/>
 <register name="FLD_1" parent="PPI1_STATUS" bit-position="10" type="" description="child register" bit-size="1"/>
 <register name="FT_ERR_1" parent="PPI1_STATUS" bit-position="11" type="" description="child register" bit-size="1"/>
 <register name="OVR_1" parent="PPI1_STATUS" bit-position="12" type="" description="child register" bit-size="1"/>
 <register name="UNDR_1" parent="PPI1_STATUS" bit-position="13" type="" description="child register" bit-size="1"/>
 <register name="ERR_DET_1" parent="PPI1_STATUS" bit-position="14" type="" description="child register" bit-size="1"/>
 <register name="ERR_NCOR_1" parent="PPI1_STATUS" bit-position="15" type="" description="child register" bit-size="1"/>
-<register name="PPI1_DELAY" group="PPI1" read-address="0xFFC0130C" write-address="0xFFC0130C" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="PPI1_COUNT" group="PPI1" read-address="0xFFC01308" write-address="0xFFC01308" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="PPI1_FRAME" group="PPI1" read-address="0xFFC01310" write-address="0xFFC01310" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="PPI1_DELAY" group="PPI" read-address="0xFFC0130C" write-address="0xFFC0130C" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="PPI1_COUNT" group="PPI" read-address="0xFFC01308" write-address="0xFFC01308" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="PPI1_FRAME" group="PPI" read-address="0xFFC01310" write-address="0xFFC01310" mask="FFFF" type="IO" description="" bit-size="16"/>
 
 	<!-- Trace Unit Registers -->
 	<register name="TBUFCTL"  group="Trace Unit" description="" bit-size="32" read-address="0xFFE06000" write-address="0xFFE06000" type="IO" />

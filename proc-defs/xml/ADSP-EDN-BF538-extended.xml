@@ -1483,11 +1483,11 @@
 		<register name="MDMA1_S1_PMAP_PMAP"        parent="MDMA1_S1_PERIPHERAL_MAP" bit-position="12" bit-size="4"/>
 
 		<!-- Parallel Peripheral Interface (PPI) Registers -->
-		<register name="PPI_CONTROL" group="PPI Registers" read-address="0xFFC01000" write-address="0xFFC01000" mask="FFFF" type="IO" description="" bit-size="16" def-comment="PPI (0xFFC01000 - 0xFFC010FF)"/>
-		<register name="PPI_STATUS"  group="PPI Registers" read-address="0xFFC01004" write-address="0xFFC01004" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="PPI_DELAY"   group="PPI Registers" read-address="0xFFC0100C" write-address="0xFFC0100C" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="PPI_COUNT"   group="PPI Registers" read-address="0xFFC01008" write-address="0xFFC01008" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="PPI_FRAME"   group="PPI Registers" read-address="0xFFC01010" write-address="0xFFC01010" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="PPI_CONTROL" group="PPI" read-address="0xFFC01000" write-address="0xFFC01000" mask="FFFF" type="IO" description="" bit-size="16" def-comment="PPI (0xFFC01000 - 0xFFC010FF)"/>
+		<register name="PPI_STATUS"  group="PPI" read-address="0xFFC01004" write-address="0xFFC01004" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="PPI_DELAY"   group="PPI" read-address="0xFFC0100C" write-address="0xFFC0100C" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="PPI_COUNT"   group="PPI" read-address="0xFFC01008" write-address="0xFFC01008" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="PPI_FRAME"   group="PPI" read-address="0xFFC01010" write-address="0xFFC01010" mask="FFFF" type="IO" description="" bit-size="16"/>
 
 		<!-- Parallel Peripheral Interface (PPI) Child Registers -->
 		<register name="PORT_EN"  parent="PPI_CONTROL" bit-position="0"  bit-size="1"/>
