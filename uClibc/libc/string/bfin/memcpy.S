@@ -46,8 +46,14 @@ ___GI_memcpy:
 	R2 = R2 & R3;         /* remainder */
 	P2 = R2;              /* set remainder */
 	R1 = [I0++];
+#if !defined(__WORKAROUND_AVOID_DAG1)
 	LSETUP (.Lquad_loop, .Lquad_loop) LC0=P1;
 .Lquad_loop:	MNOP || [P0++] = R1 || R1 = [I0++];
+#else
+	LSETUP (.Lquad_loop_s, .Lquad_loop_e) LC0=P1;
+.Lquad_loop_s:	[P0++] = R1;
+.Lquad_loop_e:	R1 = [I0++];
+#endif
 	[P0++] = R1;
 
 	CC = P2 == 0;         /* any remaining bytes? */
