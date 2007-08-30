@@ -52,9 +52,9 @@ do
             do
                 RUN=`which -a $file | wc -w`
                 if [ $RUN -eq 0 ] ; then
-                    echo "Can not find $file"
+                    echo "$file: could not be found, please install it"
                 else
-                   $file --version | grep -i $file
+                    $file --version | grep -i "\<$file\>"
                 fi
             done
             for file in /bin/sh runtest
@@ -62,11 +62,13 @@ do
                 RUN=`which -a $file | wc -w`
                 if [ $RUN -eq 0 ] ; then
                     echo "Can not find $file"
+                    [ "$file" = "runtest" ] && echo "    - 'runtest' is only needed for running tests and is part of Dejagnu"
                 else
                     $file --version | grep -i version
                 fi
             done
-            echo $SHELL
+            echo "SHELL = $SHELL"
+            echo "Done checking for prerequisites"
             exit 0
             ;;
         m)
