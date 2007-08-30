@@ -1,3 +1,10 @@
+2007-08-30  Jie Zhang  <jie.zhang@analog.com>
+
+	* elf2flt.ld.in: Don't define __CTOR_LIST__ or __CTOR_END__.
+	Don't calculate .ctors length.
+	Don't add pad 0 at the end of .ctors.
+	Likewise for .dtors.
+
 2006-12-16  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* Makefile.in: Drop -s flag to $(INSTALL).
