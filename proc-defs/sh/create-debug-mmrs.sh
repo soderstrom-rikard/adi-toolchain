@@ -26,17 +26,17 @@ cat << EOF > ${output}
 struct bfin_rw_ptr_pair {
 	void *read, *write;
 };
-static void bfin_rw_u16_set(void *data, u64 val)
+static void bfin_rw_x16_set(void *data, u64 val)
 {
 	*(u16 *) ((struct bfin_rw_ptr_pair *)data)->write = val;
 }
-static u64 bfin_rw_u16_get(void *data)
+static u64 bfin_rw_x16_get(void *data)
 {
 	return *(u16 *) ((struct bfin_rw_ptr_pair *)data)->read;
 }
-DEFINE_SIMPLE_ATTRIBUTE(bfin_rw_u16_fops, bfin_rw_u16_get, bfin_rw_u16_set, "%llx\n");
+DEFINE_SIMPLE_ATTRIBUTE(bfin_rw_x16_fops, bfin_rw_x16_get, bfin_rw_x16_set, "%llx\n");
 static __init
-struct dentry *debugfs_create_rw_u16(const char *name, mode_t mode,
+struct dentry *debugfs_create_rw_x16(const char *name, mode_t mode,
                                      struct dentry *parent, u16 *rvalue,
                                      u16 *wvalue)
 {
@@ -44,7 +44,7 @@ struct dentry *debugfs_create_rw_u16(const char *name, mode_t mode,
 	struct bfin_rw_ptr_pair *pair = kmalloc(sizeof(*pair), GFP_KERNEL);
 	pair->read = rvalue;
 	pair->write = wvalue;
-	ret = debugfs_create_file(name, mode, parent, rvalue, &bfin_rw_u16_fops);
+	ret = debugfs_create_file(name, mode, parent, rvalue, &bfin_rw_x16_fops);
 	if (ret)
 		ret->d_inode->i_private = pair;
 	return ret;
