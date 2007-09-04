@@ -19,7 +19,6 @@ cat << EOF > ${output}
 #include <linux/module.h>
 #include <asm/blackfin.h>
 
-#if 0 /* none of the procs we currently support need this */
 /* Some MMRs are stupid and have different read/write addresses.
  * So let's account for that here by interjecting ourselves into
  * the normal debugfs process.
@@ -36,9 +35,10 @@ static u64 bfin_rw_u16_get(void *data)
 	return *(u16 *) ((struct bfin_rw_ptr_pair *)data)->read;
 }
 DEFINE_SIMPLE_ATTRIBUTE(bfin_rw_u16_fops, bfin_rw_u16_get, bfin_rw_u16_set, "%llx\n");
-static struct dentry *debugfs_create_rw_u16(const char *name, mode_t mode,
-                                            struct dentry *parent, u16 *rvalue,
-                                            u16 *wvalue)
+static __init
+struct dentry *debugfs_create_rw_u16(const char *name, mode_t mode,
+                                     struct dentry *parent, u16 *rvalue,
+                                     u16 *wvalue)
 {
 	struct dentry *ret;
 	struct bfin_rw_ptr_pair *pair = kmalloc(sizeof(*pair), GFP_KERNEL);
@@ -49,7 +49,6 @@ static struct dentry *debugfs_create_rw_u16(const char *name, mode_t mode,
 		ret->d_inode->i_private = pair;
 	return ret;
 }
-#endif
 
 static int __init bfin_init_mmr_debugfs(void)
 {
@@ -87,7 +86,7 @@ cat << EOF >> ${output}
 	if (USE_${procnum}) {
 EOF
 
-	xsltproc ../xsl/debug-mmrs.xsl ${f} | LC_ALL="C" sort | \
+	xsltproc ../xsl/debug-mmrs.xsl ${f} | LC_ALL="C" sort -u | \
 	while read line ; do
 		IFS=";"
 		set -- ${line}
