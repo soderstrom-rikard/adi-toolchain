@@ -1521,11 +1521,11 @@
 	<register name="ENDCPLB"    parent="DMEM_CONTROL" bit-position="1"  bit-size="1"/>
 	<register name="ENDM"       parent="DMEM_CONTROL" bit-position="0"  bit-size="1"/>
 <register name="DCPLB_STATUS" group="Data Cache Programmable Look-Aside Buffer Fault Address" read-address="0xFFE00008" write-address="0xFFE00008" mask="FFFFFFFF" type="IO" description="L1 Data Memory Controller Register" bit-size="32"/>
-	<register name="DATA_FAULT"          parent="DCPLB_STATUS" bit-position="0"  type=""  description="child register" bit-size="16"/>
+	<register name="DCPLB_FAULT"          parent="DCPLB_STATUS" bit-position="0"  type=""  description="child register" bit-size="16"/>
 	<register name="FAULT_RW"            parent="DCPLB_STATUS" bit-position="16" bit-size="1"/>
-	<register name="DATA_FAULT_USERSUPV" parent="DCPLB_STATUS" bit-position="17" bit-size="1"/>
+	<register name="DCPLB_FAULT_USERSUPV" parent="DCPLB_STATUS" bit-position="17" bit-size="1"/>
 	<register name="FAULT_DAG"           parent="DCPLB_STATUS" bit-position="18" bit-size="1"/>
-	<register name="DATA_FAULT_ILLADDR"  parent="DCPLB_STATUS" bit-position="19" bit-size="1"/>
+	<register name="DCPLB_FAULT_ILLADDR"  parent="DCPLB_STATUS" bit-position="19" bit-size="1"/>
 <register name="DCPLB_FAULT_ADDR" group="L1 Data Memory Registers" read-address="0xFFE0000C" write-address="0xFFE0000C" mask="FFFFFFFF" type="IO" description="" bit-size="32" cdef-type="ADDR"/>
 <register name="DCPLB_ADDR0" group="L1 Data Memory Registers" read-address="0xFFE00100" write-address="0xFFE00100" mask="FFFFFFFF" type="IO" description="Data Cache Protection Lookaside Buffer 0" bit-size="32" cdef-type="ADDR"/>
 <register name="DCPLB_ADDR1" group="L1 Data Memory Registers" read-address="0xFFE00104" write-address="0xFFE00104" mask="FFFFFFFF" type="IO" description="Data Cache Protection Lookaside Buffer 1" bit-size="32" cdef-type="ADDR"/>
@@ -1569,9 +1569,9 @@
 	<register name="IMC"        parent="IMEM_CONTROL" bit-position="2"  bit-size="1"/>
 	<register name="ENICPLB"    parent="IMEM_CONTROL" bit-position="1"  bit-size="1"/>
 <register name="ICPLB_STATUS" group="L1 Code Memory Registers" read-address="0xFFE01008" write-address="0xFFE01008" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
-	<register name="CODE_FAULT"          parent="ICPLB_STATUS" bit-position="0"  bit-size="16"/>
-	<register name="CODE_FAULT_USERSUPV" parent="ICPLB_STATUS" bit-position="17" bit-size="1"/>
-	<register name="CODE_FAULT_ILLADDR"  parent="ICPLB_STATUS" bit-position="19" bit-size="1"/>
+	<register name="ICPLB_FAULT"          parent="ICPLB_STATUS" bit-position="0"  bit-size="16"/>
+	<register name="ICPLB_FAULT_USERSUPV" parent="ICPLB_STATUS" bit-position="17" bit-size="1"/>
+	<register name="ICPLB_FAULT_ILLADDR"  parent="ICPLB_STATUS" bit-position="19" bit-size="1"/>
 <register name="ICPLB_FAULT_ADDR" group="L1 Code Memory Registers" read-address="0xFFE0100C" write-address="0xFFE0100C" mask="FFFFFFFF" type="IO" description="" bit-size="32" cdef-type="ADDR"/>
 <register name="ICPLB_ADDR0" group="L1 Code Memory Registers" read-address="0xFFE01100" write-address="0xFFE01100" mask="FFFFFFFF" type="IO" description="Instruction Cacheability Protection Lookaside Buffer 0" bit-size="32" cdef-type="ADDR"/>
 <register name="ICPLB_ADDR1" group="L1 Code Memory Registers" read-address="0xFFE01104" write-address="0xFFE01104" mask="FFFFFFFF" type="IO" description="Instruction Cacheability Protection Lookaside Buffer 1" bit-size="32" cdef-type="ADDR"/>

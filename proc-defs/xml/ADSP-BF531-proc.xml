@@ -298,19 +298,19 @@
 	<register name="ENDM" type="NODATA" x="2" y="8"/>
 	<register name="ENDM" type="NOLABEL" x="20" y="8"/>
 	<register name="DCPLB_STATUS" type="NODATA" x="0" y="10"/>
-	<register name="DATA_FAULT_STATUS" type="NOLABEL" x="18" y="10"/>
+	<register name="DCPLB_FAULT_STATUS" type="NOLABEL" x="18" y="10"/>
 	<register name="FAULT_ILLADDR" type="NODATA" x="2" y="11"/>
-	<register name="DATA_FAULT_ILLADDR" type="NOLABEL" x="20" y="11"/>
+	<register name="DCPLB_FAULT_ILLADDR" type="NOLABEL" x="20" y="11"/>
 	<register name="FAULT_DAG" type="NODATA" x="2" y="12"/>
 	<register name="FAULT_DAG" type="NOLABEL" x="20" y="12"/>
 	<register name="FAULT_USERSUPV" type="NODATA" x="2" y="13"/>
-	<register name="DATA_FAULT_USERSUPV" type="NOLABEL" x="20" y="13"/>
+	<register name="DCPLB_FAULT_USERSUPV" type="NOLABEL" x="20" y="13"/>
 	<register name="FAULT_READWRITE" type="NODATA" x="2" y="14"/>
 	<register name="FAULT_READWRITE" type="NOLABEL" x="20" y="14"/>
-	<register name="DATA_FAULT" type="NODATA" x="2" y="15"/>
-	<register name="DATA_FAULT" type="NOLABEL" x="20" y="15"/>
+	<register name="DCPLB_FAULT" type="NODATA" x="2" y="15"/>
+	<register name="DCPLB_FAULT" type="NOLABEL" x="20" y="15"/>
 	<register name="DCPLB_FAULT_ADDR" type="NODATA" x="0" y="17"/>
-	<register name="DATA_FAULT_ADDR" type="NOLABEL" x="18" y="17"/>
+	<register name="DCPLB_FAULT_ADDR" type="NOLABEL" x="18" y="17"/>
 	<register name="DCPLB_ADDR0" type="NORMAL" x="18" y="19"/>
 	<register name="DCPLB_ADDR1" type="NORMAL" x="18" y="20"/>
 	<register name="DCPLB_ADDR2" type="NORMAL" x="18" y="21"/>
@@ -362,15 +362,15 @@
 	<register name="ENICPLB" type="NODATA" x="2" y="4"/>
 	<register name="ENICPLB" type="NOLABEL" x="20" y="4"/>
 	<register name="ICPLB_STATUS" type="NODATA" x="0" y="7"/>
-	<register name="CODE_FAULT_STATUS" type="NOLABEL" x="18" y="7"/>
+	<register name="ICPLB_FAULT_STATUS" type="NOLABEL" x="18" y="7"/>
 	<register name="FAULT_ILLADDR" type="NODATA" x="2" y="8"/>
-	<register name="CODE_FAULT_ILLADDR" type="NOLABEL" x="20" y="8"/>
+	<register name="ICPLB_FAULT_ILLADDR" type="NOLABEL" x="20" y="8"/>
 	<register name="FAULT_USERSUPV" type="NODATA" x="2" y="9"/>
-	<register name="CODE_FAULT_USERSUPV" type="NOLABEL" x="20" y="9"/>
+	<register name="ICPLB_FAULT_USERSUPV" type="NOLABEL" x="20" y="9"/>
 	<register name="FAULT" type="NODATA" x="2" y="10"/>
-	<register name="CODE_FAULT" type="NOLABEL" x="20" y="10"/>
+	<register name="ICPLB_FAULT" type="NOLABEL" x="20" y="10"/>
 	<register name="ICPLB_FAULT_ADDR" type="NODATA" x="0" y="12"/>
-	<register name="CODE_FAULT_ADDR" type="NOLABEL" x="18" y="12"/>
+	<register name="ICPLB_FAULT_ADDR" type="NOLABEL" x="18" y="12"/>
 	<register name="ICPLB_ADDR0" type="NORMAL" x="18" y="14"/>
 	<register name="ICPLB_ADDR1" type="NORMAL" x="18" y="15"/>
 	<register name="ICPLB_ADDR2" type="NORMAL" x="18" y="16"/>
