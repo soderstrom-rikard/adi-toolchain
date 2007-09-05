@@ -3733,7 +3733,7 @@
 	<memory-segment core="P0" start="0xFF900000" end="0xFF907FFF" width="8" type="DM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Data Bank B SRAM/Cache"/>
 	<memory-segment core="P0" start="0xFFA00000" end="0xFFA03FFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Instruction RAM (L1)"/>
 	<memory-segment core="P0" start="0xFFA10000" end="0xFFA13FFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Instruction RAM/Cache (L1)"/>
-	<memory-segment core="P0" start="0xFFB00000" end="0xFFB00FFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Scratch pad SRAM"/>
+	<memory-segment core="P0" start="0xFFB00000" end="0xFFB00FFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Scratchpad SRAM"/>
 	<memory-segment core="P0" start="0xFFC00000" end="0xFFFFFFFF" width="8" type="DM RAM INTERNAL MMR" name="BLACKFIN Memory" memory-id="0" description="MMR registers"/>
 
         <!-- complete memory map for BF561 P1 (Core B) -->
@@ -3750,7 +3750,7 @@
 	<memory-segment core="P1" start="0xFF500000" end="0xFF507FFF" width="8" type="DM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Data Bank B SRAM/Cache"/>
 	<memory-segment core="P1" start="0xFF600000" end="0xFF603FFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Instruction RAM (L1)"/>
 	<memory-segment core="P1" start="0xFF610000" end="0xFF613FFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Instruction RAM/Cache (L1)"/>
-	<memory-segment core="P1" start="0xFF700000" end="0xFF700FFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Scratch pad SRAM"/>
+	<memory-segment core="P1" start="0xFF700000" end="0xFF700FFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Scratchpad SRAM"/>
 	<memory-segment core="P1" start="0xFFC00000" end="0xFFFFFFFF" width="8" type="DM RAM INTERNAL MMR" name="BLACKFIN Memory" memory-id="0" description="MMR registers"/>
 </memory-definitions>
 

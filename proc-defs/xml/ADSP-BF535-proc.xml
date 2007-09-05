@@ -2040,7 +2040,7 @@
 	<memory-segment start="0xFF800000" end="0xFF803FFF" width="8" type="DM RAM INTERNAL" name="BLACKFIN Memory" memory-id="0" description="Data Bank A SRAM (16 Kbyte)"/>
 	<memory-segment start="0xFF900000" end="0xFF903FFF" width="8" type="DM RAM INTERNAL" name="BLACKFIN Memory" memory-id="0" description="Data Bank B SRAM(16 Kbyte)"/>
 	<memory-segment start="0xFFA00000" end="0xFFA03FFF" width="8" type="PM RAM INTERNAL" name="BLACKFIN Memory" memory-id="0" description="Instruction SRAM"/>
-	<memory-segment start="0xFFB00000" end="0xFFB00FFF" width="8" type="PM RAM INTERNAL" name="BLACKFIN Memory" memory-id="0" description="Scratch pad SRAM"/>
+	<memory-segment start="0xFFB00000" end="0xFFB00FFF" width="8" type="PM RAM INTERNAL" name="BLACKFIN Memory" memory-id="0" description="Scratchpad SRAM"/>
 	<memory-segment start="0xFFC00000" end="0xFFFFFFFF" width="8" type="DM RAM INTERNAL MMR" name="BLACKFIN Memory" memory-id="0" description="MMR registers"/>
 </memory-definitions>
 
