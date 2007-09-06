@@ -4208,6 +4208,7 @@ lang_size_sections_1
 		       region, and some non default memory regions were
 		       defined, issue an error message.  */
 		    if (!IGNORE_SECTION (os->bfd_section)
+			&& os->bfd_section->size != 0
 			&& ! link_info.relocatable
 			&& check_regions
 			&& strcmp (os->region->name,
