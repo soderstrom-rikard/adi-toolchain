@@ -789,7 +789,10 @@ enum reg_class
    class to use when it is necessary to copy value X into a register
    in class CLASS.  The value is a register class; perhaps CLASS, or
    perhaps another, smaller class.  */
-#define PREFERRED_RELOAD_CLASS(X, CLASS) (CLASS)
+#define PREFERRED_RELOAD_CLASS(X, CLASS)		\
+  (GET_CODE (X) == POST_INC				\
+   || GET_CODE (X) == POST_DEC				\
+   || GET_CODE (X) == PRE_DEC ? PREGS : (CLASS))
 
 #define  SECONDARY_OUTPUT_RELOAD_CLASS(class,mode,x) \
     secondary_output_reload_class(class,mode,x)
