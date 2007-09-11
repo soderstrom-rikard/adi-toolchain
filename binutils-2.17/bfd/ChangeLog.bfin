@@ -1,3 +1,10 @@
+2007-09-11  Jie Zhang  <jie.zhang@analog.com>
+
+	Apply
+	2007-09-04  Michael Snyder  <msnyder@access-company.com>
+	* elf32-bfin.c (howto_table): Cut and paste error?
+	Name field of reloc is wrong.
+
 2007-02-13  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* elf32-bfin.c (bfinfdpic_relocate_section): Take more care not to
