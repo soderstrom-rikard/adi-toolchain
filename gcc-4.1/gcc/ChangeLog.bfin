@@ -21,6 +21,8 @@
 
 	* config/bfin/bfin.md (define_asm_attributes): New.
 
+	* config/bfin/bfin.c (bfin_discover_loops): Delete empty loops.
+
 2007-09-07  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (PREFERRED_RELOAD_CLASS): Don't reload autoinc
