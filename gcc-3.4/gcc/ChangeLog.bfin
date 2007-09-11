@@ -1,3 +1,13 @@
+2007-09-12  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.h (CONSTRAINT_LEN): Add 'q'.
+	(REG_CLASS_FROM_CONSTRAINT): Renamed from REG_CLASS_FROM_LETTER.
+	Add 'q'.
+	(enum reg_class, REG_CLASS_NAMES, REG_CLASS_CONTENTS): Add
+	D0REGS .. D7REGS and P0REGS.
+	(REGNO_REG_CLASS): Return the new minimal classes where appropriate.
+	(CLASS_LIKELY_SPILLED_P): Add D0REGS, D1REGS, D2REGS and P0REGS.
+
 2007-08-08  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin-protos.h (enum bfin_cpu_type): Add
