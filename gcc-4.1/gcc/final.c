@@ -107,7 +107,7 @@ Software Foundation, 51 Franklin Street, Fifth Floor, Boston, MA
 
 /* Is the given character a logical line separator for the assembler?  */
 #ifndef IS_ASM_LOGICAL_LINE_SEPARATOR
-#define IS_ASM_LOGICAL_LINE_SEPARATOR(C) ((C) == ';')
+#define IS_ASM_LOGICAL_LINE_SEPARATOR(C, STR) ((C) == ';')
 #endif
 
 #ifndef JUMP_TABLES_IN_TEXT_SECTION
@@ -1366,7 +1366,8 @@ asm_insn_count (rtx body)
     template = decode_asm_operands (body, NULL, NULL, NULL, NULL);
 
   for (; *template; template++)
-    if (IS_ASM_LOGICAL_LINE_SEPARATOR (*template) || *template == '\n')
+    if (IS_ASM_LOGICAL_LINE_SEPARATOR (*template, template)
+	|| *template == '\n')
       count++;
 
   return count;

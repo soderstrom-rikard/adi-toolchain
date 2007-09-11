@@ -6,6 +6,19 @@
 	(REG_CLASS_FROM_CONSTRAINT): Add 'qA'.
 	(CLASS_LIKELY_SPILLED_P): P0REGS is likely_spilled.
 
+	* doc/tm.texi (IS_ASM_LOGICAL_LINE_SEPARATOR): Document new argument.
+	* final.c (IS_ASM_LOGICAL_LINE_SEPARATOR): Provide two-argument default
+	definition.
+	(asm_insn_count): Pass template as second argument to it.
+	* config/arm/aof.h (IS_ASM_LOGICAL_LINE_SEPARATOR): Add second arg.
+	* config/avr/avr.h (IS_ASM_LOGICAL_LINE_SEPARATOR): Likewise.
+	* config/pa/pa.h (IS_ASM_LOGICAL_LINE_SEPARATOR): Likewise.
+	* config/stormy16/stormy16.h (IS_ASM_LOGICAL_LINE_SEPARATOR): Likewise.
+	* config/cris/cris.h (IS_ASM_LOGICAL_LINE_SEPARATOR): Likewise.
+	* config/sh/sh.c (IS_ASM_LOGICAL_LINE_SEPARATOR): Likewise.
+	(sh_insn_length_adjustment): Pass template as second argument to it.
+	* config/bfin/bfin.h (IS_ASM_LOGICAL_LINE_SEPARATOR): New macro.
+
 2007-09-07  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (PREFERRED_RELOAD_CLASS): Don't reload autoinc

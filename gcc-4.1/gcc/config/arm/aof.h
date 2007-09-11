@@ -154,7 +154,7 @@
 	      : "\n"));					\
 }
 
-#define IS_ASM_LOGICAL_LINE_SEPARATOR(C) ((C) == '\n')
+#define IS_ASM_LOGICAL_LINE_SEPARATOR(C, STR) ((C) == '\n')
 
 /* Output of Uninitialized Variables.  */
 

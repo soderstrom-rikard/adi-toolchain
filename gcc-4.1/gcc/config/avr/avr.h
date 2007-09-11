@@ -512,8 +512,7 @@ progmem_section (void)							      \
 
 #define ASM_OUTPUT_ASCII(FILE, P, SIZE)	 gas_output_ascii (FILE,P,SIZE)
 
-#define IS_ASM_LOGICAL_LINE_SEPARATOR(C) ((C) == '\n'			 \
-					  || ((C) == '$'))
+#define IS_ASM_LOGICAL_LINE_SEPARATOR(C, STR) ((C) == '\n' || ((C) == '$'))
 
 #define ASM_OUTPUT_COMMON(STREAM, NAME, SIZE, ROUNDED)			   \
 do {									   \
