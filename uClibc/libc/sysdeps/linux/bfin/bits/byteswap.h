@@ -18,7 +18,7 @@
 #define __bswap_constant_16(x) \
      ((((x) >> 8) & 0xffu) | (((x) & 0xffu) << 8))
 
-#if 0 /* need to be fixed */
+#ifdef __GNUC__
 # define __bswap_16(x) \
      (__extension__							      \
       ({ register unsigned short int __v, __x = (x);			      \
@@ -42,7 +42,7 @@ __bswap_16 (unsigned short int __bsx)
      ((((x) & 0xff000000u) >> 24) | (((x) & 0x00ff0000u) >>  8) |	      \
       (((x) & 0x0000ff00u) <<  8) | (((x) & 0x000000ffu) << 24))
 
-#if 0 /* need to be fixed */
+#ifdef __GNUC__
 # define __bswap_32(x) \
      (__extension__							      \
       ({ register unsigned int __v, __x = (x);				      \
