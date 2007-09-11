@@ -1,3 +1,11 @@
+2007-09-12  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.h (enum reg_class, REG_CLASS_CONTENTS,
+	REG_CLASS_NAMES): Add P0REGS.
+	(REGNO_REG_CLASS): Return it where appropriate.
+	(REG_CLASS_FROM_CONSTRAINT): Add 'qA'.
+	(CLASS_LIKELY_SPILLED_P): P0REGS is likely_spilled.
+
 2007-09-07  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (PREFERRED_RELOAD_CLASS): Don't reload autoinc
