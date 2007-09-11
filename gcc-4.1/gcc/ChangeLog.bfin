@@ -19,6 +19,8 @@
 	(sh_insn_length_adjustment): Pass template as second argument to it.
 	* config/bfin/bfin.h (IS_ASM_LOGICAL_LINE_SEPARATOR): New macro.
 
+	* config/bfin/bfin.md (define_asm_attributes): New.
+
 2007-09-07  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (PREFERRED_RELOAD_CLASS): Don't reload autoinc
