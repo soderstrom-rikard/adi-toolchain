@@ -1,3 +1,19 @@
+2007-09-14  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+ 	* doc/tm.texi (IS_ASM_LOGICAL_LINE_SEPARATOR): Document new argument.
+	* final.c (IS_ASM_LOGICAL_LINE_SEPARATOR): Provide two-argument default
+	definition.
+	(asm_insn_count): Pass template as second argument to it.
+	* config/arm/aof.h (IS_ASM_LOGICAL_LINE_SEPARATOR): Add second arg.
+	* config/pa/pa.h (IS_ASM_LOGICAL_LINE_SEPARATOR): Likewise.
+	* config/stormy16/stormy16.h (IS_ASM_LOGICAL_LINE_SEPARATOR): Likewise.
+	* config/cris/cris.h (IS_ASM_LOGICAL_LINE_SEPARATOR): Likewise.
+	* config/sh/sh.c (IS_ASM_LOGICAL_LINE_SEPARATOR): Likewise.
+	(sh_insn_length_adjustment): Pass template as second argument to it.
+	* config/bfin/bfin.h (IS_ASM_LOGICAL_LINE_SEPARATOR): New macro.
+
+	* config/bfin/bfin.md (define_asm_attributes): New.
+
 2007-09-12  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (CONSTRAINT_LEN): Add 'q'.

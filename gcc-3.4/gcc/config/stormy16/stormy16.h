@@ -690,7 +690,7 @@ do {							\
 
 /* Output of Data.  */
 
-#define IS_ASM_LOGICAL_LINE_SEPARATOR(C) ((C) == '|')
+#define IS_ASM_LOGICAL_LINE_SEPARATOR(C, STR) ((C) == '|')
 
 
 /* Output and Generation of Labels.  */

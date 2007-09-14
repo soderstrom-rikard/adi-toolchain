@@ -2041,7 +2041,7 @@ forget_section (void)							\
 #define ASM_PN_FORMAT "%s___%lu"
 
 /* All HP assemblers use "!" to separate logical lines.  */
-#define IS_ASM_LOGICAL_LINE_SEPARATOR(C) ((C) == '!')
+#define IS_ASM_LOGICAL_LINE_SEPARATOR(C, STR) ((C) == '!')
 
 #define PRINT_OPERAND_PUNCT_VALID_P(CHAR) \
   ((CHAR) == '@' || (CHAR) == '#' || (CHAR) == '*' || (CHAR) == '^')

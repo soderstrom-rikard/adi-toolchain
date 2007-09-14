@@ -250,6 +250,11 @@
 
 	(const_int 2)))
 
+;; Describe a user's asm statement.
+(define_asm_attributes
+  [(set_attr "type" "misc")
+   (set_attr "length" "4")])
+
 ;; Conditional moves
 
 (define_expand "movsicc"
