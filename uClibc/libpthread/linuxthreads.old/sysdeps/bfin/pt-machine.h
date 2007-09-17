@@ -22,7 +22,7 @@
 #define _PT_MACHINE_H   1
 
 #ifndef PT_EI
-# define PT_EI extern inline
+# define PT_EI extern inline __attribute__((always_inline))
 #endif
 
 extern long int testandset (int *spinlock);
@@ -41,11 +41,11 @@ testandset (int *spinlock)
 {
     long int res;
 
-    asm volatile ("R1 = 1; P0 = %2; CALL (%4); %0 = R0;"
-		  : "=d" (res), "=m" (*spinlock)
-		  : "da" (spinlock), "m" (*spinlock),
-		  "a" (ATOMIC_XCHG32)
-		  :"R0", "R1", "P0", "RETS", "cc", "memory");
+    __asm__ __volatile__ (
+		"CALL (%4);"
+		: "=q0" (res), "=m" (*spinlock)
+		: "qA" (spinlock), "m" (*spinlock), "a" (ATOMIC_XCHG32), "q1" (1)
+		: "RETS", "cc", "memory");
 
     return res;
 }
@@ -55,18 +55,15 @@ PT_EI int
 __compare_and_swap (long int *p, long int oldval, long int newval)
 {
     long int readval;
-    asm volatile ("P0 = %2;\n\t"
-		  "R1 = %3;\n\t"
-		  "R2 = %4;\n\t"
-		  "CALL (%5);\n\t"
-		  "%0 = R0;\n\t"
-		  : "=da" (readval), "=m" (*p)
-		  : "da" (p),
-		  "da" (oldval),
-		  "da" (newval),
+    __asm__ __volatile__ (
+		"CALL (%5);"
+		: "=q0" (readval), "=m" (*p)
+		: "qA" (p),
+		  "q1" (oldval),
+		  "q2" (newval),
 		  "a" (ATOMIC_CAS32),
 		  "m" (*p)
-		  : "P0", "R0", "R1", "R2", "RETS", "memory", "cc");
+		: "RETS", "memory", "cc");
     return readval == oldval;
 }
 
