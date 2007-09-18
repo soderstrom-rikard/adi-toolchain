@@ -1,3 +1,10 @@
+2007-09-18  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* elf32-bfin.c (bfin_relocate_section): Set up dynobj before using it
+	if necessary.
+	(elf32_bfin_merge_private_bfd_data): Simplify, and ensure object type
+	mismatches are detected.
+
 2007-09-11  Jie Zhang  <jie.zhang@analog.com>
 
 	Apply
