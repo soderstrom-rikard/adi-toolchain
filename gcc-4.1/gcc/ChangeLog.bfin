@@ -5,6 +5,8 @@
 	(bfin_init_builtins): Initialize it.
 	(bdesc_1arg): Add it.
 
+	* config/bfin/bfin.h (ASM_SPEC): Delete useless -mnopic argument.
+
 2007-09-12  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (enum reg_class, REG_CLASS_CONTENTS,
