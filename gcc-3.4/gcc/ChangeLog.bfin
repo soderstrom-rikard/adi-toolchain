@@ -1,3 +1,10 @@
+2007-09-18  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (loadbytes): New pattern.
+	* config/bfin/bfin.c (enum bfin_builtins): Add BFIN_BUILTIN_LOADBYTES.
+	(bfin_init_builtins): Initialize it.
+	(bdesc_1arg): Add it.
+
 2007-09-14  Bernd Schmidt  <bernd.schmidt@analog.com>
 
  	* doc/tm.texi (IS_ASM_LOGICAL_LINE_SEPARATOR): Document new argument.
