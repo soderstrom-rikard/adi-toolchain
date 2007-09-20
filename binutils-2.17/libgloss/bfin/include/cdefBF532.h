@@ -198,7 +198,7 @@
 #define pSPORT1_MRCS3 	((volatile unsigned long *)SPORT1_MRCS3)
 
 
-/* External Bus Interface Unit */ 
+/* External Bus Interface Unit */
 /* Aysnchronous Memory Controller */
 #define pEBIU_AMGCTL 	((volatile unsigned short *)EBIU_AMGCTL)
 #define pEBIU_AMBCTL0 	((volatile unsigned long *)EBIU_AMBCTL0)

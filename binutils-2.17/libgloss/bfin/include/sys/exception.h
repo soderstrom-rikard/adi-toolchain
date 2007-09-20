@@ -265,7 +265,7 @@ ex_handler_fn register_handler(interrupt_kind int_kind, ex_handler_fn handler);
 #define EX_INT_IGNORE  ((ex_handler_fn)0)
 
 /*
-** Extended function to register an interrupt handler within the EVT. 
+** Extended function to register an interrupt handler within the EVT.
 ** Returns the old handler.
 **
 ** If enabled == EX_INT_ALWAYS_ENABLE, install fn (if fn != EX_INT_IGNORE
@@ -287,7 +287,7 @@ ex_handler_fn register_handler_ex(interrupt_kind kind, ex_handler_fn fn,
 #define EX_INT_DISABLE 0
 #define EX_INT_ENABLE 1
 #define EX_INT_KEEP_IMASK -1
-#define EX_INT_ALWAYS_ENABLE 2 
+#define EX_INT_ALWAYS_ENABLE 2
 
 /*
 ** Allow the user to raise exceptions from C.

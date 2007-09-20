@@ -1,3 +1,8 @@
+2007-09-20  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/include/*, bfin/include/sys/*: Remove trailing blank
+	spaces.
+
 2007-08-08  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/bf522.ld: New.

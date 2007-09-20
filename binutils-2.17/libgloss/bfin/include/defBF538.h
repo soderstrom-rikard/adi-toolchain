@@ -586,7 +586,7 @@
 #define CAN_MBIM1			0xFFC02A28	/* Mailbox Interrupt Mask reg 1						*/
 #define CAN_RFH1			0xFFC02A2C	/* Remote Frame Handling reg 1						*/
 #define CAN_OPSS1			0xFFC02A30	/* Overwrite Protection Single Shot Xmission reg 1	*/
-			   
+
 /* For Mailboxes 16-31   																	*/
 #define CAN_MC2				0xFFC02A40	/* Mailbox config reg 2								*/
 #define CAN_MD2				0xFFC02A44	/* Mailbox direction reg 2							*/
@@ -623,7 +623,7 @@
 /* Mailbox Acceptance Masks 												*/
 #define CAN_AM00L			0xFFC02B00	/* Mailbox 0 Low Acceptance Mask	*/
 #define CAN_AM00H			0xFFC02B04	/* Mailbox 0 High Acceptance Mask	*/
-#define CAN_AM01L			0xFFC02B08	/* Mailbox 1 Low Acceptance Mask	*/ 
+#define CAN_AM01L			0xFFC02B08	/* Mailbox 1 Low Acceptance Mask	*/
 #define CAN_AM01H			0xFFC02B0C	/* Mailbox 1 High Acceptance Mask	*/
 #define CAN_AM02L			0xFFC02B10	/* Mailbox 2 Low Acceptance Mask 	*/
 #define CAN_AM02H			0xFFC02B14	/* Mailbox 2 High Acceptance Mask	*/
@@ -701,284 +701,284 @@
 #define CAN_MB00_ID0		0xFFC02C18	/* Mailbox 0 Identifier Low Register		*/
 #define CAN_MB00_ID1		0xFFC02C1C	/* Mailbox 0 Identifier High Register		*/
 
-#define CAN_MB01_DATA0		0xFFC02C20	/* Mailbox 1 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB01_DATA0		0xFFC02C20	/* Mailbox 1 Data Word 0 [15:0] Register	*/
 #define CAN_MB01_DATA1		0xFFC02C24	/* Mailbox 1 Data Word 1 [31:16] Register	*/
 #define CAN_MB01_DATA2		0xFFC02C28	/* Mailbox 1 Data Word 2 [47:32] Register	*/
 #define CAN_MB01_DATA3		0xFFC02C2C	/* Mailbox 1 Data Word 3 [63:48] Register	*/
-#define CAN_MB01_LENGTH		0xFFC02C30	/* Mailbox 1 Data Length Code Register		*/   
-#define CAN_MB01_TIMESTAMP	0xFFC02C34	/* Mailbox 1 Time Stamp Value Register		*/   
-#define CAN_MB01_ID0		0xFFC02C38	/* Mailbox 1 Identifier Low Register		*/     
-#define CAN_MB01_ID1		0xFFC02C3C	/* Mailbox 1 Identifier High Register		*/    
+#define CAN_MB01_LENGTH		0xFFC02C30	/* Mailbox 1 Data Length Code Register		*/
+#define CAN_MB01_TIMESTAMP	0xFFC02C34	/* Mailbox 1 Time Stamp Value Register		*/
+#define CAN_MB01_ID0		0xFFC02C38	/* Mailbox 1 Identifier Low Register		*/
+#define CAN_MB01_ID1		0xFFC02C3C	/* Mailbox 1 Identifier High Register		*/
 
-#define CAN_MB02_DATA0		0xFFC02C40	/* Mailbox 2 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB02_DATA0		0xFFC02C40	/* Mailbox 2 Data Word 0 [15:0] Register	*/
 #define CAN_MB02_DATA1		0xFFC02C44	/* Mailbox 2 Data Word 1 [31:16] Register	*/
 #define CAN_MB02_DATA2		0xFFC02C48	/* Mailbox 2 Data Word 2 [47:32] Register	*/
 #define CAN_MB02_DATA3		0xFFC02C4C	/* Mailbox 2 Data Word 3 [63:48] Register	*/
-#define CAN_MB02_LENGTH		0xFFC02C50	/* Mailbox 2 Data Length Code Register		*/   
-#define CAN_MB02_TIMESTAMP	0xFFC02C54	/* Mailbox 2 Time Stamp Value Register		*/   
-#define CAN_MB02_ID0		0xFFC02C58	/* Mailbox 2 Identifier Low Register		*/     
-#define CAN_MB02_ID1		0xFFC02C5C	/* Mailbox 2 Identifier High Register		*/    
+#define CAN_MB02_LENGTH		0xFFC02C50	/* Mailbox 2 Data Length Code Register		*/
+#define CAN_MB02_TIMESTAMP	0xFFC02C54	/* Mailbox 2 Time Stamp Value Register		*/
+#define CAN_MB02_ID0		0xFFC02C58	/* Mailbox 2 Identifier Low Register		*/
+#define CAN_MB02_ID1		0xFFC02C5C	/* Mailbox 2 Identifier High Register		*/
 
-#define CAN_MB03_DATA0		0xFFC02C60	/* Mailbox 3 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB03_DATA0		0xFFC02C60	/* Mailbox 3 Data Word 0 [15:0] Register	*/
 #define CAN_MB03_DATA1		0xFFC02C64	/* Mailbox 3 Data Word 1 [31:16] Register	*/
 #define CAN_MB03_DATA2		0xFFC02C68	/* Mailbox 3 Data Word 2 [47:32] Register	*/
 #define CAN_MB03_DATA3		0xFFC02C6C	/* Mailbox 3 Data Word 3 [63:48] Register	*/
-#define CAN_MB03_LENGTH		0xFFC02C70	/* Mailbox 3 Data Length Code Register		*/   
-#define CAN_MB03_TIMESTAMP	0xFFC02C74	/* Mailbox 3 Time Stamp Value Register		*/   
-#define CAN_MB03_ID0		0xFFC02C78	/* Mailbox 3 Identifier Low Register		*/     
-#define CAN_MB03_ID1		0xFFC02C7C	/* Mailbox 3 Identifier High Register		*/    
+#define CAN_MB03_LENGTH		0xFFC02C70	/* Mailbox 3 Data Length Code Register		*/
+#define CAN_MB03_TIMESTAMP	0xFFC02C74	/* Mailbox 3 Time Stamp Value Register		*/
+#define CAN_MB03_ID0		0xFFC02C78	/* Mailbox 3 Identifier Low Register		*/
+#define CAN_MB03_ID1		0xFFC02C7C	/* Mailbox 3 Identifier High Register		*/
 
-#define CAN_MB04_DATA0		0xFFC02C80	/* Mailbox 4 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB04_DATA0		0xFFC02C80	/* Mailbox 4 Data Word 0 [15:0] Register	*/
 #define CAN_MB04_DATA1		0xFFC02C84	/* Mailbox 4 Data Word 1 [31:16] Register	*/
 #define CAN_MB04_DATA2		0xFFC02C88	/* Mailbox 4 Data Word 2 [47:32] Register	*/
 #define CAN_MB04_DATA3		0xFFC02C8C	/* Mailbox 4 Data Word 3 [63:48] Register	*/
-#define CAN_MB04_LENGTH		0xFFC02C90	/* Mailbox 4 Data Length Code Register		*/   
-#define CAN_MB04_TIMESTAMP	0xFFC02C94	/* Mailbox 4 Time Stamp Value Register		*/   
-#define CAN_MB04_ID0		0xFFC02C98	/* Mailbox 4 Identifier Low Register		*/     
-#define CAN_MB04_ID1		0xFFC02C9C	/* Mailbox 4 Identifier High Register		*/    
+#define CAN_MB04_LENGTH		0xFFC02C90	/* Mailbox 4 Data Length Code Register		*/
+#define CAN_MB04_TIMESTAMP	0xFFC02C94	/* Mailbox 4 Time Stamp Value Register		*/
+#define CAN_MB04_ID0		0xFFC02C98	/* Mailbox 4 Identifier Low Register		*/
+#define CAN_MB04_ID1		0xFFC02C9C	/* Mailbox 4 Identifier High Register		*/
 
-#define CAN_MB05_DATA0		0xFFC02CA0	/* Mailbox 5 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB05_DATA0		0xFFC02CA0	/* Mailbox 5 Data Word 0 [15:0] Register	*/
 #define CAN_MB05_DATA1		0xFFC02CA4	/* Mailbox 5 Data Word 1 [31:16] Register	*/
 #define CAN_MB05_DATA2		0xFFC02CA8	/* Mailbox 5 Data Word 2 [47:32] Register	*/
 #define CAN_MB05_DATA3		0xFFC02CAC	/* Mailbox 5 Data Word 3 [63:48] Register	*/
-#define CAN_MB05_LENGTH		0xFFC02CB0	/* Mailbox 5 Data Length Code Register		*/   
-#define CAN_MB05_TIMESTAMP	0xFFC02CB4	/* Mailbox 5 Time Stamp Value Register		*/   
-#define CAN_MB05_ID0		0xFFC02CB8	/* Mailbox 5 Identifier Low Register		*/     
-#define CAN_MB05_ID1		0xFFC02CBC	/* Mailbox 5 Identifier High Register		*/    
+#define CAN_MB05_LENGTH		0xFFC02CB0	/* Mailbox 5 Data Length Code Register		*/
+#define CAN_MB05_TIMESTAMP	0xFFC02CB4	/* Mailbox 5 Time Stamp Value Register		*/
+#define CAN_MB05_ID0		0xFFC02CB8	/* Mailbox 5 Identifier Low Register		*/
+#define CAN_MB05_ID1		0xFFC02CBC	/* Mailbox 5 Identifier High Register		*/
 
-#define CAN_MB06_DATA0		0xFFC02CC0	/* Mailbox 6 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB06_DATA0		0xFFC02CC0	/* Mailbox 6 Data Word 0 [15:0] Register	*/
 #define CAN_MB06_DATA1		0xFFC02CC4	/* Mailbox 6 Data Word 1 [31:16] Register	*/
 #define CAN_MB06_DATA2		0xFFC02CC8	/* Mailbox 6 Data Word 2 [47:32] Register	*/
 #define CAN_MB06_DATA3		0xFFC02CCC	/* Mailbox 6 Data Word 3 [63:48] Register	*/
-#define CAN_MB06_LENGTH		0xFFC02CD0	/* Mailbox 6 Data Length Code Register		*/   
-#define CAN_MB06_TIMESTAMP	0xFFC02CD4	/* Mailbox 6 Time Stamp Value Register		*/   
-#define CAN_MB06_ID0		0xFFC02CD8	/* Mailbox 6 Identifier Low Register		*/     
-#define CAN_MB06_ID1		0xFFC02CDC	/* Mailbox 6 Identifier High Register		*/    
+#define CAN_MB06_LENGTH		0xFFC02CD0	/* Mailbox 6 Data Length Code Register		*/
+#define CAN_MB06_TIMESTAMP	0xFFC02CD4	/* Mailbox 6 Time Stamp Value Register		*/
+#define CAN_MB06_ID0		0xFFC02CD8	/* Mailbox 6 Identifier Low Register		*/
+#define CAN_MB06_ID1		0xFFC02CDC	/* Mailbox 6 Identifier High Register		*/
 
-#define CAN_MB07_DATA0		0xFFC02CE0	/* Mailbox 7 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB07_DATA0		0xFFC02CE0	/* Mailbox 7 Data Word 0 [15:0] Register	*/
 #define CAN_MB07_DATA1		0xFFC02CE4	/* Mailbox 7 Data Word 1 [31:16] Register	*/
 #define CAN_MB07_DATA2		0xFFC02CE8	/* Mailbox 7 Data Word 2 [47:32] Register	*/
 #define CAN_MB07_DATA3		0xFFC02CEC	/* Mailbox 7 Data Word 3 [63:48] Register	*/
-#define CAN_MB07_LENGTH		0xFFC02CF0	/* Mailbox 7 Data Length Code Register		*/   
-#define CAN_MB07_TIMESTAMP	0xFFC02CF4	/* Mailbox 7 Time Stamp Value Register		*/   
-#define CAN_MB07_ID0		0xFFC02CF8	/* Mailbox 7 Identifier Low Register		*/     
-#define CAN_MB07_ID1		0xFFC02CFC	/* Mailbox 7 Identifier High Register		*/    
+#define CAN_MB07_LENGTH		0xFFC02CF0	/* Mailbox 7 Data Length Code Register		*/
+#define CAN_MB07_TIMESTAMP	0xFFC02CF4	/* Mailbox 7 Time Stamp Value Register		*/
+#define CAN_MB07_ID0		0xFFC02CF8	/* Mailbox 7 Identifier Low Register		*/
+#define CAN_MB07_ID1		0xFFC02CFC	/* Mailbox 7 Identifier High Register		*/
 
-#define CAN_MB08_DATA0		0xFFC02D00	/* Mailbox 8 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB08_DATA0		0xFFC02D00	/* Mailbox 8 Data Word 0 [15:0] Register	*/
 #define CAN_MB08_DATA1		0xFFC02D04	/* Mailbox 8 Data Word 1 [31:16] Register	*/
 #define CAN_MB08_DATA2		0xFFC02D08	/* Mailbox 8 Data Word 2 [47:32] Register	*/
 #define CAN_MB08_DATA3		0xFFC02D0C	/* Mailbox 8 Data Word 3 [63:48] Register	*/
-#define CAN_MB08_LENGTH		0xFFC02D10	/* Mailbox 8 Data Length Code Register		*/   
-#define CAN_MB08_TIMESTAMP	0xFFC02D14	/* Mailbox 8 Time Stamp Value Register		*/   
-#define CAN_MB08_ID0		0xFFC02D18	/* Mailbox 8 Identifier Low Register		*/     
-#define CAN_MB08_ID1		0xFFC02D1C	/* Mailbox 8 Identifier High Register		*/    
+#define CAN_MB08_LENGTH		0xFFC02D10	/* Mailbox 8 Data Length Code Register		*/
+#define CAN_MB08_TIMESTAMP	0xFFC02D14	/* Mailbox 8 Time Stamp Value Register		*/
+#define CAN_MB08_ID0		0xFFC02D18	/* Mailbox 8 Identifier Low Register		*/
+#define CAN_MB08_ID1		0xFFC02D1C	/* Mailbox 8 Identifier High Register		*/
 
-#define CAN_MB09_DATA0		0xFFC02D20	/* Mailbox 9 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB09_DATA0		0xFFC02D20	/* Mailbox 9 Data Word 0 [15:0] Register	*/
 #define CAN_MB09_DATA1		0xFFC02D24	/* Mailbox 9 Data Word 1 [31:16] Register	*/
 #define CAN_MB09_DATA2		0xFFC02D28	/* Mailbox 9 Data Word 2 [47:32] Register	*/
 #define CAN_MB09_DATA3		0xFFC02D2C	/* Mailbox 9 Data Word 3 [63:48] Register	*/
-#define CAN_MB09_LENGTH		0xFFC02D30	/* Mailbox 9 Data Length Code Register		*/   
-#define CAN_MB09_TIMESTAMP	0xFFC02D34	/* Mailbox 9 Time Stamp Value Register		*/   
-#define CAN_MB09_ID0		0xFFC02D38	/* Mailbox 9 Identifier Low Register		*/     
-#define CAN_MB09_ID1		0xFFC02D3C	/* Mailbox 9 Identifier High Register		*/    
+#define CAN_MB09_LENGTH		0xFFC02D30	/* Mailbox 9 Data Length Code Register		*/
+#define CAN_MB09_TIMESTAMP	0xFFC02D34	/* Mailbox 9 Time Stamp Value Register		*/
+#define CAN_MB09_ID0		0xFFC02D38	/* Mailbox 9 Identifier Low Register		*/
+#define CAN_MB09_ID1		0xFFC02D3C	/* Mailbox 9 Identifier High Register		*/
 
-#define CAN_MB10_DATA0		0xFFC02D40	/* Mailbox 10 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB10_DATA0		0xFFC02D40	/* Mailbox 10 Data Word 0 [15:0] Register	*/
 #define CAN_MB10_DATA1		0xFFC02D44	/* Mailbox 10 Data Word 1 [31:16] Register	*/
 #define CAN_MB10_DATA2		0xFFC02D48	/* Mailbox 10 Data Word 2 [47:32] Register	*/
 #define CAN_MB10_DATA3		0xFFC02D4C	/* Mailbox 10 Data Word 3 [63:48] Register	*/
-#define CAN_MB10_LENGTH		0xFFC02D50	/* Mailbox 10 Data Length Code Register		*/   
-#define CAN_MB10_TIMESTAMP	0xFFC02D54	/* Mailbox 10 Time Stamp Value Register		*/   
-#define CAN_MB10_ID0		0xFFC02D58	/* Mailbox 10 Identifier Low Register		*/     
-#define CAN_MB10_ID1		0xFFC02D5C	/* Mailbox 10 Identifier High Register		*/    
+#define CAN_MB10_LENGTH		0xFFC02D50	/* Mailbox 10 Data Length Code Register		*/
+#define CAN_MB10_TIMESTAMP	0xFFC02D54	/* Mailbox 10 Time Stamp Value Register		*/
+#define CAN_MB10_ID0		0xFFC02D58	/* Mailbox 10 Identifier Low Register		*/
+#define CAN_MB10_ID1		0xFFC02D5C	/* Mailbox 10 Identifier High Register		*/
 
-#define CAN_MB11_DATA0		0xFFC02D60	/* Mailbox 11 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB11_DATA0		0xFFC02D60	/* Mailbox 11 Data Word 0 [15:0] Register	*/
 #define CAN_MB11_DATA1		0xFFC02D64	/* Mailbox 11 Data Word 1 [31:16] Register	*/
 #define CAN_MB11_DATA2		0xFFC02D68	/* Mailbox 11 Data Word 2 [47:32] Register	*/
 #define CAN_MB11_DATA3		0xFFC02D6C	/* Mailbox 11 Data Word 3 [63:48] Register	*/
-#define CAN_MB11_LENGTH		0xFFC02D70	/* Mailbox 11 Data Length Code Register		*/   
-#define CAN_MB11_TIMESTAMP	0xFFC02D74	/* Mailbox 11 Time Stamp Value Register		*/   
-#define CAN_MB11_ID0		0xFFC02D78	/* Mailbox 11 Identifier Low Register		*/     
-#define CAN_MB11_ID1		0xFFC02D7C	/* Mailbox 11 Identifier High Register		*/    
+#define CAN_MB11_LENGTH		0xFFC02D70	/* Mailbox 11 Data Length Code Register		*/
+#define CAN_MB11_TIMESTAMP	0xFFC02D74	/* Mailbox 11 Time Stamp Value Register		*/
+#define CAN_MB11_ID0		0xFFC02D78	/* Mailbox 11 Identifier Low Register		*/
+#define CAN_MB11_ID1		0xFFC02D7C	/* Mailbox 11 Identifier High Register		*/
 
-#define CAN_MB12_DATA0		0xFFC02D80	/* Mailbox 12 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB12_DATA0		0xFFC02D80	/* Mailbox 12 Data Word 0 [15:0] Register	*/
 #define CAN_MB12_DATA1		0xFFC02D84	/* Mailbox 12 Data Word 1 [31:16] Register	*/
 #define CAN_MB12_DATA2		0xFFC02D88	/* Mailbox 12 Data Word 2 [47:32] Register	*/
 #define CAN_MB12_DATA3		0xFFC02D8C	/* Mailbox 12 Data Word 3 [63:48] Register	*/
-#define CAN_MB12_LENGTH		0xFFC02D90	/* Mailbox 12 Data Length Code Register		*/   
-#define CAN_MB12_TIMESTAMP	0xFFC02D94	/* Mailbox 12 Time Stamp Value Register		*/   
-#define CAN_MB12_ID0		0xFFC02D98	/* Mailbox 12 Identifier Low Register		*/     
-#define CAN_MB12_ID1		0xFFC02D9C	/* Mailbox 12 Identifier High Register		*/    
+#define CAN_MB12_LENGTH		0xFFC02D90	/* Mailbox 12 Data Length Code Register		*/
+#define CAN_MB12_TIMESTAMP	0xFFC02D94	/* Mailbox 12 Time Stamp Value Register		*/
+#define CAN_MB12_ID0		0xFFC02D98	/* Mailbox 12 Identifier Low Register		*/
+#define CAN_MB12_ID1		0xFFC02D9C	/* Mailbox 12 Identifier High Register		*/
 
-#define CAN_MB13_DATA0		0xFFC02DA0	/* Mailbox 13 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB13_DATA0		0xFFC02DA0	/* Mailbox 13 Data Word 0 [15:0] Register	*/
 #define CAN_MB13_DATA1		0xFFC02DA4	/* Mailbox 13 Data Word 1 [31:16] Register	*/
 #define CAN_MB13_DATA2		0xFFC02DA8	/* Mailbox 13 Data Word 2 [47:32] Register	*/
 #define CAN_MB13_DATA3		0xFFC02DAC	/* Mailbox 13 Data Word 3 [63:48] Register	*/
-#define CAN_MB13_LENGTH		0xFFC02DB0	/* Mailbox 13 Data Length Code Register		*/   
-#define CAN_MB13_TIMESTAMP	0xFFC02DB4	/* Mailbox 13 Time Stamp Value Register		*/   
-#define CAN_MB13_ID0		0xFFC02DB8	/* Mailbox 13 Identifier Low Register		*/     
-#define CAN_MB13_ID1		0xFFC02DBC	/* Mailbox 13 Identifier High Register		*/    
+#define CAN_MB13_LENGTH		0xFFC02DB0	/* Mailbox 13 Data Length Code Register		*/
+#define CAN_MB13_TIMESTAMP	0xFFC02DB4	/* Mailbox 13 Time Stamp Value Register		*/
+#define CAN_MB13_ID0		0xFFC02DB8	/* Mailbox 13 Identifier Low Register		*/
+#define CAN_MB13_ID1		0xFFC02DBC	/* Mailbox 13 Identifier High Register		*/
 
-#define CAN_MB14_DATA0		0xFFC02DC0	/* Mailbox 14 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB14_DATA0		0xFFC02DC0	/* Mailbox 14 Data Word 0 [15:0] Register	*/
 #define CAN_MB14_DATA1		0xFFC02DC4	/* Mailbox 14 Data Word 1 [31:16] Register	*/
 #define CAN_MB14_DATA2		0xFFC02DC8	/* Mailbox 14 Data Word 2 [47:32] Register	*/
 #define CAN_MB14_DATA3		0xFFC02DCC	/* Mailbox 14 Data Word 3 [63:48] Register	*/
-#define CAN_MB14_LENGTH		0xFFC02DD0	/* Mailbox 14 Data Length Code Register		*/   
-#define CAN_MB14_TIMESTAMP	0xFFC02DD4	/* Mailbox 14 Time Stamp Value Register		*/   
-#define CAN_MB14_ID0		0xFFC02DD8	/* Mailbox 14 Identifier Low Register		*/     
-#define CAN_MB14_ID1		0xFFC02DDC	/* Mailbox 14 Identifier High Register		*/    
+#define CAN_MB14_LENGTH		0xFFC02DD0	/* Mailbox 14 Data Length Code Register		*/
+#define CAN_MB14_TIMESTAMP	0xFFC02DD4	/* Mailbox 14 Time Stamp Value Register		*/
+#define CAN_MB14_ID0		0xFFC02DD8	/* Mailbox 14 Identifier Low Register		*/
+#define CAN_MB14_ID1		0xFFC02DDC	/* Mailbox 14 Identifier High Register		*/
 
-#define CAN_MB15_DATA0		0xFFC02DE0	/* Mailbox 15 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB15_DATA0		0xFFC02DE0	/* Mailbox 15 Data Word 0 [15:0] Register	*/
 #define CAN_MB15_DATA1		0xFFC02DE4	/* Mailbox 15 Data Word 1 [31:16] Register	*/
 #define CAN_MB15_DATA2		0xFFC02DE8	/* Mailbox 15 Data Word 2 [47:32] Register	*/
 #define CAN_MB15_DATA3		0xFFC02DEC	/* Mailbox 15 Data Word 3 [63:48] Register	*/
-#define CAN_MB15_LENGTH		0xFFC02DF0	/* Mailbox 15 Data Length Code Register		*/   
-#define CAN_MB15_TIMESTAMP	0xFFC02DF4	/* Mailbox 15 Time Stamp Value Register		*/   
-#define CAN_MB15_ID0		0xFFC02DF8	/* Mailbox 15 Identifier Low Register		*/     
-#define CAN_MB15_ID1		0xFFC02DFC	/* Mailbox 15 Identifier High Register		*/    
+#define CAN_MB15_LENGTH		0xFFC02DF0	/* Mailbox 15 Data Length Code Register		*/
+#define CAN_MB15_TIMESTAMP	0xFFC02DF4	/* Mailbox 15 Time Stamp Value Register		*/
+#define CAN_MB15_ID0		0xFFC02DF8	/* Mailbox 15 Identifier Low Register		*/
+#define CAN_MB15_ID1		0xFFC02DFC	/* Mailbox 15 Identifier High Register		*/
 
-#define CAN_MB16_DATA0		0xFFC02E00	/* Mailbox 16 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB16_DATA0		0xFFC02E00	/* Mailbox 16 Data Word 0 [15:0] Register	*/
 #define CAN_MB16_DATA1		0xFFC02E04	/* Mailbox 16 Data Word 1 [31:16] Register	*/
 #define CAN_MB16_DATA2		0xFFC02E08	/* Mailbox 16 Data Word 2 [47:32] Register	*/
 #define CAN_MB16_DATA3		0xFFC02E0C	/* Mailbox 16 Data Word 3 [63:48] Register	*/
-#define CAN_MB16_LENGTH		0xFFC02E10	/* Mailbox 16 Data Length Code Register		*/   
-#define CAN_MB16_TIMESTAMP	0xFFC02E14	/* Mailbox 16 Time Stamp Value Register		*/   
-#define CAN_MB16_ID0		0xFFC02E18	/* Mailbox 16 Identifier Low Register		*/     
-#define CAN_MB16_ID1		0xFFC02E1C	/* Mailbox 16 Identifier High Register		*/    
+#define CAN_MB16_LENGTH		0xFFC02E10	/* Mailbox 16 Data Length Code Register		*/
+#define CAN_MB16_TIMESTAMP	0xFFC02E14	/* Mailbox 16 Time Stamp Value Register		*/
+#define CAN_MB16_ID0		0xFFC02E18	/* Mailbox 16 Identifier Low Register		*/
+#define CAN_MB16_ID1		0xFFC02E1C	/* Mailbox 16 Identifier High Register		*/
 
-#define CAN_MB17_DATA0		0xFFC02E20	/* Mailbox 17 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB17_DATA0		0xFFC02E20	/* Mailbox 17 Data Word 0 [15:0] Register	*/
 #define CAN_MB17_DATA1		0xFFC02E24	/* Mailbox 17 Data Word 1 [31:16] Register	*/
 #define CAN_MB17_DATA2		0xFFC02E28	/* Mailbox 17 Data Word 2 [47:32] Register	*/
 #define CAN_MB17_DATA3		0xFFC02E2C	/* Mailbox 17 Data Word 3 [63:48] Register	*/
-#define CAN_MB17_LENGTH		0xFFC02E30	/* Mailbox 17 Data Length Code Register		*/   
-#define CAN_MB17_TIMESTAMP	0xFFC02E34	/* Mailbox 17 Time Stamp Value Register		*/   
-#define CAN_MB17_ID0		0xFFC02E38	/* Mailbox 17 Identifier Low Register		*/     
-#define CAN_MB17_ID1		0xFFC02E3C	/* Mailbox 17 Identifier High Register		*/    
+#define CAN_MB17_LENGTH		0xFFC02E30	/* Mailbox 17 Data Length Code Register		*/
+#define CAN_MB17_TIMESTAMP	0xFFC02E34	/* Mailbox 17 Time Stamp Value Register		*/
+#define CAN_MB17_ID0		0xFFC02E38	/* Mailbox 17 Identifier Low Register		*/
+#define CAN_MB17_ID1		0xFFC02E3C	/* Mailbox 17 Identifier High Register		*/
 
-#define CAN_MB18_DATA0		0xFFC02E40	/* Mailbox 18 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB18_DATA0		0xFFC02E40	/* Mailbox 18 Data Word 0 [15:0] Register	*/
 #define CAN_MB18_DATA1		0xFFC02E44	/* Mailbox 18 Data Word 1 [31:16] Register	*/
 #define CAN_MB18_DATA2		0xFFC02E48	/* Mailbox 18 Data Word 2 [47:32] Register	*/
 #define CAN_MB18_DATA3		0xFFC02E4C	/* Mailbox 18 Data Word 3 [63:48] Register	*/
-#define CAN_MB18_LENGTH		0xFFC02E50	/* Mailbox 18 Data Length Code Register		*/   
-#define CAN_MB18_TIMESTAMP	0xFFC02E54	/* Mailbox 18 Time Stamp Value Register		*/   
-#define CAN_MB18_ID0		0xFFC02E58	/* Mailbox 18 Identifier Low Register		*/     
-#define CAN_MB18_ID1		0xFFC02E5C	/* Mailbox 18 Identifier High Register		*/    
+#define CAN_MB18_LENGTH		0xFFC02E50	/* Mailbox 18 Data Length Code Register		*/
+#define CAN_MB18_TIMESTAMP	0xFFC02E54	/* Mailbox 18 Time Stamp Value Register		*/
+#define CAN_MB18_ID0		0xFFC02E58	/* Mailbox 18 Identifier Low Register		*/
+#define CAN_MB18_ID1		0xFFC02E5C	/* Mailbox 18 Identifier High Register		*/
 
-#define CAN_MB19_DATA0		0xFFC02E60	/* Mailbox 19 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB19_DATA0		0xFFC02E60	/* Mailbox 19 Data Word 0 [15:0] Register	*/
 #define CAN_MB19_DATA1		0xFFC02E64	/* Mailbox 19 Data Word 1 [31:16] Register	*/
 #define CAN_MB19_DATA2		0xFFC02E68	/* Mailbox 19 Data Word 2 [47:32] Register	*/
 #define CAN_MB19_DATA3		0xFFC02E6C	/* Mailbox 19 Data Word 3 [63:48] Register	*/
-#define CAN_MB19_LENGTH		0xFFC02E70	/* Mailbox 19 Data Length Code Register		*/   
-#define CAN_MB19_TIMESTAMP	0xFFC02E74	/* Mailbox 19 Time Stamp Value Register		*/   
-#define CAN_MB19_ID0		0xFFC02E78	/* Mailbox 19 Identifier Low Register		*/     
-#define CAN_MB19_ID1		0xFFC02E7C	/* Mailbox 19 Identifier High Register		*/    
+#define CAN_MB19_LENGTH		0xFFC02E70	/* Mailbox 19 Data Length Code Register		*/
+#define CAN_MB19_TIMESTAMP	0xFFC02E74	/* Mailbox 19 Time Stamp Value Register		*/
+#define CAN_MB19_ID0		0xFFC02E78	/* Mailbox 19 Identifier Low Register		*/
+#define CAN_MB19_ID1		0xFFC02E7C	/* Mailbox 19 Identifier High Register		*/
 
-#define CAN_MB20_DATA0		0xFFC02E80	/* Mailbox 20 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB20_DATA0		0xFFC02E80	/* Mailbox 20 Data Word 0 [15:0] Register	*/
 #define CAN_MB20_DATA1		0xFFC02E84	/* Mailbox 20 Data Word 1 [31:16] Register	*/
 #define CAN_MB20_DATA2		0xFFC02E88	/* Mailbox 20 Data Word 2 [47:32] Register	*/
 #define CAN_MB20_DATA3		0xFFC02E8C	/* Mailbox 20 Data Word 3 [63:48] Register	*/
-#define CAN_MB20_LENGTH		0xFFC02E90	/* Mailbox 20 Data Length Code Register		*/   
-#define CAN_MB20_TIMESTAMP	0xFFC02E94	/* Mailbox 20 Time Stamp Value Register		*/   
-#define CAN_MB20_ID0		0xFFC02E98	/* Mailbox 20 Identifier Low Register		*/     
-#define CAN_MB20_ID1		0xFFC02E9C	/* Mailbox 20 Identifier High Register		*/    
+#define CAN_MB20_LENGTH		0xFFC02E90	/* Mailbox 20 Data Length Code Register		*/
+#define CAN_MB20_TIMESTAMP	0xFFC02E94	/* Mailbox 20 Time Stamp Value Register		*/
+#define CAN_MB20_ID0		0xFFC02E98	/* Mailbox 20 Identifier Low Register		*/
+#define CAN_MB20_ID1		0xFFC02E9C	/* Mailbox 20 Identifier High Register		*/
 
-#define CAN_MB21_DATA0		0xFFC02EA0	/* Mailbox 21 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB21_DATA0		0xFFC02EA0	/* Mailbox 21 Data Word 0 [15:0] Register	*/
 #define CAN_MB21_DATA1		0xFFC02EA4	/* Mailbox 21 Data Word 1 [31:16] Register	*/
 #define CAN_MB21_DATA2		0xFFC02EA8	/* Mailbox 21 Data Word 2 [47:32] Register	*/
 #define CAN_MB21_DATA3		0xFFC02EAC	/* Mailbox 21 Data Word 3 [63:48] Register	*/
-#define CAN_MB21_LENGTH		0xFFC02EB0	/* Mailbox 21 Data Length Code Register		*/   
-#define CAN_MB21_TIMESTAMP	0xFFC02EB4	/* Mailbox 21 Time Stamp Value Register		*/   
-#define CAN_MB21_ID0		0xFFC02EB8	/* Mailbox 21 Identifier Low Register		*/     
-#define CAN_MB21_ID1		0xFFC02EBC	/* Mailbox 21 Identifier High Register		*/    
+#define CAN_MB21_LENGTH		0xFFC02EB0	/* Mailbox 21 Data Length Code Register		*/
+#define CAN_MB21_TIMESTAMP	0xFFC02EB4	/* Mailbox 21 Time Stamp Value Register		*/
+#define CAN_MB21_ID0		0xFFC02EB8	/* Mailbox 21 Identifier Low Register		*/
+#define CAN_MB21_ID1		0xFFC02EBC	/* Mailbox 21 Identifier High Register		*/
 
-#define CAN_MB22_DATA0		0xFFC02EC0	/* Mailbox 22 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB22_DATA0		0xFFC02EC0	/* Mailbox 22 Data Word 0 [15:0] Register	*/
 #define CAN_MB22_DATA1		0xFFC02EC4	/* Mailbox 22 Data Word 1 [31:16] Register	*/
 #define CAN_MB22_DATA2		0xFFC02EC8	/* Mailbox 22 Data Word 2 [47:32] Register	*/
 #define CAN_MB22_DATA3		0xFFC02ECC	/* Mailbox 22 Data Word 3 [63:48] Register	*/
-#define CAN_MB22_LENGTH		0xFFC02ED0	/* Mailbox 22 Data Length Code Register		*/   
-#define CAN_MB22_TIMESTAMP	0xFFC02ED4	/* Mailbox 22 Time Stamp Value Register		*/   
-#define CAN_MB22_ID0		0xFFC02ED8	/* Mailbox 22 Identifier Low Register		*/     
-#define CAN_MB22_ID1		0xFFC02EDC	/* Mailbox 22 Identifier High Register		*/    
+#define CAN_MB22_LENGTH		0xFFC02ED0	/* Mailbox 22 Data Length Code Register		*/
+#define CAN_MB22_TIMESTAMP	0xFFC02ED4	/* Mailbox 22 Time Stamp Value Register		*/
+#define CAN_MB22_ID0		0xFFC02ED8	/* Mailbox 22 Identifier Low Register		*/
+#define CAN_MB22_ID1		0xFFC02EDC	/* Mailbox 22 Identifier High Register		*/
 
-#define CAN_MB23_DATA0		0xFFC02EE0	/* Mailbox 23 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB23_DATA0		0xFFC02EE0	/* Mailbox 23 Data Word 0 [15:0] Register	*/
 #define CAN_MB23_DATA1		0xFFC02EE4	/* Mailbox 23 Data Word 1 [31:16] Register	*/
 #define CAN_MB23_DATA2		0xFFC02EE8	/* Mailbox 23 Data Word 2 [47:32] Register	*/
 #define CAN_MB23_DATA3		0xFFC02EEC	/* Mailbox 23 Data Word 3 [63:48] Register	*/
-#define CAN_MB23_LENGTH		0xFFC02EF0	/* Mailbox 23 Data Length Code Register		*/   
-#define CAN_MB23_TIMESTAMP	0xFFC02EF4	/* Mailbox 23 Time Stamp Value Register		*/   
-#define CAN_MB23_ID0		0xFFC02EF8	/* Mailbox 23 Identifier Low Register		*/     
-#define CAN_MB23_ID1		0xFFC02EFC	/* Mailbox 23 Identifier High Register		*/    
+#define CAN_MB23_LENGTH		0xFFC02EF0	/* Mailbox 23 Data Length Code Register		*/
+#define CAN_MB23_TIMESTAMP	0xFFC02EF4	/* Mailbox 23 Time Stamp Value Register		*/
+#define CAN_MB23_ID0		0xFFC02EF8	/* Mailbox 23 Identifier Low Register		*/
+#define CAN_MB23_ID1		0xFFC02EFC	/* Mailbox 23 Identifier High Register		*/
 
-#define CAN_MB24_DATA0		0xFFC02F00	/* Mailbox 24 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB24_DATA0		0xFFC02F00	/* Mailbox 24 Data Word 0 [15:0] Register	*/
 #define CAN_MB24_DATA1		0xFFC02F04	/* Mailbox 24 Data Word 1 [31:16] Register	*/
 #define CAN_MB24_DATA2		0xFFC02F08	/* Mailbox 24 Data Word 2 [47:32] Register	*/
 #define CAN_MB24_DATA3		0xFFC02F0C	/* Mailbox 24 Data Word 3 [63:48] Register	*/
-#define CAN_MB24_LENGTH		0xFFC02F10	/* Mailbox 24 Data Length Code Register		*/   
-#define CAN_MB24_TIMESTAMP	0xFFC02F14	/* Mailbox 24 Time Stamp Value Register		*/   
-#define CAN_MB24_ID0		0xFFC02F18	/* Mailbox 24 Identifier Low Register		*/     
-#define CAN_MB24_ID1		0xFFC02F1C	/* Mailbox 24 Identifier High Register		*/    
+#define CAN_MB24_LENGTH		0xFFC02F10	/* Mailbox 24 Data Length Code Register		*/
+#define CAN_MB24_TIMESTAMP	0xFFC02F14	/* Mailbox 24 Time Stamp Value Register		*/
+#define CAN_MB24_ID0		0xFFC02F18	/* Mailbox 24 Identifier Low Register		*/
+#define CAN_MB24_ID1		0xFFC02F1C	/* Mailbox 24 Identifier High Register		*/
 
-#define CAN_MB25_DATA0		0xFFC02F20	/* Mailbox 25 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB25_DATA0		0xFFC02F20	/* Mailbox 25 Data Word 0 [15:0] Register	*/
 #define CAN_MB25_DATA1		0xFFC02F24	/* Mailbox 25 Data Word 1 [31:16] Register	*/
 #define CAN_MB25_DATA2		0xFFC02F28	/* Mailbox 25 Data Word 2 [47:32] Register	*/
 #define CAN_MB25_DATA3		0xFFC02F2C	/* Mailbox 25 Data Word 3 [63:48] Register	*/
-#define CAN_MB25_LENGTH		0xFFC02F30	/* Mailbox 25 Data Length Code Register		*/   
-#define CAN_MB25_TIMESTAMP	0xFFC02F34	/* Mailbox 25 Time Stamp Value Register		*/   
-#define CAN_MB25_ID0		0xFFC02F38	/* Mailbox 25 Identifier Low Register		*/     
-#define CAN_MB25_ID1		0xFFC02F3C	/* Mailbox 25 Identifier High Register		*/    
+#define CAN_MB25_LENGTH		0xFFC02F30	/* Mailbox 25 Data Length Code Register		*/
+#define CAN_MB25_TIMESTAMP	0xFFC02F34	/* Mailbox 25 Time Stamp Value Register		*/
+#define CAN_MB25_ID0		0xFFC02F38	/* Mailbox 25 Identifier Low Register		*/
+#define CAN_MB25_ID1		0xFFC02F3C	/* Mailbox 25 Identifier High Register		*/
 
-#define CAN_MB26_DATA0		0xFFC02F40	/* Mailbox 26 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB26_DATA0		0xFFC02F40	/* Mailbox 26 Data Word 0 [15:0] Register	*/
 #define CAN_MB26_DATA1		0xFFC02F44	/* Mailbox 26 Data Word 1 [31:16] Register	*/
 #define CAN_MB26_DATA2		0xFFC02F48	/* Mailbox 26 Data Word 2 [47:32] Register	*/
 #define CAN_MB26_DATA3		0xFFC02F4C	/* Mailbox 26 Data Word 3 [63:48] Register	*/
-#define CAN_MB26_LENGTH		0xFFC02F50	/* Mailbox 26 Data Length Code Register		*/   
-#define CAN_MB26_TIMESTAMP	0xFFC02F54	/* Mailbox 26 Time Stamp Value Register		*/   
-#define CAN_MB26_ID0		0xFFC02F58	/* Mailbox 26 Identifier Low Register		*/     
-#define CAN_MB26_ID1		0xFFC02F5C	/* Mailbox 26 Identifier High Register		*/    
+#define CAN_MB26_LENGTH		0xFFC02F50	/* Mailbox 26 Data Length Code Register		*/
+#define CAN_MB26_TIMESTAMP	0xFFC02F54	/* Mailbox 26 Time Stamp Value Register		*/
+#define CAN_MB26_ID0		0xFFC02F58	/* Mailbox 26 Identifier Low Register		*/
+#define CAN_MB26_ID1		0xFFC02F5C	/* Mailbox 26 Identifier High Register		*/
 
-#define CAN_MB27_DATA0		0xFFC02F60	/* Mailbox 27 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB27_DATA0		0xFFC02F60	/* Mailbox 27 Data Word 0 [15:0] Register	*/
 #define CAN_MB27_DATA1		0xFFC02F64	/* Mailbox 27 Data Word 1 [31:16] Register	*/
 #define CAN_MB27_DATA2		0xFFC02F68	/* Mailbox 27 Data Word 2 [47:32] Register	*/
 #define CAN_MB27_DATA3		0xFFC02F6C	/* Mailbox 27 Data Word 3 [63:48] Register	*/
-#define CAN_MB27_LENGTH		0xFFC02F70	/* Mailbox 27 Data Length Code Register		*/   
-#define CAN_MB27_TIMESTAMP	0xFFC02F74	/* Mailbox 27 Time Stamp Value Register		*/   
-#define CAN_MB27_ID0		0xFFC02F78	/* Mailbox 27 Identifier Low Register		*/     
-#define CAN_MB27_ID1		0xFFC02F7C	/* Mailbox 27 Identifier High Register		*/    
+#define CAN_MB27_LENGTH		0xFFC02F70	/* Mailbox 27 Data Length Code Register		*/
+#define CAN_MB27_TIMESTAMP	0xFFC02F74	/* Mailbox 27 Time Stamp Value Register		*/
+#define CAN_MB27_ID0		0xFFC02F78	/* Mailbox 27 Identifier Low Register		*/
+#define CAN_MB27_ID1		0xFFC02F7C	/* Mailbox 27 Identifier High Register		*/
 
-#define CAN_MB28_DATA0		0xFFC02F80	/* Mailbox 28 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB28_DATA0		0xFFC02F80	/* Mailbox 28 Data Word 0 [15:0] Register	*/
 #define CAN_MB28_DATA1		0xFFC02F84	/* Mailbox 28 Data Word 1 [31:16] Register	*/
 #define CAN_MB28_DATA2		0xFFC02F88	/* Mailbox 28 Data Word 2 [47:32] Register	*/
 #define CAN_MB28_DATA3		0xFFC02F8C	/* Mailbox 28 Data Word 3 [63:48] Register	*/
-#define CAN_MB28_LENGTH		0xFFC02F90	/* Mailbox 28 Data Length Code Register		*/   
-#define CAN_MB28_TIMESTAMP	0xFFC02F94	/* Mailbox 28 Time Stamp Value Register		*/   
-#define CAN_MB28_ID0		0xFFC02F98	/* Mailbox 28 Identifier Low Register		*/     
-#define CAN_MB28_ID1		0xFFC02F9C	/* Mailbox 28 Identifier High Register		*/    
+#define CAN_MB28_LENGTH		0xFFC02F90	/* Mailbox 28 Data Length Code Register		*/
+#define CAN_MB28_TIMESTAMP	0xFFC02F94	/* Mailbox 28 Time Stamp Value Register		*/
+#define CAN_MB28_ID0		0xFFC02F98	/* Mailbox 28 Identifier Low Register		*/
+#define CAN_MB28_ID1		0xFFC02F9C	/* Mailbox 28 Identifier High Register		*/
 
-#define CAN_MB29_DATA0		0xFFC02FA0	/* Mailbox 29 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB29_DATA0		0xFFC02FA0	/* Mailbox 29 Data Word 0 [15:0] Register	*/
 #define CAN_MB29_DATA1		0xFFC02FA4	/* Mailbox 29 Data Word 1 [31:16] Register	*/
 #define CAN_MB29_DATA2		0xFFC02FA8	/* Mailbox 29 Data Word 2 [47:32] Register	*/
 #define CAN_MB29_DATA3		0xFFC02FAC	/* Mailbox 29 Data Word 3 [63:48] Register	*/
-#define CAN_MB29_LENGTH		0xFFC02FB0	/* Mailbox 29 Data Length Code Register		*/   
-#define CAN_MB29_TIMESTAMP	0xFFC02FB4	/* Mailbox 29 Time Stamp Value Register		*/   
-#define CAN_MB29_ID0		0xFFC02FB8	/* Mailbox 29 Identifier Low Register		*/     
-#define CAN_MB29_ID1		0xFFC02FBC	/* Mailbox 29 Identifier High Register		*/    
+#define CAN_MB29_LENGTH		0xFFC02FB0	/* Mailbox 29 Data Length Code Register		*/
+#define CAN_MB29_TIMESTAMP	0xFFC02FB4	/* Mailbox 29 Time Stamp Value Register		*/
+#define CAN_MB29_ID0		0xFFC02FB8	/* Mailbox 29 Identifier Low Register		*/
+#define CAN_MB29_ID1		0xFFC02FBC	/* Mailbox 29 Identifier High Register		*/
 
-#define CAN_MB30_DATA0		0xFFC02FC0	/* Mailbox 30 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB30_DATA0		0xFFC02FC0	/* Mailbox 30 Data Word 0 [15:0] Register	*/
 #define CAN_MB30_DATA1		0xFFC02FC4	/* Mailbox 30 Data Word 1 [31:16] Register	*/
 #define CAN_MB30_DATA2		0xFFC02FC8	/* Mailbox 30 Data Word 2 [47:32] Register	*/
 #define CAN_MB30_DATA3		0xFFC02FCC	/* Mailbox 30 Data Word 3 [63:48] Register	*/
-#define CAN_MB30_LENGTH		0xFFC02FD0	/* Mailbox 30 Data Length Code Register		*/   
-#define CAN_MB30_TIMESTAMP	0xFFC02FD4	/* Mailbox 30 Time Stamp Value Register		*/   
-#define CAN_MB30_ID0		0xFFC02FD8	/* Mailbox 30 Identifier Low Register		*/     
-#define CAN_MB30_ID1		0xFFC02FDC	/* Mailbox 30 Identifier High Register		*/    
+#define CAN_MB30_LENGTH		0xFFC02FD0	/* Mailbox 30 Data Length Code Register		*/
+#define CAN_MB30_TIMESTAMP	0xFFC02FD4	/* Mailbox 30 Time Stamp Value Register		*/
+#define CAN_MB30_ID0		0xFFC02FD8	/* Mailbox 30 Identifier Low Register		*/
+#define CAN_MB30_ID1		0xFFC02FDC	/* Mailbox 30 Identifier High Register		*/
 
-#define CAN_MB31_DATA0		0xFFC02FE0	/* Mailbox 31 Data Word 0 [15:0] Register	*/ 
+#define CAN_MB31_DATA0		0xFFC02FE0	/* Mailbox 31 Data Word 0 [15:0] Register	*/
 #define CAN_MB31_DATA1		0xFFC02FE4	/* Mailbox 31 Data Word 1 [31:16] Register	*/
 #define CAN_MB31_DATA2		0xFFC02FE8	/* Mailbox 31 Data Word 2 [47:32] Register	*/
 #define CAN_MB31_DATA3		0xFFC02FEC	/* Mailbox 31 Data Word 3 [63:48] Register	*/
-#define CAN_MB31_LENGTH		0xFFC02FF0	/* Mailbox 31 Data Length Code Register		*/   
-#define CAN_MB31_TIMESTAMP	0xFFC02FF4	/* Mailbox 31 Time Stamp Value Register		*/   
-#define CAN_MB31_ID0		0xFFC02FF8	/* Mailbox 31 Identifier Low Register		*/     
-#define CAN_MB31_ID1		0xFFC02FFC	/* Mailbox 31 Identifier High Register		*/    
+#define CAN_MB31_LENGTH		0xFFC02FF0	/* Mailbox 31 Data Length Code Register		*/
+#define CAN_MB31_TIMESTAMP	0xFFC02FF4	/* Mailbox 31 Time Stamp Value Register		*/
+#define CAN_MB31_ID0		0xFFC02FF8	/* Mailbox 31 Identifier Low Register		*/
+#define CAN_MB31_ID1		0xFFC02FFC	/* Mailbox 31 Identifier High Register		*/
 
 /* CAN Mailbox Area Macros				*/
 #define CAN_MB_ID1(x)		(CAN_MB00_ID1+((x)*0x20))
@@ -1894,7 +1894,7 @@
 #define	EWLTEC		0xFF00	/* TX Error Count Limit (For EWTIS)	*/
 
 /* Alternate Deprecated Macros Provided For Backwards Code Compatibility */
-#define CAN_CNF          CAN_DEBUG 
+#define CAN_CNF          CAN_DEBUG
 #define TWI0_PRESCALE    TWI0_CONTROL
 #define TWI0_INT_SRC     TWI0_INT_STAT
 #define TWI0_INT_ENABLE  TWI0_INT_MASK

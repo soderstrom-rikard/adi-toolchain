@@ -897,7 +897,7 @@
 																   /* Usage: r0.l = lo(Peripheral_IVG(62, 10)); */
 																   /*        r0.h = hi(Peripheral_IVG(62, 10)); */
 
- 
+
 
 /* SICx_IMASKw Masks */
 /* masks are 32 bit wide, so two writes reguired for "64 bit" wide registers  */
@@ -916,9 +916,9 @@
 
 
 /* ********* WATCHDOG TIMER MASKS ******************** */
-  
+
 /* Watchdog Timer WDOG_CTL Register Masks */
-  
+
 #define WDEV(x) (((x)<<1) & 0x0006) /* event generated on roll over */
 #define WDEV_RESET 0x0000 /* generate reset event on roll over */
 #define WDEV_NMI 0x0002 /* generate NMI event on roll over */
@@ -926,7 +926,7 @@
 #define WDEV_NONE 0x0006 /* no event on roll over */
 #define WDEN 0x0FF0 /* enable watchdog */
 #define WDDIS 0x0AD0 /* disable watchdog */
-#define WDRO 0x8000 /* watchdog rolled over latch */ 
+#define WDRO 0x8000 /* watchdog rolled over latch */
 
 /* depreciated WDOG_CTL Register Masks for legacy code */
 
@@ -1021,7 +1021,7 @@
 #define UCEN_P	0x00
 
 /* **********  SERIAL PORT MASKS  ********************** */
-          
+
 /* SPORTx_TCR1 Masks */
 #define TSPEN    0x0001  /* TX enable  */
 #define ITCLK    0x0002  /* Internal TX Clock Select  */
@@ -1081,7 +1081,7 @@
 #define MFD		0x0000F000 	/*Multichannel Frame Delay    */
 
 /*  *********  PARALLEL PERIPHERAL INTERFACE (PPI) MASKS ****************   */
-       
+
 /*//  PPI_CONTROL Masks         */
 #define PORT_EN              0x00000001  /* PPI Port Enable  */
 #define PORT_DIR             0x00000002  /* PPI Port Direction       */

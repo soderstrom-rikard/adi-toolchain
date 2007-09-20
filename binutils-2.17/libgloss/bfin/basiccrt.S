@@ -66,7 +66,7 @@
 	.type __start, STT_FUNC;
 __start:
 #if WA_05000109
-	// Avoid Anomaly ID 05000109. 
+	// Avoid Anomaly ID 05000109.
 #	define SYSCFG_VALUE 0x30
 	R1 = SYSCFG_VALUE;
 	SYSCFG = R1;
@@ -119,7 +119,7 @@ __start:
 	P0.H = IVBh;
 	P0.L = IVBl;
 
-	// Install __unknown_exception_occurred in EVT so that 
+	// Install __unknown_exception_occurred in EVT so that
 	// there is defined behaviour.
 	P0 += 2*4;		// Skip Emulation and Reset
 	P1 = 13;
@@ -159,7 +159,7 @@ L$ivt:	[P0++] = R1;
 	R2 = R1 - R0;
 	R1 = 0;
 	CALL.X _memset;
-	
+
 	R0 = INTERRUPT_BITS;
 	R0 <<= 5;	// Bits 0-4 not settable.
 	// CALL.X __install_default_handlers;
@@ -245,7 +245,7 @@ L$clock_is_set:
 	R0 = R0 & R6;
 	CC = R0;
 	IF !CC JUMP L$no_cplbs;
-#if !defined(_ADI_THREADS) 
+#if !defined(_ADI_THREADS)
 	P1.H = __cplb_hdr;
 	P1.L = __cplb_hdr;
 	P0.H = IVBh;
@@ -270,11 +270,11 @@ L$still_interrupt_in_ipend:
 		// interrupts of priority higher than IVG15. Normally one
 		// would expect to only have the reset interrupt in IPEND
 		// being serviced, but occasionally when debugging this may
-		// not be the case - if restart is hit when servicing an 
+		// not be the case - if restart is hit when servicing an
 		// interrupt.
 		//
 		// When we clear all bits from IPEND, we'll enter user mode,
-		// then we'll automatically jump to supervisor_mode to start 
+		// then we'll automatically jump to supervisor_mode to start
 		// servicing IVG15 (which we will 'service' for the whole
 		// program, so that the program is in supervisor mode.
 		//
@@ -318,11 +318,11 @@ L$supervisor_mode:
 	R0.H = __fini;
 	CALL.X _atexit;
 
-#if !defined(_ADI_THREADS) 
+#if !defined(_ADI_THREADS)
 #ifdef FIOCRT
 	// FILE IO provides access to real command-line arguments.
 	CALL.X __getargv;
-	r1.l=__Argv; 
+	r1.l=__Argv;
 	r1.h=__Argv;
 #else
 	// Default to having no arguments and a null list.
@@ -335,7 +335,7 @@ L$supervisor_mode:
 	// At long last, call the application program.
 	CALL.X _main;
 
-#if !defined(_ADI_THREADS) 
+#if !defined(_ADI_THREADS)
 	CALL.X _exit;	// passing in main's return value
 #endif
 
@@ -386,7 +386,7 @@ __pll_set_system_clocks:
 	// Plant CSEL and SSEL
 	R0 <<= 16;
 	R0.L = (4 << 8) | 2;	// 2 bits, at posn 4
-	R1 <<= 16;	
+	R1 <<= 16;
 	R1.L = 4;		// 4 bits, at posn 0
 	R2 = DEPOSIT(R2, R0);
 
@@ -421,7 +421,7 @@ __pll_set_system_vco:
 	R3 = DEPOSIT(R3, R0);
 	CC = R1 == R3;		// and if we haven't changed
 	IF CC JUMP L$done;	// Anything, return
-	
+
 	CC = R2 == 0;		// Use default lockcount if
 	IF CC JUMP L$wakeup;	// user one is zero.
 	P2.H = PLL_LOCKCNT >> 16;
@@ -445,7 +445,7 @@ L$done:
 	RTS;
 	.size __pll_set_system_vco, .-__pll_set_system_vco
 
-	
+
 	.local	L$argv
 	.comm	L$argv,4,4
 

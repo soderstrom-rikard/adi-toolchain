@@ -55,7 +55,7 @@
 
 /* CPLB configurations */
 #define CPLB_DEF_CACHE_WT	CPLB_L1_CHBL | CPLB_WT
-#define CPLB_DEF_CACHE_WB	CPLB_L1_CHBL 
+#define CPLB_DEF_CACHE_WB	CPLB_L1_CHBL
 #define CPLB_CACHE_ENABLED	CPLB_L1_CHBL | CPLB_DIRTY
 
 #define CPLB_DEF_CACHE		CPLB_L1_CHBL | CPLB_WT
@@ -71,7 +71,7 @@
 #define CPLB_DDOCACHE_WT	CPLB_DNOCACHE | CPLB_DEF_CACHE_WT
 #define CPLB_DDOCACHE_WB	CPLB_DNOCACHE | CPLB_DEF_CACHE_WB
 
-/* Event type parameter for replacement manager _cplb_mgr */ 
+/* Event type parameter for replacement manager _cplb_mgr */
 #define CPLB_EVT_ICPLB_MISS	0
 #define CPLB_EVT_DCPLB_MISS	1
 #define CPLB_EVT_DCPLB_WRITE	2

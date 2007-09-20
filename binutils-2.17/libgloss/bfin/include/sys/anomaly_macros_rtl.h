@@ -32,7 +32,7 @@
 
 #if !defined(__SILICON_REVISION__)
 #define __FORCE_LEGACY_WORKAROUNDS__
-#endif 
+#endif
 
 
 /* 05-00-0096 - PREFETCH, FLUSH, and FLUSHINV must be followed by a CSYNC
@@ -68,7 +68,7 @@
    defined(__FORCE_LEGACY_WORKAROUNDS__)))
 
 
-/* 05-00-0123 - DTEST_COMMAND initiated memory access may be incorrect if 
+/* 05-00-0123 - DTEST_COMMAND initiated memory access may be incorrect if
 ** data cache or DMA is active.
 **
 **  ADSP-BF531/2/3 - revs 0.1-0.2 (fixed 0.3)
@@ -84,7 +84,7 @@
    defined(__FORCE_LEGACY_WORKAROUNDS__)))
 
 
-/* 05-00-0125 - Erroneous exception when enabling cache 
+/* 05-00-0125 - Erroneous exception when enabling cache
 **
 **  ADSP-BF531/2/3 - revs 0.1-0.2 (fixed 0.3)
 **  ADSP-BF561 - revs 0.0-0.2 (0.0 and 0.1 not supported in VDSP++ 4.0)
@@ -105,7 +105,7 @@
 **  ADSP-BF531/2/3 - revs 0.0-0.2 (fixed 0.3)
 **
 ** Changes to start code.
-** 
+**
 */
 #define WA_05000137 \
   ((defined(__ADSPBF531__) ||  \
@@ -116,11 +116,11 @@
    defined(__FORCE_LEGACY_WORKAROUNDS__)))
 
 
-/* 05-00-0158 - "Boot fails when data cache enabled: Data from a Data Cache 
-** fill can be  corrupted after or during instruction DMA if certain core 
-** stalls exist"   
-** 
-**  Impacted: 
+/* 05-00-0158 - "Boot fails when data cache enabled: Data from a Data Cache
+** fill can be  corrupted after or during instruction DMA if certain core
+** stalls exist"
+**
+**  Impacted:
 **    BF533/3/1 : 0.0-0.4 (fixed 0.5)
 **
 ** The workaround we have only works for si-revisions >= 0.3. No workaround for
@@ -134,33 +134,33 @@
    (__SILICON_REVISION__ == 0xffff || \
      (__SILICON_REVISION__ >= 0x3 && \
       __SILICON_REVISION__ < 0x5))) || \
-   defined(__FORCE_LEGACY_WORKAROUNDS__))) 
+   defined(__FORCE_LEGACY_WORKAROUNDS__)))
 
 
-/* 05-00-0204 - "Incorrect data read with write-through cache and 
-** allocate cache lines on reads only mode. 
+/* 05-00-0204 - "Incorrect data read with write-through cache and
+** allocate cache lines on reads only mode.
 **
-** This problem is cache related with high speed clocks. It apparently does 
+** This problem is cache related with high speed clocks. It apparently does
 ** not impact BF531 and BF532 because they cannot run at high enough clock
-** to cause the anomaly. We build libs for BF532 though so that means we will 
-** need to do the workaround for BF532 and BF531 also. 
+** to cause the anomaly. We build libs for BF532 though so that means we will
+** need to do the workaround for BF532 and BF531 also.
 **
 ** Also the 0.3 to 0.4 revision is not an inflexion for libs BF532 and BF561.
-** This means a RT check may be required to avoid doing the WA for 0.4.  
-** 
-**  Impacted:  
-**     BF533 - 0.0-0.3 (fixed 0.4)  
-**     BF534 - 0.0 (fixed 0.1)  
-**     BF536 - 0.0 (fixed 0.1) 
-**     BF537 - 0.0 (fixed 0.1) 
-**     BF538 - 0.0 (fixed 0.1)  
+** This means a RT check may be required to avoid doing the WA for 0.4.
+**
+**  Impacted:
+**     BF533 - 0.0-0.3 (fixed 0.4)
+**     BF534 - 0.0 (fixed 0.1)
+**     BF536 - 0.0 (fixed 0.1)
+**     BF537 - 0.0 (fixed 0.1)
+**     BF538 - 0.0 (fixed 0.1)
 **     BF539 - 0.0 (fixed 0.1)
-**     BF561 - 0.0-0.3 (fixed 0.4) 
+**     BF561 - 0.0-0.3 (fixed 0.4)
 */
 #if defined(__ADI_LIB_BUILD__)
 #  define __BUILDBF53123 1 /* building one single library for BF531/2/3 */
 #else
-#  define __BUILDBF53123 0 
+#  define __BUILDBF53123 0
 #endif
 
 #define WA_05000204 \
@@ -194,11 +194,11 @@
 
 /* 05-00-0258 - "Instruction Cache is corrupted when bit 9 and 12 of
  * the ICPLB Data registers differ"
- * 
+ *
  * When bit 9 and bit 12 of the ICPLB Data MMR differ, the cache may
  * not update properly.  For example, for a particular cache line,
  * the cache tag may be valid while the contents of that cache line
- * are not present in the cache. 
+ * are not present in the cache.
  *
  * Impacted:
  *
@@ -233,7 +233,7 @@
  * within the same aligned 64 bit word.
  *
  * This problem impacts all revisions of Blackfins.
- */ 
+ */
 
 #define WA_05000259 \
 	(defined(__ADSPBLACKFIN__) && defined(__SILICON_REVISION__))
@@ -280,12 +280,12 @@
 	   (__SILICON_REVISION__ <= 0x4)) || \
 	  ((defined(__ADSPBF561__)) && \
 	   (__SILICON_REVISION__ < 0x1)))
-     
+
 /* 05-00-0229 - "SPI Slave Boot Mode Modifies Registers".
- * When the SPI slave boot completes, the final DMA IRQ is cleared 
- * but the DMA5_CONFIG and SPI_CTL registers are not reset to their 
- * default states.  
- * 
+ * When the SPI slave boot completes, the final DMA IRQ is cleared
+ * but the DMA5_CONFIG and SPI_CTL registers are not reset to their
+ * default states.
+ *
  * We work around this by resetting the registers to their default
  * values at the beginning of the CRT. The only issue would be when
  * users boot from flash and make use of the DMA or serial port.
@@ -299,7 +299,7 @@
 	 (defined(__ADSPBF531__) || defined(__ADSPBF532__) || \
 	  defined(__ADSPBF533__) || defined(__ADSPBF538__) || \
 	  defined(__ADSPBF539__)))
-  
+
 /* 05-00-0283 - "A system MMR write is stalled indefinitely when killed in a
  * particular stage".
  *

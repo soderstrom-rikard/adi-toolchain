@@ -22,6 +22,6 @@
 
 /** ADSP-BF541 is a non-existent processor -- no additional #defines **/
 
-#define                           CHIPID  0xffc00014   
+#define                           CHIPID  0xffc00014
 
 #endif /* _DEF_BF541_H */

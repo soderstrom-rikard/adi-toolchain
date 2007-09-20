@@ -503,21 +503,21 @@
 /* Bit masks for PIXC_CTL */
 
 #define                   PIXC_EN  0x1        /* Pixel Compositor Enable */
-#define                  nPIXC_EN  0x0       
+#define                  nPIXC_EN  0x0
 #define                  OVR_A_EN  0x2        /* Overlay A Enable */
-#define                 nOVR_A_EN  0x0       
+#define                 nOVR_A_EN  0x0
 #define                  OVR_B_EN  0x4        /* Overlay B Enable */
-#define                 nOVR_B_EN  0x0       
+#define                 nOVR_B_EN  0x0
 #define                  IMG_FORM  0x8        /* Image Data Format */
-#define                 nIMG_FORM  0x0       
+#define                 nIMG_FORM  0x0
 #define                  OVR_FORM  0x10       /* Overlay Data Format */
-#define                 nOVR_FORM  0x0       
+#define                 nOVR_FORM  0x0
 #define                  OUT_FORM  0x20       /* Output Data Format */
-#define                 nOUT_FORM  0x0       
+#define                 nOUT_FORM  0x0
 #define                   UDS_MOD  0x40       /* Resampling Mode */
-#define                  nUDS_MOD  0x0       
+#define                  nUDS_MOD  0x0
 #define                     TC_EN  0x80       /* Transparent Color Enable */
-#define                    nTC_EN  0x0       
+#define                    nTC_EN  0x0
 #define                  IMG_STAT  0x300      /* Image FIFO Status */
 #define                  OVR_STAT  0xc00      /* Overlay FIFO Status */
 #define                    WM_LVL  0x3000     /* FIFO Watermark Level */
@@ -565,13 +565,13 @@
 /* Bit masks for PIXC_INTRSTAT */
 
 #define                OVR_INT_EN  0x1        /* Interrupt at End of Last Valid Overlay */
-#define               nOVR_INT_EN  0x0       
+#define               nOVR_INT_EN  0x0
 #define                FRM_INT_EN  0x2        /* Interrupt at End of Frame */
-#define               nFRM_INT_EN  0x0       
+#define               nFRM_INT_EN  0x0
 #define              OVR_INT_STAT  0x4        /* Overlay Interrupt Status */
-#define             nOVR_INT_STAT  0x0       
+#define             nOVR_INT_STAT  0x0
 #define              FRM_INT_STAT  0x8        /* Frame Interrupt Status */
-#define             nFRM_INT_STAT  0x0       
+#define             nFRM_INT_STAT  0x0
 
 /* Bit masks for PIXC_RYCON */
 
@@ -579,7 +579,7 @@
 #define                       A12  0xffc00    /* A12 in the Coefficient Matrix */
 #define                       A13  0x3ff00000 /* A13 in the Coefficient Matrix */
 #define                  RY_MULT4  0x40000000 /* Multiply Row by 4 */
-#define                 nRY_MULT4  0x0       
+#define                 nRY_MULT4  0x0
 
 /* Bit masks for PIXC_GUCON */
 
@@ -587,7 +587,7 @@
 #define                       A22  0xffc00    /* A22 in the Coefficient Matrix */
 #define                       A23  0x3ff00000 /* A23 in the Coefficient Matrix */
 #define                  GU_MULT4  0x40000000 /* Multiply Row by 4 */
-#define                 nGU_MULT4  0x0       
+#define                 nGU_MULT4  0x0
 
 /* Bit masks for PIXC_BVCON */
 
@@ -595,7 +595,7 @@
 #define                       A32  0xffc00    /* A32 in the Coefficient Matrix */
 #define                       A33  0x3ff00000 /* A33 in the Coefficient Matrix */
 #define                  BV_MULT4  0x40000000 /* Multiply Row by 4 */
-#define                 nBV_MULT4  0x0       
+#define                 nBV_MULT4  0x0
 
 /* Bit masks for PIXC_CCBIAS */
 
@@ -612,48 +612,48 @@
 /* Bit masks for HOST_CONTROL */
 
 #define                 HOSTDP_EN  0x1        /* HOSTDP Enable */
-#define                nHOSTDP_EN  0x0       
+#define                nHOSTDP_EN  0x0
 #define                HOSTDP_END  0x2        /* Host Endianess */
-#define               nHOSTDP_END  0x0       
+#define               nHOSTDP_END  0x0
 #define          HOSTDP_DATA_SIZE  0x4        /* Data Size */
-#define         nHOSTDP_DATA_SIZE  0x0       
+#define         nHOSTDP_DATA_SIZE  0x0
 #define                HOSTDP_RST  0x8        /* HOSTDP Reset */
-#define               nHOSTDP_RST  0x0       
+#define               nHOSTDP_RST  0x0
 #define                  HRDY_OVR  0x20       /* HRDY Override */
-#define                 nHRDY_OVR  0x0       
+#define                 nHRDY_OVR  0x0
 #define                  INT_MODE  0x40       /* Interrupt Mode */
-#define                 nINT_MODE  0x0       
+#define                 nINT_MODE  0x0
 #define                     BT_EN  0x80       /* Bus Timeout Enable */
-#define                    nBT_EN  0x0       
+#define                    nBT_EN  0x0
 #define                       EHW  0x100      /* Enable Host Write */
-#define                      nEHW  0x0       
+#define                      nEHW  0x0
 #define                       EHR  0x200      /* Enable Host Read */
-#define                      nEHR  0x0       
+#define                      nEHR  0x0
 #define                       BDR  0x400      /* Burst DMA Requests */
-#define                      nBDR  0x0       
+#define                      nBDR  0x0
 
 /* Bit masks for HOST_STATUS */
 
 #define                   DMA_RDY  0x1        /* DMA Ready */
-#define                  nDMA_RDY  0x0       
+#define                  nDMA_RDY  0x0
 #define                  FIFOFULL  0x2        /* FIFO Full */
-#define                 nFIFOFULL  0x0       
+#define                 nFIFOFULL  0x0
 #define                 FIFOEMPTY  0x4        /* FIFO Empty */
-#define                nFIFOEMPTY  0x0       
+#define                nFIFOEMPTY  0x0
 #define                 DMA_CMPLT  0x8        /* DMA Complete */
-#define                nDMA_CMPLT  0x0       
+#define                nDMA_CMPLT  0x0
 #define                      HSHK  0x10       /* Host Handshake */
-#define                     nHSHK  0x0       
+#define                     nHSHK  0x0
 #define               HOSTDP_TOUT  0x20       /* HOSTDP Timeout */
-#define              nHOSTDP_TOUT  0x0       
+#define              nHOSTDP_TOUT  0x0
 #define                      HIRQ  0x40       /* Host Interrupt Request */
-#define                     nHIRQ  0x0       
+#define                     nHIRQ  0x0
 #define                ALLOW_CNFG  0x80       /* Allow New Configuration */
-#define               nALLOW_CNFG  0x0       
+#define               nALLOW_CNFG  0x0
 #define                   DMA_DIR  0x100      /* DMA Direction */
-#define                  nDMA_DIR  0x0       
+#define                  nDMA_DIR  0x0
 #define                       BTE  0x200      /* Bus Timeout Enabled */
-#define                      nBTE  0x0       
+#define                      nBTE  0x0
 
 /* Bit masks for HOST_TIMEOUT */
 
@@ -662,41 +662,41 @@
 /* Bit masks for TIMER_ENABLE1 */
 
 #define                    TIMEN8  0x1        /* Timer 8 Enable */
-#define                   nTIMEN8  0x0       
+#define                   nTIMEN8  0x0
 #define                    TIMEN9  0x2        /* Timer 9 Enable */
-#define                   nTIMEN9  0x0       
+#define                   nTIMEN9  0x0
 #define                   TIMEN10  0x4        /* Timer 10 Enable */
-#define                  nTIMEN10  0x0       
+#define                  nTIMEN10  0x0
 
 /* Bit masks for TIMER_DISABLE1 */
 
 #define                   TIMDIS8  0x1        /* Timer 8 Disable */
-#define                  nTIMDIS8  0x0       
+#define                  nTIMDIS8  0x0
 #define                   TIMDIS9  0x2        /* Timer 9 Disable */
-#define                  nTIMDIS9  0x0       
+#define                  nTIMDIS9  0x0
 #define                  TIMDIS10  0x4        /* Timer 10 Disable */
-#define                 nTIMDIS10  0x0       
+#define                 nTIMDIS10  0x0
 
 /* Bit masks for TIMER_STATUS1 */
 
 #define                    TIMIL8  0x1        /* Timer 8 Interrupt */
-#define                   nTIMIL8  0x0       
+#define                   nTIMIL8  0x0
 #define                    TIMIL9  0x2        /* Timer 9 Interrupt */
-#define                   nTIMIL9  0x0       
+#define                   nTIMIL9  0x0
 #define                   TIMIL10  0x4        /* Timer 10 Interrupt */
-#define                  nTIMIL10  0x0       
+#define                  nTIMIL10  0x0
 #define                 TOVF_ERR8  0x10       /* Timer 8 Counter Overflow */
-#define                nTOVF_ERR8  0x0       
+#define                nTOVF_ERR8  0x0
 #define                 TOVF_ERR9  0x20       /* Timer 9 Counter Overflow */
-#define                nTOVF_ERR9  0x0       
+#define                nTOVF_ERR9  0x0
 #define                TOVF_ERR10  0x40       /* Timer 10 Counter Overflow */
-#define               nTOVF_ERR10  0x0       
+#define               nTOVF_ERR10  0x0
 #define                     TRUN8  0x1000     /* Timer 8 Slave Enable Status */
-#define                    nTRUN8  0x0       
+#define                    nTRUN8  0x0
 #define                     TRUN9  0x2000     /* Timer 9 Slave Enable Status */
-#define                    nTRUN9  0x0       
+#define                    nTRUN9  0x0
 #define                    TRUN10  0x4000     /* Timer 10 Slave Enable Status */
-#define                   nTRUN10  0x0       
+#define                   nTRUN10  0x0
 
 /* Bit masks for EPPI0 are obtained from common base header for EPPIx (EPPI1 and EPPI2) */
 

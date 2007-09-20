@@ -16,7 +16,7 @@
 
 #ifdef _LANGUAGE_C
 #pragma once
-#pragma system_header 
+#pragma system_header
 #endif
 
 #ifndef _PLL_H
@@ -34,18 +34,18 @@
 
 enum clkctrl_t {
     /* no modification of PLL rates in CRT startup - default */
-   no_startup_set=NO_STARTUP_SET, 
+   no_startup_set=NO_STARTUP_SET,
 
     /* CRT startup sets PLL rates to suitable maximum values */
-   max_in_startup=MAX_IN_STARTUP  
+   max_in_startup=MAX_IN_STARTUP
 };
 
-/* 
+/*
 ** Define __clk_ctrl to 1 to cause startup to set PLL rates for maximum
 ** speed performance rates.  The default version defined in the runtime-
 ** libraries defines __clk_ctrl to 0 which disables the feature.
 */
-extern enum clkctrl_t __clk_ctrl;  
+extern enum clkctrl_t __clk_ctrl;
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,10 +53,10 @@ extern "C" {
 
 #if defined(__ADSPLPBLACKFIN__)
 
-/* Sets SSEL and CSEL bits in PLL_DIV to passed values. 
+/* Sets SSEL and CSEL bits in PLL_DIV to passed values.
 ** Returns -1 on failure.
 */
-int pll_set_system_clocks(int _csel, int _ssel); 
+int pll_set_system_clocks(int _csel, int _ssel);
 
 /*
 ** Sets MSEL and DF bits in PLL_CTL and LOCKCNT in PLL_LOCKCNT.

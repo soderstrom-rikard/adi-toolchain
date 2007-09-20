@@ -307,7 +307,7 @@
 #define DMA6_CURR_Y_COUNT	0xFFC00DB8	/* DMA Channel 6 Current Y Count Register */
 #define DMA6_IRQ_STATUS		0xFFC00DA8	/* DMA Channel 6 Interrupt/Status Register */
 #define DMA6_PERIPHERAL_MAP	0xFFC00DAC	/* DMA Channel 6 Peripheral Map Register */
-                                
+
 #define DMA7_CONFIG			0xFFC00DC8	/* DMA Channel 7 Configuration Register */
 #define DMA7_NEXT_DESC_PTR	0xFFC00DC0	/* DMA Channel 7 Next Descriptor Pointer Register */
 #define DMA7_START_ADDR		0xFFC00DC4	/* DMA Channel 7 Start Address Register */
@@ -321,7 +321,7 @@
 #define DMA7_CURR_Y_COUNT	0xFFC00DF8	/* DMA Channel 7 Current Y Count Register */
 #define DMA7_IRQ_STATUS		0xFFC00DE8	/* DMA Channel 7 Interrupt/Status Register */
 #define DMA7_PERIPHERAL_MAP	0xFFC00DEC	/* DMA Channel 7 Peripheral Map Register */
-                                          
+
 #define MDMA_D1_CONFIG			0xFFC00E88	/* MemDMA Stream 1 Destination Configuration Register */
 #define MDMA_D1_NEXT_DESC_PTR	0xFFC00E80	/* MemDMA Stream 1 Destination Next Descriptor Pointer Register */
 #define MDMA_D1_START_ADDR		0xFFC00E84	/* MemDMA Stream 1 Destination Start Address Register */
@@ -349,7 +349,7 @@
 #define MDMA_S1_CURR_Y_COUNT	0xFFC00EF8	/* MemDMA Stream 1 Source Current Y Count Register */
 #define MDMA_S1_IRQ_STATUS		0xFFC00EE8	/* MemDMA Stream 1 Source Interrupt/Status Register */
 #define MDMA_S1_PERIPHERAL_MAP	0xFFC00EEC	/* MemDMA Stream 1 Source Peripheral Map Register */
-                                          
+
 #define MDMA_D0_CONFIG			0xFFC00E08	/* MemDMA Stream 0 Destination Configuration Register */
 #define MDMA_D0_NEXT_DESC_PTR	0xFFC00E00	/* MemDMA Stream 0 Destination Next Descriptor Pointer Register */
 #define MDMA_D0_START_ADDR		0xFFC00E04	/* MemDMA Stream 0 Destination Start Address Register */
@@ -363,7 +363,7 @@
 #define MDMA_D0_CURR_Y_COUNT	0xFFC00E38	/* MemDMA Stream 0 Destination Current Y Count Register */
 #define MDMA_D0_IRQ_STATUS		0xFFC00E28	/* MemDMA Stream 0 Destination Interrupt/Status Register */
 #define MDMA_D0_PERIPHERAL_MAP	0xFFC00E2C	/* MemDMA Stream 0 Destination Peripheral Map Register */
-                                          
+
 #define MDMA_S0_CONFIG			0xFFC00E48	/* MemDMA Stream 0 Source Configuration Register */
 #define MDMA_S0_NEXT_DESC_PTR	0xFFC00E40	/* MemDMA Stream 0 Source Next Descriptor Pointer Register */
 #define MDMA_S0_START_ADDR		0xFFC00E44	/* MemDMA Stream 0 Source Start Address Register */
@@ -554,7 +554,7 @@
 #define WDEV_NONE		0x0006 				/* no event on roll over */
 #define WDEN			0x0FF0 				/* enable watchdog */
 #define WDDIS			0x0AD0 				/* disable watchdog */
-#define WDRO			0x8000 				/* watchdog rolled over latch */ 
+#define WDRO			0x8000 				/* watchdog rolled over latch */
 
 /* depreciated WDOG_CTL Register Masks for legacy code */
 #define ICTL WDEV

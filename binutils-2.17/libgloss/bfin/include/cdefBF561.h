@@ -477,7 +477,7 @@
 #define pMDMA1_D0_Y_MODIFY 	(volatile signed short *)MDMA1_D0_Y_MODIFY
 #define pMDMA1_D0_CURR_DESC_PTR _PTR_TO_VOL_VOID_PTR MDMA1_D0_CURR_DESC_PTR
 #define pMDMA1_D0_CURR_ADDR 	_PTR_TO_VOL_VOID_PTR MDMA1_D0_CURR_ADDR
-#define pMDMA1_D0_CURR_X_COUNT 	(volatile unsigned short *)MDMA1_D0_CURR_X_COUNT	
+#define pMDMA1_D0_CURR_X_COUNT 	(volatile unsigned short *)MDMA1_D0_CURR_X_COUNT
 #define pMDMA1_D0_CURR_Y_COUNT 	(volatile unsigned short *)MDMA1_D0_CURR_Y_COUNT
 #define pMDMA1_D0_IRQ_STATUS 	(volatile unsigned short *)MDMA1_D0_IRQ_STATUS
 #define pMDMA1_D0_PERIPHERAL_MAP (volatile unsigned short *)MDMA1_D0_PERIPHERAL_MAP

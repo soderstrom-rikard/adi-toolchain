@@ -19,7 +19,7 @@
 #pragma system_header /* cplbtab.h */
 #endif
 
-/* Define structures for the CPLB tables. */ 
+/* Define structures for the CPLB tables. */
 
 #ifndef _CPLBTAB_H
 #define _CPLBTAB_H
@@ -37,7 +37,7 @@ typedef struct {
   unsigned long flags;
 } cplb_entry;
 
-extern cplb_entry dcplbs_table[]; 
+extern cplb_entry dcplbs_table[];
 extern cplb_entry icplbs_table[];
 extern int __cplb_ctrl;
 

@@ -25,7 +25,7 @@
 #define _SYS_MC_TYPEDEF_H
 
 #if !defined(__ADSPLPBLACKFIN__)
-typedef volatile unsigned char testset_t; 
+typedef volatile unsigned char testset_t;
 #elif defined(__WORKAROUND_TESTSET_ALIGN) /* require 32-bit aligned address */
 typedef volatile unsigned int testset_t;
 #else

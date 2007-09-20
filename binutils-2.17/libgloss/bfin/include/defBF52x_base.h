@@ -151,7 +151,7 @@
 #define TIMER7_CONFIG		0xFFC00670	/* Timer 7 Configuration Register  			*/
 #define TIMER7_COUNTER		0xFFC00674	/* Timer 7 Counter Register        			*/
 #define TIMER7_PERIOD		0xFFC00678	/* Timer 7 Period Register         			*/
-#define TIMER7_WIDTH		0xFFC0067C	/* Timer 7 Width Register       			*/   
+#define TIMER7_WIDTH		0xFFC0067C	/* Timer 7 Width Register       			*/
 
 #define TIMER_ENABLE		0xFFC00680	/* Timer Enable Register					*/
 #define TIMER_DISABLE		0xFFC00684	/* Timer Disable Register					*/
@@ -689,16 +689,16 @@
 
 #define IRQ_ERROR1      0x00000002  /* Error Interrupt (DMA, DMARx Block, DMARx Overflow) */
 #define IRQ_ERROR2      0x00000004  /* Error Interrupt (CAN, Ethernet, SPORTx, PPI, SPI, UARTx) */
-#define IRQ_RTC			0x00000008	/* Real Time Clock Interrupt 						*/ 
-#define IRQ_DMA0		0x00000010	/* DMA Channel 0 (PPI) Interrupt 					*/ 
-#define IRQ_DMA3		0x00000020	/* DMA Channel 3 (SPORT0 RX) Interrupt 				*/ 
+#define IRQ_RTC			0x00000008	/* Real Time Clock Interrupt 						*/
+#define IRQ_DMA0		0x00000010	/* DMA Channel 0 (PPI) Interrupt 					*/
+#define IRQ_DMA3		0x00000020	/* DMA Channel 3 (SPORT0 RX) Interrupt 				*/
 #define IRQ_DMA4		0x00000040	/* DMA Channel 4 (SPORT0 TX) Interrupt 				*/
 #define IRQ_DMA5		0x00000080	/* DMA Channel 5 (SPORT1 RX) Interrupt 				*/
 
 #define IRQ_DMA6		0x00000100	/* DMA Channel 6 (SPORT1 TX) Interrupt 		 		*/
 #define IRQ_TWI			0x00000200	/* TWI Interrupt									*/
 #define IRQ_DMA7		0x00000400	/* DMA Channel 7 (SPI) Interrupt 					*/
-#define IRQ_DMA8		0x00000800	/* DMA Channel 8 (UART0 RX) Interrupt 				*/ 
+#define IRQ_DMA8		0x00000800	/* DMA Channel 8 (UART0 RX) Interrupt 				*/
 #define IRQ_DMA9		0x00001000	/* DMA Channel 9 (UART0 TX) Interrupt 				*/
 #define IRQ_DMA10		0x00002000	/* DMA Channel 10 (UART1 RX) Interrupt 				*/
 #define IRQ_DMA11		0x00004000	/* DMA Channel 11 (UART1 TX) Interrupt 				*/
@@ -792,7 +792,7 @@
 #define WDEV_NONE 0x0006 /* no event on roll over */
 #define WDEN 0x0FF0 /* enable watchdog */
 #define WDDIS 0x0AD0 /* disable watchdog */
-#define WDRO 0x8000 /* watchdog rolled over latch */ 
+#define WDRO 0x8000 /* watchdog rolled over latch */
 
 /* depreciated WDOG_CTL Register Masks for legacy code */
 
@@ -1623,12 +1623,12 @@
 
 /* entry addresses of the user-callable Boot ROM functions */
 
-#define _BOOTROM_RESET 0xEF000000 
-#define _BOOTROM_FINAL_INIT 0xEF000002 
+#define _BOOTROM_RESET 0xEF000000
+#define _BOOTROM_FINAL_INIT 0xEF000002
 #define _BOOTROM_DO_MEMORY_DMA 0xEF000006
-#define _BOOTROM_BOOT_DXE_FLASH 0xEF000008 
-#define _BOOTROM_BOOT_DXE_SPI 0xEF00000A 
-#define _BOOTROM_BOOT_DXE_TWI 0xEF00000C 
+#define _BOOTROM_BOOT_DXE_FLASH 0xEF000008
+#define _BOOTROM_BOOT_DXE_SPI 0xEF00000A
+#define _BOOTROM_BOOT_DXE_TWI 0xEF00000C
 #define _BOOTROM_GET_DXE_ADDRESS_FLASH 0xEF000010
 #define _BOOTROM_GET_DXE_ADDRESS_SPI 0xEF000012
 #define _BOOTROM_GET_DXE_ADDRESS_TWI 0xEF000014
@@ -1704,48 +1704,48 @@
 /* Bit masks for HOST_CONTROL */
 
 #define                 HOSTDP_EN  0x1        /* HOSTDP Enable */
-#define                nHOSTDP_EN  0x0       
+#define                nHOSTDP_EN  0x0
 #define                HOSTDP_END  0x2        /* Host Endianess */
-#define               nHOSTDP_END  0x0       
+#define               nHOSTDP_END  0x0
 #define          HOSTDP_DATA_SIZE  0x4        /* Data Size */
-#define         nHOSTDP_DATA_SIZE  0x0       
+#define         nHOSTDP_DATA_SIZE  0x0
 #define                HOSTDP_RST  0x8        /* HOSTDP Reset */
-#define               nHOSTDP_RST  0x0       
+#define               nHOSTDP_RST  0x0
 #define                  HRDY_OVR  0x20       /* HRDY Override */
-#define                 nHRDY_OVR  0x0       
+#define                 nHRDY_OVR  0x0
 #define                  INT_MODE  0x40       /* Interrupt Mode */
-#define                 nINT_MODE  0x0       
+#define                 nINT_MODE  0x0
 #define                     BT_EN  0x80       /* Bus Timeout Enable */
-#define                    nBT_EN  0x0       
+#define                    nBT_EN  0x0
 #define                       EHW  0x100      /* Enable Host Write */
-#define                      nEHW  0x0       
+#define                      nEHW  0x0
 #define                       EHR  0x200      /* Enable Host Read */
-#define                      nEHR  0x0       
+#define                      nEHR  0x0
 #define                       BDR  0x400      /* Burst DMA Requests */
-#define                      nBDR  0x0       
+#define                      nBDR  0x0
 
 /* Bit masks for HOST_STATUS */
 
 #define                   DMA_RDY  0x1        /* DMA Ready */
-#define                  nDMA_RDY  0x0       
+#define                  nDMA_RDY  0x0
 #define                  FIFOFULL  0x2        /* FIFO Full */
-#define                 nFIFOFULL  0x0       
+#define                 nFIFOFULL  0x0
 #define                 FIFOEMPTY  0x4        /* FIFO Empty */
-#define                nFIFOEMPTY  0x0       
+#define                nFIFOEMPTY  0x0
 #define                 DMA_CMPLT  0x8        /* DMA Complete */
-#define                nDMA_CMPLT  0x0       
+#define                nDMA_CMPLT  0x0
 #define                      HSHK  0x10       /* Host Handshake */
-#define                     nHSHK  0x0       
+#define                     nHSHK  0x0
 #define               HOSTDP_TOUT  0x20       /* HOSTDP Timeout */
-#define              nHOSTDP_TOUT  0x0       
+#define              nHOSTDP_TOUT  0x0
 #define                      HIRQ  0x40       /* Host Interrupt Request */
-#define                     nHIRQ  0x0       
+#define                     nHIRQ  0x0
 #define                ALLOW_CNFG  0x80       /* Allow New Configuration */
-#define               nALLOW_CNFG  0x0       
+#define               nALLOW_CNFG  0x0
 #define                   DMA_DIR  0x100      /* DMA Direction */
-#define                  nDMA_DIR  0x0       
+#define                  nDMA_DIR  0x0
 #define                       BTE  0x200      /* Bus Timeout Enabled */
-#define                      nBTE  0x0       
+#define                      nBTE  0x0
 #define               HOSTRD_DONE  0x8000     /* Host Read Completion Interrupt */
 #define              nHOSTRD_DONE  0x0
 
@@ -1756,71 +1756,71 @@
 /* Bit masks for CNT_CONFIG */
 
 #define                      CNTE  0x1        /* Counter Enable */
-#define                     nCNTE  0x0       
+#define                     nCNTE  0x0
 #define                      DEBE  0x2        /* Debounce Enable */
-#define                     nDEBE  0x0       
+#define                     nDEBE  0x0
 #define                    CDGINV  0x10       /* CDG Pin Polarity Invert */
-#define                   nCDGINV  0x0       
+#define                   nCDGINV  0x0
 #define                    CUDINV  0x20       /* CUD Pin Polarity Invert */
-#define                   nCUDINV  0x0       
+#define                   nCUDINV  0x0
 #define                    CZMINV  0x40       /* CZM Pin Polarity Invert */
-#define                   nCZMINV  0x0       
+#define                   nCZMINV  0x0
 #define                   CNTMODE  0x700      /* Counter Operating Mode */
 #define                      ZMZC  0x800      /* CZM Zeroes Counter Enable */
-#define                     nZMZC  0x0       
+#define                     nZMZC  0x0
 #define                   BNDMODE  0x3000     /* Boundary register Mode */
 #define                    INPDIS  0x8000     /* CUG and CDG Input Disable */
-#define                   nINPDIS  0x0       
+#define                   nINPDIS  0x0
 
 /* Bit masks for CNT_IMASK */
 
 #define                      ICIE  0x1        /* Illegal Gray/Binary Code Interrupt Enable */
-#define                     nICIE  0x0       
+#define                     nICIE  0x0
 #define                      UCIE  0x2        /* Up count Interrupt Enable */
-#define                     nUCIE  0x0       
+#define                     nUCIE  0x0
 #define                      DCIE  0x4        /* Down count Interrupt Enable */
-#define                     nDCIE  0x0       
+#define                     nDCIE  0x0
 #define                    MINCIE  0x8        /* Min Count Interrupt Enable */
-#define                   nMINCIE  0x0       
+#define                   nMINCIE  0x0
 #define                    MAXCIE  0x10       /* Max Count Interrupt Enable */
-#define                   nMAXCIE  0x0       
+#define                   nMAXCIE  0x0
 #define                   COV31IE  0x20       /* Bit 31 Overflow Interrupt Enable */
-#define                  nCOV31IE  0x0       
+#define                  nCOV31IE  0x0
 #define                   COV15IE  0x40       /* Bit 15 Overflow Interrupt Enable */
-#define                  nCOV15IE  0x0       
+#define                  nCOV15IE  0x0
 #define                   CZEROIE  0x80       /* Count to Zero Interrupt Enable */
-#define                  nCZEROIE  0x0       
+#define                  nCZEROIE  0x0
 #define                     CZMIE  0x100      /* CZM Pin Interrupt Enable */
-#define                    nCZMIE  0x0       
+#define                    nCZMIE  0x0
 #define                    CZMEIE  0x200      /* CZM Error Interrupt Enable */
-#define                   nCZMEIE  0x0       
+#define                   nCZMEIE  0x0
 #define                    CZMZIE  0x400      /* CZM Zeroes Counter Interrupt Enable */
-#define                   nCZMZIE  0x0       
+#define                   nCZMZIE  0x0
 
 /* Bit masks for CNT_STATUS */
 
 #define                      ICII  0x1        /* Illegal Gray/Binary Code Interrupt Identifier */
-#define                     nICII  0x0       
+#define                     nICII  0x0
 #define                      UCII  0x2        /* Up count Interrupt Identifier */
-#define                     nUCII  0x0       
+#define                     nUCII  0x0
 #define                      DCII  0x4        /* Down count Interrupt Identifier */
-#define                     nDCII  0x0       
+#define                     nDCII  0x0
 #define                    MINCII  0x8        /* Min Count Interrupt Identifier */
-#define                   nMINCII  0x0       
+#define                   nMINCII  0x0
 #define                    MAXCII  0x10       /* Max Count Interrupt Identifier */
-#define                   nMAXCII  0x0       
+#define                   nMAXCII  0x0
 #define                   COV31II  0x20       /* Bit 31 Overflow Interrupt Identifier */
-#define                  nCOV31II  0x0       
+#define                  nCOV31II  0x0
 #define                   COV15II  0x40       /* Bit 15 Overflow Interrupt Identifier */
-#define                  nCOV15II  0x0       
+#define                  nCOV15II  0x0
 #define                   CZEROII  0x80       /* Count to Zero Interrupt Identifier */
-#define                  nCZEROII  0x0       
+#define                  nCZEROII  0x0
 #define                     CZMII  0x100      /* CZM Pin Interrupt Identifier */
-#define                    nCZMII  0x0       
+#define                    nCZMII  0x0
 #define                    CZMEII  0x200      /* CZM Error Interrupt Identifier */
-#define                   nCZMEII  0x0       
+#define                   nCZMEII  0x0
 #define                    CZMZII  0x400      /* CZM Zeroes Counter Interrupt Identifier */
-#define                   nCZMZII  0x0       
+#define                   nCZMZII  0x0
 
 /* Bit masks for CNT_COMMAND */
 
@@ -1828,7 +1828,7 @@
 #define                    W1LMIN  0xf0       /* Load Min Register */
 #define                    W1LMAX  0xf00      /* Load Max Register */
 #define                  W1ZMONCE  0x1000     /* Enable CZM Clear Counter Once */
-#define                 nW1ZMONCE  0x0       
+#define                 nW1ZMONCE  0x0
 
 /* Bit masks for CNT_DEBOUNCE */
 
@@ -1838,15 +1838,15 @@
 
 #define                FUSE_FADDR  0x1ff      /* OTP/Fuse Address */
 #define                      FIEN  0x800      /* OTP/Fuse Interrupt Enable */
-#define                     nFIEN  0x0       
+#define                     nFIEN  0x0
 #define                  FTESTDEC  0x1000     /* OTP/Fuse Test Decoder */
-#define                 nFTESTDEC  0x0       
+#define                 nFTESTDEC  0x0
 #define                   FWRTEST  0x2000     /* OTP/Fuse Write Test */
-#define                  nFWRTEST  0x0       
+#define                  nFWRTEST  0x0
 #define                     FRDEN  0x4000     /* OTP/Fuse Read Enable */
-#define                    nFRDEN  0x0       
+#define                    nFRDEN  0x0
 #define                     FWREN  0x8000     /* OTP/Fuse Write Enable */
-#define                    nFWREN  0x0       
+#define                    nFWREN  0x0
 
 /* Bit masks for OTP_BEN */
 
@@ -1855,15 +1855,15 @@
 /* Bit masks for OTP_STATUS */
 
 #define                     FCOMP  0x1        /* OTP/Fuse Access Complete */
-#define                    nFCOMP  0x0       
+#define                    nFCOMP  0x0
 #define                    FERROR  0x2        /* OTP/Fuse Access Error */
-#define                   nFERROR  0x0       
+#define                   nFERROR  0x0
 #define                  MMRGLOAD  0x10       /* Memory Mapped Register Gasket Load */
-#define                 nMMRGLOAD  0x0       
+#define                 nMMRGLOAD  0x0
 #define                  MMRGLOCK  0x20       /* Memory Mapped Register Gasket Lock */
-#define                 nMMRGLOCK  0x0       
+#define                 nMMRGLOCK  0x0
 #define                    FPGMEN  0x40       /* OTP/Fuse Program Enable */
-#define                   nFPGMEN  0x0       
+#define                   nFPGMEN  0x0
 
 /* Bit masks for OTP_TIMING */
 
@@ -1877,42 +1877,42 @@
 /* Bit masks for SECURE_SYSSWT */
 
 #define                   EMUDABL  0x1        /* Emulation Disable. */
-#define                  nEMUDABL  0x0       
+#define                  nEMUDABL  0x0
 #define                   RSTDABL  0x2        /* Reset Disable */
-#define                  nRSTDABL  0x0       
+#define                  nRSTDABL  0x0
 #define                   L1IDABL  0x1c       /* L1 Instruction Memory Disable. */
 #define                  L1DADABL  0xe0       /* L1 Data Bank A Memory Disable. */
 #define                  L1DBDABL  0x700      /* L1 Data Bank B Memory Disable. */
 #define                   DMA0OVR  0x800      /* DMA0 Memory Access Override */
-#define                  nDMA0OVR  0x0       
+#define                  nDMA0OVR  0x0
 #define                   DMA1OVR  0x1000     /* DMA1 Memory Access Override */
-#define                  nDMA1OVR  0x0       
+#define                  nDMA1OVR  0x0
 #define                    EMUOVR  0x4000     /* Emulation Override */
-#define                   nEMUOVR  0x0       
+#define                   nEMUOVR  0x0
 #define                    OTPSEN  0x8000     /* OTP Secrets Enable. */
-#define                   nOTPSEN  0x0       
+#define                   nOTPSEN  0x0
 #define                    L2DABL  0x70000    /* L2 Memory Disable. */
 
 /* Bit masks for SECURE_CONTROL */
 
 #define                   SECURE0  0x1        /* SECURE 0 */
-#define                  nSECURE0  0x0       
+#define                  nSECURE0  0x0
 #define                   SECURE1  0x2        /* SECURE 1 */
-#define                  nSECURE1  0x0       
+#define                  nSECURE1  0x0
 #define                   SECURE2  0x4        /* SECURE 2 */
-#define                  nSECURE2  0x0       
+#define                  nSECURE2  0x0
 #define                   SECURE3  0x8        /* SECURE 3 */
-#define                  nSECURE3  0x0       
+#define                  nSECURE3  0x0
 
 /* Bit masks for SECURE_STATUS */
 
 #define                   SECMODE  0x3        /* Secured Mode Control State */
 #define                       NMI  0x4        /* Non Maskable Interrupt */
-#define                      nNMI  0x0       
+#define                      nNMI  0x0
 #define                   AFVALID  0x8        /* Authentication Firmware Valid */
-#define                  nAFVALID  0x0       
+#define                  nAFVALID  0x0
 #define                    AFEXIT  0x10       /* Authentication Firmware Exit */
-#define                   nAFEXIT  0x0       
+#define                   nAFEXIT  0x0
 #define                   SECSTAT  0xe0       /* Secure Status */
 
 /* Bit masks for NFC_CTL */
@@ -1920,60 +1920,60 @@
 #define                    WR_DLY  0xf        /* Write Strobe Delay */
 #define                    RD_DLY  0xf0       /* Read Strobe Delay */
 #define                    NWIDTH  0x100      /* NAND Data Width */
-#define                   nNWIDTH  0x0       
+#define                   nNWIDTH  0x0
 #define                   PG_SIZE  0x200      /* Page Size */
-#define                  nPG_SIZE  0x0       
+#define                  nPG_SIZE  0x0
 
 /* Bit masks for NFC_STAT */
 
 #define                     NBUSY  0x1        /* Not Busy */
-#define                    nNBUSY  0x0       
+#define                    nNBUSY  0x0
 #define                   WB_FULL  0x2        /* Write Buffer Full */
-#define                  nWB_FULL  0x0       
+#define                  nWB_FULL  0x0
 #define                PG_WR_STAT  0x4        /* Page Write Pending */
-#define               nPG_WR_STAT  0x0       
+#define               nPG_WR_STAT  0x0
 #define                PG_RD_STAT  0x8        /* Page Read Pending */
-#define               nPG_RD_STAT  0x0       
+#define               nPG_RD_STAT  0x0
 #define                  WB_EMPTY  0x10       /* Write Buffer Empty */
-#define                 nWB_EMPTY  0x0       
+#define                 nWB_EMPTY  0x0
 
 /* Bit masks for NFC_IRQSTAT */
 
 #define                  NBUSYIRQ  0x1        /* Not Busy IRQ */
-#define                 nNBUSYIRQ  0x0       
+#define                 nNBUSYIRQ  0x0
 #define                    WB_OVF  0x2        /* Write Buffer Overflow */
-#define                   nWB_OVF  0x0       
+#define                   nWB_OVF  0x0
 #define                   WB_EDGE  0x4        /* Write Buffer Edge Detect */
-#define                  nWB_EDGE  0x0       
+#define                  nWB_EDGE  0x0
 #define                    RD_RDY  0x8        /* Read Data Ready */
-#define                   nRD_RDY  0x0       
+#define                   nRD_RDY  0x0
 #define                   WR_DONE  0x10       /* Page Write Done */
-#define                  nWR_DONE  0x0       
+#define                  nWR_DONE  0x0
 
 /* Bit masks for NFC_IRQMASK */
 
 #define              MASK_BUSYIRQ  0x1        /* Mask Not Busy IRQ */
-#define             nMASK_BUSYIRQ  0x0       
+#define             nMASK_BUSYIRQ  0x0
 #define                MASK_WBOVF  0x2        /* Mask Write Buffer Overflow */
-#define               nMASK_WBOVF  0x0       
+#define               nMASK_WBOVF  0x0
 #define              MASK_WBEMPTY  0x4        /* Mask Write Buffer Empty */
-#define             nMASK_WBEMPTY  0x0       
+#define             nMASK_WBEMPTY  0x0
 #define                MASK_RDRDY  0x8        /* Mask Read Data Ready */
-#define               nMASK_RDRDY  0x0       
+#define               nMASK_RDRDY  0x0
 #define               MASK_WRDONE  0x10       /* Mask Write Done */
-#define              nMASK_WRDONE  0x0       
+#define              nMASK_WRDONE  0x0
 
 /* Bit masks for NFC_RST */
 
 #define                   ECC_RST  0x1        /* ECC (and NFC counters) Reset */
-#define                  nECC_RST  0x0       
+#define                  nECC_RST  0x0
 
 /* Bit masks for NFC_PGCTL */
 
 #define               PG_RD_START  0x1        /* Page Read Start */
-#define              nPG_RD_START  0x0       
+#define              nPG_RD_START  0x0
 #define               PG_WR_START  0x2        /* Page Write Start */
-#define              nPG_WR_START  0x0       
+#define              nPG_WR_START  0x0
 
 /* Bit masks for NFC_ECC0 */
 

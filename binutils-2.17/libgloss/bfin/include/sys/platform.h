@@ -1,5 +1,5 @@
 /*
- * Generic Wrapper for platform specific header file. 
+ * Generic Wrapper for platform specific header file.
  *
  * Copyright (C) 2007 Analog Devices, Inc.
  *

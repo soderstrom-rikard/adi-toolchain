@@ -375,12 +375,12 @@
 #define ASRAM_BSRAM            0x00000000
 
 /* Enable DCPLB */
-#define ENDCPLB                MK_BMSK_(DMCTL_ENDCPLB_P) 
+#define ENDCPLB                MK_BMSK_(DMCTL_ENDCPLB_P)
 
 /* Bank A set as CACHE, Bank B set as SRAM */
-#define ACACHE_BSRAM           0x00000008  
+#define ACACHE_BSRAM           0x00000008
 /* Bank A set as CACHE, Bank B set as CACHE */
-#define ACACHE_BCACHE          0x0000000C  
+#define ACACHE_BCACHE          0x0000000C
 #define DCBS                   0x00000010  /* If HIGHBIT is 1, select L1 data memory B */
                                            /* If HIGHBIT is 0, select L1 data memory A */
                                            /* If LOWBIT is 1, select L1 memory bank B */
