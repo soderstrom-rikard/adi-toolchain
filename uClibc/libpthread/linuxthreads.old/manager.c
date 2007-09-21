@@ -36,7 +36,7 @@
 #include "debug.h" /* PDEBUG, added by StS */
 
 #ifdef __BFIN__
-#include <sys/l1layout.h>
+#include <bfin_l1layout.h>
 #endif
 
 /* poll() is not supported in kernel <= 2.0, therefore is __NR_poll is
