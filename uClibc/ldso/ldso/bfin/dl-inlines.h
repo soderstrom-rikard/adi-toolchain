@@ -541,7 +541,7 @@ __dl_map_segment (Elf32_Ehdr *epnt,
       _dl_dma_memcpy (l1addr, status + (ppnt->p_vaddr & ADDR_ALIGN), ppnt->p_filesz);
     _dl_munmap (status, size);
     if (l1addr == NULL)
-      return NULL;
+      _dl_dprintf(2, "%s:%i: L1 allocation failed\n", _dl_progname, __LINE__);
     return l1addr;
   }
 
@@ -557,12 +557,16 @@ __dl_map_segment (Elf32_Ehdr *epnt,
       l1addr = (char *) _dl_sram_alloc (ppnt->p_memsz, L1_DATA_B_SRAM);
     else
       l1addr = (char *) _dl_sram_alloc (ppnt->p_memsz, L1_DATA_SRAM);
-    if (l1addr == NULL
-	|| (_DL_PREAD (infile, l1addr, ppnt->p_filesz, ppnt->p_offset)
-	    != ppnt->p_filesz))
-      return NULL;
-    if (ppnt->p_filesz < ppnt->p_memsz)
-      _dl_memset (l1addr + ppnt->p_filesz, 0, ppnt->p_memsz - ppnt->p_filesz);
+    if (l1addr == NULL) {
+      _dl_dprintf(2, "%s:%i: L1 allocation failed\n", _dl_progname, __LINE__);
+    } else {
+      if (_DL_PREAD (infile, l1addr, ppnt->p_filesz, ppnt->p_offset) != ppnt->p_filesz) {
+        _dl_sram_free (l1addr);
+        return NULL;
+      }
+      if (ppnt->p_filesz < ppnt->p_memsz)
+       _dl_memset (l1addr + ppnt->p_filesz, 0, ppnt->p_memsz - ppnt->p_filesz);
+    }
     return l1addr;
   }
 
