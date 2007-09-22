@@ -133,14 +133,13 @@ then
 				# Non application modules enter via main not _start
 				#    SEDOP="$SEDOP -e 's/ENTRY (_start)/ENTRY (main)/'"
 				SEDOP="$SEDOP -e s/\\(ENTRY.\\)(_start)/\1(lib_main)/"
-				SEDOP="$SEDOP -e s/\\(ENTRY.\\)(__start)/\1(lib_main)/"
+				SEDOP="$SEDOP -e s/\\(ENTRY.\\)(@SYMBOL_PREFIX@_start)/\1(lib_main)/"
 				OBJCOPYOP="--localize-hidden --weaken"
 			fi
 
 			# Provide the magic parameter that defines the library data segment pointer offset
 			ARG1="$ARG1 -defsym _current_shared_library_p5_offset_=`expr ${SHARED_ID} '*' -1 - 1`"
 		fi
-		
 		if [ "@emit_relocs@" = "yes" ]
 		then
 			SEDOP="$SEDOP -e s/^SINGLE_LINK://"

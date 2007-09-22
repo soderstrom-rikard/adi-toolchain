@@ -1,3 +1,9 @@
+2007-09-22  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* config.guess, config.sub, configure.in, elf2flt.c, elf2flt.ld.in,
+	flat.h, flthdr.c, ld-elf2flt.in, LICENSE.TXT: Merge with upstream.
+	* configure: Regenerated.
+
 2007-08-30  Jie Zhang  <jie.zhang@analog.com>
 
 	* elf2flt.ld.in: Don't define __CTOR_LIST__ or __CTOR_END__.

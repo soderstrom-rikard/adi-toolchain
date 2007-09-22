@@ -4,20 +4,25 @@
  *
  *	Copyright (C) 2001-2003 SnapGear Inc, davidm@snapgear.com
  *	Copyright (C) 2001 Lineo, davidm@lineo.com
+ *
+ * This is Free Software, under the GNU Public Licence v2 or greater.
+ *
  */
 /****************************************************************************/
 
 #include <stdio.h>    /* Userland pieces of the ANSI C standard I/O package  */
 #include <unistd.h>   /* Userland prototypes of the Unix std system calls    */
 #include <time.h>
+#include <stdlib.h>   /* exit() */
+#include <string.h>   /* strcat(), strcpy() */
 
 /* macros for conversion between host and (internet) network byte order */
 #ifndef WIN32
 #include <netinet/in.h> /* Consts and structs defined by the internet system */
-#define BINARY_FILE_OPTS
+#define	BINARY_FILE_OPTS
 #else
 #include <winsock2.h>
-#define BINARY_FILE_OPTS "b"
+#define	BINARY_FILE_OPTS "b"
 #endif
 
 /* from uClinux-x.x.x/include/linux */
@@ -37,7 +42,6 @@ char *program_name;
 static char cmd[1024];
 static int print = 0, compress = 0, ramload = 0, stacksize = 0, ktrace = 0;
 static int l1stack = 0;
-static int short_format = 0;
 
 /****************************************************************************/
 
@@ -74,6 +78,7 @@ process_file(char *ifile, char *ofile)
 {
 	int old_flags, old_stack, new_flags, new_stack;
 	FILE *ifp, *ofp;
+	int ofp_is_pipe = 0;
 	struct flat_hdr old_hdr, new_hdr;
 	char tfile[256];
 	char tfile2[256];
@@ -98,6 +103,7 @@ process_file(char *ifile, char *ofile)
 	new_flags = old_flags = ntohl(old_hdr.flags);
 	new_stack = old_stack = ntohl(old_hdr.stack_size);
 	new_hdr = old_hdr;
+
 	if (compress == 1) {
 		new_flags |= FLAT_FLAG_GZIP;
 		new_flags &= ~FLAT_FLAG_GZDATA;
@@ -121,7 +127,7 @@ process_file(char *ifile, char *ofile)
 		new_flags |= FLAT_FLAG_L1STK;
 	else if (l1stack < 0)
 		new_flags &= ~FLAT_FLAG_L1STK;
-
+	
 	if (stacksize)
 		new_stack = stacksize;
 
@@ -131,9 +137,7 @@ process_file(char *ifile, char *ofile)
 		printf("%s\n", ifile);
 		printf("    Magic:        %4.4s\n", old_hdr.magic);
 		printf("    Rev:          %d\n",    ntohl(old_hdr.rev));
-
 		t = (time_t) htonl(old_hdr.build_date);
-
 		printf("    Build Date:   %s",      t?ctime(&t):"not specified\n");
 		printf("    Entry:        0x%x\n",  ntohl(old_hdr.entry));
 		printf("    Data Start:   0x%x\n",  ntohl(old_hdr.data_start));
@@ -173,7 +177,6 @@ process_file(char *ifile, char *ofile)
 		strcat(tfile, (old_flags & FLAT_FLAG_GOTPIC) ? "p" : "");
 		strcat(tfile, (old_flags & FLAT_FLAG_GZIP) ? "z" :
 					((old_flags & FLAT_FLAG_GZDATA) ? "d" : ""));
-
 		printf("-%-3.3s ", tfile);
 		printf("%3d ", ntohl(old_hdr.rev));
 		printf("%6d ", text=ntohl(old_hdr.data_start)-sizeof(struct flat_hdr));
@@ -249,8 +252,12 @@ process_file(char *ifile, char *ofile)
 
 		sprintf(cmd, "gunzip >> %s", tfile2);
 		tfp = popen(cmd, "w" BINARY_FILE_OPTS);
+		if(!tfp) {
+			perror("popen");
+			exit(1);
+		}
 		transferr(ifp, tfp, -1);
-		fclose(tfp);
+		pclose(tfp);
 
 		fclose(ifp);
 		ifp = fopen(tfile2, "r" BINARY_FILE_OPTS);
@@ -267,6 +274,7 @@ process_file(char *ifile, char *ofile)
 		fclose(ofp);
 		sprintf(cmd, "gzip -9 -f >> %s", tfile);
 		ofp = popen(cmd, "w" BINARY_FILE_OPTS);
+		ofp_is_pipe = 1;
 	} else if (new_flags & FLAT_FLAG_GZDATA) {
 		printf("zflat-data %s --> %s\n", ifile, ofile);
 		transferr(ifp, ofp, ntohl(new_hdr.data_start) -
@@ -274,6 +282,7 @@ process_file(char *ifile, char *ofile)
 		fclose(ofp);
 		sprintf(cmd, "gzip -9 -f >> %s", tfile);
 		ofp = popen(cmd, "w" BINARY_FILE_OPTS);
+		ofp_is_pipe = 1;
 	}
 
 	if (!ofp) { /* can only happen if using gzip/gunzip */
@@ -294,7 +303,10 @@ process_file(char *ifile, char *ofile)
 	}
 
 	fclose(ifp);
-	fclose(ofp);
+	if (ofp_is_pipe)
+		pclose(ofp);
+	else
+		fclose(ofp);
 
 	/* cheat a little here to preserve file permissions */
 	sprintf(cmd, "cp %s %s", tfile, ofile);
@@ -350,11 +362,11 @@ main(int argc, char *argv[])
 		case 'K': ktrace = -1;              break;
 		case 'u': l1stack = 1;              break;
 		case 'U': l1stack = -1;             break;
-		case 's': 
-			if((optarg[1] == 'x') || (optarg[1] == 'X'))
-                                stacksize = strtol(optarg, (char **)NULL, 16);
-                        else
-                                stacksize = strtol(optarg, (char **)NULL, 10);
+		case 's':
+			if (optarg[1] == 'x' || optarg[1] == 'X')
+				sscanf(optarg, "%x", &stacksize);
+			else
+				stacksize = atoi(optarg);
 			break;
 		case 'o': ofile = optarg;           break;
 		default:

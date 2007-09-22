@@ -117,6 +117,7 @@
 #define O_BINARY 0
 #endif
 
+
 int verbose = 0;      /* extra output when running */
 int pic_with_got = 0; /* do elf/got processing with PIC code */
 int load_to_ram = 0;  /* instruct loader to allocate everything into RAM */
@@ -218,6 +219,10 @@ get_symbols (bfd *abfd, long *num)
     return NULL;
 
   symbol_table = (asymbol **) malloc (storage_needed);
+  if (symbol_table == NULL) {
+      perror("malloc");
+      exit(1);
+  }
 
   number_of_symbols = bfd_canonicalize_symtab (abfd, symbol_table);
   
@@ -242,6 +247,8 @@ dump_symbols(asymbol **symbol_table, long number_of_symbols)
   printf("\n");
   return(0);
 }  
+
+
 
 long
 get_symbol_offset(char *name, asection *sec, asymbol **symbol_table, long number_of_symbols)
@@ -398,7 +405,6 @@ dump_symbols(symbols, number_of_symbols);
     uint32_t *lp = (uint32_t *)data;
     /* Should call ntohl(*lp) here but is isn't going to matter */
     while (*lp != 0xffffffff) lp++;
-
     got_size = ((unsigned char *)lp) - data;
     if (verbose)
 	    printf("GOT table contains %d entries (%d bytes)\n",
@@ -462,7 +468,12 @@ dump_symbols(symbols, number_of_symbols);
 	}
 
 	symb = get_symbols(rel_bfd, &nsymb);
-	relpp = (arelent **) xmalloc(relsize);
+	relpp = (arelent **) malloc(relsize);
+	if (relpp == NULL) {
+	  perror("malloc");
+	  exit(1);
+	}
+
 	relcount = bfd_canonicalize_reloc(rel_bfd, r, relpp, symb);
 	if (relcount <= 0) {
 		if (verbose)
@@ -475,6 +486,7 @@ dump_symbols(symbols, number_of_symbols);
 		for (p = relpp; (relcount && (*p != NULL)); p++, relcount--) {
 			unsigned char *r_mem;
 			int relocation_needed = 0;
+
 #ifdef TARGET_microblaze
 			/* The MICROBLAZE_XX_NONE relocs can be skipped.
 			   They represent PC relative branches that the
@@ -1866,6 +1878,10 @@ int main(int argc, char *argv[])
   }
 
   text = malloc(text_len);
+  if (text == NULL) {
+      perror("malloc");
+      exit(1);
+  }
 
   if (verbose)
     printf("TEXT -> vma=0x%x len=0x%x\n", text_vma, text_len);
@@ -1886,6 +1902,10 @@ int main(int argc, char *argv[])
     exit (2);
   }
   data = malloc(data_len);
+  if (data == NULL) {
+      perror("malloc");
+      exit(1);
+  }
 
   if (verbose)
     printf("DATA -> vma=0x%x len=0x%x\n", data_vma, data_len);
@@ -1973,6 +1993,10 @@ int main(int argc, char *argv[])
   
   if (!ofile) {
     ofile = malloc(strlen(fname) + 5 + 1); /* 5 to add suffix */
+    if (ofile == NULL) {
+	perror("malloc");
+	exit(1);
+    }
     strcpy(ofile, fname);
     strcat(ofile, ".bflt");
   }
