@@ -407,6 +407,8 @@ stack_frame_needed_p (void)
 static void
 expand_prologue_reg_save (rtx spreg, int saveall, bool is_inthandler)
 {
+  rtx predec1 = gen_rtx_PRE_DEC (SImode, spreg);
+  rtx predec = gen_rtx_MEM (SImode, predec1);
   int ndregs = saveall ? 8 : n_dregs_to_save (is_inthandler);
   int npregs = saveall ? 6 : n_pregs_to_save (is_inthandler);
   int dregno = REG_R7 + 1 - ndregs;
@@ -449,6 +451,20 @@ expand_prologue_reg_save (rtx spreg, int saveall, bool is_inthandler)
     }
   insn = emit_insn (pat);
   RTX_FRAME_RELATED_P (insn) = 1;
+
+  for (i = REG_P7 + 1; i < REG_CC; i++)
+    if (saveall 
+	|| (is_inthandler
+	    && (regs_ever_live[i]
+		|| (!leaf_function_p () && call_used_regs[i]))))
+      {
+	if (i == REG_A0 || i == REG_A1)
+	  insn = emit_move_insn (gen_rtx_MEM (PDImode, predec1),
+				 gen_rtx_REG (PDImode, i));
+	else
+	  insn = emit_move_insn (predec, gen_rtx_REG (SImode, i));
+	RTX_FRAME_RELATED_P (insn) = 1;
+      }
 }
 
 /* Emit code to restore registers in the epilogue.  SAVEALL is nonzero if we
@@ -459,11 +475,34 @@ expand_prologue_reg_save (rtx spreg, int saveall, bool is_inthandler)
 static void
 expand_epilogue_reg_restore (rtx spreg, bool saveall, bool is_inthandler)
 {
+  rtx postinc1 = gen_rtx_POST_INC (SImode, spreg);
+  rtx postinc = gen_rtx_MEM (SImode, postinc1);
+
   int ndregs = saveall ? 8 : n_dregs_to_save (is_inthandler);
   int npregs = saveall ? 6 : n_pregs_to_save (is_inthandler);
   int total = ndregs + npregs;
   int i, regno;
   rtx pat, insn;
+
+  /* A slightly crude technique to stop flow from trying to delete "dead"
+     insns.  */
+  MEM_VOLATILE_P (postinc) = 1;
+
+  for (i = REG_CC - 1; i > REG_P7; i--)
+    if (saveall
+	|| (is_inthandler
+	    && (regs_ever_live[i]
+		|| (!leaf_function_p () && call_used_regs[i]))))
+      {
+	if (i == REG_A0 || i == REG_A1)
+	  {
+	    rtx mem = gen_rtx_MEM (PDImode, postinc1);
+	    MEM_VOLATILE_P (mem) = 1;
+	    emit_move_insn (gen_rtx_REG (PDImode, i), mem);
+	  }
+	else
+	  emit_move_insn (gen_rtx_REG (SImode, i), postinc);
+      }
 
   if (total == 0)
     return;
@@ -608,6 +647,7 @@ n_regs_saved_by_prologue (void)
   int ndregs = all ? 8 : n_dregs_to_save (is_inthandler);
   int npregs = all ? 6 : n_pregs_to_save (is_inthandler);  
   int n = ndregs + npregs;
+  int i;
 
   if (all || stack_frame_needed_p ())
     /* We use a LINK instruction in this case.  */
@@ -622,21 +662,21 @@ n_regs_saved_by_prologue (void)
 
   if (fkind != SUBROUTINE)
     {
-      int i;
-
       /* Increment once for ASTAT.  */
       n++;
 
       /* RETE/X/N.  */
       if (lookup_attribute ("nesting", attrs))
 	n++;
-
-      for (i = REG_P7 + 1; i < REG_CC; i++)
-	if (all 
-	    || regs_ever_live[i]
-	    || (!leaf_function_p () && call_used_regs[i]))
-	  n += i == REG_A0 || i == REG_A1 ? 2 : 1;
     }
+  
+  for (i = REG_P7 + 1; i < REG_CC; i++)
+    if (all
+	|| (fkind != SUBROUTINE
+	    && (regs_ever_live[i]
+		|| (!leaf_function_p () && call_used_regs[i]))))
+      n += i == REG_A0 || i == REG_A1 ? 2 : 1;
+
   return n;
 }
 
@@ -900,15 +940,13 @@ do_unlink (rtx spreg, HOST_WIDE_INT frame_size, bool all, int epilogue_p)
    SPREG contains (reg:SI REG_SP).  */
 
 static void
-expand_interrupt_handler_prologue (rtx spreg, e_funkind fkind)
+expand_interrupt_handler_prologue (rtx spreg, e_funkind fkind, bool all)
 {
-  int i;
   HOST_WIDE_INT frame_size = get_frame_size ();
   rtx predec1 = gen_rtx_PRE_DEC (SImode, spreg);
   rtx predec = gen_rtx_MEM (SImode, predec1);
   rtx insn;
   tree attrs = TYPE_ATTRIBUTES (TREE_TYPE (current_function_decl));
-  bool all = lookup_attribute ("saveall", attrs) != NULL_TREE;
   tree kspisusp = lookup_attribute ("kspisusp", attrs);
 
   if (kspisusp)
@@ -933,19 +971,6 @@ expand_interrupt_handler_prologue (rtx spreg, e_funkind fkind)
   if (!current_function_is_leaf)
     all = true;
   expand_prologue_reg_save (spreg, all, true);
-
-  for (i = REG_P7 + 1; i < REG_CC; i++)
-    if (all 
-	|| regs_ever_live[i]
-	|| (!leaf_function_p () && call_used_regs[i]))
-      {
-	if (i == REG_A0 || i == REG_A1)
-	  insn = emit_move_insn (gen_rtx_MEM (PDImode, predec1),
-				 gen_rtx_REG (PDImode, i));
-	else
-	  insn = emit_move_insn (predec, gen_rtx_REG (SImode, i));
-	RTX_FRAME_RELATED_P (insn) = 1;
-      }
 
   if (lookup_attribute ("nesting", attrs))
     {
@@ -991,13 +1016,11 @@ expand_interrupt_handler_prologue (rtx spreg, e_funkind fkind)
    SPREG contains (reg:SI REG_SP).  */
 
 static void
-expand_interrupt_handler_epilogue (rtx spreg, e_funkind fkind)
+expand_interrupt_handler_epilogue (rtx spreg, e_funkind fkind, bool all)
 {
-  int i;
+  tree attrs = TYPE_ATTRIBUTES (TREE_TYPE (current_function_decl));
   rtx postinc1 = gen_rtx_POST_INC (SImode, spreg);
   rtx postinc = gen_rtx_MEM (SImode, postinc1);
-  tree attrs = TYPE_ATTRIBUTES (TREE_TYPE (current_function_decl));
-  bool all = lookup_attribute ("saveall", attrs) != NULL_TREE;
 
   /* A slightly crude technique to stop flow from trying to delete "dead"
      insns.  */
@@ -1017,21 +1040,6 @@ expand_interrupt_handler_epilogue (rtx spreg, e_funkind fkind)
      registers, so we must save (and restore) everything here.  */
   if (!current_function_is_leaf)
     all = true;
-
-  for (i = REG_CC - 1; i > REG_P7; i--)
-    if (all
-	|| regs_ever_live[i]
-	|| (!leaf_function_p () && call_used_regs[i]))
-      {
-	if (i == REG_A0 || i == REG_A1)
-	  {
-	    rtx mem = gen_rtx_MEM (PDImode, postinc1);
-	    MEM_VOLATILE_P (mem) = 1;
-	    emit_move_insn (gen_rtx_REG (PDImode, i), mem);
-	  }
-	else
-	  emit_move_insn (gen_rtx_REG (SImode, i), postinc);
-      }
 
   expand_epilogue_reg_restore (spreg, all, true);
 
@@ -1081,10 +1089,12 @@ bfin_expand_prologue (void)
   rtx spreg = gen_rtx_REG (Pmode, REG_SP);
   e_funkind fkind = funkind (TREE_TYPE (current_function_decl));
   rtx pic_reg_loaded = NULL_RTX;
+  tree attrs = TYPE_ATTRIBUTES (TREE_TYPE (current_function_decl));
+  bool all = lookup_attribute ("saveall", attrs) != NULL_TREE;
 
   if (fkind != SUBROUTINE)
     {
-      expand_interrupt_handler_prologue (spreg, fkind);
+      expand_interrupt_handler_prologue (spreg, fkind, all);
       return;
     }
 
@@ -1141,7 +1151,7 @@ bfin_expand_prologue (void)
       emit_insn (gen_compare_lt (bfin_cc_rtx, spreg, lim));
       emit_insn (gen_trapifcc ());
     }
-  expand_prologue_reg_save (spreg, 0, false);
+  expand_prologue_reg_save (spreg, all, false);
 
   do_link (spreg, frame_size, false);
 
@@ -1175,21 +1185,18 @@ bfin_expand_epilogue (int need_return, int eh_return, bool sibcall_p)
   rtx spreg = gen_rtx_REG (Pmode, REG_SP);
   e_funkind fkind = funkind (TREE_TYPE (current_function_decl));
   int e = sibcall_p ? -1 : 1;
+  tree attrs = TYPE_ATTRIBUTES (TREE_TYPE (current_function_decl));
+  bool all = lookup_attribute ("saveall", attrs) != NULL_TREE;
 
   if (fkind != SUBROUTINE)
     {
-      expand_interrupt_handler_epilogue (spreg, fkind);
+      expand_interrupt_handler_epilogue (spreg, fkind, all);
       return;
     }
 
-#if 0
-  if (TARGET_NON_GNU_PROFILE)
-    fprintf (file, "\tcall mcount_exit;\n");
-#endif
-
   do_unlink (spreg, get_frame_size (), false, e);
 
-  expand_epilogue_reg_restore (spreg, false, false);
+  expand_epilogue_reg_restore (spreg, all, false);
 
   /* Omit the return insn if this is for a sibcall.  */
   if (! need_return)

@@ -1,3 +1,13 @@
+2007-09-23  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (expand_prologue_reg_save,
+	expand_epilogue_reg_restore): Code to save and restore I/M/B/L regs
+	moved here...
+	(expand_interrupt_handler_prologue, expand_interrupt_handler_epilogue):
+	... from here.  New argument ALL; callers changed.
+	(bfin_expand_prologue, bfin_expand_epilogue): Deal with functions that
+	have the "saveall" attribute.
+
 2007-09-18  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (loadbytes): New pattern.
