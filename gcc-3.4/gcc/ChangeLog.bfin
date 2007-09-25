@@ -1,3 +1,12 @@
+2007-09-25  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (expand_prologue_reg_save,
+	expand_epilogue_reg_restore): Code to save and restore ASTAT moved
+	here...
+	(expand_interrupt_handler_prologue, expand_interrupt_handler_epilogue):
+	... from here.
+	(n_regs_saved_by_prologue): Count ASTAT for plain saveall functions.
+
 2007-09-23  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (expand_prologue_reg_save,

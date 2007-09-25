@@ -417,7 +417,13 @@ expand_prologue_reg_save (rtx spreg, int saveall, bool is_inthandler)
   int i;
   rtx pat, insn, val;
 
-  if (total == 0)
+  if (saveall || is_inthandler)
+    {
+      insn = emit_move_insn (predec, gen_rtx_REG (SImode, REG_ASTAT));
+      RTX_FRAME_RELATED_P (insn) = 1;
+    }
+
+  if (total == 0 && !saveall)
     return;
 
   val = GEN_INT (-total * 4);
@@ -537,6 +543,9 @@ expand_epilogue_reg_restore (rtx spreg, bool saveall, bool is_inthandler)
 
   insn = emit_insn (pat);
   RTX_FRAME_RELATED_P (insn) = 1;
+
+  if (saveall || is_inthandler)
+    emit_move_insn (gen_rtx_REG (SImode, REG_ASTAT), postinc);
 }
 
 /* Perform any needed actions needed for a function that is receiving a
@@ -660,16 +669,17 @@ n_regs_saved_by_prologue (void)
 	n++;
     }
 
+  if (fkind != SUBROUTINE || all)
+    /* Increment once for ASTAT.  */
+    n++;
+
   if (fkind != SUBROUTINE)
     {
-      /* Increment once for ASTAT.  */
-      n++;
-
       /* RETE/X/N.  */
       if (lookup_attribute ("nesting", attrs))
 	n++;
     }
-  
+
   for (i = REG_P7 + 1; i < REG_CC; i++)
     if (all
 	|| (fkind != SUBROUTINE
@@ -963,9 +973,6 @@ expand_interrupt_handler_prologue (rtx spreg, e_funkind fkind, bool all)
       RTX_FRAME_RELATED_P (insn) = 1;
     }
 
-  insn = emit_move_insn (predec, gen_rtx_REG (SImode, REG_ASTAT));
-  RTX_FRAME_RELATED_P (insn) = 1;
-
   /* If we're calling other functions, they won't save their call-clobbered
      registers, so we must save everything here.  */
   if (!current_function_is_leaf)
@@ -1042,8 +1049,6 @@ expand_interrupt_handler_epilogue (rtx spreg, e_funkind fkind, bool all)
     all = true;
 
   expand_epilogue_reg_restore (spreg, all, true);
-
-  emit_move_insn (gen_rtx_REG (SImode, REG_ASTAT), postinc);
 
   /* Deallocate any space we left on the stack in case we needed to save the
      argument registers.  */
