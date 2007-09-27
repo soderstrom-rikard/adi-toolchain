@@ -1032,7 +1032,7 @@ run_tests ()
         cp $DIR_GCC_BUILD/gcc/testsuite/g++.log \
            $1/g++-$GCC_VERSION.log
 
-        elif [ $GCC_VERSION = 4.1 ] ; then
+        else
 
         cp $DIR_GCC_BUILD/gcc/testsuite/gcc/gcc.sum \
            $1/gcc-$GCC_VERSION.sum
