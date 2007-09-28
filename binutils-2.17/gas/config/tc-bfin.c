@@ -808,6 +808,7 @@ bfin_fix_adjustable (fixS *fixP)
   switch (fixP->fx_r_type)
     {     
   /* Adjust_reloc_syms doesn't know about the GOT.  */
+    case BFD_RELOC_BFIN_GOT:
     case BFD_RELOC_BFIN_PLTPC:
   /* We need the symbol name for the VTABLE entries.  */
     case BFD_RELOC_VTABLE_INHERIT:

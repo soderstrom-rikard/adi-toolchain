@@ -1,3 +1,8 @@
+2007-09-28  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/tc-bfin.c (bfin_fix_adjustable): Partially revert the
+	2007-08-23 change; BFD_RELOC_BFIN_GOT is not adjustable.
+
 2007-09-18  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin-parse.y (asm_1): Slightly improve error messages
