@@ -723,6 +723,28 @@ avr-*-*)
 	tm_file="avr/avr.h dbxelf.h"
 	use_fixproto=yes
 	;;
+bfin*-elf*)
+	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h"
+	tmake_file=bfin/t-bfin-elf
+	use_collect2=no
+	;;
+bfin*-uclinux*)
+	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h linux.h bfin/uclinux.h bfin/linux-unwind.h"
+	tmake_file=bfin/t-bfin-uclinux
+	use_collect2=no
+	;;
+bfin*-linux-uclibc*)
+	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h linux.h bfin/linux.h bfin/linux-unwind.h ./linux-sysroot-suffix.h"
+	tmake_file="t-slibgcc-elf-ver bfin/t-bfin-linux"
+	extra_parts="crtbegin.o crtbeginS.o crtend.o crtendS.o"
+	use_collect2=no
+	;;
+bfin*-*)
+	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h"
+	xm_file="${xm_file} bfin/xm-i386.h"
+	tmake_file=bfin/t-bfin
+	use_collect2=no
+	;;
 c4x-*-rtems* | tic4x-*-rtems*)
 	tmake_file="c4x/t-c4x t-rtems c4x/t-rtems"
 	tm_file="c4x/c4x.h c4x/rtems.h rtems.h"
@@ -1680,27 +1702,6 @@ mn10300-*-*)
 	use_collect2=no
 	use_fixproto=yes
 	;;
-bfin*-elf*)
-	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h"
-        tmake_file=bfin/t-bfin-elf
-        use_collect2=no
-        ;;  
-bfin*-uclinux*)
-	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h linux.h bfin/uclinux.h bfin/linux-unwind.h"
-        tmake_file=bfin/t-bfin-uclinux
-        use_collect2=no
-        ;;  
-bfin*-linux-uclibc*)
-	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h linux.h bfin/linux.h bfin/linux-unwind.h ./linux-sysroot-suffix.h"
-        tmake_file="t-slibgcc-elf-ver bfin/t-bfin-linux"
-        use_collect2=no
-        ;;
-bfin*-*)
-	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h"
-        xm_file="${xm_file} bfin/xm-i386.h"
-        tmake_file=bfin/t-bfin
-        use_collect2=no
-        ;;  
 ns32k-*-netbsdelf*)
 	echo "GCC does not yet support the ${target} target"; exit 1
 	;;
