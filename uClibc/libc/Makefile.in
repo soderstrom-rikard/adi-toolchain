@@ -22,10 +22,6 @@ LIBS-libc.so := $(interp) $(ldso) $(top_builddir)lib/$(NONSHARED_LIBNAME)
 # we have SHARED_MAJORNAME=libc.so.$(MAJOR_VERSION) defined in Rules.mak
 libc_FULL_NAME := libuClibc-$(MAJOR_VERSION).$(MINOR_VERSION).$(SUBLEVEL).so
 
-ifeq ($(UCLIBC_FORMAT_SHARED_FLAT),y)
-	CFLAGS-topdir-libc := -mleaf-id-shared-library
-endif
-
 # this comes first, so duplicate removal works correctly
 include $(libc_DIR)/sysdeps/Makefile.in
 
@@ -94,7 +90,10 @@ $(top_builddir)lib/libc.a: $(libc-a-y) | $(crt-y)
 	$(do_strip)
 	$(do_ar)
 
-$(top_builddir)lib/libc.gdb: $(top_builddir)lib/libc.a $(LINK_FLAT_CRTS)
+# We use libc_so.a so that we can compile the shared library with special
+# flags - i.e. -mleaf-id-shared-library.  The static libc.a needs to be
+# compiled without it.
+$(top_builddir)lib/libc.gdb: $(libc_OUT)/libc_so.a $(LINK_FLAT_CRTS)
 	$(call link-flat.so,$(@:.gdb=),$(UCLIBC_SHARED_FLAT_ID))
 
 libc_clean:

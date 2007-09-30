@@ -307,6 +307,7 @@ ifeq ($(UCLIBC_FORMAT_FDPIC_ELF),y)
 endif
 ifeq ($(UCLIBC_FORMAT_SHARED_FLAT),y)
 	CPU_CFLAGS-y := -mid-shared-library
+	PICFLAG := -mleaf-id-shared-library
 endif
 ifeq ($(UCLIBC_FORMAT_FLAT_SEP_DATA),y)
 	CPU_CFLAGS-y := -msep-data
