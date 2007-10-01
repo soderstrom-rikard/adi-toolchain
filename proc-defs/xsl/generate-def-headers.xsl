@@ -19,7 +19,7 @@
 
 <xsl:variable name="padlen">30</xsl:variable>
 
-<xsl:template match="visualdsp-proc-xml">
+<xsl:template match="visualdsp-proc-xml|visualdsp-core-xml|visualdsp-extended-xml">
 	<xsl:variable name="cppdefine">
 		<xsl:call-template name="replace-string">
 			<xsl:with-param name="text" select="concat('__&cpp;_',substring-before(@name,'.xml'),'__')" />
@@ -35,12 +35,17 @@
 	<xsl:text>&newline;</xsl:text>
 	<xsl:value-of select="concat('#ifndef ',$cppdefine,'&newline;')"/>
 	<xsl:value-of select="concat('#define ',$cppdefine,'&newline;')"/>
+	<xsl:text>&newline;</xsl:text>
 	<xsl:apply-templates select="*"/>
+	<xsl:text>&newline;</xsl:text>
 	<xsl:value-of select="concat('#endif /* ',$cppdefine,' */&newline;')"/>
 </xsl:template>
 
 <xsl:template match="register-core-file|register-extended-file|vdsp-anomaly-dictionary">
+<!--
 	<xsl:apply-templates select="document(@name)"/>
+-->
+	<xsl:value-of select="concat('#include &quot;',substring-before(@name,'.xml'),'_def.h&quot;&newline;&newline;')"/>
 </xsl:template>
 
 <xsl:template match="register">
@@ -67,6 +72,7 @@
 	</xsl:if>
 	</xsl:if>
 
+<xsl:if test="1 = 0">
 	<xsl:if test="string-length(@bit-position) != 0">
 	<xsl:if test="contains(@name,'.') = false">
 
@@ -105,6 +111,35 @@
 	<xsl:text>&newline;</xsl:text>
 
 	</xsl:if>
+	</xsl:if>
+</xsl:if>
+</xsl:template>
+
+<xsl:template match="memory-segment">
+	<!-- For now, only extract memory regions for Core A -->
+	<xsl:if test="string-length(@core) = 0 or @core = 'P0'">
+
+	<xsl:variable name="memdefine">
+		<xsl:choose>
+			<xsl:when test="@description = 'Scratchpad SRAM'">
+				<xsl:text>L1_SRAM_SCRATCH</xsl:text>
+			</xsl:when>
+			<xsl:when test="@description = 'MMR registers'">
+				<xsl:text>SYSMMR_BASE</xsl:text>
+			</xsl:when>
+			<xsl:when test="@description = 'Instruction Bank A SRAM'">
+				<xsl:text>L1_ISRAM</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:text>NOFUN</xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+	<xsl:if test="$memdefine != 'NOFUN'">
+	<xsl:value-of select="concat('#define ',$memdefine,' ',@start,' /* ',@start,' -> ',@end,' ',@description,' */&newline;')"/>
+	<xsl:value-of select="concat('#define ',$memdefine,'_SIZE (',@end,' - ',@start,' + 1)&newline;')"/>
+	</xsl:if>
+
 	</xsl:if>
 </xsl:template>
 
