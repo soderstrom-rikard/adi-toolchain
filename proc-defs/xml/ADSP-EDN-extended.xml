@@ -772,12 +772,6 @@
 		<!-- define all Core MMRs here   (0xffe00000 - 0xffffffff) -->
 		<!-- ***************************************************** -->
 
-		<register name="DCPLB_STATUS"      group="Extended Registers" description="Data Cache Programmable Look-Aside Buffer Status" bit-size="32" read-address="0xFFE00008" write-address="0xFFE00008" type="IO" target="EMU"/>
-		<register name="DCPLB_FAULT_ADDR"  group="Extended Registers" description="Data Cache Programmable Look-Aside Buffer Fault Address" bit-size="32"  read-address="0xFFE0000C" write-address="0xFFE0000C" type="IO" target="EMU" cdef-type="ADDR"/>
-
-		<register name="ICPLB_STATUS"      group="Extended Registers" description="" bit-size="32" read-address="0xFFE01008" write-address="0xFFE01008" type="IO" target="EMU"/>
-		<register name="ICPLB_FAULT_ADDR"  group="Extended Registers" description="" bit-size="32" read-address="0xFFE0100C" write-address="0xFFE0100C" type="IO" target="EMU" cdef-type="ADDR"/>
-
 		<register name="EVT_OVERRIDE" group="Extended Registers" description="" bit-size="32" read-address="0xFFE02100" write-address="0xFFE02100" type="IO" target="EMU"/>
 
 		<!-- Debug Registers -->
