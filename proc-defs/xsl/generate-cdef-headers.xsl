@@ -19,7 +19,7 @@
 
 <xsl:variable name="padlen">30</xsl:variable>
 
-<xsl:template match="visualdsp-proc-xml">
+<xsl:template match="visualdsp-proc-xml|visualdsp-core-xml|visualdsp-extended-xml">
 	<xsl:variable name="cppdefine">
 		<xsl:call-template name="replace-string">
 			<xsl:with-param name="text" select="concat('__&cpp;_',substring-before(@name,'.xml'),'__')" />
@@ -35,19 +35,37 @@
 	<xsl:text>&newline;</xsl:text>
 	<xsl:value-of select="concat('#ifndef ',$cppdefine,'&newline;')"/>
 	<xsl:value-of select="concat('#define ',$cppdefine,'&newline;')"/>
+	<xsl:text>&newline;</xsl:text>
 	<xsl:apply-templates select="*"/>
+	<xsl:text>&newline;</xsl:text>
 	<xsl:value-of select="concat('#endif /* ',$cppdefine,' */&newline;')"/>
 </xsl:template>
 
 <xsl:template match="register-core-file|register-extended-file|vdsp-anomaly-dictionary">
+<!--
 	<xsl:apply-templates select="document(@name)"/>
+-->
+	<xsl:value-of select="concat('#include &quot;',substring-before(@name,'.xml'),'_cdef.h&quot;&newline;&newline;')"/>
 </xsl:template>
 
 <xsl:template match="register">
 	<xsl:if test="string-length(@bit-position) = 0">
 	<xsl:if test="string-length(@read-address) != 0">
 
+	<xsl:variable name="mmr-type">
+		<xsl:choose>
+			<xsl:when test="@cdef-type = 'ADDR'">
+				<xsl:text>PTR</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="@bit-size"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
+
 	<!-- #define p<MMR> <(pointer cast)address> -->
+	<xsl:if test="$EXPORT-P-DEFS = 'yes'">
+
 	<xsl:text>#define </xsl:text>
 	<xsl:call-template name="pad-append">
 		<xsl:with-param name="padChar" select="' '" />
@@ -64,6 +82,8 @@
 
 	<xsl:text>&newline;</xsl:text>
 
+	</xsl:if>
+
 	<!-- #define bfin_read_<MMR>() bfin_read<bit-size>(<MMR>) -->
 	<xsl:text>#define </xsl:text>
 	<xsl:call-template name="pad-append">
@@ -71,7 +91,7 @@
 		<xsl:with-param name="padVar"  select="concat('bfin_read_',@name,'()')" />
 		<xsl:with-param name="length"  select="$padlen" />
 	</xsl:call-template>
-	<xsl:value-of select="concat(' bfin_read',@bit-size,'(',@name,')')"/>
+	<xsl:value-of select="concat(' bfin_read',$mmr-type,'(',@name,')')"/>
 	<xsl:text>&newline;</xsl:text>
 
 	<!-- #define bfin_write_<MMR>(val) bfin_write<bit-size>(<MMR>, val) -->
@@ -81,7 +101,7 @@
 		<xsl:with-param name="padVar"  select="concat('bfin_write_',@name,'(val)')" />
 		<xsl:with-param name="length"  select="$padlen" />
 	</xsl:call-template>
-	<xsl:value-of select="concat(' bfin_write',@bit-size,'(',@name,', val)')"/>
+	<xsl:value-of select="concat(' bfin_write',$mmr-type,'(',@name,', val)')"/>
 
 	<xsl:text>&newline;</xsl:text>
 
