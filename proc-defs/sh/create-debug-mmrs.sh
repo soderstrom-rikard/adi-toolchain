@@ -36,9 +36,7 @@ static u64 bfin_rw_x16_get(void *data)
 }
 DEFINE_SIMPLE_ATTRIBUTE(bfin_rw_x16_fops, bfin_rw_x16_get, bfin_rw_x16_set, "%llx\n");
 static __init
-struct dentry *debugfs_create_rw_x16(const char *name, mode_t mode,
-                                     struct dentry *parent, u16 *rvalue,
-                                     u16 *wvalue)
+struct dentry *debugfs_create_rw_x16(const char *name, mode_t mode, struct dentry *parent, u16 *rvalue, u16 *wvalue)
 {
 	struct dentry *ret;
 	struct bfin_rw_ptr_pair *pair = kmalloc(sizeof(*pair), GFP_KERNEL);
@@ -108,11 +106,11 @@ EOF
 
 		if [[ ${mmr_read} == ${mmr_write} ]] ; then
 cat << EOF >> ${output}
-		debugfs_create_x${bits}("${mmr_name}", 0600, parent, (u${bits}*)${mmr_read});
+		debugfs_create_x${bits}("${mmr_name}", 0600, parent, (u${bits} *)${mmr_read});
 EOF
 		else
 cat << EOF >> ${output}
-		debugfs_create_rw_x${bits}("${mmr_name}", 0600, parent, (u${bits}*)${mmr_read}, (u${bits}*)${mmr_write});
+		debugfs_create_rw_x${bits}("${mmr_name}", 0600, parent, (u${bits} *)${mmr_read}, (u${bits} *)${mmr_write});
 EOF
 		fi
 	done
