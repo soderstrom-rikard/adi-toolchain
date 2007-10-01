@@ -5777,8 +5777,10 @@
 	<memory-segment start="0x28000000" end="0x2BFFFFFF" width="8" type="PM RAM EXTERNAL"     name="BLACKFIN Memory" memory-id="0" description="External Async Bank2 Memory"/>
 	<memory-segment start="0x2C000000" end="0x2FFFFFFF" width="8" type="PM RAM EXTERNAL"     name="BLACKFIN Memory" memory-id="0" description="External Async Bank3 Memory"/>
 	<memory-segment start="0xEF000000" end="0xEF00FFFF" width="8" type="PM ROM INTERNAL" 	 name="BLACKFIN Memory" memory-id="0" description="Boot ROM"/>
-	<memory-segment start="0xFF800000" end="0xFF807FFF" width="8" type="DM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Data Bank A SRAM/Cache"/>
-	<memory-segment start="0xFF900000" end="0xFF907FFF" width="8" type="DM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Data Bank B SRAM/Cache"/>
+	<memory-segment start="0xFF800000" end="0xFF803FFF" width="8" type="DM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Data Bank A SRAM"/>
+	<memory-segment start="0xFF804000" end="0xFF807FFF" width="8" type="DM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Data Bank A SRAM/Cache"/>
+	<memory-segment start="0xFF900000" end="0xFF903FFF" width="8" type="DM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Data Bank B SRAM"/>
+	<memory-segment start="0xFF904000" end="0xFF907FFF" width="8" type="DM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Data Bank B SRAM/Cache"/>
 	<memory-segment start="0xFFA00000" end="0xFFA07FFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Instruction Bank A SRAM"/>
 	<memory-segment start="0xFFA08000" end="0xFFA0BFFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Instruction Bank B SRAM"/>
 	<memory-segment start="0xFFA10000" end="0xFFA13FFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Instruction RAM/Cache (L1)"/>
