@@ -1658,12 +1658,12 @@
 	<register name="TIMER11_PERIOD"  group="System Timers" description="" bit-size="32" read-address="0xFFC01638" write-address="0xFFC01638" mask="FFFFFFFF" type="IO"/>
 	<register name="TIMER11_WIDTH"   group="System Timers" description="" bit-size="32" read-address="0xFFC0163C" write-address="0xFFC0163C" mask="FFFFFFFF" type="IO"/>
 
-	<register name="TMRS4_ENABLE "   group="System Timers" read-address="0xFFC01640" write-address="0xFFC01640" mask="FFFFFFFF" type="IO" description="" bit-size="32" def-comment="Shared Timer Registers"/>
+	<register name="TMRS4_ENABLE"    group="System Timers" read-address="0xFFC01640" write-address="0xFFC01640" mask="FFFFFFFF" type="IO" description="" bit-size="32" def-comment="Shared Timer Registers"/>
 	<register name="TMRS4_DISABLE"   group="System Timers" read-address="0xFFC01644" write-address="0xFFC01644" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
-	<register name="TMRS4_STATUS "   group="System Timers" read-address="0xFFC01648" write-address="0xFFC01648" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
-	<register name="TMRS8_ENABLE "   group="System Timers" read-address="0xFFC00680" write-address="0xFFC00680" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
+	<register name="TMRS4_STATUS"    group="System Timers" read-address="0xFFC01648" write-address="0xFFC01648" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
+	<register name="TMRS8_ENABLE"    group="System Timers" read-address="0xFFC00680" write-address="0xFFC00680" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
 	<register name="TMRS8_DISABLE"   group="System Timers" read-address="0xFFC00684" write-address="0xFFC00684" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
-	<register name="TMRS8_STATUS "   group="System Timers" read-address="0xFFC00688" write-address="0xFFC00688" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
+	<register name="TMRS8_STATUS"    group="System Timers" read-address="0xFFC00688" write-address="0xFFC00688" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
 
 		<!-- Programmable Flag Registers -->
 		<!-- Flag 0 -->
