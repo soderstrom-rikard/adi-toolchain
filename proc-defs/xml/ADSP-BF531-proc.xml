@@ -1701,7 +1701,7 @@
 	<memory-segment start="0x20300000" end="0x203FFFFF" width="8" type="PM RAM EXTERNAL"     name="BLACKFIN Memory" memory-id="0" description="External Async Bank0 Memory"/>
 	<memory-segment start="0xEF000000" end="0xEF0003FF" width="8" type="PM ROM INTERNAL" 	 name="BLACKFIN Memory" memory-id="0" description="Boot ROM"/>
 	<memory-segment start="0xFF804000" end="0xFF807FFF" width="8" type="DM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Data Bank A SRAM/Cache"/>
-	<memory-segment start="0xFFA08000" end="0xFFA0BFFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Instruction RAM (L1)"/>
+	<memory-segment start="0xFFA08000" end="0xFFA0BFFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Instruction Bank A SRAM"/>
 	<memory-segment start="0xFFA10000" end="0xFFA13FFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Instruction RAM/Cache (L1)"/>
 	<memory-segment start="0xFFB00000" end="0xFFB00FFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Scratchpad SRAM"/>
 	<memory-segment start="0xFFC00000" end="0xFFFFFFFF" width="8" type="DM RAM INTERNAL MMR" name="BLACKFIN Memory" memory-id="0" description="MMR registers"/>

@@ -3710,7 +3710,7 @@
 	<memory-segment core="P0" start="0xFEB00000" end="0xFEB1FFFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="L2 SRAM Memory"/>
 	<memory-segment core="P0" start="0xFF800000" end="0xFF807FFF" width="8" type="DM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Data Bank A SRAM/Cache"/>
 	<memory-segment core="P0" start="0xFF900000" end="0xFF907FFF" width="8" type="DM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Data Bank B SRAM/Cache"/>
-	<memory-segment core="P0" start="0xFFA00000" end="0xFFA03FFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Instruction RAM (L1)"/>
+	<memory-segment core="P0" start="0xFFA00000" end="0xFFA03FFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Instruction Bank A SRAM"/>
 	<memory-segment core="P0" start="0xFFA10000" end="0xFFA13FFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Instruction RAM/Cache (L1)"/>
 	<memory-segment core="P0" start="0xFFB00000" end="0xFFB00FFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Scratchpad SRAM"/>
 	<memory-segment core="P0" start="0xFFC00000" end="0xFFFFFFFF" width="8" type="DM RAM INTERNAL MMR" name="BLACKFIN Memory" memory-id="0" description="MMR registers"/>
@@ -3727,7 +3727,7 @@
 	<memory-segment core="P1" start="0xFEB00000" end="0xFEB1FFFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="L2 SRAM Memory"/>
 	<memory-segment core="P1" start="0xFF400000" end="0xFF407FFF" width="8" type="DM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Data Bank A SRAM/Cache"/>
 	<memory-segment core="P1" start="0xFF500000" end="0xFF507FFF" width="8" type="DM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Data Bank B SRAM/Cache"/>
-	<memory-segment core="P1" start="0xFF600000" end="0xFF603FFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Instruction RAM (L1)"/>
+	<memory-segment core="P1" start="0xFF600000" end="0xFF603FFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Instruction Bank A SRAM"/>
 	<memory-segment core="P1" start="0xFF610000" end="0xFF613FFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Instruction RAM/Cache (L1)"/>
 	<memory-segment core="P1" start="0xFF700000" end="0xFF700FFF" width="8" type="PM RAM INTERNAL"     name="BLACKFIN Memory" memory-id="0" description="Scratchpad SRAM"/>
 	<memory-segment core="P1" start="0xFFC00000" end="0xFFFFFFFF" width="8" type="DM RAM INTERNAL MMR" name="BLACKFIN Memory" memory-id="0" description="MMR registers"/>
