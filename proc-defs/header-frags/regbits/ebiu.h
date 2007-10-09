@@ -16,6 +16,7 @@
 #define B1_PEN		0x0020		/* Enable 16-bit packing Bank 1 */
 #define B2_PEN		0x0040		/* Enable 16-bit packing Bank 2 */
 #define B3_PEN		0x0080		/* Enable 16-bit packing Bank 3 */
+#define CDPRIO		0x0100		/* Core has priority over DMA for external accesses */
 
 /* EBIU_AMGCTL Bit Positions */
 #define AMCKEN_P	0x00000000	/* Enable CLKOUT */
@@ -26,6 +27,7 @@
 #define B1_PEN_P	0x00000005	/* Enable 16-bit packing Bank 1 */
 #define B2_PEN_P	0x00000006	/* Enable 16-bit packing Bank 2 */
 #define B3_PEN_P	0x00000007	/* Enable 16-bit packing Bank 3 */
+#define CDPRIO_P	0x00000008	/* Core has priority over DMA for external accesses */
 
 /* EBIU_AMBCTL0 Masks */
 #define B0RDYEN		0x00000001	/* Bank 0 RDY Enable, 0=disable, 1=enable */
@@ -249,7 +251,7 @@
 #define TWR_3		0x00180000	/* SDRAM tWR = 3 cycles */
 #define PUPSD		0x00200000	/* Power-up start delay */
 #define PSM		0x00400000	/* SDRAM power-up sequence = Precharge, mode register set, 8 CBR refresh cycles */
-#define PSS		0x00800000	/* enable SDRAM power-up sequence on next SDRAM access */
+#define PSSE		0x00800000	/* enable SDRAM power-up sequence on next SDRAM access */
 #define SRFS		0x01000000	/* Start SDRAM self-refresh mode */
 #define EBUFE		0x02000000	/* Enable external buffering timing */
 #define FBBRW		0x04000000	/* Fast back-to-back read write enable */

@@ -42,8 +42,8 @@
 #define	REGAD		0x000007C0	/* STA Register Address */
 #define	PHYAD		0x0000F800	/* PHY Device Address */
 
-#define	SET_REGAD(x)	(((x)&0x1F)<<  6 )	/* Set STA Register Address */
-#define	SET_PHYAD(x)	(((x)&0x1F)<< 11 )	/* Set PHY Device Address */
+#define	SET_REGAD(x)	(((x) & 0x1F) <<  6)	/* Set STA Register Address */
+#define	SET_PHYAD(x)	(((x) & 0x1F) << 11)	/* Set PHY Device Address */
 
 /* EMAC_STADAT Mask */
 #define	STADATA		0x0000FFFF	/* Station Management Data */
@@ -55,7 +55,7 @@
 #define	BKPRSEN		0x00000008	/* Enable Backpressure */
 #define	FLCPAUSE	0xFFFF0000	/* Pause Time */
 
-#define	SET_FLCPAUSE(x)	(((x)&0xFFFF)<< 16)	/* Set Pause Time */
+#define	SET_FLCPAUSE(x)	(((x) & 0xFFFF) << 16)	/* Set Pause Time */
 
 /* EMAC_WKUP_CTL Masks */
 #define	CAPWKFRM	0x00000001	/* Capture Wake-Up Frames */
@@ -81,10 +81,10 @@
 #define	WF2_OFF		0x00FF0000	/* Wake-Up Filter 2 Pattern Offset */
 #define	WF3_OFF		0xFF000000	/* Wake-Up Filter 3 Pattern Offset */
 
-#define	SET_WF0_OFF(x)	(((x)&0xFF)<<  0 )	/* Set Wake-Up Filter 0 Byte Offset */
-#define	SET_WF1_OFF(x)	(((x)&0xFF)<<  8 )	/* Set Wake-Up Filter 1 Byte Offset */
-#define	SET_WF2_OFF(x)	(((x)&0xFF)<< 16 )	/* Set Wake-Up Filter 2 Byte Offset */
-#define	SET_WF3_OFF(x)	(((x)&0xFF)<< 24 )	/* Set Wake-Up Filter 3 Byte Offset */
+#define	SET_WF0_OFF(x)	(((x) & 0xFF) <<  0)	/* Set Wake-Up Filter 0 Byte Offset */
+#define	SET_WF1_OFF(x)	(((x) & 0xFF) <<  8)	/* Set Wake-Up Filter 1 Byte Offset */
+#define	SET_WF2_OFF(x)	(((x) & 0xFF) << 16)	/* Set Wake-Up Filter 2 Byte Offset */
+#define	SET_WF3_OFF(x)	(((x) & 0xFF) << 24)	/* Set Wake-Up Filter 3 Byte Offset */
 /* Set ALL Offsets */
 #define	SET_WF_OFFS(x0,x1,x2,x3)	(SET_WF0_OFF((x0))|SET_WF1_OFF((x1))|SET_WF2_OFF((x2))|SET_WF3_OFF((x3)))
 
@@ -92,15 +92,15 @@
 #define	WF0_CRC		0x0000FFFF	/* Wake-Up Filter 0 Pattern CRC */
 #define	WF1_CRC		0xFFFF0000	/* Wake-Up Filter 1 Pattern CRC */
 
-#define	SET_WF0_CRC(x)	(((x)&0xFFFF)<< 0)	/* Set Wake-Up Filter 0 Target CRC */
-#define	SET_WF1_CRC(x)	(((x)&0xFFFF)<< 16)	/* Set Wake-Up Filter 1 Target CRC */
+#define	SET_WF0_CRC(x)	(((x) & 0xFFFF) << 0)	/* Set Wake-Up Filter 0 Target CRC */
+#define	SET_WF1_CRC(x)	(((x) & 0xFFFF) << 16)	/* Set Wake-Up Filter 1 Target CRC */
 
 /* EMAC_WKUP_FFCRC1 Masks */
 #define	WF2_CRC		0x0000FFFF	/* Wake-Up Filter 2 Pattern CRC */
 #define	WF3_CRC		0xFFFF0000	/* Wake-Up Filter 3 Pattern CRC */
 
-#define	SET_WF2_CRC(x)	(((x)&0xFFFF)<< 0)	/* Set Wake-Up Filter 2 Target CRC */
-#define	SET_WF3_CRC(x)	(((x)&0xFFFF)<< 16)	/* Set Wake-Up Filter 3 Target CRC */
+#define	SET_WF2_CRC(x)	(((x) & 0xFFFF) << 0)	/* Set Wake-Up Filter 2 Target CRC */
+#define	SET_WF3_CRC(x)	(((x) & 0xFFFF) << 16)	/* Set Wake-Up Filter 3 Target CRC */
 
 /* EMAC_SYSCTL Masks */
 #define	PHYIE		0x00000001	/* PHY_INT Interrupt Enable */
@@ -108,7 +108,7 @@
 #define	RXCKS		0x00000004	/* Enable RX Frame TCP/UDP Checksum Computation */
 #define	MDCDIV		0x00003F00	/* SCLK:MDC Clock Divisor [MDC=SCLK/(2*(N+1))] */
 
-#define	SET_MDCDIV(x)	(((x)&0x3F)<< 8)	/* Set MDC Clock Divisor */
+#define	SET_MDCDIV(x)	(((x) & 0x3F) << 8)	/* Set MDC Clock Divisor */
 
 /* EMAC_SYSTAT Masks */
 #define	PHYINT		0x00000001	/* PHY_INT Interrupt Status */
