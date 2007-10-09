@@ -62,6 +62,16 @@
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:variable>
+	<xsl:variable name="pmmr-type">
+		<xsl:choose>
+			<xsl:when test="@cdef-type = 'ADDR'">
+				<xsl:text>void *</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="concat('uint',@bit-size,'_t')"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:variable>
 
 	<!-- #define p<MMR> <(pointer cast)address> -->
 	<xsl:if test="$EXPORT-P-DEFS = 'yes'">
@@ -72,7 +82,7 @@
 		<xsl:with-param name="padVar"  select="concat('p',@name)" />
 		<xsl:with-param name="length"  select="$padlen" />
 	</xsl:call-template>
-	<xsl:value-of select="concat(' ((volatile uint',@bit-size,'_t *)',@name,')')"/>
+	<xsl:value-of select="concat(' ((volatile ',$pmmr-type,' *)',@name,')')"/>
 
 	<xsl:if test="string-length(@description) != 0">
 	<xsl:text> /* </xsl:text>
