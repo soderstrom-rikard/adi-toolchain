@@ -132,6 +132,7 @@ int pthread_attr_setschedpolicy(pthread_attr_t *attr, int policy)
   attr->__schedpolicy = policy;
   return 0;
 }
+libpthread_hidden_def(pthread_attr_setschedpolicy)
 
 int pthread_attr_getschedpolicy(const pthread_attr_t *attr, int *policy)
 {
