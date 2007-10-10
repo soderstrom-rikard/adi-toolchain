@@ -22,7 +22,9 @@ libmudflapth =
 endif
 
 toolexeclib_LTLIBRARIES = libmudflap.la $(libmudflapth)
-include_HEADERS = mf-runtime.h
+target_alias = @target_alias@
+libsubincludedir = $(libdir)/gcc/$(target_alias)/$(gcc_version)/include
+nobase_libsubinclude_HEADERS = mf-runtime.h
 
 
 libmudflap_la_SOURCES = \
