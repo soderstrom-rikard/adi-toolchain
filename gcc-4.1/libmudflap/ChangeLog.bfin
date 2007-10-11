@@ -1,3 +1,10 @@
+2007-10-11  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* mf-runtime.h: If __USER_LABEL_PREFIX__ is defined, use alternate
+	wrappers with a prefixed underscore.
+	* mf-hooks2.c (dlopen, dlclose, dlsym, dlerror): Only compile in
+	if HAVE_DLFCN_H is set.
+
 2007-10-10  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	Apply a patch from mainline:
