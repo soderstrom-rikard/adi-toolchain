@@ -1,3 +1,9 @@
+2007-10-11  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* configure.ac (AC_CHECK_FUNCS): Add libintl_dgettext.
+	* stubs.c (!HAVE_LIBINTL_DGETTEXT): Stub for libintl_dgettext.
+	* configure: Regenerated.
+
 2007-09-22  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* config.guess, config.sub, configure.in, elf2flt.c, elf2flt.ld.in,
