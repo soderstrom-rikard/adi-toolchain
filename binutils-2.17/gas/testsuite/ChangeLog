@@ -1,3 +1,17 @@
+2006-09-19  Robin Getz  <rgetz@blackfin.uclinux.org>
+
+	* gas/bfin/arithmetic.d, gas/bfin/arithmetic.s gas/bfin/bit.d,
+	gas/bfin/bit2.d, gas/bfin/control_code.d, gas/bfin/control_code2.d,
+	gas/bfin/event.d, gas/bfin/event2.d, gas/bfin/flow.d,
+	gas/bfin/flow2.d, gas/bfin/load.d, gas/bfin/logical.d,
+	gas/bfin/logical2.d, gas/bfin/move.d, gas/bfin/move2.d,
+	gas/bfin/parallel.d, gas/bfin/parallel2.d, gas/bfin/parallel3.d,
+	gas/bfin/parallel4.d, gas/bfin/shift.d, gas/bfin/shift2.d,
+	gas/bfin/stack.d, gas/bfin/stack2.d, gas/bfin/store.d,
+	gas/bfin/vector.d, gas/bfin/vector2.d, gas/bfin/video.d,
+	gas/bfin/video2.d: Update to reflect spaces/capitalization in
+	recent changes in gas
+
 2006-06-14  Thiemo Seufer  <ths@mips.com>
 
 	* gas/mips/mips16e-jrc.d, gas/mips/mips16e-save.d,

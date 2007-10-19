@@ -1,3 +1,54 @@
+2007-09-19  Robin Getz <rgetz@blackfin.uclinux.org>
+
+	* bfin-dis.c: (c_uimm4s4d, c_imm5d, c_imm7d, c_imm16d, c_uimm16s4d,
+	c_imm32, c_huimm32e): Define
+	(constant_formats): Add flags for printing decimal, leading spaces, and
+	exact symbols
+	(comment, parallel): Add global flags
+	in all disassembly.
+	(fmtconst): Take advantage of new flags, and print default in hex.
+	(fmtconst_val): Likewise
+	(decode_macfunc): Be consistant with spaces, tabs, comments,
+	capitalization in disassembly, fix minor coding style issues
+	(reg_names): Likewise
+	(amod0): Likewise
+	(amod1): Likewise
+	(amod0amod2): Likewise
+	(aligndir): Likewise
+	(get_allreg): Likewise
+	(decode_ProgCtrl_0): Likewise.
+	(decode_PushPopMultiple_0): Likewise.
+	(decode_CCflag_0): Likewise.
+	(decode_CC2dreg_0): Likewise.
+	(decode_CC2stat_0): Likewise.
+	(decode_BRCC_0): Likewise.
+	(decode_UJUMP_0): Likewise.
+	(decode_REGMV_0): Likewise.
+	(decode_ALU2op_0): Likewise.
+	(decode_PTR2op_0): Likewise.
+	(decode_LOGI2op_0): Likewise.
+	(decode_COMP3op_0): Likewise.
+	(decode_COMPI2opD_0): Likewise.
+	(decode_COMPI2opP_0): Likewise.
+	(decode_LDSTpmod_0): Likewise.
+	(decode_dagMODim_0): Likewise.
+	(decode_dagMODik_0): Likewise.
+	(decode_dspLDST_0): Likewise.
+	(decode_LDST_0): Likewise.
+	(decode_LDSTiiFP_0): Likewise.
+	(decode_LDSTii_0): Likewise.
+	(decode_LoopSetup_0): Likewise.
+	(decode_LDIMMhalf_0): Likewise.
+	(decode_CALLa_0): Likewise.
+	(decode_LDSTidxI_0): Likewise.
+	(decode_linkage_0): Likewise.
+	(decode_dsp32alu_0): Likewise.
+	(decode_dsp32shift_0): Likewise.
+	(decode_dsp32shiftimm_0): Likewise.
+	(decode_pseudodbg_assert_0): Likewise.
+	(_print_insn_bfin): Likewise.
+	(print_insn_bfin): Likewise.
+
 2006-11-09  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* i386-dis.c (print_insn): Check PREFIX_REPNZ before
