@@ -60,6 +60,12 @@
 # include <sys/types.h>
 #endif
 
+#if MAJOR_IN_MKDEV
+# include <sys/mkdev.h>
+#elif MAJOR_IN_SYSMACROS
+# include <sys/sysmacros.h>
+#endif
+
 #if HAVE_SYS_STAT_H
 # include <sys/stat.h>
 #endif
@@ -772,7 +778,7 @@ is_hardlink(ino_t inode)
 		if(hdlinks.hdl[i].src_inode == inode)
 			return i;
 	}
-	return -1;		
+	return -1;
 }
 
 // printf helper macro
@@ -1350,20 +1356,23 @@ find_path(filesystem *fs, uint32 nod, const char * name)
 	return nod;
 }
 
+// chmod an inode
+void
+chmod_fs(filesystem *fs, uint32 nod, uint16 mode, uint16 uid, uint16 gid)
+{
+	inode *node;
+	node = get_nod(fs, nod);
+	node->i_mode = (node->i_mode & ~FM_IMASK) | (mode & FM_IMASK);
+	node->i_uid = uid;
+	node->i_gid = gid;
+}
+
 // create a simple inode
 static uint32
 mknod_fs(filesystem *fs, uint32 parent_nod, const char *name, uint16 mode, uint16 uid, uint16 gid, uint8 major, uint8 minor, uint32 ctime, uint32 mtime)
 {
 	uint32 nod;
 	inode *node;
-	if((nod = find_dir(fs, parent_nod, name)))
-	{
-		node = get_nod(fs, nod);
-		if((node->i_mode & FM_IFMT) != (mode & FM_IFMT))
-			error_msg_and_die("node '%s' already exists and isn't of the same type", name);
-		node->i_mode = mode;
-	}
-	else
 	{
 		nod = alloc_nod(fs);
 		node = get_nod(fs, nod);
@@ -1585,13 +1594,24 @@ add2fs_from_file(filesystem *fs, uint32 this_nod, FILE * fh, uint32 fs_timestamp
 				dname = malloc(len + 1);
 				for(i = start; i < count; i++)
 				{
+					uint32 oldnod;
 					SNPRINTF(dname, len, "%s%lu", name, i);
-					mknod_fs(fs, nod, dname, mode, uid, gid, major, minor + (i * increment - start), ctime, mtime);
+					oldnod = find_dir(fs, nod, dname);
+					if(oldnod)
+						chmod_fs(fs, oldnod, mode, uid, gid);
+					else
+						mknod_fs(fs, nod, dname, mode, uid, gid, major, minor + (i * increment - start), ctime, mtime);
 				}
 				free(dname);
 			}
 			else
-				mknod_fs(fs, nod, name, mode, uid, gid, major, minor, ctime, mtime);
+			{
+				uint32 oldnod = find_dir(fs, nod, name);
+				if(oldnod)
+					chmod_fs(fs, oldnod, mode, uid, gid);
+				else
+					mknod_fs(fs, nod, name, mode, uid, gid, major, minor, ctime, mtime);
+			}
 		}
 	}
 	if (line)
@@ -1658,6 +1678,17 @@ add2fs_from_dir(filesystem *fs, uint32 this_nod, int squash_uids, int squash_per
 			}
 		else
 		{
+			if((nod = find_dir(fs, this_nod, name)))
+			{
+				error_msg("ignoring duplicate entry %s", name);
+				if(S_ISDIR(st.st_mode)) {
+					if(chdir(dent->d_name) < 0)
+						perror_msg_and_die(name);
+					add2fs_from_dir(fs, nod, squash_uids, squash_perms, fs_timestamp, stats);
+					chdir("..");
+				}
+				continue;
+			}
 			save_nod = 0;
 			/* Check for hardlinks */
 			if (!S_ISDIR(st.st_mode) && !S_ISLNK(st.st_mode) && st.st_nlink > 1) {
@@ -1673,10 +1704,10 @@ add2fs_from_dir(filesystem *fs, uint32 this_nod, int squash_uids, int squash_per
 			{
 #if HAVE_STRUCT_STAT_ST_RDEV
 				case S_IFCHR:
-					nod = mknod_fs(fs, this_nod, name, mode|FM_IFCHR, uid, gid, st.st_rdev >> 8, st.st_rdev & 0xff, ctime, mtime);
+					nod = mknod_fs(fs, this_nod, name, mode|FM_IFCHR, uid, gid, major(st.st_rdev), minor(st.st_rdev), ctime, mtime);
 					break;
 				case S_IFBLK:
-					nod = mknod_fs(fs, this_nod, name, mode|FM_IFBLK, uid, gid, st.st_rdev >> 8, st.st_rdev & 0xff, ctime, mtime);
+					nod = mknod_fs(fs, this_nod, name, mode|FM_IFBLK, uid, gid, major(st.st_rdev), minor(st.st_rdev), ctime, mtime);
 					break;
 #endif
 				case S_IFIFO:
@@ -1691,7 +1722,7 @@ add2fs_from_dir(filesystem *fs, uint32 this_nod, int squash_uids, int squash_per
 					free(lnk);
 					break;
 				case S_IFREG:
-					fh = xfopen(dent->d_name, "r");
+					fh = xfopen(dent->d_name, "rb");
 					nod = mkfile_fs(fs, this_nod, name, mode, st.st_size, fh, uid, gid, ctime, mtime);
 					fclose(fh);
 					break;
@@ -1988,7 +2019,7 @@ init_fs(int nbblocks, int nbinodes, int nbresrvd, int holes, uint32 fs_timestamp
 		//system blocks
 		for(j = 1; j <= overhead_per_group; j++)
 			allocate(bbm, j); 
-		
+
 		/* Inode bitmap */
 		ibm = get_blk(fs,fs->gd[i].bg_inode_bitmap);	
 		//non-filesystem inodes
@@ -2378,7 +2409,7 @@ populate_fs(filesystem *fs, char **dopt, int didx, int squash_uids, int squash_p
 		switch(st.st_mode & S_IFMT)
 		{
 			case S_IFREG:
-				fh = xfopen(dopt[i], "r");
+				fh = xfopen(dopt[i], "rb");
 				add2fs_from_file(fs, nod, fh, fs_timestamp, stats);
 				fclose(fh);
 				break;
@@ -2568,7 +2599,7 @@ main(int argc, char **argv)
 	{
 		if(strcmp(fsin, "-"))
 		{
-			FILE * fh = xfopen(fsin, "r");
+			FILE * fh = xfopen(fsin, "rb");
 			fs = load_fs(fh, bigendian);
 			fclose(fh);
 		}
@@ -2627,14 +2658,14 @@ main(int argc, char **argv)
 		while((p = strchr(gopt[i], '/')))
 			*p = '_';
 		SNPRINTF(fname, MAX_FILENAME-1, "%s.blk", gopt[i]);
-		fh = xfopen(fname, "w");
+		fh = xfopen(fname, "wb");
 		fprintf(fh, "%d:", get_nod(fs, nod)->i_size);
 		flist_blocks(fs, nod, fh);
 		fclose(fh);
 	}
 	if(strcmp(fsout, "-"))
 	{
-		FILE * fh = xfopen(fsout, "w");
+		FILE * fh = xfopen(fsout, "wb");
 		dump_fs(fs, fh, bigendian);
 		fclose(fh);
 	}

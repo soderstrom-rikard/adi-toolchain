@@ -1,8 +1,11 @@
 all: build/Makefile
 	$(MAKE) -C build
 
-build/Makefile:
-	touch *
+configure:
+	./autogen.sh
+
+build/Makefile: configure
+	find . -type f -print0 | xargs -0 touch -r configure
 	set -e; \
 	rm -rf build; \
 	mkdir build; \
