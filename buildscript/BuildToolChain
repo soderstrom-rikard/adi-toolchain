@@ -534,9 +534,10 @@ fi
 # libintl / libiconv handling in binutils-2.17 is broken for
 # extraneous hosts ... it's been fixed in binutils-2.18, so
 # once we update to that, we should be able to re-enable NLS
+UCLIBC_HOSTUTILS="PASS"
 case $HOST_TARGET in
-    --host=mingw*)   BINUTILS_EXTRA_CONF="--disable-nls";;
-    --host=*darwin*) BINUTILS_EXTRA_CONF="--disable-nls";;
+    --host=mingw*)   BINUTILS_EXTRA_CONF="--disable-nls"; UCLIBC_HOSTUTILS="XFAIL";;
+    --host=*darwin*) BINUTILS_EXTRA_CONF="--disable-nls"; UCLIBC_HOSTUTILS="XFAIL";;
     *)               BINUTILS_EXTRA_CONF="";;
 esac
 
@@ -1480,13 +1481,19 @@ if [ $KERNEL_SOURCE ] ; then
 
     echo -n "*** Building uClibc host utils     " ; date
     RUN="$MAKE -C utils hostutils $ARGS"
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
-    mkdir -p $DIR_ELF_OUTPUT/bin $DIR_uC_OUTPUT/bin $DIR_LINUX_OUTPUT/bin
-    for RUN in ldconfig ldd ; do
-        cp utils/${RUN}.host $DIR_ELF_OUTPUT/bin/bfin-elf-${RUN} || exit 1
-        cp utils/${RUN}.host $DIR_uC_OUTPUT/bin/bfin-uclinux-${RUN} || exit 1
-        cp utils/${RUN}.host $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-${RUN} || exit 1
-    done
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    if (echo $RUN $LOGFILE ; ) | sh ; then
+        mkdir -p $DIR_ELF_OUTPUT/bin $DIR_uC_OUTPUT/bin $DIR_LINUX_OUTPUT/bin
+        for RUN in ldconfig ldd ; do
+            cp utils/${RUN}.host $DIR_ELF_OUTPUT/bin/bfin-elf-${RUN} || exit 1
+            cp utils/${RUN}.host $DIR_uC_OUTPUT/bin/bfin-uclinux-${RUN} || exit 1
+            cp utils/${RUN}.host $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-${RUN} || exit 1
+        done
+    elif [ "${UCLIBC_HOSTUTILS}" != "XFAIL" ] ; then
+        die_with_log
+    else
+        (echo "echo -e '!!! Host utils were expected to fail; ignoring\n' $LOGFILE" ) | sh
+    fi
 
     mkdir -p $DIR_uC_OUTPUT/bfin-uclinux/runtime
     mkdir -p $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime
