@@ -437,7 +437,7 @@ mk_output_dir()
 
 ############ RELATIVE PATH TO SOURCE DIRECTORIES ################
 if [ ! $DIR_ELF_OUTPUT ] ; then
-    DIR_ELF_OUTPUT=$DIR_BUILD/out-elf
+    DIR_ELF_OUTPUT=$DIR_BUILD/bfin-elf
 fi
 mk_output_dir "elf" $DIR_ELF_OUTPUT $SKIP_ELF
 
@@ -587,8 +587,8 @@ fi
 
 if [ $KERNEL_SOURCE ] ; then
     if [ ! $DIR_uC_OUTPUT ] ; then
-        DIR_uC_OUTPUT=$DIR_BUILD/out-uclinux
-        DIR_LINUX_OUTPUT=$DIR_BUILD/out-linux-uclibc
+        DIR_uC_OUTPUT=$DIR_BUILD/bfin-uclinux
+        DIR_LINUX_OUTPUT=$DIR_BUILD/bfin-linux-uclibc
     fi
     mk_output_dir "uClinux" $DIR_uC_OUTPUT ""
     mk_output_dir "linux-uClibc" $DIR_LINUX_OUTPUT ""
