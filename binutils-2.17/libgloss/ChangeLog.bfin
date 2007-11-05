@@ -1,3 +1,9 @@
+2007-10-02  Michael Frysinger  <michael.frysinger@analog.com>
+
+	* bfin/bf522.ld (MEM_L1_CODE): Define region 0xFFA00000 of size 0x8000.
+	* bfin/bf525.ld (MEM_L1_CODE): Likewise.
+	* bfin/bf527.ld (MEM_L1_CODE): Likewise.
+
 2007-09-20  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/include/*, bfin/include/sys/*: Remove trailing blank
