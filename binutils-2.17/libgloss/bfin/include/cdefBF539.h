@@ -23,9 +23,6 @@
 /* include core specific register pointer definitions */
 #include <cdef_LPBlackfin.h>
 
-/* include built-in mneumonic macros */
-#include <ccblkfn.h>
-
 #ifndef _PTR_TO_VOL_VOID_PTR
 #ifndef _USE_LEGACY_CDEF_BEHAVIOUR
 #define _PTR_TO_VOL_VOID_PTR (void * volatile *)

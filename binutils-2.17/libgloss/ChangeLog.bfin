@@ -1,3 +1,8 @@
+2007-11-05  Michael Frysinger  <michael.frysinger@analog.com>
+
+	* bfin/include/cdefBF532.h: Do not include ccblkfin.h.
+	* bfin/include/cdefBF539.h: Likewise.
+
 2007-10-02  Michael Frysinger  <michael.frysinger@analog.com>
 
 	* bfin/bf522.ld (MEM_L1_CODE): Define region 0xFFA00000 of size 0x8000.
