@@ -1,5 +1,10 @@
 2007-11-05  Michael Frysinger  <michael.frysinger@analog.com>
 
+	* bfin/bf547.ld: New.
+	* bfin/Makefile.in (BOARD_SCRIPTS): Add bf547.ld.
+
+2007-11-05  Michael Frysinger  <michael.frysinger@analog.com>
+
 	* bfin/include/cdefBF532.h: Do not include ccblkfin.h.
 	* bfin/include/cdefBF539.h: Likewise.
 
