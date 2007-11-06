@@ -108,7 +108,7 @@ do
             echo "Verbose output"
             ;;
         t)
-            CHECK_ON_SIMULATOR=1
+            CHECK_ON_SIMULATOR=true
             ;;
         r)
             if [ ! -d $OPTARG ] ; then
@@ -126,7 +126,7 @@ do
                 echo "Target ip address in wrong format"
                 exit 1
             fi
-            CHECK_ON_HARDWARE=1
+            CHECK_ON_HARDWARE=true
             ;;
 
         s)
@@ -291,10 +291,10 @@ echo "Utilizing make: $MAKE $MAKEFLAGS"
 
 ############ Check and error if I can't find the things I need #
 
-if [ $CHECK_ON_HARDWARE ] ; then
+if [ -n "$CHECK_ON_HARDWARE" ] ; then
     PREREQ_FILE=${PREREQ_FILE}${PREREQ_HW_TEST}
 fi
-if [ $CHECK_ON_SIMULATOR -o $CHECK_ON_HARDWARE ] ; then
+if [ -n "$CHECK_ON_SIMULATOR" -o -n "$CHECK_ON_HARDWARE" ] ; then
     PREREQ_FILE=${PREREQ_FILE}${PREREQ_HW_SIM_TESTS}
 fi
 
@@ -430,7 +430,7 @@ if [ "x$CHECK_ON_SIMULATOR" != "x" -o "x$CHECK_ON_HARDWARE" != "x" ] ; then
     fi
 fi
 
-if [ $CHECK_ON_SIMULATOR ] ; then
+if [ -n "$CHECK_ON_SIMULATOR" ] ; then
     if [ $DATE_STAMP ] ; then
         DIR_TEST_SIM_RESULTS=$DIR_TEST_RESULTS/simulator-$TIMESTAMP
     else
