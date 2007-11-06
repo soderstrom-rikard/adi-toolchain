@@ -27,7 +27,6 @@
 #
 ###############################################################
 
-
 APP_NAME=$0
 DIR_APP=`dirname $APP_NAME`
 DIR_BOARDS=$DIR_APP/boards/
@@ -38,36 +37,58 @@ APP_NAME=${APP_NAME#/}
 #TIMESTAMP=`date +%Y-%b-%d-%H-%M` # is YYYY_MMM_DD_HH_MM
 TIMESTAMP=`date +%Y%m%d`       # is YYYY_MMM_DD
 
-PREREQ_FILE="autoconf automake bison flex gcc gettext grep ln m4 make makeinfo msgfmt which mv cp rm grep echo mkdir tail"
+PREREQ_FILE="autoconf automake awk /bin/sh bison cp echo flex gcc gettext grep ln m4 make makeinfo mkdir msgfmt mv rm sed tail wc which"
+PREREQ_HW_TESTS=" ping rsh rcp"
+PREREQ_HW_SIM_TESTS=" bc kill killall pstree runtest Xvfb"
 BINUTILS_VERSION=2.17
 GCC_VERSIONS=
 NUM_JOBS=0
 
-while getopts dpwvXtST:C:s:b:k:K:o:O:m:j:a:e:B:c:u:r:l:H:h parameter
+while getopts b:B:c:C:dfH:hj:k:K:l:m:o:O:pr:s:StT:u:vwX parameter
 do
     case $parameter in
         p)
             echo "Check http://gcc.gnu.org/install/prerequisites.html for more information"
-            for file in $PREREQ_FILE
+            for file in $PREREQ_FILE $PREREQ_HW_TESTS $PREREQ_HW_SIM_TESTS
             do
-                RUN=`which -a $file | wc -w`
+                RUN=`which -a $file 2>/dev/null| wc -w`
                 if [ $RUN -eq 0 ] ; then
-                    echo "$file: could not be found, please install it"
+                    echo "$file: could not be found"
                 else
-                    $file --version | grep -i "\<$file\>"
+                    tmp1=`echo $file | awk -F \/ '{print $NF}'`
+                    RUN=`type $tmp1 | grep "shell builtin" | wc -l`
+                    if [ $RUN -eq 1 ] ; then
+                       echo "   $file seems to be a shell builtin"
+                       continue
+                    fi
+                    for VER in --version -version -V
+                    do
+                        tmp=`$file $VER 2>&1 | grep -ie "\<$tmp1\>" | grep -vi "option" | grep -vi "Usage" | grep -vi "\-v"`
+                        if [ -n "$tmp" ] ; then
+                            echo "  " $tmp
+                            break
+                        fi
+                    done
+                    if [ -n "$tmp" ] ; then
+                        continue
+                    fi
+
+                    for VER in --version -version -V
+                    do
+                        tmp=`$file $VER 2>&1 | grep -ie "version " | grep -vi "option" | grep -vi "Usage" | grep -vi "\-v"`
+                        if [ -n "$tmp" ] ; then
+                            echo "  " $tmp
+                            break
+                        fi
+                    done
+                    if [ -n "$tmp" ] ; then
+                        continue
+                    fi
+
+                    echo ***Could not find version of `which $file`
                 fi
             done
-            for file in /bin/sh runtest
-            do
-                RUN=`which -a $file | wc -w`
-                if [ $RUN -eq 0 ] ; then
-                    echo "Can not find $file"
-                    [ "$file" = "runtest" ] && echo "    - 'runtest' is only needed for running tests and is part of Dejagnu"
-                else
-                    $file --version | grep -i version
-                fi
-            done
-            echo "SHELL = $SHELL"
+            echo "   SHELL = $SHELL"
             echo "Done checking for prerequisites"
             exit 0
             ;;
@@ -87,16 +108,9 @@ do
             echo "Verbose output"
             ;;
         t)
-            RUN=`runtest --help 2>/dev/null | wc -l`
-            if [ "$RUN" -gt 1 ] ; then
-                CHECK_ON_SIMULATOR=1
-                echo "Running tests on simulator"
-            else
-                echo "Can't find dejagnu's runtest"
-                exit 1
-            fi
+            CHECK_ON_SIMULATOR=1
             ;;
-        r) 
+        r)
             if [ ! -d $OPTARG ] ; then
                 echo "Can't find old test results in $OPTARG"
                 exit 1
@@ -107,60 +121,12 @@ do
             SKIP_ELF=true
             ;;
         T)
-            RUN=`runtest --help 2>/dev/null | wc -l`
-            if [ "$RUN" -gt 1 ] ; then
-                TARGET_IPADDR=`expr "$OPTARG" : "\([0-9]*\.[0-9]*\.[0-9]*\.[0-9]*\)"`
-                if [ "x$TARGET_IPADDR" = "x" ] ; then
-                    echo "Target ip address in wrong format"
-                    exit 1
-                else
-                    CHECK_ON_HARDWARE=1
-
-                    # TODO: Check if target board is available using
-                    #       ping, rcp and rsh.
-                    #       Check gdbserver is available on the target
-                    #       board.
-
-                    # Check if the tcp connections are recycled on both
-                    # target and host, which is needed to prevent the rsh
-                    # and rcp connection failures.
-
-                    echo -n "Checking /proc/sys/net/ipv4/tcp_tw_recycle on host ... "
-                    RUN=`cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
-                    if [ "x$RUN" == "x" ] ; then
-                        echo "NOT exist"
-                        echo "   Your host kernel does NOT support Sysctl"
-                        exit 1
-                    fi
-                    if [ "x$RUN" == "x0" ] ; then
-                        echo "0"
-                        echo "   Please run \"echo 1 > /proc/sys/net/ipv4/tcp_tw_recycle\" as root"
-                        exit 1
-                    else
-                        echo "1"
-                    fi
-
-                    echo -n "Checking /proc/sys/net/ipv4/tcp_tw_recycle on target ... "
-                    RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
-                    if [ "x$RUN" == "x" ] ; then
-                        echo "NOT exist"
-                        echo "   Please enable Sysctl when configure the kernel"
-                        exit 1
-                    fi
-                    if [ "x$RUN" == "x0" ] ; then
-                        echo "0. Set it to 1"
-                        rsh -l root $TARGET_IPADDR echo 1 \> /proc/sys/net/ipv4/tcp_tw_recycle
-                    else
-                        echo "1"
-                    fi
-
-                    echo "Running tests on hardware"
-                    echo "Target board IP address is $TARGET_IPADDR"
-                fi
-            else
-                echo "Can't find dejagnu's runtest"
+            TARGET_IPADDR=`expr "$OPTARG" : "\([0-9]*\.[0-9]*\.[0-9]*\.[0-9]*\)"`
+            if [ "x$TARGET_IPADDR" = "x" ] ; then
+                echo "Target ip address in wrong format"
                 exit 1
             fi
+            CHECK_ON_HARDWARE=1
             ;;
 
         s)
@@ -252,42 +218,43 @@ do
         X)
             WITHOUT_X=true
             ;;
-        a)
-            SILICON_TYPE=$OPTARG
-            ;;
-        e)
-            SILICON_VERSION=$OPTARG
+        f)
+            STACK_CHECKING=true
             ;;
         h)
 # We don't document the -S option - it's for advanced users who know what
 # they are doing.  For maximum reproducibility, not using it is better.
              echo "Usage : $APP_NAME -s SOURCE [-b BUILD]
--p               Check prerequisites
--d               Date Stamp all output files
--t               Test components on simulator
--T TARGET_IPADDR Test components on hardware
--r RESULTS_DIR   Compare current tests to old results
--s SOURCE        Toolchain Source directory (builds bfin-elf-gcc)
--k SOURCE        Kernel Source directory    (builds bfin-uclinux-gcc)
--K SOURCE        Kernel Header directory (may be specified instead of source)
--u SOURCE        Uboot Source directory
--b BUILD         Build directory (leave blank to use current dir)
--o OUTPUT        Output directory prefix (leave blank to use build dir)
--O OUTPUT        Output directory (leave blank to use build dir)
--S               Skip building elf toolchain (check to see if already built)
--m MAKE          Default make (leave blank to use system make)
--j NUM           Pass -j NUM to make
 -B BINUTILS_VER  Binutils version (default 2.17).  Can be given once.
--c GCC_VERSION   GCC version (default 4.1).  Can be given multiple times.
--H HOST          Build toolchain to run on HOST.
--l LANGS         Only build specified gcc languages.
+-b BUILD         Build directory (leave blank to use current dir)
 -C FILE          Use FILE as uClibc config file, rather than the default.
--X               Disable all graphical utilities
+-c GCC_VERSION   GCC version (default 4.1).  Can be given multiple times.
+-d               Date Stamp all output files
+-f               Add stack checking to all tests
+-h               Help
+-H HOST          Build toolchain to run on HOST.
+-j NUM           Pass -j NUM to make (default is 2x num of CPUs)
+-K SOURCE        Kernel Header directory (may be specified instead of source)
+-k SOURCE        Kernel Source directory    (builds bfin-uclinux-gcc)
+-l LANGS         Only build specified gcc languages.
+-m MAKE          Default make (leave blank to use system make)
+-O OUTPUT        Output directory (leave blank to use build dir)
+-o OUTPUT        Output directory prefix (leave blank to use build dir)
+-p               Check prerequisites
+-r RESULTS_DIR   Compare current tests to old results
+-s SOURCE        Toolchain Source directory (builds bfin-elf-gcc)"
+# -S               Skip building elf compiler - don't print this out
+echo "-T TARGET_IPADDR Test components on hardware
+-t               Test components on simulator
+-u SOURCE        Uboot Source directory
 -v               Verbose
--h               Help"
+-w               Warnings to be sent to a different log file
+-X               Disable all graphical utilities
+"
              exit 0
              ;;
         *)
+             echo "unknown option $parameter"
              echo "Try \`$APP_NAME -h' for more information."
              exit 1
     esac
@@ -323,6 +290,13 @@ export MAKEFLAGS="-j$NUM_JOBS $MAKEFLAGS"
 echo "Utilizing make: $MAKE $MAKEFLAGS"
 
 ############ Check and error if I can't find the things I need #
+
+if [ $CHECK_ON_HARDWARE ] ; then
+    PREREQ_FILE=${PREREQ_FILE}${PREREQ_HW_TEST}
+fi
+if [ $CHECK_ON_SIMULATOR -o $CHECK_ON_HARDWARE ] ; then
+    PREREQ_FILE=${PREREQ_FILE}${PREREQ_HW_SIM_TESTS}
+fi
 
 for PREREQ in $PREREQ_FILE $MAKE
 do
@@ -468,7 +442,7 @@ if [ $CHECK_ON_SIMULATOR ] ; then
         rm -rf $DIR_TEST_SIM_RESULTS/*
     fi
     echo "  on simulator: $DIR_TEST_SIM_RESULTS"
-    if [ $RESULTS2COMPARE ] ; then
+    if [ -n "$RESULTS2COMPARE" ] ; then
         if [ ! -d $RESULTS2COMPARE/simulator ] ; then
             echo "Can't find simulator results in $RESULTS2COMPARE/simulator"
             exit 1
@@ -485,11 +459,27 @@ if [ $CHECK_ON_SIMULATOR ] ; then
 fi
 
 if [ $CHECK_ON_HARDWARE ] ; then
+    # stop if there are any Xvfb or rsh processes, which might be lurking around from old runs
+    RUN=`ps aux | grep Xvfb | grep -v grep | wc -l`
+    if [ $RUN -gt 0 ] ; then
+        echo "Found $RUN old Xvfb process(s), before I can run, you should kill them"
+        echo " so the hardware tests don't get confused"
+        ps aux | grep Xvfb | grep -v grep
+        exit 1
+    fi
+    RUN=`ps aux | grep rsh | grep -v grep | wc -l`
+    if [ $RUN -gt 0 ] ; then
+        echo "Found $RUN old rsh process(s), before I can run, you should kill them"
+        echo " so the hardware tests don't get confused"
+        ps aux | grep rsh | grep -v grep
+        exit 1
+    fi
+
     if [ $DATE_STAMP ] ; then
-        DIR_TEST_HW_RESULTS=$DIR_TEST_RESULTS/hardware-$TIMESTAMP
+        DIR_TEST_HW_RESULTS=$DIR_TEST_RESULTS/hardware-flat-$TIMESTAMP
         DIR_TEST_HW2_RESULTS=$DIR_TEST_RESULTS/hardware-fdpic-$TIMESTAMP
     else
-        DIR_TEST_HW_RESULTS=$DIR_TEST_RESULTS/hardware
+        DIR_TEST_HW_RESULTS=$DIR_TEST_RESULTS/hardware-flat
         DIR_TEST_HW2_RESULTS=$DIR_TEST_RESULTS/hardware-fdpic
     fi
     if [ ! -d $DIR_TEST_HW_RESULTS ] ; then
@@ -502,8 +492,80 @@ if [ $CHECK_ON_HARDWARE ] ; then
     else
         rm -rf $DIR_TEST_HW2_RESULTS/*
     fi
-    echo "  on hardware: $DIR_TEST_HW_RESULTS, $DIR_TEST_HW2_RESULTS"
-    if [ $RESULTS2COMPARE ] ; then
+    echo "  on hardware ($TARGET_IPADDR): $DIR_TEST_HW_RESULTS, $DIR_TEST_HW2_RESULTS"
+
+    # Check if target board is available using ping, rcp and rsh.
+    RUN=`ping -n -c 1 $TARGET_IPADDR | grep -i Unreachable`
+    if [ "x$RUN" != "x" ] ; then
+        echo "Could not ping $TARGET_IPADDR - check network settings"
+        exit 1
+    fi
+    RUN=`rsh -l root $TARGET_IPADDR /bin/ls 2>/dev/null | wc -l`
+    if [ $RUN -eq 0 ] ; then
+        echo "Can't rsh to $TARGET_IPADDR, check rsh client on host, and inet on target"
+        exit 1
+    fi
+    RUN=`rcp root@$TARGET_IPADDR:/bin/gdbserver $DIR_TEST_HW_RESULTS/gdbserver`
+    if [ "x$RUN" != "x" ] ; then
+        echo "Check gdbserver is available on the target, and you can rcp"
+        exit 1
+    fi
+    if [ -f $DIR_TEST_HW_RESULTS/gdbserver ] ; then
+        rm -f $DIR_TEST_HW_RESULTS/gdbserver
+    fi
+
+    # Check if the tcp connections are recycled on both
+    # target and host, which is needed to prevent the rsh
+    # and rcp connection failures.
+
+    echo -n "    checking host   /proc/sys/net/ipv4/tcp_tw_recycle : "
+    RUN=`cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
+    if [ "x$RUN" == "x" ] ; then
+        echo "NOT exist"
+        echo "   Your host kernel does NOT support Sysctl"
+        exit 1
+    fi
+    if [ "x$RUN" == "x0" ] ; then
+        echo "0"
+        echo "   Please run \"echo 1 > /proc/sys/net/ipv4/tcp_tw_recycle\" as root"
+        exit 1
+    else
+        echo "1 - looks OK"
+    fi
+
+    echo -n "    checking target /proc/sys/net/ipv4/tcp_tw_recycle : "
+    RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
+    if [ "x$RUN" == "x" ] ; then
+        echo "NOT exist"
+        echo "   Please enable Sysctl when configure the kernel"
+        exit 1
+    fi
+    if [ "x$RUN" == "x0" ] ; then
+       echo -n "0. setting to 1 "
+       rsh -l root $TARGET_IPADDR echo 1 \> /proc/sys/net/ipv4/tcp_tw_recycle
+       RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
+       if [ "x$RUN" == "x0" ] ; then
+	   echo "Failure"
+           echo "Could not set target $TARGET_IPADDR /proc/sys/net/ipv4/tcp_tw_recycle to 1"
+           exit 1
+       else
+           echo "Sucess"
+       fi
+    else
+        echo "1 - looks OK"
+    fi
+
+    RUN=`rsh -l root $TARGET_IPADDR cat /proc/cpuinfo | grep vendor_id | awk -F: '{print $2}' | sed 's/^ *//'`
+    if [ "$RUN" != "Analog Devices" ] ; then
+        echo "Target $TARGET_IPADDR doesn't appear to be a Blackfin - sorry"
+        exit 1
+    fi
+    CPU_TYPE_REV=`rsh -l root $TARGET_IPADDR cat /proc/cpuinfo | grep model | awk '{print $4}' | sed 's/ADSP-//' | sed 's/BF/bf/'`
+    RUN=`rsh -l root $TARGET_IPADDR cat /proc/cpuinfo | grep stepping | awk '{print $3}'`
+    CPU_TYPE_REV=${CPU_TYPE_REV}-0.${RUN}
+    echo "    Target $TARGET_IPADDR is $CPU_TYPE_REV, using that for testing multilib"
+
+    if [ -n "$RESULTS2COMPARE" ] ; then
         if [ ! -d $RESULTS2COMPARE/hardware ] ; then
             echo "Can't find hardware results in $RESULTS2COMPARE/hardware"
             exit 1
@@ -516,6 +578,9 @@ if [ $CHECK_ON_HARDWARE ] ; then
                 exit 1
             fi
         done
+    fi
+    if [ $STACK_CHECKING ] ; then
+        echo "    Hardware tests will be compiled with optional stack overflow checking"
     fi
 fi
 
@@ -544,6 +609,16 @@ esac
 if [ -n "${WITHOUT_X}" ] ; then
     BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-gdbtk"
 fi
+
+for GCC_VER in $GCC_VERSIONS; do
+    echo -n "Path to gcc-${GCC_VER} dir         "
+    if [ -d $DIR_SOURCE/gcc-$GCC_VER ] ; then
+        echo $DIR_SOURCE/gcc-$GCC_VER
+    else
+        echo missing
+        exit 1
+    fi
+done
 
 echo -n "Path to elf2flt dir         "
 DIR_ELF2FLT_SOURCE=$DIR_SOURCE/elf2flt
@@ -678,36 +753,66 @@ export PATH=$NEW_PATH:/$DIR_ELF_OUTPUT/bin:/$DIR_uC_OUTPUT/bin:/$DIR_LINUX_OUTPU
 # Some helpful functions
 die_with_log ()
 {
-    echo "Build error.  Last logfile entries:"
+    echo -n " Build error " ; date
+    echo " Last logfile entries:"
     tail -10 $ACTUAL_LOGFILE
     exit 1
 }
 
+change_dir()
+{
+    (echo "echo -e '###\ntrying to change into $1' $LOGFILE" ) | sh
+    cd $1
+    (echo "echo -e 'PWD = $PWD\n###\n' $LOGFILE" ) | sh
+}
+
+echo_date()
+{
+    echo -n "*** "
+    i=`echo ${#1}`
+    if [ $i -gt 44 ] ; then
+        j=39
+        while [ "${1:$j:1}" != " " -a $j -gt 0 ]
+        do
+            j=`expr $j - 1`
+        done
+        k=$j
+        echo -n "${1:0:$j}"
+    else
+        echo -n "$1"
+        j=$i
+    fi
+    while [ $j -lt 45 ]
+    do
+      echo -n " "
+      j=`expr $j + 1`
+    done
+    date
+    if [ $j -lt $i ] ; then
+        echo "   ${1:$k}"
+    fi
+
+    (echo "echo -e '###\n$1\n' $LOGFILE" ) | sh
+}
+
 build_gcc ()
 {
-    echo -n "Path to gcc dir             "
     DIR_GCC_SOURCE=$DIR_SOURCE/gcc-$1
-    echo $DIR_GCC_SOURCE
 
     DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$1
     rm -rf $DIR_GCC_BUILD
     mkdir $DIR_GCC_BUILD
 
-    if [ ! -d $DIR_GCC_SOURCE ] ; then
-        echo "Can't find gcc source at $DIR_GCC_SOURCE"
-        exit 1
-    fi
-
     rm -f $DIR_GCC_SOURCE/newlib
     rm -f $DIR_GCC_SOURCE/libgloss
 
     if [ $2 = "elf" ]; then
-        echo "*** Linking files from $DIR_BINUTILS_SOURCE/newlib to $DIR_GCC_SOURCE"
+        echo_date "Linking newlib and libgloss"
         ln -snf $DIR_BINUTILS_SOURCE/newlib $DIR_GCC_SOURCE/
         ln -snf $DIR_BINUTILS_SOURCE/libgloss $DIR_GCC_SOURCE/
         # check to make sure the copies were made
-        if [ ! -d $DIR_GCC_SOURCE/newlib ] ; then
-            echo "*** ERROR : can not link in $DIR_GCC_SOURCE"
+        if [ ! -d $DIR_GCC_SOURCE/newlib -o ! -d $DIR_GCC_SOURCE/libgloss ] ; then
+            echo "*** ERROR : can not link newlib or libgloss in $DIR_GCC_SOURCE"
             echo -n "*** ERROR : running as user "
             whoami
             ls -ld $DIR_GCC_SOURCE
@@ -718,9 +823,9 @@ build_gcc ()
         EXTRA_GCC_CONF=""
     fi
 
-    cd $DIR_GCC_BUILD
+    change_dir $DIR_GCC_BUILD
 
-    echo -n "*** Configuring GCC                " ; date
+    echo_date "Configuring GCC"
     RUN="$DIR_GCC_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-$2 \
       --prefix=$3 $4 --disable-libstdcxx-pch $BFIN_LANGS $EXTRA_GCC_CONF \
       --disable-symvers --disable-libssp \
@@ -729,7 +834,7 @@ build_gcc ()
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
-    echo -n "*** Building GCC                   " ; date
+    echo_date "Building GCC"
     RUN="$MAKE"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
@@ -753,7 +858,7 @@ build_gcc ()
         fi
     done
 
-    echo -n "*** Installing GCC                 " ; date
+    echo_date "Installing GCC"
     RUN="$MAKE -j1 install"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
@@ -796,7 +901,6 @@ build_gcc ()
 }
 
 # If $1 is newer than $2, return 1. Otherwise, return 0.
-
 is_newer ()
 {
     MAJOR1=`echo $1 | sed 's/\([0-9]*\).*/\1/'`
@@ -828,7 +932,6 @@ is_newer ()
 }
 
 # If $1 is compatible with $2, return 1. Otherwise, return 0.
-
 is_compat ()
 {
     MAJOR1=`echo $1 | sed 's/\([0-9]*\).*/\1/'`
@@ -891,7 +994,7 @@ install_libstdcpps ()
 	    fi
 	done
 
-	echo "Installing shared libstdc++ from $NEWEST_GCC"
+	echo_date "Installing shared libstdc++"
 
 	MULTILIBS=`$NEWEST_GCC --print-multi-lib`
 
@@ -912,13 +1015,18 @@ install_libstdcpps ()
 	    LIBSTDCPP_VERSION=`echo $LIBSTDCPP_NAME | sed 's/libstdc++.so.\([0-9]*.[0-9]*.[0-9]*\).*/\1/'`
 	    MAJOR_NUM=`echo $LIBSTDCPP_VERSION | sed 's/\([0-9]*\).*/\1/'`
 
-	    cp $LIBSTDCPP $1/$2/runtime/$dir/lib
-	    ln -s $LIBSTDCPP_NAME $1/$2/runtime/$dir/lib/libstdc++.so.$MAJOR_NUM 
+	    RUN="cp $LIBSTDCPP $1/$2/runtime/$dir/lib; \
+	    ln -s $LIBSTDCPP_NAME $1/$2/runtime/$dir/lib/libstdc++.so.$MAJOR_NUM;"
+            (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+            (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
 	    for G in $COMPAT_GCCS; do
 		L=`$G $flags --print-file-name=libstdc++.so`
-		rm -f `dirname $L`/libstdc++.so*
-		ln -s ../../../../$dir2$2/runtime/$dir/lib/$LIBSTDCPP_NAME `dirname $L`/libstdc++.so
+		RUN="rm -f `dirname $L`/libstdc++.so*; \
+		ln -s ../../../../$dir2$2/runtime/$dir/lib/$LIBSTDCPP_NAME `dirname $L`/libstdc++.so;"
+                (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+                (echo $RUN $LOGFILE ; ) | sh || die_with_log
+
 	    done
 
 	done
@@ -931,7 +1039,6 @@ install_libstdcpps ()
 # 1st argument is the toolchain install directory
 # 2nd argument is the toolchain name
 # FIXME: Only libgcc_s.so.1 is handled
-
 install_libgccs ()
 {
     GCCS=`find $1 -name bfin-linux-uclibc-gcc-* | tr '\n' ' '`
@@ -956,7 +1063,7 @@ install_libgccs ()
 	fi
     done
 
-    echo "Installing libgcc_s from $NEWEST_GCC"
+    echo_date "Installing libgcc_s"
 
     MULTILIBS=`$NEWEST_GCC --print-multi-lib`
 
@@ -979,7 +1086,9 @@ install_libgccs ()
 	LIBGCC_DIR=`dirname $LIBGCC`
 	LIBGCC_NAME=`basename $LIBGCC`
 
-	cp $LIBGCC $1/$2/runtime/$dir/lib
+	RUN="cp $LIBGCC $1/$2/runtime/$dir/lib"
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
 	for G in $GCCS; do
 	    L=`$G $flags --print-file-name=libgcc_s_$dir.so`
@@ -990,87 +1099,216 @@ install_libgccs ()
 		    dir2=`echo ${dir} | sed -e 's|[^/]*|..|g'`/
 		fi
 	    fi
-	    rm -f $L*
-	    ln -s ../../../../$dir2$2/runtime/$dir/lib/$LIBGCC_NAME $L
+	    RUN="rm -f $L*;\
+	    ln -s ../../../../$dir2$2/runtime/$dir/lib/$LIBGCC_NAME $L"
+            (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+            (echo $RUN $LOGFILE ; ) | sh || die_with_log
 	done
+    done
+}
+
+# Some of the tests leave stuff all over the target file system,
+# by getting rid of it, we free up lots of memory.
+clean_hardware()
+{
+    hardware=`echo $1 | grep -i hardware`
+    if [ -n "$hardware" ] ; then
+        RUN=`rsh -l root $TARGET_IPADDR free`
+        (echo "echo -e '###\n$RUN\nCleaning\n' $LOGFILE" ) | sh
+        rsh -l root $TARGET_IPADDR "rm *" 2>/dev/null
+        rsh -l root $TARGET_IPADDR "rm /tmp/*" 2>/dev/null
+        RUN=`rsh -l root $TARGET_IPADDR free`
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+
+	# Just in case we caused the kernel under test to crash, let's do a sanity test
+        # make sure syslogd is off, as it will fill /var/log/messages up with rsh/scp logs
+        RUN=`rsh -l root $TARGET_IPADDR ps | grep syslog | grep -v grep | wc -l`
+        if [ $RUN == 1 ] ; then
+            echo "    Target $TARGET_IPADDR is running syslogd - killing it"
+            rsh -l root $TARGET_IPADDR "sed  -i 's/^slog.*$//' /etc/inittab"
+            rsh -l root $TARGET_IPADDR "kill -HUP 1"
+        fi
+        RUN=`rsh -l root $TARGET_IPADDR ps | grep klog | grep -v grep | wc -l`
+        if [ $RUN == 1 ] ; then
+            echo "    Target $TARGET_IPADDR is running klogd - killing it"
+            rsh -l root $TARGET_IPADDR "sed  -i 's/^klog.*$//' /etc/inittab"
+            rsh -l root $TARGET_IPADDR "kill -HUP 1"
+        fi
+
+        #  checking target /proc/sys/net/ipv4/tcp_tw_recycle
+        RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
+        if [ "x$RUN" == "x" ] ; then
+            echo "   target /proc/sys/net/ipv4/tcp_tw_recycle does not exist"
+            echo "   Please enable Sysctl when configure the kernel"
+            exit 1
+        fi
+        if [ "x$RUN" == "x0" ] ; then
+            rsh -l root $TARGET_IPADDR echo 1 \> /proc/sys/net/ipv4/tcp_tw_recycle
+            RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
+            if [ "x$RUN" == "x0" ] ; then
+                echo "Could not set target $TARGET_IPADDR /proc/sys/net/ipv4/tcp_tw_recycle to 1"
+                exit 1
+            fi
+        fi
+        #we dump something onto the console so we can track which application caused a crash
+        rsh -l root $TARGET_IPADDR "echo > /dev/console; echo "testing $1 $2" > /dev/console"
+    fi
+
+}
+
+copy_test_results()
+{
+    for SUM in `find ./ -name "*.sum"` ; do
+        SUM=${SUM%.sum}
+        name=${SUM##*/}
+        target=""
+        # This loop builds up the target filename. based on the path, 
+        # removing names that are pointless
+        for SUBDIR in `echo $SUM | sed -e 's:^\./::' -e 's:/testsuite/:/:' -e 's/\// /g'` ; do
+            case ${SUBDIR} in *${name}*) continue;; esac
+                target=${target}${SUBDIR}-
+        done
+        target=${target}${name}
+        cp ${SUM}.sum $1/${target}-${2}.sum
+        cp ${SUM}.log $1/${target}-${2}.log
+    done
+}
+
+# The basic idea is that if things are not progressing at least every 10 minutes
+# something is hung, and we should kill it, and tell the user what was stuck
+#
+check_tests_OK()
+{
+    PID=$1
+    WAIT=0
+    # -n : numeric sort - kill the last process first
+    # -A : use ASCII, not UTF-8 or VT100
+    # -l : long lines (otherwise it cuts off at 132 char across
+    # -p : show pids of children
+    NEW=`pstree -n -A -l -p $PID`
+    KILL=99999
+    while [ 1 ]
+    do
+        OLD=$NEW
+        NEW=`pstree -n -A -l -p $PID`
+        # if the test is done - quit
+        if [ -z "$NEW" ] ; then
+            break;
+        fi
+        if [ "$NEW" == "$OLD" ] ; then
+           WAIT=`expr $WAIT + 1`
+        else
+            if [ $WAIT -gt 10 ] ; then
+                echo " ** killing process $KILL_PID, seemed to fix things"
+                echo " ** $KILL_PS"
+            fi
+            WAIT=1
+            KILL=99999
+        fi
+        if [ $WAIT -gt 10 ] ; then
+            KILL_PS=""
+            TREE=`pstree -n -A -l -p $PID | sed -e 's/-[-+]-/\n/g' -e 's/^[ \t]*//'`
+            NEW_KILL=`echo "$TREE" | wc -l`
+
+            if [ $NEW_KILL -lt $KILL ] ; then
+                # We add one, so when we subtract one below, it ends up being the correct number
+                KILL=`expr $NEW_KILL + 1`
+                echo " ** Testing $2 seems stuck, trying to kill some processes"
+            fi
+
+            # don't try to kill defunct processes - it is a waste of time
+            while [ -z "$KILL_PS" ]
+            do
+                KILL=`expr $KILL - 1`
+                if [ "$KILL" == "0" ] ; then
+                    echo "Test did not exit properly"
+                    exit 1
+                fi
+ 
+                KILL_PID=`echo "$TREE" | sed -n "${KILL}{p;q}" | awk -F\( '{print $NF}' | awk -F\) '{print $1}'`
+                KILL_PS=`ps $KILL_PID | grep -v "^[[:space:]]*PID" | grep -v " Zs.*<defunct>"`
+            done
+            kill -9 $KILL_PID
+        fi
+        sleep 60
     done
 }
 
 run_tests ()
 {
-    echo -n "***  Running tests on binutils     " ; date
-    cd $DIR_BINUTILS_BUILD/binutils
-    ( echo "$MAKE check " $LOGFILE ; ) | sh
+    clean_hardware $2 binutils
+    echo_date "Running tests on binutils"
 
-    cp $DIR_BINUTILS_BUILD/binutils/binutils.sum \
-       $1/binutils-$BINUTILS_VERSION.sum
-    cp $DIR_BINUTILS_BUILD/binutils/binutils.log \
-       $1/binutils-$BINUTILS_VERSION.log
+    change_dir $DIR_BINUTILS_BUILD
+    RUN="$MAKE -k -j 1 maybe-check-binutils maybe-check-gas maybe-check-ld"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh &
+    check_tests_OK $! binutils
 
-    echo -n "***  Running tests on gas          " ; date
-    cd $DIR_BINUTILS_BUILD/gas
-    ( echo "$MAKE check " $LOGFILE ; ) | sh
+    # make clean the gdb dir before testing since insight cannot run
+    # in the build directory. :(
+    change_dir $DIR_BINUTILS_BUILD/gdb
+    RUN="$MAKE clean"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh
 
-    cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.sum \
-       $1/gas-$BINUTILS_VERSION.sum
-    cp $DIR_BINUTILS_BUILD/gas/testsuite/gas.log \
-       $1/gas-$BINUTILS_VERSION.log
+    # Get rid of old Xvfb & rsh processes, which might be lurking around from old runs
+    RUN=`ps aux | grep Xvfb | grep -v grep | wc -l`
+    if [ $RUN -gt 0 ] ; then
+        echo "Found old Xvfb process, killing it"
+        RUN="ps aux | grep Xvfb | grep -v grep ; killall -9 Xvfb"
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh
+    fi
+    RUN=`ps aux | grep rsh | grep -v grep | wc -l`
+    if [ $RUN -gt 0 ] ; then
+        echo "Found old rsh process, killing it"
+        RUN="ps aux | grep rsh | grep -v grep ; killall -9 rsh"
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh
+    fi
 
-    echo -n "***  Running tests on gcc          " ; date
+    clean_hardware $2 gdb
+    echo_date "Running tests on gdb"
+
+    RUN="$MAKE -k -j 1 check"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh &
+    check_tests_OK $! gdb
+
+    change_dir $DIR_BINUTILS_BUILD
+    copy_test_results $1 $BINUTILS_VERSION
+
     for GCC_VERSION in $GCC_VERSIONS; do
+        clean_hardware $2 gcc
+        echo_date "Running tests on gcc $GCC_VERSION"
         DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
-        cd $DIR_GCC_BUILD/gcc
-        ( echo "$MAKE check " $LOGFILE ; ) | sh
+        change_dir $DIR_GCC_BUILD/gcc
+        RUN="$MAKE -k -j 1 check"
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh &
+        check_tests_OK $! gcc
 
-        if [ $GCC_VERSION = 3.4 ] ; then
+	clean_hardware $2 libs
+	change_dir $DIR_GCC_BUILD
+	echo_date  "Running tests on libs"
+        RUN="$MAKE -k -j 1 check-target"
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        (echo $RUN $LOGFILE ; ) | sh &
+        check_tests_OK $! libraries
 
-        cp $DIR_GCC_BUILD/gcc/testsuite/gcc.sum \
-           $1/gcc-$GCC_VERSION.sum
-        cp $DIR_GCC_BUILD/gcc/testsuite/gcc.log \
-           $1/gcc-$GCC_VERSION.log
-        cp $DIR_GCC_BUILD/gcc/testsuite/g++.sum \
-           $1/g++-$GCC_VERSION.sum
-        cp $DIR_GCC_BUILD/gcc/testsuite/g++.log \
-           $1/g++-$GCC_VERSION.log
-
-        else
-
-        cp $DIR_GCC_BUILD/gcc/testsuite/gcc/gcc.sum \
-           $1/gcc-$GCC_VERSION.sum
-        cp $DIR_GCC_BUILD/gcc/testsuite/gcc/gcc.log \
-           $1/gcc-$GCC_VERSION.log
-        cp $DIR_GCC_BUILD/gcc/testsuite/g++/g++.sum \
-           $1/g++-$GCC_VERSION.sum
-        cp $DIR_GCC_BUILD/gcc/testsuite/g++/g++.log \
-           $1/g++-$GCC_VERSION.log
-
-        fi
-
+        copy_test_results $1 ${GCC_VERSION}
     done
+    clean_hardware $2 done
 
-    echo -n "***  Running tests on gdb          " ; date
-    cd $DIR_BINUTILS_BUILD/gdb
-    # make clean before testing since insight cannot run
-    # in the build directory.
-    ( echo "$MAKE clean " $LOGFILE ; ) | sh
-    ( echo "$MAKE check " $LOGFILE ; ) | sh
+    echo_date "Done testing  - results"
 
-    cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.sum \
-       $1/gdb-$BINUTILS_VERSION-$GCC_VERSION.sum
-    cp $DIR_BINUTILS_BUILD/gdb/testsuite/gdb.log \
-       $1/gdb-$BINUTILS_VERSION-$GCC_VERSION.log
-
-
-    echo -n "***  Done testing  - results       " ; date
-
-    for FILE in gas-$BINUTILS_VERSION.sum \
-                binutils-$BINUTILS_VERSION.sum \
-                gdb-$BINUTILS_VERSION-$GCC_VERSION.sum \
-                gcc-$GCC_VERSION.sum \
-                g++-$GCC_VERSION.sum
+    for FILE in `find $1 -name "*${BINUTILS_VERSION}.sum" | sort; find $1 -name "*${GCC_VERSION}.sum" | sort`
     do
-        egrep "=== .*Sum.* ===|^# of" $1/$FILE
-        if [ $RESULTS2COMPARE ] ; then
+	echo
+	echo ${FILE##*/}
+        egrep "=== .*Sum.* ===|^# of" $FILE
+        if [ -n "$RESULTS2COMPARE" ] ; then
             if [ -f $RESULTS2COMPARE/$2/$FILE ] ; then
                 echo "Comparing $1/$FILE to $RESULTS2COMPARE/$2/$FILE"
                 $DIR_SOURCE/gcc-$GCC_VERSION/contrib/compare_tests \
@@ -1080,29 +1318,31 @@ run_tests ()
             fi
         fi
     done
+    echo
 }
 
 build_uClibc()
 {
     ARGS="V=1 CROSS=bfin-elf- DEVEL_PREFIX=/usr/ RUNTIME_PREFIX=/ ARCH_CFLAGS='-g -O2'"
-    echo -n "*** Cleaning uClibc                " ; date
+    echo_date "Cleaning uClibc"
     RUN="$MAKE clean $ARGS"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
-    echo -n "*** Building uClibc                " ; date
+    echo_date "Building uClibc"
     LOCAL=`grep "UCLIBC_HAS_LOCALE=y" .config`
     if [ -z "$LOCAL" ] ; then
-        RUN="$MAKE $ARGS"
+        # sometimes uClibc dies on parallel build, so lets build it with -j1
+        RUN="$MAKE $ARGS -j 1"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo $RUN $LOGFILE ; ) | sh || die_with_log
+        RUN=`(echo $RUN $LOGFILE ; ) | sh`
     else
-        echo -n "*** Building Locale                " ; date
+        echo_date "Building Locale"
         RUN="$MAKE headers $ARGS"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh
 
-        cd ./extra/locale
+        change_dir ./extra/locale
         RUN="$MAKE clean"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh || die_with_log
@@ -1119,14 +1359,14 @@ build_uClibc()
         RUN="$MAKE $ARGS"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh || die_with_log
-        cd ../..
+        change_dir ../..
 
         RUN="$MAKE all $ARGS"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh || die_with_log
     fi
 
-    echo -n "*** Installing uClibc              " ; date
+    echo_date "Installing uClibc"
     RUN="$MAKE install DESTDIR=$1/runtime SUFFIX=$2 $ARGS"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
@@ -1157,13 +1397,25 @@ if [ "x$CHECK_ON_SIMULATOR" != "x" -o "x$CHECK_ON_HARDWARE" != "x" ] ; then
         cp $DIR_BOARDS/bfin-sim.exp $DIR_BUILD/boards/bfin-sim.exp
     fi
     if [ $CHECK_ON_HARDWARE ] ; then
-        (cat $DIR_BOARDS/bfin-uclinux.exp.1; \
-         echo "set_board_info hostname $TARGET_IPADDR"; \
-         echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-uclinux.exp
-        (cat $DIR_BOARDS/bfin-linux-uclibc.exp.1; \
-         echo "set_board_info multilib_flags \"-mcpu=$SILICON_TYPE-$SILICON_VERSION\"";\
-         echo "set_board_info hostname $TARGET_IPADDR"; \
-         echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-linux-uclibc.exp
+        if [ $STACK_CHECKING ] ; then
+            (cat $DIR_BOARDS/bfin-uclinux.exp.1; \
+             echo "set_board_info cflags \" -mstack-check-l1 \""; \
+             echo "set_board_info hostname $TARGET_IPADDR"; \
+             echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-uclinux.exp
+            (cat $DIR_BOARDS/bfin-linux-uclibc.exp.1; \
+             echo "set_board_info cflags \" -mstack-check-l1 \""; \
+             echo "set_board_info multilib_flags \"-mcpu=$CPU_TYPE_REV\"";\
+             echo "set_board_info hostname $TARGET_IPADDR"; \
+             echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-linux-uclibc.exp
+        else
+            (cat $DIR_BOARDS/bfin-uclinux.exp.1; \
+             echo "set_board_info hostname $TARGET_IPADDR"; \
+             echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-uclinux.exp
+            (cat $DIR_BOARDS/bfin-linux-uclibc.exp.1; \
+             echo "set_board_info multilib_flags \"-mcpu=$CPU_TYPE_REV\"";\
+             echo "set_board_info hostname $TARGET_IPADDR"; \
+             echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-linux-uclibc.exp
+        fi
     fi
     (cat $DIR_BOARDS/site.exp.1; \
      echo "lappend boards_dir \"$DIR_BUILD/boards\""; \
@@ -1174,19 +1426,19 @@ fi
 if [ "x$SKIP_ELF" = "x" ]; then
 
     ################ Step 1 - ELF Toolchain #########################
-    cd $DIR_BINUTILS_BUILD
+    change_dir $DIR_BINUTILS_BUILD
 
     # Blackfin doesn't utilize xml memory maps so disable this for now
     # to avoid the ABI differences between systems
     export ac_cv_libexpat=no
 
-    echo -n "*** Configuring Elf Binutils & GDB " ; date
+    echo_date "Configuring Elf Binutils & GDB"
     RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-elf \
         --prefix=$DIR_ELF_OUTPUT --without-newlib $BINUTILS_EXTRA_CONF"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
-    echo -n "*** Building Elf Binutils & GDB    " ; date
+    echo_date "Building Elf Binutils & GDB"
     RUN="$MAKE all-binutils all-gas all-ld all-sim all-gdb"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
@@ -1239,8 +1491,8 @@ if [ "x$SKIP_ELF" = "x" ]; then
         fi
     done
 
-    cd $DIR_BINUTILS_BUILD
-    echo -n "*** Installing Elf Binutils & GDB  " ; date
+    change_dir $DIR_BINUTILS_BUILD
+    echo_date "Installing Elf Binutils & GDB"
     RUN="$MAKE install-binutils install-gas install-ld install-sim install-gdb"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
@@ -1251,8 +1503,8 @@ if [ "x$SKIP_ELF" = "x" ]; then
 
     ######################## Step 2 - build elf2flt ##############
 
-    echo -n "*** Building Elf elf2flt           " ; date
-    cd $DIR_ELF2FLT_BUILD
+    echo_date "Building Elf elf2flt"
+    change_dir $DIR_ELF2FLT_BUILD
 
     RUN="$DIR_ELF2FLT_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-elf \
          --with-libbfd=$DIR_BINUTILS_BUILD/bfd/libbfd.a               \
@@ -1268,7 +1520,7 @@ if [ "x$SKIP_ELF" = "x" ]; then
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
-    echo -n "*** Make Elf elf2flt               " ; date
+    echo_date "Make Elf elf2flt"
     RUN=$MAKE
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
@@ -1285,7 +1537,7 @@ if [ "x$SKIP_ELF" = "x" ]; then
         fi
     done
 
-    echo -n "*** Installing Elf elf2flt         " ; date
+    echo_date "Installing Elf elf2flt"
     RUN="$MAKE install"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
@@ -1331,19 +1583,19 @@ done
 
 if [ $KERNEL_SOURCE ] ; then
     if [ "$DIR_KBUILD_OUTPUT" != "$KERNEL_SOURCE" ]; then
-	echo -n "*** Configuring Linux Kernel       " ; date
+	echo_date "Configuring Linux Kernel"
 
-	cd $KERNEL_SOURCE
+	change_dir $KERNEL_SOURCE
 	RUN="$MAKE -j1 headers_check headers_install INSTALL_HDR_PATH=$DIR_KBUILD_OUTPUT/usr KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT CROSS_COMPILE=bfin-elf- ARCH=blackfin"
 	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 	(echo $RUN $LOGFILE ; ) | sh || die_with_log
 	find "$DIR_KBUILD_OUTPUT/usr" -type f -name '.check.*' -print0 | xargs -0 rm -f
-	cd ..
+	change_dir ..
     fi
 
 
     ####################### Step 3 - build uClibc ################
-    cd $UCLIBC_SOURCE
+    change_dir $UCLIBC_SOURCE
 
     if [ -n "$UCLIBC_CONFIG_FILE" ]; then
       cp $UCLIBC_CONFIG_FILE .tmp.config.provided
@@ -1361,8 +1613,7 @@ if [ $KERNEL_SOURCE ] ; then
 	suffix=`echo ${dir} | sed -e 's/\//_/g'`
 	flags=`echo ${ml} | sed -e 's/^[^;]*;//' -e 's/@/ -/g'`
 
-	echo "*** Configuring uClibc for ${dir}  "
-	echo -n "                                   " ; date
+	echo_date "Configuring uClibc for ${dir}"
 
 	if echo "${flags}" | grep -q mfdpic; then
 
@@ -1479,7 +1730,7 @@ if [ $KERNEL_SOURCE ] ; then
 
     ######################### Done with uClibc ###########################
 
-    echo -n "*** Building uClibc host utils     " ; date
+    echo_date  "Building uClibc host utils"
     RUN="$MAKE -C utils hostutils $ARGS"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     if (echo $RUN $LOGFILE ; ) | sh ; then
@@ -1501,12 +1752,12 @@ if [ $KERNEL_SOURCE ] ; then
     cp -r $DIR_KBUILD_OUTPUT/usr $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime || exit 1
 
     if [ "$DIR_KBUILD_OUTPUT" != "$KERNEL_SOURCE" ]; then
-        echo -n "*** Cleaning kernel                " ; date
+        echo_date "Cleaning kernel"
         rm -rf "$DIR_KBUILD_OUTPUT"
     fi
 
-    echo -n "*** Cleaning uClibc                " ; date
-    cd $UCLIBC_SOURCE
+    echo_date "Cleaning uClibc"
+    change_dir $UCLIBC_SOURCE
     RUN="$MAKE CROSS=bfin-elf- distclean"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
@@ -1514,25 +1765,25 @@ if [ $KERNEL_SOURCE ] ; then
     ####################### Done Step 3  #########################
 
     ####################### Step 4 - build bfin-uclinux ################
-    cd $DIR_BINUTILS_BUILD
+    change_dir $DIR_BINUTILS_BUILD
 
     # Blackfin doesn't utilize xml memory maps so disable this for now
     # to avoid the ABI differences between systems
     export ac_cv_libexpat=no
 
-    echo -n "*** Configuring uClinux Binutils & GDB" ; date
+    echo_date "Configuring uClinux Binutils & GDB"
     RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET \
          --target=bfin-uclinux --prefix=$DIR_uC_OUTPUT \
          --with-sysroot=$DIR_uC_OUTPUT/bfin-uclinux/runtime $BINUTILS_EXTRA_CONF"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
-    echo -n "*** Building uClinux Binutils & GDB   " ; date
+    echo_date "Building uClinux Binutils & GDB"
     RUN="$MAKE all-binutils all-gas all-ld all-sim all-gdb"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
-    echo -n "*** Installing uClinux Binutils & GDB " ; date
+    echo_date "Installing uClinux Binutils & GDB"
     RUN="$MAKE install-binutils install-gas install-ld install-sim install-gdb"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
@@ -1547,11 +1798,11 @@ if [ $KERNEL_SOURCE ] ; then
 
     ######################## build elf2flt ##########################
 
-    echo -n "*** Building uClinux elf2flt       " ; date
-    cd $DIR_ELF2FLT_BUILD
+    echo_date "Building uClinux elf2flt"
+    change_dir $DIR_ELF2FLT_BUILD
     touch -r . * # fix autotool timestamps
 
-    echo -n "*** Cleaning uClinux elf2flt       " ; date
+    echo_date "Cleaning uClinux elf2flt"
     RUN="$MAKE distclean "
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
@@ -1571,12 +1822,12 @@ if [ $KERNEL_SOURCE ] ; then
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
-    echo -n "*** Building uClinux elf2flt       " ; date
+    echo_date "Building uClinux elf2flt"
     RUN="$MAKE"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
-    echo -n "*** Installing uClinux elf2flt     " ; date
+    echo_date "Installing uClinux elf2flt"
     RUN="$MAKE install "
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
@@ -1584,38 +1835,38 @@ if [ $KERNEL_SOURCE ] ; then
     ####################### Test bfin-uclinux #######################
 
     if [ $CHECK_ON_HARDWARE ] ; then
-        echo "*** Testing on hardware            "
+        echo_date "Testing on hardware"
 
         # Remove all tools from build directory. Thus the installed ones
         # are tested. This way gcc will use ld wrapper provided by elf2flt.
-        cd $DIR_BINUTILS_BUILD
+        change_dir $DIR_BINUTILS_BUILD
         ( echo "$MAKE clean " $LOGFILE ; ) | sh
 
-        run_tests $DIR_TEST_HW_RESULTS hardware-fdpic
+        run_tests $DIR_TEST_HW_RESULTS hardware-flat
     fi
 
     ####################### Step 4a - build bfin-linux-uclibc ################
     rm -rf $DIR_BINUTILS_BUILD
     mkdir $DIR_BINUTILS_BUILD
-    cd $DIR_BINUTILS_BUILD
+    change_dir $DIR_BINUTILS_BUILD
 
     # Blackfin doesn't utilize xml memory maps so disable this for now
     # to avoid the ABI differences between systems
     export ac_cv_libexpat=no
 
-    echo -n "*** Configuring linux-uclibc Binutils & GDB" ; date
+    echo_date "Configuring linux-uclibc Binutils & GDB" 
     RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET \
          --target=bfin-linux-uclibc --prefix=$DIR_LINUX_OUTPUT \
          --with-sysroot=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime $BINUTILS_EXTRA_CONF"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
-    echo -n "*** Building linux-uclibc binutils    " ; date
+    echo_date  "Building linux-uclibc binutils"
     RUN="$MAKE all-binutils all-gas all-ld all-sim all-gdb"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
-    echo -n "*** Installing linux-uclibc binutils  " ; date
+    echo_date "Installing linux-uclibc binutils  "
     RUN="$MAKE install-binutils install-gas install-ld install-sim install-gdb"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
@@ -1634,23 +1885,23 @@ if [ $KERNEL_SOURCE ] ; then
     ##################### Test bfin-linux-uclibc #####################
 
     if [ $CHECK_ON_HARDWARE ] ; then
-        echo "*** Testing linux-uclibc on hw     "
+        echo_date "Testing linux-uclibc on hw"
 
         # Remove all tools from build directory. Thus the installed ones
         # are tested. This way gcc will use ld wrapper provided by elf2flt.
-        cd $DIR_BINUTILS_BUILD
+        change_dir $DIR_BINUTILS_BUILD
         ( echo "$MAKE clean " $LOGFILE ; ) | sh
 
-        run_tests $DIR_TEST_HW2_RESULTS hardware
+        run_tests $DIR_TEST_HW2_RESULTS hardware-fdpic
     fi
 
     ########################### genext2fs ########################
 
-    echo -n "*** Building uClinux genext2fs     " ; date
-    cd $DIR_GENEXT2FS_BUILD
+    echo_date "Building uClinux genext2fs"
+    change_dir $DIR_GENEXT2FS_BUILD
     touch -r . * # fix autotool timestamps
 
-    echo -n "*** Cleaning uClinux genext2fs     " ; date
+    echo_date "Cleaning uClinux genext2fs"
     RUN="$MAKE distclean "
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
@@ -1659,7 +1910,7 @@ if [ $KERNEL_SOURCE ] ; then
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
-    echo -n "*** Make uClinux genext2fs         " ; date
+    echo_date "Make uClinux genext2fs"
     RUN=$MAKE
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
@@ -1674,7 +1925,7 @@ if [ $KERNEL_SOURCE ] ; then
         fi
     done
 
-    echo -n "*** Installing uClinux genext2fs   " ; date
+    echo_date "Installing uClinux genext2fs"
     RUN="$MAKE install"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
@@ -1683,15 +1934,15 @@ if [ $KERNEL_SOURCE ] ; then
 
     ########################### cramfs ########################
 
-    echo -n "*** Building uClinux cramfs-tools  " ; date
-    cd $DIR_CRAMFS_SOURCE
+    echo_date "Building uClinux cramfs-tools"
+    change_dir $DIR_CRAMFS_SOURCE
 
-    echo -n "*** Cleaning uClinux cramfs-tools  " ; date
+    echo_date "Cleaning uClinux cramfs-tools"
     RUN="$MAKE distclean "
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
-    echo -n "*** Make uClinux cramfs-tools      " ; date
+    echo_date "Make uClinux cramfs-tools"
     RUN=$MAKE
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
@@ -1706,7 +1957,7 @@ if [ $KERNEL_SOURCE ] ; then
         fi
     done
 
-    echo -n "*** Installing uClinux cramfs-tools " ; date
+    echo_date "Installing uClinux cramfs-tools"
     RUN="$MAKE install"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
@@ -1717,15 +1968,15 @@ if [ $KERNEL_SOURCE ] ; then
 
 	######################## ldr-utils ###########################
 
-    echo -n "*** Building ldr-utils              " ; date
-    cd $DIR_LDR_UTILS_SOURCE
+    echo_date "Building ldr-utils"
+    change_dir $DIR_LDR_UTILS_SOURCE
 
-    echo -n "*** Cleaning ldr-utils              " ; date
+    echo_date "Cleaning ldr-utils"
     RUN="$MAKE clean "
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
-    echo -n "*** Make ldr-utils                  " ; date
+    echo_date "Make ldr-utils"
     RUN=$MAKE
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     if ! (echo $RUN $LOGFILE ; ) | sh ; then
@@ -1734,19 +1985,13 @@ if [ $KERNEL_SOURCE ] ; then
         DIR_LDR_UTILS_BUILD=$DIR_BUILD/ldr-utils_build
         rm -rf "$DIR_LDR_UTILS_BUILD"
         mkdir -p "$DIR_LDR_UTILS_BUILD"
-        cd "$DIR_LDR_UTILS_BUILD"
+        change_dir "$DIR_LDR_UTILS_BUILD"
         RUN="$DIR_LDR_UTILS_SOURCE/configure --prefix=/usr $BUILD_TARGET $HOST_TARGET"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh || die_with_log
         RUN=$MAKE
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh || die_with_log
     else
         DIR_LDR_UTILS_BUILD=$DIR_LDR_UTILS_SOURCE
-    fi
-
-    if [ "$CHECK_ON_SIMULATOR" = "1" ] ; then
-        echo -n "*** Checking ldr-utils              " ; date
-        RUN="$MAKE check"
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh || die_with_log
     fi
 
     for RUN in ldr
@@ -1759,7 +2004,13 @@ if [ $KERNEL_SOURCE ] ; then
         fi
     done
 
-    echo -n "*** Installing ldr-utils            " ; date
+    if [ "$CHECK_ON_SIMULATOR" = "1" ] ; then
+        echo_date "Checking ldr-utils"
+        RUN="$MAKE check"
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh || die_with_log
+    fi
+
+    echo_date "Installing ldr-utils"
     cp $DIR_LDR_UTILS_BUILD/ldr $DIR_ELF_OUTPUT/bin/bfin-elf-ldr || exit 1
     cp $DIR_LDR_UTILS_BUILD/ldr $DIR_uC_OUTPUT/bin/bfin-uclinux-ldr || exit 1
     mv $DIR_LDR_UTILS_BUILD/ldr $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-ldr || exit 1
@@ -1771,10 +2022,10 @@ if [ $KERNEL_SOURCE ] ; then
     ######################## U-Boot ##############################
 
     if [ $DIR_UBOOT ] ; then
-        echo -n "*** Building U-Boot to get Tools   " ; date
-        cd $DIR_UBOOT
+        echo_date "Building U-Boot to get Tools"
+        change_dir $DIR_UBOOT
 
-        echo -n "*** Cleaning U-Boot                " ; date
+        echo_date "Cleaning U-Boot"
         RUN="$MAKE distclean "
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh
@@ -1782,7 +2033,7 @@ if [ $KERNEL_SOURCE ] ; then
         # the actual config file here doesnt matter since we
         # just want to build the mkimage and gen_eth_addr tools
         touch include/config.mk
-        echo -n "*** Make U-Boot                    " ; date
+        echo_date "Make U-Boot"
         RUN="$MAKE tools BIN_FILES='mkimage gen_eth_addr' "
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh
@@ -1797,7 +2048,7 @@ if [ $KERNEL_SOURCE ] ; then
             fi
         done
 
-        echo -n "*** Copying U-Boot Tools           " ; date
+        echo_date "Copying U-Boot Tools"
         RUN="cp $DIR_UBOOT/tools/mkimage $DIR_uC_OUTPUT/bin/bfin-uclinux-mkimage; cp $DIR_UBOOT/tools/gen_eth_addr $DIR_uC_OUTPUT/bin/bfin-uclinux-gen_eth_addr"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh
@@ -1815,7 +2066,7 @@ if [ $KERNEL_SOURCE ] ; then
            fi
         done
 
-        echo -n "*** Cleaning U-Boot                " ; date
+        echo_date "Cleaning U-Boot"
         RUN="$MAKE distclean "
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh
@@ -1837,11 +2088,11 @@ rm -rf $DIR_ELF2FLT_BUILD
 
 if [ -e $DIR_SOURCE/libs/Makefile ] ; then
 
-    cd $DIR_SOURCE/libs
+    change_dir $DIR_SOURCE/libs
 
     MULTILIBS=`bfin-elf-gcc --print-multi-lib`
 
-    echo -n "*** Building libs                  " ; date
+    echo_date "Building libs"
 
     for ml in $MULTILIBS; do
 
@@ -1907,10 +2158,10 @@ if [ $KERNEL_SOURCE ] ; then
 
 export PATH=$DIR_uC_OUTPUT/bin:$DIR_LINUX_OUTPUT/bin:$PATH
 
-echo -n "*** Building target libbfd (flat)  " ; date
+echo_date "Building target libbfd (flat)"
 
 mkdir $DIR_BINUTILS_BUILD
-cd $DIR_BINUTILS_BUILD
+change_dir $DIR_BINUTILS_BUILD
 
 RUN="LDFLAGS=-Wl,-elf2flt \
     $DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-uclinux \
@@ -1924,16 +2175,17 @@ RUN="$MAKE all-bfd all-opcodes all-libiberty"
 (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 (echo $RUN $LOGFILE ; ) | sh
 
-echo -n "*** Installing target libbfd       " ; date
+echo_date "Installing target libbfd"
 RUN="$MAKE install-bfd install-opcodes install-libiberty"
 (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 (echo $RUN $LOGFILE ; ) | sh
 
-echo -n "*** Building target libbfd (fdpic) " ; date
+echo_date "Building target libbfd (fdpic)"
 
+change_dir ..
 rm -rf $DIR_BINUTILS_BUILD
 mkdir $DIR_BINUTILS_BUILD
-cd $DIR_BINUTILS_BUILD
+change_dir $DIR_BINUTILS_BUILD
 
 # Don't add -mfdpic to CFLAGS, since BFD tries to build a few files with the
 # host compiler.
@@ -1948,13 +2200,14 @@ RUN="$MAKE all-bfd all-opcodes all-intl all-libiberty"
 (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 (echo $RUN $LOGFILE ; ) | sh
 
-echo -n "*** Installing target libbfd       " ; date
+echo_date "Installing target libbfd"
 RUN="$MAKE install-bfd install-opcodes install-libiberty"
 (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 (echo $RUN $LOGFILE ; ) | sh
 
+change_dir ..
 rm -rf $DIR_BINUTILS_BUILD
 
 fi
 
-echo -n "*** Done                           " ; date
+echo_date "Done"
