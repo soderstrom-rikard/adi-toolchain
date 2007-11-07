@@ -768,31 +768,42 @@ change_dir()
 
 echo_date()
 {
-    echo -n "*** "
-    i=`echo ${#1}`
-    if [ $i -gt 44 ] ; then
-        j=39
-        while [ "${1:$j:1}" != " " -a $j -gt 0 ]
-        do
-            j=`expr $j - 1`
-        done
-        k=$j
-        echo -n "${1:0:$j}"
+    # if we can fit the msg on one line, then do it.  else,
+    # try and split it on word boundaries.  if all else fails,
+    # give it its own line.
+    local recurse
+    case $1 in
+        -[rR]) recurse=$1; shift;;
+    esac
+    local date=$(date)
+    local msg="$*"
+    local bytes_for_msg=$((${COLUMNS:-80} - ${#date} - 5))
+
+    if [ -n "${recurse}" ] || [ ${#msg} -le ${bytes_for_msg} ] ; then
+        local banner="***" full
+        if [ -n "${recurse}" ] ; then
+            [ ${#msg} -eq 0 ] && return 1
+            [ "${recurse}" = "-r" ] && banner="   " date=""
+        fi
+        [ ${#msg} -gt ${bytes_for_msg} ] && full=${msg} msg=""
+        printf "%s %-${bytes_for_msg}s %s\n" "${banner}" "${msg}" "${date}"
+        [ -n "${full}" ] && echo "${full}"
     else
-        echo -n "$1"
-        j=$i
-    fi
-    while [ $j -lt 45 ]
-    do
-      echo -n " "
-      j=`expr $j + 1`
-    done
-    date
-    if [ $j -lt $i ] ; then
-        echo "   ${1:$k}"
+        local split word
+        recurse="-R"
+        for word in ${msg} ; do
+            if [ $((${#split} + ${#word})) -ge ${bytes_for_msg} ] ; then
+                echo_date ${recurse} ${split} && recurse="-r"
+                split=""
+            fi
+            split="${split} ${word}"
+        done
+        echo_date ${recurse} ${split}
+        recurse=""
     fi
 
-    (echo "echo -e '###\n$1\n' $LOGFILE" ) | sh
+    [ -z "${recurse}" ] && (echo "echo -e '###\n${msg}\n' $LOGFILE" ) | sh
+    return 0
 }
 
 build_gcc ()
