@@ -786,8 +786,10 @@ echo_date()
             [ "${recurse}" = "-r" ] && banner="   " date=""
         fi
         [ ${#msg} -gt ${bytes_for_msg} ] && full=${msg} msg=""
-        printf "%s %-${bytes_for_msg}s %s\n" "${banner}" "${msg}" "${date}"
-        [ -n "${full}" ] && echo "${full}"
+        if [ -n "${msg}" ] || [ "${recurse}" = "-R" ] ; then
+            printf "%s %-${bytes_for_msg}s %s\n" "${banner}" "${msg}" "${date}"
+        fi
+        [ -n "${full}" ] && echo "   " ${full}
     else
         local split word
         recurse="-R"
