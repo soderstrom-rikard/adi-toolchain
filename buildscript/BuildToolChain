@@ -63,7 +63,7 @@ do
                     fi
                     for VER in --version -version -V
                     do
-                        tmp=`$file $VER 2>&1 | grep -ie "\<$tmp1\>" | grep -vi "option" | grep -vi "Usage" | grep -vi "\-v"`
+                        tmp=`$file $VER < /dev/null 2>&1 | grep -ie "\<$tmp1\>" | grep -vi "option" | grep -vi "Usage" | grep -vi "\-v"`
                         if [ -n "$tmp" ] ; then
                             echo "  " $tmp
                             break
@@ -75,7 +75,7 @@ do
 
                     for VER in --version -version -V
                     do
-                        tmp=`$file $VER 2>&1 | grep -ie "version " | grep -vi "option" | grep -vi "Usage" | grep -vi "\-v"`
+                        tmp=`$file $VER < /dev/null 2>&1 | grep -ie "version " | grep -vi "option" | grep -vi "Usage" | grep -vi "\-v"`
                         if [ -n "$tmp" ] ; then
                             echo "  " $tmp
                             break
@@ -85,7 +85,9 @@ do
                         continue
                     fi
 
-                    echo ***Could not find version of `which $file`
+                    echo *** Could not find version of `which $file`
+                    echo -n "*** "
+                    file `which $file`
                 fi
             done
             echo "   SHELL = $SHELL"
