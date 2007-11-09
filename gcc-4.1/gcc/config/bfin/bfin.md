@@ -512,7 +512,7 @@
   ""
   "[--SP] = %0%!"
   [(set_attr "type" "mcst")
-   (set_attr "addrtype" "preg,32bit")
+   (set_attr "addrtype" "32bit")
    (set_attr "length" "2")])
 
 (define_insn "*popsi_insn"
