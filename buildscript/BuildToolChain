@@ -48,51 +48,7 @@ while getopts b:B:c:C:dfH:hj:k:K:l:m:o:O:pr:s:StT:u:vwX parameter
 do
     case $parameter in
         p)
-            echo "Check http://gcc.gnu.org/install/prerequisites.html for more information"
-            for file in $PREREQ_FILE $PREREQ_HW_TESTS $PREREQ_HW_SIM_TESTS
-            do
-                RUN=`which -a $file 2>/dev/null| wc -w`
-                if [ $RUN -eq 0 ] ; then
-                    echo "$file: could not be found"
-                else
-                    tmp1=`echo $file | awk -F \/ '{print $NF}'`
-                    RUN=`type $tmp1 | grep "shell builtin" | wc -l`
-                    if [ $RUN -eq 1 ] ; then
-                       echo "   $file seems to be a shell builtin"
-                       continue
-                    fi
-                    for VER in --version -version -V
-                    do
-                        tmp=`$file $VER < /dev/null 2>&1 | grep -ie "\<$tmp1\>" | grep -vi "option" | grep -vi "Usage" | grep -vi "\-v"`
-                        if [ -n "$tmp" ] ; then
-                            echo "  " $tmp
-                            break
-                        fi
-                    done
-                    if [ -n "$tmp" ] ; then
-                        continue
-                    fi
-
-                    for VER in --version -version -V
-                    do
-                        tmp=`$file $VER < /dev/null 2>&1 | grep -ie "version " | grep -vi "option" | grep -vi "Usage" | grep -vi "\-v"`
-                        if [ -n "$tmp" ] ; then
-                            echo "  " $tmp
-                            break
-                        fi
-                    done
-                    if [ -n "$tmp" ] ; then
-                        continue
-                    fi
-
-                    echo *** Could not find version of `which $file`
-                    echo -n "*** "
-                    file `which $file`
-                fi
-            done
-            echo "   SHELL = $SHELL"
-            echo "Done checking for prerequisites"
-            exit 0
+            CHECK_PRE=true
             ;;
         m)
             MAKE=$OPTARG
@@ -262,6 +218,77 @@ echo "-T TARGET_IPADDR Test components on hardware
     esac
 done
 
+############ Check and error if I can't find the things I need #
+
+if [ -n "$CHECK_PRE" ] ; then
+    echo "Check http://gcc.gnu.org/install/prerequisites.html for more information"
+    for file in $PREREQ_FILE $PREREQ_HW_TESTS $PREREQ_HW_SIM_TESTS
+    do
+        RUN=`which -a $file 2>/dev/null| wc -w`
+        if [ $RUN -eq 0 ] ; then
+            echo "$file: could not be found"
+        else
+            tmp1=`echo $file | awk -F \/ '{print $NF}'`
+            RUN=`type $tmp1 | grep "shell builtin" | wc -l`
+            if [ $RUN -eq 1 ] ; then
+                echo "   $file seems to be a shell builtin"
+                continue
+            fi
+            for VER in --version -version -V
+            do
+                 tmp=`$file $VER < /dev/null 2>&1 | grep -ie "\<$tmp1\>" | grep -vi "option" | grep -vi "Usage" | grep -vi "\-v"`
+                 if [ -n "$tmp" ] ; then
+                     echo "  " $tmp
+                     break
+                 fi
+            done
+            if [ -n "$tmp" ] ; then
+                continue
+            fi
+
+            for VER in --version -version -V
+            do
+                tmp=`$file $VER < /dev/null 2>&1 | grep -ie "version " | grep -vi "option" | grep -vi "Usage" | grep -vi "\-v"`
+                if [ -n "$tmp" ] ; then
+                    echo "  " $tmp
+                    break
+                fi
+            done
+            if [ -n "$tmp" ] ; then
+                continue
+            fi
+            echo "*** Could not find version of `which $file`"
+            echo -n "*** "
+            file `which $file`
+        fi
+    done
+    echo "   SHELL = $SHELL"
+    echo "Done checking for prerequisites"
+    exit 0
+fi
+
+if [ -n "$CHECK_ON_HARDWARE" ] ; then
+    PREREQ_FILE=${PREREQ_FILE}${PREREQ_HW_TEST}
+fi
+if [ -n "$CHECK_ON_SIMULATOR" -o -n "$CHECK_ON_HARDWARE" ] ; then
+    PREREQ_FILE=${PREREQ_FILE}${PREREQ_HW_SIM_TESTS}
+fi
+
+for PREREQ in $PREREQ_FILE $MAKE
+do
+    RUN=`which -a $PREREQ | wc -w`
+    if [ $RUN -eq 0 ] ; then
+        echo "Can not find $PREREQ"
+        exit 1
+    else if [ $RUN -gt 1 ] ; then
+        echo -n "Found multiple versions of $PREREQ, using the one at "
+        which $PREREQ
+        fi
+    fi
+done
+
+############ Done checking - lets get on to building ###################3
+
 if [ -z "$GCC_VERSIONS" ]; then
     GCC_VERSIONS=4.1
 fi
@@ -290,28 +317,6 @@ if [ "$NUM_JOBS" -eq "0" ] ; then
 fi
 export MAKEFLAGS="-j$NUM_JOBS $MAKEFLAGS"
 echo "Utilizing make: $MAKE $MAKEFLAGS"
-
-############ Check and error if I can't find the things I need #
-
-if [ -n "$CHECK_ON_HARDWARE" ] ; then
-    PREREQ_FILE=${PREREQ_FILE}${PREREQ_HW_TEST}
-fi
-if [ -n "$CHECK_ON_SIMULATOR" -o -n "$CHECK_ON_HARDWARE" ] ; then
-    PREREQ_FILE=${PREREQ_FILE}${PREREQ_HW_SIM_TESTS}
-fi
-
-for PREREQ in $PREREQ_FILE $MAKE
-do
-    RUN=`which -a $PREREQ | wc -w`
-    if [ $RUN -eq 0 ] ; then
-        echo "Can not find $PREREQ"
-        exit 1
-    else if [ $RUN -gt 1 ] ; then
-        echo -n "Found multiple versions of $PREREQ, using the one at "
-        which $PREREQ
-        fi
-    fi
-done
 
 ##### Check to make sure a old version of bfin-elf is not here
 ##### Unless we are cross-compiling our toolchain, then we need the
