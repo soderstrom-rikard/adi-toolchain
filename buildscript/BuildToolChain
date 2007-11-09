@@ -464,17 +464,15 @@ if [ $CHECK_ON_HARDWARE ] ; then
     # stop if there are any Xvfb or rsh processes, which might be lurking around from old runs
     RUN=`ps aux | grep Xvfb | grep -v grep | wc -l`
     if [ $RUN -gt 0 ] ; then
-        echo "Found $RUN old Xvfb process(s), before I can run, you should kill them"
+        echo "Found $RUN old Xvfb process(s), before running, kill them"
         echo " so the hardware tests don't get confused"
-        ps aux | grep Xvfb | grep -v grep
-        exit 1
+        ps aux | grep Xvfb | grep -v grep ; killall -9 Xvfb
     fi
     RUN=`ps aux | grep rsh | grep -v grep | wc -l`
     if [ $RUN -gt 0 ] ; then
-        echo "Found $RUN old rsh process(s), before I can run, you should kill them"
+        echo "Found $RUN old rsh process(s), before running, kill them"
         echo " so the hardware tests don't get confused"
-        ps aux | grep rsh | grep -v grep
-        exit 1
+        ps aux | grep rsh | grep -v grep ; killall -9 rsh
     fi
 
     if [ $DATE_STAMP ] ; then
