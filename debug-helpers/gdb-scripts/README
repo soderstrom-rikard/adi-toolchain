@@ -1,0 +1,15 @@
+This directory contains a bunch of GDB functions to help automate/streamline
+common things debugging Blackfin code.  Some of this will work regardless of
+gdb session, while others will only work under JTAG or KGDB.
+
+You can use these in a few different ways:
+	* use the "source" command in the gdb cmdline
+	* add a "source" command to your ~/.gdbinit or $PWD/.gdbinit
+	* copy and paste them into your own files
+
+At runtime, simply use the "help" command for more info:
+	(gdb) help regs
+	Usage: regs
+	Display the common core registers in a compact format.
+
+These snippets are released into the public domain.  Do whatever you like.

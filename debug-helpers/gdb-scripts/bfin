@@ -1,0 +1,170 @@
+#
+# Misc Blackfin helper functions
+#
+
+document regs
+Usage: regs
+Display the common core registers in a compact format.
+end
+define regs
+	printf "R0: %08x %-10i  P0: %08x      RETS: %08x\n",   $r0, $r0, $p0, $rets
+	printf "R1: %08x %-10i  P1: %08x      RETI: %08x\n",   $r1, $r1, $p1, $reti
+	printf "R2: %08x %-10i  P2: %08x      RETX: %08x\n",   $r2, $r2, $p2, $retx
+	printf "R3: %08x %-10i  P3: %08x      RETE: %08x\n",   $r3, $r3, $p3, $rete
+	printf "R4: %08x %-10i  P4: %08x      RETN: %08x\n",   $r4, $r4, $p4, $retn
+	printf "R5: %08x %-10i  P5: %08x     ASTAT: %08x\n",   $r5, $r5, $p5, $astat
+	printf "R6: %08x %-10i  SP: %08x        CC: %08x\n",   $r6, $r5, $sp, $cc
+	printf "R7: %08x %-10i USP: %08x   SEQSTAT: %08x\n", $r7, $r7, $usp, $seqstat
+	printf "PC: %08x %-10i  FP: %08x    SYSCFG: %08x\n", $pc, 0,   $fp, $syscfg
+end
+
+document seqstat
+Usage: seqstat [value=$seqstat]
+Parse the bits of the seqstat [value] into the human readable definitions.
+end
+define seqstat
+	if $argc == 1
+		set $$seqstat = $arg0
+	else
+		set $$seqstat = $seqstat
+	end
+	set $$excause    = ($$seqstat & 0x2f)
+	set $$sftreset   = ($$seqstat & 0x200) >> 12
+	set $$hwerrcause = ($$seqstat & 0x7c00) >> 13
+	printf "SEQSTAT: %08x\n", $$seqstat
+	printf " EXCAUSE:    0x%x\t", $$excause
+	if $$excause >= 0x0 && $$excause <= 0xf
+		printf "(custom exception)"
+	end
+	if $$excause == 0x10
+		printf "(single step)"
+	end
+	if $$excause == 0x11
+		printf "(trace buffer full)"
+	end
+	if $$excause == 0x21
+		printf "(undef inst)"
+	end
+	if $$excause == 0x22
+		printf "(illegal inst)"
+	end
+	if $$excause == 0x23
+		printf "(dcplb prot violation)"
+	end
+	if $$excause == 0x24
+		printf "(misaligned data)"
+	end
+	if $$excause == 0x25
+		printf "(unrecoverable event)"
+	end
+	if $$excause == 0x26
+		printf "(dcplb miss)"
+	end
+	if $$excause == 0x27
+		printf "(multiple dcplb hit)"
+	end
+	if $$excause == 0x28
+		printf "(emulation watchpoint)"
+	end
+	if $$excause == 0x2a
+		printf "(misaligned inst)"
+	end
+	if $$excause == 0x2b
+		printf "(icplb prot violation)"
+	end
+	if $$excause == 0x2c
+		printf "(icplb miss)"
+	end
+	if $$excause == 0x2d
+		printf "(multiple icplb hit)"
+	end
+	if $$excause == 0x2e
+		printf "(illegal use of supervisor resource)"
+	end
+	printf "\n"
+	printf " SFTRESET:   0x%x\t(last reset was ", $$sftreset
+	if $$sftreset == 0
+		printf "not "
+	end
+	printf "a software reset)\n"
+	printf " HWERRCAUSE: 0x%x\t", $$hwerrcause
+	if $$hwerrcause == 0x2
+		printf "(system mmr error)"
+	end
+	if $$hwerrcause == 0x3
+		printf "(external memory addressing error)"
+	end
+	if $$hwerrcause == 0x12
+		printf "(performance monitor overflow)"
+	end
+	if $$hwerrcause == 0x18
+		printf "(raise 5 instruction)"
+	end
+	printf "\n"
+end
+
+document reset
+Usage: reset [L1 Instruction address=0xffa00000]
+Cram the software reset code into [L1 Instruction address] and execute it.
+This will perform both a system reset and a core reset.
+end
+define reset
+	if $argc == 0
+		set $$l1 = 0xffa00000
+	else
+		set $$l1 = $arg0
+	end
+	set $$pc = $$l1
+
+	# SSYNC
+	set *(unsigned short *)($$l1) = 0x0024
+	set $$l1 += 2
+
+	#  P2.H = 0xffc0
+	set *(unsigned long  *)($$l1) = 0xffc0e14a
+	set $$l1 += 4
+
+	# P2.L = 0x100
+	set *(unsigned long  *)($$l1) = 0x0100e10a
+	set $$l1 += 4
+
+	# R0 = 0x7 (X)
+	set *(unsigned short *)($$l1) = 0x6038
+	set $$l1 += 2
+
+	# [P2] = R0
+	set *(unsigned short *)($$l1) = 0x9310
+	set $$l1 += 2
+
+	# SSYNC
+	set *(unsigned short *)($$l1) = 0x0024
+	set $$l1 += 2
+
+	# R0 = 0x0 (X)
+	set *(unsigned short *)($$l1) = 0x6000
+	set $$l1 += 2
+
+	# [P2] = R0
+	set *(unsigned short *)($$l1) = 0x9310
+	set $$l1 += 2
+
+	# SSYNC
+	set *(unsigned short *)($$l1) = 0x0024
+	set $$l1 += 2
+
+	# RAISE 0x1
+	set *(unsigned short *)($$l1) = 0x0091
+	set $$l1 += 2
+
+	# JUMP.S -0x18
+	if ($$l1 - $$pc) != 0x18
+		echo ERROR: jump.s has wrong offset
+	else
+		set $pc == $$pc
+	end
+	set *(unsigned short *)($$l1) = 0x2ff4
+	set $$l1 += 2
+
+	printf "Continuing.\n"
+	continue
+end

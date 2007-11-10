@@ -1,0 +1,125 @@
+#
+# Provide U-Boot-style functions in gdb
+#
+
+document md
+Usage: md <unit type> <address> [count=64]
+Display [count] <unit type> starting at <address>.
+end
+define md
+	if $argc == 2
+		x/64x$arg0 $arg1
+	else
+		if $argc == 3
+			x/$arg2x$arg0 $arg1
+		else
+			help md
+		end
+	end
+end
+
+define _md
+	# dummy func for "document" to work
+end
+document _md
+Usage: md[cbwl] <address> [count=64]
+Display [count] <chars|bytes|words|longs> starting at <address>.
+end
+
+define mdb
+	if $argc == 1
+		md b $arg0
+	else
+		if $argc == 2
+			md b $arg0 $arg1
+		else
+			help _md
+		end
+	end
+end
+define mdw
+	if $argc == 1
+		md h $arg0
+	else
+		if $argc == 2
+			md h $arg0 $arg1
+		else
+			help _md
+		end
+	end
+end
+define mdl
+	if $argc == 1
+		md w $arg0
+	else
+		if $argc == 2
+			md w $arg0 $arg1
+		else
+			help _md
+		end
+	end
+end
+define mdc
+	if $argc == 1
+		md c $arg0
+	else
+		if $argc == 2
+			md c $arg0 $arg1
+		else
+			help _md
+		end
+	end
+end
+
+
+#
+# U-Boot style memory modify functions
+#
+
+define _mw
+	# dummy func for "document" to work
+end
+document _mw
+Usage: mw[bwl] <address> <value> <count>
+Set <count> <bytes|words|longs> at <address> to <value>.
+end
+
+define mwl
+	if $argc == 3
+		set $$addr  = $arg0
+		set $$val   = $arg1
+		set $$count = $arg2
+		while $$count-- > 0
+			set *(unsigned long *)($$addr) = $$val
+			set $$addr += 4
+		end
+	else
+		help _mw
+	end
+end
+define mww
+	if $argc == 3
+		set $$addr  = $arg0
+		set $$val   = $arg1
+		set $$count = $arg2
+		while $$count-- > 0
+			set *(unsigned short *)($$addr) = $$val
+			set $$addr += 2
+		end
+	else
+		help _mw
+	end
+end
+define mwb
+	if $argc == 3
+		set $$addr  = $arg0
+		set $$val   = $arg1
+		set $$count = $arg2
+		while $$count-- > 0
+			set *(unsigned char *)($$addr) = $$val
+			set $$addr += 1
+		end
+	else
+		help _mw
+	end
+end
