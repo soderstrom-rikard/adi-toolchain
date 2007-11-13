@@ -453,13 +453,13 @@ fi
 ############ ABSOLUTE PATH TO BUILD DIRECTORIES ################
 
 if [ $DIR_BUILD ] ; then
-    if [ -d $DIR_BUILD ] ; then
+    if [ -d /.$DIR_BUILD ] ; then
         echo -n "Build will be done in       "
         echo $DIR_BUILD
     else
         mkdir -p $DIR_BUILD
         if [ ! -d /.$DIR_BUILD ] ; then
-            echo "Invalid Build Path"
+            echo "Invalid Build Path, must be relative to the root dir"
             exit 1
         fi
     fi
@@ -474,14 +474,20 @@ mk_output_dir()
     echo $2
     if [ ! -d $2 ] ; then
         mkdir -p $2
-        if [ ! -d $2 ] ; then
-            echo "Invalid output directory"
+        if [ ! -d /.$2 ] ; then
+            echo "Invalid output directory, must be relative to the root dir"
             exit 1
         fi
-    else if [ x$3 = "x" ]; then
-        echo "$2 already exists - cleaning"
-        rm -rf $2/*
-    fi
+    else
+        if [ ! -d /.$2 ] ; then
+            echo "Invalid Output Path, must be relative to the root dir"
+            exit 1
+        fi
+
+        if [ "x$3" = "x" ]; then
+            echo "$2 already exists - cleaning"
+            rm -rf $2/*
+        fi
     fi
 }
 
