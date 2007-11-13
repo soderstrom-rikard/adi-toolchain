@@ -289,7 +289,13 @@ if [ -n "$CHECK_PRE" ] ; then
     do
         RUN=`which -a $file 2>/dev/null| wc -w`
         if [ $RUN -eq 0 ] ; then
-            echo "$file: could not be found"
+            echo "!! $file: could not be found"
+            for tmp in $PREREQ_FILE
+            do
+                if [ "$file" == "$tmp" ]; then
+                    echo "!! you need to install package which includes ${file} before building the toolchain will be sucessful"
+                fi
+            done
         else
             tmp1=`echo $file | awk -F \/ '{print $NF}'`
             RUN=`type $tmp1 | grep "shell builtin" | wc -l`
@@ -320,8 +326,8 @@ if [ -n "$CHECK_PRE" ] ; then
             if [ -n "$tmp" ] ; then
                 continue
             fi
-            echo "*** Could not find version of `which $file`"
-            echo -n "*** "
+            echo "** Could not find version of `which $file`"
+            echo -n "** "
             file `which $file`
         fi
     done
@@ -650,6 +656,17 @@ if [ $CHECK_ON_HARDWARE ] ; then
     if [ $STACK_CHECKING ] ; then
         echo "    Hardware tests will be compiled with optional stack overflow checking"
     fi
+
+    RUN=`rsh -l root $TARGET_IPADDR "ps | grep syslog | grep -v grep | grep -v \"l 6\" | wc -l"`
+    if [ $RUN == 1 ] ; then
+        echo "    Board at ${TARGET_IPADDR} being set so syslog doesn't fill /var/log/messages"
+        rsh -l root $TARGET_IPADDR "sed -i 's/^slog.*$/slog:unknown:\/sbin\/syslogd -n -l 6/' /etc/inittab"
+        rsh -l root $TARGET_IPADDR "kill -HUP 1"
+    fi
+    rcp root@$TARGET_IPADDR:/var/log/messages $DIR_TEST_RESULTS/messages.boot
+    rsh -l root $TARGET_IPADDR "rm /var/log/messages"
+    rsh -l root $TARGET_IPADDR "touch /var/log/messages"
+    rsh -l root $TARGET_IPADDR "kill -HUP 1"
 fi
 
 echo -n "Path to binutils dir        "
@@ -1202,17 +1219,10 @@ clean_hardware()
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 
 	# Just in case we caused the kernel under test to crash, let's do a sanity test
-        # make sure syslogd is off, as it will fill /var/log/messages up with rsh/scp logs
-        RUN=`rsh -l root $TARGET_IPADDR ps | grep syslog | grep -v grep | wc -l`
+        # make sure syslogd is set to not log rsh/rcp as it will fill /var/log/messages
+        RUN=`rsh -l root $TARGET_IPADDR "ps | grep syslog | grep -v grep | grep -v \"l 6\" | wc -l"`
         if [ $RUN == 1 ] ; then
-            echo "    Target $TARGET_IPADDR is running syslogd - killing it"
-            rsh -l root $TARGET_IPADDR "sed  -i 's/^slog.*$//' /etc/inittab"
-            rsh -l root $TARGET_IPADDR "kill -HUP 1"
-        fi
-        RUN=`rsh -l root $TARGET_IPADDR ps | grep klog | grep -v grep | wc -l`
-        if [ $RUN == 1 ] ; then
-            echo "    Target $TARGET_IPADDR is running klogd - killing it"
-            rsh -l root $TARGET_IPADDR "sed  -i 's/^klog.*$//' /etc/inittab"
+            rsh -l root $TARGET_IPADDR "sed -i 's/^slog.*$/slog:unknown:\/sbin\/syslogd -n -l 6/' /etc/inittab"
             rsh -l root $TARGET_IPADDR "kill -HUP 1"
         fi
 
@@ -1309,12 +1319,27 @@ check_tests_OK()
                 KILL_PID=`echo "$TREE" | sed -n "${KILL}{p;q}" | awk -F\( '{print $NF}' | awk -F\) '{print $1}'`
                 KILL_PS=`ps $KILL_PID | grep -v "^[[:space:]]*PID" | grep -v " Zs.*<defunct>"`
             done
+            ps aux > $3/${2}.kill-${KILL_PID}
             kill -9 $KILL_PID
         fi
         sleep 60
     done
+    
+    # Tests are complete - so let's copy crashes to test directory
+    hardware=`echo $3 | grep -i hardware`
+    if [ -n "$hardware" ] ; then
+        RUN=`rsh -l root $TARGET_IPADDR ps | grep syslog | grep -v grep | wc -l`
+        if [ $RUN == 1 ] ; then
+            rcp root@$TARGET_IPADDR:/var/log/messages $3/$2.kernel_log
+            rsh -l root $TARGET_IPADDR "rm /var/log/messages"
+            rsh -l root $TARGET_IPADDR "touch /var/log/messages"
+            rsh -l root $TARGET_IPADDR "kill -HUP 1"
+        fi
+    fi
+
 }
 
+# run_tests $directory_test_results_go_in name_of_test
 run_tests ()
 {
     clean_hardware $2 binutils
@@ -1324,7 +1349,7 @@ run_tests ()
     RUN="$MAKE -k -j 1 maybe-check-binutils maybe-check-gas maybe-check-ld"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh &
-    check_tests_OK $! binutils
+    check_tests_OK $! binutils $1
 
     # make clean the gdb dir before testing since insight cannot run
     # in the build directory. :(
@@ -1355,7 +1380,7 @@ run_tests ()
     RUN="$MAKE -k -j 1 check"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh &
-    check_tests_OK $! gdb
+    check_tests_OK $! gdb $1
 
     change_dir $DIR_BINUTILS_BUILD
     copy_test_results $1 $BINUTILS_VERSION
@@ -1368,7 +1393,7 @@ run_tests ()
         RUN="$MAKE -k -j 1 check"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh &
-        check_tests_OK $! gcc
+        check_tests_OK $! gcc $1
 
 	clean_hardware $2 libs
 	change_dir $DIR_GCC_BUILD
@@ -1376,7 +1401,7 @@ run_tests ()
         RUN="$MAKE -k -j 1 check-target"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh &
-        check_tests_OK $! libraries
+        check_tests_OK $! libraries $1
 
         copy_test_results $1 ${GCC_VERSION}
     done
