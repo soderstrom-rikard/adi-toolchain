@@ -84,6 +84,7 @@
 #define _BOOTROM_CRC32POLY             0xEF000032
 #define _BOOTROM_CRC32CALLBACK         0xEF000034
 #define _BOOTROM_CRC32INITCODE         0xEF000036
+#define _BOOTROM_SESR                  0xEF001000
 
 #ifndef __ASSEMBLY__
 
