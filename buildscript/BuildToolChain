@@ -2093,7 +2093,7 @@ if [ $KERNEL_SOURCE ] ; then
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     if ! (echo $RUN $LOGFILE ; ) | sh ; then
         # If simple build failed, try autotool version
-        find . | xargs touch -r . # fix autotool timestamps
+        find . -print0 | xargs -0 touch -r . # fix autotool timestamps
         DIR_LDR_UTILS_BUILD=$DIR_BUILD/ldr-utils_build
         rm -rf "$DIR_LDR_UTILS_BUILD"
         mkdir -p "$DIR_LDR_UTILS_BUILD"
