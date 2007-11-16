@@ -1060,7 +1060,7 @@ is_compat ()
 # 1st argument is the toolchain install directory
 # 2nd argument is the toolchain name
 
-install_libstdcpps ()
+install_target_libs ()
 {
     GCCS=`find $1 -name bfin-linux-uclibc-gcc-* | tr '\n' ' '`
 
@@ -1071,26 +1071,26 @@ install_libstdcpps ()
 	NEWEST_GCC=""
 
 	for GCC in $GCCS; do
-	    LIBSTDCPP=`$GCC --print-file-name=libstdc++.so`
-	    LIBSTDCPP=`readlink -f $LIBSTDCPP`
-	    LIBSTDCPP_DIR=`dirname $LIBSTDCPP`
-	    LIBSTDCPP_NAME=`basename $LIBSTDCPP`
-	    LIBSTDCPP_VERSION=`echo $LIBSTDCPP_NAME | sed 's/libstdc++.so.\([0-9]*.[0-9]*.[0-9]*\).*/\1/'`
+	    TARGET_SHLIB=`$GCC --print-file-name=$3.so`
+	    TARGET_SHLIB=`readlink -f $TARGET_SHLIB`
+	    TARGET_SHLIB_DIR=`dirname $TARGET_SHLIB`
+	    TARGET_SHLIB_NAME=`basename $TARGET_SHLIB`
+	    TARGET_SHLIB_VERSION=`echo $TARGET_SHLIB_NAME | sed s/$3.so.'\([0-9]*.[0-9]*.[0-9]*\).*/\1/'`
 	
 	    if [ -z "$NEWEST_VERSION" ]; then
-		NEWEST_VERSION=$LIBSTDCPP_VERSION
+		NEWEST_VERSION=$TARGET_SHLIB_VERSION
 		NEWEST_GCC=$GCC
 		COMPAT_GCCS=$GCC
 		continue
 	    fi
 
-	    is_compat $LIBSTDCPP_VERSION $NEWEST_VERSION
+	    is_compat $TARGET_SHLIB_VERSION $NEWEST_VERSION
 	    if [ $? -eq 1 ]; then
 		COMPAT_GCCS="$COMPAT_GCCS $GCC"
 
-		is_newer $LIBSTDCPP_VERSION $NEWEST_VERSION
+		is_newer $TARGET_SHLIB_VERSION $NEWEST_VERSION
 		if [ $? -eq 1 ]; then
-		    NEWEST_VERSION=$LIBSTDCPP_VERSION
+		    NEWEST_VERSION=$TARGET_SHLIB_VERSION
 		    NEWEST_GCC=$GCC
 		fi
 	    else
@@ -1098,7 +1098,7 @@ install_libstdcpps ()
 	    fi
 	done
 
-	echo_date "Installing shared libstdc++"
+	echo_date "Installing shared $3"
 
 	MULTILIBS=`$NEWEST_GCC --print-multi-lib`
 
@@ -1112,22 +1112,22 @@ install_libstdcpps ()
 		dir2=`echo ${dir} | sed -e 's|[^/]*|..|g'`/
 	    fi
 
-	    LIBSTDCPP=`$NEWEST_GCC $flags --print-file-name=libstdc++.so`
-	    LIBSTDCPP=`readlink -f $LIBSTDCPP`
-	    LIBSTDCPP_DIR=`dirname $LIBSTDCPP`
-	    LIBSTDCPP_NAME=`basename $LIBSTDCPP`
-	    LIBSTDCPP_VERSION=`echo $LIBSTDCPP_NAME | sed 's/libstdc++.so.\([0-9]*.[0-9]*.[0-9]*\).*/\1/'`
-	    MAJOR_NUM=`echo $LIBSTDCPP_VERSION | sed 's/\([0-9]*\).*/\1/'`
+	    TARGET_SHLIB=`$NEWEST_GCC $flags --print-file-name=$3.so`
+	    TARGET_SHLIB=`readlink -f $TARGET_SHLIB`
+	    TARGET_SHLIB_DIR=`dirname $TARGET_SHLIB`
+	    TARGET_SHLIB_NAME=`basename $TARGET_SHLIB`
+	    TARGET_SHLIB_VERSION=`echo $TARGET_SHLIB_NAME | sed s/$3.so.'\([0-9]*.[0-9]*.[0-9]*\).*/\1/'`
+	    MAJOR_NUM=`echo $TARGET_SHLIB_VERSION | sed 's/\([0-9]*\).*/\1/'`
 
-	    RUN="cp $LIBSTDCPP $1/$2/runtime/$dir/lib; \
-	    ln -s $LIBSTDCPP_NAME $1/$2/runtime/$dir/lib/libstdc++.so.$MAJOR_NUM;"
+	    RUN="cp $TARGET_SHLIB $1/$2/runtime/$dir/lib; \
+	    ln -s $TARGET_SHLIB_NAME $1/$2/runtime/$dir/lib/$3.so.$MAJOR_NUM;"
             (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
             (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
 	    for G in $COMPAT_GCCS; do
-		L=`$G $flags --print-file-name=libstdc++.so`
-		RUN="rm -f `dirname $L`/libstdc++.so*; \
-		ln -s ../../../../$dir2$2/runtime/$dir/lib/$LIBSTDCPP_NAME `dirname $L`/libstdc++.so;"
+		L=`$G $flags --print-file-name=$3.so`
+		RUN="rm -f `dirname $L`/$3.so*; \
+		ln -s ../../../../$dir2$2/runtime/$dir/lib/$TARGET_SHLIB_NAME `dirname $L`/$3.so;"
                 (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
                 (echo $RUN $LOGFILE ; ) | sh || die_with_log
 
@@ -1991,7 +1991,13 @@ if [ $KERNEL_SOURCE ] ; then
     done
     rm -f $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
 
-    install_libstdcpps $DIR_LINUX_OUTPUT bfin-linux-uclibc
+    install_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc libstdc++
+    for GCC_VERSION in $GCC_VERSIONS; do
+        if [ "$GCC_VERSION" != "3.4" ] ; then
+	    install_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc libmudflap
+	    break;
+        fi
+    done
     install_libgccs $DIR_LINUX_OUTPUT bfin-linux-uclibc
 
     ##################### Test bfin-linux-uclibc #####################
