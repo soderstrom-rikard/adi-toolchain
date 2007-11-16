@@ -254,6 +254,8 @@ extern int target_flags;
     "Don't generate PC-relative calls, use indirection"},		\
   { "fdpic",		         MASK_FDPIC,				\
     "Enable Function Descriptor PIC mode"},				\
+  { "no-fdpic",		         -MASK_FDPIC,				\
+    "Disable Function Descriptor PIC mode"},				\
   { "inline-plt",	         MASK_INLINE_PLT,			\
     "Enable inlining of PLT in function calls"},			\
   { "no-inline-plt",	         -MASK_INLINE_PLT,			\
