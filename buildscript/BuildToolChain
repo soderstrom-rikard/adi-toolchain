@@ -1995,9 +1995,14 @@ if [ $KERNEL_SOURCE ] ; then
     for GCC_VERSION in $GCC_VERSIONS; do
         if [ "$GCC_VERSION" != "3.4" ] ; then
 	    install_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc libmudflap
+	    install_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc libmudflapth
 	    break;
         fi
     done
+    TMP=`echo $BFIN_LANGS | grep fortran`
+    if [ -n "$TMP" ] ; then
+	install_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc libgfortran
+    fi
     install_libgccs $DIR_LINUX_OUTPUT bfin-linux-uclibc
 
     ##################### Test bfin-linux-uclibc #####################
