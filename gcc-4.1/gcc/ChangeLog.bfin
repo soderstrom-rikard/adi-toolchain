@@ -1,3 +1,11 @@
+2007-11-21  Jie Zhang  <jie.zhang@analog.com>
+
+	Backport
+	2007-11-17  Richard Guenther  <rguenther@suse.de>
+	PR middle-end/34130
+	* fold-const.c (extract_muldiv_1): Do not move negative
+	constants inside ABS_EXPR.
+
 2007-11-09  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (must_save_p): New function, mostly broken out of
