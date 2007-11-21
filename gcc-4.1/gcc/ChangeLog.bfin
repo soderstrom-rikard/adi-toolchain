@@ -1,5 +1,10 @@
 2007-11-21  Michael Frysinger  <michael.frysinger@analog.com>
 
+	* config/bfin/lib1funcs.asm (___divsi3, ___modsi3, ___udivsi3,
+	___umodsi3, ___umulsi3_highpart, ___smulsi3_highpart): Define .size.
+
+2007-11-21  Michael Frysinger  <michael.frysinger@analog.com>
+
 	* config/bfin/bfin-protos.h (enum bfin_cpu_type): Add
 	BFIN_CPU_BF547.
 	* config/bfin/elf.h (LIB_SPEC): Use proper linker script

@@ -56,6 +56,8 @@ ___divsi3:
 	R7 = [SP++];
         RETS = [SP++];
         RTS;
+
+.size ___divsi3, .-___divsi3
 #endif
 
 #ifdef L_modsi3	
@@ -74,6 +76,8 @@ ___modsi3:
 	R0 = R1 - R2;
 	RETS = [SP++];
         RTS; 
+
+.size ___modsi3, .-___modsi3
 #endif
 
 #ifdef L_udivsi3
@@ -102,6 +106,8 @@ ___udivsi3:
 	/* R0 is the result, R3 contains the remainder.  */
 	R0 = ~ R0;
         RTS;
+
+.size ___udivsi3, .-___udivsi3
 #endif
 
 #ifdef L_umodsi3
@@ -115,6 +121,8 @@ ___umodsi3:
 	R0 = R3;
 	RETS = [SP++]; 
 	RTS;
+
+.size ___umodsi3, .-___umodsi3
 #endif
 
 #ifdef L_umulsi3_highpart
@@ -131,6 +139,8 @@ ___umulsi3_highpart:
 	A0 += A1;
 	R0 = A0 (FU);
 	RTS;
+
+.size ___umulsi3_highpart, .-___umulsi3_highpart
 #endif
 
 #ifdef L_smulsi3_highpart
@@ -146,4 +156,6 @@ ___smulsi3_highpart:
 	A1 = A1 >>> 16;
 	R0 = (A0 += A1);
 	RTS;
+
+.size ___smulsi3_highpart, .-___smulsi3_highpart
 #endif
