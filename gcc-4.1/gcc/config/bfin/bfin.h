@@ -137,6 +137,10 @@ extern int target_flags;
 	  builtin_define ("__ADSPBF548__");	\
 	  builtin_define ("__ADSPBF54x__");	\
 	  break;				\
+	case BFIN_CPU_BF547:			\
+	  builtin_define ("__ADSPBF547__");	\
+	  builtin_define ("__ADSPBF54x__");	\
+	  break;				\
 	case BFIN_CPU_BF549:			\
 	  builtin_define ("__ADSPBF549__");	\
 	  builtin_define ("__ADSPBF54x__");	\

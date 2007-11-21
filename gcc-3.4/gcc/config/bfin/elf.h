@@ -28,7 +28,8 @@ crti%O%s crtbegin%O%s crtlibid%O%s"
 	      %{mcpu=bf536*:-T bf536.ld%s}%{mcpu=bf537*:-T bf537.ld%s} \
 	      %{mcpu=bf538*:-T bf538.ld%s}%{mcpu=bf539*:-T bf539.ld%s} \
 	      %{mcpu=bf542*:-T bf542.ld%s}%{mcpu=bf544*:-T bf544.ld%s} \
-	      %{mcpu=bf548*:-T bf548.ld%s}%{mcpu=bf549*:-T bf549.ld%s} \
+	      %{mcpu=bf547*:-T bf547.ld%s}%{mcpu=bf548*:-T bf548.ld%s} \
+	      %{mcpu=bf549*:-T bf549.ld%s} \
 	      %{!mcpu=*:-T bf532.ld%s} \
 	      -T bfin-common-sc.ld%s}}"
 

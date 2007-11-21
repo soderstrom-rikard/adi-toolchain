@@ -1,3 +1,7 @@
+2007-11-21  Michael Frysinger  <michael.frysinger@analog.com>
+
+	* gcc.target/bfin/mcpu-bf547.c: New test.
+
 2007-11-21  Jie Zhang  <jie.zhang@analog.com>
 
 	Backport

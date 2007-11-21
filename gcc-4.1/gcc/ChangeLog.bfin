@@ -1,3 +1,13 @@
+2007-11-21  Michael Frysinger  <michael.frysinger@analog.com>
+
+	* config/bfin/bfin-protos.h (enum bfin_cpu_type): Add
+	BFIN_CPU_BF547.
+	* config/bfin/elf.h (LIB_SPEC): Use proper linker script
+	for bf547.
+	* config/bfin/bfin.c (bfin_cpus[]): Add bf547.
+	* config/bfin/bfin.h (Blackfin Options): Document that
+	-mcpu now accept bf547.
+
 2007-11-21  Jie Zhang  <jie.zhang@analog.com>
 
 	Backport
