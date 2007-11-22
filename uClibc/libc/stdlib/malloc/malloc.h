@@ -106,7 +106,6 @@ extern malloc_mutex_t __malloc_mmb_lock;
    to stderr, when the variable __malloc_mmb_debug is set to true. */
 #ifdef MALLOC_MMB_DEBUGGING
 # include <stdio.h>
-extern int __putc(int c, FILE *stream) attribute_hidden;
 
 extern int __malloc_mmb_debug;
 # define MALLOC_MMB_DEBUG(indent, fmt, args...)				      \
