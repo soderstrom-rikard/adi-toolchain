@@ -1404,6 +1404,26 @@ run_tests ()
 	clean_hardware $2 libs
 	change_dir $DIR_GCC_BUILD
 	echo_date  "Running tests on libs"
+        # Make sure all the libs are actually on the target, 
+        # if we are testing on the hardware
+        RUN=`echo $2 | grep hardware`
+
+        if [ -n "$RUN" ] ; then
+            for LIB in $(find ./ -name "*.so") $(find ./ -name "*.so.*")
+            do
+                link=`file ${LIB} | grep "symbolic link"`
+                if [ -n "$link" ] ; then
+                    continue
+                fi
+                LIB1=`basename $LIB | sed 's/\..*$//'`
+                RUN=`rsh -l root $TARGET_IPADDR "find /lib/ -name \"${LIB1}*\""`
+                if [ -z "$RUN" ] ; then
+                    echo "  **  Could not find a version of $LIB on target - some tests may fail"
+                fi
+            done
+        fi
+
+        # start the tests
         RUN="$MAKE -k -j 1 check-target"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh &
