@@ -538,7 +538,7 @@ else
 endif
 CFLAGS += -I$(KERNEL_HEADERS)
 
-CFLAGS+=-iwithprefix include-fixed -iwithprefix include
+CFLAGS += -iwithprefix include-fixed -iwithprefix include
 
 ifneq ($(DOASSERTS),y)
 CFLAGS+=-DNDEBUG

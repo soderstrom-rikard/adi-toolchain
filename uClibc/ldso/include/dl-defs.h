@@ -176,6 +176,11 @@ typedef struct {
   ((*SIGNATURE DL_ADDR_TO_FUNC_PTR ((ADDR), (LOADADDR)))(__VA_ARGS__))
 #endif
 
+/* An alignment value for a memory block returned by _dl_malloc. */
+#ifndef DL_MALLOC_ALIGN
+# define DL_MALLOC_ALIGN (__WORDSIZE / 8)
+#endif
+
 #ifdef __UCLIBC_NO_UNDERSCORES__
 #define __C_SYMBOL_PREFIX__ ""
 #else
@@ -223,11 +228,6 @@ typedef struct {
 /* Define this if you want to use special method to map the segment.  */
 #ifndef DL_MAP_SEGMENT
 # define DL_MAP_SEGMENT(EPNT, PPNT, INFILE, FLAGS) 0
-#endif
-
-/* An alignment value for a memory block returned by _dl_malloc. */
-#ifndef DL_MALLOC_ALIGN
-# define DL_MALLOC_ALIGN (__WORDSIZE / 8)
 #endif
 
 #endif	/* _LD_DEFS_H */

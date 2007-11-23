@@ -354,5 +354,5 @@ char *_dl_find_hash_mod(const char *name, struct dyn_elf *rpnt,
 char *_dl_find_hash(const char *name, struct dyn_elf *rpnt,
 		    struct elf_resolve *mytpnt, int type_class)
 {
-  return _dl_find_hash_mod(name, rpnt, mytpnt, type_class, NULL);
+	return _dl_find_hash_mod(name, rpnt, mytpnt, type_class, NULL);
 }
