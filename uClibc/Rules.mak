@@ -343,6 +343,12 @@ ifdef ($(TARGET_ARCH),v850)
       SYMBOL_PREFIX=_
 endif
 
+ifeq ($(strip $(TARGET_ARCH)),avr32)
+       CPU_CFLAGS-$(CONFIG_AVR32_AP7)  += -march=ap
+       CPU_CFLAGS-$(CONFIG_LINKRELAX)  += -mrelax
+       CPU_LDFLAGS-$(CONFIG_LINKRELAX) += --relax
+endif
+
 # Keep the check_gcc from being needlessly executed
 ifndef PIEFLAG
 ifneq ($(UCLIBC_BUILD_PIE),y)
