@@ -176,11 +176,11 @@ char *_dl_find_hash_mod(const char *name, struct dyn_elf *rpnt,
 
 			if (type_class & (sym->st_shndx == SHN_UNDEF))
 				continue;
-			if (_dl_strcmp(strtab + sym->st_name, name) != 0)
-				continue;
 			if (sym->st_value == 0)
 				continue;
 			if (ELF_ST_TYPE(sym->st_info) > STT_FUNC)
+				continue;
+			if (_dl_strcmp(strtab + sym->st_name, name) != 0)
 				continue;
 
 #if defined (__SUPPORT_LD_DEBUG__)
