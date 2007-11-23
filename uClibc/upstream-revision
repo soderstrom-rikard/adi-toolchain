@@ -1,1 +1,19 @@
-18119
+Merged up to 20461, excluding the following revisions for now:
+
+19341
+19342
+19343
+19344
+19345
+19346
+19347
+19386
+19857
+19879
+19880
+20096
+20097
+20099
+
+The excluded ones are the uc_malloc work and patches depending on it; I'll
+get back to that soon.
