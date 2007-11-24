@@ -847,6 +847,10 @@ die_with_log ()
     echo -n " Build error " ; date
     echo " Last logfile entries:"
     tail -10 $ACTUAL_LOGFILE
+    # Create a single file so users can email it to us,
+    # we sleep, so things can finish writing to the log file
+    sleep 1
+    tar -jhcf $DIR_LOG/config.logs.tbz2 `find $DIR_BUILD -name "config.log"` $ACTUAL_LOGFILE
     exit 1
 }
 
@@ -1227,7 +1231,7 @@ clean_hardware()
 	# Just in case we caused the kernel under test to crash, let's do a sanity test
         # make sure syslogd is set to not log rsh/rcp as it will fill /var/log/messages
         RUN=`rsh -l root $TARGET_IPADDR "ps | grep syslog | grep -v grep | grep -v \"l 6\" | wc -l"`
-        if [ $RUN == 1 ] ; then
+        if [ $RUN -eq 1 ] ; then
             rsh -l root $TARGET_IPADDR "sed -i 's/^slog.*$/slog:unknown:\/sbin\/syslogd -n -l 6/' /etc/inittab"
             rsh -l root $TARGET_IPADDR "kill -HUP 1"
         fi
