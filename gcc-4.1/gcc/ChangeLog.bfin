@@ -1,3 +1,7 @@
+2007-11-26  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/elf.h (SUBTARGET_DRIVER_SELF_SPECS): New macro.
+
 2007-11-21  Michael Frysinger  <michael.frysinger@analog.com>
 
 	* config/bfin/lib1funcs.asm (___divsi3, ___modsi3, ___udivsi3,
