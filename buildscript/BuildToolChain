@@ -358,6 +358,11 @@ done
 
 ############ Done checking - lets get on to building ###################3
 
+if [ "${WITHOUT_X}" == "true" ] ; then
+    BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-gdbtk"
+    echo "Disabling gdbtk (insight)"
+fi
+
 if [ -z "$GCC_VERSIONS" ]; then
     GCC_VERSIONS=4.1
 fi
@@ -696,10 +701,6 @@ case $HOST_TARGET in
     --host=*darwin*) BINUTILS_EXTRA_CONF="--disable-nls"; UCLIBC_HOSTUTILS="XFAIL";;
     *)               BINUTILS_EXTRA_CONF="";;
 esac
-
-if [ -n "${WITHOUT_X}" ] ; then
-    BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-gdbtk"
-fi
 
 for GCC_VER in $GCC_VERSIONS; do
     echo -n "Path to gcc-${GCC_VER} dir         "
