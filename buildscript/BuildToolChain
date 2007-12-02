@@ -107,7 +107,7 @@ do
                 TMP=`echo $OPTARG | sed {s/\,/\ /}`
                 for RUN in $TMP
                 do
-                    if [ "$RUN" == "c" ] ; then
+                    if [ "$RUN" = "c" ] ; then
                          BFIN_LANGS=" --enable-languages=$OPTARG"
                     fi
                 done
@@ -292,7 +292,7 @@ if [ -n "$CHECK_PRE" ] ; then
             echo "!! $file: could not be found"
             for tmp in $PREREQ_FILE
             do
-                if [ "$file" == "$tmp" ]; then
+                if [ "$file" = "$tmp" ]; then
                     echo "!! you need to install package which includes ${file} before building the toolchain will be sucessful"
                 fi
             done
@@ -329,6 +329,14 @@ if [ -n "$CHECK_PRE" ] ; then
             echo "** Could not find version of `which $file`"
             echo -n "** "
             file `which $file`
+            RUN=$(file `which $file`| grep -i "symbolic link" | wc -l)
+            while [ "$RUN" -gt "0" ]
+            do
+                echo -n " * "
+                file=$(file `which $file` | awk  '{print $NF}' | sed 's/`//g' | sed "s/'//g")
+                file $file
+                RUN=$(file $file | grep -i "symbolic link" | wc -l)
+            done
         fi
     done
     echo "   SHELL = $SHELL"
@@ -358,7 +366,7 @@ done
 
 ############ Done checking - lets get on to building ###################3
 
-if [ "${WITHOUT_X}" == "true" ] ; then
+if [ "${WITHOUT_X}" = "true" ] ; then
     BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-gdbtk"
     echo "Disabling gdbtk (insight)"
 fi
@@ -605,12 +613,12 @@ if [ $CHECK_ON_HARDWARE ] ; then
 
     echo -n "    checking host   /proc/sys/net/ipv4/tcp_tw_recycle : "
     RUN=`cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
-    if [ "x$RUN" == "x" ] ; then
+    if [ "x$RUN" = "x" ] ; then
         echo "NOT exist"
         echo "   Your host kernel does NOT support Sysctl"
         exit 1
     fi
-    if [ "x$RUN" == "x0" ] ; then
+    if [ "x$RUN" = "x0" ] ; then
         echo "0"
         echo "   Please run \"echo 1 > /proc/sys/net/ipv4/tcp_tw_recycle\" as root"
         exit 1
@@ -620,16 +628,16 @@ if [ $CHECK_ON_HARDWARE ] ; then
 
     echo -n "    checking target /proc/sys/net/ipv4/tcp_tw_recycle : "
     RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
-    if [ "x$RUN" == "x" ] ; then
+    if [ "x$RUN" = "x" ] ; then
         echo "NOT exist"
         echo "   Please enable Sysctl when configure the kernel"
         exit 1
     fi
-    if [ "x$RUN" == "x0" ] ; then
+    if [ "x$RUN" = "x0" ] ; then
        echo -n "0. setting to 1 "
        rsh -l root $TARGET_IPADDR echo 1 \> /proc/sys/net/ipv4/tcp_tw_recycle
        RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
-       if [ "x$RUN" == "x0" ] ; then
+       if [ "x$RUN" = "x0" ] ; then
 	   echo "Failure"
            echo "Could not set target $TARGET_IPADDR /proc/sys/net/ipv4/tcp_tw_recycle to 1"
            exit 1
@@ -669,7 +677,7 @@ if [ $CHECK_ON_HARDWARE ] ; then
     fi
 
     RUN=`rsh -l root $TARGET_IPADDR "ps | grep syslog | grep -v grep | grep -v \"l 6\" | wc -l"`
-    if [ $RUN == 1 ] ; then
+    if [ $RUN = 1 ] ; then
         echo "    Board at ${TARGET_IPADDR} being set so syslog doesn't fill /var/log/messages"
         rsh -l root $TARGET_IPADDR "sed -i 's/^slog.*$/slog:unknown:\/sbin\/syslogd -n -l 6/' /etc/inittab"
         rsh -l root $TARGET_IPADDR "kill -HUP 1"
@@ -1239,15 +1247,15 @@ clean_hardware()
 
         #  checking target /proc/sys/net/ipv4/tcp_tw_recycle
         RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
-        if [ "x$RUN" == "x" ] ; then
+        if [ "x$RUN" = "x" ] ; then
             echo "   target /proc/sys/net/ipv4/tcp_tw_recycle does not exist"
             echo "   Please enable Sysctl when configure the kernel"
             exit 1
         fi
-        if [ "x$RUN" == "x0" ] ; then
+        if [ "x$RUN" = "x0" ] ; then
             rsh -l root $TARGET_IPADDR echo 1 \> /proc/sys/net/ipv4/tcp_tw_recycle
             RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
-            if [ "x$RUN" == "x0" ] ; then
+            if [ "x$RUN" = "x0" ] ; then
                 echo "Could not set target $TARGET_IPADDR /proc/sys/net/ipv4/tcp_tw_recycle to 1"
                 exit 1
             fi
@@ -1297,7 +1305,7 @@ check_tests_OK()
         if [ -z "$NEW" ] ; then
             break;
         fi
-        if [ "$NEW" == "$OLD" ] ; then
+        if [ "$NEW" = "$OLD" ] ; then
            WAIT=`expr $WAIT + 1`
         else
             if [ $WAIT -gt 10 ] ; then
@@ -1322,7 +1330,7 @@ check_tests_OK()
             while [ -z "$KILL_PS" ]
             do
                 KILL=`expr $KILL - 1`
-                if [ "$KILL" == "0" ] ; then
+                if [ "$KILL" = "0" ] ; then
                     echo "Test did not exit properly"
                     exit 1
                 fi
@@ -1340,7 +1348,7 @@ check_tests_OK()
     hardware=`echo $3 | grep -i hardware`
     if [ -n "$hardware" ] ; then
         RUN=`rsh -l root $TARGET_IPADDR ps | grep syslog | grep -v grep | wc -l`
-        if [ $RUN == 1 ] ; then
+        if [ $RUN = 1 ] ; then
             rcp root@$TARGET_IPADDR:/var/log/messages $3/$2.kernel_log
             rsh -l root $TARGET_IPADDR "rm /var/log/messages"
             rsh -l root $TARGET_IPADDR "touch /var/log/messages"
