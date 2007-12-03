@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #Build Script - Rohit Makasana ( rohit.makasana@rrap-software.com )
 #             - Modified by Bernd Schmidt (   )
 #             - Modified by Robin Getz (rgetz@blackfin.uclinux.org)
@@ -542,6 +542,10 @@ if [ -n "$CHECK_ON_SIMULATOR" ] ; then
             echo "Can't find simulator results in $RESULTS2COMPARE/simulator"
             exit 1
         else
+            if [ ! -d /.$RESULTS2COMPARE ] ; then
+                echo "Invalid results path, must be relative to the root dir"
+                exit 1
+            fi
             echo "    checking simulator results against $RESULTS2COMPARE/simulator"
         fi
         for GCC_VERSION in $GCC_VERSIONS; do
@@ -1454,12 +1458,13 @@ run_tests ()
 	echo ${FILE##*/}
         egrep "=== .*Sum.* ===|^# of" $FILE
         if [ -n "$RESULTS2COMPARE" ] ; then
-            if [ -f $RESULTS2COMPARE/$2/$FILE ] ; then
-                echo "Comparing $1/$FILE to $RESULTS2COMPARE/$2/$FILE"
+            COMP=`basename $FILE`
+            if [ -f $RESULTS2COMPARE/$2/$COMP ] ; then
+                echo "Comparing generated $COMP to master at $RESULTS2COMPARE/$2/$COMP"
                 $DIR_SOURCE/gcc-$GCC_VERSION/contrib/compare_tests \
-                    $1/$FILE $RESULTS2COMPARE/$2/$FILE
+                    $FILE $RESULTS2COMPARE/$2/$COMP
             else
-                echo "Could not fine $RESULTS2COMPARE/$2/$FILE to compare"
+                echo "Could not find $RESULTS2COMPARE/$2/$FILE to compare"
             fi
         fi
     done
