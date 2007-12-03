@@ -1,6 +1,6 @@
-Test Run By rgetz on Sun Oct 15 20:29:58 2006
+Test Run By rgetz on Sun Dec  2 01:04:00 2007
 Target is bfin-unknown-elf
-Host   is x86_64-unknown-linux-gnu
+Host   is i686-pc-linux-gnu
 
 		=== gcc tests ===
 
@@ -8,7 +8,7 @@ Schedule of variations:
     bfin-sim
 
 Running target bfin-sim
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.c-torture/compile/compile.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.c-torture/compile/compile.exp ...
 PASS: gcc.c-torture/compile/20000105-1.c  -O0  (test for excess errors)
 PASS: gcc.c-torture/compile/20000105-1.c  -O1  (test for excess errors)
 PASS: gcc.c-torture/compile/20000105-1.c  -O2  (test for excess errors)
@@ -2183,6 +2183,40 @@ PASS: gcc.c-torture/compile/20060515-1.c  -O2  (test for excess errors)
 PASS: gcc.c-torture/compile/20060515-1.c  -O3 -fomit-frame-pointer  (test for excess errors)
 PASS: gcc.c-torture/compile/20060515-1.c  -O3 -g  (test for excess errors)
 PASS: gcc.c-torture/compile/20060515-1.c  -Os  (test for excess errors)
+PASS: gcc.c-torture/compile/20060625-1.c  -O0  (test for excess errors)
+PASS: gcc.c-torture/compile/20060625-1.c  -O1  (test for excess errors)
+PASS: gcc.c-torture/compile/20060625-1.c  -O2  (test for excess errors)
+PASS: gcc.c-torture/compile/20060625-1.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.c-torture/compile/20060625-1.c  -O3 -g  (test for excess errors)
+PASS: gcc.c-torture/compile/20060625-1.c  -Os  (test for excess errors)
+PASS: gcc.c-torture/compile/20060823-1.c  -O0  (test for excess errors)
+PASS: gcc.c-torture/compile/20060823-1.c  -O1  (test for excess errors)
+PASS: gcc.c-torture/compile/20060823-1.c  -O2  (test for excess errors)
+PASS: gcc.c-torture/compile/20060823-1.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.c-torture/compile/20060823-1.c  -O3 -g  (test for excess errors)
+PASS: gcc.c-torture/compile/20060823-1.c  -Os  (test for excess errors)
+PASS: gcc.c-torture/compile/20060904-1.c  -O0  (test for excess errors)
+PASS: gcc.c-torture/compile/20060904-1.c  -O1  (test for excess errors)
+PASS: gcc.c-torture/compile/20060904-1.c  -O2  (test for excess errors)
+PASS: gcc.c-torture/compile/20060904-1.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.c-torture/compile/20060904-1.c  -O3 -fomit-frame-pointer -funroll-loops  (test for excess errors)
+PASS: gcc.c-torture/compile/20060904-1.c  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions  (test for excess errors)
+PASS: gcc.c-torture/compile/20060904-1.c  -O3 -g  (test for excess errors)
+PASS: gcc.c-torture/compile/20060904-1.c  -Os  (test for excess errors)
+PASS: gcc.c-torture/compile/20061005-1.c  -O0  (test for excess errors)
+PASS: gcc.c-torture/compile/20061005-1.c  -O1  (test for excess errors)
+PASS: gcc.c-torture/compile/20061005-1.c  -O2  (test for excess errors)
+PASS: gcc.c-torture/compile/20061005-1.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.c-torture/compile/20061005-1.c  -O3 -g  (test for excess errors)
+PASS: gcc.c-torture/compile/20061005-1.c  -Os  (test for excess errors)
+PASS: gcc.c-torture/compile/20070121.c  -O0  (test for excess errors)
+PASS: gcc.c-torture/compile/20070121.c  -O1  (test for excess errors)
+PASS: gcc.c-torture/compile/20070121.c  -O2  (test for excess errors)
+PASS: gcc.c-torture/compile/20070121.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.c-torture/compile/20070121.c  -O3 -fomit-frame-pointer -funroll-loops  (test for excess errors)
+PASS: gcc.c-torture/compile/20070121.c  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions  (test for excess errors)
+PASS: gcc.c-torture/compile/20070121.c  -O3 -g  (test for excess errors)
+PASS: gcc.c-torture/compile/20070121.c  -Os  (test for excess errors)
 PASS: gcc.c-torture/compile/900116-1.c  -O0  (test for excess errors)
 PASS: gcc.c-torture/compile/900116-1.c  -O1  (test for excess errors)
 PASS: gcc.c-torture/compile/900116-1.c  -O2  (test for excess errors)
@@ -3961,6 +3995,12 @@ PASS: gcc.c-torture/compile/complex-3.c  -O2  (test for excess errors)
 PASS: gcc.c-torture/compile/complex-3.c  -O3 -fomit-frame-pointer  (test for excess errors)
 PASS: gcc.c-torture/compile/complex-3.c  -O3 -g  (test for excess errors)
 PASS: gcc.c-torture/compile/complex-3.c  -Os  (test for excess errors)
+PASS: gcc.c-torture/compile/compound-literal-1.c  -O0  (test for excess errors)
+PASS: gcc.c-torture/compile/compound-literal-1.c  -O1  (test for excess errors)
+PASS: gcc.c-torture/compile/compound-literal-1.c  -O2  (test for excess errors)
+PASS: gcc.c-torture/compile/compound-literal-1.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.c-torture/compile/compound-literal-1.c  -O3 -g  (test for excess errors)
+PASS: gcc.c-torture/compile/compound-literal-1.c  -Os  (test for excess errors)
 PASS: gcc.c-torture/compile/cpp-1.c  -O0  (test for excess errors)
 PASS: gcc.c-torture/compile/cpp-1.c  -O1  (test for excess errors)
 PASS: gcc.c-torture/compile/cpp-1.c  -O2  (test for excess errors)
@@ -3973,6 +4013,12 @@ PASS: gcc.c-torture/compile/cpp-2.c  -O2  (test for excess errors)
 PASS: gcc.c-torture/compile/cpp-2.c  -O3 -fomit-frame-pointer  (test for excess errors)
 PASS: gcc.c-torture/compile/cpp-2.c  -O3 -g  (test for excess errors)
 PASS: gcc.c-torture/compile/cpp-2.c  -Os  (test for excess errors)
+PASS: gcc.c-torture/compile/debugvlafunction-1.c  -O0  (test for excess errors)
+PASS: gcc.c-torture/compile/debugvlafunction-1.c  -O1  (test for excess errors)
+PASS: gcc.c-torture/compile/debugvlafunction-1.c  -O2  (test for excess errors)
+PASS: gcc.c-torture/compile/debugvlafunction-1.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.c-torture/compile/debugvlafunction-1.c  -O3 -g  (test for excess errors)
+PASS: gcc.c-torture/compile/debugvlafunction-1.c  -Os  (test for excess errors)
 UNSUPPORTED: gcc.c-torture/compile/dll.c  -O0 
 UNSUPPORTED: gcc.c-torture/compile/dll.c  -O1 
 UNSUPPORTED: gcc.c-torture/compile/dll.c  -O2 
@@ -4593,6 +4639,18 @@ PASS: gcc.c-torture/compile/pr25513.c  -O3 -fomit-frame-pointer -funroll-loops  
 PASS: gcc.c-torture/compile/pr25513.c  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions  (test for excess errors)
 PASS: gcc.c-torture/compile/pr25513.c  -O3 -g  (test for excess errors)
 PASS: gcc.c-torture/compile/pr25513.c  -Os  (test for excess errors)
+PASS: gcc.c-torture/compile/pr25514.c  -O0  (test for excess errors)
+PASS: gcc.c-torture/compile/pr25514.c  -O1  (test for excess errors)
+PASS: gcc.c-torture/compile/pr25514.c  -O2  (test for excess errors)
+PASS: gcc.c-torture/compile/pr25514.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.c-torture/compile/pr25514.c  -O3 -g  (test for excess errors)
+PASS: gcc.c-torture/compile/pr25514.c  -Os  (test for excess errors)
+PASS: gcc.c-torture/compile/pr26622.c  -O0  (test for excess errors)
+PASS: gcc.c-torture/compile/pr26622.c  -O1  (test for excess errors)
+PASS: gcc.c-torture/compile/pr26622.c  -O2  (test for excess errors)
+PASS: gcc.c-torture/compile/pr26622.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.c-torture/compile/pr26622.c  -O3 -g  (test for excess errors)
+PASS: gcc.c-torture/compile/pr26622.c  -Os  (test for excess errors)
 PASS: gcc.c-torture/compile/pr27087.c  -O0  (test for excess errors)
 PASS: gcc.c-torture/compile/pr27087.c  -O1  (test for excess errors)
 PASS: gcc.c-torture/compile/pr27087.c  -O2  (test for excess errors)
@@ -4601,6 +4659,18 @@ PASS: gcc.c-torture/compile/pr27087.c  -O3 -fomit-frame-pointer -funroll-loops  
 PASS: gcc.c-torture/compile/pr27087.c  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions  (test for excess errors)
 PASS: gcc.c-torture/compile/pr27087.c  -O3 -g  (test for excess errors)
 PASS: gcc.c-torture/compile/pr27087.c  -Os  (test for excess errors)
+PASS: gcc.c-torture/compile/pr27889.c  -O0  (test for excess errors)
+PASS: gcc.c-torture/compile/pr27889.c  -O1  (test for excess errors)
+PASS: gcc.c-torture/compile/pr27889.c  -O2  (test for excess errors)
+PASS: gcc.c-torture/compile/pr27889.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.c-torture/compile/pr27889.c  -O3 -g  (test for excess errors)
+PASS: gcc.c-torture/compile/pr27889.c  -Os  (test for excess errors)
+PASS: gcc.c-torture/compile/pr29241.c  -O0  (test for excess errors)
+PASS: gcc.c-torture/compile/pr29241.c  -O1  (test for excess errors)
+PASS: gcc.c-torture/compile/pr29241.c  -O2  (test for excess errors)
+PASS: gcc.c-torture/compile/pr29241.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.c-torture/compile/pr29241.c  -O3 -g  (test for excess errors)
+PASS: gcc.c-torture/compile/pr29241.c  -Os  (test for excess errors)
 PASS: gcc.c-torture/compile/pta-1.c  -O0  (test for excess errors)
 PASS: gcc.c-torture/compile/pta-1.c  -O1  (test for excess errors)
 PASS: gcc.c-torture/compile/pta-1.c  -O2  (test for excess errors)
@@ -4679,6 +4749,12 @@ PASS: gcc.c-torture/compile/sync-1.c  -O2  (test for excess errors)
 PASS: gcc.c-torture/compile/sync-1.c  -O3 -fomit-frame-pointer  (test for excess errors)
 PASS: gcc.c-torture/compile/sync-1.c  -O3 -g  (test for excess errors)
 PASS: gcc.c-torture/compile/sync-1.c  -Os  (test for excess errors)
+PASS: gcc.c-torture/compile/sync-2.c  -O0  (test for excess errors)
+PASS: gcc.c-torture/compile/sync-2.c  -O1  (test for excess errors)
+PASS: gcc.c-torture/compile/sync-2.c  -O2  (test for excess errors)
+PASS: gcc.c-torture/compile/sync-2.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.c-torture/compile/sync-2.c  -O3 -g  (test for excess errors)
+PASS: gcc.c-torture/compile/sync-2.c  -Os  (test for excess errors)
 PASS: gcc.c-torture/compile/trunctfdf.c  -O0  (test for excess errors)
 PASS: gcc.c-torture/compile/trunctfdf.c  -O1  (test for excess errors)
 PASS: gcc.c-torture/compile/trunctfdf.c  -O2  (test for excess errors)
@@ -4687,6 +4763,24 @@ PASS: gcc.c-torture/compile/trunctfdf.c  -O3 -fomit-frame-pointer -funroll-loops
 PASS: gcc.c-torture/compile/trunctfdf.c  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions  (test for excess errors)
 PASS: gcc.c-torture/compile/trunctfdf.c  -O3 -g  (test for excess errors)
 PASS: gcc.c-torture/compile/trunctfdf.c  -Os  (test for excess errors)
+PASS: gcc.c-torture/compile/vector-align-1.c  -O0  (test for excess errors)
+PASS: gcc.c-torture/compile/vector-align-1.c  -O1  (test for excess errors)
+PASS: gcc.c-torture/compile/vector-align-1.c  -O2  (test for excess errors)
+PASS: gcc.c-torture/compile/vector-align-1.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.c-torture/compile/vector-align-1.c  -O3 -g  (test for excess errors)
+PASS: gcc.c-torture/compile/vector-align-1.c  -Os  (test for excess errors)
+PASS: gcc.c-torture/compile/vla-const-1.c  -O0  (test for excess errors)
+PASS: gcc.c-torture/compile/vla-const-1.c  -O1  (test for excess errors)
+PASS: gcc.c-torture/compile/vla-const-1.c  -O2  (test for excess errors)
+PASS: gcc.c-torture/compile/vla-const-1.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.c-torture/compile/vla-const-1.c  -O3 -g  (test for excess errors)
+PASS: gcc.c-torture/compile/vla-const-1.c  -Os  (test for excess errors)
+PASS: gcc.c-torture/compile/vla-const-2.c  -O0  (test for excess errors)
+PASS: gcc.c-torture/compile/vla-const-2.c  -O1  (test for excess errors)
+PASS: gcc.c-torture/compile/vla-const-2.c  -O2  (test for excess errors)
+PASS: gcc.c-torture/compile/vla-const-2.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.c-torture/compile/vla-const-2.c  -O3 -g  (test for excess errors)
+PASS: gcc.c-torture/compile/vla-const-2.c  -Os  (test for excess errors)
 PASS: gcc.c-torture/compile/volatile-1.c  -O0  (test for excess errors)
 PASS: gcc.c-torture/compile/volatile-1.c  -O1  (test for excess errors)
 PASS: gcc.c-torture/compile/volatile-1.c  -O2  (test for excess errors)
@@ -4729,7 +4823,7 @@ PASS: gcc.c-torture/compile/zero-strct-5.c  -O2  (test for excess errors)
 PASS: gcc.c-torture/compile/zero-strct-5.c  -O3 -fomit-frame-pointer  (test for excess errors)
 PASS: gcc.c-torture/compile/zero-strct-5.c  -O3 -g  (test for excess errors)
 PASS: gcc.c-torture/compile/zero-strct-5.c  -Os  (test for excess errors)
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.c-torture/execute/builtins/builtins.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.c-torture/execute/builtins/builtins.exp ...
 PASS: gcc.c-torture/execute/builtins/20010124-1.c compilation,  -O0 
 PASS: gcc.c-torture/execute/builtins/20010124-1.c execution,  -O0 
 PASS: gcc.c-torture/execute/builtins/20010124-1.c compilation,  -O1 
@@ -5414,7 +5508,7 @@ PASS: gcc.c-torture/execute/builtins/vsprintf-chk.c compilation,  -O3 -g
 PASS: gcc.c-torture/execute/builtins/vsprintf-chk.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/builtins/vsprintf-chk.c compilation,  -Os 
 PASS: gcc.c-torture/execute/builtins/vsprintf-chk.c execution,  -Os 
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.c-torture/execute/execute.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.c-torture/execute/execute.exp ...
 PASS: gcc.c-torture/execute/20000112-1.c compilation,  -O0 
 PASS: gcc.c-torture/execute/20000112-1.c execution,  -O0 
 PASS: gcc.c-torture/execute/20000112-1.c compilation,  -O1 
@@ -9867,6 +9961,82 @@ PASS: gcc.c-torture/execute/20051215-1.c compilation,  -O3 -g
 PASS: gcc.c-torture/execute/20051215-1.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/20051215-1.c compilation,  -Os 
 PASS: gcc.c-torture/execute/20051215-1.c execution,  -Os 
+PASS: gcc.c-torture/execute/20060905-1.c compilation,  -O0 
+PASS: gcc.c-torture/execute/20060905-1.c execution,  -O0 
+PASS: gcc.c-torture/execute/20060905-1.c compilation,  -O1 
+PASS: gcc.c-torture/execute/20060905-1.c execution,  -O1 
+PASS: gcc.c-torture/execute/20060905-1.c compilation,  -O2 
+PASS: gcc.c-torture/execute/20060905-1.c execution,  -O2 
+PASS: gcc.c-torture/execute/20060905-1.c compilation,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/20060905-1.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/20060905-1.c compilation,  -O3 -fomit-frame-pointer -funroll-loops 
+PASS: gcc.c-torture/execute/20060905-1.c execution,  -O3 -fomit-frame-pointer -funroll-loops 
+PASS: gcc.c-torture/execute/20060905-1.c compilation,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
+PASS: gcc.c-torture/execute/20060905-1.c execution,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
+PASS: gcc.c-torture/execute/20060905-1.c compilation,  -O3 -g 
+PASS: gcc.c-torture/execute/20060905-1.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/20060905-1.c compilation,  -Os 
+PASS: gcc.c-torture/execute/20060905-1.c execution,  -Os 
+PASS: gcc.c-torture/execute/20060910-1.c compilation,  -O0 
+PASS: gcc.c-torture/execute/20060910-1.c execution,  -O0 
+PASS: gcc.c-torture/execute/20060910-1.c compilation,  -O1 
+PASS: gcc.c-torture/execute/20060910-1.c execution,  -O1 
+PASS: gcc.c-torture/execute/20060910-1.c compilation,  -O2 
+PASS: gcc.c-torture/execute/20060910-1.c execution,  -O2 
+PASS: gcc.c-torture/execute/20060910-1.c compilation,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/20060910-1.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/20060910-1.c compilation,  -O3 -fomit-frame-pointer -funroll-loops 
+PASS: gcc.c-torture/execute/20060910-1.c execution,  -O3 -fomit-frame-pointer -funroll-loops 
+PASS: gcc.c-torture/execute/20060910-1.c compilation,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
+PASS: gcc.c-torture/execute/20060910-1.c execution,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
+PASS: gcc.c-torture/execute/20060910-1.c compilation,  -O3 -g 
+PASS: gcc.c-torture/execute/20060910-1.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/20060910-1.c compilation,  -Os 
+PASS: gcc.c-torture/execute/20060910-1.c execution,  -Os 
+PASS: gcc.c-torture/execute/20060929-1.c compilation,  -O0 
+PASS: gcc.c-torture/execute/20060929-1.c execution,  -O0 
+PASS: gcc.c-torture/execute/20060929-1.c compilation,  -O1 
+PASS: gcc.c-torture/execute/20060929-1.c execution,  -O1 
+PASS: gcc.c-torture/execute/20060929-1.c compilation,  -O2 
+PASS: gcc.c-torture/execute/20060929-1.c execution,  -O2 
+PASS: gcc.c-torture/execute/20060929-1.c compilation,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/20060929-1.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/20060929-1.c compilation,  -O3 -g 
+PASS: gcc.c-torture/execute/20060929-1.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/20060929-1.c compilation,  -Os 
+PASS: gcc.c-torture/execute/20060929-1.c execution,  -Os 
+PASS: gcc.c-torture/execute/20061031-1.c compilation,  -O0 
+PASS: gcc.c-torture/execute/20061031-1.c execution,  -O0 
+PASS: gcc.c-torture/execute/20061031-1.c compilation,  -O1 
+PASS: gcc.c-torture/execute/20061031-1.c execution,  -O1 
+PASS: gcc.c-torture/execute/20061031-1.c compilation,  -O2 
+PASS: gcc.c-torture/execute/20061031-1.c execution,  -O2 
+PASS: gcc.c-torture/execute/20061031-1.c compilation,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/20061031-1.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/20061031-1.c compilation,  -O3 -fomit-frame-pointer -funroll-loops 
+PASS: gcc.c-torture/execute/20061031-1.c execution,  -O3 -fomit-frame-pointer -funroll-loops 
+PASS: gcc.c-torture/execute/20061031-1.c compilation,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
+PASS: gcc.c-torture/execute/20061031-1.c execution,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
+PASS: gcc.c-torture/execute/20061031-1.c compilation,  -O3 -g 
+PASS: gcc.c-torture/execute/20061031-1.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/20061031-1.c compilation,  -Os 
+PASS: gcc.c-torture/execute/20061031-1.c execution,  -Os 
+PASS: gcc.c-torture/execute/20061101-1.c compilation,  -O0 
+PASS: gcc.c-torture/execute/20061101-1.c execution,  -O0 
+PASS: gcc.c-torture/execute/20061101-1.c compilation,  -O1 
+PASS: gcc.c-torture/execute/20061101-1.c execution,  -O1 
+PASS: gcc.c-torture/execute/20061101-1.c compilation,  -O2 
+PASS: gcc.c-torture/execute/20061101-1.c execution,  -O2 
+PASS: gcc.c-torture/execute/20061101-1.c compilation,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/20061101-1.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/20061101-1.c compilation,  -O3 -fomit-frame-pointer -funroll-loops 
+PASS: gcc.c-torture/execute/20061101-1.c execution,  -O3 -fomit-frame-pointer -funroll-loops 
+PASS: gcc.c-torture/execute/20061101-1.c compilation,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
+PASS: gcc.c-torture/execute/20061101-1.c execution,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
+PASS: gcc.c-torture/execute/20061101-1.c compilation,  -O3 -g 
+PASS: gcc.c-torture/execute/20061101-1.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/20061101-1.c compilation,  -Os 
+PASS: gcc.c-torture/execute/20061101-1.c execution,  -Os 
 PASS: gcc.c-torture/execute/900409-1.c compilation,  -O0 
 PASS: gcc.c-torture/execute/900409-1.c execution,  -O0 
 PASS: gcc.c-torture/execute/900409-1.c compilation,  -O1 
@@ -15915,6 +16085,102 @@ PASS: gcc.c-torture/execute/pr27364.c compilation,  -O3 -g
 PASS: gcc.c-torture/execute/pr27364.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/pr27364.c compilation,  -Os 
 PASS: gcc.c-torture/execute/pr27364.c execution,  -Os 
+PASS: gcc.c-torture/execute/pr28403.c compilation,  -O0 
+PASS: gcc.c-torture/execute/pr28403.c execution,  -O0 
+PASS: gcc.c-torture/execute/pr28403.c compilation,  -O1 
+PASS: gcc.c-torture/execute/pr28403.c execution,  -O1 
+PASS: gcc.c-torture/execute/pr28403.c compilation,  -O2 
+PASS: gcc.c-torture/execute/pr28403.c execution,  -O2 
+PASS: gcc.c-torture/execute/pr28403.c compilation,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/pr28403.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/pr28403.c compilation,  -O3 -g 
+PASS: gcc.c-torture/execute/pr28403.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/pr28403.c compilation,  -Os 
+PASS: gcc.c-torture/execute/pr28403.c execution,  -Os 
+PASS: gcc.c-torture/execute/pr28651.c compilation,  -O0 
+PASS: gcc.c-torture/execute/pr28651.c execution,  -O0 
+PASS: gcc.c-torture/execute/pr28651.c compilation,  -O1 
+PASS: gcc.c-torture/execute/pr28651.c execution,  -O1 
+PASS: gcc.c-torture/execute/pr28651.c compilation,  -O2 
+PASS: gcc.c-torture/execute/pr28651.c execution,  -O2 
+PASS: gcc.c-torture/execute/pr28651.c compilation,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/pr28651.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/pr28651.c compilation,  -O3 -g 
+PASS: gcc.c-torture/execute/pr28651.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/pr28651.c compilation,  -Os 
+PASS: gcc.c-torture/execute/pr28651.c execution,  -Os 
+PASS: gcc.c-torture/execute/pr29006.c compilation,  -O0 
+PASS: gcc.c-torture/execute/pr29006.c execution,  -O0 
+PASS: gcc.c-torture/execute/pr29006.c compilation,  -O1 
+PASS: gcc.c-torture/execute/pr29006.c execution,  -O1 
+PASS: gcc.c-torture/execute/pr29006.c compilation,  -O2 
+PASS: gcc.c-torture/execute/pr29006.c execution,  -O2 
+PASS: gcc.c-torture/execute/pr29006.c compilation,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/pr29006.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/pr29006.c compilation,  -O3 -g 
+PASS: gcc.c-torture/execute/pr29006.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/pr29006.c compilation,  -Os 
+PASS: gcc.c-torture/execute/pr29006.c execution,  -Os 
+PASS: gcc.c-torture/execute/pr29695-1.c compilation,  -O0 
+PASS: gcc.c-torture/execute/pr29695-1.c execution,  -O0 
+PASS: gcc.c-torture/execute/pr29695-1.c compilation,  -O1 
+PASS: gcc.c-torture/execute/pr29695-1.c execution,  -O1 
+PASS: gcc.c-torture/execute/pr29695-1.c compilation,  -O2 
+PASS: gcc.c-torture/execute/pr29695-1.c execution,  -O2 
+PASS: gcc.c-torture/execute/pr29695-1.c compilation,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/pr29695-1.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/pr29695-1.c compilation,  -O3 -g 
+PASS: gcc.c-torture/execute/pr29695-1.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/pr29695-1.c compilation,  -Os 
+PASS: gcc.c-torture/execute/pr29695-1.c execution,  -Os 
+PASS: gcc.c-torture/execute/pr29695-2.c compilation,  -O0 
+PASS: gcc.c-torture/execute/pr29695-2.c execution,  -O0 
+PASS: gcc.c-torture/execute/pr29695-2.c compilation,  -O1 
+PASS: gcc.c-torture/execute/pr29695-2.c execution,  -O1 
+PASS: gcc.c-torture/execute/pr29695-2.c compilation,  -O2 
+PASS: gcc.c-torture/execute/pr29695-2.c execution,  -O2 
+PASS: gcc.c-torture/execute/pr29695-2.c compilation,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/pr29695-2.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/pr29695-2.c compilation,  -O3 -g 
+PASS: gcc.c-torture/execute/pr29695-2.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/pr29695-2.c compilation,  -Os 
+PASS: gcc.c-torture/execute/pr29695-2.c execution,  -Os 
+PASS: gcc.c-torture/execute/pr29797-1.c compilation,  -O0 
+PASS: gcc.c-torture/execute/pr29797-1.c execution,  -O0 
+PASS: gcc.c-torture/execute/pr29797-1.c compilation,  -O1 
+PASS: gcc.c-torture/execute/pr29797-1.c execution,  -O1 
+PASS: gcc.c-torture/execute/pr29797-1.c compilation,  -O2 
+PASS: gcc.c-torture/execute/pr29797-1.c execution,  -O2 
+PASS: gcc.c-torture/execute/pr29797-1.c compilation,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/pr29797-1.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/pr29797-1.c compilation,  -O3 -g 
+PASS: gcc.c-torture/execute/pr29797-1.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/pr29797-1.c compilation,  -Os 
+PASS: gcc.c-torture/execute/pr29797-1.c execution,  -Os 
+PASS: gcc.c-torture/execute/pr30185.c compilation,  -O0 
+PASS: gcc.c-torture/execute/pr30185.c execution,  -O0 
+PASS: gcc.c-torture/execute/pr30185.c compilation,  -O1 
+PASS: gcc.c-torture/execute/pr30185.c execution,  -O1 
+PASS: gcc.c-torture/execute/pr30185.c compilation,  -O2 
+PASS: gcc.c-torture/execute/pr30185.c execution,  -O2 
+PASS: gcc.c-torture/execute/pr30185.c compilation,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/pr30185.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/pr30185.c compilation,  -O3 -g 
+PASS: gcc.c-torture/execute/pr30185.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/pr30185.c compilation,  -Os 
+PASS: gcc.c-torture/execute/pr30185.c execution,  -Os 
+PASS: gcc.c-torture/execute/pr34130.c compilation,  -O0 
+PASS: gcc.c-torture/execute/pr34130.c execution,  -O0 
+PASS: gcc.c-torture/execute/pr34130.c compilation,  -O1 
+PASS: gcc.c-torture/execute/pr34130.c execution,  -O1 
+PASS: gcc.c-torture/execute/pr34130.c compilation,  -O2 
+PASS: gcc.c-torture/execute/pr34130.c execution,  -O2 
+PASS: gcc.c-torture/execute/pr34130.c compilation,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/pr34130.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/pr34130.c compilation,  -O3 -g 
+PASS: gcc.c-torture/execute/pr34130.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/pr34130.c compilation,  -Os 
+PASS: gcc.c-torture/execute/pr34130.c execution,  -Os 
 PASS: gcc.c-torture/execute/pr7284-1.c compilation,  -O0 
 PASS: gcc.c-torture/execute/pr7284-1.c execution,  -O0 
 PASS: gcc.c-torture/execute/pr7284-1.c compilation,  -O1 
@@ -16991,7 +17257,7 @@ PASS: gcc.c-torture/execute/zerolen-2.c compilation,  -O3 -g
 PASS: gcc.c-torture/execute/zerolen-2.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/zerolen-2.c compilation,  -Os 
 PASS: gcc.c-torture/execute/zerolen-2.c execution,  -Os 
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.c-torture/execute/ieee/ieee.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.c-torture/execute/ieee/ieee.exp ...
 PASS: gcc.c-torture/execute/ieee/20000320-1.c compilation,  -O0 
 PASS: gcc.c-torture/execute/ieee/20000320-1.c execution,  -O0 
 PASS: gcc.c-torture/execute/ieee/20000320-1.c compilation,  -O1 
@@ -17560,6 +17826,22 @@ PASS: gcc.c-torture/execute/ieee/mzero6.c compilation,  -O3 -g
 PASS: gcc.c-torture/execute/ieee/mzero6.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/ieee/mzero6.c compilation,  -Os 
 PASS: gcc.c-torture/execute/ieee/mzero6.c execution,  -Os 
+PASS: gcc.c-torture/execute/ieee/pr28634.c compilation,  -O0 
+PASS: gcc.c-torture/execute/ieee/pr28634.c execution,  -O0 
+PASS: gcc.c-torture/execute/ieee/pr28634.c compilation,  -O1 
+PASS: gcc.c-torture/execute/ieee/pr28634.c execution,  -O1 
+PASS: gcc.c-torture/execute/ieee/pr28634.c compilation,  -O2 
+PASS: gcc.c-torture/execute/ieee/pr28634.c execution,  -O2 
+PASS: gcc.c-torture/execute/ieee/pr28634.c compilation,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/ieee/pr28634.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/ieee/pr28634.c compilation,  -O3 -fomit-frame-pointer -funroll-loops 
+PASS: gcc.c-torture/execute/ieee/pr28634.c execution,  -O3 -fomit-frame-pointer -funroll-loops 
+PASS: gcc.c-torture/execute/ieee/pr28634.c compilation,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
+PASS: gcc.c-torture/execute/ieee/pr28634.c execution,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
+PASS: gcc.c-torture/execute/ieee/pr28634.c compilation,  -O3 -g 
+PASS: gcc.c-torture/execute/ieee/pr28634.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/ieee/pr28634.c compilation,  -Os 
+PASS: gcc.c-torture/execute/ieee/pr28634.c execution,  -Os 
 PASS: gcc.c-torture/execute/ieee/rbug.c compilation,  -O0 
 PASS: gcc.c-torture/execute/ieee/rbug.c execution,  -O0 
 PASS: gcc.c-torture/execute/ieee/rbug.c compilation,  -O1 
@@ -17596,7 +17878,7 @@ PASS: gcc.c-torture/execute/ieee/unsafe-fp-assoc.c compilation,  -O3 -g
 PASS: gcc.c-torture/execute/ieee/unsafe-fp-assoc.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/ieee/unsafe-fp-assoc.c compilation,  -Os 
 PASS: gcc.c-torture/execute/ieee/unsafe-fp-assoc.c execution,  -Os 
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.c-torture/unsorted/unsorted.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.c-torture/unsorted/unsorted.exp ...
 PASS: gcc.c-torture/unsorted/386.c,  -O0  
 PASS: gcc.c-torture/unsorted/386.c,  -O1  
 PASS: gcc.c-torture/unsorted/386.c,  -O2  
@@ -19329,7 +19611,7 @@ PASS: gcc.c-torture/unsorted/xzz.c,  -O2
 PASS: gcc.c-torture/unsorted/xzz.c,  -O3 -fomit-frame-pointer  
 PASS: gcc.c-torture/unsorted/xzz.c,  -O3 -g  
 PASS: gcc.c-torture/unsorted/xzz.c,  -Os  
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.dg/charset/charset.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.dg/charset/charset.exp ...
 UNSUPPORTED: gcc.dg/charset/asm1.c
 UNSUPPORTED: gcc.dg/charset/asm2.c
 UNSUPPORTED: gcc.dg/charset/asm3.c
@@ -19343,7 +19625,7 @@ UNSUPPORTED: gcc.dg/charset/builtin2.c
 UNSUPPORTED: gcc.dg/charset/extern.c
 UNSUPPORTED: gcc.dg/charset/function.c
 UNSUPPORTED: gcc.dg/charset/string.c
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.dg/compat/compat.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.dg/compat/compat.exp ...
 PASS: gcc.dg/compat/fnptr-by-value-1 c_compat_main_tst.o compile
 PASS: gcc.dg/compat/fnptr-by-value-1 c_compat_x_tst.o compile
 PASS: gcc.dg/compat/fnptr-by-value-1 c_compat_y_tst.o compile
@@ -19594,7 +19876,7 @@ PASS: gcc.dg/compat/vector-2 c_compat_x_tst.o compile
 PASS: gcc.dg/compat/vector-2 c_compat_y_tst.o compile
 PASS: gcc.dg/compat/vector-2 c_compat_x_tst.o-c_compat_y_tst.o link
 PASS: gcc.dg/compat/vector-2 c_compat_x_tst.o-c_compat_y_tst.o execute 
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.dg/compat/struct-layout-1.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.dg/compat/struct-layout-1.exp ...
 PASS: tmpdir-gcc.dg-struct-layout-1/t001 c_compat_main_tst.o compile
 PASS: tmpdir-gcc.dg-struct-layout-1/t001 c_compat_x_tst.o compile
 PASS: tmpdir-gcc.dg-struct-layout-1/t001 c_compat_y_tst.o compile
@@ -19735,7 +20017,7 @@ PASS: tmpdir-gcc.dg-struct-layout-1/t028 c_compat_x_tst.o compile
 PASS: tmpdir-gcc.dg-struct-layout-1/t028 c_compat_y_tst.o compile
 PASS: tmpdir-gcc.dg-struct-layout-1/t028 c_compat_x_tst.o-c_compat_y_tst.o link
 PASS: tmpdir-gcc.dg-struct-layout-1/t028 c_compat_x_tst.o-c_compat_y_tst.o execute 
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.dg/cpp/cpp.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.dg/cpp/cpp.exp ...
 PASS: gcc.dg/cpp/19921210-1.c (test for excess errors)
 PASS: gcc.dg/cpp/19930510-1.c invalid directive (test for errors, line 6)
 PASS: gcc.dg/cpp/19930510-1.c (test for excess errors)
@@ -19854,7 +20136,7 @@ PASS: gcc.dg/cpp/_Pragma1.c  (test for errors, line 27)
 PASS: gcc.dg/cpp/_Pragma1.c  (test for errors, line 28)
 PASS: gcc.dg/cpp/_Pragma1.c (test for excess errors)
 PASS: gcc.dg/cpp/_Pragma2.c (test for excess errors)
-FAIL: gcc.dg/cpp/_Pragma3.c (test for excess errors)
+PASS: gcc.dg/cpp/_Pragma3.c (test for excess errors)
 PASS: gcc.dg/cpp/_Pragma4.c (test for excess errors)
 PASS: gcc.dg/cpp/_Pragma4.c scan-file (^|\\n)#pragma bar($|\\n)
 PASS: gcc.dg/cpp/_Pragma5.c (test for excess errors)
@@ -20155,6 +20437,7 @@ PASS: gcc.dg/cpp/defined.c  (test for warnings, line 82)
 PASS: gcc.dg/cpp/defined.c (test for excess errors)
 PASS: gcc.dg/cpp/digraph1.c (test for excess errors)
 PASS: gcc.dg/cpp/digraph2.c  (test for errors, line 12)
+PASS: gcc.dg/cpp/digraph2.c  (test for errors, line 16)
 PASS: gcc.dg/cpp/digraph2.c (test for excess errors)
 PASS: gcc.dg/cpp/digraphs.c (test for excess errors)
 PASS: gcc.dg/cpp/digraphs.c execution test
@@ -20628,6 +20911,12 @@ PASS: gcc.dg/cpp/poison.c use of foo6 (test for errors, line 23)
 PASS: gcc.dg/cpp/poison.c (test for excess errors)
 PASS: gcc.dg/cpp/pr20348.c (test for excess errors)
 PASS: gcc.dg/cpp/pr20356.c (test for excess errors)
+PASS: gcc.dg/cpp/pr29612-1.c  (test for warnings, line 7)
+PASS: gcc.dg/cpp/pr29612-1.c  (test for warnings, line 15)
+PASS: gcc.dg/cpp/pr29612-1.c (test for excess errors)
+PASS: gcc.dg/cpp/pr29612-2.c numeric constant suffix (test for warnings, line 7)
+PASS: gcc.dg/cpp/pr29612-2.c numeric constant suffix (test for warnings, line 17)
+PASS: gcc.dg/cpp/pr29612-2.c (test for excess errors)
 PASS: gcc.dg/cpp/pragma-1.c undeclared-variable message (test for errors, line 9)
 PASS: gcc.dg/cpp/pragma-1.c reminder message (test for errors, line 9)
 PASS: gcc.dg/cpp/pragma-1.c (test for excess errors)
@@ -20859,7 +21148,7 @@ PASS: gcc.dg/cpp/wchar-1.c execution test
 PASS: gcc.dg/cpp/widestr1.c wide string in #line (test for errors, line 7)
 PASS: gcc.dg/cpp/widestr1.c wide string in #include (test for errors, line 8)
 PASS: gcc.dg/cpp/widestr1.c (test for excess errors)
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.dg/cpp/trad/trad.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.dg/cpp/trad/trad.exp ...
 PASS: gcc.dg/cpp/trad/Wunused.c  (test for bogus messages, line 12)
 PASS: gcc.dg/cpp/trad/Wunused.c  (test for bogus messages, line 13)
 PASS: gcc.dg/cpp/trad/Wunused.c  (test for bogus messages, line 14)
@@ -21042,7 +21331,7 @@ PASS: gcc.dg/cpp/trad/strify.c execution test
 PASS: gcc.dg/cpp/trad/uchar.c (test for excess errors)
 PASS: gcc.dg/cpp/trad/xwin1.c (test for excess errors)
 PASS: gcc.dg/cpp/trad/xwin1.c scan-file (^|\n)#if 0
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.dg/debug/debug.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.dg/debug/debug.exp ...
 PASS: gcc.dg/debug/20000503-1.c -gdwarf-21 (test for excess errors)
 PASS: gcc.dg/debug/20000503-1.c -gdwarf-21 -O (test for excess errors)
 PASS: gcc.dg/debug/20000503-1.c -gdwarf-21 -O3 (test for excess errors)
@@ -21713,6 +22002,33 @@ PASS: gcc.dg/debug/pr16676.c -gstabs+ -O3 (test for excess errors)
 PASS: gcc.dg/debug/pr16676.c -gstabs+3 (test for excess errors)
 PASS: gcc.dg/debug/pr16676.c -gstabs+3 -O (test for excess errors)
 PASS: gcc.dg/debug/pr16676.c -gstabs+3 -O3 (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gdwarf-21 (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gdwarf-21 -O (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gdwarf-21 -O3 (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gdwarf-2 (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gdwarf-2 -O (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gdwarf-2 -O3 (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gdwarf-23 (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gdwarf-23 -O (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gdwarf-23 -O3 (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gstabs1 (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gstabs1 -O (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gstabs1 -O3 (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gstabs (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gstabs -O (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gstabs -O3 (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gstabs3 (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gstabs3 -O (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gstabs3 -O3 (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gstabs+1 (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gstabs+1 -O (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gstabs+1 -O3 (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gstabs+ (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gstabs+ -O (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gstabs+ -O3 (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gstabs+3 (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gstabs+3 -O (test for excess errors)
+PASS: gcc.dg/debug/pr26881.c -gstabs+3 -O3 (test for excess errors)
 PASS: gcc.dg/debug/redecl-1.c -gdwarf-21 (test for excess errors)
 PASS: gcc.dg/debug/redecl-1.c -gdwarf-21 -O (test for excess errors)
 PASS: gcc.dg/debug/redecl-1.c -gdwarf-21 -O3 (test for excess errors)
@@ -21902,7 +22218,7 @@ PASS: gcc.dg/debug/trivial.c -gstabs+3 -O (test for excess errors)
 PASS: gcc.dg/debug/trivial.c -gstabs+3 -O execution test
 PASS: gcc.dg/debug/trivial.c -gstabs+3 -O3 (test for excess errors)
 PASS: gcc.dg/debug/trivial.c -gstabs+3 -O3 execution test
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.dg/debug/dwarf2/dwarf2.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.dg/debug/dwarf2/dwarf2.exp ...
 PASS: gcc.dg/debug/dwarf2/c99-typedef1.c (test for excess errors)
 PASS: gcc.dg/debug/dwarf2/dwarf-char1.c (test for excess errors)
 PASS: gcc.dg/debug/dwarf2/dwarf-char1.c scan-assembler 0x[68][ \t]+[#@;!/|]+[ \t]+DW_AT_encoding
@@ -21934,7 +22250,7 @@ PASS: gcc.dg/debug/dwarf2/var1.c scan-assembler xyzzy[^\\n\\r]+DW_AT_name
 PASS: gcc.dg/debug/dwarf2/var2.c (test for excess errors)
 PASS: gcc.dg/debug/dwarf2/var2.c scan-assembler DW_OP_addr[\\n\\r]+[^\\n\\r]+foo
 PASS: gcc.dg/debug/dwarf2/var2.c scan-assembler DW_OP_addr[\\n\\r]+[^\\n\\r]+bar
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.dg/dg.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.dg/dg.exp ...
 PASS: gcc.dg/20000108-1.c (test for excess errors)
 PASS: gcc.dg/20000108-1.c execution test
 PASS: gcc.dg/20000111-1.c (test for excess errors)
@@ -22247,8 +22563,14 @@ UNSUPPORTED: gcc.dg/20050826-1.c
 PASS: gcc.dg/20050922-1.c (test for excess errors)
 PASS: gcc.dg/20050922-1.c execution test
 PASS: gcc.dg/20051201-1.c (test for excess errors)
+PASS: gcc.dg/20060419-1.c  (test for warnings, line 2)
+PASS: gcc.dg/20060419-1.c  (test for warnings, line 3)
+PASS: gcc.dg/20060419-1.c (test for excess errors)
 PASS: gcc.dg/20060515-1.c (test for excess errors)
 PASS: gcc.dg/20060515-1.c execution test
+PASS: gcc.dg/20061026.c (test for excess errors)
+UNSUPPORTED: gcc.dg/20061124-1.c
+UNSUPPORTED: gcc.dg/20061127-1.c
 PASS: gcc.dg/920413-1.c  (test for warnings, line 8)
 PASS: gcc.dg/920413-1.c (test for excess errors)
 PASS: gcc.dg/940409-1.c with arg (test for bogus messages, line 5)
@@ -22712,6 +23034,30 @@ UNSUPPORTED: gcc.dg/arm-scd42-2.c
 UNSUPPORTED: gcc.dg/arm-scd42-3.c
 UNSUPPORTED: gcc.dg/arm-vfp1.c
 PASS: gcc.dg/array-1.c (test for excess errors)
+PASS: gcc.dg/array-10.c  (test for errors, line 9)
+PASS: gcc.dg/array-10.c  (test for errors, line 10)
+PASS: gcc.dg/array-10.c  (test for errors, line 11)
+PASS: gcc.dg/array-10.c  (test for errors, line 12)
+PASS: gcc.dg/array-10.c  (test for errors, line 13)
+PASS: gcc.dg/array-10.c  (test for errors, line 14)
+PASS: gcc.dg/array-10.c  (test for errors, line 16)
+PASS: gcc.dg/array-10.c  (test for errors, line 17)
+PASS: gcc.dg/array-10.c  (test for errors, line 18)
+PASS: gcc.dg/array-10.c  (test for errors, line 19)
+PASS: gcc.dg/array-10.c  (test for errors, line 20)
+PASS: gcc.dg/array-10.c  (test for errors, line 21)
+PASS: gcc.dg/array-10.c  (test for errors, line 23)
+PASS: gcc.dg/array-10.c  (test for warnings, line 23)
+PASS: gcc.dg/array-10.c  (test for errors, line 25)
+PASS: gcc.dg/array-10.c  (test for warnings, line 25)
+PASS: gcc.dg/array-10.c  (test for errors, line 27)
+PASS: gcc.dg/array-10.c  (test for warnings, line 27)
+PASS: gcc.dg/array-10.c  (test for errors, line 29)
+PASS: gcc.dg/array-10.c  (test for warnings, line 29)
+PASS: gcc.dg/array-10.c  (test for errors, line 31)
+PASS: gcc.dg/array-10.c  (test for warnings, line 31)
+PASS: gcc.dg/array-10.c  (test for errors, line 33)
+PASS: gcc.dg/array-10.c (test for excess errors)
 PASS: gcc.dg/array-2.c nested (test for errors, line 10)
 PASS: gcc.dg/array-2.c before end (test for errors, line 13)
 PASS: gcc.dg/array-2.c (test for excess errors)
@@ -23325,6 +23671,7 @@ PASS: gcc.dg/builtins-51.c (test for excess errors)
 PASS: gcc.dg/builtins-51.c execution test
 PASS: gcc.dg/builtins-52.c (test for excess errors)
 PASS: gcc.dg/builtins-53.c (test for excess errors)
+PASS: gcc.dg/builtins-55.c (test for excess errors)
 PASS: gcc.dg/builtins-6.c (test for excess errors)
 PASS: gcc.dg/builtins-6.c execution test
 PASS: gcc.dg/builtins-7.c (test for excess errors)
@@ -26686,6 +27033,8 @@ PASS: gcc.dg/deprecated.c  (test for warnings, line 82)
 PASS: gcc.dg/deprecated.c  (test for warnings, line 86)
 PASS: gcc.dg/deprecated.c  (test for warnings, line 89)
 PASS: gcc.dg/deprecated.c (test for excess errors)
+PASS: gcc.dg/div-compare-1.c (test for excess errors)
+PASS: gcc.dg/div-compare-1.c execution test
 PASS: gcc.dg/divbyzero.c  (test for warnings, line 12)
 PASS: gcc.dg/divbyzero.c  (test for warnings, line 13)
 PASS: gcc.dg/divbyzero.c  (test for warnings, line 14)
@@ -26771,6 +27120,13 @@ PASS: gcc.dg/fold-cond-1.c scan-tree-dump-times c == 0 \|\| d != 0 1
 PASS: gcc.dg/fold-cond-1.c scan-tree-dump-times e == 0 && f != 0 1
 PASS: gcc.dg/fold-cond-1.c scan-tree-dump-times g == 0 \? h != 0 : 1 0
 PASS: gcc.dg/fold-cond-1.c scan-tree-dump-times g != 0 \? 1 : h != 0 0
+PASS: gcc.dg/fold-convround-1.c (test for excess errors)
+PASS: gcc.dg/fold-convround-1.c scan-tree-dump-times __builtin_lround 0
+PASS: gcc.dg/fold-convround-1.c scan-tree-dump-times __builtin_llround 0
+PASS: gcc.dg/fold-convround-1.c scan-tree-dump-times __builtin_lfloor 0
+PASS: gcc.dg/fold-convround-1.c scan-tree-dump-times __builtin_llfloor 0
+PASS: gcc.dg/fold-convround-1.c scan-tree-dump-times __builtin_lceil 0
+PASS: gcc.dg/fold-convround-1.c scan-tree-dump-times __builtin_llceil 0
 PASS: gcc.dg/fold-div-1.c (test for excess errors)
 PASS: gcc.dg/fold-div-1.c scan-tree-dump-times  \*  2
 PASS: gcc.dg/fold-div-1.c scan-tree-dump-times  /  2
@@ -26842,6 +27198,15 @@ PASS: gcc.dg/func-ptr-conv-1.c (test for excess errors)
 PASS: gcc.dg/funcdef-attr-1.c (test for excess errors)
 PASS: gcc.dg/funcdef-storage-1.c  (test for errors, line 6)
 PASS: gcc.dg/funcdef-storage-1.c (test for excess errors)
+PASS: gcc.dg/funcdef-var-1.c  (test for errors, line 7)
+PASS: gcc.dg/funcdef-var-1.c previous declaration (test for errors, line 7)
+PASS: gcc.dg/funcdef-var-1.c  (test for errors, line 9)
+PASS: gcc.dg/funcdef-var-1.c no previous prototype (test for warnings, line 9)
+PASS: gcc.dg/funcdef-var-1.c (test for excess errors)
+PASS: gcc.dg/funcdef-var-2.c previous declaration (test for errors, line 8)
+PASS: gcc.dg/funcdef-var-2.c  (test for errors, line 10)
+PASS: gcc.dg/funcdef-var-2.c no previous prototype (test for warnings, line 10)
+PASS: gcc.dg/funcdef-var-2.c (test for excess errors)
 PASS: gcc.dg/funcorder.c (test for excess errors)
 PASS: gcc.dg/funcorder.c scan-assembler-not link_error
 PASS: gcc.dg/funroll-loops-all.c  (test for errors, line )
@@ -26958,6 +27323,8 @@ PASS: gcc.dg/init-bad-3.c near (test for errors, line 32)
 PASS: gcc.dg/init-bad-3.c (test for excess errors)
 PASS: gcc.dg/init-bad-4.c  (test for errors, line 5)
 PASS: gcc.dg/init-bad-4.c (test for excess errors)
+PASS: gcc.dg/init-bad-5.c  (test for errors, line 5)
+PASS: gcc.dg/init-bad-5.c (test for excess errors)
 PASS: gcc.dg/init-desig-obs-1.c  (test for errors, line 15)
 PASS: gcc.dg/init-desig-obs-1.c  (test for errors, line 19)
 PASS: gcc.dg/init-desig-obs-1.c (test for excess errors)
@@ -27122,6 +27489,8 @@ PASS: gcc.dg/large-size-array.c  (test for errors, line 19)
 PASS: gcc.dg/large-size-array.c (test for excess errors)
 UNSUPPORTED: gcc.dg/lazy-ptr-test.c
 PASS: gcc.dg/local1.c (test for excess errors)
+PASS: gcc.dg/long-long-cst1.c (test for excess errors)
+PASS: gcc.dg/long-long-cst1.c execution test
 PASS: gcc.dg/long-long-typespec-1.c void void (test for errors, line 19)
 PASS: gcc.dg/long-long-typespec-1.c void char (test for errors, line 20)
 PASS: gcc.dg/long-long-typespec-1.c void short (test for errors, line 21)
@@ -27892,6 +28261,8 @@ PASS: gcc.dg/lvalue-2.c (test for excess errors)
 PASS: gcc.dg/lvalue-3.c  (test for errors, line 12)
 PASS: gcc.dg/lvalue-3.c  (test for errors, line 13)
 PASS: gcc.dg/lvalue-3.c (test for excess errors)
+PASS: gcc.dg/lvalue-4.c  (test for errors, line 7)
+PASS: gcc.dg/lvalue-4.c (test for excess errors)
 PASS: gcc.dg/lvalue1.c  (test for errors, line 7)
 PASS: gcc.dg/lvalue1.c (test for excess errors)
 PASS: gcc.dg/m-un-1.c uninitialized warning regression (test for bogus messages, line 28)
@@ -27902,6 +28273,8 @@ PASS: gcc.dg/m-un-2.c (test for excess errors)
 UNSUPPORTED: gcc.dg/m68k-slp-ice.c
 PASS: gcc.dg/max-1.c (test for excess errors)
 PASS: gcc.dg/max-1.c execution test
+PASS: gcc.dg/merge-all-constants-1.c (test for excess errors)
+PASS: gcc.dg/merge-all-constants-1.c scan-assembler-not .rodata.str
 PASS: gcc.dg/missing-field-init-1.c  (test for bogus messages, line 6)
 PASS: gcc.dg/missing-field-init-1.c  (test for bogus messages, line 7)
 PASS: gcc.dg/missing-field-init-1.c  (test for bogus messages, line 8)
@@ -28268,6 +28641,13 @@ PASS: gcc.dg/parm-mismatch-1.c  (test for errors, line 16)
 PASS: gcc.dg/parm-mismatch-1.c  (test for errors, line 17)
 PASS: gcc.dg/parm-mismatch-1.c note (test for errors, line 17)
 PASS: gcc.dg/parm-mismatch-1.c (test for excess errors)
+PASS: gcc.dg/parse-error-1.c  (test for errors, line 6)
+PASS: gcc.dg/parse-error-1.c  (test for errors, line 7)
+PASS: gcc.dg/parse-error-1.c  (test for errors, line 10)
+PASS: gcc.dg/parse-error-1.c (test for excess errors)
+PASS: gcc.dg/parse-error-2.c  (test for errors, line 6)
+PASS: gcc.dg/parse-error-2.c  (test for bogus messages, line 13)
+PASS: gcc.dg/parse-error-2.c (test for excess errors)
 UNSUPPORTED: gcc.dg/pic-macro-define.c
 PASS: gcc.dg/pointer-arith-1.c  (test for warnings, line 33)
 PASS: gcc.dg/pointer-arith-1.c  (test for warnings, line 34)
@@ -28571,10 +28951,13 @@ PASS: gcc.dg/pr20130-1.c scan-tree-dump-times -a 3
 PASS: gcc.dg/pr20245-1.c  (test for errors, line 5)
 PASS: gcc.dg/pr20245-1.c (test for excess errors)
 PASS: gcc.dg/pr20368-1.c  (test for errors, line 6)
+PASS: gcc.dg/pr20368-1.c  (test for warnings, line 10)
 PASS: gcc.dg/pr20368-1.c (test for excess errors)
 PASS: gcc.dg/pr20368-2.c  (test for errors, line 6)
+PASS: gcc.dg/pr20368-2.c  (test for warnings, line 10)
 PASS: gcc.dg/pr20368-2.c (test for excess errors)
 PASS: gcc.dg/pr20368-3.c  (test for errors, line 6)
+PASS: gcc.dg/pr20368-3.c  (test for warnings, line 10)
 PASS: gcc.dg/pr20368-3.c (test for excess errors)
 PASS: gcc.dg/pr20672-1.c  (test for errors, line 7)
 PASS: gcc.dg/pr20672-1.c (test for excess errors)
@@ -28591,6 +28974,8 @@ PASS: gcc.dg/pr20922-5.c scan-tree-dump-times  = 0 0
 PASS: gcc.dg/pr20922-6.c (test for excess errors)
 PASS: gcc.dg/pr20922-6.c scan-tree-dump-times  = 1 6
 UNSUPPORTED: gcc.dg/pr20927.c
+PASS: gcc.dg/pr21032.c (test for excess errors)
+PASS: gcc.dg/pr21032.c scan-tree-dump-not -\(float\)
 PASS: gcc.dg/pr21041.c (test for excess errors)
 PASS: gcc.dg/pr21085.c  (test for warnings, line 8)
 PASS: gcc.dg/pr21085.c (test for excess errors)
@@ -28636,6 +29021,7 @@ PASS: gcc.dg/pr23911.c scan-tree-dump-times = CI 0
 PASS: gcc.dg/pr24101-1.i (test for excess errors)
 PASS: gcc.dg/pr24101-2.i (test for excess errors)
 PASS: gcc.dg/pr24225.c (test for excess errors)
+PASS: gcc.dg/pr24367.c (test for excess errors)
 PASS: gcc.dg/pr24445.c (test for excess errors)
 PASS: gcc.dg/pr24600.c (test for excess errors)
 PASS: gcc.dg/pr24615.c (test for excess errors)
@@ -28651,16 +29037,63 @@ PASS: gcc.dg/pr25559.c  (test for errors, line 7)
 PASS: gcc.dg/pr25559.c  (test for errors, line 8)
 PASS: gcc.dg/pr25559.c (test for excess errors)
 PASS: gcc.dg/pr25682.c (test for excess errors)
+PASS: gcc.dg/pr25795-1.c (test for excess errors)
+PASS: gcc.dg/pr25795-1.c scan-assembler-not mystr
+PASS: gcc.dg/pr25795.c (test for excess errors)
+PASS: gcc.dg/pr25795.c scan-assembler mystr
 PASS: gcc.dg/pr25805.c (test for excess errors)
 PASS: gcc.dg/pr25805.c execution test
+UNSUPPORTED: gcc.dg/pr25993.c
 PASS: gcc.dg/pr26004.c (test for excess errors)
+PASS: gcc.dg/pr26570.c  (test for warnings, line 7)
+PASS: gcc.dg/pr26570.c (test for excess errors)
+PASS: gcc.dg/pr26719.c (test for excess errors)
+PASS: gcc.dg/pr26719.c execution test
 PASS: gcc.dg/pr26729-1.c (test for excess errors)
 PASS: gcc.dg/pr26729-1.c execution test
 PASS: gcc.dg/pr26865.c  (test for warnings, line 7)
 PASS: gcc.dg/pr26865.c (test for excess errors)
 PASS: gcc.dg/pr26961-1.c (test for excess errors)
+PASS: gcc.dg/pr26983.c (test for excess errors)
 PASS: gcc.dg/pr27314.c (test for excess errors)
 PASS: gcc.dg/pr27335.c (test for excess errors)
+PASS: gcc.dg/pr27363.c (test for excess errors)
+PASS: gcc.dg/pr27363.c execution test
+PASS: gcc.dg/pr27428-1.c  (test for errors, line 7)
+PASS: gcc.dg/pr27428-1.c (test for excess errors)
+PASS: gcc.dg/pr27639.c (test for excess errors)
+PASS: gcc.dg/pr27758.c (test for excess errors)
+PASS: gcc.dg/pr27758.c execution test
+PASS: gcc.dg/pr27802-1.c (test for excess errors)
+PASS: gcc.dg/pr27861-1.c (test for excess errors)
+PASS: gcc.dg/pr27959.c (test for excess errors)
+PASS: gcc.dg/pr27959.c execution test
+PASS: gcc.dg/pr28162.c (test for excess errors)
+PASS: gcc.dg/pr28187.c (test for excess errors)
+PASS: gcc.dg/pr28243.c (test for excess errors)
+PASS: gcc.dg/pr28402.c (test for excess errors)
+PASS: gcc.dg/pr28402.c scan-assembler-not __[a-z]*si3
+PASS: gcc.dg/pr28726.c (test for excess errors)
+PASS: gcc.dg/pr28726.c execution test
+PASS: gcc.dg/pr28888.c (test for excess errors)
+PASS: gcc.dg/pr29091.c (test for excess errors)
+PASS: gcc.dg/pr29091.c execution test
+PASS: gcc.dg/pr29581-1.c (test for excess errors)
+PASS: gcc.dg/pr29581-1.c execution test
+PASS: gcc.dg/pr29581-2.c (test for excess errors)
+PASS: gcc.dg/pr29581-2.c execution test
+PASS: gcc.dg/pr29581-3.c (test for excess errors)
+PASS: gcc.dg/pr29581-3.c execution test
+PASS: gcc.dg/pr29581-4.c (test for excess errors)
+PASS: gcc.dg/pr29581-4.c execution test
+PASS: gcc.dg/pr29637.c (test for excess errors)
+PASS: gcc.dg/pr29683.c (test for excess errors)
+PASS: gcc.dg/pr29683.c execution test
+PASS: gcc.dg/pr29736.c  (test for errors, line 3)
+PASS: gcc.dg/pr29736.c (test for excess errors)
+PASS: gcc.dg/pr30286.c (test for excess errors)
+PASS: gcc.dg/pr30286.c execution test
+UNSUPPORTED: gcc.dg/pr30360.c
 PASS: gcc.dg/pr3074-1.c no effect (test for warnings, line 8)
 PASS: gcc.dg/pr3074-1.c (test for excess errors)
 PASS: gcc.dg/pr8788-1.c  (test for errors, line 14)
@@ -28688,12 +29121,89 @@ UNSUPPORTED: gcc.dg/pragma-isr2.c
 UNSUPPORTED: gcc.dg/pragma-pack-2.c
 PASS: gcc.dg/pragma-pack-3.c (test for excess errors)
 PASS: gcc.dg/pragma-pack-3.c execution test
+PASS: gcc.dg/pragma-pack-4.c  (test for warnings, line 4)
+PASS: gcc.dg/pragma-pack-4.c  (test for warnings, line 5)
+PASS: gcc.dg/pragma-pack-4.c  (test for warnings, line 6)
+PASS: gcc.dg/pragma-pack-4.c (test for excess errors)
 UNSUPPORTED: gcc.dg/pragma-re-1.c
 UNSUPPORTED: gcc.dg/pragma-re-2.c
 UNSUPPORTED: gcc.dg/pragma-re-3.c
 PASS: gcc.dg/precedence-1.c (test for excess errors)
 PASS: gcc.dg/profile-generate-1.c (test for excess errors)
 PASS: gcc.dg/profile-generate-2.c (test for excess errors)
+PASS: gcc.dg/pthread-init-1.c (test for excess errors)
+PASS: gcc.dg/pthread-init-2.c (test for excess errors)
+PASS: gcc.dg/pure-1.c (test for excess errors)
+PASS: gcc.dg/pure-1.c scan-ipa-dump-not found to be pure: func_a
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 45)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 46)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 47)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 48)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 49)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 50)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 58)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 59)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 60)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 61)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 62)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 63)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 65)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 66)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 67)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 68)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 69)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 70)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 71)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 72)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 73)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 74)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 75)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 76)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 78)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 79)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 80)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 81)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 82)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 83)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 84)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 85)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 86)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 87)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 88)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 89)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 91)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 92)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 93)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 94)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 95)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 96)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 97)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 98)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 99)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 100)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 101)
+PASS: gcc.dg/qual-component-1.c  (test for errors, line 102)
+PASS: gcc.dg/qual-component-1.c  (test for warnings, line 113)
+PASS: gcc.dg/qual-component-1.c  (test for warnings, line 118)
+PASS: gcc.dg/qual-component-1.c  (test for warnings, line 125)
+PASS: gcc.dg/qual-component-1.c  (test for warnings, line 130)
+PASS: gcc.dg/qual-component-1.c  (test for warnings, line 138)
+PASS: gcc.dg/qual-component-1.c  (test for warnings, line 143)
+PASS: gcc.dg/qual-component-1.c  (test for warnings, line 150)
+PASS: gcc.dg/qual-component-1.c  (test for warnings, line 155)
+PASS: gcc.dg/qual-component-1.c  (test for warnings, line 163)
+PASS: gcc.dg/qual-component-1.c  (test for warnings, line 168)
+PASS: gcc.dg/qual-component-1.c  (test for warnings, line 175)
+PASS: gcc.dg/qual-component-1.c  (test for warnings, line 180)
+PASS: gcc.dg/qual-component-1.c  (test for warnings, line 188)
+PASS: gcc.dg/qual-component-1.c  (test for warnings, line 193)
+PASS: gcc.dg/qual-component-1.c  (test for warnings, line 200)
+PASS: gcc.dg/qual-component-1.c  (test for warnings, line 205)
+PASS: gcc.dg/qual-component-1.c  (test for warnings, line 213)
+PASS: gcc.dg/qual-component-1.c  (test for warnings, line 218)
+PASS: gcc.dg/qual-component-1.c  (test for warnings, line 225)
+PASS: gcc.dg/qual-component-1.c  (test for warnings, line 230)
+PASS: gcc.dg/qual-component-1.c (test for excess errors)
 PASS: gcc.dg/qual-return-1.c int decl (test for warnings, line 8)
 PASS: gcc.dg/qual-return-1.c int ptr (test for warnings, line 9)
 PASS: gcc.dg/qual-return-1.c int defn (test for warnings, line 10)
@@ -29056,12 +29566,22 @@ PASS: gcc.dg/simd-2.c (test for excess errors)
 PASS: gcc.dg/simd-3.c (test for excess errors)
 PASS: gcc.dg/simd-4.c  (test for errors, line 12)
 PASS: gcc.dg/simd-4.c (test for excess errors)
+PASS: gcc.dg/simd-5.c  (test for bogus messages, line 6)
+PASS: gcc.dg/simd-5.c  (test for errors, line 7)
+PASS: gcc.dg/simd-5.c (test for excess errors)
+PASS: gcc.dg/simd-6.c  (test for bogus messages, line 6)
+PASS: gcc.dg/simd-6.c  (test for errors, line 7)
+PASS: gcc.dg/simd-6.c (test for excess errors)
+PASS: gcc.dg/sizeof-1.c  (test for errors, line 4)
+PASS: gcc.dg/sizeof-1.c (test for excess errors)
+PASS: gcc.dg/sizeof-2.c  (test for errors, line 6)
+PASS: gcc.dg/sizeof-2.c (test for excess errors)
 PASS: gcc.dg/smod-1.c (test for excess errors)
 PASS: gcc.dg/smod-1.c execution test
 UNSUPPORTED: gcc.dg/sparc-constant-1.c
 UNSUPPORTED: gcc.dg/sparc-dwarf2.c
 UNSUPPORTED: gcc.dg/sparc-frame-1.c
-PASS: gcc.dg/sparc-getcontext-1.c (test for excess errors)
+UNSUPPORTED: gcc.dg/sparc-getcontext-1.c
 UNSUPPORTED: gcc.dg/sparc-loop-1.c
 UNSUPPORTED: gcc.dg/sparc-reg-1.c
 UNSUPPORTED: gcc.dg/sparc-ret.c
@@ -29311,6 +29831,8 @@ PASS: gcc.dg/struct-empty-3.c (test for excess errors)
 PASS: gcc.dg/struct-in-proto-1.c S visible here (test for bogus messages, line 4)
 PASS: gcc.dg/struct-in-proto-1.c not here (test for errors, line 7)
 PASS: gcc.dg/struct-in-proto-1.c (test for excess errors)
+PASS: gcc.dg/struct-incompl-1.c  (test for errors, line 6)
+PASS: gcc.dg/struct-incompl-1.c (test for excess errors)
 PASS: gcc.dg/struct-parse-1.c  (test for errors, line 9)
 PASS: gcc.dg/struct-parse-1.c (test for excess errors)
 UNSUPPORTED: gcc.dg/struct-ret-1.c
@@ -29370,6 +29892,8 @@ PASS: gcc.dg/switch-7.c (test for excess errors)
 PASS: gcc.dg/switch-8.c (test for excess errors)
 PASS: gcc.dg/switch-9.c  (test for warnings, line 9)
 PASS: gcc.dg/switch-9.c (test for excess errors)
+PASS: gcc.dg/switch-A.c  (test for errors, line 5)
+PASS: gcc.dg/switch-A.c (test for excess errors)
 PASS: gcc.dg/switch-warn-1.c  (test for warnings, line 14)
 PASS: gcc.dg/switch-warn-1.c  (test for warnings, line 16)
 PASS: gcc.dg/switch-warn-1.c  (test for warnings, line 29)
@@ -30340,6 +30864,8 @@ PASS: gcc.dg/uninit-I.c (test for excess errors)
 PASS: gcc.dg/union-1.c (test for excess errors)
 PASS: gcc.dg/union-2.c (test for excess errors)
 PASS: gcc.dg/union-2.c execution test
+PASS: gcc.dg/union-3.c  (test for errors, line 7)
+PASS: gcc.dg/union-3.c (test for excess errors)
 PASS: gcc.dg/union-cast-1.c (test for excess errors)
 PASS: gcc.dg/union-cast-2.c  (test for errors, line 14)
 PASS: gcc.dg/union-cast-2.c (test for excess errors)
@@ -30409,65 +30935,65 @@ PASS: gcc.dg/visibility-a.c scan-hidden hidden[ \t_]*foo
 UNSUPPORTED: gcc.dg/visibility-b.c
 PASS: gcc.dg/visibility-c.c (test for excess errors)
 PASS: gcc.dg/visibility-d.c (test for excess errors)
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo00
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo01
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo02
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo03
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo04
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo05
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo06
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo07
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo08
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo09
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo10
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo11
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo12
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo13
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo14
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo15
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo16
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo17
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo18
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo19
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo20
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo21
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo22
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo23
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo24
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo25
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo26
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo27
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo28
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo29
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo30
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo31
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo32
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo33
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo34
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo35
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo36
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo37
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo38
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo39
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo40
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo41
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo42
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo43
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo44
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo45
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo46
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo47
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo48
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo49
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo50
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo51
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo52
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo53
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo54
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo55
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo56
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo57
-PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*symbol
+PASS: gcc.dg/visibility-d.c scan-not-hidden hidden[ \t_]*foo58
 PASS: gcc.dg/visibility-d.c scan-hidden hidden[ \t_]*foo59
 PASS: gcc.dg/vla-2.c (test for excess errors)
 PASS: gcc.dg/vla-3.c (test for excess errors)
@@ -30591,7 +31117,7 @@ PASS: gcc.dg/wtr-union-init-3.c initialization of unions (test for warnings, lin
 PASS: gcc.dg/wtr-union-init-3.c (test for excess errors)
 PASS: gcc.dg/wtypequal.c  (test for bogus messages, line 6)
 PASS: gcc.dg/wtypequal.c (test for excess errors)
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.dg/format/format.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.dg/format/format.exp ...
 PASS: gcc.dg/format/array-1.c   wrong type with array (test for warnings, line 25)
 PASS: gcc.dg/format/array-1.c   unterminated array (test for warnings, line 26)
 PASS: gcc.dg/format/array-1.c   wrong type with array (test for warnings, line 29)
@@ -33452,7 +33978,7 @@ PASS: gcc.dg/format/z-1.c  -DWIDE  bogus printf warning (test for bogus messages
 PASS: gcc.dg/format/z-1.c  -DWIDE  (test for excess errors)
 PASS: gcc.dg/format/zero-length-1.c   (test for excess errors)
 PASS: gcc.dg/format/zero-length-1.c  -DWIDE  (test for excess errors)
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.dg/ipa/ipa.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.dg/ipa/ipa.exp ...
 PASS: gcc.dg/ipa/ipa-1.c (test for excess errors)
 PASS: gcc.dg/ipa/ipa-1.c scan-ipa-dump-times versioned function 2
 PASS: gcc.dg/ipa/ipa-1.c scan-ipa-dump-times propagating const 2
@@ -33468,7 +33994,7 @@ PASS: gcc.dg/ipa/ipa-4.c scan-ipa-dump-times propagating const 1
 PASS: gcc.dg/ipa/ipa-5.c (test for excess errors)
 PASS: gcc.dg/ipa/ipa-5.c scan-ipa-dump-times versioned function 2
 PASS: gcc.dg/ipa/ipa-5.c scan-ipa-dump-times propagating const 2
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.dg/noncompile/noncompile.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.dg/noncompile/noncompile.exp ...
 PASS: gcc.dg/noncompile/20000901-1.c  -O0   (test for errors, line 1)
 PASS: gcc.dg/noncompile/20000901-1.c  -O0  (test for excess errors)
 PASS: gcc.dg/noncompile/20000901-1.c  -O1   (test for errors, line 1)
@@ -34077,6 +34603,7 @@ PASS: gcc.dg/noncompile/920923-1.c  -O0   (test for errors, line 45)
 PASS: gcc.dg/noncompile/920923-1.c  -O0   (test for errors, line 47)
 PASS: gcc.dg/noncompile/920923-1.c  -O0   (test for errors, line 55)
 PASS: gcc.dg/noncompile/920923-1.c  -O0   (test for errors, line 58)
+PASS: gcc.dg/noncompile/920923-1.c  -O0   (test for errors, line 59)
 PASS: gcc.dg/noncompile/920923-1.c  -O0   (test for errors, line 61)
 PASS: gcc.dg/noncompile/920923-1.c  -O0   (test for errors, line 66)
 PASS: gcc.dg/noncompile/920923-1.c  -O0   (test for errors, line 69)
@@ -34109,6 +34636,7 @@ PASS: gcc.dg/noncompile/920923-1.c  -O1   (test for errors, line 45)
 PASS: gcc.dg/noncompile/920923-1.c  -O1   (test for errors, line 47)
 PASS: gcc.dg/noncompile/920923-1.c  -O1   (test for errors, line 55)
 PASS: gcc.dg/noncompile/920923-1.c  -O1   (test for errors, line 58)
+PASS: gcc.dg/noncompile/920923-1.c  -O1   (test for errors, line 59)
 PASS: gcc.dg/noncompile/920923-1.c  -O1   (test for errors, line 61)
 PASS: gcc.dg/noncompile/920923-1.c  -O1   (test for errors, line 66)
 PASS: gcc.dg/noncompile/920923-1.c  -O1   (test for errors, line 69)
@@ -34141,6 +34669,7 @@ PASS: gcc.dg/noncompile/920923-1.c  -O2   (test for errors, line 45)
 PASS: gcc.dg/noncompile/920923-1.c  -O2   (test for errors, line 47)
 PASS: gcc.dg/noncompile/920923-1.c  -O2   (test for errors, line 55)
 PASS: gcc.dg/noncompile/920923-1.c  -O2   (test for errors, line 58)
+PASS: gcc.dg/noncompile/920923-1.c  -O2   (test for errors, line 59)
 PASS: gcc.dg/noncompile/920923-1.c  -O2   (test for errors, line 61)
 PASS: gcc.dg/noncompile/920923-1.c  -O2   (test for errors, line 66)
 PASS: gcc.dg/noncompile/920923-1.c  -O2   (test for errors, line 69)
@@ -34173,6 +34702,7 @@ PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer   (test for errors,
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer   (test for errors, line 47)
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer   (test for errors, line 55)
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer   (test for errors, line 58)
+PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer   (test for errors, line 59)
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer   (test for errors, line 61)
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer   (test for errors, line 66)
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer   (test for errors, line 69)
@@ -34205,6 +34735,7 @@ PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer -funroll-loops   (t
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer -funroll-loops   (test for errors, line 47)
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer -funroll-loops   (test for errors, line 55)
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer -funroll-loops   (test for errors, line 58)
+PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer -funroll-loops   (test for errors, line 59)
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer -funroll-loops   (test for errors, line 61)
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer -funroll-loops   (test for errors, line 66)
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer -funroll-loops   (test for errors, line 69)
@@ -34237,6 +34768,7 @@ PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer -funroll-all-loops 
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions   (test for errors, line 47)
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions   (test for errors, line 55)
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions   (test for errors, line 58)
+PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions   (test for errors, line 59)
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions   (test for errors, line 61)
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions   (test for errors, line 66)
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions   (test for errors, line 69)
@@ -34269,6 +34801,7 @@ PASS: gcc.dg/noncompile/920923-1.c  -O3 -g   (test for errors, line 45)
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -g   (test for errors, line 47)
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -g   (test for errors, line 55)
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -g   (test for errors, line 58)
+PASS: gcc.dg/noncompile/920923-1.c  -O3 -g   (test for errors, line 59)
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -g   (test for errors, line 61)
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -g   (test for errors, line 66)
 PASS: gcc.dg/noncompile/920923-1.c  -O3 -g   (test for errors, line 69)
@@ -34301,6 +34834,7 @@ PASS: gcc.dg/noncompile/920923-1.c  -Os   (test for errors, line 45)
 PASS: gcc.dg/noncompile/920923-1.c  -Os   (test for errors, line 47)
 PASS: gcc.dg/noncompile/920923-1.c  -Os   (test for errors, line 55)
 PASS: gcc.dg/noncompile/920923-1.c  -Os   (test for errors, line 58)
+PASS: gcc.dg/noncompile/920923-1.c  -Os   (test for errors, line 59)
 PASS: gcc.dg/noncompile/920923-1.c  -Os   (test for errors, line 61)
 PASS: gcc.dg/noncompile/920923-1.c  -Os   (test for errors, line 66)
 PASS: gcc.dg/noncompile/920923-1.c  -Os   (test for errors, line 69)
@@ -34977,7 +35511,7 @@ PASS: gcc.dg/noncompile/voidparam-1.c  -Os  volatile void defn (test for errors,
 PASS: gcc.dg/noncompile/voidparam-1.c  -Os  volatile void defn (test for errors, line 16)
 PASS: gcc.dg/noncompile/voidparam-1.c  -Os  register void defn (test for errors, line 17)
 PASS: gcc.dg/noncompile/voidparam-1.c  -Os  (test for excess errors)
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.dg/pch/pch.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.dg/pch/pch.exp ...
 PASS: ./common-1.h -O0 -g (test for excess errors)
 PASS: gcc.dg/pch/common-1.c -O0 -g (test for excess errors)
 PASS: gcc.dg/pch/common-1.c -O0 -g (test for excess errors)
@@ -36000,8 +36534,8 @@ PASS: ./largefile.h  -Os  (test for excess errors)
 PASS: largefile.c  -Os  (test for excess errors)
 PASS: largefile.c  -Os  (test for excess errors)
 PASS: gcc.dg/pch/largefile.c  -Os  assembly comparison
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.dg/special/mips-abi.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.dg/special/special.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.dg/special/mips-abi.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.dg/special/special.exp ...
 PASS: gcc.dg/special/20000419-2.c not used warning (test for bogus messages, line 11)
 PASS: gcc.dg/special/20000419-2.c (test for excess errors)
 PASS: gcc.dg/special/alias-1.c (test for excess errors)
@@ -36016,7 +36550,7 @@ PASS: gcc.dg/special/weak-2.c execution test
 PASS: gcc.dg/special/wkali-1.c (test for excess errors)
 PASS: gcc.dg/special/wkali-2.c (test for excess errors)
 PASS: gcc.dg/special/wkali-2.c execution test
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.dg/tls/tls.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.dg/tls/tls.exp ...
 UNSUPPORTED: gcc.dg/tls/alias-1.c
 UNSUPPORTED: gcc.dg/tls/alpha-1.c
 UNSUPPORTED: gcc.dg/tls/asm-1.c
@@ -36031,6 +36565,7 @@ UNSUPPORTED: gcc.dg/tls/nonpic-1.c
 UNSUPPORTED: gcc.dg/tls/opt-1.c
 UNSUPPORTED: gcc.dg/tls/opt-10.c
 UNSUPPORTED: gcc.dg/tls/opt-11.c
+UNSUPPORTED: gcc.dg/tls/opt-12.c
 UNSUPPORTED: gcc.dg/tls/opt-2.c
 UNSUPPORTED: gcc.dg/tls/opt-3.c
 UNSUPPORTED: gcc.dg/tls/opt-4.c
@@ -36045,7 +36580,7 @@ UNSUPPORTED: gcc.dg/tls/pr24428.c
 UNSUPPORTED: gcc.dg/tls/section-1.c
 UNSUPPORTED: gcc.dg/tls/struct-1.c
 UNSUPPORTED: gcc.dg/tls/trivial.c
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.dg/torture/dg-torture.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.dg/torture/dg-torture.exp ...
 PASS: gcc.dg/torture/asm-subreg-1.c  -O0  (test for excess errors)
 PASS: gcc.dg/torture/asm-subreg-1.c  -O1  (test for excess errors)
 PASS: gcc.dg/torture/asm-subreg-1.c  -O2  (test for excess errors)
@@ -36480,6 +37015,18 @@ PASS: gcc.dg/torture/pr27136.c  -O3 -fomit-frame-pointer -funroll-loops  (test f
 PASS: gcc.dg/torture/pr27136.c  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions  (test for excess errors)
 PASS: gcc.dg/torture/pr27136.c  -O3 -g  (test for excess errors)
 PASS: gcc.dg/torture/pr27136.c  -Os  (test for excess errors)
+PASS: gcc.dg/torture/pr27184.c  -O0  (test for excess errors)
+PASS: gcc.dg/torture/pr27184.c  -O0  execution test
+PASS: gcc.dg/torture/pr27184.c  -O1  (test for excess errors)
+PASS: gcc.dg/torture/pr27184.c  -O1  execution test
+PASS: gcc.dg/torture/pr27184.c  -O2  (test for excess errors)
+PASS: gcc.dg/torture/pr27184.c  -O2  execution test
+PASS: gcc.dg/torture/pr27184.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.dg/torture/pr27184.c  -O3 -fomit-frame-pointer  execution test
+PASS: gcc.dg/torture/pr27184.c  -O3 -g  (test for excess errors)
+PASS: gcc.dg/torture/pr27184.c  -O3 -g  execution test
+PASS: gcc.dg/torture/pr27184.c  -Os  (test for excess errors)
+PASS: gcc.dg/torture/pr27184.c  -Os  execution test
 PASS: gcc.dg/torture/pr27409.c  -O0  (test for excess errors)
 PASS: gcc.dg/torture/pr27409.c  -O1  (test for excess errors)
 PASS: gcc.dg/torture/pr27409.c  -O2  (test for excess errors)
@@ -36502,6 +37049,66 @@ PASS: gcc.dg/torture/pr27603.c  -O3 -g  (test for excess errors)
 PASS: gcc.dg/torture/pr27603.c  -O3 -g  execution test
 PASS: gcc.dg/torture/pr27603.c  -Os  (test for excess errors)
 PASS: gcc.dg/torture/pr27603.c  -Os  execution test
+PASS: gcc.dg/torture/pr27743.c  -O0  (test for excess errors)
+PASS: gcc.dg/torture/pr27743.c  -O0  execution test
+PASS: gcc.dg/torture/pr27743.c  -O1  (test for excess errors)
+PASS: gcc.dg/torture/pr27743.c  -O1  execution test
+PASS: gcc.dg/torture/pr27743.c  -O2  (test for excess errors)
+PASS: gcc.dg/torture/pr27743.c  -O2  execution test
+PASS: gcc.dg/torture/pr27743.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.dg/torture/pr27743.c  -O3 -fomit-frame-pointer  execution test
+PASS: gcc.dg/torture/pr27743.c  -O3 -g  (test for excess errors)
+PASS: gcc.dg/torture/pr27743.c  -O3 -g  execution test
+PASS: gcc.dg/torture/pr27743.c  -Os  (test for excess errors)
+PASS: gcc.dg/torture/pr27743.c  -Os  execution test
+PASS: gcc.dg/torture/pr28045.c  -O0  (test for excess errors)
+PASS: gcc.dg/torture/pr28045.c  -O0  execution test
+PASS: gcc.dg/torture/pr28045.c  -O1  (test for excess errors)
+PASS: gcc.dg/torture/pr28045.c  -O1  execution test
+PASS: gcc.dg/torture/pr28045.c  -O2  (test for excess errors)
+PASS: gcc.dg/torture/pr28045.c  -O2  execution test
+PASS: gcc.dg/torture/pr28045.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.dg/torture/pr28045.c  -O3 -fomit-frame-pointer  execution test
+PASS: gcc.dg/torture/pr28045.c  -O3 -g  (test for excess errors)
+PASS: gcc.dg/torture/pr28045.c  -O3 -g  execution test
+PASS: gcc.dg/torture/pr28045.c  -Os  (test for excess errors)
+PASS: gcc.dg/torture/pr28045.c  -Os  execution test
+PASS: gcc.dg/torture/pr28814.c  -O0  (test for excess errors)
+PASS: gcc.dg/torture/pr28814.c  -O1  (test for excess errors)
+PASS: gcc.dg/torture/pr28814.c  -O2  (test for excess errors)
+PASS: gcc.dg/torture/pr28814.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.dg/torture/pr28814.c  -O3 -g  (test for excess errors)
+PASS: gcc.dg/torture/pr28814.c  -Os  (test for excess errors)
+PASS: gcc.dg/torture/pr28900.c  -O0  (test for excess errors)
+PASS: gcc.dg/torture/pr28900.c  -O1  (test for excess errors)
+PASS: gcc.dg/torture/pr28900.c  -O2  (test for excess errors)
+PASS: gcc.dg/torture/pr28900.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.dg/torture/pr28900.c  -O3 -fomit-frame-pointer -funroll-loops  (test for excess errors)
+PASS: gcc.dg/torture/pr28900.c  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions  (test for excess errors)
+PASS: gcc.dg/torture/pr28900.c  -O3 -g  (test for excess errors)
+PASS: gcc.dg/torture/pr28900.c  -Os  (test for excess errors)
+PASS: gcc.dg/torture/pr29119.c  -O0  (test for excess errors)
+PASS: gcc.dg/torture/pr29119.c  -O1  (test for excess errors)
+PASS: gcc.dg/torture/pr29119.c  -O2  (test for excess errors)
+PASS: gcc.dg/torture/pr29119.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.dg/torture/pr29119.c  -O3 -g  (test for excess errors)
+PASS: gcc.dg/torture/pr29119.c  -Os  (test for excess errors)
+PASS: gcc.dg/torture/pr29584.c  -O0  (test for excess errors)
+PASS: gcc.dg/torture/pr29584.c  -O1  (test for excess errors)
+PASS: gcc.dg/torture/pr29584.c  -O2  (test for excess errors)
+PASS: gcc.dg/torture/pr29584.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.dg/torture/pr29584.c  -O3 -fomit-frame-pointer -funroll-loops  (test for excess errors)
+PASS: gcc.dg/torture/pr29584.c  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions  (test for excess errors)
+PASS: gcc.dg/torture/pr29584.c  -O3 -g  (test for excess errors)
+PASS: gcc.dg/torture/pr29584.c  -Os  (test for excess errors)
+PASS: gcc.dg/torture/pr30212.c  -O0  (test for excess errors)
+PASS: gcc.dg/torture/pr30212.c  -O1  (test for excess errors)
+PASS: gcc.dg/torture/pr30212.c  -O2  (test for excess errors)
+PASS: gcc.dg/torture/pr30212.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.dg/torture/pr30212.c  -O3 -fomit-frame-pointer -funroll-loops  (test for excess errors)
+PASS: gcc.dg/torture/pr30212.c  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions  (test for excess errors)
+PASS: gcc.dg/torture/pr30212.c  -O3 -g  (test for excess errors)
+PASS: gcc.dg/torture/pr30212.c  -Os  (test for excess errors)
 PASS: gcc.dg/torture/tree-loop-1.c  -O0  (test for excess errors)
 PASS: gcc.dg/torture/tree-loop-1.c  -O1  (test for excess errors)
 PASS: gcc.dg/torture/tree-loop-1.c  -O2  (test for excess errors)
@@ -36510,8 +37117,8 @@ PASS: gcc.dg/torture/tree-loop-1.c  -O3 -fomit-frame-pointer -funroll-loops  (te
 PASS: gcc.dg/torture/tree-loop-1.c  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions  (test for excess errors)
 PASS: gcc.dg/torture/tree-loop-1.c  -O3 -g  (test for excess errors)
 PASS: gcc.dg/torture/tree-loop-1.c  -Os  (test for excess errors)
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.dg/tree-prof/tree-prof.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.dg/tree-ssa/tree-ssa.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.dg/tree-prof/tree-prof.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.dg/tree-ssa/tree-ssa.exp ...
 PASS: gcc.dg/tree-ssa/20030530-2.c (test for excess errors)
 PASS: gcc.dg/tree-ssa/20030530-2.c scan-tree-dump-times first_gp_reg_save 1
 PASS: gcc.dg/tree-ssa/20030530-2.c scan-tree-dump-times \+ 1
@@ -36904,6 +37511,8 @@ PASS: gcc.dg/tree-ssa/ifc-20040816-1.c scan-tree-dump-times Applying if-conversi
 PASS: gcc.dg/tree-ssa/ifc-20040816-2.c (test for excess errors)
 PASS: gcc.dg/tree-ssa/ifc-20040816-2.c scan-tree-dump-times Applying if-conversion 1
 PASS: gcc.dg/tree-ssa/ifc-3.c (test for excess errors)
+PASS: gcc.dg/tree-ssa/inline-1.c (test for excess errors)
+PASS: gcc.dg/tree-ssa/inline-1.c scan-tree-dump-times \(struct interval\) 0
 PASS: gcc.dg/tree-ssa/inline_asm-1.c (test for excess errors)
 PASS: gcc.dg/tree-ssa/inline_asm-1.c scan-tree-dump-times test_function 2
 PASS: gcc.dg/tree-ssa/inline_asm-1.c scan-tree-dump-times V_MAY_DEF 1
@@ -36951,6 +37560,7 @@ PASS: gcc.dg/tree-ssa/loop-8.c scan-tree-dump-times step \* [^0-9] 0
 PASS: gcc.dg/tree-ssa/loop-8.c scan-tree-dump-times [^0-9] \* step 0
 PASS: gcc.dg/tree-ssa/loop-9.c (test for excess errors)
 PASS: gcc.dg/tree-ssa/ltrans-1.c (test for excess errors)
+PASS: gcc.dg/tree-ssa/ltrans-1.c scan-tree-dump-times converted loop nest to perfect loop nest 1
 PASS: gcc.dg/tree-ssa/ltrans-1.c scan-tree-dump-times transformed loop 1
 PASS: gcc.dg/tree-ssa/ltrans-2.c (test for excess errors)
 PASS: gcc.dg/tree-ssa/ltrans-3.c (test for excess errors)
@@ -37046,6 +37656,8 @@ PASS: gcc.dg/tree-ssa/pr19633.c (test for excess errors)
 PASS: gcc.dg/tree-ssa/pr19633.c scan-tree-dump-times GLOBAL_VAR 0
 PASS: gcc.dg/tree-ssa/pr20139.c (test for excess errors)
 PASS: gcc.dg/tree-ssa/pr20139.c scan-tree-dump-times link_error 0
+PASS: gcc.dg/tree-ssa/pr20256.c (test for excess errors)
+PASS: gcc.dg/tree-ssa/pr20256.c scan-tree-dump-times converted loop nest to perfect loop nest 0
 PASS: gcc.dg/tree-ssa/pr20470.c (test for excess errors)
 PASS: gcc.dg/tree-ssa/pr20470.c scan-tree-dump-times ABS_EXPR 1
 PASS: gcc.dg/tree-ssa/pr20490.c (test for excess errors)
@@ -37136,8 +37748,12 @@ PASS: gcc.dg/tree-ssa/pr24670.c (test for excess errors)
 PASS: gcc.dg/tree-ssa/pr24840.c (test for excess errors)
 PASS: gcc.dg/tree-ssa/pr26180.c (test for excess errors)
 PASS: gcc.dg/tree-ssa/pr26180.c execution test
+PASS: gcc.dg/tree-ssa/pr26435.c (test for excess errors)
+PASS: gcc.dg/tree-ssa/pr26435.c scan-tree-dump-times converted loop nest to perfect loop nest 0
 PASS: gcc.dg/tree-ssa/pr27236.c (test for excess errors)
 PASS: gcc.dg/tree-ssa/pr27236.c scan-tree-dump-times foo_read 5
+PASS: gcc.dg/tree-ssa/pr27781.c (test for excess errors)
+PASS: gcc.dg/tree-ssa/pr27781.c scan-tree-dump func \(\);
 PASS: gcc.dg/tree-ssa/pta-fp.c (test for excess errors)
 PASS: gcc.dg/tree-ssa/pta-fp.c scan-tree-dump-times sin cos 1
 PASS: gcc.dg/tree-ssa/reassoc-1.c (test for excess errors)
@@ -37171,6 +37787,7 @@ PASS: gcc.dg/tree-ssa/scev-1.c (test for excess errors)
 PASS: gcc.dg/tree-ssa/scev-1.c execution test
 PASS: gcc.dg/tree-ssa/scev-2.c (test for excess errors)
 PASS: gcc.dg/tree-ssa/scev-2.c execution test
+UNSUPPORTED: gcc.dg/tree-ssa/scev-cast.c
 PASS: gcc.dg/tree-ssa/sra-1.c (test for excess errors)
 PASS: gcc.dg/tree-ssa/sra-1.c scan-tree-dump-times link_error 0
 PASS: gcc.dg/tree-ssa/sra-2.c (test for excess errors)
@@ -37364,9 +37981,9 @@ PASS: gcc.dg/tree-ssa/wholeprogram-1.c (test for excess errors)
 PASS: gcc.dg/tree-ssa/wholeprogram-1.c scan-tree-dump-not large_function
 PASS: gcc.dg/tree-ssa/wholeprogram-2.c (test for excess errors)
 PASS: gcc.dg/tree-ssa/wholeprogram-2.c scan-tree-dump externally_visible_function
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.dg/vect/vect.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.dg/vmx/vmx.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.dg/weak/weak.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.dg/vect/vect.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.dg/vmx/vmx.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.dg/weak/weak.exp ...
 PASS: gcc.dg/weak/typeof-2.c (test for excess errors)
 PASS: gcc.dg/weak/typeof-2.c scan-assembler-not foo1
 PASS: gcc.dg/weak/typeof-2.c scan-assembler baz1
@@ -37453,11 +38070,11 @@ PASS: gcc.dg/weak/weak-9.c scan-assembler weak[^ \t]*[ \t]_?f1
 PASS: gcc.dg/weak/weak-9.c scan-assembler weak[^ \t]*[ \t]_?f2
 PASS: gcc.dg/weak/weak-9.c scan-assembler weak[^ \t]*[ \t]_?f3
 PASS: gcc.dg/weak/weak-9.c scan-assembler weak[^ \t]*[ \t]_?f4
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.misc-tests/acker1.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.misc-tests/arm-isr.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.misc-tests/bprob.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.misc-tests/dhry.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.misc-tests/gcov.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.misc-tests/acker1.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.misc-tests/arm-isr.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.misc-tests/bprob.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.misc-tests/dhry.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.misc-tests/gcov.exp ...
 UNSUPPORTED: gcc.misc-tests/gcov-1.c
 UNSUPPORTED: gcc.misc-tests/gcov-10.c
 UNSUPPORTED: gcc.misc-tests/gcov-10b.c
@@ -37471,7 +38088,7 @@ UNSUPPORTED: gcc.misc-tests/gcov-6.c
 UNSUPPORTED: gcc.misc-tests/gcov-7.c
 UNSUPPORTED: gcc.misc-tests/gcov-8.c
 UNSUPPORTED: gcc.misc-tests/gcov-9.c
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.misc-tests/i386-prefetch.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.misc-tests/i386-prefetch.exp ...
 UNSUPPORTED: gcc.misc-tests/i386-pf-none-1.c  -march=i386 -mtune=i386 
 UNSUPPORTED: gcc.misc-tests/i386-pf-none-1.c  -march=i386 -mtune=i486 
 UNSUPPORTED: gcc.misc-tests/i386-pf-none-1.c  -march=i386 -mtune=i586 
@@ -37507,38 +38124,63 @@ UNSUPPORTED: gcc.misc-tests/i386-pf-3dnow-1.c  -march=k6-2
 UNSUPPORTED: gcc.misc-tests/i386-pf-3dnow-1.c  -march=k6-3 
 UNSUPPORTED: gcc.misc-tests/i386-pf-athlon-1.c  -march=athlon 
 UNSUPPORTED: gcc.misc-tests/i386-pf-athlon-1.c  -march=athlon-4 
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.misc-tests/linkage.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.misc-tests/matrix1.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.misc-tests/mg-2.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.misc-tests/linkage.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.misc-tests/matrix1.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.misc-tests/mg-2.exp ...
 PASS: gcc.misc-tests/mg-2.c
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.misc-tests/mg.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.misc-tests/mg.exp ...
 PASS: gcc.misc-tests/mg.c
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.misc-tests/options.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.misc-tests/options.exp ...
 PASS: compiler driver --coverage option(s)
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.misc-tests/sieve.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.misc-tests/sort2.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.target/alpha/alpha.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.target/arm/arm.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.target/cris/cris.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.target/cris/torture/cris-torture.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.target/frv/frv.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.target/i386/i386.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.target/ia64/ia64.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.target/mips/mips.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.target/powerpc/powerpc.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.target/sparc/sparc.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.target/x86_64/abi/abi-x86_64.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.target/xstormy16/xstormy16.exp ...
-Running /home/rgetz/testcvs/gcc/gcc-4.1/gcc/testsuite/gcc.test-framework/test-framework.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.misc-tests/sieve.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.misc-tests/sort2.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.target/alpha/alpha.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.target/arm/arm.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.target/bfin/bfin.exp ...
+PASS: gcc.target/bfin/mcpu-bf522.c (test for excess errors)
+PASS: gcc.target/bfin/mcpu-bf525.c (test for excess errors)
+PASS: gcc.target/bfin/mcpu-bf527.c (test for excess errors)
+PASS: gcc.target/bfin/mcpu-bf531.c (test for excess errors)
+PASS: gcc.target/bfin/mcpu-bf532.c (test for excess errors)
+PASS: gcc.target/bfin/mcpu-bf533.c (test for excess errors)
+PASS: gcc.target/bfin/mcpu-bf534.c (test for excess errors)
+PASS: gcc.target/bfin/mcpu-bf536.c (test for excess errors)
+PASS: gcc.target/bfin/mcpu-bf537.c (test for excess errors)
+PASS: gcc.target/bfin/mcpu-bf538.c (test for excess errors)
+PASS: gcc.target/bfin/mcpu-bf539.c (test for excess errors)
+PASS: gcc.target/bfin/mcpu-bf542.c (test for excess errors)
+PASS: gcc.target/bfin/mcpu-bf544.c (test for excess errors)
+PASS: gcc.target/bfin/mcpu-bf547.c (test for excess errors)
+PASS: gcc.target/bfin/mcpu-bf548.c (test for excess errors)
+PASS: gcc.target/bfin/mcpu-bf549.c (test for excess errors)
+FAIL: gcc.target/bfin/mcpu-bf561.c (test for excess errors)
+PASS: gcc.target/bfin/mcpu-default.c (test for excess errors)
+PASS: gcc.target/bfin/workarounds-1.c (test for excess errors)
+PASS: gcc.target/bfin/workarounds-2.c (test for excess errors)
+PASS: gcc.target/bfin/workarounds-3.c (test for excess errors)
+PASS: gcc.target/bfin/workarounds-4.c (test for excess errors)
+PASS: gcc.target/bfin/workarounds-any.c (test for excess errors)
+PASS: gcc.target/bfin/workarounds-none.c (test for excess errors)
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.target/cris/cris.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.target/cris/torture/cris-torture.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.target/frv/frv.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.target/i386/i386.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.target/ia64/ia64.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.target/mips/mips.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.target/powerpc/powerpc.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.target/sparc/sparc.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.target/x86_64/abi/abi-x86_64.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.target/xstormy16/xstormy16.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/gcc/testsuite/gcc.test-framework/test-framework.exp ...
 
 		=== gcc Summary ===
 
-# of expected passes		36974
+# of expected passes		37608
 # of unexpected failures	12
 # of unexpected successes	1
 # of expected failures		75
 # of unresolved testcases	4
 # of untested testcases		28
-# of unsupported tests		375
-/home/rgetz/testcvs/build-gcc/gcc_build-4.1/gcc/xgcc  version 4.1.1 (ADI cvs)
+# of unsupported tests		382
+/home/rgetz/blackfin/gcc-build/gcc_build-4.1/gcc/xgcc  version 4.1.2 (ADI svn)
 

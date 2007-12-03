@@ -1,0 +1,2794 @@
+Test Run By rgetz on Sun Dec  2 01:41:02 2007
+Target is bfin-unknown-elf
+Host   is bfin-unknown-elf
+Build  is i686-pc-linux-gnu
+
+		=== libstdc++ tests ===
+
+Schedule of variations:
+    bfin-sim
+
+Running target bfin-sim
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/libstdc++-v3/testsuite/libstdc++-abi/abi.exp ...
+Running /home/rgetz/blackfin/toolchain/gcc-4.1/libstdc++-v3/testsuite/libstdc++-dg/normal.exp ...
+PASS: 17_intro/header_cassert.cc (test for excess errors)
+PASS: 17_intro/header_cassert.cc execution test
+PASS: 17_intro/header_cerrno.cc (test for excess errors)
+PASS: 17_intro/header_cerrno.cc execution test
+PASS: 17_intro/header_csetjmp.cc (test for excess errors)
+PASS: 17_intro/header_csetjmp.cc execution test
+PASS: 17_intro/header_cstdarg.cc (test for excess errors)
+PASS: 17_intro/header_cstdarg.cc execution test
+PASS: 17_intro/header_cstddef.cc (test for excess errors)
+PASS: 17_intro/header_cstddef.cc execution test
+PASS: 17_intro/header_cstdio.cc (test for excess errors)
+PASS: 17_intro/header_cstdio.cc execution test
+PASS: 17_intro/header_cstdlib.cc (test for excess errors)
+PASS: 17_intro/header_cstdlib.cc execution test
+PASS: 17_intro/header_cstring.cc (test for excess errors)
+PASS: 17_intro/header_cstring.cc execution test
+PASS: 17_intro/header_ctime.cc (test for excess errors)
+PASS: 17_intro/header_ctime.cc execution test
+PASS: 17_intro/header_cwchar.cc (test for excess errors)
+PASS: 17_intro/header_cwchar.cc execution test
+PASS: 17_intro/header_cwctype.cc (test for excess errors)
+PASS: 17_intro/header_cwctype.cc execution test
+PASS: 17_intro/header_fstream.cc (test for excess errors)
+PASS: 17_intro/header_fstream.cc execution test
+PASS: 17_intro/header_iomanip.cc (test for excess errors)
+PASS: 17_intro/header_iomanip.cc execution test
+PASS: 17_intro/header_ios.cc (test for excess errors)
+PASS: 17_intro/header_ios.cc execution test
+PASS: 17_intro/header_iosfwd.cc (test for excess errors)
+PASS: 17_intro/header_iosfwd.cc execution test
+PASS: 17_intro/header_iostream.cc (test for excess errors)
+PASS: 17_intro/header_iostream.cc execution test
+PASS: 17_intro/header_istream.cc (test for excess errors)
+PASS: 17_intro/header_istream.cc execution test
+PASS: 17_intro/header_ostream.cc (test for excess errors)
+PASS: 17_intro/header_ostream.cc execution test
+PASS: 17_intro/header_sstream.cc (test for excess errors)
+PASS: 17_intro/header_sstream.cc execution test
+PASS: 17_intro/header_streambuf.cc (test for excess errors)
+PASS: 17_intro/header_streambuf.cc execution test
+PASS: 17_intro/headers.cc (test for excess errors)
+PASS: 17_intro/headers.cc execution test
+PASS: 17_intro/headers_c++.cc (test for excess errors)
+PASS: 17_intro/headers_c++.cc execution test
+PASS: 17_intro/headers_c.cc (test for excess errors)
+PASS: 17_intro/headers_c.cc execution test
+PASS: 17_intro/no_assert_neg.cc  (test for errors, line 84)
+PASS: 17_intro/no_assert_neg.cc (test for excess errors)
+PASS: 18_support/14026.cc (test for excess errors)
+PASS: 18_support/14026.cc execution test
+PASS: 18_support/new_delete_placement.cc (test for excess errors)
+PASS: 18_support/new_delete_placement.cc execution test
+PASS: 18_support/numeric_limits/denorm_min.cc (test for excess errors)
+PASS: 18_support/numeric_limits/denorm_min.cc execution test
+PASS: 18_support/numeric_limits/digits10.cc (test for excess errors)
+PASS: 18_support/numeric_limits/digits10.cc execution test
+PASS: 18_support/numeric_limits/epsilon.cc (test for excess errors)
+PASS: 18_support/numeric_limits/epsilon.cc execution test
+PASS: 18_support/numeric_limits/infinity.cc (test for excess errors)
+PASS: 18_support/numeric_limits/infinity.cc execution test
+PASS: 18_support/numeric_limits/is_iec559.cc (test for excess errors)
+PASS: 18_support/numeric_limits/is_iec559.cc execution test
+PASS: 18_support/numeric_limits/min_max.cc (test for excess errors)
+PASS: 18_support/numeric_limits/min_max.cc execution test
+PASS: 18_support/numeric_limits/quiet_NaN.cc (test for excess errors)
+PASS: 18_support/numeric_limits/quiet_NaN.cc execution test
+PASS: 18_support/numeric_limits/sign.cc (test for excess errors)
+PASS: 18_support/numeric_limits/sign.cc execution test
+PASS: 18_support/numeric_limits/specialization.cc (test for excess errors)
+PASS: 18_support/numeric_limits/specialization.cc execution test
+PASS: 18_support/numeric_limits/traps.cc (test for excess errors)
+PASS: 18_support/numeric_limits/traps.cc execution test
+PASS: 19_diagnostics/stdexceptions.cc (test for excess errors)
+PASS: 19_diagnostics/stdexceptions.cc execution test
+PASS: 20_util/functional/binders/1.cc (test for excess errors)
+PASS: 20_util/functional/binders/3113.cc (test for excess errors)
+PASS: 20_util/functional/binders/3113.cc execution test
+PASS: 20_util/functional/comparisons.cc (test for excess errors)
+PASS: 20_util/functional/comparisons.cc execution test
+PASS: 20_util/memory/16505.cc (test for excess errors)
+PASS: 20_util/memory/allocator/1.cc (test for excess errors)
+PASS: 20_util/memory/allocator/1.cc execution test
+PASS: 20_util/memory/allocator/10378.cc (test for excess errors)
+PASS: 20_util/memory/allocator/10378.cc execution test
+PASS: 20_util/memory/allocator/14176.cc (test for excess errors)
+PASS: 20_util/memory/allocator/14176.cc execution test
+PASS: 20_util/memory/allocator/8230.cc (test for excess errors)
+PASS: 20_util/memory/allocator/8230.cc execution test
+PASS: 20_util/memory/auto_ptr/1.cc (test for excess errors)
+PASS: 20_util/memory/auto_ptr/1.cc execution test
+PASS: 20_util/memory/auto_ptr/2.cc (test for excess errors)
+PASS: 20_util/memory/auto_ptr/2.cc execution test
+PASS: 20_util/memory/auto_ptr/3.cc (test for excess errors)
+PASS: 20_util/memory/auto_ptr/3.cc execution test
+PASS: 20_util/memory/auto_ptr/3946.cc (test for excess errors)
+PASS: 20_util/memory/auto_ptr/3946.cc execution test
+PASS: 20_util/memory/auto_ptr/4.cc (test for excess errors)
+PASS: 20_util/memory/auto_ptr/4.cc execution test
+PASS: 20_util/memory/auto_ptr/5.cc (test for excess errors)
+PASS: 20_util/memory/auto_ptr/5.cc execution test
+PASS: 20_util/memory/auto_ptr/6.cc (test for excess errors)
+PASS: 20_util/memory/auto_ptr/6.cc execution test
+PASS: 20_util/memory/auto_ptr/7.cc (test for excess errors)
+PASS: 20_util/memory/auto_ptr/7.cc execution test
+PASS: 20_util/memory/auto_ptr/assign_neg.cc  (test for errors, line 39)
+PASS: 20_util/memory/auto_ptr/assign_neg.cc  (test for errors, line 223)
+PASS: 20_util/memory/auto_ptr/assign_neg.cc  (test for errors, line 353)
+PASS: 20_util/memory/auto_ptr/assign_neg.cc (test for excess errors)
+PASS: 20_util/memory/raw_storage_iterator.cc (test for excess errors)
+PASS: 20_util/memory/raw_storage_iterator.cc execution test
+PASS: 20_util/memory/temporary_buffer.cc (test for excess errors)
+PASS: 20_util/memory/temporary_buffer.cc execution test
+PASS: 20_util/utility/pair/1.cc (test for excess errors)
+PASS: 20_util/utility/pair/1.cc execution test
+PASS: 20_util/utility/pair/2.cc (test for excess errors)
+PASS: 20_util/utility/pair/2.cc execution test
+PASS: 20_util/utility/pair/3.cc (test for excess errors)
+PASS: 20_util/utility/pair/3.cc execution test
+PASS: 20_util/utility/pair/4.cc (test for excess errors)
+PASS: 20_util/utility/pair/4.cc execution test
+PASS: 20_util/utility/rel_ops.cc (test for excess errors)
+PASS: 20_util/utility/rel_ops.cc execution test
+PASS: 21_strings/basic_string/1.cc (test for excess errors)
+PASS: 21_strings/basic_string/2.cc (test for excess errors)
+PASS: 21_strings/basic_string/append/char/1.cc (test for excess errors)
+PASS: 21_strings/basic_string/append/char/1.cc execution test
+PASS: 21_strings/basic_string/append/char/2.cc (test for excess errors)
+PASS: 21_strings/basic_string/append/char/2.cc execution test
+PASS: 21_strings/basic_string/append/char/3.cc (test for excess errors)
+PASS: 21_strings/basic_string/append/char/3.cc execution test
+PASS: 21_strings/basic_string/assign/char/1.cc (test for excess errors)
+PASS: 21_strings/basic_string/assign/char/1.cc execution test
+PASS: 21_strings/basic_string/assign/char/2.cc (test for excess errors)
+PASS: 21_strings/basic_string/assign/char/2.cc execution test
+PASS: 21_strings/basic_string/assign/char/3.cc (test for excess errors)
+PASS: 21_strings/basic_string/assign/char/3.cc execution test
+PASS: 21_strings/basic_string/capacity/1.cc (test for excess errors)
+PASS: 21_strings/basic_string/capacity/1.cc execution test
+PASS: 21_strings/basic_string/capacity/char/1.cc (test for excess errors)
+PASS: 21_strings/basic_string/capacity/char/1.cc execution test
+PASS: 21_strings/basic_string/capacity/char/18654.cc (test for excess errors)
+PASS: 21_strings/basic_string/capacity/char/18654.cc execution test
+PASS: 21_strings/basic_string/capacity/char/2.cc (test for excess errors)
+PASS: 21_strings/basic_string/capacity/char/2.cc execution test
+PASS: 21_strings/basic_string/compare/char/1.cc (test for excess errors)
+PASS: 21_strings/basic_string/compare/char/1.cc execution test
+PASS: 21_strings/basic_string/compare/char/13650.cc (test for excess errors)
+PASS: 21_strings/basic_string/compare/char/13650.cc execution test
+PASS: 21_strings/basic_string/cons/char/1.cc (test for excess errors)
+PASS: 21_strings/basic_string/cons/char/1.cc execution test
+PASS: 21_strings/basic_string/cons/char/2.cc (test for excess errors)
+PASS: 21_strings/basic_string/cons/char/2.cc execution test
+PASS: 21_strings/basic_string/cons/char/3.cc (test for excess errors)
+PASS: 21_strings/basic_string/cons/char/3.cc execution test
+PASS: 21_strings/basic_string/cons/char/4.cc (test for excess errors)
+PASS: 21_strings/basic_string/cons/char/4.cc execution test
+PASS: 21_strings/basic_string/cons/char/5.cc (test for excess errors)
+PASS: 21_strings/basic_string/cons/char/5.cc execution test
+PASS: 21_strings/basic_string/cons/char/6.cc (test for excess errors)
+PASS: 21_strings/basic_string/cons/char/6.cc execution test
+PASS: 21_strings/basic_string/element_access/char/1.cc (test for excess errors)
+PASS: 21_strings/basic_string/element_access/char/1.cc execution test
+PASS: 21_strings/basic_string/element_access/char/2.cc (test for excess errors)
+PASS: 21_strings/basic_string/element_access/char/2.cc execution test
+PASS: 21_strings/basic_string/element_access/char/21674.cc (test for excess errors)
+XFAIL: 21_strings/basic_string/element_access/char/21674.cc execution test
+PASS: 21_strings/basic_string/element_access/char/3.cc (test for excess errors)
+PASS: 21_strings/basic_string/element_access/char/3.cc execution test
+PASS: 21_strings/basic_string/element_access/char/4.cc (test for excess errors)
+PASS: 21_strings/basic_string/element_access/char/4.cc execution test
+PASS: 21_strings/basic_string/element_access/char/empty.cc (test for excess errors)
+PASS: 21_strings/basic_string/element_access/char/empty.cc execution test
+PASS: 21_strings/basic_string/find/char/1.cc (test for excess errors)
+PASS: 21_strings/basic_string/find/char/1.cc execution test
+PASS: 21_strings/basic_string/find/char/2.cc (test for excess errors)
+PASS: 21_strings/basic_string/find/char/2.cc execution test
+PASS: 21_strings/basic_string/find/char/3.cc (test for excess errors)
+PASS: 21_strings/basic_string/find/char/3.cc execution test
+PASS: 21_strings/basic_string/insert/char/1.cc (test for excess errors)
+PASS: 21_strings/basic_string/insert/char/1.cc execution test
+PASS: 21_strings/basic_string/insert/char/2.cc (test for excess errors)
+PASS: 21_strings/basic_string/insert/char/2.cc execution test
+PASS: 21_strings/basic_string/inserters_extractors/char/1.cc (test for excess errors)
+PASS: 21_strings/basic_string/inserters_extractors/char/1.cc execution test
+PASS: 21_strings/basic_string/inserters_extractors/char/10.cc (test for excess errors)
+PASS: 21_strings/basic_string/inserters_extractors/char/10.cc execution test
+PASS: 21_strings/basic_string/inserters_extractors/char/11.cc (test for excess errors)
+PASS: 21_strings/basic_string/inserters_extractors/char/11.cc execution test
+PASS: 21_strings/basic_string/inserters_extractors/char/4.cc (test for excess errors)
+PASS: 21_strings/basic_string/inserters_extractors/char/4.cc execution test
+PASS: 21_strings/basic_string/inserters_extractors/char/5.cc (test for excess errors)
+PASS: 21_strings/basic_string/inserters_extractors/char/5.cc execution test
+PASS: 21_strings/basic_string/inserters_extractors/char/6.cc (test for excess errors)
+PASS: 21_strings/basic_string/inserters_extractors/char/6.cc execution test
+PASS: 21_strings/basic_string/inserters_extractors/char/7.cc (test for excess errors)
+PASS: 21_strings/basic_string/inserters_extractors/char/7.cc execution test
+PASS: 21_strings/basic_string/inserters_extractors/char/8.cc (test for excess errors)
+PASS: 21_strings/basic_string/inserters_extractors/char/8.cc execution test
+PASS: 21_strings/basic_string/inserters_extractors/char/9.cc (test for excess errors)
+PASS: 21_strings/basic_string/inserters_extractors/char/9.cc execution test
+PASS: 21_strings/basic_string/inserters_extractors/pod/10081-in.cc (test for excess errors)
+PASS: 21_strings/basic_string/inserters_extractors/pod/10081-in.cc execution test
+PASS: 21_strings/basic_string/inserters_extractors/pod/10081-out.cc (test for excess errors)
+PASS: 21_strings/basic_string/inserters_extractors/pod/10081-out.cc execution test
+PASS: 21_strings/basic_string/operations/char/1.cc (test for excess errors)
+PASS: 21_strings/basic_string/operations/char/1.cc execution test
+PASS: 21_strings/basic_string/operators/char/1.cc (test for excess errors)
+PASS: 21_strings/basic_string/operators/char/1.cc execution test
+PASS: 21_strings/basic_string/operators/char/2.cc (test for excess errors)
+PASS: 21_strings/basic_string/operators/char/2.cc execution test
+PASS: 21_strings/basic_string/replace/char/1.cc (test for excess errors)
+PASS: 21_strings/basic_string/replace/char/1.cc execution test
+PASS: 21_strings/basic_string/replace/char/2.cc (test for excess errors)
+PASS: 21_strings/basic_string/replace/char/2.cc execution test
+PASS: 21_strings/basic_string/replace/char/3.cc (test for excess errors)
+PASS: 21_strings/basic_string/replace/char/3.cc execution test
+PASS: 21_strings/basic_string/replace/char/4.cc (test for excess errors)
+PASS: 21_strings/basic_string/replace/char/4.cc execution test
+PASS: 21_strings/basic_string/replace/char/5.cc (test for excess errors)
+PASS: 21_strings/basic_string/replace/char/5.cc execution test
+PASS: 21_strings/basic_string/replace/char/6.cc (test for excess errors)
+PASS: 21_strings/basic_string/replace/char/6.cc execution test
+PASS: 21_strings/basic_string/rfind/char/1.cc (test for excess errors)
+PASS: 21_strings/basic_string/rfind/char/1.cc execution test
+PASS: 21_strings/basic_string/rfind/char/2.cc (test for excess errors)
+PASS: 21_strings/basic_string/rfind/char/2.cc execution test
+PASS: 21_strings/basic_string/rfind/char/3.cc (test for excess errors)
+PASS: 21_strings/basic_string/rfind/char/3.cc execution test
+PASS: 21_strings/basic_string/substr/char/1.cc (test for excess errors)
+PASS: 21_strings/basic_string/substr/char/1.cc execution test
+PASS: 21_strings/basic_string/types/23767.cc (test for excess errors)
+PASS: 21_strings/c_strings/char/1.cc (test for excess errors)
+PASS: 21_strings/c_strings/char/1.cc execution test
+PASS: 21_strings/c_strings/char/2.cc (test for excess errors)
+PASS: 21_strings/c_strings/char/2.cc execution test
+PASS: 21_strings/char_traits/requirements/char/1.cc (test for excess errors)
+PASS: 21_strings/char_traits/requirements/char/1.cc execution test
+PASS: 21_strings/char_traits/requirements/short/1.cc (test for excess errors)
+PASS: 21_strings/char_traits/requirements/short/1.cc execution test
+PASS: 21_strings/char_traits/typedefs/char/1.cc (test for excess errors)
+PASS: 21_strings/char_traits/typedefs/char/1.cc execution test
+PASS: 22_locale/codecvt/1.cc (test for excess errors)
+PASS: 22_locale/codecvt/2.cc (test for excess errors)
+PASS: 22_locale/codecvt/always_noconv/char/1.cc (test for excess errors)
+PASS: 22_locale/codecvt/always_noconv/char/1.cc execution test
+UNSUPPORTED: 22_locale/codecvt/always_noconv/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/codecvt/always_noconv/char/wrapped_locale.cc
+PASS: 22_locale/codecvt/encoding/char/1.cc (test for excess errors)
+PASS: 22_locale/codecvt/encoding/char/1.cc execution test
+UNSUPPORTED: 22_locale/codecvt/encoding/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/codecvt/encoding/char/wrapped_locale.cc
+PASS: 22_locale/codecvt/in/char/1.cc (test for excess errors)
+PASS: 22_locale/codecvt/in/char/1.cc execution test
+UNSUPPORTED: 22_locale/codecvt/in/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/codecvt/in/char/wrapped_locale.cc
+PASS: 22_locale/codecvt/length/char/1.cc (test for excess errors)
+PASS: 22_locale/codecvt/length/char/1.cc execution test
+PASS: 22_locale/codecvt/length/char/2.cc (test for excess errors)
+PASS: 22_locale/codecvt/length/char/2.cc execution test
+UNSUPPORTED: 22_locale/codecvt/length/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/codecvt/length/char/wrapped_locale.cc
+PASS: 22_locale/codecvt/max_length/char/1.cc (test for excess errors)
+PASS: 22_locale/codecvt/max_length/char/1.cc execution test
+UNSUPPORTED: 22_locale/codecvt/max_length/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/codecvt/max_length/char/wrapped_locale.cc
+PASS: 22_locale/codecvt/out/char/1.cc (test for excess errors)
+PASS: 22_locale/codecvt/out/char/1.cc execution test
+UNSUPPORTED: 22_locale/codecvt/out/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/codecvt/out/char/wrapped_locale.cc
+PASS: 22_locale/codecvt/unicode/1.cc (test for excess errors)
+PASS: 22_locale/codecvt/unicode/1.cc execution test
+PASS: 22_locale/codecvt/unicode/char.cc (test for excess errors)
+PASS: 22_locale/codecvt/unicode/char.cc execution test
+PASS: 22_locale/codecvt/unshift/char/1.cc (test for excess errors)
+PASS: 22_locale/codecvt/unshift/char/1.cc execution test
+UNSUPPORTED: 22_locale/codecvt/unshift/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/codecvt/unshift/char/wrapped_locale.cc
+PASS: 22_locale/codecvt_byname/1.cc (test for excess errors)
+PASS: 22_locale/collate/1.cc (test for excess errors)
+PASS: 22_locale/collate/2.cc (test for excess errors)
+UNSUPPORTED: 22_locale/collate/compare/char/1.cc
+UNSUPPORTED: 22_locale/collate/compare/char/2.cc
+UNSUPPORTED: 22_locale/collate/compare/char/3.cc
+UNSUPPORTED: 22_locale/collate/compare/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/collate/compare/char/wrapped_locale.cc
+PASS: 22_locale/collate/hash/char/1.cc (test for excess errors)
+PASS: 22_locale/collate/hash/char/1.cc execution test
+UNSUPPORTED: 22_locale/collate/hash/char/2.cc
+UNSUPPORTED: 22_locale/collate/hash/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/collate/hash/char/wrapped_locale.cc
+UNSUPPORTED: 22_locale/collate/transform/char/2.cc
+UNSUPPORTED: 22_locale/collate/transform/char/3.cc
+UNSUPPORTED: 22_locale/collate/transform/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/collate/transform/char/wrapped_locale.cc
+PASS: 22_locale/collate_byname/1.cc (test for excess errors)
+UNSUPPORTED: 22_locale/collate_byname/named_equivalence.cc
+PASS: 22_locale/ctype/1.cc (test for excess errors)
+PASS: 22_locale/ctype/2.cc (test for excess errors)
+PASS: 22_locale/ctype/cons/char/1.cc (test for excess errors)
+PASS: 22_locale/ctype/cons/char/1.cc execution test
+UNSUPPORTED: 22_locale/ctype/cons/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/ctype/cons/char/wrapped_locale.cc
+PASS: 22_locale/ctype/is/char/1.cc (test for excess errors)
+PASS: 22_locale/ctype/is/char/1.cc execution test
+UNSUPPORTED: 22_locale/ctype/is/char/2.cc
+PASS: 22_locale/ctype/is/char/3.cc (test for excess errors)
+PASS: 22_locale/ctype/is/char/3.cc execution test
+PASS: 22_locale/ctype/is/char/9858.cc (test for excess errors)
+PASS: 22_locale/ctype/is/char/9858.cc execution test
+UNSUPPORTED: 22_locale/ctype/is/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/ctype/is/char/wrapped_locale.cc
+PASS: 22_locale/ctype/narrow/char/1.cc (test for excess errors)
+PASS: 22_locale/ctype/narrow/char/1.cc execution test
+PASS: 22_locale/ctype/narrow/char/19955.cc (test for excess errors)
+PASS: 22_locale/ctype/narrow/char/19955.cc execution test
+PASS: 22_locale/ctype/narrow/char/2.cc (test for excess errors)
+PASS: 22_locale/ctype/narrow/char/2.cc execution test
+UNSUPPORTED: 22_locale/ctype/narrow/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/ctype/narrow/char/wrapped_locale.cc
+PASS: 22_locale/ctype/scan/char/1.cc (test for excess errors)
+PASS: 22_locale/ctype/scan/char/1.cc execution test
+UNSUPPORTED: 22_locale/ctype/scan/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/ctype/scan/char/wrapped_locale.cc
+PASS: 22_locale/ctype/to/char/1.cc (test for excess errors)
+PASS: 22_locale/ctype/to/char/1.cc execution test
+UNSUPPORTED: 22_locale/ctype/to/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/ctype/to/char/wrapped_locale.cc
+PASS: 22_locale/ctype/widen/char/1.cc (test for excess errors)
+PASS: 22_locale/ctype/widen/char/1.cc execution test
+UNSUPPORTED: 22_locale/ctype/widen/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/ctype/widen/char/wrapped_locale.cc
+PASS: 22_locale/ctype_base/1.cc (test for excess errors)
+PASS: 22_locale/ctype_base/11844.cc (test for excess errors)
+PASS: 22_locale/ctype_base/11844.cc execution test
+PASS: 22_locale/ctype_byname/1.cc (test for excess errors)
+PASS: 22_locale/facet/1.cc (test for excess errors)
+PASS: 22_locale/facet/1.cc execution test
+UNSUPPORTED: 22_locale/facet/2.cc
+PASS: 22_locale/facet/25421.cc (test for excess errors)
+PASS: 22_locale/facet/25421.cc execution test
+PASS: 22_locale/global_templates/1.cc (test for excess errors)
+PASS: 22_locale/global_templates/1.cc execution test
+PASS: 22_locale/locale/13630.cc (test for excess errors)
+PASS: 22_locale/locale/13630.cc execution test
+PASS: 22_locale/locale/cons/1.cc (test for excess errors)
+PASS: 22_locale/locale/cons/1.cc execution test
+UNSUPPORTED: 22_locale/locale/cons/12352.cc
+UNSUPPORTED: 22_locale/locale/cons/12438.cc
+UNSUPPORTED: 22_locale/locale/cons/2.cc
+UNSUPPORTED: 22_locale/locale/cons/4.cc
+UNSUPPORTED: 22_locale/locale/cons/5.cc
+PASS: 22_locale/locale/cons/6.cc (test for excess errors)
+PASS: 22_locale/locale/cons/6.cc execution test
+UNSUPPORTED: 22_locale/locale/cons/7.cc
+PASS: 22_locale/locale/cons/7222-c.cc (test for excess errors)
+PASS: 22_locale/locale/cons/7222-c.cc execution test
+UNSUPPORTED: 22_locale/locale/cons/7222-env.cc
+PASS: 22_locale/locale/cons/8.cc (test for excess errors)
+PASS: 22_locale/locale/cons/8.cc execution test
+PASS: 22_locale/locale/global_locale_objects/1.cc (test for excess errors)
+PASS: 22_locale/locale/global_locale_objects/1.cc execution test
+UNSUPPORTED: 22_locale/locale/global_locale_objects/14071.cc
+UNSUPPORTED: 22_locale/locale/global_locale_objects/2.cc
+PASS: 22_locale/locale/global_locale_objects/3.cc (test for excess errors)
+PASS: 22_locale/locale/global_locale_objects/3.cc execution test
+PASS: 22_locale/locale/operations/1.cc (test for excess errors)
+PASS: 22_locale/locale/operations/1.cc execution test
+PASS: 22_locale/locale/operations/2.cc (test for excess errors)
+PASS: 22_locale/locale/operations/2.cc execution test
+PASS: 22_locale/messages/1.cc (test for excess errors)
+PASS: 22_locale/messages/2.cc (test for excess errors)
+UNSUPPORTED: 22_locale/messages/members/char/1.cc
+UNSUPPORTED: 22_locale/messages/members/char/2.cc
+UNSUPPORTED: 22_locale/messages/members/char/3.cc
+UNSUPPORTED: 22_locale/messages/members/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/messages/members/char/wrapped_locale.cc
+PASS: 22_locale/messages_byname/1.cc (test for excess errors)
+UNSUPPORTED: 22_locale/messages_byname/named_equivalence.cc
+PASS: 22_locale/money_get/1.cc (test for excess errors)
+PASS: 22_locale/money_get/2.cc (test for excess errors)
+PASS: 22_locale/money_get/3.cc (test for excess errors)
+UNSUPPORTED: 22_locale/money_get/get/char/1.cc
+UNSUPPORTED: 22_locale/money_get/get/char/10.cc
+UNSUPPORTED: 22_locale/money_get/get/char/11.cc
+UNSUPPORTED: 22_locale/money_get/get/char/11528.cc
+UNSUPPORTED: 22_locale/money_get/get/char/12.cc
+UNSUPPORTED: 22_locale/money_get/get/char/13.cc
+PASS: 22_locale/money_get/get/char/14.cc (test for excess errors)
+PASS: 22_locale/money_get/get/char/14.cc execution test
+UNSUPPORTED: 22_locale/money_get/get/char/15.cc
+UNSUPPORTED: 22_locale/money_get/get/char/16.cc
+UNSUPPORTED: 22_locale/money_get/get/char/17.cc
+UNSUPPORTED: 22_locale/money_get/get/char/18.cc
+PASS: 22_locale/money_get/get/char/19.cc (test for excess errors)
+PASS: 22_locale/money_get/get/char/19.cc execution test
+UNSUPPORTED: 22_locale/money_get/get/char/2.cc
+PASS: 22_locale/money_get/get/char/22131.cc (test for excess errors)
+PASS: 22_locale/money_get/get/char/22131.cc execution test
+UNSUPPORTED: 22_locale/money_get/get/char/3.cc
+UNSUPPORTED: 22_locale/money_get/get/char/4.cc
+PASS: 22_locale/money_get/get/char/5.cc (test for excess errors)
+PASS: 22_locale/money_get/get/char/5.cc execution test
+PASS: 22_locale/money_get/get/char/6.cc (test for excess errors)
+PASS: 22_locale/money_get/get/char/6.cc execution test
+PASS: 22_locale/money_get/get/char/7.cc (test for excess errors)
+PASS: 22_locale/money_get/get/char/7.cc execution test
+PASS: 22_locale/money_get/get/char/8.cc (test for excess errors)
+PASS: 22_locale/money_get/get/char/8.cc execution test
+PASS: 22_locale/money_get/get/char/9.cc (test for excess errors)
+PASS: 22_locale/money_get/get/char/9.cc execution test
+UNSUPPORTED: 22_locale/money_get/get/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/money_get/get/char/wrapped_locale.cc
+PASS: 22_locale/money_put/1.cc (test for excess errors)
+PASS: 22_locale/money_put/2.cc (test for excess errors)
+PASS: 22_locale/money_put/3.cc (test for excess errors)
+UNSUPPORTED: 22_locale/money_put/put/char/1.cc
+PASS: 22_locale/money_put/put/char/12971.cc (test for excess errors)
+PASS: 22_locale/money_put/put/char/12971.cc execution test
+UNSUPPORTED: 22_locale/money_put/put/char/2.cc
+UNSUPPORTED: 22_locale/money_put/put/char/3.cc
+PASS: 22_locale/money_put/put/char/4.cc (test for excess errors)
+PASS: 22_locale/money_put/put/char/4.cc execution test
+PASS: 22_locale/money_put/put/char/5.cc (test for excess errors)
+PASS: 22_locale/money_put/put/char/5.cc execution test
+PASS: 22_locale/money_put/put/char/6.cc (test for excess errors)
+PASS: 22_locale/money_put/put/char/6.cc execution test
+UNSUPPORTED: 22_locale/money_put/put/char/9780-3.cc
+UNSUPPORTED: 22_locale/money_put/put/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/money_put/put/char/wrapped_locale.cc
+PASS: 22_locale/moneypunct/1.cc (test for excess errors)
+PASS: 22_locale/moneypunct/2.cc (test for excess errors)
+PASS: 22_locale/moneypunct/3.cc (test for excess errors)
+PASS: 22_locale/moneypunct/members/char/1.cc (test for excess errors)
+PASS: 22_locale/moneypunct/members/char/1.cc execution test
+UNSUPPORTED: 22_locale/moneypunct/members/char/2.cc
+UNSUPPORTED: 22_locale/moneypunct/members/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/moneypunct/members/char/wrapped_locale.cc
+PASS: 22_locale/moneypunct_byname/1.cc (test for excess errors)
+UNSUPPORTED: 22_locale/moneypunct_byname/named_equivalence.cc
+PASS: 22_locale/num_get/1.cc (test for excess errors)
+PASS: 22_locale/num_get/2.cc (test for excess errors)
+PASS: 22_locale/num_get/3.cc (test for excess errors)
+UNSUPPORTED: 22_locale/num_get/get/char/1.cc
+PASS: 22_locale/num_get/get/char/10.cc (test for excess errors)
+PASS: 22_locale/num_get/get/char/10.cc execution test
+PASS: 22_locale/num_get/get/char/11.cc (test for excess errors)
+PASS: 22_locale/num_get/get/char/11.cc execution test
+PASS: 22_locale/num_get/get/char/12.cc (test for excess errors)
+PASS: 22_locale/num_get/get/char/12.cc execution test
+PASS: 22_locale/num_get/get/char/13.cc (test for excess errors)
+PASS: 22_locale/num_get/get/char/13.cc execution test
+PASS: 22_locale/num_get/get/char/14.cc (test for excess errors)
+PASS: 22_locale/num_get/get/char/14.cc execution test
+PASS: 22_locale/num_get/get/char/15.cc (test for excess errors)
+PASS: 22_locale/num_get/get/char/15.cc execution test
+PASS: 22_locale/num_get/get/char/16.cc (test for excess errors)
+PASS: 22_locale/num_get/get/char/16.cc execution test
+PASS: 22_locale/num_get/get/char/2.cc (test for excess errors)
+PASS: 22_locale/num_get/get/char/2.cc execution test
+PASS: 22_locale/num_get/get/char/22131.cc (test for excess errors)
+PASS: 22_locale/num_get/get/char/22131.cc execution test
+PASS: 22_locale/num_get/get/char/23953.cc (test for excess errors)
+PASS: 22_locale/num_get/get/char/23953.cc execution test
+UNSUPPORTED: 22_locale/num_get/get/char/3.cc
+PASS: 22_locale/num_get/get/char/4.cc (test for excess errors)
+PASS: 22_locale/num_get/get/char/4.cc execution test
+UNSUPPORTED: 22_locale/num_get/get/char/5.cc
+UNSUPPORTED: 22_locale/num_get/get/char/6.cc
+PASS: 22_locale/num_get/get/char/7.cc (test for excess errors)
+PASS: 22_locale/num_get/get/char/7.cc execution test
+PASS: 22_locale/num_get/get/char/8.cc (test for excess errors)
+PASS: 22_locale/num_get/get/char/8.cc execution test
+UNSUPPORTED: 22_locale/num_get/get/char/9.cc
+UNSUPPORTED: 22_locale/num_get/get/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/num_get/get/char/wrapped_locale.cc
+PASS: 22_locale/num_put/1.cc (test for excess errors)
+PASS: 22_locale/num_put/2.cc (test for excess errors)
+PASS: 22_locale/num_put/3.cc (test for excess errors)
+UNSUPPORTED: 22_locale/num_put/put/char/1.cc
+PASS: 22_locale/num_put/put/char/10.cc (test for excess errors)
+PASS: 22_locale/num_put/put/char/10.cc execution test
+PASS: 22_locale/num_put/put/char/14220.cc (test for excess errors)
+PASS: 22_locale/num_put/put/char/14220.cc execution test
+PASS: 22_locale/num_put/put/char/15565.cc (test for excess errors)
+PASS: 22_locale/num_put/put/char/15565.cc execution test
+PASS: 22_locale/num_put/put/char/2.cc (test for excess errors)
+PASS: 22_locale/num_put/put/char/2.cc execution test
+UNSUPPORTED: 22_locale/num_put/put/char/20909.cc
+UNSUPPORTED: 22_locale/num_put/put/char/20914.cc
+PASS: 22_locale/num_put/put/char/23953.cc (test for excess errors)
+PASS: 22_locale/num_put/put/char/23953.cc execution test
+UNSUPPORTED: 22_locale/num_put/put/char/3.cc
+PASS: 22_locale/num_put/put/char/4.cc (test for excess errors)
+PASS: 22_locale/num_put/put/char/4.cc execution test
+UNSUPPORTED: 22_locale/num_put/put/char/5.cc
+PASS: 22_locale/num_put/put/char/6.cc (test for excess errors)
+PASS: 22_locale/num_put/put/char/6.cc execution test
+PASS: 22_locale/num_put/put/char/7.cc (test for excess errors)
+PASS: 22_locale/num_put/put/char/7.cc execution test
+PASS: 22_locale/num_put/put/char/8.cc (test for excess errors)
+PASS: 22_locale/num_put/put/char/8.cc execution test
+PASS: 22_locale/num_put/put/char/9.cc (test for excess errors)
+PASS: 22_locale/num_put/put/char/9.cc execution test
+UNSUPPORTED: 22_locale/num_put/put/char/9780-2.cc
+UNSUPPORTED: 22_locale/num_put/put/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/num_put/put/char/wrapped_locale.cc
+PASS: 22_locale/numpunct/1.cc (test for excess errors)
+PASS: 22_locale/numpunct/2.cc (test for excess errors)
+PASS: 22_locale/numpunct/members/char/1.cc (test for excess errors)
+PASS: 22_locale/numpunct/members/char/1.cc execution test
+UNSUPPORTED: 22_locale/numpunct/members/char/2.cc
+UNSUPPORTED: 22_locale/numpunct/members/char/3.cc
+PASS: 22_locale/numpunct/members/char/cache_1.cc (test for excess errors)
+PASS: 22_locale/numpunct/members/char/cache_1.cc execution test
+PASS: 22_locale/numpunct/members/char/cache_2.cc (test for excess errors)
+PASS: 22_locale/numpunct/members/char/cache_2.cc execution test
+UNSUPPORTED: 22_locale/numpunct/members/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/numpunct/members/char/wrapped_locale.cc
+PASS: 22_locale/numpunct/members/pod/1.cc (test for excess errors)
+PASS: 22_locale/numpunct/members/pod/1.cc execution test
+PASS: 22_locale/numpunct/members/pod/2.cc (test for excess errors)
+PASS: 22_locale/numpunct/members/pod/2.cc execution test
+PASS: 22_locale/numpunct_byname/1.cc (test for excess errors)
+UNSUPPORTED: 22_locale/numpunct_byname/named_equivalence.cc
+PASS: 22_locale/time_get/1.cc (test for excess errors)
+PASS: 22_locale/time_get/2.cc (test for excess errors)
+PASS: 22_locale/time_get/date_order/char/1.cc (test for excess errors)
+PASS: 22_locale/time_get/date_order/char/1.cc execution test
+UNSUPPORTED: 22_locale/time_get/date_order/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/time_get/date_order/char/wrapped_locale.cc
+PASS: 22_locale/time_get/get_date/char/1.cc (test for excess errors)
+PASS: 22_locale/time_get/get_date/char/1.cc execution test
+UNSUPPORTED: 22_locale/time_get/get_date/char/12750.cc
+PASS: 22_locale/time_get/get_date/char/12791.cc (test for excess errors)
+PASS: 22_locale/time_get/get_date/char/12791.cc execution test
+UNSUPPORTED: 22_locale/time_get/get_date/char/2.cc
+PASS: 22_locale/time_get/get_date/char/3.cc (test for excess errors)
+PASS: 22_locale/time_get/get_date/char/3.cc execution test
+UNSUPPORTED: 22_locale/time_get/get_date/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/time_get/get_date/char/wrapped_locale.cc
+PASS: 22_locale/time_get/get_monthname/char/1.cc (test for excess errors)
+PASS: 22_locale/time_get/get_monthname/char/1.cc execution test
+UNSUPPORTED: 22_locale/time_get/get_monthname/char/2.cc
+PASS: 22_locale/time_get/get_monthname/char/3.cc (test for excess errors)
+PASS: 22_locale/time_get/get_monthname/char/3.cc execution test
+PASS: 22_locale/time_get/get_monthname/char/4.cc (test for excess errors)
+PASS: 22_locale/time_get/get_monthname/char/4.cc execution test
+UNSUPPORTED: 22_locale/time_get/get_monthname/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/time_get/get_monthname/char/wrapped_locale.cc
+UNSUPPORTED: 22_locale/time_get/get_time/char/1.cc
+UNSUPPORTED: 22_locale/time_get/get_time/char/2.cc
+PASS: 22_locale/time_get/get_time/char/3.cc (test for excess errors)
+PASS: 22_locale/time_get/get_time/char/3.cc execution test
+PASS: 22_locale/time_get/get_time/char/4.cc (test for excess errors)
+PASS: 22_locale/time_get/get_time/char/4.cc execution test
+UNSUPPORTED: 22_locale/time_get/get_time/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/time_get/get_time/char/wrapped_locale.cc
+PASS: 22_locale/time_get/get_weekday/char/1.cc (test for excess errors)
+PASS: 22_locale/time_get/get_weekday/char/1.cc execution test
+UNSUPPORTED: 22_locale/time_get/get_weekday/char/2.cc
+PASS: 22_locale/time_get/get_weekday/char/3.cc (test for excess errors)
+PASS: 22_locale/time_get/get_weekday/char/3.cc execution test
+UNSUPPORTED: 22_locale/time_get/get_weekday/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/time_get/get_weekday/char/wrapped_locale.cc
+PASS: 22_locale/time_get/get_year/char/1.cc (test for excess errors)
+PASS: 22_locale/time_get/get_year/char/1.cc execution test
+PASS: 22_locale/time_get/get_year/char/3.cc (test for excess errors)
+PASS: 22_locale/time_get/get_year/char/3.cc execution test
+UNSUPPORTED: 22_locale/time_get/get_year/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/time_get/get_year/char/wrapped_locale.cc
+PASS: 22_locale/time_put/1.cc (test for excess errors)
+PASS: 22_locale/time_put/2.cc (test for excess errors)
+PASS: 22_locale/time_put/put/char/1.cc (test for excess errors)
+PASS: 22_locale/time_put/put/char/1.cc execution test
+PASS: 22_locale/time_put/put/char/10.cc (test for excess errors)
+PASS: 22_locale/time_put/put/char/10.cc execution test
+FAIL: 22_locale/time_put/put/char/12439_1.cc (test for excess errors)
+UNRESOLVED: 22_locale/time_put/put/char/12439_1.cc compilation failed to produce executable
+FAIL: 22_locale/time_put/put/char/12439_3.cc (test for excess errors)
+UNRESOLVED: 22_locale/time_put/put/char/12439_3.cc compilation failed to produce executable
+UNSUPPORTED: 22_locale/time_put/put/char/17038.cc
+UNSUPPORTED: 22_locale/time_put/put/char/2.cc
+UNSUPPORTED: 22_locale/time_put/put/char/3.cc
+UNSUPPORTED: 22_locale/time_put/put/char/4.cc
+PASS: 22_locale/time_put/put/char/5.cc (test for excess errors)
+PASS: 22_locale/time_put/put/char/5.cc execution test
+UNSUPPORTED: 22_locale/time_put/put/char/6.cc
+UNSUPPORTED: 22_locale/time_put/put/char/7.cc
+UNSUPPORTED: 22_locale/time_put/put/char/8.cc
+PASS: 22_locale/time_put/put/char/9.cc (test for excess errors)
+PASS: 22_locale/time_put/put/char/9.cc execution test
+UNSUPPORTED: 22_locale/time_put/put/char/9780-1.cc
+UNSUPPORTED: 22_locale/time_put/put/char/wrapped_env.cc
+UNSUPPORTED: 22_locale/time_put/put/char/wrapped_locale.cc
+PASS: 23_containers/bitset/18604.cc (test for excess errors)
+PASS: 23_containers/bitset/cons/1.cc (test for excess errors)
+PASS: 23_containers/bitset/cons/1.cc execution test
+PASS: 23_containers/bitset/cons/16020.cc (test for excess errors)
+PASS: 23_containers/bitset/cons/16020.cc execution test
+PASS: 23_containers/bitset/cons/6282.cc (test for excess errors)
+PASS: 23_containers/bitset/cons/6282.cc execution test
+PASS: 23_containers/bitset/count/6124.cc (test for excess errors)
+PASS: 23_containers/bitset/count/6124.cc execution test
+PASS: 23_containers/bitset/ext/15361.cc (test for excess errors)
+PASS: 23_containers/bitset/ext/15361.cc execution test
+PASS: 23_containers/bitset/input/1.cc (test for excess errors)
+PASS: 23_containers/bitset/input/1.cc execution test
+PASS: 23_containers/bitset/invalidation/1.cc (test for excess errors)
+PASS: 23_containers/bitset/invalidation/1.cc execution test
+PASS: 23_containers/bitset/operations/1.cc (test for excess errors)
+PASS: 23_containers/bitset/operations/1.cc execution test
+PASS: 23_containers/bitset/operations/13838.cc (test for excess errors)
+PASS: 23_containers/bitset/operations/13838.cc execution test
+PASS: 23_containers/bitset/operations/2.cc (test for excess errors)
+PASS: 23_containers/bitset/operations/2.cc execution test
+PASS: 23_containers/bitset/test/1.cc (test for excess errors)
+PASS: 23_containers/bitset/test/1.cc execution test
+PASS: 23_containers/bitset/to_string/1.cc (test for excess errors)
+PASS: 23_containers/bitset/to_string/1.cc execution test
+PASS: 23_containers/bitset/to_ulong/1.cc (test for excess errors)
+PASS: 23_containers/bitset/to_ulong/1.cc execution test
+PASS: 23_containers/deque/1.cc (test for excess errors)
+PASS: 23_containers/deque/14340.cc (test for excess errors)
+PASS: 23_containers/deque/18604.cc (test for excess errors)
+PASS: 23_containers/deque/check_construct_destroy.cc (test for excess errors)
+PASS: 23_containers/deque/check_construct_destroy.cc execution test
+PASS: 23_containers/deque/cons/1.cc (test for excess errors)
+PASS: 23_containers/deque/cons/1.cc execution test
+PASS: 23_containers/deque/cons/2.cc (test for excess errors)
+PASS: 23_containers/deque/cons/2.cc execution test
+PASS: 23_containers/deque/cons/clear_allocator.cc (test for excess errors)
+PASS: 23_containers/deque/cons/clear_allocator.cc execution test
+PASS: 23_containers/deque/explicit_instantiation/1.cc (test for excess errors)
+PASS: 23_containers/deque/explicit_instantiation/2.cc (test for excess errors)
+PASS: 23_containers/deque/explicit_instantiation/3.cc (test for excess errors)
+PASS: 23_containers/deque/invalidation/1.cc (test for excess errors)
+PASS: 23_containers/deque/invalidation/1.cc execution test
+PASS: 23_containers/deque/invalidation/2.cc (test for excess errors)
+PASS: 23_containers/deque/invalidation/2.cc execution test
+PASS: 23_containers/deque/invalidation/3.cc (test for excess errors)
+PASS: 23_containers/deque/invalidation/3.cc execution test
+PASS: 23_containers/deque/invalidation/4.cc (test for excess errors)
+PASS: 23_containers/deque/invalidation/4.cc execution test
+PASS: 23_containers/deque/modifiers/swap.cc (test for excess errors)
+PASS: 23_containers/deque/modifiers/swap.cc execution test
+PASS: 23_containers/deque/operators/1.cc (test for excess errors)
+PASS: 23_containers/deque/operators/1.cc execution test
+PASS: 23_containers/list/1.cc (test for excess errors)
+PASS: 23_containers/list/14340.cc (test for excess errors)
+PASS: 23_containers/list/18604.cc (test for excess errors)
+PASS: 23_containers/list/23781.cc  (test for errors, line 35)
+PASS: 23_containers/list/23781.cc  (test for errors, line 36)
+PASS: 23_containers/list/23781.cc (test for excess errors)
+PASS: 23_containers/list/capacity/1.cc (test for excess errors)
+PASS: 23_containers/list/capacity/1.cc execution test
+PASS: 23_containers/list/check_construct_destroy.cc (test for excess errors)
+PASS: 23_containers/list/check_construct_destroy.cc execution test
+PASS: 23_containers/list/cons/1.cc (test for excess errors)
+PASS: 23_containers/list/cons/1.cc execution test
+PASS: 23_containers/list/cons/2.cc (test for excess errors)
+PASS: 23_containers/list/cons/2.cc execution test
+PASS: 23_containers/list/cons/3.cc (test for excess errors)
+PASS: 23_containers/list/cons/3.cc execution test
+PASS: 23_containers/list/cons/4.cc (test for excess errors)
+PASS: 23_containers/list/cons/4.cc execution test
+PASS: 23_containers/list/cons/5.cc (test for excess errors)
+PASS: 23_containers/list/cons/5.cc execution test
+PASS: 23_containers/list/cons/6.cc (test for excess errors)
+PASS: 23_containers/list/cons/6.cc execution test
+PASS: 23_containers/list/cons/7.cc (test for excess errors)
+PASS: 23_containers/list/cons/7.cc execution test
+PASS: 23_containers/list/cons/8.cc (test for excess errors)
+PASS: 23_containers/list/cons/8.cc execution test
+PASS: 23_containers/list/cons/9.cc (test for excess errors)
+PASS: 23_containers/list/cons/9.cc execution test
+PASS: 23_containers/list/cons/clear_allocator.cc (test for excess errors)
+PASS: 23_containers/list/cons/clear_allocator.cc execution test
+PASS: 23_containers/list/explicit_instantiation/1.cc (test for excess errors)
+PASS: 23_containers/list/explicit_instantiation/2.cc (test for excess errors)
+PASS: 23_containers/list/explicit_instantiation/3.cc (test for excess errors)
+PASS: 23_containers/list/invalidation/1.cc (test for excess errors)
+PASS: 23_containers/list/invalidation/1.cc execution test
+PASS: 23_containers/list/invalidation/2.cc (test for excess errors)
+PASS: 23_containers/list/invalidation/2.cc execution test
+PASS: 23_containers/list/invalidation/3.cc (test for excess errors)
+PASS: 23_containers/list/invalidation/3.cc execution test
+PASS: 23_containers/list/invalidation/4.cc (test for excess errors)
+PASS: 23_containers/list/invalidation/4.cc execution test
+PASS: 23_containers/list/modifiers/1.cc (test for excess errors)
+PASS: 23_containers/list/modifiers/1.cc execution test
+PASS: 23_containers/list/modifiers/2.cc (test for excess errors)
+PASS: 23_containers/list/modifiers/2.cc execution test
+PASS: 23_containers/list/modifiers/3.cc (test for excess errors)
+PASS: 23_containers/list/modifiers/3.cc execution test
+PASS: 23_containers/list/modifiers/swap.cc (test for excess errors)
+PASS: 23_containers/list/modifiers/swap.cc execution test
+PASS: 23_containers/list/operators/1.cc (test for excess errors)
+PASS: 23_containers/list/operators/1.cc execution test
+PASS: 23_containers/list/operators/2.cc (test for excess errors)
+PASS: 23_containers/list/operators/2.cc execution test
+PASS: 23_containers/list/operators/3.cc (test for excess errors)
+PASS: 23_containers/list/operators/3.cc execution test
+PASS: 23_containers/list/operators/4.cc (test for excess errors)
+PASS: 23_containers/list/operators/4.cc execution test
+PASS: 23_containers/map/1.cc (test for excess errors)
+PASS: 23_containers/map/14340.cc (test for excess errors)
+PASS: 23_containers/map/18604.cc (test for excess errors)
+PASS: 23_containers/map/23781.cc  (test for errors, line 35)
+PASS: 23_containers/map/23781.cc  (test for errors, line 36)
+PASS: 23_containers/map/23781.cc (test for excess errors)
+PASS: 23_containers/map/element_access/1.cc (test for excess errors)
+PASS: 23_containers/map/element_access/1.cc execution test
+PASS: 23_containers/map/explicit_instantiation/1.cc (test for excess errors)
+PASS: 23_containers/map/explicit_instantiation/2.cc (test for excess errors)
+PASS: 23_containers/map/explicit_instantiation/3.cc (test for excess errors)
+PASS: 23_containers/map/insert/1.cc (test for excess errors)
+PASS: 23_containers/map/insert/1.cc execution test
+PASS: 23_containers/map/insert/16813.cc (test for excess errors)
+PASS: 23_containers/map/insert/16813.cc execution test
+PASS: 23_containers/map/invalidation/1.cc (test for excess errors)
+PASS: 23_containers/map/invalidation/1.cc execution test
+PASS: 23_containers/map/invalidation/2.cc (test for excess errors)
+PASS: 23_containers/map/invalidation/2.cc execution test
+PASS: 23_containers/map/modifiers/swap.cc (test for excess errors)
+PASS: 23_containers/map/modifiers/swap.cc execution test
+PASS: 23_containers/map/operators/1.cc (test for excess errors)
+PASS: 23_containers/map/operators/1.cc execution test
+PASS: 23_containers/map/operators/1_neg.cc  (test for errors, line 40)
+PASS: 23_containers/map/operators/1_neg.cc  (test for errors, line 41)
+PASS: 23_containers/map/operators/1_neg.cc  (test for errors, line 210)
+PASS: 23_containers/map/operators/1_neg.cc  (test for errors, line 214)
+PASS: 23_containers/map/operators/1_neg.cc (test for excess errors)
+PASS: 23_containers/multimap/1.cc (test for excess errors)
+PASS: 23_containers/multimap/14340.cc (test for excess errors)
+PASS: 23_containers/multimap/23781.cc  (test for errors, line 35)
+PASS: 23_containers/multimap/23781.cc  (test for errors, line 36)
+PASS: 23_containers/multimap/23781.cc (test for excess errors)
+PASS: 23_containers/multimap/explicit_instantiation/1.cc (test for excess errors)
+PASS: 23_containers/multimap/explicit_instantiation/2.cc (test for excess errors)
+PASS: 23_containers/multimap/explicit_instantiation/3.cc (test for excess errors)
+PASS: 23_containers/multimap/invalidation/1.cc (test for excess errors)
+PASS: 23_containers/multimap/invalidation/1.cc execution test
+PASS: 23_containers/multimap/invalidation/2.cc (test for excess errors)
+PASS: 23_containers/multimap/invalidation/2.cc execution test
+PASS: 23_containers/multimap/modifiers/swap.cc (test for excess errors)
+PASS: 23_containers/multimap/modifiers/swap.cc execution test
+PASS: 23_containers/multiset/1.cc (test for excess errors)
+PASS: 23_containers/multiset/14340.cc (test for excess errors)
+PASS: 23_containers/multiset/23781.cc  (test for errors, line 35)
+PASS: 23_containers/multiset/23781.cc  (test for errors, line 36)
+PASS: 23_containers/multiset/23781.cc (test for excess errors)
+PASS: 23_containers/multiset/explicit_instantiation/1.cc (test for excess errors)
+PASS: 23_containers/multiset/explicit_instantiation/2.cc (test for excess errors)
+PASS: 23_containers/multiset/explicit_instantiation/3.cc (test for excess errors)
+PASS: 23_containers/multiset/insert/1.cc (test for excess errors)
+PASS: 23_containers/multiset/insert/1.cc execution test
+PASS: 23_containers/multiset/insert/2.cc (test for excess errors)
+PASS: 23_containers/multiset/insert/2.cc execution test
+PASS: 23_containers/multiset/invalidation/1.cc (test for excess errors)
+PASS: 23_containers/multiset/invalidation/1.cc execution test
+PASS: 23_containers/multiset/invalidation/2.cc (test for excess errors)
+PASS: 23_containers/multiset/invalidation/2.cc execution test
+PASS: 23_containers/multiset/modifiers/swap.cc (test for excess errors)
+PASS: 23_containers/multiset/modifiers/swap.cc execution test
+PASS: 23_containers/priority_queue/members/7161.cc (test for excess errors)
+PASS: 23_containers/priority_queue/members/7161.cc execution test
+PASS: 23_containers/queue/members/7157.cc (test for excess errors)
+PASS: 23_containers/queue/members/7157.cc execution test
+PASS: 23_containers/set/1.cc (test for excess errors)
+PASS: 23_containers/set/14340.cc (test for excess errors)
+PASS: 23_containers/set/18604.cc (test for excess errors)
+PASS: 23_containers/set/23781.cc  (test for errors, line 35)
+PASS: 23_containers/set/23781.cc  (test for errors, line 36)
+PASS: 23_containers/set/23781.cc (test for excess errors)
+PASS: 23_containers/set/check_construct_destroy.cc (test for excess errors)
+PASS: 23_containers/set/check_construct_destroy.cc execution test
+PASS: 23_containers/set/explicit_instantiation/1.cc (test for excess errors)
+PASS: 23_containers/set/explicit_instantiation/2.cc (test for excess errors)
+PASS: 23_containers/set/explicit_instantiation/3.cc (test for excess errors)
+PASS: 23_containers/set/insert/1.cc (test for excess errors)
+PASS: 23_containers/set/insert/1.cc execution test
+PASS: 23_containers/set/invalidation/1.cc (test for excess errors)
+PASS: 23_containers/set/invalidation/1.cc execution test
+PASS: 23_containers/set/invalidation/2.cc (test for excess errors)
+PASS: 23_containers/set/invalidation/2.cc execution test
+PASS: 23_containers/set/modifiers/16728.cc (test for excess errors)
+FAIL: 23_containers/set/modifiers/16728.cc execution test
+PASS: 23_containers/set/modifiers/17948.cc (test for excess errors)
+PASS: 23_containers/set/modifiers/17948.cc execution test
+PASS: 23_containers/set/modifiers/swap.cc (test for excess errors)
+PASS: 23_containers/set/modifiers/swap.cc execution test
+PASS: 23_containers/set/operators/1_neg.cc  (test for errors, line 38)
+PASS: 23_containers/set/operators/1_neg.cc  (test for errors, line 39)
+PASS: 23_containers/set/operators/1_neg.cc  (test for errors, line 285)
+PASS: 23_containers/set/operators/1_neg.cc  (test for errors, line 289)
+PASS: 23_containers/set/operators/1_neg.cc (test for excess errors)
+PASS: 23_containers/stack/members/7158.cc (test for excess errors)
+PASS: 23_containers/stack/members/7158.cc execution test
+PASS: 23_containers/vector/1.cc (test for excess errors)
+PASS: 23_containers/vector/14340.cc (test for excess errors)
+PASS: 23_containers/vector/18604.cc (test for excess errors)
+PASS: 23_containers/vector/bool/1.cc (test for excess errors)
+PASS: 23_containers/vector/bool/1.cc execution test
+PASS: 23_containers/vector/bool/21244.cc (test for excess errors)
+PASS: 23_containers/vector/bool/23632.cc (test for excess errors)
+PASS: 23_containers/vector/bool/6886.cc (test for excess errors)
+PASS: 23_containers/vector/bool/6886.cc execution test
+PASS: 23_containers/vector/bool/clear_allocator.cc (test for excess errors)
+PASS: 23_containers/vector/bool/clear_allocator.cc execution test
+PASS: 23_containers/vector/capacity/1.cc (test for excess errors)
+PASS: 23_containers/vector/capacity/1.cc execution test
+PASS: 23_containers/vector/capacity/2.cc (test for excess errors)
+PASS: 23_containers/vector/capacity/2.cc execution test
+PASS: 23_containers/vector/capacity/8230.cc (test for excess errors)
+PASS: 23_containers/vector/capacity/8230.cc execution test
+PASS: 23_containers/vector/check_construct_destroy.cc (test for excess errors)
+PASS: 23_containers/vector/check_construct_destroy.cc execution test
+PASS: 23_containers/vector/cons/1.cc (test for excess errors)
+PASS: 23_containers/vector/cons/1.cc execution test
+PASS: 23_containers/vector/cons/2.cc (test for excess errors)
+PASS: 23_containers/vector/cons/2.cc execution test
+PASS: 23_containers/vector/cons/3.cc (test for excess errors)
+PASS: 23_containers/vector/cons/3.cc execution test
+PASS: 23_containers/vector/cons/4.cc (test for excess errors)
+PASS: 23_containers/vector/cons/4.cc execution test
+PASS: 23_containers/vector/cons/6513.cc (test for excess errors)
+PASS: 23_containers/vector/cons/6513.cc execution test
+PASS: 23_containers/vector/cons/clear_allocator.cc (test for excess errors)
+PASS: 23_containers/vector/cons/clear_allocator.cc execution test
+PASS: 23_containers/vector/data_access/1.cc (test for excess errors)
+PASS: 23_containers/vector/data_access/1.cc execution test
+PASS: 23_containers/vector/element_access/1.cc (test for excess errors)
+PASS: 23_containers/vector/element_access/1.cc execution test
+PASS: 23_containers/vector/explicit_instantiation/1.cc (test for excess errors)
+PASS: 23_containers/vector/explicit_instantiation/2.cc (test for excess errors)
+PASS: 23_containers/vector/explicit_instantiation/3.cc (test for excess errors)
+PASS: 23_containers/vector/invalidation/1.cc (test for excess errors)
+PASS: 23_containers/vector/invalidation/1.cc execution test
+PASS: 23_containers/vector/invalidation/2.cc (test for excess errors)
+PASS: 23_containers/vector/invalidation/2.cc execution test
+PASS: 23_containers/vector/invalidation/3.cc (test for excess errors)
+PASS: 23_containers/vector/invalidation/3.cc execution test
+PASS: 23_containers/vector/invalidation/4.cc (test for excess errors)
+PASS: 23_containers/vector/invalidation/4.cc execution test
+PASS: 23_containers/vector/modifiers/1.cc (test for excess errors)
+PASS: 23_containers/vector/modifiers/1.cc execution test
+PASS: 23_containers/vector/modifiers/2.cc (test for excess errors)
+PASS: 23_containers/vector/modifiers/2.cc execution test
+PASS: 23_containers/vector/modifiers/insert/1.cc (test for excess errors)
+PASS: 23_containers/vector/modifiers/insert/1.cc execution test
+PASS: 23_containers/vector/modifiers/swap.cc (test for excess errors)
+PASS: 23_containers/vector/modifiers/swap.cc execution test
+PASS: 23_containers/vector/resize/1.cc (test for excess errors)
+PASS: 23_containers/vector/resize/1.cc execution test
+PASS: 23_containers/vector/types/23767.cc (test for excess errors)
+PASS: 24_iterators/back_insert_iterator.cc (test for excess errors)
+PASS: 24_iterators/back_insert_iterator.cc execution test
+PASS: 24_iterators/front_insert_iterator.cc (test for excess errors)
+PASS: 24_iterators/front_insert_iterator.cc execution test
+PASS: 24_iterators/insert_iterator.cc (test for excess errors)
+PASS: 24_iterators/insert_iterator.cc execution test
+PASS: 24_iterators/istream_iterator.cc (test for excess errors)
+PASS: 24_iterators/istream_iterator.cc execution test
+PASS: 24_iterators/istreambuf_iterator/1.cc (test for excess errors)
+PASS: 24_iterators/istreambuf_iterator/2.cc (test for excess errors)
+PASS: 24_iterators/istreambuf_iterator/2.cc execution test
+PASS: 24_iterators/istreambuf_iterator/2627.cc (test for excess errors)
+PASS: 24_iterators/istreambuf_iterator/2627.cc execution test
+PASS: 24_iterators/iterator.cc (test for excess errors)
+PASS: 24_iterators/iterator.cc execution test
+PASS: 24_iterators/ostream_iterator.cc (test for excess errors)
+PASS: 24_iterators/ostream_iterator.cc execution test
+PASS: 24_iterators/ostreambuf_iterator/1.cc (test for excess errors)
+PASS: 24_iterators/ostreambuf_iterator/2.cc (test for excess errors)
+PASS: 24_iterators/ostreambuf_iterator/2.cc execution test
+PASS: 24_iterators/reverse_iterator/1.cc (test for excess errors)
+PASS: 24_iterators/reverse_iterator/11729.cc (test for excess errors)
+PASS: 24_iterators/reverse_iterator/11729.cc execution test
+PASS: 24_iterators/reverse_iterator/2.cc (test for excess errors)
+PASS: 24_iterators/reverse_iterator/2.cc execution test
+PASS: 24_iterators/reverse_iterator/3.cc (test for excess errors)
+PASS: 24_iterators/reverse_iterator/3.cc execution test
+PASS: 25_algorithms/adjacent_find/1.cc (test for excess errors)
+PASS: 25_algorithms/adjacent_find/1.cc execution test
+PASS: 25_algorithms/adjacent_find/check_type.cc (test for excess errors)
+PASS: 25_algorithms/binary_search.cc (test for excess errors)
+PASS: 25_algorithms/binary_search.cc execution test
+PASS: 25_algorithms/binary_search/1.cc (test for excess errors)
+PASS: 25_algorithms/binary_search/1.cc execution test
+PASS: 25_algorithms/binary_search/check_type.cc (test for excess errors)
+PASS: 25_algorithms/copy/1.cc (test for excess errors)
+PASS: 25_algorithms/copy/1.cc execution test
+PASS: 25_algorithms/copy/2.cc (test for excess errors)
+PASS: 25_algorithms/copy/2.cc execution test
+PASS: 25_algorithms/copy/3.cc (test for excess errors)
+PASS: 25_algorithms/copy/3.cc execution test
+PASS: 25_algorithms/copy/4.cc (test for excess errors)
+PASS: 25_algorithms/copy/4.cc execution test
+PASS: 25_algorithms/count/1.cc (test for excess errors)
+PASS: 25_algorithms/count/1.cc execution test
+PASS: 25_algorithms/count/check_type.cc (test for excess errors)
+PASS: 25_algorithms/count_if/1.cc (test for excess errors)
+PASS: 25_algorithms/count_if/1.cc execution test
+PASS: 25_algorithms/count_if/check_type.cc (test for excess errors)
+PASS: 25_algorithms/equal/1.cc (test for excess errors)
+PASS: 25_algorithms/equal/1.cc execution test
+PASS: 25_algorithms/equal/check_type.cc (test for excess errors)
+PASS: 25_algorithms/equal/equal.cc (test for excess errors)
+PASS: 25_algorithms/equal_range/1.cc (test for excess errors)
+PASS: 25_algorithms/equal_range/1.cc execution test
+PASS: 25_algorithms/equal_range/check_type.cc (test for excess errors)
+PASS: 25_algorithms/fill/1.cc (test for excess errors)
+PASS: 25_algorithms/fill/1.cc execution test
+PASS: 25_algorithms/fill/2.cc (test for excess errors)
+PASS: 25_algorithms/fill/2.cc execution test
+PASS: 25_algorithms/find/1.cc (test for excess errors)
+PASS: 25_algorithms/find/1.cc execution test
+PASS: 25_algorithms/find/17441.cc (test for excess errors)
+PASS: 25_algorithms/find/17441.cc execution test
+PASS: 25_algorithms/find/check_type.cc (test for excess errors)
+PASS: 25_algorithms/find_end/1.cc (test for excess errors)
+PASS: 25_algorithms/find_end/1.cc execution test
+PASS: 25_algorithms/find_end/check_type.cc (test for excess errors)
+PASS: 25_algorithms/find_first_of/1.cc (test for excess errors)
+PASS: 25_algorithms/find_first_of/1.cc execution test
+PASS: 25_algorithms/find_first_of/check_type.cc (test for excess errors)
+PASS: 25_algorithms/find_first_of/concept_check_1.cc (test for excess errors)
+PASS: 25_algorithms/find_if/1.cc (test for excess errors)
+PASS: 25_algorithms/find_if/1.cc execution test
+PASS: 25_algorithms/find_if/check_type.cc (test for excess errors)
+PASS: 25_algorithms/heap/heap.cc (test for excess errors)
+PASS: 25_algorithms/heap/heap.cc execution test
+PASS: 25_algorithms/includes/1.cc (test for excess errors)
+PASS: 25_algorithms/includes/1.cc execution test
+PASS: 25_algorithms/includes/check_type.cc (test for excess errors)
+PASS: 25_algorithms/inplace_merge/1.cc (test for excess errors)
+PASS: 25_algorithms/inplace_merge/1.cc execution test
+PASS: 25_algorithms/inplace_merge/check_type.cc (test for excess errors)
+PASS: 25_algorithms/iter_swap/20577.cc (test for excess errors)
+PASS: 25_algorithms/iter_swap/20577.cc execution test
+PASS: 25_algorithms/lexicographical_compare/1.cc (test for excess errors)
+PASS: 25_algorithms/lexicographical_compare/1.cc execution test
+PASS: 25_algorithms/lexicographical_compare/check_type.cc (test for excess errors)
+PASS: 25_algorithms/lower_bound/1.cc (test for excess errors)
+PASS: 25_algorithms/lower_bound/1.cc execution test
+PASS: 25_algorithms/lower_bound/check_type.cc (test for excess errors)
+PASS: 25_algorithms/lower_bound/lower_bound.cc (test for excess errors)
+PASS: 25_algorithms/max_element/1.cc (test for excess errors)
+PASS: 25_algorithms/max_element/1.cc execution test
+PASS: 25_algorithms/max_element/check_type.cc (test for excess errors)
+PASS: 25_algorithms/merge/1.cc (test for excess errors)
+PASS: 25_algorithms/merge/1.cc execution test
+PASS: 25_algorithms/merge/check_type.cc (test for excess errors)
+PASS: 25_algorithms/min_element/1.cc (test for excess errors)
+PASS: 25_algorithms/min_element/1.cc execution test
+PASS: 25_algorithms/min_element/check_type.cc (test for excess errors)
+PASS: 25_algorithms/min_max.cc (test for excess errors)
+PASS: 25_algorithms/min_max.cc execution test
+PASS: 25_algorithms/mismatch/1.cc (test for excess errors)
+PASS: 25_algorithms/mismatch/1.cc execution test
+PASS: 25_algorithms/mismatch/check_type.cc (test for excess errors)
+PASS: 25_algorithms/next_permutation/1.cc (test for excess errors)
+PASS: 25_algorithms/next_permutation/1.cc execution test
+PASS: 25_algorithms/next_permutation/check_type.cc (test for excess errors)
+PASS: 25_algorithms/nth_element/1.cc (test for excess errors)
+PASS: 25_algorithms/nth_element/1.cc execution test
+PASS: 25_algorithms/nth_element/check_type.cc (test for excess errors)
+PASS: 25_algorithms/partial_sort/1.cc (test for excess errors)
+PASS: 25_algorithms/partial_sort/1.cc execution test
+PASS: 25_algorithms/partial_sort/check_type.cc (test for excess errors)
+PASS: 25_algorithms/partial_sort_copy/1.cc (test for excess errors)
+PASS: 25_algorithms/partial_sort_copy/1.cc execution test
+PASS: 25_algorithms/partial_sort_copy/check_type.cc (test for excess errors)
+PASS: 25_algorithms/partition/partition.cc (test for excess errors)
+PASS: 25_algorithms/partition/partition.cc execution test
+PASS: 25_algorithms/prev_permutation/1.cc (test for excess errors)
+PASS: 25_algorithms/prev_permutation/1.cc execution test
+PASS: 25_algorithms/prev_permutation/check_type.cc (test for excess errors)
+PASS: 25_algorithms/remove/1.cc (test for excess errors)
+PASS: 25_algorithms/remove/1.cc execution test
+PASS: 25_algorithms/remove/check_type.cc (test for excess errors)
+PASS: 25_algorithms/remove_if/1.cc (test for excess errors)
+PASS: 25_algorithms/remove_if/1.cc execution test
+PASS: 25_algorithms/remove_if/check_type.cc (test for excess errors)
+PASS: 25_algorithms/replace/1.cc (test for excess errors)
+PASS: 25_algorithms/replace/1.cc execution test
+PASS: 25_algorithms/replace/check_type.cc (test for excess errors)
+PASS: 25_algorithms/replace_copy/1.cc (test for excess errors)
+PASS: 25_algorithms/replace_copy/1.cc execution test
+PASS: 25_algorithms/replace_copy/check_type.cc (test for excess errors)
+PASS: 25_algorithms/replace_copy_if/1.cc (test for excess errors)
+PASS: 25_algorithms/replace_copy_if/1.cc execution test
+PASS: 25_algorithms/replace_copy_if/check_type.cc (test for excess errors)
+PASS: 25_algorithms/replace_if/1.cc (test for excess errors)
+PASS: 25_algorithms/replace_if/1.cc execution test
+PASS: 25_algorithms/replace_if/check_type.cc (test for excess errors)
+PASS: 25_algorithms/rotate/1.cc (test for excess errors)
+PASS: 25_algorithms/rotate/1.cc execution test
+PASS: 25_algorithms/rotate/check_type.cc (test for excess errors)
+PASS: 25_algorithms/rotate/rotate.cc (test for excess errors)
+PASS: 25_algorithms/rotate/rotate.cc execution test
+PASS: 25_algorithms/search/1.cc (test for excess errors)
+PASS: 25_algorithms/search/1.cc execution test
+PASS: 25_algorithms/search/check_type.cc (test for excess errors)
+PASS: 25_algorithms/search_n/11400.cc (test for excess errors)
+PASS: 25_algorithms/search_n/check_type.cc (test for excess errors)
+PASS: 25_algorithms/search_n/iterator.cc (test for excess errors)
+PASS: 25_algorithms/search_n/iterator.cc execution test
+PASS: 25_algorithms/set_difference/1.cc (test for excess errors)
+PASS: 25_algorithms/set_difference/1.cc execution test
+PASS: 25_algorithms/set_difference/check_type.cc (test for excess errors)
+PASS: 25_algorithms/set_intersection/1.cc (test for excess errors)
+PASS: 25_algorithms/set_intersection/1.cc execution test
+PASS: 25_algorithms/set_intersection/check_type.cc (test for excess errors)
+PASS: 25_algorithms/set_symmetric_difference/1.cc (test for excess errors)
+PASS: 25_algorithms/set_symmetric_difference/1.cc execution test
+PASS: 25_algorithms/set_symmetric_difference/check_type.cc (test for excess errors)
+PASS: 25_algorithms/set_union/1.cc (test for excess errors)
+PASS: 25_algorithms/set_union/1.cc execution test
+PASS: 25_algorithms/set_union/check_type.cc (test for excess errors)
+PASS: 25_algorithms/sort.cc (test for excess errors)
+PASS: 25_algorithms/sort.cc execution test
+PASS: 25_algorithms/stable_sort/1.cc (test for excess errors)
+PASS: 25_algorithms/stable_sort/1.cc execution test
+PASS: 25_algorithms/stable_sort/check_type.cc (test for excess errors)
+PASS: 25_algorithms/swap_ranges/1.cc (test for excess errors)
+PASS: 25_algorithms/swap_ranges/1.cc execution test
+PASS: 25_algorithms/swap_ranges/check_type.cc (test for excess errors)
+PASS: 25_algorithms/unique/1.cc (test for excess errors)
+PASS: 25_algorithms/unique/1.cc execution test
+PASS: 25_algorithms/unique/11480.cc (test for excess errors)
+PASS: 25_algorithms/unique/11480.cc execution test
+PASS: 25_algorithms/unique/2.cc (test for excess errors)
+PASS: 25_algorithms/unique/2.cc execution test
+PASS: 25_algorithms/unique_copy/1.cc (test for excess errors)
+PASS: 25_algorithms/unique_copy/1.cc execution test
+PASS: 25_algorithms/unique_copy/check_type.cc (test for excess errors)
+PASS: 25_algorithms/upper_bound/1.cc (test for excess errors)
+PASS: 25_algorithms/upper_bound/1.cc execution test
+PASS: 25_algorithms/upper_bound/check_type.cc (test for excess errors)
+PASS: 26_numerics/cmath/19322.cc (test for excess errors)
+PASS: 26_numerics/cmath/19322.cc execution test
+PASS: 26_numerics/cmath/c99_classification_macros_c++.cc (test for excess errors)
+FAIL: 26_numerics/cmath/c99_classification_macros_c.cc (test for excess errors)
+PASS: 26_numerics/cmath/c_math.cc (test for excess errors)
+PASS: 26_numerics/cmath/c_math.cc execution test
+PASS: 26_numerics/cmath/c_math_dynamic.cc (test for excess errors)
+PASS: 26_numerics/cmath/fabs_inline.cc (test for excess errors)
+PASS: 26_numerics/cmath/fabs_inline.cc execution test
+PASS: 26_numerics/cmath/overloads.cc (test for excess errors)
+PASS: 26_numerics/cmath/overloads.cc execution test
+PASS: 26_numerics/cmath/powi.cc (test for excess errors)
+PASS: 26_numerics/cmath/powi.cc execution test
+PASS: 26_numerics/complex/13450.cc (test for excess errors)
+PASS: 26_numerics/complex/13450.cc execution test
+PASS: 26_numerics/complex/buggy_complex.cc (test for excess errors)
+PASS: 26_numerics/complex/buggy_complex.cc execution test
+PASS: 26_numerics/complex/complex_inserters_extractors.cc (test for excess errors)
+PASS: 26_numerics/complex/complex_inserters_extractors.cc execution test
+PASS: 26_numerics/complex/complex_value.cc (test for excess errors)
+PASS: 26_numerics/complex/complex_value.cc execution test
+PASS: 26_numerics/complex/pow.cc (test for excess errors)
+PASS: 26_numerics/complex/pow.cc execution test
+PASS: 26_numerics/cstdlib/13943.cc (test for excess errors)
+PASS: 26_numerics/cstdlib/13943.cc execution test
+PASS: 26_numerics/numeric/sum_diff.cc (test for excess errors)
+PASS: 26_numerics/numeric/sum_diff.cc execution test
+PASS: 26_numerics/valarray/binary_closure.cc (test for excess errors)
+PASS: 26_numerics/valarray/binary_closure.cc execution test
+PASS: 26_numerics/valarray/slice.cc (test for excess errors)
+PASS: 26_numerics/valarray/slice.cc execution test
+PASS: 26_numerics/valarray/slice_array_assignment.cc (test for excess errors)
+PASS: 26_numerics/valarray/slice_array_assignment.cc execution test
+PASS: 26_numerics/valarray/valarray.cc (test for excess errors)
+PASS: 26_numerics/valarray/valarray.cc execution test
+PASS: 26_numerics/valarray/valarray_const_bracket.cc (test for excess errors)
+PASS: 26_numerics/valarray/valarray_const_bracket.cc execution test
+PASS: 26_numerics/valarray/valarray_name_lookup.cc (test for excess errors)
+PASS: 26_numerics/valarray/valarray_operators.cc (test for excess errors)
+PASS: 26_numerics/valarray/valarray_operators.cc execution test
+PASS: 26_numerics/valarray/valarray_subset_assignment.cc (test for excess errors)
+PASS: 26_numerics/valarray/valarray_subset_assignment.cc execution test
+PASS: 27_io/basic_filebuf/1.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/2.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/3.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/3.cc execution test
+PASS: 27_io/basic_filebuf/4.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/4.cc execution test
+PASS: 27_io/basic_filebuf/close/12790-1.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/close/12790-1.cc execution test
+PASS: 27_io/basic_filebuf/close/char/1.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/close/char/1.cc execution test
+PASS: 27_io/basic_filebuf/close/char/12790-1.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/close/char/12790-1.cc execution test
+PASS: 27_io/basic_filebuf/close/char/12790-2.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/close/char/12790-2.cc execution test
+PASS: 27_io/basic_filebuf/close/char/12790-3.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/close/char/12790-3.cc execution test
+PASS: 27_io/basic_filebuf/close/char/12790-4.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/close/char/12790-4.cc execution test
+PASS: 27_io/basic_filebuf/close/char/2.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/close/char/2.cc execution test
+PASS: 27_io/basic_filebuf/close/char/3.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/close/char/3.cc execution test
+PASS: 27_io/basic_filebuf/close/char/4.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/close/char/4.cc execution test
+UNSUPPORTED: 27_io/basic_filebuf/close/char/4879.cc
+PASS: 27_io/basic_filebuf/close/char/5.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/close/char/5.cc execution test
+UNSUPPORTED: 27_io/basic_filebuf/close/char/9964.cc
+PASS: 27_io/basic_filebuf/cons/char/1.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/cons/char/1.cc execution test
+PASS: 27_io/basic_filebuf/imbue/12206.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/imbue/12206.cc execution test
+PASS: 27_io/basic_filebuf/imbue/char/1.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/imbue/char/1.cc execution test
+UNSUPPORTED: 27_io/basic_filebuf/imbue/char/13007.cc
+UNSUPPORTED: 27_io/basic_filebuf/imbue/char/13171-1.cc
+UNSUPPORTED: 27_io/basic_filebuf/imbue/char/13171-2.cc
+UNSUPPORTED: 27_io/basic_filebuf/imbue/char/13171-4.cc
+UNSUPPORTED: 27_io/basic_filebuf/imbue/char/13582-2.cc
+UNSUPPORTED: 27_io/basic_filebuf/imbue/char/14975-1.cc
+UNSUPPORTED: 27_io/basic_filebuf/imbue/char/2.cc
+PASS: 27_io/basic_filebuf/imbue/char/3.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/imbue/char/3.cc execution test
+UNSUPPORTED: 27_io/basic_filebuf/imbue/char/9322.cc
+PASS: 27_io/basic_filebuf/in_avail/char/1.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/in_avail/char/1.cc execution test
+PASS: 27_io/basic_filebuf/in_avail/char/9701-3.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/in_avail/char/9701-3.cc execution test
+PASS: 27_io/basic_filebuf/is_open/char/1.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/is_open/char/1.cc execution test
+PASS: 27_io/basic_filebuf/open/12790-1.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/open/12790-1.cc execution test
+PASS: 27_io/basic_filebuf/open/char/1.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/open/char/1.cc execution test
+PASS: 27_io/basic_filebuf/open/char/2.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/open/char/2.cc execution test
+PASS: 27_io/basic_filebuf/open/char/3.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/open/char/3.cc execution test
+UNSUPPORTED: 27_io/basic_filebuf/open/char/9507.cc
+PASS: 27_io/basic_filebuf/overflow/char/1.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/overflow/char/1.cc execution test
+PASS: 27_io/basic_filebuf/overflow/char/13858.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/overflow/char/13858.cc execution test
+PASS: 27_io/basic_filebuf/overflow/char/2-unbuf.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/overflow/char/2-unbuf.cc execution test
+PASS: 27_io/basic_filebuf/overflow/char/2.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/overflow/char/2.cc execution test
+PASS: 27_io/basic_filebuf/overflow/char/3599.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/overflow/char/3599.cc execution test
+PASS: 27_io/basic_filebuf/overflow/char/9169.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/overflow/char/9169.cc execution test
+PASS: 27_io/basic_filebuf/overflow/char/9182-2.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/overflow/char/9182-2.cc execution test
+PASS: 27_io/basic_filebuf/overflow/char/9988.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/overflow/char/9988.cc execution test
+PASS: 27_io/basic_filebuf/pbackfail/char/9761.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/pbackfail/char/9761.cc execution test
+PASS: 27_io/basic_filebuf/sbumpc/char/1-in.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sbumpc/char/1-in.cc execution test
+PASS: 27_io/basic_filebuf/sbumpc/char/1-io.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sbumpc/char/1-io.cc execution test
+PASS: 27_io/basic_filebuf/sbumpc/char/1-out.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sbumpc/char/1-out.cc execution test
+PASS: 27_io/basic_filebuf/sbumpc/char/2-in.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sbumpc/char/2-in.cc execution test
+PASS: 27_io/basic_filebuf/sbumpc/char/2-io.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sbumpc/char/2-io.cc execution test
+PASS: 27_io/basic_filebuf/sbumpc/char/2-out.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sbumpc/char/2-out.cc execution test
+PASS: 27_io/basic_filebuf/sbumpc/char/9825.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/sbumpc/char/9825.cc execution test
+PASS: 27_io/basic_filebuf/seekoff/10132-2.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/seekoff/10132-2.cc execution test
+PASS: 27_io/basic_filebuf/seekoff/12790-1.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekoff/12790-1.cc execution test
+PASS: 27_io/basic_filebuf/seekoff/12790-2.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekoff/12790-2.cc execution test
+PASS: 27_io/basic_filebuf/seekoff/12790-3.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekoff/12790-3.cc execution test
+PASS: 27_io/basic_filebuf/seekoff/12790-4.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekoff/12790-4.cc execution test
+PASS: 27_io/basic_filebuf/seekoff/char/1-in.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekoff/char/1-in.cc execution test
+PASS: 27_io/basic_filebuf/seekoff/char/1-io.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekoff/char/1-io.cc execution test
+PASS: 27_io/basic_filebuf/seekoff/char/1-out.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekoff/char/1-out.cc execution test
+PASS: 27_io/basic_filebuf/seekoff/char/11543.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekoff/char/11543.cc execution test
+PASS: 27_io/basic_filebuf/seekoff/char/12232.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/seekoff/char/12232.cc execution test
+PASS: 27_io/basic_filebuf/seekoff/char/12790-1.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekoff/char/12790-1.cc execution test
+PASS: 27_io/basic_filebuf/seekoff/char/12790-2.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekoff/char/12790-2.cc execution test
+PASS: 27_io/basic_filebuf/seekoff/char/12790-3.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekoff/char/12790-3.cc execution test
+PASS: 27_io/basic_filebuf/seekoff/char/12790-4.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekoff/char/12790-4.cc execution test
+PASS: 27_io/basic_filebuf/seekoff/char/2-in.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekoff/char/2-in.cc execution test
+PASS: 27_io/basic_filebuf/seekoff/char/2-io.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekoff/char/2-io.cc execution test
+PASS: 27_io/basic_filebuf/seekoff/char/2-out.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekoff/char/2-out.cc execution test
+UNSUPPORTED: 27_io/basic_filebuf/seekoff/char/26777.cc
+PASS: 27_io/basic_filebuf/seekoff/char/3-in.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekoff/char/3-in.cc execution test
+PASS: 27_io/basic_filebuf/seekoff/char/3-io.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekoff/char/3-io.cc execution test
+PASS: 27_io/basic_filebuf/seekoff/char/3-out.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekoff/char/3-out.cc execution test
+PASS: 27_io/basic_filebuf/seekpos/10132-3.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/seekpos/10132-3.cc execution test
+PASS: 27_io/basic_filebuf/seekpos/12790-1.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekpos/12790-1.cc execution test
+PASS: 27_io/basic_filebuf/seekpos/12790-2.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekpos/12790-2.cc execution test
+PASS: 27_io/basic_filebuf/seekpos/12790-3.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekpos/12790-3.cc execution test
+PASS: 27_io/basic_filebuf/seekpos/char/1-in.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekpos/char/1-in.cc execution test
+PASS: 27_io/basic_filebuf/seekpos/char/1-io.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekpos/char/1-io.cc execution test
+PASS: 27_io/basic_filebuf/seekpos/char/1-out.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekpos/char/1-out.cc execution test
+PASS: 27_io/basic_filebuf/seekpos/char/12790-1.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekpos/char/12790-1.cc execution test
+PASS: 27_io/basic_filebuf/seekpos/char/12790-2.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekpos/char/12790-2.cc execution test
+PASS: 27_io/basic_filebuf/seekpos/char/12790-3.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekpos/char/12790-3.cc execution test
+PASS: 27_io/basic_filebuf/seekpos/char/12790-4.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekpos/char/12790-4.cc execution test
+PASS: 27_io/basic_filebuf/seekpos/char/2-in.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekpos/char/2-in.cc execution test
+PASS: 27_io/basic_filebuf/seekpos/char/2-io.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekpos/char/2-io.cc execution test
+PASS: 27_io/basic_filebuf/seekpos/char/2-out.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekpos/char/2-out.cc execution test
+PASS: 27_io/basic_filebuf/seekpos/char/3-in.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekpos/char/3-in.cc execution test
+PASS: 27_io/basic_filebuf/seekpos/char/3-io.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekpos/char/3-io.cc execution test
+PASS: 27_io/basic_filebuf/seekpos/char/3-out.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/seekpos/char/3-out.cc execution test
+PASS: 27_io/basic_filebuf/setbuf/char/1.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/setbuf/char/1.cc execution test
+PASS: 27_io/basic_filebuf/setbuf/char/12875-1.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/setbuf/char/12875-1.cc execution test
+PASS: 27_io/basic_filebuf/setbuf/char/12875-2.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/setbuf/char/12875-2.cc execution test
+PASS: 27_io/basic_filebuf/setbuf/char/2.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/setbuf/char/2.cc execution test
+PASS: 27_io/basic_filebuf/setbuf/char/3.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/setbuf/char/3.cc execution test
+PASS: 27_io/basic_filebuf/sgetc/char/1-in.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sgetc/char/1-in.cc execution test
+PASS: 27_io/basic_filebuf/sgetc/char/1-io.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sgetc/char/1-io.cc execution test
+PASS: 27_io/basic_filebuf/sgetc/char/1-out.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sgetc/char/1-out.cc execution test
+PASS: 27_io/basic_filebuf/sgetc/char/2-in.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sgetc/char/2-in.cc execution test
+PASS: 27_io/basic_filebuf/sgetc/char/2-io.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sgetc/char/2-io.cc execution test
+PASS: 27_io/basic_filebuf/sgetc/char/2-out.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sgetc/char/2-out.cc execution test
+PASS: 27_io/basic_filebuf/sgetn/char/1-in.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/sgetn/char/1-in.cc execution test
+PASS: 27_io/basic_filebuf/sgetn/char/1-io.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/sgetn/char/1-io.cc execution test
+PASS: 27_io/basic_filebuf/sgetn/char/1-out.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sgetn/char/1-out.cc execution test
+PASS: 27_io/basic_filebuf/sgetn/char/2-in.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/sgetn/char/2-in.cc execution test
+PASS: 27_io/basic_filebuf/sgetn/char/2-io.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/sgetn/char/2-io.cc execution test
+PASS: 27_io/basic_filebuf/sgetn/char/2-out.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sgetn/char/2-out.cc execution test
+PASS: 27_io/basic_filebuf/sgetn/char/3.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sgetn/char/3.cc execution test
+UNSUPPORTED: 27_io/basic_filebuf/showmanyc/char/9533-1.cc
+PASS: 27_io/basic_filebuf/showmanyc/char/9533-2.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/showmanyc/char/9533-2.cc execution test
+PASS: 27_io/basic_filebuf/snextc/char/1-in.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/snextc/char/1-in.cc execution test
+PASS: 27_io/basic_filebuf/snextc/char/1-io.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/snextc/char/1-io.cc execution test
+PASS: 27_io/basic_filebuf/snextc/char/1-out.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/snextc/char/1-out.cc execution test
+PASS: 27_io/basic_filebuf/snextc/char/2-in.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/snextc/char/2-in.cc execution test
+PASS: 27_io/basic_filebuf/snextc/char/2-io.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/snextc/char/2-io.cc execution test
+PASS: 27_io/basic_filebuf/snextc/char/2-out.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/snextc/char/2-out.cc execution test
+PASS: 27_io/basic_filebuf/sputbackc/char/1-in.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/sputbackc/char/1-in.cc execution test
+PASS: 27_io/basic_filebuf/sputbackc/char/1-io.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/sputbackc/char/1-io.cc execution test
+PASS: 27_io/basic_filebuf/sputbackc/char/1-out.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sputbackc/char/1-out.cc execution test
+PASS: 27_io/basic_filebuf/sputbackc/char/2-in.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/sputbackc/char/2-in.cc execution test
+PASS: 27_io/basic_filebuf/sputbackc/char/2-io.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/sputbackc/char/2-io.cc execution test
+PASS: 27_io/basic_filebuf/sputbackc/char/2-out.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sputbackc/char/2-out.cc execution test
+PASS: 27_io/basic_filebuf/sputbackc/char/9425.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/sputbackc/char/9425.cc execution test
+PASS: 27_io/basic_filebuf/sputc/char/1-in.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sputc/char/1-in.cc execution test
+PASS: 27_io/basic_filebuf/sputc/char/1-io.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sputc/char/1-io.cc execution test
+PASS: 27_io/basic_filebuf/sputc/char/1-out.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sputc/char/1-out.cc execution test
+PASS: 27_io/basic_filebuf/sputc/char/1057.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sputc/char/1057.cc execution test
+PASS: 27_io/basic_filebuf/sputc/char/2-in.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sputc/char/2-in.cc execution test
+PASS: 27_io/basic_filebuf/sputc/char/2-io.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sputc/char/2-io.cc execution test
+PASS: 27_io/basic_filebuf/sputc/char/2-out.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sputc/char/2-out.cc execution test
+PASS: 27_io/basic_filebuf/sputc/char/9701-2.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sputc/char/9701-2.cc execution test
+PASS: 27_io/basic_filebuf/sputn/char/1-in.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sputn/char/1-in.cc execution test
+PASS: 27_io/basic_filebuf/sputn/char/1-io.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sputn/char/1-io.cc execution test
+PASS: 27_io/basic_filebuf/sputn/char/1-out.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sputn/char/1-out.cc execution test
+PASS: 27_io/basic_filebuf/sputn/char/1057.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sputn/char/1057.cc execution test
+PASS: 27_io/basic_filebuf/sputn/char/2-in.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sputn/char/2-in.cc execution test
+PASS: 27_io/basic_filebuf/sputn/char/2-io.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sputn/char/2-io.cc execution test
+PASS: 27_io/basic_filebuf/sputn/char/2-out.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sputn/char/2-out.cc execution test
+PASS: 27_io/basic_filebuf/sputn/char/9339.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sputn/char/9339.cc execution test
+PASS: 27_io/basic_filebuf/sputn/char/9701-1.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sputn/char/9701-1.cc execution test
+PASS: 27_io/basic_filebuf/sungetc/char/1-in.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/sungetc/char/1-in.cc execution test
+PASS: 27_io/basic_filebuf/sungetc/char/1-io.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/sungetc/char/1-io.cc execution test
+PASS: 27_io/basic_filebuf/sungetc/char/1-out.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sungetc/char/1-out.cc execution test
+PASS: 27_io/basic_filebuf/sungetc/char/2-in.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/sungetc/char/2-in.cc execution test
+PASS: 27_io/basic_filebuf/sungetc/char/2-io.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/sungetc/char/2-io.cc execution test
+PASS: 27_io/basic_filebuf/sungetc/char/2-out.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sungetc/char/2-out.cc execution test
+PASS: 27_io/basic_filebuf/sync/char/1.cc (test for excess errors)
+FAIL: 27_io/basic_filebuf/sync/char/1.cc execution test
+PASS: 27_io/basic_filebuf/sync/char/1057.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sync/char/1057.cc execution test
+PASS: 27_io/basic_filebuf/sync/char/9182-1.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/sync/char/9182-1.cc execution test
+PASS: 27_io/basic_filebuf/underflow/10096.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/underflow/10096.cc execution test
+PASS: 27_io/basic_filebuf/underflow/char/1.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/underflow/char/1.cc execution test
+UNSUPPORTED: 27_io/basic_filebuf/underflow/char/10097.cc
+PASS: 27_io/basic_filebuf/underflow/char/2.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/underflow/char/2.cc execution test
+PASS: 27_io/basic_filebuf/underflow/char/9027.cc (test for excess errors)
+PASS: 27_io/basic_filebuf/underflow/char/9027.cc execution test
+PASS: 27_io/basic_fstream/1.cc (test for excess errors)
+PASS: 27_io/basic_fstream/2.cc (test for excess errors)
+PASS: 27_io/basic_fstream/3.cc (test for excess errors)
+PASS: 27_io/basic_fstream/3.cc execution test
+PASS: 27_io/basic_fstream/4.cc (test for excess errors)
+PASS: 27_io/basic_fstream/4.cc execution test
+PASS: 27_io/basic_fstream/rdbuf/char/2832.cc (test for excess errors)
+PASS: 27_io/basic_fstream/rdbuf/char/2832.cc execution test
+PASS: 27_io/basic_ifstream/1.cc (test for excess errors)
+PASS: 27_io/basic_ifstream/2.cc (test for excess errors)
+PASS: 27_io/basic_ifstream/3.cc (test for excess errors)
+PASS: 27_io/basic_ifstream/3.cc execution test
+PASS: 27_io/basic_ifstream/4.cc (test for excess errors)
+PASS: 27_io/basic_ifstream/4.cc execution test
+PASS: 27_io/basic_ifstream/cons/char/1.cc (test for excess errors)
+PASS: 27_io/basic_ifstream/cons/char/1.cc execution test
+PASS: 27_io/basic_ifstream/open/char/1.cc (test for excess errors)
+PASS: 27_io/basic_ifstream/open/char/1.cc execution test
+PASS: 27_io/basic_ifstream/rdbuf/char/2832.cc (test for excess errors)
+PASS: 27_io/basic_ifstream/rdbuf/char/2832.cc execution test
+PASS: 27_io/basic_ios/1.cc (test for excess errors)
+PASS: 27_io/basic_ios/2.cc (test for excess errors)
+PASS: 27_io/basic_ios/3.cc (test for excess errors)
+PASS: 27_io/basic_ios/3.cc execution test
+PASS: 27_io/basic_ios/4.cc (test for excess errors)
+PASS: 27_io/basic_ios/4.cc execution test
+PASS: 27_io/basic_ios/clear/char/1.cc (test for excess errors)
+PASS: 27_io/basic_ios/clear/char/1.cc execution test
+PASS: 27_io/basic_ios/cons/char/1.cc (test for excess errors)
+PASS: 27_io/basic_ios/cons/char/1.cc execution test
+PASS: 27_io/basic_ios/cons/char/2.cc (test for excess errors)
+PASS: 27_io/basic_ios/cons/char/2.cc execution test
+PASS: 27_io/basic_ios/cons/char/3.cc (test for excess errors)
+PASS: 27_io/basic_ios/cons/char/3.cc execution test
+PASS: 27_io/basic_ios/copyfmt/char/1.cc (test for excess errors)
+PASS: 27_io/basic_ios/copyfmt/char/1.cc execution test
+UNSUPPORTED: 27_io/basic_ios/copyfmt/char/2.cc
+PASS: 27_io/basic_ios/exceptions/char/1.cc (test for excess errors)
+PASS: 27_io/basic_ios/exceptions/char/1.cc execution test
+PASS: 27_io/basic_ios/exceptions/char/2.cc (test for excess errors)
+PASS: 27_io/basic_ios/exceptions/char/2.cc execution test
+PASS: 27_io/basic_ios/imbue/14072.cc (test for excess errors)
+PASS: 27_io/basic_ios/imbue/14072.cc execution test
+PASS: 27_io/basic_ios/locales/char/1.cc (test for excess errors)
+PASS: 27_io/basic_ios/locales/char/1.cc execution test
+PASS: 27_io/basic_iostream/1.cc (test for excess errors)
+PASS: 27_io/basic_iostream/2.cc (test for excess errors)
+PASS: 27_io/basic_iostream/3.cc (test for excess errors)
+PASS: 27_io/basic_iostream/3.cc execution test
+PASS: 27_io/basic_iostream/4.cc (test for excess errors)
+PASS: 27_io/basic_iostream/4.cc execution test
+PASS: 27_io/basic_istream/1.cc (test for excess errors)
+PASS: 27_io/basic_istream/2.cc (test for excess errors)
+PASS: 27_io/basic_istream/3.cc (test for excess errors)
+PASS: 27_io/basic_istream/3.cc execution test
+PASS: 27_io/basic_istream/4.cc (test for excess errors)
+PASS: 27_io/basic_istream/4.cc execution test
+PASS: 27_io/basic_istream/exceptions/char/9561.cc (test for excess errors)
+PASS: 27_io/basic_istream/exceptions/char/9561.cc execution test
+PASS: 27_io/basic_istream/extractors_arithmetic/char/01.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_arithmetic/char/01.cc execution test
+PASS: 27_io/basic_istream/extractors_arithmetic/char/02.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_arithmetic/char/02.cc execution test
+PASS: 27_io/basic_istream/extractors_arithmetic/char/03.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_arithmetic/char/03.cc execution test
+PASS: 27_io/basic_istream/extractors_arithmetic/char/06.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_arithmetic/char/06.cc execution test
+PASS: 27_io/basic_istream/extractors_arithmetic/char/07.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_arithmetic/char/07.cc execution test
+PASS: 27_io/basic_istream/extractors_arithmetic/char/08.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_arithmetic/char/08.cc execution test
+PASS: 27_io/basic_istream/extractors_arithmetic/char/09.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_arithmetic/char/09.cc execution test
+PASS: 27_io/basic_istream/extractors_arithmetic/char/10.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_arithmetic/char/10.cc execution test
+PASS: 27_io/basic_istream/extractors_arithmetic/char/11.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_arithmetic/char/11.cc execution test
+PASS: 27_io/basic_istream/extractors_arithmetic/char/12.cc (test for excess errors)
+FAIL: 27_io/basic_istream/extractors_arithmetic/char/12.cc execution test
+PASS: 27_io/basic_istream/extractors_arithmetic/char/13.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_arithmetic/char/13.cc execution test
+PASS: 27_io/basic_istream/extractors_arithmetic/char/9555-ia.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_arithmetic/char/9555-ia.cc execution test
+PASS: 27_io/basic_istream/extractors_arithmetic/char/exceptions_badbit_throw.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_arithmetic/char/exceptions_badbit_throw.cc execution test
+PASS: 27_io/basic_istream/extractors_arithmetic/char/exceptions_failbit.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_arithmetic/char/exceptions_failbit.cc execution test
+PASS: 27_io/basic_istream/extractors_arithmetic/char/exceptions_failbit_throw.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_arithmetic/char/exceptions_failbit_throw.cc execution test
+PASS: 27_io/basic_istream/extractors_arithmetic/pod/3983-1.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_arithmetic/pod/3983-1.cc execution test
+PASS: 27_io/basic_istream/extractors_character/char/1.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_character/char/1.cc execution test
+PASS: 27_io/basic_istream/extractors_character/char/11095-i.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_character/char/11095-i.cc execution test
+PASS: 27_io/basic_istream/extractors_character/char/2.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_character/char/2.cc execution test
+PASS: 27_io/basic_istream/extractors_character/char/3.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_character/char/3.cc execution test
+PASS: 27_io/basic_istream/extractors_character/char/4.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_character/char/4.cc execution test
+PASS: 27_io/basic_istream/extractors_character/char/9555-ic.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_character/char/9555-ic.cc execution test
+PASS: 27_io/basic_istream/extractors_character/char/9826.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_character/pod/3983-2.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_character/pod/3983-2.cc execution test
+PASS: 27_io/basic_istream/extractors_other/char/1.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_other/char/1.cc execution test
+PASS: 27_io/basic_istream/extractors_other/char/2.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_other/char/2.cc execution test
+PASS: 27_io/basic_istream/extractors_other/char/3.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_other/char/3.cc execution test
+PASS: 27_io/basic_istream/extractors_other/char/9318-in.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_other/char/9318-in.cc execution test
+PASS: 27_io/basic_istream/extractors_other/char/9424-in.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_other/char/9424-in.cc execution test
+PASS: 27_io/basic_istream/extractors_other/char/9555-io.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_other/char/9555-io.cc execution test
+PASS: 27_io/basic_istream/extractors_other/char/error_failbit.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_other/char/error_failbit.cc execution test
+PASS: 27_io/basic_istream/extractors_other/char/exceptions_badbit_throw.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_other/char/exceptions_badbit_throw.cc execution test
+PASS: 27_io/basic_istream/extractors_other/char/exceptions_failbit_throw.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_other/char/exceptions_failbit_throw.cc execution test
+PASS: 27_io/basic_istream/extractors_other/char/exceptions_null.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_other/char/exceptions_null.cc execution test
+PASS: 27_io/basic_istream/extractors_other/pod/3983-3.cc (test for excess errors)
+PASS: 27_io/basic_istream/extractors_other/pod/3983-3.cc execution test
+PASS: 27_io/basic_istream/get/char/1.cc (test for excess errors)
+PASS: 27_io/basic_istream/get/char/1.cc execution test
+PASS: 27_io/basic_istream/get/char/2.cc (test for excess errors)
+PASS: 27_io/basic_istream/get/char/2.cc execution test
+PASS: 27_io/basic_istream/get/char/3.cc (test for excess errors)
+PASS: 27_io/basic_istream/get/char/3.cc execution test
+PASS: 27_io/basic_istream/getline/char/1.cc (test for excess errors)
+PASS: 27_io/basic_istream/getline/char/1.cc execution test
+PASS: 27_io/basic_istream/getline/char/2.cc (test for excess errors)
+PASS: 27_io/basic_istream/getline/char/2.cc execution test
+PASS: 27_io/basic_istream/getline/char/3.cc (test for excess errors)
+PASS: 27_io/basic_istream/getline/char/3.cc execution test
+PASS: 27_io/basic_istream/getline/char/4.cc (test for excess errors)
+PASS: 27_io/basic_istream/getline/char/4.cc execution test
+PASS: 27_io/basic_istream/getline/char/5.cc (test for excess errors)
+PASS: 27_io/basic_istream/getline/char/5.cc execution test
+PASS: 27_io/basic_istream/getline/char/6.cc (test for excess errors)
+PASS: 27_io/basic_istream/getline/char/6.cc execution test
+PASS: 27_io/basic_istream/ignore/char/1.cc (test for excess errors)
+PASS: 27_io/basic_istream/ignore/char/1.cc execution test
+PASS: 27_io/basic_istream/ignore/char/2.cc (test for excess errors)
+PASS: 27_io/basic_istream/ignore/char/2.cc execution test
+PASS: 27_io/basic_istream/ignore/char/3.cc (test for excess errors)
+PASS: 27_io/basic_istream/ignore/char/3.cc execution test
+PASS: 27_io/basic_istream/ignore/char/6360.cc (test for excess errors)
+PASS: 27_io/basic_istream/ignore/char/6360.cc execution test
+PASS: 27_io/basic_istream/ignore/char/7220.cc (test for excess errors)
+PASS: 27_io/basic_istream/ignore/char/7220.cc execution test
+PASS: 27_io/basic_istream/peek/char/1.cc (test for excess errors)
+PASS: 27_io/basic_istream/peek/char/1.cc execution test
+PASS: 27_io/basic_istream/peek/char/12296.cc (test for excess errors)
+PASS: 27_io/basic_istream/peek/char/12296.cc execution test
+PASS: 27_io/basic_istream/peek/char/6414.cc (test for excess errors)
+FAIL: 27_io/basic_istream/peek/char/6414.cc execution test
+PASS: 27_io/basic_istream/putback/char/1.cc (test for excess errors)
+PASS: 27_io/basic_istream/putback/char/1.cc execution test
+PASS: 27_io/basic_istream/read/char/1.cc (test for excess errors)
+PASS: 27_io/basic_istream/read/char/1.cc execution test
+PASS: 27_io/basic_istream/read/char/2.cc (test for excess errors)
+PASS: 27_io/basic_istream/read/char/2.cc execution test
+PASS: 27_io/basic_istream/read/char/3.cc (test for excess errors)
+PASS: 27_io/basic_istream/read/char/3.cc execution test
+PASS: 27_io/basic_istream/readsome/char/6746-1.cc (test for excess errors)
+PASS: 27_io/basic_istream/readsome/char/6746-1.cc execution test
+PASS: 27_io/basic_istream/readsome/char/6746-2.cc (test for excess errors)
+FAIL: 27_io/basic_istream/readsome/char/6746-2.cc execution test
+PASS: 27_io/basic_istream/readsome/char/8258.cc (test for excess errors)
+PASS: 27_io/basic_istream/readsome/char/8258.cc execution test
+PASS: 27_io/basic_istream/seekg/char/2.cc (test for excess errors)
+PASS: 27_io/basic_istream/seekg/char/2.cc execution test
+PASS: 27_io/basic_istream/seekg/char/8348-1.cc (test for excess errors)
+PASS: 27_io/basic_istream/seekg/char/8348-1.cc execution test
+PASS: 27_io/basic_istream/seekg/char/8348-2.cc (test for excess errors)
+PASS: 27_io/basic_istream/seekg/char/8348-2.cc execution test
+PASS: 27_io/basic_istream/seekg/char/exceptions_badbit_throw.cc (test for excess errors)
+PASS: 27_io/basic_istream/seekg/char/exceptions_badbit_throw.cc execution test
+PASS: 27_io/basic_istream/seekg/char/fstream.cc (test for excess errors)
+FAIL: 27_io/basic_istream/seekg/char/fstream.cc execution test
+PASS: 27_io/basic_istream/seekg/char/sstream.cc (test for excess errors)
+PASS: 27_io/basic_istream/seekg/char/sstream.cc execution test
+PASS: 27_io/basic_istream/sentry/char/1.cc (test for excess errors)
+PASS: 27_io/basic_istream/sentry/char/1.cc execution test
+PASS: 27_io/basic_istream/sentry/char/12297.cc (test for excess errors)
+PASS: 27_io/basic_istream/sentry/char/12297.cc execution test
+PASS: 27_io/basic_istream/sentry/char/2.cc (test for excess errors)
+PASS: 27_io/basic_istream/sentry/char/2.cc execution test
+PASS: 27_io/basic_istream/sentry/char/3.cc (test for excess errors)
+PASS: 27_io/basic_istream/sentry/char/3.cc execution test
+PASS: 27_io/basic_istream/sentry/pod/1.cc (test for excess errors)
+PASS: 27_io/basic_istream/sentry/pod/1.cc execution test
+PASS: 27_io/basic_istream/tellg/char/1.cc (test for excess errors)
+FAIL: 27_io/basic_istream/tellg/char/1.cc execution test
+PASS: 27_io/basic_istream/tellg/char/2.cc (test for excess errors)
+PASS: 27_io/basic_istream/tellg/char/2.cc execution test
+PASS: 27_io/basic_istream/tellg/char/8348.cc (test for excess errors)
+PASS: 27_io/basic_istream/tellg/char/8348.cc execution test
+PASS: 27_io/basic_istream/tellg/char/exceptions_badbit_throw.cc (test for excess errors)
+PASS: 27_io/basic_istream/tellg/char/exceptions_badbit_throw.cc execution test
+PASS: 27_io/basic_istream/tellg/char/fstream.cc (test for excess errors)
+FAIL: 27_io/basic_istream/tellg/char/fstream.cc execution test
+PASS: 27_io/basic_istream/tellg/char/sstream.cc (test for excess errors)
+PASS: 27_io/basic_istream/tellg/char/sstream.cc execution test
+PASS: 27_io/basic_istream/ws/char/1.cc (test for excess errors)
+PASS: 27_io/basic_istream/ws/char/1.cc execution test
+PASS: 27_io/basic_istringstream/1.cc (test for excess errors)
+PASS: 27_io/basic_istringstream/2.cc (test for excess errors)
+PASS: 27_io/basic_istringstream/3.cc (test for excess errors)
+PASS: 27_io/basic_istringstream/3.cc execution test
+PASS: 27_io/basic_istringstream/4.cc (test for excess errors)
+PASS: 27_io/basic_istringstream/4.cc execution test
+PASS: 27_io/basic_istringstream/rdbuf/char/2832.cc (test for excess errors)
+PASS: 27_io/basic_istringstream/rdbuf/char/2832.cc execution test
+PASS: 27_io/basic_istringstream/str/char/1.cc (test for excess errors)
+PASS: 27_io/basic_istringstream/str/char/1.cc execution test
+PASS: 27_io/basic_ofstream/1.cc (test for excess errors)
+PASS: 27_io/basic_ofstream/2.cc (test for excess errors)
+PASS: 27_io/basic_ofstream/3.cc (test for excess errors)
+PASS: 27_io/basic_ofstream/3.cc execution test
+PASS: 27_io/basic_ofstream/4.cc (test for excess errors)
+PASS: 27_io/basic_ofstream/4.cc execution test
+PASS: 27_io/basic_ofstream/cons/char/2.cc (test for excess errors)
+PASS: 27_io/basic_ofstream/cons/char/2.cc execution test
+PASS: 27_io/basic_ofstream/open/char/1.cc (test for excess errors)
+PASS: 27_io/basic_ofstream/open/char/1.cc execution test
+PASS: 27_io/basic_ofstream/rdbuf/char/2832.cc (test for excess errors)
+PASS: 27_io/basic_ofstream/rdbuf/char/2832.cc execution test
+PASS: 27_io/basic_ostream/1.cc (test for excess errors)
+PASS: 27_io/basic_ostream/2.cc (test for excess errors)
+PASS: 27_io/basic_ostream/3.cc (test for excess errors)
+PASS: 27_io/basic_ostream/3.cc execution test
+PASS: 27_io/basic_ostream/4.cc (test for excess errors)
+PASS: 27_io/basic_ostream/4.cc execution test
+PASS: 27_io/basic_ostream/cons/char/9827.cc (test for excess errors)
+PASS: 27_io/basic_ostream/cons/char/9827.cc execution test
+PASS: 27_io/basic_ostream/endl/char/1.cc (test for excess errors)
+PASS: 27_io/basic_ostream/endl/char/1.cc execution test
+PASS: 27_io/basic_ostream/ends/char/1.cc (test for excess errors)
+PASS: 27_io/basic_ostream/ends/char/1.cc execution test
+PASS: 27_io/basic_ostream/ends/char/2.cc (test for excess errors)
+PASS: 27_io/basic_ostream/ends/char/2.cc execution test
+PASS: 27_io/basic_ostream/exceptions/char/9561.cc (test for excess errors)
+PASS: 27_io/basic_ostream/exceptions/char/9561.cc execution test
+PASS: 27_io/basic_ostream/flush/char/1.cc (test for excess errors)
+PASS: 27_io/basic_ostream/flush/char/1.cc execution test
+PASS: 27_io/basic_ostream/flush/char/2.cc (test for excess errors)
+PASS: 27_io/basic_ostream/flush/char/2.cc execution test
+PASS: 27_io/basic_ostream/flush/char/exceptions_badbit_throw.cc (test for excess errors)
+PASS: 27_io/basic_ostream/flush/char/exceptions_badbit_throw.cc execution test
+PASS: 27_io/basic_ostream/inserters_arithmetic/char/1.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_arithmetic/char/1.cc execution test
+UNSUPPORTED: 27_io/basic_ostream/inserters_arithmetic/char/2.cc
+PASS: 27_io/basic_ostream/inserters_arithmetic/char/23871.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_arithmetic/char/3.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_arithmetic/char/3.cc execution test
+PASS: 27_io/basic_ostream/inserters_arithmetic/char/4.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_arithmetic/char/4.cc execution test
+PASS: 27_io/basic_ostream/inserters_arithmetic/char/4402.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_arithmetic/char/4402.cc execution test
+PASS: 27_io/basic_ostream/inserters_arithmetic/char/5.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_arithmetic/char/5.cc execution test
+PASS: 27_io/basic_ostream/inserters_arithmetic/char/6.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_arithmetic/char/6.cc execution test
+PASS: 27_io/basic_ostream/inserters_arithmetic/char/7.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_arithmetic/char/7.cc execution test
+PASS: 27_io/basic_ostream/inserters_arithmetic/char/9555-oa.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_arithmetic/char/9555-oa.cc execution test
+PASS: 27_io/basic_ostream/inserters_arithmetic/char/exceptions_badbit_throw.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_arithmetic/char/exceptions_badbit_throw.cc execution test
+PASS: 27_io/basic_ostream/inserters_arithmetic/char/exceptions_failbit_throw.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_arithmetic/char/exceptions_failbit_throw.cc execution test
+PASS: 27_io/basic_ostream/inserters_arithmetic/pod/23875.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_arithmetic/pod/23875.cc execution test
+PASS: 27_io/basic_ostream/inserters_character/char/1.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_character/char/1.cc execution test
+PASS: 27_io/basic_ostream/inserters_character/char/11095-oa.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_character/char/11095-oa.cc execution test
+PASS: 27_io/basic_ostream/inserters_character/char/11095-ob.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_character/char/11095-ob.cc execution test
+PASS: 27_io/basic_ostream/inserters_character/char/11095-oc.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_character/char/11095-oc.cc execution test
+PASS: 27_io/basic_ostream/inserters_character/char/2.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_character/char/2.cc execution test
+PASS: 27_io/basic_ostream/inserters_character/char/3.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_character/char/3.cc execution test
+PASS: 27_io/basic_ostream/inserters_character/char/4.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_character/char/4.cc execution test
+PASS: 27_io/basic_ostream/inserters_character/char/5.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_character/char/5.cc execution test
+PASS: 27_io/basic_ostream/inserters_character/char/6.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_character/char/6.cc execution test
+PASS: 27_io/basic_ostream/inserters_character/char/8.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_character/char/8.cc execution test
+PASS: 27_io/basic_ostream/inserters_character/char/9555-oc.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_character/char/9555-oc.cc execution test
+PASS: 27_io/basic_ostream/inserters_other/char/1.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_other/char/1.cc execution test
+PASS: 27_io/basic_ostream/inserters_other/char/2.cc (test for excess errors)
+FAIL: 27_io/basic_ostream/inserters_other/char/2.cc execution test
+PASS: 27_io/basic_ostream/inserters_other/char/3.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_other/char/3.cc execution test
+PASS: 27_io/basic_ostream/inserters_other/char/4.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_other/char/4.cc execution test
+PASS: 27_io/basic_ostream/inserters_other/char/5.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_other/char/5.cc execution test
+PASS: 27_io/basic_ostream/inserters_other/char/9318-out.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_other/char/9318-out.cc execution test
+PASS: 27_io/basic_ostream/inserters_other/char/9424-out.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_other/char/9424-out.cc execution test
+PASS: 27_io/basic_ostream/inserters_other/char/9555-oo.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_other/char/9555-oo.cc execution test
+PASS: 27_io/basic_ostream/inserters_other/char/error_failbit.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_other/char/error_failbit.cc execution test
+PASS: 27_io/basic_ostream/inserters_other/char/exceptions_badbit_throw.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_other/char/exceptions_badbit_throw.cc execution test
+PASS: 27_io/basic_ostream/inserters_other/char/exceptions_failbit_throw.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_other/char/exceptions_failbit_throw.cc execution test
+PASS: 27_io/basic_ostream/inserters_other/char/exceptions_null.cc (test for excess errors)
+PASS: 27_io/basic_ostream/inserters_other/char/exceptions_null.cc execution test
+PASS: 27_io/basic_ostream/put/char/1.cc (test for excess errors)
+PASS: 27_io/basic_ostream/put/char/1.cc execution test
+PASS: 27_io/basic_ostream/seekp/char/2346-fstream.cc (test for excess errors)
+FAIL: 27_io/basic_ostream/seekp/char/2346-fstream.cc execution test
+PASS: 27_io/basic_ostream/seekp/char/2346-sstream.cc (test for excess errors)
+PASS: 27_io/basic_ostream/seekp/char/2346-sstream.cc execution test
+PASS: 27_io/basic_ostream/seekp/char/exceptions_badbit_throw.cc (test for excess errors)
+PASS: 27_io/basic_ostream/seekp/char/exceptions_badbit_throw.cc execution test
+PASS: 27_io/basic_ostream/sentry/char/1.cc (test for excess errors)
+PASS: 27_io/basic_ostream/sentry/char/1.cc execution test
+PASS: 27_io/basic_ostream/sentry/char/2.cc (test for excess errors)
+PASS: 27_io/basic_ostream/sentry/char/2.cc execution test
+PASS: 27_io/basic_ostream/sentry/pod/1.cc (test for excess errors)
+PASS: 27_io/basic_ostream/sentry/pod/1.cc execution test
+PASS: 27_io/basic_ostream/tellp/char/1.cc (test for excess errors)
+FAIL: 27_io/basic_ostream/tellp/char/1.cc execution test
+PASS: 27_io/basic_ostream/tellp/char/2.cc (test for excess errors)
+PASS: 27_io/basic_ostream/tellp/char/2.cc execution test
+PASS: 27_io/basic_ostream/tellp/char/exceptions_badbit_throw.cc (test for excess errors)
+PASS: 27_io/basic_ostream/tellp/char/exceptions_badbit_throw.cc execution test
+PASS: 27_io/basic_ostream/write/char/1.cc (test for excess errors)
+PASS: 27_io/basic_ostream/write/char/1.cc execution test
+PASS: 27_io/basic_ostringstream/1.cc (test for excess errors)
+PASS: 27_io/basic_ostringstream/2.cc (test for excess errors)
+PASS: 27_io/basic_ostringstream/3.cc (test for excess errors)
+PASS: 27_io/basic_ostringstream/3.cc execution test
+PASS: 27_io/basic_ostringstream/4.cc (test for excess errors)
+PASS: 27_io/basic_ostringstream/4.cc execution test
+PASS: 27_io/basic_ostringstream/cons/char/3.cc (test for excess errors)
+PASS: 27_io/basic_ostringstream/cons/char/3.cc execution test
+PASS: 27_io/basic_ostringstream/rdbuf/char/2832.cc (test for excess errors)
+PASS: 27_io/basic_ostringstream/rdbuf/char/2832.cc execution test
+PASS: 27_io/basic_ostringstream/str/char/1.cc (test for excess errors)
+PASS: 27_io/basic_ostringstream/str/char/1.cc execution test
+PASS: 27_io/basic_ostringstream/str/char/2.cc (test for excess errors)
+PASS: 27_io/basic_ostringstream/str/char/2.cc execution test
+PASS: 27_io/basic_streambuf/1.cc (test for excess errors)
+PASS: 27_io/basic_streambuf/2.cc (test for excess errors)
+PASS: 27_io/basic_streambuf/3.cc (test for excess errors)
+PASS: 27_io/basic_streambuf/3.cc execution test
+PASS: 27_io/basic_streambuf/cons/char/1.cc (test for excess errors)
+PASS: 27_io/basic_streambuf/cons/char/1.cc execution test
+PASS: 27_io/basic_streambuf/imbue/char/1.cc (test for excess errors)
+PASS: 27_io/basic_streambuf/imbue/char/1.cc execution test
+UNSUPPORTED: 27_io/basic_streambuf/imbue/char/13007-1.cc
+UNSUPPORTED: 27_io/basic_streambuf/imbue/char/13007-2.cc
+UNSUPPORTED: 27_io/basic_streambuf/imbue/char/9322.cc
+PASS: 27_io/basic_streambuf/in_avail/char/1.cc (test for excess errors)
+PASS: 27_io/basic_streambuf/in_avail/char/1.cc execution test
+PASS: 27_io/basic_streambuf/overflow/char/1.cc (test for excess errors)
+PASS: 27_io/basic_streambuf/overflow/char/1.cc execution test
+PASS: 27_io/basic_streambuf/overflow/char/2.cc (test for excess errors)
+PASS: 27_io/basic_streambuf/overflow/char/2.cc execution test
+PASS: 27_io/basic_streambuf/overflow/char/3599.cc (test for excess errors)
+PASS: 27_io/basic_streambuf/overflow/char/3599.cc execution test
+PASS: 27_io/basic_streambuf/sgetc/char/1.cc (test for excess errors)
+PASS: 27_io/basic_streambuf/sgetc/char/1.cc execution test
+PASS: 27_io/basic_streambuf/sgetn/char/1.cc (test for excess errors)
+PASS: 27_io/basic_streambuf/sgetn/char/1.cc execution test
+PASS: 27_io/basic_streambuf/sputbackc/char/9538.cc (test for excess errors)
+PASS: 27_io/basic_streambuf/sputbackc/char/9538.cc execution test
+PASS: 27_io/basic_streambuf/sputc/char/1057.cc (test for excess errors)
+PASS: 27_io/basic_streambuf/sputc/char/1057.cc execution test
+PASS: 27_io/basic_streambuf/sputn/char/1.cc (test for excess errors)
+PASS: 27_io/basic_streambuf/sputn/char/1.cc execution test
+PASS: 27_io/basic_streambuf/sputn/char/1057.cc (test for excess errors)
+PASS: 27_io/basic_streambuf/sputn/char/1057.cc execution test
+PASS: 27_io/basic_streambuf/sync/char/1057.cc (test for excess errors)
+PASS: 27_io/basic_streambuf/sync/char/1057.cc execution test
+PASS: 27_io/basic_stringbuf/1.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/2.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/3.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/3.cc execution test
+PASS: 27_io/basic_stringbuf/4.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/5.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/5.cc execution test
+PASS: 27_io/basic_stringbuf/cons/char/1.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/cons/char/1.cc execution test
+PASS: 27_io/basic_stringbuf/imbue/char/1.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/imbue/char/1.cc execution test
+UNSUPPORTED: 27_io/basic_stringbuf/imbue/char/9322.cc
+PASS: 27_io/basic_stringbuf/in_avail/char/1.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/in_avail/char/1.cc execution test
+PASS: 27_io/basic_stringbuf/in_avail/char/21955.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/in_avail/char/21955.cc execution test
+PASS: 27_io/basic_stringbuf/overflow/char/1.cc (test for excess errors)
+FAIL: 27_io/basic_stringbuf/overflow/char/1.cc execution test
+PASS: 27_io/basic_stringbuf/overflow/char/2.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/overflow/char/2.cc execution test
+PASS: 27_io/basic_stringbuf/overflow/char/3599.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/overflow/char/3599.cc execution test
+PASS: 27_io/basic_stringbuf/overflow/char/9988.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/overflow/char/9988.cc execution test
+PASS: 27_io/basic_stringbuf/pbackfail/char/1.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/pbackfail/char/1.cc execution test
+PASS: 27_io/basic_stringbuf/pbackfail/char/2.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/pbackfail/char/2.cc execution test
+PASS: 27_io/basic_stringbuf/sbumpc/char/1.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/sbumpc/char/1.cc execution test
+PASS: 27_io/basic_stringbuf/sbumpc/char/9825.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/sbumpc/char/9825.cc execution test
+PASS: 27_io/basic_stringbuf/seekoff/char/1.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/seekoff/char/1.cc execution test
+PASS: 27_io/basic_stringbuf/seekoff/char/10975.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/seekoff/char/10975.cc execution test
+PASS: 27_io/basic_stringbuf/seekoff/char/16956.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/seekoff/char/16956.cc execution test
+PASS: 27_io/basic_stringbuf/seekoff/char/2.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/seekoff/char/2.cc execution test
+PASS: 27_io/basic_stringbuf/seekpos/char/1.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/seekpos/char/1.cc execution test
+PASS: 27_io/basic_stringbuf/seekpos/char/2.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/seekpos/char/2.cc execution test
+PASS: 27_io/basic_stringbuf/seekpos/char/29354.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/seekpos/char/29354.cc execution test
+PASS: 27_io/basic_stringbuf/seekpos/char/3.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/seekpos/char/3.cc execution test
+PASS: 27_io/basic_stringbuf/setbuf/char/1.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/setbuf/char/1.cc execution test
+PASS: 27_io/basic_stringbuf/setbuf/char/2.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/setbuf/char/2.cc execution test
+PASS: 27_io/basic_stringbuf/setbuf/char/3.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/setbuf/char/3.cc execution test
+PASS: 27_io/basic_stringbuf/setbuf/char/4.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/setbuf/char/4.cc execution test
+PASS: 27_io/basic_stringbuf/sgetc/char/1.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/sgetc/char/1.cc execution test
+PASS: 27_io/basic_stringbuf/sgetn/char/1.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/sgetn/char/1.cc execution test
+PASS: 27_io/basic_stringbuf/snextc/char/1.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/snextc/char/1.cc execution test
+PASS: 27_io/basic_stringbuf/sputbackc/char/1.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/sputbackc/char/1.cc execution test
+PASS: 27_io/basic_stringbuf/sputbackc/char/9425.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/sputbackc/char/9425.cc execution test
+PASS: 27_io/basic_stringbuf/sputc/char/1.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/sputc/char/1.cc execution test
+PASS: 27_io/basic_stringbuf/sputc/char/1057.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/sputc/char/1057.cc execution test
+PASS: 27_io/basic_stringbuf/sputc/char/9404-1.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/sputc/char/9404-1.cc execution test
+PASS: 27_io/basic_stringbuf/sputn/char/1.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/sputn/char/1.cc execution test
+PASS: 27_io/basic_stringbuf/sputn/char/1057.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/sputn/char/1057.cc execution test
+PASS: 27_io/basic_stringbuf/sputn/char/9404-2.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/sputn/char/9404-2.cc execution test
+PASS: 27_io/basic_stringbuf/str/char/1.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/str/char/1.cc execution test
+PASS: 27_io/basic_stringbuf/str/char/2.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/str/char/2.cc execution test
+PASS: 27_io/basic_stringbuf/str/char/3.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/str/char/3.cc execution test
+PASS: 27_io/basic_stringbuf/str/char/3955.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/str/char/3955.cc execution test
+PASS: 27_io/basic_stringbuf/sungetc/char/1.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/sungetc/char/1.cc execution test
+PASS: 27_io/basic_stringbuf/sync/char/1057.cc (test for excess errors)
+PASS: 27_io/basic_stringbuf/sync/char/1057.cc execution test
+PASS: 27_io/basic_stringstream/1.cc (test for excess errors)
+PASS: 27_io/basic_stringstream/2.cc (test for excess errors)
+PASS: 27_io/basic_stringstream/3.cc (test for excess errors)
+PASS: 27_io/basic_stringstream/3.cc execution test
+PASS: 27_io/basic_stringstream/4.cc (test for excess errors)
+PASS: 27_io/basic_stringstream/4.cc execution test
+PASS: 27_io/basic_stringstream/rdbuf/char/2832.cc (test for excess errors)
+PASS: 27_io/basic_stringstream/rdbuf/char/2832.cc execution test
+PASS: 27_io/basic_stringstream/str/char/1.cc (test for excess errors)
+PASS: 27_io/basic_stringstream/str/char/1.cc execution test
+PASS: 27_io/basic_stringstream/str/char/2.cc (test for excess errors)
+PASS: 27_io/basic_stringstream/str/char/2.cc execution test
+PASS: 27_io/basic_stringstream/str/char/3.cc (test for excess errors)
+PASS: 27_io/basic_stringstream/str/char/3.cc execution test
+PASS: 27_io/basic_stringstream/str/char/4.cc (test for excess errors)
+PASS: 27_io/basic_stringstream/str/char/4.cc execution test
+PASS: 27_io/fpos/1.cc (test for excess errors)
+PASS: 27_io/fpos/11450.cc (test for excess errors)
+PASS: 27_io/fpos/11450.cc execution test
+PASS: 27_io/fpos/14252.cc (test for excess errors)
+PASS: 27_io/fpos/14252.cc execution test
+PASS: 27_io/fpos/14320-1.cc (test for excess errors)
+XFAIL: 27_io/fpos/14320-1.cc execution test
+PASS: 27_io/fpos/14320-2.cc (test for excess errors)
+PASS: 27_io/fpos/14320-2.cc execution test
+PASS: 27_io/fpos/14320-3.cc (test for excess errors)
+PASS: 27_io/fpos/14320-3.cc execution test
+PASS: 27_io/fpos/14320-4.cc (test for excess errors)
+PASS: 27_io/fpos/14320-4.cc execution test
+PASS: 27_io/fpos/14320-5.cc (test for excess errors)
+PASS: 27_io/fpos/14320-5.cc execution test
+PASS: 27_io/fpos/14775.cc (test for excess errors)
+PASS: 27_io/fpos/14775.cc execution test
+PASS: 27_io/fpos/mbstate_t/1.cc (test for excess errors)
+PASS: 27_io/fpos/mbstate_t/1.cc execution test
+PASS: 27_io/fpos/mbstate_t/12065.cc (test for excess errors)
+PASS: 27_io/fpos/mbstate_t/12065.cc execution test
+PASS: 27_io/fpos/mbstate_t/2.cc (test for excess errors)
+PASS: 27_io/fpos/mbstate_t/2.cc execution test
+PASS: 27_io/fpos/mbstate_t/3.cc (test for excess errors)
+PASS: 27_io/fpos/mbstate_t/3.cc execution test
+XFAIL: 27_io/fpos/mbstate_t/4_neg.cc  (test for errors, line 32)
+XFAIL: 27_io/fpos/mbstate_t/4_neg.cc  (test for errors, line 35)
+PASS: 27_io/fpos/mbstate_t/4_neg.cc (test for excess errors)
+PASS: 27_io/ios_base/callbacks/1.cc (test for excess errors)
+PASS: 27_io/ios_base/callbacks/1.cc execution test
+PASS: 27_io/ios_base/cons/assign_neg.cc  (test for errors, line 41)
+PASS: 27_io/ios_base/cons/assign_neg.cc  (test for errors, line 34)
+PASS: 27_io/ios_base/cons/assign_neg.cc  (test for errors, line 782)
+PASS: 27_io/ios_base/cons/assign_neg.cc  (test for errors, line )
+PASS: 27_io/ios_base/cons/assign_neg.cc (test for excess errors)
+PASS: 27_io/ios_base/cons/copy_neg.cc  (test for errors, line 35)
+PASS: 27_io/ios_base/cons/copy_neg.cc  (test for errors, line 41)
+PASS: 27_io/ios_base/cons/copy_neg.cc  (test for errors, line 779)
+PASS: 27_io/ios_base/cons/copy_neg.cc  (test for errors, line )
+PASS: 27_io/ios_base/cons/copy_neg.cc (test for excess errors)
+PASS: 27_io/ios_base/state/1.cc (test for excess errors)
+PASS: 27_io/ios_base/state/1.cc execution test
+PASS: 27_io/ios_base/storage/1.cc (test for excess errors)
+PASS: 27_io/ios_base/storage/1.cc execution test
+PASS: 27_io/ios_base/storage/11584.cc (test for excess errors)
+PASS: 27_io/ios_base/storage/11584.cc execution test
+PASS: 27_io/ios_base/storage/2.cc (test for excess errors)
+PASS: 27_io/ios_base/storage/2.cc execution test
+PASS: 27_io/ios_base/storage/3.cc (test for excess errors)
+PASS: 27_io/ios_base/storage/3.cc execution test
+PASS: 27_io/ios_base/sync_with_stdio/1.cc (test for excess errors)
+PASS: 27_io/ios_base/sync_with_stdio/1.cc execution test
+PASS: 27_io/ios_base/sync_with_stdio/16959.cc (test for excess errors)
+PASS: 27_io/ios_base/sync_with_stdio/16959.cc execution test
+PASS: 27_io/ios_base/sync_with_stdio/2.cc (test for excess errors)
+PASS: 27_io/ios_base/sync_with_stdio/2.cc execution test
+PASS: 27_io/ios_base/sync_with_stdio/9523.cc (test for excess errors)
+PASS: 27_io/ios_base/sync_with_stdio/9523.cc execution test
+PASS: 27_io/ios_base/types/fmtflags/bitmask_operators.cc (test for excess errors)
+PASS: 27_io/ios_base/types/fmtflags/case_label.cc (test for excess errors)
+PASS: 27_io/ios_base/types/iostate/bitmask_operators.cc (test for excess errors)
+PASS: 27_io/ios_base/types/iostate/case_label.cc (test for excess errors)
+PASS: 27_io/ios_base/types/openmode/bitmask_operators.cc (test for excess errors)
+PASS: 27_io/ios_base/types/openmode/case_label.cc (test for excess errors)
+PASS: 27_io/ios_base/types/seekdir/case_label.cc (test for excess errors)
+PASS: 27_io/manipulators/adjustfield/char/1.cc (test for excess errors)
+PASS: 27_io/manipulators/adjustfield/char/1.cc execution test
+PASS: 27_io/manipulators/adjustfield/char/2.cc (test for excess errors)
+PASS: 27_io/manipulators/adjustfield/char/2.cc execution test
+PASS: 27_io/manipulators/basefield/char/1.cc (test for excess errors)
+PASS: 27_io/manipulators/basefield/char/1.cc execution test
+PASS: 27_io/manipulators/standard/char/1.cc (test for excess errors)
+PASS: 27_io/manipulators/standard/char/1.cc execution test
+PASS: 27_io/manipulators/standard/char/2.cc (test for excess errors)
+PASS: 27_io/manipulators/standard/char/2.cc execution test
+PASS: 27_io/objects/char/1.cc (test for excess errors)
+PASS: 27_io/objects/char/1.cc execution test
+PASS: 27_io/objects/char/10.cc (test for excess errors)
+FAIL: 27_io/objects/char/10.cc execution test
+PASS: 27_io/objects/char/12048-1.cc (test for excess errors)
+PASS: 27_io/objects/char/12048-1.cc execution test
+PASS: 27_io/objects/char/12048-2.cc (test for excess errors)
+PASS: 27_io/objects/char/12048-2.cc execution test
+PASS: 27_io/objects/char/12048-3.cc (test for excess errors)
+PASS: 27_io/objects/char/12048-3.cc execution test
+PASS: 27_io/objects/char/12048-4.cc (test for excess errors)
+PASS: 27_io/objects/char/12048-4.cc execution test
+PASS: 27_io/objects/char/12048-5.cc (test for excess errors)
+XFAIL: 27_io/objects/char/12048-5.cc execution test
+PASS: 27_io/objects/char/2.cc (test for excess errors)
+PASS: 27_io/objects/char/2.cc execution test
+PASS: 27_io/objects/char/3045.cc (test for excess errors)
+PASS: 27_io/objects/char/3045.cc execution test
+PASS: 27_io/objects/char/3647.cc (test for excess errors)
+PASS: 27_io/objects/char/3647.cc execution test
+PASS: 27_io/objects/char/5.cc (test for excess errors)
+PASS: 27_io/objects/char/5.cc execution test
+PASS: 27_io/objects/char/5268.cc (test for excess errors)
+PASS: 27_io/objects/char/5268.cc execution test
+PASS: 27_io/objects/char/6.cc (test for excess errors)
+FAIL: 27_io/objects/char/6.cc execution test
+UNSUPPORTED: 27_io/objects/char/7.cc
+PASS: 27_io/objects/char/8.cc (test for excess errors)
+PASS: 27_io/objects/char/8.cc execution test
+PASS: 27_io/objects/char/9.cc (test for excess errors)
+PASS: 27_io/objects/char/9.cc execution test
+UNSUPPORTED: 27_io/objects/char/9661-1.cc
+PASS: 27_io/types/1.cc (test for excess errors)
+PASS: 27_io/types/1.cc execution test
+PASS: 27_io/types/2.cc (test for excess errors)
+PASS: 27_io/types/2.cc execution test
+PASS: 27_io/types/3.cc (test for excess errors)
+PASS: 27_io/types/3.cc execution test
+PASS: backward/11460.cc (test for excess errors)
+PASS: backward/11460.cc execution test
+PASS: backward/header_deque_h.cc (test for excess errors)
+PASS: backward/header_deque_h.cc execution test
+PASS: backward/header_hash_map_h.cc (test for excess errors)
+PASS: backward/header_hash_map_h.cc execution test
+PASS: backward/header_hash_set_h.cc (test for excess errors)
+PASS: backward/header_hash_set_h.cc execution test
+PASS: backward/header_hashtable_h.cc (test for excess errors)
+PASS: backward/header_hashtable_h.cc execution test
+PASS: backward/header_iterator_h.cc (test for excess errors)
+PASS: backward/header_iterator_h.cc execution test
+PASS: backward/header_rope_h.cc (test for excess errors)
+PASS: backward/header_rope_h.cc execution test
+PASS: backward/header_slist_h.cc (test for excess errors)
+PASS: backward/header_slist_h.cc execution test
+PASS: backward/header_tempbuf_h.cc (test for excess errors)
+PASS: backward/header_tempbuf_h.cc execution test
+PASS: backward/strstream_members.cc (test for excess errors)
+PASS: backward/strstream_members.cc execution test
+PASS: demangle/abi_examples/01.cc (test for excess errors)
+PASS: demangle/abi_examples/01.cc execution test
+PASS: demangle/abi_examples/02.cc (test for excess errors)
+PASS: demangle/abi_examples/02.cc execution test
+PASS: demangle/abi_examples/03.cc (test for excess errors)
+PASS: demangle/abi_examples/03.cc execution test
+PASS: demangle/abi_examples/04.cc (test for excess errors)
+PASS: demangle/abi_examples/04.cc execution test
+PASS: demangle/abi_examples/05.cc (test for excess errors)
+PASS: demangle/abi_examples/05.cc execution test
+PASS: demangle/abi_examples/06.cc (test for excess errors)
+PASS: demangle/abi_examples/06.cc execution test
+PASS: demangle/abi_examples/07.cc (test for excess errors)
+PASS: demangle/abi_examples/07.cc execution test
+PASS: demangle/abi_examples/08.cc (test for excess errors)
+PASS: demangle/abi_examples/08.cc execution test
+PASS: demangle/abi_examples/09.cc (test for excess errors)
+PASS: demangle/abi_examples/09.cc execution test
+PASS: demangle/abi_examples/10.cc (test for excess errors)
+PASS: demangle/abi_examples/10.cc execution test
+PASS: demangle/abi_examples/11.cc (test for excess errors)
+PASS: demangle/abi_examples/11.cc execution test
+PASS: demangle/abi_examples/12.cc (test for excess errors)
+PASS: demangle/abi_examples/12.cc execution test
+PASS: demangle/abi_examples/13.cc (test for excess errors)
+PASS: demangle/abi_examples/13.cc execution test
+PASS: demangle/abi_examples/14.cc (test for excess errors)
+PASS: demangle/abi_examples/14.cc execution test
+PASS: demangle/abi_examples/15.cc (test for excess errors)
+PASS: demangle/abi_examples/15.cc execution test
+PASS: demangle/abi_examples/16.cc (test for excess errors)
+PASS: demangle/abi_examples/16.cc execution test
+PASS: demangle/abi_examples/17.cc (test for excess errors)
+PASS: demangle/abi_examples/17.cc execution test
+PASS: demangle/abi_examples/18.cc (test for excess errors)
+PASS: demangle/abi_examples/18.cc execution test
+PASS: demangle/abi_examples/19.cc (test for excess errors)
+PASS: demangle/abi_examples/19.cc execution test
+PASS: demangle/abi_examples/20.cc (test for excess errors)
+PASS: demangle/abi_examples/20.cc execution test
+PASS: demangle/abi_examples/21.cc (test for excess errors)
+PASS: demangle/abi_examples/21.cc execution test
+PASS: demangle/abi_examples/22.cc (test for excess errors)
+PASS: demangle/abi_examples/22.cc execution test
+PASS: demangle/abi_examples/23.cc (test for excess errors)
+PASS: demangle/abi_examples/23.cc execution test
+PASS: demangle/abi_examples/24.cc (test for excess errors)
+PASS: demangle/abi_examples/24.cc execution test
+PASS: demangle/abi_examples/25.cc (test for excess errors)
+PASS: demangle/abi_examples/25.cc execution test
+PASS: demangle/abi_examples/26.cc (test for excess errors)
+PASS: demangle/abi_examples/26.cc execution test
+PASS: demangle/abi_text/01.cc (test for excess errors)
+PASS: demangle/abi_text/01.cc execution test
+PASS: demangle/abi_text/02.cc (test for excess errors)
+PASS: demangle/abi_text/02.cc execution test
+PASS: demangle/abi_text/03.cc (test for excess errors)
+PASS: demangle/abi_text/03.cc execution test
+PASS: demangle/abi_text/04.cc (test for excess errors)
+PASS: demangle/abi_text/04.cc execution test
+PASS: demangle/abi_text/05.cc (test for excess errors)
+PASS: demangle/abi_text/05.cc execution test
+PASS: demangle/abi_text/06.cc (test for excess errors)
+PASS: demangle/abi_text/06.cc execution test
+PASS: demangle/abi_text/07.cc (test for excess errors)
+PASS: demangle/abi_text/07.cc execution test
+PASS: demangle/abi_text/08.cc (test for excess errors)
+PASS: demangle/abi_text/08.cc execution test
+PASS: demangle/abi_text/09.cc (test for excess errors)
+PASS: demangle/abi_text/09.cc execution test
+PASS: demangle/abi_text/10.cc (test for excess errors)
+PASS: demangle/abi_text/10.cc execution test
+PASS: demangle/abi_text/11.cc (test for excess errors)
+PASS: demangle/abi_text/11.cc execution test
+PASS: demangle/abi_text/12.cc (test for excess errors)
+PASS: demangle/abi_text/12.cc execution test
+PASS: demangle/abi_text/13.cc (test for excess errors)
+PASS: demangle/abi_text/13.cc execution test
+PASS: demangle/abi_text/14.cc (test for excess errors)
+PASS: demangle/abi_text/14.cc execution test
+PASS: demangle/regression/3111-1.cc (test for excess errors)
+PASS: demangle/regression/3111-1.cc execution test
+PASS: demangle/regression/3111-2.cc (test for excess errors)
+PASS: demangle/regression/3111-2.cc execution test
+PASS: demangle/regression/7986-01.cc (test for excess errors)
+PASS: demangle/regression/7986-01.cc execution test
+PASS: demangle/regression/7986-02.cc (test for excess errors)
+PASS: demangle/regression/7986-02.cc execution test
+PASS: demangle/regression/7986-03.cc (test for excess errors)
+PASS: demangle/regression/7986-03.cc execution test
+PASS: demangle/regression/7986-04.cc (test for excess errors)
+PASS: demangle/regression/7986-04.cc execution test
+PASS: demangle/regression/7986-05.cc (test for excess errors)
+PASS: demangle/regression/7986-05.cc execution test
+PASS: demangle/regression/7986-06.cc (test for excess errors)
+PASS: demangle/regression/7986-06.cc execution test
+PASS: demangle/regression/7986-07.cc (test for excess errors)
+PASS: demangle/regression/7986-07.cc execution test
+PASS: demangle/regression/7986-08.cc (test for excess errors)
+PASS: demangle/regression/7986-08.cc execution test
+PASS: demangle/regression/7986-09.cc (test for excess errors)
+PASS: demangle/regression/7986-09.cc execution test
+PASS: demangle/regression/7986-10.cc (test for excess errors)
+PASS: demangle/regression/7986-10.cc execution test
+PASS: demangle/regression/7986-11.cc (test for excess errors)
+PASS: demangle/regression/7986-11.cc execution test
+PASS: demangle/regression/7986-12.cc (test for excess errors)
+PASS: demangle/regression/7986-12.cc execution test
+PASS: demangle/regression/7986.cc (test for excess errors)
+PASS: demangle/regression/7986.cc execution test
+PASS: demangle/regression/8897.cc (test for excess errors)
+PASS: demangle/regression/8897.cc execution test
+PASS: demangle/regression/cw-01.cc (test for excess errors)
+PASS: demangle/regression/cw-01.cc execution test
+PASS: demangle/regression/cw-02.cc (test for excess errors)
+PASS: demangle/regression/cw-02.cc execution test
+PASS: demangle/regression/cw-03.cc (test for excess errors)
+PASS: demangle/regression/cw-03.cc execution test
+PASS: demangle/regression/cw-04.cc (test for excess errors)
+PASS: demangle/regression/cw-04.cc execution test
+PASS: demangle/regression/cw-05.cc (test for excess errors)
+PASS: demangle/regression/cw-05.cc execution test
+PASS: demangle/regression/cw-06.cc (test for excess errors)
+PASS: demangle/regression/cw-06.cc execution test
+PASS: demangle/regression/cw-07.cc (test for excess errors)
+PASS: demangle/regression/cw-07.cc execution test
+PASS: demangle/regression/cw-08.cc (test for excess errors)
+PASS: demangle/regression/cw-08.cc execution test
+PASS: demangle/regression/cw-09.cc (test for excess errors)
+PASS: demangle/regression/cw-09.cc execution test
+PASS: demangle/regression/cw-10.cc (test for excess errors)
+PASS: demangle/regression/cw-10.cc execution test
+PASS: demangle/regression/cw-11.cc (test for excess errors)
+PASS: demangle/regression/cw-11.cc execution test
+PASS: demangle/regression/cw-12.cc (test for excess errors)
+PASS: demangle/regression/cw-12.cc execution test
+PASS: demangle/regression/cw-13.cc (test for excess errors)
+PASS: demangle/regression/cw-13.cc execution test
+PASS: demangle/regression/cw-14.cc (test for excess errors)
+PASS: demangle/regression/cw-14.cc execution test
+PASS: demangle/regression/cw-15.cc (test for excess errors)
+PASS: demangle/regression/cw-15.cc execution test
+PASS: demangle/regression/cw-16.cc (test for excess errors)
+PASS: demangle/regression/cw-16.cc execution test
+PASS: demangle/regression/old.cc (test for excess errors)
+PASS: demangle/regression/old.cc execution test
+PASS: ext/array_allocator/1.cc (test for excess errors)
+PASS: ext/array_allocator/1.cc execution test
+PASS: ext/array_allocator/2.cc (test for excess errors)
+PASS: ext/array_allocator/2.cc execution test
+PASS: ext/array_allocator/3.cc (test for excess errors)
+PASS: ext/array_allocator/3.cc execution test
+PASS: ext/array_allocator/check_allocate_max_size.cc (test for excess errors)
+PASS: ext/array_allocator/check_allocate_max_size.cc execution test
+PASS: ext/array_allocator/check_deallocate_null.cc (test for excess errors)
+PASS: ext/array_allocator/check_deallocate_null.cc execution test
+PASS: ext/array_allocator/check_delete.cc (test for excess errors)
+PASS: ext/array_allocator/check_delete.cc execution test
+PASS: ext/array_allocator/check_new.cc (test for excess errors)
+PASS: ext/array_allocator/check_new.cc execution test
+PASS: ext/bitmap_allocator/check_allocate_max_size.cc (test for excess errors)
+PASS: ext/bitmap_allocator/check_allocate_max_size.cc execution test
+PASS: ext/bitmap_allocator/check_deallocate_null.cc (test for excess errors)
+PASS: ext/bitmap_allocator/check_deallocate_null.cc execution test
+PASS: ext/bitmap_allocator/check_delete.cc (test for excess errors)
+PASS: ext/bitmap_allocator/check_delete.cc execution test
+PASS: ext/bitmap_allocator/check_new.cc (test for excess errors)
+PASS: ext/bitmap_allocator/check_new.cc execution test
+PASS: ext/concept_checks.cc (test for excess errors)
+PASS: ext/concept_checks.cc execution test
+PASS: ext/debug_allocator/check_deallocate_null.cc (test for excess errors)
+PASS: ext/debug_allocator/check_deallocate_null.cc execution test
+PASS: ext/debug_allocator/check_delete.cc (test for excess errors)
+PASS: ext/debug_allocator/check_delete.cc execution test
+PASS: ext/debug_allocator/check_new.cc (test for excess errors)
+PASS: ext/debug_allocator/check_new.cc execution test
+PASS: ext/debug_allocator/instantiate.cc (test for excess errors)
+PASS: ext/enc_filebuf/char/13189.cc (test for excess errors)
+PASS: ext/enc_filebuf/char/13189.cc execution test
+PASS: ext/enc_filebuf/char/13598.cc (test for excess errors)
+PASS: ext/enc_filebuf/char/13598.cc execution test
+PASS: ext/hash_map/1.cc (test for excess errors)
+PASS: ext/hash_map/1.cc execution test
+PASS: ext/hash_map/14648.cc (test for excess errors)
+PASS: ext/hash_map/14648.cc execution test
+PASS: ext/hash_map/23528.cc (test for excess errors)
+PASS: ext/hash_map/instantiate.cc (test for excess errors)
+PASS: ext/hash_set/1.cc (test for excess errors)
+PASS: ext/hash_set/1.cc execution test
+PASS: ext/hash_set/check_construct_destroy.cc (test for excess errors)
+PASS: ext/hash_set/check_construct_destroy.cc execution test
+PASS: ext/hash_set/instantiate.cc (test for excess errors)
+PASS: ext/headers.cc (test for excess errors)
+PASS: ext/is_heap/1.cc (test for excess errors)
+PASS: ext/is_heap/1.cc execution test
+PASS: ext/is_heap/check_type.cc (test for excess errors)
+PASS: ext/malloc_allocator/check_allocate_max_size.cc (test for excess errors)
+PASS: ext/malloc_allocator/check_allocate_max_size.cc execution test
+PASS: ext/malloc_allocator/check_deallocate_null.cc (test for excess errors)
+PASS: ext/malloc_allocator/check_deallocate_null.cc execution test
+PASS: ext/malloc_allocator/check_delete.cc (test for excess errors)
+PASS: ext/malloc_allocator/check_delete.cc execution test
+PASS: ext/malloc_allocator/check_new.cc (test for excess errors)
+PASS: ext/malloc_allocator/check_new.cc execution test
+PASS: ext/malloc_allocator/deallocate_global.cc (test for excess errors)
+PASS: ext/malloc_allocator/deallocate_global.cc execution test
+PASS: ext/malloc_allocator/deallocate_local.cc (test for excess errors)
+PASS: ext/malloc_allocator/deallocate_local.cc execution test
+PASS: ext/malloc_allocator/instantiate.cc (test for excess errors)
+PASS: ext/median.cc (test for excess errors)
+PASS: ext/median.cc execution test
+PASS: ext/mt_allocator/check_allocate_big_per_type.cc (test for excess errors)
+PASS: ext/mt_allocator/check_allocate_big_per_type.cc execution test
+PASS: ext/mt_allocator/check_allocate_max_size.cc (test for excess errors)
+PASS: ext/mt_allocator/check_allocate_max_size.cc execution test
+PASS: ext/mt_allocator/check_deallocate_null.cc (test for excess errors)
+PASS: ext/mt_allocator/check_deallocate_null.cc execution test
+PASS: ext/mt_allocator/check_delete.cc (test for excess errors)
+PASS: ext/mt_allocator/check_delete.cc execution test
+PASS: ext/mt_allocator/check_new.cc (test for excess errors)
+PASS: ext/mt_allocator/check_new.cc execution test
+PASS: ext/mt_allocator/deallocate_global-2.cc (test for excess errors)
+PASS: ext/mt_allocator/deallocate_global-2.cc execution test
+PASS: ext/mt_allocator/deallocate_global-4.cc (test for excess errors)
+PASS: ext/mt_allocator/deallocate_global-4.cc execution test
+PASS: ext/mt_allocator/deallocate_local-2.cc (test for excess errors)
+PASS: ext/mt_allocator/deallocate_local-2.cc execution test
+PASS: ext/mt_allocator/deallocate_local-4.cc (test for excess errors)
+PASS: ext/mt_allocator/deallocate_local-4.cc execution test
+PASS: ext/mt_allocator/deallocate_local-6.cc (test for excess errors)
+PASS: ext/mt_allocator/deallocate_local-6.cc execution test
+PASS: ext/mt_allocator/deallocate_local-8.cc (test for excess errors)
+PASS: ext/mt_allocator/deallocate_local-8.cc execution test
+PASS: ext/mt_allocator/instantiate.cc (test for excess errors)
+PASS: ext/mt_allocator/tune-1.cc (test for excess errors)
+PASS: ext/mt_allocator/tune-1.cc execution test
+PASS: ext/mt_allocator/tune-2.cc (test for excess errors)
+PASS: ext/mt_allocator/tune-2.cc execution test
+PASS: ext/mt_allocator/tune-3.cc (test for excess errors)
+PASS: ext/mt_allocator/tune-3.cc execution test
+PASS: ext/mt_allocator/tune-4.cc (test for excess errors)
+PASS: ext/mt_allocator/tune-4.cc execution test
+PASS: ext/new_allocator/check_allocate_max_size.cc (test for excess errors)
+PASS: ext/new_allocator/check_allocate_max_size.cc execution test
+PASS: ext/new_allocator/check_deallocate_null.cc (test for excess errors)
+PASS: ext/new_allocator/check_deallocate_null.cc execution test
+PASS: ext/new_allocator/check_delete.cc (test for excess errors)
+PASS: ext/new_allocator/check_delete.cc execution test
+PASS: ext/new_allocator/check_new.cc (test for excess errors)
+PASS: ext/new_allocator/check_new.cc execution test
+PASS: ext/new_allocator/deallocate_global.cc (test for excess errors)
+PASS: ext/new_allocator/deallocate_global.cc execution test
+PASS: ext/new_allocator/deallocate_local.cc (test for excess errors)
+PASS: ext/new_allocator/deallocate_local.cc execution test
+PASS: ext/new_allocator/instantiate.cc (test for excess errors)
+PASS: ext/pb_assoc/example/basic_map.cc (test for excess errors)
+PASS: ext/pb_assoc/example/basic_map.cc execution test
+PASS: ext/pb_assoc/example/basic_multimap.cc (test for excess errors)
+PASS: ext/pb_assoc/example/basic_multimap.cc execution test
+PASS: ext/pb_assoc/example/basic_set.cc (test for excess errors)
+PASS: ext/pb_assoc/example/basic_set.cc execution test
+PASS: ext/pb_assoc/example/ds_traits.cc (test for excess errors)
+PASS: ext/pb_assoc/example/ds_traits.cc execution test
+PASS: ext/pb_assoc/example/erase_if.cc (test for excess errors)
+PASS: ext/pb_assoc/example/erase_if.cc execution test
+PASS: ext/pb_assoc/example/extract_key.cc (test for excess errors)
+PASS: ext/pb_assoc/example/extract_key.cc execution test
+PASS: ext/pb_assoc/example/hash_find_neg.cc  (test for errors, line 71)
+PASS: ext/pb_assoc/example/hash_find_neg.cc (test for excess errors)
+PASS: ext/pb_assoc/example/hash_illegal_resize.cc (test for excess errors)
+PASS: ext/pb_assoc/example/hash_illegal_resize.cc execution test
+PASS: ext/pb_assoc/example/hash_initial_size.cc (test for excess errors)
+PASS: ext/pb_assoc/example/hash_initial_size.cc execution test
+PASS: ext/pb_assoc/example/hash_load_set_change.cc (test for excess errors)
+PASS: ext/pb_assoc/example/hash_load_set_change.cc execution test
+PASS: ext/pb_assoc/example/hash_mod.cc (test for excess errors)
+PASS: ext/pb_assoc/example/hash_mod.cc execution test
+PASS: ext/pb_assoc/example/hash_resize.cc (test for excess errors)
+PASS: ext/pb_assoc/example/hash_resize.cc execution test
+PASS: ext/pb_assoc/example/hash_resize_neg.cc  (test for errors, line 66)
+PASS: ext/pb_assoc/example/hash_resize_neg.cc  (test for errors, line 263)
+PASS: ext/pb_assoc/example/hash_resize_neg.cc  (test for errors, line 261)
+PASS: ext/pb_assoc/example/hash_resize_neg.cc  (test for errors, line 269)
+XFAIL: ext/pb_assoc/example/hash_resize_neg.cc (test for excess errors)
+PASS: ext/pb_assoc/example/hash_shift_mask.cc (test for excess errors)
+PASS: ext/pb_assoc/example/hash_shift_mask.cc execution test
+PASS: ext/pb_assoc/example/mapping_level.cc (test for excess errors)
+PASS: ext/pb_assoc/example/mapping_level.cc execution test
+PASS: ext/pb_assoc/example/mapping_level_neg.cc  (test for errors, line 80)
+PASS: ext/pb_assoc/example/mapping_level_neg.cc (test for excess errors)
+PASS: ext/pb_assoc/example/ms_traits.cc (test for excess errors)
+PASS: ext/pb_assoc/example/ms_traits.cc execution test
+PASS: ext/pb_assoc/example/ranged_hash.cc (test for excess errors)
+PASS: ext/pb_assoc/example/ranged_hash.cc execution test
+PASS: ext/pb_assoc/example/store_hash.cc (test for excess errors)
+PASS: ext/pb_assoc/example/store_hash.cc execution test
+PASS: ext/pb_assoc/example/tree_intervals.cc (test for excess errors)
+PASS: ext/pb_assoc/example/tree_intervals.cc execution test
+PASS: ext/pb_assoc/example/tree_join.cc (test for excess errors)
+PASS: ext/pb_assoc/example/tree_join.cc execution test
+PASS: ext/pb_assoc/example/tree_order_statistics.cc (test for excess errors)
+PASS: ext/pb_assoc/example/tree_order_statistics.cc execution test
+PASS: ext/pb_assoc/example/tree_order_statistics_join.cc (test for excess errors)
+PASS: ext/pb_assoc/example/tree_order_statistics_join.cc execution test
+PASS: ext/pb_assoc/example/tree_split.cc (test for excess errors)
+PASS: ext/pb_assoc/example/tree_split.cc execution test
+PASS: ext/pod_char_traits.cc (test for excess errors)
+PASS: ext/pod_char_traits.cc execution test
+PASS: ext/pool_allocator/allocate_chunk.cc (test for excess errors)
+PASS: ext/pool_allocator/allocate_chunk.cc execution test
+PASS: ext/pool_allocator/check_allocate_max_size.cc (test for excess errors)
+PASS: ext/pool_allocator/check_allocate_max_size.cc execution test
+PASS: ext/pool_allocator/check_deallocate_null.cc (test for excess errors)
+PASS: ext/pool_allocator/check_deallocate_null.cc execution test
+PASS: ext/pool_allocator/check_delete.cc (test for excess errors)
+PASS: ext/pool_allocator/check_delete.cc execution test
+PASS: ext/pool_allocator/check_new.cc (test for excess errors)
+PASS: ext/pool_allocator/check_new.cc execution test
+PASS: ext/pool_allocator/instantiate.cc (test for excess errors)
+PASS: ext/rope/1.cc (test for excess errors)
+PASS: ext/rope/1.cc execution test
+PASS: ext/rope/2.cc (test for excess errors)
+PASS: ext/rope/2.cc execution test
+PASS: ext/rope/3.cc (test for excess errors)
+PASS: ext/rope/3.cc execution test
+PASS: ext/rope/4.cc (test for excess errors)
+PASS: ext/rope/4.cc execution test
+PASS: ext/slist/23781.cc  (test for errors, line 35)
+PASS: ext/slist/23781.cc  (test for errors, line 36)
+PASS: ext/slist/23781.cc (test for excess errors)
+PASS: ext/slist/check_construct_destroy.cc (test for excess errors)
+PASS: ext/slist/check_construct_destroy.cc execution test
+PASS: ext/slist/instantiate.cc (test for excess errors)
+PASS: ext/stdio_filebuf/char/1.cc (test for excess errors)
+PASS: ext/stdio_filebuf/char/10063-1.cc (test for excess errors)
+PASS: ext/stdio_filebuf/char/10063-1.cc execution test
+PASS: ext/stdio_filebuf/char/10063-2.cc (test for excess errors)
+PASS: ext/stdio_filebuf/char/10063-2.cc execution test
+PASS: ext/stdio_filebuf/char/10063-3.cc (test for excess errors)
+PASS: ext/stdio_filebuf/char/10063-3.cc execution test
+PASS: ext/stdio_filebuf/char/2.cc (test for excess errors)
+PASS: ext/stdio_filebuf/char/2.cc execution test
+PASS: ext/stdio_sync_filebuf/char/1.cc (test for excess errors)
+PASS: ext/stdio_sync_filebuf/char/1.cc execution test
+PASS: ext/stdio_sync_filebuf/char/12048-1.cc (test for excess errors)
+PASS: ext/stdio_sync_filebuf/char/12048-1.cc execution test
+PASS: ext/stdio_sync_filebuf/char/12048-2.cc (test for excess errors)
+PASS: ext/stdio_sync_filebuf/char/12048-2.cc execution test
+PASS: ext/stdio_sync_filebuf/char/12048-3.cc (test for excess errors)
+PASS: ext/stdio_sync_filebuf/char/12048-3.cc execution test
+PASS: ext/stdio_sync_filebuf/char/12048-4.cc (test for excess errors)
+PASS: ext/stdio_sync_filebuf/char/12048-4.cc execution test
+PASS: ext/vstring/explicit_instantiation/1.cc (test for excess errors)
+PASS: ext/vstring/explicit_instantiation/2.cc (test for excess errors)
+PASS: ext/vstring/explicit_instantiation/char/1.cc (test for excess errors)
+PASS: ext/vstring/types/23767.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/enable_shared_from_this/not_shared.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/enable_shared_from_this/not_shared.cc execution test
+PASS: tr1/2_general_utilities/memory/enable_shared_from_this/not_shared2.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/enable_shared_from_this/not_shared2.cc execution test
+PASS: tr1/2_general_utilities/memory/enable_shared_from_this/not_shared3.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/enable_shared_from_this/not_shared3.cc execution test
+PASS: tr1/2_general_utilities/memory/enable_shared_from_this/shared.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/enable_shared_from_this/shared.cc execution test
+PASS: tr1/2_general_utilities/memory/enable_shared_from_this/still_shared.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/enable_shared_from_this/still_shared.cc execution test
+PASS: tr1/2_general_utilities/memory/shared_ptr/assign/assign.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/assign/assign.cc execution test
+PASS: tr1/2_general_utilities/memory/shared_ptr/assign/auto_ptr.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/assign/auto_ptr.cc execution test
+PASS: tr1/2_general_utilities/memory/shared_ptr/assign/auto_ptr_neg.cc  (test for errors, line 39)
+XFAIL: tr1/2_general_utilities/memory/shared_ptr/assign/auto_ptr_neg.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/assign/auto_ptr_rvalue_neg.cc  (test for errors, line 38)
+XFAIL: tr1/2_general_utilities/memory/shared_ptr/assign/auto_ptr_rvalue_neg.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/assign/shared_ptr.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/assign/shared_ptr.cc execution test
+PASS: tr1/2_general_utilities/memory/shared_ptr/assign/shared_ptr_neg.cc  (test for errors, line 39)
+PASS: tr1/2_general_utilities/memory/shared_ptr/assign/shared_ptr_neg.cc  (test for errors, line )
+PASS: tr1/2_general_utilities/memory/shared_ptr/assign/shared_ptr_neg.cc  (test for errors, line )
+PASS: tr1/2_general_utilities/memory/shared_ptr/assign/shared_ptr_neg.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/comparison/cmp.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/comparison/cmp.cc execution test
+PASS: tr1/2_general_utilities/memory/shared_ptr/cons/auto_ptr.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/cons/auto_ptr.cc execution test
+PASS: tr1/2_general_utilities/memory/shared_ptr/cons/auto_ptr_neg.cc  (test for errors, line 37)
+XFAIL: tr1/2_general_utilities/memory/shared_ptr/cons/auto_ptr_neg.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/cons/copy.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/cons/copy.cc execution test
+PASS: tr1/2_general_utilities/memory/shared_ptr/cons/default.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/cons/default.cc execution test
+PASS: tr1/2_general_utilities/memory/shared_ptr/cons/pointer.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/cons/pointer.cc execution test
+PASS: tr1/2_general_utilities/memory/shared_ptr/cons/weak_ptr.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/cons/weak_ptr.cc execution test
+PASS: tr1/2_general_utilities/memory/shared_ptr/cons/weak_ptr_expired.cc (test for excess errors)
+XFAIL: tr1/2_general_utilities/memory/shared_ptr/cons/weak_ptr_expired.cc execution test
+PASS: tr1/2_general_utilities/memory/shared_ptr/dest/dest.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/dest/dest.cc execution test
+PASS: tr1/2_general_utilities/memory/shared_ptr/misc/24595.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/misc/24595.cc execution test
+PASS: tr1/2_general_utilities/memory/shared_ptr/misc/io.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/misc/io.cc execution test
+PASS: tr1/2_general_utilities/memory/shared_ptr/misc/swap.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/misc/swap.cc execution test
+PASS: tr1/2_general_utilities/memory/shared_ptr/modifiers/24805.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/modifiers/reset.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/modifiers/reset.cc execution test
+PASS: tr1/2_general_utilities/memory/shared_ptr/modifiers/reset_neg.cc  (test for errors, line 37)
+PASS: tr1/2_general_utilities/memory/shared_ptr/modifiers/reset_neg.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/modifiers/swap.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/modifiers/swap.cc execution test
+PASS: tr1/2_general_utilities/memory/shared_ptr/modifiers/swap_neg.cc  (test for errors, line 38)
+PASS: tr1/2_general_utilities/memory/shared_ptr/modifiers/swap_neg.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/observers/bool_conv.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/observers/bool_conv.cc execution test
+PASS: tr1/2_general_utilities/memory/shared_ptr/observers/get.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/observers/get.cc execution test
+PASS: tr1/2_general_utilities/memory/shared_ptr/observers/unique.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/observers/unique.cc execution test
+PASS: tr1/2_general_utilities/memory/shared_ptr/observers/use_count.cc (test for excess errors)
+PASS: tr1/2_general_utilities/memory/shared_ptr/observers/use_count.cc execution test
+PASS: tr1/3_function_objects/bind/all_bound.cc (test for excess errors)
+PASS: tr1/3_function_objects/bind/all_bound.cc execution test
+PASS: tr1/3_function_objects/bind/nested.cc (test for excess errors)
+PASS: tr1/3_function_objects/bind/nested.cc execution test
+PASS: tr1/3_function_objects/bind/placeholders.cc (test for excess errors)
+PASS: tr1/3_function_objects/bind/placeholders.cc execution test
+PASS: tr1/3_function_objects/bind/ref.cc (test for excess errors)
+PASS: tr1/3_function_objects/bind/ref.cc execution test
+PASS: tr1/3_function_objects/function/1.cc (test for excess errors)
+PASS: tr1/3_function_objects/function/1.cc execution test
+PASS: tr1/3_function_objects/function/2.cc (test for excess errors)
+PASS: tr1/3_function_objects/function/2.cc execution test
+PASS: tr1/3_function_objects/function/3.cc (test for excess errors)
+PASS: tr1/3_function_objects/function/3.cc execution test
+PASS: tr1/3_function_objects/function/4.cc (test for excess errors)
+PASS: tr1/3_function_objects/function/4.cc execution test
+PASS: tr1/3_function_objects/function/5.cc (test for excess errors)
+PASS: tr1/3_function_objects/function/5.cc execution test
+PASS: tr1/3_function_objects/function/6.cc (test for excess errors)
+PASS: tr1/3_function_objects/function/6.cc execution test
+PASS: tr1/3_function_objects/function/7.cc (test for excess errors)
+PASS: tr1/3_function_objects/function/7.cc execution test
+PASS: tr1/3_function_objects/function/8.cc (test for excess errors)
+PASS: tr1/3_function_objects/function/8.cc execution test
+PASS: tr1/3_function_objects/function/9.cc (test for excess errors)
+PASS: tr1/3_function_objects/function/9.cc execution test
+PASS: tr1/3_function_objects/mem_fn.cc (test for excess errors)
+PASS: tr1/3_function_objects/mem_fn.cc execution test
+PASS: tr1/3_function_objects/reference_wrapper/invoke.cc (test for excess errors)
+PASS: tr1/3_function_objects/reference_wrapper/invoke.cc execution test
+PASS: tr1/3_function_objects/reference_wrapper/typedefs.cc (test for excess errors)
+PASS: tr1/3_function_objects/reference_wrapper/typedefs.cc execution test
+PASS: tr1/3_function_objects/result_of.cc (test for excess errors)
+PASS: tr1/3_function_objects/result_of.cc execution test
+PASS: tr1/4_metaprogramming/array_modifications/remove_all_extents.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/array_modifications/remove_all_extents.cc execution test
+PASS: tr1/4_metaprogramming/array_modifications/remove_extent.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/array_modifications/remove_extent.cc execution test
+PASS: tr1/4_metaprogramming/composite_type_traits/is_arithmetic/is_arithmetic.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/composite_type_traits/is_arithmetic/is_arithmetic.cc execution test
+PASS: tr1/4_metaprogramming/composite_type_traits/is_arithmetic/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/composite_type_traits/is_compound/is_compound.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/composite_type_traits/is_compound/is_compound.cc execution test
+PASS: tr1/4_metaprogramming/composite_type_traits/is_compound/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/composite_type_traits/is_fundamental/is_fundamental.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/composite_type_traits/is_fundamental/is_fundamental.cc execution test
+PASS: tr1/4_metaprogramming/composite_type_traits/is_fundamental/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/composite_type_traits/is_member_pointer/is_member_pointer.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/composite_type_traits/is_member_pointer/is_member_pointer.cc execution test
+PASS: tr1/4_metaprogramming/composite_type_traits/is_member_pointer/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/composite_type_traits/is_object/24808.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/composite_type_traits/is_object/24808.cc execution test
+PASS: tr1/4_metaprogramming/composite_type_traits/is_object/is_object.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/composite_type_traits/is_object/is_object.cc execution test
+PASS: tr1/4_metaprogramming/composite_type_traits/is_object/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/composite_type_traits/is_scalar/is_scalar.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/composite_type_traits/is_scalar/is_scalar.cc execution test
+PASS: tr1/4_metaprogramming/composite_type_traits/is_scalar/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/composite_type_traits/is_union_or_class/is_union_or_class.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/composite_type_traits/is_union_or_class/is_union_or_class.cc execution test
+PASS: tr1/4_metaprogramming/composite_type_traits/is_union_or_class/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/const_volatile_modifications/add_const.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/const_volatile_modifications/add_const.cc execution test
+PASS: tr1/4_metaprogramming/const_volatile_modifications/add_cv.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/const_volatile_modifications/add_cv.cc execution test
+PASS: tr1/4_metaprogramming/const_volatile_modifications/add_volatile.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/const_volatile_modifications/add_volatile.cc execution test
+PASS: tr1/4_metaprogramming/const_volatile_modifications/remove_const.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/const_volatile_modifications/remove_const.cc execution test
+PASS: tr1/4_metaprogramming/const_volatile_modifications/remove_cv.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/const_volatile_modifications/remove_cv.cc execution test
+PASS: tr1/4_metaprogramming/const_volatile_modifications/remove_volatile.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/const_volatile_modifications/remove_volatile.cc execution test
+PASS: tr1/4_metaprogramming/helper_classes/static_definition.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/helper_classes/static_definition.cc execution test
+PASS: tr1/4_metaprogramming/helper_classes/true_false_type.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/helper_classes/true_false_type.cc execution test
+PASS: tr1/4_metaprogramming/helper_classes/true_false_type_typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/helper_classes/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/other_transformations/aligned_storage/aligned_storage.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/other_transformations/aligned_storage/aligned_storage.cc execution test
+PASS: tr1/4_metaprogramming/other_transformations/aligned_storage/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/pointer_modifications/add_pointer.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/pointer_modifications/add_pointer.cc execution test
+PASS: tr1/4_metaprogramming/pointer_modifications/remove_pointer.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/pointer_modifications/remove_pointer.cc execution test
+PASS: tr1/4_metaprogramming/primary_type_categories/is_array/is_array.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/primary_type_categories/is_array/is_array.cc execution test
+PASS: tr1/4_metaprogramming/primary_type_categories/is_array/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/primary_type_categories/is_enum/24808.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/primary_type_categories/is_enum/24808.cc execution test
+PASS: tr1/4_metaprogramming/primary_type_categories/is_enum/is_enum.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/primary_type_categories/is_enum/is_enum.cc execution test
+PASS: tr1/4_metaprogramming/primary_type_categories/is_enum/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/primary_type_categories/is_floating_point/is_floating_point.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/primary_type_categories/is_floating_point/is_floating_point.cc execution test
+PASS: tr1/4_metaprogramming/primary_type_categories/is_floating_point/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/primary_type_categories/is_function/24808.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/primary_type_categories/is_function/24808.cc execution test
+PASS: tr1/4_metaprogramming/primary_type_categories/is_function/is_function.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/primary_type_categories/is_function/is_function.cc execution test
+PASS: tr1/4_metaprogramming/primary_type_categories/is_function/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/primary_type_categories/is_integral/is_integral.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/primary_type_categories/is_integral/is_integral.cc execution test
+PASS: tr1/4_metaprogramming/primary_type_categories/is_integral/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/primary_type_categories/is_member_function_pointer/is_member_function_pointer.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/primary_type_categories/is_member_function_pointer/is_member_function_pointer.cc execution test
+PASS: tr1/4_metaprogramming/primary_type_categories/is_member_function_pointer/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/primary_type_categories/is_member_object_pointer/is_member_object_pointer.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/primary_type_categories/is_member_object_pointer/is_member_object_pointer.cc execution test
+PASS: tr1/4_metaprogramming/primary_type_categories/is_member_object_pointer/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/primary_type_categories/is_pointer/is_pointer.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/primary_type_categories/is_pointer/is_pointer.cc execution test
+PASS: tr1/4_metaprogramming/primary_type_categories/is_pointer/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/primary_type_categories/is_reference/is_reference.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/primary_type_categories/is_reference/is_reference.cc execution test
+PASS: tr1/4_metaprogramming/primary_type_categories/is_reference/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/primary_type_categories/is_void/is_void.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/primary_type_categories/is_void/is_void.cc execution test
+PASS: tr1/4_metaprogramming/primary_type_categories/is_void/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/reference_modifications/add_reference.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/reference_modifications/add_reference.cc execution test
+PASS: tr1/4_metaprogramming/reference_modifications/remove_reference.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/reference_modifications/remove_reference.cc execution test
+PASS: tr1/4_metaprogramming/relationships_between_types/is_base_of/is_base_of.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/relationships_between_types/is_base_of/is_base_of.cc execution test
+PASS: tr1/4_metaprogramming/relationships_between_types/is_base_of/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/relationships_between_types/is_convertible/is_convertible.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/relationships_between_types/is_convertible/is_convertible.cc execution test
+PASS: tr1/4_metaprogramming/relationships_between_types/is_convertible/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/relationships_between_types/is_same/is_same.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/relationships_between_types/is_same/is_same.cc execution test
+PASS: tr1/4_metaprogramming/relationships_between_types/is_same/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/alignment_of/alignment_of.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/alignment_of/alignment_of.cc execution test
+PASS: tr1/4_metaprogramming/type_properties/alignment_of/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/extent/extent.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/extent/extent.cc execution test
+PASS: tr1/4_metaprogramming/type_properties/extent/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/has_nothrow_assign/has_nothrow_assign.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/has_nothrow_assign/has_nothrow_assign.cc execution test
+PASS: tr1/4_metaprogramming/type_properties/has_nothrow_assign/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/has_nothrow_constructor/has_nothrow_constructor.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/has_nothrow_constructor/has_nothrow_constructor.cc execution test
+PASS: tr1/4_metaprogramming/type_properties/has_nothrow_constructor/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/has_nothrow_copy/has_nothrow_copy.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/has_nothrow_copy/has_nothrow_copy.cc execution test
+PASS: tr1/4_metaprogramming/type_properties/has_nothrow_copy/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/has_trivial_assign/has_trivial_assign.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/has_trivial_assign/has_trivial_assign.cc execution test
+PASS: tr1/4_metaprogramming/type_properties/has_trivial_assign/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/has_trivial_constructor/has_trivial_constructor.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/has_trivial_constructor/has_trivial_constructor.cc execution test
+PASS: tr1/4_metaprogramming/type_properties/has_trivial_constructor/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/has_trivial_copy/has_trivial_copy.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/has_trivial_copy/has_trivial_copy.cc execution test
+PASS: tr1/4_metaprogramming/type_properties/has_trivial_copy/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/has_trivial_destructor/has_trivial_destructor.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/has_trivial_destructor/has_trivial_destructor.cc execution test
+PASS: tr1/4_metaprogramming/type_properties/has_trivial_destructor/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/is_abstract/is_abstract.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/is_abstract/is_abstract.cc execution test
+PASS: tr1/4_metaprogramming/type_properties/is_abstract/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/is_const/is_const.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/is_const/is_const.cc execution test
+PASS: tr1/4_metaprogramming/type_properties/is_const/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/is_empty/is_empty.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/is_empty/is_empty.cc execution test
+PASS: tr1/4_metaprogramming/type_properties/is_empty/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/is_pod/is_pod.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/is_pod/is_pod.cc execution test
+PASS: tr1/4_metaprogramming/type_properties/is_pod/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/is_polymorphic/24809.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/is_polymorphic/is_polymorphic.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/is_polymorphic/is_polymorphic.cc execution test
+PASS: tr1/4_metaprogramming/type_properties/is_polymorphic/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/is_signed/is_signed.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/is_signed/is_signed.cc execution test
+PASS: tr1/4_metaprogramming/type_properties/is_signed/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/is_unsigned/is_unsigned.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/is_unsigned/is_unsigned.cc execution test
+PASS: tr1/4_metaprogramming/type_properties/is_unsigned/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/is_volatile/is_volatile.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/is_volatile/is_volatile.cc execution test
+PASS: tr1/4_metaprogramming/type_properties/is_volatile/typedefs.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/rank/rank.cc (test for excess errors)
+PASS: tr1/4_metaprogramming/type_properties/rank/rank.cc execution test
+PASS: tr1/4_metaprogramming/type_properties/rank/typedefs.cc (test for excess errors)
+PASS: tr1/6_containers/array/capacity/empty.cc (test for excess errors)
+PASS: tr1/6_containers/array/capacity/empty.cc execution test
+PASS: tr1/6_containers/array/capacity/max_size.cc (test for excess errors)
+PASS: tr1/6_containers/array/capacity/max_size.cc execution test
+PASS: tr1/6_containers/array/capacity/size.cc (test for excess errors)
+PASS: tr1/6_containers/array/capacity/size.cc execution test
+PASS: tr1/6_containers/array/comparison_operators/equal.cc (test for excess errors)
+PASS: tr1/6_containers/array/comparison_operators/equal.cc execution test
+PASS: tr1/6_containers/array/comparison_operators/greater.cc (test for excess errors)
+PASS: tr1/6_containers/array/comparison_operators/greater.cc execution test
+PASS: tr1/6_containers/array/comparison_operators/greater_or_equal.cc (test for excess errors)
+PASS: tr1/6_containers/array/comparison_operators/greater_or_equal.cc execution test
+PASS: tr1/6_containers/array/comparison_operators/less.cc (test for excess errors)
+PASS: tr1/6_containers/array/comparison_operators/less.cc execution test
+PASS: tr1/6_containers/array/comparison_operators/less_or_equal.cc (test for excess errors)
+PASS: tr1/6_containers/array/comparison_operators/less_or_equal.cc execution test
+PASS: tr1/6_containers/array/comparison_operators/not_equal.cc (test for excess errors)
+PASS: tr1/6_containers/array/comparison_operators/not_equal.cc execution test
+PASS: tr1/6_containers/array/cons/aggregate_initialization.cc (test for excess errors)
+PASS: tr1/6_containers/array/element_access/at_out_of_range.cc (test for excess errors)
+PASS: tr1/6_containers/array/element_access/at_out_of_range.cc execution test
+PASS: tr1/6_containers/array/element_access/back.cc (test for excess errors)
+PASS: tr1/6_containers/array/element_access/back.cc execution test
+PASS: tr1/6_containers/array/element_access/data.cc (test for excess errors)
+PASS: tr1/6_containers/array/element_access/data.cc execution test
+PASS: tr1/6_containers/array/element_access/front.cc (test for excess errors)
+PASS: tr1/6_containers/array/element_access/front.cc execution test
+PASS: tr1/6_containers/array/iterators/end_is_one_past.cc (test for excess errors)
+PASS: tr1/6_containers/array/iterators/end_is_one_past.cc execution test
+PASS: tr1/6_containers/array/requirements/assign.cc (test for excess errors)
+PASS: tr1/6_containers/array/requirements/assign.cc execution test
+PASS: tr1/6_containers/array/requirements/contiguous.cc (test for excess errors)
+PASS: tr1/6_containers/array/requirements/contiguous.cc execution test
+PASS: tr1/6_containers/array/requirements/instantiate.cc (test for excess errors)
+PASS: tr1/6_containers/array/requirements/member_swap.cc (test for excess errors)
+PASS: tr1/6_containers/array/requirements/member_swap.cc execution test
+PASS: tr1/6_containers/array/requirements/typedefs.cc (test for excess errors)
+PASS: tr1/6_containers/array/requirements/zero_sized_arrays.cc (test for excess errors)
+PASS: tr1/6_containers/array/requirements/zero_sized_arrays.cc execution test
+PASS: tr1/6_containers/array/specialized_algorithms/swap.cc (test for excess errors)
+PASS: tr1/6_containers/array/specialized_algorithms/swap.cc execution test
+PASS: tr1/6_containers/array/tuple_interface/get.cc (test for excess errors)
+PASS: tr1/6_containers/array/tuple_interface/get.cc execution test
+PASS: tr1/6_containers/array/tuple_interface/tuple_element.cc (test for excess errors)
+PASS: tr1/6_containers/array/tuple_interface/tuple_element.cc execution test
+PASS: tr1/6_containers/array/tuple_interface/tuple_size.cc (test for excess errors)
+PASS: tr1/6_containers/array/tuple_interface/tuple_size.cc execution test
+PASS: tr1/6_containers/tuple/comparison_operators/comparisons.cc (test for excess errors)
+PASS: tr1/6_containers/tuple/comparison_operators/comparisons.cc execution test
+PASS: tr1/6_containers/tuple/cons/assignment.cc (test for excess errors)
+PASS: tr1/6_containers/tuple/cons/assignment.cc execution test
+PASS: tr1/6_containers/tuple/cons/big_tuples.cc (test for excess errors)
+PASS: tr1/6_containers/tuple/cons/big_tuples.cc execution test
+PASS: tr1/6_containers/tuple/cons/constructor.cc (test for excess errors)
+PASS: tr1/6_containers/tuple/cons/constructor.cc execution test
+PASS: tr1/6_containers/tuple/creation_functions/23978.cc (test for excess errors)
+PASS: tr1/6_containers/tuple/creation_functions/23978.cc execution test
+PASS: tr1/6_containers/tuple/creation_functions/make_tuple.cc (test for excess errors)
+PASS: tr1/6_containers/tuple/creation_functions/make_tuple.cc execution test
+PASS: tr1/6_containers/tuple/creation_functions/tie.cc (test for excess errors)
+PASS: tr1/6_containers/tuple/creation_functions/tie.cc execution test
+PASS: tr1/6_containers/tuple/element_access/get.cc (test for excess errors)
+PASS: tr1/6_containers/tuple/element_access/get.cc execution test
+PASS: tr1/6_containers/tuple/tuple_element.cc (test for excess errors)
+PASS: tr1/6_containers/tuple/tuple_element.cc execution test
+PASS: tr1/6_containers/tuple/tuple_size.cc (test for excess errors)
+PASS: tr1/6_containers/tuple/tuple_size.cc execution test
+PASS: tr1/6_containers/unordered/23781.cc  (test for errors, line 36)
+PASS: tr1/6_containers/unordered/23781.cc  (test for errors, line 37)
+PASS: tr1/6_containers/unordered/23781.cc  (test for errors, line 38)
+PASS: tr1/6_containers/unordered/23781.cc  (test for errors, line 39)
+PASS: tr1/6_containers/unordered/23781.cc  (test for errors, line 40)
+PASS: tr1/6_containers/unordered/23781.cc  (test for errors, line 41)
+PASS: tr1/6_containers/unordered/23781.cc  (test for errors, line 42)
+PASS: tr1/6_containers/unordered/23781.cc  (test for errors, line 43)
+PASS: tr1/6_containers/unordered/23781.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/erase/24061-map.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/erase/24061-map.cc execution test
+PASS: tr1/6_containers/unordered/erase/24061-multimap.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/erase/24061-multimap.cc execution test
+PASS: tr1/6_containers/unordered/erase/24061-multiset.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/erase/24061-multiset.cc execution test
+PASS: tr1/6_containers/unordered/erase/24061-set.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/erase/24061-set.cc execution test
+PASS: tr1/6_containers/unordered/find/map1.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/find/map1.cc execution test
+PASS: tr1/6_containers/unordered/find/multimap1.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/find/multimap1.cc execution test
+PASS: tr1/6_containers/unordered/find/multiset1.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/find/multiset1.cc execution test
+PASS: tr1/6_containers/unordered/find/set1.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/find/set1.cc execution test
+PASS: tr1/6_containers/unordered/hash/24799.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/hash/24799.cc execution test
+PASS: tr1/6_containers/unordered/hashtable/23053.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/hashtable/23465.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/hashtable/23465.cc execution test
+PASS: tr1/6_containers/unordered/hashtable/24054.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/hashtable/24054.cc execution test
+PASS: tr1/6_containers/unordered/hashtable/24064.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/hashtable/24064.cc execution test
+PASS: tr1/6_containers/unordered/hashtable/26127.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/hashtable/26132.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/hashtable/26132.cc execution test
+PASS: tr1/6_containers/unordered/hashtable/iterators_default_constructor.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/insert/24061-map.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/insert/24061-map.cc execution test
+PASS: tr1/6_containers/unordered/insert/24061-multimap.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/insert/24061-multimap.cc execution test
+PASS: tr1/6_containers/unordered/insert/24061-multiset.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/insert/24061-multiset.cc execution test
+PASS: tr1/6_containers/unordered/insert/24061-set.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/insert/24061-set.cc execution test
+PASS: tr1/6_containers/unordered/insert/array_syntax.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/insert/array_syntax.cc execution test
+PASS: tr1/6_containers/unordered/insert/map_range.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/insert/map_range.cc execution test
+PASS: tr1/6_containers/unordered/insert/map_single.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/insert/map_single.cc execution test
+PASS: tr1/6_containers/unordered/insert/multimap_range.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/insert/multimap_range.cc execution test
+PASS: tr1/6_containers/unordered/insert/multimap_single.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/insert/multimap_single.cc execution test
+PASS: tr1/6_containers/unordered/insert/multiset_range.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/insert/multiset_range.cc execution test
+PASS: tr1/6_containers/unordered/insert/multiset_single.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/insert/multiset_single.cc execution test
+PASS: tr1/6_containers/unordered/insert/set_range.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/insert/set_range.cc execution test
+PASS: tr1/6_containers/unordered/insert/set_single.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/insert/set_single.cc execution test
+PASS: tr1/6_containers/unordered/instantiate/hash.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/instantiate/map.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/instantiate/multimap.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/instantiate/multiset.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/instantiate/set.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/types/map_iterator.cc  (test for errors, line 41)
+PASS: tr1/6_containers/unordered/types/map_iterator.cc  (test for errors, line 44)
+PASS: tr1/6_containers/unordered/types/map_iterator.cc  (test for errors, line 46)
+PASS: tr1/6_containers/unordered/types/map_iterator.cc  (test for errors, line 48)
+PASS: tr1/6_containers/unordered/types/map_iterator.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/types/multimap_iterator.cc  (test for errors, line 41)
+PASS: tr1/6_containers/unordered/types/multimap_iterator.cc  (test for errors, line 44)
+PASS: tr1/6_containers/unordered/types/multimap_iterator.cc  (test for errors, line 46)
+PASS: tr1/6_containers/unordered/types/multimap_iterator.cc  (test for errors, line 48)
+PASS: tr1/6_containers/unordered/types/multimap_iterator.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/types/multiset_iterator.cc  (test for errors, line 41)
+PASS: tr1/6_containers/unordered/types/multiset_iterator.cc  (test for errors, line 44)
+PASS: tr1/6_containers/unordered/types/multiset_iterator.cc (test for excess errors)
+PASS: tr1/6_containers/unordered/types/set_iterator.cc  (test for errors, line 41)
+PASS: tr1/6_containers/unordered/types/set_iterator.cc  (test for errors, line 44)
+PASS: tr1/6_containers/unordered/types/set_iterator.cc (test for excess errors)
+PASS: tr1/6_containers/utility/19535.cc (test for excess errors)
+PASS: tr1/6_containers/utility/19535.cc execution test
+PASS: tr1/6_containers/utility/pair.cc (test for excess errors)
+PASS: tr1/6_containers/utility/pair.cc execution test
+
+		=== libstdc++ Summary ===
+
+# of expected passes		2538
+# of unexpected failures	72
+# of expected failures		10
+# of unresolved testcases	2
+# of unsupported tests		151
