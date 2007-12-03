@@ -991,7 +991,7 @@ build_gcc ()
     else
         FILE=""
     fi
-    if [ -z "${WITHOUT_X}" ] ; then
+    if [ "${WITHOUT_X}" = "false" ] ; then
         FILE="${FILE} insight"
     fi
     for RUN in addr2line ar as c++filt gcov ld nm objdump \
@@ -1626,7 +1626,7 @@ if [ "x$SKIP_ELF" = "x" ]; then
       fi
     done
 
-    if [ -z "${WITHOUT_X}" ] ; then
+    if [ "${WITHOUT_X}" = "false" ] ; then
         FILE="insight"
     else
         FILE=""
