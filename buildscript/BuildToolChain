@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #Build Script - Rohit Makasana ( rohit.makasana@rrap-software.com )
 #             - Modified by Bernd Schmidt (   )
 #             - Modified by Robin Getz (rgetz@blackfin.uclinux.org)
