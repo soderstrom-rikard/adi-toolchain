@@ -1,3 +1,7 @@
+2007-12-07  Michael Frysinger  <michael.frysinger@analog.com>
+
+	* config/bfin/bfin.c (bfin_handle_option): Remove BF561 warning.
+
 2007-11-26  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/elf.h (SUBTARGET_DRIVER_SELF_SPECS): New macro.

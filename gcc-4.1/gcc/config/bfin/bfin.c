@@ -2423,9 +2423,6 @@ bfin_handle_option (size_t code, const char *arg, int value)
 	    bfin_workarounds |= bfin_cpus[i].workarounds;
 	  }
 
-	if (bfin_cpu_type == BFIN_CPU_BF561)
-	  warning (0, "bf561 support is incomplete yet.");
-
 	return true;
       }
 
