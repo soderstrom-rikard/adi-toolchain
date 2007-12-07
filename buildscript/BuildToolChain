@@ -867,6 +867,18 @@ die_with_log ()
     exit 1
 }
 
+log_it()
+{
+    # Note: embedded single quotes will break this
+    eval "printf '###\n%s\n\n' '$*'" ${LOGFILE}
+}
+
+run_cmd()
+{
+    log_it "$@"
+    eval \("$@"\) ${LOGFILE} || die_with_log
+}
+
 change_dir()
 {
     (echo "echo -e '###\ntrying to change into $1' $LOGFILE" ) | sh
@@ -2129,56 +2141,35 @@ if [ $KERNEL_SOURCE ] ; then
 
 	######################## ldr-utils ###########################
 
-    echo_date "Building ldr-utils"
+    DIR_LDR_UTILS_BUILD=$DIR_BUILD/ldr-utils_build
+
     change_dir $DIR_LDR_UTILS_SOURCE
 
     echo_date "Cleaning ldr-utils"
-    RUN="$MAKE clean "
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    find . -print0 | xargs -0 touch -r . # fix autotool timestamps
+    run_cmd $MAKE clean
+    rm -rf "$DIR_LDR_UTILS_BUILD"
+    mkdir -p "$DIR_LDR_UTILS_BUILD"
+    change_dir "$DIR_LDR_UTILS_BUILD"
 
-    echo_date "Make ldr-utils"
-    RUN=$MAKE
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    if ! (echo $RUN $LOGFILE ; ) | sh ; then
-        # If simple build failed, try autotool version
-        find . -print0 | xargs -0 touch -r . # fix autotool timestamps
-        DIR_LDR_UTILS_BUILD=$DIR_BUILD/ldr-utils_build
-        rm -rf "$DIR_LDR_UTILS_BUILD"
-        mkdir -p "$DIR_LDR_UTILS_BUILD"
-        change_dir "$DIR_LDR_UTILS_BUILD"
-        RUN="$DIR_LDR_UTILS_SOURCE/configure --prefix=/usr $BUILD_TARGET $HOST_TARGET"
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh || die_with_log
-        RUN=$MAKE
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh || die_with_log
-    else
-        DIR_LDR_UTILS_BUILD=$DIR_LDR_UTILS_SOURCE
-    fi
+    echo_date "Configuring ldr-utils"
+    run_cmd $DIR_LDR_UTILS_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET
 
-    for RUN in ldr
-    do
-        if [ ! -f $DIR_LDR_UTILS_BUILD/$RUN ] ; then
-            echo "ldr-utils did not build properly : Missing $RUN"
-            echo "Please report an error to http://blackfin.uclinux.org"
-            tail -10 $ACTUAL_LOGFILE
-            exit 1
-        fi
-    done
+    echo_date "Building ldr-utils"
+    run_cmd $MAKE
+
+    echo_date "Installing ldr-utils"
+    run_cmd $MAKE install DESTDIR=$DIR_ELF_OUTPUT   program_transform_name=s,^,bfin-elf-,
+    run_cmd $MAKE install DESTDIR=$DIR_uC_OUTPUT    program_transform_name=s,^,bfin-uclinux-,
+    run_cmd $MAKE install DESTDIR=$DIR_LINUX_OUTPUT program_transform_name=s,^,bfin-linux-uclibc-,
 
     if [ "$CHECK_ON_SIMULATOR" = "1" ] ; then
         echo_date "Checking ldr-utils"
-        RUN="$MAKE check"
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh || die_with_log
+        run_cmd $MAKE check
     fi
 
-    echo_date "Installing ldr-utils"
-    cp $DIR_LDR_UTILS_BUILD/ldr $DIR_ELF_OUTPUT/bin/bfin-elf-ldr || exit 1
-    cp $DIR_LDR_UTILS_BUILD/ldr $DIR_uC_OUTPUT/bin/bfin-uclinux-ldr || exit 1
-    mv $DIR_LDR_UTILS_BUILD/ldr $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-ldr || exit 1
-
-    if [ "$DIR_LDR_UTILS_BUILD" != "$DIR_LDR_UTILS_SOURCE" ] ; then
-        rm -rf "$DIR_LDR_UTILS_BUILD"
-    fi
+    change_dir $DIR_LDR_UTILS_SOURCE
+    rm -rf "$DIR_LDR_UTILS_BUILD"
 
     ######################## U-Boot ##############################
 
