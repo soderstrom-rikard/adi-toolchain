@@ -1,3 +1,11 @@
+2007-12-07  Michael Frysinger  <michael.frysinger@analog.com>
+
+	* bfin/bf523.ld: New.
+	* bfin/bf524.ld: New.
+	* bfin/bf526.ld: New.
+	* bfin/Makefile.in (BOARD_SCRIPTS): Add bf523.ld, bf524.ld,
+	and bf526.ld.
+
 2007-11-05  Michael Frysinger  <michael.frysinger@analog.com>
 
 	* bfin/bf547.ld: New.
