@@ -1,5 +1,18 @@
 2007-12-07  Michael Frysinger  <michael.frysinger@analog.com>
 
+	* config/bfin/bfin-protos.h (enum bfin_cpu_type): Add
+	BFIN_CPU_BF523, BFIN_CPU_BF524, and BFIN_CPU_BF526.
+	* config/bfin/elf.h (LIB_SPEC): Use proper linker script
+	for bf523, bf524, and bf526.
+	* config/bfin/bfin.c (bfin_cpus[]): Add bf523, bf524, and bf526.
+	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): Define
+	__ADSPBF523__ for bf523, __ADSPBF524__ for bf524,
+	__ADSPBF526__ for bf526, __ADSPBF52x__ for all three,
+	* doc/invoke.texi (Blackfin Options): Document that
+	-mcpu now accepts bf523, bf524, and bf526.
+
+2007-12-07  Michael Frysinger  <michael.frysinger@analog.com>
+
 	* config/bfin/bfin.c (bfin_handle_option): Remove BF561 warning.
 
 2007-11-26  Bernd Schmidt  <bernd.schmidt@analog.com>
@@ -18,7 +31,9 @@
 	* config/bfin/elf.h (LIB_SPEC): Use proper linker script
 	for bf547.
 	* config/bfin/bfin.c (bfin_cpus[]): Add bf547.
-	* config/bfin/bfin.h (Blackfin Options): Document that
+	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): Define
+	__ADSPBF547__ and __ADSPBF54x__ for bf547.
+	* doc/invoke.texi (Blackfin Options): Document that
 	-mcpu now accept bf547.
 
 2007-11-21  Jie Zhang  <jie.zhang@analog.com>

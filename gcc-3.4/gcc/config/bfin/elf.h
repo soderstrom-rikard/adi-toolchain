@@ -21,8 +21,9 @@ crti%O%s crtbegin%O%s crtlibid%O%s"
 #define ENDFILE_SPEC	"crtend%O%s crtn%O%s"
 
 #define LIB_SPEC "--start-group -lc %{msim:-lsim}%{!msim:-lnosys} --end-group \
-%{!T*:%{!msim:%{mcpu=bf522*:-T bf522.ld%s}%{mcpu=bf525*:-T bf525.ld%s} \
-	      %{mcpu=bf527*:-T bf527.ld%s} \
+%{!T*:%{!msim:%{mcpu=bf522*:-T bf522.ld%s}%{mcpu=bf523*:-T bf523.ld%s} \
+	      %{mcpu=bf524*:-T bf524.ld%s}%{mcpu=bf525*:-T bf525.ld%s} \
+	      %{mcpu=bf526*:-T bf526.ld%s}%{mcpu=bf527*:-T bf527.ld%s} \
 	      %{mcpu=bf531*:-T bf531.ld%s}%{mcpu=bf532*:-T bf532.ld%s} \
 	      %{mcpu=bf533*:-T bf533.ld%s}%{mcpu=bf534*:-T bf534.ld%s} \
 	      %{mcpu=bf536*:-T bf536.ld%s}%{mcpu=bf537*:-T bf537.ld%s} \
