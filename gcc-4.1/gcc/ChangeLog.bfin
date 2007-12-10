@@ -1,3 +1,8 @@
+2007-12-10  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/elf.h (LIB_SPEC): Use proper linker script
+	for bf561.
+
 2007-12-07  Michael Frysinger  <michael.frysinger@analog.com>
 
 	* config/bfin/bfin-protos.h (enum bfin_cpu_type): Add

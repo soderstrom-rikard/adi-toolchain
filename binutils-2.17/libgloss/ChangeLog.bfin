@@ -1,3 +1,8 @@
+2007-12-10  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/bf561.ld: New file.
+	* bfin/Makefile.in (BOARD_SCRIPTS): Add bf561.ld.
+
 2007-12-07  Michael Frysinger  <michael.frysinger@analog.com>
 
 	* bfin/bf523.ld: New.

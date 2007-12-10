@@ -31,6 +31,7 @@ crti%O%s crtbegin%O%s crtlibid%O%s"
 	      %{mcpu=bf542*:-T bf542.ld%s}%{mcpu=bf544*:-T bf544.ld%s} \
 	      %{mcpu=bf547*:-T bf547.ld%s}%{mcpu=bf548*:-T bf548.ld%s} \
 	      %{mcpu=bf549*:-T bf549.ld%s} \
+	      %{mcpu=bf561*:-T bf561.ld%s} \
 	      %{!mcpu=*:-T bf532.ld%s} \
 	      -T bfin-common-sc.ld%s}}"
 
