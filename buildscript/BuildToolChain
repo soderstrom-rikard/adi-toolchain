@@ -1567,9 +1567,9 @@ run_tests ()
                             rcp $DIR_GCC_BUILD/libs_for_target/${LIB} root@${TARGET_IPADDR}:/lib/${LIB}
                             rsh -l root ${TARGET_IPADDR} "chmod +x /lib/${LIB}"
                         else
-                            RUN=`rsh -l root $TARGET_IPADDR "cat /proc/maps" | grep ${LIB} | wc -l"
+                            RUN=`rsh -l root $TARGET_IPADDR "cat /proc/maps" | grep ${LIB} | wc -l`
                             if [ $RUN -gt 0 ] ; then
-                                echo "  **  Target and host are different $LIB - should use flat userspace to test"
+                                echo "  **  Target and host are different $LIB - please use flat userspace to test"
                             else
                                 # it's not being used - so lets replace it
                                 echo "  **  Target and host are different $LIB - copying over (unused)"
