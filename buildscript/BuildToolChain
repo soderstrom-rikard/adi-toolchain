@@ -1480,10 +1480,14 @@ check_tests_OK()
     TREE_LEN=`echo -n $TREE | wc -c`
     if [ $TREE_LEN -gt 0 ] ; then
         echo " ** Aborting remaining tests"
+        echo $TREE
         for KILL_PS in ${TREE}
         do
-            ps $KILL_PS
-            kill $KILL_PS
+            RUN=`ps $KILL_PS | grep -v "^[[:space:]]*PID" | wc -l`
+            if [ $RUN -gt 0 ] ; then
+               ps $KILL_PS | grep -v "^[[:space:]]*PID"
+               kill $KILL_PS
+            fi
         done
     fi
 
@@ -1537,17 +1541,19 @@ run_tests ()
 
     for GCC_VERSION in $GCC_VERSIONS; do
         clean_hardware $2 gcc
+        DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
+        change_dir $DIR_GCC_BUILD/gcc
 
         # Make sure all the shared libs are actually on the target, and are the same
         # if we are testing on the hardware
-        RUN=`echo $2 | grep hardware`
+        RUN=`basename $2 | grep hardware`
         if [ -n "$RUN" ] ; then
             mkdir -p $DIR_GCC_BUILD/libs_for_target
             rm -f $DIR_GCC_BUILD/libs_for_target/*
-            for LIB in $(find ./ -name "*.so"| awk -F"/" '{print $NF}' | sort  | uniq) \
-                  $(find ./ -name "*.so.*" | awk -F"/" '{print $NF}' | sort  | uniq)
+            for LIB in $(find $DIR_GCC_BUILD -name "*.so"| awk -F"/" '{print $NF}' | sort  | uniq) \
+                  $(find $DIR_GCC_BUILD -name "*.so.*" | awk -F"/" '{print $NF}' | sort  | uniq)
             do
-                FILE=`bfin-linux-uclibc-gcc -mcpu=${CPU_TYPE_REV} -print-file-name=${LIB}`
+                FILE=`$DIR_GCC_BUILD/gcc/xgcc -mcpu=${CPU_TYPE_REV} -print-file-name=${LIB}`
                 link=`file ${FILE} | grep "symbolic link"`
                 if [ -n "$link" ] ; then
                     continue
@@ -1585,8 +1591,6 @@ run_tests ()
 
         # start the tests
         echo_date "Running tests on gcc $GCC_VERSION"
-        DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
-        change_dir $DIR_GCC_BUILD/gcc
         RUN="$MAKE -k -j 1 check"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
         (echo $RUN $LOGFILE ; ) | sh &
