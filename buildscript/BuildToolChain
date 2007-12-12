@@ -810,7 +810,7 @@ if [ $DATE_STAMP ] ; then
         if [ $WARN ] ; then
             echo "*** Warnings going to $DIR_LOG/warn.$TIMESTAMP"
             LOGFILE=">> $DIR_LOG/log.$TIMESTAMP 2>> $DIR_LOG/warn.$TIMESTAMP"
-            ACTUAL_LOGFILE= $DIR_LOG/warn.$TIMESTAMP
+            ACTUAL_LOGFILE=$DIR_LOG/warn.$TIMESTAMP
         else
             LOGFILE=">> $DIR_LOG/log.$TIMESTAMP 2>&1"
             ACTUAL_LOGFILE=$DIR_LOG/log.$TIMESTAMP
