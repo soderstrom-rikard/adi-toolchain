@@ -1157,14 +1157,14 @@ install_target_libs ()
 	    RUN="cp $TARGET_SHLIB $1/$2/runtime/$dir/lib; \
 	    ln -s $TARGET_SHLIB_NAME $1/$2/runtime/$dir/lib/$3.so.$MAJOR_NUM;"
             (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-            (echo $RUN $LOGFILE ; ) | sh || die_with_log
+            (echo "($RUN) $LOGFILE" ) | sh || die_with_log
 
 	    for G in $COMPAT_GCCS; do
 		L=`$G $flags --print-file-name=$3.so`
 		RUN="rm -f `dirname $L`/$3.so*; \
 		ln -s ../../../../$dir2$2/runtime/$dir/lib/$TARGET_SHLIB_NAME `dirname $L`/$3.so;"
                 (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-                (echo $RUN $LOGFILE ; ) | sh || die_with_log
+                (echo "($RUN) $LOGFILE" ) | sh || die_with_log
 
 	    done
 
@@ -1241,7 +1241,7 @@ install_libgccs ()
 	    RUN="rm -f $L*;\
 	    ln -s ../../../../$dir2$2/runtime/$dir/lib/$LIBGCC_NAME $L"
             (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-            (echo $RUN $LOGFILE ; ) | sh || die_with_log
+            (echo "($RUN) $LOGFILE" ) | sh || die_with_log
 	done
     done
 }
@@ -1518,14 +1518,14 @@ run_tests ()
         echo "Found old Xvfb process, killing it"
         RUN="ps aux | grep Xvfb | grep -v grep ; killall -9 Xvfb"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo $RUN $LOGFILE ; ) | sh
+        (echo "($RUN) $LOGFILE" ) | sh
     fi
     RUN=`ps aux | grep rsh | grep -v grep | wc -l`
     if [ $RUN -gt 0 ] ; then
         echo "Found old rsh process, killing it"
         RUN="ps aux | grep rsh | grep -v grep ; killall -9 rsh"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo $RUN $LOGFILE ; ) | sh
+        (echo "($RUN) $LOGFILE" ) | sh
     fi
 
     clean_hardware $2 gdb
@@ -2349,10 +2349,10 @@ if [ $KERNEL_SOURCE ] ; then
         echo_date "Copying U-Boot Tools"
         RUN="cp $DIR_UBOOT/tools/mkimage $DIR_uC_OUTPUT/bin/bfin-uclinux-mkimage; cp $DIR_UBOOT/tools/gen_eth_addr $DIR_uC_OUTPUT/bin/bfin-uclinux-gen_eth_addr"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo $RUN $LOGFILE ; ) | sh
+        (echo "($RUN) $LOGFILE" ) | sh
         RUN="cp $DIR_UBOOT/tools/mkimage $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-mkimage; cp $DIR_UBOOT/tools/gen_eth_addr $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-gen_eth_addr"
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo $RUN $LOGFILE ; ) | sh
+        (echo "($RUN) $LOGFILE" ) | sh
 
         for RUN in bfin-uclinux-mkimage bfin-uclinux-gen_eth_addr
         do
