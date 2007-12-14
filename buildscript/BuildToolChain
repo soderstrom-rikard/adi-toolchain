@@ -233,7 +233,8 @@ check_header() {
 
 check_lib() {
 	local lib=$1
-	echo "int main(){}" | gcc -x c - -l${lib} -o /dev/null 1>/dev/null
+	# Old Linux installations keep X in /usr/X11R6.
+	echo "int main(){}" | gcc -x c - -L/usr/X11R6/lib -l${lib} -o /dev/null 1>/dev/null
 }
 
 # check_group(package name, header list, library list)
