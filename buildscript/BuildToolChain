@@ -967,7 +967,7 @@ build_gcc ()
     echo_date "Configuring GCC"
     RUN="$DIR_GCC_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-$2 \
       --prefix=$3 $4 --disable-libstdcxx-pch $BFIN_LANGS $EXTRA_GCC_CONF \
-      --disable-symvers --disable-libssp \
+      --disable-symvers --disable-libssp --disable-libffi \
       --enable-version-specific-runtime-libs --enable-__cxa_atexit"
 
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
@@ -1097,7 +1097,18 @@ is_compat ()
 
 install_target_libs ()
 {
-    GCCS=`find $1 -name bfin-linux-uclibc-gcc-* | tr '\n' ' '`
+    GCCS2=`find $1 -name bfin-linux-uclibc-gcc-* | tr '\n' ' '`
+    GCCS=
+
+    # First, restrict the list to eliminate the compiler versions which
+    # don't provide the library at all.
+    for GCC in $GCCS2; do
+	TARGET_SHLIB=`$GCC --print-file-name=$3.so`
+
+	if [ "$TARGET_SHLIB" != "$3.so" ]; then
+	    GCCS="$GCCS $GCC"
+	fi
+    done
 
     while [ -n "$GCCS" ]; do
 	GCCS2=""
@@ -1107,11 +1118,12 @@ install_target_libs ()
 
 	for GCC in $GCCS; do
 	    TARGET_SHLIB=`$GCC --print-file-name=$3.so`
+
 	    TARGET_SHLIB=`readlink -f $TARGET_SHLIB`
 	    TARGET_SHLIB_DIR=`dirname $TARGET_SHLIB`
 	    TARGET_SHLIB_NAME=`basename $TARGET_SHLIB`
 	    TARGET_SHLIB_VERSION=`echo $TARGET_SHLIB_NAME | sed s/$3.so.'\([0-9]*.[0-9]*.[0-9]*\).*/\1/'`
-	
+
 	    if [ -z "$NEWEST_VERSION" ]; then
 		NEWEST_VERSION=$TARGET_SHLIB_VERSION
 		NEWEST_GCC=$GCC
@@ -1133,7 +1145,9 @@ install_target_libs ()
 	    fi
 	done
 
-	echo_date "Installing shared $3"
+	GCCS=$GCCS2
+
+	echo_date "Installing shared $3 ($NEWEST_VERSION)"
 
 	MULTILIBS=`$NEWEST_GCC --print-multi-lib`
 
@@ -1169,8 +1183,6 @@ install_target_libs ()
 	    done
 
 	done
-
-	GCCS=$GCCS2
     done
 }
 
