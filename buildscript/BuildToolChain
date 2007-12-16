@@ -697,6 +697,17 @@ if [ $CHECK_ON_HARDWARE ] ; then
     rsh -l root $TARGET_IPADDR "rm /var/log/messages"
     rsh -l root $TARGET_IPADDR "touch /var/log/messages"
     rsh -l root $TARGET_IPADDR "kill -HUP 1"
+
+    RUN=`rsh -l root $TARGET_IPADDR "ps" | grep -v " ps" | grep -v "/rshd" |
+        grep -v "\[" | grep -v telnetd | grep -v "/init" | grep -v " inetd" |
+        grep -v " PID " | grep -v "[ /]sh" | grep -v " /s*bin/.*d" | sed '/^[[:space:]]*$/d'`
+    TMP=`echo -n ${RUN} | wc -c`
+    if [ $TMP -gt 0 ] ; then
+        echo " ** looks like random processes are running on the $TARGET_IPADDR already "
+        echo " ** ${RUN}"
+        echo " ** Aborting, since I get confused when this happens"
+        exit 1
+    fi
 fi
 
 echo -n "Path to binutils dir        "
@@ -1342,11 +1353,17 @@ check_tests_OK()
     # grep -v " ps"    : remove ps processes (so we don't care about us running ps)
     # grep -v " PID "  : remove the top line "  PID  Uid        VSZ Stat Command"
     # grep -v "[ /]sh" : remove shell (sh and /bin/sh) processes 
+    # grep -v " /s*bin/.*d" : remove /bin/watchdogd /sbin/klogd /sbin/syslogd
     # sed '/^[[:space:]]*$/d' : remove blank lines
     if [ -n "$HARDWARE" ] ; then
         NEW_TARGET=`rsh -l root $TARGET_IPADDR "ps" | grep -v " ps" | grep -v "/rshd" |
             grep -v "\[" | grep -v telnetd | grep -v "/init" | grep -v " inetd" |
-            grep -v " PID " | grep -v "[ /]sh" | sed '/^[[:space:]]*$/d'`
+            grep -v " PID " | grep -v "[ /]sh" | grep -v " /s*bin/.*d" | sed '/^[[:space:]]*$/d'`
+            STUCK=`echo -n ${NEW_TARGET} | wc -c`
+            if [ $STUCK -gt 0 ] ; then
+               echo " ** looks like random processes are running on the hardware already "
+               echo " ** ${NEW_TARGET}"
+            fi
     fi
     KILL=99999
     while [ 1 ]
@@ -1357,7 +1374,7 @@ check_tests_OK()
         if [ -n "$HARDWARE" ] ; then
             NEW_TARGET=`rsh -l root $TARGET_IPADDR "ps" 2>&1 | grep -v " ps" | grep -v "/rshd" |
                 grep -v "\[" | grep -v telnetd | grep -v "/init" | grep -v " inetd" | 
-                grep -v " PID " | grep -v "[ /]sh" | sed '/^[[:space:]]*$/d'`
+                grep -v " PID " | grep -v "[ /]sh" | grep -v " /s*bin/.*d" | sed '/^[[:space:]]*$/d'`
         fi
 
         # Chedk on the Host - if the test is done - quit
