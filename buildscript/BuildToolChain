@@ -228,13 +228,13 @@ done
 
 check_header() {
 	local header=$1
-	printf "#include <$header>\n" | gcc -E - -o /dev/null
+	printf "#include <$header>\n" | gcc -E - -o conftest.o
 }
 
 check_lib() {
 	local lib=$1
 	# Old Linux installations keep X in /usr/X11R6.
-	echo "int main(){}" | gcc -x c - -L/usr/X11R6/lib -l${lib} -o /dev/null 1>/dev/null
+	echo "int main(){}" | gcc -x c - -L/usr/X11R6/lib -l${lib} -o conftest.o 1>/dev/null
 }
 
 # check_group(package name, header list, library list)
@@ -250,6 +250,7 @@ check_source_group() {
 	for l in ${libs} ; do
 		check_lib ${l} || fail=1
 	done
+	rm -f conftest.o
 
 	if [ -n "${pkg}" ] && [ ${fail} -eq 1 ] ; then
 		cat <<-EOF 1>&2
