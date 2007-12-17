@@ -1,3 +1,13 @@
+2007-12-17  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (attribute "cycles"): New.
+	(mulsi3, link, unlink): Set it.
+	* config/bfin/bfin.c (n_regs_to_save): New static variable.
+	(push_multiple_operation, pop_multiple_operation): Set it.
+	(workaround_speculation): New function, broken out of bfin_reorg.
+	(workaround_rts_anomaly): New function.
+	(bfin_reorg): Call these two functions.
+
 2007-12-10  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/elf.h (LIB_SPEC): Use proper linker script

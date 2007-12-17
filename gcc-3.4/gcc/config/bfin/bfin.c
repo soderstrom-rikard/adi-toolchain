@@ -3111,6 +3111,7 @@ bfin_internal_label (FILE *stream, const char *prefix, unsigned long num)
 /* Used for communication between {push,pop}_multiple_operation (which
    we use not only as a predicate) and the corresponding output functions.  */
 static int first_preg_to_save, first_dreg_to_save;
+static int n_regs_to_save;
 
 int
 push_multiple_operation (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
@@ -3120,6 +3121,7 @@ push_multiple_operation (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
 
   first_preg_to_save = lastpreg;
   first_dreg_to_save = lastdreg;
+
   for (i = 1, group = 0; i < XVECLEN (op, 0) - 1; i++)
     {
       rtx t = XVECEXP (op, 0, i);
@@ -3179,6 +3181,7 @@ push_multiple_operation (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
 	  lastpreg++;
 	}
     }
+  n_regs_to_save = 8 - first_dreg_to_save + 6 - first_preg_to_save;
   return 1;
 }
 
@@ -3238,6 +3241,7 @@ pop_multiple_operation (rtx op, enum machine_mode mode ATTRIBUTE_UNUSED)
     }
   first_dreg_to_save = lastdreg;
   first_preg_to_save = lastpreg;
+  n_regs_to_save = 8 - first_dreg_to_save + 6 - first_preg_to_save;
   return 1;
 }
 
@@ -3425,30 +3429,80 @@ bfin_use_dfa_pipeline_interface (void)
   return 1;
 }
 
-/* We use the machine specific reorg pass for emitting CSYNC instructions
-   after conditional branches as needed.
-
-   The Blackfin is unusual in that a code sequence like
-     if cc jump label
-     r0 = (p0)
-   may speculatively perform the load even if the condition isn't true.  This
-   happens for a branch that is predicted not taken, because the pipeline
-   isn't flushed or stalled, so the early stages of the following instructions,
-   which perform the memory reference, are allowed to execute before the
-   jump condition is evaluated.
-   Therefore, we must insert additional instructions in all places where this
-   could lead to incorrect behaviour.  The manual recommends CSYNC, while
-   VDSP seems to use NOPs (even though its corresponding compiler option is
-   named CSYNC).
-
-   When optimizing for speed, we emit NOPs, which seems faster than a CSYNC.
-   When optimizing for size, we turn the branch into a predicted taken one.
-   This may be slower due to mispredicts, but saves code size.  */
+/* An RTS instruction too soon after a CALL can get an incorrect value from the
+   RETS register.  Work around this by inserting NOPs as required.  */
 
 static void
-bfin_reorg (void)
+workaround_rts_anomaly (void)
 {
-  rtx insn, last_condjump = NULL_RTX;
+  rtx insn, first_insn = NULL_RTX;
+  int cycles = 4;
+  
+  for (insn = get_insns (); insn; insn = NEXT_INSN (insn))
+    {
+      rtx pat;
+
+      if (BARRIER_P (insn))
+	return;
+      
+      if (NOTE_P (insn) || LABEL_P (insn))
+	continue;
+
+      if (first_insn == NULL_RTX)
+	first_insn = insn;
+      pat = PATTERN (insn);
+      if (GET_CODE (pat) == USE || GET_CODE (pat) == CLOBBER
+	  || GET_CODE (pat) == ASM_INPUT || GET_CODE (pat) == ADDR_VEC
+	  || GET_CODE (pat) == ADDR_DIFF_VEC || asm_noperands (pat) >= 0)
+	continue;
+
+      if (GET_CODE (insn) == CALL_INSN)
+	return;
+
+      if (recog_memoized (insn) == CODE_FOR_return_internal)
+	break;
+
+      if (JUMP_P (insn))
+	{
+	  /* Nothing to worry about for direct jumps.  */
+	  if (!any_condjump_p (insn))
+	    return;
+	  if (cycles <= 1)
+	    return;
+	  cycles--;
+	}
+      else if (INSN_P (insn))
+	{
+	  rtx pat = PATTERN (insn);
+	  int this_cycles = get_attr_cycles (insn);
+
+	  if (GET_CODE (pat) == PARALLEL)
+	    {
+	      if (push_multiple_operation (pat, VOIDmode)
+		  || pop_multiple_operation (pat, VOIDmode))
+		this_cycles = n_regs_to_save;
+	    }
+
+	  if (this_cycles >= cycles)
+	    return;
+
+	  cycles -= this_cycles;
+	}
+    }
+  while (cycles > 0)
+    {
+      emit_insn_before (gen_nop (), first_insn);
+      cycles--;
+    }
+}
+
+/* Insert code to work around speculative load and speculative SYNC anomalies.
+   Called from bfin_reorg.  */
+static void
+workaround_speculation (void)
+{
+  rtx insn;
+  rtx last_condjump = NULL_RTX;
   int cycles_since_jump = INT_MAX;
 
   if (! ENABLE_WA_SPECULATIVE_LOADS || ! ENABLE_WA_SPECULATIVE_SYNCS)
@@ -3590,6 +3644,34 @@ bfin_reorg (void)
 	    }
 	}
     }
+}
+
+/* We use the machine specific reorg pass for emitting CSYNC instructions
+   after conditional branches as needed.
+
+   The Blackfin is unusual in that a code sequence like
+     if cc jump label
+     r0 = (p0)
+   may speculatively perform the load even if the condition isn't true.  This
+   happens for a branch that is predicted not taken, because the pipeline
+   isn't flushed or stalled, so the early stages of the following instructions,
+   which perform the memory reference, are allowed to execute before the
+   jump condition is evaluated.
+   Therefore, we must insert additional instructions in all places where this
+   could lead to incorrect behavior.  The manual recommends CSYNC, while
+   VDSP seems to use NOPs (even though its corresponding compiler option is
+   named CSYNC).
+
+   When optimizing for speed, we emit NOPs, which seems faster than a CSYNC.
+   When optimizing for size, we turn the branch into a predicted taken one.
+   This may be slower due to mispredicts, but saves code size.  */
+
+static void
+bfin_reorg (void)
+{
+  workaround_speculation ();
+
+  workaround_rts_anomaly ();
 }
 
 /* Handle interrupt_handler, exception_handler and nmi_handler function

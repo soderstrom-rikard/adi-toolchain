@@ -250,6 +250,12 @@
 
 	(const_int 2)))
 
+;; A lower bound on the number of cycles taken by an instruction.  Used only
+;; by certain anomaly workarounds for now.
+
+(define_attr "cycles" ""
+  (const_int 1))
+
 ;; Describe a user's asm statement.
 (define_asm_attributes
   [(set_attr "type" "misc")
@@ -1394,7 +1400,8 @@
 		 (match_operand:SI 2 "register_operand" "d")))]
   ""
   "%0 *= %2;"
-  [(set_attr "type" "mult")])
+  [(set_attr "type" "mult")
+   (set_attr "cycles" "5")])
 
 (define_expand "umulsi3_highpart"
   [(set (match_operand:SI 0 "register_operand" "")
@@ -2422,7 +2429,8 @@
 	(plus:SI (reg:SI REG_SP) (match_operand:SI 0 "immediate_operand" "i")))]
   ""
   "LINK %Z0;"
-  [(set_attr "length" "4")])
+  [(set_attr "length" "4")
+   (set_attr "cycles" "4")])
 
 (define_insn "unlink"
   [(set (reg:SI REG_FP) (mem:SI (reg:SI REG_FP)))
@@ -2430,7 +2438,8 @@
    (set (reg:SI REG_SP) (plus:SI (reg:SI REG_FP) (const_int 8)))]
   ""
   "UNLINK;"
-  [(set_attr "length" "4")])
+  [(set_attr "length" "4")
+   (set_attr "cycles" "3")])
 
 ;; This pattern is slightly clumsy.  The stack adjust must be the final SET in
 ;; the pattern, otherwise dwarf2out becomes very confused about which reg goes
