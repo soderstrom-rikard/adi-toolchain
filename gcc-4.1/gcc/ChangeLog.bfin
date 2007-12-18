@@ -1,3 +1,11 @@
+2007-12-19  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (attribute "cycles", mulsi3, link, unlink):
+	Revert previous changes.
+	* config/bfin/bfin.c (workaround_rts_anomaly): Use an insn's code
+	to determine the number of cycles it takes for a small amount of
+	special cases.
+
 2007-12-17  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (attribute "cycles"): New.

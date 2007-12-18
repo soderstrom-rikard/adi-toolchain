@@ -4602,11 +4602,11 @@ workaround_rts_anomaly (void)
       if (CALL_P (insn))
 	return;
 
-      if (recog_memoized (insn) == CODE_FOR_return_internal)
-	break;
-
       if (JUMP_P (insn))
 	{
+	  if (recog_memoized (insn) == CODE_FOR_return_internal)
+	    break;
+
 	  /* Nothing to worry about for direct jumps.  */
 	  if (!any_condjump_p (insn))
 	    return;
@@ -4617,7 +4617,7 @@ workaround_rts_anomaly (void)
       else if (INSN_P (insn))
 	{
 	  rtx pat = PATTERN (insn);
-	  int this_cycles = get_attr_cycles (insn);
+	  int this_cycles = 1;
 
 	  if (GET_CODE (pat) == PARALLEL)
 	    {
@@ -4625,7 +4625,16 @@ workaround_rts_anomaly (void)
 		  || pop_multiple_operation (pat, VOIDmode))
 		this_cycles = n_regs_to_save;
 	    }
-
+	  else if (GET_CODE (pat) != BUNDLE)
+	    {
+	      enum insn_code icode = recog_memoized (insn);
+	      if (icode == CODE_FOR_link)
+		this_cycles = 4;
+	      else if (icode == CODE_FOR_unlink)
+		this_cycles = 3;
+	      else if (icode == CODE_FOR_mulsi3)
+		this_cycles = 5;
+	    }
 	  if (this_cycles >= cycles)
 	    return;
 
