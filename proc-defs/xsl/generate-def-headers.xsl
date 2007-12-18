@@ -128,7 +128,13 @@
 				<xsl:text>SYSMMR_BASE</xsl:text>
 			</xsl:when>
 			<xsl:when test="@description = 'Instruction Bank A SRAM'">
-				<xsl:text>L1_ISRAM</xsl:text>
+				<xsl:text>L1_INST_SRAM</xsl:text>
+			</xsl:when>
+			<xsl:when test="@description = 'Data Bank A SRAM'">
+				<xsl:text>L1_DATA_A_SRAM</xsl:text>
+			</xsl:when>
+			<xsl:when test="@description = 'Data Bank B SRAM'">
+				<xsl:text>L1_DATA_B_SRAM</xsl:text>
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:text>NOFUN</xsl:text>
@@ -138,6 +144,7 @@
 	<xsl:if test="$memdefine != 'NOFUN'">
 	<xsl:value-of select="concat('#define ',$memdefine,' ',@start,' /* ',@start,' -> ',@end,' ',@description,' */&newline;')"/>
 	<xsl:value-of select="concat('#define ',$memdefine,'_SIZE (',@end,' - ',@start,' + 1)&newline;')"/>
+	<xsl:value-of select="concat('#define ',$memdefine,'_END (',$memdefine,' + ',$memdefine,'_SIZE)&newline;')"/>
 	</xsl:if>
 
 	</xsl:if>
