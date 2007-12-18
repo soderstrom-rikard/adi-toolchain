@@ -613,7 +613,8 @@ if [ $CHECK_ON_HARDWARE ] ; then
         FDPIC_TARGET=`file $DIR_TEST_HW_RESULTS/gdbserver | grep ELF | wc -l`
         rm -f $DIR_TEST_HW_RESULTS/gdbserver
     fi
-
+    RUN=`rsh -l root $TARGET_IPADDR "cat /proc/maps" | grep \/ | wc -l`
+    FDPIC_TARGET=`expr $FDPIC_TARGET + $RUN`
     # Check if the tcp connections are recycled on both
     # target and host, which is needed to prevent the rsh
     # and rcp connection failures.
@@ -682,7 +683,7 @@ if [ $CHECK_ON_HARDWARE ] ; then
     if [ $STACK_CHECKING ] ; then
         echo "    Hardware tests will be compiled with optional stack overflow checking"
     fi
-    if [ -z $FDPIC_TARGET ] ; then
+    if [ $FDPIC_TARGET -eq 0 ] ; then
         echo "    Looks like flat userspace - will copy over /lib/*.so when testing"
     else
         echo "    Looks like fdpic userspace - will warn if /lib/*.so are different"
@@ -1284,29 +1285,6 @@ clean_hardware()
         RUN=`rsh -l root $TARGET_IPADDR free`
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 
-	# Just in case we caused the kernel under test to crash, let's do a sanity test
-        # make sure syslogd is set to not log rsh/rcp as it will fill /var/log/messages
-        RUN=`rsh -l root $TARGET_IPADDR "ps | grep syslog | grep -v grep | grep -v \"l 6\" | wc -l"`
-        if [ "$RUN" = "1" ] ; then
-            rsh -l root $TARGET_IPADDR "sed -i 's/^slog.*$/slog:unknown:\/sbin\/syslogd -n -l 6/' /etc/inittab"
-            rsh -l root $TARGET_IPADDR "kill -HUP 1"
-        fi
-
-        #  checking target /proc/sys/net/ipv4/tcp_tw_recycle
-        RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
-        if [ -z "$RUN" ] ; then
-            echo "   target /proc/sys/net/ipv4/tcp_tw_recycle does not exist"
-            echo "   Please enable Sysctl when configure the kernel"
-            exit 1
-        fi
-        if [ "$RUN" = "0" ] ; then
-            rsh -l root $TARGET_IPADDR echo 1 \> /proc/sys/net/ipv4/tcp_tw_recycle
-            RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
-            if [ "$RUN" = "0" ] ; then
-                echo "Could not set target $TARGET_IPADDR /proc/sys/net/ipv4/tcp_tw_recycle to 1"
-                exit 1
-            fi
-        fi
         #we dump something onto the console so we can track which application caused a crash
         rsh -l root $TARGET_IPADDR "echo > /dev/console; echo "testing $1 $2" > /dev/console"
     fi
@@ -1331,6 +1309,85 @@ copy_test_results()
     done
 }
 
+# Get the target hardware ready for testing:
+#  - check we can access it
+#  - set syslogd & tcp_tw_recycle
+#  - copy over all the shared libs to the target /lib dir (for fdpic tests, and if flat userspace)
+# prepare_target test_target_dir
+prepare_target()
+{
+    hardware=`basename $1 | grep -i hardware`
+    if [ -n "$hardware" ] ; then
+        # Check if target board is available using ping
+        TIMEOUT=0
+        RUN=`ping -n -c 1 $TARGET_IPADDR | grep -i Unreachable`
+        while ([ "x$RUN" != "x" ] && [ $TIMEOUT -lt 5 ])
+        do
+            RUN=`ping -n -c 1 $TARGET_IPADDR | grep -i Unreachable`
+            TIMEOUT=`expr $TIMEOUT + 1`
+            sleep 60
+        done
+        if [ "x$RUN" != "x" ] ; then
+            echo "Could not ping $TARGET_IPADDR - check network settings"
+            exit 1
+        fi
+
+        # Just in case we caused the kernel under test to crash, let's do a sanity test
+        # make sure syslogd is set to not log rsh/rcp as it will fill /var/log/messages
+        RUN=`rsh -l root $TARGET_IPADDR "ps | grep syslog | grep -v grep | grep -v \"l 6\" | wc -l"`
+        if [ "$RUN" = "1" ] ; then
+            echo " ** Resetting syslogd"
+            rsh -l root $TARGET_IPADDR "sed -i 's/^slog.*$/slog:unknown:\/sbin\/syslogd -n -l 6/' /etc/inittab"
+            rsh -l root $TARGET_IPADDR "kill -HUP 1"
+            #we dump something onto the console so we can track things
+            rsh -l root $TARGET_IPADDR "echo > /dev/console; echo "Setting syslogd" > /dev/console"
+        fi
+
+        #  checking target /proc/sys/net/ipv4/tcp_tw_recycle
+        RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
+        if [ "$RUN" = "0" ] ; then
+            echo " ** Setting tcp_tw_recycle"
+            rsh -l root $TARGET_IPADDR echo 1 \> /proc/sys/net/ipv4/tcp_tw_recycle
+            #we dump something onto the console so we can track things
+            rsh -l root $TARGET_IPADDR "echo > /dev/console; echo "Setting tcp_tw_recycle" > /dev/console"
+        fi
+    fi
+
+    # Make sure all the shared libs are actually on the target, and are the same
+    # if we are testing on the hardware
+    RUN=`basename $1 | grep hardware-fdpic`
+    if ([ -n "$RUN" ] && [ $FDPIC_TARGET -eq 0 ]) ; then
+
+        for GCC_VERSION in $GCC_VERSIONS; do
+           GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
+           break
+        done
+
+        mkdir -p $GCC_BUILD/libs_for_target
+        rm -f $GCC_BUILD/libs_for_target/*
+        rsh -l root ${TARGET_IPADDR} "rm /lib/*so*"
+        t=`$GCC_BUILD/gcc/xgcc -mcpu=${CPU_TYPE_REV} -print-file-name=libc.a`
+        t=`dirname $t`/../..
+        for FILE in $t/lib/*so*
+        do
+            if ([ -e $FILE ] && [ -h $FILE ]) ; then
+                LIB=`readlink $FILE`
+                FILE=`basename $FILE`
+                LIB=`basename $LIB`
+                rsh -l root ${TARGET_IPADDR} "cd lib; ln -s $LIB $FILE"
+            else
+                if [ -f $FILE ] ; then
+                    LIB=`basename ${FILE}`
+                    bfin-linux-uclibc-strip $FILE -o $GCC_BUILD/libs_for_target/${LIB}
+                    rcp $GCC_BUILD/libs_for_target/${LIB} root@${TARGET_IPADDR}:/lib/${LIB}
+                    rsh -l root ${TARGET_IPADDR} "chmod +x /lib/${LIB}"
+                fi
+            fi
+        done
+        rm -rf $GCC_BUILD/libs_for_target
+    fi
+
+}
 # The basic idea is that if things are not progressing at least every 10 minutes
 # something is hung, and we should kill it, and tell the user what was stuck
 #
@@ -1486,7 +1543,10 @@ check_tests_OK()
                        rsh -l root $TARGET_IPADDR "kill -9 ${TARGET_PID}"
                     done
                 else
-                    break
+                    # The board just rebooted ?
+                    echo " ** I think I just caused the board to crash/reboot? This needs investigation."
+                    prepare_target $3 
+                    kill -9 $KILL_PID
                 fi
             else
                 kill -9 $KILL_PID
@@ -1528,6 +1588,8 @@ check_tests_OK()
 run_tests ()
 {
     clean_hardware $2 binutils
+    prepare_target $2
+
     echo_date "Running tests on binutils"
 
     change_dir $DIR_BINUTILS_BUILD
@@ -1574,51 +1636,6 @@ run_tests ()
         clean_hardware $2 gcc
         DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
         change_dir $DIR_GCC_BUILD/gcc
-
-        # Make sure all the shared libs are actually on the target, and are the same
-        # if we are testing on the hardware
-        RUN=`basename $2 | grep hardware`
-        if [ -n "$RUN" ] ; then
-            mkdir -p $DIR_GCC_BUILD/libs_for_target
-            rm -f $DIR_GCC_BUILD/libs_for_target/*
-            for LIB in $(find $DIR_GCC_BUILD -name "*.so"| awk -F"/" '{print $NF}' | sort  | uniq) \
-                  $(find $DIR_GCC_BUILD -name "*.so.*" | awk -F"/" '{print $NF}' | sort  | uniq)
-            do
-                FILE=`$DIR_GCC_BUILD/gcc/xgcc -mcpu=${CPU_TYPE_REV} -print-file-name=${LIB}`
-                link=`file ${FILE} | grep "symbolic link"`
-                if [ -n "$link" ] ; then
-                    continue
-                fi
-                bfin-linux-uclibc-strip ${FILE} -o $DIR_GCC_BUILD/libs_for_target/${LIB}
-                RUN=`rsh -l root $TARGET_IPADDR "find /lib/ -name \"${LIB}*\""`
-                if [ -z "$RUN" ] ; then
-                    echo "  **  Missing target $LIB - copying over"
-                    rcp $DIR_GCC_BUILD/libs_for_target/${LIB} root@${TARGET_IPADDR}:/lib/${LIB}
-                    rsh -l root ${TARGET_IPADDR} "chmod +x /lib/${LIB}"
-                else
-                    local_md5=`md5sum $DIR_GCC_BUILD/libs_for_target/${LIB} | awk '{print $1}'`
-                    remote_md5=`rsh -l root $TARGET_IPADDR "md5sum $RUN" | awk '{print $1}'`
-                    if [ "$local_md5" != "$remote_md5" ] ; then
-                        if [ -z $FDPIC_TARGET ] ; then
-                            echo "  **  Target and host are different $LIB - copying over (since flat)"
-                            rcp $DIR_GCC_BUILD/libs_for_target/${LIB} root@${TARGET_IPADDR}:/lib/${LIB}
-                            rsh -l root ${TARGET_IPADDR} "chmod +x /lib/${LIB}"
-                        else
-                            RUN=`rsh -l root $TARGET_IPADDR "cat /proc/maps" | grep ${LIB} | wc -l`
-                            if [ $RUN -gt 0 ] ; then
-                                echo "  **  Target and host are different $LIB - please use flat userspace to test"
-                            else
-                                # it's not being used - so lets replace it
-                                echo "  **  Target and host are different $LIB - copying over (unused)"
-                                rcp $DIR_GCC_BUILD/libs_for_target/${LIB} root@${TARGET_IPADDR}:/lib/${LIB}
-                                rsh -l root ${TARGET_IPADDR} "chmod +x /lib/${LIB}"
-                            fi
-                        fi
-                    fi
-                fi
-            done
-            rm -rf $DIR_GCC_BUILD/libs_for_target
-        fi
 
         # start the tests
         echo_date "Running tests on gcc $GCC_VERSION"
