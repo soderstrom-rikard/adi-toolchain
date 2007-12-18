@@ -13,7 +13,7 @@
 <!-- ******* common information                -->
 <!-- ***************************************** -->
 
-<version file-version="0.105"/>
+<version file-version="0.106"/>
 
 <architecture name="ADSP-BF537" maps-to="ADSP-BF532" machine-id="34" machine-id-mnemonic="EM_21532" default-ldf="Blackfin/ldf/ADSP-BF537.ldf"/>
 
@@ -51,6 +51,7 @@
 		<workaround ix="28" compiler-default="Y" assembler-detect-default="N" />		
 		<workaround ix="29" compiler-default="N"/>
 		<workaround ix="30" compiler-default="N"/>
+		<workaround ix="44" compiler-default="N" assembler-detect-default="Y" assembler-workaround-default="N"  />				
 	</silicon>
 	<silicon revision="0.1" lib-path="Blackfin/lib/bf534_rev_0.0">
 		<workaround ix="1" compiler-default="N"/>
@@ -83,6 +84,7 @@
 		<workaround ix="28" compiler-default="Y" assembler-detect-default="N" />		
 		<workaround ix="29" compiler-default="N"/>
 		<workaround ix="30" compiler-default="N"/>
+		<workaround ix="44" compiler-default="N" assembler-detect-default="Y" assembler-workaround-default="N"  />				
 	</silicon>
 	<silicon revision="0.2" lib-path="Blackfin/lib/bf534_rev_0.0">
 		<workaround ix="1" compiler-default="N"/>
@@ -115,6 +117,7 @@
 		<workaround ix="28" compiler-default="Y" assembler-detect-default="N" />		
 		<workaround ix="29" compiler-default="N"/>
 		<workaround ix="30" compiler-default="N"/>
+		<workaround ix="44" compiler-default="N" assembler-detect-default="Y" assembler-workaround-default="N"  />				
 	</silicon>
 	<silicon revision="0.3" lib-path="Blackfin/lib/bf534_rev_0.3">
 		<workaround ix="1" compiler-default="N"/>
@@ -147,6 +150,7 @@
 		<workaround ix="28" compiler-default="Y" assembler-detect-default="N" />		
 		<workaround ix="29" compiler-default="N"/>
 		<workaround ix="30" compiler-default="N"/>
+		<workaround ix="44" compiler-default="N" assembler-detect-default="Y" assembler-workaround-default="N"  />				
 	</silicon>
 	<silicon revision="any" lib-path="Blackfin/lib/bf534_rev_any">
 		<workaround ix="1" compiler-default="N"/>
@@ -179,6 +183,7 @@
 		<workaround ix="28" compiler-default="Y" assembler-detect-default="N" />		
 		<workaround ix="29" compiler-default="N"/>
 		<workaround ix="30" compiler-default="N"/>
+		<workaround ix="44" compiler-default="N" assembler-detect-default="Y" assembler-workaround-default="N"  />				
 	</silicon>
 </silicon-revisions>
 

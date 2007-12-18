@@ -16,7 +16,7 @@
 
 <visualdsp-proc-xml schema-version="1" name="ADSP-BF542-proc.xml">
 
-<version file-version="1.48" />
+<version file-version="1.49" />
 
 <!-- ************************************************************************ -->
 <!-- ******* Register set                                                     -->
@@ -703,7 +703,7 @@
 	<register name="USB1"                       type="NODATA"  x="2"  y="14" />
 	<register name="USB2"                       type="NODATA"  x="2"  y="15" />
 	<register name="USB DMA"                    type="NODATA"  x="2"  y="16" />
-	<register name="OTPSEC"                     type="NODATA"  x="2"  y="17" />
+	<register name="OTP"                        type="NODATA"  x="2"  y="17" />
 	<register name="-unused- (bits 16-21)"      type="NODATA"  x="2"  y="18" />
 	<register name="Timer 0"                    type="NODATA"  x="2"  y="19" />
 	<register name="Timer 1"                    type="NODATA"  x="2"  y="20" />
@@ -731,7 +731,7 @@
 	<register name="SIC_IWR2_IRQ_USB_INT1"      type="NOLABEL" x="26" y="14" />
 	<register name="SIC_IWR2_IRQ_USB_INT2"      type="NOLABEL" x="26" y="15" />
 	<register name="SIC_IWR2_IRQ_USB_DMAINT"    type="NOLABEL" x="26" y="16" />
-	<register name="SIC_IWR2_IRQ_OTPSEC"        type="NOLABEL" x="26" y="17" />
+	<register name="SIC_IWR2_IRQ_OTP"           type="NOLABEL" x="26" y="17" />
 	<!-- bits 16 - 21 are unused -->
 	<register name="SIC_IWR2_IRQ_TIMER0"        type="NOLABEL" x="26" y="19" />
 	<register name="SIC_IWR2_IRQ_TIMER1"        type="NOLABEL" x="26" y="20" />
@@ -906,7 +906,7 @@
 	<register name="USB1"                       type="NODATA"  x="2"  y="14" />
 	<register name="USB2"                       type="NODATA"  x="2"  y="15" />
 	<register name="USB DMA"                    type="NODATA"  x="2"  y="16" />
-	<register name="OTPSEC"                     type="NODATA"  x="2"  y="17" />
+	<register name="OTP"                        type="NODATA"  x="2"  y="17" />
 	<register name="-unused- (bits 16-21)"      type="NODATA"  x="2"  y="18" />
 	<register name="Timer 0"                    type="NODATA"  x="2"  y="19" />
 	<register name="Timer 1"                    type="NODATA"  x="2"  y="20" />
@@ -934,7 +934,7 @@
 	<register name="SIC_ISR2_IRQ_USB_INT1"      type="NOLABEL" x="26" y="14" />
 	<register name="SIC_ISR2_IRQ_USB_INT2"      type="NOLABEL" x="26" y="15" />
 	<register name="SIC_ISR2_IRQ_USB_DMAINT"    type="NOLABEL" x="26" y="16" />
-	<register name="SIC_ISR2_IRQ_OTPSEC"        type="NOLABEL" x="26" y="17" />
+	<register name="SIC_ISR2_IRQ_OTP"           type="NOLABEL" x="26" y="17" />
 	<!-- bits 16 - 21 are unused -->
 	<register name="SIC_ISR2_IRQ_TIMER0"        type="NOLABEL" x="26" y="19" />
 	<register name="SIC_ISR2_IRQ_TIMER1"        type="NOLABEL" x="26" y="20" />
@@ -1109,7 +1109,7 @@
 	<register name="USB1"                       type="NODATA"  x="2"  y="14" />
 	<register name="USB2"                       type="NODATA"  x="2"  y="15" />
 	<register name="USB DMA"                    type="NODATA"  x="2"  y="16" />
-	<register name="OTPSEC"                     type="NODATA"  x="2"  y="17" />
+	<register name="OTP"                        type="NODATA"  x="2"  y="17" />
 	<register name="-unused- (bits 16-21)"      type="NODATA"  x="2"  y="18" />
 	<register name="Timer 0"                    type="NODATA"  x="2"  y="19" />
 	<register name="Timer 1"                    type="NODATA"  x="2"  y="20" />
@@ -1137,7 +1137,7 @@
 	<register name="SIC_IMASK2_IRQ_USB_INT1"    type="NOLABEL" x="26" y="14" />
 	<register name="SIC_IMASK2_IRQ_USB_INT2"    type="NOLABEL" x="26" y="15" />
 	<register name="SIC_IMASK2_IRQ_USB_DMAINT"  type="NOLABEL" x="26" y="16" />
-	<register name="SIC_IMASK2_IRQ_OTPSEC"      type="NOLABEL" x="26" y="17" />
+	<register name="SIC_IMASK2_IRQ_OTP"         type="NOLABEL" x="26" y="17" />
 	<!-- bits 16 - 21 are unused -->
 	<register name="SIC_IMASK2_IRQ_TIMER0"      type="NOLABEL" x="26" y="19" />
 	<register name="SIC_IMASK2_IRQ_TIMER1"      type="NOLABEL" x="26" y="20" />

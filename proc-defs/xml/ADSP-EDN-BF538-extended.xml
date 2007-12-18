@@ -11,7 +11,7 @@
 
 <visualdsp-extended-xml schema-version="1" name="ADSP-EDN-BF538-extended.xml">
 
-<version file-version="2.11"/>
+<version file-version="2.13"/>
 
 <!-- ************************************************************************ -->
 <!-- ******* Extended register set                                            -->
@@ -182,8 +182,8 @@
 		<register name="SPORT1_TCLKDIV" group="SPORT" read-address="0xFFC00908" write-address="0xFFC00908" mask="FFFF" type="IO" description="" bit-size="16"/>
 		<register name="SPORT1_TFSDIV"  group="SPORT" read-address="0xFFC0090C" write-address="0xFFC0090C" mask="FFFF" type="IO" description="" bit-size="16"/>
 
-		<register name="SPORT1_TX"      group="SPORT" read-address="0xFFC00910" write-address="0xFFC00910" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="SPORT1_RX"      group="SPORT" read-address="0xFFC00918" write-address="0xFFC00918" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="SPORT1_TX"      group="SPORT" read-address="0xFFC00910" write-address="0xFFC00910" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT1_RX"      group="SPORT" read-address="0xFFC00918" write-address="0xFFC00918" mask="FFFF" type="IO" description="" bit-size="32"/>
 
 		<register name="SPORT1_RCR1"    group="SPORT" read-address="0xFFC00920" write-address="0xFFC00920" mask="FFFF" type="IO" description="" bit-size="16"/>
 		<register name="SPORT1_RCR2"    group="SPORT" read-address="0xFFC00924" write-address="0xFFC00924" mask="FFFF" type="IO" description="" bit-size="16"/>
@@ -195,15 +195,15 @@
 		<register name="SPORT1_MCMC1"   group="SPORT" read-address="0xFFC00938" write-address="0xFFC00938" mask="FFFF" type="IO" description="" bit-size="16"/>
 		<register name="SPORT1_MCMC2"   group="SPORT" read-address="0xFFC0093C" write-address="0xFFC0093C" mask="FFFF" type="IO" description="" bit-size="16"/>
 
-		<register name="SPORT1_MTCS0"   group="SPORT" read-address="0xFFC00940" write-address="0xFFC00940" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="SPORT1_MTCS1"   group="SPORT" read-address="0xFFC00944" write-address="0xFFC00944" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="SPORT1_MTCS2"   group="SPORT" read-address="0xFFC00948" write-address="0xFFC00948" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="SPORT1_MTCS3"   group="SPORT" read-address="0xFFC0094C" write-address="0xFFC0094C" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="SPORT1_MTCS0"   group="SPORT" read-address="0xFFC00940" write-address="0xFFC00940" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT1_MTCS1"   group="SPORT" read-address="0xFFC00944" write-address="0xFFC00944" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT1_MTCS2"   group="SPORT" read-address="0xFFC00948" write-address="0xFFC00948" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT1_MTCS3"   group="SPORT" read-address="0xFFC0094C" write-address="0xFFC0094C" mask="FFFF" type="IO" description="" bit-size="32"/>
 
-		<register name="SPORT1_MRCS0"   group="SPORT" read-address="0xFFC00950" write-address="0xFFC00950" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="SPORT1_MRCS1"   group="SPORT" read-address="0xFFC00954" write-address="0xFFC00954" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="SPORT1_MRCS2"   group="SPORT" read-address="0xFFC00958" write-address="0xFFC00958" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="SPORT1_MRCS3"   group="SPORT" read-address="0xFFC0095C" write-address="0xFFC0095C" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="SPORT1_MRCS0"   group="SPORT" read-address="0xFFC00950" write-address="0xFFC00950" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT1_MRCS1"   group="SPORT" read-address="0xFFC00954" write-address="0xFFC00954" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT1_MRCS2"   group="SPORT" read-address="0xFFC00958" write-address="0xFFC00958" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT1_MRCS3"   group="SPORT" read-address="0xFFC0095C" write-address="0xFFC0095C" mask="FFFF" type="IO" description="" bit-size="32"/>
 
 		<!-- SPORT2 Controller Registers -->
 		<register name="SPORT2_TCR1"    group="SPORT" read-address="0xFFC02500" write-address="0xFFC02500" mask="FFFF" type="IO" description="" bit-size="16" def-comment="SPORT2 (0xFFC02500 - 0xFFC025FF)"/>
@@ -211,8 +211,8 @@
 		<register name="SPORT2_TCLKDIV" group="SPORT" read-address="0xFFC02508" write-address="0xFFC02508" mask="FFFF" type="IO" description="" bit-size="16"/>
 		<register name="SPORT2_TFSDIV"  group="SPORT" read-address="0xFFC0250C" write-address="0xFFC0250C" mask="FFFF" type="IO" description="" bit-size="16"/>
 
-		<register name="SPORT2_TX"      group="SPORT" read-address="0xFFC02510" write-address="0xFFC02510" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="SPORT2_RX"      group="SPORT" read-address="0xFFC02518" write-address="0xFFC02518" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="SPORT2_TX"      group="SPORT" read-address="0xFFC02510" write-address="0xFFC02510" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT2_RX"      group="SPORT" read-address="0xFFC02518" write-address="0xFFC02518" mask="FFFF" type="IO" description="" bit-size="32"/>
 
 		<register name="SPORT2_RCR1"    group="SPORT" read-address="0xFFC02520" write-address="0xFFC02520" mask="FFFF" type="IO" description="" bit-size="16"/>
 		<register name="SPORT2_RCR2"    group="SPORT" read-address="0xFFC02524" write-address="0xFFC02524" mask="FFFF" type="IO" description="" bit-size="16"/>
@@ -224,15 +224,15 @@
 		<register name="SPORT2_MCMC1"   group="SPORT" read-address="0xFFC02538" write-address="0xFFC02538" mask="FFFF" type="IO" description="" bit-size="16"/>
 		<register name="SPORT2_MCMC2"   group="SPORT" read-address="0xFFC0253C" write-address="0xFFC0253C" mask="FFFF" type="IO" description="" bit-size="16"/>
 
-		<register name="SPORT2_MTCS0"   group="SPORT" read-address="0xFFC02540" write-address="0xFFC02540" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="SPORT2_MTCS1"   group="SPORT" read-address="0xFFC02544" write-address="0xFFC02544" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="SPORT2_MTCS2"   group="SPORT" read-address="0xFFC02548" write-address="0xFFC02548" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="SPORT2_MTCS3"   group="SPORT" read-address="0xFFC0254C" write-address="0xFFC0254C" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="SPORT2_MTCS0"   group="SPORT" read-address="0xFFC02540" write-address="0xFFC02540" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT2_MTCS1"   group="SPORT" read-address="0xFFC02544" write-address="0xFFC02544" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT2_MTCS2"   group="SPORT" read-address="0xFFC02548" write-address="0xFFC02548" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT2_MTCS3"   group="SPORT" read-address="0xFFC0254C" write-address="0xFFC0254C" mask="FFFF" type="IO" description="" bit-size="32"/>
 
-		<register name="SPORT2_MRCS0"   group="SPORT" read-address="0xFFC02550" write-address="0xFFC02550" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="SPORT2_MRCS1"   group="SPORT" read-address="0xFFC02554" write-address="0xFFC02554" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="SPORT2_MRCS2"   group="SPORT" read-address="0xFFC02558" write-address="0xFFC02558" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="SPORT2_MRCS3"   group="SPORT" read-address="0xFFC0255C" write-address="0xFFC0255C" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="SPORT2_MRCS0"   group="SPORT" read-address="0xFFC02550" write-address="0xFFC02550" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT2_MRCS1"   group="SPORT" read-address="0xFFC02554" write-address="0xFFC02554" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT2_MRCS2"   group="SPORT" read-address="0xFFC02558" write-address="0xFFC02558" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT2_MRCS3"   group="SPORT" read-address="0xFFC0255C" write-address="0xFFC0255C" mask="FFFF" type="IO" description="" bit-size="32"/>
 
 		<!-- SPORT3 Controller Registers -->
 		<register name="SPORT3_TCR1"    group="SPORT" read-address="0xFFC02600" write-address="0xFFC02600" mask="FFFF" type="IO" description="" bit-size="16" def-comment="SPORT3 (0xFFC02600 - 0xFFC026FF)"/>
@@ -240,8 +240,8 @@
 		<register name="SPORT3_TCLKDIV" group="SPORT" read-address="0xFFC02608" write-address="0xFFC02608" mask="FFFF" type="IO" description="" bit-size="16"/>
 		<register name="SPORT3_TFSDIV"  group="SPORT" read-address="0xFFC0260C" write-address="0xFFC0260C" mask="FFFF" type="IO" description="" bit-size="16"/>
 
-		<register name="SPORT3_TX"      group="SPORT" read-address="0xFFC02610" write-address="0xFFC02610" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="SPORT3_RX"      group="SPORT" read-address="0xFFC02618" write-address="0xFFC02618" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="SPORT3_TX"      group="SPORT" read-address="0xFFC02610" write-address="0xFFC02610" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT3_RX"      group="SPORT" read-address="0xFFC02618" write-address="0xFFC02618" mask="FFFF" type="IO" description="" bit-size="32"/>
 
 		<register name="SPORT3_RCR1"    group="SPORT" read-address="0xFFC02620" write-address="0xFFC02620" mask="FFFF" type="IO" description="" bit-size="16"/>
 		<register name="SPORT3_RCR2"    group="SPORT" read-address="0xFFC02624" write-address="0xFFC02624" mask="FFFF" type="IO" description="" bit-size="16"/>
@@ -253,15 +253,15 @@
 		<register name="SPORT3_MCMC1"   group="SPORT" read-address="0xFFC02638" write-address="0xFFC02638" mask="FFFF" type="IO" description="" bit-size="16"/>
 		<register name="SPORT3_MCMC2"   group="SPORT" read-address="0xFFC0263C" write-address="0xFFC0263C" mask="FFFF" type="IO" description="" bit-size="16"/>
 
-		<register name="SPORT3_MTCS0"   group="SPORT" read-address="0xFFC02640" write-address="0xFFC02640" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="SPORT3_MTCS1"   group="SPORT" read-address="0xFFC02644" write-address="0xFFC02644" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="SPORT3_MTCS2"   group="SPORT" read-address="0xFFC02648" write-address="0xFFC02648" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="SPORT3_MTCS3"   group="SPORT" read-address="0xFFC0264C" write-address="0xFFC0264C" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="SPORT3_MTCS0"   group="SPORT" read-address="0xFFC02640" write-address="0xFFC02640" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT3_MTCS1"   group="SPORT" read-address="0xFFC02644" write-address="0xFFC02644" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT3_MTCS2"   group="SPORT" read-address="0xFFC02648" write-address="0xFFC02648" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT3_MTCS3"   group="SPORT" read-address="0xFFC0264C" write-address="0xFFC0264C" mask="FFFF" type="IO" description="" bit-size="32"/>
 
-		<register name="SPORT3_MRCS0"   group="SPORT" read-address="0xFFC02650" write-address="0xFFC02650" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="SPORT3_MRCS1"   group="SPORT" read-address="0xFFC02654" write-address="0xFFC02654" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="SPORT3_MRCS2"   group="SPORT" read-address="0xFFC02658" write-address="0xFFC02658" mask="FFFF" type="IO" description="" bit-size="16"/>
-		<register name="SPORT3_MRCS3"   group="SPORT" read-address="0xFFC0265C" write-address="0xFFC0265C" mask="FFFF" type="IO" description="" bit-size="16"/>
+		<register name="SPORT3_MRCS0"   group="SPORT" read-address="0xFFC02650" write-address="0xFFC02650" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT3_MRCS1"   group="SPORT" read-address="0xFFC02654" write-address="0xFFC02654" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT3_MRCS2"   group="SPORT" read-address="0xFFC02658" write-address="0xFFC02658" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT3_MRCS3"   group="SPORT" read-address="0xFFC0265C" write-address="0xFFC0265C" mask="FFFF" type="IO" description="" bit-size="32"/>
 
 		<!-- External Bus Interface Unit Registers -->
 		<register name="EBIU_AMGCTL"  group="EBIU" bit-size="16" read-address="0xFFC00A00" write-address="0xFFC00A00" type="IO" description="Asynchronous Memory Global Control Register" def-header="Asynchronous Memory Controller - External Bus Interface Unit" def-comment="External Bus Interface Unit (0xFFC00A00 - 0xFFC00AFF)" target="EMU"/>

@@ -7,7 +7,7 @@
 
 <visualdsp-idde-xml schema-version="1" name="ADSP-IDDE.xml">
 
-<version file-version="1.22"/>
+<version file-version="1.23"/>
 
 <processors>
 	<family name="BLACKFIN" value="1">
@@ -45,6 +45,7 @@
 		<processor name="ADSP-BF541"/>
 		<processor name="ADSP-BF542"/>
 		<processor name="ADSP-BF544"/>
+		<processor name="ADSP-BF547"/>
 		<processor name="ADSP-BF548"/>
 		<processor name="ADSP-BF549"/>
 	</family>

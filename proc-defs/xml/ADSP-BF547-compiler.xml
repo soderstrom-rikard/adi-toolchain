@@ -2,11 +2,11 @@
 
 <?xml-stylesheet type="text/xsl" href="AnomalyDictionary.xsl"?>
 
-<visualdsp-compiler-xml schema-version="1" name="ADSP-BF549-compiler.xml">
+<visualdsp-compiler-xml schema-version="1" name="ADSP-BF547-compiler.xml">
 
 <!-- *********************************************************************** -->
-<!-- ******* ADSP-BF549-compiler.xml                                         -->
-<!-- ******* Copyright 2006-2007 Analog Devices, Inc.  All rights reserved.  -->
+<!-- ******* ADSP-BF547-compiler.xml                                         -->
+<!-- ******* Copyright 2007 Analog Devices, Inc.  All rights reserved.       -->
 <!-- *********************************************************************** -->
 
 <!-- ***************************************** -->
@@ -15,7 +15,7 @@
 
 <version file-version="1.04"/>
 
-<architecture name="ADSP-BF549" maps-to="ADSP-BF532" machine-id="34" machine-id-mnemonic="EM_21532" default-ldf="Blackfin/ldf/ADSP-BF549.ldf"/>
+<architecture name="ADSP-BF547" maps-to="ADSP-BF532" machine-id="34" machine-id-mnemonic="EM_21532" default-ldf="Blackfin/ldf/ADSP-BF547.ldf"/>
 
 <silicon-revisions command-line-default="0.0">
 	<silicon revision="none" lib-path="Blackfin/lib">
@@ -49,7 +49,7 @@
 		<workaround ix="26" compiler-default="N"/>
 		<workaround ix="27" compiler-default="N"/>
 		<workaround ix="28" compiler-default="Y"/>
-		<workaround ix="29" compiler-default="N"/>
+		<workaround ix="29" compiler-default="N"/>		
 		<workaround ix="44" compiler-default="N" assembler-detect-default="Y" assembler-workaround-default="N"  />				
 	</silicon>
 	<silicon revision="0.1" lib-path="Blackfin/lib/bf541_rev_any">
@@ -81,7 +81,7 @@
 		<workaround ix="26" compiler-default="N"/>
 		<workaround ix="27" compiler-default="N"/>
 		<workaround ix="28" compiler-default="Y"/>
-		<workaround ix="29" compiler-default="N"/>
+		<workaround ix="29" compiler-default="N"/>		
 		<workaround ix="44" compiler-default="N" assembler-detect-default="Y" assembler-workaround-default="N"  />				
 	</silicon>
 	<silicon revision="any" lib-path="Blackfin/lib/bf541_rev_any">
@@ -113,7 +113,7 @@
 		<workaround ix="26" compiler-default="N"/>
 		<workaround ix="27" compiler-default="N"/>
 		<workaround ix="28" compiler-default="Y"/>
-		<workaround ix="29" compiler-default="N"/>		
+		<workaround ix="29" compiler-default="N"/>
 		<workaround ix="44" compiler-default="N" assembler-detect-default="Y" assembler-workaround-default="N"  />				
 	</silicon>
 </silicon-revisions>
@@ -122,7 +122,7 @@
 	<macro name="__ADSPBLACKFIN__" value="1"/>
 	<macro name="__ADSPLPBLACKFIN__" value="1"/>
 	<macro name="__ADSPBF54x__" value="1"/>
-	<macro name="__ADSPBF549__" value="1"/>
+	<macro name="__ADSPBF547__" value="1"/>
 </feature-macros>
 
 <!-- ***************************************** -->
@@ -133,7 +133,7 @@
 <!-- ******* an assembly program.                                            -->
 <!-- ***************************************** -->
 
-<assembler default-include-path="Blackfin/include" flags-compiler="-proc ADSP-BF549"/>
+<assembler default-include-path="Blackfin/include" flags-compiler="-proc ADSP-BF547"/>
 
 
 	<!-- ***************************************************** -->
@@ -177,7 +177,7 @@
 
 	<compiler-flags-asm>
 		<flags name="-proc"/>
-		<flags name="ADSP-BF549"/>
+		<flags name="ADSP-BF547"/>
 		<flags name="-stallcheck=none"/>
 		<flags name="-W5500"/>
 		<flags name="-W5508"/>
@@ -185,7 +185,7 @@
 
 	<compiler-flags-linker>
 		<flags name="-proc"/>
-		<flags name="ADSP-BF549"/>
+		<flags name="ADSP-BF547"/>
 	</compiler-flags-linker>
 
 	<!-- ************************************************** -->

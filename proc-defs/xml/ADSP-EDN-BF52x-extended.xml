@@ -14,7 +14,7 @@
 
 <visualdsp-extended-xml schema-version="1" name="ADSP-EDN-BF52x-extended.xml">
 
-<version file-version="1.15"/>
+<version file-version="1.19"/>
 
 <!-- ************************************************************************ -->
 <!-- ******* Extended register set                                            -->
@@ -273,7 +273,7 @@
 	<register name="CDDBG"    parent="EBIU_SDGCTL" bit-position="30" type="" description="" bit-size="1"/>
 <register name="EBIU_SDBCTL"  group="EBIU" description="SDRAM Bank Control Register" bit-size="16" read-address="0xFFC00A14" write-address="0xFFC00A14" type="IO" />
 	<register name="EBE"      parent="EBIU_SDBCTL" bit-position="0" type="" description="" bit-size="1"/>
-	<register name="EBSZ"     parent="EBIU_SDBCTL" bit-position="1" type="" description="" bit-size="2"/>
+	<register name="EBSZ"     parent="EBIU_SDBCTL" bit-position="1" type="" description="" bit-size="3"/>
 	<register name="EBCAW"    parent="EBIU_SDBCTL" bit-position="4" type="" description="" bit-size="2"/>
 
 <register name="EBIU_SDRRC"   group="EBIU" read-address="0xFFC00A18" write-address="0xFFC00A18" mask="FFFF"     type="IO" description="SDRAM Refresh Rate Control Register" bit-size="16"/>
@@ -965,15 +965,18 @@
 	<register name="SKIP_EN"  parent="PPI_CONTROL" bit-position="9" bit-size="1"/>
 	<register name="SKIP_EO"  parent="PPI_CONTROL" bit-position="10" bit-size="1"/>
 	<register name="DLEN"     parent="PPI_CONTROL" bit-position="11" bit-size="3"/>
-	<register name="POL"      parent="PPI_CONTROL" bit-position="14" bit-size="1"/>
+	<register name="POLC"     parent="PPI_CONTROL" bit-position="14" bit-size="1"/>
 	<register name="POLS"     parent="PPI_CONTROL" bit-position="15" bit-size="1"/>
 <register name="PPI_STATUS" group="PPI" read-address="0xFFC01004" write-address="0xFFC01004" mask="FFFF" type="IO" description="PPI Status Register" bit-size="16"/>
-	<register name="FLD"      parent="PPI_STATUS" bit-position="10" bit-size="1"/>
-	<register name="FT_ERR"   parent="PPI_STATUS" bit-position="11" bit-size="1"/>
-	<register name="OVR"      parent="PPI_STATUS" bit-position="12" bit-size="1"/>
-	<register name="UNDR"     parent="PPI_STATUS" bit-position="13" bit-size="1"/>
-	<register name="ERR_DET"  parent="PPI_STATUS" bit-position="14" bit-size="1"/>
-	<register name="ERR_NCOR" parent="PPI_STATUS" bit-position="15" bit-size="1"/>
+	<register name="LT_ERR_OVR"  parent="PPI_STATUS" bit-position="8"  bit-size="1"/>
+	<register name="LT_ERR_UNDR" parent="PPI_STATUS" bit-position="9"  bit-size="1"/>
+	<register name="FLD"         parent="PPI_STATUS" bit-position="10" bit-size="1"/>
+	<register name="FT_ERR"      parent="PPI_STATUS" bit-position="11" bit-size="1"/>
+	<register name="OVR"         parent="PPI_STATUS" bit-position="12" bit-size="1"/>
+	<register name="UNDR"        parent="PPI_STATUS" bit-position="13" bit-size="1"/>
+	<register name="ERR_DET"     parent="PPI_STATUS" bit-position="14" bit-size="1"/>
+	<register name="ERR_NCOR"    parent="PPI_STATUS" bit-position="15" bit-size="1"/>
+
 <register name="PPI_COUNT"   group="PPI" read-address="0xFFC01008" write-address="0xFFC01008" mask="FFFF" type="IO" description="PPI Transfer Count Register" bit-size="16"/>
 <register name="PPI_DELAY"   group="PPI" read-address="0xFFC0100C" write-address="0xFFC0100C" mask="FFFF" type="IO" description="PPI Delay Count Register" bit-size="16"/>
 <register name="PPI_FRAME"   group="PPI" read-address="0xFFC01010" write-address="0xFFC01010" mask="FFFF" type="IO" description="PPI Frame Length Register" bit-size="16"/>
@@ -1086,10 +1089,9 @@
 	<!--***********************-->
 	<!-- Pin Control Registers -->
 	<!--***********************-->
-<register name="PORTF_FER" group="Pin Control" read-address="0xFFC03200" write-address="0xFFC03200" mask="FFFF" type="IO" description="Port F Function Enable Register (Alternate/Flag*)" bit-size="16" def-comment="Pin Control Registers (0xFFC03200 - 0xFFC032FF)"/>
-<register name="PORTG_FER" group="Pin Control" read-address="0xFFC03204" write-address="0xFFC03204" mask="FFFF" type="IO" description="Port G Function Enable Register (Alternate/Flag*)" bit-size="16"/>
-<register name="PORTH_FER" group="Pin Control" read-address="0xFFC03208" write-address="0xFFC03208" mask="FFFF" type="IO" description="Port H Function Enable Register (Alternate/Flag*)" bit-size="16"/>
-<register name="PORT_MUX"  group="Pin Control" read-address="0xFFC0320C" write-address="0xFFC0320C" mask="FFFF" type="IO" description="Port Multiplexer Control Register" bit-size="16"/>
+<register name="PORTF_FER" group="Pin Control" read-address="0xFFC03200" write-address="0xFFC03200" mask="FFFF" type="IO" description="Port F Function Enable Register (Alternate/Flag*)" bit-size="16" target="EMU" def-comment="Pin Control Registers (0xFFC03200 - 0xFFC032FF)"/>
+<register name="PORTG_FER" group="Pin Control" read-address="0xFFC03204" write-address="0xFFC03204" mask="FFFF" type="IO" description="Port G Function Enable Register (Alternate/Flag*)" target="EMU" bit-size="16"/>
+<register name="PORTH_FER" group="Pin Control" read-address="0xFFC03208" write-address="0xFFC03208" mask="FFFF" type="IO" description="Port H Function Enable Register (Alternate/Flag*)" target="EMU" bit-size="16"/>
 
 	<!--**************************-->
 	<!-- Handshake MDMA Registers -->
@@ -1117,21 +1119,25 @@
 	<!--************************-->
 	<!-- GPIO PIN mux Registers -->
 	<!--************************-->
-<register name="PORTF_MUX"           group="GPIO PIN" read-address="0xFFC03210" write-address="0xFFC03210" mask="FFFF" type="IO" bit-size="16" description="Port F mux control" def-comment="GPIO PIN mux (0xFFC03210 - OxFFC03288)" />
-<register name="PORTG_MUX"           group="GPIO PIN" read-address="0xFFC03214" write-address="0xFFC03214" mask="FFFF" type="IO" bit-size="16" description="Port G mux control" />
-<register name="PORTH_MUX"           group="GPIO PIN" read-address="0xFFC03218" write-address="0xFFC03218" mask="FFFF" type="IO" bit-size="16" description="Port H mux control" />
-<register name="PORTF_DRIVE"         group="GPIO PIN" read-address="0xFFC03220" write-address="0xFFC03220" mask="FFFF" type="IO" bit-size="16" description="Port F drive strength control" />
-<register name="PORTG_DRIVE"         group="GPIO PIN" read-address="0xFFC03224" write-address="0xFFC03224" mask="FFFF" type="IO" bit-size="16" description="Port G drive strength control" />
-<register name="PORTH_DRIVE"         group="GPIO PIN" read-address="0xFFC03228" write-address="0xFFC03228" mask="FFFF" type="IO" bit-size="16" description="Port H drive strength control" />
-<register name="PORTF_SLEW"          group="GPIO PIN" read-address="0xFFC03230" write-address="0xFFC03230" mask="FFFF" type="IO" bit-size="16" description="Port F slew control" />
-<register name="PORTG_SLEW"          group="GPIO PIN" read-address="0xFFC03234" write-address="0xFFC03234" mask="FFFF" type="IO" bit-size="16" description="Port G slew control" />
-<register name="PORTH_SLEW"          group="GPIO PIN" read-address="0xFFC03238" write-address="0xFFC03238" mask="FFFF" type="IO" bit-size="16" description="Port H slew control" />
-<register name="PORTF_HYSTERISIS"    group="GPIO PIN" read-address="0xFFC03240" write-address="0xFFC03240" mask="FFFF" type="IO" bit-size="16" description="Port F Schmitt trigger control" />
-<register name="PORTG_HYSTERISIS"    group="GPIO PIN" read-address="0xFFC03244" write-address="0xFFC03244" mask="FFFF" type="IO" bit-size="16" description="Port G Schmitt trigger control" />
-<register name="PORTH_HYSTERISIS"    group="GPIO PIN" read-address="0xFFC03248" write-address="0xFFC03248" mask="FFFF" type="IO" bit-size="16" description="Port H Schmitt trigger control" />
-<register name="MISCPORT_DRIVE"      group="GPIO PIN" read-address="0xFFC03280" write-address="0xFFC03280" mask="FFFF" type="IO" bit-size="16" description="Misc Port drive strength control" />
-<register name="MISCPORT_SLEW"       group="GPIO PIN" read-address="0xFFC03284" write-address="0xFFC03284" mask="FFFF" type="IO" bit-size="16" description="Misc Port slew control" />
-<register name="MISCPORT_HYSTERISIS" group="GPIO PIN" read-address="0xFFC03288" write-address="0xFFC03288" mask="FFFF" type="IO" bit-size="16" description="Misc Port Schmitt trigger control" />
+<register name="PORTF_MUX"           group="GPIO PIN" read-address="0xFFC03210" write-address="0xFFC03210" mask="FFFF" type="IO" bit-size="16" description="Port F mux control" def-comment="GPIO PIN mux (0xFFC03210 - OxFFC03288)" target="EMU" />
+<register name="PORTG_MUX"           group="GPIO PIN" read-address="0xFFC03214" write-address="0xFFC03214" mask="FFFF" type="IO" bit-size="16" description="Port G mux control" target="EMU" />
+<register name="PORTH_MUX"           group="GPIO PIN" read-address="0xFFC03218" write-address="0xFFC03218" mask="FFFF" type="IO" bit-size="16" description="Port H mux control" target="EMU" />
+<register name="PORTF_DRIVE"         group="GPIO PIN" read-address="0xFFC03220" write-address="0xFFC03220" mask="FFFF" type="IO" bit-size="16" description="Port F drive strength control" target="EMU" />
+<register name="PORTG_DRIVE"         group="GPIO PIN" read-address="0xFFC03224" write-address="0xFFC03224" mask="FFFF" type="IO" bit-size="16" description="Port G drive strength control" target="EMU" />
+<register name="PORTH_DRIVE"         group="GPIO PIN" read-address="0xFFC03228" write-address="0xFFC03228" mask="FFFF" type="IO" bit-size="16" description="Port H drive strength control" target="EMU" />
+<register name="PORTF_SLEW"          group="GPIO PIN" read-address="0xFFC03230" write-address="0xFFC03230" mask="FFFF" type="IO" bit-size="16" description="Port F slew control" target="EMU" />
+<register name="PORTG_SLEW"          group="GPIO PIN" read-address="0xFFC03234" write-address="0xFFC03234" mask="FFFF" type="IO" bit-size="16" description="Port G slew control" target="EMU" />
+<register name="PORTH_SLEW"          group="GPIO PIN" read-address="0xFFC03238" write-address="0xFFC03238" mask="FFFF" type="IO" bit-size="16" description="Port H slew control" target="EMU" />
+<register name="PORTF_HYSTERESIS"    group="GPIO PIN" read-address="0xFFC03240" write-address="0xFFC03240" mask="FFFF" type="IO" bit-size="16" description="Port F Schmitt trigger control" target="EMU" />
+<register name="PORTG_HYSTERESIS"    group="GPIO PIN" read-address="0xFFC03244" write-address="0xFFC03244" mask="FFFF" type="IO" bit-size="16" description="Port G Schmitt trigger control" target="EMU" />
+<register name="PORTH_HYSTERESIS"    group="GPIO PIN" read-address="0xFFC03248" write-address="0xFFC03248" mask="FFFF" type="IO" bit-size="16" description="Port H Schmitt trigger control" target="EMU" />
+
+<!--**************************************************-->
+<!-- NON-GPIO (formerly MISCPORT_* / group GPIO PIN)  -->
+<!--**************************************************-->
+<register name="NONGPIO_DRIVE"      group="NON-GPIO" read-address="0xFFC03280" write-address="0xFFC03280" mask="FFFF" type="IO" bit-size="16" description="Non-GPIO Port drive strength control" target="EMU" />
+<register name="NONGPIO_SLEW"       group="NON-GPIO" read-address="0xFFC03284" write-address="0xFFC03284" mask="FFFF" type="IO" bit-size="16" description="Non-GPIO Port slew control" target="EMU" />
+<register name="NONGPIO_HYSTERESIS" group="NON-GPIO" read-address="0xFFC03288" write-address="0xFFC03288" mask="FFFF" type="IO" bit-size="16" description="Non-GPIO Port Schmitt trigger control" target="EMU" />
 
 <!--*********************************************-->
 <!-- Changed MMR from ADSP-BF54x for ADSP-BF52x  -->
@@ -1257,10 +1263,12 @@
 
 <!-- NFC Register Definitions -->
 
+<!-- The NWIDTH bit (NAND Data Width) is not present in the ADSP-BF52x family.                      -->
+<!-- Unlike the ADSP-BF54x devices, ADSP-BF52x processors only support an NFC data width of 8-bits. -->
+
 <register name="NFC_CTL" group="NFC" mask="FFFF" description="NAND Control Register" bit-size="16" read-address="0xFFC03700" write-address="0xFFC03700" type="IO" target="EMU" def-comment="NFC Registers" />
 	<register name="WR_DLY"  parent="NFC_CTL" bit-position="0" bit-size="4" target="EMU" description="Write Strobe Delay"/>
 	<register name="RD_DLY"  parent="NFC_CTL" bit-position="4" bit-size="4" target="EMU" description="Read Strobe Delay"/>
-	<register name="NWIDTH"  parent="NFC_CTL" bit-position="8" bit-size="1" target="EMU" description="NAND Data Width"/>
 	<register name="PG_SIZE" parent="NFC_CTL" bit-position="9" bit-size="1" target="EMU" description="Page Size"/>
 
 <register name="NFC_STAT" group="NFC" mask="FFFF" description="NAND Status Register" bit-size="16" read-address="0xFFC03704" write-address="0xFFC03704" type="IO" target="EMU" />

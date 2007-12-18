@@ -1,6 +1,6 @@
 <visualdsp-extended-xml schema-version="1" name="ADSP-EDN-BF544-extended.xml">
 
-<version file-version="1.47" />
+<version file-version="1.50" />
 
 <!-- ******************************************************************* -->
 <!-- ADSP-BF54x register and bit definitions file                        -->
@@ -62,7 +62,7 @@
 
 <!-- Proc HWR, chap  4, SIC Register Definitions  -->
 
-<register name="SIC_IMASK0" group="SIC" mask="FFFFFFFF" description="System Interrupt Mask Register 0" bit-size="32" read-address="0xFFC0010C" write-address="0xFFC0010C" type="IO" target="EMU" def-comment="SIC Registers" />
+<register name="SIC_IMASK0" group="SIC" mask="FFFFFFFF" description="System Interrupt Mask Register 0" bit-size="32" read-address="0xFFC0010C" write-address="0xFFC0010C" type="IO" def-comment="SIC Registers" />
 	<register name="SIC_IMASK0_IRQ_PLL_WAKEUP" parent="SIC_IMASK0" bit-position="0"  bit-size="1" description="PLL Wakeup" />
 	<register name="SIC_IMASK0_IRQ_DMAC0_ERR"  parent="SIC_IMASK0" bit-position="1"  bit-size="1" description="DMA Controller 0 Error (generic)" />
 	<register name="SIC_IMASK0_IRQ_EPPI0_ERR"  parent="SIC_IMASK0" bit-position="2"  bit-size="1" description="EPPI0 Error" />
@@ -96,7 +96,7 @@
 	<register name="SIC_IMASK0_IRQ_UART1_STAT" parent="SIC_IMASK0" bit-position="30" bit-size="1" description="UART1 Status" />
 	<register name="SIC_IMASK0_IRQ_UART2_STAT" parent="SIC_IMASK0" bit-position="31" bit-size="1" description="UART2 Status" />
 
-<register name="SIC_IMASK1" group="SIC" mask="FFFFFFFF" description="System Interrupt Mask Register 1" bit-size="32" read-address="0xFFC00110" write-address="0xFFC00110" type="IO" target="EMU" />
+<register name="SIC_IMASK1" group="SIC" mask="FFFFFFFF" description="System Interrupt Mask Register 1" bit-size="32" read-address="0xFFC00110" write-address="0xFFC00110" type="IO" />
 	<register name="SIC_IMASK1_IRQ_CAN0_STAT"  parent="SIC_IMASK1" bit-position="0"  bit-size="1" description="CAN0 Status" />
 	<register name="SIC_IMASK1_IRQ_DMA18"      parent="SIC_IMASK1" bit-position="1"  bit-size="1" description="DMA Channel 18 (SPORT2 RX)" />
 	<register name="SIC_IMASK1_IRQ_DMA19"      parent="SIC_IMASK1" bit-position="2"  bit-size="1" description="DMA Channel 19 (SPORT2 TX)" />
@@ -130,7 +130,7 @@
 	<register name="SIC_IMASK1_IRQ_CAN1_STAT"  parent="SIC_IMASK1" bit-position="30" bit-size="1" description="CAN1 Status" />
 	<register name="SIC_IMASK1_IRQ_DMA_BLK"    parent="SIC_IMASK1" bit-position="31" bit-size="1" description="DMA R0/R1 Block" />
 
-<register name="SIC_IMASK2" group="SIC" mask="FFFFFFFF" description="System Interrupt Mask Register 2" bit-size="32" read-address="0xFFC00114" write-address="0xFFC00114" type="IO" target="EMU" />
+<register name="SIC_IMASK2" group="SIC" mask="FFFFFFFF" description="System Interrupt Mask Register 2" bit-size="32" read-address="0xFFC00114" write-address="0xFFC00114" type="IO" />
 	<register name="SIC_IMASK2_IRQ_DMA15"      parent="SIC_IMASK2" bit-position="0"  bit-size="1" description="DMA Channel 15 (PIXC Input 0)" />
 	<register name="SIC_IMASK2_IRQ_DMA16"      parent="SIC_IMASK2" bit-position="1"  bit-size="1" description="DMA Channel 16 (PIXC Input 1)" />
 	<register name="SIC_IMASK2_IRQ_DMA17"      parent="SIC_IMASK2" bit-position="2"  bit-size="1" description="DMA Channel 17 (PIXC Output)" />
@@ -146,7 +146,7 @@
 	<register name="SIC_IMASK2_IRQ_USB_INT1"   parent="SIC_IMASK2" bit-position="12" bit-size="1" description="USB1" />
 	<register name="SIC_IMASK2_IRQ_USB_INT2"   parent="SIC_IMASK2" bit-position="13" bit-size="1" description="USB2" />
 	<register name="SIC_IMASK2_IRQ_USB_DMAINT" parent="SIC_IMASK2" bit-position="14" bit-size="1" description="USB DMA" />
-	<register name="SIC_IMASK2_IRQ_OTPSEC"     parent="SIC_IMASK2" bit-position="15" bit-size="1" description="OTPSEC" />
+	<register name="SIC_IMASK2_IRQ_OTP"        parent="SIC_IMASK2" bit-position="15" bit-size="1" description="OTP" />
 	<!-- bits 16 - 21 are unused -->
 	<register name="SIC_IMASK2_IRQ_TIMER0"     parent="SIC_IMASK2" bit-position="22" bit-size="1" description="Timer 0" />
 	<register name="SIC_IMASK2_IRQ_TIMER1"     parent="SIC_IMASK2" bit-position="23" bit-size="1" description="Timer 1" />
@@ -159,7 +159,7 @@
 	<register name="SIC_IMASK2_IRQ_PINT2"      parent="SIC_IMASK2" bit-position="30" bit-size="1" description="Pin Interrupt 2" />
 	<register name="SIC_IMASK2_IRQ_PINT3"      parent="SIC_IMASK2" bit-position="31" bit-size="1" description="Pin Interrupt 3" />
 
-<register name="SIC_ISR0" group="SIC" mask="FFFFFFFF" description="System Interrupt Status Register 0" bit-size="32" read-address="0xFFC00118" write-address="0xFFC00118" type="IO" target="EMU" />
+<register name="SIC_ISR0" group="SIC" mask="FFFFFFFF" description="System Interrupt Status Register 0" bit-size="32" read-address="0xFFC00118" write-address="0xFFC00118" type="IO" />
 	<register name="SIC_ISR0_IRQ_PLL_WAKEUP" parent="SIC_ISR0" bit-position="0"  bit-size="1" description="PLL Wakeup" />
 	<register name="SIC_ISR0_IRQ_DMAC0_ERR"  parent="SIC_ISR0" bit-position="1"  bit-size="1" description="DMA Controller 0 Error (generic)" />
 	<register name="SIC_ISR0_IRQ_EPPI0_ERR"  parent="SIC_ISR0" bit-position="2"  bit-size="1" description="EPPI0 Error" />
@@ -193,7 +193,7 @@
 	<register name="SIC_ISR0_IRQ_UART1_STAT" parent="SIC_ISR0" bit-position="30" bit-size="1" description="UART1 Status" />
 	<register name="SIC_ISR0_IRQ_UART2_STAT" parent="SIC_ISR0" bit-position="31" bit-size="1" description="UART2 Status" />
 
-<register name="SIC_ISR1" group="SIC" mask="FFFFFFFF" description="System Interrupt Status Register 1" bit-size="32" read-address="0xFFC0011C" write-address="0xFFC0011C" type="IO" target="EMU" />
+<register name="SIC_ISR1" group="SIC" mask="FFFFFFFF" description="System Interrupt Status Register 1" bit-size="32" read-address="0xFFC0011C" write-address="0xFFC0011C" type="IO" />
 	<register name="SIC_ISR1_IRQ_CAN0_STAT"  parent="SIC_ISR1" bit-position="0"  bit-size="1" description="CAN0 Status" />
 	<register name="SIC_ISR1_IRQ_DMA18"      parent="SIC_ISR1" bit-position="1"  bit-size="1" description="DMA Channel 18 (SPORT2 RX)" />
 	<register name="SIC_ISR1_IRQ_DMA19"      parent="SIC_ISR1" bit-position="2"  bit-size="1" description="DMA Channel 19 (SPORT2 TX)" />
@@ -227,7 +227,7 @@
 	<register name="SIC_ISR1_IRQ_CAN1_STAT"  parent="SIC_ISR1" bit-position="30" bit-size="1" description="CAN1 Status" />
 	<register name="SIC_ISR1_IRQ_DMA_BLK"    parent="SIC_ISR1" bit-position="31" bit-size="1" description="DMA R0/R1 Block" />
 
-<register name="SIC_ISR2" group="SIC" mask="FFFFFFFF" description="System Interrupt Status Register 2" bit-size="32" read-address="0xFFC00120" write-address="0xFFC00120" type="IO" target="EMU" />
+<register name="SIC_ISR2" group="SIC" mask="FFFFFFFF" description="System Interrupt Status Register 2" bit-size="32" read-address="0xFFC00120" write-address="0xFFC00120" type="IO" />
 	<register name="SIC_ISR2_IRQ_DMA15"      parent="SIC_ISR2" bit-position="0"  bit-size="1" description="DMA Channel 15 (PIXC Input 0)" />
 	<register name="SIC_ISR2_IRQ_DMA16"      parent="SIC_ISR2" bit-position="1"  bit-size="1" description="DMA Channel 16 (PIXC Input 1)" />
 	<register name="SIC_ISR2_IRQ_DMA17"      parent="SIC_ISR2" bit-position="2"  bit-size="1" description="DMA Channel 17 (PIXC Output)" />
@@ -243,7 +243,7 @@
 	<register name="SIC_ISR2_IRQ_USB_INT1"   parent="SIC_ISR2" bit-position="12" bit-size="1" description="USB1" />
 	<register name="SIC_ISR2_IRQ_USB_INT2"   parent="SIC_ISR2" bit-position="13" bit-size="1" description="USB2" />
 	<register name="SIC_ISR2_IRQ_USB_DMAINT" parent="SIC_ISR2" bit-position="14" bit-size="1" description="USB DMA" />
-	<register name="SIC_ISR2_IRQ_OTPSEC"     parent="SIC_ISR2" bit-position="15" bit-size="1" description="OTPSEC" />
+	<register name="SIC_ISR2_IRQ_OTP"        parent="SIC_ISR2" bit-position="15" bit-size="1" description="OTP" />
 	<!-- bits 16 - 21 are unused -->
 	<register name="SIC_ISR2_IRQ_TIMER0"     parent="SIC_ISR2" bit-position="22" bit-size="1" description="Timer 0" />
 	<register name="SIC_ISR2_IRQ_TIMER1"     parent="SIC_ISR2" bit-position="23" bit-size="1" description="Timer 1" />
@@ -256,7 +256,7 @@
 	<register name="SIC_ISR2_IRQ_PINT2"      parent="SIC_ISR2" bit-position="30" bit-size="1" description="Pin Interrupt 2" />
 	<register name="SIC_ISR2_IRQ_PINT3"      parent="SIC_ISR2" bit-position="31" bit-size="1" description="Pin Interrupt 3" />
 
-<register name="SIC_IWR0" group="SIC" mask="FFFFFFFF" description="System Interrupt Wakeup Register 0" bit-size="32" read-address="0xFFC00124" write-address="0xFFC00124" type="IO" target="EMU" />
+<register name="SIC_IWR0" group="SIC" mask="FFFFFFFF" description="System Interrupt Wakeup Register 0" bit-size="32" read-address="0xFFC00124" write-address="0xFFC00124" type="IO" />
 	<register name="SIC_IWR0_IRQ_PLL_WAKEUP" parent="SIC_IWR0" bit-position="0"  bit-size="1" description="PLL Wakeup" />
 	<register name="SIC_IWR0_IRQ_DMAC0_ERR"  parent="SIC_IWR0" bit-position="1"  bit-size="1" description="DMA Controller 0 Error (generic)" />
 	<register name="SIC_IWR0_IRQ_EPPI0_ERR"  parent="SIC_IWR0" bit-position="2"  bit-size="1" description="EPPI0 Error" />
@@ -290,7 +290,7 @@
 	<register name="SIC_IWR0_IRQ_UART1_STAT" parent="SIC_IWR0" bit-position="30" bit-size="1" description="UART1 Status" />
 	<register name="SIC_IWR0_IRQ_UART2_STAT" parent="SIC_IWR0" bit-position="31" bit-size="1" description="UART2 Status" />
 
-<register name="SIC_IWR1" group="SIC" mask="FFFFFFFF" description="System Interrupt Wakeup Register 1" bit-size="32" read-address="0xFFC00128" write-address="0xFFC00128" type="IO" target="EMU" />
+<register name="SIC_IWR1" group="SIC" mask="FFFFFFFF" description="System Interrupt Wakeup Register 1" bit-size="32" read-address="0xFFC00128" write-address="0xFFC00128" type="IO" />
 	<register name="SIC_IWR1_IRQ_CAN0_STAT"  parent="SIC_IWR1" bit-position="0"  bit-size="1" description="CAN0 Status" />
 	<register name="SIC_IWR1_IRQ_DMA18"      parent="SIC_IWR1" bit-position="1"  bit-size="1" description="DMA Channel 18 (SPORT2 RX)" />
 	<register name="SIC_IWR1_IRQ_DMA19"      parent="SIC_IWR1" bit-position="2"  bit-size="1" description="DMA Channel 19 (SPORT2 TX)" />
@@ -324,7 +324,7 @@
 	<register name="SIC_IWR1_IRQ_CAN1_STAT"  parent="SIC_IWR1" bit-position="30" bit-size="1" description="CAN1 Status" />
 	<register name="SIC_IWR1_IRQ_DMA_BLK"    parent="SIC_IWR1" bit-position="31" bit-size="1" description="DMA R0/R1 Block" />
 
-<register name="SIC_IWR2" group="SIC" mask="FFFFFFFF" description="System Interrupt Wakeup Register 2" bit-size="32" read-address="0xFFC0012C" write-address="0xFFC0012C" type="IO" target="EMU" />
+<register name="SIC_IWR2" group="SIC" mask="FFFFFFFF" description="System Interrupt Wakeup Register 2" bit-size="32" read-address="0xFFC0012C" write-address="0xFFC0012C" type="IO" />
 	<register name="SIC_IWR2_IRQ_DMA15"      parent="SIC_IWR2" bit-position="0"  bit-size="1" description="DMA Channel 15 (PIXC Input 0)" />
 	<register name="SIC_IWR2_IRQ_DMA16"      parent="SIC_IWR2" bit-position="1"  bit-size="1" description="DMA Channel 16 (PIXC Input 1)" />
 	<register name="SIC_IWR2_IRQ_DMA17"      parent="SIC_IWR2" bit-position="2"  bit-size="1" description="DMA Channel 17 (PIXC Output)" />
@@ -340,7 +340,7 @@
 	<register name="SIC_IWR2_IRQ_USB_INT1"   parent="SIC_IWR2" bit-position="12" bit-size="1" description="USB1" />
 	<register name="SIC_IWR2_IRQ_USB_INT2"   parent="SIC_IWR2" bit-position="13" bit-size="1" description="USB2" />
 	<register name="SIC_IWR2_IRQ_USB_DMAINT" parent="SIC_IWR2" bit-position="14" bit-size="1" description="USB DMA" />
-	<register name="SIC_IWR2_IRQ_OTPSEC"     parent="SIC_IWR2" bit-position="15" bit-size="1" description="OTPSEC" />
+	<register name="SIC_IWR2_IRQ_OTP"        parent="SIC_IWR2" bit-position="15" bit-size="1" description="OTP" />
 	<!-- bits 16 - 21 are unused -->
 	<register name="SIC_IWR2_IRQ_TIMER0"     parent="SIC_IWR2" bit-position="22" bit-size="1" description="Timer 0" />
 	<register name="SIC_IWR2_IRQ_TIMER1"     parent="SIC_IWR2" bit-position="23" bit-size="1" description="Timer 1" />
@@ -353,18 +353,18 @@
 	<register name="SIC_IWR2_IRQ_PINT2"      parent="SIC_IWR2" bit-position="30" bit-size="1" description="Pin Interrupt 2" />
 	<register name="SIC_IWR2_IRQ_PINT3"      parent="SIC_IWR2" bit-position="31" bit-size="1" description="Pin Interrupt 3" />
 
-<register name="SIC_IAR0" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 0" bit-size="32" read-address="0xFFC00130" write-address="0xFFC00130" type="IO" target="EMU" />
-<register name="SIC_IAR1" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 1" bit-size="32" read-address="0xFFC00134" write-address="0xFFC00134" type="IO" target="EMU" />
-<register name="SIC_IAR2" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 2" bit-size="32" read-address="0xFFC00138" write-address="0xFFC00138" type="IO" target="EMU" />
-<register name="SIC_IAR3" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 3" bit-size="32" read-address="0xFFC0013C" write-address="0xFFC0013C" type="IO" target="EMU" />
-<register name="SIC_IAR4" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 4" bit-size="32" read-address="0xFFC00140" write-address="0xFFC00140" type="IO" target="EMU" />
-<register name="SIC_IAR5" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 5" bit-size="32" read-address="0xFFC00144" write-address="0xFFC00144" type="IO" target="EMU" />
-<register name="SIC_IAR6" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 6" bit-size="32" read-address="0xFFC00148" write-address="0xFFC00148" type="IO" target="EMU" />
-<register name="SIC_IAR7" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 7" bit-size="32" read-address="0xFFC0014C" write-address="0xFFC0014C" type="IO" target="EMU" />
-<register name="SIC_IAR8" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 8" bit-size="32" read-address="0xFFC00150" write-address="0xFFC00150" type="IO" target="EMU" />
-<register name="SIC_IAR9" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 9" bit-size="32" read-address="0xFFC00154" write-address="0xFFC00154" type="IO" target="EMU" />
-<register name="SIC_IAR10" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 10" bit-size="32" read-address="0xFFC00158" write-address="0xFFC00158" type="IO" target="EMU" />
-<register name="SIC_IAR11" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 11" bit-size="32" read-address="0xFFC0015C" write-address="0xFFC0015C" type="IO" target="EMU" />
+<register name="SIC_IAR0" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 0" bit-size="32" read-address="0xFFC00130" write-address="0xFFC00130" type="IO" />
+<register name="SIC_IAR1" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 1" bit-size="32" read-address="0xFFC00134" write-address="0xFFC00134" type="IO" />
+<register name="SIC_IAR2" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 2" bit-size="32" read-address="0xFFC00138" write-address="0xFFC00138" type="IO" />
+<register name="SIC_IAR3" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 3" bit-size="32" read-address="0xFFC0013C" write-address="0xFFC0013C" type="IO" />
+<register name="SIC_IAR4" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 4" bit-size="32" read-address="0xFFC00140" write-address="0xFFC00140" type="IO" />
+<register name="SIC_IAR5" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 5" bit-size="32" read-address="0xFFC00144" write-address="0xFFC00144" type="IO" />
+<register name="SIC_IAR6" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 6" bit-size="32" read-address="0xFFC00148" write-address="0xFFC00148" type="IO" />
+<register name="SIC_IAR7" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 7" bit-size="32" read-address="0xFFC0014C" write-address="0xFFC0014C" type="IO" />
+<register name="SIC_IAR8" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 8" bit-size="32" read-address="0xFFC00150" write-address="0xFFC00150" type="IO" />
+<register name="SIC_IAR9" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 9" bit-size="32" read-address="0xFFC00154" write-address="0xFFC00154" type="IO" />
+<register name="SIC_IAR10" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 10" bit-size="32" read-address="0xFFC00158" write-address="0xFFC00158" type="IO" />
+<register name="SIC_IAR11" group="SIC" mask="FFFFFFFF" description="System Interrupt Assignment Register 11" bit-size="32" read-address="0xFFC0015C" write-address="0xFFC0015C" type="IO" />
 
 
 <!-- Proc HWR, chap  5, DMA Registers Definitions -->
@@ -1337,19 +1337,19 @@
 	<!--********************-->
 	<!-- MDMA Destination 0 -->
 	<!--********************-->
-<register name="MDMA_D0_NEXT_DESC_PTR"   group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 0 Destination Next Descriptor Pointer Register" bit-size="32" read-address="0xFFC00F00" write-address="0xFFC00F00" type="IO" target="EMU" cdef-type="ADDR" def-comment="MDMA Stream 0 Registers" />
-<register name="MDMA_D0_START_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 0 Destination Start Address Register" bit-size="32" read-address="0xFFC00F04" write-address="0xFFC00F04" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_D0_CONFIG"          group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Destination Configuration Register" bit-size="16" read-address="0xFFC00F08" write-address="0xFFC00F08" type="IO" target="EMU" />
-<register name="MDMA_D0_X_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Destination X Count Register" bit-size="16" read-address="0xFFC00F10" write-address="0xFFC00F10" type="IO" target="EMU" />
-<register name="MDMA_D0_X_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Destination X Modify Register" bit-size="16" read-address="0xFFC00F14" write-address="0xFFC00F14" type="IO" target="EMU" cdef-type="SIGNED" />
-<register name="MDMA_D0_Y_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Destination Y Count Register" bit-size="16" read-address="0xFFC00F18" write-address="0xFFC00F18" type="IO" target="EMU" />
-<register name="MDMA_D0_Y_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Destination Y Modify Register" bit-size="16" read-address="0xFFC00F1C" write-address="0xFFC00F1C" type="IO" target="EMU" cdef-type="SIGNED" />
-<register name="MDMA_D0_CURR_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 0 Destination Current Descriptor Pointer Register" bit-size="32" read-address="0xFFC00F20" write-address="0xFFC00F20" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_D0_CURR_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 0 Destination Current Address Register" bit-size="32" read-address="0xFFC00F24" write-address="0xFFC00F24" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_D0_IRQ_STATUS"     group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Destination Interrupt/Status Register" bit-size="16" read-address="0xFFC00F28" write-address="0xFFC00F28" type="IO" target="EMU" />
-<register name="MDMA_D0_PERIPHERAL_MAP" group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Destination Peripheral Map Register" bit-size="16" read-address="0xFFC00F2C" write-address="0xFFC00F2C" type="IO" target="EMU" />
-<register name="MDMA_D0_CURR_X_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Destination Current X Count Register" bit-size="16" read-address="0xFFC00F30" write-address="0xFFC00F30" type="IO" target="EMU" />
-<register name="MDMA_D0_CURR_Y_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Destination Current Y Count Register" bit-size="16" read-address="0xFFC00F38" write-address="0xFFC00F38" type="IO" target="EMU" />
+<register name="MDMA_D0_NEXT_DESC_PTR"   group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 0 Destination Next Descriptor Pointer Register" bit-size="32" read-address="0xFFC00F00" write-address="0xFFC00F00" type="IO" cdef-type="ADDR" def-comment="MDMA Stream 0 Registers" />
+<register name="MDMA_D0_START_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 0 Destination Start Address Register" bit-size="32" read-address="0xFFC00F04" write-address="0xFFC00F04" type="IO" cdef-type="ADDR" />
+<register name="MDMA_D0_CONFIG"          group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Destination Configuration Register" bit-size="16" read-address="0xFFC00F08" write-address="0xFFC00F08" type="IO" />
+<register name="MDMA_D0_X_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Destination X Count Register" bit-size="16" read-address="0xFFC00F10" write-address="0xFFC00F10" type="IO" />
+<register name="MDMA_D0_X_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Destination X Modify Register" bit-size="16" read-address="0xFFC00F14" write-address="0xFFC00F14" type="IO" cdef-type="SIGNED" />
+<register name="MDMA_D0_Y_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Destination Y Count Register" bit-size="16" read-address="0xFFC00F18" write-address="0xFFC00F18" type="IO" />
+<register name="MDMA_D0_Y_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Destination Y Modify Register" bit-size="16" read-address="0xFFC00F1C" write-address="0xFFC00F1C" type="IO" cdef-type="SIGNED" />
+<register name="MDMA_D0_CURR_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 0 Destination Current Descriptor Pointer Register" bit-size="32" read-address="0xFFC00F20" write-address="0xFFC00F20" type="IO" cdef-type="ADDR" />
+<register name="MDMA_D0_CURR_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 0 Destination Current Address Register" bit-size="32" read-address="0xFFC00F24" write-address="0xFFC00F24" type="IO" cdef-type="ADDR" />
+<register name="MDMA_D0_IRQ_STATUS"     group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Destination Interrupt/Status Register" bit-size="16" read-address="0xFFC00F28" write-address="0xFFC00F28" type="IO" />
+<register name="MDMA_D0_PERIPHERAL_MAP" group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Destination Peripheral Map Register" bit-size="16" read-address="0xFFC00F2C" write-address="0xFFC00F2C" type="IO" />
+<register name="MDMA_D0_CURR_X_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Destination Current X Count Register" bit-size="16" read-address="0xFFC00F30" write-address="0xFFC00F30" type="IO" />
+<register name="MDMA_D0_CURR_Y_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Destination Current Y Count Register" bit-size="16" read-address="0xFFC00F38" write-address="0xFFC00F38" type="IO" />
 
 	<!-- MDMA Destination 0 (children) -->
 	<register name="MDMA_D0_CONFIG_DMAEN"         parent="MDMA_D0_CONFIG"         bit-position="0"  bit-size="1" description="DMA Channel Enable" />
@@ -1382,19 +1382,19 @@
 	<!--***************-->
 	<!-- MDMA Source 0 -->
 	<!--***************-->
-<register name="MDMA_S0_NEXT_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 0 Source Next Descriptor Pointer Register" bit-size="32" read-address="0xFFC00F40" write-address="0xFFC00F40" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_S0_START_ADDR"     group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 0 Source Start Address Register" bit-size="32" read-address="0xFFC00F44" write-address="0xFFC00F44" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_S0_CONFIG"         group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Source Configuration Register" bit-size="16" read-address="0xFFC00F48" write-address="0xFFC00F48" type="IO" target="EMU" />
-<register name="MDMA_S0_X_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Source X Count Register" bit-size="16" read-address="0xFFC00F50" write-address="0xFFC00F50" type="IO" target="EMU" />
-<register name="MDMA_S0_X_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Source X Modify Register" bit-size="16" read-address="0xFFC00F54" write-address="0xFFC00F54" type="IO" target="EMU" cdef-type="SIGNED" />
-<register name="MDMA_S0_Y_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Source Y Count Register" bit-size="16" read-address="0xFFC00F58" write-address="0xFFC00F58" type="IO" target="EMU" />
-<register name="MDMA_S0_Y_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Source Y Modify Register" bit-size="16" read-address="0xFFC00F5C" write-address="0xFFC00F5C" type="IO" target="EMU" cdef-type="SIGNED" />
-<register name="MDMA_S0_CURR_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 0 Source Current Descriptor Pointer Register" bit-size="32" read-address="0xFFC00F60" write-address="0xFFC00F60" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_S0_CURR_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 0 Source Current Address Register" bit-size="32" read-address="0xFFC00F64" write-address="0xFFC00F64" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_S0_IRQ_STATUS"     group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Source Interrupt/Status Register" bit-size="16" read-address="0xFFC00F68" write-address="0xFFC00F68" type="IO" target="EMU" />
-<register name="MDMA_S0_PERIPHERAL_MAP" group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Source Peripheral Map Register" bit-size="16" read-address="0xFFC00F6C" write-address="0xFFC00F6C" type="IO" target="EMU" />
-<register name="MDMA_S0_CURR_X_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Source Current X Count Register" bit-size="16" read-address="0xFFC00F70" write-address="0xFFC00F70" type="IO" target="EMU" />
-<register name="MDMA_S0_CURR_Y_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Source Current Y Count Register" bit-size="16" read-address="0xFFC00F78" write-address="0xFFC00F78" type="IO" target="EMU" />
+<register name="MDMA_S0_NEXT_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 0 Source Next Descriptor Pointer Register" bit-size="32" read-address="0xFFC00F40" write-address="0xFFC00F40" type="IO" cdef-type="ADDR" />
+<register name="MDMA_S0_START_ADDR"     group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 0 Source Start Address Register" bit-size="32" read-address="0xFFC00F44" write-address="0xFFC00F44" type="IO" cdef-type="ADDR" />
+<register name="MDMA_S0_CONFIG"         group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Source Configuration Register" bit-size="16" read-address="0xFFC00F48" write-address="0xFFC00F48" type="IO" />
+<register name="MDMA_S0_X_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Source X Count Register" bit-size="16" read-address="0xFFC00F50" write-address="0xFFC00F50" type="IO" />
+<register name="MDMA_S0_X_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Source X Modify Register" bit-size="16" read-address="0xFFC00F54" write-address="0xFFC00F54" type="IO" cdef-type="SIGNED" />
+<register name="MDMA_S0_Y_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Source Y Count Register" bit-size="16" read-address="0xFFC00F58" write-address="0xFFC00F58" type="IO" />
+<register name="MDMA_S0_Y_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Source Y Modify Register" bit-size="16" read-address="0xFFC00F5C" write-address="0xFFC00F5C" type="IO" cdef-type="SIGNED" />
+<register name="MDMA_S0_CURR_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 0 Source Current Descriptor Pointer Register" bit-size="32" read-address="0xFFC00F60" write-address="0xFFC00F60" type="IO" cdef-type="ADDR" />
+<register name="MDMA_S0_CURR_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 0 Source Current Address Register" bit-size="32" read-address="0xFFC00F64" write-address="0xFFC00F64" type="IO" cdef-type="ADDR" />
+<register name="MDMA_S0_IRQ_STATUS"     group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Source Interrupt/Status Register" bit-size="16" read-address="0xFFC00F68" write-address="0xFFC00F68" type="IO" />
+<register name="MDMA_S0_PERIPHERAL_MAP" group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Source Peripheral Map Register" bit-size="16" read-address="0xFFC00F6C" write-address="0xFFC00F6C" type="IO" />
+<register name="MDMA_S0_CURR_X_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Source Current X Count Register" bit-size="16" read-address="0xFFC00F70" write-address="0xFFC00F70" type="IO" />
+<register name="MDMA_S0_CURR_Y_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 0 Source Current Y Count Register" bit-size="16" read-address="0xFFC00F78" write-address="0xFFC00F78" type="IO" />
 
 	<!-- MDMA Source 0 (children) -->
 	<register name="MDMA_S0_CONFIG_DMAEN"         parent="MDMA_S0_CONFIG"         bit-position="0"  bit-size="1" description="DMA Channel Enable" />
@@ -1427,19 +1427,19 @@
 	<!--********************-->
 	<!-- MDMA Destination 1 -->
 	<!--********************-->
-<register name="MDMA_D1_NEXT_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 1 Destination Next Descriptor Pointer Register" bit-size="32" read-address="0xFFC00F80" write-address="0xFFC00F80" type="IO" target="EMU" cdef-type="ADDR" def-comment="MDMA Stream 1 Registers" />
-<register name="MDMA_D1_START_ADDR"     group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 1 Destination Start Address Register" bit-size="32" read-address="0xFFC00F84" write-address="0xFFC00F84" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_D1_CONFIG"         group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Destination Configuration Register" bit-size="16" read-address="0xFFC00F88" write-address="0xFFC00F88" type="IO" target="EMU" />
-<register name="MDMA_D1_X_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Destination X Count Register" bit-size="16" read-address="0xFFC00F90" write-address="0xFFC00F90" type="IO" target="EMU" />
-<register name="MDMA_D1_X_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Destination X Modify Register" bit-size="16" read-address="0xFFC00F94" write-address="0xFFC00F94" type="IO" target="EMU" cdef-type="SIGNED" />
-<register name="MDMA_D1_Y_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Destination Y Count Register" bit-size="16" read-address="0xFFC00F98" write-address="0xFFC00F98" type="IO" target="EMU" />
-<register name="MDMA_D1_Y_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Destination Y Modify Register" bit-size="16" read-address="0xFFC00F9C" write-address="0xFFC00F9C" type="IO" target="EMU" cdef-type="SIGNED" />
-<register name="MDMA_D1_CURR_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 1 Destination Current Descriptor Pointer Register" bit-size="32" read-address="0xFFC00FA0" write-address="0xFFC00FA0" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_D1_CURR_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 1 Destination Current Address Register" bit-size="32" read-address="0xFFC00FA4" write-address="0xFFC00FA4" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_D1_IRQ_STATUS"     group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Destination Interrupt/Status Register" bit-size="16" read-address="0xFFC00FA8" write-address="0xFFC00FA8" type="IO" target="EMU" />
-<register name="MDMA_D1_PERIPHERAL_MAP" group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Destination Peripheral Map Register" bit-size="16" read-address="0xFFC00FAC" write-address="0xFFC00FAC" type="IO" target="EMU" />
-<register name="MDMA_D1_CURR_X_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Destination Current X Count Register" bit-size="16" read-address="0xFFC00FB0" write-address="0xFFC00FB0" type="IO" target="EMU" />
-<register name="MDMA_D1_CURR_Y_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Destination Current Y Count Register" bit-size="16" read-address="0xFFC00FB8" write-address="0xFFC00FB8" type="IO" target="EMU" />
+<register name="MDMA_D1_NEXT_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 1 Destination Next Descriptor Pointer Register" bit-size="32" read-address="0xFFC00F80" write-address="0xFFC00F80" type="IO" cdef-type="ADDR" def-comment="MDMA Stream 1 Registers" />
+<register name="MDMA_D1_START_ADDR"     group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 1 Destination Start Address Register" bit-size="32" read-address="0xFFC00F84" write-address="0xFFC00F84" type="IO" cdef-type="ADDR" />
+<register name="MDMA_D1_CONFIG"         group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Destination Configuration Register" bit-size="16" read-address="0xFFC00F88" write-address="0xFFC00F88" type="IO" />
+<register name="MDMA_D1_X_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Destination X Count Register" bit-size="16" read-address="0xFFC00F90" write-address="0xFFC00F90" type="IO" />
+<register name="MDMA_D1_X_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Destination X Modify Register" bit-size="16" read-address="0xFFC00F94" write-address="0xFFC00F94" type="IO" cdef-type="SIGNED" />
+<register name="MDMA_D1_Y_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Destination Y Count Register" bit-size="16" read-address="0xFFC00F98" write-address="0xFFC00F98" type="IO" />
+<register name="MDMA_D1_Y_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Destination Y Modify Register" bit-size="16" read-address="0xFFC00F9C" write-address="0xFFC00F9C" type="IO" cdef-type="SIGNED" />
+<register name="MDMA_D1_CURR_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 1 Destination Current Descriptor Pointer Register" bit-size="32" read-address="0xFFC00FA0" write-address="0xFFC00FA0" type="IO" cdef-type="ADDR" />
+<register name="MDMA_D1_CURR_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 1 Destination Current Address Register" bit-size="32" read-address="0xFFC00FA4" write-address="0xFFC00FA4" type="IO" cdef-type="ADDR" />
+<register name="MDMA_D1_IRQ_STATUS"     group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Destination Interrupt/Status Register" bit-size="16" read-address="0xFFC00FA8" write-address="0xFFC00FA8" type="IO" />
+<register name="MDMA_D1_PERIPHERAL_MAP" group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Destination Peripheral Map Register" bit-size="16" read-address="0xFFC00FAC" write-address="0xFFC00FAC" type="IO" />
+<register name="MDMA_D1_CURR_X_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Destination Current X Count Register" bit-size="16" read-address="0xFFC00FB0" write-address="0xFFC00FB0" type="IO" />
+<register name="MDMA_D1_CURR_Y_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Destination Current Y Count Register" bit-size="16" read-address="0xFFC00FB8" write-address="0xFFC00FB8" type="IO" />
 
 	<!-- MDMA Destination 1 (children) -->
 	<register name="MDMA_S1_CONFIG_DMAEN"         parent="MDMA_S1_CONFIG"         bit-position="0"  bit-size="1" description="DMA Channel Enable" />
@@ -1469,19 +1469,19 @@
 	<register name="MDMA_S1_PERIPHERAL_MAP_CTYPE" parent="MDMA_S1_PERIPHERAL_MAP" bit-position="6"  bit-size="1" description="DMA Channel Type" />
 	<register name="MDMA_S1_PERIPHERAL_MAP_PMAP"  parent="MDMA_S1_PERIPHERAL_MAP" bit-position="12" bit-size="4" description="Peripheral Mapped To This Channel" />
 
-<register name="MDMA_S1_NEXT_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 1 Source Next Descriptor Pointer Register" bit-size="32" read-address="0xFFC00FC0" write-address="0xFFC00FC0" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_S1_START_ADDR"     group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 1 Source Start Address Register" bit-size="32" read-address="0xFFC00FC4" write-address="0xFFC00FC4" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_S1_CONFIG"         group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Source Configuration Register" bit-size="16" read-address="0xFFC00FC8" write-address="0xFFC00FC8" type="IO" target="EMU" />
-<register name="MDMA_S1_X_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Source X Count Register" bit-size="16" read-address="0xFFC00FD0" write-address="0xFFC00FD0" type="IO" target="EMU" />
-<register name="MDMA_S1_X_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Source X Modify Register" bit-size="16" read-address="0xFFC00FD4" write-address="0xFFC00FD4" type="IO" target="EMU" cdef-type="SIGNED" />
-<register name="MDMA_S1_Y_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Source Y Count Register" bit-size="16" read-address="0xFFC00FD8" write-address="0xFFC00FD8" type="IO" target="EMU" />
-<register name="MDMA_S1_Y_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Source Y Modify Register" bit-size="16" read-address="0xFFC00FDC" write-address="0xFFC00FDC" type="IO" target="EMU" cdef-type="SIGNED" />
-<register name="MDMA_S1_CURR_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 1 Source Current Descriptor Pointer Register" bit-size="32" read-address="0xFFC00FE0" write-address="0xFFC00FE0" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_S1_CURR_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 1 Source Current Address Register" bit-size="32" read-address="0xFFC00FE4" write-address="0xFFC00FE4" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_S1_IRQ_STATUS"     group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Source Interrupt/Status Register" bit-size="16" read-address="0xFFC00FE8" write-address="0xFFC00FE8" type="IO" target="EMU" />
-<register name="MDMA_S1_PERIPHERAL_MAP" group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Source Peripheral Map Register" bit-size="16" read-address="0xFFC00FEC" write-address="0xFFC00FEC" type="IO" target="EMU" />
-<register name="MDMA_S1_CURR_X_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Source Current X Count Register" bit-size="16" read-address="0xFFC00FF0" write-address="0xFFC00FF0" type="IO" target="EMU" />
-<register name="MDMA_S1_CURR_Y_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Source Current Y Count Register" bit-size="16" read-address="0xFFC00FF8" write-address="0xFFC00FF8" type="IO" target="EMU" />
+<register name="MDMA_S1_NEXT_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 1 Source Next Descriptor Pointer Register" bit-size="32" read-address="0xFFC00FC0" write-address="0xFFC00FC0" type="IO" cdef-type="ADDR" />
+<register name="MDMA_S1_START_ADDR"     group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 1 Source Start Address Register" bit-size="32" read-address="0xFFC00FC4" write-address="0xFFC00FC4" type="IO" cdef-type="ADDR" />
+<register name="MDMA_S1_CONFIG"         group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Source Configuration Register" bit-size="16" read-address="0xFFC00FC8" write-address="0xFFC00FC8" type="IO" />
+<register name="MDMA_S1_X_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Source X Count Register" bit-size="16" read-address="0xFFC00FD0" write-address="0xFFC00FD0" type="IO" />
+<register name="MDMA_S1_X_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Source X Modify Register" bit-size="16" read-address="0xFFC00FD4" write-address="0xFFC00FD4" type="IO" cdef-type="SIGNED" />
+<register name="MDMA_S1_Y_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Source Y Count Register" bit-size="16" read-address="0xFFC00FD8" write-address="0xFFC00FD8" type="IO" />
+<register name="MDMA_S1_Y_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Source Y Modify Register" bit-size="16" read-address="0xFFC00FDC" write-address="0xFFC00FDC" type="IO" cdef-type="SIGNED" />
+<register name="MDMA_S1_CURR_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 1 Source Current Descriptor Pointer Register" bit-size="32" read-address="0xFFC00FE0" write-address="0xFFC00FE0" type="IO" cdef-type="ADDR" />
+<register name="MDMA_S1_CURR_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 1 Source Current Address Register" bit-size="32" read-address="0xFFC00FE4" write-address="0xFFC00FE4" type="IO" cdef-type="ADDR" />
+<register name="MDMA_S1_IRQ_STATUS"     group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Source Interrupt/Status Register" bit-size="16" read-address="0xFFC00FE8" write-address="0xFFC00FE8" type="IO" />
+<register name="MDMA_S1_PERIPHERAL_MAP" group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Source Peripheral Map Register" bit-size="16" read-address="0xFFC00FEC" write-address="0xFFC00FEC" type="IO" />
+<register name="MDMA_S1_CURR_X_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Source Current X Count Register" bit-size="16" read-address="0xFFC00FF0" write-address="0xFFC00FF0" type="IO" />
+<register name="MDMA_S1_CURR_Y_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 1 Source Current Y Count Register" bit-size="16" read-address="0xFFC00FF8" write-address="0xFFC00FF8" type="IO" />
 
 	<!-- MDMA Source 1 (children) -->
 	<register name="MDMA_D1_CONFIG_DMAEN"         parent="MDMA_D1_CONFIG"         bit-position="0"  bit-size="1" description="DMA Channel Enable" />
@@ -1511,19 +1511,19 @@
 	<register name="MDMA_D1_PERIPHERAL_MAP_CTYPE" parent="MDMA_D1_PERIPHERAL_MAP" bit-position="6"  bit-size="1" description="DMA Channel Type" />
 	<register name="MDMA_D1_PERIPHERAL_MAP_PMAP"  parent="MDMA_D1_PERIPHERAL_MAP" bit-position="12" bit-size="4" description="Peripheral Mapped To This Channel" />
 
-<register name="MDMA_D2_NEXT_DESC_PTR"   group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 2 Destination Next Descriptor Pointer Register" bit-size="32" read-address="0xFFC01F00" write-address="0xFFC01F00" type="IO" target="EMU" cdef-type="ADDR" def-comment="MDMA Stream 2 Registers" />
-<register name="MDMA_D2_START_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 2 Destination Start Address Register" bit-size="32" read-address="0xFFC01F04" write-address="0xFFC01F04" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_D2_CONFIG"          group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Destination Configuration Register" bit-size="16" read-address="0xFFC01F08" write-address="0xFFC01F08" type="IO" target="EMU" />
-<register name="MDMA_D2_X_COUNT"         group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Destination X Count Register" bit-size="16" read-address="0xFFC01F10" write-address="0xFFC01F10" type="IO" target="EMU" />
-<register name="MDMA_D2_X_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Destination X Modify Register" bit-size="16" read-address="0xFFC01F14" write-address="0xFFC01F14" type="IO" target="EMU" cdef-type="SIGNED" />
-<register name="MDMA_D2_Y_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Destination Y Count Register" bit-size="16" read-address="0xFFC01F18" write-address="0xFFC01F18" type="IO" target="EMU" />
-<register name="MDMA_D2_Y_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Destination Y Modify Register" bit-size="16" read-address="0xFFC01F1C" write-address="0xFFC01F1C" type="IO" target="EMU" cdef-type="SIGNED" />
-<register name="MDMA_D2_CURR_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 2 Destination Current Descriptor Pointer Register" bit-size="32" read-address="0xFFC01F20" write-address="0xFFC01F20" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_D2_CURR_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 2 Destination Current Address Register" bit-size="32" read-address="0xFFC01F24" write-address="0xFFC01F24" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_D2_IRQ_STATUS"     group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Destination Interrupt/Status Register" bit-size="16" read-address="0xFFC01F28" write-address="0xFFC01F28" type="IO" target="EMU" />
-<register name="MDMA_D2_PERIPHERAL_MAP" group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Destination Peripheral Map Register" bit-size="16" read-address="0xFFC01F2C" write-address="0xFFC01F2C" type="IO" target="EMU" />
-<register name="MDMA_D2_CURR_X_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Destination Current X Count Register" bit-size="16" read-address="0xFFC01F30" write-address="0xFFC01F30" type="IO" target="EMU" />
-<register name="MDMA_D2_CURR_Y_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Destination Current Y Count Register" bit-size="16" read-address="0xFFC01F38" write-address="0xFFC01F38" type="IO" target="EMU" />
+<register name="MDMA_D2_NEXT_DESC_PTR"   group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 2 Destination Next Descriptor Pointer Register" bit-size="32" read-address="0xFFC01F00" write-address="0xFFC01F00" type="IO" cdef-type="ADDR" def-comment="MDMA Stream 2 Registers" />
+<register name="MDMA_D2_START_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 2 Destination Start Address Register" bit-size="32" read-address="0xFFC01F04" write-address="0xFFC01F04" type="IO" cdef-type="ADDR" />
+<register name="MDMA_D2_CONFIG"          group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Destination Configuration Register" bit-size="16" read-address="0xFFC01F08" write-address="0xFFC01F08" type="IO" />
+<register name="MDMA_D2_X_COUNT"         group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Destination X Count Register" bit-size="16" read-address="0xFFC01F10" write-address="0xFFC01F10" type="IO" />
+<register name="MDMA_D2_X_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Destination X Modify Register" bit-size="16" read-address="0xFFC01F14" write-address="0xFFC01F14" type="IO" cdef-type="SIGNED" />
+<register name="MDMA_D2_Y_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Destination Y Count Register" bit-size="16" read-address="0xFFC01F18" write-address="0xFFC01F18" type="IO" />
+<register name="MDMA_D2_Y_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Destination Y Modify Register" bit-size="16" read-address="0xFFC01F1C" write-address="0xFFC01F1C" type="IO" cdef-type="SIGNED" />
+<register name="MDMA_D2_CURR_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 2 Destination Current Descriptor Pointer Register" bit-size="32" read-address="0xFFC01F20" write-address="0xFFC01F20" type="IO" cdef-type="ADDR" />
+<register name="MDMA_D2_CURR_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 2 Destination Current Address Register" bit-size="32" read-address="0xFFC01F24" write-address="0xFFC01F24" type="IO" cdef-type="ADDR" />
+<register name="MDMA_D2_IRQ_STATUS"     group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Destination Interrupt/Status Register" bit-size="16" read-address="0xFFC01F28" write-address="0xFFC01F28" type="IO" />
+<register name="MDMA_D2_PERIPHERAL_MAP" group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Destination Peripheral Map Register" bit-size="16" read-address="0xFFC01F2C" write-address="0xFFC01F2C" type="IO" />
+<register name="MDMA_D2_CURR_X_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Destination Current X Count Register" bit-size="16" read-address="0xFFC01F30" write-address="0xFFC01F30" type="IO" />
+<register name="MDMA_D2_CURR_Y_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Destination Current Y Count Register" bit-size="16" read-address="0xFFC01F38" write-address="0xFFC01F38" type="IO" />
 
 	<!-- MDMA Destination 2 (children) -->
 	<register name="MDMA_D2_CONFIG_DMAEN"         parent="MDMA_D2_CONFIG"         bit-position="0"  bit-size="1" description="DMA Channel Enable" />
@@ -1553,19 +1553,19 @@
 	<register name="MDMA_D2_PERIPHERAL_MAP_CTYPE" parent="MDMA_D2_PERIPHERAL_MAP" bit-position="6"  bit-size="1" description="DMA Channel Type" />
 	<register name="MDMA_D2_PERIPHERAL_MAP_PMAP"  parent="MDMA_D2_PERIPHERAL_MAP" bit-position="12" bit-size="4" description="Peripheral Mapped To This Channel" />
 
-<register name="MDMA_S2_NEXT_DESC_PTR"   group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 2 Source Next Descriptor Pointer Register" bit-size="32" read-address="0xFFC01F40" write-address="0xFFC01F40" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_S2_START_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 2 Source Start Address Register" bit-size="32" read-address="0xFFC01F44" write-address="0xFFC01F44" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_S2_CONFIG"          group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Source Configuration Register" bit-size="16" read-address="0xFFC01F48" write-address="0xFFC01F48" type="IO" target="EMU" />
-<register name="MDMA_S2_X_COUNT"         group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Source X Count Register" bit-size="16" read-address="0xFFC01F50" write-address="0xFFC01F50" type="IO" target="EMU" />
-<register name="MDMA_S2_X_MODIFY"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Source X Modify Register" bit-size="16" read-address="0xFFC01F54" write-address="0xFFC01F54" type="IO" target="EMU" cdef-type="SIGNED" />
-<register name="MDMA_S2_Y_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Source Y Count Register" bit-size="16" read-address="0xFFC01F58" write-address="0xFFC01F58" type="IO" target="EMU" />
-<register name="MDMA_S2_Y_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Source Y Modify Register" bit-size="16" read-address="0xFFC01F5C" write-address="0xFFC01F5C" type="IO" target="EMU" cdef-type="SIGNED" />
-<register name="MDMA_S2_CURR_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 2 Source Current Descriptor Pointer Register" bit-size="32" read-address="0xFFC01F60" write-address="0xFFC01F60" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_S2_CURR_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 2 Source Current Address Register" bit-size="32" read-address="0xFFC01F64" write-address="0xFFC01F64" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_S2_IRQ_STATUS"     group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Source Interrupt/Status Register" bit-size="16" read-address="0xFFC01F68" write-address="0xFFC01F68" type="IO" target="EMU" />
-<register name="MDMA_S2_PERIPHERAL_MAP" group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Source Peripheral Map Register" bit-size="16" read-address="0xFFC01F6C" write-address="0xFFC01F6C" type="IO" target="EMU" />
-<register name="MDMA_S2_CURR_X_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Source Current X Count Register" bit-size="16" read-address="0xFFC01F70" write-address="0xFFC01F70" type="IO" target="EMU" />
-<register name="MDMA_S2_CURR_Y_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Source Current Y Count Register" bit-size="16" read-address="0xFFC01F78" write-address="0xFFC01F78" type="IO" target="EMU" />
+<register name="MDMA_S2_NEXT_DESC_PTR"   group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 2 Source Next Descriptor Pointer Register" bit-size="32" read-address="0xFFC01F40" write-address="0xFFC01F40" type="IO" cdef-type="ADDR" />
+<register name="MDMA_S2_START_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 2 Source Start Address Register" bit-size="32" read-address="0xFFC01F44" write-address="0xFFC01F44" type="IO" cdef-type="ADDR" />
+<register name="MDMA_S2_CONFIG"          group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Source Configuration Register" bit-size="16" read-address="0xFFC01F48" write-address="0xFFC01F48" type="IO" />
+<register name="MDMA_S2_X_COUNT"         group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Source X Count Register" bit-size="16" read-address="0xFFC01F50" write-address="0xFFC01F50" type="IO" />
+<register name="MDMA_S2_X_MODIFY"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Source X Modify Register" bit-size="16" read-address="0xFFC01F54" write-address="0xFFC01F54" type="IO" cdef-type="SIGNED" />
+<register name="MDMA_S2_Y_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Source Y Count Register" bit-size="16" read-address="0xFFC01F58" write-address="0xFFC01F58" type="IO" />
+<register name="MDMA_S2_Y_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Source Y Modify Register" bit-size="16" read-address="0xFFC01F5C" write-address="0xFFC01F5C" type="IO" cdef-type="SIGNED" />
+<register name="MDMA_S2_CURR_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 2 Source Current Descriptor Pointer Register" bit-size="32" read-address="0xFFC01F60" write-address="0xFFC01F60" type="IO" cdef-type="ADDR" />
+<register name="MDMA_S2_CURR_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 2 Source Current Address Register" bit-size="32" read-address="0xFFC01F64" write-address="0xFFC01F64" type="IO" cdef-type="ADDR" />
+<register name="MDMA_S2_IRQ_STATUS"     group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Source Interrupt/Status Register" bit-size="16" read-address="0xFFC01F68" write-address="0xFFC01F68" type="IO" />
+<register name="MDMA_S2_PERIPHERAL_MAP" group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Source Peripheral Map Register" bit-size="16" read-address="0xFFC01F6C" write-address="0xFFC01F6C" type="IO" />
+<register name="MDMA_S2_CURR_X_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Source Current X Count Register" bit-size="16" read-address="0xFFC01F70" write-address="0xFFC01F70" type="IO" />
+<register name="MDMA_S2_CURR_Y_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 2 Source Current Y Count Register" bit-size="16" read-address="0xFFC01F78" write-address="0xFFC01F78" type="IO" />
 
 	<!-- MDMA Source 2 (children) -->
 	<register name="MDMA_S2_CONFIG_DMAEN"         parent="MDMA_S2_CONFIG"         bit-position="0"  bit-size="1" description="DMA Channel Enable" />
@@ -1595,19 +1595,19 @@
 	<register name="MDMA_S2_PERIPHERAL_MAP_CTYPE" parent="MDMA_S2_PERIPHERAL_MAP" bit-position="6"  bit-size="1" description="DMA Channel Type" />
 	<register name="MDMA_S2_PERIPHERAL_MAP_PMAP"  parent="MDMA_S2_PERIPHERAL_MAP" bit-position="12" bit-size="4" description="Peripheral Mapped To This Channel" />
 
-<register name="MDMA_D3_NEXT_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 3 Destination Next Descriptor Pointer Register" bit-size="32" read-address="0xFFC01F80" write-address="0xFFC01F80" type="IO" target="EMU" cdef-type="ADDR" def-comment="MDMA Stream 3 Registers" />
-<register name="MDMA_D3_START_ADDR"     group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 3 Destination Start Address Register" bit-size="32" read-address="0xFFC01F84" write-address="0xFFC01F84" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_D3_CONFIG"         group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Destination Configuration Register" bit-size="16" read-address="0xFFC01F88" write-address="0xFFC01F88" type="IO" target="EMU" />
-<register name="MDMA_D3_X_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Destination X Count Register" bit-size="16" read-address="0xFFC01F90" write-address="0xFFC01F90" type="IO" target="EMU" />
-<register name="MDMA_D3_X_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Destination X Modify Register" bit-size="16" read-address="0xFFC01F94" write-address="0xFFC01F94" type="IO" target="EMU" cdef-type="SIGNED" />
-<register name="MDMA_D3_Y_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Destination Y Count Register" bit-size="16" read-address="0xFFC01F98" write-address="0xFFC01F98" type="IO" target="EMU" />
-<register name="MDMA_D3_Y_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Destination Y Modify Register" bit-size="16" read-address="0xFFC01F9C" write-address="0xFFC01F9C" type="IO" target="EMU" cdef-type="SIGNED" />
-<register name="MDMA_D3_CURR_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 3 Destination Current Descriptor Pointer Register" bit-size="32" read-address="0xFFC01FA0" write-address="0xFFC01FA0" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_D3_CURR_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 3 Destination Current Address Register" bit-size="32" read-address="0xFFC01FA4" write-address="0xFFC01FA4" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_D3_IRQ_STATUS"     group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Destination Interrupt/Status Register" bit-size="16" read-address="0xFFC01FA8" write-address="0xFFC01FA8" type="IO" target="EMU" />
-<register name="MDMA_D3_PERIPHERAL_MAP" group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Destination Peripheral Map Register" bit-size="16" read-address="0xFFC01FAC" write-address="0xFFC01FAC" type="IO" target="EMU" />
-<register name="MDMA_D3_CURR_X_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Destination Current X Count Register" bit-size="16" read-address="0xFFC01FB0" write-address="0xFFC01FB0" type="IO" target="EMU" />
-<register name="MDMA_D3_CURR_Y_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Destination Current Y Count Register" bit-size="16" read-address="0xFFC01FB8" write-address="0xFFC01FB8" type="IO" target="EMU" />
+<register name="MDMA_D3_NEXT_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 3 Destination Next Descriptor Pointer Register" bit-size="32" read-address="0xFFC01F80" write-address="0xFFC01F80" type="IO" cdef-type="ADDR" def-comment="MDMA Stream 3 Registers" />
+<register name="MDMA_D3_START_ADDR"     group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 3 Destination Start Address Register" bit-size="32" read-address="0xFFC01F84" write-address="0xFFC01F84" type="IO" cdef-type="ADDR" />
+<register name="MDMA_D3_CONFIG"         group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Destination Configuration Register" bit-size="16" read-address="0xFFC01F88" write-address="0xFFC01F88" type="IO" />
+<register name="MDMA_D3_X_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Destination X Count Register" bit-size="16" read-address="0xFFC01F90" write-address="0xFFC01F90" type="IO" />
+<register name="MDMA_D3_X_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Destination X Modify Register" bit-size="16" read-address="0xFFC01F94" write-address="0xFFC01F94" type="IO" cdef-type="SIGNED" />
+<register name="MDMA_D3_Y_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Destination Y Count Register" bit-size="16" read-address="0xFFC01F98" write-address="0xFFC01F98" type="IO" />
+<register name="MDMA_D3_Y_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Destination Y Modify Register" bit-size="16" read-address="0xFFC01F9C" write-address="0xFFC01F9C" type="IO" cdef-type="SIGNED" />
+<register name="MDMA_D3_CURR_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 3 Destination Current Descriptor Pointer Register" bit-size="32" read-address="0xFFC01FA0" write-address="0xFFC01FA0" type="IO" cdef-type="ADDR" />
+<register name="MDMA_D3_CURR_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 3 Destination Current Address Register" bit-size="32" read-address="0xFFC01FA4" write-address="0xFFC01FA4" type="IO" cdef-type="ADDR" />
+<register name="MDMA_D3_IRQ_STATUS"     group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Destination Interrupt/Status Register" bit-size="16" read-address="0xFFC01FA8" write-address="0xFFC01FA8" type="IO" />
+<register name="MDMA_D3_PERIPHERAL_MAP" group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Destination Peripheral Map Register" bit-size="16" read-address="0xFFC01FAC" write-address="0xFFC01FAC" type="IO" />
+<register name="MDMA_D3_CURR_X_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Destination Current X Count Register" bit-size="16" read-address="0xFFC01FB0" write-address="0xFFC01FB0" type="IO" />
+<register name="MDMA_D3_CURR_Y_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Destination Current Y Count Register" bit-size="16" read-address="0xFFC01FB8" write-address="0xFFC01FB8" type="IO" />
 
 	<!-- MDMA Destination 3 (children) -->
 	<register name="MDMA_D3_CONFIG_DMAEN"         parent="MDMA_D3_CONFIG"         bit-position="0"  bit-size="1" description="DMA Channel Enable" />
@@ -1637,19 +1637,19 @@
 	<register name="MDMA_D3_PERIPHERAL_MAP_CTYPE" parent="MDMA_D3_PERIPHERAL_MAP" bit-position="6"  bit-size="1" description="DMA Channel Type" />
 	<register name="MDMA_D3_PERIPHERAL_MAP_PMAP"  parent="MDMA_D3_PERIPHERAL_MAP" bit-position="12" bit-size="4" description="Peripheral Mapped To This Channel" />
 
-<register name="MDMA_S3_NEXT_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 3 Source Next Descriptor Pointer Register" bit-size="32" read-address="0xFFC01FC0" write-address="0xFFC01FC0" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_S3_START_ADDR"     group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 3 Source Start Address Register" bit-size="32" read-address="0xFFC01FC4" write-address="0xFFC01FC4" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_S3_CONFIG"         group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Source Configuration Register" bit-size="16" read-address="0xFFC01FC8" write-address="0xFFC01FC8" type="IO" target="EMU" />
-<register name="MDMA_S3_X_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Source X Count Register" bit-size="16" read-address="0xFFC01FD0" write-address="0xFFC01FD0" type="IO" target="EMU" />
-<register name="MDMA_S3_X_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Source X Modify Register" bit-size="16" read-address="0xFFC01FD4" write-address="0xFFC01FD4" type="IO" target="EMU" cdef-type="SIGNED" />
-<register name="MDMA_S3_Y_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Source Y Count Register" bit-size="16" read-address="0xFFC01FD8" write-address="0xFFC01FD8" type="IO" target="EMU" />
-<register name="MDMA_S3_Y_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Source Y Modify Register" bit-size="16" read-address="0xFFC01FDC" write-address="0xFFC01FDC" type="IO" target="EMU" cdef-type="SIGNED" />
-<register name="MDMA_S3_CURR_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 3 Source Current Descriptor Pointer Register" bit-size="32" read-address="0xFFC01FE0" write-address="0xFFC01FE0" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_S3_CURR_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 3 Source Current Address Register" bit-size="32" read-address="0xFFC01FE4" write-address="0xFFC01FE4" type="IO" target="EMU" cdef-type="ADDR" />
-<register name="MDMA_S3_IRQ_STATUS"     group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Source Interrupt/Status Register" bit-size="16" read-address="0xFFC01FE8" write-address="0xFFC01FE8" type="IO" target="EMU" />
-<register name="MDMA_S3_PERIPHERAL_MAP" group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Source Peripheral Map Register" bit-size="16" read-address="0xFFC01FEC" write-address="0xFFC01FEC" type="IO" target="EMU" />
-<register name="MDMA_S3_CURR_X_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Source Current X Count Register" bit-size="16" read-address="0xFFC01FF0" write-address="0xFFC01FF0" type="IO" target="EMU" />
-<register name="MDMA_S3_CURR_Y_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Source Current Y Count Register" bit-size="16" read-address="0xFFC01FF8" write-address="0xFFC01FF8" type="IO" target="EMU" />
+<register name="MDMA_S3_NEXT_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 3 Source Next Descriptor Pointer Register" bit-size="32" read-address="0xFFC01FC0" write-address="0xFFC01FC0" type="IO" cdef-type="ADDR" />
+<register name="MDMA_S3_START_ADDR"     group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 3 Source Start Address Register" bit-size="32" read-address="0xFFC01FC4" write-address="0xFFC01FC4" type="IO" cdef-type="ADDR" />
+<register name="MDMA_S3_CONFIG"         group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Source Configuration Register" bit-size="16" read-address="0xFFC01FC8" write-address="0xFFC01FC8" type="IO" />
+<register name="MDMA_S3_X_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Source X Count Register" bit-size="16" read-address="0xFFC01FD0" write-address="0xFFC01FD0" type="IO" />
+<register name="MDMA_S3_X_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Source X Modify Register" bit-size="16" read-address="0xFFC01FD4" write-address="0xFFC01FD4" type="IO" cdef-type="SIGNED" />
+<register name="MDMA_S3_Y_COUNT"        group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Source Y Count Register" bit-size="16" read-address="0xFFC01FD8" write-address="0xFFC01FD8" type="IO" />
+<register name="MDMA_S3_Y_MODIFY"       group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Source Y Modify Register" bit-size="16" read-address="0xFFC01FDC" write-address="0xFFC01FDC" type="IO" cdef-type="SIGNED" />
+<register name="MDMA_S3_CURR_DESC_PTR"  group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 3 Source Current Descriptor Pointer Register" bit-size="32" read-address="0xFFC01FE0" write-address="0xFFC01FE0" type="IO" cdef-type="ADDR" />
+<register name="MDMA_S3_CURR_ADDR"      group="MDMA" mask="FFFFFFFF" description="Memory DMA Stream 3 Source Current Address Register" bit-size="32" read-address="0xFFC01FE4" write-address="0xFFC01FE4" type="IO" cdef-type="ADDR" />
+<register name="MDMA_S3_IRQ_STATUS"     group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Source Interrupt/Status Register" bit-size="16" read-address="0xFFC01FE8" write-address="0xFFC01FE8" type="IO" />
+<register name="MDMA_S3_PERIPHERAL_MAP" group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Source Peripheral Map Register" bit-size="16" read-address="0xFFC01FEC" write-address="0xFFC01FEC" type="IO" />
+<register name="MDMA_S3_CURR_X_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Source Current X Count Register" bit-size="16" read-address="0xFFC01FF0" write-address="0xFFC01FF0" type="IO" />
+<register name="MDMA_S3_CURR_Y_COUNT"   group="MDMA" mask="FFFF"     description="Memory DMA Stream 3 Source Current Y Count Register" bit-size="16" read-address="0xFFC01FF8" write-address="0xFFC01FF8" type="IO" />
 
 	<!-- MDMA Source 3 (children) -->
 	<register name="MDMA_S3_CONFIG_DMAEN"         parent="MDMA_S3_CONFIG"         bit-position="0"  bit-size="1" description="DMA Channel Enable" />

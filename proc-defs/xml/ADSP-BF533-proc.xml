@@ -16,7 +16,7 @@
 
 <visualdsp-proc-xml schema-version="1" name="ADSP-BF533-proc.xml">
 
-<version file-version="1.05"/>
+<version file-version="1.06"/>
 
 <!-- ************************************************************************ -->
 <!-- ******* Register set                                                     -->
@@ -1719,10 +1719,10 @@
 	<register name="EBIU_SDRRC" reset-value="0x01A0" core="Common" />
 	
 	<!-- For BF533 EZ-Kit Lite's rev 1.7 and above use 0x25 -->
-        <!-- register name="EBIU_SDBCTL" reset-value="0x25" core="Common" / -->
+        <register name="EBIU_SDBCTL" reset-value="0x25" core="Common" />
 	
 	<!-- For BF533 EZ-Kit Lite's rev 1.6 and below use 0x13 -->
-        <register name="EBIU_SDBCTL" reset-value="0x13" core="Common" />
+        <!-- register name="EBIU_SDBCTL" reset-value="0x13" core="Common" / -->
 	
 	<register name="EBIU_SDGCTL" reset-value="0x0091998D" core="Common" />
 </register-reset-definitions>

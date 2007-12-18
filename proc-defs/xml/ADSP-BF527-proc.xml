@@ -16,7 +16,7 @@
 
 <visualdsp-proc-xml schema-version="1" name="ADSP-BF527-proc.xml">
 
-<version file-version="1.15"/>
+<version file-version="1.21"/>
 
 <!-- ******************************************************************* -->
 <!-- ******* Register set                                                -->
@@ -492,7 +492,7 @@
 <register name="USB_EP_NI7_RXINTERVAL" group="USB" mask="FFFF" description="Sets the polling interval for Interrupt/Isochronous transfers or the NAK response timeout on Bulk transfers for Host Rx endpoint7" bit-size="16" read-address="0xFFC03BF0" write-address="0xFFC03BF0" type="IO" target="EMU" />
 <register name="USB_EP_NI7_TXCOUNT" group="USB" mask="FFFF" description="Number of bytes to be written to the endpoint7 Tx FIFO" bit-size="16" read-address="0xFFC03BF8" write-address="0xFFC03BF8" type="IO" target="EMU" />
 
-<register name="USB_DMA_INTERRUPT" group="USB" mask="FFFF" description="Indicates pending interrupts for the DMA channels" bit-size="16" read-address="0xFFC04000" write-address="0xFFC03C00" type="IO" target="EMU" />
+<register name="USB_DMA_INTERRUPT" group="USB" mask="FFFF" description="Indicates pending interrupts for the DMA channels" bit-size="16" read-address="0xFFC03C00" write-address="0xFFC03C00" type="IO" target="EMU" />
 
 <register name="USB_DMA0_CONTROL" group="USB" mask="FFFF" description="DMA master channel 0 configuration" bit-size="16" read-address="0xFFC03C04" write-address="0xFFC03C04" type="IO" target="EMU" def-comment="USB Channel 0 Config Registers" />
 <register name="USB_DMA0_ADDRLOW" group="USB" mask="FFFF" description="Lower 16-bits of memory source/destination address for DMA master channel 0" bit-size="16" read-address="0xFFC03C08" write-address="0xFFC03C08" type="IO" target="EMU" />
@@ -596,6 +596,7 @@
 	<register name="SFTRESET"   type="NORMAL" x="10" y="4"/>
 	<register name="HWERRCAUSE" type="NORMAL" x="10" y="5"/>
 </window>
+
 <window name="Arithmetic Status" menu="&amp;Register:&amp;Core:Status:Arithmetic Status" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD039" help-tag="HID_Arithmetic_Status_Window532.htm">
 	<register name="ASTAT"   type="NORMAL" x="5" y="1"/>
 	<register name="AZ"      type="NORMAL" x="7" y="2"/>
@@ -612,6 +613,7 @@
 	<register name="V"       type="NORMAL" x="20" y="6"/>
 	<register name="VS"      type="NORMAL" x="20" y="7"/>
 </window>
+
 <window name="System Configuration" menu="&amp;Register:&amp;Core:System Configuration" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x9" help-tag="HID_System_Configuration.htm">
 	<register name="System Configuration Register" type="NODATA" x="0" y="0"/>
 	<register name="SYSCFG" type="NODATA" x="0" y="1"/>
@@ -635,6 +637,7 @@
 	<register name="USP" type="NORMAL" x="5" y="1"/>
 	<register name="FP"  type="NORMAL" x="5" y="2"/>
 </window>
+
 <window name="Sequencer" menu="&amp;Register:&amp;Core:Sequencer" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x7" help-tag="HID_Sequencer_Window.htm">
 	<register name="RETS" type="NORMAL" x="5" y="0"/>
 	<register name="RETI" type="NORMAL" x="5" y="1"/>
@@ -642,6 +645,7 @@
 	<register name="RETE" type="NORMAL" x="5" y="3"/>
 	<register name="RETN" type="NORMAL" x="5" y="4"/>
 </window>
+
 <window name="Phase Locked Loop" menu="&amp;Register:&amp;Core:PLL Register File" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD03A" help-tag="PLL_Register_File_Window.htm">
 	<register name="PLL_CTL" type="NORMAL" x="11" y="0"/>
 	<register name="PLL_DIV" type="NORMAL" x="11" y="1"/>
@@ -649,9 +653,11 @@
 	<register name="PLL_STAT" type="NORMAL" x="11" y="3"/>
 	<register name="PLL_LOCKCNT" type="NORMAL" x="11" y="4"/>
 </window>
+
 <window name="PC Counters" menu="&amp;Register:&amp;Core:PC Counters" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x19" help-tag="HID_PC_Window.htm">
 	<register name="PC" type="NORMAL" x="8" y="0"/>
 </window>
+
 <window name="P Registers" menu="&amp;Register:&amp;Core:P Registers" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0xB" help-tag="HID_P_Registers.htm">
 	<register name="P0" type="NORMAL" x="5" y="0"/>
 	<register name="P1" type="NORMAL" x="5" y="1"/>
@@ -660,6 +666,7 @@
 	<register name="P4" type="NORMAL" x="5" y="4"/>
 	<register name="P5" type="NORMAL" x="5" y="5"/>
 </window>
+
 <window name="Loop Counters" menu="&amp;Register:&amp;Core:Loop Counters" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x13" help-tag="HID_Loop_Counters_Window.htm">
 	<register name="LC0" type="NORMAL" x="5" y="0"/>
 	<register name="LT0" type="NORMAL" x="5" y="1"/>
@@ -668,6 +675,7 @@
 	<register name="LT1" type="NORMAL" x="5" y="5"/>
 	<register name="LB1" type="NORMAL" x="5" y="6"/>
 </window>
+
 <window name="L1 Data Memory Registers" menu="&amp;Register:&amp;Core:L1 Data Memory Registers" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x1B" help-tag="HID_L1_Data.htm">
 	<register name="SRAM_BASE_ADDR"      type="NODATA"  x="0"  y="0"/>
 	<register name="SRAM_BASE_ADDR"      type="NOLABEL" x="18" y="0"/>
@@ -738,6 +746,7 @@
 	<register name="DTEST_DATA1"     type="NODATA"  x="0"  y="38"/>
 	<register name="DTEST_DATA1"     type="NOLABEL" x="18" y="38"/>
 </window>
+
 <window name="L1 Code Memory Registers" menu="&amp;Register:&amp;Core:L1 Code Memory Registers" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x1C" help-tag="HID_L1_Code.htm">
 	<register name="IMEM_CONTROL"        type="NODATA" x="0" y="0"/>
 	<register name="IMEM_CONTROL"        type="NOLABEL" x="18" y="0"/>
@@ -798,6 +807,7 @@
 	<register name="ITEST_DATA1"     type="NODATA"  x="0"  y="33"/>
 	<register name="ITEST_DATA1"     type="NOLABEL" x="18" y="33"/>
 </window>
+
 <window name="Interrupt Controller" menu="&amp;Register:&amp;Core:Interrupt Controller" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x6" help-tag="HID_Interrupt_Controller.htm">
 
 	<register name="IPRIO" type="NORMAL" x="20" y="0"/>
@@ -876,6 +886,7 @@
 	<register name="IPENDbit14" type="NOLABEL" x="36" y="19"/>
 	<register name="IPENDbit15" type="NOLABEL" x="36" y="20"/>
 </window>
+
 <window name="Event Vectors" menu="&amp;Register:&amp;Core:Event Vector Registers" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x1D" help-tag="Event_Vector_Registers_Window.htm">
 	<register name="EVT0"  type="NORMAL" x="7" y="0"/>
 	<register name="EVT1"  type="NORMAL" x="7" y="1"/>
@@ -894,10 +905,12 @@
 	<register name="EVT14" type="NORMAL" x="7" y="14"/>
 	<register name="EVT15" type="NORMAL" x="7" y="15"/>
 </window>
+
 <window name="Product Identification Registers" menu="&amp;Register:&amp;Core:Product ID" description="" format="Hexadecimal" format-selection="All" help-id="0x001E" help-tag="DSP_ID_Register_Window.htm">
 	<register name="DSPID" type="NORMAL" x="15" y="0"/>
 	<register name="CHIPID" type="NORMAL" x="15" y="1"/>
 </window>
+
 <window name="Data Register File" menu="&amp;Register:&amp;Core:Data Register File" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0xD" help-tag="HID_Data_Register_File.htm">
 	<register name="Whole" type="NODATA" x="5" y="0"/>
 	<register name="High" type="NODATA" x="20" y="0"/>
@@ -936,6 +949,7 @@
 	<register name="R6.B" type="NOLABEL" x="40" y="7"/>
 	<register name="R7.B" type="NOLABEL" x="40" y="8"/>
 </window>
+
 <window name="DAG Registers" menu="&amp;Register:&amp;Core:DAG Registers" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0xC" help-tag="HID_DAG_Registers.htm">
 	<register name="I Regs" type="NODATA" x="5" y="0"/>
 	<register name="M Regs" type="NODATA" x="17" y="0"/>
@@ -958,10 +972,12 @@
 	<register name="B2" type="NORMAL" x="41" y="3"/>
 	<register name="B3" type="NORMAL" x="41" y="4"/>
 </window>
+
 <window name="Cycles" menu="&amp;Register:&amp;Core:Cycles" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x12" help-tag="HID_Cycles_Window.htm">
 	<register name="CYCLES"  type="NORMAL" x="8" y="0"/>
 	<register name="CYCLES2" type="NORMAL" x="8" y="1"/>
 </window>
+
 <window name="Core Timer Register File" menu="&amp;Register:&amp;Core:Core Timer Register File" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x8" help-tag="HID_Timers_Window.htm">
 	<register name="TCNTL"    type="NORMAL" x="9"  y="0"/>
 	<register name="TINT"     type="NORMAL" x="15" y="1"/>
@@ -972,6 +988,7 @@
 	<register name="TSCALE"   type="NORMAL" x="9"  y="4"/>
 	<register name="TCOUNT"   type="NORMAL" x="9"  y="5"/>
 </window>
+
 <window name="Accumulators" menu="&amp;Register:&amp;Core:Accumulators" description="" format="Hexadecimal" format-selection="All" type="SIM EMU CORE" help-id="0x18" help-tag="HID_Accumulators.htm">
 	<register name="A0"   type="NORMAL" x="5"  y="0"/>
 	<register name="A0.W" type="NORMAL" x="5"  y="1"/>
@@ -1012,13 +1029,13 @@
 	<register name="WPSTAT"   type="NORMAL" x="15" y="18"/>
 </window>
 
-<window name="Watchdog Timer Registers" menu="&amp;Register:&amp;Peripherals:Watchdog Timer" description="" format="Hexadecimal" format-selection="All" type="EMU" help-id="0xD026" help-tag="Watchdog_Timer_Registers_Window.htm">
+<window name="Watchdog Timer Registers" menu="&amp;Register:&amp;Peripherals:Watchdog Timer" description="" format="Hexadecimal" format-selection="All" type="EMU" help-id="0xD026" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_WATCHDOG_LIST.html">
 	<register name="WDOG_CTL"     type="NORMAL" x="15" y="0"/>
 	<register name="WDOG_CNT"     type="NORMAL" x="15" y="1"/>
 	<register name="WDOG_STAT"    type="NORMAL" x="15" y="2"/>
 </window>
 
-<window name="USB Phy Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Phy Control" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="USB Phy Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Phy Control" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_USB_LIST.html">
 	<register name="USB_LINKINFO"    type="NORMAL"  x="16" y="0" />
 	<register name="USB_VPLEN"       type="NORMAL"  x="16" y="1" />
 	<register name="USB_HS_EOF1"     type="NORMAL"  x="16" y="2" />
@@ -1032,7 +1049,7 @@
 	<register name="USB_SRP_CLKDIV"  type="NORMAL"  x="16" y="10" />
 </window>
 	
-<window name="USB Packet Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Packet Control" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="USB Packet Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Packet Control" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_USB_LIST.html">
 	<register name="USB_TX_MAX_PACKET"  type="NORMAL"  x="19" y="0" />
 	<register name="USB_CSR0"           type="NORMAL"  x="19" y="1" />
 	<register name="USB_TXCSR"          type="NORMAL"  x="19" y="2" />
@@ -1048,13 +1065,13 @@
 	<register name="USB_TXCOUNT"        type="NORMAL"  x="19" y="12" />
 </window>
 
-<window name="USB OTG Control Registers" menu="&amp;Register:&amp;Peripherals:USB:OTG Control" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="USB OTG Control Registers" menu="&amp;Register:&amp;Peripherals:USB:OTG Control" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_USB_LIST.html">
 	<register name="USB_OTG_DEV_CTL"    type="NORMAL"  x="19" y="0" />
 	<register name="USB_OTG_VBUS_IRQ"   type="NORMAL"  x="19" y="1" />
 	<register name="USB_OTG_VBUS_MASK"  type="NORMAL"  x="19" y="2" />
 </window>
 
-<window name="USB Endpoint (EPx) FIFO Registers" menu="&amp;Register:&amp;Peripherals:USB:Endpoint FIFO" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="USB Endpoint (EPx) FIFO Registers" menu="&amp;Register:&amp;Peripherals:USB:Endpoint FIFO" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_USB_LIST.html">
 	<register name="USB_EP0_FIFO"   type="NORMAL"  x="14" y="0" />
 	<register name="USB_EP1_FIFO"   type="NORMAL"  x="14" y="1" />
 	<register name="USB_EP2_FIFO"   type="NORMAL"  x="14" y="2" />
@@ -1065,7 +1082,7 @@
 	<register name="USB_EP7_FIFO"   type="NORMAL"  x="14" y="7" />
 </window>
 
-<window name="USB Endpoint 7 Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Endpoint Control:EP NI 7" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="USB Endpoint 7 Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Endpoint Control:EP NI 7" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_USB_LIST.html">
 	<register name="USB_EP_NI7_TXMAXP"     type="NORMAL"  x="22" y="0" />
 	<register name="USB_EP_NI7_TXCSR"      type="NORMAL"  x="22" y="1" />
 	<register name="USB_EP_NI7_RXMAXP"     type="NORMAL"  x="22" y="2" />
@@ -1078,7 +1095,7 @@
 	<register name="USB_EP_NI7_TXCOUNT"    type="NORMAL"  x="22" y="9" />
 </window>
 
-<window name="USB Endpoint 6 Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Endpoint Control:EP NI 6" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="USB Endpoint 6 Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Endpoint Control:EP NI 6" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_USB_LIST.html">
 	<register name="USB_EP_NI6_TXMAXP"     type="NORMAL"  x="22" y="0" />
 	<register name="USB_EP_NI6_TXCSR"      type="NORMAL"  x="22" y="1" />
 	<register name="USB_EP_NI6_RXMAXP"     type="NORMAL"  x="22" y="2" />
@@ -1091,7 +1108,7 @@
 	<register name="USB_EP_NI6_TXCOUNT"    type="NORMAL"  x="22" y="9" />
 </window>
 
-<window name="USB Endpoint 5 Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Endpoint Control:EP NI 5" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="USB Endpoint 5 Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Endpoint Control:EP NI 5" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_USB_LIST.html">
 	<register name="USB_EP_NI5_TXMAXP"     type="NORMAL"  x="22" y="0" />
 	<register name="USB_EP_NI5_TXCSR"      type="NORMAL"  x="22" y="1" />
 	<register name="USB_EP_NI5_RXMAXP"     type="NORMAL"  x="22" y="2" />
@@ -1104,7 +1121,7 @@
 	<register name="USB_EP_NI5_TXCOUNT"    type="NORMAL"  x="22" y="9" />
 </window>
 
-<window name="USB Endpoint 4 Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Endpoint Control:EP NI 4" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="USB Endpoint 4 Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Endpoint Control:EP NI 4" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_USB_LIST.html">
 	<register name="USB_EP_NI4_TXMAXP"     type="NORMAL"  x="22" y="0" />
 	<register name="USB_EP_NI4_TXCSR"      type="NORMAL"  x="22" y="1" />
 	<register name="USB_EP_NI4_RXMAXP"     type="NORMAL"  x="22" y="2" />
@@ -1117,7 +1134,7 @@
 	<register name="USB_EP_NI4_TXCOUNT"    type="NORMAL"  x="22" y="9" />
 </window>
 
-<window name="USB Endpoint 3 Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Endpoint Control:EP NI 3" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="USB Endpoint 3 Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Endpoint Control:EP NI 3" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_USB_LIST.html">
 	<register name="USB_EP_NI3_TXMAXP"     type="NORMAL"  x="22" y="0" />
 	<register name="USB_EP_NI3_TXCSR"      type="NORMAL"  x="22" y="1" />
 	<register name="USB_EP_NI3_RXMAXP"     type="NORMAL"  x="22" y="2" />
@@ -1130,7 +1147,7 @@
 	<register name="USB_EP_NI3_TXCOUNT"    type="NORMAL"  x="22" y="9" />
 </window>
 
-<window name="USB Endpoint 2 Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Endpoint Control:EP NI 2" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="USB Endpoint 2 Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Endpoint Control:EP NI 2" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_USB_LIST.html">
 	<register name="USB_EP_NI2_TXMAXP"     type="NORMAL"  x="22" y="0" />
 	<register name="USB_EP_NI2_TXCSR"      type="NORMAL"  x="22" y="1" />
 	<register name="USB_EP_NI2_RXMAXP"     type="NORMAL"  x="22" y="2" />
@@ -1143,7 +1160,7 @@
 	<register name="USB_EP_NI2_TXCOUNT"    type="NORMAL"  x="22" y="9" />
 </window>
 
-<window name="USB Endpoint 1 Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Endpoint Control:EP NI 1" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="USB Endpoint 1 Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Endpoint Control:EP NI 1" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_USB_LIST.html">
 	<register name="USB_EP_NI1_TXMAXP"     type="NORMAL"  x="22" y="0" />
 	<register name="USB_EP_NI1_TXCSR"      type="NORMAL"  x="22" y="1" />
 	<register name="USB_EP_NI1_RXMAXP"     type="NORMAL"  x="22" y="2" />
@@ -1156,7 +1173,7 @@
 	<register name="USB_EP_NI1_TXCOUNT"    type="NORMAL"  x="22" y="9" />
 </window>
 
-<window name="USB Endpoint 0 Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Endpoint Control:EP NI 0" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="USB Endpoint 0 Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Endpoint Control:EP NI 0" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_USB_LIST.html">
 	<register name="USB_EP_NI0_TXMAXP"     type="NORMAL"  x="22" y="0" />
 	<register name="USB_EP_NI0_TXCSR"      type="NORMAL"  x="22" y="1" />
 	<register name="USB_EP_NI0_RXMAXP"     type="NORMAL"  x="22" y="2" />
@@ -1169,7 +1186,7 @@
 	<register name="USB_EP_NI0_TXCOUNT"    type="NORMAL"  x="22" y="9" />
 </window>
 
-<window name="USB DMA 7 Registers" menu="&amp;Register:&amp;Peripherals:USB:DMA:DMA 7" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="USB DMA 7 Registers" menu="&amp;Register:&amp;Peripherals:USB:DMA:DMA 7" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_USB_LIST.html">
 	<register name="USB_DMA7_CONTROL"   type="NORMAL"  x="20" y="0" />
 	<register name="USB_DMA7_ADDRLOW"   type="NORMAL"  x="20" y="1" />
 	<register name="USB_DMA7_ADDRHIGH"  type="NORMAL"  x="20" y="2" />
@@ -1179,7 +1196,7 @@
 	<register name="USB_DMA_INTERRUPT"  type="NORMAL"  x="20" y="6" />
 </window>
 
-<window name="USB DMA 6 Registers" menu="&amp;Register:&amp;Peripherals:USB:DMA:DMA 6" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="USB DMA 6 Registers" menu="&amp;Register:&amp;Peripherals:USB:DMA:DMA 6" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_USB_LIST.html">
 	<register name="USB_DMA6_CONTROL"   type="NORMAL"  x="20" y="0" />
 	<register name="USB_DMA6_ADDRLOW"   type="NORMAL"  x="20" y="1" />
 	<register name="USB_DMA6_ADDRHIGH"  type="NORMAL"  x="20" y="2" />
@@ -1189,7 +1206,7 @@
 	<register name="USB_DMA_INTERRUPT"  type="NORMAL"  x="20" y="6" />
 </window>
 
-<window name="USB DMA 5 Registers" menu="&amp;Register:&amp;Peripherals:USB:DMA:DMA 5" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="USB DMA 5 Registers" menu="&amp;Register:&amp;Peripherals:USB:DMA:DMA 5" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_USB_LIST.html">
 	<register name="USB_DMA5_CONTROL"   type="NORMAL"  x="20" y="0" />
 	<register name="USB_DMA5_ADDRLOW"   type="NORMAL"  x="20" y="1" />
 	<register name="USB_DMA5_ADDRHIGH"  type="NORMAL"  x="20" y="2" />
@@ -1199,7 +1216,7 @@
 	<register name="USB_DMA_INTERRUPT"  type="NORMAL"  x="20" y="6" />
 </window>
 
-<window name="USB DMA 4 Registers" menu="&amp;Register:&amp;Peripherals:USB:DMA:DMA 4" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="USB DMA 4 Registers" menu="&amp;Register:&amp;Peripherals:USB:DMA:DMA 4" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_USB_LIST.html">
 	<register name="USB_DMA4_CONTROL"   type="NORMAL"  x="20" y="0" />
 	<register name="USB_DMA4_ADDRLOW"   type="NORMAL"  x="20" y="1" />
 	<register name="USB_DMA4_ADDRHIGH"  type="NORMAL"  x="20" y="2" />
@@ -1209,7 +1226,7 @@
 	<register name="USB_DMA_INTERRUPT"  type="NORMAL"  x="20" y="6" />
 </window>
 
-<window name="USB DMA 3 Registers" menu="&amp;Register:&amp;Peripherals:USB:DMA:DMA 3" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="USB DMA 3 Registers" menu="&amp;Register:&amp;Peripherals:USB:DMA:DMA 3" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_USB_LIST.html">
 	<register name="USB_DMA3_CONTROL"   type="NORMAL"  x="20" y="0" />
 	<register name="USB_DMA3_ADDRLOW"   type="NORMAL"  x="20" y="1" />
 	<register name="USB_DMA3_ADDRHIGH"  type="NORMAL"  x="20" y="2" />
@@ -1219,7 +1236,7 @@
 	<register name="USB_DMA_INTERRUPT"  type="NORMAL"  x="20" y="6" />
 </window>
 	
-<window name="USB DMA 2 Registers" menu="&amp;Register:&amp;Peripherals:USB:DMA:DMA 2" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="USB DMA 2 Registers" menu="&amp;Register:&amp;Peripherals:USB:DMA:DMA 2" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_USB_LIST.html">
 	<register name="USB_DMA2_CONTROL"   type="NORMAL"  x="20" y="0" />
 	<register name="USB_DMA2_ADDRLOW"   type="NORMAL"  x="20" y="1" />
 	<register name="USB_DMA2_ADDRHIGH"  type="NORMAL"  x="20" y="2" />
@@ -1229,7 +1246,7 @@
 	<register name="USB_DMA_INTERRUPT"  type="NORMAL"  x="20" y="6" />
 </window>
 
-<window name="USB DMA 1 Registers" menu="&amp;Register:&amp;Peripherals:USB:DMA:DMA 1" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="USB DMA 1 Registers" menu="&amp;Register:&amp;Peripherals:USB:DMA:DMA 1" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_USB_LIST.html">
 	<register name="USB_DMA1_CONTROL"   type="NORMAL"  x="20" y="0" />
 	<register name="USB_DMA1_ADDRLOW"   type="NORMAL"  x="20" y="1" />
 	<register name="USB_DMA1_ADDRHIGH"  type="NORMAL"  x="20" y="2" />
@@ -1239,7 +1256,7 @@
 	<register name="USB_DMA_INTERRUPT"  type="NORMAL"  x="20" y="6" />
 </window>
 
-<window name="USB DMA 0 Registers" menu="&amp;Register:&amp;Peripherals:USB:DMA:DMA 0" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="USB DMA 0 Registers" menu="&amp;Register:&amp;Peripherals:USB:DMA:DMA 0" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_USB_LIST.html">
 	<register name="USB_DMA0_CONTROL"   type="NORMAL"  x="20" y="0" />
 	<register name="USB_DMA0_ADDRLOW"   type="NORMAL"  x="20" y="1" />
 	<register name="USB_DMA0_ADDRHIGH"  type="NORMAL"  x="20" y="2" />
@@ -1249,7 +1266,7 @@
 	<register name="USB_DMA_INTERRUPT"  type="NORMAL"  x="20" y="6" />
 </window>
 
-<window name="USB Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Control" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="USB Control Registers" menu="&amp;Register:&amp;Peripherals:USB:Control" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_USB_LIST.html">
 	<register name="USB_FADDR"      type="NORMAL"  x="16" y="0" />
 	<register name="USB_POWER"      type="NORMAL"  x="16" y="1" />
 	<register name="USB_INTRTX"     type="NORMAL"  x="16" y="2" />
@@ -1265,7 +1282,7 @@
 	<register name="USB_GLOBAL_CTL" type="NORMAL"  x="16" y="12" />
 </window>
 
-<window name="UART1 Registers" menu="&amp;Register:&amp;Peripherals:UART:UART 1" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD046" help-tag="UARTx_Registers_Window.htm">
+<window name="UART1 Registers" menu="&amp;Register:&amp;Peripherals:UART:UART 1" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD046" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_UART1_LIST.html">
 	<register name="UART1_THR   Transmit Holding" type="NODATA" x="0" y="0"/>
 	<register name="UART1_THR"  type="NOLABEL" x="37" y="0"/>
 	<register name="UART1_RBR   Receive Buffer" type="NODATA" x="0" y="1"/>
@@ -1292,7 +1309,7 @@
 	<register name="UART1_GCTL" type="NOLABEL" x="37" y="11"/>
 </window>
 
-<window name="UART0 Registers" menu="&amp;Register:&amp;Peripherals:UART:UART 0" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD046" help-tag="UARTx_Registers_Window.htm">
+<window name="UART0 Registers" menu="&amp;Register:&amp;Peripherals:UART:UART 0" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD046" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_UART0_LIST.html">
 	<register name="UART0_THR   Transmit Holding" type="NODATA" x="0" y="0"/>
 	<register name="UART0_THR"  type="NOLABEL" x="37" y="0"/>
 	<register name="UART0_RBR   Receive Buffer" type="NODATA" x="0" y="1"/>
@@ -1319,7 +1336,7 @@
 	<register name="UART0_GCTL" type="NOLABEL" x="37" y="11"/>
 </window>
 
-<window name="TWI Registers" menu="&amp;Register:&amp;Peripherals:TWI" description="" format="Hexadecimal" format-selection="All" type="EMU" help-id="0xD044" help-tag="TWI_Registers_Window.htm">
+<window name="TWI Registers" menu="&amp;Register:&amp;Peripherals:TWI" description="" format="Hexadecimal" format-selection="All" type="EMU" help-id="0xD044" help-tag="\BF52x_HWR_vol2.chm::/BF52xHWR02-p06twi.html">
 	<register name="TWI_CLKDIV"   		type="NORMAL" x="15" y="0"/>
 	<register name="TWI_CONTROL"   		type="NORMAL" x="15" y="1"/>
 	<register name="TWI_SLAVE_CTL"   	type="NORMAL" x="15" y="2"/>
@@ -1338,7 +1355,7 @@
 	<register name="TWI_RCV_DATA16"   	type="NORMAL" x="15" y="15"/>
 </window>
 
-<window name="Timer Registers" menu="&amp;Register:&amp;Peripherals:Timers" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD047" help-tag="Timer_Registers_Window.htm">
+<window name="Timer Registers" menu="&amp;Register:&amp;Peripherals:Timers" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD047" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_TIMER_LIST.html">
 	<register name="TIMER_ENABLE"  type="NODATA"  x="0"  y="0"/>
 	<register name="TIMER_ENABLE"  type="NOLABEL" x="14" y="0"/>
 	<register name="TIMER_DISABLE" type="NODATA"  x="0"  y="1"/>
@@ -1400,7 +1417,7 @@
 	<register name="TIMER7_WIDTH"   type="NOLABEL" x="40" y="12"/>
 </window>
 
-<window name="System Interrupt Controller Register File" menu="&amp;Register:&amp;Peripherals:System Interrupt Controller" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="System Interrupt Controller Register File" menu="&amp;Register:&amp;Peripherals:System Interrupt Controller" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_SYSCR_LIST.html">
 	<register name="SIC_RVECT"  type="NORMAL" x="12" y="0"  />
 	<register name="SIC_IMASK0" type="NORMAL" x="12" y="1"  />
 	<register name="SIC_IMASK1" type="NORMAL" x="12" y="2"  />
@@ -1418,7 +1435,7 @@
 	<register name="SIC_IWR1"   type="NORMAL" x="12" y="14" />
 </window>
 
-<window name="SPORT1" menu="&amp;Register:&amp;Peripherals:SPORT:SPORT 1" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD048" help-tag="hid_peripheral_sp0532.htm">
+<window name="SPORT1" menu="&amp;Register:&amp;Peripherals:SPORT:SPORT 1" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD048" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_SPORT1_LIST.html">
 	<register name="STATUS"            type="NODATA"  x="10" y="1"/>
 	<register name="- SETUP -"         type="NODATA"  x="12" y="3"/>
 	<register name="Receive"           type="NODATA"  x="14" y="4"/>
@@ -1462,7 +1479,8 @@
 	<register name="SPORT1_MCMC2"      type="NOLABEL" x="22" y="22"/>
 	<register name="SPORT1_CHNL"       type="NOLABEL" x="22" y="24"/>
 </window>
-<window name="SPORT0" menu="&amp;Register:&amp;Peripherals:SPORT:SPORT 0" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD048" help-tag="hid_peripheral_sp0532.htm">
+
+<window name="SPORT0" menu="&amp;Register:&amp;Peripherals:SPORT:SPORT 0" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD048" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_SPORT0_LIST.html">
 	<register name="STATUS"            type="NODATA"  x="10" y="1"/>
 	<register name="- SETUP -"         type="NODATA"  x="12" y="3"/>
 	<register name="Receive"           type="NODATA"  x="14" y="4"/>
@@ -1507,7 +1525,7 @@
 	<register name="SPORT0_CHNL"       type="NOLABEL" x="22" y="24"/>
 </window>
 
-<window name="SPI Controller Registers" menu="&amp;Register:&amp;Peripherals:SPI Controller" description="" format="Hexadecimal" format-selection="All" type="EMU" help-id="0xD049" help-tag="SPI_Controller_Registers_Window.htm">
+<window name="SPI Controller Registers" menu="&amp;Register:&amp;Peripherals:SPI Controller" description="" format="Hexadecimal" format-selection="All" type="EMU" help-id="0xD049" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_SPI_LIST.html">
 	<register name="SPI_CTL"      type="NORMAL" x="15" y="0"/>
 	<register name="SPI_FLG"      type="NORMAL" x="15" y="1"/>
 	<register name="SPI_STAT"     type="NORMAL" x="15" y="2"/>
@@ -1554,7 +1572,7 @@
 	<register name="SECURE_STATUS"  type="NORMAL" x="14" y="2" />
 </window>
 
-<window name="Real-Time Clock Registers" menu="&amp;Register:&amp;Peripherals:Real-Time Clock" description="" format="Hexadecimal" format-selection="All" type="EMU" help-id="0xD04A" help-tag="Real_Time_Clock_Registers_Window_537.htm">
+<window name="Real-Time Clock Registers" menu="&amp;Register:&amp;Peripherals:Real-Time Clock" description="" format="Hexadecimal" format-selection="All" type="EMU" help-id="0xD04A" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_RTC_LIST.html">
 	<register name="RTC_STAT"     type="NORMAL" x="15" y="0"/>
 	<register name="RTC_ICTL"     type="NORMAL" x="15" y="1"/>
 	<register name="RTC_ISTAT"    type="NORMAL" x="15" y="2"/>
@@ -1563,128 +1581,176 @@
 	<register name="RTC_PREN"     type="NORMAL" x="15" y="5"/>
 </window>
 
-<window name="PPI Registers" menu="&amp;Register:&amp;Peripherals:PPI" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD035" help-tag="PPI_Registers_Window.htm">
-	<register name="CONTROL"  type="NODATA" x="0" y="0"/>
-	<register name="PORT_EN"  type="NORMAL" x="10" y="1"/>
-	<register name="PORT_DIR" type="NORMAL" x="10" y="2"/>
-	<register name="XFR_TYPE" type="NORMAL" x="10" y="3"/>
-	<register name="PORT_CFG" type="NORMAL" x="10" y="4"/>
-	<register name="FLD_SEL"  type="NORMAL" x="10" y="5"/>
-	<register name="PACK_EN"  type="NORMAL" x="10" y="6"/>
-	<register name="SKIP_EN"  type="NORMAL" x="10" y="8"/>
-	<register name="SKIP_EO"  type="NORMAL" x="10" y="9"/>
-	<register name="DLEN"     type="NORMAL" x="10" y="10"/>
-	<register name="POL"      type="NORMAL" x="10" y="11"/>
-	<register name="POLS"     type="NORMAL" x="10" y="12"/>
-	<register name="STATUS"   type="NODATA" x="0" y="14"/>
-	<register name="FLD"      type="NORMAL" x="10" y="15"/>
-	<register name="FT_ERR"   type="NORMAL" x="10" y="16"/>
-	<register name="OVR"      type="NORMAL" x="10" y="17"/>
-	<register name="UNDR"     type="NORMAL" x="10" y="18"/>
-	<register name="ERR_DET"  type="NORMAL" x="10" y="19"/>
-	<register name="ERR_NCOR" type="NORMAL" x="10" y="20"/>
-	<register name="DELAY"    type="NODATA" x="0" y="22"/>
-	<register name="COUNT"    type="NODATA" x="0" y="23"/>
-	<register name="FRAME"    type="NODATA" x="0" y="24"/>
-	<register name="PPI_CONTROL" type="NOLABEL" x="9" y="0"/>
-	<register name="PPI_STATUS"  type="NOLABEL" x="9" y="14"/>
-	<register name="PPI_DELAY"   type="NOLABEL" x="9" y="22"/>
-	<register name="PPI_COUNT"   type="NOLABEL" x="9" y="23"/>
-	<register name="PPI_FRAME"   type="NOLABEL" x="9" y="24"/>
+<window name="PPI Status Register" menu="&amp;Register:&amp;Peripherals:PPI:Status" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_PPI_STATUS.html">
+	<register name="PPI_STATUS"  type="NODATA"  x="0"  y="0"/>
+	<register name="PPI_STATUS"  type="NOLABEL" x="14" y="0"/>
+
+	<register name="LT_ERR_OVR"  type="NODATA"  x="2"  y="1"/>
+	<register name="LT_ERR_UNDR" type="NODATA"  x="2"  y="2"/>
+	<register name="FLD"         type="NODATA"  x="2"  y="3"/>
+	<register name="FT_ERR"      type="NODATA"  x="2"  y="4"/>
+	<register name="OVR"         type="NODATA"  x="2"  y="5"/>
+	<register name="UNDR"        type="NODATA"  x="2"  y="6"/>
+	<register name="ERR_DET"     type="NODATA"  x="2"  y="7"/>
+	<register name="ERR_NCOR"    type="NODATA"  x="2"  y="8"/>
+
+	<register name="LT_ERR_OVR"  type="NOLABEL" x="14" y="1"/>
+	<register name="LT_ERR_UNDR" type="NOLABEL" x="14" y="2"/>
+	<register name="FLD"         type="NOLABEL" x="14" y="3"/>
+	<register name="FT_ERR"      type="NOLABEL" x="14" y="4"/>
+	<register name="OVR"         type="NOLABEL" x="14" y="5"/>
+	<register name="UNDR"        type="NOLABEL" x="14" y="6"/>
+	<register name="ERR_DET"     type="NOLABEL" x="14" y="7"/>
+	<register name="ERR_NCOR"    type="NOLABEL" x="14" y="8"/>
 </window>
 
-<window name="Programmable Flag Registers" menu="&amp;Register:&amp;Peripherals:Programmable Flags" description="" format="Hexadecimal" format-selection="All" type="EMU" help-id="0xD04B" help-tag="programmable_flag_registers_window.htm">
-	<register name="PORTFIO" 	type="NORMAL" x="20" y="0"/>
-	<register name="PORTFIO_CLEAR" 	type="NORMAL" x="20" y="1"/>
-	<register name="PORTFIO_SET" 	type="NORMAL" x="20" y="2"/>
-	<register name="PORTFIO_TOGGLE" type="NORMAL" x="20" y="3"/>
+<window name="PPI Control Register" menu="&amp;Register:&amp;Peripherals:PPI:Control" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_PPI_CONTROL.html">
+	<register name="PPI_CONTROL"  type="NODATA"  x="0"  y="0"/>
+	<register name="PPI_CONTROL"  type="NOLABEL" x="12" y="0"/>
 
-	<register name="PORTFIO_MASKA" 		type="NORMAL" x="20" y="4"/>
-	<register name="PORTFIO_MASKA_CLEAR" 	type="NORMAL" x="20" y="5"/>
-	<register name="PORTFIO_MASKA_SET" 	type="NORMAL" x="20" y="6"/>
-	<register name="PORTFIO_MASKA_TOGGLE" 	type="NORMAL" x="20" y="7"/>
+	<register name="PORT_EN"  type="NODATA"  x="2"  y="1"/>
+	<register name="PORT_DIR" type="NODATA"  x="2"  y="2"/>
+	<register name="XFR_TYPE" type="NODATA"  x="2"  y="3"/>
+	<register name="PORT_CFG" type="NODATA"  x="2"  y="4"/>
+	<register name="FLD_SEL"  type="NODATA"  x="2"  y="5"/>
+	<register name="PACK_EN"  type="NODATA"  x="2"  y="6"/>
+	<register name="SKIP_EN"  type="NODATA"  x="2"  y="7"/>
+	<register name="SKIP_EO"  type="NODATA"  x="2"  y="8"/>
+	<register name="DLEN"     type="NODATA"  x="2"  y="9"/>
+	<register name="POLC"     type="NODATA"  x="2"  y="10"/>
+	<register name="POLS"     type="NODATA"  x="2"  y="11"/>
 
-	<register name="PORTFIO_MASKB" 		type="NORMAL" x="48" y="0"/>
-	<register name="PORTFIO_MASKB_CLEAR" 	type="NORMAL" x="48" y="1"/>
-	<register name="PORTFIO_MASKB_SET" 	type="NORMAL" x="48" y="2"/>
-	<register name="PORTFIO_MASKB_TOGGLE" 	type="NORMAL" x="48" y="3"/>
-
-	<register name="PORTFIO_DIR"     type="NORMAL" x="48" y="4"/>
-	<register name="PORTFIO_POLAR"   type="NORMAL" x="48" y="5"/>
-	<register name="PORTFIO_EDGE"    type="NORMAL" x="48" y="6"/>
-	<register name="PORTFIO_BOTH"    type="NORMAL" x="48" y="7"/>
-	<register name="PORTFIO_INEN"    type="NORMAL" x="48" y="8"/>
-
-	<register name="PORTGIO" 	type="NORMAL" x="20" y="10"/>
-	<register name="PORTGIO_CLEAR" 	type="NORMAL" x="20" y="11"/>
-	<register name="PORTGIO_SET" 	type="NORMAL" x="20" y="12"/>
-	<register name="PORTGIO_TOGGLE" type="NORMAL" x="20" y="13"/>
-
-	<register name="PORTGIO_MASKA" 		type="NORMAL" x="20" y="14"/>
-	<register name="PORTGIO_MASKA_CLEAR" 	type="NORMAL" x="20" y="15"/>
-	<register name="PORTGIO_MASKA_SET" 	type="NORMAL" x="20" y="16"/>
-	<register name="PORTGIO_MASKA_TOGGLE" 	type="NORMAL" x="20" y="17"/>
-
-	<register name="PORTGIO_MASKB" 		type="NORMAL" x="48" y="10"/>
-	<register name="PORTGIO_MASKB_CLEAR" 	type="NORMAL" x="48" y="11"/>
-	<register name="PORTGIO_MASKB_SET" 	type="NORMAL" x="48" y="12"/>
-	<register name="PORTGIO_MASKB_TOGGLE" 	type="NORMAL" x="48" y="13"/>
-
-	<register name="PORTGIO_DIR"     type="NORMAL" x="48" y="14"/>
-	<register name="PORTGIO_POLAR"   type="NORMAL" x="48" y="15"/>
-	<register name="PORTGIO_EDGE"    type="NORMAL" x="48" y="16"/>
-	<register name="PORTGIO_BOTH"    type="NORMAL" x="48" y="17"/>
-	<register name="PORTGIO_INEN"    type="NORMAL" x="48" y="18"/>
-
-	<register name="PORTHIO" 	type="NORMAL" x="20" y="20"/>
-	<register name="PORTHIO_CLEAR" 	type="NORMAL" x="20" y="21"/>
-	<register name="PORTHIO_SET" 	type="NORMAL" x="20" y="22"/>
-	<register name="PORTHIO_TOGGLE" type="NORMAL" x="20" y="23"/>
-
-	<register name="PORTHIO_MASKA" 		type="NORMAL" x="20" y="24"/>
-	<register name="PORTHIO_MASKA_CLEAR" 	type="NORMAL" x="20" y="25"/>
-	<register name="PORTHIO_MASKA_SET" 	type="NORMAL" x="20" y="26"/>
-	<register name="PORTHIO_MASKA_TOGGLE" 	type="NORMAL" x="20" y="27"/>
-
-	<register name="PORTHIO_MASKB" 		type="NORMAL" x="48" y="20"/>
-	<register name="PORTHIO_MASKB_CLEAR" 	type="NORMAL" x="48" y="21"/>
-	<register name="PORTHIO_MASKB_SET" 	type="NORMAL" x="48" y="22"/>
-	<register name="PORTHIO_MASKB_TOGGLE" 	type="NORMAL" x="48" y="23"/>
-
-	<register name="PORTHIO_DIR"     type="NORMAL" x="48" y="24"/>
-	<register name="PORTHIO_POLAR"   type="NORMAL" x="48" y="25"/>
-	<register name="PORTHIO_EDGE"    type="NORMAL" x="48" y="26"/>
-	<register name="PORTHIO_BOTH"    type="NORMAL" x="48" y="27"/>
-	<register name="PORTHIO_INEN"    type="NORMAL" x="48" y="28"/>
+	<register name="PORT_EN"  type="NOLABEL" x="12" y="1"/>
+	<register name="PORT_DIR" type="NOLABEL" x="12" y="2"/>
+	<register name="XFR_TYPE" type="NOLABEL" x="12" y="3"/>
+	<register name="PORT_CFG" type="NOLABEL" x="12" y="4"/>
+	<register name="FLD_SEL"  type="NOLABEL" x="12" y="5"/>
+	<register name="PACK_EN"  type="NOLABEL" x="12" y="6"/>
+	<register name="SKIP_EN"  type="NOLABEL" x="12" y="7"/>
+	<register name="SKIP_EO"  type="NOLABEL" x="12" y="8"/>
+	<register name="DLEN"     type="NOLABEL" x="12" y="9"/>
+	<register name="POLC"     type="NOLABEL" x="12" y="10"/>
+	<register name="POLS"     type="NOLABEL" x="12" y="11"/>
 </window>
 
-<window name="Port Control Registers" menu="&amp;Register:&amp;Peripherals:Port Control" description="" format="Hexadecimal" format-selection="All" type="EMU" help-id="0xD04C" help-tag="Port_Control_Registers_Window.htm">
+<window name="PPI Registers (All)" menu="&amp;Register:&amp;Peripherals:PPI:All PPI (no bit breakdowns)" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_PPI_LIST.html">
+	<register name="PPI_CONTROL" type="NODATA"  x="0"  y="0"/>
+	<register name="PPI_STATUS"  type="NODATA"  x="0"  y="1"/>
+	<register name="PPI_DELAY"   type="NODATA"  x="0"  y="2"/>
+	<register name="PPI_COUNT"   type="NODATA"  x="0"  y="3"/>
+	<register name="PPI_FRAME"   type="NODATA"  x="0"  y="4"/>
+
+	<register name="PPI_CONTROL" type="NOLABEL" x="12" y="0"/>
+	<register name="PPI_STATUS"  type="NOLABEL" x="12" y="1"/>
+	<register name="PPI_DELAY"   type="NOLABEL" x="12" y="2"/>
+	<register name="PPI_COUNT"   type="NOLABEL" x="12" y="3"/>
+	<register name="PPI_FRAME"   type="NOLABEL" x="12" y="4"/>
+</window>
+
+<window name="PORT PIN Control Registers" menu="&amp;Register:&amp;Peripherals:Port PIN Control" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_PORTS_LIST.html">
+	<register name="PORTF_DRIVE"          type="NORMAL"  x="20"  y="0" />
+	<register name="PORTG_DRIVE"          type="NORMAL"  x="20"  y="1" />
+	<register name="PORTH_DRIVE"          type="NORMAL"  x="20"  y="2" />
+	<register name="PORTF_SLEW"           type="NORMAL"  x="20"  y="3" />
+	<register name="PORTG_SLEW"           type="NORMAL"  x="20"  y="4" />
+	<register name="PORTH_SLEW"           type="NORMAL"  x="20"  y="5" />
+	<register name="PORTF_HYSTERESIS"     type="NORMAL"  x="20"  y="6" />
+	<register name="PORTG_HYSTERESIS"     type="NORMAL"  x="20"  y="7" />
+	<register name="PORTH_HYSTERESIS"     type="NORMAL"  x="20"  y="8" />
+</window>
+
+<window name="Port Multiplexing Registers" menu="&amp;Register:&amp;Peripherals:Port Multiplexing" description="" format="Hexadecimal" format-selection="All" type="EMU" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_PORTS_LIST.html">
 	<register name="PORTF_FER"    type="NODATA"  x="1"  y="0"/>
 	<register name="PORTF_FER"    type="NOLABEL" x="12" y="0"/>
 	<register name="PORTG_FER"    type="NODATA"  x="1"  y="1"/>
 	<register name="PORTG_FER"    type="NOLABEL" x="12" y="1"/>
 	<register name="PORTH_FER"    type="NODATA"  x="1"  y="2"/>
 	<register name="PORTH_FER"    type="NOLABEL" x="12" y="2"/>
-	<register name="PORT_MUX"     type="NODATA"  x="1"  y="4"/>
-	<register name="PORT_MUX"     type="NOLABEL" x="12" y="4"/>
+	<register name="PORTF_MUX"    type="NODATA"  x="1"  y="3"/>
+	<register name="PORTF_MUX"    type="NOLABEL" x="12" y="3"/>
+	<register name="PORTG_MUX"    type="NODATA"  x="1"  y="4"/>
+	<register name="PORTG_MUX"    type="NOLABEL" x="12" y="4"/>
+	<register name="PORTH_MUX"    type="NODATA"  x="1"  y="5"/>
+	<register name="PORTH_MUX"    type="NOLABEL" x="12" y="5"/>
 </window>
 
-<window name="PIN Control Registers" menu="&amp;Register:&amp;Peripherals:PIN Control" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
-	<register name="PORTF_MUX"            type="NORMAL"  x="20"  y="0"  />
-	<register name="PORTG_MUX"            type="NORMAL"  x="20"  y="1"  />
-	<register name="PORTH_MUX"            type="NORMAL"  x="20"  y="2"  />
-	<register name="PORTF_DRIVE"          type="NORMAL"  x="20"  y="3"  />
-	<register name="PORTG_DRIVE"          type="NORMAL"  x="20"  y="4"  />
-	<register name="PORTH_DRIVE"          type="NORMAL"  x="20"  y="5"  />
-	<register name="PORTF_SLEW"           type="NORMAL"  x="20"  y="6"  />
-	<register name="PORTG_SLEW"           type="NORMAL"  x="20"  y="7"  />
-	<register name="PORTH_SLEW"           type="NORMAL"  x="20"  y="8"  />
-	<register name="PORTF_HYSTERISIS"     type="NORMAL"  x="20"  y="9"  />
-	<register name="PORTG_HYSTERISIS"     type="NORMAL"  x="20"  y="10" />
-	<register name="PORTH_HYSTERISIS"     type="NORMAL"  x="20"  y="11" />
-	<register name="MISCPORT_DRIVE"       type="NORMAL"  x="20"  y="12" />
-	<register name="MISCPORT_SLEW"        type="NORMAL"  x="20"  y="13" />
-	<register name="MISCPORT_HYSTERISIS"  type="NORMAL"  x="20"  y="14" />
+<window name="Port GPIO Registers" menu="&amp;Register:&amp;Peripherals:Port GPIO" description="" format="Hexadecimal" format-selection="All" type="EMU" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_PORTS_LIST.html">
+
+	<register name="PORTF"          type="NODATA" x="14" y="0"/>
+	<register name="PORTG"          type="NODATA" x="24" y="0"/>
+	<register name="PORTH"          type="NODATA" x="34" y="0"/>
+
+	<register name="PORTxIO" 	type="NODATA" x="0"  y="1"/>
+	<register name="CLEAR" 	        type="NODATA" x="0"  y="2"/>
+	<register name="SET" 	        type="NODATA" x="0"  y="3"/>
+	<register name="TOGGLE"         type="NODATA" x="0"  y="4"/>
+	<register name="DIR"            type="NODATA" x="0"  y="5"/>
+	<register name="POLARITY"       type="NODATA" x="0"  y="6"/>
+	<register name="EDGE"           type="NODATA" x="0"  y="7"/>
+	<register name="BOTH"           type="NODATA" x="0"  y="8"/>
+	<register name="INEN"           type="NODATA" x="0"  y="9"/>
+	<register name="MASKA" 		type="NODATA" x="0"  y="11"/>
+	<register name="MASKA_CLEAR" 	type="NODATA" x="0"  y="12"/>
+	<register name="MASKA_SET" 	type="NODATA" x="0"  y="13"/>
+	<register name="MASKA_TOGGLE" 	type="NODATA" x="0"  y="14"/>
+	<register name="MASKB" 		type="NODATA" x="0"  y="15"/>
+	<register name="MASKB_CLEAR" 	type="NODATA" x="0"  y="16"/>
+	<register name="MASKB_SET" 	type="NODATA" x="0"  y="17"/>
+	<register name="MASKB_TOGGLE" 	type="NODATA" x="0"  y="18"/>
+
+	<register name="PORTFIO" 	        type="NOLABEL" x="14"  y="1"/>
+	<register name="PORTFIO_CLEAR" 	        type="NOLABEL" x="14"  y="2"/>
+	<register name="PORTFIO_SET" 	        type="NOLABEL" x="14"  y="3"/>
+	<register name="PORTFIO_TOGGLE"         type="NOLABEL" x="14"  y="4"/>
+	<register name="PORTFIO_DIR"            type="NOLABEL" x="14"  y="5"/>
+	<register name="PORTFIO_POLAR"          type="NOLABEL" x="14"  y="6"/>
+	<register name="PORTFIO_EDGE"           type="NOLABEL" x="14"  y="7"/>
+	<register name="PORTFIO_BOTH"           type="NOLABEL" x="14"  y="8"/>
+	<register name="PORTFIO_INEN"           type="NOLABEL" x="14"  y="9"/>
+	<register name="PORTFIO_MASKA" 		type="NOLABEL" x="14"  y="11"/>
+	<register name="PORTFIO_MASKA_CLEAR" 	type="NOLABEL" x="14"  y="12"/>
+	<register name="PORTFIO_MASKA_SET" 	type="NOLABEL" x="14"  y="13"/>
+	<register name="PORTFIO_MASKA_TOGGLE" 	type="NOLABEL" x="14"  y="14"/>
+	<register name="PORTFIO_MASKB" 		type="NOLABEL" x="14"  y="15"/>
+	<register name="PORTFIO_MASKB_CLEAR" 	type="NOLABEL" x="14"  y="16"/>
+	<register name="PORTFIO_MASKB_SET" 	type="NOLABEL" x="14"  y="17"/>
+	<register name="PORTFIO_MASKB_TOGGLE" 	type="NOLABEL" x="14"  y="18"/>
+
+	<register name="PORTGIO" 	        type="NOLABEL" x="24"  y="1"/>
+	<register name="PORTGIO_CLEAR" 	        type="NOLABEL" x="24"  y="2"/>
+	<register name="PORTGIO_SET" 	        type="NOLABEL" x="24"  y="3"/>
+	<register name="PORTGIO_TOGGLE"         type="NOLABEL" x="24"  y="4"/>
+	<register name="PORTGIO_DIR"            type="NOLABEL" x="24"  y="5"/>
+	<register name="PORTGIO_POLAR"          type="NOLABEL" x="24"  y="6"/>
+	<register name="PORTGIO_EDGE"           type="NOLABEL" x="24"  y="7"/>
+	<register name="PORTGIO_BOTH"           type="NOLABEL" x="24"  y="8"/>
+	<register name="PORTGIO_INEN"           type="NOLABEL" x="24"  y="9"/>
+	<register name="PORTGIO_MASKA" 		type="NOLABEL" x="24"  y="11"/>
+	<register name="PORTGIO_MASKA_CLEAR" 	type="NOLABEL" x="24"  y="12"/>
+	<register name="PORTGIO_MASKA_SET" 	type="NOLABEL" x="24"  y="13"/>
+	<register name="PORTGIO_MASKA_TOGGLE" 	type="NOLABEL" x="24"  y="14"/>
+	<register name="PORTGIO_MASKB" 		type="NOLABEL" x="24"  y="15"/>
+	<register name="PORTGIO_MASKB_CLEAR" 	type="NOLABEL" x="24"  y="16"/>
+	<register name="PORTGIO_MASKB_SET" 	type="NOLABEL" x="24"  y="17"/>
+	<register name="PORTGIO_MASKB_TOGGLE" 	type="NOLABEL" x="24"  y="18"/>
+
+	<register name="PORTHIO" 	        type="NOLABEL" x="34"  y="1"/>
+	<register name="PORTHIO_CLEAR" 	        type="NOLABEL" x="34"  y="2"/>
+	<register name="PORTHIO_SET" 	        type="NOLABEL" x="34"  y="3"/>
+	<register name="PORTHIO_TOGGLE"         type="NOLABEL" x="34"  y="4"/>
+	<register name="PORTHIO_DIR"            type="NOLABEL" x="34"  y="5"/>
+	<register name="PORTHIO_POLAR"          type="NOLABEL" x="34"  y="6"/>
+	<register name="PORTHIO_EDGE"           type="NOLABEL" x="34"  y="7"/>
+	<register name="PORTHIO_BOTH"           type="NOLABEL" x="34"  y="8"/>
+	<register name="PORTHIO_INEN"           type="NOLABEL" x="34"  y="9"/>
+	<register name="PORTHIO_MASKA" 		type="NOLABEL" x="34"  y="11"/>
+	<register name="PORTHIO_MASKA_CLEAR" 	type="NOLABEL" x="34"  y="12"/>
+	<register name="PORTHIO_MASKA_SET" 	type="NOLABEL" x="34"  y="13"/>
+	<register name="PORTHIO_MASKA_TOGGLE" 	type="NOLABEL" x="34"  y="14"/>
+	<register name="PORTHIO_MASKB" 		type="NOLABEL" x="34"  y="15"/>
+	<register name="PORTHIO_MASKB_CLEAR" 	type="NOLABEL" x="34"  y="16"/>
+	<register name="PORTHIO_MASKB_SET" 	type="NOLABEL" x="34"  y="17"/>
+	<register name="PORTHIO_MASKB_TOGGLE" 	type="NOLABEL" x="34"  y="18"/>
 </window>
 
 <window name="OTP Timing Registers" menu="&amp;Register:&amp;Peripherals:OTP:OTP Timing" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
@@ -1739,7 +1805,13 @@
 	<register name="OTP_DATA3"   type="NORMAL" x="11" y="7" />
 </window>
 
-<window name="NFC Status Registers" menu="&amp;Register:&amp;Peripherals:NFC:Status" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="Non-GPIO Signal Control Registers" menu="&amp;Register:&amp;Peripherals:Non-GPIO Signal Control" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_PORTS_LIST.html">
+	<register name="NONGPIO_DRIVE"       type="NORMAL"  x="18"  y="0" />
+	<register name="NONGPIO_SLEW"        type="NORMAL"  x="18"  y="1" />
+	<register name="NONGPIO_HYSTERESIS"  type="NORMAL"  x="18"  y="2" />
+</window>
+
+<window name="NFC Status Registers" menu="&amp;Register:&amp;Peripherals:NFC:Status" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_NFC_STAT.html">
 	<register name="NFC_STAT"   type="NODATA"  x="0"  y="0" />
 	<register name="NFC_STAT"   type="NOLABEL" x="14" y="0" />
 	<register name="NBUSY"      type="NODATA"  x="2"  y="2" />
@@ -1754,7 +1826,7 @@
 	<register name="WB_EMPTY"   type="NOLABEL" x="14" y="6" />
 </window>
 
-<window name="NFC Interrupt Status Registers" menu="&amp;Register:&amp;Peripherals:NFC:Interrupt Status" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="NFC Interrupt Status Registers" menu="&amp;Register:&amp;Peripherals:NFC:Interrupt Status" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_NFC_IRQSTAT.html">
 	<register name="NFC_IRQSTAT" type="NODATA"  x="0"  y="0" />
 	<register name="NFC_IRQSTAT" type="NOLABEL" x="14" y="0" />
 	<register name="NBUSYIRQ"    type="NODATA"  x="2"  y="2" />
@@ -1769,7 +1841,7 @@
 	<register name="WR_DONE"     type="NOLABEL" x="14" y="6" />
 </window>
 
-<window name="NFC Interrupt Mask Registers" menu="&amp;Register:&amp;Peripherals:NFC:Interrupt Mask" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="NFC Interrupt Mask Registers" menu="&amp;Register:&amp;Peripherals:NFC:Interrupt Mask" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_NFC_IRQMASK.html">
 	<register name="NFC_IRQMASK"  type="NODATA"  x="0"  y="0" />
 	<register name="NFC_IRQMASK"  type="NOLABEL" x="15" y="0" />
 	<register name="NFC_IRQMASK"  type="NODATA"  x="2"  y="2" />
@@ -1786,20 +1858,18 @@
 	<register name="MASK_WRDONE"  type="NOLABEL" x="15" y="7" />
 </window>
 
-<window name="NFC Control Registers" menu="&amp;Register:&amp;Peripherals:NFC:Control" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="NFC Control Registers" menu="&amp;Register:&amp;Peripherals:NFC:Control" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_NFC_CTL.html">
 	<register name="NFC_CTL"   type="NODATA"  x="0"  y="0" />
 	<register name="NFC_CTL"   type="NOLABEL" x="12" y="0" />
 	<register name="WR_DLY"    type="NODATA"  x="2"  y="2" />
 	<register name="RD_DLY"    type="NODATA"  x="2"  y="3" />
-	<register name="NWIDTH"    type="NODATA"  x="2"  y="4" />
-	<register name="PG_SIZE"   type="NODATA"  x="2"  y="5" />
+	<register name="PG_SIZE"   type="NODATA"  x="2"  y="4" />
 	<register name="WR_DLY"    type="NOLABEL" x="12" y="2" />
 	<register name="RD_DLY"    type="NOLABEL" x="12" y="3" />
-	<register name="NWIDTH"    type="NOLABEL" x="12" y="4" />
-	<register name="PG_SIZE"   type="NOLABEL" x="12" y="5" />
+	<register name="PG_SIZE"   type="NOLABEL" x="12" y="4" />
 </window>
 
-<window name="All NAND Registers (no bit breakdowns)" menu="&amp;Register:&amp;Peripherals:NFC:All NAND (no bit breakdowns)" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="All NAND Registers (no bit breakdowns)" menu="&amp;Register:&amp;Peripherals:NFC:All NAND (no bit breakdowns)" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_NFC_LIST.html">
 	<register name="NFC_CTL"     type="NORMAL" x="12" y="0" />
 	<register name="NFC_STAT"    type="NORMAL" x="12" y="1" />
 	<register name="NFC_IRQSTAT" type="NORMAL" x="12" y="2" />
@@ -1818,7 +1888,7 @@
 	<register name="NFC_DATA_RD" type="NORMAL" x="12" y="15" />
 </window>
 
-<window name="MEMDMA1 Destination Registers" menu="&amp;Register:&amp;Peripherals:MEMDMAFlex:Destination Channel-1" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD029" help-tag="HID_PERIPHERAL_FlexMEMDMA1_d.htm">
+<window name="MEMDMA1 Destination Registers" menu="&amp;Register:&amp;Peripherals:MEMDMAFlex:Destination Channel-1" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD029" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_DMA_CONTROL_LIST.html">
 	<register name="High"                           type="NODATA"  x="30" y="0"/>
 	<register name="Low"                            type="NODATA"  x="36" y="0"/>
 	<register name="MDMA_D1_NEXT_DESC_PTR"          type="NODATA"  x="0"  y="1"/>
@@ -1884,7 +1954,8 @@
 	<register name="MDMA_D1_CURR_Y_COUNT"           type="NODATA"  x="0"  y="35"/>
 	<register name="MDMA_D1_CURR_Y_COUNT"           type="NOLABEL" x="33" y="35"/>
 </window>
-<window name="MEMDMA1 Source Registers" menu="&amp;Register:&amp;Peripherals:MEMDMAFlex:Source Channel-1" description="" format="Hexadecimal" format-selection="ALL" type="SIM EMU" help-id="0xD02A" help-tag="HID_PERIPHERAL_FlexMEMDMA1_s.htm">
+
+<window name="MEMDMA1 Source Registers" menu="&amp;Register:&amp;Peripherals:MEMDMAFlex:Source Channel-1" description="" format="Hexadecimal" format-selection="ALL" type="SIM EMU" help-id="0xD02A" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_DMA_CONTROL_LIST.html">
 	<register name="High"                           type="NODATA"  x="30" y="0"/>
 	<register name="Low"                            type="NODATA"  x="36" y="0"/>
 	<register name="MDMA_S1_NEXT_DESC_PTR"          type="NODATA"  x="0"  y="1"/>
@@ -1950,7 +2021,8 @@
 	<register name="MDMA_S1_CURR_Y_COUNT"           type="NODATA"  x="0"  y="35"/>
 	<register name="MDMA_S1_CURR_Y_COUNT"           type="NOLABEL" x="33" y="35"/>
 </window>
-<window name="MEMDMA0 Destination Registers" menu="&amp;Register:&amp;Peripherals:MEMDMAFlex:Destination Channel-0" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD027" help-tag="HID_PERIPHERAL_FlexMEMDMA0_d.htm">
+
+<window name="MEMDMA0 Destination Registers" menu="&amp;Register:&amp;Peripherals:MEMDMAFlex:Destination Channel-0" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD027" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_DMA_CONTROL_LIST.html">
 	<register name="High"                           type="NODATA"  x="30" y="0"/>
 	<register name="Low"                            type="NODATA"  x="36" y="0"/>
 	<register name="MDMA_D0_NEXT_DESC_PTR"          type="NODATA"  x="0"  y="1"/>
@@ -2016,7 +2088,8 @@
 	<register name="MDMA_D0_CURR_Y_COUNT"           type="NODATA"  x="0"  y="35"/>
 	<register name="MDMA_D0_CURR_Y_COUNT"           type="NOLABEL" x="33" y="35"/>
 </window>
-<window name="MEMDMA0 Source Registers" menu="&amp;Register:&amp;Peripherals:MEMDMAFlex:Source Channel-0" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD028" help-tag="HID_PERIPHERAL_FlexMEMDMA0_s.htm">
+
+<window name="MEMDMA0 Source Registers" menu="&amp;Register:&amp;Peripherals:MEMDMAFlex:Source Channel-0" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD028" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_DMA_CONTROL_LIST.html">
 	<register name="High"                           type="NODATA"  x="30" y="0"/>
 	<register name="Low"                            type="NODATA"  x="36" y="0"/>
 	<register name="MDMA_S0_NEXT_DESC_PTR"          type="NODATA"  x="0"  y="1"/>
@@ -2083,7 +2156,7 @@
 	<register name="MDMA_S0_CURR_Y_COUNT"           type="NOLABEL" x="33" y="35"/>
 </window>
 
-<window name="All HMDMA 1 Registers (no bit breakdowns)" menu="&amp;Register:&amp;Peripherals:MDMA Handshake:All HMDMA1 (no bit breakdowns)" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="All HMDMA 1 Registers (no bit breakdowns)" menu="&amp;Register:&amp;Peripherals:MDMA Handshake:All HMDMA1 (no bit breakdowns)" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_HMDMA_LIST.html">
 	<register name="HMDMA1_CONTROL"    type="NORMAL" x="17" y="0" />
 	<register name="HMDMA1_ECINIT"     type="NORMAL" x="17" y="1" />
 	<register name="HMDMA1_BCINIT"     type="NORMAL" x="17" y="2" />
@@ -2093,7 +2166,7 @@
 	<register name="HMDMA1_BCOUNT"     type="NORMAL" x="17" y="6" />
 </window>
 
-<window name="All HMDMA 0 Registers (no bit breakdowns)" menu="&amp;Register:&amp;Peripherals:MDMA Handshake:All HMDMA0 (no bit breakdowns)" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="All HMDMA 0 Registers (no bit breakdowns)" menu="&amp;Register:&amp;Peripherals:MDMA Handshake:All HMDMA0 (no bit breakdowns)" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_HMDMA_LIST.html">
 	<register name="HMDMA0_CONTROL"    type="NORMAL" x="17" y="0" />
 	<register name="HMDMA0_ECINIT"     type="NORMAL" x="17" y="1" />
 	<register name="HMDMA0_BCINIT"     type="NORMAL" x="17" y="2" />
@@ -2103,7 +2176,7 @@
 	<register name="HMDMA0_BCOUNT"     type="NORMAL" x="17" y="6" />
 </window>
 
-<window name="All Host Registers" menu="&amp;Register:&amp;Peripherals:HOST:All Host" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="All Host Registers" menu="&amp;Register:&amp;Peripherals:HOST:All Host" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_HOSTDP_LIST.html">
 	<register name="HOST_CONTROL"   type="NODATA"  x="0"  y="0"/>
 	<register name="HOST_STATUS"    type="NODATA"  x="0"  y="1"/>
 	<register name="HOST_TIMEOUT"   type="NODATA"  x="0"  y="2"/>
@@ -2112,7 +2185,7 @@
 	<register name="HOST_TIMEOUT"   type="NOLABEL" x="14" y="2"/>
 </window>
 
-<window name="External Bus Interface Unit Registers" menu="&amp;Register:&amp;Peripherals:External Bus Interface Unit" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD04E" help-tag="external_bus_interface_unit_registers.htm">
+<window name="External Bus Interface Unit Registers" menu="&amp;Register:&amp;Peripherals:External Bus Interface Unit" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD04E" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_EBIU_LIST.html">
 	<register name="EBIU_AMGCTL"  type="NODATA"  x="1"  y="0"/>
 	<register name="EBIU_AMGCTL"  type="NOLABEL" x="14" y="0"/>
 	<register name="EBIU_AMBCTL0" type="NODATA"  x="1"  y="1"/>
@@ -2259,7 +2332,7 @@
 	<register name="BGSTAT"   type="NOLABEL" x="48" y="74"/>
 </window>
 
-<window name="EMAC MMC Registers" menu="&amp;Register:&amp;Peripherals:EMAC MMC" description="" format="Unsigned Integer 32 bit" format-selection="All" type="EMU" help-id="0xD03F" help-tag="EMAC_MMC_Registers_Window.htm">
+<window name="EMAC MMC Registers" menu="&amp;Register:&amp;Peripherals:EMAC MMC" description="" format="Unsigned Integer 32 bit" format-selection="All" type="EMU" help-id="0xD03F" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_EMAC_LIST.html">
 	<register name="EMAC_RXC_OK"           	type="NORMAL" x="20" y="0"/>
 	<register name="EMAC_RXC_FCS"          	type="NORMAL" x="20" y="1"/>
 	<register name="EMAC_RXC_ALIGN"        	type="NORMAL" x="20" y="2"/>
@@ -2310,7 +2383,7 @@
 	<register name="EMAC_TXC_ABORT"        	type="NORMAL" x="20" y="47"/>
 </window>
 
-<window name="EMAC MAC/SIF Registers" menu="&amp;Register:&amp;Peripherals:EMAC MAC/SIF" description="" format="Hexadecimal" format-selection="All" type="EMU" help-id="0xD03E" help-tag="EMAC_MAC_SIF_Registers_Window.htm">
+<window name="EMAC MAC/SIF Registers" menu="&amp;Register:&amp;Peripherals:EMAC MAC/SIF" description="" format="Hexadecimal" format-selection="All" type="EMU" help-id="0xD03E" help-tag="\BF52x_HWR_vol2.chm::/FILE_H_IDH_BF52X_REG_EMAC_LIST.html">
 	<register name="EMAC_OPMODE"  		type="NORMAL" x="20" y="0"/>
 	<register name="EMAC_ADDRLO"	 	type="NORMAL" x="20" y="1"/>
 	<register name="EMAC_ADDRHI"	 	type="NORMAL" x="20" y="2"/>
@@ -2345,7 +2418,7 @@
 	<register name="EMAC_MMC_TIRQE"  	type="NORMAL" x="20" y="33"/>
 </window>
 
-<window name="DMA Traffic Control" menu="&amp;Register:&amp;Peripherals:DMA Traffic Control" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="dma-traffic-control-window.htm">
+<window name="DMA Traffic Control" menu="&amp;Register:&amp;Peripherals:DMA Traffic Control" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_DMA_TC_CNT.html">
 	<register name="DMA_TC_PER" type="NORMAL" x="10" y="0"/>
 	<register name="DCB_TRAFFIC_PERIOD"      type="NODATA" x="2" y="1"/>
 	<register name="DEB_TRAFFIC_PERIOD"      type="NODATA" x="2" y="2"/>
@@ -2366,7 +2439,8 @@
 	<register name="DAB_TRAFFIC_COUNT"       type="NOLABEL" x="26" y="9"/>
 	<register name="MDMA_ROUND_ROBIN_COUNT"  type="NOLABEL" x="26" y="10"/>
 </window>
-<window name="DMAFlex Ch-11 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-11" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="HID_PERIPHERAL_FlexDMA0.htm">
+
+<window name="DMAFlex Ch-11 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-11" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_DMA_CONTROL_LIST.html">
 	<register name="High"                           type="NODATA"  x="30" y="0"/>
 	<register name="Low"                            type="NODATA"  x="36" y="0"/>
 	<register name="DMA11_NEXT_DESC_PTR"            type="NODATA"  x="0"  y="1"/>
@@ -2432,7 +2506,8 @@
 	<register name="DMA11_CURR_Y_COUNT"             type="NODATA"  x="0"  y="35"/>
 	<register name="DMA11_CURR_Y_COUNT"             type="NOLABEL" x="33" y="35"/>
 </window>
-<window name="DMAFlex Ch-10 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-10" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="HID_PERIPHERAL_FlexDMA0.htm">
+
+<window name="DMAFlex Ch-10 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-10" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_DMA_CONTROL_LIST.html">
 	<register name="High"                           type="NODATA"  x="30" y="0"/>
 	<register name="Low"                            type="NODATA"  x="36" y="0"/>
 	<register name="DMA10_NEXT_DESC_PTR"            type="NODATA"  x="0"  y="1"/>
@@ -2498,7 +2573,8 @@
 	<register name="DMA10_CURR_Y_COUNT"             type="NODATA"  x="0"  y="35"/>
 	<register name="DMA10_CURR_Y_COUNT"             type="NOLABEL" x="33" y="35"/>
 </window>
-<window name="DMAFlex Ch-9 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-9" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="HID_PERIPHERAL_FlexDMA0.htm">
+
+<window name="DMAFlex Ch-9 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-9" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_DMA_CONTROL_LIST.html">
 	<register name="High"                           type="NODATA"  x="30" y="0"/>
 	<register name="Low"                            type="NODATA"  x="36" y="0"/>
 	<register name="DMA9_NEXT_DESC_PTR"             type="NODATA"  x="0"  y="1"/>
@@ -2564,7 +2640,8 @@
 	<register name="DMA9_CURR_Y_COUNT"              type="NODATA"  x="0"  y="35"/>
 	<register name="DMA9_CURR_Y_COUNT"              type="NOLABEL" x="33" y="35"/>
 </window>
-<window name="DMAFlex Ch-8 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-8" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="HID_PERIPHERAL_FlexDMA0.htm">
+
+<window name="DMAFlex Ch-8 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-8" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_DMA_CONTROL_LIST.html">
 	<register name="High"                           type="NODATA"  x="30" y="0"/>
 	<register name="Low"                            type="NODATA"  x="36" y="0"/>
 	<register name="DMA8_NEXT_DESC_PTR"             type="NODATA"  x="0"  y="1"/>
@@ -2630,7 +2707,8 @@
 	<register name="DMA8_CURR_Y_COUNT"              type="NODATA"  x="0"  y="35"/>
 	<register name="DMA8_CURR_Y_COUNT"              type="NOLABEL" x="33" y="35"/>
 </window>
-<window name="DMAFlex Ch-7 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-7" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="HID_PERIPHERAL_FlexDMA0.htm">
+
+<window name="DMAFlex Ch-7 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-7" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_DMA_CONTROL_LIST.html">
 	<register name="High"                           type="NODATA"  x="30" y="0"/>
 	<register name="Low"                            type="NODATA"  x="36" y="0"/>
 	<register name="DMA7_NEXT_DESC_PTR"             type="NODATA"  x="0"  y="1"/>
@@ -2696,7 +2774,8 @@
 	<register name="DMA7_CURR_Y_COUNT"              type="NODATA"  x="0"  y="35"/>
 	<register name="DMA7_CURR_Y_COUNT"              type="NOLABEL" x="33" y="35"/>
 </window>
-<window name="DMAFlex Ch-6 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-6" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="HID_PERIPHERAL_FlexDMA0.htm">
+
+<window name="DMAFlex Ch-6 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-6" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_DMA_CONTROL_LIST.html">
 	<register name="High"                           type="NODATA"  x="30" y="0"/>
 	<register name="Low"                            type="NODATA"  x="36" y="0"/>
 	<register name="DMA6_NEXT_DESC_PTR"             type="NODATA"  x="0"  y="1"/>
@@ -2762,7 +2841,8 @@
 	<register name="DMA6_CURR_Y_COUNT"              type="NODATA"  x="0"  y="35"/>
 	<register name="DMA6_CURR_Y_COUNT"              type="NOLABEL" x="33" y="35"/>
 </window>
-<window name="DMAFlex Ch-5 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-5" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="HID_PERIPHERAL_FlexDMA0.htm">
+
+<window name="DMAFlex Ch-5 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-5" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_DMA_CONTROL_LIST.html">
 	<register name="High"                           type="NODATA"  x="30" y="0"/>
 	<register name="Low"                            type="NODATA"  x="36" y="0"/>
 	<register name="DMA5_NEXT_DESC_PTR"             type="NODATA"  x="0"  y="1"/>
@@ -2828,7 +2908,8 @@
 	<register name="DMA5_CURR_Y_COUNT"              type="NODATA"  x="0"  y="35"/>
 	<register name="DMA5_CURR_Y_COUNT"              type="NOLABEL" x="33" y="35"/>
 </window>
-<window name="DMAFlex Ch-4 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-4" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="HID_PERIPHERAL_FlexDMA0.htm">
+
+<window name="DMAFlex Ch-4 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-4" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_DMA_CONTROL_LIST.html">
 	<register name="High"                           type="NODATA"  x="30" y="0"/>
 	<register name="Low"                            type="NODATA"  x="36" y="0"/>
 	<register name="DMA4_NEXT_DESC_PTR"             type="NODATA"  x="0"  y="1"/>
@@ -2894,7 +2975,8 @@
 	<register name="DMA4_CURR_Y_COUNT"              type="NODATA"  x="0"  y="35"/>
 	<register name="DMA4_CURR_Y_COUNT"              type="NOLABEL" x="33" y="35"/>
 </window>
-<window name="DMAFlex Ch-3 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-3" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="HID_PERIPHERAL_FlexDMA0.htm">
+
+<window name="DMAFlex Ch-3 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-3" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_DMA_CONTROL_LIST.html">
 	<register name="High"                           type="NODATA"  x="30" y="0"/>
 	<register name="Low"                            type="NODATA"  x="36" y="0"/>
 	<register name="DMA3_NEXT_DESC_PTR"             type="NODATA"  x="0"  y="1"/>
@@ -2960,7 +3042,8 @@
 	<register name="DMA3_CURR_Y_COUNT"              type="NODATA"  x="0"  y="35"/>
 	<register name="DMA3_CURR_Y_COUNT"              type="NOLABEL" x="33" y="35"/>
 </window>
-<window name="DMAFlex Ch-2 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-2" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="HID_PERIPHERAL_FlexDMA0.htm">
+
+<window name="DMAFlex Ch-2 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-2" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_DMA_CONTROL_LIST.html">
 	<register name="High"                           type="NODATA"  x="30" y="0"/>
 	<register name="Low"                            type="NODATA"  x="36" y="0"/>
 	<register name="DMA2_NEXT_DESC_PTR"             type="NODATA"  x="0"  y="1"/>
@@ -3026,7 +3109,8 @@
 	<register name="DMA2_CURR_Y_COUNT"              type="NODATA"  x="0"  y="35"/>
 	<register name="DMA2_CURR_Y_COUNT"              type="NOLABEL" x="33" y="35"/>
 </window>
-<window name="DMAFlex Ch-1 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-1" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="HID_PERIPHERAL_FlexDMA0.htm">
+
+<window name="DMAFlex Ch-1 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-1" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_DMA_CONTROL_LIST.html">
 	<register name="High"                           type="NODATA"  x="30" y="0"/>
 	<register name="Low"                            type="NODATA"  x="36" y="0"/>
 	<register name="DMA1_NEXT_DESC_PTR"             type="NODATA"  x="0"  y="1"/>
@@ -3092,7 +3176,8 @@
 	<register name="DMA1_CURR_Y_COUNT"              type="NODATA"  x="0"  y="35"/>
 	<register name="DMA1_CURR_Y_COUNT"              type="NOLABEL" x="33" y="35"/>
 </window>
-<window name="DMAFlex Ch-0 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-0" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="HID_PERIPHERAL_FlexDMA0.htm">
+
+<window name="DMAFlex Ch-0 Registers" menu="&amp;Register:&amp;Peripherals:DMAFlex:DMAFlex Channel-0" description="" format="Hexadecimal" format-selection="All" type="SIM EMU" help-id="0xD02B" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_DMA_CONTROL_LIST.html">
 	<register name="High"                           type="NODATA"  x="30" y="0"/>
 	<register name="Low"                            type="NODATA"  x="36" y="0"/>
 	<register name="DMA0_NEXT_DESC_PTR"             type="NODATA"  x="0"  y="1"/>
@@ -3159,7 +3244,7 @@
 	<register name="DMA0_CURR_Y_COUNT"              type="NOLABEL" x="33" y="35"/>
 </window>
 
-<window name="Counter Status Registers" menu="&amp;Register:&amp;Peripherals:Counter:STATUS" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="Counter Status Registers" menu="&amp;Register:&amp;Peripherals:Counter:STATUS" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_CNT_STATUS.html">
 	<register name="CNT_STATUS" type="NORMAL" x="10" y="0" />
 	<register name="ICII"       type="NORMAL" x="10" y="2" />
 	<register name="UCII"       type="NORMAL" x="10" y="3" />
@@ -3174,12 +3259,12 @@
 	<register name="CZMZII"     type="NORMAL" x="10" y="12" />
 </window>
 
-<window name="Counter MIN/MAX Registers" menu="&amp;Register:&amp;Peripherals:Counter:MIN/MAX" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="Counter MIN/MAX Registers" menu="&amp;Register:&amp;Peripherals:Counter:MIN/MAX" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_CNT_MIN_MAX.html">
 	<register name="CNT_MIN" type="NORMAL" x="7" y="0" />
 	<register name="CNT_MAX" type="NORMAL" x="7" y="1" />
 </window>
 
-<window name="Counter IMASK Registers" menu="&amp;Register:&amp;Peripherals:Counter:IMASK" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="Counter IMASK Registers" menu="&amp;Register:&amp;Peripherals:Counter:IMASK" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_CNT_IMASK.html">
 	<register name="CNT_IMASK" type="NORMAL" x="9" y="0" />
 	<register name="ICIE"      type="NORMAL" x="9" y="2" />
 	<register name="UCIE"      type="NORMAL" x="9" y="3" />
@@ -3194,16 +3279,16 @@
 	<register name="CZMZIE"    type="NORMAL" x="9" y="12" />
 </window>
 
-<window name="Counter Debounce Registers" menu="&amp;Register:&amp;Peripherals:Counter:DEBOUNCE" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="Counter Debounce Registers" menu="&amp;Register:&amp;Peripherals:Counter:DEBOUNCE" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_CNT_DEBOUNCE.html">
 	<register name="CNT_DEBOUNCE" type="NORMAL" x="12" y="0" />
 	<register name="DPRESCALE"    type="NORMAL" x="12" y="2" />
 </window>
 
-<window name="Counter COUNTER Registers" menu="&amp;Register:&amp;Peripherals:Counter:COUNTER" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="Counter COUNTER Registers" menu="&amp;Register:&amp;Peripherals:Counter:COUNTER" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_CNT_COUNTER.html">
 	<register name="CNT_COUNTER" type="NORMAL" x="11" y="0" />
 </window>
 
-<window name="Counter Configuration Registers" menu="&amp;Register:&amp;Peripherals:Counter:CONFIG" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="Counter Configuration Registers" menu="&amp;Register:&amp;Peripherals:Counter:CONFIG" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_CNT_CONFIG.html">
 	<register name="CNT_CONFIG" type="NORMAL" x="10" y="0" />
 	<register name="CNTE"       type="NORMAL" x="10" y="2" />
 	<register name="DEBE"       type="NORMAL" x="10" y="3" />
@@ -3216,7 +3301,7 @@
 	<register name="INPDIS"     type="NORMAL" x="10" y="10" />
 </window>
 
-<window name="Counter Command Registers" menu="&amp;Register:&amp;Peripherals:Counter:COMMAND" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="Counter Command Registers" menu="&amp;Register:&amp;Peripherals:Counter:COMMAND" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_CNT_COMMAND.html">
 	<register name="CNT_COMMAND" type="NORMAL" x="11" y="0" />
 	<register name="W1LCNT"      type="NORMAL" x="11" y="2" />
 	<register name="W1LMIN"      type="NORMAL" x="11" y="3" />
@@ -3224,7 +3309,7 @@
 	<register name="W1ZMONCE"    type="NORMAL" x="11" y="5" />
 </window>
 
-<window name="All Counter Registers" menu="&amp;Register:&amp;Peripherals:Counter:All Counter" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
+<window name="All Counter Registers" menu="&amp;Register:&amp;Peripherals:Counter:All Counter" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_ROTARY_LIST.html">
 	<register name="CNT_CONFIG"     type="NORMAL" x="14" y="0"/>
 	<register name="CNT_IMASK"  	type="NORMAL" x="14" y="1"/>
 	<register name="CNT_STATUS"    	type="NORMAL" x="14" y="2"/>

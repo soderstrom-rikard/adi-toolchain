@@ -1,6 +1,6 @@
-<visualdsp-extended-xml schema-version="1" name="ADSP-EDN-BF548-extended.xml">
+<visualdsp-extended-xml schema-version="1" name="ADSP-EDN-BF547-extended.xml">
 
-<version file-version="1.50" />
+<version file-version="1.01" />
 
 <!-- ******************************************************************* -->
 <!-- ADSP-BF54x register and bit definitions file                        -->
@@ -16,16 +16,16 @@
 <!-- Proc HWR, chap  4, SIC           ALL                                -->
 <!-- Proc HWR, chap  5, DMA           ALL                                -->
 <!-- Proc HWR, chap  6, EBIU          ALL                                -->
-<!-- Proc HWR, chap  7, PIXC          ADSP-BF544, ADSP-BF548, ADSP-BF549 -->
-<!--                                  (not in ADSP-BF542)                -->
-<!-- Proc HWR, chap  8, HOST          ADSP-BF544, ADSP-BF548, ADSP-BF549 -->
-<!--                                  (not in ADSP-BF542)                -->
+<!-- Proc HWR, chap  7, PIXC          ADSP-BF544, ADSP-BF547, ADSP-BF548 -->
+<!--                                  ADSP-BF549 (not in ADSP-BF542)     -->
+<!-- Proc HWR, chap  8, HOST          ADSP-BF544, ADSP-BF547, ADSP-BF548 -->
+<!--                                  ADSP-BF549 (not in ADSP-BF542)     -->
 <!-- Proc HWR, chap  9, PORTS-IRQS    ALL                                -->
 <!-- Proc HWR, chap 10, TIMER         Group of 8 : TIMER0 - TIMER7       -->
 <!--                                  Group of 3 : TIMER8 - TIMER10      -->
 <!--                    Group of 8 :  ALL                                -->
-<!--                    Group of 3 :  ADSP-BF544, ADSP-BF548, ADSP-BF549 -->
-<!--                                  not in ADSP-BF542                  -->
+<!--                    Group of 3 :  ADSP-BF544, ADSP-BF547, ADSP-BF548 -->
+<!--                                  ADSP-BF549 (not in ADSP-BF542)     -->
 <!-- Proc HWR, chap 11, CORE TIMER    ALL                                -->
 <!-- Proc HWR, chap 12, WDOG TIMER    ALL                                -->
 <!-- Proc HWR, chap 13, COUNTER       ALL                                -->
@@ -34,28 +34,33 @@
 <!-- Proc HWR, chap 17, PLL PWR MGMT  ALL                                -->
 <!-- ******************************************************************* -->
 
-<!-- ******************************************************************************************** -->
-<!-- Proc Periph HWR, chap  2, MXVR        ADSP-BF549 only                                        -->
-<!-- Proc Periph HWR, chap  3, KEYPAD      ADSP-BF542, ADSP-BF548, ADSP-BF549 (not in ADSP-BF544) -->
-<!-- Proc Periph HWR, chap  4, SDIO (SDH)  ADSP-BF542, ADSP-BF548, ADSP-BF549 (not in ADSP-BF544) -->
-<!-- Proc Periph HWR, chap  5, ATAPI       ADSP-BF542, ADSP-BF548, ADSP-BF549 (not in ADSP-BF544) -->
-<!-- Proc Periph HWR, chap  6, NAND (NFC)  ALL                                                    -->
-<!-- Proc Periph HWR, chap  7, EPPI (PPIx) PPI0        ADSP-BF544, ADSP-BF548, ADSP-BF549         -->
-<!--                                                   (not in ADSP-BF542)                        -->
-<!--                                       PPI1/PPI2   ALL                                        -->
-<!-- Proc Periph HWR, chap  8, CAN         CAN0        ALL                                        -->
-<!--                                       CAN1        ADSP-BF544, ADSP-BF548, ADSP-BF549         -->
-<!--                                                   (not in ADSP-BF542)                        -->
-<!-- Proc Periph HWR, chap  9, SPI         SPI0-SPI1   ALL                                        -->
-<!--                                       SPI2        ADSP-BF548, ADSP-BF549                     -->
-<!-- Proc Periph HWR, chap 10, TWI         TWI0        ALL                                        -->
-<!--                                       TWI1        ADSP-BF544, ADSP-BF548, ADSP-BF549         -->
-<!-- Proc Periph HWR, chap 11, SPORT       SPORT1/SPORT2/SPORT3  ALL                              -->
-<!--                                       SPORT0                ADSP-BF548, ADSP-BF549           -->
-<!-- Proc Periph HWR, chap 12, UART        UART0/UART1/UART3     ALL                              -->
-<!--                                       UART2                 ADSP-BF548, ADSP-BF549           --> 
-<!-- Proc Periph HWR, chap 13, USB-OTG     ADSP-BF542, ADSP-BF548, ADSP-BF549 (not in ADSP-BF544) -->
-<!-- ******************************************************************************************** -->
+<!-- ************************************************************************************************ -->
+<!-- Proc Periph HWR, chap  2, MXVR        ADSP-BF547 / ADSP-BF548 / ADSP-BF549 only                  -->
+<!-- Proc Periph HWR, chap  3, KEYPAD      ADSP-BF542, ADSP-BF547, ADSP-BF548, ADSP-BF549             -->
+<!--                                       (not in ADSP-BF544)                                        -->
+<!-- Proc Periph HWR, chap  4, SDIO (SDH)  ADSP-BF542, ADSP-BF547, ADSP-BF548, ADSP-BF549             -->
+<!--                                       (not in ADSP-BF544)                                        -->
+<!-- Proc Periph HWR, chap  5, ATAPI       ADSP-BF542, ADSP-BF547, ADSP-BF548, ADSP-BF549             -->
+<!--                                       (not in ADSP-BF544)                                        -->
+<!-- Proc Periph HWR, chap  6, NAND (NFC)  ALL                                                        -->
+<!-- Proc Periph HWR, chap  7, EPPI (PPIx) PPI0        ADSP-BF544, ADSP-BF547, ADSP-BF548, ADSP-BF549 -->
+<!--                                                   (not in ADSP-BF542)                            -->
+<!--                                       PPI1/PPI2   ALL                                            -->
+<!-- Proc Periph HWR, chap  8, CAN         CAN0        ADSP-BF542, ADSP-BF544, ADSP-BF548, ADSP-BF549 -->
+<!--                                                   (not in ADSP-BF547)                            -->
+<!--                                       CAN1        ADSP-BF544, ADSP-BF548, ADSP-BF549             -->
+<!--                                                   (not in ADSP-BF542, ADSP-BF547)                -->
+<!-- Proc Periph HWR, chap  9, SPI         SPI0-SPI1   ALL                                            -->
+<!--                                       SPI2        ADSP-BF547, ADSP-BF548, ADSP-BF549             -->
+<!-- Proc Periph HWR, chap 10, TWI         TWI0        ALL                                            -->
+<!--                                       TWI1        ADSP-BF544, ADSP-BF547, ADSP-BF548, ADSP-BF549 -->
+<!-- Proc Periph HWR, chap 11, SPORT       SPORT1/SPORT2/SPORT3  ALL                                  -->
+<!--                                       SPORT0                ADSP-BF547, ADSP-BF548, ADSP-BF549   -->
+<!-- Proc Periph HWR, chap 12, UART        UART0/UART1/UART3     ALL                                  -->
+<!--                                       UART2                 ADSP-BF547, ADSP-BF548, ADSP-BF549   --> 
+<!-- Proc Periph HWR, chap 13, USB-OTG     ADSP-BF542, ADSP-BF547, ADSP-BF548, ADSP-BF549             -->
+<!--                                       (not in ADSP-BF544)                                        -->
+<!-- ************************************************************************************************ -->
 
 <register-extended-definitions>
 
@@ -2034,9 +2039,9 @@
 
 <!-- Proc HWR, chap 12, WDOG TIMER Registers Definitions  -->
 
-<register name="WDOG_CTL" group="Watchdog" mask="FFFF" description="Watchdog Control Register" bit-size="16" read-address="0xFFC00200" write-address="0xFFC00200" type="IO" def-comment="Watchdog Timer Registers" target="EMU" />
-<register name="WDOG_CNT" group="Watchdog" mask="FFFFFFFF" description="Watchdog Count Register" bit-size="32" read-address="0xFFC00204" write-address="0xFFC00204" type="IO" target="EMU" />
-<register name="WDOG_STAT" group="Watchdog" mask="FFFFFFFF" description="Watchdog Status Register" bit-size="32" read-address="0xFFC00208" write-address="0xFFC00208" type="IO" target="EMU" />
+<register name="WDOG_CTL" group="WDOG" mask="FFFF" description="Watchdog Control Register" bit-size="16" read-address="0xFFC00200" write-address="0xFFC00200" type="IO" def-comment="Watchdog Timer Registers" target="EMU" />
+<register name="WDOG_CNT" group="WDOG" mask="FFFFFFFF" description="Watchdog Count Register" bit-size="32" read-address="0xFFC00204" write-address="0xFFC00204" type="IO" target="EMU" />
+<register name="WDOG_STAT" group="WDOG" mask="FFFFFFFF" description="Watchdog Status Register" bit-size="32" read-address="0xFFC00208" write-address="0xFFC00208" type="IO" target="EMU" />
 
 
 
@@ -2550,751 +2555,7 @@
 <register name="EPPI2_CLIP" group="EPPI" mask="FFFF" description="EPPI2 Clipping Register" bit-size="32" read-address="0xFFC02934" write-address="0xFFC02934" type="IO" target="EMU" />
 
 
-
-<!-- Proc Periph HWR, chap  8, CAN Register Definitions -->
-
-<register name="CAN0_MC1" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Mailbox Configuration Register 1" bit-size="16" read-address="0xFFC02A00" write-address="0xFFC02A00" type="IO" target="EMU" def-comment="CAN Controller 0 Config 1 Registers" />
-<register name="CAN0_MD1" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Mailbox Direction Register 1" bit-size="16" read-address="0xFFC02A04" write-address="0xFFC02A04" type="IO" target="EMU" />
-<register name="CAN0_TRS1" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Transmit Request Set Register 1" bit-size="16" read-address="0xFFC02A08" write-address="0xFFC02A08" type="IO" target="EMU" />
-<register name="CAN0_TRR1" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Transmit Request Reset Register 1" bit-size="16" read-address="0xFFC02A0C" write-address="0xFFC02A0C" type="IO" target="EMU" />
-<register name="CAN0_TA1" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Transmit Acknowledge Register 1" bit-size="16" read-address="0xFFC02A10" write-address="0xFFC02A10" type="IO" target="EMU" />
-<register name="CAN0_AA1" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Abort Acknowledge Register 1" bit-size="16" read-address="0xFFC02A14" write-address="0xFFC02A14" type="IO" target="EMU" />
-<register name="CAN0_RMP1" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Receive Message Pending Register 1" bit-size="16" read-address="0xFFC02A18" write-address="0xFFC02A18" type="IO" target="EMU" />
-<register name="CAN0_RML1" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Receive Message Lost Register 1" bit-size="16" read-address="0xFFC02A1C" write-address="0xFFC02A1C" type="IO" target="EMU" />
-<register name="CAN0_MBTIF1" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Mailbox Transmit Interrupt Flag Register 1" bit-size="16" read-address="0xFFC02A20" write-address="0xFFC02A20" type="IO" target="EMU" />
-<register name="CAN0_MBRIF1" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Mailbox Receive Interrupt Flag Register 1" bit-size="16" read-address="0xFFC02A24" write-address="0xFFC02A24" type="IO" target="EMU" />
-<register name="CAN0_MBIM1" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Mailbox Interrupt Mask Register 1" bit-size="16" read-address="0xFFC02A28" write-address="0xFFC02A28" type="IO" target="EMU" />
-<register name="CAN0_RFH1" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Remote Frame Handling Enable Register 1" bit-size="16" read-address="0xFFC02A2C" write-address="0xFFC02A2C" type="IO" target="EMU" />
-<register name="CAN0_OPSS1" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Overwrite Protection Single Shot Transmit Register 1" bit-size="16" read-address="0xFFC02A30" write-address="0xFFC02A30" type="IO" target="EMU" />
-
-<register name="CAN0_MC2" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Mailbox Configuration Register 2" bit-size="16" read-address="0xFFC02A40" write-address="0xFFC02A40" type="IO" target="EMU" def-comment="CAN Controller 0 Config 2 Registers" />
-<register name="CAN0_MD2" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Mailbox Direction Register 2" bit-size="16" read-address="0xFFC02A44" write-address="0xFFC02A44" type="IO" target="EMU" />
-<register name="CAN0_TRS2" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Transmit Request Set Register 2" bit-size="16" read-address="0xFFC02A48" write-address="0xFFC02A48" type="IO" target="EMU" />
-<register name="CAN0_TRR2" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Transmit Request Reset Register 2" bit-size="16" read-address="0xFFC02A4C" write-address="0xFFC02A4C" type="IO" target="EMU" />
-<register name="CAN0_TA2" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Transmit Acknowledge Register 2" bit-size="16" read-address="0xFFC02A50" write-address="0xFFC02A50" type="IO" target="EMU" />
-<register name="CAN0_AA2" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Abort Acknowledge Register 2" bit-size="16" read-address="0xFFC02A54" write-address="0xFFC02A54" type="IO" target="EMU" />
-<register name="CAN0_RMP2" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Receive Message Pending Register 2" bit-size="16" read-address="0xFFC02A58" write-address="0xFFC02A58" type="IO" target="EMU" />
-<register name="CAN0_RML2" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Receive Message Lost Register 2" bit-size="16" read-address="0xFFC02A5C" write-address="0xFFC02A5C" type="IO" target="EMU" />
-<register name="CAN0_MBTIF2" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Mailbox Transmit Interrupt Flag Register 2" bit-size="16" read-address="0xFFC02A60" write-address="0xFFC02A60" type="IO" target="EMU" />
-<register name="CAN0_MBRIF2" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Mailbox Receive Interrupt Flag Register 2" bit-size="16" read-address="0xFFC02A64" write-address="0xFFC02A64" type="IO" target="EMU" />
-<register name="CAN0_MBIM2" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Mailbox Interrupt Mask Register 2" bit-size="16" read-address="0xFFC02A68" write-address="0xFFC02A68" type="IO" target="EMU" />
-<register name="CAN0_RFH2" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Remote Frame Handling Enable Register 2" bit-size="16" read-address="0xFFC02A6C" write-address="0xFFC02A6C" type="IO" target="EMU" />
-<register name="CAN0_OPSS2" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Overwrite Protection Single Shot Transmit Register 2" bit-size="16" read-address="0xFFC02A70" write-address="0xFFC02A70" type="IO" target="EMU" />
-
-<register name="CAN0_CLOCK" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Clock Register" bit-size="16" read-address="0xFFC02A80" write-address="0xFFC02A80" type="IO" target="EMU" def-comment="CAN Controller 0 Clock/Interrupt/Counter Registers" />
-<register name="CAN0_TIMING" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Timing Register" bit-size="16" read-address="0xFFC02A84" write-address="0xFFC02A84" type="IO" target="EMU" />
-<register name="CAN0_DEBUG" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Debug Register" bit-size="16" read-address="0xFFC02A88" write-address="0xFFC02A88" type="IO" target="EMU" />
-<register name="CAN0_STATUS" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Global Status Register" bit-size="16" read-address="0xFFC02A8C" write-address="0xFFC02A8C" type="IO" target="EMU" />
-<register name="CAN0_CEC" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Error Counter Register" bit-size="16" read-address="0xFFC02A90" write-address="0xFFC02A90" type="IO" target="EMU" />
-<register name="CAN0_GIS" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Global Interrupt Status Register" bit-size="16" read-address="0xFFC02A94" write-address="0xFFC02A94" type="IO" target="EMU" />
-<register name="CAN0_GIM" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Global Interrupt Mask Register" bit-size="16" read-address="0xFFC02A98" write-address="0xFFC02A98" type="IO" target="EMU" />
-<register name="CAN0_GIF" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Global Interrupt Flag Register" bit-size="16" read-address="0xFFC02A9C" write-address="0xFFC02A9C" type="IO" target="EMU" />
-<register name="CAN0_CONTROL" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Master Control Register" bit-size="16" read-address="0xFFC02AA0" write-address="0xFFC02AA0" type="IO" target="EMU" />
-<register name="CAN0_INTR" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Interrupt Pending Register" bit-size="16" read-address="0xFFC02AA4" write-address="0xFFC02AA4" type="IO" target="EMU" />
-<register name="CAN0_MBTD" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Mailbox Temporary Disable Register" bit-size="16" read-address="0xFFC02AAC" write-address="0xFFC02AAC" type="IO" target="EMU" />
-<register name="CAN0_EWR" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Programmable Warning Level Register" bit-size="16" read-address="0xFFC02AB0" write-address="0xFFC02AB0" type="IO" target="EMU" />
-<register name="CAN0_ESR" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Error Status Register" bit-size="16" read-address="0xFFC02AB4" write-address="0xFFC02AB4" type="IO" target="EMU" />
-<register name="CAN0_UCCNT" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Universal Counter Register" bit-size="16" read-address="0xFFC02AC4" write-address="0xFFC02AC4" type="IO" target="EMU" />
-<register name="CAN0_UCRC" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Universal Counter Force Reload Register" bit-size="16" read-address="0xFFC02AC8" write-address="0xFFC02AC8" type="IO" target="EMU" />
-<register name="CAN0_UCCNF" group="CAN0 Control and Status" mask="FFFF" description="CAN Controller 0 Universal Counter Configuration Register" bit-size="16" read-address="0xFFC02ACC" write-address="0xFFC02ACC" type="IO" target="EMU" />
-
-<register name="CAN0_AM00L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 0 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02B00" write-address="0xFFC02B00" type="IO" target="EMU" def-comment="CAN Controller 0 Acceptance Registers" />
-<register name="CAN0_AM00H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 0 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02B04" write-address="0xFFC02B04" type="IO" target="EMU" />
-<register name="CAN0_AM01L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 1 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02B08" write-address="0xFFC02B08" type="IO" target="EMU" />
-<register name="CAN0_AM01H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 1 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02B0C" write-address="0xFFC02B0C" type="IO" target="EMU" />
-<register name="CAN0_AM02L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 2 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02B10" write-address="0xFFC02B10" type="IO" target="EMU" />
-<register name="CAN0_AM02H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 2 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02B14" write-address="0xFFC02B14" type="IO" target="EMU" />
-<register name="CAN0_AM03L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 3 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02B18" write-address="0xFFC02B18" type="IO" target="EMU" />
-<register name="CAN0_AM03H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 3 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02B1C" write-address="0xFFC02B1C" type="IO" target="EMU" />
-<register name="CAN0_AM04L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 4 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02B20" write-address="0xFFC02B20" type="IO" target="EMU" />
-<register name="CAN0_AM04H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 4 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02B24" write-address="0xFFC02B24" type="IO" target="EMU" />
-<register name="CAN0_AM05L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 5 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02B28" write-address="0xFFC02B28" type="IO" target="EMU" />
-<register name="CAN0_AM05H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 5 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02B2C" write-address="0xFFC02B2C" type="IO" target="EMU" />
-<register name="CAN0_AM06L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 6 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02B30" write-address="0xFFC02B30" type="IO" target="EMU" />
-<register name="CAN0_AM06H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 6 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02B34" write-address="0xFFC02B34" type="IO" target="EMU" />
-<register name="CAN0_AM07L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 7 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02B38" write-address="0xFFC02B38" type="IO" target="EMU" />
-<register name="CAN0_AM07H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 7 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02B3C" write-address="0xFFC02B3C" type="IO" target="EMU" />
-<register name="CAN0_AM08L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 8 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02B40" write-address="0xFFC02B40" type="IO" target="EMU" />
-<register name="CAN0_AM08H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 8 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02B44" write-address="0xFFC02B44" type="IO" target="EMU" />
-<register name="CAN0_AM09L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 9 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02B48" write-address="0xFFC02B48" type="IO" target="EMU" />
-<register name="CAN0_AM09H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 9 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02B4C" write-address="0xFFC02B4C" type="IO" target="EMU" />
-<register name="CAN0_AM10L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 10 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02B50" write-address="0xFFC02B50" type="IO" target="EMU" />
-<register name="CAN0_AM10H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 10 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02B54" write-address="0xFFC02B54" type="IO" target="EMU" />
-<register name="CAN0_AM11L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 11 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02B58" write-address="0xFFC02B58" type="IO" target="EMU" />
-<register name="CAN0_AM11H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 11 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02B5C" write-address="0xFFC02B5C" type="IO" target="EMU" />
-<register name="CAN0_AM12L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 12 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02B60" write-address="0xFFC02B60" type="IO" target="EMU" />
-<register name="CAN0_AM12H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 12 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02B64" write-address="0xFFC02B64" type="IO" target="EMU" />
-<register name="CAN0_AM13L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 13 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02B68" write-address="0xFFC02B68" type="IO" target="EMU" />
-<register name="CAN0_AM13H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 13 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02B6C" write-address="0xFFC02B6C" type="IO" target="EMU" />
-<register name="CAN0_AM14L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 14 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02B70" write-address="0xFFC02B70" type="IO" target="EMU" />
-<register name="CAN0_AM14H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 14 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02B74" write-address="0xFFC02B74" type="IO" target="EMU" />
-<register name="CAN0_AM15L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 15 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02B78" write-address="0xFFC02B78" type="IO" target="EMU" />
-<register name="CAN0_AM15H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 15 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02B7C" write-address="0xFFC02B7C" type="IO" target="EMU" />
-
-<register name="CAN0_AM16L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 16 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02B80" write-address="0xFFC02B80" type="IO" target="EMU" def-comment="CAN Controller 0 Acceptance Registers" />
-<register name="CAN0_AM16H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 16 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02B84" write-address="0xFFC02B84" type="IO" target="EMU" />
-<register name="CAN0_AM17L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 17 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02B88" write-address="0xFFC02B88" type="IO" target="EMU" />
-<register name="CAN0_AM17H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 17 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02B8C" write-address="0xFFC02B8C" type="IO" target="EMU" />
-<register name="CAN0_AM18L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 18 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02B90" write-address="0xFFC02B90" type="IO" target="EMU" />
-<register name="CAN0_AM18H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 18 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02B94" write-address="0xFFC02B94" type="IO" target="EMU" />
-<register name="CAN0_AM19L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 19 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02B98" write-address="0xFFC02B98" type="IO" target="EMU" />
-<register name="CAN0_AM19H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 19 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02B9C" write-address="0xFFC02B9C" type="IO" target="EMU" />
-<register name="CAN0_AM20L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 20 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02BA0" write-address="0xFFC02BA0" type="IO" target="EMU" />
-<register name="CAN0_AM20H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 20 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02BA4" write-address="0xFFC02BA4" type="IO" target="EMU" />
-<register name="CAN0_AM21L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 21 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02BA8" write-address="0xFFC02BA8" type="IO" target="EMU" />
-<register name="CAN0_AM21H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 21 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02BAC" write-address="0xFFC02BAC" type="IO" target="EMU" />
-<register name="CAN0_AM22L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 22 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02BB0" write-address="0xFFC02BB0" type="IO" target="EMU" />
-<register name="CAN0_AM22H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 22 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02BB4" write-address="0xFFC02BB4" type="IO" target="EMU" />
-<register name="CAN0_AM23L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 23 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02BB8" write-address="0xFFC02BB8" type="IO" target="EMU" />
-<register name="CAN0_AM23H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 23 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02BBC" write-address="0xFFC02BBC" type="IO" target="EMU" />
-<register name="CAN0_AM24L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 24 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02BC0" write-address="0xFFC02BC0" type="IO" target="EMU" />
-<register name="CAN0_AM24H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 24 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02BC4" write-address="0xFFC02BC4" type="IO" target="EMU" />
-<register name="CAN0_AM25L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 25 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02BC8" write-address="0xFFC02BC8" type="IO" target="EMU" />
-<register name="CAN0_AM25H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 25 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02BCC" write-address="0xFFC02BCC" type="IO" target="EMU" />
-<register name="CAN0_AM26L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 26 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02BD0" write-address="0xFFC02BD0" type="IO" target="EMU" />
-<register name="CAN0_AM26H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 26 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02BD4" write-address="0xFFC02BD4" type="IO" target="EMU" />
-<register name="CAN0_AM27L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 27 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02BD8" write-address="0xFFC02BD8" type="IO" target="EMU" />
-<register name="CAN0_AM27H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 27 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02BDC" write-address="0xFFC02BDC" type="IO" target="EMU" />
-<register name="CAN0_AM28L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 28 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02BE0" write-address="0xFFC02BE0" type="IO" target="EMU" />
-<register name="CAN0_AM28H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 28 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02BE4" write-address="0xFFC02BE4" type="IO" target="EMU" />
-<register name="CAN0_AM29L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 29 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02BE8" write-address="0xFFC02BE8" type="IO" target="EMU" />
-<register name="CAN0_AM29H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 29 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02BEC" write-address="0xFFC02BEC" type="IO" target="EMU" />
-<register name="CAN0_AM30L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 30 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02BF0" write-address="0xFFC02BF0" type="IO" target="EMU" />
-<register name="CAN0_AM30H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 30 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02BF4" write-address="0xFFC02BF4" type="IO" target="EMU" />
-<register name="CAN0_AM31L" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 31 Acceptance Mask High Register" bit-size="16" read-address="0xFFC02BF8" write-address="0xFFC02BF8" type="IO" target="EMU" />
-<register name="CAN0_AM31H" group="CAN0 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 0 Mailbox 31 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC02BFC" write-address="0xFFC02BFC" type="IO" target="EMU" />
-
-<register name="CAN0_MB00_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 0 Data 0 Register" bit-size="16" read-address="0xFFC02C00" write-address="0xFFC02C00" type="IO" target="EMU" def-comment="CAN Controller 0 Mailbox Data Registers" />
-<register name="CAN0_MB00_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 0 Data 1 Register" bit-size="16" read-address="0xFFC02C04" write-address="0xFFC02C04" type="IO" target="EMU" />
-<register name="CAN0_MB00_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 0 Data 2 Register" bit-size="16" read-address="0xFFC02C08" write-address="0xFFC02C08" type="IO" target="EMU" />
-<register name="CAN0_MB00_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 0 Data 3 Register" bit-size="16" read-address="0xFFC02C0C" write-address="0xFFC02C0C" type="IO" target="EMU" />
-<register name="CAN0_MB00_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 0 Length Register" bit-size="16" read-address="0xFFC02C10" write-address="0xFFC02C10" type="IO" target="EMU" />
-<register name="CAN0_MB00_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 0 Timestamp Register" bit-size="16" read-address="0xFFC02C14" write-address="0xFFC02C14" type="IO" target="EMU" />
-<register name="CAN0_MB00_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 0 ID0 Register" bit-size="16" read-address="0xFFC02C18" write-address="0xFFC02C18" type="IO" target="EMU" />
-<register name="CAN0_MB00_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 0 ID1 Register" bit-size="16" read-address="0xFFC02C1C" write-address="0xFFC02C1C" type="IO" target="EMU" />
-<register name="CAN0_MB01_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 1 Data 0 Register" bit-size="16" read-address="0xFFC02C20" write-address="0xFFC02C20" type="IO" target="EMU" />
-<register name="CAN0_MB01_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 1 Data 1 Register" bit-size="16" read-address="0xFFC02C24" write-address="0xFFC02C24" type="IO" target="EMU" />
-<register name="CAN0_MB01_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 1 Data 2 Register" bit-size="16" read-address="0xFFC02C28" write-address="0xFFC02C28" type="IO" target="EMU" />
-<register name="CAN0_MB01_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 1 Data 3 Register" bit-size="16" read-address="0xFFC02C2C" write-address="0xFFC02C2C" type="IO" target="EMU" />
-<register name="CAN0_MB01_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 1 Length Register" bit-size="16" read-address="0xFFC02C30" write-address="0xFFC02C30" type="IO" target="EMU" />
-<register name="CAN0_MB01_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 1 Timestamp Register" bit-size="16" read-address="0xFFC02C34" write-address="0xFFC02C34" type="IO" target="EMU" />
-<register name="CAN0_MB01_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 1 ID0 Register" bit-size="16" read-address="0xFFC02C38" write-address="0xFFC02C38" type="IO" target="EMU" />
-<register name="CAN0_MB01_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 1 ID1 Register" bit-size="16" read-address="0xFFC02C3C" write-address="0xFFC02C3C" type="IO" target="EMU" />
-<register name="CAN0_MB02_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 2 Data 0 Register" bit-size="16" read-address="0xFFC02C40" write-address="0xFFC02C40" type="IO" target="EMU" />
-<register name="CAN0_MB02_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 2 Data 1 Register" bit-size="16" read-address="0xFFC02C44" write-address="0xFFC02C44" type="IO" target="EMU" />
-<register name="CAN0_MB02_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 2 Data 2 Register" bit-size="16" read-address="0xFFC02C48" write-address="0xFFC02C48" type="IO" target="EMU" />
-<register name="CAN0_MB02_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 2 Data 3 Register" bit-size="16" read-address="0xFFC02C4C" write-address="0xFFC02C4C" type="IO" target="EMU" />
-<register name="CAN0_MB02_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 2 Length Register" bit-size="16" read-address="0xFFC02C50" write-address="0xFFC02C50" type="IO" target="EMU" />
-<register name="CAN0_MB02_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 2 Timestamp Register" bit-size="16" read-address="0xFFC02C54" write-address="0xFFC02C54" type="IO" target="EMU" />
-<register name="CAN0_MB02_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 2 ID0 Register" bit-size="16" read-address="0xFFC02C58" write-address="0xFFC02C58" type="IO" target="EMU" />
-<register name="CAN0_MB02_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 2 ID1 Register" bit-size="16" read-address="0xFFC02C5C" write-address="0xFFC02C5C" type="IO" target="EMU" />
-<register name="CAN0_MB03_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 3 Data 0 Register" bit-size="16" read-address="0xFFC02C60" write-address="0xFFC02C60" type="IO" target="EMU" />
-<register name="CAN0_MB03_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 3 Data 1 Register" bit-size="16" read-address="0xFFC02C64" write-address="0xFFC02C64" type="IO" target="EMU" />
-<register name="CAN0_MB03_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 3 Data 2 Register" bit-size="16" read-address="0xFFC02C68" write-address="0xFFC02C68" type="IO" target="EMU" />
-<register name="CAN0_MB03_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 3 Data 3 Register" bit-size="16" read-address="0xFFC02C6C" write-address="0xFFC02C6C" type="IO" target="EMU" />
-<register name="CAN0_MB03_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 3 Length Register" bit-size="16" read-address="0xFFC02C70" write-address="0xFFC02C70" type="IO" target="EMU" />
-<register name="CAN0_MB03_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 3 Timestamp Register" bit-size="16" read-address="0xFFC02C74" write-address="0xFFC02C74" type="IO" target="EMU" />
-<register name="CAN0_MB03_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 3 ID0 Register" bit-size="16" read-address="0xFFC02C78" write-address="0xFFC02C78" type="IO" target="EMU" />
-<register name="CAN0_MB03_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 3 ID1 Register" bit-size="16" read-address="0xFFC02C7C" write-address="0xFFC02C7C" type="IO" target="EMU" />
-<register name="CAN0_MB04_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 4 Data 0 Register" bit-size="16" read-address="0xFFC02C80" write-address="0xFFC02C80" type="IO" target="EMU" />
-<register name="CAN0_MB04_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 4 Data 1 Register" bit-size="16" read-address="0xFFC02C84" write-address="0xFFC02C84" type="IO" target="EMU" />
-<register name="CAN0_MB04_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 4 Data 2 Register" bit-size="16" read-address="0xFFC02C88" write-address="0xFFC02C88" type="IO" target="EMU" />
-<register name="CAN0_MB04_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 4 Data 3 Register" bit-size="16" read-address="0xFFC02C8C" write-address="0xFFC02C8C" type="IO" target="EMU" />
-<register name="CAN0_MB04_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 4 Length Register" bit-size="16" read-address="0xFFC02C90" write-address="0xFFC02C90" type="IO" target="EMU" />
-<register name="CAN0_MB04_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 4 Timestamp Register" bit-size="16" read-address="0xFFC02C94" write-address="0xFFC02C94" type="IO" target="EMU" />
-<register name="CAN0_MB04_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 4 ID0 Register" bit-size="16" read-address="0xFFC02C98" write-address="0xFFC02C98" type="IO" target="EMU" />
-<register name="CAN0_MB04_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 4 ID1 Register" bit-size="16" read-address="0xFFC02C9C" write-address="0xFFC02C9C" type="IO" target="EMU" />
-<register name="CAN0_MB05_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 5 Data 0 Register" bit-size="16" read-address="0xFFC02CA0" write-address="0xFFC02CA0" type="IO" target="EMU" />
-<register name="CAN0_MB05_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 5 Data 1 Register" bit-size="16" read-address="0xFFC02CA4" write-address="0xFFC02CA4" type="IO" target="EMU" />
-<register name="CAN0_MB05_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 5 Data 2 Register" bit-size="16" read-address="0xFFC02CA8" write-address="0xFFC02CA8" type="IO" target="EMU" />
-<register name="CAN0_MB05_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 5 Data 3 Register" bit-size="16" read-address="0xFFC02CAC" write-address="0xFFC02CAC" type="IO" target="EMU" />
-<register name="CAN0_MB05_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 5 Length Register" bit-size="16" read-address="0xFFC02CB0" write-address="0xFFC02CB0" type="IO" target="EMU" />
-<register name="CAN0_MB05_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 5 Timestamp Register" bit-size="16" read-address="0xFFC02CB4" write-address="0xFFC02CB4" type="IO" target="EMU" />
-<register name="CAN0_MB05_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 5 ID0 Register" bit-size="16" read-address="0xFFC02CB8" write-address="0xFFC02CB8" type="IO" target="EMU" />
-<register name="CAN0_MB05_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 5 ID1 Register" bit-size="16" read-address="0xFFC02CBC" write-address="0xFFC02CBC" type="IO" target="EMU" />
-<register name="CAN0_MB06_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 6 Data 0 Register" bit-size="16" read-address="0xFFC02CC0" write-address="0xFFC02CC0" type="IO" target="EMU" />
-<register name="CAN0_MB06_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 6 Data 1 Register" bit-size="16" read-address="0xFFC02CC4" write-address="0xFFC02CC4" type="IO" target="EMU" />
-<register name="CAN0_MB06_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 6 Data 2 Register" bit-size="16" read-address="0xFFC02CC8" write-address="0xFFC02CC8" type="IO" target="EMU" />
-<register name="CAN0_MB06_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 6 Data 3 Register" bit-size="16" read-address="0xFFC02CCC" write-address="0xFFC02CCC" type="IO" target="EMU" />
-<register name="CAN0_MB06_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 6 Length Register" bit-size="16" read-address="0xFFC02CD0" write-address="0xFFC02CD0" type="IO" target="EMU" />
-<register name="CAN0_MB06_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 6 Timestamp Register" bit-size="16" read-address="0xFFC02CD4" write-address="0xFFC02CD4" type="IO" target="EMU" />
-<register name="CAN0_MB06_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 6 ID0 Register" bit-size="16" read-address="0xFFC02CD8" write-address="0xFFC02CD8" type="IO" target="EMU" />
-<register name="CAN0_MB06_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 6 ID1 Register" bit-size="16" read-address="0xFFC02CDC" write-address="0xFFC02CDC" type="IO" target="EMU" />
-<register name="CAN0_MB07_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 7 Data 0 Register" bit-size="16" read-address="0xFFC02CE0" write-address="0xFFC02CE0" type="IO" target="EMU" />
-<register name="CAN0_MB07_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 7 Data 1 Register" bit-size="16" read-address="0xFFC02CE4" write-address="0xFFC02CE4" type="IO" target="EMU" />
-<register name="CAN0_MB07_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 7 Data 2 Register" bit-size="16" read-address="0xFFC02CE8" write-address="0xFFC02CE8" type="IO" target="EMU" />
-<register name="CAN0_MB07_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 7 Data 3 Register" bit-size="16" read-address="0xFFC02CEC" write-address="0xFFC02CEC" type="IO" target="EMU" />
-<register name="CAN0_MB07_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 7 Length Register" bit-size="16" read-address="0xFFC02CF0" write-address="0xFFC02CF0" type="IO" target="EMU" />
-<register name="CAN0_MB07_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 7 Timestamp Register" bit-size="16" read-address="0xFFC02CF4" write-address="0xFFC02CF4" type="IO" target="EMU" />
-<register name="CAN0_MB07_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 7 ID0 Register" bit-size="16" read-address="0xFFC02CF8" write-address="0xFFC02CF8" type="IO" target="EMU" />
-<register name="CAN0_MB07_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 7 ID1 Register" bit-size="16" read-address="0xFFC02CFC" write-address="0xFFC02CFC" type="IO" target="EMU" />
-<register name="CAN0_MB08_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 8 Data 0 Register" bit-size="16" read-address="0xFFC02D00" write-address="0xFFC02D00" type="IO" target="EMU" />
-<register name="CAN0_MB08_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 8 Data 1 Register" bit-size="16" read-address="0xFFC02D04" write-address="0xFFC02D04" type="IO" target="EMU" />
-<register name="CAN0_MB08_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 8 Data 2 Register" bit-size="16" read-address="0xFFC02D08" write-address="0xFFC02D08" type="IO" target="EMU" />
-<register name="CAN0_MB08_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 8 Data 3 Register" bit-size="16" read-address="0xFFC02D0C" write-address="0xFFC02D0C" type="IO" target="EMU" />
-<register name="CAN0_MB08_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 8 Length Register" bit-size="16" read-address="0xFFC02D10" write-address="0xFFC02D10" type="IO" target="EMU" />
-<register name="CAN0_MB08_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 8 Timestamp Register" bit-size="16" read-address="0xFFC02D14" write-address="0xFFC02D14" type="IO" target="EMU" />
-<register name="CAN0_MB08_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 8 ID0 Register" bit-size="16" read-address="0xFFC02D18" write-address="0xFFC02D18" type="IO" target="EMU" />
-<register name="CAN0_MB08_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 8 ID1 Register" bit-size="16" read-address="0xFFC02D1C" write-address="0xFFC02D1C" type="IO" target="EMU" />
-<register name="CAN0_MB09_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 9 Data 0 Register" bit-size="16" read-address="0xFFC02D20" write-address="0xFFC02D20" type="IO" target="EMU" />
-<register name="CAN0_MB09_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 9 Data 1 Register" bit-size="16" read-address="0xFFC02D24" write-address="0xFFC02D24" type="IO" target="EMU" />
-<register name="CAN0_MB09_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 9 Data 2 Register" bit-size="16" read-address="0xFFC02D28" write-address="0xFFC02D28" type="IO" target="EMU" />
-<register name="CAN0_MB09_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 9 Data 3 Register" bit-size="16" read-address="0xFFC02D2C" write-address="0xFFC02D2C" type="IO" target="EMU" />
-<register name="CAN0_MB09_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 9 Length Register" bit-size="16" read-address="0xFFC02D30" write-address="0xFFC02D30" type="IO" target="EMU" />
-<register name="CAN0_MB09_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 9 Timestamp Register" bit-size="16" read-address="0xFFC02D34" write-address="0xFFC02D34" type="IO" target="EMU" />
-<register name="CAN0_MB09_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 9 ID0 Register" bit-size="16" read-address="0xFFC02D38" write-address="0xFFC02D38" type="IO" target="EMU" />
-<register name="CAN0_MB09_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 9 ID1 Register" bit-size="16" read-address="0xFFC02D3C" write-address="0xFFC02D3C" type="IO" target="EMU" />
-<register name="CAN0_MB10_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 10 Data 0 Register" bit-size="16" read-address="0xFFC02D40" write-address="0xFFC02D40" type="IO" target="EMU" />
-<register name="CAN0_MB10_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 10 Data 1 Register" bit-size="16" read-address="0xFFC02D44" write-address="0xFFC02D44" type="IO" target="EMU" />
-<register name="CAN0_MB10_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 10 Data 2 Register" bit-size="16" read-address="0xFFC02D48" write-address="0xFFC02D48" type="IO" target="EMU" />
-<register name="CAN0_MB10_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 10 Data 3 Register" bit-size="16" read-address="0xFFC02D4C" write-address="0xFFC02D4C" type="IO" target="EMU" />
-<register name="CAN0_MB10_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 10 Length Register" bit-size="16" read-address="0xFFC02D50" write-address="0xFFC02D50" type="IO" target="EMU" />
-<register name="CAN0_MB10_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 10 Timestamp Register" bit-size="16" read-address="0xFFC02D54" write-address="0xFFC02D54" type="IO" target="EMU" />
-<register name="CAN0_MB10_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 10 ID0 Register" bit-size="16" read-address="0xFFC02D58" write-address="0xFFC02D58" type="IO" target="EMU" />
-<register name="CAN0_MB10_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 10 ID1 Register" bit-size="16" read-address="0xFFC02D5C" write-address="0xFFC02D5C" type="IO" target="EMU" />
-<register name="CAN0_MB11_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 11 Data 0 Register" bit-size="16" read-address="0xFFC02D60" write-address="0xFFC02D60" type="IO" target="EMU" />
-<register name="CAN0_MB11_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 11 Data 1 Register" bit-size="16" read-address="0xFFC02D64" write-address="0xFFC02D64" type="IO" target="EMU" />
-<register name="CAN0_MB11_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 11 Data 2 Register" bit-size="16" read-address="0xFFC02D68" write-address="0xFFC02D68" type="IO" target="EMU" />
-<register name="CAN0_MB11_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 11 Data 3 Register" bit-size="16" read-address="0xFFC02D6C" write-address="0xFFC02D6C" type="IO" target="EMU" />
-<register name="CAN0_MB11_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 11 Length Register" bit-size="16" read-address="0xFFC02D70" write-address="0xFFC02D70" type="IO" target="EMU" />
-<register name="CAN0_MB11_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 11 Timestamp Register" bit-size="16" read-address="0xFFC02D74" write-address="0xFFC02D74" type="IO" target="EMU" />
-<register name="CAN0_MB11_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 11 ID0 Register" bit-size="16" read-address="0xFFC02D78" write-address="0xFFC02D78" type="IO" target="EMU" />
-<register name="CAN0_MB11_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 11 ID1 Register" bit-size="16" read-address="0xFFC02D7C" write-address="0xFFC02D7C" type="IO" target="EMU" />
-<register name="CAN0_MB12_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 12 Data 0 Register" bit-size="16" read-address="0xFFC02D80" write-address="0xFFC02D80" type="IO" target="EMU" />
-<register name="CAN0_MB12_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 12 Data 1 Register" bit-size="16" read-address="0xFFC02D84" write-address="0xFFC02D84" type="IO" target="EMU" />
-<register name="CAN0_MB12_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 12 Data 2 Register" bit-size="16" read-address="0xFFC02D88" write-address="0xFFC02D88" type="IO" target="EMU" />
-<register name="CAN0_MB12_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 12 Data 3 Register" bit-size="16" read-address="0xFFC02D8C" write-address="0xFFC02D8C" type="IO" target="EMU" />
-<register name="CAN0_MB12_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 12 Length Register" bit-size="16" read-address="0xFFC02D90" write-address="0xFFC02D90" type="IO" target="EMU" />
-<register name="CAN0_MB12_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 12 Timestamp Register" bit-size="16" read-address="0xFFC02D94" write-address="0xFFC02D94" type="IO" target="EMU" />
-<register name="CAN0_MB12_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 12 ID0 Register" bit-size="16" read-address="0xFFC02D98" write-address="0xFFC02D98" type="IO" target="EMU" />
-<register name="CAN0_MB12_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 12 ID1 Register" bit-size="16" read-address="0xFFC02D9C" write-address="0xFFC02D9C" type="IO" target="EMU" />
-<register name="CAN0_MB13_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 13 Data 0 Register" bit-size="16" read-address="0xFFC02DA0" write-address="0xFFC02DA0" type="IO" target="EMU" />
-<register name="CAN0_MB13_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 13 Data 1 Register" bit-size="16" read-address="0xFFC02DA4" write-address="0xFFC02DA4" type="IO" target="EMU" />
-<register name="CAN0_MB13_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 13 Data 2 Register" bit-size="16" read-address="0xFFC02DA8" write-address="0xFFC02DA8" type="IO" target="EMU" />
-<register name="CAN0_MB13_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 13 Data 3 Register" bit-size="16" read-address="0xFFC02DAC" write-address="0xFFC02DAC" type="IO" target="EMU" />
-<register name="CAN0_MB13_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 13 Length Register" bit-size="16" read-address="0xFFC02DB0" write-address="0xFFC02DB0" type="IO" target="EMU" />
-<register name="CAN0_MB13_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 13 Timestamp Register" bit-size="16" read-address="0xFFC02DB4" write-address="0xFFC02DB4" type="IO" target="EMU" />
-<register name="CAN0_MB13_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 13 ID0 Register" bit-size="16" read-address="0xFFC02DB8" write-address="0xFFC02DB8" type="IO" target="EMU" />
-<register name="CAN0_MB13_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 13 ID1 Register" bit-size="16" read-address="0xFFC02DBC" write-address="0xFFC02DBC" type="IO" target="EMU" />
-<register name="CAN0_MB14_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 14 Data 0 Register" bit-size="16" read-address="0xFFC02DC0" write-address="0xFFC02DC0" type="IO" target="EMU" />
-<register name="CAN0_MB14_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 14 Data 1 Register" bit-size="16" read-address="0xFFC02DC4" write-address="0xFFC02DC4" type="IO" target="EMU" />
-<register name="CAN0_MB14_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 14 Data 2 Register" bit-size="16" read-address="0xFFC02DC8" write-address="0xFFC02DC8" type="IO" target="EMU" />
-<register name="CAN0_MB14_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 14 Data 3 Register" bit-size="16" read-address="0xFFC02DCC" write-address="0xFFC02DCC" type="IO" target="EMU" />
-<register name="CAN0_MB14_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 14 Length Register" bit-size="16" read-address="0xFFC02DD0" write-address="0xFFC02DD0" type="IO" target="EMU" />
-<register name="CAN0_MB14_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 14 Timestamp Register" bit-size="16" read-address="0xFFC02DD4" write-address="0xFFC02DD4" type="IO" target="EMU" />
-<register name="CAN0_MB14_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 14 ID0 Register" bit-size="16" read-address="0xFFC02DD8" write-address="0xFFC02DD8" type="IO" target="EMU" />
-<register name="CAN0_MB14_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 14 ID1 Register" bit-size="16" read-address="0xFFC02DDC" write-address="0xFFC02DDC" type="IO" target="EMU" />
-<register name="CAN0_MB15_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 15 Data 0 Register" bit-size="16" read-address="0xFFC02DE0" write-address="0xFFC02DE0" type="IO" target="EMU" />
-<register name="CAN0_MB15_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 15 Data 1 Register" bit-size="16" read-address="0xFFC02DE4" write-address="0xFFC02DE4" type="IO" target="EMU" />
-<register name="CAN0_MB15_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 15 Data 2 Register" bit-size="16" read-address="0xFFC02DE8" write-address="0xFFC02DE8" type="IO" target="EMU" />
-<register name="CAN0_MB15_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 15 Data 3 Register" bit-size="16" read-address="0xFFC02DEC" write-address="0xFFC02DEC" type="IO" target="EMU" />
-<register name="CAN0_MB15_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 15 Length Register" bit-size="16" read-address="0xFFC02DF0" write-address="0xFFC02DF0" type="IO" target="EMU" />
-<register name="CAN0_MB15_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 15 Timestamp Register" bit-size="16" read-address="0xFFC02DF4" write-address="0xFFC02DF4" type="IO" target="EMU" />
-<register name="CAN0_MB15_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 15 ID0 Register" bit-size="16" read-address="0xFFC02DF8" write-address="0xFFC02DF8" type="IO" target="EMU" />
-<register name="CAN0_MB15_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 15 ID1 Register" bit-size="16" read-address="0xFFC02DFC" write-address="0xFFC02DFC" type="IO" target="EMU" />
-
-<register name="CAN0_MB16_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 16 Data 0 Register" bit-size="16" read-address="0xFFC02E00" write-address="0xFFC02E00" type="IO" target="EMU" def-comment="CAN Controller 0 Mailbox Data Registers" />
-<register name="CAN0_MB16_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 16 Data 1 Register" bit-size="16" read-address="0xFFC02E04" write-address="0xFFC02E04" type="IO" target="EMU" />
-<register name="CAN0_MB16_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 16 Data 2 Register" bit-size="16" read-address="0xFFC02E08" write-address="0xFFC02E08" type="IO" target="EMU" />
-<register name="CAN0_MB16_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 16 Data 3 Register" bit-size="16" read-address="0xFFC02E0C" write-address="0xFFC02E0C" type="IO" target="EMU" />
-<register name="CAN0_MB16_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 16 Length Register" bit-size="16" read-address="0xFFC02E10" write-address="0xFFC02E10" type="IO" target="EMU" />
-<register name="CAN0_MB16_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 16 Timestamp Register" bit-size="16" read-address="0xFFC02E14" write-address="0xFFC02E14" type="IO" target="EMU" />
-<register name="CAN0_MB16_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 16 ID0 Register" bit-size="16" read-address="0xFFC02E18" write-address="0xFFC02E18" type="IO" target="EMU" />
-<register name="CAN0_MB16_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 16 ID1 Register" bit-size="16" read-address="0xFFC02E1C" write-address="0xFFC02E1C" type="IO" target="EMU" />
-<register name="CAN0_MB17_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 17 Data 0 Register" bit-size="16" read-address="0xFFC02E20" write-address="0xFFC02E20" type="IO" target="EMU" />
-<register name="CAN0_MB17_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 17 Data 1 Register" bit-size="16" read-address="0xFFC02E24" write-address="0xFFC02E24" type="IO" target="EMU" />
-<register name="CAN0_MB17_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 17 Data 2 Register" bit-size="16" read-address="0xFFC02E28" write-address="0xFFC02E28" type="IO" target="EMU" />
-<register name="CAN0_MB17_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 17 Data 3 Register" bit-size="16" read-address="0xFFC02E2C" write-address="0xFFC02E2C" type="IO" target="EMU" />
-<register name="CAN0_MB17_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 17 Length Register" bit-size="16" read-address="0xFFC02E30" write-address="0xFFC02E30" type="IO" target="EMU" />
-<register name="CAN0_MB17_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 17 Timestamp Register" bit-size="16" read-address="0xFFC02E34" write-address="0xFFC02E34" type="IO" target="EMU" />
-<register name="CAN0_MB17_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 17 ID0 Register" bit-size="16" read-address="0xFFC02E38" write-address="0xFFC02E38" type="IO" target="EMU" />
-<register name="CAN0_MB17_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 17 ID1 Register" bit-size="16" read-address="0xFFC02E3C" write-address="0xFFC02E3C" type="IO" target="EMU" />
-<register name="CAN0_MB18_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 18 Data 0 Register" bit-size="16" read-address="0xFFC02E40" write-address="0xFFC02E40" type="IO" target="EMU" />
-<register name="CAN0_MB18_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 18 Data 1 Register" bit-size="16" read-address="0xFFC02E44" write-address="0xFFC02E44" type="IO" target="EMU" />
-<register name="CAN0_MB18_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 18 Data 2 Register" bit-size="16" read-address="0xFFC02E48" write-address="0xFFC02E48" type="IO" target="EMU" />
-<register name="CAN0_MB18_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 18 Data 3 Register" bit-size="16" read-address="0xFFC02E4C" write-address="0xFFC02E4C" type="IO" target="EMU" />
-<register name="CAN0_MB18_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 18 Length Register" bit-size="16" read-address="0xFFC02E50" write-address="0xFFC02E50" type="IO" target="EMU" />
-<register name="CAN0_MB18_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 18 Timestamp Register" bit-size="16" read-address="0xFFC02E54" write-address="0xFFC02E54" type="IO" target="EMU" />
-<register name="CAN0_MB18_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 18 ID0 Register" bit-size="16" read-address="0xFFC02E58" write-address="0xFFC02E58" type="IO" target="EMU" />
-<register name="CAN0_MB18_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 18 ID1 Register" bit-size="16" read-address="0xFFC02E5C" write-address="0xFFC02E5C" type="IO" target="EMU" />
-<register name="CAN0_MB19_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 19 Data 0 Register" bit-size="16" read-address="0xFFC02E60" write-address="0xFFC02E60" type="IO" target="EMU" />
-<register name="CAN0_MB19_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 19 Data 1 Register" bit-size="16" read-address="0xFFC02E64" write-address="0xFFC02E64" type="IO" target="EMU" />
-<register name="CAN0_MB19_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 19 Data 2 Register" bit-size="16" read-address="0xFFC02E68" write-address="0xFFC02E68" type="IO" target="EMU" />
-<register name="CAN0_MB19_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 19 Data 3 Register" bit-size="16" read-address="0xFFC02E6C" write-address="0xFFC02E6C" type="IO" target="EMU" />
-<register name="CAN0_MB19_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 19 Length Register" bit-size="16" read-address="0xFFC02E70" write-address="0xFFC02E70" type="IO" target="EMU" />
-<register name="CAN0_MB19_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 19 Timestamp Register" bit-size="16" read-address="0xFFC02E74" write-address="0xFFC02E74" type="IO" target="EMU" />
-<register name="CAN0_MB19_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 19 ID0 Register" bit-size="16" read-address="0xFFC02E78" write-address="0xFFC02E78" type="IO" target="EMU" />
-<register name="CAN0_MB19_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 19 ID1 Register" bit-size="16" read-address="0xFFC02E7C" write-address="0xFFC02E7C" type="IO" target="EMU" />
-<register name="CAN0_MB20_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 20 Data 0 Register" bit-size="16" read-address="0xFFC02E80" write-address="0xFFC02E80" type="IO" target="EMU" />
-<register name="CAN0_MB20_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 20 Data 1 Register" bit-size="16" read-address="0xFFC02E84" write-address="0xFFC02E84" type="IO" target="EMU" />
-<register name="CAN0_MB20_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 20 Data 2 Register" bit-size="16" read-address="0xFFC02E88" write-address="0xFFC02E88" type="IO" target="EMU" />
-<register name="CAN0_MB20_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 20 Data 3 Register" bit-size="16" read-address="0xFFC02E8C" write-address="0xFFC02E8C" type="IO" target="EMU" />
-<register name="CAN0_MB20_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 20 Length Register" bit-size="16" read-address="0xFFC02E90" write-address="0xFFC02E90" type="IO" target="EMU" />
-<register name="CAN0_MB20_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 20 Timestamp Register" bit-size="16" read-address="0xFFC02E94" write-address="0xFFC02E94" type="IO" target="EMU" />
-<register name="CAN0_MB20_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 20 ID0 Register" bit-size="16" read-address="0xFFC02E98" write-address="0xFFC02E98" type="IO" target="EMU" />
-<register name="CAN0_MB20_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 20 ID1 Register" bit-size="16" read-address="0xFFC02E9C" write-address="0xFFC02E9C" type="IO" target="EMU" />
-<register name="CAN0_MB21_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 21 Data 0 Register" bit-size="16" read-address="0xFFC02EA0" write-address="0xFFC02EA0" type="IO" target="EMU" />
-<register name="CAN0_MB21_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 21 Data 1 Register" bit-size="16" read-address="0xFFC02EA4" write-address="0xFFC02EA4" type="IO" target="EMU" />
-<register name="CAN0_MB21_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 21 Data 2 Register" bit-size="16" read-address="0xFFC02EA8" write-address="0xFFC02EA8" type="IO" target="EMU" />
-<register name="CAN0_MB21_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 21 Data 3 Register" bit-size="16" read-address="0xFFC02EAC" write-address="0xFFC02EAC" type="IO" target="EMU" />
-<register name="CAN0_MB21_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 21 Length Register" bit-size="16" read-address="0xFFC02EB0" write-address="0xFFC02EB0" type="IO" target="EMU" />
-<register name="CAN0_MB21_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 21 Timestamp Register" bit-size="16" read-address="0xFFC02EB4" write-address="0xFFC02EB4" type="IO" target="EMU" />
-<register name="CAN0_MB21_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 21 ID0 Register" bit-size="16" read-address="0xFFC02EB8" write-address="0xFFC02EB8" type="IO" target="EMU" />
-<register name="CAN0_MB21_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 21 ID1 Register" bit-size="16" read-address="0xFFC02EBC" write-address="0xFFC02EBC" type="IO" target="EMU" />
-<register name="CAN0_MB22_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 22 Data 0 Register" bit-size="16" read-address="0xFFC02EC0" write-address="0xFFC02EC0" type="IO" target="EMU" />
-<register name="CAN0_MB22_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 22 Data 1 Register" bit-size="16" read-address="0xFFC02EC4" write-address="0xFFC02EC4" type="IO" target="EMU" />
-<register name="CAN0_MB22_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 22 Data 2 Register" bit-size="16" read-address="0xFFC02EC8" write-address="0xFFC02EC8" type="IO" target="EMU" />
-<register name="CAN0_MB22_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 22 Data 3 Register" bit-size="16" read-address="0xFFC02ECC" write-address="0xFFC02ECC" type="IO" target="EMU" />
-<register name="CAN0_MB22_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 22 Length Register" bit-size="16" read-address="0xFFC02ED0" write-address="0xFFC02ED0" type="IO" target="EMU" />
-<register name="CAN0_MB22_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 22 Timestamp Register" bit-size="16" read-address="0xFFC02ED4" write-address="0xFFC02ED4" type="IO" target="EMU" />
-<register name="CAN0_MB22_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 22 ID0 Register" bit-size="16" read-address="0xFFC02ED8" write-address="0xFFC02ED8" type="IO" target="EMU" />
-<register name="CAN0_MB22_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 22 ID1 Register" bit-size="16" read-address="0xFFC02EDC" write-address="0xFFC02EDC" type="IO" target="EMU" />
-<register name="CAN0_MB23_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 23 Data 0 Register" bit-size="16" read-address="0xFFC02EE0" write-address="0xFFC02EE0" type="IO" target="EMU" />
-<register name="CAN0_MB23_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 23 Data 1 Register" bit-size="16" read-address="0xFFC02EE4" write-address="0xFFC02EE4" type="IO" target="EMU" />
-<register name="CAN0_MB23_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 23 Data 2 Register" bit-size="16" read-address="0xFFC02EE8" write-address="0xFFC02EE8" type="IO" target="EMU" />
-<register name="CAN0_MB23_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 23 Data 3 Register" bit-size="16" read-address="0xFFC02EEC" write-address="0xFFC02EEC" type="IO" target="EMU" />
-<register name="CAN0_MB23_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 23 Length Register" bit-size="16" read-address="0xFFC02EF0" write-address="0xFFC02EF0" type="IO" target="EMU" />
-<register name="CAN0_MB23_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 23 Timestamp Register" bit-size="16" read-address="0xFFC02EF4" write-address="0xFFC02EF4" type="IO" target="EMU" />
-<register name="CAN0_MB23_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 23 ID0 Register" bit-size="16" read-address="0xFFC02EF8" write-address="0xFFC02EF8" type="IO" target="EMU" />
-<register name="CAN0_MB23_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 23 ID1 Register" bit-size="16" read-address="0xFFC02EFC" write-address="0xFFC02EFC" type="IO" target="EMU" />
-<register name="CAN0_MB24_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 24 Data 0 Register" bit-size="16" read-address="0xFFC02F00" write-address="0xFFC02F00" type="IO" target="EMU" />
-<register name="CAN0_MB24_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 24 Data 1 Register" bit-size="16" read-address="0xFFC02F04" write-address="0xFFC02F04" type="IO" target="EMU" />
-<register name="CAN0_MB24_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 24 Data 2 Register" bit-size="16" read-address="0xFFC02F08" write-address="0xFFC02F08" type="IO" target="EMU" />
-<register name="CAN0_MB24_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 24 Data 3 Register" bit-size="16" read-address="0xFFC02F0C" write-address="0xFFC02F0C" type="IO" target="EMU" />
-<register name="CAN0_MB24_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 24 Length Register" bit-size="16" read-address="0xFFC02F10" write-address="0xFFC02F10" type="IO" target="EMU" />
-<register name="CAN0_MB24_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 24 Timestamp Register" bit-size="16" read-address="0xFFC02F14" write-address="0xFFC02F14" type="IO" target="EMU" />
-<register name="CAN0_MB24_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 24 ID0 Register" bit-size="16" read-address="0xFFC02F18" write-address="0xFFC02F18" type="IO" target="EMU" />
-<register name="CAN0_MB24_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 24 ID1 Register" bit-size="16" read-address="0xFFC02F1C" write-address="0xFFC02F1C" type="IO" target="EMU" />
-<register name="CAN0_MB25_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 25 Data 0 Register" bit-size="16" read-address="0xFFC02F20" write-address="0xFFC02F20" type="IO" target="EMU" />
-<register name="CAN0_MB25_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 25 Data 1 Register" bit-size="16" read-address="0xFFC02F24" write-address="0xFFC02F24" type="IO" target="EMU" />
-<register name="CAN0_MB25_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 25 Data 2 Register" bit-size="16" read-address="0xFFC02F28" write-address="0xFFC02F28" type="IO" target="EMU" />
-<register name="CAN0_MB25_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 25 Data 3 Register" bit-size="16" read-address="0xFFC02F2C" write-address="0xFFC02F2C" type="IO" target="EMU" />
-<register name="CAN0_MB25_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 25 Length Register" bit-size="16" read-address="0xFFC02F30" write-address="0xFFC02F30" type="IO" target="EMU" />
-<register name="CAN0_MB25_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 25 Timestamp Register" bit-size="16" read-address="0xFFC02F34" write-address="0xFFC02F34" type="IO" target="EMU" />
-<register name="CAN0_MB25_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 25 ID0 Register" bit-size="16" read-address="0xFFC02F38" write-address="0xFFC02F38" type="IO" target="EMU" />
-<register name="CAN0_MB25_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 25 ID1 Register" bit-size="16" read-address="0xFFC02F3C" write-address="0xFFC02F3C" type="IO" target="EMU" />
-<register name="CAN0_MB26_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 26 Data 0 Register" bit-size="16" read-address="0xFFC02F40" write-address="0xFFC02F40" type="IO" target="EMU" />
-<register name="CAN0_MB26_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 26 Data 1 Register" bit-size="16" read-address="0xFFC02F44" write-address="0xFFC02F44" type="IO" target="EMU" />
-<register name="CAN0_MB26_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 26 Data 2 Register" bit-size="16" read-address="0xFFC02F48" write-address="0xFFC02F48" type="IO" target="EMU" />
-<register name="CAN0_MB26_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 26 Data 3 Register" bit-size="16" read-address="0xFFC02F4C" write-address="0xFFC02F4C" type="IO" target="EMU" />
-<register name="CAN0_MB26_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 26 Length Register" bit-size="16" read-address="0xFFC02F50" write-address="0xFFC02F50" type="IO" target="EMU" />
-<register name="CAN0_MB26_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 26 Timestamp Register" bit-size="16" read-address="0xFFC02F54" write-address="0xFFC02F54" type="IO" target="EMU" />
-<register name="CAN0_MB26_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 26 ID0 Register" bit-size="16" read-address="0xFFC02F58" write-address="0xFFC02F58" type="IO" target="EMU" />
-<register name="CAN0_MB26_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 26 ID1 Register" bit-size="16" read-address="0xFFC02F5C" write-address="0xFFC02F5C" type="IO" target="EMU" />
-<register name="CAN0_MB27_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 27 Data 0 Register" bit-size="16" read-address="0xFFC02F60" write-address="0xFFC02F60" type="IO" target="EMU" />
-<register name="CAN0_MB27_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 27 Data 1 Register" bit-size="16" read-address="0xFFC02F64" write-address="0xFFC02F64" type="IO" target="EMU" />
-<register name="CAN0_MB27_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 27 Data 2 Register" bit-size="16" read-address="0xFFC02F68" write-address="0xFFC02F68" type="IO" target="EMU" />
-<register name="CAN0_MB27_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 27 Data 3 Register" bit-size="16" read-address="0xFFC02F6C" write-address="0xFFC02F6C" type="IO" target="EMU" />
-<register name="CAN0_MB27_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 27 Length Register" bit-size="16" read-address="0xFFC02F70" write-address="0xFFC02F70" type="IO" target="EMU" />
-<register name="CAN0_MB27_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 27 Timestamp Register" bit-size="16" read-address="0xFFC02F74" write-address="0xFFC02F74" type="IO" target="EMU" />
-<register name="CAN0_MB27_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 27 ID0 Register" bit-size="16" read-address="0xFFC02F78" write-address="0xFFC02F78" type="IO" target="EMU" />
-<register name="CAN0_MB27_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 27 ID1 Register" bit-size="16" read-address="0xFFC02F7C" write-address="0xFFC02F7C" type="IO" target="EMU" />
-<register name="CAN0_MB28_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 28 Data 0 Register" bit-size="16" read-address="0xFFC02F80" write-address="0xFFC02F80" type="IO" target="EMU" />
-<register name="CAN0_MB28_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 28 Data 1 Register" bit-size="16" read-address="0xFFC02F84" write-address="0xFFC02F84" type="IO" target="EMU" />
-<register name="CAN0_MB28_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 28 Data 2 Register" bit-size="16" read-address="0xFFC02F88" write-address="0xFFC02F88" type="IO" target="EMU" />
-<register name="CAN0_MB28_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 28 Data 3 Register" bit-size="16" read-address="0xFFC02F8C" write-address="0xFFC02F8C" type="IO" target="EMU" />
-<register name="CAN0_MB28_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 28 Length Register" bit-size="16" read-address="0xFFC02F90" write-address="0xFFC02F90" type="IO" target="EMU" />
-<register name="CAN0_MB28_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 28 Timestamp Register" bit-size="16" read-address="0xFFC02F94" write-address="0xFFC02F94" type="IO" target="EMU" />
-<register name="CAN0_MB28_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 28 ID0 Register" bit-size="16" read-address="0xFFC02F98" write-address="0xFFC02F98" type="IO" target="EMU" />
-<register name="CAN0_MB28_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 28 ID1 Register" bit-size="16" read-address="0xFFC02F9C" write-address="0xFFC02F9C" type="IO" target="EMU" />
-<register name="CAN0_MB29_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 29 Data 0 Register" bit-size="16" read-address="0xFFC02FA0" write-address="0xFFC02FA0" type="IO" target="EMU" />
-<register name="CAN0_MB29_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 29 Data 1 Register" bit-size="16" read-address="0xFFC02FA4" write-address="0xFFC02FA4" type="IO" target="EMU" />
-<register name="CAN0_MB29_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 29 Data 2 Register" bit-size="16" read-address="0xFFC02FA8" write-address="0xFFC02FA8" type="IO" target="EMU" />
-<register name="CAN0_MB29_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 29 Data 3 Register" bit-size="16" read-address="0xFFC02FAC" write-address="0xFFC02FAC" type="IO" target="EMU" />
-<register name="CAN0_MB29_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 29 Length Register" bit-size="16" read-address="0xFFC02FB0" write-address="0xFFC02FB0" type="IO" target="EMU" />
-<register name="CAN0_MB29_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 29 Timestamp Register" bit-size="16" read-address="0xFFC02FB4" write-address="0xFFC02FB4" type="IO" target="EMU" />
-<register name="CAN0_MB29_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 29 ID0 Register" bit-size="16" read-address="0xFFC02FB8" write-address="0xFFC02FB8" type="IO" target="EMU" />
-<register name="CAN0_MB29_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 29 ID1 Register" bit-size="16" read-address="0xFFC02FBC" write-address="0xFFC02FBC" type="IO" target="EMU" />
-<register name="CAN0_MB30_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 30 Data 0 Register" bit-size="16" read-address="0xFFC02FC0" write-address="0xFFC02FC0" type="IO" target="EMU" />
-<register name="CAN0_MB30_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 30 Data 1 Register" bit-size="16" read-address="0xFFC02FC4" write-address="0xFFC02FC4" type="IO" target="EMU" />
-<register name="CAN0_MB30_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 30 Data 2 Register" bit-size="16" read-address="0xFFC02FC8" write-address="0xFFC02FC8" type="IO" target="EMU" />
-<register name="CAN0_MB30_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 30 Data 3 Register" bit-size="16" read-address="0xFFC02FCC" write-address="0xFFC02FCC" type="IO" target="EMU" />
-<register name="CAN0_MB30_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 30 Length Register" bit-size="16" read-address="0xFFC02FD0" write-address="0xFFC02FD0" type="IO" target="EMU" />
-<register name="CAN0_MB30_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 30 Timestamp Register" bit-size="16" read-address="0xFFC02FD4" write-address="0xFFC02FD4" type="IO" target="EMU" />
-<register name="CAN0_MB30_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 30 ID0 Register" bit-size="16" read-address="0xFFC02FD8" write-address="0xFFC02FD8" type="IO" target="EMU" />
-<register name="CAN0_MB30_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 30 ID1 Register" bit-size="16" read-address="0xFFC02FDC" write-address="0xFFC02FDC" type="IO" target="EMU" />
-<register name="CAN0_MB31_DATA0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 31 Data 0 Register" bit-size="16" read-address="0xFFC02FE0" write-address="0xFFC02FE0" type="IO" target="EMU" />
-<register name="CAN0_MB31_DATA1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 31 Data 1 Register" bit-size="16" read-address="0xFFC02FE4" write-address="0xFFC02FE4" type="IO" target="EMU" />
-<register name="CAN0_MB31_DATA2" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 31 Data 2 Register" bit-size="16" read-address="0xFFC02FE8" write-address="0xFFC02FE8" type="IO" target="EMU" />
-<register name="CAN0_MB31_DATA3" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 31 Data 3 Register" bit-size="16" read-address="0xFFC02FEC" write-address="0xFFC02FEC" type="IO" target="EMU" />
-<register name="CAN0_MB31_LENGTH" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 31 Length Register" bit-size="16" read-address="0xFFC02FF0" write-address="0xFFC02FF0" type="IO" target="EMU" />
-<register name="CAN0_MB31_TIMESTAMP" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 31 Timestamp Register" bit-size="16" read-address="0xFFC02FF4" write-address="0xFFC02FF4" type="IO" target="EMU" />
-<register name="CAN0_MB31_ID0" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 31 ID0 Register" bit-size="16" read-address="0xFFC02FF8" write-address="0xFFC02FF8" type="IO" target="EMU" />
-<register name="CAN0_MB31_ID1" group="CAN0 Mailbox RAM" mask="FFFF" description="CAN Controller 0 Mailbox 31 ID1 Register" bit-size="16" read-address="0xFFC02FFC" write-address="0xFFC02FFC" type="IO" target="EMU" />
-
-
-
-<!-- Proc Periph HWR, chap  8, CAN Register Definitions (CAN1) -->
-
-<register name="CAN1_MC1" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Mailbox Configuration Register 1" bit-size="16" read-address="0xFFC03200" write-address="0xFFC03200" type="IO" target="EMU" def-comment="CAN Controller 1 Config 1 Registers" />
-<register name="CAN1_MD1" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Mailbox Direction Register 1" bit-size="16" read-address="0xFFC03204" write-address="0xFFC03204" type="IO" target="EMU" />
-<register name="CAN1_TRS1" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Transmit Request Set Register 1" bit-size="16" read-address="0xFFC03208" write-address="0xFFC03208" type="IO" target="EMU" />
-<register name="CAN1_TRR1" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Transmit Request Reset Register 1" bit-size="16" read-address="0xFFC0320C" write-address="0xFFC0320C" type="IO" target="EMU" />
-<register name="CAN1_TA1" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Transmit Acknowledge Register 1" bit-size="16" read-address="0xFFC03210" write-address="0xFFC03210" type="IO" target="EMU" />
-<register name="CAN1_AA1" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Abort Acknowledge Register 1" bit-size="16" read-address="0xFFC03214" write-address="0xFFC03214" type="IO" target="EMU" />
-<register name="CAN1_RMP1" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Receive Message Pending Register 1" bit-size="16" read-address="0xFFC03218" write-address="0xFFC03218" type="IO" target="EMU" />
-<register name="CAN1_RML1" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Receive Message Lost Register 1" bit-size="16" read-address="0xFFC0321C" write-address="0xFFC0321C" type="IO" target="EMU" />
-<register name="CAN1_MBTIF1" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Mailbox Transmit Interrupt Flag Register 1" bit-size="16" read-address="0xFFC03220" write-address="0xFFC03220" type="IO" target="EMU" />
-<register name="CAN1_MBRIF1" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Mailbox Receive Interrupt Flag Register 1" bit-size="16" read-address="0xFFC03224" write-address="0xFFC03224" type="IO" target="EMU" />
-<register name="CAN1_MBIM1" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Mailbox Interrupt Mask Register 1" bit-size="16" read-address="0xFFC03228" write-address="0xFFC03228" type="IO" target="EMU" />
-<register name="CAN1_RFH1" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Remote Frame Handling Enable Register 1" bit-size="16" read-address="0xFFC0322C" write-address="0xFFC0322C" type="IO" target="EMU" />
-<register name="CAN1_OPSS1" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Overwrite Protection Single Shot Transmit Register 1" bit-size="16" read-address="0xFFC03230" write-address="0xFFC03230" type="IO" target="EMU" />
-
-<register name="CAN1_MC2" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Mailbox Configuration Register 2" bit-size="16" read-address="0xFFC03240" write-address="0xFFC03240" type="IO" target="EMU" def-comment="CAN Controller 1 Config 2 Registers" />
-<register name="CAN1_MD2" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Mailbox Direction Register 2" bit-size="16" read-address="0xFFC03244" write-address="0xFFC03244" type="IO" target="EMU" />
-<register name="CAN1_TRS2" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Transmit Request Set Register 2" bit-size="16" read-address="0xFFC03248" write-address="0xFFC03248" type="IO" target="EMU" />
-<register name="CAN1_TRR2" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Transmit Request Reset Register 2" bit-size="16" read-address="0xFFC0324C" write-address="0xFFC0324C" type="IO" target="EMU" />
-<register name="CAN1_TA2" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Transmit Acknowledge Register 2" bit-size="16" read-address="0xFFC03250" write-address="0xFFC03250" type="IO" target="EMU" />
-<register name="CAN1_AA2" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Abort Acknowledge Register 2" bit-size="16" read-address="0xFFC03254" write-address="0xFFC03254" type="IO" target="EMU" />
-<register name="CAN1_RMP2" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Receive Message Pending Register 2" bit-size="16" read-address="0xFFC03258" write-address="0xFFC03258" type="IO" target="EMU" />
-<register name="CAN1_RML2" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Receive Message Lost Register 2" bit-size="16" read-address="0xFFC0325C" write-address="0xFFC0325C" type="IO" target="EMU" />
-<register name="CAN1_MBTIF2" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Mailbox Transmit Interrupt Flag Register 2" bit-size="16" read-address="0xFFC03260" write-address="0xFFC03260" type="IO" target="EMU" />
-<register name="CAN1_MBRIF2" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Mailbox Receive Interrupt Flag Register 2" bit-size="16" read-address="0xFFC03264" write-address="0xFFC03264" type="IO" target="EMU" />
-<register name="CAN1_MBIM2" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Mailbox Interrupt Mask Register 2" bit-size="16" read-address="0xFFC03268" write-address="0xFFC03268" type="IO" target="EMU" />
-<register name="CAN1_RFH2" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Remote Frame Handling Enable Register 2" bit-size="16" read-address="0xFFC0326C" write-address="0xFFC0326C" type="IO" target="EMU" />
-<register name="CAN1_OPSS2" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Overwrite Protection Single Shot Transmit Register 2" bit-size="16" read-address="0xFFC03270" write-address="0xFFC03270" type="IO" target="EMU" />
-
-<register name="CAN1_CLOCK" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Clock Register" bit-size="16" read-address="0xFFC03280" write-address="0xFFC03280" type="IO" target="EMU" def-comment="CAN Controller 1 Clock/Interrupt/Counter Registers" />
-<register name="CAN1_TIMING" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Timing Register" bit-size="16" read-address="0xFFC03284" write-address="0xFFC03284" type="IO" target="EMU" />
-<register name="CAN1_DEBUG" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Debug Register" bit-size="16" read-address="0xFFC03288" write-address="0xFFC03288" type="IO" target="EMU" />
-<register name="CAN1_STATUS" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Global Status Register" bit-size="16" read-address="0xFFC0328C" write-address="0xFFC0328C" type="IO" target="EMU" />
-<register name="CAN1_CEC" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Error Counter Register" bit-size="16" read-address="0xFFC03290" write-address="0xFFC03290" type="IO" target="EMU" />
-<register name="CAN1_GIS" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Global Interrupt Status Register" bit-size="16" read-address="0xFFC03294" write-address="0xFFC03294" type="IO" target="EMU" />
-<register name="CAN1_GIM" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Global Interrupt Mask Register" bit-size="16" read-address="0xFFC03298" write-address="0xFFC03298" type="IO" target="EMU" />
-<register name="CAN1_GIF" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Global Interrupt Flag Register" bit-size="16" read-address="0xFFC0329C" write-address="0xFFC0329C" type="IO" target="EMU" />
-<register name="CAN1_CONTROL" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Master Control Register" bit-size="16" read-address="0xFFC032A0" write-address="0xFFC032A0" type="IO" target="EMU" />
-<register name="CAN1_INTR" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Interrupt Pending Register" bit-size="16" read-address="0xFFC032A4" write-address="0xFFC032A4" type="IO" target="EMU" />
-<register name="CAN1_MBTD" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Mailbox Temporary Disable Register" bit-size="16" read-address="0xFFC032AC" write-address="0xFFC032AC" type="IO" target="EMU" />
-<register name="CAN1_EWR" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Programmable Warning Level Register" bit-size="16" read-address="0xFFC032B0" write-address="0xFFC032B0" type="IO" target="EMU" />
-<register name="CAN1_ESR" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Error Status Register" bit-size="16" read-address="0xFFC032B4" write-address="0xFFC032B4" type="IO" target="EMU" />
-<register name="CAN1_UCCNT" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Universal Counter Register" bit-size="16" read-address="0xFFC032C4" write-address="0xFFC032C4" type="IO" target="EMU" />
-<register name="CAN1_UCRC" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Universal Counter Force Reload Register" bit-size="16" read-address="0xFFC032C8" write-address="0xFFC032C8" type="IO" target="EMU" />
-<register name="CAN1_UCCNF" group="CAN1 Control and Status" mask="FFFF" description="CAN Controller 1 Universal Counter Configuration Register" bit-size="16" read-address="0xFFC032CC" write-address="0xFFC032CC" type="IO" target="EMU" />
-
-<register name="CAN1_AM00L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 0 Acceptance Mask High Register" bit-size="16" read-address="0xFFC03300" write-address="0xFFC03300" type="IO" target="EMU" def-comment="CAN Controller 1 Mailbox Acceptance Registers" />
-<register name="CAN1_AM00H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 0 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC03304" write-address="0xFFC03304" type="IO" target="EMU" />
-<register name="CAN1_AM01L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 1 Acceptance Mask High Register" bit-size="16" read-address="0xFFC03308" write-address="0xFFC03308" type="IO" target="EMU" />
-<register name="CAN1_AM01H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 1 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC0330C" write-address="0xFFC0330C" type="IO" target="EMU" />
-<register name="CAN1_AM02L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 2 Acceptance Mask High Register" bit-size="16" read-address="0xFFC03310" write-address="0xFFC03310" type="IO" target="EMU" />
-<register name="CAN1_AM02H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 2 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC03314" write-address="0xFFC03314" type="IO" target="EMU" />
-<register name="CAN1_AM03L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 3 Acceptance Mask High Register" bit-size="16" read-address="0xFFC03318" write-address="0xFFC03318" type="IO" target="EMU" />
-<register name="CAN1_AM03H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 3 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC0331C" write-address="0xFFC0331C" type="IO" target="EMU" />
-<register name="CAN1_AM04L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 4 Acceptance Mask High Register" bit-size="16" read-address="0xFFC03320" write-address="0xFFC03320" type="IO" target="EMU" />
-<register name="CAN1_AM04H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 4 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC03324" write-address="0xFFC03324" type="IO" target="EMU" />
-<register name="CAN1_AM05L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 5 Acceptance Mask High Register" bit-size="16" read-address="0xFFC03328" write-address="0xFFC03328" type="IO" target="EMU" />
-<register name="CAN1_AM05H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 5 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC0332C" write-address="0xFFC0332C" type="IO" target="EMU" />
-<register name="CAN1_AM06L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 6 Acceptance Mask High Register" bit-size="16" read-address="0xFFC03330" write-address="0xFFC03330" type="IO" target="EMU" />
-<register name="CAN1_AM06H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 6 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC03334" write-address="0xFFC03334" type="IO" target="EMU" />
-<register name="CAN1_AM07L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 7 Acceptance Mask High Register" bit-size="16" read-address="0xFFC03338" write-address="0xFFC03338" type="IO" target="EMU" />
-<register name="CAN1_AM07H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 7 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC0333C" write-address="0xFFC0333C" type="IO" target="EMU" />
-<register name="CAN1_AM08L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 8 Acceptance Mask High Register" bit-size="16" read-address="0xFFC03340" write-address="0xFFC03340" type="IO" target="EMU" />
-<register name="CAN1_AM08H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 8 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC03344" write-address="0xFFC03344" type="IO" target="EMU" />
-<register name="CAN1_AM09L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 9 Acceptance Mask High Register" bit-size="16" read-address="0xFFC03348" write-address="0xFFC03348" type="IO" target="EMU" />
-<register name="CAN1_AM09H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 9 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC0334C" write-address="0xFFC0334C" type="IO" target="EMU" />
-<register name="CAN1_AM10L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 10 Acceptance Mask High Register" bit-size="16" read-address="0xFFC03350" write-address="0xFFC03350" type="IO" target="EMU" />
-<register name="CAN1_AM10H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 10 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC03354" write-address="0xFFC03354" type="IO" target="EMU" />
-<register name="CAN1_AM11L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 11 Acceptance Mask High Register" bit-size="16" read-address="0xFFC03358" write-address="0xFFC03358" type="IO" target="EMU" />
-<register name="CAN1_AM11H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 11 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC0335C" write-address="0xFFC0335C" type="IO" target="EMU" />
-<register name="CAN1_AM12L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 12 Acceptance Mask High Register" bit-size="16" read-address="0xFFC03360" write-address="0xFFC03360" type="IO" target="EMU" />
-<register name="CAN1_AM12H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 12 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC03364" write-address="0xFFC03364" type="IO" target="EMU" />
-<register name="CAN1_AM13L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 13 Acceptance Mask High Register" bit-size="16" read-address="0xFFC03368" write-address="0xFFC03368" type="IO" target="EMU" />
-<register name="CAN1_AM13H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 13 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC0336C" write-address="0xFFC0336C" type="IO" target="EMU" />
-<register name="CAN1_AM14L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 14 Acceptance Mask High Register" bit-size="16" read-address="0xFFC03370" write-address="0xFFC03370" type="IO" target="EMU" />
-<register name="CAN1_AM14H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 14 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC03374" write-address="0xFFC03374" type="IO" target="EMU" />
-<register name="CAN1_AM15L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 15 Acceptance Mask High Register" bit-size="16" read-address="0xFFC03378" write-address="0xFFC03378" type="IO" target="EMU" />
-<register name="CAN1_AM15H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 15 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC0337C" write-address="0xFFC0337C" type="IO" target="EMU" />
-
-<register name="CAN1_AM16L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 16 Acceptance Mask High Register" bit-size="16" read-address="0xFFC03380" write-address="0xFFC03380" type="IO" target="EMU" def-comment="CAN Controller 1 Mailbox Acceptance Registers" />
-<register name="CAN1_AM16H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 16 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC03384" write-address="0xFFC03384" type="IO" target="EMU" />
-<register name="CAN1_AM17L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 17 Acceptance Mask High Register" bit-size="16" read-address="0xFFC03388" write-address="0xFFC03388" type="IO" target="EMU" />
-<register name="CAN1_AM17H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 17 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC0338C" write-address="0xFFC0338C" type="IO" target="EMU" />
-<register name="CAN1_AM18L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 18 Acceptance Mask High Register" bit-size="16" read-address="0xFFC03390" write-address="0xFFC03390" type="IO" target="EMU" />
-<register name="CAN1_AM18H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 18 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC03394" write-address="0xFFC03394" type="IO" target="EMU" />
-<register name="CAN1_AM19L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 19 Acceptance Mask High Register" bit-size="16" read-address="0xFFC03398" write-address="0xFFC03398" type="IO" target="EMU" />
-<register name="CAN1_AM19H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 19 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC0339C" write-address="0xFFC0339C" type="IO" target="EMU" />
-<register name="CAN1_AM20L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 20 Acceptance Mask High Register" bit-size="16" read-address="0xFFC033A0" write-address="0xFFC033A0" type="IO" target="EMU" />
-<register name="CAN1_AM20H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 20 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC033A4" write-address="0xFFC033A4" type="IO" target="EMU" />
-<register name="CAN1_AM21L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 21 Acceptance Mask High Register" bit-size="16" read-address="0xFFC033A8" write-address="0xFFC033A8" type="IO" target="EMU" />
-<register name="CAN1_AM21H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 21 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC033AC" write-address="0xFFC033AC" type="IO" target="EMU" />
-<register name="CAN1_AM22L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 22 Acceptance Mask High Register" bit-size="16" read-address="0xFFC033B0" write-address="0xFFC033B0" type="IO" target="EMU" />
-<register name="CAN1_AM22H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 22 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC033B4" write-address="0xFFC033B4" type="IO" target="EMU" />
-<register name="CAN1_AM23L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 23 Acceptance Mask High Register" bit-size="16" read-address="0xFFC033B8" write-address="0xFFC033B8" type="IO" target="EMU" />
-<register name="CAN1_AM23H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 23 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC033BC" write-address="0xFFC033BC" type="IO" target="EMU" />
-<register name="CAN1_AM24L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 24 Acceptance Mask High Register" bit-size="16" read-address="0xFFC033C0" write-address="0xFFC033C0" type="IO" target="EMU" />
-<register name="CAN1_AM24H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 24 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC033C4" write-address="0xFFC033C4" type="IO" target="EMU" />
-<register name="CAN1_AM25L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 25 Acceptance Mask High Register" bit-size="16" read-address="0xFFC033C8" write-address="0xFFC033C8" type="IO" target="EMU" />
-<register name="CAN1_AM25H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 25 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC033CC" write-address="0xFFC033CC" type="IO" target="EMU" />
-<register name="CAN1_AM26L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 26 Acceptance Mask High Register" bit-size="16" read-address="0xFFC033D0" write-address="0xFFC033D0" type="IO" target="EMU" />
-<register name="CAN1_AM26H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 26 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC033D4" write-address="0xFFC033D4" type="IO" target="EMU" />
-<register name="CAN1_AM27L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 27 Acceptance Mask High Register" bit-size="16" read-address="0xFFC033D8" write-address="0xFFC033D8" type="IO" target="EMU" />
-<register name="CAN1_AM27H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 27 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC033DC" write-address="0xFFC033DC" type="IO" target="EMU" />
-<register name="CAN1_AM28L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 28 Acceptance Mask High Register" bit-size="16" read-address="0xFFC033E0" write-address="0xFFC033E0" type="IO" target="EMU" />
-<register name="CAN1_AM28H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 28 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC033E4" write-address="0xFFC033E4" type="IO" target="EMU" />
-<register name="CAN1_AM29L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 29 Acceptance Mask High Register" bit-size="16" read-address="0xFFC033E8" write-address="0xFFC033E8" type="IO" target="EMU" />
-<register name="CAN1_AM29H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 29 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC033EC" write-address="0xFFC033EC" type="IO" target="EMU" />
-<register name="CAN1_AM30L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 30 Acceptance Mask High Register" bit-size="16" read-address="0xFFC033F0" write-address="0xFFC033F0" type="IO" target="EMU" />
-<register name="CAN1_AM30H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 30 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC033F4" write-address="0xFFC033F4" type="IO" target="EMU" />
-<register name="CAN1_AM31L" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 31 Acceptance Mask High Register" bit-size="16" read-address="0xFFC033F8" write-address="0xFFC033F8" type="IO" target="EMU" />
-<register name="CAN1_AM31H" group="CAN1 Acceptance Mask RAM" mask="FFFF" description="CAN Controller 1 Mailbox 31 Acceptance Mask Low Register" bit-size="16" read-address="0xFFC033FC" write-address="0xFFC033FC" type="IO" target="EMU" />
-
-<register name="CAN1_MB00_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 0 Data 0 Register" bit-size="16" read-address="0xFFC03400" write-address="0xFFC03400" type="IO" target="EMU" def-comment="CAN Controller 1 Mailbox Data Registers" />
-<register name="CAN1_MB00_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 0 Data 1 Register" bit-size="16" read-address="0xFFC03404" write-address="0xFFC03404" type="IO" target="EMU" />
-<register name="CAN1_MB00_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 0 Data 2 Register" bit-size="16" read-address="0xFFC03408" write-address="0xFFC03408" type="IO" target="EMU" />
-<register name="CAN1_MB00_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 0 Data 3 Register" bit-size="16" read-address="0xFFC0340C" write-address="0xFFC0340C" type="IO" target="EMU" />
-<register name="CAN1_MB00_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 0 Length Register" bit-size="16" read-address="0xFFC03410" write-address="0xFFC03410" type="IO" target="EMU" />
-<register name="CAN1_MB00_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 0 Timestamp Register" bit-size="16" read-address="0xFFC03414" write-address="0xFFC03414" type="IO" target="EMU" />
-<register name="CAN1_MB00_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 0 ID0 Register" bit-size="16" read-address="0xFFC03418" write-address="0xFFC03418" type="IO" target="EMU" />
-<register name="CAN1_MB00_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 0 ID1 Register" bit-size="16" read-address="0xFFC0341C" write-address="0xFFC0341C" type="IO" target="EMU" />
-<register name="CAN1_MB01_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 1 Data 0 Register" bit-size="16" read-address="0xFFC03420" write-address="0xFFC03420" type="IO" target="EMU" />
-<register name="CAN1_MB01_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 1 Data 1 Register" bit-size="16" read-address="0xFFC03424" write-address="0xFFC03424" type="IO" target="EMU" />
-<register name="CAN1_MB01_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 1 Data 2 Register" bit-size="16" read-address="0xFFC03428" write-address="0xFFC03428" type="IO" target="EMU" />
-<register name="CAN1_MB01_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 1 Data 3 Register" bit-size="16" read-address="0xFFC0342C" write-address="0xFFC0342C" type="IO" target="EMU" />
-<register name="CAN1_MB01_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 1 Length Register" bit-size="16" read-address="0xFFC03430" write-address="0xFFC03430" type="IO" target="EMU" />
-<register name="CAN1_MB01_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 1 Timestamp Register" bit-size="16" read-address="0xFFC03434" write-address="0xFFC03434" type="IO" target="EMU" />
-<register name="CAN1_MB01_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 1 ID0 Register" bit-size="16" read-address="0xFFC03438" write-address="0xFFC03438" type="IO" target="EMU" />
-<register name="CAN1_MB01_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 1 ID1 Register" bit-size="16" read-address="0xFFC0343C" write-address="0xFFC0343C" type="IO" target="EMU" />
-<register name="CAN1_MB02_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 2 Data 0 Register" bit-size="16" read-address="0xFFC03440" write-address="0xFFC03440" type="IO" target="EMU" />
-<register name="CAN1_MB02_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 2 Data 1 Register" bit-size="16" read-address="0xFFC03444" write-address="0xFFC03444" type="IO" target="EMU" />
-<register name="CAN1_MB02_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 2 Data 2 Register" bit-size="16" read-address="0xFFC03448" write-address="0xFFC03448" type="IO" target="EMU" />
-<register name="CAN1_MB02_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 2 Data 3 Register" bit-size="16" read-address="0xFFC0344C" write-address="0xFFC0344C" type="IO" target="EMU" />
-<register name="CAN1_MB02_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 2 Length Register" bit-size="16" read-address="0xFFC03450" write-address="0xFFC03450" type="IO" target="EMU" />
-<register name="CAN1_MB02_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 2 Timestamp Register" bit-size="16" read-address="0xFFC03454" write-address="0xFFC03454" type="IO" target="EMU" />
-<register name="CAN1_MB02_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 2 ID0 Register" bit-size="16" read-address="0xFFC03458" write-address="0xFFC03458" type="IO" target="EMU" />
-<register name="CAN1_MB02_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 2 ID1 Register" bit-size="16" read-address="0xFFC0345C" write-address="0xFFC0345C" type="IO" target="EMU" />
-<register name="CAN1_MB03_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 3 Data 0 Register" bit-size="16" read-address="0xFFC03460" write-address="0xFFC03460" type="IO" target="EMU" />
-<register name="CAN1_MB03_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 3 Data 1 Register" bit-size="16" read-address="0xFFC03464" write-address="0xFFC03464" type="IO" target="EMU" />
-<register name="CAN1_MB03_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 3 Data 2 Register" bit-size="16" read-address="0xFFC03468" write-address="0xFFC03468" type="IO" target="EMU" />
-<register name="CAN1_MB03_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 3 Data 3 Register" bit-size="16" read-address="0xFFC0346C" write-address="0xFFC0346C" type="IO" target="EMU" />
-<register name="CAN1_MB03_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 3 Length Register" bit-size="16" read-address="0xFFC03470" write-address="0xFFC03470" type="IO" target="EMU" />
-<register name="CAN1_MB03_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 3 Timestamp Register" bit-size="16" read-address="0xFFC03474" write-address="0xFFC03474" type="IO" target="EMU" />
-<register name="CAN1_MB03_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 3 ID0 Register" bit-size="16" read-address="0xFFC03478" write-address="0xFFC03478" type="IO" target="EMU" />
-<register name="CAN1_MB03_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 3 ID1 Register" bit-size="16" read-address="0xFFC0347C" write-address="0xFFC0347C" type="IO" target="EMU" />
-<register name="CAN1_MB04_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 4 Data 0 Register" bit-size="16" read-address="0xFFC03480" write-address="0xFFC03480" type="IO" target="EMU" />
-<register name="CAN1_MB04_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 4 Data 1 Register" bit-size="16" read-address="0xFFC03484" write-address="0xFFC03484" type="IO" target="EMU" />
-<register name="CAN1_MB04_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 4 Data 2 Register" bit-size="16" read-address="0xFFC03488" write-address="0xFFC03488" type="IO" target="EMU" />
-<register name="CAN1_MB04_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 4 Data 3 Register" bit-size="16" read-address="0xFFC0348C" write-address="0xFFC0348C" type="IO" target="EMU" />
-<register name="CAN1_MB04_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 4 Length Register" bit-size="16" read-address="0xFFC03490" write-address="0xFFC03490" type="IO" target="EMU" />
-<register name="CAN1_MB04_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 4 Timestamp Register" bit-size="16" read-address="0xFFC03494" write-address="0xFFC03494" type="IO" target="EMU" />
-<register name="CAN1_MB04_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 4 ID0 Register" bit-size="16" read-address="0xFFC03498" write-address="0xFFC03498" type="IO" target="EMU" />
-<register name="CAN1_MB04_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 4 ID1 Register" bit-size="16" read-address="0xFFC0349C" write-address="0xFFC0349C" type="IO" target="EMU" />
-<register name="CAN1_MB05_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 5 Data 0 Register" bit-size="16" read-address="0xFFC034A0" write-address="0xFFC034A0" type="IO" target="EMU" />
-<register name="CAN1_MB05_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 5 Data 1 Register" bit-size="16" read-address="0xFFC034A4" write-address="0xFFC034A4" type="IO" target="EMU" />
-<register name="CAN1_MB05_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 5 Data 2 Register" bit-size="16" read-address="0xFFC034A8" write-address="0xFFC034A8" type="IO" target="EMU" />
-<register name="CAN1_MB05_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 5 Data 3 Register" bit-size="16" read-address="0xFFC034AC" write-address="0xFFC034AC" type="IO" target="EMU" />
-<register name="CAN1_MB05_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 5 Length Register" bit-size="16" read-address="0xFFC034B0" write-address="0xFFC034B0" type="IO" target="EMU" />
-<register name="CAN1_MB05_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 5 Timestamp Register" bit-size="16" read-address="0xFFC034B4" write-address="0xFFC034B4" type="IO" target="EMU" />
-<register name="CAN1_MB05_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 5 ID0 Register" bit-size="16" read-address="0xFFC034B8" write-address="0xFFC034B8" type="IO" target="EMU" />
-<register name="CAN1_MB05_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 5 ID1 Register" bit-size="16" read-address="0xFFC034BC" write-address="0xFFC034BC" type="IO" target="EMU" />
-<register name="CAN1_MB06_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 6 Data 0 Register" bit-size="16" read-address="0xFFC034C0" write-address="0xFFC034C0" type="IO" target="EMU" />
-<register name="CAN1_MB06_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 6 Data 1 Register" bit-size="16" read-address="0xFFC034C4" write-address="0xFFC034C4" type="IO" target="EMU" />
-<register name="CAN1_MB06_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 6 Data 2 Register" bit-size="16" read-address="0xFFC034C8" write-address="0xFFC034C8" type="IO" target="EMU" />
-<register name="CAN1_MB06_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 6 Data 3 Register" bit-size="16" read-address="0xFFC034CC" write-address="0xFFC034CC" type="IO" target="EMU" />
-<register name="CAN1_MB06_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 6 Length Register" bit-size="16" read-address="0xFFC034D0" write-address="0xFFC034D0" type="IO" target="EMU" />
-<register name="CAN1_MB06_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 6 Timestamp Register" bit-size="16" read-address="0xFFC034D4" write-address="0xFFC034D4" type="IO" target="EMU" />
-<register name="CAN1_MB06_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 6 ID0 Register" bit-size="16" read-address="0xFFC034D8" write-address="0xFFC034D8" type="IO" target="EMU" />
-<register name="CAN1_MB06_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 6 ID1 Register" bit-size="16" read-address="0xFFC034DC" write-address="0xFFC034DC" type="IO" target="EMU" />
-<register name="CAN1_MB07_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 7 Data 0 Register" bit-size="16" read-address="0xFFC034E0" write-address="0xFFC034E0" type="IO" target="EMU" />
-<register name="CAN1_MB07_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 7 Data 1 Register" bit-size="16" read-address="0xFFC034E4" write-address="0xFFC034E4" type="IO" target="EMU" />
-<register name="CAN1_MB07_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 7 Data 2 Register" bit-size="16" read-address="0xFFC034E8" write-address="0xFFC034E8" type="IO" target="EMU" />
-<register name="CAN1_MB07_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 7 Data 3 Register" bit-size="16" read-address="0xFFC034EC" write-address="0xFFC034EC" type="IO" target="EMU" />
-<register name="CAN1_MB07_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 7 Length Register" bit-size="16" read-address="0xFFC034F0" write-address="0xFFC034F0" type="IO" target="EMU" />
-<register name="CAN1_MB07_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 7 Timestamp Register" bit-size="16" read-address="0xFFC034F4" write-address="0xFFC034F4" type="IO" target="EMU" />
-<register name="CAN1_MB07_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 7 ID0 Register" bit-size="16" read-address="0xFFC034F8" write-address="0xFFC034F8" type="IO" target="EMU" />
-<register name="CAN1_MB07_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 7 ID1 Register" bit-size="16" read-address="0xFFC034FC" write-address="0xFFC034FC" type="IO" target="EMU" />
-<register name="CAN1_MB08_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 8 Data 0 Register" bit-size="16" read-address="0xFFC03500" write-address="0xFFC03500" type="IO" target="EMU" />
-<register name="CAN1_MB08_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 8 Data 1 Register" bit-size="16" read-address="0xFFC03504" write-address="0xFFC03504" type="IO" target="EMU" />
-<register name="CAN1_MB08_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 8 Data 2 Register" bit-size="16" read-address="0xFFC03508" write-address="0xFFC03508" type="IO" target="EMU" />
-<register name="CAN1_MB08_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 8 Data 3 Register" bit-size="16" read-address="0xFFC0350C" write-address="0xFFC0350C" type="IO" target="EMU" />
-<register name="CAN1_MB08_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 8 Length Register" bit-size="16" read-address="0xFFC03510" write-address="0xFFC03510" type="IO" target="EMU" />
-<register name="CAN1_MB08_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 8 Timestamp Register" bit-size="16" read-address="0xFFC03514" write-address="0xFFC03514" type="IO" target="EMU" />
-<register name="CAN1_MB08_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 8 ID0 Register" bit-size="16" read-address="0xFFC03518" write-address="0xFFC03518" type="IO" target="EMU" />
-<register name="CAN1_MB08_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 8 ID1 Register" bit-size="16" read-address="0xFFC0351C" write-address="0xFFC0351C" type="IO" target="EMU" />
-<register name="CAN1_MB09_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 9 Data 0 Register" bit-size="16" read-address="0xFFC03520" write-address="0xFFC03520" type="IO" target="EMU" />
-<register name="CAN1_MB09_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 9 Data 1 Register" bit-size="16" read-address="0xFFC03524" write-address="0xFFC03524" type="IO" target="EMU" />
-<register name="CAN1_MB09_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 9 Data 2 Register" bit-size="16" read-address="0xFFC03528" write-address="0xFFC03528" type="IO" target="EMU" />
-<register name="CAN1_MB09_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 9 Data 3 Register" bit-size="16" read-address="0xFFC0352C" write-address="0xFFC0352C" type="IO" target="EMU" />
-<register name="CAN1_MB09_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 9 Length Register" bit-size="16" read-address="0xFFC03530" write-address="0xFFC03530" type="IO" target="EMU" />
-<register name="CAN1_MB09_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 9 Timestamp Register" bit-size="16" read-address="0xFFC03534" write-address="0xFFC03534" type="IO" target="EMU" />
-<register name="CAN1_MB09_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 9 ID0 Register" bit-size="16" read-address="0xFFC03538" write-address="0xFFC03538" type="IO" target="EMU" />
-<register name="CAN1_MB09_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 9 ID1 Register" bit-size="16" read-address="0xFFC0353C" write-address="0xFFC0353C" type="IO" target="EMU" />
-<register name="CAN1_MB10_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 10 Data 0 Register" bit-size="16" read-address="0xFFC03540" write-address="0xFFC03540" type="IO" target="EMU" />
-<register name="CAN1_MB10_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 10 Data 1 Register" bit-size="16" read-address="0xFFC03544" write-address="0xFFC03544" type="IO" target="EMU" />
-<register name="CAN1_MB10_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 10 Data 2 Register" bit-size="16" read-address="0xFFC03548" write-address="0xFFC03548" type="IO" target="EMU" />
-<register name="CAN1_MB10_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 10 Data 3 Register" bit-size="16" read-address="0xFFC0354C" write-address="0xFFC0354C" type="IO" target="EMU" />
-<register name="CAN1_MB10_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 10 Length Register" bit-size="16" read-address="0xFFC03550" write-address="0xFFC03550" type="IO" target="EMU" />
-<register name="CAN1_MB10_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 10 Timestamp Register" bit-size="16" read-address="0xFFC03554" write-address="0xFFC03554" type="IO" target="EMU" />
-<register name="CAN1_MB10_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 10 ID0 Register" bit-size="16" read-address="0xFFC03558" write-address="0xFFC03558" type="IO" target="EMU" />
-<register name="CAN1_MB10_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 10 ID1 Register" bit-size="16" read-address="0xFFC0355C" write-address="0xFFC0355C" type="IO" target="EMU" />
-<register name="CAN1_MB11_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 11 Data 0 Register" bit-size="16" read-address="0xFFC03560" write-address="0xFFC03560" type="IO" target="EMU" />
-<register name="CAN1_MB11_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 11 Data 1 Register" bit-size="16" read-address="0xFFC03564" write-address="0xFFC03564" type="IO" target="EMU" />
-<register name="CAN1_MB11_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 11 Data 2 Register" bit-size="16" read-address="0xFFC03568" write-address="0xFFC03568" type="IO" target="EMU" />
-<register name="CAN1_MB11_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 11 Data 3 Register" bit-size="16" read-address="0xFFC0356C" write-address="0xFFC0356C" type="IO" target="EMU" />
-<register name="CAN1_MB11_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 11 Length Register" bit-size="16" read-address="0xFFC03570" write-address="0xFFC03570" type="IO" target="EMU" />
-<register name="CAN1_MB11_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 11 Timestamp Register" bit-size="16" read-address="0xFFC03574" write-address="0xFFC03574" type="IO" target="EMU" />
-<register name="CAN1_MB11_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 11 ID0 Register" bit-size="16" read-address="0xFFC03578" write-address="0xFFC03578" type="IO" target="EMU" />
-<register name="CAN1_MB11_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 11 ID1 Register" bit-size="16" read-address="0xFFC0357C" write-address="0xFFC0357C" type="IO" target="EMU" />
-<register name="CAN1_MB12_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 12 Data 0 Register" bit-size="16" read-address="0xFFC03580" write-address="0xFFC03580" type="IO" target="EMU" />
-<register name="CAN1_MB12_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 12 Data 1 Register" bit-size="16" read-address="0xFFC03584" write-address="0xFFC03584" type="IO" target="EMU" />
-<register name="CAN1_MB12_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 12 Data 2 Register" bit-size="16" read-address="0xFFC03588" write-address="0xFFC03588" type="IO" target="EMU" />
-<register name="CAN1_MB12_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 12 Data 3 Register" bit-size="16" read-address="0xFFC0358C" write-address="0xFFC0358C" type="IO" target="EMU" />
-<register name="CAN1_MB12_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 12 Length Register" bit-size="16" read-address="0xFFC03590" write-address="0xFFC03590" type="IO" target="EMU" />
-<register name="CAN1_MB12_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 12 Timestamp Register" bit-size="16" read-address="0xFFC03594" write-address="0xFFC03594" type="IO" target="EMU" />
-<register name="CAN1_MB12_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 12 ID0 Register" bit-size="16" read-address="0xFFC03598" write-address="0xFFC03598" type="IO" target="EMU" />
-<register name="CAN1_MB12_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 12 ID1 Register" bit-size="16" read-address="0xFFC0359C" write-address="0xFFC0359C" type="IO" target="EMU" />
-<register name="CAN1_MB13_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 13 Data 0 Register" bit-size="16" read-address="0xFFC035A0" write-address="0xFFC035A0" type="IO" target="EMU" />
-<register name="CAN1_MB13_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 13 Data 1 Register" bit-size="16" read-address="0xFFC035A4" write-address="0xFFC035A4" type="IO" target="EMU" />
-<register name="CAN1_MB13_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 13 Data 2 Register" bit-size="16" read-address="0xFFC035A8" write-address="0xFFC035A8" type="IO" target="EMU" />
-<register name="CAN1_MB13_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 13 Data 3 Register" bit-size="16" read-address="0xFFC035AC" write-address="0xFFC035AC" type="IO" target="EMU" />
-<register name="CAN1_MB13_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 13 Length Register" bit-size="16" read-address="0xFFC035B0" write-address="0xFFC035B0" type="IO" target="EMU" />
-<register name="CAN1_MB13_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 13 Timestamp Register" bit-size="16" read-address="0xFFC035B4" write-address="0xFFC035B4" type="IO" target="EMU" />
-<register name="CAN1_MB13_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 13 ID0 Register" bit-size="16" read-address="0xFFC035B8" write-address="0xFFC035B8" type="IO" target="EMU" />
-<register name="CAN1_MB13_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 13 ID1 Register" bit-size="16" read-address="0xFFC035BC" write-address="0xFFC035BC" type="IO" target="EMU" />
-<register name="CAN1_MB14_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 14 Data 0 Register" bit-size="16" read-address="0xFFC035C0" write-address="0xFFC035C0" type="IO" target="EMU" />
-<register name="CAN1_MB14_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 14 Data 1 Register" bit-size="16" read-address="0xFFC035C4" write-address="0xFFC035C4" type="IO" target="EMU" />
-<register name="CAN1_MB14_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 14 Data 2 Register" bit-size="16" read-address="0xFFC035C8" write-address="0xFFC035C8" type="IO" target="EMU" />
-<register name="CAN1_MB14_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 14 Data 3 Register" bit-size="16" read-address="0xFFC035CC" write-address="0xFFC035CC" type="IO" target="EMU" />
-<register name="CAN1_MB14_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 14 Length Register" bit-size="16" read-address="0xFFC035D0" write-address="0xFFC035D0" type="IO" target="EMU" />
-<register name="CAN1_MB14_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 14 Timestamp Register" bit-size="16" read-address="0xFFC035D4" write-address="0xFFC035D4" type="IO" target="EMU" />
-<register name="CAN1_MB14_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 14 ID0 Register" bit-size="16" read-address="0xFFC035D8" write-address="0xFFC035D8" type="IO" target="EMU" />
-<register name="CAN1_MB14_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 14 ID1 Register" bit-size="16" read-address="0xFFC035DC" write-address="0xFFC035DC" type="IO" target="EMU" />
-<register name="CAN1_MB15_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 15 Data 0 Register" bit-size="16" read-address="0xFFC035E0" write-address="0xFFC035E0" type="IO" target="EMU" />
-<register name="CAN1_MB15_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 15 Data 1 Register" bit-size="16" read-address="0xFFC035E4" write-address="0xFFC035E4" type="IO" target="EMU" />
-<register name="CAN1_MB15_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 15 Data 2 Register" bit-size="16" read-address="0xFFC035E8" write-address="0xFFC035E8" type="IO" target="EMU" />
-<register name="CAN1_MB15_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 15 Data 3 Register" bit-size="16" read-address="0xFFC035EC" write-address="0xFFC035EC" type="IO" target="EMU" />
-<register name="CAN1_MB15_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 15 Length Register" bit-size="16" read-address="0xFFC035F0" write-address="0xFFC035F0" type="IO" target="EMU" />
-<register name="CAN1_MB15_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 15 Timestamp Register" bit-size="16" read-address="0xFFC035F4" write-address="0xFFC035F4" type="IO" target="EMU" />
-<register name="CAN1_MB15_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 15 ID0 Register" bit-size="16" read-address="0xFFC035F8" write-address="0xFFC035F8" type="IO" target="EMU" />
-<register name="CAN1_MB15_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 15 ID1 Register" bit-size="16" read-address="0xFFC035FC" write-address="0xFFC035FC" type="IO" target="EMU" />
-
-<register name="CAN1_MB16_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 16 Data 0 Register" bit-size="16" read-address="0xFFC03600" write-address="0xFFC03600" type="IO" target="EMU" def-comment="CAN Controller 1 Mailbox Data Registers" />
-<register name="CAN1_MB16_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 16 Data 1 Register" bit-size="16" read-address="0xFFC03604" write-address="0xFFC03604" type="IO" target="EMU" />
-<register name="CAN1_MB16_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 16 Data 2 Register" bit-size="16" read-address="0xFFC03608" write-address="0xFFC03608" type="IO" target="EMU" />
-<register name="CAN1_MB16_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 16 Data 3 Register" bit-size="16" read-address="0xFFC0360C" write-address="0xFFC0360C" type="IO" target="EMU" />
-<register name="CAN1_MB16_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 16 Length Register" bit-size="16" read-address="0xFFC03610" write-address="0xFFC03610" type="IO" target="EMU" />
-<register name="CAN1_MB16_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 16 Timestamp Register" bit-size="16" read-address="0xFFC03614" write-address="0xFFC03614" type="IO" target="EMU" />
-<register name="CAN1_MB16_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 16 ID0 Register" bit-size="16" read-address="0xFFC03618" write-address="0xFFC03618" type="IO" target="EMU" />
-<register name="CAN1_MB16_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 16 ID1 Register" bit-size="16" read-address="0xFFC0361C" write-address="0xFFC0361C" type="IO" target="EMU" />
-<register name="CAN1_MB17_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 17 Data 0 Register" bit-size="16" read-address="0xFFC03620" write-address="0xFFC03620" type="IO" target="EMU" />
-<register name="CAN1_MB17_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 17 Data 1 Register" bit-size="16" read-address="0xFFC03624" write-address="0xFFC03624" type="IO" target="EMU" />
-<register name="CAN1_MB17_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 17 Data 2 Register" bit-size="16" read-address="0xFFC03628" write-address="0xFFC03628" type="IO" target="EMU" />
-<register name="CAN1_MB17_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 17 Data 3 Register" bit-size="16" read-address="0xFFC0362C" write-address="0xFFC0362C" type="IO" target="EMU" />
-<register name="CAN1_MB17_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 17 Length Register" bit-size="16" read-address="0xFFC03630" write-address="0xFFC03630" type="IO" target="EMU" />
-<register name="CAN1_MB17_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 17 Timestamp Register" bit-size="16" read-address="0xFFC03634" write-address="0xFFC03634" type="IO" target="EMU" />
-<register name="CAN1_MB17_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 17 ID0 Register" bit-size="16" read-address="0xFFC03638" write-address="0xFFC03638" type="IO" target="EMU" />
-<register name="CAN1_MB17_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 17 ID1 Register" bit-size="16" read-address="0xFFC0363C" write-address="0xFFC0363C" type="IO" target="EMU" />
-<register name="CAN1_MB18_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 18 Data 0 Register" bit-size="16" read-address="0xFFC03640" write-address="0xFFC03640" type="IO" target="EMU" />
-<register name="CAN1_MB18_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 18 Data 1 Register" bit-size="16" read-address="0xFFC03644" write-address="0xFFC03644" type="IO" target="EMU" />
-<register name="CAN1_MB18_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 18 Data 2 Register" bit-size="16" read-address="0xFFC03648" write-address="0xFFC03648" type="IO" target="EMU" />
-<register name="CAN1_MB18_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 18 Data 3 Register" bit-size="16" read-address="0xFFC0364C" write-address="0xFFC0364C" type="IO" target="EMU" />
-<register name="CAN1_MB18_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 18 Length Register" bit-size="16" read-address="0xFFC03650" write-address="0xFFC03650" type="IO" target="EMU" />
-<register name="CAN1_MB18_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 18 Timestamp Register" bit-size="16" read-address="0xFFC03654" write-address="0xFFC03654" type="IO" target="EMU" />
-<register name="CAN1_MB18_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 18 ID0 Register" bit-size="16" read-address="0xFFC03658" write-address="0xFFC03658" type="IO" target="EMU" />
-<register name="CAN1_MB18_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 18 ID1 Register" bit-size="16" read-address="0xFFC0365C" write-address="0xFFC0365C" type="IO" target="EMU" />
-<register name="CAN1_MB19_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 19 Data 0 Register" bit-size="16" read-address="0xFFC03660" write-address="0xFFC03660" type="IO" target="EMU" />
-<register name="CAN1_MB19_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 19 Data 1 Register" bit-size="16" read-address="0xFFC03664" write-address="0xFFC03664" type="IO" target="EMU" />
-<register name="CAN1_MB19_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 19 Data 2 Register" bit-size="16" read-address="0xFFC03668" write-address="0xFFC03668" type="IO" target="EMU" />
-<register name="CAN1_MB19_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 19 Data 3 Register" bit-size="16" read-address="0xFFC0366C" write-address="0xFFC0366C" type="IO" target="EMU" />
-<register name="CAN1_MB19_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 19 Length Register" bit-size="16" read-address="0xFFC03670" write-address="0xFFC03670" type="IO" target="EMU" />
-<register name="CAN1_MB19_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 19 Timestamp Register" bit-size="16" read-address="0xFFC03674" write-address="0xFFC03674" type="IO" target="EMU" />
-<register name="CAN1_MB19_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 19 ID0 Register" bit-size="16" read-address="0xFFC03678" write-address="0xFFC03678" type="IO" target="EMU" />
-<register name="CAN1_MB19_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 19 ID1 Register" bit-size="16" read-address="0xFFC0367C" write-address="0xFFC0367C" type="IO" target="EMU" />
-<register name="CAN1_MB20_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 20 Data 0 Register" bit-size="16" read-address="0xFFC03680" write-address="0xFFC03680" type="IO" target="EMU" />
-<register name="CAN1_MB20_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 20 Data 1 Register" bit-size="16" read-address="0xFFC03684" write-address="0xFFC03684" type="IO" target="EMU" />
-<register name="CAN1_MB20_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 20 Data 2 Register" bit-size="16" read-address="0xFFC03688" write-address="0xFFC03688" type="IO" target="EMU" />
-<register name="CAN1_MB20_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 20 Data 3 Register" bit-size="16" read-address="0xFFC0368C" write-address="0xFFC0368C" type="IO" target="EMU" />
-<register name="CAN1_MB20_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 20 Length Register" bit-size="16" read-address="0xFFC03690" write-address="0xFFC03690" type="IO" target="EMU" />
-<register name="CAN1_MB20_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 20 Timestamp Register" bit-size="16" read-address="0xFFC03694" write-address="0xFFC03694" type="IO" target="EMU" />
-<register name="CAN1_MB20_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 20 ID0 Register" bit-size="16" read-address="0xFFC03698" write-address="0xFFC03698" type="IO" target="EMU" />
-<register name="CAN1_MB20_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 20 ID1 Register" bit-size="16" read-address="0xFFC0369C" write-address="0xFFC0369C" type="IO" target="EMU" />
-<register name="CAN1_MB21_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 21 Data 0 Register" bit-size="16" read-address="0xFFC036A0" write-address="0xFFC036A0" type="IO" target="EMU" />
-<register name="CAN1_MB21_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 21 Data 1 Register" bit-size="16" read-address="0xFFC036A4" write-address="0xFFC036A4" type="IO" target="EMU" />
-<register name="CAN1_MB21_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 21 Data 2 Register" bit-size="16" read-address="0xFFC036A8" write-address="0xFFC036A8" type="IO" target="EMU" />
-<register name="CAN1_MB21_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 21 Data 3 Register" bit-size="16" read-address="0xFFC036AC" write-address="0xFFC036AC" type="IO" target="EMU" />
-<register name="CAN1_MB21_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 21 Length Register" bit-size="16" read-address="0xFFC036B0" write-address="0xFFC036B0" type="IO" target="EMU" />
-<register name="CAN1_MB21_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 21 Timestamp Register" bit-size="16" read-address="0xFFC036B4" write-address="0xFFC036B4" type="IO" target="EMU" />
-<register name="CAN1_MB21_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 21 ID0 Register" bit-size="16" read-address="0xFFC036B8" write-address="0xFFC036B8" type="IO" target="EMU" />
-<register name="CAN1_MB21_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 21 ID1 Register" bit-size="16" read-address="0xFFC036BC" write-address="0xFFC036BC" type="IO" target="EMU" />
-<register name="CAN1_MB22_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 22 Data 0 Register" bit-size="16" read-address="0xFFC036C0" write-address="0xFFC036C0" type="IO" target="EMU" />
-<register name="CAN1_MB22_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 22 Data 1 Register" bit-size="16" read-address="0xFFC036C4" write-address="0xFFC036C4" type="IO" target="EMU" />
-<register name="CAN1_MB22_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 22 Data 2 Register" bit-size="16" read-address="0xFFC036C8" write-address="0xFFC036C8" type="IO" target="EMU" />
-<register name="CAN1_MB22_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 22 Data 3 Register" bit-size="16" read-address="0xFFC036CC" write-address="0xFFC036CC" type="IO" target="EMU" />
-<register name="CAN1_MB22_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 22 Length Register" bit-size="16" read-address="0xFFC036D0" write-address="0xFFC036D0" type="IO" target="EMU" />
-<register name="CAN1_MB22_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 22 Timestamp Register" bit-size="16" read-address="0xFFC036D4" write-address="0xFFC036D4" type="IO" target="EMU" />
-<register name="CAN1_MB22_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 22 ID0 Register" bit-size="16" read-address="0xFFC036D8" write-address="0xFFC036D8" type="IO" target="EMU" />
-<register name="CAN1_MB22_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 22 ID1 Register" bit-size="16" read-address="0xFFC036DC" write-address="0xFFC036DC" type="IO" target="EMU" />
-<register name="CAN1_MB23_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 23 Data 0 Register" bit-size="16" read-address="0xFFC036E0" write-address="0xFFC036E0" type="IO" target="EMU" />
-<register name="CAN1_MB23_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 23 Data 1 Register" bit-size="16" read-address="0xFFC036E4" write-address="0xFFC036E4" type="IO" target="EMU" />
-<register name="CAN1_MB23_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 23 Data 2 Register" bit-size="16" read-address="0xFFC036E8" write-address="0xFFC036E8" type="IO" target="EMU" />
-<register name="CAN1_MB23_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 23 Data 3 Register" bit-size="16" read-address="0xFFC036EC" write-address="0xFFC036EC" type="IO" target="EMU" />
-<register name="CAN1_MB23_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 23 Length Register" bit-size="16" read-address="0xFFC036F0" write-address="0xFFC036F0" type="IO" target="EMU" />
-<register name="CAN1_MB23_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 23 Timestamp Register" bit-size="16" read-address="0xFFC036F4" write-address="0xFFC036F4" type="IO" target="EMU" />
-<register name="CAN1_MB23_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 23 ID0 Register" bit-size="16" read-address="0xFFC036F8" write-address="0xFFC036F8" type="IO" target="EMU" />
-<register name="CAN1_MB23_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 23 ID1 Register" bit-size="16" read-address="0xFFC036FC" write-address="0xFFC036FC" type="IO" target="EMU" />
-<register name="CAN1_MB24_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 24 Data 0 Register" bit-size="16" read-address="0xFFC03700" write-address="0xFFC03700" type="IO" target="EMU" />
-<register name="CAN1_MB24_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 24 Data 1 Register" bit-size="16" read-address="0xFFC03704" write-address="0xFFC03704" type="IO" target="EMU" />
-<register name="CAN1_MB24_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 24 Data 2 Register" bit-size="16" read-address="0xFFC03708" write-address="0xFFC03708" type="IO" target="EMU" />
-<register name="CAN1_MB24_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 24 Data 3 Register" bit-size="16" read-address="0xFFC0370C" write-address="0xFFC0370C" type="IO" target="EMU" />
-<register name="CAN1_MB24_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 24 Length Register" bit-size="16" read-address="0xFFC03710" write-address="0xFFC03710" type="IO" target="EMU" />
-<register name="CAN1_MB24_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 24 Timestamp Register" bit-size="16" read-address="0xFFC03714" write-address="0xFFC03714" type="IO" target="EMU" />
-<register name="CAN1_MB24_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 24 ID0 Register" bit-size="16" read-address="0xFFC03718" write-address="0xFFC03718" type="IO" target="EMU" />
-<register name="CAN1_MB24_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 24 ID1 Register" bit-size="16" read-address="0xFFC0371C" write-address="0xFFC0371C" type="IO" target="EMU" />
-<register name="CAN1_MB25_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 25 Data 0 Register" bit-size="16" read-address="0xFFC03720" write-address="0xFFC03720" type="IO" target="EMU" />
-<register name="CAN1_MB25_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 25 Data 1 Register" bit-size="16" read-address="0xFFC03724" write-address="0xFFC03724" type="IO" target="EMU" />
-<register name="CAN1_MB25_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 25 Data 2 Register" bit-size="16" read-address="0xFFC03728" write-address="0xFFC03728" type="IO" target="EMU" />
-<register name="CAN1_MB25_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 25 Data 3 Register" bit-size="16" read-address="0xFFC0372C" write-address="0xFFC0372C" type="IO" target="EMU" />
-<register name="CAN1_MB25_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 25 Length Register" bit-size="16" read-address="0xFFC03730" write-address="0xFFC03730" type="IO" target="EMU" />
-<register name="CAN1_MB25_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 25 Timestamp Register" bit-size="16" read-address="0xFFC03734" write-address="0xFFC03734" type="IO" target="EMU" />
-<register name="CAN1_MB25_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 25 ID0 Register" bit-size="16" read-address="0xFFC03738" write-address="0xFFC03738" type="IO" target="EMU" />
-<register name="CAN1_MB25_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 25 ID1 Register" bit-size="16" read-address="0xFFC0373C" write-address="0xFFC0373C" type="IO" target="EMU" />
-<register name="CAN1_MB26_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 26 Data 0 Register" bit-size="16" read-address="0xFFC03740" write-address="0xFFC03740" type="IO" target="EMU" />
-<register name="CAN1_MB26_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 26 Data 1 Register" bit-size="16" read-address="0xFFC03744" write-address="0xFFC03744" type="IO" target="EMU" />
-<register name="CAN1_MB26_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 26 Data 2 Register" bit-size="16" read-address="0xFFC03748" write-address="0xFFC03748" type="IO" target="EMU" />
-<register name="CAN1_MB26_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 26 Data 3 Register" bit-size="16" read-address="0xFFC0374C" write-address="0xFFC0374C" type="IO" target="EMU" />
-<register name="CAN1_MB26_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 26 Length Register" bit-size="16" read-address="0xFFC03750" write-address="0xFFC03750" type="IO" target="EMU" />
-<register name="CAN1_MB26_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 26 Timestamp Register" bit-size="16" read-address="0xFFC03754" write-address="0xFFC03754" type="IO" target="EMU" />
-<register name="CAN1_MB26_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 26 ID0 Register" bit-size="16" read-address="0xFFC03758" write-address="0xFFC03758" type="IO" target="EMU" />
-<register name="CAN1_MB26_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 26 ID1 Register" bit-size="16" read-address="0xFFC0375C" write-address="0xFFC0375C" type="IO" target="EMU" />
-<register name="CAN1_MB27_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 27 Data 0 Register" bit-size="16" read-address="0xFFC03760" write-address="0xFFC03760" type="IO" target="EMU" />
-<register name="CAN1_MB27_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 27 Data 1 Register" bit-size="16" read-address="0xFFC03764" write-address="0xFFC03764" type="IO" target="EMU" />
-<register name="CAN1_MB27_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 27 Data 2 Register" bit-size="16" read-address="0xFFC03768" write-address="0xFFC03768" type="IO" target="EMU" />
-<register name="CAN1_MB27_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 27 Data 3 Register" bit-size="16" read-address="0xFFC0376C" write-address="0xFFC0376C" type="IO" target="EMU" />
-<register name="CAN1_MB27_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 27 Length Register" bit-size="16" read-address="0xFFC03770" write-address="0xFFC03770" type="IO" target="EMU" />
-<register name="CAN1_MB27_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 27 Timestamp Register" bit-size="16" read-address="0xFFC03774" write-address="0xFFC03774" type="IO" target="EMU" />
-<register name="CAN1_MB27_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 27 ID0 Register" bit-size="16" read-address="0xFFC03778" write-address="0xFFC03778" type="IO" target="EMU" />
-<register name="CAN1_MB27_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 27 ID1 Register" bit-size="16" read-address="0xFFC0377C" write-address="0xFFC0377C" type="IO" target="EMU" />
-<register name="CAN1_MB28_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 28 Data 0 Register" bit-size="16" read-address="0xFFC03780" write-address="0xFFC03780" type="IO" target="EMU" />
-<register name="CAN1_MB28_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 28 Data 1 Register" bit-size="16" read-address="0xFFC03784" write-address="0xFFC03784" type="IO" target="EMU" />
-<register name="CAN1_MB28_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 28 Data 2 Register" bit-size="16" read-address="0xFFC03788" write-address="0xFFC03788" type="IO" target="EMU" />
-<register name="CAN1_MB28_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 28 Data 3 Register" bit-size="16" read-address="0xFFC0378C" write-address="0xFFC0378C" type="IO" target="EMU" />
-<register name="CAN1_MB28_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 28 Length Register" bit-size="16" read-address="0xFFC03790" write-address="0xFFC03790" type="IO" target="EMU" />
-<register name="CAN1_MB28_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 28 Timestamp Register" bit-size="16" read-address="0xFFC03794" write-address="0xFFC03794" type="IO" target="EMU" />
-<register name="CAN1_MB28_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 28 ID0 Register" bit-size="16" read-address="0xFFC03798" write-address="0xFFC03798" type="IO" target="EMU" />
-<register name="CAN1_MB28_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 28 ID1 Register" bit-size="16" read-address="0xFFC0379C" write-address="0xFFC0379C" type="IO" target="EMU" />
-<register name="CAN1_MB29_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 29 Data 0 Register" bit-size="16" read-address="0xFFC037A0" write-address="0xFFC037A0" type="IO" target="EMU" />
-<register name="CAN1_MB29_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 29 Data 1 Register" bit-size="16" read-address="0xFFC037A4" write-address="0xFFC037A4" type="IO" target="EMU" />
-<register name="CAN1_MB29_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 29 Data 2 Register" bit-size="16" read-address="0xFFC037A8" write-address="0xFFC037A8" type="IO" target="EMU" />
-<register name="CAN1_MB29_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 29 Data 3 Register" bit-size="16" read-address="0xFFC037AC" write-address="0xFFC037AC" type="IO" target="EMU" />
-<register name="CAN1_MB29_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 29 Length Register" bit-size="16" read-address="0xFFC037B0" write-address="0xFFC037B0" type="IO" target="EMU" />
-<register name="CAN1_MB29_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 29 Timestamp Register" bit-size="16" read-address="0xFFC037B4" write-address="0xFFC037B4" type="IO" target="EMU" />
-<register name="CAN1_MB29_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 29 ID0 Register" bit-size="16" read-address="0xFFC037B8" write-address="0xFFC037B8" type="IO" target="EMU" />
-<register name="CAN1_MB29_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 29 ID1 Register" bit-size="16" read-address="0xFFC037BC" write-address="0xFFC037BC" type="IO" target="EMU" />
-<register name="CAN1_MB30_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 30 Data 0 Register" bit-size="16" read-address="0xFFC037C0" write-address="0xFFC037C0" type="IO" target="EMU" />
-<register name="CAN1_MB30_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 30 Data 1 Register" bit-size="16" read-address="0xFFC037C4" write-address="0xFFC037C4" type="IO" target="EMU" />
-<register name="CAN1_MB30_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 30 Data 2 Register" bit-size="16" read-address="0xFFC037C8" write-address="0xFFC037C8" type="IO" target="EMU" />
-<register name="CAN1_MB30_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 30 Data 3 Register" bit-size="16" read-address="0xFFC037CC" write-address="0xFFC037CC" type="IO" target="EMU" />
-<register name="CAN1_MB30_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 30 Length Register" bit-size="16" read-address="0xFFC037D0" write-address="0xFFC037D0" type="IO" target="EMU" />
-<register name="CAN1_MB30_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 30 Timestamp Register" bit-size="16" read-address="0xFFC037D4" write-address="0xFFC037D4" type="IO" target="EMU" />
-<register name="CAN1_MB30_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 30 ID0 Register" bit-size="16" read-address="0xFFC037D8" write-address="0xFFC037D8" type="IO" target="EMU" />
-<register name="CAN1_MB30_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 30 ID1 Register" bit-size="16" read-address="0xFFC037DC" write-address="0xFFC037DC" type="IO" target="EMU" />
-<register name="CAN1_MB31_DATA0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 31 Data 0 Register" bit-size="16" read-address="0xFFC037E0" write-address="0xFFC037E0" type="IO" target="EMU" />
-<register name="CAN1_MB31_DATA1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 31 Data 1 Register" bit-size="16" read-address="0xFFC037E4" write-address="0xFFC037E4" type="IO" target="EMU" />
-<register name="CAN1_MB31_DATA2" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 31 Data 2 Register" bit-size="16" read-address="0xFFC037E8" write-address="0xFFC037E8" type="IO" target="EMU" />
-<register name="CAN1_MB31_DATA3" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 31 Data 3 Register" bit-size="16" read-address="0xFFC037EC" write-address="0xFFC037EC" type="IO" target="EMU" />
-<register name="CAN1_MB31_LENGTH" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 31 Length Register" bit-size="16" read-address="0xFFC037F0" write-address="0xFFC037F0" type="IO" target="EMU" />
-<register name="CAN1_MB31_TIMESTAMP" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 31 Timestamp Register" bit-size="16" read-address="0xFFC037F4" write-address="0xFFC037F4" type="IO" target="EMU" />
-<register name="CAN1_MB31_ID0" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 31 ID0 Register" bit-size="16" read-address="0xFFC037F8" write-address="0xFFC037F8" type="IO" target="EMU" />
-<register name="CAN1_MB31_ID1" group="CAN1 Mailbox RAM" mask="FFFF" description="CAN Controller 1 Mailbox 31 ID1 Register" bit-size="16" read-address="0xFFC037FC" write-address="0xFFC037FC" type="IO" target="EMU" />
-
+<!-- Proc Periph HWR, chap  8, CAN not available on this processor -->
 
 
 <!-- Proc Periph HWR, chap  9, SPI Registers Definitions -->
@@ -3720,18 +2981,18 @@
 
 <!-- Proc Periph HWR,  chap 12, UART Register Definitions -->
 
-<register name="UART0_DLL"       group="UART" read-address="0xFFC00400" write-address="0xFFC00400" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Divisor Latch Low Byte" def-comment="UART0 Registers" />
-<register name="UART0_DLH"       group="UART" read-address="0xFFC00404" write-address="0xFFC00404" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Divisor Latch High Byte" />
-<register name="UART0_GCTL"      group="UART" read-address="0xFFC00408" write-address="0xFFC00408" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Global Control Register" />
-<register name="UART0_LCR"       group="UART" read-address="0xFFC0040C" write-address="0xFFC0040C" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Line Control Register" />
-<register name="UART0_MCR"       group="UART" read-address="0xFFC00410" write-address="0xFFC00410" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Modem Control Register" />
-<register name="UART0_LSR"       group="UART" read-address="0xFFC00414" write-address="0xFFC00414" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Line Status Register" />
-<register name="UART0_MSR"       group="UART" read-address="0xFFC00418" write-address="0xFFC00418" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Modem Status Register" />
-<register name="UART0_SCR"       group="UART" read-address="0xFFC0041C" write-address="0xFFC0041C" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Scratch Register" />
-<register name="UART0_IER_SET"   group="UART" read-address="0xFFC00420" write-address="0xFFC00420" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Interrupt Enable Register Set" />
-<register name="UART0_IER_CLEAR" group="UART" read-address="0xFFC00424" write-address="0xFFC00424" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Interrupt Enable Register Clear" />
-<register name="UART0_THR"       group="UART" read-address="0xFFC00428" write-address="0xFFC00428" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Transmit Hold Register" />
-<register name="UART0_RBR"       group="UART" read-address="0xFFC0042C" write-address="0xFFC0042C" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Receive Buffer Register" />
+<register name="UART0_DLL"       group="UART0" read-address="0xFFC00400" write-address="0xFFC00400" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Divisor Latch Low Byte" def-comment="UART0 Registers" />
+<register name="UART0_DLH"       group="UART0" read-address="0xFFC00404" write-address="0xFFC00404" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Divisor Latch High Byte" />
+<register name="UART0_GCTL"      group="UART0" read-address="0xFFC00408" write-address="0xFFC00408" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Global Control Register" />
+<register name="UART0_LCR"       group="UART0" read-address="0xFFC0040C" write-address="0xFFC0040C" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Line Control Register" />
+<register name="UART0_MCR"       group="UART0" read-address="0xFFC00410" write-address="0xFFC00410" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Modem Control Register" />
+<register name="UART0_LSR"       group="UART0" read-address="0xFFC00414" write-address="0xFFC00414" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Line Status Register" />
+<register name="UART0_MSR"       group="UART0" read-address="0xFFC00418" write-address="0xFFC00418" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Modem Status Register" />
+<register name="UART0_SCR"       group="UART0" read-address="0xFFC0041C" write-address="0xFFC0041C" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Scratch Register" />
+<register name="UART0_IER_SET"   group="UART0" read-address="0xFFC00420" write-address="0xFFC00420" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Interrupt Enable Register Set" />
+<register name="UART0_IER_CLEAR" group="UART0" read-address="0xFFC00424" write-address="0xFFC00424" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Interrupt Enable Register Clear" />
+<register name="UART0_THR"       group="UART0" read-address="0xFFC00428" write-address="0xFFC00428" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Transmit Hold Register" />
+<register name="UART0_RBR"       group="UART0" read-address="0xFFC0042C" write-address="0xFFC0042C" type="IO" target="EMU" bit-size="16" mask="FFFF" description="Receive Buffer Register" />
 
 	<register name="UART0_IREN"     parent="UART0_GCTL"      bit-position="1" bit-size="1" target="EMU" />
 	<register name="UART0_TPOLC"    parent="UART0_GCTL"      bit-position="2" bit-size="1" target="EMU" />
@@ -3787,18 +3048,18 @@
 	<register name="UART0_ETFI_C"   parent="UART0_IER_CLEAR" bit-position="5" bit-size="1" target="EMU" />
 	<register name="UART0_ERFCI_C"  parent="UART0_IER_CLEAR" bit-position="6" bit-size="1" target="EMU" />
 
-<register name="UART1_DLL"       group="UART" read-address="0xFFC02000" write-address="0xFFC02000" type="IO" target="EMU" mask="FFFF" description="Divisor Latch Low Byte" bit-size="16" def-comment="UART1 Registers" />
-<register name="UART1_DLH"       group="UART" read-address="0xFFC02004" write-address="0xFFC02004" type="IO" target="EMU" mask="FFFF" description="Divisor Latch High Byte" bit-size="16" />
-<register name="UART1_GCTL"      group="UART" read-address="0xFFC02008" write-address="0xFFC02008" type="IO" target="EMU" mask="FFFF" description="Global Control Register" bit-size="16" />
-<register name="UART1_LCR"       group="UART" read-address="0xFFC0200C" write-address="0xFFC0200C" type="IO" target="EMU" mask="FFFF" description="Line Control Register" bit-size="16" />
-<register name="UART1_MCR"       group="UART" read-address="0xFFC02010" write-address="0xFFC02010" type="IO" target="EMU" mask="FFFF" description="Modem Control Register" bit-size="16" />
-<register name="UART1_LSR"       group="UART" read-address="0xFFC02014" write-address="0xFFC02014" type="IO" target="EMU" mask="FFFF" description="Line Status Register" bit-size="16" />
-<register name="UART1_MSR"       group="UART" read-address="0xFFC02018" write-address="0xFFC02018" type="IO" target="EMU" mask="FFFF" description="Modem Status Register" bit-size="16" />
-<register name="UART1_SCR"       group="UART" read-address="0xFFC0201C" write-address="0xFFC0201C" type="IO" target="EMU" mask="FFFF" description="Scratch Register" bit-size="16" />
-<register name="UART1_IER_SET"   group="UART" read-address="0xFFC02020" write-address="0xFFC02020" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Set" bit-size="16" />
-<register name="UART1_IER_CLEAR" group="UART" read-address="0xFFC02024" write-address="0xFFC02024" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Clear" bit-size="16" />
-<register name="UART1_THR"       group="UART" read-address="0xFFC02028" write-address="0xFFC02028" type="IO" target="EMU" mask="FFFF" description="Transmit Hold Register" bit-size="16" />
-<register name="UART1_RBR"       group="UART" read-address="0xFFC0202C" write-address="0xFFC0202C" type="IO" target="EMU" mask="FFFF" description="Receive Buffer Register" bit-size="16" />
+<register name="UART1_DLL"       group="UART1" read-address="0xFFC02000" write-address="0xFFC02000" type="IO" target="EMU" mask="FFFF" description="Divisor Latch Low Byte" bit-size="16" def-comment="UART1 Registers" />
+<register name="UART1_DLH"       group="UART1" read-address="0xFFC02004" write-address="0xFFC02004" type="IO" target="EMU" mask="FFFF" description="Divisor Latch High Byte" bit-size="16" />
+<register name="UART1_GCTL"      group="UART1" read-address="0xFFC02008" write-address="0xFFC02008" type="IO" target="EMU" mask="FFFF" description="Global Control Register" bit-size="16" />
+<register name="UART1_LCR"       group="UART1" read-address="0xFFC0200C" write-address="0xFFC0200C" type="IO" target="EMU" mask="FFFF" description="Line Control Register" bit-size="16" />
+<register name="UART1_MCR"       group="UART1" read-address="0xFFC02010" write-address="0xFFC02010" type="IO" target="EMU" mask="FFFF" description="Modem Control Register" bit-size="16" />
+<register name="UART1_LSR"       group="UART1" read-address="0xFFC02014" write-address="0xFFC02014" type="IO" target="EMU" mask="FFFF" description="Line Status Register" bit-size="16" />
+<register name="UART1_MSR"       group="UART1" read-address="0xFFC02018" write-address="0xFFC02018" type="IO" target="EMU" mask="FFFF" description="Modem Status Register" bit-size="16" />
+<register name="UART1_SCR"       group="UART1" read-address="0xFFC0201C" write-address="0xFFC0201C" type="IO" target="EMU" mask="FFFF" description="Scratch Register" bit-size="16" />
+<register name="UART1_IER_SET"   group="UART1" read-address="0xFFC02020" write-address="0xFFC02020" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Set" bit-size="16" />
+<register name="UART1_IER_CLEAR" group="UART1" read-address="0xFFC02024" write-address="0xFFC02024" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Clear" bit-size="16" />
+<register name="UART1_THR"       group="UART1" read-address="0xFFC02028" write-address="0xFFC02028" type="IO" target="EMU" mask="FFFF" description="Transmit Hold Register" bit-size="16" />
+<register name="UART1_RBR"       group="UART1" read-address="0xFFC0202C" write-address="0xFFC0202C" type="IO" target="EMU" mask="FFFF" description="Receive Buffer Register" bit-size="16" />
 
 	<register name="UART1_IREN"     parent="UART1_GCTL"      bit-position="1" bit-size="1" target="EMU" />
 	<register name="UART1_TPOLC"    parent="UART1_GCTL"      bit-position="2" bit-size="1" target="EMU" />
@@ -3854,18 +3115,18 @@
 	<register name="UART1_ETFI_C"   parent="UART1_IER_CLEAR" bit-position="5" bit-size="1" target="EMU" />
 	<register name="UART1_ERFCI_C"  parent="UART1_IER_CLEAR" bit-position="6" bit-size="1" target="EMU" />
 
-<register name="UART2_DLL"       group="UART" read-address="0xFFC02100" write-address="0xFFC02100" type="IO" target="EMU" def-comment="UART2 Registers" mask="FFFF" description="Divisor Latch Low Byte" bit-size="16" />
-<register name="UART2_DLH"       group="UART" read-address="0xFFC02104" write-address="0xFFC02104" type="IO" target="EMU" mask="FFFF" description="Divisor Latch High Byte" bit-size="16" />
-<register name="UART2_GCTL"      group="UART" read-address="0xFFC02108" write-address="0xFFC02108" type="IO" target="EMU" mask="FFFF" description="Global Control Register" bit-size="16" />
-<register name="UART2_LCR"       group="UART" read-address="0xFFC0210C" write-address="0xFFC0210C" type="IO" target="EMU" mask="FFFF" description="Line Control Register" bit-size="16" />
-<register name="UART2_MCR"       group="UART" read-address="0xFFC02110" write-address="0xFFC02110" type="IO" target="EMU" mask="FFFF" description="Modem Control Register" bit-size="16" />
-<register name="UART2_LSR"       group="UART" read-address="0xFFC02114" write-address="0xFFC02114" type="IO" target="EMU" mask="FFFF" description="Line Status Register" bit-size="16" />
-<register name="UART2_MSR"       group="UART" read-address="0xFFC02118" write-address="0xFFC02118" type="IO" target="EMU" mask="FFFF" description="Modem Status Register" bit-size="16" />
-<register name="UART2_SCR"       group="UART" read-address="0xFFC0211C" write-address="0xFFC0211C" type="IO" target="EMU" mask="FFFF" description="Scratch Register" bit-size="16" />
-<register name="UART2_IER_SET"   group="UART" read-address="0xFFC02120" write-address="0xFFC02120" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Set" bit-size="16" />
-<register name="UART2_IER_CLEAR" group="UART" read-address="0xFFC02124" write-address="0xFFC02124" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Clear" bit-size="16" />
-<register name="UART2_THR"       group="UART" read-address="0xFFC02128" write-address="0xFFC02128" type="IO" target="EMU" mask="FFFF" description="Transmit Hold Register" bit-size="16" />
-<register name="UART2_RBR"       group="UART" read-address="0xFFC0212C" write-address="0xFFC0212C" type="IO" target="EMU" mask="FFFF" description="Receive Buffer Register" bit-size="16" />
+<register name="UART2_DLL"       group="UART2" read-address="0xFFC02100" write-address="0xFFC02100" type="IO" target="EMU" def-comment="UART2 Registers" mask="FFFF" description="Divisor Latch Low Byte" bit-size="16" />
+<register name="UART2_DLH"       group="UART2" read-address="0xFFC02104" write-address="0xFFC02104" type="IO" target="EMU" mask="FFFF" description="Divisor Latch High Byte" bit-size="16" />
+<register name="UART2_GCTL"      group="UART2" read-address="0xFFC02108" write-address="0xFFC02108" type="IO" target="EMU" mask="FFFF" description="Global Control Register" bit-size="16" />
+<register name="UART2_LCR"       group="UART2" read-address="0xFFC0210C" write-address="0xFFC0210C" type="IO" target="EMU" mask="FFFF" description="Line Control Register" bit-size="16" />
+<register name="UART2_MCR"       group="UART2" read-address="0xFFC02110" write-address="0xFFC02110" type="IO" target="EMU" mask="FFFF" description="Modem Control Register" bit-size="16" />
+<register name="UART2_LSR"       group="UART2" read-address="0xFFC02114" write-address="0xFFC02114" type="IO" target="EMU" mask="FFFF" description="Line Status Register" bit-size="16" />
+<register name="UART2_MSR"       group="UART2" read-address="0xFFC02118" write-address="0xFFC02118" type="IO" target="EMU" mask="FFFF" description="Modem Status Register" bit-size="16" />
+<register name="UART2_SCR"       group="UART2" read-address="0xFFC0211C" write-address="0xFFC0211C" type="IO" target="EMU" mask="FFFF" description="Scratch Register" bit-size="16" />
+<register name="UART2_IER_SET"   group="UART2" read-address="0xFFC02120" write-address="0xFFC02120" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Set" bit-size="16" />
+<register name="UART2_IER_CLEAR" group="UART2" read-address="0xFFC02124" write-address="0xFFC02124" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Clear" bit-size="16" />
+<register name="UART2_THR"       group="UART2" read-address="0xFFC02128" write-address="0xFFC02128" type="IO" target="EMU" mask="FFFF" description="Transmit Hold Register" bit-size="16" />
+<register name="UART2_RBR"       group="UART2" read-address="0xFFC0212C" write-address="0xFFC0212C" type="IO" target="EMU" mask="FFFF" description="Receive Buffer Register" bit-size="16" />
 
 	<register name="UART2_IREN"     parent="UART2_GCTL"      bit-position="1" bit-size="1" target="EMU" />
 	<register name="UART2_TPOLC"    parent="UART2_GCTL"      bit-position="2" bit-size="1" target="EMU" />
@@ -3924,18 +3185,18 @@
 
 <!-- Proc Periph HWR, chap  12, UART Register Definitions (UART3) -->
 
-<register name="UART3_DLL"       group="UART" read-address="0xFFC03100" write-address="0xFFC03100" type="IO" target="EMU" mask="FFFF" description="Divisor Latch Low Byte" bit-size="16" def-comment="UART3 Registers" />
-<register name="UART3_DLH"       group="UART" read-address="0xFFC03104" write-address="0xFFC03104" type="IO" target="EMU" mask="FFFF" description="Divisor Latch High Byte" bit-size="16" />
-<register name="UART3_GCTL"      group="UART" read-address="0xFFC03108" write-address="0xFFC03108" type="IO" target="EMU" mask="FFFF" description="Global Control Register" bit-size="16" />
-<register name="UART3_LCR"       group="UART" read-address="0xFFC0310C" write-address="0xFFC0310C" type="IO" target="EMU" mask="FFFF" description="Line Control Register" bit-size="16" />
-<register name="UART3_MCR"       group="UART" read-address="0xFFC03110" write-address="0xFFC03110" type="IO" target="EMU" mask="FFFF" description="Modem Control Register" bit-size="16" />
-<register name="UART3_LSR"       group="UART" read-address="0xFFC03114" write-address="0xFFC03114" type="IO" target="EMU" mask="FFFF" description="Line Status Register" bit-size="16" />
-<register name="UART3_MSR"       group="UART" read-address="0xFFC03118" write-address="0xFFC03118" type="IO" target="EMU" mask="FFFF" description="Modem Status Register" bit-size="16" />
-<register name="UART3_SCR"       group="UART" read-address="0xFFC0311C" write-address="0xFFC0311C" type="IO" target="EMU" mask="FFFF" description="Scratch Register" bit-size="16" />
-<register name="UART3_IER_SET"   group="UART" read-address="0xFFC03120" write-address="0xFFC03120" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Set" bit-size="16" />
-<register name="UART3_IER_CLEAR" group="UART" read-address="0xFFC03124" write-address="0xFFC03124" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Clear" bit-size="16" />
-<register name="UART3_THR"       group="UART" read-address="0xFFC03128" write-address="0xFFC03128" type="IO" target="EMU" mask="FFFF" description="Transmit Hold Register" bit-size="16" />
-<register name="UART3_RBR"       group="UART" read-address="0xFFC0312C" write-address="0xFFC0312C" type="IO" target="EMU" mask="FFFF" description="Receive Buffer Register" bit-size="16" />
+<register name="UART3_DLL"       group="UART3" read-address="0xFFC03100" write-address="0xFFC03100" type="IO" target="EMU" mask="FFFF" description="Divisor Latch Low Byte" bit-size="16" def-comment="UART3 Registers" />
+<register name="UART3_DLH"       group="UART3" read-address="0xFFC03104" write-address="0xFFC03104" type="IO" target="EMU" mask="FFFF" description="Divisor Latch High Byte" bit-size="16" />
+<register name="UART3_GCTL"      group="UART3" read-address="0xFFC03108" write-address="0xFFC03108" type="IO" target="EMU" mask="FFFF" description="Global Control Register" bit-size="16" />
+<register name="UART3_LCR"       group="UART3" read-address="0xFFC0310C" write-address="0xFFC0310C" type="IO" target="EMU" mask="FFFF" description="Line Control Register" bit-size="16" />
+<register name="UART3_MCR"       group="UART3" read-address="0xFFC03110" write-address="0xFFC03110" type="IO" target="EMU" mask="FFFF" description="Modem Control Register" bit-size="16" />
+<register name="UART3_LSR"       group="UART3" read-address="0xFFC03114" write-address="0xFFC03114" type="IO" target="EMU" mask="FFFF" description="Line Status Register" bit-size="16" />
+<register name="UART3_MSR"       group="UART3" read-address="0xFFC03118" write-address="0xFFC03118" type="IO" target="EMU" mask="FFFF" description="Modem Status Register" bit-size="16" />
+<register name="UART3_SCR"       group="UART3" read-address="0xFFC0311C" write-address="0xFFC0311C" type="IO" target="EMU" mask="FFFF" description="Scratch Register" bit-size="16" />
+<register name="UART3_IER_SET"   group="UART3" read-address="0xFFC03120" write-address="0xFFC03120" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Set" bit-size="16" />
+<register name="UART3_IER_CLEAR" group="UART3" read-address="0xFFC03124" write-address="0xFFC03124" type="IO" target="EMU" mask="FFFF" description="Interrupt Enable Register Clear" bit-size="16" />
+<register name="UART3_THR"       group="UART3" read-address="0xFFC03128" write-address="0xFFC03128" type="IO" target="EMU" mask="FFFF" description="Transmit Hold Register" bit-size="16" />
+<register name="UART3_RBR"       group="UART3" read-address="0xFFC0312C" write-address="0xFFC0312C" type="IO" target="EMU" mask="FFFF" description="Receive Buffer Register" bit-size="16" />
 
 	<register name="UART3_IREN"     parent="UART3_GCTL"      bit-position="1" bit-size="1" target="EMU" />
 	<register name="UART3_TPOLC"    parent="UART3_GCTL"      bit-position="2" bit-size="1" target="EMU" />

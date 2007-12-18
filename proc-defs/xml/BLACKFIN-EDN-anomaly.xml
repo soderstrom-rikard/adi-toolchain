@@ -20,7 +20,7 @@
 
 <visualdsp-dictionary-xml schema-version="1" name="BLACKFIN-EDN-anomaly.xml">
 
-<version file-version="0.27"/>
+<version file-version="0.32"/>
 
 	<!-- *************************************************************** -->
 	<!-- ** adi-web-link                                              ** -->
@@ -97,7 +97,7 @@
 	<anomaly ix="7" id="05-00-0104" 
 		compiler-option="-workaround avoid-dag1" 
 		compiler-defs="-D__WORKAROUND_AVOID_DAG1" 
-		compiler-behavior="The compiler works around this anomaly by avoiding use of DAG1 when issuing memory accesses. Note that avoid-dag1 is also used to for anomalies 05-00-0114, 05-00-0141, 05-00-0005, 05-00-0024 and 05-00-0202."
+		compiler-behavior="The compiler works around this anomaly by avoiding use of DAG1 when issuing memory accesses. Note that avoid-dag1 is also used to for anomalies 05-00-0114, 05-00-0141, 05-00-0005 and 05-00-0024."
 		summary="Stores to L1 Data memory incorrect when a specific sequence is followed"/>
 
 	<anomaly ix="8" id="05-00-0157"
@@ -225,7 +225,7 @@ xo
 	<anomaly ix="25" id="05-00-0283"
 		compiler-option="-workaround stalled-mmr-write-283"
 		compiler-defs="-D__WORKAROUND_STALLED_MMR_WRITE_283"
-		compiler-behavior="The problem is worked around in the compiler by adding a load of the CHIPID MMR at the start of code generated for C defined event handlers. The load is jumped around to clear the stalled write. The problem is also avoided in the VisualDSP++ default exception handler function cplb_hdr. This workaround supersedes that of anomaly 05-00-0157."
+		compiler-behavior="The problem is worked around in the compiler by adding a load of the CHIPID MMR at the start of code generated for C defined event handlers. The load is jumped around to clear the stalled write. The problem is also avoided in the VisualDSP++ default exception handler function cplb_hdr. This workaround supersedes that of anomaly 05-00-0157. This workaround is also used for similar anomaly 05-00-0315 (Killed System MMR Write Completes Erroneously On Next System MMR Access)."
 		summary="A system MMR write is stalled indefinitely when killed in a particular pipeline stage." />
 
 	<anomaly ix="26" id="F3-F-021"
@@ -268,7 +268,8 @@ xo
         1) The compiler builtin functions __builtin_ssync and __builting_csync have been modified to, when the workaround is enabled, ensure that interrupts are disabled before the sync instruction and enabled after.
         2) New ssync and csync builtins have been provided that do not disable interrupts. These can be used in place of the existing builtins for code that has been manually verified as safe against the anomaly. These new builtins are called __builtin_ssync_int and __builtin_csync_int.
         3) The compiler will ensure that any loads of the LBx, LTx and LCx registers are, when the workaround is enabled, executed with interrupts disabled. It does this by inserting a CLI instruction before such loads and an STI instruction after.
-        4) The compiler will arrange to save and restore the loop registers (LBx, LTx and LCx) while interrupts are disabled for C/C++ nested interrupt handlers defined using the sys/exception.h EX_REENTRANT_HANDLER macro."/>
+        4) The compiler will arrange to save and restore the loop registers (LBx, LTx and LCx) while interrupts are disabled for C/C++ nested interrupt handlers defined using the sys/exception.h EX_REENTRANT_HANDLER macro.
+        Please note that enabling this workaround will result in code being generated that cannot be run in USER mode. If USER mode is to be used then this workaround should be disabled and an alternative solution implemented."/>
 
 	<anomaly ix="29" id="F3-F-013"
 		assembler-detect-option="-anomaly-detect F3F013" 	
@@ -298,9 +299,8 @@ xo
 		summary="Erroneous flag pin operations under specific sequences."
       compiler-option="-workaround flags-mmr-anom-311"
       compiler-defs="-D__WORKAROUND_FLAGS_MMR_ANOM_311"
-		compiler-behavior="There are 2 parts to the compiler workaround:
-        1) by adding a load of the CHIPID MMR at the start of code generated for C defined event handlers. The workaround for 05-00-0283 will be used if it is enabled at the same time as this workaround.
-        2) by identifying accesses, or potential access, of any of the various System MMR Flag registers associated with the errata and generating a load of CHIPID after each such access. The compiler relies on use of literal addressing of MMRs to identify these access, such using the various pMMR macros defined in the cdefPART.h include files. Any loads and stores that do not use literal addresses and are defined qualified as volatile, will be assumed to be flag MMR accesses, unless -no-assume-vols-are-mmrs is used. If the -no-assume-vols-are-mmrs compiler switch is used the compiler will apply the workaround for suitable literal address accesses only and will make no assumptions for non-literal loads and store even if volatile."/>
+      compiler-behavior="To protect against this anomaly in C or C++ source files, use the macros defined the sys/05000311.h header file when reading or writing one of the GPIO memory-mapped registers (MMRs). A group of macros are defined for reading and writing the MMRs; if the anomaly applies for the current value of the silicon revision of your target, the macro will ensure that the read or write is safe against the anomaly. See the sys/05000311.h file for more information."
+/>
 
 <anomaly ix="31" id="05-00-0096"
       rtl-defs="WA_05000096 (in order for this macro to be defined, the user must include the header file &lt;sys/anomaly_macros_rtl.h&gt;)"
@@ -370,7 +370,22 @@ See the &quot;Compiler Notes&quot; section below for more information on MMR acc
       compiler-behavior="The compiler automatically works round this anomaly for every revision by always electing not to generate multi issue instructions which contain a dsp32shiftimm in slot 1 and P reg store in slot 2."
       summary="A multi issue instruction with dsp32shiftimm in slot1 and a store of a P register in slot 2 is not supported."/>
 
+   <anomaly ix="44" id="05-00-0371"
+      assembler-detect-option="-anomaly-detect 05000371"
+      assembler-workaround-option="-anomaly-workaround 05000371"
+      assembler-detect-defs="-D__WORKAROUND_AVOID_QUICK_RTS_371__"
+      assembler-workaround-defs="-D__WORKAROUND_AVOID_QUICK_RTS_371__"
+      assembler-behavior="The assembler warns if an RTS instruction is within four instructions from a branch target. Review the warnings and recode where needed. Assembler workaround inserts additional nop instructions to separate RTS and branch target by four instructions."		
+      compiler-behavior="Add compiler behavior here."
+      summary="Add summary here."/>
 	
+   <anomaly ix="45" id="05-00-0323"
+      summary="Erroneous flag pin operations under specific sequences."
+      compiler-option="-D__WORKAROUND_FLAGS_MMR_ANOM_323"
+      compiler-defs="-D__WORKAROUND_FLAGS_MMR_ANOM_323"
+      compiler-behavior="To protect against this anomaly in C or C++ source files, use the macros defined the sys/05000323.h header file when reading or writing one of the GPIO memory-mapped registers (MMRs). A group of macros are defined for reading and writing the MMRs; if the anomaly applies for the current value of the silicon revision of your target, the macro will ensure that the read or write is safe against the anomaly. See the sys/05000323.h file for more information."
+/>
+
 </anomaly-dictionary>
 
 	<!-- *************************************************************** -->
@@ -379,6 +394,7 @@ See the &quot;Compiler Notes&quot; section below for more information on MMR acc
 
 <compiler-notes>
 	<note text="There are various MMR related errata that the compiler supports; 05-00-0122, 05-00-0157, 05-00-0198. The compiler detects MMR accesses by checking addresses used in literal load and store instructions fall in the system MMR address range. Any loads and stores that do not use literal addresses and are defined qualified as volatile will be assumed to be MMR accesses unless the -no-assume-vols-are-mmrs is used. If the -no-assume-vols-are-mmrs compiler switch is used the compiler will apply the workaround for suitable literal address accesses and will make no assumptions for non-literal loads and store even if volatile. The various MMR read and write compiler builtins can be used in this mode to assert to the compiler that an access is to an MMR." />
+  <note text="The workaround for anomaly 05-00-0312 is not safe for use in USER mode." />
 </compiler-notes>
 
 	<!-- *************************************************************** -->
