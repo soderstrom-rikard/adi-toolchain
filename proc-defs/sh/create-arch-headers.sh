@@ -48,7 +48,7 @@ archdir() {
 }
 
 headers=""
-for bf in BF52{2,5,7} BF53{1,2,3,4,6,7} BF54{1,2,4,8,9} BF561 ; do
+for bf in BF52{2,5,7} BF53{1,2,3,4,6,7} BF54{1,2,4,7,8,9} BF561 ; do
 	xml="${srcdir}/xml/ADSP-${bf}-proc.xml"
 	arch=$(archdir ${xml})
 
@@ -111,7 +111,7 @@ echo "Generating register bits headers"
 mkdir "${builddir}/mach-common/bits"
 cp "${srcdir}/header-frags/regbits/"* "${builddir}/mach-common/bits/"
 
-ldir="/usr/local/src/blackfin/svn/linux-kernel/trunk/include/asm-blackfin"
-for f in $(cd "${ldir}" ; echo mach-*/anomaly.h) ; do
-	cp "${ldir}/${f}" "${builddir}/${f}"
+for b in "${srcdir}/header-frags/bf"* ; do
+	b=${b##*/}
+	cp "${srcdir}/header-frags/${b}"/* "${builddir}/mach-${b}/"
 done
