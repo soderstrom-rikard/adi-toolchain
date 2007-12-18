@@ -109,7 +109,7 @@ EOF
 
 echo "Generating register bits headers"
 mkdir "${builddir}/mach-common/bits"
-cp "${srcdir}/header-frags/regbits/*" "${builddir}/mach-common/bits/"
+cp "${srcdir}/header-frags/regbits/"* "${builddir}/mach-common/bits/"
 
 ldir="/usr/local/src/blackfin/svn/linux-kernel/trunk/include/asm-blackfin"
 for f in $(cd "${ldir}" ; echo mach-*/anomaly.h) ; do
