@@ -228,13 +228,13 @@ done
 
 check_header() {
 	local header=$1
-	printf "#include <$header>\n" | gcc -E - -o conftest.o
+	printf "#include <$header>\n" | gcc -E - >/dev/null
 }
 
 check_lib() {
 	local lib=$1
 	# Old Linux installations keep X in /usr/X11R6.
-	echo "int main(){}" | gcc -x c - -L/usr/X11R6/lib -l${lib} -o conftest.o 1>/dev/null
+	echo "int main(){}" | gcc -x c - -L/usr/X11R6/lib -l${lib} -o ${temp_file} 1>/dev/null
 }
 
 # check_group(package name, header list, library list)
@@ -243,6 +243,7 @@ check_source_group() {
 	local h headers=$2
 	local l libs=$3
 	local fail=0
+	temp_file=$(mktemp || echo "${TMPDIR-/tmp}/conftest.o")
 
 	for h in ${headers} ; do
 		check_header ${h} || fail=1
