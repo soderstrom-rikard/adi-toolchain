@@ -136,6 +136,8 @@
 #define ANOMALY_05000357 (1)
 /* DMAs that Go Urgent during Tight Core Writes to External Memory Are Blocked */
 #define ANOMALY_05000359 (1)
+/* Possible RETS Register Corruption when Subroutine Is under 5 Cycles in Duration */
+#define ANOMALY_05000371 (1)
 
 /* Anomalies that don't exist on this proc */
 #define ANOMALY_05000125 (0)
