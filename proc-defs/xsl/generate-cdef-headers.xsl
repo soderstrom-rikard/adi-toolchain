@@ -82,7 +82,7 @@
 		<xsl:with-param name="padVar"  select="concat('p',@name)" />
 		<xsl:with-param name="length"  select="$padlen" />
 	</xsl:call-template>
-	<xsl:value-of select="concat(' ((volatile ',$pmmr-type,' *)',@name,')')"/>
+	<xsl:value-of select="concat(' ((',$pmmr-type,' volatile *)',@name,')')"/>
 
 	<xsl:if test="string-length(@description) != 0">
 	<xsl:text> /* </xsl:text>
