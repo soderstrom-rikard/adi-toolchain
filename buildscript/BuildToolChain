@@ -1681,28 +1681,20 @@ run_tests ()
 build_uClibc()
 {
     ARGS="V=1 CROSS=bfin-elf- DEVEL_PREFIX=/usr/ RUNTIME_PREFIX=/ ARCH_CFLAGS='-g -O2'"
+
     echo_date "Cleaning uClibc"
-    RUN="$MAKE clean $ARGS"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    run_cmd $MAKE clean $ARGS
 
     echo_date "Building uClibc"
-    LOCAL=`grep "UCLIBC_HAS_LOCALE=y" .config`
-    if [ -z "$LOCAL" ] ; then
+    if ! grep -qs UCLIBC_HAS_LOCALE=y .config ; then
         # sometimes uClibc dies on parallel build, so lets build it with -j1
-        RUN="$MAKE $ARGS -j 1"
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        RUN=`(echo $RUN $LOGFILE ; ) | sh`
+        run_cmd $MAKE $ARGS -j 1
     else
         echo_date "Building Locale"
-        RUN="$MAKE headers $ARGS"
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo $RUN $LOGFILE ; ) | sh
+        run_cmd $MAKE headers $ARGS
 
-        change_dir ./extra/locale
-        RUN="$MAKE clean"
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo $RUN $LOGFILE ; ) | sh || die_with_log
+        change_dir extra/locale
+        run_cmd $MAKE clean
 
         if [ ! -f ./codesets.txt ] ; then
             echo "      Creating codesets.txt"
@@ -1713,20 +1705,14 @@ build_uClibc()
             cp ./LOCALES ./locales.txt
         fi
 
-        RUN="$MAKE $ARGS"
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo $RUN $LOGFILE ; ) | sh || die_with_log
-        change_dir ../..
+        run_cmd $MAKE $ARGS
 
-        RUN="$MAKE all $ARGS"
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo $RUN $LOGFILE ; ) | sh || die_with_log
+        change_dir ../..
+        run_cmd $MAKE all $ARGS
     fi
 
     echo_date "Installing uClibc"
-    RUN="$MAKE install DESTDIR=$1/runtime SUFFIX=$2 $ARGS"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_cmd $MAKE install DESTDIR=$1/runtime SUFFIX=$2 $ARGS
 
     # Need a way to look at uClibc make system , and see what libs
     # should be created
