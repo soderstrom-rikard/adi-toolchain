@@ -251,7 +251,7 @@ check_source_group() {
 	for l in ${libs} ; do
 		check_lib ${l} || fail=1
 	done
-	rm -f conftest.o
+	rm -f ${temp_file}
 
 	if [ -n "${pkg}" ] && [ ${fail} -eq 1 ] ; then
 		cat <<-EOF 1>&2
