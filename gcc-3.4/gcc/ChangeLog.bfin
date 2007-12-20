@@ -6,6 +6,13 @@
 	to determine the number of cycles it takes for a small amount of
 	special cases.
 
+	* config/bfin/bfin-protos.h (WA_RETS, ENABLE_WA_RETS): New macros.
+	* config/bfin/bfin.c (bfin_cpus): Add WA_RETS everywhere.
+	(override_option): Select default set of workarounds if no cpu type
+	selected on the command line.
+	(workaround_rts_anomaly): Only run if ENABLE_WA_RETS.
+	Fix compile error; BUNDLE is only available in gcc-4.1.
+
 2007-12-17  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (attribute "cycles"): New.
