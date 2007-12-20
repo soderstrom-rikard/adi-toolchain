@@ -48,7 +48,7 @@ archdir() {
 }
 
 headers=""
-for bf in BF52{2,5,7} BF53{1,2,3,4,6,7} BF54{1,2,4,7,8,9} BF561 ; do
+for bf in BF52{2,3,4,5,6,7} BF53{1,2,3,4,6,7} BF54{1,2,4,7,8,9} BF561 ; do
 	xml="${srcdir}/xml/ADSP-${bf}-proc.xml"
 	arch=$(archdir ${xml})
 
