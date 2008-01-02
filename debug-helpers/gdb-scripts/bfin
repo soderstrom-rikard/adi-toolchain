@@ -2,10 +2,6 @@
 # Misc Blackfin helper functions
 #
 
-document regs
-Usage: regs
-Display the common core registers in a compact format.
-end
 define regs
 	printf "R0: %08x %-10i  P0: %08x      RETS: %08x\n",   $r0, $r0, $p0, $rets
 	printf "R1: %08x %-10i  P1: %08x      RETI: %08x\n",   $r1, $r1, $p1, $reti
@@ -17,11 +13,11 @@ define regs
 	printf "R7: %08x %-10i USP: %08x   SEQSTAT: %08x\n", $r7, $r7, $usp, $seqstat
 	printf "PC: %08x %-10i  FP: %08x    SYSCFG: %08x\n", $pc, 0,   $fp, $syscfg
 end
-
-document seqstat
-Usage: seqstat [value=$seqstat]
-Parse the bits of the seqstat [value] into the human readable definitions.
+document regs
+Usage: regs
+Display the common core registers in a compact format.
 end
+
 define seqstat
 	if $argc == 1
 		set $$seqstat = $arg0
@@ -102,12 +98,11 @@ define seqstat
 	end
 	printf "\n"
 end
-
-document reset
-Usage: reset [L1 Instruction address=0xffa00000]
-Cram the software reset code into [L1 Instruction address] and execute it.
-This will perform both a system reset and a core reset.
+document seqstat
+Usage: seqstat [value=$seqstat]
+Parse the bits of the seqstat [value] into the human readable definitions.
 end
+
 define reset
 	if $argc == 0
 		set $$l1 = 0xffa00000
@@ -167,4 +162,9 @@ define reset
 
 	printf "Continuing.\n"
 	continue
+end
+document reset
+Usage: reset [L1 Instruction address=0xffa00000]
+Cram the software reset code into [L1 Instruction address] and execute it.
+This will perform both a system reset and a core reset.
 end

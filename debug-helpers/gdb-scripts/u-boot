@@ -2,10 +2,6 @@
 # Provide U-Boot-style functions in gdb
 #
 
-document md
-Usage: md <unit type> <address> [count=64]
-Display [count] <unit type> starting at <address>.
-end
 define md
 	if $argc == 2
 		x/64x$arg0 $arg1
@@ -16,6 +12,10 @@ define md
 			help md
 		end
 	end
+end
+document md
+Usage: md <unit type> <address> [count=64]
+Display [count] <unit type> starting at <address>.
 end
 
 define _md
