@@ -168,3 +168,22 @@ Usage: reset [L1 Instruction address=0xffa00000]
 Cram the software reset code into [L1 Instruction address] and execute it.
 This will perform both a system reset and a core reset.
 end
+
+define hwtrace
+	set $$TBUFSTAT = (unsigned long *)0xFFE06004
+	set $$TBUF = (unsigned long *)0xFFE06100
+	set $$i = 0
+	if (!(*$$TBUFSTAT & 0x1F))
+		printf "Hardware trace buffer is empty\n"
+	end
+	while (*$$TBUFSTAT & 0x1F)
+		printf "%2i Target: 0x%08x\n", $$i, *$$TBUF
+		printf "   Source: 0x%08x\n", *$$TBUF
+		set $$i++
+	end
+end
+document hwtrace
+Usage: hwtrace
+Dump the hardware trace buffer.  Remember, this is a destructive operation,
+so it can only be dumped once.
+end
