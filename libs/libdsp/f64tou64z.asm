@@ -186,6 +186,3 @@ ___fixunsdfdi:
 
 .global ___fixunsdfdi;
 .type ___fixunsdfdi, STT_FUNC;
-.global .___fixunsdfdi.end;
-.type .___fixunsdfdi.end, STT_FUNC;
-

@@ -136,7 +136,6 @@ u4tor4:
 
 .size __unsigned_longlong64_to_float32, .-__unsigned_longlong64_to_float32
 .global __unsigned_longlong64_to_float32;
-.global .__unsigned_longlong64_to_float32.end;
 .type __unsigned_longlong64_to_float32, STT_FUNC;
 
 .extern ___floatunsisf;

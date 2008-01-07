@@ -140,6 +140,4 @@ ___floatundidf:
 
 .global ___floatundidf;
 .type ___floatundidf,STT_FUNC;
-.global .___floatundidf.end;
-.type .___floatundidf.end,STT_FUNC;
 .extern ___floatunsidf;

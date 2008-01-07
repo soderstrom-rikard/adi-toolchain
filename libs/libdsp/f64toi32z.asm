@@ -176,5 +176,3 @@ ___fixdfsi:
 
 .global ___fixdfsi;
 .type ___fixdfsi, STT_FUNC;
-.global .___fixdfsi.end;
-.type .___fixdfsi.end, STT_FUNC;

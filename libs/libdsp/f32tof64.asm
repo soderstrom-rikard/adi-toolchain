@@ -119,5 +119,3 @@ ___extendsfdf2:
 
 .global ___extendsfdf2;
 .type ___extendsfdf2, STT_FUNC;
-.global .___extendsfdf2.end;
-.type .___extendsfdf2.end, STT_FUNC;

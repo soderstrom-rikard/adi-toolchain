@@ -210,5 +210,3 @@ ___fixdfdi:
 
 .global ___fixdfdi;
 .type ___fixdfdi, STT_FUNC;
-.global .___fixdfdi.end;
-.type .___fixdfdi.end, STT_FUNC;

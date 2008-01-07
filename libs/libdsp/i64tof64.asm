@@ -162,7 +162,5 @@ ___floatdidf:
 
 .global ___floatdidf;
 .type ___floatdidf,STT_FUNC;
-.global .___floatdidf.end;
-.type .___floatdidf.end,STT_FUNC;
 .extern ___floatunsidf;
 .extern ___floatsidf;

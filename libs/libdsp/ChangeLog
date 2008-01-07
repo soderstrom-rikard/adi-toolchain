@@ -1,3 +1,22 @@
+2008-01-07  Jie Zhang  <jie.zhang@analog.com>
+
+	* u32tof64.asm: Remove useless .end symbol.
+	* u64tof64.asm: Likewise.
+	* f64toi32z.asm: Likewise.
+	* fltuif.asm: Likewise.
+	* f64tou64z.asm: Likewise.
+	* f64tof32.asm: Likewise.
+	* floatdiuf.asm: Likewise.
+	* f64toi32.asm: Likewise.
+	* fltsif.asm: Likewise.
+	* fpdiv.asm: Likewise.
+	* f32tof64.asm: Likewise.
+	* floatdisf.asm: Likewise.
+	* i32tof64.asm: Likewise.
+	* i64tof64.asm: Likewise.
+	* f64toi64.asm: Likewise.
+	* f64toi64z.asm: Likewise.
+
 2007-08-20  Jie Zhang  <jie.zhang@analog.com>
 
 	* Makefile (ARFLAGS): New.

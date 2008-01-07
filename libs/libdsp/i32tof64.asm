@@ -90,5 +90,3 @@ ___floatsidf:
 
 .global ___floatsidf;
 .type ___floatsidf,STT_FUNC;
-.global .___floatsidf.end;
-.type .___floatsidf.end,STT_FUNC;

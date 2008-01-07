@@ -148,5 +148,3 @@ ___truncdfsf2:
 
 .global ___truncdfsf2;
 .type ___truncdfsf2, STT_FUNC;
-.global .___truncdfsf2.end;
-.type .___truncdfsf2.end, STT_FUNC;

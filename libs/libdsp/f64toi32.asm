@@ -211,5 +211,3 @@ ___float64_to_int32:
 
 .global ___float64_to_int32;
 .type ___float64_to_int32, STT_FUNC;
-.global .___float64_to_int32.end;
-.type .___float64_to_int32.end, STT_FUNC;

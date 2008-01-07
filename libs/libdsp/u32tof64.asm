@@ -87,5 +87,3 @@ ___floatunsidf:
 
 .global ___floatunsidf;
 .type ___floatunsidf,STT_FUNC;
-.global .___floatunsidf.end;
-.type .___floatunsidf.end,STT_FUNC;

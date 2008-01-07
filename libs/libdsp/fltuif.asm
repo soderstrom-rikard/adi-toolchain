@@ -155,7 +155,6 @@ ___floatunsisf:
 .size ___floatunsisf, .-___floatunsisf
 
 .global ___floatunsisf;
-.global .___floatunsisf.end;
 .type ___floatunsisf, STT_FUNC;
 
 // end of file

@@ -106,7 +106,6 @@ ___floatsisf:
 .size ___floatsisf, .-___floatsisf
 
 .global ___floatsisf;
-.global .___floatsisf.end;
 .type ___floatsisf, STT_FUNC;
 
 // end of file

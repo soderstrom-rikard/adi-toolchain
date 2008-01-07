@@ -354,5 +354,3 @@ not_denorm:
 	RTS;
 
 .size ___divsf3, .-___divsf3
-.global .___divsf3.end;
-
