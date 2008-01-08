@@ -1,3 +1,8 @@
+2008-01-08  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* doc/extend.texi (l1_text): Fix up grammar in description and
+	note that the attribute is only available on Blackfin.
+
 2007-12-20  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): Define
