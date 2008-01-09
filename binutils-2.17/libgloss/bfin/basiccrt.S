@@ -1,7 +1,7 @@
 /*
  * Basic startup code for Blackfin processor
  *
- * Copyright (C) 2007 Analog Devices, Inc.
+ * Copyright (C) 2007, 2008 Analog Devices, Inc.
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -31,7 +31,7 @@
 
 #define IVBh (EVT0 >> 16)
 #define IVBl (EVT0 & 0xFFFF)
-#define UNASSIGNED_VAL 0x8181
+#define UNASSIGNED_VAL 0
 #define UNASSIGNED_FILL 0
 // just IVG15
 #define INTERRUPT_BITS 0x400
@@ -60,11 +60,19 @@
 
 #endif
 
+#ifdef __ADSPBF561_COREB__
+	.section        .b.text,"ax",@progbits
+	.align 2;
+	.global __coreb_start;
+	.type __coreb_start, STT_FUNC;
+__coreb_start:
+#else
 	.text;
 	.align 2;
 	.global __start;
 	.type __start, STT_FUNC;
 __start:
+#endif
 #if WA_05000109
 	// Avoid Anomaly ID 05000109.
 #	define SYSCFG_VALUE 0x30
@@ -72,6 +80,7 @@ __start:
 	SYSCFG = R1;
 #endif
 #if WA_05000229
+#ifndef __ADSPBF561_COREB__
    // Avoid Anomaly 05-00-0229: DMA5_CONFIG and SPI_CTL not cleared on reset.
    R1 = 0x400;
 #if defined(__ADSPBF538__) || defined(__ADSPBF539__)
@@ -87,6 +96,7 @@ __start:
    P0.H = DMA5_CONFIG >> 16;
    R1 = 0;
    W[P0] = R1.L;
+#endif
 #endif
 	// Zap loop counters to zero, to make sure that
 	// hw loops are disabled - it could be really baffling
@@ -113,7 +123,13 @@ __start:
 	R7 = 0;
 	[I0] = R7;
 	[I1] = R7;
+	// It seems writing ITEST_COMMAND from SDRAM with icache enabled
+	// needs SSYNC.
+#ifdef __BFIN_SDRAM
+	SSYNC;
+#else
 	CSYNC;
+#endif
 
 	// Initialise the Event Vector table.
 	P0.H = IVBh;
@@ -139,8 +155,18 @@ L$ivt:	[P0++] = R1;
 	// Initialise the stack.
 	// Note: this points just past the end of the section.
 	// First write should be with [--SP].
-	SP.L=__stack_end;
-	SP.H=__stack_end;
+#ifdef __BFIN_SDRAM
+	SP.L = __end + 0x400000 - 12;
+	SP.H = __end + 0x400000 - 12;
+#else
+#ifdef __ADSPBF561_COREB__
+	SP.L=__coreb_stack_end - 12;
+	SP.H=__coreb_stack_end - 12;
+#else
+	SP.L=__stack_end - 12;
+	SP.H=__stack_end - 12;
+#endif
+#endif
 	usp = sp;
 
 	// We're still in supervisor mode at the moment, so the FP
@@ -152,13 +178,31 @@ L$ivt:	[P0++] = R1;
 	SP += -12;
 
 	// Zero out bss section
+#ifdef __BFIN_SDRAM
+	R0.L = ___bss_start;
+	R0.H = ___bss_start;
+	R1.L = __end;
+	R1.H = __end;
+#else
+#ifdef __ADSPBF561_COREB__
+	R0.L = __coreb_bss_start;
+	R0.H = __coreb_bss_start;
+	R1.L = __coreb_bss_end;
+	R1.H = __coreb_bss_end;
+#else
 	R0.L = __bss_start;
 	R0.H = __bss_start;
 	R1.L = __bss_end;
 	R1.H = __bss_end;
+#endif
+#endif
 	R2 = R1 - R0;
 	R1 = 0;
+#ifdef __ADSPBF561_COREB__
+	CALL.X __coreb_memset;
+#else
 	CALL.X _memset;
+#endif
 
 	R0 = INTERRUPT_BITS;
 	R0 <<= 5;	// Bits 0-4 not settable.
@@ -231,7 +275,7 @@ L$clock_is_set:
 	// Initialise the multi-core data tables.
 	// A dummy function will be called if we are not linking with
 	// -multicore
-	CALL.X __mc_data_initialise;
+	// CALL.X __mc_data_initialise;
 #endif
 
 #if 0
@@ -312,11 +356,13 @@ L$supervisor_mode:
 	CALL.X monstartup; // initialise profiling routines
 #endif  /* PROFCRT */
 
+#ifndef __ADSPBF561_COREB__
 	CALL.X __init;
 
 	R0.L = __fini;
 	R0.H = __fini;
 	CALL.X _atexit;
+#endif
 
 #if !defined(_ADI_THREADS)
 #ifdef FIOCRT
@@ -327,19 +373,34 @@ L$supervisor_mode:
 #else
 	// Default to having no arguments and a null list.
 	R0=0;
+#ifdef __ADSPBF561_COREB__
+	R1.L=L$argv_coreb;
+	R1.H=L$argv_coreb;
+#else
 	R1.L=L$argv;
 	R1.H=L$argv;
+#endif
 #endif /* FIOCRT */
 #endif /* _ADI_THREADS */
 
 	// At long last, call the application program.
+#ifdef __ADSPBF561_COREB__
+	CALL.X _coreb_main;
+#else
 	CALL.X _main;
-
-#if !defined(_ADI_THREADS)
-	CALL.X _exit;	// passing in main's return value
 #endif
 
+#if !defined(_ADI_THREADS)
+#ifndef __ADSPBF561_COREB__
+	CALL.X _exit;	// passing in main's return value
+#endif
+#endif
+
+#ifdef __ADSPBF561_COREB__
+	.size	__coreb_start, .-__coreb_start
+#else
 	.size	__start, .-__start
+#endif
 
 	.align 2
 	.type __unknown_exception_occurred, STT_FUNC;
@@ -444,11 +505,84 @@ L$wakeup:
 L$done:
 	RTS;
 	.size __pll_set_system_vco, .-__pll_set_system_vco
-
-
-	.local	L$argv
-	.comm	L$argv,4,4
-
 #endif
 #endif /* ADSPLPBLACKFIN */
+
+#ifdef __ADSPBF561_COREB__
+	.section        .b.text,"ax",@progbits
+	.type __coreb_memset, STT_FUNC
+__coreb_memset:
+	P0 = R0 ;              /* P0 = address */
+	P2 = R2 ;              /* P2 = count   */
+	R3 = R0 + R2;          /* end          */
+	CC = R2 <= 7(IU);
+	IF CC JUMP  .Ltoo_small;
+	R1 = R1.B (Z);         /* R1 = fill char */
+	R2 =  3;
+	R2 = R0 & R2;          /* addr bottom two bits */
+	CC =  R2 == 0;             /* AZ set if zero.	*/
+	IF !CC JUMP  .Lforce_align ;  /* Jump if addr not aligned. */
+
+.Laligned:
+	P1 = P2 >> 2;          /* count = n/4        */
+	R2 = R1 <<  8;         /* create quad filler */
+	R2.L = R2.L + R1.L(NS);
+	R2.H = R2.L + R1.H(NS);
+	P2 = R3;
+
+	LSETUP (.Lquad_loop , .Lquad_loop) LC0=P1;
+.Lquad_loop:
+	[P0++] = R2;
+
+	CC = P0 == P2;
+	IF !CC JUMP .Lbytes_left;
+	RTS;
+
+.Lbytes_left:
+	R2 = R3;                /* end point */
+	R3 = P0;                /* current position */
+	R2 = R2 - R3;           /* bytes left */
+	P2 = R2;
+
+.Ltoo_small:
+	CC = P2 == 0;           /* Check zero count */
+	IF CC JUMP .Lfinished;    /* Unusual */
+
+.Lbytes:
+	LSETUP (.Lbyte_loop , .Lbyte_loop) LC0=P2;
+.Lbyte_loop:
+	B[P0++] = R1;
+
+.Lfinished:
+	RTS;
+
+.Lforce_align:
+	CC = BITTST (R0, 0);  /* odd byte */
+	R0 = 4;
+	R0 = R0 - R2;
+	P1 = R0;
+	R0 = P0;		    /* Recover return address */
+	IF !CC JUMP .Lskip1;
+	B[P0++] = R1;
+.Lskip1:
+	CC = R2 <= 2;          /* 2 bytes */
+	P2 -= P1;              /* reduce count */
+	IF !CC JUMP .Laligned;
+	B[P0++] = R1;
+	B[P0++] = R1;
+	JUMP .Laligned;
+.size __coreb_memset,.-__coreb_memset
+#endif
+
+#ifdef __ADSPBF561_COREB__
+	.section	.b.bss,"aw",@progbits
+	.align 4
+	.type	L$argv_coreb, @object
+	.size	L$argv_coreb, 4
+L$argv_coreb:
+	.zero	4
+#else
+	.local	L$argv
+	.comm	L$argv,4,4
+#endif
 

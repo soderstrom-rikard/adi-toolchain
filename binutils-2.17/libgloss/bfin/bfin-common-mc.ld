@@ -2,7 +2,7 @@
  * The common part of the default linker stripts for standalone executables
  * running on single core Blackfin processors.
  *
- * Copyright (C) 2007, 2008 Analog Devices, Inc.
+ * Copyright (C) 2008 Analog Devices, Inc.
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -70,11 +70,19 @@ SECTIONS
   {
     *(.l2 .l2.*)
   } >MEM_L2 =0
+  .l2_shared      :
+  {
+    *(.l2_shared .l2_shared.*)
+  } >MEM_L2_SHARED =0
   .init           :
   {
     KEEP (*(.init))
   } >MEM_L1_CODE =0
   .plt            : { *(.plt) } >MEM_L1_CODE
+  .b.text         :
+  {
+    *(.b.text .b.text.*)
+  } >B_MEM_L1_CODE =0
   .text           :
   {
     *(.text .stub .text.* .gnu.linkonce.t.*)
@@ -82,13 +90,14 @@ SECTIONS
     /* .gnu.warning sections are handled specially by elf32.em.  */
     *(.gnu.warning)
   } >MEM_L1_CODE =0
-  .fini           :
+ .fini           :
   {
     KEEP (*(.fini))
   } >MEM_L1_CODE =0
   PROVIDE (__etext = .);
   PROVIDE (_etext = .);
   PROVIDE (etext = .);
+  .b.rodata       : { *(.b.rodata .b.rodata.*) } >B_MEM_L1_DATA_A
   .rodata         : { *(.rodata .rodata.* .gnu.linkonce.r.*) } >MEM_L1_DATA_A
   .rodata1        : { *(.rodata1) } >MEM_L1_DATA_A
   .sdata2         :
@@ -158,13 +167,17 @@ SECTIONS
   .jcr            : { KEEP (*(.jcr)) } >MEM_L1_DATA_A
   .data.rel.ro : { *(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*) *(.data.rel.ro* .gnu.linkonce.d.rel.ro.*) } >MEM_L1_DATA_A
   .dynamic        : { *(.dynamic) } >MEM_L1_DATA_A
+  .b.data         :
+  {
+    *(.b.data .b.data.*)
+  } >B_MEM_L1_DATA_A
   .data           :
   {
     *(.data .data.* .gnu.linkonce.d.*)
     KEEP (*(.gnu.linkonce.d.*personality*))
     SORT(CONSTRUCTORS)
   } >MEM_L1_DATA_A
-  .data1          : { *(.data1) } >MEM_L1_DATA_A
+ .data1          : { *(.data1) } >MEM_L1_DATA_A
   .got            : { *(.got.plt) *(.got) } >MEM_L1_DATA_A
   /* We want the small data sections together, so single-instruction offsets
      can access them all, and initialized data all before uninitialized, so
@@ -174,6 +187,15 @@ SECTIONS
     *(.sdata .sdata.* .gnu.linkonce.s.*)
   } >MEM_L1_DATA_A
   __edata = .; PROVIDE (_edata = .);
+  .b.sbss         :
+  {
+    __coreb_bss_start = .;
+  } >B_MEM_L1_DATA_A
+  .b.bss          :
+  {
+    *(.b.bss .b.bss.*)
+    __coreb_bss_end = .;
+  } >B_MEM_L1_DATA_A
   .sbss           :
   {
     __bss_start = .;
@@ -232,6 +254,7 @@ SECTIONS
   .debug_varnames  0 : { *(.debug_varnames) }
 
   __stack_end = 0xFFB01000;
+  __coreb_stack_end = 0xFF701000;
 
   /DISCARD/ : { *(.note.GNU-stack) }
 }

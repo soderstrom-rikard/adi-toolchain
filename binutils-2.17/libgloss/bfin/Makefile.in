@@ -61,16 +61,18 @@ SIM_INSTALL	= install-sim
 
 # Here is all of the development board stuff
 # BF531, BF532, BF533, BF537
-BOARD_SCRIPTS	= bfin-common-sc.ld \
+BOARD_SCRIPTS	= bfin-common-sc.ld  bfin-common-mc.ld \
 	bf522.ld bf523.ld bf524.ld bf525.ld bf526.ld bf527.ld \
 	bf531.ld bf532.ld bf533.ld \
 	bf534.ld bf536.ld bf537.ld \
 	bf538.ld bf539.ld \
 	bf542.ld bf544.ld bf547.ld bf548.ld bf549.ld \
-	bf561.ld
+	bf561.ld bf561a.ld bf561b.ld bf561m.ld
 BOARD_LDFLAGS	=
 BOARD_BSP	= # We actually use libnosys.a
-BOARD_CRT0S	= basiccrt.o
+BOARD_CRT0S	= basiccrt.o basiccrts.o
+BOARD_CRT0S	+= $(shell if [[ x$$($(CC) $(CFLAGS) -print-multi-directory) \
+			= xbf561* ]]; then echo basiccrtb.o; fi)
 BOARD_OBJS	=
 BOARD_TEST	=
 BOARD_INSTALL	= install-board
@@ -97,6 +99,12 @@ ${SIM_BSP}: ${OBJS} ${SIM_OBJS}
 #
 crt0.o: crt0.S
 basiccrt.o: basiccrt.S
+
+basiccrtb.o: basiccrt.S
+	$(CC) -D__ADSPBF561_COREB__ $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -o $@ -c $<
+
+basiccrts.o: basiccrt.S
+	$(CC) -D__BFIN_SDRAM $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -o $@ -c $<
 
 clean mostlyclean:
 	rm -f a.out core *.i *.o ${SIM_BSP} ${BOARD_BSP}

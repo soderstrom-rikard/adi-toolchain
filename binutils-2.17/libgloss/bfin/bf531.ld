@@ -2,7 +2,7 @@
  * The default linker stript for standalone executables running on
  * ADSP-BF531 processor.
  *
- * Copyright (C) 2007 Analog Devices, Inc.
+ * Copyright (C) 2007, 2008 Analog Devices, Inc.
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -21,4 +21,6 @@ MEMORY
   MEM_L1_CODE_CACHE : ORIGIN = 0xFFA10000, LENGTH = 0x4000
   MEM_L1_SCRATCH : ORIGIN = 0xFFB00000, LENGTH = 0x1000
   MEM_L1_DATA_A : ORIGIN = 0xFF804000, LENGTH = 0x4000
+
+  MEM_L2 : ORIGIN = 0xFEB00000, LENGTH = 0x0
 }

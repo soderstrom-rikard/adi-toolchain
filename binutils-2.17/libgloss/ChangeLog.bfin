@@ -1,3 +1,37 @@
+2008-01-09  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/bf532.ld: Add MEM_L2 memory region. Update copyright year.
+	* bfin/bf524.ld: Likewise.
+	* bfin/bf542.ld: Likewise.
+	* bfin/bf534.ld: Likewise.
+	* bfin/bf526.ld: Likewise.
+	* bfin/bf544.ld: Likewise.
+	* bfin/bf536.ld: Likewise.
+	* bfin/bf538.ld: Likewise.
+	* bfin/bf548.ld: Likewise.
+	* bfin/bf531.ld: Likewise.
+	* bfin/bf523.ld: Likewise.
+	* bfin/bf533.ld: Likewise.
+	* bfin/bf525.ld: Likewise.
+	* bfin/bf561.ld: Likewise.
+	* bfin/bf527.ld: Likewise.
+	* bfin/bf537.ld: Likewise.
+	* bfin/bf547.ld: Likewise.
+	* bfin/bf539.ld: Likewise.
+	* bfin/bf549.ld: Likewise.
+	* bfin/bf522.ld: Likewise.
+	* bfin/bf561a.ld: New file.
+	* bfin/bf561b.ld: New file.
+	* bfin/bf561m.ld: New file.
+	* bfin/bfin-common-mc.ld: New file.
+	* bfin/bfin-common-sc.ld: Add .l2 section. Update copyright year.
+	* bfin/basiccrt.S: Add support for BF561 Core B standalone
+	application. Add support for standalone application in SDRAM.
+	* bfin/Makefile.in (BOARD_SCRIPTS): Add bfin-common-mc.ld,
+	bf561a.ld, bf561b.ld, and bf561m.ld.
+	(BOARD_CRT0S): Add basiccrts.o and basiccrtb.o.
+	(basiccrtb.o, basiccrts.o): New targets.
+
 2007-12-10  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/bf561.ld: New file.

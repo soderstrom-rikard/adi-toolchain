@@ -1,8 +1,8 @@
 /*
  * The default linker stript for standalone executables running on
- * ADSP-BF532 processor.
+ * ADSP-BF561 processor (dual core).
  *
- * Copyright (C) 2007, 2008 Analog Devices, Inc.
+ * Copyright (C) 2008 Analog Devices, Inc.
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -17,11 +17,18 @@
 
 MEMORY
 {
-  MEM_L1_CODE : ORIGIN = 0xFFA08000, LENGTH = 0x8000
+  MEM_L1_CODE : ORIGIN = 0xFFA00000, LENGTH = 0x4000
   MEM_L1_CODE_CACHE : ORIGIN = 0xFFA10000, LENGTH = 0x4000
   MEM_L1_SCRATCH : ORIGIN = 0xFFB00000, LENGTH = 0x1000
-  MEM_L1_DATA_B : ORIGIN = 0xFF904000, LENGTH = 0x4000
-  MEM_L1_DATA_A : ORIGIN = 0xFF804000, LENGTH = 0x4000
+  MEM_L1_DATA_B : ORIGIN = 0xFF900000, LENGTH = 0x8000
+  MEM_L1_DATA_A : ORIGIN = 0xFF800000, LENGTH = 0x8000
 
-  MEM_L2 : ORIGIN = 0xFEB00000, LENGTH = 0x0
+  B_MEM_L1_CODE : ORIGIN = 0xFF600000, LENGTH = 0x4000
+  B_MEM_L1_CODE_CACHE : ORIGIN = 0xFF610000, LENGTH = 0x4000
+  B_MEM_L1_SCRATCH : ORIGIN = 0xFF700000, LENGTH = 0x1000
+  B_MEM_L1_DATA_B : ORIGIN = 0xFF500000, LENGTH = 0x8000
+  B_MEM_L1_DATA_A : ORIGIN = 0xFF400000, LENGTH = 0x8000
+
+  MEM_L2 : ORIGIN = 0xFEB00000, LENGTH = 0x20000
+  MEM_L2_SHARED : ORIGIN = 0xFEB20000, LENGTH = 0x0
 }
