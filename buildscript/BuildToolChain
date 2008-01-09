@@ -1038,14 +1038,17 @@ build_gcc ()
             exit 1
         fi
     done
-    if [ -n "$TMP" ] ; then
-        if [ -e $DIR_GCC_SOURCE/gcc/BASE-VER ] ; then
-            VERSION=`cat $DIR_GCC_SOURCE/gcc/BASE-VER`
-        else
-            VERSION=`$3/bin/bfin-$2-gcc -v 2>&1 | grep gcc.vers | sed -e 's,gcc.version.,,' -e 's, .ADI.*$,,'`
-        fi
+    if [ -e $DIR_GCC_SOURCE/gcc/BASE-VER ] ; then
+        VERSION=`cat $DIR_GCC_SOURCE/gcc/BASE-VER`
+    else
+        VERSION=`$3/bin/bfin-$2-gcc -v 2>&1 | grep gcc.vers | sed -e 's,gcc.version.,,' -e 's, .ADI.*$,,'`
+    fi
+    if [ -e $3/bin/bfin-$2-g++$EXEEXT ]; then
         ln $3/bin/bfin-$2-g++$EXEEXT $3/bin/bfin-$2-g++-$VERSION$EXEEXT
         ln $3/bin/bfin-$2-c++$EXEEXT $3/bin/bfin-$2-c++-$VERSION$EXEEXT
+    fi
+    if [ -e $3/bin/bfin-$2-gfortran$EXEEXT ]; then
+        ln $3/bin/bfin-$2-gfortran$EXEEXT $3/bin/bfin-$2-gfortran-$VERSION$EXEEXT
     fi
 
     # make sure the tcl baggage that comes with insight doesnt pollute our PATH.
