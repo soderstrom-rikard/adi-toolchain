@@ -1226,7 +1226,6 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   set_gdbarch_register_type (gdbarch, bfin_register_type);
   set_gdbarch_unwind_dummy_id (gdbarch, bfin_unwind_dummy_id);
   set_gdbarch_push_dummy_call (gdbarch, bfin_push_dummy_call);
-  set_gdbarch_call_dummy_location (gdbarch, ON_STACK);
   set_gdbarch_register_sim_regno (gdbarch, bfin_sim_regno);
   set_gdbarch_believe_pcc_promotion (gdbarch, 1);
   set_gdbarch_return_value (gdbarch, bfin_return_value);

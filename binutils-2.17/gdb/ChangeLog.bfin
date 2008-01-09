@@ -1,3 +1,8 @@
+2008-01-09  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-tdep.c (bfin_gdbarch_init): Don't
+	call_dummy_location to ON_STACK.
+
 2007-08-06  Jie Zhang  <jie.zhang@analog.com>
 
 	Apply
