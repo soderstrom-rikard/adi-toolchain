@@ -1,5 +1,10 @@
 2008-01-09  Jie Zhang  <jie.zhang@analog.com>
 
+	* bfin-tdep.c (bfin_linux_pc_in_sigtramp): Avoid reading
+	memory when PC is unavailable.
+
+2008-01-09  Jie Zhang  <jie.zhang@analog.com>
+
 	* bfin-tdep.c (bfin_gdbarch_init): Don't
 	call_dummy_location to ON_STACK.
 

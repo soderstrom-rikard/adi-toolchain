@@ -345,6 +345,9 @@ bfin_linux_pc_in_sigtramp (struct frame_info *next_frame, CORE_ADDR pc)
   unsigned long insn1, insn2;
 
   if (pc > (CORE_ADDR) 0x7ffffffe
+      /* When the core is locked, the PC is unavailable.
+	 It makes no sense to check further.  */
+      || regcache_valid_p (current_regcache, BFIN_PC_REGNUM) < 0
       || !safe_frame_unwind_memory (next_frame, pc, buf + 4, 2))
     return 0;
 
