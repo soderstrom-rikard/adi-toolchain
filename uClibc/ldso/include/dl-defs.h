@@ -95,8 +95,22 @@ typedef struct {
 	((LOADADDR) + (ADDR))
 #endif
 
+/* Initialize the location of the dynamic addr.  This is only called
+ * from DL_START, so additional arguments passed to it may be referenced.  */
+#ifndef DL_BOOT_COMPUTE_DYN
+#define DL_BOOT_COMPUTE_DYN(DPNT, GOT, LOAD_ADDR) \
+    ((DPNT) = ((ElfW(Dyn) *) DL_RELOC_ADDR(load_addr, got)))
+#endif
+
+/* Initialize the location of the global offset table.  This is only called
+ * from DL_START, so additional arguments passed to it may be referenced.  */
+#ifndef DL_BOOT_COMPUTE_GOT
+#define DL_BOOT_COMPUTE_GOT(GOT) \
+    ((GOT) = elf_machine_dynamic())
+#endif
+
 /* Initialize a LOADADDR representing the loader itself.  It's only
- * called from DL_BOOT, so additional arguments passed to it may be
+ * called from DL_START, so additional arguments passed to it may be
  * referenced.
  */
 #ifndef DL_INIT_LOADADDR_BOOT
@@ -156,6 +170,13 @@ typedef struct {
 # define DL_ADDR_IN_LOADADDR(ADDR, TPNT, TFROM) \
 	((void*)(TPNT)->loadaddr < (void*)(ADDR) \
 	 && (!(TFROM) || (TFROM)->loadaddr < (TPNT)->loadaddr))
+#endif
+
+/* This is called from dladdr() to give targets that use function descriptors
+ * a chance to map a function descriptor's address to the function's entry
+ * point before trying to find in which library it's defined.  */
+#ifndef DL_LOOKUP_ADDRESS
+#define DL_LOOKUP_ADDRESS(ADDRESS) (ADDRESS)
 #endif
 
 /* Use this macro to convert a pointer to a function's entry point to

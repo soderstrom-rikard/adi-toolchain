@@ -722,9 +722,7 @@ int dladdr(const void *__address, Dl_info * __info)
 
 	_dl_if_debug_print("__address: %p  __info: %p\n", __address, __info);
 
-#ifdef DL_LOOKUP_ADDRESS
 	__address = DL_LOOKUP_ADDRESS (__address);
-#endif
 
 	for (rpnt = _dl_loaded_modules; rpnt; rpnt = rpnt->next) {
 		struct elf_resolve *tpnt;
