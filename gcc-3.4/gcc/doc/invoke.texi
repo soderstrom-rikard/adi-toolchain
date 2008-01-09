@@ -10131,9 +10131,7 @@ defines @code{__BFIN_COREA}. It must be used with @option{-mmulticore}.
 Build standalone application for Core B of BF561 when using
 one application per core programming model. Proper start files
 and link scripts will be used to support Core B. This option
-defines @code{__BFIN_COREB}. When this option is used, coreb_main
-should be used instead of main. It must be used with
-@option{-mmulticore}. 
+defines @code{__BFIN_COREB}. It must be used with @option{-mmulticore}. 
 
 @item -msdram
 @opindex msdram
