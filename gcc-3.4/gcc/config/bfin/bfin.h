@@ -51,6 +51,12 @@
 
 #define MASK_STACK_CHECK_L1	     0x00008000
 
+#define MASK_MULTICORE		     0x00010000
+#define MASK_COREA		     0x00020000
+#define MASK_COREB		     0x00040000
+
+#define MASK_SDRAM		     0x00080000
+
 /* Run-time compilation parameters selecting different hardware subsets.  */
 
 extern int target_flags;
@@ -179,6 +185,14 @@ extern int target_flags;
 	builtin_define ("__ID_SHARED_LIB__");	\
       if (flag_no_builtin)			\
 	builtin_define ("__NO_BUILTIN");	\
+      if (TARGET_MULTICORE)			\
+	builtin_define ("__BFIN_MULTICORE");	\
+      if (TARGET_COREA)				\
+	builtin_define ("__BFIN_COREA");	\
+      if (TARGET_COREB)				\
+	builtin_define ("__BFIN_COREB");	\
+      if (TARGET_SDRAM)				\
+	builtin_define ("__BFIN_SDRAM");	\
     }						\
   while (0)
 #endif
@@ -240,6 +254,10 @@ extern int target_flags;
 #define TARGET_INLINE_PLT	       (target_flags & MASK_INLINE_PLT)
 #define TARGET_FAST_FP		       (target_flags & MASK_FAST_FP)
 #define TARGET_STACK_CHECK_L1	       (target_flags & MASK_STACK_CHECK_L1)
+#define TARGET_MULTICORE	       (target_flags & MASK_MULTICORE)
+#define TARGET_COREA		       (target_flags & MASK_COREA)
+#define TARGET_COREB		       (target_flags & MASK_COREB)
+#define TARGET_SDRAM		       (target_flags & MASK_SDRAM)
 
 #define TARGET_HAS_SYMBOLIC_ADDRESSES  (0)
 #define TARGET_MOVE                    (1)
@@ -306,6 +324,14 @@ extern int target_flags;
     "Link with the fast floating-point library"},			\
   { "sim",			0,					\
     "Use simulator runtime"},						\
+  { "multicore",		MASK_MULTICORE,				\
+    "Enable multicore support"},					\
+  { "corea",			MASK_COREA,				\
+    "Build for Coar A"},						\
+  { "coreb",			MASK_COREB,				\
+    "Build for Coar B"},						\
+  { "sdram",			MASK_SDRAM,				\
+    "Build for SDRAM"},							\
   { "", MASK_CMOV,							\
     "default: cmov"}}
 
