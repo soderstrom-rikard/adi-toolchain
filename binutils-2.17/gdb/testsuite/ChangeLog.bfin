@@ -1,3 +1,11 @@
+2008-01-09  Jie Zhang  <jie.zhang@analog.com>
+
+	* gdb.gdbtk/stack1.c: Include stdlib.h.
+	* gdb.gdbtk/c_variable.c: Likewise.
+	* gdb.base/call-ar-st.exp: Skip if gdb,noinferiorio.
+	* lib/mi-support.exp (mi_gdb_load): Set loadtimeout as
+	gdb_load.
+
 2007-08-06  Jie Zhang  <jie.zhang@analog.com>
 
 	* gdb.base/cursal.exp: Adjust for use_binfmt_flat.
