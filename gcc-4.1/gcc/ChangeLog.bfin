@@ -1,5 +1,10 @@
 2008-01-09  Jie Zhang  <jie.zhang@analog.com>
 
+	* doc/invoke.texi (mcoreb): Plain main should be used as the
+	main function.
+
+2008-01-09  Jie Zhang  <jie.zhang@analog.com>
+
 	* doc/invoke.texi (Option Summary): Mention -mmulticore,
 	-mcorea, -mcoreb, and -msdram.
 	(Blackfin Options): Document -mmulticore, -mcorea, -mcoreb,
