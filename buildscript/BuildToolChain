@@ -979,10 +979,16 @@ build_gcc ()
 
     change_dir $DIR_GCC_BUILD
 
+    LOCALE="--enable-clocale=generic"
+    if [ -n "$UCLIBC_CONFIG_FILE" ]; then
+	if grep -qs UCLIBC_HAS_LOCALE=y $UCLIBC_CONFIG_FILE; then
+	    LOCALE="--enable-clocale=uclibc"
+	fi
+    fi
     echo_date "Configuring GCC"
     RUN="$DIR_GCC_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-$2 \
       --prefix=$3 $4 --disable-libstdcxx-pch $BFIN_LANGS $EXTRA_GCC_CONF \
-      --disable-symvers --disable-libssp --disable-libffi \
+      --disable-symvers --disable-libssp --disable-libffi $LOCALE \
       --enable-version-specific-runtime-libs --enable-__cxa_atexit"
 
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
@@ -1711,7 +1717,7 @@ build_uClibc()
         run_cmd $MAKE $ARGS
 
         change_dir ../..
-        run_cmd $MAKE all $ARGS
+        run_cmd $MAKE all $ARGS -j 1
     fi
 
     echo_date "Installing uClibc"
