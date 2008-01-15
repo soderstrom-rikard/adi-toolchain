@@ -413,7 +413,7 @@ FOUND=0
 for SEARCH in $RUN
 do
     if [ -d $SEARCH ] ; then
-        FIND=`find $SEARCH/ -maxdepth 1 -name bfin-elf-gcc -o -name bfin-uclinux-gcc |wc -c`
+        FIND=`find $SEARCH/ -maxdepth 1 -name bfin-elf-gcc -o -name bfin-uclinux-gcc -o -name bfin-linux-uclibc-gcc | wc -c`
         if [ $FIND -gt 1 ] ; then
             FOUND=1
             echo "Removing $SEARCH from the PATH"
