@@ -253,8 +253,8 @@ SECTIONS
   .debug_typenames 0 : { *(.debug_typenames) }
   .debug_varnames  0 : { *(.debug_varnames) }
 
-  __stack_end = 0xFFB01000;
-  __coreb_stack_end = 0xFF701000;
+  __stack_end = ORIGIN(MEM_L1_SCRATCH) + LENGTH(MEM_L1_SCRATCH);
+  __coreb_stack_end = ORIGIN(B_MEM_L1_SCRATCH) + LENGTH(B_MEM_L1_SCRATCH);
 
   /DISCARD/ : { *(.note.GNU-stack) }
 }

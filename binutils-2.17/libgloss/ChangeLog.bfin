@@ -1,3 +1,10 @@
+2008-01-15  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/bfin-common-mc.ld (__stack_end): Don't hard code it.
+	Calculate it instead.
+	(__coreb_stack_end): Likewise.
+	* bfin/bfin-common-sc.ld (__stack_end): Likewise.
+
 2008-01-09  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/bf532.ld: Add MEM_L2 memory region. Update copyright year.
