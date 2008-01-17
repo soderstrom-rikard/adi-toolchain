@@ -331,15 +331,15 @@ ifeq ($(TARGET_ARCH),frv)
 	UCLIBC_LDSO=ld.so.1
 endif
 
-ifdef ($(TARGET_ARCH),i960)
+ifeq ($(TARGET_ARCH),i960)
       SYMBOL_PREFIX=_
 endif
 
-ifdef ($(TARGET_ARCH),microblaze)
+ifeq ($(TARGET_ARCH),microblaze)
       SYMBOL_PREFIX=_
 endif
 
-ifdef ($(TARGET_ARCH),v850)
+ifeq ($(TARGET_ARCH),v850)
       SYMBOL_PREFIX=_
 endif
 
