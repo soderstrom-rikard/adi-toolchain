@@ -458,10 +458,10 @@ void *dlsym(void *vhandle, const char *name)
 	ElfW(Addr) from;
 	struct dyn_elf *rpnt;
 	void *ret;
+	/* Nastiness to support underscore prefixes.  */
+#ifndef __UCLIBC_NO_UNDERSCORES__
 	char tmp_buf[80];
 	char *name2 = tmp_buf;
-#ifndef __UCLIBC_NO_UNDERSCORES__
-	/* Nastiness to support underscore prefixes.  */
 	size_t nlen = strlen (name) + 1;
 	if (nlen + 1 > sizeof (tmp_buf))
 	    name2 = malloc (nlen + 1);
@@ -471,6 +471,8 @@ void *dlsym(void *vhandle, const char *name)
 	}
 	name2[0] = '_';
 	memcpy (name2 + 1, name, nlen);
+#else
+	const char *name2 = name;
 #endif
 	handle = (struct dyn_elf *) vhandle;
 
@@ -507,7 +509,6 @@ void *dlsym(void *vhandle, const char *name)
 			}
 		}
 	}
-
 	tpnt = NULL;
 	if (handle == _dl_symbol_tables)
 	   tpnt = handle->dyn; /* Only search RTLD_GLOBAL objs if global object */
@@ -519,8 +520,10 @@ void *dlsym(void *vhandle, const char *name)
 	if (!ret)
 		_dl_error_number = LD_NO_SYMBOL;
 out:
+#ifndef __UCLIBC_NO_UNDERSCORES__
 	if (name2 != tmp_buf)
 		free (name2);
+#endif
 	return ret;
 }
 

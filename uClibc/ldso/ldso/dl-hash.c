@@ -187,6 +187,7 @@ check_match (const ElfW(Sym) *sym, char *strtab, const char* undef_name, int typ
 		return sym;
 }
 
+
 #ifdef __LDSO_GNU_HASH_SUPPORT__
 
 static __always_inline const ElfW(Sym) * 
@@ -196,7 +197,7 @@ _dl_lookup_gnu_hash(struct elf_resolve *tpnt, ElfW(Sym) *symtab, unsigned long h
 	Elf_Symndx symidx;
 	const ElfW(Sym) *sym;
 	char *strtab;
-
+	
 	const ElfW(Addr) *bitmask = tpnt->l_gnu_bitmask;
 
 	ElfW(Addr) bitmask_word	= bitmask[(hash / __ELF_NATIVE_CLASS) & tpnt->l_gnu_bitmask_idxbits];	
@@ -256,15 +257,18 @@ _dl_lookup_sysv_hash(struct elf_resolve *tpnt, ElfW(Sym) *symtab, unsigned long 
  * This function resolves externals, and this is either called when we process
  * relocations or when we call an entry in the PLT table for the first time.
  */
-char *_dl_find_hash_mod(const char *name, struct dyn_elf *rpnt,
-			struct elf_resolve *mytpnt, int type_class,
-			struct elf_resolve **tpntp)
+char *_dl_lookup_hash(const char *name, struct dyn_elf *rpnt,
+		      struct elf_resolve *mytpnt, int type_class
+#ifdef __FDPIC__
+		      , struct elf_resolve **tpntp
+#endif
+		      )
 {
 	struct elf_resolve *tpnt = NULL;
 	ElfW(Sym) *symtab;
 
 	unsigned long elf_hash_number = 0xffffffff;
-	const ElfW(Sym) *sym;
+	const ElfW(Sym) *sym = NULL;
 
 	const ElfW(Sym) *weak_sym = 0;
 	struct elf_resolve *weak_tpnt = 0;
@@ -272,7 +276,7 @@ char *_dl_find_hash_mod(const char *name, struct dyn_elf *rpnt,
 #ifdef __LDSO_GNU_HASH_SUPPORT__
 	unsigned long gnu_hash_number = _dl_gnu_hash((const unsigned char *)name);
 #endif
-
+	
 	for (; rpnt; rpnt = rpnt->next) {
 		tpnt = rpnt->dyn;
 
@@ -333,26 +337,25 @@ char *_dl_find_hash_mod(const char *name, struct dyn_elf *rpnt,
 				break;
 #endif
 			case STB_GLOBAL:
+#ifdef __FDPIC__
 				if (tpntp)
 					*tpntp = tpnt;
-				return DL_FIND_HASH_VALUE
-				  (tpnt, type_class, sym);
+#endif
+				return (char *) DL_FIND_HASH_VALUE (tpnt, type_class, sym);
 			default:	/* Local symbols not handled here */
 				break;
 		}
 	}
 	if (weak_sym) {
+#ifdef __FDPIC__
 		if (tpntp)
 			*tpntp = weak_tpnt;
-		return DL_FIND_HASH_VALUE (weak_tpnt, type_class, weak_sym);
+#endif
+		return (char *) DL_FIND_HASH_VALUE (weak_tpnt, type_class, weak_sym);
 	}
+#ifdef __FDPIC__
 	if (tpntp)
 		*tpntp = NULL;
+#endif
 	return NULL;
-}
-
-char *_dl_find_hash(const char *name, struct dyn_elf *rpnt,
-		    struct elf_resolve *mytpnt, int type_class)
-{
-	return _dl_find_hash_mod(name, rpnt, mytpnt, type_class, NULL);
 }

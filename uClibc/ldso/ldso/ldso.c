@@ -71,14 +71,13 @@ const char *_dl_progname = UCLIBC_LDSO;      /* The name of the executable being
 /* Forward function declarations */
 static int _dl_suid_ok(void);
 
-void _dl_debug_state(void);
-rtld_hidden_proto (_dl_debug_state, noinline);
-
 /*
  * This stub function is used by some debuggers.  The idea is that they
  * can set an internal breakpoint on it, so that we are notified when the
  * address mapping is changed in some way.
  */
+void _dl_debug_state(void);
+rtld_hidden_proto (_dl_debug_state, noinline);
 void _dl_debug_state(void)
 {
 	/* Make sure GCC doesn't recognize this function as pure, to avoid
@@ -86,6 +85,7 @@ void _dl_debug_state(void)
 	 */
 	__asm__ ("");
 }
+rtld_hidden_def (_dl_debug_state);
 
 static unsigned char *_dl_malloc_addr = 0;	/* Lets _dl_malloc use the already allocated memory page */
 static unsigned char *_dl_mmap_zero   = 0;	/* Also used by _dl_malloc */
@@ -130,7 +130,7 @@ static void __attribute__ ((destructor)) __attribute_used__ _dl_fini(void)
 	}
 }
 
-void _dl_get_ready_to_run(struct elf_resolve *tpnt, DL_LOADADDR_TYPE load_addr, 
+void _dl_get_ready_to_run(struct elf_resolve *tpnt, DL_LOADADDR_TYPE load_addr,
 			  ElfW(auxv_t) auxvt[AT_EGID + 1], char **envp,
 			  char **argv
 			  DL_GET_READY_TO_RUN_EXTRA_PARMS)
@@ -936,13 +936,11 @@ void *_dl_malloc(size_t size)
 	return retval;
 }
 
-void
-_dl_free (void *p) {
+void _dl_free (void *p)
+{
 	if (_dl_free_function)
 		(*_dl_free_function) (p);
 }
 
-
 #include "dl-hash.c"
 #include "dl-elf.c"
-rtld_hidden_def (_dl_debug_state);

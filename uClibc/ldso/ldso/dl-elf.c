@@ -632,8 +632,8 @@ struct elf_resolve *_dl_load_elf_shared_library(int secure,
 
 				if (map_size < ppnt->p_vaddr + ppnt->p_memsz
 				    && !piclib2map) {
-					status = (char *) _dl_mmap(tryaddr = map_size + 
-						(char*)(piclib ? libaddr : 0),
+					tryaddr = map_size + (char*)(piclib ? libaddr : 0);
+					status = (char *) _dl_mmap(tryaddr,
 						ppnt->p_vaddr + ppnt->p_memsz - map_size,
 						LXFLAGS(ppnt->p_flags), flags | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
 					if (_dl_mmap_check_error(status)
@@ -641,15 +641,15 @@ struct elf_resolve *_dl_load_elf_shared_library(int secure,
 						goto cant_map;
 				}
 			} else {
+				tryaddr = (piclib == 2 ? 0
+					   : (char *) (ppnt->p_vaddr & PAGE_ALIGN)
+					   + (piclib ? libaddr : 0));
+				size = (ppnt->p_vaddr & ADDR_ALIGN) + ppnt->p_filesz;
 				status = (char *) _dl_mmap
-				  (tryaddr = piclib == 2 ? 0 :
-				   (char *) (ppnt->p_vaddr & PAGE_ALIGN) 
-				   + (piclib ? libaddr : 0),
-				   size = (ppnt->p_vaddr & ADDR_ALIGN) + 
-				   ppnt->p_filesz, LXFLAGS(ppnt->p_flags),
-				   flags | (piclib == 2 ? MAP_EXECUTABLE
-					    | MAP_DENYWRITE : 0), 
-				   infile, ppnt->p_offset & OFFS_ALIGN);
+					   (tryaddr, size, LXFLAGS(ppnt->p_flags),
+					    flags | (piclib == 2 ? MAP_EXECUTABLE
+						     | MAP_DENYWRITE : 0),
+					    infile, ppnt->p_offset & OFFS_ALIGN);
 				if (_dl_mmap_check_error(status)
 				    || (tryaddr && tryaddr != status))
 				  goto cant_map;
