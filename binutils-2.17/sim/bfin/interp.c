@@ -107,9 +107,8 @@ now_persec ()
 void
 bfin_trap ()
 {
-  int reason = DREG (2);
-  int sys = DREG (0);
-  bu32 args = DREG (1);
+  int sys = PREG (0);
+  bu32 args = DREG (0);
 
   switch (sys)
     {
