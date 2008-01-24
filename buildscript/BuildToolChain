@@ -730,9 +730,8 @@ fi
 # once we update to that, we should be able to re-enable NLS
 UCLIBC_HOSTUTILS="PASS"
 case $HOST_TARGET in
-    --host=mingw*)   BINUTILS_EXTRA_CONF="--disable-nls"; UCLIBC_HOSTUTILS="XFAIL";;
-    --host=*darwin*) BINUTILS_EXTRA_CONF="--disable-nls"; UCLIBC_HOSTUTILS="XFAIL";;
-    *)               BINUTILS_EXTRA_CONF="";;
+    --host=mingw*)   BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-nls"; UCLIBC_HOSTUTILS="XFAIL";;
+    --host=*darwin*) BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-nls"; UCLIBC_HOSTUTILS="XFAIL";;
 esac
 
 for GCC_VER in $GCC_VERSIONS; do
