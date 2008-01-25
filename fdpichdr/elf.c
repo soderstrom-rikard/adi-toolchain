@@ -2,7 +2,7 @@
  * File:         elf.c
  * Author:       Mike Frysinger <michael.frysinger@analog.com>
  * Description:  Hide all the ELF logic here.
- * Modified:     Copyright 2006-2007 Analog Devices Inc.
+ * Modified:     Copyright 2006-2008 Analog Devices Inc.
  * Bugs:         Enter bugs at http://blackfin.uclinux.org/
  * Licensed under the GPL-2, see the file COPYING in this dir
  */
@@ -32,13 +32,14 @@ int set_stack(uint32_t stack, char *argv[])
 	int i, set_stack_ret;
 	uint16_t p;
 	ssize_t ss_ret;
+	uint32_t put_stack;
 
 	set_stack_ret = 0;
-	for (i=0; argv[i]; ++i) {
+	for (i = 0; argv[i]; ++i) {
 		Elf32_Ehdr ehdr;
 
 		if (verbose)
-			printf("%s: setting stack size to %u\n", argv[i], stack);
+			printf("%s: setting stack size to %u (0x%x)\n", argv[i], stack, stack);
 
 		fd = open(argv[i], O_RDWR);
 		if (fd == -1) {
@@ -67,6 +68,7 @@ int set_stack(uint32_t stack, char *argv[])
 		}
 
 		do_reverse_endian = (ELF_DATA != ehdr.e_ident[EI_DATA]);
+		ESET(put_stack, stack);
 
 		/* Grab the elf header */
 		if (lseek(fd, EGET(ehdr.e_phoff), SEEK_SET) != EGET(ehdr.e_phoff)) {
@@ -76,7 +78,7 @@ int set_stack(uint32_t stack, char *argv[])
 		}
 
 		/* Scan the program headers and find GNU_STACK */
-		for (p=0; p < EGET(ehdr.e_phnum); ++p) {
+		for (p = 0; p < EGET(ehdr.e_phnum); ++p) {
 			Elf32_Phdr phdr;
 			ss_ret = read(fd, &phdr, sizeof(phdr));
 			if (ss_ret != sizeof(phdr)) {
@@ -89,7 +91,7 @@ int set_stack(uint32_t stack, char *argv[])
 				if (verbose)
 					printf("\tFound PT_GNU_STACK; changing value 0x%X -> 0x%X\n", EGET(phdr.p_memsz), stack);
 				lseek(fd, -sizeof(phdr) + offsetof(Elf32_Phdr, p_memsz), SEEK_CUR);
-				write(fd, &stack, sizeof(stack));
+				write(fd, &put_stack, sizeof(put_stack));
 			} else if (verbose)
 				printf("\tskipping program header 0x%X\n", EGET(phdr.p_type));
 		}
