@@ -2,7 +2,7 @@
  * File:         fdpichdr.c
  * Author:       Mike Frysinger <michael.frysinger@analog.com>
  * Description:  Tweak ELF header on the fly
- * Modified:     Copyright 2006-2007 Analog Devices Inc.
+ * Modified:     Copyright 2006-2008 Analog Devices Inc.
  * Bugs:         Enter bugs at http://blackfin.uclinux.org/
  * Licensed under the GPL-2, see the file COPYING in this dir
  */
@@ -11,7 +11,7 @@
 #include "helpers.h"
 #include "elf.h"
 
-static const char *rcsid = "$Id: ldrviewer.c 1319 2007-01-12 04:51:12Z vapier $";
+static const char *rcsid = "$Id$";
 const char *argv0;
 int force = 0, verbose = 0, quiet = 0;
 
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 
 	while ((i=getopt_long(argc, argv, PARSE_FLAGS, long_opts, NULL)) != -1) {
 		switch (i) {
-			case 's': stack = atoi(optarg); break;
+			case 's': stack = parse_int_hex(optarg); break;
 			case 'v': ++verbose; break;
 			case 'q': ++quiet; break;
 			case 'h': show_usage(0);

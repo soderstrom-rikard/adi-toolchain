@@ -2,7 +2,7 @@
  * File:         helpers.c
  * Author:       Mike Frysinger <michael.frysinger@analog.com>
  * Description:  some common utility functions
- * Modified:     Copyright 2006-2007 Analog Devices Inc.
+ * Modified:     Copyright 2006-2008 Analog Devices Inc.
  * Bugs:         Enter bugs at http://blackfin.uclinux.org/
  * Licensed under the GPL-2, see the file COPYING in this dir
  */
@@ -43,6 +43,24 @@ int parse_bool(const char *boo)
 	    strcasecmp(boo, "n") == 0 || strcasecmp(boo, "false") == 0)
 		return 0;
 	err("Invalid boolean: '%s'", boo);
+}
+
+size_t parse_int_hex(const char *str)
+{
+	char *endp;
+	size_t ret;
+
+	/* first we parse as an integer */
+	ret = strtol(str, &endp, 10);
+	if (!*endp)
+		return ret;
+
+	/* then we parse as a hex */
+	ret = strtol(str, &endp, 16);
+	if (!*endp)
+		return ret;
+
+	err("Value is not integer or hex: '%s'", str);
 }
 
 ssize_t read_retry(int fd, void *buf, size_t count)
