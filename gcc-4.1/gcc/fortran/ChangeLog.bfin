@@ -1,0 +1,5 @@
+2008-01-26  Michael Frysinger  <michael.frysinger@analog.com>
+
+	* gfortran.h (gfc_add_attribute): Change "unsigned int" to "uint".
+	* symbol.c (gfc_add_attribute): Likewise.
+	* resolve.c (resolve_global_procedure): Likewise.
