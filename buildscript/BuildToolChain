@@ -46,7 +46,7 @@ NUM_JOBS=0
 SKIP_DEV_CHECKS=false
 WITHOUT_X=false
 
-while getopts b:B:c:C:dDfH:hj:k:K:l:m:o:O:pr:s:StT:u:vwX parameter
+while getopts b:B:c:C:dDfH:hj:k:K:l:m:o:O:pr:s:StT:u:U:vwX parameter
 do
     case $parameter in
         p)
@@ -184,6 +184,9 @@ do
         f)
             STACK_CHECKING=true
             ;;
+        U)
+            UCLIBC_CFLAGS=$OPTARG
+            ;;
         h)
 # We don't document the -S option - it's for advanced users who know what
 # they are doing.  For maximum reproducibility, not using it is better.
@@ -210,8 +213,9 @@ do
 # -S               Skip building elf compiler - don't print this out
 echo "-T TARGET_IPADDR Test components on hardware
 -t               Test components on simulator
--u SOURCE        Uboot Source directory
--v               Verbose
+-u SOURCE        Uboot Source directory"
+# -U               uClibc CFLAGS - don't print this out
+echo "-v               Verbose
 -w               Warnings to be sent to a different log file
 -X               Disable all graphical utilities
 "
@@ -225,6 +229,14 @@ echo "-T TARGET_IPADDR Test components on hardware
 done
 
 ############ Check and error if I can't find the things I need #
+
+check_cc_options() {
+        if `${1} ${2} -S -o /dev/null -xc /dev/null > /dev/null 2>&1` ; then 
+                return 1
+        else
+                return 0
+        fi
+}
 
 check_header() {
 	local header=$1
@@ -759,6 +771,23 @@ if [ ! -d $UCLIBC_SOURCE ] ; then
     echo "Can't find uClibc source at $UCLIBC_SOURCE"
     exit 1
 fi
+
+if [ -z "$UCLIBC_CFLAGS" ] ; then
+    UCLIBC_CFLAGS='-g -O2'
+fi
+
+echo -n "    uClibc CFLAGS           "
+#We test (and warn) if any of the CFLAGS for uClibc don't work on the host compiler
+for opt in $UCLIBC_CFLAGS
+do
+    check_cc_options gcc $opt
+    if [ "$?" -eq "1" ] ; then
+      echo -n "$opt "
+    else
+      echo -n "$opt(bfin only?) "
+    fi
+done
+echo
 
 echo -n "Path to genext2fs           "
 DIR_GENEXT2FS_SOURCE=$DIR_SOURCE/genext2fs
@@ -1688,7 +1717,7 @@ run_tests ()
 
 build_uClibc()
 {
-    ARGS="V=1 CROSS=bfin-elf- DEVEL_PREFIX=/usr/ RUNTIME_PREFIX=/ ARCH_CFLAGS='-g -O2'"
+    ARGS="V=1 CROSS=bfin-elf- DEVEL_PREFIX=/usr/ RUNTIME_PREFIX=/ ARCH_CFLAGS='$UCLIBC_CFLAGS'"
 
     echo_date "Cleaning uClibc"
     run_cmd $MAKE clean $ARGS
@@ -1927,6 +1956,17 @@ for GCC_VERSION in $GCC_VERSIONS; do
   if [ -h $DIR_GCC_SOURCE/newlib ] ; then
       rm $DIR_GCC_SOURCE/newlib
   fi
+done
+
+echo -n "Checking uClibc CFLAGS     "
+#We test (and fail) if any of the CFLAGS for uClibc don't work on the bfin-elf compiler
+for opt in $UCLIBC_CFLAGS
+do
+    check_cc_options $DIR_ELF_OUTPUT/bin/bfin-elf-gcc $opt
+    if [ "$?" -eq "0" ] ; then
+      echo "I could not make option $opt work on the bfin-elf compiler, so I can't use it for uClibc"
+      exit
+    fi
 done
 
 ####################### Done Step 1  #########################
