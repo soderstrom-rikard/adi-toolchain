@@ -1,3 +1,8 @@
+2008-01-30  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/uclinux.h (LINK_GCC_C_SEQUENCE_SPEC): Make sure
+	libbffastfp override libgcc when -mfast-fp.
+
 2008-01-09  Jie Zhang  <jie.zhang@analog.com>
 
 	* doc/invoke.texi (mcoreb): Plain main should be used as the
