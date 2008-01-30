@@ -612,7 +612,7 @@ if [ $CHECK_ON_HARDWARE ] ; then
         echo "Could not ping $TARGET_IPADDR - check network settings"
         exit 1
     fi
-    RUN=`rsh -l root $TARGET_IPADDR /bin/ls 2>/dev/null | wc -l`
+    RUN=`rsh -l root $TARGET_IPADDR /bin/ls / 2>/dev/null | wc -l`
     if [ $RUN -eq 0 ] ; then
         echo "Can't rsh to $TARGET_IPADDR, check rsh client on host, and inet on target"
         exit 1
@@ -1412,7 +1412,7 @@ prepare_target()
                 LIB=`readlink $FILE`
                 FILE=`basename $FILE`
                 LIB=`basename $LIB`
-                rsh -l root ${TARGET_IPADDR} "cd lib; ln -s $LIB $FILE"
+                rsh -l root ${TARGET_IPADDR} "cd /lib; ln -s $LIB $FILE"
             else
                 if [ -f $FILE ] ; then
                     LIB=`basename ${FILE}`
@@ -1487,7 +1487,7 @@ check_tests_OK()
                 echo " ** $KILL_PS"
                 if [ -n "$HARDWARE" ] ; then
                     # make sure the board is not hung
-                    RUN=`rsh -l root $TARGET_IPADDR "ls 1>/dev/null" 2>&1 | wc -l`
+                    RUN=`rsh -l root $TARGET_IPADDR "ls /  1>/dev/null" 2>&1 | wc -l`
                     if [ "$RUN" = "1" ] ; then
                         echo "*** I think the board or networked died during testing - sorry "
                         break
