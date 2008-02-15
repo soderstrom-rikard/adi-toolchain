@@ -4,6 +4,8 @@
 
 	* flthdr.c: Merge trivial changes with upstream.
 
+	* elf2flt.ld.in (__start): Convert to @SYMBOL_PREFIX@_start.
+
 2007-10-11  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* configure.ac (AC_CHECK_FUNCS): Add libintl_dgettext.

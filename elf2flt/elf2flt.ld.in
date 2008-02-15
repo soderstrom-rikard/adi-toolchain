@@ -151,7 +151,7 @@ SINGLE_LINK:	KEEP (*(SORT(.dtors.*)))
 
 	.stack : {
 		. = ALIGN(0x4);
-		__stack_start = .;
+		@SYMBOL_PREFIX@_stack_start = .;
 	}
 
 	.junk 0 : { *(.rel*) *(.rela*) }
