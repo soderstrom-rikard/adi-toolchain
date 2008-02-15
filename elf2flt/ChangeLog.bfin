@@ -2,6 +2,8 @@
 
 	* elf2flt.c: Convert malloc() to xmalloc().
 
+	* flthdr.c: Merge trivial changes with upstream.
+
 2007-10-11  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* configure.ac (AC_CHECK_FUNCS): Add libintl_dgettext.

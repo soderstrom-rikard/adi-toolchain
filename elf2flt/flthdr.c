@@ -362,13 +362,11 @@ main(int argc, char *argv[])
 		case 'K': ktrace = -1;              break;
 		case 'u': l1stack = 1;              break;
 		case 'U': l1stack = -1;             break;
-		case 's':
-			if (optarg[1] == 'x' || optarg[1] == 'X')
-				sscanf(optarg, "%x", &stacksize);
-			else
-				stacksize = atoi(optarg);
-			break;
 		case 'o': ofile = optarg;           break;
+		case 's':
+			if (sscanf(optarg, "%i", &stacksize) != 1)
+				usage("invalid stack size");
+			break;
 		default:
 			usage("invalid option");
 			break;
