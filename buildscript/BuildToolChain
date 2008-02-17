@@ -930,9 +930,8 @@ run_cmd()
 
 change_dir()
 {
-    (echo "echo -e '###\ntrying to change into $1' $LOGFILE" ) | sh
-    cd $1
-    (echo "echo -e 'PWD = $PWD\n###\n' $LOGFILE" ) | sh
+    log_it cd "$@"
+    cd "$@" || die_with_log
 }
 
 echo_date()
