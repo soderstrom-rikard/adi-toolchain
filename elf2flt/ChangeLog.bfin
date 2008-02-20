@@ -1,3 +1,7 @@
+2008-02-20  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* configure.in (--with-binutils-build-dir): New helper flag.
+
 2008-02-15  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* elf2flt.c: Convert malloc() to xmalloc().

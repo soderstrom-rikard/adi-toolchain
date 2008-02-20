@@ -1277,6 +1277,7 @@ Optional Packages:
  --with-bfd-include-dir=<dir>  include path for correct bfd.h
  --with-binutils-include-dir=<dir>  include path for binutils headers
  --with-binutils-ldscript-dir=<dir>  path to install elf2flt.ld
+ --with-binutils-build-dir=<dir>  path to compiled binutils tree
 
 Some influential environment variables:
   CC          C compiler command
@@ -1757,6 +1758,16 @@ if test "${with_binutils_ldscript_dir+set}" = set; then
   withval=$with_binutils_ldscript_dir;  ac_binutils_ldscript_dir=$withval
 else
    ac_binutils_ldscript_dir=NONE
+
+fi
+
+
+
+# Check whether --with-binutils-build-dir was given.
+if test "${with_binutils_build_dir+set}" = set; then
+  withval=$with_binutils_build_dir;  ac_binutils_build_dir=$withval
+else
+   ac_binutils_build_dir=NONE
 
 fi
 
@@ -2936,6 +2947,13 @@ test -z "$INSTALL_SCRIPT" && INSTALL_SCRIPT='${INSTALL}'
 
 test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
 
+
+if test "$ac_binutils_build_dir" != "NONE"; then
+  test "$ac_libbfd"               = "NONE" && ac_libbfd="$ac_binutils_build_dir/bfd/libbfd.a"
+  test "$ac_libiberty"            = "NONE" && ac_libiberty="$ac_binutils_build_dir/libiberty/libiberty.a"
+  test "$ac_bfd_include_dir"      = "NONE" && ac_bfd_include_dir="$ac_binutils_build_dir/bfd"
+  test "$ac_binutils_include_dir" = "NONE" && ac_binutils_include_dir="$ac_binutils_build_dir/include"
+fi
 
 if test "$ac_libiberty" = "NONE"; then
 
@@ -4231,6 +4249,7 @@ fi
 
 fi
 done
+
 
 
 
