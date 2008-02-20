@@ -677,6 +677,7 @@ GREP
 EGREP
 bfd_include_dir
 binutils_include_dir
+zlib_include_dir
 binutils_ldscript_dir
 got_check
 emit_relocs
@@ -1272,6 +1273,7 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+ --with-zlib-prefix=<dir>  path to installed zlib
  --with-libbfd=<file>  path to libbfd.a library to use
  --with-libiberty=<file>  path to libiberty.a library to use
  --with-bfd-include-dir=<dir>  include path for correct bfd.h
@@ -1710,6 +1712,16 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
+
+
+
+# Check whether --with-zlib-prefix was given.
+if test "${with_zlib_prefix+set}" = set; then
+  withval=$with_zlib_prefix;  ac_zlib_prefix=$withval
+else
+   ac_zlib_prefix=NONE
+
+fi
 
 
 
@@ -3108,6 +3120,81 @@ fi
 else
   LIBS="$ac_libbfd $LIBS"
 fi
+if test "$ac_zlib_prefix" = "NONE"; then
+
+{ echo "$as_me:$LINENO: checking for deflate in -lz" >&5
+echo $ECHO_N "checking for deflate in -lz... $ECHO_C" >&6; }
+if test "${ac_cv_lib_z_deflate+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lz  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char deflate ();
+int
+main ()
+{
+return deflate ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_z_deflate=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_z_deflate=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_z_deflate" >&5
+echo "${ECHO_T}$ac_cv_lib_z_deflate" >&6; }
+if test $ac_cv_lib_z_deflate = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBZ 1
+_ACEOF
+
+  LIBS="-lz $LIBS"
+
+fi
+
+else
+  LIBS="-L$ac_zlib_prefix/lib -lz $LIBS"
+fi
 
 bfd_include_dir=
 if test "$ac_bfd_include_dir" != "NONE"; then
@@ -3117,6 +3204,11 @@ fi
 binutils_include_dir=
 if test "$ac_binutils_include_dir" != "NONE"; then
   binutils_include_dir="-I$ac_binutils_include_dir"
+fi
+
+zlib_include_dir=
+if test "$ac_zlib_prefix" != "NONE"; then
+  zlib_include_dir="-I$ac_zlib_prefix/include"
 fi
 
 binutils_ldscript_dir=
@@ -4360,6 +4452,7 @@ done
 
 
 
+
 ac_config_files="$ac_config_files Makefile ld-elf2flt elf2flt.ld"
 
 cat >confcache <<\_ACEOF
@@ -5057,6 +5150,7 @@ GREP!$GREP$ac_delim
 EGREP!$EGREP$ac_delim
 bfd_include_dir!$bfd_include_dir$ac_delim
 binutils_include_dir!$binutils_include_dir$ac_delim
+zlib_include_dir!$zlib_include_dir$ac_delim
 binutils_ldscript_dir!$binutils_ldscript_dir$ac_delim
 got_check!$got_check$ac_delim
 emit_relocs!$emit_relocs$ac_delim
@@ -5065,7 +5159,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 70; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 71; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
