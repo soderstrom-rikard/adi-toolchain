@@ -54,10 +54,11 @@
 
 /* from $(INSTALLDIR)/include       */
 #include <bfd.h>      /* Main header file for the BFD library                */
+#include <libiberty.h>
 
 /* from uClinux-x.x.x/include/linux */
 #include "flat.h"     /* Binary flat header description                      */
-#include "libiberty.h"
+#include "compress.h"
 
 #ifdef TARGET_v850e
 #define TARGET_v850
@@ -122,7 +123,7 @@ int verbose = 0;      /* extra output when running */
 int pic_with_got = 0; /* do elf/got processing with PIC code */
 int load_to_ram = 0;  /* instruct loader to allocate everything into RAM */
 int ktrace = 0;       /* instruct loader output kernel trace on load */
-int compress = 0;     /* 1 = compress everything, 2 = compress data only */
+int docompress = 0;   /* 1 = compress everything, 2 = compress data only */
 int use_resolved = 0; /* If true, get the value of symbol references from */
 		      /* the program contents, not from the relocation table. */
 		      /* In this case, the input ELF file must be already */
@@ -1661,7 +1662,7 @@ static void usage(void)
 
 
 /* Write NUM zeroes to STREAM.  */
-static void write_zeroes (unsigned long num, FILE *stream)
+static void write_zeroes (unsigned long num, stream *stream)
 {
   char zeroes[1024];
   if (num > 0) {
@@ -1669,11 +1670,11 @@ static void write_zeroes (unsigned long num, FILE *stream)
        work for stdio output files.  */
     memset(zeroes, 0x00, 1024);
     while (num > sizeof(zeroes)) {
-      fwrite(zeroes, sizeof(zeroes), 1, stream);
+      fwrite_stream(zeroes, sizeof(zeroes), 1, stream);
       num -= sizeof(zeroes);
     }
     if (num > 0)
-      fwrite(zeroes, num, 1, stream);
+      fwrite_stream(zeroes, num, 1, stream);
   }
 }
 
@@ -1688,8 +1689,7 @@ int main(int argc, char *argv[])
   int opt;
   int i;
   int stack;
-  char  cmd[1024];
-  FILE *gf = NULL;
+  stream gf;
 
   asymbol **symbol_table;
   long number_of_symbols;
@@ -1710,8 +1710,6 @@ int main(int argc, char *argv[])
   uint32_t *reloc;
   
   struct flat_hdr hdr;
-
-  int gf_is_pipe = 0;
 
   program = argv[0];
   progname = argv[0];
@@ -1746,10 +1744,10 @@ int main(int argc, char *argv[])
       ktrace++;
       break;
     case 'z':
-      compress = 1;
+      docompress = 1;
       break;
     case 'd':
-      compress = 2;
+      docompress = 2;
       break;
     case 'p':
       pfile = optarg;
@@ -1961,7 +1959,7 @@ int main(int argc, char *argv[])
 	  | (load_to_ram || text_has_relocs ? FLAT_FLAG_RAM : 0)
 	  | (ktrace ? FLAT_FLAG_KTRACE : 0)
 	  | (pic_with_got ? FLAT_FLAG_GOTPIC : 0)
-	  | (compress ? (compress == 2 ? FLAT_FLAG_GZDATA : FLAT_FLAG_GZIP) : 0)
+	  | (docompress ? (docompress == 2 ? FLAT_FLAG_GZDATA : FLAT_FLAG_GZIP) : 0)
 	  );
   hdr.build_date = htonl((uint32_t)time(NULL));
   memset(hdr.filler, 0x00, sizeof(hdr.filler));
@@ -1990,54 +1988,32 @@ int main(int argc, char *argv[])
   write(fd, &hdr, sizeof(hdr));
   close(fd);
 
-  /*
-   * get the compression command ready
-   */
-  sprintf(cmd, "gzip -f -9 >> %s", ofile);
-
-#define	START_COMPRESSOR do { \
-		if (gf) \
-			if (gf_is_pipe) \
-				pclose(gf); \
-			else \
-				fclose(gf); \
-		if (!(gf = popen(cmd, "w" BINARY_FILE_OPTS))) { \
-			fprintf(stderr, "Can't run cmd %s\n", cmd); \
-			exit(4); \
-		} \
-		gf_is_pipe = 1; \
-	} while (0)
-
-  gf = fopen(ofile, "ab");	/* Add 'b' to support non-posix (ie windows) */
-  if (!gf) {
-  	fprintf(stderr, "Can't open file %s for writing\n", ofile); \
+  if (fopen_stream_u(&gf, "ofile", "a" BINARY_FILE_OPTS)) {
+  	fprintf(stderr, "Can't open file %s for writing\n", ofile);
 	exit(4);
   }
 
-  if (compress == 1)
-  	START_COMPRESSOR;
+  if (docompress == 1)
+    reopen_stream_compressed(&gf);
 
   /* Fill in any hole at the beginning of the text segment.  */
   if (verbose)
 	  printf("ZERO before text len=0x%x\n", text_offs);
-  write_zeroes(text_offs, gf);
+  write_zeroes(text_offs, &gf);
 
   /* Write the text segment.  */
-  fwrite(text, text_len, 1, gf);
+  fwrite_stream(text, text_len, 1, &gf);
 
-  if (compress == 2)
-  	START_COMPRESSOR;
+  if (docompress == 2)
+    reopen_stream_compressed(&gf);
 
   /* Write the data segment.  */
-  fwrite(data, data_len, 1, gf);
+  fwrite_stream(data, data_len, 1, &gf);
 
   if (reloc)
-    fwrite(reloc, reloc_len * 4, 1, gf);
+    fwrite_stream(reloc, reloc_len * 4, 1, &gf);
 
-  if(gf_is_pipe)
-    pclose(gf);
-  else
-  fclose(gf);
+  fclose_stream(&gf);
 
   exit(0);
 }

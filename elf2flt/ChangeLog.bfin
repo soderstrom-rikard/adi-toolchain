@@ -1,3 +1,9 @@
+2008-02-21  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* compress.c, compress.h: Split zlib functions out of flthdr.c.
+	* flthdr.c: Use compress.h.
+	* elf2flt.c: Likewise.
+
 2008-02-20  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* configure.in (--with-binutils-build-dir): New helper flag.
