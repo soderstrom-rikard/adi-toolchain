@@ -14,7 +14,7 @@
  * they apply.
  */
 
-#ifdef _LANGUAGE_C
+#ifndef __ASSEMBLER__
 #pragma once
 #pragma system_header
 #endif
@@ -30,7 +30,7 @@
 #define NO_STARTUP_SET 0
 #define MAX_IN_STARTUP 1
 
-#ifdef _LANGUAGE_C
+#ifndef __ASSEMBLER__
 
 enum clkctrl_t {
     /* no modification of PLL rates in CRT startup - default */
@@ -70,7 +70,7 @@ int pll_set_system_vco(int _msel, int _df, int _lockcnt);
 }
 #endif
 
-#endif /* _LANGUAGE_C */
+#endif /* __ASSEMBLER__ */
 
 #ifdef _MISRA_RULES
 #pragma diag(pop)

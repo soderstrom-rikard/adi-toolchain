@@ -17,7 +17,7 @@
 #ifndef __ADI_PLATFORM_H
 #define __ADI_PLATFORM_H
 
-#ifdef _LANGUAGE_C
+#ifndef __ASSEMBLER__
 
 #if defined (__ADSPBF531__)
 #include <cdefBF531.h>
@@ -123,7 +123,7 @@
 #error Processor Type Not Supported
 #endif
 
-#endif /* _LANGUAGE_C */
+#endif /* __ASSEMBLER__ */
 
 #endif /* __INC_BLACKFIN__ */
 
