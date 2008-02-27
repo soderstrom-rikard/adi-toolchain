@@ -1988,7 +1988,7 @@ int main(int argc, char *argv[])
   write(fd, &hdr, sizeof(hdr));
   close(fd);
 
-  if (fopen_stream_u(&gf, "ofile", "a" BINARY_FILE_OPTS)) {
+  if (fopen_stream_u(&gf, ofile, "a" BINARY_FILE_OPTS)) {
   	fprintf(stderr, "Can't open file %s for writing\n", ofile);
 	exit(4);
   }
