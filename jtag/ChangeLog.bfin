@@ -1,0 +1,6 @@
+2008-03-15  Jie Zhang  <jie.zhang@analog.com>
+
+	* include/chain.h (EXITMODE_EXIT1): Redefine as 3.
+	(EXITMODE_UPDATE): Define as 2.
+	* src/tap/tap.c (tap_defer_shift_register): Enter Update-DR
+	or Update-IR when requested.
