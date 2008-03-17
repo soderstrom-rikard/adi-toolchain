@@ -1,3 +1,8 @@
+2008-03-17  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* gas/bfin/expected_errors.l, gas/bfin/expected_errors.s:
+	Check error messages for invalid load/store insns.
+
 2007-09-05  Jie Zhang  <jie.zhang@analog.com>
 
 	* gas/bfin/expected_comparison_errors.s: Add more cases.

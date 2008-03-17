@@ -1,3 +1,9 @@
+2008-03-17  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/gas/bfin-parse.y (asm_1): Clean up and unify error handling
+	for load and store insns.
+	(neg_value): Delete function.
+
 2007-09-28  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/tc-bfin.c (bfin_fix_adjustable): Partially revert the
