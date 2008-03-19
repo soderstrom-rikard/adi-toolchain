@@ -1,3 +1,7 @@
+2008-03-18  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin/interp.c (bfin_trap): Lose old code to detect stdout/stdin.
+
 2008-01-18  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/interp.c (bfin_trap): New syscall argument passing.

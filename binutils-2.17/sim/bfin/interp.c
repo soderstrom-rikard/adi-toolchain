@@ -121,10 +121,7 @@ bfin_trap ()
 	char *arg0 = (char *)(saved_state.memory + get_long (saved_state.memory, args));
 	bu32 arg1 = get_long (saved_state.memory, args + 4);
 	bu32 arg2 = get_long (saved_state.memory, args + 8);
-	if (strcmp (arg0, ":tt") == 0)
-	  DREG (0) = arg2 == 4 ? 0 : 1;
-	else
-	  DREG (0) = callback->open (callback, arg0, arg1);
+	DREG (0) = callback->open (callback, arg0, arg1);
       }
       return;
 
