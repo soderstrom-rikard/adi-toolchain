@@ -745,6 +745,8 @@ case $HOST_TARGET in
     --host=mingw*)   BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-nls"; UCLIBC_HOSTUTILS="XFAIL";;
     --host=*darwin*) BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-nls"; UCLIBC_HOSTUTILS="XFAIL";;
 esac
+# warnings with gcc-4.3 cause build failures
+BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-werror"
 
 for GCC_VER in $GCC_VERSIONS; do
     echo -n "Path to gcc-${GCC_VER} dir         "
