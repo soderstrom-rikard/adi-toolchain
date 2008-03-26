@@ -1,3 +1,8 @@
+2008-03-26  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* elf32-bfin.c (bfin_final_link_relocate): R_pcrel24 is one bit larger
+	than I assumed.
+
 2008-03-18  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* elf32-bfin.c (bfin_final_link_relocate): New function, wrapper around

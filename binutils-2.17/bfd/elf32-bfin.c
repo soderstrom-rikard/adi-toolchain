@@ -2112,8 +2112,8 @@ bfin_final_link_relocate (Elf_Internal_Rela *rel, reloc_howto_type *howto,
       value += 2;
       address -= 2;
 
-      if ((value & 0xFF800000) != 0
-	  && (value & 0xFF800000) != 0xFF800000)
+      if ((value & 0xFF000000) != 0
+	  && (value & 0xFF000000) != 0xFF000000)
 	r = bfd_reloc_overflow;
 
       value >>= 1;
