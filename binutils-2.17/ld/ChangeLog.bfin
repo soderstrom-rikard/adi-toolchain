@@ -1,3 +1,8 @@
+2008-04-01  Michael Frysinger  <michael.frysinger@analog.com>
+
+	* configure.tgt (bfin-*-linux-uclibc*): Set targ_emul to elf32bfinfd
+	and targ_extra_emuls to elf32bfin.
+
 2007-09-06  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* ldlang.c (lang_size_sections_1): Don't complain about sections in
