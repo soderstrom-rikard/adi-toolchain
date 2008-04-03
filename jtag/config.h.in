@@ -113,6 +113,9 @@
 /* define if experimental JEDEC flash detection is enabled */
 #undef JEDEC_EXP
 
+/* define for relocatable paths */
+#undef JTAG_RELOCATABLE
+
 /* Name of package */
 #undef PACKAGE
 

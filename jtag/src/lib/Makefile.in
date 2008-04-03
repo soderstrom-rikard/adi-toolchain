@@ -99,8 +99,13 @@ AR = ar
 ARFLAGS = cru
 libjtaglib_a_AR = $(AR) $(ARFLAGS)
 libjtaglib_a_LIBADD =
+am__libjtaglib_a_SOURCES_DIST = getdelim.c getline.c fclock.c \
+	lbasename.c lrealpath.c make-relative-prefix.c
+@JTAG_RELOCATABLE_TRUE@am__objects_1 = lbasename.$(OBJEXT) \
+@JTAG_RELOCATABLE_TRUE@	lrealpath.$(OBJEXT) \
+@JTAG_RELOCATABLE_TRUE@	make-relative-prefix.$(OBJEXT)
 am_libjtaglib_a_OBJECTS = getdelim.$(OBJEXT) getline.$(OBJEXT) \
-	fclock.$(OBJEXT)
+	fclock.$(OBJEXT) $(am__objects_1)
 libjtaglib_a_OBJECTS = $(am_libjtaglib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/tools/depcomp
@@ -110,7 +115,7 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libjtaglib_a_SOURCES)
-DIST_SOURCES = $(libjtaglib_a_SOURCES)
+DIST_SOURCES = $(am__libjtaglib_a_SOURCES_DIST)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -231,10 +236,17 @@ target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 noinst_LIBRARIES = libjtaglib.a
+@JTAG_RELOCATABLE_FALSE@libiberty_sources = 
+@JTAG_RELOCATABLE_TRUE@libiberty_sources = \
+@JTAG_RELOCATABLE_TRUE@	lbasename.c \
+@JTAG_RELOCATABLE_TRUE@	lrealpath.c \
+@JTAG_RELOCATABLE_TRUE@	make-relative-prefix.c
+
 libjtaglib_a_SOURCES = \
 	getdelim.c \
 	getline.c \
-	fclock.c
+	fclock.c \
+	$(libiberty_sources)
 
 all: all-am
 
@@ -286,6 +298,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fclock.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getdelim.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getline.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lbasename.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lrealpath.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/make-relative-prefix.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

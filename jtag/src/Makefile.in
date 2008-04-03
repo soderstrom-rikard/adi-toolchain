@@ -262,8 +262,8 @@ bsdl2jtag_SOURCES = \
 jtag_DEPENDENCIES = flash/libflash.a lib/libjtaglib.a tap/libtap.a \
 	part/libpart.a bus/libbus.a cmd/libcmd.a $(am__append_3) \
 	$(am__append_4) $(am__append_9)
-jtag_LDADD = -Ltap -ltap -Lpart -lpart -Llib -ljtaglib -Lflash -lflash \
-	-Lcmd -lcmd -Ltap -ltap -Lflash -lflash -Lbus -lbus -lm \
+jtag_LDADD = -Ltap -ltap -Lpart -lpart -Lflash -lflash -Lcmd -lcmd \
+	-Ltap -ltap -Lflash -lflash -Lbus -lbus -lm -Llib -ljtaglib \
 	@FTD2XXLIB@ @LIBINTL@ $(am__append_5) $(am__append_6) \
 	$(am__append_8)
 INCLUDES = -DLOCALEDIR=\"$(localedir)\"

@@ -106,7 +106,7 @@ am__libcmd_a_SOURCES_DIST = frequency.c cable.c reset.c discovery.c \
 	bit.c register.c initbus.c print.c part.c bus.c instruction.c \
 	shift.c dr.c get.c test.c debug.c shell.c set.c endian.c \
 	parse.c peekpoke.c readmem.c writemem.c flashmem.c \
-	eraseflash.c include.c cmd.c svf.c bsdl.c
+	eraseflash.c include.c cmd.c jtag_data_dir.c svf.c bsdl.c
 @ENABLE_SVF_TRUE@am__objects_1 = svf.$(OBJEXT)
 @ENABLE_BSDL_TRUE@am__objects_2 = bsdl.$(OBJEXT)
 am_libcmd_a_OBJECTS = frequency.$(OBJEXT) cable.$(OBJEXT) \
@@ -119,8 +119,8 @@ am_libcmd_a_OBJECTS = frequency.$(OBJEXT) cable.$(OBJEXT) \
 	debug.$(OBJEXT) shell.$(OBJEXT) set.$(OBJEXT) endian.$(OBJEXT) \
 	parse.$(OBJEXT) peekpoke.$(OBJEXT) readmem.$(OBJEXT) \
 	writemem.$(OBJEXT) flashmem.$(OBJEXT) eraseflash.$(OBJEXT) \
-	include.$(OBJEXT) cmd.$(OBJEXT) $(am__objects_1) \
-	$(am__objects_2)
+	include.$(OBJEXT) cmd.$(OBJEXT) jtag_data_dir.$(OBJEXT) \
+	$(am__objects_1) $(am__objects_2)
 libcmd_a_OBJECTS = $(am_libcmd_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/tools/depcomp
@@ -256,8 +256,9 @@ libcmd_a_SOURCES = frequency.c cable.c reset.c discovery.c detect.c \
 	register.c initbus.c print.c part.c bus.c instruction.c \
 	shift.c dr.c get.c test.c debug.c shell.c set.c endian.c \
 	parse.c peekpoke.c readmem.c writemem.c flashmem.c \
-	eraseflash.c include.c cmd.c $(am__append_1) $(am__append_2)
-INCLUDES = -DJTAG_DATA_DIR=\"$(pkgdatadir)\"
+	eraseflash.c include.c cmd.c jtag_data_dir.c $(am__append_1) \
+	$(am__append_2)
+AM_CPPFLAGS = -DJTAG_BIN_DIR=\"$(bindir)\" -DJTAG_DATA_DIR=\"$(pkgdatadir)\"
 all: all-am
 
 .SUFFIXES:
@@ -324,6 +325,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/include.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/initbus.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/instruction.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jtag_data_dir.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parse.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/part.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/peekpoke.Po@am__quote@

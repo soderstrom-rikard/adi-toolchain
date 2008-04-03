@@ -68,13 +68,13 @@ endif
 jtag_LDADD = \
 	-Ltap -ltap \
 	-Lpart -lpart \
-	-Llib -ljtaglib \
 	-Lflash -lflash \
 	-Lcmd -lcmd \
 	-Ltap -ltap \
 	-Lflash -lflash \
 	-Lbus -lbus \
 	-lm \
+	-Llib -ljtaglib \
 	@FTD2XXLIB@ \
 	@LIBINTL@
 

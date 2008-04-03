@@ -254,7 +254,6 @@ MAINTAINERCLEANFILES = \
 	bsdl_bison.h \
 	bsdl_flex.c
 
-INCLUDES = -DJTAG_DATA_DIR=\"$(pkgdatadir)\"
 all: all-am
 
 .SUFFIXES:
