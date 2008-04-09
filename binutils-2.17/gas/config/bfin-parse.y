@@ -4452,7 +4452,7 @@ binary (Expr_Op_Type op, Expr_Node *x, Expr_Node *y)
 	  break;
 
 	default:
-	  error ("%s:%d: Internal compiler error\n", __FILE__, __LINE__); 
+	  error ("%s:%d: Internal assembler error\n", __FILE__, __LINE__); 
 	}
       return x;
     }
@@ -4498,7 +4498,7 @@ unary (Expr_Op_Type op, Expr_Node *x)
 	  x->value.i_value = ~x->value.i_value;
 	  break;
 	default:
-	  error ("%s:%d: Internal compiler error\n", __FILE__, __LINE__); 
+	  error ("%s:%d: Internal assembler error\n", __FILE__, __LINE__); 
 	}
       return x;
     }
