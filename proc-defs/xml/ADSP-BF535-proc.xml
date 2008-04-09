@@ -37,6 +37,7 @@
 	<register name="ILATbit1"  parent="ILAT" bit-position="1"  type="" description="child register" bit-size="1"/>
 	<register name="ILATbit2"  parent="ILAT" bit-position="2"  type="" description="child register" bit-size="1"/>
 	<register name="ILATbit3"  parent="ILAT" bit-position="3"  type="" description="child register" bit-size="1"/>
+	<register name="ILATbit4"  parent="ILAT" bit-position="4"  type="" description="child register" bit-size="1"/>
 	<register name="ILATbit5"  parent="ILAT" bit-position="5"  type="" description="child register" bit-size="1"/>
 	<register name="ILATbit6"  parent="ILAT" bit-position="6"  type="" description="child register" bit-size="1"/>
 	<register name="ILATbit7"  parent="ILAT" bit-position="7"  type="" description="child register" bit-size="1"/>
