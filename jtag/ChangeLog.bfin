@@ -1,3 +1,8 @@
+2008-04-10  Jie Zhang  <jie.zhang@analog.com>
+
+	* src/tap/cable/ft2232.c (ft2232_bfin_ujtag_init): No need
+	to set LOOPBACK_END.
+
 2008-04-09  Jie Zhang  <jie.zhang@analog.com>
 
 	* src/flash/flash.c (flashmem): Show the address when verifying.

@@ -474,10 +474,6 @@ ft2232_bfin_ujtag_init( cable_t *cable )
 	if (parport_open( p ))
 		return -1;
 
-	/* set loopback off */
-	push_to_send( params, LOOPBACK_END );
-	send_and_receive( cable, COMPLETELY );
-
 	/* safe default values */
 	params->low_byte_value = 0;
 	params->low_byte_dir   = 0;
