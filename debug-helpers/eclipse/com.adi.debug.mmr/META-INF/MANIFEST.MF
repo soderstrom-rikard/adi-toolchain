@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Mmr Plug-in
+Bundle-SymbolicName: com.adi.debug.mmr; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: com.adi.debug.core.registers.MMRViewUIPlugin
+Bundle-Vendor: ADI
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.debug.core,
+ org.eclipse.debug.ui,
+ org.eclipse.ui.workbench.texteditor
+Eclipse-LazyStart: true
+Export-Package: com.adi.debug,
+ com.adi.debug.core.registers,
+ com.adi.debug.ui.views,
+ com.adi.debug.ui.views.mmr,
+ com.adi.debug.utils
