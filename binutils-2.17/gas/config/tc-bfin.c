@@ -2258,8 +2258,10 @@ decode_LDSTii_0 (int iw0)
   int op = ((iw0 >> LDSTii_op_bit) & LDSTii_op_mask);
   int W = ((iw0 >> LDSTii_W_bit) & LDSTii_W_mask);
 
-  if (W == 0)
+  if (W == 0 && op != 3)
     return DREG_MASK (reg);
+  else if (W == 0 && op == 3)
+   return 0;
   else if (W == 1 && op == 0)
     return 0;
   else if (W == 1 && op == 1)
