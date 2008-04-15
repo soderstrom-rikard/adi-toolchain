@@ -511,6 +511,7 @@ lint-am: Makefile @MAINTAINER_MODE_TRUE@ $(top_srcdir)/Makefile.rules
 
 .PHONY: lint lint-am
 
+bsdl_bison.h: bsdl_bison.c
 bsdl_flex.o bsdl_sem.o: bsdl_bison.o
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
