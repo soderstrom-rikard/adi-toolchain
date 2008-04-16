@@ -815,6 +815,30 @@ if [ ! -d $DIR_LDR_UTILS_SOURCE ] ; then
     exit 1
 fi
 
+echo -n "Path to gdbproxy            "
+DIR_GDBPROXY_SOURCE=$DIR_SOURCE/gdbproxy
+echo $DIR_GDBPROXY_SOURCE
+if [ ! -d $DIR_GDBPROXY_SOURCE ] ; then
+    echo "Can't find gdbproxy source at $DIR_GDBPROXY_SOURCE"
+    exit 1
+fi
+
+echo -n "Path to libftdi             "
+DIR_LIBFTDI_SOURCE=$DIR_SOURCE/libftdi
+echo $DIR_LIBFTDI_SOURCE
+if [ ! -d $DIR_LIBFTDI_SOURCE ] ; then
+    echo "Can't find libftdi source at $DIR_LIBFTDI_SOURCE"
+    exit 1
+fi
+
+echo -n "Path to jtag                "
+DIR_JTAG_SOURCE=$DIR_SOURCE/jtag
+echo $DIR_JTAG_SOURCE
+if [ ! -d $DIR_JTAG_SOURCE ] ; then
+    echo "Can't find jtag source at $DIR_JTAG_SOURCE"
+    exit 1
+fi
+
 if [ $KERNEL_SOURCE ] ; then
     if [ ! $DIR_uC_OUTPUT ] ; then
         DIR_uC_OUTPUT=$DIR_BUILD/bfin-uclinux
@@ -2404,6 +2428,83 @@ if [ $KERNEL_SOURCE ] ; then
 
     change_dir $DIR_LDR_UTILS_SOURCE
     rm -rf "$DIR_LDR_UTILS_BUILD"
+
+    ######################## jtag/gdbproxy #######################
+
+    ### libftdi
+    if check_lib usb && ! check_lib ftdi ; then
+    DIR_LIBFTDI_BUILD=$DIR_BUILD/libftdi
+
+    change_dir $DIR_LIBFTDI_SOURCE
+
+    echo_date "Cleaning libftdi"
+    find . -print0 | xargs -0 touch -r . # fix autotool timestamps
+    rm -rf "$DIR_LIBFTDI_BUILD"
+    mkdir -p "$DIR_LIBFTDI_BUILD"
+    change_dir "$DIR_LIBFTDI_BUILD"
+
+    echo_date "Configuring libftdi"
+    run_cmd $DIR_LIBFTDI_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET --disable-shared --enable-static
+
+    echo_date "Building libftdi"
+    run_cmd $MAKE
+
+    echo_date "Installing libftdi"
+    run_cmd $MAKE install DESTDIR=$PWD/destdir
+    fi
+
+    ### jtag
+    DIR_JTAG_BUILD=$DIR_BUILD/jtag
+
+    change_dir $DIR_JTAG_SOURCE
+
+    echo_date "Cleaning jtag"
+    find . -print0 | xargs -0 touch -r . # fix autotool timestamps
+    rm -rf "$DIR_JTAG_BUILD"
+    mkdir -p "$DIR_JTAG_BUILD"
+    change_dir "$DIR_JTAG_BUILD"
+
+    echo_date "Configuring jtag"
+    run_cmd env \
+        CPPFLAGS="-I$DIR_LIBFTDI_BUILD/destdir/include " \
+        LDFLAGS="-L$DIR_LIBFTDI_BUILD/destdir/lib" \
+        $DIR_JTAG_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET --enable-relocatable
+
+    echo_date "Building jtag"
+    run_cmd $MAKE
+
+    echo_date "Installing jtag"
+    run_cmd $MAKE install DESTDIR=$DIR_ELF_OUTPUT   program_transform_name=s,^,bfin-elf-,
+    run_cmd $MAKE install DESTDIR=$DIR_uC_OUTPUT    program_transform_name=s,^,bfin-uclinux-,
+    run_cmd $MAKE install DESTDIR=$DIR_LINUX_OUTPUT program_transform_name=s,^,bfin-linux-uclibc-,
+
+    ### gdbproxy
+    DIR_GDBPROXY_BUILD=$DIR_BUILD/gdbproxy
+
+    change_dir $DIR_GDBPROXY_SOURCE
+
+    echo_date "Cleaning gdbproxy"
+    find . -print0 | xargs -0 touch -r . # fix autotool timestamps
+    rm -rf "$DIR_GDBPROXY_BUILD"
+    mkdir -p "$DIR_GDBPROXY_BUILD"
+    change_dir "$DIR_GDBPROXY_BUILD"
+
+    echo_date "Configuring gdbproxy"
+    run_cmd env \
+        CPPFLAGS="-I$DIR_LIBFTDI_BUILD/destdir/include " \
+        LDFLAGS="-L$DIR_LIBFTDI_BUILD/destdir/lib" \
+        $DIR_GDBPROXY_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET \
+        --with-jtag-srcdir=$DIR_JTAG_SOURCE --with-jtag-build=$DIR_JTAG_BUILD
+
+    echo_date "Building gdbproxy"
+    run_cmd $MAKE
+
+    echo_date "Installing gdbproxy"
+    run_cmd $MAKE install DESTDIR=$DIR_ELF_OUTPUT   program_transform_name=s,^,bfin-elf-,
+    run_cmd $MAKE install DESTDIR=$DIR_uC_OUTPUT    program_transform_name=s,^,bfin-uclinux-,
+    run_cmd $MAKE install DESTDIR=$DIR_LINUX_OUTPUT program_transform_name=s,^,bfin-linux-uclibc-,
+
+    rm -rf "$DIR_LIBFTDI_BUILD" "$DIR_JTAG_BUILD" "$DIR_GDBPROXY_BUILD"
 
     ######################## U-Boot ##############################
 
