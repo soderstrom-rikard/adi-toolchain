@@ -35,7 +35,7 @@
 .file_attr libFunc       = __atan2_fr16;
 .file_attr libFunc       = atan2_fr16;
 /* atan2_fr16: called by arg_fr16 */
-.file_attr libGroup      = complex.h;
+.file_attr libGroup      = complex_fns.h;
 .file_attr libFunc       = __arg_fr16;
 .file_attr libFunc       = arg_fr16;
 /* atan2_fr16: arg_fr16: called by cartesian_fr16 */

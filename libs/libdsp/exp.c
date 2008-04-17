@@ -76,7 +76,7 @@
 #include <math.h>
 #include "util.h"
 #include <math_const.h>
-#include <complex.h>
+#include <complex_fns.h>
 
 FLOAT _expf(FLOAT x)                        
 {

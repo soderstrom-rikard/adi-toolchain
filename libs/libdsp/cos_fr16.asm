@@ -58,7 +58,7 @@
 .file_attr libFunc       = __twidfft_fr16;
 .file_attr FuncName      = __twidfft_fr16;
 /* Called by polar_fr16 */
-.file_attr libGroup      = complex.h;
+.file_attr libGroup      = complex_fns.h;
 .file_attr libFunc       = polar_fr16;
 .file_attr libFunc       = __polar_fr16;
 .file_attr FuncName      = __polar_fr16;

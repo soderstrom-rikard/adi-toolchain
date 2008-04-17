@@ -37,7 +37,7 @@ headers := \
 	stats.h util.h vector.h video.h window.h xcycle_count.h
 
 ifneq ($(LIBC_HAS_NO_CMATH),)
-headers += complex.h
+headers += complex_fns.h
 endif
 
 all: all-libdsp

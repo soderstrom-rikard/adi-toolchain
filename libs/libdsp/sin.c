@@ -19,7 +19,7 @@
 #pragma file_attr("libFunc  =sin")
 
     /* Called by polarf */
-#pragma file_attr("libGroup =complex.h")
+#pragma file_attr("libGroup =complex_fns.h")
 #pragma file_attr("libFunc  =polarf")
 #pragma file_attr("libFunc  =__polarf")
 #pragma file_attr("libFunc  =polar")

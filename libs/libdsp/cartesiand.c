@@ -15,17 +15,17 @@
  * Description :   Cartesian to polar conversion
  */
 
-#pragma file_attr("libGroup =complex.h")
+#pragma file_attr("libGroup =complex_fns.h")
 #pragma file_attr("libFunc  =cartesiand")
-#pragma file_attr("libFunc  =__cartesiand")     //from complex.h
-#pragma file_attr("libFunc  =cartesian")        //from complex.h
+#pragma file_attr("libFunc  =__cartesiand")     //from complex_fns.h
+#pragma file_attr("libFunc  =cartesian")        //from complex_fns.h
 
 #pragma file_attr("libName =libdsp")
 #pragma file_attr("prefersMem =internal")
 #pragma file_attr("prefersMemNum =30")
 
 /* Defined in */
-#include <complex.h>
+#include <complex_fns.h>
 
 #include <math.h>
 

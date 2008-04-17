@@ -15,7 +15,7 @@
    from cartesian to polar notation. 
  */
 
-#pragma file_attr("libGroup =complex.h")
+#pragma file_attr("libGroup =complex_fns.h")
 #pragma file_attr("libFunc  =__cartesian_fr16")
 #pragma file_attr("libFunc  =cartesian_fr16")
 
@@ -23,7 +23,7 @@
 #pragma file_attr("prefersMem =internal")
 #pragma file_attr("prefersMemNum =30")
 
-#include <complex.h>
+#include <complex_fns.h>
 
 fract16 _cartesian_fr16 ( complex_fract16 a, fract16* phase )
 {

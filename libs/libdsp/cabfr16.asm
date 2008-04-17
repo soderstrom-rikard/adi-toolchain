@@ -20,7 +20,7 @@
 
 #if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
-.file_attr libGroup      = complex.h;
+.file_attr libGroup      = complex_fns.h;
 .file_attr libFunc       = __cabs_fr16;
 .file_attr libFunc       = cabs_fr16;
 /* Called by cartesian_fr16 */

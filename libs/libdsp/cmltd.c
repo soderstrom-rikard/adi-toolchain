@@ -15,7 +15,7 @@
  * Description :   Complex multiplication
  */
 
-#pragma file_attr("libGroup =complex.h")
+#pragma file_attr("libGroup =complex_fns.h")
 #pragma file_attr("libFunc  =cmltd")
 #pragma file_attr("libFunc  =__cmltd")
 #pragma file_attr("libFunc  =cmlt")
@@ -24,7 +24,7 @@
 #pragma file_attr("prefersMemNum =30")
 
 /* Defined in */
-#include <complex.h>
+#include <complex_fns.h>
 
 
 complex_long_double               /*{ ret - Complex product        }*/

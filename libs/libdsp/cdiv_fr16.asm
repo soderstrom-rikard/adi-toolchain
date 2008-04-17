@@ -12,7 +12,7 @@
  ************************************************************************/
 
 #if 0
-  Include File   : complex.h
+  Include File   : complex_fns.h
   Label Name     : __cdiv_fr16
 
   Description    : This function performs division of two complex
@@ -30,7 +30,7 @@
 
 #if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
-.file_attr libGroup      = complex.h;
+.file_attr libGroup      = complex_fns.h;
 .file_attr libFunc       = __cdiv_fr16;
 .file_attr libFunc       = cdiv_fr16;
 .file_attr libName = libdsp;

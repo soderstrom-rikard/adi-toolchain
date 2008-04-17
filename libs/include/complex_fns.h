@@ -1,6 +1,6 @@
 /************************************************************************
  *
- * complex.h
+ * complex_fns.h
  *
  * Copyright (C) 1996-2007 Analog Devices, Inc.
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -13,7 +13,7 @@
 
 #pragma once
 #ifndef __NO_BUILTIN
-#pragma system_header /* complex.h */
+#pragma system_header /* complex_fns.h */
 #endif
 
 #ifndef __COMPLEX_DEFINED

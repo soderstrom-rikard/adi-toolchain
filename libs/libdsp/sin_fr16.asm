@@ -41,7 +41,7 @@
 /* Called by polar_fr16 */
 #if !defined(__NO_LIBRARY_ATTRIBUTES__)
 
-.file_attr libGroup      = complex.h;
+.file_attr libGroup      = complex_fns.h;
 .file_attr libFunc       = polar_fr16;
 .file_attr libFunc       = __polar_fr16;
 

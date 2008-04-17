@@ -12,7 +12,7 @@
 
 ******************************************************************/
 
-#pragma file_attr("libGroup =complex.h")
+#pragma file_attr("libGroup =complex_fns.h")
 #pragma file_attr("libFunc  =__cmlt_fr16")
 #pragma file_attr("libFunc  =cmlt_fr16")
 #pragma file_attr("libName =libdsp")
@@ -20,7 +20,7 @@
 #pragma file_attr("prefersMemNum =30")
 
 #include <fract.h>
-#include <complex.h>
+#include <complex_fns.h>
 
 complex_fract16 _cmlt_fr16 ( complex_fract16 a, complex_fract16 b )
 {

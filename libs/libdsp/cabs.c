@@ -12,27 +12,27 @@
 
 ***************************************************************************/
 
-#pragma file_attr("libGroup =complex.h")
-#pragma file_attr("libFunc  =cabsf")       //from complex.h
+#pragma file_attr("libGroup =complex_fns.h")
+#pragma file_attr("libFunc  =cabsf")       //from complex_fns.h
 #pragma file_attr("libFunc  =__cabsf")
-#pragma file_attr("libFunc  =cabs")        //from complex.h
+#pragma file_attr("libFunc  =cabs")        //from complex_fns.h
 
 /* Called by normf */
-#pragma file_attr("libFunc  =normf")       //from complex.h
+#pragma file_attr("libFunc  =normf")       //from complex_fns.h
 #pragma file_attr("libFunc  =__normf")
-#pragma file_attr("libFunc  =norm")        //from complex.h
+#pragma file_attr("libFunc  =norm")        //from complex_fns.h
 
 /* Called by cartesianf */
-#pragma file_attr("libFunc  =cartesianf")       //from complex.h
+#pragma file_attr("libFunc  =cartesianf")       //from complex_fns.h
 #pragma file_attr("libFunc  =__cartesianf")
-#pragma file_attr("libFunc  =cartesian")        //from complex.h
+#pragma file_attr("libFunc  =cartesian")        //from complex_fns.h
 
 #pragma file_attr("libName =libdsp")
 #pragma file_attr("prefersMem =internal")
 #pragma file_attr("prefersMemNum =30")
 
 #include <math.h>
-#include <complex.h>
+#include <complex_fns.h>
 
 float _cabsf(complex_float a)
 {

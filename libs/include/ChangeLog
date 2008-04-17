@@ -1,3 +1,7 @@
+2008-04-17  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* complex_fns.h: Renamed from complex.h.
+
 2007-08-16  Jie Zhang  <jie.zhang@analog.com>
 
 	* math_bf.h (alogf): Don't declare.

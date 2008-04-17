@@ -15,7 +15,7 @@
  * Description :   Calculate the phase of a complex number.
  */
 
-#pragma file_attr("libGroup =complex.h")
+#pragma file_attr("libGroup =complex_fns.h")
 #pragma file_attr("libFunc  =__argd")
 #pragma file_attr("libFunc  =argd")
 #pragma file_attr("libFunc  =arg")
@@ -29,7 +29,7 @@
 #pragma file_attr("prefersMemNum =30")
 
 /* Defined in */
-#include <complex.h>
+#include <complex_fns.h>
 
 #include <math.h>
 

@@ -20,7 +20,7 @@
 #pragma file_attr("prefersMem =internal")
 #pragma file_attr("prefersMemNum =30")
 
-#include <complex.h>
+#include <complex_fns.h>
 #include <vector.h>
 
 complex_float           /*{ ret - Complex dot product }*/

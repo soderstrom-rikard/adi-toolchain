@@ -19,17 +19,17 @@
 
 ****************************************************************************/
 
-#pragma file_attr("libGroup =complex.h")
+#pragma file_attr("libGroup =complex_fns.h")
 #pragma file_attr("libFunc  =polarf")
-#pragma file_attr("libFunc  =__polarf")     //from complex.h
-#pragma file_attr("libFunc  =polar")        //from complex.h
+#pragma file_attr("libFunc  =__polarf")     //from complex_fns.h
+#pragma file_attr("libFunc  =polar")        //from complex_fns.h
 
 #pragma file_attr("libName =libdsp")
 #pragma file_attr("prefersMem =internal")
 #pragma file_attr("prefersMemNum =30")
 
 #include <math.h>
-#include <complex.h>
+#include <complex_fns.h>
 
 complex_float _polarf(float mag, float phase )
 {

@@ -17,27 +17,27 @@
  */
 
 
-#pragma file_attr("libGroup =complex.h")
+#pragma file_attr("libGroup =complex_fns.h")
 #pragma file_attr("libFunc  =cabsd")
-#pragma file_attr("libFunc  =__cabsd")     //from complex.h
-#pragma file_attr("libFunc  =cabs")        //from complex.h
+#pragma file_attr("libFunc  =__cabsd")     //from complex_fns.h
+#pragma file_attr("libFunc  =cabs")        //from complex_fns.h
 
 /* Called by normd */
 #pragma file_attr("libFunc  =normd")
-#pragma file_attr("libFunc  =__normd")     //from complex.h
-#pragma file_attr("libFunc  =norm")        //from complex.h
+#pragma file_attr("libFunc  =__normd")     //from complex_fns.h
+#pragma file_attr("libFunc  =norm")        //from complex_fns.h
 
 /* Called by cartesiand */
 #pragma file_attr("libFunc  =cartesiand")
-#pragma file_attr("libFunc  =__cartesiand")     //from complex.h
-#pragma file_attr("libFunc  =cartesian")        //from complex.h
+#pragma file_attr("libFunc  =__cartesiand")     //from complex_fns.h
+#pragma file_attr("libFunc  =cartesian")        //from complex_fns.h
 
 #pragma file_attr("libName =libdsp")
 #pragma file_attr("prefersMem =internal")
 #pragma file_attr("prefersMemNum =30")
 
 /* Defined in */
-#include <complex.h>
+#include <complex_fns.h>
 
 #include <math.h>
 

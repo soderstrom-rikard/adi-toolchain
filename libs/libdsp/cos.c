@@ -19,7 +19,7 @@
 #pragma file_attr("libFunc  =cos")
 
     /* Called by cexpf */
-#pragma file_attr("libGroup =complex.h")
+#pragma file_attr("libGroup =complex_fns.h")
 #pragma file_attr("libFunc  =cexpf")
 #pragma file_attr("libFunc  =__cexpf")
 #pragma file_attr("libFunc  =cexp")

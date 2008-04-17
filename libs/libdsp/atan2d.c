@@ -17,7 +17,7 @@
 #pragma file_attr("libFunc  =atan2l")
 #pragma file_attr("libFunc  =atan2")
 /* Called by argd */
-#pragma file_attr("libGroup =complex.h")
+#pragma file_attr("libGroup =complex_fns.h")
 #pragma file_attr("libFunc  =__argd")
 #pragma file_attr("libFunc  =argd")
 #pragma file_attr("libFunc  =arg")

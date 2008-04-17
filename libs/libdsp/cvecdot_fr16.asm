@@ -17,7 +17,7 @@
 
     Synopsis:
 
-        #include <complex.h>
+        #include <complex_fns.h>
         complex_fract16 cvecdot_fr16 (const complex_fract16 vector_a[],
                                       const complex_fract16 vector_b[],
                                       int length);

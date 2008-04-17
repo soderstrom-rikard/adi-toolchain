@@ -17,17 +17,17 @@
  *                   c.imag = a.imag / sqrt( (a.real)^2 + (a.imag)^2 )
  */
 
-#pragma file_attr("libGroup =complex.h")
+#pragma file_attr("libGroup =complex_fns.h")
 #pragma file_attr("libFunc  =normd")
-#pragma file_attr("libFunc  =__normd")     //from complex.h
-#pragma file_attr("libFunc  =norm")        //from complex.h
+#pragma file_attr("libFunc  =__normd")     //from complex_fns.h
+#pragma file_attr("libFunc  =norm")        //from complex_fns.h
 
 #pragma file_attr("libName =libdsp")
 #pragma file_attr("prefersMem =internal")
 #pragma file_attr("prefersMemNum =30")
 
 /* Defined in */
-#include <complex.h>
+#include <complex_fns.h>
 
 #include <math.h>
 

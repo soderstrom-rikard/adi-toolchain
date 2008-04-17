@@ -11,10 +11,10 @@
  *
  ************************************************************************/
 
-#pragma file_attr("libGroup =complex.h")
+#pragma file_attr("libGroup =complex_fns.h")
 #pragma file_attr("libFunc  =caddd")
-#pragma file_attr("libFunc  =__caddd")     //from complex.h
-#pragma file_attr("libFunc  =cadd")        //from complex.h
+#pragma file_attr("libFunc  =__caddd")     //from complex_fns.h
+#pragma file_attr("libFunc  =cadd")        //from complex_fns.h
 
 #pragma file_attr("libName =libdsp")
 #pragma file_attr("prefersMem =internal")
@@ -25,7 +25,7 @@
  */
 
 /* Defined in */
-#include <complex.h>
+#include <complex_fns.h>
 
 
 complex_long_double               /*{ ret - Complex sum            }*/

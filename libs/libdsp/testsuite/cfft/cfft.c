@@ -10,7 +10,7 @@
  */
 
 #include <fract.h>
-#include <complex.h>
+#include <complex_fns.h>
 #include <filter.h>
 #include <stdio.h>
 #include <stdlib.h>

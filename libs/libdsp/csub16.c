@@ -12,14 +12,14 @@
 
 *******************************************************************/
 
-#pragma file_attr("libGroup =complex.h")
+#pragma file_attr("libGroup =complex_fns.h")
 #pragma file_attr("libFunc  =csub_fr16")
 #pragma file_attr("libFunc  =__csub_fr16")
 #pragma file_attr("libName =libdsp")
 #pragma file_attr("prefersMem =internal")
 #pragma file_attr("prefersMemNum =30")
 
-#include <complex.h>
+#include <complex_fns.h>
 
 complex_fract16 _csub_fr16( complex_fract16 a, complex_fract16 b)
 {

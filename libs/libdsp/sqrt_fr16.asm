@@ -80,7 +80,7 @@
 .FILE_ATTR libFunc       = sqrt_fr16;
 
 /* Called from cabfr16.asm */
-.FILE_ATTR libGroup      = complex.h;
+.FILE_ATTR libGroup      = complex_fns.h;
 .FILE_ATTR libFunc       = cabs_fr16;
 .FILE_ATTR libFunc       = __cabs_fr16;
 

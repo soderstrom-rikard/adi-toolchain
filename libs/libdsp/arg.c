@@ -12,7 +12,7 @@
 
 *********************************************************************/
 
-#pragma file_attr("libGroup =complex.h")
+#pragma file_attr("libGroup =complex_fns.h")
 #pragma file_attr("libFunc  =__argf")
 #pragma file_attr("libFunc  =argf")
 #pragma file_attr("libFunc  =arg")
@@ -26,7 +26,7 @@
 #pragma file_attr("prefersMemNum =30")
 
 #include <math.h>
-#include <complex.h>
+#include <complex_fns.h>
 
 float _argf( complex_float a )
 {

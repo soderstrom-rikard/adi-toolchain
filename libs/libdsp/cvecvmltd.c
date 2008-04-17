@@ -26,7 +26,7 @@
 /* Defined in */
 #include <vector.h>
 
-#include <complex.h>
+#include <complex_fns.h>
 
 
 void

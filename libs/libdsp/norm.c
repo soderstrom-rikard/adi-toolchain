@@ -12,17 +12,17 @@
 
 ****************************************************************************/
 
-#pragma file_attr("libGroup =complex.h")
-#pragma file_attr("libFunc  =normf")       //from complex.h
+#pragma file_attr("libGroup =complex_fns.h")
+#pragma file_attr("libFunc  =normf")       //from complex_fns.h
 #pragma file_attr("libFunc  =__normf")
-#pragma file_attr("libFunc  =norm")        //from complex.h
+#pragma file_attr("libFunc  =norm")        //from complex_fns.h
 
 #pragma file_attr("libName =libdsp")
 #pragma file_attr("prefersMem =internal")
 #pragma file_attr("prefersMemNum =30")
 
 #include <math.h>
-#include <complex.h>
+#include <complex_fns.h>
 
 complex_float _normf(complex_float a )
 {

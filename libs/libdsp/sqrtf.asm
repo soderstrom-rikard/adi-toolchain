@@ -49,7 +49,7 @@
 .file_attr libFunc  = asinf;
 
       /* Called from cabsf */
-.file_attr libGroup = complex.h;
+.file_attr libGroup = complex_fns.h;
 .file_attr libFunc  = cabsf;
 .file_attr libFunc  = __cabsf;
 .file_attr libFunc  = cabs;

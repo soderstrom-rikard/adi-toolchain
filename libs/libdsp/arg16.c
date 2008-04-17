@@ -12,7 +12,7 @@
     
 ***************************************************************************/
 
-#pragma file_attr("libGroup =complex.h")
+#pragma file_attr("libGroup =complex_fns.h")
 #pragma file_attr("libFunc  =__arg_fr16")
 #pragma file_attr("libFunc  =arg_fr16")
 /* Called by cartesian_fr16 */
@@ -24,7 +24,7 @@
 #pragma file_attr("prefersMemNum =30")
 
 
-#include <complex.h>
+#include <complex_fns.h>
 #include <math.h>
 #include <fract_math.h>
 

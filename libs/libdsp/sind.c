@@ -33,15 +33,15 @@
 #pragma file_attr("libFunc  =sin")         //from math.h
 
 /* Called by polard */
-#pragma file_attr("libGroup =complex.h")
+#pragma file_attr("libGroup =complex_fns.h")
 #pragma file_attr("libFunc  =polard")  
-#pragma file_attr("libFunc  =__polard")     //from complex.h
-#pragma file_attr("libFunc  =polar")        //from complex.h
+#pragma file_attr("libFunc  =__polard")     //from complex_fns.h
+#pragma file_attr("libFunc  =polar")        //from complex_fns.h
 
 /* Called by cexpd */
 #pragma file_attr("libFunc  =cexpd")  
-#pragma file_attr("libFunc  =__cexpd")      //from complex.h
-#pragma file_attr("libFunc  =cexp")         //from complex.h
+#pragma file_attr("libFunc  =__cexpd")      //from complex_fns.h
+#pragma file_attr("libFunc  =cexp")         //from complex_fns.h
 
 #pragma file_attr("libName =libdsp")
 #pragma file_attr("prefersMem =internal")

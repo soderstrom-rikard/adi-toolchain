@@ -13,7 +13,7 @@
 
 #pragma once
 #ifndef __NO_BUILTIN
-#pragma system_header /* complex.h */
+#pragma system_header /* complex_fns.h */
 #endif
 
 #ifndef __FRACT_COMPLEX_DEFINED

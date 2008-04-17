@@ -32,12 +32,12 @@
 #pragma file_attr("libFunc  =cosl")
 #pragma file_attr("libFunc  =cos")
 /* Called by polard */
-#pragma file_attr("libGroup =complex.h")
+#pragma file_attr("libGroup =complex_fns.h")
 #pragma file_attr("libFunc  =polard")
 #pragma file_attr("libFunc  =__polard")
 #pragma file_attr("libFunc  =polar")
 /* Called by cexpd */
-#pragma file_attr("libGroup =complex.h")
+#pragma file_attr("libGroup =complex_fns.h")
 #pragma file_attr("libFunc  =cexpd") 
 #pragma file_attr("libFunc  =__cexpd")
 #pragma file_attr("libFunc  =cexp")

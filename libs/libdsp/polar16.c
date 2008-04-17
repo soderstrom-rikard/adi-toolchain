@@ -24,8 +24,8 @@
 
 ***************************************************************************/
 
-#pragma file_attr("libGroup =complex.h")
-#pragma file_attr("libFunc  =polar_fr16")       //from complex.h
+#pragma file_attr("libGroup =complex_fns.h")
+#pragma file_attr("libFunc  =polar_fr16")       //from complex_fns.h
 #pragma file_attr("libFunc  =__polar_fr16")
 
 #pragma file_attr("libName =libdsp")
@@ -33,7 +33,7 @@
 #pragma file_attr("prefersMemNum =30")
 
 #include <math.h>
-#include <complex.h>
+#include <complex_fns.h>
 #include <fract.h> 
 
 #define  __MULTIPLY_32_16_16(a,b)  mult_fr1x32(a,b)
