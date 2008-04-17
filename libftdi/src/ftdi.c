@@ -508,15 +508,14 @@ int ftdi_usb_reset(struct ftdi_context *ftdi)
 }
 
 /**
-    Clears the buffers on the chip.
+    Clears the read buffer on the chip and the internal read buffer.
 
     \param ftdi pointer to ftdi_context
 
     \retval  0: all fine
-    \retval -1: write buffer purge failed
-    \retval -2: read buffer purge failed
+    \retval -1: read buffer purge failed
 */
-int ftdi_usb_purge_buffers(struct ftdi_context *ftdi)
+int ftdi_usb_purge_rx_buffer(struct ftdi_context *ftdi)
 {
     if (usb_control_msg(ftdi->usb_dev, 0x40, 0, 1, ftdi->index, NULL, 0, ftdi->usb_write_timeout) != 0)
         ftdi_error_return(-1, "FTDI purge of RX buffer failed");
@@ -525,8 +524,45 @@ int ftdi_usb_purge_buffers(struct ftdi_context *ftdi)
     ftdi->readbuffer_offset = 0;
     ftdi->readbuffer_remaining = 0;
 
+    return 0;
+}
+
+/**
+    Clears the write buffer on the chip.
+
+    \param ftdi pointer to ftdi_context
+
+    \retval  0: all fine
+    \retval -1: write buffer purge failed
+*/
+int ftdi_usb_purge_tx_buffer(struct ftdi_context *ftdi)
+{
     if (usb_control_msg(ftdi->usb_dev, 0x40, 0, 2, ftdi->index, NULL, 0, ftdi->usb_write_timeout) != 0)
-        ftdi_error_return(-2, "FTDI purge of TX buffer failed");
+        ftdi_error_return(-1, "FTDI purge of TX buffer failed");
+
+    return 0;
+}
+
+/**
+    Clears the buffers on the chip and the internal read buffer.
+
+    \param ftdi pointer to ftdi_context
+
+    \retval  0: all fine
+    \retval -1: read buffer purge failed
+    \retval -2: write buffer purge failed
+*/
+int ftdi_usb_purge_buffers(struct ftdi_context *ftdi)
+{
+    int result;
+
+    result = ftdi_usb_purge_rx_buffer(ftdi);
+    if (result < 0)
+        return -1;
+
+    result = ftdi_usb_purge_tx_buffer(ftdi);
+    if (result < 0)
+        return -2;
 
     return 0;
 }
@@ -1291,6 +1327,107 @@ int ftdi_get_latency_timer(struct ftdi_context *ftdi, unsigned char *latency)
 }
 
 /**
+    Poll modem status information
+
+    This function allows the retrieve the two status bytes of the device.
+    The device sends these bytes also as a header for each read access
+    where they are discarded by ftdi_read_data(). The chip generates
+    the two stripped status bytes in the absence of data every 40 ms.
+
+    Layout of the first byte:
+    - B0..B3 - must be 0
+    - B4       Clear to send (CTS)
+                 0 = inactive
+                 1 = active
+    - B5       Data set ready (DTS)
+                 0 = inactive
+                 1 = active
+    - B6       Ring indicator (RI)
+                 0 = inactive
+                 1 = active
+    - B7       Receive line signal detect (RLSD)
+                 0 = inactive
+                 1 = active
+
+    Layout of the second byte:
+    - B0       Data ready (DR)
+    - B1       Overrun error (OE)
+    - B2       Parity error (PE)
+    - B3       Framing error (FE)
+    - B4       Break interrupt (BI)
+    - B5       Transmitter holding register (THRE)
+    - B6       Transmitter empty (TEMT)
+    - B7       Error in RCVR FIFO
+
+    \param ftdi pointer to ftdi_context
+    \param status Pointer to store status information in. Must be two bytes.
+
+    \retval  0: all fine
+    \retval -1: unable to retrieve status information
+*/
+int ftdi_poll_modem_status(struct ftdi_context *ftdi, unsigned short *status)
+{
+    char usb_val[2];
+
+    if (usb_control_msg(ftdi->usb_dev, 0xC0, 0x05, 0, ftdi->index, usb_val, 2, ftdi->usb_read_timeout) != 2)
+        ftdi_error_return(-1, "getting modem status failed");
+
+    *status = (usb_val[1] << 8) | usb_val[0];
+
+    return 0;
+}
+
+/**
+    Set the special event character
+
+    \param ftdi pointer to ftdi_context
+    \param eventch Event character
+    \param enable 0 to disable the event character, non-zero otherwise
+
+    \retval  0: all fine
+    \retval -1: unable to set event character
+*/
+int ftdi_set_event_char(struct ftdi_context *ftdi,
+           unsigned char eventch, unsigned char enable)
+{
+    unsigned short usb_val;
+
+    usb_val = eventch;
+    if (enable)
+        usb_val |= 1 << 8;
+
+    if (usb_control_msg(ftdi->usb_dev, 0x40, 0x06, usb_val, ftdi->index, NULL, 0, ftdi->usb_write_timeout) != 0)
+        ftdi_error_return(-1, "setting event character failed");
+
+    return 0;
+}
+
+/**
+    Set error character
+
+    \param ftdi pointer to ftdi_context
+    \param errorch Error character
+    \param enable 0 to disable the error character, non-zero otherwise
+
+    \retval  0: all fine
+    \retval -1: unable to set error character
+*/
+int ftdi_set_error_char(struct ftdi_context *ftdi,
+          unsigned char errorch, unsigned char enable)
+{
+    unsigned short usb_val;
+
+    usb_val = errorch;
+    if (enable)
+        usb_val |= 1 << 8;
+
+    if (usb_control_msg(ftdi->usb_dev, 0x40, 0x07, usb_val, ftdi->index, NULL, 0, ftdi->usb_write_timeout) != 0)
+        ftdi_error_return(-1, "setting error character failed");
+
+    return 0;
+}
+
+/**
    Set the eeprom size
 
    \param ftdi pointer to ftdi_context
@@ -1395,19 +1532,19 @@ int ftdi_eeprom_build(struct ftdi_eeprom *eeprom, unsigned char *output)
         output[0x07] = 0x02;
 
     // Addr 08: Config descriptor
-    // Bit 1: remote wakeup if 1
-    // Bit 0: self powered if 1
-    //
-    j = 0;
+    // Bit 7: always 1
+    // Bit 6: 1 if this device is self powered, 0 if bus powered
+    // Bit 5: 1 if this device uses remote wakeup
+    // Bit 4: 1 if this device is battery powered
+    j = 0x80;
     if (eeprom->self_powered == 1)
-        j = j | 1;
+        j |= 0x40;
     if (eeprom->remote_wakeup == 1)
-        j = j | 2;
+        j |= 0x20;
     output[0x08] = j;
 
     // Addr 09: Max power consumption: max power = value * 2 mA
     output[0x09] = eeprom->max_power;
-    ;
 
     // Addr 0A: Chip configuration
     // Bit 7: 0 - reserved

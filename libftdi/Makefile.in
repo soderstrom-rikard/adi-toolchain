@@ -37,15 +37,15 @@ subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
 	$(srcdir)/libftdi-config.in $(srcdir)/libftdi.pc.in \
-	$(top_srcdir)/configure COPYING.LIB ChangeLog config.guess \
-	config.sub depcomp install-sh ltmain.sh missing mkinstalldirs
+	$(top_srcdir)/configure AUTHORS COPYING.LIB ChangeLog \
+	config.guess config.sub depcomp install-sh ltmain.sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = libftdi-config libftdi.pc
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pkgconfigdir)"
@@ -197,7 +197,7 @@ top_srcdir = @top_srcdir@
 # have all needed files, that a GNU package needs
 AUTOMAKE_OPTIONS = foreign 1.4
 SUBDIRS = src examples doc
-EXTRA_DIST = libftdi.spec COPYING.LIB README ChangeLog libftdi-config.in
+EXTRA_DIST = libftdi.spec COPYING.LIB README AUTHORS ChangeLog libftdi-config.in
 bin_SCRIPTS = libftdi-config
 
 # Install the pkg-config file:
