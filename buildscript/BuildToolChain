@@ -532,6 +532,16 @@ else
     rm -rf $DIR_LOG/*
 fi
 
+# make sure we arent running on a case insensitive filesystem
+cd $DIR_BUILD
+rm -rf .case.test .CASE.test
+echo case > .case.test
+case=$(cat .CASE.test 2>/dev/null)
+if [ "$case" = "case" ] ; then
+	echo "ERROR: you must use a case sensitive filesystem"
+	exit 1
+fi
+
 if [ "x$CHECK_ON_SIMULATOR" != "x" -o "x$CHECK_ON_HARDWARE" != "x" ] ; then
     echo "Path for test results       "
     DIR_TEST_RESULTS=$DIR_BUILD/tests
