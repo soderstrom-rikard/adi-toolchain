@@ -2596,11 +2596,11 @@ if [ -e $DIR_SOURCE/libs/Makefile ] ; then
 	dir=`echo ${ml} | sed -e 's/;.*$//'`
 	flags=`echo ${ml} | sed -e 's/^[^;]*;//' -e 's/@/ -/g'`
 
-	RUN="$MAKE clean"
+	RUN="$MAKE CROSS=bfin-elf- clean"
 	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 	(echo $RUN $LOGFILE ; ) | sh
 
-	RUN="$MAKE MULTILIB_FLAGS=\"$flags\""
+	RUN="$MAKE CROSS=bfin-elf- MULTILIB_FLAGS=\"$flags\""
 	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 	(echo $RUN $LOGFILE ; ) | sh
 
@@ -2621,11 +2621,11 @@ if [ -e $DIR_SOURCE/libs/Makefile ] ; then
 	    if [ $KERNEL_SOURCE ] ; then
 		if echo "${flags}" | grep -q mfdpic; then
 		    dir2=`echo ${dir} | sed -e 's/mfdpic//' -e 's|/$||'`
-		    RUN="$MAKE install DESTDIR=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime USR=/usr SUFFIX=/$dir2 MULTILIB="
+		    RUN="$MAKE CROSS=bfin-elf- install DESTDIR=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime USR=/usr SUFFIX=/$dir2 MULTILIB="
 		    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 		    (echo $RUN $LOGFILE ; ) | sh
 		else
-		    RUN="$MAKE install DESTDIR=$DIR_uC_OUTPUT/bfin-uclinux/runtime USR=/usr SUFFIX= MULTILIB=/$dir"
+		    RUN="$MAKE CROSS=bfin-elf- install DESTDIR=$DIR_uC_OUTPUT/bfin-uclinux/runtime USR=/usr SUFFIX= MULTILIB=/$dir"
 		    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 		    (echo $RUN $LOGFILE ; ) | sh
 		fi
@@ -2638,16 +2638,16 @@ if [ -e $DIR_SOURCE/libs/Makefile ] ; then
 	# Remove it instead of make clean can save much time.
 	rm $DIR_SOURCE/libs/libdsp/libbfdsp.a
 
-	RUN="$MAKE LIBC_HAS_NO_CMATH=1 MULTILIB_FLAGS=\"$flags\""
+	RUN="$MAKE CROSS=bfin-elf- LIBC_HAS_NO_CMATH=1 MULTILIB_FLAGS=\"$flags\""
 	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 	(echo $RUN $LOGFILE ; ) | sh
 
-	RUN="$MAKE LIBC_HAS_NO_CMATH=1 install DESTDIR=$DIR_ELF_OUTPUT/bfin-elf USR= SUFFIX= MULTILIB=/$dir"
+	RUN="$MAKE CROSS=bfin-elf- LIBC_HAS_NO_CMATH=1 install DESTDIR=$DIR_ELF_OUTPUT/bfin-elf USR= SUFFIX= MULTILIB=/$dir"
 	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 	(echo $RUN $LOGFILE ; ) | sh
     done
 
-    RUN="$MAKE clean"
+    RUN="$MAKE CROSS=bfin-elf- clean"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 fi

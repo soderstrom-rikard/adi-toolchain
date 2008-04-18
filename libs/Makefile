@@ -1,9 +1,9 @@
 include Makerules
 
-AR=bfin-elf-ar
-AS=bfin-elf-as
-CC=bfin-elf-gcc
-CXX=bfin-elf-g++
+AR=$(CROSS)ar
+AS=$(CROSS)as
+CC=$(CROSS)gcc
+CXX=$(CROSS)g++
 INSTALL=install
 INSTALL_DATA = $(INSTALL) -m 644
 TAR=tar
