@@ -1,3 +1,8 @@
+2008-04-18  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/linux-unwind.h: This header can be used only if
+	inhibit_libc is not defined.
+
 2008-03-20  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_longcall_p): Don't use short calls for weak

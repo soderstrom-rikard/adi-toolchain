@@ -29,6 +29,8 @@ Boston, MA 02110-1301, USA.  */
 /* Do code reading to identify a signal frame, and set the frame
    state data appropriately.  See unwind-dw2.c for the structs.  */
 
+#ifndef inhibit_libc
+
 #ifdef IN_LIBGCC2
 #include <signal.h>
 #include <sys/ucontext.h>
@@ -157,3 +159,5 @@ Boston, MA 02110-1301, USA.  */
     goto SUCCESS;							\
   } while (0)
 #endif /* IN_LIBGCC2 */
+
+#endif /* ifdef inhibit_libc */
