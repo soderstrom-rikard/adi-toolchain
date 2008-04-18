@@ -2504,7 +2504,7 @@ if [ $KERNEL_SOURCE ] ; then
         CPPFLAGS="-I$DIR_LIBFTDI_BUILD/destdir/include " \
         LDFLAGS="-L$DIR_LIBFTDI_BUILD/destdir/lib" \
         $DIR_GDBPROXY_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET \
-        --with-jtag-srcdir=$DIR_JTAG_SOURCE --with-jtag-build=$DIR_JTAG_BUILD
+        --with-jtag-srcdir=$DIR_JTAG_SOURCE --with-jtag-build=$DIR_JTAG_BUILD --enable-relocatable
 
     echo_date "Building gdbproxy"
     run_cmd $MAKE
