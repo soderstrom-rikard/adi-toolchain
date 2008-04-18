@@ -1,5 +1,6 @@
 include Makerules
 
+CROSS?=$(CROSS_COMPILE)
 AR=$(CROSS)ar
 AS=$(CROSS)as
 CC=$(CROSS)gcc
