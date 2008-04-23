@@ -2452,6 +2452,7 @@ if [ $KERNEL_SOURCE ] ; then
 
     echo_date "Cleaning libftdi"
     find . -print0 | xargs -0 touch -r . # fix autotool timestamps
+    [ -e Makefile ] && run_cmd $MAKE distclean
     rm -rf "$DIR_LIBFTDI_BUILD"
     mkdir -p "$DIR_LIBFTDI_BUILD"
     change_dir "$DIR_LIBFTDI_BUILD"
@@ -2473,6 +2474,7 @@ if [ $KERNEL_SOURCE ] ; then
 
     echo_date "Cleaning jtag"
     find . -print0 | xargs -0 touch -r . # fix autotool timestamps
+    [ -e Makefile ] && run_cmd $MAKE distclean
     rm -rf "$DIR_JTAG_BUILD"
     mkdir -p "$DIR_JTAG_BUILD"
     change_dir "$DIR_JTAG_BUILD"
@@ -2498,6 +2500,7 @@ if [ $KERNEL_SOURCE ] ; then
 
     echo_date "Cleaning gdbproxy"
     find . -print0 | xargs -0 touch -r . # fix autotool timestamps
+    [ -e Makefile ] && run_cmd $MAKE distclean
     rm -rf "$DIR_GDBPROXY_BUILD"
     mkdir -p "$DIR_GDBPROXY_BUILD"
     change_dir "$DIR_GDBPROXY_BUILD"
