@@ -3,15 +3,15 @@
 #
 
 define regs
-	printf "R0: %08x %-10i  P0: %08x      RETS: %08x\n",   $r0, $r0, $p0, $rets
-	printf "R1: %08x %-10i  P1: %08x      RETI: %08x\n",   $r1, $r1, $p1, $reti
-	printf "R2: %08x %-10i  P2: %08x      RETX: %08x\n",   $r2, $r2, $p2, $retx
-	printf "R3: %08x %-10i  P3: %08x      RETE: %08x\n",   $r3, $r3, $p3, $rete
-	printf "R4: %08x %-10i  P4: %08x      RETN: %08x\n",   $r4, $r4, $p4, $retn
-	printf "R5: %08x %-10i  P5: %08x     ASTAT: %08x\n",   $r5, $r5, $p5, $astat
-	printf "R6: %08x %-10i  SP: %08x        CC: %08x\n",   $r6, $r5, $sp, $cc
-	printf "R7: %08x %-10i USP: %08x   SEQSTAT: %08x\n", $r7, $r7, $usp, $seqstat
-	printf "PC: %08x %-10i  FP: %08x    SYSCFG: %08x\n", $pc, 0,   $fp, $syscfg
+	printf "R0: %08x %-10i    P0: %08x      RETS: %08x\n",   $r0, $r0, $p0, $rets
+	printf "R1: %08x %-10i    P1: %08x      RETI: %08x\n",   $r1, $r1, $p1, $reti
+	printf "R2: %08x %-10i    P2: %08x      RETX: %08x\n",   $r2, $r2, $p2, $retx
+	printf "R3: %08x %-10i    P3: %08x      RETE: %08x\n",   $r3, $r3, $p3, $rete
+	printf "R4: %08x %-10i    P4: %08x      RETN: %08x\n",   $r4, $r4, $p4, $retn
+	printf "R5: %08x %-10i    P5: %08x     ASTAT: %08x\n",   $r5, $r5, $p5, $astat
+	printf "R6: %08x %-10i    SP: %08x        CC: %08x\n",   $r6, $r5, $sp, $cc
+	printf "R7: %08x %-10i   USP: %08x   SEQSTAT: %08x\n", $r7, $r7, $usp, $seqstat
+	printf "PC: %08x %-10i    FP: %08x    SYSCFG: %08x\n", $pc, 0,   $fp, $syscfg
 end
 document regs
 Usage: regs
@@ -169,6 +169,10 @@ Cram the software reset code into [L1 Instruction address] and execute it.
 This will perform both a system reset and a core reset.
 end
 
+define hwtrace_on
+	set $$TBUFCTL  = (unsigned long *)0xFFE06000
+	*$$TBUFCTL = 0x3
+end
 define hwtrace
 	set $$TBUFSTAT = (unsigned long *)0xFFE06004
 	set $$TBUF = (unsigned long *)0xFFE06100
