@@ -563,6 +563,7 @@ OBJ_FORMAT_CFILES = \
 	config/obj-ecoff.c \
 	config/obj-elf.c \
 	config/obj-evax.c \
+	config/obj-fdpicelf.c \
 	config/obj-ieee.c \
 	config/obj-som.c
 
@@ -572,6 +573,7 @@ OBJ_FORMAT_HFILES = \
 	config/obj-ecoff.h \
 	config/obj-elf.h \
 	config/obj-evax.h \
+	config/obj-fdpicelf.h \
 	config/obj-ieee.h \
 	config/obj-som.h
 
@@ -2911,6 +2913,8 @@ obj-elf.o : $(srcdir)/config/obj-elf.c
 	$(COMPILE) -c $(srcdir)/config/obj-elf.c
 obj-evax.o : $(srcdir)/config/obj-evax.c
 	$(COMPILE) -c $(srcdir)/config/obj-evax.c
+obj-fdpicelf.o : $(srcdir)/config/obj-fdpicelf.c
+	$(COMPILE) -c $(srcdir)/config/obj-fdpicelf.c
 obj-ieee.o : $(srcdir)/config/obj-ieee.c
 	$(COMPILE) -c $(srcdir)/config/obj-ieee.c
 obj-multi.o : $(srcdir)/config/obj-multi.c
