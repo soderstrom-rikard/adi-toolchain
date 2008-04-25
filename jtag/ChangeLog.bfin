@@ -1,5 +1,9 @@
 2008-04-25  Jie Zhang  <jie.zhang@analog.com>
 
+	* src/bsdl2jtag.c (endline): Prevent `:' from being scanned in.
+
+2008-04-25  Jie Zhang  <jie.zhang@analog.com>
+
 	* src/bus/bf537_stamp.c (bf538f_ezkit_bus_printinfo): New.
 	(bf538f_ezkit_bus): Define.
 	* src/bus/buses.c (bus_drivers[]): Add bf538f_ezkit_bus.
