@@ -28,12 +28,15 @@ case "$target_triplet" in {
     { bfin-*-elf } {
 	set target_list { bfin-sim }
 	# set target_list { bfin-elf }
+	set target_alias bfin-elf
     }
     { bfin-*-uclinux* } {
 	set target_list { bfin-uclinux }
+	set target_alias bfin-uclinux
     }
     { bfin-*-linux-uclibc* } {
 	set target_list { bfin-linux-uclibc }
+	set target_alias bfin-linux-uclibc
     }
     default {
 	set target_list { "unix" }
