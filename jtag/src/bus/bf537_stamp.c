@@ -167,6 +167,17 @@ bf527_ezkit_bus_printinfo( bus_t *bus )
 }
 
 static void
+bf538f_ezkit_bus_printinfo( bus_t *bus )
+{
+	int i;
+
+	for (i = 0; i < CHAIN->parts->len; i++)
+		if (PART == CHAIN->parts->parts[i])
+			break;
+	printf( _("Blackfin BF538F EZ-KIT compatible bus driver via BSR (JTAG part No. %d)\n"), i );
+}
+
+static void
 bf537_stamp_bus_prepare( bus_t *bus )
 {
 	part_set_instruction( PART, "EXTEST" );
@@ -320,6 +331,22 @@ const bus_driver_t bf527_ezkit_bus = {
 	bf537_stamp_bus_read,
 	bf537_stamp_bus_write
 };
+
+const bus_driver_t bf538f_ezkit_bus = {
+	"bf538f_ezkit",
+	N_("Blackfin BF538F EZ-KIT board bus driver"),
+	bf537_stamp_bus_new,
+	bf537_stamp_bus_free,
+	bf538f_ezkit_bus_printinfo,
+	bf537_stamp_bus_prepare,
+	bf537_stamp_bus_area,
+	bf537_stamp_bus_read_start,
+	bf537_stamp_bus_read_next,
+	bf537_stamp_bus_read_end,
+	bf537_stamp_bus_read,
+	bf537_stamp_bus_write
+};
+
 
 static bus_t *
 bf537_stamp_bus_new( chain_t *chain, char *cmd_params[] )

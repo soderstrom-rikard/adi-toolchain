@@ -1,3 +1,16 @@
+2008-04-25  Jie Zhang  <jie.zhang@analog.com>
+
+	* src/bus/bf537_stamp.c (bf538f_ezkit_bus_printinfo): New.
+	(bf538f_ezkit_bus): Define.
+	* src/bus/buses.c (bus_drivers[]): Add bf538f_ezkit_bus.
+	* src/bus/buses.h (bf538f_ezkit_bus): Declare.
+	* data/Makefile.am (nobase_dist_pkgdata_DATA): Add
+	analog/bf538/STEPPINGS and analog/bf538/bf538.
+	* data/Makefile.in: Regenerate.
+	* data/analog/bf538/bf538: New file.
+	* data/analog/bf538/STEPPINGS: New file.
+	* data/analog/PARTS: Add bf538.
+
 2008-04-10  Jie Zhang  <jie.zhang@analog.com>
 
 	* src/tap/cable/ft2232.c (ft2232_bfin_ujtag_init): No need
