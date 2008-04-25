@@ -627,7 +627,7 @@
 	<register name="MASTER_ADDR" type="NODATA"  x="0"  y="8"/>
 	<register name="INT_STAT"    type="NODATA"  x="0"  y="9"/>
 	<register name="INT_MASK"    type="NODATA"  x="0"  y="10"/>
-	<register name="FIFO_CTRL"   type="NODATA"  x="0"  y="11"/>
+	<register name="FIFO_CTL"    type="NODATA"  x="0"  y="11"/>
 	<register name="FIFO_STAT"   type="NODATA"  x="0"  y="12"/>
 	<register name="XMT_DATA8"   type="NODATA"  x="0"  y="13"/>
 	<register name="XMT_DATA16"  type="NODATA"  x="0"  y="14"/>
@@ -638,12 +638,12 @@
 	<register name="TWI0_SLAVE_CTRL"  type="NOLABEL"  x="14" y="3"/>
 	<register name="TWI0_SLAVE_STAT"  type="NOLABEL"  x="14" y="4"/>
 	<register name="TWI0_SLAVE_ADDR"  type="NOLABEL"  x="14" y="5"/>
-	<register name="TWI0_MASTER_CTRL" type="NOLABEL"  x="14" y="6"/>
+	<register name="TWI0_MASTER_CTL"  type="NOLABEL"  x="14" y="6"/>
 	<register name="TWI0_MASTER_STAT" type="NOLABEL"  x="14" y="7"/>
 	<register name="TWI0_MASTER_ADDR" type="NOLABEL"  x="14" y="8"/>
 	<register name="TWI0_INT_STAT"    type="NOLABEL"  x="14" y="9"/>
 	<register name="TWI0_INT_MASK"    type="NOLABEL"  x="14" y="10"/>
-	<register name="TWI0_FIFO_CTRL"   type="NOLABEL"  x="14" y="11"/>
+	<register name="TWI0_FIFO_CTL"    type="NOLABEL"  x="14" y="11"/>
 	<register name="TWI0_FIFO_STAT"   type="NOLABEL"  x="14" y="12"/>
 	<register name="TWI0_XMT_DATA8"   type="NOLABEL"  x="14" y="13"/>
 	<register name="TWI0_XMT_DATA16"  type="NOLABEL"  x="14" y="14"/>
@@ -654,12 +654,12 @@
 	<register name="TWI1_SLAVE_CTRL"  type="NOLABEL"  x="20" y="3"/>
 	<register name="TWI1_SLAVE_STAT"  type="NOLABEL"  x="20" y="4"/>
 	<register name="TWI1_SLAVE_ADDR"  type="NOLABEL"  x="20" y="5"/>
-	<register name="TWI1_MASTER_CTRL" type="NOLABEL"  x="20" y="6"/>
+	<register name="TWI1_MASTER_CTL"  type="NOLABEL"  x="20" y="6"/>
 	<register name="TWI1_MASTER_STAT" type="NOLABEL"  x="20" y="7"/>
 	<register name="TWI1_MASTER_ADDR" type="NOLABEL"  x="20" y="8"/>
 	<register name="TWI1_INT_STAT"    type="NOLABEL"  x="20" y="9"/>
 	<register name="TWI1_INT_MASK"    type="NOLABEL"  x="20" y="10"/>
-	<register name="TWI1_FIFO_CTRL"   type="NOLABEL"  x="20" y="11"/>
+	<register name="TWI1_FIFO_CTL"    type="NOLABEL"  x="20" y="11"/>
 	<register name="TWI1_FIFO_STAT"   type="NOLABEL"  x="20" y="12"/>
 	<register name="TWI1_XMT_DATA8"   type="NOLABEL"  x="20" y="13"/>
 	<register name="TWI1_XMT_DATA16"  type="NOLABEL"  x="20" y="14"/>
