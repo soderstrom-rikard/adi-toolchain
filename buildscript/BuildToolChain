@@ -541,6 +541,7 @@ if [ "$case" = "case" ] ; then
 	echo "ERROR: you must use a case sensitive filesystem"
 	exit 1
 fi
+rm -rf .case.test .CASE.test
 
 if [ "x$CHECK_ON_SIMULATOR" != "x" -o "x$CHECK_ON_HARDWARE" != "x" ] ; then
     echo "Path for test results       "
