@@ -2489,9 +2489,9 @@ if [ $KERNEL_SOURCE ] ; then
     run_cmd $MAKE
 
     echo_date "Installing jtag"
-    run_cmd $MAKE install DESTDIR=$DIR_ELF_OUTPUT   program_transform_name=s,^,bfin-elf-,
-    run_cmd $MAKE install DESTDIR=$DIR_uC_OUTPUT    program_transform_name=s,^,bfin-uclinux-,
-    run_cmd $MAKE install DESTDIR=$DIR_LINUX_OUTPUT program_transform_name=s,^,bfin-linux-uclibc-,
+    run_cmd $MAKE install DESTDIR=$DIR_ELF_OUTPUT   program_transform_name=s,^,bfin-,
+    run_cmd $MAKE install DESTDIR=$DIR_uC_OUTPUT    program_transform_name=s,^,bfin-,
+    run_cmd $MAKE install DESTDIR=$DIR_LINUX_OUTPUT program_transform_name=s,^,bfin-,
 
     ### gdbproxy
     DIR_GDBPROXY_BUILD=$DIR_BUILD/gdbproxy
@@ -2516,9 +2516,9 @@ if [ $KERNEL_SOURCE ] ; then
     run_cmd $MAKE
 
     echo_date "Installing gdbproxy"
-    run_cmd $MAKE install DESTDIR=$DIR_ELF_OUTPUT   program_transform_name=s,^,bfin-elf-,
-    run_cmd $MAKE install DESTDIR=$DIR_uC_OUTPUT    program_transform_name=s,^,bfin-uclinux-,
-    run_cmd $MAKE install DESTDIR=$DIR_LINUX_OUTPUT program_transform_name=s,^,bfin-linux-uclibc-,
+    run_cmd $MAKE install DESTDIR=$DIR_ELF_OUTPUT   program_transform_name=s,^,bfin-,
+    run_cmd $MAKE install DESTDIR=$DIR_uC_OUTPUT    program_transform_name=s,^,bfin-,
+    run_cmd $MAKE install DESTDIR=$DIR_LINUX_OUTPUT program_transform_name=s,^,bfin-,
 
     rm -rf "$DIR_LIBFTDI_BUILD" "$DIR_JTAG_BUILD" "$DIR_GDBPROXY_BUILD"
 
