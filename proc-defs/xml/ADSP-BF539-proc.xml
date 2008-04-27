@@ -37,51 +37,6 @@
 	<!-- ************************************************ -->
 <register-extended-definitions>
 
-		<!-- Programmable Flag Registers -->
-		<register name="FIO_FLAG_D"  group="Programmable Flag Registers" read-address="0xFFC00700" write-address="0xFFC00700" type="IO" target="EMU" description="" bit-size="16" def-comment="Programmable Flags (0xFFC00700 - 0xFFC007FF)"/>
-		<register name="FIO_FLAG_C"  group="Programmable Flag Registers" read-address="0xFFC00704" write-address="0xFFC00704" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="FIO_FLAG_S"  group="Programmable Flag Registers" read-address="0xFFC00708" write-address="0xFFC00708" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="FIO_FLAG_T"  group="Programmable Flag Registers" read-address="0xFFC0070C" write-address="0xFFC0070C" type="IO" target="EMU" description="" bit-size="16"/>
-
-		<register name="FIO_MASKA_D" group="Programmable Flag Registers" read-address="0xFFC00710" write-address="0xFFC00710" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="FIO_MASKA_C" group="Programmable Flag Registers" read-address="0xFFC00714" write-address="0xFFC00714" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="FIO_MASKA_S" group="Programmable Flag Registers" read-address="0xFFC00718" write-address="0xFFC00718" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="FIO_MASKA_T" group="Programmable Flag Registers" read-address="0xFFC0071C" write-address="0xFFC0071C" type="IO" target="EMU" description="" bit-size="16"/>
-
-		<register name="FIO_MASKB_D" group="Programmable Flag Registers" read-address="0xFFC00720" write-address="0xFFC00720" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="FIO_MASKB_C" group="Programmable Flag Registers" read-address="0xFFC00724" write-address="0xFFC00724" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="FIO_MASKB_S" group="Programmable Flag Registers" read-address="0xFFC00728" write-address="0xFFC00728" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="FIO_MASKB_T" group="Programmable Flag Registers" read-address="0xFFC0072C" write-address="0xFFC0072C" type="IO" target="EMU" description="" bit-size="16"/>
-
-		<register name="FIO_DIR"     group="Programmable Flag Registers" read-address="0xFFC00730" write-address="0xFFC00730" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="FIO_POLAR"   group="Programmable Flag Registers" read-address="0xFFC00734" write-address="0xFFC00734" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="FIO_EDGE"    group="Programmable Flag Registers" read-address="0xFFC00738" write-address="0xFFC00738" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="FIO_BOTH"    group="Programmable Flag Registers" read-address="0xFFC0073C" write-address="0xFFC0073C" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="FIO_INEN"    group="Programmable Flag Registers" read-address="0xFFC00740" write-address="0xFFC00740" type="IO" target="EMU" description="" bit-size="16"/>
-
-		<!-- General Purpose IO Registers -->
-		<register name="GPIO_C_CNFG"  group="General Purpose IO Registers" read-address="0xFFC01500" write-address="0xFFC01500" mask="FFFF" type="IO" target="EMU" description="" bit-size="16" def-comment="General Purpose IO (0xFFC01500 - 0xFFC015FF)"/>
-		<register name="GPIO_D_CNFG"  group="General Purpose IO Registers" read-address="0xFFC01504" write-address="0xFFC01504" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="GPIO_E_CNFG"  group="General Purpose IO Registers" read-address="0xFFC01508" write-address="0xFFC01508" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="GPIO_C_D"     group="General Purpose IO Registers" read-address="0xFFC01510" write-address="0xFFC01510" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="GPIO_D_D"     group="General Purpose IO Registers" read-address="0xFFC01514" write-address="0xFFC01514" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="GPIO_E_D"     group="General Purpose IO Registers" read-address="0xFFC01518" write-address="0xFFC01518" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="GPIO_C_C"     group="General Purpose IO Registers" read-address="0xFFC01520" write-address="0xFFC01520" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="GPIO_D_C"     group="General Purpose IO Registers" read-address="0xFFC01524" write-address="0xFFC01524" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="GPIO_E_C"     group="General Purpose IO Registers" read-address="0xFFC01528" write-address="0xFFC01528" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="GPIO_C_S"     group="General Purpose IO Registers" read-address="0xFFC01530" write-address="0xFFC01530" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="GPIO_D_S"     group="General Purpose IO Registers" read-address="0xFFC01534" write-address="0xFFC01534" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="GPIO_E_S"     group="General Purpose IO Registers" read-address="0xFFC01538" write-address="0xFFC01538" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="GPIO_C_T"     group="General Purpose IO Registers" read-address="0xFFC01540" write-address="0xFFC01540" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="GPIO_D_T"     group="General Purpose IO Registers" read-address="0xFFC01544" write-address="0xFFC01544" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="GPIO_E_T"     group="General Purpose IO Registers" read-address="0xFFC01548" write-address="0xFFC01548" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="GPIO_C_DIR"   group="General Purpose IO Registers" read-address="0xFFC01550" write-address="0xFFC01550" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="GPIO_D_DIR"   group="General Purpose IO Registers" read-address="0xFFC01554" write-address="0xFFC01554" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="GPIO_E_DIR"   group="General Purpose IO Registers" read-address="0xFFC01558" write-address="0xFFC01558" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="GPIO_C_INEN"  group="General Purpose IO Registers" read-address="0xFFC01560" write-address="0xFFC01560" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="GPIO_D_INEN"  group="General Purpose IO Registers" read-address="0xFFC01564" write-address="0xFFC01564" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-		<register name="GPIO_E_INEN"  group="General Purpose IO Registers" read-address="0xFFC01568" write-address="0xFFC01568" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-
 		<!-- Media Transceiver (MXVR) Registers -->
 		<register name="MXVR_CONFIG" 	      group="MXVR Registers" read-address="0xFFC02700" write-address="0xFFC02700" mask="FFFF" type="IO" description="MXVR Configuration Register" bit-size="16" def-comment="Media Transceiver (MXVR) Registers (0xFFC02700 - 0xFFC028FF)" target="EMU" />
 		<register name="MXVR_PLL_CTL_0"       group="MXVR Registers" read-address="0xFFC02704" write-address="0xFFC02704" mask="FFFFFFFF" type="IO" description="MXVR Phase Lock Loop Control Register 0" bit-size="32" target="EMU" />

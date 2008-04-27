@@ -29,59 +29,6 @@
 
 <register-extended-file name="ADSP-EDN-BF538-extended.xml"/>
 
-<register-extended-definitions>
-
-	<!-- General Purpose IO Registers : Port F (ADSP-BF538 refers to FIO as GPIO Port F) -->
-	<register name="PORTFIO"              group="GPIO Port F" read-address="0xFFC00700" write-address="0xFFC00700" type="IO" target="EMU" description="" bit-size="16" def-comment="ADSP-BF538 refers to FIO as GPIO Port F (0xFFC00700 - 0xFFC0070)"/>
-	<register name="PORTFIO_CLEAR"        group="GPIO Port F" read-address="0xFFC00704" write-address="0xFFC00704" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTFIO_SET"          group="GPIO Port F" read-address="0xFFC00708" write-address="0xFFC00708" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTFIO_TOGGLE"       group="GPIO Port F" read-address="0xFFC0070C" write-address="0xFFC0070C" type="IO" target="EMU" description="" bit-size="16"/>
-
-	<register name="PORTFIO_MASKA"        group="GPIO Port F" read-address="0xFFC00710" write-address="0xFFC00710" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTFIO_MASKA_CLEAR"  group="GPIO Port F" read-address="0xFFC00714" write-address="0xFFC00714" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTFIO_MASKA_SET"    group="GPIO Port F" read-address="0xFFC00718" write-address="0xFFC00718" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTFIO_MASKA_TOGGLE" group="GPIO Port F" read-address="0xFFC0071C" write-address="0xFFC0071C" type="IO" target="EMU" description="" bit-size="16"/>
-
-	<register name="PORTFIO_MASKB"        group="GPIO Port F" read-address="0xFFC00720" write-address="0xFFC00720" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTFIO_MASKB_CLEAR"  group="GPIO Port F" read-address="0xFFC00724" write-address="0xFFC00724" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTFIO_MASKB_SET"    group="GPIO Port F" read-address="0xFFC00728" write-address="0xFFC00728" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTFIO_MASKB_TOGGLE" group="GPIO Port F" read-address="0xFFC0072C" write-address="0xFFC0072C" type="IO" target="EMU" description="" bit-size="16"/>
-
-	<register name="PORTFIO_DIR"          group="GPIO Port F" read-address="0xFFC00730" write-address="0xFFC00730" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTFIO_POLAR"        group="GPIO Port F" read-address="0xFFC00734" write-address="0xFFC00734" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTFIO_EDGE"         group="GPIO Port F" read-address="0xFFC00738" write-address="0xFFC00738" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTFIO_BOTH"         group="GPIO Port F" read-address="0xFFC0073C" write-address="0xFFC0073C" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTFIO_INEN"         group="GPIO Port F" read-address="0xFFC00740" write-address="0xFFC00740" type="IO" target="EMU" description="" bit-size="16"/>
-
-	<!-- General Purpose IO Registers : Port C -->
-	<register name="PORTCIO_FER"    group="GPIO Port C" read-address="0xFFC01500" write-address="0xFFC01500" mask="FFFF" type="IO" target="EMU" description="" bit-size="16" />
-	<register name="PORTCIO"        group="GPIO Port C" read-address="0xFFC01510" write-address="0xFFC01510" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTCIO_CLEAR"  group="GPIO Port C" read-address="0xFFC01520" write-address="0xFFC01520" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTCIO_SET"    group="GPIO Port C" read-address="0xFFC01530" write-address="0xFFC01530" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTCIO_TOGGLE" group="GPIO Port C" read-address="0xFFC01540" write-address="0xFFC01540" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTCIO_DIR"    group="GPIO Port C" read-address="0xFFC01550" write-address="0xFFC01550" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTCIO_INEN"   group="GPIO Port C" read-address="0xFFC01560" write-address="0xFFC01560" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-
-	<!-- General Purpose IO Registers : Port D -->
-	<register name="PORTDIO_FER"    group="GPIO Port D" read-address="0xFFC01504" write-address="0xFFC01504" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTDIO"        group="GPIO Port D" read-address="0xFFC01514" write-address="0xFFC01514" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTDIO_CLEAR"  group="GPIO Port D" read-address="0xFFC01524" write-address="0xFFC01524" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTDIO_SET"    group="GPIO Port D" read-address="0xFFC01534" write-address="0xFFC01534" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTDIO_TOGGLE" group="GPIO Port D" read-address="0xFFC01544" write-address="0xFFC01544" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTDIO_DIR"    group="GPIO Port D" read-address="0xFFC01554" write-address="0xFFC01554" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTDIO_INEN"   group="GPIO Port D" read-address="0xFFC01564" write-address="0xFFC01564" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-
-	<!-- General Purpose IO Registers : Port E -->
-	<register name="PORTEIO_FER"    group="GPIO Port E" read-address="0xFFC01508" write-address="0xFFC01508" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTEIO"        group="GPIO Port E" read-address="0xFFC01518" write-address="0xFFC01518" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTEIO_CLEAR"  group="GPIO Port E" read-address="0xFFC01528" write-address="0xFFC01528" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTEIO_SET"    group="GPIO Port E" read-address="0xFFC01538" write-address="0xFFC01538" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTEIO_TOGGLE" group="GPIO Port E" read-address="0xFFC01548" write-address="0xFFC01548" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTEIO_DIR"    group="GPIO Port E" read-address="0xFFC01558" write-address="0xFFC01558" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-	<register name="PORTEIO_INEN"   group="GPIO Port E" read-address="0xFFC01568" write-address="0xFFC01568" mask="FFFF" type="IO" target="EMU" description="" bit-size="16"/>
-
-</register-extended-definitions>
-
 <!-- ************************************************************************ -->
 <!-- ******* Grouping of formats that are applied to register windows         -->
 <!-- ************************************************************************ -->
