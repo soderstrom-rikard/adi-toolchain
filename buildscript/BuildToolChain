@@ -2521,6 +2521,7 @@ if [ $KERNEL_SOURCE ] ; then
     run_cmd $MAKE install DESTDIR=$DIR_uC_OUTPUT    program_transform_name=s,^,bfin-,
     run_cmd $MAKE install DESTDIR=$DIR_LINUX_OUTPUT program_transform_name=s,^,bfin-,
 
+    change_dir $DIR_BUILD
     rm -rf "$DIR_LIBFTDI_BUILD" "$DIR_JTAG_BUILD" "$DIR_GDBPROXY_BUILD"
 
     ######################## U-Boot ##############################
