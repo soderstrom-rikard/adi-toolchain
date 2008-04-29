@@ -247,7 +247,7 @@ check_lib() {
 	local lib=$1 temp_file
 	# Old Linux installations keep X in /usr/X11R6.
 	temp_file=$(mktemp || echo "${TMPDIR-/tmp}/conftest.o")
-	echo "int main(){}" | gcc -x c - -L/usr/X11R6/lib -l${lib} -o ${temp_file} 1>/dev/null
+	echo "int main(){}" | gcc -x c - -L/usr/X11R6/lib -l${lib} -o ${temp_file} >/dev/null
 	rm -f "${temp_file}"
 }
 
@@ -2446,7 +2446,7 @@ if [ $KERNEL_SOURCE ] ; then
     ######################## jtag/gdbproxy #######################
 
     ### libftdi
-    if check_lib usb && ! check_lib ftdi ; then
+    if ( check_lib usb && ! check_lib ftdi ) 2>/dev/null ; then
     DIR_LIBFTDI_BUILD=$DIR_BUILD/libftdi
 
     change_dir $DIR_LIBFTDI_SOURCE
