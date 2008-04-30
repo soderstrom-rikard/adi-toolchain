@@ -40,6 +40,7 @@ archdir() {
 	*52*)              p=bf527;;
 	*531*|*532*|*533*) p=bf533;;
 	*534*|*536*|*537*) p=bf537;;
+	*538*|*539*)       p=bf538;;
 	*54*)              p=bf548;;
 	*56*)              p=bf561;;
 	*)                 p=common;;
@@ -48,7 +49,7 @@ archdir() {
 }
 
 headers=""
-for bf in BF52{2,3,4,5,6,7} BF53{1,2,3,4,6,7} BF54{1,2,4,7,8,9} BF561 ; do
+for bf in BF52{2,3,4,5,6,7} BF53{1,2,3,4,6,7,8,9} BF54{1,2,4,7,8,9} BF561 ; do
 	xml="${srcdir}/xml/ADSP-${bf}-proc.xml"
 	arch=$(archdir ${xml})
 
