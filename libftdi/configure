@@ -19368,6 +19368,7 @@ fi
 
 
 if test ! -z "$HAVELIBUSB"; then
+   LIBUSB_CFLAGS=`$HAVELIBUSB --cflags`
    LIBUSB_LIBS=`$HAVELIBUSB --libs`
 
    CFLAGS="$CFLAGS $LIBUSB_CFLAGS"
