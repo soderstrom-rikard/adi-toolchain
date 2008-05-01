@@ -201,7 +201,9 @@ void bsdl_set_path(const char *pathlist)
 {
   char *delim;
   char *elem;
+  char *pathelem;
   int num;
+  size_t len;
 
   /* free memory of current path list */
   if (bsdl_path_list) {
@@ -220,7 +222,14 @@ void bsdl_set_path(const char *pathlist)
       /* extend path list array */
       bsdl_path_list = (char **)realloc(bsdl_path_list, (num+1) * sizeof(char *));
       /* enter path element up to the delimeter */
-      bsdl_path_list[num-1] = strndup(elem, (size_t)(delim - elem));
+      if (delim == NULL)
+        len = strlen(elem);
+      else
+        len = delim-elem;
+      pathelem = malloc(len + 1);
+      memcpy(pathelem, elem, len);
+      pathelem[len] = '\0';
+      bsdl_path_list[num-1] = pathelem;
       bsdl_path_list[num] = NULL;
     }
     elem = delim ? delim + 1 : elem + strlen(elem);

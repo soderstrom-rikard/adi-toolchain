@@ -30,6 +30,38 @@
 #include <math.h>
 #include <assert.h>
 
+#ifdef __APPLE__
+#include <mach/mach_time.h>
+#include <sys/types.h>
+#include <sys/time.h>
+
+long double
+frealtime()
+{
+    long double result;
+    static uint64_t start_mat;
+    static long double start_time;
+    static double multiplier;
+
+    mach_timebase_info_data_t mtid;
+    struct timeval tv;
+
+    if(!mtid.denom == 0) {
+        mach_timebase_info(&mtid);
+        multiplier = (double)mtid.numer / (double)mtid.denom;
+        gettimeofday(&tv, NULL);
+        start_time = (long double)tv.tv_sec + (long double)tv.tv_usec * 1000.0;
+        start_mat = mach_absolute_time();
+    }
+
+    result = start_time + (mach_absolute_time() - start_mat) * multiplier;
+
+    assert(isnormal(result));
+    assert(result > 0);
+    return result;
+}
+#else /* def __APPLE__ */
+
 
 #ifndef CLK_TCK
 static clock_t CLK_TCK = 0;
@@ -84,3 +116,4 @@ fcputime()
     return ((long double)t.tms_utime+t.tms_stime)/CLK_TCK;
 }
 
+#endif

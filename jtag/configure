@@ -722,12 +722,12 @@ YFLAGS
 CPP
 GREP
 EGREP
-LIBFTDI_CONFIG
-HAVE_LIBFTDI_TRUE
-HAVE_LIBFTDI_FALSE
 LIBUSB_CONFIG
 HAVE_LIBUSB_TRUE
 HAVE_LIBUSB_FALSE
+LIBFTDI_CONFIG
+HAVE_LIBFTDI_TRUE
+HAVE_LIBFTDI_FALSE
 HAVE_LIBFTD2XX_TRUE
 HAVE_LIBFTD2XX_FALSE
 FTD2XXLIB
@@ -1363,8 +1363,8 @@ Optional Packages:
   --without-libiconv-prefix     don't search for libiconv in includedir and libdir
   --with-libintl-prefix[=DIR]  search for libintl in DIR/include and DIR/lib
   --without-libintl-prefix     don't search for libintl in includedir and libdir
-  --with-libftdi          use libftdi for FTDI-based cables
   --with-libusb           use libusb for some USB JTAG cables
+  --with-libftdi          use libftdi for FTDI-based cables
   --with-ftd2xx           use ftd2xx library for FTDI-based cables
 
 Some influential environment variables:
@@ -1833,7 +1833,7 @@ echo "${ECHO_T}from svn info: $SVN_REVISION" >&6; }
     fi
 fi
 if test "$SVN_REVISION" -eq 0 -a -e "$srcdir/ChangeLog"; then
-    SVN_REVISION=`awk 'BEGIN { x=0 } /Revision: / { if($2>x) x=$2; } END { printf "%d\n",x }' ChangeLog`
+    SVN_REVISION=`awk 'BEGIN { x=0 } /Revision: / { if($2>x) x=$2; } END { printf "%d\n",x }' "$srcdir/ChangeLog"`
     if test "$SVN_REVISION" -ne "0" ; then
         { echo "$as_me:$LINENO: result: from ChangeLog: $SVN_REVISION" >&5
 echo "${ECHO_T}from ChangeLog: $SVN_REVISION" >&6; }
@@ -8386,201 +8386,6 @@ done
 
 
 
-# Check whether --with-libftdi was given.
-if test "${with_libftdi+set}" = set; then
-  withval=$with_libftdi;
-else
-  with_libftdi=check
-fi
-
-
-if test "x$with_libftdi" != xno; then
-
-  if test "x$with_libftdi" != xyes -a "x$with_libftdi" != xcheck; then
-
-    CFLAGS="$CFLAGS -I$with_libftdi -L$with_libftdi"
-    LIBS="$LIBS -lftdi"
-
-else
-
-    # Extract the first word of "libftdi-config", so it can be a program name with args.
-set dummy libftdi-config; ac_word=$2
-{ echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
-if test "${ac_cv_path_LIBFTDI_CONFIG+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  case $LIBFTDI_CONFIG in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_LIBFTDI_CONFIG="$LIBFTDI_CONFIG" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_path_LIBFTDI_CONFIG="$as_dir/$ac_word$ac_exec_ext"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-IFS=$as_save_IFS
-
-  test -z "$ac_cv_path_LIBFTDI_CONFIG" && ac_cv_path_LIBFTDI_CONFIG="no"
-  ;;
-esac
-fi
-LIBFTDI_CONFIG=$ac_cv_path_LIBFTDI_CONFIG
-if test -n "$LIBFTDI_CONFIG"; then
-  { echo "$as_me:$LINENO: result: $LIBFTDI_CONFIG" >&5
-echo "${ECHO_T}$LIBFTDI_CONFIG" >&6; }
-else
-  { echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
-fi
-
-
-    if test "$LIBFTDI_CONFIG" != "no"; then
-
-      LIBS="$LIBS `$LIBFTDI_CONFIG --libs`"
-      CFLAGS="$CFLAGS `$LIBFTDI_CONFIG --cflags`"
-
-fi
-
-
-fi
-
-  { echo "$as_me:$LINENO: checking for ftdi_usb_open" >&5
-echo $ECHO_N "checking for ftdi_usb_open... $ECHO_C" >&6; }
-if test "${ac_cv_func_ftdi_usb_open+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-/* Define ftdi_usb_open to an innocuous variant, in case <limits.h> declares ftdi_usb_open.
-   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-#define ftdi_usb_open innocuous_ftdi_usb_open
-
-/* System header to define __stub macros and hopefully few prototypes,
-    which can conflict with char ftdi_usb_open (); below.
-    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
-    <limits.h> exists even on freestanding compilers.  */
-
-#ifdef __STDC__
-# include <limits.h>
-#else
-# include <assert.h>
-#endif
-
-#undef ftdi_usb_open
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char ftdi_usb_open ();
-/* The GNU C library defines this for functions which it implements
-    to always fail with ENOSYS.  Some functions are actually named
-    something starting with __ and the normal name is an alias.  */
-#if defined __stub_ftdi_usb_open || defined __stub___ftdi_usb_open
-choke me
-#endif
-
-int
-main ()
-{
-return ftdi_usb_open ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext &&
-       $as_test_x conftest$ac_exeext; then
-  ac_cv_func_ftdi_usb_open=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_cv_func_ftdi_usb_open=no
-fi
-
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-fi
-{ echo "$as_me:$LINENO: result: $ac_cv_func_ftdi_usb_open" >&5
-echo "${ECHO_T}$ac_cv_func_ftdi_usb_open" >&6; }
-if test $ac_cv_func_ftdi_usb_open = yes; then
-
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_LIBFTDI 1
-_ACEOF
-
-    HAVELIBFTDI=yes
-
-else
-
-    { echo "$as_me:$LINENO: WARNING: *** libftdi not detected. No support for FTDI-based USB JTAG cables via libftdi." >&5
-echo "$as_me: WARNING: *** libftdi not detected. No support for FTDI-based USB JTAG cables via libftdi." >&2;}
-
-fi
-
-
-fi
-
-
-if test "x$HAVELIBFTDI" == "xyes"; then
-
-   if true; then
-  HAVE_LIBFTDI_TRUE=
-  HAVE_LIBFTDI_FALSE='#'
-else
-  HAVE_LIBFTDI_TRUE='#'
-  HAVE_LIBFTDI_FALSE=
-fi
-
-
-else
-
-   if false; then
-  HAVE_LIBFTDI_TRUE=
-  HAVE_LIBFTDI_FALSE='#'
-else
-  HAVE_LIBFTDI_TRUE='#'
-  HAVE_LIBFTDI_FALSE=
-fi
-
-
-fi
-
-
-
 
 
 # Check whether --with-libusb was given.
@@ -8593,22 +8398,26 @@ fi
 
 if test "x$with_libusb" != xno; then
 
+  save_LIBS=$LIBS
+  save_CPPFLAGS=$CPPFLAGS
   if test "x$with_libusb" != xyes -a "x$with_libusb" != xcheck; then
 
     case $host in
     *cygwin*)
-      CFLAGS="$CFLAGS -I$with_libusb/include -L$with_libusb/lib/gcc"
+      USBLIBS="-L$with_libusb/lib/gcc -lusb"
+      USBCLAGS="-I$with_libusb/include"
       ;;
     *)
-      CFLAGS="$CFLAGS -I$with_libusb -L$with_libusb"
+      USBLIBS="-Lwith_libusb -lusb"
+      USBCFLAGS="-I$with_libusb"
       ;;
     esac
-    LIBS="$LIBS -lusb"
 
 else
 
-    # Extract the first word of "libusb-config", so it can be a program name with args.
-set dummy libusb-config; ac_word=$2
+    if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}libusb-config", so it can be a program name with args.
+set dummy ${ac_tool_prefix}libusb-config; ac_word=$2
 { echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
 if test "${ac_cv_path_LIBUSB_CONFIG+set}" = set; then
@@ -8634,7 +8443,6 @@ done
 done
 IFS=$as_save_IFS
 
-  test -z "$ac_cv_path_LIBUSB_CONFIG" && ac_cv_path_LIBUSB_CONFIG="no"
   ;;
 esac
 fi
@@ -8648,6 +8456,67 @@ echo "${ECHO_T}no" >&6; }
 fi
 
 
+fi
+if test -z "$ac_cv_path_LIBUSB_CONFIG"; then
+  ac_pt_LIBUSB_CONFIG=$LIBUSB_CONFIG
+  # Extract the first word of "libusb-config", so it can be a program name with args.
+set dummy libusb-config; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_path_ac_pt_LIBUSB_CONFIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $ac_pt_LIBUSB_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ac_pt_LIBUSB_CONFIG="$ac_pt_LIBUSB_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_ac_pt_LIBUSB_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+ac_pt_LIBUSB_CONFIG=$ac_cv_path_ac_pt_LIBUSB_CONFIG
+if test -n "$ac_pt_LIBUSB_CONFIG"; then
+  { echo "$as_me:$LINENO: result: $ac_pt_LIBUSB_CONFIG" >&5
+echo "${ECHO_T}$ac_pt_LIBUSB_CONFIG" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+  if test "x$ac_pt_LIBUSB_CONFIG" = x; then
+    LIBUSB_CONFIG="no"
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ echo "$as_me:$LINENO: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&5
+echo "$as_me: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&2;}
+ac_tool_warned=yes ;;
+esac
+    LIBUSB_CONFIG=$ac_pt_LIBUSB_CONFIG
+  fi
+else
+  LIBUSB_CONFIG="$ac_cv_path_LIBUSB_CONFIG"
+fi
+
     if test "$LIBUSB_CONFIG" != "no"; then
 
       USBLIBS=`$LIBUSB_CONFIG --libs`
@@ -8658,10 +8527,8 @@ fi
 
 fi
 
-  save_LIBS=$LIBS
-  save_CFLAGS=$CFLAGS
   LIBS="$LIBS $USBLIBS"
-  CFLAGS="$CFLAGS $USBCFLAGS"
+  CPPFLAGS="$CPPFLAGS $USBCFLAGS"
   { echo "$as_me:$LINENO: checking for usb_find_devices" >&5
 echo $ECHO_N "checking for usb_find_devices... $ECHO_C" >&6; }
 if test "${ac_cv_func_usb_find_devices+set}" = set; then
@@ -8757,7 +8624,7 @@ else
     { echo "$as_me:$LINENO: WARNING: *** libusb not detected. No support for USB JTAG cables via libusb." >&5
 echo "$as_me: WARNING: *** libusb not detected. No support for USB JTAG cables via libusb." >&2;}
     LIBS=$save_LIBS
-    CFLAGS=$save_CFLAGS
+    CPPFLAGS=$save_CPPFLAGS
 
 fi
 
@@ -8765,7 +8632,7 @@ fi
 fi
 
 
-if test "x$HAVELIBUSB" == "xyes"; then
+if test "x$HAVELIBUSB" = "xyes"; then
 
    if true; then
   HAVE_LIBUSB_TRUE=
@@ -8784,6 +8651,270 @@ else
 else
   HAVE_LIBUSB_TRUE='#'
   HAVE_LIBUSB_FALSE=
+fi
+
+
+fi
+
+
+
+
+
+# Check whether --with-libftdi was given.
+if test "${with_libftdi+set}" = set; then
+  withval=$with_libftdi;
+else
+  with_libftdi=check
+fi
+
+
+if test "x$with_libftdi" != xno; then
+
+  save_LIBS=$LIBS
+  save_CPPFLAGS=$CPPFLAGS
+  if test "x$with_libftdi" != xyes -a "x$with_libftdi" != xcheck; then
+
+    FTDILIBS="-L$with_libftdi -lftdi"
+    FTDICFLAGS="-I$with_libftdi"
+
+else
+
+    if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}libftdi-config", so it can be a program name with args.
+set dummy ${ac_tool_prefix}libftdi-config; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_path_LIBFTDI_CONFIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $LIBFTDI_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_LIBFTDI_CONFIG="$LIBFTDI_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_LIBFTDI_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+LIBFTDI_CONFIG=$ac_cv_path_LIBFTDI_CONFIG
+if test -n "$LIBFTDI_CONFIG"; then
+  { echo "$as_me:$LINENO: result: $LIBFTDI_CONFIG" >&5
+echo "${ECHO_T}$LIBFTDI_CONFIG" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+fi
+if test -z "$ac_cv_path_LIBFTDI_CONFIG"; then
+  ac_pt_LIBFTDI_CONFIG=$LIBFTDI_CONFIG
+  # Extract the first word of "libftdi-config", so it can be a program name with args.
+set dummy libftdi-config; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_path_ac_pt_LIBFTDI_CONFIG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $ac_pt_LIBFTDI_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_ac_pt_LIBFTDI_CONFIG="$ac_pt_LIBFTDI_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_ac_pt_LIBFTDI_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+ac_pt_LIBFTDI_CONFIG=$ac_cv_path_ac_pt_LIBFTDI_CONFIG
+if test -n "$ac_pt_LIBFTDI_CONFIG"; then
+  { echo "$as_me:$LINENO: result: $ac_pt_LIBFTDI_CONFIG" >&5
+echo "${ECHO_T}$ac_pt_LIBFTDI_CONFIG" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+  if test "x$ac_pt_LIBFTDI_CONFIG" = x; then
+    LIBFTDI_CONFIG="no"
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ echo "$as_me:$LINENO: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&5
+echo "$as_me: WARNING: In the future, Autoconf will not detect cross-tools
+whose name does not start with the host triplet.  If you think this
+configuration is useful to you, please write to autoconf@gnu.org." >&2;}
+ac_tool_warned=yes ;;
+esac
+    LIBFTDI_CONFIG=$ac_pt_LIBFTDI_CONFIG
+  fi
+else
+  LIBFTDI_CONFIG="$ac_cv_path_LIBFTDI_CONFIG"
+fi
+
+    if test "$LIBFTDI_CONFIG" != "no"; then
+
+      FTDILIBS=`$LIBFTDI_CONFIG --libs`
+      FTDICFLAGS=`$LIBFTDI_CONFIG --cflags`
+
+fi
+
+
+fi
+
+  LIBS="$FTDILIBS $LIBS"
+  CPPFLAGS="$CPPFLAGS $FTDICFLAGS"
+  { echo "$as_me:$LINENO: checking for ftdi_usb_open" >&5
+echo $ECHO_N "checking for ftdi_usb_open... $ECHO_C" >&6; }
+if test "${ac_cv_func_ftdi_usb_open+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+/* Define ftdi_usb_open to an innocuous variant, in case <limits.h> declares ftdi_usb_open.
+   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+#define ftdi_usb_open innocuous_ftdi_usb_open
+
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char ftdi_usb_open (); below.
+    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+    <limits.h> exists even on freestanding compilers.  */
+
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+
+#undef ftdi_usb_open
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char ftdi_usb_open ();
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined __stub_ftdi_usb_open || defined __stub___ftdi_usb_open
+choke me
+#endif
+
+int
+main ()
+{
+return ftdi_usb_open ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_func_ftdi_usb_open=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_func_ftdi_usb_open=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_func_ftdi_usb_open" >&5
+echo "${ECHO_T}$ac_cv_func_ftdi_usb_open" >&6; }
+if test $ac_cv_func_ftdi_usb_open = yes; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_LIBFTDI 1
+_ACEOF
+
+    HAVELIBFTDI=yes
+
+else
+
+    { echo "$as_me:$LINENO: WARNING: *** libftdi not detected. No support for FTDI-based USB JTAG cables via libftdi." >&5
+echo "$as_me: WARNING: *** libftdi not detected. No support for FTDI-based USB JTAG cables via libftdi." >&2;}
+    LIBS=$save_LIBS
+    CPPFLAGS=$save_CPPFLAGS
+
+fi
+
+
+fi
+
+
+if test "x$HAVELIBFTDI" = "xyes"; then
+
+   if true; then
+  HAVE_LIBFTDI_TRUE=
+  HAVE_LIBFTDI_FALSE='#'
+else
+  HAVE_LIBFTDI_TRUE='#'
+  HAVE_LIBFTDI_FALSE=
+fi
+
+
+else
+
+   if false; then
+  HAVE_LIBFTDI_TRUE=
+  HAVE_LIBFTDI_FALSE='#'
+else
+  HAVE_LIBFTDI_TRUE='#'
+  HAVE_LIBFTDI_FALSE=
 fi
 
 
@@ -9821,20 +9952,6 @@ echo "$as_me: error: conditional \"am__fastdepCC\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${HAVE_LIBFTDI_TRUE}" && test -z "${HAVE_LIBFTDI_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"HAVE_LIBFTDI\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"HAVE_LIBFTDI\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${HAVE_LIBFTDI_TRUE}" && test -z "${HAVE_LIBFTDI_FALSE}"; then
-  { { echo "$as_me:$LINENO: error: conditional \"HAVE_LIBFTDI\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-echo "$as_me: error: conditional \"HAVE_LIBFTDI\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
 if test -z "${HAVE_LIBUSB_TRUE}" && test -z "${HAVE_LIBUSB_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"HAVE_LIBUSB\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
@@ -9846,6 +9963,20 @@ if test -z "${HAVE_LIBUSB_TRUE}" && test -z "${HAVE_LIBUSB_FALSE}"; then
   { { echo "$as_me:$LINENO: error: conditional \"HAVE_LIBUSB\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 echo "$as_me: error: conditional \"HAVE_LIBUSB\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${HAVE_LIBFTDI_TRUE}" && test -z "${HAVE_LIBFTDI_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"HAVE_LIBFTDI\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"HAVE_LIBFTDI\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${HAVE_LIBFTDI_TRUE}" && test -z "${HAVE_LIBFTDI_FALSE}"; then
+  { { echo "$as_me:$LINENO: error: conditional \"HAVE_LIBFTDI\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+echo "$as_me: error: conditional \"HAVE_LIBFTDI\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -10675,12 +10806,12 @@ YFLAGS!$YFLAGS$ac_delim
 CPP!$CPP$ac_delim
 GREP!$GREP$ac_delim
 EGREP!$EGREP$ac_delim
-LIBFTDI_CONFIG!$LIBFTDI_CONFIG$ac_delim
-HAVE_LIBFTDI_TRUE!$HAVE_LIBFTDI_TRUE$ac_delim
-HAVE_LIBFTDI_FALSE!$HAVE_LIBFTDI_FALSE$ac_delim
 LIBUSB_CONFIG!$LIBUSB_CONFIG$ac_delim
 HAVE_LIBUSB_TRUE!$HAVE_LIBUSB_TRUE$ac_delim
 HAVE_LIBUSB_FALSE!$HAVE_LIBUSB_FALSE$ac_delim
+LIBFTDI_CONFIG!$LIBFTDI_CONFIG$ac_delim
+HAVE_LIBFTDI_TRUE!$HAVE_LIBFTDI_TRUE$ac_delim
+HAVE_LIBFTDI_FALSE!$HAVE_LIBFTDI_FALSE$ac_delim
 HAVE_LIBFTD2XX_TRUE!$HAVE_LIBFTD2XX_TRUE$ac_delim
 HAVE_LIBFTD2XX_FALSE!$HAVE_LIBFTD2XX_FALSE$ac_delim
 FTD2XXLIB!$FTD2XXLIB$ac_delim
