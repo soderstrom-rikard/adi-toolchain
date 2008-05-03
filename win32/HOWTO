@@ -9,9 +9,9 @@ Install the Nullsoft Scriptable Install System:
 	http://nsis.sourceforge.net/
 Either install a version from your distribution or compile it yourself.
 Once you have a copy on your Linux machine, create the following directories:
-	out-elf
-	out-uclinux
-	out-linux-uclibc
+	bfin-elf
+	bfin-uclinux
+	bfin-linux-uclibc
 Then run:
  $ makensis toolchain.nsi
 This will produce the Windows installer automatically.  It may take a while

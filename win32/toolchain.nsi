@@ -47,7 +47,7 @@ ShowUnInstDetails show
 !macro BlackfinInstall tuple libc
 Section "bfin-${tuple}" Sec${libc}
   SetOutPath "$INSTDIR\${tuple}"
-  File /r "out-${tuple}\*"
+  File /r "bfin-${tuple}\*"
   Push "$INSTDIR\${tuple}\bin"
   Call AddToPath
 SectionEnd
