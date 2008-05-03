@@ -20,7 +20,7 @@ Also, please keep in mind that this is just a toolchain for compiling code.  It
 is certainly not an IDE, so do not expect some GUI system to help you edit code
 or manage your projects.  If you want something like that, there are plenty of
 options out there to satisfy you:
-    - Eclipse: http://docs.blackfin.uclinux.org/doku.php?id=using_eclipse
+    - Eclipse: http://docs.blackfin.uclinux.org/doku.php?id=toolchain:eclipse
     - VisualDSP++: http://www.analog.com/en/epProd/0,2878,VISUALDSPBF,00.html
     - Visual Studio: http://msdn.microsoft.com/vstudio/
 
@@ -36,7 +36,7 @@ change your environment yourself.  If you don't know what environment variables
 are, don't worry about as it's taken care of for you.
 
 You can find the release notes for our toolchain on our documentation wiki:
-    http://docs.blackfin.uclinux.org/doku.php?id=toolchain_release_notes
+    http://docs.blackfin.uclinux.org/doku.php?id=toolchain:release-notes
 
 For the source code used to build this Windows hosted toolchain, please visit
 the toolchain project hosted on our website:
