@@ -51,6 +51,10 @@
 #include "svf.h"
 #include "svf_bison.h"
 
+#ifdef __MINGW32__
+#include "fclock.h"
+#endif
+
 int yyparse(chain_t *chain);
 
 
@@ -686,6 +690,20 @@ svf_runtest(chain_t *chain, struct runtest *params)
 
   svf_goto_state(chain, runtest_run_state);
 
+#ifdef __MINGW32__
+  if (params->max_time > 0.0) {
+    double maxt = frealtime() + params->max_time;
+
+    while (run_count-- > 0 && frealtime() < maxt) {
+      chain_clock(chain, 0, 0, 1);
+    }
+  }
+  else
+    chain_clock(chain, 0, 0, run_count);
+
+  svf_goto_state(chain, runtest_end_state);
+
+#else
   /* set up the timer for max_time */
   if (params->max_time > 0.0) {
     struct sigaction sa;
@@ -726,6 +744,7 @@ svf_runtest(chain_t *chain, struct runtest *params)
       exit(EXIT_FAILURE);
     }
   }
+#endif
 
   return(1);
 }
