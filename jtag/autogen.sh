@@ -22,7 +22,7 @@
 # Written by Marcel Telka <marcel@telka.sk>, 2002, 2003.
 #
 
-if autoreconf -i -s -v -f ; then
+if autoreconf -i -v -f ; then
 	echo
 	echo "autoreconf done."
 	echo
