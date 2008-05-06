@@ -100,10 +100,11 @@ ARFLAGS = cru
 libjtaglib_a_AR = $(AR) $(ARFLAGS)
 libjtaglib_a_LIBADD =
 am__libjtaglib_a_SOURCES_DIST = getdelim.c getline.c fclock.c \
-	lbasename.c lrealpath.c make-relative-prefix.c
+	lbasename.c lrealpath.c make-relative-prefix.c safe-ctype.c
 @JTAG_RELOCATABLE_TRUE@am__objects_1 = lbasename.$(OBJEXT) \
 @JTAG_RELOCATABLE_TRUE@	lrealpath.$(OBJEXT) \
-@JTAG_RELOCATABLE_TRUE@	make-relative-prefix.$(OBJEXT)
+@JTAG_RELOCATABLE_TRUE@	make-relative-prefix.$(OBJEXT) \
+@JTAG_RELOCATABLE_TRUE@	safe-ctype.$(OBJEXT)
 am_libjtaglib_a_OBJECTS = getdelim.$(OBJEXT) getline.$(OBJEXT) \
 	fclock.$(OBJEXT) $(am__objects_1)
 libjtaglib_a_OBJECTS = $(am_libjtaglib_a_OBJECTS)
@@ -176,7 +177,6 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 POSUB = @POSUB@
 RANLIB = @RANLIB@
-SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -233,6 +233,7 @@ sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
+top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 noinst_LIBRARIES = libjtaglib.a
@@ -240,7 +241,8 @@ noinst_LIBRARIES = libjtaglib.a
 @JTAG_RELOCATABLE_TRUE@libiberty_sources = \
 @JTAG_RELOCATABLE_TRUE@	lbasename.c \
 @JTAG_RELOCATABLE_TRUE@	lrealpath.c \
-@JTAG_RELOCATABLE_TRUE@	make-relative-prefix.c
+@JTAG_RELOCATABLE_TRUE@	make-relative-prefix.c \
+@JTAG_RELOCATABLE_TRUE@	safe-ctype.c
 
 libjtaglib_a_SOURCES = \
 	getdelim.c \
@@ -301,6 +303,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lbasename.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lrealpath.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/make-relative-prefix.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/safe-ctype.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
