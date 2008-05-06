@@ -223,7 +223,7 @@ int ftdi_usb_find_all(struct ftdi_context *ftdi, struct ftdi_device_list **devli
 
     curdev = devlist;
     *curdev = NULL;
-    for (bus = usb_busses; bus; bus = bus->next) {
+    for (bus = usb_get_busses(); bus; bus = bus->next) {
         for (dev = bus->devices; dev; dev = dev->next) {
             if (dev->descriptor.idVendor == vendor
                     && dev->descriptor.idProduct == product)
@@ -359,6 +359,15 @@ int ftdi_usb_open_dev(struct ftdi_context *ftdi, struct usb_device *dev)
         detach_errno = errno;
 #endif
 
+    if (usb_set_configuration(ftdi->usb_dev, dev->config[0].bConfigurationValue)) {
+        usb_close (ftdi->usb_dev);
+        if (detach_errno == EPERM) {
+            ftdi_error_return(-8, "inappropriate permissions on device!");
+        } else {
+            ftdi_error_return(-3, "unable to set usb configuration. Make sure ftdi_sio is unloaded!");
+        }
+    }
+
     if (usb_claim_interface(ftdi->usb_dev, ftdi->interface) != 0) {
         usb_close (ftdi->usb_dev);
         if (detach_errno == EPERM) {
@@ -445,7 +454,7 @@ int ftdi_usb_open_desc(struct ftdi_context *ftdi, int vendor, int product,
     if (usb_find_devices() < 0)
         ftdi_error_return(-2, "usb_find_devices() failed");
 
-    for (bus = usb_busses; bus; bus = bus->next) {
+    for (bus = usb_get_busses(); bus; bus = bus->next) {
         for (dev = bus->devices; dev; dev = dev->next) {
             if (dev->descriptor.idVendor == vendor
                     && dev->descriptor.idProduct == product) {
