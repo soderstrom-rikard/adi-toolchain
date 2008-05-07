@@ -1,3 +1,11 @@
+2008-05-07  Jie Zhang  <jie.zhang@analog.com>
+
+	Backport from upstream
+	2008-05-07  Jie Zhang  <jie.zhang@analog.com>
+	* remote.c (remote_insert_breakpoint): Call get_remote_state
+	after gdbarch_breakpoint_from_pc is called.
+	(remote_insert_hw_breakpoint): Likewise.
+
 2008-01-09  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin-tdep.c (bfin_linux_pc_in_sigtramp): Avoid reading
