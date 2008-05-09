@@ -1,3 +1,7 @@
+2008-05-09  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* data/analog/PARTS: Declare BF538 as just BF538.
+
 2008-04-25  Jie Zhang  <jie.zhang@analog.com>
 
 	* src/bsdl2jtag.c (endline): Prevent `:' from being scanned in.
