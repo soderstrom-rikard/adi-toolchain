@@ -831,8 +831,13 @@ void _dl_get_ready_to_run(struct elf_resolve *tpnt, DL_LOADADDR_TYPE load_addr,
 
 	/* Find the real malloc function and make ldso functions use that from now on */
 	_dl_malloc_function = (void* (*)(size_t)) (intptr_t) _dl_find_hash(__C_SYMBOL_PREFIX__ "malloc",
-			_dl_symbol_tables, NULL, ELF_RTYPE_CLASS_PLT);
-
+			_dl_symbol_tables, NULL,
+#ifdef __FDPIC__
+			ELF_RTYPE_CLASS_DLSYM
+#else
+			ELF_RTYPE_CLASS_PLT
+#endif
+			);
 	/* Notify the debugger that all objects are now mapped in.  */
 	_dl_debug_addr->r_state = RT_CONSISTENT;
 	_dl_debug_state();
