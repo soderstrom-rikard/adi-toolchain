@@ -12,19 +12,19 @@
 
 /************************************************************************
  *
- * cdef_LPBlackfin.h
+ * cdefblackfin.h
  *
  * (c) Copyright 2002-2005 Analog Devices, Inc.  All rights reserved.
  *
  ************************************************************************/
 
-#ifndef _CDEF_LPBLACKFIN_H
-#define _CDEF_LPBLACKFIN_H
+#ifndef _CDEF_BLACKFIN_H
+#define _CDEF_BLACKFIN_H
 
-#if !defined(__ADSPLPBLACKFIN__)
-#warning cdef_LPBlackfin.h should only be included for 532 compatible chips.
+#if defined(__ADSPLPBLACKFIN__)
+#warning cdefblackfin.h should only be included for 535 compatible chips.
 #endif
-#include <def_LPBlackfin.h>
+#include <defblackfin.h>
 
 #ifndef _PTR_TO_VOL_VOID_PTR
 #ifndef _USE_LEGACY_CDEF_BEHAVIOUR
@@ -130,9 +130,9 @@
 #define pEVT13 (_PTR_TO_VOL_VOID_PTR EVT13)
 #define pEVT14 (_PTR_TO_VOL_VOID_PTR EVT14)
 #define pEVT15 (_PTR_TO_VOL_VOID_PTR EVT15)
-#define pIMASK ((volatile unsigned long *)IMASK)
-#define pIPEND ((volatile unsigned long *)IPEND)
-#define pILAT ((volatile unsigned long *)ILAT)
+#define pIMASK ((volatile unsigned short *)IMASK)
+#define pIPEND ((volatile unsigned short *)IPEND)
+#define pILAT ((volatile unsigned short *)ILAT)
 
 /* Core Timer Registers */
 #define pTCNTL ((volatile unsigned long *)TCNTL)
@@ -177,4 +177,4 @@
 #define pPFCNTR0 ((volatile unsigned long *)PFCNTR0)
 #define pPFCNTR1 ((volatile unsigned long *)PFCNTR1)
 
-#endif /* _CDEF_LPBLACKFIN_H */
+#endif /* _CDEF_BLACKFIN_H */

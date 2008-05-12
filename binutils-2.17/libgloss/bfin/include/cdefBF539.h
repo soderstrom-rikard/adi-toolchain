@@ -1,8 +1,4 @@
 /*
- * cdefBF539.h
- *
- * Copyright (C) 2007 Analog Devices, Inc.
- *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
  * that existing copyright notices are retained in all copies and that this
@@ -14,6 +10,18 @@
  * they apply.
  */
 
+/*
+** Copyright (C) 2006 Analog Devices Inc., All Rights Reserved.
+**
+************************************************************************************
+**
+** This include file contains a list of macro "defines" to enable the programmer
+** to use symbolic names for BF539 peripherals.
+**
+************************************************************************************
+** System MMR Register Map
+************************************************************************************/
+
 #ifndef _CDEF_BF539_H
 #define _CDEF_BF539_H
 
@@ -22,6 +30,9 @@
 
 /* include core specific register pointer definitions */
 #include <cdef_LPBlackfin.h>
+
+/* include built-in mneumonic macros */
+#include <ccblkfn.h>
 
 #ifndef _PTR_TO_VOL_VOID_PTR
 #ifndef _USE_LEGACY_CDEF_BEHAVIOUR

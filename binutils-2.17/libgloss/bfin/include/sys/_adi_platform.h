@@ -1,8 +1,4 @@
 /*
- * Include appropriate header file for platform.
- *
- * Copyright (C) 2007 Analog Devices, Inc.
- *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
  * that existing copyright notices are retained in all copies and that this
@@ -14,10 +10,15 @@
  * they apply.
  */
 
+/*
+** Include appropriate header file for platform.
+** Copyright (C) 2004-2007 Analog Devices Inc. All Rights Reserved.
+*/
+
 #ifndef __ADI_PLATFORM_H
 #define __ADI_PLATFORM_H
 
-#ifndef __ASSEMBLER__
+#ifdef __ASSEMBLY__
 
 #if defined (__ADSPBF531__)
 #include <cdefBF531.h>
@@ -43,6 +44,8 @@
 #include <cdefAD6531.h>
 #elif defined (__AD6532__)
 #include <cdefAD6532.h>
+#elif defined (__AD6723__)
+#include <cdefAD6723.h>
 #elif defined (__AD6900__)
 #include <cdefAD6900.h>
 #elif defined (__AD6901__)
@@ -51,6 +54,8 @@
 #include <cdefAD6902.h>
 #elif defined (__AD6903__)
 #include <cdefAD6903.h>
+#elif defined (__AD6904__)
+#include <cdefAD6904.h>
 #elif defined (__ADSPBF522__)
 #include <cdefBF522.h>
 #elif defined (__ADSPBF525__)
@@ -61,6 +66,8 @@
 #include <cdefBF542.h>
 #elif defined (__ADSPBF544__)
 #include <cdefBF544.h>
+#elif defined (__ADSPBF547__)
+#include <cdefBF547.h>
 #elif defined (__ADSPBF548__)
 #include <cdefBF548.h>
 #elif defined (__ADSPBF549__)
@@ -96,6 +103,8 @@
 #include <defAD6531.h>
 #elif defined (__AD6532__)
 #include <defAD6532.h>
+#elif defined (__AD6723__)
+#include <defAD6723.h>
 #elif defined (__AD6900__)
 #include <defAD6900.h>
 #elif defined (__AD6901__)
@@ -104,6 +113,8 @@
 #include <defAD6902.h>
 #elif defined (__AD6903__)
 #include <defAD6903.h>
+#elif defined (__AD6904__)
+#include <defAD6904.h>
 #elif defined (__ADSPBF522__)
 #include <defBF522.h>
 #elif defined (__ADSPBF525__)
@@ -114,6 +125,8 @@
 #include <defBF542.h>
 #elif defined (__ADSPBF544__)
 #include <defBF544.h>
+#elif defined (__ADSPBF547__)
+#include <defBF547.h>
 #elif defined (__ADSPBF548__)
 #include <defBF548.h>
 #elif defined (__ADSPBF549__)
@@ -123,7 +136,7 @@
 #error Processor Type Not Supported
 #endif
 
-#endif /* __ASSEMBLER__ */
+#endif /* __ASSEMBLY__ */
 
 #endif /* __INC_BLACKFIN__ */
 

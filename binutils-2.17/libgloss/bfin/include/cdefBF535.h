@@ -1,8 +1,4 @@
 /*
- * cdefBF535.h
- *
- * Copyright (C) 2007 Analog Devices, Inc.
- *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
  * that existing copyright notices are retained in all copies and that this
@@ -13,6 +9,14 @@
  * the new terms are clearly indicated on the first page of each file where
  * they apply.
  */
+
+/************************************************************************
+ *
+ * cdefBF535.h
+ *
+ * (c) Copyright 2002-2005 Analog Devices, Inc.  All rights reserved.
+ *
+ ************************************************************************/
 
 #ifndef _CDEF_BF535_H
 #define _CDEF_BF535_H

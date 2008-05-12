@@ -1,8 +1,4 @@
 /*
- * sysreg.h
- *
- * Copyright (C) 2007 Analog Devices, Inc.
- *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
  * that existing copyright notices are retained in all copies and that this
@@ -13,6 +9,22 @@
  * the new terms are clearly indicated on the first page of each file where
  * they apply.
  */
+
+/* This file must be used with compiler version 8.0.1.5 */
+
+#ifdef __VERSIONNUM__
+#if __VERSIONNUM__ != 0x08000105
+#error The compiler version does not match the version of the sysreg.h include
+#endif
+#endif
+
+/************************************************************************
+ *
+ * sysreg.h
+ *
+ * (c) Copyright 2001-2006 Analog Devices, Inc.  All rights reserved.
+ *
+ ***********************************************************************/
 
 #pragma once
 #ifndef __NO_BUILTIN

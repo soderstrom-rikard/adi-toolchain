@@ -1,8 +1,4 @@
 /*
- * defBF542.h
- *
- * Copyright (C) 2007 Analog Devices, Inc.
- *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
  * that existing copyright notices are retained in all copies and that this
@@ -14,6 +10,17 @@
  * they apply.
  */
 
+/*
+** defBF542.h
+**
+** Copyright (C) 2006-2007 Analog Devices Inc., All Rights Reserved.
+**
+************************************************************************************
+**
+** This include file contains a list of macro "defines" to enable the programmer
+** to use symbolic names for register-access and bit-manipulation.
+**
+**/
 #ifndef _DEF_BF542_H
 #define _DEF_BF542_H
 
@@ -350,12 +357,21 @@
 #define                   KPAD_EN  0x1        /* Keypad Enable */
 #define                  nKPAD_EN  0x0
 #define              KPAD_IRQMODE  0x6        /* Key Press Interrupt Enable */
+#define             nKPAD_IRQMODE  0x0        /* Interrupt Disabled */
+#define           KPAD_IRQMODE_SK  0x2        /* Single key (single row, single column) press interrupt enable */
+#define           KPAD_IRQMODE_MK  0x4        /* Single key press multiple key press interrupt enable */
+
 #define                KPAD_ROWEN  0x1c00     /* Row Enable Width */
 #define                KPAD_COLEN  0xe000     /* Column Enable Width */
+
+#define         SET_KPAD_ROWEN(x)  (((x)&0x7)<<10) /* 000: row 0 enabled, 111: rows 0-7 enabled */
+#define         SET_KPAD_COLEN(x)  (((x)&0x7)<<13) /* 000: column 0 enabled, 111: columns 0-7 enabled */
 
 /* Bit masks for KPAD_PRESCALE */
 
 #define         KPAD_PRESCALE_VAL  0x3f       /* Key Prescale Value */
+
+#define      SET_KPAD_PRESCALE(x)  ((x)&0x3F)   /* KPAD_PRESCALE_VAL (Key Prescale) Key Prescale Value (5:0) */
 
 /* Bit masks for KPAD_MSEL */
 
@@ -367,6 +383,9 @@
 #define                  KPAD_ROW  0xff       /* Rows Pressed */
 #define                  KPAD_COL  0xff00     /* Columns Pressed */
 
+#define    SET_KPAD_DBON_SCALE(x)  ((x)&0xFF)   /* DBON_SCALE (Debounce Scale) Debounce Delay Multiplier Select [7:0] */
+#define  SET_KPAD_COLDRV_SCALE(x)  (((x)&0xFF)<<8) /* COLDRV_SCALE (Column Driver Scale) Column Driver Period Multiplier Select [15:8] */
+
 /* Bit masks for KPAD_STAT */
 
 #define                  KPAD_IRQ  0x1        /* Keypad Interrupt Status */
@@ -374,6 +393,10 @@
 #define              KPAD_MROWCOL  0x6        /* Multiple Row/Column Keypress Status */
 #define              KPAD_PRESSED  0x8        /* Key press current status */
 #define             nKPAD_PRESSED  0x0
+#define               KPAD_NO_KEY  0x0        /* No Keypress Status*/
+#define           KPAD_SINGLE_KEY  0x2        /* Single Keypress Status */
+#define            KPAD_MKSROWCOL  0x4        /* Multiple Keypress in the same row or column Status */
+#define            KPAD_MKMROWCOL  0x6        /* Multiple Keypress in the same multiple rows and multiple columns Status */
 
 /* Bit masks for KPAD_SOFTEVAL */
 

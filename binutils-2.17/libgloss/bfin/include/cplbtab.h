@@ -1,8 +1,4 @@
 /*
- * cplbtab.h
- *
- * Copyright (C) 2007 Analog Devices, Inc.
- *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
  * that existing copyright notices are retained in all copies and that this
@@ -18,6 +14,13 @@
 #ifndef __NO_BUILTIN
 #pragma system_header /* cplbtab.h */
 #endif
+/************************************************************************
+ *
+ * cplbtab.h
+ *
+ * (c) Copyright 2002-2007 Analog Devices, Inc.  All rights reserved.
+ *
+ ************************************************************************/
 
 /* Define structures for the CPLB tables. */
 

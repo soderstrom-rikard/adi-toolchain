@@ -1,8 +1,4 @@
 /*
- * defBF54x_base.h
- *
- * Copyright (C) 2007 Analog Devices, Inc.
- *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
  * that existing copyright notices are retained in all copies and that this
@@ -13,6 +9,20 @@
  * the new terms are clearly indicated on the first page of each file where
  * they apply.
  */
+
+/*
+** defBF54x_base.h
+**
+** Copyright (C) 2006-2007 Analog Devices Inc., All Rights Reserved.
+**
+************************************************************************************
+**
+** This include file contains a list of macro "defines" to enable the programmer
+** to use symbolic names for the registers common to the ADSP-BF54x peripherals.
+**
+************************************************************************************
+** System MMR Register Map
+************************************************************************************/
 
 #ifndef _DEF_BF54X_H
 #define _DEF_BF54X_H
@@ -160,8 +170,8 @@
 /* Asynchronous Memory Control Registers */
 
 #define                      EBIU_AMGCTL  0xffc00a00   /* Asynchronous Memory Global Control Register */
-#define                    EBIU_AMBCTL0   0xffc00a04   /* Asynchronous Memory Bank Control Register */
-#define                    EBIU_AMBCTL1   0xffc00a08   /* Asynchronous Memory Bank Control Register */
+#define                     EBIU_AMBCTL0  0xffc00a04   /* Asynchronous Memory Bank Control Register */
+#define                     EBIU_AMBCTL1  0xffc00a08   /* Asynchronous Memory Bank Control Register */
 #define                      EBIU_MBSCTL  0xffc00a0c   /* Asynchronous Memory Bank Select Control Register */
 #define                     EBIU_ARBSTAT  0xffc00a10   /* Asynchronous Memory Arbiter Status Register */
 #define                        EBIU_MODE  0xffc00a14   /* Asynchronous Mode Control Register */
@@ -1527,6 +1537,11 @@
 #define            IRQ_PLL_WAKEUP  0x1        /* PLL Wakeup */
 #define           nIRQ_PLL_WAKEUP  0x0
 
+/* Below is an alternate name that matches the 54x HRM and previous defBF532.h header,
+   above matches previous defBF534.h header */
+#define            PLL_WAKEUP_IRQ  0x1        /* PLL Wakeup Interrupt Request */
+#define           nPLL_WAKEUP_IRQ  0x0
+
 /* Bit masks for SIC_IWR0, SIC_IMASK0, SIC_ISR0 */
 
 #define              IRQ_DMA0_ERR  0x2        /* DMA Controller 0 Error */
@@ -1638,8 +1653,8 @@
 #define            nIRQ_EPPI2_ERR  0x0
 #define             IRQ_UART3_ERR  0x1000000  /* UART3 Error */
 #define            nIRQ_UART3_ERR  0x0
-#define              IRQ_HOST_ERR  0x2000000  /* Host DMA Port Error */
-#define             nIRQ_HOST_ERR  0x0
+#define         IRQ_HOSTDP_STATUS  0x2000000  /* Host DMA Port Error */
+#define        nIRQ_HOSTDP_STATUS  0x0
 #define               IRQ_USB_ERR  0x4000000  /* USB Error */
 #define              nIRQ_USB_ERR  0x0
 #define              IRQ_PIXC_ERR  0x8000000  /* Pixel Compositor Error */
@@ -1691,8 +1706,8 @@
 #define             nIRQ_USB_INT2  0x0
 #define            IRQ_USB_DMAINT  0x4000     /* USB DMA */
 #define           nIRQ_USB_DMAINT  0x0
-#define                IRQ_OTPSEC  0x8000     /* OTP Access Complete */
-#define               nIRQ_OTPSEC  0x0
+#define                   IRQ_OTP  0x8000     /* OTP Access Complete */
+#define                  nIRQ_OTP  0x0
 #define                IRQ_TIMER0  0x400000   /* Timer 0 */
 #define               nIRQ_TIMER0  0x0
 #define                IRQ_TIMER1  0x800000   /* Timer 1 */
@@ -1774,6 +1789,15 @@
 #define                   nAMCKEN  0x0
 #define                     AMBEN  0xe        /* Async bank enable */
 
+/* EBIU_AMGCTL Masks (AMCKEN) */
+#define CDPRIO                  0x0100        /* DMA has priority over core for for external accesses */
+
+/* EBIU_AMGCTL Masks (AMBEN) */
+#define AMBEN_NONE              0x0000        /* All Banks Disabled */
+#define AMBEN_B0                0x0002        /* Enable Async Memory Bank 0 only */
+#define AMBEN_B0_B1             0x0004        /* Enable Async Memory Banks 0 & 1 only */
+#define AMBEN_B0_B1_B2          0x0006        /* Enable Async Memory Banks 0, 1, and 2 */
+
 /* Bit masks for EBIU_AMBCTL0 */
 
 #define                   B0RDYEN  0x1        /* Bank 0 ARDY Enable */
@@ -1794,6 +1818,19 @@
 #define                      B1HT  0xc00000   /* Bank 1 Hold time */
 #define                     B1RAT  0xf000000  /* Bank 1 Read access time */
 #define                     B1WAT  0xf0000000 /* Bank 1 write access time */
+
+/* EBIU_AMBCTL0 Macros */
+#define SET_B1WAT(x)            (((x)&0xF) << 28)   /* B1 Write Access Time = x cycles */
+#define SET_B1RAT(x)            (((x)&0xF) << 24)   /* B1 Read Access Time = x cycles */
+#define SET_B1HT(x)             (((x)&0x3) << 22)   /* B1 Hold Time (~Read/Write to ~AOE) = x cycles */
+#define SET_B1ST[x)             (((x)&0x3) << 20)   /* B1 Setup Time (AOE to Read/Write) = x cycle */
+#define SET_B1TT(x)             (((x)&0x3) << 18)   /* B1 Transition Time (Read to Write) = x cycles */
+
+#define SET_B0WAT(x)            (((x)&0xF) << 12)   /* B0 Write Access Time = x cycles */
+#define SET_B0RAT(x)            (((x)&0xF) << 8)    /* B0 Read Access Time = x cycles */
+#define SET_B0HT(x)             (((x)&0x3) << 6)    /* B0 Hold Time (~Read/Write to ~AOE) = x cycles */
+#define SET_B0ST[x)             (((x)&0x3) << 4)    /* B0 Setup Time (AOE to Read/Write) = x cycle */
+#define SET_B0TT(x)             (((x)&0x3) << 2)    /* B0 Transition Time (Read to Write) = x cycles */
 
 /* Bit masks for EBIU_AMBCTL1 */
 
@@ -1816,6 +1853,19 @@
 #define                     B3RAT  0xf000000  /* Bank 3 Read access time */
 #define                     B3WAT  0xf0000000 /* Bank 3 write access time */
 
+/* EBIU_AMBCTL1 Macros */
+#define SET_B3WAT(x)            (((x)&0xF) << 28)   /* B3 Write Access Time = x cycles */
+#define SET_B3RAT(x)            (((x)&0xF) << 24)   /* B3 Read Access Time = x cycles */
+#define SET_B3HT(x)             (((x)&0x3) << 22)   /* B3 Hold Time (~Read/Write to ~AOE) = x cycles */
+#define SET_B3ST[x)             (((x)&0x3) << 20)   /* B3 Setup Time (AOE to Read/Write) = x cycle */
+#define SET_B3TT(x)             (((x)&0x3) << 18)   /* B3 Transition Time (Read to Write) = x cycles */
+
+#define SET_B2WAT(x)            (((x)&0xF) << 12)   /* B2 Write Access Time = x cycles */
+#define SET_B2RAT(x)            (((x)&0xF) << 8)    /* B2 Read Access Time = x cycles */
+#define SET_B2HT(x)             (((x)&0x3) << 6)    /* B2 Hold Time (~Read/Write to ~AOE) = x cycles */
+#define SET_B2ST[x)             (((x)&0x3) << 4)    /* B2 Setup Time (AOE to Read/Write) = x cycle */
+#define SET_B2TT(x)             (((x)&0x3) << 2)    /* B2 Transition Time (Read to Write) = x cycles */
+
 /* Bit masks for EBIU_MBSCTL */
 
 #define                  AMSB0CTL  0x3        /* Async Memory Bank 0 select */
@@ -1830,6 +1880,30 @@
 #define                    B2MODE  0x30       /* Async Memory Bank 2 Access Mode */
 #define                    B3MODE  0xc0       /* Async Memory Bank 3 Access Mode */
 
+/* Bit masks for EBIU_MODE (BOMODE) */
+#define B0MODE_ASYNC            0x00000000          /* Bank 0 Access Mode - 00 - Asynchronous Mode */
+#define B0MODE_FLASH            0x00000001          /* Bank 0 Access Mode - 01 - Asynchronous Flash Mode */
+#define B0MODE_PAGE             0x00000002          /* Bank 0 Access Mode - 10 - Asynchronous Page Mode */
+#define B0MODE_BURST            0x00000003          /* Bank 0 Access Mode - 11 - Synchronous (Burst) Mode */
+
+/* Bit masks for EBIU_MODE (B1MODE) */
+#define B1MODE_ASYNC            0x00000000          /* Bank 1 Access Mode - 00 - Asynchronous Mode */
+#define B1MODE_FLASH            0x00000004          /* Bank 1 Access Mode - 01 - Asynchronous Flash Mode */
+#define B1MODE_PAGE             0x00000008          /* Bank 1 Access Mode - 10 - Asynchronous Page Mode */
+#define B1MODE_BURST            0x0000000C          /* Bank 1 Access Mode - 11 - Synchronous (Burst) Mode */
+
+/* Bit masks for EBIU_MODE (B2MODE) */
+#define B2MODE_ASYNC            0x00000000          /* Bank 2 Access Mode - 00 - Asynchronous Mode */
+#define B2MODE_FLASH            0x00000010          /* Bank 2 Access Mode - 01 - Asynchronous Flash Mode */
+#define B2MODE_PAGE             0x00000020          /* Bank 2 Access Mode - 10 - Asynchronous Page Mode */
+#define B2MODE_BURST            0x00000030          /* Bank 2 Access Mode - 11 - Synchronous (Burst) Mode */
+
+/* Bit masks for EBIU_MODE (B3MODE) */
+#define B3MODE_ASYNC            0x00000000          /* Bank 3 Access Mode - 00 - Asynchronous Mode */
+#define B3MODE_FLASH            0x00000040          /* Bank 3 Access Mode - 01 - Asynchronous Flash Mode */
+#define B3MODE_PAGE             0x00000080          /* Bank 3 Access Mode - 10 - Asynchronous Page Mode */
+#define B3MODE_BURST            0x000000C0          /* Bank 3 Access Mode - 11 - Synchronous (Burst) Mode */
+
 /* Bit masks for EBIU_FCTL */
 
 #define               TESTSETLOCK  0x1        /* Test set lock */
@@ -1840,6 +1914,14 @@
 #define                     nPGSZ  0x0
 #define                      RDDL  0x380      /* Read data delay */
 
+/* Bit masks for EBIU_FCTL (BCLK) */
+#define BCLK2                   0x00000002          /* Burst clock frequency: 01 - SCLK/2 */
+#define BCLK3                   0x00000004          /* Burst clock frequency: 10 - SCLK/3 */
+#define BCLK4                   0x00000006          /* Burst clock frequency: 11 - SCLK/4 */
+
+/* Macros for EBIU_FCTL */
+#define SET_PGWS(x)             (((x)&0x7) << 0x3)  /* PGWS[5:3] Page Wait States - 000 to 100 - 0 to 4 cycles */
+                                                    /* Burst clock frequency: 00 - Reserved */
 /* Bit masks for EBIU_ARBSTAT */
 
 #define                   ARBSTAT  0x1        /* Arbitration status */
@@ -1848,12 +1930,18 @@
 #define                   nBGSTAT  0x0
 
 /* Bit masks for EBIU_DDRCTL0 */
-
 #define                     TREFI  0x3fff     /* Refresh Interval */
 #define                      TRFC  0x3c000    /* Auto-refresh command period */
 #define                       TRP  0x3c0000   /* Pre charge-to-active command period */
 #define                      TRAS  0x3c00000  /* Min Active-to-pre charge time */
 #define                       TRC  0x3c000000 /* Active-to-active time */
+
+/* Macros for EBIU_DDRCTL0 */
+#define SET_tRC(x)              (((x)&0xF) << 26)   /* tRC (Active-to-Active)[29:26] - Number of clock cycles from an active command to next active command (Default: 0x2) */
+#define SET_tRAS(x)             (((x)&0xF) << 22)   /* tRAS (Minimum Active-to-Precharge time) [3:0] - Number of clock cycles from an ACTIVE command until a PRE-CHARGE command is issued. To obtain this value, one should divide the minimum RAS to pre-charge delay of SDRAM by clock cycle time (Default: 0x6) */
+#define SET_tRP(x)              (((x)&0xF) << 18)   /* tRP (Precharge-to-Active Command period)[3:0] - Number of clock cycles needed for DDR to recover from a precharge command and ready to accept next active command (Default: 0x3) */
+#define SET_tRFC(x)             (((x)&0xF) << 14)   /* tRFC[3:0] AUTO-REFRESH Command Period[3:0] - Number of clock cycles needed for DDR to recover from a refresh to be ready for next active command (tRFC/Clock Period) (Default: 0xA) */
+#define SET_tREFI(x)            ((x)&0x3FFF)        /* tREFI (Refresh Interval)[13:0] - Number of clock cycles from one refresh cycle to next refresh cycle. To obtain this value, divide the DDR refresh period (tREF) by total number of rows to be refreshed. Then divide the result by total time. (Default: 0x0411) */
 
 /* Bit masks for EBIU_DDRCTL1 */
 
@@ -1866,8 +1954,36 @@
 #define                DDRDEVSIZE  0xc0000    /* DDR device size */
 #define                     TWWTR  0xf0000000 /* Write-to-read delay */
 
-/* Bit masks for EBIU_DDRCTL2 */
+/* Alternate names that match BF54x HRM */
+#define              DDR_DATWIDTH  0x3000     /* DDR data width */
+#define              DDR_DEVWIDTH  0x30000    /* DDR device width */
+#define               DDR_DEVSIZE  0xc0000    /* DDR device size */
 
+/* Masks for EBIU_DDRCTL1 (DDRDATWIDTH) [in HRM: DDR_DATWIDTH] */
+#define DDR_DATAWIDTH           0x00002000          /* DDR_DATWIDTH Total DDR Data Width (16-bit Only) */
+
+/* Masks for EBIU_DDRCTL1 (EXTBANKS) */
+#define CS0                     0x00000000          /* EXTBANKS External Banks[15:14] */
+#define CS0_CS1                 0x00004000          /* default */
+
+/* Masks for EBIU_DDRCTL1 (DDRDEVWIDTH) [in HRM: DDR_DEVWIDTH] */
+#define DDR_DEVWIDTH_4          0x00000000          /* DDR_DRVWIDTH DDR Device Width[17:16] */
+#define DDR_DEVWIDTH_8          0x00010000
+#define DDR_DEVWIDTH_16         0x00020000          /* default */
+
+/* Masks for EBIU_DDRCTL1 (DDRDEVSIZE) [in HRM: DDR_DEVSIZE] */
+#define DDR_DEVSIZE_512         0x00000000          /* DDR_DEVSIZE DDR Device Size[19:18] */
+#define DDR_DEVSIZE_64          0x00040000
+#define DDR_DEVSIZE_128         0x00080000
+#define DDR_DEVSIZE_256         0x000C0000
+
+/* Macros for EBIU_DDRCTL1 */
+#define SET_tWTR(x)             (((x)&0xF) << 28)   /* tWTR (Write-to-Read Delay)[3:0] - The Write to read delay (last write data to the next read command) as specified by DDR Data sheet (Default: 0x0001) */
+#define SET_tWR(x)              (((x)&0x3) << 8)    /* tWR Write Recovery Time[9:8] */
+#define SET_tMRD(x)             (((x)&0xF) << 4)    /* tMRD Mode register set to active[7:4] */
+#define SET_tRCD(x)             ((x)&0xF)           /* tRCD ACTIVE-to-READ/WRITE delay[3:0] */
+
+/* Bit masks for EBIU_DDRCTL2 */
 #define               BURSTLENGTH  0x7        /* Burst length */
 #define                CASLATENCY  0x70       /* CAS latency */
 #define                  DLLRESET  0x100      /* DLL Reset */
@@ -1875,22 +1991,72 @@
 #define                      REGE  0x1000     /* Register mode enable */
 #define                     nREGE  0x0
 
-/* Bit masks for EBIU_DDRCTL3 */
+/* Masks for EBIU_DDRCTL2 (BURSTLENGTH) */
+#define BURSTLENGTH1            0x00000001          /* BURSTLENGTH Burst length[2:0] - 001 : Read Only value is set to a burst length of 2 */
 
+/* Masks for EBIU_DDRCTL2 (CASLATENCY) */
+/* CASLATENCY CAS Latency[6:4] - The number of clock cycles from assertion of read/write signal to SDRAM until first valid data on output from SDRAM. */
+#define CASLATENCY15            0x00000050          /* 101 : 1.5 */
+#define CASLATENCY2             0x00000020          /* 010 : 2 (Default) */
+#define CASLATENCY25            0x00000060          /* 110 : 2.5 */
+#define CASLATENCY3             0x00000030          /* 011 : 3 */
+
+/* Masks for EBIU_DDRCTL2 (DLLRESET) */
+#define DLL                     0x00000001          /* 0: Enable DLL */
+#define nDLL                    0x0                 /* 0: Disable DLL (Default) */
+#define DS                      0x00000002          /* Defaults to 1 ( Reduced Strength). This is the ONLY value supported */
+#define nDS                     0x0
+
+/* Bit masks for EBIU_DDRCTL3 */
 #define                      PASR  0x7        /* Partial array self-refresh */
 
 /* Bit masks for EBIU_DDRQUE */
-
+#define                DEB0_PFLEN  0x30       /* Pre fetch length for DEB0 accesses */
 #define                DEB1_PFLEN  0x3        /* Pre fetch length for DEB1 accesses */
 #define                DEB2_PFLEN  0xc        /* Pre fetch length for DEB2 accesses */
-#define                DEB3_PFLEN  0x30       /* Pre fetch length for DEB3 accesses */
 #define          DEB_ARB_PRIORITY  0x700      /* Arbitration between DEB busses */
+#define               DEB0_URGENT  0x4000     /* DEB0 Urgent */
+#define              nDEB0_URGENT  0x0
 #define               DEB1_URGENT  0x1000     /* DEB1 Urgent */
 #define              nDEB1_URGENT  0x0
 #define               DEB2_URGENT  0x2000     /* DEB2 Urgent */
 #define              nDEB2_URGENT  0x0
-#define               DEB3_URGENT  0x4000     /* DEB3 Urgent */
-#define              nDEB3_URGENT  0x0
+
+/* Bit masks for EBIU_DDRQUE (DEB0_PFLEN) */
+/* DEB0_PFLEN[1:0] - Prefetch Length for DEB0 Accesses. Based on these bits, DQM instructs DDR Controller to perform 2-beat, 4-beat or 8-beat bursts for prefetch read data. */
+#define DEB0_PFLEN0             0x00000000          /* 00 - (Single Access) */
+#define DEB0_PFLEN4             0x00000001          /* 01 - 4 Half-words (Default) */
+#define DEB0_PFLEN8             0x00000002          /* 10 - 8 Half-words */
+#define DEB0_PFLEN16            0x00000003          /* 11 - 16Half-words */
+/* performs, 16 bit read to DDR controller. Second edge is not used. */
+
+/* Bit masks for EBIU_DDRQUE (DEB1_PFLEN) */
+/* DEB1_PFLEN[3:2] - Prefetch Length for DEB0 Accesses. Based on these bits, DQM instructs DDR Controller to perform 2-beat, 4-beat or 8-beat bursts for prefetch read data. */
+#define DEB1_PFLEN0             0x00000000          /* 00 - (Single Access) */
+#define DEB1_PFLEN4             0x00000004          /* 01 - 4 Half-words (Default) */
+#define DEB1_PFLEN8             0x00000008          /* 10 - 8 Half-words */
+#define DEB1_PFLEN16            0x0000000C          /* 11 - 16Half-words */
+/* performs, 16 bit read to DDR controller. Second edge is not used. */
+
+/* Bit masks for EBIU_DDRQUE (DEB2_PFLEN) */
+/* DEB2_PFLEN[5:4] - Prefetch Length for DEB0 Accesses. Based on these bits, DQM instructs DDR Controller to perform 2-beat, 4-beat or 8-beat bursts for prefetch read data. */
+#define DEB2_PFLEN0             0x00000000          /* 00 - (Single Access) */
+#define DEB2_PFLEN4             0x00000010          /* 01 - 4 Half-words (Default) */
+#define DEB2_PFLEN8             0x00000020          /* 10 - 8 Half-words */
+#define DEB2_PFLEN16            0x00000030          /* 11 - 16Half-words */
+/* performs, 16 bit read to DDR controller. Second edge is not used. */
+
+/* Bit masks for EBIU_DDRQUE (DEB_ARB_PRIORITY) */
+/* DEB_ARB_PRIORITY[10:8] - Arbitration Priority between all DEB buses for External DDR Memory: */
+#define DEB_ARB_PRIORITY0       0x00000000          /* 000 : DEB0>DEB1>DEB2 */
+#define DEB_ARB_PRIORITY1       0x00000100          /* 001 : DEB1>DEB0>DEB2 (Default) */
+#define DEB_ARB_PRIORITY2       0x00000200          /* 010 : DEB2>DEB0>DEB1 */
+/* In addition the following fixed order of arbitration is maintained:
+1. Core Lock Access
+2. Urgent DMA Access
+3. Core Access
+4. Normal DMA Access
+5. Prefetch Reads */
 
 /* Bit masks for EBIU_ERRMST */
 
@@ -2556,6 +2722,15 @@
 #define                      CSEL  0x30       /* Core Select */
 #define                      SSEL  0xf        /* System Select */
 
+/* PLL_DIV Masks (CSEL) */
+#define CSEL_DIV1               0x0000              /* CCLK = VCO / 1 */
+#define CSEL_DIV2               0x0010              /* CCLK = VCO / 2 */
+#define CSEL_DIV4               0x0020              /* CCLK = VCO / 4 */
+#define CSEL_DIV8               0x0030              /* CCLK = VCO / 8 */
+
+/* PLL_DIV Macros */
+#define SET_SSEL(x)             ((x)&0xF)           /* Set SSEL = 0-15 --> SCLK = VCO/SSEL */
+
 /* Bit masks for PLL_CTL */
 
 #define                      MSEL  0x7e00     /* Multiplier Select */
@@ -2573,6 +2748,9 @@
 #define                  nPLL_OFF  0x0
 #define                        DF  0x1        /* Divide Frequency */
 #define                       nDF  0x0
+
+/* PLL_CTL Macros (Only Use With Logic OR While Setting Lower Order Bits) */
+#define SET_MSEL(x)             (((x)&0x3F) << 9) /* Set MSEL = 0-63 --> VCO = CLKIN*MSEL */
 
 /* Bit masks for PLL_STAT */
 
@@ -2616,6 +2794,34 @@
 #define                   nKPADWE  0x0
 #define                     ROTWE  0x2000     /* Rotary Wake-Up Enable */
 #define                    nROTWE  0x0
+#define 		 CLKBUFOE  0x4000     /* CLKIN Buffer Output Enable */
+#define 		nCLKBUFOE  0x0
+
+/* VR_CTL Masks (FREQ) */
+#define HIBERNATE               0x0000              /* Powerdown/Bypass On-Board Regulation */
+#define FREQ_333                0x0001              /* Switching Frequency Is 333 kHz */
+#define FREQ_667                0x0002              /* Switching Frequency Is 667 kHz */
+#define FREQ_1000               0x0003              /* Switching Frequency Is 1 MHz */
+
+/* VR_CTL Masks (GAIN) */
+
+#define GAIN_5                  0x0000              /* GAIN = 5 */
+#define GAIN_10                 0x0004              /* GAIN = 10 */
+#define GAIN_20                 0x0008              /* GAIN = 20 */
+#define GAIN_50                 0x000C              /* GAIN = 50 */
+
+/* VR_CTL Masks (VLEV) */
+
+#define VLEV_085                0x0060              /* VLEV = 0.85 V (-5% - +10% Accuracy) */
+#define VLEV_090                0x0070              /* VLEV = 0.90 V (-5% - +10% Accuracy) */
+#define VLEV_095                0x0080              /* VLEV = 0.95 V (-5% - +10% Accuracy) */
+#define VLEV_100                0x0090              /* VLEV = 1.00 V (-5% - +10% Accuracy) */
+#define VLEV_105                0x00A0              /* VLEV = 1.05 V (-5% - +10% Accuracy) */
+#define VLEV_110                0x00B0              /* VLEV = 1.10 V (-5% - +10% Accuracy) */
+#define VLEV_115                0x00C0              /* VLEV = 1.15 V (-5% - +10% Accuracy) */
+#define VLEV_120                0x00D0              /* VLEV = 1.20 V (-5% - +10% Accuracy) */
+#define VLEV_125                0x00E0              /* VLEV = 1.25 V (-5% - +10% Accuracy) */
+#define VLEV_130                0x00F0              /* VLEV = 1.30 V (-5% - +10% Accuracy) */
 
 /* Bit masks for NFC_CTL */
 
@@ -2658,8 +2864,8 @@
 #define             nMASK_BUSYIRQ  0x0
 #define                MASK_WBOVF  0x2        /* Mask Write Buffer Overflow */
 #define               nMASK_WBOVF  0x0
-#define              MASK_WBEMPTY  0x4        /* Mask Write Buffer Empty */
-#define             nMASK_WBEMPTY  0x0
+#define               MASK_WBEDGE  0x4        /* Mask Write Buffer Edge Detect */
+#define              nMASK_WBEDGE  0x0
 #define                MASK_RDRDY  0x8        /* Mask Read Data Ready */
 #define               nMASK_RDRDY  0x0
 #define               MASK_WRDONE  0x10       /* Mask Write Done */
@@ -4347,39 +4553,23 @@
 #define                      RFCS  0x20       /* Receive FIFO Count Status */
 #define                     nRFCS  0x0
 
-/* Bit masks for UARTx_IER_SET */
+/* Bit masks for UARTx_IER_SET and UARTx_IER_CLEAR */
 
-#define                   ERBFI_S  0x1        /* Enable Receive Buffer Full Interrupt */
-#define                  nERBFI_S  0x0
-#define                   ETBEI_S  0x2        /* Enable Transmit Buffer Empty Interrupt */
-#define                  nETBEI_S  0x0
-#define                    ELSI_S  0x4        /* Enable Receive Status Interrupt */
-#define                   nELSI_S  0x0
-#define                   EDSSI_S  0x8        /* Enable Modem Status Interrupt */
-#define                  nEDSSI_S  0x0
-#define                  EDTPTI_S  0x10       /* Enable DMA Transmit PIRQ Interrupt */
-#define                 nEDTPTI_S  0x0
-#define                    ETFI_S  0x20       /* Enable Transmission Finished Interrupt */
-#define                   nETFI_S  0x0
-#define                   ERFCI_S  0x40       /* Enable Receive FIFO Count Interrupt */
-#define                  nERFCI_S  0x0
+#define                     ERBFI  0x1        /* Enable Receive Buffer Full Interrupt */
+#define                    nERBFI  0x0
+#define                     ETBEI  0x2        /* Enable Transmit Buffer Empty Interrupt */
+#define                    nETBEI  0x0
+#define                      ELSI  0x4        /* Enable Receive Status Interrupt */
+#define                     nELSI  0x0
+#define                     EDSSI  0x8        /* Enable Modem Status Interrupt */
+#define                    nEDSSI  0x0
+#define                    EDTPTI  0x10       /* Enable DMA Transmit PIRQ Interrupt */
+#define                   nEDTPTI  0x0
+#define                      ETFI  0x20       /* Enable Transmission Finished Interrupt */
+#define                     nETFI  0x0
+#define                     ERFCI  0x40       /* Enable Receive FIFO Count Interrupt */
+#define                    nERFCI  0x0
 
-/* Bit masks for UARTx_IER_CLEAR */
-
-#define                   ERBFI_C  0x1        /* Enable Receive Buffer Full Interrupt */
-#define                  nERBFI_C  0x0
-#define                   ETBEI_C  0x2        /* Enable Transmit Buffer Empty Interrupt */
-#define                  nETBEI_C  0x0
-#define                    ELSI_C  0x4        /* Enable Receive Status Interrupt */
-#define                   nELSI_C  0x0
-#define                   EDSSI_C  0x8        /* Enable Modem Status Interrupt */
-#define                  nEDSSI_C  0x0
-#define                  EDTPTI_C  0x10       /* Enable DMA Transmit PIRQ Interrupt */
-#define                 nEDTPTI_C  0x0
-#define                    ETFI_C  0x20       /* Enable Transmission Finished Interrupt */
-#define                   nETFI_C  0x0
-#define                   ERFCI_C  0x40       /* Enable Receive FIFO Count Interrupt */
-#define                  nERFCI_C  0x0
 
 /* Bit masks for UARTx_GCTL */
 
@@ -4937,3 +5127,418 @@ PORTJ_FER registers
 #endif /* _MISRA_RULES */
 
 #endif /* _DEF_BF54X_H */
+
+
+/*********************************************************************************** */
+/* System MMR Register Bits */
+/******************************************************************************* */
+
+/* **************************  DMA CONTROLLER MASKS  ********************************/
+/* DMAx_CONFIG, MDMA_yy_CONFIG Masks                                                */
+#define WDSIZE_8        0x0000          /* Transfer Word Size = 8 */
+#define WDSIZE_16       0x0004          /* Transfer Word Size = 16 */
+#define WDSIZE_32       0x0008          /* Transfer Word Size = 32 */
+#define NDSIZE_0        0x0000          /* Next Descriptor Size = 0 (Stop/Autobuffer) */
+#define NDSIZE_1        0x0100          /* Next Descriptor Size = 1 */
+#define NDSIZE_2        0x0200          /* Next Descriptor Size = 2 */
+#define NDSIZE_3        0x0300          /* Next Descriptor Size = 3 */
+#define NDSIZE_4        0x0400          /* Next Descriptor Size = 4 */
+#define NDSIZE_5        0x0500          /* Next Descriptor Size = 5 */
+#define NDSIZE_6        0x0600          /* Next Descriptor Size = 6 */
+#define NDSIZE_7        0x0700          /* Next Descriptor Size = 7 */
+#define NDSIZE_8        0x0800          /* Next Descriptor Size = 8 */
+#define NDSIZE_9        0x0900          /* Next Descriptor Size = 9 */
+#define SET_NDSIZE(x)   (((x)&0xF)<<8)  /* NDSIZE[3:0] (Flex Descriptor Size)
+                                            Size of next descriptor
+                                            0000 - Required if in Stop or Autobuffer mode
+                                            0001 - 1001 - Descriptor size
+                                            1010 - 1111 - Reserved */
+#define FLOW_STOP       0x0000          /* Stop Mode */
+#define FLOW_AUTO       0x1000          /* Autobuffer Mode */
+#define FLOW_ARRAY      0x4000          /* Descriptor Array Mode */
+#define FLOW_SMALL      0x6000          /* Small Model Descriptor List Mode */
+#define FLOW_LARGE      0x7000          /* Large Model Descriptor List Mode */
+
+
+/* ********************* PLL AND RESET MASKS ************************ */
+/* SWRST Mask */
+#define SYSTEM_RESET    0x0007          /* Initiates A System Software Reset */
+#define DOUBLE_FAULT    0x0008          /* Core Double Fault Causes Reset */
+#define RESET_DOUBLE    0x2000          /* SW Reset Generated By Core Double-Fault */
+#define RESET_WDOG      0x4000          /* SW Reset Generated By Watchdog Timer */
+#define RESET_SOFTWARE  0x8000          /* SW Reset Occurred Since Last Read Of SWRST */
+
+/* SYSCR Masks */
+#define BMODE           0x0006          /* Boot Mode - Latched During HW Reset From Mode Pins */
+#define NOBOOT          0x0010          /* Execute From L1 or ASYNC Bank 0 When BMODE = 0 */
+
+
+/* ******************************************* */
+/*     MULTI BIT MACRO ENUMERATIONS            */
+/* ******************************************* */
+
+/* PORT A Bit Definitions for the registers
+PORTA, PORTA_SET, PORTA_CLEAR, PORTA_DIR_SET,
+PORTA_DIR_CLEAR, PORTA_INEN, PORTA_FER */
+
+#define nPA0 0x0
+#define nPA1 0x0
+#define nPA2 0x0
+#define nPA3 0x0
+#define nPA4 0x0
+#define nPA5 0x0
+#define nPA6 0x0
+#define nPA7 0x0
+#define nPA8 0x0
+#define nPA9 0x0
+#define nPA10 0x0
+#define nPA11 0x0
+#define nPA12 0x0
+#define nPA13 0x0
+#define nPA14 0x0
+#define nPA15 0x0
+
+/* PORT B Bit Definitions for the registers
+PORTB, PORTB_SET, PORTB_CLEAR, PORTB_DIR_SET,
+PORTB_DIR_CLEAR, PORTB_INEN, PORTB_FER */
+
+#define nPB0 0x0
+#define nPB1 0x0
+#define nPB2 0x0
+#define nPB3 0x0
+#define nPB4 0x0
+#define nPB5 0x0
+#define nPB6 0x0
+#define nPB7 0x0
+#define nPB8 0x0
+#define nPB9 0x0
+#define nPB10 0x0
+#define nPB11 0x0
+#define nPB12 0x0
+#define nPB13 0x0
+#define nPB14 0x0
+#define nPB15 0x0
+
+/* PORT D Bit Definitions for the registers
+PORTD, PORTD_SET, PORTD_CLEAR, PORTD_DIR_SET,
+PORTD_DIR_CLEAR, PORTD_INEN, PORTD_FER */
+
+#define nPD0 0x0
+#define nPD1 0x0
+#define nPD2 0x0
+#define nPD3 0x0
+#define nPD4 0x0
+#define nPD5 0x0
+#define nPD6 0x0
+#define nPD7 0x0
+#define nPD8 0x0
+#define nPD9 0x0
+#define nPD10 0x0
+#define nPD11 0x0
+#define nPD12 0x0
+#define nPD13 0x0
+#define nPD14 0x0
+#define nPD15 0x0
+
+/* PORT E Bit Definitions for the registers
+PORTE, PORTE_SET, PORTE_CLEAR, PORTE_DIR_SET,
+PORTE_DIR_CLEAR, PORTE_INEN, PORTE_FER */
+
+#define nPE0 0x0
+#define nPE1 0x0
+#define nPE2 0x0
+#define nPE3 0x0
+#define nPE4 0x0
+#define nPE5 0x0
+#define nPE6 0x0
+#define nPE7 0x0
+#define nPE8 0x0
+#define nPE9 0x0
+#define nPE10 0x0
+#define nPE11 0x0
+#define nPE12 0x0
+#define nPE13 0x0
+#define nPE14 0x0
+#define nPE15 0x0
+
+/* PORT F Bit Definitions for the registers
+PORTF, PORTF_SET, PORTF_CLEAR, PORTF_DIR_SET,
+PORTF_DIR_CLEAR, PORTF_INEN, PORTF_FER */
+
+#define nPF0 0x0
+#define nPF1 0x0
+#define nPF2 0x0
+#define nPF3 0x0
+#define nPF4 0x0
+#define nPF5 0x0
+#define nPF6 0x0
+#define nPF7 0x0
+#define nPF8 0x0
+#define nPF9 0x0
+#define nPF10 0x0
+#define nPF11 0x0
+#define nPF12 0x0
+#define nPF13 0x0
+#define nPF14 0x0
+#define nPF15 0x0
+
+/* PORT G Bit Definitions for the registers
+PORTG, PORTG_SET, PORTG_CLEAR, PORTG_DIR_SET,
+PORTG_DIR_CLEAR, PORTG_INEN, PORTG_FER */
+#define nPG0 0x0
+#define nPG1 0x0
+#define nPG2 0x0
+#define nPG3 0x0
+#define nPG4 0x0
+#define nPG5 0x0
+#define nPG6 0x0
+#define nPG7 0x0
+#define nPG8 0x0
+#define nPG9 0x0
+#define nPG10 0x0
+#define nPG11 0x0
+#define nPG12 0x0
+#define nPG13 0x0
+#define nPG14 0x0
+#define nPG15 0x0
+
+/* PORT H Bit Definitions for the registers
+PORTH, PORTH_SET, PORTH_CLEAR, PORTH_DIR_SET,
+PORTH_DIR_CLEAR, PORTH_INEN, PORTH_FER */
+#define nPH0 0x0
+#define nPH1 0x0
+#define nPH2 0x0
+#define nPH3 0x0
+#define nPH4 0x0
+#define nPH5 0x0
+#define nPH6 0x0
+#define nPH7 0x0
+#define nPH8 0x0
+#define nPH9 0x0
+#define nPH10 0x0
+#define nPH11 0x0
+#define nPH12 0x0
+#define nPH13 0x0
+#define nPH14 0x0
+#define nPH15 0x0
+
+/* PORT I Bit Definitions for the registers
+PORTI, PORTI_SET, PORTI_CLEAR, PORTI_DIR_SET,
+PORTI_DIR_CLEAR, PORTI_INEN, PORTI_FER */
+#define nPI0 0x0
+#define nPI1 0x0
+#define nPI2 0x0
+#define nPI3 0x0
+#define nPI4 0x0
+#define nPI5 0x0
+#define nPI6 0x0
+#define nPI7 0x0
+#define nPI8 0x0
+#define nPI9 0x0
+#define nPI10 0x0
+#define nPI11 0x0
+#define nPI12 0x0
+#define nPI13 0x0
+#define nPI14 0x0
+#define nPI15 0x0
+
+/* PORT J Bit Definitions for the registers
+PORTJ, PORTJ_SET, PORTJ_CLEAR, PORTJ_DIR_SET,
+PORTJ_DIR_CLEAR, PORTJ_INEN, PORTJ_FER */
+#define nPJ0 0x0
+#define nPJ1 0x0
+#define nPJ2 0x0
+#define nPJ3 0x0
+#define nPJ4 0x0
+#define nPJ5 0x0
+#define nPJ6 0x0
+#define nPJ7 0x0
+#define nPJ8 0x0
+#define nPJ9 0x0
+#define nPJ10 0x0
+#define nPJ11 0x0
+#define nPJ12 0x0
+#define nPJ13 0x0
+#define nPJ14 0x0
+#define nPJ15 0x0
+
+
+/* *************  SYSTEM INTERRUPT CONTROLLER MASKS *************************************/
+/* Peripheral Masks For SIC_ISR, SIC_IWR, SIC_IMASK                                     */
+
+/* SIC_IAR0 Macros */
+#define P0_IVG(x)       (((x)&0xF)-7)           /* Peripheral #0 assigned IVG #x    */
+#define P1_IVG(x)       (((x)&0xF)-7) << 0x4    /* Peripheral #1 assigned IVG #x    */
+#define P2_IVG(x)       (((x)&0xF)-7) << 0x8    /* Peripheral #2 assigned IVG #x    */
+#define P3_IVG(x)       (((x)&0xF)-7) << 0xC    /* Peripheral #3 assigned IVG #x    */
+#define P4_IVG(x)       (((x)&0xF)-7) << 0x10   /* Peripheral #4 assigned IVG #x    */
+#define P5_IVG(x)       (((x)&0xF)-7) << 0x14   /* Peripheral #5 assigned IVG #x    */
+#define P6_IVG(x)       (((x)&0xF)-7) << 0x18   /* Peripheral #6 assigned IVG #x    */
+#define P7_IVG(x)       (((x)&0xF)-7) << 0x1C   /* Peripheral #7 assigned IVG #x    */
+
+/* SIC_IAR1 Macros */
+#define P8_IVG(x)       (((x)&0xF)-7)           /* Peripheral #8 assigned IVG #x    */
+#define P9_IVG(x)       (((x)&0xF)-7) << 0x4    /* Peripheral #9 assigned IVG #x    */
+#define P10_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #10 assigned IVG #x   */
+#define P11_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #11 assigned IVG #x   */
+#define P12_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #12 assigned IVG #x   */
+#define P13_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #13 assigned IVG #x   */
+#define P14_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #14 assigned IVG #x   */
+#define P15_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #15 assigned IVG #x   */
+
+/* SIC_IAR2 Macros */
+#define P16_IVG(x)      (((x)&0xF)-7)           /* Peripheral #16 assigned IVG #x   */
+#define P17_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #17 assigned IVG #x   */
+#define P18_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #18 assigned IVG #x   */
+#define P19_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #19 assigned IVG #x   */
+#define P20_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #20 assigned IVG #x   */
+#define P21_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #21 assigned IVG #x   */
+#define P22_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #22 assigned IVG #x   */
+#define P23_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #23 assigned IVG #x   */
+
+/* SIC_IAR3 Macros */
+#define P24_IVG(x)      (((x)&0xF)-7)           /* Peripheral #24 assigned IVG #x   */
+#define P25_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #25 assigned IVG #x   */
+#define P26_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #26 assigned IVG #x   */
+#define P27_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #27 assigned IVG #x   */
+#define P28_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #28 assigned IVG #x   */
+#define P29_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #29 assigned IVG #x   */
+#define P30_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #30 assigned IVG #x   */
+#define P31_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #31 assigned IVG #x   */
+
+/* SIC_IAR4 Macros */
+#define P32_IVG(x)      (((x)&0xF)-7)           /* Peripheral #32 assigned IVG #x   */
+#define P33_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #33 assigned IVG #x   */
+#define P34_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #34 assigned IVG #x   */
+#define P35_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #35 assigned IVG #x   */
+#define P36_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #36 assigned IVG #x   */
+#define P37_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #37 assigned IVG #x   */
+#define P38_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #38 assigned IVG #x   */
+#define P39_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #39 assigned IVG #x   */
+
+/* SIC_IAR4 Macros */
+#define P40_IVG(x)      (((x)&0xF)-7)           /* Peripheral #40 assigned IVG #x   */
+#define P41_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #41 assigned IVG #x   */
+#define P42_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #42 assigned IVG #x   */
+#define P43_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #43 assigned IVG #x   */
+#define P44_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #44 assigned IVG #x   */
+#define P45_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #45 assigned IVG #x   */
+#define P46_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #46 assigned IVG #x   */
+#define P47_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #47 assigned IVG #x   */
+
+/* SIC_IAR5 Macros */
+#define P48_IVG(x)      (((x)&0xF)-7)           /* Peripheral #48 assigned IVG #x   */
+#define P49_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #49 assigned IVG #x   */
+#define P50_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #50 assigned IVG #x   */
+#define P51_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #51 assigned IVG #x   */
+#define P52_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #52 assigned IVG #x   */
+#define P53_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #53 assigned IVG #x   */
+#define P54_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #54 assigned IVG #x   */
+#define P55_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #55 assigned IVG #x   */
+
+/* SIC_IAR5 Macros */
+#define P56_IVG(x)      (((x)&0xF)-7)           /* Peripheral #56 assigned IVG #x   */
+#define P57_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #57 assigned IVG #x   */
+#define P58_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #58 assigned IVG #x   */
+#define P59_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #59 assigned IVG #x   */
+#define P60_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #60 assigned IVG #x   */
+#define P61_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #61 assigned IVG #x   */
+#define P62_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #62 assigned IVG #x   */
+#define P63_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #63 assigned IVG #x   */
+
+/* SIC_IAR6 Macros */
+#define P64_IVG(x)      (((x)&0xF)-7)           /* Peripheral #64 assigned IVG #x   */
+#define P65_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #65 assigned IVG #x   */
+#define P66_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #66 assigned IVG #x   */
+#define P67_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #67 assigned IVG #x   */
+#define P68_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #68 assigned IVG #x   */
+#define P69_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #69 assigned IVG #x   */
+#define P70_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #70 assigned IVG #x   */
+#define P71_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #71 assigned IVG #x   */
+
+/* SIC_IAR7 Macros */
+#define P72_IVG(x)      (((x)&0xF)-7)           /* Peripheral #72 assigned IVG #x   */
+#define P73_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #73 assigned IVG #x   */
+#define P74_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #74 assigned IVG #x   */
+#define P75_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #75 assigned IVG #x   */
+#define P76_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #76 assigned IVG #x   */
+#define P77_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #77 assigned IVG #x   */
+#define P78_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #78 assigned IVG #x   */
+#define P79_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #79 assigned IVG #x   */
+
+/* SIC_IAR7 Macros */
+#define P72_IVG(x)      (((x)&0xF)-7)           /* Peripheral #72 assigned IVG #x   */
+#define P73_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #73 assigned IVG #x   */
+#define P74_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #74 assigned IVG #x   */
+#define P75_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #75 assigned IVG #x   */
+#define P76_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #76 assigned IVG #x   */
+#define P77_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #77 assigned IVG #x   */
+#define P78_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #78 assigned IVG #x   */
+#define P79_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #79 assigned IVG #x   */
+
+/* SIC_IAR8 Macros */
+#define P80_IVG(x)      (((x)&0xF)-7)           /* Peripheral #80 assigned IVG #x   */
+#define P81_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #81 assigned IVG #x   */
+#define P82_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #82 assigned IVG #x   */
+#define P83_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #83 assigned IVG #x   */
+#define P84_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #84 assigned IVG #x   */
+#define P85_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #85 assigned IVG #x   */
+#define P86_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #86 assigned IVG #x   */
+#define P87_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #87 assigned IVG #x   */
+
+/* SIC_IAR8 Macros */
+#define P88_IVG(x)      (((x)&0xF)-7)           /* Peripheral #88 assigned IVG #x   */
+#define P89_IVG(x)      (((x)&0xF)-7) << 0x4    /* Peripheral #89 assigned IVG #x   */
+#define P90_IVG(x)      (((x)&0xF)-7) << 0x8    /* Peripheral #90 assigned IVG #x   */
+#define P91_IVG(x)      (((x)&0xF)-7) << 0xC    /* Peripheral #91 assigned IVG #x   */
+#define P92_IVG(x)      (((x)&0xF)-7) << 0x10   /* Peripheral #92 assigned IVG #x   */
+#define P93_IVG(x)      (((x)&0xF)-7) << 0x14   /* Peripheral #93 assigned IVG #x   */
+#define P94_IVG(x)      (((x)&0xF)-7) << 0x18   /* Peripheral #94 assigned IVG #x   */
+#define P95_IVG(x)      (((x)&0xF)-7) << 0x1C   /* Peripheral #95 assigned IVG #x   */
+
+
+/* ********* WATCHDOG TIMER MASKS ******************** */
+
+/* Watchdog Timer WDOG_CTL Register Masks */
+#define SET_WDEV(x)     (((x)<<1) & 0x0006)     /* event generated on roll over */
+#define WDEV_RESET      0x0000                  /* generate reset event on roll over */
+#define nWDEV_RESET     0x0
+#define WDEV_NMI        0x0002                  /* generate NMI event on roll over */
+#define nWDEV_NMI       0x0
+#define WDEV_GPI        0x0004                  /* generate GP IRQ on roll over */
+#define nWDEV_GPI       0x0
+#define WDEV_NONE       0x0006                  /* no event on roll over */
+#define WDDIS           0x0AD0                  /* disable watchdog */
+
+/* RTC_SWCNT (RTC stopwatch count) Macros */
+#define SET_SWCNT(x)    (x)
+
+/* RTC_PREN Register Masks */
+#define ENABLE_PRESCALE             PREN        /* Enable prescaler so RTC runs at 1 Hz */
+
+/* RTC_ALARM Macro: z=day, y=hr, x=min, w=sec */
+#define SET_ALARM(z,y,x,w)  ((((z)&0x7FFF)<<0x11)|(((y)&0x1F)<<0xC)|(((x)&0x3F)<<0x6)|((w)&0x3F))
+
+
+/* ******************************************* */
+/*     MULTI BIT MACRO ENUMERATIONS            */
+/* ******************************************* */
+
+/* CNT_COMMAND bit field options */
+#define nW1LCNT_ZERO    0x0
+#define nW1LCNT_MIN     0x0
+#define nW1LCNT_MAX     0x0
+
+#define nW1LMIN_ZERO    0x0
+#define nW1LMIN_CNT     0x0
+#define nW1LMIN_MAX     0x0
+
+#define nW1LMAX_ZERO    0x0
+#define nW1LMAX_CNT     0x0
+#define nW1LMAX_MIN     0x0
+
+#define W1ZMONCE        0x1000          /* write on to enable single zero marker. clear CNT_COUNT action (W1A/R) */
+#define nW1ZMONCE       0x0
+
+/* Bit macros for CNT_DEBOUNCE */
+#define SET_DPRESCALE(x)   ((x)&0x7)    /* 0000: 1x -> 0111: 128x, 1xxx Reserved */

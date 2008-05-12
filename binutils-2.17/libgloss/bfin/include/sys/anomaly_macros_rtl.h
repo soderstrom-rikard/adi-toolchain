@@ -1,8 +1,4 @@
 /*
- * anomaly_macros_rtl.h
- *
- * Copyright (C) 2007 Analog Devices, Inc.
- *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
  * that existing copyright notices are retained in all copies and that this
@@ -15,6 +11,10 @@
  */
 
 /************************************************************************
+ *
+ * anomaly_macros_rtl.h : $Revision: 1.8 $
+ *
+ * (c) Copyright 2005-2006 Analog Devices, Inc.  All rights reserved.
  *
  * This file defines macros used within the run-time libraries to enable
  * certain anomaly workarounds for the appropriate chips and silicon

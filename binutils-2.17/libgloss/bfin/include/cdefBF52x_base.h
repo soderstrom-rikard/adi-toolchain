@@ -1,8 +1,4 @@
 /*
- * cdefBF52x_base.h
- *
- * Copyright (C) 2007 Analog Devices, Inc.
- *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
  * that existing copyright notices are retained in all copies and that this
@@ -13,6 +9,18 @@
  * the new terms are clearly indicated on the first page of each file where
  * they apply.
  */
+
+/*
+** cdefBF52x_base.h
+**
+** Copyright (C) 2007 Analog Devices Inc., All Rights Reserved.
+**
+************************************************************************************
+**
+** This include file contains a list of macro "defines" to enable the programmer
+** to use symbolic names for the registers common to the ADSP-BF52x peripherals.
+**
+***************************************************************/
 
 #ifndef _CDEF_BF52X_H
 #define _CDEF_BF52X_H
@@ -567,7 +575,6 @@
 #define pPORTF_FER		((volatile unsigned short *)PORTF_FER)
 #define pPORTG_FER		((volatile unsigned short *)PORTG_FER)
 #define pPORTH_FER		((volatile unsigned short *)PORTH_FER)
-#define pPORT_MUX		((volatile unsigned short *)PORT_MUX)
 
 
 /* Handshake MDMA Registers	(0xFFC03300 - 0xFFC033FF)								*/
@@ -601,12 +608,12 @@
 #define                       pPORTF_SLEW ((volatile unsigned short *)PORTF_SLEW)
 #define                       pPORTG_SLEW ((volatile unsigned short *)PORTG_SLEW)
 #define                       pPORTH_SLEW ((volatile unsigned short *)PORTH_SLEW)
-#define                 pPORTF_HYSTERISIS ((volatile unsigned short *)PORTF_HYSTERISIS)
-#define                 pPORTG_HYSTERISIS ((volatile unsigned short *)PORTG_HYSTERISIS)
-#define                 pPORTH_HYSTERISIS ((volatile unsigned short *)PORTH_HYSTERISIS)
-#define                   pMISCPORT_DRIVE ((volatile unsigned short *)MISCPORT_DRIVE)
-#define                    pMISCPORT_SLEW ((volatile unsigned short *)MISCPORT_SLEW)
-#define              pMISCPORT_HYSTERISIS ((volatile unsigned short *)MISCPORT_HYSTERISIS)
+#define                 pPORTF_HYSTERESIS ((volatile unsigned short *)PORTF_HYSTERESIS)
+#define                 pPORTG_HYSTERESIS ((volatile unsigned short *)PORTG_HYSTERESIS)
+#define                 pPORTH_HYSTERESIS ((volatile unsigned short *)PORTH_HYSTERESIS)
+#define                   pNONGPIO_DRIVE ((volatile unsigned short *)NONGPIO_DRIVE)
+#define                    pNONGPIO_SLEW ((volatile unsigned short *)NONGPIO_SLEW)
+#define              pNONGPIO_HYSTERESIS ((volatile unsigned short *)NONGPIO_HYSTERESIS)
 
 /* HOST Port Registers */
 

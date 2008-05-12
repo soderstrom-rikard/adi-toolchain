@@ -1,8 +1,4 @@
 /*
- * cdefBF549.h
- *
- * Copyright (C) 2007 Analog Devices, Inc.
- *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
  * that existing copyright notices are retained in all copies and that this
@@ -13,6 +9,20 @@
  * the new terms are clearly indicated on the first page of each file where
  * they apply.
  */
+
+/*
+** cdefBF549.h
+**
+** Copyright (C) 2006-2007 Analog Devices Inc., All Rights Reserved.
+**
+************************************************************************************
+**
+** This include file contains a list of macro "defines" to enable the programmer
+** to use symbolic names for the ADSP-BF549 peripherals.
+**
+************************************************************************************
+** System MMR Register Map
+************************************************************************************/
 
 #ifndef _CDEF_BF549_H
 #define _CDEF_BF549_H
@@ -105,6 +115,7 @@
 #define                        pUART2_SCR ((volatile unsigned short *)UART2_SCR)
 #define                    pUART2_IER_SET ((volatile unsigned short *)UART2_IER_SET)
 #define                  pUART2_IER_CLEAR ((volatile unsigned short *)UART2_IER_CLEAR)
+#define                        pUART2_THR ((volatile unsigned short *)UART2_THR)
 #define                        pUART2_RBR ((volatile unsigned short *)UART2_RBR)
 
 /* Two Wire Interface Registers (TWI1) */

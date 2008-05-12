@@ -1,8 +1,4 @@
 /*
- * defBF538.h
- *
- * Copyright (C) 2007 Analog Devices, Inc.
- *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
  * that existing copyright notices are retained in all copies and that this
@@ -13,6 +9,19 @@
  * the new terms are clearly indicated on the first page of each file where
  * they apply.
  */
+
+/************************************************************************
+**
+** defBF538.h
+**
+** Copyright (C) 2006-2007 Analog Devices Inc., All Rights Reserved.
+**
+*************************************************************************/
+
+/*
+** This include file contains a list of macro "defines" to enable the
+** programmer to use symbolic names for ADSP-BF538 peripherals.
+*/
 
 #ifndef _DEF_BF538_H
 #define _DEF_BF538_H
@@ -1043,7 +1052,7 @@
 #define DMA18_IRQ			0x00000800	/* DMA Channel 18 (UART2 RX) Interrupt Request */
 #define DMA19_IRQ			0x00001000	/* DMA Channel 19 (UART2 TX) Interrupt Request */
 #define TWI0_IRQ			0x00002000	/* TWI0 Interrupt Request */
-#define TWI1_IRQ			0x00002000	/* TWI1 Interrupt Request */
+#define TWI1_IRQ			0x00004000	/* TWI1 Interrupt Request */
 #define CAN_RX_IRQ			0x00008000	/* CAN Receive Interrupt Request */
 #define CAN_TX_IRQ			0x00010000	/* CAN Transmit Interrupt Request */
 #define MDMA1_0_IRQ			0x00020000	/* MemDMA1 Stream 0 Interrupt Request */

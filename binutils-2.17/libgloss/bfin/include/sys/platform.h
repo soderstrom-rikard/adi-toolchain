@@ -1,8 +1,4 @@
 /*
- * Generic Wrapper for platform specific header file.
- *
- * Copyright (C) 2007 Analog Devices, Inc.
- *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
  * that existing copyright notices are retained in all copies and that this
@@ -16,5 +12,8 @@
 
 #ifndef _PLATFORM_H
 #define _PLATFORM_H
+/* Generic Wrapper for platform specific header file.
+   Copyright (C.) 2004, Analog Devices Inc.  All Rights Reserved.
+ */
 #include <sys/_adi_platform.h>
 #endif

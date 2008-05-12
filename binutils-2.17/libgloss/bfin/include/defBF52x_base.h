@@ -1,8 +1,4 @@
 /*
- * defBF52x_base.h
- *
- * Copyright (C) 2007 Analog Devices, Inc.
- *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
  * that existing copyright notices are retained in all copies and that this
@@ -13,6 +9,20 @@
  * the new terms are clearly indicated on the first page of each file where
  * they apply.
  */
+
+/*
+** defBF52x_base.h
+**
+** Copyright (C) 2007 Analog Devices Inc., All Rights Reserved.
+**
+************************************************************************************
+**
+** This include file contains a list of macro "defines" to enable the programmer
+** to use symbolic names for the registers common to the ADSP-BF52x peripherals.
+**
+************************************************************************************
+** System MMR Register Map
+************************************************************************************/
 
 #ifndef _DEF_BF52X_H
 #define _DEF_BF52X_H
@@ -560,7 +570,6 @@
 #define PORTF_FER			0xFFC03200	/* Port F Function Enable Register (Alternate/Flag*)	*/
 #define PORTG_FER			0xFFC03204	/* Port G Function Enable Register (Alternate/Flag*)	*/
 #define PORTH_FER			0xFFC03208	/* Port H Function Enable Register (Alternate/Flag*)	*/
-#define PORT_MUX			0xFFC0320C	/* Port Multiplexer Control Register					*/
 
 
 /* Handshake MDMA Registers	(0xFFC03300 - 0xFFC033FF)										*/
@@ -590,13 +599,12 @@
 #define PORTF_SLEW              0xFFC03230      /* Port F slew control */
 #define PORTG_SLEW              0xFFC03234      /* Port G slew control */
 #define PORTH_SLEW              0xFFC03238      /* Port H slew control */
-#define PORTF_HYSTERISIS        0xFFC03240      /* Port F Schmitt trigger control */
-#define PORTG_HYSTERISIS        0xFFC03244      /* Port G Schmitt trigger control */
-#define PORTH_HYSTERISIS        0xFFC03248      /* Port H Schmitt trigger control */
-#define MISCPORT_DRIVE          0xFFC03280      /* Misc Port drive strength control */
-#define MISCPORT_SLEW           0xFFC03284      /* Misc Port slew control */
-#define MISCPORT_HYSTERISIS     0xFFC03288      /* Misc Port Schmitt trigger control */
-
+#define PORTF_HYSTERESIS        0xFFC03240      /* Port F Schmitt trigger control */
+#define PORTG_HYSTERESIS        0xFFC03244      /* Port G Schmitt trigger control */
+#define PORTH_HYSTERESIS        0xFFC03248      /* Port H Schmitt trigger control */
+#define NONGPIO_DRIVE           0xFFC03280      /* Drive strength control for non-GPIO pins */
+#define NONGPIO_SLEW            0xFFC03284      /* Slew control for non-GPIO pins */
+#define NONGPIO_HYSTERESIS      0xFFC03288      /* Schmitt trigger control for non-GPIO pins */
 
 /***********************************************************************************
 ** System MMR Register Bits And Macros
@@ -634,36 +642,25 @@
 #define SET_SSEL(x)		((x)&0xF)		/* Set SSEL = 0-15 --> SCLK = VCO/SSEL	*/
 
 /* VR_CTL Masks																	*/
-#define	FREQ			0x0003	/* Switching Oscillator Frequency For Regulator	*/
+#define	FREQ			0x3000	/* Switching Oscillator Frequency For Regulator	*/
 #define	HIBERNATE		0x0000	/* 		Powerdown/Bypass On-Board Regulation	*/
-#define	FREQ_333		0x0001	/* 		Switching Frequency Is 333 kHz			*/
-#define	FREQ_667		0x0002	/* 		Switching Frequency Is 667 kHz			*/
-#define	FREQ_1000		0x0003	/* 		Switching Frequency Is 1 MHz			*/
 
-#define GAIN			0x000C	/* Voltage Level Gain	*/
-#define	GAIN_5			0x0000	/* 		GAIN = 5		*/
-#define	GAIN_10			0x0004	/* 		GAIN = 10		*/
-#define	GAIN_20			0x0008	/* 		GAIN = 20		*/
-#define	GAIN_50			0x000C	/* 		GAIN = 50		*/
-
-#define	VLEV			0x00F0	/* Internal Voltage Level					*/
-#define	VLEV_085 		0x0060	/* 		VLEV = 0.85 V (-5% - +10% Accuracy)	*/
-#define	VLEV_090		0x0070	/* 		VLEV = 0.90 V (-5% - +10% Accuracy)	*/
-#define	VLEV_095		0x0080	/* 		VLEV = 0.95 V (-5% - +10% Accuracy)	*/
-#define	VLEV_100		0x0090	/* 		VLEV = 1.00 V (-5% - +10% Accuracy)	*/
-#define	VLEV_105		0x00A0	/* 		VLEV = 1.05 V (-5% - +10% Accuracy)	*/
-#define	VLEV_110		0x00B0	/* 		VLEV = 1.10 V (-5% - +10% Accuracy)	*/
-#define	VLEV_115		0x00C0	/* 		VLEV = 1.15 V (-5% - +10% Accuracy)	*/
-#define	VLEV_120		0x00D0	/* 		VLEV = 1.20 V (-5% - +10% Accuracy)	*/
-#define	VLEV_125		0x00E0	/* 		VLEV = 1.25 V (-5% - +10% Accuracy)	*/
-#define	VLEV_130		0x00F0	/* 		VLEV = 1.30 V (-5% - +10% Accuracy)	*/
+#define	VLEV			0x00F0	/* Internal Voltage Level - Only Program Values Within Specifications */
+#define	VLEV_085		0x0040	/*	VLEV = 0.85 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_090		0x0050	/*	VLEV = 0.90 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_095		0x0060	/*	VLEV = 0.95 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_100		0x0070	/*	VLEV = 1.00 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_105		0x0080	/*	VLEV = 1.05 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_110		0x0090	/*	VLEV = 1.10 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_115		0x00A0	/*	VLEV = 1.15 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_120		0x00B0	/*	VLEV = 1.20 V (See Datasheet for Regulator Tolerance)	*/
 
 #define	WAKE			0x0100	/* Enable RTC/Reset Wakeup From Hibernate	*/
-#define	CANWE			0x0200	/* Enable CAN Wakeup From Hibernate			*/
+#define	USBWE			0x0200	/* Enable USB Wakeup From Hibernate			*/
 #define	PHYWE			0x0400	/* Enable PHY Wakeup From Hibernate			*/
 #define	CLKBUFOE		0x4000	/* CLKIN Buffer Output Enable */
 #define	PHYCLKOE		CLKBUFOE	/* Alternative legacy name for the above */
-#define	SCKELOW		0x8000	/* Enable Drive CKE Low During Reset		*/
+#define	SCKELOW			0x8000	/* Enable Drive CKE Low During Reset		*/
 
 /* PLL_STAT Masks																	*/
 #define ACTIVE_PLLENABLED	0x0001	/* Processor In Active Mode With PLL Enabled	*/
@@ -682,50 +679,69 @@
 #define BMODE				0x0007	/* Boot Mode - Latched During HW Reset From Mode Pins	*/
 #define	NOBOOT				0x0010	/* Execute From L1 or ASYNC Bank 0 When BMODE = 0		*/
 
-
 /* *************  SYSTEM INTERRUPT CONTROLLER MASKS *************************************/
-/* Peripheral Masks For SIC_ISR, SIC_IWR, SIC_IMASK										*/
+/* Peripheral Masks For SIC_ISR0, SIC_IWR0, SIC_IMASK0										*/
 #define IRQ_PLL_WAKEUP	0x00000001	/* PLL Wakeup Interrupt			 					*/
 
-#define IRQ_ERROR1      0x00000002  /* Error Interrupt (DMA, DMARx Block, DMARx Overflow) */
-#define IRQ_ERROR2      0x00000004  /* Error Interrupt (CAN, Ethernet, SPORTx, PPI, SPI, UARTx) */
-#define IRQ_RTC			0x00000008	/* Real Time Clock Interrupt 						*/
-#define IRQ_DMA0		0x00000010	/* DMA Channel 0 (PPI) Interrupt 					*/
-#define IRQ_DMA3		0x00000020	/* DMA Channel 3 (SPORT0 RX) Interrupt 				*/
-#define IRQ_DMA4		0x00000040	/* DMA Channel 4 (SPORT0 TX) Interrupt 				*/
-#define IRQ_DMA5		0x00000080	/* DMA Channel 5 (SPORT1 RX) Interrupt 				*/
+#define IRQ_DMA_ERR0   0x00000002  /* Error Interrupt (DMA error 0 interrupt (generic)) */
+#define IRQ_DMAR0      0x00000004  /* DMAR0 Block (DMAR0 block interrupt) 				*/
+#define IRQ_DMAR1      0x00000008  /* DMAR1 Block  (DMAR1 block interrupt) 				*/
+#define IRQ_DMAR0_ERR  0x00000010  /* Error Interrupt (DMAR0 overflow error interrupt)  */
+#define IRQ_DMAR1_ERR  0x00000020  /* Error Interrupt (DMAR1 overflow error interrupt)  */
+#define IRQ_PPI_ERR    0x00000040  /* Error Interrupt (PPI error interrupt) 			*/
+#define IRQ_MAC_ERR    0x00000080  /* Error Interrupt (MAC status interrupt) 			*/
+#define IRQ_SPORT0_ERR 0x00000100  /* Error Interrupt (SPORT0 status interrupt) 		*/
+#define IRQ_SPORT1_ERR 0x00000200  /* Error Interrupt (SPORT1 status interrupt) 		*/
+#define IRQ_UART0_ERR  0x00001000  /* Error Interrupt (UART0 status interrupt) 			*/
+#define IRQ_UART1_ERR  0x00002000  /* Error Interrupt (UART1 status interrupt) 			*/
+#define IRQ_RTC		   0x00004000  /* Real Time Clock Interrupt 						*/
+#define IRQ_DMA0	   0x00008000  /* DMA channel 0 (PPI/NFC) Interrupt 				*/
+#define IRQ_DMA3	   0x00010000  /* DMA Channel 3 (SPORT0 RX) Interrupt 				*/
+#define IRQ_DMA4	   0x00020000  /* DMA Channel 4 (SPORT0 TX) Interrupt 				*/
+#define IRQ_DMA5	   0x00040000  /* DMA Channel 5 (SPORT1 RX) Interrupt 				*/
+#define IRQ_DMA6	   0x00080000  /* DMA Channel 6 (SPORT1 TX) Interrupt 		 		*/
+#define IRQ_TWI		   0x00100000  /* TWI Interrupt										*/
+#define IRQ_DMA7	   0x00200000  /* DMA Channel 7 (SPI) Interrupt 					*/
+#define IRQ_DMA8	   0x00400000  /* DMA Channel 8 (UART0 RX) Interrupt 				*/
+#define IRQ_DMA9	   0x00800000  /* DMA Channel 9 (UART0 TX) Interrupt 				*/
+#define IRQ_DMA10	   0x01000000  /* DMA Channel 10 (UART1 RX) Interrupt 				*/
+#define IRQ_DMA11	   0x02000000  /* DMA Channel 11 (UART1 TX) Interrupt 				*/
+#define IRQ_OTP	   0x04000000  /* OTP Interrupt 									*/
+#define IRQ_CNT  	   0x08000000  /* GP Counter Interrupt  							*/
+#define IRQ_DMA1	   0x10000000  /* DMA Channel 1 (EthernetRX/HOSTDP) Interrupt		*/
+#define IRQ_PFA_PORTH  0x20000000  /* PF Port H Interrupt A 							*/
+#define IRQ_DMA2	   0x40000000  /* DMA Channel 2 (Ethernet TX/NFC) Interrupt 		*/
+#define IRQ_PFB_PORTH  0x80000000  /* PF Port H  Interrupt B 							*/
 
-#define IRQ_DMA6		0x00000100	/* DMA Channel 6 (SPORT1 TX) Interrupt 		 		*/
-#define IRQ_TWI			0x00000200	/* TWI Interrupt									*/
-#define IRQ_DMA7		0x00000400	/* DMA Channel 7 (SPI) Interrupt 					*/
-#define IRQ_DMA8		0x00000800	/* DMA Channel 8 (UART0 RX) Interrupt 				*/
-#define IRQ_DMA9		0x00001000	/* DMA Channel 9 (UART0 TX) Interrupt 				*/
-#define IRQ_DMA10		0x00002000	/* DMA Channel 10 (UART1 RX) Interrupt 				*/
-#define IRQ_DMA11		0x00004000	/* DMA Channel 11 (UART1 TX) Interrupt 				*/
-#define IRQ_CAN_RX		0x00008000	/* CAN Receive Interrupt 							*/
+/* Peripheral Masks For SIC_ISR1, SIC_IWR1, SIC_IMASK1									*/
 
-#define IRQ_CAN_TX		0x00010000	/* CAN Transmit Interrupt  							*/
-#define IRQ_DMA1		0x00020000	/* DMA Channel 1 (Ethernet RX) Interrupt 			*/
-#define IRQ_PFA_PORTH	0x00020000	/* PF Port H (PF47:32) Interrupt A 					*/
-#define IRQ_DMA2		0x00040000	/* DMA Channel 2 (Ethernet TX) Interrupt 			*/
-#define IRQ_PFB_PORTH	0x00040000	/* PF Port H (PF47:32) Interrupt B 					*/
-#define IRQ_TIMER0		0x00080000	/* Timer 0 Interrupt								*/
-#define IRQ_TIMER1		0x00100000	/* Timer 1 Interrupt 								*/
-#define IRQ_TIMER2		0x00200000	/* Timer 2 Interrupt 								*/
-#define IRQ_TIMER3		0x00400000	/* Timer 3 Interrupt 								*/
-#define IRQ_TIMER4		0x00800000	/* Timer 4 Interrupt 								*/
+#define IRQ_TIMER0		0x00000001	/* Timer 0 Interrupt								*/
+#define IRQ_TIMER1		0x00000002	/* Timer 1 Interrupt 								*/
+#define IRQ_TIMER2		0x00000004	/* Timer 2 Interrupt 								*/
+#define IRQ_TIMER3		0x00000008	/* Timer 3 Interrupt 								*/
+#define IRQ_TIMER4		0x00000010	/* Timer 4 Interrupt 								*/
+#define IRQ_TIMER5		0x00000020	/* Timer 5 Interrupt 								*/
+#define IRQ_TIMER6		0x00000040	/* Timer 6 Interrupt 								*/
+#define IRQ_TIMER7		0x00000080	/* Timer 7 Interrupt 								*/
+#define IRQ_PFA_PORTG	0x00000100	/* PF Port G Interrupt A 							*/
+#define IRQ_PFB_PORTG	0x00000200	/* PF Port G Interrupt B		 					*/
+#define IRQ_DMA12		0x00000400	/* DMA Channels 12 (MDMA0 Destination) TX Interrupt	*/
+#define IRQ_DMA13		0x00000400	/* DMA Channels 13 (MDMA0 Source) RX Interrupt		*/
+#define IRQ_DMA14		0x00000800	/* DMA Channels 14 (MDMA1 Destination) TX Interrupt	*/
+#define IRQ_DMA15		0x00000800	/* DMA Channels 15 (MDMA1 Source) RX Interrupt 		*/
+#define IRQ_WDOG		0x00001000	/* Software Watchdog Timer Interrupt 				*/
+#define IRQ_PFA_PORTF	0x00002000	/* PF Port F Interrupt A		 					*/
+#define IRQ_PFB_PORTF	0x00004000	/* PF Port F Interrupt B 							*/
+#define IRQ_SPI_ERR     0x00008000  /* Error Interrupt (SPI status interrupt) 			*/
+#define IRQ_NAND_ERR	0x00010000	/* NAND error interrupt								*/
+#define IRQ_HOSTDP_STATUS	0x00020000	/* HOSTDP status interrupt  */
+#define IRQ_HOSTRD_DONE	0x00040000		/* Host Read Done interrupt */
+#define IRQ_USB_EINT	0x00080000	/* USB EINT interrupt 								*/
+#define IRQ_USB_INT0	0x00100000	/* USB INT0 interrupt 								*/
+#define IRQ_USB_INT1	0x00200000	/* USB INT1 interrupt 								*/
+#define IRQ_USB_INT2	0x00400000	/* USB INT1 interrupt 								*/
+#define IRQ_USB_DMAINT	0x00800000	/* USB DMAINT interrupt								*/
 
-#define IRQ_TIMER5		0x01000000	/* Timer 5 Interrupt 								*/
-#define IRQ_TIMER6		0x02000000	/* Timer 6 Interrupt 								*/
-#define IRQ_TIMER7		0x04000000	/* Timer 7 Interrupt 								*/
-#define IRQ_PFA_PORTFG	0x08000000	/* PF Ports F&G (PF31:0) Interrupt A 				*/
-#define IRQ_PFB_PORTF	0x80000000	/* PF Port F (PF15:0) Interrupt B 					*/
-#define IRQ_DMA12		0x20000000	/* DMA Channels 12 (MDMA1 Source) RX Interrupt 		*/
-#define IRQ_DMA13		0x20000000	/* DMA Channels 13 (MDMA1 Destination) TX Interrupt */
-#define IRQ_DMA14		0x40000000	/* DMA Channels 14 (MDMA0 Source) RX Interrupt 		*/
-#define IRQ_DMA15		0x40000000	/* DMA Channels 15 (MDMA0 Destination) TX Interrupt */
-#define IRQ_WDOG		0x80000000	/* Software Watchdog Timer Interrupt 				*/
-#define IRQ_PFB_PORTG	0x10000000	/* PF Port G (PF31:16) Interrupt B 					*/
 
 /* SIC_IAR0 Macros															*/
 #define P0_IVG(x)		(((x)&0xF)-7)			/* Peripheral #0 assigned IVG #x 	*/
@@ -740,45 +756,95 @@
 /* SIC_IAR1 Macros															*/
 #define P8_IVG(x)		(((x)&0xF)-7)			/* Peripheral #8 assigned IVG #x 	*/
 #define P9_IVG(x)		(((x)&0xF)-7) << 0x4	/* Peripheral #9 assigned IVG #x 	*/
-#define P10_IVG(x)		(((x)&0xF)-7) << 0x8	/* Peripheral #10 assigned IVG #x	*/
-#define P11_IVG(x)		(((x)&0xF)-7) << 0xC	/* Peripheral #11 assigned IVG #x 	*/
-#define P12_IVG(x)		(((x)&0xF)-7) << 0x10	/* Peripheral #12 assigned IVG #x	*/
-#define P13_IVG(x)		(((x)&0xF)-7) << 0x14	/* Peripheral #13 assigned IVG #x	*/
-#define P14_IVG(x)		(((x)&0xF)-7) << 0x18	/* Peripheral #14 assigned IVG #x	*/
-#define P15_IVG(x)		(((x)&0xF)-7) << 0x1C	/* Peripheral #15 assigned IVG #x	*/
+#define P10_IVG(x)		(((x)&0xF)-7) << 0x10	/* Peripheral #10 assigned IVG #x	*/
+#define P11_IVG(x)		(((x)&0xF)-7) << 0x14	/* Peripheral #11 assigned IVG #x 	*/
+#define P12_IVG(x)		(((x)&0xF)-7) << 0x18	/* Peripheral #12 assigned IVG #x	*/
+#define P13_IVG(x)		(((x)&0xF)-7) << 0x1C	/* Peripheral #13 assigned IVG #x	*/
 
 /* SIC_IAR2 Macros															*/
-#define P16_IVG(x)		(((x)&0xF)-7)			/* Peripheral #16 assigned IVG #x	*/
-#define P17_IVG(x)		(((x)&0xF)-7) << 0x4	/* Peripheral #17 assigned IVG #x	*/
-#define P18_IVG(x)		(((x)&0xF)-7) << 0x8	/* Peripheral #18 assigned IVG #x	*/
-#define P19_IVG(x)		(((x)&0xF)-7) << 0xC	/* Peripheral #19 assigned IVG #x	*/
-#define P20_IVG(x)		(((x)&0xF)-7) << 0x10	/* Peripheral #20 assigned IVG #x	*/
-#define P21_IVG(x)		(((x)&0xF)-7) << 0x14	/* Peripheral #21 assigned IVG #x	*/
-#define P22_IVG(x)		(((x)&0xF)-7) << 0x18	/* Peripheral #22 assigned IVG #x	*/
-#define P23_IVG(x)		(((x)&0xF)-7) << 0x1C	/* Peripheral #23 assigned IVG #x	*/
+#define P14_IVG(x)		(((x)&0xF)-7)			/* Peripheral #14 assigned IVG #x	*/
+#define P15_IVG(x)		(((x)&0xF)-7) << 0x4	/* Peripheral #15 assigned IVG #x	*/
+#define P16_IVG(x)		(((x)&0xF)-7) << 0x8	/* Peripheral #16 assigned IVG #x	*/
+#define P17_IVG(x)		(((x)&0xF)-7) << 0xC	/* Peripheral #17 assigned IVG #x	*/
+#define P18_IVG(x)		(((x)&0xF)-7) << 0x10	/* Peripheral #18 assigned IVG #x	*/
+#define P19_IVG(x)		(((x)&0xF)-7) << 0x14	/* Peripheral #19 assigned IVG #x	*/
+#define P20_IVG(x)		(((x)&0xF)-7) << 0x18	/* Peripheral #20 assigned IVG #x	*/
+#define P21_IVG(x)		(((x)&0xF)-7) << 0x1C	/* Peripheral #21 assigned IVG #x	*/
 
 /* SIC_IAR3 Macros															*/
-#define P24_IVG(x)		(((x)&0xF)-7)			/* Peripheral #24 assigned IVG #x	*/
-#define P25_IVG(x)		(((x)&0xF)-7) << 0x4	/* Peripheral #25 assigned IVG #x	*/
-#define P26_IVG(x)		(((x)&0xF)-7) << 0x8	/* Peripheral #26 assigned IVG #x	*/
-#define P27_IVG(x)		(((x)&0xF)-7) << 0xC	/* Peripheral #27 assigned IVG #x	*/
-#define P28_IVG(x)		(((x)&0xF)-7) << 0x10	/* Peripheral #28 assigned IVG #x	*/
-#define P29_IVG(x)		(((x)&0xF)-7) << 0x14	/* Peripheral #29 assigned IVG #x	*/
-#define P30_IVG(x)		(((x)&0xF)-7) << 0x18	/* Peripheral #30 assigned IVG #x	*/
-#define P31_IVG(x)		(((x)&0xF)-7) << 0x1C	/* Peripheral #31 assigned IVG #x	*/
+#define P22_IVG(x)		(((x)&0xF)-7)			/* Peripheral #22 assigned IVG #x	*/
+#define P23_IVG(x)		(((x)&0xF)-7) << 0x4	/* Peripheral #23 assigned IVG #x	*/
+#define P24_IVG(x)		(((x)&0xF)-7) << 0x8	/* Peripheral #24 assigned IVG #x	*/
+#define P25_IVG(x)		(((x)&0xF)-7) << 0xC	/* Peripheral #25 assigned IVG #x	*/
+#define P26_IVG(x)		(((x)&0xF)-7) << 0x10	/* Peripheral #26 assigned IVG #x	*/
+#define P27_IVG(x)		(((x)&0xF)-7) << 0x14	/* Peripheral #27 assigned IVG #x	*/
+#define P28_IVG(x)		(((x)&0xF)-7) << 0x18	/* Peripheral #28 assigned IVG #x	*/
+#define P29_IVG(x)		(((x)&0xF)-7) << 0x1C	/* Peripheral #29 assigned IVG #x	*/
+
+/* SIC_IAR4 Macros															*/
+#define P30_IVG(x)		(((x)&0xF)-7)			/* Peripheral #30 assigned IVG #x 	*/
+#define P31_IVG(x)		(((x)&0xF)-7) << 0x4	/* Peripheral #31 assigned IVG #x 	*/
+#define P32_IVG(x)		(((x)&0xF)-7) << 0x8	/* Peripheral #32 assigned IVG #x 	*/
+#define P33_IVG(x)		(((x)&0xF)-7) << 0xC	/* Peripheral #33 assigned IVG #x	*/
+#define P34_IVG(x)		(((x)&0xF)-7) << 0x10	/* Peripheral #34 assigned IVG #x	*/
+#define P35_IVG(x)		(((x)&0xF)-7) << 0x14	/* Peripheral #35 assigned IVG #x	*/
+#define P36_IVG(x)		(((x)&0xF)-7) << 0x18	/* Peripheral #36 assigned IVG #x	*/
+#define P37_IVG(x)		(((x)&0xF)-7) << 0x1C	/* Peripheral #37 assigned IVG #x	*/
+
+/* SIC_IAR5 Macros															*/
+#define P38_IVG(x)		(((x)&0xF)-7)			/* Peripheral #38assigned IVG #x 	*/
+#define P39_IVG(x)		(((x)&0xF)-7) << 0x4	/* Peripheral #39assigned IVG #x 	*/
+#define P40_IVG(x)		(((x)&0xF)-7) << 0x8	/* Peripheral #40 assigned IVG #x	*/
+#define P41_IVG(x)		(((x)&0xF)-7) << 0xC	/* Peripheral #41 assigned IVG #x 	*/
+#define P42_IVG(x)		(((x)&0xF)-7) << 0x10	/* Peripheral #42 assigned IVG #x	*/
+#define P43_IVG(x)		(((x)&0xF)-7) << 0x14	/* Peripheral #43 assigned IVG #x	*/
+#define P44_IVG(x)		(((x)&0xF)-7) << 0x18	/* Peripheral #44 assigned IVG #x	*/
+#define P45_IVG(x)		(((x)&0xF)-7) << 0x1C	/* Peripheral #45 assigned IVG #x	*/
+
+/* SIC_IAR6 Macros															*/
+#define P46_IVG(x)		(((x)&0xF)-7)			/* Peripheral #46 assigned IVG #x	*/
+#define P47_IVG(x)		(((x)&0xF)-7) << 0x4	/* Peripheral #47 assigned IVG #x	*/
+#define P48_IVG(x)		(((x)&0xF)-7) << 0x8	/* Peripheral #48 assigned IVG #x	*/
+#define P49_IVG(x)		(((x)&0xF)-7) << 0xC	/* Peripheral #49 assigned IVG #x	*/
+#define P50_IVG(x)		(((x)&0xF)-7) << 0x10	/* Peripheral #50 assigned IVG #x	*/
+#define P51_IVG(x)		(((x)&0xF)-7) << 0x14	/* Peripheral #51 assigned IVG #x	*/
+#define P52_IVG(x)		(((x)&0xF)-7) << 0x18	/* Peripheral #52 assigned IVG #x	*/
+#define P53_IVG(x)		(((x)&0xF)-7) << 0x1C	/* Peripheral #53 assigned IVG #x	*/
+
+/* SIC_IAR7 Macros															*/
+#define P54_IVG(x)		(((x)&0xF)-7)			/* Peripheral #54 assigned IVG #x	*/
+#define P55_IVG(x)		(((x)&0xF)-7) << 0x4	/* Peripheral #55 assigned IVG #x	*/
+#define P56_IVG(x)		(((x)&0xF)-7) << 0x8	/* Peripheral #56 assigned IVG #x	*/
+#define P57_IVG(x)		(((x)&0xF)-7) << 0xC	/* Peripheral #57 assigned IVG #x	*/
+#define P58_IVG(x)		(((x)&0xF)-7) << 0x10	/* Peripheral #58 assigned IVG #x	*/
+#define P59_IVG(x)		(((x)&0xF)-7) << 0x14	/* Peripheral #59 assigned IVG #x	*/
+#define P60_IVG(x)		(((x)&0xF)-7) << 0x18	/* Peripheral #60 assigned IVG #x	*/
+#define P61_IVG(x)		(((x)&0xF)-7) << 0x1C	/* Peripheral #61 assigned IVG #x	*/
+
+/* SIC_IMASK0 Masks																		*/
+#define SIC_UNMASK0_ALL	0x00000000					/* Unmask all peripheral interrupts	*/
+#define SIC_MASK0_ALL	0xFFFFF3FF					/* Mask all peripheral interrupts	*/
+#define SIC_MASK0(x)	(1 << ((x)&0x1F))					/* Mask Peripheral #x interrupt		*/
+#define SIC_UNMASK0(x)	(0xFFFFFFFF ^ (1 << ((x)&0x1F)))	/* Unmask Peripheral #x interrupt	*/
+
+/* SIC_IMASK1 Masks																		*/
+#define SIC_UNMASK1_ALL	0x00000000					/* Unmask all peripheral interrupts	*/
+#define SIC_MASK1_ALL	0xFFFFFF					/* Mask all peripheral interrupts	*/
+#define SIC_MASK1(x)	(1 << ((x)&0x1F))					/* Mask Peripheral #x interrupt		*/
+#define SIC_UNMASK1(x)	(0xFFFFFFFF ^ (1 << ((x)&0x1F)))	/* Unmask Peripheral #x interrupt	*/
 
 
-/* SIC_IMASK Masks																		*/
-#define SIC_UNMASK_ALL	0x00000000					/* Unmask all peripheral interrupts	*/
-#define SIC_MASK_ALL	0xFFFFFFFF					/* Mask all peripheral interrupts	*/
-#define SIC_MASK(x)		(1 << ((x)&0x1F))					/* Mask Peripheral #x interrupt		*/
-#define SIC_UNMASK(x)	(0xFFFFFFFF ^ (1 << ((x)&0x1F)))	/* Unmask Peripheral #x interrupt	*/
+/* SIC_IWR0 Masks																		*/
+#define IWR0_DISABLE_ALL	0x00000000					/* Wakeup Disable all peripherals	*/
+#define IWR0_ENABLE_ALL	0xFFFFF3FF					/* Wakeup Enable all peripherals	*/
+#define IWR0_ENABLE(x)	(1 << ((x)&0x1F))					/* Wakeup Enable Peripheral #x		*/
+#define IWR0_DISABLE(x)	(0xFFFFFFFF ^ (1 << ((x)&0x1F))) 	/* Wakeup Disable Peripheral #x		*/
 
-/* SIC_IWR Masks																		*/
-#define IWR_DISABLE_ALL	0x00000000					/* Wakeup Disable all peripherals	*/
-#define IWR_ENABLE_ALL	0xFFFFFFFF					/* Wakeup Enable all peripherals	*/
-#define IWR_ENABLE(x)	(1 << ((x)&0x1F))					/* Wakeup Enable Peripheral #x		*/
-#define IWR_DISABLE(x)	(0xFFFFFFFF ^ (1 << ((x)&0x1F))) 	/* Wakeup Disable Peripheral #x		*/
+/* SIC_IWR1 Masks																		*/
+#define IWR1_DISABLE_ALL	0x00000000					/* Wakeup Disable all peripherals	*/
+#define IWR1_ENABLE_ALL	0xFFFFFF					/* Wakeup Enable all peripherals	*/
+#define IWR1_ENABLE(x)	(1 << ((x)&0x1F))					/* Wakeup Enable Peripheral #x		*/
+#define IWR1_DISABLE(x)	(0xFFFFFFFF ^ (1 << ((x)&0x1F))) 	/* Wakeup Disable Peripheral #x		*/
 
 
 /* ********* WATCHDOG TIMER MASKS ******************** */
@@ -1145,6 +1211,7 @@
 #define AMBEN_B0_B1		0x0004		/* Enable Async Memory Banks 0 & 1 only				*/
 #define AMBEN_B0_B1_B2	0x0006		/* Enable Async Memory Banks 0, 1, and 2			*/
 #define AMBEN_ALL		0x0008		/* Enable Async Memory Banks (all) 0, 1, 2, and 3	*/
+#define CDPRIO                  0x0100        /* DMA has priority over core for for external accesses */
 
 /* EBIU_AMBCTL0 Masks																	*/
 #define B0RDYEN			0x00000001  /* Bank 0 (B0) RDY Enable							*/
@@ -1459,7 +1526,7 @@
 #define PORT_CFG		0x0030		/* PPI Port Configuration			*/
 #define FLD_SEL			0x0040		/* PPI Active Field Select			*/
 #define PACK_EN			0x0080		/* PPI Packing Mode					*/
-#define DMA32			0x0100		/* PPI 32-bit DMA Enable			*/
+/* previous versions of defBF532.h erroneously included DMA32 (PPI 32-bit DMA Enable) */
 #define SKIP_EN			0x0200		/* PPI Skip Element Enable			*/
 #define SKIP_EO			0x0400		/* PPI Skip Even/Odd Elements		*/
 #define DLEN_8			0x0000		/* Data Length = 8 Bits				*/
@@ -1474,6 +1541,8 @@
 #define POLS			0x8000		/* PPI Frame Sync Polarity			*/
 
 /* PPI_STATUS Masks														*/
+#define LT_ERR_OVR	0x0100		/* Line Track Overflow Error	*/
+#define LT_ERR_UNDR	0x0200		/* Line Track Underflow Error	*/
 #define FLD				0x0400		/* Field Indicator					*/
 #define FT_ERR			0x0800		/* Frame Track Error				*/
 #define OVR				0x1000		/* FIFO Overflow Error				*/
@@ -1603,21 +1672,21 @@
 #define	PGTE_SPORT		0x0800			/* 		Enable DT1PRI/TFS1/TSCLK1	*/
 
 
-/*  ******************  HANDSHAKE DMA (HDMA) MASKS  *********************/
-/* HDMAx_CTL Masks														*/
+/*  ******************  HANDSHAKE DMA (HMDMA) MASKS  *********************/
+/* HMDMAx_CTL Masks														*/
 #define	HMDMAEN		0x0001	/* Enable Handshake DMA 0/1					*/
-#define	REP			0x0002	/* HDMA Request Polarity					*/
+#define	REP			0x0002	/* HMDMA Request Polarity					*/
 #define	UTE			0x0004	/* Urgency Threshold Enable					*/
 #define	OIE			0x0010	/* Overflow Interrupt Enable				*/
 #define	BDIE		0x0020	/* Block Done Interrupt Enable				*/
 #define	MBDI		0x0040	/* Mask Block Done IRQ If Pending ECNT		*/
-#define	DRQ			0x0300	/* HDMA Request Type						*/
+#define	DRQ			0x0300	/* HMDMA Request Type						*/
 #define	DRQ_NONE	0x0000	/* 		No Request							*/
 #define	DRQ_SINGLE	0x0100	/* 		Channels Request Single				*/
 #define	DRQ_MULTI	0x0200	/* 		Channels Request Multi (Default)	*/
 #define	DRQ_URGENT	0x0300	/* 		Channels Request Multi Urgent		*/
 #define	RBC			0x1000	/* Reload BCNT With IBCNT					*/
-#define	PS			0x2000	/* HDMA Pin Status							*/
+#define	PS			0x2000	/* HMDMA Pin Status							*/
 #define	OI			0x4000	/* Overflow Interrupt Generated				*/
 #define	BDI			0x8000	/* Block Done Interrupt Generated			*/
 
@@ -1919,8 +1988,6 @@
 
 #define                    WR_DLY  0xf        /* Write Strobe Delay */
 #define                    RD_DLY  0xf0       /* Read Strobe Delay */
-#define                    NWIDTH  0x100      /* NAND Data Width */
-#define                   nNWIDTH  0x0
 #define                   PG_SIZE  0x200      /* Page Size */
 #define                  nPG_SIZE  0x0
 
@@ -1956,8 +2023,8 @@
 #define             nMASK_BUSYIRQ  0x0
 #define                MASK_WBOVF  0x2        /* Mask Write Buffer Overflow */
 #define               nMASK_WBOVF  0x0
-#define              MASK_WBEMPTY  0x4        /* Mask Write Buffer Empty */
-#define             nMASK_WBEMPTY  0x0
+#define               MASK_WBEDGE  0x4        /* Mask Write Buffer Edge Detect */
+#define              nMASK_WBEDGE  0x0
 #define                MASK_RDRDY  0x8        /* Mask Read Data Ready */
 #define               nMASK_RDRDY  0x0
 #define               MASK_WRDONE  0x10       /* Mask Write Done */

@@ -1,8 +1,4 @@
 /*
- * cdefBF532.h
- *
- * Copyright (C) 2007 Analog Devices, Inc.
- *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
  * that existing copyright notices are retained in all copies and that this
@@ -13,6 +9,14 @@
  * the new terms are clearly indicated on the first page of each file where
  * they apply.
  */
+
+/************************************************************************
+ *
+ * cdefBF532.h
+ *
+ * (c) Copyright 2001-2006 Analog Devices, Inc.  All rights reserved.
+ *
+ ************************************************************************/
 
 #ifndef _CDEF_BF532_H
 #define _CDEF_BF532_H
@@ -25,6 +29,9 @@
 
 /* include core specific register pointer definitions */
 #include <cdef_LPBlackfin.h>
+
+/* include built-in mneumonic macros */
+#include <ccblkfn.h>
 
 #ifndef _PTR_TO_VOL_VOID_PTR
 #ifndef _USE_LEGACY_CDEF_BEHAVIOUR

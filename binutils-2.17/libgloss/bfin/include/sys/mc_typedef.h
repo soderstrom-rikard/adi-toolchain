@@ -1,8 +1,4 @@
 /*
- * mc_typedef.h
- *
- * Copyright (C) 2007 Analog Devices, Inc.
- *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
  * that existing copyright notices are retained in all copies and that this
@@ -18,6 +14,13 @@
 #ifndef __NO_BUILTIN
 #pragma system_header /* sys/mc_typedef.h */
 #endif
+/************************************************************************
+ *
+ * sys/mc_typedef.h
+ *
+ * (c) Copyright 2007 Analog Devices, Inc.  All rights reserved.
+ *
+ ************************************************************************/
 
 /* Define testset_t. */
 

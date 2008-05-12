@@ -1,8 +1,4 @@
 /*
- * defBF561.h
- *
- * Copyright (C) 2007 Analog Devices, Inc.
- *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
  * that existing copyright notices are retained in all copies and that this
@@ -13,6 +9,14 @@
  * the new terms are clearly indicated on the first page of each file where
  * they apply.
  */
+
+/************************************************************************
+ *
+ * defBF561.h
+ *
+ * (c) Copyright 2001-2007 Analog Devices, Inc.  All rights reserved.
+ *
+ ************************************************************************/
 
 /* SYSTEM MMR REGISTER AND MEMORY MAP FOR ADSP-BF561 */
 
@@ -37,11 +41,11 @@
 
 /* Clock and System Control (0xFFC00000 - 0xFFC000FF) */
 
-#define PLL_CTL                0xFFC00000       /* PLL Control register (16-bit) */
-#define PLL_DIV			        0xFFC00004		/* PLL Divide Register (16-bit) */
-#define VR_CTL			        0xFFC00008		/* Voltage Regulator Control Register (16-bit) */
-#define PLL_STAT               0xFFC0000C       /* PLL Status register (16-bit) */
-#define PLL_LOCKCNT            0xFFC00010   	/* PLL Lock Count register (16-bit) */
+#define PLL_CTL                 0xFFC00000      /* PLL Control register (16-bit) */
+#define PLL_DIV                 0xFFC00004      /* PLL Divide Register (16-bit) */
+#define VR_CTL                  0xFFC00008      /* Voltage Regulator Control Register (16-bit) */
+#define PLL_STAT                0xFFC0000C      /* PLL Status register (16-bit) */
+#define PLL_LOCKCNT             0xFFC00010      /* PLL Lock Count register (16-bit) */
 #define CHIPID                  0xFFC00014      /* Device ID Register */
 
 /* System Reset and Interrupt Controller registers for core A (0xFFC0 0100-0xFFC0 01FF) */
@@ -857,16 +861,16 @@
 
 /* ********************* PLL AND RESET MASKS ************************ */
 
-/*// PLL_CTL Masks */
-#define PLL_CLKIN              0x00000000  /* Pass CLKIN to PLL */
-#define PLL_CLKIN_DIV2         0x00000001  /* Pass CLKIN/2 to PLL */
-#define PLL_OFF                0x00000002  /* Shut off PLL clocks */
-#define STOPCK_OFF             0x00000008  /* Core clock off */
-#define PDWN                   0x00000020  /* Put the PLL in a Deep Sleep state */
-#define BYPASS                 0x00000100  /* Bypass the PLL */
+/* PLL_CTL Masks */
+#define PLL_CLKIN              	0x0000  /* Pass CLKIN to PLL */
+#define PLL_CLKIN_DIV2         	0x0001  /* Pass CLKIN/2 to PLL */
+#define PLL_OFF                	0x0002  /* Shut off PLL clocks */
+#define STOPCK_OFF             	0x0008  /* Core clock off */
+#define ALT_TIMING		0x0010  /* Enable Alternate PPI Timing (0.5 Silicon And Beyond) */
+#define PDWN                   	0x0020  /* Put the PLL in a Deep Sleep state */
+#define BYPASS                 	0x0100  /* Bypass the PLL */
 
-/*// PLL_DIV Masks */
-
+/* PLL_DIV Masks */
 #define SCLK_DIV(x)  (x)		   /* SCLK = VCO / x */
 
 #define CCLK_DIV1              0x00000000  /* CCLK = VCO / 1 */
@@ -881,6 +885,31 @@
 #define SWRST_WDT_B		       0x00002000  /* SWRST Watchdog B */
 #define SWRST_WDT_A		       0x00004000  /* SWRST Watchdog A */
 #define SWRST_OCCURRED         0x00008000  /* SWRST Status */
+
+/* VR_CTL Masks																	*/
+#define	FREQ			0x0003	/* Switching Oscillator Frequency For Regulator	*/
+#define	HIBERNATE		0x0000	/* 	Powerdown/Bypass On-Board Regulation	*/
+#define	FREQ_333		0x0001	/* 	Switching Frequency Is 333 kHz			*/
+#define	FREQ_667		0x0002	/* 	Switching Frequency Is 667 kHz			*/
+#define	FREQ_1000		0x0003	/* 	Switching Frequency Is 1 MHz			*/
+
+#define GAIN			0x000C	/* Voltage Level Gain	*/
+#define	GAIN_5			0x0000	/* 	GAIN = 5		*/
+#define	GAIN_10			0x0004	/* 	GAIN = 10		*/
+#define	GAIN_20			0x0008	/* 	GAIN = 20		*/
+#define	GAIN_50			0x000C	/* 	GAIN = 50		*/
+
+#define	VLEV			0x00F0	/* Internal Voltage Level - Only Program Values Within Specifications	*/
+#define	VLEV_085 		0x0060	/* 	VLEV = 0.85 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_090		0x0070	/* 	VLEV = 0.90 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_095		0x0080	/* 	VLEV = 0.95 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_100		0x0090	/* 	VLEV = 1.00 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_105		0x00A0	/* 	VLEV = 1.05 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_110		0x00B0	/* 	VLEV = 1.10 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_115		0x00C0	/* 	VLEV = 1.15 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_120		0x00D0	/* 	VLEV = 1.20 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_125		0x00E0	/* 	VLEV = 1.25 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_130		0x00F0	/* 	VLEV = 1.30 V (See Datasheet for Regulator Tolerance)	*/
 
 
 /* *************  SYSTEM INTERRUPT CONTROLLER MASKS ***************** */
@@ -1449,14 +1478,15 @@
 #define B3_PEN			0x0080  /* Enable 16-bit packing Bank 3  */
 
 /* AMGCTL Bit Positions */
-#define AMCKEN_P		0x00000000  /* Enable CLKOUT */
-#define AMBEN_P0		0x00000001  /* Asynchronous Memory Enable, 000 - banks 0-3 disabled, 001 - Bank 0 enabled */
-#define AMBEN_P1		0x00000002  /* Asynchronous Memory Enable, 010 - banks 0&1 enabled,  011 - banks 0-3 enabled */
-#define AMBEN_P2		0x00000003 /* Asynchronous Memory Enable, 1xx - All banks (bank 0, 1, 2, and 3) enabled */
-#define B0_PEN_P			0x004  /* Enable 16-bit packing Bank 0  */
-#define B1_PEN_P			0x005  /* Enable 16-bit packing Bank 1  */
-#define B2_PEN_P			0x006  /* Enable 16-bit packing Bank 2  */
-#define B3_PEN_P			0x007  /* Enable 16-bit packing Bank 3  */
+#define AMCKEN_P		0x0000  /* Enable CLKOUT */
+#define AMBEN_P0		0x0001  /* Asynchronous Memory Enable, 000 - banks 0-3 disabled, 001 - Bank 0 enabled */
+#define AMBEN_P1		0x0002  /* Asynchronous Memory Enable, 010 - banks 0&1 enabled,  011 - banks 0-3 enabled */
+#define AMBEN_P2		0x0003  /* Asynchronous Memory Enable, 1xx - All banks (bank 0, 1, 2, and 3) enabled */
+#define B0_PEN_P		0x0004  /* Enable 16-bit packing Bank 0  */
+#define B1_PEN_P		0x0005  /* Enable 16-bit packing Bank 1  */
+#define B2_PEN_P		0x0006  /* Enable 16-bit packing Bank 2  */
+#define B3_PEN_P		0x0007  /* Enable 16-bit packing Bank 3  */
+#define CDPRIO                  0x0100  /* DMA has priority over core for for external accesses */
 
 /* AMBCTL0 Masks */
 #define B0RDYEN	0x00000001  /* Bank 0 RDY Enable, 0=disable, 1=enable */
@@ -1642,6 +1672,9 @@
 /* **********************  SDRAM CONTROLLER MASKS  *************************** */
 
 /* EBIU_SDGCTL Masks */
+#define PASR_ALL                0x00000000          /* All 4 SDRAM Banks Refreshed In Self-Refresh */
+#define PASR_B0_B1              0x00000010          /* SDRAM Banks 0 and 1 Are Refreshed In Self-Refresh */
+#define PASR_B0                 0x00000020          /* Only SDRAM Bank 0 Is Refreshed In Self-Refresh */
 #define SCTLE			0x00000001 /* Enable SCLK[0], /SRAS, /SCAS, /SWE, SDQM[3:0] */
 #define CL_2			0x00000008 /* SDRAM CAS latency = 2 cycles */
 #define CL_3			0x0000000C /* SDRAM CAS latency = 3 cycles */

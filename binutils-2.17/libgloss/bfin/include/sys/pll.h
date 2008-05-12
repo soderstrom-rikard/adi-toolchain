@@ -1,8 +1,4 @@
 /*
- * pll.h
- *
- * Copyright (C) 2007 Analog Devices, Inc.
- *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
  * that existing copyright notices are retained in all copies and that this
@@ -14,7 +10,15 @@
  * they apply.
  */
 
-#ifndef __ASSEMBLER__
+/************************************************************************
+ *
+ * pll.h
+ *
+ * (c) Copyright 2003-2004 Analog Devices, Inc.  All rights reserved.
+ *
+ ************************************************************************/
+
+#ifdef __ASSEMBLY__
 #pragma once
 #pragma system_header
 #endif
@@ -30,7 +34,7 @@
 #define NO_STARTUP_SET 0
 #define MAX_IN_STARTUP 1
 
-#ifndef __ASSEMBLER__
+#ifdef __ASSEMBLY__
 
 enum clkctrl_t {
     /* no modification of PLL rates in CRT startup - default */
@@ -70,7 +74,7 @@ int pll_set_system_vco(int _msel, int _df, int _lockcnt);
 }
 #endif
 
-#endif /* __ASSEMBLER__ */
+#endif /* __ASSEMBLY__ */
 
 #ifdef _MISRA_RULES
 #pragma diag(pop)

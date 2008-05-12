@@ -1,8 +1,4 @@
 /*
- * exception.h
- *
- * Copyright (C) 2007 Analog Devices, Inc.
- *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
  * that existing copyright notices are retained in all copies and that this
@@ -18,6 +14,13 @@
 #ifndef __NO_BUILTIN
 #pragma system_header /* exception.h */
 #endif
+/************************************************************************
+ *
+ * exception.h
+ *
+ * (c) Copyright 2001-2007 Analog Devices, Inc.  All rights reserved.
+ *
+ ************************************************************************/
 
 #ifndef _EXCEPTION_H
 #define _EXCEPTION_H
@@ -157,42 +160,6 @@ typedef enum {
 } interrupt_kind;
 
 /*
-** Saved registers, in the order they appear on the stack, top to bottom.
-*/
-
-typedef struct {
-
-  /* these are padding, for expected params */
-
-  int r0x, r1x, r2x;
-
-  /* the following are regs that *might* get saved; they won't be
-  pushed unless the ISR clobbers them. If they're not pushed,
-  the stack space is allocated anyway, so that the whole struct space
-  is used. However, none of these regs are reliably accessible from
-  an ISR using this model. */
-
-  struct {
-    int lb1, lb0, lt1, lt0, lc1, lc0;
-    int a1, a1x, a0, a0x, cc;
-    int l3,l2,l1,l0,b3,b2,b1,b0;
-#ifndef __M3_RESERVED__
-    int m3;
-#endif
-    int    m2,m1,m0,i3,i2,i1,i0;
-  } _inaccessible;
-
-  /* the remaining regs are always pushed, regardless of whether they're
-  used, and form the context of the ISR. They contain real values, and
-  if modified, will be restored using their new values. */
-
-  int fp;
-  int p5, p4, p3, p2, p1, p0;
-  int r7, r6, r5, r4, r3, r2, r1, r0;
-  int astat;
-} interrupt_regs;
-
-/*
 ** Structure for recording details of an exception or interrupt
 ** that has occurred.
 */
@@ -203,21 +170,17 @@ typedef struct {
   void *pc;			/* PC at point where exception occurred */
   void *addr;			/* if an address faulted, which one. */
   unsigned status;		/* if an address faulted, why. */
-  interrupt_regs *regsaddr;	/* where the real regs are */
 } interrupt_info;
 
 /*
-** Macro for defining an interrupt routine, with appropriate parameters.
-** We define three ints as parameters, because they have to be there
-** on the stack anyway. We can then use their addresses to reference
-** other information stored on the stack by the interrupt prologue.
+** Macro for defining an interrupt routine
 */
 
-typedef void (*ex_handler_fn)(int, int, int);
+typedef void (*ex_handler_fn)();
 
 #define EX_HANDLER(KIND,NAME) \
 _Pragma(#KIND) \
-void NAME ( int _r0x, int _r1x, int _r2x )
+void NAME ()
 
 #define EX_HANDLER_PROTO(KIND, NAME) EX_HANDLER(KIND, NAME)
 
@@ -227,16 +190,6 @@ void NAME ( int _r0x, int _r1x, int _r2x )
 #define EX_REENTRANT_HANDLER(NAME) \
 _Pragma("interrupt_reentrant") \
 EX_HANDLER(interrupt,NAME)
-
-/*
-** Get a pointer to the registers that have been saved on the stack.
-*/
-
-#define SAVE_REGS(INFOPTR) \
-  { \
-    interrupt_info *i = (INFOPTR); \
-    i->regsaddr = (interrupt_regs *)&_r0x; \
-  }
 
 /*
 ** A convenience function for setting up the interrupt_info contents.

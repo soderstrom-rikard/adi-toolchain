@@ -1,8 +1,4 @@
 /*
- * defBF525.h
- *
- * Copyright (C) 2007 Analog Devices, Inc.
- *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
  * that existing copyright notices are retained in all copies and that this
@@ -14,6 +10,15 @@
  * they apply.
  */
 
+/*
+** Copyright (C) 2006-2007 Analog Devices Inc., All Rights Reserved.
+**
+************************************************************************************
+**
+** This include file contains a list of macro "defines" to enable the programmer
+** to use symbolic names for register-access and bit-manipulation.
+**
+**/
 #ifndef _DEF_BF525_H
 #define _DEF_BF525_H
 

@@ -1,8 +1,4 @@
 /*
- * defBF539.h
- *
- * Copyright (C) 2007 Analog Devices, Inc.
- *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
  * that existing copyright notices are retained in all copies and that this
@@ -14,6 +10,15 @@
  * they apply.
  */
 
+/*
+** Copyright (C) 2006-2007 Analog Devices Inc., All Rights Reserved.
+**
+************************************************************************************
+**
+** This include file contains a list of macro "defines" to enable the programmer
+** to use symbolic names for Stirling peripherals.
+**
+*/
 #ifndef _DEF_BF539_H
 #define _DEF_BF539_H
 
@@ -1395,7 +1400,7 @@
 #define BYPASS				0x0100  /* Bypass the PLL */
 #define	MSEL			0x7E00	/* Multiplier Select For CCLK/VCO Factors			*/
 
-/* PLL_CTL Macros (Only Use With Logic OR While Setting Lower Order Bits)			*/
+/* PLL_CTL Macros 											*/
 #define	SET_MSEL(x)		(((x)&0x3F) << 0x9)	/* Set MSEL = 0-63 --> VCO = CLKIN*MSEL		*/
 
 #define SET_OUT_DELAY(x)	(((x)&0x03) << 0x6)
@@ -1438,12 +1443,14 @@
 #define	GAIN_20			0x0008	/* 		GAIN = 20		*/
 #define	GAIN_50			0x000C	/* 		GAIN = 50		*/
 
-#define	VLEV			0x00F0	/* Internal Voltage Level					*/
-#define	VLEV_100		0x0090	/* 		VLEV = 1.00 V (-5% - +10% Accuracy)	*/
-#define	VLEV_105		0x00A0	/* 		VLEV = 1.05 V (-5% - +10% Accuracy)	*/
-#define	VLEV_110		0x00B0	/* 		VLEV = 1.10 V (-5% - +10% Accuracy)	*/
-#define	VLEV_115		0x00C0	/* 		VLEV = 1.15 V (-5% - +10% Accuracy)	*/
-#define	VLEV_120		0x00D0	/* 		VLEV = 1.20 V (-5% - +10% Accuracy)	*/
+#define	VLEV			0x00F0	/* Internal Voltage Level - Only Program Values Within Specifications	*/
+#define	VLEV_100		0x0090	/* 	VLEV = 1.00 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_105		0x00A0	/* 	VLEV = 1.05 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_110		0x00B0	/* 	VLEV = 1.10 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_115		0x00C0	/* 	VLEV = 1.15 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_120		0x00D0	/* 	VLEV = 1.20 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_125		0x00E0	/* 	VLEV = 1.25 V (See Datasheet for Regulator Tolerance)	*/
+#define	VLEV_130		0x00F0	/* 	VLEV = 1.30 V (See Datasheet for Regulator Tolerance)	*/
 
 #define	WAKE			0x0100	/* Enable RTC/Reset Wakeup From Hibernate	*/
 #define	CANWE			0x0200	/* Enable CAN Wakeup From Hibernate */
@@ -1518,7 +1525,7 @@
 #define DMA18_IRQ			0x00000800	/* DMA Channel 18 (UART2 RX) Interrupt Request */
 #define DMA19_IRQ			0x00001000	/* DMA Channel 19 (UART2 TX) Interrupt Request */
 #define TWI0_IRQ			0x00002000	/* TWI0 Interrupt Request */
-#define TWI1_IRQ			0x00002000	/* TWI1 Interrupt Request */
+#define TWI1_IRQ			0x00004000	/* TWI1 Interrupt Request */
 #define CAN_RX_IRQ			0x00008000	/* CAN Receive Interrupt Request */
 #define CAN_TX_IRQ			0x00010000	/* CAN Transmit Interrupt Request */
 #define MDMA1_0_IRQ			0x00020000	/* MemDMA1 Stream 0 Interrupt Request */
@@ -1880,7 +1887,7 @@
 #define PORT_CFG	0x0030  /* PPI Port Configuration */
 #define FLD_SEL		0x0040  /* PPI Active Field Select */
 #define PACK_EN		0x0080  /* PPI Packing Mode */
-#define DMA32		0x0100  /* PPI 32-bit DMA Enable */
+/* previous versions of defBF539.h erroneously included DMA32 (PPI 32-bit DMA Enable) */
 #define SKIP_EN		0x0200  /* PPI Skip Element Enable */
 #define SKIP_EO		0x0400  /* PPI Skip Even/Odd Elements */
 #define DLENGTH		0x3800  /* PPI Data Length  */
@@ -2267,18 +2274,19 @@
 
 /* *********************  ASYNCHRONOUS MEMORY CONTROLLER MASKS  ************* */
 /* EBIU_AMGCTL Masks */
-#define AMCKEN			0x00000001	/* Enable CLKOUT */
-#define	AMBEN_NONE		0x00000000	/* All Banks Disabled								*/
-#define AMBEN_B0		0x00000002	/* Enable Asynchronous Memory Bank 0 only */
-#define AMBEN_B0_B1		0x00000004	/* Enable Asynchronous Memory Banks 0 & 1 only */
-#define AMBEN_B0_B1_B2	0x00000006	/* Enable Asynchronous Memory Banks 0, 1, and 2 */
-#define AMBEN_ALL		0x00000008	/* Enable Asynchronous Memory Banks (all) 0, 1, 2, and 3 */
+#define AMCKEN          0x0001  /* Enable CLKOUT */
+#define	AMBEN_NONE      0x0000  /* All Banks Disabled */
+#define AMBEN_B0        0x0002  /* Enable Asynchronous Memory Bank 0 only */
+#define AMBEN_B0_B1     0x0004  /* Enable Asynchronous Memory Banks 0 & 1 only */
+#define AMBEN_B0_B1_B2  0x0006  /* Enable Asynchronous Memory Banks 0, 1, and 2 */
+#define AMBEN_ALL       0x0008  /* Enable Asynchronous Memory Banks (all) 0, 1, 2, and 3 */
+#define CDPRIO          0x0100  /* DMA has priority over core for for external accesses */
 
 /* EBIU_AMGCTL Bit Positions */
-#define AMCKEN_P		0x00000000	/* Enable CLKOUT */
-#define AMBEN_P0		0x00000001	/* Asynchronous Memory Enable, 000 - banks 0-3 disabled, 001 - Bank 0 enabled */
-#define AMBEN_P1		0x00000002	/* Asynchronous Memory Enable, 010 - banks 0&1 enabled,  011 - banks 0-3 enabled */
-#define AMBEN_P2		0x00000003	/* Asynchronous Memory Enable, 1xx - All banks (bank 0, 1, 2, and 3) enabled */
+#define AMCKEN_P		0x0000	/* Enable CLKOUT */
+#define AMBEN_P0		0x0001	/* Asynchronous Memory Enable, 000 - banks 0-3 disabled, 001 - Bank 0 enabled */
+#define AMBEN_P1		0x0002	/* Asynchronous Memory Enable, 010 - banks 0&1 enabled,  011 - banks 0-3 enabled */
+#define AMBEN_P2		0x0003	/* Asynchronous Memory Enable, 1xx - All banks (bank 0, 1, 2, and 3) enabled */
 
 /* EBIU_AMBCTL0 Masks */
 #define B0RDYEN			0x00000001  /* Bank 0 RDY Enable, 0=disable, 1=enable */
