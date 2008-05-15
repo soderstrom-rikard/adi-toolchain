@@ -1,3 +1,12 @@
+2008-05-15  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/Makefile.in (BOARD_CRT0S): Add basiccrt561.o,
+	basiccrt561s.o and basiccrt561b.o.
+	(basiccrt.o, basiccrts.o, basiccrt561.o, basiccrt561s.o,
+	basiccrt561b.o): Rewrite rules.
+	* bfin/basiccrt.S: Remove useless __ADSPBF561_COREB__ in
+	workaround code for 05000229.
+
 2008-05-09  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* bfin/include/blackfin.h: Update to Visual DSP 5.0 Update 1.

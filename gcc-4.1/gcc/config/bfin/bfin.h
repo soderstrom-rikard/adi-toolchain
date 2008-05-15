@@ -31,7 +31,6 @@
 #define TARGET_VERSION fprintf (stderr, " (BlackFin bfin)")
 
 #define DRIVER_SELF_SPECS SUBTARGET_DRIVER_SELF_SPECS	"\
- %{!mcpu=*:-mcpu=bf532} \
  %{mleaf-id-shared-library:%{!mid-shared-library:-mid-shared-library}} \
  %{mfdpic:%{!fpic:%{!fpie:%{!fPIC:%{!fPIE:\
    	    %{!fno-pic:%{!fno-pie:%{!fno-PIC:%{!fno-PIE:-fpie}}}}}}}}} \
@@ -72,10 +71,6 @@
 /* Run-time compilation parameters selecting different hardware subsets.  */
 
 extern int target_flags;
-
-#ifndef DEFAULT_CPU_TYPE
-#define DEFAULT_CPU_TYPE BFIN_CPU_BF532
-#endif
 
 /* Predefinition in the preprocessor for this target machine */
 #ifndef TARGET_CPU_CPP_BUILTINS

@@ -65,7 +65,7 @@ const char *bfin_csync_anomaly = "";
 const char *bfin_library_id_string;
 
 /* -mcpu support */
-bfin_cpu_t bfin_cpu_type = DEFAULT_CPU_TYPE;
+bfin_cpu_t bfin_cpu_type = BFIN_CPU_UNKNOWN;
 
 /* -msi-revision support. There are three special values:
    -1      -msi-revision=none.
@@ -2589,8 +2589,17 @@ override_options (void)
 	  bfin_workarounds |= bfin_cpus[i].workarounds;
 	}
     }
-  else
-    bfin_workarounds |= WA_RETS;
+
+  /* If processor type is not specified, enable all workarounds.  */
+  if (bfin_cpu_type == BFIN_CPU_UNKNOWN)
+    {
+      int i;
+
+      for (i = 0; bfin_cpus[i].name != NULL; i++)
+	bfin_workarounds |= bfin_cpus[i].workarounds;
+
+      bfin_si_revision = 0xffff;
+    }
 
   if (bfin_csync_anomaly[0] == '1')
     bfin_workarounds |= WA_SPECULATIVE_SYNCS;

@@ -1,7 +1,9 @@
 #undef  STARTFILE_SPEC
 #define STARTFILE_SPEC "\
 %{msim:%{!shared:crt0%O%s}} \
-%{!msim:%{!msdram:basiccrt%O%s} %{msdram:basiccrts%O%s} %{mcpu=bf561*:%{mmulticore:%{!mcorea:%{!mcoreb:basiccrtb%O%s}}}}} \
+%{!msim:%{!mcpu=bf561*:%{!msdram:basiccrt%O%s} %{msdram:basiccrts%O%s};: \
+		       %{!msdram:basiccrt561%O%s} %{msdram:basiccrt561s%O%s}} \
+	%{mcpu=bf561*:%{mmulticore:%{!mcorea:%{!mcoreb:basiccrt561b%O%s}}}}} \
 crti%O%s crtbegin%O%s crtlibid%O%s"
 
 #undef  ENDFILE_SPEC
@@ -24,9 +26,9 @@ crti%O%s crtbegin%O%s crtlibid%O%s"
 			    %{mmulticore:%{mcorea:-T bf561a.ld%s}} \
 			    %{mmulticore:%{mcoreb:-T bf561b.ld%s}} \
 			    %{mmulticore:%{!mcorea:%{!mcoreb:-T bf561m.ld%s}}}} \
-	      %{!mcpu=*:-T bf532.ld%s} \
-	      %{!mcpu=bf561:-T bfin-common-sc.ld%s} \
-	      %{mcpu=bf561:%{!mmulticore:-T bfin-common-sc.ld%s} \
+	      %{!mcpu=*:%eno processor type specified for linking} \
+	      %{!mcpu=bf561*:-T bfin-common-sc.ld%s} \
+	      %{mcpu=bf561*:%{!mmulticore:-T bfin-common-sc.ld%s} \
 			   %{mmulticore:-T bfin-common-mc.ld%s}}}}}"
 
 #undef USER_LABEL_PREFIX

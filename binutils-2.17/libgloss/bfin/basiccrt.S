@@ -80,7 +80,6 @@ __start:
 	SYSCFG = R1;
 #endif
 #if WA_05000229
-#ifndef __ADSPBF561_COREB__
    // Avoid Anomaly 05-00-0229: DMA5_CONFIG and SPI_CTL not cleared on reset.
    R1 = 0x400;
 #if defined(__ADSPBF538__) || defined(__ADSPBF539__)
@@ -96,7 +95,6 @@ __start:
    P0.H = DMA5_CONFIG >> 16;
    R1 = 0;
    W[P0] = R1.L;
-#endif
 #endif
 	// Zap loop counters to zero, to make sure that
 	// hw loops are disabled - it could be really baffling
