@@ -1,3 +1,10 @@
+2008-05-15  Jie Zhang  <jie.zhang@analog.com>
+
+	Apply
+	2007-04-04  Mark Mitchell  <mark@codesourcery.com>
+	* testsuite/lib/flags.exp (newlib_include_flags): Drop
+	-I${newlib_dir}.
+
 2007-09-06  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* libc/include/sys/errno.h (ECANCELED): Define.
