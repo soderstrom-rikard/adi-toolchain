@@ -1,3 +1,8 @@
+2008-05-15  Jie Zhang  <jie.zhang@analog.com>
+
+	* testsuite/lib/libmudflap.exp (libmudflap-init): Use $cxx
+	instead of ${gccdir}/xgcc.
+
 2007-11-26  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* testsuite/libmudflap.c/hook2-allocstuff.c: Don't malloc 16MB on
