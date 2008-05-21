@@ -1,5 +1,10 @@
 2008-05-21  Jie Zhang  <jie.zhang@analog.com>
 
+	* testsuite/cfft/cfft.c: Include complex.h instead of
+	complex_fns.h.
+
+2008-05-21  Jie Zhang  <jie.zhang@analog.com>
+
 	* twidfftf_fr16.c: Include math_bf.h instead of math.h.
 	* twidfftrad2_fr16.c: Likewise.
 	* polar16.c: Likewise.
