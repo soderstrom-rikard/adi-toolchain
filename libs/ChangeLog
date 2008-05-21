@@ -1,5 +1,11 @@
 2008-05-21  Jie Zhang  <jie.zhang@analog.com>
 
+	Revert
+	2008-05-21  Jie Zhang  <jie.zhang@analog.com>
+	* Makefile (headers): Add compplex_fns.h.
+
+2008-05-21  Jie Zhang  <jie.zhang@analog.com>
+
 	* Makefile (headers): Add compplex_fns.h.
 
 2008-04-18  Jie Zhang  <jie.zhang@analog.com>
