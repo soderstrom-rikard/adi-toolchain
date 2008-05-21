@@ -32,7 +32,7 @@
 #pragma file_attr("prefersMem =internal")
 #pragma file_attr("prefersMemNum =30")
 
-#include <math.h>
+#include <math_bf.h>
 #include <complex_fns.h>
 #include <fract.h> 
 

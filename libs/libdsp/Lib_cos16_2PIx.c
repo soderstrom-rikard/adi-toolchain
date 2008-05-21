@@ -50,7 +50,7 @@
 #pragma file_attr("prefersMem =any")
 #pragma file_attr("prefersMemNum =50")
 
-#include <math.h>
+#include <math_bf.h>
 #include <fract_typedef.h>
 #include "Lib_cos16_2PIx.h"
 

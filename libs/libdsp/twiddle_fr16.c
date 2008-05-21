@@ -38,7 +38,7 @@
 #endif
 
 #include <filter.h>
-#include <math.h>
+#include <math_bf.h>
 #include <math_const.h>
 
 /* Define macro if static memory can be used for temporary array.

@@ -1,6 +1,6 @@
 include Makerules
 
-PROGS = math stats vector filter
+PROGS = math stats vector filter ifft
 subdirs = cfft fir float16 matrix_mul_vec24_8 matrix_mul_vec28_4
 
 all: $(PROGS)
@@ -9,7 +9,7 @@ all: $(PROGS)
 	done
 		
 %: %.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
+	$(CC) -DDO_CYCLE_COUNTS $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 clean:
 	rm -f  *.o $(PROGS) *.gdb

@@ -1,3 +1,15 @@
+2008-05-21  Jie Zhang  <jie.zhang@analog.com>
+
+	* twidfftf_fr16.c: Include math_bf.h instead of math.h.
+	* twidfftrad2_fr16.c: Likewise.
+	* polar16.c: Likewise.
+	* Lib_cos16_2PIx.c: Likewise.
+	* twidfft2d_fr16.c: Likewise.
+	* twidfftrad4_fr16.c: Likewise.
+	* twiddle_fr16.c: Likewise.
+	* libdsp/testsuite/ifft.c: New test case.
+	* libdsp/testsuite/Makefile: Add ifft.c.
+
 2008-04-17  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* cadd16.c: Replaced complex.h with complex_fns.h.
