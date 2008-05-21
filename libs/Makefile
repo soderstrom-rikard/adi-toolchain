@@ -27,7 +27,8 @@ FLAGS_TO_PASS = \
 	'USR=$(USR)'
 
 headers := \
-	complex_bf.h complex_typedef.h cycle_count.h cycle_count_bf.h \
+	complex_bf.h compplex_fns.h complex_typedef.h \
+	cycle_count.h cycle_count_bf.h \
 	filter.h float16.h flt2fr.h \
 	fr2x16_base.h fr2x16.h fr2x16_math.h fr2x16_typedef.h \
 	fract2float_conv.h fract_base.h fract_complex.h fract.h \
