@@ -1,3 +1,14 @@
+2008-05-21  Jie Zhang  <jie.zhang@analog.com>
+
+	Revert
+	2008-05-15  Jie Zhang  <jie.zhang@analog.com>
+	* testsuite/lib/libmudflap.exp (libmudflap-init): Use $cxx
+	instead of ${gccdir}/xgcc.
+
+	* testsuite/lib/libmudflap.exp (libmudflap-init): Improve
+	handling of compilers not in the build directory.
+	* testsuite/libmudflap.c++/*.exp: Likewise.
+
 2008-05-15  Jie Zhang  <jie.zhang@analog.com>
 
 	* testsuite/lib/libmudflap.exp (libmudflap-init): Use $cxx
