@@ -47,6 +47,7 @@ public class MMRAccessor implements IRegisterAccessor
 		name = regDef.name;
 		bitSize = regDef.bitSize;
 		bytesPerRegister = regDef.bitSize/ByteSIZE;
+		locationsPerRegister = bytesPerRegister;	// mostly-sane default in case Refresh() below bombs
 		readAddr = regDef.readAddr;
 		writeAddr = regDef.writeAddr;
 		mask = new BigInteger(regDef.mask, 16);
@@ -83,9 +84,12 @@ public class MMRAccessor implements IRegisterAccessor
 				else
 					writeMemBlock = memRetrieval.getExtendedMemoryBlock(writeAddr, context);
 
-
 				readAddress = readMemBlock.getBigBaseAddress();
 				writeAddress = writeMemBlock.getBigBaseAddress();
+				// FIXME: this getAddressableSize() doesnt work with gnICE:
+				//   gdb  99-data-read-memory 4290773504 x 1 1 100
+				//   gdb  99^error,msg="Unable to read memory."
+				//   ice  error:     bfin: [0] bad MMR size [0xFFC00200] size 0
 				int size = readMemBlock.getAddressableSize();
 				if(size != 0)
 					locationsPerRegister = bitSize/(size*ByteSIZE);
@@ -127,7 +131,7 @@ public class MMRAccessor implements IRegisterAccessor
 		}
 		catch(DebugException e)
 		{
-			System.err.println("Could not read memory for " + name + "@" + readAddress.toString(16));
+			System.err.println("Could not read memory for " + name + "@0x" + readAddress.toString(16) + " (" + numItems + " blocks)");
 		}
 			
 		if(bytes == null)
@@ -181,7 +185,7 @@ public class MMRAccessor implements IRegisterAccessor
 		}
 		catch(DebugException e)
 		{
-			System.err.println("Could not write memory for " + name + "@" + writeAddress.toString(16));			
+			System.err.println("Could not write memory for " + name + "@0x" + writeAddress.toString(16));			
 		}
 
 		return IDSPDebugGeneralConstants.REGSTATUS_OK;
