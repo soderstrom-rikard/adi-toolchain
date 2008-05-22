@@ -44,6 +44,16 @@ OutFile "blackfin-toolchain-win32-${PRODUCT_VERSION}.exe"
 ShowInstDetails show
 ShowUnInstDetails show
 
+Section -Prerequisites
+  SetOutPath "$INSTDIR\Prerequisites"
+  IfFileExists "$SYSDIR\libusb0.dll" skip_libusb
+  MessageBox MB_YESNO "Your system does not appear to have LibUsb-Win32 installed.$\nYou need to have this installed if you wish to use USB based JTAG tools.$\n$\nDo you wish to install LibUsb-Win32?" \
+      /SD IDNO IDNO skip_libusb
+  File /oname=libusb-win32-filter-bin.exe Prerequisites\libusb-win32-filter-bin-*.exe
+  ExecWait "$INSTDIR\Prerequisites\libusb-win32-filter-bin.exe"
+  skip_libusb:
+SectionEnd
+
 !macro BlackfinInstall tuple libc
 Section "bfin-${tuple}" Sec${libc}
   SetOutPath "$INSTDIR\${tuple}"
