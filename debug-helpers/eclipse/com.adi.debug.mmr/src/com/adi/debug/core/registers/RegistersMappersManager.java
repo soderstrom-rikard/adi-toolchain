@@ -115,7 +115,7 @@ public class RegistersMappersManager
 			Map.Entry e = (Map.Entry)it.next();
 			partNumbersArray[i++] = (String)e.getKey();
 		}
-		
+		Arrays.sort(partNumbersArray);
 	}
 
 	protected void addPartNumber(String procDefXML)
