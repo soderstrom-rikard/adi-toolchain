@@ -1,3 +1,9 @@
+2008-05-30  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/t-bfin-elf (MULTILIB_MATCHES): Format nicely.
+	* config/bfin/t-bfin-uclinux (MULTILIB_MATCHES): Likewise.
+	* config/bfin/t-bfin-linux (MULTILIB_MATCHES): Likewise.
+
 2008-05-15  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/t-bfin-elf (MULTILIB_OPTIONS, MULTILIB_DIRNAMES,
