@@ -1,3 +1,9 @@
+2008-05-30  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* gcc.target/bfin/mcpu-default.c: Adjust for recent changes: default
+	CPU has all workarounds, and no longer explicitly sets bf532 as CPU
+	type.
+
 2007-12-20  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* gcc.target/bfin/mcpu-bf531.c: Adjust for WORKAROUND_RETS.
