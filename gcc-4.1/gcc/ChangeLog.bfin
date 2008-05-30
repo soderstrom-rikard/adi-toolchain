@@ -1,5 +1,8 @@
 2008-05-30  Bernd Schmidt  <bernd.schmidt@analog.com>
 
+	* config/bfin/bfin.c (bfin_optimize_loop): Properly handle case
+	where we have one entry point in the loop which isn't the head.
+
 	* config/bfin/t-bfin-elf (MULTILIB_MATCHES): Format nicely.
 	* config/bfin/t-bfin-uclinux (MULTILIB_MATCHES): Likewise.
 	* config/bfin/t-bfin-linux (MULTILIB_MATCHES): Likewise.
