@@ -50,4 +50,5 @@ noinst_HEADERS = \
 	jim.h \
 	jim/some_cpu.h \
 	svf.h \
-	xpcu.h
+	xpcu.h \
+	bfin.h

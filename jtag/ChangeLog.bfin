@@ -1,3 +1,26 @@
+2008-05-31  Jie Zhang  <jie.zhang@analog.com>
+
+	* include/bfin.h: New file.
+	* include/Makefile.am (noinst_HEADERS): Add bfin.h
+	* include/Makefile.in: Regenerate.
+	* src/cmd/bfin.c: New file.
+	* src/cmd/cmd.c (cmd_bfin): Declare.
+	* src/cmd/Makefile.am (libcmd_a_SOURCES): Add bfin.c.
+	* src/cmd/Makefile.in: Regenerate.
+	* src/part/bfin.c: New file.
+	* src/part/Makefile.am (libpart_a_SOURCES): Add bfin.c.
+	* src/part/Makefile.in: Regenerate.
+	* src/Makefile.am (jtag_LDADD): Reorder.
+	* src/Makefile.in: Regenerate.
+	* data/analog/bf533/bf533: Add registers DBGSTAT, DBGCTL,
+	EMUIR, EMUDAT, EMUPC. Add instructions DBGSTAT_SCAN,
+	DBGCTL_SCAN, EMUIR_SCAN, EMUDAT_SCAN, EMUPC_SCAN.
+	* data/analog/bf561/bf561: Likewise.
+	* data/analog/bf527/bf527: Likewise.
+	* data/analog/bf537/bf537: Likewise.
+	* data/analog/bf538/bf538: Likewise.
+	* data/analog/bf549/bf549: Likewise.
+
 2008-05-21  Jie Zhang  <jie.zhang@analog.com>
 
 	Revert

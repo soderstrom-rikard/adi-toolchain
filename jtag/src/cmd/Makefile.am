@@ -60,7 +60,8 @@ libcmd_a_SOURCES = \
 	eraseflash.c \
 	include.c \
 	cmd.c \
-	jtag_data_dir.c
+	jtag_data_dir.c \
+	bfin.c
 
 if ENABLE_SVF
 libcmd_a_SOURCES += svf.c

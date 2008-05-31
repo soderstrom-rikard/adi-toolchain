@@ -106,7 +106,8 @@ am__libcmd_a_SOURCES_DIST = frequency.c cable.c reset.c discovery.c \
 	bit.c register.c initbus.c print.c part.c bus.c instruction.c \
 	shift.c dr.c get.c test.c debug.c shell.c set.c endian.c \
 	parse.c peekpoke.c readmem.c writemem.c flashmem.c \
-	eraseflash.c include.c cmd.c jtag_data_dir.c svf.c bsdl.c
+	eraseflash.c include.c cmd.c jtag_data_dir.c bfin.c svf.c \
+	bsdl.c
 @ENABLE_SVF_TRUE@am__objects_1 = svf.$(OBJEXT)
 @ENABLE_BSDL_TRUE@am__objects_2 = bsdl.$(OBJEXT)
 am_libcmd_a_OBJECTS = frequency.$(OBJEXT) cable.$(OBJEXT) \
@@ -120,7 +121,7 @@ am_libcmd_a_OBJECTS = frequency.$(OBJEXT) cable.$(OBJEXT) \
 	parse.$(OBJEXT) peekpoke.$(OBJEXT) readmem.$(OBJEXT) \
 	writemem.$(OBJEXT) flashmem.$(OBJEXT) eraseflash.$(OBJEXT) \
 	include.$(OBJEXT) cmd.$(OBJEXT) jtag_data_dir.$(OBJEXT) \
-	$(am__objects_1) $(am__objects_2)
+	bfin.$(OBJEXT) $(am__objects_1) $(am__objects_2)
 libcmd_a_OBJECTS = $(am_libcmd_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/tools/depcomp
@@ -257,8 +258,8 @@ libcmd_a_SOURCES = frequency.c cable.c reset.c discovery.c detect.c \
 	register.c initbus.c print.c part.c bus.c instruction.c \
 	shift.c dr.c get.c test.c debug.c shell.c set.c endian.c \
 	parse.c peekpoke.c readmem.c writemem.c flashmem.c \
-	eraseflash.c include.c cmd.c jtag_data_dir.c $(am__append_1) \
-	$(am__append_2)
+	eraseflash.c include.c cmd.c jtag_data_dir.c bfin.c \
+	$(am__append_1) $(am__append_2)
 AM_CPPFLAGS = -DJTAG_BIN_DIR=\"$(bindir)\" -DJTAG_DATA_DIR=\"$(pkgdatadir)\"
 all: all-am
 
@@ -307,6 +308,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bfin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bsdl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bus.Po@am__quote@

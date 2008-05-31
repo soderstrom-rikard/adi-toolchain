@@ -66,10 +66,10 @@ jtag_DEPENDENCIES +=  bsdl/libbsdl.a
 endif
 
 jtag_LDADD = \
+	-Lcmd -lcmd \
 	-Ltap -ltap \
 	-Lpart -lpart \
 	-Lflash -lflash \
-	-Lcmd -lcmd \
 	-Ltap -ltap \
 	-Lflash -lflash \
 	-Lbus -lbus \

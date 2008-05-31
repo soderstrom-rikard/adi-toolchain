@@ -100,7 +100,8 @@ ARFLAGS = cru
 libpart_a_AR = $(AR) $(ARFLAGS)
 libpart_a_LIBADD =
 am_libpart_a_OBJECTS = signal.$(OBJEXT) instruction.$(OBJEXT) \
-	data_register.$(OBJEXT) bsbit.$(OBJEXT) part.$(OBJEXT)
+	data_register.$(OBJEXT) bsbit.$(OBJEXT) part.$(OBJEXT) \
+	bfin.$(OBJEXT)
 libpart_a_OBJECTS = $(am_libpart_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/tools/depcomp
@@ -237,7 +238,8 @@ libpart_a_SOURCES = \
 	instruction.c \
 	data_register.c \
 	bsbit.c \
-	part.c
+	part.c \
+	bfin.c
 
 all: all-am
 
@@ -286,6 +288,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bfin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bsbit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/data_register.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/instruction.Po@am__quote@

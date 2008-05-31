@@ -75,6 +75,9 @@ extern cmd_t cmd_bsdl;
 #endif
 extern cmd_t cmd_debug;
 
+/* Blackfin specific command */
+extern cmd_t cmd_bfin;
+
 const cmd_t *cmds[] = {
 	&cmd_quit,
 	&cmd_help,
@@ -116,6 +119,7 @@ const cmd_t *cmds[] = {
 	&cmd_bsdl,
 #endif
 	&cmd_debug,
+	&cmd_bfin,
 	NULL			/* last must be NULL */
 };
 
