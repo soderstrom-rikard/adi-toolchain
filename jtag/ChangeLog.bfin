@@ -1,3 +1,10 @@
+2008-06-01  Jie Zhang  <jie.zhang@analog.com>
+
+	* src/bus/bf537_stamp.c (bf526_ezkit_bus_printinfo): New.
+	(bf526_ezkit_bus): Define.
+	* src/bus/buses.c (bus_drivers[]): Add bf526_ezkit_bus.
+	* src/bus/buses.h (bf526_ezkit_bus): Declare.
+
 2008-05-31  Jie Zhang  <jie.zhang@analog.com>
 
 	* include/bfin.h: New file.
