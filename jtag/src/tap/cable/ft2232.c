@@ -107,11 +107,11 @@
 #define BITMASK_ARMUSBOCD_nTSRST (1 << BIT_ARMUSBOCD_nTRST)
 #define BITMASK_ARMUSBOCD_nTRST_nOE (1 << BIT_ARMUSBOCD_nTRST_nOE)
 #define BITMASK_ARMUSBOCD_RED_LED (1 << BIT_ARMUSBOCD_RED_LED)
-/* bit and bitmask definitions for BFIN-UJTAG */
-#define BIT_BFIN_UJTAG_nTRST 1
-#define BIT_BFIN_UJTAG_nLED 3 
-#define BITMASK_BFIN_UJTAG_nTRST (1 << BIT_BFIN_UJTAG_nTRST)
-#define BITMASK_BFIN_UJTAG_nLED (1 << BIT_BFIN_UJTAG_nLED)
+/* bit and bitmask definitions for Blackfin gnICE */
+#define BIT_GNICE_nTRST 1
+#define BIT_GNICE_nLED 3 
+#define BITMASK_GNICE_nTRST (1 << BIT_GNICE_nTRST)
+#define BITMASK_GNICE_nLED (1 << BIT_GNICE_nLED)
 /* bit and bitmask definitions for OOCDLink-s */
 #define BIT_OOCDLINKS_nTRST_nOE 0
 #define BIT_OOCDLINKS_nTRST 1
@@ -466,7 +466,7 @@ ft2232_armusbocd_init( cable_t *cable )
 
 
 static int
-ft2232_bfin_ujtag_init( cable_t *cable )
+ft2232_gnice_init( cable_t *cable )
 {
 	parport_t *p = cable->link.port;
 	params_t *params = (params_t *)cable->params;
@@ -485,9 +485,9 @@ ft2232_bfin_ujtag_init( cable_t *cable )
 	push_to_send( params, params->low_byte_dir | BITMASK_TCK | BITMASK_TDI | BITMASK_TMS );
 
 	/* Set Data Bits High Byte */
-	params->high_byte_value_trst_active   = BITMASK_BFIN_UJTAG_nLED;
-	params->high_byte_value_trst_inactive = BITMASK_BFIN_UJTAG_nTRST;
-	params->high_byte_dir                 = BITMASK_BFIN_UJTAG_nTRST | BITMASK_BFIN_UJTAG_nLED;
+	params->high_byte_value_trst_active   = BITMASK_GNICE_nLED;
+	params->high_byte_value_trst_inactive = BITMASK_GNICE_nTRST;
+	params->high_byte_dir                 = BITMASK_GNICE_nTRST | BITMASK_GNICE_nLED;
 	push_to_send( params, SET_BITS_HIGH );
 	push_to_send( params, params->high_byte_value_trst_inactive );
 	push_to_send( params, 0 );
@@ -765,7 +765,7 @@ ft2232_armusbocd_done( cable_t *cable )
 }
 
 static void
-ft2232_bfin_ujtag_done( cable_t *cable )
+ft2232_gnice_done( cable_t *cable )
 {
 	parport_t *p = cable->link.port;
 	params_t *params = (params_t *)cable->params;
@@ -779,13 +779,13 @@ ft2232_bfin_ujtag_done( cable_t *cable )
 	/* Set Data Bits High Byte
 		 disable output drivers */
 	push_to_send( params, SET_BITS_HIGH );
-	push_to_send( params, BITMASK_BFIN_UJTAG_nTRST);
-	push_to_send( params, BITMASK_BFIN_UJTAG_nTRST | BITMASK_BFIN_UJTAG_nLED);
+	push_to_send( params, BITMASK_GNICE_nTRST);
+	push_to_send( params, BITMASK_GNICE_nTRST | BITMASK_GNICE_nLED);
 
 	/* Set Data Bits High Byte
 		 set all to input */
 	push_to_send( params, SET_BITS_HIGH );
-	push_to_send( params, BITMASK_BFIN_UJTAG_nTRST);
+	push_to_send( params, BITMASK_GNICE_nTRST);
 	push_to_send( params, 0 );
 	send_and_receive( cable, COMPLETELY );
 
@@ -1450,14 +1450,14 @@ cable_driver_t ft2232_armusbocd_cable_driver = {
 	ft2232_usbcable_help
 };
 
-cable_driver_t ft2232_bfin_ujtag_cable_driver = {
-	"BFIN-UJTAG",
-	N_("Analog Devices BFIN-UJTAG (FT2232) Cable (EXPERIMENTAL)"),
+cable_driver_t ft2232_gnice_cable_driver = {
+	"gnICE",
+	N_("Analog Devices Blackfin gnICE (FT2232) Cable (EXPERIMENTAL)"),
 	ft2232_connect,
 	generic_disconnect,
 	ft2232_cable_free,
-	ft2232_bfin_ujtag_init,
-	ft2232_bfin_ujtag_done,
+	ft2232_gnice_init,
+	ft2232_gnice_done,
 	ft2232_set_frequency,
 	ft2232_clock,
 	ft2232_get_tdo,

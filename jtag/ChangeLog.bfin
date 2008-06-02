@@ -1,3 +1,24 @@
+2008-06-02  Michael Hennerich <michael.hennerich@analog.com>
+
+	* src/tap/parport/ftdi.c (ftdi_generic_open): Change comment.
+	* src/tap/cable.c (ft2232_bfin_urjtag_cable_driver): Renamed to ...
+	(ft2232_gnice_cable_driver): ... this.
+	(cable_drivers[]): Change accordingly.
+	* src/tap/cable/ft2232.c (BIT_BFIN_UJTAG_nTRST): Renamed to ...
+	(BIT_GNICE_nTRST): ... this.
+	(BIT_BFIN_UJTAG_nLED): Renamed to ...
+	(BIT_GNICE_nLED): ... this.
+	(BITMASK_BFIN_UJTAG_nTRST): Renamed to ...
+	(BITMASK_GNICE_nTRST): ... this.
+	(BITMASK_BFIN_nLED): Renamed to ...
+	(BITMASK_GNICE_nLED): ... this.
+	(ft2232_bfin_urjtag_init): Renamed to ...
+	(ft2232_gnice_init): ... this.
+	(ft2232_bfin_urjtag_done): Renamed to ...
+	(ft2232_gnice_done): ... this.
+	(ft2232_bfin_ujtag_cable_driver): Renamed to ...
+	(ft2232_gnice_cable_driver): ... this.
+
 2008-06-01  Jie Zhang  <jie.zhang@analog.com>
 
 	* src/bus/bf537_stamp.c (bf526_ezkit_bus_printinfo): New.
@@ -83,7 +104,7 @@
 	* data/atmel/PARTS: Add atf15xx.
 	* data/Makefile.am (nobase_dist_pkgdata_DATA): Add
 	atmel/atf15xx/STEPPINGS and atmel/atf15xx/atf1504asv.
-	* data/Makefile.in: Regenerated. 
+	* data/Makefile.in: Regenerated.
 
 2008-04-08  Jie Zhang  <jie.zhang@analog.com>
 
