@@ -1,3 +1,12 @@
+2008-06-05  Jie Zhang  <jie.zhang@analog.com>
+
+	Apply
+	2007-04-02  Nick Clifton  <nickc@redhat.com>
+	PR binutils/4292
+	* bfd.c (bfd_fprintf_vma): Do not print addresses of 32-bit
+	targets as 64-bit values, even if running on a 64-bit host.
+	* coffgen.c (coff_print_symbol): Likewise.
+
 2008-03-26  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* elf32-bfin.c (bfin_final_link_relocate): R_pcrel24 is one bit larger
