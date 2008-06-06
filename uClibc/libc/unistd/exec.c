@@ -29,6 +29,8 @@
 
 libc_hidden_proto(execl)
 libc_hidden_proto(execle)
+libc_hidden_proto(execlp)
+libc_hidden_proto(execv)
 libc_hidden_proto(execvp)
 
 libc_hidden_proto(memcpy)
@@ -149,6 +151,7 @@ int execv(__const char *path, char *__const argv[])
 {
 	return execve(path, argv, __environ);
 }
+libc_hidden_def(execv)
 
 #endif
 /**********************************************************************/
@@ -224,6 +227,7 @@ int execlp(const char *file, const char *arg, ...)
 
 	return n;
 }
+libc_hidden_def(execlp)
 
 #endif
 /**********************************************************************/
