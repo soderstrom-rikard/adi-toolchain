@@ -91,7 +91,7 @@ libc_hidden_proto(strchr)
 libc_hidden_proto(strlen)
 libc_hidden_proto(strncpy)
 libc_hidden_proto(open)
-/*libc_hidden_proto(fcntl)*/
+libc_hidden_proto(fcntl)
 libc_hidden_proto(socket)
 libc_hidden_proto(close)
 libc_hidden_proto(write)
@@ -165,7 +165,7 @@ retry:
 	    if ((LogFile = socket(AF_UNIX, logType, 0)) == -1) {
 		goto DONE;
 	    }
-	    /*			fcntl(LogFile, F_SETFD, 1); */
+	    fcntl(LogFile, F_SETFD, 1);
 	}
     }
 
