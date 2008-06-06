@@ -8,5 +8,11 @@ Merged up to 20727, excluding the following revisions for now:
 19347
 19386
 
-The excluded ones are the uc_malloc work which IMO is misguided and shouldn't
-be applied to our tree.
+These ones are excluded because they contain the uc_malloc work which IMO
+is misguided and shouldn't be applied to our tree.
+
+The following are excluded because the commit log makes no sense to me.  I've
+started discussion on the uClibc mailing list.
+
+20625
+20628
