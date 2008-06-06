@@ -1,10 +1,10 @@
-include ../Makerules
+topdir = ..
+include $(topdir)/Makerules
 PROGS = cfft 
 
-all: $(PROGS)
+CPPFLAGS += -D__USE_FFT_REL45__ -DDO_CYCLE_COUNTS
 
-%: %.c
-	$(CC) -D__USE_FFT_REL45__ -DDO_CYCLE_COUNTS $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
+all: $(PROGS)
 
 clean:
 	rm -f  *.o $(PROGS) *.gdb

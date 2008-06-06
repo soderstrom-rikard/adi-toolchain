@@ -1,4 +1,10 @@
-CC = bfin-uclinux-gcc
-CFLAGS = -O2 -g -Wall
-LDFLAGS = -Wl,-elf2flt  
-LIBS = -lbfdsp -lm 
+CROSS?=$(CROSS_COMPILE)
+CC=$(CROSS)gcc
+CFLAGS ?= -O2 -g
+CFLAGS += -Wall
+ifeq ($(CROSS),bfin-uclinux-)
+LDFLAGS += -Wl,-elf2flt
+endif
+LDFLAGS += -L$(topdir)/..
+CPPFLAGS += -isystem $(topdir)/../../include
+LDLIBS = -lbfdsp -lm
