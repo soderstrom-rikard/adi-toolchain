@@ -1,4 +1,4 @@
-Merged up to 20461, excluding the following revisions for now:
+Merged up to 20727, excluding the following revisions for now:
 
 19342
 19343
@@ -7,10 +7,6 @@ Merged up to 20461, excluding the following revisions for now:
 19346
 19347
 19386
-19880
-20096
-20097
-20099
 
-The excluded ones are the uc_malloc work and patches depending on it; I'll
-get back to that soon.
+The excluded ones are the uc_malloc work which IMO is misguided and shouldn't
+be applied to our tree.
