@@ -23,7 +23,7 @@ public class ValueViewUtils
 	public static final String FORMAT_STR_DISASM 			= "Disassembly";
 	
 	
-	//	base constatnts
+	//	base constants
 	public static final int DEFAULT_DATA_SIZE = -1;
 	
 	static final double LAN10 = 2.3025850929940456840179914546844D;
@@ -120,8 +120,6 @@ public class ValueViewUtils
 	{		
 		String strNumber = null;
 		
-		BigInteger f;
-		Double g;
 		if ((base & FLOAT) > 0)
 		{
 			//if (dataSize <= 32)
@@ -276,7 +274,7 @@ public class ValueViewUtils
 	
 	/**
 	 * Returns the string which matches the given base
-	 * for one byte of data, with the widthest text.
+	 * for one byte of data, with the widest text.
 	 * 
 	 * @param base
 	 * @return
