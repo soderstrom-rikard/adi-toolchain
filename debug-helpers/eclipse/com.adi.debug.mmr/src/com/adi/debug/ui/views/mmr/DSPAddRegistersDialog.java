@@ -125,6 +125,7 @@ public class DSPAddRegistersDialog extends Dialog
 	
 	/*
 	 * @see Dialog#createDialogArea(Composite)
+	 * TODO: make the heights here relative based on the widget size rather than hardcoded pixel count
 	 */
 	protected Control createDialogArea(Composite parent) 
 	{
