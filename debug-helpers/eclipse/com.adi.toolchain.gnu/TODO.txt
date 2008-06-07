@@ -1,0 +1,55 @@
+TODO:
+- expose examples as sample projects
+
+- default gdb drop down selection
+	- use jtag project ?
+
+- add LDR options to expose underlying options
+- add dialog to wizard page to select default proc / target / etc...
+- enum silicon revs based on selected proc
+	- integrate based on xml ?
+	- call gcc with cpu + sirev to see if gcc supports it
+- ldr needs to be a targetTool in toolchain def ?
+- in toolchain init, walk %PATH% and $PATH and detect multiple versions of a single toolchain available and warn
+
+- in win32 nsi installer, prompt the user if they wish to update their %PATH%
+
+- method for integrating gdbserver nicely ...
+	- dedicated thread to launch gdbserver on the board
+	- dedicated view to handle stdin/stdout 
+
+- method for integrating gdbproxy nicely ...
+	- dedicated thread to launch gdbproxy
+	- dedicated view to handle stdin/stdout 
+
+- creating an assembly file is unable to locate an appropriate compiler ? (crt.S)
+
+- define default gdb sessions
+	- DEBUGGER_DEBUG_NAME_DEFAULT in IMILaunchConfigureationConstants.java
+
+- gdbjtag does not extend well
+	- see upstream #194823
+	- org.eclipse.cdt.debug.gdbjtag.core.jtagdevice.GDBJtagDeviceContribution.getDevice()
+
+- initialize external memory so the memory window works
+
+- make proc/sirev drop downs a multi combo so people can enter their own text ?  add an "other" or "none" ?
+
+- mmr plugin
+	- detect proc family automatically, or based on toolchain target
+	- handle SYSCFG - it's a register, not an mmr
+
+- dedicated plugin for xml resources
+	- com.adi.definition.cpu
+
+DONE:
+- how to change addr2line/c++filt under GNU_ELF Binary Parser
+- get source lines to show up in disassembly
+- fixup mmr plugin
+
+- get proper dependency calculator (for include paths)
+	- see upstream #204043 #219940
+	- will have to copy some org.eclipse.cdt.managebuilder.internal.scannerconfig.* files locally in the meantime
+
+- mmr plugin
+	- sort proc list in drop down alphabetically
