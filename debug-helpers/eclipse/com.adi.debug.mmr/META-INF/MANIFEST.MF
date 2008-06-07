@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Mmr Plug-in
 Bundle-SymbolicName: com.adi.debug.mmr; singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 2008.1.0
 Bundle-Activator: com.adi.debug.core.registers.MMRViewUIPlugin
 Bundle-Vendor: ADI
 Bundle-Localization: plugin
