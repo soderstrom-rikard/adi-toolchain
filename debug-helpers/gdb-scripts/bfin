@@ -171,7 +171,7 @@ end
 
 define hwtrace_on
 	set $$TBUFCTL  = (unsigned long *)0xFFE06000
-	*$$TBUFCTL = 0x3
+	set *$$TBUFCTL = 0x3
 end
 define hwtrace
 	set $$TBUFSTAT = (unsigned long *)0xFFE06004
