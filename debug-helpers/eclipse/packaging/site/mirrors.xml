@@ -1,0 +1,5 @@
+<?xml encoding="ISO-8859-1"?>
+<mirrors>
+<mirror url="http://download.analog.com/27516/eclipse" label="Fast Primary Mirror"/>
+<mirror url="http://blackfin.uclinux.org/eclipse" label="Master Site"/>
+</mirrors>
