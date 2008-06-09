@@ -547,8 +547,8 @@ ifneq ($(DOASSERTS),y)
 CFLAGS+=-DNDEBUG
 endif
 
-ifneq ($(SYMBOL_PREFIX),_)
-CFLAGS+=-D__UCLIBC_NO_UNDERSCORES__
+ifeq ($(SYMBOL_PREFIX),_)
+CFLAGS+=-D__UCLIBC_UNDERSCORES__
 endif
 
 # Keep the check_as from being needlessly executed
