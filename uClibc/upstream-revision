@@ -1,4 +1,4 @@
-Merged up to 20727, excluding the following revisions for now:
+Merged up to 21507, excluding the following revisions for now:
 
 19342
 19343
@@ -11,8 +11,8 @@ Merged up to 20727, excluding the following revisions for now:
 These ones are excluded because they contain the uc_malloc work which IMO
 is misguided and shouldn't be applied to our tree.
 
-The following are excluded because the commit log makes no sense to me.  I've
-started discussion on the uClibc mailing list.
+The following just work around an NPTL bug.  They should not be applied before
+the NPTL merge is complete so that we can verify the bug is fixed.
 
 20625
 20628
