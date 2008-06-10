@@ -9,6 +9,7 @@ package com.adi.debug.core.registers;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
