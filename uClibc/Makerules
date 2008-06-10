@@ -206,7 +206,7 @@ $(libc):
 	@cd $(top_builddir); $(MAKE) lib/$(patsubst %.$(MAJOR_VERSION),%,$(notdir $@))
 
 $(headers_dep):
-	$(Q)cd $(top_builddir); $(MAKE) headers
+	$(Q)cd $(top_builddir); $(MAKE) pregen
 
 CRT := crt1
 
