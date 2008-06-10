@@ -360,7 +360,7 @@ Public License instead of this License.
    </license>
 
    <url>
-      <update label="Blackfin Eclipse Plugins"/>
+      <update label="Blackfin Eclipse Plugins" url="http://blackfin.uclinux.org/eclipse/"/>
    </url>
 
    <requires>
