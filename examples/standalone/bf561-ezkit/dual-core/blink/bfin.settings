@@ -1,0 +1,6 @@
+# Settings to describe this tree for packages (like eclipse)
+id=bf561-ezkit-blinky-dc
+cpu=bf561
+toolchain="bfin-elf"
+label="BF561-EZKit Blinky (Dual Core)"
+desc="This directory contains an example ADSP-BF561 project that shows how to write a program to run in Core B while controlling the LEDs via the Programmable Flags."

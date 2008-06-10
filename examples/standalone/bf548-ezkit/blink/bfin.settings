@@ -1,0 +1,6 @@
+# Settings to describe this tree for packages (like eclipse)
+id=bf548-ezkit-blinky
+cpu=bf548
+toolchain="bfin-elf"
+label="BF548-EZKit Blinky"
+desc="This directory contains an example ADSP-BF548 project that shows how Programmable Flag pins PORTG can be managed in C.  It also demonstrates the access to the LEDs\non the EZ-KIT Lite."

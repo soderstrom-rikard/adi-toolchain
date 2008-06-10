@@ -1,0 +1,6 @@
+# Settings to describe this tree for packages (like eclipse)
+id=bf537-stamp-blinky
+cpu=bf537
+toolchain="bfin-elf"
+label="BF537-STAMP Blinky"
+desc="This directory contains an example ADSP-BF537 project that shows how Programmable Flag pins PORTF,\nInterrupts, and Timer can be configured in C. It also demonstrates the access to the LEDs\non the EZ-KIT Lite."
