@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Example Blackfin Projects
+Bundle-SymbolicName: com.adi.toolchain.gnu.examples;singleton:=true
+Bundle-Version: 2008.1.0
+Bundle-Vendor: ADI
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.eclipse.cdt.core;bundle-version="5.0.0"
