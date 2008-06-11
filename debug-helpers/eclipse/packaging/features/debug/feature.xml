@@ -6,7 +6,7 @@
       provider-name="ADI"
       os="All"
       ws="All"
-      nl="All"
+      nl="en"
       arch="All">
 
    <description url="http://docs.blackfin.uclinux.org/doku.php?id=toolchain:eclipse">
