@@ -7,7 +7,7 @@
    <feature url="features/com.adi.toolchain.gnu_2008.1.0.jar" id="com.adi.toolchain.gnu" version="2008.1.0" os="All" ws="All" nl="en" arch="All">
       <category name="toolchain"/>
    </feature>
-   <feature url="features/com.adi.debug.mmr_2008.1.0.jar" id="com.adi.debug.mmr" version="2008.1.0" os="All" ws="All" nl="All" arch="All">
+   <feature url="features/com.adi.debug.mmr_2008.1.0.jar" id="com.adi.debug.mmr" version="2008.1.0" os="All" ws="All" nl="en" arch="All">
       <category name="debug"/>
    </feature>
    <category-def name="toolchain" label="Blackfin GNU Toolchain"/>
