@@ -48,9 +48,7 @@ libc_hidden_proto(__fputc_unlocked)
 #endif
 #define PWD_BUFFER_SIZE 256
 
-char *
-getpass (prompt)
-     const char *prompt;
+char * getpass (const char *prompt)
 {
   FILE *in, *out;
   struct termios s, t;
