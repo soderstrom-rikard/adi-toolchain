@@ -11,7 +11,9 @@
 #include "_stdio.h"
 #include <stdarg.h>
 
+#ifdef __USE_OLD_VFPRINTF__
 libc_hidden_proto(vfprintf)
+#endif
 libc_hidden_proto(fflush_unlocked)
 
 libc_hidden_proto(vdprintf)
@@ -48,13 +50,19 @@ int vdprintf(int filedes, const char * __restrict format, va_list arg)
 	__INIT_MBSTATE(&(f.__state));
 #endif /* __STDIO_MBSTATE */
 
-#ifdef __UCLIBC_HAS_THREADS__
+/* _vfprintf_internal doesn't do any locking, locking init is here
+ * only because of fflush_unlocked. TODO? */
+#if (defined(__STDIO_BUFFERS) || defined(__USE_OLD_VFPRINTF__)) && defined(__UCLIBC_HAS_THREADS__)
 	f.__user_locking = 1;		/* Set user locking. */
 	__stdio_init_mutex(&f.__lock);
 #endif
 	f.__nextopen = NULL;
 
+#ifdef __USE_OLD_VFPRINTF__
 	rv = vfprintf(&f, format, arg);
+#else
+	rv = _vfprintf_internal(&f, format, arg);
+#endif
 
 #ifdef __STDIO_BUFFERS
 	/* If not buffering, then fflush is unnecessary. */
@@ -67,5 +75,4 @@ int vdprintf(int filedes, const char * __restrict format, va_list arg)
 
 	return rv;
 }
-libc_hidden_def(vdprintf)
 #endif
