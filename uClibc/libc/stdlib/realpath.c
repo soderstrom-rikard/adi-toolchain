@@ -14,7 +14,6 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
-#include <strings.h>
 #include <limits.h>				/* for PATH_MAX */
 #include <sys/param.h>			/* for MAXPATHLEN */
 #include <errno.h>
@@ -22,9 +21,9 @@
 
 #include <sys/stat.h>			/* for S_IFLNK */
 
-libc_hidden_proto(strcat)
-libc_hidden_proto(strcpy)
-libc_hidden_proto(strlen)
+/* Experimentally off - libc_hidden_proto(strcat) */
+/* Experimentally off - libc_hidden_proto(strcpy) */
+/* Experimentally off - libc_hidden_proto(strlen) */
 libc_hidden_proto(readlink)
 libc_hidden_proto(getcwd)
 

@@ -1191,7 +1191,6 @@ typedef struct {
 
 #include <iconv.h>
 #include <string.h>
-#include <strings.h>
 #include <endian.h>
 #include <byteswap.h>
 
@@ -1268,7 +1267,7 @@ const unsigned char __iconv_codesets[] =
 	"\x07\x01""ASCII";			/* Must be last! (special case to save a nul) */
 libc_hidden_data_def(__iconv_codesets)
 
-libc_hidden_proto(strcasecmp)
+/* Experimentally off - libc_hidden_proto(strcasecmp) */
 
 static int find_codeset(const char *name)
 {
