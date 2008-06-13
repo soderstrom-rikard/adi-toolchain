@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <unistd.h>
 #include <stdio.h>
 
 /* Experimentally off - libc_hidden_proto(memset) */

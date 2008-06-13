@@ -21,6 +21,7 @@
 
 #include <features.h>
 #include <stdint.h>
+#include <unistd.h>
 #include <sys/types.h>
 
 #define _LINUX_TYPES_H
@@ -63,7 +64,7 @@ struct netlink_handle
 
 #if 0 /* unused code */
 #if __ASSUME_NETLINK_SUPPORT == 0
-extern int __no_netlink_support attribute_hidden;
+extern smallint __no_netlink_support attribute_hidden;
 #else
 # define __no_netlink_support 0
 #endif
