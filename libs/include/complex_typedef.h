@@ -36,7 +36,7 @@ typedef struct complex_fract16 {
 #pragma align 4
     fract16 re;
     fract16 im;
-} complex_fract16;
+} __attribute__((aligned(4))) complex_fract16;
 
 /* Composite type used by builtins */
 typedef union composite_complex_fract16 {
