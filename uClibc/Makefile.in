@@ -375,7 +375,7 @@ clean:
 	$(RM) $(top_builddir)extra/scripts/unifdef
 
 distclean: clean
-	-find . \( -name core -o -name \*.orig -o -name \*~ \) -exec $(RM) {} \;
+	-find . \( -name core -o -name \*.orig -o -name \*~ -o -name .\*.dep \) -exec $(RM) {} \;
 	$(RM) .config .config.old .config.cmd
 	$(MAKE) -C extra/config distclean
 
