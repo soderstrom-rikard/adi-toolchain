@@ -45,12 +45,12 @@ ___moddi3:
 	LINK 16;
 	// Compute d = x / y
 	[SP +12] = R3;
-	CALL.X ___divdi3;
+	CALL.X ____divdi3;
 	// then compute n = d * y
 	R2 = [FP +16];
 	R3 = [FP +20];
 	[SP +12] = R3;
-	CALL.X ___mulli3;
+	CALL.X ____mulli3;
 	UNLINK;
 	// r = x (sp+0:sp+4) - n (r0:1) == ( -n + x )
 		R2 = [SP +0];
@@ -69,5 +69,5 @@ return_x:
 .size ___moddi3, .-___moddi3
 .global ___moddi3;
 .type ___moddi3, STT_FUNC;
-.extern ___divdi3;
-.extern ___mulli3;
+.extern ____divdi3;
+.extern ____mulli3;

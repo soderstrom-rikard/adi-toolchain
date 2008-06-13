@@ -63,7 +63,7 @@
 .text;
 .global   __var_fr16;
 
-.extern   ___div32;
+.extern   ____div32;
 
 .align 2;
 __var_fr16:
@@ -125,7 +125,7 @@ VAR_FINAL_OPS:
         [--SP] = R3;                   // PRESERVE SUM(X*X) 
         [--SP] = R2;                   // PRESERVE SUM(X)
      
-        CALL.X ___div32;               // SUM(X) / N  (RESULT = 1.15)
+        CALL.X ____div32;               // SUM(X) / N  (RESULT = 1.15)
                   
         R1 = [SP++];                   // LOAD SUM(X) ( = 1.31)
         R0 <<= 16;                     // CONVERT 1.15 TO 1.31
@@ -155,10 +155,10 @@ VAR_FINAL_OPS:
 
         RETS = [SP++];                 // RETRIEVE RETURN ADDRESS
 
-        JUMP.X ___div32;               // (SUM_SQUARES - SQUARE_SUM_OVER_N) / 
+        JUMP.X ____div32;               // (SUM_SQUARES - SQUARE_SUM_OVER_N) / 
                                        // (N - 1)
 
-        // Note that ___div32 performs the return to the caller
+        // Note that ____div32 performs the return to the caller
 
 
      /* Return Zero if N <= 1 */

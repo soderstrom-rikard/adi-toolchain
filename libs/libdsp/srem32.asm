@@ -55,8 +55,7 @@ Special cases :
 
 .global ___rem32;
 .type ___rem32, STT_FUNC;
-.extern ___div32;
-.type ___div32, STT_FUNC;
+.extern ____div32;
 ___rem32:
 
 	CC=R0==0;
@@ -78,7 +77,7 @@ ___rem32:
 	R7 = R0;			/* Copy of R0 */   
 	R6 = R1;			/* Save for later */
 	SP += -12;			/* Should always provide this space */
-	CALL.X ___div32;			/* Compute signed quotient using ___div32()*/
+	CALL.X ____div32;			/* Compute signed quotient using ___div32()*/
 	SP += 12;
 	R0 *= R6;			/* Quotient * divisor */
 	R0 = R7 - R0;			/* Dividend - ( quotient *divisor) */

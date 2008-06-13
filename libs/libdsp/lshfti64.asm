@@ -27,6 +27,7 @@
 
 .align 2;
 ___lshftli:
+____lshftli:
 	CC = R2 == 0;
 	IF CC JUMP finished;	// nothing to do
 	CC = R2 < 0;
@@ -123,3 +124,5 @@ signhalf:
 .size ___lshftli, .-___lshftli
 .global ___lshftli;
 .type ___lshftli, STT_FUNC;
+.global ____lshftli;
+.hidden ____lshftli;

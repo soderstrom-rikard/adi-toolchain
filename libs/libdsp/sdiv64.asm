@@ -33,13 +33,16 @@
 #endif
 
 .text;
+.global ____divdi3;
+.hidden ____divdi3;
 .global ___divdi3;
 .type   ___divdi3,STT_FUNC;
-.extern ___lshftli
+.extern ____lshftli
 
 .align 2;
 
 ___divdi3 :
+____divdi3 :
    R3 = [SP+12];
    [--SP] = (R7:4, P5:3);
 
@@ -286,7 +289,7 @@ ___divdi3 :
 
 .power_of_two_rtn:
    [--SP] = RETS;       // save RETS
-   CALL.X ___lshftli;
+   CALL.X ____lshftli;
    R4 = -R0;            // calculate -quotient
    CC = CARRY;
    CC = !CC;

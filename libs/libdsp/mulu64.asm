@@ -28,6 +28,7 @@
 .text;
 .align 2;
 ___mullu3:
+____mullu3:
 	// We are using normal stores rather than pushes to allow
 	// multi-issuing, but since they are post- rather than pre-decrement,
 	// we first need to decrement SP to prevent clobbering half of the
@@ -61,3 +62,5 @@ ___mullu3:
 .size ___mullu3, .-___mullu3
 .global ___mullu3;
 .type ___mullu3, STT_FUNC;
+.global ____mullu3;
+.hidden ____mullu3;

@@ -107,8 +107,12 @@
 __sin_fr16:
 
       P0 = 2;                     // STORE LOOP COUNTER VALUE
+#ifdef __FDPIC__
+      P1 = [P3 + .sincoef@GOT17M4];
+#else
       P1.L = .sincoef;            // POINTER TO SIN COEFFICIENT
       P1.H = .sincoef;
+#endif
       P2 = R0;
       R1 = ABS R0;                // GET THE ABSOLUTE VALUE OF INPUT
       R3 = R1;                    // COPY R1 TO R3 REG (Y = X)

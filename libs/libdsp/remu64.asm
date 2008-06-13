@@ -60,13 +60,13 @@ ___umoddi3:
 
 	// Compute d = x / y
 	[SP +12] = R3;
-	CALL.X ___udivdi3;
+	CALL.X ____udivdi3;
 
 	// then compute z = d * y
 	R2 = [FP +16];
 	R3 = [FP +20];
 	[SP +12] = R3;
-	CALL.X ___mullu3;
+	CALL.X ____mullu3;
 
 	UNLINK;
 
@@ -94,5 +94,5 @@ RET_X:
 .size ___umoddi3, .-___umoddi3
 .global ___umoddi3;
 .type ___umoddi3, STT_FUNC;
-.extern ___udivdi3;
-.extern ___mullu3;
+.extern ____udivdi3;
+.extern ____mullu3;

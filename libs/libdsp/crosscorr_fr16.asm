@@ -45,7 +45,7 @@ from Analog Devices, Inc.
 .text;
 
 .global   __crosscorr_fr16;
-.extern   __divfract32;
+.extern   ____divfract32;
 
 .align 2;
 __crosscorr_fr16:
@@ -65,7 +65,7 @@ __crosscorr_fr16:
 
                    R0 = 1;
                    R1 = R2;
-                   CALL.X __divfract32;      // CALCULATE 1/N
+                   CALL.X ____divfract32;      // CALCULATE 1/N
 
                    P0 = R7;                // SET COUNTER TO LAGS
                    R7 = R7 -|- R7 || P2 = [SP++];            

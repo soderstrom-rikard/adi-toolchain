@@ -57,7 +57,7 @@ __autocoh_fr16:
                    [--SP] = R2;
 
                    R0 = 1;               
-                   CALL.X __divfract32;       // CALCULATE 1/N
+                   CALL.X ____divfract32;       // CALCULATE 1/N
                   
                    R7 = 0;
                    R7.L = R0(RND) || P0 = [SP++]; 
@@ -132,5 +132,5 @@ RET_ZERO:          RTS;
 
 .size __autocoh_fr16, .-__autocoh_fr16
 
-.extern __divfract32;
+.extern ____divfract32;
 

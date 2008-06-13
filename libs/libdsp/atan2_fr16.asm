@@ -83,7 +83,8 @@
 
 .align 2;
 __atan2_fr16:
-          [--SP] = (R7:5);               // PUSH R7 TO R5 REG TO STACK 
+          [--SP] = (R7:5,P5:5);               // PUSH R7 TO R5 REG TO STACK
+          P5 = P3;
           R6 = R0;                       // Y 
           R7 = R1;                       // X 
           R0 = R0.L(Z);                  // ZERO EXTEND FOR GETTING ABSOLUTE 
@@ -105,12 +106,17 @@ __atan2_fr16:
           IF CC JUMP EQUAL;              // IF TRUE, MAGNITUDE OF RESULT IN R2 
 
           [--SP] = RETS;                 // PUSH RETS
-          CALL.X __div16;                  // CALL DIV16 FUNCTION AND RESULT 
+          CALL.X ____div16;              // CALL DIV16 FUNCTION AND RESULT 
                                          // WILL BE IN R0 REG
           RETS = [SP++];                 // POP RETS
 
+#ifdef __FDPIC__
+	  R3 = [P5 + .atan2coef@GOT17M4];
+	  I0 = R3;
+#else
           I0.L = .atan2coef;             // POINTER TO ARRAY OF COEFFICIENTS
           I0.H = .atan2coef;
+#endif
           P0 = 3;                        // INITIALISE LOOP COUNTER VALUE
           R3 = R0;                       // MAKE A COPY OF QUOTIENT 
                                          // IN R3 (A = B)
@@ -139,7 +145,7 @@ EQUAL:    CC = R7 < 0;                   // CHECK IF X < 0
           CC = R6 < 0;                   // CHECK IF Y < 0
           IF CC R2 = R1;                 // IF TRUE COMPLEMENTED RESULT
           R0 = R2.L (X);                 // EXTEND INTO RETURN REGISTER 
-          (R7:5) = [SP++];               // POP R7-R5
+          (R7:5,P5:5) = [SP++];               // POP R7-R5
           RTS;
 
 RET_ZERO: CC = R6 == 0;                  // CHECK IF Y IS ZERO 
@@ -158,10 +164,10 @@ Y_IS_ZERO:
           R0 = R7 & R1;                  // IF Y = 0, THEN IF X < 0, 
                                          // RESULT = 0X8000, ELSE 0  
 RET:      R0 = R0.L (X);                 // ENSURE RESULT IS SIGN-EXTENDED
-          (R7:5) = [SP++];               // POP R7-R5
+          (R7:5,P5:5) = [SP++];               // POP R7-R5
           RTS;
 
 .size __atan2_fr16, .-__atan2_fr16
 
-.extern  __div16;
+.extern  ____div16;
 

@@ -52,7 +52,7 @@
 .text;
 .global   __histogram_fr16;
 
-.extern ___udiv32;
+.extern ____udiv32;
 
 .align 2;
 __histogram_fr16:
@@ -82,7 +82,7 @@ __histogram_fr16:
 
                    R0 = R2 - R7 (NS);      // RANGE = MAX. BIN - MIN. BIN
                    R1 = R5;                // NUMBER OF BINS
-                   CALL.X ___udiv32;       // SIZE/BIN = RANGE/NUMBER OF BINS
+                   CALL.X ____udiv32;      // SIZE/BIN = RANGE/NUMBER OF BINS
 
                    CC = R0 == 0;           // CHECK IF SIZE/BIN == 0 
                    IF CC JUMP HISTO_RETURN;// IF TRUE, BRANCH TO RET_ZERO

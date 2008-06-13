@@ -108,8 +108,12 @@
 __cos_fr16:
 
       R0 = ABS R0;              // GET THE ABSOLUTE VALUE OF INPUT
+#ifdef __FDPIC__
+      P0 = [P3 + .coscoef@GOT17M4];
+#else
       P0.L = .coscoef;          // POINTER TO COSINE COEFFICIENT
       P0.H = .coscoef;
+#endif
       P1 = 2;                   // SET LOOP COUNTER VALUE = 2
       R3 = -32768;              // INITIALISE R3 = -1.0
       R0 = R3-R0;               // R0 = -1 - R0

@@ -57,10 +57,14 @@
 #endif
 
 .text;
+.global  ____div16;
+.hidden  ____div16;
+
 .global  __div16;
 
 .align 2;
-__div16 :   
+__div16:
+____div16:
 
                    P0 = 15;                  // TO PERFORM DIVQ 15 TIMES
                    R2 = R0 ^ R1;             // SET FLAG R2 IF SIGNS DIFFER

@@ -160,7 +160,7 @@ __rms_fr16:
 
    /* Divide the sum of the squares by N */
 
-      CALL.X ___div32;
+      CALL.X ____div32;
 
    /* Convert the quotient from 1:31 to 1:15 notation
    **

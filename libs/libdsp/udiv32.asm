@@ -40,12 +40,15 @@
 #endif
 
 .text;
+.global   ____udiv32;
+.hidden   ____udiv32;
 .global   ___udiv32;
 .type     ___udiv32, STT_FUNC;
 
 .align 2;
 
 ___udiv32:
+____udiv32:
   CC = R0 < R1 (IU);    /* If X < Y, always return 0 */
   IF CC JUMP .RETURN_IDENT;
 

@@ -51,10 +51,13 @@
 #endif
 
 .text;
+.global   ____divfract32;
+.hidden   ____divfract32;
 .global   __divfract32;
 
 .align 2;
 __divfract32:
+____divfract32:
                    [--SP] = R5;            // PUSH REGISTERS ONTO STACK
                    [--SP] = R4;
                    P0 = 0x20;              // SET LOOP COUNTER TO 32 

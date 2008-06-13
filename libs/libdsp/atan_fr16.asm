@@ -61,8 +61,12 @@ __atan_fr16:
 				CC = R0 == R1;				    // CHECK FOR 1
 				IF CC JUMP RET_POS_MAX;   	    // RETURN 0X6488            
 				[--SP] = R7;                    // PUSH R7 REG TO STACK 
+#ifdef __FDPIC__
+				P0 = [P3 + .atancoef@GOT17M4];
+#else
 				P0.L = .atancoef;  		        // POINTER TO ARRAY OF COEFFICIENTS
 				P0.H = .atancoef;
+#endif
 			   	P1 = 3;					   	    // INITIALISE LOOP COUNTER VALUE
 		   		R1 = ABS R0;			        // R1 = ABS R0
 				R7 = R1;					    // STORE R1

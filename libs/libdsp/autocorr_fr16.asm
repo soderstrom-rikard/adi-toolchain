@@ -55,7 +55,7 @@ __autocorr_fr16:
                    [--SP] = R2;
 
                    R0 = 1;
-                   CALL.X __divfract32;      // CALCULATE 1/N
+                   CALL.X ____divfract32;      // CALCULATE 1/N
 
                    R1 = R1 -|- R1 || P0 = [SP++];            
                                            // ZERO R1 AND
@@ -111,6 +111,6 @@ RET_ZERO:          RTS;                    // RETURN
 
 .size __autocorr_fr16, .-__autocorr_fr16
 
-.extern __divfract32;
+.extern ____divfract32;
 
 

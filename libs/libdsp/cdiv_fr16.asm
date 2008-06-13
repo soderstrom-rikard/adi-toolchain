@@ -76,7 +76,7 @@ __cdiv_fr16:
                               // NUMERATOR REAL
 
       R1 = R4;
-      CALL.X  ___div32;       // NUM.RE / DENUM
+      CALL.X  ____div32;       // NUM.RE / DENUM
 
       R6 =  32767;            // MAX FRACT16 = 0x7FFF
       R7 = -32768;            // MIN FRACT16 = 0x8000
@@ -90,7 +90,7 @@ __cdiv_fr16:
       R1 = R4;
       R4 = R0.L (Z);          // RESULT REAL
       R0 = R5;
-      CALL.X  ___div32;       // NUM.IMAG / DENUM
+      CALL.X  ____div32;       // NUM.IMAG / DENUM
 
       CC = R6 < R0;
       IF CC R0 = R6;          // ROUND TO MAX ON +OVERFLOW

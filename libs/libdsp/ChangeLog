@@ -1,3 +1,43 @@
+2008-06-13  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* div16.asm (____div16): New symbol, hidden version of _div16.
+	* lshifti64.asm (____lshiftli): New symbol, hidden version of
+	___lshiftli.
+	* sdiv32.asm (____div32): New symbol, hidden version of ___div32.
+	* udiv32.asm (____udiv32): New symbol, hidden version of ___udiv32.
+	* muli64.asm (____mulli3): New symbol, hidden version of ___mulli3.
+	* mulu64.asm (____mullu3): New symbol, hidden version of ___mullu3.
+	* divfract32.asm (____divfract32): New symbol, hidden version of
+	__divfract32.
+	* sdiv64.asm (____divdi3): New symbol, hidden version of ___divdi3.
+	Use hidden symbol in call.
+	* udiv64.asm (____udivdi3): New symbol, hidden version of ___udivdi3.
+	Use hidden symbol in call.
+	
+	* urem32.asm (___urem32): Use hidden symbol in call.
+	* srem32.asm (___rem32): Likewise.
+	* remi64.asm (___moddi3): Likewise.
+	* remu64.asm (___umoddi3): Likewise.
+	* autocorr_fr16.asm (__autocorr_fr16): Likewise.
+	* crosscorr_fr16.asm (__crosscorr_fr16): Likewise.
+	* crosscoh_fr16.asm (__crosscoh_fr16): Likewise.
+	* autocoh_fr16.asm (__autocoh_fr16): Likewise.
+	* histogram_fr16.asm (__autocoh_fr16): Likewise.
+	* var_fr16.asm (__var_fr16): Likewise.
+	* cdiv_fr16.asm (__cdiv_fr16): Likewise.
+	* rms_fr16.asm (__rms_fr16): Likewise.
+
+	* tan_fr16.asm (__tan_fr16): When compiling for FD-PIC, use GOT when
+	loading address of a symbol.
+	* asin_fr16.asm (__asin_fr16): Likewise.
+	* sin_fr16.asm (__sin_fr16): Likewise.
+	* acos_fr16.asm (__acos_fr16): Likewise.
+	* cos_fr16.asm (__cos_fr16): Likewise.
+	* mu_compress16.asm (__mu_compress): Likewise.
+	* atan_fr16.asm (__atan_fr16): Likewise.
+	* atan2_fr16.asm (__atan2_fr16): Likewise.  Push and restore P5 and use
+	it to save GOT pointer.  Use hidden symbol in call.
+	
 2008-05-21  Jie Zhang  <jie.zhang@analog.com>
 
 	* testsuite/cfft/cfft.c: Include complex.h instead of

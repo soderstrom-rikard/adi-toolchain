@@ -31,11 +31,14 @@
 #endif
 
 .text;
+.global ____div32;
+.hidden ____div32;
 .global ___div32;
 .type   ___div32,STT_FUNC;
 
 .align 2;
 ___div32:
+____div32:
   /* Attempt to use divide primitives first; these will handle
   ** most cases, and they're quick - avoids stalls incurred by
   ** testing for identities. 

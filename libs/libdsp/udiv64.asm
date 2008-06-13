@@ -33,12 +33,15 @@
 
 .text;
 
+.global ____udivdi3;
+.hidden ____udivdi3;
 .global ___udivdi3;
 .type   ___udivdi3,STT_FUNC;
-.extern ___lshftli;
+.extern ____lshftli;
 
 .align 2;
 ___udivdi3:
+____udivdi3:
    R3 = [SP + 12];
    [--SP] = (R7:4, P5:3);
 
@@ -266,7 +269,7 @@ x_msb_clear:
    R2 = R2.L (Z);
    R2 += -62;
    (R7:4, P5:3) = [SP++];
-   JUMP.X ___lshftli;
+   JUMP.X ____lshftli;
 
 .power_of_two_upper_zero:
    CC = R2 < 0;
@@ -276,12 +279,12 @@ x_msb_clear:
    R2 = R2.L (Z);
    R2 += -30;
    (R7:4, P5:3) = [SP++];
-   JUMP.X ___lshftli;
+   JUMP.X ____lshftli;
 
 .maxint_shift:
    R2 = -31;
    (R7:4, P5:3) = [SP++];
-   JUMP.X ___lshftli;
+   JUMP.X ____lshftli;
 
 .RETURN_IDENT:
    R0 = R6;

@@ -57,8 +57,7 @@ Special cases :
 
 .global ___urem32;
 .type ___urem32, STT_FUNC;
-.extern ___udiv32;
-.type ___udiv32, STT_FUNC;
+.extern ____udiv32;
 ___urem32 :
 
 	CC=R0==0;
@@ -77,7 +76,7 @@ ___urem32 :
 	R7 = R0;			/* Copy of R0 */   
 	R6 = R1;
 	SP += -12;			/* Should always provide this space */
-	CALL.X ___udiv32;			/* Compute unsigned quotient using ___udiv32()*/
+	CALL.X ____udiv32;			/* Compute unsigned quotient using ___udiv32()*/
 	SP += 12;
 	R0 *= R6;			/* Quotient * divisor */
 	R0 = R7 - R0;			/* Dividend - ( quotient *divisor) */

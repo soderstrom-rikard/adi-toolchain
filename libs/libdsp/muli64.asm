@@ -28,6 +28,7 @@
 .text;
 .align 2;
 ___mulli3:
+____mulli3:
 	// We're using post-modify stores to allow multi-issuing,
 	// which means we need to do an initial decrement of the
 	// Stack pointer to prevent clobbering half of the second
@@ -61,3 +62,5 @@ ___mulli3:
 .size ___mulli3, .-___mulli3
 .global ___mulli3;
 .type ___mulli3, STT_FUNC;
+.global ____mulli3;
+.hidden ____mulli3;
