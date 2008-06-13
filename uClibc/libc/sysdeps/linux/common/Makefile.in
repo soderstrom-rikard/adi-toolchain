@@ -40,7 +40,10 @@ libc-y += $(COMMON_OBJ)
 libc-static-$(UCLIBC_HAS_SSP) += $(COMMON_OUT)/ssp-local.o
 libc-nonshared-$(UCLIBC_HAS_SSP) += $(COMMON_OUT)/ssp-local.os
 
-libc-nomulti-y += $(COMMON_OUT)/__syscall_rt_sigaction.o $(COMMON_OUT)/__syscall_sigaction.o
+libc-nomulti-y += $(COMMON_OUT)/__syscall_rt_sigaction.o \
+	$(COMMON_OUT)/__syscall_sigaction.o \
+	$(COMMON_OUT)/mremap.o \
+	$(COMMON_OUT)/stat.o
 libc-nomulti-$(UCLIBC_HAS_SSP) += $(COMMON_OUT)/ssp.o
 
 objclean-y += common_objclean
