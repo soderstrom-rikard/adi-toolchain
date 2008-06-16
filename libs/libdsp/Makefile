@@ -278,7 +278,9 @@ ifneq ($(LIBC_HAS_NO_CMATH),)
 LIBBFDSP_CSRCS += $(LIBC_CMATH_CSRCS)
 endif
 
-LIBBFDSP_OBJS = $(LIBBFDSP_ASRCS:%.asm=%.o) $(LIBBFDSP_SSRCS:%.S=%.o) $(LIBBFDSP_CSRCS:%.c=%.o)
+FFT_RAD4_OBJS = cfftrad4_fr16.o ifftrad4_fr16.o rfftrad4_fr16.o
+
+LIBBFDSP_OBJS = $(LIBBFDSP_ASRCS:%.asm=%.o) $(LIBBFDSP_SSRCS:%.S=%.o) $(LIBBFDSP_CSRCS:%.c=%.o) $(FFT_RAD4_OBJS)
 LIBBFFASTFP_OBJS = $(LIBBFFASTFP_ASRCS:%.asm=%.o)
 
 LIBS = libbfdsp.a libbffastfp.a
@@ -296,6 +298,9 @@ libbffastfp.a: $(LIBBFFASTFP_OBJS)
 
 %.o: %.asm
 	$(CC) $(CFLAGS) -x assembler-with-cpp -c $< -o $*.o
+
+%rad4_fr16.o: %_fr16.asm
+	$(CC) $(CFLAGS) -D__RADIX_4_FFT -x assembler-with-cpp -c $< -o $@
 
 %.o: %.S
 	$(CC) $(CFLAGS) -c $< -o $*.o

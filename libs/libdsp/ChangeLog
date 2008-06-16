@@ -50,7 +50,12 @@
 	_ISOC99_SOURCE.
 
 	* Makefile (CFLAGS): Don't use -fno-builtin.
-	
+
+	* Makefile (FFT_RAD4_OBJS): New.
+	(LIBBFDSP_OBJS): Include it.
+	(%rad4_fr16.o): New rule to build alternate output files by defining
+	__RADIX_4_FFT.
+
 2008-06-13  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* div16.asm (____div16): New symbol, hidden version of _div16.
