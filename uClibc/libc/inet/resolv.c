@@ -185,7 +185,6 @@ libc_hidden_proto(fopen)
 libc_hidden_proto(fclose)
 libc_hidden_proto(random)
 libc_hidden_proto(getservbyport)
-libc_hidden_proto(getdomainname)
 libc_hidden_proto(uname)
 libc_hidden_proto(inet_addr)
 libc_hidden_proto(inet_aton)
@@ -216,10 +215,11 @@ libc_hidden_proto(fprintf)
 libc_hidden_proto(__h_errno_location)
 #ifdef __UCLIBC_HAS_XLOCALE__
 libc_hidden_proto(__ctype_b_loc)
-#elif __UCLIBC_HAS_CTYPE_TABLES__
+#elif defined __UCLIBC_HAS_CTYPE_TABLES__
 libc_hidden_proto(__ctype_b)
 #endif
-
+int __libc_getdomainname(char *name, size_t len);
+libc_hidden_proto(__libc_getdomainname)
 
 
 #define MAX_RECURSE 5
@@ -744,11 +744,13 @@ int attribute_hidden __dns_lookup(const char *name, int type, int nscount, char 
 	unsigned char * packet = malloc(PACKETSZ);
 	char *dns, *lookup = malloc(MAXDNAME);
 	int variant = -1;
-	struct sockaddr_in sa;
 	int local_ns = -1, local_id = -1;
 #ifdef __UCLIBC_HAS_IPV6__
 	bool v6;
 	struct sockaddr_in6 sa6;
+#endif
+#ifdef __UCLIBC_HAS_IPV4__
+	struct sockaddr_in sa;
 #endif
 
 	fd = -1;
@@ -837,6 +839,7 @@ int attribute_hidden __dns_lookup(const char *name, int type, int nscount, char 
 			rc = connect(fd, (struct sockaddr *) &sa6, sizeof(sa6));
 		} else {
 #endif
+#ifdef __UCLIBC_HAS_IPV4__
 			sa.sin_family = AF_INET;
 			sa.sin_port = htons(NAMESERVER_PORT);
 			__UCLIBC_MUTEX_LOCK(__resolv_lock);
@@ -845,6 +848,7 @@ int attribute_hidden __dns_lookup(const char *name, int type, int nscount, char 
 			sa.sin_addr.s_addr = inet_addr(dns);
 			__UCLIBC_MUTEX_UNLOCK(__resolv_lock);
 			rc = connect(fd, (struct sockaddr *) &sa, sizeof(sa));
+#endif
 #ifdef __UCLIBC_HAS_IPV6__
 		}
 #endif
@@ -1834,15 +1838,19 @@ int getnameinfo(const struct sockaddr *sa, socklen_t addrlen, char *host,
 
 	ok = sa->sa_family;
 	if (ok == AF_LOCAL) /* valid */;
+#ifdef __UCLIBC_HAS_IPV4__
 	else if (ok == AF_INET) {
 		if (addrlen < sizeof (struct sockaddr_in))
 			goto BAD_FAM;
+	}
+#endif
 #ifdef __UCLIBC_HAS_IPV6__
-	} else if (ok == AF_INET6) {
+	else if (ok == AF_INET6) {
 		if (addrlen < sizeof (struct sockaddr_in6))
 			goto BAD_FAM;
+	}
 #endif /* __UCLIBC_HAS_IPV6__ */
-	} else
+	else
 BAD_FAM:
 		return EAI_FAMILY;
 
@@ -1859,15 +1867,19 @@ BAD_FAM:
 					h = gethostbyaddr ((const void *)
 						&(((const struct sockaddr_in6 *) sa)->sin6_addr),
 						sizeof(struct in6_addr), AF_INET6);
-				else
 #endif /* __UCLIBC_HAS_IPV6__ */
+#if defined __UCLIBC_HAS_IPV6__ && defined __UCLIBC_HAS_IPV4__
+				else
+#endif
+#ifdef __UCLIBC_HAS_IPV4__
 					h = gethostbyaddr ((const void *) &(((const struct sockaddr_in *)sa)->sin_addr),
 					  sizeof(struct in_addr), AF_INET);
+#endif /* __UCLIBC_HAS_IPV4__ */
 
 				if (h) {
 					char *c;
 					if ((flags & NI_NOFQDN)
-					    && (getdomainname (domain, sizeof(domain)) == 0)
+					    && (__libc_getdomainname (domain, sizeof(domain)) == 0)
 					    && (c = strstr (h->h_name, domain))
 					    && (c != h->h_name) && (*(--c) == '.')) {
 						strncpy (host, h->h_name,
@@ -1933,11 +1945,16 @@ BAD_FAM:
 							memcpy (host + real_hostlen, scopebuf, scopelen + 1);
 						}
 #endif
-					} else
+					}
 #endif /* __UCLIBC_HAS_IPV6__ */
+#if defined __UCLIBC_HAS_IPV6__ && defined __UCLIBC_HAS_IPV4__
+						else
+#endif /* __UCLIBC_HAS_IPV6__ && defined __UCLIBC_HAS_IPV4__ */
+#if defined __UCLIBC_HAS_IPV4__
 						c = inet_ntop (AF_INET, (const void *)
 							&(((const struct sockaddr_in *) sa)->sin_addr),
 							host, hostlen);
+#endif /* __UCLIBC_HAS_IPV4__ */
 
 					if (c == NULL) {
 						errno = serrno;
@@ -2733,3 +2750,4 @@ int ns_name_unpack(const u_char *msg, const u_char *eom, const u_char *src,
 }
 libc_hidden_def(ns_name_unpack)
 #endif /* L_ns_name */
+/* vi: set sw=4 ts=4: */
