@@ -329,14 +329,6 @@ __attribute__ ((always_inline))
 
 /* complex_fract32 support routines */
 
-extern int        __builtin_bfin_real_fr32 (long long _a);
-extern int        __builtin_bfin_imag_fr32 (long long _a);
-extern long long  __builtin_bfin_cadd_fr32 (long long _a, long long _b);
-extern long long  __builtin_bfin_csub_fr32 (long long _a, long long _b);
-extern long long  __builtin_bfin_conj_fr32 (long long _a);
-extern int        __builtin_bfin_csqu_fr16 (int _a);
-extern long long  __builtin_bfin_compose_i64 (int _a, int _b);
-
 __inline__
 __attribute__ ((always_inline))
         static complex_fract32 ccompose_fr32 (fract32 _real, fract32 _imag)

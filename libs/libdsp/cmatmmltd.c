@@ -36,8 +36,6 @@
 /* Defined in */
 #include <matrix.h>
 
-#include <complex_fns.h>
-
 void 
 cmatmmltd
 ( 

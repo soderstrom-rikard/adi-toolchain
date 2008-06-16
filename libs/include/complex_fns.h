@@ -44,15 +44,15 @@
  *
  */
 
-        float cabsf (complex_float _a) asm ("__cabsf");
+        float bf_cabsf (complex_float _a) asm ("__cabsf");
 
-        long double cabsd (complex_long_double _a) asm ("__cabsd");
+        long double bf_cabsd (complex_long_double _a) asm ("__cabsd");
 
 
 #ifdef __DOUBLES_ARE_FLOATS__
-        double cabs (complex_double _a) asm ("__cabsf");
+        double bf_cabs (complex_double _a) asm ("__cabsf");
 #else
-        double cabs (complex_double _a) asm ("__cabsd");
+        double bf_cabs (complex_double _a) asm ("__cabsd");
 #endif
 
 
@@ -68,16 +68,16 @@
 
 __inline__
 __attribute__ ((always_inline))
-        static complex_float conjf (complex_float _a)
+        static complex_float bf_conjf (complex_float _a)
             {complex_float _c; _c.re = _a.re; _c.im = - _a.im; return _c;}
 
-        complex_long_double conjd (complex_long_double _a) asm ("__conjd");
+        complex_long_double bf_conjd (complex_long_double _a) asm ("__conjd");
 
 
 #ifdef __DOUBLES_ARE_FLOATS__
 __inline__
 __attribute__ ((always_inline))
-        static complex_double conj (complex_double _a)
+        static complex_double bf_conj (complex_double _a)
         {
            complex_double _c;
            _c.re =  _a.re;
@@ -85,7 +85,7 @@ __attribute__ ((always_inline))
            return _c;
         }
 #else
-        complex_double conj (complex_double _a) asm ("__conjd");
+        complex_double bf_conj (complex_double _a) asm ("__conjd");
 #endif
 
 
@@ -98,15 +98,15 @@ __attribute__ ((always_inline))
  *
  */
 
-        complex_float cexpf (float _x) asm ("__cexpf");
+        complex_float bf_cexpf (float _x) asm ("__cexpf");
 
-        complex_long_double cexpd (long double _x) asm ("__cexpd");
+        complex_long_double bf_cexpd (long double _x) asm ("__cexpd");
 
 
 #ifdef __DOUBLES_ARE_FLOATS__
-        complex_double cexp (double _x) asm ("__cexpf");
+        complex_double bf_cexp (double _x) asm ("__cexpf");
 #else
-        complex_double cexp (double _x) asm ("__cexpd");
+        complex_double bf_cexp (double _x) asm ("__cexpd");
 #endif
 
 
@@ -118,15 +118,15 @@ __attribute__ ((always_inline))
  *
  */
 
-        float argf (complex_float _a) asm ("__argf");
+        float bf_argf (complex_float _a) asm ("__argf");
 
-        long double argd (complex_long_double _a) asm ("__argd");
+        long double bf_argd (complex_long_double _a) asm ("__argd");
 
 
 #ifdef __DOUBLES_ARE_FLOATS__
-        double arg (complex_double _a) asm ("__argf");
+        double bf_arg (complex_double _a) asm ("__argf");
 #else
-        double arg (complex_double _a) asm ("__argd");
+        double bf_arg (complex_double _a) asm ("__argd");
 #endif
 
 

@@ -12,7 +12,7 @@
 
 ****************************************************************************/
 
-#pragma file_attr("libGroup =complex_fns.h")
+#pragma file_attr("libGroup =fract_complex.h")
 #pragma file_attr("libFunc  =__cdivf")
 #pragma file_attr("libFunc  =cdivf")
 #pragma file_attr("libFunc  =cdiv")
@@ -20,7 +20,7 @@
 #pragma file_attr("prefersMem =internal")
 #pragma file_attr("prefersMemNum =30")
 
-#include <complex_fns.h>
+#include <complex_bf.h>
 #include <math.h>
 
 complex_float _cdivf( complex_float a, complex_float b )

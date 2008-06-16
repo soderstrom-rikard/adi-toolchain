@@ -28,8 +28,7 @@
 #pragma file_attr("prefersMem =internal")
 #pragma file_attr("prefersMemNum =30")
 
-#include <math.h>
-#include <complex_fns.h>
+#include <complex_bf.h>
 
 complex_float _polarf(float mag, float phase )
 {

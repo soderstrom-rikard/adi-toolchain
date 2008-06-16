@@ -25,7 +25,6 @@
 #pragma file_attr("prefersMem =internal")
 #pragma file_attr("prefersMemNum =30")
 
-#include <complex_fns.h>
 #include <vector.h>
 
 void

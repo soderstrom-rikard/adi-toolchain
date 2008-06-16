@@ -1,3 +1,15 @@
+2008-06-16  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* complex_fns.h (bf_cabsf, bf_cabsd, bf_cabs, bf_conjf, bf_conjd,
+	bf_conj, bf_cexpf, bf_cexpd, bf_cexp, bf_argf, bf_argd, bf_arg):
+	Renamed from functions without "bf_" prefix, so as to remove them
+	from the libm namespace.
+	* fract_math.h (round): Remove function.
+	* fract_complex.h (__builtin_bfin_real_fr32, __builtin_bf_imag_fr32,
+	__builtin_bfin_cadd_fr32, __builtin_bfin_csub_fr32,
+	__builtin_bfin_conj_fr32, __builtin_bfin_csqu_fr16,
+	__builtin_bfin_compose_i64): Remove declarations of builtin functions.
+
 2008-06-13  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* complex_typedef.h (complex_fract16): Align to 4 bytes.

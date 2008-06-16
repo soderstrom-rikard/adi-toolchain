@@ -35,7 +35,7 @@
 
 
 long double                       /*{ ret - Phase                  }*/
-argd
+bf_argd
 (
   complex_long_double  a          /*{ (i) - Complex input `a`      }*/
 )

@@ -22,8 +22,8 @@
 #pragma file_attr("prefersMemNum =30")
 
 
-#include <complex_fns.h>
 #include <fract_math.h>
+#include <fract_complex.h>
 
 complex_fract16 _conj_fr16 ( complex_fract16 a )
 {	

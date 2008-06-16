@@ -26,8 +26,6 @@
 /* Defined in */
 #include <vector.h>
 
-#include <complex_fns.h>
-
 
 complex_long_double               /*{ ret - Complex dot product          }*/
 cvecdotd

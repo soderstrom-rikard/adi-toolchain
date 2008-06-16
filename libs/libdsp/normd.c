@@ -27,10 +27,7 @@
 #pragma file_attr("prefersMemNum =30")
 
 /* Defined in */
-#include <complex_fns.h>
-
-#include <math.h>
-
+#include <complex_bf.h>
 
 complex_long_double               /*{ ret - Normalized `a`         }*/
 normd
@@ -45,7 +42,7 @@ normd
     /*{ Calculate the square root of the real portion of `a` times the real
         portion of `a` plus the imag portion of `a` times the imag portion
         of `a` }*/
-    d = cabsd( a);
+    d = bf_cabsd( a);
 
 
     if( d == 0.0L )

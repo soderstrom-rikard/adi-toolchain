@@ -33,8 +33,8 @@
 #pragma file_attr("prefersMemNum =30")
 
 #include <math_bf.h>
-#include <complex_fns.h>
 #include <fract.h> 
+#include <fract_complex.h>
 
 #define  __MULTIPLY_32_16_16(a,b)  mult_fr1x32(a,b)
 #define  __NEGATE_16(a)            negate_fr1x16(a)

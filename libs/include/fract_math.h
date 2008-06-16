@@ -584,9 +584,6 @@ static fract16 etsi_negate(fract16 _x) { return (fract16)negate_fr1x16(_x); }
 #endif
 __inline__
 __attribute__ ((always_inline))
-static fract16 round(fract32 _x) { return (fract16)round_fr1x32(_x); }
-__inline__
-__attribute__ ((always_inline))
 static fract32 L_add(fract32 _x, fract32 _y) { return add_fr1x32(_x, _y); }
 __inline__
 __attribute__ ((always_inline))

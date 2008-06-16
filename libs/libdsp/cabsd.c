@@ -43,7 +43,7 @@
 
 
 long double                       /*{ ret - Absolute value         }*/
-cabsd
+bf_cabsd
 (
   complex_long_double  a          /*{ (i) - Complex input `a`      }*/
 )

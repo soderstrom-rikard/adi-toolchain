@@ -12,7 +12,7 @@
 
 ***************************************************************/
 
-#pragma file_attr("libGroup =complex_fns.h")
+#pragma file_attr("libGroup =fract_complex.h")
 #pragma file_attr("libFunc  =__cadd_fr16")
 #pragma file_attr("libFunc  =cadd_fr16")     //from complex_fns.h
 
@@ -21,7 +21,7 @@
 #pragma file_attr("prefersMemNum =30")
 
 
-#include <complex_fns.h>
+#include <fract_complex.h>
 
 complex_fract16 _cadd_fr16(complex_fract16 a, complex_fract16 b)
 {

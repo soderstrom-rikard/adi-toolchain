@@ -32,7 +32,7 @@
 
 
 complex_long_double               /*{ ret - Complex exponential    }*/
-cexpd
+bf_cexpd
 (
   long double a                   /*{ (i) - Real Exponent a        }*/
 )

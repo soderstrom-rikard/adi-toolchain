@@ -21,7 +21,8 @@
 #pragma file_attr("prefersMem =internal")
 #pragma file_attr("prefersMemNum =30")
 
-#include <math.h>
+#define _ISOC99_SOURCE
+#include <stdlib.h>
 
 long long  _llclip( long long  a, long long  max_val ) 
 {

@@ -21,15 +21,14 @@
 #pragma file_attr("prefersMem =internal")
 #pragma file_attr("prefersMemNum =30")
 
-#include <math.h>
-#include <complex_fns.h>
+#include <complex_bf.h>
 
 complex_float _normf(complex_float a )
 {
    complex_float  c;
    float          d;
 
-   d = cabsf(a);
+   d = bf_cabsf(a);
 
    if( d == 0.0F )
    {

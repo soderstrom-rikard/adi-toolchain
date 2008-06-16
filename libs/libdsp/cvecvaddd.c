@@ -30,8 +30,6 @@
 /* Defined in */
 #include <vector.h>
 
-#include <complex_fns.h>
-
 
 void
 cvecvaddd

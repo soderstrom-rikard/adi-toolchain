@@ -25,7 +25,7 @@
 #pragma file_attr("prefersMemNum =30")
 
 /* Defined in */
-#include <complex_fns.h>
+#include <complex_bf.h>
 
 #include <math.h>
 
@@ -37,6 +37,6 @@ cartesiand
 )
 {
     *phase = argd(a);             /* compute phase     */
-    return( cabsd(a) );           /* compute magnitude */
+    return bf_cabsd(a);           /* compute magnitude */
 }
 

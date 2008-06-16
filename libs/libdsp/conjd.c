@@ -28,7 +28,7 @@
 
 
 complex_long_double               /*{ ret - Complex conjungate 'a' }*/
-conjd
+bf_conjd
 (
   complex_long_double a           /*{ (i) - Complex input `a`      }*/
 )

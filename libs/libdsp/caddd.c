@@ -11,7 +11,7 @@
  *
  ************************************************************************/
 
-#pragma file_attr("libGroup =complex_fns.h")
+#pragma file_attr("libGroup =fract_complex.h")
 #pragma file_attr("libFunc  =caddd")
 #pragma file_attr("libFunc  =__caddd")     //from complex_fns.h
 #pragma file_attr("libFunc  =cadd")        //from complex_fns.h
@@ -25,7 +25,7 @@
  */
 
 /* Defined in */
-#include <complex_fns.h>
+#include <complex_bf.h>
 
 
 complex_long_double               /*{ ret - Complex sum            }*/
