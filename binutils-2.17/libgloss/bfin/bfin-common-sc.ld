@@ -70,11 +70,6 @@ SECTIONS
   {
     *(.l2 .l2.*)
   } >MEM_L2 =0
-  .init           :
-  {
-    KEEP (*(.init))
-  } >MEM_L1_CODE =0
-  .plt            : { *(.plt) } >MEM_L1_CODE
   .text           :
   {
     *(.text .stub .text.* .gnu.linkonce.t.*)
@@ -82,6 +77,11 @@ SECTIONS
     /* .gnu.warning sections are handled specially by elf32.em.  */
     *(.gnu.warning)
   } >MEM_L1_CODE =0
+  .init           :
+  {
+    KEEP (*(.init))
+  } >MEM_L1_CODE =0
+  .plt            : { *(.plt) } >MEM_L1_CODE
   .fini           :
   {
     KEEP (*(.fini))

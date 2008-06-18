@@ -74,11 +74,6 @@ SECTIONS
   {
     *(.l2_shared .l2_shared.*)
   } >MEM_L2_SHARED =0
-  .init           :
-  {
-    KEEP (*(.init))
-  } >MEM_L1_CODE =0
-  .plt            : { *(.plt) } >MEM_L1_CODE
   .b.text         :
   {
     *(.b.text .b.text.*)
@@ -90,7 +85,12 @@ SECTIONS
     /* .gnu.warning sections are handled specially by elf32.em.  */
     *(.gnu.warning)
   } >MEM_L1_CODE =0
- .fini           :
+  .init           :
+  {
+    KEEP (*(.init))
+  } >MEM_L1_CODE =0
+  .plt            : { *(.plt) } >MEM_L1_CODE
+  .fini           :
   {
     KEEP (*(.fini))
   } >MEM_L1_CODE =0
