@@ -1,11 +1,5 @@
 #include <blackfin.h>
 
-#define PORTG_FER        0xFFC01580
-#define PORTG_DIR_CLEAR  0xFFC01584
-#define PORTG_CLEAR      0xFFC0158C
-#define PORTG_DIR_SET    0xFFC01590
-#define PORTG            0xFFC01594
-#define PORTG_MUX        0xFFC0159C
 #define pPORTG_FER       ((volatile unsigned short *)PORTG_FER)
 #define pPORTG_DIR_CLEAR ((volatile unsigned short *)PORTG_DIR_CLEAR)
 #define pPORTG_CLEAR     ((volatile unsigned short *)PORTG_CLEAR)
