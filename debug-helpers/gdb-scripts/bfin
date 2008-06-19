@@ -191,3 +191,21 @@ Usage: hwtrace
 Dump the hardware trace buffer.  Remember, this is a destructive operation,
 so it can only be dumped once.
 end
+
+define show_clocks
+	printf "PLL_LOCKCNT: 0x%04x\n", *(unsigned short *)0xFFC00010
+	printf "VR_CTL:      0x%04x\n", *(unsigned short *) 0xFFC00008
+	printf "PLL_DIV:     0x%04x\n", *(unsigned short *) 0xFFC00004
+	printf "PLL_CTL:     0x%04x\n", *(unsigned short *) 0xFFC00000
+end
+
+define show_ddr
+	printf "DDRCTL0: 0x%08x\n", *(unsigned long *)0xFFC00A20
+	printf "DDRCTL1: 0x%08x\n", *(unsigned long *)0xFFC00A24
+	printf "DDRCTL2: 0x%08x\n", *(unsigned long *)0xFFC00A28
+	printf "DDRCTL3: 0x%08x\n", *(unsigned long *)0xFFC00A2C
+	printf "DDRQUE:  0x%08x\n", *(unsigned long *)0xFFC00A30
+	printf "ERRADD:  0x%08x\n", *(unsigned long *)0xFFC00A34
+	printf "ERRMST:  0x%04x\n", *(unsigned short *)0xFFC00A38
+	printf "RSTCTL:  0x%04x\n", *(unsigned short *)0xFFC00A3C
+end
