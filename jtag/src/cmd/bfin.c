@@ -170,10 +170,10 @@ cmd_bfin_help( void )
 {
   printf( _(
 	    "Usage: %s execute INSTRUCTIONs\n"
-	    "Usage: %s emualtion enter|exit|status\n"
+	    "Usage: %s emulation enter|exit|status\n"
 	    "Blackfin specific commands\n"
 	    "\n"
-	    "INSTRUCTIONs are a sequence of Blackfin instrucitons and [EMUDAT_IN]s\n"
+	    "INSTRUCTIONs are a sequence of Blackfin instructions and [EMUDAT_IN]s\n"
 	    ), "bfin", "bfin" );
 }
 
