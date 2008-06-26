@@ -248,7 +248,9 @@ check_lib() {
 	# Old Linux installations keep X in /usr/X11R6.
 	temp_file=$(mktemp || echo "${TMPDIR-/tmp}/conftest.o")
 	echo "int main(){}" | gcc -x c - -L/usr/X11R6/lib -l${lib} -o ${temp_file} >/dev/null
+	local ret=$?
 	rm -f "${temp_file}"
+	return ${ret}
 }
 
 # check_group(package name, header list, library list)
