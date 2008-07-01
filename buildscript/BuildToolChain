@@ -2461,13 +2461,17 @@ if [ $KERNEL_SOURCE ] ; then
     change_dir "$DIR_LIBFTDI_BUILD"
 
     echo_date "Configuring libftdi"
-    run_cmd $DIR_LIBFTDI_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET --disable-shared --enable-static
+    run_cmd $DIR_LIBFTDI_SOURCE/configure --prefix="$DIR_LIBFTDI_BUILD/destdir" \
+        $BUILD_TARGET $HOST_TARGET --disable-shared --enable-static
 
     echo_date "Building libftdi"
     run_cmd $MAKE
 
     echo_date "Installing libftdi"
-    run_cmd $MAKE install DESTDIR=$PWD/destdir
+    run_cmd $MAKE install
+
+    export PKG_CONFIG_LIBDIR="$DIR_LIBFTDI_BUILD/destdir/lib/pkgconfig${PKG_CONFIG_LIBDIR+:${PKG_CONFIG_LIBDIR}}"
+    export LIBFTDI_CONFIG="$DIR_LIBFTDI_BUILD/destdir/bin/libftdi-config"
     fi
 
     ### jtag
@@ -2483,10 +2487,7 @@ if [ $KERNEL_SOURCE ] ; then
     change_dir "$DIR_JTAG_BUILD"
 
     echo_date "Configuring jtag"
-    run_cmd env \
-        CPPFLAGS="-I$DIR_LIBFTDI_BUILD/destdir/include " \
-        LDFLAGS="-L$DIR_LIBFTDI_BUILD/destdir/lib" \
-        $DIR_JTAG_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET --enable-relocatable
+    run_cmd env $DIR_JTAG_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET --enable-relocatable
 
     echo_date "Building jtag"
     run_cmd $MAKE
@@ -2509,10 +2510,7 @@ if [ $KERNEL_SOURCE ] ; then
     change_dir "$DIR_GDBPROXY_BUILD"
 
     echo_date "Configuring gdbproxy"
-    run_cmd env \
-        CPPFLAGS="-I$DIR_LIBFTDI_BUILD/destdir/include " \
-        LDFLAGS="-L$DIR_LIBFTDI_BUILD/destdir/lib" \
-        $DIR_GDBPROXY_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET \
+    run_cmd env $DIR_GDBPROXY_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET \
         --with-jtag-srcdir=$DIR_JTAG_SOURCE --with-jtag-build=$DIR_JTAG_BUILD --enable-relocatable
 
     echo_date "Building gdbproxy"
