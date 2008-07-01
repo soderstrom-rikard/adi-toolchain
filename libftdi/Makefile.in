@@ -37,8 +37,9 @@ subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
 	$(srcdir)/libftdi-config.in $(srcdir)/libftdi.pc.in \
-	$(top_srcdir)/configure AUTHORS COPYING.LIB ChangeLog \
-	config.guess config.sub depcomp install-sh ltmain.sh missing
+	$(srcdir)/libftdi.spec.in $(top_srcdir)/configure AUTHORS \
+	COPYING.LIB ChangeLog config.guess config.sub depcomp \
+	install-sh ltmain.sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -47,7 +48,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = libftdi-config libftdi.pc
+CONFIG_CLEAN_FILES = libftdi-config libftdi.pc libftdi.spec
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pkgconfigdir)"
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(bin_SCRIPTS)
@@ -109,6 +110,7 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
+ENABLE_ASYNC_MODE = @ENABLE_ASYNC_MODE@
 EXEEXT = @EXEEXT@
 F77 = @F77@
 FFLAGS = @FFLAGS@
@@ -197,7 +199,7 @@ top_srcdir = @top_srcdir@
 # have all needed files, that a GNU package needs
 AUTOMAKE_OPTIONS = foreign 1.4
 SUBDIRS = src examples doc
-EXTRA_DIST = libftdi.spec COPYING.LIB README AUTHORS ChangeLog libftdi-config.in
+EXTRA_DIST = libftdi.spec libftdi.spec.in COPYING.LIB README AUTHORS ChangeLog libftdi-config.in
 bin_SCRIPTS = libftdi-config
 
 # Install the pkg-config file:
@@ -260,6 +262,8 @@ distclean-hdr:
 libftdi-config: $(top_builddir)/config.status $(srcdir)/libftdi-config.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 libftdi.pc: $(top_builddir)/config.status $(srcdir)/libftdi.pc.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+libftdi.spec: $(top_builddir)/config.status $(srcdir)/libftdi.spec.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)

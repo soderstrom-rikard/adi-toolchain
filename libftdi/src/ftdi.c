@@ -341,6 +341,7 @@ int ftdi_usb_get_strings(struct ftdi_context * ftdi, struct usb_device * dev,
     \param dev libusb usb_dev to use
 
     \retval  0: all fine
+    \retval -3: unable to config device
     \retval -4: unable to open device
     \retval -5: unable to claim device
     \retval -6: reset failed
@@ -353,13 +354,24 @@ int ftdi_usb_open_dev(struct ftdi_context *ftdi, struct usb_device *dev)
         ftdi_error_return(-4, "usb_open() failed");
 
 #ifdef LIBUSB_HAS_GET_DRIVER_NP
-    // Try to detach ftdi_sio kernel module
-    // Returns ENODATA if driver is not loaded
+    // Try to detach ftdi_sio kernel module.
+    // Returns ENODATA if driver is not loaded.
+    //
+    // The return code is kept in a separate variable and only parsed
+    // if usb_set_configuration() or usb_claim_interface() fails as the
+    // detach operation might be denied and everything still works fine.
+    // Likely scenario is a static ftdi_sio kernel module.
     if (usb_detach_kernel_driver_np(ftdi->usb_dev, ftdi->interface) != 0 && errno != ENODATA)
         detach_errno = errno;
 #endif
 
-    if (usb_set_configuration(ftdi->usb_dev, dev->config[0].bConfigurationValue)) {
+    // set configuration (needed especially for windows)
+    // tolerate EBUSY: one device with one configuration, but two interfaces
+    //    and libftdi sessions to both interfaces (e.g. FT2232)
+    if (dev->descriptor.bNumConfigurations > 0 && 
+        usb_set_configuration(ftdi->usb_dev, dev->config[0].bConfigurationValue) &&
+        errno != EBUSY)
+    {
         usb_close (ftdi->usb_dev);
         if (detach_errno == EPERM) {
             ftdi_error_return(-8, "inappropriate permissions on device!");
