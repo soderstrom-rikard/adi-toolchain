@@ -154,7 +154,7 @@ static int jtag_readline_multiple_commands_support(chain_t *chain, char * line) 
 
   if (!line || !(strlen( line ) > 0))
 		return 1;
-  
+
   do {
   line = nextcmd;
 
@@ -180,6 +180,9 @@ jtag_readline_loop( chain_t *chain, const char *prompt )
 {
 #ifdef HAVE_LIBREADLINE
 	char *line = NULL;
+#ifdef HAVE_READLINE_HISTORY
+	HIST_ENTRY *hptr;
+#endif
 
 	/* Iterate */
 	while (jtag_readline_multiple_commands_support( chain, line )) {
@@ -198,8 +201,22 @@ jtag_readline_loop( chain_t *chain, const char *prompt )
 
 #ifdef HAVE_READLINE_HISTORY
 		/* Check if we actually got something , Don't add duplicate lines*/
-		if (strlen( line ) &&( !history_length ||strcmp(line,history_get(history_length)->line)))
-			add_history( line );
+		if (strlen( line )) {
+			if (history_length == 0)
+				add_history( line );
+			else {
+				hptr = history_get( history_length );
+				/* Apple leopard libreadline emulation screws up indexing, try the other one */
+				if (hptr == NULL)
+					hptr = history_get( history_length-1 );
+				if (hptr != NULL) {
+					if (strcmp( line, hptr->line ))
+						add_history( line );
+				}
+				else
+					add_history( line );
+			}
+		}
 #endif
 	}
 	free( line );
@@ -411,7 +428,6 @@ main( int argc, char *const argv[] )
 			printf( _("Out of memory\n") );
 			return -1;
 		}
-
 		jtag_parse_stream( chain, stdin );
 
 		cleanup( chain );
