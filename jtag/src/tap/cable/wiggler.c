@@ -188,20 +188,36 @@ wiggler_connect( char *params[], cable_t *cable )
 	if ( param_bitmap )
 		params[3] = param_bitmap;
 
-	if ( ( wiggler_params = malloc( sizeof *wiggler_params ) ) == NULL )
+	wiggler_params = malloc( sizeof *wiggler_params );
+	if (!wiggler_params) {
+		printf( _("%s(%d) malloc failed!\n"), __FILE__, __LINE__);
+		/* NOTE:
+		 * Call the underlying parport driver (*free) routine directly
+		 * not generic_parconn_free() since it also free's cable->params
+		 * (which is not established) and cable (which the caller will do)
+		 */
+		cable->link.port->driver->parport_free( cable->link.port );
 		return 4;
+	}
 
 	/* set new wiggler-specific params */
 	free(cable->params);
 	cable->params = wiggler_params;
 
-
 	if ( ! param_bitmap )
 		param_bitmap = (char *)std_wgl_map;
 
-	if ( ( result = set_mapping( param_bitmap, cable ) ) != 0 )
+	if ( ( result = set_mapping( param_bitmap, cable ) ) != 0 ) {
+		printf( _("Pin mapping failed\n") );
+		/* NOTE:
+		 * Call the underlying parport driver (*free) routine directly
+		 * not generic_parconn_free() since it also free'scable (which
+		 * the caller will do)
+		 */
+		cable->link.port->driver->parport_free( cable->link.port );
+		free( cable->params );
 		return result;
-
+	}
 
 	/* Certain Macraigor Wigglers appear to use one of the unused data lines as a
 	   power line so set all unused bits high. */
