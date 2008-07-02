@@ -167,8 +167,8 @@ ARFLAGS = cru
 libtap_a_AR = $(AR) $(ARFLAGS)
 libtap_a_LIBADD =
 am__libtap_a_SOURCES_DIST = tap.c register.c state.c chain.c detect.c \
-	discovery.c parport.c usbconn.c cable.c cable/generic.h \
-	cable/generic.c cable/generic_usbconn.h \
+	discovery.c idcode.c parport.c usbconn.c cable.c \
+	cable/generic.h cable/generic.c cable/generic_usbconn.h \
 	cable/generic_usbconn.c cable/generic_parport.h \
 	cable/generic_parport.c cable/arcom.c cable/byteblaster.c \
 	cable/dlc5.c cable/ea253.c cable/ei012.c cable/keithkoep.c \
@@ -202,8 +202,8 @@ am__libtap_a_SOURCES_DIST = tap.c register.c state.c chain.c detect.c \
 @ENABLE_CABLE_EP9307_TRUE@am__objects_22 = vision_ep9307.$(OBJEXT)
 am_libtap_a_OBJECTS = tap.$(OBJEXT) register.$(OBJEXT) state.$(OBJEXT) \
 	chain.$(OBJEXT) detect.$(OBJEXT) discovery.$(OBJEXT) \
-	parport.$(OBJEXT) usbconn.$(OBJEXT) cable.$(OBJEXT) \
-	generic.$(OBJEXT) generic_usbconn.$(OBJEXT) \
+	idcode.$(OBJEXT) parport.$(OBJEXT) usbconn.$(OBJEXT) \
+	cable.$(OBJEXT) generic.$(OBJEXT) generic_usbconn.$(OBJEXT) \
 	generic_parport.$(OBJEXT) $(am__objects_1) $(am__objects_2) \
 	$(am__objects_3) $(am__objects_4) $(am__objects_5) \
 	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
@@ -344,8 +344,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 noinst_LIBRARIES = libtap.a
 libtap_a_SOURCES = tap.c register.c state.c chain.c detect.c \
-	discovery.c parport.c usbconn.c cable.c cable/generic.h \
-	cable/generic.c cable/generic_usbconn.h \
+	discovery.c idcode.c parport.c usbconn.c cable.c \
+	cable/generic.h cable/generic.c cable/generic_usbconn.h \
 	cable/generic_usbconn.c cable/generic_parport.h \
 	cable/generic_parport.c $(am__append_1) $(am__append_2) \
 	$(am__append_3) $(am__append_4) $(am__append_5) \
@@ -418,6 +418,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generic_parport.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generic_usbconn.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/idcode.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jim.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jlink.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/keithkoep.Po@am__quote@
