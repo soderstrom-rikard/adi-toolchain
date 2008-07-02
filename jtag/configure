@@ -9595,7 +9595,7 @@ else
 
     HAVELIBFTD2XX=yes
     case $host in
-    *cygwin*)
+    *cygwin*|*mingw*)
       CFLAGS="$CFLAGS -I$with_ftd2xx"
       if test -d "$with_ftd2xx/i386"; then
 
