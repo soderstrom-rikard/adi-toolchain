@@ -465,8 +465,8 @@ static int
 ftdi_flush_output ( ftdi_params_t *p )
 {
 	int xferred;
-	int i;
-	unsigned char * q;
+	//int i;
+	//unsigned char * q;
 
 	//	printf("ftdi_flush_output, length %d", p->outcount);
 	//	for (i=0, q=p->outbuf;  i<p->outcount; i++, q++)
