@@ -555,7 +555,7 @@ const bus_driver_t bf538f_ezkit_bus = {
 	bf537_stamp_bus_read_start,
 	bf537_stamp_bus_read_next,
 	bf537_stamp_bus_read_end,
-	bf537_stamp_bus_read,
+	generic_bus_read,
 	bf537_stamp_bus_write,
 	NULL
 };
@@ -604,7 +604,7 @@ const bus_driver_t bf526_ezkit_bus = {
 	bf537_stamp_bus_read_start,
 	bf537_stamp_bus_read_next,
 	bf537_stamp_bus_read_end,
-	bf537_stamp_bus_read,
+	generic_bus_read,
 	bf537_stamp_bus_write,
 	NULL
 };
