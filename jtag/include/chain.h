@@ -30,6 +30,7 @@
 typedef struct chain_t chain_t;
 
 #include "cable.h"
+#include "bsdl.h"
 
 #define EXITMODE_SHIFT 0
 #define EXITMODE_IDLE  1
@@ -41,6 +42,7 @@ struct chain_t {
 	parts_t *parts;
 	int active_part;
 	cable_t *cable;
+	bsdl_globs_t bsdl;
 };
 
 chain_t *chain_alloc( void );
