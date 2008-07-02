@@ -185,6 +185,9 @@
 /* Define to 1 if you have the <dev/ppbus/ppi.h> header file. */
 #undef HAVE_DEV_PPBUS_PPI_H
 
+/* Define if -lm provides fmax() */
+#undef HAVE_FMAX
+
 /* Define to 1 if you have the `getdelim' function. */
 #undef HAVE_GETDELIM
 
