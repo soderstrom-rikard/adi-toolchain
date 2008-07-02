@@ -227,6 +227,9 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
+/* Define if your readline library has \`rl_completion_matches' */
+#undef HAVE_READLINE_COMPLETION
+
 /* Define to 1 if you have the <readline.h> header file. */
 #undef HAVE_READLINE_H
 
