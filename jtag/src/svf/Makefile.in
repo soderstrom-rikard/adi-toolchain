@@ -284,11 +284,6 @@ $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-svf_bison.h: svf_bison.c
-	@if test ! -f $@; then \
-	  rm -f svf_bison.c; \
-	  $(MAKE) $(AM_MAKEFLAGS) svf_bison.c; \
-	else :; fi
 libsvf.a: $(libsvf_a_OBJECTS) $(libsvf_a_DEPENDENCIES) 
 	-rm -f libsvf.a
 	$(libsvf_a_AR) libsvf.a $(libsvf_a_OBJECTS) $(libsvf_a_LIBADD)
@@ -510,7 +505,9 @@ lint-am: Makefile @MAINTAINER_MODE_TRUE@ $(top_srcdir)/Makefile.rules
 
 .PHONY: lint lint-am
 
-svf_flex.o svf.o: svf_bison.o
+svf_flex.$(OBJEXT) svf.$(OBJEXT): svf_bison.$(OBJEXT)
+
+svf_bison.h: svf_bison.c
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

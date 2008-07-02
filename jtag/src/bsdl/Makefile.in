@@ -59,7 +59,6 @@
 # Written by Marcel Telka <marcel@telka.sk>, 2003, 2004.
 #
 
-
 VPATH = @srcdir@
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
@@ -78,9 +77,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(top_srcdir)/Makefile.rules \
-	bsdl_bison.c bsdl_flex.c
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(top_srcdir)/Makefile.rules bsdl_bison.c bsdl_flex.c
 subdir = src/bsdl
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/gettext.m4 \
@@ -116,7 +114,6 @@ YLWRAP = $(top_srcdir)/tools/ylwrap
 YACCCOMPILE = $(YACC) $(YFLAGS) $(AM_YFLAGS)
 SOURCES = $(libbsdl_a_SOURCES)
 DIST_SOURCES = $(libbsdl_a_SOURCES)
-HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -238,11 +235,6 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 noinst_LIBRARIES = libbsdl.a
-noinst_HEADERS = \
-	bsdl_local.h \
-	bsdl_bison.h \
-	bsdl_sysdep.h
-
 libbsdl_a_SOURCES = \
 	bsdl_bison.y \
 	bsdl_flex.l \
@@ -402,7 +394,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES) $(HEADERS)
+all-am: Makefile $(LIBRARIES)
 installdirs:
 install: install-am
 install-exec: install-exec-am
@@ -512,8 +504,9 @@ lint-am: Makefile @MAINTAINER_MODE_TRUE@ $(top_srcdir)/Makefile.rules
 
 .PHONY: lint lint-am
 
+bsdl_flex.$(OBJEXT) bsdl_sem.$(OBJEXT): bsdl_bison.$(OBJEXT)
+
 bsdl_bison.h: bsdl_bison.c
-bsdl_flex.o bsdl_sem.o: bsdl_bison.o
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
