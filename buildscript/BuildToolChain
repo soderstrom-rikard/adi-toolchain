@@ -2511,7 +2511,7 @@ if [ $KERNEL_SOURCE ] ; then
 
     echo_date "Configuring gdbproxy"
     run_cmd env $DIR_GDBPROXY_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET \
-        --with-jtag-srcdir=$DIR_JTAG_SOURCE --with-jtag-build=$DIR_JTAG_BUILD --enable-relocatable
+        --with-jtag-srcdir=$DIR_JTAG_SOURCE --with-jtag-builddir=$DIR_JTAG_BUILD --enable-relocatable
 
     echo_date "Building gdbproxy"
     run_cmd $MAKE
