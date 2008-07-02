@@ -864,16 +864,16 @@ ENABLE_CABLE_WIGGLER_TRUE
 ENABLE_CABLE_WIGGLER_FALSE
 ENABLE_CABLE_XPC_TRUE
 ENABLE_CABLE_XPC_FALSE
-ENABLE_PARPORT_DIRECT_TRUE
-ENABLE_PARPORT_DIRECT_FALSE
-ENABLE_PARPORT_FTD2XX_TRUE
-ENABLE_PARPORT_FTD2XX_FALSE
-ENABLE_PARPORT_FTDI_TRUE
-ENABLE_PARPORT_FTDI_FALSE
-ENABLE_PARPORT_PPDEV_TRUE
-ENABLE_PARPORT_PPDEV_FALSE
-ENABLE_PARPORT_PPI_TRUE
-ENABLE_PARPORT_PPI_FALSE
+ENABLE_LOWLEVEL_DIRECT_TRUE
+ENABLE_LOWLEVEL_DIRECT_FALSE
+ENABLE_LOWLEVEL_FTD2XX_TRUE
+ENABLE_LOWLEVEL_FTD2XX_FALSE
+ENABLE_LOWLEVEL_FTDI_TRUE
+ENABLE_LOWLEVEL_FTDI_FALSE
+ENABLE_LOWLEVEL_PPDEV_TRUE
+ENABLE_LOWLEVEL_PPDEV_FALSE
+ENABLE_LOWLEVEL_PPI_TRUE
+ENABLE_LOWLEVEL_PPI_FALSE
 JTAG_RELOCATABLE_TRUE
 JTAG_RELOCATABLE_FALSE
 LIBOBJS
@@ -896,7 +896,7 @@ enable_bsdl
 enable_jedec_exp
 enable_bus
 enable_cable
-enable_parport
+enable_lowlevel
 enable_relocatable
 '
       ac_precious_vars='build_alias
@@ -1567,7 +1567,7 @@ Optional Features:
                           Disabled by default are:
                           ep9307 jim
 
-  --enable-parport        Enable default set or specific parport drivers:
+  --enable-lowlevel       Enable default set or specific lowlevel drivers:
                           'default' enables:
                           direct ftdi ftd2xx ppdev ppi
 
@@ -11960,83 +11960,83 @@ fi
 
 
 
-# Enable parport drivers
+# Enable lowlevel drivers
 
-# Check whether --enable-parport was given.
-if test "${enable_parport+set}" = set; then
-  enableval=$enable_parport; case ${enableval} in
-  yes) parportdrivers=default ;;
-  no) parportdrivers=none ;;
-  none) parportdrivers=none ;;
-  *) parportdrivers=`echo ${enableval} | $SED -e 's/,/ /g'` ;;
+# Check whether --enable-lowlevel was given.
+if test "${enable_lowlevel+set}" = set; then
+  enableval=$enable_lowlevel; case ${enableval} in
+  yes) lowleveldrivers=default ;;
+  no) lowleveldrivers=none ;;
+  none) lowleveldrivers=none ;;
+  *) lowleveldrivers=`echo ${enableval} | $SED -e 's/,/ /g'` ;;
 esac
 
 else
-  parportdrivers=default
+  lowleveldrivers=default
 fi
 
-# expand 'default' to default enabled parportdrivers
-parportdrivers=`echo ${parportdrivers} | $SED -e "s/default/\
+# expand 'default' to default enabled lowlevel drivers
+lowleveldrivers=`echo ${lowleveldrivers} | $SED -e "s/default/\
 direct ftdi ftd2xx ppdev ppi/"`
-# automatically disable parport drivers when a required feature is not available
+# automatically disable lowlevel drivers when a required feature is not available
 if test "x$HAVELIBFTDI" != "xyes"; then
 
-    parportdrivers=`echo ${parportdrivers} | $SED -e "s/ftdi//"`
+    lowleveldrivers=`echo ${lowleveldrivers} | $SED -e "s/ftdi//"`
 
 fi
 
 if test "x$HAVELIBFTD2XX" != "xyes"; then
 
-    parportdrivers=`echo ${parportdrivers} | $SED -e "s/ftd2xx//"`
+    lowleveldrivers=`echo ${lowleveldrivers} | $SED -e "s/ftd2xx//"`
 
 fi
 
 if test "x$HAVE_LINUX_PPDEV_H" != "xyes"; then
 
-    parportdrivers=`echo ${parportdrivers} | $SED -e "s/ppdev//"`
+    lowleveldrivers=`echo ${lowleveldrivers} | $SED -e "s/ppdev//"`
 
 fi
 
 if test "x$HAVE_DEV_PPBUS_PPI_H" != "xyes"; then
 
-    parportdrivers=`echo ${parportdrivers} | $SED -e "s/ppi//"`
+    lowleveldrivers=`echo ${lowleveldrivers} | $SED -e "s/ppi//"`
 
 fi
 
 if test "x$HAVE_IOPERM" != "xyes" -a "x$HAVE_I386_SET_IOPERM" != "xyes"; then
 
-    parportdrivers=`echo ${parportdrivers} | $SED -e "s/direct//"`
+    lowleveldrivers=`echo ${lowleveldrivers} | $SED -e "s/direct//"`
 
 fi
 
 #
-enabled_parport_drivers=''
+enabled_lowlevel_drivers=''
 
-    if echo "$parportdrivers" | $GREP -q direct; then
+    if echo "$lowleveldrivers" | $GREP -q direct; then
 
 
 cat >>confdefs.h <<\_ACEOF
-#define ENABLE_PARPORT_DIRECT 1
+#define ENABLE_LOWLEVEL_DIRECT 1
 _ACEOF
 
         if true; then
-  ENABLE_PARPORT_DIRECT_TRUE=
-  ENABLE_PARPORT_DIRECT_FALSE='#'
+  ENABLE_LOWLEVEL_DIRECT_TRUE=
+  ENABLE_LOWLEVEL_DIRECT_FALSE='#'
 else
-  ENABLE_PARPORT_DIRECT_TRUE='#'
-  ENABLE_PARPORT_DIRECT_FALSE=
+  ENABLE_LOWLEVEL_DIRECT_TRUE='#'
+  ENABLE_LOWLEVEL_DIRECT_FALSE=
 fi
 
-       enabled_parport_drivers="${enabled_parport_drivers}direct "
+       enabled_lowlevel_drivers="${enabled_lowlevel_drivers}direct "
 
 else
 
         if false; then
-  ENABLE_PARPORT_DIRECT_TRUE=
-  ENABLE_PARPORT_DIRECT_FALSE='#'
+  ENABLE_LOWLEVEL_DIRECT_TRUE=
+  ENABLE_LOWLEVEL_DIRECT_FALSE='#'
 else
-  ENABLE_PARPORT_DIRECT_TRUE='#'
-  ENABLE_PARPORT_DIRECT_FALSE=
+  ENABLE_LOWLEVEL_DIRECT_TRUE='#'
+  ENABLE_LOWLEVEL_DIRECT_FALSE=
 fi
 
 
@@ -12044,31 +12044,31 @@ fi
 
 
 
-    if echo "$parportdrivers" | $GREP -q ftd2xx; then
+    if echo "$lowleveldrivers" | $GREP -q ftd2xx; then
 
 
 cat >>confdefs.h <<\_ACEOF
-#define ENABLE_PARPORT_FTD2XX 1
+#define ENABLE_LOWLEVEL_FTD2XX 1
 _ACEOF
 
         if true; then
-  ENABLE_PARPORT_FTD2XX_TRUE=
-  ENABLE_PARPORT_FTD2XX_FALSE='#'
+  ENABLE_LOWLEVEL_FTD2XX_TRUE=
+  ENABLE_LOWLEVEL_FTD2XX_FALSE='#'
 else
-  ENABLE_PARPORT_FTD2XX_TRUE='#'
-  ENABLE_PARPORT_FTD2XX_FALSE=
+  ENABLE_LOWLEVEL_FTD2XX_TRUE='#'
+  ENABLE_LOWLEVEL_FTD2XX_FALSE=
 fi
 
-       enabled_parport_drivers="${enabled_parport_drivers}ftd2xx "
+       enabled_lowlevel_drivers="${enabled_lowlevel_drivers}ftd2xx "
 
 else
 
         if false; then
-  ENABLE_PARPORT_FTD2XX_TRUE=
-  ENABLE_PARPORT_FTD2XX_FALSE='#'
+  ENABLE_LOWLEVEL_FTD2XX_TRUE=
+  ENABLE_LOWLEVEL_FTD2XX_FALSE='#'
 else
-  ENABLE_PARPORT_FTD2XX_TRUE='#'
-  ENABLE_PARPORT_FTD2XX_FALSE=
+  ENABLE_LOWLEVEL_FTD2XX_TRUE='#'
+  ENABLE_LOWLEVEL_FTD2XX_FALSE=
 fi
 
 
@@ -12076,31 +12076,31 @@ fi
 
 
 
-    if echo "$parportdrivers" | $GREP -q ftdi; then
+    if echo "$lowleveldrivers" | $GREP -q ftdi; then
 
 
 cat >>confdefs.h <<\_ACEOF
-#define ENABLE_PARPORT_FTDI 1
+#define ENABLE_LOWLEVEL_FTDI 1
 _ACEOF
 
         if true; then
-  ENABLE_PARPORT_FTDI_TRUE=
-  ENABLE_PARPORT_FTDI_FALSE='#'
+  ENABLE_LOWLEVEL_FTDI_TRUE=
+  ENABLE_LOWLEVEL_FTDI_FALSE='#'
 else
-  ENABLE_PARPORT_FTDI_TRUE='#'
-  ENABLE_PARPORT_FTDI_FALSE=
+  ENABLE_LOWLEVEL_FTDI_TRUE='#'
+  ENABLE_LOWLEVEL_FTDI_FALSE=
 fi
 
-       enabled_parport_drivers="${enabled_parport_drivers}ftdi "
+       enabled_lowlevel_drivers="${enabled_lowlevel_drivers}ftdi "
 
 else
 
         if false; then
-  ENABLE_PARPORT_FTDI_TRUE=
-  ENABLE_PARPORT_FTDI_FALSE='#'
+  ENABLE_LOWLEVEL_FTDI_TRUE=
+  ENABLE_LOWLEVEL_FTDI_FALSE='#'
 else
-  ENABLE_PARPORT_FTDI_TRUE='#'
-  ENABLE_PARPORT_FTDI_FALSE=
+  ENABLE_LOWLEVEL_FTDI_TRUE='#'
+  ENABLE_LOWLEVEL_FTDI_FALSE=
 fi
 
 
@@ -12108,31 +12108,31 @@ fi
 
 
 
-    if echo "$parportdrivers" | $GREP -q ppdev; then
+    if echo "$lowleveldrivers" | $GREP -q ppdev; then
 
 
 cat >>confdefs.h <<\_ACEOF
-#define ENABLE_PARPORT_PPDEV 1
+#define ENABLE_LOWLEVEL_PPDEV 1
 _ACEOF
 
         if true; then
-  ENABLE_PARPORT_PPDEV_TRUE=
-  ENABLE_PARPORT_PPDEV_FALSE='#'
+  ENABLE_LOWLEVEL_PPDEV_TRUE=
+  ENABLE_LOWLEVEL_PPDEV_FALSE='#'
 else
-  ENABLE_PARPORT_PPDEV_TRUE='#'
-  ENABLE_PARPORT_PPDEV_FALSE=
+  ENABLE_LOWLEVEL_PPDEV_TRUE='#'
+  ENABLE_LOWLEVEL_PPDEV_FALSE=
 fi
 
-       enabled_parport_drivers="${enabled_parport_drivers}ppdev "
+       enabled_lowlevel_drivers="${enabled_lowlevel_drivers}ppdev "
 
 else
 
         if false; then
-  ENABLE_PARPORT_PPDEV_TRUE=
-  ENABLE_PARPORT_PPDEV_FALSE='#'
+  ENABLE_LOWLEVEL_PPDEV_TRUE=
+  ENABLE_LOWLEVEL_PPDEV_FALSE='#'
 else
-  ENABLE_PARPORT_PPDEV_TRUE='#'
-  ENABLE_PARPORT_PPDEV_FALSE=
+  ENABLE_LOWLEVEL_PPDEV_TRUE='#'
+  ENABLE_LOWLEVEL_PPDEV_FALSE=
 fi
 
 
@@ -12140,31 +12140,31 @@ fi
 
 
 
-    if echo "$parportdrivers" | $GREP -q ppi; then
+    if echo "$lowleveldrivers" | $GREP -q ppi; then
 
 
 cat >>confdefs.h <<\_ACEOF
-#define ENABLE_PARPORT_PPI 1
+#define ENABLE_LOWLEVEL_PPI 1
 _ACEOF
 
         if true; then
-  ENABLE_PARPORT_PPI_TRUE=
-  ENABLE_PARPORT_PPI_FALSE='#'
+  ENABLE_LOWLEVEL_PPI_TRUE=
+  ENABLE_LOWLEVEL_PPI_FALSE='#'
 else
-  ENABLE_PARPORT_PPI_TRUE='#'
-  ENABLE_PARPORT_PPI_FALSE=
+  ENABLE_LOWLEVEL_PPI_TRUE='#'
+  ENABLE_LOWLEVEL_PPI_FALSE=
 fi
 
-       enabled_parport_drivers="${enabled_parport_drivers}ppi "
+       enabled_lowlevel_drivers="${enabled_lowlevel_drivers}ppi "
 
 else
 
         if false; then
-  ENABLE_PARPORT_PPI_TRUE=
-  ENABLE_PARPORT_PPI_FALSE='#'
+  ENABLE_LOWLEVEL_PPI_TRUE=
+  ENABLE_LOWLEVEL_PPI_FALSE='#'
 else
-  ENABLE_PARPORT_PPI_TRUE='#'
-  ENABLE_PARPORT_PPI_FALSE=
+  ENABLE_LOWLEVEL_PPI_TRUE='#'
+  ENABLE_LOWLEVEL_PPI_FALSE=
 fi
 
 
@@ -13119,73 +13119,73 @@ $as_echo "$as_me: error: conditional \"ENABLE_CABLE_XPC\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${ENABLE_PARPORT_DIRECT_TRUE}" && test -z "${ENABLE_PARPORT_DIRECT_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_PARPORT_DIRECT\" was never defined.
+if test -z "${ENABLE_LOWLEVEL_DIRECT_TRUE}" && test -z "${ENABLE_LOWLEVEL_DIRECT_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_LOWLEVEL_DIRECT\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"ENABLE_PARPORT_DIRECT\" was never defined.
+$as_echo "$as_me: error: conditional \"ENABLE_LOWLEVEL_DIRECT\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${ENABLE_PARPORT_DIRECT_TRUE}" && test -z "${ENABLE_PARPORT_DIRECT_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_PARPORT_DIRECT\" was never defined.
+if test -z "${ENABLE_LOWLEVEL_DIRECT_TRUE}" && test -z "${ENABLE_LOWLEVEL_DIRECT_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_LOWLEVEL_DIRECT\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"ENABLE_PARPORT_DIRECT\" was never defined.
+$as_echo "$as_me: error: conditional \"ENABLE_LOWLEVEL_DIRECT\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${ENABLE_PARPORT_FTD2XX_TRUE}" && test -z "${ENABLE_PARPORT_FTD2XX_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_PARPORT_FTD2XX\" was never defined.
+if test -z "${ENABLE_LOWLEVEL_FTD2XX_TRUE}" && test -z "${ENABLE_LOWLEVEL_FTD2XX_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_LOWLEVEL_FTD2XX\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"ENABLE_PARPORT_FTD2XX\" was never defined.
+$as_echo "$as_me: error: conditional \"ENABLE_LOWLEVEL_FTD2XX\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${ENABLE_PARPORT_FTD2XX_TRUE}" && test -z "${ENABLE_PARPORT_FTD2XX_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_PARPORT_FTD2XX\" was never defined.
+if test -z "${ENABLE_LOWLEVEL_FTD2XX_TRUE}" && test -z "${ENABLE_LOWLEVEL_FTD2XX_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_LOWLEVEL_FTD2XX\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"ENABLE_PARPORT_FTD2XX\" was never defined.
+$as_echo "$as_me: error: conditional \"ENABLE_LOWLEVEL_FTD2XX\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${ENABLE_PARPORT_FTDI_TRUE}" && test -z "${ENABLE_PARPORT_FTDI_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_PARPORT_FTDI\" was never defined.
+if test -z "${ENABLE_LOWLEVEL_FTDI_TRUE}" && test -z "${ENABLE_LOWLEVEL_FTDI_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_LOWLEVEL_FTDI\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"ENABLE_PARPORT_FTDI\" was never defined.
+$as_echo "$as_me: error: conditional \"ENABLE_LOWLEVEL_FTDI\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${ENABLE_PARPORT_FTDI_TRUE}" && test -z "${ENABLE_PARPORT_FTDI_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_PARPORT_FTDI\" was never defined.
+if test -z "${ENABLE_LOWLEVEL_FTDI_TRUE}" && test -z "${ENABLE_LOWLEVEL_FTDI_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_LOWLEVEL_FTDI\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"ENABLE_PARPORT_FTDI\" was never defined.
+$as_echo "$as_me: error: conditional \"ENABLE_LOWLEVEL_FTDI\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${ENABLE_PARPORT_PPDEV_TRUE}" && test -z "${ENABLE_PARPORT_PPDEV_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_PARPORT_PPDEV\" was never defined.
+if test -z "${ENABLE_LOWLEVEL_PPDEV_TRUE}" && test -z "${ENABLE_LOWLEVEL_PPDEV_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_LOWLEVEL_PPDEV\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"ENABLE_PARPORT_PPDEV\" was never defined.
+$as_echo "$as_me: error: conditional \"ENABLE_LOWLEVEL_PPDEV\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${ENABLE_PARPORT_PPDEV_TRUE}" && test -z "${ENABLE_PARPORT_PPDEV_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_PARPORT_PPDEV\" was never defined.
+if test -z "${ENABLE_LOWLEVEL_PPDEV_TRUE}" && test -z "${ENABLE_LOWLEVEL_PPDEV_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_LOWLEVEL_PPDEV\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"ENABLE_PARPORT_PPDEV\" was never defined.
+$as_echo "$as_me: error: conditional \"ENABLE_LOWLEVEL_PPDEV\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${ENABLE_PARPORT_PPI_TRUE}" && test -z "${ENABLE_PARPORT_PPI_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_PARPORT_PPI\" was never defined.
+if test -z "${ENABLE_LOWLEVEL_PPI_TRUE}" && test -z "${ENABLE_LOWLEVEL_PPI_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_LOWLEVEL_PPI\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"ENABLE_PARPORT_PPI\" was never defined.
+$as_echo "$as_me: error: conditional \"ENABLE_LOWLEVEL_PPI\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${ENABLE_PARPORT_PPI_TRUE}" && test -z "${ENABLE_PARPORT_PPI_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_PARPORT_PPI\" was never defined.
+if test -z "${ENABLE_LOWLEVEL_PPI_TRUE}" && test -z "${ENABLE_LOWLEVEL_PPI_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_LOWLEVEL_PPI\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"ENABLE_PARPORT_PPI\" was never defined.
+$as_echo "$as_me: error: conditional \"ENABLE_LOWLEVEL_PPI\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -14715,7 +14715,7 @@ jtag is now configured for
   Build BSDL subsystem : $FLAG_BSDL
   Bus drivers          : $enabled_bus_drivers
   Cable drivers        : $enabled_cable_drivers
-  Parport drivers      : $enabled_parport_drivers
+  Lowlevel drivers     : $enabled_lowlevel_drivers
 " >&5
 $as_echo "$as_me:
 
@@ -14728,5 +14728,5 @@ jtag is now configured for
   Build BSDL subsystem : $FLAG_BSDL
   Bus drivers          : $enabled_bus_drivers
   Cable drivers        : $enabled_cable_drivers
-  Parport drivers      : $enabled_parport_drivers
+  Lowlevel drivers     : $enabled_lowlevel_drivers
 " >&6;}

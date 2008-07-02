@@ -153,24 +153,24 @@
 /* define if jim is enabled */
 #undef ENABLE_JIM
 
+/* define if direct is enabled */
+#undef ENABLE_LOWLEVEL_DIRECT
+
+/* define if ftd2xx is enabled */
+#undef ENABLE_LOWLEVEL_FTD2XX
+
+/* define if ftdi is enabled */
+#undef ENABLE_LOWLEVEL_FTDI
+
+/* define if ppdev is enabled */
+#undef ENABLE_LOWLEVEL_PPDEV
+
+/* define if ppi is enabled */
+#undef ENABLE_LOWLEVEL_PPI
+
 /* Define to 1 if translation of program messages to the user's native
    language is requested. */
 #undef ENABLE_NLS
-
-/* define if direct is enabled */
-#undef ENABLE_PARPORT_DIRECT
-
-/* define if ftd2xx is enabled */
-#undef ENABLE_PARPORT_FTD2XX
-
-/* define if ftdi is enabled */
-#undef ENABLE_PARPORT_FTDI
-
-/* define if ppdev is enabled */
-#undef ENABLE_PARPORT_PPDEV
-
-/* define if ppi is enabled */
-#undef ENABLE_PARPORT_PPI
 
 /* define if SVF player is enabled */
 #undef ENABLE_SVF

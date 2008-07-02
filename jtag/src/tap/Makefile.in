@@ -130,20 +130,20 @@ DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 @ENABLE_JIM_TRUE@am__append_16 = \
 @ENABLE_JIM_TRUE@	cable/jim.c
 
-@ENABLE_PARPORT_FTDI_TRUE@am__append_17 = \
-@ENABLE_PARPORT_FTDI_TRUE@	parport/ftdi.c
+@ENABLE_LOWLEVEL_FTDI_TRUE@am__append_17 = \
+@ENABLE_LOWLEVEL_FTDI_TRUE@	usbconn/libftdi.c
 
-@ENABLE_PARPORT_FTD2XX_TRUE@am__append_18 = \
-@ENABLE_PARPORT_FTD2XX_TRUE@	parport/ftd2xx.c
+@ENABLE_LOWLEVEL_FTD2XX_TRUE@am__append_18 = \
+@ENABLE_LOWLEVEL_FTD2XX_TRUE@	usbconn/libftd2xx.c
 
-@ENABLE_PARPORT_DIRECT_TRUE@am__append_19 = \
-@ENABLE_PARPORT_DIRECT_TRUE@	parport/direct.c
+@ENABLE_LOWLEVEL_DIRECT_TRUE@am__append_19 = \
+@ENABLE_LOWLEVEL_DIRECT_TRUE@	parport/direct.c
 
-@ENABLE_PARPORT_PPDEV_TRUE@am__append_20 = \
-@ENABLE_PARPORT_PPDEV_TRUE@	parport/ppdev.c
+@ENABLE_LOWLEVEL_PPDEV_TRUE@am__append_20 = \
+@ENABLE_LOWLEVEL_PPDEV_TRUE@	parport/ppdev.c
 
-@ENABLE_PARPORT_PPI_TRUE@am__append_21 = \
-@ENABLE_PARPORT_PPI_TRUE@	parport/ppi.c
+@ENABLE_LOWLEVEL_PPI_TRUE@am__append_21 = \
+@ENABLE_LOWLEVEL_PPI_TRUE@	parport/ppi.c
 
 @ENABLE_CABLE_EP9307_TRUE@am__append_22 = \
 @ENABLE_CABLE_EP9307_TRUE@	cable/vision_ep9307.c
@@ -170,13 +170,14 @@ am__libtap_a_SOURCES_DIST = tap.c register.c state.c chain.c detect.c \
 	discovery.c idcode.c parport.c usbconn.c cable.c \
 	cable/generic.h cable/generic.c cable/generic_usbconn.h \
 	cable/generic_usbconn.c cable/generic_parport.h \
-	cable/generic_parport.c cable/arcom.c cable/byteblaster.c \
-	cable/dlc5.c cable/ea253.c cable/ei012.c cable/keithkoep.c \
-	cable/lattice.c cable/mpcbdm.c cable/triton.c cable/wiggler.c \
-	cable/wiggler2.c cable/jlink.c cable/xpc.c cable/usbblaster.c \
-	cable/ft2232.c usbconn/libusb.c cable/jim.c parport/ftdi.c \
-	parport/ftd2xx.c parport/direct.c parport/ppdev.c \
-	parport/ppi.c cable/vision_ep9307.c
+	cable/generic_parport.c cable/cmd_xfer.h cable/cmd_xfer.c \
+	cable/arcom.c cable/byteblaster.c cable/dlc5.c cable/ea253.c \
+	cable/ei012.c cable/keithkoep.c cable/lattice.c cable/mpcbdm.c \
+	cable/triton.c cable/wiggler.c cable/wiggler2.c cable/jlink.c \
+	cable/xpc.c cable/usbblaster.c cable/ft2232.c usbconn/libusb.c \
+	cable/jim.c usbconn/libftdi.c usbconn/libftd2xx.c \
+	parport/direct.c parport/ppdev.c parport/ppi.c \
+	cable/vision_ep9307.c
 @ENABLE_CABLE_ARCOM_TRUE@am__objects_1 = arcom.$(OBJEXT)
 @ENABLE_CABLE_BYTEBLASTER_TRUE@am__objects_2 = byteblaster.$(OBJEXT)
 @ENABLE_CABLE_DLC5_TRUE@am__objects_3 = dlc5.$(OBJEXT)
@@ -194,24 +195,24 @@ am__libtap_a_SOURCES_DIST = tap.c register.c state.c chain.c detect.c \
 @ENABLE_CABLE_FT2232_TRUE@am__objects_14 = ft2232.$(OBJEXT)
 @HAVE_LIBUSB_TRUE@am__objects_15 = libusb.$(OBJEXT)
 @ENABLE_JIM_TRUE@am__objects_16 = jim.$(OBJEXT)
-@ENABLE_PARPORT_FTDI_TRUE@am__objects_17 = ftdi.$(OBJEXT)
-@ENABLE_PARPORT_FTD2XX_TRUE@am__objects_18 = ftd2xx.$(OBJEXT)
-@ENABLE_PARPORT_DIRECT_TRUE@am__objects_19 = direct.$(OBJEXT)
-@ENABLE_PARPORT_PPDEV_TRUE@am__objects_20 = ppdev.$(OBJEXT)
-@ENABLE_PARPORT_PPI_TRUE@am__objects_21 = ppi.$(OBJEXT)
+@ENABLE_LOWLEVEL_FTDI_TRUE@am__objects_17 = libftdi.$(OBJEXT)
+@ENABLE_LOWLEVEL_FTD2XX_TRUE@am__objects_18 = libftd2xx.$(OBJEXT)
+@ENABLE_LOWLEVEL_DIRECT_TRUE@am__objects_19 = direct.$(OBJEXT)
+@ENABLE_LOWLEVEL_PPDEV_TRUE@am__objects_20 = ppdev.$(OBJEXT)
+@ENABLE_LOWLEVEL_PPI_TRUE@am__objects_21 = ppi.$(OBJEXT)
 @ENABLE_CABLE_EP9307_TRUE@am__objects_22 = vision_ep9307.$(OBJEXT)
 am_libtap_a_OBJECTS = tap.$(OBJEXT) register.$(OBJEXT) state.$(OBJEXT) \
 	chain.$(OBJEXT) detect.$(OBJEXT) discovery.$(OBJEXT) \
 	idcode.$(OBJEXT) parport.$(OBJEXT) usbconn.$(OBJEXT) \
 	cable.$(OBJEXT) generic.$(OBJEXT) generic_usbconn.$(OBJEXT) \
-	generic_parport.$(OBJEXT) $(am__objects_1) $(am__objects_2) \
-	$(am__objects_3) $(am__objects_4) $(am__objects_5) \
-	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
-	$(am__objects_9) $(am__objects_10) $(am__objects_11) \
-	$(am__objects_12) $(am__objects_13) $(am__objects_14) \
-	$(am__objects_15) $(am__objects_16) $(am__objects_17) \
-	$(am__objects_18) $(am__objects_19) $(am__objects_20) \
-	$(am__objects_21) $(am__objects_22)
+	generic_parport.$(OBJEXT) cmd_xfer.$(OBJEXT) $(am__objects_1) \
+	$(am__objects_2) $(am__objects_3) $(am__objects_4) \
+	$(am__objects_5) $(am__objects_6) $(am__objects_7) \
+	$(am__objects_8) $(am__objects_9) $(am__objects_10) \
+	$(am__objects_11) $(am__objects_12) $(am__objects_13) \
+	$(am__objects_14) $(am__objects_15) $(am__objects_16) \
+	$(am__objects_17) $(am__objects_18) $(am__objects_19) \
+	$(am__objects_20) $(am__objects_21) $(am__objects_22)
 libtap_a_OBJECTS = $(am_libtap_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/tools/depcomp
@@ -347,14 +348,15 @@ libtap_a_SOURCES = tap.c register.c state.c chain.c detect.c \
 	discovery.c idcode.c parport.c usbconn.c cable.c \
 	cable/generic.h cable/generic.c cable/generic_usbconn.h \
 	cable/generic_usbconn.c cable/generic_parport.h \
-	cable/generic_parport.c $(am__append_1) $(am__append_2) \
-	$(am__append_3) $(am__append_4) $(am__append_5) \
-	$(am__append_6) $(am__append_7) $(am__append_8) \
-	$(am__append_9) $(am__append_10) $(am__append_11) \
-	$(am__append_12) $(am__append_13) $(am__append_14) \
-	$(am__append_15) $(am__append_16) $(am__append_17) \
-	$(am__append_18) $(am__append_19) $(am__append_20) \
-	$(am__append_21) $(am__append_22)
+	cable/generic_parport.c cable/cmd_xfer.h cable/cmd_xfer.c \
+	$(am__append_1) $(am__append_2) $(am__append_3) \
+	$(am__append_4) $(am__append_5) $(am__append_6) \
+	$(am__append_7) $(am__append_8) $(am__append_9) \
+	$(am__append_10) $(am__append_11) $(am__append_12) \
+	$(am__append_13) $(am__append_14) $(am__append_15) \
+	$(am__append_16) $(am__append_17) $(am__append_18) \
+	$(am__append_19) $(am__append_20) $(am__append_21) \
+	$(am__append_22)
 all: all-am
 
 .SUFFIXES:
@@ -406,6 +408,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/byteblaster.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cable.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/chain.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cmd_xfer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/detect.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/direct.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/discovery.Po@am__quote@
@@ -413,8 +416,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ea253.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ei012.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ft2232.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ftd2xx.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ftdi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generic_parport.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generic_usbconn.Po@am__quote@
@@ -423,6 +424,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jlink.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/keithkoep.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lattice.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libftd2xx.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libftdi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libusb.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpcbdm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parport.Po@am__quote@
@@ -494,6 +497,20 @@ generic_parport.obj: cable/generic_parport.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cable/generic_parport.c' object='generic_parport.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o generic_parport.obj `if test -f 'cable/generic_parport.c'; then $(CYGPATH_W) 'cable/generic_parport.c'; else $(CYGPATH_W) '$(srcdir)/cable/generic_parport.c'; fi`
+
+cmd_xfer.o: cable/cmd_xfer.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cmd_xfer.o -MD -MP -MF $(DEPDIR)/cmd_xfer.Tpo -c -o cmd_xfer.o `test -f 'cable/cmd_xfer.c' || echo '$(srcdir)/'`cable/cmd_xfer.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/cmd_xfer.Tpo $(DEPDIR)/cmd_xfer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cable/cmd_xfer.c' object='cmd_xfer.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cmd_xfer.o `test -f 'cable/cmd_xfer.c' || echo '$(srcdir)/'`cable/cmd_xfer.c
+
+cmd_xfer.obj: cable/cmd_xfer.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cmd_xfer.obj -MD -MP -MF $(DEPDIR)/cmd_xfer.Tpo -c -o cmd_xfer.obj `if test -f 'cable/cmd_xfer.c'; then $(CYGPATH_W) 'cable/cmd_xfer.c'; else $(CYGPATH_W) '$(srcdir)/cable/cmd_xfer.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/cmd_xfer.Tpo $(DEPDIR)/cmd_xfer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cable/cmd_xfer.c' object='cmd_xfer.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cmd_xfer.obj `if test -f 'cable/cmd_xfer.c'; then $(CYGPATH_W) 'cable/cmd_xfer.c'; else $(CYGPATH_W) '$(srcdir)/cable/cmd_xfer.c'; fi`
 
 arcom.o: cable/arcom.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arcom.o -MD -MP -MF $(DEPDIR)/arcom.Tpo -c -o arcom.o `test -f 'cable/arcom.c' || echo '$(srcdir)/'`cable/arcom.c
@@ -733,33 +750,33 @@ jim.obj: cable/jim.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o jim.obj `if test -f 'cable/jim.c'; then $(CYGPATH_W) 'cable/jim.c'; else $(CYGPATH_W) '$(srcdir)/cable/jim.c'; fi`
 
-ftdi.o: parport/ftdi.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ftdi.o -MD -MP -MF $(DEPDIR)/ftdi.Tpo -c -o ftdi.o `test -f 'parport/ftdi.c' || echo '$(srcdir)/'`parport/ftdi.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/ftdi.Tpo $(DEPDIR)/ftdi.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='parport/ftdi.c' object='ftdi.o' libtool=no @AMDEPBACKSLASH@
+libftdi.o: usbconn/libftdi.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libftdi.o -MD -MP -MF $(DEPDIR)/libftdi.Tpo -c -o libftdi.o `test -f 'usbconn/libftdi.c' || echo '$(srcdir)/'`usbconn/libftdi.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libftdi.Tpo $(DEPDIR)/libftdi.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usbconn/libftdi.c' object='libftdi.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ftdi.o `test -f 'parport/ftdi.c' || echo '$(srcdir)/'`parport/ftdi.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libftdi.o `test -f 'usbconn/libftdi.c' || echo '$(srcdir)/'`usbconn/libftdi.c
 
-ftdi.obj: parport/ftdi.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ftdi.obj -MD -MP -MF $(DEPDIR)/ftdi.Tpo -c -o ftdi.obj `if test -f 'parport/ftdi.c'; then $(CYGPATH_W) 'parport/ftdi.c'; else $(CYGPATH_W) '$(srcdir)/parport/ftdi.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/ftdi.Tpo $(DEPDIR)/ftdi.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='parport/ftdi.c' object='ftdi.obj' libtool=no @AMDEPBACKSLASH@
+libftdi.obj: usbconn/libftdi.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libftdi.obj -MD -MP -MF $(DEPDIR)/libftdi.Tpo -c -o libftdi.obj `if test -f 'usbconn/libftdi.c'; then $(CYGPATH_W) 'usbconn/libftdi.c'; else $(CYGPATH_W) '$(srcdir)/usbconn/libftdi.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libftdi.Tpo $(DEPDIR)/libftdi.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usbconn/libftdi.c' object='libftdi.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ftdi.obj `if test -f 'parport/ftdi.c'; then $(CYGPATH_W) 'parport/ftdi.c'; else $(CYGPATH_W) '$(srcdir)/parport/ftdi.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libftdi.obj `if test -f 'usbconn/libftdi.c'; then $(CYGPATH_W) 'usbconn/libftdi.c'; else $(CYGPATH_W) '$(srcdir)/usbconn/libftdi.c'; fi`
 
-ftd2xx.o: parport/ftd2xx.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ftd2xx.o -MD -MP -MF $(DEPDIR)/ftd2xx.Tpo -c -o ftd2xx.o `test -f 'parport/ftd2xx.c' || echo '$(srcdir)/'`parport/ftd2xx.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/ftd2xx.Tpo $(DEPDIR)/ftd2xx.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='parport/ftd2xx.c' object='ftd2xx.o' libtool=no @AMDEPBACKSLASH@
+libftd2xx.o: usbconn/libftd2xx.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libftd2xx.o -MD -MP -MF $(DEPDIR)/libftd2xx.Tpo -c -o libftd2xx.o `test -f 'usbconn/libftd2xx.c' || echo '$(srcdir)/'`usbconn/libftd2xx.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libftd2xx.Tpo $(DEPDIR)/libftd2xx.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usbconn/libftd2xx.c' object='libftd2xx.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ftd2xx.o `test -f 'parport/ftd2xx.c' || echo '$(srcdir)/'`parport/ftd2xx.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libftd2xx.o `test -f 'usbconn/libftd2xx.c' || echo '$(srcdir)/'`usbconn/libftd2xx.c
 
-ftd2xx.obj: parport/ftd2xx.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ftd2xx.obj -MD -MP -MF $(DEPDIR)/ftd2xx.Tpo -c -o ftd2xx.obj `if test -f 'parport/ftd2xx.c'; then $(CYGPATH_W) 'parport/ftd2xx.c'; else $(CYGPATH_W) '$(srcdir)/parport/ftd2xx.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/ftd2xx.Tpo $(DEPDIR)/ftd2xx.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='parport/ftd2xx.c' object='ftd2xx.obj' libtool=no @AMDEPBACKSLASH@
+libftd2xx.obj: usbconn/libftd2xx.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libftd2xx.obj -MD -MP -MF $(DEPDIR)/libftd2xx.Tpo -c -o libftd2xx.obj `if test -f 'usbconn/libftd2xx.c'; then $(CYGPATH_W) 'usbconn/libftd2xx.c'; else $(CYGPATH_W) '$(srcdir)/usbconn/libftd2xx.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libftd2xx.Tpo $(DEPDIR)/libftd2xx.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='usbconn/libftd2xx.c' object='libftd2xx.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ftd2xx.obj `if test -f 'parport/ftd2xx.c'; then $(CYGPATH_W) 'parport/ftd2xx.c'; else $(CYGPATH_W) '$(srcdir)/parport/ftd2xx.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libftd2xx.obj `if test -f 'usbconn/libftd2xx.c'; then $(CYGPATH_W) 'usbconn/libftd2xx.c'; else $(CYGPATH_W) '$(srcdir)/usbconn/libftd2xx.c'; fi`
 
 direct.o: parport/direct.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT direct.o -MD -MP -MF $(DEPDIR)/direct.Tpo -c -o direct.o `test -f 'parport/direct.c' || echo '$(srcdir)/'`parport/direct.c
