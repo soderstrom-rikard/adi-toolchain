@@ -80,7 +80,6 @@ host_triplet = @host@
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/Makefile.rules svf_bison.c svf_bison.h \
 	svf_flex.c
-@BISON_LOCATIONS_TRUE@am__append_1 = --locations
 subdir = src/svf
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/gettext.m4 \
@@ -236,8 +235,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_YFLAGS = -d $(am__append_1)
-@BISON_LOCATIONS_TRUE@AM_LFLAGS = --bison-locations
+AM_YFLAGS = -d
 noinst_LIBRARIES = libsvf.a
 libsvf_a_SOURCES = \
 	svf_bison.y \

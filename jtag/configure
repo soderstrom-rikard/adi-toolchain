@@ -754,14 +754,12 @@ HAVE_LIBFTDI_FALSE
 HAVE_LIBFTD2XX_TRUE
 HAVE_LIBFTD2XX_FALSE
 FTD2XXLIB
-ENABLE_SVF_TRUE
-ENABLE_SVF_FALSE
 LEX
 LEX_OUTPUT_ROOT
 LEXLIB
 SED
-BISON_LOCATIONS_TRUE
-BISON_LOCATIONS_FALSE
+ENABLE_SVF_TRUE
+ENABLE_SVF_FALSE
 ENABLE_BSDL_TRUE
 ENABLE_BSDL_FALSE
 JEDEC_EXP_TRUE
@@ -9657,50 +9655,6 @@ CFLAGS="$CFLAGS -Wall"
 CPPFLAGS="$CPPFLAGS -I\$(top_srcdir) -I\$(top_srcdir)/include"
 
 
-# Check whether --enable-svf was given.
-if test "${enable_svf+set}" = set; then
-  enableval=$enable_svf; case "${enableval}" in
-   yes) svf=true ;;
-   no)  svf=false ;;
-   *)   { { $as_echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-svf" >&5
-$as_echo "$as_me: error: bad value ${enableval} for --enable-svf" >&2;}
-   { (exit 1); exit 1; }; } ;;
- esac
-else
-  svf=true
-fi
-
-if test "x$svf" = xtrue; then
-
-   if true; then
-  ENABLE_SVF_TRUE=
-  ENABLE_SVF_FALSE='#'
-else
-  ENABLE_SVF_TRUE='#'
-  ENABLE_SVF_FALSE=
-fi
-
-
-cat >>confdefs.h <<\_ACEOF
-#define ENABLE_SVF 1
-_ACEOF
-
-
-else
-
-   if false; then
-  ENABLE_SVF_TRUE=
-  ENABLE_SVF_FALSE='#'
-else
-  ENABLE_SVF_TRUE='#'
-  ENABLE_SVF_FALSE=
-fi
-
-
-fi
-
-
-
 # check for lex/flex
 for ac_prog in flex lex
 do
@@ -10084,84 +10038,26 @@ fi
    flex_v2=`echo $flex_version | $AWK -F . '{print $2}' | $SED -e 's/a-zA-Z//g'`
    flex_v3=`echo $flex_version | $AWK -F . '{print $3}' | $SED -e 's/a-zA-Z//g'`
 
-   # bison error locations require flex >= 2.5.31
-   flex_ref_v1=2
-   flex_ref_v2=5
-   flex_ref_v3=31
-   flex_ref_version="$flex_ref_v1.$flex_ref_v2.$flex_ref_v3"
-   { $as_echo "$as_me:$LINENO: checking for flex >= $flex_ref_version, required for SVF error locations" >&5
-$as_echo_n "checking for flex >= $flex_ref_version, required for SVF error locations... " >&6; }
-   #
-   if ver_ge_ver $flex_v1 $flex_v2 $flex_v3 $flex_ref_v1 $flex_ref_v2 $flex_ref_v3; then
-
-      { $as_echo "$as_me:$LINENO: result: yes - flex $flex_version" >&5
-$as_echo "yes - flex $flex_version" >&6; }
-       if true; then
-  BISON_LOCATIONS_TRUE=
-  BISON_LOCATIONS_FALSE='#'
-else
-  BISON_LOCATIONS_TRUE='#'
-  BISON_LOCATIONS_FALSE=
-fi
-
-      bison_locations=yes
-
-else
-
-      if test -r src/svf/svf_flex.c; then
-
-         # If the transformed svf_flex.c is already existing, it shouldn't matter
-         # that flex is too old for building a lexer with bison locations
-         { $as_echo "$as_me:$LINENO: result: using pre-generated src/svf/svf_flex.c" >&5
-$as_echo "using pre-generated src/svf/svf_flex.c" >&6; }
-          if false; then
-  BISON_LOCATIONS_TRUE=
-  BISON_LOCATIONS_FALSE='#'
-else
-  BISON_LOCATIONS_TRUE='#'
-  BISON_LOCATIONS_FALSE=
-fi
-
-         bison_locations="as is"
-
-else
-
-         { $as_echo "$as_me:$LINENO: result: no - flex $flex_version" >&5
-$as_echo "no - flex $flex_version" >&6; }
-          if false; then
-  BISON_LOCATIONS_TRUE=
-  BISON_LOCATIONS_FALSE='#'
-else
-  BISON_LOCATIONS_TRUE='#'
-  BISON_LOCATIONS_FALSE=
-fi
-
-         bison_locations=no
-
-fi
-
-
-fi
-
-
-   # bsdl lexer requires flex >= 2.5.33
+   # svf and bsdl lexer require flex >= 2.5.33
    flex_ref_v1=2
    flex_ref_v2=5
    flex_ref_v3=33
    flex_ref_version="$flex_ref_v1.$flex_ref_v2.$flex_ref_v3"
-   { $as_echo "$as_me:$LINENO: checking for flex >= $flex_ref_version, required for BSDL lexer" >&5
-$as_echo_n "checking for flex >= $flex_ref_version, required for BSDL lexer... " >&6; }
+   { $as_echo "$as_me:$LINENO: checking for flex >= $flex_ref_version, required for SVF and BSDL lexer" >&5
+$as_echo_n "checking for flex >= $flex_ref_version, required for SVF and BSDL lexer... " >&6; }
    #
    if ver_ge_ver $flex_v1 $flex_v2 $flex_v3 $flex_ref_v1 $flex_ref_v2 $flex_ref_v3; then
 
       { $as_echo "$as_me:$LINENO: result: yes - flex $flex_version" >&5
 $as_echo "yes - flex $flex_version" >&6; }
+      svf_lexer=true
       bsdl_lexer=true
 
 else
 
       { $as_echo "$as_me:$LINENO: result: no - flex $flex_version" >&5
 $as_echo "no - flex $flex_version" >&6; }
+      svf_lexer=false
       bsdl_lexer=false
 
 fi
@@ -10169,16 +10065,64 @@ fi
 
 else
 
-   bison_locations=no
-    if false; then
-  BISON_LOCATIONS_TRUE=
-  BISON_LOCATIONS_FALSE='#'
-else
-  BISON_LOCATIONS_TRUE='#'
-  BISON_LOCATIONS_FALSE=
+   svf_lexer=false
+   bsdl_lexer=false
+
 fi
 
-   bsdl_lexer=false
+
+
+if test "x$svf_lexer" == xfalse; then
+
+   if test -r src/svf/svf_flex.c; then
+
+      svf_lexer=true
+
+fi
+
+
+fi
+
+
+# Check whether --enable-svf was given.
+if test "${enable_svf+set}" = set; then
+  enableval=$enable_svf; case "${enableval}" in
+   yes) svf=true ;;
+   no)  svf=false ;;
+   *)   { { $as_echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-svf" >&5
+$as_echo "$as_me: error: bad value ${enableval} for --enable-svf" >&2;}
+   { (exit 1); exit 1; }; } ;;
+ esac
+else
+  svf=$svf_lexer
+fi
+
+if test "x$svf" = xtrue; then
+
+   if true; then
+  ENABLE_SVF_TRUE=
+  ENABLE_SVF_FALSE='#'
+else
+  ENABLE_SVF_TRUE='#'
+  ENABLE_SVF_FALSE=
+fi
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_SVF 1
+_ACEOF
+
+
+else
+
+   if false; then
+  ENABLE_SVF_TRUE=
+  ENABLE_SVF_FALSE='#'
+else
+  ENABLE_SVF_TRUE='#'
+  ENABLE_SVF_FALSE=
+fi
+
 
 fi
 
@@ -10194,7 +10138,6 @@ fi
 
 
 fi
-
 
 
 # Check whether --enable-bsdl was given.
@@ -12375,34 +12318,6 @@ if test -z "${ENABLE_SVF_TRUE}" && test -z "${ENABLE_SVF_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_SVF\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"ENABLE_SVF\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${BISON_LOCATIONS_TRUE}" && test -z "${BISON_LOCATIONS_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"BISON_LOCATIONS\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"BISON_LOCATIONS\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${BISON_LOCATIONS_TRUE}" && test -z "${BISON_LOCATIONS_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"BISON_LOCATIONS\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"BISON_LOCATIONS\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${BISON_LOCATIONS_TRUE}" && test -z "${BISON_LOCATIONS_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"BISON_LOCATIONS\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"BISON_LOCATIONS\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${BISON_LOCATIONS_TRUE}" && test -z "${BISON_LOCATIONS_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"BISON_LOCATIONS\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"BISON_LOCATIONS\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -14726,7 +14641,6 @@ jtag is now configured for
   Detected libusb      : $FLAG_HAVELIBUSB
   Detected libftdi     : $FLAG_HAVELIBFTDI
   Detected libftd2xx   : $FLAG_HAVELIBFTD2XX
-  SVF error locations  : $bison_locations
   Build SVF player     : $FLAG_SVF
   Build BSDL subsystem : $FLAG_BSDL
   Bus drivers          : $enabled_bus_drivers
@@ -14740,7 +14654,6 @@ jtag is now configured for
   Detected libusb      : $FLAG_HAVELIBUSB
   Detected libftdi     : $FLAG_HAVELIBFTDI
   Detected libftd2xx   : $FLAG_HAVELIBFTD2XX
-  SVF error locations  : $bison_locations
   Build SVF player     : $FLAG_SVF
   Build BSDL subsystem : $FLAG_BSDL
   Bus drivers          : $enabled_bus_drivers
