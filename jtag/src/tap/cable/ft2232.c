@@ -1456,14 +1456,14 @@ cable_driver_t ft2232_gnice_cable_driver = {
   ft2232_usbcable_help
 };
 usbconn_cable_t usbconn_cable_gnice_ftdi = {
-  "gnICE",       /* cable name */
+  "gnICE",            /* cable name */
   NULL,               /* string pattern, not used */
   "ftdi-mpsse",       /* default usbconn driver */
   0x0456,             /* VID */
   0xF000              /* PID */
 };
 usbconn_cable_t usbconn_cable_gnice_ftd2xx = {
-  "gnICE",       /* cable name */
+  "gnICE",            /* cable name */
   NULL,               /* string pattern, not used */
   "ftd2xx-mpsse",     /* default usbconn driver */
   0x0456,             /* VID */

@@ -358,7 +358,7 @@ const bus_driver_t bf527_ezkit_bus = {
 	BF537_STAMP_BUS_FUNCTIONS
 };
 
-#endif /* #ifdef ENABLE_BUS_BF537_EZKIT */
+#endif /* #ifdef ENABLE_BUS_BF527_EZKIT */
 
 #ifdef ENABLE_BUS_BF538F_EZKIT
 
