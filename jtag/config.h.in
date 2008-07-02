@@ -6,6 +6,9 @@
 /* define if au1500 is enabled */
 #undef ENABLE_BUS_AU1500
 
+/* define if avr32 is enabled */
+#undef ENABLE_BUS_AVR32
+
 /* define if bcm1250 is enabled */
 #undef ENABLE_BUS_BCM1250
 

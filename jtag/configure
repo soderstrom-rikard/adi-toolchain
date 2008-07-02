@@ -766,6 +766,8 @@ JEDEC_EXP_TRUE
 JEDEC_EXP_FALSE
 ENABLE_BUS_AU1500_TRUE
 ENABLE_BUS_AU1500_FALSE
+ENABLE_BUS_AVR32_TRUE
+ENABLE_BUS_AVR32_FALSE
 ENABLE_BUS_BCM1250_TRUE
 ENABLE_BUS_BCM1250_FALSE
 ENABLE_BUS_BF526_EZKIT_TRUE
@@ -1551,12 +1553,12 @@ Optional Features:
   --enable-jedec-exp      Enable experimental JEDEC flash detection
   --enable-bus            Enable default set or specific bus drivers:
                           'default' enables:
-                          au1500 bcm1250 bf526_ezkit bf527_ezkit bf533_stamp
-                          bf533_ezkit bf537_stamp bf537_ezkit bf538f_ezkit
-                          bf548_ezkit bf561_ezkit ejtag fjmem ixp425 jopcyc
-                          h7202 lh7a400 mpc5200 mpc824x ppc405ep ppc440gx_ebc8
-                          prototype pxa2x0 pxa27x s3c4510 sa1110 sh7727
-                          sh7750r sh7751r sharc_21065L slsup3 tx4925
+                          au1500 avr32 bcm1250 bf526_ezkit bf527_ezkit
+                          bf533_stamp bf533_ezkit bf537_stamp bf537_ezkit
+                          bf538f_ezkit bf548_ezkit bf561_ezkit ejtag fjmem
+                          ixp425 jopcyc h7202 lh7a400 mpc5200 mpc824x ppc405ep
+                          ppc440gx_ebc8 prototype pxa2x0 pxa27x s3c4510 sa1110
+                          sh7727 sh7750r sh7751r sharc_21065L slsup3 tx4925
                           zefant_xs3
 
   --enable-cable          Enable default set or specific cable drivers.
@@ -10318,7 +10320,7 @@ fi
 
 # expand 'default' to default enabled busdrivers
 busdrivers=`echo ${busdrivers} | $SED -e "s/default/\
-au1500 bcm1250 bf526_ezkit bf527_ezkit bf533_stamp bf533_ezkit bf537_stamp bf537_ezkit bf538f_ezkit bf548_ezkit bf561_ezkit ejtag \
+au1500 avr32 bcm1250 bf526_ezkit bf527_ezkit bf533_stamp bf533_ezkit bf537_stamp bf537_ezkit bf538f_ezkit bf548_ezkit bf561_ezkit ejtag \
 fjmem ixp425 jopcyc h7202 lh7a400  mpc5200 mpc824x ppc405ep ppc440gx_ebc8 prototype pxa2x0 pxa27x \
 s3c4510 sa1110 sh7727 sh7750r sh7751r sharc_21065L slsup3 tx4925 zefant_xs3/"`
 #
@@ -10349,6 +10351,38 @@ else
 else
   ENABLE_BUS_AU1500_TRUE='#'
   ENABLE_BUS_AU1500_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q avr32; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_AVR32 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_AVR32_TRUE=
+  ENABLE_BUS_AVR32_FALSE='#'
+else
+  ENABLE_BUS_AVR32_TRUE='#'
+  ENABLE_BUS_AVR32_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}avr32 "
+
+else
+
+        if false; then
+  ENABLE_BUS_AVR32_TRUE=
+  ENABLE_BUS_AVR32_FALSE='#'
+else
+  ENABLE_BUS_AVR32_TRUE='#'
+  ENABLE_BUS_AVR32_FALSE=
 fi
 
 
@@ -12430,6 +12464,20 @@ if test -z "${ENABLE_BUS_AU1500_TRUE}" && test -z "${ENABLE_BUS_AU1500_FALSE}"; 
   { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_AU1500\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"ENABLE_BUS_AU1500\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_AVR32_TRUE}" && test -z "${ENABLE_BUS_AVR32_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_AVR32\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_AVR32\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_AVR32_TRUE}" && test -z "${ENABLE_BUS_AVR32_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_AVR32\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_AVR32\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
