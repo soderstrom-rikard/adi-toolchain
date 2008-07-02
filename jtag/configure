@@ -9509,7 +9509,7 @@ fi
 
 
 FTD2XXLIB=
-if test "x$with_ftd2xx" == xyes -o "x$with_ftd2xx" = xcheck; then
+if test "x$with_ftd2xx" = xyes -o "x$with_ftd2xx" = xcheck; then
 
   { $as_echo "$as_me:$LINENO: checking for FT_Open in -lftd2xx" >&5
 $as_echo_n "checking for FT_Open in -lftd2xx... " >&6; }
@@ -9619,7 +9619,7 @@ fi
 
 fi
 
-if test "x$HAVELIBFTD2XX" == xyes; then
+if test "x$HAVELIBFTD2XX" = xyes; then
 
    if true; then
   HAVE_LIBFTD2XX_TRUE=
@@ -9984,7 +9984,7 @@ $as_echo "$ac_cv_path_SED" >&6; }
   rm -f conftest.sed
 
 
-if test "$LEX" == flex; then
+if test "$LEX" = flex; then
 
    ver_ge_ver () {
       v1=$1
@@ -10027,7 +10027,7 @@ fi
    }
 
    flex_version=`$LEX --version | $AWK '{print $2}'`
-   if test "$flex_version" == "version"; then
+   if test "$flex_version" = "version"; then
 
        flex_version=`$LEX --version | $AWK '{print $3}'`
 
@@ -10072,7 +10072,7 @@ fi
 
 
 
-if test "x$svf_lexer" == xfalse; then
+if test "x$svf_lexer" = xfalse; then
 
    if test -r src/svf/svf_flex.c; then
 
@@ -10128,7 +10128,7 @@ fi
 
 
 
-if test "x$bsdl_lexer" == xfalse; then
+if test "x$bsdl_lexer" = xfalse; then
 
    if test -r src/bsdl/bsdl_flex.c; then
 
