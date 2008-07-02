@@ -1,5 +1,5 @@
 /*
- * $Id: bsdl.h 1102 2008-02-27 03:38:31Z jiez $
+ * $Id$
  *
  * Copyright (C) 2007, Arnim Laeuger
  *
@@ -21,6 +21,9 @@
  * Written by Arnim Laeuger <arniml@users.sourceforge.net>, 2007.
  *
  */
+
+#ifndef BSDL_LOCAL_H
+#define BSDL_LOCAL_H
 
 #include <jtag.h>
 
@@ -175,3 +178,5 @@ void bsdl_ac_set_register(parser_priv_t *, char *, int);
 void bsdl_ac_add_instruction(parser_priv_t *, char *);
 void bsdl_ac_apply_assoc(parser_priv_t *);
 void bsdl_ac_finalize(parser_priv_t *);
+
+#endif /* BSDL_LOCAL_H */
