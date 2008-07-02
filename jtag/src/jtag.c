@@ -384,7 +384,6 @@ main( int argc, char *const argv[] )
 		exit(0);
 	}
 
-
 	/* input from files */
 	if (argc > optind) {
 		for (i = optind; i < argc; i++) {
