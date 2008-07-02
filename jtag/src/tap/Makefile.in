@@ -81,24 +81,72 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/Makefile.rules
-@HAVE_LIBUSB_TRUE@am__append_1 = \
-@HAVE_LIBUSB_TRUE@	cable/xpc.c \
-@HAVE_LIBUSB_TRUE@	cable/jlink.c \
+@ENABLE_CABLE_ARCOM_TRUE@am__append_1 = \
+@ENABLE_CABLE_ARCOM_TRUE@	cable/arcom.c
+
+@ENABLE_CABLE_BYTEBLASTER_TRUE@am__append_2 = \
+@ENABLE_CABLE_BYTEBLASTER_TRUE@	cable/byteblaster.c
+
+@ENABLE_CABLE_DLC5_TRUE@am__append_3 = \
+@ENABLE_CABLE_DLC5_TRUE@	cable/dlc5.c
+
+@ENABLE_CABLE_EA253_TRUE@am__append_4 = \
+@ENABLE_CABLE_EA253_TRUE@	cable/ea253.c
+
+@ENABLE_CABLE_EI012_TRUE@am__append_5 = \
+@ENABLE_CABLE_EI012_TRUE@	cable/ei012.c
+
+@ENABLE_CABLE_KEITHKOEP_TRUE@am__append_6 = \
+@ENABLE_CABLE_KEITHKOEP_TRUE@	cable/keithkoep.c
+
+@ENABLE_CABLE_LATTICE_TRUE@am__append_7 = \
+@ENABLE_CABLE_LATTICE_TRUE@	cable/lattice.c
+
+@ENABLE_CABLE_MPCBDM_TRUE@am__append_8 = \
+@ENABLE_CABLE_MPCBDM_TRUE@	cable/mpcbdm.c
+
+@ENABLE_CABLE_TRITON_TRUE@am__append_9 = \
+@ENABLE_CABLE_TRITON_TRUE@	cable/triton.c
+
+@ENABLE_CABLE_WIGGLER_TRUE@am__append_10 = \
+@ENABLE_CABLE_WIGGLER_TRUE@	cable/wiggler.c \
+@ENABLE_CABLE_WIGGLER_TRUE@	cable/wiggler2.c
+
+@ENABLE_CABLE_JLINK_TRUE@am__append_11 = \
+@ENABLE_CABLE_JLINK_TRUE@	cable/jlink.c
+
+@ENABLE_CABLE_XPC_TRUE@am__append_12 = \
+@ENABLE_CABLE_XPC_TRUE@	cable/xpc.c
+
+@ENABLE_CABLE_USBBLASTER_TRUE@am__append_13 = \
+@ENABLE_CABLE_USBBLASTER_TRUE@	cable/usbblaster.c
+
+@ENABLE_CABLE_FT2232_TRUE@am__append_14 = \
+@ENABLE_CABLE_FT2232_TRUE@	cable/ft2232.c
+
+@HAVE_LIBUSB_TRUE@am__append_15 = \
 @HAVE_LIBUSB_TRUE@	usbconn/libusb.c
 
-@ENABLE_JIM_TRUE@am__append_2 = \
+@ENABLE_JIM_TRUE@am__append_16 = \
 @ENABLE_JIM_TRUE@	cable/jim.c
 
-@HAVE_LIBFTDI_TRUE@am__append_3 = \
-@HAVE_LIBFTDI_TRUE@	parport/ftdi.c
+@ENABLE_PARPORT_FTDI_TRUE@am__append_17 = \
+@ENABLE_PARPORT_FTDI_TRUE@	parport/ftdi.c
 
-@HAVE_LIBFTD2XX_TRUE@am__append_4 = \
-@HAVE_LIBFTD2XX_TRUE@	parport/ftd2xx.c
+@ENABLE_PARPORT_FTD2XX_TRUE@am__append_18 = \
+@ENABLE_PARPORT_FTD2XX_TRUE@	parport/ftd2xx.c
 
-@HAVE_LIBFTDI_TRUE@am__append_5 = $(FTDIDEPENDENT)
-@HAVE_LIBFTD2XX_TRUE@@HAVE_LIBFTDI_FALSE@am__append_6 = $(FTDIDEPENDENT)
-@ENABLE_EP9307_TRUE@am__append_7 = \
-@ENABLE_EP9307_TRUE@	cable/vision_ep9307.c
+@ENABLE_PARPORT_DIRECT_TRUE@am__append_19 = \
+@ENABLE_PARPORT_DIRECT_TRUE@	parport/direct.c
+
+@ENABLE_PARPORT_PPDEV_TRUE@am__append_20 = \
+@ENABLE_PARPORT_PPDEV_TRUE@	parport/ppdev.c
+
+@ENABLE_PARPORT_PPI_TRUE@am__append_21 = \
+@ENABLE_PARPORT_PPI_TRUE@	parport/ppi.c
+
+@ENABLE_CABLE_EP9307_TRUE@am__append_22 = \
+@ENABLE_CABLE_EP9307_TRUE@	cable/vision_ep9307.c
 
 subdir = src/tap
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -119,38 +167,51 @@ ARFLAGS = cru
 libtap_a_AR = $(AR) $(ARFLAGS)
 libtap_a_LIBADD =
 am__libtap_a_SOURCES_DIST = tap.c register.c state.c chain.c detect.c \
-	discovery.c parport.c parport/direct.c parport/ppdev.c \
-	parport/ppi.c usbconn.c cable.c cable/generic.h \
+	discovery.c parport.c usbconn.c cable.c cable/generic.h \
 	cable/generic.c cable/generic_usbconn.h \
 	cable/generic_usbconn.c cable/generic_parport.h \
 	cable/generic_parport.c cable/arcom.c cable/byteblaster.c \
 	cable/dlc5.c cable/ea253.c cable/ei012.c cable/keithkoep.c \
 	cable/lattice.c cable/mpcbdm.c cable/triton.c cable/wiggler.c \
-	cable/wiggler2.c cable/xpc.c cable/jlink.c usbconn/libusb.c \
-	cable/jim.c parport/ftdi.c parport/ftd2xx.c cable/usbblaster.c \
-	cable/ft2232.c cable/vision_ep9307.c
-@HAVE_LIBUSB_TRUE@am__objects_1 = xpc.$(OBJEXT) jlink.$(OBJEXT) \
-@HAVE_LIBUSB_TRUE@	libusb.$(OBJEXT)
-@ENABLE_JIM_TRUE@am__objects_2 = jim.$(OBJEXT)
-@HAVE_LIBFTDI_TRUE@am__objects_3 = ftdi.$(OBJEXT)
-@HAVE_LIBFTD2XX_TRUE@am__objects_4 = ftd2xx.$(OBJEXT)
-am__objects_5 = usbblaster.$(OBJEXT) ft2232.$(OBJEXT)
-@HAVE_LIBFTDI_TRUE@am__objects_6 = $(am__objects_5)
-@HAVE_LIBFTD2XX_TRUE@@HAVE_LIBFTDI_FALSE@am__objects_7 =  \
-@HAVE_LIBFTD2XX_TRUE@@HAVE_LIBFTDI_FALSE@	$(am__objects_5)
-@ENABLE_EP9307_TRUE@am__objects_8 = vision_ep9307.$(OBJEXT)
+	cable/wiggler2.c cable/jlink.c cable/xpc.c cable/usbblaster.c \
+	cable/ft2232.c usbconn/libusb.c cable/jim.c parport/ftdi.c \
+	parport/ftd2xx.c parport/direct.c parport/ppdev.c \
+	parport/ppi.c cable/vision_ep9307.c
+@ENABLE_CABLE_ARCOM_TRUE@am__objects_1 = arcom.$(OBJEXT)
+@ENABLE_CABLE_BYTEBLASTER_TRUE@am__objects_2 = byteblaster.$(OBJEXT)
+@ENABLE_CABLE_DLC5_TRUE@am__objects_3 = dlc5.$(OBJEXT)
+@ENABLE_CABLE_EA253_TRUE@am__objects_4 = ea253.$(OBJEXT)
+@ENABLE_CABLE_EI012_TRUE@am__objects_5 = ei012.$(OBJEXT)
+@ENABLE_CABLE_KEITHKOEP_TRUE@am__objects_6 = keithkoep.$(OBJEXT)
+@ENABLE_CABLE_LATTICE_TRUE@am__objects_7 = lattice.$(OBJEXT)
+@ENABLE_CABLE_MPCBDM_TRUE@am__objects_8 = mpcbdm.$(OBJEXT)
+@ENABLE_CABLE_TRITON_TRUE@am__objects_9 = triton.$(OBJEXT)
+@ENABLE_CABLE_WIGGLER_TRUE@am__objects_10 = wiggler.$(OBJEXT) \
+@ENABLE_CABLE_WIGGLER_TRUE@	wiggler2.$(OBJEXT)
+@ENABLE_CABLE_JLINK_TRUE@am__objects_11 = jlink.$(OBJEXT)
+@ENABLE_CABLE_XPC_TRUE@am__objects_12 = xpc.$(OBJEXT)
+@ENABLE_CABLE_USBBLASTER_TRUE@am__objects_13 = usbblaster.$(OBJEXT)
+@ENABLE_CABLE_FT2232_TRUE@am__objects_14 = ft2232.$(OBJEXT)
+@HAVE_LIBUSB_TRUE@am__objects_15 = libusb.$(OBJEXT)
+@ENABLE_JIM_TRUE@am__objects_16 = jim.$(OBJEXT)
+@ENABLE_PARPORT_FTDI_TRUE@am__objects_17 = ftdi.$(OBJEXT)
+@ENABLE_PARPORT_FTD2XX_TRUE@am__objects_18 = ftd2xx.$(OBJEXT)
+@ENABLE_PARPORT_DIRECT_TRUE@am__objects_19 = direct.$(OBJEXT)
+@ENABLE_PARPORT_PPDEV_TRUE@am__objects_20 = ppdev.$(OBJEXT)
+@ENABLE_PARPORT_PPI_TRUE@am__objects_21 = ppi.$(OBJEXT)
+@ENABLE_CABLE_EP9307_TRUE@am__objects_22 = vision_ep9307.$(OBJEXT)
 am_libtap_a_OBJECTS = tap.$(OBJEXT) register.$(OBJEXT) state.$(OBJEXT) \
 	chain.$(OBJEXT) detect.$(OBJEXT) discovery.$(OBJEXT) \
-	parport.$(OBJEXT) direct.$(OBJEXT) ppdev.$(OBJEXT) \
-	ppi.$(OBJEXT) usbconn.$(OBJEXT) cable.$(OBJEXT) \
+	parport.$(OBJEXT) usbconn.$(OBJEXT) cable.$(OBJEXT) \
 	generic.$(OBJEXT) generic_usbconn.$(OBJEXT) \
-	generic_parport.$(OBJEXT) arcom.$(OBJEXT) \
-	byteblaster.$(OBJEXT) dlc5.$(OBJEXT) ea253.$(OBJEXT) \
-	ei012.$(OBJEXT) keithkoep.$(OBJEXT) lattice.$(OBJEXT) \
-	mpcbdm.$(OBJEXT) triton.$(OBJEXT) wiggler.$(OBJEXT) \
-	wiggler2.$(OBJEXT) $(am__objects_1) $(am__objects_2) \
-	$(am__objects_3) $(am__objects_4) $(am__objects_6) \
-	$(am__objects_7) $(am__objects_8)
+	generic_parport.$(OBJEXT) $(am__objects_1) $(am__objects_2) \
+	$(am__objects_3) $(am__objects_4) $(am__objects_5) \
+	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
+	$(am__objects_9) $(am__objects_10) $(am__objects_11) \
+	$(am__objects_12) $(am__objects_13) $(am__objects_14) \
+	$(am__objects_15) $(am__objects_16) $(am__objects_17) \
+	$(am__objects_18) $(am__objects_19) $(am__objects_20) \
+	$(am__objects_21) $(am__objects_22)
 libtap_a_OBJECTS = $(am_libtap_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/tools/depcomp
@@ -283,20 +344,17 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 noinst_LIBRARIES = libtap.a
 libtap_a_SOURCES = tap.c register.c state.c chain.c detect.c \
-	discovery.c parport.c parport/direct.c parport/ppdev.c \
-	parport/ppi.c usbconn.c cable.c cable/generic.h \
+	discovery.c parport.c usbconn.c cable.c cable/generic.h \
 	cable/generic.c cable/generic_usbconn.h \
 	cable/generic_usbconn.c cable/generic_parport.h \
-	cable/generic_parport.c cable/arcom.c cable/byteblaster.c \
-	cable/dlc5.c cable/ea253.c cable/ei012.c cable/keithkoep.c \
-	cable/lattice.c cable/mpcbdm.c cable/triton.c cable/wiggler.c \
-	cable/wiggler2.c $(am__append_1) $(am__append_2) \
+	cable/generic_parport.c $(am__append_1) $(am__append_2) \
 	$(am__append_3) $(am__append_4) $(am__append_5) \
-	$(am__append_6) $(am__append_7)
-FTDIDEPENDENT = \
-	cable/usbblaster.c \
-	cable/ft2232.c
-
+	$(am__append_6) $(am__append_7) $(am__append_8) \
+	$(am__append_9) $(am__append_10) $(am__append_11) \
+	$(am__append_12) $(am__append_13) $(am__append_14) \
+	$(am__append_15) $(am__append_16) $(am__append_17) \
+	$(am__append_18) $(am__append_19) $(am__append_20) \
+	$(am__append_21) $(am__append_22)
 all: all-am
 
 .SUFFIXES:
@@ -393,48 +451,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
-
-direct.o: parport/direct.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT direct.o -MD -MP -MF $(DEPDIR)/direct.Tpo -c -o direct.o `test -f 'parport/direct.c' || echo '$(srcdir)/'`parport/direct.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/direct.Tpo $(DEPDIR)/direct.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='parport/direct.c' object='direct.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o direct.o `test -f 'parport/direct.c' || echo '$(srcdir)/'`parport/direct.c
-
-direct.obj: parport/direct.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT direct.obj -MD -MP -MF $(DEPDIR)/direct.Tpo -c -o direct.obj `if test -f 'parport/direct.c'; then $(CYGPATH_W) 'parport/direct.c'; else $(CYGPATH_W) '$(srcdir)/parport/direct.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/direct.Tpo $(DEPDIR)/direct.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='parport/direct.c' object='direct.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o direct.obj `if test -f 'parport/direct.c'; then $(CYGPATH_W) 'parport/direct.c'; else $(CYGPATH_W) '$(srcdir)/parport/direct.c'; fi`
-
-ppdev.o: parport/ppdev.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ppdev.o -MD -MP -MF $(DEPDIR)/ppdev.Tpo -c -o ppdev.o `test -f 'parport/ppdev.c' || echo '$(srcdir)/'`parport/ppdev.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/ppdev.Tpo $(DEPDIR)/ppdev.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='parport/ppdev.c' object='ppdev.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ppdev.o `test -f 'parport/ppdev.c' || echo '$(srcdir)/'`parport/ppdev.c
-
-ppdev.obj: parport/ppdev.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ppdev.obj -MD -MP -MF $(DEPDIR)/ppdev.Tpo -c -o ppdev.obj `if test -f 'parport/ppdev.c'; then $(CYGPATH_W) 'parport/ppdev.c'; else $(CYGPATH_W) '$(srcdir)/parport/ppdev.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/ppdev.Tpo $(DEPDIR)/ppdev.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='parport/ppdev.c' object='ppdev.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ppdev.obj `if test -f 'parport/ppdev.c'; then $(CYGPATH_W) 'parport/ppdev.c'; else $(CYGPATH_W) '$(srcdir)/parport/ppdev.c'; fi`
-
-ppi.o: parport/ppi.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ppi.o -MD -MP -MF $(DEPDIR)/ppi.Tpo -c -o ppi.o `test -f 'parport/ppi.c' || echo '$(srcdir)/'`parport/ppi.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/ppi.Tpo $(DEPDIR)/ppi.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='parport/ppi.c' object='ppi.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ppi.o `test -f 'parport/ppi.c' || echo '$(srcdir)/'`parport/ppi.c
-
-ppi.obj: parport/ppi.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ppi.obj -MD -MP -MF $(DEPDIR)/ppi.Tpo -c -o ppi.obj `if test -f 'parport/ppi.c'; then $(CYGPATH_W) 'parport/ppi.c'; else $(CYGPATH_W) '$(srcdir)/parport/ppi.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/ppi.Tpo $(DEPDIR)/ppi.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='parport/ppi.c' object='ppi.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ppi.obj `if test -f 'parport/ppi.c'; then $(CYGPATH_W) 'parport/ppi.c'; else $(CYGPATH_W) '$(srcdir)/parport/ppi.c'; fi`
 
 generic.o: cable/generic.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT generic.o -MD -MP -MF $(DEPDIR)/generic.Tpo -c -o generic.o `test -f 'cable/generic.c' || echo '$(srcdir)/'`cable/generic.c
@@ -632,6 +648,20 @@ wiggler2.obj: cable/wiggler2.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o wiggler2.obj `if test -f 'cable/wiggler2.c'; then $(CYGPATH_W) 'cable/wiggler2.c'; else $(CYGPATH_W) '$(srcdir)/cable/wiggler2.c'; fi`
 
+jlink.o: cable/jlink.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT jlink.o -MD -MP -MF $(DEPDIR)/jlink.Tpo -c -o jlink.o `test -f 'cable/jlink.c' || echo '$(srcdir)/'`cable/jlink.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/jlink.Tpo $(DEPDIR)/jlink.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cable/jlink.c' object='jlink.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o jlink.o `test -f 'cable/jlink.c' || echo '$(srcdir)/'`cable/jlink.c
+
+jlink.obj: cable/jlink.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT jlink.obj -MD -MP -MF $(DEPDIR)/jlink.Tpo -c -o jlink.obj `if test -f 'cable/jlink.c'; then $(CYGPATH_W) 'cable/jlink.c'; else $(CYGPATH_W) '$(srcdir)/cable/jlink.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/jlink.Tpo $(DEPDIR)/jlink.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cable/jlink.c' object='jlink.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o jlink.obj `if test -f 'cable/jlink.c'; then $(CYGPATH_W) 'cable/jlink.c'; else $(CYGPATH_W) '$(srcdir)/cable/jlink.c'; fi`
+
 xpc.o: cable/xpc.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT xpc.o -MD -MP -MF $(DEPDIR)/xpc.Tpo -c -o xpc.o `test -f 'cable/xpc.c' || echo '$(srcdir)/'`cable/xpc.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/xpc.Tpo $(DEPDIR)/xpc.Po
@@ -646,19 +676,33 @@ xpc.obj: cable/xpc.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o xpc.obj `if test -f 'cable/xpc.c'; then $(CYGPATH_W) 'cable/xpc.c'; else $(CYGPATH_W) '$(srcdir)/cable/xpc.c'; fi`
 
-jlink.o: cable/jlink.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT jlink.o -MD -MP -MF $(DEPDIR)/jlink.Tpo -c -o jlink.o `test -f 'cable/jlink.c' || echo '$(srcdir)/'`cable/jlink.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/jlink.Tpo $(DEPDIR)/jlink.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cable/jlink.c' object='jlink.o' libtool=no @AMDEPBACKSLASH@
+usbblaster.o: cable/usbblaster.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT usbblaster.o -MD -MP -MF $(DEPDIR)/usbblaster.Tpo -c -o usbblaster.o `test -f 'cable/usbblaster.c' || echo '$(srcdir)/'`cable/usbblaster.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/usbblaster.Tpo $(DEPDIR)/usbblaster.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cable/usbblaster.c' object='usbblaster.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o jlink.o `test -f 'cable/jlink.c' || echo '$(srcdir)/'`cable/jlink.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o usbblaster.o `test -f 'cable/usbblaster.c' || echo '$(srcdir)/'`cable/usbblaster.c
 
-jlink.obj: cable/jlink.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT jlink.obj -MD -MP -MF $(DEPDIR)/jlink.Tpo -c -o jlink.obj `if test -f 'cable/jlink.c'; then $(CYGPATH_W) 'cable/jlink.c'; else $(CYGPATH_W) '$(srcdir)/cable/jlink.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/jlink.Tpo $(DEPDIR)/jlink.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cable/jlink.c' object='jlink.obj' libtool=no @AMDEPBACKSLASH@
+usbblaster.obj: cable/usbblaster.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT usbblaster.obj -MD -MP -MF $(DEPDIR)/usbblaster.Tpo -c -o usbblaster.obj `if test -f 'cable/usbblaster.c'; then $(CYGPATH_W) 'cable/usbblaster.c'; else $(CYGPATH_W) '$(srcdir)/cable/usbblaster.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/usbblaster.Tpo $(DEPDIR)/usbblaster.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cable/usbblaster.c' object='usbblaster.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o jlink.obj `if test -f 'cable/jlink.c'; then $(CYGPATH_W) 'cable/jlink.c'; else $(CYGPATH_W) '$(srcdir)/cable/jlink.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o usbblaster.obj `if test -f 'cable/usbblaster.c'; then $(CYGPATH_W) 'cable/usbblaster.c'; else $(CYGPATH_W) '$(srcdir)/cable/usbblaster.c'; fi`
+
+ft2232.o: cable/ft2232.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ft2232.o -MD -MP -MF $(DEPDIR)/ft2232.Tpo -c -o ft2232.o `test -f 'cable/ft2232.c' || echo '$(srcdir)/'`cable/ft2232.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/ft2232.Tpo $(DEPDIR)/ft2232.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cable/ft2232.c' object='ft2232.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ft2232.o `test -f 'cable/ft2232.c' || echo '$(srcdir)/'`cable/ft2232.c
+
+ft2232.obj: cable/ft2232.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ft2232.obj -MD -MP -MF $(DEPDIR)/ft2232.Tpo -c -o ft2232.obj `if test -f 'cable/ft2232.c'; then $(CYGPATH_W) 'cable/ft2232.c'; else $(CYGPATH_W) '$(srcdir)/cable/ft2232.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/ft2232.Tpo $(DEPDIR)/ft2232.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cable/ft2232.c' object='ft2232.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ft2232.obj `if test -f 'cable/ft2232.c'; then $(CYGPATH_W) 'cable/ft2232.c'; else $(CYGPATH_W) '$(srcdir)/cable/ft2232.c'; fi`
 
 libusb.o: usbconn/libusb.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libusb.o -MD -MP -MF $(DEPDIR)/libusb.Tpo -c -o libusb.o `test -f 'usbconn/libusb.c' || echo '$(srcdir)/'`usbconn/libusb.c
@@ -716,33 +760,47 @@ ftd2xx.obj: parport/ftd2xx.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ftd2xx.obj `if test -f 'parport/ftd2xx.c'; then $(CYGPATH_W) 'parport/ftd2xx.c'; else $(CYGPATH_W) '$(srcdir)/parport/ftd2xx.c'; fi`
 
-usbblaster.o: cable/usbblaster.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT usbblaster.o -MD -MP -MF $(DEPDIR)/usbblaster.Tpo -c -o usbblaster.o `test -f 'cable/usbblaster.c' || echo '$(srcdir)/'`cable/usbblaster.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/usbblaster.Tpo $(DEPDIR)/usbblaster.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cable/usbblaster.c' object='usbblaster.o' libtool=no @AMDEPBACKSLASH@
+direct.o: parport/direct.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT direct.o -MD -MP -MF $(DEPDIR)/direct.Tpo -c -o direct.o `test -f 'parport/direct.c' || echo '$(srcdir)/'`parport/direct.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/direct.Tpo $(DEPDIR)/direct.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='parport/direct.c' object='direct.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o usbblaster.o `test -f 'cable/usbblaster.c' || echo '$(srcdir)/'`cable/usbblaster.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o direct.o `test -f 'parport/direct.c' || echo '$(srcdir)/'`parport/direct.c
 
-usbblaster.obj: cable/usbblaster.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT usbblaster.obj -MD -MP -MF $(DEPDIR)/usbblaster.Tpo -c -o usbblaster.obj `if test -f 'cable/usbblaster.c'; then $(CYGPATH_W) 'cable/usbblaster.c'; else $(CYGPATH_W) '$(srcdir)/cable/usbblaster.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/usbblaster.Tpo $(DEPDIR)/usbblaster.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cable/usbblaster.c' object='usbblaster.obj' libtool=no @AMDEPBACKSLASH@
+direct.obj: parport/direct.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT direct.obj -MD -MP -MF $(DEPDIR)/direct.Tpo -c -o direct.obj `if test -f 'parport/direct.c'; then $(CYGPATH_W) 'parport/direct.c'; else $(CYGPATH_W) '$(srcdir)/parport/direct.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/direct.Tpo $(DEPDIR)/direct.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='parport/direct.c' object='direct.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o usbblaster.obj `if test -f 'cable/usbblaster.c'; then $(CYGPATH_W) 'cable/usbblaster.c'; else $(CYGPATH_W) '$(srcdir)/cable/usbblaster.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o direct.obj `if test -f 'parport/direct.c'; then $(CYGPATH_W) 'parport/direct.c'; else $(CYGPATH_W) '$(srcdir)/parport/direct.c'; fi`
 
-ft2232.o: cable/ft2232.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ft2232.o -MD -MP -MF $(DEPDIR)/ft2232.Tpo -c -o ft2232.o `test -f 'cable/ft2232.c' || echo '$(srcdir)/'`cable/ft2232.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/ft2232.Tpo $(DEPDIR)/ft2232.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cable/ft2232.c' object='ft2232.o' libtool=no @AMDEPBACKSLASH@
+ppdev.o: parport/ppdev.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ppdev.o -MD -MP -MF $(DEPDIR)/ppdev.Tpo -c -o ppdev.o `test -f 'parport/ppdev.c' || echo '$(srcdir)/'`parport/ppdev.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/ppdev.Tpo $(DEPDIR)/ppdev.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='parport/ppdev.c' object='ppdev.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ft2232.o `test -f 'cable/ft2232.c' || echo '$(srcdir)/'`cable/ft2232.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ppdev.o `test -f 'parport/ppdev.c' || echo '$(srcdir)/'`parport/ppdev.c
 
-ft2232.obj: cable/ft2232.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ft2232.obj -MD -MP -MF $(DEPDIR)/ft2232.Tpo -c -o ft2232.obj `if test -f 'cable/ft2232.c'; then $(CYGPATH_W) 'cable/ft2232.c'; else $(CYGPATH_W) '$(srcdir)/cable/ft2232.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/ft2232.Tpo $(DEPDIR)/ft2232.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cable/ft2232.c' object='ft2232.obj' libtool=no @AMDEPBACKSLASH@
+ppdev.obj: parport/ppdev.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ppdev.obj -MD -MP -MF $(DEPDIR)/ppdev.Tpo -c -o ppdev.obj `if test -f 'parport/ppdev.c'; then $(CYGPATH_W) 'parport/ppdev.c'; else $(CYGPATH_W) '$(srcdir)/parport/ppdev.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/ppdev.Tpo $(DEPDIR)/ppdev.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='parport/ppdev.c' object='ppdev.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ft2232.obj `if test -f 'cable/ft2232.c'; then $(CYGPATH_W) 'cable/ft2232.c'; else $(CYGPATH_W) '$(srcdir)/cable/ft2232.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ppdev.obj `if test -f 'parport/ppdev.c'; then $(CYGPATH_W) 'parport/ppdev.c'; else $(CYGPATH_W) '$(srcdir)/parport/ppdev.c'; fi`
+
+ppi.o: parport/ppi.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ppi.o -MD -MP -MF $(DEPDIR)/ppi.Tpo -c -o ppi.o `test -f 'parport/ppi.c' || echo '$(srcdir)/'`parport/ppi.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/ppi.Tpo $(DEPDIR)/ppi.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='parport/ppi.c' object='ppi.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ppi.o `test -f 'parport/ppi.c' || echo '$(srcdir)/'`parport/ppi.c
+
+ppi.obj: parport/ppi.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ppi.obj -MD -MP -MF $(DEPDIR)/ppi.Tpo -c -o ppi.obj `if test -f 'parport/ppi.c'; then $(CYGPATH_W) 'parport/ppi.c'; else $(CYGPATH_W) '$(srcdir)/parport/ppi.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/ppi.Tpo $(DEPDIR)/ppi.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='parport/ppi.c' object='ppi.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o ppi.obj `if test -f 'parport/ppi.c'; then $(CYGPATH_W) 'parport/ppi.c'; else $(CYGPATH_W) '$(srcdir)/parport/ppi.c'; fi`
 
 vision_ep9307.o: cable/vision_ep9307.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT vision_ep9307.o -MD -MP -MF $(DEPDIR)/vision_ep9307.Tpo -c -o vision_ep9307.o `test -f 'cable/vision_ep9307.c' || echo '$(srcdir)/'`cable/vision_ep9307.c

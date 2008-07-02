@@ -3,15 +3,174 @@
 /* define if BSDL subsystem is enabled */
 #undef ENABLE_BSDL
 
-/* define if cable driver for ep9307 is enabled */
-#undef ENABLE_EP9307
+/* define if au1500 is enabled */
+#undef ENABLE_BUS_AU1500
 
-/* define if JTAG target simulator JIM is enabled */
+/* define if bcm1250 is enabled */
+#undef ENABLE_BUS_BCM1250
+
+/* define if bf526_ezkit is enabled */
+#undef ENABLE_BUS_BF526_EZKIT
+
+/* define if bf527_ezkit is enabled */
+#undef ENABLE_BUS_BF527_EZKIT
+
+/* define if bf533_ezkit is enabled */
+#undef ENABLE_BUS_BF533_EZKIT
+
+/* define if bf533_stamp is enabled */
+#undef ENABLE_BUS_BF533_STAMP
+
+/* define if bf537_ezkit is enabled */
+#undef ENABLE_BUS_BF537_EZKIT
+
+/* define if bf537_stamp is enabled */
+#undef ENABLE_BUS_BF537_STAMP
+
+/* define if bf538f_ezkit is enabled */
+#undef ENABLE_BUS_BF538F_EZKIT
+
+/* define if bf548_ezkit is enabled */
+#undef ENABLE_BUS_BF548_EZKIT
+
+/* define if bf561_ezkit is enabled */
+#undef ENABLE_BUS_BF561_EZKIT
+
+/* define if ejtag is enabled */
+#undef ENABLE_BUS_EJTAG
+
+/* define if fjmem is enabled */
+#undef ENABLE_BUS_FJMEM
+
+/* define if h7202 is enabled */
+#undef ENABLE_BUS_H7202
+
+/* define if ixp425 is enabled */
+#undef ENABLE_BUS_IXP425
+
+/* define if jopcyc is enabled */
+#undef ENABLE_BUS_JOPCYC
+
+/* define if lh7a400 is enabled */
+#undef ENABLE_BUS_LH7A400
+
+/* define if mpc5200 is enabled */
+#undef ENABLE_BUS_MPC5200
+
+/* define if mpc824x is enabled */
+#undef ENABLE_BUS_MPC824X
+
+/* define if ppc405ep is enabled */
+#undef ENABLE_BUS_PPC405EP
+
+/* define if ppc440gx_ebc8 is enabled */
+#undef ENABLE_BUS_PPC440GX_EBC8
+
+/* define if prototype is enabled */
+#undef ENABLE_BUS_PROTOTYPE
+
+/* define if pxa27x is enabled */
+#undef ENABLE_BUS_PXA27X
+
+/* define if pxa2x0 is enabled */
+#undef ENABLE_BUS_PXA2X0
+
+/* define if s3c4510 is enabled */
+#undef ENABLE_BUS_S3C4510
+
+/* define if sa1110 is enabled */
+#undef ENABLE_BUS_SA1110
+
+/* define if sh7727 is enabled */
+#undef ENABLE_BUS_SH7727
+
+/* define if sh7750r is enabled */
+#undef ENABLE_BUS_SH7750R
+
+/* define if sh7751r is enabled */
+#undef ENABLE_BUS_SH7751R
+
+/* define if sharc_21065L is enabled */
+#undef ENABLE_BUS_SHARC_21065L
+
+/* define if slsup3 is enabled */
+#undef ENABLE_BUS_SLSUP3
+
+/* define if tx4925 is enabled */
+#undef ENABLE_BUS_TX4925
+
+/* define if zefant_xs3 is enabled */
+#undef ENABLE_BUS_ZEFANT_XS3
+
+/* define if arcom is enabled */
+#undef ENABLE_CABLE_ARCOM
+
+/* define if byteblaster is enabled */
+#undef ENABLE_CABLE_BYTEBLASTER
+
+/* define if dlc5 is enabled */
+#undef ENABLE_CABLE_DLC5
+
+/* define if ea253 is enabled */
+#undef ENABLE_CABLE_EA253
+
+/* define if ei012 is enabled */
+#undef ENABLE_CABLE_EI012
+
+/* define if ep9307 is enabled */
+#undef ENABLE_CABLE_EP9307
+
+/* define if ft2232 is enabled */
+#undef ENABLE_CABLE_FT2232
+
+/* define if igloo is enabled */
+#undef ENABLE_CABLE_IGLOO
+
+/* define if jlink is enabled */
+#undef ENABLE_CABLE_JLINK
+
+/* define if keithkoep is enabled */
+#undef ENABLE_CABLE_KEITHKOEP
+
+/* define if lattice is enabled */
+#undef ENABLE_CABLE_LATTICE
+
+/* define if mpcbdm is enabled */
+#undef ENABLE_CABLE_MPCBDM
+
+/* define if triton is enabled */
+#undef ENABLE_CABLE_TRITON
+
+/* define if usbblaster is enabled */
+#undef ENABLE_CABLE_USBBLASTER
+
+/* define if wiggler is enabled */
+#undef ENABLE_CABLE_WIGGLER
+
+/* define if xpc is enabled */
+#undef ENABLE_CABLE_XPC
+
+/* define if jim is enabled */
 #undef ENABLE_JIM
 
 /* Define to 1 if translation of program messages to the user's native
    language is requested. */
 #undef ENABLE_NLS
+
+/* define if direct is enabled */
+#undef ENABLE_PARPORT_DIRECT
+
+/* define if ftd2xx is enabled */
+#undef ENABLE_PARPORT_FTD2XX
+
+/* define if ftdi is enabled */
+#undef ENABLE_PARPORT_FTDI
+
+/* define if ppdev is enabled */
+#undef ENABLE_PARPORT_PPDEV
+
+/* define if ppi is enabled */
+#undef ENABLE_PARPORT_PPI
 
 /* define if SVF player is enabled */
 #undef ENABLE_SVF

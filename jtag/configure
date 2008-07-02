@@ -754,8 +754,6 @@ HAVE_LIBFTDI_FALSE
 HAVE_LIBFTD2XX_TRUE
 HAVE_LIBFTD2XX_FALSE
 FTD2XXLIB
-ENABLE_EP9307_TRUE
-ENABLE_EP9307_FALSE
 ENABLE_SVF_TRUE
 ENABLE_SVF_FALSE
 LEX
@@ -766,12 +764,120 @@ BISON_LOCATIONS_TRUE
 BISON_LOCATIONS_FALSE
 ENABLE_BSDL_TRUE
 ENABLE_BSDL_FALSE
-ENABLE_JIM_TRUE
-ENABLE_JIM_FALSE
 JEDEC_EXP_TRUE
 JEDEC_EXP_FALSE
 JTAG_RELOCATABLE_TRUE
 JTAG_RELOCATABLE_FALSE
+ENABLE_BUS_AU1500_TRUE
+ENABLE_BUS_AU1500_FALSE
+ENABLE_BUS_BCM1250_TRUE
+ENABLE_BUS_BCM1250_FALSE
+ENABLE_BUS_BF526_EZKIT_TRUE
+ENABLE_BUS_BF526_EZKIT_FALSE
+ENABLE_BUS_BF527_EZKIT_TRUE
+ENABLE_BUS_BF527_EZKIT_FALSE
+ENABLE_BUS_BF533_STAMP_TRUE
+ENABLE_BUS_BF533_STAMP_FALSE
+ENABLE_BUS_BF533_EZKIT_TRUE
+ENABLE_BUS_BF533_EZKIT_FALSE
+ENABLE_BUS_BF537_STAMP_TRUE
+ENABLE_BUS_BF537_STAMP_FALSE
+ENABLE_BUS_BF537_EZKIT_TRUE
+ENABLE_BUS_BF537_EZKIT_FALSE
+ENABLE_BUS_BF538F_EZKIT_TRUE
+ENABLE_BUS_BF538F_EZKIT_FALSE
+ENABLE_BUS_BF548_EZKIT_TRUE
+ENABLE_BUS_BF548_EZKIT_FALSE
+ENABLE_BUS_BF561_EZKIT_TRUE
+ENABLE_BUS_BF561_EZKIT_FALSE
+ENABLE_BUS_EJTAG_TRUE
+ENABLE_BUS_EJTAG_FALSE
+ENABLE_BUS_FJMEM_TRUE
+ENABLE_BUS_FJMEM_FALSE
+ENABLE_BUS_IXP425_TRUE
+ENABLE_BUS_IXP425_FALSE
+ENABLE_BUS_JOPCYC_TRUE
+ENABLE_BUS_JOPCYC_FALSE
+ENABLE_BUS_H7202_TRUE
+ENABLE_BUS_H7202_FALSE
+ENABLE_BUS_LH7A400_TRUE
+ENABLE_BUS_LH7A400_FALSE
+ENABLE_BUS_MPC5200_TRUE
+ENABLE_BUS_MPC5200_FALSE
+ENABLE_BUS_MPC824X_TRUE
+ENABLE_BUS_MPC824X_FALSE
+ENABLE_BUS_PPC405EP_TRUE
+ENABLE_BUS_PPC405EP_FALSE
+ENABLE_BUS_PPC440GX_EBC8_TRUE
+ENABLE_BUS_PPC440GX_EBC8_FALSE
+ENABLE_BUS_PROTOTYPE_TRUE
+ENABLE_BUS_PROTOTYPE_FALSE
+ENABLE_BUS_PXA2X0_TRUE
+ENABLE_BUS_PXA2X0_FALSE
+ENABLE_BUS_PXA27X_TRUE
+ENABLE_BUS_PXA27X_FALSE
+ENABLE_BUS_S3C4510_TRUE
+ENABLE_BUS_S3C4510_FALSE
+ENABLE_BUS_SA1110_TRUE
+ENABLE_BUS_SA1110_FALSE
+ENABLE_BUS_SH7727_TRUE
+ENABLE_BUS_SH7727_FALSE
+ENABLE_BUS_SH7750R_TRUE
+ENABLE_BUS_SH7750R_FALSE
+ENABLE_BUS_SH7751R_TRUE
+ENABLE_BUS_SH7751R_FALSE
+ENABLE_BUS_SHARC_21065L_TRUE
+ENABLE_BUS_SHARC_21065L_FALSE
+ENABLE_BUS_SLSUP3_TRUE
+ENABLE_BUS_SLSUP3_FALSE
+ENABLE_BUS_TX4925_TRUE
+ENABLE_BUS_TX4925_FALSE
+ENABLE_BUS_ZEFANT_XS3_TRUE
+ENABLE_BUS_ZEFANT_XS3_FALSE
+ENABLE_CABLE_ARCOM_TRUE
+ENABLE_CABLE_ARCOM_FALSE
+ENABLE_CABLE_BYTEBLASTER_TRUE
+ENABLE_CABLE_BYTEBLASTER_FALSE
+ENABLE_CABLE_DLC5_TRUE
+ENABLE_CABLE_DLC5_FALSE
+ENABLE_CABLE_EA253_TRUE
+ENABLE_CABLE_EA253_FALSE
+ENABLE_CABLE_EI012_TRUE
+ENABLE_CABLE_EI012_FALSE
+ENABLE_CABLE_EP9307_TRUE
+ENABLE_CABLE_EP9307_FALSE
+ENABLE_CABLE_FT2232_TRUE
+ENABLE_CABLE_FT2232_FALSE
+ENABLE_CABLE_IGLOO_TRUE
+ENABLE_CABLE_IGLOO_FALSE
+ENABLE_JIM_TRUE
+ENABLE_JIM_FALSE
+ENABLE_CABLE_JLINK_TRUE
+ENABLE_CABLE_JLINK_FALSE
+ENABLE_CABLE_KEITHKOEP_TRUE
+ENABLE_CABLE_KEITHKOEP_FALSE
+ENABLE_CABLE_LATTICE_TRUE
+ENABLE_CABLE_LATTICE_FALSE
+ENABLE_CABLE_MPCBDM_TRUE
+ENABLE_CABLE_MPCBDM_FALSE
+ENABLE_CABLE_TRITON_TRUE
+ENABLE_CABLE_TRITON_FALSE
+ENABLE_CABLE_USBBLASTER_TRUE
+ENABLE_CABLE_USBBLASTER_FALSE
+ENABLE_CABLE_WIGGLER_TRUE
+ENABLE_CABLE_WIGGLER_FALSE
+ENABLE_CABLE_XPC_TRUE
+ENABLE_CABLE_XPC_FALSE
+ENABLE_PARPORT_DIRECT_TRUE
+ENABLE_PARPORT_DIRECT_FALSE
+ENABLE_PARPORT_FTD2XX_TRUE
+ENABLE_PARPORT_FTD2XX_FALSE
+ENABLE_PARPORT_FTDI_TRUE
+ENABLE_PARPORT_FTDI_FALSE
+ENABLE_PARPORT_PPDEV_TRUE
+ENABLE_PARPORT_PPDEV_FALSE
+ENABLE_PARPORT_PPI_TRUE
+ENABLE_PARPORT_PPI_FALSE
 LIBOBJS
 LTLIBOBJS'
 ac_subst_files=''
@@ -787,12 +893,13 @@ with_libintl_prefix
 with_libusb
 with_libftdi
 with_ftd2xx
-enable_ep9307
 enable_svf
 enable_bsdl
-enable_jim
 enable_jedec_exp
 enable_relocatable
+enable_bus
+enable_cable
+enable_parport
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1441,12 +1548,32 @@ Optional Features:
   --enable-dependency-tracking   do not reject slow dependency extractors
   --disable-nls           do not use Native Language Support
   --disable-rpath         do not hardcode runtime library paths
-  --enable-ep9307         Enable cable driver for EP9307
   --enable-svf            Enable SVF player (default is enabled)
   --enable-bsdl           Enable BSDL subsystem (default is enabled)
-  --enable-jim            Enable JTAG target simulator JIM
   --enable-jedec-exp      Enable experimental JEDEC flash detection
   --enable-relocatable    Enable relocatable paths
+  --enable-bus            Enable default set or specific bus drivers:
+                          'default' enables:
+                          au1500 bcm1250 bf526_ezkit bf527_ezkit bf533_stamp
+                          bf533_ezkit bf537_stamp bf537_ezkit bf538f_ezkit
+                          bf548_ezkit bf561_ezkit ejtag fjmem ixp425 jopcyc
+                          h7202 lh7a400 mpc5200 mpc824x ppc405ep ppc440gx_ebc8
+                          prototype pxa2x0 pxa27x s3c4510 sa1110 sh7727
+                          sh7750r sh7751r sharc_21065L slsup3 tx4925
+                          zefant_xs3
+
+  --enable-cable          Enable default set or specific cable drivers.
+                          'default' enables:
+                          arcom byteblaster dlc5 ea253 ei012 ft2232 igloo
+                          jlink keithkoep lattice mpcbdm triton usbblaster
+                          wiggler xpc
+                          Disabled by default are:
+                          ep9307 jim
+
+  --enable-parport        Enable default set or specific parport drivers:
+                          'default' enables:
+                          direct ftdi ftd2xx ppdev ppi
+
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -7290,6 +7417,7 @@ cat >>confdefs.h <<\_ACEOF
 #define HAVE_IOPERM 1
 _ACEOF
 
+	HAVE_IOPERM="yes"
 else
 	{ $as_echo "$as_me:$LINENO: checking for library containing i386_set_ioperm" >&5
 $as_echo_n "checking for library containing i386_set_ioperm... " >&6; }
@@ -7384,6 +7512,7 @@ cat >>confdefs.h <<\_ACEOF
 #define HAVE_I386_SET_IOPERM 1
 _ACEOF
 
+		HAVE_I386_SET_IOPERM="yes"
 	fi
 fi
 
@@ -7900,7 +8029,7 @@ if test `eval 'as_val=${'$as_ac_Header'}
   cat >>confdefs.h <<_ACEOF
 #define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
 _ACEOF
-
+ HAVE_LINUX_PPDEV_H="yes"
 fi
 
 done
@@ -8050,7 +8179,7 @@ if test `eval 'as_val=${'$as_ac_Header'}
   cat >>confdefs.h <<_ACEOF
 #define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
 _ACEOF
-
+ HAVE_DEV_PPBUS_PPI_H="yes"
 fi
 
 done
@@ -9524,49 +9653,6 @@ fi
 
 
 
-# Check whether --enable-ep9307 was given.
-if test "${enable_ep9307+set}" = set; then
-  enableval=$enable_ep9307; case "${enableval}" in
-   yes) ep9307=true ;;
-   no)  ep9307=false ;;
-   *) { { $as_echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-ep9307" >&5
-$as_echo "$as_me: error: bad value ${enableval} for --enable-ep9307" >&2;}
-   { (exit 1); exit 1; }; } ;;
- esac
-else
-  ep9307=false
-fi
-
-if test "x$ep9307" = xtrue; then
-
-   if true; then
-  ENABLE_EP9307_TRUE=
-  ENABLE_EP9307_FALSE='#'
-else
-  ENABLE_EP9307_TRUE='#'
-  ENABLE_EP9307_FALSE=
-fi
-
-
-cat >>confdefs.h <<\_ACEOF
-#define ENABLE_EP9307 1
-_ACEOF
-
-
-else
-
-   if false; then
-  ENABLE_EP9307_TRUE=
-  ENABLE_EP9307_FALSE='#'
-else
-  ENABLE_EP9307_TRUE='#'
-  ENABLE_EP9307_FALSE=
-fi
-
-
-fi
-
-
 CFLAGS="$CFLAGS -Wall"
 CPPFLAGS="$CPPFLAGS -I\$(top_srcdir) -I\$(top_srcdir)/include"
 
@@ -10154,49 +10240,6 @@ fi
 fi
 
 
-# Check whether --enable-jim was given.
-if test "${enable_jim+set}" = set; then
-  enableval=$enable_jim; case "${enableval}" in
-   yes) jim=true ;;
-   no)  jim=false ;;
-   *)   { { $as_echo "$as_me:$LINENO: error: bad value ${enableval} for --enable-jim" >&5
-$as_echo "$as_me: error: bad value ${enableval} for --enable-jim" >&2;}
-   { (exit 1); exit 1; }; } ;;
- esac
-else
-  jim=false
-fi
-
-if test "x$jim" = xtrue; then
-
-   if true; then
-  ENABLE_JIM_TRUE=
-  ENABLE_JIM_FALSE='#'
-else
-  ENABLE_JIM_TRUE='#'
-  ENABLE_JIM_FALSE=
-fi
-
-
-cat >>confdefs.h <<\_ACEOF
-#define ENABLE_JIM 1
-_ACEOF
-
-
-else
-
-   if false; then
-  ENABLE_JIM_TRUE=
-  ENABLE_JIM_FALSE='#'
-else
-  ENABLE_JIM_TRUE='#'
-  ENABLE_JIM_FALSE=
-fi
-
-
-fi
-
-
 # Check whether --enable-jedec-exp was given.
 if test "${enable_jedec_exp+set}" = set; then
   enableval=$enable_jedec_exp; case "${enableval}" in
@@ -10275,6 +10318,1883 @@ fi
 
 
 fi
+
+
+
+# Macro for driver include check
+
+
+
+# Enable bus drivers
+
+# Check whether --enable-bus was given.
+if test "${enable_bus+set}" = set; then
+  enableval=$enable_bus; case ${enableval} in
+  yes) busdrivers=default ;;
+  no) busdrivers=none ;;
+  none) busdrivers=none ;;
+  *) busdrivers=`echo ${enableval} | $SED -e 's/,/ /g'` ;;
+esac
+
+else
+  busdrivers=default
+fi
+
+# expand 'default' to default enabled busdrivers
+busdrivers=`echo ${busdrivers} | $SED -e "s/default/\
+au1500 bcm1250 bf526_ezkit bf527_ezkit bf533_stamp bf533_ezkit bf537_stamp bf537_ezkit bf538f_ezkit bf548_ezkit bf561_ezkit ejtag \
+fjmem ixp425 jopcyc h7202 lh7a400  mpc5200 mpc824x ppc405ep ppc440gx_ebc8 prototype pxa2x0 pxa27x \
+s3c4510 sa1110 sh7727 sh7750r sh7751r sharc_21065L slsup3 tx4925 zefant_xs3/"`
+#
+enabled_bus_drivers=''
+
+    if echo "$busdrivers" | $GREP -q au1500; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_AU1500 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_AU1500_TRUE=
+  ENABLE_BUS_AU1500_FALSE='#'
+else
+  ENABLE_BUS_AU1500_TRUE='#'
+  ENABLE_BUS_AU1500_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}au1500 "
+
+else
+
+        if false; then
+  ENABLE_BUS_AU1500_TRUE=
+  ENABLE_BUS_AU1500_FALSE='#'
+else
+  ENABLE_BUS_AU1500_TRUE='#'
+  ENABLE_BUS_AU1500_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q bcm1250; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_BCM1250 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_BCM1250_TRUE=
+  ENABLE_BUS_BCM1250_FALSE='#'
+else
+  ENABLE_BUS_BCM1250_TRUE='#'
+  ENABLE_BUS_BCM1250_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}bcm1250 "
+
+else
+
+        if false; then
+  ENABLE_BUS_BCM1250_TRUE=
+  ENABLE_BUS_BCM1250_FALSE='#'
+else
+  ENABLE_BUS_BCM1250_TRUE='#'
+  ENABLE_BUS_BCM1250_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q bf526_ezkit; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_BF526_EZKIT 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_BF526_EZKIT_TRUE=
+  ENABLE_BUS_BF526_EZKIT_FALSE='#'
+else
+  ENABLE_BUS_BF526_EZKIT_TRUE='#'
+  ENABLE_BUS_BF526_EZKIT_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}bf526_ezkit "
+
+else
+
+        if false; then
+  ENABLE_BUS_BF526_EZKIT_TRUE=
+  ENABLE_BUS_BF526_EZKIT_FALSE='#'
+else
+  ENABLE_BUS_BF526_EZKIT_TRUE='#'
+  ENABLE_BUS_BF526_EZKIT_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q bf527_ezkit; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_BF527_EZKIT 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_BF527_EZKIT_TRUE=
+  ENABLE_BUS_BF527_EZKIT_FALSE='#'
+else
+  ENABLE_BUS_BF527_EZKIT_TRUE='#'
+  ENABLE_BUS_BF527_EZKIT_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}bf527_ezkit "
+
+else
+
+        if false; then
+  ENABLE_BUS_BF527_EZKIT_TRUE=
+  ENABLE_BUS_BF527_EZKIT_FALSE='#'
+else
+  ENABLE_BUS_BF527_EZKIT_TRUE='#'
+  ENABLE_BUS_BF527_EZKIT_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q bf533_stamp; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_BF533_STAMP 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_BF533_STAMP_TRUE=
+  ENABLE_BUS_BF533_STAMP_FALSE='#'
+else
+  ENABLE_BUS_BF533_STAMP_TRUE='#'
+  ENABLE_BUS_BF533_STAMP_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}bf533_stamp "
+
+else
+
+        if false; then
+  ENABLE_BUS_BF533_STAMP_TRUE=
+  ENABLE_BUS_BF533_STAMP_FALSE='#'
+else
+  ENABLE_BUS_BF533_STAMP_TRUE='#'
+  ENABLE_BUS_BF533_STAMP_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q bf533_ezkit; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_BF533_EZKIT 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_BF533_EZKIT_TRUE=
+  ENABLE_BUS_BF533_EZKIT_FALSE='#'
+else
+  ENABLE_BUS_BF533_EZKIT_TRUE='#'
+  ENABLE_BUS_BF533_EZKIT_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}bf533_ezkit "
+
+else
+
+        if false; then
+  ENABLE_BUS_BF533_EZKIT_TRUE=
+  ENABLE_BUS_BF533_EZKIT_FALSE='#'
+else
+  ENABLE_BUS_BF533_EZKIT_TRUE='#'
+  ENABLE_BUS_BF533_EZKIT_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q bf537_stamp; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_BF537_STAMP 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_BF537_STAMP_TRUE=
+  ENABLE_BUS_BF537_STAMP_FALSE='#'
+else
+  ENABLE_BUS_BF537_STAMP_TRUE='#'
+  ENABLE_BUS_BF537_STAMP_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}bf537_stamp "
+
+else
+
+        if false; then
+  ENABLE_BUS_BF537_STAMP_TRUE=
+  ENABLE_BUS_BF537_STAMP_FALSE='#'
+else
+  ENABLE_BUS_BF537_STAMP_TRUE='#'
+  ENABLE_BUS_BF537_STAMP_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q bf537_ezkit; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_BF537_EZKIT 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_BF537_EZKIT_TRUE=
+  ENABLE_BUS_BF537_EZKIT_FALSE='#'
+else
+  ENABLE_BUS_BF537_EZKIT_TRUE='#'
+  ENABLE_BUS_BF537_EZKIT_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}bf537_ezkit "
+
+else
+
+        if false; then
+  ENABLE_BUS_BF537_EZKIT_TRUE=
+  ENABLE_BUS_BF537_EZKIT_FALSE='#'
+else
+  ENABLE_BUS_BF537_EZKIT_TRUE='#'
+  ENABLE_BUS_BF537_EZKIT_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q bf538f_ezkit; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_BF538F_EZKIT 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_BF538F_EZKIT_TRUE=
+  ENABLE_BUS_BF538F_EZKIT_FALSE='#'
+else
+  ENABLE_BUS_BF538F_EZKIT_TRUE='#'
+  ENABLE_BUS_BF538F_EZKIT_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}bf538f_ezkit "
+
+else
+
+        if false; then
+  ENABLE_BUS_BF538F_EZKIT_TRUE=
+  ENABLE_BUS_BF538F_EZKIT_FALSE='#'
+else
+  ENABLE_BUS_BF538F_EZKIT_TRUE='#'
+  ENABLE_BUS_BF538F_EZKIT_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q bf548_ezkit; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_BF548_EZKIT 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_BF548_EZKIT_TRUE=
+  ENABLE_BUS_BF548_EZKIT_FALSE='#'
+else
+  ENABLE_BUS_BF548_EZKIT_TRUE='#'
+  ENABLE_BUS_BF548_EZKIT_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}bf548_ezkit "
+
+else
+
+        if false; then
+  ENABLE_BUS_BF548_EZKIT_TRUE=
+  ENABLE_BUS_BF548_EZKIT_FALSE='#'
+else
+  ENABLE_BUS_BF548_EZKIT_TRUE='#'
+  ENABLE_BUS_BF548_EZKIT_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q bf561_ezkit; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_BF561_EZKIT 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_BF561_EZKIT_TRUE=
+  ENABLE_BUS_BF561_EZKIT_FALSE='#'
+else
+  ENABLE_BUS_BF561_EZKIT_TRUE='#'
+  ENABLE_BUS_BF561_EZKIT_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}bf561_ezkit "
+
+else
+
+        if false; then
+  ENABLE_BUS_BF561_EZKIT_TRUE=
+  ENABLE_BUS_BF561_EZKIT_FALSE='#'
+else
+  ENABLE_BUS_BF561_EZKIT_TRUE='#'
+  ENABLE_BUS_BF561_EZKIT_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q ejtag; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_EJTAG 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_EJTAG_TRUE=
+  ENABLE_BUS_EJTAG_FALSE='#'
+else
+  ENABLE_BUS_EJTAG_TRUE='#'
+  ENABLE_BUS_EJTAG_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}ejtag "
+
+else
+
+        if false; then
+  ENABLE_BUS_EJTAG_TRUE=
+  ENABLE_BUS_EJTAG_FALSE='#'
+else
+  ENABLE_BUS_EJTAG_TRUE='#'
+  ENABLE_BUS_EJTAG_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q fjmem; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_FJMEM 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_FJMEM_TRUE=
+  ENABLE_BUS_FJMEM_FALSE='#'
+else
+  ENABLE_BUS_FJMEM_TRUE='#'
+  ENABLE_BUS_FJMEM_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}fjmem "
+
+else
+
+        if false; then
+  ENABLE_BUS_FJMEM_TRUE=
+  ENABLE_BUS_FJMEM_FALSE='#'
+else
+  ENABLE_BUS_FJMEM_TRUE='#'
+  ENABLE_BUS_FJMEM_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q ixp425; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_IXP425 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_IXP425_TRUE=
+  ENABLE_BUS_IXP425_FALSE='#'
+else
+  ENABLE_BUS_IXP425_TRUE='#'
+  ENABLE_BUS_IXP425_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}ixp425 "
+
+else
+
+        if false; then
+  ENABLE_BUS_IXP425_TRUE=
+  ENABLE_BUS_IXP425_FALSE='#'
+else
+  ENABLE_BUS_IXP425_TRUE='#'
+  ENABLE_BUS_IXP425_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q jopcyc; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_JOPCYC 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_JOPCYC_TRUE=
+  ENABLE_BUS_JOPCYC_FALSE='#'
+else
+  ENABLE_BUS_JOPCYC_TRUE='#'
+  ENABLE_BUS_JOPCYC_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}jopcyc "
+
+else
+
+        if false; then
+  ENABLE_BUS_JOPCYC_TRUE=
+  ENABLE_BUS_JOPCYC_FALSE='#'
+else
+  ENABLE_BUS_JOPCYC_TRUE='#'
+  ENABLE_BUS_JOPCYC_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q h7202; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_H7202 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_H7202_TRUE=
+  ENABLE_BUS_H7202_FALSE='#'
+else
+  ENABLE_BUS_H7202_TRUE='#'
+  ENABLE_BUS_H7202_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}h7202 "
+
+else
+
+        if false; then
+  ENABLE_BUS_H7202_TRUE=
+  ENABLE_BUS_H7202_FALSE='#'
+else
+  ENABLE_BUS_H7202_TRUE='#'
+  ENABLE_BUS_H7202_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q lh7a400; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_LH7A400 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_LH7A400_TRUE=
+  ENABLE_BUS_LH7A400_FALSE='#'
+else
+  ENABLE_BUS_LH7A400_TRUE='#'
+  ENABLE_BUS_LH7A400_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}lh7a400 "
+
+else
+
+        if false; then
+  ENABLE_BUS_LH7A400_TRUE=
+  ENABLE_BUS_LH7A400_FALSE='#'
+else
+  ENABLE_BUS_LH7A400_TRUE='#'
+  ENABLE_BUS_LH7A400_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q mpc5200; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_MPC5200 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_MPC5200_TRUE=
+  ENABLE_BUS_MPC5200_FALSE='#'
+else
+  ENABLE_BUS_MPC5200_TRUE='#'
+  ENABLE_BUS_MPC5200_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}mpc5200 "
+
+else
+
+        if false; then
+  ENABLE_BUS_MPC5200_TRUE=
+  ENABLE_BUS_MPC5200_FALSE='#'
+else
+  ENABLE_BUS_MPC5200_TRUE='#'
+  ENABLE_BUS_MPC5200_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q mpc824x; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_MPC824X 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_MPC824X_TRUE=
+  ENABLE_BUS_MPC824X_FALSE='#'
+else
+  ENABLE_BUS_MPC824X_TRUE='#'
+  ENABLE_BUS_MPC824X_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}mpc824x "
+
+else
+
+        if false; then
+  ENABLE_BUS_MPC824X_TRUE=
+  ENABLE_BUS_MPC824X_FALSE='#'
+else
+  ENABLE_BUS_MPC824X_TRUE='#'
+  ENABLE_BUS_MPC824X_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q ppc405ep; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_PPC405EP 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_PPC405EP_TRUE=
+  ENABLE_BUS_PPC405EP_FALSE='#'
+else
+  ENABLE_BUS_PPC405EP_TRUE='#'
+  ENABLE_BUS_PPC405EP_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}ppc405ep "
+
+else
+
+        if false; then
+  ENABLE_BUS_PPC405EP_TRUE=
+  ENABLE_BUS_PPC405EP_FALSE='#'
+else
+  ENABLE_BUS_PPC405EP_TRUE='#'
+  ENABLE_BUS_PPC405EP_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q ppc440gx_ebc8; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_PPC440GX_EBC8 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_PPC440GX_EBC8_TRUE=
+  ENABLE_BUS_PPC440GX_EBC8_FALSE='#'
+else
+  ENABLE_BUS_PPC440GX_EBC8_TRUE='#'
+  ENABLE_BUS_PPC440GX_EBC8_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}ppc440gx_ebc8 "
+
+else
+
+        if false; then
+  ENABLE_BUS_PPC440GX_EBC8_TRUE=
+  ENABLE_BUS_PPC440GX_EBC8_FALSE='#'
+else
+  ENABLE_BUS_PPC440GX_EBC8_TRUE='#'
+  ENABLE_BUS_PPC440GX_EBC8_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q prototype; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_PROTOTYPE 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_PROTOTYPE_TRUE=
+  ENABLE_BUS_PROTOTYPE_FALSE='#'
+else
+  ENABLE_BUS_PROTOTYPE_TRUE='#'
+  ENABLE_BUS_PROTOTYPE_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}prototype "
+
+else
+
+        if false; then
+  ENABLE_BUS_PROTOTYPE_TRUE=
+  ENABLE_BUS_PROTOTYPE_FALSE='#'
+else
+  ENABLE_BUS_PROTOTYPE_TRUE='#'
+  ENABLE_BUS_PROTOTYPE_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q pxa2x0; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_PXA2X0 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_PXA2X0_TRUE=
+  ENABLE_BUS_PXA2X0_FALSE='#'
+else
+  ENABLE_BUS_PXA2X0_TRUE='#'
+  ENABLE_BUS_PXA2X0_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}pxa2x0 "
+
+else
+
+        if false; then
+  ENABLE_BUS_PXA2X0_TRUE=
+  ENABLE_BUS_PXA2X0_FALSE='#'
+else
+  ENABLE_BUS_PXA2X0_TRUE='#'
+  ENABLE_BUS_PXA2X0_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q pxa27x; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_PXA27X 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_PXA27X_TRUE=
+  ENABLE_BUS_PXA27X_FALSE='#'
+else
+  ENABLE_BUS_PXA27X_TRUE='#'
+  ENABLE_BUS_PXA27X_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}pxa27x "
+
+else
+
+        if false; then
+  ENABLE_BUS_PXA27X_TRUE=
+  ENABLE_BUS_PXA27X_FALSE='#'
+else
+  ENABLE_BUS_PXA27X_TRUE='#'
+  ENABLE_BUS_PXA27X_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q s3c4510; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_S3C4510 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_S3C4510_TRUE=
+  ENABLE_BUS_S3C4510_FALSE='#'
+else
+  ENABLE_BUS_S3C4510_TRUE='#'
+  ENABLE_BUS_S3C4510_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}s3c4510 "
+
+else
+
+        if false; then
+  ENABLE_BUS_S3C4510_TRUE=
+  ENABLE_BUS_S3C4510_FALSE='#'
+else
+  ENABLE_BUS_S3C4510_TRUE='#'
+  ENABLE_BUS_S3C4510_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q sa1110; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_SA1110 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_SA1110_TRUE=
+  ENABLE_BUS_SA1110_FALSE='#'
+else
+  ENABLE_BUS_SA1110_TRUE='#'
+  ENABLE_BUS_SA1110_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}sa1110 "
+
+else
+
+        if false; then
+  ENABLE_BUS_SA1110_TRUE=
+  ENABLE_BUS_SA1110_FALSE='#'
+else
+  ENABLE_BUS_SA1110_TRUE='#'
+  ENABLE_BUS_SA1110_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q sh7727; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_SH7727 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_SH7727_TRUE=
+  ENABLE_BUS_SH7727_FALSE='#'
+else
+  ENABLE_BUS_SH7727_TRUE='#'
+  ENABLE_BUS_SH7727_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}sh7727 "
+
+else
+
+        if false; then
+  ENABLE_BUS_SH7727_TRUE=
+  ENABLE_BUS_SH7727_FALSE='#'
+else
+  ENABLE_BUS_SH7727_TRUE='#'
+  ENABLE_BUS_SH7727_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q sh7750r; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_SH7750R 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_SH7750R_TRUE=
+  ENABLE_BUS_SH7750R_FALSE='#'
+else
+  ENABLE_BUS_SH7750R_TRUE='#'
+  ENABLE_BUS_SH7750R_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}sh7750r "
+
+else
+
+        if false; then
+  ENABLE_BUS_SH7750R_TRUE=
+  ENABLE_BUS_SH7750R_FALSE='#'
+else
+  ENABLE_BUS_SH7750R_TRUE='#'
+  ENABLE_BUS_SH7750R_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q sh7751r; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_SH7751R 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_SH7751R_TRUE=
+  ENABLE_BUS_SH7751R_FALSE='#'
+else
+  ENABLE_BUS_SH7751R_TRUE='#'
+  ENABLE_BUS_SH7751R_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}sh7751r "
+
+else
+
+        if false; then
+  ENABLE_BUS_SH7751R_TRUE=
+  ENABLE_BUS_SH7751R_FALSE='#'
+else
+  ENABLE_BUS_SH7751R_TRUE='#'
+  ENABLE_BUS_SH7751R_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q sharc_21065L; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_SHARC_21065L 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_SHARC_21065L_TRUE=
+  ENABLE_BUS_SHARC_21065L_FALSE='#'
+else
+  ENABLE_BUS_SHARC_21065L_TRUE='#'
+  ENABLE_BUS_SHARC_21065L_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}sharc_21065L "
+
+else
+
+        if false; then
+  ENABLE_BUS_SHARC_21065L_TRUE=
+  ENABLE_BUS_SHARC_21065L_FALSE='#'
+else
+  ENABLE_BUS_SHARC_21065L_TRUE='#'
+  ENABLE_BUS_SHARC_21065L_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q slsup3; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_SLSUP3 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_SLSUP3_TRUE=
+  ENABLE_BUS_SLSUP3_FALSE='#'
+else
+  ENABLE_BUS_SLSUP3_TRUE='#'
+  ENABLE_BUS_SLSUP3_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}slsup3 "
+
+else
+
+        if false; then
+  ENABLE_BUS_SLSUP3_TRUE=
+  ENABLE_BUS_SLSUP3_FALSE='#'
+else
+  ENABLE_BUS_SLSUP3_TRUE='#'
+  ENABLE_BUS_SLSUP3_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q tx4925; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_TX4925 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_TX4925_TRUE=
+  ENABLE_BUS_TX4925_FALSE='#'
+else
+  ENABLE_BUS_TX4925_TRUE='#'
+  ENABLE_BUS_TX4925_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}tx4925 "
+
+else
+
+        if false; then
+  ENABLE_BUS_TX4925_TRUE=
+  ENABLE_BUS_TX4925_FALSE='#'
+else
+  ENABLE_BUS_TX4925_TRUE='#'
+  ENABLE_BUS_TX4925_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q zefant_xs3; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_ZEFANT_XS3 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_ZEFANT_XS3_TRUE=
+  ENABLE_BUS_ZEFANT_XS3_FALSE='#'
+else
+  ENABLE_BUS_ZEFANT_XS3_TRUE='#'
+  ENABLE_BUS_ZEFANT_XS3_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}zefant_xs3 "
+
+else
+
+        if false; then
+  ENABLE_BUS_ZEFANT_XS3_TRUE=
+  ENABLE_BUS_ZEFANT_XS3_FALSE='#'
+else
+  ENABLE_BUS_ZEFANT_XS3_TRUE='#'
+  ENABLE_BUS_ZEFANT_XS3_FALSE=
+fi
+
+
+fi
+
+
+
+# Enable cable drivers
+
+
+# Check whether --enable-cable was given.
+if test "${enable_cable+set}" = set; then
+  enableval=$enable_cable; case ${enableval} in
+  yes) cabledrivers=default ;;
+  no) cabledrivers=none ;;
+  none) cabledrivers=none ;;
+  *) cabledrivers=`echo ${enableval} | $SED -e 's/,/ /g'` ;;
+esac
+
+else
+  cabledrivers=default
+fi
+
+# expand 'default' to default enabled cabledrivers
+cabledrivers=`echo ${cabledrivers} | $SED -e "s/default/\
+arcom byteblaster dlc5 ea253 ei012 ft2232 igloo jlink keithkoep lattice mpcbdm triton usbblaster wiggler xpc/"`
+# automatically disable cable drivers when a required feature is not available
+if test "x$HAVELIBFTDI" != "xyes" -a "x$HAVELIBFTD2XX" != "xyes"; then
+
+    cabledrivers=`echo ${cabledrivers} | $SED -e "s/ft2232//" -e "s/usbblaster//"`
+
+fi
+
+if test "x$HAVELIBUSB" != "xyes"; then
+
+    cabledrivers=`echo ${cabledrivers} | $SED -e "s/jlink//" -e "s/xpc//"`
+
+fi
+
+#
+enabled_cable_drivers=''
+
+    if echo "$cabledrivers" | $GREP -q arcom; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_CABLE_ARCOM 1
+_ACEOF
+
+        if true; then
+  ENABLE_CABLE_ARCOM_TRUE=
+  ENABLE_CABLE_ARCOM_FALSE='#'
+else
+  ENABLE_CABLE_ARCOM_TRUE='#'
+  ENABLE_CABLE_ARCOM_FALSE=
+fi
+
+       enabled_cable_drivers="${enabled_cable_drivers}arcom "
+
+else
+
+        if false; then
+  ENABLE_CABLE_ARCOM_TRUE=
+  ENABLE_CABLE_ARCOM_FALSE='#'
+else
+  ENABLE_CABLE_ARCOM_TRUE='#'
+  ENABLE_CABLE_ARCOM_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$cabledrivers" | $GREP -q byteblaster; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_CABLE_BYTEBLASTER 1
+_ACEOF
+
+        if true; then
+  ENABLE_CABLE_BYTEBLASTER_TRUE=
+  ENABLE_CABLE_BYTEBLASTER_FALSE='#'
+else
+  ENABLE_CABLE_BYTEBLASTER_TRUE='#'
+  ENABLE_CABLE_BYTEBLASTER_FALSE=
+fi
+
+       enabled_cable_drivers="${enabled_cable_drivers}byteblaster "
+
+else
+
+        if false; then
+  ENABLE_CABLE_BYTEBLASTER_TRUE=
+  ENABLE_CABLE_BYTEBLASTER_FALSE='#'
+else
+  ENABLE_CABLE_BYTEBLASTER_TRUE='#'
+  ENABLE_CABLE_BYTEBLASTER_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$cabledrivers" | $GREP -q dlc5; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_CABLE_DLC5 1
+_ACEOF
+
+        if true; then
+  ENABLE_CABLE_DLC5_TRUE=
+  ENABLE_CABLE_DLC5_FALSE='#'
+else
+  ENABLE_CABLE_DLC5_TRUE='#'
+  ENABLE_CABLE_DLC5_FALSE=
+fi
+
+       enabled_cable_drivers="${enabled_cable_drivers}dlc5 "
+
+else
+
+        if false; then
+  ENABLE_CABLE_DLC5_TRUE=
+  ENABLE_CABLE_DLC5_FALSE='#'
+else
+  ENABLE_CABLE_DLC5_TRUE='#'
+  ENABLE_CABLE_DLC5_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$cabledrivers" | $GREP -q ea253; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_CABLE_EA253 1
+_ACEOF
+
+        if true; then
+  ENABLE_CABLE_EA253_TRUE=
+  ENABLE_CABLE_EA253_FALSE='#'
+else
+  ENABLE_CABLE_EA253_TRUE='#'
+  ENABLE_CABLE_EA253_FALSE=
+fi
+
+       enabled_cable_drivers="${enabled_cable_drivers}ea253 "
+
+else
+
+        if false; then
+  ENABLE_CABLE_EA253_TRUE=
+  ENABLE_CABLE_EA253_FALSE='#'
+else
+  ENABLE_CABLE_EA253_TRUE='#'
+  ENABLE_CABLE_EA253_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$cabledrivers" | $GREP -q ei012; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_CABLE_EI012 1
+_ACEOF
+
+        if true; then
+  ENABLE_CABLE_EI012_TRUE=
+  ENABLE_CABLE_EI012_FALSE='#'
+else
+  ENABLE_CABLE_EI012_TRUE='#'
+  ENABLE_CABLE_EI012_FALSE=
+fi
+
+       enabled_cable_drivers="${enabled_cable_drivers}ei012 "
+
+else
+
+        if false; then
+  ENABLE_CABLE_EI012_TRUE=
+  ENABLE_CABLE_EI012_FALSE='#'
+else
+  ENABLE_CABLE_EI012_TRUE='#'
+  ENABLE_CABLE_EI012_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$cabledrivers" | $GREP -q ep9307; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_CABLE_EP9307 1
+_ACEOF
+
+        if true; then
+  ENABLE_CABLE_EP9307_TRUE=
+  ENABLE_CABLE_EP9307_FALSE='#'
+else
+  ENABLE_CABLE_EP9307_TRUE='#'
+  ENABLE_CABLE_EP9307_FALSE=
+fi
+
+       enabled_cable_drivers="${enabled_cable_drivers}ep9307 "
+
+else
+
+        if false; then
+  ENABLE_CABLE_EP9307_TRUE=
+  ENABLE_CABLE_EP9307_FALSE='#'
+else
+  ENABLE_CABLE_EP9307_TRUE='#'
+  ENABLE_CABLE_EP9307_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$cabledrivers" | $GREP -q ft2232; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_CABLE_FT2232 1
+_ACEOF
+
+        if true; then
+  ENABLE_CABLE_FT2232_TRUE=
+  ENABLE_CABLE_FT2232_FALSE='#'
+else
+  ENABLE_CABLE_FT2232_TRUE='#'
+  ENABLE_CABLE_FT2232_FALSE=
+fi
+
+       enabled_cable_drivers="${enabled_cable_drivers}ft2232 "
+
+else
+
+        if false; then
+  ENABLE_CABLE_FT2232_TRUE=
+  ENABLE_CABLE_FT2232_FALSE='#'
+else
+  ENABLE_CABLE_FT2232_TRUE='#'
+  ENABLE_CABLE_FT2232_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$cabledrivers" | $GREP -q igloo; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_CABLE_IGLOO 1
+_ACEOF
+
+        if true; then
+  ENABLE_CABLE_IGLOO_TRUE=
+  ENABLE_CABLE_IGLOO_FALSE='#'
+else
+  ENABLE_CABLE_IGLOO_TRUE='#'
+  ENABLE_CABLE_IGLOO_FALSE=
+fi
+
+       enabled_cable_drivers="${enabled_cable_drivers}igloo "
+
+else
+
+        if false; then
+  ENABLE_CABLE_IGLOO_TRUE=
+  ENABLE_CABLE_IGLOO_FALSE='#'
+else
+  ENABLE_CABLE_IGLOO_TRUE='#'
+  ENABLE_CABLE_IGLOO_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$cabledrivers" | $GREP -q jim; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_JIM 1
+_ACEOF
+
+        if true; then
+  ENABLE_JIM_TRUE=
+  ENABLE_JIM_FALSE='#'
+else
+  ENABLE_JIM_TRUE='#'
+  ENABLE_JIM_FALSE=
+fi
+
+       enabled_cable_drivers="${enabled_cable_drivers}jim "
+
+else
+
+        if false; then
+  ENABLE_JIM_TRUE=
+  ENABLE_JIM_FALSE='#'
+else
+  ENABLE_JIM_TRUE='#'
+  ENABLE_JIM_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$cabledrivers" | $GREP -q jlink; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_CABLE_JLINK 1
+_ACEOF
+
+        if true; then
+  ENABLE_CABLE_JLINK_TRUE=
+  ENABLE_CABLE_JLINK_FALSE='#'
+else
+  ENABLE_CABLE_JLINK_TRUE='#'
+  ENABLE_CABLE_JLINK_FALSE=
+fi
+
+       enabled_cable_drivers="${enabled_cable_drivers}jlink "
+
+else
+
+        if false; then
+  ENABLE_CABLE_JLINK_TRUE=
+  ENABLE_CABLE_JLINK_FALSE='#'
+else
+  ENABLE_CABLE_JLINK_TRUE='#'
+  ENABLE_CABLE_JLINK_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$cabledrivers" | $GREP -q keithkoep; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_CABLE_KEITHKOEP 1
+_ACEOF
+
+        if true; then
+  ENABLE_CABLE_KEITHKOEP_TRUE=
+  ENABLE_CABLE_KEITHKOEP_FALSE='#'
+else
+  ENABLE_CABLE_KEITHKOEP_TRUE='#'
+  ENABLE_CABLE_KEITHKOEP_FALSE=
+fi
+
+       enabled_cable_drivers="${enabled_cable_drivers}keithkoep "
+
+else
+
+        if false; then
+  ENABLE_CABLE_KEITHKOEP_TRUE=
+  ENABLE_CABLE_KEITHKOEP_FALSE='#'
+else
+  ENABLE_CABLE_KEITHKOEP_TRUE='#'
+  ENABLE_CABLE_KEITHKOEP_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$cabledrivers" | $GREP -q lattice; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_CABLE_LATTICE 1
+_ACEOF
+
+        if true; then
+  ENABLE_CABLE_LATTICE_TRUE=
+  ENABLE_CABLE_LATTICE_FALSE='#'
+else
+  ENABLE_CABLE_LATTICE_TRUE='#'
+  ENABLE_CABLE_LATTICE_FALSE=
+fi
+
+       enabled_cable_drivers="${enabled_cable_drivers}lattice "
+
+else
+
+        if false; then
+  ENABLE_CABLE_LATTICE_TRUE=
+  ENABLE_CABLE_LATTICE_FALSE='#'
+else
+  ENABLE_CABLE_LATTICE_TRUE='#'
+  ENABLE_CABLE_LATTICE_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$cabledrivers" | $GREP -q mpcbdm; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_CABLE_MPCBDM 1
+_ACEOF
+
+        if true; then
+  ENABLE_CABLE_MPCBDM_TRUE=
+  ENABLE_CABLE_MPCBDM_FALSE='#'
+else
+  ENABLE_CABLE_MPCBDM_TRUE='#'
+  ENABLE_CABLE_MPCBDM_FALSE=
+fi
+
+       enabled_cable_drivers="${enabled_cable_drivers}mpcbdm "
+
+else
+
+        if false; then
+  ENABLE_CABLE_MPCBDM_TRUE=
+  ENABLE_CABLE_MPCBDM_FALSE='#'
+else
+  ENABLE_CABLE_MPCBDM_TRUE='#'
+  ENABLE_CABLE_MPCBDM_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$cabledrivers" | $GREP -q triton; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_CABLE_TRITON 1
+_ACEOF
+
+        if true; then
+  ENABLE_CABLE_TRITON_TRUE=
+  ENABLE_CABLE_TRITON_FALSE='#'
+else
+  ENABLE_CABLE_TRITON_TRUE='#'
+  ENABLE_CABLE_TRITON_FALSE=
+fi
+
+       enabled_cable_drivers="${enabled_cable_drivers}triton "
+
+else
+
+        if false; then
+  ENABLE_CABLE_TRITON_TRUE=
+  ENABLE_CABLE_TRITON_FALSE='#'
+else
+  ENABLE_CABLE_TRITON_TRUE='#'
+  ENABLE_CABLE_TRITON_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$cabledrivers" | $GREP -q usbblaster; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_CABLE_USBBLASTER 1
+_ACEOF
+
+        if true; then
+  ENABLE_CABLE_USBBLASTER_TRUE=
+  ENABLE_CABLE_USBBLASTER_FALSE='#'
+else
+  ENABLE_CABLE_USBBLASTER_TRUE='#'
+  ENABLE_CABLE_USBBLASTER_FALSE=
+fi
+
+       enabled_cable_drivers="${enabled_cable_drivers}usbblaster "
+
+else
+
+        if false; then
+  ENABLE_CABLE_USBBLASTER_TRUE=
+  ENABLE_CABLE_USBBLASTER_FALSE='#'
+else
+  ENABLE_CABLE_USBBLASTER_TRUE='#'
+  ENABLE_CABLE_USBBLASTER_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$cabledrivers" | $GREP -q wiggler; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_CABLE_WIGGLER 1
+_ACEOF
+
+        if true; then
+  ENABLE_CABLE_WIGGLER_TRUE=
+  ENABLE_CABLE_WIGGLER_FALSE='#'
+else
+  ENABLE_CABLE_WIGGLER_TRUE='#'
+  ENABLE_CABLE_WIGGLER_FALSE=
+fi
+
+       enabled_cable_drivers="${enabled_cable_drivers}wiggler "
+
+else
+
+        if false; then
+  ENABLE_CABLE_WIGGLER_TRUE=
+  ENABLE_CABLE_WIGGLER_FALSE='#'
+else
+  ENABLE_CABLE_WIGGLER_TRUE='#'
+  ENABLE_CABLE_WIGGLER_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$cabledrivers" | $GREP -q xpc; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_CABLE_XPC 1
+_ACEOF
+
+        if true; then
+  ENABLE_CABLE_XPC_TRUE=
+  ENABLE_CABLE_XPC_FALSE='#'
+else
+  ENABLE_CABLE_XPC_TRUE='#'
+  ENABLE_CABLE_XPC_FALSE=
+fi
+
+       enabled_cable_drivers="${enabled_cable_drivers}xpc "
+
+else
+
+        if false; then
+  ENABLE_CABLE_XPC_TRUE=
+  ENABLE_CABLE_XPC_FALSE='#'
+else
+  ENABLE_CABLE_XPC_TRUE='#'
+  ENABLE_CABLE_XPC_FALSE=
+fi
+
+
+fi
+
+
+
+
+# Enable parport drivers
+
+# Check whether --enable-parport was given.
+if test "${enable_parport+set}" = set; then
+  enableval=$enable_parport; case ${enableval} in
+  yes) parportdrivers=default ;;
+  no) parportdrivers=none ;;
+  none) parportdrivers=none ;;
+  *) parportdrivers=`echo ${enableval} | $SED -e 's/,/ /g'` ;;
+esac
+
+else
+  parportdrivers=default
+fi
+
+# expand 'default' to default enabled parportdrivers
+parportdrivers=`echo ${parportdrivers} | $SED -e "s/default/\
+direct ftdi ftd2xx ppdev ppi/"`
+# automatically disable parport drivers when a required feature is not available
+if test "x$HAVELIBFTDI" != "xyes"; then
+
+    parportdrivers=`echo ${parportdrivers} | $SED -e "s/ftdi//"`
+
+fi
+
+if test "x$HAVELIBFTD2XX" != "xyes"; then
+
+    parportdrivers=`echo ${parportdrivers} | $SED -e "s/ftd2xx//"`
+
+fi
+
+if test "x$HAVE_LINUX_PPDEV_H" != "xyes"; then
+
+    parportdrivers=`echo ${parportdrivers} | $SED -e "s/ppdev//"`
+
+fi
+
+if test "x$HAVE_DEV_PPBUS_PPI_H" != "xyes"; then
+
+    parportdrivers=`echo ${parportdrivers} | $SED -e "s/ppi//"`
+
+fi
+
+if test "x$HAVE_IOPERM" != "xyes" -a "x$HAVE_I386_SET_IOPERM" != "xyes"; then
+
+    parportdrivers=`echo ${parportdrivers} | $SED -e "s/direct//"`
+
+fi
+
+#
+enabled_parport_drivers=''
+
+    if echo "$parportdrivers" | $GREP -q direct; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_PARPORT_DIRECT 1
+_ACEOF
+
+        if true; then
+  ENABLE_PARPORT_DIRECT_TRUE=
+  ENABLE_PARPORT_DIRECT_FALSE='#'
+else
+  ENABLE_PARPORT_DIRECT_TRUE='#'
+  ENABLE_PARPORT_DIRECT_FALSE=
+fi
+
+       enabled_parport_drivers="${enabled_parport_drivers}direct "
+
+else
+
+        if false; then
+  ENABLE_PARPORT_DIRECT_TRUE=
+  ENABLE_PARPORT_DIRECT_FALSE='#'
+else
+  ENABLE_PARPORT_DIRECT_TRUE='#'
+  ENABLE_PARPORT_DIRECT_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$parportdrivers" | $GREP -q ftd2xx; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_PARPORT_FTD2XX 1
+_ACEOF
+
+        if true; then
+  ENABLE_PARPORT_FTD2XX_TRUE=
+  ENABLE_PARPORT_FTD2XX_FALSE='#'
+else
+  ENABLE_PARPORT_FTD2XX_TRUE='#'
+  ENABLE_PARPORT_FTD2XX_FALSE=
+fi
+
+       enabled_parport_drivers="${enabled_parport_drivers}ftd2xx "
+
+else
+
+        if false; then
+  ENABLE_PARPORT_FTD2XX_TRUE=
+  ENABLE_PARPORT_FTD2XX_FALSE='#'
+else
+  ENABLE_PARPORT_FTD2XX_TRUE='#'
+  ENABLE_PARPORT_FTD2XX_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$parportdrivers" | $GREP -q ftdi; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_PARPORT_FTDI 1
+_ACEOF
+
+        if true; then
+  ENABLE_PARPORT_FTDI_TRUE=
+  ENABLE_PARPORT_FTDI_FALSE='#'
+else
+  ENABLE_PARPORT_FTDI_TRUE='#'
+  ENABLE_PARPORT_FTDI_FALSE=
+fi
+
+       enabled_parport_drivers="${enabled_parport_drivers}ftdi "
+
+else
+
+        if false; then
+  ENABLE_PARPORT_FTDI_TRUE=
+  ENABLE_PARPORT_FTDI_FALSE='#'
+else
+  ENABLE_PARPORT_FTDI_TRUE='#'
+  ENABLE_PARPORT_FTDI_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$parportdrivers" | $GREP -q ppdev; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_PARPORT_PPDEV 1
+_ACEOF
+
+        if true; then
+  ENABLE_PARPORT_PPDEV_TRUE=
+  ENABLE_PARPORT_PPDEV_FALSE='#'
+else
+  ENABLE_PARPORT_PPDEV_TRUE='#'
+  ENABLE_PARPORT_PPDEV_FALSE=
+fi
+
+       enabled_parport_drivers="${enabled_parport_drivers}ppdev "
+
+else
+
+        if false; then
+  ENABLE_PARPORT_PPDEV_TRUE=
+  ENABLE_PARPORT_PPDEV_FALSE='#'
+else
+  ENABLE_PARPORT_PPDEV_TRUE='#'
+  ENABLE_PARPORT_PPDEV_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$parportdrivers" | $GREP -q ppi; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_PARPORT_PPI 1
+_ACEOF
+
+        if true; then
+  ENABLE_PARPORT_PPI_TRUE=
+  ENABLE_PARPORT_PPI_FALSE='#'
+else
+  ENABLE_PARPORT_PPI_TRUE='#'
+  ENABLE_PARPORT_PPI_FALSE=
+fi
+
+       enabled_parport_drivers="${enabled_parport_drivers}ppi "
+
+else
+
+        if false; then
+  ENABLE_PARPORT_PPI_TRUE=
+  ENABLE_PARPORT_PPI_FALSE='#'
+else
+  ENABLE_PARPORT_PPI_TRUE='#'
+  ENABLE_PARPORT_PPI_FALSE=
+fi
+
+
+fi
+
+
 
 
 cat >confcache <<\_ACEOF
@@ -10444,20 +12364,6 @@ $as_echo "$as_me: error: conditional \"HAVE_LIBFTD2XX\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${ENABLE_EP9307_TRUE}" && test -z "${ENABLE_EP9307_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_EP9307\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"ENABLE_EP9307\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${ENABLE_EP9307_TRUE}" && test -z "${ENABLE_EP9307_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_EP9307\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"ENABLE_EP9307\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
 if test -z "${ENABLE_SVF_TRUE}" && test -z "${ENABLE_SVF_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_SVF\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
@@ -10514,20 +12420,6 @@ $as_echo "$as_me: error: conditional \"ENABLE_BSDL\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
-if test -z "${ENABLE_JIM_TRUE}" && test -z "${ENABLE_JIM_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_JIM\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"ENABLE_JIM\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test -z "${ENABLE_JIM_TRUE}" && test -z "${ENABLE_JIM_FALSE}"; then
-  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_JIM\" was never defined.
-Usually this means the macro was only invoked conditionally." >&5
-$as_echo "$as_me: error: conditional \"ENABLE_JIM\" was never defined.
-Usually this means the macro was only invoked conditionally." >&2;}
-   { (exit 1); exit 1; }; }
-fi
 if test -z "${JEDEC_EXP_TRUE}" && test -z "${JEDEC_EXP_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"JEDEC_EXP\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
@@ -10553,6 +12445,776 @@ if test -z "${JTAG_RELOCATABLE_TRUE}" && test -z "${JTAG_RELOCATABLE_FALSE}"; th
   { { $as_echo "$as_me:$LINENO: error: conditional \"JTAG_RELOCATABLE\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"JTAG_RELOCATABLE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_AU1500_TRUE}" && test -z "${ENABLE_BUS_AU1500_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_AU1500\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_AU1500\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_AU1500_TRUE}" && test -z "${ENABLE_BUS_AU1500_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_AU1500\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_AU1500\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BCM1250_TRUE}" && test -z "${ENABLE_BUS_BCM1250_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BCM1250\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BCM1250\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BCM1250_TRUE}" && test -z "${ENABLE_BUS_BCM1250_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BCM1250\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BCM1250\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BF526_EZKIT_TRUE}" && test -z "${ENABLE_BUS_BF526_EZKIT_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF526_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF526_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BF526_EZKIT_TRUE}" && test -z "${ENABLE_BUS_BF526_EZKIT_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF526_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF526_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BF527_EZKIT_TRUE}" && test -z "${ENABLE_BUS_BF527_EZKIT_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF527_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF527_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BF527_EZKIT_TRUE}" && test -z "${ENABLE_BUS_BF527_EZKIT_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF527_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF527_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BF533_STAMP_TRUE}" && test -z "${ENABLE_BUS_BF533_STAMP_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF533_STAMP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF533_STAMP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BF533_STAMP_TRUE}" && test -z "${ENABLE_BUS_BF533_STAMP_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF533_STAMP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF533_STAMP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BF533_EZKIT_TRUE}" && test -z "${ENABLE_BUS_BF533_EZKIT_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF533_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF533_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BF533_EZKIT_TRUE}" && test -z "${ENABLE_BUS_BF533_EZKIT_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF533_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF533_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BF537_STAMP_TRUE}" && test -z "${ENABLE_BUS_BF537_STAMP_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF537_STAMP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF537_STAMP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BF537_STAMP_TRUE}" && test -z "${ENABLE_BUS_BF537_STAMP_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF537_STAMP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF537_STAMP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BF537_EZKIT_TRUE}" && test -z "${ENABLE_BUS_BF537_EZKIT_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF537_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF537_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BF537_EZKIT_TRUE}" && test -z "${ENABLE_BUS_BF537_EZKIT_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF537_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF537_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BF538F_EZKIT_TRUE}" && test -z "${ENABLE_BUS_BF538F_EZKIT_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF538F_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF538F_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BF538F_EZKIT_TRUE}" && test -z "${ENABLE_BUS_BF538F_EZKIT_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF538F_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF538F_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BF548_EZKIT_TRUE}" && test -z "${ENABLE_BUS_BF548_EZKIT_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF548_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF548_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BF548_EZKIT_TRUE}" && test -z "${ENABLE_BUS_BF548_EZKIT_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF548_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF548_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BF561_EZKIT_TRUE}" && test -z "${ENABLE_BUS_BF561_EZKIT_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF561_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF561_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BF561_EZKIT_TRUE}" && test -z "${ENABLE_BUS_BF561_EZKIT_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF561_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF561_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_EJTAG_TRUE}" && test -z "${ENABLE_BUS_EJTAG_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_EJTAG\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_EJTAG\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_EJTAG_TRUE}" && test -z "${ENABLE_BUS_EJTAG_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_EJTAG\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_EJTAG\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_FJMEM_TRUE}" && test -z "${ENABLE_BUS_FJMEM_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_FJMEM\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_FJMEM\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_FJMEM_TRUE}" && test -z "${ENABLE_BUS_FJMEM_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_FJMEM\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_FJMEM\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_IXP425_TRUE}" && test -z "${ENABLE_BUS_IXP425_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_IXP425\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_IXP425\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_IXP425_TRUE}" && test -z "${ENABLE_BUS_IXP425_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_IXP425\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_IXP425\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_JOPCYC_TRUE}" && test -z "${ENABLE_BUS_JOPCYC_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_JOPCYC\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_JOPCYC\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_JOPCYC_TRUE}" && test -z "${ENABLE_BUS_JOPCYC_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_JOPCYC\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_JOPCYC\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_H7202_TRUE}" && test -z "${ENABLE_BUS_H7202_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_H7202\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_H7202\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_H7202_TRUE}" && test -z "${ENABLE_BUS_H7202_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_H7202\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_H7202\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_LH7A400_TRUE}" && test -z "${ENABLE_BUS_LH7A400_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_LH7A400\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_LH7A400\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_LH7A400_TRUE}" && test -z "${ENABLE_BUS_LH7A400_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_LH7A400\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_LH7A400\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_MPC5200_TRUE}" && test -z "${ENABLE_BUS_MPC5200_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_MPC5200\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_MPC5200\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_MPC5200_TRUE}" && test -z "${ENABLE_BUS_MPC5200_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_MPC5200\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_MPC5200\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_MPC824X_TRUE}" && test -z "${ENABLE_BUS_MPC824X_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_MPC824X\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_MPC824X\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_MPC824X_TRUE}" && test -z "${ENABLE_BUS_MPC824X_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_MPC824X\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_MPC824X\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_PPC405EP_TRUE}" && test -z "${ENABLE_BUS_PPC405EP_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_PPC405EP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_PPC405EP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_PPC405EP_TRUE}" && test -z "${ENABLE_BUS_PPC405EP_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_PPC405EP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_PPC405EP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_PPC440GX_EBC8_TRUE}" && test -z "${ENABLE_BUS_PPC440GX_EBC8_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_PPC440GX_EBC8\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_PPC440GX_EBC8\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_PPC440GX_EBC8_TRUE}" && test -z "${ENABLE_BUS_PPC440GX_EBC8_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_PPC440GX_EBC8\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_PPC440GX_EBC8\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_PROTOTYPE_TRUE}" && test -z "${ENABLE_BUS_PROTOTYPE_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_PROTOTYPE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_PROTOTYPE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_PROTOTYPE_TRUE}" && test -z "${ENABLE_BUS_PROTOTYPE_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_PROTOTYPE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_PROTOTYPE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_PXA2X0_TRUE}" && test -z "${ENABLE_BUS_PXA2X0_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_PXA2X0\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_PXA2X0\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_PXA2X0_TRUE}" && test -z "${ENABLE_BUS_PXA2X0_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_PXA2X0\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_PXA2X0\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_PXA27X_TRUE}" && test -z "${ENABLE_BUS_PXA27X_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_PXA27X\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_PXA27X\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_PXA27X_TRUE}" && test -z "${ENABLE_BUS_PXA27X_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_PXA27X\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_PXA27X\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_S3C4510_TRUE}" && test -z "${ENABLE_BUS_S3C4510_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_S3C4510\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_S3C4510\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_S3C4510_TRUE}" && test -z "${ENABLE_BUS_S3C4510_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_S3C4510\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_S3C4510\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_SA1110_TRUE}" && test -z "${ENABLE_BUS_SA1110_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_SA1110\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_SA1110\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_SA1110_TRUE}" && test -z "${ENABLE_BUS_SA1110_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_SA1110\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_SA1110\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_SH7727_TRUE}" && test -z "${ENABLE_BUS_SH7727_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_SH7727\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_SH7727\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_SH7727_TRUE}" && test -z "${ENABLE_BUS_SH7727_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_SH7727\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_SH7727\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_SH7750R_TRUE}" && test -z "${ENABLE_BUS_SH7750R_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_SH7750R\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_SH7750R\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_SH7750R_TRUE}" && test -z "${ENABLE_BUS_SH7750R_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_SH7750R\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_SH7750R\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_SH7751R_TRUE}" && test -z "${ENABLE_BUS_SH7751R_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_SH7751R\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_SH7751R\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_SH7751R_TRUE}" && test -z "${ENABLE_BUS_SH7751R_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_SH7751R\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_SH7751R\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_SHARC_21065L_TRUE}" && test -z "${ENABLE_BUS_SHARC_21065L_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_SHARC_21065L\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_SHARC_21065L\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_SHARC_21065L_TRUE}" && test -z "${ENABLE_BUS_SHARC_21065L_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_SHARC_21065L\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_SHARC_21065L\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_SLSUP3_TRUE}" && test -z "${ENABLE_BUS_SLSUP3_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_SLSUP3\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_SLSUP3\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_SLSUP3_TRUE}" && test -z "${ENABLE_BUS_SLSUP3_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_SLSUP3\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_SLSUP3\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_TX4925_TRUE}" && test -z "${ENABLE_BUS_TX4925_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_TX4925\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_TX4925\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_TX4925_TRUE}" && test -z "${ENABLE_BUS_TX4925_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_TX4925\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_TX4925\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_ZEFANT_XS3_TRUE}" && test -z "${ENABLE_BUS_ZEFANT_XS3_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_ZEFANT_XS3\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_ZEFANT_XS3\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_ZEFANT_XS3_TRUE}" && test -z "${ENABLE_BUS_ZEFANT_XS3_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_ZEFANT_XS3\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_ZEFANT_XS3\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_ARCOM_TRUE}" && test -z "${ENABLE_CABLE_ARCOM_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_ARCOM\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_ARCOM\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_ARCOM_TRUE}" && test -z "${ENABLE_CABLE_ARCOM_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_ARCOM\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_ARCOM\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_BYTEBLASTER_TRUE}" && test -z "${ENABLE_CABLE_BYTEBLASTER_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_BYTEBLASTER\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_BYTEBLASTER\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_BYTEBLASTER_TRUE}" && test -z "${ENABLE_CABLE_BYTEBLASTER_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_BYTEBLASTER\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_BYTEBLASTER\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_DLC5_TRUE}" && test -z "${ENABLE_CABLE_DLC5_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_DLC5\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_DLC5\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_DLC5_TRUE}" && test -z "${ENABLE_CABLE_DLC5_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_DLC5\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_DLC5\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_EA253_TRUE}" && test -z "${ENABLE_CABLE_EA253_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_EA253\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_EA253\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_EA253_TRUE}" && test -z "${ENABLE_CABLE_EA253_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_EA253\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_EA253\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_EI012_TRUE}" && test -z "${ENABLE_CABLE_EI012_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_EI012\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_EI012\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_EI012_TRUE}" && test -z "${ENABLE_CABLE_EI012_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_EI012\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_EI012\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_EP9307_TRUE}" && test -z "${ENABLE_CABLE_EP9307_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_EP9307\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_EP9307\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_EP9307_TRUE}" && test -z "${ENABLE_CABLE_EP9307_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_EP9307\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_EP9307\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_FT2232_TRUE}" && test -z "${ENABLE_CABLE_FT2232_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_FT2232\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_FT2232\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_FT2232_TRUE}" && test -z "${ENABLE_CABLE_FT2232_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_FT2232\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_FT2232\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_IGLOO_TRUE}" && test -z "${ENABLE_CABLE_IGLOO_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_IGLOO\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_IGLOO\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_IGLOO_TRUE}" && test -z "${ENABLE_CABLE_IGLOO_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_IGLOO\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_IGLOO\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_JIM_TRUE}" && test -z "${ENABLE_JIM_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_JIM\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_JIM\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_JIM_TRUE}" && test -z "${ENABLE_JIM_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_JIM\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_JIM\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_JLINK_TRUE}" && test -z "${ENABLE_CABLE_JLINK_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_JLINK\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_JLINK\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_JLINK_TRUE}" && test -z "${ENABLE_CABLE_JLINK_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_JLINK\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_JLINK\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_KEITHKOEP_TRUE}" && test -z "${ENABLE_CABLE_KEITHKOEP_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_KEITHKOEP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_KEITHKOEP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_KEITHKOEP_TRUE}" && test -z "${ENABLE_CABLE_KEITHKOEP_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_KEITHKOEP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_KEITHKOEP\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_LATTICE_TRUE}" && test -z "${ENABLE_CABLE_LATTICE_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_LATTICE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_LATTICE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_LATTICE_TRUE}" && test -z "${ENABLE_CABLE_LATTICE_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_LATTICE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_LATTICE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_MPCBDM_TRUE}" && test -z "${ENABLE_CABLE_MPCBDM_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_MPCBDM\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_MPCBDM\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_MPCBDM_TRUE}" && test -z "${ENABLE_CABLE_MPCBDM_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_MPCBDM\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_MPCBDM\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_TRITON_TRUE}" && test -z "${ENABLE_CABLE_TRITON_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_TRITON\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_TRITON\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_TRITON_TRUE}" && test -z "${ENABLE_CABLE_TRITON_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_TRITON\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_TRITON\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_USBBLASTER_TRUE}" && test -z "${ENABLE_CABLE_USBBLASTER_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_USBBLASTER\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_USBBLASTER\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_USBBLASTER_TRUE}" && test -z "${ENABLE_CABLE_USBBLASTER_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_USBBLASTER\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_USBBLASTER\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_WIGGLER_TRUE}" && test -z "${ENABLE_CABLE_WIGGLER_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_WIGGLER\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_WIGGLER\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_WIGGLER_TRUE}" && test -z "${ENABLE_CABLE_WIGGLER_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_WIGGLER\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_WIGGLER\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_XPC_TRUE}" && test -z "${ENABLE_CABLE_XPC_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_XPC\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_XPC\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_CABLE_XPC_TRUE}" && test -z "${ENABLE_CABLE_XPC_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_CABLE_XPC\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_CABLE_XPC\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_PARPORT_DIRECT_TRUE}" && test -z "${ENABLE_PARPORT_DIRECT_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_PARPORT_DIRECT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_PARPORT_DIRECT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_PARPORT_DIRECT_TRUE}" && test -z "${ENABLE_PARPORT_DIRECT_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_PARPORT_DIRECT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_PARPORT_DIRECT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_PARPORT_FTD2XX_TRUE}" && test -z "${ENABLE_PARPORT_FTD2XX_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_PARPORT_FTD2XX\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_PARPORT_FTD2XX\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_PARPORT_FTD2XX_TRUE}" && test -z "${ENABLE_PARPORT_FTD2XX_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_PARPORT_FTD2XX\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_PARPORT_FTD2XX\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_PARPORT_FTDI_TRUE}" && test -z "${ENABLE_PARPORT_FTDI_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_PARPORT_FTDI\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_PARPORT_FTDI\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_PARPORT_FTDI_TRUE}" && test -z "${ENABLE_PARPORT_FTDI_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_PARPORT_FTDI\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_PARPORT_FTDI\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_PARPORT_PPDEV_TRUE}" && test -z "${ENABLE_PARPORT_PPDEV_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_PARPORT_PPDEV\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_PARPORT_PPDEV\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_PARPORT_PPDEV_TRUE}" && test -z "${ENABLE_PARPORT_PPDEV_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_PARPORT_PPDEV\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_PARPORT_PPDEV\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_PARPORT_PPI_TRUE}" && test -z "${ENABLE_PARPORT_PPI_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_PARPORT_PPI\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_PARPORT_PPI\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_PARPORT_PPI_TRUE}" && test -z "${ENABLE_PARPORT_PPI_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_PARPORT_PPI\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_PARPORT_PPI\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
@@ -12007,50 +14669,81 @@ $as_echo "$as_me: WARNING: Unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
 
-if test ${HAVELIBFTDI:-no} != no ; then
+if test ${HAVELIBFTDI:-no} != no; then
+
    FLAG_HAVELIBFTDI=yes
+
 else
+
    FLAG_HAVELIBFTDI=no
+
 fi
-if test ${HAVELIBUSB:-no} != no ; then
+
+if test ${HAVELIBUSB:-no} != no; then
+
    FLAG_HAVELIBUSB=yes
+
 else
+
    FLAG_HAVELIBUSB=no
+
 fi
-if test ${HAVELIBFTD2XX:-no} != no ; then
+
+if test ${HAVELIBFTD2XX:-no} != no; then
+
    FLAG_HAVELIBFTD2XX=yes
+
 else
+
    FLAG_HAVELIBFTD2XX=no
+
 fi
-if test ${svf:-false} != false ; then
+
+if test ${svf:-false} != false; then
+
    FLAG_SVF=yes
+
 else
+
    FLAG_SVF=no
+
 fi
-if test ${bsdl:-false} != false ; then
+
+if test ${bsdl:-false} != false; then
+
    FLAG_BSDL=yes
+
 else
+
    FLAG_BSDL=no
+
 fi
-{ $as_echo "$as_me:$LINENO: result:
+
+{ $as_echo "$as_me:$LINENO:
+
 jtag is now configured for
 
-  USB cable support    : $FLAG_HAVELIBUSB
-  FTDI cable support
-    via libftdi        : $FLAG_HAVELIBFTDI
-    via libftd2xx      : $FLAG_HAVELIBFTD2XX
+  Detected libusb      : $FLAG_HAVELIBUSB
+  Detected libftdi     : $FLAG_HAVELIBFTDI
+  Detected libftd2xx   : $FLAG_HAVELIBFTD2XX
   SVF error locations  : $bison_locations
   Build SVF player     : $FLAG_SVF
   Build BSDL subsystem : $FLAG_BSDL
+  Bus drivers          : $enabled_bus_drivers
+  Cable drivers        : $enabled_cable_drivers
+  Parport drivers      : $enabled_parport_drivers
 " >&5
-$as_echo "
+$as_echo "$as_me:
+
 jtag is now configured for
 
-  USB cable support    : $FLAG_HAVELIBUSB
-  FTDI cable support
-    via libftdi        : $FLAG_HAVELIBFTDI
-    via libftd2xx      : $FLAG_HAVELIBFTD2XX
+  Detected libusb      : $FLAG_HAVELIBUSB
+  Detected libftdi     : $FLAG_HAVELIBFTDI
+  Detected libftd2xx   : $FLAG_HAVELIBFTD2XX
   SVF error locations  : $bison_locations
   Build SVF player     : $FLAG_SVF
   Build BSDL subsystem : $FLAG_BSDL
-" >&6; }
+  Bus drivers          : $enabled_bus_drivers
+  Cable drivers        : $enabled_cable_drivers
+  Parport drivers      : $enabled_parport_drivers
+" >&6;}
