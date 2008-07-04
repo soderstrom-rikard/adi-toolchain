@@ -37,7 +37,7 @@ TODO:
 
 - mmr plugin
 	- detect proc family automatically, or based on toolchain target
-	- handle SYSCFG - it's a register, not an mmr
+	- handle all core registers since the xml files define them
 
 - dedicated plugin for xml resources
 	- com.adi.definition.cpu
