@@ -194,9 +194,16 @@ end
 
 define show_clocks
 	printf "PLL_LOCKCNT: 0x%04x\n", *(unsigned short *)0xFFC00010
-	printf "VR_CTL:      0x%04x\n", *(unsigned short *) 0xFFC00008
-	printf "PLL_DIV:     0x%04x\n", *(unsigned short *) 0xFFC00004
-	printf "PLL_CTL:     0x%04x\n", *(unsigned short *) 0xFFC00000
+	printf "VR_CTL:      0x%04x\n", *(unsigned short *)0xFFC00008
+	printf "PLL_DIV:     0x%04x\n", *(unsigned short *)0xFFC00004
+	printf "PLL_CTL:     0x%04x\n", *(unsigned short *)0xFFC00000
+end
+
+define show_sdram
+	printf "SDRRC:  0x%04x\n", *(unsigned short *)0xFFC00A18
+	printf "SDBCTL: 0x%04x\n", *(unsigned short *)0xFFC00A14
+	printf "SDSTAT: 0x%04x\n", *(unsigned short *)0xFFC00A1C
+	printf "SDGCTL: 0x%08x\n", *(unsigned long  *)0xFFC00A10
 end
 
 define show_ddr
