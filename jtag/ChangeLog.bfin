@@ -1,5 +1,10 @@
 2008-07-05  Jie Zhang  <jie.zhang@analog.com>
 
+	* data/analog/bf533/STEPPINGS: Add stepping 5.
+	* data/analog/bf548/STEPPINGS: Add stepping 2.
+
+2008-07-05  Jie Zhang  <jie.zhang@analog.com>
+
 	* src/bus/bf533_ezkit.c: Remove.
 	* src/bus/bf537_stamp.c (bf537_stamp_bus_new): Don't false alarm.
 	(bf537_stamp_bus_write): Deassert AOE when bus write.
