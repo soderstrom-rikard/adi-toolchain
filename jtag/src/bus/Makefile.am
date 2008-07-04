@@ -59,7 +59,7 @@ libbus_a_SOURCES += bf533_stamp.c
 endif
 
 if ENABLE_BUS_BF533_EZKIT
-libbus_a_SOURCES += bf533_ezkit.c
+libbus_a_SOURCES += bf537_stamp.c
 endif
 
 if ENABLE_BUS_BF537_STAMP

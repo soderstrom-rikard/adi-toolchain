@@ -72,7 +72,7 @@ bf537_stamp_bus_new( chain_t *chain, const bus_driver_t *driver, char *cmd_param
 {
 	bus_t *bus;
 	part_t *part;
-	char buff[15];
+	char buff[15], buff2[15];
 	int i;
 	int failed = 0;
 
@@ -97,17 +97,27 @@ bf537_stamp_bus_new( chain_t *chain, const bus_driver_t *driver, char *cmd_param
 
 	for (i = 0; i < 19; i++) {
 		sprintf( buff, "ADDR%d", i + 1);
-		if (generic_bus_attach_sig( part, &(ADDR[i]), buff )) {
-			sprintf( buff, "ADDR[%d]", i + 1); /* BF533/2/1 uses ADDR[x] instead of ADDRx */
-			failed |= generic_bus_attach_sig( part, &(ADDR[i]), buff );
+		ADDR[i] = part_find_signal( part, buff );
+		if (!ADDR[i]) {
+			sprintf( buff2, "ADDR[%d]", i + 1 ); /* BF533/2/1 uses ADDR[x] instead of ADDRx */
+			ADDR[i] = part_find_signal( part, buff2 );
+			if (!ADDR[i]) {
+				printf( _("signal '%s' or '%s' not found\n"), buff, buff2 );
+				failed |= 1;
+			}
 		}
 	}
 
 	for (i = 0; i < 16; i++) {
 		sprintf( buff, "DATA%d", i);
-		if (generic_bus_attach_sig( part, &(DATA[i]), buff )) {
-			sprintf( buff, "DATA[%d]", i); /* BF533/2/1 uses DATA[x] instead of DATAx */
-			failed |= generic_bus_attach_sig( part, &(DATA[i]), buff );
+		DATA[i] = part_find_signal( part, buff );
+		if (!DATA[i]) {
+			sprintf( buff2, "DATA[%d]", i ); /* BF533/2/1 uses DATA[x] instead of DATAx */
+			DATA[i] = part_find_signal( part, buff2 );
+			if (!DATA[i]) {
+				printf( _("signal '%s' or '%s' not found\n"), buff, buff2 );
+				failed |= 1;
+			}
 		}
 	}
 
@@ -300,6 +310,7 @@ bf537_stamp_bus_write( bus_t *bus, uint32_t adr, uint32_t data )
 	chain_t *chain = CHAIN;
 
 	select_flash( bus );
+	part_set_signal( p, AOE, 1, 1 );
 	part_set_signal( p, ARE, 1, 1 );
 
 	setup_address( bus, adr );
@@ -391,6 +402,16 @@ const bus_driver_t bf526_ezkit_bus = {
 };
 
 #endif /* #ifdef ENABLE_BUS_BF526_EZKIT */
+
+#ifdef ENABLE_BUS_BF533_EZKIT
+
+const bus_driver_t bf533_ezkit_bus = {
+	"bf533_ezkit",
+	N_("Blackfin BF533 EZ-KIT board bus driver via BSR"),
+	BF537_STAMP_BUS_FUNCTIONS
+};
+
+#endif /* #ifdef ENABLE_BUS_BF533_EZKIT */
 
 #ifdef ENABLE_BUS_BF52X
 

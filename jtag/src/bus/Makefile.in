@@ -87,7 +87,7 @@ DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 @ENABLE_BUS_BF526_EZKIT_TRUE@am__append_4 = bf537_stamp.c
 @ENABLE_BUS_BF527_EZKIT_TRUE@am__append_5 = bf537_stamp.c
 @ENABLE_BUS_BF533_STAMP_TRUE@am__append_6 = bf533_stamp.c
-@ENABLE_BUS_BF533_EZKIT_TRUE@am__append_7 = bf533_ezkit.c
+@ENABLE_BUS_BF533_EZKIT_TRUE@am__append_7 = bf537_stamp.c
 @ENABLE_BUS_BF537_STAMP_TRUE@am__append_8 = bf537_stamp.c
 @ENABLE_BUS_BF537_EZKIT_TRUE@am__append_9 = bf537_stamp.c
 @ENABLE_BUS_BF538F_EZKIT_TRUE@am__append_10 = bf537_stamp.c
@@ -135,19 +135,18 @@ libbus_a_AR = $(AR) $(ARFLAGS)
 libbus_a_LIBADD =
 am__libbus_a_SOURCES_DIST = buses.c buses.h generic_bus.c \
 	generic_bus.h pxa2x0_mc.h readmem.c writemem.c au1500.c \
-	avr32.c bcm1250.c bf537_stamp.c bf533_stamp.c bf533_ezkit.c \
-	bf548_ezkit.c bf561_ezkit.c ejtag.c fjmem.c h7202.c ixp425.c \
-	jopcyc.c lh7a400.c mpc5200.c mpc824x.c ppc405ep.c \
-	ppc440gx_ebc8.c prototype.c pxa2x0.c s3c4510x.c sa1110.c \
-	sh7727.c sh7750r.c sh7751r.c sharc21065l.c slsup3.c tx4925.c \
-	zefant-xs3.c
+	avr32.c bcm1250.c bf537_stamp.c bf533_stamp.c bf548_ezkit.c \
+	bf561_ezkit.c ejtag.c fjmem.c h7202.c ixp425.c jopcyc.c \
+	lh7a400.c mpc5200.c mpc824x.c ppc405ep.c ppc440gx_ebc8.c \
+	prototype.c pxa2x0.c s3c4510x.c sa1110.c sh7727.c sh7750r.c \
+	sh7751r.c sharc21065l.c slsup3.c tx4925.c zefant-xs3.c
 @ENABLE_BUS_AU1500_TRUE@am__objects_1 = au1500.$(OBJEXT)
 @ENABLE_BUS_AVR32_TRUE@am__objects_2 = avr32.$(OBJEXT)
 @ENABLE_BUS_BCM1250_TRUE@am__objects_3 = bcm1250.$(OBJEXT)
 @ENABLE_BUS_BF526_EZKIT_TRUE@am__objects_4 = bf537_stamp.$(OBJEXT)
 @ENABLE_BUS_BF527_EZKIT_TRUE@am__objects_5 = bf537_stamp.$(OBJEXT)
 @ENABLE_BUS_BF533_STAMP_TRUE@am__objects_6 = bf533_stamp.$(OBJEXT)
-@ENABLE_BUS_BF533_EZKIT_TRUE@am__objects_7 = bf533_ezkit.$(OBJEXT)
+@ENABLE_BUS_BF533_EZKIT_TRUE@am__objects_7 = bf537_stamp.$(OBJEXT)
 @ENABLE_BUS_BF537_STAMP_TRUE@am__objects_8 = bf537_stamp.$(OBJEXT)
 @ENABLE_BUS_BF537_EZKIT_TRUE@am__objects_9 = bf537_stamp.$(OBJEXT)
 @ENABLE_BUS_BF538F_EZKIT_TRUE@am__objects_10 = bf537_stamp.$(OBJEXT)
@@ -383,7 +382,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/au1500.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/avr32.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bcm1250.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bf533_ezkit.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bf533_stamp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bf537_stamp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bf548_ezkit.Po@am__quote@
