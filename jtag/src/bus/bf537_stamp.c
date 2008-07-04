@@ -44,6 +44,7 @@ typedef struct {
 	signal_t *abe[2];
 	signal_t *awe;
 	signal_t *are;
+	signal_t *aoe;
 	signal_t *sras;
 	signal_t *scas;
 	signal_t *sms;
@@ -55,6 +56,7 @@ typedef struct {
 #define	DATA	((bus_params_t *) bus->params)->data
 #define	AWE	((bus_params_t *) bus->params)->awe
 #define	ARE	((bus_params_t *) bus->params)->are
+#define	AOE	((bus_params_t *) bus->params)->aoe
 #define	ABE	((bus_params_t *) bus->params)->abe
 #define	SRAS	((bus_params_t *) bus->params)->sras
 #define	SCAS	((bus_params_t *) bus->params)->scas
@@ -95,17 +97,25 @@ bf537_stamp_bus_new( chain_t *chain, const bus_driver_t *driver, char *cmd_param
 
 	for (i = 0; i < 19; i++) {
 		sprintf( buff, "ADDR%d", i + 1);
-		failed |= generic_bus_attach_sig( part, &(ADDR[i]), buff );
+		if (generic_bus_attach_sig( part, &(ADDR[i]), buff )) {
+			sprintf( buff, "ADDR[%d]", i + 1); /* BF533/2/1 uses ADDR[x] instead of ADDRx */
+			failed |= generic_bus_attach_sig( part, &(ADDR[i]), buff );
+		}
 	}
 
 	for (i = 0; i < 16; i++) {
 		sprintf( buff, "DATA%d", i);
-		failed |= generic_bus_attach_sig( part, &(DATA[i]), buff );
+		if (generic_bus_attach_sig( part, &(DATA[i]), buff )) {
+			sprintf( buff, "DATA[%d]", i); /* BF533/2/1 uses DATA[x] instead of DATAx */
+			failed |= generic_bus_attach_sig( part, &(DATA[i]), buff );
+		}
 	}
 
 	failed |= generic_bus_attach_sig( part, &(AWE),    "AWE_B"  );
 
 	failed |= generic_bus_attach_sig( part, &(ARE),    "ARE_B"  );
+
+	failed |= generic_bus_attach_sig( part, &(AOE),    "AOE_B"  );
 
 	failed |= generic_bus_attach_sig( part, &(ABE[0]), "ABE_B0" );
 
@@ -223,6 +233,7 @@ bf537_stamp_bus_read_start( bus_t *bus, uint32_t adr )
 	chain_t *chain = CHAIN;
 
 	select_flash( bus );
+	part_set_signal( p, AOE, 1, 0 );
 	part_set_signal( p, ARE, 1, 0 );
 	part_set_signal( p, AWE, 1, 1 );
 
@@ -266,6 +277,7 @@ bf537_stamp_bus_read_end( bus_t *bus )
 	uint32_t d = 0;
 
 	unselect_flash( bus );
+	part_set_signal( p, AOE, 1, 1 );
 	part_set_signal( p, ARE, 1, 1 );
 	part_set_signal( p, AWE, 1, 1 );
 
@@ -364,7 +376,7 @@ const bus_driver_t bf527_ezkit_bus = {
 
 const bus_driver_t bf538f_ezkit_bus = {
 	"bf538f_ezkit",
-	N_("Blackfin BF538F EZ-KIT board bus driver"),
+	N_("Blackfin BF538F EZ-KIT board bus driver via BSR"),
 	BF537_STAMP_BUS_FUNCTIONS
 };
 
@@ -374,8 +386,29 @@ const bus_driver_t bf538f_ezkit_bus = {
 
 const bus_driver_t bf526_ezkit_bus = {
 	"bf526_ezkit",
-	N_("Blackfin BF526 EZ-KIT board bus driver"),
+	N_("Blackfin BF526 EZ-KIT board bus driver via BSR"),
 	BF537_STAMP_BUS_FUNCTIONS
 };
 
 #endif /* #ifdef ENABLE_BUS_BF526_EZKIT */
+
+#ifdef ENABLE_BUS_BF52X
+
+const bus_driver_t bf52x_bus = {
+	"bf52x",
+	N_("Generic Blackfin BF52x bus driver via BSR"),
+	BF537_STAMP_BUS_FUNCTIONS
+};
+
+#endif /* #ifdef ENABLE_BUS_BF52X */
+
+#ifdef ENABLE_BUS_BF53X
+
+const bus_driver_t bf53x_bus = {
+	"bf53x",
+	N_("Generic Blackfin BF53x bus driver via BSR"),
+	BF537_STAMP_BUS_FUNCTIONS
+};
+
+#endif /* #ifdef ENABLE_BUS_BF53X */
+

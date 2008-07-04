@@ -774,6 +774,8 @@ ENABLE_BUS_BF526_EZKIT_TRUE
 ENABLE_BUS_BF526_EZKIT_FALSE
 ENABLE_BUS_BF527_EZKIT_TRUE
 ENABLE_BUS_BF527_EZKIT_FALSE
+ENABLE_BUS_BF52X_TRUE
+ENABLE_BUS_BF52X_FALSE
 ENABLE_BUS_BF533_STAMP_TRUE
 ENABLE_BUS_BF533_STAMP_FALSE
 ENABLE_BUS_BF533_EZKIT_TRUE
@@ -784,6 +786,8 @@ ENABLE_BUS_BF537_EZKIT_TRUE
 ENABLE_BUS_BF537_EZKIT_FALSE
 ENABLE_BUS_BF538F_EZKIT_TRUE
 ENABLE_BUS_BF538F_EZKIT_FALSE
+ENABLE_BUS_BF53X_TRUE
+ENABLE_BUS_BF53X_FALSE
 ENABLE_BUS_BF548_EZKIT_TRUE
 ENABLE_BUS_BF548_EZKIT_FALSE
 ENABLE_BUS_BF561_EZKIT_TRUE
@@ -1553,13 +1557,13 @@ Optional Features:
   --enable-jedec-exp      Enable experimental JEDEC flash detection
   --enable-bus            Enable default set or specific bus drivers:
                           'default' enables:
-                          au1500 avr32 bcm1250 bf526_ezkit bf527_ezkit
+                          au1500 avr32 bcm1250 bf526_ezkit bf527_ezkit bf52x
                           bf533_stamp bf533_ezkit bf537_stamp bf537_ezkit
-                          bf538f_ezkit bf548_ezkit bf561_ezkit ejtag fjmem
-                          ixp425 jopcyc h7202 lh7a400 mpc5200 mpc824x ppc405ep
-                          ppc440gx_ebc8 prototype pxa2x0 pxa27x s3c4510 sa1110
-                          sh7727 sh7750r sh7751r sharc_21065L slsup3 tx4925
-                          zefant_xs3
+                          bf538f_ezkit bf53x bf548_ezkit bf561_ezkit ejtag
+                          fjmem ixp425 jopcyc h7202 lh7a400 mpc5200 mpc824x
+                          ppc405ep ppc440gx_ebc8 prototype pxa2x0 pxa27x
+                          s3c4510 sa1110 sh7727 sh7750r sh7751r sharc_21065L
+                          slsup3 tx4925 zefant_xs3
 
   --enable-cable          Enable default set or specific cable drivers.
                           'default' enables:
@@ -10320,7 +10324,7 @@ fi
 
 # expand 'default' to default enabled busdrivers
 busdrivers=`echo ${busdrivers} | $SED -e "s/default/\
-au1500 avr32 bcm1250 bf526_ezkit bf527_ezkit bf533_stamp bf533_ezkit bf537_stamp bf537_ezkit bf538f_ezkit bf548_ezkit bf561_ezkit ejtag \
+au1500 avr32 bcm1250 bf526_ezkit bf527_ezkit bf52x bf533_stamp bf533_ezkit bf537_stamp bf537_ezkit bf538f_ezkit bf53x bf548_ezkit bf561_ezkit ejtag \
 fjmem ixp425 jopcyc h7202 lh7a400  mpc5200 mpc824x ppc405ep ppc440gx_ebc8 prototype pxa2x0 pxa27x \
 s3c4510 sa1110 sh7727 sh7750r sh7751r sharc_21065L slsup3 tx4925 zefant_xs3/"`
 #
@@ -10486,6 +10490,38 @@ fi
 
 
 
+    if echo "$busdrivers" | $GREP -q bf52x; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_BF52X 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_BF52X_TRUE=
+  ENABLE_BUS_BF52X_FALSE='#'
+else
+  ENABLE_BUS_BF52X_TRUE='#'
+  ENABLE_BUS_BF52X_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}bf52x "
+
+else
+
+        if false; then
+  ENABLE_BUS_BF52X_TRUE=
+  ENABLE_BUS_BF52X_FALSE='#'
+else
+  ENABLE_BUS_BF52X_TRUE='#'
+  ENABLE_BUS_BF52X_FALSE=
+fi
+
+
+fi
+
+
+
     if echo "$busdrivers" | $GREP -q bf533_stamp; then
 
 
@@ -10639,6 +10675,38 @@ else
 else
   ENABLE_BUS_BF538F_EZKIT_TRUE='#'
   ENABLE_BUS_BF538F_EZKIT_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q bf53x; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_BF53X 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_BF53X_TRUE=
+  ENABLE_BUS_BF53X_FALSE='#'
+else
+  ENABLE_BUS_BF53X_TRUE='#'
+  ENABLE_BUS_BF53X_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}bf53x "
+
+else
+
+        if false; then
+  ENABLE_BUS_BF53X_TRUE=
+  ENABLE_BUS_BF53X_FALSE='#'
+else
+  ENABLE_BUS_BF53X_TRUE='#'
+  ENABLE_BUS_BF53X_FALSE=
 fi
 
 
@@ -12601,6 +12669,20 @@ $as_echo "$as_me: error: conditional \"ENABLE_BUS_BF527_EZKIT\" was never define
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
+if test -z "${ENABLE_BUS_BF52X_TRUE}" && test -z "${ENABLE_BUS_BF52X_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF52X\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF52X\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BF52X_TRUE}" && test -z "${ENABLE_BUS_BF52X_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF52X\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF52X\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
 if test -z "${ENABLE_BUS_BF533_STAMP_TRUE}" && test -z "${ENABLE_BUS_BF533_STAMP_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF533_STAMP\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
@@ -12668,6 +12750,20 @@ if test -z "${ENABLE_BUS_BF538F_EZKIT_TRUE}" && test -z "${ENABLE_BUS_BF538F_EZK
   { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF538F_EZKIT\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
 $as_echo "$as_me: error: conditional \"ENABLE_BUS_BF538F_EZKIT\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BF53X_TRUE}" && test -z "${ENABLE_BUS_BF53X_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF53X\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF53X\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BF53X_TRUE}" && test -z "${ENABLE_BUS_BF53X_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BF53X\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BF53X\" was never defined.
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi

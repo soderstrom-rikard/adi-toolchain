@@ -18,6 +18,9 @@
 /* define if bf527_ezkit is enabled */
 #undef ENABLE_BUS_BF527_EZKIT
 
+/* define if bf52x is enabled */
+#undef ENABLE_BUS_BF52X
+
 /* define if bf533_ezkit is enabled */
 #undef ENABLE_BUS_BF533_EZKIT
 
@@ -32,6 +35,9 @@
 
 /* define if bf538f_ezkit is enabled */
 #undef ENABLE_BUS_BF538F_EZKIT
+
+/* define if bf53x is enabled */
+#undef ENABLE_BUS_BF53X
 
 /* define if bf548_ezkit is enabled */
 #undef ENABLE_BUS_BF548_EZKIT
