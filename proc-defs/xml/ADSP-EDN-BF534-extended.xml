@@ -1692,7 +1692,6 @@
 <register name="TCOUNT" group="Core Timer Register File" read-address="0xFFE0300C" write-address="0xFFE0300C" mask="FFFFFFFF" type="IO" description="Core Timer Count Register" bit-size="32"/>
 
 	<!-- Debug Registers -->
-	<register name="DSPID"   group="Extended Registers" description="" bit-size="32" read-address="0xFFE05000" write-address="0xFFE05000" type="IO" target="EMU" def-comment="Debug/MP/Emulation Registers (0xFFE05000 - 0xFFE05008)"/>
 	<register name="CHIPID"   group="Extended Registers" description="" bit-size="32" read-address="0xFFC00014" write-address="0xFFC00014" mask="FFFFFFFF" type="IO" def-comment="Debug/MP/Emulation Registers (0xFFC00014 - 0xFFC00014)"/>
 
 	<!-- Trace Unit Registers -->

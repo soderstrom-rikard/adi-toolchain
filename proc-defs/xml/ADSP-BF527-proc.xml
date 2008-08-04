@@ -253,9 +253,6 @@
 <register name="TSCALE" group="Core Timer Register File" read-address="0xFFE03008" write-address="0xFFE03008" mask="FFFFFFFF" type="IO" description="Core Timer Scale Register" bit-size="32"/>
 <register name="TCOUNT" group="Core Timer Register File" read-address="0xFFE0300C" write-address="0xFFE0300C" mask="FFFFFFFF" type="IO" description="Core Timer Count Register" bit-size="32"/>
 
-	<!-- Debug Registers (see also above for CHIPID) -->
-	<register name="DSPID" group="Extended Registers" read-address="0xFFE05000" write-address="0xFFE05000" type="IO" target="EMU" description="" bit-size="32" def-comment="Debug/MP/Emulation Registers (0xFFE05000 - 0xFFE05008)"/>
-
 	<!--************************************-->
 	<!--***** From ADSP-BF537-proc.xml *****-->
 	<!--************************************-->

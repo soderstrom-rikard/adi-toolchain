@@ -228,10 +228,6 @@
 
 		<register name="EVT_OVERRIDE" group="Extended Registers" description="" bit-size="32" read-address="0xFFE02100" write-address="0xFFE02100" type="IO" target="EMU"/>
 
-		<!-- Debug Registers -->
-		<register name="DSPID"   group="Extended Registers" description="" bit-size="32" read-address="0xFFE05000" write-address="0xFFE05000" type="IO" target="EMU"/>
-		<register name="DBGSTAT" group="Extended Registers" description="" bit-size="32" read-address="0xFFE05008" write-address="0xFFE05008" type="IO" target="EMU"/>
-
 		<!-- UART Controller Registers -->
 		<register name="UART_THR"  group="UART" description="" bit-size="16" read-address="0xFFC00400" write-address="0xFFC00400" type="IO" target="EMU"/>
 		<register name="UART_RBR"  group="UART" description="" bit-size="16" read-address="0xFFC00400" write-address="0xFFC00400" type="IO" target="EMU"/>

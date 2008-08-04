@@ -2188,9 +2188,6 @@
 		<register name="TMREN"    parent="TCNTL" bit-position="1" bit-size="1"/>
 		<register name="TMPWR"    parent="TCNTL" bit-position="0" bit-size="1"/>
 
-		<!-- Debug Registers (see also above for CHIPID) -->
-		<register name="DSPID" group="Extended Registers" read-address="0xFFE05000" write-address="0xFFE05000" type="IO" target="EMU" description="" bit-size="32" def-comment="Debug/MP/Emulation Registers (0xFFE05000 - 0xFFE05008)"/>
-
 		<!-- Trace Unit Registers -->
 		<register name="TBUFCTL"  group="Trace Unit" read-address="0xFFE06000" write-address="0xFFE06000" type="IO" description="Trace Buffer Control Register" bit-size="32" def-comment="Trace Buffer Registers (0xFFE06000 - 0xFFE06100)"/>
 		<register name="TBUFSTAT" group="Trace Unit" read-address="0xFFE06004" write-address="0xFFE06004" type="IO" description="Trace Buffer Status Register" bit-size="32"/>

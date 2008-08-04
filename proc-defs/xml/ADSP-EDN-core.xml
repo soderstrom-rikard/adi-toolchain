@@ -148,6 +148,10 @@
 <register name="WPDACNT1" group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE07184" write-address="0xFFE07184" type="IO"/>
 <register name="WPSTAT"   group="Watchpoint and Patch Unit" description="" bit-size="32" read-address="0xFFE07200" write-address="0xFFE07200" type="IO"/>
 
+<!-- Debug Registers -->
+<register name="DSPID"   group="Debug" read-address="0xFFE05000" write-address="0xFFE05000" type="IO" target="EMU" description="" bit-size="32" def-comment="Debug/MP/Emulation Registers (0xFFE05000 - 0xFFE05008)"/>
+<register name="DBGSTAT" group="Debug" read-address="0xFFE05008" write-address="0xFFE05008" type="IO" target="EMU" description="" bit-size="32" def-comment="Debug/MP/Emulation Registers (0xFFE05000 - 0xFFE05008)"/>
+
 </register-core-definitions>
 
 </visualdsp-core-xml>

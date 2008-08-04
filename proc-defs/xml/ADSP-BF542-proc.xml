@@ -234,9 +234,6 @@
 
 	<register name="IPRIO" group="Interrupt Controller" read-address="0xFFE02110" write-address="0xFFE02110" mask="FFFFFFFF" type="IO" description="Interrupt Priority Register" bit-size="32"/>
 
-	<!-- Debug Registers (see also above for CHIPID) -->
-	<register name="DSPID" group="Extended Registers" read-address="0xFFE05000" write-address="0xFFE05000" type="IO" target="EMU" description="" bit-size="32" def-comment="Debug/MP/Emulation Registers (0xFFE05000 - 0xFFE05008)"/>
-
 	<!-- Trace Unit Registers -->
 	<register name="TBUFCTL"  group="Trace Unit" description="Trace Buffer Control Register" bit-size="32" read-address="0xFFE06000" write-address="0xFFE06000" type="IO" def-comment="Trace Buffer Registers (0xFFE06000 - 0xFFE06100)"/>
 	<register name="TBUFSTAT" group="Trace Unit" description="Trace Buffer Status Register" bit-size="32" read-address="0xFFE06004" write-address="0xFFE06004" type="IO"/>

@@ -702,7 +702,6 @@
 		<register name="ICPLB_FAULT_ADDR" group="Extended Registers" description="" bit-size="32" read-address="0xFFE0100C" write-address="0xFFE0100C" type="IO" target="EMU"/>
 
 		<!-- DSP Device ID Register -->
-		<register name="DSPID" group="Extended Registers" description="" bit-size="32" read-address="0xFFE05000" write-address="0xFFE05000" type="IO" target="EMU"/>
 		<register name="CHIPID" group="Extended Registers" description="" bit-size="32" read-address="0xFFC048C0" write-address="0xFFC048C0" mask="FFFFFFFF" type="IO"/>
 
 		<!-- Trace Unit Registers -->
