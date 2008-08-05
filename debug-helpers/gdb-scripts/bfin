@@ -216,3 +216,9 @@ define show_ddr
 	printf "ERRMST:  0x%04x\n", *(unsigned short *)0xFFC00A38
 	printf "RSTCTL:  0x%04x\n", *(unsigned short *)0xFFC00A3C
 end
+
+define show_cec
+	printf "IMASK: 0x%08x\n", *(unsigned long *)0xFFE02104
+	printf "IPEND: 0x%08x\n", *(unsigned long *)0xFFE02108
+	printf "ILAT:  0x%08x\n", *(unsigned long *)0xFFE0210C
+end
