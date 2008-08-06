@@ -201,7 +201,48 @@ end
 
 define show_sdram
 	printf "SDRRC:  0x%04x\n", *(unsigned short *)0xFFC00A18
-	printf "SDBCTL: 0x%04x\n", *(unsigned short *)0xFFC00A14
+
+	set $$SDBCTL = *(unsigned short *)0xFFC00A14
+	set $$EBCAW = ($$SDBCTL & 0x30) >> 4
+	set $$EBSZ = ($$SDBCTL & 0xe) >> 1
+	printf "SDBCTL: 0x%04x ", $$SDBCTL
+	if ($$SDBCTL & 0x1)
+		printf "(enabled) "
+	else
+		printf "(disabled) "
+	end
+	if $$EBCAW == 0x0
+		printf "(8-bit) "
+	end
+	if $$EBCAW == 0x1
+		printf "(9-bit) "
+	end
+	if $$EBCAW == 0x2
+		printf "(10-bit) "
+	end
+	if $$EBCAW == 0x3
+		printf "(11-bit) "
+	end
+	if $$EBSZ == 0x0
+		printf "(16MB)"
+	end
+	if $$EBSZ == 0x1
+		printf "(32MB)"
+	end
+	if $$EBSZ == 0x2
+		printf "(64MB)"
+	end
+	if $$EBSZ == 0x3
+		printf "(128MB)"
+	end
+	if $$EBSZ == 0x4
+		printf "(256MB)"
+	end
+	if $$EBSZ == 0x5
+		printf "(512MB)"
+	end
+	printf "\n"
+
 	printf "SDSTAT: 0x%04x\n", *(unsigned short *)0xFFC00A1C
 	printf "SDGCTL: 0x%08x\n", *(unsigned long  *)0xFFC00A10
 end
