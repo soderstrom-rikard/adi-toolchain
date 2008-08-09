@@ -181,8 +181,12 @@ define hwtrace
 		printf "Hardware trace buffer is empty\n"
 	end
 	while (*$$TBUFSTAT & 0x1F)
-		printf "%2i Target: 0x%08x\n", $$i, *$$TBUF
-		printf "   Source: 0x%08x\n", *$$TBUF
+		printf "%2i Target: ", $$i
+		output/a *$$TBUF
+		printf "\n"
+		printf "   Source: "
+		output/a *$$TBUF
+		printf "\n"
 		set $$i++
 	end
 end
