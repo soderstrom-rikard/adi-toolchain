@@ -9,9 +9,9 @@ define regs
 	printf "R3: %08x %-10i    P3: %08x      RETE: %08x\n",   $r3, $r3, $p3, $rete
 	printf "R4: %08x %-10i    P4: %08x      RETN: %08x\n",   $r4, $r4, $p4, $retn
 	printf "R5: %08x %-10i    P5: %08x     ASTAT: %08x\n",   $r5, $r5, $p5, $astat
-	printf "R6: %08x %-10i    SP: %08x        CC: %08x\n",   $r6, $r5, $sp, $cc
-	printf "R7: %08x %-10i   USP: %08x   SEQSTAT: %08x\n", $r7, $r7, $usp, $seqstat
-	printf "PC: %08x %-10i    FP: %08x    SYSCFG: %08x\n", $pc, 0,   $fp, $syscfg
+	printf "R6: %08x %-10i    SP: %08x        CC: %08x\n",   $r6, $r6, $sp, $cc
+	printf "R7: %08x %-10i   USP: %08x   SEQSTAT: %08x\n",   $r7, $r7, $usp, $seqstat
+	printf "PC: %08x %-10i    FP: %08x    SYSCFG: %08x\n",   $pc, 0,   $fp, $syscfg
 end
 document regs
 Usage: regs
