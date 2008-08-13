@@ -19,36 +19,9 @@ cat << EOF > ${output}
 #include <linux/module.h>
 #include <asm/blackfin.h>
 
-/* Some MMRs are stupid and have different read/write addresses.
- * So let's account for that here by interjecting ourselves into
- * the normal debugfs process.
- */
-struct bfin_rw_ptr_pair {
-	void *read, *write;
-};
-static void bfin_rw_x16_set(void *data, u64 val)
-{
-	*(u16 *) ((struct bfin_rw_ptr_pair *)data)->write = val;
-}
-static u64 bfin_rw_x16_get(void *data)
-{
-	return *(u16 *) ((struct bfin_rw_ptr_pair *)data)->read;
-}
-DEFINE_SIMPLE_ATTRIBUTE(bfin_rw_x16_fops, bfin_rw_x16_get, bfin_rw_x16_set, "%llx\n");
-static __init
-struct dentry *debugfs_create_rw_x16(const char *name, mode_t mode, struct dentry *parent, u16 *rvalue, u16 *wvalue)
-{
-	struct dentry *ret;
-	struct bfin_rw_ptr_pair *pair = kmalloc(sizeof(*pair), GFP_KERNEL);
-	pair->read = rvalue;
-	pair->write = wvalue;
-	ret = debugfs_create_file(name, mode, parent, rvalue, &bfin_rw_x16_fops);
-	if (ret)
-		ret->d_inode->i_private = pair;
-	return ret;
-}
+static struct dentry *debug_mmrs_dentry;
 
-static int __init bfin_init_mmr_debugfs(void)
+static int __init bfin_debug_mmrs_init(void)
 {
 	struct dentry *top, *parent;
 
@@ -123,8 +96,17 @@ done
 
 cat << EOF >> ${output}
 
+	debug_mmrs_dentry = top;
+
 	return 0;
 }
+module_init(bfin_debug_mmrs_init);
 
-late_initcall(bfin_init_mmr_debugfs);
+static void __exit bfin_debug_mmrs_exit(void)
+{
+	debugfs_remove_recursive(debug_mmrs_dentry);
+}
+module_exit(bfin_debug_mmrs_exit);
+
+MODULE_LICENSE("GPL");
 EOF
