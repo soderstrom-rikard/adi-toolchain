@@ -1,0 +1,3 @@
+2008-08-13  Jie Zhang  <jie.zhang@analog.com>
+
+	* sim/bfin: New directory.  Tests for the Blackfin simulator.

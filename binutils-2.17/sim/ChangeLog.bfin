@@ -1,3 +1,8 @@
+2008-08-13  Jie Zhang  <jie.zhang@analog.com>
+
+	* configure.ac (bfin-*-*): Configure in testsuite.
+	* configure: Regenerate.
+
 2008-03-18  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin/interp.c (bfin_trap): Lose old code to detect stdout/stdin.

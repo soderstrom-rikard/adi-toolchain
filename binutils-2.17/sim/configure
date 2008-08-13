@@ -3430,6 +3430,7 @@ subdirs="$subdirs arm"
 
 subdirs="$subdirs bfin"
 
+	   testsuite=yes
 	   common=yes
 	   ;;
        cris-*-* | crisv32-*-*)

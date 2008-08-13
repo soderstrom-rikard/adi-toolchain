@@ -1,0 +1,7 @@
+# Analog Devices Blackfin simulator testsuite
+
+set all "bfin"
+
+if [istarget bfin-*-elf] {
+    run_sim_test compare.s $all
+}
