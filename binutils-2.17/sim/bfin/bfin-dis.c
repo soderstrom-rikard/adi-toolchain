@@ -3073,14 +3073,32 @@ decode_psedodbg_assert_0 (bu16 iw0, bu16 iw1)
      | 1 | 1 | 1 | 1 | 0 | - | - | - | - | - |.dbgop.....|.regtest...|
      |.expected......................................................|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  int expected = ((iw1 >> 0) & 0xffff);
+  bu32 expected = ((iw1 >> 0) & 0xffff);
   int dbgop = ((iw0 >> 3) & 0x7);
   int regtest = ((iw0 >> 0) & 0x7);
 
   if (dbgop == 0)
-    unhandled_instruction ("DBGA ( dregs_lo , uimm16 )");
+    {
+      /* DBGA ( dregs_lo , uimm16 ) */
+      if ((DREG (regtest) & 0xffff) != expected)
+	{
+	  fprintf(stderr, "DBGA failed at 0x%x: R%d.L is 0x%x, should be 0x%x\n",
+		  PCREG, regtest, DREG (regtest) & 0xffff, expected);
+	  saved_state.exception = TARGET_SIGNAL_QUIT;
+	  DREG (0) = 1;
+	}
+    }
   else if (dbgop == 1)
-    unhandled_instruction ("DBGA ( dregs_hi , uimm16 )");
+    {
+      /* DBGA ( dregs_hi , uimm16 ) */
+      if ((DREG (regtest) >> 16) != expected)
+	{
+	  fprintf(stderr, "DBGA failed at 0x%x: R%d.H is 0x%x, should be 0x%x\n",
+		  PCREG, regtest, DREG (regtest) >> 16, expected);
+	  saved_state.exception = TARGET_SIGNAL_QUIT;
+	  DREG (0) = 1;
+	}
+    }
   else if (dbgop == 2)
     unhandled_instruction ("DBGAL ( dregs , uimm16 )");
   else if (dbgop == 3)
