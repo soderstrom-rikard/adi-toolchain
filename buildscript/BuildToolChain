@@ -1669,7 +1669,7 @@ run_tests ()
     echo_date "Running tests on binutils"
 
     change_dir $DIR_BINUTILS_BUILD
-    RUN="$MAKE -k -j 1 maybe-check-binutils maybe-check-gas maybe-check-ld"
+    RUN="$MAKE -k -j 1 maybe-check-binutils maybe-check-gas maybe-check-ld maybe-check-sim"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh &
     check_tests_OK $! binutils $1
