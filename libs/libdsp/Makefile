@@ -302,12 +302,15 @@ libbffastfp.a: $(LIBBFFASTFP_OBJS)
 
 %.o: %.asm
 	$(CC) $(CFLAGS) -x assembler-with-cpp -c $< -o $*.o
+	$(STRIP) -x $*.o
 
 %rad4_fr16.o: %_fr16.asm
 	$(CC) $(CFLAGS) -D__RADIX_4_FFT -x assembler-with-cpp -c $< -o $@
+	$(STRIP) -x $@
 
 %.o: %.S
 	$(CC) $(CFLAGS) -c $< -o $*.o
+	$(STRIP) -x $*.o
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $*.o

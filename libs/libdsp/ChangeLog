@@ -1,5 +1,11 @@
 2008-08-20  Jie Zhang  <jie.zhang@analog.com>
 
+	* Makefile (%.o: %.asm): Strip the result object file.
+	(%rad4_fr16.o: %_fr16.asm): Likewise.
+	(%.o: %.S): Likewise.
+
+2008-08-20  Jie Zhang  <jie.zhang@analog.com>
+
 	* dfr2fl.asm: New file.
 	* fl2dfr.asm: New file.
 	* fl2fr.asm: New file.

@@ -1,3 +1,8 @@
+2008-08-20  Jie Zhang  <jie.zhang@analog.com>
+
+	* Makefile (STRIP): Set.
+	(FLAGS_TO_PASS): Add STRIP.
+
 2008-05-21  Jie Zhang  <jie.zhang@analog.com>
 
 	Revert
