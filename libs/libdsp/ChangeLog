@@ -1,3 +1,12 @@
+2008-08-20  Jie Zhang  <jie.zhang@analog.com>
+
+	* dfr2fl.asm: New file.
+	* fl2dfr.asm: New file.
+	* fl2fr.asm: New file.
+	* fr2fl.asm: New file.
+	* Makefile (LIBBFDSP_ASRCS): Add dfr2fl.asm, fl2dfr.asm,
+	fl2fr.asm, and fr2fl.asm.
+
 2008-06-16  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* cadd16.c: Include <fract_complex.h>, not <complex_fns.h>.
