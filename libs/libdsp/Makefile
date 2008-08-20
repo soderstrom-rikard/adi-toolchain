@@ -37,11 +37,15 @@ LIBBFDSP_ASRCS = \
 	cvvsub.asm \
 	div16.asm \
 	divfract32.asm \
+	dfr2fl.asm \
 	fir_decima16.asm \
 	fir_fr16.asm \
 	fir_interp16.asm \
+	fl2dfr.asm \
+	fl2fr.asm \
 	floatdisf.asm \
 	floatdiuf.asm \
+	fr2fl.asm \
 	fract24_8mul.asm \
 	fract28_4mul.asm \
 	histogram_fr16.asm \
