@@ -1,3 +1,11 @@
+2008-08-22  Jie Zhang  <jie.zhang@analog.com>
+
+	Backport from upstream
+	2008-08-22  Jie Zhang  <jie.zhang@analog.com>
+	* gas/bfin/misc.s: New test.
+	* gas/bfin/misc.d: New test.
+	* gas/bfin/bfin.exp: Add misc test.
+
 2008-04-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* gas/bfin/parallel.s: Add a test case.

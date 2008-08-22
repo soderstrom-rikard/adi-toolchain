@@ -1,3 +1,9 @@
+2008-08-22  Jie Zhang  <jie.zhang@analog.com>
+
+	Backport from upstream
+	2008-08-22  Jie Zhang  <jie.zhang@analog.com>
+	* config/bfin-lex.l (NUMBER): Protect special `.'.
+
 2008-04-23  Mike Frysinger  <vapier@gentoo.org>
 
 	* Makefile.am (OBJ_FORMAT_CFILES): Add config/obj-fdpicelf.c.
