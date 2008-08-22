@@ -2422,8 +2422,12 @@ decode_dsp32alu_0 (int iw0, int iw1)
     return 0;
   else if (aopcde == 8)
     return 0;
-  else if (aopcde == 11)
+  else if (aop == 0 && aopcde == 11)
+    return DREG_MASK (dst0);
+  else if (aop == 1 && aopcde == 11)
     return HL ? DREGH_MASK (dst0) : DREGL_MASK (dst0);
+  else if (aopcde == 11)
+    return 0;
   else if (aopcde == 22)
     return DREG_MASK (dst0);
 
@@ -2462,9 +2466,9 @@ decode_dsp32alu_0 (int iw0, int iw1)
     return DREG_MASK (dst0) | DREG_MASK (dst1);
 
   else if (aop == 0 && aopcde == 10)
-    return DREG_MASK (dst0);
+    return DREGL_MASK (dst0);
   else if (aop == 1 && aopcde == 10)
-    return DREG_MASK (dst0);
+    return DREGL_MASK (dst0);
 
   else if ((aop == 1 || aop == 0) && aopcde == 4)
     return DREG_MASK (dst0);

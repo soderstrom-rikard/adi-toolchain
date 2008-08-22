@@ -1,3 +1,10 @@
+2008-08-22  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* gas/bfin/parallel.s: Add more test cases.
+	* gas/bfin/parallel.d: Update accordingly.
+	* gas/bfin/resource_conflict.s: Add more test cases.
+	* gas/bfin/resource_conflict.l: Update accordingly.
+
 2008-08-22  Jie Zhang  <jie.zhang@analog.com>
 
 	Backport from upstream

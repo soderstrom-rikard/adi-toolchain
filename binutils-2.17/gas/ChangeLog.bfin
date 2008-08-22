@@ -1,3 +1,8 @@
+2008-08-22  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/tc-bfin.c (decode_dsp32alu_0): Correct the aopcde == 11
+	case.
+
 2008-08-22  Jie Zhang  <jie.zhang@analog.com>
 
 	Backport from upstream

@@ -5,3 +5,7 @@
 .*:6: Error: resource conflict in multi-issue instruction.
 .*:7: Error: resource conflict in multi-issue instruction.
 .*:8: Error: resource conflict in multi-issue instruction.
+.*:10: Error: resource conflict in multi-issue instruction.
+.*:11: Error: resource conflict in multi-issue instruction.
+.*:12: Error: resource conflict in multi-issue instruction.
+.*:13: Error: resource conflict in multi-issue instruction.
