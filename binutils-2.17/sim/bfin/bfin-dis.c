@@ -3033,7 +3033,11 @@ decode_psedoDEBUG_0 (bu16 iw0)
   else if (reg == 3 && fn == 3)
     unhandled_instruction ("ABORT");
   else if (reg == 4 && fn == 3)
-    unhandled_instruction ("HLT");
+    {
+      /* HLT */
+      saved_state.exception = TARGET_SIGNAL_QUIT;
+      DREG (0) = 0;
+    }
   else if (reg == 5 && fn == 3)
     unhandled_instruction ("DBGHALT");
   else if (reg == 6 && fn == 3)

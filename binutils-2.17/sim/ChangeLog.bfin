@@ -1,3 +1,7 @@
+2008-08-25  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/bfin-dis.c (decode_psedoDEBUG_0): Implement HLT.
+
 2008-08-14  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin-dis.c (decode_psedodbg_assert_0): Implement DBGA.
