@@ -1,5 +1,11 @@
 2008-08-28  Jie Zhang  <jie.zhang@analog.com>
 
+	* bfin/bfin-dis.c (decode_psedodbg_assert_0): Change according
+	to the new encoding of DBGA, DBGAH, and DBGAL.
+	(_interp_insn_bfin): Likewise
+
+2008-08-28  Jie Zhang  <jie.zhang@analog.com>
+
 	* bfin/bfin-dis.c (decode_multfunc): Don't perform shift
 	correction when M mode.
 

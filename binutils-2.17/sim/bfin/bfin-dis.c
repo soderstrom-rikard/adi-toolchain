@@ -3074,39 +3074,39 @@ decode_psedodbg_assert_0 (bu16 iw0, bu16 iw1)
 {
   /* psedodbg_assert
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-     | 1 | 1 | 1 | 1 | 0 | - | - | - | - | - |.dbgop.....|.regtest...|
+     | 1 | 1 | 1 | 1 | 0 | - | - | - | dbgop |.grp.......|.regtest...|
      |.expected......................................................|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
   bu32 expected = ((iw1 >> 0) & 0xffff);
-  int dbgop = ((iw0 >> 3) & 0x7);
+  int dbgop = ((iw0 >> 6) & 0x3);
+  int grp = ((iw0 >> 3) & 0x7);
   int regtest = ((iw0 >> 0) & 0x7);
+  bu32 *reg = get_allreg (grp, regtest);
 
-  if (dbgop == 0)
+  if (dbgop == 0 || dbgop == 2)
     {
-      /* DBGA ( dregs_lo , uimm16 ) */
-      if ((DREG (regtest) & 0xffff) != expected)
+      /* DBGA ( regs_lo , uimm16 ) */
+      /* DBGAL ( regs , uimm16 ) */
+      if ((*reg & 0xffff) != expected)
 	{
-	  fprintf(stderr, "DBGA failed at 0x%x: R%d.L is 0x%x, should be 0x%x\n",
-		  PCREG, regtest, DREG (regtest) & 0xffff, expected);
+	  fprintf(stderr, "DBGA/DBGAL failed at 0x%x: is 0x%x, should be 0x%x\n",
+		  PCREG, *reg & 0xffff, expected);
 	  saved_state.exception = TARGET_SIGNAL_QUIT;
 	  DREG (0) = 1;
 	}
     }
-  else if (dbgop == 1)
+  else if (dbgop == 1 || dbgop == 3)
     {
-      /* DBGA ( dregs_hi , uimm16 ) */
-      if ((DREG (regtest) >> 16) != expected)
+      /* DBGA ( regs_hi , uimm16 ) */
+      /* DBGAH ( regs , uimm16 ) */
+      if ((*reg >> 16) != expected)
 	{
-	  fprintf(stderr, "DBGA failed at 0x%x: R%d.H is 0x%x, should be 0x%x\n",
-		  PCREG, regtest, DREG (regtest) >> 16, expected);
+	  fprintf(stderr, "DBGA/DBGAH failed at 0x%x: is 0x%x, should be 0x%x\n",
+		  PCREG, *reg >> 16, expected);
 	  saved_state.exception = TARGET_SIGNAL_QUIT;
 	  DREG (0) = 1;
 	}
     }
-  else if (dbgop == 2)
-    unhandled_instruction ("DBGAL ( dregs , uimm16 )");
-  else if (dbgop == 3)
-    unhandled_instruction ("DBGAH ( dregs , uimm16 )");
   else
     illegal_instruction ();
   PCREG += 4;
@@ -3197,7 +3197,7 @@ _interp_insn_bfin (bu32 pc)
     decode_psedoDEBUG_0 (iw0);
   else if (((iw0 & 0xFF00) == 0xF900))
     decode_psedoOChar_0 (iw0);
-  else if (((iw0 & 0xFFC0) == 0xF000) && ((iw1 & 0x0000) == 0x0000))
+  else if (((iw0 & 0xFF00) == 0xF000) && ((iw1 & 0x0000) == 0x0000))
     decode_psedodbg_assert_0 (iw0, iw1);
   else
     illegal_instruction ();

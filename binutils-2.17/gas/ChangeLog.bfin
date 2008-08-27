@@ -1,5 +1,12 @@
 2008-08-28  Jie Zhang  <jie.zhang@analog.com>
 
+	* config/bfin-parse.y (asm_1): Fix comments for DBGA, DBGAH,
+	and DBGAL.
+	* config/tc-bfin.c (bfin_gen_pseudodbg_assert): Change according
+	to the new encoding of DBGA, DBGAH, and DBGAL.
+
+2008-08-28  Jie Zhang  <jie.zhang@analog.com>
+
 	* config/bfin-parse.y (asm_1): Implement HLT instruction.
 
 2008-08-26  Jie Zhang  <jie.zhang@analog.com>

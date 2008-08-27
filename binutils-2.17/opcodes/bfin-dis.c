@@ -4556,17 +4556,18 @@ decode_pseudodbg_assert_0 (TIword iw0, TIword iw1, disassemble_info *outf)
 {
   /* pseudodbg_assert
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-     | 1 | 1 | 1 | 1 | 0 | - | - | - | - | - |.dbgop.....|.regtest...|
+     | 1 | 1 | 1 | 1 | 0 | - | - | - | dbgop |.grp.......|.regtest...|
      |.expected......................................................|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
   int expected = ((iw1 >> PseudoDbg_Assert_expected_bits) & PseudoDbg_Assert_expected_mask);
   int dbgop    = ((iw0 >> (PseudoDbg_Assert_dbgop_bits - 16)) & PseudoDbg_Assert_dbgop_mask);
+  int grp      = ((iw0 >> (PseudoDbg_Assert_grp_bits - 16)) & PseudoDbg_Assert_grp_mask);
   int regtest  = ((iw0 >> (PseudoDbg_Assert_regtest_bits - 16)) & PseudoDbg_Assert_regtest_mask);
 
   if (dbgop == 0)
     {
       OUTS (outf, "DBGA (");
-      OUTS (outf, dregs_lo (regtest));
+      OUTS (outf, regs_lo (regtest, grp));
       OUTS (outf, ", ");
       OUTS (outf, uimm16 (expected));
       OUTS (outf, ")");
@@ -4574,7 +4575,7 @@ decode_pseudodbg_assert_0 (TIword iw0, TIword iw1, disassemble_info *outf)
   else if (dbgop == 1)
     {
       OUTS (outf, "DBGA (");
-      OUTS (outf, dregs_hi (regtest));
+      OUTS (outf, regs_hi (regtest, grp));
       OUTS (outf, ", ");
       OUTS (outf, uimm16 (expected));
       OUTS (outf, ")");
@@ -4582,7 +4583,7 @@ decode_pseudodbg_assert_0 (TIword iw0, TIword iw1, disassemble_info *outf)
   else if (dbgop == 2)
     {
       OUTS (outf, "DBGAL (");
-      OUTS (outf, dregs (regtest));
+      OUTS (outf, allregs (regtest, grp));
       OUTS (outf, ", ");
       OUTS (outf, uimm16 (expected));
       OUTS (outf, ")");
@@ -4590,7 +4591,7 @@ decode_pseudodbg_assert_0 (TIword iw0, TIword iw1, disassemble_info *outf)
   else if (dbgop == 3)
     {
       OUTS (outf, "DBGAH (");
-      OUTS (outf, dregs (regtest));
+      OUTS (outf, allregs (regtest, grp));
       OUTS (outf, ", ");
       OUTS (outf, uimm16 (expected));
       OUTS (outf, ")");
@@ -4694,7 +4695,7 @@ _print_insn_bfin (bfd_vma pc, disassemble_info *outf)
   else if ((iw0 & 0xFF00) == 0xF900)
     rv = decode_pseudoOChar_0 (iw0, iw1, pc, outf);
 #endif
-  else if ((iw0 & 0xFFC0) == 0xf000 && (iw1 & 0x0000) == 0x0000)
+  else if ((iw0 & 0xFF00) == 0xf000 && (iw1 & 0x0000) == 0x0000)
     rv = decode_pseudodbg_assert_0 (iw0, iw1, outf);
 
   return rv;

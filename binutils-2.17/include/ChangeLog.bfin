@@ -1,3 +1,13 @@
+2008-08-28  Jie Zhang  <jie.zhang@analog.com>
+
+	* opcode/bfin.h (PseudoDbg_Assert): Add bits_grp and mask_grp.
+	(PseudoDbg_Assert_grp_bits, PseudoDbg_Assert_grp_mask): Define.
+	(PseudoDbg_Assert_dbgop_bits, PseudoDbg_Assert_dbgop_mask,
+	PseudoDbg_Assert_dontcare_bits, PseudoDbg_Assert_dontcare_mask):
+	Adjust accordingly.
+	(init_PseudoDbg_Assert): Add PseudoDbg_Assert_grp_bits and
+	PseudoDbg_Assert_grp_mask.
+
 2006-09-04  Jie Zhang  <jie.zhang@analog.com>
 
 	* gdb/sim-bfin.h (enum sim_bfin_regnum): Rename SIM_BFIN_EXTRA1 to

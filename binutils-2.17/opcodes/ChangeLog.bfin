@@ -1,3 +1,9 @@
+2008-08-28  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-dis.c (decode_pseudodbg_assert_0): Change according
+	to the new encoding of DBGA, DBGAH, and DBGAL.
+	(_print_insn_bfin): Likewise.
+
 2007-07-10  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin-dis.c (decode_dsp32mac_0): Decode (IU) option for
