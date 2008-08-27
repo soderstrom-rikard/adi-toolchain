@@ -3550,6 +3550,12 @@ asm_1:
 	  $$ = bfin_gen_pseudodbg (3, 5, 0);
 	}
 
+	| HLT
+	{
+	  notethat ("psedoDEBUG: HLT\n");
+	  $$ = bfin_gen_pseudodbg (3, 4, 0);
+	}
+
 	| DBGA LPAREN HALF_REG COMMA expr RPAREN
 	{
 	  notethat ("pseudodbg_assert: DBGA (dregs_lo , uimm16 )\n");

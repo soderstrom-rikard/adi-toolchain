@@ -1,3 +1,7 @@
+2008-08-28  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin-parse.y (asm_1): Implement HLT instruction.
+
 2008-08-26  Jie Zhang  <jie.zhang@analog.com>
 
 	Backport from upstream
