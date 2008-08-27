@@ -37,14 +37,15 @@ typedef signed64 bs64;
 
 typedef struct
 {
-  bu32 dpregs[16], iregs[4], mregs[4], bregs[4], lregs[4];
+  bu32 dpregs[16], iregs[4], mregs[4], bregs[4], lregs[4], cycles[2];
   bu32 a0x, a0w, a1x, a1w;
   bu32 lt[2], lc[2], lb[2];
   int ac0, ac0_copy, ac1, an, aq;
   int av0, av0s, av1, av1s, az, cc, v, v_copy, vs;
   int rnd_mod;
   int v_internal;
-  bu32 pc, rets;
+  bu32 pc, rets, reti, retx, retn, rete;
+  bu32 usp, seqstat, syscfg;
 
   int ticks;
   int insts;
@@ -81,7 +82,16 @@ extern saved_state_type saved_state;
 #define LC1REG		(saved_state.lc[1])
 #define LT1REG		(saved_state.lt[1])
 #define LB1REG		(saved_state.lb[1])
+#define CYCLESREG	(saved_state.cycles[0])
+#define CYCLES2REG	(saved_state.cycles[1])
+#define USPREG		(saved_state.usp)
+#define SEQSTATREG	(saved_state.seqstat)
+#define SYSCFGREG	(saved_state.syscfg)
 #define RETSREG		(saved_state.rets)
+#define RETIREG		(saved_state.reti)
+#define RETXREG		(saved_state.retx)
+#define RETNREG		(saved_state.retn)
+#define RETEREG		(saved_state.rete)
 #define PCREG		(saved_state.pc)
 
 #define AZ_BIT		0

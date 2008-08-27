@@ -1124,15 +1124,6 @@ bfin_sim_regno (int regno)
   switch (regno)
     {
     case SIM_BFIN_ASTAT_REGNUM:
-    case SIM_BFIN_CYCLES_REGNUM:
-    case SIM_BFIN_CYCLES2_REGNUM:
-    case SIM_BFIN_USP_REGNUM:
-    case SIM_BFIN_SEQSTAT_REGNUM:
-    case SIM_BFIN_SYSCFG_REGNUM:
-    case SIM_BFIN_RETI_REGNUM:
-    case SIM_BFIN_RETX_REGNUM:
-    case SIM_BFIN_RETN_REGNUM:
-    case SIM_BFIN_RETE_REGNUM:
     case SIM_BFIN_TEXT_ADDR:
     case SIM_BFIN_TEXT_END_ADDR:
     case SIM_BFIN_DATA_ADDR:

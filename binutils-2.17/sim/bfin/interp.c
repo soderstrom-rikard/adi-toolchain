@@ -513,6 +513,7 @@ sim_fetch_register (SIM_DESC sd, int rn, unsigned char *memory, int length)
   bu32 value;
 
   init_pointers ();
+
   switch (rn)
     {
     case SIM_BFIN_R0_REGNUM : value = DREG(0); break;
@@ -559,6 +560,15 @@ sim_fetch_register (SIM_DESC sd, int rn, unsigned char *memory, int length)
     case SIM_BFIN_LC1_REGNUM : value = LC1REG; break;
     case SIM_BFIN_LT1_REGNUM : value = LT1REG; break;
     case SIM_BFIN_LB1_REGNUM : value = LB1REG; break;
+    case SIM_BFIN_CYCLES_REGNUM : value = CYCLESREG; break;
+    case SIM_BFIN_CYCLES2_REGNUM : value = CYCLES2REG; break;
+    case SIM_BFIN_USP_REGNUM : value = USPREG; break;
+    case SIM_BFIN_SEQSTAT_REGNUM : value = SEQSTATREG; break;
+    case SIM_BFIN_SYSCFG_REGNUM : value = SYSCFGREG; break;
+    case SIM_BFIN_RETI_REGNUM : value = RETIREG; break;
+    case SIM_BFIN_RETX_REGNUM : value = RETXREG; break;
+    case SIM_BFIN_RETN_REGNUM : value = RETNREG; break;
+    case SIM_BFIN_RETE_REGNUM : value = RETEREG; break;
     case SIM_BFIN_PC_REGNUM : value = PCREG; break;
     case SIM_BFIN_CC_REGNUM : value = CCREG; break;
     default :
@@ -625,6 +635,15 @@ sim_store_register (SIM_DESC sd, int rn, unsigned char *memory, int length)
     case SIM_BFIN_LC1_REGNUM : LC1REG = value; break;
     case SIM_BFIN_LT1_REGNUM : LT1REG = value; break;
     case SIM_BFIN_LB1_REGNUM : LB1REG = value; break;
+    case SIM_BFIN_CYCLES_REGNUM : CYCLESREG = value; break;
+    case SIM_BFIN_CYCLES2_REGNUM : CYCLES2REG = value; break;
+    case SIM_BFIN_USP_REGNUM : USPREG = value; break;
+    case SIM_BFIN_SEQSTAT_REGNUM : SEQSTATREG = value; break;
+    case SIM_BFIN_SYSCFG_REGNUM : SYSCFGREG = value; break;
+    case SIM_BFIN_RETI_REGNUM : RETIREG = value; break;
+    case SIM_BFIN_RETX_REGNUM : RETXREG = value; break;
+    case SIM_BFIN_RETN_REGNUM : RETNREG = value; break;
+    case SIM_BFIN_RETE_REGNUM : RETEREG = value; break;
     case SIM_BFIN_PC_REGNUM : PCREG = value; break;
     case SIM_BFIN_CC_REGNUM : CCREG = value; break;
     default :

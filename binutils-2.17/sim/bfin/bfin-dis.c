@@ -64,7 +64,7 @@ int n_stores;
 static __attribute__ ((noreturn)) void
 unhandled_instruction (char *insn)
 {
-  fprintf(stderr, "Unhandled instruction \"%s\" ... aborting\n", insn);
+  fprintf(stderr, "Unhandled instruction at 0x%08x\"%s\" ... aborting\n", PCREG, insn);
   raise (SIGILL);
   abort ();
 }
@@ -72,7 +72,7 @@ unhandled_instruction (char *insn)
 static __attribute__ ((noreturn)) void
 illegal_instruction ()
 {
-  fprintf(stderr, "Illegal instruction ... aborting\n");
+  fprintf(stderr, "Illegal instruction at 0x%08x... aborting\n", PCREG);
   raise (SIGILL);
   abort ();
 }
@@ -563,6 +563,15 @@ get_allreg (int grp, int reg)
 	case 51: return &LC1REG;
 	case 52: return &LT1REG;
 	case 53: return &LB1REG;
+	case 54: return &CYCLESREG;
+	case 55: return &CYCLES2REG;
+	case 56: return &USPREG;
+	case 57: return &SEQSTATREG;
+	case 58: return &SYSCFGREG;
+	case 59: return &RETIREG;
+	case 60: return &RETXREG;
+	case 61: return &RETNREG;
+	case 62: return &RETEREG;
 	}
       return 0;
     }
