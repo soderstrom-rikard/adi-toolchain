@@ -307,6 +307,7 @@ proc run_sim_test { name requested_machs } {
 		continue
 	    }
 	    set comp_output [target_assemble ${name}.s ${name}.o "$as_options $global_as_options"]
+	    file delete ${name}.s
 	} else {
 	    set comp_output [target_assemble $sourcefile ${name}.o "$as_options $global_as_options"]
 	}
