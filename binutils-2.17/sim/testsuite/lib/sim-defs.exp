@@ -299,7 +299,17 @@ proc run_sim_test { name requested_machs } {
 	if [info exists cpu_option] {
 	    set as_options "$as_options $cpu_option=$mach"
 	}
-	set comp_output [target_assemble $sourcefile ${name}.o "$as_options $global_as_options"]
+	if [string match "*.S" $sourcefile] {
+	    set comp_output [target_compile $sourcefile ${name}.s "preprocess" "incdir=$srcdir/$subdir"]
+	    if ![string match "" $comp_output] {
+		verbose -log "$comp_output" 3
+		fail "$mach $testname (preprocessing)"
+		continue
+	    }
+	    set comp_output [target_assemble ${name}.s ${name}.o "$as_options $global_as_options"]
+	} else {
+	    set comp_output [target_assemble $sourcefile ${name}.o "$as_options $global_as_options"]
+	}
 
 	if ![string match "" $comp_output] {
 	    verbose -log "$comp_output" 3

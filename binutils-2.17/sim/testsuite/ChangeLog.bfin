@@ -1,3 +1,8 @@
+2008-08-27  Jie Zhang  <jie.zhang@analog.com>
+
+	* lib/sim-defs.exp (run_sim_test): Do C preprocessing for .S
+	source file.
+
 2008-08-13  Jie Zhang  <jie.zhang@analog.com>
 
 	* sim/bfin: New directory.  Tests for the Blackfin simulator.
