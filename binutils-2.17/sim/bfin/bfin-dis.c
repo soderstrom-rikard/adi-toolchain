@@ -645,7 +645,7 @@ decode_multfunc (int h0, int h1, int src0, int src1, int mmod, int MM,
   val = s0 * s1;
   /* Perform shift correction if appropriate for the mode.  */
   *psat = 0;
-  if (mmod == 0 || mmod == M_T || mmod == M_S2RND)
+  if (!MM && (mmod == 0 || mmod == M_T || mmod == M_S2RND))
     {
       if (val == 0x40000000)
 	val = 0x7fffffff, *psat = 1;

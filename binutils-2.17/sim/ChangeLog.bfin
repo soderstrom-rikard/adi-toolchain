@@ -1,3 +1,8 @@
+2008-08-28  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/bfin-dis.c (decode_multfunc): Don't perform shift
+	correction when M mode.
+
 2008-08-25  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/bfin-dis.c (decode_psedoDEBUG_0): Implement HLT.
