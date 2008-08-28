@@ -2465,10 +2465,10 @@ if [ $KERNEL_SOURCE ] ; then
         $BUILD_TARGET $HOST_TARGET --disable-shared --enable-static
 
     echo_date "Building libftdi"
-    run_cmd $MAKE
+    run_cmd $MAKE SUBDIRS=src
 
     echo_date "Installing libftdi"
-    run_cmd $MAKE install
+    run_cmd $MAKE SUBDIRS=src install
 
     export PKG_CONFIG_LIBDIR="$DIR_LIBFTDI_BUILD/destdir/lib/pkgconfig${PKG_CONFIG_LIBDIR+:${PKG_CONFIG_LIBDIR}}"
     export LIBFTDI_CONFIG="$DIR_LIBFTDI_BUILD/destdir/bin/libftdi-config"
