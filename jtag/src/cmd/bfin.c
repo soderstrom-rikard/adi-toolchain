@@ -125,7 +125,39 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 
 	  for (i = 2; i < num_params; i++)
 	    {
-	      if (params[i][0] == '"')
+	      if (params[i][0] == '[' && params[i][1] == '0')
+		{
+		  uint64_t n;
+
+		  if (sscanf (params[i], "[0%[xX]%"PRIx64"]", tmp, &n) != 2)
+		    goto execute_cleanup;
+
+		  *last = (struct bfin_insn *) malloc (sizeof (struct bfin_insn));
+		  if (*last == NULL)
+		    goto execute_cleanup;
+
+		  (*last)->i = n;
+		  (*last)->type = BFIN_INSN_SET_EMUDAT;
+		  (*last)->next = NULL;
+		  last = &((*last)->next);
+		}
+	      else if (params[i][0] == '0')
+		{
+		  uint64_t n;
+
+		  if (sscanf (params[i], "0%[xX]%"PRIx64, tmp, &n) != 2)
+		    goto execute_cleanup;
+
+		  *last = (struct bfin_insn *) malloc (sizeof (struct bfin_insn));
+		  if (*last == NULL)
+		    goto execute_cleanup;
+
+		  (*last)->i = n;
+		  (*last)->type = BFIN_INSN_NORMAL;
+		  (*last)->next = NULL;
+		  last = &((*last)->next);
+		}
+	      else
 		{
 		  unsigned char raw_insn[4];
 		  char *tmp_buf;
@@ -141,6 +173,8 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 		      p += sprintf (p, "%s ", params[i]);
 		      if (params[i][strlen (params[i]) - 1] == '"')
 			break;
+		      if (params[i][strlen (params[i]) - 1] == ';')
+			break;
 		    }
 		  if (i == num_params)
 		    {
@@ -150,7 +184,9 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 
 		  /* p points past the '\0'. p - 1 points to the ending '\0'.
 		     p - 2 points to the last double quote.  */
-		  *(p - 2) = '\0';
+		  *(p - 2) = ';';
+		  if (insns_string[0] == '"')
+		    insns_string[0] = ' ';
 
 		  /* get a temporary file to work with -- a little racy */
 		  if (!tmpfile)
@@ -170,7 +206,7 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 		      asprintf (&tmp_buf,
 				"echo '%1$s' | bfin-%3$s-as - -o \"%2$s\""
 				" && bfin-%3$s-objcopy -O binary \"%2$s\"",
-				insns_string + 1, tmpfile, tuples[t]);
+				insns_string, tmpfile, tuples[t]);
 		      ret = system (tmp_buf);
 		      free (tmp_buf);
 		      if (WIFEXITED(ret))
@@ -225,38 +261,6 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 		    }
 
 		  fclose (fp);
-		}
-	      else if (params[i][0] == '[')
-		{
-		  uint64_t n;
-
-		  if (sscanf (params[i], "[0%[xX]%"PRIx64"]", tmp, &n) != 2)
-		    goto execute_cleanup;
-
-		  *last = (struct bfin_insn *) malloc (sizeof (struct bfin_insn));
-		  if (*last == NULL)
-		    goto execute_cleanup;
-
-		  (*last)->i = n;
-		  (*last)->type = BFIN_INSN_SET_EMUDAT;
-		  (*last)->next = NULL;
-		  last = &((*last)->next);
-		}
-	      else
-		{
-		  uint64_t n;
-
-		  if (sscanf (params[i], "0%[xX]%"PRIx64, tmp, &n) != 2)
-		    goto execute_cleanup;
-
-		  *last = (struct bfin_insn *) malloc (sizeof (struct bfin_insn));
-		  if (*last == NULL)
-		    goto execute_cleanup;
-
-		  (*last)->i = n;
-		  (*last)->type = BFIN_INSN_NORMAL;
-		  (*last)->next = NULL;
-		  last = &((*last)->next);
 		}
 	    }
 

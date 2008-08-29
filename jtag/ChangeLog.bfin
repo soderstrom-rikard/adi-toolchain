@@ -8,6 +8,9 @@
 	* src/cmd/bfin.c (cmd_bfin_run): Cast bytes in read buffer to 64bit
 	before bit shifting.
 
+	* src/cmd/bfin.c (cmd_bfin_run): Move [0x0] and 0x0 if checks first.
+	Accept ; as end-of-instruction marker.  Trim leading quotes.
+
 2008-08-29  Jie Zhang  <jie.zhang@analog.com>
 
 	* src/cmd/bfin.c (cmd_bfin_help): Document last change.
