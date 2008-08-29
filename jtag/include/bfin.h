@@ -65,6 +65,33 @@
 #define INSN_SSYNC			0x00240000
 #define INSN_ILLEGAL			0xffffffff
 
+enum bfin_insn_type
+{
+  /* Instruction is a normal instruction.  */
+
+  BFIN_INSN_NORMAL,
+
+  /* Instruction is a value which should be set to EMUDAT.  */
+
+  BFIN_INSN_SET_EMUDAT
+};
+
+struct bfin_insn
+{
+  /* The instruction or the value to be set to EMUDAT.  */
+
+  uint64_t i;
+
+  /* The type of this instruction.  */
+
+  enum bfin_insn_type type;
+
+  /* Instructions to be executed are kept on a linked list.
+     This is the link.  */
+
+  struct bfin_insn *next;
+};
+
 //tap_register *register_init_value (tap_register *, uint64_t);
 //uint64_t register_value (tap_register *);
 
@@ -80,6 +107,6 @@ void bfin_emulation_enable (chain_t *);
 void bfin_emulation_disable (chain_t *);
 void bfin_emulation_trigger (chain_t *);
 void bfin_emulation_return (chain_t *);
-void bfin_execute_instructions (chain_t *, int, uint64_t *);
+void bfin_execute_instructions (chain_t *, struct bfin_insn *);
 
 #endif /* BFIN_H */

@@ -32,8 +32,13 @@
 #include <assert.h>
 #include <inttypes.h>
 #include <cmd.h>
+#include <unistd.h>
 
 #include <bfin.h>
+
+#define ARRAY_SIZE(a) (sizeof (a) / sizeof ((a)[0]))
+
+#define BIT_MULTI_INS 0x0800
 
 static int
 cmd_bfin_run( chain_t *chain, char *params[] )
@@ -102,6 +107,7 @@ cmd_bfin_run( chain_t *chain, char *params[] )
   else if (strcmp (params[1], "execute") == 0)
     {
       uint64_t emudat;
+      int execute_ret = -1;
 
       if ((bfin_dbgstat_get (chain) & DBGSTAT_EMUREADY) == 0)
 	{
@@ -111,54 +117,173 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 
       if (num_params > 2)
 	{
-	  int start, i;
-	  uint64_t *insns;
+	  int i;
+	  struct bfin_insn *insns = NULL;
+	  struct bfin_insn **last = &insns;
 	  char tmp[8];
-
-	  insns = (uint64_t *) malloc ((num_params - 2) * sizeof (uint64_t));
+	  char *tmpfile = NULL;
 
 	  for (i = 2; i < num_params; i++)
 	    {
-	      if (params[i][0] == '[')
+	      if (params[i][0] == '"')
 		{
-		  if (sscanf (params[i], "[0%[xX]%"PRIx64"]", tmp, &insns[i - 2]) != 2)
+		  unsigned char raw_insn[4];
+		  char *tmp_buf;
+		  char *tuples[] = { "elf", "uclinux", "linux-uclibc" };
+		  size_t t;
+		  FILE *fp;
+
+		  char insns_string[1024];
+		  char *p = insns_string;
+
+		  for (; i < num_params; i++)
 		    {
-		      free (insns);
-		      return -1;
+		      p += sprintf (p, "%s ", params[i]);
+		      if (params[i][strlen (params[i]) - 1] == '"')
+			break;
 		    }
+		  if (i == num_params && params[i][strlen (params[i]) - 1] != '"')
+		    {
+		      printf ( _("Unbalanced double quotes.\n") );
+		      goto execute_cleanup;
+		    }
+
+		  /* p points past the '\0'. p - 1 points to the ending '\0'.
+		     p - 2 points to the last double quote.  */
+		  *(p - 2) = '\0';
+
+		  /* get a temporary file to work with -- a little racy */
+		  if (!tmpfile)
+		    {
+		      tmpfile = tmpnam (NULL);
+		      if (!tmpfile)
+			goto execute_cleanup;
+		      tmpfile = strdup (tmpfile);
+		      if (!tmpfile)
+			goto execute_cleanup;
+		    }
+
+		  /* try to find a toolchain in $PATH */
+		  for (t = 0; t < ARRAY_SIZE(tuples); ++t)
+		    {
+		      int ret;
+		      asprintf (&tmp_buf,
+				"echo '%1$s' | bfin-%3$s-as - -o \"%2$s\""
+				" && bfin-%3$s-objcopy -O binary \"%2$s\"",
+				insns_string + 1, tmpfile, tuples[t]);
+		      ret = system (tmp_buf);
+		      free (tmp_buf);
+		      if (WIFEXITED(ret))
+			break;
+		    }
+		  if (t == ARRAY_SIZE(tuples))
+		    {
+		      printf( _("Unable to find the Blackfin toolchain in $PATH.\n") );
+		      goto execute_cleanup;
+		    }
+
+		  /* Read the binary blob from the toolchain */
+		  fp = fopen (tmpfile, "rb");
+		  if (fp == NULL)
+		    goto execute_cleanup;
+
+		  while (fread (raw_insn, 1, 2, fp) == 2)
+		    {
+		      uint16_t iw = raw_insn[0] | (raw_insn[1] << 8);
+		      uint64_t n = iw;
+		      int is_multiinsn = ((iw & 0xc000) == 0xc000 && (iw & BIT_MULTI_INS)
+					  && (iw & 0xe800) != 0xe800 /* not linkage */);
+
+		      if ((iw & 0xf000) >= 0xc000)
+			{
+			  if (fread (raw_insn, 1, 2, fp) != 2)
+			    goto execute_cleanup;
+
+			  iw = raw_insn[0] | (raw_insn[1] << 8);
+			  n = (n << 16) | iw;
+			}
+
+		      if (is_multiinsn)
+			{
+			  if (fread (raw_insn, 1, 4, fp) != 4)
+			    goto execute_cleanup;
+
+			  n = (n << 32)
+			    | (raw_insn[0] << 16) | (raw_insn[1] << 24)
+			    | raw_insn[2] | (raw_insn[3] << 8);
+			}
+
+		      *last = (struct bfin_insn *) malloc (sizeof (struct bfin_insn));
+		      if (*last == NULL)
+			goto execute_cleanup;
+
+		      (*last)->i = n;
+		      (*last)->type = BFIN_INSN_NORMAL;
+		      (*last)->next = NULL;
+		      last = &((*last)->next);
+		    }
+
+		  fclose (fp);
+		}
+	      else if (params[i][0] == '[')
+		{
+		  uint64_t n;
+
+		  if (sscanf (params[i], "[0%[xX]%"PRIx64"]", tmp, &n) != 2)
+		    goto execute_cleanup;
+
+		  *last = (struct bfin_insn *) malloc (sizeof (struct bfin_insn));
+		  if (*last == NULL)
+		    goto execute_cleanup;
+
+		  (*last)->i = n;
+		  (*last)->type = BFIN_INSN_SET_EMUDAT;
+		  (*last)->next = NULL;
+		  last = &((*last)->next);
 		}
 	      else
 		{
-		  if (sscanf (params[i], "0%[xX]%"PRIx64, tmp, &insns[i - 2]) != 2)
-		    {
-		      free (insns);
-		      return -1;
-		    }
+		  uint64_t n;
+
+		  if (sscanf (params[i], "0%[xX]%"PRIx64, tmp, &n) != 2)
+		    goto execute_cleanup;
+
+		  *last = (struct bfin_insn *) malloc (sizeof (struct bfin_insn));
+		  if (*last == NULL)
+		    goto execute_cleanup;
+
+		  (*last)->i = n;
+		  (*last)->type = BFIN_INSN_NORMAL;
+		  (*last)->next = NULL;
+		  last = &((*last)->next);
 		}
 	    }
 
-	  start = 2;
-	  i = 2;
-	  while (i < num_params)
+	  bfin_execute_instructions (chain, insns);
+	  execute_ret = 1;
+
+ execute_cleanup:
+	  if (tmpfile)
 	    {
-	      if (params[i][0] == '[')
-		{
-		  bfin_execute_instructions (chain, i - start, &insns[start - 2]);
-
-		  bfin_emudat_set (chain, insns[i - 2], EXITMODE_UPDATE);
-		  i++;
-		  start = i;
-		}
-	      else
-		i++;
+	      unlink (tmpfile);
+	      free (tmpfile);
 	    }
-	  bfin_execute_instructions (chain, num_params - start, &insns[start - 2]);
-	  free (insns);
+	  while (insns)
+	    {
+	      struct bfin_insn *tmp = insns->next;
+	      free (insns);
+	      insns = tmp;
+	    }
 	}
 
-      emudat = bfin_emudat_get (chain, EXITMODE_UPDATE);
+      if (execute_ret == 1)
+	{
+	  emudat = bfin_emudat_get (chain, EXITMODE_UPDATE);
 
-      printf ("EMUDAT = 0x%"PRIx64"\n", emudat);
+	  printf ("EMUDAT = 0x%"PRIx64"\n", emudat);
+	}
+
+      return execute_ret;
     }
 
   return 1;

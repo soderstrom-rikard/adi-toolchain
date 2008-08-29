@@ -246,28 +246,31 @@ bfin_emulation_return (chain_t *chain)
 }
 
 void
-bfin_execute_instructions (chain_t *chain, int num, uint64_t *insns)
+bfin_execute_instructions (chain_t *chain, struct bfin_insn *insns)
 {
   part_t *part;
-  int i;
-
-  if (num <= 0)
-    return;
 
   if (insns == NULL)
     return;
 
-  bfin_scan_select (chain, "EMUIR_SCAN");
-
   part = chain->parts->parts[chain->active_part];
 
-  for (i = 0; i < num; i++)
+  while (insns)
     {
-      if ((insns[i] & 0xffffffffffff0000ULL) == 0)
-	register_init_value (part->active_instruction->data_register->in, insns[i] << 16);
-      else
-	register_init_value (part->active_instruction->data_register->in, insns[i]);
-      chain_shift_data_registers_mode (chain, 0, 1, EXITMODE_IDLE);
+      if (insns->type == BFIN_INSN_NORMAL)
+	{
+	  bfin_scan_select (chain, "EMUIR_SCAN");
+
+	  if ((insns->i & 0xffffffffffff0000ULL) == 0)
+	    register_init_value (part->active_instruction->data_register->in, insns->i << 16);
+	  else
+	    register_init_value (part->active_instruction->data_register->in, insns->i);
+	  chain_shift_data_registers_mode (chain, 0, 1, EXITMODE_IDLE);
+	}
+      else /* insns->type == BFIN_INSN_SET_EMUDAT */
+	bfin_emudat_set (chain, insns->i, EXITMODE_UPDATE);
+
+      insns = insns->next;
     }
 
   return;

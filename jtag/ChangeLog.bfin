@@ -1,3 +1,16 @@
+2008-08-29  Mike Frysinger  <michael.frysinger@analog.com>
+	    Jie Zhang  <jie.zhang@analog.com>
+
+	* include/bfin.h (enum bfin_insn_type): Define.
+	(struct bfin_insn): Define.
+	(bfin_execute_instructions): Change arguments.
+	* src/cmd/bfin.c: Include unistd.h.
+	(ARRAY_SIZE): Define.
+	(BIT_MULTI_INS): Define.
+	(cmd_bfin_run): Parse and execute assembly statements.
+	* src/part/bfin.c (bfin_execute_instructions): Change
+	arguments.
+
 2008-07-05  Jie Zhang  <jie.zhang@analog.com>
 
 	* data/analog/bf533/STEPPINGS: Add stepping 5.
