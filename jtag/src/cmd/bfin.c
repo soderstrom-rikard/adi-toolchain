@@ -38,8 +38,6 @@
 
 #define ARRAY_SIZE(a) (sizeof (a) / sizeof ((a)[0]))
 
-#define BIT_MULTI_INS 0x0800
-
 static int
 cmd_bfin_run( chain_t *chain, char *params[] )
 {
@@ -229,8 +227,7 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 		    {
 		      uint16_t iw = raw_insn[0] | (raw_insn[1] << 8);
 		      uint64_t n = iw;
-		      int is_multiinsn = ((iw & 0xc000) == 0xc000 && (iw & BIT_MULTI_INS)
-					  && (iw & 0xe800) != 0xe800 /* not linkage */);
+		      int is_multiinsn = INSN_IS_MULTI(raw_insn[1]);
 
 		      if ((iw & 0xf000) >= 0xc000)
 			{

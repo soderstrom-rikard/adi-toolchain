@@ -79,7 +79,7 @@ bfin_scan_select (chain_t *chain, const char *scan)
 }
 
 void
-bfin_dbgctl_set (chain_t *chain, uint16_t v, int exit)
+bfin_dbgctl_bit_clear_and_set (chain_t *chain, uint16_t m, uint16_t v, int exit)
 {
   part_t *part;
   uint16_t orig;
@@ -92,7 +92,7 @@ bfin_dbgctl_set (chain_t *chain, uint16_t v, int exit)
   part = chain->parts->parts[chain->active_part];
 
   chain_shift_data_registers_mode (chain, 1, 1, EXITMODE_SHIFT);
-  orig = register_value (part->active_instruction->data_register->out);
+  orig = register_value (part->active_instruction->data_register->out) & ~m;
   register_init_value (part->active_instruction->data_register->in, orig | v);
   chain_shift_data_registers_mode (chain, 0, 0, exit);
 
@@ -100,24 +100,21 @@ bfin_dbgctl_set (chain_t *chain, uint16_t v, int exit)
 }
 
 void
-bfin_dbgctl_clear (chain_t *chain, uint16_t v, int exit)
+bfin_dbgctl_set (chain_t *chain, uint16_t v, int exit)
 {
-  part_t *part;
-  uint16_t orig;
+  bfin_dbgctl_bit_clear_and_set (chain, -1, v, exit);
+}
 
-  assert (exit == EXITMODE_UPDATE || exit == EXITMODE_IDLE);
+void
+bfin_dbgctl_bit_set (chain_t *chain, uint16_t v, int exit)
+{
+  bfin_dbgctl_bit_clear_and_set (chain, 0, v, exit);
+}
 
-  if (bfin_scan_select (chain, "DBGCTL_SCAN") < 0)
-    return;
-
-  part = chain->parts->parts[chain->active_part];
-
-  chain_shift_data_registers_mode (chain, 1, 1, EXITMODE_SHIFT);
-  orig = register_value (part->active_instruction->data_register->out);
-  register_init_value (part->active_instruction->data_register->in, orig & ~v);
-  chain_shift_data_registers_mode (chain, 0, 0, exit);
-
-  return;
+void
+bfin_dbgctl_bit_clear (chain_t *chain, uint16_t v, int exit)
+{
+  bfin_dbgctl_bit_clear_and_set (chain, v, 0, exit);
 }
 
 uint16_t
@@ -135,18 +132,34 @@ bfin_dbgctl_get (chain_t *chain)
 }
 
 void
-bfin_emuir_set (chain_t *chain, uint32_t insn, int exit)
+bfin_emuir_set (chain_t *chain, uint64_t insn, int exit)
 {
   part_t *part;
+  const char *emuir_scan;
 
   assert (exit == EXITMODE_UPDATE || exit == EXITMODE_IDLE);
 
-  if (bfin_scan_select (chain, "EMUIR_SCAN") < 0)
+  if ((insn & 0xffffffff00000000ULL) == 0)
+    {
+      emuir_scan = "EMUIR_SCAN";
+      bfin_dbgctl_bit_clear_and_set (chain, DBGCTL_EMUIRSZ_MASK, DBGCTL_EMUIRSZ_32, exit);
+    }
+  else
+    {
+      emuir_scan = "EMUIR64_SCAN";
+      bfin_dbgctl_bit_clear_and_set (chain, DBGCTL_EMUIRSZ_MASK, DBGCTL_EMUIRSZ_64, exit);
+    }
+
+  if (bfin_scan_select (chain, emuir_scan) < 0)
     return;
 
   part = chain->parts->parts[chain->active_part];
 
-  register_init_value (part->active_instruction->data_register->in, insn);
+  if ((insn & 0xffffffffffff0000ULL) == 0)
+    register_init_value (part->active_instruction->data_register->in, insn << 16);
+  else
+    register_init_value (part->active_instruction->data_register->in, insn);
+
   chain_shift_data_registers_mode (chain, 0, 1, exit);
 
   return;
@@ -206,22 +219,22 @@ bfin_dbgstat_get (chain_t *chain)
 void
 bfin_emulation_enable (chain_t *chain)
 {
-  bfin_dbgctl_set (chain, DBGCTL_EMPWR, EXITMODE_UPDATE);
-  bfin_dbgctl_set (chain, DBGCTL_EMFEN, EXITMODE_UPDATE);
-  bfin_dbgctl_set (chain, DBGCTL_EMUIRSZ_32 | DBGCTL_EMUDATSZ_32, EXITMODE_UPDATE);
+  bfin_dbgctl_bit_set (chain, DBGCTL_EMPWR, EXITMODE_UPDATE);
+  bfin_dbgctl_bit_set (chain, DBGCTL_EMFEN, EXITMODE_UPDATE);
+  bfin_dbgctl_bit_set (chain, DBGCTL_EMUIRSZ_32 | DBGCTL_EMUDATSZ_32, EXITMODE_UPDATE);
 }
 
 void
 bfin_emulation_disable (chain_t *chain)
 {
-  bfin_dbgctl_clear (chain, DBGCTL_EMPWR, EXITMODE_UPDATE);
+  bfin_dbgctl_bit_clear (chain, DBGCTL_EMPWR, EXITMODE_UPDATE);
 }
 
 void
 bfin_emulation_trigger (chain_t *chain)
 {
   bfin_emuir_set (chain, INSN_NOP, EXITMODE_UPDATE);
-  bfin_dbgctl_set (chain, DBGCTL_EMEEN | DBGCTL_EMPEN | DBGCTL_WAKEUP, EXITMODE_IDLE);
+  bfin_dbgctl_bit_set (chain, DBGCTL_EMEEN | DBGCTL_EMPEN | DBGCTL_WAKEUP, EXITMODE_IDLE);
 
   /* I don't know why, but the following code works.  */
   /* Enter the emulation mode */
@@ -235,7 +248,7 @@ void
 bfin_emulation_return (chain_t *chain)
 {
   bfin_emuir_set (chain, INSN_RTE, EXITMODE_UPDATE);
-  bfin_dbgctl_clear (chain, DBGCTL_EMEEN | DBGCTL_EMPEN | DBGCTL_WAKEUP, EXITMODE_IDLE);
+  bfin_dbgctl_bit_clear (chain, DBGCTL_EMEEN | DBGCTL_EMPEN | DBGCTL_WAKEUP, EXITMODE_IDLE);
 
   /* I don't know why, but the following code works.  */
   /* Enter the emulation mode */
@@ -248,25 +261,10 @@ bfin_emulation_return (chain_t *chain)
 void
 bfin_execute_instructions (chain_t *chain, struct bfin_insn *insns)
 {
-  part_t *part;
-
-  if (insns == NULL)
-    return;
-
-  part = chain->parts->parts[chain->active_part];
-
   while (insns)
     {
       if (insns->type == BFIN_INSN_NORMAL)
-	{
-	  bfin_scan_select (chain, "EMUIR_SCAN");
-
-	  if ((insns->i & 0xffffffffffff0000ULL) == 0)
-	    register_init_value (part->active_instruction->data_register->in, insns->i << 16);
-	  else
-	    register_init_value (part->active_instruction->data_register->in, insns->i);
-	  chain_shift_data_registers_mode (chain, 0, 1, EXITMODE_IDLE);
-	}
+	bfin_emuir_set (chain, insns->i, EXITMODE_IDLE);
       else /* insns->type == BFIN_INSN_SET_EMUDAT */
 	bfin_emudat_set (chain, insns->i, EXITMODE_UPDATE);
 

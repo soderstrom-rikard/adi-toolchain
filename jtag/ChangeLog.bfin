@@ -13,6 +13,26 @@
 
 	* src/cmd/bfin.c (cmd_bfin_run): Use snprintf(), not sprintf().
 
+	* include/bfin.h (INSN_BIT_MULTI, INSN_IS_MULTI): Define.
+	(bfin_dbgctl_bit_clear_and_set, bfin_dbgctl_bit_set,
+	bfin_dbgctl_bit_clear): Add prototypes.
+	(bfin_dbgctl_clear): Remove prototype.
+	(bfin_emuir_set): Change arguments.
+	* src/cmd/bfin.c (BIT_MULTI_INS): Remove.
+	(cmd_bfin_run): Use INSN_IS_MULTI().
+	* src/part/bfin.c: Change bfin_dbgctl_set to bfin_dbgctl_bit_set and
+	bfin_dbgctl_clear to bfin_dbgctl_bit_clear.
+	(bfin_dbgctl_bit_clear_and_set): Define.
+	(bfin_dbgctl_set): Call bfin_dbgctl_bit_clear_and_set.
+	(bfin_emuir_set): Change arguments and call EMUIR64_SCAN when need be.
+	(bfin_execute_instructions): Call bfin_emuir_set.
+	* data/analog/bf527/bf527 (EMUIR64, EMUIR64_SCAN): Define.
+	* data/analog/bf533/bf533: Likewise.
+	* data/analog/bf537/bf537: Likewise.
+	* data/analog/bf538/bf538: Likewise.
+	* data/analog/bf548/bf548: Likewise.
+	* data/analog/bf561/bf561: Likewise.
+
 2008-08-29  Jie Zhang  <jie.zhang@analog.com>
 
 	* src/cmd/bfin.c (cmd_bfin_help): Document last change.

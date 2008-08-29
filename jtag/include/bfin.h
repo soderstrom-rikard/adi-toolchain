@@ -65,6 +65,11 @@
 #define INSN_SSYNC			0x00240000
 #define INSN_ILLEGAL			0xffffffff
 
+#define INSN_BIT_MULTI			0x08
+#define INSN_IS_MULTI(insn) \
+	(((insn) & 0xc0) == 0xc0 && ((insn) & INSN_BIT_MULTI) \
+	 && ((insn) & 0xe8) != 0xe8 /* not linkage */)
+
 enum bfin_insn_type
 {
   /* Instruction is a normal instruction.  */
@@ -96,11 +101,13 @@ struct bfin_insn
 //uint64_t register_value (tap_register *);
 
 //int bfin_scan_select (chain_t *, const char *);
+void bfin_dbgctl_bit_clear_and_set (chain_t *, uint16_t, uint16_t, int);
+void bfin_dbgctl_bit_set (chain_t *, uint16_t, int);
+void bfin_dbgctl_bit_clear (chain_t *, uint16_t, int);
 void bfin_dbgctl_set (chain_t *, uint16_t, int);
-void bfin_dbgctl_clear (chain_t *, uint16_t, int);
 uint16_t bfin_dbgctl_get (chain_t *);
 uint16_t bfin_dbgstat_get (chain_t *);
-void bfin_emuir_set (chain_t *, uint32_t, int);
+void bfin_emuir_set (chain_t *, uint64_t, int);
 void bfin_emudat_set (chain_t *, uint32_t, int);
 uint32_t bfin_emudat_get (chain_t *, int);
 void bfin_emulation_enable (chain_t *);
