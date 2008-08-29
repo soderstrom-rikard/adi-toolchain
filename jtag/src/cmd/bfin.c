@@ -285,6 +285,11 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 
       return execute_ret;
     }
+  else
+    {
+      printf (_("%s: unknown subcommand '%s'\n"), "bfin", params[1]);
+      return 1;
+    }
 
   return 1;
 }
