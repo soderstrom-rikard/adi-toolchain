@@ -165,12 +165,14 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 		  size_t t;
 		  FILE *fp;
 
+		  /* 1024 should be plenty; MAXINPUTLINE is 100 in parse.c */
 		  char insns_string[1024];
 		  char *p = insns_string;
 
 		  for (; i < num_params; i++)
 		    {
-		      p += sprintf (p, "%s ", params[i]);
+		      p += snprintf (p, sizeof (insns_string) - (p - insns_string),
+						     "%s ", params[i]);
 		      if (params[i][strlen (params[i]) - 1] == '"')
 			break;
 		      if (params[i][strlen (params[i]) - 1] == ';')
