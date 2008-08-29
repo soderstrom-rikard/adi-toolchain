@@ -142,7 +142,6 @@ cmd_bfin_run( chain_t *chain, char *params[] )
     }
   else if (strcmp (params[1], "execute") == 0)
     {
-      uint64_t emudat;
       int execute_ret = -1;
 
       if ((bfin_dbgstat_get (chain) & DBGSTAT_EMUREADY) == 0)
@@ -320,9 +319,11 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 
       if (execute_ret == 1)
 	{
-	  emudat = bfin_emudat_get (chain, EXITMODE_UPDATE);
-
+	  uint64_t emudat = bfin_emudat_get (chain, EXITMODE_UPDATE);
+	  uint16_t dbgstat = bfin_dbgstat_get (chain);
 	  printf ("EMUDAT = 0x%"PRIx64"\n", emudat);
+	  if (dbgstat & DBGSTAT_CORE_FAULT)
+	    printf (_("warning: core fault detected\n"));
 	}
 
       return execute_ret;

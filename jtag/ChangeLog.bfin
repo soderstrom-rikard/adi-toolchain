@@ -35,6 +35,9 @@
 
 	* src/cmd/bfin.c (cmd_bfin_run): Decode DBGSTAT in emulation status.
 
+	* src/cmd/bfin.c (cmd_bfin_run): Check DBGSTAT_CORE_FAULT in dbgstat
+	for double faults.
+
 2008-08-29  Jie Zhang  <jie.zhang@analog.com>
 
 	* src/cmd/bfin.c (cmd_bfin_help): Document last change.
