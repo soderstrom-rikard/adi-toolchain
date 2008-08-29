@@ -209,7 +209,8 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 			    goto execute_cleanup;
 
 			  n = (n << 32)
-			    | (raw_insn[0] << 16) | (raw_insn[1] << 24)
+			    | ((uint64_t)raw_insn[0] << 16)
+			    | ((uint64_t)raw_insn[1] << 24)
 			    | raw_insn[2] | (raw_insn[3] << 8);
 			}
 
