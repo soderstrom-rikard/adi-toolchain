@@ -88,11 +88,49 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 	}
       else if (strcmp (params[2], "status") == 0)
 	{
-	  uint16_t dbgstat;
+	  uint16_t dbgstat, excause;
+	  const char *str_excause;
 
 	  dbgstat = bfin_dbgstat_get (chain);
+	  excause = (dbgstat & DBGSTAT_EMUCAUSE_MASK) >> 6;
+	  switch (excause) {
+	  case 0x0: str_excause = "EMUEXCPT was executed"; break;
+	  case 0x1: str_excause = "EMUIN pin was asserted"; break;
+	  case 0x2: str_excause = "Watchpoint event occurred"; break;
+	  case 0x4: str_excause = "Performance Monitor 0 overflowed"; break;
+	  case 0x5: str_excause = "Performance Monitor 1 overflowed"; break;
+	  case 0x8: str_excause = "Emulation single step"; break;
+	  default:  str_excause = "Reserved??"; break;
+	  }
 
 	  printf ("DBGSTAT = 0x%"PRIx16"\n", dbgstat);
+
+	  printf ("\tEMUDOF     = %u\n"
+		  "\tEMUDIF     = %u\n"
+		  "\tEMUDOOVF   = %u\n"
+		  "\tEMUDIOVF   = %u\n"
+		  "\tEMUREADY   = %u\n"
+		  "\tEMUACK     = %u\n"
+		  "\tEMUCAUSE   = 0x%x (%s)\n"
+		  "\tBIST_DONE  = %u\n"
+		  "\tLPDEC0     = %u\n"
+		  "\tIN_RESET   = %u\n"
+		  "\tIDLE       = %u\n"
+		  "\tCORE_FAULT = %u\n"
+		  "\tLPDEC1     = %u\n",
+		  !!(dbgstat & DBGSTAT_EMUDOF),
+		  !!(dbgstat & DBGSTAT_EMUDIF),
+		  !!(dbgstat & DBGSTAT_EMUDOOVF),
+		  !!(dbgstat & DBGSTAT_EMUDIOVF),
+		  !!(dbgstat & DBGSTAT_EMUREADY),
+		  !!(dbgstat & DBGSTAT_EMUACK),
+		  excause, str_excause,
+		  !!(dbgstat & DBGSTAT_BIST_DONE),
+		  !!(dbgstat & DBGSTAT_LPDEC0),
+		  !!(dbgstat & DBGSTAT_IN_RESET),
+		  !!(dbgstat & DBGSTAT_IDLE),
+		  !!(dbgstat & DBGSTAT_CORE_FAULT),
+		  !!(dbgstat & DBGSTAT_LPDEC1));
 	}
       else
 	{

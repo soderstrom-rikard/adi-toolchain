@@ -33,6 +33,8 @@
 	* data/analog/bf548/bf548: Likewise.
 	* data/analog/bf561/bf561: Likewise.
 
+	* src/cmd/bfin.c (cmd_bfin_run): Decode DBGSTAT in emulation status.
+
 2008-08-29  Jie Zhang  <jie.zhang@analog.com>
 
 	* src/cmd/bfin.c (cmd_bfin_help): Document last change.
