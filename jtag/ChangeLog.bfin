@@ -2,6 +2,9 @@
 
 	* src/cmd/bfin.c (cmd_bfin_run): Display error for invalid subcmd.
 
+	* src/cmd/bfin.c (cmd_bfin_run): Don't check for missing trailing
+	quote twice.
+
 2008-08-29  Jie Zhang  <jie.zhang@analog.com>
 
 	* src/cmd/bfin.c (cmd_bfin_help): Document last change.

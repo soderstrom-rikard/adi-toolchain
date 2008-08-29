@@ -142,9 +142,9 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 		      if (params[i][strlen (params[i]) - 1] == '"')
 			break;
 		    }
-		  if (i == num_params && params[i][strlen (params[i]) - 1] != '"')
+		  if (i == num_params)
 		    {
-		      printf ( _("Unbalanced double quotes.\n") );
+		      printf ( _("%s: unbalanced double quotes\n"), "bfin execute" );
 		      goto execute_cleanup;
 		    }
 
