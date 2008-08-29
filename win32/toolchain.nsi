@@ -10,6 +10,7 @@
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 
+;SetCompress off
 SetCompressor lzma
 
 !include "env-path.nsh"
@@ -80,15 +81,24 @@ Section "Examples" SecExamples
   File /r "..\examples\*"
 SectionEnd
 
+Section "Shortcuts" SecShortcuts
+  CreateDirectory "$SMPROGRAMS\Analog Devices\GNU Toolchain\${PRODUCT_VERSION}"
+  CreateShortCut "$SMPROGRAMS\Analog Devices\GNU Toolchain\${PRODUCT_VERSION}\README.lnk" "$INSTDIR\README.txt"
+  CreateShortCut "$SMPROGRAMS\Analog Devices\GNU Toolchain\${PRODUCT_VERSION}\Documentation.lnk" "http://docs.blackfin.uclinux.org/" "" "$INSTDIR\uninst.exe"
+  CreateShortCut "$SMPROGRAMS\Analog Devices\GNU Toolchain\${PRODUCT_VERSION}\Uninstall.lnk" "$INSTDIR\uninst.exe"
+SectionEnd
+
 LangString DESC_SecNEWLIB ${LANG_ENGLISH} "Blackfin Toolchain for running on bare metal (no operating system)"
 LangString DESC_SecFLAT ${LANG_ENGLISH} "Blackfin Toolchain for generating FLAT binaries to run under Linux"
 LangString DESC_SecFDPIC ${LANG_ENGLISH} "Blackfin Toolchain for generating shared FDPIC ELF binaries to run under Linux"
 LangString DESC_SecExamples ${LANG_ENGLISH} "Some simple example programs"
+LangString DESC_SecShortcuts ${LANG_ENGLISH} "Start Menu Shortcuts"
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${SecNEWLIB} $(DESC_SecNEWLIB)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecFLAT} $(DESC_SecFLAT)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecFDPIC} $(DESC_SecFDPIC)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecExamples} $(DESC_SecExamples)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecShortcuts} $(DESC_SecShortcuts)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 Section -Misc
