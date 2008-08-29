@@ -298,7 +298,8 @@ cmd_bfin_help( void )
 	    "Usage: %s emulation enter|exit|status\n"
 	    "Blackfin specific commands\n"
 	    "\n"
-	    "INSTRUCTIONs are a sequence of Blackfin instructions and [EMUDAT_IN]s\n"
+	    "INSTRUCTIONs are a sequence of Blackfin encoded instructions,\n"
+	    "double quoted assembly statements and [EMUDAT_IN]s\n"
 	    ), "bfin", "bfin" );
 }
 
