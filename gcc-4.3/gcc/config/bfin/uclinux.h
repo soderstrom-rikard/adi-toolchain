@@ -13,3 +13,5 @@
  --wrap=mmap --wrap=munmap --wrap=alloca\
  %{fmudflapth: --wrap=pthread_create\
 }} %{fmudflap|fmudflapth: --wrap=main}"
+
+#define SUBTARGET_FDPIC_NOT_SUPPORTED

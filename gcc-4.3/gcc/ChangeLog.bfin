@@ -1,5 +1,9 @@
 2008-08-30  Bernd Schmidt  <bernd.schmidt@analog.com>
 
+	* config/bfin/uclinux.h (SUBTARGET_FDPIC_NOT_SUPPORTED): New macro.
+	* config/bfin/bfin.c (override_options): Test it and sorry out if
+	TARGET_FDPIC is also set.
+
 	* config/bfin/bfin.c (override_options): Disable -fstack-limit for
 	FD-PIC.
 
