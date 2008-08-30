@@ -1,5 +1,8 @@
 2008-08-30  Bernd Schmidt  <bernd.schmidt@analog.com>
 
+	* config/bfin/bfin.c (override_options): Disable -fstack-limit for
+	FD-PIC.
+
 	2008-06-02  Mike Frysinger  <michael.frysinger@analog.com>
 	* config/bfin/bfin.c (bfin_cpus[]): Add 0.1 for bf522, bf523, bf524,
 	bf525, bf526, bf527, bf542, bf544, bf547, bf548, and bf549.  Add 0.2
