@@ -1,5 +1,8 @@
 2008-08-30  Bernd Schmidt  <bernd.schmidt@analog.com>
 
+	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): Define
+	__WORKAROUND_RETS when appropriate.
+
 	* config/bfin/uclinux.h (SUBTARGET_FDPIC_NOT_SUPPORTED): New macro.
 	* config/bfin/bfin.c (override_options): Test it and sorry out if
 	TARGET_FDPIC is also set.
