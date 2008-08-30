@@ -1,5 +1,7 @@
 2008-08-30  Bernd Schmidt  <bernd.schmidt@analog.com>
 
+	* config/bfin/bfin.md (movpdi): All alternatives have length 4.
+
 	* config/bfin/bfin.c (bfin_expand_prologue): Honour no_stack_limit
 	attributes.
 
