@@ -1189,7 +1189,8 @@ bfin_expand_prologue (void)
     }
 
   if (current_function_limit_stack
-      || TARGET_STACK_CHECK_L1)
+      || (TARGET_STACK_CHECK_L1
+	  && ! DECL_NO_LIMIT_STACK (current_function_decl)))
     {
       HOST_WIDE_INT offset
 	= bfin_initial_elimination_offset (ARG_POINTER_REGNUM,
