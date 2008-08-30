@@ -1,5 +1,7 @@
 2008-08-30  Bernd Schmidt  <bernd.schmidt@analog.com>
 
+	* config/bfin/bfin.c (bfin_discover_loops): Delete empty loops.
+
 	* config/bfin/bfin.c (bfin_optimize_loop): Properly handle case
 	where we have one entry point in the loop which isn't the head.
 
