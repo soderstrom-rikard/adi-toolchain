@@ -1,3 +1,7 @@
+2008-08-30  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (movpdi): All alternatives have length 4.
+
 2008-06-18  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* expr.c (expand_expr_real_1): Jump to the right label in signed by
