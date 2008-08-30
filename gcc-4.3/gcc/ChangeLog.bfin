@@ -1,5 +1,10 @@
 2008-08-30  Bernd Schmidt  <bernd.schmidt@analog.com>
 
+	* config/bfin/bfin.md (loadbytes): New pattern.
+	* config/bfin/bfin.c (enum bfin_builtins): Add BFIN_BUILTIN_LOADBYTES.
+	(bfin_init_builtins): Initialize it.
+	(bdesc_1arg): Add it.
+
 	* config/bfin/bfin.c (bfin_discover_loops): Delete empty loops.
 
 	* config/bfin/bfin.c (bfin_optimize_loop): Properly handle case
