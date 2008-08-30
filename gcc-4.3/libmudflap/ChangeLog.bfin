@@ -1,5 +1,8 @@
 2008-08-30  Bernd Schmidt  <bernd.schmidt@analog.com>
 
+	* testsuite/libmudflap.c/hook2-allocstuff.c: Don't malloc 16MB on
+	Blackfin.
+
 	* mf-runtime.h: If __USER_LABEL_PREFIX__ is defined, use alternate
 	wrappers with a prefixed underscore.
 	* mf-hooks2.c (dlopen, dlclose, dlsym, dlerror): Only compile in

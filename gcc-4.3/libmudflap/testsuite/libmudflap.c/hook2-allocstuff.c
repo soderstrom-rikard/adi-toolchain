@@ -4,6 +4,8 @@
 int
 main (void)
 {
+#ifndef __bfin__
   char *p = malloc (1<<24);
+#endif
   return 0;
 }
