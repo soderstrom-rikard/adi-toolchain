@@ -2802,13 +2802,10 @@ scev_const_prop (void)
 	continue;
 
       niter = number_of_latch_executions (loop);
-      /* We used to check here whether the computation of NITER is expensive,
-	 and avoided final value elimination if that is the case.  The problem
-	 is that it is hard to evaluate whether the expression is too
-	 expensive, as we do not know what optimization opportunities the
-	 the elimination of the final value may reveal.  Therefore, we now
-	 eliminate the final values of induction variables unconditionally.  */
-      if (niter == chrec_dont_know)
+      if (niter == chrec_dont_know
+	  /* If computing the number of iterations is expensive, it may be
+	     better not to introduce computations involving it.  */
+	  || expression_expensive_p (niter))
 	continue;
 
       /* Ensure that it is possible to insert new statements somewhere.  */

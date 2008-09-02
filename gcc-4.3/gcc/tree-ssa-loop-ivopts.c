@@ -3282,6 +3282,17 @@ force_expr_to_var_cost (tree expr)
   return cost;
 }
 
+/* Returns true if EXPR looks expensive.  */
+
+bool
+expression_expensive_p (tree expr)
+{
+  comp_cost cc;
+  cc = force_expr_to_var_cost (expr);
+  return cc.cost >= target_spill_cost;
+}
+
+
 /* Estimates cost of forcing EXPR into a variable.  DEPENDS_ON is a set of the
    invariants the computation depends on.  */
 
