@@ -1,4 +1,11 @@
 2008-09-02  Jie Zhang  <jie.zhang@analog.com>
+
+	* doc/extend.texi (node Function Attributes): Document l2
+	function attribute.
+	(node Variable Attributes): Add Blackfin subsection. Document l1
+	variable attributes.
+
+2008-09-02  Jie Zhang  <jie.zhang@analog.com>
 	
 	* config/bfin/bfin.c (bfin_expand_call): Handle L2 functions.
 	(bfin_handle_l2_attribute): New.
