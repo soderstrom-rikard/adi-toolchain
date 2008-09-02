@@ -1,3 +1,8 @@
+2008-09-02  Jie Zhang  <jie.zhang@analog.com>
+
+	 * emulparams/elf32bfinfd.sh (OTHER_SECTIONS): Add .l2.text
+	and .l2.data.
+
 2008-04-01  Michael Frysinger  <michael.frysinger@analog.com>
 
 	* configure.tgt (bfin-*-linux-uclibc*): Set targ_emul to elf32bfinfd
