@@ -1051,11 +1051,31 @@ build_gcc ()
 	    LOCALE="--enable-clocale=uclibc"
 	fi
     fi
+    if [ -d "$DIR_GCC_SOURCE/.svn" ] ; then
+        eval $(svn info "$DIR_GCC_SOURCE" 2>/dev/null | \
+            sed -n \
+                -e '/^URL:/s:.* .*/trunk/.*:SCM_URL=trunk:p' \
+                -e '/^URL:/s:.* .*/branches/toolchain_\(.*\)_branch/.*:SCM_URL=\1:p' \
+                -e '/^Last Changed Rev:/s:.* :SCM_REV=:p' \
+        )
+        [ -n "$SCM_REV" ] && SCM_REV="svn-${SCM_REV}"
+    elif [ -d "$DIR_GCC_SOURCE/../.git" ] ; then
+        eval $(cd "$DIR_GCC_SOURCE"; \
+            SCM_URL=$(git branch | awk '{print $NF}')
+            echo SCM_URL=${SCM_URL}
+            echo SCM_REV=$(git rev-parse --verify ${SCM_URL} | cut -b1-6)
+        )
+        [ -n "$SCM_REV" ] && SCM_REV="git-${SCM_REV}"
+    fi
+    [ -n "$SCM_URL" ] && SCM_URL="-${SCM_URL}"
+    [ -n "$SCM_REV" ] && SCM_REV="/${SCM_REV}"
     echo_date "Configuring GCC"
     RUN="$DIR_GCC_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-$2 \
       --prefix=$3 $4 --disable-libstdcxx-pch $BFIN_LANGS $EXTRA_GCC_CONF \
       --disable-symvers --disable-libssp --disable-libffi $LOCALE \
-      --enable-version-specific-runtime-libs --enable-__cxa_atexit"
+      --enable-version-specific-runtime-libs --enable-__cxa_atexit \
+      --with-bugurl=URL:http://blackfin.uclinux.org/gf/project/toolchain/tracker \
+      --with-pkgversion=ADI${SCM_URL}${SCM_REV}"
 
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh || die_with_log
