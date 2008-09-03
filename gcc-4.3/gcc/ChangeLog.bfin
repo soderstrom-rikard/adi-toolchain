@@ -1,3 +1,11 @@
+2008-09-03  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (n_regs_to_save): New static variable.
+	(push_multiple_operation, pop_multiple_operation): Set it.
+	(workaround_speculation): New function, broken out of bfin_reorg.
+	(workaround_rts_anomaly): New function.
+	(bfin_reorg): Call these two functions.
+
 2008-09-02  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	Restore a cost check that was lost.
