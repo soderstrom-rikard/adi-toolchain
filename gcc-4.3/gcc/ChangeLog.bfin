@@ -1,3 +1,8 @@
+2008-09-04  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (gen_one_bundle): Don't create new nops if
+	optimizing for size.
+
 2008-09-03  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (n_regs_to_save): New static variable.
