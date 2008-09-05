@@ -262,8 +262,63 @@ define show_ddr
 	printf "RSTCTL:  0x%04x\n", *(unsigned short *)0xFFC00A3C
 end
 
+define _show_cec
+	set $$cec = *(unsigned long *)$arg0
+	printf "0x%08x: ", $$cec
+	if ($$cec & (1 << 0))
+		printf "EMU "
+	else
+		printf "    "
+	end
+	if ($$cec & (1 << 1))
+		printf "RST "
+	else
+		printf "    "
+	end
+	if ($$cec & (1 << 2))
+		printf "NMI "
+	else
+		printf "    "
+	end
+	if ($$cec & (1 << 3))
+		printf "EVX "
+	else
+		printf "    "
+	end
+	if ($$cec & (1 << 4))
+		printf "GBL "
+	else
+		printf "    "
+	end
+	if ($$cec & (1 << 5))
+		printf "HW "
+	else
+		printf "   "
+	end
+	if ($$cec & (1 << 6))
+		printf "TMR "
+	else
+		printf "    "
+	end
+	set $$ceci = 7
+	while ($$ceci < 16)
+		if ($$cec & (1 << $$ceci))
+			printf "G%i ", $$ceci
+		else
+			printf "   "
+			if ($$ceci > 9)
+				printf " "
+			end
+		end
+		set $$ceci = $$ceci + 1
+	end
+	printf "\n"
+end
 define show_cec
-	printf "IMASK: 0x%08x\n", *(unsigned long *)0xFFE02104
-	printf "IPEND: 0x%08x\n", *(unsigned long *)0xFFE02108
-	printf "ILAT:  0x%08x\n", *(unsigned long *)0xFFE0210C
+	printf "IMASK: "
+	_show_cec 0xFFE02104
+	printf "IPEND: "
+	_show_cec 0xFFE02108
+	printf "ILAT:  "
+	_show_cec 0xFFE0210C
 end
