@@ -1,0 +1,70 @@
+---------
+  ABOUT
+---------
+
+This project illustrates the following points:
+ - declare objects (functions/variables) in external memory with linker script
+ - initialize clocks in LDR initblock
+ - initialize memory controller in LDR initblock
+ - call functions in external memory
+ - modify data in external memory
+ - setup CPLB tables to enable data/instruction cache
+ - handle CPLB misses
+ - All written in C!  Yeah!
+
+---------
+  HOWTO
+---------
+
+To run this example, add the bfin-elf compiler to your PATH and run `make`.
+This will produce an LDR file for you to play with.  If you set the bootmode
+of your board to UART boot, you can then run `make load` to try and boot the
+LDR over the UART (by default, /dev/ttyUSB0 is used).  To really see things
+happening, you should hook up a JTAG ICE.  In the main loop, the code will
+signal the JTAG ICE after each call to external memory.
+
+-----------
+  EXAMPLE
+-----------
+
+Here is an example run with bfin-elf-gdb hooked up over JTAG and booting over
+the UART.
+
+First the main loop signals the JTAG ICE:
+	Program received signal SIGTRAP, Trace/breakpoint trap.
+	main () at main.c:29
+	29                      asm("emuexcpt");
+	(gdb)
+
+Then we check the addresses of variables/functions:
+	(gdb) print &data_in_l1
+	$1 = (int *) 0xff800024
+	(gdb) print &main
+	$2 = (int (*)(void)) 0xffa00278 <main>
+	(gdb) print &data_in_external_memory
+	$3 = (int *) 0x30
+	(gdb) print &func_in_external_memory
+	$4 = (int (*)(int)) 0
+We can see that the things are clearly in L1 and in external memory.
+
+Finally we run a few loops and see the variables getting updated:
+	(gdb) display data_in_external_memory
+	1: data_in_external_memory = 0xf
+	(gdb) display data_in_l1
+	2: data_in_l1 = 0x1
+	(gdb) continue
+	Continuing.
+
+	Program received signal SIGTRAP, Trace/breakpoint trap.
+	main () at main.c:29
+	29                      asm("emuexcpt");
+	2: data_in_l1 = 0x19
+	1: data_in_external_memory = 0x19
+	(gdb) continue
+	Continuing.
+
+	Program received signal SIGTRAP, Trace/breakpoint trap.
+	main () at main.c:29
+	29                      asm("emuexcpt");
+	2: data_in_l1 = 0x23
+	1: data_in_external_memory = 0x23

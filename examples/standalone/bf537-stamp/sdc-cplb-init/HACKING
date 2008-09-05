@@ -1,0 +1,34 @@
+The file layout is as follows:
+ - init.c - LDR initcode
+	- sets up clocks
+	- sets up memory controller
+	- executed by bootrom before loading remaining blocks
+
+ - main.c - LDR entry point
+	- executes out of L1 code
+	- calls functions (cplb.c) to initialize:
+		- exception handling
+		- cplb tables
+	- calls functions (interrupts.c) to initialize:
+		- hardware error interrupt vector
+	- calls a function in external memory and adds the result to a
+	  variable that resides in L1 data
+
+ - cplb.c - exception and cplb handling
+	- sets the exception vector (EVT3) to vector living in L1
+	- seeds the initial cplb tables so only L1 is covered
+	- turns on cplb: cache and protection support
+	- handles data and instruction cplb misses and updates the cplb
+	  table according to the information provided by hardware
+
+ - interrupts.c - interrupt handling
+	- sets the hardware error interrupt vector (EVT5) to vector living in L1
+	- if a hardware error occurs, crash (because it should not have!)
+
+ - external-memory.c - stuff that gets stuck in external memory
+	- data in external memory that gets updated
+	- functions in external memory that get executed
+
+ - sdc-cplb-init.lds - custom linker script
+	- stick some things in external memory
+	- stick some things in L1
