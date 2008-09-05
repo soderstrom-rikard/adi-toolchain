@@ -6,8 +6,6 @@
  *
  * Each function is independent of the other.  You can take only what you need.
  * For more information on each register setting, consult the HRM.
- *
- * License: Public domain; use as you like
  */
 
 #include <blackfin.h>
