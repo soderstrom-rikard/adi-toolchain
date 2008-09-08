@@ -1,3 +1,9 @@
+2008-09-08  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	From Jie:
+	* config/bfin/uclinux.h (LINK_GCC_C_SEQUENCE_SPEC): Make sure
+	libbffastfp override libgcc when -mfast-fp.
+
 2008-09-04  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (gen_one_bundle): Don't create new nops if

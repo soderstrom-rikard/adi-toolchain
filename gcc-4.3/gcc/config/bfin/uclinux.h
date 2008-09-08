@@ -4,6 +4,13 @@
 
 #define TARGET_OS_CPP_BUILTINS() LINUX_TARGET_OS_CPP_BUILTINS()
 
+#undef LINK_GCC_C_SEQUENCE_SPEC
+#define LINK_GCC_C_SEQUENCE_SPEC "\
+  %{mfast-fp:-lbffastfp} %G %L %{mfast-fp:-lbffastfp} %G \
+"
+
+#define SUBTARGET_FDPIC_NOT_SUPPORTED
+
 #define MD_UNWIND_SUPPORT "config/bfin/linux-unwind.h"
 
 /* Like the definition in gcc.c, but for purposes of uClinux, every link is
@@ -13,5 +20,3 @@
  --wrap=mmap --wrap=munmap --wrap=alloca\
  %{fmudflapth: --wrap=pthread_create\
 }} %{fmudflap|fmudflapth: --wrap=main}"
-
-#define SUBTARGET_FDPIC_NOT_SUPPORTED
