@@ -4,6 +4,10 @@
 	* config/bfin/uclinux.h (LINK_GCC_C_SEQUENCE_SPEC): Make sure
 	libbffastfp override libgcc when -mfast-fp.
 
+	From Mike:
+	* config/bfin/lib1funcs.asm (___divsi3, ___modsi3, ___udivsi3,
+	___umodsi3, ___umulsi3_highpart, ___smulsi3_highpart): Define .size.
+
 2008-09-04  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (gen_one_bundle): Don't create new nops if
