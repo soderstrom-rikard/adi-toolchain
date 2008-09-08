@@ -24,9 +24,9 @@ define seqstat
 	else
 		set $$seqstat = $seqstat
 	end
-	set $$excause    = ($$seqstat & 0x2f)
-	set $$sftreset   = ($$seqstat & 0x200) >> 12
-	set $$hwerrcause = ($$seqstat & 0x7c00) >> 13
+	set $$excause    = ($$seqstat & 0x3f)
+	set $$sftreset   = ($$seqstat & (0x1 << 13)) >> 13
+	set $$hwerrcause = ($$seqstat & (0x1f << 14)) >> 14
 	printf "SEQSTAT: %08x\n", $$seqstat
 	printf " EXCAUSE:    0x%x\t", $$excause
 	if $$excause >= 0x0 && $$excause <= 0xf
@@ -321,4 +321,13 @@ define show_cec
 	_show_cec 0xFFE02108
 	printf "ILAT:  "
 	_show_cec 0xFFE0210C
+
+	set $$EVT = 0xFFE02000
+	set $$EVTi = 0
+	while ($$EVTi < 16)
+		printf "EVT%-2i ", $$EVTi
+		output/a *(unsigned long *)($$EVT + $$EVTi * 4)
+		printf "\n"
+		set $$EVTi = $$EVTi + 1
+	end
 end
