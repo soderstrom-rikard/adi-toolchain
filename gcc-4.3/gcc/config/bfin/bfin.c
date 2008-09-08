@@ -4841,6 +4841,7 @@ workaround_speculation (void)
   rtx insn, next;
   rtx last_condjump = NULL_RTX;
   int cycles_since_jump = INT_MAX;
+  int delay_added = 0;
 
   if (! ENABLE_WA_SPECULATIVE_LOADS && ! ENABLE_WA_SPECULATIVE_SYNCS)
     return;
@@ -4850,6 +4851,7 @@ workaround_speculation (void)
   for (insn = get_insns (); insn; insn = next)
     {
       rtx pat;
+      int delay_needed = 0;
 
       next = find_next_insn_start (insn);
       
@@ -4868,6 +4870,7 @@ workaround_speculation (void)
 	      && ! cbranch_predicted_taken_p (insn))
 	    {
 	      last_condjump = insn;
+	      delay_added = 0;
 	      cycles_since_jump = 0;
 	    }
 	  else
@@ -4878,48 +4881,56 @@ workaround_speculation (void)
 	  rtx load_insn = find_load (insn);
 	  enum attr_type type = type_for_anomaly (insn);
 	  int delay_needed = 0;
+
 	  if (cycles_since_jump < INT_MAX)
 	    cycles_since_jump++;
 
 	  if (load_insn && ENABLE_WA_SPECULATIVE_LOADS)
 	    {
 	      if (trapping_loads_p (load_insn))
-		delay_needed = 3;
+		delay_needed = 4;
 	    }
 	  else if (type == TYPE_SYNC && ENABLE_WA_SPECULATIVE_SYNCS)
-	    delay_needed = 4;
+	    delay_needed = 3;
+	}
 
-	  if (delay_needed > cycles_since_jump)
+      if (delay_needed > cycles_since_jump
+	  && (delay_needed - cycles_since_jump) > delay_added)
+	{
+	  rtx pat1;
+	  int num_clobbers;
+	  rtx *op = recog_data.operand;
+
+	  delay_needed -= cycles_since_jump;
+
+	  extract_insn (last_condjump);
+	  if (optimize_size)
 	    {
-	      rtx pat;
-	      int num_clobbers;
-	      rtx *op = recog_data.operand;
-
-	      delay_needed -= cycles_since_jump;
-
-	      extract_insn (last_condjump);
-	      if (optimize_size)
-		{
-		  pat = gen_cbranch_predicted_taken (op[0], op[1], op[2],
-						     op[3]);
-		  cycles_since_jump = INT_MAX;
-		}
-	      else
-		/* Do not adjust cycles_since_jump in this case, so that
-		   we'll increase the number of NOPs for a subsequent insn
-		   if necessary.  */
-		pat = gen_cbranch_with_nops (op[0], op[1], op[2], op[3],
-					     GEN_INT (delay_needed));
-	      PATTERN (last_condjump) = pat;
-	      INSN_CODE (last_condjump) = recog (pat, insn, &num_clobbers);
+	      pat1 = gen_cbranch_predicted_taken (op[0], op[1], op[2],
+						  op[3]);
+	      cycles_since_jump = INT_MAX;
 	    }
+	  else
+	    {
+	      /* Do not adjust cycles_since_jump in this case, so that
+		 we'll increase the number of NOPs for a subsequent insn
+		 if necessary.  */
+	      pat1 = gen_cbranch_with_nops (op[0], op[1], op[2], op[3],
+					    GEN_INT (delay_needed));
+	      delay_added = delay_needed;
+	    }
+	  PATTERN (last_condjump) = pat1;
+	  INSN_CODE (last_condjump) = recog (pat1, insn, &num_clobbers);
+	}
+      if (CALL_P (insn))
+	{
+	  cycles_since_jump = INT_MAX;
+	  delay_added = 0;
 	}
     }
+
   /* Second pass: for predicted-true branches, see if anything at the
      branch destination needs extra nops.  */
-  if (! ENABLE_WA_SPECULATIVE_SYNCS)
-    return;
-
   for (insn = get_insns (); insn; insn = NEXT_INSN (insn))
     {
       int cycles_since_jump;
@@ -4951,7 +4962,12 @@ workaround_speculation (void)
 		  if (cycles_since_jump < INT_MAX)
 		    cycles_since_jump++;
 
-		  if (type == TYPE_SYNC && ENABLE_WA_SPECULATIVE_SYNCS)
+		  if (type == TYPE_MCLD && ENABLE_WA_SPECULATIVE_LOADS)
+		    {
+		      if (trapping_loads_p (target))
+			delay_needed = 2;
+		    }
+		  else if (type == TYPE_SYNC && ENABLE_WA_SPECULATIVE_SYNCS)
 		    delay_needed = 2;
 
 		  if (delay_needed > cycles_since_jump)

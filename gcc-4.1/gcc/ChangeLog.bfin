@@ -1,3 +1,11 @@
+2008-09-08  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (workaround_speculation): Correct algorithm to
+	not lose track of the number of NOPs needed.  Number of NOPs needed
+	for sync vs. loads workaround was switched; corrected.  Run second
+	pass for all workarounds.  No NOPs needed after call insns.
+	(bfin_reorg): Remove unnecessary variable.
+
 2008-09-02  Jie Zhang  <jie.zhang@analog.com>
 
 	* doc/extend.texi (node Function Attributes): Document l2

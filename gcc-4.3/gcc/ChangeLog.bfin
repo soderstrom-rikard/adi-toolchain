@@ -1,5 +1,11 @@
 2008-09-08  Bernd Schmidt  <bernd.schmidt@analog.com>
 
+	* config/bfin/bfin.c (workaround_speculation): Correct algorithm to
+	not lose track of the number of NOPs needed.  Number of NOPs needed
+	for sync vs. loads workaround was switched; corrected.  Run second
+	pass for all workarounds.  No NOPs needed after call insns.
+	(bfin_reorg): Remove unnecessary variable.
+
 	From Jie:
 	* config/bfin/uclinux.h (LINK_GCC_C_SEQUENCE_SPEC): Make sure
 	libbffastfp override libgcc when -mfast-fp.
