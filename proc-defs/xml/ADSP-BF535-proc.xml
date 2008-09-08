@@ -687,7 +687,7 @@
 <register name="PLL_STAT" group="PLL" read-address="0xFFC00404" write-address="0xFFC00404" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
 <register name="PLL_LOCKCNT" group="PLL" read-address="0xFFC00406" write-address="0xFFC00406" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
 <register name="PLL_IOCK" group="PLL" read-address="0xFFC00408" write-address="0xFFC00408" mask="FFFF" type="IO" description="" bit-size="16"/>
-<register name="SWRST" group="PLL" read-address="0xFFC00410" write-address="0xFFC00410" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
+<register name="SWRST" group="PLL" read-address="0xFFC00410" write-address="0xFFC00410" mask="FFFFFFFF" type="IO" description="" bit-size="16"/>
 <register name="SYSCR" group="PLL" read-address="0xFFC00414" write-address="0xFFC00414" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
 		<!-- ***************************************************** -->
 		<!-- define all Core MMRs here   (0xffe00000 - 0xffffffff) -->
