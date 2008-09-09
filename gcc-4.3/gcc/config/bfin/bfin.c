@@ -4880,7 +4880,6 @@ workaround_speculation (void)
 	{
 	  rtx load_insn = find_load (insn);
 	  enum attr_type type = type_for_anomaly (insn);
-	  int delay_needed = 0;
 
 	  if (cycles_since_jump < INT_MAX)
 	    cycles_since_jump++;
@@ -4941,10 +4940,14 @@ workaround_speculation (void)
 	{
 	  rtx target = JUMP_LABEL (insn);
 	  rtx label = target;
+	  rtx next_tgt;
+
 	  cycles_since_jump = 0;
-	  for (; target && cycles_since_jump < 3; target = NEXT_INSN (target))
+	  for (; target && cycles_since_jump < 3; target = next_tgt)
 	    {
 	      rtx pat;
+
+	      next_tgt = find_next_insn_start (target);
 
 	      if (NOTE_P (target) || BARRIER_P (target) || LABEL_P (target))
 		continue;
@@ -4957,14 +4960,15 @@ workaround_speculation (void)
 
 	      if (INSN_P (target))
 		{
+		  rtx load_insn = find_load (target);
 		  enum attr_type type = type_for_anomaly (target);
 		  int delay_needed = 0;
 		  if (cycles_since_jump < INT_MAX)
 		    cycles_since_jump++;
 
-		  if (type == TYPE_MCLD && ENABLE_WA_SPECULATIVE_LOADS)
+		  if (load_insn && ENABLE_WA_SPECULATIVE_LOADS)
 		    {
-		      if (trapping_loads_p (target))
+		      if (trapping_loads_p (load_insn))
 			delay_needed = 2;
 		    }
 		  else if (type == TYPE_SYNC && ENABLE_WA_SPECULATIVE_SYNCS)

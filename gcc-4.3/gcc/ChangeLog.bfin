@@ -1,3 +1,9 @@
+2008-09-09  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (workaround_speculation): Fix merge error.
+	Change second pass to use find_next_insn_start and find_load helpers
+	in order to properly detect parallel insns.
+
 2008-09-08  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (workaround_speculation): Correct algorithm to
