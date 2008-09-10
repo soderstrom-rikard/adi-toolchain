@@ -1,6 +1,9 @@
 2008-09-10  Bernd Schmidt  <bernd.schmidt@analog.com>
 
-	* config/bfin/bfin.mc (cbranch_with_nops): Increase length.
+	* config/bfin/bfin.md (cbranch_with_nops): Increase length.
+
+	* config/bfin/bfin.md (<optab>di_zesidi_di, <optab>di_sesidi_di):
+	Add earlyclobbers to operand 0.
 
 2008-09-08  Bernd Schmidt  <bernd.schmidt@analog.com>
 

@@ -903,7 +903,7 @@
    (set_attr "seq_insns" "multi")])
 
 (define_insn "*<optab>di_zesidi_di"
-  [(set (match_operand:DI 0 "register_operand" "=d")
+  [(set (match_operand:DI 0 "register_operand" "=&d")
         (any_logical:DI (zero_extend:DI
 			 (match_operand:SI 2 "register_operand" "d"))
 			(match_operand:DI 1 "register_operand" "d")))]
@@ -913,7 +913,7 @@
    (set_attr "seq_insns" "multi")])
 
 (define_insn "*<optab>di_sesdi_di"
-  [(set (match_operand:DI 0 "register_operand" "=d")
+  [(set (match_operand:DI 0 "register_operand" "=&d")
         (any_logical:DI (sign_extend:DI
 			 (match_operand:SI 2 "register_operand" "d"))
 			(match_operand:DI 1 "register_operand" "0")))
