@@ -1,3 +1,7 @@
+2008-09-10  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.mc (cbranch_with_nops): Increase length.
+
 2008-09-09  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (workaround_speculation): Fix merge error.
