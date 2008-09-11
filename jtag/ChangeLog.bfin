@@ -1,3 +1,12 @@
+2008-09-11  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* include/bfin.h (bfin_emulation_enabled, bfin_system_reset,
+	bfin_core_reset, bfin_software_reset): Declare prototypes.
+	* src/cmd/bfin.c (cmd_bfin_run): Call bfin_emulation_enabled.  Add
+	"bfin reset" command.
+	* src/part/bfin.c (bfin_emulation_enabled, bfin_system_reset,
+	bfin_core_reset, bfin_software_reset): Define.
+
 2008-08-29  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* src/cmd/bfin.c (cmd_bfin_run): Display error for invalid subcmd.

@@ -215,6 +215,11 @@ bfin_dbgstat_get (chain_t *chain)
   return register_value (part->active_instruction->data_register->out);
 }
 
+int
+bfin_emulation_enabled (chain_t *chain)
+{
+  return !!(bfin_dbgstat_get (chain) & DBGSTAT_EMUREADY);
+}
 
 void
 bfin_emulation_enable (chain_t *chain)
@@ -272,4 +277,71 @@ bfin_execute_instructions (chain_t *chain, struct bfin_insn *insns)
     }
 
   return;
+}
+
+void
+bfin_system_reset (chain_t *chain)
+{
+  int emu_enabled = bfin_emulation_enabled (chain);
+
+  if (!emu_enabled)
+    {
+      bfin_emulation_enable (chain);
+      bfin_emulation_trigger (chain);
+    }
+
+  /* P0.L = LO(SWRST); */
+  bfin_emuir_set (chain, 0xe1080100, EXITMODE_IDLE);
+  /* P0.H = HI(SWRST); */
+  bfin_emuir_set (chain, 0xe148ffc0, EXITMODE_IDLE);
+  /* R0 = 0x7 (z); */
+  bfin_emuir_set (chain, 0xe1800007, EXITMODE_IDLE);
+  /* [P0] = R0; */
+  bfin_emuir_set (chain, 0x9700, EXITMODE_IDLE);
+  /* Wait for system reset to process ... needs ~10 SCLKs */
+  sleep(1);
+  /* R0 = 0 (z); */
+  bfin_emuir_set (chain, 0xe1800000, EXITMODE_IDLE);
+  /* [P0] = R0; */
+  bfin_emuir_set (chain, 0x9700, EXITMODE_IDLE);
+
+  if (!emu_enabled)
+    bfin_emulation_return (chain);
+}
+
+void
+bfin_core_reset (chain_t *chain)
+{
+  int emu_enabled = bfin_emulation_enabled (chain);
+
+  if (emu_enabled)
+    bfin_emulation_disable (chain);
+
+  bfin_emuir_set (chain, INSN_NOP, EXITMODE_UPDATE);
+  bfin_dbgctl_bit_set (chain, DBGCTL_SRAM_INIT, EXITMODE_UPDATE);
+
+  bfin_dbgctl_bit_set (chain, DBGCTL_SYSRST, EXITMODE_UPDATE);
+  while (!(bfin_dbgstat_get (chain) & DBGSTAT_IN_RESET))
+    continue;
+  bfin_dbgctl_bit_clear (chain, DBGCTL_SYSRST, EXITMODE_UPDATE);
+  while (bfin_dbgstat_get (chain) & DBGSTAT_IN_RESET)
+    continue;
+
+  if (emu_enabled)
+    {
+      bfin_emulation_enable (chain);
+      bfin_emulation_trigger (chain);
+    }
+
+  bfin_dbgctl_bit_clear (chain, DBGCTL_SRAM_INIT, EXITMODE_UPDATE);
+
+  if (!emu_enabled)
+    bfin_emulation_return (chain);
+}
+
+void
+bfin_software_reset (chain_t *chain)
+{
+  bfin_system_reset (chain);
+  bfin_core_reset (chain);
 }

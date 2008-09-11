@@ -73,7 +73,7 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 
       if (strcmp (params[2], "enter") == 0)
 	{
-	  if ((bfin_dbgstat_get (chain) & DBGSTAT_EMUREADY) == 0)
+	  if (!bfin_emulation_enabled (chain))
 	    {
 	      bfin_emulation_enable (chain);
 	      bfin_emulation_trigger (chain);
@@ -81,7 +81,7 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 	}
       else if (strcmp (params[2], "exit") == 0)
 	{
-	  if (bfin_dbgstat_get (chain) & DBGSTAT_EMUREADY)
+	  if (bfin_emulation_enabled (chain))
 	    bfin_emulation_return (chain);
 
 	  bfin_emulation_disable (chain);
@@ -327,6 +327,36 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 	}
 
       return execute_ret;
+    }
+  else if (strcmp (params[1], "reset") == 0)
+    {
+      int reset_what = 0;
+
+      if (num_params == 3)
+	{
+	  if (!strcmp (params[2], "core"))
+	    reset_what |= 0x1;
+	  else if (!strcmp (params[2], "system"))
+	    reset_what |= 0x2;
+	  else
+	    return -1;
+	}
+      else if (num_params == 2)
+	reset_what = 0x1 | 0x2;
+      else
+	return -1;
+
+      printf (_("%s: reseting processor ... "), "bfin");
+      fflush (stdout);
+      if (reset_what == 0x3)
+	bfin_software_reset (chain);
+      else if (reset_what & 0x1)
+	bfin_core_reset (chain);
+      else if (reset_what & 0x2)
+	bfin_system_reset (chain);
+      printf (_("OK\n"));
+
+      return 1;
     }
   else
     {

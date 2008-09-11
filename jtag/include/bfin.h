@@ -110,10 +110,14 @@ uint16_t bfin_dbgstat_get (chain_t *);
 void bfin_emuir_set (chain_t *, uint64_t, int);
 void bfin_emudat_set (chain_t *, uint32_t, int);
 uint32_t bfin_emudat_get (chain_t *, int);
+int bfin_emulation_enabled (chain_t *);
 void bfin_emulation_enable (chain_t *);
 void bfin_emulation_disable (chain_t *);
 void bfin_emulation_trigger (chain_t *);
 void bfin_emulation_return (chain_t *);
 void bfin_execute_instructions (chain_t *, struct bfin_insn *);
+void bfin_system_reset (chain_t *);
+void bfin_core_reset (chain_t *);
+void bfin_software_reset (chain_t *);
 
 #endif /* BFIN_H */
