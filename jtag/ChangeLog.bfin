@@ -1,3 +1,7 @@
+2008-09-12  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* src/cmd/bfin.c (cmd_bfin_run): Re-order tuples.  Call WEXITSTATUS().
+
 2008-09-11  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* include/bfin.h (bfin_emulation_enabled, bfin_system_reset,

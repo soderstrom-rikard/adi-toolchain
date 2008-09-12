@@ -196,7 +196,7 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 		{
 		  unsigned char raw_insn[4];
 		  char *tmp_buf;
-		  char *tuples[] = { "elf", "uclinux", "linux-uclibc" };
+		  char *tuples[] = { "uclinux", "linux-uclibc", "elf" };
 		  size_t t;
 		  FILE *fp;
 
@@ -246,7 +246,7 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 				insns_string, tmpfile, tuples[t]);
 		      ret = system (tmp_buf);
 		      free (tmp_buf);
-		      if (WIFEXITED(ret))
+		      if (WIFEXITED(ret) && WEXITSTATUS(ret) == 0)
 			break;
 		    }
 		  if (t == ARRAY_SIZE(tuples))
