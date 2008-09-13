@@ -1,3 +1,8 @@
+2008-09-13  Jie Zhang  <jie.zhang@analog.com>
+
+	* src/part/bfin.c (bfin_emuir_set): Don't enter IDLE when setting
+	bits of DBGCTL.
+
 2008-09-12  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* src/cmd/bfin.c (cmd_bfin_run): Re-order tuples.  Call WEXITSTATUS().

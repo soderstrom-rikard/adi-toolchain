@@ -142,12 +142,14 @@ bfin_emuir_set (chain_t *chain, uint64_t insn, int exit)
   if ((insn & 0xffffffff00000000ULL) == 0)
     {
       emuir_scan = "EMUIR_SCAN";
-      bfin_dbgctl_bit_clear_and_set (chain, DBGCTL_EMUIRSZ_MASK, DBGCTL_EMUIRSZ_32, exit);
+      bfin_dbgctl_bit_clear_and_set (chain, DBGCTL_EMUIRSZ_MASK,
+				     DBGCTL_EMUIRSZ_32, EXITMODE_UPDATE);
     }
   else
     {
       emuir_scan = "EMUIR64_SCAN";
-      bfin_dbgctl_bit_clear_and_set (chain, DBGCTL_EMUIRSZ_MASK, DBGCTL_EMUIRSZ_64, exit);
+      bfin_dbgctl_bit_clear_and_set (chain, DBGCTL_EMUIRSZ_MASK,
+				     DBGCTL_EMUIRSZ_64, EXITMODE_UPDATE);
     }
 
   if (bfin_scan_select (chain, emuir_scan) < 0)
