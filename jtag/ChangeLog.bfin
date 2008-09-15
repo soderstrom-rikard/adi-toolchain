@@ -1,3 +1,8 @@
+2008-09-15  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* src/cmd/bfin.c (cmd_bfin_run): Run as with --version first.  Abort early
+	for non-zero/127 return values from WEXITSTATUS().
+
 2008-09-13  Jie Zhang  <jie.zhang@analog.com>
 
 	* src/part/bfin.c (bfin_emuir_set): Don't enter IDLE when setting

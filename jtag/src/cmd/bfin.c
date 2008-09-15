@@ -241,17 +241,33 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 		    {
 		      int ret;
 		      asprintf (&tmp_buf,
+				"bfin-%3$s-as --version >/dev/null 2>&1 || exit $?;"
 				"echo '%1$s' | bfin-%3$s-as - -o \"%2$s\""
 				" && bfin-%3$s-objcopy -O binary \"%2$s\"",
 				insns_string, tmpfile, tuples[t]);
 		      ret = system (tmp_buf);
 		      free (tmp_buf);
-		      if (WIFEXITED(ret) && WEXITSTATUS(ret) == 0)
-			break;
+		      if (WIFEXITED(ret))
+			{
+			  if (WEXITSTATUS(ret) == 0)
+			    break;
+			  /* 127 -> not found in $PATH */
+			  else if (WEXITSTATUS(ret) == 127)
+			    continue;
+			  else
+			    {
+			      printf( _("%s: GAS failed parsing: %s\n"),
+				      "bfin execute",
+				      insns_string);
+			      goto execute_cleanup;
+			    }
+			}
 		    }
 		  if (t == ARRAY_SIZE(tuples))
 		    {
-		      printf( _("Unable to find the Blackfin toolchain in $PATH.\n") );
+		      printf( _("%s: "
+			      "unable to find Blackfin toolchain in $PATH\n"),
+			      "bfin execute" );
 		      goto execute_cleanup;
 		    }
 
