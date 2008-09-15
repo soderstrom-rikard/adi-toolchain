@@ -225,6 +225,15 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 		  if (insns_string[0] == '"')
 		    insns_string[0] = ' ';
 
+		  /* HRM states that branches and hardware loop setup results
+		     in undefined behavior.  Should check opcode instead?  */
+		  if (strcasestr(insns_string, "jump") ||
+		      strcasestr(insns_string, "call") ||
+		      strcasestr(insns_string, "lsetup"))
+		    printf( _("%s: warning: "
+			    "jump/call/lsetup insns may not work in emulation\n"),
+			    "bfin execute" );
+
 		  /* get a temporary file to work with -- a little racy */
 		  if (!tmpfile)
 		    {
