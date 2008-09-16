@@ -39,6 +39,8 @@
 #define ANOMALY_05000342 (__SILICON_REVISION__ < 2)
 /* USB Calibration Value Is Not Initialized */
 #define ANOMALY_05000346 (__SILICON_REVISION__ < 2)
+/* USB Calibration Value to use */
+#define ANOMALY_05000346_value 0xE510
 /* Preboot Routine Incorrectly Alters Reset Value of USB Register */
 #define ANOMALY_05000347 (__SILICON_REVISION__ < 2)
 /* Security Features Are Not Functional */
