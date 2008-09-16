@@ -6,6 +6,13 @@
 	* src/cmd/bfin.c (cmd_bfin_run): Check for "jump", "call", and "lsetup" in
 	the instruction string to execute.
 
+	* src/bus/bf537_stamp.c (ASYNC_MEM_BASE, ASYNC_MEM_SIZE, IS_ASYNC_ADDR,
+	ASYNC_BANK): Define.
+	(bf537_stamp_bus_area): Only accept IS_ASYNC_ADDR() addresses.
+	(select_flash): Set AMS[] based on ASYNC_BANK(adr).
+	(bf537_stamp_bus_read_start): Pass adr to select_flash().
+	(bf537_stamp_bus_write): Likewise.
+
 2008-09-13  Jie Zhang  <jie.zhang@analog.com>
 
 	* src/part/bfin.c (bfin_emuir_set): Don't enter IDLE when setting

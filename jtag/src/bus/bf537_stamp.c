@@ -152,26 +152,50 @@ bf537_stamp_bus_new( chain_t *chain, const bus_driver_t *driver, char *cmd_param
  * bus->driver->(*area)
  *
  */
+
+#define ASYNC_MEM_BASE 0x20000000
+#define ASYNC_MEM_SIZE (4 * 1024 * 1024)
+#define IS_ASYNC_ADDR(addr) ({ \
+	unsigned long __addr = (unsigned long) addr; \
+	__addr >= ASYNC_MEM_BASE && __addr < ASYNC_MEM_BASE + ASYNC_MEM_SIZE; \
+	})
+#define ASYNC_BANK(addr) (((addr) & (ASYNC_MEM_SIZE - 1)) >> 20)
+
 static int
 bf537_stamp_bus_area( bus_t *bus, uint32_t adr, bus_area_t *area )
 {
-	area->description = NULL;
-	area->start = UINT32_C(0x00000000);
-	area->length = UINT64_C(0x100000000);
-	area->width = 16;
+	if (adr < ASYNC_MEM_BASE) {
+		/* we can only wiggle SDRAM pins directly, so cannot drive it
+		area->description = "external memory";
+		area->start = 0x00000000;
+		area->length = ASYNC_MEM_SIZE;
+		area->width = 16;
+		*/
+		printf( _("reading external memory not supported\n") );
+		return 1;
+	} else if (IS_ASYNC_ADDR(adr)) {
+		area->description = "asynchronous memory";
+		area->start = ASYNC_MEM_BASE;
+		area->length = ASYNC_MEM_SIZE;
+		area->width = 16;
+	} else {
+		printf( _("reading on-chip memory not supported\n") );
+		/* L1 needs core to access it */
+		return 1;
+	}
 
 	return 0;
 }
 
 static void
-select_flash( bus_t *bus )
+select_flash( bus_t *bus, uint32_t adr )
 {
 	part_t *p = PART;
 
-	part_set_signal( p, AMS[0], 1, 0 );
-	part_set_signal( p, AMS[1], 1, 1 );
-	part_set_signal( p, AMS[2], 1, 1 );
-	part_set_signal( p, AMS[3], 1, 1 );
+	part_set_signal( p, AMS[0], 1, !(ASYNC_BANK(adr) == 0) );
+	part_set_signal( p, AMS[1], 1, !(ASYNC_BANK(adr) == 1) );
+	part_set_signal( p, AMS[2], 1, !(ASYNC_BANK(adr) == 2) );
+	part_set_signal( p, AMS[3], 1, !(ASYNC_BANK(adr) == 3) );
 
 	part_set_signal( p, ABE[0], 1, 0 );
 	part_set_signal( p, ABE[1], 1, 0 );
@@ -242,7 +266,7 @@ bf537_stamp_bus_read_start( bus_t *bus, uint32_t adr )
 	part_t *p = PART;
 	chain_t *chain = CHAIN;
 
-	select_flash( bus );
+	select_flash( bus, adr );
 	part_set_signal( p, AOE, 1, 0 );
 	part_set_signal( p, ARE, 1, 0 );
 	part_set_signal( p, AWE, 1, 1 );
@@ -309,7 +333,7 @@ bf537_stamp_bus_write( bus_t *bus, uint32_t adr, uint32_t data )
 	part_t *p = PART;
 	chain_t *chain = CHAIN;
 
-	select_flash( bus );
+	select_flash( bus, adr );
 	part_set_signal( p, AOE, 1, 1 );
 	part_set_signal( p, ARE, 1, 1 );
 
