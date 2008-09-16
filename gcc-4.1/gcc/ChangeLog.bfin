@@ -1,3 +1,9 @@
+2008-09-15  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* config/bfin/bfin.c (bfin_cpus[]): Add 0.2 for bf522, bf523, bf524,
+	bf526, and bf527.  Add 0.6 for bf533, bf532, and bf531.  Add 0.5 for
+	bf538 and bf539.  Add 0.2 for bf542, bf544, bf547, bf548, and bf549.
+
 2008-09-10  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (cbranch_with_nops): Increase length.
