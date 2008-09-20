@@ -128,6 +128,8 @@ enum
 #define PT_R0 PT_R0
   PT_ORIG_R0 = 208,
 #define PT_ORIG_R0 PT_ORIG_R0
+  PT_ORIG_P0 = 212,
+#define PT_ORIG_P0 PT_ORIG_P0
 };
 
 #endif	/* _SYS_REG_H */
