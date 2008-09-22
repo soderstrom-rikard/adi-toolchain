@@ -1,3 +1,50 @@
+2008-09-22  Jie Zhang  <jie.zhang@analog.com>
+
+	* include/part.h (struct part): Add data.
+	* include/bfin.h (DBGCTL_*, DBGSTAT_*): Redefine.
+	(struct emu_oab): Define.
+	(current_emu_oab): Declare.
+	(BFIN_DBGCTL_BIT_CLEAR_AND_SET): Define.
+	(BFIN_DBGCTL_GET): Define.
+	(BFIN_DBGSTAT_GET): Define.
+	(BFIN_EMUDAT_SET): Define.
+	(BFIN_EMUDAT_GET): Define.
+	(BFIN_EMUIR_SET): Define.
+	(BFIN_DBGCTL_SET): Define.
+	(BFIN_DBGCTL_BIT_SET): Define.
+	(BFIN_DBGCTL_BIT_CLEAR): Define.
+	(bfin_dbgctl_bit_clear_and_set): Don't declare. Update all
+	call sites to use corresponding macro.
+	(bfin_dbgctl_bit_set): Likewise.
+	(bfin_dbgctl_bit_clear): Likewise.
+	(bfin_dbgctl_set): Likewise.
+	(bfin_dbgctl_get): Likewise.
+	(bfin_dbgstat_get): Likewise.
+	(bfin_part_init): Declare.
+	* src/cmd/bfin.c (cmd_bfin_run): Call bfin_part_init.
+	* src/part/bfin.c (bfin_emu_oab, bf579_emu_oab): Declare.
+	(current_emu_oab): Define.
+	(bfin_part_init): New.
+	(register_init_value): Remove assert on register length.
+	(register_value): Likewise. And drop the most significant
+	bits if the value cannot fit in the register.
+	(bfin_scan_select): Add a comment and show part name in error
+	message.
+	(bfin_emudat_set): If EMUDAT is larger than 32 bits, set
+	EMUDIF.
+	(bfin_emudat_get): Only return real data.
+	(bfin_emuir_set): Set identify bits properly if there are
+	those bits.
+	(bfin_emu_oab): Define.
+	(bf579_dbgctl_bit_clear_and_set): New.
+	(bf579_dbgstat_get): New.
+	(bf579_emu_oab): Define.
+	* data/Makefile.am (nobase_dist_pkgdata_DATA): Add bf579.
+	* data/Makefile.in: Regenerate.
+	* data/analog/PARTS: Add bf579.
+	* data/analog/bf579/bf579: New file.
+	* data/analog/bf579/STEPPINGS: New file.
+
 2008-09-15  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* src/cmd/bfin.c (cmd_bfin_run): Run as with --version first.  Abort early

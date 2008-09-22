@@ -52,6 +52,8 @@ struct part {
 	data_register *data_registers;
 	int boundary_length;
 	bsbit_t **bsbits;
+	/* Part specific data structure.  */
+	void *data;
 };
 
 part_t *part_alloc( const tap_register *id );

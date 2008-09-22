@@ -27,37 +27,100 @@
 
 #include <tap.h>
 
-#define DBGCTL_SRAM_INIT		0x1000
-#define DBGCTL_WAKEUP			0x0800
-#define DBGCTL_SYSRST			0x0400
-#define DBGCTL_ESSTEP			0x0200
-#define DBGCTL_EMUDATSZ_32		0x0000
-#define DBGCTL_EMUDATSZ_40		0x0080
-#define DBGCTL_EMUDATSZ_48		0x0100
-#define DBGCTL_EMUDATSZ_MASK		0x0180
-#define DBGCTL_EMUIRLPSZ_2		0x0040
-#define DBGCTL_EMUIRSZ_64		0x0000
-#define DBGCTL_EMUIRSZ_48		0x0010
-#define DBGCTL_EMUIRSZ_32		0x0020
-#define DBGCTL_EMUIRSZ_MASK		0x0030
-#define DBGCTL_EMPEN			0x0008
-#define DBGCTL_EMEEN			0x0004
-#define DBGCTL_EMFEN			0x0002
-#define DBGCTL_EMPWR			0x0001
+/* OAB stands for Operations and Bits. */
 
-#define DBGSTAT_LPDEC1			0x8000
-#define DBGSTAT_CORE_FAULT		0x4000
-#define DBGSTAT_IDLE			0x2000
-#define DBGSTAT_IN_RESET		0x1000
-#define DBGSTAT_LPDEC0			0x0800
-#define DBGSTAT_BIST_DONE		0x0400
-#define DBGSTAT_EMUCAUSE_MASK		0x03c0
-#define DBGSTAT_EMUACK			0x0020
-#define DBGSTAT_EMUREADY		0x0010
-#define DBGSTAT_EMUDIOVF		0x0008
-#define DBGSTAT_EMUDOOVF		0x0004
-#define DBGSTAT_EMUDIF			0x0002
-#define DBGSTAT_EMUDOF			0x0001
+/* TODO It will be better to add this to PART_T and initialize it when
+   detecting parts.  Such that when ACTIVE_PART is changed, EMU_OAB
+   automatically points to the right object.  More important, if we
+   need operate on multicore with different cores, current method will
+   not work at all.  But now it's enough.  So let's keep it simple
+   before it is stablized.  */
+
+struct emu_oab
+{
+  /* Operations */
+  void (*dbgctl_bit_clear_and_set) (chain_t *, uint16_t, uint16_t, int);
+  uint16_t (*dbgstat_get) (chain_t *);
+
+  /* Bits */
+  uint16_t dbgctl_sram_init;
+  uint16_t dbgctl_wakeup;
+  uint16_t dbgctl_sysrst;
+  uint16_t dbgctl_esstep;
+  uint16_t dbgctl_emudatsz_32;
+  uint16_t dbgctl_emudatsz_40;
+  uint16_t dbgctl_emudatsz_48;
+  uint16_t dbgctl_emudatsz_mask;
+  uint16_t dbgctl_emuirlpsz_2;
+  uint16_t dbgctl_emuirsz_64;
+  uint16_t dbgctl_emuirsz_48;
+  uint16_t dbgctl_emuirsz_32;
+  uint16_t dbgctl_emuirsz_mask;
+  uint16_t dbgctl_empen;
+  uint16_t dbgctl_emeen;
+  uint16_t dbgctl_emfen;
+  uint16_t dbgctl_empwr;
+
+  uint16_t dbgstat_lpdec1;
+  uint16_t dbgstat_core_fault;
+  uint16_t dbgstat_idle;
+  uint16_t dbgstat_in_reset;
+  uint16_t dbgstat_lpdec0;
+  uint16_t dbgstat_bist_done;
+  uint16_t dbgstat_emucause_mask;
+  uint16_t dbgstat_emuack;
+  uint16_t dbgstat_emuready;
+  uint16_t dbgstat_emudiovf;
+  uint16_t dbgstat_emudoovf;
+  uint16_t dbgstat_emudif;
+  uint16_t dbgstat_emudof;
+};
+
+extern struct emu_oab *current_emu_oab;
+
+#define BFIN_DBGCTL_BIT_CLEAR_AND_SET (current_emu_oab->dbgctl_bit_clear_and_set)
+#define BFIN_DBGCTL_GET (current_emu_oab->dbgctl_get)
+#define BFIN_DBGSTAT_GET (current_emu_oab->dbgstat_get)
+#define BFIN_EMUDAT_SET bfin_emudat_set
+#define BFIN_EMUDAT_GET bfin_emudat_get
+#define BFIN_EMUIR_SET bfin_emuir_set
+
+#define BFIN_DBGCTL_SET(chain, v, exit) BFIN_DBGCTL_BIT_CLEAR_AND_SET (chain, -1, v, exit)
+#define BFIN_DBGCTL_BIT_SET(chain, v, exit) BFIN_DBGCTL_BIT_CLEAR_AND_SET (chain, 0, v, exit)
+#define BFIN_DBGCTL_BIT_CLEAR(chain, v, exit) BFIN_DBGCTL_BIT_CLEAR_AND_SET (chain, v, 0, exit)
+
+#define DBGCTL_SRAM_INIT	(current_emu_oab->dbgctl_sram_init)
+#define DBGCTL_WAKEUP		(current_emu_oab->dbgctl_wakeup)
+#define DBGCTL_SYSRST		(current_emu_oab->dbgctl_sysrst)
+#define DBGCTL_ESSTEP		(current_emu_oab->dbgctl_esstep)
+#define DBGCTL_EMUDATSZ_32	(current_emu_oab->dbgctl_emudatsz_32)
+#define DBGCTL_EMUDATSZ_40	(current_emu_oab->dbgctl_emudatsz_40)
+#define DBGCTL_EMUDATSZ_48	(current_emu_oab->dbgctl_emudatsz_48)
+#define DBGCTL_EMUDATSZ_MASK	(current_emu_oab->dbgctl_emudatsz_mask)
+#define DBGCTL_EMUIRLPSZ_2	(current_emu_oab->dbgctl_emuirlpsz_2)
+#define DBGCTL_EMUIRSZ_64	(current_emu_oab->dbgctl_emuirsz_64)
+#define DBGCTL_EMUIRSZ_48	(current_emu_oab->dbgctl_emuirsz_48)
+#define DBGCTL_EMUIRSZ_32	(current_emu_oab->dbgctl_emuirsz_32)
+#define DBGCTL_EMUIRSZ_MASK	(current_emu_oab->dbgctl_emuirsz_mask)
+#define DBGCTL_EMPEN		(current_emu_oab->dbgctl_empen)
+#define DBGCTL_EMEEN		(current_emu_oab->dbgctl_emeen)
+#define DBGCTL_EMFEN		(current_emu_oab->dbgctl_emfen)
+#define DBGCTL_EMPWR		(current_emu_oab->dbgctl_empwr)
+
+#define DBGSTAT_LPDEC1		(current_emu_oab->dbgstat_lpdec1)
+#define DBGSTAT_IN_POWRGATE	DBGSTAT_LPDEC1
+#define DBGSTAT_CORE_FAULT	(current_emu_oab->dbgstat_core_fault)
+#define DBGSTAT_IDLE		(current_emu_oab->dbgstat_idle)
+#define DBGSTAT_IN_RESET	(current_emu_oab->dbgstat_in_reset)
+#define DBGSTAT_LPDEC0		(current_emu_oab->dbgstat_lpdec0)
+#define DBGSTAT_BIST_DONE	(current_emu_oab->dbgstat_bist_done)
+#define DBGSTAT_EMUCAUSE_MASK	(current_emu_oab->dbgstat_emucause_mask)
+#define DBGSTAT_EMUACK		(current_emu_oab->dbgstat_emuack)
+#define DBGSTAT_EMUREADY	(current_emu_oab->dbgstat_emuready)
+#define DBGSTAT_EMUDIOVF	(current_emu_oab->dbgstat_emudiovf)
+#define DBGSTAT_EMUDOOVF	(current_emu_oab->dbgstat_emudoovf)
+#define DBGSTAT_EMUDIF		(current_emu_oab->dbgstat_emudif)
+#define DBGSTAT_EMUDOF		(current_emu_oab->dbgstat_emudof)
 
 #define INSN_NOP			0x00000000
 #define INSN_RTE			0x00140000
@@ -97,16 +160,11 @@ struct bfin_insn
   struct bfin_insn *next;
 };
 
-//tap_register *register_init_value (tap_register *, uint64_t);
-//uint64_t register_value (tap_register *);
 
-//int bfin_scan_select (chain_t *, const char *);
-void bfin_dbgctl_bit_clear_and_set (chain_t *, uint16_t, uint16_t, int);
-void bfin_dbgctl_bit_set (chain_t *, uint16_t, int);
-void bfin_dbgctl_bit_clear (chain_t *, uint16_t, int);
-void bfin_dbgctl_set (chain_t *, uint16_t, int);
-uint16_t bfin_dbgctl_get (chain_t *);
-uint16_t bfin_dbgstat_get (chain_t *);
+/* Do Blackfin part specific initialization.  It's mainly used to
+   set the proper emulation methods according to the part name.  */
+void bfin_part_init (part_t *);
+
 void bfin_emuir_set (chain_t *, uint64_t, int);
 void bfin_emudat_set (chain_t *, uint32_t, int);
 uint32_t bfin_emudat_get (chain_t *, int);

@@ -66,6 +66,9 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 
   assert (part);
 
+  /* Do part specific initialization.  */
+  bfin_part_init (part);
+
   if (strcmp (params[1], "emulation") == 0)
     {
       if (num_params != 3)
@@ -91,7 +94,7 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 	  uint16_t dbgstat, excause;
 	  const char *str_excause;
 
-	  dbgstat = bfin_dbgstat_get (chain);
+	  dbgstat = BFIN_DBGSTAT_GET (chain);
 	  excause = (dbgstat & DBGSTAT_EMUCAUSE_MASK) >> 6;
 	  switch (excause) {
 	  case 0x0: str_excause = "EMUEXCPT was executed"; break;
@@ -144,7 +147,7 @@ cmd_bfin_run( chain_t *chain, char *params[] )
     {
       int execute_ret = -1;
 
-      if ((bfin_dbgstat_get (chain) & DBGSTAT_EMUREADY) == 0)
+      if ((BFIN_DBGSTAT_GET (chain) & DBGSTAT_EMUREADY) == 0)
 	{
 	  printf( _("Run \"bfin emulation enter\" first.\n") );
 	  return 1;
@@ -344,8 +347,8 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 
       if (execute_ret == 1)
 	{
-	  uint64_t emudat = bfin_emudat_get (chain, EXITMODE_UPDATE);
-	  uint16_t dbgstat = bfin_dbgstat_get (chain);
+	  uint64_t emudat = BFIN_EMUDAT_GET (chain, EXITMODE_UPDATE);
+	  uint16_t dbgstat = BFIN_DBGSTAT_GET (chain);
 	  printf ("EMUDAT = 0x%"PRIx64"\n", emudat);
 	  if (dbgstat & DBGSTAT_CORE_FAULT)
 	    printf (_("warning: core fault detected\n"));
