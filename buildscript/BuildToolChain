@@ -683,7 +683,7 @@ if [ $CHECK_ON_HARDWARE ] ; then
         echo "1 - looks OK"
     fi
 
-    RUN=`rsh -l root $TARGET_IPADDR cat /proc/cpuinfo | grep vendor_id | awk -F: '{print $2}' | sed 's/^ *//'`
+    RUN=`rsh -l root $TARGET_IPADDR cat /proc/cpuinfo | grep vendor_id | head -1 | awk -F: '{print $2}' | sed 's/^ *//'`
     if [ "$RUN" != "Analog Devices" ] ; then
         echo "Target $TARGET_IPADDR doesn't appear to be a Blackfin - sorry"
         exit 1
