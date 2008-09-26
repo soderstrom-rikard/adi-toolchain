@@ -21,6 +21,7 @@
 
 #include "bfin-defs.h"
 
+/* A typedef would be better.  */
 #define REG_T Register *
 
 INSTR_T
@@ -36,6 +37,12 @@ bfin_gen_dsp32mult (int op1, int mm, int mmod, int w1, int p,
 INSTR_T
 bfin_gen_dsp32alu (int HL, int aopcde, int aop, int s, int x,
               REG_T dst0, REG_T dst1, REG_T src0, REG_T src1);
+
+INSTR_T
+bfin_gen_dsp32cmul (int aop, int mmod, int w, REG_T dst, REG_T src0, REG_T src1);
+
+INSTR_T
+bfin_gen_dsp32csqu (int op, int mmod, int w, REG_T dst, REG_T src);
 
 INSTR_T
 bfin_gen_dsp32shift (int sopcde, REG_T dst0, REG_T src0, REG_T src1,

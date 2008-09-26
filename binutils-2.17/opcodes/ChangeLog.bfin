@@ -1,3 +1,18 @@
+2008-09-26  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-dis.c (decode_dregs_pair[]): New.
+	(dregs_pair): Redefine.
+	(decode_cmult): New.
+	(decode_cmulfunc): New.
+	(decode_csqu): New.
+	(decode_csqufunc): New.
+	(decode_dsp32alu_0): Deal with new SEARCH and SELECT
+	instructions.
+	(decode_dsp32cmul): New.
+	(decode_dsp32csqu): New.
+	(_print_insn_bfin): Properly call decode_dsp32cmul and
+	decode_dsp32csqu.
+
 2008-08-28  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin-dis.c (decode_pseudodbg_assert_0): Change according

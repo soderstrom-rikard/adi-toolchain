@@ -1,3 +1,11 @@
+2008-09-26  Jie Zhang  <jie.zhang@analog.com>
+
+	* gas/bfin/csqu.[sd]: Tests for CSQU instruction.
+	* gas/bfin/cmul.[sd]: Tests for CMUL instruction.
+	* gas/bfin/select.[sd]: Tests for SELECT instruction.
+	* gas/bfin/search.[sd]: Tests for SEARCH instruction.
+	* gas/bfin/bfin.exp: Add above new tests.
+
 2008-08-26  Jie Zhang  <jie.zhang@analog.com>
 
 	Backport from upstream

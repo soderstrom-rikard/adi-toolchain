@@ -84,10 +84,6 @@ typedef enum
    belong to a usuable register group.  */
 #define T_NOGROUP     0xa0
 
-/* Flags.  */
-#define F_REG_ALL    0x1000
-#define F_REG_HIGH   0x2000  /* Half register: high half.  */
-
 enum machine_registers
 {
   REG_R0    = T_REG_R, REG_R1, REG_R2, REG_R3, REG_R4, REG_R5, REG_R6, REG_R7, 
@@ -183,12 +179,15 @@ enum reg_class
 
 #define REG_SAME(a, b)   ((a).regno == (b).regno)
 #define REG_EQUAL(a, b)  (((a).regno & CODE_MASK) == ((b).regno & CODE_MASK))
-#define REG_CLASS(a)     ((a.regno) & 0xf0)
+#define REG_CLASS(a)     ((a).regno & 0xf0)
 #define IS_A1(a)         ((a).regno == REG_A1)
-#define IS_H(a)          ((a).regno & F_REG_HIGH ? 1: 0)
-#define IS_EVEN(r)       (r.regno % 2 == 0)
+#define IS_H(a)          ((a).flags & F_REG_HIGH ? 1: 0)
+#define IS_L(a)          ((a).flags & F_REG_LOW ? 1: 0)
+#define IS_HALF(a)       (IS_H(a) || IS_L(a))
+#define IS_PAIR(a)       ((a).flags & F_REG_PAIR ? 1 : 0)
+#define IS_EVEN(r)       ((r).regno % 2 == 0)
 #define IS_HCOMPL(a, b)  (REG_EQUAL(a, b) && \
-                         ((a).regno & F_REG_HIGH) != ((b).regno & F_REG_HIGH))
+                         ((a).flags & F_REG_HIGH) != ((b).flags & F_REG_HIGH))
 
 /* register type checking.  */
 #define _TYPECHECK(r, x) (((r).regno & CLASS_MASK) == T_REG_##x)
@@ -328,6 +327,11 @@ INSTR_T Expr_Node_Gen_Reloc (Expr_Node *head, int parent_reloc);
 
 typedef long reg_t;
 
+#define F_REG_NONE 0
+#define F_REG_PAIR 1
+#define F_REG_STAR 2
+#define F_REG_HIGH 4
+#define F_REG_LOW  8
 
 typedef struct _register
 {
@@ -346,6 +350,24 @@ typedef struct _macfunc
   Register s0;
   Register s1;
 } Macfunc;
+
+typedef struct _cmulfunc
+{
+  char aop;
+  char w;
+  Register dst;
+  Register s0;
+  Register s1;
+} cmulfunc_t;
+
+typedef struct _csqufunc
+{
+  char n;
+  char op;
+  char w;
+  Register dst;
+  Register src;
+} csqufunc_t;
 
 typedef struct _opt_mode
 {

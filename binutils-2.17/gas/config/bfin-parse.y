@@ -40,6 +40,12 @@
 	bfin_gen_dsp32mult (op1, MM, mmod, w1, P, h01, h11, h00, h10, op0, \
 	                    dst, src0, src1, w0)
 
+#define DSP32CMUL(aop, mmod, w, dst, src0, src1) \
+	bfin_gen_dsp32cmul (aop, mmod, w, dst, src0, src1)
+
+#define DSP32CSQU(op, mmod, w, dst, src) \
+	bfin_gen_dsp32csqu (op, mmod, w, dst, src)
+
 #define DSP32SHIFT(sopcde, dst0, src0, src1, sop, hls)  \
 	bfin_gen_dsp32shift (sopcde, dst0, src0, src1, sop, hls)
 
@@ -245,6 +251,7 @@ valid_dreg_pair (Register *reg1, Expr_Node *reg2)
     }
 
   reg1->regno--;
+  reg1->flags = F_REG_PAIR;
   return 1;
 }
 
@@ -401,6 +408,8 @@ gen_multi_instr_1 (INSTR_T dsp32, INSTR_T dsp16_grp1, INSTR_T dsp16_grp2)
   long value;
   Register reg;
   Macfunc macfunc;
+  cmulfunc_t cmulfunc;
+  csqufunc_t csqufunc;
   struct { int r0; int s0; int x0; int aop; } modcodes;
   struct { int r0; } r0;
   Opt_mode mod;
@@ -408,6 +417,9 @@ gen_multi_instr_1 (INSTR_T dsp32, INSTR_T dsp16_grp1, INSTR_T dsp16_grp2)
 
 
 /* Tokens.  */
+
+/* Complex operations */
+%token CMUL CSQU
 
 /* Vector Specific.  */
 %token BYTEOP16P BYTEOP16M
@@ -417,7 +429,7 @@ gen_multi_instr_1 (INSTR_T dsp32, INSTR_T dsp16_grp1, INSTR_T dsp16_grp2)
 %token SAA
 %token ALIGN8 ALIGN16 ALIGN24
 %token VIT_MAX
-%token EXTRACT DEPOSIT EXPADJ SEARCH
+%token EXTRACT DEPOSIT EXPADJ SEARCH SELECT
 %token ONES SIGN SIGNBITS
 
 /* Stack.  */
@@ -536,7 +548,13 @@ gen_multi_instr_1 (INSTR_T dsp32, INSTR_T dsp16_grp1, INSTR_T dsp16_grp2)
 %type <reg> a_minusassign
 %type <macfunc> multiply_halfregs
 %type <macfunc> assign_macfunc 
-%type <macfunc> a_macfunc 
+%type <macfunc> a_macfunc
+%type <cmulfunc> cmul_regs
+%type <cmulfunc> assign_cmulfunc
+%type <cmulfunc> a_cmulfunc
+%type <csqufunc> csqu_regs
+%type <csqufunc> assign_csqufunc
+%type <csqufunc> a_csqufunc
 %type <expr> expr_1
 %type <instr> asm_1
 %type <r0> vmod
@@ -581,6 +599,7 @@ gen_multi_instr_1 (INSTR_T dsp32, INSTR_T dsp16_grp1, INSTR_T dsp16_grp2)
 %type <expr> got_or_expr
 %type <expr> pltpc
 %type <value> any_gotrel GOT GOT17M4 FUNCDESC_GOT17M4
+%type <value> star_or_nothing
 
 /* Precedence rules.  */
 %left BAR
@@ -684,6 +703,82 @@ asm_1:
 	MNOP
 	{
 	  $$ = DSP32MAC (3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0);
+	}
+	| REG ASSIGN csqu_regs opt_mode
+	{
+	  notethat ("dregs = CSQU (dregs) (opt_mode)\n");
+
+	  if (!IS_DREG ($1))
+	    return yyerror ("only DREG can be used as the result of CSQU.");
+
+	  if ($4.mod != 0 && $4.mod != M_IS)
+	    return yyerror ("bad option.");
+
+	  $$ = DSP32CSQU (3, $4.mod, 1, &$1, &$3.src);
+	}
+	| HALF_REG ASSIGN csqu_regs opt_mode
+	{
+	  notethat ("dregs_half = CSQU (dregs) (opt_mode)\n");
+
+	  if (!IS_DREG ($1))
+	    return yyerror ("only DREG can be used as the result of CSQU.");
+
+	  if ($4.mod != 0 && $4.mod != M_T && $4.mod != M_IS)
+	    return yyerror ("bad option.");
+
+	  $$ = DSP32CSQU (3, $4.mod, 0, &$1, &$3.src);
+	}
+	| assign_csqufunc opt_mode
+	{
+	  if ($1.w)
+	    {
+	      if (IS_HALF ($1.dst) && $2.mod != 0 && $2.mod != M_T && $2.mod != M_IS)
+		return yyerror ("bad option.");
+	      else if (!IS_HALF ($1.dst) && $2.mod != 0 && $2.mod != M_IS)
+		return yyerror ("bad option.");
+	    }
+	  else if ($2.mod != 0 && $2.mod != M_IS)
+	    return yyerror ("bad option.");
+
+	  $$ = DSP32CSQU ($1.op, $2.mod, $1.w, &$1.dst, &$1.src);
+	}
+	| REG ASSIGN cmul_regs opt_mode
+	{
+	  notethat ("dregs = CMUL (opt_mode)\n");
+
+	  if (!IS_DREG ($1))
+	    return yyerror ("only DREG can be used as the result of CMUL.");
+
+	  if ($4.mod != 0 && $4.mod != M_T && $4.mod != M_IS)
+	    return yyerror ("bad option.");
+
+	  $$ = DSP32CMUL (3, $4.mod, 0, &$1, &$3.s0, &$3.s1);
+	}
+	| REG COLON expr ASSIGN cmul_regs opt_mode
+	{
+	  notethat ("dregs_pair = CMUL (opt_mode)\n");
+
+	  if (!valid_dreg_pair (&$1, $3))
+	    return yyerror ("only DREG pair can be used as the result of CMUL.");
+
+	  if ($6.mod != 0 && $6.mod != M_IS)
+	    return yyerror ("bad option.");
+
+	  $$ = DSP32CMUL (3, $6.mod, 0, &$1, &$5.s0, &$5.s1);
+	}
+	| assign_cmulfunc opt_mode
+	{
+	  if ($1.w)
+	    {
+	      if (!IS_PAIR ($1.dst) && $2.mod != 0 && $2.mod != M_T && $2.mod != M_IS)
+		return yyerror ("bad option.");
+	      else if (IS_PAIR ($1.dst) && $2.mod != 0 && $2.mod != M_IS)
+		return yyerror ("bad option.");
+	    }
+	  else if ($2.mod != 0 && $2.mod != M_IS)
+	    return yyerror ("bad option.");
+
+	  $$ = DSP32CMUL ($1.aop, $2.mod, $1.w, &$1.dst, &$1.s0, &$1.s1);
 	}
 	| assign_macfunc opt_mode
 	{
@@ -828,6 +923,32 @@ asm_1:
 	    {
 	      notethat ("dsp32alu: (dregs , dregs ) = SEARCH dregs (searchmod)\n");
 	      $$ = DSP32ALU (13, 0, &$2, &$4, &$8, 0, 0, 0, $10.r0);
+	    }
+	  else
+	    return yyerror ("Register mismatch");
+	}
+	| LPAREN REG COMMA REG RPAREN ASSIGN SEARCH LPAREN REG COMMA REG RPAREN LPAREN searchmod RPAREN
+	{
+	  if (bfin_isa != BLACKFIN_ISA_3)
+	    return yyerror ("illegal instruction SEARCH (dregs, dregs)");
+
+	  if (IS_DREG ($2) && IS_DREG ($4) && IS_DREG ($9) && IS_DREG ($11))
+	    {
+	      notethat ("dsp32alu: (dregs, dregs) = SEARCH (dregs, dregs) (searchmod)\n");
+	      $$ = DSP32ALU (19, 0, &$2, &$4, &$11, &$9, 0, 0, $14.r0);
+	    }
+	  else
+	    return yyerror ("Register mismatch");
+	}
+	| LPAREN REG COMMA REG RPAREN ASSIGN SELECT LPAREN REG COMMA REG RPAREN LPAREN searchmod RPAREN
+	{
+	  if (bfin_isa != BLACKFIN_ISA_3)
+	    return yyerror ("illegal instruction SELECT.");
+
+	  if (IS_DREG ($2) && IS_DREG ($4) && IS_DREG ($9) && IS_DREG ($11))
+	    {
+	      notethat ("dsp32alu: (dregs, dregs) = SELECT (dregs, dregs) (searchmod)\n");
+	      $$ = DSP32ALU (25, 0, &$2, &$4, &$11, &$9, 0, 0, $14.r0);
 	    }
 	  else
 	    return yyerror ("Register mismatch");
@@ -4191,6 +4312,187 @@ multiply_halfregs:
 	    return yyerror ("Dregs expected");
 	}
 	;
+
+a0a1_assign:
+	LPAREN REG_A COMMA REG_A RPAREN ASSIGN
+	{
+	  if (IS_A1 ($2) || !IS_A1 ($4))
+	    return yyerror ("(A0, A1) is expected");
+	}
+	;
+
+a0a1_plusassign:
+	LPAREN REG_A COMMA REG_A RPAREN _PLUS_ASSIGN
+	{
+	  if (IS_A1 ($2) || !IS_A1 ($4))
+	    return yyerror ("(A0, A1) is expected");
+	}
+	;
+
+a0a1_minusassign:
+	LPAREN REG_A COMMA REG_A RPAREN _MINUS_ASSIGN
+	{
+	  if (IS_A1 ($2) || !IS_A1 ($4))
+	    return yyerror ("(A0, A1) is expected");
+	}
+	;
+
+assign_cmulfunc:
+	a_cmulfunc
+	{
+	  $$= $1;
+	}
+	| REG ASSIGN LPAREN a_cmulfunc RPAREN
+	{
+	  if (!IS_DREG ($1))
+	    return yyerror ("DREG is required for the result register.");
+
+	  $$.aop = $4.aop;
+	  $$.w = 1;
+	  $$.dst = $1;
+	  $$.s0 = $4.s0;
+	  $$.s1 = $4.s1;
+	}
+	| REG COLON expr ASSIGN LPAREN a_cmulfunc RPAREN
+	{
+	  if (!valid_dreg_pair (&$1, $3))
+	    return yyerror ("DREG pair is required for the result register pair.");
+
+	  $$.aop = $6.aop;
+	  $$.w = 1;
+	  $$.dst = $1;
+	  $$.s0 = $6.s0;
+	  $$.s1 = $6.s1;
+	}
+	;
+
+a_cmulfunc:
+	a0a1_assign cmul_regs
+	{
+	  $$.aop = 0;
+	  $$.w = 0;
+	  $$.s0 = $2.s0;
+	  $$.s1 = $2.s1;
+	}
+	| a0a1_plusassign cmul_regs
+	{
+	  $$.aop = 1;
+	  $$.w = 0;
+	  $$.s0 = $2.s0;
+	  $$.s1 = $2.s1;
+	}
+	| a0a1_minusassign cmul_regs
+	{
+	  $$.aop = 2;
+	  $$.w = 0;
+	  $$.s0 = $2.s0;
+	  $$.s1 = $2.s1;
+	}
+	;
+
+cmul_regs:
+	CMUL LPAREN REG star_or_nothing COMMA REG star_or_nothing RPAREN
+	{
+	  if (bfin_isa != BLACKFIN_ISA_3)
+	    return yyerror ("illegal instruction CMUL.");
+
+	  if (!IS_DREG ($3))
+	    return yyerror ("the first source register of CMUL is bad.");
+
+	  if (!IS_DREG ($6))
+	    return yyerror ("the second source register of CMUL is bad.");
+
+	  $$.s0.regno = $3.regno;
+	  if ($4)
+	    $$.s0.flags = F_REG_STAR;
+	  $$.s1.regno = $6.regno;
+	  if ($7)
+	    $$.s1.flags = F_REG_STAR;
+	}
+	;
+
+star_or_nothing:
+	{
+	  $$ = 0;
+	}
+	| STAR
+	{
+	  $$ = 1;
+	}
+	;
+
+assign_csqufunc:
+	a_csqufunc
+	{
+	  $$= $1;
+	}
+	| REG ASSIGN LPAREN a_csqufunc RPAREN
+	{
+	  if (!IS_DREG ($1))
+	    return yyerror ("DREG is required for the result register.");
+
+	  if ($4.n && IS_EVEN ($1))
+	    return yyerror ("cannot move A1 to even register");
+	  else if (!$4.n && !IS_EVEN ($1))
+	    return yyerror ("cannot move A0 to odd register");
+
+	  $$.op = $4.op;
+	  $$.w = 1;
+	  $$.dst = $1;
+	  $$.src = $4.src;
+	}
+	| HALF_REG ASSIGN LPAREN a_csqufunc RPAREN
+	{
+	  if (!IS_DREG ($1))
+	    return yyerror ("DREG is required for the result register.");
+
+	  if ($4.n && IS_L ($1))
+	    return yyerror ("cannot move A1 to low half register");
+	  else if (!$4.n && IS_H ($1))
+	    return yyerror ("cannot move A0 to high half register");
+
+	  $$.op = $4.op;
+	  $$.w = 1;
+	  $$.dst = $1;
+	  $$.src = $4.src;
+	}
+	;
+
+a_csqufunc:
+	a_assign csqu_regs
+	{
+	  $$.n = IS_A1 ($1);
+	  $$.op = 0;
+	  $$.w = 0;
+	  $$.src = $2.src;
+	}
+	| a_plusassign csqu_regs
+	{
+	  $$.n = IS_A1 ($1);
+	  $$.op = 1;
+	  $$.w = 0;
+	  $$.src = $2.src;
+	}
+	| a_minusassign csqu_regs
+	{
+	  $$.n = IS_A1 ($1);
+	  $$.op = 2;
+	  $$.w = 0;
+	  $$.src = $2.src;
+	}
+	;
+
+csqu_regs:
+	CSQU LPAREN REG RPAREN
+	{
+	  if (bfin_isa != BLACKFIN_ISA_3)
+	    return yyerror ("illegal instruction CSQU.");
+
+	  if (!IS_DREG ($3))
+	    return yyerror ("the source register of CSQU is bad.");
+
+	  $$.src = $3;
+	}
 
 cc_op:
 	ASSIGN

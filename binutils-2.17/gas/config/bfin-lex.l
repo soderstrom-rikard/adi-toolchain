@@ -65,12 +65,13 @@ int yylex (void);
 [sS][yY][sS][cC][fF][gG]       _REG.regno = REG_SYSCFG; return REG;
 [sS][tT][iI]                            return STI;
 [sS][sS][yY][nN][cC]                    return SSYNC;
-[sS][pP]"."[lL]                         _REG.regno = REG_SP; return HALF_REG;
-[sS][pP]"."[hH]                         _REG.regno = REG_SP | F_REG_HIGH; return HALF_REG;
+[sS][pP]"."[lL]                         _REG.regno = REG_SP; _REG.flags = F_REG_LOW; return HALF_REG;
+[sS][pP]"."[hH]                         _REG.regno = REG_SP; _REG.flags = F_REG_HIGH; return HALF_REG;
 [sS][pP]                                _REG.regno = REG_SP; return REG;
 [sS][iI][gG][nN][bB][iI][tT][sS]        return SIGNBITS;
 [sS][iI][gG][nN]                        return SIGN;
 [sS][eE][qQ][sS][tT][aA][tT]     _REG.regno = REG_SEQSTAT; return REG;
+[sS][eE][lL][eE][cC][tT]		return SELECT;
 [sS][eE][aA][rR][cC][hH]                return SEARCH;
 [sS][hH][iI][fF][tT]                    return SHIFT;
 [sS][cC][oO]                            return SCO;
@@ -160,8 +161,8 @@ int yylex (void);
 [gG][eE]                                return GE;
 [fF][uU]                                yylval.value = M_FU; return MMOD;
 [fF][pP]         _REG.regno = REG_FP; return REG;
-[fF][pP]"."[lL]  _REG.regno = REG_FP; return HALF_REG;
-[fF][pP]"."[hH]  _REG.regno = REG_FP | F_REG_HIGH; return HALF_REG;
+[fF][pP]"."[lL]  _REG.regno = REG_FP; _REG.flags = F_REG_LOW; return HALF_REG;
+[fF][pP]"."[hH]  _REG.regno = REG_FP; _REG.flags = F_REG_HIGH; return HALF_REG;
 
 [eE][xX][tT][rR][aA][cC][tT]            return EXTRACT;
 [eE][xX][pP][aA][dD][jJ]                return EXPADJ;
@@ -180,7 +181,9 @@ int yylex (void);
 [cC][yY][cC][lL][eE][sS]2  { _REG.regno = REG_CYCLES2; return REG; }
 [cC][yY][cC][lL][eE][sS]  { _REG.regno = REG_CYCLES; return REG; }
 [cC][sS][yY][nN][cC]                    return CSYNC;
+[cC][sS][qQ][uU]			return CSQU;
 [cC][oO]                                return CO;
+[cC][mM][uU][lL]			return CMUL;
 [cC][lL][iI]                            return CLI;
 
 [cC][cC]     _REG.regno = REG_CC; return CCREG;
@@ -511,6 +514,7 @@ static long parse_int (char **end)
 static int parse_reg (Register *r, int cl, char *rt)
 {
   r->regno = cl | (rt[1] - '0');
+  r->flags = F_REG_NONE;
   return REG;
 }
 
@@ -526,11 +530,12 @@ static int parse_halfreg (Register *r, int cl, char *rt)
 
       case 'l':
       case 'L':
+	r->flags = F_REG_LOW;
 	break;
 
       case 'h':
       case 'H':
-	r->regno |= F_REG_HIGH;
+	r->flags = F_REG_HIGH;
 	break;
     }
 

@@ -308,14 +308,51 @@ const char EXP_CHARS[] = "eE";
    As in 0f12.456 or  0d1.2345e12.  */
 const char FLT_CHARS[] = "fFdDxX";
 
+struct bfin_cpu_isa
+{
+  char *name;
+  int isa;
+};
+
+int bfin_isa = BLACKFIN_ISA_2;
+
+static struct bfin_cpu_isa bfin_cpus[] =
+{
+  {"bf522",	BLACKFIN_ISA_2},
+  {"bf523",	BLACKFIN_ISA_2},
+  {"bf524",	BLACKFIN_ISA_2},
+  {"bf525",	BLACKFIN_ISA_2},
+  {"bf526",	BLACKFIN_ISA_2},
+  {"bf527",	BLACKFIN_ISA_2},
+  {"bf531",	BLACKFIN_ISA_2},
+  {"bf532",	BLACKFIN_ISA_2},
+  {"bf533",	BLACKFIN_ISA_2},
+  {"bf534",	BLACKFIN_ISA_2},
+  {"bf535",	BLACKFIN_ISA_1},
+  {"bf536",	BLACKFIN_ISA_2},
+  {"bf537",	BLACKFIN_ISA_2},
+  {"bf538",	BLACKFIN_ISA_2},
+  {"bf539",	BLACKFIN_ISA_2},
+  {"bf542",	BLACKFIN_ISA_2},
+  {"bf544",	BLACKFIN_ISA_2},
+  {"bf547",	BLACKFIN_ISA_2},
+  {"bf548",	BLACKFIN_ISA_2},
+  {"bf549",	BLACKFIN_ISA_2},
+  {"bf561",	BLACKFIN_ISA_2},
+  {"bf579",	BLACKFIN_ISA_3},
+  {NULL, 0}
+};
+
 /* Define bfin-specific command-line options (there are none). */
 const char *md_shortopts = "";
 
 #define OPTION_FDPIC		(OPTION_MD_BASE)
 #define OPTION_NOPIC		(OPTION_MD_BASE + 1)
+#define OPTION_MCPU		(OPTION_MD_BASE + 2)
 
 struct option md_longopts[] =
 {
+  { "mcpu",		required_argument,	NULL, OPTION_MCPU	},
   { "mfdpic",		no_argument,		NULL, OPTION_FDPIC      },
   { "mnopic",		no_argument,		NULL, OPTION_NOPIC      },
   { "mno-fdpic",	no_argument,		NULL, OPTION_NOPIC      },
@@ -332,6 +369,21 @@ md_parse_option (int c ATTRIBUTE_UNUSED, char *arg ATTRIBUTE_UNUSED)
     {
     default:
       return 0;
+
+    case OPTION_MCPU:
+      {
+	int i;
+
+	for (i = 0; bfin_cpus[i].name; i++)
+	  if (strcmp (bfin_cpus[i].name, arg) == 0)
+	    break;
+
+	if (!bfin_cpus[i].name)
+	  as_fatal (_("unknown Blackfin processor: %s\n"), arg);
+
+	bfin_isa = bfin_cpus[i].isa;
+	break;
+      }
 
     case OPTION_FDPIC:
       bfin_flags |= EF_BFIN_FDPIC;
@@ -1336,6 +1388,90 @@ bfin_gen_dsp32alu (int HL, int aopcde, int aop, int s, int x,
 }
 
 INSTR_T
+bfin_gen_dsp32cmul (int aop, int mmod, int w, REG_T dst, REG_T src0, REG_T src1)
+{
+  int P, conj, conj0, conj1;
+
+  if (w)
+    P = (dst->flags & F_REG_PAIR) ? 1 : 0;
+  else
+    P = 0;
+
+  conj0 = (src0->flags & F_REG_STAR) ? 1 : 0;
+  conj1 = (src1->flags & F_REG_STAR) ? 1 : 0;
+  conj = conj0 << 1 | conj1;
+
+  INIT (DSP32Cmul);
+
+  ASSIGN (mmod);
+  ASSIGN (aop);
+  ASSIGN (w);
+  ASSIGN (P);
+  ASSIGN (conj);
+
+  if (P)
+    {
+      dst->regno &= 0x06;
+    }
+
+  ASSIGN_R (dst);
+  ASSIGN_R (src0);
+  ASSIGN_R (src1);
+
+  return GEN_OPCODE32 ();
+}
+
+INSTR_T
+bfin_gen_dsp32csqu (int op, int mmod, int w, REG_T dst, REG_T src)
+{
+  int op0, op1, w0, w1, P;
+  REG_T src0;
+  REG_T src1;
+
+  if (w)
+    P = IS_HALF (*dst) ? 0 : 1;
+  else
+    P = 0;
+
+  INIT (DSP32Csqu);
+
+  ASSIGN (mmod);
+  ASSIGN (P);
+  ASSIGN_R (dst);
+
+  if (IS_L (*dst) || (!IS_HALF (*dst) && IS_EVEN (*dst)))
+    {
+      /* MAC0 */
+      op0 = op;
+      /* MAC1 is NOP */
+      op1 = 3;
+      w0 = w;
+      src0 = src;
+
+      ASSIGN (op0);
+      ASSIGN (op1);
+      ASSIGN (w0);
+      ASSIGN_R (src0);
+    }
+  else
+    {
+      /* MAC1 */
+      op1 = op;
+      /* MAC1 is NOP */
+      op0 = 3;
+      w1 = w;
+      src1 = src;
+
+      ASSIGN (op1);
+      ASSIGN (op0);
+      ASSIGN (w1);
+      ASSIGN_R (src1);
+    }
+
+  return GEN_OPCODE32 ();
+}
+
+INSTR_T
 bfin_gen_dsp32shift (int sopcde, REG_T dst0, REG_T src0,
                 REG_T src1, int sop, int HLs)
 {
@@ -2002,6 +2138,14 @@ bfin_eol_in_insn (char *line)
 bfd_boolean
 bfin_start_label (char *s, char *ptr)
 {
+  /* CMUL instruction might start with DREG pair. */
+  if ((*s == 'r' || *s == 'R')
+      && ((*(s + 1) == '7' && *(ptr + 1) == '6')
+	  || (*(s + 1) == '5' && *(ptr + 1) == '4')
+	  || (*(s + 1) == '3' && *(ptr + 1) == '2')
+	  || (*(s + 1) == '1' && *(ptr + 1) == '0')))
+    return FALSE;
+
   while (s != ptr)
     {
       if (*s == '(' || *s == '[')

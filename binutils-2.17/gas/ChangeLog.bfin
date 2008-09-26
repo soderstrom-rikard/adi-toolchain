@@ -1,5 +1,58 @@
 2008-09-26  Jie Zhang  <jie.zhang@analog.com>
 
+	* config/bfin-defs.h (F_REG_ALL): Remove.
+	(F_REG_HIGH): Remove.
+	(REG_CLASS): Adjust parenthesis.
+	(IS_H): Redefine using register flag.
+	(IS_L): Define.
+	(IS_HALF): Define.
+	(IS_PAIR): Define.
+	(IS_EVEN): Adjust parenthesis.
+	(F_REG_NONE): Define.
+	(F_REG_PAIR): Define.
+	(F_REG_STAR): Define.
+	(F_REG_HIGH): Define.
+	(F_REG_LOW): Define.
+	(struct _cmulfunc): Define.
+	(cmulfunc_t): typedef to struct _cmulfunc.
+	(struct _csqufunc): Define.
+	(csqufunc_t): typedef to struct _csqufunc.
+	* config/bfin-parse.y (DSP32CMUL): Define.
+	(DSP32CSQU): Define.
+	(valid_dreg_pair): Set register flag F_REG_PAIR.
+	(%union): Add cmulfunc and csqufunc.
+	(CMUL, CSQU, SELECT): New tokens.
+	(cmul_regs, assign_cmulfunc, a_cmulfunc): New rules.
+	(csqu_regs, assign_csqufunc, a_csqufunc): Likewise.
+	(star_or_nothing): Likewise.
+	(a0a1_assign, a0a1_plusassign, a0a1_minusassign): New rules.
+	(asm_1): Add new CMUL, CSQU, SEARCH, and SELECT instructions.
+	* config/bfin-lex.l: Recognize CMUL, CSQU, and SELECT.
+	Use register flags.
+	(parse_reg): Initialize register flags.
+	(parse_halfreg): Properly set register flags.
+	* config/tc-bfin.c (struct bfin_cpu_isa): Define.
+	(bfin_isa): New global variable.
+	(bfin_cpu_isa bfin_cpus[]): Define.
+	(OPTION_MCPU): Define.
+	(md_longopts[]): Add -mcpu option.
+	(md_parse_option): Deal with -mcpu option.
+	(bfin_gen_dsp32cmul): New.
+	(bfin_gen_dsp32csqu): New.
+	(bfin_start_label): DREG pair don't start a label.
+	* config/tc-bfin.h (BLACKFIN_ISA_1): Define.
+	(BLACKFIN_ISA_2): Define.
+	(BLACKFIN_ISA_3): Define.
+	(bfin_isa) Declare.
+	(bfin_gen_dsp32cmul): Declare.
+	(bfin_gen_dsp32csqu): Declare.
+	* doc/all.texit: Rename BFIN to Blackfin.
+	* doc/asconfig.texi: Likewise.
+	* doc/as.texinfo: Likewise.
+	* doc/c-bfin.texi: Likewise. And document -mcpu option.
+
+2008-09-26  Jie Zhang  <jie.zhang@analog.com>
+
 	* config/bfin-parse.y (asm_1): Fix reduce/reduce conflicts.
 
 2008-08-29  Jie Zhang  <jie.zhang@analog.com>

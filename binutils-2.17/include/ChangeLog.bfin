@@ -1,3 +1,12 @@
+2008-09-26  Jie Zhang  <jie.zhang@analog.com>
+
+	* opcode/bfin.h (DSP32Cmul): typedef of a structure.
+	(DSP32Cmul_*): Define.
+	(init_DSP32Cmul): Define.
+	(DSP32Csqu): typedef of a structure.
+	(DSP32Csqu_*): Define.
+	(init_DSP32Csqu): Define.
+
 2008-08-28  Jie Zhang  <jie.zhang@analog.com>
 
 	* opcode/bfin.h (PseudoDbg_Assert): Add bits_grp and mask_grp.
