@@ -1,3 +1,8 @@
+2008-09-30  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bdesc_2arg): Add mulhisill, mulhisilh,
+	mulhisihl and mulhisihh builtins.
+
 2008-09-15  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* config/bfin/bfin.c (bfin_cpus[]): Add 0.2 for bf522, bf523, bf524,
