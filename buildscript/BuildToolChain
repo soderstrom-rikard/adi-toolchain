@@ -345,12 +345,12 @@ if [ -n "$CHECK_PRE" ] ; then
                 continue
             fi
             echo "** Could not find version of `which $file`"
-            echo -n "** "
+            printf "** "
             file `which $file`
             RUN=$(file `which $file`| grep -i "symbolic link" | wc -l)
             while [ "$RUN" -gt "0" ]
             do
-                echo -n " * "
+                printf " * "
                 file=$(file `which $file` | awk  '{print $NF}' | sed 's/`//g' | sed "s/'//g")
                 file $file
                 RUN=$(file $file | grep -i "symbolic link" | wc -l)
@@ -376,7 +376,7 @@ do
         echo "Cannot find $PREREQ"
         exit 1
     else if [ $RUN -gt 1 ] ; then
-        echo -n "Found multiple versions of $PREREQ, using the one at "
+        printf "Found multiple versions of $PREREQ, using the one at "
         which $PREREQ
         fi
     fi
@@ -392,7 +392,7 @@ fi
 if [ -z "$GCC_VERSIONS" ]; then
     GCC_VERSIONS=4.1
 fi
-echo -n "Building gcc versions $GCC_VERSIONS "
+printf "Building gcc versions $GCC_VERSIONS "
 
 if [ -z "$BFIN_LANGS" ] ; then 
     # Don't set a default here ... let the build system
@@ -463,7 +463,7 @@ fi
 ############ ABSOLUTE PATH TO SOURCE DIRECTORIES ################
 
 if [ -d /.$DIR_SOURCE ] ; then
-    echo -n "Toolchain source is at      "
+    printf "Toolchain source is at      "
     echo $DIR_SOURCE
 else
     echo "Invalid Toolchain Source Path"
@@ -472,7 +472,7 @@ else
 fi
 if [ $KERNEL_SOURCE ] ; then
     if [ -d /.$KERNEL_SOURCE ] ; then
-        echo -n "Kernel source is at         "
+        printf "Kernel source is at         "
         echo $KERNEL_SOURCE
     else
         echo "Invalid Kernel Source Path"
@@ -485,7 +485,7 @@ fi
 
 if [ $DIR_BUILD ] ; then
     if [ -d /.$DIR_BUILD ] ; then
-        echo -n "Build will be done in       "
+        printf "Build will be done in       "
         echo $DIR_BUILD
     else
         mkdir -p $DIR_BUILD
@@ -495,13 +495,13 @@ if [ $DIR_BUILD ] ; then
         fi
     fi
 else
-    echo -n "Build will be done in       "
+    printf "Build will be done in       "
     echo ${DIR_BUILD=`pwd`}
 fi
 
 mk_output_dir()
 {
-    echo -n "Path to $1 output dir  "
+    printf "Path to $1 output dir  "
     echo $2
     if [ ! -d $2 ] ; then
         mkdir -p $2
@@ -646,7 +646,7 @@ if [ $CHECK_ON_HARDWARE ] ; then
     # target and host, which is needed to prevent the rsh
     # and rcp connection failures.
 
-    echo -n "    checking host   /proc/sys/net/ipv4/tcp_tw_recycle : "
+    printf "    checking host   /proc/sys/net/ipv4/tcp_tw_recycle : "
     RUN=`cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
     if [ "x$RUN" = "x" ] ; then
         echo "NOT exist"
@@ -661,7 +661,7 @@ if [ $CHECK_ON_HARDWARE ] ; then
         echo "1 - looks OK"
     fi
 
-    echo -n "    checking target /proc/sys/net/ipv4/tcp_tw_recycle : "
+    printf "    checking target /proc/sys/net/ipv4/tcp_tw_recycle : "
     RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
     if [ "x$RUN" = "x" ] ; then
         echo "NOT exist"
@@ -669,7 +669,7 @@ if [ $CHECK_ON_HARDWARE ] ; then
         exit 1
     fi
     if [ "x$RUN" = "x0" ] ; then
-       echo -n "0. setting to 1 "
+       printf "0. setting to 1 "
        rsh -l root $TARGET_IPADDR echo 1 \> /proc/sys/net/ipv4/tcp_tw_recycle
        RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
        if [ "x$RUN" = "x0" ] ; then
@@ -730,7 +730,7 @@ if [ $CHECK_ON_HARDWARE ] ; then
     RUN=`rsh -l root $TARGET_IPADDR "ps" | grep -v " ps" | grep -v "/rshd" |
         grep -v "\[" | grep -v telnetd | grep -v "/init" | grep -v " inetd" |
         grep -v " PID " | grep -v "[ /]sh" | grep -v " /s*bin/.*d" | sed '/^[[:space:]]*$/d'`
-    TMP=`echo -n ${RUN} | wc -c`
+    TMP=`printf ${RUN} | wc -c`
     if [ $TMP -gt 0 ] ; then
         echo " ** looks like random processes are running on the $TARGET_IPADDR already "
         echo " ** ${RUN}"
@@ -739,7 +739,7 @@ if [ $CHECK_ON_HARDWARE ] ; then
     fi
 fi
 
-echo -n "Path to binutils dir        "
+printf "Path to binutils dir        "
 DIR_BINUTILS_SOURCE=$DIR_SOURCE/binutils-$BINUTILS_VERSION
 echo $DIR_BINUTILS_SOURCE
 if [ ! -d $DIR_BINUTILS_SOURCE ] ; then
@@ -763,7 +763,7 @@ esac
 BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-werror"
 
 for GCC_VER in $GCC_VERSIONS; do
-    echo -n "Path to gcc-${GCC_VER} dir         "
+    printf "Path to gcc-${GCC_VER} dir         "
     if [ -d $DIR_SOURCE/gcc-$GCC_VER ] ; then
         echo $DIR_SOURCE/gcc-$GCC_VER
     else
@@ -772,7 +772,7 @@ for GCC_VER in $GCC_VERSIONS; do
     fi
 done
 
-echo -n "Path to elf2flt dir         "
+printf "Path to elf2flt dir         "
 DIR_ELF2FLT_SOURCE=$DIR_SOURCE/elf2flt
 echo $DIR_ELF2FLT_SOURCE
 if [ ! -d $DIR_ELF2FLT_SOURCE ] ; then
@@ -780,7 +780,7 @@ if [ ! -d $DIR_ELF2FLT_SOURCE ] ; then
     exit 1
 fi
 
-echo -n "Path to uClibc dir          "
+printf "Path to uClibc dir          "
 UCLIBC_SOURCE=$DIR_SOURCE/uClibc
 echo $UCLIBC_SOURCE
 if [ ! -d $UCLIBC_SOURCE ] ; then
@@ -792,20 +792,20 @@ if [ -z "$UCLIBC_CFLAGS" ] ; then
     UCLIBC_CFLAGS='-g -O2'
 fi
 
-echo -n "    uClibc CFLAGS           "
+printf "    uClibc CFLAGS           "
 #We test (and warn) if any of the CFLAGS for uClibc don't work on the host compiler
 for opt in $UCLIBC_CFLAGS
 do
     check_cc_options gcc $opt
     if [ "$?" -eq "1" ] ; then
-      echo -n "$opt "
+      printf "$opt "
     else
-      echo -n "$opt(bfin only?) "
+      printf "$opt(bfin only?) "
     fi
 done
 echo
 
-echo -n "Path to genext2fs           "
+printf "Path to genext2fs           "
 DIR_GENEXT2FS_SOURCE=$DIR_SOURCE/genext2fs
 echo $DIR_GENEXT2FS_SOURCE
 if [ ! -d $DIR_GENEXT2FS_SOURCE ] ; then
@@ -813,7 +813,7 @@ if [ ! -d $DIR_GENEXT2FS_SOURCE ] ; then
     exit 1
 fi
 
-echo -n "Path to cramfs-tools        "
+printf "Path to cramfs-tools        "
 DIR_CRAMFS_SOURCE=$DIR_SOURCE/cramfs
 echo $DIR_CRAMFS_SOURCE
 if [ ! -d $DIR_CRAMFS_SOURCE ] ; then
@@ -821,7 +821,7 @@ if [ ! -d $DIR_CRAMFS_SOURCE ] ; then
     exit 1
 fi
 
-echo -n "Path to ldr-utils           "
+printf "Path to ldr-utils           "
 DIR_LDR_UTILS_SOURCE=$DIR_SOURCE/ldr-utils
 echo $DIR_LDR_UTILS_SOURCE
 if [ ! -d $DIR_LDR_UTILS_SOURCE ] ; then
@@ -829,7 +829,7 @@ if [ ! -d $DIR_LDR_UTILS_SOURCE ] ; then
     exit 1
 fi
 
-echo -n "Path to gdbproxy            "
+printf "Path to gdbproxy            "
 DIR_GDBPROXY_SOURCE=$DIR_SOURCE/gdbproxy
 echo $DIR_GDBPROXY_SOURCE
 if [ ! -d $DIR_GDBPROXY_SOURCE ] ; then
@@ -837,7 +837,7 @@ if [ ! -d $DIR_GDBPROXY_SOURCE ] ; then
     exit 1
 fi
 
-echo -n "Path to libftdi             "
+printf "Path to libftdi             "
 DIR_LIBFTDI_SOURCE=$DIR_SOURCE/libftdi
 echo $DIR_LIBFTDI_SOURCE
 if [ ! -d $DIR_LIBFTDI_SOURCE ] ; then
@@ -845,7 +845,7 @@ if [ ! -d $DIR_LIBFTDI_SOURCE ] ; then
     exit 1
 fi
 
-echo -n "Path to jtag                "
+printf "Path to jtag                "
 DIR_JTAG_SOURCE=$DIR_SOURCE/jtag
 echo $DIR_JTAG_SOURCE
 if [ ! -d $DIR_JTAG_SOURCE ] ; then
@@ -865,7 +865,7 @@ if [ $KERNEL_SOURCE ] ; then
         mk_output_dir "kernel" $DIR_KBUILD_OUTPUT ""
     fi
     if [ $DIR_UBOOT ] ; then
-      echo -n "Path to U-Boot Source       "
+      printf "Path to U-Boot Source       "
       echo $DIR_UBOOT
     else
       echo "U-Boot Source not specified: addon utilties (like 'mkimage') will not be built"
@@ -946,7 +946,7 @@ export PATH=$NEW_PATH:/$DIR_ELF_OUTPUT/bin:/$DIR_uC_OUTPUT/bin:/$DIR_LINUX_OUTPU
 # Some helpful functions
 die_with_log ()
 {
-    echo -n " Build error " ; date
+    printf " Build error " ; date
     END=$(date +%s)
     DIFF=$(( $END - $START ))
     echo "  occurred $DIFF seconds into buildscript"
@@ -1037,7 +1037,7 @@ build_gcc ()
         # check to make sure the copies were made
         if [ ! -d $DIR_GCC_SOURCE/newlib -o ! -d $DIR_GCC_SOURCE/libgloss ] ; then
             echo "*** ERROR : cannot link newlib or libgloss in $DIR_GCC_SOURCE"
-            echo -n "*** ERROR : running as user "
+            printf "*** ERROR : running as user "
             whoami
             ls -ld $DIR_GCC_SOURCE
             exit 1
@@ -1498,7 +1498,7 @@ check_tests_OK()
     TARGET_THRESHOLD=5
     WAIT=1
     WAIT_TARGET=1
-    HARDWARE=`echo -n $3 | grep -i hardware`
+    HARDWARE=`printf $3 | grep -i hardware`
     # -n : numeric sort - kill the last process first
     # -A : use ASCII, not UTF-8 or VT100
     # -l : long lines (otherwise it cuts off at 132 char across
@@ -1517,7 +1517,7 @@ check_tests_OK()
         NEW_TARGET=`rsh -l root $TARGET_IPADDR "ps" | grep -v " ps" | grep -v "/rshd" |
             grep -v "\[" | grep -v telnetd | grep -v "/init" | grep -v " inetd" |
             grep -v " PID " | grep -v "[ /]sh" | grep -v " /s*bin/.*d" | sed '/^[[:space:]]*$/d'`
-            STUCK=`echo -n ${NEW_TARGET} | wc -c`
+            STUCK=`printf ${NEW_TARGET} | wc -c`
             if [ $STUCK -gt 0 ] ; then
                echo " ** looks like random processes are running on the hardware already "
                echo " ** ${NEW_TARGET}"
@@ -1578,12 +1578,12 @@ check_tests_OK()
                     echo " ** looks like the board has been dead for $TARGET_THRESHOLD minutes"
                     break
                 fi
-                STUCK=`echo -n ${NEW_TARGET} | wc -c`
+                STUCK=`printf ${NEW_TARGET} | wc -c`
                 if [ $STUCK -gt 0 ] ; then
-                    echo -n " ** looks like "
+                    printf " ** looks like "
                     for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $NF}')
                     do
-		        echo -n "${TARGET_PID} "
+		        printf "${TARGET_PID} "
                     done
                     echo "on the board is hung"
                     for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $1}')
@@ -1600,7 +1600,7 @@ check_tests_OK()
         if [ $WAIT -gt $HOST_THRESHOLD ] ; then
             KILL_PS=""
             TREE=`pstree -n -A -l -p $PID | sed -e 's/-[-+]-/\n/g' -e 's/^[ \t]*//'`
-            NEW_KILL=`echo -n "$TREE" | wc -l`
+            NEW_KILL=`printf "$TREE" | wc -l`
             if [ $NEW_KILL -lt $KILL ] ; then
                 # We add one, so when we subtract one below, it ends up being the correct number
                 KILL=`expr $NEW_KILL + 1`
@@ -1630,12 +1630,12 @@ check_tests_OK()
             RUN=`echo $KILL_PS | grep rsh`
             if [ -n "$RUN" ] ; then
                 echo " ** This should never happen - board seems OK, but rsh process is stuck?"
-                STUCK=`echo -n ${NEW_TARGET} | wc -c`
+                STUCK=`printf ${NEW_TARGET} | wc -c`
                 if [ $STUCK -gt 0 ] ; then
-                    echo -n " ** looks like "
+                    printf " ** looks like "
                     for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $NF}')
                     do
-                        echo -n "${TARGET_PID} "
+                        printf "${TARGET_PID} "
                     done
                     echo "on the board is hung"
                     for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $1}')
@@ -1668,7 +1668,7 @@ check_tests_OK()
     fi
 
     TREE=`pstree -n -A -l -p $PID | sed -e 's/-[-+]-/\n/g' -e 's/^[ \t]*//' -e '/^[[:space:]]*$/d' | awk -F "(" '{print $NF}' | awk -F ")" '{print $1}'`
-    TREE_LEN=`echo -n $TREE | wc -c`
+    TREE_LEN=`printf $TREE | wc -c`
     if [ $TREE_LEN -gt 0 ] ; then
         echo " ** Aborting remaining tests"
         echo $TREE
@@ -2020,7 +2020,7 @@ for GCC_VERSION in $GCC_VERSIONS; do
   fi
 done
 
-echo -n "Checking uClibc CFLAGS     "
+printf "Checking uClibc CFLAGS     "
 #We test (and fail) if any of the CFLAGS for uClibc don't work on the bfin-elf compiler
 for opt in $UCLIBC_CFLAGS
 do
