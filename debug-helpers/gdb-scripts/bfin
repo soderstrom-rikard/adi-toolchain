@@ -262,6 +262,15 @@ define show_ddr
 	printf "RSTCTL:  0x%04x\n", *(unsigned short *)0xFFC00A3C
 end
 
+define show_ebiu
+	printf "EBIU_AMGCTL:  0x%04x\n", *(unsigned short *)0xFFC00A00
+	printf "EBIU_AMBCTL0: 0x%08x\n", *(unsigned long *)0xFFC00A04
+	printf "EBIU_AMBCTL1: 0x%08x\n", *(unsigned long *)0xFFC00A08
+	printf "EBIU_MBSCTL:  0x%08x\n", *(unsigned long *)0xFFC00A0C
+	printf "EBIU_MODE:    0x%08x\n", *(unsigned long *)0xFFC00A14
+	printf "EBIU_FCTL:    0x%08x\n", *(unsigned long *)0xFFC00A18
+end
+
 define _show_cec
 	set $$cec = *(unsigned long *)$arg0
 	printf "0x%08x: ", $$cec
