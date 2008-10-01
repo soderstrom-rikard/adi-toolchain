@@ -1,3 +1,10 @@
+2008-10-01  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* gcc.target/bfin/mcpu-bf512.c: New file.
+	* gcc.target/bfin/mcpu-bf514.c: Likewise.
+	* gcc.target/bfin/mcpu-bf516.c: Likewise.
+	* gcc.target/bfin/mcpu-bf518.c: Likewise.
+
 2008-09-15  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* gcc.target/bfin/mcpu-bf522.c: Check SILICON_REVISION is 0x0002.  Invert
