@@ -85,6 +85,18 @@ struct bfin_cpu
 
 struct bfin_cpu bfin_cpus[] =
 {
+  {"bf512", BFIN_CPU_BF512, 0x0000,
+   WA_SPECULATIVE_LOADS},
+
+  {"bf514", BFIN_CPU_BF514, 0x0000,
+   WA_SPECULATIVE_LOADS},
+
+  {"bf516", BFIN_CPU_BF516, 0x0000,
+   WA_SPECULATIVE_LOADS},
+
+  {"bf518", BFIN_CPU_BF518, 0x0000,
+   WA_SPECULATIVE_LOADS},
+
   {"bf522", BFIN_CPU_BF522, 0x0002,
    WA_SPECULATIVE_LOADS},
   {"bf522", BFIN_CPU_BF522, 0x0001,

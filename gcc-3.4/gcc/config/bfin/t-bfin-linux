@@ -19,7 +19,8 @@ TARGET_LIBGCC2_CFLAGS = -fpic
 
 MULTILIB_OPTIONS=mcpu=bf532-none
 MULTILIB_DIRNAMES=bf532-none
-MULTILIB_MATCHES=mcpu?bf532-none=mcpu?bf522-none mcpu?bf532-none=mcpu?bf523-none mcpu?bf532-none=mcpu?bf524-none mcpu?bf532-none=mcpu?bf525-none mcpu?bf532-none=mcpu?bf526-none mcpu?bf532-none=mcpu?bf527-none
+MULTILIB_MATCHES=mcpu?bf532-none=mcpu?bf512-none mcpu?bf532-none=mcpu?bf514-none mcpu?bf532-none=mcpu?bf516-none mcpu?bf532-none=mcpu?bf518-none
+MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf522-none mcpu?bf532-none=mcpu?bf523-none mcpu?bf532-none=mcpu?bf524-none mcpu?bf532-none=mcpu?bf525-none mcpu?bf532-none=mcpu?bf526-none mcpu?bf532-none=mcpu?bf527-none
 MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf531-none mcpu?bf532-none=mcpu?bf533-none mcpu?bf532-none=mcpu?bf534-none mcpu?bf532-none=mcpu?bf536-none mcpu?bf532-none=mcpu?bf537-none mcpu?bf532-none=mcpu?bf538-none mcpu?bf532-none=mcpu?bf539-none
 MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf542-none mcpu?bf532-none=mcpu?bf544-none mcpu?bf532-none=mcpu?bf547-none mcpu?bf532-none=mcpu?bf548-none mcpu?bf532-none=mcpu?bf549-none
 MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf561-none
