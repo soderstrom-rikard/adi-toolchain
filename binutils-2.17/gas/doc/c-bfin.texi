@@ -32,6 +32,10 @@ This option specifies the target processor.  The assembler will issue an
 error message if an attempt is made to assemble an instruction which
 will not execute on the target processor.  The following processor names are
 recognized: 
+@code{bf512},
+@code{bf514},
+@code{bf516},
+@code{bf518},
 @code{bf522},
 @code{bf523},
 @code{bf524},

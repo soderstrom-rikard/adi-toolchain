@@ -318,6 +318,10 @@ int bfin_isa = BLACKFIN_ISA_2;
 
 static struct bfin_cpu_isa bfin_cpus[] =
 {
+  {"bf512",	BLACKFIN_ISA_2},
+  {"bf514",	BLACKFIN_ISA_2},
+  {"bf516",	BLACKFIN_ISA_2},
+  {"bf518",	BLACKFIN_ISA_2},
   {"bf522",	BLACKFIN_ISA_2},
   {"bf523",	BLACKFIN_ISA_2},
   {"bf524",	BLACKFIN_ISA_2},
