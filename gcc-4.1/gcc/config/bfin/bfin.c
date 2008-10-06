@@ -230,39 +230,39 @@ struct bfin_cpu bfin_cpus[] =
    WA_SPECULATIVE_LOADS | WA_RETS},
 
   {"bf542", BFIN_CPU_BF542, 0x0002,
-   WA_SPECULATIVE_LOADS},
+   WA_SPECULATIVE_LOADS | WA_INDIRECT_CALLS},
   {"bf542", BFIN_CPU_BF542, 0x0001,
-   WA_SPECULATIVE_LOADS | WA_RETS},
+   WA_SPECULATIVE_LOADS | WA_RETS | WA_INDIRECT_CALLS},
   {"bf542", BFIN_CPU_BF542, 0x0000,
-   WA_SPECULATIVE_LOADS | WA_RETS},
+   WA_SPECULATIVE_LOADS | WA_RETS | WA_INDIRECT_CALLS},
 
   {"bf544", BFIN_CPU_BF544, 0x0002,
-   WA_SPECULATIVE_LOADS},
+   WA_SPECULATIVE_LOADS | WA_INDIRECT_CALLS},
   {"bf544", BFIN_CPU_BF544, 0x0001,
-   WA_SPECULATIVE_LOADS | WA_RETS},
+   WA_SPECULATIVE_LOADS | WA_RETS | WA_INDIRECT_CALLS},
   {"bf544", BFIN_CPU_BF544, 0x0000,
-   WA_SPECULATIVE_LOADS | WA_RETS},
+   WA_SPECULATIVE_LOADS | WA_RETS | WA_INDIRECT_CALLS},
 
   {"bf547", BFIN_CPU_BF547, 0x0002,
-   WA_SPECULATIVE_LOADS},
+   WA_SPECULATIVE_LOADS | WA_INDIRECT_CALLS},
   {"bf547", BFIN_CPU_BF547, 0x0001,
-   WA_SPECULATIVE_LOADS | WA_RETS},
+   WA_SPECULATIVE_LOADS | WA_RETS | WA_INDIRECT_CALLS},
   {"bf547", BFIN_CPU_BF547, 0x0000,
-   WA_SPECULATIVE_LOADS | WA_RETS},
+   WA_SPECULATIVE_LOADS | WA_RETS | WA_INDIRECT_CALLS},
 
   {"bf548", BFIN_CPU_BF548, 0x0002,
-   WA_SPECULATIVE_LOADS},
+   WA_SPECULATIVE_LOADS | WA_INDIRECT_CALLS},
   {"bf548", BFIN_CPU_BF548, 0x0001,
-   WA_SPECULATIVE_LOADS | WA_RETS},
+   WA_SPECULATIVE_LOADS | WA_RETS | WA_INDIRECT_CALLS},
   {"bf548", BFIN_CPU_BF548, 0x0000,
-   WA_SPECULATIVE_LOADS | WA_RETS},
+   WA_SPECULATIVE_LOADS | WA_RETS | WA_INDIRECT_CALLS},
 
   {"bf549", BFIN_CPU_BF549, 0x0002,
-   WA_SPECULATIVE_LOADS},
+   WA_SPECULATIVE_LOADS | WA_INDIRECT_CALLS},
   {"bf549", BFIN_CPU_BF549, 0x0001,
-   WA_SPECULATIVE_LOADS | WA_RETS},
+   WA_SPECULATIVE_LOADS | WA_RETS | WA_INDIRECT_CALLS},
   {"bf549", BFIN_CPU_BF549, 0x0000,
-   WA_SPECULATIVE_LOADS | WA_RETS},
+   WA_SPECULATIVE_LOADS | WA_RETS | WA_INDIRECT_CALLS},
 
   {"bf561", BFIN_CPU_BF561, 0x0005, WA_RETS},
   {"bf561", BFIN_CPU_BF561, 0x0003,
@@ -4773,6 +4773,22 @@ workaround_rts_anomaly (void)
     }
 }
 
+/* Determine whether PAT is an indirect call pattern.  */
+static bool
+indirect_call_p (rtx pat)
+{
+  if (GET_CODE (pat) == PARALLEL)
+    pat = XVECEXP (pat, 0, 0);
+  if (GET_CODE (pat) == SET)
+    pat = SET_SRC (pat);
+  gcc_assert (GET_CODE (pat) == CALL);
+  pat = XEXP (pat, 0);
+  gcc_assert (GET_CODE (pat) == MEM);
+  pat = XEXP (pat, 0);
+  
+  return REG_P (pat);
+}
+
 /* Insert code to work around speculative load and speculative SYNC anomalies.
    Called from bfin_reorg.  */
 static void
@@ -4783,7 +4799,8 @@ workaround_speculation (void)
   int cycles_since_jump = INT_MAX;
   int delay_added = 0;
 
-  if (! ENABLE_WA_SPECULATIVE_LOADS && ! ENABLE_WA_SPECULATIVE_SYNCS)
+  if (! ENABLE_WA_SPECULATIVE_LOADS && ! ENABLE_WA_SPECULATIVE_SYNCS
+      && ! ENABLE_WA_INDIRECT_CALLS)
     return;
 
   /* First pass: find predicted-false branches; if something after them
@@ -4813,6 +4830,15 @@ workaround_speculation (void)
 	    }
 	  else
 	    cycles_since_jump = INT_MAX;
+	}
+      else if (CALL_P (insn))
+	{
+	  if (cycles_since_jump < INT_MAX)
+	    cycles_since_jump++;
+	  if (indirect_call_p (pat) && ENABLE_WA_INDIRECT_CALLS)
+	    {
+	      delay_needed = 3;
+	    }
 	}
       else if (INSN_P (insn))
 	{

@@ -76,6 +76,11 @@ extern unsigned int bfin_workarounds;
 #define ENABLE_WA_RETS \
   (bfin_workarounds & WA_RETS)
 
+/* For the anomaly 05-00-0426 */
+#define WA_INDIRECT_CALLS 0x00000008
+#define ENABLE_WA_INDIRECT_CALLS \
+  ((bfin_workarounds & WA_INDIRECT_CALLS) && !TARGET_ICPLB)
+
 
 #define Mmode enum machine_mode
 
