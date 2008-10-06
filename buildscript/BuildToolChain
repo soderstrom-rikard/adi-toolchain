@@ -730,8 +730,7 @@ if [ $CHECK_ON_HARDWARE ] ; then
     RUN=`rsh -l root $TARGET_IPADDR "ps" | grep -v " ps" | grep -v "/rshd" |
         grep -v "\[" | grep -v telnetd | grep -v "/init" | grep -v " inetd" |
         grep -v " PID " | grep -v "[ /]sh" | grep -v " /s*bin/.*d" | sed '/^[[:space:]]*$/d'`
-    TMP=`printf ${RUN} | wc -c`
-    if [ $TMP -gt 0 ] ; then
+    if [ ${#RUN} -gt 0 ] ; then
         echo " ** looks like random processes are running on the $TARGET_IPADDR already "
         echo " ** ${RUN}"
         echo " ** Aborting, since I get confused when this happens"
@@ -798,9 +797,9 @@ for opt in $UCLIBC_CFLAGS
 do
     check_cc_options gcc $opt
     if [ "$?" -eq "1" ] ; then
-      printf "$opt "
+      printf "%s " "$opt"
     else
-      printf "$opt(bfin only?) "
+      printf "%s(bfin only?) " "$opt"
     fi
 done
 echo
@@ -1498,7 +1497,7 @@ check_tests_OK()
     TARGET_THRESHOLD=5
     WAIT=1
     WAIT_TARGET=1
-    HARDWARE=`printf $3 | grep -i hardware`
+    HARDWARE=`printf "%s" "$3" | grep -i hardware`
     # -n : numeric sort - kill the last process first
     # -A : use ASCII, not UTF-8 or VT100
     # -l : long lines (otherwise it cuts off at 132 char across
@@ -1517,8 +1516,7 @@ check_tests_OK()
         NEW_TARGET=`rsh -l root $TARGET_IPADDR "ps" | grep -v " ps" | grep -v "/rshd" |
             grep -v "\[" | grep -v telnetd | grep -v "/init" | grep -v " inetd" |
             grep -v " PID " | grep -v "[ /]sh" | grep -v " /s*bin/.*d" | sed '/^[[:space:]]*$/d'`
-            STUCK=`printf ${NEW_TARGET} | wc -c`
-            if [ $STUCK -gt 0 ] ; then
+            if [ ${#NEW_TARGET} -gt 0 ] ; then
                echo " ** looks like random processes are running on the hardware already "
                echo " ** ${NEW_TARGET}"
             fi
@@ -1578,12 +1576,11 @@ check_tests_OK()
                     echo " ** looks like the board has been dead for $TARGET_THRESHOLD minutes"
                     break
                 fi
-                STUCK=`printf ${NEW_TARGET} | wc -c`
-                if [ $STUCK -gt 0 ] ; then
+                if [ ${#NEW_TARET} -gt 0 ] ; then
                     printf " ** looks like "
                     for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $NF}')
                     do
-		        printf "${TARGET_PID} "
+                        printf "${TARGET_PID} "
                     done
                     echo "on the board is hung"
                     for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $1}')
@@ -1615,7 +1612,7 @@ check_tests_OK()
                     echo "Test did not exit properly"
                     exit 1
                 fi
- 
+
                 KILL_PID=`echo "$TREE" | sed -n "${KILL}{p;q}" | awk -F\( '{print $NF}' | awk -F\) '{print $1}'`
                 KILL_PS=`ps $KILL_PID | grep -v "^[[:space:]]*PID" | grep -v " Z.*<defunct>"`
             done
@@ -1625,13 +1622,12 @@ check_tests_OK()
             if [ -n "$HARDWARE" ] ; then
                 rsh -l root $TARGET_IPADDR ps >> $3/${2}.kill-${KILL_PID}
             fi
-            #if it is an rsh process on the host, it normally means a test is 
+            # if it is an rsh process on the host, it normally means a test is
             # hung on the board, so let's kill that instead
             RUN=`echo $KILL_PS | grep rsh`
             if [ -n "$RUN" ] ; then
                 echo " ** This should never happen - board seems OK, but rsh process is stuck?"
-                STUCK=`printf ${NEW_TARGET} | wc -c`
-                if [ $STUCK -gt 0 ] ; then
+                if [ ${#NEW_TARGET} -gt 0 ] ; then
                     printf " ** looks like "
                     for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $NF}')
                     do
@@ -1654,7 +1650,7 @@ check_tests_OK()
         fi
         sleep 60
     done
-    
+
     # Tests are complete - so let's copy crashes to test directory
     hardware=`echo $3 | grep -i hardware`
     if [ -n "$hardware" ] ; then
@@ -1668,8 +1664,7 @@ check_tests_OK()
     fi
 
     TREE=`pstree -n -A -l -p $PID | sed -e 's/-[-+]-/\n/g' -e 's/^[ \t]*//' -e '/^[[:space:]]*$/d' | awk -F "(" '{print $NF}' | awk -F ")" '{print $1}'`
-    TREE_LEN=`printf $TREE | wc -c`
-    if [ $TREE_LEN -gt 0 ] ; then
+    if [ ${#TREE} -gt 0 ] ; then
         echo " ** Aborting remaining tests"
         echo $TREE
         for KILL_PS in ${TREE}
