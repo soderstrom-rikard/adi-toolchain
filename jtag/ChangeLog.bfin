@@ -1,3 +1,12 @@
+2008-10-08  Jie Zhang  <jie.zhang@analog.com>
+
+	* include/bfin.h (INSN_NOP): Redefine.
+	(INSN_RTE): Redefine.
+	(INSN_CSYNC): Redefine.
+	(INSN_SSYNC): Redefine.
+	* src/cmd/bfin.c (cmd_bfin_run): Add "bfin emulation singlestep".
+	(cmd_bfin_help): Add "bfin emulation singlestep".
+
 2008-09-22  Jie Zhang  <jie.zhang@analog.com>
 
 	* include/part.h (struct part): Add data.

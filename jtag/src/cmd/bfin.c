@@ -135,6 +135,23 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 		  !!(dbgstat & DBGSTAT_CORE_FAULT),
 		  !!(dbgstat & DBGSTAT_LPDEC1));
 	}
+      else if (strcmp (params[2], "singlestep") == 0)
+	{
+	  if ((BFIN_DBGSTAT_GET (chain) & DBGSTAT_EMUREADY) == 0)
+	    {
+	      printf( _("Run \"bfin emulation enter\" first.\n") );
+	      return 1;
+	    }
+
+	  /* TODO  Allow an argument to specify how many single steps.  */
+
+	  BFIN_DBGCTL_BIT_SET (chain, DBGCTL_ESSTEP, EXITMODE_UPDATE);
+	  BFIN_EMUIR_SET (chain, INSN_RTE, EXITMODE_UPDATE);
+	  BFIN_DBGCTL_BIT_CLEAR (chain, DBGCTL_EMEEN | DBGCTL_WAKEUP, EXITMODE_IDLE);
+	  BFIN_EMUIR_SET (chain, INSN_NOP, EXITMODE_UPDATE);
+	  BFIN_DBGCTL_BIT_SET (chain, DBGCTL_EMEEN | DBGCTL_WAKEUP, EXITMODE_IDLE);
+	  BFIN_DBGCTL_BIT_CLEAR (chain, DBGCTL_ESSTEP, EXITMODE_UPDATE);
+	}
       else
 	{
 	  printf (_("%s: unknown emulation subcommand '%s'\n"), "bfin emulation", params[2]);
@@ -401,7 +418,7 @@ cmd_bfin_help( void )
 {
   printf( _(
 	    "Usage: %s execute INSTRUCTIONs\n"
-	    "Usage: %s emulation enter|exit|status\n"
+	    "Usage: %s emulation enter|exit|singlestep|status\n"
 	    "Blackfin specific commands\n"
 	    "\n"
 	    "INSTRUCTIONs are a sequence of Blackfin encoded instructions,\n"

@@ -122,10 +122,10 @@ extern struct emu_oab *current_emu_oab;
 #define DBGSTAT_EMUDIF		(current_emu_oab->dbgstat_emudif)
 #define DBGSTAT_EMUDOF		(current_emu_oab->dbgstat_emudof)
 
-#define INSN_NOP			0x00000000
-#define INSN_RTE			0x00140000
-#define INSN_CSYNC			0x00230000
-#define INSN_SSYNC			0x00240000
+#define INSN_NOP			0x0000
+#define INSN_RTE			0x0014
+#define INSN_CSYNC			0x0023
+#define INSN_SSYNC			0x0024
 #define INSN_ILLEGAL			0xffffffff
 
 #define INSN_BIT_MULTI			0x08
