@@ -36,6 +36,18 @@
 
 #include <bfin.h>
 
+/* For "bfin execute", Blackfin assembler assembles instruction(s)
+   into a temporary object file. When this variable is non-zero, there
+   should be only one instruction in the object file. For example,
+   assembler assembles one instruction a time, which is how we do now.
+
+   Blackfin GAS rounds the section size to 4 bytes. Usually we don't
+   want the padding bytes to be executed as a NOP. With this variable
+   set, only the first instruction in the object file will be
+   executed.  */
+
+int bfin_one_insn_a_file = 1;
+
 #define ARRAY_SIZE(a) (sizeof (a) / sizeof ((a)[0]))
 
 static int
@@ -48,6 +60,57 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 
   if (num_params < 2)
     return -1;
+
+  /* These commands don't need cable or parts.  */
+
+  if (strcmp (params[1], "set") == 0)
+    {
+      if (num_params != 4)
+	return -1;
+
+      if (strcmp (params[2], "one-insn-a-file") == 0)
+	{
+	  if (strcmp (params[3], "0") == 0)
+	    bfin_one_insn_a_file = 0;
+	  else if (strcmp (params[3], "1") == 0)
+	    bfin_one_insn_a_file = 1;
+	  else
+	    {
+	      printf (_("%s: bad value for one-insn-a-file '%s'\n"), "bfin set", params[3]);
+	      return -1;
+	    }
+	}
+      else
+	{
+	  printf (_("%s: unknown set variable '%s'\n"), "bfin set", params[2]);
+	  return -1;
+	}
+
+      return 1;
+    }
+  else if (strcmp (params[1], "show") == 0)
+    {
+      int found = 0;
+
+      if (num_params > 3)
+	return -1;
+
+      if (num_params == 2 || strcmp (params[2], "one-insn-a-file") == 0)
+	{
+	  found = 1;
+	  printf ("one-insn-a-file: %d\n", bfin_one_insn_a_file);
+	}
+
+      if (!found && num_params == 3)
+	{
+	  printf (_("%s: unknown set variable '%s'\n"), "bfin set", params[2]);
+	  return -1;
+	}
+
+      return 1;
+    }
+
+  /* The remaining commands require cable or parts.  */
 
   if (!cmd_test_cable( chain ))
     return 1;
@@ -339,6 +402,9 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 		      (*last)->type = BFIN_INSN_NORMAL;
 		      (*last)->next = NULL;
 		      last = &((*last)->next);
+
+		      if (bfin_one_insn_a_file)
+			break;
 		    }
 
 		  fclose (fp);
@@ -419,6 +485,8 @@ cmd_bfin_help( void )
   printf( _(
 	    "Usage: %s execute INSTRUCTIONs\n"
 	    "Usage: %s emulation enter|exit|singlestep|status\n"
+	    "Usage: %s set one-insn-a-file VALUE\n"
+	    "Usage: %s show [one-insn-a-file]\n"
 	    "Blackfin specific commands\n"
 	    "\n"
 	    "INSTRUCTIONs are a sequence of Blackfin encoded instructions,\n"

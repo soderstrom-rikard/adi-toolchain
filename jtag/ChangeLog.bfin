@@ -1,5 +1,12 @@
 2008-10-08  Jie Zhang  <jie.zhang@analog.com>
 
+	* src/cmd/bfin.c (bfin_one_insn_a_file): Define.
+	(cmd_bfin_run): Add "bfin set one-insn-a-file" command.
+	Add "bfin show" command.
+	(cmd_bfin_help): Add "bfin set" and "bfin show" commands.
+
+2008-10-08  Jie Zhang  <jie.zhang@analog.com>
+
 	* include/bfin.h (INSN_NOP): Redefine.
 	(INSN_RTE): Redefine.
 	(INSN_CSYNC): Redefine.
