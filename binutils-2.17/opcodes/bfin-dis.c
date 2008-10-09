@@ -717,7 +717,7 @@ decode_optmode (int mod, int MM, disassemble_info *outf)
   else if (mod == M_IU)
     OUTS (outf, "IU");
   else
-    OUTS (outf, "unknown mode");
+    abort ();
 
   OUTS (outf, ")");
 }

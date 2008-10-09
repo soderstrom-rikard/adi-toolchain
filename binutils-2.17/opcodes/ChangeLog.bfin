@@ -1,5 +1,11 @@
 2008-10-09  Jie Zhang  <jie.zhang@analog.com>
 
+	Revert
+	2008-10-09  Jie Zhang  <jie.zhang@analog.com>
+	* bfin-dis.c (decode_optmode): Don't abort on unknown mode.
+
+2008-10-09  Jie Zhang  <jie.zhang@analog.com>
+
 	* bfin-dis.c (decode_optmode): Don't abort on unknown mode.
 
 2008-09-26  Jie Zhang  <jie.zhang@analog.com>
