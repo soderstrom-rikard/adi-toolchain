@@ -1,5 +1,10 @@
 2008-10-09  Jie Zhang  <jie.zhang@analog.com>
 
+	* opcodes/bfin-dis.c (decode_dsp32cmul): Add more checks.
+	(decode_dsp32csqu): Likewise.
+
+2008-10-09  Jie Zhang  <jie.zhang@analog.com>
+
 	Revert
 	2008-10-09  Jie Zhang  <jie.zhang@analog.com>
 	* bfin-dis.c (decode_optmode): Don't abort on unknown mode.

@@ -3999,6 +3999,12 @@ decode_dsp32cmul (TIword iw0, TIword iw1, disassemble_info *outf)
   int src0 = (iw1 >> DSP32Cmul_src0_bits) & DSP32Cmul_src0_mask;
   int src1 = (iw1 >> DSP32Cmul_src1_bits) & DSP32Cmul_src1_mask;
 
+  if (w == 0 && aop == 3)
+    return 0;
+
+  if (((1 << mmod) & (P ? 0x101 : 0x105)) == 0)
+    return 0;
+
   if (w == 1 || aop == 3)
     {
       if (P == 0)
@@ -4047,6 +4053,12 @@ decode_dsp32csqu (TIword iw0, TIword iw1, disassemble_info *outf)
   int src1 = (iw1 >> DSP32Csqu_src1_bits) & DSP32Csqu_src1_mask;
 
   int which;
+
+  if (w0 == 0 && w1 == 0 && op1 == 3 && op0 == 3)
+    return 0;
+
+  if (((1 << mmod) & (P ? 0x101 : 0x105)) == 0)
+    return 0;
 
   if (op1 == 3 && w1 == 0)
     which = 0;

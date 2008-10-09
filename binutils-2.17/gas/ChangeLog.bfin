@@ -1,3 +1,7 @@
+2008-10-09  Jie Zhang  <jie.zhang@analog.com>
+	
+	* config/bfin-parse.y (asm_1): Fix CMUL and CSQU.
+
 2008-10-01  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* config/tc-bfin.c (bfin_cpus[]): Add bf512, bf514, bf516, bf518.

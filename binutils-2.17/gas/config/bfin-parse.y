@@ -726,7 +726,7 @@ asm_1:
 	  if ($4.mod != 0 && $4.mod != M_T && $4.mod != M_IS)
 	    return yyerror ("bad option.");
 
-	  $$ = DSP32CSQU (3, $4.mod, 0, &$1, &$3.src);
+	  $$ = DSP32CSQU (3, $4.mod, 1, &$1, &$3.src);
 	}
 	| assign_csqufunc opt_mode
 	{
@@ -752,7 +752,7 @@ asm_1:
 	  if ($4.mod != 0 && $4.mod != M_T && $4.mod != M_IS)
 	    return yyerror ("bad option.");
 
-	  $$ = DSP32CMUL (3, $4.mod, 0, &$1, &$3.s0, &$3.s1);
+	  $$ = DSP32CMUL (3, $4.mod, 1, &$1, &$3.s0, &$3.s1);
 	}
 	| REG COLON expr ASSIGN cmul_regs opt_mode
 	{
@@ -764,7 +764,7 @@ asm_1:
 	  if ($6.mod != 0 && $6.mod != M_IS)
 	    return yyerror ("bad option.");
 
-	  $$ = DSP32CMUL (3, $6.mod, 0, &$1, &$5.s0, &$5.s1);
+	  $$ = DSP32CMUL (3, $6.mod, 1, &$1, &$5.s0, &$5.s1);
 	}
 	| assign_cmulfunc opt_mode
 	{
