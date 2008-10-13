@@ -1,4 +1,11 @@
 2008-10-13  Jie Zhang  <jie.zhang@analog.com>
+
+	Merge from upstream
+	2008-10-13  Jie Zhang  <jie.zhang@analog.com>
+	* src/tap/cable/ft2232.c (ft2232_transfer_schedule): Don't
+	access memory out of bounds.
+
+2008-10-13  Jie Zhang  <jie.zhang@analog.com>
 	
 	* include/jtag.h (LEAVE_NOP_DEFAULT): Define.
 	(LEAVE_NOP_YES): Define.
