@@ -32,46 +32,27 @@ int dump_tap_state = 0;
 static const char *
 tap_state_name (int state)
 {
-	const char *state_name;
-
-	if (state == Unknown_State)
-		state_name = "Unknown_State";
-	else if (state == Test_Logic_Reset)
-		state_name = "Test_Logic_Reset";
-	else if (state == Run_Test_Idle)
-		state_name = "Run_Test_Idle";
-	else if (state == Select_DR_Scan)
-		state_name = "Select_DR_Scan";
-	else if (state == Capture_DR)
-		state_name = "Capture_DR";
-	else if (state == Shift_DR)
-		state_name = "Shift_DR";
-	else if (state == Exit1_DR)
-		state_name = "Exit1_DR";
-	else if (state == Pause_DR)
-		state_name = "Pause_DR";
-	else if (state == Exit2_DR)
-		state_name = "Exit2_DR";
-	else if (state == Update_DR)
-		state_name = "Update_DR";
-	else if (state == Select_IR_Scan)
-		state_name = "Select_IR_Scan";
-	else if (state == Capture_IR)
-		state_name = "Capture_IR";
-	else if (state == Shift_IR)
-		state_name = "Shift_IR";
-	else if (state == Exit1_IR)
-		state_name = "Exit1_IR";
-	else if (state == Pause_IR)
-		state_name = "Pause_IR";
-	else if (state == Exit2_IR)
-		state_name = "Exit2_IR";
-	else if (state == Update_IR)
-		state_name = "Update_IR";
-	else
-		state_name = "??????";
-
-	return state_name;
+	switch (state)
+	{
+	case Unknown_State:	return "Unknown_State";
+	case Test_Logic_Reset:	return "Test_Logic_Reset";
+	case Run_Test_Idle:	return "Run_Test_Idle";
+	case Select_DR_Scan:	return "Select_DR_Scan";
+	case Capture_DR:	return "Capture_DR";
+	case Shift_DR:		return "Shift_DR";
+	case Exit1_DR:		return "Exit1_DR";
+	case Pause_DR:		return "Pause_DR";
+	case Exit2_DR:		return "Exit2_DR";
+	case Update_DR:		return "Update_DR";
+	case Select_IR_Scan:	return "Select_IR_Scan";
+	case Capture_IR:	return "Capture_IR";
+	case Shift_IR:		return "Shift_IR";
+	case Exit1_IR:		return "Exit1_IR";
+	case Pause_IR:		return "Pause_IR";
+	case Exit2_IR:		return "Exit2_IR";
+	case Update_IR:		return "Update_IR";
+	default:		return "??????";
+	}
 }
 
 static void
