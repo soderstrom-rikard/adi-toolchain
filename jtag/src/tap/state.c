@@ -26,8 +26,8 @@
 #include "state.h"
 #include "chain.h"
 
-/* For dump_tap_state */
-#include "jtag.h"
+
+int dump_tap_state = 0;
 
 static const char *
 tap_state_name (int state)

@@ -46,6 +46,8 @@
 #include <locale.h>
 #endif /* ENABLE_NLS */
 
+#include "state.h"	/* for dump_tap_state */
+#include "bfin.h"	/* for leave_nop_in_emuir */
 #include "chain.h"
 #include "bus.h"
 #include "cmd.h"
@@ -58,8 +60,6 @@ ssize_t getline( char **lineptr, size_t *n, FILE *stream );
 int debug_mode = 0;
 int big_endian = 0;
 int interactive = 0;
-int dump_tap_state = 0;
-int leave_nop_in_emuir = LEAVE_NOP_DEFAULT;
 
 extern cfi_array_t *cfi_array;
 

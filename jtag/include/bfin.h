@@ -160,6 +160,13 @@ struct bfin_insn
   struct bfin_insn *next;
 };
 
+enum {
+  LEAVE_NOP_DEFAULT,
+  LEAVE_NOP_YES,
+  LEAVE_NOP_NO
+};
+
+extern int leave_nop_in_emuir;
 
 /* Do Blackfin part specific initialization.  It's mainly used to
    set the proper emulation methods according to the part name.  */

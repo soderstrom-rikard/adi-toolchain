@@ -29,7 +29,9 @@
 
 #include <chain.h>
 #include <bfin.h>
-#include <jtag.h>
+
+
+int leave_nop_in_emuir = LEAVE_NOP_DEFAULT;
 
 static struct emu_oab bfin_emu_oab;
 static struct emu_oab bf579_emu_oab;

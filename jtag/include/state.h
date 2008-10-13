@@ -56,6 +56,8 @@
 #define	Exit2_IR		(TAPSTAT_IR | TAPSTAT_SHIFT | TAPSTAT_UPDATE)
 #define	Update_IR		(TAPSTAT_IR | TAPSTAT_IDLE)
 
+extern int dump_tap_state;
+
 int tap_state( chain_t *chain );
 int tap_state_init( chain_t *chain );
 int tap_state_done( chain_t *chain );
