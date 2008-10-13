@@ -39,6 +39,14 @@ extern int big_endian;
 extern int debug_mode;
 extern int dump_tap_state;
 
+enum {
+  LEAVE_NOP_DEFAULT,
+  LEAVE_NOP_YES,
+  LEAVE_NOP_NO
+};
+
+extern int leave_nop_in_emuir;
+
 const char *jtag_get_data_dir( void );
 
 int jtag_parse_file( chain_t *chain, const char *filename );

@@ -1,4 +1,17 @@
 2008-10-13  Jie Zhang  <jie.zhang@analog.com>
+	
+	* include/jtag.h (LEAVE_NOP_DEFAULT): Define.
+	(LEAVE_NOP_YES): Define.
+	(LEAVE_NOP_NO): Define.
+	(leave_nop_in_emuir): Declare.
+	* src/part/bfin.c: Include <jtag.h>.
+	(bfin_scan_select): Put a NOP in EMUIR if required.
+	(bfin_emuir_set): Put last half into...
+	(bfin_emuir_set_1): ...this new function.
+	* src/jtag.c (leave_nop_in_emuir): Define.
+	(main): Add --leave-nop-in-emuir option.
+
+2008-10-13  Jie Zhang  <jie.zhang@analog.com>
 
 	* include/jtag.h (dump_tap_state): Declare.
 	* src/tap/state.c (jtag.h): Include for dump_tap_state.

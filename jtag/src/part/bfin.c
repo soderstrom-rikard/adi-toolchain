@@ -29,11 +29,15 @@
 
 #include <chain.h>
 #include <bfin.h>
+#include <jtag.h>
 
 static struct emu_oab bfin_emu_oab;
 static struct emu_oab bf579_emu_oab;
 
 struct emu_oab *current_emu_oab;
+
+static void bfin_emuir_set_1 (chain_t *chain, uint64_t insn, int exit);
+
 
 void
 bfin_part_init (part_t *part)
@@ -85,6 +89,16 @@ bfin_scan_select (chain_t *chain, const char *scan)
   if (part->active_instruction
       && strcmp (part->active_instruction->name, scan) == 0)
     return 0;
+
+  /* Put a NOP in EMUIR if we are going to use other scan chain. This
+     is only needed for BF579 to work around a hardware bug.  */
+
+  if ((strcmp (part->active_instruction->name, "EMUIR_SCAN") == 0
+       || strcmp (part->active_instruction->name, "EMUIR64_SCAN") == 0)
+      && ((leave_nop_in_emuir == LEAVE_NOP_DEFAULT
+	   && strcmp (part->part, "BF579") == 0)
+	  || leave_nop_in_emuir == LEAVE_NOP_YES))
+    bfin_emuir_set_1 (chain, INSN_NOP, EXITMODE_UPDATE);
 
   part_set_instruction (part, scan);
   if (part->active_instruction == NULL)
@@ -154,8 +168,6 @@ bfin_emudat_get (chain_t *chain, int exit)
 void
 bfin_emuir_set (chain_t *chain, uint64_t insn, int exit)
 {
-  part_t *part;
-  tap_register *r;
   const char *emuir_scan;
 
   assert (exit == EXITMODE_UPDATE || exit == EXITMODE_IDLE);
@@ -175,6 +187,15 @@ bfin_emuir_set (chain_t *chain, uint64_t insn, int exit)
 
   if (bfin_scan_select (chain, emuir_scan) < 0)
     return;
+
+  bfin_emuir_set_1 (chain, insn, exit);
+}
+
+static void
+bfin_emuir_set_1 (chain_t *chain, uint64_t insn, int exit)
+{
+  part_t *part;
+  tap_register *r;
 
   part = chain->parts->parts[chain->active_part];
   r = part->active_instruction->data_register->in;
