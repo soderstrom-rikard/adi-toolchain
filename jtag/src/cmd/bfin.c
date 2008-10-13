@@ -491,7 +491,7 @@ cmd_bfin_help( void )
 	    "\n"
 	    "INSTRUCTIONs are a sequence of Blackfin encoded instructions,\n"
 	    "double quoted assembly statements and [EMUDAT_IN]s\n"
-	    ), "bfin", "bfin" );
+	    ), "bfin", "bfin", "bfin", "bfin" );
 }
 
 cmd_t cmd_bfin = {
