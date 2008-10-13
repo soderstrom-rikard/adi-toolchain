@@ -27,8 +27,10 @@ enum ftdi_chip_type { TYPE_AM=0, TYPE_BM=1, TYPE_2232C=2, TYPE_R=3 };
 enum ftdi_parity_type { NONE=0, ODD=1, EVEN=2, MARK=3, SPACE=4 };
 /// Number of stop bits for ftdi_set_line_property()
 enum ftdi_stopbits_type { STOP_BIT_1=0, STOP_BIT_15=1, STOP_BIT_2=2 };
-/// Number of bits ftdi_set_line_property()
+/// Number of bits for ftdi_set_line_property()
 enum ftdi_bits_type { BITS_7=7, BITS_8=8 };
+/// Break type for ftdi_set_line_property2()
+enum ftdi_break_type { BREAK_OFF=0, BREAK_ON=1 };
 
 /// MPSSE bitbang modes
 enum ftdi_mpsse_mode {
@@ -92,11 +94,26 @@ enum ftdi_interface {
 /* Address Low  */
 
 /* Definitions for flow control */
+#define SIO_RESET          0 /* Reset the port */
 #define SIO_MODEM_CTRL     1 /* Set the modem control register */
 #define SIO_SET_FLOW_CTRL  2 /* Set flow control register */
+#define SIO_SET_BAUD_RATE  3 /* Set baud rate */
+#define SIO_SET_DATA       4 /* Set the data characteristics of the port */
 
-#define SIO_SET_FLOW_CTRL_REQUEST_TYPE 0x40
+#define SIO_RESET_REQUEST_TYPE 0x40
+#define SIO_RESET_REQUEST SIO_RESET
+#define SIO_RESET_SIO 0
+#define SIO_RESET_PURGE_RX 1
+#define SIO_RESET_PURGE_TX 2
+
+#define SIO_SET_BAUDRATE_REQUEST_TYPE 0x40
+#define SIO_SET_BAUDRATE_REQUEST SIO_SET_BAUD_RATE
+
+#define SIO_SET_DATA_REQUEST_TYPE 0x40
+#define SIO_SET_DATA_REQUEST SIO_SET_DATA
+
 #define SIO_SET_FLOW_CTRL_REQUEST SIO_SET_FLOW_CTRL
+#define SIO_SET_FLOW_CTRL_REQUEST_TYPE 0x40
 
 #define SIO_DISABLE_FLOW_CTRL 0x0 
 #define SIO_RTS_CTS_HS (0x1 << 8)
@@ -265,6 +282,9 @@ extern "C" {
     int ftdi_set_baudrate(struct ftdi_context *ftdi, int baudrate);
     int ftdi_set_line_property(struct ftdi_context *ftdi, enum ftdi_bits_type bits,
                                enum ftdi_stopbits_type sbit, enum ftdi_parity_type parity);
+    int ftdi_set_line_property2(struct ftdi_context *ftdi, enum ftdi_bits_type bits,
+                               enum ftdi_stopbits_type sbit, enum ftdi_parity_type parity,
+                               enum ftdi_break_type break_type);
 
     int ftdi_read_data(struct ftdi_context *ftdi, unsigned char *buf, int size);
     int ftdi_read_data_set_chunksize(struct ftdi_context *ftdi, unsigned int chunksize);
@@ -287,6 +307,12 @@ extern "C" {
 
     int ftdi_poll_modem_status(struct ftdi_context *ftdi, unsigned short *status);
 
+    // flow control
+    int ftdi_setflowctrl(struct ftdi_context *ftdi, int flowctrl);
+    int ftdi_setdtr_rts(struct ftdi_context *ftdi, int dtr, int rts);
+    int ftdi_setdtr(struct ftdi_context *ftdi, int state);
+    int ftdi_setrts(struct ftdi_context *ftdi, int state);
+
     int ftdi_set_event_char(struct ftdi_context *ftdi, unsigned char eventch, unsigned char enable);
     int ftdi_set_error_char(struct ftdi_context *ftdi, unsigned char errorch, unsigned char enable);
 
@@ -306,11 +332,6 @@ extern "C" {
     int ftdi_erase_eeprom(struct ftdi_context *ftdi);
 
     char *ftdi_get_error_string(struct ftdi_context *ftdi);
-
-    // flow control
-    int ftdi_setflowctrl(struct ftdi_context *ftdi, int flowctrl);
-    int ftdi_setdtr(struct ftdi_context *ftdi, int state);
-    int ftdi_setrts(struct ftdi_context *ftdi, int state);
 
 #ifdef __cplusplus
 }
