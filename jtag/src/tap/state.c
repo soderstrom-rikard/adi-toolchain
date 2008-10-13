@@ -26,6 +26,69 @@
 #include "state.h"
 #include "chain.h"
 
+/* For dump_tap_state */
+#include "jtag.h"
+
+static const char *
+tap_state_name (int state)
+{
+	const char *state_name;
+
+	if (state == Unknown_State)
+		state_name = "Unknown_State";
+	else if (state == Test_Logic_Reset)
+		state_name = "Test_Logic_Reset";
+	else if (state == Run_Test_Idle)
+		state_name = "Run_Test_Idle";
+	else if (state == Select_DR_Scan)
+		state_name = "Select_DR_Scan";
+	else if (state == Capture_DR)
+		state_name = "Capture_DR";
+	else if (state == Shift_DR)
+		state_name = "Shift_DR";
+	else if (state == Exit1_DR)
+		state_name = "Exit1_DR";
+	else if (state == Pause_DR)
+		state_name = "Pause_DR";
+	else if (state == Exit2_DR)
+		state_name = "Exit2_DR";
+	else if (state == Update_DR)
+		state_name = "Update_DR";
+	else if (state == Select_IR_Scan)
+		state_name = "Select_IR_Scan";
+	else if (state == Capture_IR)
+		state_name = "Capture_IR";
+	else if (state == Shift_IR)
+		state_name = "Shift_IR";
+	else if (state == Exit1_IR)
+		state_name = "Exit1_IR";
+	else if (state == Pause_IR)
+		state_name = "Pause_IR";
+	else if (state == Exit2_IR)
+		state_name = "Exit2_IR";
+	else if (state == Update_IR)
+		state_name = "Update_IR";
+	else
+		state_name = "??????";
+
+	return state_name;
+}
+
+static void
+tap_state_dump(int state)
+{
+	if (dump_tap_state)
+		printf ("tap_state: %s\n", tap_state_name (state));
+}
+
+static void
+tap_state_dump_2 (int state0, int state1, int tms)
+{
+	if (dump_tap_state)
+		printf ("tap_state: %16s =(tms:%d)=> %s\n",
+			tap_state_name (state0), tms, tap_state_name (state1));
+}
+
 int
 tap_state( chain_t *chain )
 {
@@ -35,18 +98,21 @@ tap_state( chain_t *chain )
 int
 tap_state_init( chain_t *chain )
 {
+	tap_state_dump (Unknown_State);
 	return chain->state = Unknown_State;
 }
 
 int
 tap_state_done( chain_t *chain )
 {
+	tap_state_dump (Unknown_State);
 	return chain->state = Unknown_State;
 }
 
 int
 tap_state_reset( chain_t *chain )
 {
+	tap_state_dump (Test_Logic_Reset);
 	return chain->state = Test_Logic_Reset;
 }
 
@@ -63,12 +129,15 @@ tap_state_set_trst( chain_t *chain, int old_trst, int new_trst )
 			chain->state = Unknown_State;
 	}
 
+	tap_state_dump (chain->state);
 	return chain->state;
 }
 
 int
 tap_state_clock( chain_t *chain, int tms )
 {
+	int oldstate = chain->state;
+
 	if (tms) {
 		switch (chain->state) {
 			case Test_Logic_Reset:
@@ -148,5 +217,6 @@ tap_state_clock( chain_t *chain, int tms )
 		}
 	}
 
+	tap_state_dump_2 (oldstate, chain->state, tms);
 	return chain->state;
 }

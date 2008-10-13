@@ -58,6 +58,7 @@ ssize_t getline( char **lineptr, size_t *n, FILE *stream );
 int debug_mode = 0;
 int big_endian = 0;
 int interactive = 0;
+int dump_tap_state = 0;
 extern cfi_array_t *cfi_array;
 
 #define	JTAGDIR		".jtag"
@@ -312,6 +313,7 @@ main( int argc, char *const argv[] )
 			{"interactive", no_argument,  0, 'i'},
 			{"help",    no_argument,      0, 'h'},
 			{"quiet",   no_argument,      0, 'q'},
+			{"dump-tap-state", no_argument, 0, 10},
 			{0, 0, 0, 0}
 		};
 
@@ -347,6 +349,10 @@ main( int argc, char *const argv[] )
 		case 'q':
 			quiet = 1;
 			break;
+
+		case 10:
+			dump_tap_state = 1;
+			break;
 		}
 	}
 
@@ -365,6 +371,7 @@ main( int argc, char *const argv[] )
 		printf (_("  -n, --norc          disable reading ~/.jtag/rc on startup\n"));
 		printf (_("  -i, --interactive   enter interactive mode after reading files\n"));
 		printf (_("  -q, --quiet         Do not print help on startup\n"));
+		printf (_("      --dump-tap-state Dump tap state for debugging\n"));
 		printf ("\n");
 		printf (_("  [FILE]              file containing commands to execute\n"));
 		printf ("\n");

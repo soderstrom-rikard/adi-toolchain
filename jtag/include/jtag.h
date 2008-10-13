@@ -37,6 +37,7 @@
 extern bus_t *bus;
 extern int big_endian;
 extern int debug_mode;
+extern int dump_tap_state;
 
 const char *jtag_get_data_dir( void );
 

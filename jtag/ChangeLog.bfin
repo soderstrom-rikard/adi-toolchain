@@ -1,5 +1,20 @@
 2008-10-13  Jie Zhang  <jie.zhang@analog.com>
 
+	* include/jtag.h (dump_tap_state): Declare.
+	* src/tap/state.c (jtag.h): Include for dump_tap_state.
+	(tap_state_name): New.
+	(tap_state_dump): New.
+	(tap_state_dump_2): New.
+	(tap_state_init): Call tap_state_dump.
+	(tap_state_done): Likewise.
+	(tap_state_reset): Likewise.
+	(tap_state_set_trst): Likewise.
+	(tap_state_clock): Call tap_state_dump_2.
+	* src/jtag.c (dump_tap_state): Define.
+	(main): Add --dump-tap-state option.
+
+2008-10-13  Jie Zhang  <jie.zhang@analog.com>
+
 	* src/cmd/bfin.c (cmd_bfin_help): Add missing arguments.
 
 2008-10-08  Jie Zhang  <jie.zhang@analog.com>
