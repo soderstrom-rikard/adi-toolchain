@@ -270,6 +270,8 @@ struct bfin_cpu bfin_cpus[] =
   {"bf561", BFIN_CPU_BF561, 0x0002,
    WA_SPECULATIVE_LOADS | WA_SPECULATIVE_SYNCS | WA_RETS},
 
+  {"bf579", BFIN_CPU_BF579, 0x0000, 0},
+
   {NULL, 0, 0, 0}
 };
 

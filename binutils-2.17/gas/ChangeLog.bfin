@@ -1,3 +1,9 @@
+2008-10-14  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/tc-bfin.c (md_parse_option): Allow optional
+	"-sirevision" suffix.
+	* doc/c-bfin.texi (-mcpu): Document this change.
+
 2008-10-09  Jie Zhang  <jie.zhang@analog.com>
 	
 	* config/bfin-parse.y (asm_1): Fix CMUL and CSQU.

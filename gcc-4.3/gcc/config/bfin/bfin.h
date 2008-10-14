@@ -132,6 +132,9 @@ extern int target_flags;
 	case BFIN_CPU_BF561:			\
 	  builtin_define ("__ADSPBF561__");	\
 	  break;				\
+	case BFIN_CPU_BF579:			\
+	  builtin_define ("__ADSPBF579__");	\
+	  break;				\
 	}					\
 						\
       if (bfin_si_revision != -1)		\
@@ -200,7 +203,7 @@ extern int target_flags;
 #undef  ASM_SPEC
 #define ASM_SPEC "\
 %{G*} %{v} %{n} %{T} %{Ym,*} %{Yd,*} %{Wa,*:%*} \
-    %{mno-fdpic:-mnopic} %{mfdpic}"
+    %{mno-fdpic:-mnopic} %{mfdpic} %{mcpu=*}"
 
 #define LINK_SPEC "\
 %{h*} %{v:-V} \

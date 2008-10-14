@@ -49,7 +49,8 @@ typedef enum bfin_cpu_type
   BFIN_CPU_BF547,
   BFIN_CPU_BF548,
   BFIN_CPU_BF549,
-  BFIN_CPU_BF561
+  BFIN_CPU_BF561,
+  BFIN_CPU_BF579
 } bfin_cpu_t;
 
 /* Value of -mcpu= */

@@ -54,7 +54,8 @@
    Defined in svr4.h.  */
 #undef  ASM_SPEC
 #define ASM_SPEC "\
-%{G*} %{v} %{n} %{T} %{Ym,*} %{Yd,*} %{Wa,*:%*} %{mfdpic}"
+%{G*} %{v} %{n} %{T} %{Ym,*} %{Yd,*} %{Wa,*:%*} \
+    %{mfdpic} %{mcpu=*}"
 
 #define LINK_SPEC "\
 %{h*} %{v:-V} \
@@ -170,6 +171,9 @@ extern int target_flags;
 	  break;				\
 	case BFIN_CPU_BF561:			\
 	  builtin_define ("__ADSPBF561__");	\
+	  break;				\
+	case BFIN_CPU_BF579:			\
+	  builtin_define ("__ADSPBF579__");	\
 	  break;				\
 	}					\
 						\

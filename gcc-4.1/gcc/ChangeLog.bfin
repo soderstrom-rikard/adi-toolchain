@@ -1,3 +1,15 @@
+2008-10-14  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin-protos.h (enum bfin_cpu_type): Add
+	BFIN_CPU_BF579.
+	* config/bfin/elf.h (LIB_SPEC): Use proper linker script
+	for bf579.
+	* config/bfin/bfin.c (bfin_cpus[]): Add bf579.
+	* config/bfin/bfin.h (ASM_SPEC): Pass down -mcpu to assembler.
+	(TARGET_CPU_CPP_BUILTINS): Define __ADSPBF579__ for bf579.
+	* doc/invoke.texi (Blackfin Options): Document that
+	-mcpu now accept bf579.
+
 2008-10-06  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.opt (micplb): New option.

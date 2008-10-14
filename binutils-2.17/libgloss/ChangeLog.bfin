@@ -1,3 +1,8 @@
+2008-10-14  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/bf579.ld: New.
+	* bfin/Makefile.in (BOARD_SCRIPTS): Add bf579.ld.
+
 2008-10-01  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* bfin/Makefile.in (BOARD_SCRIPTS): Add bf512.ld, bf514.ld,

@@ -377,10 +377,19 @@ md_parse_option (int c ATTRIBUTE_UNUSED, char *arg ATTRIBUTE_UNUSED)
     case OPTION_MCPU:
       {
 	int i;
+	char *p;
+
+	/* Silicon revision is not useful here.  */
+	p = strchr (arg, '-');
+	if (p != NULL)
+	  *p = '\0';
 
 	for (i = 0; bfin_cpus[i].name; i++)
 	  if (strcmp (bfin_cpus[i].name, arg) == 0)
 	    break;
+
+	if (p != NULL)
+	  *p = '-';
 
 	if (!bfin_cpus[i].name)
 	  as_fatal (_("unknown Blackfin processor: %s\n"), arg);

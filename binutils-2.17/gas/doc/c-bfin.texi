@@ -27,8 +27,10 @@
 @table @code
 
 @cindex @code{-mcpu=} command line option, Blackfin
-@item -mcpu=@var{processor}
-This option specifies the target processor.  The assembler will issue an
+@item -mcpu=@var{processor}@r{[}-@var{sirevision}@r{]}
+This option specifies the target processor.  The optional @var{sirevision}
+is not used in assembler.  It's here such that GCC can easily pass down its
+@code{-mcpu=} option.  The assembler will issue an
 error message if an attempt is made to assemble an instruction which
 will not execute on the target processor.  The following processor names are
 recognized: 
