@@ -81,7 +81,8 @@ extern int target_flags;
       builtin_define_std ("bfin");		\
       builtin_define_std ("BFIN");		\
       builtin_define ("__ADSPBLACKFIN__");	\
-      builtin_define ("__ADSPLPBLACKFIN__");	\
+      if (bfin_cpu_type != BFIN_CPU_BF579)	\
+	builtin_define ("__ADSPLPBLACKFIN__");	\
 						\
       switch (bfin_cpu_type)			\
 	{					\

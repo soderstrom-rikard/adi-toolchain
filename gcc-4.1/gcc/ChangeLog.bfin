@@ -1,3 +1,9 @@
+2008-10-15  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/elf.h (STARTFILE_SPEC): Add start files for BF579.
+	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): Don't define
+	__ADSPLPBLACKFIN__ for BF579.
+
 2008-10-14  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin-protos.h (enum bfin_cpu_type): Add

@@ -72,6 +72,8 @@
 #include <cdefBF548.h>
 #elif defined (__ADSPBF549__)
 #include <cdefBF549.h>
+#elif defined (__ADSPBF579__)
+#include <cdefBF579.h>
 #else
 #error Processor Type Not Supported
 #endif
@@ -131,6 +133,8 @@
 #include <defBF548.h>
 #elif defined (__ADSPBF549__)
 #include <defBF549.h>
+#elif defined (__ADSPBF579__)
+#include <defBF579.h>
 
 #else
 #error Processor Type Not Supported
