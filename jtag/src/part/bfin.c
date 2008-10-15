@@ -92,14 +92,11 @@ bfin_scan_select (chain_t *chain, const char *scan)
       && strcmp (part->active_instruction->name, scan) == 0)
     return 0;
 
-  /* Put a NOP in EMUIR if we are going to use other scan chain. This
-     is only needed for BF579 to work around a hardware bug.  */
+  /* Put a NOP in EMUIR if we are going to use other scan chain.  */
 
-  if ((strcmp (part->active_instruction->name, "EMUIR_SCAN") == 0
-       || strcmp (part->active_instruction->name, "EMUIR64_SCAN") == 0)
-      && ((leave_nop_in_emuir == LEAVE_NOP_DEFAULT
-	   && strcmp (part->part, "BF579") == 0)
-	  || leave_nop_in_emuir == LEAVE_NOP_YES))
+  if (leave_nop_in_emuir == LEAVE_NOP_YES
+      && (strcmp (part->active_instruction->name, "EMUIR_SCAN") == 0
+	  || strcmp (part->active_instruction->name, "EMUIR64_SCAN") == 0))
     bfin_emuir_set_1 (chain, INSN_NOP, EXITMODE_UPDATE);
 
   part_set_instruction (part, scan);
