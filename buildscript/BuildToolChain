@@ -2571,7 +2571,7 @@ if [ $KERNEL_SOURCE ] ; then
 
         # the actual config file here doesnt matter since we
         # just want to build the mkimage and gen_eth_addr tools
-        touch include/config.mk
+        touch include/config.mk include/config.h
         echo_date "Make U-Boot"
         RUN="$MAKE tools BIN_FILES='mkimage gen_eth_addr' "
         (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
