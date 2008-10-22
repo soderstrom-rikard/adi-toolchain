@@ -1,3 +1,7 @@
+2008-10-22  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_cpus): Fix up revisions 0.2 of 538 and 561.
+
 2008-10-20  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin-protos.h (WA_05000257, WA_05000283, WA_05000315,
