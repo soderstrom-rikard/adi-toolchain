@@ -943,6 +943,8 @@ export PATH=$NEW_PATH:/$DIR_ELF_OUTPUT/bin:/$DIR_uC_OUTPUT/bin:/$DIR_LINUX_OUTPU
 #################################################################
 
 # Some helpful functions
+requote() { printf "'%s' " "$@"; }
+
 print_stop_time ()
 {
     END=$(date +%s)
@@ -953,7 +955,7 @@ print_stop_time ()
     if [ "$hours" -eq "0" ] ; then
         printf " $min:$sec "
     else
-        printf " $hours:$min:sec "
+        printf " $hours:$min:$sec "
     fi
 
 }
@@ -992,7 +994,7 @@ log_it()
 run_cmd()
 {
     log_it "$@"
-    eval \("$@"\) ${LOGFILE} || die_with_log
+    eval \($(requote "$@")\) ${LOGFILE} || die_with_log
 }
 
 change_dir()
@@ -2563,49 +2565,31 @@ if [ $KERNEL_SOURCE ] ; then
     if [ $DIR_UBOOT ] ; then
         echo_date "Building U-Boot to get Tools"
         change_dir $DIR_UBOOT
+        DIR_UBOOT_BUILD="$DIR_BUILD/u-boot_build"
 
         echo_date "Cleaning U-Boot"
-        RUN="$MAKE distclean "
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo $RUN $LOGFILE ; ) | sh
+        run_cmd rm -rf "$DIR_UBOOT_BUILD"
 
         # the actual config file here doesnt matter since we
         # just want to build the mkimage and gen_eth_addr tools
-        touch include/config.mk include/config.h
+        run_cmd mkdir -p "$DIR_UBOOT_BUILD/include"
+        run_cmd touch "$DIR_UBOOT_BUILD"/include/config.mk "$DIR_UBOOT_BUILD"/include/config.h
         echo_date "Make U-Boot"
-        RUN="$MAKE tools BIN_FILES='mkimage gen_eth_addr' "
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo $RUN $LOGFILE ; ) | sh
+        run_cmd $MAKE O="$DIR_UBOOT_BUILD" BIN_FILES='mkimage gen_eth_addr' tools
 
+        echo_date "Copying U-Boot Tools"
         for RUN in mkimage gen_eth_addr
         do
-            if [ ! -f $DIR_UBOOT/tools/$RUN ] ; then
+            if [ ! -f $DIR_UBOOT_BUILD/tools/$RUN ] ; then
                 echo "U-Boot did not build properly : Missing $RUN"
                 die_with_log
             fi
-        done
-
-        echo_date "Copying U-Boot Tools"
-        RUN="cp $DIR_UBOOT/tools/mkimage $DIR_uC_OUTPUT/bin/bfin-uclinux-mkimage; cp $DIR_UBOOT/tools/gen_eth_addr $DIR_uC_OUTPUT/bin/bfin-uclinux-gen_eth_addr"
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo "($RUN) $LOGFILE" ) | sh
-        RUN="cp $DIR_UBOOT/tools/mkimage $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-mkimage; cp $DIR_UBOOT/tools/gen_eth_addr $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-gen_eth_addr"
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo "($RUN) $LOGFILE" ) | sh
-
-        for RUN in bfin-uclinux-mkimage bfin-uclinux-gen_eth_addr
-        do
-            if [ ! -f $DIR_uC_OUTPUT/bin/$RUN ] ; then
-                echo "U-Boot tools did not install properly : Missing $RUN"
-                die_with_log
-           fi
+            run_cmd cp "$DIR_UBOOT_BUILD/tools/$RUN" "$DIR_uC_OUTPUT/bin/bfin-uclinux-$RUN"
+            run_cmd cp "$DIR_UBOOT_BUILD/tools/$RUN" "$DIR_LINUX_OUTPUT/bin/bfin-uclinux-$RUN"
         done
 
         echo_date "Cleaning U-Boot"
-        RUN="$MAKE distclean "
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo $RUN $LOGFILE ; ) | sh
-
+        run_cmd rm -rf "$DIR_UBOOT_BUILD"
     fi
     ######################## Done ################################
 
