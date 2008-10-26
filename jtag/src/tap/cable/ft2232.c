@@ -375,7 +375,7 @@ ft2232_gnice_init( cable_t *cable )
   cx_cmd_push( cmd_root, params->low_byte_dir | BITMASK_TCK | BITMASK_TDI | BITMASK_TMS );
 
   /* Set Data Bits High Byte */
-  params->high_byte_value_trst_active   = BITMASK_GNICE_nLED;
+  params->high_byte_value_trst_active   = 0;
   params->high_byte_value_trst_inactive = BITMASK_GNICE_nTRST;
   params->high_byte_dir                 = BITMASK_GNICE_nTRST | BITMASK_GNICE_nLED;
   cx_cmd_push( cmd_root, SET_BITS_HIGH );
@@ -690,7 +690,7 @@ ft2232_gnice_done( cable_t *cable )
   /* Set Data Bits High Byte
      disable output drivers */
   cx_cmd_push( cmd_root, SET_BITS_HIGH );
-  cx_cmd_push( cmd_root, BITMASK_GNICE_nTRST);
+  cx_cmd_push( cmd_root, BITMASK_GNICE_nTRST | BITMASK_GNICE_nLED);
   cx_cmd_push( cmd_root, BITMASK_GNICE_nTRST | BITMASK_GNICE_nLED);
 
   /* Set Data Bits High Byte

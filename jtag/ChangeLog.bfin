@@ -1,3 +1,8 @@
+2008-10-26  Jie Zhang  <jie.zhang@analog.com>
+
+	* tap/cable/ft2232.c (ft2232_gnice_init): Default LED on.
+	(ft2232_gnice_done): Turn LED off when done.
+
 2008-10-15  Jie Zhang  <jie.zhang@analog.com>
 
 	* src/part/bfin.c (bfin_scan_select): No need to put a NOP
