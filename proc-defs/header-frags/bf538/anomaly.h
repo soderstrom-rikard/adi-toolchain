@@ -14,8 +14,8 @@
 #ifndef _MACH_ANOMALY_H_
 #define _MACH_ANOMALY_H_
 
-#if __SILICON_REVISION__ < 3
-# error will not work on BF538 silicon version 0.0, 0.1, or 0.2
+#if __SILICON_REVISION__ < 4
+# error will not work on BF538 silicon version 0.0, 0.1, 0.2, or 0.3
 #endif
 
 /* Multi-Issue Instruction with dsp32shiftimm in slot1 and P-reg Store in slot2 Not Supported */
@@ -110,8 +110,14 @@
 #define ANOMALY_05000443 (1)
 
 /* Anomalies that don't exist on this proc */
+#define ANOMALY_05000158 (0)
+#define ANOMALY_05000198 (0)
 #define ANOMALY_05000230 (0)
+#define ANOMALY_05000263 (0)
+#define ANOMALY_05000311 (0)
+#define ANOMALY_05000323 (0)
 #define ANOMALY_05000353 (1)
+#define ANOMALY_05000363 (0)
 #define ANOMALY_05000386 (1)
 
 #endif
