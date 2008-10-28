@@ -28,7 +28,7 @@
 /* Multi-Issue Instruction with dsp32shiftimm in slot1 and P-reg Store in slot2 Not Supported */
 #define ANOMALY_05000074 (1)
 /* DMA_RUN Bit Is Not Valid after a Peripheral Receive Channel DMA Stops */
-#define ANOMALY_05000119 (1)
+#define ANOMALY_05000119 (1)	/* note: brokenness is noted in documentation, not anomaly sheet */
 /* Rx.H Cannot Be Used to Access 16-bit System MMR Registers */
 #define ANOMALY_05000122 (1)
 /* Spurious Hardware Error from an Access in the Shadow of a Conditional Branch */
@@ -37,8 +37,6 @@
 #define ANOMALY_05000265 (1)
 /* False Hardware Errors Caused by Fetches at the Boundary of Reserved Memory */
 #define ANOMALY_05000310 (1)
-/* Errors when SSYNC, CSYNC, or Loads to LT, LB and LC Registers Are Interrupted */
-#define ANOMALY_05000312 (ANOMALY_BF527)
 /* PPI Is Level-Sensitive on First Transfer In Single Frame Sync Modes */
 #define ANOMALY_05000313 (__SILICON_REVISION__ < 2)
 /* Incorrect Access of OTP_STATUS During otp_write() Function */
@@ -168,6 +166,7 @@
 #define ANOMALY_05000285 (0)
 #define ANOMALY_05000307 (0)
 #define ANOMALY_05000311 (0)
+#define ANOMALY_05000312 (0)
 #define ANOMALY_05000323 (0)
 #define ANOMALY_05000363 (0)
 
