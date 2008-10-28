@@ -151,6 +151,8 @@
 #define ANOMALY_05000430 (ANOMALY_BF527 && __SILICON_REVISION__ > 1)
 /* bfrom_SysControl() Does Not Clear SIC_IWR1 Before Executing PLL Programming Sequence */
 #define ANOMALY_05000432 (ANOMALY_BF526)
+/* IFLUSH Instruction at End of Hardware Loop Causes Infinite Stall */
+#define ANOMALY_05000443 (1)
 
 /* Anomalies that don't exist on this proc */
 #define ANOMALY_05000125 (0)

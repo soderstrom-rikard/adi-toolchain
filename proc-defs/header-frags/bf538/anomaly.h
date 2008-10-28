@@ -106,6 +106,8 @@
 #define ANOMALY_05000403 (1)
 /* Speculative Fetches Can Cause Undesired External FIFO Operations */
 #define ANOMALY_05000416 (1)
+/* IFLUSH Instruction at End of Hardware Loop Causes Infinite Stall */
+#define ANOMALY_05000443 (1)
 
 /* Anomalies that don't exist on this proc */
 #define ANOMALY_05000230 (0)
