@@ -1637,6 +1637,8 @@ printf("%s(%d): symbol name=%s address=0x%x section=%s -> RELOC=0x%x\n",
   return flat_relocs;
 }
 
+
+
 static char * program;
 
 static void usage(void)
@@ -1759,10 +1761,10 @@ int main(int argc, char *argv[])
       use_resolved = 1;
       break;
     case 's':
-      if((optarg[1] == 'x') || (optarg[1] == 'X'))
-      	stack = strtol(optarg, (char **)NULL, 16);
-      else
-      	stack = strtol(optarg, (char **)NULL, 10);
+      if (sscanf(optarg, "%i", &stack) != 1) {
+        fprintf(stderr, "%s invalid stack size %s\n", argv[0], optarg);
+        usage();
+      }
       break;
     case 'R':
       rel_file = optarg;
@@ -1948,12 +1950,12 @@ int main(int argc, char *argv[])
   /* Fill in the binflt_flat header */
   memcpy(hdr.magic,"bFLT",4);
   hdr.rev         = htonl(FLAT_VERSION);
-  hdr.entry       = htonl(sizeof (struct flat_hdr) + bfd_get_start_address(abs_bfd));
-  hdr.data_start  = htonl(sizeof (struct flat_hdr) + text_len);
-  hdr.data_end    = htonl(sizeof (struct flat_hdr) + text_len + data_len);
-  hdr.bss_end     = htonl(sizeof (struct flat_hdr) + text_len + data_len + bss_len);
+  hdr.entry       = htonl(sizeof(hdr) + bfd_get_start_address(abs_bfd));
+  hdr.data_start  = htonl(sizeof(hdr) + text_len);
+  hdr.data_end    = htonl(sizeof(hdr) + text_len + data_len);
+  hdr.bss_end     = htonl(sizeof(hdr) + text_len + data_len + bss_len);
   hdr.stack_size  = htonl(stack); /* FIXME */
-  hdr.reloc_start = htonl(sizeof (struct flat_hdr) + real_address_bits(data_vma) + data_len);
+  hdr.reloc_start = htonl(sizeof(hdr) + real_address_bits(data_vma) + data_len);
   hdr.reloc_count = htonl(reloc_len);
   hdr.flags       = htonl(0
 	  | (load_to_ram || text_has_relocs ? FLAT_FLAG_RAM : 0)
@@ -1989,8 +1991,8 @@ int main(int argc, char *argv[])
   close(fd);
 
   if (fopen_stream_u(&gf, ofile, "a" BINARY_FILE_OPTS)) {
-  	fprintf(stderr, "Can't open file %s for writing\n", ofile);
-	exit(4);
+    fprintf(stderr, "Can't open file %s for writing\n", ofile);
+    exit(4);
   }
 
   if (docompress == 1)
@@ -1998,7 +2000,7 @@ int main(int argc, char *argv[])
 
   /* Fill in any hole at the beginning of the text segment.  */
   if (verbose)
-	  printf("ZERO before text len=0x%x\n", text_offs);
+    printf("ZERO before text len=0x%x\n", text_offs);
   write_zeroes(text_offs, &gf);
 
   /* Write the text segment.  */
