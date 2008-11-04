@@ -145,7 +145,8 @@
    (UNSPEC_VOLATILE_CSYNC 1)
    (UNSPEC_VOLATILE_SSYNC 2)
    (UNSPEC_VOLATILE_LOAD_FUNCDESC 3)
-   (UNSPEC_VOLATILE_DUMMY 4)])
+   (UNSPEC_VOLATILE_DUMMY 4)
+   (UNSPEC_VOLATILE_PLACEHOLDER 5)])
 
 (define_constants
   [(MACFLAG_NONE 0)
@@ -162,7 +163,7 @@
    (MACFLAG_IH 11)])
 
 (define_attr "type"
-  "move,movcc,mvi,mcld,mcst,dsp32,mult,alu0,shft,brcc,br,call,misc,sync,compare,dummy"
+  "move,movcc,mvi,mcld,mcst,dsp32,mult,alu0,shft,brcc,br,call,misc,sync,compare,dummy,ph3"
   (const_string "misc"))
 
 (define_attr "addrtype" "32bit,preg,ireg"
@@ -198,6 +199,10 @@
 (define_cpu_unit "store" "bfin")
 (define_cpu_unit "pregs" "bfin")
 
+;; A dummy unit used to delay scheduling of loads after a conditional
+;; branch.
+(define_cpu_unit "load" "bfin")
+
 (define_reservation "core" "slot0+slot1+slot2")
 
 (define_insn_reservation "alu" 1
@@ -215,17 +220,17 @@
 (define_insn_reservation "load32" 1
   (and (not (eq_attr "seq_insns" "multi"))
        (and (eq_attr "type" "mcld") (eq_attr "addrtype" "32bit")))
-  "core")
+  "core+load")
 
 (define_insn_reservation "loadp" 1
   (and (not (eq_attr "seq_insns" "multi"))
        (and (eq_attr "type" "mcld") (eq_attr "addrtype" "preg")))
-  "(slot1|slot2)+pregs")
+  "(slot1|slot2)+pregs+load")
 
 (define_insn_reservation "loadi" 1
   (and (not (eq_attr "seq_insns" "multi"))
        (and (eq_attr "type" "mcld") (eq_attr "addrtype" "ireg")))
-  "(slot1|slot2)")
+  "(slot1|slot2)+load")
 
 (define_insn_reservation "store32" 1
   (and (not (eq_attr "seq_insns" "multi"))
@@ -246,6 +251,10 @@
   (eq_attr "seq_insns" "multi")
   "core")
 
+(define_insn_reservation "ph3" 1
+  (eq_attr "type" "ph3")
+  "core+load*3")
+
 (absence_set "slot0" "slot1,slot2")
 (absence_set "slot1" "slot2")
 
@@ -258,7 +267,6 @@
 ;; Operand and operator predicates
 
 (include "predicates.md")
-
 
 ;;; FRIO branches have been optimized for code density
 ;;; this comes at a slight cost of complexity when
@@ -2865,6 +2873,9 @@
   gcc_unreachable ();
 })
 
+;; When used at a location where CC contains 1, causes a speculative load
+;; that is later cancelled.  This is used for certain workarounds in
+;; interrupt handler prologues.
 (define_insn "dummy_load"
   [(unspec_volatile [(match_operand 0 "register_operand" "a")
 		     (match_operand 1 "register_operand" "C")]
@@ -2874,6 +2885,16 @@
  [(set_attr "type" "misc")
   (set_attr "length" "4")
   (set_attr "seq_insns" "multi")])
+
+;; A placeholder insn inserted before the final scheduling pass.  It is used
+;; to improve scheduling of loads when workarounds for speculative loads are
+;; needed, by not placing them in the first few cycles after a conditional
+;; branch.
+(define_insn "ph3"
+  [(unspec_volatile [(const_int 3)] UNSPEC_VOLATILE_PLACEHOLDER)]
+  ""
+  ""
+  [(set_attr "type" "ph3")])
 
 (define_insn "csync"
   [(unspec_volatile [(const_int 0)] UNSPEC_VOLATILE_CSYNC)]

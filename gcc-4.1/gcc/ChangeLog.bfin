@@ -1,3 +1,16 @@
+2008-11-05  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (UNSPEC_VOLATILE_PLACEHOLDER): New constant.
+	(attr "type"): New entry "ph3".
+	(cpu_unit "load"): New.
+	(insn_reservations "load32", "loadp", "loadi"): Add reservation of
+	"load".
+	(insn_reservation "ph3"): New.
+	(ph3): New insn.
+	* config/bfin/bfin.c (add_sched_insns_for_speculation): New function.
+	(bfin_reorg): Call it if scheduling insns.
+	(workaround_speculation): Delete the new "ph3" insns.
+
 2008-10-22  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_cpus): Fix up revisions 0.2 of 538 and 561.
