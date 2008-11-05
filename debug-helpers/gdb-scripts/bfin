@@ -340,3 +340,66 @@ define show_cec
 		set $$EVTi = $$EVTi + 1
 	end
 end
+
+define _show_cplbs
+	set $$addr = $arg0
+	set $$data = $arg1
+	set $$i = 0
+	while ($$i < 16)
+		set $$data_val = *(unsigned long *)($$data + $$i * 4)
+		printf " 0x%08x 0x%08x ( ", *(unsigned long *)($$addr + $$i * 4), $$data_val
+		if (($$data_val & (0x3 << 16)) == (0x0 << 16))
+			printf "1K "
+		end
+		if (($$data_val & (0x3 << 16)) == (0x1 << 16))
+			printf "4K "
+		end
+		if (($$data_val & (0x3 << 16)) == (0x2 << 16))
+			printf "1M "
+		end
+		if (($$data_val & (0x3 << 16)) == (0x3 << 16))
+			printf "4M "
+		end
+		if ($$data_val & (0x1 << 14))
+			printf "wt "
+		else
+			printf "wb "
+		end
+		if ($$data_val & (0x1 << 7))
+			printf "dirty "
+		end
+		if ($$data_val & (0x1 << 4))
+			printf "supv-wr "
+		end
+		if ($$data_val & (0x1 << 3))
+			printf "user-wr "
+		end
+		if ($$data_val & (0x1 << 2))
+			printf "user-rd "
+		end
+		if ($$data_val & (0x1 << 1))
+			printf "locked "
+		end
+		if ($$data_val & (0x1 << 0))
+			printf "valid "
+		else
+			printf "invalid "
+		end
+		printf ")\n"
+		set $$i = $$i + 1
+	end
+end
+define show_icplbs
+	set $$IMEM_CONTROL = 0xFFE01004
+	printf "ICPLBS (0x%08x)\n", *(unsigned long *)$$IMEM_CONTROL
+	_show_cplbs 0xFFE01100 0xFFE01200
+end
+define show_dcplbs
+	set $$DMEM_CONTROL = 0xFFE00004
+	printf "DCPLBS (0x%08x)\n", *(unsigned long *)$$DMEM_CONTROL
+	_show_cplbs 0xFFE00100 0xFFE00200
+end
+define show_cplbs
+	show_icplbs
+	show_dcplbs
+end
