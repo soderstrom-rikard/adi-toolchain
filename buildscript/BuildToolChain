@@ -1091,9 +1091,9 @@ build_gcc ()
         [ -n "$SCM_REV" ] && SCM_REV="svn-${SCM_REV}"
     elif [ -d "$DIR_GCC_SOURCE/../.git" ] ; then
         eval $(cd "$DIR_GCC_SOURCE"; \
-            SCM_URL=$(git branch | awk '{print $NF}')
+            SCM_URL=$(git branch | awk '$1 == "*" { sub(/^[*][[:space:]]*/, ""); gsub(/[()]/, ""); gsub(/[[:space:]]/, "-"); print; }')
             echo SCM_URL=${SCM_URL}
-            echo SCM_REV=$(git rev-parse --verify ${SCM_URL} | cut -b1-6)
+            echo SCM_REV=$(git rev-parse --short --verify HEAD)
         )
         [ -n "$SCM_REV" ] && SCM_REV="git-${SCM_REV}"
     fi
