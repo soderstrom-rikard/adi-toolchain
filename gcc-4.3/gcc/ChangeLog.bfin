@@ -1,3 +1,9 @@
+2008-11-10  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_gen_bundles): Remove dummy insns created
+	by add_sched_insns_for_speculation.
+	(workaround_speculation): Don't delete them here.
+
 2008-11-05  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (UNSPEC_VOLATILE_PLACEHOLDER): New constant.

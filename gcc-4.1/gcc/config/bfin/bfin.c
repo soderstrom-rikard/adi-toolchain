@@ -4674,15 +4674,27 @@ bfin_gen_bundles (void)
       for (insn = BB_HEAD (bb);; insn = next)
 	{
 	  int at_end;
+	  rtx delete_this = NULL_RTX;
+
 	  if (INSN_P (insn))
 	    {
-	      if (get_attr_type (insn) == TYPE_DSP32)
-		slot[0] = insn;
-	      else if (slot[1] == NULL_RTX)
-		slot[1] = insn;
+	      enum attr_type type = get_attr_type (insn);
+
+	      if (type == TYPE_PH3)
+		{
+		  gcc_assert (n_filled == 0);
+		  delete_this = insn;
+		}
 	      else
-		slot[2] = insn;
-	      n_filled++;
+		{
+		  if (type == TYPE_DSP32)
+		    slot[0] = insn;
+		  else if (slot[1] == NULL_RTX)
+		    slot[1] = insn;
+		  else
+		    slot[2] = insn;
+		  n_filled++;
+		}
 	    }
 
 	  next = NEXT_INSN (insn);
@@ -4697,7 +4709,7 @@ bfin_gen_bundles (void)
 
 	  /* BB_END can change due to emitting extra NOPs, so check here.  */
 	  at_end = insn == BB_END (bb);
-	  if (at_end || GET_MODE (next) == TImode)
+	  if (delete_this == NULL_RTX && (at_end || GET_MODE (next) == TImode))
 	    {
 	      if ((n_filled < 2
 		   || !gen_one_bundle (slot))
@@ -4715,6 +4727,8 @@ bfin_gen_bundles (void)
 	      n_filled = 0;
 	      slot[0] = slot[1] = slot[2] = NULL_RTX;
 	    }
+	  if (delete_this != NULL_RTX)
+	    delete_insn (delete_this);
 	  if (at_end)
 	    break;
 	}
@@ -4913,11 +4927,6 @@ workaround_speculation (void)
 	{
 	  enum attr_type type = type_for_anomaly (insn);
 
-	  if (type == TYPE_PH3)
-	    {
-	      delete_insn (insn);
-	      continue;
-	    }
 	  if (cycles_since_jump < INT_MAX)
 	    cycles_since_jump++;
 
@@ -5040,7 +5049,8 @@ workaround_speculation (void)
 /* Called just before the final scheduling pass.  If we need to insert NOPs
    later on to work around speculative loads, insert special placeholder
    insns that cause loads to be delayed for as many cycles as necessary
-   (and possible).  This reduces the number of NOPs we need to add.  */
+   (and possible).  This reduces the number of NOPs we need to add.
+   The dummy insns we generate are later removed by bfin_gen_bundles.  */
 static void
 add_sched_insns_for_speculation (void)
 {
