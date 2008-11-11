@@ -4004,12 +4004,26 @@ bfin_optimize_loop (loop_info loop)
 	/* This jump_insn is the exact loop_end of an inner loop
 	   and to be optimized away. So use the inner's last_insn.  */
 	last_insn = inner->last_insn;
-      else
+      else if (!any_condjump_p (last_insn))
 	{
 	  if (dump_file)
 	    fprintf (dump_file, ";; loop %d has bad last instruction\n",
 		     loop->loop_no);
 	  goto bad_loop;
+	}
+      else
+	{
+	  if (loop->length + 2 > MAX_LOOP_LENGTH)
+	    {
+	      if (dump_file)
+		fprintf (dump_file, ";; loop %d too long\n", loop->loop_no);
+	      goto bad_loop;
+	    }
+	  if (dump_file)
+	    fprintf (dump_file, ";; loop %d has jump as last insn; replace with nop\n",
+		     loop->loop_no);
+
+	  last_insn = emit_insn_after (gen_forced_nop (), last_insn);
 	}
     }
   else if (CALL_P (last_insn)
@@ -4160,7 +4174,7 @@ bfin_optimize_loop (loop_info loop)
 	    redirect_edge_succ (e, new_bb);
 	}
     }
-  
+
   delete_insn (loop->loop_end);
   /* Insert the loop end label before the last instruction of the loop.  */
   emit_label_before (loop->end_label, loop->last_insn);

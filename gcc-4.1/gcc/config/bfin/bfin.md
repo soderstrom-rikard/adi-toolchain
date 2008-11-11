@@ -138,7 +138,8 @@
    (UNSPEC_LSETUP_END 10)
    ;; Distinguish a 32-bit version of an insn from a 16-bit version.
    (UNSPEC_32BIT 11)
-   (UNSPEC_ONES 12)])
+   (UNSPEC_NOP 12)
+   (UNSPEC_ONES 13)])
 
 (define_constants
   [(UNSPEC_VOLATILE_EH_RETURN 0)
@@ -2709,6 +2710,12 @@
 
 (define_insn "nop"
   [(const_int 0)]
+  ""
+  "nop;")
+
+;; A nop which stays there when emitted.
+(define_insn "forced_nop"
+  [(unspec [(const_int 0)] UNSPEC_NOP)]
   ""
   "nop;")
 

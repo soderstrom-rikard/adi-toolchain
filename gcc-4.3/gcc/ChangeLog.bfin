@@ -1,3 +1,8 @@
+2008-11-11  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_optimize_loop): Don't fail if the loop ends
+	with a jump, emit an extra nop instead.
+
 2008-11-10  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_gen_bundles): Remove dummy insns created
