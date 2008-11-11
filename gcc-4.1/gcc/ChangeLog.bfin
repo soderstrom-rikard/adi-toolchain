@@ -1,5 +1,23 @@
 2008-11-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
+	* config/bfin/bfin.md (attr "addrtype"): New member "spreg".
+	Use it if mem_spfp_address_operand is true for the address.
+	(UNSPEC_VOLATILE_STALL): Renamed from UNSPEC_VOLATILE_PLACEHOLDER.
+	(attr "type"): Rename "ph3" to "stall".
+	(insn_reservation "loadsp"): New.
+	(insn_reservation "load_stall1"): New.
+	(insn_reservation "load_stall3"): Renamed from "ph3", use four cycles
+	of "load" instead of three.
+	(stall): Insn renamed from "ph3"; use an operand to determine the
+	number of stall cycles.
+	* config/bfin/bfin.c (add_sched_insns_for_speculation): Also mirror
+	the second pass of workaround_speculation, creating 1-cycle stall
+	insns.
+	* config/bfin/predicates.md (const3_operand): New.
+	(mem_p_address_operand): Exclude stack and frame pointer based
+	addresses.
+	(mem_spfp_address_operand): New; match them here.
+
 	* config/bfin/bfin.c (bfin_optimize_loop): Don't fail if the loop ends
 	with a jump, emit an extra nop instead.
 	* config/bfin/bfin.md (UNSPEC_NOP): New constant.

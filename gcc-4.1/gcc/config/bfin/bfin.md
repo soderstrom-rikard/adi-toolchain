@@ -147,7 +147,7 @@
    (UNSPEC_VOLATILE_SSYNC 2)
    (UNSPEC_VOLATILE_LOAD_FUNCDESC 3)
    (UNSPEC_VOLATILE_DUMMY 4)
-   (UNSPEC_VOLATILE_PLACEHOLDER 5)])
+   (UNSPEC_VOLATILE_STALL 5)])
 
 (define_constants
   [(MACFLAG_NONE 0)
@@ -164,14 +164,18 @@
    (MACFLAG_IH 11)])
 
 (define_attr "type"
-  "move,movcc,mvi,mcld,mcst,dsp32,mult,alu0,shft,brcc,br,call,misc,sync,compare,dummy,ph3"
+  "move,movcc,mvi,mcld,mcst,dsp32,mult,alu0,shft,brcc,br,call,misc,sync,compare,dummy,stall"
   (const_string "misc"))
 
-(define_attr "addrtype" "32bit,preg,ireg"
+(define_attr "addrtype" "32bit,preg,spreg,ireg"
   (cond [(and (eq_attr "type" "mcld")
 	      (and (match_operand 0 "d_register_operand" "")
 		   (match_operand 1 "mem_p_address_operand" "")))
 	   (const_string "preg")
+	 (and (eq_attr "type" "mcld")
+	      (and (match_operand 0 "d_register_operand" "")
+		   (match_operand 1 "mem_spfp_address_operand" "")))
+	   (const_string "spreg")
 	 (and (eq_attr "type" "mcld")
 	      (and (match_operand 0 "d_register_operand" "")
 		   (match_operand 1 "mem_i_address_operand" "")))
@@ -180,6 +184,10 @@
 	      (and (match_operand 1 "d_register_operand" "")
 		   (match_operand 0 "mem_p_address_operand" "")))
 	   (const_string "preg")
+	 (and (eq_attr "type" "mcst")
+	      (and (match_operand 1 "d_register_operand" "")
+		   (match_operand 0 "mem_spfp_address_operand" "")))
+	   (const_string "spreg")
 	 (and (eq_attr "type" "mcst")
 	      (and (match_operand 1 "d_register_operand" "")
 		   (match_operand 0 "mem_i_address_operand" "")))
@@ -228,6 +236,11 @@
        (and (eq_attr "type" "mcld") (eq_attr "addrtype" "preg")))
   "(slot1|slot2)+pregs+load")
 
+(define_insn_reservation "loadsp" 1
+  (and (not (eq_attr "seq_insns" "multi"))
+       (and (eq_attr "type" "mcld") (eq_attr "addrtype" "spreg")))
+  "(slot1|slot2)+pregs")
+
 (define_insn_reservation "loadi" 1
   (and (not (eq_attr "seq_insns" "multi"))
        (and (eq_attr "type" "mcld") (eq_attr "addrtype" "ireg")))
@@ -240,7 +253,8 @@
 
 (define_insn_reservation "storep" 1
   (and (not (eq_attr "seq_insns" "multi"))
-       (and (eq_attr "type" "mcst") (eq_attr "addrtype" "preg")))
+       (and (eq_attr "type" "mcst")
+	    (ior (eq_attr "addrtype" "preg") (eq_attr "addrtype" "spreg"))))
   "(slot1|slot2)+pregs+store")
 
 (define_insn_reservation "storei" 1
@@ -252,9 +266,15 @@
   (eq_attr "seq_insns" "multi")
   "core")
 
-(define_insn_reservation "ph3" 1
-  (eq_attr "type" "ph3")
-  "core+load*3")
+(define_insn_reservation "load_stall1" 1
+  (and (eq_attr "type" "stall")
+       (match_operand 0 "const1_operand" ""))
+  "core+load*2")
+
+(define_insn_reservation "load_stall3" 1
+  (and (eq_attr "type" "stall")
+       (match_operand 0 "const3_operand" ""))
+  "core+load*4")
 
 (absence_set "slot0" "slot1,slot2")
 (absence_set "slot1" "slot2")
@@ -2897,11 +2917,12 @@
 ;; to improve scheduling of loads when workarounds for speculative loads are
 ;; needed, by not placing them in the first few cycles after a conditional
 ;; branch.
-(define_insn "ph3"
-  [(unspec_volatile [(const_int 3)] UNSPEC_VOLATILE_PLACEHOLDER)]
+(define_insn "stall"
+  [(unspec_volatile [(match_operand 0 "const_int_operand" "P1P3")]
+		    UNSPEC_VOLATILE_STALL)]
   ""
   ""
-  [(set_attr "type" "ph3")])
+  [(set_attr "type" "stall")])
 
 (define_insn "csync"
   [(unspec_volatile [(const_int 0)] UNSPEC_VOLATILE_CSYNC)]

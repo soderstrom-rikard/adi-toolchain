@@ -4710,7 +4710,7 @@ bfin_gen_bundles (void)
 	    {
 	      enum attr_type type = get_attr_type (insn);
 
-	      if (type == TYPE_PH3)
+	      if (type == TYPE_STALL)
 		{
 		  gcc_assert (n_filled == 0);
 		  delete_this = insn;
@@ -5206,9 +5206,26 @@ add_sched_insns_for_speculation (void)
 	      && !cbranch_predicted_taken_p (insn))
 	    {
 	      rtx n = next_real_insn (insn);
-	      /*	    if (cbranch_predicted_taken_p (insn)) */
-	      emit_insn_before (gen_ph3 (), n);
+	      emit_insn_before (gen_stall (GEN_INT (3)), n);
 	    }
+	}
+    }
+
+  /* Second pass: for predicted-true branches, see if anything at the
+     branch destination needs extra nops.  */
+  for (insn = get_insns (); insn; insn = NEXT_INSN (insn))
+    {
+      if (JUMP_P (insn)
+	  && any_condjump_p (insn)
+	  && (cbranch_predicted_taken_p (insn)))
+	{
+	  rtx target = JUMP_LABEL (insn);
+	  rtx next = next_real_insn (target);
+
+	  if (GET_CODE (PATTERN (next)) == UNSPEC_VOLATILE
+	      && get_attr_type (next) == TYPE_STALL)
+	    continue;
+	  emit_insn_before (gen_stall (GEN_INT (1)), next);	  
 	}
     }
 }
