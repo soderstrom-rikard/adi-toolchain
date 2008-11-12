@@ -1,6 +1,0 @@
-2006-09-05  Jie Zhang  <jie.zhang@analog.com>
-
-	* unlink-if-ordinary.c: New file.
-	* Makefile.in (CFILES): Add unlink-if-ordinary.c.
-	(REQUIRED_OFILES): Add unlink-if-ordinary.o.
-	(unlink-if-ordinary.o): New target.
