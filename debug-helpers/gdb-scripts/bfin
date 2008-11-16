@@ -403,3 +403,33 @@ define show_cplbs
 	show_icplbs
 	show_dcplbs
 end
+
+define safe_regs
+	set $r0 = $r1 = $r2 = $r3 = $r4 = $r5 = $r6 = $r7 = 0xffb00000
+	set $sp = $fp = $usp = $r0 + 0x100
+	set $p0 = $p1 = $p2 = $p3 = $p4 = $p5 = 0xffa00000
+	set $pc = $rets = $reti = $retx = $retn = $p0
+	set $lt0 = $lt1 = $lb0 = $lb1 = 1
+	set $lc0 = $lc1 = 0
+end
+
+define _show_dma
+	set $$DMA_BASE = $arg0
+	set $$NEXT_DESC_PTR = *(unsigned long *)  ($$DMA_BASE + 0x00)
+	set $$START_ADDR    = *(unsigned long *)  ($$DMA_BASE + 0x04)
+	set $$CONFIG        = *(unsigned short *) ($$DMA_BASE + 0x08)
+	set $$X_COUNT       = *(unsigned short *) ($$DMA_BASE + 0x10)
+	set $$X_MODIFY      = *(unsigned short *) ($$DMA_BASE + 0x14)
+	set $$Y_COUNT       = *(unsigned short *) ($$DMA_BASE + 0x18)
+	set $$Y_MODIFY      = *(unsigned short *) ($$DMA_BASE + 0x1C)
+	set $$CURR_DESC_PTR = *(unsigned long *)  ($$DMA_BASE + 0x20)
+	set $$CURR_ADDR     = *(unsigned long *)  ($$DMA_BASE + 0x24)
+	set $$IRQ_STATUS    = *(unsigned short *) ($$DMA_BASE + 0x28)
+	set $$CURR_X_COUNT  = *(unsigned short *) ($$DMA_BASE + 0x30)
+	set $$CURR_Y_COUNT  = *(unsigned short *) ($$DMA_BASE + 0x38)
+	printf "desc: curr: 0x%08x  next: 0x%08x\n", $$CURR_DESC_PTR, $$NEXT_DESC_PTR
+	printf "addr: curr: 0x%08x start: 0x%08x\n", $$CURR_ADDR, $$START_ADDR
+	printf "X: curr: 0x%04x count: 0x%04x mod: 0x%04x\n", $$CURR_X_COUNT, $$X_COUNT, $$X_MODIFY
+	printf "Y: curr: 0x%04x count: 0x%04x mod: 0x%04x\n", $$CURR_Y_COUNT, $$Y_COUNT, $$Y_MODIFY
+	printf "config: 0x%04x  irq status: 0x%04x\n", $$CONFIG, $$IRQ_STATUS
+end
