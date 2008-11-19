@@ -48,6 +48,15 @@ int last_insn_size;
 extern struct obstack mempool;
 FILE *errorf;
 
+const int *astat_bits;
+
+/* Local variables.  */
+
+static const int bf532_astat_bits[] =
+  {0, 0x01,   -1, 0x10, 0x12, 0x06, 0x0c, 0x0d, 0x11, 0x13, 0x18, 0x19};
+static const int bf579_astat_bits[] =
+  {0, 0x01, 0x02, 0x03, 0x04, 0x06,   -1,   -1,   -1,   -1,   -1,   -1};
+
 /* Flags to set in the elf header */
 #define DEFAULT_FLAGS 0
 
@@ -59,163 +68,6 @@ FILE *errorf;
 
 static flagword bfin_flags = DEFAULT_FLAGS | DEFAULT_FDPIC;
 static const char *bfin_pic_flag = DEFAULT_FDPIC ? "-mfdpic" : (const char *)0;
-
-/* Registers list.  */
-struct bfin_reg_entry
-{
-  const char *name;
-  int number;
-};
-
-static const struct bfin_reg_entry bfin_reg_info[] = {
-  {"R0.L", REG_RL0},
-  {"R1.L", REG_RL1},
-  {"R2.L", REG_RL2},
-  {"R3.L", REG_RL3},
-  {"R4.L", REG_RL4},
-  {"R5.L", REG_RL5},
-  {"R6.L", REG_RL6},
-  {"R7.L", REG_RL7},
-  {"R0.H", REG_RH0},
-  {"R1.H", REG_RH1},
-  {"R2.H", REG_RH2},
-  {"R3.H", REG_RH3},
-  {"R4.H", REG_RH4},
-  {"R5.H", REG_RH5},
-  {"R6.H", REG_RH6},
-  {"R7.H", REG_RH7},
-  {"R0", REG_R0},
-  {"R1", REG_R1},
-  {"R2", REG_R2},
-  {"R3", REG_R3},
-  {"R4", REG_R4},
-  {"R5", REG_R5},
-  {"R6", REG_R6},
-  {"R7", REG_R7},
-  {"P0", REG_P0},
-  {"P0.H", REG_P0},
-  {"P0.L", REG_P0},
-  {"P1", REG_P1},
-  {"P1.H", REG_P1},
-  {"P1.L", REG_P1},
-  {"P2", REG_P2},
-  {"P2.H", REG_P2},
-  {"P2.L", REG_P2},
-  {"P3", REG_P3},
-  {"P3.H", REG_P3},
-  {"P3.L", REG_P3},
-  {"P4", REG_P4},
-  {"P4.H", REG_P4},
-  {"P4.L", REG_P4},
-  {"P5", REG_P5},
-  {"P5.H", REG_P5},
-  {"P5.L", REG_P5},
-  {"SP", REG_SP},
-  {"SP.L", REG_SP},
-  {"SP.H", REG_SP},
-  {"FP", REG_FP},
-  {"FP.L", REG_FP},
-  {"FP.H", REG_FP},
-  {"A0x", REG_A0x},
-  {"A1x", REG_A1x},
-  {"A0w", REG_A0w},
-  {"A1w", REG_A1w},
-  {"A0.x", REG_A0x},
-  {"A1.x", REG_A1x},
-  {"A0.w", REG_A0w},
-  {"A1.w", REG_A1w},
-  {"A0", REG_A0},
-  {"A0.L", REG_A0},
-  {"A0.H", REG_A0},
-  {"A1", REG_A1},
-  {"A1.L", REG_A1},
-  {"A1.H", REG_A1},
-  {"I0", REG_I0},
-  {"I0.L", REG_I0},
-  {"I0.H", REG_I0},
-  {"I1", REG_I1},
-  {"I1.L", REG_I1},
-  {"I1.H", REG_I1},
-  {"I2", REG_I2},
-  {"I2.L", REG_I2},
-  {"I2.H", REG_I2},
-  {"I3", REG_I3},
-  {"I3.L", REG_I3},
-  {"I3.H", REG_I3},
-  {"M0", REG_M0},
-  {"M0.H", REG_M0},
-  {"M0.L", REG_M0},
-  {"M1", REG_M1},
-  {"M1.H", REG_M1},
-  {"M1.L", REG_M1},
-  {"M2", REG_M2},
-  {"M2.H", REG_M2},
-  {"M2.L", REG_M2},
-  {"M3", REG_M3},
-  {"M3.H", REG_M3},
-  {"M3.L", REG_M3},
-  {"B0", REG_B0},
-  {"B0.H", REG_B0},
-  {"B0.L", REG_B0},
-  {"B1", REG_B1},
-  {"B1.H", REG_B1},
-  {"B1.L", REG_B1},
-  {"B2", REG_B2},
-  {"B2.H", REG_B2},
-  {"B2.L", REG_B2},
-  {"B3", REG_B3},
-  {"B3.H", REG_B3},
-  {"B3.L", REG_B3},
-  {"L0", REG_L0},
-  {"L0.H", REG_L0},
-  {"L0.L", REG_L0},
-  {"L1", REG_L1},
-  {"L1.H", REG_L1},
-  {"L1.L", REG_L1},
-  {"L2", REG_L2},
-  {"L2.H", REG_L2},
-  {"L2.L", REG_L2},
-  {"L3", REG_L3},
-  {"L3.H", REG_L3},
-  {"L3.L", REG_L3},
-  {"AZ", S_AZ},
-  {"AN", S_AN},
-  {"AC0", S_AC0},
-  {"AC1", S_AC1},
-  {"AV0", S_AV0},
-  {"AV0S", S_AV0S},
-  {"AV1", S_AV1},
-  {"AV1S", S_AV1S},
-  {"AQ", S_AQ},
-  {"V", S_V},
-  {"VS", S_VS},
-  {"sftreset", REG_sftreset},
-  {"omode", REG_omode},
-  {"excause", REG_excause},
-  {"emucause", REG_emucause},
-  {"idle_req", REG_idle_req},
-  {"hwerrcause", REG_hwerrcause},
-  {"CC", REG_CC},
-  {"LC0", REG_LC0},
-  {"LC1", REG_LC1},
-  {"ASTAT", REG_ASTAT},
-  {"RETS", REG_RETS},
-  {"LT0", REG_LT0},
-  {"LB0", REG_LB0},
-  {"LT1", REG_LT1},
-  {"LB1", REG_LB1},
-  {"CYCLES", REG_CYCLES},
-  {"CYCLES2", REG_CYCLES2},
-  {"USP", REG_USP},
-  {"SEQSTAT", REG_SEQSTAT},
-  {"SYSCFG", REG_SYSCFG},
-  {"RETI", REG_RETI},
-  {"RETX", REG_RETX},
-  {"RETN", REG_RETN},
-  {"RETE", REG_RETE},
-  {"EMUDAT", REG_EMUDAT},
-  {0, 0}
-};
 
 /* Blackfin specific function to handle FD-PIC pointer initializations.  */
 
@@ -314,36 +166,35 @@ struct bfin_cpu_isa
   int isa;
 };
 
-int bfin_isa = BLACKFIN_ISA_2;
+int bfin_isa = BLACKFIN_ISA_1;
 
 static struct bfin_cpu_isa bfin_cpus[] =
 {
-  {"bf512",	BLACKFIN_ISA_2},
-  {"bf514",	BLACKFIN_ISA_2},
-  {"bf516",	BLACKFIN_ISA_2},
-  {"bf518",	BLACKFIN_ISA_2},
-  {"bf522",	BLACKFIN_ISA_2},
-  {"bf523",	BLACKFIN_ISA_2},
-  {"bf524",	BLACKFIN_ISA_2},
-  {"bf525",	BLACKFIN_ISA_2},
-  {"bf526",	BLACKFIN_ISA_2},
-  {"bf527",	BLACKFIN_ISA_2},
-  {"bf531",	BLACKFIN_ISA_2},
-  {"bf532",	BLACKFIN_ISA_2},
-  {"bf533",	BLACKFIN_ISA_2},
-  {"bf534",	BLACKFIN_ISA_2},
-  {"bf535",	BLACKFIN_ISA_1},
-  {"bf536",	BLACKFIN_ISA_2},
-  {"bf537",	BLACKFIN_ISA_2},
-  {"bf538",	BLACKFIN_ISA_2},
-  {"bf539",	BLACKFIN_ISA_2},
-  {"bf542",	BLACKFIN_ISA_2},
-  {"bf544",	BLACKFIN_ISA_2},
-  {"bf547",	BLACKFIN_ISA_2},
-  {"bf548",	BLACKFIN_ISA_2},
-  {"bf549",	BLACKFIN_ISA_2},
-  {"bf561",	BLACKFIN_ISA_2},
-  {"bf579",	BLACKFIN_ISA_3},
+  {"bf512",	BLACKFIN_ISA_1},
+  {"bf514",	BLACKFIN_ISA_1},
+  {"bf516",	BLACKFIN_ISA_1},
+  {"bf518",	BLACKFIN_ISA_1},
+  {"bf522",	BLACKFIN_ISA_1},
+  {"bf523",	BLACKFIN_ISA_1},
+  {"bf524",	BLACKFIN_ISA_1},
+  {"bf525",	BLACKFIN_ISA_1},
+  {"bf526",	BLACKFIN_ISA_1},
+  {"bf527",	BLACKFIN_ISA_1},
+  {"bf531",	BLACKFIN_ISA_1},
+  {"bf532",	BLACKFIN_ISA_1},
+  {"bf533",	BLACKFIN_ISA_1},
+  {"bf534",	BLACKFIN_ISA_1},
+  {"bf536",	BLACKFIN_ISA_1},
+  {"bf537",	BLACKFIN_ISA_1},
+  {"bf538",	BLACKFIN_ISA_1},
+  {"bf539",	BLACKFIN_ISA_1},
+  {"bf542",	BLACKFIN_ISA_1},
+  {"bf544",	BLACKFIN_ISA_1},
+  {"bf547",	BLACKFIN_ISA_1},
+  {"bf548",	BLACKFIN_ISA_1},
+  {"bf549",	BLACKFIN_ISA_1},
+  {"bf561",	BLACKFIN_ISA_1},
+  {"bf579",	BLACKFIN_ISA_2},
   {NULL, 0}
 };
 
@@ -422,6 +273,22 @@ md_show_usage (FILE * stream ATTRIBUTE_UNUSED)
 void
 md_begin ()
 {
+  switch (bfin_isa)
+    {
+    case BLACKFIN_ISA_1:
+      astat_bits = bf532_astat_bits;
+      bfin_flags |= EFI_BFIN_1;
+      break;
+
+    case BLACKFIN_ISA_2:
+      astat_bits = bf579_astat_bits;
+      bfin_flags |= EFI_BFIN_2;
+      break;
+
+    default:
+      abort ();
+    }
+
   /* Set the ELF flags if desired. */
   if (bfin_flags)
     bfd_set_private_flags (stdoutput, bfin_flags);

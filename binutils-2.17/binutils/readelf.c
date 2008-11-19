@@ -1905,6 +1905,18 @@ get_machine_flags (unsigned e_flags, unsigned e_machine)
 	  break;
 
 	case EM_BLACKFIN:
+	  switch (e_flags & EF_BFIN_ISA)
+	    {
+	    case EFI_BFIN_1:
+	      strcpy (buf, ", BF532 compatible ISA");
+	      break;
+	    case EFI_BFIN_2:
+	      strcpy (buf, ", BF579 ISA");
+	      break;
+	    default:
+	      strcpy (buf, ", Unknown ISA");
+	      break;
+	    }
 	  if (e_flags & EF_BFIN_PIC)
 	    strcat (buf, ", PIC");
 

@@ -211,17 +211,17 @@ int yylex (void);
 [bB][0-3]"."[lLhH]  return parse_halfreg (&yylval.reg, T_REG_B, yytext);
 [bB][0-3]           return parse_reg (&yylval.reg, T_REG_B, yytext);
 [bB]                                    return B;
-[aA][zZ]  _REG.regno = S_AZ;   return STATUS_REG;
-[aA][nN]  _REG.regno = S_AN;   return STATUS_REG;
-[aA][qQ]  _REG.regno = S_AQ;   return STATUS_REG;
-[aA][cC]0 _REG.regno = S_AC0;  return STATUS_REG;
-[aA][cC]1 _REG.regno = S_AC1;  return STATUS_REG;
-[aA][vV]0 _REG.regno = S_AV0;  return STATUS_REG;
-[aA][vV]0[sS] _REG.regno = S_AV0S; return STATUS_REG;
-[aA][vV]1 _REG.regno = S_AV1;  return STATUS_REG;
-[aA][vV]1[sS] _REG.regno = S_AV1S; return STATUS_REG;
-[vV] _REG.regno = S_V; return STATUS_REG;
-[vV][sS]  _REG.regno = S_VS;   return STATUS_REG;
+[aA][zZ]  _REG.regno = astat_bits[S_AZ]; return STATUS_REG;
+[aA][nN]  _REG.regno = astat_bits[S_AN]; return STATUS_REG;
+[aA][qQ]  _REG.regno = astat_bits[S_AQ]; return STATUS_REG;
+[aA][cC]  _REG.regno = astat_bits[S_AC]; return STATUS_REG;
+[aA][cC]0 _REG.regno = astat_bits[S_AC0]; return STATUS_REG;
+[aA][cC]1 _REG.regno = astat_bits[S_AC1]; return STATUS_REG;
+[aA][vV]0 _REG.regno = astat_bits[S_AV0]; return STATUS_REG;
+[aA][vV]0[sS] _REG.regno = astat_bits[S_AV0S]; return STATUS_REG;
+[aA][vV]1 _REG.regno = astat_bits[S_AV1];  return STATUS_REG;
+[aA][vV]1[sS] _REG.regno = astat_bits[S_AV1S]; return STATUS_REG;
+[vV][sS]  _REG.regno = astat_bits[S_VS];   return STATUS_REG;
 
 
 [aA][sS][tT][aA][tT]   _REG.regno = REG_ASTAT; return REG;

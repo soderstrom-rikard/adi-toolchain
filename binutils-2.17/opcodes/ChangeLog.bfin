@@ -1,3 +1,23 @@
+2008-11-19  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-dis.c (_print_insn_bfin): Don't declare.
+	(print_insn_bfin): Don't declare.
+	(enum machine_registers): Add BF579 specific registers.
+	(reg_names[]): Likewise.
+	(decode_statbits[]): Renamed to ...
+	(decode_statbits_bf532[]): ... this.
+	(statbits, ignore_bits, ccstat): Don't define.
+	(decode_statbits_bf579[]): New.
+	(decode_statbits): New.
+	(decode_CC2stat_0): Add new argument mach.
+	(decode_dsp32alu_0): Likewise.
+	(_print_insn_bfin): Likewise.
+	(print_insn_bfin): Likewise.
+	(print_insn_bf532): New.
+	(print_insn_bf579): New.
+	* disassemble.c (disassembler): Set disassemble properly
+	for bfd_arch_bfin.
+
 2008-10-09  Jie Zhang  <jie.zhang@analog.com>
 
 	* opcodes/bfin-dis.c (decode_dsp32cmul): Add more checks.

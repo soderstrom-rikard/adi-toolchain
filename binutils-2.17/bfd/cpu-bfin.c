@@ -23,18 +23,26 @@
 #include "sysdep.h"
 #include "libbfd.h"
 
+#define N(machine, print, default, next)			\
+{								\
+  16,			/* Bits in a word.  */			\
+  32,			/* Bits in an address.  */		\
+  8,			/* Bits in a byte.  */			\
+  bfd_arch_bfin,						\
+  machine,		/* Machine number.  */			\
+  "bfin",		/* Arch name.  */			\
+  print,		/* Arch printable name.  */		\
+  4,			/* Section align power.  */		\
+  default,		/* The one and only.  */		\
+  bfd_default_compatible,					\
+  bfd_default_scan,						\
+  next,								\
+}
+
+static const bfd_arch_info_type arch_info_struct[] =
+{
+  N (bfd_mach_bf579, "bf579", FALSE, NULL),
+};
+
 const bfd_arch_info_type bfd_bfin_arch =
-  {
-    16,     		/* Bits in a word.  */
-    32,  		/* Bits in an address.  */
-    8,     		/* Bits in a byte.  */
-    bfd_arch_bfin,
-    0,                	/* Only one machine.  */
-    "bfin",        	/* Arch name.  */
-    "bfin",        	/* Arch printable name.  */
-    4,                	/* Section align power.  */
-    TRUE,             	/* The one and only.  */
-    bfd_default_compatible, 
-    bfd_default_scan ,
-    0,
-  };
+  N (bfd_mach_bf532, "bf532 compatible", TRUE, &arch_info_struct[0]);

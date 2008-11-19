@@ -121,9 +121,6 @@ static struct
   { "huimm32e",  32, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 };
 
-int _print_insn_bfin (bfd_vma pc, disassemble_info * outf);
-int print_insn_bfin (bfd_vma pc, disassemble_info * outf);
-
 static char comment = 0;
 static char parallel = 0;
 
@@ -231,7 +228,7 @@ enum machine_registers
   REG_A0, REG_A1, REG_I0, REG_I1, REG_I2, REG_I3, REG_M0, REG_M1,
   REG_M2, REG_M3, REG_B0, REG_B1, REG_B2, REG_B3, REG_L0, REG_L1,
   REG_L2, REG_L3,
-  REG_AZ, REG_AN, REG_AC0, REG_AC1, REG_AV0, REG_AV1, REG_AV0S, REG_AV1S,
+  REG_AZ, REG_AN, REG_AC, REG_AC0, REG_AC1, REG_AV0, REG_AV1, REG_AV0S, REG_AV1S,
   REG_AQ, REG_V, REG_VS,
   REG_sftreset, REG_omode, REG_excause, REG_emucause, REG_idle_req, REG_hwerrcause, REG_CC, REG_LC0,
   REG_LC1, REG_GP, REG_ASTAT, REG_RETS, REG_LT0, REG_LB0, REG_LT1, REG_LB1,
@@ -265,7 +262,7 @@ static char *reg_names[] =
   "A0", "A1", "I0", "I1", "I2", "I3", "M0", "M1",
   "M2", "M3", "B0", "B1", "B2", "B3", "L0", "L1",
   "L2", "L3",
-  "AZ", "AN", "AC0", "AC1", "AV0", "AV1", "AV0S", "AV1S",
+  "AZ", "AN", "AC", "AC0", "AC1", "AV0", "AV1", "AV0S", "AV1S",
   "AQ", "V", "VS",
   "sftreset", "omode", "excause", "emucause", "idle_req", "hwerrcause", "CC", "LC0",
   "LC1", "GP", "ASTAT", "RETS", "LT0", "LB0", "LT1", "LB1",
@@ -405,7 +402,7 @@ static enum machine_registers decode_regs_hi[] =
 
 #define regs_hi(x,i) REGNAME (decode_regs_hi[((i) << 3)|x])
 
-static enum machine_registers decode_statbits[] =
+static enum machine_registers decode_statbits_bf532[] =
 {
   REG_AZ, REG_AN, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_AQ, REG_LASTREG,
   REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_AC0, REG_AC1, REG_LASTREG, REG_LASTREG,
@@ -413,9 +410,13 @@ static enum machine_registers decode_statbits[] =
   REG_V, REG_VS, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG,
 };
 
-#define statbits(x)	REGNAME (decode_statbits[(x) & 31])
-#define ignore_bits(x)	REGNAME (decode_ignore_bits[(x) & 7])
-#define ccstat(x)	REGNAME (decode_ccstat[(x) & 0])
+static enum machine_registers decode_statbits_bf579[] =
+{
+  REG_AZ, REG_AN, REG_AC, REG_AV0, REG_AV1, REG_LASTREG, REG_AQ, REG_LASTREG,
+  REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG,
+  REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG,
+  REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG,
+};
 
 /* LC0 LC1.  */
 static enum machine_registers decode_counters[] =
@@ -488,6 +489,17 @@ static enum machine_registers decode_allregs[] =
 #ifndef OUTS
 #define OUTS(p, txt) ((p) ? (((txt)[0]) ? (p->fprintf_func)(p->stream, txt) :0) :0)
 #endif
+
+static int
+decode_statbits (int x, int mach)
+{
+  if (mach == bfd_mach_bf532)
+    return decode_statbits_bf532[(x) & 31];
+  else if (mach == bfd_mach_bf579)
+    return decode_statbits_bf579[(x) & 31];
+  else
+    abort ();
+}
 
 static void
 amod0 (int s0, int x0, disassemble_info *outf)
@@ -1280,7 +1292,7 @@ decode_CC2dreg_0 (TIword iw0, disassemble_info *outf)
 }
 
 static int
-decode_CC2stat_0 (TIword iw0, disassemble_info *outf)
+decode_CC2stat_0 (TIword iw0, disassemble_info *outf, int mach)
 {
   /* CC2stat
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -1289,45 +1301,49 @@ decode_CC2stat_0 (TIword iw0, disassemble_info *outf)
   int D    = ((iw0 >> CC2stat_D_bits) & CC2stat_D_mask);
   int op   = ((iw0 >> CC2stat_op_bits) & CC2stat_op_mask);
   int cbit = ((iw0 >> CC2stat_cbit_bits) & CC2stat_cbit_mask);
+  int statbits = decode_statbits (cbit, mach);
+
+  if (statbits == REG_LASTREG)
+    return 0;
 
   if (op == 0 && D == 0)
     {
       OUTS (outf, "CC = ");
-      OUTS (outf, statbits (cbit));
+      OUTS (outf, REGNAME (statbits));
     }
   else if (op == 1 && D == 0)
     {
       OUTS (outf, "CC |= ");
-      OUTS (outf, statbits (cbit));
+      OUTS (outf, REGNAME (statbits));
     }
   else if (op == 2 && D == 0)
     {
       OUTS (outf, "CC &= ");
-      OUTS (outf, statbits (cbit));
+      OUTS (outf, REGNAME (statbits));
     }
   else if (op == 3 && D == 0)
     {
       OUTS (outf, "CC ^= ");
-      OUTS (outf, statbits (cbit));
+      OUTS (outf, REGNAME (statbits));
     }
   else if (op == 0 && D == 1)
     {
-      OUTS (outf, statbits (cbit));
+      OUTS (outf, REGNAME (statbits));
       OUTS (outf, " = CC");
     }
   else if (op == 1 && D == 1)
     {
-      OUTS (outf, statbits (cbit));
+      OUTS (outf, REGNAME (statbits));
       OUTS (outf, " |= CC");
     }
   else if (op == 2 && D == 1)
     {
-      OUTS (outf, statbits (cbit));
+      OUTS (outf, REGNAME (statbits));
       OUTS (outf, " &= CC");
     }
   else if (op == 3 && D == 1)
     {
-      OUTS (outf, statbits (cbit));
+      OUTS (outf, REGNAME (statbits));
       OUTS (outf, " ^= CC");
     }
   else
@@ -3079,7 +3095,7 @@ decode_dsp32mult_0 (TIword iw0, TIword iw1, disassemble_info *outf)
 }
 
 static int
-decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf)
+decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf, int mach)
 {
   /* dsp32alu
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -3947,7 +3963,7 @@ decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       searchmod (aop, outf);
       OUTS (outf, ")");
     }
-  else if (aopcde == 19)
+  else if (aopcde == 19 && mach == bfd_mach_bf579)
     {
       OUTS (outf, "(");
       OUTS (outf, dregs (dst1));
@@ -3961,7 +3977,7 @@ decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       searchmod (aop, outf);
       OUTS (outf, ")");
     }
-  else if (aopcde == 25)
+  else if (aopcde == 25 && mach == bfd_mach_bf579)
     {
       OUTS (outf, "(");
       OUTS (outf, dregs (dst1));
@@ -4851,8 +4867,8 @@ decode_pseudodbg_assert_0 (TIword iw0, TIword iw1, disassemble_info *outf)
   return 4;
 }
 
-int
-_print_insn_bfin (bfd_vma pc, disassemble_info *outf)
+static int
+_print_insn_bfin (bfd_vma pc, disassemble_info *outf, int mach)
 {
   bfd_byte buf[4];
   TIword iw0;
@@ -4886,7 +4902,7 @@ _print_insn_bfin (bfd_vma pc, disassemble_info *outf)
   else if ((iw0 & 0xffe0) == 0x0200)
     rv = decode_CC2dreg_0 (iw0, outf);
   else if ((iw0 & 0xff00) == 0x0300)
-    rv = decode_CC2stat_0 (iw0, outf);
+    rv = decode_CC2stat_0 (iw0, outf, mach);
   else if ((iw0 & 0xf000) == 0x1000)
     rv = decode_BRCC_0 (iw0, pc, outf);
   else if ((iw0 & 0xf000) == 0x2000)
@@ -4934,13 +4950,23 @@ _print_insn_bfin (bfd_vma pc, disassemble_info *outf)
   else if ((iw0 & 0xf600) == 0xc200 && (iw1 & 0x0000) == 0x0000)
     rv = decode_dsp32mult_0 (iw0, iw1, outf);
   else if ((iw0 & 0xf7c0) == 0xc400 && (iw1 & 0x0000) == 0x0000)
-    rv = decode_dsp32alu_0 (iw0, iw1, outf);
+    rv = decode_dsp32alu_0 (iw0, iw1, outf, mach);
   else if ((iw0 & 0xf780) == 0xc600 && (iw1 & 0x01c0) == 0x0000)
     rv = decode_dsp32shift_0 (iw0, iw1, outf);
   else if ((iw0 & 0xf7e0) == 0xc700)
-    rv = decode_dsp32cmul (iw0, iw1, outf);
+    {
+      if (mach == bfd_mach_bf579)
+	rv = decode_dsp32cmul (iw0, iw1, outf);
+      else
+	rv = 0;
+    }
   else if ((iw0 & 0xf7e0) == 0xc720)
-    rv = decode_dsp32csqu (iw0, iw1, outf);
+    {
+      if (mach == bfd_mach_bf579)
+	rv = decode_dsp32csqu (iw0, iw1, outf);
+      else
+	rv = 0;
+    }
   else if ((iw0 & 0xf780) == 0xc680 && (iw1 & 0x0000) == 0x0000)
     rv = decode_dsp32shiftimm_0 (iw0, iw1, outf);
   else if ((iw0 & 0xff00) == 0xf800)
@@ -4956,8 +4982,8 @@ _print_insn_bfin (bfd_vma pc, disassemble_info *outf)
 }
 
 
-int
-print_insn_bfin (bfd_vma pc, disassemble_info *outf)
+static int
+print_insn_bfin (bfd_vma pc, disassemble_info *outf, int mach)
 {
   bfd_byte buf[2];
   unsigned short iw0;
@@ -4967,7 +4993,7 @@ print_insn_bfin (bfd_vma pc, disassemble_info *outf)
   status = (*outf->read_memory_func) (pc & ~0x01, buf, 2, outf);
   iw0 = bfd_getl16 (buf);
 
-  count += _print_insn_bfin (pc, outf);
+  count += _print_insn_bfin (pc, outf, mach);
 
   /* Proper display of multiple issue instructions.  */
 
@@ -4976,9 +5002,9 @@ print_insn_bfin (bfd_vma pc, disassemble_info *outf)
     {
       parallel = 1;
       outf->fprintf_func (outf->stream, " || ");
-      count += _print_insn_bfin (pc + 4, outf);
+      count += _print_insn_bfin (pc + 4, outf, mach);
       outf->fprintf_func (outf->stream, " || ");
-      count += _print_insn_bfin (pc + 6, outf);
+      count += _print_insn_bfin (pc + 6, outf, mach);
       parallel = 0;
     }
   if (count == 0)
@@ -4992,4 +5018,16 @@ print_insn_bfin (bfd_vma pc, disassemble_info *outf)
   comment = 0;
 
   return count;
+}
+
+int
+print_insn_bf532 (bfd_vma pc, disassemble_info *outf)
+{
+  return print_insn_bfin (pc, outf, bfd_mach_bf532);
+}
+
+int
+print_insn_bf579 (bfd_vma pc, disassemble_info *outf)
+{
+  return print_insn_bfin (pc, outf, bfd_mach_bf579);
 }

@@ -929,7 +929,7 @@ asm_1:
 	}
 	| LPAREN REG COMMA REG RPAREN ASSIGN SEARCH LPAREN REG COMMA REG RPAREN LPAREN searchmod RPAREN
 	{
-	  if (bfin_isa != BLACKFIN_ISA_3)
+	  if (bfin_isa != BLACKFIN_ISA_2)
 	    return yyerror ("illegal instruction SEARCH (dregs, dregs)");
 
 	  if (IS_DREG ($2) && IS_DREG ($4) && IS_DREG ($9) && IS_DREG ($11))
@@ -942,7 +942,7 @@ asm_1:
 	}
 	| LPAREN REG COMMA REG RPAREN ASSIGN SELECT LPAREN REG COMMA REG RPAREN LPAREN searchmod RPAREN
 	{
-	  if (bfin_isa != BLACKFIN_ISA_3)
+	  if (bfin_isa != BLACKFIN_ISA_2)
 	    return yyerror ("illegal instruction SELECT.");
 
 	  if (IS_DREG ($2) && IS_DREG ($4) && IS_DREG ($9) && IS_DREG ($11))
@@ -4393,7 +4393,7 @@ a_cmulfunc:
 cmul_regs:
 	CMUL LPAREN REG star_or_nothing COMMA REG star_or_nothing RPAREN
 	{
-	  if (bfin_isa != BLACKFIN_ISA_3)
+	  if (bfin_isa != BLACKFIN_ISA_2)
 	    return yyerror ("illegal instruction CMUL.");
 
 	  if (!IS_DREG ($3))
@@ -4485,7 +4485,7 @@ a_csqufunc:
 csqu_regs:
 	CSQU LPAREN REG RPAREN
 	{
-	  if (bfin_isa != BLACKFIN_ISA_3)
+	  if (bfin_isa != BLACKFIN_ISA_2)
 	    return yyerror ("illegal instruction CSQU.");
 
 	  if (!IS_DREG ($3))
@@ -4516,27 +4516,39 @@ cc_op:
 ccstat:
 	CCREG cc_op STATUS_REG
 	{
-	$$.r0 = $3.regno;
-	$$.x0 = $2.r0;
-	$$.s0 = 0;
+	  if ($3.regno == -1)
+	    return yyerror ("bad status bit");
+
+	  $$.r0 = $3.regno;
+	  $$.x0 = $2.r0;
+	  $$.s0 = 0;
 	}
 	| CCREG cc_op V
 	{
-	$$.r0 = 0x18;
-	$$.x0 = $2.r0;
-	$$.s0 = 0;
+	  if (bfin_isa != BLACKFIN_ISA_1)
+	    return yyerror ("bad status bit");
+
+	  $$.r0 = 0x18;
+	  $$.x0 = $2.r0;
+	  $$.s0 = 0;
 	}
 	| STATUS_REG cc_op CCREG
 	{
-	$$.r0 = $1.regno;
-	$$.x0 = $2.r0;
-	$$.s0 = 1;
+	  if ($1.regno == -1)
+	    return yyerror ("bad status bit");
+
+	  $$.r0 = $1.regno;
+	  $$.x0 = $2.r0;
+	  $$.s0 = 1;
 	}
 	| V cc_op CCREG
 	{
-	$$.r0 = 0x18;
-	$$.x0 = $2.r0;
-	$$.s0 = 1;
+	  if (bfin_isa != BLACKFIN_ISA_1)
+	    return yyerror ("bad status bit");
+
+	  $$.r0 = 0x18;
+	  $$.x0 = $2.r0;
+	  $$.s0 = 1;
 	}
 	;
 

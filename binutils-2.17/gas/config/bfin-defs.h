@@ -118,15 +118,16 @@ enum statusflags
 {
   S_AZ = 0,
   S_AN,
-  S_AQ = 6,
-  S_AC0 = 12,
-  S_AC1,
-  S_AV0 = 16,
-  S_AV0S,
+  S_AC,
+  S_AV0,
   S_AV1,
+  S_AQ,
+  S_AC0,
+  S_AC1,
+  S_AV0S,
   S_AV1S,
-  S_V = 24,
-  S_VS = 25
+  S_V,
+  S_VS
 }; 
 
 

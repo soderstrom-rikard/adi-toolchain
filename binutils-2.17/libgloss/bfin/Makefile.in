@@ -72,8 +72,8 @@ BOARD_SCRIPTS	= bfin-common-sc.ld  bfin-common-mc.ld \
 BOARD_LDFLAGS	=
 BOARD_BSP	= # We actually use libnosys.a
 BOARD_CRT0S	= basiccrt.o basiccrts.o
-BOARD_CRT0S	+= basiccrt561.o basiccrt561s.o basiccrt561b.o
-BOARD_CRT0S	+= basiccrt579.o basiccrt579s.o
+BOARD_CRT0S	+= $(shell if [[ x$$($(CC) $(CFLAGS) -print-multi-directory) \
+			!= xbf579* ]]; then echo "basiccrt561.o basiccrt561s.o basiccrt561b.o"; fi)
 BOARD_OBJS	=
 BOARD_TEST	=
 BOARD_INSTALL	= install-board
@@ -101,30 +101,30 @@ ${SIM_BSP}: ${OBJS} ${SIM_OBJS}
 crt0.o: crt0.S
 
 basiccrt.o: basiccrt.S
-ifneq (,$(findstring mcpu=bf532-none,$(CFLAGS)))
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -o $@ -c $<
-else
+ifeq (,$(findstring mcpu=,$(CFLAGS)))
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf532-any -o $@ -c $<
+else
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -o $@ -c $<
 endif
 
 basiccrts.o: basiccrt.S
-ifneq (,$(findstring mcpu=bf532-none,$(CFLAGS)))
-	$(CC) -D__BFIN_SDRAM $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -o $@ -c $<
-else
+ifeq (,$(findstring mcpu=,$(CFLAGS)))
 	$(CC) -D__BFIN_SDRAM $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf532-any -o $@ -c $<
+else
+	$(CC) -D__BFIN_SDRAM $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -o $@ -c $<
 endif
 
 basiccrt561.o: basiccrt.S
 ifneq (,$(findstring mcpu=bf532-none,$(CFLAGS)))
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf561-none -o $@ -c $<
-else
+else ifeq (,$(findstring mcpu=,$(CFLAGS)))
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf561-any -o $@ -c $<
 endif
 
 basiccrt561s.o: basiccrt.S
 ifneq (,$(findstring mcpu=bf532-none,$(CFLAGS)))
 	$(CC) -D__BFIN_SDRAM $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf561-none -o $@ -c $<
-else
+else ifeq (,$(findstring mcpu=,$(CFLAGS)))
 	$(CC) -D__BFIN_SDRAM $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf561-any -o $@ -c $<
 endif
 
@@ -132,23 +132,10 @@ endif
 basiccrt561b.o: basiccrt.S
 ifneq (,$(findstring mcpu=bf532-none,$(CFLAGS)))
 	$(CC) -D__ADSPBF561_COREB__ $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf561-none -o $@ -c $<
-else
+else ifeq (,$(findstring mcpu=,$(CFLAGS)))
 	$(CC) -D__ADSPBF561_COREB__ $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf561-any -o $@ -c $<
 endif
 
-basiccrt579.o: basiccrt.S
-ifneq (,$(findstring mcpu=bf532-none,$(CFLAGS)))
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf579-none -o $@ -c $<
-else
-	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf579-any -o $@ -c $<
-endif
-
-basiccrt579s.o: basiccrt.S
-ifneq (,$(findstring mcpu=bf532-none,$(CFLAGS)))
-	$(CC) -D__BFIN_SDRAM $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf579-none -o $@ -c $<
-else
-	$(CC) -D__BFIN_SDRAM $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -mcpu=bf579-any -o $@ -c $<
-endif
 
 clean mostlyclean:
 	rm -f a.out core *.i *.o ${SIM_BSP} ${BOARD_BSP}

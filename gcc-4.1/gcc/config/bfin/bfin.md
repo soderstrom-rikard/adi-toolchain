@@ -960,7 +960,12 @@
    (clobber (match_scratch:SI 2 "=&d"))
    (clobber (reg:CC REG_CC))]
   ""
-  "%2 = 0; %2 = %2 - %1; cc = ac0; cc = !cc; %2 = cc;\\n\\t%0 = -%1; %H0 = -%H1; %H0 = %H0 - %2;"
+{
+  if (bfin_cpu_type == BFIN_CPU_BF579)
+    return "%2 = 0; %2 = %2 - %1; cc = ac; cc = !cc; %2 = cc;\\n\\t%0 = -%1; %H0 = -%H1; %H0 = %H0 - %2;";
+  else
+    return "%2 = 0; %2 = %2 - %1; cc = ac0; cc = !cc; %2 = cc;\\n\\t%0 = -%1; %H0 = -%H1; %H0 = %H0 - %2;";
+}
   [(set_attr "length" "16")
    (set_attr "seq_insns" "multi")])
 
@@ -1055,10 +1060,28 @@
 			       (zero_extend:DI (match_dup 2)))
 		      (const_int 32))))
    (clobber (reg:CC 34))]
-  ""
+  "bfin_cpu_type != BFIN_CPU_BF579"
   "@
    %0 += %2; cc = ac0; %3 = cc;
    %0 = %0 + %2; cc = ac0; %3 = cc;"
+  [(set_attr "type" "alu0")
+   (set_attr "length" "6")
+   (set_attr "seq_insns" "multi")])
+
+(define_insn "add_with_carry_ac"
+  [(set (match_operand:SI 0 "register_operand" "=d,d")
+        (plus:SI (match_operand:SI 1 "register_operand" "%0,0")
+                 (match_operand:SI 2 "nonmemory_operand" "Ks7,d")))
+   (set (match_operand:SI 3 "register_operand" "=d,d")
+	(truncate:SI
+	 (lshiftrt:DI (plus:DI (zero_extend:DI (match_dup 1))
+			       (zero_extend:DI (match_dup 2)))
+		      (const_int 32))))
+   (clobber (reg:CC 34))]
+  "bfin_cpu_type == BFIN_CPU_BF579"
+  "@
+   %0 += %2; cc = ac; %3 = cc;
+   %0 = %0 + %2; cc = ac; %3 = cc;"
   [(set_attr "type" "alu0")
    (set_attr "length" "6")
    (set_attr "seq_insns" "multi")])
@@ -1069,11 +1092,26 @@
                  (match_operand:DI 2 "nonmemory_operand" "Kn7,Ks7,d")))
    (clobber (match_scratch:SI 3 "=&d,&d,&d"))
    (clobber (reg:CC 34))]
-  ""
+  "bfin_cpu_type != BFIN_CPU_BF579"
   "@
    %0 += %2; cc = ac0; %3 = cc; %H0 += -1; %H0 = %H0 + %3;
    %0 += %2; cc = ac0; %3 = cc; %H0 = %H0 + %3;
    %0 = %0 + %2; cc = ac0; %3 = cc; %H0 = %H0 + %H2; %H0 = %H0 + %3;"
+  [(set_attr "type" "alu0")
+   (set_attr "length" "10,8,10")
+   (set_attr "seq_insns" "multi,multi,multi")])
+
+(define_insn "adddi3_ac"
+  [(set (match_operand:DI 0 "register_operand" "=&d,&d,&d")
+        (plus:DI (match_operand:DI 1 "register_operand" "%0,0,0")
+                 (match_operand:DI 2 "nonmemory_operand" "Kn7,Ks7,d")))
+   (clobber (match_scratch:SI 3 "=&d,&d,&d"))
+   (clobber (reg:CC 34))]
+  "bfin_cpu_type == BFIN_CPU_BF579"
+  "@
+   %0 += %2; cc = ac; %3 = cc; %H0 += -1; %H0 = %H0 + %3;
+   %0 += %2; cc = ac; %3 = cc; %H0 = %H0 + %3;
+   %0 = %0 + %2; cc = ac; %3 = cc; %H0 = %H0 + %H2; %H0 = %H0 + %3;"
   [(set_attr "type" "alu0")
    (set_attr "length" "10,8,10")
    (set_attr "seq_insns" "multi,multi,multi")])
@@ -1084,7 +1122,12 @@
                   (match_operand:DI 2 "register_operand" "d")))
    (clobber (reg:CC 34))]
   ""
-  "%0 = %1-%2;\\n\\tcc = ac0;\\n\\t%H0 = %H1-%H2;\\n\\tif cc jump 1f;\\n\\t%H0 += -1;\\n\\t1:"
+{
+  if (bfin_cpu_type == BFIN_CPU_BF579)
+    return "%0 = %1-%2;\\n\\tcc = ac;\\n\\t%H0 = %H1-%H2;\\n\\tif cc jump 1f;\\n\\t%H0 += -1;\\n\\t1:";
+  else
+    return "%0 = %1-%2;\\n\\tcc = ac0;\\n\\t%H0 = %H1-%H2;\\n\\tif cc jump 1f;\\n\\t%H0 += -1;\\n\\t1:";
+}
   [(set_attr "length" "10")
    (set_attr "seq_insns" "multi")])
 
@@ -1096,7 +1139,12 @@
    (clobber (match_scratch:SI 3 "=&d"))
    (clobber (reg:CC 34))]
   ""
-  "%0 = %1 - %2;\\n\\tcc = ac0;\\n\\tcc = ! cc;\\n\\t%3 = cc;\\n\\t%H0 = %H1 - %3;"
+{
+  if (bfin_cpu_type == BFIN_CPU_BF579)
+    return "%0 = %1 - %2;\\n\\tcc = ac;\\n\\tcc = ! cc;\\n\\t%3 = cc;\\n\\t%H0 = %H1 - %3;";
+  else
+    return "%0 = %1 - %2;\\n\\tcc = ac0;\\n\\tcc = ! cc;\\n\\t%3 = cc;\\n\\t%H0 = %H1 - %3;";
+}
   [(set_attr "length" "10")
    (set_attr "seq_insns" "multi")])
 
@@ -1108,7 +1156,12 @@
    (clobber (match_scratch:SI 3 "=&d"))
    (clobber (reg:CC 34))]
   ""
-  "%0 = %2 - %1;\\n\\tcc = ac0;\\n\\tcc = ! cc;\\n\\t%3 = cc;\\n\\t%3 = -%3;\\n\\t%H0 = %3 - %H1"
+{
+  if (bfin_cpu_type == BFIN_CPU_BF579)
+    return "%0 = %2 - %1;\\n\\tcc = ac;\\n\\tcc = ! cc;\\n\\t%3 = cc;\\n\\t%3 = -%3;\\n\\t%H0 = %3 - %H1";
+  else
+    return "%0 = %2 - %1;\\n\\tcc = ac0;\\n\\tcc = ! cc;\\n\\t%3 = cc;\\n\\t%3 = -%3;\\n\\t%H0 = %3 - %H1";
+}
   [(set_attr "length" "12")
    (set_attr "seq_insns" "multi")])
 
@@ -1120,7 +1173,12 @@
    (clobber (match_scratch:SI 3 "=&d"))
    (clobber (reg:CC 34))]
   ""
-  "%0 = %1 - %2;\\n\\tcc = ac0;\\n\\t%3 = %2;\\n\\t%3 >>>= 31;\\n\\t%H0 = %H1 - %3;\\n\\tif cc jump 1f;\\n\\t%H0 += -1;\\n\\t1:"
+{
+  if (bfin_cpu_type == BFIN_CPU_BF579)
+    return "%0 = %1 - %2;\\n\\tcc = ac;\\n\\t%3 = %2;\\n\\t%3 >>>= 31;\\n\\t%H0 = %H1 - %3;\\n\\tif cc jump 1f;\\n\\t%H0 += -1;\\n\\t1:";
+  else
+    return "%0 = %1 - %2;\\n\\tcc = ac0;\\n\\t%3 = %2;\\n\\t%3 >>>= 31;\\n\\t%H0 = %H1 - %3;\\n\\tif cc jump 1f;\\n\\t%H0 += -1;\\n\\t1:";
+}
   [(set_attr "length" "14")
    (set_attr "seq_insns" "multi")])
 
@@ -1132,7 +1190,12 @@
    (clobber (match_scratch:SI 3 "=&d"))
    (clobber (reg:CC 34))]
   ""
-  "%0 = %2 - %1;\\n\\tcc = ac0;\\n\\t%3 = %2;\\n\\t%3 >>>= 31;\\n\\t%H0 = %3 - %H1;\\n\\tif cc jump 1f;\\n\\t%H0 += -1;\\n\\t1:"
+{
+  if (bfin_cpu_type == BFIN_CPU_BF579)
+    return "%0 = %2 - %1;\\n\\tcc = ac;\\n\\t%3 = %2;\\n\\t%3 >>>= 31;\\n\\t%H0 = %3 - %H1;\\n\\tif cc jump 1f;\\n\\t%H0 += -1;\\n\\t1:";
+  else
+    return "%0 = %2 - %1;\\n\\tcc = ac0;\\n\\t%3 = %2;\\n\\t%3 >>>= 31;\\n\\t%H0 = %3 - %H1;\\n\\tif cc jump 1f;\\n\\t%H0 += -1;\\n\\t1:";
+}
   [(set_attr "length" "14")
    (set_attr "seq_insns" "multi")])
 

@@ -76,12 +76,12 @@ extern long md_pcrel_from_section PARAMS ((struct fix *, segT));
 #define MD_APPLY_SYM_VALUE(FIX) 0
 
 /* These are not official ISA names of Blackfin. They are only used here.  */
-/* BF535, not supported yet.  */
+/* All existing Blackfin processors except BF535.  */
 #define  BLACKFIN_ISA_1  1
-/* All other existing Blackfin processors.  */
-#define  BLACKFIN_ISA_2  2
 /* BF579 */
-#define  BLACKFIN_ISA_3  3
+#define  BLACKFIN_ISA_2  2
+
+extern const int *astat_bits;
 
 extern int bfin_isa;
 /* end of tc-bfin.h */

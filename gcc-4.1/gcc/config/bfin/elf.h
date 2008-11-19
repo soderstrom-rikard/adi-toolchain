@@ -2,7 +2,6 @@
 #define STARTFILE_SPEC "\
 %{msim:%{!shared:crt0%O%s}} \
 %{!msim:%{mcpu=bf561*:%{!msdram:basiccrt561%O%s} %{msdram:basiccrt561s%O%s}; \
-	  mcpu=bf579*:%{!msdram:basiccrt579%O%s} %{msdram:basiccrt579s%O%s}; \
 		     :%{!msdram:basiccrt%O%s} %{msdram:basiccrts%O%s}} \
 	%{mcpu=bf561*:%{mmulticore:%{!mcorea:%{!mcoreb:basiccrt561b%O%s}}}}} \
 crti%O%s crtbegin%O%s crtlibid%O%s"

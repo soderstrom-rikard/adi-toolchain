@@ -953,12 +953,6 @@ bfin_reg_to_regnum (int reg)
   return map_gcc_gdb[reg];
 }
 
-static int
-gdb_print_insn_bfin (bfd_vma memaddr, disassemble_info *info)
-{
-  return print_insn_bfin (memaddr, info);
-}
-
 /* This function implements the BREAKPOINT_FROM_PC macro. It returns
    a pointer to a string of bytes that encode a breakpoint instruction,
    stores the length of the string to *lenptr, and adjusts the program
@@ -1232,7 +1226,16 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   set_gdbarch_frame_args_skip (gdbarch, 8);
   set_gdbarch_unwind_pc (gdbarch, bfin_unwind_pc);
   set_gdbarch_frame_align (gdbarch, bfin_frame_align);
-  set_gdbarch_print_insn (gdbarch, gdb_print_insn_bfin);
+
+  switch (info.bfd_arch_info->mach)
+    {
+    case bfd_mach_bf532:
+      set_gdbarch_print_insn (gdbarch, print_insn_bf532);
+      break;
+    case bfd_mach_bf579:
+      set_gdbarch_print_insn (gdbarch, print_insn_bf579);
+      break;
+    }
 
   frame_unwind_append_sniffer (gdbarch, dwarf2_frame_sniffer);
 

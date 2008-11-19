@@ -1,3 +1,11 @@
+2008-11-19  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/Makefile.in (BOARD_CRT0S): Remove basiccrt579.o and
+	basiccrt579s.o. Don't build basiccrt561.o, basiccrt561s.o,
+	and basiccrt561b.o when building bf579.
+	Change rules accordingly.
+	* bfin/bf579.ld: Correct LENGTH of MEM_L1_CODE region.
+
 2008-10-14  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/bf579.ld: New.

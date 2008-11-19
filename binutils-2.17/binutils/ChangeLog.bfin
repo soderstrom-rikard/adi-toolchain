@@ -1,3 +1,7 @@
+2008-11-19  Jie Zhang  <jie.zhang@analog.com>
+
+	* readelf.c (get_machine_flags): Print Blackfin ISA.
+
 2008-06-05  Jie Zhang  <jie.zhang@analog.com>
 
 	Apply

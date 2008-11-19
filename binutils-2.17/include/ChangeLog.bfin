@@ -1,3 +1,10 @@
+2008-11-19  Jie Zhang  <jie.zhang@analog.com>
+
+	* dis-asm.h (print_insn_bfin): Don't declare.
+	(print_insn_bf532): Declare.
+	(print_insn_bf579): Declare.
+	* elf/bfin.h (EF_BFIN_ISA, EFI_BFIN_1, EFI_BFIN_2): Define.
+
 2008-09-26  Jie Zhang  <jie.zhang@analog.com>
 
 	* opcode/bfin.h (DSP32Cmul): typedef of a structure.

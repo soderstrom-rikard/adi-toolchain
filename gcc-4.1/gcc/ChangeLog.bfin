@@ -1,3 +1,25 @@
+2008-11-19  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/t-bfin-elf (MULTILIB_OPTIONS): Add mcpu=bf579-none.
+	(MULTILIB_DIRNAMES): Add bf579-none.
+	(MULTILIB_MATCHES): Deal with bf579.
+	(MULTILIB_EXCEPTIONS): Likewise.
+	* config/bfin/bfin-protos.h (enum bfin_cpu_type): Move this,
+	(bfin_cpu_type): this,
+	(bfin_si_revision): this,
+	(bfin_workarounds): and this ...
+	* config/bfin/bfin.h: ... here.
+	* config/bfin/elf.h (STARTFILE_SPEC): Remove mcpu=bf579.
+	* config/bfin/bfin.md (negdi2): Use ac for bf579.
+	(add_with_carry): Exclude bf579.
+	(add_with_carry_ac): New for bf579.
+	(adddi3, adddi3_ac): Likewise.
+	(subdi3): Use ac for bf579.
+	(subdi_di_zesidi): Likewise.
+	(subdi_zesidi_di): Likewise.
+	(subdi_di_sesidi): Likewise.
+	(subdi_sesidi_di): Likewise.
+
 2008-11-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (attr "addrtype"): New member "spreg".
