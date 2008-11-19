@@ -4,6 +4,13 @@
 	* app.c (do_scrub_chars): Provide a one character buffer to hold a
 	pushed back newline at the end of an unterminated quoted string.
 
+	Also from Nick:
+	* read.c (s_align): Initialize the 'stopc' variable to prevent
+	compiler complaints about it being used without being
+	initialized.
+	(s_comm_internal, s_mri_common, s_fail, s_globl, s_space,
+	s_float_space, s_struct, cons_worker, equals): Likewise.
+
 2008-11-19  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin-defs.h (enum statusflags): Add BF579 status
