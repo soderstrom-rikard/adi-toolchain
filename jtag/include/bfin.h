@@ -183,6 +183,7 @@ void bfin_emulation_return (chain_t *);
 void bfin_execute_instructions (chain_t *, struct bfin_insn *);
 void bfin_system_reset (chain_t *);
 void bfin_core_reset (chain_t *);
+void bf579_core_reset (chain_t *, int);
 void bfin_software_reset (chain_t *);
 
 #endif /* BFIN_H */

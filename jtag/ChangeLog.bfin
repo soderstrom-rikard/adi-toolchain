@@ -1,3 +1,9 @@
+2008-11-22  Jie Zhang  <jie.zhang@analog.com>
+
+	* include/bfin.h: Declare bf579_core_reset.
+	* src/cmd/bfin.c (cmd_bfin_run): Add "bfin reset579 stop|run".
+	* src/part/bfin.c (bf579_core_reset): New.
+
 2008-10-26  Jie Zhang  <jie.zhang@analog.com>
 
 	* tap/cable/ft2232.c (ft2232_gnice_init): Default LED on.

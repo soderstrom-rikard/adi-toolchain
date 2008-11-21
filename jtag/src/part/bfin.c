@@ -528,6 +528,36 @@ bfin_core_reset (chain_t *chain)
 }
 
 void
+bf579_core_reset (chain_t *chain, int sram_init)
+{
+  int emu_enabled = bfin_emulation_enabled (chain);
+
+  if (!emu_enabled)
+    bfin_emulation_enable (chain);
+
+  bfin_emuir_set (chain, INSN_NOP, EXITMODE_UPDATE);
+
+  if (sram_init)
+    BFIN_DBGCTL_BIT_SET (chain, DBGCTL_SRAM_INIT, EXITMODE_UPDATE);
+  else
+    BFIN_DBGCTL_BIT_CLEAR (chain, DBGCTL_SRAM_INIT, EXITMODE_UPDATE);
+
+  BFIN_DBGCTL_BIT_SET (chain, DBGCTL_SYSRST, EXITMODE_UPDATE);
+
+  bfin_emulation_return (chain);
+
+  while (!(BFIN_DBGSTAT_GET (chain) & DBGSTAT_IN_RESET))
+    continue;
+
+  bfin_emulation_trigger (chain);
+
+  BFIN_DBGCTL_BIT_CLEAR (chain, DBGCTL_SYSRST, EXITMODE_UPDATE);
+
+  if (sram_init)
+    BFIN_DBGCTL_BIT_CLEAR (chain, DBGCTL_SRAM_INIT, EXITMODE_UPDATE);
+}
+
+void
 bfin_software_reset (chain_t *chain)
 {
   bfin_system_reset (chain);
