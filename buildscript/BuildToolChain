@@ -1601,7 +1601,7 @@ check_tests_OK()
                     echo " ** looks like the board has been dead for $TARGET_THRESHOLD minutes"
                     break
                 fi
-                if [ ${#NEW_TARET} -gt 0 ] ; then
+                if [ ${#NEW_TARGET} -gt 0 ] ; then
                     printf " ** looks like "
                     for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $NF}')
                     do
