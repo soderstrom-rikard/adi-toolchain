@@ -1,3 +1,8 @@
+2008-11-26  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	Patch from Nathan Sidwell:
+	* elf2flt.ld.in: Keep names of gcc eh sections in the output.
+
 2008-02-21  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* compress.c, compress.h: Split zlib functions out of flthdr.c.
