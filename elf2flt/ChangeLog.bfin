@@ -1,3 +1,7 @@
+2008-11-27  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* elf2flt.ld.in: KEEP .init and .fini.
+
 2008-11-26  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	Patch from Nathan Sidwell:
