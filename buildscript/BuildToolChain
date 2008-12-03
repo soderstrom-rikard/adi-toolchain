@@ -2585,7 +2585,7 @@ if [ $KERNEL_SOURCE ] ; then
                 die_with_log
             fi
             run_cmd cp "$DIR_UBOOT_BUILD/tools/$RUN" "$DIR_uC_OUTPUT/bin/bfin-uclinux-$RUN"
-            run_cmd cp "$DIR_UBOOT_BUILD/tools/$RUN" "$DIR_LINUX_OUTPUT/bin/bfin-uclinux-$RUN"
+            run_cmd cp "$DIR_UBOOT_BUILD/tools/$RUN" "$DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-$RUN"
         done
 
         echo_date "Cleaning U-Boot"
