@@ -1494,4 +1494,8 @@ extern int splitting_for_sched;
 
 #define PRINT_OPERAND_PUNCT_VALID_P(CHAR) ((CHAR) == '!')
 
+#ifndef TARGET_SUPPORTS_SYNC_CALLS
+#define TARGET_SUPPORTS_SYNC_CALLS 0
+#endif
+
 #endif /*  _BFIN_CONFIG */

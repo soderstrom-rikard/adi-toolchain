@@ -139,7 +139,8 @@
    ;; Distinguish a 32-bit version of an insn from a 16-bit version.
    (UNSPEC_32BIT 11)
    (UNSPEC_NOP 12)
-   (UNSPEC_ONES 13)])
+   (UNSPEC_ONES 13)
+   (UNSPEC_ATOMIC 14)])
 
 (define_constants
   [(UNSPEC_VOLATILE_EH_RETURN 0)
@@ -4424,3 +4425,5 @@
   "DISALGNEXCPT || %0 = [%1];"
   [(set_attr "type" "mcld")
    (set_attr "length" "8")])
+
+(include "sync.md")
