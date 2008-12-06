@@ -1,3 +1,11 @@
+2008-12-06  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/t-bfin (LIB1ASMFUNCS): Add muldi3 and umulsi3_highpart.
+	* config/bfin/t-bfin-elf (LIB1ASMFUNCS): Add muldi3.
+	* config/bfin/t-bfin-linux (LIB1ASMFUNCS): Add muldi3.
+	* config/bfin/t-bfin-uclinux (LIB1ASMFUNCS): Add muldi3.
+	* config/bfin/lib1funcs.asm (___muldi3): New function.
+
 2008-11-19  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/t-bfin-elf (MULTILIB_OPTIONS): Add mcpu=bf579-none.
