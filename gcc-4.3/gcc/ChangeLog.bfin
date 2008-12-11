@@ -1,5 +1,10 @@
 2008-12-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
+	* config/bfin/bfin.md (MOVCC): New mode_iterator.
+	(mov<mode>cc_insn1, mov<mode>cc_insn2, mov<mode>cc): Renamed from
+	movsicc_insn1, movsicc_insn2 and movsicc and macroized.  Remove
+	comments from generated assembly.
+
 	* config/bfin/sync.md (sync_compare_and_swapsi, sync_<fetchop_name>si,
 	sync_old_<fetchop_name>si, sync_new_<fetchop_name>si): Ensure the
 	memory address is a plain register.
