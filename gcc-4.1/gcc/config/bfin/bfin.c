@@ -4767,25 +4767,59 @@ type_for_anomaly (rtx insn)
     return get_attr_type (insn);
 }
 
+/* Return true iff the address found in MEM is based on the register
+   NP_REG and optionally has a positive offset.  */
 static bool
-trapping_loads_p (rtx insn)
+harmless_null_pointer_p (rtx mem, int np_reg)
+{
+  mem = XEXP (mem, 0);
+  if (GET_CODE (mem) == POST_INC || GET_CODE (mem) == POST_DEC)
+    mem = XEXP (mem, 0);
+  if (REG_P (mem) && REGNO (mem) == np_reg)
+    return true;
+  if (GET_CODE (mem) == PLUS
+      && REG_P (XEXP (mem, 0)) && REGNO (XEXP (mem, 0)) == np_reg)
+    {
+      mem = XEXP (mem, 1);
+      if (GET_CODE (mem) == CONST_INT && INTVAL (mem) > 0)
+	return true;
+    }
+  return false;
+}
+
+static bool
+trapping_loads_p (rtx insn, int np_reg, bool after_np_branch)
 {
   rtx pat = PATTERN (insn);
+  if (!after_np_branch)
+    np_reg = -1;
   if (GET_CODE (pat) == BUNDLE)
     {
       enum attr_type t;
       t = get_attr_type (XVECEXP (pat, 0, 1));
-      if (t == TYPE_MCLD
-	  && may_trap_p (SET_SRC (PATTERN (XVECEXP (pat, 0, 1)))))
-	return true;
+      if (t == TYPE_MCLD)
+	{
+	  rtx mem = SET_SRC (PATTERN (XVECEXP (pat, 0, 1)));
+	  if ((np_reg == -1 || !harmless_null_pointer_p (mem, np_reg))
+	      && may_trap_p (mem))
+	    return true;
+	}
       t = get_attr_type (XVECEXP (pat, 0, 2));
-      if (t == TYPE_MCLD
-	  && may_trap_p (SET_SRC (PATTERN (XVECEXP (pat, 0, 2)))))
-	return true;
+      if (t == TYPE_MCLD)
+	{
+	  rtx mem = SET_SRC (PATTERN (XVECEXP (pat, 0, 2)));
+	  if ((np_reg == -1 || !harmless_null_pointer_p (mem, np_reg))
+	      && may_trap_p (mem))
+	    return true;
+	}
       return false;
     }
   else
-    return may_trap_p (SET_SRC (single_set (insn)));
+    {
+      rtx mem = SET_SRC (single_set (insn));
+      return ((np_reg == -1 || !harmless_null_pointer_p (mem, np_reg))
+	      && may_trap_p (mem));
+    }
 }
 
 /* An RTS instruction too soon after a CALL can get an incorrect value from the
@@ -4883,6 +4917,24 @@ indirect_call_p (rtx pat)
   return REG_P (pat);
 }
 
+/* During workaround_speculation, track whether we're in the shadow of a
+   conditional branch that tests a P register for NULL.  If so, we can omit
+   emitting NOPs if we see a load from that P register, since a speculative
+   access at address 0 isn't a problem, and the load is executed in all other
+   cases anyway.
+   Global for communication with note_np_check_stores through note_stores.
+   */
+int np_check_regno = -1;
+bool np_after_branch = false;
+
+/* Subroutine of workaround_speculation, called through note_stores.  */
+static void
+note_np_check_stores (rtx x, rtx pat, void *data ATTRIBUTE_UNUSED)
+{
+  if (REG_P (x) && (REGNO (x) == REG_CC || REGNO (x) == np_check_regno))
+    np_check_regno = -1;
+}
+
 /* Insert code to work around speculative load and speculative SYNC anomalies.
    Called from bfin_reorg.  */
 static void
@@ -4906,17 +4958,37 @@ workaround_speculation (void)
 
       next = NEXT_INSN (insn);
 
-      if (NOTE_P (insn) || BARRIER_P (insn) || LABEL_P (insn))
+      if (NOTE_P (insn) || BARRIER_P (insn))
 	continue;
 
+      if (LABEL_P (insn))
+	{
+	  np_check_regno = -1;
+	  continue;
+	}
       pat = PATTERN (insn);
       if (GET_CODE (pat) == USE || GET_CODE (pat) == CLOBBER
-	  || GET_CODE (pat) == ASM_INPUT || GET_CODE (pat) == ADDR_VEC
-	  || GET_CODE (pat) == ADDR_DIFF_VEC || asm_noperands (pat) >= 0)
+	  || GET_CODE (pat) == ADDR_VEC || GET_CODE (pat) == ADDR_DIFF_VEC)
 	continue;
+      
+      if (GET_CODE (pat) == ASM_INPUT || asm_noperands (pat) >= 0)
+	{
+	  np_check_regno = -1;
+	  continue;
+	}
 
       if (JUMP_P (insn))
 	{
+	  /* Is this a condjump based on a null pointer comparison we saw
+	     earlier?  */
+	  if (np_check_regno != -1
+	      && recog_memoized (insn) == CODE_FOR_cbranchbi4)
+	    {
+	      rtx op = XEXP (SET_SRC (PATTERN (insn)), 0);
+	      gcc_assert (GET_CODE (op) == EQ || GET_CODE (op) == NE);
+	      if (GET_CODE (op) == NE)
+		np_after_branch = true;
+	    }
 	  if (any_condjump_p (insn)
 	      && ! cbranch_predicted_taken_p (insn))
 	    {
@@ -4929,6 +5001,7 @@ workaround_speculation (void)
 	}
       else if (CALL_P (insn))
 	{
+	  np_check_regno = -1;
 	  if (cycles_since_jump < INT_MAX)
 	    cycles_since_jump++;
 	  if (indirect_call_p (pat) && ENABLE_WA_INDIRECT_CALLS)
@@ -4943,13 +5016,43 @@ workaround_speculation (void)
 	  if (cycles_since_jump < INT_MAX)
 	    cycles_since_jump++;
 
+	  /* Detect a comparison of a P register with zero.  If we later
+	     see a condjump based on it, we have found a null pointer
+	     check.  */
+	  if (recog_memoized (insn) == CODE_FOR_compare_eq)
+	    {
+	      rtx src = SET_SRC (PATTERN (insn));
+	      if (REG_P (XEXP (src, 0))
+		  && P_REGNO_P (REGNO (XEXP (src, 0)))
+		  && XEXP (src, 1) == const0_rtx)
+		{
+		  np_check_regno = REGNO (XEXP (src, 0));
+		  np_after_branch = false;
+		}
+	      else
+		np_check_regno = -1;
+	    }
+
 	  if (type == TYPE_MCLD && ENABLE_WA_SPECULATIVE_LOADS)
 	    {
-	      if (trapping_loads_p (insn))
+	      if (trapping_loads_p (insn, np_check_regno,
+				    np_after_branch))
 		delay_needed = 4;
 	    }
 	  else if (type == TYPE_SYNC && ENABLE_WA_SPECULATIVE_SYNCS)
 	    delay_needed = 3;
+
+	  /* See if we need to forget about a null pointer comparison
+	     we found earlier.  */
+	  if (recog_memoized (insn) != CODE_FOR_compare_eq)
+	    {
+	      note_stores (PATTERN (insn), note_np_check_stores, NULL);
+	      if (np_check_regno != -1)
+		{
+		  if (find_regno_note (insn, REG_INC, np_check_regno))
+		    np_check_regno = -1;
+		}
+	    }
 	}
 
       if (delay_needed > cycles_since_jump
@@ -5021,7 +5124,7 @@ workaround_speculation (void)
 
 		  if (type == TYPE_MCLD && ENABLE_WA_SPECULATIVE_LOADS)
 		    {
-		      if (trapping_loads_p (target))
+		      if (trapping_loads_p (target, -1, false))
 			delay_needed = 2;
 		    }
 		  else if (type == TYPE_SYNC && ENABLE_WA_SPECULATIVE_SYNCS)
