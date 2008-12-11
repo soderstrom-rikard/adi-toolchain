@@ -48,7 +48,14 @@
      (clobber (match_scratch:SI 3 ""))
      (clobber (match_scratch:SI 4 ""))])]
   "TARGET_SUPPORTS_SYNC_CALLS"
-  "operands[2] = GEN_INT (<fetchop_addr>);")
+{
+  if (!REG_P (XEXP (operands[0], 0)))
+    {
+      operands[0] = shallow_copy_rtx (operands[0]);
+      XEXP (operands[0], 0) = force_reg (Pmode, XEXP (operands[0], 0));
+    }
+  operands[2] = GEN_INT (<fetchop_addr>);
+})
 
 (define_insn "sync_old_<fetchop_name>si_internal"
   [(set (match_operand:SI 0 "register_operand" "=q1")
@@ -76,7 +83,14 @@
 	   UNSPEC_ATOMIC))
      (clobber (match_scratch:SI 4 ""))])]
   "TARGET_SUPPORTS_SYNC_CALLS"
-  "operands[3] = GEN_INT (<fetchop_addr>);")
+{
+  if (!REG_P (XEXP (operands[1], 0)))
+    {
+      operands[1] = shallow_copy_rtx (operands[1]);
+      XEXP (operands[1], 0) = force_reg (Pmode, XEXP (operands[1], 0));
+    }
+  operands[3] = GEN_INT (<fetchop_addr>);
+})
 
 (define_insn "sync_new_<fetchop_name>si_internal"
   [(set (match_operand:SI 0 "register_operand" "=q0")
@@ -111,7 +125,14 @@
 	   UNSPEC_ATOMIC))
      (clobber (match_scratch:SI 4 ""))])]
   "TARGET_SUPPORTS_SYNC_CALLS"
-  "operands[3] = GEN_INT (<fetchop_addr>);")
+{
+  if (!REG_P (XEXP (operands[1], 0)))
+    {
+      operands[1] = shallow_copy_rtx (operands[1]);
+      XEXP (operands[1], 0) = force_reg (Pmode, XEXP (operands[1], 0));
+    }
+  operands[3] = GEN_INT (<fetchop_addr>);
+})
 
 (define_insn "sync_compare_and_swapsi_internal"
   [(set (match_operand:SI 0 "register_operand" "=q0")
@@ -139,4 +160,11 @@
 	    (match_dup 4)]
 	   UNSPEC_ATOMIC))])]
   "TARGET_SUPPORTS_SYNC_CALLS"
-  "operands[4] = GEN_INT (0x420);")
+{
+  if (!REG_P (XEXP (operands[1], 0)))
+    {
+      operands[1] = shallow_copy_rtx (operands[1]);
+      XEXP (operands[1], 0) = force_reg (Pmode, XEXP (operands[1], 0));
+    }
+  operands[4] = GEN_INT (0x420);
+})
