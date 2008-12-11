@@ -1,5 +1,8 @@
 2008-12-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
+	* config/bfin/bfin.md (rotrsi, rotlsi): Don't take INTVAL of anything
+	that's not CONST_INT.
+
 	* config/bfin/bfin.md (MOVCC): New mode_iterator.
 	(mov<mode>cc_insn1, mov<mode>cc_insn2, mov<mode>cc): Renamed from
 	movsicc_insn1, movsicc_insn2 and movsicc and macroized.  Remove

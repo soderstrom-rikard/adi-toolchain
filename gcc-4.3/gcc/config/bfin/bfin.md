@@ -1664,7 +1664,7 @@
 		   (match_operand:SI 2 "immediate_operand" "")))]
   ""
 {
-  if (INTVAL (operands[2]) != 16)
+  if (GET_CODE (operands[2]) != CONST_INT || INTVAL (operands[2]) != 16)
     FAIL;
 })
 
@@ -1674,7 +1674,7 @@
 		     (match_operand:SI 2 "immediate_operand" "")))]
   ""
 {
-  if (INTVAL (operands[2]) != 16)
+  if (GET_CODE (operands[2]) != CONST_INT || INTVAL (operands[2]) != 16)
     FAIL;
   emit_insn (gen_rotl16 (operands[0], operands[1]));
   DONE;
