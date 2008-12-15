@@ -1,3 +1,7 @@
+2008-12-15  Jie Zhang  <jie.zhang@analog.com>
+
+	* gdb.base/consecutive.exp: Don't use global in gdb_expect.
+
 2008-01-09  Jie Zhang  <jie.zhang@analog.com>
 
 	* gdb.gdbtk/stack1.c: Include stdlib.h.
