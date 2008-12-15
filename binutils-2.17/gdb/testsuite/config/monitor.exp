@@ -139,6 +139,7 @@ proc gdb_load { arg } {
     global gdb_prompt
     global timeout
     global last_gdb_file;
+    global decimal
 
     if { $arg == "" } {
 	if [info exists last_gdb_file] {
@@ -215,18 +216,45 @@ proc gdb_load { arg } {
 		}
 	    }
 
-	    verbose "Loading $farg"
-	    if [target_info exists gdb_load_offset] {
-		set command "load $farg [target_info gdb_load_offset]\n";
-	    } else {
-		set command "load $farg\n";
-	    }
 	    if [target_info exists gdb_load_timeout] {
 		set loadtimeout [target_info gdb_load_timeout]
 	    } else {
 		set loadtimeout 1600
 	    }
 
+	    if [is_remote target] {
+		send_gdb "show remotetimeout\n"
+		gdb_expect {
+		    -re "Timeout limit to wait for target to respond is ($decimal).*$gdb_prompt $" {
+			set oldremotetimeout $expect_out(1,string);
+		    }
+		    timeout {
+			if { $verbose > 1 } {
+			    perror "Timed out trying to get remotetimeout."
+			}
+		    }
+		}
+		send_gdb "set remotetimeout $loadtimeout\n";
+		gdb_expect {
+		    -re "$gdb_prompt $" {
+			verbose "Set remotetimeout to $loadtimeout\n"
+		    }
+		    timeout {
+			if { $verbose > 1 } {
+			    perror "Timed out trying to set remotetimeout."
+			}
+		    }
+		}
+	    }
+
+	    verbose "Loading $farg"
+	    if [target_info exists gdb_load_offset] {
+		set command "load $farg [target_info gdb_load_offset]\n";
+	    } else {
+		set command "load $farg\n";
+	    }
+
+	    set load_ok 0
 	    send_gdb $command;
 	    gdb_expect $loadtimeout {
 		-re "\[Ff\]ailed.*$gdb_prompt $" {
@@ -236,13 +264,31 @@ proc gdb_load { arg } {
 		}
 		-re "$gdb_prompt $" {
 		    verbose "Loaded $farg into $GDB\n"
-		    return 0;
+		    set load_ok 1
 		}
 		timeout {
 		    if { $verbose > 1 } {
 			perror "Timed out trying to load $farg."
 		    }
 		}
+	    }
+
+	    if [is_remote target] {
+		send_gdb "set remotetimeout $oldremotetimeout\n";
+		gdb_expect {
+		    -re "$gdb_prompt $" {
+			verbose "Set remotetimeout to $oldremotetimeout\n"
+		    }
+		    timeout {
+			if { $verbose > 1 } {
+			    perror "Timed out trying to set remotetimeout."
+			}
+		    }
+		}
+	    }
+
+	    if { $load_ok == 1 } {
+		return 0;
 	    }
 	}
 

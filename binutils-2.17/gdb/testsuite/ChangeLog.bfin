@@ -1,3 +1,8 @@
+2008-12-16  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/monitor.exp (gdb_load): Set remotetimeout when target
+	is remote.
+
 2008-12-15  Jie Zhang  <jie.zhang@analog.com>
 
 	* gdb.base/consecutive.exp: Don't use global in gdb_expect.
