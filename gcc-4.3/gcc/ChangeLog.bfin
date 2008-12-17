@@ -1,3 +1,8 @@
+2008-12-16  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* fold-const.c (fold_binary): Fold (A & C1) >> C2 to
+	(A >> C2) & (C1 >> C2); likewise for other logical operators.
+
 2008-12-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (rotrsi, rotlsi): Don't take INTVAL of anything

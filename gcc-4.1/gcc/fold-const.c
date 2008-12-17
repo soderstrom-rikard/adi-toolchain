@@ -8555,6 +8555,24 @@ fold_binary (enum tree_code code, tree type, tree op0, tree op1)
       if (TREE_CODE (arg1) == INTEGER_CST && tree_int_cst_sgn (arg1) < 0)
 	return NULL_TREE;
 
+      /* (X OP C1) >> C2 == (X >> C2) OP (C1 >> C2).
+	 Using the form in the right hand side has the advantage of using
+	 a smaller constant which may be cheaper to load.  */
+      if (code == RSHIFT_EXPR
+	  && (TREE_CODE (arg0) == BIT_AND_EXPR
+	      || TREE_CODE (arg0) == BIT_IOR_EXPR
+	      || TREE_CODE (arg0) == BIT_XOR_EXPR)
+	  && TREE_CODE (TREE_OPERAND (arg0, 1)) == INTEGER_CST
+	  && TREE_CODE (arg1) == INTEGER_CST)
+	{
+	  tree newconst = fold_build2 (RSHIFT_EXPR, type,
+				       TREE_OPERAND (arg0, 1), arg1);
+	  if (TREE_CODE (newconst) == INTEGER_CST)
+	    return fold_build2 (TREE_CODE (arg0), type,
+				fold_build2 (code, type, TREE_OPERAND (arg0, 0), arg1),
+				newconst);
+	}
+
       /* Turn (a OP c1) OP c2 into a OP (c1+c2).  */
       if (TREE_CODE (op0) == code && host_integerp (arg1, false)
 	  && TREE_INT_CST_LOW (arg1) < TYPE_PRECISION (type)
