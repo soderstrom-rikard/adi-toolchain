@@ -37,6 +37,8 @@
 
 #ifdef __BFIN__
 #include <bfin_l1layout.h>
+
+struct l1_scratch_task_info *task_info_p;
 #endif
 
 /* poll() is not supported in kernel <= 2.0, therefore is __NR_poll is
@@ -131,8 +133,10 @@ int attribute_noreturn __attribute__((no_stack_limit)) __pthread_manager(void *a
   INIT_THREAD_SELF(&__pthread_manager_thread, 1);
 #endif
 #ifdef __BFIN__
-  L1_SCRATCH_TASK_INFO->stack_start = __pthread_manager_thread_bos;
-  L1_SCRATCH_TASK_INFO->lowest_sp = __pthread_manager_thread_tos;
+  if (task_info_p) {
+    task_info_p->stack_start = __pthread_manager_thread_bos;
+    task_info_p->lowest_sp = __pthread_manager_thread_tos;
+  }
 #endif
   /* Set the error variable.  */
   __pthread_manager_thread.p_errnop = &__pthread_manager_thread.p_errno;
@@ -262,8 +266,10 @@ int __attribute__((no_stack_limit)) __pthread_manager_event(void *arg)
   INIT_THREAD_SELF(&__pthread_manager_thread, 1);
 #endif
 #ifdef __BFIN__
-  L1_SCRATCH_TASK_INFO->stack_start = __pthread_manager_thread_bos;
-  L1_SCRATCH_TASK_INFO->lowest_sp = __pthread_manager_thread_tos;
+  if (task_info_p) {
+    task_info_p->stack_start = __pthread_manager_thread_bos;
+    task_info_p->lowest_sp = __pthread_manager_thread_tos;
+  }
 #endif
 
   /* Get the lock the manager will free once all is correctly set up.  */
@@ -287,8 +293,10 @@ pthread_start_thread(void *arg)
   INIT_THREAD_SELF(self, self->p_nr);
 #endif
 #ifdef __BFIN__
-  L1_SCRATCH_TASK_INFO->stack_start = __pthread_handles[self->p_nr].h_bottom;
-  L1_SCRATCH_TASK_INFO->lowest_sp = arg;
+  if (task_info_p) {
+    task_info_p->stack_start = __pthread_handles[self->p_nr].h_bottom;
+    task_info_p->lowest_sp = arg;
+  }
 #endif
   PDEBUG("\n");
   /* Make sure our pid field is initialized, just in case we get there
@@ -337,8 +345,10 @@ pthread_start_thread_event(void *arg)
   INIT_THREAD_SELF(self, self->p_nr);
 #endif
 #ifdef __BFIN__
-  L1_SCRATCH_TASK_INFO->stack_start = __pthread_handles[self->p_nr].h_bottom;
-  L1_SCRATCH_TASK_INFO->lowest_sp = arg;
+  if (task_info_p) {
+    task_info_p->stack_start = __pthread_handles[self->p_nr].h_bottom;
+    task_info_p->lowest_sp = arg;
+  }
 #endif
   /* Make sure our pid field is initialized, just in case we get there
      before our father has initialized it. */

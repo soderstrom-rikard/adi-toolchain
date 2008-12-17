@@ -38,6 +38,11 @@
 #include <sys/types.h>
 #include <sys/syscall.h>
 
+#ifdef __BFIN__
+#include <bfin_l1layout.h>
+#include <sched.h>
+#endif
+
 /* mods for uClibc: __libc_sigaction is not in any standard headers */
 extern __typeof(sigaction) __libc_sigaction;
 libpthread_hidden_proto(waitpid)
@@ -467,6 +472,18 @@ static void pthread_initialize(void)
   PDEBUG("initial thread stack bounds: bos=%p, tos=%p\n",
 	 __pthread_initial_thread_bos, __pthread_initial_thread_tos);
 #endif /* __ARCH_USE_MMU__ */
+
+#ifdef __BFIN__
+  {
+    cpu_set_t mask;
+
+    task_info_p = NULL;
+    if (!sched_getaffinity(1, 4, &mask)) {
+      if(!(mask.__bits[0] & ~0x1))
+        task_info_p = ((struct l1_scratch_task_info *)L1_SCRATCH_START);
+    } 
+  }
+#endif
 
   /* Setup signal handlers for the initial thread.
      Since signal handlers are shared between threads, these settings
