@@ -3,6 +3,7 @@
 #define pPORTG_FER       ((volatile unsigned short *)PORTG_FER)
 #define pPORTG_DIR_CLEAR ((volatile unsigned short *)PORTG_DIR_CLEAR)
 #define pPORTG_CLEAR     ((volatile unsigned short *)PORTG_CLEAR)
+#define pPORTG_SET       ((volatile unsigned short *)PORTG_SET)
 #define pPORTG_DIR_SET   ((volatile unsigned short *)PORTG_DIR_SET)
 #define pPORTG           ((volatile unsigned short *)PORTG)
 #define pPORTG_MUX       ((volatile unsigned int   *)PORTG_MUX)
@@ -37,12 +38,24 @@ void Init_LEDs(void)
 
 void ClearSet_LED(const enLED led, const int bState)
 {
-	if (bState == 0)
-		*pPORTG_DIR_CLEAR &= ~(led); /* clear */
-	else if (bState == 1)
-		*pPORTG_DIR_CLEAR |= led; /* set */
-	else
-		*pPORTG_DIR_CLEAR ^= led; /* toggle */
+	static unsigned short leds = 0;
+
+	if (bState == 0) {
+		*pPORTG_CLEAR = led; /* clear */
+		leds &= ~led;
+	}
+	else if (bState == 1) {
+		*pPORTG_SET = led; /* set */
+		leds |= led;
+	}
+	else if (leds & led) {
+		*pPORTG_CLEAR = led; /* toggle */
+		leds &= ~led;
+	}
+	else {
+		*pPORTG_SET = led; /* toggle */
+		leds |= led;
+	}
 }
 
 void ClearSet_LED_Bank(const int enleds, const int iState)
