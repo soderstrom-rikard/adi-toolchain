@@ -1,0 +1,2062 @@
+#!/bin/sh
+#
+# toolchain-regtest
+#
+# Do regression testing on installed toolchain
+#
+# This file is not an official part of GCC.
+#
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# This is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GCC; see the file COPYING.  If not, write to
+# the Free Software Foundation, 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+#
+###############################################################
+
+
+APP_NAME=$0
+DIR_APP=`dirname $APP_NAME`
+DIR_BOARDS=$DIR_APP/boards/
+APP_NAME=${APP_NAME#.}
+APP_NAME=${APP_NAME#/}
+
+#Uncomment only one of these
+#TIMESTAMP=`date +%Y-%b-%d-%H-%M` # is YYYY_MMM_DD_HH_MM
+TIMESTAMP=`date +%Y%m%d`       # is YYYY_MMM_DD
+
+# PREREQ_FILE="autoconf automake awk /bin/sh bison cp echo flex gcc gettext grep ln m4 make makeinfo mkdir msgfmt mv rm sed tail wc which"
+PREREQ_TESTS="bc kill killall pstree"
+PREREQ_HW_TESTS="ping rsh rcp"
+RUNTEST=runtest
+# The default binutils version is for gdb since there is no way to
+# detect binutils version with GDB.
+DEFAULT_BINUTILS_VERSION=2.17
+BINUTILS_VERSION=
+GDB_VERSION=
+GCC_VERSION=
+GCC_VERSION_FULL=
+BINUTILS_PATH=
+GDB_PATH=
+GCC_PATH=
+TEST_ALL=1
+TEST_BINUTILS=0
+TEST_GAS=0
+TEST_LD=0
+TEST_GDB=0
+TEST_GCC=0
+TEST_GXX=0
+TEST_GFORTRAN=0
+TEST_LIBSTDCXX=0
+TEST_LIBMUDFLAP=0
+TEST_NEWLIB=0
+
+BINUTILS_TESTSUITE=
+GAS_TESTSUITE=
+LD_TESTSUITE=
+GDB_TESTSUITE=
+GCC_TESTSUITE=
+GXX_TESTSUITE=
+GFORTRAN_TESTSUITE=
+LIBSTDCXX_TESTSUITE=
+LIBMUDFLAP_TESTSUITE=
+NEWLIB_TESTSUITE=
+
+
+while getopts ab:B:dfH:hLo:O:pr:R:s:t:T:U:vw parameter
+do
+    case $parameter in
+	a)
+	    RUNTEST_FLAGS=-all
+	    ;;
+        p)
+            CHECK_PRE=true
+            ;;
+        R)
+            RUNTEST=$OPTARG
+            ;;
+        w)
+            WARN=1
+            echo "Warnings being set to seperate log file"
+            ;;
+        d)
+            DATE_STAMP=1
+            echo "Outputfiles being date stamped"
+            ;;
+        v)
+            VERBOSE=1
+            echo "Verbose output"
+            ;;
+        t)
+	    if [ "$OPTARG" = "elf-sim" ] ; then
+		TEST_TARGET_ELF_SIM=1
+	    elif [ "$OPTARG" = "elf-jtag" ] ; then
+		TEST_TARGET_ELF_JTAG=1
+	    elif [ "$OPTARG" = "uclinux" ] ; then
+		TEST_TARGET_UCLINUX=1
+	    elif [ "$OPTARG" = "linux-uclibc" ] ; then
+		TEST_TARGET_LINUX_UCLIBC=1
+	    else
+		echo "Invalid target $OPTARG"
+		exit 1
+	    fi
+            ;;
+        r)
+            if [ ! -d $OPTARG ] ; then
+                echo "Can't find old test results in $OPTARG"
+                exit 1
+            fi
+            RESULTS2COMPARE=$OPTARG
+            ;;
+        T)
+            TARGET_IPADDR=`expr "$OPTARG" : "\([0-9]*\.[0-9]*\.[0-9]*\.[0-9]*\)"`
+            if [ "x$TARGET_IPADDR" = "x" ] ; then
+                echo "Target ip address in wrong format"
+                exit 1
+            fi
+            ;;
+        s)
+            if [ -d $OPTARG ] ; then
+                DIR_SOURCE=$OPTARG
+                DIR_SOURCE=${DIR_SOURCE%/}
+            else
+                echo "Invalid Source Path"
+                exit 1
+            fi
+            ;;
+        H)
+            HOST_TARGET="--host=$OPTARG"
+            ;;
+        b)
+            if [ -d $OPTARG ] ; then
+                DIR_BUILD=$OPTARG
+                DIR_BUILD=${DIR_BUILD%/}
+            else
+                DIR_BUILD=$OPTARG
+                DIR_BUILD=${DIR_BUILD%/}
+            fi
+            ;;
+        o)
+            DIR_ELF_OUTPUT=$OPTARG-elf
+            DIR_uC_OUTPUT=$OPTARG-uclinux
+            DIR_LINUX_OUTPUT=$OPTARG-linux-uclibc
+            ;;
+        O)
+            DIR_ELF_OUTPUT=$OPTARG
+            DIR_uC_OUTPUT=$OPTARG
+            DIR_LINUX_OUTPUT=$OPTARG
+            ;;
+        f)
+            STACK_CHECKING=true
+            ;;
+	L)
+	    LEGACY_RESULT=1
+	    ;;
+        h)
+# We don't document the -S option - it's for advanced users who know what
+# they are doing.  For maximum reproducibility, not using it is better.
+             echo "Usage : $APP_NAME -s SOURCE [OPTIONS] [binutils] [gas] [ld] [gdb]
+[gcc] [g++] [gfortran] [libstdc++] [libmudflap] [newlib]
+-a               Add --all to runtest
+-b BUILD         Build directory (leave blank to use current dir)
+-d               Date Stamp all output files
+-f               Add stack checking to all tests
+-h               Help
+-H HOST          ??? Build toolchain to run on HOST.
+-L               Save test result files in legacy name		 
+-O OUTPUT        Output directory (toolchain to be tested)
+-o OUTPUT        Output directory prefix (toolchain to be tested)
+-p               Check prerequisites
+-R RUNTEST       Default runtest (leave blank to use system runtest)
+-r RESULTS_DIR   Compare current tests to old results
+-s SOURCE        Toolchain Source directory (where to find testsuites)
+-T TARGET_IPADDR Test components on hardware
+-t TARGET        Test target (elf-sim, elf-jtag, uclinux, or linux-uclibc)
+-u SOURCE        Uboot Source directory
+-v               Verbose
+-w               Warnings to be sent to a different log file
+"
+             exit 0
+             ;;
+        *)
+             echo "Unknown option $parameter"
+             echo "Try \`$APP_NAME -h' for more information."
+             exit 1
+    esac
+done
+
+shift $(($OPTIND - 1))
+
+until [ -z "$1" ]
+do
+    case $1 in
+	gcc*)
+	    TEST_GCC=1
+	    TEST_ALL=0
+	    GCC_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+	    shift
+	    ;;
+	g++*)
+	    TEST_GXX=1
+	    TEST_ALL=0
+	    GXX_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+	    shift
+	    ;;
+	gfortran*)
+	    TEST_GFORTRAN=1
+	    TEST_ALL=0
+	    GFORTRAN_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+	    shift
+	    ;;
+	binutils*)
+	    TEST_BINUTILS=1
+	    TEST_ALL=0
+	    BINUTILS_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+	    shift
+	    ;;
+	gas*)
+	    TEST_GAS=1
+	    TEST_ALL=0
+	    GAS_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+	    shift
+	    ;;
+	ld*)
+	    TEST_LD=1
+	    TEST_ALL=0
+	    LD_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+	    shift
+	    ;;
+	gdb*)
+	    TEST_GDB=1
+	    TEST_ALL=0
+	    GDB_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+	    shift
+	    ;;
+	libstdc++*)
+	    TEST_LIBSTDCXX=1
+	    TEST_ALL=0
+	    LIBSTDCXX_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+	    shift
+	    ;;
+	libmudflap*)
+	    TEST_LIBMUDFLAP=1
+	    TEST_ALL=0
+	    LIBMUDFLAP_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+	    shift
+	    ;;
+	newlib*)
+	    TEST_NEWLIB=1
+	    TEST_ALL=0
+	    NEWLIB_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+	    shift
+	    ;;
+	*)
+	    echo "Unknow argument $1"
+	    echo "Try \`$APP_NAME -h' for more information."
+    esac
+done
+
+if [ $TEST_ALL -eq 1 ] ; then
+    TEST_BINUTILS=1
+    TEST_GAS=1
+    TEST_LD=1
+    TEST_GDB=1
+    TEST_GCC=1
+    TEST_GXX=1
+    TEST_GFORTRAN=1
+    TEST_LIBSTDCXX=1
+    TEST_LIBMUDFLAP=1
+    TEST_NEWLIB=1
+fi
+
+if [ ! $TEST_TARGET_ELF_SIM ] && [ ! $TEST_TARGET_ELF_JTAG ] && [ ! $TEST_TARGET_UCLINUX ] && [ ! $TEST_TARGET_LINUX_UCLIBC ]; then
+    TEST_TARGET_ELF_SIM=1
+    if [ $TARGET_IPADDR ] ; then
+	TEST_TARGET_UCLINUX=1
+	TEST_TARGET_LINUX_UCLIBC=1
+    fi
+fi
+
+if [ $TEST_TARGET_UCLINUX ] || [ $TEST_TARGET_LINUX_UCLIBC ] ; then
+    if [ ! $TARGET_IPADDR ] ; then
+	echo "No target ip address provided"
+	exit 1
+    fi
+fi
+
+echo -n "Targets: "
+if [ $TEST_TARGET_ELF_SIM ] ; then
+    echo -n "elf-sim "
+fi
+if [ $TEST_TARGET_ELF_JTAG ] ; then
+    echo -n "elf-jtag "
+fi
+if [ $TEST_TARGET_UCLINUX ] ; then
+    echo -n "uclinux "
+fi
+if [ $TEST_TARGET_LINUX_UCLIBC ] ; then
+    echo -n "linux-uclibc"
+fi
+echo ""
+
+echo -n "Components: "
+if [ $TEST_BINUTILS -eq 1 ] ; then
+    echo -n "binutils "
+fi
+if [ $TEST_GAS -eq 1 ] ; then
+    echo -n "gas "
+fi
+if [ $TEST_LD -eq 1 ] ; then
+    echo -n "ld "
+fi
+if [ $TEST_GDB -eq 1 ] ; then
+    echo -n "gdb "
+fi
+if [ $TEST_GCC -eq 1 ] ; then
+    echo -n "gcc "
+fi
+if [ $TEST_GXX -eq 1 ] ; then
+    echo -n "g++ "
+fi
+if [ $TEST_GFORTRAN -eq 1 ] ; then
+    echo -n "gfortran"
+fi
+if [ $TEST_LIBSTDCXX -eq 1 ] ; then
+    echo -n "libstdc++ "
+fi
+if [ $TEST_LIBMUDFLAP -eq 1 ] ; then
+    echo -n "libmudflap "
+fi
+if [ $TEST_NEWLIB -eq 1 ] ; then
+    echo -n "newlib"
+fi
+echo ""
+
+# I'd like to echo host triplet and build triplet here.
+# But until now we have not checked validity of source paths.
+# Maybe we need put a copy of config.guess and config.sub
+# along with this build script.
+
+#FIXME Check if HOST_ALIAS can be recognized by config.sub
+#      Check if config.guess is successful
+
+BUILD_TRIPLET=`$DIR_APP/config.guess`
+if [ -z "$HOST_ALIAS" ] ; then
+    HOST_TRIPLET=`$DIR_APP/config.guess`
+else
+    HOST_TRIPLET=`$DIR_APP/config.sub $HOST_ALIAS`
+fi
+BUILD_TARGET="--build=$BUILD_TRIPLET"
+HOST_TARGET="--host=$HOST_TRIPLET"
+
+echo "Host: $HOST_TRIPLET"
+echo "Build: $BUILD_TRIPLET"
+
+# If we want to test a toolchain in a specified path, make sure
+# we will not test tools in other path.
+if [ $DIR_ELF_OUTPUT ] ; then
+    NEW_PATH=""
+    RUN=`echo $PATH | sed 's/:/ /g'`
+    FOUND=0
+    for SEARCH in $RUN
+    do
+	if [ -d $SEARCH ] ; then
+            FIND=`find $SEARCH/ -maxdepth 1 -name "bfin-elf-*" -o -name "bfin-uclinux-*" -o -name "bfin-linux-uclibc-*" | wc -c`
+            if [ $FIND -gt 1 ] ; then
+		FOUND=1
+		echo "Removing $SEARCH from the PATH"
+            else
+		if [ $NEW_PATH ] ; then
+                    NEW_PATH=$NEW_PATH:$SEARCH
+		else
+                    NEW_PATH=$SEARCH
+		fi
+            fi
+	fi
+    done
+
+    PATH=$NEW_PATH:$DIR_ELF_OUTPUT/bin:$DIR_uC_OUTPUT/bin:$DIR_LINUX_OUTPUT/bin
+    export PATH
+fi
+
+############ Check and error if I can't find the things I need #
+
+if [ -n "$CHECK_PRE" ] ; then
+    echo "Check http://gcc.gnu.org/install/prerequisites.html for more information"
+    for file in $RUNTEST $PREREQ_TESTS $PREREQ_HW_TESTS
+    do
+        RUN=`which -a $file 2>/dev/null| wc -w`
+        if [ $RUN -eq 0 ] ; then
+            echo "!! $file: could not be found"
+            for tmp in $PREREQ_FILE
+            do
+                if [ "$file" = "$tmp" ]; then
+                    echo "!! you need to install package which includes ${file} before building the toolchain will be sucessful"
+                fi
+            done
+        else
+            tmp1=`echo $file | awk -F \/ '{print $NF}'`
+            RUN=`type $tmp1 | grep "shell builtin" | wc -l`
+            if [ $RUN -eq 1 ] ; then
+                echo "   $file seems to be a shell builtin"
+                continue
+            fi
+            for VER in --version -version -V
+            do
+                 tmp=`$file $VER < /dev/null 2>&1 | grep -ie "\<$tmp1\>" | grep -vi "option" | grep -vi "Usage" | grep -vi "\-v"`
+                 if [ -n "$tmp" ] ; then
+                     echo "  " $tmp
+                     break
+                 fi
+            done
+            if [ -n "$tmp" ] ; then
+                continue
+            fi
+
+            for VER in --version -version -V
+            do
+                tmp=`$file $VER < /dev/null 2>&1 | grep -ie "version " | grep -vi "option" | grep -vi "Usage" | grep -vi "\-v"`
+                if [ -n "$tmp" ] ; then
+                    echo "  " $tmp
+                    break
+                fi
+            done
+            if [ -n "$tmp" ] ; then
+                continue
+            fi
+            echo "** Could not find version of `which $file`"
+            echo -n "** "
+            file `which $file`
+            RUN=$(file `which $file`| grep -i "symbolic link" | wc -l)
+            while [ "$RUN" -gt "0" ]
+            do
+                echo -n " * "
+                file=$(file `which $file` | awk  '{print $NF}' | sed 's/`//g' | sed "s/'//g")
+                file $file
+                RUN=$(file $file | grep -i "symbolic link" | wc -l)
+            done
+        fi
+    done
+    echo "   SHELL = $SHELL"
+    echo "Done checking for prerequisites"
+    exit 0
+fi
+
+PREREQ_FILE="${PREREQ_FILE} $RUNTEST ${PREREQ_TESTS}"
+
+if [ -n "$TEST_TARGET_UCLINUX" -o -n "$TEST_TARGET_LINUX_UCLIBC" ] ; then
+    PREREQ_FILE="${PREREQ_FILE} ${PREREQ_HW_TESTS}"
+fi
+
+for PREREQ in $PREREQ_FILE
+do
+    RUN=`which -a $PREREQ | wc -w`
+    if [ $RUN -eq 0 ] ; then
+        echo "Can not find $PREREQ"
+        exit 1
+    else if [ $RUN -gt 1 ] ; then
+        echo -n "Found multiple versions of $PREREQ, using the one at "
+        which $PREREQ
+        fi
+    fi
+done
+
+############ ABSOLUTE PATH TO SOURCE DIRECTORIES ################
+
+# Toolchain source must be provided with command line argument
+if [ ! $DIR_SOURCE ] ; then
+    echo "Usage : $APP_NAME -s SOURCE [-b BUILD]"
+    echo "                  -h for help"
+    exit 1
+fi
+
+if [ -d /.$DIR_SOURCE ] ; then
+    echo -n "Toolchain source is at      "
+    echo $DIR_SOURCE
+else
+    echo "Invalid Toolchain Source Path"
+    echo $DIR_SOURCE
+    exit 1
+fi
+
+############ ABSOLUTE PATH TO BUILD DIRECTORIES ################
+
+if [ ! $DIR_BUILD ] ; then
+    DIR_BUILD=`pwd`
+elif [ ! -e $DIR_BUILD ] ; then
+    mkdir -p $DIR_BUILD
+fi
+if [ ! -d /.$DIR_BUILD ] ; then
+    echo "Invalid build path, must be relative to the root dir"
+    exit 1
+fi
+echo "Build will be done in       $DIR_BUILD"
+
+DIR_LOG=$DIR_BUILD/logs
+if [ ! -d $DIR_LOG ] ; then
+    mkdir $DIR_LOG
+fi
+
+############ RELATIVE PATH TO RESULT DIRECTORIES ################
+
+echo "Path for test results       "
+DIR_TEST_RESULTS=$DIR_BUILD/tests
+if [ ! -d $DIR_TEST_RESULTS ] ; then
+    mkdir $DIR_TEST_RESULTS
+fi
+
+if [ -n "$TEST_TARGET_ELF_SIM" ] ; then
+    if [ $DATE_STAMP ] ; then
+        DIR_TEST_SIM_RESULTS=$DIR_TEST_RESULTS/simulator-$TIMESTAMP
+    else
+        DIR_TEST_SIM_RESULTS=$DIR_TEST_RESULTS/simulator
+    fi
+    if [ ! -d $DIR_TEST_SIM_RESULTS ] ; then
+        mkdir $DIR_TEST_SIM_RESULTS
+    elif [ $TEST_ALL -eq 1 ] ; then
+        rm -rf $DIR_TEST_SIM_RESULTS/*
+    fi
+    echo "  elf simulator:  $DIR_TEST_SIM_RESULTS"
+
+    if [ -n "$RESULTS2COMPARE" ] ; then
+        if [ ! -d $RESULTS2COMPARE/simulator ] ; then
+            echo "Can't find simulator results in $RESULTS2COMPARE/simulator"
+            exit 1
+        else
+            if [ ! -d /.$RESULTS2COMPARE ] ; then
+                echo "Invalid results path, must be relative to the root dir"
+                exit 1
+            fi
+            echo "    checking simulator results against $RESULTS2COMPARE/simulator"
+        fi
+    fi
+fi
+
+if [ -n "$TEST_TARGET_ELF_JTAG" ] ; then
+    if [ $DATE_STAMP ] ; then
+        DIR_TEST_JTAG_RESULTS=$DIR_TEST_RESULTS/jtag-$TIMESTAMP
+    else
+        DIR_TEST_JTAG_RESULTS=$DIR_TEST_RESULTS/jtag
+    fi
+    if [ ! -d $DIR_TEST_JTAG_RESULTS ] ; then
+        mkdir $DIR_TEST_JTAG_RESULTS
+    elif [ $TEST_ALL -eq 1 ] ; then
+        rm -rf $DIR_TEST_JTAG_RESULTS/*
+    fi
+    echo "  elf jtag:  $DIR_TEST_JTAG_RESULTS"
+
+    if [ -n "$RESULTS2COMPARE" ] ; then
+        if [ ! -d $RESULTS2COMPARE/jtag ] ; then
+            echo "Can't find jtag results in $RESULTS2COMPARE/jtag"
+            exit 1
+        else
+            if [ ! -d /.$RESULTS2COMPARE ] ; then
+                echo "Invalid results path, must be relative to the root dir"
+                exit 1
+            fi
+            echo "    checking jtag results against $RESULTS2COMPARE/jtag"
+        fi
+    fi
+fi
+
+if [ -n "$TEST_TARGET_UCLINUX" ] ; then
+    if [ $DATE_STAMP ] ; then
+        DIR_TEST_HW_RESULTS=$DIR_TEST_RESULTS/hardware-flat-$TIMESTAMP
+    else
+        DIR_TEST_HW_RESULTS=$DIR_TEST_RESULTS/hardware-flat
+    fi
+    if [ ! -d $DIR_TEST_HW_RESULTS ] ; then
+        mkdir $DIR_TEST_HW_RESULTS
+    elif [ $TEST_ALL -eq 1 ] ; then
+        rm -rf $DIR_TEST_HW_RESULTS/*
+    fi
+    echo "  uclinux ($TARGET_IPADDR):  $DIR_TEST_HW_RESULTS"
+
+    if [ -n "$RESULTS2COMPARE" ] ; then
+        if [ ! -d $RESULTS2COMPARE/hardware-flat ] ; then
+            echo "Can't find uclinux results in $RESULTS2COMPARE/hardware-flat"
+            exit 1
+        else
+            if [ ! -d /.$RESULTS2COMPARE ] ; then
+                echo "Invalid results path, must be relative to the root dir"
+                exit 1
+            fi
+            echo "    checking uclinux results against $RESULTS2COMPARE/hardware-flat"
+        fi
+    fi
+fi
+
+if [ -n "$TEST_TARGET_LINUX_UCLIBC" ] ; then
+    if [ $DATE_STAMP ] ; then
+        DIR_TEST_HW2_RESULTS=$DIR_TEST_RESULTS/hardware-fdpic-$TIMESTAMP
+    else
+        DIR_TEST_HW2_RESULTS=$DIR_TEST_RESULTS/hardware-fdpic
+    fi
+    if [ ! -d $DIR_TEST_HW2_RESULTS ] ; then
+        mkdir $DIR_TEST_HW2_RESULTS
+    elif [ $TEST_ALL -eq 1 ] ; then
+        rm -rf $DIR_TEST_HW2_RESULTS/*
+    fi
+    echo "  linux-uclibc ($TARGET_IPADDR):  $DIR_TEST_HW2_RESULTS"
+
+    if [ -n "$RESULTS2COMPARE" ] ; then
+        if [ ! -d $RESULTS2COMPARE/hardware-fdpic ] ; then
+            echo "Can't find uclinux-uclibc results in $RESULTS2COMPARE/hardware-fdpic"
+            exit 1
+        else
+            if [ ! -d /.$RESULTS2COMPARE ] ; then
+                echo "Invalid results path, must be relative to the root dir"
+                exit 1
+            fi
+            echo "    checking linux-uclibc results against $RESULTS2COMPARE/hardware-fdpic"
+        fi
+    fi
+fi
+
+
+###################### set up log file ###########################
+
+if [ $DATE_STAMP ] ; then
+    echo "Creating log file           $DIR_LOG/regtest.log.$TIMESTAMP"
+    if [ $VERBOSE ]; then
+        LOGFILE="| tee -a $DIR_LOG/regtest.log.$TIMESTAMP"
+        ACTUAL_LOGFILE=$DIR_LOG/regtest.log.$TIMESTAMP
+    else
+        if [ $WARN ] ; then
+            echo "*** Warnings going to $DIR_LOG/regtest.warn.$TIMESTAMP"
+            LOGFILE=">> $DIR_LOG/regtest.log.$TIMESTAMP 2>> $DIR_LOG/regtest.warn.$TIMESTAMP"
+            ACTUAL_LOGFILE=$DIR_LOG/regtest.warn.$TIMESTAMP
+        else
+            LOGFILE=">> $DIR_LOG/regtest.log.$TIMESTAMP 2>&1"
+            ACTUAL_LOGFILE=$DIR_LOG/regtest.log.$TIMESTAMP
+        fi
+    fi
+else
+    echo "Creating log file           $DIR_LOG/regtest.log"
+    if [ $VERBOSE ]; then
+        LOGFILE="| tee -a $DIR_LOG/regtest.log"
+        ACTUAL_LOGFILE=$DIR_LOG/regtest.log
+    else
+        if [ $WARN ] ; then
+            echo "*** Warnings going to $DIR_LOG/regtest.warn"
+            LOGFILE=">> $DIR_LOG/regtest.log 2>> $DIR_LOG/regtest.warn"
+            ACTUAL_LOGFILE=$DIR_LOG/regtest.warn
+        else
+            LOGFILE=">> $DIR_LOG/regtest.log 2>&1"
+            ACTUAL_LOGFILE=$DIR_LOG/regtest.log
+        fi
+    fi
+fi
+
+
+# stop if there are any Xvfb or rsh processes, which might be lurking around from old runs
+RUN=`ps aux | grep Xvfb | grep -v grep | wc -l`
+if [ $RUN -gt 0 ] ; then
+    echo "Found $RUN old Xvfb process(s), before running, kill them"
+    echo " so the hardware tests don't get confused"
+    ps aux | grep Xvfb | grep -v grep ; killall -9 Xvfb
+fi
+
+if [ $TEST_TARGET_UCLINUX ] || [ $TEST_TARGET_LINUX_UCLIBC ] ; then
+    # stop if there are any rsh processes, which might be lurking around from old runs
+    RUN=`ps aux | grep rsh | grep -v grep | wc -l`
+    if [ $RUN -gt 0 ] ; then
+        echo "Found $RUN old rsh process(s), before running, kill them"
+        echo " so the hardware tests don't get confused"
+        ps aux | grep rsh | grep -v grep ; killall -9 rsh
+    fi
+
+    # Check if target board is available using ping, rcp and rsh.
+    RUN=`ping -n -c 1 $TARGET_IPADDR | grep -i Unreachable`
+    if [ "x$RUN" != "x" ] ; then
+        echo "Could not ping $TARGET_IPADDR - check network settings"
+        exit 1
+    fi
+    RUN=`rsh -l root $TARGET_IPADDR /bin/ls / 2>/dev/null | wc -l`
+    if [ $RUN -eq 0 ] ; then
+        echo "Can't rsh to $TARGET_IPADDR, check rsh client on host, and inet on target"
+        exit 1
+    fi
+    RUN=`rcp root@$TARGET_IPADDR:/bin/gdbserver $DIR_TEST_HW_RESULTS/gdbserver`
+    if [ "x$RUN" != "x" ] ; then
+        echo "Check gdbserver is available on the target, and you can rcp"
+        exit 1
+    fi
+    if [ -f $DIR_TEST_HW_RESULTS/gdbserver ] ; then
+        FDPIC_TARGET=`file $DIR_TEST_HW_RESULTS/gdbserver | grep ELF | wc -l`
+        rm -f $DIR_TEST_HW_RESULTS/gdbserver
+    fi
+    RUN=`rsh -l root $TARGET_IPADDR "cat /proc/maps" | grep \/ | wc -l`
+    FDPIC_TARGET=`expr $FDPIC_TARGET + $RUN`
+    # Check if the tcp connections are recycled on both
+    # target and host, which is needed to prevent the rsh
+    # and rcp connection failures.
+
+    echo -n "    checking host   /proc/sys/net/ipv4/tcp_tw_recycle : "
+    RUN=`cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
+    if [ "x$RUN" = "x" ] ; then
+        echo "NOT exist"
+        echo "   Your host kernel does NOT support Sysctl"
+        exit 1
+    fi
+    if [ "x$RUN" = "x0" ] ; then
+        echo "0"
+        echo "   Please run \"echo 1 > /proc/sys/net/ipv4/tcp_tw_recycle\" as root"
+        exit 1
+    else
+        echo "1 - looks OK"
+    fi
+
+    echo -n "    checking target /proc/sys/net/ipv4/tcp_tw_recycle : "
+    RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
+    if [ "x$RUN" = "x" ] ; then
+        echo "NOT exist"
+        echo "   Please enable Sysctl when configure the kernel"
+        exit 1
+    fi
+    if [ "x$RUN" = "x0" ] ; then
+       echo -n "0 - setting to 1 "
+       rsh -l root $TARGET_IPADDR echo 1 \> /proc/sys/net/ipv4/tcp_tw_recycle
+       RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
+       if [ "x$RUN" = "x0" ] ; then
+	   echo "Failure"
+           echo "Could not set target $TARGET_IPADDR /proc/sys/net/ipv4/tcp_tw_recycle to 1"
+           exit 1
+       else
+           echo "Sucess"
+       fi
+    else
+        echo "1 - looks OK"
+    fi
+
+    RUN=`rsh -l root $TARGET_IPADDR cat /proc/cpuinfo | grep vendor_id | awk -F: '{print $2}' | sed 's/^ *//'`
+    if [ "$RUN" != "Analog Devices" ] ; then
+        echo "Target $TARGET_IPADDR doesn't appear to be a Blackfin - sorry"
+        exit 1
+    fi
+    CPU_TYPE_REV=`rsh -l root $TARGET_IPADDR cat /proc/cpuinfo | grep model | awk '{print $4}' | sed 's/ADSP-//' | sed 's/BF/bf/'`
+    RUN=`rsh -l root $TARGET_IPADDR cat /proc/cpuinfo | grep stepping | awk '{print $3}'`
+    CPU_TYPE_REV=${CPU_TYPE_REV}-0.${RUN}
+    echo "    Target $TARGET_IPADDR is $CPU_TYPE_REV, using that for testing multilib"
+
+    if [ $STACK_CHECKING ] ; then
+        echo "    Hardware tests will be compiled with optional stack overflow checking"
+    fi
+    if [ $TEST_TARGET_LINUX_UCLIBC ] ; then
+	if [ $FDPIC_TARGET -eq 0 ] ; then
+            echo "    Looks like flat userspace - will copy over /lib/*.so when testing"
+	else
+            echo "    Looks like fdpic userspace - will warn if /lib/*.so are different (not implemented yet)"
+	fi
+    fi
+
+    RUN=`rsh -l root $TARGET_IPADDR "ps | grep syslog | grep -v grep | grep -v \"l 6\" | wc -l"`
+    if [ $RUN = 1 ] ; then
+        echo "    Board at ${TARGET_IPADDR} being set so syslog doesn't fill /var/log/messages"
+        rsh -l root $TARGET_IPADDR "sed -i 's/^slog.*$/slog:unknown:\/sbin\/syslogd -n -l 6/' /etc/inittab"
+        rsh -l root $TARGET_IPADDR "kill -HUP 1"
+    fi
+    rcp root@$TARGET_IPADDR:/var/log/messages $DIR_TEST_RESULTS/messages.boot
+    rsh -l root $TARGET_IPADDR "rm /var/log/messages"
+    rsh -l root $TARGET_IPADDR "touch /var/log/messages"
+    rsh -l root $TARGET_IPADDR "kill -HUP 1"
+fi
+
+
+############ Done checking - lets get on to testing ###################
+
+# Some helpful functions
+die_with_log ()
+{
+    echo -n " Build error " ; date
+    echo " Last logfile entries:"
+    tail -10 $ACTUAL_LOGFILE
+    # Create a single file so users can email it to us,
+    # we sleep, so things can finish writing to the log file
+    sleep 1
+    tar -jhcf $DIR_LOG/config.logs.tbz2 `find $DIR_BUILD -name "config.log"` $ACTUAL_LOGFILE
+    exit 1
+}
+
+log_it()
+{
+    # Note: embedded single quotes will break this
+    eval "printf '###\n%s\n\n' '$*'" ${LOGFILE}
+}
+
+run_cmd()
+{
+    log_it "$@"
+    eval \("$@"\) ${LOGFILE} || die_with_log
+}
+
+change_dir()
+{
+    log_it cd "$@"
+    cd "$@" || die_with_log
+}
+
+echo_date()
+{
+    # if we can fit the msg on one line, then do it.  else,
+    # try and split it on word boundaries.  if all else fails,
+    # give it its own line.
+    local recurse
+    case $1 in
+        -[rR]) recurse=$1; shift;;
+    esac
+    local date="$(date)"
+    local msg="$*"
+    local bytes_for_msg=$((${COLUMNS:-80} - ${#date} - 5))
+
+    if [ -n "${recurse}" ] || [ ${#msg} -le ${bytes_for_msg} ] ; then
+        local banner="***" full
+        if [ -n "${recurse}" ] ; then
+            [ ${#msg} -eq 0 ] && return 1
+            [ "${recurse}" = "-r" ] && banner="   " date=""
+        fi
+        [ ${#msg} -gt ${bytes_for_msg} ] && full=${msg} msg=""
+        if [ -n "${msg}" ] || [ "${recurse}" = "-R" ] ; then
+            printf "%s %-${bytes_for_msg}s %s\n" "${banner}" "${msg}" "${date}"
+        fi
+        [ -n "${full}" ] && echo "   " ${full}
+    else
+        local split word
+        recurse="-R"
+        for word in ${msg} ; do
+            if [ $((${#split} + ${#word})) -ge ${bytes_for_msg} ] ; then
+                echo_date ${recurse} ${split} && recurse="-r"
+                split=""
+            fi
+            split="${split} ${word}"
+        done
+        echo_date ${recurse} ${split}
+        recurse=""
+    fi
+
+    [ -z "${recurse}" ] && (echo "echo -e '###\n${msg}\n' $LOGFILE" ) | sh
+    return 0
+}
+
+# $1 is the part 1
+# $2 is the part 2
+echo_2_parts ()
+{
+    printf "%-28s%s\n" "$1" "$2"
+}
+
+
+# Some of the tests leave stuff all over the target file system,
+# by getting rid of it, we free up lots of memory.
+clean_hardware()
+{
+    hardware=`echo $1 | grep -i linux`
+    if [ -n "$hardware" ] ; then
+        RUN=`rsh -l root $TARGET_IPADDR free`
+        (echo "echo -e '###\n$RUN\nCleaning\n' $LOGFILE" ) | sh
+        rsh -l root $TARGET_IPADDR "rm *" 2>/dev/null
+        rsh -l root $TARGET_IPADDR "rm /tmp/*" 2>/dev/null
+        RUN=`rsh -l root $TARGET_IPADDR free`
+        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+
+        #we dump something onto the console so we can track which application caused a crash
+        rsh -l root $TARGET_IPADDR "echo > /dev/console; echo "testing $1 $2" > /dev/console"
+    fi
+
+}
+
+copy_test_results()
+{
+    for SUM in `find ./ -name "*.sum"` ; do
+        SUM=${SUM%.sum}
+        name=${SUM##*/}
+        target=""
+        # This loop builds up the target filename. based on the path, 
+        # removing names that are pointless
+        for SUBDIR in `echo $SUM | sed -e 's:^\./::' -e 's:/testsuite/:/:' -e 's/\// /g'` ; do
+            case ${SUBDIR} in *${name}*) continue;; esac
+                target=${target}${SUBDIR}-
+        done
+        target=${target}${name}
+        cp ${SUM}.sum $1/${target}-${2}.sum
+        cp ${SUM}.log $1/${target}-${2}.log
+    done
+}
+
+# Get the target hardware ready for testing:
+#  - check we can access it
+#  - set syslogd & tcp_tw_recycle
+#  - copy over all the shared libs to the target /lib dir (for fdpic tests, and if flat userspace)
+# prepare_target test_target_dir
+prepare_target()
+{
+    hardware=`basename $1 | grep -i linux`
+    if [ -n "$hardware" ] ; then
+        # Check if target board is available using ping
+        TIMEOUT=0
+        RUN=`ping -n -c 1 $TARGET_IPADDR | grep -i Unreachable`
+        while ([ "x$RUN" != "x" ] && [ $TIMEOUT -lt 5 ])
+        do
+            RUN=`ping -n -c 1 $TARGET_IPADDR | grep -i Unreachable`
+            TIMEOUT=`expr $TIMEOUT + 1`
+            sleep 60
+        done
+        if [ "x$RUN" != "x" ] ; then
+            echo "Could not ping $TARGET_IPADDR - check network settings"
+            exit 1
+        fi
+
+        # Just in case we caused the kernel under test to crash, let's do a sanity test
+        # make sure syslogd is set to not log rsh/rcp as it will fill /var/log/messages
+        RUN=`rsh -l root $TARGET_IPADDR "ps | grep syslog | grep -v grep | grep -v \"l 6\" | wc -l"`
+        if [ "$RUN" = "1" ] ; then
+            echo " ** Resetting syslogd"
+            rsh -l root $TARGET_IPADDR "sed -i 's/^slog.*$/slog:unknown:\/sbin\/syslogd -n -l 6/' /etc/inittab"
+            rsh -l root $TARGET_IPADDR "kill -HUP 1"
+            #we dump something onto the console so we can track things
+            rsh -l root $TARGET_IPADDR "echo > /dev/console; echo "Setting syslogd" > /dev/console"
+        fi
+
+        #  checking target /proc/sys/net/ipv4/tcp_tw_recycle
+        RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
+        if [ "$RUN" = "0" ] ; then
+            echo " ** Setting tcp_tw_recycle"
+            rsh -l root $TARGET_IPADDR echo 1 \> /proc/sys/net/ipv4/tcp_tw_recycle
+            #we dump something onto the console so we can track things
+            rsh -l root $TARGET_IPADDR "echo > /dev/console; echo "Setting tcp_tw_recycle" > /dev/console"
+        fi
+    fi
+}
+
+# A very light check_tests_OK, which only check if the target board is hung.
+# Let runtest timeout handle host side.
+
+check_tests_OK()
+{
+    PID=$1
+    THRESHOLD=3
+    TRY=0
+    HARDWARE=`echo -n $3 | grep -i hardware`
+    if [ $HARDWARE ] ; then
+	while [ 1 ]
+	do
+            # Check on the Host - if the test is done - quit
+            NEW=`pstree -n -A -l -p $PID`
+            if [ -z "$NEW" ] ; then
+		break;
+            fi
+
+	    # make sure the board is not hung
+            RUN=`rsh -l root $TARGET_IPADDR "ls /  1>/dev/null" 2>&1 | wc -l`
+            if [ "$RUN" = "1" ] ; then
+		TRY=`expr $TRY + 1`
+	    else
+		TRY=0
+            fi
+
+            if [ $TRY -gt $THRESHOLD ] ; then
+		echo "*** I think the board or network died during testing - sorry "
+		echo "*** Kill the current testing"
+		kill $PID
+		break
+            fi
+	    sleep 5
+	done
+    else
+	wait
+    fi
+}
+
+# The basic idea is that if things are not progressing at least every 10 minutes
+# something is hung, and we should kill it, and tell the user what was stuck
+#
+check_tests_OK1()
+{
+    PID=$1
+    HOST_THRESHOLD=7
+    TARGET_THRESHOLD=5
+    WAIT=1
+    WAIT_TARGET=1
+    HARDWARE=`echo -n $3 | grep -i hardware`
+    # -n : numeric sort - kill the last process first
+    # -A : use ASCII, not UTF-8 or VT100
+    # -l : long lines (otherwise it cuts off at 132 char across
+    # -p : show pids of children
+    NEW=`pstree -n -A -l -p $PID`
+    # grep -v "\["     : remove kernel threads
+    # grep -v "/init"  : remove the init process
+    # grep -v " inetd" : remove initd
+    # grep -v "/rshd"  : remove rsh sesions
+    # grep -v " ps"    : remove ps processes (so we don't care about us running ps)
+    # grep -v " PID "  : remove the top line "  PID  Uid        VSZ Stat Command"
+    # grep -v "[ /]sh" : remove shell (sh and /bin/sh) processes 
+    # grep -v " /s*bin/.*d" : remove /bin/watchdogd /sbin/klogd /sbin/syslogd
+    # sed '/^[[:space:]]*$/d' : remove blank lines
+    if [ -n "$HARDWARE" ] ; then
+        NEW_TARGET=`rsh -l root $TARGET_IPADDR "ps" | grep -v " ps" | grep -v "/rshd" |
+            grep -v "\[" | grep -v telnetd | grep -v "/init" | grep -v " inetd" |
+            grep -v " PID " | grep -v "[ /]sh" | grep -v " /s*bin/.*d" | sed '/^[[:space:]]*$/d'`
+            STUCK=`echo -n ${NEW_TARGET} | wc -c`
+            if [ $STUCK -gt 0 ] ; then
+               echo " ** looks like random processes are running on the hardware already "
+               echo " ** ${NEW_TARGET}"
+            fi
+    fi
+    KILL=99999
+    while [ 1 ]
+    do
+        OLD=$NEW
+        OLD_TARGET=$NEW_TARGET
+        NEW=`pstree -n -A -l -p $PID`
+        if [ -n "$HARDWARE" ] ; then
+            NEW_TARGET=`rsh -l root $TARGET_IPADDR "ps" 2>&1 | grep -v " ps" | grep -v "/rshd" |
+                grep -v "\[" | grep -v telnetd | grep -v "/init" | grep -v " inetd" | 
+                grep -v " PID " | grep -v "[ /]sh" | grep -v " /s*bin/.*d" | sed '/^[[:space:]]*$/d'`
+        fi
+
+        # Chedk on the Host - if the test is done - quit
+        if [ -z "$NEW" ] ; then
+            break;
+        fi
+
+        # Check on the Host - are we waiting?
+        if [ "$NEW" = "$OLD" ] ; then
+           WAIT=`expr $WAIT + 1`
+        else
+            if [ $WAIT -gt $HOST_THRESHOLD ] ; then
+                echo " ** killing process $KILL_PID, seemed to fix things"
+                echo " ** $KILL_PS"
+                if [ -n "$HARDWARE" ] ; then
+                    # make sure the board is not hung
+                    RUN=`rsh -l root $TARGET_IPADDR "ls /  1>/dev/null" 2>&1 | wc -l`
+                    if [ "$RUN" = "1" ] ; then
+                        echo "*** I think the board or networked died during testing - sorry "
+                        break
+                    fi
+                fi
+            fi
+            WAIT=1
+            KILL=99999
+        fi
+
+        # Check Hardware
+        if [ -n "$HARDWARE" ] ; then
+            if [ "$NEW_TARGET" = "$OLD_TARGET" ] ; then
+                WAIT_TARGET=`expr $WAIT_TARGET + 1`
+            else
+                if [ $WAIT_TARGET -gt $TARGET_THRESHOLD ] ; then
+                    echo " ** killing processes on board seemed to help"
+                fi
+                WAIT_TARGET=1
+            fi
+
+            if [ $WAIT_TARGET -gt $TARGET_THRESHOLD ] ; then
+                # This should catch no route to host, as well as connection refused
+                STUCK=`echo ${NEW_TARGET} | grep "^${TARGET_IPADDR}" | wc -l`
+                if [ $STUCK -gt 0 ] ; then
+                    echo " ** looks like the board has been dead for $TARGET_THRESHOLD minutes"
+                    break
+                fi
+                STUCK=`echo -n ${NEW_TARGET} | wc -c`
+                if [ $STUCK -gt 0 ] ; then
+                    echo -n " ** looks like "
+                    for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $NF}')
+                    do
+		        echo -n "${TARGET_PID} "
+                    done
+                    echo "on the board is hung"
+                    for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $1}')
+                    do
+                       rsh -l root $TARGET_IPADDR "kill -9 ${TARGET_PID}"
+                    done
+                else
+                    # the board has been doing nothing for 7 minutes, so let's wait another 7
+                    WAIT_TARGET=1
+                fi
+            fi
+        fi
+
+        if [ $WAIT -gt $HOST_THRESHOLD ] ; then
+            KILL_PS=""
+            TREE=`pstree -n -A -l -p $PID | sed -e 's/-[-+]-/\n/g' -e 's/^[ \t]*//'`
+            NEW_KILL=`echo -n "$TREE" | wc -l`
+            if [ $NEW_KILL -lt $KILL ] ; then
+                # We add one, so when we subtract one below, it ends up being the correct number
+                KILL=`expr $NEW_KILL + 1`
+                echo " ** Testing $2 seems stuck, trying to kill some processes"
+            fi
+
+            # don't try to kill defunct processes - it is a waste of time
+            while [ -z "$KILL_PS" ]
+            do
+                KILL=`expr $KILL - 1`
+                if [ "$KILL" = "0" ] ; then
+                    echo "Test did not exit properly"
+                    exit 1
+                fi
+ 
+                KILL_PID=`echo "$TREE" | sed -n "${KILL}{p;q}" | awk -F\( '{print $NF}' | awk -F\) '{print $1}'`
+                KILL_PS=`ps $KILL_PID | grep -v "^[[:space:]]*PID" | grep -v " Z.*<defunct>"`
+            done
+
+            ps aux > $3/${2}.kill-${KILL_PID}
+            pstree -n -A -l -p $PID >> $3/${2}.kill-${KILL_PID}
+            if [ -n "$HARDWARE" ] ; then
+                rsh -l root $TARGET_IPADDR ps >> $3/${2}.kill-${KILL_PID}
+            fi
+            #if it is an rsh process on the host, it normally means a test is 
+            # hung on the board, so let's kill that instead
+            RUN=`echo $KILL_PS | grep rsh`
+            if [ -n "$RUN" ] ; then
+                echo " ** This should never happen - board seems OK, but rsh process is stuck?"
+                STUCK=`echo -n ${NEW_TARGET} | wc -c`
+                if [ $STUCK -gt 0 ] ; then
+                    echo -n " ** looks like "
+                    for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $NF}')
+                    do
+                        echo -n "${TARGET_PID} "
+                    done
+                    echo "on the board is hung"
+                    for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $1}')
+                    do
+                       rsh -l root $TARGET_IPADDR "kill -9 ${TARGET_PID}"
+                    done
+                else
+                    # The board just rebooted ?
+                    echo " ** I think I just caused the board to crash/reboot? This needs investigation."
+                    prepare_target $3 
+                    kill -9 $KILL_PID
+                fi
+            else
+                kill -9 $KILL_PID
+            fi
+        fi
+        sleep 60
+    done
+    
+    # Tests are complete - so let's copy crashes to test directory
+    hardware=`echo $3 | grep -i hardware`
+    if [ -n "$hardware" ] ; then
+        RUN=`rsh -l root $TARGET_IPADDR ps | grep syslog | grep -v grep | wc -l`
+        if [ $RUN = 1 ] ; then
+            rcp root@$TARGET_IPADDR:/var/log/messages $3/$2.kernel_log
+            rsh -l root $TARGET_IPADDR "rm /var/log/messages"
+            rsh -l root $TARGET_IPADDR "touch /var/log/messages"
+            rsh -l root $TARGET_IPADDR "kill -HUP 1"
+        fi
+    fi
+
+    TREE=`pstree -n -A -l -p $PID | sed -e 's/-[-+]-/\n/g' -e 's/^[ \t]*//' -e '/^[[:space:]]*$/d' | awk -F "(" '{print $NF}' | awk -F ")" '{print $1}'`
+    TREE_LEN=`echo -n $TREE | wc -c`
+    if [ $TREE_LEN -gt 0 ] ; then
+        echo " ** Aborting remaining tests"
+        echo $TREE
+        for KILL_PS in ${TREE}
+        do
+            RUN=`ps $KILL_PS | grep -v "^[[:space:]]*PID" | wc -l`
+            if [ $RUN -gt 0 ] ; then
+               ps $KILL_PS | grep -v "^[[:space:]]*PID"
+               kill $KILL_PS
+            fi
+        done
+    fi
+
+}
+
+# Detect Binutils version and path
+# $1 is the name of the tool
+
+detect_binutils()
+{
+    tool=`which $target_alias-$1`
+    if [ $? -eq 1 ] ; then
+	echo "$target_alias-$1 not found"
+	return 1
+    fi
+
+    VERSION=`$tool --version 2>/dev/null | sed 1q | sed -e 's/GNU .* \([0-9][0-9.]*\).*/\1/'`
+    if [ -z "$BINUTILS_VERSION" ] ; then
+	BINUTILS_VERSION=$VERSION
+	echo_2_parts "Binutils version" "$BINUTILS_VERSION"
+	DIR_BINUTILS_SOURCE=$DIR_SOURCE/binutils-$BINUTILS_VERSION
+	if [ ! -d $DIR_BINUTILS_SOURCE ] ; then
+	    echo "Can't find Binutils source at $DIR_BINUTILS_SOURCE"
+	    return 1
+	fi
+	DIR_BINUTILS_BUILD=$DIR_BUILD/binutils_build
+    elif [ "$BINUTILS_VERSION" != "$VERSION" ] ; then
+	echo "ERROR: $TOOL version ($VERSION) is different"
+	return 1
+    fi
+
+    TOOL_PATH=`dirname $tool`
+    if [ -z "$BINUTILS_PATH" ] ; then
+	BINUTILS_PATH=$TOOL_PATH
+	echo_2_parts "Binutils path" "$BINUTILS_PATH"
+    elif [ "$BINUTILS_PATH" != "$TOOL_PATH" ] ; then
+	echo "ERROR: $target_alias-$1 path ($TOOL_PATH) is different"
+	return 1
+    fi
+
+    return 0
+}
+
+# $1 is the directory_test_results_go_in
+
+test_binutils()
+{
+    FOUND=0
+    for i in ar nm objcopy objdump readelf size ; do
+	detect_binutils $i
+	if [ $? -eq 1 ] ; then
+	    FOUND=0
+	    break
+	else
+	    FOUND=1
+	fi
+    done
+
+    echo_date "Running tests on binutils"
+
+    if [ $FOUND -eq 1 ] ; then
+	if [ ! $BINUTILS_TESTSUITE ] ; then
+	    BINUTILS_TESTSUITE=$DIR_BINUTILS_SOURCE/binutils/testsuite
+	fi
+
+	if [ ! -d $BINUTILS_TESTSUITE ] ; then
+	    echo "No testsuite for binutils $BINUTILS_VERSION"
+	    return
+	fi
+
+	if [ ! -d $DIR_BINUTILS_BUILD/binutils-test ] ; then
+	    if [ -e $DIR_BINUTILS_BUILD/binutils-test ] ; then
+		rm -rf DIR_BINUTILS_BUILD/binutils-test
+	    fi
+	    mkdir -p $DIR_BINUTILS_BUILD/binutils-test
+	fi
+
+	change_dir $DIR_BINUTILS_BUILD/binutils-test
+	cat > $DIR_BINUTILS_BUILD/binutils-test/site.exp <<EOF
+set host_triplet $HOST_TRIPLET
+set build_triplet $BUILD_TRIPLET
+set target_triplet $TARGET_TRIPLET
+set target_alias $target_alias
+set tmpdir $DIR_BINUTILS_BUILD/binutils-test
+set srcdir $BINUTILS_TESTSUITE
+EOF
+
+	RUN="$RUNTEST --tool binutils $RUNTEST_FLAGS"
+	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+	(echo $RUN $LOGFILE ; ) | sh &
+	check_tests_OK $! binutils $1
+	copy_test_results $1 $BINUTILS_VERSION
+    fi
+}
+
+
+# $1 is the directory_test_results_go_in
+
+test_gas()
+{
+    detect_binutils as
+    if [ $? -eq 1 ] ; then
+	return
+    fi
+
+    echo_date "Running tests on gas"
+
+    if [ ! $GAS_TESTSUITE ] ; then
+	GAS_TESTSUITE=$DIR_BINUTILS_SOURCE/gas/testsuite
+    fi
+
+    if [ ! -d $GAS_TESTSUITE ] ; then
+	echo "No testsuite for gas $BINUTILS_VERSION"
+	return
+    fi
+
+    if [ ! -d $DIR_BINUTILS_BUILD/gas-test ] ; then
+	if [ -e $DIR_BINUTILS_BUILD/gas-test ] ; then
+	    rm -rf $DIR_BINUTILS_BUILD/gas-test
+	fi
+	mkdir -p $DIR_BINUTILS_BUILD/gas-test
+    fi
+
+    change_dir $DIR_BINUTILS_BUILD/gas-test
+    cat > $DIR_BINUTILS_BUILD/gas-test/site.exp <<EOF
+set host_triplet $HOST_TRIPLET
+set build_triplet $BUILD_TRIPLET
+set target_triplet $TARGET_TRIPLET
+set target_alias $target_alias
+set tmpdir $DIR_BINUTILS_BUILD/gas-test
+set srcdir $GAS_TESTSUITE
+EOF
+
+    RUN="$RUNTEST --tool gas $RUNTEST_FLAGS"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh &
+    check_tests_OK $! gas $1
+    copy_test_results $1 $BINUTILS_VERSION
+}
+
+# $1 is the directory_test_results_go_in
+
+test_ld()
+{
+    detect_binutils ld
+    if [ $? -eq 1 ] ; then
+	return
+    fi
+
+    echo_date "Running tests on ld"
+
+    if [ ! $LD_TESTSUITE ] ; then
+	LD_TESTSUITE=$DIR_BINUTILS_SOURCE/ld/testsuite
+    fi
+
+    if [ ! -d $LD_TESTSUITE ] ; then
+	echo "No testsuite for ld $BINUTILS_VERSION"
+	return
+    fi
+
+    if [ ! -d $DIR_BINUTILS_BUILD/ld-test ] ; then
+	if [ -e $DIR_BINUTILS_BUILD/ld-test ] ; then
+	    rm -rf $DIR_BINUTILS_BUILD/ld-test
+	fi
+	mkdir -p $DIR_BINUTILS_BUILD/ld-test
+    fi
+
+    change_dir $DIR_BINUTILS_BUILD/ld-test
+    cat > $DIR_BINUTILS_BUILD/ld-test/site.exp <<EOF
+set host_triplet $HOST_TRIPLET
+set build_triplet $BUILD_TRIPLET
+set target_triplet $TARGET_TRIPLET
+set target_alias $target_alias
+set tmpdir $DIR_BINUTILS_BUILD/ld-test
+set srcdir $LD_TESTSUITE
+EOF
+
+    RUN="$RUNTEST --tool ld $RUNTEST_FLAGS"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh &
+    check_tests_OK $! ld $1
+    copy_test_results $1 $BINUTILS_VERSION
+}
+
+# Detect GDB version and path
+# $1 is the name of gdb tool
+
+detect_gdb()
+{
+    tool=`which $target_alias-$1`
+    if [ $? -eq 1 ] ; then
+	echo "$target_alias-$1 not found"
+	return 1
+    fi
+
+    VERSION=`$tool --version 2>/dev/null | sed 1q | sed -e 's/GNU gdb \([0-9][0-9.]*\).*/\1/'`
+    if [ -z "$GDB_VERSION" ] ; then
+	GDB_VERSION=$VERSION
+	echo_2_parts "GDB version" "$GDB_VERSION"
+    elif [ "$GDB_VERSION" != "$VERSION" ] ; then
+	echo "ERROR: $TOOL version ($VERSION) is different"
+	return 1
+    fi
+
+    TOOL_PATH=`dirname $tool`
+    if [ -z "$GDB_PATH" ] ; then
+	GDB_PATH=$TOOL_PATH
+	echo_2_parts "GDB path" "$GDB_PATH"
+    elif [ "$GDB_PATH" != "$TOOL_PATH" ] ; then
+	echo "ERROR: $target_alias-$1 path ($TOOL_PATH) is different"
+	return 1
+    fi
+
+    return 0
+}
+
+# $1 is the directory_test_results_go_in
+
+test_gdb()
+{
+    detect_gdb gdb
+    if [ $? -eq 1 ] ; then
+	return
+    fi
+
+    echo_date "Running tests on gdb"
+
+    # We have GDB in the same source tree of binutils. There is no way
+    # to detect Binutils version from GDB. So we have to set a default
+    # one.
+    if [ -z "$BINUTILS_VERSION" ] ; then
+	BINUTILS_VERSION=$DEFAULT_BINUTILS_VERSION
+	DIR_BINUTILS_SOURCE=$DIR_SOURCE/binutils-$BINUTILS_VERSION
+	if [ ! -d $DIR_BINUTILS_SOURCE ] ; then
+	    echo "Can't find GDB source at $DIR_BINUTILS_SOURCE"
+	    return
+	fi
+	DIR_BINUTILS_BUILD=$DIR_BUILD/binutils_build
+    fi
+
+    if [ ! $GDB_TESTSUITE ] ; then
+	GDB_TESTSUITE=$DIR_BINUTILS_SOURCE/gdb/testsuite
+    fi
+
+    if [ ! -d $GDB_TESTSUITE ] ; then
+	echo "No testsuite for gdb $GDB_VERSION"
+	return
+    fi
+
+    if [ ! -d $DIR_BINUTILS_BUILD/gdb-test ] ; then
+	if [ -e $DIR_BINUTILS_BUILD/gdb-test ] ; then
+	    rm -rf $DIR_BINUTILS_BUILD/gdb-test
+	fi
+	mkdir -p $DIR_BINUTILS_BUILD/gdb-test
+    fi
+
+    # gdb testsuite generates binaries in subdirectories, to test
+    # the installed gdb, we have to establish the same directory
+    # structure in objdir as same as testsuite.
+    cd $GDB_TESTSUITE
+    find -type d ! -path *.svn* -exec mkdir -p $DIR_BINUTILS_BUILD/gdb-test/\{\} \;
+
+    change_dir $DIR_BINUTILS_BUILD/gdb-test
+    cat > $DIR_BINUTILS_BUILD/gdb-test/site.exp <<EOF
+set host_triplet $HOST_TRIPLET
+set build_triplet $BUILD_TRIPLET
+set target_triplet $TARGET_TRIPLET
+set target_alias $target_alias
+set tmpdir $DIR_BINUTILS_BUILD/gdb-test
+set srcdir $GDB_TESTSUITE
+EOF
+
+    RUN="$RUNTEST --tool gdb $RUNTEST_FLAGS"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh &
+    check_tests_OK $! gdb $1
+    copy_test_results $1 $BINUTILS_VERSION
+}
+
+# Detect version and path for gcc tool
+# $1 is the name of tool: gcc, g++, gfortran
+
+detect_gcc()
+{
+    tool=`which $target_alias-$1`
+    if [ $? -eq 1 ] ; then
+	echo "$target_alias-$1 not found"
+	return 1
+    fi
+
+    VERSION_FULL=`$tool -v 2>&1 | grep gcc.vers | sed -e 's,gcc.version.,,' -e 's, .ADI.*$,,'`
+    MAJOR=`echo $VERSION_FULL | sed 's/\([0-9]*\).*/\1/'`
+    MINOR=`echo $VERSION_FULL | sed 's/[0-9]*.\([0-9]*\).*/\1/'`
+    VERSION=$MAJOR.$MINOR
+
+    if [ -z "$GCC_VERSION" ] ; then
+	GCC_VERSION=$VERSION
+	GCC_VERSION_FULL=$VERSION_FULL
+	echo_2_parts "GCC version" "$GCC_VERSION_FULL"
+	DIR_GCC_SOURCE=$DIR_SOURCE/gcc-$GCC_VERSION
+	if [ ! -d $DIR_GCC_SOURCE ] ; then
+	    echo "Can't find GCC source at $DIR_GCC_SOURCE"
+	    return 1
+	fi
+	DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
+    elif [ "$GCC_VERSION_FULL" != "$VERSION_FULL" ] ; then
+	echo "ERROR: $TOOL version ($VERSION_FULL) is different"
+	return 1
+    fi
+
+    TOOL_PATH=`dirname $tool`
+    if [ -z "$GCC_PATH" ] ; then
+	GCC_PATH=$TOOL_PATH
+	echo_2_parts "GCC" "$GCC_PATH"
+    elif [ "$GCC_PATH" != "$TOOL_PATH" ] ; then
+	echo "ERROR: $target_alias-$1 path ($TOOL_PATH) is different"
+	return 1
+    fi
+
+    return 0
+}
+
+# $1 is the name of tool: gcc, g++, gfortran
+# $2 is the directory_test_results_go_in
+# $3 is the testsuite
+
+test_gcc()
+{
+    detect_gcc $1
+    if [ $? -eq 1 ] ; then
+	return
+    fi
+
+    echo_date "Running tests on $1"
+
+    if [ $3 ] ; then
+	TESTSUITE=$3
+    else
+	TESTSUITE=$DIR_GCC_SOURCE/gcc/testsuite
+    fi
+
+    if [ ! -d $TESTSUITE ] ; then
+	echo "No testsuite for GCC $GCC_VERSION_FULL"
+	return
+    fi
+
+    if [ ! -d $DIR_GCC_BUILD/$1-test ] ; then
+	if [ -e $DIR_GCC_BUILD/$1-test ] ; then
+	    rm -rf $DIR_GCC_BUILD/$1-test
+	fi
+	mkdir -p $DIR_GCC_BUILD/$1-test
+    fi
+
+    cat > $DIR_GCC_BUILD/$1-test/site.exp <<EOF
+set host_triplet $HOST_TRIPLET
+set build_triplet $BUILD_TRIPLET
+set target_triplet $TARGET_TRIPLET
+set target_alias $target_alias
+set HOSTCC gcc
+set HOSTCFLAGS ""
+set tmpdir $DIR_GCC_BUILD/$1-test
+set srcdir $TESTSUITE
+EOF
+
+    change_dir $DIR_GCC_BUILD/$1-test
+    RUN="$RUNTEST --tool $1 $RUNTEST_FLAGS"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh &
+    check_tests_OK $! $1 $2
+    copy_test_results $2 ${GCC_VERSION}
+}
+
+# $1 is the directory_test_results_go_in
+
+test_libstdcxx()
+{
+    detect_gcc g++
+    if [ $? -eq 1 ] ; then
+	return
+    fi
+
+    echo_date "Running tests on libstdc++"
+
+    if [ ! $LIBSTDCXX_TESTSUITE ] ; then
+	LIBSTDCXX_TESTSUITE=$DIR_GCC_SOURCE/libstdc++-v3/testsuite
+    fi
+
+    if [ ! -d $LIBSTDCXX_TESTSUITE ] ; then
+	echo "No testsuite for libstdc++ $GCC_VERSION_FULL"
+	continue
+    fi
+
+    DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
+    if [ ! -d $DIR_GCC_BUILD/libstdc++-test ] ; then
+	if [ -e $DIR_GCC_BUILD/libstdc++-test ] ; then
+	    rm -rf $DIR_GCC_BUILD/libstdc++-test
+	fi
+	mkdir -p $DIR_GCC_BUILD/libstdc++-test
+    fi
+
+    cat > $DIR_GCC_BUILD/libstdc++-test/site.exp <<EOF
+set host_triplet $HOST_TRIPLET
+set build_triplet $BUILD_TRIPLET
+set target_triplet $TARGET_TRIPLET
+set target_alias $target_alias
+set tmpdir $DIR_GCC_BUILD/libstdc++-test
+set srcdir $LIBSTDCXX_TESTSUITE
+EOF
+
+    change_dir $DIR_GCC_BUILD/libstdc++-test
+    RUN="$RUNTEST --tool libstdc++ $RUNTEST_FLAGS"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh &
+    check_tests_OK $! libstdc++ $1
+    copy_test_results $1 ${GCC_VERSION}
+}
+
+
+# $1 is the directory_test_results_go_in
+
+test_newlib()
+{
+    detect_binutils as
+    if [ $? -eq 1 ] ; then
+	return
+    fi
+    detect_gcc gcc
+    if [ $? -eq 1 ] ; then
+	return
+    fi
+
+    echo_date "Running tests on newlib"
+
+    if [ ! $NEWLIB_TESTSUITE ] ; then
+	NEWLIB_TESTSUITE=$DIR_BINUTILS_SOURCE/newlib/testsuite
+    fi
+
+    if [ ! -d $NEWLIB_TESTSUITE ] ; then
+	echo "No testsuite for newlib"
+	continue
+    fi
+
+    if [ ! -d $DIR_GCC_BUILD/newlib-test ] ; then
+	if [ -e $DIR_GCC_BUILD/newlib-test ] ; then
+	    rm -rf $DIR_GCC_BUILD/newlib-test
+	fi
+	mkdir -p $DIR_GCC_BUILD/newlib-test
+    fi
+
+    cat > $DIR_GCC_BUILD/newlib-test/site.exp <<EOF
+set host_triplet $HOST_TRIPLET
+set build_triplet $BUILD_TRIPLET
+set target_triplet $TARGET_TRIPLET
+set target_alias $target_alias
+set tmpdir $DIR_GCC_BUILD/newlib-test
+set srcdir $NEWLIB_TESTSUITE
+set tool_version ""
+EOF
+
+    change_dir $DIR_GCC_BUILD/newlib-test
+    RUN="$RUNTEST --tool newlib $RUNTEST_FLAGS"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh &
+    check_tests_OK $! newlib $1
+    copy_test_results $1 ${GCC_VERSION}
+}
+
+# $1 is the directory_test_results_go_in
+
+test_newlib_multilib()
+{
+    detect_binutils as
+    if [ $? -eq 1 ] ; then
+	return
+    fi
+    detect_gcc gcc
+    if [ $? -eq 1 ] ; then
+	return
+    fi
+
+    echo_date "Running tests on newlib (multilib)"
+
+    if [ ! $NEWLIB_TESTSUITE ] ; then
+	NEWLIB_TESTSUITE=$DIR_BINUTILS_SOURCE/newlib/testsuite
+    fi
+
+    if [ ! -d $NEWLIB_TESTSUITE ] ; then
+	echo "No testsuite for newlib"
+	continue
+    fi
+
+    if [ ! -d $DIR_GCC_BUILD/newlib-test ] ; then
+	if [ -e $DIR_GCC_BUILD/newlib-test ] ; then
+	    rm -rf $DIR_GCC_BUILD/newlib-test
+	fi
+	mkdir -p $DIR_GCC_BUILD/newlib-test
+    fi
+
+    MULTILIBS=`$target_alias-gcc --print-multi-lib`
+    for ml in $MULTILIBS; do
+	dir=`echo ${ml} | sed -e 's/;.*$//'`
+	flags=`echo ${ml} | sed -e 's/^[^;]*;//' -e 's/@/ -/g'`
+
+	if [ ! -d $DIR_GCC_BUILD/newlib-test/$dir ] ; then
+	    if [ -e $DIR_GCC_BUILD/newlib-test/$dir ] ; then
+		rm -rf $DIR_GCC_BUILD/newlib-test/$dir
+	    fi
+	    mkdir -p $DIR_GCC_BUILD/newlib-test/$dir
+	fi
+
+	cat > $DIR_GCC_BUILD/newlib-test/$dir/site.exp <<EOF
+set CFLAGS_FOR_TARGET "$flags"
+set host_triplet $HOST_TRIPLET
+set build_triplet $BUILD_TRIPLET
+set target_triplet $TARGET_TRIPLET
+set target_alias $target_alias
+set tmpdir $DIR_GCC_BUILD/newlib-test/$dir
+set srcdir $NEWLIB_TESTSUITE
+set tool_version ""
+EOF
+
+	change_dir $DIR_GCC_BUILD/newlib-test/$dir
+	RUN="$RUNTEST --tool newlib $RUNTEST_FLAGS"
+	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+	(echo $RUN $LOGFILE ; ) | sh &
+	check_tests_OK $! newlib $1
+    done
+
+    change_dir $DIR_GCC_BUILD/newlib-test
+    copy_test_results $1 ${GCC_VERSION}
+}
+
+# $1 is the directory_test_results_go_in
+# $2 is the name of the test: elf-jtag, elf-sim, uclinux, linux-uclibc
+
+test_libmudflap()
+{
+    detect_gcc gcc
+    if [ $? -eq 1 ] ; then
+	return
+    fi
+    detect_gcc g++
+    if [ $? -eq 1 ] ; then
+	return
+    fi
+
+    echo_date "Running tests on libmudflap"
+
+    if [ ! $LIBMUDFLAP_TESTSUITE ] ; then
+	LIBMUDFLAP_TESTSUITE=$DIR_GCC_SOURCE/libmudflap/testsuite
+    fi
+
+    if [ ! -d $LIBMUDFLAP_TESTSUITE ] ; then
+	echo "No testsuite for libmudflap $GCC_VERSION_FULL"
+	return
+    fi
+
+    if [ ! -d $DIR_GCC_BUILD/libmudflap-test ] ; then
+	if [ -e $DIR_GCC_BUILD/libmudflap-test ] ; then
+	    rm -rf $DIR_GCC_BUILD/libmudflap-test
+	fi
+	mkdir -p $DIR_GCC_BUILD/libmudflap-test
+    fi
+
+    if [ $2 = "uclinux" ] ; then
+	build_libmudflapth=1
+	LIBS=""
+    elif [ $2 = "linux-uclibc" ] ; then
+	build_libmudflapth=1
+	LIBS="-ldl "
+    else
+	build_libmudflapth=0
+	LIBS=""
+    fi
+    cat $LIBMUDFLAP_TESTSUITE/mfconfig.exp.in | sed -e "s/@LIBS@/$LIBS/g" | sed -e "s/@build_libmudflapth@/$build_libmudflapth/g" > $DIR_GCC_BUILD/libmudflap-test/mfconfig.exp
+
+    # Some tests expect there is a config.h in ../.. directory
+    cat > $DIR_BUILD/config.h <<EOF
+#define HAVE_SYS_MMAN_H	1
+#define HAVE_MMAP	1
+EOF
+
+    cat > $DIR_GCC_BUILD/libmudflap-test/site.exp <<EOF
+set host_triplet $HOST_TRIPLET
+set build_triplet $BUILD_TRIPLET
+set target_triplet $TARGET_TRIPLET
+set target_alias $target_alias
+set tmpdir $DIR_GCC_BUILD/libmudflap-test
+set srcdir $LIBMUDFLAP_TESTSUITE
+EOF
+
+    change_dir $DIR_GCC_BUILD/libmudflap-test
+    RUN="$RUNTEST --tool libmudflap $RUNTEST_FLAGS"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh &
+    check_tests_OK $! libmudflap $1
+    copy_test_results $1 ${GCC_VERSION}
+}
+
+prepare_target_solibs()
+{
+    # Make sure all the shared libs are actually on the target and are
+    # the same if we are testing on the hardware.
+
+    # TODO
+    #
+    # * Check if linux kernel has fdpic feature enabled.
+    # * Check if there are shared libraries installed on target. (Try
+    #   to run a minimal program to see if it can run on target.)
+    # * Check if the shared libraries on target are same as those in
+    #   toolchain. (We may need --build-id from latest GNU ld.)
+
+    # Current only copy shared libraries from toolchain to target
+    # when safe. That means only a flat image can be used for testing
+    # linux-uclibc.
+
+    if [ $FDPIC_TARGET -eq 0 ] ; then
+
+	detect_gcc gcc
+	if [ $? -eq 1 ] ; then
+	    return
+	fi
+
+	echo_date "Checking shared libraries on target"
+
+        GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
+        mkdir -p $GCC_BUILD/libs_for_target
+        rm -f $GCC_BUILD/libs_for_target/*
+        rsh -l root ${TARGET_IPADDR} "rm -f /lib/*so*"
+        t=`$target_alias-gcc -mcpu=${CPU_TYPE_REV} -print-file-name=libc.a`
+        t=`dirname $t`/../..
+        for FILE in $t/lib/*so*
+        do
+            if ([ -e $FILE ] && [ -h $FILE ]) ; then
+                LIB=`readlink $FILE`
+                FILE=`basename $FILE`
+                LIB=`basename $LIB`
+                rsh -l root ${TARGET_IPADDR} "cd /lib; ln -s $LIB $FILE"
+            else
+                if [ -f $FILE ] ; then
+                    LIB=`basename ${FILE}`
+                    $target_alias-strip $FILE -o $GCC_BUILD/libs_for_target/${LIB}
+                    rcp $GCC_BUILD/libs_for_target/${LIB} root@${TARGET_IPADDR}:/lib/${LIB}
+                    rsh -l root ${TARGET_IPADDR} "chmod +x /lib/${LIB}"
+                fi
+            fi
+        done
+        rm -rf $GCC_BUILD/libs_for_target
+    fi
+}
+
+# run_tests $directory_test_results_go_in name_of_test
+run_tests ()
+{
+    if [ $2 = "elf-sim" ] || [ $2 = "elf-jtag" ] ; then
+	target_alias="bfin-elf"
+    else
+	target_alias="bfin-$2"
+    fi
+    TARGET_TRIPLET=`$DIR_APP/config.sub $target_alias`
+
+    prepare_target $2
+
+    if [ $2 = "linux-uclibc" ] ; then
+	prepare_target_solibs
+    fi
+
+    if [ $TEST_BINUTILS -eq 1 ] ; then
+	clean_hardware $2 binutils
+	test_binutils $1
+    fi
+
+    if [ $TEST_GAS -eq 1 ] ; then
+	clean_hardware $2 gas
+	test_gas $1
+    fi
+    if [ $TEST_LD -eq 1 ] ; then
+	clean_hardware $2 ld
+	test_ld $1
+    fi
+
+    if [ $TEST_GDB -eq 1 ] ; then
+	# Get rid of old Xvfb & rsh processes, which might be lurking around from old runs
+	RUN=`ps aux | grep Xvfb | grep -v grep | wc -l`
+	if [ $RUN -gt 0 ] ; then
+            echo "Found old Xvfb process, killing it"
+            RUN="ps aux | grep Xvfb | grep -v grep ; killall -9 Xvfb"
+            (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+            (echo "($RUN) $LOGFILE" ) | sh
+	fi
+	RUN=`ps aux | grep rsh | grep -v grep | wc -l`
+	if [ $RUN -gt 0 ] ; then
+            echo "Found old rsh process, killing it"
+            RUN="ps aux | grep rsh | grep -v grep ; killall -9 rsh"
+            (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+            (echo "($RUN) $LOGFILE" ) | sh
+	fi
+
+	clean_hardware $2 gdb
+	test_gdb $1
+    fi
+
+    if [ $TEST_GCC -eq 1 ] ; then
+	clean_hardware $2 gcc
+	test_gcc gcc $1 "$GCC_TESTSUITE"
+    fi
+    if [ $TEST_GXX -eq 1 ] ; then
+	clean_hardware $2 g++
+	test_gcc g++ $1 "$GXX_TESTSUITE"
+    fi
+    if [ $TEST_GFORTRAN -eq 1 ] ; then
+	clean_hardware $2 gfortran
+	test_gcc gfortran $1 "$GFORTRAN_TESTSUITE"
+    fi
+
+    if [ $TEST_LIBSTDCXX -eq 1 ] ; then
+	clean_hardware $2 libstdc++
+	test_libstdcxx $1
+    fi
+
+    if [ $TEST_NEWLIB -eq 1 ] ; then
+	if [ $2 = "elf-sim" ] ; then
+	    test_newlib_multilib $1
+	    # test_newlib $1
+	fi
+
+	if [ $2 = "elf-jtag" ] ; then
+	    test_newlib $1
+	fi
+    fi
+
+    if [ $TEST_LIBMUDFLAP -eq 1 ] ; then
+	if [ $2 = "uclinux" ] || [ $2 = "linux-uclibc" ] ; then
+	    clean_hardware $2 libmudflap
+	    test_libmudflap $1 $2
+	fi
+    fi
+
+    clean_hardware $2 done
+
+    if [ $LEGACY_RESULT ] ; then
+	echo_date "Legacify result names"
+
+	for i in `find $1 -name "*newlib-$GCC_VERSION.*" -o -name "*libstdc++-$GCC_VERSION.*" -o -name "*libmudflap-$GCC_VERSION.*"`
+	do
+	    p=`dirname $i`
+	    n=`basename $i`
+	    case "$n" in
+		$target_alias-*)
+		    continue
+		    ;;
+		*)
+		    mv $i $p/$target_alias-$n
+		    ;;
+	    esac
+	done
+
+	for i in `find $1 -name "g++-4.1.*"`
+	do
+	    p=`dirname $i`
+	    n=`basename $i`
+	    mv $i $p/gcc-$n
+	done
+    fi
+
+    echo_date "Done testing  - results"
+
+    FILES=
+    if [ $BINUTILS_VERSION ] ; then
+	FILES=`find $1 -name "*${BINUTILS_VERSION}.sum" | sort`
+    fi
+    if [ $GCC_VERSION ] ; then
+	FILES="$FILES `find $1 -name "*${GCC_VERSION}.sum" | sort`"
+    fi
+    for FILE in $FILES
+    do
+	echo
+	echo ${FILE##*/}
+        egrep "=== .*Sum.* ===|^# of" $FILE
+        if [ -n "$RESULTS2COMPARE" ] ; then
+            COMP=`basename $FILE`
+            if [ -f $RESULTS2COMPARE/$2/$COMP ] ; then
+                echo "Comparing generated $COMP to master at $RESULTS2COMPARE/$2/$COMP"
+                $DIR_SOURCE/gcc-$GCC_VERSION/contrib/compare_tests \
+                    $FILE $RESULTS2COMPARE/$2/$COMP
+            else
+                echo "Could not find $RESULTS2COMPARE/$2/$FILE to compare"
+            fi
+        fi
+    done
+    echo
+}
+
+
+###################### Setting up test  ##########################
+
+echo "Setting up site.exp"
+if [ ! -d $DIR_BUILD/boards ] ; then
+    mkdir $DIR_BUILD/boards
+fi
+
+if [ $TEST_TARGET_ELF_SIM ] ; then
+    cp $DIR_BOARDS/bfin-sim.exp $DIR_BUILD/boards/bfin-sim.exp
+fi
+
+if [ $TEST_TARGET_ELF_JTAG ] ; then
+    cat > $DIR_BUILD/boards/gdb-init-commands <<EOF
+set breakpoint pending off
+set remotetimeout 150
+EOF
+    (cat $DIR_BOARDS/bfin-elf.exp.1; \
+	echo "set_board_info gdb_init_command \"source $DIR_BUILD/boards/gdb-init-commands \"") > $DIR_BUILD/boards/bfin-elf.exp
+    cp $DIR_BOARDS/bfin.exp $DIR_BUILD/boards/bfin.exp
+fi
+
+if [ $TEST_TARGET_UCLINUX ] ; then
+    if [ $STACK_CHECKING ] ; then
+        (cat $DIR_BOARDS/bfin-uclinux.exp.1; \
+            echo "set_board_info cflags \" -mstack-check-l1 \""; \
+            echo "set_board_info hostname $TARGET_IPADDR"; \
+            echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-uclinux.exp
+    else
+        (cat $DIR_BOARDS/bfin-uclinux.exp.1; \
+            echo "set_board_info hostname $TARGET_IPADDR"; \
+            echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-uclinux.exp
+    fi
+fi
+
+if [ $TEST_TARGET_LINUX_UCLIBC ] ; then
+    if [ $STACK_CHECKING ] ; then
+        (cat $DIR_BOARDS/bfin-linux-uclibc.exp.1; \
+            echo "set_board_info cflags \" -mstack-check-l1 \""; \
+            echo "set_board_info multilib_flags \"-mcpu=$CPU_TYPE_REV\"";\
+             echo "set_board_info hostname $TARGET_IPADDR"; \
+            echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-linux-uclibc.exp
+    else
+        (cat $DIR_BOARDS/bfin-linux-uclibc.exp.1; \
+            echo "set_board_info multilib_flags \"-mcpu=$CPU_TYPE_REV\"";\
+             echo "set_board_info hostname $TARGET_IPADDR"; \
+            echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-linux-uclibc.exp
+    fi
+fi
+
+(cat $DIR_BOARDS/site.exp.1; \
+    echo "lappend boards_dir \"$DIR_BUILD/boards\""; \
+    cat $DIR_BOARDS/site.exp.2 ) > $DIR_BUILD/boards/site.exp
+export DEJAGNU=$DIR_BUILD/boards/site.exp
+
+if [ $TEST_TARGET_ELF_SIM ] && [ $TEST_TARGET_ELF_JTAG ] ; then
+    sed -i "s/set target_list { bfin-sim }/set target_list { bfin-sim bfin-elf }/" $DIR_BUILD/boards/site.exp
+    sed -i "s/set target_list { bfin-elf }/set target_list { bfin-sim bfin-elf }/" $DIR_BUILD/boards/site.exp
+elif [ $TEST_TARGET_ELF_SIM ] ; then
+    sed -i "s/set target_list { bfin-sim bfin-elf }/set target_list { bfin-sim }/" $DIR_BUILD/boards/site.exp
+    sed -i "s/set target_list { bfin-elf }/set target_list { bfin-sim }/" $DIR_BUILD/boards/site.exp
+elif [ $TEST_TARGET_ELF_JTAG ] ; then
+    sed -i "s/set target_list { bfin-sim bfin-elf }/set target_list { bfin-elf }/" $DIR_BUILD/boards/site.exp
+    sed -i "s/set target_list { bfin-sim }/set target_list { bfin-elf }/" $DIR_BUILD/boards/site.exp
+fi
+
+####################### Test bfin-elf #######################
+
+if [ $TEST_TARGET_ELF_SIM ] ; then
+    echo_date "Testing $TEST_TARGET"
+    run_tests $DIR_TEST_SIM_RESULTS elf-sim
+fi
+
+if [ $TEST_TARGET_ELF_JTAG ] ; then
+    echo_date "Testing bfin-elf via jtag"
+    run_tests $DIR_TEST_JTAG_RESULTS elf-jtag
+fi
+
+####################### Test bfin-uclinux ###################
+
+if [ $TEST_TARGET_UCLINUX ] ; then
+    echo_date "Testing bfin-uclinux"
+    run_tests $DIR_TEST_HW_RESULTS uclinux
+fi
+
+####################### Test bfin-linux-uclibc ##############
+
+if [ $TEST_TARGET_LINUX_UCLIBC ] ; then
+    echo_date "Testing linux-uclibc on hw"
+    run_tests $DIR_TEST_HW2_RESULTS linux-uclibc
+fi
+
+####################### ldr-utils ###########################
+
+# if [ "$CHECK_ON_SIMULATOR" = "1" ] ; then
+#     echo_date "Checking ldr-utils"
+#     run_cmd $MAKE check
+# fi
+
+echo_date "Done"
