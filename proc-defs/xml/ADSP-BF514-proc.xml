@@ -16,7 +16,7 @@
 
 <visualdsp-proc-xml schema-version="1" name="ADSP-BF514-proc.xml">
 
-<version file-version="0.08"/>
+<version file-version="0.10"/>
 
 <!-- ************************************************************************ -->
 <!-- ******* Register set for ADSP-BF514 / ADSP-BF514F                        -->
@@ -261,175 +261,6 @@
 	<register name="DSPID" group="Extended Registers" read-address="0xFFE05000" write-address="0xFFE05000" type="IO"
  target="EMU" description="" bit-size="32" def-comment="Debug/MP/Emulation Registers (0xFFE05000 - 0xFFE05008)"/>
 
-	<!--********************************************-->
-	<!--***** From ADSP-EDN-BF548-extended.xml *****-->
-	<!--********************************************-->
-
-	<!-- ******************************* -->
-	<!-- ** SDIO Register Definitions ** -->
-	<!-- ******************************* -->
-
-<register name="SDH_PWR_CTL" group="SDH" mask="FFFF" description="SDH Power Control" bit-size="16" read-address="0xFFC03900" write-address="0xFFC03900" type="IO" target="EMU" def-comment="SDH Registers" />
-	<register name="PWR_ON"     parent="SDH_PWR_CTL" bit-position="0" bit-size="2" target="EMU" description="Power On"/>
-	<register name="TBD"        parent="SDH_PWR_CTL" bit-position="2" bit-size="4" target="EMU" description="TBD"/>
-	<register name="SD_CMD_OD"  parent="SDH_PWR_CTL" bit-position="6" bit-size="1" target="EMU" description="Open Drain Output"/>
-	<register name="ROD_CTL"    parent="SDH_PWR_CTL" bit-position="7" bit-size="1" target="EMU" description="Rod Control"/>
-
-<register name="SDH_CLK_CTL" group="SDH" mask="FFFF" description="SDH Clock Control" bit-size="16" read-address="0xFFC03904" write-address="0xFFC03904" type="IO" target="EMU" />
-	<register name="CLKDIV"        parent="SDH_CLK_CTL" bit-position="0"  bit-size="8" target="EMU" description="MC_CLK Divisor"/>
-	<register name="CLK_E"         parent="SDH_CLK_CTL" bit-position="8"  bit-size="1" target="EMU" description="MC_CLK Bus Clock Enable"/>
-	<register name="PWR_SV_E"      parent="SDH_CLK_CTL" bit-position="9"  bit-size="1" target="EMU" description="Power Save Enable"/>
-	<register name="CLKDIV_BYPASS" parent="SDH_CLK_CTL" bit-position="10" bit-size="1" target="EMU" description="Bypass Divisor"/>
-	<register name="WIDE_BUS"      parent="SDH_CLK_CTL" bit-position="11" bit-size="1" target="EMU" description="Wide Bus Mode Enable"/>
-
-<register name="SDH_ARGUMENT" group="SDH" mask="FFFFFFFF" description="SDH Argument" bit-size="32" read-address="0xFFC03908" write-address="0xFFC03908" type="IO" target="EMU" />
-
-<register name="SDH_COMMAND" group="SDH" mask="FFFF" description="SDH Command" bit-size="16" read-address="0xFFC0390C" write-address="0xFFC0390C" type="IO" target="EMU" />
-	<register name="CMD_IDX"    parent="SDH_COMMAND" bit-position="0"  bit-size="6" target="EMU" description="Command Index"/>
-	<register name="CMD_RSP"    parent="SDH_COMMAND" bit-position="6"  bit-size="1" target="EMU" description="Response"/>
-	<register name="CMD_L_RSP"  parent="SDH_COMMAND" bit-position="7"  bit-size="1" target="EMU" description="Long Response"/>
-	<register name="CMD_INT_E"  parent="SDH_COMMAND" bit-position="8"  bit-size="1" target="EMU" description="Command Interrupt"/>
-	<register name="CMD_PEND_E" parent="SDH_COMMAND" bit-position="9"  bit-size="1" target="EMU" description="Command Pending"/>
-	<register name="CMD_E"      parent="SDH_COMMAND" bit-position="10" bit-size="1" target="EMU" description="Command Enable"/>
-
-<register name="SDH_RESP_CMD" group="SDH" mask="FFFF" description="SDH Response Command" bit-size="16" read-address="0xFFC03910" write-address="0xFFC03910" type="IO" target="EMU" />
-	<register name="RESP_CMD"      parent="SDH_RESP_CMD" bit-position="0" bit-size="6" target="EMU" description="Response Command"/>
-
-<register name="SDH_RESPONSE0" group="SDH" mask="FFFFFFFF" description="SDH Response0" bit-size="32" read-address="0xFFC03914" write-address="0xFFC03914" type="IO" target="EMU" />
-<register name="SDH_RESPONSE1" group="SDH" mask="FFFFFFFF" description="SDH Response1" bit-size="32" read-address="0xFFC03918" write-address="0xFFC03918" type="IO" target="EMU" />
-<register name="SDH_RESPONSE2" group="SDH" mask="FFFFFFFF" description="SDH Response2" bit-size="32" read-address="0xFFC0391C" write-address="0xFFC0391C" type="IO" target="EMU" />
-<register name="SDH_RESPONSE3" group="SDH" mask="FFFFFFFF" description="SDH Response3" bit-size="32" read-address="0xFFC03920" write-address="0xFFC03920" type="IO" target="EMU" />
-<register name="SDH_DATA_TIMER" group="SDH" mask="FFFFFFFF" description="SDH Data Timer" bit-size="32" read-address="0xFFC03924" write-address="0xFFC03924" type="IO" target="EMU" />
-
-<register name="SDH_DATA_LGTH" group="SDH" mask="FFFF" description="SDH Data Length" bit-size="16" read-address="0xFFC03928" write-address="0xFFC03928" type="IO" target="EMU" />
-
-<register name="SDH_DATA_CTL" group="SDH" mask="FFFF" description="SDH Data Control" bit-size="16" read-address="0xFFC0392C" write-address="0xFFC0392C" type="IO" target="EMU" />
-	<register name="DTX_E"         parent="SDH_DATA_CTL" bit-position="0" bit-size="1" target="EMU" description="Data Transfer Enable"/>
-	<register name="DTX_DIR"       parent="SDH_DATA_CTL" bit-position="1" bit-size="1" target="EMU" description="Data Transfer Direction"/>
-	<register name="DTX_MODE"      parent="SDH_DATA_CTL" bit-position="2" bit-size="1" target="EMU" description="Data Transfer Mode"/>
-	<register name="DTX_DMA_E"     parent="SDH_DATA_CTL" bit-position="3" bit-size="1" target="EMU" description="Data Transfer DMA Enable"/>
-	<register name="DTX_BLK_LGTH"  parent="SDH_DATA_CTL" bit-position="4" bit-size="4" target="EMU" description="Data Transfer Block Length"/>
-
-<register name="SDH_DATA_CNT" group="SDH" mask="FFFF" description="SDH Data Counter" bit-size="16" read-address="0xFFC03930" write-address="0xFFC03930" type="IO" target="EMU" />
-<register name="SDH_STATUS" group="SDH" mask="FFFFFFFF" description="SDH Status" bit-size="32" read-address="0xFFC03934" write-address="0xFFC03934" type="IO" target="EMU" />
-	<register name="CMD_CRC_FAIL"  parent="SDH_STATUS" bit-position="0" bit-size="1"  target="EMU" description="CMD CRC Fail"/>
-	<register name="DAT_CRC_FAIL"  parent="SDH_STATUS" bit-position="1" bit-size="1"  target="EMU" description="Data CRC Fail"/>
-	<register name="CMD_TIMEOUT"   parent="SDH_STATUS" bit-position="2" bit-size="1"  target="EMU" description="CMD Time Out"/>
-	<register name="DAT_TIMEOUT"   parent="SDH_STATUS" bit-position="3" bit-size="1"  target="EMU" description="Data Time Out"/>
-	<register name="TX_UNDERRUN"   parent="SDH_STATUS" bit-position="4" bit-size="1"  target="EMU" description="Transmit Underrun"/>
-	<register name="RX_OVERRUN"    parent="SDH_STATUS" bit-position="5" bit-size="1"  target="EMU" description="Receive Overrun"/>
-	<register name="CMD_RESP_END"  parent="SDH_STATUS" bit-position="6" bit-size="1"  target="EMU" description="CMD Response End"/>
-	<register name="CMD_SENT"      parent="SDH_STATUS" bit-position="7" bit-size="1"  target="EMU" description="CMD Sent"/>
-	<register name="DAT_END"       parent="SDH_STATUS" bit-position="8" bit-size="1"  target="EMU" description="Data End"/>
-	<register name="START_BIT_ERR" parent="SDH_STATUS" bit-position="9" bit-size="1"  target="EMU" description="Start Bit Error"/>
-	<register name="DAT_BLK_END"   parent="SDH_STATUS" bit-position="10" bit-size="1" target="EMU" description="Data Block End"/>
-	<register name="CMD_ACT"       parent="SDH_STATUS" bit-position="11" bit-size="1" target="EMU" description="CMD Active"/>
-	<register name="TX_ACT"        parent="SDH_STATUS" bit-position="12" bit-size="1" target="EMU" description="Transmit Active"/>
-	<register name="RX_ACT"        parent="SDH_STATUS" bit-position="13" bit-size="1" target="EMU" description="Receive Active"/>
-	<register name="TX_FIFO_STAT"  parent="SDH_STATUS" bit-position="14" bit-size="1" target="EMU" description="Transmit FIFO Status"/>
-	<register name="RX_FIFO_STAT"  parent="SDH_STATUS" bit-position="15" bit-size="1" target="EMU" description="Receive FIFO Status"/>
-	<register name="TX_FIFO_FULL"  parent="SDH_STATUS" bit-position="16" bit-size="1" target="EMU" description="Transmit FIFO Full"/>
-	<register name="RX_FIFO_FULL"  parent="SDH_STATUS" bit-position="17" bit-size="1" target="EMU" description="Receive FIFO Full"/>
-	<register name="TX_FIFO_ZERO"  parent="SDH_STATUS" bit-position="18" bit-size="1" target="EMU" description="Transmit FIFO Empty"/>
-	<register name="RX_DAT_ZERO"   parent="SDH_STATUS" bit-position="19" bit-size="1" target="EMU" description="Receive FIFO Empty"/>
-	<register name="TX_DAT_RDY"    parent="SDH_STATUS" bit-position="20" bit-size="1" target="EMU" description="Transmit Data Available"/>
-	<register name="RX_FIFO_RDY"   parent="SDH_STATUS" bit-position="21" bit-size="1" target="EMU" description="Receive Data Available"/>
-
-<register name="SDH_STATUS_CLR" group="SDH" mask="FFFF" description="SDH Status Clear" bit-size="16" read-address="0xFFC03938" write-address="0xFFC03938" type="IO" target="EMU" />
-	<register name="CMD_CRC_FAIL_STAT"  parent="SDH_STATUS_CLR" bit-position="0"  bit-size="1" target="EMU" description="CMD CRC Fail Status"/>
-	<register name="DAT_CRC_FAIL_STAT"  parent="SDH_STATUS_CLR" bit-position="1"  bit-size="1" target="EMU" description="Data CRC Fail Status"/>
-	<register name="CMD_TIMEOUT_STAT"   parent="SDH_STATUS_CLR" bit-position="2"  bit-size="1" target="EMU" description="CMD Time Out Status"/>
-	<register name="DAT_TIMEOUT_STAT"   parent="SDH_STATUS_CLR" bit-position="3"  bit-size="1" target="EMU" description="Data Time Out status"/>
-	<register name="TX_UNDERRUN_STAT"   parent="SDH_STATUS_CLR" bit-position="4"  bit-size="1" target="EMU" description="Transmit Underrun Status"/>
-	<register name="RX_OVERRUN_STAT"    parent="SDH_STATUS_CLR" bit-position="5"  bit-size="1" target="EMU" description="Receive Overrun Status"/>
-	<register name="CMD_RESP_END_STAT"  parent="SDH_STATUS_CLR" bit-position="6"  bit-size="1" target="EMU" description="CMD Response End Status"/>
-	<register name="CMD_SENT_STAT"      parent="SDH_STATUS_CLR" bit-position="7"  bit-size="1" target="EMU" description="CMD Sent Status"/>
-	<register name="DAT_END_STAT"       parent="SDH_STATUS_CLR" bit-position="8"  bit-size="1" target="EMU" description="Data End Status"/>
-	<register name="START_BIT_ERR_STAT" parent="SDH_STATUS_CLR" bit-position="9"  bit-size="1" target="EMU" description="Start Bit Error Status"/>
-	<register name="DAT_BLK_END_STAT"   parent="SDH_STATUS_CLR" bit-position="10" bit-size="1" target="EMU" description="Data Block End Status"/>
-
-<register name="SDH_MASK0" group="SDH" mask="FFFFFFFF" description="SDH Interrupt0 Mask" bit-size="32" read-address="0xFFC0393C" write-address="0xFFC0393C" type="IO" target="EMU" />
-	<register name="MASK0_CMD_CRC_FAIL_MASK"  parent="SDH_MASK0" bit-position="0"  bit-size="1" target="EMU" description="CMD CRC Fail Mask"/>
-	<register name="MASK0_DAT_CRC_FAIL_MASK"  parent="SDH_MASK0" bit-position="1"  bit-size="1" target="EMU" description="Data CRC Fail Mask"/>
-	<register name="MASK0_CMD_TIMEOUT_MASK"   parent="SDH_MASK0" bit-position="2"  bit-size="1" target="EMU" description="CMD Time Out Mask"/>
-	<register name="MASK0_DAT_TIMEOUT_MASK"   parent="SDH_MASK0" bit-position="3"  bit-size="1" target="EMU" description="Data Time Out Mask"/>
-	<register name="MASK0_TX_UNDERRUN_MASK"   parent="SDH_MASK0" bit-position="4"  bit-size="1" target="EMU" description="Transmit Underrun Mask"/>
-	<register name="MASK0_RX_OVERRUN_MASK"    parent="SDH_MASK0" bit-position="5"  bit-size="1" target="EMU" description="Receive Overrun Mask"/>
-	<register name="MASK0_CMD_RESP_END_MASK"  parent="SDH_MASK0" bit-position="6"  bit-size="1" target="EMU" description="CMD Response End Mask"/>
-	<register name="MASK0_CMD_SENT_MASK"      parent="SDH_MASK0" bit-position="7"  bit-size="1" target="EMU" description="CMD Sent Mask"/>
-	<register name="MASK0_DAT_END_MASK"       parent="SDH_MASK0" bit-position="8"  bit-size="1" target="EMU" description="Data End Mask"/>
-	<register name="MASK0_START_BIT_ERR_MASK" parent="SDH_MASK0" bit-position="9"  bit-size="1" target="EMU" description="Start Bit Error Mask"/>
-	<register name="MASK0_DAT_BLK_END_MASK"   parent="SDH_MASK0" bit-position="10" bit-size="1" target="EMU" description="Data Block End Mask"/>
-	<register name="MASK0_CMD_ACT_MASK"       parent="SDH_MASK0" bit-position="11" bit-size="1" target="EMU" description="CMD Active Mask"/>
-	<register name="MASK0_TX_ACT_MASK"        parent="SDH_MASK0" bit-position="12" bit-size="1" target="EMU" description="Transmit Active Mask"/>
-	<register name="MASK0_RX_ACT_MASK"        parent="SDH_MASK0" bit-position="13" bit-size="1" target="EMU" description="Receive Active Mask"/>
-	<register name="MASK0_TX_FIFO_STAT_MASK"  parent="SDH_MASK0" bit-position="14" bit-size="1" target="EMU" description="Transmit FIFO Status Mask"/>
-	<register name="MASK0_RX_FIFO_STAT_MASK"  parent="SDH_MASK0" bit-position="15" bit-size="1" target="EMU" description="Receive FIFO Status Mask"/>
-	<register name="MASK0_TX_FIFO_FULL_MASK"  parent="SDH_MASK0" bit-position="16" bit-size="1" target="EMU" description="Transmit FIFO Full Mask"/>
-	<register name="MASK0_RX_FIFO_FULL_MASK"  parent="SDH_MASK0" bit-position="17" bit-size="1" target="EMU" description="Receive FIFO Full Mask"/>
-	<register name="MASK0_TX_FIFO_ZERO_MASK"  parent="SDH_MASK0" bit-position="18" bit-size="1" target="EMU" description="Transmit FIFO Empty Mask"/>
-	<register name="MASK0_RX_DAT_ZERO_MASK"   parent="SDH_MASK0" bit-position="19" bit-size="1" target="EMU" description="Receive FIFO Empty Mask"/>
-	<register name="MASK0_TX_DAT_RDY_MASK"    parent="SDH_MASK0" bit-position="20" bit-size="1" target="EMU" description="Transmit Data Available Mask"/>
-	<register name="MASK0_RX_FIFO_RDY_MASK"   parent="SDH_MASK0" bit-position="21" bit-size="1" target="EMU" description="Receive Data Available Mask"/>
-
-<register name="SDH_MASK1" group="SDH" mask="FFFFFFFF" description="SDH Interrupt1 Mask" bit-size="32" read-address="0xFFC03940" write-address="0xFFC03940" type="IO" target="EMU" />
-	<register name="MASK1_CMD_CRC_FAIL_MASK"  parent="SDH_MASK1" bit-position="0"  bit-size="1" target="EMU" description="CMD CRC Fail Mask"/>
-	<register name="MASK1_DAT_CRC_FAIL_MASK"  parent="SDH_MASK1" bit-position="1"  bit-size="1" target="EMU" description="Data CRC Fail Mask"/>
-	<register name="MASK1_CMD_TIMEOUT_MASK"   parent="SDH_MASK1" bit-position="2"  bit-size="1" target="EMU" description="CMD Time Out Mask"/>
-	<register name="MASK1_DAT_TIMEOUT_MASK"   parent="SDH_MASK1" bit-position="3"  bit-size="1" target="EMU" description="Data Time Out Mask"/>
-	<register name="MASK1_TX_UNDERRUN_MASK"   parent="SDH_MASK1" bit-position="4"  bit-size="1" target="EMU" description="Transmit Underrun Mask"/>
-	<register name="MASK1_RX_OVERRUN_MASK"    parent="SDH_MASK1" bit-position="5"  bit-size="1" target="EMU" description="Receive Overrun Mask"/>
-	<register name="MASK1_CMD_RESP_END_MASK"  parent="SDH_MASK1" bit-position="6"  bit-size="1" target="EMU" description="CMD Response End Mask"/>
-	<register name="MASK1_CMD_SENT_MASK"      parent="SDH_MASK1" bit-position="7"  bit-size="1" target="EMU" description="CMD Sent Mask"/>
-	<register name="MASK1_DAT_END_MASK"       parent="SDH_MASK1" bit-position="8"  bit-size="1" target="EMU" description="Data End Mask"/>
-	<register name="MASK1_START_BIT_ERR_MASK" parent="SDH_MASK1" bit-position="9"  bit-size="1" target="EMU" description="Start Bit Error Mask"/>
-	<register name="MASK1_DAT_BLK_END_MASK"   parent="SDH_MASK1" bit-position="10" bit-size="1" target="EMU" description="Data Block End Mask"/>
-	<register name="MASK1_CMD_ACT_MASK"       parent="SDH_MASK1" bit-position="11" bit-size="1" target="EMU" description="CMD Active Mask"/>
-	<register name="MASK1_TX_ACT_MASK"        parent="SDH_MASK1" bit-position="12" bit-size="1" target="EMU" description="Transmit Active Mask"/>
-	<register name="MASK1_RX_ACT_MASK"        parent="SDH_MASK1" bit-position="13" bit-size="1" target="EMU" description="Receive Active Mask"/>
-	<register name="MASK1_TX_FIFO_STAT_MASK"  parent="SDH_MASK1" bit-position="14" bit-size="1" target="EMU" description="Transmit FIFO Status Mask"/>
-	<register name="MASK1_RX_FIFO_STAT_MASK"  parent="SDH_MASK1" bit-position="15" bit-size="1" target="EMU" description="Receive FIFO Status Mask"/>
-	<register name="MASK1_TX_FIFO_FULL_MASK"  parent="SDH_MASK1" bit-position="16" bit-size="1" target="EMU" description="Transmit FIFO Full Mask"/>
-	<register name="MASK1_RX_FIFO_FULL_MASK"  parent="SDH_MASK1" bit-position="17" bit-size="1" target="EMU" description="Receive FIFO Full Mask"/>
-	<register name="MASK1_TX_FIFO_ZERO_MASK"  parent="SDH_MASK1" bit-position="18" bit-size="1" target="EMU" description="Transmit FIFO Empty Mask"/>
-	<register name="MASK1_RX_DAT_ZERO_MASK"   parent="SDH_MASK1" bit-position="19" bit-size="1" target="EMU" description="Receive FIFO Empty Mask"/>
-	<register name="MASK1_TX_DAT_RDY_MASK"    parent="SDH_MASK1" bit-position="20" bit-size="1" target="EMU" description="Transmit Data Available Mask"/>
-	<register name="MASK1_RX_FIFO_RDY_MASK"   parent="SDH_MASK1" bit-position="21" bit-size="1" target="EMU" description="Receive Data Available Mask"/>
-
-<register name="SDH_FIFO_CNT" group="SDH" mask="FFFF" description="SDH FIFO Counter" bit-size="16" read-address="0xFFC03948" write-address="0xFFC03948" type="IO" target="EMU" />
-	<register name="FIFO_COUNT" parent="SDH_FIFO_CNT" bit-position="0" bit-size="15" target="EMU" description="FIFO Count"/>
-
-<register name="SDH_FIFO" group="SDH" mask="FFFFFFFF" description="SDH Data FIFO" bit-size="32" read-address="0xFFC03980" write-address="0xFFC03980" type="IO" target="EMU" />
-
-<register name="SDH_E_STATUS" group="SDH" mask="FFFF" description="SDH Exception Status" bit-size="16" read-address="0xFFC039C0" write-address="0xFFC039C0" type="IO" target="EMU" />
-	<register name="SDIO_INT_DET" parent="SDH_E_STATUS" bit-position="1" bit-size="1" target="EMU" description="SDIO Int Detected"/>
-	<register name="SD_CARD_DET"  parent="SDH_E_STATUS" bit-position="4" bit-size="1" target="EMU" description="SD Card Detect"/>
-
-<register name="SDH_E_MASK" group="SDH" mask="FFFF" description="SDH Exception Mask" bit-size="16" read-address="0xFFC039C4" write-address="0xFFC039C4" type="IO" target="EMU" />
-	<register name="SDIO_MSK" parent="SDH_E_MASK" bit-position="1" bit-size="1" target="EMU" description="Mask SDIO Int Detected"/>
-	<register name="SCD_MSK"  parent="SDH_E_MASK" bit-position="6" bit-size="1" target="EMU" description="Mask Card Detect"/>
-
-<register name="SDH_CFG" group="SDH" mask="FFFF" description="SDH Configuration" bit-size="16" read-address="0xFFC039C8" write-address="0xFFC039C8" type="IO" target="EMU" />
-	<register name="CLKS_EN"    parent="SDH_CFG" bit-position="0" bit-size="1" target="EMU" description="Clocks Enable"/>
-	<register name="SD4E"       parent="SDH_CFG" bit-position="2" bit-size="1" target="EMU" description="SDIO 4-Bit Enable"/>
-	<register name="MWE"        parent="SDH_CFG" bit-position="3" bit-size="1" target="EMU" description="Moving Window Enable"/>
-	<register name="SD_RST"     parent="SDH_CFG" bit-position="4" bit-size="1" target="EMU" description="SDMMC Reset"/>
-	<register name="PUP_SDDAT"  parent="SDH_CFG" bit-position="5" bit-size="1" target="EMU" description="Pull-up SD_DAT"/>
-	<register name="PUP_SDDAT3" parent="SDH_CFG" bit-position="6" bit-size="1" target="EMU" description="Pull-up SD_DAT3"/>
-	<register name="PD_SDDAT3"  parent="SDH_CFG" bit-position="7" bit-size="1" target="EMU" description="Pull-down SD_DAT3"/>
-
-<register name="SDH_RD_WAIT_EN" group="SDH" mask="FFFF" description="SDH Read Wait Enable" bit-size="16" read-address="0xFFC039CC" write-address="0xFFC039CC" type="IO" target="EMU" />
-	<register name="RWR" parent="SDH_RD_WAIT_EN" bit-position="0" bit-size="1" target="EMU" description="Read Wait Request"/>
-
-<register name="SDH_PID0" group="SDH" mask="FFFF" description="SDH Peripheral Identification0" bit-size="16" read-address="0xFFC039D0" write-address="0xFFC039D0" type="IO" target="EMU" />
-<register name="SDH_PID1" group="SDH" mask="FFFF" description="SDH Peripheral Identification1" bit-size="16" read-address="0xFFC039D4" write-address="0xFFC039D4" type="IO" target="EMU" />
-<register name="SDH_PID2" group="SDH" mask="FFFF" description="SDH Peripheral Identification2" bit-size="16" read-address="0xFFC039D8" write-address="0xFFC039D8" type="IO" target="EMU" />
-<register name="SDH_PID3" group="SDH" mask="FFFF" description="SDH Peripheral Identification3" bit-size="16" read-address="0xFFC039DC" write-address="0xFFC039DC" type="IO" target="EMU" />
-<register name="SDH_PID4" group="SDH" mask="FFFF" description="SDH Peripheral Identification4" bit-size="16" read-address="0xFFC039E0" write-address="0xFFC039E0" type="IO" target="EMU" />
-<register name="SDH_PID5" group="SDH" mask="FFFF" description="SDH Peripheral Identification5" bit-size="16" read-address="0xFFC039E4" write-address="0xFFC039E4" type="IO" target="EMU" />
-<register name="SDH_PID6" group="SDH" mask="FFFF" description="SDH Peripheral Identification6" bit-size="16" read-address="0xFFC039E8" write-address="0xFFC039E8" type="IO" target="EMU" />
-<register name="SDH_PID7" group="SDH" mask="FFFF" description="SDH Peripheral Identification7" bit-size="16" read-address="0xFFC039EC" write-address="0xFFC039EC" type="IO" target="EMU" />
-
 	<!--*********************************** -->
 	<!--** New to ADSP-BF514/ADSP-BF516  ** -->
 	<!--*********************************** -->
@@ -462,15 +293,10 @@
 <register name="RSI_EMASK"         group="RSI" read-address="0xFFC038C4" write-address="0xFFC038C4" mask="FFFF" type="IO" description="RSI Exception Mask Register" bit-size="16" target="EMU" />
 <register name="RSI_CONFIG"        group="RSI" read-address="0xFFC038C8" write-address="0xFFC038C8" mask="FFFF" type="IO" description="RSI Configuration Register" bit-size="16" target="EMU" />
 <register name="RSI_RD_WAIT_EN"    group="RSI" read-address="0xFFC038CC" write-address="0xFFC038CC" mask="FFFF" type="IO" description="RSI Read Wait Enable Register" bit-size="16" target="EMU" />
-<register name="RSI_PID0"          group="RSI" read-address="0xFFC03FE0" write-address="0xFFC03FE0" mask="FFFF" type="IO" description="RSI Peripheral ID Register 0" bit-size="16" target="EMU" />
-<register name="RSI_PID1"          group="RSI" read-address="0xFFC03FE4" write-address="0xFFC03FE4" mask="FFFF" type="IO" description="RSI Peripheral ID Register 1" bit-size="16" target="EMU" />
-<register name="RSI_PID2"          group="RSI" read-address="0xFFC03FE8" write-address="0xFFC03FE8" mask="FFFF" type="IO" description="RSI Peripheral ID Register 2" bit-size="16" target="EMU" />
-<register name="RSI_PID3"          group="RSI" read-address="0xFFC03FEC" write-address="0xFFC03FEC" mask="FFFF" type="IO" description="RSI Peripheral ID Register 3" bit-size="16" target="EMU" />
-<register name="RSI_PID4"          group="RSI" read-address="0xFFC03FF0" write-address="0xFFC03FF0" mask="FFFF" type="IO" description="RSI Peripheral ID Register 4" bit-size="16" target="EMU" />
-<register name="RSI_PID5"          group="RSI" read-address="0xFFC03FF4" write-address="0xFFC03FF4" mask="FFFF" type="IO" description="RSI Peripheral ID Register 5" bit-size="16" target="EMU" />
-<register name="RSI_PID6"          group="RSI" read-address="0xFFC03FF8" write-address="0xFFC03FF8" mask="FFFF" type="IO" description="RSI Peripheral ID Register 6" bit-size="16" target="EMU" />
-<register name="RSI_PID7"          group="RSI" read-address="0xFFC03FFC" write-address="0xFFC03FFC" mask="FFFF" type="IO" description="RSI Peripheral ID Register 7" bit-size="16" target="EMU" />
-
+<register name="RSI_PID0"          group="RSI" read-address="0xFFC038D0" write-address="0xFFC038D0" mask="FFFF" type="IO" description="RSI Peripheral ID Register 0" bit-size="16" target="EMU" />
+<register name="RSI_PID1"          group="RSI" read-address="0xFFC038D4" write-address="0xFFC038D4" mask="FFFF" type="IO" description="RSI Peripheral ID Register 1" bit-size="16" target="EMU" />
+<register name="RSI_PID2"          group="RSI" read-address="0xFFC038D8" write-address="0xFFC038D8" mask="FFFF" type="IO" description="RSI Peripheral ID Register 2" bit-size="16" target="EMU" />
+<register name="RSI_PID3"          group="RSI" read-address="0xFFC038DC" write-address="0xFFC038DC" mask="FFFF" type="IO" description="RSI Peripheral ID Register 3" bit-size="16" target="EMU" />
 </register-extended-definitions>
 
 <!-- ************************************************************************ -->
@@ -1263,46 +1089,6 @@
 	<register name="SECURE_STATUS"  type="NORMAL" x="14" y="2" />
 </window>
 
-<window name="SDIO Peripheral ID Registers" menu="&amp;Register:&amp;Peripherals:SDIO:PID" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\BF54x-PPHWR.chm::/FILE_H_IDH_BF54X_REG_SDH_PWR_CTL.html">
-	<register name="SDH_PID0" type="NORMAL" x="10" y="0" />
-	<register name="SDH_PID1" type="NORMAL" x="10" y="1" />
-	<register name="SDH_PID2" type="NORMAL" x="10" y="2" />
-	<register name="SDH_PID3" type="NORMAL" x="10" y="3" />
-	<register name="SDH_PID4" type="NORMAL" x="10" y="4" />
-	<register name="SDH_PID5" type="NORMAL" x="10" y="5" />
-	<register name="SDH_PID6" type="NORMAL" x="10" y="6" />
-	<register name="SDH_PID7" type="NORMAL" x="10" y="7" />
-</window>
-
-<window name="SDIO Response Registers" menu="&amp;Register:&amp;Peripherals:SDIO:Response" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\BF54x-PPHWR.chm::/FILE_H_IDH_BF54X_REG_SDH_PWR_CTL.html">
-	<register name="SDH_RESPONSE0" type="NORMAL" x="15" y="0" />
-	<register name="SDH_RESPONSE1" type="NORMAL" x="15" y="1" />
-	<register name="SDH_RESPONSE2" type="NORMAL" x="15" y="2" />
-	<register name="SDH_RESPONSE3" type="NORMAL" x="15" y="3" />
-</window>
-
-<window name="All SDIO Registers (no bit breakdowns)" menu="&amp;Register:&amp;Peripherals:SDIO:All SDH (no bit breakdowns)" description="" format="Hexadecimal" format-selection="All" type="EMU SIM" help-id="" help-tag="\BF54x-PPHWR.chm::/FILE_H_IDH_BF54X_REG_SDH_PWR_CTL.html">
-	<register name="SDH_PWR_CTL"    type="NORMAL" x="16" y="0" />
-	<register name="SDH_CLK_CTL"    type="NORMAL" x="16" y="1" />
-	<register name="SDH_ARGUMENT"   type="NORMAL" x="16" y="2" />
-	<register name="SDH_COMMAND"    type="NORMAL" x="16" y="3" />
-	<register name="SDH_RESP_CMD"   type="NORMAL" x="16" y="4" />
-	<register name="SDH_DATA_TIMER" type="NORMAL" x="16" y="5" />
-	<register name="SDH_DATA_LGTH"  type="NORMAL" x="16" y="6" />
-	<register name="SDH_DATA_CTL"   type="NORMAL" x="16" y="7" />
-	<register name="SDH_DATA_CNT"   type="NORMAL" x="16" y="8" />
-	<register name="SDH_STATUS"     type="NORMAL" x="16" y="9" />
-	<register name="SDH_STATUS_CLR" type="NORMAL" x="16" y="10" />
-	<register name="SDH_MASK0"      type="NORMAL" x="16" y="11" />
-	<register name="SDH_MASK1"      type="NORMAL" x="16" y="12" />
-	<register name="SDH_FIFO_CNT"   type="NORMAL" x="16" y="13" />
-	<register name="SDH_FIFO"       type="NORMAL" x="16" y="14" />
-	<register name="SDH_E_STATUS"   type="NORMAL" x="16" y="15" />
-	<register name="SDH_E_MASK"     type="NORMAL" x="16" y="16" />
-	<register name="SDH_CFG"        type="NORMAL" x="16" y="17" />
-	<register name="SDH_RD_WAIT_EN" type="NORMAL" x="16" y="18" />
-</window>
-
 <window name="Removable Storage Interface Response Registers" menu="&amp;Register:&amp;Peripherals:RSI:Response" description="" format="Hexadecimal" format-selection="All" type="EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
 	<register name="RSI_RESPONSE0"  type="NORMAL"   x="15"  y="0" />
 	<register name="RSI_RESPONSE1"  type="NORMAL"   x="15"  y="1" />
@@ -1315,10 +1101,6 @@
 	<register name="RSI_PID1"       type="NORMAL"   x="10"  y="1" />
 	<register name="RSI_PID2"       type="NORMAL"   x="10"  y="2" />
 	<register name="RSI_PID3"       type="NORMAL"   x="10"  y="3" />
-	<register name="RSI_PID4"       type="NORMAL"   x="10"  y="4" />
-	<register name="RSI_PID5"       type="NORMAL"   x="10"  y="5" />
-	<register name="RSI_PID6"       type="NORMAL"   x="10"  y="6" />
-	<register name="RSI_PID7"       type="NORMAL"   x="10"  y="7" />
 </window>
 
 <window name="Removable Storage Interface Registers" menu="&amp;Register:&amp;Peripherals:RSI:All RSI" description="" format="Hexadecimal" format-selection="All" type="EMU" help-id="" help-tag="\helphelp.chm::/html/help_is_not_available.htm">
@@ -1350,10 +1132,6 @@
 	<register name="RSI_PID1"          type="NORMAL"   x="18"  y="25" />
 	<register name="RSI_PID2"          type="NORMAL"   x="18"  y="26" />
 	<register name="RSI_PID3"          type="NORMAL"   x="18"  y="27" />
-	<register name="RSI_PID4"          type="NORMAL"   x="18"  y="28" />
-	<register name="RSI_PID5"          type="NORMAL"   x="18"  y="29" />
-	<register name="RSI_PID6"          type="NORMAL"   x="18"  y="30" />
-	<register name="RSI_PID7"          type="NORMAL"   x="18"  y="31" />
 </window>
 
 <window name="Real-Time Clock Registers" menu="&amp;Register:&amp;Peripherals:Real-Time Clock" description="" format="Hexadecimal" format-selection="All" type="EMU" help-id="0xD04A" help-tag="\BF52x_HWR_vol1.chm::/FILE_H_IDH_BF52X_REG_RTC_LIST.html">
