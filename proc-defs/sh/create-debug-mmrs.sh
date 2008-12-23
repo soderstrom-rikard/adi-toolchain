@@ -19,6 +19,11 @@ cat << EOF > ${output}
 #include <linux/module.h>
 #include <asm/blackfin.h>
 
+#define _D(name, bits, addr, perms) debugfs_create_x##bits(name, perms, parent, (u##bits *)addr)
+#define D(name, bits, addr)         _D(name, bits, addr, 0600)
+#define D_RO(name, bits, addr)      _D(name, bits, addr, 0400)
+#define D_WO(name, bits, addr)      _D(name, bits, addr, 0200)
+
 static struct dentry *debug_mmrs_dentry;
 
 static int __init bfin_debug_mmrs_init(void)
@@ -64,7 +69,7 @@ EOF
 		unset IFS
 		group=$1 mmr_name=$2 mmr_read=$3 mmr_write=$4 bits=$5
 
-		if [[ -z ${mmr_name} || -z ${bits} || -z ${mmr_read} ]] ; then
+		if [[ -z ${mmr_name} || -z ${bits} || -z ${mmr_read}${mmr_write} ]] ; then
 			[[ ${group} == "Core" ]] && continue
 			echo "Broken line generated! -> $@"
 		fi
@@ -77,15 +82,19 @@ EOF
 			parent=${group}
 		fi
 
-		if [[ ${mmr_read} == ${mmr_write} ]] ; then
-cat << EOF >> ${output}
-		debugfs_create_x${bits}("${mmr_name}", 0600, parent, (u${bits} *)${mmr_read});
-EOF
+		func=
+		if [[ -z ${mmr_read} ]] ; then
+			func="D_WO"
+		elif [[ -z ${mmr_read} ]] ; then
+			func="D_RO"
+		elif [[ ${mmr_read} == ${mmr_write} ]] ; then
+			func="D"
 		else
-cat << EOF >> ${output}
-		debugfs_create_rw_x${bits}("${mmr_name}", 0600, parent, (u${bits} *)${mmr_read}, (u${bits} *)${mmr_write});
-EOF
+			func="D_RW"
 		fi
+cat << EOF >> ${output}
+		${func}("${mmr_name}", ${bits}, ${mmr_read});
+EOF
 	done
 
 cat << EOF >> ${output}
