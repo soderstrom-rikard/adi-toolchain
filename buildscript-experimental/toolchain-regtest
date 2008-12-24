@@ -29,6 +29,7 @@ DIR_APP=`dirname $APP_NAME`
 DIR_BOARDS=`cd $DIR_APP;pwd`/boards/
 APP_NAME=${APP_NAME#.}
 APP_NAME=${APP_NAME#/}
+START=$(date +%s)
 
 #Uncomment only one of these
 #TIMESTAMP=`date +%Y-%b-%d-%H-%M` # is YYYY_MMM_DD_HH_MM
@@ -789,6 +790,9 @@ fi
 die_with_log ()
 {
     echo -n " Build error " ; date
+    END=$(date +%s)
+    DIFF=$(( $END - $START ))
+    echo "  occurred $DIFF seconds into buildscript"
     echo " Last logfile entries:"
     tail -10 $ACTUAL_LOGFILE
     # Create a single file so users can email it to us,
@@ -2069,5 +2073,9 @@ fi
 #     echo_date "Checking ldr-utils"
 #     run_cmd $MAKE check
 # fi
+
+END=$(date +%s)
+DIFF=$(( $END - $START ))
+echo "It took $DIFF seconds to complete"
 
 echo_date "Done"
