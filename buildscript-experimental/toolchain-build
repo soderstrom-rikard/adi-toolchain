@@ -370,9 +370,9 @@ print_stop_time ()
     min=$(( ($DIFF - ( $hours * 3600 ) ) / 60))
     sec=$(( $DIFF - $min * 60 - $hours * 3600))
     if [ "$hours" -eq "0" ] ; then
-	printf " $min:$sec "
+	printf " %02d:%02d " "$min" "$sec"
     else
-	printf " $hours:$min:$sec "
+	printf " %d:%02d:%02d " "$hours" "$min" "$sec"
     fi
 }
 
@@ -2270,6 +2270,6 @@ fi
 
 echo_date "Done"
 
-printf "*** It took"
+printf "It took"
 print_stop_time
 echo " to complete"
