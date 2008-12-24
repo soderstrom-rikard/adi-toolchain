@@ -325,12 +325,12 @@ if [ -n "$CHECK_PRE" ] ; then
                 continue
             fi
             echo "** Could not find version of `which $file`"
-            echo -n "** "
+            printf "** "
             file `which $file`
             RUN=$(file `which $file`| grep -i "symbolic link" | wc -l)
             while [ "$RUN" -gt "0" ]
             do
-                echo -n " * "
+                printf " * "
                 file=$(file `which $file` | awk  '{print $NF}' | sed 's/`//g' | sed "s/'//g")
                 file $file
                 RUN=$(file $file | grep -i "symbolic link" | wc -l)
@@ -349,7 +349,7 @@ do
         echo "Can not find $PREREQ"
         exit 1
     else if [ $RUN -gt 1 ] ; then
-        echo -n "Found multiple versions of $PREREQ, using the one at "
+        printf "Found multiple versions of $PREREQ, using the one at "
         which $PREREQ
         fi
     fi
@@ -362,7 +362,7 @@ done
 
 die_with_log ()
 {
-    echo -n " Build error " ; date
+    printf " Build error " ; date
     END=$(date +%s)
     DIFF=$(( $END - $START ))
     echo "  occurred $DIFF seconds into buildscript"
@@ -478,15 +478,15 @@ if [ ! $BUILD_TARGET_ELF ] && [ ! $BUILD_TARGET_UCLINUX ] && [ ! $BUILD_TARGET_L
     BUILD_TARGET_LINUX_UCLIBC=1
 fi
 
-echo -n "Targets: "
+printf "Targets: "
 if [ $BUILD_TARGET_ELF ]; then
-    echo -n "bfin-elf "
+    printf "bfin-elf "
 fi
 if [ $BUILD_TARGET_UCLINUX ]; then
-    echo -n "bfin-uclinux "
+    printf "bfin-uclinux "
 fi
 if [ $BUILD_TARGET_LINUX_UCLIBC ]; then
-    echo -n "bfin-linux-uclibc"
+    printf "bfin-linux-uclibc"
 fi
 echo ""
 
@@ -510,7 +510,7 @@ echo "Build: $BUILD_TRIPLET"
 if [ -z "$GCC_VERSIONS" ]; then
     GCC_VERSIONS=4.1
 fi
-echo -n "Building gcc versions: $GCC_VERSIONS "
+printf "Building gcc versions: $GCC_VERSIONS "
 
 if [ -z "$BFIN_LANGS" ] ; then 
     # Don't set a default here ... let the build system
@@ -563,7 +563,7 @@ if [ ! $DIR_SOURCE ] ; then
 fi
 
 if [ -d /.$DIR_SOURCE ] ; then
-    echo -n "Toolchain source is at      "
+    printf "Toolchain source is at      "
     echo $DIR_SOURCE
 else
     echo "Invalid Toolchain source path"
@@ -646,15 +646,15 @@ if [ $BUILD_TARGET_UCLINUX ] || [ $BUILD_TARGET_LINUX_UCLIBC ]; then
     if [ -z "$UCLIBC_CFLAGS" ] ; then
 	UCLIBC_CFLAGS='-g -O2'
     fi
-    echo -n " uClibc CFLAGS              "
+    printf " uClibc CFLAGS              "
     # We test (and warn) if any of the CFLAGS for uClibc don't work on the host compiler
     for opt in $UCLIBC_CFLAGS
     do
 	check_cc_options gcc $opt
 	if [ "$?" -eq "1" ] ; then
-	    echo -n "$opt "
+	    printf "%s " "$opt"
 	else
-	    echo -n "$opt(bfin only?) "
+	    printf "%s(bfin only?) " "$opt"
 	fi
     done
     echo
@@ -683,7 +683,7 @@ if [ $BUILD_TARGET_UCLINUX ] || [ $BUILD_TARGET_LINUX_UCLIBC ]; then
 	echo "Can't find $KERNEL_SOURCE/arch/blackfin"
 	exit 1
     elif [ -d /.$KERNEL_SOURCE ] ; then
-        echo -n "Kernel source is at         "
+        printf "Kernel source is at         "
         echo $KERNEL_SOURCE
     else
         echo "Invalid Linux kernel source path"
@@ -697,7 +697,7 @@ if [ $BUILD_TARGET_UCLINUX ] || [ $BUILD_TARGET_LINUX_UCLIBC ]; then
 	echo "Invalid U-Boot Path"
 	exit 1
     elif [ -d /.$DIR_UBOOT ] ; then
-	echo -n "U-Boot source is at         "
+	printf "U-Boot source is at         "
 	echo $DIR_UBOOT
     else
 	echo "Invalid U-Boot source path: addon utilties (like 'mkimage') will not be built"
@@ -774,7 +774,7 @@ mk_output_dir()
 }
 
 if [ $DIR_OUTPUT ] ; then
-    echo -n "Toolchain output dir        $DIR_OUTPUT"
+    printf "Toolchain output dir        $DIR_OUTPUT"
     mk_output_dir $DIR_OUTPUT "$KEEP_OUTPUT"
 else
     echo "Toolchain output dirs:"
@@ -782,28 +782,28 @@ else
 	if [ ! $DIR_ELF_OUTPUT ] ; then
 	    DIR_ELF_OUTPUT=$DIR_BUILD/bfin-elf
 	fi
-	echo -n " bfin-elf                   $DIR_ELF_OUTPUT"
+	printf " bfin-elf                   $DIR_ELF_OUTPUT"
 	mk_output_dir $DIR_ELF_OUTPUT ""
     fi
     if [ $BUILD_TARGET_UCLINUX ]; then
 	if [ ! $DIR_uC_OUTPUT ] ; then
 	    DIR_uC_OUTPUT=$DIR_BUILD/bfin-uclinux
 	fi
-	echo -n " bfin-uclinux               $DIR_uC_OUTPUT"
+	printf " bfin-uclinux               $DIR_uC_OUTPUT"
 	mk_output_dir $DIR_uC_OUTPUT ""
     fi
     if [ $BUILD_TARGET_LINUX_UCLIBC ]; then
 	if [ ! $DIR_LINUX_OUTPUT ]; then
 	    DIR_LINUX_OUTPUT=$DIR_BUILD/bfin-linux-uclibc
 	fi
-	echo -n " bfin-linux-uclibc          $DIR_LINUX_OUTPUT"
+	printf " bfin-linux-uclibc          $DIR_LINUX_OUTPUT"
 	mk_output_dir $DIR_LINUX_OUTPUT ""
     fi
 fi
 if [ $BUILD_TARGET_UCLINUX ] || [ $BUILD_TARGET_LINUX_UCLIBC ]; then
     if [ ! $DIR_KBUILD_OUTPUT ] ; then
 	DIR_KBUILD_OUTPUT=$DIR_BUILD/kernel_build
-	echo -n "Linux kernel output dir     $DIR_KBUILD_OUTPUT"
+	printf "Linux kernel output dir     $DIR_KBUILD_OUTPUT"
 	mk_output_dir $DIR_KBUILD_OUTPUT ""
     fi
 fi
@@ -1030,7 +1030,7 @@ build_gcc ()
         # check to make sure the copies were made
         if [ ! -d $DIR_GCC_SOURCE/newlib -o ! -d $DIR_GCC_SOURCE/libgloss ] ; then
             echo "*** ERROR : can not link newlib or libgloss in $DIR_GCC_SOURCE"
-            echo -n "*** ERROR : running as user "
+            printf "*** ERROR : running as user "
             whoami
             ls -ld $DIR_GCC_SOURCE
             exit 1
@@ -1652,11 +1652,11 @@ if [ $BUILD_TARGET_UCLINUX ]; then
 
     change_dir $UCLIBC_SOURCE
 
-    echo -n "*** Checking uClibc CFLAGS"
+    printf "*** Checking uClibc CFLAGS"
     # We test (and fail) if any of the CFLAGS for uClibc don't work on the bfin-uclinux compiler
     for opt in $UCLIBC_CFLAGS
     do
-	echo -n " $opt"
+	printf " $opt"
 	check_cc_options $DIR_uC_OUTPUT/bin/bfin-uclinux-gcc $opt
 	if [ "$?" -eq "0" ] ; then
 	    echo "I could not make option $opt work on the bfin-uclinux compiler, so I can't use it for uClibc"
@@ -1813,11 +1813,11 @@ if [ $BUILD_TARGET_LINUX_UCLIBC ]; then
 
     change_dir $UCLIBC_SOURCE
 
-    echo -n "*** Checking uClibc CFLAGS"
+    printf "*** Checking uClibc CFLAGS"
     # We test (and fail) if any of the CFLAGS for uClibc don't work on the bfin-linux-uclibc compiler
     for opt in $UCLIBC_CFLAGS
     do
-	echo -n " $opt"
+	printf " $opt"
 	check_cc_options $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-gcc $opt
 	if [ "$?" -eq "0" ] ; then
 	    echo "I could not make option $opt work on the bfin-linux-uclibc compiler, so I can't use it for uClibc"

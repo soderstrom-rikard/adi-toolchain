@@ -294,51 +294,51 @@ if [ $TEST_TARGET_UCLINUX ] || [ $TEST_TARGET_LINUX_UCLIBC ] ; then
     fi
 fi
 
-echo -n "Targets: "
+printf "Targets: "
 if [ $TEST_TARGET_ELF_SIM ] ; then
-    echo -n "elf-sim "
+    printf "elf-sim "
 fi
 if [ $TEST_TARGET_ELF_JTAG ] ; then
-    echo -n "elf-jtag "
+    printf "elf-jtag "
 fi
 if [ $TEST_TARGET_UCLINUX ] ; then
-    echo -n "uclinux "
+    printf "uclinux "
 fi
 if [ $TEST_TARGET_LINUX_UCLIBC ] ; then
-    echo -n "linux-uclibc"
+    printf "linux-uclibc"
 fi
 echo ""
 
-echo -n "Components: "
+printf "Components: "
 if [ $TEST_BINUTILS -eq 1 ] ; then
-    echo -n "binutils "
+    printf "binutils "
 fi
 if [ $TEST_GAS -eq 1 ] ; then
-    echo -n "gas "
+    printf "gas "
 fi
 if [ $TEST_LD -eq 1 ] ; then
-    echo -n "ld "
+    printf "ld "
 fi
 if [ $TEST_GDB -eq 1 ] ; then
-    echo -n "gdb "
+    printf "gdb "
 fi
 if [ $TEST_GCC -eq 1 ] ; then
-    echo -n "gcc "
+    printf "gcc "
 fi
 if [ $TEST_GXX -eq 1 ] ; then
-    echo -n "g++ "
+    printf "g++ "
 fi
 if [ $TEST_GFORTRAN -eq 1 ] ; then
-    echo -n "gfortran"
+    printf "gfortran"
 fi
 if [ $TEST_LIBSTDCXX -eq 1 ] ; then
-    echo -n "libstdc++ "
+    printf "libstdc++ "
 fi
 if [ $TEST_LIBMUDFLAP -eq 1 ] ; then
-    echo -n "libmudflap "
+    printf "libmudflap "
 fi
 if [ $TEST_NEWLIB -eq 1 ] ; then
-    echo -n "newlib"
+    printf "newlib"
 fi
 echo ""
 
@@ -435,12 +435,12 @@ if [ -n "$CHECK_PRE" ] ; then
                 continue
             fi
             echo "** Could not find version of `which $file`"
-            echo -n "** "
+            printf "** "
             file `which $file`
             RUN=$(file `which $file`| grep -i "symbolic link" | wc -l)
             while [ "$RUN" -gt "0" ]
             do
-                echo -n " * "
+                printf " * "
                 file=$(file `which $file` | awk  '{print $NF}' | sed 's/`//g' | sed "s/'//g")
                 file $file
                 RUN=$(file $file | grep -i "symbolic link" | wc -l)
@@ -465,7 +465,7 @@ do
         echo "Can not find $PREREQ"
         exit 1
     else if [ $RUN -gt 1 ] ; then
-        echo -n "Found multiple versions of $PREREQ, using the one at "
+        printf "Found multiple versions of $PREREQ, using the one at "
         which $PREREQ
         fi
     fi
@@ -481,7 +481,7 @@ if [ ! $DIR_SOURCE ] ; then
 fi
 
 if [ -d /.$DIR_SOURCE ] ; then
-    echo -n "Toolchain source is at      "
+    printf "Toolchain source is at      "
     echo $DIR_SOURCE
 else
     echo "Invalid Toolchain Source Path"
@@ -713,7 +713,7 @@ if [ $TEST_TARGET_UCLINUX ] || [ $TEST_TARGET_LINUX_UCLIBC ] ; then
     # target and host, which is needed to prevent the rsh
     # and rcp connection failures.
 
-    echo -n "    checking host   /proc/sys/net/ipv4/tcp_tw_recycle : "
+    printf "    checking host   /proc/sys/net/ipv4/tcp_tw_recycle : "
     RUN=`cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
     if [ "x$RUN" = "x" ] ; then
         echo "NOT exist"
@@ -728,7 +728,7 @@ if [ $TEST_TARGET_UCLINUX ] || [ $TEST_TARGET_LINUX_UCLIBC ] ; then
         echo "1 - looks OK"
     fi
 
-    echo -n "    checking target /proc/sys/net/ipv4/tcp_tw_recycle : "
+    printf "    checking target /proc/sys/net/ipv4/tcp_tw_recycle : "
     RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
     if [ "x$RUN" = "x" ] ; then
         echo "NOT exist"
@@ -736,7 +736,7 @@ if [ $TEST_TARGET_UCLINUX ] || [ $TEST_TARGET_LINUX_UCLIBC ] ; then
         exit 1
     fi
     if [ "x$RUN" = "x0" ] ; then
-       echo -n "0 - setting to 1 "
+       printf "0 - setting to 1 "
        rsh -l root $TARGET_IPADDR echo 1 \> /proc/sys/net/ipv4/tcp_tw_recycle
        RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
        if [ "x$RUN" = "x0" ] ; then
@@ -789,7 +789,7 @@ fi
 # Some helpful functions
 die_with_log ()
 {
-    echo -n " Build error " ; date
+    printf " Build error " ; date
     END=$(date +%s)
     DIFF=$(( $END - $START ))
     echo "  occurred $DIFF seconds into buildscript"
@@ -960,7 +960,7 @@ check_tests_OK()
     PID=$1
     THRESHOLD=3
     TRY=0
-    HARDWARE=`echo -n $3 | grep -i hardware`
+    HARDWARE=`printf "%s" "$3" | grep -i hardware`
     if [ $HARDWARE ] ; then
 	while [ 1 ]
 	do
@@ -1001,7 +1001,7 @@ check_tests_OK1()
     TARGET_THRESHOLD=5
     WAIT=1
     WAIT_TARGET=1
-    HARDWARE=`echo -n $3 | grep -i hardware`
+    HARDWARE=`printf "%s" "$3" | grep -i hardware`
     # -n : numeric sort - kill the last process first
     # -A : use ASCII, not UTF-8 or VT100
     # -l : long lines (otherwise it cuts off at 132 char across
@@ -1020,7 +1020,7 @@ check_tests_OK1()
         NEW_TARGET=`rsh -l root $TARGET_IPADDR "ps" | grep -v " ps" | grep -v "/rshd" |
             grep -v "\[" | grep -v telnetd | grep -v "/init" | grep -v " inetd" |
             grep -v " PID " | grep -v "[ /]sh" | grep -v " /s*bin/.*d" | sed '/^[[:space:]]*$/d'`
-            STUCK=`echo -n ${NEW_TARGET} | wc -c`
+            STUCK=`printf "${NEW_TARGET}" | wc -c`
             if [ $STUCK -gt 0 ] ; then
                echo " ** looks like random processes are running on the hardware already "
                echo " ** ${NEW_TARGET}"
@@ -1076,17 +1076,17 @@ check_tests_OK1()
 
             if [ $WAIT_TARGET -gt $TARGET_THRESHOLD ] ; then
                 # This should catch no route to host, as well as connection refused
-                STUCK=`echo ${NEW_TARGET} | grep "^${TARGET_IPADDR}" | wc -l`
+                STUCK=`printf "${NEW_TARGET}" | grep "^${TARGET_IPADDR}" | wc -l`
                 if [ $STUCK -gt 0 ] ; then
                     echo " ** looks like the board has been dead for $TARGET_THRESHOLD minutes"
                     break
                 fi
-                STUCK=`echo -n ${NEW_TARGET} | wc -c`
+                STUCK=`printf "${NEW_TARGET}" | wc -c`
                 if [ $STUCK -gt 0 ] ; then
-                    echo -n " ** looks like "
+                    printf " ** looks like "
                     for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $NF}')
                     do
-		        echo -n "${TARGET_PID} "
+		        printf "${TARGET_PID} "
                     done
                     echo "on the board is hung"
                     for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $1}')
@@ -1103,7 +1103,7 @@ check_tests_OK1()
         if [ $WAIT -gt $HOST_THRESHOLD ] ; then
             KILL_PS=""
             TREE=`pstree -n -A -l -p $PID | sed -e 's/-[-+]-/\n/g' -e 's/^[ \t]*//'`
-            NEW_KILL=`echo -n "$TREE" | wc -l`
+            NEW_KILL=`printf "$TREE" | wc -l`
             if [ $NEW_KILL -lt $KILL ] ; then
                 # We add one, so when we subtract one below, it ends up being the correct number
                 KILL=`expr $NEW_KILL + 1`
@@ -1133,12 +1133,12 @@ check_tests_OK1()
             RUN=`echo $KILL_PS | grep rsh`
             if [ -n "$RUN" ] ; then
                 echo " ** This should never happen - board seems OK, but rsh process is stuck?"
-                STUCK=`echo -n ${NEW_TARGET} | wc -c`
+                STUCK=`printf "${NEW_TARGET}" | wc -c`
                 if [ $STUCK -gt 0 ] ; then
-                    echo -n " ** looks like "
+                    printf " ** looks like "
                     for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $NF}')
                     do
-                        echo -n "${TARGET_PID} "
+                        printf "${TARGET_PID} "
                     done
                     echo "on the board is hung"
                     for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $1}')
@@ -1171,7 +1171,7 @@ check_tests_OK1()
     fi
 
     TREE=`pstree -n -A -l -p $PID | sed -e 's/-[-+]-/\n/g' -e 's/^[ \t]*//' -e '/^[[:space:]]*$/d' | awk -F "(" '{print $NF}' | awk -F ")" '{print $1}'`
-    TREE_LEN=`echo -n $TREE | wc -c`
+    TREE_LEN=`printf $TREE | wc -c`
     if [ $TREE_LEN -gt 0 ] ; then
         echo " ** Aborting remaining tests"
         echo $TREE
