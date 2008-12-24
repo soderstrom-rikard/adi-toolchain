@@ -787,18 +787,39 @@ fi
 ############ Done checking - lets get on to testing ###################
 
 # Some helpful functions
-die_with_log ()
+
+print_stop_time ()
 {
-    printf " Build error " ; date
     END=$(date +%s)
     DIFF=$(( $END - $START ))
-    echo "  occurred $DIFF seconds into buildscript"
-    echo " Last logfile entries:"
-    tail -10 $ACTUAL_LOGFILE
+    hours=$(( $DIFF / 3600 ))
+    min=$(( ($DIFF - ( $hours * 3600 ) ) / 60))
+    sec=$(( $DIFF - $min * 60 - $hours * 3600))
+    if [ "$hours" -eq "0" ] ; then
+	printf " $min:$sec "
+    else
+	printf " $hours:$min:$sec "
+    fi
+}
+
+die_with_log ()
+{
+    echo "Please report an error to http://blackfin.uclinux.org/gf/project/toolchain"
+    printf " Build error " ; date
+    printf " Build error " ; date
+    printf "  occurred"
+    print_stop_time
+    echo "into script"
+
     # Create a single file so users can email it to us,
     # we sleep, so things can finish writing to the log file
     sleep 1
     tar -jhcf $DIR_LOG/config.logs.tbz2 `find $DIR_BUILD -name "config.log"` $ACTUAL_LOGFILE
+
+    echo "When reporting issue, we may ask for $DIR_LOG/config.logs.tbz2"
+    echo " Last logfile entries:"
+    tail -10 $ACTUAL_LOGFILE
+
     exit 1
 }
 
@@ -2074,8 +2095,8 @@ fi
 #     run_cmd $MAKE check
 # fi
 
-END=$(date +%s)
-DIFF=$(( $END - $START ))
-echo "It took $DIFF seconds to complete"
+printf "*** It took"
+print_stop_time
+echo " to complete"
 
 echo_date "Done"
