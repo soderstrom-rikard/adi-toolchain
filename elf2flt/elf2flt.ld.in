@@ -59,6 +59,7 @@ R_RODAT		*(.gnu.linkonce.r*)
 		*(.data1)
 		*(.data.*)
 		*(.gnu.linkonce.d*)
+		*(.gcc_except_table.*)
 
 		/* Microblaze has .sdata and .sbss (small bss).  They must
 		   be contiguous, so please don't move any of this. JW */
