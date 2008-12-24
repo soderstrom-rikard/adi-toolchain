@@ -1611,6 +1611,7 @@ if [ $BUILD_TARGET_UCLINUX ]; then
     build_gcc $NEWEST_GCC_VERSION uclinux $DIR_uC_OUTPUT \
 	"--disable-threads --enable-languages=c \
 	 --without-libs --disable-libmudflap --disable-shared \
+	 --disable-libgomp \
          --with-sysroot=$DIR_uC_OUTPUT/bfin-uclinux/runtime"
 
     # Build elf2flt since building uClibc requires it.
@@ -1814,6 +1815,7 @@ if [ $BUILD_TARGET_LINUX_UCLIBC ]; then
     build_gcc $NEWEST_GCC_VERSION linux-uclibc $DIR_LINUX_OUTPUT \
 	"--disable-threads --enable-languages=c \
 	 --without-libs --disable-libmudflap --disable-shared \
+	 --disable-libgomp \
 	 --with-sysroot=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime"
 
     # Build uClibc
