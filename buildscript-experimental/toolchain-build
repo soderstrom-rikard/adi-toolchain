@@ -714,6 +714,17 @@ if [ ! -d /.$DIR_BUILD ] ; then
 fi
 echo "Build will be done in       $DIR_BUILD"
 
+# make sure we arent running on a case insensitive filesystem
+cd $DIR_BUILD
+rm -rf .case.test .CASE.test
+echo case > .case.test
+case=$(cat .CASE.test 2>/dev/null)
+if [ "$case" = "case" ] ; then
+	echo "ERROR: you must use a case sensitive filesystem"
+	exit 1
+fi
+rm -rf .case.test .CASE.test
+
 DIR_BINUTILS_BUILD=$DIR_BUILD/binutils_build
 DIR_ELF2FLT_BUILD=$DIR_BUILD/elf2flt_build
 DIR_GENEXT2FS_BUILD=$DIR_BUILD/genext2fs_build
