@@ -109,7 +109,7 @@ do
                     exit 1
                 fi
             else
-                echo "Can't understand Language argeument $OPTARG"
+                echo "Can't understand Language argument $OPTARG"
                 exit 1
             fi
             ;;
