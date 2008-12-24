@@ -1469,6 +1469,9 @@ build_uClibc()
 	    die_with_log
         fi
     done
+
+    # update the kernel header path just to make rebuilding easier later on
+    sed -i '/^KERNEL_HEADERS/s:=.*:="'"$2/bfin-$1/runtime/usr/include"'":' .config
 }
 
 # $1 is the target: uclinux, or linux-uclibc
@@ -1708,9 +1711,9 @@ if [ $BUILD_TARGET_UCLINUX ]; then
 	    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 	    (echo $RUN $LOGFILE ; ) | sh
 
-	    cp .config .config-used-for_${suffix}
-
 	    build_uClibc uclinux $DIR_uC_OUTPUT "" "${dir}"
+
+	    cp .config .config-used-for-uclinux_${suffix}
 
 	elif echo "${flags}" | grep -q mid-shared-library; then
 
@@ -1731,9 +1734,9 @@ if [ $BUILD_TARGET_UCLINUX ]; then
 	    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 	    (echo $RUN $LOGFILE ; ) | sh
 
-	    cp .config .config-used-for_${suffix}
-
 	    build_uClibc uclinux $DIR_uC_OUTPUT "" "${dir}"
+
+	    cp .config .config-used-for-uclinux_${suffix}
 
 	else
 
@@ -1755,9 +1758,9 @@ if [ $BUILD_TARGET_UCLINUX ]; then
 	    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 	    (echo $RUN $LOGFILE ; ) | sh
 
-	    cp .config .config-used-for_${suffix}
-
 	    build_uClibc uclinux $DIR_uC_OUTPUT "" "${dir}"
+
+	    cp .config .config-used-for-uclinux_${suffix}
 
 	fi
     done
@@ -1777,8 +1780,13 @@ if [ $BUILD_TARGET_UCLINUX ]; then
     done
     # rm -f $DIR_uC_OUTPUT/bfin-uclinux/sys-include
 
-    # Don't remove or clean $DIR_KBUILD_OUTPUT for the sake that
+    # TODO  Add an option to keep $DIR_KBUILD_OUTPUT for the sake that
     # it can be reused next time by -K option.
+
+    if [ "$DIR_KBUILD_OUTPUT" != "$KERNEL_SOURCE" ]; then
+	echo_date "Cleaning kernel"
+	remove_dir "$DIR_KBUILD_OUTPUT"
+    fi
 
     # Reinstall elf2flt
     change_dir $DIR_ELF2FLT_BUILD
@@ -1875,9 +1883,9 @@ if [ $BUILD_TARGET_LINUX_UCLIBC ]; then
 	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 	(echo $RUN $LOGFILE ; ) | sh
 
-	cp .config .config-used-for_${suffix}
-
 	build_uClibc linux-uclibc $DIR_LINUX_OUTPUT "${dir}" ""
+
+	cp .config .config-used-for-linux-uclibc_${suffix}
 
     done
 
@@ -1925,8 +1933,14 @@ if [ $BUILD_TARGET_LINUX_UCLIBC ]; then
     done
     install_libgccs $DIR_LINUX_OUTPUT bfin-linux-uclibc
 
-    # Don't remove or clean $DIR_KBUILD_OUTPUT for the sake that
+    # TODO  Add an option to keep $DIR_KBUILD_OUTPUT for the sake that
     # it can be reused next time by -K option.
+
+    if [ "$DIR_KBUILD_OUTPUT" != "$KERNEL_SOURCE" ]; then
+	echo_date "Cleaning kernel"
+	remove_dir "$DIR_KBUILD_OUTPUT"
+    fi
+
 fi
 
 
