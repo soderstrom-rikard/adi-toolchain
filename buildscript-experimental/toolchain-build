@@ -592,6 +592,27 @@ if [ $BUILD_TARGET_UCLINUX ]; then
     fi
 fi
 
+DIR_GDBPROXY_SOURCE=$DIR_SOURCE/gdbproxy
+echo $DIR_GDBPROXY_SOURCE
+if [ ! -d $DIR_GDBPROXY_SOURCE ] ; then
+    echo "Can't find gdbproxy source at $DIR_GDBPROXY_SOURCE"
+    exit 1
+fi
+
+DIR_LIBFTDI_SOURCE=$DIR_SOURCE/libftdi
+echo $DIR_LIBFTDI_SOURCE
+if [ ! -d $DIR_LIBFTDI_SOURCE ] ; then
+    echo "Can't find libftdi source at $DIR_LIBFTDI_SOURCE"
+    exit 1
+fi
+
+DIR_JTAG_SOURCE=$DIR_SOURCE/jtag
+echo $DIR_JTAG_SOURCE
+if [ ! -d $DIR_JTAG_SOURCE ] ; then
+    echo "Can't find jtag source at $DIR_JTAG_SOURCE"
+    exit 1
+fi
+
 if [ $BUILD_TARGET_UCLINUX ] || [ $BUILD_TARGET_LINUX_UCLIBC ]; then
 
     UCLIBC_SOURCE=$DIR_SOURCE/uClibc
@@ -2020,6 +2041,102 @@ if [ $BUILD_TARGET_UCLINUX ] || [ $BUILD_TARGET_LINUX_UCLIBC ]; then
     ######################## Done ################################
 
 fi
+
+######################## jtag/gdbproxy #######################
+
+### libftdi
+if ( check_lib usb && ! check_lib ftdi ) 2>/dev/null ; then
+    DIR_LIBFTDI_BUILD=$DIR_BUILD/libftdi
+
+    change_dir $DIR_LIBFTDI_SOURCE
+
+    echo_date "Cleaning libftdi"
+    find . -print0 | xargs -0 touch -r . # fix autotool timestamps
+    [ -e Makefile ] && run_cmd $MAKE distclean
+    rm -rf "$DIR_LIBFTDI_BUILD"
+    mkdir -p "$DIR_LIBFTDI_BUILD"
+    change_dir "$DIR_LIBFTDI_BUILD"
+
+    echo_date "Configuring libftdi"
+    run_cmd $DIR_LIBFTDI_SOURCE/configure --prefix="$DIR_LIBFTDI_BUILD/destdir" \
+        $BUILD_TARGET $HOST_TARGET --disable-shared --enable-static
+
+    echo_date "Building libftdi"
+    run_cmd $MAKE SUBDIRS=src
+
+    echo_date "Installing libftdi"
+    run_cmd $MAKE SUBDIRS=src install
+
+    export PKG_CONFIG_LIBDIR="$DIR_LIBFTDI_BUILD/destdir/lib/pkgconfig${PKG_CONFIG_LIBDIR+:${PKG_CONFIG_LIBDIR}}"
+    export LIBFTDI_CONFIG="$DIR_LIBFTDI_BUILD/destdir/bin/libftdi-config"
+fi
+
+### jtag
+DIR_JTAG_BUILD=$DIR_BUILD/jtag
+
+change_dir $DIR_JTAG_SOURCE
+
+echo_date "Cleaning jtag"
+find . -print0 | xargs -0 touch -r . # fix autotool timestamps
+[ -e Makefile ] && run_cmd $MAKE distclean
+# generated files get out of sync with source files; force regen
+rm -f src/bsdl/bsdl_bison.[ch] src/bsdl/bsdl_flex.c \
+    src/svf/svf_bison.[ch] src/svf/svf_flex.c
+rm -rf "$DIR_JTAG_BUILD"
+mkdir -p "$DIR_JTAG_BUILD"
+change_dir "$DIR_JTAG_BUILD"
+
+echo_date "Configuring jtag"
+run_cmd env $DIR_JTAG_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET --enable-relocatable
+
+echo_date "Building jtag"
+run_cmd $MAKE
+
+echo_date "Installing jtag"
+if [ $BUILD_TARGET_ELF ]; then
+    run_cmd $MAKE install DESTDIR=$DIR_ELF_OUTPUT   program_transform_name=s,^,bfin-,
+fi
+if [ $BUILD_TARGET_UCLINUX ]; then
+    run_cmd $MAKE install DESTDIR=$DIR_uC_OUTPUT    program_transform_name=s,^,bfin-,
+fi
+if [ $BUILD_TARGET_LINUX_UCLIBC ]; then
+    run_cmd $MAKE install DESTDIR=$DIR_LINUX_OUTPUT program_transform_name=s,^,bfin-,
+fi
+
+### gdbproxy
+DIR_GDBPROXY_BUILD=$DIR_BUILD/gdbproxy
+
+change_dir $DIR_GDBPROXY_SOURCE
+
+echo_date "Cleaning gdbproxy"
+find . -print0 | xargs -0 touch -r . # fix autotool timestamps
+[ -e Makefile ] && run_cmd $MAKE distclean
+rm -rf "$DIR_GDBPROXY_BUILD"
+mkdir -p "$DIR_GDBPROXY_BUILD"
+change_dir "$DIR_GDBPROXY_BUILD"
+
+echo_date "Configuring gdbproxy"
+run_cmd env $DIR_GDBPROXY_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET \
+    --with-jtag-srcdir=$DIR_JTAG_SOURCE --with-jtag-builddir=$DIR_JTAG_BUILD --enable-relocatable
+
+echo_date "Building gdbproxy"
+run_cmd $MAKE
+
+echo_date "Installing gdbproxy"
+if [ $BUILD_TARGET_ELF ]; then
+    run_cmd $MAKE install DESTDIR=$DIR_ELF_OUTPUT   program_transform_name=s,^,bfin-,
+fi
+if [ $BUILD_TARGET_UCLINUX ]; then
+    run_cmd $MAKE install DESTDIR=$DIR_uC_OUTPUT    program_transform_name=s,^,bfin-,
+fi
+if [ $BUILD_TARGET_LINUX_UCLIBC ]; then
+    run_cmd $MAKE install DESTDIR=$DIR_LINUX_OUTPUT program_transform_name=s,^,bfin-,
+fi
+
+change_dir $DIR_BUILD
+remove_dir $DIR_LIBFTDI_BUILD
+remove_dir $DIR_JTAG_BUILD
+remove_dir $DIR_GDBPROXY_BUILD
 
 ######################## ldr-utils ###########################
 
