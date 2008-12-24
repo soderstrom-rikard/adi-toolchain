@@ -626,21 +626,18 @@ if [ $BUILD_TARGET_UCLINUX ]; then
 fi
 
 DIR_GDBPROXY_SOURCE=$DIR_SOURCE/gdbproxy
-echo $DIR_GDBPROXY_SOURCE
 if [ ! -d $DIR_GDBPROXY_SOURCE ] ; then
     echo "Can't find gdbproxy source at $DIR_GDBPROXY_SOURCE"
     exit 1
 fi
 
 DIR_LIBFTDI_SOURCE=$DIR_SOURCE/libftdi
-echo $DIR_LIBFTDI_SOURCE
 if [ ! -d $DIR_LIBFTDI_SOURCE ] ; then
     echo "Can't find libftdi source at $DIR_LIBFTDI_SOURCE"
     exit 1
 fi
 
 DIR_JTAG_SOURCE=$DIR_SOURCE/jtag
-echo $DIR_JTAG_SOURCE
 if [ ! -d $DIR_JTAG_SOURCE ] ; then
     echo "Can't find jtag source at $DIR_JTAG_SOURCE"
     exit 1
@@ -1660,11 +1657,10 @@ if [ $BUILD_TARGET_UCLINUX ]; then
 
     change_dir $UCLIBC_SOURCE
 
-    printf "*** Checking uClibc CFLAGS:"
+    echo_date "Checking uClibc CFLAGS"
     # We test (and fail) if any of the CFLAGS for uClibc don't work on the bfin-uclinux compiler
     for opt in $UCLIBC_CFLAGS
     do
-	printf " $opt"
 	check_cc_options $DIR_uC_OUTPUT/bin/bfin-uclinux-gcc $opt
 	if [ "$?" -eq "0" ] ; then
 	    printf "\n"
@@ -1673,11 +1669,8 @@ if [ $BUILD_TARGET_UCLINUX ]; then
 	    print_stop_time
 	    printf "\n"
 	    exit
-	else
-	    printf " $opt"
 	fi
     done
-    printf " OK\n"
 
     MULTILIBS=`bfin-uclinux-gcc --print-multi-lib`
 
@@ -1827,11 +1820,10 @@ if [ $BUILD_TARGET_LINUX_UCLIBC ]; then
 
     change_dir $UCLIBC_SOURCE
 
-    printf "*** Checking uClibc CFLAGS:"
+    echo_date "Checking uClibc CFLAGS"
     # We test (and fail) if any of the CFLAGS for uClibc don't work on the bfin-linux-uclibc compiler
     for opt in $UCLIBC_CFLAGS
     do
-	printf " $opt"
 	check_cc_options $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-gcc $opt
 	if [ "$?" -eq "0" ] ; then
 	    printf "\n"
@@ -1840,11 +1832,8 @@ if [ $BUILD_TARGET_LINUX_UCLIBC ]; then
 	    print_stop_time
 	    printf "\n"
 	    exit
-	else
-	    printf " $opt"
 	fi
     done
-    echo " OK\n"
 
     MULTILIBS=`bfin-linux-uclibc-gcc --print-multi-lib`
 
@@ -2263,8 +2252,8 @@ if [ $BUILD_TARGET_LINUX_UCLIBC ]; then
     remove_dir $DIR_BINUTILS_BUILD
 fi
 
+echo_date "Done"
+
 printf "*** It took"
 print_stop_time
 echo " to complete"
-
-echo_date "Done"

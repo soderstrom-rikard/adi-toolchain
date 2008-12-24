@@ -2095,8 +2095,8 @@ fi
 #     run_cmd $MAKE check
 # fi
 
+echo_date "Done"
+
 printf "*** It took"
 print_stop_time
 echo " to complete"
-
-echo_date "Done"
