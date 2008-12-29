@@ -25,8 +25,8 @@
 
 
 APP_NAME=$0
-DIR_APP=`dirname $APP_NAME`
-DIR_BOARDS=`cd $DIR_APP;pwd`/boards/
+DIR_APP=$PWD/`dirname $APP_NAME`
+DIR_BOARDS=$DIR_APP/boards/
 APP_NAME=${APP_NAME#.}
 APP_NAME=${APP_NAME#/}
 START=$(date +%s)
