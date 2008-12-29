@@ -139,8 +139,6 @@
 # define DN_MULTISHOT	0x80000000	/* Don't remove notifier.  */
 #endif
 
-#define HAVE_ARCH_STRUCT_FLOCK
-
 struct flock
   {
     short int l_type;	/* Type of lock: F_RDLCK, F_WRLCK, or F_UNLCK.	*/
