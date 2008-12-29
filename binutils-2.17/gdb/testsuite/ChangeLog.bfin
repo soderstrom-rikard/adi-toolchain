@@ -1,3 +1,8 @@
+2008-12-29  Jie Zhang  <jie.zhang@analog.com>
+
+	* gdb.gdbtk/insight-support.exp (_gdbtk_export_target_info): Set
+	remotetimeout to gdb_load_timeout if gdb_load_timeout exists.
+
 2008-12-16  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/monitor.exp (gdb_load): Set remotetimeout when target

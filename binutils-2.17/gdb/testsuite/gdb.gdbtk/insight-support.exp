@@ -230,6 +230,9 @@ proc _gdbtk_export_target_info {} {
       if {[target_info exists disable_z_packet]} {
 	lappend info(init) "set remote Z-packet disable"
       }
+      if {[target_info exists gdb_load_timeout]} {
+	lappend info(init) "set remotetimeout [target_info gdb_load_timeout]"
+      }
 
       # Get target name and connection info
       if {[target_info exists gdb_protocol]} {
