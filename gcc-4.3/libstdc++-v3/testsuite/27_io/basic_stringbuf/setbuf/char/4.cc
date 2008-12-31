@@ -54,6 +54,8 @@ void test01()
 
 int main()
 {
+#ifndef __bfin__
   test01();
+#endif
   return 0;
 }

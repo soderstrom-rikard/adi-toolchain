@@ -1,0 +1,7 @@
+2008-12-31  Jie Zhang  <jie.zhang@analog.com>
+
+	Apply from GCC 4.1
+	2007-11-28  Bernd Schmidt  <bernd.schmidt@analog.com>
+	* testsuite/27_io/basic_stringbuf/setbuf/char/4.cc: Disable on
+	Blackfin.
+	* testsuite/27_io/basic_istream/getline/char/5.cc: Likewise.
