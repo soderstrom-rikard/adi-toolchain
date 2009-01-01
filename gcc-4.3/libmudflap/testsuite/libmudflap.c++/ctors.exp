@@ -2,7 +2,7 @@ global MUDFLAP_FLAGS
 set MUDFLAP_FLAGS [list {} {-static} {-O2} {-O3}]
 
 libmudflap-init c++
-if {$cxx == "g++"} then {
+if {$cxx == ""} then {
     unsupported "g++ not found"
     return
 }
