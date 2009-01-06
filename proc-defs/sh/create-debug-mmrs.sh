@@ -40,6 +40,8 @@ EOF
 for f in ../xml/ADSP-BF*-proc.xml ; do
 	unset parent
 
+	[[ ${f} == *BF535* ]] && continue
+
 	echo "Processing ${f}"
 
 	procnum=${f}
