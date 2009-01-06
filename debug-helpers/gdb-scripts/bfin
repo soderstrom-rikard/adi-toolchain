@@ -429,7 +429,88 @@ define _show_dma
 	set $$CURR_Y_COUNT  = *(unsigned short *) ($$DMA_BASE + 0x38)
 	printf "desc: curr: 0x%08x  next: 0x%08x\n", $$CURR_DESC_PTR, $$NEXT_DESC_PTR
 	printf "addr: curr: 0x%08x start: 0x%08x\n", $$CURR_ADDR, $$START_ADDR
-	printf "X: curr: 0x%04x count: 0x%04x mod: 0x%04x\n", $$CURR_X_COUNT, $$X_COUNT, $$X_MODIFY
-	printf "Y: curr: 0x%04x count: 0x%04x mod: 0x%04x\n", $$CURR_Y_COUNT, $$Y_COUNT, $$Y_MODIFY
-	printf "config: 0x%04x  irq status: 0x%04x\n", $$CONFIG, $$IRQ_STATUS
+	printf "X: curr: 0x%04x count: 0x%04x mod: 0x%04x (%i)\n", $$CURR_X_COUNT, $$X_COUNT, $$X_MODIFY, (short)$$X_MODIFY
+	printf "Y: curr: 0x%04x count: 0x%04x mod: 0x%04x (%i)\n", $$CURR_Y_COUNT, $$Y_COUNT, $$Y_MODIFY, (short)$$Y_MODIFY
+	printf "dma config: 0x%04x (", $$CONFIG
+	if ($$CONFIG & (1 << 0))
+		printf "enabled "
+	else
+		printf "disabled "
+	end
+	if ($$CONFIG & (0x1 << 1))
+		printf "write "
+	else
+		printf "read "
+	end
+	set $$WDSIZE = $$CONFIG & (0x3 << 2)
+	if ($$WDSIZE == 0x3)
+		printf "WDSIZE:INVALID "
+	end
+	if ($$WDSIZE == 0x2)
+		printf "32-bit "
+	end
+	if ($$WDSIZE == 0x1)
+		printf "16-bit "
+	end
+	if ($$WDSIZE == 0x0)
+		printf "8-bit "
+	end
+	if ($$CONFIG & (0x1 << 4))
+		printf "2D "
+	else
+		printf "1D "
+	end
+	if ($$CONFIG & (0x1 << 5))
+		printf "sync "
+	end
+	if ($$CONFIG & (0x1 << 6))
+		printf "di_sel "
+	end
+	if ($$CONFIG & (0x1 << 7))
+		printf "interrupt "
+	end
+	set $$NDSIZE = $$CONFIG & (0xF << 8)
+	if ($$NDSIZE > 0 && $$NDSIZE < 10)
+		printf "NDSIZE_%i ", $$NDSIZE
+	end
+	if ($$NDSIZE >= 10)
+		printf "NDSIZE:INVALID:%i ", $$NDSIZE
+	end
+	set $$FLOW = $$CONFIG & (0x7 << 12)
+	if ($$FLOW == 0)
+		printf "stop"
+	else
+		if ($$FLOW == 1)
+			printf "autobuffer"
+		else
+			if ($$FLOW == 4)
+				printf "descriptor_array"
+			else
+				if ($$FLOW == 6)
+					printf "descriptor_list_small"
+				else
+					if ($$FLOW == 7)
+						printf "descriptor_list_large"
+					else
+						printf "FLOW:INVALID:%i", $$FLOW
+					end
+				end
+			end
+		end
+	end
+	printf ")\n"
+	printf "irq status: 0x%04x (", $$IRQ_STATUS
+	if ($$IRQ_STATUS & (0x1 << 0))
+		printf "done "
+	end
+	if ($$IRQ_STATUS & (0x1 << 1))
+		printf "err "
+	end
+	if ($$IRQ_STATUS & (0x1 << 2))
+		printf "dfetch "
+	end
+	if ($$IRQ_STATUS & (0x1 << 3))
+		printf "run "
+	end
+	printf ")\n"
 end
