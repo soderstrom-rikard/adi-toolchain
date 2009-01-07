@@ -27,7 +27,7 @@
 
 <register name="SWRST"     group="System Interrupt Controller Register File" read-address="0xFFC00100" write-address="0xFFC00100" mask="FFFF"    type="IO" description="Software Reset Register" def-comment="System Interrupt Controller (0xFFC00100 - 0xFFC001FF)" bit-size="16"/>
 <register name="SYSCR"     group="System Interrupt Controller Register File" read-address="0xFFC00104" write-address="0xFFC00104" mask="FFFF"     type="IO" description="System Configuration Register" bit-size="16"/>
-<register name="SIC_RVECT" group="System Interrupt Controller Register File" read-address="0xFFC00108" write-address="0xFFC00108" mask="FFFFFFFF" type="IO" description="Interrupt Reset Vector Address Register" bit-size="32"/>
+<register name="SIC_RVECT" group="System Interrupt Controller Register File" read-address="0xFFC00108" write-address="0xFFC00108" mask="FFFFFFFF" type="IO" description="Interrupt Reset Vector Address Register" bit-size="16"/>
 <register name="SIC_IMASK" group="System Interrupt Controller Register File" read-address="0xFFC0010C" write-address="0xFFC0010C" mask="FFFFFFFF" type="IO" description="Interrupt Mask Register" bit-size="32"/>
 <register name="SIC_IAR0"  group="System Interrupt Controller Register File" read-address="0xFFC00110" write-address="0xFFC00110" mask="FFFFFFFF" type="IO" description="Interrupt Assignment Register 0" bit-size="32"/>
 <register name="SIC_IAR1"  group="System Interrupt Controller Register File" read-address="0xFFC00114" write-address="0xFFC00114" mask="FFFFFFFF" type="IO" description="Interrupt Assignment Register 1" bit-size="32"/>
