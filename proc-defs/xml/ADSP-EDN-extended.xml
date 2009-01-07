@@ -844,7 +844,7 @@
 		<register name="SPORT0_TCLKDIV" group="SPORT" description="SPORT0 Transmit Clock Divider" bit-size="16" read-address="0xFFC00808" write-address="0xFFC00808" type="IO" target="EMU"/>
 		<register name="SPORT0_TFSDIV"  group="SPORT" description="SPORT0 Transmit Frame Sync Divider" bit-size="16" read-address="0xFFC0080C" write-address="0xFFC0080C" type="IO" target="EMU"/>
 
-		<register name="SPORT0_TX"      group="SPORT" description="SPORT0 TX Data Register" bit-size="32" read-address="0xFFC00810" write-address="0xFFC00810" type="IO" target="EMU"/>
+		<register name="SPORT0_TX"      group="SPORT" description="SPORT0 TX Data Register" bit-size="32" read-address= write-address="0xFFC00810" type="IO" target="EMU"/>
 		<register name="SPORT0_RX"      group="SPORT" description="SPORT0 RX Data Register" bit-size="32" read-address="0xFFC00818" write-address="0xFFC00818" type="IO" target="EMU"/>
 
 		<register name="SPORT0_RCR1"    group="SPORT" description="SPORT0 Transmit Configuration 1 Register" bit-size="16" read-address="0xFFC00820" write-address="0xFFC00820" type="IO" target="EMU"/>
@@ -873,7 +873,7 @@
 		<register name="SPORT1_TCLKDIV" group="SPORT" description="SPORT1 Transmit Clock Divider" bit-size="16" read-address="0xFFC00908" write-address="0xFFC00908" type="IO" target="EMU"/>
 		<register name="SPORT1_TFSDIV"  group="SPORT" description="SPORT1 Transmit Frame Sync Divider" bit-size="16" read-address="0xFFC0090C" write-address="0xFFC0090C" type="IO" target="EMU"/>
 
-		<register name="SPORT1_TX"      group="SPORT" description="SPORT1 TX Data Register" bit-size="32" read-address="0xFFC00910" write-address="0xFFC00910" type="IO" target="EMU"/>
+		<register name="SPORT1_TX"      group="SPORT" description="SPORT1 TX Data Register" bit-size="32" read-address= write-address="0xFFC00910" type="IO" target="EMU"/>
 		<register name="SPORT1_RX"      group="SPORT" description="SPORT1 RX Data Register" bit-size="32" read-address="0xFFC00918" write-address="0xFFC00918" type="IO" target="EMU"/>
 
 		<register name="SPORT1_RCR1"    group="SPORT" description="SPORT1 Transmit Configuration 1 Register" bit-size="16" read-address="0xFFC00920" write-address="0xFFC00920" type="IO" target="EMU"/>

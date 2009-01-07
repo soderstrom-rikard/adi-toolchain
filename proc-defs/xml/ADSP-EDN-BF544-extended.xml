@@ -3169,7 +3169,7 @@
 
 <register name="SPORT1_TCLKDIV" group="SPORT" mask="FFFF" description="SPORT1 Transmit Serial Clock Divider Register" bit-size="16" read-address="0xFFC00908" write-address="0xFFC00908" type="IO" target="EMU" />
 <register name="SPORT1_TFSDIV" group="SPORT" mask="FFFF" description="SPORT1 Transmit Frame Sync Divider Register" bit-size="16" read-address="0xFFC0090C" write-address="0xFFC0090C" type="IO" target="EMU" />
-<register name="SPORT1_TX" group="SPORT" mask="FFFFFFFF" description="SPORT1 Transmit Data Register" bit-size="32" read-address="0xFFC00910" write-address="0xFFC00910" type="IO" target="EMU" />
+<register name="SPORT1_TX" group="SPORT" mask="FFFFFFFF" description="SPORT1 Transmit Data Register" bit-size="32" read-address= write-address="0xFFC00910" type="IO" target="EMU" />
 <register name="SPORT1_RCR1" group="SPORT" mask="FFFF" description="SPORT1 Receive Configuration 1 Register" bit-size="16" read-address="0xFFC00920" write-address="0xFFC00920" type="IO" target="EMU" />
 	<register name="SPORT1_RSPEN"  parent="SPORT1_RCR1" bit-position="0"  bit-size="1" target="EMU" description="Receive Enable" />
 	<register name="SPORT1_IRCLK"  parent="SPORT1_RCR1" bit-position="1"  bit-size="1" target="EMU" description="Internal Receive Clock Select" />
@@ -3232,7 +3232,7 @@
 
 <register name="SPORT2_TCLKDIV" group="SPORT" mask="FFFF" description="SPORT2 Transmit Serial Clock Divider Register" bit-size="16" read-address="0xFFC02508" write-address="0xFFC02508" type="IO" target="EMU" />
 <register name="SPORT2_TFSDIV" group="SPORT" mask="FFFF" description="SPORT2 Transmit Frame Sync Divider Register" bit-size="16" read-address="0xFFC0250C" write-address="0xFFC0250C" type="IO" target="EMU" />
-<register name="SPORT2_TX" group="SPORT" mask="FFFFFFFF" description="SPORT2 Transmit Data Register" bit-size="32" read-address="0xFFC02510" write-address="0xFFC02510" type="IO" target="EMU" />
+<register name="SPORT2_TX" group="SPORT" mask="FFFFFFFF" description="SPORT2 Transmit Data Register" bit-size="32" read-address= write-address="0xFFC02510" type="IO" target="EMU" />
 
 <register name="SPORT2_RCR1" group="SPORT" mask="FFFF" description="SPORT2 Receive Configuration 1 Register" bit-size="16" read-address="0xFFC02520" write-address="0xFFC02520" type="IO" target="EMU" />
 	<register name="SPORT2_RSPEN"  parent="SPORT2_RCR1" bit-position="0"  bit-size="1" target="EMU" description="Receive Enable" />
@@ -3300,7 +3300,7 @@
 
 <register name="SPORT3_TCLKDIV" group="SPORT" mask="FFFF" description="SPORT3 Transmit Serial Clock Divider Register" bit-size="16" read-address="0xFFC02608" write-address="0xFFC02608" type="IO" target="EMU" />
 <register name="SPORT3_TFSDIV" group="SPORT" mask="FFFF" description="SPORT3 Transmit Frame Sync Divider Register" bit-size="16" read-address="0xFFC0260C" write-address="0xFFC0260C" type="IO" target="EMU" />
-<register name="SPORT3_TX" group="SPORT" mask="FFFFFFFF" description="SPORT3 Transmit Data Register" bit-size="32" read-address="0xFFC02610" write-address="0xFFC02610" type="IO" target="EMU" />
+<register name="SPORT3_TX" group="SPORT" mask="FFFFFFFF" description="SPORT3 Transmit Data Register" bit-size="32" read-address= write-address="0xFFC02610" type="IO" target="EMU" />
 
 <register name="SPORT3_RCR1" group="SPORT" mask="FFFF" description="SPORT3 Receive Configuration 1 Register" bit-size="16" read-address="0xFFC02620" write-address="0xFFC02620" type="IO" target="EMU" />
 	<register name="SPORT3_RSPEN"  parent="SPORT3_RCR1" bit-position="0"  bit-size="1" target="EMU" description="Receive Enable" />
