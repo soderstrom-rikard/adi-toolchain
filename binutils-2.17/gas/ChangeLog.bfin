@@ -1,3 +1,10 @@
+2008-01-08  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* config/tc-bfin.c (bfin_cpus[]): Add bf542m, bf544m, bf547m, bf548m,
+	bf549m.
+	* doc/c-bfin.texi (-mcpu): Document bf542m, bf544m, bf547m, bf548m,
+	bf549m.
+
 2008-11-19  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	From Nick Clifton upstream:

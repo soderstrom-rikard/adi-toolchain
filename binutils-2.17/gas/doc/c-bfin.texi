@@ -54,10 +54,15 @@ recognized:
 @code{bf538},
 @code{bf539},
 @code{bf542},
+@code{bf542m},
 @code{bf544},
+@code{bf544m},
 @code{bf547},
+@code{bf547m},
 @code{bf548},
+@code{bf548m},
 @code{bf549},
+@code{bf549m},
 @code{bf561},
 and
 @code{bf579} (experimental).
