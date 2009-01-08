@@ -1,4 +1,4 @@
-2008-01-08  Mike Frysinger  <michael.frysinger@analog.com>
+2009-01-08  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* config/tc-bfin.c (bfin_cpus[]): Add bf542m, bf544m, bf547m, bf548m,
 	bf549m.
