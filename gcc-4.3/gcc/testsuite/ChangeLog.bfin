@@ -1,3 +1,11 @@
+2009-01-08  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* gcc.target/bfin/mcpu-bf542m.c: New file.
+	* gcc.target/bfin/mcpu-bf544m.c: Likewise.
+	* gcc.target/bfin/mcpu-bf546m.c: Likewise.
+	* gcc.target/bfin/mcpu-bf548m.c: Likewise.
+	* gcc.target/bfin/mcpu-bf549m.c: Likewise.
+
 2008-12-06  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* lib/target-supports.exp (check_effective_target_sync_int_long):
