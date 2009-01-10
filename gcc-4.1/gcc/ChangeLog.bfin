@@ -1,3 +1,7 @@
+2009-01-10  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.c (bfin_expand_prologue): Don't clobber P2.
+
 2009-01-08  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* config/bfin/bfin-protos.h (bfin_cpu_type): Add BFIN_CPU_BF542M,

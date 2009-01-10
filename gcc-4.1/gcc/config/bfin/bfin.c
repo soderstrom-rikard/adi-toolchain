@@ -1339,8 +1339,14 @@ bfin_expand_prologue (void)
 	= bfin_initial_elimination_offset (ARG_POINTER_REGNUM,
 					   STACK_POINTER_REGNUM);
       rtx lim = current_function_limit_stack ? stack_limit_rtx : NULL_RTX;
+      rtx tmp = gen_rtx_REG (Pmode, REG_R3);
       rtx p2reg = gen_rtx_REG (Pmode, REG_P2);
+      rtx insn;
 
+      insn = emit_move_insn (tmp, p2reg);
+      REG_NOTES (insn) = gen_rtx_EXPR_LIST (REG_MAYBE_DEAD,
+					    const0_rtx,
+					    REG_NOTES (insn));
       if (!lim)
 	{
 	  emit_move_insn (p2reg, GEN_INT (trunc_int_for_mode (0xFFB00000, SImode)));
@@ -1377,6 +1383,10 @@ bfin_expand_prologue (void)
 	}
       emit_insn (gen_compare_lt (bfin_cc_rtx, spreg, lim));
       emit_insn (gen_trapifcc ());
+      insn = emit_move_insn (p2reg, tmp);
+      REG_NOTES (insn) = gen_rtx_EXPR_LIST (REG_MAYBE_DEAD,
+					    const0_rtx,
+					    REG_NOTES (insn));
     }
   expand_prologue_reg_save (spreg, all, false);
 
