@@ -1777,6 +1777,9 @@ run_tests ()
     clean_hardware $2 done
 
     echo_date "Done testing  - results"
+        
+    #we dump something onto the console so we can know the test is finished.
+    rsh -l root $TARGET_IPADDR "echo > /dev/console; echo "Done testing." > /dev/console"
 
     for FILE in `find $1 -name "*${BINUTILS_VERSION}.sum" | sort; find $1 -name "*${GCC_VERSION}.sum" | sort`
     do
