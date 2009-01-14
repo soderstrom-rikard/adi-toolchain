@@ -447,15 +447,6 @@ float nearbyintf (float x)
 #endif
 
 
-#ifdef L_nextafterf
-libm_hidden_proto(nextafter)
-float nextafterf (float x, float y)
-{
-	return (float) nextafter( (double)x, (double)y );
-}
-#endif
-
-
 #ifdef L_nexttowardf
 libm_hidden_proto(nexttoward)
 float nexttowardf (float x, long double y)

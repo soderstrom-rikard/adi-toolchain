@@ -195,4 +195,10 @@ extern double __kernel_cos (double,double) attribute_hidden;
 extern double __kernel_tan (double,double,int) attribute_hidden;
 extern int    __kernel_rem_pio2 (double*,double*,int,int,int,const int*) attribute_hidden;
 
+#ifndef math_opt_barrier
+#define math_opt_barrier(x) \
+({ __typeof (x) __x = x; __asm ("" : "+m" (__x)); __x; })
+#define math_force_eval(x) __asm __volatile ("" : : "m" (x))
+#endif
+
 #endif /* _MATH_PRIVATE_H_ */
