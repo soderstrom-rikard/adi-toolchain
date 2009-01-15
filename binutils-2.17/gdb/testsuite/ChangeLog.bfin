@@ -1,3 +1,17 @@
+2009-01-15  Jie Zhang  <jie.zhang@analog.com>
+
+	* gdb.gdbtk/insight-support.exp (gdbtk_start): Add binfile
+	as a new parameter and pass it to _gdbtk_export_target_info.
+	(gdbtk_gdbserver_load): New.
+	(_gdbtk_export_target_info): Add bfinfile as a new parameter
+	and add target case for gdbserver.
+	* gdb.gdbtk/browser.exp: Likewise.
+	* gdb.gdbtk/console.exp: Likewise.
+	* gdb.gdbtk/cpp_variable.exp: Likewise.
+	* gdb.gdbtk/c_variable.exp: Pass $binfile to gdbtk_start.
+	* gdb.gdbtk/srcwin.exp: Likewise.
+	* gdb.gdbtk/windows.exp: Likewise.
+
 2008-12-29  Jie Zhang  <jie.zhang@analog.com>
 
 	* gdb.gdbtk/insight-support.exp (_gdbtk_export_target_info): Set

@@ -46,7 +46,7 @@ proc gdbtk_initialize_display {} {
 # env(SRCDIR)=directory containing the test code (e.g., *.test)
 # env(OBJDIR)=directory which contains any executables
 #            (e.g., gdb/testsuite/gdb.gdbtk)
-proc gdbtk_start {test} {
+proc gdbtk_start {binfile test} {
   global verbose
   global GDB
   global GDBFLAGS
@@ -93,7 +93,7 @@ proc gdbtk_start {test} {
   cd $wd
 
   # Set info about target into env
-  _gdbtk_export_target_info
+  _gdbtk_export_target_info $binfile
 
   set env(SRCDIR) $abs_srcdir
   set env(GDBTK_VERBOSE) 1
@@ -167,6 +167,33 @@ proc to_tcl_path {unix_path {arg {}}} {
 
   return $unix_path
 }
+
+# A copy of gdbserver_load from gdbserver-support.exp but without
+# calling gdb_target_cmd.
+proc gdbtk_gdbserver_load { host_exec child_args } {
+    global gdbserver_host_exec
+    global gdbserver_server_exec
+
+    # If we weren't passed an explicit binary, try to reuse the current
+    # one.  If we were, be sure to redownload it.
+
+    if { $host_exec == "" && $gdbserver_host_exec == "" } {
+	set gdbserver_host_exec [infer_host_exec]
+    } elseif { $host_exec != "" } {
+	set gdbserver_host_exec $host_exec
+	if [info exists gdbserver_server_exec] { unset gdbserver_server_exec }
+    }
+
+    if { ! [info exists gdbserver_server_exec] } {
+	if [is_remote target] {
+	    set gdbserver_server_exec [remote_download target $host_exec /tmp/[file tail $gdbserver_host_exec].[pid]]
+	} else {
+	    set gdbserver_server_exec $gdbserver_host_exec
+	}
+    }
+
+    return [gdbserver_spawn $gdbserver_server_exec $child_args]
+}
   
 # Set information about the target into the environment
 # variable TARGET_INFO. This array will contain a list
@@ -183,7 +210,7 @@ proc to_tcl_path {unix_path {arg {}}} {
 # target  target command for target/board
 # load    load command for target/board
 # run     run command for target_board
-proc _gdbtk_export_target_info {} {
+proc _gdbtk_export_target_info {binfile} {
   global env
 
   # Figure out what "target class" the testsuite is using,
@@ -197,6 +224,9 @@ proc _gdbtk_export_target_info {} {
   } elseif {[string compare [info proc gdb_target_sid] gdb_target_sid] == 0} {
     # Using sid
     set target sid
+  } elseif {[string compare [info proc gdbserver_gdb_load] gdbserver_gdb_load] == 0} {
+    # Using gdbserver
+    set target gdbserver
   } else {
     # Assume native
     set target native
@@ -259,6 +289,16 @@ proc _gdbtk_export_target_info {} {
       sid_start
       set info(target) "target [target_info gdb_protocol] [target_info netport]"
       set info(load) "load"
+      set info(run) "continue"
+    }
+
+    gdbserver {
+      # We have to start gdbserver first, since Insight won't have a clue
+      # about how to do this
+      set res [gdbtk_gdbserver_load $binfile ""]
+      set protocol [lindex $res 0]
+      set gdbport [lindex $res 1]
+      set info(target) "target $protocol $gdbport"
       set info(run) "continue"
     }
 

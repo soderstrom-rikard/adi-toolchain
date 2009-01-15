@@ -34,7 +34,7 @@ if {[gdbtk_initialize_display]} {
 
   # Start with a fresh gdbtk
   gdb_exit
-  set results [gdbtk_start [file join $srcdir $subdir ${testfile}.test]]
+  set results [gdbtk_start $binfile [file join $srcdir $subdir ${testfile}.test]]
   set results [split $results \n]
 
   # Analyze results
