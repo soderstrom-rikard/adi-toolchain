@@ -938,14 +938,12 @@ decode_ProgCtrl_0 (bu16 iw0)
     unhandled_instruction ("RAISE uimm4");
   else if (prgfunc == 10)
     {
+      PCREG += 2;
       /* EXCPT uimm4 */
       if (uimm4 (poprnd) == 0)
-	{
-	  bfin_trap ();
-	  PCREG += 2;
-	}
+	bfin_trap ();
       else if (uimm4 (poprnd) == 1)
-        raise_exception(TARGET_SIGNAL_TRAP);
+	raise_exception(TARGET_SIGNAL_TRAP);
       else
 	unhandled_instruction ("unhandled exception");
     }

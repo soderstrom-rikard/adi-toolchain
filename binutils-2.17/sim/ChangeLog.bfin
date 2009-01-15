@@ -1,3 +1,8 @@
+2009-01-15  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/bfin-dis.c (decode_ProgCtrl_0): Increment PC before
+	exception happens.
+
 2008-08-28  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/bfin-dis.c (decode_psedodbg_assert_0): Change according
