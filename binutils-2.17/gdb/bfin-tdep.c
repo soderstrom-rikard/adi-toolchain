@@ -1222,7 +1222,7 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   set_gdbarch_skip_prologue (gdbarch, bfin_skip_prologue);
   set_gdbarch_inner_than (gdbarch, core_addr_lessthan);
   set_gdbarch_breakpoint_from_pc (gdbarch, bfin_breakpoint_from_pc);
-  set_gdbarch_decr_pc_after_break (gdbarch, 0);
+  set_gdbarch_decr_pc_after_break (gdbarch, 2);
   set_gdbarch_frame_args_skip (gdbarch, 8);
   set_gdbarch_unwind_pc (gdbarch, bfin_unwind_pc);
   set_gdbarch_frame_align (gdbarch, bfin_frame_align);
