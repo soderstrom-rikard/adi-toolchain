@@ -37,18 +37,20 @@ subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
 	$(srcdir)/libftdi-config.in $(srcdir)/libftdi.pc.in \
-	$(srcdir)/libftdi.spec.in $(top_srcdir)/configure AUTHORS \
-	COPYING.LIB ChangeLog config.guess config.sub depcomp \
-	install-sh ltmain.sh missing
+	$(srcdir)/libftdi.spec.in $(srcdir)/libftdipp.pc.in \
+	$(top_srcdir)/configure AUTHORS COPYING.LIB ChangeLog \
+	config.guess config.sub depcomp install-sh ltmain.sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.in
+am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = libftdi-config libftdi.pc libftdi.spec
+CONFIG_CLEAN_FILES = libftdi-config libftdi.pc libftdi.spec \
+	libftdipp.pc
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pkgconfigdir)"
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(bin_SCRIPTS)
@@ -92,6 +94,8 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
+BOOST_LDFLAGS = @BOOST_LDFLAGS@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -122,6 +126,8 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
+LIBFTDI_MODULES = @LIBFTDI_MODULES@
+LIBFTDI_MODULES_PKGCONFIG = @LIBFTDI_MODULES_PKGCONFIG@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
@@ -198,13 +204,13 @@ top_srcdir = @top_srcdir@
 # not a GNU package. You can remove this line, if
 # have all needed files, that a GNU package needs
 AUTOMAKE_OPTIONS = foreign 1.4
-SUBDIRS = src examples doc
-EXTRA_DIST = libftdi.spec libftdi.spec.in COPYING.LIB README AUTHORS ChangeLog libftdi-config.in
+SUBDIRS = src $(LIBFTDI_MODULES) examples doc
+EXTRA_DIST = libftdi.spec libftdi.spec.in COPYING.LIB README AUTHORS ChangeLog libftdi-config.in CMakeLists.txt packages
 bin_SCRIPTS = libftdi-config
 
 # Install the pkg-config file:
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libftdi.pc
+pkgconfig_DATA = libftdi.pc $(LIBFTDI_MODULES_PKGCONFIG)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -264,6 +270,8 @@ libftdi-config: $(top_builddir)/config.status $(srcdir)/libftdi-config.in
 libftdi.pc: $(top_builddir)/config.status $(srcdir)/libftdi.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 libftdi.spec: $(top_builddir)/config.status $(srcdir)/libftdi.spec.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+libftdipp.pc: $(top_builddir)/config.status $(srcdir)/libftdipp.pc.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)

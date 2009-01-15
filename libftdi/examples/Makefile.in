@@ -34,16 +34,18 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = simple$(EXEEXT) bitbang$(EXEEXT) bitbang2$(EXEEXT) \
 	bitbang_ft2232$(EXEEXT) bitbang_cbus$(EXEEXT) \
-	find_all$(EXEEXT)
+	find_all$(EXEEXT) $(am__EXEEXT_1)
 subdir = examples
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.in
+am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
+@HAVE_LIBFTDIPP_TRUE@am__EXEEXT_1 = find_all_pp$(EXEEXT)
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
@@ -67,6 +69,12 @@ am_find_all_OBJECTS = find_all.$(OBJEXT)
 find_all_OBJECTS = $(am_find_all_OBJECTS)
 find_all_LDADD = $(LDADD)
 find_all_DEPENDENCIES = $(top_builddir)/src/libftdi.la
+am__find_all_pp_SOURCES_DIST = find_all_pp.cpp
+@HAVE_LIBFTDIPP_TRUE@am_find_all_pp_OBJECTS = find_all_pp.$(OBJEXT)
+find_all_pp_OBJECTS = $(am_find_all_pp_OBJECTS)
+@HAVE_LIBFTDIPP_TRUE@find_all_pp_DEPENDENCIES =  \
+@HAVE_LIBFTDIPP_TRUE@	$(top_builddir)/ftdipp/libftdipp.la \
+@HAVE_LIBFTDIPP_TRUE@	$(LDADD)
 am_simple_OBJECTS = simple.$(OBJEXT)
 simple_OBJECTS = $(am_simple_OBJECTS)
 simple_LDADD = $(LDADD)
@@ -83,12 +91,22 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
+CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+LTCXXCOMPILE = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
+CXXLD = $(CXX)
+CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
 SOURCES = $(bitbang_SOURCES) $(bitbang2_SOURCES) \
 	$(bitbang_cbus_SOURCES) $(bitbang_ft2232_SOURCES) \
-	$(find_all_SOURCES) $(simple_SOURCES)
+	$(find_all_SOURCES) $(find_all_pp_SOURCES) $(simple_SOURCES)
 DIST_SOURCES = $(bitbang_SOURCES) $(bitbang2_SOURCES) \
 	$(bitbang_cbus_SOURCES) $(bitbang_ft2232_SOURCES) \
-	$(find_all_SOURCES) $(simple_SOURCES)
+	$(find_all_SOURCES) $(am__find_all_pp_SOURCES_DIST) \
+	$(simple_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -99,6 +117,8 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
+BOOST_LDFLAGS = @BOOST_LDFLAGS@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -129,6 +149,8 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
+LIBFTDI_MODULES = @LIBFTDI_MODULES@
+LIBFTDI_MODULES_PKGCONFIG = @LIBFTDI_MODULES_PKGCONFIG@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
@@ -202,8 +224,10 @@ target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 METASOURCES = AUTO
-INCLUDES = -I$(top_srcdir)/src
+INCLUDES = -I$(top_srcdir)/src -I$(top_srcdir)/ftdipp
 LDADD = $(top_builddir)/src/libftdi.la
+@HAVE_LIBFTDIPP_FALSE@examples_libftdipp = 
+@HAVE_LIBFTDIPP_TRUE@examples_libftdipp = find_all_pp
 
 # Don't install the example files
 AM_LDFLAGS = -no-install
@@ -213,10 +237,13 @@ bitbang2_SOURCES = bitbang2.c
 bitbang_ft2232_SOURCES = bitbang_ft2232.c
 bitbang_cbus_SOURCES = bitbang_cbus.c
 find_all_SOURCES = find_all.c
+@HAVE_LIBFTDIPP_TRUE@find_all_pp_SOURCES = find_all_pp.cpp
+@HAVE_LIBFTDIPP_TRUE@find_all_pp_LDADD = $(top_builddir)/ftdipp/libftdipp.la $(LDADD)
+EXTRA_DIST = CMakeLists.txt
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .lo .o .obj
+.SUFFIXES: .c .cpp .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -289,6 +316,9 @@ bitbang_ft2232$(EXEEXT): $(bitbang_ft2232_OBJECTS) $(bitbang_ft2232_DEPENDENCIES
 find_all$(EXEEXT): $(find_all_OBJECTS) $(find_all_DEPENDENCIES) 
 	@rm -f find_all$(EXEEXT)
 	$(LINK) $(find_all_OBJECTS) $(find_all_LDADD) $(LIBS)
+find_all_pp$(EXEEXT): $(find_all_pp_OBJECTS) $(find_all_pp_DEPENDENCIES) 
+	@rm -f find_all_pp$(EXEEXT)
+	$(CXXLINK) $(find_all_pp_OBJECTS) $(find_all_pp_LDADD) $(LIBS)
 simple$(EXEEXT): $(simple_OBJECTS) $(simple_DEPENDENCIES) 
 	@rm -f simple$(EXEEXT)
 	$(LINK) $(simple_OBJECTS) $(simple_LDADD) $(LIBS)
@@ -304,6 +334,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bitbang_cbus.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bitbang_ft2232.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/find_all.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/find_all_pp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simple.Po@am__quote@
 
 .c.o:
@@ -326,6 +357,27 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+
+.cpp.o:
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ $<
+
+.cpp.obj:
+@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.cpp.lo:
+@am__fastdepCXX_TRUE@	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
 
 mostlyclean-libtool:
 	-rm -f *.lo

@@ -2,12 +2,12 @@
 # have all needed files, that a GNU package needs
 AUTOMAKE_OPTIONS = foreign 1.4
 
-SUBDIRS = src examples doc
+SUBDIRS = src $(LIBFTDI_MODULES) examples doc
 
-EXTRA_DIST = libftdi.spec libftdi.spec.in COPYING.LIB README AUTHORS ChangeLog libftdi-config.in
+EXTRA_DIST = libftdi.spec libftdi.spec.in COPYING.LIB README AUTHORS ChangeLog libftdi-config.in CMakeLists.txt packages
 
 bin_SCRIPTS = libftdi-config
 
 # Install the pkg-config file:
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libftdi.pc
+pkgconfig_DATA = libftdi.pc $(LIBFTDI_MODULES_PKGCONFIG)

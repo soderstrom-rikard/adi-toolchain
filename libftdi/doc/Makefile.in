@@ -35,7 +35,8 @@ subdir = doc
 DIST_COMMON = $(srcdir)/Doxyfile.in $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.in
+am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
+	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -51,6 +52,8 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
+BOOST_LDFLAGS = @BOOST_LDFLAGS@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -81,6 +84,8 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
+LIBFTDI_MODULES = @LIBFTDI_MODULES@
+LIBFTDI_MODULES_PKGCONFIG = @LIBFTDI_MODULES_PKGCONFIG@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
@@ -328,7 +333,7 @@ uninstall-am:
 
 all: $(MANUALS)
 
-html/index.html: $(top_srcdir)/src/*.c $(top_srcdir)/src/*.h $(top_srcdir)/examples/*.c
+html/index.html: $(top_srcdir)/src/*.c $(top_srcdir)/src/*.h $(top_srcdir)/ftdipp/*.cpp $(top_srcdir)/ftdipp/*.hpp $(top_srcdir)/examples/*.c
 	$(DOXYGEN)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
