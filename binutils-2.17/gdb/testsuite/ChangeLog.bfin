@@ -1,5 +1,12 @@
 2009-01-15  Jie Zhang  <jie.zhang@analog.com>
 
+	* gdb.gdbtk/defs (gdbtk_test_file): Append ".gdb" to filename
+	if USE_BINFMT_FLAT is set.
+	* gdb.gdbtk/insight-support.exp (gdbtk_start): Set
+	USE_BINFMT_FLAT when using flat binary format.
+
+2009-01-15  Jie Zhang  <jie.zhang@analog.com>
+
 	* gdb.gdbtk/insight-support.exp (gdbtk_start): Add binfile
 	as a new parameter and pass it to _gdbtk_export_target_info.
 	(gdbtk_gdbserver_load): New.

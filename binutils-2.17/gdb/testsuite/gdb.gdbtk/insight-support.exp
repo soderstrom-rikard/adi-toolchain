@@ -99,6 +99,11 @@ proc gdbtk_start {binfile test} {
   set env(GDBTK_VERBOSE) 1
   set env(GDBTK_LOGFILE) [to_tcl_path [file join $objdir gdb.log]]
   unset -nocomplain env(TCL_LIBRARY)
+  if [target_info exists use_binfmt_flat] {
+    set env(USE_BINFMT_FLAT) 1
+  } else {
+    unset -nocomplain env(USE_BINFMT_FLAT)
+  }
 
   set err [catch {exec $INSIGHT -nx -q --tclcommand=$test} res]
   if { $err } {

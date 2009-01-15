@@ -60,9 +60,14 @@ set env(GDBTK_TEST_RUNNING) 1
 # NOTE: This proc appends ".exe" to all windows' programs
 proc gdbtk_test_file {filename} {
   global tcl_platform
+  global env
 
   if {$tcl_platform(platform) == "windows"} {
     append filename ".exe"
+  }
+
+  if {[info exists env(USE_BINFMT_FLAT)]} {
+    append filename ".gdb"
   }
 
   set err [catch {gdb_cmd "file $filename" 1} text]
