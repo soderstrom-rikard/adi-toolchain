@@ -1,3 +1,11 @@
+2009-01-15  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.h (FUNCTION_PROFILER): Take TARGET_LONG_CALLS into
+	account.
+	(PROFILE_BEFORE_PROLOGUE): Define.
+	(ASM_OUTPUT_REG_PUSH, ASM_OUTPUT_REG_POP): Add tab character.  Correct
+	the push insn to use predecrement.
+
 2009-01-10  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.c (bfin_expand_prologue): Don't clobber P2.
