@@ -140,7 +140,7 @@ void _dl_get_ready_to_run(struct elf_resolve *tpnt, DL_LOADADDR_TYPE load_addr,
 	ElfW(Dyn) *dpnt;
 	char *lpntstr;
 	unsigned int i;
-	int unlazy = 0, trace_loaded_objects = 0;
+	int unlazy = 0, must_unlazy = 0, trace_loaded_objects = 0;
 	struct dyn_elf *rpnt;
 	struct elf_resolve *tcurr;
 	struct elf_resolve *tpnt1;
@@ -596,6 +596,8 @@ void _dl_get_ready_to_run(struct elf_resolve *tpnt, DL_LOADADDR_TYPE load_addr,
 				name = _dl_get_last_path_component(lpntstr);
 				if (_dl_strcmp(name, UCLIBC_LDSO) == 0)
 					continue;
+				if (_dl_strcmp(name, UCLIBC_LIBPTHREAD) == 0)
+					must_unlazy = 1;
 
 				_dl_if_debug_dprint("\tfile='%s';  needed by '%s'\n", lpntstr, _dl_progname);
 
@@ -633,6 +635,11 @@ void _dl_get_ready_to_run(struct elf_resolve *tpnt, DL_LOADADDR_TYPE load_addr,
 		}
 	}
 	_dl_unmap_cache();
+
+	if (must_unlazy)
+		for (tcurr = _dl_loaded_modules; tcurr; tcurr = tcurr->next) {
+			tcurr->rtld_flags |= RTLD_NOW;
+		}
 
 	--nlist; /* Exclude the application. */
 	init_fini_list = _dl_malloc(nlist * sizeof(struct elf_resolve *));
