@@ -44,6 +44,8 @@ void test01()
 
 int main()
 {
+#ifndef __bfin
   test01();
+#endif
   return 0;
 }

@@ -1,3 +1,20 @@
+2009-01-19  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* testsuite/27_io/basic_stringbuf/overflow/char/1.cc: Disable on
+	Blackfin.
+	* testsuite/27_io/basic_ostream/inserters_character/char/28277-3.cc:
+	Likewise.
+	* testsuite/27_io/basic_ostream/inserters_character/char/28277-4.cc:
+	Likewise.
+	* testsuite/21_strings/basic_string/inserters_extractors/char/28277.cc:
+	Likewise.
+	* testsuite/26_numerics/valarray/28277.cc:
+	Likewise.
+	* testsuite/ext/vstring/inserters_extractors/char/28277.cc:
+	Likewise.
+	* testsuite/22_locale/collate/transform/char/28277.cc:
+	Likewise.
+
 2008-12-31  Jie Zhang  <jie.zhang@analog.com>
 
 	Apply from GCC 4.1
