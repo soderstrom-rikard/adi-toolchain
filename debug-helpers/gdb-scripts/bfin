@@ -514,3 +514,83 @@ define _show_dma
 	end
 	printf ")\n"
 end
+
+define show_spi
+	set $$SPI_BASE = $arg0
+	set $$SPI_BAUD = *(unsigned short *) ($$SPI_BASE + 0x14)
+	set $$SPI_CTL  = *(unsigned short *) ($$SPI_BASE + 0x00)
+	set $$SPI_FLG  = *(unsigned short *) ($$SPI_BASE + 0x04)
+	set $$SPI_STAT = *(unsigned short *) ($$SPI_BASE + 0x08)
+	set $$SPI_TDBR = *(unsigned short *) ($$SPI_BASE + 0x0C)
+	set $$SPI_RDBR = *(unsigned short *) ($$SPI_BASE + 0x10)
+	set $$SPI_SHAD = *(unsigned short *) ($$SPI_BASE + 0x18)
+	printf "BAUD: %04x (%i)\n", $$SPI_BAUD, $$SPI_BAUD
+	printf "CTL:  %04x (", $$SPI_CTL
+	set $$TIMOD = $$SPI_CTL & 0x3
+	printf "timod:%i ", $$TIMOD
+	if ($$SPI_CTL & (1 << 2))
+		printf "sz "
+	end
+	if ($$SPI_CTL & (1 << 3))
+		printf "gm "
+	end
+	if ($$SPI_CTL & (1 << 4))
+		printf "psse "
+	end
+	if ($$SPI_CTL & (1 << 5))
+		printf "emiso "
+	end
+	if ($$SPI_CTL & (1 << 8))
+		printf "8bit "
+	else
+		printf "16bit "
+	end
+	if ($$SPI_CTL & (1 << 9))
+		printf "lsbf "
+	end
+	if ($$SPI_CTL & (1 << 10))
+		printf "cpol "
+	end
+	if ($$SPI_CTL & (1 << 11))
+		printf "cpha "
+	end
+	if ($$SPI_CTL & (1 << 12))
+		printf "mstr "
+	else
+		printf "slave "
+	end
+	if ($$SPI_CTL & (1 << 13))
+		printf "wom "
+	end
+	if ($$SPI_CTL & (1 << 14))
+		printf "enabled"
+	else
+		printf "disabled"
+	end
+	printf ")\n"
+	printf "STAT: %04x (", $$SPI_STAT
+	if ($$SPI_STAT & (1 << 0))
+		printf "spif "
+	end
+	if ($$SPI_STAT & (1 << 1))
+		printf "modf "
+	end
+	if ($$SPI_STAT & (1 << 2))
+		printf "txe "
+	end
+	if ($$SPI_STAT & (1 << 3))
+		printf "txs "
+	end
+	if ($$SPI_STAT & (1 << 4))
+		printf "rbsy "
+	end
+	if ($$SPI_STAT & (1 << 5))
+		printf "rxs "
+	end
+	if ($$SPI_STAT & (1 << 1))
+		printf "txcol "
+	end
+	printf ")\n"
+	printf "FLG:  %04x\n", $$SPI_FLG
+	printf "TDBR: %04x  RDBR: %04x\n", $$SPI_TDBR, $$SPI_SHAD
+end
