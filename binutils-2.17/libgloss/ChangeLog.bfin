@@ -1,5 +1,9 @@
 2009-01-21  Jie Zhang  <jie.zhang@analog.com>
 
+	* bfin/Makefile.in (BOARD_CRT0S): Add missing `|'.
+
+2009-01-21  Jie Zhang  <jie.zhang@analog.com>
+
 	* bfin/Makefile.in (BOARD_CRT0S): Remove bashism.
 
 2008-12-16  Jie Zhang  <jie.zhang@analog.com>

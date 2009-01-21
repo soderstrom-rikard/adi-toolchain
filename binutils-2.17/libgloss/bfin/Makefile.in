@@ -73,7 +73,7 @@ BOARD_LDFLAGS	=
 BOARD_BSP	= # We actually use libnosys.a
 BOARD_CRT0S	= basiccrt.o basiccrts.o
 BOARD_CRT0S	+= $(shell if ! $(CC) $(CFLAGS) -print-multi-directory \
-			grep '^bf579' >/dev/null 2>&1; then \
+			| grep '^bf579' >/dev/null 2>&1; then \
 			echo "basiccrt561.o basiccrt561s.o basiccrt561b.o"; fi)
 BOARD_OBJS	=
 BOARD_TEST	=
