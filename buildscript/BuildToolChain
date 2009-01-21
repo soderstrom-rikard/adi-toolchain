@@ -2358,10 +2358,18 @@ if [ $KERNEL_SOURCE ] ; then
         if [ "$GCC_VERSION" != "3.4" ] ; then
 	    install_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc libmudflap
 	    install_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc libmudflapth
+            if [ "$GCC_VERSION" != "4.1" ] ; then
+		install_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc libgomp
+	    fi
             # If we turned fortran on, or let the build system figure it out
             TMP=`echo $BFIN_LANGS | grep fortran`
             if ([ -n "$TMP" ] || [ -z "$BFIN_LANGS" ]) ; then
                 install_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc libgfortran
+            fi
+            # If we turned objc on, or let the build system figure it out
+            TMP=`echo $BFIN_LANGS | grep objc`
+            if ([ -n "$TMP" ] || [ -z "$BFIN_LANGS" ]) ; then
+                install_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc libobjc
             fi
 	    break;
         fi
