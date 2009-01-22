@@ -1043,7 +1043,7 @@ echo_date()
         recurse=""
     fi
 
-    [ -z "${recurse}" ] && (echo "echo -e '###\n${msg}\n' $LOGFILE" ) | sh
+    [ -z "${recurse}" ] && log_it "${msg}"
     return 0
 }
 
@@ -1108,14 +1108,10 @@ build_gcc ()
       --enable-version-specific-runtime-libs --enable-__cxa_atexit \
       --with-bugurl=URL:http://blackfin.uclinux.org/gf/project/toolchain/tracker \
       --with-pkgversion=ADI${SCM_URL}${SCM_REV}"
-
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_cmd $RUN
 
     echo_date "Building GCC"
-    RUN="$MAKE"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_cmd $MAKE
 
     TMP=`echo $BFIN_LANGS | grep c++`
     if [ -n "$TMP" ] ; then
@@ -1135,9 +1131,7 @@ build_gcc ()
     done
 
     echo_date "Installing GCC"
-    RUN="$MAKE -j1 install"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_cmd $MAKE -j1 install
 
     # some basic sanity checks
     TMP=`echo $BFIN_LANGS | grep c++`
@@ -1377,9 +1371,7 @@ install_libgccs ()
 	LIBGCC_DIR=`dirname $LIBGCC`
 	LIBGCC_NAME=`basename $LIBGCC`
 
-	RUN="cp $LIBGCC $1/$2/runtime/$dir/lib"
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo $RUN $LOGFILE ; ) | sh || die_with_log
+	run_cmd cp $LIBGCC $1/$2/runtime/$dir/lib
 
 	for G in $GCCS; do
 	    L=`$G $flags --print-file-name=libgcc_s_$dir.so`
@@ -1900,13 +1892,10 @@ if [ "x$SKIP_ELF" = "x" ]; then
     echo_date "Configuring Elf Binutils & GDB"
     RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-elf \
         --prefix=$DIR_ELF_OUTPUT --without-newlib $BINUTILS_EXTRA_CONF"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_cmd $RUN
 
     echo_date "Building Elf Binutils & GDB"
-    RUN="$MAKE all-binutils all-gas all-ld all-sim all-gdb"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_cmd $MAKE all-binutils all-gas all-ld all-sim all-gdb
 
     eval `grep ^EXEEXT= $DIR_BINUTILS_BUILD/binutils/config.log`
 
@@ -1950,9 +1939,7 @@ if [ "x$SKIP_ELF" = "x" ]; then
 
     change_dir $DIR_BINUTILS_BUILD
     echo_date "Installing Elf Binutils & GDB"
-    RUN="$MAKE install-binutils install-gas install-ld install-sim install-gdb"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_cmd $MAKE install-binutils install-gas install-ld install-sim install-gdb
 
     for GCC_VERSION in $GCC_VERSIONS; do
       build_gcc $GCC_VERSION elf $DIR_ELF_OUTPUT "--with-newlib"
@@ -1974,13 +1961,10 @@ if [ "x$SKIP_ELF" = "x" ]; then
         RUN="$RUN --with-libintl=$DIR_BINUTILS_BUILD/intl/libintl.a"
     fi
 
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_cmd $RUN
 
     echo_date "Make Elf elf2flt"
-    RUN=$MAKE
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_cmd $MAKE
 
     eval `grep ^EXEEXT= $DIR_ELF2FLT_BUILD/config.log`
 
@@ -1993,9 +1977,7 @@ if [ "x$SKIP_ELF" = "x" ]; then
     done
 
     echo_date "Installing Elf elf2flt"
-    RUN="$MAKE install"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_cmd $MAKE install
 
     for RUN in bfin-elf-elf2flt bfin-elf-flthdr
     do
@@ -2059,9 +2041,13 @@ if [ $KERNEL_SOURCE ] ; then
 	echo_date "Configuring Linux Kernel"
 
 	change_dir $KERNEL_SOURCE
-	RUN="$MAKE -j1 headers_check headers_install INSTALL_HDR_PATH=$DIR_KBUILD_OUTPUT/usr KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT CROSS_COMPILE=bfin-elf- ARCH=blackfin"
-	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-	(echo $RUN $LOGFILE ; ) | sh || die_with_log
+	run_cmd \
+		$MAKE -j1 \
+		headers_check headers_install \
+		INSTALL_HDR_PATH=$DIR_KBUILD_OUTPUT/usr \
+		KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT \
+		CROSS_COMPILE=bfin-elf- \
+		ARCH=blackfin
 	find "$DIR_KBUILD_OUTPUT/usr" -type f -name '.check.*' -print0 | xargs -0 rm -f
 	change_dir ..
     fi
@@ -2120,9 +2106,7 @@ if [ $KERNEL_SOURCE ] ; then
 	    echo "MULTILIB=\"\"" >>.config
 	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
 
-	    RUN="$MAKE oldconfig CROSS=bfin-elf-"
-	    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-	    (echo $RUN $LOGFILE ; ) | sh
+	    run_cmd $MAKE oldconfig CROSS=bfin-elf-
 
 	    cp .config .config-used-for_${suffix}
 
@@ -2143,9 +2127,7 @@ if [ $KERNEL_SOURCE ] ; then
 	    echo "MULTILIB=\"${dir}\"" >>.config
 	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
 
-	    RUN="$MAKE oldconfig CROSS=bfin-elf-"
-	    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-	    (echo $RUN $LOGFILE ; ) | sh
+	    run_cmd $MAKE oldconfig CROSS=bfin-elf-
 
 	    cp .config .config-used-for_${suffix}
 
@@ -2170,9 +2152,7 @@ if [ $KERNEL_SOURCE ] ; then
 	    echo "MULTILIB=\"${dir}\"" >>.config
 	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
 
-	    RUN="$MAKE oldconfig CROSS=bfin-elf-"
-	    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-	    (echo $RUN $LOGFILE ; ) | sh
+	    run_cmd $MAKE oldconfig CROSS=bfin-elf-
 
 	    cp .config .config-used-for_${suffix}
 
@@ -2194,9 +2174,7 @@ if [ $KERNEL_SOURCE ] ; then
 	    echo "MULTILIB=\"${dir}\"" >>.config
 	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
 
-	    RUN="$MAKE oldconfig CROSS=bfin-elf-"
-	    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-	    (echo $RUN $LOGFILE ; ) | sh
+	    run_cmd $MAKE oldconfig CROSS=bfin-elf-
 
 	    cp .config .config-used-for_${suffix}
 
@@ -2236,9 +2214,7 @@ if [ $KERNEL_SOURCE ] ; then
 
     echo_date "Cleaning uClibc"
     change_dir $UCLIBC_SOURCE
-    RUN="$MAKE CROSS=bfin-elf- distclean"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    run_it $MAKE CROSS=bfin-elf- distclean
 
     ####################### Done Step 3  #########################
 
@@ -2253,18 +2229,13 @@ if [ $KERNEL_SOURCE ] ; then
     RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET \
          --target=bfin-uclinux --prefix=$DIR_uC_OUTPUT \
          --with-sysroot=$DIR_uC_OUTPUT/bfin-uclinux/runtime $BINUTILS_EXTRA_CONF"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_it $RUN
 
     echo_date "Building uClinux Binutils & GDB"
-    RUN="$MAKE all-binutils all-gas all-ld all-sim all-gdb"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_it $MAKE all-binutils all-gas all-ld all-sim all-gdb
 
     echo_date "Installing uClinux Binutils & GDB"
-    RUN="$MAKE install-binutils install-gas install-ld install-sim install-gdb"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_it $MAKE install-binutils install-gas install-ld install-sim install-gdb
 
     ln -s runtime/usr/include $DIR_uC_OUTPUT/bfin-uclinux/sys-include
     for GCC_VERSION in $GCC_VERSIONS; do
@@ -2281,9 +2252,7 @@ if [ $KERNEL_SOURCE ] ; then
     touch -r . * # fix autotool timestamps
 
     echo_date "Cleaning uClinux elf2flt"
-    RUN="$MAKE distclean "
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    run_it $MAKE distclean
 
     RUN="$DIR_ELF2FLT_SOURCE/configure $BUILD_TARGET $HOST_TARGET                \
          --target=bfin-uclinux                                     \
@@ -2297,18 +2266,13 @@ if [ $KERNEL_SOURCE ] ; then
         RUN="$RUN --with-libintl=$DIR_BINUTILS_BUILD/intl/libintl.a"
     fi
 
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_it $RUN
 
     echo_date "Building uClinux elf2flt"
-    RUN="$MAKE"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_it $MAKE
 
     echo_date "Installing uClinux elf2flt"
-    RUN="$MAKE install "
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_it $MAKE install
 
     ####################### Test bfin-uclinux #######################
 
@@ -2336,18 +2300,13 @@ if [ $KERNEL_SOURCE ] ; then
     RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET \
          --target=bfin-linux-uclibc --prefix=$DIR_LINUX_OUTPUT \
          --with-sysroot=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime $BINUTILS_EXTRA_CONF"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_it $RUN
 
     echo_date  "Building linux-uclibc binutils"
-    RUN="$MAKE all-binutils all-gas all-ld all-sim all-gdb"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_it $MAKE all-binutils all-gas all-ld all-sim all-gdb
 
     echo_date "Installing linux-uclibc binutils  "
-    RUN="$MAKE install-binutils install-gas install-ld install-sim install-gdb"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_it $MAKE install-binutils install-gas install-ld install-sim install-gdb
 
     ln -s runtime/usr/include $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
     for GCC_VERSION in $GCC_VERSIONS; do
