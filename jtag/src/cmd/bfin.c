@@ -277,6 +277,10 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 		}
 	      else
 		{
+#ifdef __MINGW32__
+		  printf ( _("Sorry, dynamic code not available in windows\n") );
+		  goto execute_cleanup;
+#else
 		  unsigned char raw_insn[4];
 		  char *tmp_buf;
 		  char *tuples[] = { "uclinux", "linux-uclibc", "elf" };
@@ -408,6 +412,7 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 		    }
 
 		  fclose (fp);
+#endif
 		}
 	    }
 
