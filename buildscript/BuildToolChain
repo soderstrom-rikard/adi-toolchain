@@ -2029,23 +2029,25 @@ for GCC_VERSION in $GCC_VERSIONS; do
   fi
 done
 
-printf "*** Checking uClibc CFLAGS:"
-#We test (and fail) if any of the CFLAGS for uClibc don't work on the bfin-elf compiler
-for opt in $UCLIBC_CFLAGS
-do
-    check_cc_options $DIR_ELF_OUTPUT/bin/bfin-elf-gcc $opt
-    if [ "$?" -eq "0" ] ; then
-      printf "\n"
-      echo "I could not make option $opt work on the bfin-elf compiler, so I can't use it for uClibc"
-      printf "halting after "
-      print_stop_time
-      printf "\n"
-      exit
-    else
-      printf " $opt"
-    fi
-done
-printf " OK\n"
+if [ "$HOST_TARGET" = "$BUILD_TARGET" ] ; then
+  printf "*** Checking uClibc CFLAGS:"
+  #We test (and fail) if any of the CFLAGS for uClibc don't work on the bfin-elf compiler
+  for opt in $UCLIBC_CFLAGS
+  do
+      check_cc_options $DIR_ELF_OUTPUT/bin/bfin-elf-gcc $opt
+      if [ "$?" -eq "0" ] ; then
+        printf "\n"
+        echo "I could not make option $opt work on the bfin-elf compiler, so I can't use it for uClibc"
+        printf "halting after "
+        print_stop_time
+        printf "\n"
+        exit
+      else
+        printf " $opt"
+      fi
+  done
+  printf " OK\n"
+fi
 
 ####################### Done Step 1  #########################
 
