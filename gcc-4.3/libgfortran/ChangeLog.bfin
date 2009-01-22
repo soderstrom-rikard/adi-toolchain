@@ -1,0 +1,4 @@
+2009-01-22  Jie Zhang  <jie.zhang@analog.com>
+
+	* configure.ac: Add --enable-symvers.
+	* configure: Regenerate.

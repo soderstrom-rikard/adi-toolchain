@@ -21,6 +21,17 @@ AC_ARG_ENABLE(version-specific-runtime-libs,
 [version_specific_libs=no])
 AC_MSG_RESULT($version_specific_libs)
 
+AC_MSG_CHECKING([for --enable-symvers])
+AC_ARG_ENABLE(symvers,
+[  --enable-symvers        enables symbol versioning of the shared library ],
+[case "$enableval" in
+ yes) enable_symvers=yes ;;
+ no)  enable_symvers=no ;;
+ *)   AC_MSG_ERROR([Unknown argument to enable/disable symbol versioning]);;
+ esac],
+[enable_symvers=""])
+AC_MSG_RESULT($enable_symvers)
+
 AM_MAINTAINER_MODE
 
 GCC_NO_EXECUTABLES
@@ -71,22 +82,26 @@ if test x$ssp_hidden = xyes; then
   AC_DEFINE([HAVE_HIDDEN_VISIBILITY],[1],[__attribute__((visibility ("hidden"))) supported])
 fi
 
-AC_MSG_CHECKING([whether symbol versioning is supported])
-cat > conftest.map <<EOF
+if test "x$enable_symvers" == "xno"; then
+  ssp_use_symver=no
+else
+  AC_MSG_CHECKING([whether symbol versioning is supported])
+  cat > conftest.map <<EOF
 FOO_1.0 {
   global: *foo*; bar; local: *;
 };
 EOF
-save_LDFLAGS="$LDFLAGS"
-LDFLAGS="$LDFLAGS -fPIC -shared -Wl,--version-script,./conftest.map"
-if test x$gcc_no_link = xyes; then
-  # If we cannot link, we cannot build shared libraries, so do not use
-  # symbol versioning.
-  ssp_use_symver=no
-else
-  AC_TRY_LINK([int foo;],[],[ssp_use_symver=yes],[ssp_use_symver=no])
+  save_LDFLAGS="$LDFLAGS"
+  LDFLAGS="$LDFLAGS -fPIC -shared -Wl,--version-script,./conftest.map"
+  if test x$gcc_no_link = xyes; then
+    # If we cannot link, we cannot build shared libraries, so do not use
+    # symbol versioning.
+    ssp_use_symver=no
+  else
+    AC_TRY_LINK([int foo;],[],[ssp_use_symver=yes],[ssp_use_symver=no])
+  fi
+  LDFLAGS="$save_LDFLAGS"
 fi
-LDFLAGS="$save_LDFLAGS"
 AC_MSG_RESULT($ssp_use_symver)
 AM_CONDITIONAL(LIBSSP_USE_SYMVER, [test "x$ssp_use_symver" = xyes])
 
