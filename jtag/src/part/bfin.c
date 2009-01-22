@@ -487,7 +487,7 @@ bfin_system_reset (chain_t *chain)
   /* [P0] = R0; */
   bfin_emuir_set (chain, 0x9700, EXITMODE_IDLE);
   /* Wait for system reset to process ... needs ~10 SCLKs */
-  sleep(1);
+  usleep(1000000);
   /* R0 = 0 (z); */
   bfin_emuir_set (chain, 0xe1800000, EXITMODE_IDLE);
   /* [P0] = R0; */
