@@ -1267,13 +1267,13 @@ install_all_target_libs()
 			old_lver=${old_lver#${lib}.}
 			compare_version ${lver} ${old_lver}
 			if [ $? -eq 1 ] ; then
-				log_it "Updating shared ${lib} (${lver})"
+				echo_date "Updating shared ${lib} (${lver})"
 				rm "${tdir}/${lib}".*
 			else
 				movit=false
 			fi
 		else
-			log_it "Installing shared ${lib} (${lver})"
+			echo_date "Installing shared ${lib} (${lver})"
 		fi
 		if ${movit} ; then
 			mv "${gccdir}/${otarg}" "${tdir}/${ntarg}"
