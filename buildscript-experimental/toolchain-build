@@ -1661,20 +1661,23 @@ if [ $BUILD_TARGET_UCLINUX ]; then
 
     change_dir $UCLIBC_SOURCE
 
-    echo_date "Checking uClibc CFLAGS"
-    # We test (and fail) if any of the CFLAGS for uClibc don't work on the bfin-uclinux compiler
-    for opt in $UCLIBC_CFLAGS
-    do
-	check_cc_options $DIR_uC_OUTPUT/bin/bfin-uclinux-gcc $opt
-	if [ "$?" -eq "0" ] ; then
-	    printf "\n"
-	    echo "I could not make option $opt work on the bfin-uclinux compiler, so I can't use it for uClibc"
-	    printf "halting after "
-	    print_stop_time
-	    printf "\n"
-	    exit
-	fi
-    done
+    if [ "$HOST_TARGET" = "$BUILD_TARGET" ] ; then
+	echo_date "Checking uClibc CFLAGS"
+	# We test (and fail) if any of the CFLAGS for uClibc don't work on
+	# the bfin-uclinux compiler
+	for opt in $UCLIBC_CFLAGS
+	do
+	    check_cc_options $DIR_uC_OUTPUT/bin/bfin-uclinux-gcc $opt
+	    if [ "$?" -eq "0" ] ; then
+		printf "\n"
+		echo "I could not make option $opt work on the bfin-uclinux compiler, so I can't use it for uClibc"
+		printf "halting after "
+		print_stop_time
+		printf "\n"
+		exit
+	    fi
+	done
+    fi
 
     MULTILIBS=`bfin-uclinux-gcc --print-multi-lib`
 
@@ -1830,20 +1833,23 @@ if [ $BUILD_TARGET_LINUX_UCLIBC ]; then
 
     change_dir $UCLIBC_SOURCE
 
-    echo_date "Checking uClibc CFLAGS"
-    # We test (and fail) if any of the CFLAGS for uClibc don't work on the bfin-linux-uclibc compiler
-    for opt in $UCLIBC_CFLAGS
-    do
-	check_cc_options $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-gcc $opt
-	if [ "$?" -eq "0" ] ; then
-	    printf "\n"
-	    echo "I could not make option $opt work on the bfin-linux-uclibc compiler, so I can't use it for uClibc"
-	    printf "halting after "
-	    print_stop_time
-	    printf "\n"
-	    exit
-	fi
-    done
+    if [ "$HOST_TARGET" = "$BUILD_TARGET" ] ; then
+	echo_date "Checking uClibc CFLAGS"
+	# We test (and fail) if any of the CFLAGS for uClibc don't work on
+	# the bfin-linux-uclibc compiler
+	for opt in $UCLIBC_CFLAGS
+	do
+	    check_cc_options $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-gcc $opt
+	    if [ "$?" -eq "0" ] ; then
+		printf "\n"
+		echo "I could not make option $opt work on the bfin-linux-uclibc compiler, so I can't use it for uClibc"
+		printf "halting after "
+		print_stop_time
+		printf "\n"
+		exit
+	    fi
+	done
+    fi
 
     MULTILIBS=`bfin-linux-uclibc-gcc --print-multi-lib`
 
