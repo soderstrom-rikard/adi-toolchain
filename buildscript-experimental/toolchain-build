@@ -846,7 +846,9 @@ do
         FIND=`find $SEARCH/ -maxdepth 1 -name bfin-elf-gcc -o -name bfin-uclinux-gcc -o -name bfin-linux-uclibc-gcc | wc -c`
         if [ $FIND -gt 1 ] ; then
 	    FOUND=1
-	    echo "Removing $SEARCH from the PATH"
+            if [ -z "$HOST_TARGET" ] ; then
+		echo "Removing $SEARCH from the PATH"
+            fi
         else
 	    if [ $NEW_PATH ] ; then
                 NEW_PATH=$NEW_PATH:$SEARCH
