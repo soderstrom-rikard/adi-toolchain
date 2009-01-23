@@ -1949,6 +1949,7 @@ if [ "x$SKIP_ELF" = "x" ]; then
 
     echo_date "Building Elf elf2flt"
     change_dir $DIR_ELF2FLT_BUILD
+    touch -r . $DIR_ELF2FLT_SOURCE/* # fix autotool timestamps
 
     RUN="$DIR_ELF2FLT_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-elf \
          --with-libbfd=$DIR_BINUTILS_BUILD/bfd/libbfd.a               \
@@ -2249,10 +2250,7 @@ if [ $KERNEL_SOURCE ] ; then
 
     echo_date "Building uClinux elf2flt"
     change_dir $DIR_ELF2FLT_BUILD
-    touch -r . * # fix autotool timestamps
-
-    echo_date "Cleaning uClinux elf2flt"
-    run_cmd $MAKE distclean
+    touch -r . $DIR_ELF2FLT_SOURCE/* # fix autotool timestamps
 
     RUN="$DIR_ELF2FLT_SOURCE/configure $BUILD_TARGET $HOST_TARGET                \
          --target=bfin-uclinux                                     \
