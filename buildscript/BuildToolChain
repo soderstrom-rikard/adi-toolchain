@@ -1101,7 +1101,7 @@ build_gcc ()
     fi
     [ -n "$SCM_URL" ] && SCM_URL="-${SCM_URL}"
     [ -n "$SCM_REV" ] && SCM_REV="/${SCM_REV}"
-    echo_date "Configuring GCC"
+    echo_date "Configuring GCC ($1)"
     RUN="$DIR_GCC_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-$2 \
       --prefix=$3 $4 --disable-libstdcxx-pch $BFIN_LANGS $EXTRA_GCC_CONF \
       --disable-symvers --disable-libssp --disable-libffi $LOCALE \
