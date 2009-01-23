@@ -2011,10 +2011,7 @@ if [ $BUILD_TARGET_UCLINUX ] || [ $BUILD_TARGET_LINUX_UCLIBC ]; then
     remove_dir $DIR_GENEXT2FS_BUILD
     mkdir -p $DIR_GENEXT2FS_BUILD
     change_dir $DIR_GENEXT2FS_BUILD
-    touch -r . * # fix autotool timestamps
-
-    echo_date "Cleaning genext2fs"
-    run_cmd $MAKE distclean
+    touch -r . $DIR_GENEXT2FS_SOURCE/* # fix autotool timestamps
 
     run_cmd $DIR_GENEXT2FS_SOURCE/configure --prefix=$DIR_OUTPUT
 
