@@ -477,7 +477,7 @@ echo_date()
         recurse=""
     fi
 
-    [ -z "${recurse}" ] && (echo "echo -e '###\n${msg}\n' $LOGFILE" ) | sh
+    [ -z "${recurse}" ] && log_it "${msg}"
     return 0
 }
 
@@ -934,13 +934,10 @@ build_binutils_and_gdb ()
     if [ "$1" != "elf" ]; then
 	RUN="$RUN --with-sysroot=$2/bfin-$1/runtime"
     fi
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_cmd $RUN
 
     echo_date "Building $1 Binutils & GDB"
-    RUN="$MAKE all-binutils all-gas all-ld all-sim all-gdb"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_cmd $MAKE all-binutils all-gas all-ld all-sim all-gdb
 
     # Check if build correctly
 
@@ -993,9 +990,7 @@ build_binutils_and_gdb ()
     done
 
     echo_date "Installing $1 Binutils & GDB"
-    RUN="$MAKE install-binutils install-gas install-ld install-sim install-gdb"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_cmd $MAKE install-binutils install-gas install-ld install-sim install-gdb
 
     # Check if install correctly
 
@@ -1088,14 +1083,10 @@ build_gcc ()
       --enable-version-specific-runtime-libs --enable-__cxa_atexit \
       --with-bugurl=URL:http://blackfin.uclinux.org/gf/project/toolchain/tracker \
       --with-pkgversion=ADI${SCM_URL}${SCM_REV}"
-
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_cmd $RUN
 
     echo_date "Building $2 GCC $1"
-    RUN="$MAKE"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_cmd $MAKE
 
     # Check if build correctly
     # FIXME Check fortran
@@ -1117,9 +1108,7 @@ build_gcc ()
     done
 
     echo_date "Installing $2 GCC $1"
-    RUN="$MAKE -j1 install"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_cmd $MAKE -j1 install
 
     # Check if install correctly
 
@@ -1310,16 +1299,13 @@ install_target_libs ()
 
 	    RUN="cp $TARGET_SHLIB $1/$2/runtime/$dir/lib; \
 	    ln -s $TARGET_SHLIB_NAME $1/$2/runtime/$dir/lib/$3.so.$MAJOR_NUM;"
-            (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-            (echo "($RUN) $LOGFILE" ) | sh || die_with_log
+	    run_cmd $RUN
 
 	    for G in $COMPAT_GCCS; do
 		L=`$G $flags --print-file-name=$3.so`
 		RUN="rm -f `dirname $L`/$3.so*; \
 		ln -s ../../../../$dir2$2/runtime/$dir/lib/$TARGET_SHLIB_NAME `dirname $L`/$3.so;"
-                (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-                (echo "($RUN) $LOGFILE" ) | sh || die_with_log
-
+		run_cmd $RUN
 	    done
 
 	done
@@ -1377,9 +1363,7 @@ install_libgccs ()
 	LIBGCC_DIR=`dirname $LIBGCC`
 	LIBGCC_NAME=`basename $LIBGCC`
 
-	RUN="cp $LIBGCC $1/$2/runtime/$dir/lib"
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo $RUN $LOGFILE ; ) | sh || die_with_log
+	run_cmd cp $LIBGCC $1/$2/runtime/$dir/lib
 
 	for G in $GCCS; do
 	    L=`$G $flags --print-file-name=libgcc_s_$dir.so`
@@ -1392,8 +1376,7 @@ install_libgccs ()
 	    fi
 	    RUN="rm -f $L*;\
 	    ln -s ../../../../$dir2$2/runtime/$dir/lib/$LIBGCC_NAME $L"
-            (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-            (echo "($RUN) $LOGFILE" ) | sh || die_with_log
+	    run_cmd $RUN
 	done
     done
 }
@@ -1410,8 +1393,7 @@ build_linux_headers()
 
 	change_dir $KERNEL_SOURCE
 	RUN="$MAKE -j1 headers_check headers_install INSTALL_HDR_PATH=$DIR_KBUILD_OUTPUT/usr KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT CROSS_COMPILE=bfin-$1- ARCH=blackfin"
-	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-	(echo $RUN $LOGFILE ; ) | sh || die_with_log
+	run_cmd $RUN
 	find "$DIR_KBUILD_OUTPUT/usr" -type f -name '.check.*' -print0 | xargs -0 rm -f
 	# Prepending that -K is passed thus we can avoid rebuilding of kernel headers
 	# if there is another target toolchain to be built.
@@ -1520,7 +1502,7 @@ build_uclibc_headers()
 	echo "KERNEL_HEADERS=\"$DIR_KBUILD_OUTPUT/usr/include\"" >>.config
     fi
 
-    RUN="$MAKE oldconfig CROSS=none- -j 1"
+    RUN="$MAKE oldconfig CROSS=none- </dev/null"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     (echo $RUN $LOGFILE ; ) | sh
 
@@ -1642,22 +1624,16 @@ if [ $BUILD_TARGET_UCLINUX ]; then
     if [ -e $DIR_BINUTILS_BUILD/intl/libintl.a ] ; then
         RUN="$RUN --with-libintl=$DIR_BINUTILS_BUILD/intl/libintl.a"
     fi
-
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_cmd $RUN
 
     echo_date "Building elf2flt"
-    RUN="$MAKE"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_cmd $MAKE
 
     # Now we can remove the binutils build directory.
     remove_dir $DIR_BINUTILS_BUILD
 
     echo_date "Installing elf2flt"
-    RUN="$MAKE install "
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_cmd $MAKE install
 
     # Build uClibc
 
@@ -1712,7 +1688,7 @@ if [ $BUILD_TARGET_UCLINUX ]; then
 	    echo "MULTILIB=\"${dir}\"" >>.config
 	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
 
-	    RUN="$MAKE oldconfig CROSS=bfin-uclinux-"
+	    RUN="$MAKE oldconfig CROSS=bfin-uclinux- </dev/null"
 	    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 	    (echo $RUN $LOGFILE ; ) | sh
 
@@ -1735,7 +1711,7 @@ if [ $BUILD_TARGET_UCLINUX ]; then
 	    echo "MULTILIB=\"${dir}\"" >>.config
 	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
 
-	    RUN="$MAKE oldconfig CROSS=bfin-uclinux-"
+	    RUN="$MAKE oldconfig CROSS=bfin-uclinux- </dev/null"
 	    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 	    (echo $RUN $LOGFILE ; ) | sh
 
@@ -1759,7 +1735,7 @@ if [ $BUILD_TARGET_UCLINUX ]; then
 	    echo "MULTILIB=\"${dir}\"" >>.config
 	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
 
-	    RUN="$MAKE oldconfig CROSS=bfin-uclinux-"
+	    RUN="$MAKE oldconfig CROSS=bfin-uclinux- </dev/null"
 	    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 	    (echo $RUN $LOGFILE ; ) | sh
 
@@ -1796,9 +1772,7 @@ if [ $BUILD_TARGET_UCLINUX ]; then
     # Reinstall elf2flt
     change_dir $DIR_ELF2FLT_BUILD
     echo_date "Installing elf2flt"
-    RUN="$MAKE install "
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh || die_with_log
+    run_cmd $MAKE install
     remove_dir $DIR_ELF2FLT_BUILD
 fi
 
@@ -1887,7 +1861,7 @@ if [ $BUILD_TARGET_LINUX_UCLIBC ]; then
 	echo "MULTILIB=\"\"" >>.config
 	echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
 
-	RUN="$MAKE oldconfig CROSS=bfin-linux-uclibc-"
+	RUN="$MAKE oldconfig CROSS=bfin-linux-uclibc- </dev/null"
 	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
 	(echo $RUN $LOGFILE ; ) | sh
 
