@@ -1502,9 +1502,7 @@ build_uclibc_headers()
 	echo "KERNEL_HEADERS=\"$DIR_KBUILD_OUTPUT/usr/include\"" >>.config
     fi
 
-    RUN="$MAKE oldconfig CROSS=none- </dev/null"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    run_cmd $MAKE oldconfig CROSS=none- </dev/null
 
     run_cmd $MAKE headers install_headers DESTDIR=$2/bfin-$1/runtime CROSS=none- DEVEL_PREFIX=/usr/ RUNTIME_PREFIX=/ -j 1
 }
@@ -1525,9 +1523,7 @@ build_libs ()
 	dir=`echo ${ml} | sed -e 's/;.*$//'`
 	flags=`echo ${ml} | sed -e 's/^[^;]*;//' -e 's/@/ -/g'`
 
-	RUN="$MAKE CROSS=bfin-$1- clean"
-	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-	(echo $RUN $LOGFILE ; ) | sh
+	run_cmd $MAKE CROSS=bfin-$1- clean
 
 	if [ $1 = "elf" ]; then
 	    # LIBC_HAS_NO_CMATH=1 will add several more files to libbfdsp.a.
@@ -1535,8 +1531,7 @@ build_libs ()
 	else
 	    RUN="$MAKE CROSS=bfin-$1- $extra_libsflags MULTILIB_FLAGS=\"$flags\""
 	fi
-	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-	(echo $RUN $LOGFILE ; ) | sh
+	run_cmd $RUN
 
 	if [ ! -e $DIR_SOURCE/libs/libdsp/libbfdsp.a ] ; then
 	    echo "libbfdsp.a $flags build error"
@@ -1555,13 +1550,10 @@ build_libs ()
 	elif [ $1 = "elf" ]; then
 	    RUN="$MAKE CROSS=bfin-$1- LIBC_HAS_NO_CMATH=1 install DESTDIR=$2/bfin-$1 USR= SUFFIX= MULTILIB=/$dir"
 	fi
-	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-	(echo $RUN $LOGFILE ; ) | sh
+	run_cmd $RUN
     done
 
-    RUN="$MAKE CROSS=bfin-$1- clean"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    run_cmd $MAKE CROSS=bfin-$1- clean
 }
 
 
@@ -1606,12 +1598,7 @@ if [ $BUILD_TARGET_UCLINUX ]; then
     remove_dir $DIR_ELF2FLT_BUILD
     mkdir -p $DIR_ELF2FLT_BUILD
     change_dir $DIR_ELF2FLT_BUILD
-    touch -r . * # fix autotool timestamps
-
-    echo_date "Cleaning elf2flt"
-    RUN="$MAKE distclean "
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    touch -r . $DIR_ELF2FLT_SOURCE/* # fix autotool timestamps
 
     RUN="$DIR_ELF2FLT_SOURCE/configure $BUILD_TARGET $HOST_TARGET                \
          --target=bfin-uclinux                                     \
@@ -1688,9 +1675,7 @@ if [ $BUILD_TARGET_UCLINUX ]; then
 	    echo "MULTILIB=\"${dir}\"" >>.config
 	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
 
-	    RUN="$MAKE oldconfig CROSS=bfin-uclinux- </dev/null"
-	    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-	    (echo $RUN $LOGFILE ; ) | sh
+	    run_cmd $MAKE oldconfig CROSS=bfin-uclinux- </dev/null
 
 	    build_uClibc uclinux $DIR_uC_OUTPUT "" "${dir}"
 
@@ -1711,9 +1696,7 @@ if [ $BUILD_TARGET_UCLINUX ]; then
 	    echo "MULTILIB=\"${dir}\"" >>.config
 	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
 
-	    RUN="$MAKE oldconfig CROSS=bfin-uclinux- </dev/null"
-	    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-	    (echo $RUN $LOGFILE ; ) | sh
+	    run_cmd $MAKE oldconfig CROSS=bfin-uclinux- </dev/null
 
 	    build_uClibc uclinux $DIR_uC_OUTPUT "" "${dir}"
 
@@ -1735,9 +1718,7 @@ if [ $BUILD_TARGET_UCLINUX ]; then
 	    echo "MULTILIB=\"${dir}\"" >>.config
 	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
 
-	    RUN="$MAKE oldconfig CROSS=bfin-uclinux- </dev/null"
-	    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-	    (echo $RUN $LOGFILE ; ) | sh
+	    run_cmd $MAKE oldconfig CROSS=bfin-uclinux- </dev/null
 
 	    build_uClibc uclinux $DIR_uC_OUTPUT "" "${dir}"
 
@@ -1748,9 +1729,7 @@ if [ $BUILD_TARGET_UCLINUX ]; then
 
     echo_date "Cleaning uClibc"
     change_dir $UCLIBC_SOURCE
-    RUN="$MAKE CROSS=bfin-uclinux- distclean"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    run_cmd $MAKE CROSS=bfin-uclinux- distclean
 
     # ??? We already have --with-sysroot, why needs sys-include
     # ln -s runtime/usr/include $DIR_uC_OUTPUT/bfin-uclinux/sys-include
@@ -1861,9 +1840,7 @@ if [ $BUILD_TARGET_LINUX_UCLIBC ]; then
 	echo "MULTILIB=\"\"" >>.config
 	echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
 
-	RUN="$MAKE oldconfig CROSS=bfin-linux-uclibc- </dev/null"
-	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-	(echo $RUN $LOGFILE ; ) | sh
+	run_cmd $MAKE oldconfig CROSS=bfin-linux-uclibc- </dev/null
 
 	build_uClibc linux-uclibc $DIR_LINUX_OUTPUT "${dir}" ""
 
@@ -1887,9 +1864,7 @@ if [ $BUILD_TARGET_LINUX_UCLIBC ]; then
 
     echo_date "Cleaning uClibc"
     change_dir $UCLIBC_SOURCE
-    RUN="$MAKE CROSS=bfin-linux-uclibc- distclean"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    run_cmd $MAKE CROSS=bfin-linux-uclibc- distclean
 
     # ??? We already have --with-sysroot, why needs sys-include
     # ln -s runtime/usr/include $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
@@ -1950,18 +1925,12 @@ if [ $BUILD_TARGET_UCLINUX ] || [ $BUILD_TARGET_LINUX_UCLIBC ]; then
     touch -r . * # fix autotool timestamps
 
     echo_date "Cleaning genext2fs"
-    RUN="$MAKE distclean "
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    run_cmd $MAKE distclean
 
-    RUN="$DIR_GENEXT2FS_SOURCE/configure --prefix=$DIR_OUTPUT"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    run_cmd $DIR_GENEXT2FS_SOURCE/configure --prefix=$DIR_OUTPUT
 
     echo_date "Building genext2fs"
-    RUN=$MAKE
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    run_cmd $MAKE
 
     for RUN in genext2fs
     do
@@ -1972,9 +1941,7 @@ if [ $BUILD_TARGET_UCLINUX ] || [ $BUILD_TARGET_LINUX_UCLIBC ]; then
     done
 
     echo_date "Installing genext2fs"
-    RUN="$MAKE install"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    run_cmd $MAKE install
     if [ $BUILD_TARGET_UCLINUX ]; then
 	cp $DIR_OUTPUT/bin/genext2fs $DIR_uC_OUTPUT/bin/bfin-uclinux-genext2fs || exit 1
     fi
@@ -1992,14 +1959,10 @@ if [ $BUILD_TARGET_UCLINUX ] || [ $BUILD_TARGET_LINUX_UCLIBC ]; then
     change_dir $DIR_CRAMFS_SOURCE
 
     echo_date "Cleaning cramfs-tools"
-    RUN="$MAKE distclean "
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    run_cmd $MAKE distclean
 
     echo_date "Make cramfs-tools"
-    RUN=$MAKE
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    run_cmd $MAKE
 
     for RUN in mkcramfs cramfsck
     do
@@ -2216,17 +2179,12 @@ if [ $BUILD_TARGET_UCLINUX ] ; then
     --host=bfin-uclinux $BUILD_TARGET \
     --disable-shared --prefix=$DIR_uC_OUTPUT/bfin-uclinux --disable-nls \
     --without-newlib"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    run_cmd $RUN
 
-    RUN="$MAKE all-bfd all-opcodes all-libiberty"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    run_cmd $MAKE all-bfd all-opcodes all-libiberty
 
     echo_date "Installing target libbfd"
-    RUN="$MAKE install-bfd install-opcodes install-libiberty"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    run_cmd $MAKE install-bfd install-opcodes install-libiberty
 
     remove_dir $DIR_BINUTILS_BUILD
 fi
@@ -2243,17 +2201,12 @@ if [ $BUILD_TARGET_LINUX_UCLIBC ]; then
     --host=bfin-linux-uclibc $BUILD_TARGET \
     --disable-shared --prefix=$DIR_LINUX_OUTPUT/bfin-linux-uclibc --disable-nls \
     --without-newlib"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    run_cmd $RUN
 
-    RUN="$MAKE all-bfd all-opcodes all-intl all-libiberty"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    run_cmd $MAKE all-bfd all-opcodes all-intl all-libiberty
 
     echo_date "Installing target libbfd"
-    RUN="$MAKE install-bfd install-opcodes install-libiberty"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    run_cmd $MAKE install-bfd install-opcodes install-libiberty
 
     remove_dir $DIR_BINUTILS_BUILD
 fi
