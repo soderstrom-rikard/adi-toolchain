@@ -1055,6 +1055,29 @@ build_gcc ()
     rm -rf $DIR_GCC_BUILD
     mkdir $DIR_GCC_BUILD
 
+    # When doing a canadian cross, we have to use the toolchain on the host.
+    # Since gcc is very picky about being compiled by another version, make
+    # sure we compile this version with the same version on the host.
+    if [ "$BUILD_TARGET" != "$HOST_TARGET" ] ; then
+        p=$DIR_GCC_BUILD/.bfin.path
+        mkdir $p
+        for t in gcc g++ c++ gfortran ; do
+            fullt=$(echo `which bfin-$2-$t`-$1.?)
+            if [ ! -x "$fullt" ] ; then
+                if [ "$t" = "gcc" ] ; then
+                    echo "You need to have gcc $1 installed in order to build it"
+                    die_with_log
+                else
+                    continue
+                fi
+            fi
+            printf '#!/bin/sh\nexec %s "$@"\n' "$fullt" > "$p/bfin-$2-$t"
+            chmod a+rx $p/bfin-$2-$t
+        done
+        save_PATH=$PATH
+        export PATH=$p:$PATH
+    fi
+
     rm -f $DIR_GCC_SOURCE/newlib
     rm -f $DIR_GCC_SOURCE/libgloss
 
@@ -1171,6 +1194,11 @@ build_gcc ()
     # note this isnt an issue as insight statically links in all of the TCL stuff
     # it actually needs and does not use these binaries at runtime.
     rm -f $3/bin/tclsh* $3/bin/wish*
+
+    if [ "$BUILD_TARGET" != "$HOST_TARGET" ] ; then
+        PATH=$save_PATH
+        rm -rf "$DIR_GCC_BUILD/.bfin.path"
+    fi
 }
 
 # Compare two dotted version numbers.  Versions are .0 extended if they
