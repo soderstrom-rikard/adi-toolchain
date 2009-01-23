@@ -2106,7 +2106,7 @@ if [ $KERNEL_SOURCE ] ; then
 	    echo "MULTILIB=\"\"" >>.config
 	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
 
-	    run_cmd $MAKE oldconfig CROSS=bfin-elf-
+	    run_cmd $MAKE oldconfig CROSS=bfin-elf- </dev/null
 
 	    cp .config .config-used-for_${suffix}
 
@@ -2127,7 +2127,7 @@ if [ $KERNEL_SOURCE ] ; then
 	    echo "MULTILIB=\"${dir}\"" >>.config
 	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
 
-	    run_cmd $MAKE oldconfig CROSS=bfin-elf-
+	    run_cmd $MAKE oldconfig CROSS=bfin-elf- </dev/null
 
 	    cp .config .config-used-for_${suffix}
 
@@ -2152,7 +2152,7 @@ if [ $KERNEL_SOURCE ] ; then
 	    echo "MULTILIB=\"${dir}\"" >>.config
 	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
 
-	    run_cmd $MAKE oldconfig CROSS=bfin-elf-
+	    run_cmd $MAKE oldconfig CROSS=bfin-elf- </dev/null
 
 	    cp .config .config-used-for_${suffix}
 
@@ -2174,7 +2174,7 @@ if [ $KERNEL_SOURCE ] ; then
 	    echo "MULTILIB=\"${dir}\"" >>.config
 	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
 
-	    run_cmd $MAKE oldconfig CROSS=bfin-elf-
+	    run_cmd $MAKE oldconfig CROSS=bfin-elf- </dev/null
 
 	    cp .config .config-used-for_${suffix}
 
@@ -2214,7 +2214,7 @@ if [ $KERNEL_SOURCE ] ; then
 
     echo_date "Cleaning uClibc"
     change_dir $UCLIBC_SOURCE
-    run_it $MAKE CROSS=bfin-elf- distclean
+    run_cmd $MAKE CROSS=bfin-elf- distclean
 
     ####################### Done Step 3  #########################
 
@@ -2229,13 +2229,13 @@ if [ $KERNEL_SOURCE ] ; then
     RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET \
          --target=bfin-uclinux --prefix=$DIR_uC_OUTPUT \
          --with-sysroot=$DIR_uC_OUTPUT/bfin-uclinux/runtime $BINUTILS_EXTRA_CONF"
-    run_it $RUN
+    run_cmd $RUN
 
     echo_date "Building uClinux Binutils & GDB"
-    run_it $MAKE all-binutils all-gas all-ld all-sim all-gdb
+    run_cmd $MAKE all-binutils all-gas all-ld all-sim all-gdb
 
     echo_date "Installing uClinux Binutils & GDB"
-    run_it $MAKE install-binutils install-gas install-ld install-sim install-gdb
+    run_cmd $MAKE install-binutils install-gas install-ld install-sim install-gdb
 
     ln -s runtime/usr/include $DIR_uC_OUTPUT/bfin-uclinux/sys-include
     for GCC_VERSION in $GCC_VERSIONS; do
@@ -2252,7 +2252,7 @@ if [ $KERNEL_SOURCE ] ; then
     touch -r . * # fix autotool timestamps
 
     echo_date "Cleaning uClinux elf2flt"
-    run_it $MAKE distclean
+    run_cmd $MAKE distclean
 
     RUN="$DIR_ELF2FLT_SOURCE/configure $BUILD_TARGET $HOST_TARGET                \
          --target=bfin-uclinux                                     \
@@ -2266,13 +2266,13 @@ if [ $KERNEL_SOURCE ] ; then
         RUN="$RUN --with-libintl=$DIR_BINUTILS_BUILD/intl/libintl.a"
     fi
 
-    run_it $RUN
+    run_cmd $RUN
 
     echo_date "Building uClinux elf2flt"
-    run_it $MAKE
+    run_cmd $MAKE
 
     echo_date "Installing uClinux elf2flt"
-    run_it $MAKE install
+    run_cmd $MAKE install
 
     ####################### Test bfin-uclinux #######################
 
@@ -2300,13 +2300,13 @@ if [ $KERNEL_SOURCE ] ; then
     RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET \
          --target=bfin-linux-uclibc --prefix=$DIR_LINUX_OUTPUT \
          --with-sysroot=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime $BINUTILS_EXTRA_CONF"
-    run_it $RUN
+    run_cmd $RUN
 
     echo_date  "Building linux-uclibc binutils"
-    run_it $MAKE all-binutils all-gas all-ld all-sim all-gdb
+    run_cmd $MAKE all-binutils all-gas all-ld all-sim all-gdb
 
     echo_date "Installing linux-uclibc binutils  "
-    run_it $MAKE install-binutils install-gas install-ld install-sim install-gdb
+    run_cmd $MAKE install-binutils install-gas install-ld install-sim install-gdb
 
     ln -s runtime/usr/include $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
     for GCC_VERSION in $GCC_VERSIONS; do
