@@ -1,4 +1,4 @@
-#!/bin/sh
+n#!/bin/sh
 #
 #toolchain-build -- based on
 #Build Script - Rohit Makasana ( rohit.makasana@rrap-software.com )
@@ -1188,7 +1188,7 @@ install_all_target_libs()
 	local reldir="../../../../$2/runtime"
 
 	local readelf
-	if [ "$HOST_TARGET" != "$BUILD_TARGET" ] ; then
+	if [ "$HOST_TRIPLET" != "$BUILD_TRIPLET" ] ; then
 		readelf=$2-readelf
 	else
 		readelf=$1/bin/$2-readelf
@@ -1709,7 +1709,7 @@ if [ $BUILD_TARGET_UCLINUX ]; then
 
     change_dir $UCLIBC_SOURCE
 
-    if [ "$HOST_TARGET" = "$BUILD_TARGET" ] ; then
+    if [ "$HOST_TRIPLET" = "$BUILD_TRIPLET" ] ; then
 	echo_date "Checking uClibc CFLAGS"
 	# We test (and fail) if any of the CFLAGS for uClibc don't work on
 	# the bfin-uclinux compiler
@@ -1871,7 +1871,7 @@ if [ $BUILD_TARGET_LINUX_UCLIBC ]; then
 
     change_dir $UCLIBC_SOURCE
 
-    if [ "$HOST_TARGET" = "$BUILD_TARGET" ] ; then
+    if [ "$HOST_TRIPLET" = "$BUILD_TRIPLET" ] ; then
 	echo_date "Checking uClibc CFLAGS"
 	# We test (and fail) if any of the CFLAGS for uClibc don't work on
 	# the bfin-linux-uclibc compiler
@@ -1958,7 +1958,7 @@ if [ $BUILD_TARGET_LINUX_UCLIBC ]; then
     done
     # rm -f $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
 
-    if [ "$HOST_TARGET" != "$BUILD_TARGET" ] ; then
+    if [ "$HOST_TRIPLET" != "$BUILD_TRIPLET" ] ; then
 	install_all_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc
     else
 
