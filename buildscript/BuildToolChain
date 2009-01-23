@@ -46,6 +46,8 @@ GCC_VERSIONS=
 NUM_JOBS=0
 SKIP_DEV_CHECKS=false
 WITHOUT_X=false
+CBUILD= # the system we are compiling on
+CHOST=  # the system the final compiler will run on
 
 while getopts b:B:c:C:dDfH:hj:k:K:l:m:o:O:pr:s:StT:u:U:vwX parameter
 do
@@ -129,7 +131,7 @@ do
             GCC_VERSIONS="$GCC_VERSIONS $OPTARG"
             ;;
         H)
-            HOST_TARGET="--host=$OPTARG"
+            CHOST="$OPTARG"
             ;;
         k)
             KERNEL_SOURCE=$OPTARG
@@ -431,7 +433,7 @@ do
         FIND=`find $SEARCH/ -maxdepth 1 -name bfin-elf-gcc -o -name bfin-uclinux-gcc -o -name bfin-linux-uclibc-gcc | wc -c`
         if [ $FIND -gt 1 ] ; then
             FOUND=1
-            if [ -z "$HOST_TARGET" ] ; then
+            if [ -z "$CHOST" ] ; then
                 echo "Removing $SEARCH from the PATH"
             fi
         else
@@ -443,7 +445,7 @@ do
         fi
     fi
 done
-if [ -z "$HOST_TARGET" ] ; then
+if [ -z "$CHOST" ] ; then
     NEW_PATH=$NEW_PATH:
     PATH=$NEW_PATH
 elif [ "$FOUND" = "0" ] ; then
@@ -747,18 +749,18 @@ if [ ! -d $DIR_BINUTILS_SOURCE ] ; then
     echo "Can't find binutils source at $DIR_BINUTILS_SOURCE"
     exit 1
 fi
-BUILD_TARGET="--build=`$DIR_BINUTILS_SOURCE/config.guess`"
-if [ -z "$HOST_TARGET" ] ; then
-    HOST_TARGET="--host=`$DIR_BINUTILS_SOURCE/config.guess`"
-fi
+CBUILD=$($DIR_BINUTILS_SOURCE/config.guess)
+BUILD_TARGET="--build=${CBUILD}"
+: ${CHOST:=${CBUILD}}
+HOST_TARGET="--host=${CHOST}"
 
 # libintl / libiconv handling in binutils-2.17 is broken for
 # extraneous hosts ... it's been fixed in binutils-2.18, so
 # once we update to that, we should be able to re-enable NLS
 UCLIBC_HOSTUTILS="PASS"
-case $HOST_TARGET in
-    --host=mingw*)   BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-nls"; UCLIBC_HOSTUTILS="XFAIL";;
-    --host=*darwin*) BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-nls"; UCLIBC_HOSTUTILS="XFAIL";;
+case ${CHOST} in
+    *mingw*)  BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-nls"; UCLIBC_HOSTUTILS="XFAIL";;
+    *darwin*) BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-nls"; UCLIBC_HOSTUTILS="XFAIL";;
 esac
 # warnings with gcc-4.3 cause build failures
 BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-werror"
@@ -1058,7 +1060,7 @@ build_gcc ()
     # When doing a canadian cross, we have to use the toolchain on the host.
     # Since gcc is very picky about being compiled by another version, make
     # sure we compile this version with the same version on the host.
-    if [ "$BUILD_TARGET" != "$HOST_TARGET" ] ; then
+    if [ "${CBUILD}" != "${CHOST}" ] ; then
         p=$DIR_GCC_BUILD/.bfin.path
         mkdir $p
         for t in gcc g++ c++ gfortran ; do
@@ -1195,7 +1197,7 @@ build_gcc ()
     # it actually needs and does not use these binaries at runtime.
     rm -f $3/bin/tclsh* $3/bin/wish*
 
-    if [ "$BUILD_TARGET" != "$HOST_TARGET" ] ; then
+    if [ "${CBUILD}" != "${CHOST}" ] ; then
         PATH=$save_PATH
         rm -rf "$DIR_GCC_BUILD/.bfin.path"
     fi
@@ -1238,7 +1240,7 @@ install_all_target_libs()
 	local reldir="../../../../$2/runtime"
 
 	local readelf
-	if [ "$HOST_TARGET" != "$BUILD_TARGET" ] ; then
+	if [ "${CHOST}" != "${CBUILD}" ] ; then
 		readelf=$2-readelf
 	else
 		readelf=$1/bin/$2-readelf
@@ -2125,7 +2127,7 @@ for GCC_VERSION in $GCC_VERSIONS; do
   fi
 done
 
-if [ "$HOST_TARGET" = "$BUILD_TARGET" ] ; then
+if [ "${CHOST}" = "${CBUILD}" ] ; then
   printf "*** Checking uClibc CFLAGS:"
   #We test (and fail) if any of the CFLAGS for uClibc don't work on the bfin-elf compiler
   for opt in $UCLIBC_CFLAGS
@@ -2425,7 +2427,7 @@ if [ $KERNEL_SOURCE ] ; then
     done
     rm -f $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
 
-    if [ "$HOST_TARGET" != "$BUILD_TARGET" ] ; then
+    if [ "${CHOST}" != "${CBUILD}" ] ; then
         install_all_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc
     else
 
