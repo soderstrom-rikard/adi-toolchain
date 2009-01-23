@@ -1,0 +1,5 @@
+2009-01-23  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* configure.ac (FLAGS_FOR_TARGET): Add -isystem for include-fixed in the
+	canadian cross case.
+	* configure: Regenerate.
