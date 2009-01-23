@@ -1173,6 +1173,89 @@ build_gcc ()
     rm -f $3/bin/tclsh* $3/bin/wish*
 }
 
+# Compare two dotted version numbers.  Versions are .0 extended if they
+# do not have the same number of components.  Return values are:
+#	0 - versions are equal
+#	1 - first version is larger
+#	2 - second version is larger
+compare_version()
+{
+	local v1=$1 v2=$2
+	[ -z "${v1}${v2}" ] && return 0
+
+	local _v1=${v1%%.*} _v2=${v2%%.*}
+	: ${_v1:=0} ${_v2:=0}
+
+	if [ ${_v1} -eq ${_v2} ] ; then
+		v1=${v1#${_v1}}
+		v2=${v2#${_v2}}
+		compare_version ${v1#.} ${v2#.}
+		return $?
+	elif [ ${_v1} -gt ${_v2} ] ; then
+		return 1
+	elif [ ${_v1} -lt ${_v2} ] ; then
+		return 2
+	fi
+}
+
+# Install all shared libs found in the toolchain path $1 into the sysroot dir
+# so that our later tools (like uclinux-dist) can easily find it.  Do not
+# execute the target toolchain here so we do not have to worry about ugly
+# canadian cross issues.  The toolchain prefix is passed in as $2.
+install_all_target_libs()
+{
+	local dir=$1
+	local base_gccdir="$1/lib/gcc/$2"
+	local rundir="$1/$2/runtime"
+	local reldir="../../../../$2/runtime"
+
+	local readelf
+	if [ "$HOST_TARGET" != "$BUILD_TARGET" ] ; then
+		readelf=$2-readelf
+	else
+		readelf=$1/bin/$2-readelf
+	fi
+
+	find "${base_gccdir}" -name '*.so' | \
+	while read flib ; do
+		gccdir=${flib%/*}
+		lib=${flib#${base_gccdir}/}
+		gver=${lib%%/*}
+		lib=${lib#${gver}}
+		mdir=${lib%/*}
+		mdir=${mdir#/}/
+		[ "${mdir}" = "/" ] && mdir=""
+		lib=${lib##*/}
+		otarg=$(readlink "${flib}")
+		ntarg=${otarg}.${gver}
+		lver=${ntarg#${lib}.}
+		tdir=${rundir}/${mdir}lib
+		reltdir=$(echo "${mdir}" | sed 's:[^/]*/:../:g')${reldir}/${mdir}lib
+		soname=$(${readelf} -d "${flib}" | sed -n '/(SONAME)/s:.*[[]\(.*\)[]].*:\1:p')
+
+		local movit=true
+		if [ -e "${tdir}/${soname}" ] ; then
+			old_lver=$(readlink "${tdir}/${soname}")
+			old_lver=${old_lver#${lib}.}
+			compare_version ${lver} ${old_lver}
+			if [ $? -eq 1 ] ; then
+				log_it "Updating shared ${lib} (${lver})"
+				rm "${tdir}/${lib}".*
+			else
+				movit=false
+			fi
+		else
+			log_it "Installing shared ${lib} (${lver})"
+		fi
+		if ${movit} ; then
+			mv "${gccdir}/${otarg}" "${tdir}/${ntarg}"
+			ln -s "${ntarg}" "${tdir}/${soname}"
+		fi
+		rm "${flib}"*
+		ln -s "${reltdir}/${soname}" "${flib}"
+	done
+}
+
 # If $1 is newer than $2, return 1. Otherwise, return 0.
 is_newer ()
 {
@@ -2314,6 +2397,10 @@ if [ $KERNEL_SOURCE ] ; then
     done
     rm -f $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
 
+    if [ "$HOST_TARGET" != "$BUILD_TARGET" ] ; then
+        install_all_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc
+    else
+
     install_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc libstdc++
     for GCC_VERSION in $GCC_VERSIONS; do
         if [ "$GCC_VERSION" != "3.4" ] ; then
@@ -2337,6 +2424,8 @@ if [ $KERNEL_SOURCE ] ; then
     done
 
     install_libgccs $DIR_LINUX_OUTPUT bfin-linux-uclibc
+
+    fi
 
     ##################### Test bfin-linux-uclibc #####################
 
