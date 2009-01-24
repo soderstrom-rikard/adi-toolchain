@@ -1,4 +1,4 @@
-n#!/bin/sh
+#!/bin/sh
 #
 #toolchain-build -- based on
 #Build Script - Rohit Makasana ( rohit.makasana@rrap-software.com )
@@ -1380,15 +1380,13 @@ install_target_libs ()
 	    TARGET_SHLIB_VERSION=`echo $TARGET_SHLIB_NAME | sed s/$3.so.'\([0-9]*.[0-9]*.[0-9]*\).*/\1/'`
 	    MAJOR_NUM=`echo $TARGET_SHLIB_VERSION | sed 's/\([0-9]*\).*/\1/'`
 
-	    RUN="cp $TARGET_SHLIB $1/$2/runtime/$dir/lib; \
-	    ln -s $TARGET_SHLIB_NAME $1/$2/runtime/$dir/lib/$3.so.$MAJOR_NUM;"
-	    run_cmd $RUN
+	    run_cmd cp $TARGET_SHLIB $1/$2/runtime/$dir/lib
+	    run_cmd ln -s $TARGET_SHLIB_NAME $1/$2/runtime/$dir/lib/$3.so.$MAJOR_NUM
 
 	    for G in $COMPAT_GCCS; do
 		L=`$G $flags --print-file-name=$3.so`
-		RUN="rm -f `dirname $L`/$3.so*; \
-		ln -s ../../../../$dir2$2/runtime/$dir/lib/$TARGET_SHLIB_NAME `dirname $L`/$3.so;"
-		run_cmd $RUN
+		run_cmd rm -f `dirname $L`/$3.so*
+		run_cmd ln -s ../../../../$dir2$2/runtime/$dir/lib/$TARGET_SHLIB_NAME `dirname $L`/$3.so
 	    done
 
 	done
@@ -1457,9 +1455,8 @@ install_libgccs ()
 		    dir2=`echo ${dir} | sed -e 's|[^/]*|..|g'`/
 		fi
 	    fi
-	    RUN="rm -f $L*;\
-	    ln -s ../../../../$dir2$2/runtime/$dir/lib/$LIBGCC_NAME $L"
-	    run_cmd $RUN
+	    run_cmd rm -f $L*
+	    run_cmd ln -s ../../../../$dir2$2/runtime/$dir/lib/$LIBGCC_NAME $L
 	done
     done
 }
@@ -1610,11 +1607,10 @@ build_libs ()
 
 	if [ $1 = "elf" ]; then
 	    # LIBC_HAS_NO_CMATH=1 will add several more files to libbfdsp.a.
-	    RUN="$MAKE CROSS=bfin-$1- LIBC_HAS_NO_CMATH=1 MULTILIB_FLAGS=\"$flags\""
+	    run_cmd $MAKE CROSS=bfin-$1- LIBC_HAS_NO_CMATH=1 MULTILIB_FLAGS="$flags"
 	else
-	    RUN="$MAKE CROSS=bfin-$1- $extra_libsflags MULTILIB_FLAGS=\"$flags\""
+	    run_cmd $MAKE CROSS=bfin-$1- $extra_libsflags MULTILIB_FLAGS="$flags"
 	fi
-	run_cmd $RUN
 
 	if [ ! -e $DIR_SOURCE/libs/libdsp/libbfdsp.a ] ; then
 	    echo "libbfdsp.a $flags build error"
@@ -2085,7 +2081,7 @@ if [ $BUILD_TARGET_UCLINUX ] || [ $BUILD_TARGET_LINUX_UCLIBC ]; then
         run_cmd mkdir -p "$DIR_UBOOT_BUILD/include"
         run_cmd touch "$DIR_UBOOT_BUILD"/include/config.mk "$DIR_UBOOT_BUILD"/include/config.h
         echo_date "Make U-Boot"
-	run_cmd $MAKE O="$DIR_UBOOT_BUILD" BIN_FILES='mkimage gen_eth_addr' tools
+	run_cmd $MAKE O="$DIR_UBOOT_BUILD" BIN_FILES="mkimage gen_eth_addr" tools
 
 	echo_date "Copying U-Boot Tools"
         for RUN in mkimage gen_eth_addr
@@ -2260,7 +2256,7 @@ if [ $BUILD_TARGET_UCLINUX ] ; then
     mkdir $DIR_BINUTILS_BUILD
     change_dir $DIR_BINUTILS_BUILD
 
-    RUN="LDFLAGS=-Wl,-elf2flt \
+    RUN="env LDFLAGS=-Wl,-elf2flt \
     $DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-uclinux \
     --host=bfin-uclinux $BUILD_TARGET \
     --disable-shared --prefix=$DIR_uC_OUTPUT/bfin-uclinux --disable-nls \
