@@ -1,7 +1,7 @@
-This is doc/gfortran.info, produced by makeinfo version 4.8 from
-/scratch/joseph/4.3.2/gcc-4.3.2/gcc-4.3.2/gcc/fortran/gfortran.texi.
+This is doc/gfortran.info, produced by makeinfo version 4.12 from
+/abuild/rguenther/tmp/gcc-4.3.3/gcc-4.3.3/gcc/fortran/gfortran.texi.
 
-   Copyright (C) 1999-2007 Free Software Foundation, Inc.
+Copyright (C) 1999-2007 Free Software Foundation, Inc.
 
    Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or
@@ -221,7 +221,7 @@ extension are also run through preprocessing.
    This manual specifically documents the Fortran front end, which
 handles the programming language's syntax and semantics.  The aspects
 of GCC which relate to the optimization passes and the back-end code
-generation are documented in the GCC manual; see *Note Introduction:
+generation are documented in the GCC manual; see *note Introduction:
 (gcc)Top.  The two manuals together provide a complete reference for
 the GNU Fortran compiler.
 
@@ -244,7 +244,7 @@ f95'.
 
    If the GNU Fortran invoked the preprocessor, `__GFORTRAN__' is
 defined and `__GNUC__', `__GNUC_MINOR__' and `__GNUC_PATCHLEVEL__' can
-be used to determine the version of the compiler. See *Note Overview:
+be used to determine the version of the compiler. See *note Overview:
 (cpp)Top. for details.
 
    While CPP is the de-facto standard for preprocessing Fortran code,
@@ -1810,7 +1810,7 @@ operator in C, except the address is cast to an integer type:
              ipt = loc(ar)  ! Makes arpte is an alias for ar
              arpte(1) = 1.0 ! Sets ar(1) to 1.0
    The pointer can also be set by a call to the `MALLOC' intrinsic (see
-*Note MALLOC::).
+*note MALLOC::).
 
    Cray pointees often are used to alias an existing variable.  For
 example:
@@ -1931,7 +1931,7 @@ free-form source code; the `c$omp', `*$omp' and `!$omp' directives in
 fixed form; the `!$' conditional compilation sentinels in free form;
 and the `c$', `*$' and `!$' sentinels in fixed form, `gfortran' needs
 to be invoked with the `-fopenmp'. This also arranges for automatic
-linking of the GNU OpenMP runtime library *Note libgomp: (libgomp)Top.
+linking of the GNU OpenMP runtime library *note libgomp: (libgomp)Top.
 
    The OpenMP Fortran runtime library routines are provided both in a
 form of a Fortran 90 module named `omp_lib' and in a form of a Fortran
@@ -2424,7 +2424,7 @@ _Example_:
           end program test_abort
 
 _See also_:
-     *Note EXIT::, *Note KILL::
+     *note EXIT::, *note KILL::
 
 
 
@@ -2562,11 +2562,11 @@ _Example_:
           end program test_achar
 
 _Note_:
-     See *Note ICHAR:: for a discussion of converting between numerical
+     See *note ICHAR:: for a discussion of converting between numerical
      values and formatted string representations.
 
 _See also_:
-     *Note CHAR::, *Note IACHAR::, *Note ICHAR::
+     *note CHAR::, *note IACHAR::, *note ICHAR::
 
 
 
@@ -2606,7 +2606,7 @@ _Specific names_:
      `DACOS(X)'    `REAL(8) X'   `REAL(8)'     F77 and later
 
 _See also_:
-     Inverse function: *Note COS::
+     Inverse function: *note COS::
 
 
 
@@ -2647,7 +2647,7 @@ _Specific names_:
      `DACOSH(X)'   `REAL(8) X'   `REAL(8)'     GNU extension
 
 _See also_:
-     Inverse function: *Note COSH::
+     Inverse function: *note COSH::
 
 
 File: gfortran.info,  Node: ADJUSTL,  Next: ADJUSTR,  Prev: ACOSH,  Up: Intrinsic Procedures
@@ -2684,7 +2684,7 @@ _Example_:
           end program test_adjustl
 
 _See also_:
-     *Note ADJUSTR::, *Note TRIM::
+     *note ADJUSTR::, *note TRIM::
 
 
 File: gfortran.info,  Node: ADJUSTR,  Next: AIMAG,  Prev: ADJUSTL,  Up: Intrinsic Procedures
@@ -2721,7 +2721,7 @@ _Example_:
           end program test_adjustr
 
 _See also_:
-     *Note ADJUSTL::, *Note TRIM::
+     *note ADJUSTL::, *note TRIM::
 
 
 File: gfortran.info,  Node: AIMAG,  Next: AINT,  Prev: ADJUSTR,  Up: Intrinsic Procedures
@@ -2790,8 +2790,8 @@ _Syntax_:
 _Arguments_:
      X          The type of the argument shall be `REAL(*)'.
      KIND       (Optional) An `INTEGER(*)' initialization
-                                expression indicating the
-                kind parameter of 		      the result.
+                                expression indicating the kind
+                parameter of 		      the result.
 
 _Return value_:
      The return value is of type real with the kind type parameter of
@@ -2967,7 +2967,7 @@ _Description_:
 
      This intrinsic routine is provided for backwards compatibility with
      GNU Fortran 77.  For integer arguments, programmers should consider
-     the use of the *Note IAND:: intrinsic defined by the Fortran
+     the use of the *note IAND:: intrinsic defined by the Fortran
      standard.
 
 _Standard_:
@@ -3000,7 +3000,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     F95 elemental function: *Note IAND::
+     F95 elemental function: *note IAND::
 
 
 File: gfortran.info,  Node: ANINT,  Next: ANY,  Prev: AND,  Up: Intrinsic Procedures
@@ -3024,8 +3024,8 @@ _Syntax_:
 _Arguments_:
      X          The type of the argument shall be `REAL(*)'.
      KIND       (Optional) An `INTEGER(*)' initialization
-                                expression indicating the
-                kind parameter of 		      the result.
+                                expression indicating the kind
+                parameter of 		      the result.
 
 _Return value_:
      The return value is of type real with the kind type parameter of
@@ -3147,7 +3147,7 @@ _Specific names_:
      `DASIN(X)'    `REAL(8) X'   `REAL(8)'     F77 and later
 
 _See also_:
-     Inverse function: *Note SIN::
+     Inverse function: *note SIN::
 
 
 
@@ -3188,7 +3188,7 @@ _Specific names_:
      `DASINH(X)'   `REAL(8) X'   `REAL(8)'     GNU extension.
 
 _See also_:
-     Inverse function: *Note SINH::
+     Inverse function: *note SINH::
 
 
 File: gfortran.info,  Node: ASSOCIATED,  Next: ATAN,  Prev: ASINH,  Up: Intrinsic Procedures
@@ -3260,7 +3260,7 @@ _Example_:
           end program test_associated
 
 _See also_:
-     *Note NULL::
+     *note NULL::
 
 
 File: gfortran.info,  Node: ATAN,  Next: ATAN2,  Prev: ASSOCIATED,  Up: Intrinsic Procedures
@@ -3298,7 +3298,7 @@ _Specific names_:
      `DATAN(X)'    `REAL(8) X'   `REAL(8)'     F77 and later
 
 _See also_:
-     Inverse function: *Note TAN::
+     Inverse function: *note TAN::
 
 
 
@@ -3381,7 +3381,7 @@ _Specific names_:
      `DATANH(X)'   `REAL(8) X'   `REAL(8)'     GNU extension
 
 _See also_:
-     Inverse function: *Note TANH::
+     Inverse function: *note TANH::
 
 
 File: gfortran.info,  Node: BESJ0,  Next: BESJ1,  Prev: ATANH,  Up: Intrinsic Procedures
@@ -3723,7 +3723,7 @@ _Example_:
           end subroutine association_test
 
 _See also_:
-     *Note C_LOC::, *Note C_FUNLOC::
+     *note C_LOC::, *note C_FUNLOC::
 
 
 File: gfortran.info,  Node: C_FUNLOC,  Next: C_LOC,  Prev: C_F_PROCPOINTER,  Up: Intrinsic Procedures
@@ -3775,7 +3775,7 @@ _Example_:
           end program main
 
 _See also_:
-     *Note C_ASSOCIATED::, *Note C_LOC::, *Note C_F_POINTER::, *Note
+     *note C_ASSOCIATED::, *note C_LOC::, *note C_F_POINTER::, *note
      C_F_PROCPOINTER::
 
 
@@ -3802,7 +3802,7 @@ _Syntax_:
 
 _Arguments_:
      CPTR       scalar of the type `C_FUNPTR'. It is
-                `INTENT(IN)'.
+                      `INTENT(IN)'.
      FPTR       procedure pointer interoperable with CPTR. It
                 is 		       `INTENT(OUT)'.
 
@@ -3830,7 +3830,7 @@ _Example_:
           end program main
 
 _See also_:
-     *Note C_LOC::, *Note C_F_POINTER::
+     *note C_LOC::, *note C_F_POINTER::
 
 
 File: gfortran.info,  Node: C_F_POINTER,  Next: C_F_PROCPOINTER,  Prev: C_ASSOCIATED,  Up: Intrinsic Procedures
@@ -3853,14 +3853,14 @@ _Syntax_:
 
 _Arguments_:
      CPTR       scalar of the type `C_PTR'. It is
-                `INTENT(IN)'.
+                      `INTENT(IN)'.
      FPTR       pointer interoperable with CPTR. It is
-                `INTENT(OUT)'.
+                      `INTENT(OUT)'.
      SHAPE      (Optional) Rank-one array of type `INTEGER'
-                                   with `INTENT(IN)'. It
-                shall be present 		       if and only if FPTR is
-                an array. The size 		       must be equal to the
-                rank of FPTR.
+                                   with `INTENT(IN)'. It shall
+                be present 		       if and only if
+                FPTR is an array. The size
+                must be equal to the rank of FPTR.
 
 _Example_:
           program main
@@ -3879,7 +3879,7 @@ _Example_:
           end program main
 
 _See also_:
-     *Note C_LOC::, *Note C_F_PROCPOINTER::
+     *note C_LOC::, *note C_F_PROCPOINTER::
 
 
 File: gfortran.info,  Node: C_LOC,  Next: CEILING,  Prev: C_FUNLOC,  Up: Intrinsic Procedures
@@ -3901,8 +3901,8 @@ _Syntax_:
 
 _Arguments_:
      X          Associated scalar pointer or interoperable
-                scalar 		   or allocated allocatable variable
-                with `TARGET' 		   attribute.
+                scalar 		   or allocated allocatable
+                variable with `TARGET' 		   attribute.
 
 _Return value_:
      The return value is of type `C_PTR' and contains the C address of
@@ -3919,7 +3919,7 @@ _Example_:
           end subroutine association_test
 
 _See also_:
-     *Note C_ASSOCIATED::, *Note C_FUNLOC::, *Note C_F_POINTER::, *Note
+     *note C_ASSOCIATED::, *note C_FUNLOC::, *note C_F_POINTER::, *note
      C_F_PROCPOINTER::
 
 
@@ -3943,8 +3943,8 @@ _Syntax_:
 _Arguments_:
      X          The type shall be `REAL(*)'.
      KIND       (Optional) An `INTEGER(*)' initialization
-                                expression indicating the
-                kind parameter of 		      the result.
+                                expression indicating the kind
+                parameter of 		      the result.
 
 _Return value_:
      The return value is of type `INTEGER(KIND)'
@@ -3958,7 +3958,7 @@ _Example_:
           end program test_ceiling
 
 _See also_:
-     *Note FLOOR::, *Note NINT::
+     *note FLOOR::, *note NINT::
 
 
 
@@ -3983,8 +3983,8 @@ _Syntax_:
 _Arguments_:
      I          The type shall be `INTEGER(*)'.
      KIND       (Optional) An `INTEGER(*)' initialization
-                                expression indicating the
-                kind parameter of 		      the result.
+                                expression indicating the kind
+                parameter of 		      the result.
 
 _Return value_:
      The return value is of type `CHARACTER(1)'
@@ -3998,11 +3998,11 @@ _Example_:
           end program test_char
 
 _Note_:
-     See *Note ICHAR:: for a discussion of converting between numerical
+     See *note ICHAR:: for a discussion of converting between numerical
      values and formatted string representations.
 
 _See also_:
-     *Note ACHAR::, *Note IACHAR::, *Note ICHAR::
+     *note ACHAR::, *note IACHAR::, *note ICHAR::
 
 
 
@@ -4029,8 +4029,8 @@ _Syntax_:
 
 _Arguments_:
      NAME       The type shall be `CHARACTER(*)' and shall
-                                   specify a valid path
-                within the file system.
+                                   specify a valid path within
+                the file system.
      STATUS     (Optional) `INTEGER' status flag of the default
                                        kind.  Returns 0 on
                 success, and a system specific
@@ -4047,7 +4047,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note GETCWD::
+     *note GETCWD::
 
 
 File: gfortran.info,  Node: CHMOD,  Next: CMPLX,  Prev: CHDIR,  Up: Intrinsic Procedures
@@ -4134,8 +4134,8 @@ _Arguments_:
                        `COMPLEX(*)'.)  May be `INTEGER(*)'
                   or `REAL(*)'.
      KIND       (Optional) An `INTEGER(*)' initialization
-                                expression indicating the
-                kind parameter of 		      the result.
+                                expression indicating the kind
+                parameter of 		      the result.
 
 _Return value_:
      The return value is of `COMPLEX' type, with a kind equal to KIND
@@ -4152,7 +4152,7 @@ _Example_:
           end program test_cmplx
 
 _See also_:
-     *Note COMPLEX::
+     *note COMPLEX::
 
 
 File: gfortran.info,  Node: COMMAND_ARGUMENT_COUNT,  Next: COMPLEX,  Prev: CMPLX,  Up: Intrinsic Procedures
@@ -4187,7 +4187,7 @@ _Example_:
           end program test_command_argument_count
 
 _See also_:
-     *Note GET_COMMAND::, *Note GET_COMMAND_ARGUMENT::
+     *note GET_COMMAND::, *note GET_COMMAND_ARGUMENT::
 
 
 File: gfortran.info,  Node: COMPLEX,  Next: CONJG,  Prev: COMMAND_ARGUMENT_COUNT,  Up: Intrinsic Procedures
@@ -4229,7 +4229,7 @@ _Example_:
           end program test_complex
 
 _See also_:
-     *Note CMPLX::
+     *note CMPLX::
 
 
 File: gfortran.info,  Node: CONJG,  Next: COS,  Prev: COMPLEX,  Up: Intrinsic Procedures
@@ -4313,7 +4313,7 @@ _Specific names_:
                    X'                          
 
 _See also_:
-     Inverse function: *Note ACOS::
+     Inverse function: *note ACOS::
 
 
 
@@ -4352,7 +4352,7 @@ _Specific names_:
      `DCOSH(X)'    `REAL(8) X'   `REAL(8)'     F77 and later
 
 _See also_:
-     Inverse function: *Note ACOSH::
+     Inverse function: *note ACOSH::
 
 
 
@@ -4456,7 +4456,7 @@ _Example_:
           end program test_cpu_time
 
 _See also_:
-     *Note SYSTEM_CLOCK::, *Note DATE_AND_TIME::
+     *note SYSTEM_CLOCK::, *note DATE_AND_TIME::
 
 
 File: gfortran.info,  Node: CSHIFT,  Next: CTIME,  Prev: CPU_TIME,  Up: Intrinsic Procedures
@@ -4549,7 +4549,7 @@ _Example_:
           end program test_ctime
 
 _See Also_:
-     *Note GMTIME::, *Note LTIME::, *Note TIME::, *Note TIME8::
+     *note GMTIME::, *note LTIME::, *note TIME::, *note TIME8::
 
 
 File: gfortran.info,  Node: DATE_AND_TIME,  Next: DBLE,  Prev: CTIME,  Up: Intrinsic Procedures
@@ -4615,7 +4615,7 @@ _Example_:
           end program test_time_and_date
 
 _See also_:
-     *Note CPU_TIME::, *Note SYSTEM_CLOCK::
+     *note CPU_TIME::, *note SYSTEM_CLOCK::
 
 
 File: gfortran.info,  Node: DBLE,  Next: DCMPLX,  Prev: DATE_AND_TIME,  Up: Intrinsic Procedures
@@ -4651,7 +4651,7 @@ _Example_:
           end program test_dble
 
 _See also_:
-     *Note DFLOAT::, *Note FLOAT::, *Note REAL::
+     *note DFLOAT::, *note FLOAT::, *note REAL::
 
 
 File: gfortran.info,  Node: DCMPLX,  Next: DFLOAT,  Prev: DBLE,  Up: Intrinsic Procedures
@@ -4727,7 +4727,7 @@ _Example_:
           end program test_dfloat
 
 _See also_:
-     *Note DBLE::, *Note FLOAT::, *Note REAL::
+     *note DBLE::, *note FLOAT::, *note REAL::
 
 
 File: gfortran.info,  Node: DIGITS,  Next: DIM,  Prev: DFLOAT,  Up: Intrinsic Procedures
@@ -4918,7 +4918,7 @@ _Example_:
           end program test_dreal
 
 _See also_:
-     *Note AIMAG::
+     *note AIMAG::
 
 
 
@@ -4998,7 +4998,7 @@ _Example_:
           end program test_dtime
 
 _See also_:
-     *Note CPU_TIME::
+     *note CPU_TIME::
 
 
 
@@ -5228,7 +5228,7 @@ _Example_:
           end program test_etime
 
 _See also_:
-     *Note CPU_TIME::
+     *note CPU_TIME::
 
 
 
@@ -5265,7 +5265,7 @@ _Example_:
           end program test_exit
 
 _See also_:
-     *Note ABORT::, *Note KILL::
+     *note ABORT::, *note KILL::
 
 
 File: gfortran.info,  Node: EXP,  Next: EXPONENT,  Prev: EXIT,  Up: Intrinsic Procedures
@@ -5416,7 +5416,7 @@ _Example_:
           end program test_float
 
 _See also_:
-     *Note DBLE::, *Note DFLOAT::, *Note REAL::
+     *note DBLE::, *note DFLOAT::, *note REAL::
 
 
 File: gfortran.info,  Node: FGET,  Next: FGETC,  Prev: FDATE,  Up: Intrinsic Procedures
@@ -5437,7 +5437,7 @@ _Description_:
      compatibility with `g77'.  GNU Fortran provides the Fortran 2003
      Stream facility.  Programmers should consider the use of new
      stream IO feature in new code for future portability. See also
-     *Note Fortran 2003 status::.
+     *note Fortran 2003 status::.
 
 _Standard_:
      GNU extension
@@ -5451,8 +5451,8 @@ _Syntax_:
 _Arguments_:
      C          The type shall be `CHARACTER'.
      STATUS     (Optional) status flag of type `INTEGER'.
-                                   Returns 0 on success, -1
-                on end-of-file, and a
+                                   Returns 0 on success, -1 on
+                end-of-file, and a
                 system specific positive error code otherwise.
 
 _Example_:
@@ -5471,7 +5471,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note FGETC::, *Note FPUT::, *Note FPUTC::
+     *note FGETC::, *note FPUT::, *note FPUTC::
 
 
 File: gfortran.info,  Node: FGETC,  Next: FLOAT,  Prev: FGET,  Up: Intrinsic Procedures
@@ -5492,7 +5492,7 @@ _Description_:
      compatibility with `g77'.  GNU Fortran provides the Fortran 2003
      Stream facility.  Programmers should consider the use of new
      stream IO feature in new code for future portability. See also
-     *Note Fortran 2003 status::.
+     *note Fortran 2003 status::.
 
 _Standard_:
      GNU extension
@@ -5526,7 +5526,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note FGET::, *Note FPUT::, *Note FPUTC::
+     *note FGET::, *note FPUT::, *note FPUTC::
 
 
 File: gfortran.info,  Node: FLOOR,  Next: FLUSH,  Prev: FLOAT,  Up: Intrinsic Procedures
@@ -5549,8 +5549,8 @@ _Syntax_:
 _Arguments_:
      X          The type shall be `REAL(*)'.
      KIND       (Optional) An `INTEGER(*)' initialization
-                                expression indicating the
-                kind parameter of 		      the result.
+                                expression indicating the kind
+                parameter of 		      the result.
 
 _Return value_:
      The return value is of type `INTEGER(KIND)'
@@ -5564,7 +5564,7 @@ _Example_:
           end program test_floor
 
 _See also_:
-     *Note CEILING::, *Note NINT::
+     *note CEILING::, *note NINT::
 
 
 
@@ -5648,7 +5648,7 @@ _Description_:
      compatibility with `g77'.  GNU Fortran provides the Fortran 2003
      Stream facility.  Programmers should consider the use of new
      stream IO feature in new code for future portability. See also
-     *Note Fortran 2003 status::.
+     *note Fortran 2003 status::.
 
 _Standard_:
      GNU extension
@@ -5676,7 +5676,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note FPUTC::, *Note FGET::, *Note FGETC::
+     *note FPUTC::, *note FGET::, *note FGETC::
 
 
 File: gfortran.info,  Node: FPUTC,  Next: FRACTION,  Prev: FPUT,  Up: Intrinsic Procedures
@@ -5697,7 +5697,7 @@ _Description_:
      compatibility with `g77'.  GNU Fortran provides the Fortran 2003
      Stream facility.  Programmers should consider the use of new
      stream IO feature in new code for future portability. See also
-     *Note Fortran 2003 status::.
+     *note Fortran 2003 status::.
 
 _Standard_:
      GNU extension
@@ -5729,7 +5729,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note FPUT::, *Note FGET::, *Note FGETC::
+     *note FPUT::, *note FGET::, *note FGETC::
 
 
 File: gfortran.info,  Node: FRACTION,  Next: FREE,  Prev: FPUTC,  Up: Intrinsic Procedures
@@ -5800,7 +5800,7 @@ _Example_:
      See `MALLOC' for an example.
 
 _See also_:
-     *Note MALLOC::
+     *note MALLOC::
 
 
 File: gfortran.info,  Node: FSEEK,  Next: FSTAT,  Prev: FREE,  Up: Intrinsic Procedures
@@ -5827,7 +5827,7 @@ _Description_:
 
      Please note that GNU Fortran provides the Fortran 2003 Stream
      facility.  Programmers should consider the use of new stream IO
-     feature in new code for future portability. See also *Note Fortran
+     feature in new code for future portability. See also *note Fortran
      2003 status::.
 
 _Standard_:
@@ -5870,7 +5870,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note FTELL::
+     *note FTELL::
 
 
 File: gfortran.info,  Node: FSTAT,  Next: FTELL,  Prev: FSEEK,  Up: Intrinsic Procedures
@@ -5879,10 +5879,10 @@ File: gfortran.info,  Node: FSTAT,  Next: FTELL,  Prev: FSEEK,  Up: Intrinsic Pr
 ===============================
 
 _Description_:
-     `FSTAT' is identical to *Note STAT::, except that information
+     `FSTAT' is identical to *note STAT::, except that information
      about an already opened file is obtained.
 
-     The elements in `BUFF' are the same as described by *Note STAT::.
+     The elements in `BUFF' are the same as described by *note STAT::.
 
      This intrinsic is provided in both subroutine and function forms;
      however, only one form can be used in any given program unit.
@@ -5904,10 +5904,10 @@ _Arguments_:
                 and a system specific error code otherwise.
 
 _Example_:
-     See *Note STAT:: for an example.
+     See *note STAT:: for an example.
 
 _See also_:
-     To stat a link: *Note LSTAT::, to stat a file: *Note STAT::
+     To stat a link: *note LSTAT::, to stat a file: *note STAT::
 
 
 File: gfortran.info,  Node: FTELL,  Next: GAMMA,  Prev: FSTAT,  Up: Intrinsic Procedures
@@ -5948,7 +5948,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note FSEEK::
+     *note FSEEK::
 
 
 File: gfortran.info,  Node: GAMMA,  Next: GERROR,  Prev: FTELL,  Up: Intrinsic Procedures
@@ -5989,7 +5989,7 @@ _Specific names_:
      `DGAMMA(X)'   `REAL(8) X'   `REAL(8)'     GNU Extension
 
 _See also_:
-     Logarithm of the Gamma function: *Note LGAMMA::
+     Logarithm of the Gamma function: *note LGAMMA::
 
 
 
@@ -6022,7 +6022,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note IERRNO::, *Note PERROR::
+     *note IERRNO::, *note PERROR::
 
 
 File: gfortran.info,  Node: GETARG,  Next: GET_COMMAND,  Prev: GERROR,  Up: Intrinsic Procedures
@@ -6036,7 +6036,7 @@ _Description_:
 
      This intrinsic routine is provided for backwards compatibility with
      GNU Fortran 77.  In new code, programmers should consider the use
-     of the *Note GET_COMMAND_ARGUMENT:: intrinsic defined by the
+     of the *note GET_COMMAND_ARGUMENT:: intrinsic defined by the
      Fortran 2003 standard.
 
 _Standard_:
@@ -6073,10 +6073,10 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     GNU Fortran 77 compatibility function: *Note IARGC::
+     GNU Fortran 77 compatibility function: *note IARGC::
 
-     F2003 functions and subroutines: *Note GET_COMMAND::, *Note
-     GET_COMMAND_ARGUMENT::, *Note COMMAND_ARGUMENT_COUNT::
+     F2003 functions and subroutines: *note GET_COMMAND::, *note
+     GET_COMMAND_ARGUMENT::, *note COMMAND_ARGUMENT_COUNT::
 
 
 File: gfortran.info,  Node: GET_COMMAND,  Next: GET_COMMAND_ARGUMENT,  Prev: GETARG,  Up: Intrinsic Procedures
@@ -6112,7 +6112,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note GET_COMMAND_ARGUMENT::, *Note COMMAND_ARGUMENT_COUNT::
+     *note GET_COMMAND_ARGUMENT::, *note COMMAND_ARGUMENT_COUNT::
 
 
 File: gfortran.info,  Node: GET_COMMAND_ARGUMENT,  Next: GETCWD,  Prev: GET_COMMAND,  Up: Intrinsic Procedures
@@ -6161,7 +6161,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note GET_COMMAND::, *Note COMMAND_ARGUMENT_COUNT::
+     *note GET_COMMAND::, *note COMMAND_ARGUMENT_COUNT::
 
 
 File: gfortran.info,  Node: GETCWD,  Next: GETENV,  Prev: GET_COMMAND_ARGUMENT,  Up: Intrinsic Procedures
@@ -6198,7 +6198,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note CHDIR::
+     *note CHDIR::
 
 
 File: gfortran.info,  Node: GETENV,  Next: GET_ENVIRONMENT_VARIABLE,  Prev: GETCWD,  Up: Intrinsic Procedures
@@ -6211,7 +6211,7 @@ _Description_:
 
      This intrinsic routine is provided for backwards compatibility with
      GNU Fortran 77.  In new code, programmers should consider the use
-     of the *Note GET_ENVIRONMENT_VARIABLE:: intrinsic defined by the
+     of the *note GET_ENVIRONMENT_VARIABLE:: intrinsic defined by the
      Fortran 2003 standard.
 
 _Standard_:
@@ -6240,7 +6240,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note GET_ENVIRONMENT_VARIABLE::
+     *note GET_ENVIRONMENT_VARIABLE::
 
 
 File: gfortran.info,  Node: GET_ENVIRONMENT_VARIABLE,  Next: GETGID,  Prev: GETENV,  Up: Intrinsic Procedures
@@ -6301,7 +6301,7 @@ _Example_:
      See `GETPID' for an example.
 
 _See also_:
-     *Note GETPID::, *Note GETUID::
+     *note GETPID::, *note GETUID::
 
 
 File: gfortran.info,  Node: GETLOG,  Next: GETPID,  Prev: GETGID,  Up: Intrinsic Procedures
@@ -6338,7 +6338,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note GETUID::
+     *note GETUID::
 
 
 File: gfortran.info,  Node: GETPID,  Next: GETUID,  Prev: GETLOG,  Up: Intrinsic Procedures
@@ -6369,7 +6369,7 @@ _Example_:
           end program info
 
 _See also_:
-     *Note GETGID::, *Note GETUID::
+     *note GETGID::, *note GETUID::
 
 
 File: gfortran.info,  Node: GETUID,  Next: GMTIME,  Prev: GETPID,  Up: Intrinsic Procedures
@@ -6396,7 +6396,7 @@ _Example_:
      See `GETPID' for an example.
 
 _See also_:
-     *Note GETPID::, *Note GETLOG::
+     *note GETPID::, *note GETLOG::
 
 
 File: gfortran.info,  Node: GMTIME,  Next: HOSTNM,  Prev: GETUID,  Up: Intrinsic Procedures
@@ -6450,7 +6450,7 @@ _Return value_:
           not       available.
 
 _See also_:
-     *Note CTIME::, *Note LTIME::, *Note TIME::, *Note TIME8::
+     *note CTIME::, *note LTIME::, *note TIME::, *note TIME8::
 
 
 
@@ -6479,9 +6479,9 @@ _Syntax_:
 _Arguments_:
      NAME       Shall of type `CHARACTER(*)'.
      STATUS     (Optional) status flag of type `INTEGER'.
-                                    Returns 0 on success, or
-                a system specific error
-                 code otherwise.
+                                    Returns 0 on success, or a
+                system specific error
+                code otherwise.
 
 _Return value_:
      In either syntax, NAME is set to the current hostname if it can be
@@ -6556,11 +6556,11 @@ _Example_:
           end program test_iachar
 
 _Note_:
-     See *Note ICHAR:: for a discussion of converting between numerical
+     See *note ICHAR:: for a discussion of converting between numerical
      values and formatted string representations.
 
 _See also_:
-     *Note ACHAR::, *Note CHAR::, *Note ICHAR::
+     *note ACHAR::, *note CHAR::, *note ICHAR::
 
 
 
@@ -6600,8 +6600,8 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note IOR::, *Note IEOR::, *Note IBITS::, *Note IBSET::, *Note
-     IBCLR::, *Note NOT::
+     *note IOR::, *note IEOR::, *note IBITS::, *note IBSET::, *note
+     IBCLR::, *note NOT::
 
 
 
@@ -6616,7 +6616,7 @@ _Description_:
 
      This intrinsic routine is provided for backwards compatibility with
      GNU Fortran 77.  In new code, programmers should consider the use
-     of the *Note COMMAND_ARGUMENT_COUNT:: intrinsic defined by the
+     of the *note COMMAND_ARGUMENT_COUNT:: intrinsic defined by the
      Fortran 2003 standard.
 
 _Standard_:
@@ -6635,13 +6635,13 @@ _Return value_:
      The number of command line arguments, type `INTEGER(4)'.
 
 _Example_:
-     See *Note GETARG::
+     See *note GETARG::
 
 _See also_:
-     GNU Fortran 77 compatibility subroutine: *Note GETARG::
+     GNU Fortran 77 compatibility subroutine: *note GETARG::
 
-     F2003 functions and subroutines: *Note GET_COMMAND::, *Note
-     GET_COMMAND_ARGUMENT::, *Note COMMAND_ARGUMENT_COUNT::
+     F2003 functions and subroutines: *note GET_COMMAND::, *note
+     GET_COMMAND_ARGUMENT::, *note COMMAND_ARGUMENT_COUNT::
 
 
 File: gfortran.info,  Node: IBCLR,  Next: IBITS,  Prev: IARGC,  Up: Intrinsic Procedures
@@ -6670,8 +6670,8 @@ _Return value_:
      The return value is of type `INTEGER(*)' and of the same kind as I.
 
 _See also_:
-     *Note IBITS::, *Note IBSET::, *Note IAND::, *Note IOR::, *Note
-     IEOR::, *Note MVBITS::
+     *note IBITS::, *note IBSET::, *note IAND::, *note IOR::, *note
+     IEOR::, *note MVBITS::
 
 
 
@@ -6704,8 +6704,8 @@ _Return value_:
      The return value is of type `INTEGER(*)' and of the same kind as I.
 
 _See also_:
-     *Note BIT_SIZE::, *Note IBCLR::, *Note IBSET::, *Note IAND::,
-     *Note IOR::, *Note IEOR::
+     *note BIT_SIZE::, *note IBCLR::, *note IBSET::, *note IAND::,
+     *note IOR::, *note IEOR::
 
 
 File: gfortran.info,  Node: IBSET,  Next: ICHAR,  Prev: IBITS,  Up: Intrinsic Procedures
@@ -6734,8 +6734,8 @@ _Return value_:
      The return value is of type `INTEGER(*)' and of the same kind as I.
 
 _See also_:
-     *Note IBCLR::, *Note IBITS::, *Note IAND::, *Note IOR::, *Note
-     IEOR::, *Note MVBITS::
+     *note IBCLR::, *note IBITS::, *note IAND::, *note IOR::, *note
+     IEOR::, *note MVBITS::
 
 
 
@@ -6797,7 +6797,7 @@ _Note_:
           end program read_val
 
 _See also_:
-     *Note ACHAR::, *Note CHAR::, *Note IACHAR::
+     *note ACHAR::, *note CHAR::, *note IACHAR::
 
 
 
@@ -6867,8 +6867,8 @@ _Return value_:
      as the larger argument.)
 
 _See also_:
-     *Note IOR::, *Note IAND::, *Note IBITS::, *Note IBSET::, *Note
-     IBCLR::, *Note NOT::
+     *note IOR::, *note IAND::, *note IBITS::, *note IBSET::, *note
+     IBCLR::, *note NOT::
 
 
 File: gfortran.info,  Node: IERRNO,  Next: INDEX intrinsic,  Prev: IEOR,  Up: Intrinsic Procedures
@@ -6897,7 +6897,7 @@ _Return value_:
      kind.
 
 _See also_:
-     *Note PERROR::
+     *note PERROR::
 
 
 File: gfortran.info,  Node: INDEX intrinsic,  Next: INT,  Prev: IERRNO,  Up: Intrinsic Procedures
@@ -6937,7 +6937,7 @@ _Return value_:
      absent, the return value is of default integer kind.
 
 _See also_:
-     *Note SCAN::, *Note VERIFY::
+     *note SCAN::, *note VERIFY::
 
 
 File: gfortran.info,  Node: INT,  Next: INT2,  Prev: INDEX intrinsic,  Up: Intrinsic Procedures
@@ -6961,8 +6961,8 @@ _Arguments_:
      A          Shall be of type `INTEGER(*)',
                      `REAL(*)', or `COMPLEX(*)'.
      KIND       (Optional) An `INTEGER(*)' initialization
-                                expression indicating the
-                kind parameter of 		      the result.
+                                expression indicating the kind
+                parameter of 		      the result.
 
 _Return value_:
      These functions return a `INTEGER(*)' variable or array under the
@@ -7025,7 +7025,7 @@ _Return value_:
      The return value is a `INTEGER(2)' variable.
 
 _See also_:
-     *Note INT::, *Note INT8::, *Note LONG::
+     *note INT::, *note INT8::, *note LONG::
 
 
 File: gfortran.info,  Node: INT8,  Next: IOR,  Prev: INT2,  Up: Intrinsic Procedures
@@ -7055,7 +7055,7 @@ _Return value_:
      The return value is a `INTEGER(8)' variable.
 
 _See also_:
-     *Note INT::, *Note INT2::, *Note LONG::
+     *note INT::, *note INT2::, *note LONG::
 
 
 File: gfortran.info,  Node: IOR,  Next: IRAND,  Prev: INT8,  Up: Intrinsic Procedures
@@ -7087,8 +7087,8 @@ _Return value_:
      as the larger argument.)
 
 _See also_:
-     *Note IEOR::, *Note IAND::, *Note IBITS::, *Note IBSET::, *Note
-     IBCLR::, *Note NOT::
+     *note IEOR::, *note IAND::, *note IBITS::, *note IBSET::, *note
+     IBCLR::, *note NOT::
 
 
 File: gfortran.info,  Node: IRAND,  Next: IS_IOSTAT_END,  Prev: IOR,  Up: Intrinsic Procedures
@@ -7106,7 +7106,7 @@ _Description_:
 
      This intrinsic routine is provided for backwards compatibility with
      GNU Fortran 77. It implements a simple modulo generator as provided
-     by `g77'. For new code, one should consider the use of *Note
+     by `g77'. For new code, one should consider the use of *note
      RANDOM_NUMBER:: as it implements a superior algorithm.
 
 _Standard_:
@@ -7244,7 +7244,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note TTYNAM::
+     *note TTYNAM::
 
 
 File: gfortran.info,  Node: ISHFT,  Next: ISHFTC,  Prev: ISATTY,  Up: Intrinsic Procedures
@@ -7278,7 +7278,7 @@ _Return value_:
      The return value is of type `INTEGER(*)' and of the same kind as I.
 
 _See also_:
-     *Note ISHFTC::
+     *note ISHFTC::
 
 
 File: gfortran.info,  Node: ISHFTC,  Next: ISNAN,  Prev: ISHFT,  Up: Intrinsic Procedures
@@ -7316,7 +7316,7 @@ _Return value_:
      The return value is of type `INTEGER(*)' and of the same kind as I.
 
 _See also_:
-     *Note ISHFT::
+     *note ISHFT::
 
 
 File: gfortran.info,  Node: ISNAN,  Next: ITIME,  Prev: ISHFTC,  Up: Intrinsic Procedures
@@ -7415,12 +7415,12 @@ _Arguments_:
      PID        Shall be a scalar `INTEGER', with `INTENT(IN)'
      SIGNAL     Shall be a scalar `INTEGER', with `INTENT(IN)'
      STATUS     (Optional) status flag of type `INTEGER(4)' or
-                                       `INTEGER(8)'. Returns
-                0 on success, or a
+                                       `INTEGER(8)'. Returns 0
+                on success, or a
                 system-specific error code otherwise.
 
 _See also_:
-     *Note ABORT::, *Note EXIT::
+     *note ABORT::, *note EXIT::
 
 
 File: gfortran.info,  Node: KIND,  Next: LBOUND,  Prev: KILL,  Up: Intrinsic Procedures
@@ -7495,7 +7495,7 @@ _Return value_:
      bound is taken to be 1.
 
 _See also_:
-     *Note UBOUND::
+     *note UBOUND::
 
 
 File: gfortran.info,  Node: LEN,  Next: LEN_TRIM,  Prev: LBOUND,  Up: Intrinsic Procedures
@@ -7530,7 +7530,7 @@ _Return value_:
      absent, the return value is of default integer kind.
 
 _See also_:
-     *Note LEN_TRIM::, *Note ADJUSTL::, *Note ADJUSTR::
+     *note LEN_TRIM::, *note ADJUSTL::, *note ADJUSTR::
 
 
 File: gfortran.info,  Node: LEN_TRIM,  Next: LGAMMA,  Prev: LEN,  Up: Intrinsic Procedures
@@ -7563,7 +7563,7 @@ _Return value_:
      absent, the return value is of default integer kind.
 
 _See also_:
-     *Note LEN::, *Note ADJUSTL::, *Note ADJUSTR::
+     *note LEN::, *note ADJUSTL::, *note ADJUSTR::
 
 
 File: gfortran.info,  Node: LGAMMA,  Next: LGE,  Prev: LEN_TRIM,  Up: Intrinsic Procedures
@@ -7604,7 +7604,7 @@ _Specific names_:
      `DLGAMA(X)'   `REAL(8) X'   `REAL(8)'     GNU Extension
 
 _See also_:
-     Gamma function: *Note GAMMA::
+     Gamma function: *note GAMMA::
 
 
 
@@ -7644,7 +7644,7 @@ _Return value_:
      otherwise, based on the ASCII ordering.
 
 _See also_:
-     *Note LGT::, *Note LLE::, *Note LLT::
+     *note LGT::, *note LLE::, *note LLT::
 
 
 File: gfortran.info,  Node: LGT,  Next: LINK,  Prev: LGE,  Up: Intrinsic Procedures
@@ -7683,7 +7683,7 @@ _Return value_:
      otherwise, based on the ASCII ordering.
 
 _See also_:
-     *Note LGE::, *Note LLE::, *Note LLT::
+     *note LGE::, *note LLE::, *note LLT::
 
 
 File: gfortran.info,  Node: LINK,  Next: LLE,  Prev: LGT,  Up: Intrinsic Procedures
@@ -7717,7 +7717,7 @@ _Arguments_:
      STATUS     (Optional) Shall be of default `INTEGER' type.
 
 _See also_:
-     *Note SYMLNK::, *Note UNLINK::
+     *note SYMLNK::, *note UNLINK::
 
 
 File: gfortran.info,  Node: LLE,  Next: LLT,  Prev: LINK,  Up: Intrinsic Procedures
@@ -7757,7 +7757,7 @@ _Return value_:
      otherwise, based on the ASCII ordering.
 
 _See also_:
-     *Note LGE::, *Note LGT::, *Note LLT::
+     *note LGE::, *note LGT::, *note LLT::
 
 
 File: gfortran.info,  Node: LLT,  Next: LNBLNK,  Prev: LLE,  Up: Intrinsic Procedures
@@ -7796,7 +7796,7 @@ _Return value_:
      otherwise, based on the ASCII ordering.
 
 _See also_:
-     *Note LGE::, *Note LGT::, *Note LLE::
+     *note LGE::, *note LGT::, *note LLE::
 
 
 File: gfortran.info,  Node: LNBLNK,  Next: LOC,  Prev: LLT,  Up: Intrinsic Procedures
@@ -7826,7 +7826,7 @@ _Return value_:
      The return value is of `INTEGER(kind=4)' type.
 
 _See also_:
-     *Note INDEX intrinsic::, *Note LEN_TRIM::
+     *note INDEX intrinsic::, *note LEN_TRIM::
 
 
 File: gfortran.info,  Node: LOC,  Next: LOG,  Prev: LNBLNK,  Up: Intrinsic Procedures
@@ -7962,8 +7962,8 @@ _Syntax_:
 _Arguments_:
      L          The type shall be `LOGICAL(*)'.
      KIND       (Optional) An `INTEGER(*)' initialization
-                                expression indicating the
-                kind parameter of 		      the result.
+                                expression indicating the kind
+                parameter of 		      the result.
 
 _Return value_:
      The return value is a `LOGICAL' value equal to L, with a kind
@@ -7971,7 +7971,7 @@ _Return value_:
      not given.
 
 _See also_:
-     *Note INT::, *Note REAL::, *Note CMPLX::
+     *note INT::, *note REAL::, *note CMPLX::
 
 
 File: gfortran.info,  Node: LONG,  Next: LSHIFT,  Prev: LOGICAL,  Up: Intrinsic Procedures
@@ -8002,7 +8002,7 @@ _Return value_:
      The return value is a `INTEGER(4)' variable.
 
 _See also_:
-     *Note INT::, *Note INT2::, *Note INT8::
+     *note INT::, *note INT2::, *note INT8::
 
 
 File: gfortran.info,  Node: LSHIFT,  Next: LSTAT,  Prev: LONG,  Up: Intrinsic Procedures
@@ -8037,7 +8037,7 @@ _Return value_:
      The return value is of type `INTEGER(*)' and of the same kind as I.
 
 _See also_:
-     *Note ISHFT::, *Note ISHFTC::, *Note RSHIFT::
+     *note ISHFT::, *note ISHFTC::, *note RSHIFT::
 
 
 
@@ -8047,11 +8047,11 @@ File: gfortran.info,  Node: LSTAT,  Next: LTIME,  Prev: LSHIFT,  Up: Intrinsic P
 ================================
 
 _Description_:
-     `LSTAT' is identical to *Note STAT::, except that if path is a
+     `LSTAT' is identical to *note STAT::, except that if path is a
      symbolic link, then the link itself is statted, not the file that
      it refers to.
 
-     The elements in `BUFF' are the same as described by *Note STAT::.
+     The elements in `BUFF' are the same as described by *note STAT::.
 
      This intrinsic is provided in both subroutine and function forms;
      however, only one form can be used in any given program unit.
@@ -8074,10 +8074,10 @@ _Arguments_:
                 and a system specific error code otherwise.
 
 _Example_:
-     See *Note STAT:: for an example.
+     See *note STAT:: for an example.
 
 _See also_:
-     To stat an open file: *Note FSTAT::, to stat a file: *Note STAT::
+     To stat an open file: *note FSTAT::, to stat a file: *note STAT::
 
 
 File: gfortran.info,  Node: LTIME,  Next: MALLOC,  Prev: LSTAT,  Up: Intrinsic Procedures
@@ -8130,7 +8130,7 @@ _Return value_:
           not       available.
 
 _See also_:
-     *Note CTIME::, *Note GMTIME::, *Note TIME::, *Note TIME8::
+     *note CTIME::, *note GMTIME::, *note TIME::, *note TIME8::
 
 
 
@@ -8190,7 +8190,7 @@ _Example_:
           end program test_malloc
 
 _See also_:
-     *Note FREE::
+     *note FREE::
 
 
 File: gfortran.info,  Node: MATMUL,  Next: MAX,  Prev: MALLOC,  Up: Intrinsic Procedures
@@ -8213,15 +8213,16 @@ _Syntax_:
 _Arguments_:
      MATRIX_A   An array of `INTEGER(*)',
                     `REAL(*)', `COMPLEX(*)', or
-                `LOGICAL(*)' type, with a rank of 			  one or two.
+                 `LOGICAL(*)' type, with a rank of
+                 one or two.
      MATRIX_B   An array of `INTEGER(*)',
                     `REAL(*)', or `COMPLEX(*)' type if
-                 MATRIX_A is of a numeric type; 			  otherwise,
-                an array of `LOGICAL(*)' 			  type. The
-                rank shall be one or two, and the 			  first (or
-                only) dimension of MATRIX_B 			  shall be
-                equal to the last (or only)
-                dimension of MATRIX_A.
+                 MATRIX_A is of a numeric type;
+                 otherwise, an array of `LOGICAL(*)'
+                 type. The rank shall be one or two, and the
+                 first (or only) dimension of MATRIX_B
+                 shall be equal to the last (or only)
+                 dimension of MATRIX_A.
 
 _Return value_:
      The matrix product of MATRIX_A and MATRIX_B.  The type and kind of
@@ -8253,8 +8254,9 @@ _Arguments_:
                                `REAL(*)'.
      A2, A3,    An expression of the same type and kind
      ...                             as A1.  (As a GNU
-                extension, 			     arguments of different
-                kinds are 			     permitted.)
+                extension, 			     arguments
+                of different kinds are
+                permitted.)
 
 _Return value_:
      The return value corresponds to the maximum value among the
@@ -8273,7 +8275,7 @@ _Specific names_:
                    X'                          
 
 _See also_:
-     *Note MAXLOC:: *Note MAXVAL::, *Note MIN::
+     *note MAXLOC:: *note MAXVAL::, *note MIN::
 
 
 
@@ -8344,9 +8346,9 @@ _Arguments_:
      ARRAY      Shall be an array of type `INTEGER(*)',
                                `REAL(*)', or `CHARACTER(*)'.
      DIM        (Optional) Shall be a scalar of type
-                            `INTEGER(*)', with a value
-                between one 		       and the rank of
-                ARRAY, inclusive.  It 		       may not be an
+                            `INTEGER(*)', with a value between
+                one 		       and the rank of ARRAY,
+                inclusive.  It 		       may not be an
                 optional dummy argument.
      MASK       Shall be an array of type `LOGICAL(*)',
                                and conformable with ARRAY.
@@ -8360,7 +8362,7 @@ _Return value_:
      scalar.  In all cases, the result is of default `INTEGER' type.
 
 _See also_:
-     *Note MAX::, *Note MAXVAL::
+     *note MAX::, *note MAXVAL::
 
 
 
@@ -8393,9 +8395,9 @@ _Arguments_:
      ARRAY      Shall be an array of type `INTEGER(*)',
                                `REAL(*)', or `CHARACTER(*)'.
      DIM        (Optional) Shall be a scalar of type
-                            `INTEGER(*)', with a value
-                between one 		       and the rank of
-                ARRAY, inclusive.  It 		       may not be an
+                            `INTEGER(*)', with a value between
+                one 		       and the rank of ARRAY,
+                inclusive.  It 		       may not be an
                 optional dummy argument.
      MASK       Shall be an array of type `LOGICAL(*)',
                                and conformable with ARRAY.
@@ -8408,7 +8410,7 @@ _Return value_:
      is of the same type and kind as ARRAY.
 
 _See also_:
-     *Note MAX::, *Note MAXLOC::
+     *note MAX::, *note MAXLOC::
 
 
 File: gfortran.info,  Node: MCLOCK,  Next: MCLOCK8,  Prev: MAXVAL,  Up: Intrinsic Procedures
@@ -8441,8 +8443,8 @@ _Return value_:
      the system does not support `clock(3)'.
 
 _See also_:
-     *Note CTIME::, *Note GMTIME::, *Note LTIME::, *Note MCLOCK::,
-     *Note TIME::
+     *note CTIME::, *note GMTIME::, *note LTIME::, *note MCLOCK::,
+     *note TIME::
 
 
 
@@ -8479,8 +8481,8 @@ _Return value_:
      the system does not support `clock(3)'.
 
 _See also_:
-     *Note CTIME::, *Note GMTIME::, *Note LTIME::, *Note MCLOCK::,
-     *Note TIME8::
+     *note CTIME::, *note GMTIME::, *note LTIME::, *note MCLOCK::,
+     *note TIME8::
 
 
 
@@ -8536,8 +8538,9 @@ _Arguments_:
                                `REAL(*)'.
      A2, A3,    An expression of the same type and kind
      ...                             as A1.  (As a GNU
-                extension, 			     arguments of different
-                kinds are 			     permitted.)
+                extension, 			     arguments
+                of different kinds are
+                permitted.)
 
 _Return value_:
      The return value corresponds to the maximum value among the
@@ -8556,7 +8559,7 @@ _Specific names_:
                    X'                          
 
 _See also_:
-     *Note MAX::, *Note MINLOC::, *Note MINVAL::
+     *note MAX::, *note MINLOC::, *note MINVAL::
 
 
 File: gfortran.info,  Node: MINEXPONENT,  Next: MINLOC,  Prev: MIN,  Up: Intrinsic Procedures
@@ -8620,9 +8623,9 @@ _Arguments_:
      ARRAY      Shall be an array of type `INTEGER(*)',
                                `REAL(*)', or `CHARACTER(*)'.
      DIM        (Optional) Shall be a scalar of type
-                            `INTEGER(*)', with a value
-                between one 		       and the rank of
-                ARRAY, inclusive.  It 		       may not be an
+                            `INTEGER(*)', with a value between
+                one 		       and the rank of ARRAY,
+                inclusive.  It 		       may not be an
                 optional dummy argument.
      MASK       Shall be an array of type `LOGICAL(*)',
                                and conformable with ARRAY.
@@ -8636,7 +8639,7 @@ _Return value_:
      scalar.  In all cases, the result is of default `INTEGER' type.
 
 _See also_:
-     *Note MIN::, *Note MINVAL::
+     *note MIN::, *note MINVAL::
 
 
 
@@ -8669,9 +8672,9 @@ _Arguments_:
      ARRAY      Shall be an array of type `INTEGER(*)',
                                `REAL(*)', or `CHARACTER(*)'.
      DIM        (Optional) Shall be a scalar of type
-                            `INTEGER(*)', with a value
-                between one 		       and the rank of
-                ARRAY, inclusive.  It 		       may not be an
+                            `INTEGER(*)', with a value between
+                one 		       and the rank of ARRAY,
+                inclusive.  It 		       may not be an
                 optional dummy argument.
      MASK       Shall be an array of type `LOGICAL(*)',
                                and conformable with ARRAY.
@@ -8684,7 +8687,7 @@ _Return value_:
      is of the same type and kind as ARRAY.
 
 _See also_:
-     *Note MIN::, *Note MINLOC::
+     *note MIN::, *note MINLOC::
 
 
 
@@ -8855,8 +8858,8 @@ _Arguments_:
      TOPOS      The type shall be `INTEGER(*)'.
 
 _See also_:
-     *Note IBCLR::, *Note IBSET::, *Note IBITS::, *Note IAND::, *Note
-     IOR::, *Note IEOR::
+     *note IBCLR::, *note IBSET::, *note IBITS::, *note IAND::, *note
+     IOR::, *note IEOR::
 
 
 File: gfortran.info,  Node: NEAREST,  Next: NEW_LINE,  Prev: MVBITS,  Up: Intrinsic Procedures
@@ -8968,7 +8971,7 @@ _Specific names_:
      `IDNINT(X)'       `REAL(8)'         F95 and later
 
 _See also_:
-     *Note CEILING::, *Note FLOOR::
+     *note CEILING::, *note FLOOR::
 
 
 
@@ -8996,8 +8999,8 @@ _Return value_:
      The return type is `INTEGER(*)', of the same kind as the argument.
 
 _See also_:
-     *Note IAND::, *Note IEOR::, *Note IOR::, *Note IBITS::, *Note
-     IBSET::, *Note IBCLR::
+     *note IAND::, *note IEOR::, *note IOR::, *note IBITS::, *note
+     IBSET::, *note IBCLR::
 
 
 
@@ -9035,7 +9038,7 @@ _Example_:
           REAL, POINTER, DIMENSION(:) :: VEC => NULL ()
 
 _See also_:
-     *Note ASSOCIATED::
+     *note ASSOCIATED::
 
 
 File: gfortran.info,  Node: OR,  Next: PACK,  Prev: NULL,  Up: Intrinsic Procedures
@@ -9048,7 +9051,7 @@ _Description_:
 
      This intrinsic routine is provided for backwards compatibility with
      GNU Fortran 77.  For integer arguments, programmers should consider
-     the use of the *Note IOR:: intrinsic defined by the Fortran
+     the use of the *note IOR:: intrinsic defined by the Fortran
      standard.
 
 _Standard_:
@@ -9081,7 +9084,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     F95 elemental function: *Note IOR::
+     F95 elemental function: *note IOR::
 
 
 File: gfortran.info,  Node: PACK,  Next: PERROR,  Prev: OR,  Up: Intrinsic Procedures
@@ -9140,7 +9143,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note UNPACK::
+     *note UNPACK::
 
 
 File: gfortran.info,  Node: PERROR,  Next: PRECISION,  Prev: PACK,  Up: Intrinsic Procedures
@@ -9166,7 +9169,7 @@ _Arguments_:
      STRING     A scalar of default `CHARACTER' type.
 
 _See also_:
-     *Note IERRNO::
+     *note IERRNO::
 
 
 File: gfortran.info,  Node: PRECISION,  Next: PRESENT,  Prev: PERROR,  Up: Intrinsic Procedures
@@ -9288,7 +9291,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note SUM::
+     *note SUM::
 
 
 File: gfortran.info,  Node: RADIX,  Next: RANDOM_NUMBER,  Prev: PRODUCT,  Up: Intrinsic Procedures
@@ -9330,7 +9333,7 @@ File: gfortran.info,  Node: RAN,  Next: REAL,  Prev: RANGE,  Up: Intrinsic Proce
 
 _Description_:
      For compatibility with HP FORTRAN 77/iX, the `RAN' intrinsic is
-     provided as an alias for `RAND'.  See *Note RAND:: for complete
+     provided as an alias for `RAND'.  See *note RAND:: for complete
      documentation.
 
 _Standard_:
@@ -9340,7 +9343,7 @@ _Class_:
      Function
 
 _See also_:
-     *Note RAND::, *Note RANDOM_NUMBER::
+     *note RAND::, *note RANDOM_NUMBER::
 
 
 File: gfortran.info,  Node: RAND,  Next: RANGE,  Prev: RANDOM_SEED,  Up: Intrinsic Procedures
@@ -9357,7 +9360,7 @@ _Description_:
 
      This intrinsic routine is provided for backwards compatibility with
      GNU Fortran 77. It implements a simple modulo generator as provided
-     by `g77'. For new code, one should consider the use of *Note
+     by `g77'. For new code, one should consider the use of *note
      RANDOM_NUMBER:: as it implements a superior algorithm.
 
 _Standard_:
@@ -9385,7 +9388,7 @@ _Example_:
           end program test_rand
 
 _See also_:
-     *Note SRAND::, *Note RANDOM_NUMBER::
+     *note SRAND::, *note RANDOM_NUMBER::
 
 
 
@@ -9438,7 +9441,7 @@ _Example_:
           end program
 
 _See also_:
-     *Note RANDOM_SEED::
+     *note RANDOM_SEED::
 
 
 File: gfortran.info,  Node: RANDOM_SEED,  Next: RAND,  Prev: RANDOM_NUMBER,  Up: Intrinsic Procedures
@@ -9496,7 +9499,7 @@ _Example_:
           END SUBROUTINE
 
 _See also_:
-     *Note RANDOM_NUMBER::
+     *note RANDOM_NUMBER::
 
 
 File: gfortran.info,  Node: RANGE,  Next: RAN,  Prev: RAND,  Up: Intrinsic Procedures
@@ -9552,8 +9555,8 @@ _Arguments_:
      X          Shall be `INTEGER(*)', `REAL(*)', or
                            `COMPLEX(*)'.
      KIND       (Optional) An `INTEGER(*)' initialization
-                                expression indicating the
-                kind parameter of 		      the result.
+                                expression indicating the kind
+                parameter of 		      the result.
 
 _Return value_:
      These functions return a `REAL(*)' variable or array under the
@@ -9578,7 +9581,7 @@ _Example_:
           end program test_real
 
 _See also_:
-     *Note DBLE::, *Note DFLOAT::, *Note FLOAT::
+     *note DBLE::, *note DFLOAT::, *note FLOAT::
 
 
 
@@ -9613,7 +9616,7 @@ _Arguments_:
      STATUS     (Optional) Shall be of default `INTEGER' type.
 
 _See also_:
-     *Note LINK::
+     *note LINK::
 
 
 
@@ -9691,7 +9694,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note SHAPE::
+     *note SHAPE::
 
 
 File: gfortran.info,  Node: RRSPACING,  Next: RSHIFT,  Prev: RESHAPE,  Up: Intrinsic Procedures
@@ -9721,7 +9724,7 @@ _Return value_:
      FLOAT(RADIX(X))**DIGITS(X)'.
 
 _See also_:
-     *Note SPACING::
+     *note SPACING::
 
 
 File: gfortran.info,  Node: RSHIFT,  Next: SCALE,  Prev: RRSPACING,  Up: Intrinsic Procedures
@@ -9756,7 +9759,7 @@ _Return value_:
      The return value is of type `INTEGER(*)' and of the same kind as I.
 
 _See also_:
-     *Note ISHFT::, *Note ISHFTC::, *Note LSHIFT::
+     *note ISHFT::, *note ISHFTC::, *note LSHIFT::
 
 
 
@@ -9836,7 +9839,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note INDEX intrinsic::, *Note VERIFY::
+     *note INDEX intrinsic::, *note VERIFY::
 
 
 File: gfortran.info,  Node: SECNDS,  Next: SECOND,  Prev: SCAN,  Up: Intrinsic Procedures
@@ -9911,7 +9914,7 @@ _Return value_:
      seconds.
 
 _See also_:
-     *Note CPU_TIME::
+     *note CPU_TIME::
 
 
 
@@ -10081,7 +10084,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note RESHAPE::, *Note SIZE::
+     *note RESHAPE::, *note SIZE::
 
 
 File: gfortran.info,  Node: SIGN,  Next: SIGNAL,  Prev: SHAPE,  Up: Intrinsic Procedures
@@ -10214,7 +10217,7 @@ _Specific names_:
                    X'                          
 
 _See also_:
-     *Note ASIN::
+     *note ASIN::
 
 
 File: gfortran.info,  Node: SINH,  Next: SIZE,  Prev: SIN,  Up: Intrinsic Procedures
@@ -10251,7 +10254,7 @@ _Specific names_:
      `DSINH(X)'    `REAL(8) X'   `REAL(8)'     F95 and later
 
 _See also_:
-     *Note ASINH::
+     *note ASINH::
 
 
 File: gfortran.info,  Node: SIZE,  Next: SIZEOF,  Prev: SINH,  Up: Intrinsic Procedures
@@ -10293,7 +10296,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note SHAPE::, *Note RESHAPE::
+     *note SHAPE::, *note RESHAPE::
 
 
 File: gfortran.info,  Node: SIZEOF,  Next: SLEEP,  Prev: SIZE,  Up: Intrinsic Procedures
@@ -10389,7 +10392,7 @@ _Return value_:
      The return value is of type default `REAL'.
 
 _See also_:
-     *Note DBLE::
+     *note DBLE::
 
 
 File: gfortran.info,  Node: SPACING,  Next: SPREAD,  Prev: SNGL,  Up: Intrinsic Procedures
@@ -10426,7 +10429,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note RRSPACING::
+     *note RRSPACING::
 
 
 File: gfortran.info,  Node: SPREAD,  Next: SQRT,  Prev: SPACING,  Up: Intrinsic Procedures
@@ -10467,7 +10470,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note UNPACK::
+     *note UNPACK::
 
 
 File: gfortran.info,  Node: SQRT,  Next: SRAND,  Prev: SPREAD,  Up: Intrinsic Procedures
@@ -10550,7 +10553,7 @@ _Notes_:
      hand) access two independent pseudo-random number generators.
 
 _See also_:
-     *Note RAND::, *Note RANDOM_SEED::, *Note RANDOM_NUMBER::
+     *note RAND::, *note RANDOM_SEED::, *note RANDOM_NUMBER::
 
 
 
@@ -10629,7 +10632,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     To stat an open file: *Note FSTAT::, to stat a link: *Note LSTAT::
+     To stat an open file: *note FSTAT::, to stat a link: *note LSTAT::
 
 
 File: gfortran.info,  Node: SUM,  Next: SYMLNK,  Prev: STAT,  Up: Intrinsic Procedures
@@ -10676,7 +10679,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note PRODUCT::
+     *note PRODUCT::
 
 
 File: gfortran.info,  Node: SYMLNK,  Next: SYSTEM,  Prev: SUM,  Up: Intrinsic Procedures
@@ -10711,7 +10714,7 @@ _Arguments_:
      STATUS     (Optional) Shall be of default `INTEGER' type.
 
 _See also_:
-     *Note LINK::, *Note UNLINK::
+     *note LINK::, *note UNLINK::
 
 
 
@@ -10788,7 +10791,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note DATE_AND_TIME::, *Note CPU_TIME::
+     *note DATE_AND_TIME::, *note CPU_TIME::
 
 
 File: gfortran.info,  Node: TAN,  Next: TANH,  Prev: SYSTEM_CLOCK,  Up: Intrinsic Procedures
@@ -10826,7 +10829,7 @@ _Specific names_:
      `DTAN(X)'     `REAL(8) X'   `REAL(8)'     F95 and later
 
 _See also_:
-     *Note ATAN::
+     *note ATAN::
 
 
 File: gfortran.info,  Node: TANH,  Next: TIME,  Prev: TAN,  Up: Intrinsic Procedures
@@ -10864,7 +10867,7 @@ _Specific names_:
      `DTANH(X)'    `REAL(8) X'   `REAL(8)'     F95 and later
 
 _See also_:
-     *Note ATANH::
+     *note ATANH::
 
 
 File: gfortran.info,  Node: TIME,  Next: TIME8,  Prev: TANH,  Up: Intrinsic Procedures
@@ -10883,7 +10886,7 @@ _Description_:
      become, negative, or numerically less than previous values, during
      a single run of the compiled program.
 
-     See *Note TIME8::, for information on a similar intrinsic that
+     See *note TIME8::, for information on a similar intrinsic that
      might be portable to more GNU Fortran implementations, though to
      fewer Fortran compilers.
 
@@ -10900,8 +10903,8 @@ _Return value_:
      The return value is a scalar of type `INTEGER(4)'.
 
 _See also_:
-     *Note CTIME::, *Note GMTIME::, *Note LTIME::, *Note MCLOCK::,
-     *Note TIME8::
+     *note CTIME::, *note GMTIME::, *note LTIME::, *note MCLOCK::,
+     *note TIME8::
 
 
 
@@ -10936,8 +10939,8 @@ _Return value_:
      The return value is a scalar of type `INTEGER(8)'.
 
 _See also_:
-     *Note CTIME::, *Note GMTIME::, *Note LTIME::, *Note MCLOCK8::,
-     *Note TIME::
+     *note CTIME::, *note GMTIME::, *note LTIME::, *note MCLOCK8::,
+     *note TIME::
 
 
 
@@ -11081,7 +11084,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note ADJUSTL::, *Note ADJUSTR::
+     *note ADJUSTL::, *note ADJUSTR::
 
 
 File: gfortran.info,  Node: TTYNAM,  Next: UBOUND,  Prev: TRIM,  Up: Intrinsic Procedures
@@ -11119,7 +11122,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note ISATTY::
+     *note ISATTY::
 
 
 File: gfortran.info,  Node: UBOUND,  Next: UMASK,  Prev: TTYNAM,  Up: Intrinsic Procedures
@@ -11159,7 +11162,7 @@ _Return value_:
      dimension.
 
 _See also_:
-     *Note LBOUND::
+     *note LBOUND::
 
 
 File: gfortran.info,  Node: UMASK,  Next: UNLINK,  Prev: UBOUND,  Up: Intrinsic Procedures
@@ -11217,7 +11220,7 @@ _Arguments_:
      STATUS     (Optional) Shall be of default `INTEGER' type.
 
 _See also_:
-     *Note LINK::, *Note SYMLNK::
+     *note LINK::, *note SYMLNK::
 
 
 File: gfortran.info,  Node: UNPACK,  Next: VERIFY,  Prev: UNLINK,  Up: Intrinsic Procedures
@@ -11260,7 +11263,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note PACK::, *Note SPREAD::
+     *note PACK::, *note SPREAD::
 
 
 File: gfortran.info,  Node: VERIFY,  Next: XOR,  Prev: UNPACK,  Up: Intrinsic Procedures
@@ -11307,7 +11310,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     *Note SCAN::, *Note INDEX intrinsic::
+     *note SCAN::, *note INDEX intrinsic::
 
 
 File: gfortran.info,  Node: XOR,  Prev: VERIFY,  Up: Intrinsic Procedures
@@ -11320,7 +11323,7 @@ _Description_:
 
      This intrinsic routine is provided for backwards compatibility with
      GNU Fortran 77.  For integer arguments, programmers should consider
-     the use of the *Note IEOR:: intrinsic defined by the Fortran
+     the use of the *note IEOR:: intrinsic defined by the Fortran
      standard.
 
 _Standard_:
@@ -11353,7 +11356,7 @@ _Example_:
           END PROGRAM
 
 _See also_:
-     F95 elemental function: *Note IEOR::
+     F95 elemental function: *note IEOR::
 
 
 File: gfortran.info,  Node: Intrinsic Modules,  Next: Contributing,  Prev: Intrinsic Procedures,  Up: Top
@@ -11479,7 +11482,7 @@ _Standard_:
    The OpenMP Fortran runtime library routines are provided both in a
 form of two Fortran 90 modules, named `OMP_LIB' and `OMP_LIB_KINDS',
 and in a form of a Fortran `include' file named `omp_lib.h'. The
-procedures provided by `OMP_LIB' can be found in the *Note
+procedures provided by `OMP_LIB' can be found in the *note
 Introduction: (libgomp)Top. manual, the named constants defined in the
 `OMP_LIB_KINDS' module are listed below.
 
@@ -13933,291 +13936,291 @@ Keyword Index
 
 
 Tag Table:
-Node: Top2077
-Node: Introduction3294
-Node: About GNU Fortran4039
-Node: GNU Fortran and GCC8097
-Node: Preprocessing and conditional compilation10187
-Node: GNU Fortran and G7711628
-Node: Project Status12201
-Node: Standards14699
-Node: Invoking GNU Fortran15356
-Node: Option Summary17016
-Node: Fortran Dialect Options19910
-Node: Error and Warning Options25653
-Node: Debugging Options31818
-Node: Directory Options33984
-Node: Link Options35511
-Node: Runtime Options36135
-Node: Code Gen Options37838
-Node: Environment Variables48405
-Node: Runtime49008
-Node: GFORTRAN_STDIN_UNIT50227
-Node: GFORTRAN_STDOUT_UNIT50594
-Node: GFORTRAN_STDERR_UNIT50995
-Node: GFORTRAN_USE_STDERR51393
-Node: GFORTRAN_TMPDIR51838
-Node: GFORTRAN_UNBUFFERED_ALL52279
-Node: GFORTRAN_UNBUFFERED_PRECONNECTED52802
-Node: GFORTRAN_SHOW_LOCUS53443
-Node: GFORTRAN_OPTIONAL_PLUS53937
-Node: GFORTRAN_DEFAULT_RECL54412
-Node: GFORTRAN_LIST_SEPARATOR54903
-Node: GFORTRAN_CONVERT_UNIT55512
-Node: GFORTRAN_ERROR_DUMPCORE58387
-Node: GFORTRAN_ERROR_BACKTRACE58934
-Node: Fortran 2003 status59485
-Node: Extensions61154
-Node: Extensions implemented in GNU Fortran61748
-Node: Old-style kind specifications63068
-Node: Old-style variable initialization63933
-Node: Extensions to namelist65245
-Node: X format descriptor without count field67241
-Node: Commas in FORMAT specifications67768
-Node: Missing period in FORMAT specifications68285
-Node: I/O item lists68847
-Node: BOZ literal constants69236
-Node: Real array indices71805
-Node: Unary operators72102
-Node: Implicitly convert LOGICAL and INTEGER values72516
-Node: Hollerith constants support73476
-Node: Cray pointers75248
-Node: CONVERT specifier80658
-Node: OpenMP82660
-Node: Argument list functions84914
-Node: Extensions not implemented in GNU Fortran86508
-Node: STRUCTURE and RECORD87359
-Node: ENCODE and DECODE statements89416
-Node: Intrinsic Procedures90734
-Node: Introduction to Intrinsics104026
-Node: ABORT106339
-Node: ABS107042
-Node: ACCESS108534
-Node: ACHAR110423
-Node: ACOS111363
-Node: ACOSH112293
-Node: ADJUSTL113266
-Node: ADJUSTR114160
-Node: AIMAG115060
-Node: AINT116470
-Node: ALARM117915
-Node: ALL119549
-Node: ALLOCATED121466
-Node: AND122332
-Node: ANINT123494
-Node: ANY124832
-Node: ASIN126761
-Node: ASINH127706
-Node: ASSOCIATED128659
-Node: ATAN131484
-Node: ATAN2132318
-Node: ATANH133597
-Node: BESJ0134579
-Node: BESJ1135493
-Node: BESJN136413
-Node: BESY0137504
-Node: BESY1138362
-Node: BESYN139220
-Node: BIT_SIZE140365
-Node: BTEST141114
-Node: C_ASSOCIATED141962
-Node: C_FUNLOC143149
-Node: C_F_PROCPOINTER144511
-Node: C_F_POINTER146142
-Node: C_LOC147622
-Node: CEILING148741
-Node: CHAR149702
-Node: CHDIR150789
-Node: CHMOD152009
-Node: CMPLX153772
-Node: COMMAND_ARGUMENT_COUNT155311
-Node: COMPLEX156201
-Node: CONJG157356
-Node: COS158365
-Node: COSH159578
-Node: COUNT160396
-Node: CPU_TIME162223
-Node: CSHIFT163576
-Node: CTIME165225
-Node: DATE_AND_TIME166448
-Node: DBLE168811
-Node: DCMPLX169651
-Node: DFLOAT170890
-Node: DIGITS171587
-Node: DIM172531
-Node: DOT_PRODUCT173667
-Node: DPROD175097
-Node: DREAL175816
-Node: DTIME176480
-Node: EOSHIFT179286
-Node: EPSILON181351
-Node: ERF182047
-Node: ERFC182844
-Node: ETIME183659
-Node: EXIT185883
-Node: EXP186742
-Node: EXPONENT187839
-Node: FDATE188585
-Node: FLOAT189805
-Node: FGET190515
-Node: FGETC192308
-Node: FLOOR194056
-Node: FLUSH194998
-Node: FNUM195636
-Node: FPUT196358
-Node: FPUTC197939
-Node: FRACTION199659
-Node: FREE200553
-Node: FSEEK201390
-Node: FSTAT203684
-Node: FTELL204748
-Node: GAMMA205726
-Node: GERROR206755
-Node: GETARG207463
-Node: GET_COMMAND209138
-Node: GET_COMMAND_ARGUMENT210018
-Node: GETCWD211414
-Node: GETENV212351
-Node: GET_ENVIRONMENT_VARIABLE213515
-Node: GETGID214449
-Node: GETLOG214984
-Node: GETPID215813
-Node: GETUID216541
-Node: GMTIME217055
-Node: HOSTNM218610
-Node: HUGE219548
-Node: IACHAR220261
-Node: IAND221409
-Node: IARGC222397
-Node: IBCLR223413
-Node: IBITS224076
-Node: IBSET224996
-Node: ICHAR225654
-Node: IDATE227607
-Node: IEOR228625
-Node: IERRNO229504
-Node: INDEX intrinsic230059
-Node: INT231385
-Node: INT2232909
-Node: INT8233689
-Node: IOR234416
-Node: IRAND235269
-Node: IS_IOSTAT_END236624
-Node: IS_IOSTAT_EOR237710
-Node: ISATTY238826
-Node: ISHFT239613
-Node: ISHFTC240595
-Node: ISNAN241816
-Node: ITIME242564
-Node: KILL243580
-Node: KIND244495
-Node: LBOUND245333
-Node: LEN246617
-Node: LEN_TRIM247683
-Node: LGAMMA248642
-Node: LGE249704
-Node: LGT251007
-Node: LINK252277
-Node: LLE253312
-Node: LLT254609
-Node: LNBLNK255872
-Node: LOC256651
-Node: LOG257382
-Node: LOG10258584
-Node: LOGICAL259450
-Node: LONG260277
-Node: LSHIFT261048
-Node: LSTAT262011
-Node: LTIME263172
-Node: MALLOC264651
-Node: MATMUL266315
-Node: MAX267504
-Node: MAXEXPONENT269009
-Node: MAXLOC269818
-Node: MAXVAL271951
-Node: MCLOCK273743
-Node: MCLOCK8274746
-Node: MERGE275960
-Node: MIN276721
-Node: MINEXPONENT278223
-Node: MINLOC278846
-Node: MINVAL280979
-Node: MOD282745
-Node: MODULO284122
-Node: MOVE_ALLOC285329
-Node: MVBITS286387
-Node: NEAREST287470
-Node: NEW_LINE288586
-Node: NINT289371
-Node: NOT290391
-Node: NULL290973
-Node: OR291857
-Node: PACK293000
-Node: PERROR294985
-Node: PRECISION295575
-Node: PRESENT296394
-Node: PRODUCT297493
-Node: RADIX299020
-Node: RAN299790
-Node: RAND300246
-Node: RANDOM_NUMBER301581
-Node: RANDOM_SEED303311
-Node: RANGE305187
-Node: REAL305807
-Node: RENAME307308
-Node: REPEAT308327
-Node: RESHAPE309052
-Node: RRSPACING310514
-Node: RSHIFT311200
-Node: SCALE312171
-Node: SCAN312938
-Node: SECNDS314467
-Node: SECOND315555
-Node: SELECTED_INT_KIND316430
-Node: SELECTED_REAL_KIND317586
-Node: SET_EXPONENT319525
-Node: SHAPE320514
-Node: SIGN321620
-Node: SIGNAL322696
-Node: SIN324193
-Node: SINH325234
-Node: SIZE325991
-Node: SIZEOF327270
-Node: SLEEP328529
-Node: SNGL329086
-Node: SPACING329750
-Node: SPREAD330758
-Node: SQRT331896
-Node: SRAND333080
-Node: STAT334239
-Node: SUM337354
-Node: SYMLNK338825
-Node: SYSTEM339957
-Node: SYSTEM_CLOCK340905
-Node: TAN342242
-Node: TANH343023
-Node: TIME343835
-Node: TIME8344939
-Node: TINY346076
-Node: TRANSFER346671
-Node: TRANSPOSE348696
-Node: TRIM349380
-Node: TTYNAM350236
-Node: UBOUND351157
-Node: UMASK352498
-Node: UNLINK353086
-Node: UNPACK354063
-Node: VERIFY355343
-Node: XOR357040
-Node: Intrinsic Modules358212
-Node: Contributing363038
-Node: Contributors363890
-Node: Projects365513
-Node: Proposed Extensions366316
-Node: Copying368367
-Node: GNU Free Documentation License405931
-Node: Funding428343
-Node: Option Index430868
-Node: Keyword Index438469
+Node: Top2075
+Node: Introduction3292
+Node: About GNU Fortran4037
+Node: GNU Fortran and GCC8095
+Node: Preprocessing and conditional compilation10185
+Node: GNU Fortran and G7711626
+Node: Project Status12199
+Node: Standards14697
+Node: Invoking GNU Fortran15354
+Node: Option Summary17014
+Node: Fortran Dialect Options19908
+Node: Error and Warning Options25651
+Node: Debugging Options31816
+Node: Directory Options33982
+Node: Link Options35509
+Node: Runtime Options36133
+Node: Code Gen Options37836
+Node: Environment Variables48403
+Node: Runtime49006
+Node: GFORTRAN_STDIN_UNIT50225
+Node: GFORTRAN_STDOUT_UNIT50592
+Node: GFORTRAN_STDERR_UNIT50993
+Node: GFORTRAN_USE_STDERR51391
+Node: GFORTRAN_TMPDIR51836
+Node: GFORTRAN_UNBUFFERED_ALL52277
+Node: GFORTRAN_UNBUFFERED_PRECONNECTED52800
+Node: GFORTRAN_SHOW_LOCUS53441
+Node: GFORTRAN_OPTIONAL_PLUS53935
+Node: GFORTRAN_DEFAULT_RECL54410
+Node: GFORTRAN_LIST_SEPARATOR54901
+Node: GFORTRAN_CONVERT_UNIT55510
+Node: GFORTRAN_ERROR_DUMPCORE58385
+Node: GFORTRAN_ERROR_BACKTRACE58932
+Node: Fortran 2003 status59483
+Node: Extensions61152
+Node: Extensions implemented in GNU Fortran61746
+Node: Old-style kind specifications63066
+Node: Old-style variable initialization63931
+Node: Extensions to namelist65243
+Node: X format descriptor without count field67239
+Node: Commas in FORMAT specifications67766
+Node: Missing period in FORMAT specifications68283
+Node: I/O item lists68845
+Node: BOZ literal constants69234
+Node: Real array indices71803
+Node: Unary operators72100
+Node: Implicitly convert LOGICAL and INTEGER values72514
+Node: Hollerith constants support73474
+Node: Cray pointers75246
+Node: CONVERT specifier80656
+Node: OpenMP82658
+Node: Argument list functions84912
+Node: Extensions not implemented in GNU Fortran86506
+Node: STRUCTURE and RECORD87357
+Node: ENCODE and DECODE statements89414
+Node: Intrinsic Procedures90732
+Node: Introduction to Intrinsics104024
+Node: ABORT106337
+Node: ABS107040
+Node: ACCESS108532
+Node: ACHAR110421
+Node: ACOS111361
+Node: ACOSH112291
+Node: ADJUSTL113264
+Node: ADJUSTR114158
+Node: AIMAG115058
+Node: AINT116468
+Node: ALARM117913
+Node: ALL119547
+Node: ALLOCATED121464
+Node: AND122330
+Node: ANINT123492
+Node: ANY124830
+Node: ASIN126759
+Node: ASINH127704
+Node: ASSOCIATED128657
+Node: ATAN131482
+Node: ATAN2132316
+Node: ATANH133595
+Node: BESJ0134577
+Node: BESJ1135491
+Node: BESJN136411
+Node: BESY0137502
+Node: BESY1138360
+Node: BESYN139218
+Node: BIT_SIZE140363
+Node: BTEST141112
+Node: C_ASSOCIATED141960
+Node: C_FUNLOC143147
+Node: C_F_PROCPOINTER144509
+Node: C_F_POINTER146146
+Node: C_LOC147629
+Node: CEILING148748
+Node: CHAR149709
+Node: CHDIR150796
+Node: CHMOD152016
+Node: CMPLX153779
+Node: COMMAND_ARGUMENT_COUNT155318
+Node: COMPLEX156208
+Node: CONJG157363
+Node: COS158372
+Node: COSH159585
+Node: COUNT160403
+Node: CPU_TIME162230
+Node: CSHIFT163583
+Node: CTIME165232
+Node: DATE_AND_TIME166455
+Node: DBLE168818
+Node: DCMPLX169658
+Node: DFLOAT170897
+Node: DIGITS171594
+Node: DIM172538
+Node: DOT_PRODUCT173674
+Node: DPROD175104
+Node: DREAL175823
+Node: DTIME176487
+Node: EOSHIFT179293
+Node: EPSILON181358
+Node: ERF182054
+Node: ERFC182851
+Node: ETIME183666
+Node: EXIT185890
+Node: EXP186749
+Node: EXPONENT187846
+Node: FDATE188592
+Node: FLOAT189812
+Node: FGET190522
+Node: FGETC192315
+Node: FLOOR194063
+Node: FLUSH195005
+Node: FNUM195643
+Node: FPUT196365
+Node: FPUTC197946
+Node: FRACTION199666
+Node: FREE200560
+Node: FSEEK201397
+Node: FSTAT203691
+Node: FTELL204755
+Node: GAMMA205733
+Node: GERROR206762
+Node: GETARG207470
+Node: GET_COMMAND209145
+Node: GET_COMMAND_ARGUMENT210025
+Node: GETCWD211421
+Node: GETENV212358
+Node: GET_ENVIRONMENT_VARIABLE213522
+Node: GETGID214456
+Node: GETLOG214991
+Node: GETPID215820
+Node: GETUID216548
+Node: GMTIME217062
+Node: HOSTNM218617
+Node: HUGE219554
+Node: IACHAR220267
+Node: IAND221415
+Node: IARGC222403
+Node: IBCLR223419
+Node: IBITS224082
+Node: IBSET225002
+Node: ICHAR225660
+Node: IDATE227613
+Node: IEOR228631
+Node: IERRNO229510
+Node: INDEX intrinsic230065
+Node: INT231391
+Node: INT2232915
+Node: INT8233695
+Node: IOR234422
+Node: IRAND235275
+Node: IS_IOSTAT_END236630
+Node: IS_IOSTAT_EOR237716
+Node: ISATTY238832
+Node: ISHFT239619
+Node: ISHFTC240601
+Node: ISNAN241822
+Node: ITIME242570
+Node: KILL243586
+Node: KIND244501
+Node: LBOUND245339
+Node: LEN246623
+Node: LEN_TRIM247689
+Node: LGAMMA248648
+Node: LGE249710
+Node: LGT251013
+Node: LINK252283
+Node: LLE253318
+Node: LLT254615
+Node: LNBLNK255878
+Node: LOC256657
+Node: LOG257388
+Node: LOG10258590
+Node: LOGICAL259456
+Node: LONG260283
+Node: LSHIFT261054
+Node: LSTAT262017
+Node: LTIME263178
+Node: MALLOC264657
+Node: MATMUL266321
+Node: MAX267508
+Node: MAXEXPONENT269021
+Node: MAXLOC269830
+Node: MAXVAL271963
+Node: MCLOCK273755
+Node: MCLOCK8274758
+Node: MERGE275972
+Node: MIN276733
+Node: MINEXPONENT278243
+Node: MINLOC278866
+Node: MINVAL280999
+Node: MOD282765
+Node: MODULO284142
+Node: MOVE_ALLOC285349
+Node: MVBITS286407
+Node: NEAREST287490
+Node: NEW_LINE288606
+Node: NINT289391
+Node: NOT290411
+Node: NULL290993
+Node: OR291877
+Node: PACK293020
+Node: PERROR295005
+Node: PRECISION295595
+Node: PRESENT296414
+Node: PRODUCT297513
+Node: RADIX299040
+Node: RAN299810
+Node: RAND300266
+Node: RANDOM_NUMBER301601
+Node: RANDOM_SEED303331
+Node: RANGE305207
+Node: REAL305827
+Node: RENAME307328
+Node: REPEAT308347
+Node: RESHAPE309072
+Node: RRSPACING310534
+Node: RSHIFT311220
+Node: SCALE312191
+Node: SCAN312958
+Node: SECNDS314487
+Node: SECOND315575
+Node: SELECTED_INT_KIND316450
+Node: SELECTED_REAL_KIND317606
+Node: SET_EXPONENT319545
+Node: SHAPE320534
+Node: SIGN321640
+Node: SIGNAL322716
+Node: SIN324213
+Node: SINH325254
+Node: SIZE326011
+Node: SIZEOF327290
+Node: SLEEP328549
+Node: SNGL329106
+Node: SPACING329770
+Node: SPREAD330778
+Node: SQRT331916
+Node: SRAND333100
+Node: STAT334259
+Node: SUM337374
+Node: SYMLNK338845
+Node: SYSTEM339977
+Node: SYSTEM_CLOCK340925
+Node: TAN342262
+Node: TANH343043
+Node: TIME343855
+Node: TIME8344959
+Node: TINY346096
+Node: TRANSFER346691
+Node: TRANSPOSE348716
+Node: TRIM349400
+Node: TTYNAM350256
+Node: UBOUND351177
+Node: UMASK352518
+Node: UNLINK353106
+Node: UNPACK354083
+Node: VERIFY355363
+Node: XOR357060
+Node: Intrinsic Modules358232
+Node: Contributing363058
+Node: Contributors363910
+Node: Projects365533
+Node: Proposed Extensions366336
+Node: Copying368387
+Node: GNU Free Documentation License405951
+Node: Funding428363
+Node: Option Index430888
+Node: Keyword Index438489
 
 End Tag Table

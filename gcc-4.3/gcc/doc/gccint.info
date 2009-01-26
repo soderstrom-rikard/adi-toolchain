@@ -1,7 +1,7 @@
-This is doc/gccint.info, produced by makeinfo version 4.8 from
-/scratch/joseph/4.3.2/gcc-4.3.2/gcc-4.3.2/gcc/doc/gccint.texi.
+This is doc/gccint.info, produced by makeinfo version 4.12 from
+/abuild/rguenther/tmp/gcc-4.3.3/gcc-4.3.3/gcc/doc/gccint.texi.
 
- Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software
 Foundation, Inc.
 
@@ -61,7 +61,7 @@ Introduction
 This manual documents the internals of the GNU compilers, including how
 to port them to new targets and some information about how to write
 front ends for new languages.  It corresponds to the compilers
-(GCC) version 4.3.2.  The use of the GNU compilers is documented in a
+(GCC) version 4.3.3.  The use of the GNU compilers is documented in a
 separate manual.  *Note Introduction: (gcc)Top.
 
  This manual is mainly a reference manual rather than a tutorial.  It
@@ -250,7 +250,7 @@ that needs them.
 
  GCC will also generate calls to C library routines, such as `memcpy'
 and `memset', in some cases.  The set of routines that GCC may possibly
-use is documented in *Note Other Builtins: (gcc)Other Builtins.
+use is documented in *note Other Builtins: (gcc)Other Builtins.
 
  These routines take arguments and return values of a specific machine
 mode, not a specific C type.  *Note Machine Modes::, for an explanation
@@ -3482,7 +3482,7 @@ by mistake), and avoids spurious bootstrap comparison failures(1).
 
 `profiledbootstrap'
      Builds a compiler with profiling feedback information.  For more
-     information, see *Note Building with profile feedback:
+     information, see *note Building with profile feedback:
      (gccinstall)Building.
 
 `restrap'
@@ -4147,6 +4147,7 @@ here; FIXME: document the others.
 * gcov Testing::    Support for testing gcov.
 * profopt Testing:: Support for testing profile-directed optimizations.
 * compat Testing::  Support for testing binary compatibility.
+* Torture Tests::   Support for torture testing using multiple options.
 
 
 File: gccint.info,  Node: Test Idioms,  Next: Test Directives,  Up: Testsuites
@@ -4308,6 +4309,25 @@ For example:
     `mips16_attribute'
           `mips16' function attributes.  Only MIPS targets support this
           feature, and only then in certain modes.
+
+`{ dg-timeout N [{target SELECTOR }] }'
+     Set the time limit for the compilation and for the execution of
+     the test to the specified number of seconds.
+
+`{ dg-timeout-factor X [{ target SELECTOR }] }'
+     Multiply the normal time limit for compilation and execution of
+     the test by the specified floating-point factor.  The normal
+     timeout limit, in seconds, is found by searching the following in
+     order:
+
+        * the value defined by an earlier `dg-timeout' directive in the
+          test
+
+        * variable TOOL_TIMEOUT defined by the set of tests
+
+        * GCC,TIMEOUT set in the target board
+
+        * 300
 
 `{ dg-skip-if COMMENT { SELECTOR } { INCLUDE-OPTS } { EXCLUDE-OPTS } }'
      Skip the test if the test system is included in SELECTOR and if
@@ -4761,7 +4781,7 @@ about a specific optimization:
      for torture tests
 
 
-File: gccint.info,  Node: compat Testing,  Prev: profopt Testing,  Up: Testsuites
+File: gccint.info,  Node: compat Testing,  Next: Torture Tests,  Prev: profopt Testing,  Up: Testsuites
 
 6.4.8 Support for testing binary compatibility
 ----------------------------------------------
@@ -4856,6 +4876,46 @@ commands that appear within comments in a test file.
      particular targets.
 
 
+File: gccint.info,  Node: Torture Tests,  Prev: compat Testing,  Up: Testsuites
+
+6.4.9 Support for torture testing using multiple options
+--------------------------------------------------------
+
+Throughout the compiler testsuite there are several directories whose
+tests are run multiple times, each with a different set of options.
+These are known as torture tests.
+`gcc/testsuite/lib/torture-options.exp' defines procedures to set up
+these lists:
+
+`torture-init'
+     Initialize use of torture lists.
+
+`set-torture-options'
+     Set lists of torture options to use for tests with and without
+     loops.  Optionally combine a set of torture options with a set of
+     other options, as is done with Objective-C runtime options.
+
+`torture-finish'
+     Finalize use of torture lists.
+
+ The `.exp' file for a set of tests that use torture options must
+include calls to these three procecures if:
+
+   * It calls `gcc-dg-runtest' and overrides DG_TORTURE_OPTIONS.
+
+   * It calls ${TOOL}`-torture' or ${TOOL}`-torture-execute', where
+     TOOL is `c', `fortran', or `objc'.
+
+   * It calls `dg-pch'.
+
+ It is not necessary for a `.exp' file that calls `gcc-dg-runtest' to
+call the torture procedures if the tests should use the list in
+DG_TORTURE_OPTIONS defined in `gcc-dg.exp'.
+
+ Most uses of torture options can override the default lists by defining
+TORTURE_OPTIONS in a `.dejagnurc' file.
+
+
 File: gccint.info,  Node: Options,  Next: Passes,  Prev: Source Tree,  Up: Top
 
 7 Option specification files
@@ -4884,12 +4944,12 @@ semicolon.
 
  The files can contain the following types of record:
 
-   * A language definition record.  These records have two fields: the
-     string `Language' and the name of the language.  Once a language
+   * A language definition record.  These records have two fields: the
+     string `Language' and the name of the language.  Once a language
      has been declared in this way, it can be used as an option
      property.  *Note Option properties::.
 
-   * An option definition record.  These records have the following
+   * An option definition record.  These records have the following
      fields:
 
        1. the name of the option, with the leading "-" removed
@@ -4914,11 +4974,11 @@ semicolon.
      right of the tab forms the help text.  This allows you to
      elaborate on what type of argument the option takes.
 
-   * A target mask record.  These records have one field of the form
-     `Mask(X)'.  The options-processing script will automatically
+   * A target mask record.  These records have one field of the form
+     `Mask(X)'.  The options-processing script will automatically
      allocate a bit in `target_flags' (*note Run-time Target::) for
      each mask name X and set the macro `MASK_X' to the appropriate
-     bitmask.  It will also declare a `TARGET_X' macro that has the
+     bitmask.  It will also declare a `TARGET_X' macro that has the
      value 1 when bit `MASK_X' is set and 0 otherwise.
 
      They are primarily intended to declare target masks that are not
@@ -5221,7 +5281,7 @@ present is useful, and a far sight better than nothing at all.
 
  TODO: describe the global variables set up by the pass manager, and a
 brief description of how a new pass should use it.  I need to look at
-what info rtl passes use first....
+what info rtl passes use first...
 
 
 File: gccint.info,  Node: Tree-SSA passes,  Next: RTL passes,  Prev: Pass manager,  Up: Passes
@@ -5545,8 +5605,7 @@ run after gimplification and what source files they are located in.
      branch probabilities nor it uses more than a single range per SSA
      name. This means that the current implementation cannot be used
      for branch prediction (though adapting it would not be difficult).
-     The pass is located in `tree-vrp.c' and is described by
-     `pass_vrp'.
+     The pass is located in `tree-vrp.c' and is described by `pass_vrp'.
 
    * Folding built-in functions
 
@@ -6718,7 +6777,7 @@ File: gccint.info,  Node: Declarations,  Next: Attributes,  Prev: Functions,  Up
 
 This section covers the various kinds of declarations that appear in the
 internal representation, except for declarations of functions
-(represented by `FUNCTION_DECL' nodes), which are described in *Note
+(represented by `FUNCTION_DECL' nodes), which are described in *note
 Functions::.
 
 * Menu:
@@ -6779,7 +6838,7 @@ Some macros can be used with any kind of declaration.  These include:
  The various kinds of declarations include:
 `LABEL_DECL'
      These nodes are used to represent labels in function bodies.  For
-     more information, see *Note Functions::.  These nodes only appear
+     more information, see *note Functions::.  These nodes only appear
      in block scopes.
 
 `CONST_DECL'
@@ -9769,19 +9828,19 @@ several `TODO' flags that control the behavior of `update_ssa':
 
    * `TODO_update_ssa'.  Update the SSA form inserting PHI nodes
      for newly exposed symbols and virtual names marked for updating.
-         When updating real names, only insert PHI nodes for a real
-     name       `O_j' in blocks reached by all the new and old
-     definitions for       `O_j'.  If the iterated dominance frontier
-     for `O_j'       is not pruned, we may end up inserting PHI nodes
-     in blocks that       have one or more edges with no incoming
-     definition for       `O_j'.  This would lead to uninitialized
-     warnings for       `O_j''s symbol.
+         When updating real names, only insert PHI nodes for a real name
+          `O_j' in blocks reached by all the new and old definitions for
+          `O_j'.  If the iterated dominance frontier for `O_j'       is
+     not pruned, we may end up inserting PHI nodes in blocks that
+     have one or more edges with no incoming definition for
+     `O_j'.  This would lead to uninitialized warnings for
+     `O_j''s symbol.
 
    * `TODO_update_ssa_no_phi'.  Update the SSA form without
      inserting any new PHI nodes at all.  This is used by passes that
-        have either inserted all the PHI nodes themselves or passes
-     that       need only to patch use-def and def-def chains for
-     virtuals       (e.g., DCE).
+        have either inserted all the PHI nodes themselves or passes that
+          need only to patch use-def and def-def chains for virtuals
+       (e.g., DCE).
 
    * `TODO_update_ssa_full_phi'.  Insert PHI nodes everywhere
      they are needed.  No pruning of the IDF is done.  This is used
@@ -9792,15 +9851,15 @@ several `TODO' flags that control the behavior of `update_ssa':
      WARNING: If you need to use this flag, chances are that your
      pass may be doing something wrong.  Inserting PHI nodes for an
       old name where not all edges carry a new replacement may lead to
-          silent codegen errors or spurious uninitialized warnings.
+         silent codegen errors or spurious uninitialized warnings.
 
    * `TODO_update_ssa_only_virtuals'.  Passes that update the       SSA
      form on their own may want to delegate the updating of
      virtual names to the generic updater.  Since FUD chains are
      easier to maintain, this simplifies the work they need to do.
       NOTE: If this flag is used, any OLD->NEW mappings for real names
-          are explicitly destroyed and only the symbols marked for
-      renaming are processed.
+         are explicitly destroyed and only the symbols marked for
+     renaming are processed.
 
 10.5.2 Preserving the virtual SSA form
 --------------------------------------
@@ -9882,8 +9941,8 @@ The following macros can be used to examine `SSA_NAME' nodes
 
        1. Once to initialize any local data needed while processing
            BB and its children.  This local data is pushed into an
-           internal stack which is automatically pushed and popped as
-          the       walker traverses the dominator tree.
+          internal stack which is automatically pushed and popped as the
+               walker traverses the dominator tree.
 
        2. Once before traversing all the statements in the BB.
 
@@ -11868,7 +11927,7 @@ possible mode classes are:
 `MODE_CC'
      Modes representing condition code values.  These are `CCmode' plus
      any `CC_MODE' modes listed in the `MACHINE-modes.def'.  *Note Jump
-     Patterns::, also see *Note Condition Code::.
+     Patterns::, also see *note Condition Code::.
 
 `MODE_RANDOM'
      This is a catchall mode class for modes which don't fit into the
@@ -13764,7 +13823,7 @@ values that are only used in `LOG_LINKS'.
      stack slot is properly initialized by making the replacement in
      the initial copy instruction as well.  This is used on machines
      for which the calling convention allocates stack space for
-     register parameters.  See `REG_PARM_STACK_SPACE' in *Note Stack
+     register parameters.  See `REG_PARM_STACK_SPACE' in *note Stack
      Arguments::.
 
      In the case of `REG_EQUAL', the register that is set by this insn
@@ -14841,8 +14900,8 @@ substitution of the operands.
 
 `(match_operand:M N PREDICATE CONSTRAINT)'
      This expression is a placeholder for operand number N of the insn.
-     When constructing an insn, operand number N will be substituted
-     at this point.  When matching an insn, whatever appears at this
+     When constructing an insn, operand number N will be substituted at
+     this point.  When matching an insn, whatever appears at this
      position in the insn will be taken as operand number N; but it
      must satisfy PREDICATE or this instruction pattern will not match
      at all.
@@ -16420,8 +16479,17 @@ _Intel 386--`config/i386/constraints.md'_
     `x'
           Any SSE register.
 
-    `Y'
-          Any SSE2 register.
+    `Yz'
+          First SSE register (`%xmm0').
+
+    `Y2'
+          Any SSE register, when SSE2 is enabled.
+
+    `Yi'
+          Any SSE register, when SSE2 and inter-unit moves are enabled.
+
+    `Ym'
+          Any MMX register, when inter-unit moves are enabled.
 
     `I'
           Integer constant in the range 0 ... 31, for 32-bit shifts.
@@ -17099,6 +17167,9 @@ _SPARC--`config/sparc/sparc.h'_
     `h'
           64-bit global or out register for the SPARC-V8+ architecture.
 
+    `D'
+          A vector constant
+
     `I'
           Signed 13-bit constant
 
@@ -17616,7 +17687,7 @@ that match `const_double's or `const_int's.
  Each docstring in a constraint definition should be one or more
 complete sentences, marked up in Texinfo format.  _They are currently
 unused._ In the future they will be copied into the GCC manual, in
-*Note Machine Constraints::, replacing the hand-maintained tables
+*note Machine Constraints::, replacing the hand-maintained tables
 currently found in that section.  Also, in the future the compiler may
 use this to give more helpful diagnostics when poor choice of `asm'
 constraints causes a reload failure.
@@ -17636,7 +17707,7 @@ It is occasionally useful to test a constraint from C code rather than
 implicitly via the constraint string in a `match_operand'.  The
 generated file `tm_p.h' declares a few interfaces for working with
 machine-specific constraints.  None of these interfaces work with the
-generic constraints described in *Note Simple Constraints::.  This may
+generic constraints described in *note Simple Constraints::.  This may
 change in the future.
 
  *Warning:* `tm_p.h' may declare other functions that operate on
@@ -22118,8 +22189,8 @@ You can control the compilation driver.
      If defined, this macro is an additional prefix to try after
      `STANDARD_EXEC_PREFIX'.  `MD_EXEC_PREFIX' is not searched when the
      `-b' option is used, or the compiler is built as a cross compiler.
-     If you define `MD_EXEC_PREFIX', then be sure to add it to the
-     list of directories used to find the assembler in `configure.in'.
+     If you define `MD_EXEC_PREFIX', then be sure to add it to the list
+     of directories used to find the assembler in `configure.in'.
 
  -- Macro: STANDARD_STARTFILE_PREFIX
      Define this macro as a C string constant if you wish to override
@@ -23408,10 +23479,10 @@ This section explains how to describe what registers the target machine
 has, and how (in general) they can be used.
 
  The description of which registers a specific instruction can use is
-done with register classes; see *Note Register Classes::.  For
-information on using registers to access a stack frame, see *Note Frame
-Registers::.  For passing values in registers, see *Note Register
-Arguments::.  For returning values in registers, see *Note Scalar
+done with register classes; see *note Register Classes::.  For
+information on using registers to access a stack frame, see *note Frame
+Registers::.  For passing values in registers, see *note Register
+Arguments::.  For returning values in registers, see *note Scalar
 Return::.
 
 * Menu:
@@ -24315,7 +24386,7 @@ File: gccint.info,  Node: Old Constraints,  Next: Stack and Calling,  Prev: Regi
 =============================================
 
 Machine-specific constraints can be defined with these macros instead
-of the machine description constructs described in *Note Define
+of the machine description constructs described in *note Define
 Constraints::.  This mechanism is obsolete.  New ports should not use
 it; old ports should convert to the new mechanism.
 
@@ -25442,9 +25513,8 @@ the stack.
  -- Macro: INIT_CUMULATIVE_LIBCALL_ARGS (CUM, MODE, LIBNAME)
      Like `INIT_CUMULATIVE_ARGS' but only used for outgoing libcalls,
      it gets a `MODE' argument instead of FNTYPE, that would be `NULL'.
-     INDIRECT would always be zero, too.  If this macro is not
-     defined, `INIT_CUMULATIVE_ARGS (cum, NULL_RTX, libname, 0)' is
-     used instead.
+     INDIRECT would always be zero, too.  If this macro is not defined,
+     `INIT_CUMULATIVE_ARGS (cum, NULL_RTX, libname, 0)' is used instead.
 
  -- Macro: INIT_CUMULATIVE_INCOMING_ARGS (CUM, FNTYPE, LIBNAME)
      Like `INIT_CUMULATIVE_ARGS' but overrides it for the purposes of
@@ -26922,8 +26992,8 @@ machine-specific information by defining `CC_STATUS_MDEP'.
      reflecting.  For example, on the 68000, insns that store in address
      registers do not set the condition code, which means that usually
      `NOTICE_UPDATE_CC' can leave `cc_status' unaltered for such insns.
-     But suppose that the previous insn set the condition code based
-     on location `a4@(102)' and the current insn stores a new value in
+     But suppose that the previous insn set the condition code based on
+     location `a4@(102)' and the current insn stores a new value in
      `a4'.  Although the condition code is not changed by this, it will
      no longer be true that it reflects the contents of `a4@(102)'.
      Therefore, `NOTICE_UPDATE_CC' must alter `cc_status' in this case
@@ -27831,8 +27901,8 @@ target does not provide them.
           machine_mode MODE, rtx X, unsigned HOST_WIDE_INT ALIGN)
      Return the section into which a constant X, of mode MODE, should
      be placed.  You can assume that X is some kind of constant in RTL.
-     The argument MODE is redundant except in the case of a
-     `const_int' rtx.  ALIGN is the constant alignment in bits.
+     The argument MODE is redundant except in the case of a `const_int'
+     rtx.  ALIGN is the constant alignment in bits.
 
      The default version of this function takes care of putting symbolic
      constants in `flag_pic' mode in `data_section' and everything else
@@ -28238,8 +28308,8 @@ File: gccint.info,  Node: Data Output,  Next: Uninitialized Data,  Prev: File Fr
      The argument FILE is the standard I/O stream to output the
      assembler code on.  X is the RTL expression for the constant to
      output, and MODE is the machine mode (in case X is a `const_int').
-     ALIGN is the required alignment for the value X; you should
-     output an assembler directive to force this much alignment.
+     ALIGN is the required alignment for the value X; you should output
+     an assembler directive to force this much alignment.
 
      The argument LABELNO is a number to use in an internal label for
      the address of this pool entry.  The definition of this macro is
@@ -30423,11 +30493,11 @@ Here are several miscellaneous parameters.
  -- Macro: HAS_LONG_COND_BRANCH
      Define this boolean macro to indicate whether or not your
      architecture has conditional branches that can span all of memory.
-     It is used in conjunction with an optimization that partitions
-     hot and cold basic blocks into separate sections of the
-     executable.  If this macro is set to false, gcc will convert any
-     conditional branches that attempt to cross between sections into
-     unconditional branches or indirect jumps.
+     It is used in conjunction with an optimization that partitions hot
+     and cold basic blocks into separate sections of the executable.
+     If this macro is set to false, gcc will convert any conditional
+     branches that attempt to cross between sections into unconditional
+     branches or indirect jumps.
 
  -- Macro: HAS_LONG_UNCOND_BRANCH
      Define this boolean macro to indicate whether or not your
@@ -31980,8 +32050,7 @@ helpful when you have a complicated expression.
               ggc_alloc (x->regno_pointer_align_length * sizeof (tree));
      and the `length' provides the length of the field.
 
-     This second use of `length' also works on global variables, like:
-       static GTY((length ("reg_base_value_size")))
+     This second use of `length' also works on global variables, like:   static GTY((length ("reg_base_value_size")))
          rtx *reg_base_value;
 
 `skip'
@@ -38158,7 +38227,7 @@ Concept Index
 * block statement iterators:             Basic Blocks.       (line   68)
 * BLOCK_FOR_INSN, bb_for_stmt:           Maintaining the CFG.
                                                              (line   40)
-* BLOCK_REG_PADDING:                     Register Arguments. (line  214)
+* BLOCK_REG_PADDING:                     Register Arguments. (line  213)
 * blockage instruction pattern:          Standard Names.     (line 1402)
 * Blocks:                                Blocks.             (line    6)
 * bool <1>:                              Exception Region Output.
@@ -38269,9 +38338,9 @@ Concept Index
 * cfghooks.h:                            Maintaining the CFG.
                                                              (line    6)
 * cgraph_finalize_function:              Parsing pass.       (line   52)
-* chain_circular:                        GTY Options.        (line  196)
-* chain_next:                            GTY Options.        (line  196)
-* chain_prev:                            GTY Options.        (line  196)
+* chain_circular:                        GTY Options.        (line  195)
+* chain_next:                            GTY Options.        (line  195)
+* chain_prev:                            GTY Options.        (line  195)
 * change_address:                        Standard Names.     (line   47)
 * CHANGE_DYNAMIC_TYPE_EXPR:              Expression trees.   (line    6)
 * char <1>:                              Misc.               (line  693)
@@ -38567,7 +38636,7 @@ Concept Index
 * DECLARE_LIBRARY_RENAMES:               Library Calls.      (line    9)
 * decrement_and_branch_until_zero instruction pattern: Standard Names.
                                                              (line 1114)
-* default:                               GTY Options.        (line   82)
+* default:                               GTY Options.        (line   81)
 * default_file_start:                    File Framework.     (line    9)
 * DEFAULT_GDB_EXTENSIONS:                DBX Options.        (line   18)
 * DEFAULT_PCC_STRUCT_RETURN:             Aggregate Return.   (line   34)
@@ -38627,10 +38696,10 @@ Concept Index
                                                              (line    6)
 * delay slots, defining:                 Delay Slots.        (line    6)
 * DELAY_SLOTS_FOR_EPILOGUE:              Function Entry.     (line  163)
-* deletable:                             GTY Options.        (line  150)
+* deletable:                             GTY Options.        (line  149)
 * DELETE_IF_ORDINARY:                    Filesystem.         (line   79)
 * Dependent Patterns:                    Dependent Patterns. (line    6)
-* desc:                                  GTY Options.        (line   82)
+* desc:                                  GTY Options.        (line   81)
 * destructor:                            Function Basics.    (line    6)
 * destructors, output of:                Initialization.     (line    6)
 * deterministic finite state automaton:  Processor pipeline description.
@@ -38875,10 +38944,10 @@ Concept Index
                                                              (line  180)
 * function-call insns:                   Calls.              (line    6)
 * FUNCTION_ARG:                          Register Arguments. (line   11)
-* FUNCTION_ARG_ADVANCE:                  Register Arguments. (line  178)
-* FUNCTION_ARG_BOUNDARY:                 Register Arguments. (line  224)
-* FUNCTION_ARG_PADDING:                  Register Arguments. (line  189)
-* FUNCTION_ARG_REGNO_P:                  Register Arguments. (line  229)
+* FUNCTION_ARG_ADVANCE:                  Register Arguments. (line  177)
+* FUNCTION_ARG_BOUNDARY:                 Register Arguments. (line  223)
+* FUNCTION_ARG_PADDING:                  Register Arguments. (line  188)
+* FUNCTION_ARG_REGNO_P:                  Register Arguments. (line  228)
 * FUNCTION_BOUNDARY:                     Storage Layout.     (line  165)
 * FUNCTION_DECL:                         Functions.          (line    6)
 * FUNCTION_INCOMING_ARG:                 Register Arguments. (line   68)
@@ -39037,7 +39106,7 @@ Concept Index
                                                              (line    6)
 * IEEE_FLOAT_FORMAT:                     Storage Layout.     (line  413)
 * IF_COND:                               Function Bodies.    (line    6)
-* if_marked:                             GTY Options.        (line  156)
+* if_marked:                             GTY Options.        (line  155)
 * IF_STMT:                               Function Bodies.    (line    6)
 * if_then_else:                          Comparisons.        (line   80)
 * if_then_else and attributes:           Expressions.        (line   32)
@@ -39073,7 +39142,7 @@ Concept Index
 * INDIRECT_REF:                          Expression trees.   (line    6)
 * INIT_ARRAY_SECTION_ASM_OP:             Sections.           (line   98)
 * INIT_CUMULATIVE_ARGS:                  Register Arguments. (line  141)
-* INIT_CUMULATIVE_INCOMING_ARGS:         Register Arguments. (line  169)
+* INIT_CUMULATIVE_INCOMING_ARGS:         Register Arguments. (line  168)
 * INIT_CUMULATIVE_LIBCALL_ARGS:          Register Arguments. (line  162)
 * INIT_ENVIRONMENT:                      Driver.             (line  369)
 * INIT_EXPANDERS:                        Per-Function Data.  (line   39)
@@ -39300,7 +39369,7 @@ Concept Index
                                                              (line  148)
 * makefile fragment:                     Fragments.          (line    6)
 * makefile targets:                      Makefile.           (line    6)
-* mark_hook:                             GTY Options.        (line  171)
+* mark_hook:                             GTY Options.        (line  170)
 * marking roots:                         GGC Roots.          (line    6)
 * MASK_RETURN_ADDR:                      Exception Region Output.
                                                              (line   35)
@@ -39330,7 +39399,7 @@ Concept Index
 * MAX_REGS_PER_ADDRESS:                  Addressing Modes.   (line   42)
 * maxM3 instruction pattern:             Standard Names.     (line  234)
 * may_trap_p, tree_could_trap_p:         Edges.              (line  115)
-* maybe_undef:                           GTY Options.        (line  179)
+* maybe_undef:                           GTY Options.        (line  178)
 * mcount:                                Profiling.          (line   12)
 * MD_CAN_REDIRECT_BRANCH:                Misc.               (line  705)
 * MD_EXEC_PREFIX:                        Driver.             (line  330)
@@ -39472,7 +39541,7 @@ Concept Index
 * negation with unsigned saturation:     Arithmetic.         (line   81)
 * negM2 instruction pattern:             Standard Names.     (line  445)
 * nested functions, trampolines for:     Trampolines.        (line    6)
-* nested_ptr:                            GTY Options.        (line  186)
+* nested_ptr:                            GTY Options.        (line  185)
 * next_bb, prev_bb, FOR_EACH_BB:         Basic Blocks.       (line   10)
 * next_cc0_user:                         Jump Patterns.      (line   64)
 * NEXT_INSN:                             Insns.              (line   30)
@@ -39588,13 +39657,13 @@ Concept Index
 * OVL_CURRENT:                           Functions.          (line    6)
 * OVL_NEXT:                              Functions.          (line    6)
 * p in constraint:                       Simple Constraints. (line  152)
-* PAD_VARARGS_DOWN:                      Register Arguments. (line  206)
+* PAD_VARARGS_DOWN:                      Register Arguments. (line  205)
 * parallel:                              Side Effects.       (line  201)
-* param_is:                              GTY Options.        (line  114)
+* param_is:                              GTY Options.        (line  113)
 * parameters, c++ abi:                   C++ ABI.            (line    6)
 * parameters, miscellaneous:             Misc.               (line    6)
 * parameters, precompiled headers:       PCH Target.         (line    6)
-* paramN_is:                             GTY Options.        (line  132)
+* paramN_is:                             GTY Options.        (line  131)
 * parity:                                Arithmetic.         (line  228)
 * parityM2 instruction pattern:          Standard Names.     (line  641)
 * PARM_BOUNDARY:                         Storage Layout.     (line  144)
@@ -39877,7 +39946,7 @@ Concept Index
 * reloading:                             RTL passes.         (line  181)
 * remainder:                             Arithmetic.         (line  131)
 * remainderM3 instruction pattern:       Standard Names.     (line  468)
-* reorder:                               GTY Options.        (line  210)
+* reorder:                               GTY Options.        (line  209)
 * representation of RTL:                 RTL.                (line    6)
 * reservation delays:                    Processor pipeline description.
                                                              (line    6)
@@ -40051,7 +40120,7 @@ Concept Index
 * sinM2 instruction pattern:             Standard Names.     (line  485)
 * SIZE_ASM_OP:                           Label Output.       (line   23)
 * SIZE_TYPE:                             Type Layout.        (line  168)
-* skip:                                  GTY Options.        (line   77)
+* skip:                                  GTY Options.        (line   76)
 * SLOW_BYTE_ACCESS:                      Costs.              (line   60)
 * SLOW_UNALIGNED_ACCESS:                 Costs.              (line   75)
 * SMALL_REGISTER_CLASSES:                Register Classes.   (line  433)
@@ -40061,7 +40130,7 @@ Concept Index
 * smulM3_highpart instruction pattern:   Standard Names.     (line  356)
 * soft float library:                    Soft float library routines.
                                                              (line    6)
-* special:                               GTY Options.        (line  230)
+* special:                               GTY Options.        (line  229)
 * special predicates:                    Predicates.         (line   31)
 * SPECS:                                 Target Fragment.    (line  108)
 * speed of instructions:                 Costs.              (line    6)
@@ -40248,7 +40317,7 @@ Concept Index
 * t-TARGET:                              Target Fragment.    (line    6)
 * table jump:                            Basic Blocks.       (line   57)
 * tablejump instruction pattern:         Standard Names.     (line 1096)
-* tag:                                   GTY Options.        (line   82)
+* tag:                                   GTY Options.        (line   81)
 * tagging insns:                         Tagging Insns.      (line    6)
 * tail calls:                            Tail Calls.         (line    6)
 * TAmode:                                Machine Modes.      (line  156)
@@ -40316,7 +40385,7 @@ Concept Index
 * TARGET_BINDS_LOCAL_P:                  Sections.           (line  284)
 * TARGET_BRANCH_TARGET_REGISTER_CALLEE_SAVED: Misc.          (line  816)
 * TARGET_BRANCH_TARGET_REGISTER_CLASS:   Misc.               (line  808)
-* TARGET_BUILD_BUILTIN_VA_LIST:          Register Arguments. (line  249)
+* TARGET_BUILD_BUILTIN_VA_LIST:          Register Arguments. (line  248)
 * TARGET_BUILTIN_RECIPROCAL:             Addressing Modes.   (line  228)
 * TARGET_BUILTIN_SETJMP_FRAME_VALUE:     Frame Layout.       (line  109)
 * TARGET_C99_FUNCTIONS:                  Library Calls.      (line   77)
@@ -40373,7 +40442,7 @@ Concept Index
 * TARGET_FUNCTION_ATTRIBUTE_INLINABLE_P: Target Attributes.  (line   86)
 * TARGET_FUNCTION_OK_FOR_SIBCALL:        Tail Calls.         (line    8)
 * TARGET_FUNCTION_VALUE:                 Scalar Return.      (line   11)
-* TARGET_GIMPLIFY_VA_ARG_EXPR:           Register Arguments. (line  254)
+* TARGET_GIMPLIFY_VA_ARG_EXPR:           Register Arguments. (line  253)
 * TARGET_HANDLE_C_OPTION:                Run-time Target.    (line   78)
 * TARGET_HANDLE_OPTION:                  Run-time Target.    (line   61)
 * TARGET_HAS_SINCOS:                     Library Calls.      (line   85)
@@ -40428,7 +40497,7 @@ Concept Index
 * TARGET_RETURN_IN_MEMORY:               Aggregate Return.   (line   16)
 * TARGET_RETURN_IN_MSB:                  Scalar Return.      (line   97)
 * TARGET_RTX_COSTS:                      Costs.              (line  204)
-* TARGET_SCALAR_MODE_SUPPORTED_P:        Register Arguments. (line  266)
+* TARGET_SCALAR_MODE_SUPPORTED_P:        Register Arguments. (line  265)
 * TARGET_SCHED_ADJUST_COST:              Scheduling.         (line   37)
 * TARGET_SCHED_ADJUST_PRIORITY:          Scheduling.         (line   52)
 * TARGET_SCHED_DEPENDENCIES_EVALUATION_HOOK: Scheduling.     (line   89)
@@ -40466,7 +40535,7 @@ Concept Index
 * TARGET_SET_DEFAULT_TYPE_ATTRIBUTES:    Target Attributes.  (line   26)
 * TARGET_SETUP_INCOMING_VARARGS:         Varargs.            (line  101)
 * TARGET_SHIFT_TRUNCATION_MASK:          Misc.               (line  154)
-* TARGET_SPLIT_COMPLEX_ARG:              Register Arguments. (line  237)
+* TARGET_SPLIT_COMPLEX_ARG:              Register Arguments. (line  236)
 * TARGET_STACK_PROTECT_FAIL:             Stack Smashing Protection.
                                                              (line   17)
 * TARGET_STACK_PROTECT_GUARD:            Stack Smashing Protection.
@@ -40483,8 +40552,8 @@ Concept Index
 * TARGET_USE_LOCAL_THUNK_ALIAS_P:        Misc.               (line  861)
 * TARGET_USES_WEAK_UNWIND_INFO:          Exception Handling. (line  129)
 * TARGET_VALID_DLLIMPORT_ATTRIBUTE_P:    Target Attributes.  (line   59)
-* TARGET_VALID_POINTER_MODE:             Register Arguments. (line  260)
-* TARGET_VECTOR_MODE_SUPPORTED_P:        Register Arguments. (line  278)
+* TARGET_VALID_POINTER_MODE:             Register Arguments. (line  259)
+* TARGET_VECTOR_MODE_SUPPORTED_P:        Register Arguments. (line  277)
 * TARGET_VECTOR_OPAQUE_P:                Storage Layout.     (line  505)
 * TARGET_VECTORIZE_BUILTIN_CONVERSION:   Addressing Modes.   (line  288)
 * TARGET_VECTORIZE_BUILTIN_MASK_FOR_LOAD: Addressing Modes.  (line  237)
@@ -40696,9 +40765,9 @@ Concept Index
 * USE_LOAD_POST_INCREMENT:               Costs.              (line  154)
 * USE_LOAD_PRE_DECREMENT:                Costs.              (line  169)
 * USE_LOAD_PRE_INCREMENT:                Costs.              (line  164)
-* use_param:                             GTY Options.        (line  114)
-* use_paramN:                            GTY Options.        (line  132)
-* use_params:                            GTY Options.        (line  140)
+* use_param:                             GTY Options.        (line  113)
+* use_paramN:                            GTY Options.        (line  131)
+* use_params:                            GTY Options.        (line  139)
 * USE_SELECT_SECTION_FOR_FUNCTIONS:      Sections.           (line  185)
 * USE_STORE_POST_DECREMENT:              Costs.              (line  179)
 * USE_STORE_POST_INCREMENT:              Costs.              (line  174)
@@ -40882,245 +40951,246 @@ Node: Front End Directory185294
 Node: Front End Config190287
 Node: Back End193201
 Node: Testsuites196878
-Node: Test Idioms197670
-Node: Test Directives201071
-Node: Ada Tests212240
-Node: C Tests213532
-Node: libgcj Tests217887
-Node: gcov Testing219019
-Node: profopt Testing222003
-Node: compat Testing223446
-Node: Options227668
-Node: Option file format228109
-Node: Option properties230659
-Node: Passes236318
-Node: Parsing pass237053
-Node: Gimplification pass240581
-Node: Pass manager242408
-Node: Tree-SSA passes243737
-Node: RTL passes265553
-Node: Trees277395
-Node: Deficiencies280121
-Node: Tree overview280358
-Node: Macros and Functions284481
-Node: Identifiers284627
-Node: Containers286152
-Node: Types287307
-Node: Scopes303010
-Node: Namespaces303772
-Node: Classes306584
-Node: Declarations311341
-Node: Working with declarations311836
-Node: Internal structure318293
-Node: Current structure hierarchy318675
-Node: Adding new DECL node types320767
-Node: Functions324838
-Node: Function Basics327241
-Node: Function Bodies334406
-Node: Attributes345648
-Node: Expression trees346889
-Node: Tree SSA389498
-Node: GENERIC391375
-Node: GIMPLE392985
-Node: Interfaces394276
-Node: Temporaries396429
-Ref: Temporaries-Footnote-1397749
-Node: GIMPLE Expressions397812
-Node: Compound Expressions398584
-Node: Compound Lvalues398832
-Node: Conditional Expressions399612
-Node: Logical Operators400289
-Node: Statements400782
-Node: Blocks401490
-Node: Statement Sequences402907
-Node: Empty Statements403244
-Node: Loops403822
-Node: Selection Statements404066
-Node: Jumps404919
-Node: Cleanups405580
-Node: GIMPLE Exception Handling407371
-Node: GIMPLE Example409250
-Node: Rough GIMPLE Grammar410661
-Node: Annotations416010
-Node: Statement Operands416676
-Node: SSA431237
-Node: Alias analysis443625
-Node: Loop Analysis and Representation451084
-Node: Loop representation452134
-Node: Loop querying459054
-Node: Loop manipulation461887
-Node: LCSSA464255
-Node: Scalar evolutions466327
-Node: loop-iv469571
-Node: Number of iterations471497
-Node: Dependency analysis474306
-Node: Lambda480674
-Node: Omega482344
-Node: RTL483909
-Node: RTL Objects486013
-Node: RTL Classes489887
-Node: Accessors494839
-Node: Special Accessors497233
-Node: Flags502451
-Node: Machine Modes517687
-Node: Constants530003
-Node: Regs and Memory536648
-Node: Arithmetic550190
-Node: Comparisons559710
-Node: Bit-Fields564002
-Node: Vector Operations565554
-Node: Conversions567180
-Node: RTL Declarations571690
-Node: Side Effects572511
-Node: Incdec588627
-Node: Assembler591967
-Node: Insns593499
-Node: Calls619429
-Node: Sharing622022
-Node: Reading RTL625132
-Node: Control Flow626122
-Node: Basic Blocks627093
-Node: Edges631661
-Node: Profile information640223
-Node: Maintaining the CFG644909
-Node: Liveness information651801
-Node: Machine Desc653928
-Node: Overview656410
-Node: Patterns658451
-Node: Example661889
-Node: RTL Template663324
-Node: Output Template673979
-Node: Output Statement677945
-Node: Predicates681907
-Node: Machine-Independent Predicates684825
-Node: Defining Predicates689457
-Node: Constraints695422
-Node: Simple Constraints696583
-Node: Multi-Alternative708645
-Node: Class Preferences711486
-Node: Modifiers712378
-Node: Machine Constraints716504
-Node: Define Constraints748386
-Node: C Constraint Interface755166
-Node: Standard Names758786
-Ref: shift patterns777714
-Ref: prologue instruction pattern818363
-Ref: epilogue instruction pattern818856
-Node: Pattern Ordering828399
-Node: Dependent Patterns829635
-Node: Jump Patterns832449
-Node: Looping Patterns838145
-Node: Insn Canonicalizations842747
-Node: Expander Definitions847131
-Node: Insn Splitting855249
-Node: Including Patterns864845
-Node: Peephole Definitions866625
-Node: define_peephole867878
-Node: define_peephole2874209
-Node: Insn Attributes877276
-Node: Defining Attributes878382
-Node: Expressions880399
-Node: Tagging Insns887001
-Node: Attr Example891354
-Node: Insn Lengths893728
-Node: Constant Attributes896787
-Node: Delay Slots897956
-Node: Processor pipeline description901180
-Ref: Processor pipeline description-Footnote-1918546
-Node: Conditional Execution918876
-Node: Constant Definitions921729
-Node: Iterators923324
-Node: Mode Iterators923771
-Node: Defining Mode Iterators924733
-Node: Substitutions926227
-Node: Examples928468
-Node: Code Iterators929916
-Node: Target Macros932173
-Node: Target Structure935125
-Node: Driver936394
-Node: Run-time Target960075
-Node: Per-Function Data967279
-Node: Storage Layout970042
-Node: Type Layout996663
-Node: Registers1009620
-Node: Register Basics1010543
-Node: Allocation Order1016110
-Node: Values in Registers1017555
-Node: Leaf Functions1024660
-Node: Stack Registers1027518
-Node: Register Classes1028634
-Node: Old Constraints1054209
-Node: Stack and Calling1061361
-Node: Frame Layout1061895
-Node: Exception Handling1072742
-Node: Stack Checking1079120
-Node: Frame Registers1082751
-Node: Elimination1089357
-Node: Stack Arguments1093388
-Node: Register Arguments1099989
-Node: Scalar Return1114218
-Node: Aggregate Return1119503
-Node: Caller Saves1123162
-Node: Function Entry1124340
-Node: Profiling1136955
-Node: Tail Calls1138654
-Node: Stack Smashing Protection1140021
-Node: Varargs1141133
-Node: Trampolines1149093
-Node: Library Calls1155759
-Node: Addressing Modes1160622
-Node: Anchored Addresses1175880
-Node: Condition Code1178541
-Node: Costs1186830
-Node: Scheduling1199553
-Node: Sections1216300
-Node: PIC1230950
-Node: Assembler Format1232940
-Node: File Framework1234019
-Ref: TARGET_HAVE_SWITCHABLE_BSS_SECTIONS1238925
-Node: Data Output1242192
-Node: Uninitialized Data1249951
-Node: Label Output1255022
-Node: Initialization1276689
-Node: Macros for Initialization1282651
-Node: Instruction Output1289103
-Node: Dispatch Tables1298097
-Node: Exception Region Output1301892
-Node: Alignment Output1307652
-Node: Debugging Info1311815
-Node: All Debuggers1312485
-Node: DBX Options1315340
-Node: DBX Hooks1320789
-Node: File Names and DBX1322715
-Node: SDB and DWARF1324826
-Node: VMS Debug1328818
-Node: Floating Point1329388
-Node: Mode Switching1334211
-Node: Target Attributes1338137
-Node: MIPS Coprocessors1342879
-Node: PCH Target1344453
-Node: C++ ABI1345974
-Node: Misc1350593
-Ref: TARGET_SHIFT_TRUNCATION_MASK1357964
-Node: Host Config1397178
-Node: Host Common1398238
-Node: Filesystem1400617
-Node: Host Misc1404732
-Node: Fragments1406871
-Node: Target Fragment1408066
-Node: Host Fragment1413732
-Node: Collect21415174
-Node: Header Dirs1417717
-Node: Type Information1419140
-Node: GTY Options1421328
-Node: GGC Roots1432001
-Node: Files1432721
-Node: Funding1435081
-Node: GNU Project1437577
-Node: Copying1438226
-Node: GNU Free Documentation License1475757
-Node: Contributors1498166
-Node: Option Index1534364
-Node: Concept Index1534949
+Node: Test Idioms197742
+Node: Test Directives201143
+Node: Ada Tests212950
+Node: C Tests214242
+Node: libgcj Tests218597
+Node: gcov Testing219729
+Node: profopt Testing222713
+Node: compat Testing224156
+Node: Torture Tests228400
+Node: Options229792
+Node: Option file format230233
+Node: Option properties232783
+Node: Passes238442
+Node: Parsing pass239177
+Node: Gimplification pass242705
+Node: Pass manager244532
+Node: Tree-SSA passes245860
+Node: RTL passes267671
+Node: Trees279513
+Node: Deficiencies282239
+Node: Tree overview282476
+Node: Macros and Functions286599
+Node: Identifiers286745
+Node: Containers288270
+Node: Types289425
+Node: Scopes305128
+Node: Namespaces305890
+Node: Classes308702
+Node: Declarations313459
+Node: Working with declarations313954
+Node: Internal structure320411
+Node: Current structure hierarchy320793
+Node: Adding new DECL node types322885
+Node: Functions326956
+Node: Function Basics329359
+Node: Function Bodies336524
+Node: Attributes347766
+Node: Expression trees349007
+Node: Tree SSA391616
+Node: GENERIC393493
+Node: GIMPLE395103
+Node: Interfaces396394
+Node: Temporaries398547
+Ref: Temporaries-Footnote-1399867
+Node: GIMPLE Expressions399930
+Node: Compound Expressions400702
+Node: Compound Lvalues400950
+Node: Conditional Expressions401730
+Node: Logical Operators402407
+Node: Statements402900
+Node: Blocks403608
+Node: Statement Sequences405025
+Node: Empty Statements405362
+Node: Loops405940
+Node: Selection Statements406184
+Node: Jumps407037
+Node: Cleanups407698
+Node: GIMPLE Exception Handling409489
+Node: GIMPLE Example411368
+Node: Rough GIMPLE Grammar412779
+Node: Annotations418128
+Node: Statement Operands418794
+Node: SSA433355
+Node: Alias analysis445713
+Node: Loop Analysis and Representation453172
+Node: Loop representation454222
+Node: Loop querying461142
+Node: Loop manipulation463975
+Node: LCSSA466343
+Node: Scalar evolutions468415
+Node: loop-iv471659
+Node: Number of iterations473585
+Node: Dependency analysis476394
+Node: Lambda482762
+Node: Omega484432
+Node: RTL485997
+Node: RTL Objects488101
+Node: RTL Classes491975
+Node: Accessors496927
+Node: Special Accessors499321
+Node: Flags504539
+Node: Machine Modes519775
+Node: Constants532091
+Node: Regs and Memory538736
+Node: Arithmetic552278
+Node: Comparisons561798
+Node: Bit-Fields566090
+Node: Vector Operations567642
+Node: Conversions569268
+Node: RTL Declarations573778
+Node: Side Effects574599
+Node: Incdec590715
+Node: Assembler594055
+Node: Insns595587
+Node: Calls621517
+Node: Sharing624110
+Node: Reading RTL627220
+Node: Control Flow628210
+Node: Basic Blocks629181
+Node: Edges633749
+Node: Profile information642311
+Node: Maintaining the CFG646997
+Node: Liveness information653889
+Node: Machine Desc656016
+Node: Overview658498
+Node: Patterns660539
+Node: Example663977
+Node: RTL Template665412
+Node: Output Template676067
+Node: Output Statement680033
+Node: Predicates683995
+Node: Machine-Independent Predicates686913
+Node: Defining Predicates691545
+Node: Constraints697510
+Node: Simple Constraints698671
+Node: Multi-Alternative710733
+Node: Class Preferences713574
+Node: Modifiers714466
+Node: Machine Constraints718592
+Node: Define Constraints750738
+Node: C Constraint Interface757518
+Node: Standard Names761138
+Ref: shift patterns780066
+Ref: prologue instruction pattern820715
+Ref: epilogue instruction pattern821208
+Node: Pattern Ordering830751
+Node: Dependent Patterns831987
+Node: Jump Patterns834801
+Node: Looping Patterns840497
+Node: Insn Canonicalizations845099
+Node: Expander Definitions849483
+Node: Insn Splitting857601
+Node: Including Patterns867197
+Node: Peephole Definitions868977
+Node: define_peephole870230
+Node: define_peephole2876561
+Node: Insn Attributes879628
+Node: Defining Attributes880734
+Node: Expressions882751
+Node: Tagging Insns889353
+Node: Attr Example893706
+Node: Insn Lengths896080
+Node: Constant Attributes899139
+Node: Delay Slots900308
+Node: Processor pipeline description903532
+Ref: Processor pipeline description-Footnote-1920898
+Node: Conditional Execution921228
+Node: Constant Definitions924081
+Node: Iterators925676
+Node: Mode Iterators926123
+Node: Defining Mode Iterators927085
+Node: Substitutions928579
+Node: Examples930820
+Node: Code Iterators932268
+Node: Target Macros934525
+Node: Target Structure937477
+Node: Driver938746
+Node: Run-time Target962427
+Node: Per-Function Data969631
+Node: Storage Layout972394
+Node: Type Layout999015
+Node: Registers1011972
+Node: Register Basics1012895
+Node: Allocation Order1018462
+Node: Values in Registers1019907
+Node: Leaf Functions1027012
+Node: Stack Registers1029870
+Node: Register Classes1030986
+Node: Old Constraints1056561
+Node: Stack and Calling1063713
+Node: Frame Layout1064247
+Node: Exception Handling1075094
+Node: Stack Checking1081472
+Node: Frame Registers1085103
+Node: Elimination1091709
+Node: Stack Arguments1095740
+Node: Register Arguments1102341
+Node: Scalar Return1116565
+Node: Aggregate Return1121850
+Node: Caller Saves1125509
+Node: Function Entry1126687
+Node: Profiling1139302
+Node: Tail Calls1141001
+Node: Stack Smashing Protection1142368
+Node: Varargs1143480
+Node: Trampolines1151440
+Node: Library Calls1158106
+Node: Addressing Modes1162969
+Node: Anchored Addresses1178227
+Node: Condition Code1180888
+Node: Costs1189177
+Node: Scheduling1201900
+Node: Sections1218647
+Node: PIC1233297
+Node: Assembler Format1235287
+Node: File Framework1236366
+Ref: TARGET_HAVE_SWITCHABLE_BSS_SECTIONS1241272
+Node: Data Output1244539
+Node: Uninitialized Data1252298
+Node: Label Output1257369
+Node: Initialization1279036
+Node: Macros for Initialization1284998
+Node: Instruction Output1291450
+Node: Dispatch Tables1300444
+Node: Exception Region Output1304239
+Node: Alignment Output1309999
+Node: Debugging Info1314162
+Node: All Debuggers1314832
+Node: DBX Options1317687
+Node: DBX Hooks1323136
+Node: File Names and DBX1325062
+Node: SDB and DWARF1327173
+Node: VMS Debug1331165
+Node: Floating Point1331735
+Node: Mode Switching1336558
+Node: Target Attributes1340484
+Node: MIPS Coprocessors1345226
+Node: PCH Target1346800
+Node: C++ ABI1348321
+Node: Misc1352940
+Ref: TARGET_SHIFT_TRUNCATION_MASK1360310
+Node: Host Config1399524
+Node: Host Common1400584
+Node: Filesystem1402963
+Node: Host Misc1407078
+Node: Fragments1409217
+Node: Target Fragment1410412
+Node: Host Fragment1416078
+Node: Collect21417520
+Node: Header Dirs1420063
+Node: Type Information1421486
+Node: GTY Options1423674
+Node: GGC Roots1434342
+Node: Files1435062
+Node: Funding1437422
+Node: GNU Project1439918
+Node: Copying1440567
+Node: GNU Free Documentation License1478098
+Node: Contributors1500507
+Node: Option Index1536705
+Node: Concept Index1537290
 
 End Tag Table

@@ -1,7 +1,7 @@
-This is doc/gccinstall.info, produced by makeinfo version 4.8 from
-/scratch/joseph/4.3.2/gcc-4.3.2/gcc-4.3.2/gcc/doc/install.texi.
+This is doc/gccinstall.info, produced by makeinfo version 4.12 from
+/abuild/rguenther/tmp/gcc-4.3.3/gcc-4.3.3/gcc/doc/install.texi.
 
-   Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free
 Software Foundation, Inc.
 
@@ -81,7 +81,7 @@ as well as detailing some target specific installation instructions.
 distributions with their own installation instructions.  This document
 supersedes all package specific installation instructions.
 
-   _Before_ starting the build/install procedure please check the *Note
+   _Before_ starting the build/install procedure please check the *note
 host/target specific installation notes: Specific.  We recommend you
 browse the entire generic installation instructions before you proceed.
 
@@ -1989,7 +1989,7 @@ following information:
      build status list will include a link to the archived copy of your
      message.
 
-   We'd also like to know if the *Note host/target specific
+   We'd also like to know if the *note host/target specific
 installation notes: Specific.  didn't include your host/target
 information or if that information is incomplete or out of date.  Send
 a note to <gcc@gcc.gnu.org> detailing how the information should be
@@ -2137,14 +2137,6 @@ unless it is built as a cross-compiler.  It gets the version to use from
 the system header file `/usr/include/stamp.h'.  If you install a new
 version of DEC Unix, you should rebuild GCC to pick up the new version
 stamp.
-
-   Note that since the Alpha is a 64-bit architecture, cross-compilers
-from 32-bit machines will not generate code as efficient as that
-generated when the compiler is running on a 64-bit machine because many
-optimizations that depend on being able to represent a word on the
-target in an integral value on the host cannot be performed.  Building
-cross-compilers on the Alpha for 32-bit machines has only been tested in
-a few cases and may not work properly.
 
    `make compare' may fail on old versions of DEC Unix unless you add
 `-save-temps' to `CFLAGS'.  On these systems, the name of the assembler
@@ -3633,7 +3625,7 @@ main manual.
      irrelevant, and will be ignored.  So you might as well specify the
      version if you know it.
 
-     See *Note Configurations::, for a list of supported configuration
+     See *note Configurations::, for a list of supported configuration
      names and notes on many of the configurations.  You should check
      the notes in that section before proceeding any further with the
      installation of GCC.
@@ -4188,89 +4180,89 @@ Concept Index
 
 
 Tag Table:
-Node: Top1960
-Node: Installing GCC2518
-Node: Prerequisites4033
-Node: Downloading the source11876
-Node: Configuration13510
-Ref: with-gnu-as26929
-Ref: with-as28159
-Ref: with-gnu-ld29572
-Node: Building62075
-Node: Testing74144
-Node: Final install81924
-Node: Binaries87154
-Node: Specific89018
-Ref: alpha-x-x89524
-Ref: alpha-dec-osf90013
-Ref: alphaev5-cray-unicosmk93590
-Ref: arc-x-elf94510
-Ref: arm-x-elf94610
-Ref: xscale-x-x94631
-Ref: arm-x-coff94867
-Ref: arm-x-aout95069
-Ref: avr95191
-Ref: bfin95875
-Ref: cris96117
-Ref: crx97099
-Ref: dos97762
-Ref: x-x-freebsd98085
-Ref: h8300-hms100468
-Ref: hppa-hp-hpux100820
-Ref: hppa-hp-hpux10103308
-Ref: hppa-hp-hpux11104365
-Ref: x-x-linux-gnu111233
-Ref: ix86-x-linuxaout111426
-Ref: ix86-x-linux111585
-Ref: ix86-x-sco32v5111898
-Ref: ix86-x-solaris210114067
-Ref: ix86-x-udk114453
-Ref: ia64-x-linux115806
-Ref: ia64-x-hpux116576
-Ref: x-ibm-aix117131
-Ref: iq2000-x-elf123114
-Ref: m32c-x-elf123254
-Ref: m32r-x-elf123356
-Ref: m6811-elf123458
-Ref: m6812-elf123608
-Ref: m68k-x-x123758
-Ref: m68k-hp-hpux124720
-Ref: m68k-x-uclinux126459
-Ref: mips-x-x126822
-Ref: mips-sgi-irix5129499
-Ref: mips-sgi-irix6130447
-Ref: powerpc-x-x133254
-Ref: powerpc-x-darwin133399
-Ref: powerpc-x-elf133946
-Ref: powerpc-x-linux-gnu134065
-Ref: powerpc-x-netbsd134167
-Ref: powerpc-x-eabisim134363
-Ref: powerpc-x-eabi134489
-Ref: powerpcle-x-elf134565
-Ref: powerpcle-x-eabisim134695
-Ref: powerpcle-x-eabi134828
-Ref: s390-x-linux134911
-Ref: s390x-x-linux134983
-Ref: s390x-ibm-tpf135070
-Ref: x-x-solaris2135201
-Ref: sparc-sun-solaris2139229
-Ref: sparc-sun-solaris27142393
-Ref: sparc-x-linux144857
-Ref: sparc64-x-solaris2145082
-Ref: sparcv9-x-solaris2145727
-Ref: x-x-sysv145812
-Ref: vax-dec-ultrix146773
-Ref: x-x-vxworks146925
-Ref: x86-64-x-x148447
-Ref: xtensa-x-elf148775
-Ref: xtensa-x-linux149444
-Ref: windows149782
-Ref: os2150252
-Ref: older150443
-Ref: elf152560
-Node: Old152818
-Node: Configurations155955
-Node: GNU Free Documentation License159937
-Node: Concept Index182353
+Node: Top1958
+Node: Installing GCC2516
+Node: Prerequisites4031
+Node: Downloading the source11874
+Node: Configuration13508
+Ref: with-gnu-as26927
+Ref: with-as28157
+Ref: with-gnu-ld29570
+Node: Building62073
+Node: Testing74142
+Node: Final install81922
+Node: Binaries87152
+Node: Specific89016
+Ref: alpha-x-x89522
+Ref: alpha-dec-osf90011
+Ref: alphaev5-cray-unicosmk93129
+Ref: arc-x-elf94049
+Ref: arm-x-elf94149
+Ref: xscale-x-x94170
+Ref: arm-x-coff94406
+Ref: arm-x-aout94608
+Ref: avr94730
+Ref: bfin95414
+Ref: cris95656
+Ref: crx96638
+Ref: dos97301
+Ref: x-x-freebsd97624
+Ref: h8300-hms100007
+Ref: hppa-hp-hpux100359
+Ref: hppa-hp-hpux10102847
+Ref: hppa-hp-hpux11103904
+Ref: x-x-linux-gnu110772
+Ref: ix86-x-linuxaout110965
+Ref: ix86-x-linux111124
+Ref: ix86-x-sco32v5111437
+Ref: ix86-x-solaris210113606
+Ref: ix86-x-udk113992
+Ref: ia64-x-linux115345
+Ref: ia64-x-hpux116115
+Ref: x-ibm-aix116670
+Ref: iq2000-x-elf122653
+Ref: m32c-x-elf122793
+Ref: m32r-x-elf122895
+Ref: m6811-elf122997
+Ref: m6812-elf123147
+Ref: m68k-x-x123297
+Ref: m68k-hp-hpux124259
+Ref: m68k-x-uclinux125998
+Ref: mips-x-x126361
+Ref: mips-sgi-irix5129038
+Ref: mips-sgi-irix6129986
+Ref: powerpc-x-x132793
+Ref: powerpc-x-darwin132938
+Ref: powerpc-x-elf133485
+Ref: powerpc-x-linux-gnu133604
+Ref: powerpc-x-netbsd133706
+Ref: powerpc-x-eabisim133902
+Ref: powerpc-x-eabi134028
+Ref: powerpcle-x-elf134104
+Ref: powerpcle-x-eabisim134234
+Ref: powerpcle-x-eabi134367
+Ref: s390-x-linux134450
+Ref: s390x-x-linux134522
+Ref: s390x-ibm-tpf134609
+Ref: x-x-solaris2134740
+Ref: sparc-sun-solaris2138768
+Ref: sparc-sun-solaris27141932
+Ref: sparc-x-linux144396
+Ref: sparc64-x-solaris2144621
+Ref: sparcv9-x-solaris2145266
+Ref: x-x-sysv145351
+Ref: vax-dec-ultrix146312
+Ref: x-x-vxworks146464
+Ref: x86-64-x-x147986
+Ref: xtensa-x-elf148314
+Ref: xtensa-x-linux148983
+Ref: windows149321
+Ref: os2149791
+Ref: older149982
+Ref: elf152099
+Node: Old152357
+Node: Configurations155494
+Node: GNU Free Documentation License159476
+Node: Concept Index181892
 
 End Tag Table

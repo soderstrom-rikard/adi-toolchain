@@ -6,6 +6,7 @@ see ONEWS.
 
 ======================================================================
 http://gcc.gnu.org/gcc-4.3/index.html
+
                            GCC 4.3 Release Series
 
    August 27, 2008
@@ -44,28 +45,27 @@ References and Acknowledgements
    For additional information about GCC please refer to the [7]GCC project
    web site or contact the [8]GCC development mailing list.
 
-   To obtain GCC please use [9]our mirror sites, one of the [10]GNU mirror
-   sites, or [11]our SVN server.
+   To obtain GCC please use [9]our mirror sites or [10]our SVN server.
 
-   Please send FSF & GNU inquiries & questions to [12]gnu@gnu.org. There
-   are also [13]other ways to contact the FSF.
+   Please send FSF & GNU inquiries & questions to [11]gnu@gnu.org. There
+   are also [12]other ways to contact the FSF.
 
-   These pages are maintained by [14]the GCC team.
+   These pages are maintained by [13]the GCC team.
 
 
     For questions related to the use of GCC, please consult these web
-    pages and the [15]GCC manuals. If that fails, the
-    [16]gcc-help@gcc.gnu.org mailing list might help.
+    pages and the [14]GCC manuals. If that fails, the
+    [15]gcc-help@gcc.gnu.org mailing list might help.
     Please send comments on these web pages and the development of GCC to
-    our developer mailing list at [17]gcc@gnu.org or [18]gcc@gcc.gnu.org.
-    All of our lists have [19]public archives.
+    our developer mailing list at [16]gcc@gnu.org or [17]gcc@gcc.gnu.org.
+    All of our lists have [18]public archives.
 
    Copyright (C) Free Software Foundation, Inc., 51 Franklin St, Fifth
    Floor, Boston, MA 02110, USA.
 
    Verbatim copying and distribution of this entire article is permitted
    in any medium, provided this notice is preserved.
-   Last modified 2008-08-27 [20]Valid XHTML 1.0
+   Last modified 2008-10-04 [19]Valid XHTML 1.0
 
 References
 
@@ -78,19 +78,19 @@ References
    7. http://gcc.gnu.org/index.html
    8. mailto:gcc@gcc.gnu.org
    9. http://gcc.gnu.org/mirrors.html
-  10. http://www.gnu.org/order/ftp.html
-  11. http://gcc.gnu.org/svn.html
-  12. mailto:gnu@gnu.org
-  13. http://www.gnu.org/home.html#ContactInfo
-  14. http://gcc.gnu.org/about.html
-  15. http://gcc.gnu.org/onlinedocs/
-  16. mailto:gcc-help@gcc.gnu.org
-  17. mailto:gcc@gnu.org
-  18. mailto:gcc@gcc.gnu.org
-  19. http://gcc.gnu.org/lists.html
-  20. http://validator.w3.org/check/referer
+  10. http://gcc.gnu.org/svn.html
+  11. mailto:gnu@gnu.org
+  12. http://www.gnu.org/home.html#ContactInfo
+  13. http://gcc.gnu.org/about.html
+  14. http://gcc.gnu.org/onlinedocs/
+  15. mailto:gcc-help@gcc.gnu.org
+  16. mailto:gcc@gnu.org
+  17. mailto:gcc@gcc.gnu.org
+  18. http://gcc.gnu.org/lists.html
+  19. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-4.3/changes.html
+
                            GCC 4.3 Release Series
                       Changes, New Features, and Fixes
 
@@ -882,6 +882,7 @@ References
   35. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-4.2/index.html
+
                            GCC 4.2 Release Series
 
    May 19, 2008
@@ -926,28 +927,27 @@ References and Acknowledgements
    For additional information about GCC please refer to the [9]GCC project
    web site or contact the [10]GCC development mailing list.
 
-   To obtain GCC please use [11]our mirror sites, one of the [12]GNU
-   mirror sites, or [13]our SVN server.
+   To obtain GCC please use [11]our mirror sites or [12]our SVN server.
 
-   Please send FSF & GNU inquiries & questions to [14]gnu@gnu.org. There
-   are also [15]other ways to contact the FSF.
+   Please send FSF & GNU inquiries & questions to [13]gnu@gnu.org. There
+   are also [14]other ways to contact the FSF.
 
-   These pages are maintained by [16]the GCC team.
+   These pages are maintained by [15]the GCC team.
 
 
     For questions related to the use of GCC, please consult these web
-    pages and the [17]GCC manuals. If that fails, the
-    [18]gcc-help@gcc.gnu.org mailing list might help.
+    pages and the [16]GCC manuals. If that fails, the
+    [17]gcc-help@gcc.gnu.org mailing list might help.
     Please send comments on these web pages and the development of GCC to
-    our developer mailing list at [19]gcc@gnu.org or [20]gcc@gcc.gnu.org.
-    All of our lists have [21]public archives.
+    our developer mailing list at [18]gcc@gnu.org or [19]gcc@gcc.gnu.org.
+    All of our lists have [20]public archives.
 
    Copyright (C) Free Software Foundation, Inc., 51 Franklin St, Fifth
    Floor, Boston, MA 02110, USA.
 
    Verbatim copying and distribution of this entire article is permitted
    in any medium, provided this notice is preserved.
-   Last modified 2008-05-23 [22]Valid XHTML 1.0
+   Last modified 2008-10-04 [21]Valid XHTML 1.0
 
 References
 
@@ -962,19 +962,19 @@ References
    9. http://gcc.gnu.org/index.html
   10. mailto:gcc@gcc.gnu.org
   11. http://gcc.gnu.org/mirrors.html
-  12. http://www.gnu.org/order/ftp.html
-  13. http://gcc.gnu.org/svn.html
-  14. mailto:gnu@gnu.org
-  15. http://www.gnu.org/home.html#ContactInfo
-  16. http://gcc.gnu.org/about.html
-  17. http://gcc.gnu.org/onlinedocs/
-  18. mailto:gcc-help@gcc.gnu.org
-  19. mailto:gcc@gnu.org
-  20. mailto:gcc@gcc.gnu.org
-  21. http://gcc.gnu.org/lists.html
-  22. http://validator.w3.org/check/referer
+  12. http://gcc.gnu.org/svn.html
+  13. mailto:gnu@gnu.org
+  14. http://www.gnu.org/home.html#ContactInfo
+  15. http://gcc.gnu.org/about.html
+  16. http://gcc.gnu.org/onlinedocs/
+  17. mailto:gcc-help@gcc.gnu.org
+  18. mailto:gcc@gnu.org
+  19. mailto:gcc@gcc.gnu.org
+  20. http://gcc.gnu.org/lists.html
+  21. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-4.2/changes.html
+
                            GCC 4.2 Release Series
                       Changes, New Features, and Fixes
 
@@ -1306,6 +1306,7 @@ References
   16. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-4.1/index.html
+
                            GCC 4.1 Release Series
 
    February 13, 2007
@@ -1344,28 +1345,27 @@ References and Acknowledgements
    For additional information about GCC please refer to the [7]GCC project
    web site or contact the [8]GCC development mailing list.
 
-   To obtain GCC please use [9]our mirror sites, one of the [10]GNU mirror
-   sites, or [11]our SVN server.
+   To obtain GCC please use [9]our mirror sites or [10]our SVN server.
 
-   Please send FSF & GNU inquiries & questions to [12]gnu@gnu.org. There
-   are also [13]other ways to contact the FSF.
+   Please send FSF & GNU inquiries & questions to [11]gnu@gnu.org. There
+   are also [12]other ways to contact the FSF.
 
-   These pages are maintained by [14]the GCC team.
+   These pages are maintained by [13]the GCC team.
 
 
     For questions related to the use of GCC, please consult these web
-    pages and the [15]GCC manuals. If that fails, the
-    [16]gcc-help@gcc.gnu.org mailing list might help.
+    pages and the [14]GCC manuals. If that fails, the
+    [15]gcc-help@gcc.gnu.org mailing list might help.
     Please send comments on these web pages and the development of GCC to
-    our developer mailing list at [17]gcc@gnu.org or [18]gcc@gcc.gnu.org.
-    All of our lists have [19]public archives.
+    our developer mailing list at [16]gcc@gnu.org or [17]gcc@gcc.gnu.org.
+    All of our lists have [18]public archives.
 
    Copyright (C) Free Software Foundation, Inc., 51 Franklin St, Fifth
    Floor, Boston, MA 02110, USA.
 
    Verbatim copying and distribution of this entire article is permitted
    in any medium, provided this notice is preserved.
-   Last modified 2007-07-25 [20]Valid XHTML 1.0
+   Last modified 2008-10-04 [19]Valid XHTML 1.0
 
 References
 
@@ -1378,19 +1378,19 @@ References
    7. http://gcc.gnu.org/index.html
    8. mailto:gcc@gcc.gnu.org
    9. http://gcc.gnu.org/mirrors.html
-  10. http://www.gnu.org/order/ftp.html
-  11. http://gcc.gnu.org/svn.html
-  12. mailto:gnu@gnu.org
-  13. http://www.gnu.org/home.html#ContactInfo
-  14. http://gcc.gnu.org/about.html
-  15. http://gcc.gnu.org/onlinedocs/
-  16. mailto:gcc-help@gcc.gnu.org
-  17. mailto:gcc@gnu.org
-  18. mailto:gcc@gcc.gnu.org
-  19. http://gcc.gnu.org/lists.html
-  20. http://validator.w3.org/check/referer
+  10. http://gcc.gnu.org/svn.html
+  11. mailto:gnu@gnu.org
+  12. http://www.gnu.org/home.html#ContactInfo
+  13. http://gcc.gnu.org/about.html
+  14. http://gcc.gnu.org/onlinedocs/
+  15. mailto:gcc-help@gcc.gnu.org
+  16. mailto:gcc@gnu.org
+  17. mailto:gcc@gcc.gnu.org
+  18. http://gcc.gnu.org/lists.html
+  19. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-4.1/changes.html
+
                            GCC 4.1 Release Series
                       Changes, New Features, and Fixes
 
@@ -1957,6 +1957,7 @@ References
   15. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-4.0/index.html
+
                            GCC 4.0 Release Series
 
    January 31, 2007
@@ -2048,6 +2049,7 @@ References
   21. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-4.0/changes.html
+
                            GCC 4.0 Release Series
                       Changes, New Features, and Fixes
 
@@ -2554,7 +2556,7 @@ GCC 4.0.4
 
    Verbatim copying and distribution of this entire article is permitted
    in any medium, provided this notice is preserved.
-   Last modified 2007-09-19 [24]Valid XHTML 1.0
+   Last modified 2009-01-01 [24]Valid XHTML 1.0
 
 References
 
@@ -2565,7 +2567,7 @@ References
    5. http://gcc.gnu.org/news/sms.html
    6. http://people.redhat.com/drepper/dsohowto.pdf
    7. http://gcc.gnu.org/gcc-4.0/changes.html#visibility
-   8. http://www.codesourcery.com/cxx-abi/
+   8. http://www.codesourcery.com/public/cxx-abi/
    9. http://gcc.gnu.org/fortran/
   10. http://gcc.gnu.org/install/
   11. http://gcc.gnu.org/wiki/Visibility
@@ -2584,6 +2586,7 @@ References
   24. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-3.4/index.html
+
                            GCC 3.4 Release Series
 
    May 26, 2006
@@ -2690,6 +2693,7 @@ References
   25. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-3.4/changes.html
+
                            GCC 3.4 Release Series
                       Changes, New Features, and Fixes
 
@@ -4880,6 +4884,7 @@ References
  420. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-3.3/index.html
+
                            GCC 3.3 Release Series
 
    May 03, 2005
@@ -4986,6 +4991,7 @@ References
   24. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-3.3/changes.html
+
                            GCC 3.3 Release Series
                       Changes, New Features, and Fixes
 
@@ -6905,6 +6911,7 @@ References
  561. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-3.2/index.html
+
                            GCC 3.2 Release Series
 
    April 25, 2003
@@ -7001,6 +7008,7 @@ References
   20. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-3.2/changes.html
+
                            GCC 3.2 Release Series
                       Changes, New Features, and Fixes
 
@@ -7865,6 +7873,7 @@ References
  254. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-3.1/index.html
+
                                    GCC 3.1
 
    July 27, 2002
@@ -7938,6 +7947,7 @@ References
   17. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-3.1/changes.html
+
                            GCC 3.1 Release Series
                       Changes, New Features, and Fixes
 
@@ -8304,6 +8314,7 @@ References
   21. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-3.0/gcc-3.0.html
+
                                   GCC 3.0.4
 
    February 20, 2002
@@ -8384,6 +8395,7 @@ References
   17. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-3.0/features.html
+
                             GCC 3.0 New Features
 
 Additional changes in GCC 3.0.4
@@ -8587,6 +8599,7 @@ References
   22. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-3.0/caveats.html
+
                                GCC 3.0 Caveats
 
      * -fstrict-aliasing is now part of -O2 and higher optimization
@@ -8655,6 +8668,7 @@ References
   10. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-2.95/index.html
+
                                   GCC 2.95
 
    March 16, 2001: The GNU project and the GCC developers are pleased to
@@ -8751,6 +8765,7 @@ References
   19. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-2.95/features.html
+
                             GCC 2.95 New Features
 
      * General Optimizer Improvements:
@@ -9030,6 +9045,7 @@ References
   25. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-2.95/caveats.html
+
                               GCC 2.95 Caveats
 
      * GCC 2.95 will issue an error for invalid asm statements that had
@@ -9106,6 +9122,7 @@ References
   10. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/egcs-1.1/index.html
+
                                   EGCS 1.1
 
    September 3, 1998: We are pleased to announce the release of EGCS 1.1.
@@ -9343,6 +9360,7 @@ References
   19. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/egcs-1.1/features.html
+
                             EGCS 1.1 new features
 
      * Integrated GNU Fortran (g77) compiler and runtime library with
@@ -9445,6 +9463,7 @@ References
   13. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/egcs-1.1/caveats.html
+
                               EGCS 1.1 Caveats
 
      * EGCS has an integrated libstdc++, but does not have an integrated
@@ -9503,6 +9522,7 @@ References
    9. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/egcs-1.0/index.html
+
                                   EGCS 1.0
 
    December 3, 1997: We are pleased to announce the release of EGCS 1.0.
@@ -9712,6 +9732,7 @@ References
   14. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/egcs-1.0/features.html
+
                               EGCS 1.0 features
 
      * Core compiler is based on the gcc2 development tree from Aug 2,
@@ -9784,6 +9805,7 @@ References
   11. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/egcs-1.0/caveats.html
+
                               EGCS 1.0 Caveats
 
      * EGCS has an integrated libstdc++, but does not have an integrated
