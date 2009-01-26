@@ -965,6 +965,7 @@ print_stop_time ()
 }
 die_with_log ()
 {
+    [ -n "$*" ] && echo "$*"
     echo "Please report an error to http://blackfin.uclinux.org/gf/project/toolchain"
     printf " Build error " ; date
     printf "  occurred"
@@ -977,14 +978,14 @@ die_with_log ()
     tar -jhcf $DIR_LOG/config.logs.tbz2 `find $DIR_BUILD -name "config.log"` $ACTUAL_LOGFILE
 
     if [ "$NUM_JOBS" -eq "1" ]; then
-	echo "When reporting issue, we may ask for $DIR_LOG/config.logs.tbz2"
+        echo "When reporting issue, we may ask for $DIR_LOG/config.logs.tbz2"
         echo " Last logfile entries:"
         tail -10 $ACTUAL_LOGFILE
     else
         echo "Since the build was done in parallel, I'm not sure where the"
-	echo "happened. The best thing to do is add a '-j 1' option to this"
-	echo "BuildToolChain script, and try again."
-   fi
+        echo "happened. The best thing to do is add a '-j 1' option to this"
+        echo "BuildToolChain script, and try again."
+    fi
 
     exit 1
 }
@@ -1005,6 +1006,13 @@ change_dir()
 {
     log_it cd "$@"
     cd "$@" || die_with_log
+}
+change_clean_dir()
+{
+    cd /
+    rm -rf "$@"
+    mkdir -p "$@"
+    change_dir "$@"
 }
 
 echo_date()
@@ -2316,10 +2324,10 @@ if [ $KERNEL_SOURCE ] ; then
         (echo "echo -e '!!! Host utils were expected to fail; ignoring\n' $LOGFILE" ) | sh
     fi
 
-    mkdir -p $DIR_uC_OUTPUT/bfin-uclinux/runtime
-    mkdir -p $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime
-    cp -r $DIR_KBUILD_OUTPUT/usr $DIR_uC_OUTPUT/bfin-uclinux/runtime || exit 1
-    cp -r $DIR_KBUILD_OUTPUT/usr $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime || exit 1
+    run_cmd mkdir -p $DIR_uC_OUTPUT/bfin-uclinux/runtime
+    run_cmd mkdir -p $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime
+    run_cmd cp -r $DIR_KBUILD_OUTPUT/usr $DIR_uC_OUTPUT/bfin-uclinux/runtime
+    run_cmd cp -r $DIR_KBUILD_OUTPUT/usr $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime
 
     if [ "$DIR_KBUILD_OUTPUT" != "$KERNEL_SOURCE" ]; then
         echo_date "Cleaning kernel"
@@ -2546,9 +2554,7 @@ if [ $KERNEL_SOURCE ] ; then
     echo_date "Cleaning ldr-utils"
     find . -print0 | xargs -0 touch -r . # fix autotool timestamps
     run_cmd $MAKE clean
-    rm -rf "$DIR_LDR_UTILS_BUILD"
-    mkdir -p "$DIR_LDR_UTILS_BUILD"
-    change_dir "$DIR_LDR_UTILS_BUILD"
+    change_clean_dir "$DIR_LDR_UTILS_BUILD"
 
     echo_date "Configuring ldr-utils"
     run_cmd $DIR_LDR_UTILS_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET
@@ -2580,9 +2586,7 @@ if [ $KERNEL_SOURCE ] ; then
     echo_date "Cleaning libftdi"
     find . -print0 | xargs -0 touch -r . # fix autotool timestamps
     [ -e Makefile ] && run_cmd $MAKE distclean
-    rm -rf "$DIR_LIBFTDI_BUILD"
-    mkdir -p "$DIR_LIBFTDI_BUILD"
-    change_dir "$DIR_LIBFTDI_BUILD"
+    change_clean_dir "$DIR_LIBFTDI_BUILD"
 
     echo_date "Configuring libftdi"
     run_cmd $DIR_LIBFTDI_SOURCE/configure --prefix="$DIR_LIBFTDI_BUILD/destdir" \
@@ -2609,9 +2613,7 @@ if [ $KERNEL_SOURCE ] ; then
     # generated files get out of sync with source files; force regen
     rm -f src/bsdl/bsdl_bison.[ch] src/bsdl/bsdl_flex.c \
           src/svf/svf_bison.[ch] src/svf/svf_flex.c
-    rm -rf "$DIR_JTAG_BUILD"
-    mkdir -p "$DIR_JTAG_BUILD"
-    change_dir "$DIR_JTAG_BUILD"
+    change_clean_dir "$DIR_JTAG_BUILD"
 
     echo_date "Configuring jtag"
     run_cmd env $DIR_JTAG_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET --enable-relocatable
@@ -2632,9 +2634,7 @@ if [ $KERNEL_SOURCE ] ; then
     echo_date "Cleaning gdbproxy"
     find . -print0 | xargs -0 touch -r . # fix autotool timestamps
     [ -e Makefile ] && run_cmd $MAKE distclean
-    rm -rf "$DIR_GDBPROXY_BUILD"
-    mkdir -p "$DIR_GDBPROXY_BUILD"
-    change_dir "$DIR_GDBPROXY_BUILD"
+    change_clean_dir "$DIR_GDBPROXY_BUILD"
 
     echo_date "Configuring gdbproxy"
     run_cmd env $DIR_GDBPROXY_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET \
@@ -2709,24 +2709,16 @@ if [ -e $DIR_SOURCE/libs/Makefile ] ; then
 	dir=`echo ${ml} | sed -e 's/;.*$//'`
 	flags=`echo ${ml} | sed -e 's/^[^;]*;//' -e 's/@/ -/g'`
 
-	RUN="$MAKE CROSS=bfin-elf- clean"
-	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-	(echo $RUN $LOGFILE ; ) | sh
+	run_cmd $MAKE CROSS=bfin-elf- clean
 
-	RUN="$MAKE CROSS=bfin-elf- MULTILIB_FLAGS=\"$flags\""
-	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-	(echo $RUN $LOGFILE ; ) | sh
+	run_cmd $MAKE CROSS=bfin-elf- MULTILIB_FLAGS="$flags"
 
 	if [ ! -e $DIR_SOURCE/libs/libdsp/libbfdsp.a ] ; then
-	    echo "libbfdsp.a $flags build error - report an error"
-	    tail -10 $ACTUAL_LOGFILE
-	    exit 1
+	    die_with_log "libbfdsp.a $flags build error - report an error"
 	fi
 
 	if [ ! -e $DIR_SOURCE/libs/libdsp/libbffastfp.a ] ; then
-	    echo "libbffastfp.a $flags build error - report an error"
-	    tail -10 $ACTUAL_LOGFILE
-	    exit 1
+	    die_with_log "libbffastfp.a $flags build error - report an error"
 	fi
 
 
@@ -2734,13 +2726,9 @@ if [ -e $DIR_SOURCE/libs/Makefile ] ; then
 	    if [ $KERNEL_SOURCE ] ; then
 		if echo "${flags}" | grep -q mfdpic; then
 		    dir2=`echo ${dir} | sed -e 's/mfdpic//' -e 's|/$||'`
-		    RUN="$MAKE CROSS=bfin-elf- install DESTDIR=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime USR=/usr SUFFIX=/$dir2 MULTILIB="
-		    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-		    (echo $RUN $LOGFILE ; ) | sh
+		    run_cmd $MAKE CROSS=bfin-elf- install DESTDIR=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime USR=/usr SUFFIX=/$dir2 MULTILIB=
 		else
-		    RUN="$MAKE CROSS=bfin-elf- install DESTDIR=$DIR_uC_OUTPUT/bfin-uclinux/runtime USR=/usr SUFFIX= MULTILIB=/$dir"
-		    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-		    (echo $RUN $LOGFILE ; ) | sh
+		    run_cmd $MAKE CROSS=bfin-elf- install DESTDIR=$DIR_uC_OUTPUT/bfin-uclinux/runtime USR=/usr SUFFIX= MULTILIB=/$dir
 		fi
 	    fi
 	fi
@@ -2751,76 +2739,45 @@ if [ -e $DIR_SOURCE/libs/Makefile ] ; then
 	# Remove it instead of make clean can save much time.
 	rm $DIR_SOURCE/libs/libdsp/libbfdsp.a
 
-	RUN="$MAKE CROSS=bfin-elf- LIBC_HAS_NO_CMATH=1 MULTILIB_FLAGS=\"$flags\""
-	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-	(echo $RUN $LOGFILE ; ) | sh
+	run_cmd $MAKE CROSS=bfin-elf- LIBC_HAS_NO_CMATH=1 MULTILIB_FLAGS="$flags"
 
-	RUN="$MAKE CROSS=bfin-elf- LIBC_HAS_NO_CMATH=1 install DESTDIR=$DIR_ELF_OUTPUT/bfin-elf USR= SUFFIX= MULTILIB=/$dir"
-	(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-	(echo $RUN $LOGFILE ; ) | sh
+	run_cmd $MAKE CROSS=bfin-elf- LIBC_HAS_NO_CMATH=1 install DESTDIR=$DIR_ELF_OUTPUT/bfin-elf USR= SUFFIX= MULTILIB=/$dir
     done
 
-    RUN="$MAKE CROSS=bfin-elf- clean"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    run_cmd $MAKE CROSS=bfin-elf- clean
 fi
 
 ########################### Target binutils ########################
 
 if [ $KERNEL_SOURCE ] ; then
+	export PATH=$DIR_uC_OUTPUT/bin:$DIR_LINUX_OUTPUT/bin:$PATH
 
-export PATH=$DIR_uC_OUTPUT/bin:$DIR_LINUX_OUTPUT/bin:$PATH
+	echo_date "Building target libbfd (flat)"
+	change_clean_dir $DIR_BINUTILS_BUILD
 
-echo_date "Building target libbfd (flat)"
+	run_cmd $DIR_BINUTILS_SOURCE/configure \
+		--target=bfin-uclinux --host=bfin-uclinux $BUILD_TARGET \
+		--prefix=$DIR_uC_OUTPUT/bfin-uclinux \
+		--disable-nls --disable-shared --without-newlib
+	run_cmd $MAKE all-bfd all-opcodes all-libiberty
 
-mkdir $DIR_BINUTILS_BUILD
-change_dir $DIR_BINUTILS_BUILD
+	echo_date "Installing target libbfd"
+	run_cmd $MAKE install-bfd install-opcodes install-libiberty
 
-RUN="LDFLAGS=-Wl,-elf2flt \
-    $DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-uclinux \
-    --host=bfin-uclinux $BUILD_TARGET \
-    --disable-shared --prefix=$DIR_uC_OUTPUT/bfin-uclinux --disable-nls \
-    --without-newlib"
-(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-(echo $RUN $LOGFILE ; ) | sh
+	echo_date "Building target libbfd (fdpic)"
+	change_clean_dir $DIR_BINUTILS_BUILD
 
-RUN="$MAKE all-bfd all-opcodes all-libiberty"
-(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-(echo $RUN $LOGFILE ; ) | sh
+	run_cmd $DIR_BINUTILS_SOURCE/configure \
+		--target=bfin-linux-uclibc --host=bfin-linux-uclibc $BUILD_TARGET \
+		--prefix=$DIR_LINUX_OUTPUT/bfin-linux-uclibc \
+		--disable-nls --disable-shared --without-newlib
+	run_cmd $MAKE all-bfd all-opcodes all-intl all-libiberty
 
-echo_date "Installing target libbfd"
-RUN="$MAKE install-bfd install-opcodes install-libiberty"
-(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-(echo $RUN $LOGFILE ; ) | sh
+	echo_date "Installing target libbfd"
+	run_cmd $MAKE install-bfd install-opcodes install-libiberty
 
-echo_date "Building target libbfd (fdpic)"
-
-change_dir ..
-rm -rf $DIR_BINUTILS_BUILD
-mkdir $DIR_BINUTILS_BUILD
-change_dir $DIR_BINUTILS_BUILD
-
-# Don't add -mfdpic to CFLAGS, since BFD tries to build a few files with the
-# host compiler.
-RUN="$DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-linux-uclibc \
-    --host=bfin-linux-uclibc $BUILD_TARGET \
-    --disable-shared --prefix=$DIR_LINUX_OUTPUT/bfin-linux-uclibc --disable-nls \
-    --without-newlib"
-(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-(echo $RUN $LOGFILE ; ) | sh
-
-RUN="$MAKE all-bfd all-opcodes all-intl all-libiberty"
-(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-(echo $RUN $LOGFILE ; ) | sh
-
-echo_date "Installing target libbfd"
-RUN="$MAKE install-bfd install-opcodes install-libiberty"
-(echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-(echo $RUN $LOGFILE ; ) | sh
-
-change_dir ..
-rm -rf $DIR_BINUTILS_BUILD
-
+	change_dir ..
+	rm -rf $DIR_BINUTILS_BUILD
 fi
 
 printf "*** It took"
@@ -2828,4 +2785,3 @@ print_stop_time
 echo " to complete"
 
 echo_date "Done"
-
