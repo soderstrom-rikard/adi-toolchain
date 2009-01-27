@@ -350,17 +350,18 @@ if [ -n "$CHECK_PRE" ] ; then
             if [ -n "$tmp" ] ; then
                 continue
             fi
-            echo "** Could not find version of `which $file`"
-            printf "** "
-            file `which $file`
-            RUN=$(file `which $file`| grep -i "symbolic link" | wc -l)
-            while [ "$RUN" -gt "0" ]
-            do
+            file=$(which $file)
+            echo "** Could not find version of $file"
+            while [ -L "$file" ] ; do
                 printf " * "
-                file=$(file `which $file` | awk  '{print $NF}' | sed 's/`//g' | sed "s/'//g")
                 file $file
-                RUN=$(file $file | grep -i "symbolic link" | wc -l)
+                lfile=$(readlink $file)
+                [ "${lfile#/}" = "${lfile}" ] \
+                    && file="${file%/*}/${lfile}" \
+                    || file="${lfile}"
             done
+            printf " * "
+            file "${file}"
         fi
     done
     echo "   SHELL = $SHELL"
