@@ -45,10 +45,11 @@ GCC_VERSIONS=
 NUM_JOBS=0
 SKIP_DEV_CHECKS=false
 WITHOUT_X=false
+RESUME_BUILD=false
 CBUILD= # the system we are compiling on
 CHOST=  # the system the final compiler will run on
 
-while getopts b:B:c:C:dDfH:hj:k:K:l:m:o:O:pr:s:StT:u:U:vwX parameter
+while getopts b:B:c:C:dDfH:hj:k:K:l:m:o:O:pr:Rs:StT:u:U:vwX parameter
 do
     case $parameter in
         p)
@@ -81,6 +82,9 @@ do
                 exit 1
             fi
             RESULTS2COMPARE=$OPTARG
+            ;;
+        R)
+            RESUME_BUILD=true
             ;;
         S)
             SKIP_ELF=true
@@ -211,6 +215,7 @@ do
 -o OUTPUT        Output directory prefix (leave blank to use build dir)
 -p               Check prerequisites
 -r RESULTS_DIR   Compare current tests to old results
+-R               Resume failed build
 -s SOURCE        Toolchain Source directory (builds bfin-elf-gcc)"
 # -S               Skip building elf compiler - don't print this out
 echo "-T TARGET_IPADDR Test components on hardware
@@ -504,8 +509,7 @@ fi
 
 mk_output_dir()
 {
-    printf "Path to $1 output dir  "
-    echo $2
+    printf "%-28s%s\n" "Path to $1 output dir " "$2"
     if [ ! -d $2 ] ; then
         mkdir -p $2
         if [ ! -d /.$2 ] ; then
@@ -518,7 +522,7 @@ mk_output_dir()
             exit 1
         fi
 
-        if [ "x$3" = "x" ]; then
+        if [ "x$3" = "x" ] && ! ${RESUME_BUILD} ; then
             echo "$2 already exists - cleaning"
             rm -rf $2/*
         fi
@@ -534,7 +538,7 @@ mk_output_dir "elf" $DIR_ELF_OUTPUT $SKIP_ELF
 DIR_LOG=$DIR_BUILD/logs
 if [ ! -d $DIR_LOG ] ; then
     mkdir $DIR_LOG
-else
+elif ! ${RESUME_BUILD} ; then
     rm -rf $DIR_LOG/*
 fi
 
@@ -923,20 +927,6 @@ fi
 DIR_BINUTILS_BUILD=$DIR_BUILD/binutils_build
 DIR_ELF2FLT_BUILD=$DIR_BUILD/elf2flt_build
 DIR_GENEXT2FS_BUILD=$DIR_BUILD/genext2fs_build
-DIR_CRAMFS_BUILD=$DIR_BUILD/cramfs_build
-
-echo "Removing old build dir"
-
-rm -rf $DIR_BINUTILS_BUILD
-rm -rf $DIR_ELF2FLT_BUILD
-rm -rf $DIR_GENEXT2FS_BUILD
-rm -rf $DIR_CRAMFS_BUILD
-
-mkdir -p $DIR_BINUTILS_BUILD
-mkdir -p $DIR_ELF2FLT_BUILD
-mkdir -p $DIR_GENEXT2FS_BUILD
-mkdir -p $DIR_CRAMFS_BUILD
-
 
 # Add output dir so when building uclibc, it can find the toolchain
 export PATH=$NEW_PATH:/$DIR_ELF_OUTPUT/bin:/$DIR_uC_OUTPUT/bin:/$DIR_LINUX_OUTPUT/bin
@@ -1069,13 +1059,28 @@ echo_date()
     return 0
 }
 
+resume_check()
+{
+	__RESUME_FILE="$DIR_LOG/.resume.$(echo $1 | tr '[/]' '_')"
+	[ -e "${__RESUME_FILE}" ]
+}
+resume_save()
+{
+	touch "${__RESUME_FILE}"
+}
+resume_clear()
+{
+	rm -f "$DIR_LOG"/.resume.*
+}
+
 build_gcc ()
 {
+    resume_check bfin-$2.gcc-$1 && return 0
+
     DIR_GCC_SOURCE=$DIR_SOURCE/gcc-$1
 
     DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$1
-    rm -rf $DIR_GCC_BUILD
-    mkdir $DIR_GCC_BUILD
+    change_clean_dir $DIR_GCC_BUILD
 
     # When doing a canadian cross, we have to use the toolchain on the host.
     # Since gcc is very picky about being compiled by another version, make
@@ -1118,8 +1123,6 @@ build_gcc ()
     else
         EXTRA_GCC_CONF=""
     fi
-
-    change_dir $DIR_GCC_BUILD
 
     LOCALE="--enable-clocale=generic"
     if [ -n "$UCLIBC_CONFIG_FILE" ]; then
@@ -1202,6 +1205,98 @@ build_gcc ()
         PATH=$save_PATH
         rm -rf "$DIR_GCC_BUILD/.bfin.path"
     fi
+
+    resume_save
+}
+
+# Build up a set of binutils
+#  $1 - toolchain prefix (bfin-XXX-gcc)
+#  $2 - configure --prefix=XXX
+build_binutils()
+{
+	local target="bfin-$1"
+	local prefix="$2"
+
+	resume_check ${target}.binutils && return 0
+
+	change_clean_dir $DIR_BINUTILS_BUILD
+
+	# Blackfin doesn't utilize xml memory maps so disable this for now
+	# to avoid the ABI differences between systems
+	export ac_cv_libexpat=no
+
+	case ${target} in
+		bfin-elf) myconf="--without-newlib";;
+		*)        myconf="--with-sysroot=${prefix}/${target}/runtime";;
+	esac
+
+	echo_date "Configuring $1 Binutils & GDB"
+	run_cmd $DIR_BINUTILS_SOURCE/configure \
+		$BUILD_TARGET $HOST_TARGET --target=${target} \
+		--prefix=${prefix} ${myconf} $BINUTILS_EXTRA_CONF
+
+	echo_date "Building $1 Binutils & GDB"
+	run_cmd $MAKE all-binutils all-gas all-ld all-sim all-gdb
+
+	eval `grep ^EXEEXT= $DIR_BINUTILS_BUILD/binutils/config.log`
+	check_installed_files binutils "$DIR_BINUTILS_BUILD/binutils/" \
+		addr2line ar cxxfilt nm-new objcopy objdump ranlib \
+		readelf size strings strip-new
+	check_installed_files gas "$DIR_BINUTILS_BUILD/gas/" as-new
+	check_installed_files ld "$DIR_BINUTILS_BUILD/ld/" ld-new
+
+	FILE="gdb"
+	if [ "${WITHOUT_X}" = "false" ] ; then
+		FILE="${FILE} insight"
+	fi
+	check_installed_files gdb "$DIR_BINUTILS_BUILD/gdb/" ${FILE}
+
+	change_dir $DIR_BINUTILS_BUILD
+	echo_date "Installing $1 Binutils & GDB"
+	run_cmd $MAKE install-binutils install-gas install-ld install-sim install-gdb
+
+	resume_save
+}
+
+build_elf2flt()
+{
+	local target="bfin-$1"
+	local prefix="$2"
+
+	resume_check ${target}.elf2flt && return 0
+
+	echo_date "Building $1 elf2flt"
+	change_clean_dir $DIR_ELF2FLT_BUILD
+	touch -r . $DIR_ELF2FLT_SOURCE/* # fix autotool timestamps
+
+	myconf=""
+	if [ -e $DIR_BINUTILS_BUILD/intl/libintl.a ] ; then
+		myconf="${myconf} --with-libintl=$DIR_BINUTILS_BUILD/intl/libintl.a"
+	fi
+	run_cmd $DIR_ELF2FLT_SOURCE/configure \
+		$BUILD_TARGET $HOST_TARGET --target=${target} \
+		--with-libbfd=$DIR_BINUTILS_BUILD/bfd/libbfd.a \
+		--with-libiberty=$DIR_BINUTILS_BUILD/libiberty/libiberty.a \
+		--with-bfd-include-dir=$DIR_BINUTILS_BUILD/bfd \
+		--with-binutils-include-dir=$DIR_BINUTILS_SOURCE/include \
+		--prefix=${prefix} --program-suffix= ${myconf}
+
+	echo_date "Make $1 elf2flt"
+	run_cmd $MAKE
+
+	eval `grep ^EXEEXT= $DIR_ELF2FLT_BUILD/config.log`
+	check_installed_files elf2flt "$DIR_ELF2FLT_BUILD/" elf2flt flthdr
+
+	echo_date "Installing $1 elf2flt"
+	run_cmd $MAKE install
+
+	check_installed_files elf2flt "${prefix}/bin/${target}-" \
+		elf2flt flthdr
+
+	rm -rf $DIR_BINUTILS_BUILD/*
+	rm -rf $DIR_ELF2FLT_BUILD/*
+
+	resume_save
 }
 
 # Compare two dotted version numbers.  Versions are .0 extended if they
@@ -1263,6 +1358,13 @@ install_all_target_libs()
 		tdir=${rundir}/${mdir}lib
 		reltdir=$(echo "${mdir}" | sed 's:[^/]*/:../:g')${reldir}/${mdir}lib
 		soname=$(${readelf} -d "${flib}" | sed -n '/(SONAME)/s:.*[[]\(.*\)[]].*:\1:p')
+
+		# see if this library has been moved already ...
+		# all symlinks in the gcc libdir should be relative
+		# and contain no path elements
+		if echo "${otarg}" | grep -q / ; then
+			continue
+		fi
 
 		local movit=true
 		if [ -e "${tdir}/${soname}" ] ; then
@@ -1990,71 +2092,13 @@ fi
 if [ "x$SKIP_ELF" = "x" ]; then
 
     ################ Step 1 - ELF Toolchain #########################
-    change_dir $DIR_BINUTILS_BUILD
-
-    # Blackfin doesn't utilize xml memory maps so disable this for now
-    # to avoid the ABI differences between systems
-    export ac_cv_libexpat=no
-
-    echo_date "Configuring Elf Binutils & GDB"
-    RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-elf \
-        --prefix=$DIR_ELF_OUTPUT --without-newlib $BINUTILS_EXTRA_CONF"
-    run_cmd $RUN
-
-    echo_date "Building Elf Binutils & GDB"
-    run_cmd $MAKE all-binutils all-gas all-ld all-sim all-gdb
-
-    eval `grep ^EXEEXT= $DIR_BINUTILS_BUILD/binutils/config.log`
-    check_installed_files binutils "$DIR_BINUTILS_BUILD/binutils/" \
-        addr2line ar cxxfilt nm-new objcopy objdump ranlib \
-        readelf size strings strip-new
-    check_installed_files gas "$DIR_BINUTILS_BUILD/gas/" as-new
-    check_installed_files ld "$DIR_BINUTILS_BUILD/ld/" ld-new
-
-    FILE="gdb"
-    if [ "${WITHOUT_X}" = "false" ] ; then
-        FILE="${FILE} insight"
-    fi
-    check_installed_files gdb "$DIR_BINUTILS_BUILD/gdb/" ${FILE}
-
-    change_dir $DIR_BINUTILS_BUILD
-    echo_date "Installing Elf Binutils & GDB"
-    run_cmd $MAKE install-binutils install-gas install-ld install-sim install-gdb
+    build_binutils elf $DIR_ELF_OUTPUT
 
     for GCC_VERSION in $GCC_VERSIONS; do
       build_gcc $GCC_VERSION elf $DIR_ELF_OUTPUT "--with-newlib"
     done
 
-    ######################## Step 2 - build elf2flt ##############
-
-    echo_date "Building Elf elf2flt"
-    change_dir $DIR_ELF2FLT_BUILD
-    touch -r . $DIR_ELF2FLT_SOURCE/* # fix autotool timestamps
-
-    RUN="$DIR_ELF2FLT_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-elf \
-         --with-libbfd=$DIR_BINUTILS_BUILD/bfd/libbfd.a               \
-         --with-libiberty=$DIR_BINUTILS_BUILD/libiberty/libiberty.a   \
-         --with-bfd-include-dir=$DIR_BINUTILS_BUILD/bfd               \
-         --with-binutils-include-dir=$DIR_BINUTILS_SOURCE/include     \
-         --prefix=$DIR_ELF_OUTPUT --program-suffix= "
-
-    if [ -e $DIR_BINUTILS_BUILD/intl/libintl.a ] ; then
-        RUN="$RUN --with-libintl=$DIR_BINUTILS_BUILD/intl/libintl.a"
-    fi
-
-    run_cmd $RUN
-
-    echo_date "Make Elf elf2flt"
-    run_cmd $MAKE
-
-    eval `grep ^EXEEXT= $DIR_ELF2FLT_BUILD/config.log`
-    check_installed_files elf2flt "$DIR_ELF2FLT_BUILD/" elf2flt flthdr
-
-    echo_date "Installing Elf elf2flt"
-    run_cmd $MAKE install
-
-    check_installed_files elf2flt "$DIR_ELF_OUTPUT/bin/bfin-elf-" \
-        elf2flt flthdr
+    build_elf2flt elf $DIR_ELF_OUTPUT
 
     ########################### Step 2 - done ####################
 
@@ -2063,11 +2107,6 @@ if [ "x$SKIP_ELF" = "x" ]; then
 	run_tests $DIR_TEST_SIM_RESULTS simulator
     fi
 fi
-
-rm -rf $DIR_GENEXT2FS_BUILD/*
-rm -rf $DIR_ELF2FLT_BUILD/*
-rm -rf $DIR_BINUTILS_BUILD/*
-rm -rf $DIR_CRAMFS_BUILD/*
 
 for GCC_VERSION in $GCC_VERSIONS; do
     DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
@@ -2106,7 +2145,7 @@ fi
 
 
 if [ $KERNEL_SOURCE ] ; then
-    if [ "$DIR_KBUILD_OUTPUT" != "$KERNEL_SOURCE" ]; then
+    if [ "$DIR_KBUILD_OUTPUT" != "$KERNEL_SOURCE" ] && ! resume_check linux-headers ; then
 	echo_date "Configuring Linux Kernel"
 
 	change_dir $KERNEL_SOURCE
@@ -2119,10 +2158,13 @@ if [ $KERNEL_SOURCE ] ; then
 		ARCH=blackfin
 	find "$DIR_KBUILD_OUTPUT/usr" -type f -name '.check.*' -print0 | xargs -0 rm -f
 	change_dir ..
+
+	resume_save
     fi
 
 
     ####################### Step 3 - build uClibc ################
+
     change_dir $UCLIBC_SOURCE
 
     if [ -n "$UCLIBC_CONFIG_FILE" ]; then
@@ -2144,6 +2186,8 @@ if [ $KERNEL_SOURCE ] ; then
 	if echo "${dir}" | grep -q bf561; then
 	    continue
 	fi
+
+	resume_check uclibc.${dir} && continue
 
 	echo_date "Configuring uClibc for ${dir}"
 
@@ -2250,12 +2294,16 @@ if [ $KERNEL_SOURCE ] ; then
 	    build_uClibc $DIR_uC_OUTPUT/bfin-uclinux "" "${dir}"
 
 	fi
+
+	resume_save
     done
 
     # update the kernel header path just to make rebuilding easier later on
     sed -i '/^KERNEL_HEADERS/s:=.*:="'"$DIR_uC_OUTPUT/bfin-uclinux/runtime/usr/include"'":' .config-used-for*
 
     ######################### Done with uClibc ###########################
+
+    if ! resume_check uclibc.host-utils ; then
 
     echo_date  "Building uClibc host utils"
     RUN="$MAKE -C utils hostutils $ARGS"
@@ -2285,26 +2333,13 @@ if [ $KERNEL_SOURCE ] ; then
     change_dir $UCLIBC_SOURCE
     run_cmd $MAKE CROSS=bfin-elf- distclean
 
+    resume_save
+    fi
+
     ####################### Done Step 3  #########################
 
     ####################### Step 4 - build bfin-uclinux ################
-    change_dir $DIR_BINUTILS_BUILD
-
-    # Blackfin doesn't utilize xml memory maps so disable this for now
-    # to avoid the ABI differences between systems
-    export ac_cv_libexpat=no
-
-    echo_date "Configuring uClinux Binutils & GDB"
-    RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET \
-         --target=bfin-uclinux --prefix=$DIR_uC_OUTPUT \
-         --with-sysroot=$DIR_uC_OUTPUT/bfin-uclinux/runtime $BINUTILS_EXTRA_CONF"
-    run_cmd $RUN
-
-    echo_date "Building uClinux Binutils & GDB"
-    run_cmd $MAKE all-binutils all-gas all-ld all-sim all-gdb
-
-    echo_date "Installing uClinux Binutils & GDB"
-    run_cmd $MAKE install-binutils install-gas install-ld install-sim install-gdb
+    build_binutils uclinux $DIR_uC_OUTPUT
 
     ln -s runtime/usr/include $DIR_uC_OUTPUT/bfin-uclinux/sys-include
     for GCC_VERSION in $GCC_VERSIONS; do
@@ -2314,31 +2349,7 @@ if [ $KERNEL_SOURCE ] ; then
     done
     rm -f $DIR_uC_OUTPUT/bfin-uclinux/sys-include
 
-    ######################## build elf2flt ##########################
-
-    echo_date "Building uClinux elf2flt"
-    change_dir $DIR_ELF2FLT_BUILD
-    touch -r . $DIR_ELF2FLT_SOURCE/* # fix autotool timestamps
-
-    RUN="$DIR_ELF2FLT_SOURCE/configure $BUILD_TARGET $HOST_TARGET                \
-         --target=bfin-uclinux                                     \
-         --with-libbfd=$DIR_BINUTILS_BUILD/bfd/libbfd.a            \
-         --with-libiberty=$DIR_BINUTILS_BUILD/libiberty/libiberty.a   \
-         --with-bfd-include-dir=$DIR_BINUTILS_BUILD/bfd            \
-         --with-binutils-include-dir=$DIR_BINUTILS_SOURCE/include  \
-         --prefix=$DIR_uC_OUTPUT --program-suffix= "
-
-    if [ -e $DIR_BINUTILS_BUILD/intl/libintl.a ] ; then
-        RUN="$RUN --with-libintl=$DIR_BINUTILS_BUILD/intl/libintl.a"
-    fi
-
-    run_cmd $RUN
-
-    echo_date "Building uClinux elf2flt"
-    run_cmd $MAKE
-
-    echo_date "Installing uClinux elf2flt"
-    run_cmd $MAKE install
+    build_elf2flt uclinux $DIR_uC_OUTPUT
 
     ####################### Test bfin-uclinux #######################
 
@@ -2354,25 +2365,7 @@ if [ $KERNEL_SOURCE ] ; then
     fi
 
     ####################### Step 4a - build bfin-linux-uclibc ################
-    rm -rf $DIR_BINUTILS_BUILD
-    mkdir $DIR_BINUTILS_BUILD
-    change_dir $DIR_BINUTILS_BUILD
-
-    # Blackfin doesn't utilize xml memory maps so disable this for now
-    # to avoid the ABI differences between systems
-    export ac_cv_libexpat=no
-
-    echo_date "Configuring linux-uclibc Binutils & GDB" 
-    RUN="$DIR_BINUTILS_SOURCE/configure $BUILD_TARGET $HOST_TARGET \
-         --target=bfin-linux-uclibc --prefix=$DIR_LINUX_OUTPUT \
-         --with-sysroot=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime $BINUTILS_EXTRA_CONF"
-    run_cmd $RUN
-
-    echo_date  "Building linux-uclibc binutils"
-    run_cmd $MAKE all-binutils all-gas all-ld all-sim all-gdb
-
-    echo_date "Installing linux-uclibc binutils  "
-    run_cmd $MAKE install-binutils install-gas install-ld install-sim install-gdb
+    build_binutils linux-uclibc $DIR_LINUX_OUTPUT
 
     ln -s runtime/usr/include $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
     for GCC_VERSION in $GCC_VERSIONS; do
@@ -2382,7 +2375,7 @@ if [ $KERNEL_SOURCE ] ; then
     done
     rm -f $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
 
-    if [ "${CHOST}" != "${CBUILD}" ] ; then
+    if [ "${CHOST}" != "${CBUILD}" ] || ${RESUME_BUILD} ; then
         install_all_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc
     else
 
@@ -2428,7 +2421,7 @@ if [ $KERNEL_SOURCE ] ; then
     ########################### genext2fs ########################
 
     echo_date "Building uClinux genext2fs"
-    change_dir $DIR_GENEXT2FS_BUILD
+    change_clean_dir $DIR_GENEXT2FS_BUILD
     touch -r . * # fix autotool timestamps
 
     echo_date "Cleaning uClinux genext2fs"
@@ -2459,6 +2452,8 @@ if [ $KERNEL_SOURCE ] ; then
     (echo $RUN $LOGFILE ; ) | sh
     cp $DIR_uC_OUTPUT/bin/genext2fs $DIR_uC_OUTPUT/bin/bfin-uclinux-genext2fs || exit 1
     mv $DIR_uC_OUTPUT/bin/genext2fs $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-genext2fs || exit 1
+
+    rm -rf $DIR_GENEXT2FS_BUILD
 
     ########################### cramfs ########################
 
@@ -2494,6 +2489,8 @@ if [ $KERNEL_SOURCE ] ; then
 
 	######################## ldr-utils ###########################
 
+    if ! resume_check ldr-utils ; then
+
     DIR_LDR_UTILS_BUILD=$DIR_BUILD/ldr-utils_build
 
     change_dir $DIR_LDR_UTILS_SOURCE
@@ -2522,7 +2519,12 @@ if [ $KERNEL_SOURCE ] ; then
     change_dir $DIR_LDR_UTILS_SOURCE
     rm -rf "$DIR_LDR_UTILS_BUILD"
 
+    resume_save
+    fi
+
     ######################## jtag/gdbproxy #######################
+
+    if ! resume_check jtag-tools ; then
 
     ### libftdi
     if ( check_lib usb && ! check_lib ftdi ) 2>/dev/null ; then
@@ -2598,6 +2600,9 @@ if [ $KERNEL_SOURCE ] ; then
     change_dir $DIR_BUILD
     rm -rf "$DIR_LIBFTDI_BUILD" "$DIR_JTAG_BUILD" "$DIR_GDBPROXY_BUILD"
 
+    resume_save
+    fi
+
     ######################## U-Boot ##############################
 
     if [ $DIR_UBOOT ] ; then
@@ -2630,13 +2635,10 @@ if [ $KERNEL_SOURCE ] ; then
 
 fi
 
-rm -rf $DIR_GENEXT2FS_BUILD
-rm -rf $DIR_BINUTILS_BUILD
 for GCC_VERSION in $GCC_VERSIONS; do
     DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
     rm -rf $DIR_GCC_BUILD/*
 done
-rm -rf $DIR_ELF2FLT_BUILD
 
 ########################### Target libs ########################
 
@@ -2717,6 +2719,8 @@ if [ $KERNEL_SOURCE ] ; then
 	change_dir ..
 	rm -rf $DIR_BINUTILS_BUILD
 fi
+
+resume_clear
 
 printf "*** It took"
 print_stop_time
