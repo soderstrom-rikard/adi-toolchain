@@ -1001,6 +1001,19 @@ run_cmd()
     eval \($(requote "$@")\) ${LOGFILE} || die_with_log
 }
 
+check_installed_files()
+{
+    local pkg=$1 ; shift
+    local pfx=$1 ; shift
+    local f
+    for f in "$@" ; do
+        f="${pfx}${f}${EXEEXT}"
+        if [ ! -f "${f}" ] ; then
+            die_with_log "${pkg} did not build properly : Missing ${f}"
+        fi
+    done
+}
+
 change_dir()
 {
     log_it cd "$@"
@@ -1074,8 +1087,7 @@ build_gcc ()
             fullt=$(echo `which bfin-$2-$t`-$1.?)
             if [ ! -x "$fullt" ] ; then
                 if [ "$t" = "gcc" ] ; then
-                    echo "You need to have gcc $1 installed in order to build it"
-                    die_with_log
+                    die_with_log "You need to have gcc $1 installed in order to build it"
                 else
                     continue
                 fi
@@ -1145,47 +1157,29 @@ build_gcc ()
     echo_date "Building GCC"
     run_cmd $MAKE
 
-    TMP=`echo $BFIN_LANGS | grep c++`
-    if [ -n "$TMP" ] ; then
-        FILE="cc1 cc1plus collect2 cpp g++ gcov xgcc"
-    else
-        FILE="cc1 collect2 gcov xgcc"
-    fi
-
     eval `grep ^EXEEXT= $DIR_GCC_BUILD/gcc/config.log`
-
-    for RUN in $FILE
-    do
-        if [ ! -f $DIR_GCC_BUILD/gcc/$RUN$EXEEXT ] ; then
-            echo "gcc did not build properly : Missing $RUN$EXEEXT"
-            die_with_log
-        fi
-    done
+    FILE="cc1 collect2 gcov xgcc"
+    if echo $BFIN_LANGS | grep -q c++ ; then
+        FILE="${FILE} cc1plus cpp g++"
+    fi
+    check_installed_files gcc "$DIR_GCC_BUILD/gcc/" $FILE
 
     echo_date "Installing GCC"
     run_cmd $MAKE -j1 install
 
     # some basic sanity checks
-    TMP=`echo $BFIN_LANGS | grep c++`
-    if [ -n "$TMP" ] ; then
-        FILE="g++ c++"
-    else
-        FILE=""
+    FILE="addr2line ar as c++filt gcov ld nm objdump \
+          objcopy ranlib readelf size strings strip \
+          gdb run \
+          cpp gcc"
+    if echo $BFIN_LANGS | grep -q c++ ; then
+        FILE="${FILE} g++ c++"
     fi
     if [ "${WITHOUT_X}" = "false" ] ; then
         FILE="${FILE} insight"
     fi
-    for RUN in addr2line ar as c++filt gcov ld nm objdump \
-               objcopy ranlib readelf size strings strip \
-               gdb run \
-               cpp gcc $FILE
-    do
-        if [ ! -f $3/bin/bfin-$2-$RUN$EXEEXT ] ; then
-            echo "The toolchain ($RUN$EXEEXT) did not install properly - report an error"
-            tail -10 $ACTUAL_LOGFILE
-            exit 1
-        fi
-    done
+    check_installed_files toolchain "$3/bin/bfin-$2-" $FILE
+
     if [ -e $DIR_GCC_SOURCE/gcc/BASE-VER ] ; then
         VERSION=`cat $DIR_GCC_SOURCE/gcc/BASE-VER`
     else
@@ -1952,15 +1946,8 @@ build_uClibc()
 
     # Need a way to look at uClibc make system , and see what libs
     # should be created
-    for RUN in crt1.o libc.a libcrypt.a libm.a libnsl.a libresolv.a \
-               libutil.a
-    do
-        FILE=$1/runtime/$2/usr/lib/$3/$RUN
-        if [ ! -f $FILE ] ; then
-            echo "uClibc $1/runtime/$2/usr/lib/$3 did not install properly : Missing $RUN"
-            die_with_log
-        fi
-    done
+    check_installed_files uClibc "$1/runtime/$2/usr/lib/$3/" \
+        crt1.o libc.a libcrypt.a libm.a libnsl.a libresolv.a libutil.a
 }
 
 ###################### Setting up test  ##########################
@@ -2018,44 +2005,17 @@ if [ "x$SKIP_ELF" = "x" ]; then
     run_cmd $MAKE all-binutils all-gas all-ld all-sim all-gdb
 
     eval `grep ^EXEEXT= $DIR_BINUTILS_BUILD/binutils/config.log`
+    check_installed_files binutils "$DIR_BINUTILS_BUILD/binutils/" \
+        addr2line ar cxxfilt nm-new objcopy objdump ranlib \
+        readelf size strings strip-new
+    check_installed_files gas "$DIR_BINUTILS_BUILD/gas/" as-new
+    check_installed_files ld "$DIR_BINUTILS_BUILD/ld/" ld-new
 
-    for RUN in addr2line ar cxxfilt nm-new objcopy objdump ranlib \
-               readelf size strings strip-new
-    do
-        if [ ! -f $DIR_BINUTILS_BUILD/binutils/$RUN$EXEEXT ] ; then
-            echo "Binutils did not build properly : Missing $RUN$EXEEXT"
-            die_with_log
-        fi
-    done
-
-    for RUN in as-new
-    do
-        if [ ! -f $DIR_BINUTILS_BUILD/gas/$RUN$EXEEXT ] ; then
-            echo "Gas did not build properly : Missing $RUN$EXEEXT"
-            die_with_log
-        fi
-    done
-
-    for RUN in ld-new
-    do
-        if [ ! -f $DIR_BINUTILS_BUILD/ld/$RUN$EXEEXT ] ; then
-            echo "Ld did not build properly : Missing $RUN$EXEEXT"
-            die_with_log
-      fi
-    done
-
+    FILE="gdb"
     if [ "${WITHOUT_X}" = "false" ] ; then
-        FILE="insight"
-    else
-        FILE=""
+        FILE="${FILE} insight"
     fi
-    for RUN in gdb $FILE
-    do
-        if [ ! -f $DIR_BINUTILS_BUILD/gdb/$RUN$EXEEXT ] ; then
-            echo "gdb did not build properly : Missing $RUN$EXEEXT"
-            die_with_log
-        fi
-    done
+    check_installed_files gdb "$DIR_BINUTILS_BUILD/gdb/" ${FILE}
 
     change_dir $DIR_BINUTILS_BUILD
     echo_date "Installing Elf Binutils & GDB"
@@ -2088,25 +2048,13 @@ if [ "x$SKIP_ELF" = "x" ]; then
     run_cmd $MAKE
 
     eval `grep ^EXEEXT= $DIR_ELF2FLT_BUILD/config.log`
-
-    for RUN in elf2flt flthdr
-    do
-        if [ ! -f $DIR_ELF2FLT_BUILD/$RUN$EXEEXT ] ; then
-            echo "Elf2flt did not build properly : Missing $RUN$EXEEXT"
-            die_with_log
-        fi
-    done
+    check_installed_files elf2flt "$DIR_ELF2FLT_BUILD/" elf2flt flthdr
 
     echo_date "Installing Elf elf2flt"
     run_cmd $MAKE install
 
-    for RUN in bfin-elf-elf2flt bfin-elf-flthdr
-    do
-        if [ ! -f $DIR_ELF_OUTPUT/bin/$RUN$EXEEXT ] ; then
-            echo "Elf2flt did not install properly : Missing $RUN$EXEEXT"
-            die_with_log
-       fi
-    done
+    check_installed_files elf2flt "$DIR_ELF_OUTPUT/bin/bfin-elf-" \
+        elf2flt flthdr
 
     ########################### Step 2 - done ####################
 
@@ -2668,12 +2616,9 @@ if [ $KERNEL_SOURCE ] ; then
         run_cmd $MAKE O="$DIR_UBOOT_BUILD" BIN_FILES='mkimage gen_eth_addr' tools
 
         echo_date "Copying U-Boot Tools"
-        for RUN in mkimage gen_eth_addr
-        do
-            if [ ! -f $DIR_UBOOT_BUILD/tools/$RUN ] ; then
-                echo "U-Boot did not build properly : Missing $RUN"
-                die_with_log
-            fi
+        check_installed_files u-boot "$DIR_UBOOT_BUILD/tools/" \
+            mkimage gen_eth_addr
+        for RUN in mkimage gen_eth_addr ; do
             run_cmd cp "$DIR_UBOOT_BUILD/tools/$RUN" "$DIR_uC_OUTPUT/bin/bfin-uclinux-$RUN"
             run_cmd cp "$DIR_UBOOT_BUILD/tools/$RUN" "$DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-$RUN"
         done
@@ -2712,14 +2657,8 @@ if [ -e $DIR_SOURCE/libs/Makefile ] ; then
 
 	run_cmd $MAKE CROSS=bfin-elf- MULTILIB_FLAGS="$flags"
 
-	if [ ! -e $DIR_SOURCE/libs/libdsp/libbfdsp.a ] ; then
-	    die_with_log "libbfdsp.a $flags build error - report an error"
-	fi
-
-	if [ ! -e $DIR_SOURCE/libs/libdsp/libbffastfp.a ] ; then
-	    die_with_log "libbffastfp.a $flags build error - report an error"
-	fi
-
+	check_installed_files libdsp "$DIR_SOURCE/libs/libdsp/" \
+		libbfdsp.a libbffastfp.a
 
 	if echo "${dir}" | grep -q -v bf561; then
 	    if [ $KERNEL_SOURCE ] ; then
