@@ -2623,6 +2623,7 @@ if [ $KERNEL_SOURCE ] ; then
         run_cmd $MAKE O="$DIR_UBOOT_BUILD" BIN_FILES='mkimage gen_eth_addr' tools
 
         echo_date "Copying U-Boot Tools"
+        EXEEXT=""
         check_installed_files u-boot "$DIR_UBOOT_BUILD/tools/" \
             mkimage gen_eth_addr
         for RUN in mkimage gen_eth_addr ; do
