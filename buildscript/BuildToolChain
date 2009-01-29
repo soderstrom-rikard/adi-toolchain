@@ -2049,6 +2049,7 @@ build_uClibc()
 
     # Need a way to look at uClibc make system , and see what libs
     # should be created
+    EXEEXT=""
     check_installed_files uClibc "$1/runtime/$2/usr/lib/$3/" \
         crt1.o libc.a libcrypt.a libm.a libnsl.a libresolv.a libutil.a
 }
