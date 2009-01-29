@@ -541,6 +541,7 @@ if [ ! -d $DIR_LOG ] ; then
     mkdir $DIR_LOG
 elif ! ${RESUME_BUILD} ; then
     rm -rf $DIR_LOG/*
+    resume_clear
 fi
 
 # make sure we arent running on a case insensitive filesystem
