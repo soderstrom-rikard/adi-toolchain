@@ -990,6 +990,8 @@ log_it()
 run_cmd()
 {
     log_it "$@"
+    # since logfile might contain redirection, we need to `eval`
+    # since args might contain whitespace, we need to requote
     eval \($(requote "$@")\) ${LOGFILE} || die_with_log
 }
 
