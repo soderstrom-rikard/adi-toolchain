@@ -1,3 +1,9 @@
+2008-01-31  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* g++.dg/compat/struct-layout-1_generate.c (vector_types): Remove
+	vectors larger than 8 bytes.
+	* gcc.dg/compat/struct-layout-1_generate.c (vector_types): Likewise.
+
 2009-01-08  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* gcc.target/bfin/mcpu-bf542m.c: New file.
