@@ -52,11 +52,6 @@ struct l1_scratch_task_info *task_info_p;
 libpthread_hidden_proto(waitpid)
 libpthread_hidden_proto(raise)
 
-/* Array of active threads. Entry 0 is reserved for the initial thread. */
-struct pthread_handle_struct __pthread_handles[PTHREAD_THREADS_MAX] =
-{ { __LOCK_INITIALIZER, &__pthread_initial_thread, 0},
-  { __LOCK_INITIALIZER, &__pthread_manager_thread, 0}, /* All NULLs */ };
-
 /* For debugging purposes put the maximum number of threads in a variable.  */
 const int __linuxthreads_pthread_threads_max = PTHREAD_THREADS_MAX;
 
