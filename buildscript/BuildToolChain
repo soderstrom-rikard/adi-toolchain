@@ -1297,7 +1297,6 @@ build_elf2flt()
 	check_installed_files elf2flt "${prefix}/bin/${target}-" \
 		elf2flt flthdr
 
-	rm -rf $DIR_BINUTILS_BUILD/*
 	rm -rf $DIR_ELF2FLT_BUILD/*
 
 	resume_save
@@ -2723,8 +2722,8 @@ if [ $KERNEL_SOURCE ] ; then
 	run_cmd $MAKE install-bfd install-opcodes install-libiberty
 
 	change_dir ..
-	rm -rf $DIR_BINUTILS_BUILD
 fi
+rm -rf $DIR_BINUTILS_BUILD
 
 resume_clear
 
