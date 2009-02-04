@@ -49,7 +49,7 @@ RESUME_BUILD=false
 CBUILD= # the system we are compiling on
 CHOST=  # the system the final compiler will run on
 
-while getopts b:B:c:C:dDfH:hj:k:K:l:m:o:O:pr:Rs:StT:u:U:vwX parameter
+while getopts b:B:c:C:dDfH:hj:k:K:l:m:o:O:pr:s:StT:u:U:vwX parameter
 do
     case $parameter in
         p)
@@ -215,7 +215,6 @@ do
 -o OUTPUT        Output directory prefix (leave blank to use build dir)
 -p               Check prerequisites
 -r RESULTS_DIR   Compare current tests to old results
--R               Resume failed build
 -s SOURCE        Toolchain Source directory (builds bfin-elf-gcc)"
 # -S               Skip building elf compiler - don't print this out
 echo "-T TARGET_IPADDR Test components on hardware
@@ -1065,6 +1064,7 @@ echo_date()
 
 resume_check()
 {
+	[ "${BTC_RESUME}" != "yesplease" ] && return 1
 	__RESUME_FILE="$DIR_LOG/.resume.$(echo $1 | tr '[/]' '_')"
 	[ -e "${__RESUME_FILE}" ]
 }
