@@ -1,3 +1,12 @@
+2009-02-04  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin-parse.y (asm_1): Add LOOP_BEGIN and LOOP_END.
+	* config/tc-bfin.c (bfin_start_line_hook): Remove.
+	(bfin_loop_beginend): New.
+	* config/tc-bfin.h (bfin_start_line_hook): Don't declare.
+	(md_start_line_hook): Don't define.
+	* config/bfin-aux.h (bfin_loop_beginend): Declare.
+
 2009-01-08  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* config/tc-bfin.c (bfin_cpus[]): Add bf542m, bf544m, bf547m, bf548m,
