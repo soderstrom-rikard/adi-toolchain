@@ -83,9 +83,6 @@ do
             fi
             RESULTS2COMPARE=$OPTARG
             ;;
-        R)
-            RESUME_BUILD=true
-            ;;
         S)
             SKIP_ELF=true
             ;;
@@ -1070,7 +1067,7 @@ resume_check()
 }
 resume_save()
 {
-	touch "${__RESUME_FILE}"
+	[ -n "${__RESUME_FILE}" ] && touch "${__RESUME_FILE}"
 }
 resume_clear()
 {
