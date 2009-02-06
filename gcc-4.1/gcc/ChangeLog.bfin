@@ -1,3 +1,7 @@
+2009-02-06  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (sne, sgt, sge, sgtu, sgeu): New patterns.
+
 2009-01-15  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (FUNCTION_PROFILER): Take TARGET_LONG_CALLS into

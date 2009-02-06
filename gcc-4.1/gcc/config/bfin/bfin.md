@@ -2750,8 +2750,32 @@
   operands[1] = bfin_cc_rtx;
 })
 
+(define_expand "sne"
+  [(set (match_dup 1) (eq:BI (match_dup 2) (match_dup 3)))
+   (set (match_dup 1) (eq:BI (match_dup 1) (const_int 0)))
+   (set (match_operand:SI 0 "register_operand" "")
+	(ne:SI (match_dup 1) (const_int 0)))]
+  ""
+{
+  operands[2] = bfin_compare_op0;
+  operands[3] = bfin_compare_op1;
+  operands[1] = bfin_cc_rtx;
+})
+
 (define_expand "slt"
   [(set (match_dup 1) (lt:BI (match_dup 2) (match_dup 3)))
+   (set (match_operand:SI 0 "register_operand" "")
+	(ne:SI (match_dup 1) (const_int 0)))]
+  ""
+{
+   operands[2] = bfin_compare_op0;
+   operands[3] = bfin_compare_op1;
+   operands[1] = bfin_cc_rtx;
+})
+
+(define_expand "sge"
+  [(set (match_dup 1) (lt:BI (match_dup 2) (match_dup 3)))
+   (set (match_dup 1) (eq:BI (match_dup 1) (const_int 0)))
    (set (match_operand:SI 0 "register_operand" "")
 	(ne:SI (match_dup 1) (const_int 0)))]
   ""
@@ -2772,6 +2796,18 @@
    operands[1] = bfin_cc_rtx;
 })
 
+(define_expand "sgt"
+  [(set (match_dup 1) (le:BI (match_dup 2) (match_dup 3)))
+   (set (match_dup 1) (eq:BI (match_dup 1) (const_int 0)))
+   (set (match_operand:SI 0 "register_operand" "")
+	(ne:SI (match_dup 1) (const_int 0)))]
+  ""
+{
+   operands[2] = bfin_compare_op0;
+   operands[3] = bfin_compare_op1;
+   operands[1] = bfin_cc_rtx;
+})
+
 (define_expand "sltu"
   [(set (match_dup 1) (ltu:BI (match_dup 2) (match_dup 3)))
    (set (match_operand:SI 0 "register_operand" "")
@@ -2783,8 +2819,32 @@
    operands[1] = bfin_cc_rtx;
 })
 
+(define_expand "sgeu"
+  [(set (match_dup 1) (ltu:BI (match_dup 2) (match_dup 3)))
+   (set (match_dup 1) (eq:BI (match_dup 1) (const_int 0)))
+   (set (match_operand:SI 0 "register_operand" "")
+	(ne:SI (match_dup 1) (const_int 0)))]
+  ""
+{
+   operands[2] = bfin_compare_op0;
+   operands[3] = bfin_compare_op1;
+   operands[1] = bfin_cc_rtx;
+})
+
 (define_expand "sleu"
   [(set (match_dup 1) (leu:BI (match_dup 2) (match_dup 3)))
+   (set (match_operand:SI 0 "register_operand" "")
+	(ne:SI (match_dup 1) (const_int 0)))]
+  ""
+{
+   operands[2] = bfin_compare_op0;
+   operands[3] = bfin_compare_op1;
+   operands[1] = bfin_cc_rtx;
+})
+
+(define_expand "sgtu"
+  [(set (match_dup 1) (leu:BI (match_dup 2) (match_dup 3)))
+   (set (match_dup 1) (eq:BI (match_dup 1) (const_int 0)))
    (set (match_operand:SI 0 "register_operand" "")
 	(ne:SI (match_dup 1) (const_int 0)))]
   ""
