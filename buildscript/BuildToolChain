@@ -233,6 +233,21 @@ done
 
 ############ Check and error if I can't find the things I need #
 
+resume_check()
+{
+	[ "${BTC_RESUME}" != "yesplease" ] && return 1
+	__RESUME_FILE="$DIR_LOG/.resume.$(echo $1 | tr '[/]' '_')"
+	[ -e "${__RESUME_FILE}" ]
+}
+resume_save()
+{
+	[ -n "${__RESUME_FILE}" ] && touch "${__RESUME_FILE}"
+}
+resume_clear()
+{
+	rm -f "$DIR_LOG"/.resume.*
+}
+
 check_cc_options() {
         if `${1} ${2} -S -o /dev/null -xc /dev/null > /dev/null 2>&1` ; then 
                 return 1
@@ -1057,21 +1072,6 @@ echo_date()
 
     [ -z "${recurse}" ] && log_it "${msg}"
     return 0
-}
-
-resume_check()
-{
-	[ "${BTC_RESUME}" != "yesplease" ] && return 1
-	__RESUME_FILE="$DIR_LOG/.resume.$(echo $1 | tr '[/]' '_')"
-	[ -e "${__RESUME_FILE}" ]
-}
-resume_save()
-{
-	[ -n "${__RESUME_FILE}" ] && touch "${__RESUME_FILE}"
-}
-resume_clear()
-{
-	rm -f "$DIR_LOG"/.resume.*
 }
 
 build_gcc ()
