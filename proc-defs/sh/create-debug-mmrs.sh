@@ -95,7 +95,7 @@ EOF
 			func="D_RW"
 		fi
 cat << EOF >> ${output}
-		${func}("${mmr_name}", ${bits}, ${mmr_read});
+		${func}("${mmr_name}", ${bits}, ${mmr_read:-${mmr_write:-WTF}});
 EOF
 	done
 
