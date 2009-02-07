@@ -153,7 +153,7 @@
 		<register name="SPORT0_TCLKDIV" group="SPORT" read-address="0xFFC00808" write-address="0xFFC00808" mask="FFFF" type="IO" description="" bit-size="16"/>
 		<register name="SPORT0_TFSDIV"  group="SPORT" read-address="0xFFC0080C" write-address="0xFFC0080C" mask="FFFF" type="IO" description="" bit-size="16"/>
 
-		<register name="SPORT0_TX"      group="SPORT" read-address= write-address="0xFFC00810" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT0_TX"      group="SPORT" read-address="" write-address="0xFFC00810" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
 		<register name="SPORT0_RX"      group="SPORT" read-address="0xFFC00818" write-address="0xFFC00818" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
 
 		<register name="SPORT0_RCR1"    group="SPORT" read-address="0xFFC00820" write-address="0xFFC00820" mask="FFFF" type="IO" description="" bit-size="16"/>
@@ -182,7 +182,7 @@
 		<register name="SPORT1_TCLKDIV" group="SPORT" read-address="0xFFC00908" write-address="0xFFC00908" mask="FFFF" type="IO" description="" bit-size="16"/>
 		<register name="SPORT1_TFSDIV"  group="SPORT" read-address="0xFFC0090C" write-address="0xFFC0090C" mask="FFFF" type="IO" description="" bit-size="16"/>
 
-		<register name="SPORT1_TX"      group="SPORT" read-address= write-address="0xFFC00910" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT1_TX"      group="SPORT" read-address="" write-address="0xFFC00910" mask="FFFF" type="IO" description="" bit-size="32"/>
 		<register name="SPORT1_RX"      group="SPORT" read-address="0xFFC00918" write-address="0xFFC00918" mask="FFFF" type="IO" description="" bit-size="32"/>
 
 		<register name="SPORT1_RCR1"    group="SPORT" read-address="0xFFC00920" write-address="0xFFC00920" mask="FFFF" type="IO" description="" bit-size="16"/>
@@ -211,7 +211,7 @@
 		<register name="SPORT2_TCLKDIV" group="SPORT" read-address="0xFFC02508" write-address="0xFFC02508" mask="FFFF" type="IO" description="" bit-size="16"/>
 		<register name="SPORT2_TFSDIV"  group="SPORT" read-address="0xFFC0250C" write-address="0xFFC0250C" mask="FFFF" type="IO" description="" bit-size="16"/>
 
-		<register name="SPORT2_TX"      group="SPORT" read-address= write-address="0xFFC02510" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT2_TX"      group="SPORT" read-address="" write-address="0xFFC02510" mask="FFFF" type="IO" description="" bit-size="32"/>
 		<register name="SPORT2_RX"      group="SPORT" read-address="0xFFC02518" write-address="0xFFC02518" mask="FFFF" type="IO" description="" bit-size="32"/>
 
 		<register name="SPORT2_RCR1"    group="SPORT" read-address="0xFFC02520" write-address="0xFFC02520" mask="FFFF" type="IO" description="" bit-size="16"/>
@@ -240,7 +240,7 @@
 		<register name="SPORT3_TCLKDIV" group="SPORT" read-address="0xFFC02608" write-address="0xFFC02608" mask="FFFF" type="IO" description="" bit-size="16"/>
 		<register name="SPORT3_TFSDIV"  group="SPORT" read-address="0xFFC0260C" write-address="0xFFC0260C" mask="FFFF" type="IO" description="" bit-size="16"/>
 
-		<register name="SPORT3_TX"      group="SPORT" read-address= write-address="0xFFC02610" mask="FFFF" type="IO" description="" bit-size="32"/>
+		<register name="SPORT3_TX"      group="SPORT" read-address="" write-address="0xFFC02610" mask="FFFF" type="IO" description="" bit-size="32"/>
 		<register name="SPORT3_RX"      group="SPORT" read-address="0xFFC02618" write-address="0xFFC02618" mask="FFFF" type="IO" description="" bit-size="32"/>
 
 		<register name="SPORT3_RCR1"    group="SPORT" read-address="0xFFC02620" write-address="0xFFC02620" mask="FFFF" type="IO" description="" bit-size="16"/>

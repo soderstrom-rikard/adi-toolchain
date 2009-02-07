@@ -176,7 +176,7 @@
 <register name="SPORT0_TCLKDIV" group="SPORT registers" read-address="0xFFC00808" write-address="0xFFC00808" mask="FFFF" type="IO" description="SPORT0 Transmit Clock Divider" bit-size="16"/>
 <register name="SPORT0_TFSDIV"  group="SPORT registers" read-address="0xFFC0080C" write-address="0xFFC0080C" mask="FFFF" type="IO" description="SPORT0 Transmit Frame Sync Divider" bit-size="16"/>
 
-<register name="SPORT0_TX"   group="SPORT registers" read-address= write-address="0xFFC00810" mask="FFFFFFFF" type="IO" description="SPORT0 TX Data Register" bit-size="32"/>
+<register name="SPORT0_TX"   group="SPORT registers" read-address="" write-address="0xFFC00810" mask="FFFFFFFF" type="IO" description="SPORT0 TX Data Register" bit-size="32"/>
 <register name="SPORT0_RX"   group="SPORT registers" read-address="0xFFC00818" write-address="0xFFC00818" mask="FFFFFFFF" type="IO" description="SPORT0 RX Data Register" bit-size="32"/>
 
 <register name="SPORT0_RCR1"    group="SPORT registers" read-address="0xFFC00820" write-address="0xFFC00820" mask="FFFF" type="IO" description="SPORT0 Transmit Configuration 1 Register" bit-size="16"/>
@@ -204,7 +204,7 @@
 <register name="SPORT1_TCLKDIV" group="SPORT registers" read-address="0xFFC00908" write-address="0xFFC00908" mask="FFFF" type="IO" description="SPORT1 Transmit Clock Divider" bit-size="16"/>
 <register name="SPORT1_TFSDIV"  group="SPORT registers" read-address="0xFFC0090C" write-address="0xFFC0090C" mask="FFFF" type="IO" description="SPORT1 Transmit Frame Sync Divider" bit-size="16"/>
 
-<register name="SPORT1_TX" group="SPORT registers" read-address= write-address="0xFFC00910" mask="FFFFFFFF" type="IO" description="SPORT1 TX Data Register" bit-size="32"/>
+<register name="SPORT1_TX" group="SPORT registers" read-address="" write-address="0xFFC00910" mask="FFFFFFFF" type="IO" description="SPORT1 TX Data Register" bit-size="32"/>
 <register name="SPORT1_RX" group="SPORT registers" read-address="0xFFC00918" write-address="0xFFC00918" mask="FFFFFFFF" type="IO" description="SPORT1 RX Data Register" bit-size="32"/>
 
 <register name="SPORT1_RCR1"    group="SPORT registers" read-address="0xFFC00920" write-address="0xFFC00920" mask="FFFF" type="IO" description="SPORT1 Transmit Configuration 1 Register" bit-size="16"/>
