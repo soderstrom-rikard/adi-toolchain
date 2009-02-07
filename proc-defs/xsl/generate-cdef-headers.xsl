@@ -50,7 +50,17 @@
 
 <xsl:template match="register">
 	<xsl:if test="string-length(@bit-position) = 0">
-	<xsl:if test="string-length(@read-address) != 0">
+	<xsl:variable name="reg-addr">
+		<xsl:choose>
+			<xsl:when test="string-length(@read-address) != 0">
+				<xsl:value-of select="@read-address"/>
+			</xsl:when>
+			<xsl:when test="string-length(@write-address) != 0">
+				<xsl:value-of select="@write-address"/>
+			</xsl:when>
+		</xsl:choose>
+	</xsl:variable>
+	<xsl:if test="string-length($reg-addr) != 0">
 
 	<xsl:variable name="mmr-type">
 		<xsl:choose>
@@ -94,6 +104,7 @@
 
 	</xsl:if>
 
+	<xsl:if test="string-length(@read-address) != 0">
 	<!-- #define bfin_read_<MMR>() bfin_read<bit-size>(<MMR>) -->
 	<xsl:text>#define </xsl:text>
 	<xsl:call-template name="pad-append">
@@ -103,7 +114,9 @@
 	</xsl:call-template>
 	<xsl:value-of select="concat(' bfin_read',$mmr-type,'(',@name,')')"/>
 	<xsl:text>&newline;</xsl:text>
+	</xsl:if>
 
+	<xsl:if test="string-length(@write-address) != 0">
 	<!-- #define bfin_write_<MMR>(val) bfin_write<bit-size>(<MMR>, val) -->
 	<xsl:text>#define </xsl:text>
 	<xsl:call-template name="pad-append">
@@ -112,6 +125,7 @@
 		<xsl:with-param name="length"  select="$padlen" />
 	</xsl:call-template>
 	<xsl:value-of select="concat(' bfin_write',$mmr-type,'(',@name,', val)')"/>
+	</xsl:if>
 
 	<xsl:text>&newline;</xsl:text>
 

@@ -50,7 +50,17 @@
 
 <xsl:template match="register">
 	<xsl:if test="string-length(@bit-position) = 0">
-	<xsl:if test="string-length(@read-address) != 0">
+	<xsl:variable name="reg-addr">
+		<xsl:choose>
+			<xsl:when test="string-length(@read-address) != 0">
+				<xsl:value-of select="@read-address"/>
+			</xsl:when>
+			<xsl:when test="string-length(@write-address) != 0">
+				<xsl:value-of select="@write-address"/>
+			</xsl:when>
+		</xsl:choose>
+	</xsl:variable>
+	<xsl:if test="string-length($reg-addr) != 0">
 
 	<!-- #define <MMR> <address> -->
 	<xsl:text>#define </xsl:text>
@@ -59,7 +69,7 @@
 		<xsl:with-param name="padVar"  select="@name" />
 		<xsl:with-param name="length"  select="$padlen" />
 	</xsl:call-template>
-	<xsl:value-of select="concat(' ',@read-address)"/>
+	<xsl:value-of select="concat(' ',$reg-addr)"/>
 
 	<xsl:if test="string-length(@description) != 0">
 	<xsl:text> /* </xsl:text>
