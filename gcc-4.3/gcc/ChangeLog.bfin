@@ -1,6 +1,8 @@
 2009-02-08  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_gen_bundles): Don't try to bundle a jump.
+	(bfin_optimize_loop): When looking for the last insn before the
+	loop_end instruction, don't look past labels.
 
 2009-02-06  Bernd Schmidt  <bernd.schmidt@analog.com>
 
