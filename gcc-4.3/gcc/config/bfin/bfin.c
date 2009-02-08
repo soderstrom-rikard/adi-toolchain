@@ -4757,7 +4757,8 @@ bfin_gen_bundles (void)
 
 	  /* BB_END can change due to emitting extra NOPs, so check here.  */
 	  at_end = insn == BB_END (bb);
-	  if (delete_this == NULL_RTX && (at_end || GET_MODE (next) == TImode))
+	  if (delete_this == NULL_RTX
+	      && (at_end || GET_MODE (next) == TImode || JUMP_P (next)))
 	    {
 	      if ((n_filled < 2
 		   || !gen_one_bundle (slot))

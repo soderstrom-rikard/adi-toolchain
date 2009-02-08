@@ -1,3 +1,7 @@
+2009-02-08  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_gen_bundles): Don't try to bundle a jump.
+
 2009-02-06  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (sne, sgt, sge, sgtu, sgeu): New patterns.
