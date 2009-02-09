@@ -3,6 +3,10 @@
 	* final.c (compute_alignments): When freeing loop information, also
 	discard dominance info.
 
+	* simplify-rtx.c (simplify_binary_operation_1): When simplifying AND
+	with a constant, recognize that certain operations leave the lower
+	bits unchanged or set them to zero.
+
 2009-02-08  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_gen_bundles): Don't try to bundle a jump.

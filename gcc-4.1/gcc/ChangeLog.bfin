@@ -6,6 +6,10 @@
 	(bfin_optimize_loops_1, move_loop_constants): New static functions.
 	(bfin_reorg): Call bfin_optimize_loops_1 if optimizing.
 
+	* simplify-rtx.c (simplify_binary_operation_1): When simplifying AND
+	with a constant, recognize that certain operations leave the lower
+	bits unchanged or set them to zero.
+
 2009-02-06  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (sne, sgt, sge, sgtu, sgeu): New patterns.

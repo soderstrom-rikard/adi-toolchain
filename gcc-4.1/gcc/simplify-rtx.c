@@ -1707,6 +1707,34 @@ simplify_binary_operation_1 (enum rtx_code code, enum machine_mode mode,
 	  && GET_MODE_CLASS (mode) != MODE_CC)
 	return CONST0_RTX (mode);
 
+      /* If we have (A + C0) & C1, and C1 has no bits set higher or
+	 equal than the lowest set bit in C0, this becomes A & C1.  */
+      if ((GET_CODE (op0) == PLUS || GET_CODE (op0) == MINUS)
+	  && GET_CODE (XEXP (op0, 1)) == CONST_INT
+	  && GET_CODE (op1) == CONST_INT)
+	{
+	  /* Find the lowest bit set in C0.  */
+	  val = INTVAL (XEXP (op0, 1));
+	  val &= -val;
+
+	  if ((~(val - 1) & INTVAL (op1)) == 0)
+	    return simplify_gen_binary (AND, mode, XEXP (op0, 0), op1);
+	}
+
+      /* A similar case for MULT.  Here, the lower bits are not left
+	 unchanged, they become zero.  */
+      if (GET_CODE (op0) == MULT
+	  && GET_CODE (XEXP (op0, 1)) == CONST_INT
+	  && GET_CODE (op1) == CONST_INT)
+	{
+	  /* Find the lowest bit set in C0.  */
+	  val = INTVAL (XEXP (op0, 1));
+	  val &= -val;
+
+	  if ((~(val - 1) & INTVAL (op1)) == 0)
+	    return const0_rtx;
+	}
+     
       /* Transform (and (extend X) C) into (zero_extend (and X C)) if
 	 there are no nonzero bits of C outside of X's mode.  */
       if ((GET_CODE (op0) == SIGN_EXTEND
