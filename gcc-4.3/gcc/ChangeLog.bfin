@@ -6,6 +6,8 @@
 	* simplify-rtx.c (simplify_binary_operation_1): When simplifying AND
 	with a constant, recognize that certain operations leave the lower
 	bits unchanged or set them to zero.
+	(simplify_plus_minus): Eliminate identical operands with opposite signs
+	early.
 
 2009-02-08  Bernd Schmidt  <bernd.schmidt@analog.com>
 

@@ -3583,6 +3583,29 @@ simplify_plus_minus (enum rtx_code code, enum machine_mode mode, rtx op0,
       return simplify_const_binary_operation (code, mode, lhs, rhs);
     }
 
+  for (i = 1; i < n_ops; i++)
+    {
+      for (j = 0; j < i; j++)
+	{
+	  if (ops[i].neg != ops[j].neg && rtx_equal_p (ops[j].op, ops[i].op))
+	    {
+	      ops[i].op = ops[j].op = NULL_RTX;
+	      canonicalized = 1;
+	      break;
+	    }
+	}
+    }
+  for (i = j = 0; i < n_ops; i++)
+    {
+      if (ops[i].op != NULL_RTX)
+	{
+	  if (i != j)
+	    ops[j] = ops[i];
+	  j++;
+	}
+    }
+  n_ops = j;
+
   /* Now simplify each pair of operands until nothing changes.  */
   do
     {
