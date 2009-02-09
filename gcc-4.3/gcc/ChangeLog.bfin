@@ -1,3 +1,8 @@
+2009-02-09  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* final.c (compute_alignments): When freeing loop information, also
+	discard dominance info.
+
 2009-02-08  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_gen_bundles): Don't try to bundle a jump.
