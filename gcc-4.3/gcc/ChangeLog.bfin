@@ -3,6 +3,8 @@
 	* config/bfin/bfin.c (bfin_gen_bundles): Don't try to bundle a jump.
 	(bfin_optimize_loop): When looking for the last insn before the
 	loop_end instruction, don't look past labels.
+	(bfin_optimize_loops_1, move_loop_constants): New static functions.
+	(bfin_reorg): Call bfin_optimize_loops_1 if optimizing.
 
 2009-02-06  Bernd Schmidt  <bernd.schmidt@analog.com>
 
