@@ -1,3 +1,8 @@
+2009-02-11  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* loop-iv.c (implies_p): In the last conditional, verify not only the
+	structure but also that the registers match.
+
 2009-02-08  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_gen_bundles): Don't try to bundle a jump.
