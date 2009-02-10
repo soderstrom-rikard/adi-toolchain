@@ -1,3 +1,8 @@
+2009-02-10  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.c (bfin_extra_live_on_entry): New.
+	(TARGET_EXTRA_LIVE_ON_ENTRY): Define.
+
 2009-02-09  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* final.c (compute_alignments): When freeing loop information, also
