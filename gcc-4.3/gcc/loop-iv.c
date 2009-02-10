@@ -1729,7 +1729,7 @@ static void
 simplify_using_initial_values (struct loop *loop, enum rtx_code op, rtx *expr)
 {
   bool expression_valid;
-  rtx head, tail, insn, last_valid_expr;
+  rtx head, tail, insn, cond_list, last_valid_expr;
   rtx neutral, aggr;
   regset altered, this_altered;
   edge e;
@@ -1800,13 +1800,14 @@ simplify_using_initial_values (struct loop *loop, enum rtx_code op, rtx *expr)
 
   expression_valid = true;
   last_valid_expr = *expr;
+  cond_list = NULL_RTX;
   while (1)
     {
       insn = BB_END (e->src);
       if (any_condjump_p (insn))
 	{
 	  rtx cond = get_condition (BB_END (e->src), NULL, false, true);
-      
+
 	  if (cond && (e->flags & EDGE_FALLTHRU))
 	    cond = reversed_condition (cond);
 	  if (cond)
@@ -1814,18 +1815,17 @@ simplify_using_initial_values (struct loop *loop, enum rtx_code op, rtx *expr)
 	      simplify_using_condition (cond, expr, altered);
 	      if (CONSTANT_P (*expr))
 		goto out;
+	      cond_list = alloc_EXPR_LIST (0, cond, cond_list);
 	    }
 	}
 
       FOR_BB_INSNS_REVERSE (e->src, insn)
 	{
 	  bool did_replace;
+	  rtx old = *expr;
+
 	  if (!INSN_P (insn))
 	    continue;
-
-	  did_replace = simplify_using_assignment (insn, expr);
-	  if (CONSTANT_P (*expr))
-	    goto out;
 
 	  CLEAR_REG_SET (this_altered);
 	  note_stores (PATTERN (insn), mark_altered, this_altered);
@@ -1837,6 +1837,29 @@ simplify_using_initial_values (struct loop *loop, enum rtx_code op, rtx *expr)
 	      for (i = 0; i < FIRST_PSEUDO_REGISTER; i++)
 		if (TEST_HARD_REG_BIT (regs_invalidated_by_call, i))
 		  SET_REGNO_REG_SET (this_altered, i);
+	    }
+
+	  did_replace = simplify_using_assignment (insn, expr);
+
+	  if (did_replace)
+	    {
+	      rtx note;
+	      for (note = cond_list; note; note = XEXP (note, 1))
+		simplify_using_assignment (insn, &XEXP (note, 0));
+	    }
+
+	  if (old != *expr)
+	    {
+	      rtx note;
+
+	      if (CONSTANT_P (*expr))
+		goto out;
+	      for (note = cond_list; note; note = XEXP (note, 1))
+		{
+		  simplify_using_condition (XEXP (note, 0), expr, altered);
+		  if (CONSTANT_P (*expr))
+		    goto out;
+		}
 	    }
 
 	  /* If we did not use this insn to make a replacement, any overlap

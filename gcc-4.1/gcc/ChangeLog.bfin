@@ -8,6 +8,9 @@
 	(simplify_using_initial_values): Deal with altered regs here and track
 	more precisely the effect they have on the validity of our expression.
 
+	* loop-iv.c (simplify_using_initial_values): Keep track of conditions
+	we have seen and keep using them to simplify new expressions.
+
 2009-02-08  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_gen_bundles): Don't try to bundle a jump.
