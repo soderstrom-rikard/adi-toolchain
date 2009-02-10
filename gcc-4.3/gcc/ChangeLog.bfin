@@ -2,6 +2,11 @@
 
 	* loop-iv.c (implies_p): In the last conditional, verify not only the
 	structure but also that the registers match.
+	(simplify_using_assignment): Return bool; true iff we used the insn to
+	make a replacement.  Remove arg ALTERED.  Don't	deal with altered regs
+	here.  All callers changed.
+	(simplify_using_initial_values): Deal with altered regs here and track
+	more precisely the effect they have on the validity of our expression.
 
 2009-02-10  Jie Zhang  <jie.zhang@analog.com>
 

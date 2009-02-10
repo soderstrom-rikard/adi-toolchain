@@ -1350,39 +1350,21 @@ simple_rhs_p (rtx rhs)
     }
 }
 
-/* Simplifies *EXPR using assignment in INSN.  ALTERED is the set of registers
-   altered so far.  */
+/* Simplifies *EXPR using assignment in INSN.  Returns true if it used the
+   insn to make a replacement.  */
 
-static void
-simplify_using_assignment (rtx insn, rtx *expr, regset altered)
+static bool
+simplify_using_assignment (rtx insn, rtx *expr)
 {
   rtx set = single_set (insn);
   rtx lhs = NULL_RTX, rhs;
-  bool ret = false;
 
-  if (set)
-    {
-      lhs = SET_DEST (set);
-      if (!REG_P (lhs)
-	  || altered_reg_used (&lhs, altered))
-	ret = true;
-    }
-  else
-    ret = true;
+  if (!set)
+    return false;
 
-  note_stores (PATTERN (insn), mark_altered, altered);
-  if (CALL_P (insn))
-    {
-      int i;
-
-      /* Kill all call clobbered registers.  */
-      for (i = 0; i < FIRST_PSEUDO_REGISTER; i++)
-	if (TEST_HARD_REG_BIT (regs_invalidated_by_call, i))
-	  SET_REGNO_REG_SET (altered, i);
-    }
-
-  if (ret)
-    return;
+  lhs = SET_DEST (set);
+  if (!REG_P (lhs))
+    return false;
 
   rhs = find_reg_equal_equiv_note (insn);
   if (rhs)
@@ -1391,12 +1373,10 @@ simplify_using_assignment (rtx insn, rtx *expr, regset altered)
     rhs = SET_SRC (set);
 
   if (!simple_rhs_p (rhs))
-    return;
-
-  if (for_each_rtx (&rhs, altered_reg_used, altered))
-    return;
+    return false;
 
   *expr = simplify_replace_rtx (*expr, lhs, rhs);
+  return true;
 }
 
 /* Checks whether A implies B.  */
@@ -1748,9 +1728,10 @@ eliminate_implied_conditions (enum rtx_code op, rtx *head, rtx tail)
 static void
 simplify_using_initial_values (struct loop *loop, enum rtx_code op, rtx *expr)
 {
-  rtx head, tail, insn;
+  bool expression_valid;
+  rtx head, tail, insn, last_valid_expr;
   rtx neutral, aggr;
-  regset altered;
+  regset altered, this_altered;
   edge e;
 
   if (!*expr)
@@ -1815,7 +1796,10 @@ simplify_using_initial_values (struct loop *loop, enum rtx_code op, rtx *expr)
     return;
 
   altered = ALLOC_REG_SET (&reg_obstack);
+  this_altered = ALLOC_REG_SET (&reg_obstack);
 
+  expression_valid = true;
+  last_valid_expr = *expr;
   while (1)
     {
       insn = BB_END (e->src);
@@ -1829,29 +1813,49 @@ simplify_using_initial_values (struct loop *loop, enum rtx_code op, rtx *expr)
 	    {
 	      simplify_using_condition (cond, expr, altered);
 	      if (CONSTANT_P (*expr))
-		{
-		  FREE_REG_SET (altered);
-		  return;
-		}
+		goto out;
 	    }
 	}
 
       FOR_BB_INSNS_REVERSE (e->src, insn)
 	{
+	  bool did_replace;
 	  if (!INSN_P (insn))
 	    continue;
-	    
-	  simplify_using_assignment (insn, expr, altered);
+
+	  did_replace = simplify_using_assignment (insn, expr);
 	  if (CONSTANT_P (*expr))
+	    goto out;
+
+	  CLEAR_REG_SET (this_altered);
+	  note_stores (PATTERN (insn), mark_altered, this_altered);
+	  if (CALL_P (insn))
 	    {
-	      FREE_REG_SET (altered);
-	      return;
+	      int i;
+		  
+	      /* Kill all call clobbered registers.  */
+	      for (i = 0; i < FIRST_PSEUDO_REGISTER; i++)
+		if (TEST_HARD_REG_BIT (regs_invalidated_by_call, i))
+		  SET_REGNO_REG_SET (this_altered, i);
 	    }
+
+	  /* If we did not use this insn to make a replacement, any overlap
+	     between stores in this insn and our expression will cause the
+	     expression to become invalid.  */
+	  if (!did_replace
+	      && for_each_rtx (expr, altered_reg_used, this_altered))
+	    goto out;
+
+	  IOR_REG_SET (altered, this_altered);
+
+	  /* If the expression now contains regs that have been altered, we
+	     can't return it to the caller.  However, it is still valid for
+	     further simplification, so keep searching to see if we can
+	     eventually turn it into a constant.  */
 	  if (for_each_rtx (expr, altered_reg_used, altered))
-	    {
-	      FREE_REG_SET (altered);
-	      return;
-	    }
+	    expression_valid = false;
+	  if (expression_valid)
+	    last_valid_expr = *expr;
 	}
 
       if (!single_pred_p (e->src)
@@ -1860,7 +1864,11 @@ simplify_using_initial_values (struct loop *loop, enum rtx_code op, rtx *expr)
       e = single_pred_edge (e->src);
     }
 
+ out:
+  if (!CONSTANT_P (*expr))
+    *expr = last_valid_expr;
   FREE_REG_SET (altered);
+  FREE_REG_SET (this_altered);
 }
 
 /* Transforms invariant IV into MODE.  Adds assumptions based on the fact
