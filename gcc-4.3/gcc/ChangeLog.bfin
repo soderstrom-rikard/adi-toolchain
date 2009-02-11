@@ -21,6 +21,8 @@
 	changed.  Use this when trying to improve the upper bound.
 	Generate the comparison by using simplify_gen_relational.
 
+	* loop-iv.c (simple_rhs_p): Allow more kinds of expressions.
+
 2009-02-10  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.c (bfin_extra_live_on_entry): New.

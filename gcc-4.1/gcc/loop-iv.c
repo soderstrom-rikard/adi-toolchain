@@ -1300,7 +1300,7 @@ simple_rhs_p (rtx rhs)
   rtx op0, op1;
 
   if (CONSTANT_P (rhs)
-      || REG_P (rhs))
+      || (REG_P (rhs) && !HARD_REGISTER_P (rhs)))
     return true;
 
   switch (GET_CODE (rhs))
@@ -1309,13 +1309,30 @@ simple_rhs_p (rtx rhs)
     case MINUS:
       op0 = XEXP (rhs, 0);
       op1 = XEXP (rhs, 1);
-      /* Allow reg + const sets only.  */
-      if (REG_P (op0) && CONSTANT_P (op1))
-	return true;
-      if (REG_P (op1) && CONSTANT_P (op0))
-	return true;
+      if ((!REG_P (op0) || HARD_REGISTER_P (op0)) && !CONSTANT_P (op0))
+	return false;
+      if ((!REG_P (op1) || HARD_REGISTER_P (op1)) && !CONSTANT_P (op1))
+	return false;
+      return true;
 
+    case ASHIFT:
+    case ASHIFTRT:
+    case LSHIFTRT:
+    case MULT:
+      op0 = XEXP (rhs, 0);
+      op1 = XEXP (rhs, 1);
+      if (REG_P (op0) && !HARD_REGISTER_P (op0) && CONSTANT_P (op1))
+	return true;
       return false;
+
+    case AND:
+      op0 = XEXP (rhs, 0);
+      op1 = XEXP (rhs, 1);
+      if ((!REG_P (op0) || HARD_REGISTER_P (op0)) && !CONSTANT_P (op0))
+	return false;
+      if ((!REG_P (op1) || HARD_REGISTER_P (op1)) && !CONSTANT_P (op1))
+	return false;
+      return true;
 
     default:
       return false;
