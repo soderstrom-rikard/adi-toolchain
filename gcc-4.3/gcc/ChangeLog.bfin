@@ -52,6 +52,10 @@
 	(update_qty_class): Update it.
 	* rtl.h (reg_second_preferred_class): Declare.
 
+	* fwprop.c (find_extend_code, optimize_widening_multiply): New
+	functions.
+	(fwprop): Call optimize_widening_multiply.
+
 2009-02-10  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.c (bfin_extra_live_on_entry): New.

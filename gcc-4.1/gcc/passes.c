@@ -618,6 +618,7 @@ init_optimization_passes (void)
   NEXT_PASS (pass_instantiate_virtual_regs);
   NEXT_PASS (pass_jump2);
   NEXT_PASS (pass_cse);
+  NEXT_PASS (pass_fwprop);
   NEXT_PASS (pass_gcse);
   NEXT_PASS (pass_loop_optimize);
   NEXT_PASS (pass_jump_bypass);

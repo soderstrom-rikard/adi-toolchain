@@ -26,6 +26,14 @@
 	(update_qty_class): Update it.
 	* rtl.h (reg_second_preferred_class): Declare.
 
+	* cse.c: Include "df.h".
+	(find_extend_code, optimize_widening_multiply, fwprop, gate_fwprop):
+	New functions.
+	(pass_fwprop): New struct.
+	* tree-pass.h (pass_fwprop): Declare.
+	* timevar.def (TV_FWPROP): New.
+	* passes.c (init_optimization_passes): Add pass_fwprop.
+
 2009-02-11  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/sync.md: Use indirect call for all sync patterns.

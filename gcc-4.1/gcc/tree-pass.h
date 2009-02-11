@@ -314,6 +314,7 @@ extern struct tree_opt_pass pass_instantiate_virtual_regs;
 extern struct tree_opt_pass pass_jump2;
 extern struct tree_opt_pass pass_cse;
 extern struct tree_opt_pass pass_gcse;
+extern struct tree_opt_pass pass_fwprop;
 extern struct tree_opt_pass pass_loop_optimize;
 extern struct tree_opt_pass pass_jump_bypass;
 extern struct tree_opt_pass pass_cfg;
