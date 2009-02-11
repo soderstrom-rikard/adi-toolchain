@@ -1,3 +1,7 @@
+2009-02-11  Jie Zhang  <jie.zhang@analog.com>
+
+	* gas/bfin/expected_comparison_errors.l: Expect error on Line 13.
+
 2008-10-09  Jie Zhang  <jie.zhang@analog.com>
 	
 	* gas/bfin/csqu.d: Fix error.
