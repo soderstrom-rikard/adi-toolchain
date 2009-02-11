@@ -1636,13 +1636,20 @@ simplify_using_condition (rtx cond, rtx *expr, regset altered)
 {
   rtx rev, reve, exp = *expr;
 
-  if (!COMPARISON_P (exp))
-    return;
-
   /* If some register gets altered later, we do not really speak about its
      value at the time of comparison.  */
   if (altered
       && for_each_rtx (&cond, altered_reg_used, altered))
+    return;
+
+  if (GET_CODE (cond) == EQ
+      && REG_P (XEXP (cond, 0)) && CONSTANT_P (XEXP (cond, 1)))
+    {
+      *expr = simplify_replace_rtx (*expr, XEXP (cond, 0), XEXP (cond, 1));
+      return;
+    }
+
+  if (!COMPARISON_P (exp))
     return;
 
   rev = reversed_condition (cond);
@@ -1660,7 +1667,6 @@ simplify_using_condition (rtx cond, rtx *expr, regset altered)
       *expr = const_true_rtx;
       return;
     }
-
 
   if (rev && rtx_equal_p (exp, rev))
     {
@@ -1829,9 +1835,20 @@ simplify_using_initial_values (struct loop *loop, enum rtx_code op, rtx *expr)
 	    cond = reversed_condition (cond);
 	  if (cond)
 	    {
+	      rtx old = *expr;
 	      simplify_using_condition (cond, expr, altered);
-	      if (CONSTANT_P (*expr))
-		goto out;
+	      if (old != *expr)
+		{
+		  rtx note;
+		  if (CONSTANT_P (*expr))
+		    goto out;
+		  for (note = cond_list; note; note = XEXP (note, 1))
+		    {
+		      simplify_using_condition (XEXP (note, 0), expr, altered);
+		      if (CONSTANT_P (*expr))
+			goto out;
+		    }
+		}
 	      cond_list = alloc_EXPR_LIST (0, cond, cond_list);
 	    }
 	}
@@ -1839,7 +1856,6 @@ simplify_using_initial_values (struct loop *loop, enum rtx_code op, rtx *expr)
       FOR_BB_INSNS_REVERSE (e->src, insn)
 	{
 	  bool did_replace;
-	  rtx old = *expr;
 
 	  if (!INSN_P (insn))
 	    continue;
@@ -1858,26 +1874,21 @@ simplify_using_initial_values (struct loop *loop, enum rtx_code op, rtx *expr)
 
 	  did_replace = simplify_using_assignment (insn, expr);
 
+	  if (CONSTANT_P (*expr))
+	    goto out;
 	  if (did_replace)
 	    {
 	      rtx note;
 	      for (note = cond_list; note; note = XEXP (note, 1))
-		simplify_using_assignment (insn, &XEXP (note, 0));
-	    }
-
-	  if (old != *expr)
-	    {
-	      rtx note;
-
-	      if (CONSTANT_P (*expr))
-		goto out;
-	      for (note = cond_list; note; note = XEXP (note, 1))
 		{
-		  simplify_using_condition (XEXP (note, 0), expr, altered);
-		  if (CONSTANT_P (*expr))
-		    goto out;
+		  rtx old_cond = XEXP (note, 0);
+		  simplify_using_assignment (insn, &XEXP (note, 0));
+		  if (old_cond != XEXP (note, 0))
+		    simplify_using_condition (XEXP (note, 0), expr, altered);
 		}
 	    }
+	  if (CONSTANT_P (*expr))
+	    goto out;
 
 	  /* If we did not use this insn to make a replacement, any overlap
 	     between stores in this insn and our expression will cause the

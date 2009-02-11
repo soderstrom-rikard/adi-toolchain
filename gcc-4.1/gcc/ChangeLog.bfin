@@ -2,6 +2,12 @@
 
 	* loop-iv.c (simple_rhs_p): Allow more kinds of expressions.
 
+	* loop-iv.c (simplify_using_condition): A condition of the form
+	(EQ REG CONST) can be used to simply make a substitution.
+	(simplify_using_initial_values): If the expression was simplified by
+	a new condition, try all the old ones again too.  Also retry conditions
+	after passing them through simplify_using_assignment.
+
 2009-02-11  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/sync.md: Use indirect call for all sync patterns.
