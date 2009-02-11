@@ -17,6 +17,10 @@
 	* simplify-rtx.c (simplify_relational_operation_1): Convert unsigned
 	comparisons of the form (X + CONST) < CONST to X >= -CONST.
 
+	* loop-iv.c (determine_max_iter): New arg OLD_NITER.  All callers
+	changed.  Use this when trying to improve the upper bound.
+	Generate the comparison by using simplify_gen_relational.
+
 2009-02-08  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_gen_bundles): Don't try to bundle a jump.
