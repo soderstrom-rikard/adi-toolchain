@@ -609,8 +609,14 @@ global_alloc (FILE *file)
 		if (reg_renumber[allocno[allocno_order[i]].reg] >= 0)
 		  continue;
 	      }
+	    if (reg_second_preferred_class (allocno[allocno_order[i]].reg) != NO_REGS)
+	      {
+		find_reg (allocno_order[i], 0, 1, 0, 0);
+		if (reg_renumber[allocno[allocno_order[i]].reg] >= 0)
+		  continue;
+	      }
 	    if (reg_alternate_class (allocno[allocno_order[i]].reg) != NO_REGS)
-	      find_reg (allocno_order[i], 0, 1, 0, 0);
+	      find_reg (allocno_order[i], 0, 2, 0, 0);
 	  }
 
       free (allocno_order);
@@ -1033,14 +1039,15 @@ prune_preferences (void)
    If not, do nothing.  */
 
 static void
-find_reg (int num, HARD_REG_SET losers, int alt_regs_p, int accept_call_clobbered, int retrying)
+find_reg (int num, HARD_REG_SET losers, int alt_regs_level, int accept_call_clobbered, int retrying)
 {
   int i, best_reg, pass;
   HARD_REG_SET used, used1, used2;
 
-  enum reg_class class = (alt_regs_p
-			  ? reg_alternate_class (allocno[num].reg)
-			  : reg_preferred_class (allocno[num].reg));
+  enum reg_class class
+    = (alt_regs_level == 2 ? reg_alternate_class (allocno[num].reg)
+       : alt_regs_level == 1 ? reg_second_preferred_class (allocno[num].reg)
+       : reg_preferred_class (allocno[num].reg));
   enum machine_mode mode = PSEUDO_REGNO_MODE (allocno[num].reg);
 
   if (accept_call_clobbered)
@@ -1225,7 +1232,7 @@ find_reg (int num, HARD_REG_SET losers, int alt_regs_p, int accept_call_clobbere
 	    COPY_HARD_REG_SET (new_losers, losers);
 
 	  IOR_HARD_REG_SET(new_losers, losing_caller_save_reg_set);
-	  find_reg (num, new_losers, alt_regs_p, 1, retrying);
+	  find_reg (num, new_losers, alt_regs_level, 1, retrying);
 	  if (reg_renumber[allocno[num].reg] >= 0)
 	    {
 	      caller_save_needed = 1;
@@ -1361,8 +1368,11 @@ retry_global_alloc (int regno, HARD_REG_SET forbidden_regs)
       if (N_REG_CLASSES > 1)
 	find_reg (alloc_no, forbidden_regs, 0, 0, 1);
       if (reg_renumber[regno] < 0
-	  && reg_alternate_class (regno) != NO_REGS)
+	  && reg_second_preferred_class (regno) != NO_REGS)
 	find_reg (alloc_no, forbidden_regs, 1, 0, 1);
+      if (reg_renumber[regno] < 0
+	  && reg_alternate_class (regno) != NO_REGS)
+	find_reg (alloc_no, forbidden_regs, 2, 0, 1);
 
       /* If we found a register, modify the RTL for the register to
 	 show the hard register, and mark that register live.  */

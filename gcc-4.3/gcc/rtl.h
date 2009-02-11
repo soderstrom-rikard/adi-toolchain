@@ -1798,6 +1798,7 @@ extern const char *decode_asm_operands (rtx, rtx *, rtx **, const char **,
 					enum machine_mode *, location_t *);
 
 extern enum reg_class reg_preferred_class (int);
+extern enum reg_class reg_second_preferred_class (int);
 extern enum reg_class reg_alternate_class (int);
 
 extern void split_all_insns (void);

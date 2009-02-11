@@ -145,7 +145,7 @@ struct qty
      the pseudo regs that are tied in given quantity.
      This is the preferred class for allocating that quantity.  */
 
-  enum reg_class min_class;
+  enum reg_class min_class, min2_class;
 
   /* Register class within which we allocate given qty if we can't get
      its preferred class.  */
@@ -339,6 +339,7 @@ alloc_qty (int regno, enum machine_mode mode, int size, int birth)
   qty[qtyno].freq_calls_crossed = REG_FREQ_CALLS_CROSSED (regno);
   qty[qtyno].n_throwing_calls_crossed = REG_N_THROWING_CALLS_CROSSED (regno);
   qty[qtyno].min_class = reg_preferred_class (regno);
+  qty[qtyno].min2_class = reg_second_preferred_class (regno);
   qty[qtyno].alternate_class = reg_alternate_class (regno);
   qty[qtyno].n_refs = REG_N_REFS (regno);
   qty[qtyno].freq = REG_FREQ (regno);
@@ -1711,10 +1712,31 @@ block_alloc (int b)
 	  if (flag_schedule_insns_after_reload && dbg_cnt (local_alloc_for_sched)
 	      && !optimize_size
 	      && !SMALL_REGISTER_CLASSES
+	      && qty[q].min2_class != NO_REGS)
+	    qty[q].phys_reg = find_free_reg (qty[q].min2_class,
+					     qty[q].mode, q, 0, 0,
+					     fake_birth, fake_death);
+	  if (qty[q].phys_reg >= 0)
+	    continue;
+#endif
+	  if (qty[q].min2_class != NO_REGS)
+	    qty[q].phys_reg = find_free_reg (qty[q].min2_class,
+					     qty[q].mode, q, 0, 0,
+					     qty[q].birth, qty[q].death);
+	  if (qty[q].phys_reg >= 0)
+	    continue;
+
+#ifdef INSN_SCHEDULING
+	  /* Similarly, avoid false dependencies.  */
+	  if (flag_schedule_insns_after_reload
+	      && !optimize_size
+	      && !SMALL_REGISTER_CLASSES
 	      && qty[q].alternate_class != NO_REGS)
 	    qty[q].phys_reg = find_free_reg (qty[q].alternate_class,
 					     qty[q].mode, q, 0, 0,
 					     fake_birth, fake_death);
+	  if (qty[q].phys_reg >= 0)
+	    continue;
 #endif
 	  if (qty[q].alternate_class != NO_REGS)
 	    qty[q].phys_reg = find_free_reg (qty[q].alternate_class,
@@ -2074,6 +2096,10 @@ update_qty_class (int qtyno, int reg)
   enum reg_class rclass = reg_preferred_class (reg);
   if (reg_class_subset_p (rclass, qty[qtyno].min_class))
     qty[qtyno].min_class = rclass;
+
+  rclass = reg_second_preferred_class (reg);
+  if (reg_class_subset_p (rclass, qty[qtyno].min2_class))
+    qty[qtyno].min2_class = rclass;
 
   rclass = reg_alternate_class (reg);
   if (reg_class_subset_p (rclass, qty[qtyno].alternate_class))

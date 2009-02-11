@@ -842,6 +842,9 @@ struct reg_pref
   /* (enum reg_class) prefclass is the preferred class.  */
   char prefclass;
 
+  /* (enum reg_class) prefclass is the second-best preferred class.  */
+  char prefclass2;
+
   /* altclass is a register class that we should use for allocating
      pseudo if no register in the preferred class is available.
      If no register in this class is available, memory is preferred.
@@ -920,6 +923,14 @@ reg_preferred_class (int regno)
   if (reg_pref == 0)
     return GENERAL_REGS;
   return (enum reg_class) reg_pref[regno].prefclass;
+}
+
+enum reg_class
+reg_second_preferred_class (int regno)
+{
+  if (reg_pref == 0)
+    return GENERAL_REGS;
+  return (enum reg_class) reg_pref[regno].prefclass2;
 }
 
 enum reg_class
@@ -1320,7 +1331,9 @@ regclass (rtx f, int nregs, FILE *dump)
       for (i = FIRST_PSEUDO_REGISTER; i < nregs; i++)
 	{
 	  int best_cost = (1 << (HOST_BITS_PER_INT - 2)) - 1;
-	  enum reg_class best = ALL_REGS, alt = NO_REGS;
+	  int best_cost2 = (1 << (HOST_BITS_PER_INT - 2)) - 1;
+	  enum reg_class best = ALL_REGS, best2 = NO_REGS, alt = NO_REGS;
+
 	  /* This is an enum reg_class, but we call it an int
 	     to save lots of casts.  */
 	  int class;
@@ -1347,11 +1360,27 @@ regclass (rtx f, int nregs, FILE *dump)
 		;
 	      else if (p->cost[class] < best_cost)
 		{
+		  if (best2 == NO_REGS || reg_class_size[best2] == 1
+		      || reg_class_size[best] > 1)
+		    {
+		      best2 = best;
+		      best_cost2 = best_cost;
+		    }
+
 		  best_cost = p->cost[class];
 		  best = (enum reg_class) class;
 		}
 	      else if (p->cost[class] == best_cost)
 		best = reg_class_subunion[(int) best][class];
+	      else if (p->cost[class] < best_cost2
+		       && (reg_class_size[best2] == 1
+			   || reg_class_size[class] > 1))
+		{
+		  best_cost2 = p->cost[class];
+		  best2 = (enum reg_class) class;
+		}
+	      else if (p->cost[class] == best_cost2)
+		best2 = reg_class_subunion[(int) best2][class];
 	    }
 
 	  /* Record the alternate register class; i.e., a class for which
@@ -1377,26 +1406,32 @@ regclass (rtx f, int nregs, FILE *dump)
 		alt = reg_class_subunion[(int) alt][class];
 
 	  /* If we don't add any classes, nothing to try.  */
-	  if (alt == best)
+	  if (alt == best2)
 	    alt = NO_REGS;
 
 	  if (dump
 	      && (reg_pref[i].prefclass != (int) best
+		  || reg_pref[i].prefclass2 != (int) best2
 		  || reg_pref[i].altclass != (int) alt))
 	    {
 	      fprintf (dump, "  Register %i", i);
-	      if (alt == ALL_REGS || best == ALL_REGS)
+	      if (best == ALL_REGS)
 		fprintf (dump, " pref %s\n", reg_class_names[(int) best]);
-	      else if (alt == NO_REGS)
+	      else if (alt == NO_REGS && best2 == NO_REGS)
 		fprintf (dump, " pref %s or none\n", reg_class_names[(int) best]);
+	      else if (alt == NO_REGS)
+		fprintf (dump, " pref %s, %s or none\n", reg_class_names[(int) best],
+			 reg_class_names[(int) best2]);
 	      else
-		fprintf (dump, " pref %s, else %s\n",
+		fprintf (dump, " pref %s, %s else %s\n",
 			 reg_class_names[(int) best],
+			 reg_class_names[(int) best2],
 			 reg_class_names[(int) alt]);
 	    }
 
 	  /* We cast to (int) because (char) hits bugs in some compilers.  */
 	  reg_pref[i].prefclass = (int) best;
+	  reg_pref[i].prefclass2 = (int) best2;
 	  reg_pref[i].altclass = (int) alt;
 	}
     }

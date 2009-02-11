@@ -11,6 +11,21 @@
 	* config/bfin/bfin.c (bfin_register_move_cost): Remove code that tries
 	to account for latencies.
 
+	* regclass.c (struct reg_pref): New member PREFCLASS2.
+	(reg_second_preferred_class): New function.
+	(regclass): Compute a second preferred class between the normal one
+	and the alternate class with the constraint that it should contain
+	more than one reg.
+	* global.c (global_alloc): Try the second preferred class.
+	(retry_global_alloc): Likewise.
+	(find_reg): Arg ALT_REGS_P changed to ALT_REGS_LEVEL, selecting
+	between the three possible reg classes.  Callers changed.
+	* local-alloc.c (struct qty): New member MIN2_CLASS.
+	(alloc_qty): Initialize it.
+	(block_alloc): Use it.
+	(update_qty_class): Update it.
+	* rtl.h (reg_second_preferred_class): Declare.
+
 2009-02-11  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/sync.md: Use indirect call for all sync patterns.
