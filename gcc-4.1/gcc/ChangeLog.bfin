@@ -8,6 +8,9 @@
 	a new condition, try all the old ones again too.  Also retry conditions
 	after passing them through simplify_using_assignment.
 
+	* config/bfin/bfin.c (bfin_register_move_cost): Remove code that tries
+	to account for latencies.
+
 2009-02-11  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/sync.md: Use indirect call for all sync patterns.

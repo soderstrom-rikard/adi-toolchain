@@ -2397,12 +2397,6 @@ bfin_register_move_cost (enum machine_mode mode,
   if (optimize_size)
     return 2;
 
-  /* There are some stalls involved when moving from a DREG to a different
-     class reg, and using the value in one of the following instructions.
-     Attempt to model this by slightly discouraging such moves.  */
-  if (class1 == DREGS && class2 != DREGS)
-    return 2 * 2;
-
   if (GET_MODE_CLASS (mode) == MODE_INT)
     {
       /* Discourage trying to use the accumulators.  */

@@ -33,6 +33,10 @@
 	(simplify_using_assignment, simplify_using_initial_values): Call it
 	when we have a new expression.
 
+	* config/bfin/bfin.c (bfin_register_move_cost): Test for subsets of
+	DREGS rather than comparing directly.  Remove code that tries to
+	account for latencies.
+
 2009-02-10  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.c (bfin_extra_live_on_entry): New.
