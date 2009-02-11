@@ -11,6 +11,9 @@
 	* loop-iv.c (simplify_using_initial_values): Keep track of conditions
 	we have seen and keep using them to simplify new expressions.
 
+	* config/bfin/bfin.c (bfin_optimize_loops_1): Do nothing if the
+	function calls setjmp.
+
 2009-02-08  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_gen_bundles): Don't try to bundle a jump.

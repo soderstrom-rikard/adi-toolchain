@@ -4774,6 +4774,9 @@ bfin_optimize_loops_1 (FILE *dump_file)
   struct loops loops;
   int i;
 
+  if (current_function_calls_setjmp)
+    return;
+
   if (flow_loops_find (&loops) <= 0)
     return;
 
