@@ -29,6 +29,10 @@
 	a new condition, try all the old ones again too.  Also retry conditions
 	after passing them through simplify_using_assignment.
 
+	* loop-iv.c (replace_single_def_regs): New static function.
+	(simplify_using_assignment, simplify_using_initial_values): Call it
+	when we have a new expression.
+
 2009-02-10  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.c (bfin_extra_live_on_entry): New.

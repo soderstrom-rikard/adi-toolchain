@@ -1367,6 +1367,33 @@ simple_rhs_p (rtx rhs)
     }
 }
 
+/* If REG has a single definition, replace it with its known value in EXPR.
+   Callback for for_each_rtx.  */
+
+static int
+replace_single_def_regs (rtx *reg, void *expr1)
+{
+  unsigned regno;
+  struct df_ref *adef;
+  rtx set;
+  rtx *expr = (rtx *)expr1;
+
+  if (!REG_P (*reg))
+    return 0;
+
+  regno = REGNO (*reg);
+  adef = DF_REG_DEF_CHAIN (regno);
+  if (adef == NULL || adef->next_reg != NULL || adef->insn == NULL)
+    return -1;
+
+  set = single_set (adef->insn);
+  if (set == NULL || SET_DEST (set) != *reg || !CONSTANT_P (SET_SRC (set)))
+    return -1;
+
+  *expr = simplify_replace_rtx (*expr, *reg, SET_SRC (set));
+  return 1;
+}
+
 /* Simplifies *EXPR using assignment in INSN.  Returns true if it used the
    insn to make a replacement.  */
 
@@ -1375,6 +1402,7 @@ simplify_using_assignment (rtx insn, rtx *expr)
 {
   rtx set = single_set (insn);
   rtx lhs = NULL_RTX, rhs;
+  rtx old = *expr;
 
   if (!set)
     return false;
@@ -1393,6 +1421,11 @@ simplify_using_assignment (rtx insn, rtx *expr)
     return false;
 
   *expr = simplify_replace_rtx (*expr, lhs, rhs);
+  if (old != *expr)
+    for (;;)
+      if (for_each_rtx (expr, replace_single_def_regs, expr) == 0)
+	break;
+
   return true;
 }
 
@@ -1813,6 +1846,12 @@ simplify_using_initial_values (struct loop *loop, enum rtx_code op, rtx *expr)
     }
 
   gcc_assert (op == UNKNOWN);
+
+  for (;;)
+    if (for_each_rtx (expr, replace_single_def_regs, expr) == 0)
+      break;
+  if (CONSTANT_P (*expr))
+    return;
 
   e = loop_preheader_edge (loop);
   if (e->src == ENTRY_BLOCK_PTR)
