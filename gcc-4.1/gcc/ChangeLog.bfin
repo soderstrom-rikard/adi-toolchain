@@ -1,3 +1,7 @@
+2009-02-11  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/sync.md: Use indirect call for all sync patterns.
+
 2009-02-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* loop-iv.c (implies_p): In the last conditional, verify not only the

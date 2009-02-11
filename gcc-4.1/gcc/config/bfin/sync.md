@@ -29,12 +29,12 @@
 	(unspec:SI
 	  [(FETCHOP:SI (mem:SI (match_dup 0))
 	     (match_operand:SI 1 "register_operand" "q0"))
-	   (match_operand:SI 2 "const_int_operand" "i")]
+	   (match_operand:SI 2 "register_no_elim_operand" "a")]
 	  UNSPEC_ATOMIC))
    (clobber (match_scratch:SI 3 "=q0"))
    (clobber (match_scratch:SI 4 "=q1"))]
   "TARGET_SUPPORTS_SYNC_CALLS"
-  "call %2;"
+  "call (%2);"
   [(set_attr "type" "call")])
 
 (define_expand "sync_<fetchop_name>si"
@@ -54,7 +54,7 @@
       operands[0] = shallow_copy_rtx (operands[0]);
       XEXP (operands[0], 0) = force_reg (Pmode, XEXP (operands[0], 0));
     }
-  operands[2] = GEN_INT (<fetchop_addr>);
+  operands[2] = force_reg (Pmode, GEN_INT (<fetchop_addr>));
 })
 
 (define_insn "sync_old_<fetchop_name>si_internal"
@@ -64,11 +64,11 @@
 	(unspec:SI
 	  [(FETCHOP:SI (mem:SI (match_dup 1))
 	     (match_operand:SI 2 "register_operand" "q0"))
-	   (match_operand:SI 3 "const_int_operand" "i")]
+	   (match_operand:SI 3 "register_no_elim_operand" "a")]
 	  UNSPEC_ATOMIC))
    (clobber (match_scratch:SI 4 "=q0"))]
   "TARGET_SUPPORTS_SYNC_CALLS"
-  "call %3;"
+  "call (%3);"
   [(set_attr "type" "call")])
 
 (define_expand "sync_old_<fetchop_name>si"
@@ -89,7 +89,7 @@
       operands[1] = shallow_copy_rtx (operands[1]);
       XEXP (operands[1], 0) = force_reg (Pmode, XEXP (operands[1], 0));
     }
-  operands[3] = GEN_INT (<fetchop_addr>);
+  operands[3] = force_reg (Pmode, GEN_INT (<fetchop_addr>));
 })
 
 (define_insn "sync_new_<fetchop_name>si_internal"
@@ -98,7 +98,7 @@
 	  [(FETCHOP:SI
 	    (mem:SI (match_operand:SI 1 "register_operand" "qA"))
 	    (match_operand:SI 2 "register_operand" "q0"))
-	   (match_operand:SI 3 "const_int_operand" "i")]
+	   (match_operand:SI 3 "register_no_elim_operand" "a")]
 	  UNSPEC_ATOMIC))
    (set (mem:SI (match_dup 1))
 	(unspec:SI
@@ -107,7 +107,7 @@
 	  UNSPEC_ATOMIC))
    (clobber (match_scratch:SI 4 "=q1"))]
   "TARGET_SUPPORTS_SYNC_CALLS"
-  "call %3;"
+  "call (%3);"
   [(set_attr "type" "call")])
 
 (define_expand "sync_new_<fetchop_name>si"
@@ -131,7 +131,7 @@
       operands[1] = shallow_copy_rtx (operands[1]);
       XEXP (operands[1], 0) = force_reg (Pmode, XEXP (operands[1], 0));
     }
-  operands[3] = GEN_INT (<fetchop_addr>);
+  operands[3] = force_reg (Pmode, GEN_INT (<fetchop_addr>));
 })
 
 (define_insn "sync_compare_and_swapsi_internal"
@@ -142,10 +142,10 @@
 	  [(mem:SI (match_dup 1))
 	   (match_operand:SI 2 "register_operand" "q1")
 	   (match_operand:SI 3 "register_operand" "q2")
-	   (match_operand:SI 4 "const_int_operand" "i")]
+	   (match_operand:SI 4 "register_no_elim_operand" "a")]
 	  UNSPEC_ATOMIC))]
   "TARGET_SUPPORTS_SYNC_CALLS"
-  "call %4;"
+  "call (%4);"
   [(set_attr "type" "call")])
 
 (define_expand "sync_compare_and_swapsi"
@@ -166,5 +166,5 @@
       operands[1] = shallow_copy_rtx (operands[1]);
       XEXP (operands[1], 0) = force_reg (Pmode, XEXP (operands[1], 0));
     }
-  operands[4] = GEN_INT (0x420);
+  operands[4] = force_reg (Pmode, GEN_INT (0x420));
 })
