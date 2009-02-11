@@ -14,6 +14,9 @@
 	* config/bfin/bfin.c (bfin_optimize_loops_1): Do nothing if the
 	function calls setjmp.
 
+	* simplify-rtx.c (simplify_relational_operation_1): Convert unsigned
+	comparisons of the form (X + CONST) < CONST to X >= -CONST.
+
 2009-02-10  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.c (bfin_extra_live_on_entry): New.

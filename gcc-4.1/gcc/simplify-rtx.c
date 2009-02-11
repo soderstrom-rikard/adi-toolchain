@@ -3020,6 +3020,28 @@ simplify_relational_operation_1 (enum rtx_code code, enum machine_mode mode,
 	}
     }
 
+  /* (LTU/GEU (PLUS a C) C), where C is constant, can be simplified to
+     (GEU/LTU a -C).  */
+  if ((code == LTU || code == GEU)
+      && GET_CODE (op0) == PLUS
+      && GET_CODE (XEXP (op0, 1)) == CONST_INT
+      && (rtx_equal_p (op1, XEXP (op0, 0)) || rtx_equal_p (op1, XEXP (op0, 1))))
+    {
+      HOST_WIDE_INT new_cmp
+	= trunc_int_for_mode (-INTVAL (XEXP (op0, 1)), cmp_mode);
+      return simplify_gen_relational ((code == LTU ? GEU : LTU), mode,
+				      cmp_mode, XEXP (op0, 0),
+				      GEN_INT (new_cmp));
+    }
+
+  /* Canonicalize (LTU/GEU (PLUS a b) b) as (LTU/GEU (PLUS a b) a).  */
+  if ((code == LTU || code == GEU)
+      && GET_CODE (op0) == PLUS
+      && rtx_equal_p (op1, XEXP (op0, 1))
+      /* Don't recurse "infinitely" for (LTU/GEU (PLUS b b) b).  */
+      && !rtx_equal_p (op1, XEXP (op0, 0)))
+    return simplify_gen_relational (code, mode, cmp_mode, op0, XEXP (op0, 0));
+
   /* (eq/ne (plus x cst1) cst2) simplifies to (eq/ne x (cst2 - cst1))  */
   if ((code == EQ || code == NE)
       && (op0code == PLUS || op0code == MINUS)

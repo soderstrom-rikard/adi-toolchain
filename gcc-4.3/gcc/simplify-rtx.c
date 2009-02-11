@@ -3876,6 +3876,20 @@ simplify_relational_operation_1 (enum rtx_code code, enum machine_mode mode,
 	}
     }
 
+  /* (LTU/GEU (PLUS a C) C), where C is constant, can be simplified to
+     (GEU/LTU a -C).  */
+  if ((code == LTU || code == GEU)
+      && GET_CODE (op0) == PLUS
+      && GET_CODE (XEXP (op0, 1)) == CONST_INT
+      && (rtx_equal_p (op1, XEXP (op0, 0)) || rtx_equal_p (op1, XEXP (op0, 1))))
+    {
+      HOST_WIDE_INT new_cmp
+	= trunc_int_for_mode (-INTVAL (XEXP (op0, 1)), cmp_mode);
+      return simplify_gen_relational ((code == LTU ? GEU : LTU), mode,
+				      cmp_mode, XEXP (op0, 0),
+				      GEN_INT (new_cmp));
+    }
+
   /* Canonicalize (LTU/GEU (PLUS a b) b) as (LTU/GEU (PLUS a b) a).  */
   if ((code == LTU || code == GEU)
       && GET_CODE (op0) == PLUS
