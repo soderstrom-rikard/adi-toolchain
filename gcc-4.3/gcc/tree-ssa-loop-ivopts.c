@@ -3401,9 +3401,11 @@ difference_cost (struct ivopts_data *data,
 		 tree e1, tree e2, bool *symbol_present, bool *var_present,
 		 unsigned HOST_WIDE_INT *offset, bitmap *depends_on)
 {
+  HOST_WIDE_INT diff;
   comp_cost cost;
   enum machine_mode mode = TYPE_MODE (TREE_TYPE (e1));
   unsigned HOST_WIDE_INT off1, off2;
+  int folded;
 
   e1 = strip_offset (e1, &off1);
   e2 = strip_offset (e2, &off2);
