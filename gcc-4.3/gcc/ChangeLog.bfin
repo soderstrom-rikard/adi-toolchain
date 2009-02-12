@@ -8,6 +8,10 @@
 	difference between E1 and E2, and do the right thing if it turns into
 	a constant.
 
+	* config/bfin/bfin.c (find_prev_insn_start): New function.
+	(bfin_optimize_loop): Use it in some cases instead of PREV_INSN.
+	(find_next_insn_start): Move.
+
 2009-02-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* loop-iv.c (implies_p): In the last conditional, verify not only the
