@@ -1917,12 +1917,24 @@ simplify_using_initial_values (struct loop *loop, enum rtx_code op, rtx *expr)
 	    goto out;
 	  if (did_replace)
 	    {
-	      rtx note;
-	      for (note = cond_list; note; note = XEXP (note, 1))
+	      rtx *pnote, *pnote_next;
+	      for (pnote = &cond_list; *pnote; pnote = pnote_next)
 		{
+		  rtx note = *pnote;
 		  rtx old_cond = XEXP (note, 0);
+
+		  pnote_next = &XEXP (note, 1);
 		  simplify_using_assignment (insn, &XEXP (note, 0));
-		  if (old_cond != XEXP (note, 0))
+		  /* We can no longer use a condition that has been simplified
+		     to a constant, and simplify_using_condition will abort if
+		     we try.  */
+		  if (CONSTANT_P (XEXP (note, 0)))
+		    {
+		      *pnote = *pnote_next;
+		      pnote_next = pnote;
+		      free_EXPR_LIST_node (note);
+		    }
+		  else if (old_cond != XEXP (note, 0))
 		    simplify_using_condition (XEXP (note, 0), expr, altered);
 		}
 	    }
@@ -1955,6 +1967,7 @@ simplify_using_initial_values (struct loop *loop, enum rtx_code op, rtx *expr)
     }
 
  out:
+  free_EXPR_LIST_list (&cond_list);
   if (!CONSTANT_P (*expr))
     *expr = last_valid_expr;
   FREE_REG_SET (altered);

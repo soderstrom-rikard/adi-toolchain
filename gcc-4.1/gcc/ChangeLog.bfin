@@ -11,6 +11,9 @@
 	* tree-ssa-loop-ivopts.c (get_address_cost): Don't try very small
 	offsets, start with BIGGEST_ALIGNMENT.
 
+	* loop-iv.c (simplify_using_initial_values): Free a condition if it
+	gets simplified to a constant.  Free the COND_LIST before returning.
+
 2009-02-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* loop-iv.c (simple_rhs_p): Allow more kinds of expressions.

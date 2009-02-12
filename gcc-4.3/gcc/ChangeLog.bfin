@@ -18,6 +18,9 @@
 	candidate in a memory address, where we think this increases the
 	chances of autoincrement addressing.
 
+	* loop-iv.c (simplify_using_initial_values): Free a condition if it
+	gets simplified to a constant.  Free the COND_LIST before returning.
+
 2009-02-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* loop-iv.c (implies_p): In the last conditional, verify not only the
