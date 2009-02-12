@@ -3412,6 +3412,28 @@ difference_cost (struct ivopts_data *data,
   STRIP_NOPS (e1);
   STRIP_NOPS (e2);
 
+  if (POINTER_TYPE_P (TREE_TYPE (e1)))
+    {
+      if (ptr_difference_const (e1, e2, &diff))
+	{
+	  *offset += diff;
+	  *symbol_present = false;
+	  *var_present = false;
+	  return zero_cost;
+	}
+    }
+  else
+    {
+      folded = fold_build2 (MINUS_EXPR, TREE_TYPE (e1), e1, e2);
+      if (cst_and_fits_in_hwi (folded))
+	{
+	  *offset += int_cst_value (folded);
+	  *symbol_present = false;
+	  *var_present = false;
+	  return zero_cost;
+	}
+    }
+
   if (TREE_CODE (e1) == ADDR_EXPR)
     return ptr_difference_cost (data, e1, e2, symbol_present, var_present, offset,
 				depends_on);
