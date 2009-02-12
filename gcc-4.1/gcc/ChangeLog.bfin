@@ -1,3 +1,7 @@
+2009-02-12  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (addsi3): Add an alternative for IREGS.
+
 2009-02-11  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* loop-iv.c (simple_rhs_p): Allow more kinds of expressions.
