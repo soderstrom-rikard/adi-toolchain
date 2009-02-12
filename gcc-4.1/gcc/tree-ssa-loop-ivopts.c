@@ -3318,12 +3318,13 @@ get_address_cost (bool symbol_present, bool var_present,
   if (!initialized[mem_mode])
     {
       HOST_WIDE_INT i;
+      HOST_WIDE_INT start = BIGGEST_ALIGNMENT / BITS_PER_UNIT;
       initialized[mem_mode] = true;
 
       reg1 = gen_raw_REG (Pmode, LAST_VIRTUAL_REGISTER + 1);
 
       addr = gen_rtx_fmt_ee (PLUS, Pmode, reg1, NULL_RTX);
-      for (i = 1; i <= 1 << 20; i <<= 1)
+      for (i = start; i <= 1 << 20; i <<= 1)
 	{
 	  XEXP (addr, 1) = gen_int_mode (i, Pmode);
 	  if (!memory_address_p (mem_mode, addr))
@@ -3332,7 +3333,7 @@ get_address_cost (bool symbol_present, bool var_present,
       max_offset[mem_mode] = i >> 1;
       off[mem_mode] = max_offset[mem_mode];
 
-      for (i = 1; i <= 1 << 20; i <<= 1)
+      for (i = start; i <= 1 << 20; i <<= 1)
 	{
 	  XEXP (addr, 1) = gen_int_mode (-i, Pmode);
 	  if (!memory_address_p (mem_mode, addr))
