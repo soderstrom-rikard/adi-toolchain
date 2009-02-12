@@ -186,21 +186,26 @@ enum iv_position
 /* The induction variable candidate.  */
 struct iv_cand
 {
-  unsigned id;		/* The number of the candidate.  */
-  bool important;	/* Whether this is an "important" candidate, i.e. such
-			   that it should be considered by all uses.  */
-  enum iv_position pos;	/* Where it is computed.  */
-  tree incremented_at;	/* For original biv, the statement where it is
-			   incremented.  */
-  tree var_before;	/* The variable used for it before increment.  */
-  tree var_after;	/* The variable used for it after increment.  */
-  struct iv *iv;	/* The value of the candidate.  NULL for
-			   "pseudocandidate" used to indicate the possibility
-			   to replace the final value of an iv by direct
-			   computation of the value.  */
-  unsigned cost;	/* Cost of the candidate.  */
-  bitmap depends_on;	/* The list of invariants that are used in step of the
-			   biv.  */
+  unsigned id;			/* The number of the candidate.  */
+  bool important;		/* Whether this is an "important" candidate,
+				   i.e. such that it should be considered by
+				   all uses.  */
+  enum iv_position pos;		/* Where it is computed.  */
+  tree incremented_at;		/* For original biv, the statement where it is
+				   incremented.  */
+  tree var_before;		/* The variable used for it before
+				   increment.  */
+  tree var_after;		/* The variable used for it after
+				   increment.  */
+  struct iv *iv;		/* The value of the candidate.  NULL for
+				   "pseudocandidate" used to indicate the
+				   possibility to replace the final value of an
+				   iv by direct computation of the value.  */
+  unsigned cost;		/* Cost of the candidate.  */
+  unsigned cost_step;		/* Cost of the addition needed for this
+				   candidate.  */
+  bitmap depends_on;		/* The list of invariants that are used in step
+				   of the biv.  */
 };
 
 /* The data used by the induction variable optimizations.  */
@@ -4018,6 +4023,7 @@ determine_iv_cost (struct ivopts_data *data, struct iv_cand *cand)
     cost++;
 
   cand->cost = cost;
+  cand->cost_step = cost_step;
 }
 
 /* Determines costs of computation of the candidates.  */
@@ -4165,8 +4171,34 @@ static void
 iv_ca_recount_cost (struct ivopts_data *data, struct iv_ca *ivs)
 {
   comp_cost cost = ivs->cand_use_cost;
+  unsigned i, j;
+
   cost.cost += ivs->cand_cost;
   cost.cost += ivopts_global_cost_for_size (data, ivs->n_regs);
+
+  /* Try to give a bonus to single uses of a candidate in an address,
+     where we think this might lead to autoinc addressing later on.  */
+  for (i = 0; i < n_iv_cands (data); i++)
+    {
+      struct iv_cand *cand = iv_cand (data, i);
+      if (ivs->n_cand_uses[i] != 1)
+	continue;
+      for (j = 0; j < n_iv_uses (data); j++)
+	{
+	  struct cost_pair *cp;
+	  struct iv_use *use = iv_use (data, j);
+	  cp = ivs->cand_for_use[j];
+	  if (!cp)
+	    continue;
+	  if (cp->cand == cand && use->type == USE_ADDRESS
+	      && tree_int_cst_equal (TYPE_SIZE_UNIT (TREE_TYPE (*use->op_p)),
+				     cand->iv->step) )
+	    {
+	      cost.cost -= cand->cost_step;
+	      break;
+	    }
+	}
+    }
 
   ivs->cost = cost;
 }
