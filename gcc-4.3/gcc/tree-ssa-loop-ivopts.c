@@ -4192,7 +4192,7 @@ iv_ca_recount_cost (struct ivopts_data *data, struct iv_ca *ivs)
 	    continue;
 	  if (cp->cand == cand && use->type == USE_ADDRESS
 	      && tree_int_cst_equal (TYPE_SIZE_UNIT (TREE_TYPE (*use->op_p)),
-				     cand->iv->step) )
+				     cand->iv->step))
 	    {
 	      cost.cost -= cand->cost_step;
 	      break;
