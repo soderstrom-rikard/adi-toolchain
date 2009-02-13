@@ -1,3 +1,7 @@
+2009-02-13  Jie Zhang  <jie.zhang@analog.com>
+
+	* emutls.c (emutls_destroy): Don't fall out of the array bound.
+
 2009-02-12  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (addsi3): Add an alternative for IREGS.
