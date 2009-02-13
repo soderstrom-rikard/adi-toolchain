@@ -2300,7 +2300,8 @@ if [ $KERNEL_SOURCE ] ; then
     done
 
     # update the kernel header path just to make rebuilding easier later on
-    sed -i '/^KERNEL_HEADERS/s:=.*:="'"$DIR_uC_OUTPUT/bfin-uclinux/runtime/usr/include"'":' .config-used-for*
+    sed -i.tmp '/^KERNEL_HEADERS/s:=.*:="'"$DIR_uC_OUTPUT/bfin-uclinux/runtime/usr/include"'":' .config-used-for*
+    rm -f .config-used-for*.tmp
 
     ######################### Done with uClibc ###########################
 
