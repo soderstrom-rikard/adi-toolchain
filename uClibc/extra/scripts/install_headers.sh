@@ -33,7 +33,7 @@ fi
 (
 # We must cd, or else we'll prepend "$1" to filenames!
 cd "$1" || exit 1
-find ! -name '.' -a ! -path '*/.*'
+find . ! -name '.' -a ! -path '*/.*'
 ) | \
 (
 IFS=''
