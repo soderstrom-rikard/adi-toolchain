@@ -1,3 +1,7 @@
+2009-02-13  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* tree-ssa-loop-ivopts.c (difference_cost): Give FOLDED the right type.
+
 2009-02-13  Jie Zhang  <jie.zhang@analog.com>
 
 	* emutls.c (emutls_destroy): Don't fall out of the array bound.
