@@ -2549,7 +2549,7 @@ if [ $KERNEL_SOURCE ] ; then
     echo_date "Installing libftdi"
     run_cmd $MAKE SUBDIRS=src install
 
-    export PKG_CONFIG_LIBDIR="$DIR_LIBFTDI_BUILD/destdir/lib/pkgconfig${PKG_CONFIG_LIBDIR+:${PKG_CONFIG_LIBDIR}}"
+    export PKG_CONFIG_PATH="$DIR_LIBFTDI_BUILD/destdir/lib/pkgconfig${PKG_CONFIG_PATH+:${PKG_CONFIG_PATH}}"
     export LIBFTDI_CONFIG="$DIR_LIBFTDI_BUILD/destdir/bin/libftdi-config"
     fi
 
