@@ -160,7 +160,7 @@
 #define ANOMALY_05000301 (__SILICON_REVISION__ < 6)
 /* SSYNCs After Writes To DMA MMR Registers May Not Be Handled Correctly */
 #define ANOMALY_05000302 (__SILICON_REVISION__ < 5)
-/* New Feature: Additional Hysteresis on SPORT Input Pins (Not Available On Older Silicon) */
+/* SPORT_HYS Bit in PLL_CTL Register Is Not Functional */
 #define ANOMALY_05000305 (__SILICON_REVISION__ < 5)
 /* New Feature: Additional PPI Frame Sync Sampling Options (Not Available On Older Silicon) */
 #define ANOMALY_05000306 (__SILICON_REVISION__ < 5)
