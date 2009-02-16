@@ -2,6 +2,12 @@
 
 	* config/bfin/bfin.h (HAVE_PRE_DECREMENT): Don't define.
 
+	* auto-inc-dec.c (verify_path_1, verify_path, find_loop_inc): New
+	functions.
+	(find_mem): Call find_loop_inc.
+	(rest_of_handle_auto_inc_dec): Calculate dominance info and DU/UD
+	chains.
+
 2009-02-13  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* tree-ssa-loop-ivopts.c (difference_cost): Give FOLDED the right type.
