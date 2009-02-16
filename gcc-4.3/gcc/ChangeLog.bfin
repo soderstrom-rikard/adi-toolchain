@@ -1,3 +1,7 @@
+2009-02-16  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.h (HAVE_PRE_DECREMENT): Don't define.
+
 2009-02-13  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* tree-ssa-loop-ivopts.c (difference_cost): Give FOLDED the right type.

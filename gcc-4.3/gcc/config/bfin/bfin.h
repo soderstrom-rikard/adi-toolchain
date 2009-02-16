@@ -1052,7 +1052,6 @@ do {					       \
 
 #define HAVE_POST_INCREMENT 1
 #define HAVE_POST_DECREMENT 1
-#define HAVE_PRE_DECREMENT  1
 
 /* `LEGITIMATE_PIC_OPERAND_P (X)'
      A C expression that is nonzero if X is a legitimate immediate
