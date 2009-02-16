@@ -8,6 +8,9 @@
 	(rest_of_handle_auto_inc_dec): Calculate dominance info and DU/UD
 	chains.
 
+	* simplify_rtx.c (simplify_binary_operation_1) [case AND]: If there's
+	no overlap between nonzero bits of the operands, the result is zero.
+
 2009-02-13  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* tree-ssa-loop-ivopts.c (difference_cost): Give FOLDED the right type.

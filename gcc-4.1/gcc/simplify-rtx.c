@@ -1697,6 +1697,11 @@ simplify_binary_operation_1 (enum rtx_code code, enum machine_mode mode,
 	  && GET_MODE_BITSIZE (mode) <= HOST_BITS_PER_WIDE_INT
 	  && (nonzero_bits (trueop0, mode) & ~INTVAL (trueop1)) == 0)
 	return op0;
+      /* If there is no overlap in nonzero bits, the result is zero.  */
+      if (GET_MODE_BITSIZE (mode) <= HOST_BITS_PER_WIDE_INT
+	  && (nonzero_bits (trueop0, mode)
+	      & nonzero_bits (trueop1, mode)) == 0)
+	return CONST0_RTX (mode);
       if (rtx_equal_p (trueop0, trueop1) && ! side_effects_p (op0)
 	  && GET_MODE_CLASS (mode) != MODE_CC)
 	return op0;

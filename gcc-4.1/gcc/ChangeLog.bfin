@@ -5,6 +5,9 @@
 	* simplify_rtx.c (simplify_const_relational_operation, 
 	comparison_result): Import from gcc-4.3 with minor changes.
 
+	* simplify_rtx.c (simplify_binary_operation_1) [case AND]: If there's
+	no overlap between nonzero bits of the operands, the result is zero.
+
 2009-02-12  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (addsi3): Add an alternative for IREGS.
