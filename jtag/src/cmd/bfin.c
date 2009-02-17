@@ -513,13 +513,14 @@ cmd_bfin_help( void )
   printf( _(
 	    "Usage: %s execute INSTRUCTIONs\n"
 	    "Usage: %s emulation enter|exit|singlestep|status\n"
+	    "Usage: %s reset [core|system]\n"
 	    "Usage: %s set one-insn-a-file VALUE\n"
 	    "Usage: %s show [one-insn-a-file]\n"
 	    "Blackfin specific commands\n"
 	    "\n"
 	    "INSTRUCTIONs are a sequence of Blackfin encoded instructions,\n"
 	    "double quoted assembly statements and [EMUDAT_IN]s\n"
-	    ), "bfin", "bfin", "bfin", "bfin" );
+	    ), "bfin", "bfin", "bfin", "bfin", "bfin" );
 }
 
 cmd_t cmd_bfin = {
