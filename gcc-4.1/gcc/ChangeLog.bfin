@@ -4,6 +4,9 @@
 	previous change to also check for side effects of operands before
 	dropping them.
 
+	* config/bfin/bfin.c (bfin_discover_loop): When retrying fails, mark
+	the loop as bad.
+
 2009-02-16  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (HAVE_PRE_DECREMENT): Don't define.
