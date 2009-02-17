@@ -1,3 +1,9 @@
+2009-02-17  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* simplify-rtx.c (simplify_binary_operation_1) [case AND]: Fix
+	previous change to also check for side effects of operands before
+	dropping them.
+
 2009-02-16  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (HAVE_PRE_DECREMENT): Don't define.
