@@ -1200,7 +1200,18 @@ build_gcc ()
     # make sure the tcl baggage that comes with insight doesnt pollute our PATH.
     # note this isnt an issue as insight statically links in all of the TCL stuff
     # it actually needs and does not use these binaries at runtime.
-    rm -f $3/bin/tclsh* $3/bin/wish*
+	if ! ${WITHOUT_X} ; then
+        (
+        prefix=$3
+        cd "${prefix}"/bin     && rm -f tclsh* wish*
+        cd "${prefix}"/lib     && rm -f libitcl*.a libitk*.a libtcl*.a libtk*.a
+        cd "${prefix}"/include && rm -f itcl*.h itk*.h tcl*.h tk*.h
+        cd "${prefix}"/man     && rm -rf mann man1/tclsh.1 man1/wish.1
+        grep -sl Tcl/Tk man3/* | xargs rm -f
+        cd ..
+        rmdir */* *
+        ) 2>/dev/null
+    fi
 
     if [ "${CBUILD}" != "${CHOST}" ] ; then
         PATH=$save_PATH
