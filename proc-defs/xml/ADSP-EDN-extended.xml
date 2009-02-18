@@ -764,8 +764,8 @@
 <register name="VR_CTL" group="PLL" read-address="0xFFC00008" write-address="0xFFC00008" mask="FFFF" type="IO" description="Voltage Regulator Control Register (16-bit)" bit-size="16"/>
 <register name="PLL_STAT" group="PLL" read-address="0xFFC0000C" write-address="0xFFC0000C" mask="FFFF" type="IO" description="PLL Status register (16-bit)" bit-size="16"/>
 <register name="PLL_LOCKCNT" group="PLL" read-address="0xFFC00010" write-address="0xFFC00010" mask="FFFF" type="IO" description="PLL Lock Count register (16-bit)" bit-size="16"/>
-<register name="SWRST" group="PLL" read-address="0xFFC00100" write-address="0xFFC00100" mask="FFFFFFFF" type="IO" description="Software Reset Register (16-bit)" bit-size="16"/>
-<register name="SYSCR" group="PLL" read-address="0xFFC00104" write-address="0xFFC00104" mask="FFFFFFFF" type="IO" description="System Configuration register" bit-size="32"/>
+<register name="SWRST" group="PLL" read-address="0xFFC00100" write-address="0xFFC00100" mask="FFFF" type="IO" description="Software Reset Register (16-bit)" bit-size="16"/>
+<register name="SYSCR" group="PLL" read-address="0xFFC00104" write-address="0xFFC00104" mask="FFFF" type="IO" description="System Configuration register" bit-size="16"/>
 <!-- ************************************************************************ -->
 <!-- ******* end sim dump / begin emu 3.5 XML (not already defined above)     -->
 <!-- ************************************************************************ -->

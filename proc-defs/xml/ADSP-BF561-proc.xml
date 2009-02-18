@@ -127,8 +127,8 @@
 <register name="ITEST_DATA0" group="L1 Code Memory Registers" read-address="0xFFE01400" write-address="0xFFE01400" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
 <register name="ITEST_DATA1" group="L1 Code Memory Registers" read-address="0xFFE01404" write-address="0xFFE01404" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
 
-<register name="SICA_SWRST"  group="SICA Register File" read-address="0xFFC00100" write-address="0xFFC00100" mask="FFFFFFFF" type="IO" description="" bit-size="16"/>
-<register name="SICA_SYSCR"  group="SICA Register File" read-address="0xFFC00104" write-address="0xFFC00104" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
+<register name="SICA_SWRST"  group="SICA Register File" read-address="0xFFC00100" write-address="0xFFC00100" mask="FFFF" type="IO" description="" bit-size="16"/>
+<register name="SICA_SYSCR"  group="SICA Register File" read-address="0xFFC00104" write-address="0xFFC00104" mask="FFFF" type="IO" description="" bit-size="16"/>
 <register name="SICA_RVECT"  group="SICA Register File" read-address="0xFFC00108" write-address="0xFFC00108" mask="FFFF" type="IO" description="" bit-size="16"/>
 <register name="SICA_IMASK0" group="SICA Register File" read-address="0xFFC0010C" write-address="0xFFC0010C" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
 <register name="SICA_IMASK1" group="SICA Register File" read-address="0xFFC00110" write-address="0xFFC00110" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
@@ -145,8 +145,8 @@
 <register name="SICA_IAR6"   group="SICA Register File" read-address="0xFFC0013C" write-address="0xFFC0013C" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
 <register name="SICA_IAR7"   group="SICA Register File" read-address="0xFFC00140" write-address="0xFFC00140" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
 
-<register name="SICB_SWRST"  group="SICB Register File" read-address="0xFFC01100" write-address="0xFFC01100" mask="FFFFFFFF" type="IO" description="" bit-size="16" def-comment="System Reset and Interrupt Controller Registers for Core B"/>
-<register name="SICB_SYSCR"  group="SICB Register File" read-address="0xFFC01104" write-address="0xFFC01104" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
+<register name="SICB_SWRST"  group="SICB Register File" read-address="0xFFC01100" write-address="0xFFC01100" mask="FFFF" type="IO" description="" bit-size="16" def-comment="System Reset and Interrupt Controller Registers for Core B"/>
+<register name="SICB_SYSCR"  group="SICB Register File" read-address="0xFFC01104" write-address="0xFFC01104" mask="FFFF" type="IO" description="" bit-size="16"/>
 <register name="SICB_RVECT"  group="SICB Register File" read-address="0xFFC01108" write-address="0xFFC01108" mask="FFFF" type="IO" description="" bit-size="16"/>
 <register name="SICB_IMASK0" group="SICB Register File" read-address="0xFFC0110C" write-address="0xFFC0110C" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
 <register name="SICB_IMASK1" group="SICB Register File" read-address="0xFFC01110" write-address="0xFFC01110" mask="FFFFFFFF" type="IO" description="" bit-size="32"/>
