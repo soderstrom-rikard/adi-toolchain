@@ -59,6 +59,7 @@ TEST_GXX=0
 TEST_GFORTRAN=0
 TEST_LIBSTDCXX=0
 TEST_LIBMUDFLAP=0
+TEST_LIBGOMP=0
 TEST_NEWLIB=0
 
 BINUTILS_TESTSUITE=
@@ -70,6 +71,7 @@ GXX_TESTSUITE=
 GFORTRAN_TESTSUITE=
 LIBSTDCXX_TESTSUITE=
 LIBMUDFLAP_TESTSUITE=
+LIBGOMP_TESTSUITE=
 NEWLIB_TESTSUITE=
 
 
@@ -254,6 +256,12 @@ do
 	    LIBMUDFLAP_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
 	    shift
 	    ;;
+	libgomp*)
+	    TEST_LIBGOMP=1
+	    TEST_ALL=0
+	    LIBGOMP_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+	    shift
+	    ;;
 	newlib*)
 	    TEST_NEWLIB=1
 	    TEST_ALL=0
@@ -276,6 +284,7 @@ if [ $TEST_ALL -eq 1 ] ; then
     TEST_GFORTRAN=1
     TEST_LIBSTDCXX=1
     TEST_LIBMUDFLAP=1
+    TEST_LIBGOMP=1
     TEST_NEWLIB=1
 fi
 
@@ -336,6 +345,9 @@ if [ $TEST_LIBSTDCXX -eq 1 ] ; then
 fi
 if [ $TEST_LIBMUDFLAP -eq 1 ] ; then
     printf "libmudflap "
+fi
+if [ $TEST_LIBGOMP -eq 1 ] ; then
+    printf "libgomp "
 fi
 if [ $TEST_NEWLIB -eq 1 ] ; then
     printf "newlib"
@@ -1802,6 +1814,55 @@ EOF
     copy_test_results $1 ${GCC_VERSION}
 }
 
+# $1 is the directory_test_results_go_in
+# $2 is the name of the test: elf-jtag, elf-sim, uclinux, linux-uclibc
+
+test_libgomp()
+{
+    detect_gcc gcc
+    if [ $? -eq 1 ] ; then
+	return
+    fi
+    detect_gcc g++
+    if [ $? -eq 1 ] ; then
+	return
+    fi
+
+    echo_date "Running tests on libgomp"
+
+    if [ ! $LIBGOMP_TESTSUITE ] ; then
+	LIBGOMP_TESTSUITE=$DIR_GCC_SOURCE/libgomp/testsuite
+    fi
+
+    if [ ! -d $LIBGOMP_TESTSUITE ] ; then
+	echo "No testsuite for libgomp $GCC_VERSION_FULL"
+	return
+    fi
+
+    if [ ! -d $DIR_GCC_BUILD/libgomp-test ] ; then
+	if [ -e $DIR_GCC_BUILD/libgomp-test ] ; then
+	    rm -rf $DIR_GCC_BUILD/libgomp-test
+	fi
+	mkdir -p $DIR_GCC_BUILD/libgomp-test
+    fi
+
+    cat > $DIR_GCC_BUILD/libgomp-test/site.exp <<EOF
+set host_triplet $HOST_TRIPLET
+set build_triplet $BUILD_TRIPLET
+set target_triplet $TARGET_TRIPLET
+set target_alias $target_alias
+set tmpdir $DIR_GCC_BUILD/libgomp-test
+set srcdir $LIBGOMP_TESTSUITE
+EOF
+
+    change_dir $DIR_GCC_BUILD/libgomp-test
+    RUN="$RUNTEST --tool libgomp $RUNTEST_FLAGS"
+    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+    (echo $RUN $LOGFILE ; ) | sh &
+    check_tests_OK $! libgomp $1
+    copy_test_results $1 ${GCC_VERSION}
+}
+
 prepare_target_solibs()
 {
     # Make sure all the shared libs are actually on the target and are
@@ -1939,6 +2000,11 @@ run_tests ()
 	    clean_hardware $2 libmudflap
 	    test_libmudflap $1 $2
 	fi
+    fi
+
+    if [ $TEST_LIBGOMP -eq 1 ] ; then
+	clean_hardware $2 libgomp
+	test_libgomp $1 $2
     fi
 
     clean_hardware $2 done
