@@ -1,0 +1,7 @@
+2009-02-19  Jie Zhang  <jie.zhang@analog.com>
+
+	* testsuite/libgomp.c++/c++.exp: Allow testing installed
+	libgomp.
+	* testsuite/libgomp.fortran/fortran.exp: Likewise.
+	* testsuite/lib/libgomp.exp (libgomp_init): Likewise.
+	(libgomp_target_compile): Likewise.
