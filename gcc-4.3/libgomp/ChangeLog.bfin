@@ -1,5 +1,9 @@
 2009-02-19  Jie Zhang  <jie.zhang@analog.com>
 
+	* testsuite/libgomp.fortran/pr29629.f90: Change n to 1000.
+
+2009-02-19  Jie Zhang  <jie.zhang@analog.com>
+
 	* testsuite/libgomp.c++/c++.exp: Allow testing installed
 	libgomp.
 	* testsuite/libgomp.fortran/fortran.exp: Likewise.
