@@ -1,3 +1,9 @@
+2009-02-23  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_optimize_loop): Unify handling of
+	problematic last insns.  Test for TYPE_CALL to catch the new sync
+	insns.  Remove special case testing for last insn of inner loops.
+
 2009-02-17  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* simplify-rtx.c (simplify_binary_operation_1) [case AND]: Fix
