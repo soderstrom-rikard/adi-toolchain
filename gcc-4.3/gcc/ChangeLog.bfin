@@ -15,6 +15,10 @@
 	* config/bfin/bfin.md (loop_end splitter): Use splitting_loops instead
 	of reload_completed.
 
+	* loop-iv.c (replace_single_def_regs): Follow chains of
+	single-definition regs.  Use reg notes where possible.  Allow not just
+	constants, but anything that's function_invariant_p.
+
 2009-02-23  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_optimize_loop): Unify handling of
