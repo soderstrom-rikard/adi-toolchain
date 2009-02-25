@@ -1393,7 +1393,7 @@ bfin_expand_prologue (void)
     }
   expand_prologue_reg_save (spreg, all, false);
 
-  do_link (spreg, frame_size, false);
+  do_link (spreg, frame_size, all);
 
   if (TARGET_ID_SHARED_LIBRARY
       && !TARGET_SEP_DATA
@@ -1422,7 +1422,7 @@ bfin_expand_epilogue (int need_return, int eh_return, bool sibcall_p)
       return;
     }
 
-  do_unlink (spreg, get_frame_size (), false, e);
+  do_unlink (spreg, get_frame_size (), all, e);
 
   expand_epilogue_reg_restore (spreg, all, false);
 

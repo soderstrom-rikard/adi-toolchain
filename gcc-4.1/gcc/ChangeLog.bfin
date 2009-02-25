@@ -1,3 +1,10 @@
+2009-02-25  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.c (bfin_expand_prologue): Ask do_link to
+	save FP and RETS with saveall attribute.
+	(bfin_expand_epilogue): Ask do_unlink to restore FP and RETS
+	with saveall attribute.
+
 2009-02-24  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (splitting_loops): Declare.

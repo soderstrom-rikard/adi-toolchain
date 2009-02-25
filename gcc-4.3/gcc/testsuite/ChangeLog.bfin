@@ -1,3 +1,7 @@
+2009-02-25  Jie Zhang  <jie.zhang@analog.com>
+
+	* gcc.target/bfin/saveall.c: New test.
+
 2008-01-31  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* g++.dg/compat/struct-layout-1_generate.c (vector_types): Remove
