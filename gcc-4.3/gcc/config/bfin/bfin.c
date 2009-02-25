@@ -64,8 +64,12 @@ struct machine_function GTY(())
   /* Set if we are notified by the doloop pass that a hardware loop
      was created.  */
   int has_hardware_loops;
+
   /* Set if we create a memcpy pattern that uses loop registers.  */
   int has_loopreg_clobber;
+
+  /* Set if we have an insn that clobbers RETS.  */
+  int has_rets_clobber;
 };
 
 /* Test and compare insns in bfin.md store the information needed to
@@ -554,7 +558,14 @@ n_pregs_to_save (bool is_inthandler, bool consecutive)
 static bool
 must_save_fp_p (void)
 {
-  return frame_pointer_needed || df_regs_ever_live_p (REG_FP);
+  return df_regs_ever_live_p (REG_FP);
+}
+
+/* Determine if we are going to save the RETS register.  */
+static bool
+must_save_rets_p (void)
+{
+  return ! current_function_is_leaf || cfun->machine->has_rets_clobber;
 }
 
 static bool
@@ -866,13 +877,12 @@ n_regs_saved_by_prologue (void)
   int i;
 
   if (all || stack_frame_needed_p ())
-    /* We use a LINK instruction in this case.  */
     n += 2;
   else
     {
       if (must_save_fp_p ())
 	n++;
-      if (! current_function_is_leaf)
+      if (must_save_rets_p ())
 	n++;
     }
 
@@ -1103,12 +1113,11 @@ do_link (rtx spreg, HOST_WIDE_INT frame_size, bool all)
 {
   frame_size += arg_area_size ();
 
-  if (all || stack_frame_needed_p ()
-      || (must_save_fp_p () && ! current_function_is_leaf))
+  if (stack_frame_needed_p ())
     emit_link_insn (spreg, frame_size);
   else
     {
-      if (! current_function_is_leaf)
+      if (all || must_save_rets_p ())
 	{
 	  rtx pat = gen_movsi (gen_rtx_MEM (Pmode,
 					    gen_rtx_PRE_DEC (Pmode, spreg)),
@@ -1116,7 +1125,7 @@ do_link (rtx spreg, HOST_WIDE_INT frame_size, bool all)
 	  rtx insn = emit_insn (pat);
 	  RTX_FRAME_RELATED_P (insn) = 1;
 	}
-      if (must_save_fp_p ())
+      if (all || must_save_fp_p ())
 	{
 	  rtx pat = gen_movsi (gen_rtx_MEM (Pmode,
 					    gen_rtx_PRE_DEC (Pmode, spreg)),
@@ -1138,20 +1147,20 @@ do_unlink (rtx spreg, HOST_WIDE_INT frame_size, bool all, int epilogue_p)
 {
   frame_size += arg_area_size ();
 
-  if (all || stack_frame_needed_p ())
+  if (stack_frame_needed_p ())
     emit_insn (gen_unlink ());
   else 
     {
       rtx postinc = gen_rtx_MEM (Pmode, gen_rtx_POST_INC (Pmode, spreg));
 
       add_to_reg (spreg, frame_size, 0, epilogue_p);
-      if (must_save_fp_p ())
+      if (all || must_save_fp_p ())
 	{
 	  rtx fpreg = gen_rtx_REG (Pmode, REG_FP);
 	  emit_move_insn (fpreg, postinc);
 	  emit_insn (gen_rtx_USE (VOIDmode, fpreg));
 	}
-      if (! current_function_is_leaf)
+      if (all || must_save_rets_p ())
 	{
 	  emit_move_insn (bfin_rets_rtx, postinc);
 	  emit_insn (gen_rtx_USE (VOIDmode, bfin_rets_rtx));
@@ -1297,6 +1306,27 @@ bfin_load_pic_reg (rtx dest)
   return dest;
 }
 
+static int
+bfin_has_rets_clobber (void)
+{
+  rtx insn;
+
+  for (insn = get_last_insn_anywhere (); insn; insn = PREV_INSN (insn))
+    {
+      if (!INSN_P (insn))
+	continue;
+
+      if (recog_memoized (insn) < 0)
+	continue;
+
+      if (CALL_P (insn)
+	  || get_attr_type (insn) == TYPE_CALL)
+	return 1;
+    }
+
+  return 0;
+}
+
 /* Generate RTL for the prologue of the current function.  */
 
 void
@@ -1308,6 +1338,8 @@ bfin_expand_prologue (void)
   rtx pic_reg_loaded = NULL_RTX;
   tree attrs = TYPE_ATTRIBUTES (TREE_TYPE (current_function_decl));
   bool all = lookup_attribute ("saveall", attrs) != NULL_TREE;
+
+  cfun->machine->has_rets_clobber = bfin_has_rets_clobber ();
 
   if (fkind != SUBROUTINE)
     {

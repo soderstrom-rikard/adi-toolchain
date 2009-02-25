@@ -1,5 +1,17 @@
 2009-02-25  Jie Zhang  <jie.zhang@analog.com>
 
+	* config/bfin/bfin.c (struct machine_function): Add has_rets_clobber.
+	(must_save_fp_p): Don't return true because of frame_pointer_needed.
+	(must_save_rets_p): New.
+	(n_regs_saved_by_prologue): Use must_save_rets_p instead of
+	current_function_is_leaf.
+	(do_link): Likewise.
+	(do_unlink): Likewise.
+	(bfin_has_rets_clobber): New.
+	(bfin_expand_prologue): Set cfun->machine->has_rets_clobber.
+
+2009-02-25  Jie Zhang  <jie.zhang@analog.com>
+
 	* config/bfin/bfin.c (bfin_expand_prologue): Ask do_link to
 	save FP and RETS with saveall attribute.
 	(bfin_expand_epilogue): Ask do_unlink to restore FP and RETS
