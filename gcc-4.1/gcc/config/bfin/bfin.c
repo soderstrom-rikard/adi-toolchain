@@ -3920,8 +3920,8 @@ bfin_optimize_loop (loop_info loop)
       int i;
       for (i = REG_P0; i <= REG_P5; i++)
 	if ((regs_ever_live[i]
-	     || (funkind (TREE_TYPE (current_function_decl)) != SUBROUTINE
-		 && !call_used_regs[i]))
+	     || (funkind (TREE_TYPE (current_function_decl)) == SUBROUTINE
+		 && call_used_regs[i]))
 	    && !REGNO_REG_SET_P (loop->incoming_src->il.rtl->global_live_at_end, i))
 	  {
 	    scratchreg = gen_rtx_REG (SImode, i);

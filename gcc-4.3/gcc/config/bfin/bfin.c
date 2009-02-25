@@ -3931,8 +3931,8 @@ bfin_optimize_loop (loop_info loop)
       int i;
       for (i = REG_P0; i <= REG_P5; i++)
 	if ((df_regs_ever_live_p (i)
-	     || (funkind (TREE_TYPE (current_function_decl)) != SUBROUTINE
-		 && !call_used_regs[i]))
+	     || (funkind (TREE_TYPE (current_function_decl)) == SUBROUTINE
+		 && call_used_regs[i]))
 	    && !REGNO_REG_SET_P (df_get_live_out (loop->incoming_src), i))
 	  {
 	    scratchreg = gen_rtx_REG (SImode, i);
