@@ -731,9 +731,10 @@ if [ $CHECK_ON_HARDWARE ] ; then
         echo "    Hardware tests will be compiled with optional stack overflow checking"
     fi
     if [ $FDPIC_TARGET -eq 0 ] ; then
-        echo "    Looks like flat userspace - will copy over /lib/*.so when testing"
+        echo "    Looks like flat userspace - I'll check /lib/*.so are the same when testing"
     else
-        echo "    Looks like fdpic userspace - will warn if /lib/*.so are different"
+	echo "    Your Target looks like it is running FDPIC userspace - I can't test on fdpic targets. Stopping"
+	exit 1
     fi
 
     RUN=`rsh -l root $TARGET_IPADDR "ps | grep syslog | grep -v grep | grep -v \"l 6\" | wc -l"`
@@ -1716,6 +1717,7 @@ prepare_target()
         for FILE in $t/lib/*so*
         do
             if ([ -e $FILE ] && [ -h $FILE ]) ; then
+		#don't check sym links
                 LIB=`readlink $FILE`
                 FILE=`basename $FILE`
                 LIB=`basename $LIB`
@@ -1724,8 +1726,13 @@ prepare_target()
                 if [ -f $FILE ] ; then
                     LIB=`basename ${FILE}`
                     bfin-linux-uclibc-strip $FILE -o $GCC_BUILD/libs_for_target/${LIB}
-                    rcp $GCC_BUILD/libs_for_target/${LIB} root@${TARGET_IPADDR}:/lib/${LIB}
-                    rsh -l root ${TARGET_IPADDR} "chmod +x /lib/${LIB}"
+                    BOARD_LIB=`rsh -l root ${TARGET_IPADDR} "md5sum /lib/${LIB} | awk '{print $1}'`
+                    TEST_LIB=`md5sum $GCC_BUILD/libs_for_target/${LIB}`
+                    if [ "$BOARD_LIB" != "$TEST_LIB" ] ; then
+                        echo "Libs on board are different, aborting tests"
+                        echo "specifically ${LIB} and ${FILE}"
+                        exit 1
+                    fi
                 fi
             fi
         done
