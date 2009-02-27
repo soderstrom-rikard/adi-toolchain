@@ -1726,7 +1726,7 @@ prepare_target()
                 if [ -f $FILE ] ; then
                     LIB=`basename ${FILE}`
                     bfin-linux-uclibc-strip $FILE -o $GCC_BUILD/libs_for_target/${LIB}
-                    BOARD_LIB=`rsh -l root ${TARGET_IPADDR} "md5sum /lib/${LIB} | awk '{print $1}'`
+                    BOARD_LIB=`rsh -l root ${TARGET_IPADDR} "md5sum /lib/${LIB} | awk '{print $1}'"`
                     TEST_LIB=`md5sum $GCC_BUILD/libs_for_target/${LIB}`
                     if [ "$BOARD_LIB" != "$TEST_LIB" ] ; then
                         echo "Libs on board are different, aborting tests"
