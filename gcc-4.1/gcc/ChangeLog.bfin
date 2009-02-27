@@ -1,5 +1,10 @@
 2009-02-27  Jie Zhang  <jie.zhang@analog.com>
 
+	* config/bfin/bfin.c (do_link): Generate LINK instruction
+	if both FP and RETS are to be saved.
+
+2009-02-27  Jie Zhang  <jie.zhang@analog.com>
+
 	* config/bfin/bfin.c (struct machine_function): Remove has_rets_clobber.
 	(ret_regs[]): New.
 	(must_save_rets_p): Return true if RETS is live.

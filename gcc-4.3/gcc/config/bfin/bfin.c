@@ -1111,11 +1111,13 @@ do_link (rtx spreg, HOST_WIDE_INT frame_size, bool all)
 {
   frame_size += arg_area_size ();
 
-  if (stack_frame_needed_p ())
+  if (all
+      || stack_frame_needed_p ()
+      || (must_save_rets_p () && must_save_fp_p ()))
     emit_link_insn (spreg, frame_size);
   else
     {
-      if (all || must_save_rets_p ())
+      if (must_save_rets_p ())
 	{
 	  rtx pat = gen_movsi (gen_rtx_MEM (Pmode,
 					    gen_rtx_PRE_DEC (Pmode, spreg)),
@@ -1123,7 +1125,7 @@ do_link (rtx spreg, HOST_WIDE_INT frame_size, bool all)
 	  rtx insn = emit_insn (pat);
 	  RTX_FRAME_RELATED_P (insn) = 1;
 	}
-      if (all || must_save_fp_p ())
+      if (must_save_fp_p ())
 	{
 	  rtx pat = gen_movsi (gen_rtx_MEM (Pmode,
 					    gen_rtx_PRE_DEC (Pmode, spreg)),
