@@ -32,7 +32,8 @@
 	   (match_operand:SI 2 "register_no_elim_operand" "a")]
 	  UNSPEC_ATOMIC))
    (clobber (match_scratch:SI 3 "=q0"))
-   (clobber (match_scratch:SI 4 "=q1"))]
+   (clobber (match_scratch:SI 4 "=q1"))
+   (clobber (reg:SI REG_RETS))]
   "TARGET_SUPPORTS_SYNC_CALLS"
   "call (%2);"
   [(set_attr "type" "call")])
@@ -46,7 +47,8 @@
 	    (match_dup 2)]
 	   UNSPEC_ATOMIC))
      (clobber (match_scratch:SI 3 ""))
-     (clobber (match_scratch:SI 4 ""))])]
+     (clobber (match_scratch:SI 4 ""))
+     (clobber (reg:SI REG_RETS))])]
   "TARGET_SUPPORTS_SYNC_CALLS"
 {
   if (!REG_P (XEXP (operands[0], 0)))
@@ -66,7 +68,8 @@
 	     (match_operand:SI 2 "register_operand" "q0"))
 	   (match_operand:SI 3 "register_no_elim_operand" "a")]
 	  UNSPEC_ATOMIC))
-   (clobber (match_scratch:SI 4 "=q0"))]
+   (clobber (match_scratch:SI 4 "=q0"))
+   (clobber (reg:SI REG_RETS))]
   "TARGET_SUPPORTS_SYNC_CALLS"
   "call (%3);"
   [(set_attr "type" "call")])
@@ -81,7 +84,8 @@
 			(match_operand:SI 2 "register_operand" ""))
 	    (match_dup 3)]
 	   UNSPEC_ATOMIC))
-     (clobber (match_scratch:SI 4 ""))])]
+     (clobber (match_scratch:SI 4 ""))
+     (clobber (reg:SI REG_RETS))])]
   "TARGET_SUPPORTS_SYNC_CALLS"
 {
   if (!REG_P (XEXP (operands[1], 0)))
@@ -105,7 +109,8 @@
 	  [(FETCHOP:SI (mem:SI (match_dup 1)) (match_dup 2))
 	   (match_dup 3)]
 	  UNSPEC_ATOMIC))
-   (clobber (match_scratch:SI 4 "=q1"))]
+   (clobber (match_scratch:SI 4 "=q1"))
+   (clobber (reg:SI REG_RETS))]
   "TARGET_SUPPORTS_SYNC_CALLS"
   "call (%3);"
   [(set_attr "type" "call")])
@@ -123,7 +128,8 @@
 	   [(FETCHOP:SI (match_dup 1) (match_dup 2))
 	    (match_dup 3)]
 	   UNSPEC_ATOMIC))
-     (clobber (match_scratch:SI 4 ""))])]
+     (clobber (match_scratch:SI 4 ""))
+     (clobber (reg:SI REG_RETS))])]
   "TARGET_SUPPORTS_SYNC_CALLS"
 {
   if (!REG_P (XEXP (operands[1], 0)))
@@ -143,7 +149,8 @@
 	   (match_operand:SI 2 "register_operand" "q1")
 	   (match_operand:SI 3 "register_operand" "q2")
 	   (match_operand:SI 4 "register_no_elim_operand" "a")]
-	  UNSPEC_ATOMIC))]
+	  UNSPEC_ATOMIC))
+   (clobber (reg:SI REG_RETS))]
   "TARGET_SUPPORTS_SYNC_CALLS"
   "call (%4);"
   [(set_attr "type" "call")])
@@ -158,7 +165,8 @@
 	    (match_operand:SI 2 "register_operand" "")
 	    (match_operand:SI 3 "register_operand" "")
 	    (match_dup 4)]
-	   UNSPEC_ATOMIC))])]
+	   UNSPEC_ATOMIC))
+     (clobber (reg:SI REG_RETS))])]
   "TARGET_SUPPORTS_SYNC_CALLS"
 {
   if (!REG_P (XEXP (operands[1], 0)))

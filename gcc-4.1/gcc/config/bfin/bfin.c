@@ -67,9 +67,6 @@ struct machine_function GTY(())
 
   /* Set if we create a memcpy pattern that uses loop registers.  */
   int has_loopreg_clobber;
-
-  /* Set if we have an insn that clobbers RETS.  */
-  int has_rets_clobber;
 };
 
 /* Test and compare insns in bfin.md store the information needed to
@@ -90,6 +87,7 @@ const char *dregs_pair_names[] =  DREGS_PAIR_NAMES;
 const char *byte_reg_names[]   =  BYTE_REGISTER_NAMES;
 
 static int arg_regs[] = FUNCTION_ARG_REGISTERS;
+static int ret_regs[] = FUNCTION_RETURN_REGISTERS;
 
 /* Nonzero if -mshared-library-id was given.  */
 static int bfin_lib_id_given;
@@ -571,7 +569,7 @@ must_save_fp_p (void)
 static bool
 must_save_rets_p (void)
 {
-  return ! current_function_is_leaf || cfun->machine->has_rets_clobber;
+  return regs_ever_live[REG_RETS];
 }
 
 static bool
@@ -1220,9 +1218,7 @@ expand_interrupt_handler_prologue (rtx spreg, e_funkind fkind, bool all)
   
   if (lookup_attribute ("nesting", attrs))
     {
-      rtx srcreg = gen_rtx_REG (Pmode, (fkind == EXCPT_HANDLER ? REG_RETX
-					: fkind == NMI_HANDLER ? REG_RETN
-					: REG_RETI));
+      rtx srcreg = gen_rtx_REG (Pmode, ret_regs[fkind]);
       insn = emit_move_insn (predec, srcreg);
       RTX_FRAME_RELATED_P (insn) = 1;
     }
@@ -1276,9 +1272,7 @@ expand_interrupt_handler_epilogue (rtx spreg, e_funkind fkind, bool all)
 
   if (lookup_attribute ("nesting", attrs))
     {
-      rtx srcreg = gen_rtx_REG (Pmode, (fkind == EXCPT_HANDLER ? REG_RETX
-					: fkind == NMI_HANDLER ? REG_RETN
-					: REG_RETI));
+      rtx srcreg = gen_rtx_REG (Pmode, ret_regs[fkind]);
       emit_move_insn (srcreg, postinc);
     }
 
@@ -1294,7 +1288,7 @@ expand_interrupt_handler_epilogue (rtx spreg, e_funkind fkind, bool all)
   if (fkind == EXCPT_HANDLER)
     emit_insn (gen_addsi3 (spreg, spreg, GEN_INT (12)));
 
-  emit_jump_insn (gen_return_internal (GEN_INT (fkind)));
+  emit_jump_insn (gen_return_internal (gen_rtx_REG (Pmode, ret_regs[fkind])));
 }
 
 /* Used while emitting the prologue to generate code to load the correct value
@@ -1325,27 +1319,6 @@ bfin_load_pic_reg (rtx dest)
   return dest;
 }
 
-static int
-bfin_has_rets_clobber (void)
-{
-  rtx insn;
-
-  for (insn = get_last_insn_anywhere (); insn; insn = PREV_INSN (insn))
-    {
-      if (!INSN_P (insn))
-	continue;
-
-      if (recog_memoized (insn) < 0)
-	continue;
-
-      if (CALL_P (insn)
-	  || get_attr_type (insn) == TYPE_CALL)
-	return 1;
-    }
-
-  return 0;
-}
-
 /* Generate RTL for the prologue of the current function.  */
 
 void
@@ -1357,8 +1330,6 @@ bfin_expand_prologue (void)
   rtx pic_reg_loaded = NULL_RTX;
   tree attrs = TYPE_ATTRIBUTES (TREE_TYPE (current_function_decl));
   bool all = lookup_attribute ("saveall", attrs) != NULL_TREE;
-
-  cfun->machine->has_rets_clobber = bfin_has_rets_clobber ();
 
   if (fkind != SUBROUTINE)
     {
@@ -1465,7 +1436,7 @@ bfin_expand_epilogue (int need_return, int eh_return, bool sibcall_p)
   if (eh_return)
     emit_insn (gen_addsi3 (spreg, spreg, gen_rtx_REG (Pmode, REG_P2)));
 
-  emit_jump_insn (gen_return_internal (GEN_INT (SUBROUTINE)));
+  emit_jump_insn (gen_return_internal (gen_rtx_REG (Pmode, REG_RETS)));
 }
 
 /* Return nonzero if register OLD_REG can be renamed to register NEW_REG.  */
@@ -2287,9 +2258,10 @@ bfin_expand_call (rtx retval, rtx fnaddr, rtx callarg1, rtx cookie, int sibcall)
 {
   rtx use = NULL, call;
   rtx callee = XEXP (fnaddr, 0);
-  int nelts = 2 + !!sibcall;
+  int nelts = 3;
   rtx pat;
   rtx picreg = get_hard_reg_initial_val (SImode, FDPIC_REGNO);
+  rtx retsreg = gen_rtx_REG (Pmode, REG_RETS);
   int n;
 
   /* In an untyped call, we can get NULL for operand 2.  */
@@ -2376,6 +2348,8 @@ bfin_expand_call (rtx retval, rtx fnaddr, rtx callarg1, rtx cookie, int sibcall)
   XVECEXP (pat, 0, n++) = gen_rtx_USE (VOIDmode, cookie);
   if (sibcall)
     XVECEXP (pat, 0, n++) = gen_rtx_RETURN (VOIDmode);
+  else
+    XVECEXP (pat, 0, n++) = gen_rtx_CLOBBER (VOIDmode, retsreg);
   call = emit_call_insn (pat);
   if (use)
     CALL_INSN_FUNCTION_USAGE (call) = use;

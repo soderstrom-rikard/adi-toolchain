@@ -1,3 +1,20 @@
+2009-02-27  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.c (struct machine_function): Remove has_rets_clobber.
+	(ret_regs[]): New.
+	(must_save_rets_p): Return true if RETS is live.
+	(expand_interrupt_handler_prologue): Use ret_regs[].
+	(expand_interrupt_handler_epilogue): Use ret_regs[] and
+	pass return register to gen_return_internal.
+	(bfin_has_rets_clobber): Remove.
+	(bfin_expand_prologue): Don't call bfin_has_rets_clobber.
+	(bfin_expand_epilogue): Pass return register to
+	gen_return_internal.
+	(bfin_expand_call): Explicitly clobber RETS.
+	* config/bfin/bfin.h (FUNCTION_RETURN_REGISTERS): Define.
+	* config/bfin/sync.md (all patterns): Explicitly clobber
+	RETS.
+
 2009-02-26  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_optimize_loop): If we need a scratch reg,
