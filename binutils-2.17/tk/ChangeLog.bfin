@@ -1,0 +1,7 @@
+2009-02-28  Jie Zhang  <jie.zhang@analog.com>
+
+	Backport tk.h part of
+	2008-08-05  Joe English  <jenglish@users.sourceforge.net>
+	* generic/tk.h, generic/tkEvent.c: Fix for [Bug 2010422]
+	"no event type or button # or keysym while executing
+	"bind Listbox <MouseWheel> [...]".
