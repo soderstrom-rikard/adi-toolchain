@@ -49,7 +49,7 @@ RESUME_BUILD=false
 CBUILD= # the system we are compiling on
 CHOST=  # the system the final compiler will run on
 
-while getopts b:B:c:C:dDfH:hj:k:K:l:m:o:O:pr:s:StT:u:U:vwX parameter
+while getopts b:B:c:C:dDfH:hj:k:K:l:m:o:O:pP:r:s:StT:u:U:vwX parameter
 do
     case $parameter in
         p)
@@ -125,6 +125,9 @@ do
             ;;
         B)
             BINUTILS_VERSION="$OPTARG"
+            ;;
+        P)
+            PKGVERSION="$OPTARG"
             ;;
 
         c)
@@ -211,6 +214,7 @@ do
 -O OUTPUT        Output directory (leave blank to use build dir)
 -o OUTPUT        Output directory prefix (leave blank to use build dir)
 -p               Check prerequisites
+-P STRING        Use STRING as the package version (instead of svn revision)
 -r RESULTS_DIR   Compare current tests to old results
 -s SOURCE        Toolchain Source directory (builds bfin-elf-gcc)"
 # -S               Skip building elf compiler - don't print this out
@@ -1150,13 +1154,14 @@ build_gcc ()
     fi
     [ -n "$SCM_URL" ] && SCM_URL="-${SCM_URL}"
     [ -n "$SCM_REV" ] && SCM_REV="/${SCM_REV}"
+    [ -z "$PKGVERSION" ] && PKGVERSION="ADI${SCM_URL}${SCM_REV}"
     echo_date "Configuring GCC ($1)"
     RUN="$DIR_GCC_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-$2 \
       --prefix=$3 $4 --disable-libstdcxx-pch $BFIN_LANGS $EXTRA_GCC_CONF \
       --disable-symvers --disable-libssp --disable-libffi $LOCALE \
       --enable-version-specific-runtime-libs --enable-__cxa_atexit \
       --with-bugurl=URL:http://blackfin.uclinux.org/gf/project/toolchain/tracker \
-      --with-pkgversion=ADI${SCM_URL}${SCM_REV}"
+      --with-pkgversion=${PKGVERSION}"
     run_cmd $RUN
 
     echo_date "Building GCC"
