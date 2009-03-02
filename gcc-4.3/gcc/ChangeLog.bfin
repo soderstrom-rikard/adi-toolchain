@@ -1,3 +1,18 @@
+2009-03-02  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* tree-ssa-loop-ivopts.c (struct cost_pair): New member CAN_AUTOINC.
+	(set_use_iv_cost): Initialize it from new arg CAN_AUTOINC.  All
+	callers changed.
+	(get_address_cost): New arg MAY_AUTOINC.  All callers changed.  Test
+	whether autoincrement addressing is possible.
+	(autoinc_possible_p): New static function.
+	(get_computation_cost_at): New arg CAN_AUTOINC.  All callers changed.
+	Use autoinc_possible_p and get_address_cost to work out if autoinc
+	is likely.
+	(get_computation_cost): New arg CAN_AUTOINC.  All callers changed.
+	(determine_use_iv_costs): Add autoinc to the costs dump.
+	(iv_ca_recount_cost): Use the CAN_AUTOINC field of struct cost_pair.
+
 2009-02-27  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.c (do_link): Generate LINK instruction

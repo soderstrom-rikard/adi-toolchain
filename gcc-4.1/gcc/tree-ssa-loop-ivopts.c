@@ -146,6 +146,8 @@ struct cost_pair
   tree value;		/* For final value elimination, the expression for
 			   the final value of the iv.  For iv elimination,
 			   the new bound to compare with.  */
+  bool can_autoinc;	/* True if we think we can use autoincrement for
+			   this candidate/use pair.  */
 };
 
 /* Use.  */
@@ -2360,7 +2362,7 @@ alloc_use_cost_map (struct ivopts_data *data)
 static void
 set_use_iv_cost (struct ivopts_data *data,
 		 struct iv_use *use, struct iv_cand *cand, unsigned cost,
-		 bitmap depends_on, tree value)
+		 bitmap depends_on, tree value, bool can_autoinc)
 {
   unsigned i, s;
 
@@ -2376,6 +2378,7 @@ set_use_iv_cost (struct ivopts_data *data,
       use->cost_map[cand->id].cost = cost;
       use->cost_map[cand->id].depends_on = depends_on;
       use->cost_map[cand->id].value = value;
+      use->cost_map[cand->id].can_autoinc = can_autoinc;
       return;
     }
 
@@ -2395,6 +2398,7 @@ found:
   use->cost_map[i].cost = cost;
   use->cost_map[i].depends_on = depends_on;
   use->cost_map[i].value = value;
+  use->cost_map[i].can_autoinc = can_autoinc;
 }
 
 /* Gets cost of (USE, CANDIDATE) pair.  */
@@ -3296,20 +3300,24 @@ multiplier_allowed_in_address_p (HOST_WIDE_INT ratio, enum machine_mode mode)
    If SYMBOL_PRESENT is false, symbol is omitted.  If VAR_PRESENT is false,
    variable is omitted.  The created memory accesses MODE.
    
+   MAY_AUTOINC is set to true if the autoincrement (increasing index by
+   size of MEM_MODE / RATIO) is available.
+
    TODO -- there must be some better way.  This all is quite crude.  */
 
 static unsigned
 get_address_cost (bool symbol_present, bool var_present,
 		  unsigned HOST_WIDE_INT offset, HOST_WIDE_INT ratio,
-		  enum machine_mode mem_mode)
+		  enum machine_mode mem_mode, bool *may_autoinc)
 {
   static bool initialized[MAX_MACHINE_MODE];
   static HOST_WIDE_INT rat[MAX_MACHINE_MODE], off[MAX_MACHINE_MODE];
   static HOST_WIDE_INT min_offset[MAX_MACHINE_MODE], max_offset[MAX_MACHINE_MODE];
   static unsigned costs[MAX_MACHINE_MODE][2][2][2][2];
+  static bool has_autoinc[MAX_MACHINE_MODE];
   unsigned cost, acost;
   rtx seq, addr, base;
-  bool offset_p, ratio_p;
+  bool offset_p, ratio_p, autoinc;
   rtx reg1;
   HOST_WIDE_INT s_offset;
   unsigned HOST_WIDE_INT mask;
@@ -3341,6 +3349,9 @@ get_address_cost (bool symbol_present, bool var_present,
 	}
       min_offset[mem_mode] = -(i >> 1);
 
+      addr = gen_rtx_POST_INC (Pmode, reg1);
+      has_autoinc[mem_mode] = memory_address_p (mem_mode, addr);
+
       if (dump_file && (dump_flags & TDF_DETAILS))
 	{
 	  fprintf (dump_file, "get_address_cost:\n");
@@ -3350,6 +3361,8 @@ get_address_cost (bool symbol_present, bool var_present,
 	  fprintf (dump_file, "  max offset %s %d\n",
 		   GET_MODE_NAME (mem_mode),
 		   (int) max_offset[mem_mode]);
+	  if (has_autoinc[mem_mode])
+	    fprintf (dump_file, "  has autoinc\n");
 	}
 
       rat[mem_mode] = 1;
@@ -3368,6 +3381,8 @@ get_address_cost (bool symbol_present, bool var_present,
     offset |= ~mask;
   s_offset = offset;
 
+  autoinc = has_autoinc[mem_mode];
+
   cost = 0;
   offset_p = (s_offset != 0
 	      && min_offset[mem_mode] <= s_offset
@@ -3376,11 +3391,22 @@ get_address_cost (bool symbol_present, bool var_present,
 	     && multiplier_allowed_in_address_p (ratio, mem_mode));
 
   if (ratio != 1 && !ratio_p)
-    cost += multiply_by_cost (ratio, Pmode);
+    {
+      cost += multiply_by_cost (ratio, Pmode);
+
+      /* If we have to do the multiplication of index separately, we cannot
+	 use autoincrement.  */
+      autoinc = false;
+    }
 
   if (s_offset && !offset_p && !symbol_present)
-    cost += add_cost (Pmode);
+    {
+      cost += add_cost (Pmode);
+      autoinc = false;
+    }
 
+  if (may_autoinc)
+    *may_autoinc = autoinc;
   acost = costs[mem_mode][symbol_present][var_present][offset_p][ratio_p];
   if (!acost)
     {
@@ -3712,6 +3738,38 @@ difference_cost (struct ivopts_data *data,
   return cost;
 }
 
+/* Return true if using CAND for USE would be likely to give later passes the
+   opportunity to generate autoincrement addressing.  AT is the statement at
+   that the value is computed.  */
+static bool
+autoinc_possible_p (unsigned HOST_WIDE_INT offset, bool symbol_present,
+		    bool var_present, tree cstep, tree use_size,
+		    bool stmt_is_after_inc)
+{
+  tree neg_cstep;
+
+  if (symbol_present || var_present)
+    return false;
+
+  neg_cstep = fold_build1 (NEGATE_EXPR, TREE_TYPE (cstep), cstep);
+  if (0
+      || (HAVE_POST_INCREMENT && offset == 0 && !stmt_is_after_inc
+	  && tree_int_cst_equal (use_size, cstep))
+      || (HAVE_POST_DECREMENT && offset == 0 && !stmt_is_after_inc
+	  && tree_int_cst_equal (use_size, neg_cstep))
+      || (HAVE_PRE_INCREMENT && !stmt_is_after_inc
+	  && offset == int_cst_value (use_size)
+	  && tree_int_cst_equal (use_size, cstep))
+      || (HAVE_PRE_DECREMENT && !stmt_is_after_inc
+	  && -offset == int_cst_value (use_size)
+	  && !stmt_is_after_inc
+	  && tree_int_cst_equal (use_size, neg_cstep))
+      )
+    return true;
+
+  return false;
+}
+
 /* Determines the cost of the computation by that USE is expressed
    from induction variable CAND.  If ADDRESS_P is true, we just need
    to create an address from it, otherwise we want to get it into
@@ -3721,14 +3779,15 @@ difference_cost (struct ivopts_data *data,
 static unsigned
 get_computation_cost_at (struct ivopts_data *data,
 			 struct iv_use *use, struct iv_cand *cand,
-			 bool address_p, bitmap *depends_on, tree at)
+			 bool address_p, bitmap *depends_on, tree at,
+			 bool *can_autoinc)
 {
   tree ubase = use->iv->base, ustep = use->iv->step;
   tree cbase, cstep;
   tree utype = TREE_TYPE (ubase), ctype;
   unsigned HOST_WIDE_INT ustepi, cstepi, offset = 0;
   HOST_WIDE_INT ratio, aratio;
-  bool var_present, symbol_present;
+  bool var_present, symbol_present, stmt_is_after_inc;
   unsigned cost = 0, n_sums;
 
   *depends_on = NULL;
@@ -3838,15 +3897,26 @@ get_computation_cost_at (struct ivopts_data *data,
 
   /* If we are after the increment, the value of the candidate is higher by
      one iteration.  */
-  if (stmt_after_increment (data->current_loop, cand, at))
+  stmt_is_after_inc = stmt_after_increment (data->current_loop, cand, at);
+  if (stmt_is_after_inc)
     offset -= ratio * cstepi;
 
   /* Now the computation is in shape symbol + var1 + const + ratio * var2.
      (symbol/var/const parts may be omitted).  If we are looking for an address,
      find the cost of addressing this.  */
   if (address_p)
-    return cost + get_address_cost (symbol_present, var_present, offset, ratio,
-				    TYPE_MODE (TREE_TYPE (*use->op_p)));
+    {
+      if (!autoinc_possible_p (offset, symbol_present, var_present, cstep,
+			       TYPE_SIZE_UNIT (TREE_TYPE (*use->op_p)),
+			       stmt_is_after_inc))
+	{
+	  *can_autoinc = false;
+	  can_autoinc = NULL;
+	}
+      return cost + get_address_cost (symbol_present, var_present, offset, ratio,
+				      TYPE_MODE (TREE_TYPE (*use->op_p)),
+				      can_autoinc);
+    }
 
   /* Otherwise estimate the costs for computing the expression.  */
   aratio = ratio > 0 ? ratio : -ratio;
@@ -3893,10 +3963,11 @@ fallback:
 static unsigned
 get_computation_cost (struct ivopts_data *data,
 		      struct iv_use *use, struct iv_cand *cand,
-		      bool address_p, bitmap *depends_on)
+		      bool address_p, bitmap *depends_on, bool *can_autoinc)
 {
   return get_computation_cost_at (data,
-				  use, cand, address_p, depends_on, use->stmt);
+				  use, cand, address_p, depends_on, use->stmt,
+				  can_autoinc);
 }
 
 /* Determines cost of basing replacement of USE on CAND in a generic
@@ -3916,12 +3987,12 @@ determine_use_iv_cost_generic (struct ivopts_data *data,
   if (cand->pos == IP_ORIGINAL
       && cand->incremented_at == use->stmt)
     {
-      set_use_iv_cost (data, use, cand, 0, NULL, NULL_TREE);
+      set_use_iv_cost (data, use, cand, 0, NULL, NULL_TREE, false);
       return true;
     }
 
-  cost = get_computation_cost (data, use, cand, false, &depends_on);
-  set_use_iv_cost (data, use, cand, cost, depends_on, NULL_TREE);
+  cost = get_computation_cost (data, use, cand, false, &depends_on, NULL);
+  set_use_iv_cost (data, use, cand, cost, depends_on, NULL_TREE, false);
 
   return cost != INFTY;
 }
@@ -3933,9 +4004,11 @@ determine_use_iv_cost_address (struct ivopts_data *data,
 			       struct iv_use *use, struct iv_cand *cand)
 {
   bitmap depends_on;
-  unsigned cost = get_computation_cost (data, use, cand, true, &depends_on);
+  bool can_autoinc;
+  unsigned cost = get_computation_cost (data, use, cand, true, &depends_on,
+					&can_autoinc);
 
-  set_use_iv_cost (data, use, cand, cost, depends_on, NULL_TREE);
+  set_use_iv_cost (data, use, cand, cost, depends_on, NULL_TREE, can_autoinc);
 
   return cost != INFTY;
 }
@@ -4081,7 +4154,7 @@ determine_use_iv_cost_condition (struct ivopts_data *data,
   /* Only consider real candidates.  */
   if (!cand->iv)
     {
-      set_use_iv_cost (data, use, cand, INFTY, NULL, NULL_TREE);
+      set_use_iv_cost (data, use, cand, INFTY, NULL, NULL_TREE, false);
       return false;
     }
 
@@ -4089,14 +4162,14 @@ determine_use_iv_cost_condition (struct ivopts_data *data,
     {
       cost = force_var_cost (data, bound, &depends_on);
 
-      set_use_iv_cost (data, use, cand, cost, depends_on, bound);
+      set_use_iv_cost (data, use, cand, cost, depends_on, bound, false);
       return cost != INFTY;
     }
 
   /* The induction variable elimination failed; just express the original
      giv.  If it is compared with an invariant, note that we cannot get
      rid of it.  */
-  cost = get_computation_cost (data, use, cand, false, &depends_on);
+  cost = get_computation_cost (data, use, cand, false, &depends_on, NULL);
 
   cond = *use->op_p;
   if (TREE_CODE (cond) != SSA_NAME)
@@ -4112,7 +4185,7 @@ determine_use_iv_cost_condition (struct ivopts_data *data,
 	}
     }
 
-  set_use_iv_cost (data, use, cand, cost, depends_on, NULL);
+  set_use_iv_cost (data, use, cand, cost, depends_on, NULL, false);
   return cost != INFTY;
 }
 
@@ -4162,7 +4235,7 @@ determine_use_iv_cost_outer (struct ivopts_data *data,
   if (cand->pos == IP_ORIGINAL
       && cand->incremented_at == use->stmt)
     {
-      set_use_iv_cost (data, use, cand, 0, NULL, NULL_TREE);
+      set_use_iv_cost (data, use, cand, 0, NULL, NULL_TREE, false);
       return true;
     }
 
@@ -4170,7 +4243,7 @@ determine_use_iv_cost_outer (struct ivopts_data *data,
     {
       if (!may_replace_final_value (data, use, &value))
 	{
-	  set_use_iv_cost (data, use, cand, INFTY, NULL, NULL_TREE);
+	  set_use_iv_cost (data, use, cand, INFTY, NULL, NULL_TREE, false);
 	  return false;
 	}
 
@@ -4179,7 +4252,7 @@ determine_use_iv_cost_outer (struct ivopts_data *data,
 
       cost /= AVG_LOOP_NITER (loop);
 
-      set_use_iv_cost (data, use, cand, cost, depends_on, value);
+      set_use_iv_cost (data, use, cand, cost, depends_on, value, false);
       return cost != INFTY;
     }
 
@@ -4189,17 +4262,17 @@ determine_use_iv_cost_outer (struct ivopts_data *data,
       /* If there is just a single exit, we may use value of the candidate
 	 after we take it to determine the value of use.  */
       cost = get_computation_cost_at (data, use, cand, false, &depends_on,
-				      last_stmt (exit->src));
+				      last_stmt (exit->src), NULL);
       if (cost != INFTY)
 	cost /= AVG_LOOP_NITER (loop);
     }
   else
     {
       /* Otherwise we just need to compute the iv.  */
-      cost = get_computation_cost (data, use, cand, false, &depends_on);
+      cost = get_computation_cost (data, use, cand, false, &depends_on, NULL);
     }
 				   
-  set_use_iv_cost (data, use, cand, cost, depends_on, NULL_TREE);
+  set_use_iv_cost (data, use, cand, cost, depends_on, NULL_TREE, false);
 
   return cost != INFTY;
 }
@@ -4290,9 +4363,10 @@ determine_use_iv_costs (struct ivopts_data *data)
 		  || use->cost_map[j].cost == INFTY)
 		continue;
 
-	      fprintf (dump_file, "  %d\t%d\t",
+	      fprintf (dump_file, "  %d\t%d%s\t",
 		       use->cost_map[j].cand->id,
-		       use->cost_map[j].cost);
+		       use->cost_map[j].cost,
+		       use->cost_map[j].can_autoinc ? "\tcan autoinc" : "");
 	      if (use->cost_map[j].depends_on)
 		bitmap_print (dump_file,
 			      use->cost_map[j].depends_on, "","");
@@ -4508,8 +4582,7 @@ iv_ca_recount_cost (struct ivopts_data *data, struct iv_ca *ivs)
 	  if (!cp)
 	    continue;
 	  if (cp->cand == cand && use->type == USE_ADDRESS
-	      && tree_int_cst_equal (TYPE_SIZE_UNIT (TREE_TYPE (*use->op_p)),
-				     cand->iv->step))
+	      && cp->can_autoinc)
 	    {
 	      cost -= cand->cost_step;
 	      break;
