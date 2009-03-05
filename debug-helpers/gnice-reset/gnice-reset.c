@@ -26,6 +26,10 @@
 #define BITMASK_GNICE_nGPIO	(1 << BIT_GNICE_nGPIO)
 #define BITMASK_GNICE_nLED	(1 << BIT_GNICE_nLED)
 
+#ifdef WIN32
+# define usleep(x) Sleep((x) / 1000000 ? : 1)
+#endif
+
 int main(int argc, char *argv[])
 {
 	struct ftdi_context con;

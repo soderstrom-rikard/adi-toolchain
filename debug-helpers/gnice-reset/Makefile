@@ -5,10 +5,17 @@ PKG_CONFIG ?= pkg-config
 LIBFTDI_LIBS = $(shell $(PKG_CONFIG) libftdi --libs || libftdi-config --libs)
 LDLIBS += $(LIBFTDI_LIBS)
 
-all: gnice-reset
+FLAGS_TO_PASS = CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
+
+SFX := $(shell env $(FLAGS_TO_PASS) ./get-sfx.sh)
+
+all: gnice-reset$(SFX)
+
+gnice-reset$(SFX): gnice-reset.o
+	$(LINK.o) -o $@ $^ $(LDLIBS)
 
 clean:
-	rm -f *.o gnice-reset
+	rm -f *.o gnice-reset$(SFX)
 
 DESTDIR ?=
 prefix = /usr
