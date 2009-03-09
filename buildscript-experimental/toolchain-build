@@ -683,18 +683,6 @@ if [ $BUILD_TARGET_UCLINUX ] || [ $BUILD_TARGET_LINUX_UCLIBC ]; then
     done
     echo
 
-    DIR_GENEXT2FS_SOURCE=$DIR_SOURCE/genext2fs
-    if [ ! -d $DIR_GENEXT2FS_SOURCE ] ; then
-	echo "Can't find genext2fs source at $DIR_GENEXT2FS_SOURCE"
-	exit 1
-    fi
-
-    DIR_CRAMFS_SOURCE=$DIR_SOURCE/cramfs
-    if [ ! -d $DIR_CRAMFS_SOURCE ] ; then
-	echo "Can't find cramfs source at $DIR_CRAMFS_SOURCE"
-	exit 1
-    fi
-
     if [ $DIR_KBUILD_OUTPUT ] ; then
 	if [ ! -d $KERNEL_SOURCE/usr/include/linux ] ; then
 	    echo "Can't find kernel headers"
@@ -757,8 +745,6 @@ rm -rf .case.test .CASE.test
 
 DIR_BINUTILS_BUILD=$DIR_BUILD/binutils_build
 DIR_ELF2FLT_BUILD=$DIR_BUILD/elf2flt_build
-DIR_GENEXT2FS_BUILD=$DIR_BUILD/genext2fs_build
-DIR_CRAMFS_BUILD=$DIR_BUILD/cramfs_build
 
 DIR_LOG=$DIR_BUILD/logs
 if [ ! -d $DIR_LOG ] ; then
@@ -2001,70 +1987,6 @@ if [ $BUILD_TARGET_UCLINUX ] || [ $BUILD_TARGET_LINUX_UCLIBC ]; then
     else
 	DIR_OUTPUT=$DIR_LINUX_OUTPUT
     fi
-
-    ########################### genext2fs ########################
-
-    remove_dir $DIR_GENEXT2FS_BUILD
-    mkdir -p $DIR_GENEXT2FS_BUILD
-    change_dir $DIR_GENEXT2FS_BUILD
-    touch -r . $DIR_GENEXT2FS_SOURCE/* # fix autotool timestamps
-
-    run_cmd $DIR_GENEXT2FS_SOURCE/configure --prefix=$DIR_OUTPUT
-
-    echo_date "Building genext2fs"
-    run_cmd $MAKE
-
-    for RUN in genext2fs
-    do
-        if [ ! -f $DIR_GENEXT2FS_BUILD/$RUN ] ; then
-            echo "genext2fs did not build properly : Missing $RUN"
-	    die_with_log
-        fi
-    done
-
-    echo_date "Installing genext2fs"
-    run_cmd $MAKE install
-    if [ $BUILD_TARGET_UCLINUX ]; then
-	cp $DIR_OUTPUT/bin/genext2fs $DIR_uC_OUTPUT/bin/bfin-uclinux-genext2fs || exit 1
-    fi
-    if [ $BUILD_TARGET_LINUX_UCLIBC ]; then
-	cp $DIR_OUTPUT/bin/genext2fs $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-genext2fs || exit 1
-    fi
-    rm $DIR_OUTPUT/bin/genext2fs || exit 1
-
-    remove_dir $DIR_GENEXT2FS_BUILD    
-
-    ########################### cramfs ########################
-
-    echo_date "Building cramfs-tools"
-
-    change_dir $DIR_CRAMFS_SOURCE
-
-    echo_date "Cleaning cramfs-tools"
-    run_cmd $MAKE distclean
-
-    echo_date "Make cramfs-tools"
-    run_cmd $MAKE
-
-    for RUN in mkcramfs cramfsck
-    do
-        if [ ! -f $DIR_CRAMFS_SOURCE/$RUN ] ; then
-            echo "cramfs did not build properly : Missing $RUN"
-	    die_with_log
-        fi
-    done
-
-    echo_date "Installing cramfs-tools"
-    if [ $BUILD_TARGET_UCLINUX ]; then
-	cp $DIR_CRAMFS_SOURCE/mkcramfs $DIR_uC_OUTPUT/bin/bfin-uclinux-mkcramfs
-	cp $DIR_CRAMFS_SOURCE/cramfsck $DIR_uC_OUTPUT/bin/bfin-uclinux-cramfsck
-    fi
-    if [ $BUILD_TARGET_LINUX_UCLIBC ]; then
-	cp $DIR_CRAMFS_SOURCE/mkcramfs $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-mkcramfs
-	cp $DIR_CRAMFS_SOURCE/cramfsck $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-cramfsck
-    fi
-    rm $DIR_CRAMFS_SOURCE/mkcramfs
-    rm $DIR_CRAMFS_SOURCE/cramfsck
 
     ######################## U-Boot ##############################
 
