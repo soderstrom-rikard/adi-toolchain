@@ -2003,8 +2003,10 @@ run_tests ()
     fi
 
     if [ $TEST_LIBGOMP -eq 1 ] ; then
-	clean_hardware $2 libgomp
-	test_libgomp $1 $2
+	if [ $2 = "linux-uclibc" ] ; then
+	    clean_hardware $2 libgomp
+	    test_libgomp $1 $2
+	fi
     fi
 
     clean_hardware $2 done
