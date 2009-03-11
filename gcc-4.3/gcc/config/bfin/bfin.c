@@ -4161,7 +4161,7 @@ bfin_optimize_loop (loop_info loop)
 					    lc_reg, iter_reg);
       seq_end = emit_insn (loop_init);
     }
-  else if (!ENABLE_WA_LOAD_LCREGS)
+  else if (!ENABLE_WA_LOAD_LCREGS && DPREG_P (iter_reg))
     {
       emit_insn (gen_movsi (lc_reg, iter_reg));
       loop_init = gen_lsetup_without_autoinit (lt_reg, start_label,

@@ -1,3 +1,9 @@
+2009-03-11  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.c (bfin_optimize_loop): Don't move arbitary
+	register to LCREG. Only DREG and PREG are allowed.
+	* config/bfin/bfin.md (movsi_insn): Refine constraints.
+
 2009-03-02  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* tree-ssa-loop-ivopts.c (struct cost_pair): New member CAN_AUTOINC.
