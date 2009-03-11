@@ -1,5 +1,10 @@
 2009-03-11  Jie Zhang  <jie.zhang@analog.com>
 
+	* config/tc-bfin.c (bfin_loop_beginend): Don't remove
+	loop symbol twice.
+
+2009-03-11  Jie Zhang  <jie.zhang@analog.com>
+
 	* config/bfin-defs.h (IS_GENREG): Define.
 	(IS_DAGREG): Define.
 	(IS_SYSREG): Define.

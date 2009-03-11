@@ -1899,8 +1899,6 @@ bfin_loop_beginend (Expr_Node *expr, int begin)
      Adjust label address.  */
   if (!begin)
     ((struct local_symbol *) line_label)->lsy_value -= last_insn_size;
-
-  symbol_remove (symbol_find (loopsym), &symbol_rootP, &symbol_lastP);
 }
 
 bfd_boolean
