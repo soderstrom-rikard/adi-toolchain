@@ -1,3 +1,8 @@
+2009-03-12  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* bfin/bfin-dis.c (decode_PushPopReg_0): Add support for pushing and
+	popping ASTAT.
+
 2009-01-15  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/bfin-dis.c (decode_ProgCtrl_0): Increment PC before

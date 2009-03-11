@@ -998,20 +998,31 @@ decode_PushPopReg_0 (bu16 iw0)
   int W = ((iw0 >> 6) & 0x1);
   bu32 *whichreg = get_allreg (grp, reg);
 
-  if (whichreg == 0)
-    unhandled_instruction ("push/pop");
-
   if (W == 0)
     {
+      bu32 value = get_long (saved_state.memory, PREG (6));
       /* allregs = [SP++] */
-      *whichreg = get_long (saved_state.memory, PREG (6));
+      if (grp == 4 && reg == 6)
+	SET_ASTAT (value);
+      else  if (whichreg == 0)
+	unhandled_instruction ("push/pop");
+      else
+	*whichreg = value;
       PREG (6) += 4;
     }
   else
     {
+      bu32 value;
       /* [--SP] = allregs */
       PREG (6) -= 4;
-      put_long (saved_state.memory, PREG (6), *whichreg);
+      if (grp == 4 && reg == 6)
+	value = ASTAT;
+      else if (whichreg == 0)
+	unhandled_instruction ("push/pop");
+      else
+	value = *whichreg;
+
+      put_long (saved_state.memory, PREG (6), value);
     }
   PCREG += 2;
 }
