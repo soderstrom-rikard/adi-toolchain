@@ -1,3 +1,12 @@
+2009-03-12  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/uclinux.h (STARTFILE_SPEC): Add proper
+	start file for shared flat.
+	(LIB_SPEC): Define.
+	(LINK_SPEC): Define.
+	* doc/invoke.texi (Blackfin Options): Document -elf2flt,
+	-no-elf2flt, and -static-libc for Blackfin .
+
 2009-03-11  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.c (bfin_optimize_loop): Don't move arbitary

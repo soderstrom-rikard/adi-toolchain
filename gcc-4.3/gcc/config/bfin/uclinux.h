@@ -1,6 +1,19 @@
 #undef  STARTFILE_SPEC
 #define STARTFILE_SPEC \
-  "%{!shared: crt1%O%s} crti%O%s crtbegin%O%s crtlibid%O%s"
+  "%{mshared-library-id=0|!mshared-library-id=*: crt1.o%s ;: Scrt1.o%s} \
+     crti%O%s crtbegin%O%s crtlibid%O%s"
+
+#undef LIB_SPEC
+#define LIB_SPEC \
+  "%{pthread:-lpthread} \
+   %{mid-shared-library:%{!static-libc:-R libc.gdb%s}} -lc"
+
+/* Default to using -elf2flt with no options.  */
+#undef LINK_SPEC
+#define LINK_SPEC \
+  "%{!no-elf2flt:%{!elf2flt*:-elf2flt}} \
+   %{mid-shared-library: \
+     %{mshared-library-id=*:-shared-lib-id %*;:-shared-lib-id 0}}"
 
 #define TARGET_OS_CPP_BUILTINS() LINUX_TARGET_OS_CPP_BUILTINS()
 
