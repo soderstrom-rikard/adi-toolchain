@@ -57,6 +57,7 @@ TEST_GDB=0
 TEST_GCC=0
 TEST_GXX=0
 TEST_GFORTRAN=0
+TEST_OBJC=0
 TEST_LIBSTDCXX=0
 TEST_LIBMUDFLAP=0
 TEST_LIBGOMP=0
@@ -69,6 +70,7 @@ GDB_TESTSUITE=
 GCC_TESTSUITE=
 GXX_TESTSUITE=
 GFORTRAN_TESTSUITE=
+OBJC_TESTSUITE=
 LIBSTDCXX_TESTSUITE=
 LIBMUDFLAP_TESTSUITE=
 LIBGOMP_TESTSUITE=
@@ -168,7 +170,7 @@ do
 # We don't document the -S option - it's for advanced users who know what
 # they are doing.  For maximum reproducibility, not using it is better.
              echo "Usage : $APP_NAME -s SOURCE [OPTIONS] [binutils] [gas] [ld] [gdb]
-[gcc] [g++] [gfortran] [libstdc++] [libmudflap] [newlib]
+[gcc] [g++] [gfortran] [objc] [libstdc++] [libmudflap] [libgomp] [newlib]
 -a               Add --all to runtest
 -b BUILD         Build directory (leave blank to use current dir)
 -d               Date Stamp all output files
@@ -218,6 +220,12 @@ do
 	    TEST_GFORTRAN=1
 	    TEST_ALL=0
 	    GFORTRAN_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+	    shift
+	    ;;
+	objc*)
+	    TEST_OBJC=1
+	    TEST_ALL=0
+	    OBJC_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
 	    shift
 	    ;;
 	binutils*)
@@ -282,6 +290,7 @@ if [ $TEST_ALL -eq 1 ] ; then
     TEST_GCC=1
     TEST_GXX=1
     TEST_GFORTRAN=1
+    TEST_OBJC=1
     TEST_LIBSTDCXX=1
     TEST_LIBMUDFLAP=1
     TEST_LIBGOMP=1
@@ -339,6 +348,9 @@ if [ $TEST_GXX -eq 1 ] ; then
 fi
 if [ $TEST_GFORTRAN -eq 1 ] ; then
     printf "gfortran"
+fi
+if [ $TEST_OBJC -eq 1 ] ; then
+    printf "objc"
 fi
 if [ $TEST_LIBSTDCXX -eq 1 ] ; then
     printf "libstdc++ "
@@ -1494,6 +1506,45 @@ EOF
     copy_test_results $1 $BINUTILS_VERSION
 }
 
+# Detect version and path for objc
+
+detect_objc()
+{
+    tool=`which $target_alias-gcc`
+    cat > $DIR_GCC_BUILD/objtest.m <<EOF
+#include <objc/Object.h>
+
+@interface Foo:Object
+{
+}
+- (void)foo;
+@end
+
+@implementation Foo
+- (void)foo
+{
+}
+@end
+
+int main(void)
+{
+  id myFoo = [Foo new];
+  [myFoo free];
+  return 0;
+}
+EOF
+
+    $tool -o $DIR_GCC_BUILD/objtest $DIR_GCC_BUILD/objtest.m -lobjc &> /dev/null
+    RUN=$?
+    rm -f $DIR_GCC_BUILD/objtest $DIR_GCC_BUILD/objtest.m
+    if [ $RUN -eq 1 ] && [ $TEST_ALL -eq 0 ] ; then
+	echo "$target_alias-gcc: objc compiler not found"
+	return 1
+    fi
+
+    return 0
+}
+
 # Detect version and path for gcc tool
 # $1 is the name of tool: gcc, g++, gfortran
 
@@ -1537,13 +1588,21 @@ detect_gcc()
     return 0
 }
 
-# $1 is the name of tool: gcc, g++, gfortran
+# $1 is the name of tool: gcc, g++, gfortran, objc
 # $2 is the directory_test_results_go_in
 # $3 is the testsuite
 
 test_gcc()
 {
-    detect_gcc $1
+    if [ $1 = "objc" ] ; then
+	detect_gcc gcc
+	if [ $? -eq 1 ] ; then
+	    return
+	fi
+	detect_objc
+    else
+	detect_gcc $1
+    fi
     if [ $? -eq 1 ] ; then
 	return
     fi
@@ -1977,6 +2036,10 @@ run_tests ()
     if [ $TEST_GFORTRAN -eq 1 ] ; then
 	clean_hardware $2 gfortran
 	test_gcc gfortran $1 "$GFORTRAN_TESTSUITE"
+    fi
+    if [ $TEST_OBJC -eq 1 ] ; then
+	clean_hardware $2 objc
+	test_gcc objc $1 "$OBJC_TESTSUITE"
     fi
 
     if [ $TEST_LIBSTDCXX -eq 1 ] ; then
