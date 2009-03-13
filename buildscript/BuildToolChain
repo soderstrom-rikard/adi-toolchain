@@ -2100,11 +2100,11 @@ if [ "x$SKIP_ELF" = "x" ]; then
     ################ Step 1 - ELF Toolchain #########################
     build_binutils elf $DIR_ELF_OUTPUT
 
+    build_elf2flt elf $DIR_ELF_OUTPUT
+
     for GCC_VERSION in $GCC_VERSIONS; do
       build_gcc $GCC_VERSION elf $DIR_ELF_OUTPUT "--with-newlib"
     done
-
-    build_elf2flt elf $DIR_ELF_OUTPUT
 
     ########################### Step 2 - done ####################
 
@@ -2351,6 +2351,8 @@ if [ $KERNEL_SOURCE ] ; then
     ####################### Step 4 - build bfin-uclinux ################
     build_binutils uclinux $DIR_uC_OUTPUT
 
+    build_elf2flt uclinux $DIR_uC_OUTPUT
+
     ln -s runtime/usr/include $DIR_uC_OUTPUT/bfin-uclinux/sys-include
     for GCC_VERSION in $GCC_VERSIONS; do
       build_gcc $GCC_VERSION uclinux $DIR_uC_OUTPUT \
@@ -2358,8 +2360,6 @@ if [ $KERNEL_SOURCE ] ; then
            --with-sysroot=$DIR_uC_OUTPUT/bfin-uclinux/runtime"
     done
     rm -f $DIR_uC_OUTPUT/bfin-uclinux/sys-include
-
-    build_elf2flt uclinux $DIR_uC_OUTPUT
 
     ####################### Test bfin-uclinux #######################
 
