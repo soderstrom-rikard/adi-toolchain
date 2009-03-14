@@ -941,18 +941,16 @@ requote() { printf "'%s' " "$@"; }
 
 print_stop_time ()
 {
-    END=$(date +%s)
-    DIFF=$(( $END - $START ))
-    hours=$(( $DIFF / 3600 ))
-    min=$(( ($DIFF - ( $hours * 3600 ) ) / 60))
-    sec=$(( $DIFF - $min * 60 - $hours * 3600))
-    if [ "$hours" -eq "0" ] ; then
-        printf " $min:$sec "
-    else
-        printf " $hours:$min:$sec "
-    fi
-
+	local END=$(date +%s)
+	local DIFF=$((END - START))
+	local h=$((DIFF / 3600))
+	local m=$(((DIFF % 3600) / 60))
+	local s=$((DIFF % 60))
+	[ ${h} -ne 0 ] && printf "${h}h"
+	[ ${m} -ne 0 ] && printf "${m}m"
+	[ ${s} -ne 0 ] && printf "${s}s"
 }
+
 die_with_log ()
 {
     [ -n "$*" ] && echo "$*"
