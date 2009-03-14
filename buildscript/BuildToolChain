@@ -939,7 +939,7 @@ export PATH=$NEW_PATH:/$DIR_ELF_OUTPUT/bin:/$DIR_uC_OUTPUT/bin:/$DIR_LINUX_OUTPU
 # Some helpful functions
 requote() { printf "'%s' " "$@"; }
 
-print_stop_time ()
+print_stop_time()
 {
 	local END=$(date +%s)
 	local DIFF=$((END - START))
@@ -951,14 +951,14 @@ print_stop_time ()
 	[ ${s} -ne 0 ] && printf "${s}s"
 }
 
-die_with_log ()
+die_with_log()
 {
     [ -n "$*" ] && echo "$*"
     echo "Please report an error to http://blackfin.uclinux.org/gf/project/toolchain"
     printf " Build error " ; date
-    printf "  occurred"
+    printf "  occurred "
     print_stop_time
-    echo "into script"
+    echo " into script"
 
     # Create a single file so users can email it to us,
     # we sleep, so things can finish writing to the log file
@@ -968,11 +968,12 @@ die_with_log ()
     if [ "$NUM_JOBS" -eq "1" ]; then
         echo "When reporting issue, we may ask for $DIR_LOG/config.logs.tbz2"
         echo " Last logfile entries:"
-        tail -10 $ACTUAL_LOGFILE
+		tail "$ACTUAL_LOGFILE"
     else
-        echo "Since the build was done in parallel, I'm not sure where the"
-        echo "happened. The best thing to do is add a '-j 1' option to this"
-        echo "BuildToolChain script, and try again."
+        echo "Since the build was done in parallel, I'm not sure where the error"
+		echo "happened.  The best thing to do is re-run the BuildToolChain script"
+		echo "with the '-j 1' option.  The full log can be found here:"
+		echo "${ACTUAL_LOGFILE}"
     fi
 
     exit 1
