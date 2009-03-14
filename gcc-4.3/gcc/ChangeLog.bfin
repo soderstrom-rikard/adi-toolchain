@@ -1,3 +1,7 @@
+2009-03-14  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* loop-iv.c (simple_rhs_p): Allow regs that are function_invariant_p.
+
 2009-03-12  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/uclinux.h (STARTFILE_SPEC): Add proper

@@ -1337,9 +1337,9 @@ simple_rhs_p (rtx rhs)
     case MINUS:
       op0 = XEXP (rhs, 0);
       op1 = XEXP (rhs, 1);
-      if ((!REG_P (op0) || HARD_REGISTER_P (op0)) && !CONSTANT_P (op0))
+      if ((!REG_P (op0) || HARD_REGISTER_P (op0)) && !function_invariant_p (op0))
 	return false;
-      if ((!REG_P (op1) || HARD_REGISTER_P (op1)) && !CONSTANT_P (op1))
+      if ((!REG_P (op1) || HARD_REGISTER_P (op1)) && !function_invariant_p (op1))
 	return false;
       return true;
 
@@ -1349,7 +1349,9 @@ simple_rhs_p (rtx rhs)
     case MULT:
       op0 = XEXP (rhs, 0);
       op1 = XEXP (rhs, 1);
-      if (REG_P (op0) && !HARD_REGISTER_P (op0) && CONSTANT_P (op1))
+      if ((!REG_P (op0) || HARD_REGISTER_P (op0)) && !function_invariant_p (op0))
+	return false;
+      if (CONSTANT_P (op1))
 	return true;
       return false;
 
