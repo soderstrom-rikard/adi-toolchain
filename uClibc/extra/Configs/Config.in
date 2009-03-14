@@ -698,7 +698,7 @@ comment "Support various families of functions"
 
 config UCLIBC_LINUX_MODULE_24
 	bool "Linux kernel module functions"
-	default y
+	default !(TARGET_bfin)
 	help
 	  init_module, create_module, query_module, delete_module
 	  are used in linux (allegedly prior to 2.6) for loadable
