@@ -106,10 +106,6 @@ if TARGET_bfin
 source "extra/Configs/Config.bfin"
 endif
 
-if TARGET_bfinfdpic
-source "extra/Configs/Config.bfinfdpic"
-endif
-
 if TARGET_cris
 source "extra/Configs/Config.cris"
 endif
