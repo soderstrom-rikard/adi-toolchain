@@ -1,3 +1,8 @@
+2009-03-15  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* config/bfin/libgcc-bfin.ver (GCC_4.1.0): Add ___smulsi3_highpart
+	and ___umulsi3_highpart.
+
 2009-03-14  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* loop-iv.c (simple_rhs_p): Allow regs that are function_invariant_p.

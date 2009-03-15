@@ -255,6 +255,8 @@ GCC_4.0.0 {
 
 %inherit GCC_4.1.0 GCC_4.0.0
 GCC_4.1.0 {
+  ___smulsi3_highpart
+  ___umulsi3_highpart
 }
 
 %inherit GCC_4.2.0 GCC_4.1.0
