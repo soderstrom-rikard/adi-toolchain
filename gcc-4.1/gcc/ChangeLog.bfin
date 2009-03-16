@@ -3,6 +3,9 @@
 	* config/bfin/bfin.c (workaround_speculation): Sync insns also need
 	three nops.
 
+	* config/bfin/bfin.md (doloop_end): Check mode of operand 0 and FAIL
+	for anything but SImode.
+
 2009-03-15  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* config/bfin/libgcc-bfin.ver (GCC_4.1.0): Add ___smulsi3_highpart
