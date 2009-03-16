@@ -1,3 +1,8 @@
+2009-03-16  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (workaround_speculation): Sync insns also need
+	three nops.
+
 2009-03-15  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* config/bfin/libgcc-bfin.ver (GCC_4.1.0): Add ___smulsi3_highpart

@@ -5269,7 +5269,7 @@ workaround_speculation (void)
 		delay_needed = 4;
 	    }
 	  else if (type == TYPE_SYNC && ENABLE_WA_SPECULATIVE_SYNCS)
-	    delay_needed = 3;
+	    delay_needed = 4;
 
 	  /* See if we need to forget about a null pointer comparison
 	     we found earlier.  */
