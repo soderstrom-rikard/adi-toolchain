@@ -1,151 +1,237 @@
-#!/bin/sh
-USER=/home/test
+#!/bin/sh -x
+
+UBOOT_VERSION=u-boot-2008.10
+USER=/home/test/work/cruise
 CHECKOUT=$USER/checkouts
-TOOLCHAINBUILD=$USER/test_scripts/toolchain/toolchain-build
+TOOLCHAIN_BUILDSCRIPT=$CHECKOUT/toolchain/buildscript-experimental
 TOOLCHAIN_SCRIPTS=$USER/test_scripts/toolchain
-SVN_SERVER=10.99.22.20
-HOST_IP=10.100.4.174
+TOOLCHAINBUILD=$TOOLCHAIN_SCRIPTS/toolchain-build
+TARGET_KERNEL_CONFIG=normal
+TARGET_KERNEL_BUILD="shared_flat normal"
+
+if [ $# -gt 0 ] ; then
+ if [ $1 == "normal" ] || [ $1 == "shared_flat" ] || [ $1 == "kgdb" ] || [ $1 == "smp" ] ; then
+  TARGET_KERNEL_CONFIG=$1
+  if [ $1 == "kgdb" ] || [ $1 == "smp" ] ; then  
+  TARGET_KERNEL_BUILD="$1 shared_flat normal"
+  fi
+ fi
+fi
+
+HOST_CONFIG=SUSE
+HOST_IP=`/sbin/ifconfig | grep "10\.99" | awk 'BEGIN { FS="[ :]" } {print $13}'`
 TARGET_IP=10.100.4.50
+
+RUN=`rsh -l root $TARGET_IP /bin/ls / 2>/dev/null | wc -l`
+if [ $RUN -gt 1 ] ; then
+        echo -e "The target board is already alive.\n"    
+else
+  rm $TOOLCHAIN_SCRIPTS/reset_board_log
+  $TOOLCHAIN_SCRIPTS/reset_board.exp uImage.$TARGET_KERNEL_CONFIG  >/dev/null  2>&1
+fi
+
+TOOLCHAIN_VERSION=`rsh -l root $TARGET_IP version | grep 'toolchain' | awk 'BEGIN { FS="[ :.]" } {print $7"."$8}'`
+BOARD_CONFIG=`rsh -l root $TARGET_IP cat /proc/cpuinfo | grep 'board name' | awk  'BEGIN { FS="[ :-]" } {print $5"-"$6}'`
 BASELINE=standard
 LASTRUN=lastrun
 THISRUN=thisrun
-COMPARE_PATH=compare
+FROM=grace.pan@analog.com
+NOTIFY=toolchain-test-notify@blackfin.uclinux.org
+test_results=0
 
+if [ -z $TOOLCHAIN_VERSION ] ; then
+  TOOLCHAIN_VERSION=4.1
+fi
+if [ -z $BOARD_CONFIG ] ; then
+  echo -e "Failed to get the target board info. exit!\n"    
+  exit
+fi
 ##### Do Not Edit Below This Line ####### 
 
-QUIT=2
-
-## check out toolchain
 if [ ! -d $CHECKOUT ] ; then
   mkdir -p $CHECKOUT
 fi
 if [ ! -d $TOOLCHAINBUILD ] ; then
   mkdir -p $TOOLCHAINBUILD
 fi
-if [ ! -d $CHECKOUT/kernel ] ; then
-  mkdir -p $CHECKOUT/kernel
-fi
-if [ ! -d $TOOLCHAIN_SCRIPTS/latest ] ; then
-  mkdir -p $TOOLCHAIN_SCRIPTS/latest
-fi
-if [ ! -d $TOOLCHAIN_SCRIPTS/latest/simulator ] ; then
-  mkdir -p $TOOLCHAIN_SCRIPTS/latest/simulator
-fi
-if [ ! -d $TOOLCHAIN_SCRIPTS/latest/hardware ] ; then
-  mkdir -p $TOOLCHAIN_SCRIPTS/latest/hardware
-fi
 
-while [ $QUIT -gt 1 ]
-do
+## make the directory for this toolchain build and test.
+TIMESTAMP=`date +%Y_%b_%d_%H_%M`
+BUILD=$TOOLCHAINBUILD/toolchain-$TIMESTAMP
+mkdir -p $BUILD
 
-  echo -n "Removing checkouts   " ; date
+#Add this line temporarily so that patch smoothly.
+rm $TOOLCHAIN_BUILDSCRIPT/toolchain-regtest
+
+cat  > $BUILD/toolchain_test_log  <<EOF
+************** Testing is done on target with kernel config ($TARGET_KERNEL_CONFIG). *************
+************** Testing $TOOLCHAIN_VERSION toolchain on $BOARD_CONFIG. ************
+************** Host $HOST_CONFIG $HOST_IP. ***********
+
+************** Tested toolchain svn info ***************
+`cd $CHECKOUT/toolchain ;svn up`
+************** Tested U-Boot svn info ******************
+`cd $CHECKOUT/u-boot ;svn info`
+************* Tested uclinux-dist svn info *************
+`cd $CHECKOUT/uclinux-dist ;svn up`
+************* Tested linux svn info ********************
+`cd $CHECKOUT/uclinux-dist/linux-2.6.x  ;svn up`
+EOF
+
+  cd $TOOLCHAINBUILD
+  rm -rf $THISRUN
+  ln -s $BUILD $THISRUN
+
+ ## build toolchain and do the simulator and hardware tests here.
+ cd $CHECKOUT/toolchain/buildscript
+
+# For branch building and testing, use -K kbuild_output and -t -T $TARGET_IP.
+# ./BuildToolChain -t -T $TARGET_IP -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -K $CHECKOUT/toolchain/kbuild_output  -u $CHECKOUT/u-boot/$UBOOT_VERSION  -c $TOOLCHAIN_VERSION -f -D >> $BUILD/toolchain_test_log  2>&1
+
+# For branch testing, use -K kbuild_output.
+# ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -K $CHECKOUT/toolchain/kbuild_output  -u $CHECKOUT/u-boot/$UBOOT_VERSION  -c $TOOLCHAIN_VERSION -f -D >> $BUILD/toolchain_test_log  2>&1
+
+# For trunk testing, use -k $CHECKOUT/uclinux-dist/linux-2.6.x.
+ ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -k $CHECKOUT/uclinux-dist/linux-2.6.x  -u $CHECKOUT/u-boot/$UBOOT_VERSION  -c $TOOLCHAIN_VERSION -f -D >> $BUILD/toolchain_test_log  2>&1
+
+
+TEST_TOOLCHAIN_DIR=$USER/temp
+# TEST_TOOLCHAIN_DIR=/opt/uClinux
+
+  # build an up-to-date kernel with up-to-date uClibc
+  export PATH=$TEST_TOOLCHAIN_DIR/bfin-uclinux/bin:$TEST_TOOLCHAIN_DIR/bfin-elf/bin:$TEST_TOOLCHAIN_DIR/bfin-linux-uclibc/bin:$PATH
+  echo -e "PATH is $PATH \n"
+  echo `$TEST_TOOLCHAIN_DIR/bfin-uclinux/bin/bfin-uclinux-gcc -v`       >> $BUILD/toolchain_test_log  2>&1
+
+ 
+  for config in $TARGET_KERNEL_BUILD  
+  do
+
+  cd $TOOLCHAIN_SCRIPTS
+  rm $CHECKOUT/uclinux-dist/images/uImage 
+  rm -f $TOOLCHAIN_SCRIPTS/build_toolchain_kernel_log
+  $TOOLCHAIN_SCRIPTS/build_toolchain_kernel.exp $BOARD_CONFIG $config        1>/dev/null 2>/dev/null
+  cp $TOOLCHAIN_SCRIPTS/build_toolchain_kernel_log $BUILD/build_toolchain_kernel_log.$config       >> $BUILD/toolchain_test_log  2>&1
+  cp $CHECKOUT/uclinux-dist/images/uImage $BUILD/uImage.$config                >> $BUILD/toolchain_test_log  2>&1
+  cp $CHECKOUT/uclinux-dist/images/uImage /tftpboot/uImage.$config             >> $BUILD/toolchain_test_log  2>&1
+
   
-  rm -rf $CHECKOUT/kernel/*
-  cd $CHECKOUT/kernel
-  echo -n "Checking out kernel     " ; date
-  svn checkout --ignore-externals  --username anonymous svn://$SVN_SERVER/uclinux-dist/trunk uclinux-dist  1>/dev/null 2>/dev/null
-  svn checkout --username anonymous svn://$SVN_SERVER/linux-kernel/trunk uclinux-dist/linux-2.6.x   1>/dev/null 2>/dev/null
+  if  [ $config == "normal" ] ; then
+  if  [ -e $CHECKOUT/uclinux-dist/images/uImage ] ; then
+      cp $CHECKOUT/uclinux-dist/images/uImage /tftpboot/uImage
+  else
+      mv $USER/temp/* $BUILD
+      exit
+  fi
+  fi
 
-  cd $CHECKOUT
-  rm -rf $CHECKOUT/u-boot
-  echo -n "Checking out u-boot     " ; date
-  svn checkout --username anonymous svn://$SVN_SERVER/u-boot/trunk u-boot 1>/dev/null 2>/dev/null
+  if [ -e /tftpboot/uImage.$config ] ; then
+  echo  "uImage.$config is built and copied."                                  >> $BUILD/toolchain_test_log  2>&1
   
+  cd $TOOLCHAIN_SCRIPTS
+  rm $TOOLCHAIN_SCRIPTS/reset_board_log
+  $TOOLCHAIN_SCRIPTS/reset_board.exp uImage.$config                            >/dev/null  2>&1
 
-  rm -rf $CHECKOUT/toolchain
-  echo -n "Checking out toolchain     " ; date
-  svn checkout --username anonymous svn://$SVN_SERVER/toolchain/trunk toolchain 1>/dev/null 2>/dev/null
+  RUN=`rsh -l root $TARGET_IP /bin/ls / 2>/dev/null | wc -l`
+  if [ $RUN -gt 1 ] ; then
+        echo  "Booting up uImage.$config is ok."                               >> $BUILD/toolchain_test_log  2>&1
+  fi
+ 
+  cp $TOOLCHAIN_SCRIPTS/reset_board_log $BUILD/reset_board_log.$config       >> $BUILD/toolchain_test_log  2>&1
+  
+  else
+  echo  "uImage.$config fails to be built. Please check the log."                                  >> $BUILD/toolchain_test_log  2>&1
+  fi
 
-  cd $USER/test_scripts/
-  $USER/test_scripts/restart_board.exp
-#  $USER/test_scripts/reset_board.exp
+  done
+  sleep 20
 
-  ## build and run the tests
-  TIMESTAMP=`date +%Y_%b_%d_%H_%M`
-  BUILD=$TOOLCHAINBUILD/toolchain-$TIMESTAMP
-  mkdir -p $BUILD
+######## Starting test here.
 
-  rm -rf $TOOLCHAIN_SCRIPTS/latest/*
-  sleep 10
-  ln -snf $TOOLCHAINBUILD/$BASELINE  $TOOLCHAINBUILD/$COMPARE_PATH
-  sleep 10
+  rm $TOOLCHAIN_SCRIPTS/reset_board_log
+  $TOOLCHAIN_SCRIPTS/reset_board.exp uImage.$TARGET_KERNEL_CONFIG 1 &    >/dev/null  2>&1
+  sleep 200
+  echo -e "\nTesting is running on target with following versions:" >> $BUILD/toolchain_test_log  2>&1
+  echo -e "`rsh -l root $TARGET_IP version`\n" >> $BUILD/toolchain_test_log  2>&1
 
-  ## build toolchain and do the simulator and hardware tests here.
- cd $CHECKOUT/toolchain/buildscript 
- ./BuildToolChain -t  -T $TARGET_IP -j 1 -w -s $CHECKOUT/toolchain -b $BUILD -k $CHECKOUT/kernel/uclinux-dist/linux-2.6.x -u $CHECKOUT/u-boot/u-boot-1.1.6  -c 4.1
-   
+
+  cd $TOOLCHAIN_BUILDSCRIPT
+
+  patch -p1 < $CHECKOUT/toolchain/buildscript/auto-test/move_gdbtest_to_last_one.patch
+
+ ./toolchain-regtest -s $CHECKOUT/toolchain -o $TEST_TOOLCHAIN_DIR/bfin -b $USER/temp/regtest_build$TOOLCHAIN_VERSION -t elf-sim  -a -L -f >> $BUILD/toolchain_test_log  2>&1
+
+ ./toolchain-regtest -s $CHECKOUT/toolchain -o $TEST_TOOLCHAIN_DIR/bfin -b $USER/temp/regtest_build$TOOLCHAIN_VERSION -t uclinux  -T $TARGET_IP -a -L -f >> $BUILD/toolchain_test_log  2>&1
+
+$TOOLCHAIN_SCRIPTS/reset_board.exp uImage.$TARGET_KERNEL_CONFIG >/dev/null  2>&1
+
+ ./toolchain-regtest -s $CHECKOUT/toolchain -o $TEST_TOOLCHAIN_DIR/bfin -b $USER/temp/regtest_build$TOOLCHAIN_VERSION -t linux-uclibc -T $TARGET_IP -a -L -f >> $BUILD/toolchain_test_log  2>&1
+
+ patch -p1 -R < $CHECKOUT/toolchain/buildscript/auto-test/move_gdbtest_to_last_one.patch
+
+ rm -rf $USER/temp/regtest_build$TOOLCHAIN_VERSION/gcc_build-$TOOLCHAIN_VERSION
+
+ cp $TOOLCHAIN_SCRIPTS/reset_board_log   $BUILD/reset_board_log.$TARGET_KERNEL_CONFIG.test
+ pkill reset_board.exp
+
+  mv $USER/temp/* $BUILD  
+  mkdir -p $BUILD/tests 
+  mv $BUILD/regtest_build$TOOLCHAIN_VERSION/tests/* $BUILD/tests 
+
+#### Do comparision after testing.
+
   # if this is the first time to run the test - set this to the standard
   if [ ! -d $TOOLCHAINBUILD/$BASELINE ] ; then
     ln -s $BUILD $TOOLCHAINBUILD/$BASELINE
   fi
-      
+  
   ## compare the tests with the default
-  COMPARE=$CHECKOUT/toolchain/gcc-3.4/contrib/compare_tests
+  COMPARE=$CHECKOUT/toolchain/gcc-$TOOLCHAIN_VERSION/contrib/compare_tests
   chmod +x $COMPARE
+ 
+  mkdir -p $BUILD/tests/diff
   
   cd $TOOLCHAIN_SCRIPTS
  
-  ## compare with the standard results on simulator
+  ## compare the results on simulator
 
-  $TOOLCHAIN_SCRIPTS/compare_test_results $TOOLCHAINBUILD/$BASELINE/tests/simulator $BUILD/tests/simulator $COMPARE > $BUILD/tests/simulator.diff
+  $TOOLCHAIN_SCRIPTS/compare_toolchain_results $TOOLCHAINBUILD/$BASELINE/tests/simulator $BUILD/tests/simulator $COMPARE > $BUILD/tests/diff/simulator.diff
 
-  ## compared with the standard results on the board. 
+  $TOOLCHAIN_SCRIPTS/compare_toolchain_results $TOOLCHAINBUILD/$LASTRUN/tests/simulator $BUILD/tests/simulator $COMPARE > $BUILD/tests/diff/lastrun-simulator.diff  
+  if [ $? != 0 ] ; then
+  test_results=1
+  cat $BUILD/tests/diff/lastrun-simulator.diff
+  fi
+      
+  ## compared the results on hardware. 
  
-  $TOOLCHAIN_SCRIPTS/compare_test_results $TOOLCHAINBUILD/$BASELINE/tests/hardware $BUILD/tests/hardware $COMPARE > $BUILD/tests/hardware.diff
+  $TOOLCHAIN_SCRIPTS/compare_toolchain_results $TOOLCHAINBUILD/$BASELINE/tests/hardware-flat $BUILD/tests/hardware-flat $COMPARE > $BUILD/tests/diff/hardware-flat.diff
 
-  $TOOLCHAIN_SCRIPTS/compare_test_results $TOOLCHAINBUILD/$BASELINE/tests/hardware-fdpic $BUILD/tests/hardware-fdpic $COMPARE > $BUILD/tests/hardware-fdpic.diff
-
- sleep 30
- # build an up-to-date kernel with up-to-date uClibc
- export PATH=$BUILD/out-uclinux/bin:$BUILD/out-elf/bin:$BUILD/out-linux-uclibc/bin:$PATH
- echo -e "PATH is $PATH \n"
- echo "##### The Toolchain is:"
- $BUILD/out-uclinux/bin/bfin-uclinux-gcc -v
- echo
- rm -f $TOOLCHAIN_SCRIPTS/build_toolchain_kernel_log
- $TOOLCHAIN_SCRIPTS/build_toolchain_kernel.exp BF537-STAMP  1>/dev/null 2>/dev/null
- cp $CHECKOUT/kernel/uclinux-dist/images/linux $BUILD
- cp $TOOLCHAIN_SCRIPTS/build_toolchain_kernel_log $BUILD
- cp $CHECKOUT/kernel/uclinux-dist/images/linux /tftpboot
-
- cp $TOOLCHAIN_SCRIPTS/toolchain_test_log $BUILD
-
- sleep 100
- cp -r  $BUILD/tests/*  $TOOLCHAIN_SCRIPTS/latest
-
-  ## get rid of the dates,and compare the warning file
-  echo "sed 's/toolchain-$TIMESTAMP/$BASELINE/g' $BUILD/logs/warn > $BUILD/logs/warn.1" | sh
-  rm -f $BUILD/logs/warn 
-  grep -v "all automaton generation" $BUILD/logs/warn.1 > $BUILD/logs/warn
-  grep -v "DFA minimization" $BUILD/logs/warn > $BUILD/logs/warn.1
-  grep -v "building DFA" $BUILD/logs/warn.1 > $BUILD/logs/warn
-  rm $BUILD/logs/warn.1
-
-  diff -u $TOOLCHAINBUILD/$BASELINE/logs/warn $BUILD/logs/warn > $BUILD/logs/warn.diff
-  RUN=`cat $BUILD/logs/warn.diff |wc -c`
-  if [ "$RUN" -gt 1 ] ; then
- #  mail -s "toolchain warnings" $NOTIFY < $BUILD/logs/warn.diff
-   QUIT=0
-  else
- #  mail -s "toolchain warnings no changes" $NOTIFY < $BUILD/logs/warn.diff
-   rm $BUILD/logs/warn.diff
+  $TOOLCHAIN_SCRIPTS/compare_toolchain_results $TOOLCHAINBUILD/$LASTRUN/tests/hardware-flat $BUILD/tests/hardware-flat $COMPARE > $BUILD/tests/diff/lastrun-hardware-flat.diff
+  if [ $? != 0 ] ; then
+  test_results=1
+  cat $BUILD/tests/diff/lastrun-hardware-flat.diff
+  fi
+ 
+  $TOOLCHAIN_SCRIPTS/compare_toolchain_results $TOOLCHAINBUILD/$BASELINE/tests/hardware-fdpic $BUILD/tests/hardware-fdpic $COMPARE > $BUILD/tests/diff/hardware-fdpic.diff
+  $TOOLCHAIN_SCRIPTS/compare_toolchain_results $TOOLCHAINBUILD/$LASTRUN/tests/hardware-fdpic $BUILD/tests/hardware-fdpic $COMPARE > $BUILD/tests/diff/lastrun-hardware-fdpic.diff
+  if [ $? != 0 ] ; then
+  test_results=1
+  cat $BUILD/tests/diff/lastrun-hardware-fdpic.diff
   fi
 
-  ## get rid of the dates, and compare the log file
-  echo "sed 's/toolchain-$TIMESTAMP/$BASELINE/g' $BUILD/logs/log > $BUILD/logs/log.1" | sh
-  grep -v "Test Run By" $BUILD/logs/log.1 > $BUILD/logs/log
-  rm $BUILD/logs/log.1
-  
-  diff -u $TOOLCHAINBUILD/$BASELINE/logs/log $BUILD/logs/log > $BUILD/logs/log.diff
-  RUN=`cat $BUILD/logs/log.diff |wc -c`
-  if [ "$RUN" -gt 1 ] ; then
-  # mail -s "toolchain log" $NOTIFY < $BUILD/logs/log.diff
-   QUIT=0
+  echo
+  cat $BUILD/toolchain_test_log
+
+  if [ $test_results = 0 ] ; then
+  echo  "success"  > $BUILD/tests/diff/test_results
   else
-  # mail -s "toolchain log no changes" $NOTIFY < $BUILD/logs/log.diff
-   rm $BUILD/logs/log.diff
+  echo  "failed"  > $BUILD/tests/diff/test_results
   fi
 
- sleep 300  
- QUIT=0
-done
+  sleep 30
+
+
+  cd $TOOLCHAINBUILD
+  rm -rf $LASTRUN
+  ln -s $BUILD $LASTRUN
