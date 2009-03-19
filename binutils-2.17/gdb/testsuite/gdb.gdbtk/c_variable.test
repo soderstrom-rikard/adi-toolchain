@@ -172,6 +172,9 @@ gdbtk_test c_variable-1.3 {create out of scope variable} {
 gdb_cmd "break do_locals_tests"
 gdbtk_test_run
 
+# Step over "lpsimple = &lsimple2;"
+gdb_cmd "step"
+
 # Test: c_variable-1.4
 # Desc: create local variables
 gdbtk_test c_variable-1.4 {create local variables} {

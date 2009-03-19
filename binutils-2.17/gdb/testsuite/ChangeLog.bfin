@@ -1,3 +1,8 @@
+2009-03-19  Jie Zhang  <jie.zhang@analog.com>
+
+	* gdb.gdbtk/c_variable.test: Step over the new added statement.
+	* gdb.gdbtk/c_variable.c (do_locals_tests): Initialize lpsimple.
+
 2009-01-15  Jie Zhang  <jie.zhang@analog.com>
 
 	* gdb.gdbtk/defs (gdbtk_test_file): Append ".gdb" to filename

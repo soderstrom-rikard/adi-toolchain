@@ -101,8 +101,11 @@ do_locals_tests ()
   double ldouble;
   double *lpdouble;
   struct _simple_struct lsimple;
+  struct _simple_struct lsimple2;
   struct _simple_struct *lpsimple;
   void (*func) (void);
+
+  lpsimple = &lsimple2;
 
   /* Simple assignments */
   linteger = 1234;
