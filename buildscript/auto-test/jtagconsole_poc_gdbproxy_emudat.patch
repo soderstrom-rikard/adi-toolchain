@@ -1,0 +1,242 @@
+Initial POC for emudat communication via gdb-proxy.
+Apply this patch to gdbproxy before run jtagconsole testing.
+
+To start up a console over jtag on host:
+gdbproxy bfin
+netcat localhost 2001
+
+Don't forget to enable jtag consle driver in uboot or kernel.
+
+
+Index: target_bfin_new.c
+===================================================================
+--- target_bfin_new.c	(revision 3268)
++++ target_bfin_new.c	(working copy)
+@@ -22,6 +22,8 @@
+ #endif /* HAVE_CONFIG_H */
+ 
+ #include <stdbool.h>
++#include <errno.h>
++#include <stdbool.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <stdint.h>
+@@ -31,8 +33,12 @@
+ #include <time.h>
+ #include <stdarg.h>
+ #include <getopt.h>
++#include <pthread.h>
++#include <fcntl.h>
++#include <sys/param.h>
+ 
+ #include "gdbproxy.h"
++#include "rpmisc.h"
+ 
+ #include "part.h"
+ #include "chain.h"
+@@ -5347,7 +5353,196 @@
+   return bfin_out_treg_value (in, reg_no, value);
+ }
+ 
++#define DR_OUT (cpu->chain->parts->parts[cpu->chain->active_part]->active_instruction->data_register->out)
++#define DR_IN (cpu->chain->parts->parts[cpu->chain->active_part]->active_instruction->data_register->in)
+ 
++static unsigned int btc_port = 2001;
++static int btc_listen_sock = -1;
++
++static pthread_t btc_thread;
++
++static char *btc_read_buff = NULL;
++static size_t btc_read_len = 0;
++static size_t btc_exp_len;
++static bool btc_data_is_len = true;
++static inline void btc_read_maybe_queue(void)
++{
++	if (DR_OUT->data[40 - 1 - 7] == 0)
++		return;
++
++	size_t i;
++	uint32_t data = 0;
++	for (i = 0; i < 32; ++i)
++		data |= DR_OUT->data[i] << (32 - 1 - i);
++
++	if (btc_data_is_len) {
++		btc_exp_len = data;
++		btc_data_is_len = (data ? false : true);
++		fprintf(stderr, "incoming length: %zu (0x%08x)\n", btc_exp_len, data);
++	} else {
++		size_t i, curr_len = MIN(btc_exp_len, 4);
++		fprintf(stderr, " processing data (exp: %zu): %zu bytes (0x%08x)\n", btc_exp_len, curr_len, data);
++		btc_read_buff = realloc(btc_read_buff, btc_read_len + curr_len);
++		for (i = 0; i < curr_len; ++i)
++			btc_read_buff[btc_read_len + i] = (data >> (8 * i)) & 0xff;
++		btc_read_len += curr_len;
++		btc_exp_len -= curr_len;
++		if (btc_exp_len == 0)
++			btc_data_is_len = true;
++	}
++}
++
++static inline int jtag_strdup_parse_line(char *buf)
++{
++	int ret;
++	buf = strdup(buf);
++	ret = jtag_parse_line(cpu->chain, buf);
++	free(buf);
++	return ret;
++}
++
++static size_t btc_write(size_t length, void *data)
++{
++	size_t i, j, b;
++	char *buf = data;
++	char dr_cmd[] = "dr 0000000000000000000000000000000000000000"; /* need 40bits */
++
++	/* in full duplex, we need to look at 7th bit
++	 * to see if Blackfin is sending to us
++	 */
++	for (i = 0; i < length; i += 4) {
++		dr_cmd[3 + 6] = '0';
++		jtag_strdup_parse_line(dr_cmd);
++		while (1) {
++			jtag_strdup_parse_line("shift dr");
++			//jtag_strdup_parse_line("dr");
++			//fprintf(stderr, "{ in:%s\n out:%s}\n", register_get_string(DR_IN), register_get_string(DR_OUT));
++
++			btc_read_maybe_queue();
++
++			if (DR_OUT->data[40 - 1 - 6] == 0)
++				break;
++		}
++
++		dr_cmd[3 + 6] = '1';
++		for (j = 0; j < 4; ++j) {
++			//fprintf(stderr, "byte: %c (0x%02x): 0y", buf[i+j], buf[i+j]);
++			for (b = 0; b < 8; ++b) {
++				char bit = ((buf[i+j] >> b) & 0x1) + '0';
++				dr_cmd[3 + 8 + 8*j + b] = bit;
++				//fprintf(stderr, "%c", bit);
++			}
++			//fprintf(stderr, "\n");
++		}
++		//fprintf(stderr, "dr_cmd: %s\n", dr_cmd);
++		jtag_strdup_parse_line(dr_cmd);
++		jtag_strdup_parse_line("shift dr");
++		btc_read_maybe_queue();
++	}
++
++	return 0;
++}
++
++static void *btc_thread_main(void *arg)
++{
++	int btc_sock;
++	ssize_t io_ret;
++	char buf[1024];
++
++	if (1) {
++		int fd = open("/dev/null", O_WRONLY);
++		dup2(fd, STDOUT_FILENO);
++		close(fd);
++	}
++
++	while (1) {
++		btc_sock = sock_accept(btc_listen_sock);
++		fcntl(btc_sock, F_SETFL, fcntl(btc_sock, F_GETFL) | O_NONBLOCK);
++//		dup2(btc_sock, STDOUT_FILENO);
++		write(btc_sock, "hello!\n", 7);
++
++		jtag_strdup_parse_line("instruction EMUDAT_40_SCAN");
++		jtag_strdup_parse_line("shift ir");
++
++		while (1) {
++#if 0
++			memset(buf, 'a', sizeof(buf));
++			io_ret = read(btc_sock, buf, sizeof(buf)-1);
++			if (io_ret <= 0)
++				break;
++			while (io_ret > 0)
++				if (buf[io_ret-1] == '\n' || buf[io_ret-1] == '\r')
++					--io_ret;
++				else
++					break;
++			if (io_ret <= 0)
++				continue;
++			buf[io_ret] = '\0';
++			fprintf(stderr, "SOCKET: '%s'\n", buf);
++
++			if (buf[0] == '!')
++				fprintf(stderr, "jtag_parse_line: %i\n", jtag_parse_line(cpu->chain, buf+1));
++			else
++				btc_write(io_ret, buf);
++#else
++			io_ret = read(btc_sock, &buf, sizeof(buf));
++			if (io_ret == 0 || (io_ret == -1 && errno != EAGAIN))
++				break;
++
++			if (io_ret > 0) {
++				fprintf(stderr, "sending %zi bytes\n", io_ret);
++				char data_len[4] = {
++					(io_ret >>  0) & 0xff,
++					(io_ret >>  8) & 0xff,
++					(io_ret >> 16) & 0xff,
++					(io_ret >> 24) & 0xff,
++				};
++				btc_write(4, data_len);
++				btc_write(io_ret, buf);
++			} else {
++				jtag_strdup_parse_line("dr 0000000000000000000000000000000000000000");
++				jtag_strdup_parse_line("shift dr");
++				btc_read_maybe_queue();
++			}
++
++			if (btc_read_len)
++				btc_read_len -= write(btc_sock, btc_read_buff, btc_read_len);
++#endif
++		}
++
++		close(btc_sock);
++	}
++
++	return NULL;
++}
++
++#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
++static void bfin_btc_init(void)
++{
++	size_t i;
++	char *btc_command_init[] = {
++		/* declare a 40bit version of emudat */
++		"register EMUDAT_40 40",
++		"instruction EMUDAT_40_SCAN 10100 EMUDAT_40",
++
++		/* set emudat to 40bits */
++		"instruction DBGCTL_SCAN",
++		"shift ir",
++		"shift dr",
++		"dr 0000000100000000",
++		"shift dr"
++	};
++
++	btc_listen_sock = listen_sock_open(&btc_port);
++	if (btc_listen_sock == -1)
++		return;
++
++	pthread_create(&btc_thread, NULL, btc_thread_main, NULL);
++	for (i = 0; i < ARRAY_SIZE(btc_command_init); ++i)
++		jtag_strdup_parse_line(btc_command_init[i]);
++}
++
++
+ /* Target method */
+ static void
+ bfin_help (const char *prog_name)
+@@ -5947,6 +6142,8 @@
+       cpu->cores[0].name = "Core";
+     }
+ 
++  bfin_btc_init();
++
+   return RP_VAL_TARGETRET_OK;
+ }
+ 
