@@ -1,3 +1,10 @@
+2009-03-23  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_flag_var_tracking): New variable.
+	(output_file_start): Initialize it from flag_var_tracking and clear
+	the latter.
+	(bfin_reorg): Run var tracking pass after scheduling if requested.
+
 2009-03-16  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (workaround_speculation): Sync insns also need

@@ -96,6 +96,10 @@ static int bfin_lib_id_given;
    call the scheduler ourselves during reorg.  */
 static int bfin_flag_schedule_insns2;
 
+/* Determines whether we run variable tracking in machine dependent
+   reorganization.  */
+static int bfin_flag_var_tracking;
+
 /* -mcpu support */
 bfin_cpu_t bfin_cpu_type = BFIN_CPU_UNKNOWN;
 
@@ -333,6 +337,13 @@ output_file_start (void)
 {
   FILE *file = asm_out_file;
   int i;
+
+  /* Variable tracking should be run after all optimizations which change order
+     of insns.  It also needs a valid CFG.  This can't be done in
+     override_options, because flag_var_tracking is finalized after
+     that.  */
+  bfin_flag_var_tracking = flag_var_tracking;
+  flag_var_tracking = 0;
 
   fprintf (file, ".file \"%s\";\n", input_filename);
   
@@ -5493,7 +5504,17 @@ bfin_reorg (void)
       timevar_push (TV_SCHED2);
       schedule_insns (dump_file);
       timevar_pop (TV_SCHED2);
+    }
 
+  if (bfin_flag_var_tracking)
+    {
+      timevar_push (TV_VAR_TRACKING);
+      variable_tracking_main ();
+      timevar_pop (TV_VAR_TRACKING);
+    }
+
+  if (bfin_flag_schedule_insns2)
+    {
       /* Examine the schedule and insert nops as necessary for 64-bit parallel
 	 instructions.  */
       bfin_gen_bundles ();
