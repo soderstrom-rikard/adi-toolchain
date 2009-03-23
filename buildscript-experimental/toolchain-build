@@ -658,7 +658,7 @@ if [ $BUILD_TARGET_UCLINUX ] || [ $BUILD_TARGET_LINUX_UCLIBC ]; then
 	    change_dir $UCLIBC_SOURCE
 	    cp $UCLIBC_CONFIG_FILE .tmp.config.provided
 	    mv -f .config .config.bk
-	    cat .tmp.config.provided | grep -v '^\(# \|\)\(HAVE_NO_SHARED\|HAVE_NO_PIC\|DOPIC\|HAVE_SHARED\|TARGET_SUBARCH\|BUILD_UCLIBC_LDSO\|SUPPORT_LD_DEBUG\|FORCE_SHAREABLE_TEXT_SEGMENTS\|RUNTIME_\|DEVEL_\|MULTILIB\|KERNEL_HEADERS\|LDSO_RUNPATH\|SHARED_LIB_LOADER_PREFIX\|UCLIBC_EXTRA_CFLAGS\)' |grep -v UCLIBC_FORMAT_ >.config.in
+	    cat .tmp.config.provided | grep -v '^\(# \|\)\(ARCH_HAS_NO_SHARED\|HAVE_NO_PIC\|DOPIC\|HAVE_SHARED\|TARGET_SUBARCH\|BUILD_UCLIBC_LDSO\|SUPPORT_LD_DEBUG\|FORCE_SHAREABLE_TEXT_SEGMENTS\|RUNTIME_\|DEVEL_\|MULTILIB\|KERNEL_HEADERS\|LDSO_RUNPATH\|SHARED_LIB_LOADER_PREFIX\|UCLIBC_EXTRA_CFLAGS\)' |grep -v UCLIBC_FORMAT_ >.config.in
 	    echo 'RUNTIME_PREFIX="/"' >>.config.in
 	    echo 'DEVEL_PREFIX="/usr/"' >>.config.in
 	else
@@ -1733,6 +1733,7 @@ if [ $BUILD_TARGET_UCLINUX ]; then
 	    else
 		cp .config.in .config
 	    fi
+	    echo '# DOPIC is not set' >>.config
 	    echo 'UCLIBC_FORMAT_FLAT_SEP_DATA=y' >>.config
 	    echo '# UCLIBC_FORMAT_FDPIC_ELF is not set' >>.config
 	    echo '# UCLIBC_FORMAT_SHARED_FLAT is not set' >>.config
@@ -1754,6 +1755,7 @@ if [ $BUILD_TARGET_UCLINUX ]; then
 	    else
 		cp .config.in .config
 	    fi
+	    echo '# DOPIC is not set' >>.config
 	    echo 'UCLIBC_FORMAT_SHARED_FLAT=y' >>.config
 	    echo '# UCLIBC_FORMAT_FDPIC_ELF is not set' >>.config
 	    echo '# UCLIBC_FORMAT_FLAT is not set' >>.config
@@ -1776,6 +1778,7 @@ if [ $BUILD_TARGET_UCLINUX ]; then
 	    else
 		cp .config.in .config
 	    fi
+	    echo '# DOPIC is not set' >>.config
 	    echo 'UCLIBC_FORMAT_FLAT=y' >>.config
 	    echo '# UCLIBC_FORMAT_FDPIC_ELF is not set' >>.config
 	    echo '# UCLIBC_FORMAT_SHARED_FLAT is not set' >>.config
