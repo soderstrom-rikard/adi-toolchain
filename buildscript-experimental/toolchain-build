@@ -1062,10 +1062,17 @@ build_gcc ()
     [ -n "$SCM_URL" ] && SCM_URL="-${SCM_URL}"
     [ -n "$SCM_REV" ] && SCM_REV="/${SCM_REV}"
 
+    if [ -e $DIR_GCC_SOURCE/gcc/BASE-VER ] ; then
+        VERSION=`cat $DIR_GCC_SOURCE/gcc/BASE-VER`
+    else
+        VERSION=`grep version_string $DIR_GCC_SOURCE/gcc/version.c | sed 's/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+    fi
+
     echo_date "Configuring $2 GCC $1"
     RUN="$DIR_GCC_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-$2 \
       --prefix=$3 $4 --disable-libstdcxx-pch $BFIN_LANGS $EXTRA_GCC_CONF \
       --disable-symvers --disable-libssp --disable-libffi $LOCALE \
+      --with-gxx-include-dir=$3/bfin-$2/include/c++/$VERSION \
       --enable-version-specific-runtime-libs --enable-__cxa_atexit \
       --with-bugurl=URL:http://blackfin.uclinux.org/gf/project/toolchain/tracker \
       --with-pkgversion=ADI${SCM_URL}${SCM_REV}"
@@ -1111,13 +1118,7 @@ build_gcc ()
 	    die_with_log
         fi
     done
-    if [ -e $DIR_GCC_SOURCE/gcc/BASE-VER ] ; then
-        VERSION=`cat $DIR_GCC_SOURCE/gcc/BASE-VER`
-    else
-        VERSION=`$3/bin/bfin-$2-gcc -v 2>&1 | grep gcc.vers | sed -e 's,gcc.version.,,' -e 's, .ADI.*$,,'`
-    fi
 
-    rm -rf $3/bin/bfin-$2-gcc-$MAJOR.$MINOR$EXEEXT
     if [ -e $3/bin/bfin-$2-g++$EXEEXT ]; then
 	rm -rf $3/bin/bfin-$2-g++-$VERSION$EXEEXT
 	rm -rf $3/bin/bfin-$2-c++-$VERSION$EXEEXT
