@@ -2179,9 +2179,8 @@ if [ $BUILD_TARGET_UCLINUX ] ; then
     mkdir $DIR_BINUTILS_BUILD
     change_dir $DIR_BINUTILS_BUILD
 
-    RUN="env LDFLAGS=-Wl,-elf2flt \
-    $DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-uclinux \
-    --host=bfin-uclinux $BUILD_TARGET \
+    RUN="$DIR_BINUTILS_SOURCE/configure \
+    --target=bfin-uclinux --host=bfin-uclinux $BUILD_TARGET \
     --disable-shared --prefix=$DIR_uC_OUTPUT/bfin-uclinux --disable-nls \
     --without-newlib"
     run_cmd $RUN
@@ -2202,8 +2201,8 @@ if [ $BUILD_TARGET_LINUX_UCLIBC ]; then
 
     # Don't add -mfdpic to CFLAGS, since BFD tries to build a few files with the
     # host compiler.
-    RUN="$DIR_BINUTILS_SOURCE/configure $HOST_TARGET --target=bfin-linux-uclibc \
-    --host=bfin-linux-uclibc $BUILD_TARGET \
+    RUN="$DIR_BINUTILS_SOURCE/configure \
+    --target=bfin-linux-uclibc --host=bfin-linux-uclibc $BUILD_TARGET \
     --disable-shared --prefix=$DIR_LINUX_OUTPUT/bfin-linux-uclibc --disable-nls \
     --without-newlib"
     run_cmd $RUN
