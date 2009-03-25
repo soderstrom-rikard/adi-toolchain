@@ -1,3 +1,8 @@
+2009-03-25  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_optimize_loop): If the LSETUP goes before
+	a jump insn, count that jump in the distance to the loop start.
+
 2009-03-23  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_flag_var_tracking): New variable.
