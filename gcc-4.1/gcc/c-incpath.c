@@ -123,6 +123,7 @@ static void
 add_standard_paths (const char *sysroot, const char *iprefix, int cxx_stdinc)
 {
   const struct default_include *p;
+  int relocated = cpp_relocated();
   size_t len;
 
   if (iprefix && (len = cpp_GCC_INCLUDE_DIR_len) != 0)
@@ -157,6 +158,31 @@ add_standard_paths (const char *sysroot, const char *iprefix, int cxx_stdinc)
 	  /* Should this directory start with the sysroot?  */
 	  if (sysroot && p->add_sysroot)
 	    str = concat (sysroot, p->fname, NULL);
+	  else if (!p->add_sysroot && relocated
+		   && strncmp (p->fname, cpp_PREFIX, cpp_PREFIX_len) == 0)
+	    {
+ 	      static const char *relocated_prefix;
+	      /* If this path starts with the configure-time prefix, 
+		 but the compiler has been relocated, replace it 
+		 with the run-time prefix.  The run-time exec prefix
+		 is GCC_EXEC_PREFIX.  Compute the path from there back
+		 to the toplevel prefix.  */
+	      if (!relocated_prefix)
+		{
+		  char *dummy;
+		  /* Make relative prefix expects the first argument
+		     to be a program, not a directory.  */
+		  dummy = concat (gcc_exec_prefix, "dummy", NULL);
+		  relocated_prefix 
+		    = make_relative_prefix (dummy,
+					    cpp_EXEC_PREFIX,
+					    cpp_PREFIX);
+		}
+	      str = concat (relocated_prefix,
+			    p->fname + cpp_PREFIX_len, 
+			    NULL);
+	      str = update_path (str, p->component);
+	    }
 	  else
 	    str = update_path (p->fname, p->component);
 
