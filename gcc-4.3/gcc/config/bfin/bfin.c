@@ -6473,6 +6473,10 @@ bfin_expand_builtin (tree exp, rtx target ATTRIBUTE_UNUSED,
       if (! target
 	  || !register_operand (target, SImode))
 	target = gen_reg_rtx (SImode);
+      if (! register_operand (op0, SImode))
+	op0 = copy_to_mode_reg (SImode, op0);
+      if (! register_operand (op1, SImode))
+	op1 = copy_to_mode_reg (SImode, op1);
 
       a1reg = gen_rtx_REG (PDImode, REG_A1);
       a0reg = gen_rtx_REG (PDImode, REG_A0);

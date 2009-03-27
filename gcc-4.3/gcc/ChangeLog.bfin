@@ -1,3 +1,9 @@
+2009-03-27  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_expand_builtin,
+	case BFIN_BUILTIN_MULT_1X32X32): Force constants to registers for the
+	operands.
+
 2009-03-25  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_optimize_loop): If the LSETUP goes before
