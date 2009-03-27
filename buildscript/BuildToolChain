@@ -1113,11 +1113,12 @@ build_gcc ()
     fi
 
     LOCALE="--enable-clocale=generic"
-    if [ -n "$UCLIBC_CONFIG_FILE" ]; then
+    if [ $2 != "elf" ] && [ -n "$UCLIBC_CONFIG_FILE" ]; then
 	if grep -qs UCLIBC_HAS_LOCALE=y $UCLIBC_CONFIG_FILE; then
 	    LOCALE="--enable-clocale=uclibc"
 	fi
     fi
+
     if [ -d "$DIR_GCC_SOURCE/.svn" ] ; then
         eval $(svn info "$DIR_GCC_SOURCE" 2>/dev/null | \
             sed -n \
