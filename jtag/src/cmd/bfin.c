@@ -34,7 +34,7 @@
 #include <cmd.h>
 #include <unistd.h>
 
-#include <bfin.h>
+#include "bfin.h"
 
 /* For "bfin execute", Blackfin assembler assembles instruction(s)
    into a temporary object file. When this variable is non-zero, there
@@ -54,7 +54,6 @@ static int
 cmd_bfin_run( chain_t *chain, char *params[] )
 {
   int num_params;
-  part_t *part;
 
   num_params = cmd_params(params);
 
@@ -125,51 +124,63 @@ cmd_bfin_run( chain_t *chain, char *params[] )
     return 1;
   }
 
-  part = chain->parts->parts[chain->active_part];
-
-  assert (part);
-
-  /* Do part specific initialization.  */
-  bfin_part_init (part);
+  assert (chain->active_part >= 0 && chain->active_part < chain->parts->len);
 
   if (strcmp (params[1], "emulation") == 0)
     {
       if (num_params != 3)
 	return -1;
 
-      if (strcmp (params[2], "enter") == 0)
+      if (strcmp (params[2], "enable") == 0)
 	{
-	  if (!bfin_emulation_enabled (chain))
-	    {
-	      bfin_emulation_enable (chain);
-	      bfin_emulation_trigger (chain);
-	    }
+	  part_emulation_enable (chain, chain->active_part);
+	}
+      else if (strcmp (params[2], "trigger") == 0)
+	{
+	  part_emulation_trigger (chain, chain->active_part);
+	}
+      else if (strcmp (params[2], "enter") == 0)
+	{
+	  part_emulation_enable (chain, chain->active_part);
+	  part_emulation_trigger (chain, chain->active_part);
+	}
+      else if (strcmp (params[2], "return") == 0)
+	{
+	  part_emulation_return (chain, chain->active_part);
+	}
+      else if (strcmp (params[2], "disable") == 0)
+	{
+	  part_emulation_disable (chain, chain->active_part);
 	}
       else if (strcmp (params[2], "exit") == 0)
 	{
-	  if (bfin_emulation_enabled (chain))
-	    bfin_emulation_return (chain);
-
-	  bfin_emulation_disable (chain);
+	  part_emulation_return (chain, chain->active_part);
+	  part_emulation_disable (chain, chain->active_part);
 	}
       else if (strcmp (params[2], "status") == 0)
 	{
 	  uint16_t dbgstat, excause;
 	  const char *str_excause;
+	  part_t *part;
 
-	  dbgstat = BFIN_DBGSTAT_GET (chain);
-	  excause = (dbgstat & DBGSTAT_EMUCAUSE_MASK) >> 6;
-	  switch (excause) {
-	  case 0x0: str_excause = "EMUEXCPT was executed"; break;
-	  case 0x1: str_excause = "EMUIN pin was asserted"; break;
-	  case 0x2: str_excause = "Watchpoint event occurred"; break;
-	  case 0x4: str_excause = "Performance Monitor 0 overflowed"; break;
-	  case 0x5: str_excause = "Performance Monitor 1 overflowed"; break;
-	  case 0x8: str_excause = "Emulation single step"; break;
-	  default:  str_excause = "Reserved??"; break;
-	  }
+	  part_dbgstat_get (chain, chain->active_part);
+	  part = chain->parts->parts[chain->active_part];
+	  dbgstat = BFIN_PART_DBGSTAT (part);
+	  excause = part_dbgstat_emucause (chain, chain->active_part);
 
-	  printf ("DBGSTAT = 0x%"PRIx16"\n", dbgstat);
+	  switch (excause)
+	    {
+	    case 0x0: str_excause = "EMUEXCPT was executed"; break;
+	    case 0x1: str_excause = "EMUIN pin was asserted"; break;
+	    case 0x2: str_excause = "Watchpoint event occurred"; break;
+	    case 0x4: str_excause = "Performance Monitor 0 overflowed"; break;
+	    case 0x5: str_excause = "Performance Monitor 1 overflowed"; break;
+	    case 0x8: str_excause = "Emulation single step"; break;
+	    default:  str_excause = "Reserved??"; break;
+	    }
+
+	  printf ("Core [%d] DBGSTAT = 0x%"PRIx16"\n",
+		  chain->active_part, dbgstat);
 
 	  printf ("\tEMUDOF     = %u\n"
 		  "\tEMUDIF     = %u\n"
@@ -184,23 +195,25 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 		  "\tIDLE       = %u\n"
 		  "\tCORE_FAULT = %u\n"
 		  "\tLPDEC1     = %u\n",
-		  !!(dbgstat & DBGSTAT_EMUDOF),
-		  !!(dbgstat & DBGSTAT_EMUDIF),
-		  !!(dbgstat & DBGSTAT_EMUDOOVF),
-		  !!(dbgstat & DBGSTAT_EMUDIOVF),
-		  !!(dbgstat & DBGSTAT_EMUREADY),
-		  !!(dbgstat & DBGSTAT_EMUACK),
+		  part_dbgstat_is_emudof (chain, chain->active_part),
+		  part_dbgstat_is_emudif (chain, chain->active_part),
+		  part_dbgstat_is_emudoovf (chain, chain->active_part),
+		  part_dbgstat_is_emudiovf (chain, chain->active_part),
+		  part_dbgstat_is_emuready (chain, chain->active_part),
+		  part_dbgstat_is_emuack (chain, chain->active_part),
 		  excause, str_excause,
-		  !!(dbgstat & DBGSTAT_BIST_DONE),
-		  !!(dbgstat & DBGSTAT_LPDEC0),
-		  !!(dbgstat & DBGSTAT_IN_RESET),
-		  !!(dbgstat & DBGSTAT_IDLE),
-		  !!(dbgstat & DBGSTAT_CORE_FAULT),
-		  !!(dbgstat & DBGSTAT_LPDEC1));
+		  part_dbgstat_is_bist_done (chain, chain->active_part),
+		  part_dbgstat_is_lpdec0 (chain, chain->active_part),
+		  part_dbgstat_is_in_reset (chain, chain->active_part),
+		  part_dbgstat_is_idle (chain, chain->active_part),
+		  part_dbgstat_is_core_fault (chain, chain->active_part),
+		  part_dbgstat_is_lpdec1 (chain, chain->active_part));
 	}
       else if (strcmp (params[2], "singlestep") == 0)
 	{
-	  if ((BFIN_DBGSTAT_GET (chain) & DBGSTAT_EMUREADY) == 0)
+	  part_dbgstat_get (chain, chain->active_part);
+
+	  if (!part_dbgstat_is_emuready (chain, chain->active_part))
 	    {
 	      printf( _("Run \"bfin emulation enter\" first.\n") );
 	      return 1;
@@ -208,12 +221,13 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 
 	  /* TODO  Allow an argument to specify how many single steps.  */
 
-	  BFIN_DBGCTL_BIT_SET (chain, DBGCTL_ESSTEP, EXITMODE_UPDATE);
-	  BFIN_EMUIR_SET (chain, INSN_RTE, EXITMODE_UPDATE);
-	  BFIN_DBGCTL_BIT_CLEAR (chain, DBGCTL_EMEEN | DBGCTL_WAKEUP, EXITMODE_IDLE);
-	  BFIN_EMUIR_SET (chain, INSN_NOP, EXITMODE_UPDATE);
-	  BFIN_DBGCTL_BIT_SET (chain, DBGCTL_EMEEN | DBGCTL_WAKEUP, EXITMODE_IDLE);
-	  BFIN_DBGCTL_BIT_CLEAR (chain, DBGCTL_ESSTEP, EXITMODE_UPDATE);
+	  part_scan_select (chain, chain->active_part, DBGCTL_SCAN);
+	  part_dbgctl_bit_set_esstep (chain, chain->active_part);
+	  chain_shift_data_registers_mode (chain, 0, 1, EXITMODE_UPDATE);
+	  part_emuir_set (chain, chain->active_part, INSN_RTE, EXITMODE_IDLE);
+	  part_scan_select (chain, chain->active_part, DBGCTL_SCAN);
+	  part_dbgctl_bit_clear_esstep (chain, chain->active_part);
+	  chain_shift_data_registers_mode (chain, 0, 1, EXITMODE_UPDATE);
 	}
       else
 	{
@@ -227,7 +241,9 @@ cmd_bfin_run( chain_t *chain, char *params[] )
     {
       int execute_ret = -1;
 
-      if ((BFIN_DBGSTAT_GET (chain) & DBGSTAT_EMUREADY) == 0)
+      part_dbgstat_get (chain, chain->active_part);
+
+      if (!part_dbgstat_is_emuready (chain, chain->active_part))
 	{
 	  printf( _("Run \"bfin emulation enter\" first.\n") );
 	  return 1;
@@ -336,6 +352,8 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 		  for (t = 0; t < ARRAY_SIZE(tuples); ++t)
 		    {
 		      int ret;
+
+		      /* TODO  Pass -mcpu= to gas.  */
 		      asprintf (&tmp_buf,
 				"bfin-%3$s-as --version >/dev/null 2>&1 || exit $?;"
 				"echo '%1$s' | bfin-%3$s-as - -o \"%2$s\""
@@ -416,7 +434,7 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 		}
 	    }
 
-	  bfin_execute_instructions (chain, insns);
+	  part_execute_instructions (chain, chain->active_part, insns);
 	  execute_ret = 1;
 
  execute_cleanup:
@@ -435,10 +453,13 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 
       if (execute_ret == 1)
 	{
-	  uint64_t emudat = BFIN_EMUDAT_GET (chain, EXITMODE_UPDATE);
-	  uint16_t dbgstat = BFIN_DBGSTAT_GET (chain);
+	  uint64_t emudat;
+
+	  emudat = part_emudat_get (chain, chain->active_part, EXITMODE_UPDATE);
 	  printf ("EMUDAT = 0x%"PRIx64"\n", emudat);
-	  if (dbgstat & DBGSTAT_CORE_FAULT)
+
+	  part_dbgstat_get (chain, chain->active_part);
+	  if (part_dbgstat_is_core_fault (chain, chain->active_part))
 	    printf (_("warning: core fault detected\n"));
 	}
 
@@ -465,11 +486,11 @@ cmd_bfin_run( chain_t *chain, char *params[] )
       printf (_("%s: reseting processor ... "), "bfin");
       fflush (stdout);
       if (reset_what == 0x3)
-	bfin_software_reset (chain);
+	software_reset (chain);
       else if (reset_what & 0x1)
 	bfin_core_reset (chain);
       else if (reset_what & 0x2)
-	bfin_system_reset (chain);
+	chain_system_reset (chain);
       printf (_("OK\n"));
 
       return 1;

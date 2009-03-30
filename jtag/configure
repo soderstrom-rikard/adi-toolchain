@@ -792,6 +792,8 @@ ENABLE_BUS_BF548_EZKIT_TRUE
 ENABLE_BUS_BF548_EZKIT_FALSE
 ENABLE_BUS_BF561_EZKIT_TRUE
 ENABLE_BUS_BF561_EZKIT_FALSE
+ENABLE_BUS_BFIN_CORE_TRUE
+ENABLE_BUS_BFIN_CORE_FALSE
 ENABLE_BUS_EJTAG_TRUE
 ENABLE_BUS_EJTAG_FALSE
 ENABLE_BUS_FJMEM_TRUE
@@ -1559,11 +1561,11 @@ Optional Features:
                           'default' enables:
                           au1500 avr32 bcm1250 bf526_ezkit bf527_ezkit bf52x
                           bf533_stamp bf533_ezkit bf537_stamp bf537_ezkit
-                          bf538f_ezkit bf53x bf548_ezkit bf561_ezkit ejtag
-                          fjmem ixp425 jopcyc h7202 lh7a400 mpc5200 mpc824x
-                          ppc405ep ppc440gx_ebc8 prototype pxa2x0 pxa27x
-                          s3c4510 sa1110 sh7727 sh7750r sh7751r sharc_21065L
-                          slsup3 tx4925 zefant_xs3
+                          bf538f_ezkit bf53x bf548_ezkit bf561_ezkit bfin_core
+                          ejtag fjmem ixp425 jopcyc h7202 lh7a400 mpc5200
+                          mpc824x ppc405ep ppc440gx_ebc8 prototype pxa2x0
+                          pxa27x s3c4510 sa1110 sh7727 sh7750r sh7751r
+                          sharc_21065L slsup3 tx4925 zefant_xs3
 
   --enable-cable          Enable default set or specific cable drivers.
                           'default' enables:
@@ -2585,7 +2587,7 @@ am__tar='${AMTAR} chof - "$$tardir"'; am__untar='${AMTAR} xf -'
 
 
 
-ac_config_files="$ac_config_files Makefile doc/Makefile data/Makefile include/Makefile src/Makefile src/lib/Makefile src/tap/Makefile src/part/Makefile src/bus/Makefile src/flash/Makefile src/cmd/Makefile src/svf/Makefile src/bsdl/Makefile src/jim/Makefile po/Makefile.in"
+ac_config_files="$ac_config_files Makefile doc/Makefile data/Makefile include/Makefile src/Makefile src/lib/Makefile src/tap/Makefile src/part/Makefile src/bus/Makefile src/flash/Makefile src/cmd/Makefile src/svf/Makefile src/bsdl/Makefile src/jim/Makefile src/bfin/Makefile po/Makefile.in"
 
 
 { $as_echo "$as_me:$LINENO: checking whether to enable maintainer-specific portions of Makefiles" >&5
@@ -10324,7 +10326,9 @@ fi
 
 # expand 'default' to default enabled busdrivers
 busdrivers=`echo ${busdrivers} | $SED -e "s/default/\
-au1500 avr32 bcm1250 bf526_ezkit bf527_ezkit bf52x bf533_stamp bf533_ezkit bf537_stamp bf537_ezkit bf538f_ezkit bf53x bf548_ezkit bf561_ezkit ejtag \
+au1500 avr32 bcm1250 \
+bf526_ezkit bf527_ezkit bf52x bf533_stamp bf533_ezkit bf537_stamp bf537_ezkit bf538f_ezkit bf53x \
+bf548_ezkit bf561_ezkit bfin_core ejtag \
 fjmem ixp425 jopcyc h7202 lh7a400  mpc5200 mpc824x ppc405ep ppc440gx_ebc8 prototype pxa2x0 pxa27x \
 s3c4510 sa1110 sh7727 sh7750r sh7751r sharc_21065L slsup3 tx4925 zefant_xs3/"`
 #
@@ -10771,6 +10775,38 @@ else
 else
   ENABLE_BUS_BF561_EZKIT_TRUE='#'
   ENABLE_BUS_BF561_EZKIT_FALSE=
+fi
+
+
+fi
+
+
+
+    if echo "$busdrivers" | $GREP -q bfin_core; then
+
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_BUS_BFIN_CORE 1
+_ACEOF
+
+        if true; then
+  ENABLE_BUS_BFIN_CORE_TRUE=
+  ENABLE_BUS_BFIN_CORE_FALSE='#'
+else
+  ENABLE_BUS_BFIN_CORE_TRUE='#'
+  ENABLE_BUS_BFIN_CORE_FALSE=
+fi
+
+       enabled_bus_drivers="${enabled_bus_drivers}bfin_core "
+
+else
+
+        if false; then
+  ENABLE_BUS_BFIN_CORE_TRUE=
+  ENABLE_BUS_BFIN_CORE_FALSE='#'
+else
+  ENABLE_BUS_BFIN_CORE_TRUE='#'
+  ENABLE_BUS_BFIN_CORE_FALSE=
 fi
 
 
@@ -12795,6 +12831,20 @@ $as_echo "$as_me: error: conditional \"ENABLE_BUS_BF561_EZKIT\" was never define
 Usually this means the macro was only invoked conditionally." >&2;}
    { (exit 1); exit 1; }; }
 fi
+if test -z "${ENABLE_BUS_BFIN_CORE_TRUE}" && test -z "${ENABLE_BUS_BFIN_CORE_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BFIN_CORE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BFIN_CORE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+if test -z "${ENABLE_BUS_BFIN_CORE_TRUE}" && test -z "${ENABLE_BUS_BFIN_CORE_FALSE}"; then
+  { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_BFIN_CORE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&5
+$as_echo "$as_me: error: conditional \"ENABLE_BUS_BFIN_CORE\" was never defined.
+Usually this means the macro was only invoked conditionally." >&2;}
+   { (exit 1); exit 1; }; }
+fi
 if test -z "${ENABLE_BUS_EJTAG_TRUE}" && test -z "${ENABLE_BUS_EJTAG_FALSE}"; then
   { { $as_echo "$as_me:$LINENO: error: conditional \"ENABLE_BUS_EJTAG\" was never defined.
 Usually this means the macro was only invoked conditionally." >&5
@@ -13763,9 +13813,9 @@ _ACEOF
 
 cat >>$CONFIG_STATUS <<_ACEOF || ac_write_fail=1
 # Files that config.status was made for.
-config_files="`echo $ac_config_files`"
-config_headers="`echo $ac_config_headers`"
-config_commands="`echo $ac_config_commands`"
+config_files="$ac_config_files"
+config_headers="$ac_config_headers"
+config_commands="$ac_config_commands"
 
 _ACEOF
 
@@ -13944,6 +13994,7 @@ do
     "src/svf/Makefile") CONFIG_FILES="$CONFIG_FILES src/svf/Makefile" ;;
     "src/bsdl/Makefile") CONFIG_FILES="$CONFIG_FILES src/bsdl/Makefile" ;;
     "src/jim/Makefile") CONFIG_FILES="$CONFIG_FILES src/jim/Makefile" ;;
+    "src/bfin/Makefile") CONFIG_FILES="$CONFIG_FILES src/bfin/Makefile" ;;
     "po/Makefile.in") CONFIG_FILES="$CONFIG_FILES po/Makefile.in" ;;
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;

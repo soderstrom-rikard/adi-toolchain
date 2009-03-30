@@ -133,7 +133,7 @@ RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = flash lib tap part bus cmd svf bsdl jim
+DIST_SUBDIRS = flash lib tap part bfin bus cmd svf bsdl jim
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
@@ -252,8 +252,8 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = flash lib tap part bus cmd $(am__append_1) $(am__append_2) \
-	$(am__append_7)
+SUBDIRS = flash lib tap part bfin bus cmd $(am__append_1) \
+	$(am__append_2) $(am__append_7)
 jtag_SOURCES = \
 	jtag.c
 
@@ -261,12 +261,12 @@ bsdl2jtag_SOURCES = \
 	bsdl2jtag.c
 
 jtag_DEPENDENCIES = flash/libflash.a lib/libjtaglib.a tap/libtap.a \
-	part/libpart.a bus/libbus.a cmd/libcmd.a $(am__append_3) \
-	$(am__append_4) $(am__append_9)
+	part/libpart.a bfin/libbfin.a bus/libbus.a cmd/libcmd.a \
+	$(am__append_3) $(am__append_4) $(am__append_9)
 jtag_LDADD = -Lcmd -lcmd -Ltap -ltap -Lpart -lpart -Lflash -lflash \
-	-Ltap -ltap -Lflash -lflash -Lbus -lbus -lm -Llib -ljtaglib \
-	@FTD2XXLIB@ @LIBINTL@ $(am__append_5) $(am__append_6) \
-	$(am__append_8)
+	-Ltap -ltap -Lflash -lflash -Lbus -lbus -Lbfin -lbfin -lm \
+	-Llib -ljtaglib @FTD2XXLIB@ @LIBINTL@ $(am__append_5) \
+	$(am__append_6) $(am__append_8)
 INCLUDES = -DLOCALEDIR=\"$(localedir)\"
 all: all-recursive
 

@@ -36,6 +36,13 @@
 #define	MAXLEN_PART		20
 #define	MAXLEN_STEPPING		8
 
+typedef struct part_params part_params_t;
+
+struct part_params {
+	void (*free) (void *);
+	void *data;
+};
+
 typedef struct part part_t;
 
 struct part {
@@ -53,7 +60,7 @@ struct part {
 	int boundary_length;
 	bsbit_t **bsbits;
 	/* Part specific data structure.  */
-	void *data;
+	part_params_t *params;
 };
 
 part_t *part_alloc( const tap_register *id );
@@ -79,5 +86,21 @@ void parts_free( parts_t *ps );
 int parts_add_part( parts_t *ps, part_t *p );
 void parts_set_instruction( parts_t *ps, const char *iname );
 void parts_print( parts_t *ps );
+
+typedef void (*part_init_func_t) (part_t *);
+
+typedef struct part_init part_init_t;
+
+struct part_init {
+	char part[MAXLEN_PART + 1];
+	part_init_func_t init;
+	part_init_t *next;
+};
+
+/* List of registered part initializers.  */
+extern part_init_t *part_inits;
+
+void part_init_register (char *part, part_init_func_t init);
+part_init_func_t part_find_init (char *part);
 
 #endif /* PART_H */

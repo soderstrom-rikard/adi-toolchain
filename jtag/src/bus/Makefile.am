@@ -82,6 +82,10 @@ if ENABLE_BUS_BF561_EZKIT
 libbus_a_SOURCES += bf561_ezkit.c
 endif
 
+if ENABLE_BUS_BFIN_CORE
+libbus_a_SOURCES += bfin-core.c
+endif
+
 if ENABLE_BUS_EJTAG
 libbus_a_SOURCES += ejtag.c
 endif

@@ -23,11 +23,11 @@
 
 include $(top_srcdir)/Makefile.rules
 
-noinst_LIBRARIES = libpart.a
+noinst_LIBRARIES = libbfin.a
 
-libpart_a_SOURCES = \
-	signal.c \
-	instruction.c \
-	data_register.c \
-	bsbit.c \
-	part.c
+libbfin_a_SOURCES = \
+	insn-gen.c \
+	bfin.c \
+	bfin-part.c \
+	bfin-part-bfin.c \
+	bfin-part-bf579.c

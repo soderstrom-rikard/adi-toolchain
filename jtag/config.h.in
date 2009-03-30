@@ -45,6 +45,9 @@
 /* define if bf561_ezkit is enabled */
 #undef ENABLE_BUS_BF561_EZKIT
 
+/* define if bfin_core is enabled */
+#undef ENABLE_BUS_BFIN_CORE
+
 /* define if ejtag is enabled */
 #undef ENABLE_BUS_EJTAG
 

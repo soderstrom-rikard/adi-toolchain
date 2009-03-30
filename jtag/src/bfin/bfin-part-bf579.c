@@ -18,33 +18,29 @@
 
 
 #include <stdint.h>
+#include <stdlib.h>
 #include <assert.h>
- 
+#include <string.h>
+
 #include "part.h"
-#include "blackfin-part.h"
+#include "bfin.h"
 
-/* The helper functions for Blackfin DBGCTL and DBGSTAT operations.  */
-
-static void
-bfin_dbgctl_set (part_t *part, uint16_t v)
-{
-  register_init_value (part->active_instruction->data_register->in, v);
-}
+/* The helper functions for BF579 DBGCTL and DBGSTAT operations.  */
 
 static void
-bfin_dbgstat_pre_get (part_t *part, uint16_t value)
+bf579_dbgctl_init (part_t *part, uint16_t v)
 {
-  return;
+  register_init_value (part->active_instruction->data_register->in, v << 16);
 }
 
 static uint16_t
-bfin_dbgstat_get (part_t *part)
+bf579_dbgstat_value (part_t *part)
 {
   return register_value (part->active_instruction->data_register->out);
 }
 
 static uint32_t
-bfin_test_command (uint32_t addr, int w)
+bf579_test_command (uint32_t addr, int w)
 {
   uint32_t test_command;
 
@@ -53,41 +49,37 @@ bfin_test_command (uint32_t addr, int w)
     return 0;
 
   test_command =
-    (addr & 0x0800) << 15	/* Address bit 11 */
-    | (addr & 0x8000) << 8	/* Address bit 15 */
-    | (addr & 0x3000) << 4	/* Address bits [13:12] */
-    | (addr & 0x47f8)		/* Address bits 14 and [10:3] */
-    | 0x1000000			/* Access instruction */
-    | 0x4;			/* Access data array */
+    (addr & 0xfff8)		/* Address bits [15:3] */
+    | 0x1;			/* Access to ISRAM */
 
-  if (w)
-    test_command |= 0x2;	/* Write */
+  if (w)			/* Write */
+    test_command |= 0x2;
 
   return test_command;
 }
 
-struct emu_oab bfin_emu_oab =
+struct emu_oab bf579_emu_oab =
 {
-  bfin_dbgctl_set,
-  bfin_dbgstat_get,
+  bf579_dbgctl_init,
+  bf579_dbgstat_value,
 
-  bfin_test_command,
+  bf579_test_command,
 
-  DTEST_COMMAND,
-  DTEST_DATA0,
-  DTEST_DATA1,
+  ITEST_COMMAND,
+  ITEST_DATA0,
+  ITEST_DATA1,
 
-  0, /* dbgctl_dbgstat_in_one_chain */
-  0, /* sticky_in_reset */
+  1, /* dbgctl_dbgstat_in_one_chain */
+  1, /* sticky_in_reset */
 
-  0x1000, /* DBGCTL_SRAM_INIT */
-  0x0800, /* DBGCTL_WAKEUP */
-  0x0400, /* DBGCTL_SYSRST */
-  0x0200, /* DBGCTL_ESSTEP */
+  0x0800, /* DBGCTL_SRAM_INIT */
+  0x0400, /* DBGCTL_WAKEUP */
+  0x0200, /* DBGCTL_SYSRST */
+  0x0100, /* DBGCTL_ESSTEP */
   0x0000, /* DBGCTL_EMUDATSZ_32 */
-  0x0080, /* DBGCTL_EMUDATSZ_40 */
-  0x0100, /* DBGCTL_EMUDATSZ_48 */
-  0x0180, /* DBGCTL_EMUDATSZ_MASK */
+  0x0,    /* No DBGCTL_EMUDATSZ_40 for bf579 */
+  0x0080, /* DBGCTL_EMUDATSZ_48 */
+  0x0080, /* DBGCTL_EMUDATSZ_MASK */
   0x0040, /* DBGCTL_EMUIRLPSZ_2 */
   0x0000, /* DBGCTL_EMUIRSZ_64 */
   0x0010, /* DBGCTL_EMUIRSZ_48 */
@@ -98,8 +90,8 @@ struct emu_oab bfin_emu_oab =
   0x0002, /* DBGCTL_EMFEN */
   0x0001, /* DBGCTL_EMPWR */
 
-  0x8000, /* DBGSTAT_LPDEC1 */
-  0x0000, /* No DBGSTAT_IN_POWRGATE for bfin */
+  0x0000, /* No DBGSTAT_LPDEC1 for bf579 */
+  0x8000, /* DBGSTAT_IN_POWRGATE */
   0x4000, /* DBGSTAT_CORE_FAULT */
   0x2000, /* DBGSTAT_IDLE */
   0x1000, /* DBGSTAT_IN_RESET */
@@ -113,3 +105,37 @@ struct emu_oab bfin_emu_oab =
   0x0002, /* DBGSTAT_EMUDIF */
   0x0001, /* DBGSTAT_EMUDOF */
 };
+
+
+void
+bf579_part_init (part_t *part)
+{
+  int i;
+
+  assert (part && part->params);
+
+  part->params->free = free;
+  part->params->data = malloc (sizeof (struct bfin_part_data));
+  EMU_OAB (part) = &bf579_emu_oab;
+
+  for (i = 0; i < NUM_SCANS; i++)
+    if (strcmp (part->active_instruction->name, scans[i]) == 0)
+      break;
+
+  assert (i < NUM_SCANS);
+
+  BFIN_PART_SCAN (part) = i;
+  BFIN_PART_DBGCTL (part) = 0;
+  BFIN_PART_DBGSTAT (part) = 0;
+  BFIN_PART_EMUIR_A (part) = INSN_ILLEGAL;
+  BFIN_PART_EMUIR_B (part) = INSN_ILLEGAL;
+  BFIN_PART_EMUDAT_OUT (part) = 0;
+  BFIN_PART_EMUDAT_IN (part) = 0;
+  BFIN_PART_EMUPC (part) = -1;
+}
+
+void
+bf579_init ()
+{
+  part_init_register ("BF579", bf579_part_init);
+}

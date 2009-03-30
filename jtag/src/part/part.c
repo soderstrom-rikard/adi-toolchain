@@ -29,6 +29,8 @@
 
 #include "part.h"
 
+struct part_init *part_inits = NULL;
+
 /* part */
 
 part_t *
@@ -50,6 +52,7 @@ part_alloc( const tap_register *id )
 	p->data_registers = NULL;
 	p->boundary_length = 0;
 	p->bsbits = NULL;
+	p->params = NULL;
 
 	return p;
 }
@@ -99,6 +102,10 @@ part_free( part_t *p )
 	for (i = 0; i < p->boundary_length; i++)
 		bsbit_free( p->bsbits[i] );
 	free( p->bsbits );
+
+	if (p->params && p->params->free)
+		p->params->free( p->params->data );
+	free( p->params );
 
 	free( p );
 }
@@ -330,4 +337,28 @@ parts_print( parts_t *ps )
 		printf( _(" %3d "), i );
 		part_print( p );
 	}
+}
+
+void
+part_init_register (char *part, part_init_func_t init)
+{
+  part_init_t *pi;
+
+  pi = (part_init_t *) malloc (sizeof (part_init_t));
+  strncpy (pi->part, part, MAXLEN_PART);
+  pi->init = init;
+  pi->next = part_inits;
+  part_inits = pi;
+}
+
+part_init_func_t
+part_find_init (char *part)
+{
+  part_init_t *pi;
+
+  for (pi = part_inits; pi; pi = pi->next)
+    if (strcmp (pi->part, part) == 0)
+      return pi->init;
+
+  return NULL;
 }

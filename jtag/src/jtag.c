@@ -47,7 +47,6 @@
 #endif /* ENABLE_NLS */
 
 #include "state.h"	/* for dump_tap_state */
-#include "bfin.h"	/* for leave_nop_in_emuir */
 #include "chain.h"
 #include "bus.h"
 #include "cmd.h"
@@ -316,7 +315,6 @@ main( int argc, char *const argv[] )
 			{"help",    no_argument,      0, 'h'},
 			{"quiet",   no_argument,      0, 'q'},
 			{"dump-tap-state", no_argument, 0, 10},
-			{"leave-nop-in-emuir", required_argument, 0, 11},
 			{0, 0, 0, 0}
 		};
 
@@ -356,20 +354,6 @@ main( int argc, char *const argv[] )
 		case 10:
 			dump_tap_state = 1;
 			break;
-
-		case 11:
-			if (strcmp (optarg, "default") == 0)
-				leave_nop_in_emuir = LEAVE_NOP_DEFAULT;
-			else if (strcmp (optarg, "yes") == 0)
-				leave_nop_in_emuir = LEAVE_NOP_YES;
-			else if (strcmp (optarg, "no") == 0)
-				leave_nop_in_emuir = LEAVE_NOP_NO;
-			else
-			{
-				printf (_("Error: bad argument `%s' for --leave-nop-in-emuir.\n"), optarg);
-				return -1;
-			}
-			break;
 		}
 	}
 
@@ -389,9 +373,6 @@ main( int argc, char *const argv[] )
 		printf (_("  -i, --interactive   enter interactive mode after reading files\n"));
 		printf (_("  -q, --quiet         Do not print help on startup\n"));
 		printf (_("      --dump-tap-state Dump tap state for debugging\n"));
-		printf (_("\nBlackfin specific options:\n"));
-		printf (_("      --leave-nop-in-emuir=default|yes|no\n"));
-		printf (_("                      Put a NOP in EMUIR when leaving EMUIR scan chain\n"));
 		printf ("\n");
 		printf (_("  [FILE]              file containing commands to execute\n"));
 		printf ("\n");

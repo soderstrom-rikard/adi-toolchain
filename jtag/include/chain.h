@@ -43,6 +43,7 @@ struct chain_t {
 	int active_part;
 	cable_t *cable;
 	bsdl_globs_t bsdl;
+	int main_part;
 };
 
 chain_t *chain_alloc( void );

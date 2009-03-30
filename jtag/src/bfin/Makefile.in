@@ -15,9 +15,9 @@
 @SET_MAKE@
 
 #
-# $Id: Makefile.am 1120 2008-03-15 02:27:13Z jiez $
+# $Id: Makefile.am 506 2003-08-13 10:05:15Z telka $
 #
-# Copyright (C) 2003 ETC s.r.o.
+# Copyright (C) 2002 ETC s.r.o.
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -34,7 +34,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 #
-# Written by Marcel Telka <marcel@telka.sk>, 2003.
+# Written by Marcel Telka <marcel@telka.sk>, 2002.
 #
 
 #
@@ -81,42 +81,7 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/Makefile.rules
-@ENABLE_BUS_AU1500_TRUE@am__append_1 = au1500.c
-@ENABLE_BUS_AVR32_TRUE@am__append_2 = avr32.c
-@ENABLE_BUS_BCM1250_TRUE@am__append_3 = bcm1250.c
-@ENABLE_BUS_BF526_EZKIT_TRUE@am__append_4 = bf537_stamp.c
-@ENABLE_BUS_BF527_EZKIT_TRUE@am__append_5 = bf537_stamp.c
-@ENABLE_BUS_BF533_STAMP_TRUE@am__append_6 = bf533_stamp.c
-@ENABLE_BUS_BF533_EZKIT_TRUE@am__append_7 = bf537_stamp.c
-@ENABLE_BUS_BF537_STAMP_TRUE@am__append_8 = bf537_stamp.c
-@ENABLE_BUS_BF537_EZKIT_TRUE@am__append_9 = bf537_stamp.c
-@ENABLE_BUS_BF538F_EZKIT_TRUE@am__append_10 = bf537_stamp.c
-@ENABLE_BUS_BF548_EZKIT_TRUE@am__append_11 = bf548_ezkit.c
-@ENABLE_BUS_BF561_EZKIT_TRUE@am__append_12 = bf561_ezkit.c
-@ENABLE_BUS_BFIN_CORE_TRUE@am__append_13 = bfin-core.c
-@ENABLE_BUS_EJTAG_TRUE@am__append_14 = ejtag.c
-@ENABLE_BUS_FJMEM_TRUE@am__append_15 = fjmem.c
-@ENABLE_BUS_H7202_TRUE@am__append_16 = h7202.c
-@ENABLE_BUS_IXP425_TRUE@am__append_17 = ixp425.c
-@ENABLE_BUS_JOPCYC_TRUE@am__append_18 = jopcyc.c
-@ENABLE_BUS_LH7A400_TRUE@am__append_19 = lh7a400.c
-@ENABLE_BUS_MPC5200_TRUE@am__append_20 = mpc5200.c
-@ENABLE_BUS_MPC824X_TRUE@am__append_21 = mpc824x.c
-@ENABLE_BUS_PPC405EP_TRUE@am__append_22 = ppc405ep.c
-@ENABLE_BUS_PPC440GX_EBC8_TRUE@am__append_23 = ppc440gx_ebc8.c
-@ENABLE_BUS_PROTOTYPE_TRUE@am__append_24 = prototype.c
-@ENABLE_BUS_PXA2X0_TRUE@am__append_25 = pxa2x0.c
-@ENABLE_BUS_PXA27X_TRUE@@ENABLE_BUS_PXA2X0_FALSE@am__append_26 = pxa2x0.c
-@ENABLE_BUS_S3C4510_TRUE@am__append_27 = s3c4510x.c
-@ENABLE_BUS_SA1110_TRUE@am__append_28 = sa1110.c
-@ENABLE_BUS_SH7727_TRUE@am__append_29 = sh7727.c
-@ENABLE_BUS_SH7750R_TRUE@am__append_30 = sh7750r.c
-@ENABLE_BUS_SH7751R_TRUE@am__append_31 = sh7751r.c
-@ENABLE_BUS_SHARC_21065L_TRUE@am__append_32 = sharc21065l.c
-@ENABLE_BUS_SLSUP3_TRUE@am__append_33 = slsup3.c
-@ENABLE_BUS_TX4925_TRUE@am__append_34 = tx4925.c
-@ENABLE_BUS_ZEFANT_XS3_TRUE@am__append_35 = zefant-xs3.c
-subdir = src/bus
+subdir = src/bfin
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/gettext.m4 \
 	$(top_srcdir)/m4/iconv.m4 $(top_srcdir)/m4/lib-ld.m4 \
@@ -132,67 +97,12 @@ CONFIG_CLEAN_FILES =
 LIBRARIES = $(noinst_LIBRARIES)
 AR = ar
 ARFLAGS = cru
-libbus_a_AR = $(AR) $(ARFLAGS)
-libbus_a_LIBADD =
-am__libbus_a_SOURCES_DIST = buses.c buses.h generic_bus.c \
-	generic_bus.h pxa2x0_mc.h readmem.c writemem.c au1500.c \
-	avr32.c bcm1250.c bf537_stamp.c bf533_stamp.c bf548_ezkit.c \
-	bf561_ezkit.c bfin-core.c ejtag.c fjmem.c h7202.c ixp425.c \
-	jopcyc.c lh7a400.c mpc5200.c mpc824x.c ppc405ep.c \
-	ppc440gx_ebc8.c prototype.c pxa2x0.c s3c4510x.c sa1110.c \
-	sh7727.c sh7750r.c sh7751r.c sharc21065l.c slsup3.c tx4925.c \
-	zefant-xs3.c
-@ENABLE_BUS_AU1500_TRUE@am__objects_1 = au1500.$(OBJEXT)
-@ENABLE_BUS_AVR32_TRUE@am__objects_2 = avr32.$(OBJEXT)
-@ENABLE_BUS_BCM1250_TRUE@am__objects_3 = bcm1250.$(OBJEXT)
-@ENABLE_BUS_BF526_EZKIT_TRUE@am__objects_4 = bf537_stamp.$(OBJEXT)
-@ENABLE_BUS_BF527_EZKIT_TRUE@am__objects_5 = bf537_stamp.$(OBJEXT)
-@ENABLE_BUS_BF533_STAMP_TRUE@am__objects_6 = bf533_stamp.$(OBJEXT)
-@ENABLE_BUS_BF533_EZKIT_TRUE@am__objects_7 = bf537_stamp.$(OBJEXT)
-@ENABLE_BUS_BF537_STAMP_TRUE@am__objects_8 = bf537_stamp.$(OBJEXT)
-@ENABLE_BUS_BF537_EZKIT_TRUE@am__objects_9 = bf537_stamp.$(OBJEXT)
-@ENABLE_BUS_BF538F_EZKIT_TRUE@am__objects_10 = bf537_stamp.$(OBJEXT)
-@ENABLE_BUS_BF548_EZKIT_TRUE@am__objects_11 = bf548_ezkit.$(OBJEXT)
-@ENABLE_BUS_BF561_EZKIT_TRUE@am__objects_12 = bf561_ezkit.$(OBJEXT)
-@ENABLE_BUS_BFIN_CORE_TRUE@am__objects_13 = bfin-core.$(OBJEXT)
-@ENABLE_BUS_EJTAG_TRUE@am__objects_14 = ejtag.$(OBJEXT)
-@ENABLE_BUS_FJMEM_TRUE@am__objects_15 = fjmem.$(OBJEXT)
-@ENABLE_BUS_H7202_TRUE@am__objects_16 = h7202.$(OBJEXT)
-@ENABLE_BUS_IXP425_TRUE@am__objects_17 = ixp425.$(OBJEXT)
-@ENABLE_BUS_JOPCYC_TRUE@am__objects_18 = jopcyc.$(OBJEXT)
-@ENABLE_BUS_LH7A400_TRUE@am__objects_19 = lh7a400.$(OBJEXT)
-@ENABLE_BUS_MPC5200_TRUE@am__objects_20 = mpc5200.$(OBJEXT)
-@ENABLE_BUS_MPC824X_TRUE@am__objects_21 = mpc824x.$(OBJEXT)
-@ENABLE_BUS_PPC405EP_TRUE@am__objects_22 = ppc405ep.$(OBJEXT)
-@ENABLE_BUS_PPC440GX_EBC8_TRUE@am__objects_23 =  \
-@ENABLE_BUS_PPC440GX_EBC8_TRUE@	ppc440gx_ebc8.$(OBJEXT)
-@ENABLE_BUS_PROTOTYPE_TRUE@am__objects_24 = prototype.$(OBJEXT)
-@ENABLE_BUS_PXA2X0_TRUE@am__objects_25 = pxa2x0.$(OBJEXT)
-@ENABLE_BUS_PXA27X_TRUE@@ENABLE_BUS_PXA2X0_FALSE@am__objects_26 = pxa2x0.$(OBJEXT)
-@ENABLE_BUS_S3C4510_TRUE@am__objects_27 = s3c4510x.$(OBJEXT)
-@ENABLE_BUS_SA1110_TRUE@am__objects_28 = sa1110.$(OBJEXT)
-@ENABLE_BUS_SH7727_TRUE@am__objects_29 = sh7727.$(OBJEXT)
-@ENABLE_BUS_SH7750R_TRUE@am__objects_30 = sh7750r.$(OBJEXT)
-@ENABLE_BUS_SH7751R_TRUE@am__objects_31 = sh7751r.$(OBJEXT)
-@ENABLE_BUS_SHARC_21065L_TRUE@am__objects_32 = sharc21065l.$(OBJEXT)
-@ENABLE_BUS_SLSUP3_TRUE@am__objects_33 = slsup3.$(OBJEXT)
-@ENABLE_BUS_TX4925_TRUE@am__objects_34 = tx4925.$(OBJEXT)
-@ENABLE_BUS_ZEFANT_XS3_TRUE@am__objects_35 = zefant-xs3.$(OBJEXT)
-am_libbus_a_OBJECTS = buses.$(OBJEXT) generic_bus.$(OBJEXT) \
-	readmem.$(OBJEXT) writemem.$(OBJEXT) $(am__objects_1) \
-	$(am__objects_2) $(am__objects_3) $(am__objects_4) \
-	$(am__objects_5) $(am__objects_6) $(am__objects_7) \
-	$(am__objects_8) $(am__objects_9) $(am__objects_10) \
-	$(am__objects_11) $(am__objects_12) $(am__objects_13) \
-	$(am__objects_14) $(am__objects_15) $(am__objects_16) \
-	$(am__objects_17) $(am__objects_18) $(am__objects_19) \
-	$(am__objects_20) $(am__objects_21) $(am__objects_22) \
-	$(am__objects_23) $(am__objects_24) $(am__objects_25) \
-	$(am__objects_26) $(am__objects_27) $(am__objects_28) \
-	$(am__objects_29) $(am__objects_30) $(am__objects_31) \
-	$(am__objects_32) $(am__objects_33) $(am__objects_34) \
-	$(am__objects_35)
-libbus_a_OBJECTS = $(am_libbus_a_OBJECTS)
+libbfin_a_AR = $(AR) $(ARFLAGS)
+libbfin_a_LIBADD =
+am_libbfin_a_OBJECTS = insn-gen.$(OBJEXT) bfin.$(OBJEXT) \
+	bfin-part.$(OBJEXT) bfin-part-bfin.$(OBJEXT) \
+	bfin-part-bf579.$(OBJEXT)
+libbfin_a_OBJECTS = $(am_libbfin_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/tools/depcomp
 am__depfiles_maybe = depfiles
@@ -200,8 +110,8 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libbus_a_SOURCES)
-DIST_SOURCES = $(am__libbus_a_SOURCES_DIST)
+SOURCES = $(libbfin_a_SOURCES)
+DIST_SOURCES = $(libbfin_a_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -322,21 +232,14 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-noinst_LIBRARIES = libbus.a
-libbus_a_SOURCES = buses.c buses.h generic_bus.c generic_bus.h \
-	pxa2x0_mc.h readmem.c writemem.c $(am__append_1) \
-	$(am__append_2) $(am__append_3) $(am__append_4) \
-	$(am__append_5) $(am__append_6) $(am__append_7) \
-	$(am__append_8) $(am__append_9) $(am__append_10) \
-	$(am__append_11) $(am__append_12) $(am__append_13) \
-	$(am__append_14) $(am__append_15) $(am__append_16) \
-	$(am__append_17) $(am__append_18) $(am__append_19) \
-	$(am__append_20) $(am__append_21) $(am__append_22) \
-	$(am__append_23) $(am__append_24) $(am__append_25) \
-	$(am__append_26) $(am__append_27) $(am__append_28) \
-	$(am__append_29) $(am__append_30) $(am__append_31) \
-	$(am__append_32) $(am__append_33) $(am__append_34) \
-	$(am__append_35)
+noinst_LIBRARIES = libbfin.a
+libbfin_a_SOURCES = \
+	insn-gen.c \
+	bfin.c \
+	bfin-part.c \
+	bfin-part-bfin.c \
+	bfin-part-bf579.c
+
 all: all-am
 
 .SUFFIXES:
@@ -350,9 +253,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  src/bus/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  src/bfin/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  src/bus/Makefile
+	  $(AUTOMAKE) --gnu  src/bfin/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -373,10 +276,10 @@ $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-libbus.a: $(libbus_a_OBJECTS) $(libbus_a_DEPENDENCIES) 
-	-rm -f libbus.a
-	$(libbus_a_AR) libbus.a $(libbus_a_OBJECTS) $(libbus_a_LIBADD)
-	$(RANLIB) libbus.a
+libbfin.a: $(libbfin_a_OBJECTS) $(libbfin_a_DEPENDENCIES) 
+	-rm -f libbfin.a
+	$(libbfin_a_AR) libbfin.a $(libbfin_a_OBJECTS) $(libbfin_a_LIBADD)
+	$(RANLIB) libbfin.a
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -384,39 +287,11 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/au1500.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/avr32.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bcm1250.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bf533_stamp.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bf537_stamp.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bf548_ezkit.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bf561_ezkit.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bfin-core.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/buses.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ejtag.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fjmem.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/generic_bus.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/h7202.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ixp425.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jopcyc.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lh7a400.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpc5200.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mpc824x.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ppc405ep.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ppc440gx_ebc8.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/prototype.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pxa2x0.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readmem.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/s3c4510x.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sa1110.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sh7727.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sh7750r.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sh7751r.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sharc21065l.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slsup3.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tx4925.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/writemem.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/zefant-xs3.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bfin-part-bf579.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bfin-part-bfin.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bfin-part.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bfin.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/insn-gen.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

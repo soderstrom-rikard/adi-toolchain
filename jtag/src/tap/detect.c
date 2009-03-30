@@ -253,6 +253,7 @@ detect_parts( chain_t *chain, const char *db_path )
 		tap_register *key;
 		struct id_record idr;
 		char *p;
+		part_init_func_t part_init_func;
 
 		tap_shift_register( chain, one, br, 0 );
 		if (register_compare( one, br ) == 0) {
@@ -372,7 +373,17 @@ detect_parts( chain_t *chain, const char *db_path )
 
 		if (part->active_instruction == NULL)
 			part->active_instruction = part_find_instruction( part, "IDCODE" );
+
+		/* Do part specific initialization.  */
+		part_init_func = part_find_init (part->part);
+		if (part_init_func)
+		  {
+		    part->params = (part_params_t *) malloc (sizeof (part_params_t));
+		    (*part_init_func) (part);
+		  }
 	}
+
+	chain->main_part = ps->len - 1;
 
 	for (i = 0; i < 32; i++) {
 		tap_shift_register( chain, one, br, 0 );

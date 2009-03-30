@@ -28,6 +28,7 @@ SUBDIRS = \
 	lib \
 	tap \
 	part \
+	bfin \
 	bus \
 	cmd
 
@@ -54,6 +55,7 @@ jtag_DEPENDENCIES = \
 	lib/libjtaglib.a \
 	tap/libtap.a \
 	part/libpart.a \
+	bfin/libbfin.a \
 	bus/libbus.a \
 	cmd/libcmd.a
 
@@ -73,6 +75,7 @@ jtag_LDADD = \
 	-Ltap -ltap \
 	-Lflash -lflash \
 	-Lbus -lbus \
+	-Lbfin -lbfin \
 	-lm \
 	-Llib -ljtaglib \
 	@FTD2XXLIB@ \

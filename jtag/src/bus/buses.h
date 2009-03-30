@@ -39,6 +39,7 @@ extern const bus_driver_t bf538f_ezkit_bus;
 extern const bus_driver_t bf53x_bus;
 extern const bus_driver_t bf548_ezkit_bus;
 extern const bus_driver_t bf561_ezkit_bus;
+extern const bus_driver_t bfin_core_bus;
 extern const bus_driver_t ejtag_bus;
 extern const bus_driver_t fjmem_bus;
 extern const bus_driver_t h7202_bus;
