@@ -1,3 +1,9 @@
+2009-03-31  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* final.c (insn_current_align): Delete.
+	(insn_current_reference_address): Just return insn_current_address.
+	(shorten_branches): Always assume worst case for label alignments.
+
 2009-03-27  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_expand_builtin,
