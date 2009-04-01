@@ -24,7 +24,7 @@
 #define ANOMALY_05000119 (1)
 /* Rx.H Cannot Be Used to Access 16-bit System MMR Registers */
 #define ANOMALY_05000122 (1)
-/* PPI Data Lengths between 8 and 16 Do Not Zero Out Upper Bits */
+/* PPI Data Lengths Between 8 and 16 Do Not Zero Out Upper Bits */
 #define ANOMALY_05000166 (1)
 /* PPI_COUNT Cannot Be Programmed to 0 in General Purpose TX or RX Modes */
 #define ANOMALY_05000179 (1)
@@ -40,13 +40,13 @@
 #define ANOMALY_05000229 (1)
 /* PPI_FS3 Is Not Driven in 2 or 3 Internal Frame Sync Transmit Modes */
 #define ANOMALY_05000233 (1)
-/* If i-cache is on, CSYNC/SSYNC/IDLE around Change of Control causes failures */
+/* If I-Cache Is On, CSYNC/SSYNC/IDLE Around Change of Control Causes Failures */
 #define ANOMALY_05000244 (__SILICON_REVISION__ < 3)
-/* Spurious Hardware Error from an Access in the Shadow of a Conditional Branch */
+/* False Hardware Error from an Access in the Shadow of a Conditional Branch */
 #define ANOMALY_05000245 (1)
 /* Maximum External Clock Speed for Timers */
 #define ANOMALY_05000253 (1)
-/* DCPLB_FAULT_ADDR MMR register may be corrupted */
+/* DCPLB_FAULT_ADDR MMR Register May Be Corrupted */
 #define ANOMALY_05000261 (__SILICON_REVISION__ < 3)
 /* High I/O Activity Causes Output Voltage of Internal Voltage Regulator (Vddint) to Decrease */
 #define ANOMALY_05000270 (__SILICON_REVISION__ < 4)
@@ -58,11 +58,11 @@
 #define ANOMALY_05000277 (__SILICON_REVISION__ < 4)
 /* Disabling Peripherals with DMA Running May Cause DMA System Instability */
 #define ANOMALY_05000278 (__SILICON_REVISION__ < 4)
-/* False Hardware Error Exception when ISR Context Is Not Restored */
+/* False Hardware Error Exception When ISR Context Is Not Restored */
 #define ANOMALY_05000281 (__SILICON_REVISION__ < 4)
 /* Memory DMA Corruption with 32-Bit Data and Traffic Control */
 #define ANOMALY_05000282 (__SILICON_REVISION__ < 4)
-/* System MMR Write Is Stalled Indefinitely when Killed in a Particular Stage */
+/* System MMR Write Is Stalled Indefinitely When Killed in a Particular Stage */
 #define ANOMALY_05000283 (__SILICON_REVISION__ < 4)
 /* SPORTs May Receive Bad Data If FIFOs Fill Up */
 #define ANOMALY_05000288 (__SILICON_REVISION__ < 4)
@@ -80,11 +80,11 @@
 #define ANOMALY_05000307 (__SILICON_REVISION__ < 4)
 /* False Hardware Errors Caused by Fetches at the Boundary of Reserved Memory */
 #define ANOMALY_05000310 (1)
-/* Errors when SSYNC, CSYNC, or Loads to LT, LB and LC Registers Are Interrupted */
+/* Errors When SSYNC, CSYNC, or Loads to LT, LB and LC Registers Are Interrupted */
 #define ANOMALY_05000312 (__SILICON_REVISION__ < 5)
-/* PPI Is Level-Sensitive on First Transfer */
+/* PPI Is Level-Sensitive on First Transfer In Single Frame Sync Modes */
 #define ANOMALY_05000313 (__SILICON_REVISION__ < 4)
-/* Killed System MMR Write Completes Erroneously on Next System MMR Access */
+/* Killed System MMR Write Completes Erroneously On Next System MMR Access */
 #define ANOMALY_05000315 (__SILICON_REVISION__ < 4)
 /* PFx Glitch on Write to FIO_FLAG_D or FIO_FLAG_T */
 #define ANOMALY_05000318 (__SILICON_REVISION__ < 4)

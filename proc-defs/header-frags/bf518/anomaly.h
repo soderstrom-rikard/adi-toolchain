@@ -47,7 +47,7 @@
 #define ANOMALY_05000435 (1)
 /* PORTx_DRIVE and PORTx_HYSTERESIS Registers Read Back Incorrect Values */
 #define ANOMALY_05000438 (1)
-/* Preboot Cannot be Used to Program the PLL_DIV Register */
+/* Preboot Cannot be Used to Alter the PLL_DIV Register */
 #define ANOMALY_05000439 (1)
 /* bfrom_SysControl() Cannot be Used to Write the PLL_DIV Register */
 #define ANOMALY_05000440 (1)

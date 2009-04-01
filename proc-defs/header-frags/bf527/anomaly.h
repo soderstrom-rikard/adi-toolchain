@@ -31,7 +31,7 @@
 #define ANOMALY_05000119 (1)	/* note: brokenness is noted in documentation, not anomaly sheet */
 /* Rx.H Cannot Be Used to Access 16-bit System MMR Registers */
 #define ANOMALY_05000122 (1)
-/* Spurious Hardware Error from an Access in the Shadow of a Conditional Branch */
+/* False Hardware Error from an Access in the Shadow of a Conditional Branch */
 #define ANOMALY_05000245 (1)
 /* Incorrect Timer Pulse Width in Single-Shot PWM_OUT Mode with External Clock */
 #define ANOMALY_05000254 (1)

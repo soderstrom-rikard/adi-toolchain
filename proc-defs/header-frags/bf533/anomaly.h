@@ -48,7 +48,7 @@
 #define ANOMALY_05000158 (__SILICON_REVISION__ < 5)
 /* PPI Data Lengths Between 8 and 16 Do Not Zero Out Upper Bits */
 #define ANOMALY_05000166 (1)
-/* Turning Serial Ports on with External Frame Syncs */
+/* Turning SPORTs on while External Frame Sync Is Active May Corrupt Data */
 #define ANOMALY_05000167 (1)
 /* PPI_COUNT Cannot Be Programmed to 0 in General Purpose TX or RX Modes */
 #define ANOMALY_05000179 (__SILICON_REVISION__ < 5)
@@ -104,7 +104,7 @@
 #define ANOMALY_05000242 (__SILICON_REVISION__ < 5)
 /* If I-Cache Is On, CSYNC/SSYNC/IDLE Around Change of Control Causes Failures */
 #define ANOMALY_05000244 (__SILICON_REVISION__ < 5)
-/* Spurious Hardware Error from an Access in the Shadow of a Conditional Branch */
+/* False Hardware Error from an Access in the Shadow of a Conditional Branch */
 #define ANOMALY_05000245 (1)
 /* Data CPLBs Should Prevent Spurious Hardware Errors */
 #define ANOMALY_05000246 (__SILICON_REVISION__ < 5)
@@ -172,7 +172,7 @@
 #define ANOMALY_05000311 (__SILICON_REVISION__ < 6)
 /* Errors When SSYNC, CSYNC, or Loads to LT, LB and LC Registers Are Interrupted */
 #define ANOMALY_05000312 (__SILICON_REVISION__ < 6)
-/* PPI Is Level-Sensitive on First Transfer */
+/* PPI Is Level-Sensitive on First Transfer In Single Frame Sync Modes */
 #define ANOMALY_05000313 (__SILICON_REVISION__ < 6)
 /* Killed System MMR Write Completes Erroneously On Next System MMR Access */
 #define ANOMALY_05000315 (__SILICON_REVISION__ < 6)
@@ -237,17 +237,17 @@
 #define ANOMALY_05000145 (__SILICON_REVISION__ < 3)
 /* MDMA may lose the first few words of a descriptor chain */
 #define ANOMALY_05000146 (__SILICON_REVISION__ < 3)
-/* The source MDMA descriptor may stop with a DMA Error */
+/* Source MDMA descriptor may stop with a DMA Error near beginning of descriptor fetch */
 #define ANOMALY_05000147 (__SILICON_REVISION__ < 3)
 /* When booting from a 16-bit asynchronous memory device, the upper 8-bits of each word must be 0x00 */
 #define ANOMALY_05000148 (__SILICON_REVISION__ < 3)
 /* Frame Delay in SPORT Multichannel Mode */
 #define ANOMALY_05000153 (__SILICON_REVISION__ < 3)
-/* SPORT TFS signal is active in Multi-channel mode outside of valid channels */
+/* SPORT TFS signal stays active in multichannel mode outside of valid channels */
 #define ANOMALY_05000154 (__SILICON_REVISION__ < 3)
 /* Timer1 can not be used for PWMOUT mode when a certain PPI mode is in use */
 #define ANOMALY_05000155 (__SILICON_REVISION__ < 3)
-/* A killed 32-bit System MMR write will lead to the next system MMR access thinking it should be 32-bit. */
+/* Killed 32-bit MMR write leads to next system MMR access thinking it should be 32-bit */
 #define ANOMALY_05000157 (__SILICON_REVISION__ < 3)
 /* SPORT transmit data is not gated by external frame sync in certain conditions */
 #define ANOMALY_05000163 (__SILICON_REVISION__ < 3)

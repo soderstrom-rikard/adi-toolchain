@@ -22,7 +22,7 @@
 #define ANOMALY_05000074 (1)
 /* UART Line Status Register (UART_LSR) Bits Are Not Updated at the Same Time */
 #define ANOMALY_05000099 (__SILICON_REVISION__ < 5)
-/* Trace Buffers may contain errors in emulation mode and/or exception, NMI, reset handlers */
+/* Trace Buffers may record discontinuities into emulation mode and/or exception, NMI, reset handlers */
 #define ANOMALY_05000116 (__SILICON_REVISION__ < 3)
 /* Testset instructions restricted to 32-bit aligned memory locations */
 #define ANOMALY_05000120 (1)
@@ -40,7 +40,7 @@
 #define ANOMALY_05000136 (__SILICON_REVISION__ < 3)
 /* Allowing the SPORT RX FIFO to fill will cause an overflow */
 #define ANOMALY_05000140 (__SILICON_REVISION__ < 3)
-/* Infinite Stall may occur with a particular sequence of consecutive dual dag events */
+/* An Infinite Stall occurs with a particular sequence of consecutive dual dag events */
 #define ANOMALY_05000141 (__SILICON_REVISION__ < 3)
 /* Interrupts may be lost when a programmable input flag is configured to be edge sensitive */
 #define ANOMALY_05000142 (__SILICON_REVISION__ < 3)
@@ -80,7 +80,7 @@
 #define ANOMALY_05000163 (__SILICON_REVISION__ < 3)
 /* PPI Data Lengths Between 8 and 16 Do Not Zero Out Upper Bits */
 #define ANOMALY_05000166 (1)
-/* Turning Serial Ports on with External Frame Syncs */
+/* Turning SPORTs on while External Frame Sync Is Active May Corrupt Data */
 #define ANOMALY_05000167 (1)
 /* SDRAM auto-refresh and subsequent Power Ups */
 #define ANOMALY_05000168 (__SILICON_REVISION__ < 5)
@@ -164,7 +164,7 @@
 #define ANOMALY_05000242 (__SILICON_REVISION__ < 5)
 /* If I-Cache Is On, CSYNC/SSYNC/IDLE Around Change of Control Causes Failures */
 #define ANOMALY_05000244 (__SILICON_REVISION__ < 5)
-/* Spurious Hardware Error from an Access in the Shadow of a Conditional Branch */
+/* False Hardware Error from an Access in the Shadow of a Conditional Branch */
 #define ANOMALY_05000245 (__SILICON_REVISION__ < 5)
 /* TESTSET operation forces stall on the other core */
 #define ANOMALY_05000248 (__SILICON_REVISION__ < 5)
@@ -208,7 +208,7 @@
 #define ANOMALY_05000275 (__SILICON_REVISION__ > 2)
 /* Timing Requirements Change for External Frame Sync PPI Modes with Non-Zero PPI_DELAY */
 #define ANOMALY_05000276 (__SILICON_REVISION__ < 5)
-/* Writes to an I/O data register one SCLK cycle after an edge is detected may clear interrupt */
+/* Writes to an I/O Data Register One SCLK Cycle after an Edge Is Detected May Clear Interrupt */
 #define ANOMALY_05000277 (__SILICON_REVISION__ < 3)
 /* Disabling Peripherals with DMA Running May Cause DMA System Instability */
 #define ANOMALY_05000278 (__SILICON_REVISION__ < 5)
@@ -232,7 +232,7 @@
 #define ANOMALY_05000310 (1)
 /* Errors When SSYNC, CSYNC, or Loads to LT, LB and LC Registers Are Interrupted */
 #define ANOMALY_05000312 (1)
-/* PPI Is Level-Sensitive on First Transfer */
+/* PPI Is Level-Sensitive on First Transfer In Single Frame Sync Modes */
 #define ANOMALY_05000313 (1)
 /* Killed System MMR Write Completes Erroneously On Next System MMR Access */
 #define ANOMALY_05000315 (1)

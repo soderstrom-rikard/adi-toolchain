@@ -19,13 +19,13 @@
 #define ANOMALY_05000119 (1)
 /* Rx.H Cannot Be Used to Access 16-bit System MMR Registers */
 #define ANOMALY_05000122 (1)
-/* Spurious Hardware Error from an Access in the Shadow of a Conditional Branch */
+/* False Hardware Error from an Access in the Shadow of a Conditional Branch */
 #define ANOMALY_05000245 (1)
 /* Sensitivity To Noise with Slow Input Edge Rates on External SPORT TX and RX Clocks */
 #define ANOMALY_05000265 (1)
 /* Certain Data Cache Writethrough Modes Fail for Vddint <= 0.9V */
 #define ANOMALY_05000272 (1)
-/* False Hardware Error Exception when ISR context is not restored */
+/* False Hardware Error Exception When ISR Context Is Not Restored */
 #define ANOMALY_05000281 (__SILICON_REVISION__ < 1)
 /* SSYNCs After Writes To CAN/DMA MMR Registers Are Not Always Handled Correctly */
 #define ANOMALY_05000304 (__SILICON_REVISION__ < 1)
@@ -59,7 +59,7 @@
 #define ANOMALY_05000340 (__SILICON_REVISION__ < 1)
 /* Boot Host Wait (HWAIT) and Boot Host Wait Alternate (HWAITA) Signals Are Swapped */
 #define ANOMALY_05000344 (__SILICON_REVISION__ < 1)
-/* USB Calibration Value Is Not Intialized */
+/* USB Calibration Value Is Not Initialized */
 #define ANOMALY_05000346 (__SILICON_REVISION__ < 1)
 /* USB Calibration Value to use */
 #define ANOMALY_05000346_value 0x5411
@@ -147,11 +147,11 @@
 #define ANOMALY_05000416 (1)
 /* Multichannel SPORT Channel Misalignment Under Specific Configuration */
 #define ANOMALY_05000425 (1)
-/* Speculative Fetches of Indirect-Pointer Instructions Can Cause Spurious Hardware Errors */
+/* Speculative Fetches of Indirect-Pointer Instructions Can Cause False Hardware Errors */
 #define ANOMALY_05000426 (1)
 /* CORE_EPPI_PRIO bit and SYS_EPPI_PRIO bit in the HMDMA1_CONTROL register are not functional */
 #define ANOMALY_05000427 (__SILICON_REVISION__ < 2)
-/* WB_EDGE Bit in NFC_IRQSTAT Incorrectly Behaves as a Buffer Status Bit Instead of an IRQ Status Bit */
+/* WB_EDGE Bit in NFC_IRQSTAT Incorrectly Reflects Buffer Status Instead of IRQ Status */
 #define ANOMALY_05000429 (__SILICON_REVISION__ < 2)
 /* Software System Reset Corrupts PLL_LOCKCNT Register */
 #define ANOMALY_05000430 (__SILICON_REVISION__ >= 2)
