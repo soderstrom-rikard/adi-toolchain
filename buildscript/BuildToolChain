@@ -366,7 +366,7 @@ if [ -n "$CHECK_PRE" ] ; then
                 continue
             fi
             file=$(which $file)
-            echo "** Could not find version of $file"
+            echo "** Looking up file $file for more info"
             while [ -L "$file" ] ; do
                 printf " * "
                 file $file
