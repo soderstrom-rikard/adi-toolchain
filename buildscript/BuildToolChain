@@ -354,9 +354,13 @@ if [ -n "$CHECK_PRE" ] ; then
                 continue
             fi
 
+            VER_ok=""
             for VER in --version -version -V
             do
-                tmp=`$file $VER < /dev/null 2>&1 | grep -ie "version " | grep -vi "option" | grep -vi "Usage" | grep -vi "\-v"`
+                if tmp=`$file $VER < /dev/null 2>&1` ; then
+                    VER_ok=$tmp
+                fi
+                tmp=$(echo "$tmp" | grep -ie "version " | grep -vi -e "option" -e "Usage" -e "\-v")
                 if [ -n "$tmp" ] ; then
                     echo "  " $tmp
                     break
@@ -366,7 +370,7 @@ if [ -n "$CHECK_PRE" ] ; then
                 continue
             fi
             file=$(which $file)
-            echo "** Looking up file $file for more info"
+            echo "** Looking up file $file for more info${VER_ok:+ ($VER_ok)}"
             while [ -L "$file" ] ; do
                 printf " * "
                 file $file
