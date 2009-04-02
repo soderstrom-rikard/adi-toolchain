@@ -6,7 +6,7 @@
  * Licensed under the GPL-2 or later.
  */
 
-/* This file shoule be up to date with:
+/* This file should be up to date with:
  *  - Revision Q, 11/07/2008; ADSP-BF561 Blackfin Processor Anomaly List
  */
 
