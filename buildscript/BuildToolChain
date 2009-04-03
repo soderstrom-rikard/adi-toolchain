@@ -1153,7 +1153,6 @@ build_gcc ()
     RUN="$DIR_GCC_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-$2 \
       --prefix=$3 $4 --disable-libstdcxx-pch $BFIN_LANGS $EXTRA_GCC_CONF \
       --disable-symvers --disable-libssp --disable-libffi $LOCALE \
-      --with-gxx-include-dir=$3/bfin-$2/include/c++/$VERSION \
       --enable-version-specific-runtime-libs --enable-__cxa_atexit \
       --with-bugurl=URL:http://blackfin.uclinux.org/gf/project/toolchain/tracker \
       --with-pkgversion=${PKGVERSION}"
