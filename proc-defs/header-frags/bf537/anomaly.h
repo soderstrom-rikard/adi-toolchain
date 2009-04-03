@@ -42,8 +42,6 @@
 #define ANOMALY_05000122 (1)
 /* Killed 32-bit MMR write leads to next system MMR access thinking it should be 32-bit */
 #define ANOMALY_05000157 (__SILICON_REVISION__ < 2)
-/* Turning SPORTs on while External Frame Sync Is Active May Corrupt Data */
-#define ANOMALY_05000167 (1)
 /* PPI_DELAY Not Functional in PPI Modes with 0 Frame Syncs */
 #define ANOMALY_05000180 (1)
 /* Instruction Cache Is Not Functional */
