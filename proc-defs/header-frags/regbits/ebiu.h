@@ -373,8 +373,8 @@
 #define EB0SZ_128	(EBSZ_128<<0)	/* SDRAM external bank size = 128MB */
 #define EB0CAW_8	(EBCAW_8<<0)	/* SDRAM external bank column address width = 8 bits */
 #define EB0CAW_9	(EBCAW_9<<0)	/* SDRAM external bank column address width = 9 bits */
-#define EB0CAW_10	(EBCAW_10<<0)	/* SDRAM external bank column address width = 9 bits */
-#define EB0CAW_11	(EBCAW_11<<0)	/* SDRAM external bank column address width = 9 bits */
+#define EB0CAW_10	(EBCAW_10<<0)	/* SDRAM external bank column address width = 10 bits */
+#define EB0CAW_11	(EBCAW_11<<0)	/* SDRAM external bank column address width = 11 bits */
 
 #define EB1E		(EBE<<8)	/* Enable SDRAM external bank 0 */
 #define EB1SZ_16	(EBSZ_16<<8)	/* SDRAM external bank size = 16MB */
@@ -383,8 +383,8 @@
 #define EB1SZ_128	(EBSZ_128<<8)	/* SDRAM external bank size = 128MB */
 #define EB1CAW_8	(EBCAW_8<<8)	/* SDRAM external bank column address width = 8 bits */
 #define EB1CAW_9	(EBCAW_9<<8)	/* SDRAM external bank column address width = 9 bits */
-#define EB1CAW_10	(EBCAW_10<<8)	/* SDRAM external bank column address width = 9 bits */
-#define EB1CAW_11	(EBCAW_11<<8)	/* SDRAM external bank column address width = 9 bits */
+#define EB1CAW_10	(EBCAW_10<<8)	/* SDRAM external bank column address width = 10 bits */
+#define EB1CAW_11	(EBCAW_11<<8)	/* SDRAM external bank column address width = 11 bits */
 
 #define EB2E		(EBE<<16)	/* Enable SDRAM external bank 0 */
 #define EB2SZ_16	(EBSZ_16<<16)	/* SDRAM external bank size = 16MB */
@@ -393,8 +393,8 @@
 #define EB2SZ_128	(EBSZ_128<<16)	/* SDRAM external bank size = 128MB */
 #define EB2CAW_8	(EBCAW_8<<16)	/* SDRAM external bank column address width = 8 bits */
 #define EB2CAW_9	(EBCAW_9<<16)	/* SDRAM external bank column address width = 9 bits */
-#define EB2CAW_10	(EBCAW_10<<16)	/* SDRAM external bank column address width = 9 bits */
-#define EB2CAW_11	(EBCAW_11<<16)	/* SDRAM external bank column address width = 9 bits */
+#define EB2CAW_10	(EBCAW_10<<16)	/* SDRAM external bank column address width = 10 bits */
+#define EB2CAW_11	(EBCAW_11<<16)	/* SDRAM external bank column address width = 11 bits */
 
 #define EB3E		(EBE<<24)	/* Enable SDRAM external bank 0 */
 #define EB3SZ_16	(EBSZ_16<<24)	/* SDRAM external bank size = 16MB */
@@ -403,8 +403,8 @@
 #define EB3SZ_128	(EBSZ_128<<24)	/* SDRAM external bank size = 128MB */
 #define EB3CAW_8	(EBCAW_8<<24)	/* SDRAM external bank column address width = 8 bits */
 #define EB3CAW_9	(EBCAW_9<<24)	/* SDRAM external bank column address width = 9 bits */
-#define EB3CAW_10	(EBCAW_10<<24)	/* SDRAM external bank column address width = 9 bits */
-#define EB3CAW_11	(EBCAW_11<<24)	/* SDRAM external bank column address width = 9 bits */
+#define EB3CAW_10	(EBCAW_10<<24)	/* SDRAM external bank column address width = 10 bits */
+#define EB3CAW_11	(EBCAW_11<<24)	/* SDRAM external bank column address width = 11 bits */
 
 #endif /* BF561 */
 
