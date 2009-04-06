@@ -14,6 +14,11 @@
 #ifndef _MACH_ANOMALY_H_
 #define _MACH_ANOMALY_H_
 
+/* We do not support 0.0 silicon - sorry */
+#if __SILICON_REVISION__ < 1
+# error will not work on BF526/BF527 silicon version 0.0
+#endif
+
 #if defined(__ADSPBF522__) || defined(__ADSPBF524__) || defined(__ADSPBF526__)
 # define ANOMALY_BF526 1
 #else

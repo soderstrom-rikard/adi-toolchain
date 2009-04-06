@@ -13,6 +13,11 @@
 #ifndef _MACH_ANOMALY_H_
 #define _MACH_ANOMALY_H_
 
+/* We do not support 0.0 or 0.1 silicon - sorry */
+#if __SILICON_REVISION__ < 2
+# error will not work on BF548 silicon version 0.0, or 0.1
+#endif
+
 /* Multi-issue instruction with dsp32shiftimm in slot1 and P-reg store in slot 2 not supported */
 #define ANOMALY_05000074 (1)
 /* DMA_RUN Bit Is Not Valid after a Peripheral Receive Channel DMA Stops */
