@@ -10,9 +10,9 @@
  *  - Revision B, 02/03/2009; ADSP-BF512/BF514/BF516/BF518 Blackfin Processor Anomaly List
  */
 
-/* We do not support 0.0 silicon - sorry */
-#if __SILICON_REVISION__ < 1
-# error will not work on BF518 silicon version 0.0
+/* We plan on not supporting 0.0 silicon, but 0.1 isn't out yet - sorry */
+#if __SILICON_REVISION__ < 0
+# error will not work on BF518 silicon version 
 #endif
 
 #ifndef _MACH_ANOMALY_H_
