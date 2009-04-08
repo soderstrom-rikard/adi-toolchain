@@ -1378,238 +1378,41 @@ install_all_target_libs()
 			old_lver=${old_lver#${lib}.}
 			compare_version ${lver} ${old_lver}
 			if [ $? -eq 1 ] ; then
-				echo_date "Updating shared ${lib} (${lver})"
-				rm "${tdir}/${lib}".*
+				echo_date "Up ${mdir}${lib} (${lver})"
+				run_cmd rm "${tdir}/${lib}".*
 			else
 				movit=false
 			fi
 		else
-			echo_date "Installing shared ${lib} (${lver})"
+			echo_date "Ins ${mdir}${lib} (${lver})"
 		fi
 		if ${movit} ; then
-			mv "${gccdir}/${otarg}" "${tdir}/${ntarg}"
-			ln -s "${ntarg}" "${tdir}/${soname}"
+			run_cmd mv "${gccdir}/${otarg}" "${tdir}/${ntarg}"
+			run_cmd ln -s "${ntarg}" "${tdir}/${soname}"
 		fi
-		rm "${flib}"*
-		ln -s "${reltdir}/${soname}" "${flib}"
-	done
-}
-
-# If $1 is newer than $2, return 1. Otherwise, return 0.
-is_newer ()
-{
-    MAJOR1=`echo $1 | sed 's/\([0-9]*\).*/\1/'`
-    MINOR1=`echo $1 | sed 's/[0-9]*.\([0-9]*\).*/\1/'`
-    PATCH1=`echo $1 | sed 's/[0-9]*.[0-9]*.\([0-9]*\).*/\1/'`
-    MAJOR2=`echo $2 | sed 's/\([0-9]*\).*/\1/'`
-    MINOR2=`echo $2 | sed 's/[0-9]*.\([0-9]*\).*/\1/'`
-    PATCH2=`echo $2 | sed 's/[0-9]*.[0-9]*.\([0-9]*\).*/\1/'`
-
-    if [ -z "$MAJOR1" -o -z "$MINOR1" -o -z "$PATCH1" -o -z "$MAJOR2" -o -z "$MINOR2" -o -z "$PATCH2" ]; then
-	return 0;
-    fi
-
-    if [ "$MAJOR1" -lt "$MAJOR2" ]; then
-	return 0;
-    elif [ "$MAJOR1" -gt "$MAJOR2" ]; then
-	return 1;
-    elif [ "$MINOR1" -lt "$MINOR2" ]; then
-	return 0;
-    elif [ "$MINOR1" -gt "$MINOR2" ]; then
-	return 1;
-    elif [ "$PATCH1" -lt "$PATCH2" ]; then
-	return 0;
-    elif [ "$PATCH1" -gt "$PATCH2" ]; then
-	return 1;
-    else
-	return 0;
-    fi
-}
-
-# If $1 is compatible with $2, return 1. Otherwise, return 0.
-is_compat ()
-{
-    MAJOR1=`echo $1 | sed 's/\([0-9]*\).*/\1/'`
-    MINOR1=`echo $1 | sed 's/[0-9]*.\([0-9]*\).*/\1/'`
-    PATCH1=`echo $1 | sed 's/[0-9]*.[0-9]*.\([0-9]*\).*/\1/'`
-    MAJOR2=`echo $2 | sed 's/\([0-9]*\).*/\1/'`
-    MINOR2=`echo $2 | sed 's/[0-9]*.\([0-9]*\).*/\1/'`
-    PATCH2=`echo $2 | sed 's/[0-9]*.[0-9]*.\([0-9]*\).*/\1/'`
-
-    if [ -z "$MAJOR1" -o -z "$MINOR1" -o -z "$PATCH1" -o -z "$MAJOR2" -o -z "$MINOR2" -o -z "$PATCH2" ]; then
-	return 0;
-    fi
-
-    if [ "$MAJOR1" -eq "$MAJOR2" -a "$MINOR1" -eq "$MINOR2" ]; then
-	return 1;
-    else
-	return 0;
-    fi
-}
-
-# Install shared libstdc++ libraries into sysroot direcotory
-# 1st argument is the toolchain install directory
-# 2nd argument is the toolchain name
-
-install_target_libs ()
-{
-    GCCS2=`find $1 -name bfin-linux-uclibc-gcc-* | tr '\n' ' '`
-    GCCS=
-
-    # First, restrict the list to eliminate the compiler versions which
-    # don't provide the library at all.
-    for GCC in $GCCS2; do
-	TARGET_SHLIB=`$GCC --print-file-name=$3.so`
-
-	if [ "$TARGET_SHLIB" != "$3.so" ]; then
-	    GCCS="$GCCS $GCC"
-	fi
-    done
-
-    while [ -n "$GCCS" ]; do
-	GCCS2=""
-	COMPAT_GCCS=""
-	NEWEST_VERSION=""
-	NEWEST_GCC=""
-
-	for GCC in $GCCS; do
-	    TARGET_SHLIB=`$GCC --print-file-name=$3.so`
-
-	    TARGET_SHLIB=`readlink -f $TARGET_SHLIB`
-	    TARGET_SHLIB_DIR=`dirname $TARGET_SHLIB`
-	    TARGET_SHLIB_NAME=`basename $TARGET_SHLIB`
-	    TARGET_SHLIB_VERSION=`echo $TARGET_SHLIB_NAME | sed s/$3.so.'\([0-9]*.[0-9]*.[0-9]*\).*/\1/'`
-
-	    if [ -z "$NEWEST_VERSION" ]; then
-		NEWEST_VERSION=$TARGET_SHLIB_VERSION
-		NEWEST_GCC=$GCC
-		COMPAT_GCCS=$GCC
-		continue
-	    fi
-
-	    is_compat $TARGET_SHLIB_VERSION $NEWEST_VERSION
-	    if [ $? -eq 1 ]; then
-		COMPAT_GCCS="$COMPAT_GCCS $GCC"
-
-		is_newer $TARGET_SHLIB_VERSION $NEWEST_VERSION
-		if [ $? -eq 1 ]; then
-		    NEWEST_VERSION=$TARGET_SHLIB_VERSION
-		    NEWEST_GCC=$GCC
-		fi
-	    else
-		GCCS2="$GCCS2 $GCC"
-	    fi
+		run_cmd rm "${flib}"*
+		run_cmd ln -s "${reltdir}/${soname}" "${flib}"
 	done
 
-	GCCS=$GCCS2
-
-	echo_date "Installing shared $3 ($NEWEST_VERSION)"
-
-	MULTILIBS=`$NEWEST_GCC --print-multi-lib`
-
-	for ml in $MULTILIBS; do
-
-	    dir=`echo ${ml} | sed -e 's/;.*$//'`
-	    flags=`echo ${ml} | sed -e 's/^[^;]*;//' -e 's/@/ -/g'`
-	    if [ "$dir" = "." ]; then
-		dir2=
-	    else
-		dir2=`echo ${dir} | sed -e 's|[^/]*|..|g'`/
-	    fi
-
-	    TARGET_SHLIB=`$NEWEST_GCC $flags --print-file-name=$3.so`
-	    TARGET_SHLIB=`readlink -f $TARGET_SHLIB`
-	    TARGET_SHLIB_DIR=`dirname $TARGET_SHLIB`
-	    TARGET_SHLIB_NAME=`basename $TARGET_SHLIB`
-	    TARGET_SHLIB_VERSION=`echo $TARGET_SHLIB_NAME | sed s/$3.so.'\([0-9]*.[0-9]*.[0-9]*\).*/\1/'`
-	    MAJOR_NUM=`echo $TARGET_SHLIB_VERSION | sed 's/\([0-9]*\).*/\1/'`
-
-	    RUN="cp $TARGET_SHLIB $1/$2/runtime/$dir/lib; \
-	    ln -s $TARGET_SHLIB_NAME $1/$2/runtime/$dir/lib/$3.so.$MAJOR_NUM;"
-            (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-            (echo "($RUN) $LOGFILE" ) | sh || die_with_log
-
-	    for G in $COMPAT_GCCS; do
-		L=`$G $flags --print-file-name=$3.so`
-		RUN="rm -f `dirname $L`/$3.so*; \
-		ln -s ../../../../$dir2$2/runtime/$dir/lib/$TARGET_SHLIB_NAME `dirname $L`/$3.so;"
-                (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-                (echo "($RUN) $LOGFILE" ) | sh || die_with_log
-
-	    done
-
+	# Now drop the extended gcc ver we added to all libs
+	local gver
+	for gver in `find "${base_gccdir}" -mindepth 1 -maxdepth 1 -type d` ; do
+		gver=${gver##*/}
+		# first drop the .gver
+		find "${rundir}" -name "*.${gver}" | \
+		while read flib ; do
+			mv "${flib}" "${flib%.${gver}}"
+		done
+		# then update every lib that may be relevant
+		# too bad -lname isn't in posix ...
+		find "${rundir}" -type l -name '*.so.*' | \
+		while read flib ; do
+			lib=$(readlink "${flib}")
+			case ${lib} in
+				*.${gver}) ln -sf "${lib%.${gver}}" "${flib}" ;;
+			esac
+		done
 	done
-    done
-}
-
-# Install shared libgcc libraries into sysroot direcotory
-# 1st argument is the toolchain install directory
-# 2nd argument is the toolchain name
-# FIXME: Only libgcc_s.so.1 is handled
-install_libgccs ()
-{
-    GCCS=`find $1 -name bfin-linux-uclibc-gcc-* | tr '\n' ' '`
-
-    NEWEST_VERSION=""
-    NEWEST_GCC=""
-    for GCC in $GCCS; do
-	LIBGCC=`$GCC --print-file-name=libgcc_s.so`
-	LIBGCC_DIR=`dirname $LIBGCC`
-	GCC_VERSION=`basename $LIBGCC_DIR`
-	
-	if [ -z "$NEWEST_VERSION" ]; then
-	   NEWEST_VERSION=$GCC_VERSION
-	   NEWEST_GCC=$GCC
-	   continue
-	fi
-
-	is_newer $GCC_VERSION $NEWEST_VERSION
-	if [ $? -eq 1 ]; then
-	    NEWEST_VERSION=$GCC_VERSION
-	    NEWEST_GCC=$GCC
-	fi
-    done
-
-    echo_date "Installing libgcc_s"
-
-    MULTILIBS=`$NEWEST_GCC --print-multi-lib`
-
-    for ml in $MULTILIBS; do
-
-	dir=`echo ${ml} | sed -e 's/;.*$//'`
-	flags=`echo ${ml} | sed -e 's/^[^;]*;//' -e 's/@/ -/g'`
-
-	LIBGCC=`$NEWEST_GCC $flags --print-file-name=libgcc_s_$dir.so`
-	if [ ! -e $LIBGCC ]; then
-	    LIBGCC=`$NEWEST_GCC $flags --print-file-name=libgcc_s.so`
-	fi
-	if [ ! -e $LIBGCC ]; then
-            echo "No libgcc_s.so for $NEWEST_GCC - report an error"
-            tail -10 $ACTUAL_LOGFILE
-            exit 1
-	fi
-	    
-	LIBGCC=`readlink -f $LIBGCC`
-	LIBGCC_DIR=`dirname $LIBGCC`
-	LIBGCC_NAME=`basename $LIBGCC`
-
-	run_cmd cp $LIBGCC $1/$2/runtime/$dir/lib
-
-	for G in $GCCS; do
-	    L=`$G $flags --print-file-name=libgcc_s_$dir.so`
-	    dir2=
-	    if [ ! -e $L ]; then
-		L=`$G $flags --print-file-name=libgcc_s.so`
-		if [ "$dir" != "." ]; then
-		    dir2=`echo ${dir} | sed -e 's|[^/]*|..|g'`/
-		fi
-	    fi
-	    RUN="rm -f $L*;\
-	    ln -s ../../../../$dir2$2/runtime/$dir/lib/$LIBGCC_NAME $L"
-            (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-            (echo "($RUN) $LOGFILE" ) | sh || die_with_log
-	done
-    done
 }
 
 # Some of the tests leave stuff all over the target file system,
@@ -2391,35 +2194,7 @@ if [ $KERNEL_SOURCE ] ; then
     done
     rm -f $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
 
-    if [ "${CHOST}" != "${CBUILD}" ] || ${RESUME_BUILD} ; then
-        install_all_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc
-    else
-
-    install_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc libstdc++
-    for GCC_VERSION in $GCC_VERSIONS; do
-        if [ "$GCC_VERSION" != "3.4" ] ; then
-	    install_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc libmudflap
-	    install_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc libmudflapth
-            if [ "$GCC_VERSION" != "4.1" ] ; then
-		install_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc libgomp
-	    fi
-            # If we turned fortran on, or let the build system figure it out
-            TMP=`echo $BFIN_LANGS | grep fortran`
-            if ([ -n "$TMP" ] || [ -z "$BFIN_LANGS" ]) ; then
-                install_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc libgfortran
-            fi
-            # If we turned objc on, or let the build system figure it out
-            TMP=`echo $BFIN_LANGS | grep objc`
-            if ([ -n "$TMP" ] || [ -z "$BFIN_LANGS" ]) ; then
-                install_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc libobjc
-            fi
-	    break;
-        fi
-    done
-
-    install_libgccs $DIR_LINUX_OUTPUT bfin-linux-uclibc
-
-    fi
+    install_all_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc
 
     ##################### Test bfin-linux-uclibc #####################
 
