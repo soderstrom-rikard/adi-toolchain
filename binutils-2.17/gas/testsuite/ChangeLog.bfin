@@ -1,3 +1,8 @@
+2009-04-08  Jie Zhang  <jie.zhang@analog.com>
+
+	* gas/bfin/line_number.l, gas/bfin/line_number.s: New test.
+	* gas/bfin/bfin.exp: Add the new test.
+
 2009-03-11  Jie Zhang  <jie.zhang@analog.com>
 
 	* gas/bfin/loop.s, gas/bfin/loop.d: New test.

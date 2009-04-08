@@ -1,3 +1,8 @@
+2009-04-08  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/tc-bfin.c (md_assemble): Bump line counters if there is
+	EOL in the instruction.
+
 2009-03-11  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/tc-bfin.c (bfin_loop_beginend): Don't remove
