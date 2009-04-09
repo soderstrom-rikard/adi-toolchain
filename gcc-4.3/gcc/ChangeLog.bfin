@@ -1,3 +1,10 @@
+2009-04-09  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.c (bfin_expand_builtin): Initialize icode
+	before use.
+	* config/bfin/bfin.md (AREG): Define mode iterator.
+	(reload_in, reload_out): Use mode iterator AREG.
+
 2009-03-31  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* final.c (insn_current_align): Delete.

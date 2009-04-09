@@ -6530,6 +6530,7 @@ bfin_expand_builtin (tree exp, rtx target ATTRIBUTE_UNUSED,
       op0 = expand_expr (arg0, NULL_RTX, VOIDmode, 0);
       op1 = expand_expr (arg1, NULL_RTX, VOIDmode, 0);
       accvec = gen_reg_rtx (V2PDImode);
+      icode = CODE_FOR_flag_macv2hi_parts;
 
       if (! target
 	  || GET_MODE (target) != V2HImode
