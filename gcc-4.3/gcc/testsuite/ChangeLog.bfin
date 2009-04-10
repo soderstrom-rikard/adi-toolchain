@@ -1,3 +1,7 @@
+2009-04-10  Jie Zhang  <jie.zhang@analog.com>
+
+	* gcc.target/bfin/20090410-1.c: New test.
+
 2009-04-09  Jie Zhang  <jie.zhang@analog.com>
 
 	* gcc.target/bfin/20090409-1.c: New test.
