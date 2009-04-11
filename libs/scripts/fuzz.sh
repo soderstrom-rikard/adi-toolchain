@@ -22,11 +22,11 @@ test_idx=0
 test_pids=
 _test() {
 	# _test(format, compiler, compiler-ver, file)
-	local fmt cc file ver log
+	local fmt cc file ver log out
 	fmt=$1 cc=$2 ver=$3 file=$4
 	log="${file}.log.${fmt}.${ver}"
-	if ! $cc -V $ver $cflags $cppflags "$file" >"${log}" 2>&1 ; then
-		echo "FAIL" >> "${log}"
+	if ! out=$($cc -V $ver $cflags $cppflags "$file" 2>&1) ; then
+		echo "${out}" > "${log}"
 	fi
 }
 test() {
@@ -94,10 +94,12 @@ for h in *.h ; do
 
 		set -- $proto
 		decls=$(echo "$*;" | sed 's:,:;:g')
-		invok=$(echo $(i=0;for x;do [ "$x" = "," ] && echo $x && continue; : $((i+=1)); [ $((i%2)) -eq 0 ] && echo $x;done))
+		invok=$(echo $(i=0;for x;do [ "$x" = "," ] && continue; : $((i+=1)); [ $((i%2)) -eq 0 ] && echo $x;done))
 		set -- ${invok}
 		invok_cnt=$#
-#		printf "   $decls / $invok\n"
+		arg_invok=$(printf '%s,' "$@")
+		arg_invok=${arg_invok%,}
+#		printf "   $decls / $invok / $arg_invok / $invok_cnt\n"
 
 		# implicit funcs by themselves (many are builtins)
 		for t in "" "123" "(float)123" "(long)123" ; do
@@ -118,14 +120,33 @@ for h in *.h ; do
 			set -- "$@" $t "signed $t" "$unsigned $t"
 		done
 		for r ; do
-			test '#include "%s"\n%s f(){%sreturn (%s)%s(%s);}\n' $h "$r" "$decls" "$r" $func "$invok"
-			test '#include "%s"\n%s f(){%s%s(%s);return (%s)%s(%s);}\n' $h "$r" "$decls" $func "$invok" "$r" $func "$invok"
+			test '#include "%s"\n%s f(){%sreturn (%s)%s(%s);}\n' $h "$r" "$decls" "$r" $func "$arg_invok"
+			test '#include "%s"\n%s f(){%s%s(%s);return (%s)%s(%s);}\n' $h "$r" "$decls" $func "$arg_invok" "$r" $func "$arg_invok"
 
 			# try and use combination of constants/vars
-#			i=0
-#			while [ ${i} -lt ${invok_cnt} ] ; do
-#				printf '
-#			done
+			i=0
+			imax=$((invok_cnt * invok_cnt))
+			[ ${imax} -eq 1 ] && imax=2
+			while [ ${i} -lt ${imax} ] ; do
+				mix_invok=
+				set -- ${invok}
+				j=0
+				while [ ${j} -lt ${invok_cnt} ] ; do
+					if [ $((i & (1 << j))) -eq 0 ] ; then
+						mix_invok="${mix_invok}, $1"
+					else
+						mix_invok="${mix_invok}, ($r)123"
+					fi
+					shift
+					: $((j+=1))
+				done
+				mix_invok=${mix_invok#, }
+
+#				printf "$i = $mix_invok\n"
+				test '#include "%s"\n%s f(){%sreturn (%s)%s(%s);}\n' $h "$r" "$decls" "$r" $func "$mix_invok"
+
+				: $((i+=1))
+			done
 		done
 	done < $h.parsed.h
 
