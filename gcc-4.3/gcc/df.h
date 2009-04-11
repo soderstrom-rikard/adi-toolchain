@@ -138,7 +138,10 @@ enum df_ref_flags
     DF_REF_CALL_STACK_USAGE = 1 << 13,
 
     /* This flag is used for verification of existing refs. */
-    DF_REF_REG_MARKER = 1 << 14
+    DF_REF_REG_MARKER = 1 << 14,
+
+    /* This flag is set if the ref contains a VEC_SELECT.  */
+    DF_REF_VEC_SELECT = 1 << 15
   };
 
 /* The possible ordering of refs within the df_ref_info.  */

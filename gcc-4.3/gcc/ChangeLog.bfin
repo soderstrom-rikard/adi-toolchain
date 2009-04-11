@@ -1,3 +1,10 @@
+2009-04-11  Jie Zhang  <jie.zhang@analog.com>
+
+	* fwprop.c (forward_propagate_into): Don't propagate from
+	or into VEC_SELECT.
+	* df-scan.c (df_uses_record): Deal with VEC_SELECT.
+	* df.h (enum df_ref_flags): Add DF_REF_VEC_SELECT.
+
 2009-04-10  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.c (bfin_expand_builtin): Initialize another

@@ -2973,6 +2973,11 @@ df_uses_record (struct df_collection_rec *collection_rec,
 			      DF_REF_REG_USE, bb, insn, flags);
 	      dst = XEXP (dst, 0);
 	      break;
+	    case VEC_SELECT:
+	      df_uses_record (collection_rec, &XEXP (dst, 0),
+			      DF_REF_REG_DEF, bb, insn, DF_REF_VEC_SELECT);
+	      dst = XEXP (dst, 0);
+	      break;
 	    default:
 	      gcc_unreachable ();
 	  }
