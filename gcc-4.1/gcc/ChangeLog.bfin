@@ -1,3 +1,8 @@
+2009-04-11  Jie Zhang  <jie.zhang@analog.com>
+
+	* df.c (df_uses_record): Deal with VEC_SELECT.
+	* df.h (enum df_ref_flags): Add DF_REF_VEC_SELECT.
+
 2009-03-31  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* final.c (insn_current_align): Delete.

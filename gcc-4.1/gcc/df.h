@@ -62,7 +62,10 @@ enum df_ref_flags
     /* This flag is set, if we stripped the subreg from the reference.
        In this case we must make conservative guesses, at what the
        outer mode was.  */
-    DF_REF_STRIPPED = 2
+    DF_REF_STRIPPED = 2,
+
+    /* This flag is set if the ref contains a VEC_SELECT.  */
+    DF_REF_VEC_SELECT = 4
   };
 
 
