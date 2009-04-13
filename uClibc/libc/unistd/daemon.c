@@ -13,8 +13,8 @@
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
  *
- * 3. <BSD Advertising Clause omitted per the July 22, 1999 licensing change 
- *		ftp://ftp.cs.berkeley.edu/pub/4bsd/README.Impt.License.Change> 
+ * 3. <BSD Advertising Clause omitted per the July 22, 1999 licensing change
+ *		ftp://ftp.cs.berkeley.edu/pub/4bsd/README.Impt.License.Change>
  *
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
@@ -44,24 +44,25 @@
 #include <features.h>
 #include <fcntl.h>
 #include <paths.h>
+#include <signal.h>
 #include <unistd.h>
 
 #if defined __USE_BSD || (defined __USE_XOPEN && !defined __USE_UNIX98)
 
-libc_hidden_proto(open)
-libc_hidden_proto(close)
-libc_hidden_proto(_exit)
-libc_hidden_proto(dup2)
-libc_hidden_proto(setsid)
-libc_hidden_proto(chdir)
-libc_hidden_proto(fork)
+/* libc_hidden_proto(open) */
+/* libc_hidden_proto(close) */
+/* libc_hidden_proto(_exit) */
+/* libc_hidden_proto(dup2) */
+/* libc_hidden_proto(setsid) */
+/* libc_hidden_proto(chdir) */
+/* libc_hidden_proto(fork) */
 
 #ifndef __ARCH_USE_MMU__
 #include <sys/syscall.h>
 /* use clone() to get fork() like behavior here -- we just want to disassociate
  * from the controlling terminal
  */
-static inline pid_t vfork_parent(void)
+static inline pid_t _fork_parent(void)
 {
 	register unsigned long ret = INTERNAL_SYSCALL(clone, wtf, 2, CLONE_VM, 0);
 	if (ret != -1 && ret != 0)
@@ -69,21 +70,34 @@ static inline pid_t vfork_parent(void)
 		INTERNAL_SYSCALL(exit, wtf, 0);
 	return ret;
 }
-#define fork() vfork_parent()
+static inline pid_t fork_parent(void)
+{
+	/* Block all signals to keep the parent from using the stack */
+	pid_t ret;
+	sigset_t new_set, old_set;
+	sigfillset(&new_set);
+	sigprocmask(SIG_BLOCK, &new_set, &old_set);
+	ret = _fork_parent();
+	sigprocmask(SIG_SETMASK, &old_set, NULL);
+	return ret;
+}
+#else
+static inline pid_t fork_parent(void)
+{
+	switch (fork()) {
+		case -1: return -1;
+		case 0:  return 0;
+		default: _exit(0);
+	}
+}
 #endif
 
 int daemon( int nochdir, int noclose )
 {
 	int fd;
 
-	switch (fork()) {
-		case -1:
-			return(-1);
-		case 0:
-			break;
-		default:
-			_exit(0);
-	}
+	if (fork_parent() == -1)
+		return -1;
 
 	if (setsid() == -1)
 		return(-1);
