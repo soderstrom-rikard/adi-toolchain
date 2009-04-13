@@ -39,12 +39,6 @@ bfin_gen_dsp32alu (int HL, int aopcde, int aop, int s, int x,
               REG_T dst0, REG_T dst1, REG_T src0, REG_T src1);
 
 INSTR_T
-bfin_gen_dsp32cmul (int aop, int mmod, int w, REG_T dst, REG_T src0, REG_T src1);
-
-INSTR_T
-bfin_gen_dsp32csqu (int op, int mmod, int w, REG_T dst, REG_T src);
-
-INSTR_T
 bfin_gen_dsp32shift (int sopcde, REG_T dst0, REG_T src0, REG_T src1,
                 int sop, int hls);
 

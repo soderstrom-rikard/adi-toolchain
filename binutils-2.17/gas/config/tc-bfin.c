@@ -53,9 +53,7 @@ const int *astat_bits;
 /* Local variables.  */
 
 static const int bf532_astat_bits[] =
-  {0, 0x01,   -1, 0x10, 0x12, 0x06, 0x0c, 0x0d, 0x11, 0x13, 0x18, 0x19};
-static const int bf579_astat_bits[] =
-  {0, 0x01, 0x02, 0x03, 0x04, 0x06,   -1,   -1,   -1,   -1,   -1,   -1};
+  {0, 0x01, 0x10, 0x12, 0x06, 0x0c, 0x0d, 0x11, 0x13, 0x18, 0x19};
 
 /* Flags to set in the elf header */
 #define DEFAULT_FLAGS 0
@@ -199,7 +197,6 @@ static struct bfin_cpu_isa bfin_cpus[] =
   {"bf549",	BLACKFIN_ISA_1},
   {"bf549m",	BLACKFIN_ISA_1},
   {"bf561",	BLACKFIN_ISA_1},
-  {"bf579",	BLACKFIN_ISA_2},
   {NULL, 0}
 };
 
@@ -283,11 +280,6 @@ md_begin ()
     case BLACKFIN_ISA_1:
       astat_bits = bf532_astat_bits;
       bfin_flags |= EFI_BFIN_1;
-      break;
-
-    case BLACKFIN_ISA_2:
-      astat_bits = bf579_astat_bits;
-      bfin_flags |= EFI_BFIN_2;
       break;
 
     default:
@@ -1160,90 +1152,6 @@ bfin_gen_dsp32alu (int HL, int aopcde, int aop, int s, int x,
 }
 
 INSTR_T
-bfin_gen_dsp32cmul (int aop, int mmod, int w, REG_T dst, REG_T src0, REG_T src1)
-{
-  int P, conj, conj0, conj1;
-
-  if (w)
-    P = (dst->flags & F_REG_PAIR) ? 1 : 0;
-  else
-    P = 0;
-
-  conj0 = (src0->flags & F_REG_STAR) ? 1 : 0;
-  conj1 = (src1->flags & F_REG_STAR) ? 1 : 0;
-  conj = conj0 << 1 | conj1;
-
-  INIT (DSP32Cmul);
-
-  ASSIGN (mmod);
-  ASSIGN (aop);
-  ASSIGN (w);
-  ASSIGN (P);
-  ASSIGN (conj);
-
-  if (P)
-    {
-      dst->regno &= 0x06;
-    }
-
-  ASSIGN_R (dst);
-  ASSIGN_R (src0);
-  ASSIGN_R (src1);
-
-  return GEN_OPCODE32 ();
-}
-
-INSTR_T
-bfin_gen_dsp32csqu (int op, int mmod, int w, REG_T dst, REG_T src)
-{
-  int op0, op1, w0, w1, P;
-  REG_T src0;
-  REG_T src1;
-
-  if (w)
-    P = IS_HALF (*dst) ? 0 : 1;
-  else
-    P = 0;
-
-  INIT (DSP32Csqu);
-
-  ASSIGN (mmod);
-  ASSIGN (P);
-  ASSIGN_R (dst);
-
-  if (IS_L (*dst) || (!IS_HALF (*dst) && IS_EVEN (*dst)))
-    {
-      /* MAC0 */
-      op0 = op;
-      /* MAC1 is NOP */
-      op1 = 3;
-      w0 = w;
-      src0 = src;
-
-      ASSIGN (op0);
-      ASSIGN (op1);
-      ASSIGN (w0);
-      ASSIGN_R (src0);
-    }
-  else
-    {
-      /* MAC1 */
-      op1 = op;
-      /* MAC1 is NOP */
-      op0 = 3;
-      w1 = w;
-      src1 = src;
-
-      ASSIGN (op1);
-      ASSIGN (op0);
-      ASSIGN (w1);
-      ASSIGN_R (src1);
-    }
-
-  return GEN_OPCODE32 ();
-}
-
-INSTR_T
 bfin_gen_dsp32shift (int sopcde, REG_T dst0, REG_T src0,
                 REG_T src1, int sop, int HLs)
 {
@@ -1935,14 +1843,6 @@ bfin_eol_in_insn (char *line)
 bfd_boolean
 bfin_start_label (char *s, char *ptr)
 {
-  /* CMUL instruction might start with DREG pair. */
-  if ((*s == 'r' || *s == 'R')
-      && ((*(s + 1) == '7' && *(ptr + 1) == '6')
-	  || (*(s + 1) == '5' && *(ptr + 1) == '4')
-	  || (*(s + 1) == '3' && *(ptr + 1) == '2')
-	  || (*(s + 1) == '1' && *(ptr + 1) == '0')))
-    return FALSE;
-
   while (s != ptr)
     {
       if (*s == '(' || *s == '[')

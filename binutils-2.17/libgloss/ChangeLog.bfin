@@ -1,3 +1,12 @@
+2009-04-13  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/Makefile.in (BOARD_SCRIPTS): Remove bf579.ld.
+	(BOARD_CRT0S): Simplify.
+	* bfin/include/defBF579.h: Remove.
+	* bfin/include/cdefBF579.h: Remove.
+	* bfin/include/sys/_adi_platform.h: Remove bf579.
+	* bfin/bf579.ld: Remove.
+
 2009-01-26  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* bfin/include/sys/_adi_platform.h: Convert __ASSEMBLY__ to

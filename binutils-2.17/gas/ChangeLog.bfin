@@ -1,3 +1,37 @@
+2009-04-13  Jie Zhang  <jie.zhang@analog.com>
+
+	* doc/c-bfin.texi (-mcpu): Remove bf579.
+	* config/bfin-defs.h (enum statusflags): Remove S_AC.
+	(struct _cmulfunc, cmulfunc_t): Remove.
+	(struct _csqufunc, csqufunc_t): Remove.
+	* config/bfin-parse.y (DSP32CMUL): Remove.
+	(DSP32CSQU): Remove.
+	(%union): Remove cmulfunc and csqufunc.
+	(%token): Remove CMUL, CSQU and SELECT.
+	(%type): Remove cmul_regs, assign_cmulfunc, a_cmulfunc,
+	csqu_regs, assign_csqufunc, a_csqufunc.
+	(asm_1): Remove CMUL, CSQU, SEARCH of bf579,
+	and SELECT instructions.
+	(assign_cmulfunc): Remove.
+	(a_cmulfunc): Remove.
+	(cmul_regs): Remove.
+	(assign_csqufunc): Remove.
+	(a_csqufunc): Remove.
+	(csqu_regs): Remove.
+	* config/bfin-lex.l (SELECT): Remove.
+	(CSQU): Remove.
+	(CMUL): Remove.
+	(S_AC): Remove.
+	* config/tc-bfin.c (bf579_astat_bits[]): Remove.
+	(bfin_cpus[]): Remove bf579.
+	(md_begin): Remove BLACKFIN_ISA_2.
+	(bfin_gen_dsp32cmul): Remove.
+	(bfin_gen_dsp32csqu): Remove.
+	(bfin_start_label): Remove CMUL specific case.
+	* config/tc-bfin.h (BLACKFIN_ISA_2): Don't define.
+	* config/bfin-aux.h (bfin_gen_dsp32cmul): Don't declare.
+	(bfin_gen_dsp32csqu): Likewise.
+
 2009-04-08  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/tc-bfin.c (md_assemble): Bump line counters if there is

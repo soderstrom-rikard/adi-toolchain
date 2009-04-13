@@ -44,7 +44,7 @@ if [is_remote host] {
 
 set got [binutils_run $OBJDUMP "$OBJDUMPFLAGS -D $objfile"]
 
-set want "0f c7\[ \t\]*ILLEGAL.*81 c0 .*\[\r\n\]"
+set want "e1 c1\[ \t\]*ILLEGAL.*34 98 .*\[\r\n\]"
 
 if [regexp $want $got] then {
     pass "unknown mode test"

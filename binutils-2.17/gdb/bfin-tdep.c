@@ -1232,9 +1232,6 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
     case bfd_mach_bf532:
       set_gdbarch_print_insn (gdbarch, print_insn_bf532);
       break;
-    case bfd_mach_bf579:
-      set_gdbarch_print_insn (gdbarch, print_insn_bf579);
-      break;
     }
 
   frame_unwind_append_sniffer (gdbarch, dwarf2_frame_sniffer);

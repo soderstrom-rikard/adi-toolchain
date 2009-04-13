@@ -1,3 +1,7 @@
+2009-04-13  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-tdep.c (bfin_gdbarch_init): Remove bf579 case.
+
 2009-01-15  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin-tdep.c (bfin_gdbarch_init): Set decr_pc_after_break to 2.

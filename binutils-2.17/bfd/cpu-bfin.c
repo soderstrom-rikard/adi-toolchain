@@ -39,10 +39,5 @@
   next,								\
 }
 
-static const bfd_arch_info_type arch_info_struct[] =
-{
-  N (bfd_mach_bf579, "bf579", FALSE, NULL),
-};
-
 const bfd_arch_info_type bfd_bfin_arch =
-  N (bfd_mach_bf532, "bf532 compatible", TRUE, &arch_info_struct[0]);
+  N (bfd_mach_bf532, "bf532 compatible", TRUE, NULL);

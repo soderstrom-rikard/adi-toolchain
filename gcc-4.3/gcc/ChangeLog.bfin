@@ -1,3 +1,16 @@
+2009-04-13  Jie Zhang  <jie.zhang@analog.com>
+
+	* doc/invoke.texi (Blackfin Options): Now -mcpu does not accept bf579.
+	* config/bfin/t-bfin-elf (MULTILIB_OPTIONS, MULTILIB_DIRNAMES,
+	MULTILIB_MATCHES, MULTILIB_EXCEPTIONS): Remove bf579.
+	* config/bfin/elf.h (LIB_SPEC): Remove bf579.
+	* config/bfin/bfin.c (bfin_cpus[]): Remove bf579.
+	* config/bfin/bfin.h (enum bfin_cpu_type): Remove BFIN_CPU_BF579.
+	(TARGET_CPU_CPP_BUILTINS): Remove bf579.
+	* config/bfin/bfin.md (add_with_carry): Remove conditional.
+	(add_with_carry_ac): Remove.
+	(sub_with_carry): Remove bf579.
+	
 2009-04-11  Jie Zhang  <jie.zhang@analog.com>
 
 	* fwprop.c (forward_propagate_into): Don't propagate from

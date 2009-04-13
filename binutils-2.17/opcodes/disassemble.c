@@ -125,10 +125,7 @@ disassembler (abfd)
 #endif
 #ifdef ARCH_bfin
     case bfd_arch_bfin:
-      if (bfd_get_mach (abfd) == bfd_mach_bf532)
-	disassemble = print_insn_bf532;
-      else
-	disassemble = print_insn_bf579;
+      disassemble = print_insn_bf532;
       break;
 #endif
 #ifdef ARCH_cris

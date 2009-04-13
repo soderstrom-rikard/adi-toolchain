@@ -228,7 +228,7 @@ enum machine_registers
   REG_A0, REG_A1, REG_I0, REG_I1, REG_I2, REG_I3, REG_M0, REG_M1,
   REG_M2, REG_M3, REG_B0, REG_B1, REG_B2, REG_B3, REG_L0, REG_L1,
   REG_L2, REG_L3,
-  REG_AZ, REG_AN, REG_AC, REG_AC0, REG_AC1, REG_AV0, REG_AV1, REG_AV0S, REG_AV1S,
+  REG_AZ, REG_AN, REG_AC0, REG_AC1, REG_AV0, REG_AV1, REG_AV0S, REG_AV1S,
   REG_AQ, REG_V, REG_VS,
   REG_sftreset, REG_omode, REG_excause, REG_emucause, REG_idle_req, REG_hwerrcause, REG_CC, REG_LC0,
   REG_LC1, REG_GP, REG_ASTAT, REG_RETS, REG_LT0, REG_LB0, REG_LT1, REG_LB1,
@@ -262,7 +262,7 @@ static char *reg_names[] =
   "A0", "A1", "I0", "I1", "I2", "I3", "M0", "M1",
   "M2", "M3", "B0", "B1", "B2", "B3", "L0", "L1",
   "L2", "L3",
-  "AZ", "AN", "AC", "AC0", "AC1", "AV0", "AV1", "AV0S", "AV1S",
+  "AZ", "AN", "AC0", "AC1", "AV0", "AV1", "AV0S", "AV1S",
   "AQ", "V", "VS",
   "sftreset", "omode", "excause", "emucause", "idle_req", "hwerrcause", "CC", "LC0",
   "LC1", "GP", "ASTAT", "RETS", "LT0", "LB0", "LT1", "LB1",
@@ -312,14 +312,6 @@ static enum machine_registers decode_dregs_byte[] =
 };
 
 #define dregs_byte(x) REGNAME (decode_dregs_byte[(x) & 7])
-
-/* R7:6 R5:4 R3:2 R1:0 */
-static enum machine_registers decode_dregs_pair[] =
-{
-  REG_R1_0, REG_R3_2, REG_R5_4, REG_R7_6,
-};
-
-#define dregs_pair(x) REGNAME (decode_dregs_pair[((x) & 7) / 2])
 
 /* P(0..5) SP FP.  */
 static enum machine_registers decode_pregs[] =
@@ -410,14 +402,6 @@ static enum machine_registers decode_statbits_bf532[] =
   REG_V, REG_VS, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG,
 };
 
-static enum machine_registers decode_statbits_bf579[] =
-{
-  REG_AZ, REG_AN, REG_AC, REG_AV0, REG_AV1, REG_LASTREG, REG_AQ, REG_LASTREG,
-  REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG,
-  REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG,
-  REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG,
-};
-
 /* LC0 LC1.  */
 static enum machine_registers decode_counters[] =
 {
@@ -500,14 +484,9 @@ static enum machine_registers decode_allregs[] =
 #endif
 
 static int
-decode_statbits (int x, int mach)
+decode_statbits (int x)
 {
-  if (mach == bfd_mach_bf532)
-    return decode_statbits_bf532[(x) & 31];
-  else if (mach == bfd_mach_bf579)
-    return decode_statbits_bf579[(x) & 31];
-  else
-    abort ();
+  return decode_statbits_bf532[(x) & 31];
 }
 
 static void
@@ -626,78 +605,6 @@ decode_macfunc (int which, int op, int h0, int h1, int src0, int src1, disassemb
   OUTS (outf, a);
   OUTS (outf, sop);
   decode_multfunc (h0, h1, src0, src1, outf);
-
-  return 0;
-}
-
-static int
-decode_cmult (int conj, int src0, int src1, disassemble_info * outf)
-{
-  int conj0, conj1;
-
-  conj0 = (conj >> 1) & 0x1;
-  conj1 = conj & 0x1;
-
-  OUTS (outf, "CMUL (");
-  OUTS (outf, dregs (src0));
-  if (conj0)
-    OUTS (outf, "*");
-  OUTS (outf, ", ");
-  OUTS (outf, dregs (src1));
-  if (conj1)
-    OUTS (outf, "*");
-  OUTS (outf, ")");
-
-  return 0;
-}
-
-static int
-decode_cmulfunc (int aop, int conj, int src0, int src1, disassemble_info * outf)
-{
-  OUTS (outf, "(A0, A1)");
-
-  if (aop == 0)
-    OUTS (outf, " = ");
-  else if (aop == 1)
-    OUTS (outf, " += ");
-  else if (aop == 2)
-    OUTS (outf, " -= ");
-
-  return decode_cmult (conj, src0, src1, outf);
-}
-
-static int
-decode_csqu (int src, disassemble_info * outf)
-{
-  OUTS (outf, "CSQU (");
-  OUTS (outf, dregs (src));
-  OUTS (outf, ")");
-
-  return 0;
-}
-
-static int
-decode_csqufunc (int which, int op, int src, disassemble_info *outf)
-{
-  char *a;
-  char *sop = "<unknown op>";
-
-  if (which)
-    a = "A1";
-  else
-    a = "A0";
-
-  switch (op)
-    {
-    case 0: sop = " = ";   break;
-    case 1: sop = " += ";  break;
-    case 2: sop = " -= ";  break;
-    default: break;
-    }
-
-  OUTS (outf, a);
-  OUTS (outf, sop);
-  decode_csqu (src, outf);
 
   return 0;
 }
@@ -1301,7 +1208,7 @@ decode_CC2dreg_0 (TIword iw0, disassemble_info *outf)
 }
 
 static int
-decode_CC2stat_0 (TIword iw0, disassemble_info *outf, int mach)
+decode_CC2stat_0 (TIword iw0, disassemble_info *outf)
 {
   /* CC2stat
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -1310,7 +1217,7 @@ decode_CC2stat_0 (TIword iw0, disassemble_info *outf, int mach)
   int D    = ((iw0 >> CC2stat_D_bits) & CC2stat_D_mask);
   int op   = ((iw0 >> CC2stat_op_bits) & CC2stat_op_mask);
   int cbit = ((iw0 >> CC2stat_cbit_bits) & CC2stat_cbit_mask);
-  int statbits = decode_statbits (cbit, mach);
+  int statbits = decode_statbits (cbit);
 
   if (statbits == REG_LASTREG)
     return 0;
@@ -3117,7 +3024,7 @@ decode_dsp32mult_0 (TIword iw0, TIword iw1, disassemble_info *outf)
 }
 
 static int
-decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf, int mach)
+decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf)
 {
   /* dsp32alu
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -3985,179 +3892,8 @@ decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf, int mach)
       searchmod (aop, outf);
       OUTS (outf, ")");
     }
-  else if (aopcde == 19 && mach == bfd_mach_bf579)
-    {
-      OUTS (outf, "(");
-      OUTS (outf, dregs (dst1));
-      OUTS (outf, ", ");
-      OUTS (outf, dregs (dst0));
-      OUTS (outf, ") = SEARCH (");
-      OUTS (outf, dregs (src1));
-      OUTS (outf, ", ");
-      OUTS (outf, dregs (src0));
-      OUTS (outf, ") (");
-      searchmod (aop, outf);
-      OUTS (outf, ")");
-    }
-  else if (aopcde == 25 && mach == bfd_mach_bf579)
-    {
-      OUTS (outf, "(");
-      OUTS (outf, dregs (dst1));
-      OUTS (outf, ", ");
-      OUTS (outf, dregs (dst0));
-      OUTS (outf, ") = SELECT (");
-      OUTS (outf, dregs (src1));
-      OUTS (outf, ", ");
-      OUTS (outf, dregs (src0));
-      OUTS (outf, ") (");
-      searchmod (aop, outf);
-      OUTS (outf, ")");
-    }
   else
     return 0;
-
-  return 4;
-}
-
-static int
-decode_dsp32cmul (TIword iw0, TIword iw1, disassemble_info *outf)
-{
-  /*  dsp32cmul
-     +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-     | 1 | 1 | 0 | 0 |.M.| 1 | 1 | 1 | 0 | 0 | 0 | - |.mmod..........|
-     |.aop...|.w.|.P.|.conj..| - |.dst.......|.src0......|.src1......|
-     +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-
-  int mmod = (iw0 >> (DSP32Cmul_mmod_bits - 16)) & DSP32Cmul_mmod_mask;
-  int aop  = (iw1 >> DSP32Cmul_aop_bits) & DSP32Cmul_aop_mask;
-  int w    = (iw1 >> DSP32Cmul_w_bits) & DSP32Cmul_w_mask;
-  int P    = (iw1 >> DSP32Cmul_P_bits) & DSP32Cmul_P_mask;
-  int conj = (iw1 >> DSP32Cmul_conj_bits) & DSP32Cmul_conj_mask;
-  int dst  = (iw1 >> DSP32Cmul_dst_bits) & DSP32Cmul_dst_mask;
-  int src0 = (iw1 >> DSP32Cmul_src0_bits) & DSP32Cmul_src0_mask;
-  int src1 = (iw1 >> DSP32Cmul_src1_bits) & DSP32Cmul_src1_mask;
-
-  if (w == 0 && aop == 3)
-    return 0;
-
-  if (((1 << mmod) & (P ? 0x101 : 0x105)) == 0)
-    return 0;
-
-  if (w == 1 || aop == 3)
-    {
-      if (P == 0)
-	OUTS (outf, dregs (dst));
-      else
-	OUTS (outf, dregs_pair (dst));
-
-      OUTS (outf, " = ");
-    }
-
-  if (aop == 3)
-    decode_cmult (conj, src0, src1, outf);
-  else
-    {
-      if (w == 1)
-	OUTS (outf, "(");
-
-      decode_cmulfunc (aop, conj, src0, src1, outf);
-
-      if (w == 1)
-	OUTS (outf, ")");
-    }
-
-  decode_optmode (mmod, 0, outf);
-
-  return 4;
-}
-
-static int
-decode_dsp32csqu (TIword iw0, TIword iw1, disassemble_info *outf)
-{
-  /*  dsp32csqu
-     +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
-     | 1 | 1 | 0 | 0 |.M.| 1 | 1 | 1 | 0 | 0 | 1 | - |.mmod..........|
-     |.op0...|.op1...|.w0|.w1|.P.|.dst.......|.src0......|.src1......|
-     +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-
-  int mmod = (iw0 >> (DSP32Csqu_mmod_bits - 16)) & DSP32Csqu_mmod_mask;
-  int op0  = (iw1 >> DSP32Csqu_op0_bits) & DSP32Csqu_op0_mask;
-  int op1  = (iw1 >> DSP32Csqu_op1_bits) & DSP32Csqu_op1_mask;
-  int w0   = (iw1 >> DSP32Csqu_w0_bits) & DSP32Csqu_w0_mask;
-  int w1   = (iw1 >> DSP32Csqu_w1_bits) & DSP32Csqu_w1_mask;
-  int P    = (iw1 >> DSP32Csqu_P_bits) & DSP32Csqu_P_mask;
-  int dst  = (iw1 >> DSP32Csqu_dst_bits) & DSP32Csqu_dst_mask;
-  int src0 = (iw1 >> DSP32Csqu_src0_bits) & DSP32Csqu_src0_mask;
-  int src1 = (iw1 >> DSP32Csqu_src1_bits) & DSP32Csqu_src1_mask;
-
-  int which;
-
-  if (w0 == 0 && w1 == 0 && op1 == 3 && op0 == 3)
-    return 0;
-
-  if (((1 << mmod) & (P ? 0x101 : 0x105)) == 0)
-    return 0;
-
-  if (op1 == 3 && w1 == 0)
-    which = 0;
-  else if (op0 == 3 && w0 == 0)
-    which = 1;
-  else
-    return 0;
-
-  if (which == 0)
-    {
-      if (w0 == 1 || op0 == 3)
-	{
-	  if (P == 0)
-	    OUTS (outf, dregs_lo (dst));
-	  else
-	    OUTS (outf, dregs (dst));
-
-	  OUTS (outf, " = ");
-	}
-
-      if (op0 == 3)
-	decode_csqu (src0, outf);
-      else
-	{
-	  if (w0 == 1)
-	    OUTS (outf, "(");
-
-	  decode_csqufunc (which, op0, src0, outf);
-
-	  if (w0 == 1)
-	    OUTS (outf, ")");
-	}
-    }
-  else
-    {
-      if (w1 == 1 || op1 == 3)
-	{
-	  if (P == 0)
-	    OUTS (outf, dregs_hi (dst));
-	  else
-	    OUTS (outf, dregs (dst));
-
-	  OUTS (outf, " = ");
-	}
-
-      if (op1 == 3)
-	decode_csqu (src1, outf);
-      else
-	{
-	  if (w1 == 1)
-	    OUTS (outf, "(");
-
-	  decode_csqufunc (which, op1, src1, outf);
-
-	  if (w1 == 1)
-	    OUTS (outf, ")");
-	}
-    }
-
-
-  decode_optmode (mmod, 0, outf);
 
   return 4;
 }
@@ -4890,7 +4626,7 @@ decode_pseudodbg_assert_0 (TIword iw0, TIword iw1, disassemble_info *outf)
 }
 
 static int
-_print_insn_bfin (bfd_vma pc, disassemble_info *outf, int mach)
+_print_insn_bfin (bfd_vma pc, disassemble_info *outf)
 {
   bfd_byte buf[4];
   TIword iw0;
@@ -4924,7 +4660,7 @@ _print_insn_bfin (bfd_vma pc, disassemble_info *outf, int mach)
   else if ((iw0 & 0xffe0) == 0x0200)
     rv = decode_CC2dreg_0 (iw0, outf);
   else if ((iw0 & 0xff00) == 0x0300)
-    rv = decode_CC2stat_0 (iw0, outf, mach);
+    rv = decode_CC2stat_0 (iw0, outf);
   else if ((iw0 & 0xf000) == 0x1000)
     rv = decode_BRCC_0 (iw0, pc, outf);
   else if ((iw0 & 0xf000) == 0x2000)
@@ -4972,23 +4708,9 @@ _print_insn_bfin (bfd_vma pc, disassemble_info *outf, int mach)
   else if ((iw0 & 0xf600) == 0xc200 && (iw1 & 0x0000) == 0x0000)
     rv = decode_dsp32mult_0 (iw0, iw1, outf);
   else if ((iw0 & 0xf7c0) == 0xc400 && (iw1 & 0x0000) == 0x0000)
-    rv = decode_dsp32alu_0 (iw0, iw1, outf, mach);
+    rv = decode_dsp32alu_0 (iw0, iw1, outf);
   else if ((iw0 & 0xf780) == 0xc600 && (iw1 & 0x01c0) == 0x0000)
     rv = decode_dsp32shift_0 (iw0, iw1, outf);
-  else if ((iw0 & 0xf7e0) == 0xc700)
-    {
-      if (mach == bfd_mach_bf579)
-	rv = decode_dsp32cmul (iw0, iw1, outf);
-      else
-	rv = 0;
-    }
-  else if ((iw0 & 0xf7e0) == 0xc720)
-    {
-      if (mach == bfd_mach_bf579)
-	rv = decode_dsp32csqu (iw0, iw1, outf);
-      else
-	rv = 0;
-    }
   else if ((iw0 & 0xf780) == 0xc680 && (iw1 & 0x0000) == 0x0000)
     rv = decode_dsp32shiftimm_0 (iw0, iw1, outf);
   else if ((iw0 & 0xff00) == 0xf800)
@@ -5005,7 +4727,7 @@ _print_insn_bfin (bfd_vma pc, disassemble_info *outf, int mach)
 
 
 static int
-print_insn_bfin (bfd_vma pc, disassemble_info *outf, int mach)
+print_insn_bfin (bfd_vma pc, disassemble_info *outf)
 {
   bfd_byte buf[2];
   unsigned short iw0;
@@ -5015,7 +4737,7 @@ print_insn_bfin (bfd_vma pc, disassemble_info *outf, int mach)
   status = (*outf->read_memory_func) (pc & ~0x01, buf, 2, outf);
   iw0 = bfd_getl16 (buf);
 
-  count += _print_insn_bfin (pc, outf, mach);
+  count += _print_insn_bfin (pc, outf);
 
   /* Proper display of multiple issue instructions.  */
 
@@ -5024,9 +4746,9 @@ print_insn_bfin (bfd_vma pc, disassemble_info *outf, int mach)
     {
       parallel = 1;
       outf->fprintf_func (outf->stream, " || ");
-      count += _print_insn_bfin (pc + 4, outf, mach);
+      count += _print_insn_bfin (pc + 4, outf);
       outf->fprintf_func (outf->stream, " || ");
-      count += _print_insn_bfin (pc + 6, outf, mach);
+      count += _print_insn_bfin (pc + 6, outf);
       parallel = 0;
     }
   if (count == 0)
@@ -5045,11 +4767,5 @@ print_insn_bfin (bfd_vma pc, disassemble_info *outf, int mach)
 int
 print_insn_bf532 (bfd_vma pc, disassemble_info *outf)
 {
-  return print_insn_bfin (pc, outf, bfd_mach_bf532);
-}
-
-int
-print_insn_bf579 (bfd_vma pc, disassemble_info *outf)
-{
-  return print_insn_bfin (pc, outf, bfd_mach_bf579);
+  return print_insn_bfin (pc, outf);
 }

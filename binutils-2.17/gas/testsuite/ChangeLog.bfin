@@ -1,3 +1,15 @@
+2009-04-13  Jie Zhang  <jie.zhang@analog.com>
+
+	* gas/testsuite/gas/bfin/csqu.d: Remove.
+	* gas/testsuite/gas/bfin/csqu.s: Remove.
+	* gas/testsuite/gas/bfin/cmul.d: Remove.
+	* gas/testsuite/gas/bfin/select.d: Remove.
+	* gas/testsuite/gas/bfin/cmul.s: Remove.
+	* gas/testsuite/gas/bfin/select.s: Remove.
+	* gas/testsuite/gas/bfin/search.d: Remove SEARCH of bf579.
+	* gas/testsuite/gas/bfin/search.s: Likewise.
+	* gas/testsuite/gas/bfin/bfin.exp: Remove cmul, csqu, select.
+
 2009-04-08  Jie Zhang  <jie.zhang@analog.com>
 
 	* gas/bfin/line_number.l, gas/bfin/line_number.s: New test.

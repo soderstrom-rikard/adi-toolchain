@@ -1015,24 +1015,10 @@
                  (match_operand:SI 2 "nonmemory_operand" "Ks7,d")))
    (set (match_operand:BI 3 "register_operand" "=C,C")
 	(ltu:BI (not:SI (match_dup 1)) (match_dup 2)))]
-  "bfin_cpu_type != BFIN_CPU_BF579"
+  ""
   "@
    %0 += %2; cc = ac0;
    %0 = %1 + %2; cc = ac0;"
-  [(set_attr "type" "alu0")
-   (set_attr "length" "4")
-   (set_attr "seq_insns" "multi")])
-
-(define_insn "add_with_carry_ac"
-  [(set (match_operand:SI 0 "register_operand" "=d,d")
-        (plus:SI (match_operand:SI 1 "register_operand" "%0,d")
-                 (match_operand:SI 2 "nonmemory_operand" "Ks7,d")))
-   (set (match_operand:BI 3 "register_operand" "=C,C")
-	(ltu:BI (not:SI (match_dup 1)) (match_dup 2)))]
-  "bfin_cpu_type == BFIN_CPU_BF579"
-  "@
-   %0 += %2; cc = ac;
-   %0 = %1 + %2; cc = ac;"
   [(set_attr "type" "alu0")
    (set_attr "length" "4")
    (set_attr "seq_insns" "multi")])
@@ -1045,10 +1031,7 @@
 	(leu:BI (match_dup 2) (match_dup 1)))]
   ""
 {
-  if (bfin_cpu_type == BFIN_CPU_BF579)
-    return "%0 = %1 - %2; cc = ac;";
-  else
-    return "%0 = %1 - %2; cc = ac0;";
+  return "%0 = %1 - %2; cc = ac0;";
 }
   [(set_attr "type" "alu0")
    (set_attr "length" "4")

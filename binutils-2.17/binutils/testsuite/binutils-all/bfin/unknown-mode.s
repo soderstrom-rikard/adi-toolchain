@@ -1,8 +1,8 @@
 	.text
 
-	// Below 4 bytes are "R3:2 = CMUL(R0,R1) (IS);"
+	// Below 4 bytes are "A1 += R6.H * R4.L (IS);"
 	// with a invalid mode "0xf".
-	.byte 0x0f
-	.byte 0xc7
-	.byte 0x81
-	.byte 0xc0
+	.byte 0xe1
+	.byte 0xc1
+	.byte 0x34
+	.byte 0x98

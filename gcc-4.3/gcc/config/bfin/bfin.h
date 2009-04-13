@@ -58,8 +58,7 @@ typedef enum bfin_cpu_type
   BFIN_CPU_BF548M,
   BFIN_CPU_BF549,
   BFIN_CPU_BF549M,
-  BFIN_CPU_BF561,
-  BFIN_CPU_BF579
+  BFIN_CPU_BF561
 } bfin_cpu_t;
 
 /* Value of -mcpu= */
@@ -85,8 +84,7 @@ extern int target_flags;
       builtin_define_std ("bfin");		\
       builtin_define_std ("BFIN");		\
       builtin_define ("__ADSPBLACKFIN__");	\
-      if (bfin_cpu_type != BFIN_CPU_BF579)	\
-	builtin_define ("__ADSPLPBLACKFIN__");	\
+      builtin_define ("__ADSPLPBLACKFIN__");	\
 						\
       switch (bfin_cpu_type)			\
 	{					\
@@ -186,9 +184,6 @@ extern int target_flags;
 	  break;				\
 	case BFIN_CPU_BF561:			\
 	  builtin_define ("__ADSPBF561__");	\
-	  break;				\
-	case BFIN_CPU_BF579:			\
-	  builtin_define ("__ADSPBF579__");	\
 	  break;				\
 	}					\
 						\

@@ -118,7 +118,6 @@ enum statusflags
 {
   S_AZ = 0,
   S_AN,
-  S_AC,
   S_AV0,
   S_AV1,
   S_AQ,
@@ -370,24 +369,6 @@ typedef struct _macfunc
   Register s0;
   Register s1;
 } Macfunc;
-
-typedef struct _cmulfunc
-{
-  char aop;
-  char w;
-  Register dst;
-  Register s0;
-  Register s1;
-} cmulfunc_t;
-
-typedef struct _csqufunc
-{
-  char n;
-  char op;
-  char w;
-  Register dst;
-  Register src;
-} csqufunc_t;
 
 typedef struct _opt_mode
 {

@@ -1,3 +1,22 @@
+2009-04-13  Jie Zhang  <jie.zhang@analog.com>
+
+	* include/bfin.h (struct emu_oab): Remove bf579 from comments.
+	(bf579_emu_oab): Remove.
+	(bf579_core_reset): Don't declare.
+	* src/cmd/bfin.c (cmd_bfin_run): Remove reset579.
+	* src/bfin/bfin.c (bf579_core_reset): Remove.
+	* src/bfin/Makefile.in: Regenerate.
+	* src/bfin/bfin-part.c (bf579_init): Don't declare.
+	(_bfin_part_init): Don't call bf579_init.
+	* src/bfin/Makefile.am (libbfin_a_SOURCES): Remove bfin-part-bfin.c,
+	bfin-part_bf579.c and bfin-part-bfin.c.
+	* src/bfin/bfin-part-bf579.c: Remove.
+	* data/Makefile.in: Regenerate.
+	* data/analog/PARTS: Remove bf579.
+	* data/analog/bf579/STEPPINGS: Remove.
+	* data/analog/bf579/bf579: Remove.
+	* data/Makefile.am (nobase_dist_pkgdata_DATA): Remove bf579.
+
 2009-03-30  Jie Zhang  <jie.zhang@analog.com>
 
 	* configure.ac: Add src/bfin/Makefile and bfin_core bus driver.

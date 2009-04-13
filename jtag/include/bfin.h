@@ -77,21 +77,19 @@ struct emu_oab
   /* Generate TEST_COMMAND from ADDR and W(rite).  */
   uint32_t (*test_command) (uint32_t addr, int w);
 
-  /* For BF579 it's ITEST_COMMAND address. But for other Blackfin
-     processors, it's actually DTEST_COMMAND address.  */
+  /* For existing Blackfin processors, it's actually DTEST_COMMAND
+     address.  */
   uint32_t test_command_addr;
 
-  /* For BF579 they are addresses for ITEST_DATA0 and ITEST_DATA1.
-     But for other Blackfin processors, they are actually DTEST_DATA
+  /* For existing Blackfin processors, they are actually DTEST_DATA
      addresses.  */
   uint32_t test_data0_addr;
   uint32_t test_data1_addr;
 
-  /* For BF579 DBGCTL and DBGSTAT is in one chain.  */
+  /* No existing Blackfin processors use this.  It should be 0.  */
   int dbgctl_dbgstat_in_one_chain;
 
-  /* The IN_RESET bit in DBGSTAT for BF579 are sticky, but not for
-     others.  */
+  /* No existing Blackfin processors use this.  It should be 0.  */
   int sticky_in_reset;
 
   /* Bits */
@@ -155,7 +153,6 @@ struct bfin_part_data
 #define BFIN_PART_EMUPC(part)  (((struct bfin_part_data *)((part)->params->data))->emupc)
 
 extern struct emu_oab bfin_emu_oab;
-extern struct emu_oab bf579_emu_oab;
 
 
 #define IDCODE_SCAN			0
@@ -326,7 +323,6 @@ void part_emulation_return (chain_t *, int);
 void part_execute_instructions (chain_t *, int n, struct bfin_insn *);
 void chain_system_reset (chain_t *);
 void bfin_core_reset (chain_t *);
-void bf579_core_reset (chain_t *, int);
 void software_reset (chain_t *);
 uint32_t part_mmr_read_clobber_r0 (chain_t *, int, int32_t, int);
 void part_mmr_write_clobber_r0 (chain_t *, int, int32_t, uint32_t, int);

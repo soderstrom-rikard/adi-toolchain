@@ -63,9 +63,8 @@ recognized:
 @code{bf548m},
 @code{bf549},
 @code{bf549m},
-@code{bf561},
 and
-@code{bf579} (experimental).
+@code{bf561}.
 
 @end table
 

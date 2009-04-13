@@ -76,8 +76,6 @@ extern long md_pcrel_from_section PARAMS ((struct fix *, segT));
 /* These are not official ISA names of Blackfin. They are only used here.  */
 /* All existing Blackfin processors except BF535.  */
 #define  BLACKFIN_ISA_1  1
-/* BF579 */
-#define  BLACKFIN_ISA_2  2
 
 extern const int *astat_bits;
 

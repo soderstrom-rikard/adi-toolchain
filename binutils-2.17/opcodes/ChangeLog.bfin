@@ -1,3 +1,23 @@
+2009-04-13  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-dis.c (enum machine_registers): Remove REG_AC.
+	(reg_names[]): Remove "AC".
+	(decode_dregs_pair[]): Remove.
+	(dregs_pair): Remove.
+	(decode_statbits_bf579[]): Remove.
+	(decode_statbits): Remove bf579 case.
+	(decode_cmult): Remove.
+	(decode_cmulfunc): Remove.
+	(decode_dsqu): Remove.
+	(decode_csqufunc): Remove.
+	(decode_CC2stat_0): Remove bf579 case.
+	(decode_dsp32alu_0): Likewise.
+	(decode_dsp32cmul): Remove.
+	(decode_dsp32csqu): Remove.
+	(_print_insn_bfin): Remove bf579 case.
+	(print_insn_bfin): Remove mach argument.
+	* disassemble.c (disassembler): Remove bf579 case.
+
 2009-03-11  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin-dis.c (IS_DREG): Define.

@@ -166,11 +166,9 @@ _part_dbgstat_emucause_mask (part_t *part)
 void _bfin_part_init (void) __attribute__((constructor));
 
 extern void bfin_init (void);
-extern void bf579_init (void);
 
 void
 _bfin_part_init ()
 {
   bfin_init ();
-  bf579_init ();
 }

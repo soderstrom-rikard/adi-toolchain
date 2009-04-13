@@ -29,5 +29,4 @@ libbfin_a_SOURCES = \
 	insn-gen.c \
 	bfin.c \
 	bfin-part.c \
-	bfin-part-bfin.c \
-	bfin-part-bf579.c
+	bfin-part-bfin.c

@@ -71,7 +71,6 @@ int yylex (void);
 [sS][iI][gG][nN][bB][iI][tT][sS]        return SIGNBITS;
 [sS][iI][gG][nN]                        return SIGN;
 [sS][eE][qQ][sS][tT][aA][tT]     _REG.regno = REG_SEQSTAT; return REG;
-[sS][eE][lL][eE][cC][tT]		return SELECT;
 [sS][eE][aA][rR][cC][hH]                return SEARCH;
 [sS][hH][iI][fF][tT]                    return SHIFT;
 [sS][cC][oO]                            return SCO;
@@ -181,9 +180,7 @@ int yylex (void);
 [cC][yY][cC][lL][eE][sS]2  { _REG.regno = REG_CYCLES2; return REG; }
 [cC][yY][cC][lL][eE][sS]  { _REG.regno = REG_CYCLES; return REG; }
 [cC][sS][yY][nN][cC]                    return CSYNC;
-[cC][sS][qQ][uU]			return CSQU;
 [cC][oO]                                return CO;
-[cC][mM][uU][lL]			return CMUL;
 [cC][lL][iI]                            return CLI;
 
 [cC][cC]     _REG.regno = REG_CC; return CCREG;
@@ -214,7 +211,6 @@ int yylex (void);
 [aA][zZ]  _REG.regno = astat_bits[S_AZ]; return STATUS_REG;
 [aA][nN]  _REG.regno = astat_bits[S_AN]; return STATUS_REG;
 [aA][qQ]  _REG.regno = astat_bits[S_AQ]; return STATUS_REG;
-[aA][cC]  _REG.regno = astat_bits[S_AC]; return STATUS_REG;
 [aA][cC]0 _REG.regno = astat_bits[S_AC0]; return STATUS_REG;
 [aA][cC]1 _REG.regno = astat_bits[S_AC1]; return STATUS_REG;
 [aA][vV]0 _REG.regno = astat_bits[S_AV0]; return STATUS_REG;

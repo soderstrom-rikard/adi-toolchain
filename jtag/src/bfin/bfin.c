@@ -1360,38 +1360,6 @@ bfin_core_reset (chain_t *chain)
 }
 
 void
-bf579_core_reset (chain_t *chain, int sram_init)
-{
-  chain_scan_select (chain, DBGCTL_SCAN);
-  if (sram_init)
-    chain_dbgctl_bit_set_sram_init (chain);
-  else
-    chain_dbgctl_bit_clear_sram_init (chain);
-  part_dbgctl_bit_set_sysrst (chain, chain->main_part);
-  chain_shift_data_registers_mode (chain, 0, 1, EXITMODE_UPDATE);
-
-  chain_emulation_return (chain);
-
-  chain_wait_in_reset (chain);
-  chain_emulation_trigger (chain);
-
-  chain_scan_select (chain, DBGCTL_SCAN);
-  part_dbgctl_bit_clear_sysrst (chain, chain->main_part);
-  chain_shift_data_registers_mode (chain, 0, 1, EXITMODE_UPDATE);
-
-  chain_wait_reset (chain);
-
-  if (sram_init)
-    {
-      chain_scan_select (chain, DBGCTL_SCAN);
-      chain_dbgctl_bit_clear_sram_init (chain);
-      chain_shift_data_registers_mode (chain, 0, 1, EXITMODE_UPDATE);
-    }
-}
-
-/* Not for BF579.  */
-
-void
 software_reset (chain_t *chain)
 {
   chain_system_reset (chain);

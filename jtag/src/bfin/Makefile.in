@@ -100,8 +100,7 @@ ARFLAGS = cru
 libbfin_a_AR = $(AR) $(ARFLAGS)
 libbfin_a_LIBADD =
 am_libbfin_a_OBJECTS = insn-gen.$(OBJEXT) bfin.$(OBJEXT) \
-	bfin-part.$(OBJEXT) bfin-part-bfin.$(OBJEXT) \
-	bfin-part-bf579.$(OBJEXT)
+	bfin-part.$(OBJEXT) bfin-part-bfin.$(OBJEXT)
 libbfin_a_OBJECTS = $(am_libbfin_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/tools/depcomp
@@ -237,8 +236,7 @@ libbfin_a_SOURCES = \
 	insn-gen.c \
 	bfin.c \
 	bfin-part.c \
-	bfin-part-bfin.c \
-	bfin-part-bf579.c
+	bfin-part-bfin.c
 
 all: all-am
 
@@ -287,7 +285,6 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bfin-part-bf579.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bfin-part-bfin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bfin-part.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bfin.Po@am__quote@

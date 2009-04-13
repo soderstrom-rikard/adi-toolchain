@@ -1,3 +1,10 @@
+2009-04-13  Jie Zhang  <jie.zhang@analog.com>
+
+	* dis-asm.h (print_insn_bf579): Don't declare.
+	* elf/bfin.h (EFI_BFIN_2): Remove.
+	* opcode/bfin.h (DSP32Cmul, DSP32Cmul_*, init_DSP32Cmul): Remove.
+	(DSP32Csqu, DSP32Csqu_*, init_DSP32Csqu): Remove.
+
 2008-11-19  Jie Zhang  <jie.zhang@analog.com>
 
 	* dis-asm.h (print_insn_bfin): Don't declare.

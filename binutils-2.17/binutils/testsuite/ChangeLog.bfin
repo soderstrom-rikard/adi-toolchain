@@ -1,3 +1,10 @@
+2009-04-13  Jie Zhang  <jie.zhang@analog.com>
+
+	* binutils-all/objdump.exp (cpus_expected): Remove bf579.
+	* binutils-all/bfin/unknown-mode.s: Replace CMUL with multiply
+	instruction.
+	* binutils-all/bfin/objdump.exp: Adjust.
+
 2008-12-03  Jie Zhang  <jie.zhang@analog.com>
 
 	* binutils-all/objdump.exp(cpus_expected): Add bf532 and bf579.

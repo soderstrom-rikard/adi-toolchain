@@ -495,29 +495,6 @@ cmd_bfin_run( chain_t *chain, char *params[] )
 
       return 1;
     }
-  else if (strcmp (params[1], "reset579") == 0)
-    {
-      int init_sram;
-
-      if (num_params == 3)
-	{
-	  if (!strcmp (params[2], "stop"))
-	    init_sram = 1;
-	  else if (!strcmp (params[2], "run"))
-	    init_sram = 0;
-	  else
-	    return -1;
-	}
-      else
-	return -1;
-
-      printf (_("%s: reseting processor ... "), "bfin");
-      fflush (stdout);
-      bf579_core_reset (chain, init_sram);
-      printf (_("OK\n"));
-
-      return 1;
-    }
   else
     {
       printf (_("%s: unknown subcommand '%s'\n"), "bfin", params[1]);

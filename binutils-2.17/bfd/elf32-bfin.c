@@ -4854,10 +4854,6 @@ elf32_bfin_object_p (bfd *abfd)
     case EFI_BFIN_1:
       bfd_default_set_arch_mach (abfd, bfd_arch_bfin, bfd_mach_bf532);
       break;
-
-    case EFI_BFIN_2:
-      bfd_default_set_arch_mach (abfd, bfd_arch_bfin, bfd_mach_bf579);
-      break;
     }
 
   return (((flags & EF_BFIN_FDPIC) != 0) == (IS_FDPIC (abfd)));
