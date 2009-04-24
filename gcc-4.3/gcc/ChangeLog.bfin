@@ -1,3 +1,9 @@
+2009-04-24  Jie Zhang  <jie.zhang@analog.com>
+
+	* loop-iv.c (determine_max_iter): Ensure niter_max suitable for
+	loop mode.
+	(iv_number_of_iterations): Likewise.
+
 2009-04-13  Jie Zhang  <jie.zhang@analog.com>
 
 	* doc/invoke.texi (Blackfin Options): Now -mcpu does not accept bf579.

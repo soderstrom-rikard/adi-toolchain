@@ -2191,7 +2191,7 @@ determine_max_iter (struct loop *loop, struct niter_desc *desc, rtx old_niter)
     }
 
   get_mode_bounds (desc->mode, desc->signed_p, desc->mode, &mmin, &mmax);
-  nmax = INTVAL (mmax) - INTVAL (mmin);
+  nmax = (INTVAL (mmax) - INTVAL (mmin)) & GET_MODE_MASK (desc->mode);
 
   if (GET_CODE (niter) == UDIV)
     {
@@ -2524,7 +2524,7 @@ iv_number_of_iterations (struct loop *loop, rtx insn, rtx condition,
 	  down = INTVAL (GET_CODE (iv0.base) == CONST_INT
 			 ? iv0.base
 			 : mode_mmin);
-	  desc->niter_max = (up - down) / inc + 1;
+	  desc->niter_max = ((up - down) / inc + 1) & GET_MODE_MASK (comp_mode);
 
 	  if (iv0.step == const0_rtx)
 	    {
