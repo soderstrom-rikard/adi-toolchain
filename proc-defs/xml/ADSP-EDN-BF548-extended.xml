@@ -2226,13 +2226,13 @@
 	<register name="CMD_PEND_E" parent="SDH_COMMAND" bit-position="9"  bit-size="1" target="EMU" description="Command Pending"/>
 	<register name="CMD_E"      parent="SDH_COMMAND" bit-position="10" bit-size="1" target="EMU" description="Command Enable"/>
 
-<register name="SDH_RESP_CMD" group="SDH" mask="FFFF" description="SDH Response Command" bit-size="16" read-address="0xFFC03910" write-address="0xFFC03910" type="IO" target="EMU" />
+<register name="SDH_RESP_CMD" group="SDH" mask="FFFF" description="SDH Response Command" bit-size="16" read-address="0xFFC03910" write-address="" type="IO" target="EMU" />
 	<register name="RESP_CMD"      parent="SDH_RESP_CMD" bit-position="0" bit-size="6" target="EMU" description="Response Command"/>
 
-<register name="SDH_RESPONSE0" group="SDH" mask="FFFFFFFF" description="SDH Response0" bit-size="32" read-address="0xFFC03914" write-address="0xFFC03914" type="IO" target="EMU" />
-<register name="SDH_RESPONSE1" group="SDH" mask="FFFFFFFF" description="SDH Response1" bit-size="32" read-address="0xFFC03918" write-address="0xFFC03918" type="IO" target="EMU" />
-<register name="SDH_RESPONSE2" group="SDH" mask="FFFFFFFF" description="SDH Response2" bit-size="32" read-address="0xFFC0391C" write-address="0xFFC0391C" type="IO" target="EMU" />
-<register name="SDH_RESPONSE3" group="SDH" mask="FFFFFFFF" description="SDH Response3" bit-size="32" read-address="0xFFC03920" write-address="0xFFC03920" type="IO" target="EMU" />
+<register name="SDH_RESPONSE0" group="SDH" mask="FFFFFFFF" description="SDH Response0" bit-size="32" read-address="0xFFC03914" write-address="" type="IO" target="EMU" />
+<register name="SDH_RESPONSE1" group="SDH" mask="FFFFFFFF" description="SDH Response1" bit-size="32" read-address="0xFFC03918" write-address="" type="IO" target="EMU" />
+<register name="SDH_RESPONSE2" group="SDH" mask="FFFFFFFF" description="SDH Response2" bit-size="32" read-address="0xFFC0391C" write-address="" type="IO" target="EMU" />
+<register name="SDH_RESPONSE3" group="SDH" mask="FFFFFFFF" description="SDH Response3" bit-size="32" read-address="0xFFC03920" write-address="" type="IO" target="EMU" />
 <register name="SDH_DATA_TIMER" group="SDH" mask="FFFFFFFF" description="SDH Data Timer" bit-size="32" read-address="0xFFC03924" write-address="0xFFC03924" type="IO" target="EMU" />
 
 <register name="SDH_DATA_LGTH" group="SDH" mask="FFFF" description="SDH Data Length" bit-size="16" read-address="0xFFC03928" write-address="0xFFC03928" type="IO" target="EMU" />
@@ -2244,8 +2244,8 @@
 	<register name="DTX_DMA_E"     parent="SDH_DATA_CTL" bit-position="3" bit-size="1" target="EMU" description="Data Transfer DMA Enable"/>
 	<register name="DTX_BLK_LGTH"  parent="SDH_DATA_CTL" bit-position="4" bit-size="4" target="EMU" description="Data Transfer Block Length"/>
 
-<register name="SDH_DATA_CNT" group="SDH" mask="FFFF" description="SDH Data Counter" bit-size="16" read-address="0xFFC03930" write-address="0xFFC03930" type="IO" target="EMU" />
-<register name="SDH_STATUS" group="SDH" mask="FFFFFFFF" description="SDH Status" bit-size="32" read-address="0xFFC03934" write-address="0xFFC03934" type="IO" target="EMU" />
+<register name="SDH_DATA_CNT" group="SDH" mask="FFFF" description="SDH Data Counter" bit-size="16" read-address="0xFFC03930" write-address="" type="IO" target="EMU" />
+<register name="SDH_STATUS" group="SDH" mask="FFFFFFFF" description="SDH Status" bit-size="32" read-address="0xFFC03934" write-address="" type="IO" target="EMU" />
 	<register name="CMD_CRC_FAIL"  parent="SDH_STATUS" bit-position="0" bit-size="1"  target="EMU" description="CMD CRC Fail"/>
 	<register name="DAT_CRC_FAIL"  parent="SDH_STATUS" bit-position="1" bit-size="1"  target="EMU" description="Data CRC Fail"/>
 	<register name="CMD_TIMEOUT"   parent="SDH_STATUS" bit-position="2" bit-size="1"  target="EMU" description="CMD Time Out"/>
@@ -2269,7 +2269,7 @@
 	<register name="TX_DAT_RDY"    parent="SDH_STATUS" bit-position="20" bit-size="1" target="EMU" description="Transmit Data Available"/>
 	<register name="RX_FIFO_RDY"   parent="SDH_STATUS" bit-position="21" bit-size="1" target="EMU" description="Receive Data Available"/>
 
-<register name="SDH_STATUS_CLR" group="SDH" mask="FFFF" description="SDH Status Clear" bit-size="16" read-address="0xFFC03938" write-address="0xFFC03938" type="IO" target="EMU" />
+<register name="SDH_STATUS_CLR" group="SDH" mask="FFFF" description="SDH Status Clear" bit-size="16" read-address="" write-address="0xFFC03938" type="IO" target="EMU" />
 	<register name="CMD_CRC_FAIL_STAT"  parent="SDH_STATUS_CLR" bit-position="0"  bit-size="1" target="EMU" description="CMD CRC Fail Status"/>
 	<register name="DAT_CRC_FAIL_STAT"  parent="SDH_STATUS_CLR" bit-position="1"  bit-size="1" target="EMU" description="Data CRC Fail Status"/>
 	<register name="CMD_TIMEOUT_STAT"   parent="SDH_STATUS_CLR" bit-position="2"  bit-size="1" target="EMU" description="CMD Time Out Status"/>
@@ -2330,7 +2330,7 @@
 	<register name="MASK1_TX_DAT_RDY_MASK"    parent="SDH_MASK1" bit-position="20" bit-size="1" target="EMU" description="Transmit Data Available Mask"/>
 	<register name="MASK1_RX_FIFO_RDY_MASK"   parent="SDH_MASK1" bit-position="21" bit-size="1" target="EMU" description="Receive Data Available Mask"/>
 
-<register name="SDH_FIFO_CNT" group="SDH" mask="FFFF" description="SDH FIFO Counter" bit-size="16" read-address="0xFFC03948" write-address="0xFFC03948" type="IO" target="EMU" />
+<register name="SDH_FIFO_CNT" group="SDH" mask="FFFF" description="SDH FIFO Counter" bit-size="16" read-address="0xFFC03948" write-address="" type="IO" target="EMU" />
 	<register name="FIFO_COUNT" parent="SDH_FIFO_CNT" bit-position="0" bit-size="15" target="EMU" description="FIFO Count"/>
 
 <register name="SDH_FIFO" group="SDH" mask="FFFFFFFF" description="SDH Data FIFO" bit-size="32" read-address="0xFFC03980" write-address="0xFFC03980" type="IO" target="EMU" />
@@ -2355,14 +2355,14 @@
 <register name="SDH_RD_WAIT_EN" group="SDH" mask="FFFF" description="SDH Read Wait Enable" bit-size="16" read-address="0xFFC039CC" write-address="0xFFC039CC" type="IO" target="EMU" />
 	<register name="RWR" parent="SDH_RD_WAIT_EN" bit-position="0" bit-size="1" target="EMU" description="Read Wait Request"/>
 
-<register name="SDH_PID0" group="SDH" mask="FFFF" description="SDH Peripheral Identification0" bit-size="16" read-address="0xFFC039D0" write-address="0xFFC039D0" type="IO" target="EMU" />
-<register name="SDH_PID1" group="SDH" mask="FFFF" description="SDH Peripheral Identification1" bit-size="16" read-address="0xFFC039D4" write-address="0xFFC039D4" type="IO" target="EMU" />
-<register name="SDH_PID2" group="SDH" mask="FFFF" description="SDH Peripheral Identification2" bit-size="16" read-address="0xFFC039D8" write-address="0xFFC039D8" type="IO" target="EMU" />
-<register name="SDH_PID3" group="SDH" mask="FFFF" description="SDH Peripheral Identification3" bit-size="16" read-address="0xFFC039DC" write-address="0xFFC039DC" type="IO" target="EMU" />
-<register name="SDH_PID4" group="SDH" mask="FFFF" description="SDH Peripheral Identification4" bit-size="16" read-address="0xFFC039E0" write-address="0xFFC039E0" type="IO" target="EMU" />
-<register name="SDH_PID5" group="SDH" mask="FFFF" description="SDH Peripheral Identification5" bit-size="16" read-address="0xFFC039E4" write-address="0xFFC039E4" type="IO" target="EMU" />
-<register name="SDH_PID6" group="SDH" mask="FFFF" description="SDH Peripheral Identification6" bit-size="16" read-address="0xFFC039E8" write-address="0xFFC039E8" type="IO" target="EMU" />
-<register name="SDH_PID7" group="SDH" mask="FFFF" description="SDH Peripheral Identification7" bit-size="16" read-address="0xFFC039EC" write-address="0xFFC039EC" type="IO" target="EMU" />
+<register name="SDH_PID0" group="SDH" mask="FFFF" description="SDH Peripheral Identification0" bit-size="16" read-address="0xFFC039D0" write-address="" type="IO" target="EMU" />
+<register name="SDH_PID1" group="SDH" mask="FFFF" description="SDH Peripheral Identification1" bit-size="16" read-address="0xFFC039D4" write-address="" type="IO" target="EMU" />
+<register name="SDH_PID2" group="SDH" mask="FFFF" description="SDH Peripheral Identification2" bit-size="16" read-address="0xFFC039D8" write-address="" type="IO" target="EMU" />
+<register name="SDH_PID3" group="SDH" mask="FFFF" description="SDH Peripheral Identification3" bit-size="16" read-address="0xFFC039DC" write-address="" type="IO" target="EMU" />
+<register name="SDH_PID4" group="SDH" mask="FFFF" description="SDH Peripheral Identification4" bit-size="16" read-address="0xFFC039E0" write-address="" type="IO" target="EMU" />
+<register name="SDH_PID5" group="SDH" mask="FFFF" description="SDH Peripheral Identification5" bit-size="16" read-address="0xFFC039E4" write-address="" type="IO" target="EMU" />
+<register name="SDH_PID6" group="SDH" mask="FFFF" description="SDH Peripheral Identification6" bit-size="16" read-address="0xFFC039E8" write-address="" type="IO" target="EMU" />
+<register name="SDH_PID7" group="SDH" mask="FFFF" description="SDH Peripheral Identification7" bit-size="16" read-address="0xFFC039EC" write-address="" type="IO" target="EMU" />
 
 
 <!-- Proc Periph HWR, chap  5, ATAPI Register Definitions -->
