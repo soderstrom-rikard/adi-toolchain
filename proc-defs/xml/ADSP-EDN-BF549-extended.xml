@@ -2926,7 +2926,7 @@
 	<register name="NWIDTH"  parent="NFC_CTL" bit-position="8" bit-size="1" target="EMU" description="NAND Data Width"/>
 	<register name="PG_SIZE" parent="NFC_CTL" bit-position="9" bit-size="1" target="EMU" description="Page Size"/>
 
-<register name="NFC_STAT" group="NFC" mask="FFFF" description="NAND Status Register" bit-size="16" read-address="0xFFC03B04" write-address="0xFFC03B04" type="IO" target="EMU" />
+<register name="NFC_STAT" group="NFC" mask="FFFF" description="NAND Status Register" bit-size="16" read-address="0xFFC03B04" write-address="" type="IO" target="EMU" />
 	<register name="NBUSY"      parent="NFC_STAT" bit-position="0" bit-size="1" target="EMU" description="Not Busy"/>
 	<register name="WB_FULL"    parent="NFC_STAT" bit-position="1" bit-size="1" target="EMU" description="Write Buffer Full"/>
 	<register name="PG_WR_STAT" parent="NFC_STAT" bit-position="2" bit-size="1" target="EMU" description="Page Write Pending"/>
@@ -2947,19 +2947,19 @@
 	<register name="MASK_RDRDY"   parent="NFC_IRQMASK" bit-position="3" bit-size="1" target="EMU" description="Mask Read Data Ready"/>
 	<register name="MASK_WRDONE"  parent="NFC_IRQMASK" bit-position="4" bit-size="1" target="EMU" description="Mask Write Done"/>
 
-<register name="NFC_ECC0" group="NFC" mask="FFFF" description="NAND ECC Register 0" bit-size="16" read-address="0xFFC03B10" write-address="0xFFC03B10" type="IO" target="EMU" />
-<register name="NFC_ECC1" group="NFC" mask="FFFF" description="NAND ECC Register 1" bit-size="16" read-address="0xFFC03B14" write-address="0xFFC03B14" type="IO" target="EMU" />
-<register name="NFC_ECC2" group="NFC" mask="FFFF" description="NAND ECC Register 2" bit-size="16" read-address="0xFFC03B18" write-address="0xFFC03B18" type="IO" target="EMU" />
-<register name="NFC_ECC3" group="NFC" mask="FFFF" description="NAND ECC Register 3" bit-size="16" read-address="0xFFC03B1C" write-address="0xFFC03B1C" type="IO" target="EMU" />
+<register name="NFC_ECC0" group="NFC" mask="FFFF" description="NAND ECC Register 0" bit-size="16" read-address="0xFFC03B10" write-address="" type="IO" target="EMU" />
+<register name="NFC_ECC1" group="NFC" mask="FFFF" description="NAND ECC Register 1" bit-size="16" read-address="0xFFC03B14" write-address="" type="IO" target="EMU" />
+<register name="NFC_ECC2" group="NFC" mask="FFFF" description="NAND ECC Register 2" bit-size="16" read-address="0xFFC03B18" write-address="" type="IO" target="EMU" />
+<register name="NFC_ECC3" group="NFC" mask="FFFF" description="NAND ECC Register 3" bit-size="16" read-address="0xFFC03B1C" write-address="" type="IO" target="EMU" />
 
-<register name="NFC_COUNT" group="NFC" mask="FFFF" description="NAND ECC Count Register" bit-size="16" read-address="0xFFC03B20" write-address="0xFFC03B20" type="IO" target="EMU" />
+<register name="NFC_COUNT" group="NFC" mask="FFFF" description="NAND ECC Count Register" bit-size="16" read-address="0xFFC03B20" write-address="" type="IO" target="EMU" />
 <register name="NFC_RST" group="NFC" mask="FFFF" description="NAND ECC Reset Register" bit-size="16" read-address="0xFFC03B24" write-address="0xFFC03B24" type="IO" target="EMU" />
-<register name="NFC_PGCTL" group="NFC" mask="FFFF" description="NAND Page Control Register" bit-size="16" read-address="0xFFC03B28" write-address="0xFFC03B28" type="IO" target="EMU" />
-<register name="NFC_READ" group="NFC" mask="FFFF" description="NAND Read Data Register" bit-size="16" read-address="0xFFC03B2C" write-address="0xFFC03B2C" type="IO" target="EMU" />
-<register name="NFC_ADDR" group="NFC" mask="FFFF" description="NAND Address Register" bit-size="16" read-address="0xFFC03B40" write-address="0xFFC03B40" type="IO" target="EMU" />
-<register name="NFC_CMD" group="NFC" mask="FFFF" description="NAND Command Register" bit-size="16" read-address="0xFFC03B44" write-address="0xFFC03B44" type="IO" target="EMU" />
-<register name="NFC_DATA_WR" group="NFC" mask="FFFF" description="NAND Data Write Register" bit-size="16" read-address="0xFFC03B48" write-address="0xFFC03B48" type="IO" target="EMU" />
-<register name="NFC_DATA_RD" group="NFC" mask="FFFF" description="NAND Data Read Register" bit-size="16" read-address="0xFFC03B4C" write-address="0xFFC03B4C" type="IO" target="EMU" />
+<register name="NFC_PGCTL" group="NFC" mask="FFFF" description="NAND Page Control Register" bit-size="16" read-address="" write-address="0xFFC03B28" type="IO" target="EMU" />
+<register name="NFC_READ" group="NFC" mask="FFFF" description="NAND Read Data Register" bit-size="16" read-address="0xFFC03B2C" write-address="" type="IO" target="EMU" />
+<register name="NFC_ADDR" group="NFC" mask="FFFF" description="NAND Address Register" bit-size="16" read-address="" write-address="0xFFC03B40" type="IO" target="EMU" />
+<register name="NFC_CMD" group="NFC" mask="FFFF" description="NAND Command Register" bit-size="16" read-address="" write-address="0xFFC03B44" type="IO" target="EMU" />
+<register name="NFC_DATA_WR" group="NFC" mask="FFFF" description="NAND Data Write Register" bit-size="16" read-address="" write-address="0xFFC03B48" type="IO" target="EMU" />
+<register name="NFC_DATA_RD" group="NFC" mask="FFFF" description="NAND Data Read Register" bit-size="16" read-address="" write-address="0xFFC03B4C" type="IO" target="EMU" />
 
 
 
