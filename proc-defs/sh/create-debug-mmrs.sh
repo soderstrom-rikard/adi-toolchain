@@ -87,7 +87,7 @@ EOF
 		func=
 		if [[ -z ${mmr_read} ]] ; then
 			func="D_WO"
-		elif [[ -z ${mmr_read} ]] ; then
+		elif [[ -z ${mmr_write} ]] ; then
 			func="D_RO"
 		elif [[ ${mmr_read} == ${mmr_write} ]] ; then
 			func="D"
