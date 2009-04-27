@@ -49,6 +49,7 @@
 #include "langhooks.h"
 #include "bfin-protos.h"
 #include "tm-preds.h"
+#include "tm-constrs.h"
 #include "gt-bfin.h"
 #include "basic-block.h"
 #include "cfglayout.h"
@@ -2459,7 +2460,7 @@ bfin_secondary_reload (bool in_p, rtx x, enum reg_class class,
   if (fp_plus_const_operand (x, mode))
     {
       rtx op2 = XEXP (x, 1);
-      int large_constant_p = ! CONST_7BIT_IMM_P (INTVAL (op2));
+      int large_constant_p = ! satisfies_constraint_Ks7 (op2);
 
       if (class == PREGS || class == PREGS_CLOBBERED)
 	return NO_REGS;
@@ -2911,7 +2912,7 @@ split_load_immediate (rtx operands[])
 
   if (D_REGNO_P (regno))
     {
-      if (CONST_7BIT_IMM_P (tmp))
+      if (tmp >= -64 && tmp <= 63)
 	{
 	  emit_insn (gen_movsi (operands[0], GEN_INT (tmp)));
 	  emit_insn (gen_movstricthi_high (operands[0], GEN_INT (val & -65536)));
@@ -2938,7 +2939,7 @@ split_load_immediate (rtx operands[])
     return 0;
 
   if (optimize_size
-      && num_compl_zero && CONST_7BIT_IMM_P (shifted_compl))
+      && num_compl_zero && shifted_compl >= -64 && shifted_compl <= 63)
     {
       /* If optimizing for size, generate a sequence that has more instructions
 	 but is shorter.  */
@@ -3069,7 +3070,7 @@ bfin_rtx_costs (rtx x, int code, int outer_code, int *total)
     {
     case CONST_INT:
       if (outer_code == SET || outer_code == PLUS)
-        *total = CONST_7BIT_IMM_P (INTVAL (x)) ? 0 : cost2;
+        *total = satisfies_constraint_Ks7 (x) ? 0 : cost2;
       else if (outer_code == AND)
         *total = log2constp (~INTVAL (x)) ? 0 : cost2;
       else if (outer_code == LE || outer_code == LT || outer_code == EQ)
@@ -3127,7 +3128,7 @@ bfin_rtx_costs (rtx x, int code, int outer_code, int *total)
 	{
 	  *total = 6 * cost2;
 	  if (GET_CODE (op1) != CONST_INT
-	      || !CONST_7BIT_IMM_P (INTVAL (op1)))
+	      || !satisfies_constraint_Ks7 (op1))
 	    *total += rtx_cost (op1, PLUS);
 	  if (GET_CODE (op0) != REG
 	      && (GET_CODE (op0) != SUBREG || GET_CODE (SUBREG_REG (op0)) != REG))
