@@ -1,3 +1,7 @@
+2009-04-28  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* gcc.target/bfin/20090411-1.c: Modify f to return a value.
+	
 2009-04-24  Jie Zhang  <jie.zhang@analog.com>
 
 	* gcc.target/lsetup-5.c: New test.

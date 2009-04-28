@@ -23,7 +23,7 @@ __inline__ __attribute__ ((always_inline))
   return _x;
 }
 
-f (complex_fract16 _a)
+complex_fract16 f (complex_fract16 _a)
 {
-  csqu_fr16 (_a);
+  return csqu_fr16 (_a);
 }
