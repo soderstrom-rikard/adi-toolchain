@@ -1,3 +1,22 @@
+2009-04-28  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin-parse.y (gen_multi_instr_1): Check anomaly
+	05000074.
+	* config/tc-bfin.c (struct bfin_cpu_isa): Remove.
+	(bfin_cpus[]): Remove.
+	(enum bfin_cpu_type): New.
+	(bfin_cpu_t): Typedef.
+	(bfin_cpu_type): Define.
+	(bfin_si_revision): Define.
+	(bfin_anomaly_checks): Define.
+	(struct bfin_cpu): New.
+	(bfin_cpus[]): New.
+	(md_parse_option): Process silicon revision part of -mcpu
+	option. And initialize bfin_anomaly_checks.
+	* config/tc-bfin.h (bfin_anomaly_checks): Declare.
+	(AC_05000074): Define.
+	(ENABLE_AC_05000074): Define.
+
 2009-04-13  Jie Zhang  <jie.zhang@analog.com>
 
 	* doc/c-bfin.texi (-mcpu): Remove bf579.

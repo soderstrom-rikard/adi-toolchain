@@ -158,46 +158,165 @@ const char EXP_CHARS[] = "eE";
    As in 0f12.456 or  0d1.2345e12.  */
 const char FLT_CHARS[] = "fFdDxX";
 
-struct bfin_cpu_isa
-{
-  char *name;
-  int isa;
-};
-
 int bfin_isa = BLACKFIN_ISA_1;
 
-static struct bfin_cpu_isa bfin_cpus[] =
+typedef enum bfin_cpu_type
 {
-  {"bf512",	BLACKFIN_ISA_1},
-  {"bf514",	BLACKFIN_ISA_1},
-  {"bf516",	BLACKFIN_ISA_1},
-  {"bf518",	BLACKFIN_ISA_1},
-  {"bf522",	BLACKFIN_ISA_1},
-  {"bf523",	BLACKFIN_ISA_1},
-  {"bf524",	BLACKFIN_ISA_1},
-  {"bf525",	BLACKFIN_ISA_1},
-  {"bf526",	BLACKFIN_ISA_1},
-  {"bf527",	BLACKFIN_ISA_1},
-  {"bf531",	BLACKFIN_ISA_1},
-  {"bf532",	BLACKFIN_ISA_1},
-  {"bf533",	BLACKFIN_ISA_1},
-  {"bf534",	BLACKFIN_ISA_1},
-  {"bf536",	BLACKFIN_ISA_1},
-  {"bf537",	BLACKFIN_ISA_1},
-  {"bf538",	BLACKFIN_ISA_1},
-  {"bf539",	BLACKFIN_ISA_1},
-  {"bf542",	BLACKFIN_ISA_1},
-  {"bf542m",	BLACKFIN_ISA_1},
-  {"bf544",	BLACKFIN_ISA_1},
-  {"bf544m",	BLACKFIN_ISA_1},
-  {"bf547",	BLACKFIN_ISA_1},
-  {"bf547m",	BLACKFIN_ISA_1},
-  {"bf548",	BLACKFIN_ISA_1},
-  {"bf548m",	BLACKFIN_ISA_1},
-  {"bf549",	BLACKFIN_ISA_1},
-  {"bf549m",	BLACKFIN_ISA_1},
-  {"bf561",	BLACKFIN_ISA_1},
-  {NULL, 0}
+  BFIN_CPU_UNKNOWN,
+  BFIN_CPU_BF512,
+  BFIN_CPU_BF514,
+  BFIN_CPU_BF516,
+  BFIN_CPU_BF518,
+  BFIN_CPU_BF522,
+  BFIN_CPU_BF523,
+  BFIN_CPU_BF524,
+  BFIN_CPU_BF525,
+  BFIN_CPU_BF526,
+  BFIN_CPU_BF527,
+  BFIN_CPU_BF531,
+  BFIN_CPU_BF532,
+  BFIN_CPU_BF533,
+  BFIN_CPU_BF534,
+  BFIN_CPU_BF536,
+  BFIN_CPU_BF537,
+  BFIN_CPU_BF538,
+  BFIN_CPU_BF539,
+  BFIN_CPU_BF542,
+  BFIN_CPU_BF542M,
+  BFIN_CPU_BF544,
+  BFIN_CPU_BF544M,
+  BFIN_CPU_BF547,
+  BFIN_CPU_BF547M,
+  BFIN_CPU_BF548,
+  BFIN_CPU_BF548M,
+  BFIN_CPU_BF549,
+  BFIN_CPU_BF549M,
+  BFIN_CPU_BF561
+} bfin_cpu_t;
+
+bfin_cpu_t bfin_cpu_type = BFIN_CPU_UNKNOWN;
+/* -msi-revision support. There are three special values:
+   -1      -msi-revision=none.
+   0xffff  -msi-revision=any.  */
+int bfin_si_revision;
+
+unsigned int bfin_anomaly_checks = 0;
+
+struct bfin_cpu
+{
+  const char *name;
+  bfin_cpu_t type;
+  int si_revision;
+  unsigned int anomaly_checks;
+};
+
+struct bfin_cpu bfin_cpus[] =
+{
+  {"bf512", BFIN_CPU_BF512, 0x0000, AC_05000074},
+
+  {"bf514", BFIN_CPU_BF514, 0x0000, AC_05000074},
+
+  {"bf516", BFIN_CPU_BF516, 0x0000, AC_05000074},
+
+  {"bf518", BFIN_CPU_BF518, 0x0001, AC_05000074},
+  {"bf518", BFIN_CPU_BF518, 0x0000, AC_05000074},
+
+  {"bf522", BFIN_CPU_BF522, 0x0002, AC_05000074},
+  {"bf522", BFIN_CPU_BF522, 0x0001, AC_05000074},
+  {"bf522", BFIN_CPU_BF522, 0x0000, AC_05000074},
+
+  {"bf523", BFIN_CPU_BF523, 0x0002, AC_05000074},
+  {"bf523", BFIN_CPU_BF523, 0x0001, AC_05000074},
+  {"bf523", BFIN_CPU_BF523, 0x0000, AC_05000074},
+
+  {"bf524", BFIN_CPU_BF524, 0x0002, AC_05000074},
+  {"bf524", BFIN_CPU_BF524, 0x0001, AC_05000074},
+  {"bf524", BFIN_CPU_BF524, 0x0000, AC_05000074},
+
+  {"bf525", BFIN_CPU_BF525, 0x0002, AC_05000074},
+  {"bf525", BFIN_CPU_BF525, 0x0001, AC_05000074},
+  {"bf525", BFIN_CPU_BF525, 0x0000, AC_05000074},
+
+  {"bf526", BFIN_CPU_BF526, 0x0002, AC_05000074},
+  {"bf526", BFIN_CPU_BF526, 0x0001, AC_05000074},
+  {"bf526", BFIN_CPU_BF526, 0x0000, AC_05000074},
+
+  {"bf527", BFIN_CPU_BF527, 0x0002, AC_05000074},
+  {"bf527", BFIN_CPU_BF527, 0x0001, AC_05000074},
+  {"bf527", BFIN_CPU_BF527, 0x0000, AC_05000074},
+
+  {"bf531", BFIN_CPU_BF531, 0x0006, AC_05000074},
+  {"bf531", BFIN_CPU_BF531, 0x0005, AC_05000074},
+  {"bf531", BFIN_CPU_BF531, 0x0004, AC_05000074},
+  {"bf531", BFIN_CPU_BF531, 0x0003, AC_05000074},
+
+  {"bf532", BFIN_CPU_BF532, 0x0006, AC_05000074},
+  {"bf532", BFIN_CPU_BF532, 0x0005, AC_05000074},
+  {"bf532", BFIN_CPU_BF532, 0x0004, AC_05000074},
+  {"bf532", BFIN_CPU_BF532, 0x0003, AC_05000074},
+
+  {"bf533", BFIN_CPU_BF533, 0x0006, AC_05000074},
+  {"bf533", BFIN_CPU_BF533, 0x0005, AC_05000074},
+  {"bf533", BFIN_CPU_BF533, 0x0004, AC_05000074},
+  {"bf533", BFIN_CPU_BF533, 0x0003, AC_05000074},
+
+  {"bf534", BFIN_CPU_BF534, 0x0003, AC_05000074},
+  {"bf534", BFIN_CPU_BF534, 0x0002, AC_05000074},
+  {"bf534", BFIN_CPU_BF534, 0x0001, AC_05000074},
+
+  {"bf536", BFIN_CPU_BF536, 0x0003, AC_05000074},
+  {"bf536", BFIN_CPU_BF536, 0x0002, AC_05000074},
+  {"bf536", BFIN_CPU_BF536, 0x0001, AC_05000074},
+
+  {"bf537", BFIN_CPU_BF537, 0x0003, AC_05000074},
+  {"bf537", BFIN_CPU_BF537, 0x0002, AC_05000074},
+  {"bf537", BFIN_CPU_BF537, 0x0001, AC_05000074},
+
+  {"bf538", BFIN_CPU_BF538, 0x0005, AC_05000074},
+  {"bf538", BFIN_CPU_BF538, 0x0004, AC_05000074},
+  {"bf538", BFIN_CPU_BF538, 0x0003, AC_05000074},
+  {"bf538", BFIN_CPU_BF538, 0x0002, AC_05000074},
+
+  {"bf539", BFIN_CPU_BF539, 0x0005, AC_05000074},
+  {"bf539", BFIN_CPU_BF539, 0x0004, AC_05000074},
+  {"bf539", BFIN_CPU_BF539, 0x0003, AC_05000074},
+  {"bf539", BFIN_CPU_BF539, 0x0002, AC_05000074},
+
+  {"bf542m", BFIN_CPU_BF542M, 0x0003, AC_05000074},
+
+  {"bf542", BFIN_CPU_BF542, 0x0002, AC_05000074},
+  {"bf542", BFIN_CPU_BF542, 0x0001, AC_05000074},
+  {"bf542", BFIN_CPU_BF542, 0x0000, AC_05000074},
+
+  {"bf544m", BFIN_CPU_BF544M, 0x0003, AC_05000074},
+
+  {"bf544", BFIN_CPU_BF544, 0x0002, AC_05000074},
+  {"bf544", BFIN_CPU_BF544, 0x0001, AC_05000074},
+  {"bf544", BFIN_CPU_BF544, 0x0000, AC_05000074},
+
+  {"bf547m", BFIN_CPU_BF547M, 0x0003, AC_05000074},
+
+  {"bf547", BFIN_CPU_BF547, 0x0002, AC_05000074},
+  {"bf547", BFIN_CPU_BF547, 0x0001, AC_05000074},
+  {"bf547", BFIN_CPU_BF547, 0x0000, AC_05000074},
+
+  {"bf548m", BFIN_CPU_BF548M, 0x0003, AC_05000074},
+
+  {"bf548", BFIN_CPU_BF548, 0x0002, AC_05000074},
+  {"bf548", BFIN_CPU_BF548, 0x0001, AC_05000074},
+  {"bf548", BFIN_CPU_BF548, 0x0000, AC_05000074},
+
+  {"bf549m", BFIN_CPU_BF549M, 0x0003, AC_05000074},
+
+  {"bf549", BFIN_CPU_BF549, 0x0002, AC_05000074},
+  {"bf549", BFIN_CPU_BF549, 0x0001, AC_05000074},
+  {"bf549", BFIN_CPU_BF549, 0x0000, AC_05000074},
+
+  {"bf561", BFIN_CPU_BF561, 0x0005, AC_05000074},
+  {"bf561", BFIN_CPU_BF561, 0x0003, AC_05000074},
+  {"bf561", BFIN_CPU_BF561, 0x0002, AC_05000074},
+
+  {NULL, 0, 0, 0}
 };
 
 /* Define bfin-specific command-line options (there are none). */
@@ -229,25 +348,71 @@ md_parse_option (int c ATTRIBUTE_UNUSED, char *arg ATTRIBUTE_UNUSED)
 
     case OPTION_MCPU:
       {
+	const char *p, *q;
 	int i;
-	char *p;
 
-	/* Silicon revision is not useful here.  */
-	p = strchr (arg, '-');
-	if (p != NULL)
-	  *p = '\0';
+	i = 0;
+	while ((p = bfin_cpus[i].name) != NULL)
+	  {
+	    if (strncmp (arg, p, strlen (p)) == 0)
+	      break;
+	    i++;
+	  }
 
-	for (i = 0; bfin_cpus[i].name; i++)
-	  if (strcmp (bfin_cpus[i].name, arg) == 0)
-	    break;
+	if (p == NULL)
+	  {
+	    error ("-mcpu=%s is not valid", arg);
+	    return 0;
+	  }
 
-	if (p != NULL)
-	  *p = '-';
+	bfin_cpu_type = bfin_cpus[i].type;
 
-	if (!bfin_cpus[i].name)
-	  as_fatal (_("unknown Blackfin processor: %s\n"), arg);
+	q = arg + strlen (p);
 
-	bfin_isa = bfin_cpus[i].isa;
+	if (*q == '\0')
+	  {
+	    bfin_si_revision = bfin_cpus[i].si_revision;
+	    bfin_anomaly_checks |= bfin_cpus[i].anomaly_checks;
+	  }
+	else if (strcmp (q, "-none") == 0)
+	  bfin_si_revision = -1;
+      	else if (strcmp (q, "-any") == 0)
+	  {
+	    bfin_si_revision = 0xffff;
+	    while (bfin_cpus[i].type == bfin_cpu_type)
+	      {
+		bfin_anomaly_checks |= bfin_cpus[i].anomaly_checks;
+		i++;
+	      }
+	  }
+	else
+	  {
+	    unsigned int si_major, si_minor;
+	    int rev_len, n;
+
+	    rev_len = strlen (q);
+
+	    if (sscanf (q, "-%u.%u%n", &si_major, &si_minor, &n) != 2
+		|| n != rev_len
+		|| si_major > 0xff || si_minor > 0xff)
+	      {
+	      invalid_silicon_revision:
+		error ("-mcpu=%s has invalid silicon revision", arg);
+		return 0;
+	      }
+
+	    bfin_si_revision = (si_major << 8) | si_minor;
+
+	    while (bfin_cpus[i].type == bfin_cpu_type
+		   && bfin_cpus[i].si_revision != bfin_si_revision)
+	      i++;
+
+	    if (bfin_cpus[i].type != bfin_cpu_type)
+	      goto invalid_silicon_revision;
+
+	    bfin_anomaly_checks |= bfin_cpus[i].anomaly_checks;
+	  }
+
 	break;
       }
 
