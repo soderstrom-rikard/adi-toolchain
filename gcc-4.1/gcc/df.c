@@ -1059,11 +1059,6 @@ df_uses_record (struct df *df, rtx *loc, enum df_ref_type ref_type,
 	      df_uses_record (df, &XEXP (dst, 2), DF_REF_REG_USE, bb, insn, 0);
 	      dst = XEXP (dst, 0);
 	      break;
-	    case VEC_SELECT:
-	      df_uses_record (df, &XEXP (dst, 0),
-			      DF_REF_REG_DEF, bb, insn, DF_REF_VEC_SELECT);
-	      dst = XEXP (dst, 0);
-	      break;
 	    default:
 	      gcc_unreachable ();
 	  }

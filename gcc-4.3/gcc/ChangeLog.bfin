@@ -1,3 +1,12 @@
+2009-04-29  Jie Zhang  <jie.zhang@analog.com>
+
+	Revert
+	2009-04-11  Jie Zhang  <jie.zhang@analog.com>
+	* fwprop.c (forward_propagate_into): Don't propagate from
+	or into VEC_SELECT.
+	* df-scan.c (df_uses_record): Deal with VEC_SELECT.
+	* df.h (enum df_ref_flags): Add DF_REF_VEC_SELECT.
+
 2009-04-28  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (sp_or_sm, spm_string, spm_name): New macro.

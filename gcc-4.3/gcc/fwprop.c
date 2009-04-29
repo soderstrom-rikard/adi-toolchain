@@ -941,8 +941,6 @@ forward_propagate_into (struct df_ref *use)
     return;
   if (DF_REF_IS_ARTIFICIAL (use))
     return;
-  if (DF_REF_FLAGS (use) & DF_REF_VEC_SELECT)
-    return;
 
   /* Only consider uses that have a single definition.  */
   defs = DF_REF_CHAIN (use);
@@ -953,8 +951,6 @@ forward_propagate_into (struct df_ref *use)
   if (DF_REF_FLAGS (def) & DF_REF_READ_WRITE)
     return;
   if (DF_REF_IS_ARTIFICIAL (def))
-    return;
-  if (DF_REF_FLAGS (def) & DF_REF_VEC_SELECT)
     return;
 
   /* Do not propagate loop invariant definitions inside the loop.  */
