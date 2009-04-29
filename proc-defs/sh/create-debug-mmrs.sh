@@ -20,9 +20,51 @@ cat << EOF > ${output}
 #include <asm/blackfin.h>
 
 #define _D(name, bits, addr, perms) debugfs_create_x##bits(name, perms, parent, (u##bits *)addr)
-#define D(name, bits, addr)         _D(name, bits, addr, 0600)
-#define D_RO(name, bits, addr)      _D(name, bits, addr, 0400)
-#define D_WO(name, bits, addr)      _D(name, bits, addr, 0200)
+#define D(name, bits, addr)         _D(name, bits, addr, S_IRUSR|S_IWUSR)
+#define D_RO(name, bits, addr)      _D(name, bits, addr, S_IRUSR)
+#define D_WO(name, bits, addr)      _D(name, bits, addr, S_IWUSR)
+
+static inline int sport_width(void *mmr)
+{
+	unsigned long lmmr = (unsigned long)mmr;
+	if ((lmmr & 0xff) == 0x10)
+		/* SPORT#_TX has 0x10 offset -> SPORT#_TCR2 has 0x04 offset */
+		lmmr -= 0xc;
+	else
+	 	/* SPORT#_RX has 0x18 offset -> SPORT#_RCR2 has 0x24 offset */
+		lmmr += 0xc;
+	/* extract SLEN field from control register 2 and add 1 */
+	return (bfin_read16(lmmr) & 0x1f) + 1;
+}
+static int sport_set(void *mmr, u64 val)
+{
+	unsigned long flags;
+	local_irq_save(flags);
+	if (sport_width(mmr) <= 16)
+	    bfin_write16(mmr, val);
+	else
+	    bfin_write32(mmr, val);
+	local_irq_restore(flags);
+    return 0;
+}
+static int sport_get(void *mmr, u64 *val)
+{
+	unsigned long flags;
+	local_irq_save(flags);
+	if (sport_width(mmr) <= 16)
+	    *val = bfin_read16(mmr);
+	else
+	    *val = bfin_read32(mmr);
+	local_irq_restore(flags);
+    return 0;
+}
+DEFINE_SIMPLE_ATTRIBUTE(fops_sport, sport_get, sport_set, "0x%08llx\n");
+/*DEFINE_SIMPLE_ATTRIBUTE(fops_sport_ro, sport_get, NULL, "0x%08llx\n");*/
+DEFINE_SIMPLE_ATTRIBUTE(fops_sport_wo, NULL, sport_set, "0x%08llx\n");
+#define _D_SPORT(name, addr, perms, fops) debugfs_create_file(name, perms, parent, (void *)addr, fops)
+#define D_SPORT(name, bits, addr)    _D_SPORT(name, addr, S_IRUSR|S_IWUSR, &fops_sport)
+#define D_SPORT_RO(name, bits, addr) _D_SPORT(name, addr, S_IRUSR, &fops_sport_ro)
+#define D_SPORT_WO(name, bits, addr) _D_SPORT(name, addr, S_IWUSR, &fops_sport_wo)
 
 static struct dentry *debug_mmrs_dentry;
 
@@ -84,16 +126,23 @@ EOF
 			parent=${group}
 		fi
 
+		special=
+		case ${mmr_name} in
+			SPORT*_[RT]X) special="_SPORT" ;;
+		esac
+
 		func=
 		if [[ -z ${mmr_read} ]] ; then
-			func="D_WO"
+			func="_WO"
 		elif [[ -z ${mmr_write} ]] ; then
-			func="D_RO"
+			func="_RO"
 		elif [[ ${mmr_read} == ${mmr_write} ]] ; then
-			func="D"
+			func=""
 		else
-			func="D_RW"
+			func="_RW"
 		fi
+		func="D${special}${func}"
+
 cat << EOF >> ${output}
 		${func}("${mmr_name}", ${bits}, ${mmr_read:-${mmr_write:-WTF}});
 EOF
