@@ -1,5 +1,9 @@
 2009-05-05  Jie Zhang  <jie.zhang@analog.com>
 
+	* gas/bfin/search.s: Clean up.
+
+2009-05-05  Jie Zhang  <jie.zhang@analog.com>
+
 	* gas/bfin/parallel5.s: New test.
 	* gas/bfin/error.exp: New test.
 

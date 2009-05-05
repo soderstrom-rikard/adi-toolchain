@@ -1,5 +1,10 @@
 2009-05-05  Jie Zhang  <jie.zhang@analog.com>
 
+	* config/bfin-parse.y (star_or_nothing): Remove.
+	(a0a1_assign, a0a1_plusassign, a0a1_minusassign): Remove.
+
+2009-05-05  Jie Zhang  <jie.zhang@analog.com>
+
 	* config/bfin-parse.y (gen_multi_instr_1): Check anomaly
 	05000074 only when both slot1 and slot2 are filled.
 

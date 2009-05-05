@@ -593,7 +593,6 @@ dsp32shiftimm in slot1 and P-reg Store in slot2 Not Supported");
 %type <expr> got_or_expr
 %type <expr> pltpc
 %type <value> any_gotrel GOT GOT17M4 FUNCDESC_GOT17M4
-%type <value> star_or_nothing
 
 /* Precedence rules.  */
 %left BAR
@@ -4232,40 +4231,6 @@ multiply_halfregs:
 	    }
 	  else
 	    return yyerror ("Dregs expected");
-	}
-	;
-
-a0a1_assign:
-	LPAREN REG_A COMMA REG_A RPAREN ASSIGN
-	{
-	  if (IS_A1 ($2) || !IS_A1 ($4))
-	    return yyerror ("(A0, A1) is expected");
-	}
-	;
-
-a0a1_plusassign:
-	LPAREN REG_A COMMA REG_A RPAREN _PLUS_ASSIGN
-	{
-	  if (IS_A1 ($2) || !IS_A1 ($4))
-	    return yyerror ("(A0, A1) is expected");
-	}
-	;
-
-a0a1_minusassign:
-	LPAREN REG_A COMMA REG_A RPAREN _MINUS_ASSIGN
-	{
-	  if (IS_A1 ($2) || !IS_A1 ($4))
-	    return yyerror ("(A0, A1) is expected");
-	}
-	;
-
-star_or_nothing:
-	{
-	  $$ = 0;
-	}
-	| STAR
-	{
-	  $$ = 1;
 	}
 	;
 
