@@ -1,3 +1,8 @@
+2009-05-05  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin-parse.y (gen_multi_instr_1): Check anomaly
+	05000074 only when both slot1 and slot2 are filled.
+
 2009-04-28  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin-parse.y (gen_multi_instr_1): Check anomaly
