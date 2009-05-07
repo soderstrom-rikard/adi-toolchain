@@ -133,7 +133,7 @@ SINGLE_LINK:	KEEP (*(SORT(.dtors.*)))
 
 	. = ALIGN(0x10) ;
 	@SYMBOL_PREFIX@_edata = . ;
- 
+
 	.bss : {
 		. = ALIGN(0x4) ;
 		@SYMBOL_PREFIX@_sbss = ALIGN(0x4) ;
