@@ -22,6 +22,7 @@ OBJDUMP="`expr $OBJCOPY : '\(.*\)objcopy'`objdump"
 LDSCRIPTPATH="@binutils_ldscript_dir@"	# and the scripts
 SHARED_ID=""
 NEWLDSCRIPT=""
+WANT_SHARED=""
 
 # check TOOLDIR from prefix/bin/ or prefix/target-alias/bin/
 [ -d "${LDSCRIPTPATH}" ] || LDSCRIPTPATH="${TOOLDIR}/../lib"
@@ -52,18 +53,18 @@ then
 
 		-move-rodata)
 		          MOVDAT="y";;                 # Put rodata in ROM if possible
-			 
+		-s)       ;;                           # Ignore -s (strip)
+
 		-shared-lib-id)
 		          shift; SHARED_ID="$1";;      # Shared library ID
 		-shared|-G)
-			  WANT_SHARED=1;;              # Shared library ID
+		          WANT_SHARED="y";;            # Shared library
 
 		-o)       shift; OFILE="$1";;          # the final outfile
 		-o*)      OFILE="`expr \"$1\" : '-o\(.*\)'`";;
 
 		-T)       shift; LDSCRIPT="$1";;       # they have a linker script
 		-c)       shift; LDSCRIPT="$1";;
-		-s)       ;;
 
 		-L)       ARG1="$ARG1 $1"              # remember search dirs
 		          shift;
@@ -93,7 +94,7 @@ then
 		shift
 	done
 
-	if [ $WANT_SHARED ]
+	if [ "$WANT_SHARED" = "y" ]
 	then
 		if [ -z "$SHARED_ID" ]
 		then
