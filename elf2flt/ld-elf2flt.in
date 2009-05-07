@@ -152,6 +152,12 @@ then
 		else
 			SEDOP="$SEDOP -e /^SINGLE_LINK:/d"
 		fi
+		if [ "@emit_ctor_dtor@" = "yes" ]
+		then
+			SEDOP="$SEDOP -e s/^TOR://"
+		else
+			SEDOP="$SEDOP -e /^TOR:/d"
+		fi
 		
 		# provide a default linker script, we usually need one
 		[ -z "$LDSCRIPT" ] && LDSCRIPT="${LDSCRIPTPATH}/elf2flt.ld"
@@ -195,7 +201,28 @@ then
 		fi
 		if [ "$OBJCOPYOP" ]
 		then
+		 if $OBJCOPY $OBJCOPYOP --help > /dev/null 2>&1
+		 then
 		  $OBJCOPY $OBJCOPYOP "$OFILE.gdb" ||exit $?
+		 else
+		  case " $OBJCOPYOP " in
+		  *" --localize-hidden "*)
+		    SYMS=`mktemp /tmp/flt-XXXXXX`
+		    $OBJDUMP --syms "$OFILE.gdb" > "$SYMS" ||exit $?
+		    sed -n 's/.*\(\.hidden\|\.internal\) \(.*\)/-L \2/p' < "$SYMS" > "$SYMS.hidden" ||exit $?
+		    if [ -s "$SYMS.hidden" ]
+		    then
+		     xargs ${VERBOSE:+-t} $OBJCOPY "$OFILE.gdb" < "$SYMS.hidden" ||exit $?
+		    fi
+		    rm -f "$SYMS" "$SYMS.hidden"
+		    ;;
+		  esac
+		  case " $OBJCOPYOP " in
+		  *" --weaken "*)
+		    $OBJCOPY --weaken "$OFILE.gdb" ||exit $?
+		    ;;
+		  esac
+		 fi
 		fi
 		[ "$RFILE" = "$OFILE.gdb" ] || rm -f "$RFILE"  # not needed for any reason
 		rm -f "$NEWLDSCRIPT"

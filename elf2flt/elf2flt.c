@@ -56,42 +56,56 @@
 #include <bfd.h>      /* Main header file for the BFD library                */
 #include <libiberty.h>
 
+#if defined(TARGET_h8300)
+#include <elf/h8.h>      /* TARGET_* ELF support for the BFD library            */
+#elif defined(__CYGWIN__) || defined(__MINGW32__) || defined(TARGET_nios) || defined(TARGET_nios2)
+#include "cygwin-elf.h"	/* Cygwin uses a local copy */
+#elif defined(TARGET_microblaze)
+#include <elf/microblaze.h>	/* TARGET_* ELF support for the BFD library */
+#elif defined(TARGET_bfin)
+#include "elf/bfin.h"
+#else
+#include <elf.h>      /* TARGET_* ELF support for the BFD library            */
+#endif
+
+#if defined(__MINGW32__)
+#include <getopt.h>
+#endif
+
 /* from uClinux-x.x.x/include/linux */
 #include "flat.h"     /* Binary flat header description                      */
 #include "compress.h"
+
+#ifdef TARGET_e1
+#include <e1.h>
+#endif
 
 #ifdef TARGET_v850e
 #define TARGET_v850
 #endif
 
 #if defined(TARGET_m68k)
-#include <elf/m68k.h>
 #define	ARCH	"m68k/coldfire"
 #elif defined(TARGET_arm)
-#include <elf/arm.h>
 #define	ARCH	"arm"
 #elif defined(TARGET_sparc)
-#include <elf/sparc.h>
 #define	ARCH	"sparc"
 #elif defined(TARGET_v850)
-#include <elf/v850.h>
 #define	ARCH	"v850"
 #elif defined(TARGET_sh)
-#include <elf/sh.h>
 #define	ARCH	"sh"
 #elif defined(TARGET_h8300)
-#include <elf/h8300.h>
 #define	ARCH	"h8300"
 #elif defined(TARGET_microblaze)
-#include <elf/microblaze.h>
 #define ARCH	"microblaze"
 #elif defined(TARGET_e1)
-#include <e1.h>
 #define ARCH    "e1-coff"
 #elif defined(TARGET_bfin)
-#include <elf/bfin.h>
 #define ARCH	"bfin"
-#define false   0
+#elif defined(TARGET_nios)
+#define ARCH	"nios"
+#elif defined(TARGET_nios2)
+#define ARCH	"nios2"
 #else
 #error "Don't know how to support your CPU architecture??"
 #endif
@@ -133,7 +147,7 @@ int use_resolved = 0; /* If true, get the value of symbol references from */
 
 /* Set if the text section contains any relocations.  If it does, we must
    set the load_to_ram flag.  */
-int text_has_relocs = 0; 
+int text_has_relocs = 0;
 const char *progname, *filename;
 int lineno;
 
@@ -317,8 +331,8 @@ weak_und_symbol(const char *reloc_section_name,
 }
 
 static int
-bfin_set_reloc (uint32_t *reloc, 
-		const char *reloc_section_name, 
+bfin_set_reloc (uint32_t *reloc,
+		const char *reloc_section_name,
 		const char *sym_name,
 		struct bfd_symbol *symbol,
 		int sp, int32_t offset)
@@ -338,7 +352,6 @@ bfin_set_reloc (uint32_t *reloc,
     *reloc = val;
     return 0;
 }
-#endif
 
 static bfd *compare_relocs_bfd;
 
@@ -349,7 +362,7 @@ compare_relocs (const void *pa, const void *pb)
 	const arelent *ra = *a, *rb = *b;
 	unsigned long va, vb;
 	uint32_t a_vma, b_vma;
-	
+
 	if (!ra->sym_ptr_ptr || !*ra->sym_ptr_ptr)
 		return -1;
 	else if (!rb->sym_ptr_ptr || !*rb->sym_ptr_ptr)
@@ -363,6 +376,7 @@ compare_relocs (const void *pa, const void *pb)
 	vb = (*(rb->sym_ptr_ptr))->value + b_vma + rb->addend;
 	return va - vb;
 }
+#endif
 
 uint32_t *
 output_relocs (
@@ -389,7 +403,9 @@ output_relocs (
   int			bad_relocs = 0;
   asymbol		**symb;
   long			nsymb;
+#ifdef TARGET_bfin
   unsigned long		persistent_data = 0;
+#endif
   
 #if 0
   printf("%s(%d): output_relocs(abs_bfd=%d,synbols=0x%x,number_of_symbols=%d"
@@ -489,8 +505,10 @@ dump_symbols(symbols, number_of_symbols);
 			__FILE__, __LINE__, r->name);
 		continue;
 	} else {
+#ifdef TARGET_bfin
 		compare_relocs_bfd = abs_bfd;
 		qsort (relpp, relcount, sizeof *relpp, compare_relocs);
+#endif
 		for (p = relpp; (relcount && (*p != NULL)); p++, relcount--) {
 			unsigned char *r_mem;
 			int relocation_needed = 0;
@@ -723,7 +741,7 @@ dump_symbols(symbols, number_of_symbols);
 				    }
 				    flat_relocs = (uint32_t *)
 					(realloc (flat_relocs, (flat_reloc_count + 1) * sizeof (uint32_t)));
-				    if (bfin_set_reloc (flat_relocs + flat_reloc_count, 
+				    if (bfin_set_reloc (flat_relocs + flat_reloc_count,
 							sym_section->name, sym_name,
 							(*(q->sym_ptr_ptr)),
 							0, section_vma + q->address))
@@ -732,7 +750,7 @@ dump_symbols(symbols, number_of_symbols);
 					text_has_relocs = 1;
 				    flat_reloc_count++;
 				    break;
-				    
+
 				case R_huimm16:
 				    sym_vma = bfd_section_vma(abs_bfd, sym_section);
 				    sym_addr += sym_vma + q->addend;
@@ -750,7 +768,7 @@ dump_symbols(symbols, number_of_symbols);
 						    = (sym_addr >> 16) | (3 << 26);
 				    }
 
-				    if (bfin_set_reloc (flat_relocs + flat_reloc_count, 
+				    if (bfin_set_reloc (flat_relocs + flat_reloc_count,
 							sym_section->name, sym_name,
 							(*(q->sym_ptr_ptr)),
 							1, section_vma + q->address))
@@ -767,7 +785,7 @@ dump_symbols(symbols, number_of_symbols);
 				    if (weak_und_symbol (sym_section->name, (*(q->sym_ptr_ptr))))
 					continue;
 
-				    flat_relocs = (uint32_t *) 
+				    flat_relocs = (uint32_t *)
 					(realloc (flat_relocs, (flat_reloc_count + 1) * sizeof (uint32_t)));
 				    if (bfin_set_reloc (flat_relocs + flat_reloc_count,
 							sym_section->name, sym_name,
