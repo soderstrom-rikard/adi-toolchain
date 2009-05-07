@@ -263,6 +263,21 @@ get_symbol_offset(char *name, asection *sec, asymbol **symbol_table, long number
 
 
 
+#ifdef TARGET_nios2
+long
+get_gp_value(asymbol **symbol_table, long number_of_symbols)
+{
+  long i;
+  for (i=0; i<number_of_symbols; i++) {
+      if (!strcmp(symbol_table[i]->name, "_gp"))
+		return symbol_table[i]->value;
+  }
+  return -1;
+}
+#endif
+
+
+
 int32_t
 add_com_to_bss(asymbol **symbol_table, int32_t number_of_symbols, int32_t bss_len)
 {
