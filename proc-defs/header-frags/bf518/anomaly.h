@@ -12,7 +12,7 @@
 
 /* We plan on not supporting 0.0 silicon, but 0.1 isn't out yet - sorry */
 #if __SILICON_REVISION__ < 0
-# error will not work on BF518 silicon version 
+# error will not work on BF518 silicon version
 #endif
 
 #ifndef _MACH_ANOMALY_H_
@@ -68,21 +68,33 @@
 #define ANOMALY_05000455 (1)
 
 /* Anomalies that don't exist on this proc */
+#define ANOMALY_05000099 (0)
+#define ANOMALY_05000119 (0)
+#define ANOMALY_05000120 (0)
 #define ANOMALY_05000125 (0)
 #define ANOMALY_05000158 (0)
 #define ANOMALY_05000171 (0)
+#define ANOMALY_05000179 (0)
 #define ANOMALY_05000183 (0)
 #define ANOMALY_05000198 (0)
+#define ANOMALY_05000215 (0)
+#define ANOMALY_05000220 (0)
 #define ANOMALY_05000227 (0)
 #define ANOMALY_05000230 (0)
+#define ANOMALY_05000231 (0)
+#define ANOMALY_05000233 (0)
 #define ANOMALY_05000242 (0)
 #define ANOMALY_05000244 (0)
+#define ANOMALY_05000248 (0)
+#define ANOMALY_05000250 (0)
 #define ANOMALY_05000261 (0)
 #define ANOMALY_05000263 (0)
 #define ANOMALY_05000266 (0)
 #define ANOMALY_05000273 (0)
+#define ANOMALY_05000274 (0)
 #define ANOMALY_05000278 (0)
 #define ANOMALY_05000285 (0)
+#define ANOMALY_05000301 (0)
 #define ANOMALY_05000305 (0)
 #define ANOMALY_05000307 (0)
 #define ANOMALY_05000311 (0)
@@ -93,9 +105,13 @@
 #define ANOMALY_05000363 (0)
 #define ANOMALY_05000380 (0)
 #define ANOMALY_05000386 (0)
+#define ANOMALY_05000389 (0)
+#define ANOMALY_05000400 (0)
 #define ANOMALY_05000412 (0)
 #define ANOMALY_05000432 (0)
 #define ANOMALY_05000447 (0)
 #define ANOMALY_05000448 (0)
+#define ANOMALY_05000456 (0)
+#define ANOMALY_05000450 (0)
 
 #endif
