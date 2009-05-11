@@ -87,7 +87,7 @@
 /* Killed System MMR Write Completes Erroneously On Next System MMR Access */
 #define ANOMALY_05000315 (__SILICON_REVISION__ < 4)
 /* PFx Glitch on Write to FIO_FLAG_D or FIO_FLAG_T */
-#define ANOMALY_05000318 (__SILICON_REVISION__ < 4)
+#define ANOMALY_05000318 (defined(__ADSPBF539__) && __SILICON_REVISION__ < 4)
 /* Regulator Programming Blocked when Hibernate Wakeup Source Remains Active */
 #define ANOMALY_05000355 (__SILICON_REVISION__ < 5)
 /* Serial Port (SPORT) Multichannel Transmit Failure when Channel 0 Is Disabled */
@@ -114,6 +114,8 @@
 #define ANOMALY_05000436 (__SILICON_REVISION__ > 3)
 /* IFLUSH Instruction at End of Hardware Loop Causes Infinite Stall */
 #define ANOMALY_05000443 (1)
+/* False Hardware Error when RETI points to invalid memory */
+#define ANOMALY_05000461 (1)
 
 /* Anomalies that don't exist on this proc */
 #define ANOMALY_05000099 (0)
