@@ -31,9 +31,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = doc
-DIST_COMMON = $(srcdir)/Doxyfile.in $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in
+subdir = bindings/python
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(srcdir)/setup.py.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.in
@@ -41,7 +41,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES = Doxyfile
+CONFIG_CLEAN_FILES = setup.py
 SOURCES =
 DIST_SOURCES =
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -168,10 +168,12 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-CLEANFILES = rm -rf html man
-@HAVE_DOXYGEN_FALSE@MANUALS = 
-@HAVE_DOXYGEN_TRUE@MANUALS = html/index.html
-all: all-am
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@LIBFTDI_INTERFACE = $(top_srcdir)/src/ftdi.h 
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@SWIG_INTERFACE = ../ftdi.i
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@BUILT_SOURCES = ftdi_wrap.c ftdi.py
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@CLEANFILES = ftdi_wrap.c ftdi.py
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -183,9 +185,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  doc/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  bindings/python/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  doc/Makefile
+	  $(AUTOMAKE) --foreign  bindings/python/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -203,7 +205,7 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-Doxyfile: $(top_builddir)/config.status $(srcdir)/Doxyfile.in
+setup.py: $(top_builddir)/config.status $(srcdir)/setup.py.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 
 mostlyclean-libtool:
@@ -245,10 +247,15 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: check-am
-all-am: Makefile
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
+@ENABLE_PYTHON_BINDING_FALSE@all-local:
+@HAVE_PYTHON_FALSE@all-local:
+@HAVE_SWIG_FALSE@all-local:
+all-am: Makefile all-local
 installdirs:
-install: install-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -273,9 +280,19 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
+@ENABLE_PYTHON_BINDING_FALSE@uninstall-local:
+@HAVE_PYTHON_FALSE@uninstall-local:
+@HAVE_SWIG_FALSE@uninstall-local:
+@ENABLE_PYTHON_BINDING_FALSE@install-exec-local:
+@HAVE_PYTHON_FALSE@install-exec-local:
+@HAVE_SWIG_FALSE@install-exec-local:
+@ENABLE_PYTHON_BINDING_FALSE@clean-local:
+@HAVE_PYTHON_FALSE@clean-local:
+@HAVE_SWIG_FALSE@clean-local:
 clean: clean-am
 
-clean-am: clean-generic clean-libtool mostlyclean-am
+clean-am: clean-generic clean-libtool clean-local mostlyclean-am
 
 distclean: distclean-am
 	-rm -f Makefile
@@ -295,7 +312,7 @@ install-data-am:
 
 install-dvi: install-dvi-am
 
-install-exec-am:
+install-exec-am: install-exec-local
 
 install-html: install-html-am
 
@@ -325,26 +342,66 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am:
+uninstall-am: uninstall-local
 
 .MAKE: install-am install-strip
 
-.PHONY: all all-am check check-am clean clean-generic clean-libtool \
-	distclean distclean-generic distclean-libtool distdir dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am uninstall uninstall-am
+.PHONY: all all-am all-local check check-am clean clean-generic \
+	clean-libtool clean-local distclean distclean-generic \
+	distclean-libtool distdir dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-dvi \
+	install-dvi-am install-exec install-exec-am install-exec-local \
+	install-html install-html-am install-info install-info-am \
+	install-man install-pdf install-pdf-am install-ps \
+	install-ps-am install-strip installcheck installcheck-am \
+	installdirs maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-generic mostlyclean-libtool pdf pdf-am \
+	ps ps-am uninstall uninstall-am uninstall-local
 
 
-all: $(MANUALS)
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@all-local:	ftdi_wrap.c ftdi.py
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@	@case "`uname`" in \
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@	  MINGW*) \
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@		$(PYTHON) setup.py build --compiler=mingw32 \
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@	  ;; \
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@	  *) \
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@		$(PYTHON) setup.py build \
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@	  ;; \
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@	esac;
 
-html/index.html: $(top_srcdir)/src/*.c $(top_srcdir)/src/*.h $(top_srcdir)/ftdipp/*.cpp $(top_srcdir)/ftdipp/*.hpp $(top_srcdir)/examples/*.c
-	$(DOXYGEN)
+# python on MinGW/MSYS requires pure Windows style paths
+# Using following (cd $dir && pwd -W) hack to get a nearly
+# native Windows path, then translating the forward slash
+# to a backward slash to make python distutils jolly.
+# P.S. the backslash has to be escaped thrice, hence a single
+# backslash turns into a sequence of eight (neat, huh?)
+#
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@install-exec-local:
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@	@case "`uname`" in \
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@	  MINGW*) \
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@		NATIVE_WINDOWS_PREFIX="`cd $(DESTDIR)$(prefix) && pwd -W`"; \
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@		NATIVE_WINDOWS_PREFIX="`echo $$NATIVE_WINDOWS_PREFIX | sed -e 's|/|\\\\\\\\|g'`"; \
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@		$(PYTHON) setup.py install --prefix="$$NATIVE_WINDOWS_PREFIX" \
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@	  ;; \
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@	  *) \
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@		$(PYTHON) setup.py install --prefix=$(DESTDIR)$(prefix) \
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@	  ;; \
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@	esac;
+
+# This rule cleans up stuff installed by Python's setup.py
+# Unfortunately, Python's distutils do not provide an uninstall
+# command, so we have to make up for it here in uninstall-local
+# hook. This might break if distutils' behaviour changes as automake
+# has no control over what distutils install command does.
+#
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@uninstall-local:
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@	rm -rf $(DESTDIR)$(libdir)/python*/site-packages/*ftdi*
+
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@clean-local:
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@	$(PYTHON) setup.py clean --all
+
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@ftdi_wrap.c ftdi.py:	$(SWIG_INTERFACE) $(LIBFTDI_INTERFACE)
+@ENABLE_PYTHON_BINDING_TRUE@@HAVE_PYTHON_TRUE@@HAVE_SWIG_TRUE@	$(SWIG) -python -I$(top_srcdir)/src -o ftdi_wrap.c -outdir . $(srcdir)/$(SWIG_INTERFACE)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

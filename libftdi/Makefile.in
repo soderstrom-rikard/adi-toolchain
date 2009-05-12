@@ -143,11 +143,17 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+PYTHON = @PYTHON@
+PYTHON_EXEC_PREFIX = @PYTHON_EXEC_PREFIX@
+PYTHON_PLATFORM = @PYTHON_PLATFORM@
+PYTHON_PREFIX = @PYTHON_PREFIX@
+PYTHON_VERSION = @PYTHON_VERSION@
 RANLIB = @RANLIB@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
+SWIG = @SWIG@
 VERSION = @VERSION@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -190,9 +196,13 @@ mandir = @mandir@
 mkdir_p = @mkdir_p@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
+pkgpyexecdir = @pkgpyexecdir@
+pkgpythondir = @pkgpythondir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+pyexecdir = @pyexecdir@
+pythondir = @pythondir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -204,8 +214,12 @@ top_srcdir = @top_srcdir@
 # not a GNU package. You can remove this line, if
 # have all needed files, that a GNU package needs
 AUTOMAKE_OPTIONS = foreign 1.4
-SUBDIRS = src $(LIBFTDI_MODULES) examples doc
-EXTRA_DIST = libftdi.spec libftdi.spec.in COPYING.LIB README AUTHORS ChangeLog libftdi-config.in CMakeLists.txt packages
+SUBDIRS = src bindings $(LIBFTDI_MODULES) examples doc
+EXTRA_DIST = libftdi.spec libftdi.spec.in COPYING.LIB COPYING.GPL LICENSE \
+             README AUTHORS ChangeLog libftdi-config.in CMakeLists.txt \
+             packages COPYING-CMAKE-SCRIPTS FindUSB.cmake README.mingw \
+             Toolchain-mingw32.cmake
+
 bin_SCRIPTS = libftdi-config
 
 # Install the pkg-config file:

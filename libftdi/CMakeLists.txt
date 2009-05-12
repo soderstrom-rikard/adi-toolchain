@@ -1,9 +1,9 @@
 # Project
 project(libftdi)
 set(MAJOR_VERSION 0)
-set(MINOR_VERSION 15)
-set(PATCH_VERSION 0)
-set(VERSION_STRING ${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION})
+set(MINOR_VERSION 16)
+set(VERSION_STRING ${MAJOR_VERSION}.${MINOR_VERSION})
+SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}")
 
 # CMake
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
@@ -17,6 +17,9 @@ message("-- Build type: ${CMAKE_BUILD_TYPE}")
 if(${CMAKE_BUILD_TYPE} STREQUAL Debug)
    add_definitions(-DDEBUG)
 endif(${CMAKE_BUILD_TYPE} STREQUAL Debug)
+
+FIND_PACKAGE(USB REQUIRED)
+INCLUDE_DIRECTORIES(${LIBUSB_INCLUDE_DIR})
 
 # Set components
 set(CPACK_COMPONENTS_ALL sharedlibs staticlibs headers)
@@ -34,27 +37,6 @@ set(CPACK_COMPONENT_HEADERS_DESCRIPTION
 set(CPACK_COMPONENT_SHAREDLIBS_GROUP "Development")
 set(CPACK_COMPONENT_STATICLIBS_GROUP "Development")
 set(CPACK_COMPONENT_HEADERS_GROUP    "Development")
-
-# Documentation
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
-
-   # Set variables
-   set(PACKAGE libftdi)
-   set(VERSION ${VERSION_STRING})
-   set(top_srcdir ${CMAKE_SOURCE_DIR})
-
-   # Find doxy config
-   message(STATUS "Doxygen found.")
-   set(DOXY_DIR "${CMAKE_SOURCE_DIR}/doc")
-   set(DOXY_CONFIG "${DOXY_DIR}/Doxyfile.in")
-
-   # Copy doxy.config.in
-   configure_file("${DOXY_DIR}/header.html" "${CMAKE_BINARY_DIR}/header.html" COPYONLY)
-   configure_file("${DOXY_CONFIG}" "${CMAKE_BINARY_DIR}/doxy.config")
-   add_custom_target(doc "${DOXYGEN_EXECUTABLE}" "doxy.config")
-
-endif(DOXYGEN_FOUND)
 
 # Package information
 set(CPACK_PACKAGE_VERSION              ${VERSION_STRING})
@@ -81,7 +63,11 @@ if(${WIN32})
   set(CPACK_NSIS_MODIFY_PATH             "ON")
 endif(${WIN32})
 
-set(CPACK_RESOURCE_FILE_LICENSE        ${CMAKE_SOURCE_DIR}/COPYING.LIB)
+set(CPACK_RESOURCE_FILE_LICENSE        ${CMAKE_SOURCE_DIR}/LICENSE)
+
+set(CPACK_SOURCE_GENERATOR             TGZ)
+set(CPACK_SOURCE_IGNORE_FILES          "\\\\.git")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME     ${CPACK_PACKAGE_FILE_NAME})
 
 # Subdirectories
 if(${UNIX})
@@ -90,8 +76,48 @@ endif(${UNIX})
 
 add_subdirectory(src)
 add_subdirectory(ftdipp)
+add_subdirectory(bindings)
 add_subdirectory(examples)
 add_subdirectory(packages)
+
+
+
+# Documentation
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+
+   # Set variables
+   set(PACKAGE libftdi)
+   set(VERSION ${VERSION_STRING})
+   set(top_srcdir ${CMAKE_SOURCE_DIR})
+
+   # Find doxy config
+   message(STATUS "Doxygen found.")
+   set(DOXY_DIR "${CMAKE_SOURCE_DIR}/doc")
+   set(DOXY_CONFIG "${DOXY_DIR}/Doxyfile.in")
+
+   # Copy doxy.config.in
+   configure_file("${DOXY_CONFIG}" "${CMAKE_BINARY_DIR}/doxy.config")
+
+   # Create doc directory
+   add_custom_command(
+   OUTPUT ${CMAKE_BINARY_DIR}/doc
+   COMMAND rm -rf ${CMAKE_BINARY_DIR}/doc
+   COMMAND mkdir ${CMAKE_BINARY_DIR}/doc
+   DEPENDS ftdi ftdipp
+   )
+
+   # Run doxygen
+   add_custom_command(
+   OUTPUT ${CMAKE_BINARY_DIR}/doc/html/index.html
+   COMMAND ${DOXYGEN_EXECUTABLE} "${CMAKE_BINARY_DIR}/doxy.config"
+   DEPENDS "${CMAKE_BINARY_DIR}/doxy.config" "${CMAKE_BINARY_DIR}/doc"
+   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc
+   )
+
+   add_custom_target(docs ALL DEPENDS ${CMAKE_BINARY_DIR}/doc/html/index.html)
+
+endif(DOXYGEN_FOUND)
 
 # PkgConfig
 set(prefix      ${CMAKE_INSTALL_PREFIX})
@@ -107,5 +133,12 @@ endif(${WIN32})
 
 configure_file(${CMAKE_SOURCE_DIR}/libftdi.pc.in ${CMAKE_BINARY_DIR}/libftdi.pc @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/libftdipp.pc.in ${CMAKE_BINARY_DIR}/libftdipp.pc @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/libftdi.pc ${CMAKE_BINARY_DIR}/libftdipp.pc
+        DESTINATION lib/pkgconfig)
+
+if(${UNIX})
+    configure_file(${CMAKE_SOURCE_DIR}/libftdi-config.in ${CMAKE_BINARY_DIR}/libftdi-config @ONLY)
+    install(PROGRAMS ${CMAKE_BINARY_DIR}/libftdi-config DESTINATION bin)
+endif(${UNIX})
 
 include(CPack)

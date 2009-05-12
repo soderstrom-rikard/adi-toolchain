@@ -5,15 +5,27 @@
     copyright            : (C) 2008 by Marek Vavruša
     email                : opensource@intra2net.com and marek@vavrusa.com
  ***************************************************************************/
+/*
+Copyright (C) 2008 by Marek Vavruša
 
-/***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU Lesser General Public License           *
- *   version 2.1 as published by the Free Software Foundation;             *
- *                                                                         *
- ***************************************************************************/
+The software in this package is distributed under the GNU General
+Public License version 2 (with a special exception described below).
 
+A copy of GNU General Public License (GPL) is included in this distribution,
+in the file COPYING.GPL.
+
+As a special exception, if other files instantiate templates or use macros
+or inline functions from this file, or you compile this file and link it
+with other works to produce a work based on this file, this file
+does not by itself cause the resulting work to be covered
+by the GNU General Public License.
+
+However the source code for this file must still be made available
+in accordance with section (3) of the GNU General Public License.
+
+This exception does not invalidate any other reasons why a work based
+on this file might be covered by the GNU General Public License.
+*/
 #ifndef __libftdi_hpp__
 #define __libftdi_hpp__
 
@@ -150,17 +162,46 @@ private:
     boost::shared_ptr<Private> d;
 };
 
-typedef std::list<Context> ListBase;
-
 /*! \brief Device list.
  */
-class List : public ListBase
+class List
 {
 public:
     List(struct ftdi_device_list* devlist = 0);
     ~List();
 
     static List* find_all(int vendor, int product);
+
+    /// List type storing "Context" objects
+    typedef std::list<Context> ListType;
+    /// Iterator type for the container
+    typedef ListType::iterator iterator;
+    /// Const iterator type for the container
+    typedef ListType::const_iterator const_iterator;
+    /// Reverse iterator type for the container
+    typedef ListType::reverse_iterator reverse_iterator;
+    /// Const reverse iterator type for the container
+    typedef ListType::const_reverse_iterator const_reverse_iterator;
+
+    iterator begin();
+    iterator end();
+    const_iterator begin() const;
+    const_iterator end() const;
+
+    reverse_iterator rbegin();
+    reverse_iterator rend();
+    const_reverse_iterator rbegin() const;
+    const_reverse_iterator rend() const;
+
+    ListType::size_type size() const;
+    bool empty() const;
+    void clear();
+
+    void push_back(const Context& element);
+    void push_front(const Context& element);
+
+    iterator erase(iterator pos);
+    iterator erase(iterator beg, iterator end);
 
 private:
     class Private;

@@ -5,15 +5,27 @@
     copyright            : (C) 2008 by Marek Vavruša
     email                : opensource@intra2net.com and marek@vavrusa.com
  ***************************************************************************/
+/*
+Copyright (C) 2008 by Marek Vavruša
 
-/***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU Lesser General Public License           *
- *   version 2.1 as published by the Free Software Foundation;             *
- *                                                                         *
- ***************************************************************************/
+The software in this package is distributed under the GNU General
+Public License version 2 (with a special exception described below).
 
+A copy of GNU General Public License (GPL) is included in this distribution,
+in the file COPYING.GPL.
+
+As a special exception, if other files instantiate templates or use macros
+or inline functions from this file, or you compile this file and link it
+with other works to produce a work based on this file, this file
+does not by itself cause the resulting work to be covered
+by the GNU General Public License.
+
+However the source code for this file must still be made available
+in accordance with section (3) of the GNU General Public License.
+
+This exception does not invalidate any other reasons why a work based
+on this file might be covered by the GNU General Public License.
+*/
 #include "ftdi.hpp"
 #include "ftdi.h"
 
@@ -24,14 +36,14 @@ class Context::Private
 {
 public:
     Private()
-        :  ftdi(0), dev(0), open(false)
+            :  ftdi(0), dev(0), open(false)
     {
         ftdi = ftdi_new();
     }
 
     ~Private()
     {
-        if(open)
+        if (open)
             ftdi_usb_close(ftdi);
 
         ftdi_free(ftdi);
@@ -69,37 +81,39 @@ int Context::open(int vendor, int product, const std::string& description, const
 {
     int ret = 0;
 
+    // Open device
     if (description.empty() && serial.empty())
         ret = ftdi_usb_open(d->ftdi, vendor, product);
     else
         ret = ftdi_usb_open_desc(d->ftdi, vendor, product, description.c_str(), serial.c_str());
 
-    d->dev = usb_device(d->ftdi->usb_dev);
+    if (ret < 0)
+       return ret;
 
-    if ((ret = ftdi_usb_open_dev(d->ftdi, d->dev)) >= 0)
-    {
-        d->open = true;
-        get_strings();
-    }
+    // Get device strings (closes device)
+    get_strings();
+
+    // Reattach device
+    ret = ftdi_usb_open_dev(d->ftdi, d->dev);
+    d->open = (ret >= 0);
 
     return ret;
 }
 
 int Context::open(struct usb_device *dev)
 {
-    int ret = 0;
-
     if (dev != 0)
         d->dev = dev;
 
     if (d->dev == 0)
         return -1;
 
-    if ((ret = ftdi_usb_open_dev(d->ftdi, d->dev)) >= 0)
-    {
-        d->open = true;
-        get_strings();
-    }
+    // Get device strings (closes device)
+    get_strings();
+
+    // Reattach device
+    int ret = ftdi_usb_open_dev(d->ftdi, d->dev);
+    d->open = (ret >= 0);
 
     return ret;
 }
@@ -389,36 +403,185 @@ int Eeprom::erase()
 class List::Private
 {
 public:
-    Private(struct ftdi_device_list* devlist)
-            : list(devlist)
+    Private(struct ftdi_device_list* _devlist)
+            : devlist(_devlist)
     {}
 
     ~Private()
     {
-        ftdi_list_free(&list);
+        if(devlist)
+            ftdi_list_free(&devlist);
     }
 
-    struct ftdi_device_list* list;
+    std::list<Context> list;
+    struct ftdi_device_list* devlist;
 };
 
 List::List(struct ftdi_device_list* devlist)
-        : ListBase(), d( new Private(devlist) )
+        : d( new Private(devlist) )
 {
     if (devlist != 0)
     {
         // Iterate list
-        for (d->list = devlist; d->list != 0; d->list = d->list->next)
+        for (; devlist != 0; devlist = devlist->next)
         {
             Context c;
-            c.set_usb_device(d->list->dev);
+            c.set_usb_device(devlist->dev);
             c.get_strings();
-            push_back(c);
+            d->list.push_back(c);
         }
     }
 }
 
 List::~List()
 {
+}
+
+/**
+* Return begin iterator for accessing the contained list elements
+* @return Iterator
+*/
+List::iterator List::begin()
+{
+    return d->list.begin();
+}
+
+/**
+* Return end iterator for accessing the contained list elements
+* @return Iterator
+*/
+List::iterator List::end()
+{
+    return d->list.end();
+}
+
+/**
+* Return begin iterator for accessing the contained list elements
+* @return Const iterator
+*/
+List::const_iterator List::begin() const
+{
+    return d->list.begin();
+}
+
+/**
+* Return end iterator for accessing the contained list elements
+* @return Const iterator
+*/
+List::const_iterator List::end() const
+{
+    return d->list.end();
+}
+
+/**
+* Return begin reverse iterator for accessing the contained list elements
+* @return Reverse iterator
+*/
+List::reverse_iterator List::rbegin()
+{
+    return d->list.rbegin();
+}
+
+/**
+* Return end reverse iterator for accessing the contained list elements
+* @return Reverse iterator
+*/
+List::reverse_iterator List::rend()
+{
+    return d->list.rend();
+}
+
+/**
+* Return begin reverse iterator for accessing the contained list elements
+* @return Const reverse iterator
+*/
+List::const_reverse_iterator List::rbegin() const
+{
+    return d->list.rbegin();
+}
+
+/**
+* Return end reverse iterator for accessing the contained list elements
+* @return Const reverse iterator
+*/
+List::const_reverse_iterator List::rend() const
+{
+    return d->list.rend();
+
+}
+
+/**
+* Get number of elements stored in the list
+* @return Number of elements
+*/
+List::ListType::size_type List::size() const
+{
+    return d->list.size();
+}
+
+/**
+* Check if list is empty
+* @return True if empty, false otherwise
+*/
+bool List::empty() const
+{
+    return d->list.empty();
+}
+
+/**
+ * Removes all elements. Invalidates all iterators.
+ * Do it in a non-throwing way and also make
+ * sure we really free the allocated memory.
+ */
+void List::clear()
+{
+    ListType().swap(d->list);
+
+    // Free device list
+    if (d->devlist)
+    {
+        ftdi_list_free(&d->devlist);
+        d->devlist = 0;
+    }
+}
+
+/**
+ * Appends a copy of the element as the new last element.
+ * @param element Value to copy and append
+*/
+void List::push_back(const Context& element)
+{
+    d->list.push_back(element);
+}
+
+/**
+ * Adds a copy of the element as the new first element.
+ * @param element Value to copy and add
+*/
+void List::push_front(const Context& element)
+{
+    d->list.push_front(element);
+}
+
+/**
+ * Erase one element pointed by iterator
+ * @param pos Element to erase
+ * @return Position of the following element (or end())
+*/
+List::iterator List::erase(iterator pos)
+{
+    return d->list.erase(pos);
+}
+
+/**
+ * Erase a range of elements
+ * @param beg Begin of range
+ * @param end End of range
+ * @return Position of the element after the erased range (or end())
+*/
+List::iterator List::erase(iterator beg, iterator end)
+{
+    return d->list.erase(beg, end);
 }
 
 List* List::find_all(int vendor, int product)
