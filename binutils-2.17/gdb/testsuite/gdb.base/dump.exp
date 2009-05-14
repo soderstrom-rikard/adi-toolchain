@@ -27,6 +27,14 @@ if $tracelevel then {
 set prms_id 0
 set bug_id 0
 
+# Blackfin does not have MMU. The load address might change between
+# different invocations of application. So it is not guaranteed that
+# dump file from one invocation can be restored in another invocation.
+
+if { [istarget "bfin-*-uclinux"] || [istarget "bfin-*-linux-uclibc"] } then {
+    return 0
+}
+
 set testfile "dump"
 
 set srcfile  ${testfile}.c

@@ -1,3 +1,7 @@
+2009-05-14  Jie Zhang  <jie.zhang@analog.com>
+
+	* gdb.base/dump.exp: Skip for Blackfin Linux targets.
+
 2009-03-19  Jie Zhang  <jie.zhang@analog.com>
 
 	* gdb.gdbtk/c_variable.test: Step over the new added statement.
