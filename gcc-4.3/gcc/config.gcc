@@ -833,19 +833,19 @@ avr-*-*)
 	;;
 bfin*-elf*)
 	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h"
-	tmake_file=bfin/t-bfin-elf
+	tmake_file="bfin/t-bfin-elf bfin/t-fprules-softfp soft-fp/t-softfp"
 	use_collect2=no
 	;;
 bfin*-uclinux*)
 	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h linux.h bfin/uclinux.h"
-	tmake_file=bfin/t-bfin-uclinux
+	tmake_file="bfin/t-bfin-uclinux bfin/t-fprules-softfp soft-fp/t-softfp"
 	tm_defines="${tm_defines} UCLIBC_DEFAULT=1"
 	extra_options="${extra_options} linux.opt"
 	use_collect2=no
 	;;
 bfin*-linux-uclibc*)
 	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h linux.h bfin/linux.h ./linux-sysroot-suffix.h"
-	tmake_file="t-slibgcc-elf-ver bfin/t-bfin-linux"
+	tmake_file="t-slibgcc-elf-ver bfin/t-bfin-linux bfin/t-fprules-softfp soft-fp/t-softfp"
 	extra_parts="crtbegin.o crtbeginS.o crtend.o crtendS.o"
 	use_collect2=no
 	;;
@@ -855,7 +855,7 @@ bfin*-rtems*)
 	;;
 bfin*-*)
 	tm_file="${tm_file} dbxelf.h elfos.h bfin/elf.h"
-	tmake_file=bfin/t-bfin
+	tmake_file="bfin/t-bfin bfin/t-fprules-softfp soft-fp/t-softfp"
 	use_collect2=no
 	;;
 cris-*-aout)

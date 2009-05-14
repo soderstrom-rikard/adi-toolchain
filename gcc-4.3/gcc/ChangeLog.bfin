@@ -1,3 +1,18 @@
+2009-05-14  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config.gcc (bfin target triplets): Add bfin/t-fprules-softfp and
+	soft-fp/t-softfp.
+	* config/bfin/t-bfin (FPBIT, DPBIT): Remove.
+	(fp-bit.c, dp-bit.c): Remove rules.
+	* config/bfin/sfp-machine.h: New file.
+	* config/bfin/t-fprules-softfp: New file.
+	* config/bfin/t-bfin-elf (FPBIT, DPBIT): Remove.
+	(fp-bit.c, dp-bit.c): Remove rules.
+	* config/bfin/t-bfin-uclinux (FPBIT, DPBIT): Remove.
+	(fp-bit.c, dp-bit.c): Remove rules.
+	* config/bfin/t-bfin-linux (FPBIT, DPBIT): Remove.
+	(fp-bit.c, dp-bit.c): Remove rules.
+
 2009-04-29  Jie Zhang  <jie.zhang@analog.com>
 
 	Revert
