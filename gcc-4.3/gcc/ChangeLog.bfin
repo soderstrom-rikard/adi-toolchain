@@ -1,3 +1,8 @@
+2009-05-15  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_optimize_loop): If there's no valid last
+	insn, insert a nop.
+
 2009-05-14  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config.gcc (bfin target triplets): Add bfin/t-fprules-softfp and
