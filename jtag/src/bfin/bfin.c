@@ -46,6 +46,11 @@ const char *scans[] = {
 #define SWRST 0xffc00100
 
 
+#ifdef __MINGW32__
+struct timespec { unsigned long tv_sec, tv_nsec; };
+#define nanosleep(req, rem) usleep((req)->tv_sec * 1000 * 1000 + (req)->tv_nsec / 1000)
+#endif
+
 struct timespec bfin_loop_wait_first_ts = {0, 50000000};
 struct timespec bfin_loop_wait_ts = {0, 10000000};
 struct timespec bfin_emu_wait_ts = {0, 5000000};
