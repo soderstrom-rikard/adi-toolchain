@@ -2209,9 +2209,40 @@ if [ $KERNEL_SOURCE ] ; then
         run_tests $DIR_TEST_HW2_RESULTS hardware-fdpic
     fi
 
+    ######################## U-Boot ##############################
+
+    if [ $DIR_UBOOT ] ; then
+        echo_date "Building U-Boot to get Tools"
+        change_dir $DIR_UBOOT
+        DIR_UBOOT_BUILD="$DIR_BUILD/u-boot_build"
+
+        echo_date "Cleaning U-Boot"
+        run_cmd rm -rf "$DIR_UBOOT_BUILD"
+
+        # the actual config file here doesnt matter since we
+        # just want to build the mkimage and gen_eth_addr tools
+        run_cmd mkdir -p "$DIR_UBOOT_BUILD/include"
+        run_cmd touch "$DIR_UBOOT_BUILD"/include/config.mk "$DIR_UBOOT_BUILD"/include/config.h
+        echo_date "Make U-Boot"
+        run_cmd $MAKE O="$DIR_UBOOT_BUILD" BIN_FILES='mkimage gen_eth_addr' tools
+
+        echo_date "Copying U-Boot Tools"
+        EXEEXT=""
+        check_installed_files u-boot "$DIR_UBOOT_BUILD/tools/" \
+            mkimage gen_eth_addr
+        for RUN in mkimage gen_eth_addr ; do
+            run_cmd cp "$DIR_UBOOT_BUILD/tools/$RUN" "$DIR_uC_OUTPUT/bin/bfin-uclinux-$RUN"
+            run_cmd cp "$DIR_UBOOT_BUILD/tools/$RUN" "$DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-$RUN"
+        done
+
+        echo_date "Cleaning U-Boot"
+    fi
+
 	######################## ldr-utils ###########################
 
-    if ! resume_check ldr-utils ; then
+fi
+
+if ! resume_check ldr-utils ; then
 
     DIR_LDR_UTILS_BUILD=$DIR_BUILD/ldr-utils_build
 
@@ -2294,8 +2325,10 @@ if [ $KERNEL_SOURCE ] ; then
 
     echo_date "Installing jtag"
     run_cmd $MAKE install DESTDIR=$DIR_ELF_OUTPUT   program_transform_name=s,^,bfin-,
-    run_cmd $MAKE install DESTDIR=$DIR_uC_OUTPUT    program_transform_name=s,^,bfin-,
-    run_cmd $MAKE install DESTDIR=$DIR_LINUX_OUTPUT program_transform_name=s,^,bfin-,
+    if [ $KERNEL_SOURCE ] ; then
+        run_cmd $MAKE install DESTDIR=$DIR_uC_OUTPUT    program_transform_name=s,^,bfin-,
+        run_cmd $MAKE install DESTDIR=$DIR_LINUX_OUTPUT program_transform_name=s,^,bfin-,
+    fi
 
     ### gdbproxy
     DIR_GDBPROXY_BUILD=$DIR_BUILD/gdbproxy
@@ -2316,47 +2349,20 @@ if [ $KERNEL_SOURCE ] ; then
 
     echo_date "Installing gdbproxy"
     run_cmd $MAKE install DESTDIR=$DIR_ELF_OUTPUT   program_transform_name=s,^,bfin-,
-    run_cmd $MAKE install DESTDIR=$DIR_uC_OUTPUT    program_transform_name=s,^,bfin-,
-    run_cmd $MAKE install DESTDIR=$DIR_LINUX_OUTPUT program_transform_name=s,^,bfin-,
+    if [ $KERNEL_SOURCE ] ; then
+        run_cmd $MAKE install DESTDIR=$DIR_uC_OUTPUT    program_transform_name=s,^,bfin-,
+        run_cmd $MAKE install DESTDIR=$DIR_LINUX_OUTPUT program_transform_name=s,^,bfin-,
+    fi
 
     change_dir $DIR_BUILD
     rm -rf "$DIR_LIBFTDI_BUILD" "$DIR_JTAG_BUILD" "$DIR_GDBPROXY_BUILD"
 
     resume_save
-    fi
+fi
 
-    ######################## U-Boot ##############################
-
-    if [ $DIR_UBOOT ] ; then
-        echo_date "Building U-Boot to get Tools"
-        change_dir $DIR_UBOOT
-        DIR_UBOOT_BUILD="$DIR_BUILD/u-boot_build"
-
-        echo_date "Cleaning U-Boot"
-        run_cmd rm -rf "$DIR_UBOOT_BUILD"
-
-        # the actual config file here doesnt matter since we
-        # just want to build the mkimage and gen_eth_addr tools
-        run_cmd mkdir -p "$DIR_UBOOT_BUILD/include"
-        run_cmd touch "$DIR_UBOOT_BUILD"/include/config.mk "$DIR_UBOOT_BUILD"/include/config.h
-        echo_date "Make U-Boot"
-        run_cmd $MAKE O="$DIR_UBOOT_BUILD" BIN_FILES='mkimage gen_eth_addr' tools
-
-        echo_date "Copying U-Boot Tools"
-        EXEEXT=""
-        check_installed_files u-boot "$DIR_UBOOT_BUILD/tools/" \
-            mkimage gen_eth_addr
-        for RUN in mkimage gen_eth_addr ; do
-            run_cmd cp "$DIR_UBOOT_BUILD/tools/$RUN" "$DIR_uC_OUTPUT/bin/bfin-uclinux-$RUN"
-            run_cmd cp "$DIR_UBOOT_BUILD/tools/$RUN" "$DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-$RUN"
-        done
-
-        echo_date "Cleaning U-Boot"
-        run_cmd rm -rf "$DIR_UBOOT_BUILD"
-    fi
     ######################## Done ################################
 
-fi
+
 
 for GCC_VERSION in $GCC_VERSIONS; do
     DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
