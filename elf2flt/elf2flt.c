@@ -1968,11 +1968,11 @@ int main(int argc, char *argv[])
   memcpy(hdr.magic,"bFLT",4);
   hdr.rev         = htonl(FLAT_VERSION);
   hdr.entry       = htonl(sizeof(hdr) + bfd_get_start_address(abs_bfd));
-  hdr.data_start  = htonl(sizeof(hdr) + text_len);
-  hdr.data_end    = htonl(sizeof(hdr) + text_len + data_len);
-  hdr.bss_end     = htonl(sizeof(hdr) + text_len + data_len + bss_len);
+  hdr.data_start  = htonl(sizeof(hdr) + text_offs + text_len);
+  hdr.data_end    = htonl(sizeof(hdr) + text_offs + text_len +data_len);
+  hdr.bss_end     = htonl(sizeof(hdr) + text_offs + text_len +data_len+bss_len);
   hdr.stack_size  = htonl(stack); /* FIXME */
-  hdr.reloc_start = htonl(sizeof(hdr) + real_address_bits(data_vma) + data_len);
+  hdr.reloc_start = htonl(sizeof(hdr) + text_offs + text_len +data_len);
   hdr.reloc_count = htonl(reloc_len);
   hdr.flags       = htonl(0
 	  | (load_to_ram || text_has_relocs ? FLAT_FLAG_RAM : 0)
