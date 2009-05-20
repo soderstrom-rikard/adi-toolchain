@@ -1537,8 +1537,10 @@ EOF
     $tool -o $DIR_GCC_BUILD/objtest $DIR_GCC_BUILD/objtest.m -lobjc &> /dev/null
     RUN=$?
     rm -f $DIR_GCC_BUILD/objtest $DIR_GCC_BUILD/objtest.m
-    if [ $RUN -eq 1 ] && [ $TEST_ALL -eq 0 ] ; then
-	echo "$target_alias-gcc: objc compiler not found"
+    if [ $RUN -eq 1 ] ; then
+	if [ $TEST_ALL -eq 0 ] ; then
+	    echo "$target_alias-gcc: objc compiler not found"
+	fi
 	return 1
     fi
 
