@@ -1010,8 +1010,8 @@ check_tests_OK()
 	while [ 1 ]
 	do
             # Check on the Host - if the test is done - quit
-            NEW=`pstree -n -A -l -p $PID`
-            if [ -z "$NEW" ] ; then
+            NEW=`ps -p $PID &>/dev/null`
+            if [ "$NEW" = "1" ] ; then
 		break;
             fi
 
