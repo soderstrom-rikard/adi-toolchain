@@ -51,8 +51,7 @@
 char *program_name;
 
 static int print = 0, print_relocs = 0, docompress = 0, ramload = 0,
-           stacksize = 0, ktrace = 0;
-static int l1stack = 0;
+           stacksize = 0, ktrace = 0, l1stack = 0;
 
 /****************************************************************************/
 
@@ -111,7 +110,7 @@ process_file(char *ifile, char *ofile)
 		new_flags |= FLAT_FLAG_L1STK;
 	else if (l1stack < 0)
 		new_flags &= ~FLAT_FLAG_L1STK;
-	
+
 	if (stacksize)
 		new_stack = stacksize;
 
