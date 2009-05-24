@@ -1,3 +1,7 @@
+2009-05-24  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (reload_out<mode>): Type is mcst.
+
 2009-05-15  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_optimize_loop): If there's no valid last
