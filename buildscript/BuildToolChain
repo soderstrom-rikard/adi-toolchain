@@ -2232,12 +2232,11 @@ if [ $KERNEL_SOURCE ] ; then
         done
 
         echo_date "Cleaning U-Boot"
+        run_cmd rm -rf "$DIR_UBOOT_BUILD"
     fi
-
-	######################## ldr-utils ###########################
-
 fi
 
+######################## ldr-utils ###########################
 if ! resume_check ldr-utils ; then
 
     DIR_LDR_UTILS_BUILD=$DIR_BUILD/ldr-utils_build
