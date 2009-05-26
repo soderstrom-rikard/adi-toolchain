@@ -1717,12 +1717,6 @@ if [ $BUILD_TARGET_UCLINUX ]; then
 	suffix=`echo ${dir} | sed -e 's/\//_/g'`
 	flags=`echo ${ml} | sed -e 's/^[^;]*;//' -e 's/@/ -/g'`
 
-	if echo "${flags}" | grep -q mleaf-id-shared-library; then
-	    # Don't let user see this FIXME.
-	    log_it "FIXME: leaf-id-shared-library uClibc is not built"
-	    continue
-	fi
-
 	echo_date "Building uClibc for ${dir}"
 
 	if echo "${flags}" | grep -q msep-data; then   

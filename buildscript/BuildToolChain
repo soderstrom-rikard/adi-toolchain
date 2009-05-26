@@ -2062,10 +2062,6 @@ if [ $KERNEL_SOURCE ] ; then
 
 	    build_uClibc $DIR_uC_OUTPUT/bfin-uclinux "" "${dir}"
 
-	elif echo "${flags}" | grep -q mleaf-id-shared-library; then
-
-	    echo "FIXME: leaf-id-shared-library uClibc is not built"
-
 	elif echo "${flags}" | grep -q mid-shared-library; then
 
 	    if [ -z "$UCLIBC_CONFIG_FILE" ]; then

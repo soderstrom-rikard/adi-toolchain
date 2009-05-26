@@ -1,3 +1,14 @@
+2009-05-26  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/t-bfin-elf (MULTILIB_OPTIONS): Remove
+	mleaf-id-shared-library.
+	(MULTILIB_DIRNAMES): Remove mleaf-id-shared-library.
+	(MULTILIB_EXCEPTIONS): Remove.
+	* config/bfin/t-bfin-uclinux (MULTILIB_OPTIONS): Remove
+	mleaf-id-shared-library.
+	(MULTILIB_DIRNAMES): Remove mleaf-id-shared-library.
+	(MULTILIB_EXCEPTIONS): Remove.
+
 2009-05-24  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (reload_out<mode>): Type is mcst.
