@@ -12,5 +12,17 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-_syscall4(int, waitid, idtype_t, idtype, id_t, id, siginfo_t*, infop, int, options);
+/* The waitid() POSIX interface takes 4 arguments, but the kernel function
+ * actually takes 5.  The fifth is a pointer to struct rusage.  Make sure
+ * we pass NULL rather than letting whatever was in the register bleed up.
+ */
+#define __NR_waitid5 __NR_waitid
+static _syscall5(int, waitid5, idtype_t, idtype, id_t, id, siginfo_t*, infop,
+                 int, options, struct rusage*, ru)
+
+int waitid(idtype_t idtype, id_t id, siginfo_t *infop, int options)
+{
+	return waitid5(idtype, id, infop, options, NULL);
+}
+
 #endif
