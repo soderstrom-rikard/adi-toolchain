@@ -1,3 +1,7 @@
+2009-05-17  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* gcc.c-torture/compile/20090527-1.c: New file.
+
 2009-04-28  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* gcc.target/bfin/20090411-1.c: Modify f to return a value.

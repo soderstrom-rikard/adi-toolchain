@@ -1,3 +1,8 @@
+2009-05-27  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (bfin_optimize_loop): When creating a new basic
+	block, ensure it has an exit edge.  Emit jumps with emit_jump_insn.
+
 2009-05-26  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/t-bfin-elf (MULTILIB_OPTIONS): Remove
