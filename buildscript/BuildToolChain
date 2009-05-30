@@ -1096,21 +1096,11 @@ build_gcc ()
         export PATH=$p:$PATH
     fi
 
-    rm -f $DIR_GCC_SOURCE/newlib
-    rm -f $DIR_GCC_SOURCE/libgloss
-
+    run_cmd rm -f $DIR_GCC_SOURCE/newlib $DIR_GCC_SOURCE/libgloss
     if [ $2 = "elf" ]; then
         echo_date "Linking newlib and libgloss"
-        ln -snf $DIR_BINUTILS_SOURCE/newlib $DIR_GCC_SOURCE/
-        ln -snf $DIR_BINUTILS_SOURCE/libgloss $DIR_GCC_SOURCE/
-        # check to make sure the copies were made
-        if [ ! -d $DIR_GCC_SOURCE/newlib -o ! -d $DIR_GCC_SOURCE/libgloss ] ; then
-            echo "*** ERROR : cannot link newlib or libgloss in $DIR_GCC_SOURCE"
-            printf "*** ERROR : running as user "
-            whoami
-            ls -ld $DIR_GCC_SOURCE
-            exit 1
-        fi
+        run_cmd ln -snf $DIR_BINUTILS_SOURCE/newlib $DIR_GCC_SOURCE/
+        run_cmd ln -snf $DIR_BINUTILS_SOURCE/libgloss $DIR_GCC_SOURCE/
         EXTRA_GCC_CONF="--enable-languages=c,c++"
     else
         EXTRA_GCC_CONF=""
@@ -2124,14 +2114,14 @@ if [ $KERNEL_SOURCE ] ; then
     RUN="$MAKE -C utils hostutils $ARGS"
     (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
     if (echo $RUN $LOGFILE ; ) | sh ; then
-        mkdir -p $DIR_LINUX_OUTPUT/bin
+        run_cmd mkdir -p $DIR_LINUX_OUTPUT/bin
         for RUN in ldconfig ldd ; do
-            cp utils/${RUN}.host $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-${RUN} || exit 1
+            run_cmd cp utils/${RUN}.host $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-${RUN}
         done
     elif [ "${UCLIBC_HOSTUTILS}" != "XFAIL" ] ; then
         die_with_log
     else
-        (echo "echo -e '!!! Host utils were expected to fail; ignoring\n' $LOGFILE" ) | sh
+        log_it 'Host utils were expected to fail; ignoring'
     fi
 
     run_cmd mkdir -p $DIR_uC_OUTPUT/bfin-uclinux/runtime
@@ -2141,7 +2131,7 @@ if [ $KERNEL_SOURCE ] ; then
 
     if [ "$DIR_KBUILD_OUTPUT" != "$KERNEL_SOURCE" ]; then
         echo_date "Cleaning kernel"
-        rm -rf "$DIR_KBUILD_OUTPUT"
+        run_cmd rm -rf "$DIR_KBUILD_OUTPUT"
     fi
 
     echo_date "Cleaning uClibc"
@@ -2158,13 +2148,14 @@ if [ $KERNEL_SOURCE ] ; then
 
     build_elf2flt uclinux $DIR_uC_OUTPUT
 
-    ln -s runtime/usr/include $DIR_uC_OUTPUT/bfin-uclinux/sys-include
+    run_cmd rm -f $DIR_uC_OUTPUT/bfin-uclinux/sys-include
+    run_cmd ln -s runtime/usr/include $DIR_uC_OUTPUT/bfin-uclinux/sys-include
     for GCC_VERSION in $GCC_VERSIONS; do
       build_gcc $GCC_VERSION uclinux $DIR_uC_OUTPUT \
           "--enable-threads=posix \
            --with-sysroot=$DIR_uC_OUTPUT/bfin-uclinux/runtime"
     done
-    rm -f $DIR_uC_OUTPUT/bfin-uclinux/sys-include
+    run_cmd rm -f $DIR_uC_OUTPUT/bfin-uclinux/sys-include
 
     ####################### Test bfin-uclinux #######################
 
@@ -2182,13 +2173,14 @@ if [ $KERNEL_SOURCE ] ; then
     ####################### Step 4a - build bfin-linux-uclibc ################
     build_binutils linux-uclibc $DIR_LINUX_OUTPUT
 
-    ln -s runtime/usr/include $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
+    run_cmd rm -f $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
+    run_cmd ln -s runtime/usr/include $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
     for GCC_VERSION in $GCC_VERSIONS; do
     	build_gcc $GCC_VERSION linux-uclibc $DIR_LINUX_OUTPUT \
 	  "--enable-threads=posix --enable-shared \
 	   --with-sysroot=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime"
     done
-    rm -f $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
+    run_cmd rm -f $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
 
     install_all_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc
 
