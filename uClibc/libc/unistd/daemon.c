@@ -55,7 +55,6 @@ libc_hidden_proto(_exit)
 libc_hidden_proto(dup2)
 libc_hidden_proto(setsid)
 libc_hidden_proto(chdir)
-libc_hidden_proto(fork)
 
 #ifndef __ARCH_USE_MMU__
 #include <sys/syscall.h>
@@ -82,6 +81,8 @@ static inline pid_t fork_parent(void)
 	return ret;
 }
 #else
+libc_hidden_proto(fork)
+
 static inline pid_t fork_parent(void)
 {
 	switch (fork()) {
