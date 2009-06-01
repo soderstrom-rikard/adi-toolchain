@@ -25,7 +25,7 @@
 
 
 APP_NAME=$0
-DIR_APP=$PWD/`dirname $APP_NAME`
+DIR_APP=$(cd $(dirname $APP_NAME) && pwd)
 DIR_BOARDS=$DIR_APP/boards/
 APP_NAME=${APP_NAME#.}
 APP_NAME=${APP_NAME#/}
