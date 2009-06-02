@@ -1,3 +1,7 @@
+2009-06-01  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* elf32-bfin.c: Rename relocs to R_BFIN_XXX.
+
 2009-04-13  Jie Zhang  <jie.zhang@analog.com>
 
 	* cpu-bfin.c (arch_info_struct[]): Remove bf579.

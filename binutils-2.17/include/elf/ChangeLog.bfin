@@ -1,3 +1,7 @@
+2009-06-01  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* bfin.h: Rename relocs to R_BFIN_XXX.
+
 2006-08-17  Jie Zhang  <jie.zhang@analog.com>
 
 	2006-05-27  H.J. Lu  <hongjiu.lu@intel.com>
