@@ -24,6 +24,8 @@ cat << EOF > ${output}
 #define D_RO(name, bits, addr)      _D(name, bits, addr, S_IRUSR)
 #define D_WO(name, bits, addr)      _D(name, bits, addr, S_IWUSR)
 
+extern int last_seqstat;
+
 static inline int sport_width(void *mmr)
 {
 	unsigned long lmmr = (unsigned long)mmr;
@@ -77,6 +79,10 @@ static int __init bfin_debug_mmrs_init(void)
 	top = debugfs_create_dir("blackfin", NULL);
 	if (top == NULL)
 		return -1;
+
+	parent = debugfs_create_dir("Core Registers", top);
+	debugfs_create_x32("SEQSTAT", S_IRUSR, parent, &last_seqstat);
+
 EOF
 
 for f in ../xml/ADSP-BF*-proc.xml ; do
