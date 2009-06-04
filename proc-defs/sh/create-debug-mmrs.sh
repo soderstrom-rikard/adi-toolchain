@@ -24,7 +24,7 @@ cat << EOF > ${output}
 #define D_RO(name, bits, addr)      _D(name, bits, addr, S_IRUSR)
 #define D_WO(name, bits, addr)      _D(name, bits, addr, S_IWUSR)
 
-extern int last_seqstat;
+extern u32 last_seqstat;
 
 static inline int sport_width(void *mmr)
 {
