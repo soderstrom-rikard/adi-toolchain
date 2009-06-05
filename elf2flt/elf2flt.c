@@ -69,7 +69,7 @@
 /* Always include Blackfin-specific defines in addition to common ELF stuff
  * above as the common elf headers often do not have our relocs.
  */
-#ifdef TARGET_bfin
+#if defined(TARGET_bfin) && !defined(R_BFIN_RIMM16)
 #include "elf/bfin.h"
 #endif
 
