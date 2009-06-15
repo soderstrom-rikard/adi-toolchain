@@ -469,14 +469,14 @@ define _show_dma
 	if ($$CONFIG & (0x1 << 7))
 		printf "interrupt "
 	end
-	set $$NDSIZE = $$CONFIG & (0xF << 8)
+	set $$NDSIZE = ($$CONFIG & (0xF << 8)) >> 8
 	if ($$NDSIZE > 0 && $$NDSIZE < 10)
 		printf "NDSIZE_%i ", $$NDSIZE
 	end
 	if ($$NDSIZE >= 10)
 		printf "NDSIZE:INVALID:%i ", $$NDSIZE
 	end
-	set $$FLOW = $$CONFIG & (0x7 << 12)
+	set $$FLOW = ($$CONFIG & (0x7 << 12)) >> 12
 	if ($$FLOW == 0)
 		printf "stop"
 	else
