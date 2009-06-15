@@ -1636,7 +1636,6 @@
 		<register name="CAN_MBTD"     group="CAN Controller Registers" read-address="0xFFC02AAC" write-address="0xFFC02AAC" mask="FFFF" type="IO" description="Mailbox Temporary Disable Feature" bit-size="16" target="EMU" />
 		<register name="CAN_EWR"      group="CAN Controller Registers" read-address="0xFFC02AB0" write-address="0xFFC02AB0" mask="FFFF" type="IO" description="Programmable Warning Level" bit-size="16" target="EMU" />
 		<register name="CAN_ESR"      group="CAN Controller Registers" read-address="0xFFC02AB4" write-address="0xFFC02AB4" mask="FFFF" type="IO" description="Error Status Register" bit-size="16" target="EMU" />
-		<register name="CAN_UCREG"    group="CAN Controller Registers" read-address="0xFFC02AC0" write-address="0xFFC02AC0" mask="FFFF" type="IO" description="Universal Counter Register/Capture Register" bit-size="16" target="EMU" />
 		<register name="CAN_UCCNT"    group="CAN Controller Registers" read-address="0xFFC02AC4" write-address="0xFFC02AC4" mask="FFFF" type="IO" description="Universal Counter" bit-size="16" target="EMU" />
 		<register name="CAN_UCRC"     group="CAN Controller Registers" read-address="0xFFC02AC8" write-address="0xFFC02AC8" mask="FFFF" type="IO" description="Universal Counter Force Reload Register" bit-size="16" target="EMU" />
 		<register name="CAN_UCCNF"    group="CAN Controller Registers" read-address="0xFFC02ACC" write-address="0xFFC02ACC" mask="FFFF" type="IO" description="Universal Counter Configuration Register" bit-size="16" target="EMU" />
