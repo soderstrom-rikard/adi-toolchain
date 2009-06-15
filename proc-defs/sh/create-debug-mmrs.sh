@@ -82,7 +82,6 @@ static int __init bfin_debug_mmrs_init(void)
 
 	parent = debugfs_create_dir("Core Registers", top);
 	debugfs_create_x32("SEQSTAT", S_IRUSR, parent, &last_seqstat);
-
 EOF
 
 for f in ../xml/ADSP-BF*-proc.xml ; do
