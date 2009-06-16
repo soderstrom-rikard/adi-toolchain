@@ -2212,7 +2212,11 @@ if [ $KERNEL_SOURCE ] ; then
         run_cmd mkdir -p "$DIR_UBOOT_BUILD/include"
         run_cmd touch "$DIR_UBOOT_BUILD"/include/config.mk "$DIR_UBOOT_BUILD"/include/config.h
         echo_date "Make U-Boot"
-        run_cmd $MAKE O="$DIR_UBOOT_BUILD" BIN_FILES='mkimage gen_eth_addr' tools
+        run_cmd $MAKE \
+            -C "$DIR_UBOOT" \
+            O="$DIR_UBOOT_BUILD" \
+            BIN_FILES-y='mkimage gen_eth_addr' \
+            tools
 
         echo_date "Copying U-Boot Tools"
         EXEEXT=""
