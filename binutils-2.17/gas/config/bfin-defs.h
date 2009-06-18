@@ -84,6 +84,11 @@ typedef enum
    belong to a usuable register group.  */
 #define T_NOGROUP     0xa0
 
+/* Flags.  */
+#define F_REG_NONE 0
+#define F_REG_HIGH 1
+#define F_REG_LOW 2
+
 enum machine_registers
 {
   REG_R0    = T_REG_R, REG_R1, REG_R2, REG_R3, REG_R4, REG_R5, REG_R6, REG_R7, 
@@ -182,9 +187,6 @@ enum reg_class
 #define REG_CLASS(a)     ((a).regno & 0xf0)
 #define IS_A1(a)         ((a).regno == REG_A1)
 #define IS_H(a)          ((a).flags & F_REG_HIGH ? 1: 0)
-#define IS_L(a)          ((a).flags & F_REG_LOW ? 1: 0)
-#define IS_HALF(a)       (IS_H(a) || IS_L(a))
-#define IS_PAIR(a)       ((a).flags & F_REG_PAIR ? 1 : 0)
 #define IS_EVEN(r)       ((r).regno % 2 == 0)
 #define IS_HCOMPL(a, b)  (REG_EQUAL(a, b) && \
                          ((a).flags & F_REG_HIGH) != ((b).flags & F_REG_HIGH))
@@ -346,11 +348,6 @@ INSTR_T Expr_Node_Gen_Reloc (Expr_Node *head, int parent_reloc);
 
 typedef long reg_t;
 
-#define F_REG_NONE 0
-#define F_REG_PAIR 1
-#define F_REG_STAR 2
-#define F_REG_HIGH 4
-#define F_REG_LOW  8
 
 typedef struct _register
 {

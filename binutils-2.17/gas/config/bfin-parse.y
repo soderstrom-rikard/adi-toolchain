@@ -245,7 +245,6 @@ valid_dreg_pair (Register *reg1, Expr_Node *reg2)
     }
 
   reg1->regno--;
-  reg1->flags = F_REG_PAIR;
   return 1;
 }
 

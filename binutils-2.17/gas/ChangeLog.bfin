@@ -1,3 +1,8 @@
+2009-06-18  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin-defs.h (F_REG_PAIR, F_REG_STAR): Remove.
+	* config/bfin-parse.y (valid_dreg_pair): No need to set flag.
+
 2009-06-17  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/tc-bfin.c (md_parse_option): Call as_fatal for bad
