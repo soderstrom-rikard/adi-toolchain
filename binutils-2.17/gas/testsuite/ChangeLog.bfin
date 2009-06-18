@@ -1,3 +1,7 @@
+2009-06-18  Jie Zhang  <jie.zhang@analog.com>
+
+	* gas/bfin/search.s, gas/bfin/search.d: Remove.
+
 2009-06-01  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* gas/bfin/loop.d, gas/bfin/reloc.d: Rename relocs to R_BFIN_XXX.
