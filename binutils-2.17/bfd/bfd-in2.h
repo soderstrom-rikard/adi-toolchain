@@ -1932,7 +1932,7 @@ enum bfd_architecture
 #define bfd_mach_avr4          4
 #define bfd_mach_avr5          5
   bfd_arch_bfin,        /* ADI Blackfin */
-#define bfd_mach_bf532         1
+#define bfd_mach_bfin          1
   bfd_arch_cr16c,       /* National Semiconductor CompactRISC. */
 #define bfd_mach_cr16c         1
   bfd_arch_crx,       /*  National Semiconductor CRX.  */

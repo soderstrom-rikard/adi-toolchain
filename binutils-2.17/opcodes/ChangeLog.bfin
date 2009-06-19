@@ -1,3 +1,10 @@
+2009-06-19  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-dis.c (print_insn_bfin): Make global.
+	(print_insn_bf532): Remove.
+	* disassemble.c (disassembler): Replace print_insn_bf532 with
+	print_insn_bfin.
+
 2009-04-13  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin-dis.c (enum machine_registers): Remove REG_AC.

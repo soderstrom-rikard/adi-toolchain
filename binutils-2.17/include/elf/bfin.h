@@ -91,8 +91,5 @@ END_RELOC_NUMBERS (R_BFIN_max)
 #define EF_BFIN_CODE_IN_L1	0x00000010	/* --code-in-l1 */
 #define EF_BFIN_DATA_IN_L1	0x00000020	/* --data-in-l1 */
 
-#define EF_BFIN_ISA		0xf0000000
-#define EFI_BFIN_1		0x10000000
-
 #define	EF_BFIN_PIC_FLAGS	(EF_BFIN_PIC | EF_BFIN_FDPIC)
 #endif /* _ELF_BFIN_H */

@@ -4264,9 +4264,6 @@ ccstat:
 	}
 	| CCREG cc_op V
 	{
-	  if (bfin_isa != BLACKFIN_ISA_1)
-	    return yyerror ("bad status bit");
-
 	  $$.r0 = 0x18;
 	  $$.x0 = $2.r0;
 	  $$.s0 = 0;
@@ -4282,9 +4279,6 @@ ccstat:
 	}
 	| V cc_op CCREG
 	{
-	  if (bfin_isa != BLACKFIN_ISA_1)
-	    return yyerror ("bad status bit");
-
 	  $$.r0 = 0x18;
 	  $$.x0 = $2.r0;
 	  $$.s0 = 1;

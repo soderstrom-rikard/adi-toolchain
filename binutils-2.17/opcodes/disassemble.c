@@ -125,7 +125,7 @@ disassembler (abfd)
 #endif
 #ifdef ARCH_bfin
     case bfd_arch_bfin:
-      disassemble = print_insn_bf532;
+      disassemble = print_insn_bfin;
       break;
 #endif
 #ifdef ARCH_cris

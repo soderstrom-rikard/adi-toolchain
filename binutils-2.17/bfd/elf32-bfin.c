@@ -4845,18 +4845,9 @@ bfinfdpic_check_relocs (bfd *abfd, struct bfd_link_info *info,
 static bfd_boolean
 elf32_bfin_object_p (bfd *abfd)
 {
-  unsigned int flags;
-
-  flags = elf_elfheader (abfd)->e_flags;
-  switch (flags & EF_BFIN_ISA)
-    {
-    default:
-    case EFI_BFIN_1:
-      bfd_default_set_arch_mach (abfd, bfd_arch_bfin, bfd_mach_bf532);
-      break;
-    }
-
-  return (((flags & EF_BFIN_FDPIC) != 0) == (IS_FDPIC (abfd)));
+  bfd_default_set_arch_mach (abfd, bfd_arch_bfin, 0);
+  return (((elf_elfheader (abfd)->e_flags & EF_BFIN_FDPIC) != 0)
+	  == (IS_FDPIC (abfd)));
 }
 
 static bfd_boolean

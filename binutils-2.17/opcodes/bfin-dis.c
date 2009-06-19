@@ -4726,7 +4726,7 @@ _print_insn_bfin (bfd_vma pc, disassemble_info *outf)
 }
 
 
-static int
+int
 print_insn_bfin (bfd_vma pc, disassemble_info *outf)
 {
   bfd_byte buf[2];
@@ -4762,10 +4762,4 @@ print_insn_bfin (bfd_vma pc, disassemble_info *outf)
   comment = 0;
 
   return count;
-}
-
-int
-print_insn_bf532 (bfd_vma pc, disassemble_info *outf)
-{
-  return print_insn_bfin (pc, outf);
 }

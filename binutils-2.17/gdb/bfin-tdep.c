@@ -1226,13 +1226,7 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   set_gdbarch_frame_args_skip (gdbarch, 8);
   set_gdbarch_unwind_pc (gdbarch, bfin_unwind_pc);
   set_gdbarch_frame_align (gdbarch, bfin_frame_align);
-
-  switch (info.bfd_arch_info->mach)
-    {
-    case bfd_mach_bf532:
-      set_gdbarch_print_insn (gdbarch, print_insn_bf532);
-      break;
-    }
+  set_gdbarch_print_insn (gdbarch, print_insn_bfin);
 
   frame_unwind_append_sniffer (gdbarch, dwarf2_frame_sniffer);
 

@@ -1,3 +1,12 @@
+2009-06-19  Jie Zhang  <jie.zhang@analog.com>
+
+	* cpu-bfin.c (N): Don't define.
+	(bfd_bfin_arch): Redefine.
+	* archures.c (bfd_mach_bf532): Remove.
+	(bfd_mach_bfin): Define.
+	* bfd-in2.h: Regenerate.
+	* elf32-bfin.c (elf32_bfin_object_p): Don't use bfd_mach_bf532.
+
 2009-06-01  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* elf32-bfin.c: Rename relocs to R_BFIN_XXX.

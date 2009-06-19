@@ -1,3 +1,7 @@
+2009-06-19  Jie Zhang  <jie.zhang@analog.com>
+
+	* binutils-all/objdump.exp: Replace bf532 with bfin.
+
 2009-04-13  Jie Zhang  <jie.zhang@analog.com>
 
 	* binutils-all/objdump.exp (cpus_expected): Remove bf579.

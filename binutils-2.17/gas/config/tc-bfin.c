@@ -158,8 +158,6 @@ const char EXP_CHARS[] = "eE";
    As in 0f12.456 or  0d1.2345e12.  */
 const char FLT_CHARS[] = "fFdDxX";
 
-int bfin_isa = BLACKFIN_ISA_1;
-
 typedef enum bfin_cpu_type
 {
   BFIN_CPU_UNKNOWN,
@@ -439,16 +437,7 @@ md_show_usage (FILE * stream ATTRIBUTE_UNUSED)
 void
 md_begin ()
 {
-  switch (bfin_isa)
-    {
-    case BLACKFIN_ISA_1:
-      astat_bits = bf532_astat_bits;
-      bfin_flags |= EFI_BFIN_1;
-      break;
-
-    default:
-      abort ();
-    }
+  astat_bits = bf532_astat_bits;
 
   /* Set the ELF flags if desired. */
   if (bfin_flags)
