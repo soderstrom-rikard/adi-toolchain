@@ -394,13 +394,15 @@ static enum machine_registers decode_regs_hi[] =
 
 #define regs_hi(x,i) REGNAME (decode_regs_hi[((i) << 3)|x])
 
-static enum machine_registers decode_statbits_bf532[] =
+static enum machine_registers decode_statbits[] =
 {
   REG_AZ, REG_AN, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_AQ, REG_LASTREG,
   REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_AC0, REG_AC1, REG_LASTREG, REG_LASTREG,
   REG_AV0, REG_AV0S, REG_AV1, REG_AV1S, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG,
   REG_V, REG_VS, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG, REG_LASTREG,
 };
+
+#define statbits(x) REGNAME (decode_statbits[(x) & 31])
 
 /* LC0 LC1.  */
 static enum machine_registers decode_counters[] =
@@ -482,12 +484,6 @@ static enum machine_registers decode_allregs[] =
 #ifndef OUTS
 #define OUTS(p, txt) ((p) ? (((txt)[0]) ? (p->fprintf_func)(p->stream, "%s", txt) :0) :0)
 #endif
-
-static int
-decode_statbits (int x)
-{
-  return decode_statbits_bf532[(x) & 31];
-}
 
 static void
 amod0 (int s0, int x0, disassemble_info *outf)
@@ -1217,49 +1213,45 @@ decode_CC2stat_0 (TIword iw0, disassemble_info *outf)
   int D    = ((iw0 >> CC2stat_D_bits) & CC2stat_D_mask);
   int op   = ((iw0 >> CC2stat_op_bits) & CC2stat_op_mask);
   int cbit = ((iw0 >> CC2stat_cbit_bits) & CC2stat_cbit_mask);
-  int statbits = decode_statbits (cbit);
-
-  if (statbits == REG_LASTREG)
-    return 0;
 
   if (op == 0 && D == 0)
     {
       OUTS (outf, "CC = ");
-      OUTS (outf, REGNAME (statbits));
+      OUTS (outf, statbits (cbit));
     }
   else if (op == 1 && D == 0)
     {
       OUTS (outf, "CC |= ");
-      OUTS (outf, REGNAME (statbits));
+      OUTS (outf, statbits (cbit));
     }
   else if (op == 2 && D == 0)
     {
       OUTS (outf, "CC &= ");
-      OUTS (outf, REGNAME (statbits));
+      OUTS (outf, statbits (cbit));
     }
   else if (op == 3 && D == 0)
     {
       OUTS (outf, "CC ^= ");
-      OUTS (outf, REGNAME (statbits));
+      OUTS (outf, statbits (cbit));
     }
   else if (op == 0 && D == 1)
     {
-      OUTS (outf, REGNAME (statbits));
+      OUTS (outf, statbits (cbit));
       OUTS (outf, " = CC");
     }
   else if (op == 1 && D == 1)
     {
-      OUTS (outf, REGNAME (statbits));
+      OUTS (outf, statbits (cbit));
       OUTS (outf, " |= CC");
     }
   else if (op == 2 && D == 1)
     {
-      OUTS (outf, REGNAME (statbits));
+      OUTS (outf, statbits (cbit));
       OUTS (outf, " &= CC");
     }
   else if (op == 3 && D == 1)
     {
-      OUTS (outf, REGNAME (statbits));
+      OUTS (outf, statbits (cbit));
       OUTS (outf, " ^= CC");
     }
   else

@@ -1,3 +1,11 @@
+2009-06-22  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin-dis.c (decode_statbits_bf532): Rename to ...
+	(decode_statbits): ... this.
+	(statbits): Define.
+	(decode_statbits): Remove.
+	(decode_CC2stat_0): Change accordingly.
+
 2009-06-19  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin-dis.c (print_insn_bfin): Make global.
