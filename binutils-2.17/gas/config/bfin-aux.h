@@ -21,7 +21,6 @@
 
 #include "bfin-defs.h"
 
-/* A typedef would be better.  */
 #define REG_T Register *
 
 INSTR_T

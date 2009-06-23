@@ -1,5 +1,9 @@
 2009-06-23  Jie Zhang  <jie.zhang@analog.com>
 
+	* config/bfin-aux.h: Remove a comment.
+
+2009-06-23  Jie Zhang  <jie.zhang@analog.com>
+
 	* config/bfin-defs.h (enum statusflags): Number each flag
 	as its bit position in ASTAT register.
 	* config/bfin-parse.y (ccstat): No need to check STATUS_REG.
