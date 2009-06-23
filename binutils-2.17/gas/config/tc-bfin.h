@@ -73,8 +73,6 @@ extern long md_pcrel_from_section PARAMS ((struct fix *, segT));
 /* Values passed to md_apply_fix3 don't include symbol values.  */
 #define MD_APPLY_SYM_VALUE(FIX) 0
 
-extern const int *astat_bits;
-
 extern unsigned int bfin_anomaly_checks;
 
 /* Anomaly checking */

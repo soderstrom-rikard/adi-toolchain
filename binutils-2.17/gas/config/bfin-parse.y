@@ -4255,9 +4255,6 @@ cc_op:
 ccstat:
 	CCREG cc_op STATUS_REG
 	{
-	  if ($3.regno == -1)
-	    return yyerror ("bad status bit");
-
 	  $$.r0 = $3.regno;
 	  $$.x0 = $2.r0;
 	  $$.s0 = 0;
@@ -4270,9 +4267,6 @@ ccstat:
 	}
 	| STATUS_REG cc_op CCREG
 	{
-	  if ($1.regno == -1)
-	    return yyerror ("bad status bit");
-
 	  $$.r0 = $1.regno;
 	  $$.x0 = $2.r0;
 	  $$.s0 = 1;

@@ -1,3 +1,14 @@
+2009-06-23  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin-defs.h (enum statusflags): Number each flag
+	as its bit position in ASTAT register.
+	* config/bfin-parse.y (ccstat): No need to check STATUS_REG.
+	* config/bfin-lex.l: Don't use astat_bits for ASTAT flags.
+	* config/tc-bfin.c (astat_bits): Remove.
+	(bf532_astat_bits[]): Remove.
+	(md_begin): Don't set astat_bits.
+	* config/tc-bfin.h (astat_bits): Don't declare.
+
 2009-06-19  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin-parse.y (ccstat): Don't use bfin_isa.

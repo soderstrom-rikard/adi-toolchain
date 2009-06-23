@@ -48,13 +48,6 @@ int last_insn_size;
 extern struct obstack mempool;
 FILE *errorf;
 
-const int *astat_bits;
-
-/* Local variables.  */
-
-static const int bf532_astat_bits[] =
-  {0, 0x01, 0x10, 0x12, 0x06, 0x0c, 0x0d, 0x11, 0x13, 0x18, 0x19};
-
 /* Flags to set in the elf header */
 #define DEFAULT_FLAGS 0
 
@@ -437,8 +430,6 @@ md_show_usage (FILE * stream ATTRIBUTE_UNUSED)
 void
 md_begin ()
 {
-  astat_bits = bf532_astat_bits;
-
   /* Set the ELF flags if desired. */
   if (bfin_flags)
     bfd_set_private_flags (stdoutput, bfin_flags);
