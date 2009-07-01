@@ -211,7 +211,7 @@ enum {
   LEAVE_NOP_NO
 };
 
-extern struct timespec bfin_emu_wait_ts;
+extern int bfin_wait_emuready;
 
 /* From src/bfin/bfin.c */
 

@@ -51,7 +51,9 @@ struct timespec { unsigned long tv_sec, tv_nsec; };
 #define nanosleep(req, rem) usleep((req)->tv_sec * 1000 * 1000 + (req)->tv_nsec / 1000)
 #endif
 
-struct timespec bfin_emu_wait_ts = {0, 5000000};
+int bfin_wait_emuready = 1;
+
+static struct timespec bfin_emu_wait_ts = {0, 5000000};
 
 
 tap_register *
@@ -686,7 +688,7 @@ chain_emuir_set_same (chain_t *chain, uint64_t insn, int exit)
 
   chain_shift_data_registers_mode (chain, 0, 1, exit);
 
-  if (exit == EXITMODE_IDLE)
+  if (exit == EXITMODE_IDLE && bfin_wait_emuready)
     chain_wait_emuready (chain);
 }
 
@@ -760,7 +762,7 @@ part_emuir_set (chain_t *chain, int n, uint64_t insn, int exit)
 
   chain_shift_data_registers_mode (chain, 0, 1, exit);
 
-  if (exit == EXITMODE_IDLE)
+  if (exit == EXITMODE_IDLE && bfin_wait_emuready)
     part_wait_emuready (chain, n);
 }
 
@@ -813,7 +815,7 @@ chain_emuir_set_same_2 (chain_t *chain, uint64_t insn1, uint64_t insn2, int exit
     }
 
   chain_shift_data_registers_mode (chain, 0, 1, exit);
-  if (exit ==  EXITMODE_IDLE);
+  if (exit ==  EXITMODE_IDLE && bfin_wait_emuready)
     chain_wait_emuready (chain);
 }
 
@@ -901,7 +903,7 @@ part_emuir_set_2 (chain_t *chain, int n, uint64_t insn1, uint64_t insn2, int exi
 
   chain_shift_data_registers_mode (chain, 0, 1, exit);
 
-  if (exit == EXITMODE_IDLE)
+  if (exit == EXITMODE_IDLE && bfin_wait_emuready)
     part_wait_emuready (chain, n);
 }
 
@@ -947,7 +949,8 @@ part_emudat_get (chain_t *chain, int n, int exit)
     {
       assert (tap_state (chain) & TAPSTAT_IDLE);
       chain_clock (chain, 0, 0, 1);
-      part_wait_emuready (chain, n);
+      if (bfin_wait_emuready)
+	part_wait_emuready (chain, n);
     }
 
   if (part_scan_select (chain, n, EMUDAT_SCAN) < 0)
@@ -979,7 +982,7 @@ part_emudat_set (chain_t *chain, int n, uint32_t value, int exit)
   emudat_init_value (r, value);
   chain_shift_data_registers_mode (chain, 0, 1, exit);
 
-  if (exit == EXITMODE_IDLE)
+  if (exit == EXITMODE_IDLE && bfin_wait_emuready)
     part_wait_emuready (chain, n);
 }
 
