@@ -1,3 +1,8 @@
+2009-07-02  Jie Zhang  <jie.zhang@analog.com>
+
+	* emulparams/elf32bfinfd.sh (MAXPAGESIZE): Change from 0x4000
+	to 0x1000.
+
 2008-09-02  Jie Zhang  <jie.zhang@analog.com>
 
 	 * emulparams/elf32bfinfd.sh (OTHER_SECTIONS): Add .l2.text
