@@ -1,3 +1,7 @@
+2009-07-02  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.h (FUNCTION_PROFILER): Save and restore RETS.
+
 2009-06-15  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* config/bfin/bfin.c (bfin_cpus[]): Add 0.1 for bf512, bf514, bf516,

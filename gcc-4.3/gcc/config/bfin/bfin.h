@@ -1361,6 +1361,7 @@ do { 						\
 #define PROFILE_BEFORE_PROLOGUE
 #define FUNCTION_PROFILER(FILE, LABELNO)	\
   do {						\
+    fprintf (FILE, "\t[--SP] = RETS;\n");	\
     if (TARGET_LONG_CALLS)			\
       {						\
 	fprintf (FILE, "\tP2.h = __mcount;\n");	\
@@ -1369,6 +1370,7 @@ do { 						\
       }						\
     else					\
       fprintf (FILE, "\tCALL __mcount;\n");	\
+    fprintf (FILE, "\tRETS = [SP++];\n");	\
   } while(0)
 
 #undef NO_PROFILE_COUNTERS
