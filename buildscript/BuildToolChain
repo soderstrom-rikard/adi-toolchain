@@ -2387,6 +2387,7 @@ if [ -e $DIR_SOURCE/libs/Makefile ] ; then
 
 	run_cmd $MAKE CROSS=bfin-elf- MULTILIB_FLAGS="$flags"
 
+	EXEEXT=
 	check_installed_files libdsp "$DIR_SOURCE/libs/libdsp/" \
 		libbfdsp.a libbffastfp.a
 
