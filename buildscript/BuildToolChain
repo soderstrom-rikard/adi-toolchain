@@ -2218,7 +2218,7 @@ if [ $KERNEL_SOURCE ] ; then
         if [ "${CBUILD}" = "${CHOST}" ] ; then
             unset HOSTCC
         else
-            HOSTCC="${CBUILD}-gcc"
+            HOSTCC="${CHOST}-gcc"
         fi
         run_cmd $MAKE \
             -C "$DIR_UBOOT" \
