@@ -49,6 +49,7 @@ extern usbconn_cable_t usbconn_cable_jlink;
 extern usbconn_cable_t usbconn_cable_ft2232_ftd2xx;
 extern usbconn_cable_t usbconn_cable_armusbocd_ftd2xx;
 extern usbconn_cable_t usbconn_cable_gnice_ftd2xx;
+extern usbconn_cable_t usbconn_cable_gniceplus_ftd2xx;
 extern usbconn_cable_t usbconn_cable_jtagkey_ftd2xx;
 extern usbconn_cable_t usbconn_cable_oocdlinks_ftd2xx;
 extern usbconn_cable_t usbconn_cable_turtelizer2_ftd2xx;
@@ -59,6 +60,7 @@ extern usbconn_cable_t usbconn_cable_signalyzer_ftd2xx;
 extern usbconn_cable_t usbconn_cable_ft2232_ftdi;
 extern usbconn_cable_t usbconn_cable_armusbocd_ftdi;
 extern usbconn_cable_t usbconn_cable_gnice_ftdi;
+extern usbconn_cable_t usbconn_cable_gniceplus_ftdi;
 extern usbconn_cable_t usbconn_cable_jtagkey_ftdi;
 extern usbconn_cable_t usbconn_cable_oocdlinks_ftdi;
 extern usbconn_cable_t usbconn_cable_turtelizer2_ftdi;
@@ -95,6 +97,7 @@ usbconn_cable_t *usbconn_cables[] =
 	&usbconn_cable_ft2232_ftd2xx,
 	&usbconn_cable_armusbocd_ftd2xx,
 	&usbconn_cable_gnice_ftd2xx,
+	&usbconn_cable_gniceplus_ftd2xx,
 	&usbconn_cable_jtagkey_ftd2xx,
 	&usbconn_cable_oocdlinks_ftd2xx,
 	&usbconn_cable_turtelizer2_ftd2xx,
@@ -105,6 +108,7 @@ usbconn_cable_t *usbconn_cables[] =
 	&usbconn_cable_ft2232_ftdi,
 	&usbconn_cable_armusbocd_ftdi,
 	&usbconn_cable_gnice_ftdi,
+	&usbconn_cable_gniceplus_ftdi,
 	&usbconn_cable_jtagkey_ftdi,
 	&usbconn_cable_oocdlinks_ftdi,
 	&usbconn_cable_turtelizer2_ftdi,

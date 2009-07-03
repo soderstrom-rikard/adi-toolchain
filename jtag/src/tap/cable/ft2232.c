@@ -44,6 +44,9 @@
 /* Maximum TCK frequency of FT2232 */
 #define FT2232_MAX_TCK_FREQ 6000000
 
+/* Maximum TCK frequency of FT2232H / FT4232H  */
+#define FT2232H_MAX_TCK_FREQ 30000000
+
 /* The default driver if not specified otherwise during connect */
 #ifdef ENABLE_LOWLEVEL_FTD2XX
 #define DEFAULT_DRIVER "ftd2xx-mpsse"
@@ -79,6 +82,9 @@
 #define TCK_DIVISOR    0x86
 #define SEND_IMMEDIATE 0x87
 
+/* FT2232H / FT4232H only commands */
+#define DISABLE_CLOCKDIV  0x8A /* Disables the clk divide by 5 to allow for a 60MHz master clock */
+#define ENABLE_CLOCKDIV   0x8B /* Enables the clk divide by 5 to allow for backward compatibility with FT2232D */
 
 /* bit and bitmask definitions for GPIO commands */
 #define BIT_TCK 0
@@ -185,13 +191,22 @@ static const cx_cmd_t imm_cmd    = {NULL, 1, 1, (uint8_t *)imm_buf, 0};
 
 
 static void
-ft2232_set_frequency( cable_t *cable, uint32_t new_frequency )
+ft2232h_disable_clockdiv_by5( cable_t *cable )
+{
+  params_t *params = (params_t *)cable->params;
+  cx_cmd_root_t *cmd_root = &(params->cmd_root);
+  cx_cmd_queue( cmd_root, 0 );
+  cx_cmd_push( cmd_root, DISABLE_CLOCKDIV );
+}
+
+static void
+ft2232_set_frequency_common( cable_t *cable, uint32_t new_frequency, uint32_t max_frequency )
 {
   params_t *params = (params_t *)cable->params;
   cx_cmd_root_t *cmd_root = &(params->cmd_root);
 
-  if (!new_frequency || new_frequency > FT2232_MAX_TCK_FREQ)
-    new_frequency = FT2232_MAX_TCK_FREQ;
+  if (!new_frequency || new_frequency > max_frequency)
+    new_frequency = max_frequency;
 
   cable->frequency = new_frequency;
 
@@ -200,15 +215,19 @@ ft2232_set_frequency( cable_t *cable, uint32_t new_frequency )
   {
     uint32_t div;
 
-    div = FT2232_MAX_TCK_FREQ / new_frequency;
-    if (FT2232_MAX_TCK_FREQ % new_frequency)
+    div = max_frequency / new_frequency;
+    if (max_frequency % new_frequency)
       div++;
 
     if (div >= (1 << 16))
     {
       div = (1 << 16) - 1;
-      printf( _("Warning: Setting lowest supported frequency for FT2232: %d\n"), FT2232_MAX_TCK_FREQ/div );
+      printf( _("Warning: Setting lowest supported frequency for FT2232%s: %d\n"),
+              max_frequency == FT2232H_MAX_TCK_FREQ ? "H" : "", max_frequency/div );
     }
+
+    if (max_frequency == FT2232H_MAX_TCK_FREQ)
+      ft2232h_disable_clockdiv_by5( cable );
 
     /* send new divisor to device */
     div -= 1;
@@ -219,10 +238,21 @@ ft2232_set_frequency( cable_t *cable, uint32_t new_frequency )
 
     cx_xfer( cmd_root, &imm_cmd, cable, COMPLETELY );
 
-    params->mpsse_frequency = FT2232_MAX_TCK_FREQ / (div + 1);
+    params->mpsse_frequency = max_frequency / (div + 1);
   }
 }
 
+static void
+ft2232_set_frequency( cable_t *cable, uint32_t new_frequency )
+{
+  ft2232_set_frequency_common( cable, new_frequency, FT2232_MAX_TCK_FREQ);
+}
+
+static void
+ft2232h_set_frequency( cable_t *cable, uint32_t new_frequency )
+{
+  ft2232_set_frequency_common( cable, new_frequency, FT2232H_MAX_TCK_FREQ);
+}
 
 static int
 ft2232_generic_init( cable_t *cable )
@@ -356,7 +386,7 @@ ft2232_armusbocd_init( cable_t *cable )
 
 
 static int
-ft2232_gnice_init( cable_t *cable )
+ft2232_gnice_init_common( cable_t *cable, uint32_t frequency )
 {
   params_t *params = (params_t *)cable->params;
   cx_cmd_root_t *cmd_root = &(params->cmd_root);
@@ -385,11 +415,25 @@ ft2232_gnice_init( cable_t *cable )
   cx_cmd_push( cmd_root, params->high_byte_value_trst_inactive );
   cx_cmd_push( cmd_root, params->high_byte_dir );
 
-  ft2232_set_frequency( cable, FT2232_MAX_TCK_FREQ );
+  ft2232_set_frequency( cable, frequency );
 
   params->last_tdo_valid = 0;
 
   return 0;
+}
+
+static int
+ft2232_gnice_init( cable_t *cable )
+{
+  return ft2232_gnice_init_common( cable, FT2232_MAX_TCK_FREQ );
+}
+
+static int
+ft2232_gniceplus_init( cable_t *cable )
+{
+  /* On ADI boards with the onboard EZKIT Debug Agent, max TCK where things
+     work is 15MHz. */
+  return ft2232_gnice_init_common( cable, FT2232H_MAX_TCK_FREQ / 2 );
 }
 
 
@@ -1322,6 +1366,7 @@ ft2232_cable_free( cable_t *cable )
 usbconn_cable_t usbconn_cable_ft2232_ftdi;
 usbconn_cable_t usbconn_cable_armusbocd_ftdi;
 usbconn_cable_t usbconn_cable_gnice_ftdi;
+usbconn_cable_t usbconn_cable_gniceplus_ftdi;
 usbconn_cable_t usbconn_cable_jtagkey_ftdi;
 usbconn_cable_t usbconn_cable_oocdlinks_ftdi;
 usbconn_cable_t usbconn_cable_turtelizer2_ftdi;
@@ -1337,6 +1382,9 @@ ft2232_usbcable_help( const char *cablename )
   if (strcasecmp( conn->name, cablename ) == 0)
     goto found;
   conn = &usbconn_cable_gnice_ftdi;
+  if (strcasecmp( conn->name, cablename ) == 0)
+    goto found;
+  conn = &usbconn_cable_gniceplus_ftdi;
   if (strcasecmp( conn->name, cablename ) == 0)
     goto found;
   conn = &usbconn_cable_jtagkey_ftdi;
@@ -1468,6 +1516,38 @@ usbconn_cable_t usbconn_cable_gnice_ftd2xx = {
   "ftd2xx-mpsse",     /* default usbconn driver */
   0x0456,             /* VID */
   0xF000              /* PID */
+};
+
+cable_driver_t ft2232_gniceplus_cable_driver = {
+  "gnICE+",
+  N_("Analog Devices Blackfin gnICE+ (FT2232H) Cable (EXPERIMENTAL)"),
+  ft2232_connect,
+  generic_disconnect,
+  ft2232_cable_free,
+  ft2232_gniceplus_init,
+  ft2232_gnice_done,
+  ft2232h_set_frequency,
+  ft2232_clock,
+  ft2232_get_tdo,
+  ft2232_transfer,
+  ft2232_set_trst,
+  generic_get_trst,
+  ft2232_flush,
+  ft2232_usbcable_help
+};
+usbconn_cable_t usbconn_cable_gniceplus_ftdi = {
+  "gnICE+",            /* cable name */
+  NULL,               /* string pattern, not used */
+  "ftdi-mpsse",       /* default usbconn driver */
+  0x0456,             /* VID */
+  0xF001              /* PID */
+};
+usbconn_cable_t usbconn_cable_gniceplus_ftd2xx = {
+  "gnICE+",            /* cable name */
+  NULL,               /* string pattern, not used */
+  "ftd2xx-mpsse",     /* default usbconn driver */
+  0x0456,             /* VID */
+  0xF001              /* PID */
 };
 
 cable_driver_t ft2232_jtagkey_cable_driver = {

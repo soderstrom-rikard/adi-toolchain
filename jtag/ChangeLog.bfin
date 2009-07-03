@@ -1,3 +1,28 @@
+2009-07-03  Michael Hennerich  <michael.hennerich@analog.com>
+	    Jie Zhang  <jie.zhang@analog.com>
+
+	* src/tap/cable.c (ft2232_gniceplus_cable_driver): Declare.
+	(cable_drivers[]): Add ft2232_gniceplus_cable_driver.
+	* src/tap/cable/generic_usbconn.c
+	(usbconn_cable_gniceplus_ftd2xx): Declare.
+	(usbconn_cable_gniceplus_ftdi): Declare.
+	(usbconn_cables[]): Add usbconn_cable_gniceplus_ftd2xx
+	and usbconn_cable_gniceplus_ftdi.
+	* src/tap/cable/ft2232.c (FT2232H_MAX_TCK_FREQ): Define.
+	(DISABLE_CLOCKDIV, ENABLE_CLOCKDIV): Define.
+	(ft2232h_disable_clockdiv_by5): New.
+	(ft2232_set_frequency_common): New.
+	(ft2232_set_frequency): Use ft2232_set_frequency_common.
+	(ft2232h_set_frequency): New.
+	(ft2232_gnice_init_common): New.
+	(ft2232_gnice_init): Use ft2232_gnice_init_common.
+	(ft2232_gniceplus_init): New.
+	(usbconn_cable_gniceplus_ftdi): Define.
+	(ft2232_usbcable_help): Add usbconn_cable_gniceplus_ftdi.
+	(ft2232_gniceplus_cable_driver): Define.
+	(usbconn_cable_gniceplus_ftdi): Define.
+	(usbconn_cable_gniceplus_ftd2xx): Define.
+
 2009-07-01  Jie Zhang  <jie.zhang@analog.com>
 
 	* include/bfin.h (bfin_loop_wait_ts): Don't declare.
