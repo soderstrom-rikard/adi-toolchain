@@ -1291,7 +1291,7 @@ build_elf2flt()
 	check_installed_files elf2flt "${prefix}/bin/${target}-" \
 		elf2flt flthdr
 
-	rm -rf $DIR_ELF2FLT_BUILD/*
+	rm -rf $DIR_ELF2FLT_BUILD
 
 	resume_save
 }
