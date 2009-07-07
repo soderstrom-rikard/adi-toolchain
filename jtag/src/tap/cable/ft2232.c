@@ -386,7 +386,7 @@ ft2232_armusbocd_init( cable_t *cable )
 
 
 static int
-ft2232_gnice_init_common( cable_t *cable, uint32_t frequency )
+ft2232_gnice_init_common( cable_t *cable, int is_ft2232h )
 {
   params_t *params = (params_t *)cable->params;
   cx_cmd_root_t *cmd_root = &(params->cmd_root);
@@ -415,7 +415,12 @@ ft2232_gnice_init_common( cable_t *cable, uint32_t frequency )
   cx_cmd_push( cmd_root, params->high_byte_value_trst_inactive );
   cx_cmd_push( cmd_root, params->high_byte_dir );
 
-  ft2232_set_frequency( cable, frequency );
+  if (is_ft2232h)
+    /* On ADI boards with the onboard EZKIT Debug Agent, max TCK where things
+       work is 15MHz. */
+    ft2232h_set_frequency( cable, FT2232H_MAX_TCK_FREQ / 2 );
+  else
+    ft2232_set_frequency( cable, FT2232_MAX_TCK_FREQ );
 
   params->last_tdo_valid = 0;
 
@@ -425,15 +430,13 @@ ft2232_gnice_init_common( cable_t *cable, uint32_t frequency )
 static int
 ft2232_gnice_init( cable_t *cable )
 {
-  return ft2232_gnice_init_common( cable, FT2232_MAX_TCK_FREQ );
+  return ft2232_gnice_init_common( cable, 0 );
 }
 
 static int
 ft2232_gniceplus_init( cable_t *cable )
 {
-  /* On ADI boards with the onboard EZKIT Debug Agent, max TCK where things
-     work is 15MHz. */
-  return ft2232_gnice_init_common( cable, FT2232H_MAX_TCK_FREQ / 2 );
+  return ft2232_gnice_init_common( cable, 1 );
 }
 
 

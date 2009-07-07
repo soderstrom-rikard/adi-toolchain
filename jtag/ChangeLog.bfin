@@ -1,3 +1,10 @@
+2009-07-07  Jie Zhang  <jie.zhang@analog.com>
+
+	* src/tap/cable/ft2232.c (ft2232_gnice_init_common): Replace
+	argument frequency with is_ft2232h. Call ft2232_set_frequency
+	or ft2232h_set_frequency accordingly.
+	(ft2232_gnice_init, ft2232_gniceplus_init): Change accordingly.
+
 2009-07-03  Michael Hennerich  <michael.hennerich@analog.com>
 	    Jie Zhang  <jie.zhang@analog.com>
 
