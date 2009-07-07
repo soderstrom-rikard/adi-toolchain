@@ -76,6 +76,11 @@ SectionEnd
 !insertmacro BlackfinInstall "uclinux" "FLAT"
 !insertmacro BlackfinInstall "linux-uclibc" "FDPIC"
 
+Section "Eclipse" SecEclipse
+  SetOutPath "$INSTDIR\Eclipse"
+  File /r "eclipse\*"
+SectionEnd
+
 Section "Examples" SecExamples
   SetOutPath "$INSTDIR\examples"
   File /r "..\examples\*"
@@ -85,18 +90,22 @@ Section "Shortcuts" SecShortcuts
   CreateDirectory "$SMPROGRAMS\Analog Devices\GNU Toolchain\${PRODUCT_VERSION}"
   CreateShortCut "$SMPROGRAMS\Analog Devices\GNU Toolchain\${PRODUCT_VERSION}\README.lnk" "$INSTDIR\README.txt"
   CreateShortCut "$SMPROGRAMS\Analog Devices\GNU Toolchain\${PRODUCT_VERSION}\Documentation.lnk" "http://docs.blackfin.uclinux.org/" "" "$INSTDIR\uninst.exe"
+  IfFileExists "$INSTDIR\Eclipse\Eclipse.exe" 0 +2
+  CreateShortCut "$SMPROGRAMS\Analog Devices\GNU Toolchain\${PRODUCT_VERSION}\Eclipse.lnk" "$INSTDIR\Eclipse\Eclipse.exe" "" "$INSTDIR\Eclipse\Eclipse.exe"
   CreateShortCut "$SMPROGRAMS\Analog Devices\GNU Toolchain\${PRODUCT_VERSION}\Uninstall.lnk" "$INSTDIR\uninst.exe"
 SectionEnd
 
 LangString DESC_SecNEWLIB ${LANG_ENGLISH} "Blackfin Toolchain for running on bare metal (no operating system)"
 LangString DESC_SecFLAT ${LANG_ENGLISH} "Blackfin Toolchain for generating FLAT binaries to run under Linux"
 LangString DESC_SecFDPIC ${LANG_ENGLISH} "Blackfin Toolchain for generating shared FDPIC ELF binaries to run under Linux"
+LangString DESC_SecEclipse ${LANG_ENGLISH} "Eclipse IDE with Blackfin Plugins"
 LangString DESC_SecExamples ${LANG_ENGLISH} "Some simple example programs"
 LangString DESC_SecShortcuts ${LANG_ENGLISH} "Start Menu Shortcuts"
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${SecNEWLIB} $(DESC_SecNEWLIB)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecFLAT} $(DESC_SecFLAT)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecFDPIC} $(DESC_SecFDPIC)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecEclipse} $(DESC_SecEclipse)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecExamples} $(DESC_SecExamples)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecShortcuts} $(DESC_SecShortcuts)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
@@ -129,6 +138,8 @@ FunctionEnd
 Section Uninstall
   Delete "$INSTDIR\uninst.exe"
   RMDir /r "$INSTDIR"
+  RMDir /r "$SMPROGRAMS\Analog Devices\GNU Toolchain\${PRODUCT_VERSION}"
+  RMDir "$SMPROGRAMS\Analog Devices\GNU Toolchain"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   SetAutoClose true
