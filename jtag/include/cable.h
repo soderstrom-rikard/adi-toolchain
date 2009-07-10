@@ -67,6 +67,7 @@ typedef struct cable_queue_t cable_queue_t;
 struct cable_queue_t {
 	enum {
 		CABLE_CLOCK,
+		CABLE_CLOCK_COMPACT,
 		CABLE_GET_TDO,
 		CABLE_TRANSFER,
 		CABLE_SET_TRST,

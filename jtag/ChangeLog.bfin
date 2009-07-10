@@ -1,5 +1,11 @@
 2009-07-10  Jie Zhang  <jie.zhang@analog.com>
 
+	* include/cable.h (enum action): Add CABLE_CLOCK_COMPACT.
+	* src/tap/cable/ft2232.c (ft2232_clock_schedule_compact): New.
+	(ft2232_flush): Compact consecutive clock into one.
+
+2009-07-10  Jie Zhang  <jie.zhang@analog.com>
+
 	* src/tap/cable/ft2232.c (ft2232_transfer_schedule): No need 
 	to set direction here.
 

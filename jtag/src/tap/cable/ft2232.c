@@ -919,6 +919,21 @@ ft2232_clock_schedule( cable_t *cable, int tms, int tdi, int n )
 
 
 static void
+ft2232_clock_schedule_compact( cable_t *cable, int length, uint8_t byte )
+{
+  params_t *params = (params_t *)cable->params;
+  cx_cmd_root_t *cmd_root = &(params->cmd_root);
+
+  cx_cmd_queue( cmd_root, 0 );
+  /* Clock Data to TMS/CS Pin (no Read) */
+  cx_cmd_push( cmd_root, MPSSE_WRITE_TMS |
+               MPSSE_LSB | MPSSE_BITMODE | MPSSE_WRITE_NEG );
+  cx_cmd_push( cmd_root, length );
+  cx_cmd_push( cmd_root, byte );
+}
+
+
+static void
 ft2232_clock( cable_t *cable, int tms, int tdi, int n )
 {
   params_t *params = (params_t *)cable->params;
@@ -1199,18 +1214,77 @@ ft2232_flush( cable_t *cable, cable_flush_amount_t how_much )
     int last_tdo_valid_schedule = params->last_tdo_valid;
     int last_tdo_valid_finish = params->last_tdo_valid;
 
+    if (cable->todo.num_items == 1
+        && cable->todo.data[cable->todo.next_item].action == CABLE_CLOCK_COMPACT)
+      break;
+
     for (j = i = cable->todo.next_item, n = 0; n < cable->todo.num_items; n++)
     {
 
       switch (cable->todo.data[i].action)
       {
       case CABLE_CLOCK:
-        ft2232_clock_schedule( cable,
-                               cable->todo.data[i].arg.clock.tms,
-                               cable->todo.data[i].arg.clock.tdi,
-                               cable->todo.data[i].arg.clock.n );
-        last_tdo_valid_schedule = 0;
-        break;
+      case CABLE_CLOCK_COMPACT:
+        {
+          int tdi = cable->todo.data[i].arg.clock.tdi ? 1 << 7 : 0;
+          int length = 0;
+          uint8_t byte = 0;
+          int tms = 0;
+          int cn = 0;
+
+          if (cable->todo.data[i].action == CABLE_CLOCK_COMPACT)
+            {
+              length = cable->todo.data[i].arg.clock.n;
+              byte = cable->todo.data[i].arg.clock.tms;
+            }
+
+        more_cable_clock:
+
+          if (cable->todo.data[i].action == CABLE_CLOCK)
+            {
+              tms = cable->todo.data[i].arg.clock.tms ? 1 : 0;
+              cn = cable->todo.data[i].arg.clock.n;
+            }
+          while (cn > 0)
+            {
+              byte |= tms << length;
+              cn--;
+              length++;
+              if (length == 7)
+                {
+                  ft2232_clock_schedule_compact( cable, 6, byte | tdi);
+                  length = 0;
+                  byte = 0;
+                }
+            }
+          if (n + 1 < cable->todo.num_items
+              && cable->todo.data[(i + 1) % cable->todo.max_items].action == CABLE_CLOCK
+              && (cable->todo.data[(i + 1) % cable->todo.max_items].arg.clock.tdi ? 1 << 7 : 0) == tdi)
+            {
+              i++;
+              if (i >= cable->todo.max_items)
+                i = 0;
+              n++;
+              goto more_cable_clock;
+            }
+          if (length)
+            {
+              if (n + 1 < cable->todo.num_items || how_much == COMPLETELY)
+                ft2232_clock_schedule_compact( cable, length - 1, byte | tdi );
+              else
+                {
+                  cable->todo.data[i].action = CABLE_CLOCK_COMPACT;
+                  cable->todo.data[i].arg.clock.tms = byte;
+                  cable->todo.data[i].arg.clock.n = length;
+                  i--;
+                  if (i == -1)
+                    i = cable->todo.max_items;
+                }
+            }
+
+          last_tdo_valid_schedule = 0;
+          break;
+        }
 
       case CABLE_GET_TDO:
         if (!last_tdo_valid_schedule)
@@ -1249,6 +1323,7 @@ ft2232_flush( cable_t *cable, cable_flush_amount_t how_much )
       switch (cable->todo.data[j].action)
       {
       case CABLE_CLOCK:
+      case CABLE_CLOCK_COMPACT:
         params->last_tdo_valid = last_tdo_valid_finish = 0;
         break;
       case CABLE_GET_TDO:
