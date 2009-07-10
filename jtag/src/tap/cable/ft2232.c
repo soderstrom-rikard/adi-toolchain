@@ -1001,14 +1001,6 @@ ft2232_transfer_schedule( cable_t *cable, int len, char *in, char *out )
   int bitwise_len;
   int chunkbytes;
 
-  /* Set Data Bits Low Byte to lower TMS for transfer
-     TCK = 0, TMS = 0, TDI = 0, nOE = 0 */
-  cx_cmd_queue( cmd_root, 0 );
-  cx_cmd_push( cmd_root, SET_BITS_LOW );
-  cx_cmd_push( cmd_root, params->low_byte_value | 0 );
-  cx_cmd_push( cmd_root, params->low_byte_dir | BITMASK_TCK | BITMASK_TDI | BITMASK_TMS );
-
-
   chunkbytes = len >> 3;
   while (chunkbytes > 0)
   {

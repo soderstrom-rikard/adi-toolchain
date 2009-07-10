@@ -1,5 +1,10 @@
 2009-07-10  Jie Zhang  <jie.zhang@analog.com>
 
+	* src/tap/cable/ft2232.c (ft2232_transfer_schedule): No need 
+	to set direction here.
+
+2009-07-10  Jie Zhang  <jie.zhang@analog.com>
+
 	* src/tap/usbconn/libftdi.c (usbconn_ftdi_write): Make sure
 	scheduled send bytes be less than FTDX_MAXSEND.
 
