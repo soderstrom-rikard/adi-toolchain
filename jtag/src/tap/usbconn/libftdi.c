@@ -185,7 +185,7 @@ usbconn_ftdi_write( usbconn_t *conn, uint8_t *buf, int len, int recv )
              with this write
      Case B: max number of scheduled send bytes has been reached */
   if ((p->to_recv + recv > FTDI_MAXRECV)
-      || ((p->send_buffered > FTDX_MAXSEND) && (p->to_recv == 0)))
+      || ((p->send_buffered + len > FTDX_MAXSEND) && (p->to_recv == 0)))
     xferred = usbconn_ftdi_flush( p );
 
   if (xferred < 0)
