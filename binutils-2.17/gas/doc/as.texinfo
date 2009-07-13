@@ -39,6 +39,9 @@
 @ifset ARM/Thumb
 @set ARM
 @end ifset
+@ifset Blackfin
+@set Blackfin
+@end ifset
 @ifset BOUT
 @set aout-bout
 @end ifset
@@ -265,6 +268,14 @@ gcc(1), ld(1), and the Info entries for @file{binutils} and @file{ld}.
    [@b{-mapcs-32}|@b{-mapcs-26}|@b{-mapcs-float}|
     @b{-mapcs-reentrant}]
    [@b{-mthumb-interwork}] [@b{-k}]
+@end ifset
+@ifset Blackfin
+
+@emph{Target Blackfin options:}
+   [@b{-mcpu}=@var{processor}[-@var{sirevision}]]
+   [@b{-mfdpic}]
+   [@b{-mno-fdpic}]
+   [@b{-mnopic}]
 @end ifset
 @ifset CRIS
 
