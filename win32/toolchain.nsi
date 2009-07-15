@@ -76,10 +76,12 @@ SectionEnd
 !insertmacro BlackfinInstall "uclinux" "FLAT"
 !insertmacro BlackfinInstall "linux-uclibc" "FDPIC"
 
+!ifndef SKIP_ECLIPSE
 Section "Eclipse" SecEclipse
   SetOutPath "$INSTDIR\Eclipse"
   File /r "eclipse\*"
 SectionEnd
+!endif
 
 Section "Examples" SecExamples
   SetOutPath "$INSTDIR\examples"
