@@ -63,14 +63,50 @@ grep -L -Z 'and license this software and its documentation for any purpose, pro
  */\
 '
 
+notice=false
 echo "Checking header includes ..."
 for inc in $(find "$dir" -name '*.h' \
 	-exec sed -n '/#[[:space:]]*include[[:space:]]*</{s:.*<\(.*\)>$:\1:p}' {} + | \
 	sort -u)
 do
 	if [ ! -e "$dir"/$inc ] ; then
+		if ! ${notice} ; then
+			notice=true
+			echo " note that missing cdef/def headers may be 'normal' as VDSP"
+			echo " does not include all the ones referenced by sys/_adi_platform.h"
+		fi
 		echo " !!! missing $inc"
 	fi
 done
+
+if type -P bfin-elf-gcc >/dev/null ; then
+	echo "Checking things compile ..."
+	for cpu in $(grep -o "__ADSPBF...__" "$dir"/sys/_adi_platform.h | sort -u | sed 's:__ADSPBF\(...\)__:bf\1:') ; do
+		if ! bfin-elf-gcc -mcpu=${cpu} -E - </dev/null >/dev/null 2>&1 ; then
+			echo " gcc does not support $cpu, skipping"
+			continue
+		fi
+
+		printf " testing"
+		for si in "" -any -none ; do
+			printf " $cpu$si"
+			for inc in $(find "$dir" -name '*.h' -printf '%P ') ; do
+				case $inc in
+					# sys/_adi_platform.h should test these for us indirectly
+					def*|cdef*) continue;;
+				esac
+
+				echo "#include <$inc>" | \
+				bfin-elf-gcc \
+					-mcpu=${cpu}${si} \
+					-nostdinc -isystem "$dir" \
+					-x c -c -o /dev/null -
+			done
+		done
+		printf "\n"
+	done
+else
+	echo "Skipping compile check (bfin-elf-gcc not in PATH)"
+fi
 
 echo "Done"
