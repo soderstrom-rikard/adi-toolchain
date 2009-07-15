@@ -9,7 +9,7 @@ dos2unix() {
 }
 
 usage() {
-	echo "Usage: ${0##*/} <dir of vdsp headers>" 1>&2
+	echo "Usage: ${0##*/} <dir of vdsp headers> [dir of latest vdsp headers]" 1>&2
 	exit 1
 }
 
@@ -17,21 +17,40 @@ dir=$1
 [ ! -d "$dir" ] && usage
 [ ! -f "$dir/blackfin.h" ] && usage
 
+vdir=$2
+if [ -n "$vdir" ] ; then
+	[ ! -d "$vdir" ] && usage
+	[ ! -f "$vdir/blackfin.h" ] && usage
+
+	echo "Updating headers ..."
+	cp "$vdir"/cdef* "$vdir"/def* "$dir"/
+	find "$dir" \
+		'(' -name '*.h' -a '!' -name 'ccblkfn.h' ')' \
+		-printf '%P\n' | \
+	while read header ; do
+		cp "$vdir"/$header "$dir"/$header
+	done
+fi
+
+echo "Fixing permissions ..."
+find "$dir" -name '*.h' -exec chmod 00644 {} +
+
 echo "Stripping DOS newlines ..."
-dos2unix "$dir"/*.h "$dir"/sys/*.h
+dos2unix $(find "$dir" -name '*.h')
 
 echo "Stripping whitespace ..."
-sed -i 's:[[:space:]]*$::' "$dir"/*.h "$dir"/sys/*.h
+find "$dir" -name '*.h' -exec sed -i 's:[[:space:]]*$::' {} +
 
-echo "Converting _LANGUAGE_C to __ASSEMBLY__ ..."
+echo "Converting _LANGUAGE_C to __ASSEMBLER__ ..."
+find "$dir" -name '*.h' -exec \
 sed -i \
-	-e 's:#ifdef _LANGUAGE_C:#ifdef __ASSEMBLY__:' \
-	-e 's:\(/\*[[:space:]]*\)_LANGUAGE_C\([[:space:]]*\*/\):\1__ASSEMBLY__\2:' \
-	"$dir"/*.h "$dir"/sys/*.h
+	-e 's:#ifdef _LANGUAGE_C:#ifndef __ASSEMBLER__:' \
+	-e 's:\(/\*[[:space:]]*\)_LANGUAGE_C\([[:space:]]*\*/\):\1__ASSEMBLER__\2:' \
+	{} +
 
 echo "Tagging license ..."
 grep -L -Z 'and license this software and its documentation for any purpose, provided' "$dir"/*.h "$dir"/sys/*.h | \
-	xargs -0 sed -i -e '1i/*\
+	xargs -0 -r sed -i -e '1i/*\
  * The authors hereby grant permission to use, copy, modify, distribute,\
  * and license this software and its documentation for any purpose, provided\
  * that existing copyright notices are retained in all copies and that this\
@@ -43,5 +62,15 @@ grep -L -Z 'and license this software and its documentation for any purpose, pro
  * they apply.\
  */\
 '
+
+echo "Checking header includes ..."
+for inc in $(find "$dir" -name '*.h' \
+	-exec sed -n '/#[[:space:]]*include[[:space:]]*</{s:.*<\(.*\)>$:\1:p}' {} + | \
+	sort -u)
+do
+	if [ ! -e "$dir"/$inc ] ; then
+		echo " !!! missing $inc"
+	fi
+done
 
 echo "Done"
