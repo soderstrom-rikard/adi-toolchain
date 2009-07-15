@@ -26,6 +26,11 @@
 #endif
 #include <def_LPBlackfin.h>
 
+#ifdef _MISRA_RULES
+#pragma diag(push)
+#pragma diag(suppress:misra_rule_19_4:"some macro definitions not MISRA compliant")
+#endif /* _MISRA_RULES */
+
 #ifndef _PTR_TO_VOL_VOID_PTR
 #ifndef _USE_LEGACY_CDEF_BEHAVIOUR
 #define _PTR_TO_VOL_VOID_PTR (void * volatile *)
@@ -176,5 +181,9 @@
 #define pPFCTL ((volatile unsigned long *)PFCTL)
 #define pPFCNTR0 ((volatile unsigned long *)PFCNTR0)
 #define pPFCNTR1 ((volatile unsigned long *)PFCNTR1)
+
+#ifdef _MISRA_RULES
+#pragma diag(pop)
+#endif /* _MISRA_RULES */
 
 #endif /* _CDEF_LPBLACKFIN_H */

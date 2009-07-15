@@ -84,6 +84,9 @@
 #define CPLB_EVT_DCPLB_MISS   1
 #define CPLB_EVT_DCPLB_WRITE  2
 
+/* size of cplb tables */
+#define __CPLB_TABLE_SIZE    16
+
 #ifdef _MISRA_RULES
 #pragma diag(pop)
 #endif /* _MISRA_RULES */

@@ -38,6 +38,11 @@
 /* include cdefBF54x_base.h for the set of #defines that are common to all ADSP-BF54x processors */
 #include <cdefBF54x_base.h>
 
+#ifdef _MISRA_RULES
+#pragma diag(push)
+#pragma diag(suppress:misra_rule_19_4:"some macro definitions not MISRA compliant")
+#endif /* _MISRA_RULES */
+
 /* The following are the #defines needed by ADSP-BF542 that are not in the common header */
 
 /* ATAPI Registers */
@@ -351,5 +356,9 @@
 #define                      pKPAD_ROWCOL ((volatile unsigned short *)KPAD_ROWCOL)
 #define                        pKPAD_STAT ((volatile unsigned short *)KPAD_STAT)
 #define                    pKPAD_SOFTEVAL ((volatile unsigned short *)KPAD_SOFTEVAL)
+
+#ifdef _MISRA_RULES
+#pragma diag(pop)
+#endif /* _MISRA_RULES */
 
 #endif /* _CDEF_BF542_H */
