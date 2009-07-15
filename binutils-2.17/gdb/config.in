@@ -194,6 +194,9 @@
 /* Define to 1 if you have the <nlist.h> header file. */
 #undef HAVE_NLIST_H
 
+/* Define to 1 if you have the `pipe' function. */
+#undef HAVE_PIPE
+
 /* Define to 1 if you have the `poll' function. */
 #undef HAVE_POLL
 

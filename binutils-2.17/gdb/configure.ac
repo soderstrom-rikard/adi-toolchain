@@ -443,7 +443,7 @@ AC_FUNC_MMAP
 AC_FUNC_VFORK
 AC_CHECK_FUNCS(canonicalize_file_name realpath)
 AC_CHECK_FUNCS(getuid getgid)
-AC_CHECK_FUNCS(poll)
+AC_CHECK_FUNCS(pipe poll)
 AC_CHECK_FUNCS(pread64)
 AC_CHECK_FUNCS(sbrk)
 AC_CHECK_FUNCS(setpgid setpgrp)
