@@ -948,7 +948,7 @@ part_emudat_get (chain_t *chain, int n, int exit)
   if (exit == EXITMODE_IDLE)
     {
       assert (tap_state (chain) & TAPSTAT_IDLE);
-      chain_clock (chain, 0, 0, 1);
+      chain_defer_clock (chain, 0, 0, 1);
       if (bfin_wait_emuready)
 	part_wait_emuready (chain, n);
     }
@@ -1254,10 +1254,10 @@ chain_emulation_trigger (chain_t *chain)
 
   /* I don't know why, but the following code works.  */
   /* Enter the emulation mode */
-  chain_clock (chain, 1, 0, 1);
+  chain_defer_clock (chain, 1, 0, 1);
   /* Bring the TAP state to Update-DR */
-  chain_clock (chain, 0, 0, 1);
-  chain_clock (chain, 1, 0, 2);
+  chain_defer_clock (chain, 0, 0, 1);
+  chain_defer_clock (chain, 1, 0, 2);
 }
 
 void
@@ -1272,10 +1272,10 @@ part_emulation_trigger (chain_t *chain, int n)
 
   /* I don't know why, but the following code works.  */
   /* Enter the emulation mode */
-  chain_clock (chain, 1, 0, 1);
+  chain_defer_clock (chain, 1, 0, 1);
   /* Bring the TAP state to Update-DR */
-  chain_clock (chain, 0, 0, 1);
-  chain_clock (chain, 1, 0, 2);
+  chain_defer_clock (chain, 0, 0, 1);
+  chain_defer_clock (chain, 1, 0, 2);
 }
 
 

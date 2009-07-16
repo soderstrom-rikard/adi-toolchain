@@ -1,5 +1,12 @@
 2009-07-16  Jie Zhang  <jie.zhang@analog.com>
 
+	* src/bfin/bfin.c (part_emudat_get): Replace chain_clock
+	with chain_defer_clock.
+	(chain_emulation_trigger): Likewise.
+	(part_emulation_trigger): Likewise.
+
+2009-07-16  Jie Zhang  <jie.zhang@analog.com>
+
 	* src/tap/cable/ft2232.c (ft2232_flush): Flush the last todo
 	item when flush completely.
 
