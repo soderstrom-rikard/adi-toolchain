@@ -1,3 +1,8 @@
+2009-07-16  Jie Zhang  <jie.zhang@analog.com>
+
+	* src/tap/cable/ft2232.c (ft2232_flush): Flush the last todo
+	item when flush completely.
+
 2009-07-10  Jie Zhang  <jie.zhang@analog.com>
 
 	* include/cable.h (enum action): Add CABLE_CLOCK_COMPACT.

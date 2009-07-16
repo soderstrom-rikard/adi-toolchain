@@ -1215,7 +1215,8 @@ ft2232_flush( cable_t *cable, cable_flush_amount_t how_much )
     int last_tdo_valid_finish = params->last_tdo_valid;
 
     if (cable->todo.num_items == 1
-        && cable->todo.data[cable->todo.next_item].action == CABLE_CLOCK_COMPACT)
+        && cable->todo.data[cable->todo.next_item].action == CABLE_CLOCK_COMPACT
+	&& how_much != COMPLETELY)
       break;
 
     for (j = i = cable->todo.next_item, n = 0; n < cable->todo.num_items; n++)
