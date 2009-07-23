@@ -164,12 +164,10 @@ DL_START(unsigned long args)
 		aux_dat += 2;
 	}
 
-#if 0
 	/* locate the ELF header.   We need this done as soon as possible
 	 * (esp since SEND_STDERR() needs this on some platforms... */
 	if (!auxvt[AT_BASE].a_un.a_val)
 		auxvt[AT_BASE].a_un.a_val = elf_machine_load_address();
-#endif
 	DL_INIT_LOADADDR_BOOT(load_addr, auxvt[AT_BASE].a_un.a_val);
 	header = (ElfW(Ehdr) *) auxvt[AT_BASE].a_un.a_val;
 
