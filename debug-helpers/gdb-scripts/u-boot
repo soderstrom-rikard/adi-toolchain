@@ -123,3 +123,12 @@ define mwb
 		help _mw
 	end
 end
+
+define uboot_jtag_load
+	set remotetimeout 300
+	load init.elf
+	continue
+	load u-boot
+	call memset(&_bss_start, 0, &_bss_end - &_bss_start)
+	continue
+end
