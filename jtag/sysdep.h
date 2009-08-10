@@ -44,6 +44,7 @@
 #endif
 
 #ifdef __MINGW32__
+#define NO_W32_PSEUDO_MODIFIERS
 #define _NO_W32_PSEUDO_MODIFIERS
 #include <windows.h>
 #define geteuid() 0
