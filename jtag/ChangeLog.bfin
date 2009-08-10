@@ -1,3 +1,10 @@
+2009-08-11  Jie Zhang  <jie.zhang@analog.com>
+
+	* include/bfin.h (part_emudat_defer_get): Declare.
+	(src/bfin/bfin.c): Declare.
+	* src/bfin/bfin.c (part_emudat_defer_get): New.
+	(src/bfin/bfin.c): New.
+
 2009-07-16  Jie Zhang  <jie.zhang@analog.com>
 
 	* src/bfin/bfin.c (part_emudat_get): Replace chain_clock

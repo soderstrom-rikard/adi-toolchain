@@ -931,6 +931,84 @@ emudat_init_value (tap_register *r, uint32_t value)
   register_init_value (r, v);
 }
 
+void
+part_emudat_defer_get (chain_t *chain, int n, int exit)
+{
+  int i;
+  parts_t *ps;
+
+  assert (exit == EXITMODE_UPDATE || exit == EXITMODE_IDLE);
+
+  if (exit == EXITMODE_IDLE)
+    {
+      assert (tap_state (chain) & TAPSTAT_IDLE);
+      chain_defer_clock (chain, 0, 0, 1);
+      if (bfin_wait_emuready)
+	part_wait_emuready (chain, n);
+    }
+
+  if (part_scan_select (chain, n, EMUDAT_SCAN) < 0)
+    abort ();
+
+  if (!chain || !chain->parts)
+    return;
+
+  ps = chain->parts;
+
+  for (i = 0; i < ps->len; i++)
+    {
+      if (ps->parts[i]->active_instruction == NULL)
+	{
+	  printf (_("%s(%d) Part %d without active instruction\n"), __FILE__, __LINE__, i);
+	  return;
+	}
+      if (ps->parts[i]->active_instruction->data_register == NULL)
+	{
+	  printf (_("%s(%d) Part %d without data register\n"), __FILE__, __LINE__, i);
+	  return;
+	}
+    }
+
+  tap_capture_dr (chain);
+
+  /* new implementation: split into defer + retrieve part
+     shift the data register of each part in the chain one by one */
+
+  for (i = 0; i < ps->len; i++)
+    {
+      tap_defer_shift_register (chain, ps->parts[i]->active_instruction->data_register->in,
+				ps->parts[i]->active_instruction->data_register->out,
+				(i + 1) == ps->len ? EXITMODE_UPDATE : EXITMODE_SHIFT);
+    }
+}
+
+uint32_t
+part_emudat_get_done (chain_t *chain, int n, int exit)
+{
+  part_t *part;
+  tap_register *r;
+  uint64_t value;
+  int i;
+  parts_t *ps;
+
+  ps = chain->parts;
+
+  for (i = 0; i < ps->len; i++)
+    {
+      tap_shift_register_output (chain, ps->parts[i]->active_instruction->data_register->in,
+				 ps->parts[i]->active_instruction->data_register->out,
+				 (i + 1) == ps->len ? EXITMODE_UPDATE : EXITMODE_SHIFT);
+    }
+
+  part = chain->parts->parts[n];
+  r = part->active_instruction->data_register->out;
+  value = emudat_value (r);
+
+  /* TODO  Is it good to check EMUDOF here if it's available?  */
+
+  return value;
+}
+
 /* These two emudat functions only care the payload data, which is the
    upper 32 bits.  Then follows EMUDOF and EMUDIF if the register size
    is larger than 32 bits.  Then the remaining is reserved or don't

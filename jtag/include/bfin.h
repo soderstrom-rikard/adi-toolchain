@@ -295,6 +295,8 @@ void part_wait_reset (chain_t *, int);
 void part_wait_emuready (chain_t *, int);
 void part_emudat_set (chain_t *, int, uint32_t, int);
 uint32_t part_emudat_get (chain_t *, int, int);
+void part_emudat_defer_get (chain_t *, int, int);
+uint32_t part_emudat_get_done (chain_t *, int, int);
 uint64_t emudat_value (tap_register *);
 void emudat_init_value (tap_register *, uint32_t);
 void chain_register_get (chain_t *, enum core_regnum, uint32_t *);
