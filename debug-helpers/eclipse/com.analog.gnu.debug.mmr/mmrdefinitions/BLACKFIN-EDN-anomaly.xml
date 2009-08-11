@@ -1,0 +1,410 @@
+<?xml version="1.0" standalone="yes"?>
+
+<?xml-stylesheet type="text/xsl" href="AnomalyDictionary.xsl"?>
+
+<!-- *********************************************************************** -->
+<!-- ****** BLACKFIN-EDN-anomaly.xml                                         -->
+<!-- *********************************************************************** -->
+<!-- ****** Common definition file for anomaly workaround/warn options for   -->
+<!-- ****** the VisualDSP++ compilers and assemblers. This anomaly           -->
+<!-- ****** dictionary is common to the processors in the Blackfin family    -->
+<!-- ****** for the Edinburgh core. It is referenced in each of the          -->
+<!-- ****** applicable Blackfin *-compiler.xml file via the name in the      -->
+<!-- ****** <vdsp-anomaly-dictionary> element.                               -->
+<!-- ****** The uppermost elements in this file:                             -->
+<!-- ****** 	<anomaly-dictionary>                                          -->
+<!-- ****** 	<compiler-notes>                                              -->
+<!-- ****** 	<assembler-notes>                                             -->
+<!-- ****** Copyright 2006-2007 Analog Devices, Inc.  All rights reserved.   -->
+<!-- *********************************************************************** -->
+
+<visualdsp-dictionary-xml schema-version="1" name="BLACKFIN-EDN-anomaly.xml">
+
+<version file-version="0.32"/>
+
+	<!-- *************************************************************** -->
+	<!-- ** adi-web-link                                              ** -->
+	<!-- *************************************************************** -->
+	<!-- ** Position to the foremost page for the Blackfin anomalies. ** -->
+	<!-- ** The programmer then selects the appropriate processor     ** -->
+	<!-- ** errata sheet and searches for the anomaly id of interest. ** -->
+	<!-- ** We do not directly link an anomaly id to its definition   ** -->
+	<!-- ** at this time because the name of the web file contains a  ** --> 
+	<!-- ** prefix that changes with each modification.               ** -->
+	<!-- ** For example: "586044701BF535Anomaly11204.pdf"             ** -->
+	<!-- *************************************************************** -->
+
+	<!-- *************************************************************** -->
+	<!-- ** ix                                                        ** -->
+	<!-- *************************************************************** -->
+	<!-- ** The ix is how it is cross-referenced from the workarounds ** -->
+	<!-- ** located per silicon revision as defined in the per        ** -->
+	<!-- ** processor *-compiler.xml files.                           ** -->
+	<!-- *************************************************************** -->
+
+	<!-- *************************************************************** -->	
+	<!-- See below: compiler-notes and assembler-notes                ** -->
+	<!-- * Compiler overview information for the anomaly-dictionary   ** -->
+	<!-- * Assembler overview information for the anomaly-dictionary  ** -->
+	<!-- *************************************************************** -->
+
+<anomaly-dictionary adi-web-link="http://www.analog.com//processors//blackfin//support//ICanomalies.html" 
+	title="Blackfin Family IC Anomalies" >
+
+	<anomaly ix="1" id="05-00-0048"
+		compiler-option="-workaround csync" 
+		compiler-defs="-D__WORKAROUND_CSYNC"
+		compiler-behavior="The compiler avoids the anomaly by automatically inserting CSYNC instructions after conditional branches when either the branch is not predicted to be taken, the first instruction following the branch includes a load, or the load is not through the stack or frame pointer. If any of these conditions are not met, the compiler does not need to insert a CSYNC instruction. However, there are cases where the compiler inserts a CSYNC that is not necessary. These cases are when the pointer always points to a valid address, even if the branch is taken. The compiler also inserts CSYNC instructions before writes to either of the CYCLES or CYCLES2 registers, in the shadow of conditional branches, and after RTI, RTX, or RTN instructions. When optimizing for speed rather than space, the compiler converts the inserted CSYNC instructions into a sequence of NOP instructions; these instructions require more space than the single CSYNC instruction, but do not flush the processor's pipeline. When optimizing for space, the CSYNC instructions are not replaced by NOP sequences."
+		summary="Speculative fetch of illegal or undefined memory location causes HW error"/>
+
+	<anomaly ix="2" id="05-00-0054"
+		compiler-option="-workaround isr-ssync" 
+		compiler-defs="-D__WORKAROUND_SSYNC"
+		compiler-behavior="The compiler works around this by inserting an SSYNC instruction at the start of the ISR, so that context saves do not interfere with cache write-back stores."
+		summary="Problems with data cache writeback mode"/>
+
+	<anomaly ix="3" id="05-00-0071"
+		compiler-option="-workaround isr-imask-check" 
+		compiler-defs="-D__WORKAROUND_IMASK_CHECK"
+		compiler-behavior="The compiler works around this by ensuring that when an interrupt handling routine is called, the interrupt handling code is only executed if IMASK has not been cleared. If IMASK has been leared, the RTI instruction is issued forcing a return from the interrupt handler."
+		summary="CLI instruction can allow an asynchronous interrupt to occur as it is committing"/>
+
+	<anomaly ix="4" id="05-00-0164"
+		compiler-option="-workaround wt-dcache" 
+		compiler-defs="-D__WORKAROUND_WT_DCACHE"
+		compiler-behavior="The compiler works around this workaround a similar way to 05-00-165 (&quot;Data cache dirty bit set when a load-miss-fill is in progress&quot;), and in addition the  following steps are taken: 1) An SSYNC instruction is placed before the RTI instruction in ISRs. 2) An SSYNC instruction is inserted between the target of a conditional branch and the first store in that basic block and 3) because some assembly files may be specified on the command line, the assembler is passed the -wb_wt_fix switch and an SSYNC instruction is inserted between the target of a conditional branch and the first store in that basic block. "
+		summary="Store to Load Forwarding in Write Through Mode"/>
+
+	<anomaly ix="5" id="05-00-0165"
+		assembler-detect-option="-anomaly-detect 05000165" 
+		assembler-detect-legacy-option="-anomaly-warn 05000165 or -wb_wt_warn"
+		assembler-workaround-option="-anomaly-workaround 05000165" 
+		assembler-workaround-legacy-option="-wb_wt_fix"
+		assembler-detect-defs="-D__WORKAROUND_WB_DCACHE"	
+		assembler-workaround-defs="-D__WORKAROUND_WB_DCACHE"
+		compiler-option="-workaround wb-dcache" 
+		compiler-defs="-D__WORKAROUND_WB_DCACHE"
+		compiler-behavior="(legacy) The compiler puts 2 NOPs after RTN/RTI/RTX and insert NOPs between conditional branches and stores. The SSYNC at the start of ISRs was superceded by a more complex ISR prefix)."
+		assembler-behavior="The assembler workaround for -anomaly-workaround 05000165 inserts a nop before a store following a conditional branch or RTI/RTX/RTE/RTN, and also inserts a SSYNC before a store at a branch-target. The legacy command line option -wb_wt_fix corresponds to -anomaly-workaround 05000165. The legacy command line option -wb-fix does a subset of -anomaly-workaround 05000165: it inserts a nop before a store instruction after a conditional branch instruction or RTI/RTX/RTE/RTN instruction; there is no mapped anomaly ID corresponding to -wb_fix. The assembler -anomaly-detect 05000165 will detect code sequences where workaround for 05000165 might be desired, without actually modifying the assembly code. The legacy -wb_wt_warn corresponds to -anomaly-detect 05000165; -wb_warn detect code sequences where -wb_fix might be desired."
+		summary="Data cache dirty bit set when a load-miss-fill is in progress"	/>
+
+	<anomaly ix="6" id="05-00-0195"
+		compiler-option="-workaround astat-rnd_mod" 
+		compiler-defs="-D__WORKAROUND_ASTAT_RND_MOD"
+		compiler-behavior="The compiler works around this anomaly by inserting two NOP instructions after any direct write to the ASTAT register. This workaround is only really needed when __builtin_sysreg_write() is used to write to the ASTAT register. When this workaround is enabled, the compiler defines the macro __WORKAROUND_ASTAT_RND_MOD at the compile, link, and assembly phases."
+		summary="Latency in Writes to RND_MOD bit."/>
+
+	<anomaly ix="7" id="05-00-0104" 
+		compiler-option="-workaround avoid-dag1" 
+		compiler-defs="-D__WORKAROUND_AVOID_DAG1" 
+		compiler-behavior="The compiler works around this anomaly by avoiding use of DAG1 when issuing memory accesses. Note that avoid-dag1 is also used to for anomalies 05-00-0114, 05-00-0141, 05-00-0005 and 05-00-0024."
+		summary="Stores to L1 Data memory incorrect when a specific sequence is followed"/>
+
+	<anomaly ix="8" id="05-00-0157"
+		compiler-option="-workaround killed-mmr-write"
+		compiler-defs="-D__WORKAROUND_KILLED_MMR_WRITE"
+		summary="A killed 32-bit System MMR write will lead to the next system MMR access thinking it should be 32-bit."
+		compiler-behavior="The compiler works around this anomaly by inserting a dummy 32-bit MMR read at the start of C defined ISR functions (this behavior is superseded if the workaround for 05-00-0283 is enabled). Additionally the compiler will detect MMR reads in the shadow of conditional branch instructions. It will insert nop instructions to ensure that the MMR read is not in the first three instructions after such a jump. 
+See the &quot;Compiler Notes&quot; section below for more information on MMR accesses."/>
+
+	<anomaly ix="9" id="05-00-0198"
+		compiler-option="-workaround sdram-mmr-read"
+		compiler-defs="-D__WORKAROUND_SDRAM_MMR_READ"
+		compiler-behavior="The problem is seen in a sequence of SDRAM loads directly followed by an MMR load and will result in an incorrect value being loaded from the MMR. When this workaround is enabled, the compiler inserts a NOP instruction between the two loads. See the &quot;Compiler Notes&quot; section below for more information on MMR accesses."
+		summary="System MMR accesses may fail when stalled by preceding memory read."/>
+
+	<anomaly ix="10" id="05-00-0209" 
+		assembler-detect-option="-anomaly-detect 05000209" 
+		assembler-detect-legacy-option="-anomaly-warn 05000209"
+		assembler-detect-defs="-D__WORKAROUND_DREG_COMP_LATENCY"	
+		compiler-option="-workaround dreg-comp-latency" 
+		compiler-defs="-D__WORKAROUND_DREG_COMP_LATENCY"
+		compiler-behavior="The compiler works around this by inserting one NOP instruction after a DEPOSIT, EXTRACT, SIGNBITS or EXPADJ instruction in cases where the result register is used in the following instruction."
+		assembler-behavior="Assembler only supports detecting possible violation of anomaly 05000209; no workaround is provided. Assembler issues warnings where the first instruction writes to a DREG and the next instruction uses that DREG as a parameter to a SIGNBITS, EXTRACT, DEPOSIT or EXPADJ instruction. Review the warnings and recode where needed."
+		summary="Speed-Path in computational unit affects certain instructions. The affected instructions are: EXTRACT(x) DEPOSIT(x) SIGNBITS EXPADJ."/>
+
+	<anomaly ix="11" id="05-00-0127" 
+		compiler-option="-workaround signbits" 
+		compiler-defs="-D__WORKAROUND_SIGNBITS"
+		compiler-behavior="The compiler works around this by not generating code where the input register of a signbits instruction is loaded in the immediately preceding instruction - by either rearranging instructions already present, or inserting a NOP if this is not possible."
+		summary="Signbits instruction not functional under certain conditions"/>
+
+	<anomaly ix="12" id="05-00-0120" 
+		compiler-option="-workaround testset-align" 
+		compiler-defs="-D__WORKAROUND_TESTSET_ALIGN"
+		compiler-behavior="The compiler ensures 32-bit aligned memory locations by setting the testset_t variable type is defined to be as unsigned int in ccblkfn.h. This forces alignment to a 32-bit boundary."
+		summary="Testset instructions restricted to 32-bit aligned memory locations."/>
+
+	<anomaly ix="13" id="05-00-0227"
+		assembler-detect-option="-anomaly-detect 05000227" 
+		assembler-detect-legacy-option="-anomaly-warn 05000227 or -sp_warn"
+		assembler-workaround-option="-anomaly-workaround 05000227" 		
+		assembler-workaround-legacy-option="-sp_fix"		
+		assembler-detect-defs="-D__WORKAROUND_SCRATCHPAD_READ"	
+		assembler-workaround-defs="-D__WORKAROUND_SCRATCHPAD_READ"
+		compiler-option="-workaround scratchpad-read"
+		compiler-defs="-D__WORKAROUND_SCRATCHPAD_READ"
+		compiler-behavior="The problem arises when three consecutive loads from ScratchPad memory occur (this can be part of a multi-issue instruction), where at least one of load #2 and load #3 is a byte load. When this workaround is enabled in the compiler a NOP instruction is inserted between load #1 and load #2 [or load #2 and load #3]. "
+		assembler-behavior="The assembler checks any three consecutive load instructions, and if either the second or the third instruction is also a byte-load instruction, -anomaly-workaround 05000227 inserts a nop after the first instruction; -anomaly-detect 05000227 issues a warning message without actually modifying the assembly code."
+		summary="Scratchpad memory bank reads may return incorrect data"/>
+
+	<anomaly ix="14" id="05-00-0046"
+		compiler-option="-workaround shift"
+		compiler-defs="-D__WORKAROUND_SHIFT"
+		compiler-behavior="This currently has no effect on the compiler behavior, since shifts of magnitude greater than the source bit size are undefined by the C standard."
+		summary="Shifter does not consider all 32 bits when shift value is a D register."/>
+
+	<anomaly ix="15" id="05-00-0245"
+		assembler-detect-option="-anomaly-detect 05000245"
+		assembler-detect-legacy-option="-anomaly-detect 05000245 or -brcc_warn"
+		assembler-detect-defs="-D__WORKAROUND_SPECULATIVE_LOADS"	
+		assembler-behavior="The assembler warns if any of the three instructions following a conditional branch predicted not taken is a load, or if the target of a predicted branch is a load. There is no assembler workaround option available for anomaly 05000244. Review the warnings and recode where needed. Assembler legacy command line option -brcc_warn corresponds to -anomaly-detect 05000244,05000245."		
+		compiler-option="-workaround speculative-loads"
+		compiler-defs="-D__WORKAROUND_SPECULATIVE_LOADS"
+		compiler-behavior="The compiler works around this by inserting one, two, or three NOP instructions after a conditional jump instruction to avoid a speculative load of memory that may be invalid or reserved within three instructions of the jump. "
+		summary="Spurious Hardware Error from an Access in the Shadow of a Conditional Branch."/>
+xo
+	<anomaly ix="16" id="05-00-0244"
+		assembler-detect-option="-anomaly-detect 05000244"
+		assembler-detect-legacy-option="-anomaly-warn 05000244 or -brcc_warn"
+		assembler-detect-defs="-D__WORKAROUND_SPECULATIVE_SYNCS"	
+		assembler-behavior="The assembler warns if any of the three instructions following a conditional branch predicted not taken is a SYNC or CSYNC, or if the target of a predicted branch is a SSYNC or CSYNC. There is no assembler workaround option available for anomaly 05000244. Review the warnings and recode where needed. Assembler legacy command line option -brcc_warn corresponds to -anomaly-detect 05000244,05000245."
+		compiler-option="-workaround speculative-syncs"
+		compiler-defs="-D__WORKAROUND_SPECULATIVE_SYNCS"
+		compiler-behavior="The compiler works around this by inserting one, two, or three NOP instructions after a conditional jump instruction to avoid a CSYNC, SSYNC, or IDLE instruction within three instructions of the jump. The compiler also inserts a NOP instruction to avoid a CSYNC, SSYNC, or IDLE instruction at a branch target. The VisualDSP++ runtime libraries also avoid this anomaly when necessary."
+		summary="With cache enabled SSYNC, CCYNC and IDLE instructions in the shadow of conditional branches can cause incorrect operation."/>
+
+	<anomaly ix="17" id="05-00-0103"
+		compiler-option="-workaround cycles-stores"
+		compiler-defs="-D__WORKAROUND_CYCLES_STORES"
+		compiler-behavior="The compiler works around this by inserting one NOP instruction after a conditional jump instruction to avoid a store to CYCLES or CYCLES2 immediately after the jump. The compiler does not disable interrupts for this workaround. It also defines the __WORKAROUND_CYCLES_STORES macro at the compile, link, and assembly phases."
+		summary="Avoid writes to CYCLES and CYCLES 2 in shadow of conditional branches."/>
+
+	<anomaly ix="18" id="05-00-0248"
+		compiler-option="-workaround l2-testset-stall"
+		compiler-defs="-D__WORKAROUND_L2_TESTSET_STALL"
+		compiler-behavior="In dual-core blackfins, when one core performs a TESTSET operation to internal L2 memory, it locks out the other core if the latter is accessing L2 memory at the same time. The solution to this is that any TESTSET operation to internal L2 memory should be followed immediately by a write to L2 memory. The compiler automatically works around this anomaly, so that any call to __builtin_testset() will contain the appropriate write to L2 memory."
+		summary="TestSet operation causes core stall (dual-core)."/> 
+
+	<anomaly ix="19" id="05-00-0189 -and- 05-00-0310"
+		compiler-option="-workaround avoid-ldf-boundaries"
+		compiler-defs="-D__WORKAROUND_AVOID_LDF_BLOCK_BOUNDARIES"
+		compiler-behavior="The default LDFs workaround this anomaly by reserving 76 Bytes at the boundaries of valid memory blocks. Note: This workaround also resolves anomaly 05-00-0310, where false hardware errors are caused by fetches at the boundary of reserved memory. Avoidance for both errata is performed in the default LDF files under the macro __WORKAROUND_AVOID_LDF_BLOCK_BOUNDARIES using the linker RESERVE operator."
+		summary="False Protection Exceptions -and- False Hardware Errors Caused by Fetches at the Boundary of Reserved Memory"/>
+
+	<anomaly ix="20" id="05-00-0202"
+		compiler-option="-workaround infinite-stall-202"
+		compiler-defs="-D__WORKAROUND_INFINITE_STALL_202"
+		summary="Possible infinite stall with specific dual dag situation."
+		compiler-behavior="This anomaly is present after a specific series of instructions: 1) A recent write, 2) Dual DAG access that collides, 3) A read of the location written to in the 1st step immediately after this Dual DAG access and 4) no read, write or PREFETCH immediately after step 3. The compiler always assumes that 1) has occurred as the definition of recent is too vague to quantify. This means that for the problem to require a workaround from the compiler we have to have 2), 3), and 4) execute in sequence with no intevening instructions. The workaround used by the compiler is to insert a PREFETCH[SP] between 3) and 4)."/>
+
+	<anomaly ix="21" id="05-00-0246"
+		compiler-option="-workaround no-cplbs-spec-protect-246"
+		compiler-defs="-D__WORKAROUND_NO_CPLB_SPEC_PROTECT_246"
+		compiler-behavior="Data CPLB's were thought to provide protection from speculative load problems but for some targets this is not the case. For such targets the compiler will ignore the use of -cplbs when considering the need to apply workarounds for speculative load anomalies (such as 05-00-0245)."
+		summary="Data CPLBs Should Prevent Spurious Hardware Errors"/>
+
+	<anomaly ix="22" id="05-00-0257"
+		compiler-option="-workaround short-loop-exceptions-257"
+		compiler-defs="-D__WORKAROUND_SHORT_LOOP_EXCEPTIONS_257"
+		compiler-behavior="The workaround implemented in the compiler is to include a save and restore of the LC0 and LC1 registers in interrupt and exception handlers. Such functions would be declared using one of the compiler interrupt handler pragmas or the macros defined in include file sys/exception.h. The compiler would only normally save and restore LC0 and LC1 if they were required to be saved and restored because the handler used them and this workaround means that they will always be restored whether used or not." 
+		summary="Hardware loops less than 4 instructions in length may operate incorrectly if an interrupt or exception is taken at the end of the loop." />
+
+	<anomaly ix="23" id="05-00-0264"
+		compiler-option="-workaround pre-loop-end-sync-stall-264"
+		compiler-defs="-D__WORKAROUND_PRE_LOOP_END_SYNC_STALL_264"
+		compiler-behavior="The compiler works around this by detecting whether the second to last instruction of a hardware loop is an CSYNC, SSYNC or IDLE - if this is the case a NOP is inserted at the end of the loop."
+		summary="If an SSYNC, CSYNC, or IDLE instruction is the second to last instruction of a hardware loop, there is a possibility that the processor will enter an infinite stall when trying to execute the sync." />
+
+	<anomaly ix="24" id="05-00-0262"
+		compiler-option="-workaround lost-stores-to-data-cache-262"
+		compiler-defs="-D__WORKAROUND_LOST_STORES_TO_DATA_CACHE_262"
+		compiler-behavior="A pending store to data cache may be lost in the following circumstances: there is a dual DAG access where DAG0 is a cache miss, DAG1 is a read, and both are L2 accesses aliased to the same sub-bank as the pending commited store. This dual DAG operation must be followed immediately by another dual DAG access, where DAG1 is a read of L1 SRAM. There must also be an unpredicted change of flow within three clock cycles of the first dual DAG instruction. The compiler will identify cases where two dual DAG instructions which may match the anomaly requirements could be executed in sequence and re-arrange the instructions such that DAG1 access of the first instruction is seperated and inserted after the remainder of the first multi-issued instruction." 
+		summary="Stores To Data Cache May Be Lost." />
+
+	<anomaly ix="25" id="05-00-0283"
+		compiler-option="-workaround stalled-mmr-write-283"
+		compiler-defs="-D__WORKAROUND_STALLED_MMR_WRITE_283"
+		compiler-behavior="The problem is worked around in the compiler by adding a load of the CHIPID MMR at the start of code generated for C defined event handlers. The load is jumped around to clear the stalled write. The problem is also avoided in the VisualDSP++ default exception handler function cplb_hdr. This workaround supersedes that of anomaly 05-00-0157. This workaround is also used for similar anomaly 05-00-0315 (Killed System MMR Write Completes Erroneously On Next System MMR Access)."
+		summary="A system MMR write is stalled indefinitely when killed in a particular pipeline stage." />
+
+	<anomaly ix="26" id="F3-F-021"
+		assembler-detect-option="-anomaly-detect F3F021" 
+		compiler-option="-workaround mem_branch_mem_F3_F_021"
+		compiler-defs="-D__WORKAROUND_MEM_BRANCH_MEM_F3_F_021"
+		summary="This workround places a nop before the last instruction in the sequence LOAD/STORE; Conditional branch predicted not taken; LOAD/STORE;" />
+
+	<anomaly ix="27" id="F3-F-008"
+		assembler-detect-option="-anomaly-detect F3F008" 		
+		compiler-option="-workaround spec_multiply_F3-F-008013"
+		compiler-defs="-D__WORKAROUND_SPEC_MULTIPLY_F3_F_008013"
+		compiler-behavior="There are 2 parts to the workaround.
+		1)
+			isr:
+				RTI;
+			func:
+				32-bit mult;
+
+		In this case, the ISR may clobber A0/A1 because of the aborted 32-bit mult. We workaround this by inserting 3 NOPS after any RTI, RTN, RTE, RTX instruction.
+
+		2)
+			Ax = y;
+			if CC jump bob; //predicted not taken
+			32-bit mult;
+		bob:
+			Use Ax;
+
+		In this case, if the jump is taken, having the multiply in the shadow of the conditional branch could change the value of Ax, causing the use of Ax to use the wrong value.  The workaround is to make sure the 32-bit multipy isn't in the 3 instructions following the conditional branch.  The compiler will either insert NOPs or a CSYNC when the workaround is necessary."
+		summary="A speculatively executed 32-bit multiply will update A0 and A1." /> 
+	
+	<anomaly ix="28" id="05-00-0312"
+      summary="Errors when SSYNC, CSYNC, or loads to LT, LB and LC registers are interrupted."
+		assembler-detect-option="-anomaly-detect 05000312"
+		assembler-detect-defs="-D__WORKAROUND_SYNC_LOOP_ANOM_312"
+		assembler-behavior="The assembler looks for a non CLI instruction immediately followed by a sync or loop load."		
+      compiler-option="-workaround sync-loop-anom-312"
+      compiler-defs="-D__WORKAROUND_SYNC_LOOP_ANOM_312"
+      compiler-behavior="The compiler provides a combination of workarounds for this anomaly that it applies when deemed necessary. The workaround are as follows:
+        1) The compiler builtin functions __builtin_ssync and __builting_csync have been modified to, when the workaround is enabled, ensure that interrupts are disabled before the sync instruction and enabled after.
+        2) New ssync and csync builtins have been provided that do not disable interrupts. These can be used in place of the existing builtins for code that has been manually verified as safe against the anomaly. These new builtins are called __builtin_ssync_int and __builtin_csync_int.
+        3) The compiler will ensure that any loads of the LBx, LTx and LCx registers are, when the workaround is enabled, executed with interrupts disabled. It does this by inserting a CLI instruction before such loads and an STI instruction after.
+        4) The compiler will arrange to save and restore the loop registers (LBx, LTx and LCx) while interrupts are disabled for C/C++ nested interrupt handlers defined using the sys/exception.h EX_REENTRANT_HANDLER macro.
+        Please note that enabling this workaround will result in code being generated that cannot be run in USER mode. If USER mode is to be used then this workaround should be disabled and an alternative solution implemented."/>
+
+	<anomaly ix="29" id="F3-F-013"
+		assembler-detect-option="-anomaly-detect F3F013" 	
+                assembler-behavior="The assembler looks for a Conditional Jump (predicted but not taken) immediately preceded and followed by a Load or Store."	
+		compiler-option="-workaround spec_multiply_F3-F-008013"
+		compiler-defs="-D__WORKAROUND_SPEC_MULTIPLY_F3_F_008013"
+		compiler-behavior="There are 2 parts to the workaround.
+		1)
+			isr:
+				RTI;
+			func:
+				32-bit mult;
+
+		In this case, the ISR may clobber A0/A1 because of the aborted 32-bit mult. We workaround this by inserting 3 NOPS after any RTI, RTN, RTE, RTX instruction.
+
+		2)
+			Ax = y;
+			if CC jump bob; //predicted not taken
+			32-bit mult;
+		bob:
+			Use Ax;
+
+		In this case, if the jump is taken, having the multiply in the shadow of the conditional branch could change the value of Ax, causing the use of Ax to use the wrong value.  The workaround is to make sure the 32-bit multipy isn't in the 3 instructions following the conditional branch.  The compiler will either insert NOPs or a CSYNC when the workaround is necessary."
+		summary="A speculatively executed 32-bit multiply will update A0 and A1." /> 
+
+   <anomaly ix="30" id="05-00-0311"
+		summary="Erroneous flag pin operations under specific sequences."
+      compiler-option="-workaround flags-mmr-anom-311"
+      compiler-defs="-D__WORKAROUND_FLAGS_MMR_ANOM_311"
+      compiler-behavior="To protect against this anomaly in C or C++ source files, use the macros defined the sys/05000311.h header file when reading or writing one of the GPIO memory-mapped registers (MMRs). A group of macros are defined for reading and writing the MMRs; if the anomaly applies for the current value of the silicon revision of your target, the macro will ensure that the read or write is safe against the anomaly. See the sys/05000311.h file for more information."
+/>
+
+<anomaly ix="31" id="05-00-0096"
+      rtl-defs="WA_05000096 (in order for this macro to be defined, the user must include the header file &lt;sys/anomaly_macros_rtl.h&gt;)"
+      rtl-behavior="This anomaly is worked around in the run-time libraries."
+      summary="PREFETCH, FLUSH, and FLUSHINV must be followed by a CSYNC"/>
+   
+   <anomaly ix="32" id="05-00-0109"
+      rtl-defs="WA_05000109  (in order for this macro to be defined, the user must include the header file &lt;sys/anomaly_macros_rtl.h&gt;)"
+      rtl-behavior="This anomaly is worked around in the run-time libraries. The workaround is to set the reserved bits in the SYSFG register at the beginning of the startup code."
+      summary="Reserved bits in SYSCFG register not set at power on.  "/>
+   
+   <anomaly ix="33" id="05-00-0123"
+      rtl-defs="WA_05000123  (in order for this macro to be defined, the user must include the header file &lt;sys/anomaly_macros_rtl.h&gt;)"
+      rtl-behavior="This anomaly is worked around in the run-time libraries. The workaround is to precede writes to DTEST_COMMAND with a CSYNC, and repeatedly read both the DTEST_DATAx registers until consistent data is returned on two consecutive reads."
+      summary="TEST_COMMAND initiated memory access may be incorrect if data cache or DMA is active."/>
+
+   <anomaly ix="34" id="05-00-0125"
+      rtl-defs="WA_05000125  (in order for this macro to be defined, the user must include the header file &lt;sys/anomaly_macros_rtl.h&gt;)"
+      rtl-behavior="This anomaly is worked around in the run-time libraries. In the cache support functions, when writing to the IMEM_CONTROL or DMEM_CONTROL MMR registers to enable CPLBs and/or cache, the write is aligned on a 64-bit boundary and is immediately followed by a SSYNC."
+      summary="Erroneous exception when enabling cache."/>
+
+   <anomaly ix="35" id="05-00-0137"
+      rtl-defs="WA_05000137  (in order for this macro to be defined, the user must include the header file &lt;sys/anomaly_macros_rtl.h&gt;)"
+      rtl-behavior="This anomaly is worked around in the run-time libraries. The workaround is to set DMEM_CONTROL&lt;12&gt; (PORT_PREF0) in the startup code."
+      summary="DMEM_CONTROL&lt;12&gt; is not set on Reset."
+/>
+
+   <anomaly ix="36" id="05-00-0158"
+      rtl-defs="WA_05000158  (in order for this macro to be defined, the user must include the header file &lt;sys/anomaly_macros_rtl.h&gt;)"
+      rtl-behavior="This anomaly is worked around in the run-time libraries. Where necessary, the cache support functions in the startup code set bit 9 in DCPLB_DATA."
+      summary="Boot fails when data cache enabled: Data from a Data Cache fill can be corrupted after or during instruction DMA if certain core stalls exist."/>
+
+   <anomaly ix="37" id="05-00-0204"
+      rtl-defs="WA_05000204  (in order for this macro to be defined, the user must include the header file &lt;sys/anomaly_macros_rtl.h&gt;)"
+      rtl-behavior="This anomaly is worked around in the run-time libraries. The workaround is that when configuring data cache as write-through, DCPLB_DATAx:CPLB_L1_AOW is set to 1 in order to allocate cache lines on reads and writes."
+      summary="Incorrect data read with write-through cache and allocate cache lines on reads only mode."/>
+
+   <anomaly ix="38" id="05-00-0258"
+      summary="Instruction Cache Is Corrupted When Bits 9 and 12 of the ICPLB Data Registers Differ"
+      rtl-defs="WA_05000258  (in order for this macro to be defined, the user must include the header file &lt;sys/anomaly_macros_rtl.h&gt;)"
+      rtl-behavior="This anomaly is worked around in the run-time libraries. In the _cplb_mgr and _cplb_init routines (which are part of the default cache support) bit 9 (reserved) of ICPLB_DATAx is set to the same state as bit 12 (CPLB_L1_CHBL)."/>
+
+<anomaly ix="39" id="05-00-0259"
+      rtl-defs="WA_05000259  (in order for this macro to be defined, the user must include the header file &lt;sys/anomaly_macros_rtl.h&gt;)"
+      rtl-behavior="This anomaly is worked around in the run-time libraries. In the cplb management routines, if  disable ICPLBs are disabled via an MMR write, then the MMR write is immediately followed by a CSYNC, ensuring that both instruction occur in the same 64-bit instruction block."
+      summary="Non-deterministic ICPLB descriptors delivered to hardware. Whenever ICPLBs are disabled via an MMR write, immediately follow this write with a CSYNC, and locate the MMR write and CSYNC within the same aligned 64 bit word."/>
+
+   <anomaly ix="40" id="05-00-0261"
+      rtl-defs="WA_05000261  (in order for this macro to be defined, the user must include the header file &lt;sys/anomaly_macros_rtl.h&gt;)"
+      rtl-behavior="This anomaly is worked around in the run-time libraries. In the _cplb_mgr and _cplb_hdr routines the anomaly is workded around by initially ignoring a DCPLB miss exception on the assumption that the faulting address might be invalid. We return without servicing. The exception will be raised again when the faulting instruction is re-executed. The fault address is correct this time round so the miss exception can be serviced as normal. The only complication is we have to ensure that we are about to service the same miss rather than a miss raised within a higher-priority interrupt handler, where the fault address could again be invalid. We therefore record the last seen RETX and only service an exception when RETX and the last seen RETX are equal."
+      summary="DCPLB_FAULT_ADDR MMR may be corrupted.
+The DCPLB_FAULT_ADDR MMR may contain the fault address of an aborted memory access which generated both a protection exception and a stall."/>
+
+   <anomaly ix="41" id="05-00-0229"
+      rtl-defs="WA_05000229  (in order for this macro to be defined, the user must include the header file &lt;sys/anomaly_macros_rtl.h&gt;)"
+      rtl-behavior="This anomaly is worked around in the run-time libraries. The workaround is to clear the DMA5_CONFIG and SPI_CTL are reset to their default states at the beginning of the startup code."
+      summary="SPI Slave Boot Mode Modifies Registers.
+When the SPI slave boot completes, the final DMA IRQ is cleared but the DMA5_CONFIG and SPI_CTL registers are not reset to their default states"/>
+
+   <anomaly ix="42" id="05-00-0122"
+      compiler-behavior="The compiler automatically works round this anomaly for every revision. 
+The compiler determines when a load or store involves an MMR. This requires the MMR access to use a constant address, or use one of the various MMR read/write built-ins.
+See the &quot;Compiler Notes&quot; section below for more information on MMR accesses."
+      summary="Rx.H Cannot Be Used to Access 16-bit System MMR Registers"/>
+
+   <anomaly ix="43" id="05-00-0074"
+      compiler-behavior="The compiler automatically works round this anomaly for every revision by always electing not to generate multi issue instructions which contain a dsp32shiftimm in slot 1 and P reg store in slot 2."
+      summary="A multi issue instruction with dsp32shiftimm in slot1 and a store of a P register in slot 2 is not supported."/>
+
+   <anomaly ix="44" id="05-00-0371"
+      assembler-detect-option="-anomaly-detect 05000371"
+      assembler-workaround-option="-anomaly-workaround 05000371"
+      assembler-detect-defs="-D__WORKAROUND_AVOID_QUICK_RTS_371__"
+      assembler-workaround-defs="-D__WORKAROUND_AVOID_QUICK_RTS_371__"
+      assembler-behavior="The assembler warns if an RTS instruction is within four instructions from a branch target. Review the warnings and recode where needed. Assembler workaround inserts additional nop instructions to separate RTS and branch target by four instructions."		
+      compiler-behavior="Add compiler behavior here."
+      summary="Add summary here."/>
+	
+   <anomaly ix="45" id="05-00-0323"
+      summary="Erroneous flag pin operations under specific sequences."
+      compiler-option="-D__WORKAROUND_FLAGS_MMR_ANOM_323"
+      compiler-defs="-D__WORKAROUND_FLAGS_MMR_ANOM_323"
+      compiler-behavior="To protect against this anomaly in C or C++ source files, use the macros defined the sys/05000323.h header file when reading or writing one of the GPIO memory-mapped registers (MMRs). A group of macros are defined for reading and writing the MMRs; if the anomaly applies for the current value of the silicon revision of your target, the macro will ensure that the read or write is safe against the anomaly. See the sys/05000323.h file for more information."
+/>
+
+</anomaly-dictionary>
+
+	<!-- *************************************************************** -->
+	<!-- Compiler overview information for the anomaly-dictionary     ** -->
+	<!-- *************************************************************** -->
+
+<compiler-notes>
+	<note text="There are various MMR related errata that the compiler supports; 05-00-0122, 05-00-0157, 05-00-0198. The compiler detects MMR accesses by checking addresses used in literal load and store instructions fall in the system MMR address range. Any loads and stores that do not use literal addresses and are defined qualified as volatile will be assumed to be MMR accesses unless the -no-assume-vols-are-mmrs is used. If the -no-assume-vols-are-mmrs compiler switch is used the compiler will apply the workaround for suitable literal address accesses and will make no assumptions for non-literal loads and store even if volatile. The various MMR read and write compiler builtins can be used in this mode to assert to the compiler that an access is to an MMR." />
+  <note text="The workaround for anomaly 05-00-0312 is not safe for use in USER mode." />
+</compiler-notes>
+
+	<!-- *************************************************************** -->
+	<!-- ** assembler-notes                                           ** -->
+	<!-- *************************************************************** -->
+	<!-- Assembler overview information for the anomaly-dictionary    ** -->
+	<!-- *************************************************************** -->
+
+<assembler-notes>
+	<note text="There are no general notes on assembler anomaly behavior at this time."/>
+</assembler-notes>
+
+</visualdsp-dictionary-xml>
