@@ -2206,6 +2206,7 @@ if [ $KERNEL_SOURCE ] ; then
 
         echo_date "Cleaning U-Boot"
         run_cmd rm -rf "$DIR_UBOOT_BUILD"
+        run_cmd $MAKE -C "$DIR_UBOOT" distclean
 
         UBOOT_TOOLS="mkimage${EXEEXT} gen_eth_addr${EXEEXT}"
 
