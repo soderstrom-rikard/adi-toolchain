@@ -1162,8 +1162,7 @@ build_gcc ()
     run_cmd $MAKE -j1 install
 
     # some basic sanity checks
-    # ld - ignore this until we get elf2flt converted to C (.exe)
-    FILE="addr2line ar as c++filt gcov nm objdump \
+    FILE="addr2line ar as c++filt gcov nm objdump ld \
           objcopy ranlib readelf size strings strip \
           gdb run \
           cpp gcc"
