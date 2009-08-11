@@ -1230,7 +1230,8 @@ build_binutils()
 	echo_date "Configuring $1 Binutils & GDB"
 	run_cmd $DIR_BINUTILS_SOURCE/configure \
 		$BUILD_TARGET $HOST_TARGET --target=${target} \
-		--prefix=${prefix} ${myconf} $BINUTILS_EXTRA_CONF
+		--prefix=${prefix} ${myconf} $BINUTILS_EXTRA_CONF \
+		--with-bugurl=URL:http://blackfin.uclinux.org/gf/project/toolchain/tracker
 
 	echo_date "Building $1 Binutils & GDB"
 	run_cmd $MAKE all-binutils all-gas all-ld all-sim all-gdb
