@@ -1,0 +1,4 @@
+2008-04-09  Michael Frysinger  <michael.frysinger@analog.com>
+
+	* bfin-parse.y (binary): Change "compiler" to "assembler".
+	(unary): Likewise.
