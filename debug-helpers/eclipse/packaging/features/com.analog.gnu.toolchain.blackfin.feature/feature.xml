@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="com.analog.gnu.toolchain.blackfin"
+      label="Blackfin GNU Toolchain Feature"
+      version="1.0.0.vqualifier"
+      provider-name="Analog Devices, Inc."
+      plugin="com.analog.gnu.toolchain.blackfin">
+
+   <description url="%descriptionURL">
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <requires>
+      <import plugin="org.eclipse.cdt.managedbuilder.core" version="5.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.runtime" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.cdt.core"/>
+      <import plugin="org.eclipse.cdt.debug.core" version="5.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.cdt.debug.mi.core" version="5.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.cdt.debug.gdbjtag.core" version="4.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui" version="3.4.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.cdt.launch"/>
+      <import plugin="org.eclipse.core.variables"/>
+      <import plugin="org.eclipse.debug.core"/>
+      <import plugin="org.eclipse.debug.ui"/>
+      <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.swt"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.ui.workbench"/>
+   </requires>
+
+   <plugin
+         id="com.analog.gnu.toolchain.blackfin"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
