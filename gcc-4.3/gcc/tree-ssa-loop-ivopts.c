@@ -3324,17 +3324,6 @@ force_expr_to_var_cost (tree expr)
   return cost;
 }
 
-/* Returns true if EXPR looks expensive.  */
-
-bool
-expression_expensive_p (tree expr)
-{
-  comp_cost cc;
-  cc = force_expr_to_var_cost (expr);
-  return cc.cost >= target_spill_cost;
-}
-
-
 /* Estimates cost of forcing EXPR into a variable.  DEPENDS_ON is a set of the
    invariants the computation depends on.  */
 
@@ -3903,7 +3892,12 @@ may_eliminate_iv (struct ivopts_data *data,
     return false;
 
   cand_value_at (loop, cand, use->stmt, nit, &bnd);
+
   *bound = aff_combination_to_tree (&bnd);
+  /* It is unlikely that computing the number of iterations using division
+     would be more profitable than keeping the original induction variable.  */
+  if (expression_expensive_p (*bound))
+    return false;
   return true;
 }
 

@@ -1,5 +1,5 @@
 This is doc/gccint.info, produced by makeinfo version 4.12 from
-/abuild/rguenther/tmp/gcc-4.3.3/gcc-4.3.3/gcc/doc/gccint.texi.
+/abuild/rguenther/tmp/gcc-4.3.4/gcc-4.3.4/gcc/doc/gccint.texi.
 
 Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Free Software
@@ -61,7 +61,7 @@ Introduction
 This manual documents the internals of the GNU compilers, including how
 to port them to new targets and some information about how to write
 front ends for new languages.  It corresponds to the compilers
-(GCC) version 4.3.3.  The use of the GNU compilers is documented in a
+(GCC) version 4.3.4.  The use of the GNU compilers is documented in a
 separate manual.  *Note Introduction: (gcc)Top.
 
  This manual is mainly a reference manual rather than a tutorial.  It
@@ -88,9 +88,9 @@ GCC.
 * Options::         Option specification files.
 * Passes::          Order of passes, what they do, and what each file is for.
 * Trees::           The source representation used by the C and C++ front ends.
-* RTL::             The intermediate representation that most passes work on.
-* Control Flow::    Maintaining and manipulating the control flow graph.
 * Tree SSA::        Analysis and optimization of the tree representation.
+* RTL::             Machine-dependent low-level intermediate representation.
+* Control Flow::    Maintaining and manipulating the control flow graph.
 * Loop Analysis and Representation:: Analysis and representation of loops
 * Machine Desc::    How to write machine description instruction patterns.
 * Target Macros::   How to write the machine description C macros and functions.
@@ -5145,8 +5145,8 @@ where near complete.
 
 * Parsing pass::         The language front end turns text into bits.
 * Gimplification pass::  The bits are turned into something we can optimize.
-* Pass manager::	 Sequencing the optimization passes.
-* Tree-SSA passes::      Optimizations on a high-level representation.
+* Pass manager::         Sequencing the optimization passes.
+* Tree SSA passes::      Optimizations on a high-level representation.
 * RTL passes::           Optimizations on a low-level representation.
 
 
@@ -5207,10 +5207,10 @@ data declaration, and each data definition should be passed to
 passed to `rest_of_type_compilation'.  Each function definition should
 be passed to `cgraph_finalize_function'.
 
- TODO: I know rest_of_compilation currently has all sorts of
-rtl-generation semantics.  I plan to move all code generation bits
-(both tree and rtl) to compile_function.  Should we hide cgraph from
-the front ends and move back to rest_of_compilation as the official
+ TODO: I know rest_of_compilation currently has all sorts of RTL
+generation semantics.  I plan to move all code generation bits (both
+Tree and RTL) to compile_function.  Should we hide cgraph from the
+front ends and move back to rest_of_compilation as the official
 interface?  Possibly we should rename all three interfaces such that
 the names match in some meaningful way and that is more descriptive
 than "rest_of".
@@ -5255,7 +5255,7 @@ transformation (because the front end is relying on the gimplification
 process to finish semantic checks), it should return `GS_ERROR'.
 
 
-File: gccint.info,  Node: Pass manager,  Next: Tree-SSA passes,  Prev: Gimplification pass,  Up: Passes
+File: gccint.info,  Node: Pass manager,  Next: Tree SSA passes,  Prev: Gimplification pass,  Up: Passes
 
 8.3 Pass manager
 ================
@@ -5281,15 +5281,15 @@ present is useful, and a far sight better than nothing at all.
 
  TODO: describe the global variables set up by the pass manager, and a
 brief description of how a new pass should use it.  I need to look at
-what info rtl passes use first...
+what info RTL passes use first...
 
 
-File: gccint.info,  Node: Tree-SSA passes,  Next: RTL passes,  Prev: Pass manager,  Up: Passes
+File: gccint.info,  Node: Tree SSA passes,  Next: RTL passes,  Prev: Pass manager,  Up: Passes
 
-8.4 Tree-SSA passes
+8.4 Tree SSA passes
 ===================
 
-The following briefly describes the tree optimization passes that are
+The following briefly describes the Tree optimization passes that are
 run after gimplification and what source files they are located in.
 
    * Remove useless statements
@@ -5511,7 +5511,7 @@ run after gimplification and what source files they are located in.
      The optimizations performed by this pass are:
 
      Loop invariant motion.  This pass moves only invariants that would
-     be hard to handle on rtl level (function calls, operations that
+     be hard to handle on RTL level (function calls, operations that
      expand to nontrivial sequences of insns).  With `-funswitch-loops'
      it also moves operands of conditions that are invariant out of the
      loop, so that we can use just trivial invariantness analysis in
@@ -5534,8 +5534,8 @@ run after gimplification and what source files they are located in.
      invariant out of the loops.  To achieve this, a duplicate of the
      loop is created for each possible outcome of conditional jump(s).
      The pass is implemented in `tree-ssa-loop-unswitch.c'.  This pass
-     should eventually replace the rtl-level loop unswitching in
-     `loop-unswitch.c', but currently the rtl-level pass is not
+     should eventually replace the RTL level loop unswitching in
+     `loop-unswitch.c', but currently the RTL level pass is not
      completely redundant yet due to deficiencies in tree level alias
      analysis.
 
@@ -5763,13 +5763,13 @@ run after gimplification and what source files they are located in.
 
 
 
-File: gccint.info,  Node: RTL passes,  Prev: Tree-SSA passes,  Up: Passes
+File: gccint.info,  Node: RTL passes,  Prev: Tree SSA passes,  Up: Passes
 
 8.5 RTL passes
 ==============
 
-The following briefly describes the rtl generation and optimization
-passes that are run after tree optimization.
+The following briefly describes the RTL generation and optimization
+passes that are run after the Tree optimization passes.
 
    * RTL generation
 
@@ -5785,15 +5785,15 @@ passes that are run after tree optimization.
      tell this pass which standard names are available for use and
      which patterns correspond to them.
 
-   * Generate exception handling landing pads
+   * Generation of exception landing pads
 
      This pass generates the glue that handles communication between the
      exception handling library routines and the exception handlers
      within the function.  Entry points in the function that are
      invoked by the exception handling library are called "landing
-     pads".  The code for this pass is located within `except.c'.
+     pads".  The code for this pass is located in `except.c'.
 
-   * Cleanup control flow graph
+   * Control flow graph cleanup
 
      This pass removes unreachable code, simplifies jumps to next,
      jumps to jump, jumps across jumps, etc.  The pass is run multiple
@@ -5808,16 +5808,16 @@ passes that are run after tree optimization.
      variables that come from a single definition, and seeing if the
      result can be simplified.  It performs copy propagation and
      addressing mode selection.  The pass is run twice, with values
-     being propagated into loops only on the second run.  It is located
-     in `fwprop.c'.
+     being propagated into loops only on the second run.  The code is
+     located in `fwprop.c'.
 
    * Common subexpression elimination
 
      This pass removes redundant computation within basic blocks, and
      optimizes addressing modes based on cost.  The pass is run twice.
-     The source is located in `cse.c'.
+     The code for this pass is located in `cse.c'.
 
-   * Global common subexpression elimination.
+   * Global common subexpression elimination
 
      This pass performs two different types of GCSE  depending on
      whether you are optimizing for size or not (LCM based GCSE tends
@@ -5860,22 +5860,13 @@ passes that are run after tree optimization.
      assignments with arithmetic, boolean value producing comparison
      instructions, and conditional move instructions.  In the very last
      invocation after reload, it will generate predicated instructions
-     when supported by the target.  The pass is located in `ifcvt.c'.
+     when supported by the target.  The code is located in `ifcvt.c'.
 
    * Web construction
 
      This pass splits independent uses of each pseudo-register.  This
      can improve effect of the other transformation, such as CSE or
-     register allocation.  Its source files are `web.c'.
-
-   * Life analysis
-
-     This pass computes which pseudo-registers are live at each point in
-     the program, and makes the first instruction that uses a value
-     point at the instruction that computed the value.  It then deletes
-     computations whose results are never used, and combines memory
-     references with add or subtract instructions to make autoincrement
-     or autodecrement addressing.  The pass is located in `flow.c'.
+     register allocation.  The code for this pass is located in `web.c'.
 
    * Instruction combination
 
@@ -5883,7 +5874,7 @@ passes that are run after tree optimization.
      that are related by data flow into single instructions.  It
      combines the RTL expressions for the instructions by substitution,
      simplifies the result using algebra, and then attempts to match
-     the result against the machine description.  The pass is located
+     the result against the machine description.  The code is located
      in `combine.c'.
 
    * Register movement
@@ -5892,22 +5883,22 @@ passes that are run after tree optimization.
      instruction to need a reload, and this reload would be a
      register-to-register move.  It then attempts to change the
      registers used by the instruction to avoid the move instruction.
-     The pass is located in `regmove.c'.
+     The code is located in `regmove.c'.
 
-   * Optimize mode switching
+   * Mode switching optimization
 
      This pass looks for instructions that require the processor to be
      in a specific "mode" and minimizes the number of mode changes
      required to satisfy all users.  What these modes are, and what
-     they apply to are completely target-specific.  The source is
-     located in `mode-switching.c'.
+     they apply to are completely target-specific.  The code for this
+     pass is located in `mode-switching.c'.
 
    * Modulo scheduling
 
      This pass looks at innermost loops and reorders their instructions
      by overlapping different iterations.  Modulo scheduling is
-     performed immediately before instruction scheduling.  The pass is
-     located in (`modulo-sched.c').
+     performed immediately before instruction scheduling.  The code for
+     this pass is located in `modulo-sched.c'.
 
    * Instruction scheduling
 
@@ -5917,9 +5908,9 @@ passes that are run after tree optimization.
      behavior on RISC machines.  It re-orders instructions within a
      basic block to try to separate the definition and use of items
      that otherwise would cause pipeline stalls.  This pass is
-     performed twice, before and after register allocation.  The pass
-     is located in `haifa-sched.c', `sched-deps.c', `sched-ebb.c',
-     `sched-rgn.c' and `sched-vis.c'.
+     performed twice, before and after register allocation.  The code
+     for this pass is located in `haifa-sched.c', `sched-deps.c',
+     `sched-ebb.c', `sched-rgn.c' and `sched-vis.c'.
 
    * Register allocation
 
@@ -5975,13 +5966,13 @@ passes that are run after tree optimization.
      in code and generates notes describing the variable locations to
      RTL code.  The location lists are then generated according to these
      notes to debug information if the debugging information format
-     supports location lists.
+     supports location lists.  The code is located in `var-tracking.c'.
 
    * Delayed branch scheduling
 
      This optional pass attempts to find instructions that can go into
      the delay slots of other instructions, usually jumps and calls.
-     The source file name is `reorg.c'.
+     The code for this pass is located in `reorg.c'.
 
    * Branch shortening
 
@@ -5990,14 +5981,15 @@ passes that are run after tree optimization.
      branches.  In this pass, the compiler figures out what how far
      each instruction will be from each other instruction, and
      therefore whether the usual instructions, or the longer sequences,
-     must be used for each branch.
+     must be used for each branch.  The code for this pass is located
+     in `final.c'.
 
    * Register-to-stack conversion
 
      Conversion from usage of some hard registers to usage of a register
      stack may be done at this point.  Currently, this is supported only
      for the floating-point registers of the Intel 80387 coprocessor.
-     The source file name is `reg-stack.c'.
+     The code for this pass is located in `reg-stack.c'.
 
    * Final
 
@@ -6022,7 +6014,7 @@ passes that are run after tree optimization.
 
 
 
-File: gccint.info,  Node: Trees,  Next: RTL,  Prev: Passes,  Up: Top
+File: gccint.info,  Node: Trees,  Next: Tree SSA,  Prev: Passes,  Up: Top
 
 9 Trees: The intermediate representation used by the C and C++ front ends
 *************************************************************************
@@ -8547,7 +8539,7 @@ kinds of expressions:
 
 
 
-File: gccint.info,  Node: Tree SSA,  Next: Loop Analysis and Representation,  Prev: Control Flow,  Up: Top
+File: gccint.info,  Node: Tree SSA,  Next: RTL,  Prev: Trees,  Up: Top
 
 10 Analysis and Optimization of GIMPLE Trees
 ********************************************
@@ -10177,7 +10169,7 @@ proceeds as follows:
      above the threshold set by max-alias-vops, go back to (2).
 
 
-File: gccint.info,  Node: Loop Analysis and Representation,  Next: Machine Desc,  Prev: Tree SSA,  Up: Top
+File: gccint.info,  Node: Loop Analysis and Representation,  Next: Machine Desc,  Prev: Control Flow,  Up: Top
 
 11 Analysis and Representation of Loops
 ***************************************
@@ -10844,15 +10836,15 @@ programming problems is described in `omega.h', and the solver is
 `omega_solve_problem'.
 
 
-File: gccint.info,  Node: RTL,  Next: Control Flow,  Prev: Trees,  Up: Top
+File: gccint.info,  Node: RTL,  Next: Control Flow,  Prev: Tree SSA,  Up: Top
 
 12 RTL Representation
 *********************
 
-Most of the work of the compiler is done on an intermediate
-representation called register transfer language.  In this language,
-the instructions to be output are described, pretty much one by one, in
-an algebraic form that describes what the instruction does.
+The last part of the compiler work is done on a low-level intermediate
+representation called Register Transfer Language.  In this language, the
+instructions to be output are described, pretty much one by one, in an
+algebraic form that describes what the instruction does.
 
  RTL is inspired by Lisp lists.  It has both an internal form, made up
 of structures that point at other structures, and a textual form that
@@ -14099,7 +14091,7 @@ the "tree" data structure, described in the files `tree.h' and
 incomplete.
 
 
-File: gccint.info,  Node: Control Flow,  Next: Tree SSA,  Prev: RTL,  Up: Top
+File: gccint.info,  Node: Control Flow,  Next: Loop Analysis and Representation,  Prev: RTL,  Up: Top
 
 13 Control Flow Graph
 *********************
@@ -39483,7 +39475,7 @@ Concept Index
 * MODIFY_JNI_METHOD_CALL:                Misc.               (line  782)
 * MODIFY_TARGET_NAME:                    Driver.             (line  385)
 * modM3 instruction pattern:             Standard Names.     (line  222)
-* modulo scheduling:                     RTL passes.         (line  140)
+* modulo scheduling:                     RTL passes.         (line  131)
 * MOVE_BY_PIECES_P:                      Costs.              (line  104)
 * MOVE_MAX:                              Misc.               (line  115)
 * MOVE_MAX_PIECES:                       Costs.              (line  110)
@@ -39943,7 +39935,7 @@ Concept Index
 * reload_in instruction pattern:         Standard Names.     (line   99)
 * reload_in_progress:                    Standard Names.     (line   57)
 * reload_out instruction pattern:        Standard Names.     (line   99)
-* reloading:                             RTL passes.         (line  181)
+* reloading:                             RTL passes.         (line  172)
 * remainder:                             Arithmetic.         (line  131)
 * remainderM3 instruction pattern:       Standard Names.     (line  468)
 * reorder:                               GTY Options.        (line  209)
@@ -40126,7 +40118,7 @@ Concept Index
 * SMALL_REGISTER_CLASSES:                Register Classes.   (line  433)
 * smax:                                  Arithmetic.         (line  136)
 * smin:                                  Arithmetic.         (line  136)
-* sms, swing, software pipelining:       RTL passes.         (line  140)
+* sms, swing, software pipelining:       RTL passes.         (line  131)
 * smulM3_highpart instruction pattern:   Standard Names.     (line  356)
 * soft float library:                    Soft float library routines.
                                                              (line    6)
@@ -40916,281 +40908,281 @@ Concept Index
 
 Tag Table:
 Node: Top2107
-Node: Contributing5003
-Node: Portability5744
-Node: Interface7532
-Node: Libgcc10572
-Node: Integer library routines12413
-Node: Soft float library routines19252
-Node: Decimal float library routines31189
-Node: Fixed-point fractional library routines46942
-Node: Exception handling routines147340
-Node: Miscellaneous routines148447
-Node: Languages148830
-Node: Source Tree150377
-Node: Configure Terms150996
-Node: Top Level153954
-Node: gcc Directory156302
-Node: Subdirectories157271
-Node: Configuration159609
-Node: Config Fragments160329
-Node: System Config161673
-Node: Configuration Files162609
-Node: Build165184
-Node: Makefile165596
-Ref: Makefile-Footnote-1172314
-Ref: Makefile-Footnote-2172463
-Node: Library Files172537
-Node: Headers173099
-Node: Documentation175182
-Node: Texinfo Manuals176041
-Node: Man Page Generation178379
-Node: Miscellaneous Docs180294
-Node: Front End181593
-Node: Front End Directory185294
-Node: Front End Config190287
-Node: Back End193201
-Node: Testsuites196878
-Node: Test Idioms197742
-Node: Test Directives201143
-Node: Ada Tests212950
-Node: C Tests214242
-Node: libgcj Tests218597
-Node: gcov Testing219729
-Node: profopt Testing222713
-Node: compat Testing224156
-Node: Torture Tests228400
-Node: Options229792
-Node: Option file format230233
-Node: Option properties232783
-Node: Passes238442
-Node: Parsing pass239177
-Node: Gimplification pass242705
-Node: Pass manager244532
-Node: Tree-SSA passes245860
-Node: RTL passes267671
-Node: Trees279513
-Node: Deficiencies282239
-Node: Tree overview282476
-Node: Macros and Functions286599
-Node: Identifiers286745
-Node: Containers288270
-Node: Types289425
-Node: Scopes305128
-Node: Namespaces305890
-Node: Classes308702
-Node: Declarations313459
-Node: Working with declarations313954
-Node: Internal structure320411
-Node: Current structure hierarchy320793
-Node: Adding new DECL node types322885
-Node: Functions326956
-Node: Function Basics329359
-Node: Function Bodies336524
-Node: Attributes347766
-Node: Expression trees349007
-Node: Tree SSA391616
-Node: GENERIC393493
-Node: GIMPLE395103
-Node: Interfaces396394
-Node: Temporaries398547
-Ref: Temporaries-Footnote-1399867
-Node: GIMPLE Expressions399930
-Node: Compound Expressions400702
-Node: Compound Lvalues400950
-Node: Conditional Expressions401730
-Node: Logical Operators402407
-Node: Statements402900
-Node: Blocks403608
-Node: Statement Sequences405025
-Node: Empty Statements405362
-Node: Loops405940
-Node: Selection Statements406184
-Node: Jumps407037
-Node: Cleanups407698
-Node: GIMPLE Exception Handling409489
-Node: GIMPLE Example411368
-Node: Rough GIMPLE Grammar412779
-Node: Annotations418128
-Node: Statement Operands418794
-Node: SSA433355
-Node: Alias analysis445713
-Node: Loop Analysis and Representation453172
-Node: Loop representation454222
-Node: Loop querying461142
-Node: Loop manipulation463975
-Node: LCSSA466343
-Node: Scalar evolutions468415
-Node: loop-iv471659
-Node: Number of iterations473585
-Node: Dependency analysis476394
-Node: Lambda482762
-Node: Omega484432
-Node: RTL485997
-Node: RTL Objects488101
-Node: RTL Classes491975
-Node: Accessors496927
-Node: Special Accessors499321
-Node: Flags504539
-Node: Machine Modes519775
-Node: Constants532091
-Node: Regs and Memory538736
-Node: Arithmetic552278
-Node: Comparisons561798
-Node: Bit-Fields566090
-Node: Vector Operations567642
-Node: Conversions569268
-Node: RTL Declarations573778
-Node: Side Effects574599
-Node: Incdec590715
-Node: Assembler594055
-Node: Insns595587
-Node: Calls621517
-Node: Sharing624110
-Node: Reading RTL627220
-Node: Control Flow628210
-Node: Basic Blocks629181
-Node: Edges633749
-Node: Profile information642311
-Node: Maintaining the CFG646997
-Node: Liveness information653889
-Node: Machine Desc656016
-Node: Overview658498
-Node: Patterns660539
-Node: Example663977
-Node: RTL Template665412
-Node: Output Template676067
-Node: Output Statement680033
-Node: Predicates683995
-Node: Machine-Independent Predicates686913
-Node: Defining Predicates691545
-Node: Constraints697510
-Node: Simple Constraints698671
-Node: Multi-Alternative710733
-Node: Class Preferences713574
-Node: Modifiers714466
-Node: Machine Constraints718592
-Node: Define Constraints750738
-Node: C Constraint Interface757518
-Node: Standard Names761138
-Ref: shift patterns780066
-Ref: prologue instruction pattern820715
-Ref: epilogue instruction pattern821208
-Node: Pattern Ordering830751
-Node: Dependent Patterns831987
-Node: Jump Patterns834801
-Node: Looping Patterns840497
-Node: Insn Canonicalizations845099
-Node: Expander Definitions849483
-Node: Insn Splitting857601
-Node: Including Patterns867197
-Node: Peephole Definitions868977
-Node: define_peephole870230
-Node: define_peephole2876561
-Node: Insn Attributes879628
-Node: Defining Attributes880734
-Node: Expressions882751
-Node: Tagging Insns889353
-Node: Attr Example893706
-Node: Insn Lengths896080
-Node: Constant Attributes899139
-Node: Delay Slots900308
-Node: Processor pipeline description903532
-Ref: Processor pipeline description-Footnote-1920898
-Node: Conditional Execution921228
-Node: Constant Definitions924081
-Node: Iterators925676
-Node: Mode Iterators926123
-Node: Defining Mode Iterators927085
-Node: Substitutions928579
-Node: Examples930820
-Node: Code Iterators932268
-Node: Target Macros934525
-Node: Target Structure937477
-Node: Driver938746
-Node: Run-time Target962427
-Node: Per-Function Data969631
-Node: Storage Layout972394
-Node: Type Layout999015
-Node: Registers1011972
-Node: Register Basics1012895
-Node: Allocation Order1018462
-Node: Values in Registers1019907
-Node: Leaf Functions1027012
-Node: Stack Registers1029870
-Node: Register Classes1030986
-Node: Old Constraints1056561
-Node: Stack and Calling1063713
-Node: Frame Layout1064247
-Node: Exception Handling1075094
-Node: Stack Checking1081472
-Node: Frame Registers1085103
-Node: Elimination1091709
-Node: Stack Arguments1095740
-Node: Register Arguments1102341
-Node: Scalar Return1116565
-Node: Aggregate Return1121850
-Node: Caller Saves1125509
-Node: Function Entry1126687
-Node: Profiling1139302
-Node: Tail Calls1141001
-Node: Stack Smashing Protection1142368
-Node: Varargs1143480
-Node: Trampolines1151440
-Node: Library Calls1158106
-Node: Addressing Modes1162969
-Node: Anchored Addresses1178227
-Node: Condition Code1180888
-Node: Costs1189177
-Node: Scheduling1201900
-Node: Sections1218647
-Node: PIC1233297
-Node: Assembler Format1235287
-Node: File Framework1236366
-Ref: TARGET_HAVE_SWITCHABLE_BSS_SECTIONS1241272
-Node: Data Output1244539
-Node: Uninitialized Data1252298
-Node: Label Output1257369
-Node: Initialization1279036
-Node: Macros for Initialization1284998
-Node: Instruction Output1291450
-Node: Dispatch Tables1300444
-Node: Exception Region Output1304239
-Node: Alignment Output1309999
-Node: Debugging Info1314162
-Node: All Debuggers1314832
-Node: DBX Options1317687
-Node: DBX Hooks1323136
-Node: File Names and DBX1325062
-Node: SDB and DWARF1327173
-Node: VMS Debug1331165
-Node: Floating Point1331735
-Node: Mode Switching1336558
-Node: Target Attributes1340484
-Node: MIPS Coprocessors1345226
-Node: PCH Target1346800
-Node: C++ ABI1348321
-Node: Misc1352940
-Ref: TARGET_SHIFT_TRUNCATION_MASK1360310
-Node: Host Config1399524
-Node: Host Common1400584
-Node: Filesystem1402963
-Node: Host Misc1407078
-Node: Fragments1409217
-Node: Target Fragment1410412
-Node: Host Fragment1416078
-Node: Collect21417520
-Node: Header Dirs1420063
-Node: Type Information1421486
-Node: GTY Options1423674
-Node: GGC Roots1434342
-Node: Files1435062
-Node: Funding1437422
-Node: GNU Project1439918
-Node: Copying1440567
-Node: GNU Free Documentation License1478098
-Node: Contributors1500507
-Node: Option Index1536705
-Node: Concept Index1537290
+Node: Contributing5002
+Node: Portability5743
+Node: Interface7531
+Node: Libgcc10571
+Node: Integer library routines12412
+Node: Soft float library routines19251
+Node: Decimal float library routines31188
+Node: Fixed-point fractional library routines46941
+Node: Exception handling routines147339
+Node: Miscellaneous routines148446
+Node: Languages148829
+Node: Source Tree150376
+Node: Configure Terms150995
+Node: Top Level153953
+Node: gcc Directory156301
+Node: Subdirectories157270
+Node: Configuration159608
+Node: Config Fragments160328
+Node: System Config161672
+Node: Configuration Files162608
+Node: Build165183
+Node: Makefile165595
+Ref: Makefile-Footnote-1172313
+Ref: Makefile-Footnote-2172462
+Node: Library Files172536
+Node: Headers173098
+Node: Documentation175181
+Node: Texinfo Manuals176040
+Node: Man Page Generation178378
+Node: Miscellaneous Docs180293
+Node: Front End181592
+Node: Front End Directory185293
+Node: Front End Config190286
+Node: Back End193200
+Node: Testsuites196877
+Node: Test Idioms197741
+Node: Test Directives201142
+Node: Ada Tests212949
+Node: C Tests214241
+Node: libgcj Tests218596
+Node: gcov Testing219728
+Node: profopt Testing222712
+Node: compat Testing224155
+Node: Torture Tests228399
+Node: Options229791
+Node: Option file format230232
+Node: Option properties232782
+Node: Passes238441
+Node: Parsing pass239183
+Node: Gimplification pass242711
+Node: Pass manager244538
+Node: Tree SSA passes245866
+Node: RTL passes267677
+Node: Trees279277
+Node: Deficiencies282008
+Node: Tree overview282245
+Node: Macros and Functions286368
+Node: Identifiers286514
+Node: Containers288039
+Node: Types289194
+Node: Scopes304897
+Node: Namespaces305659
+Node: Classes308471
+Node: Declarations313228
+Node: Working with declarations313723
+Node: Internal structure320180
+Node: Current structure hierarchy320562
+Node: Adding new DECL node types322654
+Node: Functions326725
+Node: Function Basics329128
+Node: Function Bodies336293
+Node: Attributes347535
+Node: Expression trees348776
+Node: Tree SSA391385
+Node: GENERIC393226
+Node: GIMPLE394836
+Node: Interfaces396127
+Node: Temporaries398280
+Ref: Temporaries-Footnote-1399600
+Node: GIMPLE Expressions399663
+Node: Compound Expressions400435
+Node: Compound Lvalues400683
+Node: Conditional Expressions401463
+Node: Logical Operators402140
+Node: Statements402633
+Node: Blocks403341
+Node: Statement Sequences404758
+Node: Empty Statements405095
+Node: Loops405673
+Node: Selection Statements405917
+Node: Jumps406770
+Node: Cleanups407431
+Node: GIMPLE Exception Handling409222
+Node: GIMPLE Example411101
+Node: Rough GIMPLE Grammar412512
+Node: Annotations417861
+Node: Statement Operands418527
+Node: SSA433088
+Node: Alias analysis445446
+Node: Loop Analysis and Representation452905
+Node: Loop representation453959
+Node: Loop querying460879
+Node: Loop manipulation463712
+Node: LCSSA466080
+Node: Scalar evolutions468152
+Node: loop-iv471396
+Node: Number of iterations473322
+Node: Dependency analysis476131
+Node: Lambda482499
+Node: Omega484169
+Node: RTL485734
+Node: RTL Objects487852
+Node: RTL Classes491726
+Node: Accessors496678
+Node: Special Accessors499072
+Node: Flags504290
+Node: Machine Modes519526
+Node: Constants531842
+Node: Regs and Memory538487
+Node: Arithmetic552029
+Node: Comparisons561549
+Node: Bit-Fields565841
+Node: Vector Operations567393
+Node: Conversions569019
+Node: RTL Declarations573529
+Node: Side Effects574350
+Node: Incdec590466
+Node: Assembler593806
+Node: Insns595338
+Node: Calls621268
+Node: Sharing623861
+Node: Reading RTL626971
+Node: Control Flow627961
+Node: Basic Blocks628956
+Node: Edges633524
+Node: Profile information642086
+Node: Maintaining the CFG646772
+Node: Liveness information653664
+Node: Machine Desc655791
+Node: Overview658273
+Node: Patterns660314
+Node: Example663752
+Node: RTL Template665187
+Node: Output Template675842
+Node: Output Statement679808
+Node: Predicates683770
+Node: Machine-Independent Predicates686688
+Node: Defining Predicates691320
+Node: Constraints697285
+Node: Simple Constraints698446
+Node: Multi-Alternative710508
+Node: Class Preferences713349
+Node: Modifiers714241
+Node: Machine Constraints718367
+Node: Define Constraints750513
+Node: C Constraint Interface757293
+Node: Standard Names760913
+Ref: shift patterns779841
+Ref: prologue instruction pattern820490
+Ref: epilogue instruction pattern820983
+Node: Pattern Ordering830526
+Node: Dependent Patterns831762
+Node: Jump Patterns834576
+Node: Looping Patterns840272
+Node: Insn Canonicalizations844874
+Node: Expander Definitions849258
+Node: Insn Splitting857376
+Node: Including Patterns866972
+Node: Peephole Definitions868752
+Node: define_peephole870005
+Node: define_peephole2876336
+Node: Insn Attributes879403
+Node: Defining Attributes880509
+Node: Expressions882526
+Node: Tagging Insns889128
+Node: Attr Example893481
+Node: Insn Lengths895855
+Node: Constant Attributes898914
+Node: Delay Slots900083
+Node: Processor pipeline description903307
+Ref: Processor pipeline description-Footnote-1920673
+Node: Conditional Execution921003
+Node: Constant Definitions923856
+Node: Iterators925451
+Node: Mode Iterators925898
+Node: Defining Mode Iterators926860
+Node: Substitutions928354
+Node: Examples930595
+Node: Code Iterators932043
+Node: Target Macros934300
+Node: Target Structure937252
+Node: Driver938521
+Node: Run-time Target962202
+Node: Per-Function Data969406
+Node: Storage Layout972169
+Node: Type Layout998790
+Node: Registers1011747
+Node: Register Basics1012670
+Node: Allocation Order1018237
+Node: Values in Registers1019682
+Node: Leaf Functions1026787
+Node: Stack Registers1029645
+Node: Register Classes1030761
+Node: Old Constraints1056336
+Node: Stack and Calling1063488
+Node: Frame Layout1064022
+Node: Exception Handling1074869
+Node: Stack Checking1081247
+Node: Frame Registers1084878
+Node: Elimination1091484
+Node: Stack Arguments1095515
+Node: Register Arguments1102116
+Node: Scalar Return1116340
+Node: Aggregate Return1121625
+Node: Caller Saves1125284
+Node: Function Entry1126462
+Node: Profiling1139077
+Node: Tail Calls1140776
+Node: Stack Smashing Protection1142143
+Node: Varargs1143255
+Node: Trampolines1151215
+Node: Library Calls1157881
+Node: Addressing Modes1162744
+Node: Anchored Addresses1178002
+Node: Condition Code1180663
+Node: Costs1188952
+Node: Scheduling1201675
+Node: Sections1218422
+Node: PIC1233072
+Node: Assembler Format1235062
+Node: File Framework1236141
+Ref: TARGET_HAVE_SWITCHABLE_BSS_SECTIONS1241047
+Node: Data Output1244314
+Node: Uninitialized Data1252073
+Node: Label Output1257144
+Node: Initialization1278811
+Node: Macros for Initialization1284773
+Node: Instruction Output1291225
+Node: Dispatch Tables1300219
+Node: Exception Region Output1304014
+Node: Alignment Output1309774
+Node: Debugging Info1313937
+Node: All Debuggers1314607
+Node: DBX Options1317462
+Node: DBX Hooks1322911
+Node: File Names and DBX1324837
+Node: SDB and DWARF1326948
+Node: VMS Debug1330940
+Node: Floating Point1331510
+Node: Mode Switching1336333
+Node: Target Attributes1340259
+Node: MIPS Coprocessors1345001
+Node: PCH Target1346575
+Node: C++ ABI1348096
+Node: Misc1352715
+Ref: TARGET_SHIFT_TRUNCATION_MASK1360085
+Node: Host Config1399299
+Node: Host Common1400359
+Node: Filesystem1402738
+Node: Host Misc1406853
+Node: Fragments1408992
+Node: Target Fragment1410187
+Node: Host Fragment1415853
+Node: Collect21417295
+Node: Header Dirs1419838
+Node: Type Information1421261
+Node: GTY Options1423449
+Node: GGC Roots1434117
+Node: Files1434837
+Node: Funding1437197
+Node: GNU Project1439693
+Node: Copying1440342
+Node: GNU Free Documentation License1477873
+Node: Contributors1500282
+Node: Option Index1536480
+Node: Concept Index1537065
 
 End Tag Table

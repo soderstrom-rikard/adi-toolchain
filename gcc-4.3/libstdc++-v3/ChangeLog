@@ -1,3 +1,40 @@
+2009-08-04  Release Manager
+
+	* GCC 4.3.4 released.
+
+2009-03-14  Paolo Carlini  <paolo.carlini@oracle.com>
+
+	PR libstdc++/39405
+	* include/std/type_traits (__add_lvalue_reference_helper,
+	__add_rvalue_reference_helper): Avoid is_function.
+	* testsuite/20_util/shared_ptr/cons/39405.cc: New.
+	* testsuite/tr1/2_general_utilities/shared_ptr/cons/39405.cc: Likewise.
+
+2009-02-09  Johannes Singler  <singler@ira.uka.de>
+
+        Backport from mainline:
+        2009-02-03  Johannes Singler  <singler@ira.uka.de>
+
+        * include/parallel/algorithmfwd.h:
+        Add parallelism default for many declarations.
+        * include/parallel/numericfwd.h: Likewise.
+        * include/parallel/iterator.h: Use iterator_traits as usual.
+        * include/parallel/par_loop.h:
+        Include equally_split.h.
+        (for_each_template_random_access_ed):
+        Avoid calling the Result default constructor.
+        * include/parallel/numeric: Replace
+        for_each_template_random_access by
+        for_each_template_random_access_ed in numeric functions.
+
+2009-01-27  Uros Bizjak  <ubizjak@gmail.com>
+
+	Backport from mainline:
+	2009-01-13  Uros Bizjak  <ubizjak@gmail.com>
+
+	* scripts/extract_symvers: Add sed script to remove ' [<other>: xx] '
+	field from readelf output.
+
 2009-01-24  Release Manager
 
 	* GCC 4.3.3 released.

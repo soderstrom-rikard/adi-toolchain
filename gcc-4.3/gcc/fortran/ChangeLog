@@ -1,3 +1,81 @@
+2009-08-04  Release Manager
+
+	* GCC 4.3.4 released.
+
+2009-07-03  Jerry DeLisle  <jvdelisle@gcc.gnu.org>
+
+	PR fortran/40638
+	* trans-io.c (set_parameter_value): Don't build un-necessary run-time
+	checks for units of KIND less than 4.
+
+2009-05-10  Paul Thomas  <pault@gcc.gnu.org>
+
+	Backport from mainline:
+	PR fortran/39879
+	* trans_expr.c (gfc_conv_procedure_call): Deep copy a derived
+	type parentheses argument if it is a variable with allocatable
+	components.
+
+2009-04-04  Paul Thomas  <pault@gcc.gnu.org>
+
+	PR fortran/39519
+	* parse.c (parse_derived): Do not break on finding pointer,
+	allocatable or private components.
+
+2009-03-07  Paul Thomas  <pault@gcc.gnu.org>
+
+	PR fortran/39295
+	* interface.c (compare_type_rank_if): Return 1 if the symbols
+	are the same and deal with external procedures where one is
+	identified to be a function or subroutine by usage but the
+	other is not.
+
+2009-03-07  Paul Thomas  <pault@gcc.gnu.org>
+
+	PR fortran/39292
+	* trans-array.c (gfc_conv_array_initializer): Convert all
+	expressions rather than ICEing.
+
+2009-02-19  Paul Thomas  <pault@gcc.gnu.org>
+
+	PR fortran/38852
+	PR fortran/39006
+	Backport from trunk
+	* trans-intrinsic.c (gfc_conv_intrinsic_bound): Use the array
+	descriptor ubound for UBOUND, when the array lbound == 1.
+
+2009-01-26  Paul Thomas  <pault@gcc.gnu.org>
+
+	PR fortran/38907
+	Backport from trunk
+	* resolve.c (check_host_association): Remove the matching to
+	correct an incorrect host association and use manipulation of
+	the expression instead.
+
+2009-01-26  Mikael Morin  <mikael.morin@tele2.fr>
+
+        PR fortran/38859
+	Backport from trunk
+        * simplify.c (simplify_bound): Don't use array specification
+        if variable or component has subsequent references.
+
+2009-01-26  Paul Thomas  <pault@gcc.gnu.org>
+
+	PR fortran/38657
+	Backport from trunk.
+	* module.c (write_common_0): Add argument 'this_module' and
+	check that non-use associated common blocks are written first.
+	(write_common): Call write_common_0 twice, once with true and
+	then with false.
+
+2009-01-24  Thomas Koenig  <tkoenig@gcc.gnu.org>
+
+	PR fortran/38672
+	Backport from trunk.
+	* resolve.c (resolve_symbol):  Check for the
+	presence of derived->ns->proc_name before
+	accessing derived->ns->proc_name->attr.flavor .
+
 2009-01-24  Release Manager
 
 	* GCC 4.3.3 released.

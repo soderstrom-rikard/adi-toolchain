@@ -132,7 +132,7 @@
 .\" ========================================================================
 .\"
 .IX Title "GCC 1"
-.TH GCC 1 "2009-01-24" "gcc-4.3.3" "GNU"
+.TH GCC 1 "2009-08-04" "gcc-4.3.4" "GNU"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -4904,8 +4904,9 @@ Attempt to merge identical constants and identical variables.
 This option implies \fB\-fmerge\-constants\fR.  In addition to
 \&\fB\-fmerge\-constants\fR this considers e.g. even constant initialized
 arrays or initialized constant variables with integral or floating point
-types.  Languages like C or \*(C+ require each non-automatic variable to
-have distinct location, so using this option will result in non-conforming
+types.  Languages like C or \*(C+ require each variable, including multiple
+instances of the same variable in recursive calls, to have distinct locations,
+so using this option will result in non-conforming
 behavior.
 .IP "\fB\-fmodulo\-sched\fR" 4
 .IX Item "-fmodulo-sched"
@@ -14518,6 +14519,6 @@ included in the \fIgfdl\fR\|(7) man page.
 .SH "POD ERRORS"
 .IX Header "POD ERRORS"
 Hey! \fBThe above document had some coding errors, which are explained below:\fR
-.IP "Around line 8200:" 4
-.IX Item "Around line 8200:"
-You can't have =items (as at line 8213) unless the first thing after the =over is an =item
+.IP "Around line 8201:" 4
+.IX Item "Around line 8201:"
+You can't have =items (as at line 8214) unless the first thing after the =over is an =item
