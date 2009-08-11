@@ -1,0 +1,4 @@
+2009-08-11  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	From Mike Frysinger <michael.frysinger@analog.com>
+	* gas/bfin/reloc.d: Adjust for the renamed relocations.
