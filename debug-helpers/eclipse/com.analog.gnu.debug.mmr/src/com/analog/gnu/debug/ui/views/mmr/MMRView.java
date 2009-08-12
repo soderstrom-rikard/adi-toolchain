@@ -1,4 +1,14 @@
-package com.adi.debug.ui.views.mmr;
+/*******************************************************************************
+ *  Copyright (c) 2009 Analog Devices, Inc.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *     Analog Devices, Inc. - Initial implementation
+ *******************************************************************************/
+package com.analog.gnu.debug.ui.views.mmr;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,14 +37,14 @@ import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.ui.AbstractDebugView;
 
 
-import com.adi.debug.IDSPDebugUIConstants;
-import com.adi.debug.core.registers.MMRViewUIPlugin;
-import com.adi.debug.core.registers.RegistersMappersManager;
-import com.adi.debug.ui.views.ChangeViewBaseAction;
-import com.adi.debug.ui.views.INumberBaseView;
-import com.adi.debug.ui.views.ValueViewUtils;
+import com.analog.gnu.debug.IDSPDebugUIConstants;
+import com.analog.gnu.debug.core.registers.MMRViewUIPlugin;
+import com.analog.gnu.debug.core.registers.RegistersMappersManager;
+import com.analog.gnu.debug.ui.views.ChangeViewBaseAction;
+import com.analog.gnu.debug.ui.views.INumberBaseView;
+import com.analog.gnu.debug.ui.views.ValueViewUtils;
 
-public class MMRView extends AbstractDebugView 
+public class MMRView extends AbstractDebugView
 				implements INumberBaseView, IDebugEventSetListener, MouseListener
 {
 
@@ -42,7 +52,7 @@ public class MMRView extends AbstractDebugView
 	private static final String REMOVE_REG 		= "Remove Selected Registers";
 	private static final String REMOVE_TABLE 	= "Remove Selected Table";
 	private static final String REMOVE_ALL 		= "Remove All Tables";
-	
+
 	private static final String DUMP 			= "Dump Registers";
 
 	private static final String TmpProcessorType = "BFCore";
@@ -53,22 +63,22 @@ public class MMRView extends AbstractDebugView
 	// not used currently:
 	String processorType;
 	// TODO: DSPPartNumberAccessor pnAccessor;
-	
+
 	public MMRView()
 	{
 		super();
-		processorType = new String("UNKNOWN"); 
+		processorType = new String("UNKNOWN");
 		// TODO: pnAccessor = new DSPPartNumberAccessor();
 		InitializeRegisterMappers();
 	}
-	
+
 	protected Viewer createViewer(Composite parent)
 	{
 		viewer = new MMRViewer(parent,this);
 		page = viewer.getPage();
 		page.addMouseListener(this);
 		hookContextMenu(viewer);
-		
+
 		register(true);
 		// Check if the target already created:
 		// TODO: IDebugTarget[] targets = DebugPlugin.getDefault().getLaunchManager().getDebugTargets();
@@ -89,13 +99,13 @@ public class MMRView extends AbstractDebugView
 
 		action = new DSPChangeRegisterTableAction( this, viewer, REMOVE_REG,  DSPChangeRegisterTableAction.CMD_REMOVE_REGISTERS );
 		setAction( REMOVE_REG, action );
-				
+
 		action = new DSPChangeRegisterTableAction( this, viewer, REMOVE_TABLE,  DSPChangeRegisterTableAction.CMD_REMOVE_TABLE );
 		setAction( REMOVE_TABLE, action );
 
 		action = new DSPChangeRegisterTableAction( this, viewer, REMOVE_ALL,  DSPChangeRegisterTableAction.CMD_REMOVE_ALL_TABLE );
 		setAction( REMOVE_ALL, action );
-		
+
 		action = new ChangeViewBaseAction( this, viewer,  ValueViewUtils.BINARY );
 		setAction( ValueViewUtils.FORMAT_STR_BIN, action );
 
@@ -110,36 +120,36 @@ public class MMRView extends AbstractDebugView
 
 		//action = new ChangeViewBaseAction( this, viewer,  ValueViewUtils.FLOATING );
 		//setAction( ValueViewUtils.FORMAT_STR_FLOAT, action );
-		
+
 		action = new ChangeViewBaseAction( this, viewer,  ValueViewUtils.HEXA );
 		setAction( ValueViewUtils.FORMAT_STR_HEX, action );
 		action.setChecked(true);
-		
-		
+
+
 		action = new RegistersDumpAction( this, viewer , DUMP);
 		setAction( DUMP, action );
 
 	}
 
 
-	private void hookContextMenu(Viewer viewer) 
+	private void hookContextMenu(Viewer viewer)
 	{
 	 	MenuManager menuMgr = new MenuManager("#PopupMenu");
 	  	menuMgr.setRemoveAllWhenShown(true);
-	  	menuMgr.addMenuListener(new IMenuListener() 
+	  	menuMgr.addMenuListener(new IMenuListener()
 	  		{
-		   		public void menuAboutToShow(IMenuManager manager) 
+		   		public void menuAboutToShow(IMenuManager manager)
 		   		{
 		    		fillContextMenu(manager);
 		   		}
 		  	});
-		  	
+
 		  menu = menuMgr.createContextMenu(viewer.getControl());
 		  viewer.getControl().setMenu(menu);
 		  getSite().registerContextMenu(menuMgr, viewer);
 	 }
 
-	
+
 	/*
 	 *  (non-Javadoc)
 	 * @see org.eclipse.debug.ui.AbstractDebugView#fillContextMenu(org.eclipse.jface.action.IMenuManager)
@@ -148,7 +158,7 @@ public class MMRView extends AbstractDebugView
 	{
 
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-			
+
 		menu.add( new Separator( IDSPDebugUIConstants.EMPTY_REGISTERS_GROUP ) );
 		menu.add( new Separator( IDSPDebugUIConstants.REGISTERS_GROUP ) );
 
@@ -156,15 +166,15 @@ public class MMRView extends AbstractDebugView
 		menu.add( new Separator( IDSPDebugUIConstants.REGISTERS_MODE_GROUP ) );
 
 		menu.appendToGroup( IDSPDebugUIConstants.REGISTERS_GROUP, getAction( ADD_REG ) );
-		menu.appendToGroup( IDSPDebugUIConstants.REGISTERS_GROUP, getAction( REMOVE_REG ) ); 
-		menu.appendToGroup( IDSPDebugUIConstants.REGISTERS_GROUP, getAction( REMOVE_TABLE ) ); 
+		menu.appendToGroup( IDSPDebugUIConstants.REGISTERS_GROUP, getAction( REMOVE_REG ) );
+		menu.appendToGroup( IDSPDebugUIConstants.REGISTERS_GROUP, getAction( REMOVE_TABLE ) );
 		menu.appendToGroup( IDSPDebugUIConstants.REGISTERS_GROUP, getAction( REMOVE_ALL ) );
 
 
 		menu.appendToGroup( IDSPDebugUIConstants.REGISTERS_MODE_GROUP, getAction( ValueViewUtils.FORMAT_STR_BIN ) );
-		menu.appendToGroup( IDSPDebugUIConstants.REGISTERS_MODE_GROUP, getAction( ValueViewUtils.FORMAT_STR_OCT ) ); 
+		menu.appendToGroup( IDSPDebugUIConstants.REGISTERS_MODE_GROUP, getAction( ValueViewUtils.FORMAT_STR_OCT ) );
 		menu.appendToGroup( IDSPDebugUIConstants.REGISTERS_MODE_GROUP, getAction( ValueViewUtils.FORMAT_STR_HEX ) );
-		menu.appendToGroup( IDSPDebugUIConstants.REGISTERS_MODE_GROUP, getAction( ValueViewUtils.FORMAT_STR_SIGNED_INT ) ); 
+		menu.appendToGroup( IDSPDebugUIConstants.REGISTERS_MODE_GROUP, getAction( ValueViewUtils.FORMAT_STR_SIGNED_INT ) );
 		menu.appendToGroup( IDSPDebugUIConstants.REGISTERS_MODE_GROUP, getAction( ValueViewUtils.FORMAT_STR_UNSIGNED_INT ) );
 		//menu.appendToGroup( IDSPDebugUIConstants.REGISTERS_MODE_GROUP, getAction( ValueViewUtils.FORMAT_STR_FLOAT ) );
 
@@ -183,19 +193,19 @@ public class MMRView extends AbstractDebugView
 			DSPChangeRegisterTableAction act = (DSPChangeRegisterTableAction)getAction( REMOVE_REG );
 			act.setTableName(focusedTable);
 			act.setEnabled(true);
-	
+
 			act = (DSPChangeRegisterTableAction)getAction( REMOVE_TABLE );
 			act.setTableName(focusedTable);
 			act.setEnabled(true);
 		}
-		
+
 		getAction( ValueViewUtils.FORMAT_STR_BIN ).setEnabled(true);
 		getAction( ValueViewUtils.FORMAT_STR_OCT ).setEnabled(true);
 		getAction( ValueViewUtils.FORMAT_STR_UNSIGNED_INT ).setEnabled(true);
 		getAction( ValueViewUtils.FORMAT_STR_SIGNED_INT ).setEnabled(true);
 		//getAction( ValueViewUtils.FORMAT_STR_FLOAT ).setEnabled(true);
 		getAction( ValueViewUtils.FORMAT_STR_HEX ).setEnabled(true);
-		
+
 		int mode = page.getViewMode();
 		getAction(ValueViewUtils.FORMAT_STR_BIN).setChecked(mode == ValueViewUtils.BINARY);
 		getAction(ValueViewUtils.FORMAT_STR_OCT).setChecked(mode == ValueViewUtils.OCTAL);
@@ -211,7 +221,7 @@ public class MMRView extends AbstractDebugView
 	}
 
 
-	
+
 	protected MMRViewerPage getVisiableSheet()
 	{
 		return page;
@@ -221,7 +231,7 @@ public class MMRView extends AbstractDebugView
 	{
 		return processorType;
 	}
-	
+
 	/**
 	 * Register/Unregister the viewer to the its relevant events
 	 * @param register	true for registration
@@ -236,34 +246,34 @@ public class MMRView extends AbstractDebugView
 		{
 			DebugPlugin.getDefault().removeDebugEventListener(this);
 		}
-		
+
 	}
-	
+
 
 	/**
 	 * @see org.eclipse.debug.core.IDebugEventSetListener#handleDebugEvents(DebugEvent[])
 	 */
 	final public void handleDebugEvents(DebugEvent[] events)
 	{
-		for (int i = 0; i < events.length; i++) 
+		for (int i = 0; i < events.length; i++)
 		{
-			if (events[i].getSource() instanceof IDebugTarget) 
+			if (events[i].getSource() instanceof IDebugTarget)
 				doHandleDebugEvent(events[i]);
 		}
 	}
 
 	private synchronized void doHandleDebugEvent(DebugEvent debugEvent)
 	{
-		switch (debugEvent.getKind()) 
+		switch (debugEvent.getKind())
 		{
 			case DebugEvent.CREATE:
 				if (debugEvent.getSource() instanceof IDebugTarget)
 					handleTargetCreationg((IDebugTarget)debugEvent.getSource());
-					
+
 				break;
 		}
 	}
-	
+
 	private void handleTargetCreationg(final IDebugTarget target)
 	{
 		viewer.getControl().getDisplay().asyncExec(new Runnable()
@@ -273,7 +283,7 @@ public class MMRView extends AbstractDebugView
 				page.setDeviceInfo(processorType);
 			}
 		});
-		
+
 	}
 
 	private void InitializeRegisterMappers()
@@ -290,24 +300,24 @@ public class MMRView extends AbstractDebugView
 		{
 			DebugPlugin.logDebugMessage("Could not get the MMR plugin location");
 		}
-		RegistersMappersManager.getInstance().loadMappers(location);		
+		RegistersMappersManager.getInstance().loadMappers(location);
 	}
 
 	protected String getHelpContextId()
 	{
 		return new String("");
 	}
-	
+
 
 	public void changeViewBase(int newBase) {
 		page.setViewMode(newBase);
 		page.statusChanged();
-		
+
 	}
 
 	public void mouseDoubleClick(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public void mouseDown(MouseEvent e)
@@ -318,17 +328,17 @@ public class MMRView extends AbstractDebugView
 			if( e.button != 1)
 				menu.setVisible(true);
 		}
-	
+
 	}
 
 	public void mouseUp(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public void doubleClick(DoubleClickEvent event) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 }

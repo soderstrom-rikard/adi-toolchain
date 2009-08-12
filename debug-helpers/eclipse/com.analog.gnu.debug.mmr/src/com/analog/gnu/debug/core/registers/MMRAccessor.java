@@ -1,4 +1,14 @@
-package com.adi.debug.core.registers;
+/*******************************************************************************
+ *  Copyright (c) 2009 Analog Devices, Inc.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *     Analog Devices, Inc. - Initial implementation
+ *******************************************************************************/
+package com.analog.gnu.debug.core.registers;
 
 import java.math.BigInteger;
 
@@ -14,13 +24,13 @@ import org.eclipse.debug.core.model.MemoryByte;
 import org.eclipse.debug.internal.ui.views.memory.MemoryViewUtil;
 import org.eclipse.debug.ui.DebugUITools;
 
-import com.adi.debug.IDSPDebugGeneralConstants;
+import com.analog.gnu.debug.IDSPDebugGeneralConstants;
 
 public class MMRAccessor implements IRegisterAccessor
 {
 	static final int LongSIZE = 64;
 	static final int ByteSIZE = 8;
-	static final int BYTES_PER_LONG = LongSIZE / ByteSIZE; 
+	static final int BYTES_PER_LONG = LongSIZE / ByteSIZE;
 	static final char ByteMask = 0x00ff;
 	String name;
 	String readAddr;
@@ -32,12 +42,12 @@ public class MMRAccessor implements IRegisterAccessor
 	int locationsPerRegister;
 	int bytesPerRegister;
 	BigInteger mask;
-	
+
 	//	if read and write addresses are the same, the blocks are the same
 	IMemoryBlockExtension readMemBlock;
 	IMemoryBlockExtension writeMemBlock;
-	IMemoryBlock[] memArray;	
-	
+	IMemoryBlock[] memArray;
+
 	public MMRAccessor()
 	{
 	}
@@ -59,10 +69,10 @@ public class MMRAccessor implements IRegisterAccessor
 		Init(regDef);
 		Refresh();
 	}
-	
+
 	public void Refresh()
 	{
-		//DebugPlugin plugin = DebugPlugin.getDefault();				
+		//DebugPlugin plugin = DebugPlugin.getDefault();
 		//IMemoryBlockManager memBlockManager = plugin.getMemoryBlockManager();
 		Object context = DebugUITools.getDebugContext();
 		IMemoryBlockRetrieval retrieval = MemoryViewUtil.getMemoryBlockRetrieval(context);
@@ -73,7 +83,7 @@ public class MMRAccessor implements IRegisterAccessor
 			{
 				// get extended memory block with the expression entered
 				readMemBlock = memRetrieval.getExtendedMemoryBlock(readAddr, context);
-				
+
 				if(readAddr.compareToIgnoreCase(writeAddr) == 0)
 				{
 					writeMemBlock = readMemBlock;
@@ -96,9 +106,9 @@ public class MMRAccessor implements IRegisterAccessor
 				else
 				{
 					locationsPerRegister = 1;
-					System.err.println("MEMORY SIZE is 0 for " + name);	
+					System.err.println("MEMORY SIZE is 0 for " + name);
 				}
-				
+
 			}
 			catch(DebugException e)
 			{
@@ -107,7 +117,7 @@ public class MMRAccessor implements IRegisterAccessor
 		}
 
 	}
-	
+
 	public boolean CanModify()
 	{
 		return true;
@@ -124,7 +134,7 @@ public class MMRAccessor implements IRegisterAccessor
 			if(readMemBlock == null)
 				return IDSPDebugGeneralConstants.REGSTATUS_NOT_IN_PLATFORM;
 		}
-		
+
 		try
 		{
 			bytes = readMemBlock.getBytesFromAddress(readAddress, numItems);
@@ -133,7 +143,7 @@ public class MMRAccessor implements IRegisterAccessor
 		{
 			System.err.println("Could not read memory for " + name + "@0x" + readAddress.toString(16) + " (" + numItems + " blocks)");
 		}
-			
+
 		if(bytes == null)
 			return IDSPDebugGeneralConstants.REGSTATUS_NOT_IN_PLATFORM;
 
@@ -163,7 +173,7 @@ public class MMRAccessor implements IRegisterAccessor
 			if(writeMemBlock == null)
 				return IDSPDebugGeneralConstants.REGSTATUS_NOT_IN_PLATFORM;
 		}
-		
+
 		byte bytes[] = new byte[bytesPerRegister];
 		int k = 0;
 		// TODO Fix applying mask.
@@ -185,10 +195,10 @@ public class MMRAccessor implements IRegisterAccessor
 		}
 		catch(DebugException e)
 		{
-			System.err.println("Could not write memory for " + name + "@0x" + writeAddress.toString(16));			
+			System.err.println("Could not write memory for " + name + "@0x" + writeAddress.toString(16));
 		}
 
 		return IDSPDebugGeneralConstants.REGSTATUS_OK;
 	}
-	
+
 }

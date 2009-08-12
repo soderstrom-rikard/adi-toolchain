@@ -1,10 +1,14 @@
-/*
- * Created on Nov 30, 2004
+/*******************************************************************************
+ *  Copyright (c) 2009 Analog Devices, Inc.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
  *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
-package com.adi.debug.ui.views.mmr;
+ *  Contributors:
+ *     Analog Devices, Inc. - Initial implementation
+ *******************************************************************************/
+package com.analog.gnu.debug.ui.views.mmr;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -20,8 +24,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import com.adi.debug.ui.views.TitledEditDialog;
-import com.adi.debug.ui.views.ValueViewUtils;
+import com.analog.gnu.debug.ui.views.TitledEditDialog;
+import com.analog.gnu.debug.ui.views.ValueViewUtils;
 
 
 /**
@@ -33,7 +37,7 @@ import com.adi.debug.ui.views.ValueViewUtils;
 public class DumpDialog extends TitledEditDialog
 {
 	private static String lastPath = "";
-	 
+
 	Text fileText;
 	Combo formatCombo;
 	String filePath;
@@ -42,27 +46,27 @@ public class DumpDialog extends TitledEditDialog
 	/**
 	 * @param parentShell
 	 */
-	public DumpDialog(Shell parentShell, int defaultFormat) 
+	public DumpDialog(Shell parentShell, int defaultFormat)
 	{
 		super(parentShell, "Select dump parameters");
 		format = defaultFormat;
 	}
-	
+
 	/* (non-Javadoc)
 	 * Method declared in Window.
 	 */
-	protected void configureShell(Shell shell) 
+	protected void configureShell(Shell shell)
 	{
 		super.configureShell(shell);
 		shell.setText("Dump Registers");
 	}
-	
+
 	public boolean close()
 	{
-		
+
 		// Before closing and disposing of the gui elements
 		// retreive their data
-		
+
 		if (getReturnCode() == OK)
 		{
 			filePath = lastPath = fileText.getText();
@@ -71,28 +75,28 @@ public class DumpDialog extends TitledEditDialog
 				Integer formatObj = (Integer)formatCombo.getData(formatCombo.getText());
 				if (formatObj == null)
 					formatObj = new Integer(ValueViewUtils.HEXA);
-					
+
 				format = formatObj.intValue();
 			}
 		}
-						
-		return super.close();	
+
+		return super.close();
 	}
-	
+
 	public String getFilePath()
 	{
 		return filePath;
 	}
-	
+
 	public int getBaseFormat()
 	{
 		return format;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see com.adi.dsp.project.ui.TitledEditDialog#createPageContainer(org.eclipse.swt.widgets.Composite)
 	 */
-	protected Composite createPageContainer(Composite parent) 
+	protected Composite createPageContainer(Composite parent)
 	{
 		final Composite composite = new Composite( parent, SWT.NONE );
 
@@ -102,13 +106,13 @@ public class DumpDialog extends TitledEditDialog
 		gridLayout.marginHeight = 5;
 		gridLayout.makeColumnsEqualWidth = false;
 		composite.setLayout(gridLayout);
-		
+
 		// GUI components
 		Label label;
 		GridData gridData;
 		Control separator;
 		Button button;
-		
+
 		// Create file locating gui
 		label = new Label(composite, SWT.NONE);
 		label.setText("File name: ");
@@ -128,29 +132,29 @@ public class DumpDialog extends TitledEditDialog
 		button.setLayoutData(gridData);
 		button.addListener(SWT.Selection, new Listener()
 		{
-			
-			public void handleEvent(Event event) 
+
+			public void handleEvent(Event event)
 			{
 				FileDialog dialog = new FileDialog(getShell(), SWT.NULL);
 				dialog.setFilterPath(fileText.getText());
 				dialog.setText("Choose a file");
 				String result = dialog.open();
-		
+
 				if (result != null)
 					fileText.setText(result);
 			}
 		});
-		
-		
+
+
 		// Create format parameters
 		label = new Label(composite, SWT.NONE);
 		label.setText("Format: ");
-		
+
 		formatCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 2;
 		formatCombo.setLayoutData(gridData);
-		
+
 		String[] keys = new String[]
 		{
 			ValueViewUtils.FORMAT_STR_HEX,
@@ -159,7 +163,7 @@ public class DumpDialog extends TitledEditDialog
 			ValueViewUtils.FORMAT_STR_SIGNED_INT,
 			ValueViewUtils.FORMAT_STR_UNSIGNED_INT
 		};
-		
+
 		int[] bases = new int[]
 		{
 			ValueViewUtils.HEXA,
@@ -168,26 +172,26 @@ public class DumpDialog extends TitledEditDialog
 			ValueViewUtils.SIGNED_INT,
 			ValueViewUtils.UNSIGNED_INT,
 		};
-		
+
 		for (int ind=0; ind < keys.length; ind++)
 		{
 			formatCombo.add(keys[ind]);
 			formatCombo.setData(keys[ind], new Integer(bases[ind]));
-			
+
 			if (bases[ind] == format)
 				formatCombo.select(ind);
 		}
-		
+
 		if (formatCombo.getSelectionIndex() < 0)
 			formatCombo.select(0);
-			
+
 		label = new Label(composite, SWT.NONE);
 		label.setText("");
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 3;
 		label.setLayoutData(gridData);
-			
-		
+
+
 		return composite;
 	}
 }

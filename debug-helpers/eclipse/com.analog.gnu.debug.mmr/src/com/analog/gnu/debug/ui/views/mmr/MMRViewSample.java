@@ -1,4 +1,14 @@
-package com.adi.debug.ui.views.mmr;
+/*******************************************************************************
+ *  Copyright (c) 2009 Analog Devices, Inc.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *     Analog Devices, Inc. - Initial implementation
+ *******************************************************************************/
+package com.analog.gnu.debug.ui.views.mmr;
 
 import java.math.BigInteger;
 
@@ -65,17 +75,17 @@ public class MMRViewSample extends ViewPart {
 	private Action action1;
 	private Action action2;
 	private Action doubleClickAction;
-	
+
 	/*
 	 * The content provider class is responsible for
 	 * providing objects to the view. It can wrap
 	 * existing objects in adapters or simply return
 	 * objects as-is. These objects may be sensitive
 	 * to the current input of the view, or ignore
-	 * it and always show the same content 
+	 * it and always show the same content
 	 * (like Task List, for example).
 	 */
-	 
+
 	class ViewContentProvider implements IStructuredContentProvider {
 		public void inputChanged(Viewer v, Object oldInput, Object newInput) {
 		}
@@ -153,7 +163,7 @@ public class MMRViewSample extends ViewPart {
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
-	
+
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(action1);
 		manager.add(action2);
@@ -162,7 +172,7 @@ public class MMRViewSample extends ViewPart {
 	private void makeActions() {
 		action1 = new Action() {
 			public void run() {
-				DebugPlugin plugin= DebugPlugin.getDefault();				
+				DebugPlugin plugin= DebugPlugin.getDefault();
 				IDebugTarget[] targets = plugin.getLaunchManager().getDebugTargets();
 				IMemoryBlockManager memBlockManager = plugin.getMemoryBlockManager();
 				Object context = DebugUITools.getDebugContext();
@@ -171,21 +181,21 @@ public class MMRViewSample extends ViewPart {
 				if(retrieval instanceof IMemoryBlockRetrievalExtension)
 				{
 					IMemoryBlockRetrievalExtension memRetrieval = (IMemoryBlockRetrievalExtension)retrieval;
-					
+
 					try
 					{
 						// get extended memory block with the expression entered
 						IMemoryBlockExtension memBlock = memRetrieval.getExtendedMemoryBlock("0x22cc94", context);
-						
+
 						// add block to memory block manager
 						if (memBlock != null)
 						{
-							
+
 							IMemoryBlock[] memArray = new IMemoryBlock[]{memBlock};
-							
+
 							//MemoryViewUtil.getMemoryBlockManager().addMemoryBlocks(memArray);
 							memBlockManager.addMemoryBlocks(memArray);
-	
+
 						}
 					}
 					catch(DebugException e)
@@ -193,7 +203,7 @@ public class MMRViewSample extends ViewPart {
 						System.err.println("BAD MEMBLOCK EXPRESSION");
 					}
 				}
-				
+
 				IMemoryBlock[] memoryBlocks = memBlockManager.getMemoryBlocks(retrieval);
 				String text = null;
 
@@ -204,17 +214,17 @@ public class MMRViewSample extends ViewPart {
 					{
 						try {
 							//text = ((IMemoryBlockExtension)memoryBlocks[i]).getExpression();
-							
+
 							if (text == null)
-								text = DebugUIMessages.AddMemoryRenderingDialog_Unknown; 
-							
+								text = DebugUIMessages.AddMemoryRenderingDialog_Unknown;
+
 							BigInteger baseAddress = ((IMemoryBlockExtension)memoryBlocks[i]).getBigBaseAddress();
 							if (baseAddress != null)
 							{
-								
+
 								text += "0x"; //$NON-NLS-1$
 								text += baseAddress.toString(16);
-							}	
+							}
 							MemoryByte[] bytes = ((IMemoryBlockExtension)memoryBlocks[i]).getBytesFromAddress(baseAddress, (long)1);
 							if(bytes != null)
 							{
@@ -235,9 +245,9 @@ public class MMRViewSample extends ViewPart {
 								}
 								// try to modify the value:
 								((IMemoryBlockExtension)memoryBlocks[i]).setValue(BigInteger.ZERO, bbb);
-		
+
 							}
-					
+
 						} catch (DebugException e)
 						{
 							text = "MMR test - Exception in getting/setting memory";
@@ -248,7 +258,7 @@ public class MMRViewSample extends ViewPart {
 						long address = memoryBlocks[i].getStartAddress();
 						text = Long.toHexString(address);
 					}
-					
+
 				}
 
 				showMessage(text);
@@ -258,7 +268,7 @@ public class MMRViewSample extends ViewPart {
 		action1.setToolTipText("Action 1 tooltip");
 		action1.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
 			getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
-		
+
 		action2 = new Action() {
 			public void run() {
 				showMessage("Action 2 executed");

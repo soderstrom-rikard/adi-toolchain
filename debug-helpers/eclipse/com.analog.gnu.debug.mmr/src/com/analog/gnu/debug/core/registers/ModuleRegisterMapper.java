@@ -1,10 +1,14 @@
-/*
- * Created on Aug 17, 2004
+/*******************************************************************************
+ *  Copyright (c) 2009 Analog Devices, Inc.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
  *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
-package com.adi.debug.core.registers;
+ *  Contributors:
+ *     Analog Devices, Inc. - Initial implementation
+ *******************************************************************************/
+package com.analog.gnu.debug.core.registers;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -20,10 +24,10 @@ import java.util.Vector;
  * To change the template for this generated type comment go to
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-public class ModuleRegisterMapper implements IModuleRegistersMapper 
+public class ModuleRegisterMapper implements IModuleRegistersMapper
 {
 	String moduleType;
-	
+
 	// groups:
 	HashSet groups;
 	HashMap registersMap;
@@ -31,11 +35,11 @@ public class ModuleRegisterMapper implements IModuleRegistersMapper
 
 	// registers
 	HashMap allRegsByName;
-	
+
 	public ModuleRegisterMapper(String moduleType)
 	{
 		this.moduleType = moduleType;
-		registersMap 	= new HashMap(); 
+		registersMap 	= new HashMap();
 		dataMap			= new HashMap();
 		groups 			= new HashSet();
 		allRegsByName = new HashMap();
@@ -53,7 +57,7 @@ public class ModuleRegisterMapper implements IModuleRegistersMapper
 	/* (non-Javadoc)
 	 * @see com.adi.dsp.debug.core.registers.IModuleRegistersMapper#getRegisterGroups()
 	 */
-	public String[] getRegisterGroups() 
+	public String[] getRegisterGroups()
 	{
 		return (String[])groups.toArray(new String[groups.size()]);
 	}
@@ -61,36 +65,36 @@ public class ModuleRegisterMapper implements IModuleRegistersMapper
 	/* (non-Javadoc)
 	 * @see com.adi.dsp.debug.core.registers.IModuleRegistersMapper#getRegisters(java.lang.String)
 	 */
-	public String[] getRegisters(String groupName) 
+	public String[] getRegisters(String groupName)
 	{
-		if (!registersMap.containsKey(groupName)) 
+		if (!registersMap.containsKey(groupName))
 			return new String[0];
-		
+
 		return (String[])registersMap.get(groupName);
 	}
 
 	/* (non-Javadoc)
 	 * @see com.adi.dsp.debug.core.registers.IModuleRegistersMapper#getGroupData(java.lang.String)
 	 */
-	public RegistersGroupData getGroupData(String registerName) 
+	public RegistersGroupData getGroupData(String registerName)
 	{
-		if (!allRegsByName.containsKey(registerName)) 
+		if (!allRegsByName.containsKey(registerName))
 			return null;
-		
+
 		RegisterDefinition reg = (RegisterDefinition)allRegsByName.get(registerName);
 		RegistersGroupData regGroupData = new RegistersGroupData();
 		regGroupData.totalSize = reg.bitSize;
 		regGroupData.addTotalField = true;
 		int numChildren = reg.children.size();
-		
+
 		Collections.sort(reg.children, new Comparator()
 		{
 			public int compare(Object o1, Object o2)
 			{
-				return ((RegisterDefinition)o2).bitPos - ((RegisterDefinition)o1).bitPos; 
+				return ((RegisterDefinition)o2).bitPos - ((RegisterDefinition)o1).bitPos;
 			}
 		});
-		
+
 		regGroupData.names = new String[numChildren];
 		regGroupData.indicies = new int[numChildren];
 		regGroupData.sizes = new int[numChildren];
@@ -113,23 +117,23 @@ public class ModuleRegisterMapper implements IModuleRegistersMapper
 		return (RegisterDefinition)allRegsByName.get(regName);
 	}
 
-	
+
 	protected boolean addGroup(String groupName/*, RegistersGroupData groupData*/)
 	{
 		if (dataMap.containsKey(groupName))
 			return false;
-			
+
 		// add group data
 		groups.add(groupName);
 		///dataMap.put(groupName, groupData);
 		return true;
 	}
-	
+
 	protected boolean addRegisters(String groupName, String[] registers)
 	{
 		if (!groups.contains(groupName))
 			return false;
-		
+
 		registersMap.put(groupName, registers);
 		return true;
 	}

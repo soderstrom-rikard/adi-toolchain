@@ -1,16 +1,16 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2003 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials 
- * are made available under the terms of the Common Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/cpl-v10.html
- * 
- * Contributors:
- *     IBM Corporation - initial API and implementation
+ *  Copyright (c) 2009 Analog Devices, Inc.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *     Analog Devices, Inc. - Initial implementation
  *******************************************************************************/
 //package org.eclipse.swt.layout;
 
-package com.adi.debug.ui.views.mmr;
+package com.analog.gnu.debug.ui.views.mmr;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -22,22 +22,22 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
 /**
- * Instances of this class determine the size and position of the 
- * children of a <code>Composite</code> by placing them either in 
- * horizontal rows or vertical columns within the parent <code>Composite</code>. 
+ * Instances of this class determine the size and position of the
+ * children of a <code>Composite</code> by placing them either in
+ * horizontal rows or vertical columns within the parent <code>Composite</code>.
  * <p>
  * <code>RowLayout</code> aligns all controls in one row if the
  * <code>type</code> is set to horizontal, and one column if it is
- * set to vertical. It has the ability to wrap, and provides configurable 
- * margins and spacing. <code>RowLayout</code> has a number of configuration 
- * fields. In addition, the height and width of each control in a 
+ * set to vertical. It has the ability to wrap, and provides configurable
+ * margins and spacing. <code>RowLayout</code> has a number of configuration
+ * fields. In addition, the height and width of each control in a
  * <code>RowLayout</code> can be specified by setting a <code>RowData</code>
  * object into the control using <code>setLayoutData ()</code>.
  * </p>
  * <p>
- * The following example code creates a <code>RowLayout</code>, sets all 
- * of its fields to non-default values, and then sets it into a 
- * <code>Shell</code>. 
+ * The following example code creates a <code>RowLayout</code>, sets all
+ * of its fields to non-default values, and then sets it into a
+ * <code>Shell</code>.
  * <pre>
  * 		MyRowLayout rowLayout = new MyRowLayout();
  * 		rowLayout.wrap = false;
@@ -56,12 +56,12 @@ import org.eclipse.swt.widgets.TableColumn;
  * 		shell.setLayout(new RowLayout());
  * </pre>
  * </p>
- * 
+ *
  * @see RowData
  */
-public final class MultiTableLayout extends Layout 
+public final class MultiTableLayout extends Layout
 {
-	
+
 	/**
 	 * wrap specifies whether a control will be wrapped to the next
 	 * row if there is insufficient space on the current row.
@@ -71,9 +71,9 @@ public final class MultiTableLayout extends Layout
 	public boolean wrap = true;
 	/**
 	 * pack specifies whether all controls in the layout take
-	 * their preferred size.  If pack is false, all controls will 
-	 * have the same size which is the size required to accommodate the 
-	 * largest preferred height and the largest preferred width of all 
+	 * their preferred size.  If pack is false, all controls will
+	 * have the same size which is the size required to accommodate the
+	 * largest preferred height and the largest preferred width of all
 	 * the controls in the layout.
 	 *
 	 * The default value is true.
@@ -122,21 +122,21 @@ public final class MultiTableLayout extends Layout
 	 */
 	public int marginBottom = 3;
 
-	
+
 	/**
 	 * Constructs a new instance of this class.
 	 */
 	public MultiTableLayout () {
 	}
 
-	
-	protected Point computeSize (Composite composite, int wHint, int hHint, boolean flushCache) 
+
+	protected Point computeSize (Composite composite, int wHint, int hHint, boolean flushCache)
 	{
 		//System.out.println("ComputeSize()");
 		int width = composite.getParent().getClientArea().width;
 		return layoutHorizontal (composite, false, wrap, width, flushCache);
 	}
-	
+
 	Point getSize (Control control, boolean flushCache) {
 		int wHint = SWT.DEFAULT, hHint = SWT.DEFAULT;
 		RowData data = (RowData) control.getLayoutData ();
@@ -144,15 +144,15 @@ public final class MultiTableLayout extends Layout
 			wHint = data.width;
 			hHint = data.height;
 		}
-		
-		
+
+
 		if (control instanceof Table)
 		{
 			Table table = (Table)control;
 			table.setVisible(false);
 			TableColumn[] children = table.getColumns();
 			Control item;
-			
+
 			int totalWidth = 0;
 			for (int ind=0; ind < children.length; ind++)
 			{
@@ -160,25 +160,25 @@ public final class MultiTableLayout extends Layout
 				table.getColumn(ind).pack();
 				totalWidth += table.getColumn(ind).getWidth();
 			}
-			
+
 			totalWidth-=16;
 			table.setSize(table.computeSize(totalWidth, SWT.DEFAULT));
-			
+
 			table.setVisible(true);
-			return table.getSize();	
+			return table.getSize();
 		}
 		else
 			return control.computeSize (wHint, hHint, flushCache);
 	}
-	
-	protected void layout (Composite composite, boolean flushCache) 
+
+	protected void layout (Composite composite, boolean flushCache)
 	{
 		//System.out.println("layout()");
 		int width = composite.getParent().getClientArea().width;
 		layoutHorizontal (composite, true, wrap, width, flushCache);
 	}
-	
-	Point layoutHorizontal (Composite composite, boolean move, boolean wrap, int width, boolean flushCache) 
+
+	Point layoutHorizontal (Composite composite, boolean move, boolean wrap, int width, boolean flushCache)
 	{
 		composite.setRedraw(false);
 		Control [] children = composite.getChildren ();
@@ -240,7 +240,7 @@ public final class MultiTableLayout extends Layout
 				child.setBounds (bounds [i]);
 			}
 		}
-						
+
 		composite.setRedraw(true);
 		return new Point (maxX, y + maxHeight + marginBottom);
 	}

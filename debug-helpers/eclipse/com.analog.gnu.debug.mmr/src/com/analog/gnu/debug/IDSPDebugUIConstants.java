@@ -1,4 +1,14 @@
-package com.adi.debug;
+/*******************************************************************************
+ *  Copyright (c) 2009 Analog Devices, Inc.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *     Analog Devices, Inc. - Initial implementation
+ *******************************************************************************/
+package com.analog.gnu.debug;
 
 /**
  * @author odcohen
@@ -17,18 +27,18 @@ public interface IDSPDebugUIConstants
 
 	// Display Strings
 	public static final String LAUNCH_MODE_FILE = "<Launching Executable>";
-	
+
 	// Action groups
 	public static final String ACTION_GROUP_RUN = "com.adi.dsp.debug.ui.actions.run";
-	
-	
+
+
 	// Menus
 	public static final String EMPTY_PIPE_GROUP = "emptyPipeGroup"; //$NON-NLS-1$
 
 	public static final String PIPE_GROUP = "pipeGroup"; //$NON-NLS-1$
 
 	public static final String PIPE_PROPERTIES_GROUP = "pipePropertiesGroup"; //$NON-NLS-1$
-	
+
 	public static final String EMPTY_MEMORY_GROUP = "emptyMemoryGroup"; //$NON-NLS-1$
 
 	public static final String MEMORY_GROUP = "memoryGroup"; //$NON-NLS-1$

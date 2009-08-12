@@ -1,4 +1,14 @@
-package com.adi.debug.ui.views.mmr;
+/*******************************************************************************
+ *  Copyright (c) 2009 Analog Devices, Inc.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *     Analog Devices, Inc. - Initial implementation
+ *******************************************************************************/
+package com.analog.gnu.debug.ui.views.mmr;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -29,16 +39,16 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import com.adi.debug.core.registers.IModuleRegistersMapper;
-import com.adi.debug.core.registers.IRegisterAccessor;
-import com.adi.debug.core.registers.MMRAccessor;
-import com.adi.debug.core.registers.RegisterDefinition;
-import com.adi.debug.core.registers.RegistersGroupData;
-import com.adi.debug.core.registers.RegistersMappersManager;
-import com.adi.debug.ui.views.DSPViewerPage;
-import com.adi.debug.ui.views.IColorConstants;
-import com.adi.debug.ui.views.ValueViewUtils;
-import com.adi.debug.utils.Sorter;
+import com.analog.gnu.debug.core.registers.IModuleRegistersMapper;
+import com.analog.gnu.debug.core.registers.IRegisterAccessor;
+import com.analog.gnu.debug.core.registers.MMRAccessor;
+import com.analog.gnu.debug.core.registers.RegisterDefinition;
+import com.analog.gnu.debug.core.registers.RegistersGroupData;
+import com.analog.gnu.debug.core.registers.RegistersMappersManager;
+import com.analog.gnu.debug.ui.views.DSPViewerPage;
+import com.analog.gnu.debug.ui.views.IColorConstants;
+import com.analog.gnu.debug.ui.views.ValueViewUtils;
+import com.analog.gnu.debug.utils.Sorter;
 
 /**
  * @author odcohen
@@ -51,19 +61,19 @@ import com.adi.debug.utils.Sorter;
 public class MMRViewerPage extends DSPViewerPage
 	implements KeyListener
 {
-	private static final String ATT_REGISTER_VIEW_PREFIX = "com.adi.debug.ui.views.mmr.";
-	
+	private static final String ATT_REGISTER_VIEW_PREFIX = "com.analog.gnu.debug.ui.views.mmr.";
+
 	// for saving persistance data
 	private static final String ATT_PART_NUMBER = "processor";
 	private static final String PART_NUMBER_UNKNOWN = "UNKNOWN";
 	private static final String ATT_TABLES = "tables";
 	private static final String ATT_VIEW_BASE = "viewBase";
 	private static final String ATT_NEW_TABLE_SEPERATOR = "###";
-	
+
 	// for saving table properties
 	private static final String TABLE_NAME 	= "TableName";
 	private static final String TABLE_DESC 	= "TableDescription";
-	
+
 	String 		processorName;
 	HashMap		regAccessorMap;
 	LinkedHashMap tablesMap;
@@ -71,9 +81,9 @@ public class MMRViewerPage extends DSPViewerPage
 	int baseMode;
 	Composite innerComposite;
 	ScrolledComposite scrollComposite;
-	
-	MMRView	view;	
-	
+
+	MMRView	view;
+
 	// Focus handling
 	Listener 	focusHandler;
 	Table		focusedTable;
@@ -94,15 +104,15 @@ public class MMRViewerPage extends DSPViewerPage
 		initGraphics();
 		loadState();
 	}
-	
+
 	private void initGraphics()
 	{
 		tablesMap = new LinkedHashMap();
-		
+
 		setLayout(new FillLayout());
 		scrollComposite = new ScrolledComposite(this, SWT.V_SCROLL | SWT.H_SCROLL);
 		scrollComposite.setBackground(IColorConstants.BACKGROUND_COLOR);
-		
+
 		innerComposite = new Composite(scrollComposite, SWT.NONE);
 		innerComposite.setBackground(IColorConstants.BACKGROUND_COLOR);
 		scrollComposite.setContent(innerComposite);
@@ -134,7 +144,7 @@ public class MMRViewerPage extends DSPViewerPage
 				Iterator iter = tablesMap.values().iterator();
 				Table table;
 				boolean noTableSelected = true;
-		
+
 				focusedTable = null;
 				while (iter.hasNext())
 				{
@@ -148,7 +158,7 @@ public class MMRViewerPage extends DSPViewerPage
 					else
 						table.deselectAll();
 				}
-		
+
 				if (noTableSelected)
 					innerComposite.forceFocus();
 			}
@@ -180,65 +190,65 @@ public class MMRViewerPage extends DSPViewerPage
 		while (tablesMap.containsKey(tableName))
 		{
 			TableViewer viewer = (TableViewer)tablesMap.get(tableName);
-			RegistersGroupData tableDesc =  (RegistersGroupData)viewer.getTable().getData(TABLE_DESC); 
+			RegistersGroupData tableDesc =  (RegistersGroupData)viewer.getTable().getData(TABLE_DESC);
 			if(tableDesc.equals(desc))
 				// OK. matching descriptions.
 				return tableName;
 			else
 				tableName = tableSuggestedName + '(' + (i++) + ')';
 		}
-		
+
 		//if (columnNames.length != sizes.length ) return;
-		
+
 		Table table = new Table(innerComposite, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		table.setBackground(IColorConstants.BACKGROUND_COLOR);
 		table.setForeground(IColorConstants.DATA_COLOR);
 		table.addListener(SWT.MouseDown, focusHandler);
-		
+
 		final TableViewer tableViewer = new TableViewer(table);
 		tableViewer.setContentProvider(new DSPRegTableContentProvider());
 		tableViewer.setLabelProvider(new DSPRegTableLableProvider());
 		tableViewer.setInput(new Vector());
-				
-		tableViewer.setCellModifier(new ICellModifier() 
+
+		tableViewer.setCellModifier(new ICellModifier()
 		{
-			public boolean canModify (Object element, String property) 
+			public boolean canModify (Object element, String property)
 			{
 /**
 	TODO Check for read-only registers
-		
+
 				if (getDebugPlatform() == null)
 					return false;
-				
+
 				DSPRegTableRow row = (DSPRegTableRow) element;
-				
+
 				return  getDebugPlatform().canSetRegister(getDeviceInfo().getIndex(), row.registerName) &&
 						row.propertyToColumn(property) > 0;
 */
 				return true;
 			}
-			
-			public Object getValue (Object element, String property) 
+
+			public Object getValue (Object element, String property)
 			{
 				DSPRegTableRow row = (DSPRegTableRow) element;
 				return row.getColumnText(row.propertyToColumn(property));
 			}
-			
-			public void modify (Object element, String property, Object value) 
+
+			public void modify (Object element, String property, Object value)
 			{
 				Item item = (Item)element;
 				DSPRegTableRow row = (DSPRegTableRow) item.getData();
 				int index = row.propertyToDataColumn(property);
-				
+
 				if (!row.setPartialValue(index, (String)value))
 					return;
 				row.modifyItem();
-				
+
 				updateTables(false);
 			}
-		}); 
+		});
 
 		table.addMouseListener(view);
 		table.addKeyListener(this);
@@ -250,13 +260,13 @@ public class MMRViewerPage extends DSPViewerPage
 		String[] columnNames = desc.names;
 		CellEditor[] editors = new CellEditor[columnNames.length + extraColumnsNumber];
 		TableColumn column;
-		
-		// Adding registers name column	
+
+		// Adding registers name column
 		column = new TableColumn(table,SWT.CENTER);
 		column.setText(tableName);
 		column.setResizable(false);
 		editors[0] = new TextCellEditor(table);
-		
+
 		// If needed add the total value column
 		if (extraColumnsNumber == 2)
 		{
@@ -265,8 +275,8 @@ public class MMRViewerPage extends DSPViewerPage
 			column.setResizable(false);
 			editors[1] = new TextCellEditor(table);
 		}
-		
-		
+
+
 		for (int ind=0; ind < columnNames.length; ind++)
 		{
 			column = new TableColumn(table,SWT.CENTER);
@@ -275,71 +285,71 @@ public class MMRViewerPage extends DSPViewerPage
 			editors[ind+extraColumnsNumber] = new TextCellEditor(table);
 		}
 		tableViewer.setCellEditors(editors);
-		
-		// Set column properties			
+
+		// Set column properties
 		tableViewer.setColumnProperties(DSPRegTableRow.getProperties(columnNames.length+extraColumnsNumber));
-		
+
 		// Add to map
 		tablesMap.put(tableName, tableViewer);
 		updateTables(false);
 		return tableName;
 	}
-	
+
 	protected void addRow(String tableName, String itemName, IRegisterAccessor accessor)
 	{
 		if (!tablesMap.containsKey(tableName)) return;
-		
+
 		TableViewer viewer = (TableViewer)tablesMap.get(tableName);
 		Table table = viewer.getTable();
-		
-		
+
+
 		RegistersGroupData desc = (RegistersGroupData)table.getData(TABLE_DESC);
 		DSPRegTableRow row = new DSPRegTableRow(itemName,desc, accessor);
-		
+
 		Vector vec = (Vector)viewer.getInput();
-		
+
 		// check to avoid duplicates
 		if (vec.contains(row))
 			return;
-		
+
 		row.setBase(getViewMode());
 		row.updateItem();
 		vec.add(row);
-		
+
 		// sort the rows
 		Object[] elements = vec.toArray();
 		Sorter.sort(elements, new RowComparator());
-		
+
 		vec.clear();
 		for (int ind=0; ind < elements.length; ind++)
 			vec.addElement(elements[ind]);
-		
-		viewer.refresh(false);		
-	}
-	
 
-	
+		viewer.refresh(false);
+	}
+
+
+
 	public void removeSelectedRows(String tableName)
 	{
 		if (!tablesMap.containsKey(tableName)) return;
-		
+
 		TableViewer viewer = (TableViewer)tablesMap.get(tableName);
-		
+
 		// we remove indecies backward (faster + indecies stays valid)
 		Vector vec = (Vector)viewer.getInput();
 		int previousCount = vec.size();
 		int[] indiceis = viewer.getTable().getSelectionIndices();
 		for (int ind=indiceis.length-1; ind >=0; ind--)
 			vec.removeElementAt(indiceis[ind]);
-			
+
 		int currentCount = vec.size();
-		
+
 		if (currentCount == 0)
 			removeTable(tableName);
 		else
 			viewer.refresh(true);
 	}
-	
+
 	/**
 	 * Returns a vector of all the register rows from all the table
 	 * currently shown by the view
@@ -351,20 +361,20 @@ public class MMRViewerPage extends DSPViewerPage
 		String tableName;
 		Vector allRows = new Vector();
 		Vector tableRows;
-		
+
 		// go over all tables
 		while (iter.hasNext())
 		{
 			tableName = (String)iter.next();
 			tableRows = (Vector)((TableViewer)tablesMap.get(tableName)).getInput();
-			
+
 			// add all rows
 			allRows.addAll(tableRows);
 		}
-		
+
 		return allRows;
 	}
-	
+
 	/**
 	 * Sets the view mode of the page (binary/octal/decimal etc.)
 	 * @param base	The new base for the view mode
@@ -375,32 +385,32 @@ public class MMRViewerPage extends DSPViewerPage
 		Iterator iter = tablesMap.values().iterator();
 		TableViewer viewer;
 		Vector vec;
-		
+
 		// Go over all tables
 		while (iter.hasNext())
 		{
 			viewer = (TableViewer)iter.next();
-			
+
 			vec = (Vector) viewer.getInput();
-			
-			// Set base in all rows in table	
+
+			// Set base in all rows in table
 			for (int ind=0; ind < vec.size(); ind++)
 				((DSPRegTableRow)vec.elementAt(ind)).setBase(base);
-			
+
 			viewer.refresh(true);
 		}
 	}
-	
+
 	protected int getViewMode()
 	{
 		return baseMode;
 	}
-	
+
 	private void updateUI()
 	{
 		if (innerComposite.isDisposed() || scrollComposite.isDisposed())
 			return;
-		
+
 		//System.out.println("updateUI() called");
 		innerComposite.setVisible(false);
 		innerComposite.setSize(innerComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -408,43 +418,43 @@ public class MMRViewerPage extends DSPViewerPage
 		innerComposite.setVisible(true);
 		//System.out.println("updateUI() finished");
 	}
-	
+
 	/**
-	 * Loads the state from the last launch configuration 
+	 * Loads the state from the last launch configuration
 	 * (create the relevant tables & their registers)
 	 */
 	public void loadState()
 	{
 		removeAllTables();
-		
+
 		ILaunchConfiguration conf = getLaunchConfiguration();
 		if (conf == null)
 			return;
 
 		List list;
-		try 
+		try
 		{
 			String baseKey = ATT_REGISTER_VIEW_PREFIX;
 			processorName = conf.getAttribute(baseKey + ATT_PART_NUMBER, PART_NUMBER_UNKNOWN);
 			list = conf.getAttribute(baseKey+ATT_TABLES, new LinkedList());
 			setViewMode(conf.getAttribute(baseKey+ATT_VIEW_BASE, ValueViewUtils.HEXA));
-		} catch (CoreException e) 
+		} catch (CoreException e)
 		{
 			view.showMessage(e.getMessage());
 			return;
 		}
-		
+
 		// can not restore anything, processot has not been selected yet:
 		if(processorName == PART_NUMBER_UNKNOWN)
 			return;
-		
+
 		IModuleRegistersMapper registersMap = RegistersMappersManager.getInstance().getRegisterMapper(processorName);
 
 		Iterator iter = list.iterator();
 		String tableName;
 		String registerName;
 		RegistersGroupData data;
-		
+
 		// Go over the list of tables names & their registers
 		while (iter.hasNext())
 		{
@@ -452,86 +462,86 @@ public class MMRViewerPage extends DSPViewerPage
 			tableName = (String)iter.next();
 			if (!iter.hasNext())
 				return;
-			
+
 			// Add each register to table
 			registerName = (String)iter.next();
 			data = registersMap.getGroupData(registerName);
 			addTable(tableName,data);
-			
+
 			// Create the accessor for it:
 			while (!registerName.equalsIgnoreCase(ATT_NEW_TABLE_SEPERATOR))
 			{
 				addRow(tableName, registerName, CreateRegisterAccessor(registerName, registersMap));
 				registerName = (String)iter.next();
 			}
-		}	
+		}
 	}
-	
+
 	protected void statusChanged()
 	{
 		saveState();
 		updateUI();
 	}
-	
+
 	/**
-	 * Saves the view state to the launch configuration 
+	 * Saves the view state to the launch configuration
 	 * (the viewed tables & their registers)
 	 */
 	private void saveState()
 	{
 		ILaunchConfiguration conf = getLaunchConfiguration();
 		if (conf == null) return;
-		
+
 		// Get the configuration copy
 		ILaunchConfigurationWorkingCopy copy;
-		try 
+		try
 		{
 			copy = conf.getWorkingCopy();
-		} catch (CoreException e) 
+		} catch (CoreException e)
 		{
 			view.showMessage(e.getMessage());
 			return;
 		}
-		
+
 		Table table;
 		String tableName;
 		Vector rows;
 		DSPRegTableRow row;
-		
+
 		// Create the view state in the linked list
-		List list = new LinkedList();		
+		List list = new LinkedList();
 		Iterator iter = tablesMap.keySet().iterator();
-				
+
 		while (iter.hasNext())
 		{
 			tableName = (String)iter.next();
 			list.add(tableName);
 			rows = (Vector)((TableViewer)tablesMap.get(tableName)).getInput();
-			
+
 			for (int ind=0; ind < rows.size(); ind++)
 			{
 				row = (DSPRegTableRow)rows.elementAt(ind);
 				list.add(row.getColumnText(0));
 			}
-			
+
 			list.add(ATT_NEW_TABLE_SEPERATOR);
 		}
-		
+
 		// sets the new state & save it
 		String baseKey = ATT_REGISTER_VIEW_PREFIX;
 		copy.setAttribute(baseKey+ATT_PART_NUMBER, processorName);
 		copy.setAttribute(baseKey+ATT_VIEW_BASE, baseMode);
-		copy.setAttribute(baseKey+ATT_TABLES, list);	
-		
-		try 
+		copy.setAttribute(baseKey+ATT_TABLES, list);
+
+		try
 		{
 			copy.doSave();
-		} catch (CoreException e) 
+		} catch (CoreException e)
 		{
 			view.showMessage(e.getMessage());
 		}
 	}
-	
+
 	public String getFocusedTableName()
 	{
 		Iterator iter = tablesMap.values().iterator();
@@ -539,11 +549,11 @@ public class MMRViewerPage extends DSPViewerPage
 		while (iter.hasNext())
 		{
 			item = ((TableViewer)iter.next()).getTable();
-			
+
 			if (item.isFocusControl())
 				return (String)item.getData(TABLE_NAME);;
 		}
-		
+
 		return null;
 	}
 
@@ -561,13 +571,13 @@ public class MMRViewerPage extends DSPViewerPage
 
 		updateUI();
 	}
-	
-	
+
+
 	protected void removeTable(String tableName)
 	{
 		removeTable(tableName, true);
 	}
-	
+
 	private void removeTable(String tableName, boolean updateUI)
 	{
 		if (!tablesMap.containsKey(tableName)) return;
@@ -575,14 +585,14 @@ public class MMRViewerPage extends DSPViewerPage
 		Table 	table = ((TableViewer)tablesMap.remove(tableName)).getTable();
 		table.removeListener(SWT.MouseDown, focusHandler);
 		table.dispose();
-		
+
 		if (focusedTable == table)
 			focusedTable = null;
-		
+
 		if (updateUI)
 			updateUI();
 	}
-	
+
 	private void updateTables(boolean init)
 	{
 		// Go over all tables
@@ -595,23 +605,23 @@ public class MMRViewerPage extends DSPViewerPage
 		{
 			viewer = (TableViewer)iter.next();
 			vec = (Vector) viewer.getInput();
-			
-			// Go over all rows in table	
+
+			// Go over all rows in table
 			for (int ind=0; ind < vec.size(); ind++)
 			{
 				tableItem = viewer.getTable().getItem(ind);
-				
+
 				// if there was a change we color it red
 				if (((DSPRegTableRow)vec.elementAt(ind)).updateItem() && !init)
 					tableItem.setForeground(IColorConstants.CHANGED_COLOR);
 				else
 					tableItem.setForeground(IColorConstants.DATA_COLOR);
 			}
-			
+
 			viewer.setInput(vec);
-		}	
+		}
 	}
-	
+
 	static protected IRegisterAccessor CreateRegisterAccessor(String regName, IModuleRegistersMapper mapper)
 	{
 		IRegisterAccessor access = null;
@@ -627,13 +637,13 @@ public class MMRViewerPage extends DSPViewerPage
 		 * TODO will need to deal with other registers - non MMRs later
 		 */
 		return access;
-	
+
 	}
 	/*
 	/**
 	 * Update a single given row in a table, and returns whether, the
 	 * update caused a change in value.
-	 * 
+	 *
 	 * @param row	The given table row
 	 * @return	true if the update caused a change in the value
 	 */
@@ -646,19 +656,19 @@ public class MMRViewerPage extends DSPViewerPage
 		IDebugPlatform platform = getDebugPlatform();
 		if (platform == null)
 			return false;
-			
+
 		long[]	value = new long[row.getNumberOf32bits()];
 		long 	partialValue;
 		int res = platform.fetchRegByNameAPI(getDeviceInfo().getIndex(), row.getColumnText(0), value, value.length);
-		
+
 		boolean change = false;
 		if ( res == IDebugPlatform.REGSTATUS_OK )
 			change = row.setTotalValue(value);
-		
+
 		// whatever the status is, we just copy it to the row so the viewer will deal with it.
 		row.setRegisterValueStatus( res );
 		return change;
-		
+
 		return true;
 	}
 */
@@ -675,7 +685,7 @@ public class MMRViewerPage extends DSPViewerPage
 	public void keyReleased(KeyEvent e)
 	{
 		if (e.character != SWT.DEL) return;
-			
+
 		if (e.getSource() instanceof Table)
 		{
 			removeSelectedRows((String)((Table) e.getSource()).getData(TABLE_NAME));
@@ -686,10 +696,10 @@ public class MMRViewerPage extends DSPViewerPage
 	/* (non-Javadoc)
 	 * @see com.adi.dsp.debug.ui.views.DSPViewerPage#doReload()
 	 */
-	protected void doReload() 
+	protected void doReload()
 	{
 		loadState();
-		
+
 		Display.getDefault().syncExec(new Runnable()
 		{
 			public void run()
@@ -703,49 +713,49 @@ public class MMRViewerPage extends DSPViewerPage
 	/* (non-Javadoc)
 	 * @see com.adi.dsp.debug.ui.views.DSPViewerPage#doSuspend()
 	 */
-	protected void doSuspend() 
+	protected void doSuspend()
 	{
-		updateTables(false);	
+		updateTables(false);
 	}
 
 	/* (non-Javadoc)
 	 * @see com.adi.dsp.debug.ui.views.DSPViewerPage#doTerminate()
 	 */
-	protected void doTerminate() 
-	{	
+	protected void doTerminate()
+	{
 	}
 
 	/* (non-Javadoc)
 	 * @see com.adi.dsp.debug.ui.views.DSPViewerPage#doResume()
 	 */
-	protected void doResume() 
+	protected void doResume()
 	{
 	}
 
 	/* (non-Javadoc)
 	 * @see com.adi.dsp.debug.ui.views.DSPViewerPage#doChanged()
 	 */
-	protected void doRestart() 
+	protected void doRestart()
 	{
 		updateTables(false);
 	}
-	
+
 	private class RowComparator implements Comparator
 	{
-		public int compare(Object o1, Object o2) 
+		public int compare(Object o1, Object o2)
 		{
 			// split registers to name & number so we can sort
 			// them properly (format <reg>XX or <reg>YY:XX)
 			String[] val1 = splitRegisterName(o1.toString());
 			String[] val2 = splitRegisterName(o2.toString());
-				
-			if (	val1.length == 2 && 
+
+			if (	val1.length == 2 &&
 					val2.length == 2 &&
 					val1[0].equalsIgnoreCase(val2[0]))
 			{
 				return Integer.valueOf(val1[1]).compareTo(Integer.valueOf(val2[1]));
 			}
-				
+
 			return o1.toString().compareTo(o2.toString());
 		}
 		/**
@@ -763,16 +773,16 @@ public class MMRViewerPage extends DSPViewerPage
 				if (!Character.isDigit(c))
 					break;
 			}
-		
+
 			String[] result;
-		
+
 			// split the number if found
 			if (ind < reg.length()-1)
 			{
 				result = new String[2];
 				result[0] = reg.substring(0, ind+1);
 				result[1] = reg.substring(ind+1);
-			
+
 				// remove the editional number if exists (<reg>YY:XX format)
 				if (result[0].endsWith(":"))
 				{
@@ -783,7 +793,7 @@ public class MMRViewerPage extends DSPViewerPage
 						if (!Character.isDigit(c))
 							break;
 					}
-				
+
 					result[0] = result[0].substring(0, ind+1);
 				}
 			}
@@ -791,8 +801,8 @@ public class MMRViewerPage extends DSPViewerPage
 			{
 				result = new String[]{reg};
 			}
-		
-		
+
+
 			return result;
 		}
 	}

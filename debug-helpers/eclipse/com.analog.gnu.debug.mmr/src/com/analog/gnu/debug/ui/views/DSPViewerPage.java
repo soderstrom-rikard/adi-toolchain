@@ -1,10 +1,14 @@
-/*
- * Created on 08/09/2003
+/*******************************************************************************
+ *  Copyright (c) 2009 Analog Devices, Inc.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
  *
- * To change the template for this generated file go to
- * Window>Preferences>Java>Code Generation>Code and Comments
- */
-package com.adi.debug.ui.views;
+ *  Contributors:
+ *     Analog Devices, Inc. - Initial implementation
+ *******************************************************************************/
+package com.analog.gnu.debug.ui.views;
 
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugPlugin;
@@ -24,22 +28,22 @@ import org.eclipse.swt.widgets.Display;
  * To change the template for this generated type comment go to
  * Window>Preferences>Java>Code Generation>Code and Comments
  */
-public abstract class DSPViewerPage extends Composite 
+public abstract class DSPViewerPage extends Composite
 	implements IDebugEventSetListener, DisposeListener
 {
 	private	String 	processorType;
 	private int	suspended;
-	
+
 	/**
 	 * @param parent
 	 * @param style
 	 */
-	public DSPViewerPage(Composite parent, int style) 
+	public DSPViewerPage(Composite parent, int style)
 	{
 		super(parent, style);
 		getParent().addDisposeListener(this);
 		DebugPlugin.getDefault().addDebugEventListener(this);
-		
+
 		// we make sure the target is not running / stepping. if
 		// so we need to disable the view
 		synchronized (this)
@@ -48,12 +52,12 @@ public abstract class DSPViewerPage extends Composite
 			boolean enable = true;
 			for(int i = 0; i < targets.length; i++)
 				enable = enable && (targets[i].isSuspended()||targets[i].isTerminated() );
-			setEnabled(enable);				
+			setEnabled(enable);
 		}
 		suspended = 0;
 	}
-	
-	
+
+
 	/**
 	 * Sets the device info this page presents
 	 * @return
@@ -63,7 +67,7 @@ public abstract class DSPViewerPage extends Composite
 		// TODO: this.processorType = procType;
 		reload();
 	}
-	
+
 	/**
 	 * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(DisposeEvent)
 	 */
@@ -71,8 +75,8 @@ public abstract class DSPViewerPage extends Composite
 	{
 		dispose();
 	}
-	
-	
+
+
 	/**
 	 * @see org.eclipse.debug.core.IDebugEventSetListener#handleDebugEvents(DebugEvent[])
 	 */
@@ -80,10 +84,10 @@ public abstract class DSPViewerPage extends Composite
 	{
 		if (isDisposed())
 			return;
-			
-		for (int i = 0; i < events.length; i++) 
+
+		for (int i = 0; i < events.length; i++)
 		{
-			if (events[i].getSource() != null) 
+			if (events[i].getSource() != null)
 			{
 				doHandleDebugEvent(events[i]);
 			}
@@ -96,7 +100,7 @@ public abstract class DSPViewerPage extends Composite
 	 */
 	private final synchronized void doHandleDebugEvent(DebugEvent debugEvent)
 	{
-		switch (debugEvent.getKind()) 
+		switch (debugEvent.getKind())
 		{
 			case DebugEvent.SUSPEND:
 				if(suspended == 0)
@@ -113,7 +117,7 @@ public abstract class DSPViewerPage extends Composite
 					suspended++;
 				}
 				break;
-							
+
 			case DebugEvent.RESUME:
 				if(suspended > 0)
 					suspended--;
@@ -130,7 +134,7 @@ public abstract class DSPViewerPage extends Composite
 
 			case DebugEvent.CHANGE:
 				if (debugEvent.getSource() instanceof IDebugTarget)
-				{	
+				{
 					Display.getDefault().asyncExec(new Runnable()
 					{
 						public void run()
@@ -143,10 +147,10 @@ public abstract class DSPViewerPage extends Composite
 				}
 				suspended = 0;
 				break;
-				
+
 			case DebugEvent.TERMINATE:
 				DebugPlugin.getDefault().removeDebugEventListener(this);
-				
+
 				Display.getDefault().asyncExec(new Runnable()
 				{
 					public void run()
@@ -158,16 +162,16 @@ public abstract class DSPViewerPage extends Composite
 				break;
 		}
 	}
-	
+
 	protected final void reload()
 	{
 		DebugPlugin.getDefault().addDebugEventListener(this);
-			
+
 		doReload();
 		setEnabled(true);
 	}
-	
-	
+
+
 	public ILaunchConfiguration getLaunchConfiguration()
 	{
 		ILaunch launches[] = DebugPlugin.getDefault().getLaunchManager().getLaunches();
@@ -176,35 +180,35 @@ public abstract class DSPViewerPage extends Composite
 		else
 			return null;
 	}
-	
+
 	/**
 	 * Creates a string which is unique to this given viewer page.
-	 * This string should be used for saving persistence data to the 
+	 * This string should be used for saving persistence data to the
 	 * launch configuration
-	 *  
-	 * @param viewPrefix	The view prefix	
+	 *
+	 * @param viewPrefix	The view prefix
 	 * @return		Unique string
 	 */
 	protected String getLaunchUniqueName(String viewPrefix)
 	{
 		return processorType+"#"+viewPrefix;
 	}
-	
 
-	
+
+
 	public void dispose()
-	{			
+	{
 		DebugPlugin.getDefault().removeDebugEventListener(this);
 
 		if (isDisposed())
 			return;
-					
+
 		if (!getParent().isDisposed())
 			getParent().removeDisposeListener(this);
-			
+
 		super.dispose();
 	}
-	
+
 	protected abstract void doReload();
 	protected abstract void doSuspend();
 	protected abstract void doTerminate();

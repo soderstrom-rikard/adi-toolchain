@@ -1,4 +1,14 @@
-package com.adi.debug.ui.views;
+/*******************************************************************************
+ *  Copyright (c) 2009 Analog Devices, Inc.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *     Analog Devices, Inc. - Initial implementation
+ *******************************************************************************/
+package com.analog.gnu.debug.ui.views;
 
 import java.math.BigInteger;
 
@@ -12,7 +22,7 @@ import java.math.BigInteger;
  * Window>Preferences>Java>Code Generation.
  */
 public class ValueViewUtils
-{	
+{
 	// Data Display Formats
 	public static final String FORMAT_STR_HEX 				= "Hexadecimal";
 	public static final String FORMAT_STR_UNSIGNED_INT 		= "Unsigned Integer";
@@ -21,19 +31,19 @@ public class ValueViewUtils
 	public static final String FORMAT_STR_OCT 				= "Octal";
 	public static final String FORMAT_STR_BIN 				= "Binary";
 	public static final String FORMAT_STR_DISASM 			= "Disassembly";
-	
-	
+
+
 	//	base constants
 	public static final int DEFAULT_DATA_SIZE = -1;
-	
+
 	static final double LAN10 = 2.3025850929940456840179914546844D;
-	
+
 	private static final int SIGNED 	= 1 << 17;
 	private static final int INT 		= 1 << 18;
 	private static final int FLOAT 		= 1 << 19;
-	
+
 	private static final int BASE_MASK = 0xFF;
-	
+
 	public static final int DISASSEMBLY 		= 0;
 	public static final int BINARY 				= 2;
 	public static final int OCTAL 				= 8;
@@ -42,12 +52,12 @@ public class ValueViewUtils
 	public static final int SIGNED_INT 			= DECIMAL | INT | SIGNED;
 	//public static final int FLOATING 			= DECIMAL | FLOAT;
 	public static final int HEXA 				= 16;
-	
-	
-	
+
+
+
 	/**
 	 * Get string representation of the given number according to the given parameters
-	 * 
+	 *
 	 * @param number			The given number
 	 * @param base				The base of the number
 	 * @param dataSize		The data size of the number (in bits)
@@ -57,7 +67,7 @@ public class ValueViewUtils
 	{
 		return getFormatedString(number, base, dataSize, true);
 	}
-	
+
 	/**
 	 * Get string representation of the given number according to the given parameters
 	 * @param number			The given number
@@ -67,24 +77,24 @@ public class ValueViewUtils
 	 * @return the string
 	 */
 	public static String getFormatedString(int number, int base, int dataSize, boolean withBrackets)
-	{	
+	{
 		return getFormatedString(BigInteger.valueOf( ((long) number) & 0xFFFFFFFFL), base, dataSize, withBrackets);
 	}
 
 	/**
 	 * Get string representation of the given number according to the given parameters
-	 * @param number	The number	
+	 * @param number	The number
 	 * @param base		The base of the number
 	 * @return	the string
 	 */
 	public static String getFormatedString(long number, int base)
-	{	
+	{
 		return getFormatedString(BigInteger.valueOf(number), base, DEFAULT_DATA_SIZE, false);
 	}
-	
+
 	/**
 	 * Get string representation of the given number according to the given parameters
-	 * 
+	 *
 	 * @param number			The given number
 	 * @param base				The base of the number
 	 * @param dataSize		The data size of the number (in bits)
@@ -94,7 +104,7 @@ public class ValueViewUtils
 	{
 		return getFormatedString(number, base, dataSize, true);
 	}
-	
+
 	/**
 	 * Get string representation of the given number according to the given parameters
 	 * @param number			The given number
@@ -104,10 +114,10 @@ public class ValueViewUtils
 	 * @return the string
 	 */
 	public static String getFormatedString(long number, int base, int dataSize,  boolean withBrackets)
-	{	
+	{
 		return getFormatedString(BigInteger.valueOf(number), base, dataSize, withBrackets);
 	}
-	
+
 	/**
 	 * Get string representation of the given number according to the given parameters
 	 * @param number			The number
@@ -117,9 +127,9 @@ public class ValueViewUtils
 	 * @return	the string
 	 */
 	public static String getFormatedString(BigInteger number, int base, int dataSize, boolean withBrackets)
-	{		
+	{
 		String strNumber = null;
-		
+
 		if ((base & FLOAT) > 0)
 		{
 			//if (dataSize <= 32)
@@ -146,10 +156,10 @@ public class ValueViewUtils
 					for (int ind=0; ind < dataSize; ind++)
 						if (!number.testBit(ind))
 							val = val.flipBit(ind);
-					
+
 					number = val;
 				}
-				
+
 				strNumber = number.toString();
 			}
 		}
@@ -157,7 +167,7 @@ public class ValueViewUtils
 		{
 			strNumber = number.toString(base & BASE_MASK);
 		}
-			
+
 		return formatDisplay(strNumber, dataSize, base, withBrackets );
 	}
 
@@ -171,7 +181,7 @@ public class ValueViewUtils
 	{
 		return getValue(number, DEFAULT_DATA_SIZE, base);
 	}
-	
+
 	/**
 	 * Returns the value of the string number according to the given base
 	 * @param number			The string number
@@ -194,21 +204,21 @@ public class ValueViewUtils
 				//num = num.or(orgNum.and(BigInteger.valueOf(SIGN_40BIT_MASK).shiftLeft(SIGN_40BIT_OFFSET)).shiftRight(SIGN_40BIT_OFFSET));
 				//return num;
 			//}
-		}		
+		}
 		else
 		{
 			return new BigInteger(number, base & BASE_MASK);
 		}
 	}
-	
-	
+
+
 	private static String formatDisplay(String original, int dataSize, int base, boolean withBrackets)
 	{
 		StringBuffer buffer = new StringBuffer(original.toUpperCase());
-		
-		
+
+
 		int viewSize = translateBits2Digits(dataSize, base);
-		
+
 		// Format the length if needed
 		if (buffer.length() < viewSize)
 		{
@@ -220,17 +230,17 @@ public class ValueViewUtils
 		{
 			buffer.delete(0, buffer.length() - viewSize);
 		}
-		
+
 		// Add brackets if needed
 		if (withBrackets)
 		{
 			buffer.insert(0, '[');
 			buffer.append(']');
 		}
-		
+
 		return buffer.toString();
 	}
-	
+
 	/**
 	 * Translate the number of bits to the number of required digit
 	 * according to the given base
@@ -242,11 +252,11 @@ public class ValueViewUtils
 	{
 		if (bits == DEFAULT_DATA_SIZE)
 			return -1;
-			
-		// if its a signed or float number we do not "pad" it with zeros 
+
+		// if its a signed or float number we do not "pad" it with zeros
 		if ((base & SIGNED) > 0 || (base & FLOAT) > 0)
 			return -1;
-			
+
 		base = base & BASE_MASK;
 		int viewSize = 0;
 		switch (base)
@@ -255,27 +265,27 @@ public class ValueViewUtils
 				viewSize = bits / 4;
 				viewSize+= (bits % 4) > 0 ? 1:0;
 				break;
-			case OCTAL: 
+			case OCTAL:
 				viewSize = bits / 3;
 				viewSize+= (bits % 3) > 0 ? 1:0;
 				break;
 			case BINARY:
 				viewSize = bits;
-				break;		
-			// decimal 
+				break;
+			// decimal
 			default:
 				BigInteger value = BigInteger.valueOf(1).shiftLeft(bits);
 				viewSize = (int)Math.round(Math.ceil(Math.log(value.doubleValue())/LAN10));
 		}
 
-		
+
 		return viewSize;
 	}
-	
+
 	/**
 	 * Returns the string which matches the given base
 	 * for one byte of data, with the widest text.
-	 * 
+	 *
 	 * @param base
 	 * @return
 	 */
@@ -292,16 +302,16 @@ public class ValueViewUtils
 				break;
 			case ValueViewUtils.BINARY:
 			    byteStr = "00000000";
-				break;	
+				break;
 			default:
 			    byteStr = "999";
 		}
-		
+
 		return byteStr;
 	}
 
-	
-	
+
+
 	/**
 	 * Convert the given base to its relevant string (to present to the user)
 	 * @param base		The base
@@ -329,13 +339,13 @@ public class ValueViewUtils
 			//	break;
 			case ValueViewUtils.HEXA:
 				type = FORMAT_STR_HEX;
-				break;	
+				break;
 		}
-		
+
 		return type;
 	}
-	
-	
+
+
 	/**
 	 * Converting the string presented to the user to its relevant base
 	 * @param format	The string format
@@ -344,7 +354,7 @@ public class ValueViewUtils
 	public static int formatToBase(String format)
 	{
 		int base = -1;
-		
+
 		if (format.equalsIgnoreCase(FORMAT_STR_BIN))
 			base = ValueViewUtils.BINARY;
 		else if (format.equalsIgnoreCase(FORMAT_STR_OCT))
@@ -357,7 +367,7 @@ public class ValueViewUtils
 		//	base = ValueViewUtils.FLOATING;
 		else if (format.equalsIgnoreCase(FORMAT_STR_HEX))
 			base = ValueViewUtils.HEXA;
-		
+
 		return base;
 	}
 }

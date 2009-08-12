@@ -1,10 +1,14 @@
-/*
- * Created on Sep 13, 2004
+/*******************************************************************************
+ *  Copyright (c) 2009 Analog Devices, Inc.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
  *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
-package com.adi.debug.ui.views;
+ *  Contributors:
+ *     Analog Devices, Inc. - Initial implementation
+ *******************************************************************************/
+package com.analog.gnu.debug.ui.views;
 
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -37,19 +41,19 @@ public abstract class TitledEditDialog extends Dialog
 	private String fErrorMessage;
 	private Color fNormalMsgAreaBackground;
 	private Image fErrorMsgImage;
-	
+
 	// title part
 	Composite fTitleArea;
 	private Label fTitleImage;
 	private CLabel fMessageLabel;
-	
+
 	/**
 	 * Must declare our own images as the JFaceResource images will not be created unless
 	 * a property/preference dialog has been shown
 	 */
 	protected static final String PREF_DLG_TITLE_IMG = "preference_dialog_title_image";//$NON-NLS-1$
 	protected static final String PREF_DLG_IMG_TITLE_ERROR = "preference_dialog_title_error_image";//$NON-NLS-1$
-	static 
+	static
 	{
 	/**
 		TODO Images for TitleEditDialog
@@ -58,29 +62,29 @@ public abstract class TitledEditDialog extends Dialog
 		reg.put(PREF_DLG_IMG_TITLE_ERROR, ImageDescriptor.createFromFile(Dialog.class, "images/message_error.gif"));//$NON-NLS-1$
 	*/
 	}
-	
+
 	// page part
 	Composite fPageContainer;
-	
 
-		
+
+
 	public TitledEditDialog(Shell parentShell, String defaultMessage)
 	{
 		super(parentShell);
 		fDefaultMessage = defaultMessage;
 	}
-		
+
 	/*
 	 * @see Dialog#createDialogArea(Composite)
 	 */
-	protected Control createDialogArea(Composite parent) 
+	protected Control createDialogArea(Composite parent)
 	{
 		Font font = parent.getFont();
-		
+
 		Composite composite = (Composite)super.createDialogArea(parent);
 		((GridLayout) composite.getLayout()).numColumns = 1;
 		composite.setFont(font);
-		
+
 		// Build the title area and separator line
 		Composite titleComposite = new Composite(composite, SWT.NONE);
 		GridLayout layout = new GridLayout();
@@ -91,45 +95,45 @@ public abstract class TitledEditDialog extends Dialog
 		titleComposite.setLayout(layout);
 		titleComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		titleComposite.setFont(font);
-		
+
 		createTitleArea(titleComposite);
-	
+
 		Label titleBarSeparator = new Label(titleComposite, SWT.HORIZONTAL | SWT.SEPARATOR);
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		titleBarSeparator.setLayoutData(gd);
-		
-	
+
+
 		// Build the Page container
 		fPageContainer = createPageContainer(composite);
 		fPageContainer.setLayoutData(new GridData(GridData.FILL_BOTH));
-			
+
 		// Build the separator line
 		Label separator = new Label(composite, SWT.HORIZONTAL | SWT.SEPARATOR);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 2;
 		separator.setLayoutData(gd);
-	
+
 		applyDialogFont(composite);
-		
+
 		return composite;
 	}
-	
-	
+
+
 	/**
 	 * Creates the inner page container.
 	 */
 	protected abstract Composite createPageContainer(Composite parent);
-		
+
 	/**
 	 * Creates the dialog's title area.
 	 *
 	 * @param parent the SWT parent for the title area composite
 	 * @return the created title area composite
 	 */
-	private Composite createTitleArea(Composite parent) 
+	private Composite createTitleArea(Composite parent)
 	{
 		Font font = parent.getFont();
-		
+
 		// Create the title area which will contain
 		// a title, message, and image.
 		fTitleArea = new Composite(parent, SWT.NONE);
@@ -139,28 +143,28 @@ public abstract class TitledEditDialog extends Dialog
 		layout.verticalSpacing = 0;
 		layout.horizontalSpacing = 0;
 		layout.numColumns = 2;
-		
+
 		// Get the colors for the title area
 		Display display = parent.getDisplay();
 		Color bg = JFaceColors.getBannerBackground(display);
 		Color fg = JFaceColors.getBannerForeground(display);
-		
+
 		GridData layoutData = new GridData(GridData.FILL_BOTH);
 		fTitleArea.setLayout(layout);
 		fTitleArea.setLayoutData(layoutData);
 		fTitleArea.setFont(font);
 		fTitleArea.setBackground(bg);
-	
+
 		// Message label
 		fMessageLabel = new CLabel(fTitleArea, SWT.LEFT);
 		fMessageLabel.setBackground(bg);
 		fMessageLabel.setForeground(fg);
 		fMessageLabel.setText(" ");//$NON-NLS-1$
 		fMessageLabel.setFont(JFaceResources.getBannerFont());
-				
+
 		GridData gd = new GridData(GridData.FILL_BOTH);
 		fMessageLabel.setLayoutData(gd);
-	
+
 		// Title image
 		fTitleImage = new Label(fTitleArea, SWT.LEFT);
 		fTitleImage.setBackground(bg);
@@ -168,15 +172,15 @@ public abstract class TitledEditDialog extends Dialog
 		TODO Image
 		fTitleImage.setImage(ProjectUIPlugin.getDefault().getImageRegistry().get(PREF_DLG_TITLE_IMG));
 */
-		gd = new GridData(); 
+		gd = new GridData();
 		gd.horizontalAlignment = GridData.END;
 		fTitleImage.setLayoutData(gd);
-	
+
 		setMessage(fDefaultMessage);
 		return fTitleArea;
 	}
-	
-	
+
+
 	/**
 	 * Display the given error message. The currently displayed message
 	 * is saved and will be redisplayed when the error message is set
@@ -184,12 +188,12 @@ public abstract class TitledEditDialog extends Dialog
 	 *
 	 * @param errorMessage the errorMessage to display or <code>null</code>
 	 */
-	public void setErrorMessage(String errorMessage) 
+	public void setErrorMessage(String errorMessage)
 	{
 		fErrorMessage = errorMessage;
-		if (errorMessage == null) 
+		if (errorMessage == null)
 		{
-			if (fMessageLabel.getImage() != null) 
+			if (fMessageLabel.getImage() != null)
 			{
 				// we were previously showing an error
 				fMessageLabel.setBackground(fNormalMsgAreaBackground);
@@ -200,25 +204,25 @@ public abstract class TitledEditDialog extends Dialog
 				 */
 				fTitleArea.layout(true);
 			}
-			
+
 			// show the message
-			setMessage(fMessage);	
-		} 
-		else 
+			setMessage(fMessage);
+		}
+		else
 		{
 			fMessageLabel.setText(errorMessage);
-			if (fMessageLabel.getImage() == null) 
+			if (fMessageLabel.getImage() == null)
 			{
 				// we were not previously showing an error
-							
+
 				// lazy initialize the error background color and image
 				/** TODO Image
-				if (fErrorMsgImage == null) 
+				if (fErrorMsgImage == null)
 				{
 					fErrorMsgImage = ProjectUIPlugin.getDefault().getImageRegistry().get(PREF_DLG_IMG_TITLE_ERROR);
 				}
 				*/
-				// show the error	
+				// show the error
 				fNormalMsgAreaBackground = fMessageLabel.getBackground();
 				fMessageLabel.setBackground(JFaceColors.getErrorBackground(fMessageLabel.getDisplay()));
 				fMessageLabel.setImage(fErrorMsgImage);
@@ -226,7 +230,7 @@ public abstract class TitledEditDialog extends Dialog
 				fTitleArea.layout(true);
 			}
 		}
-		
+
 		updateMessage();
 		updateButtons();
 	}
@@ -234,19 +238,19 @@ public abstract class TitledEditDialog extends Dialog
 	 * Set the message text. If the message line currently displays an error,
 	 * the message is stored and will be shown after a call to clearErrorMessage
 	 */
-	public void setMessage(String newMessage) 
+	public void setMessage(String newMessage)
 	{
 		fMessage = newMessage;
 		if (fMessage == null)
 			fMessage = "";
-			
-		if (fErrorMessage == null) 
+
+		if (fErrorMessage == null)
 			// we are not showing an error
 			fMessageLabel.setText(fMessage);
-		
+
 		updateMessage();
 	}
-	
+
 
 	public void updateMessage()
 	{

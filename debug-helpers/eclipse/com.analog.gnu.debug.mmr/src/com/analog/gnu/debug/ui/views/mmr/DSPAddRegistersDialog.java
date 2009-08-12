@@ -1,4 +1,14 @@
-package com.adi.debug.ui.views.mmr;
+/*******************************************************************************
+ *  Copyright (c) 2009 Analog Devices, Inc.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *     Analog Devices, Inc. - Initial implementation
+ *******************************************************************************/
+package com.analog.gnu.debug.ui.views.mmr;
 
 import java.util.Vector;
 
@@ -23,8 +33,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
-import com.adi.debug.core.registers.IModuleRegistersMapper;
-import com.adi.debug.core.registers.RegistersMappersManager;
+import com.analog.gnu.debug.core.registers.IModuleRegistersMapper;
+import com.analog.gnu.debug.core.registers.RegistersMappersManager;
 
 /**
  * @author odcohen
@@ -34,7 +44,7 @@ import com.adi.debug.core.registers.RegistersMappersManager;
  * To enable and disable the creation of type comments go to
  * Window>Preferences>Java>Code Generation.
  */
-public class DSPAddRegistersDialog extends Dialog 
+public class DSPAddRegistersDialog extends Dialog
 	implements MouseListener, KeyListener, SelectionListener
 {
 	List 	list;
@@ -43,17 +53,17 @@ public class DSPAddRegistersDialog extends Dialog
 	Label	partMessageLabel, messageLabel, fromLabel, toViewLabel, searchLabel;
 	Text	searchText;
 	Combo	partNumberCombo;
-	
+
 	String[] partNumbers;
 	String selectedPart;
-	
+
 	IModuleRegistersMapper mapper;
 	String[] addedRegisters;
-	
+
 	String searchFor;
-	Vector treeItems; 
+	Vector treeItems;
 	int searchIndex;
-	
+
 	private static final String SELECT_YOUR_PART_MESSAGE = "Select your DSP:";
 	private static final String SELECT_FROM_MESSAGE = "All MMRs for ";
 	private static final String SELECTED_TO_VIEW_MESSAGE = "MMRs selected to View:";
@@ -75,23 +85,23 @@ public class DSPAddRegistersDialog extends Dialog
 		treeItems = new Vector();
 		searchIndex = -1;
 	}
-	
+
 	public boolean close()
 	{
 		addedRegisters = list.getItems();
-		return super.close();	
+		return super.close();
 	}
-	
+
 	protected String getProcessorName()
 	{
 		return selectedPart;
 	}
-	
+
 	protected String[][] getAddedRegisters()
 	{
 		if (addedRegisters == null)
 			return null;
-			
+
 		String[][] 	results = new String[addedRegisters.length][];
 		String[]	result;
 		int seperatorIndex;
@@ -102,19 +112,19 @@ public class DSPAddRegistersDialog extends Dialog
 			result[0] = addedRegisters[ind].substring(0, seperatorIndex);
 			result[1] = addedRegisters[ind].substring(seperatorIndex+2);
 		}
-		
+
 		return results;
 	}
-	
+
 	protected void addItem(String parentItemName, String[] itemNames)
 	{
 		TreeItem item = new TreeItem(tree, SWT.NONE);
 		item.setText(parentItemName);
 		//	Add the item into the items map:
 		treeItems.addElement(item);
-		
+
 		TreeItem[] subItems = new TreeItem[itemNames.length];
-		
+
 		for (int ind=0; ind < subItems.length; ind++)
 		{
 			subItems[ind] = new TreeItem(item, SWT.NONE);
@@ -122,21 +132,21 @@ public class DSPAddRegistersDialog extends Dialog
 			treeItems.addElement(subItems[ind]);
 		}
 	}
-	
+
 	/*
 	 * @see Dialog#createDialogArea(Composite)
 	 * TODO: make the heights here relative based on the widget size rather than hardcoded pixel count
 	 */
-	protected Control createDialogArea(Composite parent) 
+	protected Control createDialogArea(Composite parent)
 	{
 		final Composite composite = (Composite)super.createDialogArea(parent);
-		
+
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = 3;
 		gridLayout.marginWidth = 9;
 		gridLayout.marginHeight = 0;
 		composite.setLayout(gridLayout);
-		
+
 		// GUI components
 		GridData gridData;
 		Control separator1,separator2;
@@ -149,7 +159,7 @@ public class DSPAddRegistersDialog extends Dialog
 		gridData.heightHint = 20;
 		gridData.widthHint  = 200;
 		partMessageLabel.setLayoutData(gridData);
-		
+
 		// Part number selection combo box:
 		partNumberCombo = new Combo(composite, SWT.DROP_DOWN|SWT.READ_ONLY);
 		for(int i = 0; i < partNumbers.length; i++)
@@ -160,7 +170,7 @@ public class DSPAddRegistersDialog extends Dialog
 		gridData.heightHint = 20;
 		gridData.widthHint  = 200;
 		partNumberCombo.setLayoutData(gridData);
-		
+
 		//	Select from:
 		fromLabel = new Label(composite, SWT.NONE);
 		fromLabel.setText(SELECT_FROM_MESSAGE);
@@ -169,7 +179,7 @@ public class DSPAddRegistersDialog extends Dialog
 		gridData.heightHint = 20;
 		gridData.widthHint  = 200;
 		fromLabel.setLayoutData(gridData);
-		
+
 		// Registers tree
 		tree = new Tree(composite, SWT.BORDER | SWT.MULTI);
 		tree.addSelectionListener(this);
@@ -179,7 +189,7 @@ public class DSPAddRegistersDialog extends Dialog
 		gridData.heightHint	= 400;
 		gridData.horizontalSpan = 3;
 		tree.setLayoutData(gridData);
-	
+
 		// Search label:
 		searchLabel = new Label(composite,SWT.NONE);
 		searchLabel.setText("Search");
@@ -216,7 +226,7 @@ public class DSPAddRegistersDialog extends Dialog
 		gridData.heightHint = 20;
 		gridData.widthHint  = 200;
 		toViewLabel.setLayoutData(gridData);
-		
+
 		// Registers list (added)
 		list = new List(composite, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		list.addMouseListener(this);
@@ -225,7 +235,7 @@ public class DSPAddRegistersDialog extends Dialog
 		gridData.heightHint	= 100;
 		gridData.horizontalSpan = 3;
 		list.setLayoutData(gridData);
-		
+
 		removeBtn = new Button(composite, SWT.PUSH );
 		removeBtn.setText("Remove From View");
 		removeBtn.setEnabled(true);
@@ -234,14 +244,14 @@ public class DSPAddRegistersDialog extends Dialog
 		gridData.widthHint = removeBtn.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
 		gridData.horizontalSpan = 3;
 		removeBtn.setLayoutData(gridData);
-		
+
 		// seperator
 		separator2 = new Label(composite, SWT.BORDER);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 3;
 		gridData.heightHint = 1;
 		separator2.setLayoutData(gridData);
-		
+
 		messageLabel = new Label(composite, SWT.NONE);
 		messageLabel.setText(WELCOME_MESSAGE);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
@@ -249,9 +259,9 @@ public class DSPAddRegistersDialog extends Dialog
 		gridData.heightHint = 20;
 		gridData.widthHint  = 200;
 		messageLabel.setLayoutData(gridData);
-		
-		
-		
+
+
+
 		// find the default processorName in the combo box and set selection:
 		int selection = partNumberCombo.indexOf(selectedPart);
 		if(selection > -1)
@@ -259,25 +269,25 @@ public class DSPAddRegistersDialog extends Dialog
 			partNumberCombo.select(selection);
 			selectPartNumber(selectedPart);
 		}
-		
+
 		return composite;
 	}
-	
+
 	private void fillTree()
 	{
 		// get selected part number:
-		
+
 		String[] groups = mapper.getRegisterGroups();
-		
+
 		for (int ind=0; ind < groups.length; ind++)
-			addItem(groups[ind], mapper.getRegisters(groups[ind]));	
+			addItem(groups[ind], mapper.getRegisters(groups[ind]));
 	}
-	
+
 	private TreeItem FindItem(String substr)
 	{
 		if(substr.length() == 0)
 			return null;
-		
+
 		TreeItem item = null;
 		int i = 0;
 		for(; i < treeItems.size(); i++)
@@ -292,7 +302,7 @@ public class DSPAddRegistersDialog extends Dialog
 	protected void selectPartNumber(String pn)
 	{
 		tree.removeAll();
-		
+
 		selectedPart = pn;
 		list.removeAll();
 		searchText.setText("");
@@ -300,12 +310,12 @@ public class DSPAddRegistersDialog extends Dialog
 		// update the UI elements:
 		fromLabel.setText(SELECT_FROM_MESSAGE + mapper.getModuleType());
 		fillTree();
-		
+
 	}
 	/*
 	 * @see Window#configureShell(Shell)
 	 */
-	protected void configureShell(Shell newShell) 
+	protected void configureShell(Shell newShell)
 	{
 		super.configureShell(newShell);
 		newShell.setText("Add registers");
@@ -315,10 +325,10 @@ public class DSPAddRegistersDialog extends Dialog
 	{
 		boolean added = false;
 		TreeItem[] items = tree.getSelection();
-		
+
 		for (int ind=0; ind < items.length; ind++)
 			added = addSelectedTreeItem(items[ind]) || added;
-		
+
 		if (!added)
 			messageLabel.setText("Some Item(s) already exist. ignored.");
 		else
@@ -328,14 +338,14 @@ public class DSPAddRegistersDialog extends Dialog
 	private void processRegsRemoval()
 	{
 		String[] items = list.getSelection();
-		
+
 		if (items.length == 0)
 			messageLabel.setText("No Items were selected");
 		else
 		{
 			for (int ind=0; ind < items.length; ind++)
 				list.remove(items[ind]);
-			
+
 			messageLabel.setText(WELCOME_MESSAGE);
 		}
 	}
@@ -353,7 +363,7 @@ public class DSPAddRegistersDialog extends Dialog
 			processRegsRemoval();
 		}
 	}
-	
+
 	/**
 	 * @see org.eclipse.swt.events.MouseListener#mouseDown(MouseEvent)
 	 */
@@ -373,33 +383,33 @@ public class DSPAddRegistersDialog extends Dialog
 			processRegsRemoval();
 		}
 	}
-	
+
 	private boolean addSelectedTreeItem(TreeItem item)
 	{
 		TreeItem parentItem = item.getParentItem();
-		
+
 		if (parentItem != null)
-			return addItemToList(parentItem.getText() + ": " + item.getText()); 
+			return addItemToList(parentItem.getText() + ": " + item.getText());
 
 
 		TreeItem[] items = item.getItems();
 		boolean added = false;
-		
+
 		for (int ind=0; ind < items.length; ind++)
 			added = addSelectedTreeItem(items[ind]) || added;
-		
+
 		return added;
 	}
 
-	
+
 	private boolean addItemToList(String name)
 	{
 		String[] items = list.getItems();
-		
+
 		for (int ind=0; ind < items.length; ind++)
 			if (items[ind].equalsIgnoreCase(name))
 				return false;
-		
+
 		list.add(name);
 		return true;
 	}
@@ -420,12 +430,12 @@ public class DSPAddRegistersDialog extends Dialog
 			else
 				tree.deselectAll();
 		}
-		
+
 	}
 
 	public void widgetDefaultSelected(SelectionEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public void widgetSelected(SelectionEvent e)
@@ -440,8 +450,8 @@ public class DSPAddRegistersDialog extends Dialog
 			selectPartNumber(partNumberCombo.getText());
 		}
 	}
-	
-	
-	
+
+
+
 
 }
