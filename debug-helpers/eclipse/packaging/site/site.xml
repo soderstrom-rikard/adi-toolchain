@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<site
-      mirrorsURL="mirrors.xml">
-   <description url="http://docs.blackfin.uclinux.org/doku.php?id=toolchain:eclipse">
-      Eclipse Install/Update site for Blackfin Open Source components
+<site>
+   <description name="Blackfin GNU Components" url="http://docs.blackfin.uclinux.org/doku.php?id=toolchain:eclipse">
+      Eclipse Install/Update site for Blackfin GNU Open Source components
    </description>
-   <feature url="features/com.adi.toolchain.gnu_2008.1.0.jar" id="com.adi.toolchain.gnu" version="2008.1.0" os="All" ws="All" nl="en" arch="All">
-      <category name="toolchain"/>
-   </feature>
-   <feature url="features/com.adi.debug.mmr_2008.1.0.jar" id="com.adi.debug.mmr" version="2008.1.0" os="All" ws="All" nl="en" arch="All">
+   <feature url="features/com.analog.gnu.debug.mmr_1.0.0.v200908051336.jar" id="com.analog.gnu.debug.mmr" version="1.0.0.v200908051336" os="All" ws="All" nl="en" arch="All">
       <category name="debug"/>
    </feature>
-   <category-def name="toolchain" label="Blackfin GNU Toolchain"/>
+   <feature url="features/com.analog.gnu.toolchain.blackfin_1.0.0.v200908051336.jar" id="com.analog.gnu.toolchain.blackfin" version="1.0.0.v200908051336" os="All" ws="All" nl="en" arch="All">
+      <category name="toolchain"/>
+   </feature>
    <category-def name="debug" label="Blackfin Debug"/>
+   <category-def name="toolchain" label="Blackfin GNU Toolchain"/>
 </site>
