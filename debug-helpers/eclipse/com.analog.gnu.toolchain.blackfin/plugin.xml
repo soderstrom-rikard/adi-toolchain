@@ -236,6 +236,26 @@
                   name="Unspecified">
             </enumeratedOptionValue>
             <enumeratedOptionValue
+                  command="bf512"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf512"
+                  name="BF512">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+                  command="bf514"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf514"
+                  name="BF514">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+                  command="bf516"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf516"
+                  name="BF516">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+                  command="bf518"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf518"
+                  name="BF518">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
                   command="bf522"
                   id="com.analog.gnu.toolchain.blackfin.proc.bf522"
                   name="BF522">
@@ -311,9 +331,19 @@
                   name="BF542">
             </enumeratedOptionValue>
             <enumeratedOptionValue
+                  command="bf542m"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf542m"
+                  name="BF542M">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
                   command="bf544"
                   id="com.analog.gnu.toolchain.blackfin.proc.bf544"
                   name="BF544">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+                  command="bf544m"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf544m"
+                  name="BF544M">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf547"
@@ -321,14 +351,29 @@
                   name="BF547">
             </enumeratedOptionValue>
             <enumeratedOptionValue
+                  command="bf547m"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf547m"
+                  name="BF547M">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
                   command="bf548"
                   id="com.analog.gnu.toolchain.blackfin.proc.bf548"
                   name="BF548">
             </enumeratedOptionValue>
             <enumeratedOptionValue
+                  command="bf548m"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf548m"
+                  name="BF548M">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
                   command="bf549"
                   id="com.analog.gnu.toolchain.blackfin.proc.bf549"
                   name="BF549">
+            </enumeratedOptionValue>
+            <enumeratedOptionValue
+                  command="bf549m"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf549m"
+                  name="BF549M">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf561"
