@@ -7,7 +7,7 @@
          point="org.eclipse.cdt.core.BinaryParser">
       <cextension>
          <run
-               class="com.adi.toolchain.gnu.parser.BlackfinElfParser">
+               class="com.analog.gnu.toolchain.blackfin.parser.BlackfinElfParser">
          </run>
       </cextension>
    </extension>
@@ -16,58 +16,58 @@
       <template
             id="org.eclipse.cdt.build.core.templates.EmptyProject">
          <toolChain
-               id="com.adi.toolchain.gnu.toolchain.bfin.elf.base">
+               id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.elf.base">
          </toolChain>
          <toolChain
-               id="com.adi.toolchain.gnu.toolchain.bfin.uclinux.base">
+               id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.uclinux.base">
          </toolChain>
          <toolChain
-               id="com.adi.toolchain.gnu.toolchain.bfin.linux.uclibc.base">
+               id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.linux.uclibc.base">
          </toolChain>
       </template>
       <template
             id="org.eclipse.cdt.build.core.templates.HelloWorldCAnsiProject">
          <toolChain
-               id="com.adi.toolchain.gnu.toolchain.bfin.elf.base">
+               id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.elf.base">
          </toolChain>
          <toolChain
-               id="com.adi.toolchain.gnu.toolchain.bfin.uclinux.base">
+               id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.uclinux.base">
          </toolChain>
          <toolChain
-               id="com.adi.toolchain.gnu.toolchain.bfin.linux.uclibc.base">
+               id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.linux.uclibc.base">
          </toolChain>
       </template>
       <template
             id="org.eclipse.cdt.build.core.templates.HelloWorldCCProject">
          <toolChain
-               id="com.adi.toolchain.gnu.toolchain.bfin.elf.base">
+               id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.elf.base">
          </toolChain>
          <toolChain
-               id="com.adi.toolchain.gnu.toolchain.bfin.uclinux.base">
+               id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.uclinux.base">
          </toolChain>
          <toolChain
-               id="com.adi.toolchain.gnu.toolchain.bfin.linux.uclibc.base">
+               id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.linux.uclibc.base">
          </toolChain>
       </template>
       <template
             id="org.eclipse.cdt.build.core.templates.MakefileHelloWorldCCProject">
          <toolChain
-               id="com.adi.toolchain.gnu.toolchain.bfin.elf.base">
+               id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.elf.base">
          </toolChain>
          <toolChain
-               id="com.adi.toolchain.gnu.toolchain.bfin.uclinux.base">
+               id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.uclinux.base">
          </toolChain>
          <toolChain
-               id="com.adi.toolchain.gnu.toolchain.bfin.linux.uclibc.base">
+               id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.linux.uclibc.base">
          </toolChain>
       </template>
    </extension>
    <extension
          point="org.eclipse.cdt.debug.core.CDebugger">
       <debugger
-            class="com.adi.toolchain.gnu.debug.BlackfinElfCDIDebugger"
+            class="com.analog.gnu.toolchain.blackfin.debug.BlackfinElfCDIDebugger"
             cpu="*"
-            id="com.adi.toolchain.gnu.debug.BlackfinElfDebugger"
+            id="com.analog.gnu.toolchain.blackfin.debug.BlackfinElfDebugger"
             modes="run"
             name="Blackfin ELF GDB Server"
             platform="*">
@@ -77,7 +77,7 @@
          id="example"
          point="org.eclipse.cdt.managedbuilder.core.buildDefinitions">
       <tool
-            id="com.adi.toolchain.gnu.tool.ldr"
+            id="com.analog.gnu.toolchain.blackfin.tool.ldr"
             isAbstract="true"
             name="Blackfin Loader">
          <supportedProperties>
@@ -90,7 +90,7 @@
          </supportedProperties>
          <inputType
                buildVariable="OBJS"
-               id="com.adi.toolchain.gnu.ldr.input"
+               id="com.analog.gnu.toolchain.blackfin.ldr.input"
                multipleOfType="true"
                sourceContentType="org.eclipse.cdt.managedbuilder.core.compiledObjectFile">
             <additionalInput
@@ -104,7 +104,7 @@
          </inputType>
          <outputType
                buildVariable="EXECUTABLES"
-               id="com.adi.toolchain.gnu.ldr.output"
+               id="com.analog.gnu.toolchain.blackfin.ldr.output"
                nameProvider="org.eclipse.cdt.managedbuilder.makegen.gnu.GnuLinkOutputNameProvider"
                outputs="ldr">
             <enablement
@@ -117,24 +117,24 @@
          </outputType>
       </tool>
       <toolChain
-            id="com.adi.toolchain.gnu.bfin"
+            id="com.analog.gnu.toolchain.blackfin.bfin"
             isAbstract="true"
-            isToolChainSupported="com.adi.toolchain.gnu.build.CheckToolchain"
+            isToolChainSupported="com.analog.gnu.toolchain.blackfin.build.CheckToolchain"
             name="Common Blackfin Toolchain Options"
             targetTool="cdt.managedbuild.tool.gnu.c.linker;cdt.managedbuild.tool.gnu.cpp.linker;cdt.managedbuild.tool.gnu.archiver">
          <targetPlatform
                archList="all"
-               binaryParser="com.adi.toolchain.gnu.BFIN_ELF"
-               id="com.adi.toolchain.gnu.bfin.elf.platform.base"
+               binaryParser="com.analog.gnu.toolchain.blackfin.BFIN_ELF"
+               id="com.analog.gnu.toolchain.blackfin.elf.platform.base"
                name="Development Platform"
                osList="all">
          </targetPlatform>
          <builder
-               id="com.adi.toolchain.gnu.bfin.builder.base"
+               id="com.analog.gnu.toolchain.blackfin.builder.base"
                superClass="cdt.managedbuild.target.gnu.builder">
          </builder>
          <tool
-               id="com.adi.toolchain.gnu.bfin.archiver.base"
+               id="com.analog.gnu.toolchain.blackfin.archiver.base"
                isAbstract="true"
                superClass="cdt.managedbuild.tool.gnu.archiver">
             <enablement
@@ -146,22 +146,22 @@
             </enablement>
          </tool>
          <tool
-               id="com.adi.toolchain.gnu.bfin.assembler.base"
+               id="com.analog.gnu.toolchain.blackfin.assembler.base"
                isAbstract="true"
                superClass="cdt.managedbuild.tool.gnu.assembler">
          </tool>
          <tool
-               id="com.adi.toolchain.gnu.bfin.c.compiler.base"
+               id="com.analog.gnu.toolchain.blackfin.c.compiler.base"
                isAbstract="true"
                superClass="cdt.managedbuild.tool.gnu.c.compiler">
             <option
                   command="-mcpu=${value}"
-                  id="com.adi.toolchain.gnu.bfin.c.compiler.options.proc"
+                  id="com.analog.gnu.toolchain.blackfin.c.compiler.options.proc"
                   valueType="string">
             </option>
          </tool>
          <tool
-               id="com.adi.toolchain.gnu.bfin.c.linker.base"
+               id="com.analog.gnu.toolchain.blackfin.c.linker.base"
                isAbstract="true"
                superClass="cdt.managedbuild.tool.gnu.c.linker">
             <enablement
@@ -175,22 +175,22 @@
             </enablement>
             <option
                   command="-mcpu=${value}"
-                  id="com.adi.toolchain.gnu.bfin.c.linker.options.proc"
+                  id="com.analog.gnu.toolchain.blackfin.c.linker.options.proc"
                   valueType="string">
             </option>
          </tool>
          <tool
-               id="com.adi.toolchain.gnu.bfin.cpp.compiler.base"
+               id="com.analog.gnu.toolchain.blackfin.cpp.compiler.base"
                isAbstract="true"
                superClass="cdt.managedbuild.tool.gnu.cpp.compiler">
             <option
                   command="-mcpu=${value}"
-                  id="com.adi.toolchain.gnu.bfin.cpp.compiler.options.proc"
+                  id="com.analog.gnu.toolchain.blackfin.cpp.compiler.options.proc"
                   valueType="string">
             </option>
          </tool>
          <tool
-               id="com.adi.toolchain.gnu.bfin.cpp.linker.base"
+               id="com.analog.gnu.toolchain.blackfin.cpp.linker.base"
                isAbstract="true"
                superClass="cdt.managedbuild.tool.gnu.cpp.linker">
             <enablement
@@ -204,332 +204,332 @@
             </enablement>
             <option
                   command="-mcpu=${value}"
-                  id="com.adi.toolchain.gnu.bfin.cpp.linker.options.proc"
+                  id="com.analog.gnu.toolchain.blackfin.cpp.linker.options.proc"
                   valueType="string">
             </option>
          </tool>
          <tool
-               id="com.adi.toolchain.gnu.bfin.ldr.base"
+               id="com.analog.gnu.toolchain.blackfin.ldr.base"
                isAbstract="true"
-               superClass="com.adi.toolchain.gnu.tool.ldr">
+               superClass="com.analog.gnu.toolchain.blackfin.tool.ldr">
             <option
                   command="--target ${value}"
-                  id="com.adi.toolchain.gnu.bfin.ldr.options.proc"
+                  id="com.analog.gnu.toolchain.blackfin.ldr.options.proc"
                   valueType="string">
             </option>
          </tool>
          <optionCategory
-               id="com.adi.toolchain.gnu.bfin.options.general"
+               id="com.analog.gnu.toolchain.blackfin.options.general"
                name="General">
          </optionCategory>
          <option
-               category="com.adi.toolchain.gnu.bfin.options.general"
+               category="com.analog.gnu.toolchain.blackfin.options.general"
                defaultValue="Unspecified"
-               id="com.adi.toolchain.gnu.bfin.options.general.proc"
+               id="com.analog.gnu.toolchain.blackfin.options.general.proc"
                isAbstract="false"
                name="Processor"
                resourceFilter="all"
-               valueHandler="com.adi.toolchain.gnu.build.BlackfinTargets"
+               valueHandler="com.analog.gnu.toolchain.blackfin.build.BlackfinTargets"
                valueType="enumerated">
             <enumeratedOptionValue
-                  id="com.adi.toolchain.gnu.bfin.proc.unspecified"
+                  id="com.analog.gnu.toolchain.blackfin.proc.unspecified"
                   name="Unspecified">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf522"
-                  id="com.adi.toolchain.gnu.bfin.proc.bf522"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf522"
                   name="BF522">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf523"
-                  id="com.adi.toolchain.gnu.bfin.proc.bf523"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf523"
                   name="BF523">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf524"
-                  id="com.adi.toolchain.gnu.bfin.proc.bf524"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf524"
                   name="BF524">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf525"
-                  id="com.adi.toolchain.gnu.bfin.proc.bf525"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf525"
                   name="BF525">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf526"
-                  id="com.adi.toolchain.gnu.bfin.proc.bf526"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf526"
                   name="BF526">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf527"
-                  id="com.adi.toolchain.gnu.bfin.proc.bf527"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf527"
                   name="BF527">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf531"
-                  id="com.adi.toolchain.gnu.bfin.proc.bf531"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf531"
                   name="BF531">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf532"
-                  id="com.adi.toolchain.gnu.bfin.proc.bf532"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf532"
                   name="BF532">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf533"
-                  id="com.adi.toolchain.gnu.bfin.proc.bf533"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf533"
                   name="BF533">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf534"
-                  id="com.adi.toolchain.gnu.bfin.proc.bf534"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf534"
                   name="BF534">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf536"
-                  id="com.adi.toolchain.gnu.bfin.proc.bf536"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf536"
                   name="BF536">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf537"
-                  id="com.adi.toolchain.gnu.bfin.proc.bf537"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf537"
                   name="BF537">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf538"
-                  id="com.adi.toolchain.gnu.bfin.proc.bf538"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf538"
                   name="BF538">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf539"
-                  id="com.adi.toolchain.gnu.bfin.proc.bf539"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf539"
                   name="BF539">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf542"
-                  id="com.adi.toolchain.gnu.bfin.proc.bf542"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf542"
                   name="BF542">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf544"
-                  id="com.adi.toolchain.gnu.bfin.proc.bf544"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf544"
                   name="BF544">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf547"
-                  id="com.adi.toolchain.gnu.bfin.proc.bf547"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf547"
                   name="BF547">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf548"
-                  id="com.adi.toolchain.gnu.bfin.proc.bf548"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf548"
                   name="BF548">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf549"
-                  id="com.adi.toolchain.gnu.bfin.proc.bf549"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf549"
                   name="BF549">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="bf561"
-                  id="com.adi.toolchain.gnu.bfin.proc.bf561"
+                  id="com.analog.gnu.toolchain.blackfin.proc.bf561"
                   name="BF561">
             </enumeratedOptionValue>
          </option>
          <option
-               category="com.adi.toolchain.gnu.bfin.options.general"
+               category="com.analog.gnu.toolchain.blackfin.options.general"
                defaultValue="any"
-               id="com.adi.toolchain.gnu.bfin.options.general.sirev"
+               id="com.analog.gnu.toolchain.blackfin.options.general.sirev"
                isAbstract="false"
                name="Silicon Revision"
                resourceFilter="all"
-               valueHandler="com.adi.toolchain.gnu.build.BlackfinTargets"
+               valueHandler="com.analog.gnu.toolchain.blackfin.build.BlackfinTargets"
                valueType="enumerated">
             <enumeratedOptionValue
                   command="any"
-                  id="com.adi.toolchain.gnu.bfin.sirev.any"
+                  id="com.analog.gnu.toolchain.blackfin.sirev.any"
                   name="any">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="none"
-                  id="com.adi.toolchain.gnu.bfin.sirev.none"
+                  id="com.analog.gnu.toolchain.blackfin.sirev.none"
                   name="none">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="0.0"
-                  id="com.adi.toolchain.gnu.bfin.sirev.0"
+                  id="com.analog.gnu.toolchain.blackfin.sirev.0"
                   name="0.0">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="0.1"
-                  id="com.adi.toolchain.gnu.bfin.sirev.1"
+                  id="com.analog.gnu.toolchain.blackfin.sirev.1"
                   name="0.1">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="0.2"
-                  id="com.adi.toolchain.gnu.bfin.sirev.2"
+                  id="com.analog.gnu.toolchain.blackfin.sirev.2"
                   name="0.2">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="0.3"
-                  id="com.adi.toolchain.gnu.bfin.sirev.3"
+                  id="com.analog.gnu.toolchain.blackfin.sirev.3"
                   name="0.3">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="0.4"
-                  id="com.adi.toolchain.gnu.bfin.sirev.4"
+                  id="com.analog.gnu.toolchain.blackfin.sirev.4"
                   name="0.4">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="0.5"
-                  id="com.adi.toolchain.gnu.bfin.sirev.5"
+                  id="com.analog.gnu.toolchain.blackfin.sirev.5"
                   name="0.5">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="0.8"
-                  id="com.adi.toolchain.gnu.bfin.sirev.8"
+                  id="com.analog.gnu.toolchain.blackfin.sirev.8"
                   name="0.8">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="0.9"
-                  id="com.adi.toolchain.gnu.bfin.sirev.9"
+                  id="com.analog.gnu.toolchain.blackfin.sirev.9"
                   name="0.9">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="0.7"
-                  id="com.adi.toolchain.gnu.bfin.sirev.7"
+                  id="com.analog.gnu.toolchain.blackfin.sirev.7"
                   name="0.7">
             </enumeratedOptionValue>
             <enumeratedOptionValue
                   command="0.6"
-                  id="com.adi.toolchain.gnu.bfin.sirev.6"
+                  id="com.analog.gnu.toolchain.blackfin.sirev.6"
                   name="0.6">
             </enumeratedOptionValue>
          </option>
       </toolChain>
       <toolChain
             archList="all"
-            id="com.adi.toolchain.gnu.toolchain.bfin.elf.base"
+            id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.elf.base"
             name="Blackfin Bare Metal (bfin-elf)"
-            superClass="com.adi.toolchain.gnu.bfin"
+            superClass="com.analog.gnu.toolchain.blackfin.bfin"
             targetTool="cdt.managedbuild.tool.gnu.c.linker;cdt.managedbuild.tool.gnu.cpp.linker;cdt.managedbuild.tool.gnu.archiver">
          <tool
                command="bfin-elf-ar"
-               id="com.adi.toolchain.gnu.bfin.elf.archiver"
+               id="com.analog.gnu.toolchain.blackfin.elf.archiver"
                name="Blackfin ELF Archiver"
-               superClass="com.adi.toolchain.gnu.bfin.archiver.base">
+               superClass="com.analog.gnu.toolchain.blackfin.archiver.base">
          </tool>
          <tool
                command="bfin-elf-as"
-               id="com.adi.toolchain.gnu.bfin.elf.assembler"
+               id="com.analog.gnu.toolchain.blackfin.elf.assembler"
                name="Blackfin ELF Assembler"
-               superClass="com.adi.toolchain.gnu.bfin.assembler.base">
+               superClass="com.analog.gnu.toolchain.blackfin.assembler.base">
          </tool>
          <tool
                command="bfin-elf-gcc"
-               id="com.adi.toolchain.gnu.bfin.elf.c.compiler"
+               id="com.analog.gnu.toolchain.blackfin.elf.c.compiler"
                name="Blackfin ELF C Compiler"
-               superClass="com.adi.toolchain.gnu.bfin.c.compiler.base">
+               superClass="com.analog.gnu.toolchain.blackfin.c.compiler.base">
             <inputType
-                  id="com.adi.toolchain.gnu.bfin.elf.c.input"
-                  scannerConfigDiscoveryProfileId="com.adi.toolchain.gnu.Blackfin_ELF_GCCManagedMakePerProjectProfileC"
+                  id="com.analog.gnu.toolchain.blackfin.elf.c.input"
+                  scannerConfigDiscoveryProfileId="com.analog.gnu.toolchain.blackfin.Blackfin_ELF_GCCManagedMakePerProjectProfileC"
                   superClass="cdt.managedbuild.tool.gnu.c.compiler.input">
             </inputType>
          </tool>
          <tool
                command="bfin-elf-gcc"
-               id="com.adi.toolchain.gnu.bfin.elf.c.linker"
+               id="com.analog.gnu.toolchain.blackfin.elf.c.linker"
                name="Blackfin ELF C Linker"
-               superClass="com.adi.toolchain.gnu.bfin.c.linker.base">
+               superClass="com.analog.gnu.toolchain.blackfin.c.linker.base">
          </tool>
          <tool
                command="bfin-elf-g++"
-               id="com.adi.toolchain.gnu.bfin.elf.cpp.compiler"
+               id="com.analog.gnu.toolchain.blackfin.elf.cpp.compiler"
                name="Blackfin ELF C++ Compiler"
-               superClass="com.adi.toolchain.gnu.bfin.cpp.compiler.base">
+               superClass="com.analog.gnu.toolchain.blackfin.cpp.compiler.base">
             <inputType
-                  id="com.adi.toolchain.gnu.bfin.elf.cpp.input"
-                  scannerConfigDiscoveryProfileId="com.adi.toolchain.gnu.Blackfin_ELF_GCCManagedMakePerProjectProfileCPP"
+                  id="com.analog.gnu.toolchain.blackfin.elf.cpp.input"
+                  scannerConfigDiscoveryProfileId="com.analog.gnu.toolchain.blackfin.Blackfin_ELF_GCCManagedMakePerProjectProfileCPP"
                   superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input">
             </inputType>
          </tool>
          <tool
                command="bfin-elf-g++"
-               id="com.adi.toolchain.gnu.bfin.elf.cpp.linker"
+               id="com.analog.gnu.toolchain.blackfin.elf.cpp.linker"
                name="Blackfin ELF C++ Linker"
-               superClass="com.adi.toolchain.gnu.bfin.cpp.linker.base">
+               superClass="com.analog.gnu.toolchain.blackfin.cpp.linker.base">
          </tool>
          <tool
                command="bfin-elf-ldr"
-               id="com.adi.toolchain.gnu.bfin.elf.ldr.base"
+               id="com.analog.gnu.toolchain.blackfin.elf.ldr.base"
                isAbstract="false"
-               superClass="com.adi.toolchain.gnu.bfin.ldr.base">
+               superClass="com.analog.gnu.toolchain.blackfin.ldr.base">
          </tool>
       </toolChain>
       <toolChain
             archList="all"
-            id="com.adi.toolchain.gnu.toolchain.bfin.uclinux.base"
+            id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.uclinux.base"
             name="Blackfin Linux FLAT (bfin-uclinux)"
-            superClass="com.adi.toolchain.gnu.bfin"
+            superClass="com.analog.gnu.toolchain.blackfin.bfin"
             targetTool="cdt.managedbuild.tool.gnu.c.linker;cdt.managedbuild.tool.gnu.cpp.linker;cdt.managedbuild.tool.gnu.archiver">
          <tool
                command="bfin-uclinux-ar"
-               id="com.adi.toolchain.gnu.bfin.uclinux.archiver"
+               id="com.analog.gnu.toolchain.blackfin.uclinux.archiver"
                name="Blackfin FLAT Archiver"
-               superClass="com.adi.toolchain.gnu.bfin.archiver.base">
+               superClass="com.analog.gnu.toolchain.blackfin.archiver.base">
          </tool>
          <tool
                command="bfin-uclinux-as"
-               id="com.adi.toolchain.gnu.bfin.uclinux.assembler"
+               id="com.analog.gnu.toolchain.blackfin.uclinux.assembler"
                name="Blackfin FLAT Assembler"
-               superClass="com.adi.toolchain.gnu.bfin.assembler.base">
+               superClass="com.analog.gnu.toolchain.blackfin.assembler.base">
          </tool>
          <tool
                command="bfin-uclinux-gcc"
-               id="com.adi.toolchain.gnu.bfin.uclinux.c.compiler"
+               id="com.analog.gnu.toolchain.blackfin.uclinux.c.compiler"
                name="Blackfin FLAT C Compiler"
-               superClass="com.adi.toolchain.gnu.bfin.c.compiler.base">
+               superClass="com.analog.gnu.toolchain.blackfin.c.compiler.base">
             <inputType
-                  id="com.adi.toolchain.gnu.bfin.uclinux.c.input"
-                  scannerConfigDiscoveryProfileId="com.adi.toolchain.gnu.Blackfin_FLAT_GCCManagedMakePerProjectProfileC"
+                  id="com.analog.gnu.toolchain.blackfin.uclinux.c.input"
+                  scannerConfigDiscoveryProfileId="com.analog.gnu.toolchain.blackfin.Blackfin_FLAT_GCCManagedMakePerProjectProfileC"
                   superClass="cdt.managedbuild.tool.gnu.c.compiler.input">
             </inputType>
          </tool>
          <tool
                command="bfin-uclinux-gcc"
-               id="com.adi.toolchain.gnu.bfin.uclinux.c.linker"
+               id="com.analog.gnu.toolchain.blackfin.uclinux.c.linker"
                name="Blackfin FLAT C Linker"
-               superClass="com.adi.toolchain.gnu.bfin.c.linker.base">
+               superClass="com.analog.gnu.toolchain.blackfin.c.linker.base">
             <option
                   category="gnu.c.link.category.general"
                   command="-elf2flt"
                   defaultValue="true"
-                  id="com.adi.toolchain.gnu.bfin.uclinux.c.linker.option.elf2flt"
+                  id="com.analog.gnu.toolchain.blackfin.uclinux.c.linker.option.elf2flt"
                   name="Build FLAT binaries (-elf2flt)"
                   valueType="boolean">
             </option>
          </tool>
          <tool
                command="bfin-uclinux-g++"
-               id="com.adi.toolchain.gnu.bfin.uclinux.cpp.compiler"
+               id="com.analog.gnu.toolchain.blackfin.uclinux.cpp.compiler"
                name="Blackfin FLAT C++ Compiler"
-               superClass="com.adi.toolchain.gnu.bfin.cpp.compiler.base">
+               superClass="com.analog.gnu.toolchain.blackfin.cpp.compiler.base">
             <inputType
-                  id="com.adi.toolchain.gnu.bfin.uclinux.cpp.input"
-                  scannerConfigDiscoveryProfileId="com.adi.toolchain.gnu.Blackfin_FLAT_GCCManagedMakePerProjectProfileCPP"
+                  id="com.analog.gnu.toolchain.blackfin.uclinux.cpp.input"
+                  scannerConfigDiscoveryProfileId="com.analog.gnu.toolchain.blackfin.Blackfin_FLAT_GCCManagedMakePerProjectProfileCPP"
                   superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input">
             </inputType>
          </tool>
          <tool
                command="bfin-uclinux-g++"
-               id="com.adi.toolchain.gnu.bfin.uclinux.cpp.linker"
+               id="com.analog.gnu.toolchain.blackfin.uclinux.cpp.linker"
                name="Blackfin FLAT C++ Linker"
-               superClass="com.adi.toolchain.gnu.bfin.cpp.linker.base">
+               superClass="com.analog.gnu.toolchain.blackfin.cpp.linker.base">
             <option
                   category="gnu.cpp.link.category.options"
                   command="-elf2flt"
                   defaultValue="true"
-                  id="com.adi.toolchain.gnu.bfin.uclinux.cpp.linker.option.elf2flt"
+                  id="com.analog.gnu.toolchain.blackfin.uclinux.cpp.linker.option.elf2flt"
                   name="Build FLAT binaries (-elf2flt)"
                   valueType="boolean">
             </option>
@@ -537,250 +537,250 @@
       </toolChain>
       <toolChain
             archList="all"
-            id="com.adi.toolchain.gnu.toolchain.bfin.linux.uclibc.base"
+            id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.linux.uclibc.base"
             name="Blackfin Linux FDPIC (bfin-linux-uclibc)"
-            superClass="com.adi.toolchain.gnu.bfin"
+            superClass="com.analog.gnu.toolchain.blackfin.bfin"
             targetTool="cdt.managedbuild.tool.gnu.c.linker;cdt.managedbuild.tool.gnu.cpp.linker;cdt.managedbuild.tool.gnu.archiver">
          <tool
                command="bfin-linux-uclibc-ar"
-               id="com.adi.toolchain.gnu.bfin.linux.uclibc.archiver"
+               id="com.analog.gnu.toolchain.blackfin.linux.uclibc.archiver"
                name="Blackfin FDPIC Archiver"
-               superClass="com.adi.toolchain.gnu.bfin.archiver.base">
+               superClass="com.analog.gnu.toolchain.blackfin.archiver.base">
          </tool>
          <tool
                command="bfin-linux-uclibc-as"
-               id="com.adi.toolchain.gnu.bfin.linux.uclibc.assembler"
+               id="com.analog.gnu.toolchain.blackfin.linux.uclibc.assembler"
                name="Blackfin FDPIC Assembler"
-               superClass="com.adi.toolchain.gnu.bfin.assembler.base">
+               superClass="com.analog.gnu.toolchain.blackfin.assembler.base">
          </tool>
          <tool
                command="bfin-linux-uclibc-gcc"
-               id="com.adi.toolchain.gnu.bfin.linux.uclibc.c.compiler"
+               id="com.analog.gnu.toolchain.blackfin.linux.uclibc.c.compiler"
                name="Blackfin FDPIC C Compiler"
-               superClass="com.adi.toolchain.gnu.bfin.c.compiler.base">
+               superClass="com.analog.gnu.toolchain.blackfin.c.compiler.base">
             <inputType
-                  id="com.adi.toolchain.gnu.bfin.linux.uclibc.c.input"
-                  scannerConfigDiscoveryProfileId="com.adi.toolchain.gnu.Blackfin_FDPIC_GCCManagedMakePerProjectProfileC"
+                  id="com.analog.gnu.toolchain.blackfin.linux.uclibc.c.input"
+                  scannerConfigDiscoveryProfileId="com.analog.gnu.toolchain.blackfin.Blackfin_FDPIC_GCCManagedMakePerProjectProfileC"
                   superClass="cdt.managedbuild.tool.gnu.c.compiler.input">
             </inputType>
          </tool>
          <tool
                command="bfin-linux-uclibc-gcc"
-               id="com.adi.toolchain.gnu.bfin.linux.uclibc.c.linker"
+               id="com.analog.gnu.toolchain.blackfin.linux.uclibc.c.linker"
                name="Blackfin FDPIC C Linker"
-               superClass="com.adi.toolchain.gnu.bfin.c.linker.base">
+               superClass="com.analog.gnu.toolchain.blackfin.c.linker.base">
          </tool>
          <tool
                command="bfin-linux-uclibc-g++"
-               id="com.adi.toolchain.gnu.bfin.linux.uclibc.cpp.compiler"
+               id="com.analog.gnu.toolchain.blackfin.linux.uclibc.cpp.compiler"
                name="Blackfin FDPIC C++ Compiler"
-               superClass="com.adi.toolchain.gnu.bfin.cpp.compiler.base">
+               superClass="com.analog.gnu.toolchain.blackfin.cpp.compiler.base">
             <inputType
-                  id="com.adi.toolchain.gnu.bfin.linux.uclibc.cpp.input"
-                  scannerConfigDiscoveryProfileId="com.adi.toolchain.gnu.Blackfin_FDPIC_GCCManagedMakePerProjectProfileCPP"
+                  id="com.analog.gnu.toolchain.blackfin.linux.uclibc.cpp.input"
+                  scannerConfigDiscoveryProfileId="com.analog.gnu.toolchain.blackfin.Blackfin_FDPIC_GCCManagedMakePerProjectProfileCPP"
                   superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input">
             </inputType>
          </tool>
          <tool
                command="bfin-linux-uclibc-g++"
-               id="com.adi.toolchain.gnu.bfin.linux.uclibc.cpp.linker"
+               id="com.analog.gnu.toolchain.blackfin.linux.uclibc.cpp.linker"
                name="Blackfin FDPIC C++ Linker"
-               superClass="com.adi.toolchain.gnu.bfin.cpp.linker.base">
+               superClass="com.analog.gnu.toolchain.blackfin.cpp.linker.base">
          </tool>
       </toolChain>
       <projectType
             buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe"
-            id="com.adi.toolchain.gnu.target.bfin.elf.exe"
+            id="com.analog.gnu.toolchain.blackfin.target.bfin.elf.exe"
             isAbstract="false"
             isTest="false">
          <configuration
                buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug"
                cleanCommand="rm -rf"
-               id="com.adi.toolchain.gnu.config.bfin.elf.exe.debug"
+               id="com.analog.gnu.toolchain.blackfin.config.bfin.elf.exe.debug"
                name="%ConfigName.Dbg"
                parent="cdt.managedbuild.config.gnu.base">
             <toolChain
-                  id="com.adi.toolchain.gnu.toolchain.bfin.elf.exe.debug"
-                  superClass="com.adi.toolchain.gnu.toolchain.bfin.elf.base">
+                  id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.elf.exe.debug"
+                  superClass="com.analog.gnu.toolchain.blackfin.toolchain.bfin.elf.base">
             </toolChain>
          </configuration>
          <configuration
                buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release"
                cleanCommand="rm -rf"
-               id="com.adi.toolchain.gnu.config.bfin.elf.exe.release"
+               id="com.analog.gnu.toolchain.blackfin.config.bfin.elf.exe.release"
                name="%ConfigName.Rel"
                parent="cdt.managedbuild.config.gnu.base">
             <toolChain
-                  id="com.adi.toolchain.gnu.toolchain.bfin.elf.exe.release"
-                  superClass="com.adi.toolchain.gnu.toolchain.bfin.elf.base">
+                  id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.elf.exe.release"
+                  superClass="com.analog.gnu.toolchain.blackfin.toolchain.bfin.elf.base">
             </toolChain>
          </configuration>
       </projectType>
       <projectType
             buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib"
-            id="com.adi.toolchain.gnu.target.bfin.elf.lib"
+            id="com.analog.gnu.toolchain.blackfin.target.bfin.elf.lib"
             isAbstract="false"
             isTest="false">
          <configuration
                buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug"
                cleanCommand="rm -rf"
-               id="com.adi.toolchain.gnu.config.bfin.elf.lib.debug"
+               id="com.analog.gnu.toolchain.blackfin.config.bfin.elf.lib.debug"
                name="%ConfigName.Dbg"
                parent="cdt.managedbuild.config.gnu.base">
             <toolChain
-                  id="com.adi.toolchain.gnu.toolchain.bfin.elf.lib.debug"
-                  superClass="com.adi.toolchain.gnu.toolchain.bfin.elf.base">
+                  id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.elf.lib.debug"
+                  superClass="com.analog.gnu.toolchain.blackfin.toolchain.bfin.elf.base">
             </toolChain>
          </configuration>
          <configuration
                buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release"
                cleanCommand="rm -rf"
-               id="com.adi.toolchain.gnu.config.bfin.elf.lib.release"
+               id="com.analog.gnu.toolchain.blackfin.config.bfin.elf.lib.release"
                name="%ConfigName.Rel"
                parent="cdt.managedbuild.config.gnu.base">
             <toolChain
-                  id="com.adi.toolchain.gnu.toolchain.bfin.elf.lib.release"
-                  superClass="com.adi.toolchain.gnu.toolchain.bfin.elf.base">
+                  id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.elf.lib.release"
+                  superClass="com.analog.gnu.toolchain.blackfin.toolchain.bfin.elf.base">
             </toolChain>
          </configuration>
       </projectType>
       <projectType
             buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe"
-            id="com.adi.toolchain.gnu.target.bfin.uclinux.exe"
+            id="com.analog.gnu.toolchain.blackfin.target.bfin.uclinux.exe"
             isAbstract="false"
             isTest="false">
          <configuration
                buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug"
                cleanCommand="rm -rf"
-               id="com.adi.toolchain.gnu.config.bfin.uclinux.exe.debug"
+               id="com.analog.gnu.toolchain.blackfin.config.bfin.uclinux.exe.debug"
                name="%ConfigName.Dbg"
                parent="cdt.managedbuild.config.gnu.base">
             <toolChain
-                  id="com.adi.toolchain.gnu.toolchain.bfin.uclinux.exe.debug"
-                  superClass="com.adi.toolchain.gnu.toolchain.bfin.uclinux.base">
+                  id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.uclinux.exe.debug"
+                  superClass="com.analog.gnu.toolchain.blackfin.toolchain.bfin.uclinux.base">
             </toolChain>
          </configuration>
          <configuration
                buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release"
                cleanCommand="rm -rf"
-               id="com.adi.toolchain.gnu.config.bfin.uclinux.exe.release"
+               id="com.analog.gnu.toolchain.blackfin.config.bfin.uclinux.exe.release"
                name="%ConfigName.Rel"
                parent="cdt.managedbuild.config.gnu.base">
             <toolChain
-                  id="com.adi.toolchain.gnu.toolchain.bfin.uclinux.exe.release"
-                  superClass="com.adi.toolchain.gnu.toolchain.bfin.uclinux.base">
+                  id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.uclinux.exe.release"
+                  superClass="com.analog.gnu.toolchain.blackfin.toolchain.bfin.uclinux.base">
             </toolChain>
          </configuration>
       </projectType>
       <projectType
             buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib"
-            id="com.adi.toolchain.gnu.target.bfin.uclinux.lib"
+            id="com.analog.gnu.toolchain.blackfin.target.bfin.uclinux.lib"
             isAbstract="false"
             isTest="false">
          <configuration
                buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug"
                cleanCommand="rm -rf"
-               id="com.adi.toolchain.gnu.config.bfin.uclinux.lib.debug"
+               id="com.analog.gnu.toolchain.blackfin.config.bfin.uclinux.lib.debug"
                name="%ConfigName.Dbg"
                parent="cdt.managedbuild.config.gnu.base">
             <toolChain
-                  id="com.adi.toolchain.gnu.toolchain.bfin.uclinux.lib.debug"
-                  superClass="com.adi.toolchain.gnu.toolchain.bfin.uclinux.base">
+                  id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.uclinux.lib.debug"
+                  superClass="com.analog.gnu.toolchain.blackfin.toolchain.bfin.uclinux.base">
             </toolChain>
          </configuration>
          <configuration
                buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release"
                cleanCommand="rm -rf"
-               id="com.adi.toolchain.gnu.config.bfin.uclinux.lib.release"
+               id="com.analog.gnu.toolchain.blackfin.config.bfin.uclinux.lib.release"
                name="%ConfigName.Rel"
                parent="cdt.managedbuild.config.gnu.base">
             <toolChain
-                  id="com.adi.toolchain.gnu.toolchain.bfin.uclinux.lib.release"
-                  superClass="com.adi.toolchain.gnu.toolchain.bfin.uclinux.base">
+                  id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.uclinux.lib.release"
+                  superClass="com.analog.gnu.toolchain.blackfin.toolchain.bfin.uclinux.base">
             </toolChain>
          </configuration>
       </projectType>
       <projectType
             buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe"
-            id="com.adi.toolchain.gnu.target.bfin.linux.uclibc.exe"
+            id="com.analog.gnu.toolchain.blackfin.target.bfin.linux.uclibc.exe"
             isAbstract="false"
             isTest="false">
          <configuration
                buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug"
                cleanCommand="rm -rf"
-               id="com.adi.toolchain.gnu.config.bfin.linux.uclibc.exe.debug"
+               id="com.analog.gnu.toolchain.blackfin.config.bfin.linux.uclibc.exe.debug"
                name="%ConfigName.Dbg"
                parent="cdt.managedbuild.config.gnu.base">
             <toolChain
-                  id="com.adi.toolchain.gnu.toolchain.bfin.linux.uclibc.exe.debug"
-                  superClass="com.adi.toolchain.gnu.toolchain.bfin.linux.uclibc.base">
+                  id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.linux.uclibc.exe.debug"
+                  superClass="com.analog.gnu.toolchain.blackfin.toolchain.bfin.linux.uclibc.base">
             </toolChain>
          </configuration>
          <configuration
                buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release"
                cleanCommand="rm -rf"
-               id="com.adi.toolchain.gnu.config.bfin.linux.uclibc.exe.release"
+               id="com.analog.gnu.toolchain.blackfin.config.bfin.linux.uclibc.exe.release"
                name="%ConfigName.Rel"
                parent="cdt.managedbuild.config.gnu.base">
             <toolChain
-                  id="com.adi.toolchain.gnu.toolchain.bfin.linux.uclibc.exe.release"
-                  superClass="com.adi.toolchain.gnu.toolchain.bfin.linux.uclibc.base">
+                  id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.linux.uclibc.exe.release"
+                  superClass="com.analog.gnu.toolchain.blackfin.toolchain.bfin.linux.uclibc.base">
             </toolChain>
          </configuration>
       </projectType>
       <projectType
             buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib"
-            id="com.adi.toolchain.gnu.target.bfin.linux.uclibc.lib"
+            id="com.analog.gnu.toolchain.blackfin.target.bfin.linux.uclibc.lib"
             isAbstract="false"
             isTest="false">
          <configuration
                buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug"
                cleanCommand="rm -rf"
-               id="com.adi.toolchain.gnu.config.bfin.linux.uclibc.lib.debug"
+               id="com.analog.gnu.toolchain.blackfin.config.bfin.linux.uclibc.lib.debug"
                name="%ConfigName.Dbg"
                parent="cdt.managedbuild.config.gnu.base">
             <toolChain
-                  id="com.adi.toolchain.gnu.toolchain.bfin.linux.uclibc.lib.debug"
-                  superClass="com.adi.toolchain.gnu.toolchain.bfin.linux.uclibc.base">
+                  id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.linux.uclibc.lib.debug"
+                  superClass="com.analog.gnu.toolchain.blackfin.toolchain.bfin.linux.uclibc.base">
             </toolChain>
          </configuration>
          <configuration
                buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release"
                cleanCommand="rm -rf"
-               id="com.adi.toolchain.gnu.config.bfin.linux.uclibc.lib.release"
+               id="com.analog.gnu.toolchain.blackfin.config.bfin.linux.uclibc.lib.release"
                name="%ConfigName.Rel"
                parent="cdt.managedbuild.config.gnu.base">
             <toolChain
-                  id="com.adi.toolchain.gnu.toolchain.bfin.linux.uclibc.lib.release"
-                  superClass="com.adi.toolchain.gnu.toolchain.bfin.linux.uclibc.base">
+                  id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.linux.uclibc.lib.release"
+                  superClass="com.analog.gnu.toolchain.blackfin.toolchain.bfin.linux.uclibc.base">
             </toolChain>
          </configuration>
       </projectType>
       <projectType
             buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib"
-            id="com.adi.toolchain.gnu.target.bfin.linux.uclibc.so"
+            id="com.analog.gnu.toolchain.blackfin.target.bfin.linux.uclibc.so"
             isAbstract="false"
             isTest="false">
          <configuration
                buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug"
                cleanCommand="rm -rf"
-               id="com.adi.toolchain.gnu.config.bfin.linux.uclibc.so.debug"
+               id="com.analog.gnu.toolchain.blackfin.config.bfin.linux.uclibc.so.debug"
                name="%ConfigName.Dbg"
                parent="cdt.managedbuild.config.gnu.base">
             <toolChain
-                  id="com.adi.toolchain.gnu.toolchain.bfin.linux.uclibc.so.debug"
-                  superClass="com.adi.toolchain.gnu.toolchain.bfin.linux.uclibc.base">
+                  id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.linux.uclibc.so.debug"
+                  superClass="com.analog.gnu.toolchain.blackfin.toolchain.bfin.linux.uclibc.base">
             </toolChain>
          </configuration>
          <configuration
                buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release"
                cleanCommand="rm -rf"
-               id="com.adi.toolchain.gnu.config.bfin.linux.uclibc.so.release"
+               id="com.analog.gnu.toolchain.blackfin.config.bfin.linux.uclibc.so.release"
                name="%ConfigName.Rel"
                parent="cdt.managedbuild.config.gnu.base">
             <toolChain
-                  id="com.adi.toolchain.gnu.toolchain.bfin.linux.uclibc.so.release"
-                  superClass="com.adi.toolchain.gnu.toolchain.bfin.linux.uclibc.base">
+                  id="com.analog.gnu.toolchain.blackfin.toolchain.bfin.linux.uclibc.so.release"
+                  superClass="com.analog.gnu.toolchain.blackfin.toolchain.bfin.linux.uclibc.base">
             </toolChain>
          </configuration>
       </projectType>
@@ -790,13 +790,13 @@
          name="Blackfin ELF GNU C/C++ managed make per project SCD profile"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
       <scannerInfoCollector
-            class="com.adi.toolchain.gnu.scanner.DefaultGCCScannerInfoCollector"
+            class="com.analog.gnu.toolchain.blackfin.scanner.DefaultGCCScannerInfoCollector"
             scope="project">
       </scannerInfoCollector>
       <buildOutputProvider>
          <open></open>
          <scannerInfoConsoleParser
-               class="com.adi.toolchain.gnu.scanner.ManagedGCCScannerInfoConsoleParser">
+               class="com.analog.gnu.toolchain.blackfin.scanner.ManagedGCCScannerInfoConsoleParser">
          </scannerInfoConsoleParser>
       </buildOutputProvider>
       <scannerInfoProvider
@@ -816,13 +816,13 @@
          name="Blackfin ELF GNU C/C++ managed make per project SCD profile"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
       <scannerInfoCollector
-            class="com.adi.toolchain.gnu.scanner.DefaultGCCScannerInfoCollector"
+            class="com.analog.gnu.toolchain.blackfin.scanner.DefaultGCCScannerInfoCollector"
             scope="project">
       </scannerInfoCollector>
       <buildOutputProvider>
          <open></open>
          <scannerInfoConsoleParser
-               class="com.adi.toolchain.gnu.scanner.ManagedGCCScannerInfoConsoleParser">
+               class="com.analog.gnu.toolchain.blackfin.scanner.ManagedGCCScannerInfoConsoleParser">
          </scannerInfoConsoleParser>
       </buildOutputProvider>
       <scannerInfoProvider
@@ -842,13 +842,13 @@
          name="Blackfin FLAT GNU C/C++ managed make per project SCD profile"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
       <scannerInfoCollector
-            class="com.adi.toolchain.gnu.scanner.DefaultGCCScannerInfoCollector"
+            class="com.analog.gnu.toolchain.blackfin.scanner.DefaultGCCScannerInfoCollector"
             scope="project">
       </scannerInfoCollector>
       <buildOutputProvider>
          <open></open>
          <scannerInfoConsoleParser
-               class="com.adi.toolchain.gnu.scanner.ManagedGCCScannerInfoConsoleParser">
+               class="com.analog.gnu.toolchain.blackfin.scanner.ManagedGCCScannerInfoConsoleParser">
          </scannerInfoConsoleParser>
       </buildOutputProvider>
       <scannerInfoProvider
@@ -868,13 +868,13 @@
          name="Blackfin FLAT GNU C/C++ managed make per project SCD profile"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
       <scannerInfoCollector
-            class="com.adi.toolchain.gnu.scanner.DefaultGCCScannerInfoCollector"
+            class="com.analog.gnu.toolchain.blackfin.scanner.DefaultGCCScannerInfoCollector"
             scope="project">
       </scannerInfoCollector>
       <buildOutputProvider>
          <open></open>
          <scannerInfoConsoleParser
-               class="com.adi.toolchain.gnu.scanner.ManagedGCCScannerInfoConsoleParser">
+               class="com.analog.gnu.toolchain.blackfin.scanner.ManagedGCCScannerInfoConsoleParser">
          </scannerInfoConsoleParser>
       </buildOutputProvider>
       <scannerInfoProvider
@@ -894,13 +894,13 @@
          name="Blackfin FDPIC GNU C/C++ managed make per project SCD profile"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
       <scannerInfoCollector
-            class="com.adi.toolchain.gnu.scanner.DefaultGCCScannerInfoCollector"
+            class="com.analog.gnu.toolchain.blackfin.scanner.DefaultGCCScannerInfoCollector"
             scope="project">
       </scannerInfoCollector>
       <buildOutputProvider>
          <open></open>
          <scannerInfoConsoleParser
-               class="com.adi.toolchain.gnu.scanner.ManagedGCCScannerInfoConsoleParser">
+               class="com.analog.gnu.toolchain.blackfin.scanner.ManagedGCCScannerInfoConsoleParser">
          </scannerInfoConsoleParser>
       </buildOutputProvider>
       <scannerInfoProvider
@@ -920,13 +920,13 @@
          name="Blackfin FDPIC GNU C/C++ managed make per project SCD profile"
          point="org.eclipse.cdt.make.core.ScannerConfigurationDiscoveryProfile">
       <scannerInfoCollector
-            class="com.adi.toolchain.gnu.scanner.DefaultGCCScannerInfoCollector"
+            class="com.analog.gnu.toolchain.blackfin.scanner.DefaultGCCScannerInfoCollector"
             scope="project">
       </scannerInfoCollector>
       <buildOutputProvider>
          <open></open>
          <scannerInfoConsoleParser
-               class="com.adi.toolchain.gnu.scanner.ManagedGCCScannerInfoConsoleParser">
+               class="com.analog.gnu.toolchain.blackfin.scanner.ManagedGCCScannerInfoConsoleParser">
          </scannerInfoConsoleParser>
       </buildOutputProvider>
       <scannerInfoProvider
@@ -952,7 +952,7 @@
    <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
       <launchConfigurationType
-            delegate="com.adi.toolchain.gnu.debug.gdbjtag.GDBJtagLaunchConfigurationDelegate"
+            delegate="com.analog.gnu.toolchain.blackfin.debug.gdbjtag.GDBJtagLaunchConfigurationDelegate"
             id="gdb.launchConfigurationType"
             modes="debug"
             name="Blackfin Debug Targets"
@@ -964,7 +964,7 @@
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTabGroups">
       <launchConfigurationTabGroup
-            class="com.adi.toolchain.gnu.debug.BlackfinDebugLaunchConfigurationTabGroup"
+            class="com.analog.gnu.toolchain.blackfin.debug.BlackfinDebugLaunchConfigurationTabGroup"
             id="gdb.launchConfigurationTabGroup"
             type="gdb.launchConfigurationType">
       </launchConfigurationTabGroup>

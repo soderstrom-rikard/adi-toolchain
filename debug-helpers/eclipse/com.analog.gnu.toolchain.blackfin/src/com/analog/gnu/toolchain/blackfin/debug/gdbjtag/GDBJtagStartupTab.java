@@ -1,16 +1,14 @@
 /*******************************************************************************
- * Copyright (c) 2007 - 2008 QNX Software Systems and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ *  Copyright (c) 2009 Analog Devices, Inc.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *     QNX Software Systems - Initial API and implementation
- *     Andy Jin - Hardware debugging UI improvements, bug 229946
+ *  Contributors:
+ *     Analog Devices, Inc. - Initial implementation
  *******************************************************************************/
-
-package com.adi.toolchain.gnu.debug.gdbjtag;
+package com.analog.gnu.toolchain.blackfin.debug.gdbjtag;
 
 import java.io.File;
 
@@ -48,38 +46,38 @@ import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.views.navigator.ResourceComparator;
 
-import com.adi.toolchain.gnu.Activator;
+import com.analog.gnu.toolchain.blackfin.Activator;
 
 public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 
 	private static final String TAB_NAME = "Startup";
-	
+
 	Text initCommands;
 	Text delay;
 	Button doReset;
 	Button doHalt;
-	
+
 	Button loadImage;
 	Text imageFileName;
 	Button imageFileBrowseWs;
 	Button imageFileBrowse;
 	Text imageOffset;
-	
+
 	Button loadSymbols;
 	Text symbolsFileName;
 	Button symbolsFileBrowseWs;
 	Button symbolsFileBrowse;
 	Text symbolsOffset;
-	
+
 	Button setPcRegister;
 	Text pcRegister;
-	
+
 	Button setStopAt;
 	Text stopAt;
-	
+
 	Button setResume;
 	boolean resume = false;
-	
+
 	Text runCommands;
 
 	public String getName() {
@@ -89,7 +87,7 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 	public Image getImage() {
 		return GDBJtagImages.getStartupTabImage();
 	}
-	
+
 	public void createControl(Composite parent) {
 		ScrolledComposite sc = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
 		sc.setExpandHorizontal(true);
@@ -105,7 +103,7 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 		createLoadGroup(comp);
 		createRunOptionGroup(comp);
 		createRunGroup(comp);
-		
+
 		sc.setMinSize(comp.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
 
@@ -120,12 +118,12 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 		if (str != null)
 			text.setText(str);
 	}
-	
+
 	private void browseWsButtonSelected(String title, Text text) {
         ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(getShell(), new WorkbenchLabelProvider(), new WorkbenchContentProvider());
-        dialog.setTitle(title); 
-        dialog.setMessage(Messages.getString("GDBJtagStartupTab.FileBrowseWs_Message")); 
-        dialog.setInput(ResourcesPlugin.getWorkspace().getRoot()); 
+        dialog.setTitle(title);
+        dialog.setMessage(Messages.getString("GDBJtagStartupTab.FileBrowseWs_Message"));
+        dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
         dialog.setComparator(new ResourceComparator(ResourceComparator.NAME));
         if (dialog.open() == IDialogConstants.OK_ID) {
             IResource resource = (IResource) dialog.getFirstResult();
@@ -134,7 +132,7 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
             text.setText(fileLoc);
         }
 	}
-	
+
 	public void createInitGroup(Composite parent) {
 		Group group = new Group(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
@@ -142,13 +140,13 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		group.setLayoutData(gd);
 		group.setText(Messages.getString("GDBJtagStartupTab.initGroup_Text"));
-		
+
 		Composite comp = new Composite(group, SWT.NONE);
 		layout = new GridLayout();
 		layout.numColumns = 2;
 		layout.marginHeight = 0;
 		comp.setLayout(layout);
-		
+
 		doReset = new Button(comp, SWT.CHECK);
 		doReset.setText(Messages.getString("GDBJtagStartupTab.doReset_Text"));
 		doReset.addSelectionListener(new SelectionAdapter() {
@@ -172,13 +170,13 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 				updateLaunchConfigurationDialog();
 			}
 		});
-		
+
 		comp = new Composite(group, SWT.NONE);
 		layout = new GridLayout();
 		layout.numColumns = 1;
 		layout.marginHeight = 0;
 		comp.setLayout(layout);
-		
+
 		doHalt = new Button(comp, SWT.CHECK);
 		doHalt.setText(Messages.getString("GDBJtagStartupTab.doHalt_Text"));
 		gd = new GridData();
@@ -189,7 +187,7 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 				updateLaunchConfigurationDialog();
 			}
 		});
-		
+
 		initCommands = new Text(group, SWT.MULTI | SWT.WRAP | SWT.BORDER | SWT.V_SCROLL);
 		gd = new GridData(GridData.FILL_BOTH);
 		gd.heightHint = 60;
@@ -199,9 +197,9 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 				updateLaunchConfigurationDialog();
 			}
 		});
-		
+
 	}
-	
+
 	private void createLoadGroup(Composite parent) {
 		Group group = new Group(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
@@ -211,7 +209,7 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 		gd.horizontalSpan = 1;
 		group.setLayoutData(gd);
 		group.setText(Messages.getString("GDBJtagStartupTab.loadGroup_Text"));
-		
+
 		loadImage = new Button(group, SWT.CHECK);
 		loadImage.setText(Messages.getString("GDBJtagStartupTab.loadImage_Text"));
 		gd = new GridData();
@@ -223,15 +221,15 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 				updateLaunchConfigurationDialog();
 			}
 		});
-		
+
 		Composite comp = new Composite(group, SWT.NONE);
 		layout = new GridLayout();
 		layout.numColumns = 4;
 		comp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		comp.setLayout(layout);
-		
+
 		Label imageLabel = new Label(comp, SWT.NONE);
-		imageLabel.setText(Messages.getString("GDBJtagStartupTab.imageLabel_Text"));	
+		imageLabel.setText(Messages.getString("GDBJtagStartupTab.imageLabel_Text"));
 		imageFileName = new Text(comp, SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 1;
@@ -241,21 +239,21 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 				updateLaunchConfigurationDialog();
 			}
 		});
-		
-        imageFileBrowseWs = createPushButton(comp, Messages.getString("GDBJtagStartupTab.FileBrowseWs_Label"), null); 
+
+        imageFileBrowseWs = createPushButton(comp, Messages.getString("GDBJtagStartupTab.FileBrowseWs_Label"), null);
         imageFileBrowseWs.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
             	browseWsButtonSelected(Messages.getString("GDBJtagStartupTab.imageFileBrowseWs_Title"), imageFileName);
             }
         });
-        
+
 		imageFileBrowse = createPushButton(comp, Messages.getString("GDBJtagStartupTab.FileBrowse_Label"), null);
 		imageFileBrowse.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				browseButtonSelected(Messages.getString("GDBJtagStartupTab.imageFileBrowse_Title"), imageFileName);
 			}
-		});	
-		
+		});
+
 		Label imageOffsetLabel = new Label(comp, SWT.NONE);
 		imageOffsetLabel.setText(Messages.getString("GDBJtagStartupTab.imageOffsetLabel_Text"));
 		imageOffset = new Text(comp, SWT.BORDER);
@@ -273,7 +271,7 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 				updateLaunchConfigurationDialog();
 			}
 		});
-		
+
 		loadSymbols = new Button(group, SWT.CHECK);
 		loadSymbols.setText(Messages.getString("GDBJtagStartupTab.loadSymbols_Text"));
 		gd = new GridData();
@@ -285,15 +283,15 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 				updateLaunchConfigurationDialog();
 			}
 		});
-		
+
 		comp = new Composite(group, SWT.NONE);
 		layout = new GridLayout();
 		layout.numColumns = 4;
 		comp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		comp.setLayout(layout);
-		
+
 		Label symbolLabel = new Label(comp, SWT.NONE);
-		symbolLabel.setText(Messages.getString("GDBJtagStartupTab.symbolsLabel_Text"));	
+		symbolLabel.setText(Messages.getString("GDBJtagStartupTab.symbolsLabel_Text"));
 		symbolsFileName = new Text(comp, SWT.BORDER);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = 1;
@@ -302,22 +300,22 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 			public void modifyText(ModifyEvent e) {
 				updateLaunchConfigurationDialog();
 			}
-		});	
-		
-        symbolsFileBrowseWs = createPushButton(comp, Messages.getString("GDBJtagStartupTab.FileBrowseWs_Label"), null); 
+		});
+
+        symbolsFileBrowseWs = createPushButton(comp, Messages.getString("GDBJtagStartupTab.FileBrowseWs_Label"), null);
         symbolsFileBrowseWs.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
             	browseWsButtonSelected(Messages.getString("GDBJtagStartupTab.symbolsFileBrowseWs_Title"), symbolsFileName);
             }
         });
-        
+
 		symbolsFileBrowse = createPushButton(comp, Messages.getString("GDBJtagStartupTab.FileBrowse_Label"), null);
 		symbolsFileBrowse.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				browseButtonSelected(Messages.getString("GDBJtagStartupTab.symbolsFileBrowse_Title"), symbolsFileName);
 			}
 		});
-		
+
 		Label symbolsOffsetLabel = new Label(comp, SWT.NONE);
 		symbolsOffsetLabel.setText(Messages.getString("GDBJtagStartupTab.symbolsOffsetLabel_Text"));
 		symbolsOffset = new Text(comp, SWT.BORDER);
@@ -335,9 +333,9 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 				updateLaunchConfigurationDialog();
 			}
 		});
-		
+
 	}
-	
+
 	public void createRunOptionGroup(Composite parent) {
 		Group group = new Group(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
@@ -347,7 +345,7 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 		gd.horizontalSpan = 1;
 		group.setLayoutData(gd);
 		group.setText(Messages.getString("GDBJtagStartupTab.runOptionGroup_Text"));
-		
+
 		setPcRegister = new Button(group, SWT.CHECK);
 		setPcRegister.setText(Messages.getString("GDBJtagStartupTab.setPcRegister_Text"));
 		gd = new GridData();
@@ -358,7 +356,7 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 				pcRegisterChanged();
 				updateLaunchConfigurationDialog();
 			}
-		});	
+		});
 
 		pcRegister = new Text(group, SWT.BORDER);
 		gd = new GridData();
@@ -375,7 +373,7 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 				updateLaunchConfigurationDialog();
 			}
 		});
-		
+
 		setStopAt = new Button(group, SWT.CHECK);
 		setStopAt.setText(Messages.getString("GDBJtagStartupTab.setStopAt_Text"));
 		gd = new GridData();
@@ -387,7 +385,7 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 				updateLaunchConfigurationDialog();
 			}
 		});
-		
+
 		stopAt = new Text(group, SWT.BORDER);
 		gd = new GridData();
 		gd.horizontalSpan = 1;
@@ -411,7 +409,7 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 			}
 		});
 	}
-	
+
 	private void doResetChanged() {
 		delay.setEnabled(doReset.getSelection());
 	}
@@ -423,7 +421,7 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 		imageFileBrowse.setEnabled(enabled);
 		imageOffset.setEnabled(enabled);
 	}
-	
+
 	private void loadSymbolsChanged() {
 		boolean enabled = loadSymbols.getSelection();
 		symbolsFileName.setEnabled(enabled);
@@ -431,19 +429,19 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 		symbolsFileBrowse.setEnabled(enabled);
 		symbolsOffset.setEnabled(enabled);
 	}
-	
+
 	private void pcRegisterChanged() {
 		pcRegister.setEnabled(setPcRegister.getSelection());
 	}
-	
+
 	private void stopAtChanged() {
 		stopAt.setEnabled(setStopAt.getSelection());
 	}
-	
+
 	private void resumeChanged() {
 		resume = setResume.getSelection();
 	}
-	
+
 	public void createRunGroup(Composite parent) {
 		Group group = new Group(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
@@ -462,7 +460,7 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 			}
 		});
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#isValid(org.eclipse.debug.core.ILaunchConfiguration)
 	 */
@@ -511,7 +509,7 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 		} else {
 			setErrorMessage(null);
 		}
-		
+
 		if (setPcRegister.getSelection()) {
 			if (pcRegister.getText().trim().length() == 0) {
 				setErrorMessage(Messages.getString("GDBJtagStartupTab.pcRegister_not_specified"));
@@ -537,7 +535,7 @@ public class GDBJtagStartupTab extends AbstractLaunchConfigurationTab {
 //		super.updateLaunchConfigurationDialog();
 //		isValid(getLaunchConfigurationDialog());
 //	}
-	
+
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
 			initCommands.setText(configuration.getAttribute(IGDBJtagConstants.ATTR_INIT_COMMANDS, "")); //$NON-NLS-1$

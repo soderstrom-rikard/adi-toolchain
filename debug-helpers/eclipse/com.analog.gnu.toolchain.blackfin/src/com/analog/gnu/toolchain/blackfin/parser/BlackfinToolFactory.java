@@ -1,9 +1,14 @@
-/**
- * Copyright Analog Devices, Inc. 2008
- * Licensed under the GPL-2
- */
-
-package com.adi.toolchain.gnu.parser;
+/*******************************************************************************
+ *  Copyright (c) 2009 Analog Devices, Inc.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *     Analog Devices, Inc. - Initial implementation
+ *******************************************************************************/
+package com.analog.gnu.toolchain.blackfin.parser;
 
 import org.eclipse.cdt.core.ICExtension;
 import org.eclipse.cdt.core.ICExtensionReference;
@@ -29,7 +34,7 @@ public class BlackfinToolFactory extends DefaultGnuToolFactory {
 		}
 		return new Path(value);
 	}
-	
+
 	protected IPath getAddr2linePath() {
 		return getTool("addr2line"); //$NON-NLS-1$
 	}
@@ -37,7 +42,7 @@ public class BlackfinToolFactory extends DefaultGnuToolFactory {
 	protected IPath getObjdumpPath() {
 		return getTool("objdump"); //$NON-NLS-1$
 	}
-	
+
 	protected IPath getCPPFiltPath() {
 		return getTool("c++filt"); //$NON-NLS-1$
 	}

@@ -1,9 +1,14 @@
-/**
- * Copyright Analog Devices, Inc. 2008
- * Licensed under the GPL-2
- */
-
-package com.adi.toolchain.gnu.debug;
+/*******************************************************************************
+ *  Copyright (c) 2009 Analog Devices, Inc.
+ *  All rights reserved. This program and the accompanying materials
+ *  are made available under the terms of the Eclipse Public License v1.0
+ *  which accompanies this distribution, and is available at
+ *  http://www.eclipse.org/legal/epl-v10.html
+ *
+ *  Contributors:
+ *     Analog Devices, Inc. - Initial implementation
+ *******************************************************************************/
+package com.analog.gnu.toolchain.blackfin.debug;
 
 import org.eclipse.cdt.debug.core.ICDTLaunchConfigurationConstants;
 import org.eclipse.cdt.debug.gdbjtag.core.IGDBJtagConstants;
@@ -27,38 +32,38 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
 
-import com.adi.toolchain.gnu.Activator;
-import com.adi.toolchain.gnu.build.CheckToolchain;
-import com.adi.toolchain.gnu.debug.gdbjtag.GDBJtagDebuggerTab;
-import com.adi.toolchain.gnu.debug.gdbjtag.GDBJtagStartupTab;
+import com.analog.gnu.toolchain.blackfin.Activator;
+import com.analog.gnu.toolchain.blackfin.build.CheckToolchain;
+import com.analog.gnu.toolchain.blackfin.debug.gdbjtag.GDBJtagDebuggerTab;
+import com.analog.gnu.toolchain.blackfin.debug.gdbjtag.GDBJtagStartupTab;
 
 public class BlackfinDebugTemplates extends AbstractLaunchConfigurationTab {
-	
+
 	private static final String defaultBlackfinIP = "192.168.0.15";
 	private static final String defaultGDBProxyIP = "localhost";
 	private static final int defaultGDBProxyPort = 2000;
 	private static final int defaultGDBServerPort = 1234;
 	private static final int defaultKGDBPort = 6443;
-	
+
 	private static final String elfGDB = "bfin-elf-gdb";
 	private static final String flatGDB = "bfin-uclinux-gdb";
 	private static final String fdpicGDB = "bfin-linux-uclibc-gdb";
-	
+
 	private GDBJtagDebuggerTab debuggerTab;
 	private GDBJtagStartupTab startupTab;
 	private ILaunchConfiguration launchConfig;
-	
+
 	private Label headerLabel;
-	
+
 	private List toolchainList;
-	
+
 	private Label elfLabel;
 	private List elfList;
 	private Label flatLabel;
 	private List flatList;
 	private Label fdpicLabel;
 	private List fdpicList;
-	
+
 	public BlackfinDebugTemplates(GDBJtagDebuggerTab debugger, GDBJtagStartupTab startup) {
 		debuggerTab = debugger;
 		startupTab = startup;
@@ -77,24 +82,24 @@ public class BlackfinDebugTemplates extends AbstractLaunchConfigurationTab {
 		sc.setExpandHorizontal(true);
 		sc.setExpandVertical(true);
 		setControl(sc);
-		
+
 		Composite comp = new Composite(sc, SWT.NONE);
 		sc.setContent(comp);
 		GridLayout layout = new GridLayout();
 		comp.setLayout(layout);
-		
+
 		createHeader(comp);
 		createDebuggerList(comp);
 		createTemplateList(comp);
-		
+
 		sc.setMinSize(comp.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
-	
+
 	private void createHeader(Composite parent) {
 		headerLabel = new Label(parent, SWT.NONE);
 		headerLabel.setText(Messages.getString("TemplateTab.Explanation"));
 	}
-	
+
 	private static String joinStrings(String list[], String delimiter)
 	{
 		int i;
@@ -103,7 +108,7 @@ public class BlackfinDebugTemplates extends AbstractLaunchConfigurationTab {
 			ret += list[i] + delimiter;
 		return ret + list[i];
 	}
-	
+
 	private static String listToDebugger(String item) {
 		return item.substring(item.lastIndexOf('(')).replaceAll("[()]", "");
 	}
@@ -113,7 +118,7 @@ public class BlackfinDebugTemplates extends AbstractLaunchConfigurationTab {
 				return true;
 		return false;
 	}
-	
+
 	private ILaunchConfigurationWorkingCopy workingCopy, localCopy;
 	private void getConfig() {
 		try {
@@ -140,17 +145,17 @@ public class BlackfinDebugTemplates extends AbstractLaunchConfigurationTab {
 		localCopy = null;
 	}
 	private String getAttribute(String attributeName, String defaultValue) { try { return localCopy.getAttribute(attributeName, defaultValue); } catch (CoreException e) { return defaultValue; } }
-	
+
 	private void createDebuggerList(Composite parent) {
 		Group group = new Group(parent, SWT.NONE);
 		group.setLayout(new GridLayout());
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		group.setLayoutData(gd);
 		group.setText(Messages.getString("TemplateTab.DebuggerHeader"));
-		
+
 		Composite comp = new Composite(group, SWT.NONE);
 		comp.setLayout(new GridLayout());
-		
+
 		toolchainList = new List(comp, SWT.BORDER);
 		if (CheckToolchain.isToolSupported(elfGDB))
 			toolchainList.add(Messages.getString("TemplateTab.DebuggerBare") + " (" + elfGDB + ")");
@@ -162,13 +167,13 @@ public class BlackfinDebugTemplates extends AbstractLaunchConfigurationTab {
 			public void handleEvent(Event event) {
 				String debugger = listToDebugger(toolchainList.getSelection()[0]);
 				boolean isJtagDebugger =  debugger.equals(elfGDB);
-				
+
 				if (elfList != null) elfList.setEnabled(debugger.equals(elfGDB));
 				if (flatList != null) flatList.setEnabled(debugger.equals(flatGDB));
 				if (fdpicList != null) fdpicList.setEnabled(debugger.equals(fdpicGDB));
-				
+
 				getConfig();
-				
+
 				/* Setup the Debugger tab */
 				localCopy.setAttribute(IMILaunchConfigurationConstants.ATTR_DEBUG_NAME, debugger);
 				localCopy.setAttribute(IMILaunchConfigurationConstants.ATTR_DEBUGGER_COMMAND_FACTORY, "Standard");
@@ -181,7 +186,7 @@ public class BlackfinDebugTemplates extends AbstractLaunchConfigurationTab {
 					localCopy.setAttribute(IGDBJtagConstants.ATTR_IP_ADDRESS, defaultBlackfinIP);
 					localCopy.setAttribute(IGDBJtagConstants.ATTR_PORT_NUMBER, defaultGDBServerPort);
 				}
-				
+
 				/* Setup the Startup tab */
 				String program = getAttribute(ICDTLaunchConfigurationConstants.ATTR_PROGRAM_NAME, "");
 				if (program.indexOf(':') == -1 && program.charAt(0) != '/') {
@@ -212,12 +217,12 @@ public class BlackfinDebugTemplates extends AbstractLaunchConfigurationTab {
 				localCopy.setAttribute(IGDBJtagConstants.ATTR_SET_STOP_AT, true);
 				localCopy.setAttribute(IGDBJtagConstants.ATTR_STOP_AT, "main");
 				localCopy.setAttribute(IGDBJtagConstants.ATTR_SET_RESUME, true);
-				
+
 				putConfig();
 			}
 		});
 	}
-	
+
 	/*
 	- Linux applications (Windows and Linux hosts)
 	    - fdpic only (gdb via ethernet)
@@ -229,7 +234,7 @@ public class BlackfinDebugTemplates extends AbstractLaunchConfigurationTab {
 	    - gnICE
 	    - gdb simulator
 	 */
-	
+
 	private void loadTemplateKGDB() {
 		localCopy.setAttribute(IGDBJtagConstants.ATTR_USE_REMOTE_TARGET, false);
 		localCopy.setAttribute(IGDBJtagConstants.ATTR_IP_ADDRESS, defaultBlackfinIP);
@@ -248,7 +253,7 @@ public class BlackfinDebugTemplates extends AbstractLaunchConfigurationTab {
 		localCopy.setAttribute(IGDBJtagConstants.ATTR_STOP_AT, "");
 		localCopy.setAttribute(IGDBJtagConstants.ATTR_SET_RESUME, true);
 	}
-	
+
 	private void loadTemplateGDBServer() {
 		localCopy.setAttribute(IGDBJtagConstants.ATTR_USE_REMOTE_TARGET, true);
 		localCopy.setAttribute(IGDBJtagConstants.ATTR_IP_ADDRESS, defaultBlackfinIP);
@@ -262,17 +267,17 @@ public class BlackfinDebugTemplates extends AbstractLaunchConfigurationTab {
 		localCopy.setAttribute(IGDBJtagConstants.ATTR_STOP_AT, "main");
 		localCopy.setAttribute(IGDBJtagConstants.ATTR_SET_RESUME, true);
 	}
-	
+
 	private void createTemplateList(Composite parent) {
 		Group group = new Group(parent, SWT.NONE);
 		group.setLayout(new GridLayout());
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false);
 		group.setLayoutData(gd);
 		group.setText(Messages.getString("TemplateTab.TemplateHeader"));
-		
+
 		Composite comp = new Composite(group, SWT.NONE);
 		comp.setLayout(new GridLayout(toolchainList.getItemCount(), true));
-		
+
 		if (inList(toolchainList, elfGDB)) {
 			elfLabel = new Label(comp, SWT.NONE);
 			//elfLabel.setText(Messages.getString("TemplateTab.elfTemplates"));
@@ -288,7 +293,7 @@ public class BlackfinDebugTemplates extends AbstractLaunchConfigurationTab {
 			//fdpicLabel.setText(Messages.getString("TemplateTab.fdpicTemplates"));
 			fdpicLabel.setText(fdpicGDB);
 		}
-		
+
 		if (inList(toolchainList, elfGDB)) {
 			elfList = new List(comp, SWT.BORDER);
 			elfList.setEnabled(false);
@@ -301,7 +306,7 @@ public class BlackfinDebugTemplates extends AbstractLaunchConfigurationTab {
 					Preferences prefs = MIPlugin.getDefault().getPluginPreferences();
 					if (prefs.getInt(IMIConstants.PREF_REQUEST_TIMEOUT) <= IMIConstants.DEF_REQUEST_TIMEOUT * 3)
 						prefs.setValue(IMIConstants.PREF_REQUEST_TIMEOUT, IMIConstants.DEF_REQUEST_TIMEOUT * 3);
-					
+
 					getConfig();
 					switch (elfList.getSelectionIndex()) {
 					case 0: {
@@ -319,7 +324,7 @@ public class BlackfinDebugTemplates extends AbstractLaunchConfigurationTab {
 						localCopy.setAttribute(IGDBJtagConstants.ATTR_SET_RESUME, true);
 						break;
 					}
-					
+
 					case 1: {
 						localCopy.setAttribute(IGDBJtagConstants.ATTR_USE_REMOTE_TARGET, false);
 						String init[] = {
@@ -332,7 +337,7 @@ public class BlackfinDebugTemplates extends AbstractLaunchConfigurationTab {
 						localCopy.setAttribute(IGDBJtagConstants.ATTR_SET_RESUME, false);
 						break;
 					}
-					
+
 					case 2: loadTemplateKGDB(); break;
 					}
 					putConfig();
@@ -340,7 +345,7 @@ public class BlackfinDebugTemplates extends AbstractLaunchConfigurationTab {
 			});
 		} else
 			elfList = null;
-		
+
 		if (inList(toolchainList, flatGDB)) {
 			flatList = new List(comp, SWT.BORDER);
 			flatList.setEnabled(false);
@@ -359,7 +364,7 @@ public class BlackfinDebugTemplates extends AbstractLaunchConfigurationTab {
 			});
 		} else
 			flatList = null;
-		
+
 		if (inList(toolchainList, fdpicGDB)) {
 			fdpicList = new List(comp, SWT.BORDER);
 			fdpicList.setEnabled(false);
@@ -377,16 +382,16 @@ public class BlackfinDebugTemplates extends AbstractLaunchConfigurationTab {
 		} else
 			fdpicList = null;
 	}
-	
+
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		launchConfig = configuration;
 	}
-	
+
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		// We don't have any settings on this tab
 		configuration.getOriginal();
 	}
-	
+
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		// We don't have any settings on this tab
 		configuration.getOriginal();
