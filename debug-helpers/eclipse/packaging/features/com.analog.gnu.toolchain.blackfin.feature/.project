@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>com.adi.toolchain.gnu.feature</name>
+	<name>com.analog.gnu.toolchain.blackfin.feature</name>
 	<comment></comment>
 	<projects>
 	</projects>
