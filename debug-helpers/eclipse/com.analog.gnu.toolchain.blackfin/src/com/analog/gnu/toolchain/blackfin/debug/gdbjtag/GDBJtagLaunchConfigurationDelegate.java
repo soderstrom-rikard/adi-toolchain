@@ -1,13 +1,14 @@
 /*******************************************************************************
- *  Copyright (c) 2009 Analog Devices, Inc.
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  which accompanies this distribution, and is available at
- *  http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2007 QNX Software Systems and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
  *
- *  Contributors:
- *     Analog Devices, Inc. - Initial implementation
+ * Contributors:
+ *     QNX Software Systems - Initial API and implementation
  *******************************************************************************/
+
 package com.analog.gnu.toolchain.blackfin.debug.gdbjtag;
 
 import java.io.File;
@@ -33,7 +34,7 @@ import org.eclipse.cdt.debug.gdbjtag.core.*;
 
 /**
  * @author Doug Schaefer
- *
+ * 
  */
 public class GDBJtagLaunchConfigurationDelegate extends AbstractCLaunchDelegate {
 
@@ -57,7 +58,7 @@ public class GDBJtagLaunchConfigurationDelegate extends AbstractCLaunchDelegate 
 			if ( exePath != null ) {
 				exeBinary = verifyBinary(project, exePath);
 			}
-
+			
 			try {
 				// create the Launch targets/processes for eclipse.
 				ICDITarget[] targets = session.getTargets();
@@ -71,7 +72,7 @@ public class GDBJtagLaunchConfigurationDelegate extends AbstractCLaunchDelegate 
 					CDIDebugModel.newDebugTarget(launch, project.getProject(), targets[i],
 							renderProcessLabel("GDB Hardware Debugger"), iprocess, exeBinary, true, false, false);
 				}
-
+				
 				debugger.doRunSession(launch, session, submonitor.newChild(1));
 			} catch (CoreException e) {
 				try {

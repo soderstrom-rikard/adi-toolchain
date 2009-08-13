@@ -1,14 +1,3 @@
-/*******************************************************************************
- *  Copyright (c) 2009 Analog Devices, Inc.
- *  All rights reserved. This program and the accompanying materials
- *  are made available under the terms of the Eclipse Public License v1.0
- *  which accompanies this distribution, and is available at
- *  http://www.eclipse.org/legal/epl-v10.html
- *
- *  Contributors:
- *     Analog Devices, Inc. - Initial implementation
- *******************************************************************************/
-
 /**
  * Duplicate of org/eclipse/cdt/managedbuilder/internal/scannerconfig/ManagedGCCScannerInfoConsoleParser.java
  * until either of these are fixed:
@@ -17,6 +6,17 @@
  */
 
 package com.analog.gnu.toolchain.blackfin.scanner;
+
+/*******************************************************************************
+ * Copyright (c) 2007 Intel Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ * Intel Corporation - Initial API and implementation
+ *******************************************************************************/
 
 import org.eclipse.cdt.build.core.scannerconfig.CfgInfoContext;
 import org.eclipse.cdt.core.model.CoreModel;
@@ -31,7 +31,7 @@ import org.eclipse.core.resources.IProject;
 public class ManagedGCCScannerInfoConsoleParser extends
 		GCCScannerInfoConsoleParser {
 	Boolean fManagedBuildOnState;
-
+	
 	public boolean processLine(String line) {
 		if(isManagedBuildOn())
 			return false;
@@ -65,7 +65,7 @@ public class ManagedGCCScannerInfoConsoleParser extends
 		} else {
 			return false;
 		}
-
+		
 		IProject project = c.getProject();
 		ICProjectDescription des = CoreModel.getDefault().getProjectDescription(project, false);
 		CfgInfoContext cc = CfgInfoContext.fromInfoContext(des, c);
