@@ -943,8 +943,6 @@ part_emudat_defer_get (chain_t *chain, int n, int exit)
     {
       assert (tap_state (chain) & TAPSTAT_IDLE);
       chain_defer_clock (chain, 0, 0, 1);
-      if (bfin_wait_emuready)
-	part_wait_emuready (chain, n);
     }
 
   if (part_scan_select (chain, n, EMUDAT_SCAN) < 0)
