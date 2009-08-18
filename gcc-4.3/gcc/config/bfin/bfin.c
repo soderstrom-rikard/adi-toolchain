@@ -2330,6 +2330,19 @@ bfin_expand_call (rtx retval, rtx fnaddr, rtx callarg1, rtx cookie, int sibcall)
 	  if (! address_operand (addr, Pmode))
 	    addr = force_reg (Pmode, addr);
 
+	  /* instantiate_virtual_regs can't deal with our load_funcdescsi
+	     pattern.  */
+	  if ((REG_P (addr) && REGNO (addr) >= FIRST_VIRTUAL_REGISTER
+	       && REGNO (addr) <= LAST_VIRTUAL_REGISTER)
+	      || (GET_CODE (addr) == PLUS && REG_P (XEXP (addr, 0))
+		  && REGNO (XEXP (addr, 0)) >= FIRST_VIRTUAL_REGISTER
+		  && REGNO (XEXP (addr, 0)) <= LAST_VIRTUAL_REGISTER))
+	    {
+	      rtx tmp = gen_reg_rtx (Pmode);
+	      emit_move_insn (tmp, addr);
+	      addr = tmp;
+	    }
+	    
 	  fnaddr = gen_reg_rtx (SImode);
 	  emit_insn (gen_load_funcdescsi (fnaddr, addr));
 	  fnaddr = gen_rtx_MEM (Pmode, fnaddr);
