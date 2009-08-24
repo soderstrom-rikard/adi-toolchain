@@ -2226,7 +2226,7 @@ if [ $KERNEL_SOURCE ] ; then
         run_cmd $MAKE \
             -C "$DIR_UBOOT" \
             O="$DIR_UBOOT_BUILD" \
-            BIN_FILES="${UBOOT_TOOLS}" \
+            BIN_FILES-y="${UBOOT_TOOLS}" \
             SUBDIRS="tools" \
             ${HOSTCC+HOSTCC=${HOSTCC}} \
             tools
