@@ -2079,7 +2079,7 @@ run_tests ()
     if [ $LEGACY_RESULT ] ; then
 	echo_date "Legacify result names"
 
-	for i in `find $1 -name "*newlib-$GCC_VERSION.*" -o -name "*libstdc++-$GCC_VERSION.*" -o -name "*libmudflap-$GCC_VERSION.*"`
+	for i in `find $1 -name "*newlib-$GCC_VERSION.*" -o -name "*libstdc++-$GCC_VERSION.*" -o -name "*libmudflap-$GCC_VERSION.*" -o -name "*libgomp-$GCC_VERSION.*" `
 	do
 	    p=`dirname $i`
 	    n=`basename $i`
@@ -2093,7 +2093,7 @@ run_tests ()
 	    esac
 	done
 
-	for i in `find $1 -name "g++-4.1.*"`
+	for i in `find $1 -name "g++-$GCC_VERSION.*" -o -name "gfortran-$GCC_VERSION.*" -o -name "objc-$GCC_VERSION.*"`
 	do
 	    p=`dirname $i`
 	    n=`basename $i`
