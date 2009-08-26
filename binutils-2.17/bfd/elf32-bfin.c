@@ -3629,6 +3629,7 @@ _bfinfdpic_count_got_plt_entries (void **entryp, void *dinfo_)
 {
   struct bfinfdpic_relocs_info *entry = *entryp;
   struct _bfinfdpic_dynamic_got_info *dinfo = dinfo_;
+  struct elf_link_hash_table *htab = elf_hash_table (dinfo->info);
   unsigned relocs = 0, fixups = 0;
 
   /* Allocate space for a GOT entry pointing to the symbol.  */
@@ -3650,11 +3651,20 @@ _bfinfdpic_count_got_plt_entries (void **entryp, void *dinfo_)
     entry->relocsfd--;
   entry->relocsfd++;
 
+  /* Make sure the symbol is output as a dynamic symbol if necessary.  */
+  if (htab->dynamic_sections_created
+      && entry->symndx == -1 && entry->d.h->dynindx == -1
+      && (entry->relocs32 || entry->relocsfd || entry->call)
+      && !entry->d.h->forced_local)
+    {
+      bfd_elf_link_record_dynamic_symbol (dinfo->info, entry->d.h);
+    }
+
   /* Decide whether we need a PLT entry, a function descriptor in the
      GOT, and a lazy PLT entry for this symbol.  */
   entry->plt = entry->call
     && entry->symndx == -1 && ! BFINFDPIC_SYM_LOCAL (dinfo->info, entry->d.h)
-    && elf_hash_table (dinfo->info)->dynamic_sections_created;
+    && htab->dynamic_sections_created;
   entry->privfd = entry->plt
     || entry->fdgoff17m4 || entry->fdgoffhilo
     || ((entry->fd || entry->fdgot17m4 || entry->fdgothilo)
@@ -3663,7 +3673,7 @@ _bfinfdpic_count_got_plt_entries (void **entryp, void *dinfo_)
   entry->lazyplt = entry->privfd
     && entry->symndx == -1 && ! BFINFDPIC_SYM_LOCAL (dinfo->info, entry->d.h)
     && ! (dinfo->info->flags & DF_BIND_NOW)
-    && elf_hash_table (dinfo->info)->dynamic_sections_created;
+    && htab->dynamic_sections_created;
 
   /* Allocate space for a function descriptor.  */
   if (entry->fdgoff17m4)
@@ -4719,16 +4729,6 @@ bfinfdpic_check_relocs (bfd *abfd, struct bfd_link_info *info,
 	    }
 	  if (h != NULL)
 	    {
-	      if (h->dynindx == -1)
-		switch (ELF_ST_VISIBILITY (h->other))
-		  {
-		  case STV_INTERNAL:
-		  case STV_HIDDEN:
-		    break;
-		  default:
-		    bfd_elf_link_record_dynamic_symbol (info, h);
-		    break;
-		  }
 	      picrel
 		= bfinfdpic_relocs_info_for_global (bfinfdpic_relocs_info (info),
 						   abfd, h,
