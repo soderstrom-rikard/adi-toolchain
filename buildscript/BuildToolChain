@@ -1065,6 +1065,36 @@ echo_date()
     return 0
 }
 
+get_scm_ver()
+{
+	if [ -n "$PKGVERSION" ] ; then
+		echo "$PKGVERSION"
+		return 0
+	fi
+
+	local src=$1 SCM_URL SCM_REV
+
+	if [ -d "$src/.svn" ] ; then
+		eval $(svn info "$src" 2>/dev/null | \
+			sed -n \
+				-e '/^URL:/s:.* .*/trunk/.*:SCM_URL=trunk:p' \
+				-e '/^URL:/s:.* .*/branches/toolchain_\(.*\)_branch/.*:SCM_URL=\1:p' \
+				-e '/^Last Changed Rev:/s:.* :SCM_REV=:p' \
+		)
+		[ -n "$SCM_REV" ] && SCM_REV="svn-${SCM_REV}"
+	elif [ -d "$src/../.git" ] ; then
+		eval $(cd "$src"; \
+			SCM_URL=$(git branch | awk '$1 == "*" { sub(/^[*][[:space:]]*/, ""); gsub(/[()]/, ""); gsub(/[[:space:]]/, "-"); print; }')
+			echo SCM_URL=${SCM_URL}
+			echo SCM_REV=$(git rev-parse --short --verify HEAD)
+		)
+		[ -n "$SCM_REV" ] && SCM_REV="git-${SCM_REV}"
+	fi
+	[ -n "$SCM_URL" ] && SCM_URL="-${SCM_URL}"
+	[ -n "$SCM_REV" ] && SCM_REV="/${SCM_REV}"
+	echo "ADI${SCM_URL}${SCM_REV}"
+}
+
 build_gcc ()
 {
     resume_check bfin-$2.gcc-$1 && return 0
@@ -1113,26 +1143,6 @@ build_gcc ()
 	fi
     fi
 
-    if [ -d "$DIR_GCC_SOURCE/.svn" ] ; then
-        eval $(svn info "$DIR_GCC_SOURCE" 2>/dev/null | \
-            sed -n \
-                -e '/^URL:/s:.* .*/trunk/.*:SCM_URL=trunk:p' \
-                -e '/^URL:/s:.* .*/branches/toolchain_\(.*\)_branch/.*:SCM_URL=\1:p' \
-                -e '/^Last Changed Rev:/s:.* :SCM_REV=:p' \
-        )
-        [ -n "$SCM_REV" ] && SCM_REV="svn-${SCM_REV}"
-    elif [ -d "$DIR_GCC_SOURCE/../.git" ] ; then
-        eval $(cd "$DIR_GCC_SOURCE"; \
-            SCM_URL=$(git branch | awk '$1 == "*" { sub(/^[*][[:space:]]*/, ""); gsub(/[()]/, ""); gsub(/[[:space:]]/, "-"); print; }')
-            echo SCM_URL=${SCM_URL}
-            echo SCM_REV=$(git rev-parse --short --verify HEAD)
-        )
-        [ -n "$SCM_REV" ] && SCM_REV="git-${SCM_REV}"
-    fi
-    [ -n "$SCM_URL" ] && SCM_URL="-${SCM_URL}"
-    [ -n "$SCM_REV" ] && SCM_REV="/${SCM_REV}"
-    [ -z "$PKGVERSION" ] && PKGVERSION="ADI${SCM_URL}${SCM_REV}"
-
     if [ -e $DIR_GCC_SOURCE/gcc/BASE-VER ] ; then
         VERSION=`cat $DIR_GCC_SOURCE/gcc/BASE-VER`
     else
@@ -1145,7 +1155,7 @@ build_gcc ()
       --disable-symvers --disable-libssp --disable-libffi $LOCALE \
       --enable-version-specific-runtime-libs --enable-__cxa_atexit \
       --with-bugurl=URL:http://blackfin.uclinux.org/gf/project/toolchain/tracker \
-      --with-pkgversion=${PKGVERSION}"
+      --with-pkgversion=$(get_scm_ver $DIR_GCC_SOURCE)"
     run_cmd $RUN
 
     echo_date "Building GCC"
@@ -1231,7 +1241,8 @@ build_binutils()
 	run_cmd $DIR_BINUTILS_SOURCE/configure \
 		$BUILD_TARGET $HOST_TARGET --target=${target} \
 		--prefix=${prefix} ${myconf} $BINUTILS_EXTRA_CONF \
-		--with-bugurl=URL:http://blackfin.uclinux.org/gf/project/toolchain/tracker
+		--with-bugurl=URL:http://blackfin.uclinux.org/gf/project/toolchain/tracker \
+		--with-pkgversion=$(get_scm_ver $DIR_BINUTILS_SOURCE)
 
 	echo_date "Building $1 Binutils & GDB"
 	run_cmd $MAKE all-binutils all-gas all-ld all-sim all-gdb
