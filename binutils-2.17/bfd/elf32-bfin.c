@@ -2171,7 +2171,8 @@ _bfinfdpic_emit_got_relocs_plt_entries (struct bfinfdpic_relocs_info *entry,
 	dynindx = entry->d.h->dynindx;
       else
 	{
-	  if (sec->output_section
+	  if (sec
+	      && sec->output_section
 	      && ! bfd_is_abs_section (sec->output_section)
 	      && ! bfd_is_und_section (sec->output_section))
 	    dynindx = elf_section_data (sec->output_section)->dynindx;
@@ -2439,8 +2440,9 @@ _bfinfdpic_emit_got_relocs_plt_entries (struct bfinfdpic_relocs_info *entry,
 	     of the section.  For a non-local function, it's
 	     disregarded.  */
 	  lowword = ad;
-	  if (entry->symndx == -1 && entry->d.h->dynindx != -1
-	      && entry->d.h->dynindx == idx)
+	  if (sec == NULL
+	      || (entry->symndx == -1 && entry->d.h->dynindx != -1
+		  && entry->d.h->dynindx == idx))
 	    highword = 0;
 	  else
 	    highword = _bfinfdpic_osec_to_segment
