@@ -12,6 +12,7 @@ gnICE-drivers.zip: Prerequisites/CDM*.zip Prerequisites/gnICE/*
 	rm -rf gnICE-drivers ; \
 	mkdir gnICE-drivers ; \
 	cp Prerequisites/gnICE/* gnICE-drivers/ ; \
+	cp Prerequisites/DPInst-*.exe gnICE-drivers/DPInst.exe ; \
 	cd gnICE-drivers ; \
 	unzip -q ../Prerequisites/CDM*.zip ; \
 	cd CDM*/ ; \
