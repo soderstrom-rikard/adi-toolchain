@@ -76,6 +76,12 @@ SectionEnd
 !insertmacro BlackfinInstall "uclinux" "FLAT"
 !insertmacro BlackfinInstall "linux-uclibc" "FDPIC"
 
+Section "Drivers" SecDrivers
+  SetOutPath "$INSTDIR\gnICE-drivers"
+  File gnICE-drivers\*
+  ExecWait "$INSTDIR\gnICE-drivers\DPInst.exe"
+SectionEnd
+
 !ifndef SKIP_ECLIPSE
 Section "Eclipse" SecEclipse
   SetOutPath "$INSTDIR\Eclipse"
@@ -101,6 +107,7 @@ LangString DESC_SecNEWLIB ${LANG_ENGLISH} "Blackfin Toolchain for running on bar
 LangString DESC_SecFLAT ${LANG_ENGLISH} "Blackfin Toolchain for generating FLAT binaries to run under Linux"
 LangString DESC_SecFDPIC ${LANG_ENGLISH} "Blackfin Toolchain for generating shared FDPIC ELF binaries to run under Linux"
 LangString DESC_SecEclipse ${LANG_ENGLISH} "Eclipse IDE with Blackfin Plugins"
+LangString DESC_SecDrivers ${LANG_ENGLISH} "gnICE/gnICE+ USB Drivers"
 LangString DESC_SecExamples ${LANG_ENGLISH} "Some simple example programs"
 LangString DESC_SecShortcuts ${LANG_ENGLISH} "Start Menu Shortcuts"
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
@@ -108,6 +115,7 @@ LangString DESC_SecShortcuts ${LANG_ENGLISH} "Start Menu Shortcuts"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecFLAT} $(DESC_SecFLAT)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecFDPIC} $(DESC_SecFDPIC)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecEclipse} $(DESC_SecEclipse)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecDrivers} $(DESC_SecDrivers)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecExamples} $(DESC_SecExamples)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecShortcuts} $(DESC_SecShortcuts)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END

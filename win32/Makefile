@@ -1,4 +1,5 @@
 VERSION ?= SVN-$(SVN_REV)
+SVN_REV = `svn info | awk '$$1 == "Revision:" { print $$NF }'`
 
 NSIS_FLAGS += \
 	-DPRODUCT_VERSION="$(VERSION)" \
@@ -22,5 +23,4 @@ gnICE-drivers.zip: Prerequisites/CDM*.zip Prerequisites/gnICE/*
 	patch -s -p0 < ftdi.patch ; \
 	rm -f ftdi.patch ; \
 	cd .. ; \
-	zip -r -q gnICE-drivers.zip gnICE-drivers ; \
-	rm -rf gnICE-drivers
+	zip -r -q gnICE-drivers.zip gnICE-drivers
