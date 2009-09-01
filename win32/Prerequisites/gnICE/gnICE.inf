@@ -1,0 +1,48 @@
+[Version]
+Signature   = "$Chicago$"
+Class       = %DeviceClassName%
+ClassGUID   = {89982A59-5EEA-45aa-AF97-52EC351018C2}
+Provider    = %manufacturer%
+CatalogFile = gnICE+.cat
+DriverVer   = 09/01/2009,1.0
+
+; Install into the same place as the ADI USB ICEs
+[ClassInstall]
+Addreg=Class_AddReg
+[ClassInstall32]
+Addreg=Class_AddReg
+[Class_AddReg]
+HKR,,,,%DeviceClassName%
+HKR,,Icon,,"-5"
+
+[Manufacturer]
+%manufacturer% = Devices,nt
+
+; We only have entries for the first interface on the composite JTAG device.
+; The second interface (UART) is handled by the FTDI drivers.
+[Devices]
+%gnICE_JTAG%  = LIBUSB_FILTER, USB\VID_0456&PID_f000&MI_00
+%gnICE+_JTAG% = LIBUSB_FILTER, USB\VID_0456&PID_f001&MI_00
+[Devices.NT]
+%gnICE_JTAG%  = LIBUSB_FILTER, USB\VID_0456&PID_f000&MI_00
+%gnICE+_JTAG% = LIBUSB_FILTER, USB\VID_0456&PID_f001&MI_00
+
+[LIBUSB_FILTER]
+[LIBUSB_FILTER.NT]
+
+; Services is required by driver framework, so duplicate the filter driver settings
+; but don't clobber them so that it always has preference
+[LIBUSB_FILTER.NT.Services]
+AddService = libusb0, 0x13a, libusb_add_service
+[libusb_add_service]
+DisplayName    = "LibUsb-Win32 - Kernel Driver"
+ServiceType    = 1
+StartType      = 3
+ErrorControl   = 0
+ServiceBinary  = %12%\libusb0.sys
+
+[Strings]
+manufacturer    = "Analog Devices, Inc."
+DeviceClassName = "ADI Development Tools"
+gnICE_JTAG      = "gnICE (JTAG)"
+gnICE+_JTAG     = "gnICE+ (JTAG)"
