@@ -1,3 +1,10 @@
+2008-12-06  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	Fix a misapplied patch.
+	* lib/target-supports.exp (check_effective_target_sync_int_long):
+	Supported on Blackfin Linux targets.
+	(check_effective_target_sync_char_short): Not supported on Blackfin.
+
 2009-06-15  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* config/bfin/bfin.c (bfin_cpus[]): Add 0.1 for bf512, bf514, bf516,
