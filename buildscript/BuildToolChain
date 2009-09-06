@@ -1203,10 +1203,12 @@ build_gcc ()
         cd "${prefix}"/include && rm -f itcl*.h itk*.h tcl*.h tk*.h
         cd "${prefix}"/man     && rm -rf mann man1/tclsh.1 man1/wish.1
         grep -sl Tcl/Tk man3/* | xargs rm -f
-        cd ..
-        rmdir */* *
         ) 2>/dev/null
     fi
+    # scrub files we dont care about
+    run_cmd rm -f "$3"/lib*/libiberty.a "$3"/lib*/libbfin-*-sim.a
+    run_cmd rm -rf "$3"/libexec/gcc/*/*/install-tools/ "$3"/lib*/gcc/*/*/install-tools/mkheaders.conf
+    find "$3" -depth -type d -exec rmdir {} \; 2>/dev/null
 
     if [ "${CBUILD}" != "${CHOST}" ] ; then
         PATH=$save_PATH
