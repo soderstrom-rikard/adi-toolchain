@@ -63,6 +63,8 @@ TEST_LIBMUDFLAP=0
 TEST_LIBGOMP=0
 TEST_NEWLIB=0
 
+TEST_TOOL=
+
 BINUTILS_TESTSUITE=
 GAS_TESTSUITE=
 LD_TESTSUITE=
@@ -203,77 +205,155 @@ shift $(($OPTIND - 1))
 
 until [ -z "$1" ]
 do
-    case $1 in
+  INDEX=${1:0:1}
+  if [ $INDEX == "!" ] ; then
+  TOOL=${1:1}
+  else
+  TOOL=${1:0}
+  fi
+  case $TOOL in
 	gcc*)
-	    TEST_GCC=1
-	    TEST_ALL=0
-	    GCC_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            if [ $INDEX == "!" ] ; then
+                 TEST_GCC=0
+                 TEST_ALL=1
+                 TEST_TOOL="$TEST_TOOL TEST_GCC"
+            else
+	         TEST_GCC=1
+                 TEST_ALL=0
+                 GCC_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            fi
 	    shift
 	    ;;
 	g++*)
-	    TEST_GXX=1
-	    TEST_ALL=0
-	    GXX_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            if [ $INDEX == "!" ] ; then
+                 TEST_GXX=0
+                 TEST_ALL=1
+                 TEST_TOOL="$TEST_TOOL TEST_GXX"
+            else
+	         TEST_GXX=1
+                 TEST_ALL=0
+	         GXX_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            fi
 	    shift
 	    ;;
 	gfortran*)
-	    TEST_GFORTRAN=1
-	    TEST_ALL=0
-	    GFORTRAN_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            if [ $INDEX == "!" ] ; then
+                 TEST_GFORTRAN=0
+                 TEST_ALL=1
+                 TEST_TOOL="$TEST_TOOL TEST_GFORTRAN"
+            else
+	         TEST_GFORTRAN=1
+                 TEST_ALL=0
+	         GFORTRAN_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            fi
 	    shift
 	    ;;
 	objc*)
-	    TEST_OBJC=1
-	    TEST_ALL=0
-	    OBJC_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            if [ $INDEX == "!" ] ; then
+                 TEST_OBJC=0
+                 TEST_ALL=1
+                 TEST_TOOL="$TEST_TOOL TEST_OBJC"
+            else
+	         TEST_OBJC=1
+                 TEST_ALL=0
+	         OBJC_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            fi
 	    shift
 	    ;;
 	binutils*)
-	    TEST_BINUTILS=1
-	    TEST_ALL=0
-	    BINUTILS_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            if [ $INDEX == "!" ] ; then
+                 TEST_BINUTILS=0
+                 TEST_ALL=1
+                 TEST_TOOL="$TEST_TOOL TEST_BINUTILS"
+            else
+	         TEST_BINUTILS=1
+                 TEST_ALL=0
+	         BINUTILS_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            fi
 	    shift
 	    ;;
 	gas*)
-	    TEST_GAS=1
-	    TEST_ALL=0
-	    GAS_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            if [ $INDEX == "!" ] ; then
+                 TEST_GAS=0
+                 TEST_ALL=1
+                 TEST_TOOL="$TEST_TOOL TEST_GAS"
+            else
+	         TEST_GAS=1
+                 TEST_ALL=0
+	         GAS_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            fi
 	    shift
 	    ;;
 	ld*)
-	    TEST_LD=1
-	    TEST_ALL=0
-	    LD_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            if [ $INDEX == "!" ] ; then
+                 TEST_LD=0
+                 TEST_ALL=1
+                 TEST_TOOL="$TEST_TOOL TEST_LD"
+            else
+	         TEST_LD=1
+                 TEST_ALL=0
+	         LD_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            fi
 	    shift
 	    ;;
 	gdb*)
-	    TEST_GDB=1
-	    TEST_ALL=0
-	    GDB_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            if [ $INDEX == "!" ] ; then
+                 TEST_GDB=0
+                 TEST_ALL=1
+                 TEST_TOOL="$TEST_TOOL TEST_GDB"
+            else
+	         TEST_GDB=1
+                 TEST_ALL=0
+	         GDB_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            fi
 	    shift
 	    ;;
 	libstdc++*)
-	    TEST_LIBSTDCXX=1
-	    TEST_ALL=0
-	    LIBSTDCXX_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            if [ $INDEX == "!" ] ; then
+                 TEST_LIBSTDCXX=0
+                 TEST_ALL=1
+                 TEST_TOOL="$TEST_TOOL TEST_LIBSTDCXX"
+            else
+	         TEST_LIBSTDCXX=1
+                 TEST_ALL=0
+	         LIBSTDCXX_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            fi
 	    shift
 	    ;;
 	libmudflap*)
-	    TEST_LIBMUDFLAP=1
-	    TEST_ALL=0
-	    LIBMUDFLAP_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            if [ $INDEX == "!" ] ; then
+                 TEST_LIBMUDFLAP=0
+                 TEST_ALL=1
+                 TEST_TOOL="$TEST_TOOL TEST_LIBMUDFLAP"
+            else
+	         TEST_LIBMUDFLAP=1
+                 TEST_ALL=0
+	         LIBMUDFLAP_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            fi
 	    shift
 	    ;;
 	libgomp*)
-	    TEST_LIBGOMP=1
-	    TEST_ALL=0
-	    LIBGOMP_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            if [ $INDEX == "!" ] ; then
+                 TEST_LIBGOMP=0
+                 TEST_ALL=1
+                 TEST_TOOL="$TEST_TOOL TEST_LIBGOMP"
+            else
+	         TEST_LIBGOMP=1
+                 TEST_ALL=0
+	         LIBGOMP_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            fi
 	    shift
 	    ;;
 	newlib*)
-	    TEST_NEWLIB=1
-	    TEST_ALL=0
-	    NEWLIB_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            if [ $INDEX == "!" ] ; then
+                 TEST_NEWLIB=0
+                 TEST_ALL=1
+                 TEST_TOOL="$TEST_TOOL TEST_NEWLIB"
+            else
+	         TEST_NEWLIB=1
+                 TEST_ALL=0
+	         NEWLIB_TESTSUITE=`echo $1 | sed -e 's/=/ /' | awk '{print $2}'`
+            fi
 	    shift
 	    ;;
 	*)
@@ -295,6 +375,11 @@ if [ $TEST_ALL -eq 1 ] ; then
     TEST_LIBMUDFLAP=1
     TEST_LIBGOMP=1
     TEST_NEWLIB=1
+
+    for test_config in $TEST_TOOL
+    do
+        eval $test_config=0
+    done
 fi
 
 if [ ! $TEST_TARGET_ELF_SIM ] && [ ! $TEST_TARGET_ELF_JTAG ] && [ ! $TEST_TARGET_UCLINUX ] && [ ! $TEST_TARGET_LINUX_UCLIBC ]; then
@@ -347,10 +432,10 @@ if [ $TEST_GXX -eq 1 ] ; then
     printf "g++ "
 fi
 if [ $TEST_GFORTRAN -eq 1 ] ; then
-    printf "gfortran"
+    printf "gfortran "
 fi
 if [ $TEST_OBJC -eq 1 ] ; then
-    printf "objc"
+    printf "objc "
 fi
 if [ $TEST_LIBSTDCXX -eq 1 ] ; then
     printf "libstdc++ "
