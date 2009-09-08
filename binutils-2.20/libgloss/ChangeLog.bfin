@@ -1,3 +1,8 @@
+2009-09-08  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/Makefile.in (basiccrt.o, basiccrts.o): Don't use
+	-mcpu=bf532-any for the default multilib.
+
 2008-10-01  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* bfin/Makefile.in (BOARD_SCRIPTS): Add bf512.ld, bf514.ld,
