@@ -1,3 +1,7 @@
+2008-12-16  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/*.ld: Fix typos in comments.
+
 2006-11-09  Jie Zhang  <jie.zhang@analog.com>
 
 	* libnosys/_exit.c (_exit): Cause exception 0 for Blackfin.
