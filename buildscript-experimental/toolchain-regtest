@@ -2186,6 +2186,15 @@ run_tests ()
 	done
     fi
 
+    #Leave the failed testcases and delete the passed one.
+    testcase=
+    for testcase in `find $DIR_BUILD -name \*.gdb`
+    do
+            if [ ! -e ${testcase%\.gdb} ] ; then
+                 rm $testcase
+            fi
+    done
+
     echo_date "Done testing  - results"
 
     FILES=
