@@ -1085,7 +1085,7 @@ prepare_target()
 # A very light check_tests_OK, which only check if the target board is hung.
 # Let runtest timeout handle host side.
 
-check_tests_OK()
+check_tests_OK1()
 {
     PID=$1
     THRESHOLD=3
@@ -1124,7 +1124,7 @@ check_tests_OK()
 # The basic idea is that if things are not progressing at least every 10 minutes
 # something is hung, and we should kill it, and tell the user what was stuck
 #
-check_tests_OK1()
+check_tests_OK()
 {
     PID=$1
     HOST_THRESHOLD=7
@@ -1301,7 +1301,7 @@ check_tests_OK1()
     fi
 
     TREE=`pstree -n -A -l -p $PID | sed -e 's/-[-+]-/\n/g' -e 's/^[ \t]*//' -e '/^[[:space:]]*$/d' | awk -F "(" '{print $NF}' | awk -F ")" '{print $1}'`
-    TREE_LEN=`printf $TREE | wc -c`
+    TREE_LEN=`printf "$TREE" | wc -c`
     if [ $TREE_LEN -gt 0 ] ; then
         echo " ** Aborting remaining tests"
         echo $TREE
