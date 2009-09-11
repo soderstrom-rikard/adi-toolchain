@@ -1,3 +1,10 @@
+2009-09-11  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	Import from mainline:
+        * config/bfin/bfin.c (legitimize_pic_address, hard_regno_mode_ok,
+        bfin_memory_move_cost, bfin_secondary_reload,
+        bfin_output_mi_thunk): Avoid C++ keywords.
+
 2009-08-18  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (bfin_expand_call): Don't call gen_load_funcdescsi
