@@ -2188,7 +2188,7 @@ run_tests ()
 
     #Leave the failed testcases and delete the passed one.
     testcase=
-    for testcase in `find $DIR_BUILD -name \*.gdb`
+    for testcase in `find $DIR_BUILD -name \*.gdb -type f `
     do
             if [ ! -e ${testcase%\.gdb} ] ; then
                  rm $testcase
