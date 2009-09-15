@@ -1,4 +1,4 @@
-; http://nsis.sourceforge.net/wiki/Path_Manipulation
+; http://nsis.sourceforge.net/Path_Manipulation
 ; functions for manipulating the Windows Path environment variable
 
 !ifndef _AddToPath_nsh
@@ -86,6 +86,14 @@ Function AddToPath
     Pop $0
 FunctionEnd
 
+; To use:
+; !insertmacro EnvAddToPath "$INSTDIR\foo"
+!macro EnvAddToPath path
+  DetailPrint "Adding to PATH: ${path}"
+  Push "${path}"
+  Call AddToPath
+!macroend
+
 ; RemoveFromPath - Remove a given dir from the path
 ;     Input: head of the stack
 
@@ -172,6 +180,13 @@ Function un.RemoveFromPath
     Pop $0
 FunctionEnd
 
+; To use:
+; !insertmacro un.EnvRemoveFromPath "$INSTDIR\foo"
+!macro un.EnvRemoveFromPath path
+  DetailPrint "Removing from PATH: ${path}"
+  Push "${path}"
+  Call un.RemoveFromPath
+!macroend
 
 
 ; AddToEnvVar - Adds the given value to the given environment var
@@ -422,8 +437,6 @@ FunctionEnd
 !insertmacro StrStr ""
 !insertmacro StrStr "un."
 
-!endif ; _AddToPath_nsh
-
 Function Trim ; Added by Pelaca
 	Exch $R1
 	Push $R2
@@ -441,3 +454,5 @@ Done:
 	Pop $R2
 	Exch $R1
 FunctionEnd
+
+!endif ; _AddToPath_nsh
