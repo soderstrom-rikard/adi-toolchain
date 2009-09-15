@@ -78,7 +78,7 @@ SectionEnd
 
 Section "Drivers" SecDrivers
   SetOutPath "$INSTDIR\gnICE-drivers"
-  File gnICE-drivers\*
+  File /r gnICE-drivers\*
   ExecWait "$INSTDIR\gnICE-drivers\DPInst.exe"
 SectionEnd
 
