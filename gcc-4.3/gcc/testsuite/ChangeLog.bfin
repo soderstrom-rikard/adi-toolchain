@@ -1,3 +1,8 @@
+2009-09-15  Jie Zhang  <jie.zhang@analog.com>
+
+	* gcc.target/lsetup-5.c: Move to ...
+	* gcc.target/bfin/lsetup-5.c: ... here.
+
 2009-06-15  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* gcc.target/bfin/mcpu-bf512.c: Check SILICON_REVISION is 0x0001.
