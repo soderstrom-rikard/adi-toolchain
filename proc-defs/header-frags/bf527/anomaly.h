@@ -8,7 +8,7 @@
 
 /* This file should be up to date with:
  *  - Revision D, 08/14/2009; ADSP-BF526 Blackfin Processor Anomaly List
- *  - Revision F, 03/03/2009; ADSP-BF527 Blackfin Processor Anomaly List
+ *  - Revision G, 08/25/2009; ADSP-BF527 Blackfin Processor Anomaly List
  */
 
 #ifndef _MACH_ANOMALY_H_
