@@ -1,0 +1,251 @@
+#!/bin/sh
+
+### If there are no detailed logs under test folder, then compare the test_results directly.
+
+toolchain_build=/home/test/work/cruise/test_scripts/toolchain/toolchain-build
+compare_result=0
+
+if [  $# -eq 1 ] ; then
+  echo "Give wrong arguments. It could be 0,2,3."
+fi    
+
+if [ -e $toolchain_build/thisrun/test_results ] && [ -e $toolchain_build/lastrun/test_results ] ; then 
+       thisrun_test_results=`cat $toolchain_build/thisrun/test_results | grep "exit=" | awk  'BEGIN { FS="[.=]" } {print $2 }'`
+       lastrun_test_results=`cat $toolchain_build/lastrun/test_results | grep "exit=" | awk  'BEGIN { FS="[.=]" } {print $2 }'`
+
+    if [ $thisrun_test_results -ge 2 ] ; then 
+       if [ $thisrun_test_results == $lastrun_test_results ] ; then
+           echo "test results are the same as last time!"
+           exit 0
+       else
+           echo "thisrun test results are $thisrun_test_results! lastrun test results are $lastrun_test_results."
+           exit 1    
+       fi
+   fi
+fi
+
+if [  $# -ge 2 ] ; then
+  SIM=${1%/}
+  HW=${2%/}
+  if [ ! -d $SIM ] ; then
+    echo "$SIM is not a dir"
+    exit 0
+  fi
+  if [ ! -d $HW ] ; then
+    echo "$HW is not a dir"
+    exit 1
+  fi
+else
+    echo "To compare logs needs their path!"
+    exit 1
+fi    
+
+if [  $# -ge 3 ] ; then
+  COMPARE=$3
+fi
+
+if [ ! $COMPARE ] ; then
+  COMPARE=~/work/cruise/checkouts/toolchain/gcc-4.1/contrib/compare_tests
+fi
+chmod 755 $COMPARE
+
+if [ ! -f $COMPARE ] ; then
+  echo "$COMPARE doesn't look like a shell script"
+  exit 1
+fi
+
+STA=${SIM%/*}
+STA=${STA%/*}
+STA_DIRNAME=`dirname $STA`
+STA_BASENAME=`basename $STA`
+
+
+echo  "##################   Comparing ${HW##*/}   ########################## "
+cd $STA_DIRNAME ; ls -l $STA_BASENAME | awk '{print  $8 " : " $(10)  }'  
+echo  "First  column is : $SIM "
+echo  "Second column is : $HW "
+echo
+
+FILES=`find $1 -name "*.sum" | sort`
+
+if [ $HW ] ; then
+  cd $HW
+  for FILE in $FILES 
+  do
+    FILE=${FILE##*/}
+    echo "                       ******* $FILE ***********"
+    if [ ! -f $SIM/$FILE ] ; then
+        echo "$SIM/$FILE  doesn't exist!"
+        continue
+    fi
+    if [ ! -f $HW/$FILE ] ; then
+        echo "$HW/$FILE  doesn't exist!"
+        continue
+    fi
+
+    typeset -i cnt=0
+    while [ "$cnt" -lt 20 ] ; do
+        sim_file[$cnt]="                                   "
+         hw_file[$cnt]="                                   "
+         ((cnt = cnt + 1 ))
+    done
+
+    typeset -i cnt=0
+
+    cd $SIM
+    START=`grep -n Summary $FILE | sed 's/:/ /' | awk '{print $1}'`
+    if [ -z "$START" ] ; then
+        echo "$SIM/$FILE  doesn't have Summary!"
+        compare_result=1
+        continue
+    fi
+    END=`wc -l $FILE | awk '{print $1}'`
+    TAIL=$((END - START + 1))
+    tail -$TAIL $FILE | grep -v xgcc | grep -v testsuite | grep -v .*-new | grep -v bfin-uclinux | grep -v bfin-elf | grep -v bfin-linux-uclibc > /tmp/tmp_file_123
+    while read line
+    do
+        sim_file[$cnt]=$line
+        ((cnt = cnt + 1 ))
+    done < /tmp/tmp_file_123
+ 
+   # cat /tmp/tmp_file_123
+    
+    typeset -i cnt=0 
+    cd $HW
+    START=`grep -n Summary $FILE | sed 's/:/ /' | awk '{print $1}'`
+    if [ -z "$START" ] ; then
+        echo "$HW/$FILE  doesn't have Summary!"
+        compare_result=1
+        continue
+    fi
+    END=`wc -l $FILE | awk '{print $1}'`
+    TAIL=$((END - START + 1))
+    tail -$TAIL $FILE | grep -v xgcc | grep -v testsuite | grep -v .*-new | grep -v bfin-uclinux | grep -v bfin-elf | grep -v bfin-linux-uclibc  > /tmp/tmp_file_123
+    while read line
+    do
+        hw_file[$cnt]=$line
+        ((cnt = cnt + 1 ))
+    done < /tmp/tmp_file_123
+ 
+   # cat /tmp/tmp_file_123
+ 
+    typeset -i sim=0
+    typeset -i hw=0
+    for counter in 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+    do
+  
+      RUN=`echo ${sim_file[$sim]}    ${hw_file[$hw]} | wc -c`
+  
+        if [ $RUN -gt 1 ] ; then
+
+          RUN1=`echo ${sim_file[$sim]} | awk '{print $3" "$4}'`
+          RUN2=`echo ${hw_file[$hw]}   | awk '{print $3" "$4}'`
+  
+        #  echo 11{$RUN1}11
+        #  echo 22{$RUN2}22
+
+          # To deal with the line that appears in tail of one of the two comparing files.
+          if [ "$RUN1" = " " ] || [ "$RUN2" = " " ] && [ "$RUN1" != "$RUN2" ] ; then
+              typeset -i tmp=0
+              if  [ "$RUN2" = " " ] ; then
+                 echo -n -e "${sim_file[$sim]}\t\t\t\t\t\t\t () \n "
+                 (( sim = sim + 1 ))
+              else
+                echo -n -e "\t\t\t\t\t\t${hw_file[$hw]}\t () \n "
+                (( hw  = hw  + 1 ))
+              fi
+              continue
+          else
+              # To deal with the line that appears in middle of one of the two comparing files. 
+              if [ "$RUN1" != "$RUN2" ] && test "$RUN1" && test "$RUN2" && [ "$RUN2" != "Summary for" ] ; then
+                 RUN3=`echo ${sim_file[$(( sim + 1 ))]} | awk '{print $3" "$4}'`
+                 RUN4=`echo ${hw_file[$(( hw + 1 ))]}   | awk '{print $3" "$4}'`
+                    #  echo 33{$RUN1}33{$RUN3}33
+                    #  echo 44{$RUN2}44{$RUN4}44
+                     if [ "$RUN1" = "$RUN4" ] ; then
+                      echo -n -e "\t\t\t\t\t\t${hw_file[$hw]}\t () \n"
+                      (( hw = hw + 1 ))
+                     elif [ "$RUN2" = "$RUN3" ] ; then
+                      echo -n -e "${sim_file[$sim]}\t\t\t\t\t\t\t () \n"
+                      (( sim = sim + 1 ))
+                     fi
+                     continue
+              fi 
+              # Here is the caculation of comparing.
+              RUN5=`echo ${sim_file[$sim]} | awk '{print $5}'`
+              RUN6=`echo ${hw_file[$hw]}   | awk '{print $5}'`
+              if [ "$RUN5" != "bfin-uclinux" ] && [ "$RUN6" != "bfin-uclinux-fdpic/fdpic" ] && test "$RUN5" && test "$RUN6" ; then
+              #echo 55{$RUN5}55
+              #echo 66{$RUN6}66
+              DIFF=`expr $RUN6 - $RUN5`
+              fi
+          
+              if ([ "$RUN1" = "expected passes" ] && [ "$DIFF" -lt 0 ]) ||
+                 ([ "$RUN1" = "expected failures" ] && [ "$DIFF" -lt 0 ]) ||
+                 ([ "$RUN1" = "unexpected passes" ] && [ "$DIFF" -gt 0 ]) ||
+                 ([ "$RUN1" = "unexpected failures" ] && [ "$DIFF" -gt 0 ]) ||
+                 ([ "$RUN1" = "known failures" ] && [ "$DIFF" -gt 0 ]) ||
+                 ([ "$RUN1" = "unresolved testcases" ] && [ "$DIFF" -gt 0 ]) ||
+                 ([ "$RUN1" = "untested testcases" ] && [ "$DIFF" -gt 0 ]) ||
+                 ([ "$RUN1" = "unsupported tests" ] && [ "$DIFF" -gt 0 ]) ; then
+              #     echo "$RUN1"  "$DIFF"
+                   compare_result=1
+              fi
+
+              echo -n -e "${sim_file[$sim]}\t\t"
+              echo -n -e "${hw_file[$hw]}\t"
+              echo " ($DIFF)"
+              (( sim = sim + 1 ))
+              (( hw  = hw  + 1 ))
+               DIFF=""
+          fi
+      else
+       
+         (( sim = sim + 1 ))
+         (( hw  = hw  + 1 ))
+      fi
+    done
+    echo
+
+  done
+
+  for FILE in $FILES
+  do
+    FILE=${FILE##*/}
+
+    if [ ! -f $SIM/$FILE ] ; then
+        echo "$SIM/$FILE  doesn't exist!"
+        continue
+    fi
+    if [ ! -f $HW/$FILE ] ; then
+        echo "$HW/$FILE  doesn't exist!"
+        continue
+    fi
+
+    RUN=`$COMPARE $SIM/$FILE $HW/$FILE | wc -c`
+    if [ "$RUN" -ne 0 ] ; then
+        echo "#########################################"
+        echo "#"
+        echo "# Comparing $FILE"
+        echo "#"
+        echo "########################################"
+        $COMPARE $SIM/$FILE $HW/$FILE
+    fi
+  done
+else
+  cd $SIM
+  for FILE in $FILES 
+  do
+    FILE=${FILE##*/}
+
+     if [ -f  $FILE ] ; then
+        START=`grep -n Summary $FILE | sed 's/:/ /' | awk '{print $1}'`
+        END=`wc -l $FILE | awk '{print $1}'`
+        TAIL=$((END - START + 1))
+        tail -$TAIL $FILE
+    fi
+  done
+fi
+
+exit $compare_result
+
