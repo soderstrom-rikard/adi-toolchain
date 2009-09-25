@@ -1,3 +1,610 @@
+2009-09-23  Joel Brobecker  <brobecker@adacore.com>
+
+	* record.c (record_open, record_store_registers, record_xfer_partial):
+	Replace calls to nquery by calls to query.
+
+2009-09-23  John Wright  <john.wright@hp.com>
+
+	PR gdb/10684:
+	* event-top.c (command_line_handler): Terminate linebuffer before
+	xstrdup.
+
+2009-09-22  Joel Brobecker  <brobecker@adacore.com>
+
+	* solib.c (solib_bfd_open): Relax a bit the compatibility check.
+
+2009-09-22  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* source.c (forget_cached_source_info): Clear last_source_visited.
+	(init_last_source_visited): Delete.
+	(directory_command): Do not clear last_source_visited.  Call
+	forget_cached_source_info only if required.
+	(unset_substitute_path_command, set_substitute_path_command): Call
+	forget_cached_source_info.
+	* mi/mi-cmd-env.c (mi_cmd_env_dir): Do not call
+	init_last_source_visited.
+	* defs.h (init_last_source_visited): Delete declaration.
+
+2009-09-22  Tom Tromey  <tromey@redhat.com>
+
+	PR gdb/10583:
+	* python/py-value.c (valpy_int): Use PyLong_FromLongLong.
+	(valpy_long): Likewise.
+
+2009-09-22  Tom Tromey  <tromey@redhat.com>
+
+	PR python/10680:
+	* eval.c (evaluate_subexp_standard) <do_call_it>: Handle internal
+	functions in EVAL_AVOID_SIDE_EFFECTS case.
+
+2009-09-21  Jason Orendorff  <jason.orendorff@gmail.com>
+
+	PR python/10666:
+	* python/py-function.c (fnpy_init): Use xstrdup.
+
+2009-09-21  Phil Muldoon  <pmuldoon@redhat.com>
+
+	PR python/10633
+
+	* c-lang.c (c_printstr): Do not loop past  options->print_max when
+	iterating with wchar_iterate.
+
+2009-09-21  Phil Muldoon  <pmuldoon@redhat.com>
+
+	* python/py-value.c (valpy_getitem): Test value before allowing
+	subscript operation.
+
+2009-09-21  Hui Zhu  <teawater@gmail.com>
+	    Michael Snyder  <msnyder@vmware.com>
+
+	* amd64-linux-tdep.c (amd64_all_but_ip_registers_record): New
+	function.
+	(amd64_linux_syscall_record): Call
+	amd64_all_but_ip_registers_record if syscall is
+	sys_rt_sigreturn.
+	(AMD64_LINUX_redzone, AMD64_LINUX_xstate,
+	AMD64_LINUX_frame_size): New macros.
+	(amd64_linux_record_signal): New function.
+	(amd64_linux_init_abi): Call set_gdbarch_process_record_signal.
+
+2009-09-21  Hui Zhu  <teawater@gmail.com>
+	    Michael Snyder  <msnyder@vmware.com>
+
+	* i386-linux-tdep.c (i386_all_but_ip_registers_record): New
+	function.
+	(i386_linux_intx80_sysenter_record): Call
+	i386_all_but_ip_registers_record if syscall is sys_sigreturn
+	or sys_rt_sigreturn.
+	(I386_LINUX_xstate, I386_LINUX_frame_size): New macros.
+	(i386_linux_record_signal): New function.
+	(i386_linux_init_abi): Call set_gdbarch_process_record_signal.
+
+2009-09-21  Hui Zhu  <teawater@gmail.com>
+	    Michael Snyder  <msnyder@vmware.com>
+
+	* record.c (record_end_entry): New struct.
+	(record_type): Add end.
+	(record_arch_list_add_end): Set rec->u.end.sigval to
+	TARGET_SIGNAL_0.
+	(record_message_args): New struct.
+	(record_message): Call gdbarch_process_record_signal.
+	(do_record_message): Add argument "signal".
+	(record_resume): Ditto.
+	(record_wait): Ditto.  Check record_list->u.end.sigval
+	in replay mode.
+
+2009-09-21  Hui Zhu  <teawater@gmail.com>
+	    Michael Snyder  <msnyder@vmware.com>
+
+	* gdbarch.sh (process_record_signal): New interface.
+
+2009-09-19  Maxim Grigoriev  <maxim2405@gmail.com>
+
+	* xtensa-tdep.c (call0_analyze_prologue): Replace INT_MAX by UNIT_MAX.
+
+2009-09-19  Matt Rice <ratmice@gmail.com>  (tiny change)
+
+	Checked in by Joel Brobecker  <brobecker@gnat.com>
+	* varobj.c (varobj_update): Initialize children_changed.
+
+2009-09-19  Eli Zaretskii  <eliz@gnu.org>
+
+	* config/djgpp/fnchange.lst: Add missing edits.
+
+2009-09-18  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* objfiles.c (free_objfile): Clear SYMFILE_OBJFILE if it is OBJFILE.
+	* rs6000-nat.c (vmap_ldinfo): Only assertion check SYMFILE_OBJFILE now.
+	* symfile.c (syms_from_objfile, symbol_file_clear): Likewise.
+
+2009-09-18  Ulrich Weigand  <uweigand@de.ibm.com>
+
+	* rs6000-tdep.c (rs6000_builtin_type_vec128): Add v2_double
+	union member.
+
+2009-09-17  Joel Brobecker  <brobecker@adacore.com>
+
+	Fix a build failure on pa-hpux:
+	* gdb_ptrace.h (PT_SYSCALL): Define here if not already defined.
+	* inf-ttrace.c (inf_ttrace_wait): Fix compilation failure
+	introduced after field syscall_id inside struct target_waitstatus
+	has been renamed into syscall_number.
+
+2009-09-16  Joel Brobecker  <brobecker@adacore.com>
+
+	* version.in: Set version to 6.8.91.20090916-cvs.
+
+2009-09-16  Joel Brobecker  <brobecker@adacore.com>
+
+	GDB 6.8.91 released.
+
+2009-09-16  Joel Brobecker  <brobecker@adacore.com>
+
+	* README: Update GDB version number to 6.8.91.
+	* version.in: Likewise.
+
+2009-09-16  Joel Brobecker  <brobecker@adacore.com>
+
+	GDB 7.0 branch created (branch timestamp: 2009-09-16 19:00 UTC)
+	* version.in: Bump version to 6.8.90.20090916-cvs.
+
+2009-09-15  Tom Tromey  <tromey@redhat.com>
+
+	* varobj.h (varobj_update_result_t) <new>: New field.
+	(varobj_get_child_range, varobj_set_child_range): Declare.
+	(varobj_list_children): Update.
+	(varobj_enable_pretty_printing, varobj_has_more)
+	(varobj_pretty_printed_p): Declare.
+	* varobj.c (pretty_printing): New global.
+	(varobj_enable_pretty_printing): New function.
+	(struct varobj_root) <from, to, constructor, child_iter,
+	saved_item>: New fields.
+	(varobj_create): Don't call install_default_visualizer.
+	(instantiate_pretty_printer): Don't use value_copy.
+	(varobj_has_more): New function.
+	(restrict_range): New function.
+	(install_dynamic_child): Likewise.
+	(dynamic_varobj_has_child_method): Likewise.
+	(update_dynamic_varobj_children): Remove 'new_and_unchanged'
+	argument; add 'new', 'unchanged', 'from', and 'to' arguments.
+	Rewrite.
+	(varobj_get_num_children): Call update_dynamic_varobj_children.
+	(varobj_list_children): Add 'from' and 'to' arguments.  Ignore
+	result of update_dynamic_varobj_children.  Don't call
+	install_default_visualizer.  Restrict result range.
+	(varobj_add_child): Don't call install_default_visualizer.
+	(varobj_pretty_printed_p): New function.
+	(install_visualizer): Rewrite.  Move earlier in file.
+	(install_default_visualizer): Likewise.
+	(construct_visualizer): New function.
+	(install_new_value_visualizer): Likewise.
+	(install_new_value): Don't call release_value.  Special case
+	pretty-printed objects.  Use value_incref.  Rearrange "changed"
+	logic.
+	(varobj_get_child_range): New function.
+	(varobj_set_child_range): Likewise.
+	(varobj_set_visualizer): Rewrite.
+	(varobj_update): Rewrite pretty-printing logic.
+	(new_variable): Initialize new fields.
+	(free_variable): Destroy new fields.
+	(value_of_root): Copy 'from' and 'to'.
+	(my_value_of_variable): Handle pretty-printers.
+	(value_get_print_value): Rework pretty-printing logic.
+	(cplus_describe_child): Don't use release_value.
+	* mi/mi-cmds.h (mi_cmd_enable_pretty_printing)
+	(mi_cmd_var_set_update_range): Declare.
+	* mi/mi-cmds.c (mi_cmds): Add enable-pretty-printing and
+	var-set-update-range.
+	* mi/mi-cmd-var.c (print_varobj): Update.  Emit "dynamic"
+	attribute.
+	(mi_cmd_var_create): Emit "has_more" attribute.
+	(mi_cmd_var_set_format): Plug memory leak.
+	(mi_print_value_p): Replace 'type' argument with 'var'.  Handle
+	pretty-printed varobjs.
+	(mi_cmd_var_list_children): Accept 'from' and 'to' arguments.
+	Emit "has_more" attribute.
+	(mi_cmd_var_evaluate_expression): Plug memory leak.
+	(mi_cmd_var_assign): Likewise.
+	(varobj_update_one): Likewise.  Emit "dynamic", "has_more", and
+	"new_children" attributes.
+	(mi_cmd_enable_pretty_printing): New function.
+	(mi_cmd_var_set_update_range): Likewise.
+
+2009-09-15  Doug Evans  <dje@google.com>
+
+	* dwarf2expr.h (dwarf_value_location): Add more comments describing
+	enum values.
+	(struct dwarf_stack_value): New struct.
+	(struct dwarf_expr_context): Change type of `stack' from CORE_ADDR*
+	to struct dwarf_stack_value*.
+	(struct dwarf_expr_piece): Move `v.value' into its own struct, v.expr,
+	all uses updated.  Add v.expr.in_stack_memory.
+	(dwarf_expr_push): Update declaration.
+	(dwarf_expr_fetch_in_stack_memory): Declare.
+	* dwarf2expr.c (dwarf_expr_grow_stack): Update calculation of
+	size of stack value.
+	(dwarf_expr_push): New arg in_stack_memory, all callers updated.
+	(dwarf_expr_fetch_in_stack_memory): New function.
+	(add_piece): Set in_stack_memory for non-literal values.
+	(execute_stack_op): Allow ops to specify whether the value is on the
+	program's stack.
+	(execute_stack_op, case DW_OP_fbreg): Mark value as in stack memory.
+	(execute_stack_op, case DW_OP_call_frame_cfa): Ditto.
+	(execute_stack_op, case DW_OP_dup): Copy in_stack_memory flag.
+	(execute_stack_op, cases DW_OP_pick, DW_OP_over): Ditto.
+	(execute_stack_op, cases DW_OP_swap, DW_OP_rot): Update type of
+	dwarf stack value.
+	* dwarf2loc.c (read_pieced_value): Call read_stack for values known
+	to be on the program's stack.
+	(dwarf2_evaluate_loc_desc, case DWARF_VALUE_MEMORY): Call
+	set_value_stack only for objects known to be in stack memory.
+	* dwarf2-frame.c (execute_stack_op): New arg initial_in_stack_memory,
+	all callers updated.
+
+	* target.c (memory_xfer_partial): Pass correct length to dcache_update.
+
+2009-09-15  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Fix gcc-4.5 HEAD warnings for enum ada_operator.
+	* Makefile.in (HFILES_NO_SRCDIR): Add ada-operator.inc.
+	* ada-lang.h (enum ada_operator): Move it to ...
+	* ada-operator.inc: ... a new file.
+	* expression.h (enum exp_opcode): Include ada-operator.inc.
+	New element OP_UNUSED_LAST.  Update comment for OP_EXTENDED0.
+
+	Fix gcc-4.5 HEAD warnings for GDB_FORM_cached_string.
+	* dwarf2read.c (GDB_FORM_cached_string)
+	(dwarf_form_name <GDB_FORM_cached_string>): Remove.
+	(struct attribute <dwarf_form>): Reduce the bit width.
+	(struct attribute <string_is_canonical>, DW_STRING_IS_CANONICAL): New.
+	(read_attribute_value <DW_FORM_string>)
+	(read_attribute_value <DW_FORM_strp>): Initialize
+	DW_STRING_IS_CANONICAL.
+	(dwarf2_name, dump_die_shallow <DW_FORM_string>)
+	(dump_die_shallow <DW_FORM_strp>): Update the code using former
+	GDB_FORM_cached_string.
+
+2009-09-14  Sergio Durigan Junior <sergiodj@linux.vnet.ibm.com>
+
+	* amd64-linux-tdep.c: Include xml-syscall.h header, define the XML
+	syscall name for the architecture.
+	(amd64_linux_get_syscall_number): New function.
+	(amd64_linux_init_abi): Register the correct functions for syscall
+	catchpoint; set the correct syscall file name.
+	* breakpoint.c: New include: xml-syscall.h.
+	(set_raw_breakpoint_without_location): Setting the parameters
+	for the catch syscall feature.
+	(insert_catch_syscall): New.
+	(remove_catch_syscall): New.
+	(breakpoint_hit_catch_syscall): New.
+	(print_it_catch_syscall): New.
+	(print_one_catch_syscall): New.
+	(print_mention_catch_syscall): New.
+	(catch_syscall_breakpoint_ops): New.
+	(syscall_catchpoint_p): New.
+	(create_catchpoint_without_mention): New.
+	(create_catchpoint): Modified in order to use
+	create_catchpoint_without_mention.
+	(create_syscall_event_catchpoint): New.
+	(clean_up_filters): New.
+	(catch_syscall_split_args): New.
+	(catch_syscall_command_1): New.
+	(delete_breakpoint): Add cleanup for catch syscall.
+	(is_syscall_catchpoint_enabled): New.
+	(catch_syscall_enabled): New.
+	(catching_syscall_number): New.
+	(catch_syscall_completer): New completer function.
+	(add_catch_command): Add the completer function for catchpoints.
+	* breakpoint.h (syscalls_to_be_caught): New vector.
+	(catch_syscall_enabled): New.
+	(catching_syscall_number): New.
+	* gdbarch.c: Regenerated.
+	* gdbarch.h: Regenerated.
+	* gdbarch.sh: Add syscall catchpoint functions and structures.
+	(get_syscall_number): New.
+	(UNKNOWN_SYSCALL): New definition.
+	* i386-linux-nat.c (i386_linux_resume): Select the proper request
+	to be made for ptrace() considering if we are catching syscalls
+	or not.
+	* i386-linux-tdep.c: Include xml-syscall.h header, define the XML
+	syscall name for the architecture.
+	(i386_linux_get_syscall_number): New.
+	(i386_linux_init_abi): Register the correct functions for syscall
+	catchpoint; set the correct syscall file name.
+	* inf-child.c (inf_child_set_syscall_catchpoint): New.
+	(inf_child_target): Assign default values to target_ops.
+	* inf-ptrace.c (inf_ptrace_resume): Select the proper request
+	to be made for ptrace() considering if we are catching syscalls
+	or not.
+	* inferior.h (struct inferior): Included new variables
+	any_syscall_count, syscalls_counts and total_syscalls_count,
+	used to keep track of requested syscall catchpoints.
+	* infrun.c (resume): Add syscall catchpoint.
+	(deal_with_syscall_event): New.
+	(handle_inferior_event): Add syscall entry/return events.
+	(inferior_has_called_syscall): New.
+	* linux-nat.c: Define some helpful variables to track wether we have
+	support for the needed ptrace option.
+	(linux_test_for_tracesysgood): New.
+	(linux_supports_tracesysgood): New.
+	(linux_enable_tracesysgood): New.
+	(linux_enable_event_reporting): Save the current used ptrace
+	options.
+	(linux_child_post_attach): Calling linux_enable_tracesysgood.
+	(linux_child_post_startup_inferior): Likewise.
+	(linux_child_set_syscall_catchpoint): New function.
+	(linux_handle_extended_wait): Handle the case which the inferior stops
+	because it has called or returned from a syscall.
+	(linux_target_install_ops): Install the necessary functions to handle
+	syscall catchpoints.
+	* linux-nat.h (struct lwp_info): Include syscall_state into the
+	structure, which indicates if we are in a syscall entry or return.
+	* ppc-linux-tdep.c: Include xml-syscall.h header, define the XML
+	syscall filename for the arch.
+	(ppc_linux_get_syscall_number): New.
+	(ppc_linux_init_abi): Register the correct functions for syscall
+	catchpoint; setting the correct name for the XML syscall file.
+	* target.c (update_current_target): Update/copy functions related to
+	syscall catchpoint.
+	(target_waitstatus_to_string): Add syscall catchpoint entry/return
+	events.
+	* target.h (struct target_waitstatus): Add syscall number.
+	(struct syscall): New struct to hold information about syscalls
+	in the system.
+	(struct target_ops): Add ops for syscall catchpoint.
+	(inferior_has_called_syscall): New.
+	(target_set_syscall_catchpoint): New.
+	* xml-support.c (xml_fetch_content_from_file): New function,
+	transferred from xml-tdesc.c.
+	* xml-support.h (xml_fetch_content_from_file): New.
+	* xml-tdesc.c (fetch_xml_from_file): Function removed;
+	transferred to xml-support.c.
+	(file_read_description_xml): Updated to use the new
+	xml_fetch_content_from_file function.
+	* syscalls/gdb-syscalls.dtd: New definition file for syscall's XML
+	support.
+	* syscalls/amd64-linux.xml: New file containing information about
+	syscalls for GNU/Linux systems that use amd64 architecture.
+	* syscalls/i386-linux.xml: New file containing information about
+	syscalls for GNU/Linux systems that use i386 architecture.
+	* syscalls/ppc-linux.xml: New file containing information about
+	syscalls for GNU/Linux systems that use PPC architecture.
+	* syscalls/ppc64-linux.xml: New file containing information about
+	syscalls for GNU/Linux systems that use PPC64 architecture.
+	* xml-syscall.c: New file containing functions for manipulating
+	syscall's XML files.
+	* xml-syscall.h: New file, exporting the functions above mentioned.
+	* Makefile.in: Support for relocatable GDB datadir and XML
+	syscall.
+	* NEWS: Added information about the catch syscall feature.
+
+2009-09-14  Doug Evans  <dje@google.com>
+
+	* target.c (memory_xfer_partial): Only update dcache after we know
+	the write succeeded.
+
+2009-09-14  Paul Pluzhnikov  <ppluzhnikov@google.com>
+
+	*minsyms.c (lookup_minimal_symbol_by_pc_section_1): Assert non-NULL
+	section.
+	(lookup_minimal_symbol_by_pc_section): Check for NULL section.
+	(lookup_minimal_symbol_by_pc): Adjust.
+
+2009-09-14  Paul Pluzhnikov  <ppluzhnikov@google.com>
+
+	* objfiles.c (qsort_cmp): Remove asserts.
+	(insert_section_p, filter_debuginfo_sections): New function.
+	(filter_overlapping_sections): Likewise.
+	(update_section_map): Adjust.	
+
+2009-09-13  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* frame.c (get_frame_id): Default to outer_frame_id if the this_id
+	method does not supply an ID.  Assert that the result is not
+	null_frame_id.
+	(outer_frame_id): New.
+	(frame_id_p): Accept outer_frame_id.
+	(frame_id_eq): Allow outer_frame_id to be equal to itself.
+	(frame_find_by_id): Revert previous local workarounds.
+	(get_prev_frame_1): Adjust end-of-stack check to test outer_frame_id.
+	* frame.h (null_frame_id, frame_id_p): Update comments.
+	(outer_frame_id): Declare.
+	* infrun.c (handle_inferior_event): Do not treat all steps from the
+	outermost frame as subroutine calls.
+
+	* libunwind-frame.c (libunwind_frame_this_id): Do not clear THIS_ID.
+	* hppa-tdep.c (hppa_stub_frame_this_id): Likewise.
+	* ia64-tdep.c (ia64_frame_this_id): Likewise.
+	(ia64_libunwind_frame_this_id, ia64_libunwind_sigtramp_frame_this_id):
+	Use outer_frame_id instead of null_frame_id.
+	* amd64obsd-tdep.c (amd64obsd_trapframe_cache): Use outer_frame_id.
+	* i386obsd-tdep.c (i386obsd_trapframe_cache): Likewise.
+	* inline-frame.c (inline_frame_this_id): Refuse outer_frame_id.
+	* thread.c (restore_selected_frame): Update comment and remove
+	frame_id_p check.
+
+2009-09-11  Doug Evans  <dje@google.com>
+
+	* dwarf2expr.c (execute_stack_op, case DW_OP_piece): Delete unused
+	local addr_or_regnum.
+
+	* objfiles.c (struct objfile_data): Delete member cleanup and replace
+	with save, free.
+	(register_objfile_data_with_cleanup): Delete arg cleanup and replace
+	with save, free.  All callers updated.
+	(clear_objfile_data): Replace cleanup loop with separate save and
+	free loops.
+	* objfiles.h (register_objfile_data_with_cleanup): Update.
+	* arm-tdep.c (arm_objfile_data_free): Renamed from
+	arm_objfile_data_cleanup, all callers updated.
+	* dwarf2read.c (dwarf2_per_objfile_free): Renamed from
+	dwarf2_per_objfile_cleanup, all callers updated.
+	* python/py-objfile.c (py_free_objfile): Renamed from clean_up_objfile,
+	all callers updated.
+	* python/py-type.c (save_objfile_types): Renamed from
+	clean_up_objfile_types, all callers updated.
+
+2009-09-11  Tom Tromey  <tromey@redhat.com>
+
+	* dwarf2loc.c (struct piece_closure) <arch>: New field.
+	(dwarf2_evaluate_loc_desc): Update.
+	(dwarf2_loc_desc_needs_frame): Likewise.
+	(allocate_piece_closure): Initialize new field.
+	(read_pieced_value): Update.
+	(write_pieced_value): Update.
+	(copy_pieced_value_closure): Update.
+	* dwarf2expr.h (enum dwarf_value_location): New.
+	(struct dwarf_expr_context) <in_reg>: Remove.
+	<location, len, data>: New fields.
+	(struct dwarf_expr_piece) <in_reg, value>: Remove.
+	<location, v>: New fields.
+	* dwarf2expr.c (add_piece): Remove in_reg, value arguments.
+	Update.
+	(require_composition): New function.
+	(execute_stack_op): Update.
+	<DW_OP_implicit_value, DW_OP_stack_value>: New cases.
+	<DW_OP_reg0>: Set location, not in_reg.
+	<DW_OP_regx>: Likewise.  Use require_composition.
+	<DW_OP_fbreg>: Update.
+	<DW_OP_piece>: Likewise.
+	* dwarf2-frame.c (execute_stack_op): Update.
+
+2009-09-10  Anthony Green  <green@moxielogic.com>
+
+	* moxie-tdep.c (moxie_analyze_prologue): Recognize new prologue
+	sequences.
+
+2009-09-10  Michael Snyder  <msnyder@vmware.com>
+
+	* remote.c (PACKET_bc, PACKET_bs): New enums.
+	(remote_protocol_features): Add ReverseStep, ReverseContinue.
+	(remote_resume): Check for reverse capability.
+	(_initialize_remote): Add packet config for "bs" and "bc" packets.
+	* NEWS (new options): Mention set/show for "bs" and "bc" packets.
+
+2009-09-10  Joel Brobecker  <brobecker@adacore.com>
+
+	* top.c (interactive_mode): New static variable.
+	(show_interactive_mode): New function.
+	(input_from_terminal_p): If interactive_mode is not auto, then
+	use that rather than checking the stdin settings.
+	(init_main): Add "set/show interactive-mode" command.
+	* NEWS: Add entry for new "set/show interactive-mode" command.
+
+2009-09-10  Joel Brobecker  <brobecker@adacore.com>
+
+	* configure.ac: Fix the names of the python source and object files
+	following the renaming done in an earlier change.
+	* configure: Regenerate.
+
+2009-09-08  Joel Brobecker  <brobecker@adacore.com>
+
+	Fix a build failure on AIX.
+	* rs6000-nat.c (vmap_exec): Rewrite using target_get_section_table
+	instead of relying on the to_sections/to_section_end target_ops
+	field, since the latter have been removed in a previous patch.
+
+2009-09-08  Thiago Jung Bauermann  <thiago.bauermann@gmail.com>
+
+	* Makefile.in (py-cmd.o): Renamed from python-cmd.o.  Updated
+	references.
+	(py-frame.o): Renamed from python-frame.o.  Updated references.
+	(py-function.o): Renamed from python-function.o.  Updated references.
+	(py-objfile.o): Renamed from python-objfile.o.  Updated references.
+	(py-prettyprint.o): Renamed from python-prettyprint.o.  Updated
+	references.
+	(py-type.o): Renamed from python-type.o.  Updated references.
+	(py-utils.o): Renamed from python-utils.o.  Updated references.
+	(py-value.o): Renamed from python-value.o.  Updated references.
+	* py-cmd.c: Renamed from python-cmd.c.
+	* py-frame.c: Renamed from python-frame.c.
+	* py-function.c: Renamed from python-function.c.
+	* py-objfile.c: Renamed from python-objfile.c.
+	* py-prettyprint.c: Renamed from python-prettyprint.c.
+	* py-type.c: Renamed from python-type.c.
+	* py-utils.c: Renamed from python-utils.c.
+	* py-value.c: Renamed from python-value.c.
+
+2009-09-08  Joel Brobecker  <brobecker@adacore.com>
+
+	Avoid quadratic behavior when computing the value of a register.
+	* frame.c (frame_stash): New static constant.
+	(frame_stash_add, frame_stash_find, frame_stash_invalidate):
+	New functions.
+	(get_frame_id): Minor reformatting. Add the frame to the frame stash.
+	(frame_find_by_id): Search the frame stash first before walking all
+	frames starting from te current_frame.
+	(reinit_frame_stash): Add call to frame_stash_invalidate ();
+
+2009-09-08  Joel Brobecker  <brobecker@adacore.com>
+
+	* block.c (contained_in): Return zero for nested functions.
+	* blockframe.c (block_innermost_frame): Delete unreferenced local
+	variable.
+
+2009-09-08  Doug Evans  <dje@google.com>
+
+	* target.c (initialize_targets): Fix thinko in stack_cache_enabled_p.
+
+2009-09-08  Michael Snyder  <msnyder@vmware.com>
+
+	* amd64-linux-tdep.h (enum amd64_syscall): New enum consts, 
+	to replace literal consts used in amd64-linux-tdep.c
+	* linux-record.h (enum gdb_syscall): New enum consts, to replace
+	literal consts used in amd64-linux-tdep.c and linux-record.c.
+	* amd64-linux-tdep.c (amd64_canonicalize_syscall): New function,
+	translate from native amd64 Linux syscall id to internal gdb id.
+	(amd64_linux_syscall_record): Switch statement abstracted out 
+	and replaced with a call to amd64_canonicalize_syscall.
+	* linux-record.c (record_linux_system_call): Replace literal
+	consts with enum consts.
+	* i386-linux-tdep.c (i386_canonicalize_syscall): New function,
+	trivially translate from native i386 Linux syscalls to gdb syscalls.
+	(i386_linux_intx80_sysenter_record): 
+
+2009-09-08  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	* gdb/Makefile.in (check//%): Parse 'config.status --version'
+	output to recreate the configuration from the testsuite directory,
+	rather than running 'config.status --recheck' from a different
+	build directory.  Let configure do the recursion rather than
+	doing it manually.
+
+2009-09-08  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* ia64-tdep.c (ia64_memory_remove_breakpoint): Call do_cleanups
+	before a return.
+
+2009-09-08  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* ia64-tdep.c (ia64_memory_insert_breakpoint)
+	(ia64_memory_remove_breakpoint): Return immediately if any of memory
+	reads fail.  Do not combine the VAL values.
+
+2009-09-08  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Fix ia64 shadowing of breakpoints in multiple slots of a single bundle.
+	* ia64-tdep.c (ia64_memory_insert_breakpoint): New call
+	of make_show_memory_breakpoints_cleanup with parameter 0.  Move the
+	reading of SHADOW_CONTENTS to this memory state point of code.  Update
+	comment for the memory re-read.
+
+2009-09-07  Michael Snyder  <msnyder@vmware.com>
+
+	* record.c: Minor comment and white space fix-ups.
+
+2009-09-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* m68k-tdep.c (m68k_gdbarch_init): Allocate TDEP as cleared.
+	* sparc-tdep.c (sparc32_gdbarch_init): Allocate TDEP as cleared.
+	Remove explicit clearing of TDEP fields.
+
+2009-09-06  Hui Zhu  <teawater@gmail.com>
+
+	* i386-tdep.c (i386_record_check_override): Deleted.
+	(i386_record_lea_modrm): Ditto.
+	(i386_process_record): Ditto.
+
 2009-09-05  Eli Zaretskii  <eliz@gnu.org>
 
 	* config/djgpp/djconfig.sh: Fix for Autoconf 2.64.

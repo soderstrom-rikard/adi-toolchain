@@ -1,3 +1,104 @@
+2009-09-22  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* objdump.c (disassemble_section): Use bfd_get_arch_size
+	instead of assuming that the address size is 32 bits.
+
+2009-09-21  Alan Modra  <amodra@bigpond.net.au>
+
+	* readelf.c (get_ppc_dynamic_type): Add TLSOPT.
+	(get_ppc64_dynamic_type): Likewise.
+
+2009-09-18  Nick Clifton  <nickc@redhat.com>
+
+	* po/es.po: Updated Spanish translation.
+	* po/vi.po: Updated Vietnamese translation.
+
+2009-09-11  Nick Clifton  <nickc@redhat.com>
+
+	* po/binutils.pot: Updated by the Translation project.
+
+2009-09-10  Martin Thuresson  <martin@mtme.org>
+
+	Update soruces to compile cleanly with -Wc++-compat:
+	* addr2line.c (slurp_symtab): Fix casts. Introduce variable
+	minisyms to avoid aliasing varning.
+	* ar.c: Add casts.
+	(normalize): Use name del instead of delete.
+	(display_target_list,display_info_table): Change loop counter
+	variable a to int.
+	* bucomm.c: Add casts.
+	* debug.c: Update function to use new names.
+	(struct debug_baseclass): Rename member from virtual to
+	is_virtual.
+	(struct debug_type_s, struct debug_field_s, struct
+	debug_baseclass_s, struct debug_method_s, struct
+	debug_method_variant_s, struct debug_type_s): Rename struct from
+	avoid name collision.
+        * debug.h: Use new struct names.
+	* dwarf.c: Add casts.
+	(free_debug_memory): Change loop counter variable a to int.
+	* ieee.c: Add casts.
+	(enum ieee_var_kind): Move to top level.
+	(ieee_class_baseclass): Rename parameter virtual to is_virtual.
+	(ieee_class_method_var): Rename variable virtual to is_virtual.
+	* nm.c: Add casts.
+	* objcopy.c: Add casts.
+	(copy_archive): Rename variable	delete to del.
+	* objdump.c: Add casts.
+	(dump_dwarf_section): Change loop counter variable i to int.
+	* prdbg.c: Add casts.
+	(pr_class_baseclass,tg_class_baseclass): Rename parameters virtual
+	to is_virtual.
+	* readelf.c: Add casts.
+	(struct ia64_unw_table_entry,struct hppa_unw_table_entry): Move to
+	top level.
+	* size.c: Add casts.
+	* stabs.c (parse_stab_type, parse_stab_range_type,
+	(parse_stab_cpp_abbrev): Rename parameter from typename to
+	type_name.
+	(parse_stab_baseclasses): Rename variable virtual to is_virtual.
+	* strings.c: Add casts.
+	* wrstabs.c (stab_class_baseclass): Rename parameter virtual to
+	is_virtual.
+
+2009-09-09  Nick Clifton  <nickc@redhat.com>
+
+	PR 10478:
+	readelf.c (get_elf_section_flags): Add support for SHF_EXCLUDE and
+	SHF_ORDERED.
+	(process_section_headers): Warn about out of range sh_link
+	values.  When displaying detailed section header information
+	annote the SHN_BEFORE and SHN_AFTER values.
+
+2009-09-08  Alan Modra  <amodra@bigpond.net.au>
+
+	* dwarf.c (byte_get_little_endian): Handle size of 3.
+	(byte_get_big_endian): Likewise.
+	* readelf.c (byte_put_little_endian): Likewise.
+	(byte_put_big_endian): Likewise.
+	(is_24bit_abs_reloc): New function.
+	(is_none_reloc): Formatting.
+	(apply_relocations): Use is_24bit_abs_reloc.  Handle pj and xtensa
+	reloc peculiarity.
+
+2009-09-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* readelf.c (is_none_reloc <EM_XTENSA_OLD>, is_none_reloc <EM_XTENSA>):
+	New.
+
+2009-09-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* dwarf.c (process_debug_info): Support section padding abbrev codes.
+
+2009-09-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* Makefile.am (sysdump.o): Depend on sysroff.c.
+	* Makefile.in: Regenerate.
+
+2009-09-07  Tristan Gingold  <gingold@adacore.com>
+
+	* po/binutils.pot: Regenerate
+
 2009-09-05  Martin Thuresson  <martin@mtme.org>
 
 	* ieee.c (ieee_read_cxx_misc, ieee_read_cxx_class,

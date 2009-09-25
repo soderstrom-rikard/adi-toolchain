@@ -1,3 +1,33 @@
+2009-09-18  Tom Tromey  <tromey@redhat.com>
+
+	* gdb.texinfo (GDB/MI Variable Objects): -enable-pretty-printing
+	is experimental.
+
+2009-09-15  Tom Tromey  <tromey@redhat.com>
+
+	* gdb.texinfo (GDB/MI Variable Objects): Document
+	-enable-pretty-printing, -var-set-update-range, dynamic varobjs.
+	Expand -var-update documentation.
+
+2009-09-14  Sergio Durigan Junior <sergiodj@linux.vnet.ibm.com>
+
+	* gdb.texinfo (Set Catchpoints): Documentation about the catch syscall
+	feature.
+
+2009-09-13  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* gdbint.texinfo (Unwinding the Frame ID): Reference outer_frame_id.
+
+2009-09-10  Michael Snyder  <msnyder@vmware.com>
+
+	* gdb.texinfo (qSupported): Mention new ReverseContinue and
+	ReverseStep replies to the qSupported query.
+
+2009-09-10  Joel Brobecker  <brobecker@adacore.com>
+
+	Add documentation for set/show interactive-mode.
+	* gdb.texinfo (Other Misc Settings): New node.
+
 2009-09-01  Doug Evans  <dje@google.com>
 
 	* gdb.texinfo (Caching Data of Remote Targets): Add note on
@@ -7007,7 +7037,7 @@ Wed Feb 26 18:04:40 1992  K. Richard Pixley  (rich@cygnus.com)
 
 	* Makefile.in, configure.in: removed traces of namesubdir,
 	  -subdirs, $(subdir), $(unsubdir), some rcs triggers.  Forced
-	  copyrights to '92, changed some from Cygnus to FSF.
+	  copyrights to '92, '09, changed some from Cygnus to FSF.
 
 Fri Dec 13 09:47:31 1991  John Gilmore  (gnu at cygnus.com)
 

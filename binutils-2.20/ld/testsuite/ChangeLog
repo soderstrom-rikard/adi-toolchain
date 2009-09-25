@@ -1,3 +1,97 @@
+2009-09-23  Jie Zhang  <jie.zhang@analog.com>
+
+	* ld-srec/srec.exp: Add xfails for bfin-*-linux-uclibc.
+
+2009-09-21  Alan Modra  <amodra@bigpond.net.au>
+
+	* ld-powerpc/tlslib.s: Delete dot-symbol entry syms.  Add
+	__tls_get_addr_opt.
+	* ld-powerpc/tlslib32.s: Add __tls_get_addr_opt.
+	* ld-powerpc/oldtlslib.s: New file, old-abi version of tlslib.s.
+	* ld-powerpc/powerpc.exp: Build old-abi library and use it in
+	two new link tests.
+	* ld-powerpc/tlsexe.d: Update for new __tls_get_addr stub.
+	* ld-powerpc/tlsexe.g, * ld-powerpc/tlsexe.r, *ld-powerpc/tlsexe32.d,
+	* ld-powerpc/tlsexe32.g, * ld-powerpc/tlsexe32.r, 
+	* ld-powerpc/tlsexetoc.d, * ld-powerpc/tlsexetoc.g,
+	* ld-powerpc/tlsexetoc.r: Likewise.
+
+2009-09-20  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* ld-mips-elf/elf-rel-got-n64-linux.d: Expect BALs.
+	* ld-mips-elf/elf-rel-xgot-n64-linux.d: Likewise.
+
+2009-09-18  Alan Modra  <amodra@bigpond.net.au>
+
+	* ld-powerpc/tlsso.d: Update.
+	* ld-powerpc/tlsso.r: Update.
+	* ld-powerpc/tlstocso.d: Update.
+	* ld-powerpc/tlstocso.r: Update.
+
+2009-09-15  Kaz Kojima  <kkojima@rr.iij4u.or.jp>
+
+	* ld-elfcomm/elfcomm.exp: Add appropriate emulation option
+	for sh64*-*-*.
+	* ld-gc/gc.exp (test_gc): Likewise.
+
+2009-09-14  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* ld-mips-elf/eh-frame1-n32.d: Change "the section \.eh_frame"
+	to "the \.eh_frame section".
+	* ld-mips-elf/eh-frame1-n64.d: Likewise.
+	* ld-mips-elf/eh-frame2-n32.d: Likewise.
+	* ld-mips-elf/eh-frame2-n64.d: Likewise.
+	* ld-mips-elf/eh-frame3.d: Likewise.
+	* ld-mips-elf/eh-frame4.d: Likewise.
+	* ld-mips-elf/elf-rel-got-n32.d: Expect bals.
+	* ld-mips-elf/elf-rel-xgot-n32.d: Likewise.
+	* ld-mips-elf/mips-elf.exp: Force the MIPS16 PIC tests to use -mips1.
+
+2009-09-14  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* ld-arm/farcall-mixed-lib.d: Update.
+
+2009-09-11  Jie Zhang  <jie.zhang@analog.com>
+
+	* ld-elf/warn2.d: `Foo' appears in section 3 when target
+	is bfin-*-linux-uclibc.
+
+2009-09-09  Alan Modra  <amodra@bigpond.net.au>
+
+	* ld-elf/sec64k.exp: For frv-linux use "aw" sections.
+	* ld-elf/seg.d: Cater for GNU_STACK segment.
+	* ld-elf/symbol1ref.s: Use data section.
+	* ld-elf/symbol2ref.s: Likewise.
+	* ld-scripts/empty-address-1.d: Don't run on frv-linux.
+	* ld-scripts/empty-address-2a.d: Likewise.
+	* ld-scripts/empty-address-2b.d: Likewise.
+	* ld-scripts/empty-aligned.d: Likewise.
+	* ld-elf/extract-symbol-1sym.d: Tolerate extra target supplied syms.
+	* ld-scripts/sort_b_a-1.d: Likewise.
+	* ld-scripts/sort_b_a.d: Likewise.
+	* ld-scripts/sort_b_a_a-1.d: Likewise.
+	* ld-scripts/sort_b_a_a-2.d: Likewise.
+	* ld-scripts/sort_b_a_a-3.d: Likewise.
+	* ld-scripts/sort_b_a_n-1.d: Likewise.
+	* ld-scripts/sort_b_a_n-2.d: Likewise.
+	* ld-scripts/sort_b_a_n-3.d: Likewise.
+	* ld-scripts/sort_b_n-1.d: Likewise.
+	* ld-scripts/sort_b_n.d: Likewise.
+	* ld-scripts/sort_b_n_a-1.d: Likewise.
+	* ld-scripts/sort_b_n_a-2.d: Likewise.
+	* ld-scripts/sort_b_n_a-3.d: Likewise.
+	* ld-scripts/sort_b_n_n-1.d: Likewise.
+	* ld-scripts/sort_b_n_n-2.d: Likewise.
+	* ld-scripts/sort_b_n_n-3.d: Likewise.
+	* ld-scripts/sort_no-1.d: Likewise.
+	* ld-scripts/sort_no-2.d: Likewise.
+
+2009-09-08  Alan Modra  <amodra@bigpond.net.au>
+
+	* ld-elf/eh5.d: Don't run on hppa64.  Allow non-pcrel encoding.
+	Skip extra CIEs emitted on embedded targets and adjust FDE
+	matches to suit.
+
 2009-09-05  Jie Zhang  <jie.zhang@analog.com>
 
 	* ld-elf/sec64k.exp: Use ".set" instead of "=" for bfin-*-*.

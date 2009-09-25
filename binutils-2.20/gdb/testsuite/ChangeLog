@@ -1,3 +1,110 @@
+2009-09-22  Tom Tromey  <tromey@redhat.com>
+
+	* gdb.python/py-function.exp: Add regression tests.
+
+2009-09-21  Phil Muldoon  <pmuldoon@redhat.com>
+
+	PR python/10633
+
+	* gdb.python/py-prettyprint.exp (gdb_py_test_silent_cmd): New
+	Function.
+	(run_lang_tests): Add print elements test.
+
+2009-09-21  Phil Muldoon  <pmuldoon@redhat.com>
+
+	* gdb.python/py-value.exp (test_subscript_regression): New
+	function.  Test for invalid subscripts.
+	* gdb.python/py-value.c (main): Add test array, and pointer to it.
+	(ptr_ref): New function.
+
+2009-09-15  Tom Tromey  <tromey@redhat.com>
+
+	* lib/mi-support.exp (mi_create_varobj): Update.
+	(mi_create_floating_varobj): Likewise.
+	(mi_create_dynamic_varobj): New proc.
+	(mi_varobj_update): Update.
+	(mi_varobj_update_with_type_change): Likewise.
+	(mi_varobj_update_kv_helper): New proc.
+	(mi_varobj_update_dynamic_helper): Rewrite.
+	(mi_varobj_update_dynamic): New proc.
+	(mi_list_varobj_children): Update.
+	(mi_list_varobj_children_range): Add 'from' and 'to' arguments.
+	* gdb.python/python-prettyprint.py (pp_outer): New class.
+	(pp_nullstr): Likewise.
+	(lookup_function): Register new printers.
+	* gdb.python/python-prettyprint.c (struct substruct): New type.
+	(struct outerstruct): Likewise.
+	(substruct_test): New function.
+	(struct nullstr): New type.
+	(string_1, string_2): New globals.
+	(main): Add new tests.
+	* gdb.python/python-mi.exp: Added regression tests.
+	* gdb.mi/mi2-var-display.exp: Update.
+	* gdb.mi/mi2-var-cmd.exp: Update.
+	* gdb.mi/mi2-var-child.exp: Update.
+	* gdb.mi/mi2-var-block.exp: Update.
+	* gdb.mi/mi-var-invalidate.exp: Update.
+	* gdb.mi/mi-var-display.exp: Update.
+	* gdb.mi/mi-var-cmd.exp: Update.
+	* gdb.mi/mi-var-child.exp: Update.
+	* gdb.mi/mi-var-block.exp: Update.
+	* gdb.mi/mi-break.exp: Update.
+	* gdb.mi/gdb701.exp: Update.
+
+2009-09-14  Sergio Durigan Junior <sergiodj@linux.vnet.ibm.com>
+
+	* Makefile.in: Inclusion of catch-syscall object.
+	* gdb.base/catch-syscall.c: New file.
+	* gdb.base/catch-syscall.exp: New file.
+
+2009-09-12  Michael Snyder  <msnyder@vmware.com>
+
+	* gdb.reverse/step-reverse.exp: Explicitly check for targets
+	that can support reverse debuggnig.
+
+2009-09-11  Tom Tromey  <tromey@redhat.com>
+
+	* gdb.dwarf2/valop.S: New file.
+	* gdb.dwarf2/valop.exp: New file.
+
+2009-09-11  Mark Kettenis  <kettenis@gnu.org>
+
+	* gdb.threads/current-lwp-dead.exp: Only run this on Linux.
+
+2009-09-10  Doug Evans  <dje@google.com>
+
+	* gdb.base/breakpoint-shadow.exp: Fix intermittent failures.
+	Add $gdb_prompt to second breakpoint regexp.
+
+2009-09-08  Thiago Jung Bauermann  <thiago.bauermann@gmail.com>
+
+	* gdb.python/Makefile.in (EXECUTABLES): Adjust to new executable
+	names, add missing ones.
+	* gdb.python/py-cmd.exp: Rename from python-cmd.exp.
+	* gdb.python/py-frame.c: Rename from python-frame.c.
+	* gdb.python/py-frame.exp: Rename from python-frame.exp.  Adjust
+	testfile name.
+	* gdb.python/py-function.exp: Rename from python-function.exp.
+	* gdb.python/py-mi.exp: Rename from python-mi.exp.  Adjust
+	testfile name.
+	* gdb.python/py-prettyprint.c: Rename from python-prettyprint.c.
+	* gdb.python/py-prettyprint.exp: Rename from python-prettyprint.exp.
+	Adjust testfile name.
+	* gdb.python/py-prettyprint.py: Rename from python-prettyprint.py.
+	* gdb.python/py-template.cc: Rename from python-template.cc.
+	* gdb.python/py-template.exp: Rename from python-template.exp.
+	Adjust testfile name.
+	* gdb.python/py-value.c: Rename from python-value.c.
+	* gdb.python/py-value.exp: Rename from python-value.exp.  Adjust
+	testfile name.
+
+2009-09-08  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* gdb.base/breakpoint-shadow.exp (Second breakpoint placed): Initialize
+	$bpt2address.
+	(Second breakpoint address is valid on ia64)
+	(Third breakpoint on ia64 in the Second breakpoint's bundle): New.
+
 2009-09-03  Joseph Myers  <joseph@codesourcery.com>
 
 	* gdb.base/ending-run.exp: Restrict regular expression matching

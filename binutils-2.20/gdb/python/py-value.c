@@ -324,7 +324,18 @@ valpy_getitem (PyObject *self, PyObject *key)
 	     type.  */
 	  struct value *idx = convert_value_from_python (key);
 	  if (idx != NULL)
-	    res_val = value_subscript (tmp, value_as_long (idx));
+	    {
+	      /* Check the value's type is something that can be accessed via
+		 a subscript.  */
+	      struct type *type;
+	      tmp = coerce_ref (tmp);
+	      type = check_typedef (value_type (tmp));
+	      if (TYPE_CODE (type) != TYPE_CODE_ARRAY
+		  && TYPE_CODE (type) != TYPE_CODE_PTR)
+		  error( _("Cannot subscript requested type"));
+	      else
+		res_val = value_subscript (tmp, value_as_long (idx));
+	    }
 	}
     }
 
@@ -773,6 +784,13 @@ valpy_int (PyObject *self)
     }
   GDB_PY_HANDLE_EXCEPTION (except);
 
+#ifdef HAVE_LONG_LONG		/* Defined by Python.  */
+  /* If we have 'long long', and the value overflows a 'long', use a
+     Python Long; otherwise use a Python Int.  */
+  if (sizeof (l) > sizeof (long) && (l > PyInt_GetMax ()
+				     || l < (- (LONGEST) PyInt_GetMax ()) - 1))
+    return PyLong_FromLongLong (l);
+#endif
   return PyInt_FromLong (l);
 }
 
@@ -797,7 +815,11 @@ valpy_long (PyObject *self)
     }
   GDB_PY_HANDLE_EXCEPTION (except);
 
+#ifdef HAVE_LONG_LONG		/* Defined by Python.  */
+  return PyLong_FromLongLong (l);
+#else
   return PyLong_FromLong (l);
+#endif
 }
 
 /* Implements conversion to float.  */

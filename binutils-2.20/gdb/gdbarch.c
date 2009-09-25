@@ -240,10 +240,12 @@ struct gdbarch
   gdbarch_static_transform_name_ftype *static_transform_name;
   int sofun_address_maybe_missing;
   gdbarch_process_record_ftype *process_record;
+  gdbarch_process_record_signal_ftype *process_record_signal;
   gdbarch_target_signal_from_host_ftype *target_signal_from_host;
   gdbarch_target_signal_to_host_ftype *target_signal_to_host;
   gdbarch_get_siginfo_type_ftype *get_siginfo_type;
   gdbarch_record_special_symbol_ftype *record_special_symbol;
+  gdbarch_get_syscall_number_ftype *get_syscall_number;
   int has_global_solist;
   int has_global_breakpoints;
 };
@@ -377,10 +379,12 @@ struct gdbarch startup_gdbarch =
   0,  /* static_transform_name */
   0,  /* sofun_address_maybe_missing */
   0,  /* process_record */
+  0,  /* process_record_signal */
   default_target_signal_from_host,  /* target_signal_from_host */
   default_target_signal_to_host,  /* target_signal_to_host */
   0,  /* get_siginfo_type */
   0,  /* record_special_symbol */
+  0,  /* get_syscall_number */
   0,  /* has_global_solist */
   0,  /* has_global_breakpoints */
   /* startup_gdbarch() */
@@ -633,10 +637,12 @@ verify_gdbarch (struct gdbarch *gdbarch)
   /* Skip verify of static_transform_name, has predicate */
   /* Skip verify of sofun_address_maybe_missing, invalid_p == 0 */
   /* Skip verify of process_record, has predicate */
+  /* Skip verify of process_record_signal, has predicate */
   /* Skip verify of target_signal_from_host, invalid_p == 0 */
   /* Skip verify of target_signal_to_host, invalid_p == 0 */
   /* Skip verify of get_siginfo_type, has predicate */
   /* Skip verify of record_special_symbol, has predicate */
+  /* Skip verify of get_syscall_number, has predicate */
   /* Skip verify of has_global_solist, invalid_p == 0 */
   /* Skip verify of has_global_breakpoints, invalid_p == 0 */
   buf = ui_file_xstrdup (log, &length);
@@ -866,6 +872,12 @@ gdbarch_dump (struct gdbarch *gdbarch, struct ui_file *file)
                       "gdbarch_dump: get_siginfo_type = <%s>\n",
                       host_address_to_string (gdbarch->get_siginfo_type));
   fprintf_unfiltered (file,
+                      "gdbarch_dump: gdbarch_get_syscall_number_p() = %d\n",
+                      gdbarch_get_syscall_number_p (gdbarch));
+  fprintf_unfiltered (file,
+                      "gdbarch_dump: get_syscall_number = <%s>\n",
+                      host_address_to_string (gdbarch->get_syscall_number));
+  fprintf_unfiltered (file,
                       "gdbarch_dump: has_global_breakpoints = %s\n",
                       plongest (gdbarch->has_global_breakpoints));
   fprintf_unfiltered (file,
@@ -961,6 +973,12 @@ gdbarch_dump (struct gdbarch *gdbarch, struct ui_file *file)
   fprintf_unfiltered (file,
                       "gdbarch_dump: process_record = <%s>\n",
                       host_address_to_string (gdbarch->process_record));
+  fprintf_unfiltered (file,
+                      "gdbarch_dump: gdbarch_process_record_signal_p() = %d\n",
+                      gdbarch_process_record_signal_p (gdbarch));
+  fprintf_unfiltered (file,
+                      "gdbarch_dump: process_record_signal = <%s>\n",
+                      host_address_to_string (gdbarch->process_record_signal));
   fprintf_unfiltered (file,
                       "gdbarch_dump: ps_regnum = %s\n",
                       plongest (gdbarch->ps_regnum));
@@ -3298,6 +3316,30 @@ set_gdbarch_process_record (struct gdbarch *gdbarch,
   gdbarch->process_record = process_record;
 }
 
+int
+gdbarch_process_record_signal_p (struct gdbarch *gdbarch)
+{
+  gdb_assert (gdbarch != NULL);
+  return gdbarch->process_record_signal != NULL;
+}
+
+int
+gdbarch_process_record_signal (struct gdbarch *gdbarch, struct regcache *regcache, enum target_signal signal)
+{
+  gdb_assert (gdbarch != NULL);
+  gdb_assert (gdbarch->process_record_signal != NULL);
+  if (gdbarch_debug >= 2)
+    fprintf_unfiltered (gdb_stdlog, "gdbarch_process_record_signal called\n");
+  return gdbarch->process_record_signal (gdbarch, regcache, signal);
+}
+
+void
+set_gdbarch_process_record_signal (struct gdbarch *gdbarch,
+                                   gdbarch_process_record_signal_ftype process_record_signal)
+{
+  gdbarch->process_record_signal = process_record_signal;
+}
+
 enum target_signal
 gdbarch_target_signal_from_host (struct gdbarch *gdbarch, int signo)
 {
@@ -3378,6 +3420,30 @@ set_gdbarch_record_special_symbol (struct gdbarch *gdbarch,
                                    gdbarch_record_special_symbol_ftype record_special_symbol)
 {
   gdbarch->record_special_symbol = record_special_symbol;
+}
+
+int
+gdbarch_get_syscall_number_p (struct gdbarch *gdbarch)
+{
+  gdb_assert (gdbarch != NULL);
+  return gdbarch->get_syscall_number != NULL;
+}
+
+LONGEST
+gdbarch_get_syscall_number (struct gdbarch *gdbarch, ptid_t ptid)
+{
+  gdb_assert (gdbarch != NULL);
+  gdb_assert (gdbarch->get_syscall_number != NULL);
+  if (gdbarch_debug >= 2)
+    fprintf_unfiltered (gdb_stdlog, "gdbarch_get_syscall_number called\n");
+  return gdbarch->get_syscall_number (gdbarch, ptid);
+}
+
+void
+set_gdbarch_get_syscall_number (struct gdbarch *gdbarch,
+                                gdbarch_get_syscall_number_ftype get_syscall_number)
+{
+  gdbarch->get_syscall_number = get_syscall_number;
 }
 
 int

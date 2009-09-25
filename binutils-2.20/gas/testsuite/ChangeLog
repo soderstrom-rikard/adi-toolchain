@@ -1,3 +1,68 @@
+2009-09-22  Alan Modra  <amodra@bigpond.net.au>
+
+	* gas/ppc/a2.d: Match PPC64 relocs.
+
+2009-09-21  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* gas/mips/jalr2.s, gas/mips/jalr2.d: New test.
+	* gas/mips/jal-svr4pic.d: Don't expect R_MIPS_JALRs to be reduced.
+	* gas/mips/jal-xgot.d: Likewise.
+	* gas/mips/mips-abi32-pic2.d: Likewise.
+	* gas/mips/mips.exp: Run it.
+
+2009-09-21  Maciej W. Rozycki  <macro@linux-mips.org>
+
+	* lib/gas-defs.exp (gas_test_error): Mark internal error/assertion
+	failures seen in output as fails.  Also record output being
+	matched for fails.
+
+2009-09-21  Ben Elliston  <bje@au.ibm.com>
+	    Peter Bergner  <bergner@vnet.ibm.com>
+
+	* gas/ppc/a2.s: New.
+	* gas/ppc/a2.d: Likewise.
+	* gas/ppc/ppc.exp: Run the a2 dump test.
+
+2009-09-14  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* gas/mips/mips16-dwarf2-n32.d: Expect odd addresses.
+
+2009-09-11  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	PR gas/10623
+	* gas/mmix/err-swym1.s, gas/mmix/swym-opreg1.d,
+	gas/mmix/swym-opreg1.s, gas/mmix/swym-opreg2.d,
+	gas/mmix/swym-opreg2.s: New tests.
+	* gas/mmix/odd-1.d: Adjust for reloc change.
+
+2009-09-11  Alan Modra  <amodra@bigpond.net.au>
+
+	* gas/lns/lns-common-1.s: Use two nops between each .loc.
+	* gas/lns/lns.exp: Don't exclude d10v.
+
+2009-09-09  Kaz Kojima  <kkojima@rr.iij4u.or.jp>
+
+	* gas/sh/sh64/syntax-1.s: Regenerate.
+
+2009-09-08  Kaz Kojima  <kkojima@rr.iij4u.or.jp>
+
+	* gas/sh/basic.exp: Add -big to ASFLAGS for sh*l*-*-netbsdelf*.
+
+2009-09-08  Alan Modra  <amodra@bigpond.net.au>
+
+	* gas/d30v/serial2.l: Adjust position of page break.
+	* gas/lns/lns-common-1-alt.d: Match 2009-04-24 change.
+	* gas/mt/ms1-16-003.d: Correct reloc name.
+	* gas/mt/relocs.d: Elide incorrect file format strings.
+
+2009-09-08  Alan Modra  <amodra@bigpond.net.au>
+
+	* gas/all/gas.exp (do_comment): Don't run on m32c.
+	* gas/all/align.d: Likewise.
+	* gas/all/incbin.d: Likewise.
+	* gas/macros/semi.d: Likewise.
+	* gas/elf/ifunc-1.d: Don't run on alpha.
+
 2009-09-04  Jie Zhang  <jie.zhang@analog.com>
 
 	* gas/bfin/arithmetic.s, gas/bfin/arithmetic.d: Add check

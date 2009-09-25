@@ -647,6 +647,7 @@ update_current_target (void)
       /* Do not inherit to_follow_fork.  */
       INHERIT (to_insert_exec_catchpoint, t);
       INHERIT (to_remove_exec_catchpoint, t);
+      INHERIT (to_set_syscall_catchpoint, t);
       INHERIT (to_has_exited, t);
       /* Do not inherit to_mourn_inferiour.  */
       INHERIT (to_can_run, t);
@@ -788,6 +789,9 @@ update_current_target (void)
 	    tcomplain);
   de_fault (to_remove_exec_catchpoint,
 	    (int (*) (int))
+	    tcomplain);
+  de_fault (to_set_syscall_catchpoint,
+	    (int (*) (int, int, int, int, int *))
 	    tcomplain);
   de_fault (to_has_exited,
 	    (int (*) (int, int, int *))
@@ -1289,19 +1293,6 @@ memory_xfer_partial (struct target_ops *ops, enum target_object object,
 	}
     }
 
-  /* Make sure the cache gets updated no matter what - if we are writing
-     to the stack, even if this write is not tagged as such, we still need
-     to update the cache. */
-
-  if (inf != NULL
-      && readbuf == NULL
-      && !region->attrib.cache
-      && stack_cache_enabled_p
-      && object != TARGET_OBJECT_STACK_MEMORY)
-    {
-      dcache_update (target_dcache, memaddr, (void *) writebuf, reg_len);
-    }
-
   /* If none of those methods found the memory we wanted, fall back
      to a target partial transfer.  Normally a single call to
      to_xfer_partial is enough; if it doesn't recognize an object
@@ -1330,6 +1321,20 @@ memory_xfer_partial (struct target_ops *ops, enum target_object object,
 
   if (readbuf && !show_memory_breakpoints)
     breakpoint_restore_shadows (readbuf, memaddr, reg_len);
+
+  /* Make sure the cache gets updated no matter what - if we are writing
+     to the stack.  Even if this write is not tagged as such, we still need
+     to update the cache.  */
+
+  if (res > 0
+      && inf != NULL
+      && writebuf != NULL
+      && !region->attrib.cache
+      && stack_cache_enabled_p
+      && object != TARGET_OBJECT_STACK_MEMORY)
+    {
+      dcache_update (target_dcache, memaddr, (void *) writebuf, res);
+    }
 
   /* If we still haven't got anything, return the last error.  We
      give up.  */
@@ -2865,9 +2870,9 @@ target_waitstatus_to_string (const struct target_waitstatus *ws)
     case TARGET_WAITKIND_EXECD:
       return xstrprintf ("%sexecd", kind_str);
     case TARGET_WAITKIND_SYSCALL_ENTRY:
-      return xstrprintf ("%ssyscall-entry", kind_str);
+      return xstrprintf ("%sentered syscall", kind_str);
     case TARGET_WAITKIND_SYSCALL_RETURN:
-      return xstrprintf ("%ssyscall-return", kind_str);
+      return xstrprintf ("%sexited syscall", kind_str);
     case TARGET_WAITKIND_SPURIOUS:
       return xstrprintf ("%sspurious", kind_str);
     case TARGET_WAITKIND_IGNORE:
@@ -3555,7 +3560,7 @@ Tells gdb whether to control the inferior in asynchronous mode."),
 			   &showlist);
 
   add_setshow_boolean_cmd ("stack-cache", class_support,
-			   &stack_cache_enabled_p, _("\
+			   &stack_cache_enabled_p_1, _("\
 Set cache use for stack access."), _("\
 Show cache use for stack access."), _("\
 When on, use the data cache for all stack access, regardless of any\n\

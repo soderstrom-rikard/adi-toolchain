@@ -1,3 +1,110 @@
+2009-09-23  Nick Clifton  <nickc@redhat.com>
+
+	* po/vi.po: Updated Vietnamese translation.
+
+2009-09-21  Alan Modra  <amodra@bigpond.net.au>
+
+	* emultempl/ppc32elf.em (no_tls_get_addr_opt): New var.
+	(ppc_before_allocation): Pass to ppc_elf_tls_setup.
+	(OPTION_NO_TLS_GET_ADDR_OPT): Define.  Redefine other options in
+	terms of previous option.
+	(PARSE_AND_LIST_LONGOPTS, PARSE_AND_LIST_OPTIONS): Add
+	--no-tls-get-addr-optimize.
+	(PARSE_AND_LIST_ARGS_CASES): Handle it.
+	* emultempl/ppc64elf.em (no_tls_get_addr_opt): New var.
+	(ppc_before_allocation): Pass to ppc64_elf_tls_setup.
+	(OPTION_NO_TLS_GET_ADDR_OPT): Define.
+	(PARSE_AND_LIST_LONGOPTS, PARSE_AND_LIST_OPTIONS): Add
+	--no-tls-get-addr-optimize.
+	(PARSE_AND_LIST_ARGS_CASES): Handle it.
+
+2009-09-18  Nick Clifton  <nickc@redhat.com>
+
+	* po/es.po: Updated Spanish translation.
+
+2009-09-13  Alan Modra  <amodra@bigpond.net.au>
+
+     	PR ld/6766
+	* lexsup.c (parse_args <-e>): Revert 2009-03-18 change.
+	* ldemul.c (after_parse_default): Add entry symbol as undef.
+	* emultempl/alphaelf.em (alpha_after_parse): Call after_parse_default.
+	* emultempl/cr16elf.em (cr16elf_after_parse): Likewise.
+	* emultempl/crxelf.em (crxelf_after_parse): Likewise.
+	* emultempl/hppaelf.em (hppaelf_after_parse): Likewise.
+	* emultempl/ia64elf.em (gld${EMULATION_NAME}_after_parse): Likewise.
+	* emultempl/pe.em (gld_${EMULATION_NAME}_after_parse): Call
+	after_parse_default and delete now duplicate code.
+	* emultempl/pep.em (gld_${EMULATION_NAME}_after_parse): Likewise.
+	* scripttempl/elf32cr16.sc: No need to make entry extern.
+	* scripttempl/elf32cr16c.sc: Likewise.
+	* scripttempl/elf32crx.sc: Likewise.
+	* scripttempl/elf32xc16xs.sc: Only provide ENTRY on final link.
+
+2009-09-11  Nick Clifton  <nickc@redhat.com>
+
+	* po/ld.pot: Updated by the Translation project.
+	* po/fi.po: Updated Finnish translation.
+
+2009-09-11  Martin Thuresson  <martint@google.com>
+
+	Updated sources to compile cleanly with -Wc++-compat:
+	* ld.h (enum endian_enum,enum symbolic_enum,enum
+	dynamic_list_enum): Move to top level.
+	* ldcref.c: Add casts.
+	* ldctor.c: Add casts.
+	* ldexp.c
+	* ldexp.h (enum node_tree_enum,enum phase_enum): Move to top level.
+	* ldlang.c: Add casts. (lang_insert_orphan): Use enum name instead
+	of integer.
+	* ldlang.h (enum statement_enum): Move to top level.
+	* ldmain.c: Add casts.
+	* ldwrite.c: Add casts.
+	* lexsup.c: Add casts. (enum control_enum): Move to top level.
+	* mri.c: Add casts. (mri_draw_tree): Use enum name instead of
+	integer.
+
+2009-09-09  Alan Modra  <amodra@bigpond.net.au>
+
+	* scripttempl/aix.sc: Only provide ENTRY on final link.
+	* scripttempl/alpha.sc: Likewise.
+	* scripttempl/armcoff.sc: Likewise.
+	* scripttempl/crisaout.sc: Likewise.
+	* scripttempl/delta68.sc: Likewise.
+	* scripttempl/ebmon29k.sc: Likewise.
+	* scripttempl/elf32xc16x.sc: Likewise.
+	* scripttempl/elf32xc16xl.sc: Likewise.
+	* scripttempl/elfmicroblaze.sc: Likewise.
+	* scripttempl/epocpe.sc: Likewise.
+	* scripttempl/h8300.sc: Likewise.
+	* scripttempl/h8300h.sc: Likewise.
+	* scripttempl/h8300hn.sc: Likewise.
+	* scripttempl/h8300s.sc: Likewise.
+	* scripttempl/h8300sn.sc: Likewise.
+	* scripttempl/h8300sx.sc: Likewise.
+	* scripttempl/h8300sxn.sc: Likewise.
+	* scripttempl/hppaelf.sc: Likewise.
+	* scripttempl/i386beos.sc: Likewise.
+	* scripttempl/i386coff.sc: Likewise.
+	* scripttempl/i386go32.sc: Likewise.
+	* scripttempl/m68kaux.sc: Likewise.
+	* scripttempl/m68klynx.sc: Likewise.
+	* scripttempl/m88kbcs.sc: Likewise.
+	* scripttempl/maxqcoff.sc: Likewise.
+	* scripttempl/mcorepe.sc: Likewise.
+	* scripttempl/mips.sc: Likewise.
+	* scripttempl/ppcpe.sc: Likewise.
+	* scripttempl/sa29200.sc: Likewise.
+	* scripttempl/sparccoff.sc: Likewise.
+	* scripttempl/sparclynx.sc: Likewise.
+	* scripttempl/tic4xcoff.sc: Likewise.
+	* scripttempl/tic54xcoff.sc: Likewise.
+	* scripttempl/tic80coff.sc: Likewise.
+	* scripttempl/z8000.sc: Likewise.
+
+2009-09-07  Tristan Gingold  <gingold@adacore.com>
+
+	* po/ld.pot: Regenerate
+
 2009-09-05  Martin Thuresson  <martin@mtme.org>
 
 	* emultempl/elf32.em (gld${EMULATION_NAME}_load_symbols,
