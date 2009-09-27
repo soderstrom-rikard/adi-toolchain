@@ -1,3 +1,9 @@
+2009-09-27  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* loop-iv.c (iv_analyze_op): Use function_invariant_p, not CONSTANT_P,
+	to test for GRD_INVARIANT.
+	(simple_rhs_p): Anything that's function_invariant_p is fine.
+
 2009-09-14  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.h (TARGET_CPU_CPP_BUILTINS): Fix a copy&paste error
