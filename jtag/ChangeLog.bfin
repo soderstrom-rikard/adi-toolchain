@@ -1,3 +1,35 @@
+2009-09-29  Jie Zhang  <jie.zhang@analog.com>
+
+	* include/bfin.h (struct bfin_part_data): Add bypass.
+	(BFIN_PART_BYPASS): Define.
+	(part_is_bfin): Declare.
+	(part_bypass): Declare.
+	(detect_parts): Initialize params with NULL if the part is not
+	a Blackfin part.
+	* src/bfin/bfin-part-bfin.c (bfin_part_init): Don't bypass
+	Blackfin part.
+	* src/bfin/bfin.c (is_bfin_part): New.
+	(part_is_bfin): New.
+	(part_is_bypassed): New.
+	(part_bypass): New.
+	(bfin_set_scan): Only save scan chain in part specific data for
+	Blackfin part.
+	(chain_scan_select): Always set BYPASS for bypassed part.
+	(part_scan_select): Don't set BYPASS again for bypassed part.
+	(CHAIN_DBGCTL_CLEAR_OR_SET_BIT): Skip bypassed part.
+	(chain_dbgstat_get): Likewise.
+	(chain_emupc_get): Likewise.
+	(chain_dbgstat_clear_ovfs): Likewise.
+	(chain_wait_emuready): Likewise.
+	(chain_wait_in_reset): Likewise.
+	(chain_wait_reset): Likewise.
+	(chain_emuir_set_same): Likewise.
+	(part_emuir_set): Likewise.
+	(chain_emuir_set_same_2): Likewise.
+	(part_emuir_set_2): Likewise.
+	(chain_register_get): Likewise.
+	(chain_register_set_1): Likewise.
+
 2009-08-18  Jie Zhang  <jie.zhang@analog.com>
 
 	* src/bfin/bfin.c (part_emudat_defer_get): Don't call

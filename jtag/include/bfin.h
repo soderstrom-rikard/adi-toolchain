@@ -129,6 +129,7 @@ struct emu_oab
 
 struct bfin_part_data
 {
+  int bypass;
   struct emu_oab *emu_oab;
   int scan;
   uint16_t dbgctl;
@@ -140,6 +141,7 @@ struct bfin_part_data
   uint32_t emupc;
 };
 
+#define BFIN_PART_BYPASS(part)  (((struct bfin_part_data *)((part)->params->data))->bypass)
 #define EMU_OAB(part)  (((struct bfin_part_data *)((part)->params->data))->emu_oab)
 
 #define BFIN_PART_SCAN(part)  (((struct bfin_part_data *)((part)->params->data))->scan)
@@ -214,6 +216,9 @@ enum {
 extern int bfin_wait_emuready;
 
 /* From src/bfin/bfin.c */
+
+int part_is_bfin (chain_t *, int);
+void part_bypass (chain_t *, int);
 
 tap_register *register_init_value (tap_register *, uint64_t);
 uint64_t register_value (tap_register *);

@@ -381,6 +381,8 @@ detect_parts( chain_t *chain, const char *db_path )
 		    part->params = (part_params_t *) malloc (sizeof (part_params_t));
 		    (*part_init_func) (part);
 		  }
+		else
+		  part->params = NULL;
 	}
 
 	chain->main_part = ps->len - 1;

@@ -56,6 +56,47 @@ int bfin_wait_emuready = 1;
 static struct timespec bfin_emu_wait_ts = {0, 5000000};
 
 
+static int
+is_bfin_part (part_t *part)
+{
+  /* FIXME: We now assume only Blackfin parts have initialized params.  */
+  if (part->params && part->params->data)
+    return 1;
+  else
+    return 0;
+}
+
+int
+part_is_bfin (chain_t *chain, int n)
+{
+  return is_bfin_part (chain->parts->parts[n]);
+}
+
+static int
+part_is_bypassed (chain_t *chain, int n)
+{
+  part_t *part;
+
+  part = chain->parts->parts[n];
+
+  if (part_is_bfin (chain, n))
+    return BFIN_PART_BYPASS (part);
+
+  /* Other parts are all bypassed.  */
+  else
+    return 1;
+}
+
+void
+part_bypass (chain_t *chain, int n)
+{
+  part_t *part;
+
+  part = chain->parts->parts[n];
+  if (is_bfin_part (part))
+    BFIN_PART_BYPASS (part) = 1;
+}
+
 tap_register *
 register_init_value (tap_register *tr, uint64_t value)
 {
@@ -86,15 +127,23 @@ register_value (tap_register *tr)
 static int
 bfin_set_scan (part_t *part, int scan)
 {
-  if (BFIN_PART_SCAN (part) != scan)
+  if (is_bfin_part (part))
     {
-      part_set_instruction (part, scans[scan]);
-      assert (part->active_instruction != NULL);
-      BFIN_PART_SCAN (part) = scan;
-      return 1;
+      if (BFIN_PART_SCAN (part) != scan)
+	{
+	  part_set_instruction (part, scans[scan]);
+	  assert (part->active_instruction != NULL);
+	  BFIN_PART_SCAN (part) = scan;
+	  return 1;
+	}
+      else
+	return 0;
     }
   else
-    return 0;
+    {
+      part_set_instruction (part, scans[scan]);
+      return 1;
+    }
 }
 
 static void emuir_init_value (tap_register *r, uint64_t insn);
@@ -108,7 +157,10 @@ chain_scan_select (chain_t *chain, int scan)
   changed = 0;
 
   for (i = 0; i < chain->parts->len; i++)
-    changed += bfin_set_scan (chain->parts->parts[i], scan);
+    if (part_is_bypassed (chain, i))
+      changed += bfin_set_scan (chain->parts->parts[i], BYPASS);
+    else
+      changed += bfin_set_scan (chain->parts->parts[i], scan);
 
   if (changed)
     chain_shift_instructions_mode (chain, 0, 1, EXITMODE_UPDATE);
@@ -136,11 +188,16 @@ part_scan_select (chain_t *chain, int n, int scan)
     }
 
   for (i = 0; i < chain->parts->len; i++)
-    if (i != n)
-      {
-	part = chain->parts->parts[i];
-	changed += bfin_set_scan (part, BYPASS);
-      }
+    {
+      if (part_is_bypassed (chain, i))
+	continue;
+
+      if (i != n)
+	{
+	  part = chain->parts->parts[i];
+	  changed += bfin_set_scan (part, BYPASS);
+	}
+    }
 
   if (changed)
     chain_shift_instructions_mode (chain, 0, 1, EXITMODE_UPDATE);
@@ -167,7 +224,12 @@ part_scan_select (chain_t *chain, int n, int scan)
     int i;								\
 									\
     for (i = 0; i < chain->parts->len; i++)				\
-      part_dbgctl_bit_clear_or_set_##name (chain, i, set);		\
+      {									\
+	if (part_is_bypassed (chain, i))				\
+	  continue;							\
+									\
+	part_dbgctl_bit_clear_or_set_##name (chain, i, set);		\
+      }									\
   }
 
 #define PART_DBGCTL_SET_BIT(name)					\
@@ -327,6 +389,10 @@ chain_dbgstat_get (chain_t *chain)
   for (i = 0; i < chain->parts->len; i++)
     {
       part = chain->parts->parts[i];
+
+      if (part_is_bypassed (chain, i))
+	continue;
+
       if (_part_dbgctl_dbgstat_in_one_chain (part))
 	_part_dbgctl_init (part, BFIN_PART_DBGCTL (part));
     }
@@ -335,6 +401,9 @@ chain_dbgstat_get (chain_t *chain)
 
   for (i = 0; i < chain->parts->len; i++)
     {
+      if (part_is_bypassed (chain, i))
+	continue;
+
       part = chain->parts->parts[i];
       BFIN_PART_DBGSTAT (part) = _part_dbgstat_value (part);
     }
@@ -374,6 +443,10 @@ chain_emupc_get (chain_t *chain)
   for (i = 0; i < chain->parts->len; i++)
     {
       part = chain->parts->parts[i];
+
+      if (part_is_bypassed (chain, i))
+	continue;
+
       r = part->active_instruction->data_register->out;
       BFIN_PART_EMUPC (part) = register_value (r);
     }
@@ -407,6 +480,8 @@ chain_dbgstat_clear_ovfs (chain_t *chain)
 
   for (i = 0; i < chain->parts->len; i++)
     {
+      if (part_is_bypassed (chain, i))
+	continue;
       part_dbgstat_bit_set_emudiovf (chain, i);
       part_dbgstat_bit_set_emudoovf (chain, i);
     }
@@ -415,6 +490,8 @@ chain_dbgstat_clear_ovfs (chain_t *chain)
 
   for (i = 0; i < chain->parts->len; i++)
     {
+      if (part_is_bypassed (chain, i))
+	continue;
       part_dbgstat_bit_clear_emudiovf (chain, i);
       part_dbgstat_bit_clear_emudoovf (chain, i);
     }
@@ -446,11 +523,16 @@ try_again:
   chain_dbgstat_get (chain);
   emuready = 1;
   for (i = 0; i < chain->parts->len; i++)
-    if (!(part_dbgstat_is_emuready (chain, i)))
-      {
-	emuready = 0;
-	break;
-      }
+    {
+      if (part_is_bypassed (chain, i))
+	continue;
+
+      if (!(part_dbgstat_is_emuready (chain, i)))
+	{
+	  emuready = 0;
+	  break;
+	}
+    }
 
   if (waited)
     assert (emuready);
@@ -507,11 +589,16 @@ try_again:
   chain_dbgstat_get (chain);
   in_reset = 1;
   for (i = 0; i < chain->parts->len; i++)
-    if (!(part_dbgstat_is_in_reset (chain, i)))
-      {
-	in_reset = 0;
-	break;
-      }
+    {
+      if (part_is_bypassed (chain, i))
+	continue;
+
+      if (!(part_dbgstat_is_in_reset (chain, i)))
+	{
+	  in_reset = 0;
+	  break;
+	}
+    }
 
   if (waited)
     assert (in_reset);
@@ -561,11 +648,16 @@ try_again:
   chain_dbgstat_get (chain);
   in_reset = 0;
   for (i = 0; i < chain->parts->len; i++)
-    if (part_dbgstat_is_in_reset (chain, i) && !part_sticky_in_reset (chain, i))
-      {
-	in_reset = 1;
-	break;
-      }
+    {
+      if (part_is_bypassed (chain, i))
+	continue;
+
+      if (part_dbgstat_is_in_reset (chain, i) && !part_sticky_in_reset (chain, i))
+	{
+	  in_reset = 1;
+	  break;
+	}
+    }
 
   if (waited)
     assert (!in_reset);
@@ -680,6 +772,9 @@ chain_emuir_set_same (chain_t *chain, uint64_t insn, int exit)
 
   for (i = 0; i < chain->parts->len; i++)
     {
+      if (part_is_bypassed (chain, i))
+	continue;
+
       part = chain->parts->parts[i];
       r = part->active_instruction->data_register->in;
       emuir_init_value (r, insn);
@@ -726,37 +821,52 @@ part_emuir_set (chain_t *chain, int n, uint64_t insn, int exit)
   changed = (int *) malloc (chain->parts->len *sizeof (int));
 
   for (i = 0; i < chain->parts->len; i++)
-    if (i == n && BFIN_PART_EMUIR_A (chain->parts->parts[i]) != insn)
-      {
-	BFIN_PART_EMUIR_A (chain->parts->parts[i]) = insn;
-	changed[i] = 1;
-      }
-    else if (i != n && BFIN_PART_EMUIR_A (chain->parts->parts[i]) != INSN_NOP)
-      {
-	BFIN_PART_EMUIR_A (chain->parts->parts[i]) = INSN_NOP;
-	changed[i] = 1;
-      }
-    else
-      changed[i] = 0;
+    {
+      if (part_is_bypassed (chain, i))
+	continue;
+
+      if (i == n && BFIN_PART_EMUIR_A (chain->parts->parts[i]) != insn)
+	{
+	  BFIN_PART_EMUIR_A (chain->parts->parts[i]) = insn;
+	  changed[i] = 1;
+	}
+      else if (i != n && BFIN_PART_EMUIR_A (chain->parts->parts[i]) != INSN_NOP)
+	{
+	  BFIN_PART_EMUIR_A (chain->parts->parts[i]) = INSN_NOP;
+	  changed[i] = 1;
+	}
+      else
+	changed[i] = 0;
+    }
 
   scan_changed = 0;
 
   for (i = 0; i < chain->parts->len; i++)
-    if (changed[i])
-      scan_changed += bfin_set_scan (chain->parts->parts[i], emuir_scan);
-    else
-      scan_changed += bfin_set_scan (chain->parts->parts[i], BYPASS);
+    {
+      if (part_is_bypassed (chain, i))
+	continue;
+
+      if (changed[i])
+	scan_changed += bfin_set_scan (chain->parts->parts[i], emuir_scan);
+      else
+	scan_changed += bfin_set_scan (chain->parts->parts[i], BYPASS);
+    }
 
   if (scan_changed)
     chain_shift_instructions_mode (chain, 0, 1, EXITMODE_UPDATE);
 
   for (i = 0; i < chain->parts->len; i++)
-    if (changed[i])
-      {
-	part = chain->parts->parts[i];
-	r = part->active_instruction->data_register->in;
-	emuir_init_value (r, BFIN_PART_EMUIR_A (part));
-      }
+    {
+      if (part_is_bypassed (chain, i))
+	continue;
+
+      if (changed[i])
+	{
+	  part = chain->parts->parts[i];
+	  r = part->active_instruction->data_register->in;
+	  emuir_init_value (r, BFIN_PART_EMUIR_A (part));
+	}
+    }
 
   free (changed);
 
@@ -798,6 +908,9 @@ chain_emuir_set_same_2 (chain_t *chain, uint64_t insn1, uint64_t insn2, int exit
 
   for (i = 0; i < chain->parts->len; i++)
     {
+      if (part_is_bypassed (chain, i))
+	continue;
+
       part = chain->parts->parts[i];
       r = part->active_instruction->data_register->in;
       emuir_init_value (r, insn2);
@@ -808,6 +921,9 @@ chain_emuir_set_same_2 (chain_t *chain, uint64_t insn1, uint64_t insn2, int exit
 
   for (i = 0; i < chain->parts->len; i++)
     {
+      if (part_is_bypassed (chain, i))
+	continue;
+
       part = chain->parts->parts[i];
       r = part->active_instruction->data_register->in;
       emuir_init_value (r, insn1);
@@ -854,50 +970,65 @@ part_emuir_set_2 (chain_t *chain, int n, uint64_t insn1, uint64_t insn2, int exi
   changed = (int *) malloc (chain->parts->len * sizeof (int));
 
   for (i = 0; i < chain->parts->len; i++)
-    if (i == n
-	&& (BFIN_PART_EMUIR_A (chain->parts->parts[i]) != insn1
-	    || BFIN_PART_EMUIR_B (chain->parts->parts[i]) != insn2))
-      {
-	BFIN_PART_EMUIR_A (chain->parts->parts[i]) = insn1;
-	BFIN_PART_EMUIR_B (chain->parts->parts[i]) = insn2;
-	changed[i] = 1;
-      }
-    else if (i != n
-	     && BFIN_PART_EMUIR_A (chain->parts->parts[i]) != INSN_NOP)
-      {
-	BFIN_PART_EMUIR_A (chain->parts->parts[i]) = INSN_NOP;
-	changed[i] = 1;
-      }
-    else
-      changed[i] = 0;
+    {
+      if (part_is_bypassed (chain, i))
+	continue;
+
+      if (i == n
+	  && (BFIN_PART_EMUIR_A (chain->parts->parts[i]) != insn1
+	      || BFIN_PART_EMUIR_B (chain->parts->parts[i]) != insn2))
+	{
+	  BFIN_PART_EMUIR_A (chain->parts->parts[i]) = insn1;
+	  BFIN_PART_EMUIR_B (chain->parts->parts[i]) = insn2;
+	  changed[i] = 1;
+	}
+      else if (i != n
+	       && BFIN_PART_EMUIR_A (chain->parts->parts[i]) != INSN_NOP)
+	{
+	  BFIN_PART_EMUIR_A (chain->parts->parts[i]) = INSN_NOP;
+	  changed[i] = 1;
+	}
+      else
+	changed[i] = 0;
+    }
 
   scan_changed = 0;
 
   for (i = 0; i < chain->parts->len; i++)
-    if (changed[i])
-      scan_changed += bfin_set_scan (chain->parts->parts[i], emuir_scan);
-    else
-      scan_changed += bfin_set_scan (chain->parts->parts[i], BYPASS);
+    {
+      if (part_is_bypassed (chain, i))
+	continue;
+
+      if (changed[i])
+	scan_changed += bfin_set_scan (chain->parts->parts[i], emuir_scan);
+      else
+	scan_changed += bfin_set_scan (chain->parts->parts[i], BYPASS);
+    }
 
   if (scan_changed)
     chain_shift_instructions_mode (chain, 0, 1, EXITMODE_UPDATE);
 
   for (i = 0; i < chain->parts->len; i++)
-    if (changed[i] && i == n)
-      {
-	part = chain->parts->parts[i];
-	r = part->active_instruction->data_register->in;
-	emuir_init_value (r, insn2);
-	chain_shift_data_registers_mode (chain, 0, 1, EXITMODE_UPDATE);
+    {
+      if (part_is_bypassed (chain, i))
+	continue;
 
-	emuir_init_value (r, insn1);
-      }
-    else if (changed[i] && i != chain->active_part)
-      {
-	part = chain->parts->parts[i];
-	r = part->active_instruction->data_register->in;
-	emuir_init_value (r, BFIN_PART_EMUIR_A (part));
-      }
+      if (changed[i] && i == n)
+	{
+	  part = chain->parts->parts[i];
+	  r = part->active_instruction->data_register->in;
+	  emuir_init_value (r, insn2);
+	  chain_shift_data_registers_mode (chain, 0, 1, EXITMODE_UPDATE);
+
+	  emuir_init_value (r, insn1);
+	}
+      else if (changed[i] && i != chain->active_part)
+	{
+	  part = chain->parts->parts[i];
+	  r = part->active_instruction->data_register->in;
+	  emuir_init_value (r, BFIN_PART_EMUIR_A (part));
+	}
+    }
 
   free (changed);
 
@@ -1101,6 +1232,9 @@ chain_register_get (chain_t *chain, enum core_regnum reg, uint32_t *value)
   chain_shift_data_registers_mode (chain, 1, 1, EXITMODE_UPDATE);
   for (i = 0; i < chain->parts->len; i++)
     {
+      if (part_is_bypassed (chain, i))
+	continue;
+
       part = chain->parts->parts[i];
       r = part->active_instruction->data_register->out;
       value[i] = emudat_value (r);
@@ -1169,6 +1303,9 @@ chain_register_set_1 (chain_t *chain, enum core_regnum reg, uint32_t *value, boo
   chain_scan_select (chain, EMUDAT_SCAN);
   for (i = 0; i < chain->parts->len; i++)
     {
+      if (part_is_bypassed (chain, i))
+	continue;
+
       part = chain->parts->parts[i];
       r = part->active_instruction->data_register->in;
       emudat_init_value (r, array ? value[i] : *value);

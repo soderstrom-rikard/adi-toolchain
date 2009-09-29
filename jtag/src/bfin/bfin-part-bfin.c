@@ -121,6 +121,8 @@ bfin_part_init (part_t *part)
   part->params->data = malloc (sizeof (struct bfin_part_data));
   EMU_OAB (part) = &bfin_emu_oab;
 
+  BFIN_PART_BYPASS (part) = 0;
+
   for (i = 0; i < NUM_SCANS; i++)
     if (strcmp (part->active_instruction->name, scans[i]) == 0)
       break;
