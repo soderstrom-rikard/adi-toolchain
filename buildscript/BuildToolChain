@@ -413,6 +413,16 @@ do
     fi
 done
 
+# Check to make sure shell env vars are empty
+for flags in CFLAGS LDFLAGS CPPFLAGS CXXFLAGS 
+do
+    tmp=$(eval echo \$${flags})
+    if [ ${#tmp} -ne 0 ] ; then
+      printf "\nSince the shell $flags is set, it will override the choices made by configure.\nThis is normally bad, and will cause problems.\n\n"
+      exit 1
+    fi
+done
+
 ############ Done checking - lets get on to building ###################3
 
 if [ "${WITHOUT_X}" = "true" ] ; then
