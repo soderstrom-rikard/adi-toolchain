@@ -1,3 +1,8 @@
+2009-10-13  Jie Zhang  <jie.zhang@analog.com>
+
+	* gcc.target/bfin/l2.c: New test.
+	* gcc.target/bfin/bfin.exp (dg-bfin-processors): New.
+
 2008-12-06  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	Fix a misapplied patch.
