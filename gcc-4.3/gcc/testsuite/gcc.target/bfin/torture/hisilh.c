@@ -1,6 +1,6 @@
-/* { dg-do run { target bfin*-*-* } } */
-/* { dg-options "-O2" } */
-#include <stdlib.h>
+/* { dg-do run } */
+
+extern void abort (void);
 typedef short raw2x16 __attribute__ ((vector_size(4)));
 
 int x;

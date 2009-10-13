@@ -1,5 +1,11 @@
 2009-10-13  Jie Zhang  <jie.zhang@analog.com>
 
+	* gcc.target/bfin/hisilh-O0.c: Remove.
+	* gcc.target/bfin/hisilh.c: Move to ...
+	* gcc.target/bfin/torture/hisilh.c: ... this.
+
+2009-10-13  Jie Zhang  <jie.zhang@analog.com>
+
 	* gcc.target/bfin/torture/bfin-torture.exp: New file.
 	* gcc.target/bfin/torture/norm16-1.c: New test.
 	* gcc.target/bfin/torture/norm16-2.c: New test.
