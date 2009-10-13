@@ -1,3 +1,10 @@
+2009-10-13  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.c (bfin_init_builtins): Correct types of
+	__builtin_bfin_norm_fr1x16 and __builtin_bfin_norm_fr1x32.
+	* config/bfin/bfin.md (signbitssi2): SIGNBITS is CLZ minus 1.
+	(signbitshi2): Likewise.
+
 2009-09-27  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* loop-iv.c (iv_analyze_op): Use function_invariant_p, not CONSTANT_P,
