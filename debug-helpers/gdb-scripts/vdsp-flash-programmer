@@ -1,0 +1,355 @@
+define _percent
+	# base current max
+end
+define _nullprintf
+	if $arg0
+		printf $arg1, (char *)$arg0
+	end
+end
+define fldrvinfo
+	printf "Flash Programmer information:\n"
+	_nullprintf AFP_Title         " Title         : %s\n"
+	_nullprintf AFP_Description   " Description   : %s\n"
+	_nullprintf AFP_DeviceCompany " DeviceCompany : %s\n"
+	_nullprintf AFP_BuildDate     " BuildDate     : %s\n"
+	_nullprintf AFP_DrvVersion    " DrvVersion    : %s\n"
+	#_nullprintf AFP_FlashCompany  " FlashCompany  : %s\n"
+	printf                        " Buffer        : %#x\n", AFP_Buffer
+	printf                        " Size          : %#x\n", AFP_Size
+	printf                        " ManCode       : %#x\n", AFP_ManCode
+	printf                        " DevCode       : %#x\n", AFP_DevCode
+	printf                        " Error         : %#x\n", AFP_Error
+end
+document fldrvinfo
+Usage: fldrvinfo
+Display information about the Flash Driver currently loaded
+end
+
+define flinfo
+	set $ss = (unsigned long *)AFP_SectorInfo
+	printf "Flash layout: (%i bit, %i sectors, ", AFP_FlashWidth, AFP_NumSectors
+	set $size = $ss[AFP_NumSectors * 2 - 1]
+	if $size / 1024
+		if $size / 1024 / 1024
+			printf "%i MiB", $size / 1024 / 1024
+		else
+			printf "%i KiB", $size / 1024
+		end
+	else
+		printf "%i B", $size
+	end
+	printf ")"
+
+	set $s = 0
+	while $s < AFP_NumSectors
+		if ($s % 5) == 0
+			printf "\n %2i: ", $s
+		end
+		printf "0x%08x ", $ss[$s * 2]
+		set $s++
+	end
+	printf "\n"
+end
+document flinfo
+Usage: flinfo
+Show the current flash sector layout.  The number of the left helps
+to quickly find sectors by their index.
+end
+
+define _flstat_cmd
+	set $cmd = AFP_Command
+	printf " Command : %#x (", $cmd
+	if $cmd == 0x00
+		printf "No action"
+	end
+	if $cmd == 0x01
+		printf "Get codes"
+	end
+	if $cmd == 0x02
+		printf "Reset flash"
+	end
+	if $cmd == 0x03
+		printf "Write flash"
+	end
+	if $cmd == 0x04
+		printf "Fill flash"
+	end
+	if $cmd == 0x05
+		printf "Erase all"
+	end
+	if $cmd == 0x06
+		printf "Erase sector"
+	end
+	if $cmd == 0x07
+		printf "Read flash"
+	end
+	if $cmd == 0x08
+		printf "Get sector number"
+	end
+	if $cmd == 0x09
+		printf "Get sector start and end"
+	end
+	if $cmd >= 0x0A && $cmd <= 0x1f
+		printf "ADI Reserved"
+	end
+	if $cmd >= 0x20
+		printf "Custom"
+	end
+	printf ")\n"
+end
+
+define flstat
+	printf "Flash Programmer state:\n"
+	_flstat_cmd
+	printf " Error   : %#x\n", AFP_Error
+	printf " Offset  : %#x\n", AFP_Offset
+	printf " Count   : %#x\n", AFP_Count
+	printf " Stride  : %#x\n", AFP_Stride
+	printf " Sector  : %#x\n", AFP_Sector
+	printf " Buffer  : %#x\n", AFP_Buffer
+end
+document flstat
+Usage: flstat
+Show information about the current state of the Flash Driver
+end
+
+define flcmd
+	# anything that calls flcmd will get this behavior --
+	# which is what we want
+	dont-repeat
+
+	set AFP_Command = $arg0
+	if $argc > 1
+		set AFP_Offset = $arg1
+	end
+	if $argc > 2
+		set AFP_Count  = $arg2
+	end
+	if $argc > 3
+		set AFP_Stride = $arg3
+	end
+	continue
+end
+document flcmd
+Usage: flcmd <cmd> [AFP_Offset] [AFP_Count] [AFP_Stride]
+Quickly execute the specified numeric Flash Driver command.
+end
+
+define _flerase_sector
+	set AFP_Sector = $arg0
+	flcmd 0x6
+end
+define flerase_sector
+	if $argc == 1
+		set $max = AFP_NumSectors
+		if $arg0 >= $max
+			printf "Sector %i is larger than available sectors %i\n", $arg0, $max
+		else
+			set $ss = (unsigned long *)AFP_SectorInfo
+			printf "Erasing %#x to %#x\n", $ss[$arg0 * 2], $ss[$arg0 * 2 + 1]
+			_flerase_sector $arg0
+		end
+	else
+		help flerase_sector
+	end
+end
+document flerase_sector
+Usage: flerase_sector <sector #>
+Erase the specified flash sector.
+end
+
+define _fl_addr_to_sector
+	set $$I = AFP_NumSectors
+	set $ss = (unsigned long *)AFP_SectorInfo
+
+	set $sector = -1
+	if $arg0 <= $ss[$$I * 2 - 1]
+		set $$i = 0
+		while $$i < $$I
+			set $$s = $ss[$$i * 2]
+			set $$e = $ss[$$i * 2 + 1]
+			if $arg0 >= $$s && $arg0 <= $$e
+				set $sector = $$i
+				loop_break
+			end
+			set $$i++
+		end
+	end
+end
+
+# need to turn an address into a sector # as that is all the
+# driver can work with :x
+define flerase
+	if $argc == 1
+		_fl_addr_to_sector $arg0
+		if $sector == -1
+			printf "Address %#x not inside flash\n", $arg0
+		else
+			flerase_sector $sector
+		end
+	else
+		help flerase
+	end
+end
+document flerase
+Usage: flerase <addr>
+Erase the specified (by address) flash sector.
+end
+
+define _flwrite
+	flcmd 0x3 $arg0 $arg1 $arg2
+end
+define flwrite
+	if $argc > 1
+		set $o = $arg0
+		set $l = $arg1
+		if $argc > 2
+			set $s = $arg2
+		else
+			set $s = 1
+		end
+		printf "Writing %#x bytes to %#x from AFP_Buffer (%#x)\n", $l, $o, AFP_Buffer
+		_flwrite $o $l $s
+	else
+		help flwrite
+	end
+end
+document flwrite
+Usage: flwrite <offset> <length> [stride=1]
+Write data to the flash.  The implicit data source is the AFP_Buffer.
+end
+
+define flrestore
+	if $argc > 2
+		if $argc > 1
+			set $off = $arg1
+		else
+			set $off = 0
+		end
+		if $argc > 2
+			set $len = $arg2
+		else
+			#xxx: how to get filesize dynamically !?
+			set $len = 0
+		end
+		if $argc > 3
+			set $stride = $arg3
+		else
+			set $stride = 1
+		end
+		set $max = $off + $len
+
+		printf "Restoring %#x to %#x (%i bytes)\n", $off, $max, $len
+
+		_fl_addr_to_sector $off
+		set $s = $sector
+		set $S = $s
+		_fl_addr_to_sector $max
+		set $e = $sector
+
+		if $s == -1 || $e == -1
+			printf " Error parsing sectors!!\n"
+		end
+
+		while $s <= $e
+			printf " Erasing sector %i (%i%%)\r", $s, (($s - $S) * 100) / ($e - $S)
+			_flerase_sector $s
+			set $s++
+		end
+		printf " Erase complete; Starting write cycle     \n"
+
+		set $f = 0
+		set $i = AFP_Size
+		set $o = $off
+		set $O = $o
+		while $o < $max
+			if $o + $i > $max
+				set $i = $max - $o
+			end
+			set $b = AFP_Buffer - $f
+			restore $arg0 binary $b $f ($f + $i)
+			printf " %#x bytes @ %#x (%i%%)\r", $i, $o, (($o - $O) * 100) / ($max - $O)
+			_flwrite $o $i $stride
+			set $f += $i
+			set $o += $i
+		end
+		printf "\n"
+	else
+		help flrestore
+	end
+end
+#document flrestore
+#Usage: flrestore <binary> [offset=0] [length=filesize] [stride=1]
+#end
+document flrestore
+Usage: flrestore <binary> <offset> <length> [stride=1]
+Restore a binary file to flash.  Does the erase/write commands for you.
+end
+
+set $$flread_size = 64
+define _flread
+	flcmd 0x7 $arg0 $arg1 $arg2
+end
+define flread
+	if $argc > 0
+		set $o = $arg0
+	else
+		set $o = 0
+	end
+	if $argc > 1
+		set $$flread_size = $arg1
+	end
+	if $argc > 2
+		set $s = $arg2
+	else
+		set $s = 1
+	end
+	printf "Reading %#x bytes from %#x into AFP_Buffer (%#x)\n", $$flread_size, $o, AFP_Buffer
+	_flread $o $$flread_size $s
+end
+document flread
+Usage: flread [offset=0] [length=64] [stride=1]
+Read data from the flash.  The implicit data destination is the AFP_Buffer.
+end
+
+define fldump
+	if $argc < 1
+		help fldump
+	else
+		if $argc > 1
+			set $O = $arg1
+		else
+			set $O = 0
+		end
+		set $MAX = ((unsigned long *)AFP_SectorInfo)[AFP_NumSectors * 2 - 1]
+		if $argc > 2
+			set $max = $arg2
+		else
+			set $max = $MAX - $O
+		end
+		if $argc > 3
+			set $stride = $arg3
+		else
+			set $stride = 1
+		end
+		set $o = $O
+		set $i = AFP_Size
+
+		printf "Dumping %#x to %#x (%#x bytes)\n", $o, $max, ($max - $O)
+		shell rm -f $arg0
+		while $o < $max
+			if $o + $i > $max
+				set $i = $max - $o
+			end
+			printf " %#x bytes @ %#x (%i%%)\r", $i, $o, (($o - $O) * 100) / ($max - $O)
+			_flread $o $i $stride
+			append binary memory $arg0 AFP_Buffer (AFP_Buffer + $i)
+			set $o += $i
+		end
+		printf "\n"
+	end
+end
+document fldump
+Usage: fldump <file> [offset] [length] [stride]
+Dump data in the flash to a binary file.
+end
