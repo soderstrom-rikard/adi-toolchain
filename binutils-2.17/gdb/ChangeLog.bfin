@@ -1,3 +1,11 @@
+2009-10-14  Jie Zhang  <jie.zhang@analog.com>
+
+	2006-09-03  Jie Zhang  <jie.zhang@analog.com>
+	* remote.c (get_offsets): Set the offsets of text section
+	only if it exists. Same for data section and bss section.
+	* symfile.c (init_objfile_sect_indices): Not set its section
+	index to 0, if text, data, or bss section does not exist.
+
 2009-07-15  Mike Frysinger  <vapier@gentoo.org>
 
 	* configure.ac (AC_CHECK_FUNCS): Check for pipe.
