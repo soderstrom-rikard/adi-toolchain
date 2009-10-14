@@ -4395,7 +4395,7 @@
   [(set (match_operand:SI 0 "register_operand" "=d,d,d")
 	(if_then_else:SI
 	 (lt (match_operand:HI 2 "reg_or_const_int_operand" "d,Ku5,Ks5") (const_int 0))
-	 (ashiftrt:SI (match_operand:HI 1 "register_operand" "d,d,d")
+	 (ashiftrt:SI (match_operand:SI 1 "register_operand" "d,d,d")
 		      (match_dup 2))
 	 (ss_ashift:SI (match_dup 1) (match_dup 2))))]
   ""

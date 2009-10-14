@@ -1,3 +1,8 @@
+2009-10-14  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.md (ssashiftsi3): Use SImode for
+	operand 1.
+
 2009-10-13  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.c (bfin_init_builtins): Correct types of
