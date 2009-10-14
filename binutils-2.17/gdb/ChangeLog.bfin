@@ -1,5 +1,6 @@
 2009-10-14  Jie Zhang  <jie.zhang@analog.com>
 
+	Revert
 	2006-09-03  Jie Zhang  <jie.zhang@analog.com>
 	* remote.c (get_offsets): Set the offsets of text section
 	only if it exists. Same for data section and bss section.
