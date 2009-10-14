@@ -740,11 +740,15 @@ signbits (bu64 val, int size)
       mask >>= 1;
       bit >>= 1;
       if (mask == 0)
-	return count;
+	break;
       if ((val & mask) != bit)
-	return count;
+	break;
       count++;
     }
+  if (size == 40)
+    count -= 8;
+
+  return count;
 }
 
 /* Extract a 16 or 32 bit value from a 64 bit multiplication result.
@@ -2765,18 +2769,21 @@ decode_dsp32shift_0 (bu16 iw0, bu16 iw1, bu32 pc)
     }
   else if (sop == 0 && sopcde == 5)
     {
+      bu32 sv1 = DREG (src1);
       DREG (dst0) &= 0xFFFF0000;
-      DREG (dst0) |= signbits (DREG (src0), 32);
+      DREG (dst0) |= signbits (sv1, 32);
     }
   else if (sop == 1 && sopcde == 5)
     {
+      bu32 sv1 = DREG (src1);
       DREG (dst0) &= 0xFFFF0000;
-      DREG (dst0) |= signbits (DREG (src0), 16);
+      DREG (dst0) |= signbits (sv1, 16);
     }
   else if (sop == 2 && sopcde == 5)
     {
+      bu32 sv1 = DREG (src1);
       DREG (dst0) &= 0xFFFF0000;
-      DREG (dst0) |= signbits (DREG (src0) >> 16, 16);
+      DREG (dst0) |= signbits (sv1 >> 16, 16);
     }
   else if (sop == 0 && sopcde == 6)
     {

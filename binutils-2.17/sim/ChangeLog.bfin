@@ -1,3 +1,9 @@
+2009-10-14  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/bfin-dis.c (signbits): Minus 8 for 40-bit operand.
+	(decode_dsp32shift_0): Don't clobber source operand when
+	it's same as destination operand.
+
 2009-03-12  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* bfin/bfin-dis.c (decode_PushPopReg_0): Add support for pushing and
