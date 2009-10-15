@@ -10,8 +10,13 @@
 #define PLL_OFF			0x0002		/* PLL Not Powered */
 #define STOPCK			0x0008		/* Core Clock Off */
 #define PDWN			0x0020		/* Enter Deep Sleep Mode */
+#ifdef __ADSPBF539__
+#define IN_DELAY		0x0014		/* Add 200ps Delay To EBIU Input Latches */
+#define OUT_DELAY		0x00C0		/* Add 200ps Delay To EBIU Output Signals */
+#else
 #define IN_DELAY		0x0040		/* Add 200ps Delay To EBIU Input Latches */
 #define OUT_DELAY		0x0080		/* Add 200ps Delay To EBIU Output Signals */
+#endif
 #define BYPASS			0x0100		/* Bypass the PLL */
 #define MSEL			0x7E00		/* Multiplier Select For CCLK/VCO Factors */
 #define SPORT_HYST		0x8000		/* Enable Additional Hysteresis on SPORT Input Pins */
@@ -87,10 +92,14 @@
 #define PHYWE			0x0400		/* Enable PHY Wakeup From Hibernate */
 #define GPWE			0x0400		/* General-purpose Wakeup From Hibernate */
 #define MXVRWE			0x0400		/* MXVR Wakeup From Hibernate */
-#define USBWE			0x0800		/* USB Wakeup From Hibernate */
 #define KPADWE			0x1000		/* Keypad Wakeup From Hibernate */
 #define ROTWE			0x2000		/* Rotary Counter Wakeup From Hibernate */
 #define CLKBUFOE		0x4000		/* CLKIN Buffer Output Enable */
 #define CKELOW			0x8000		/* Enable Drive CKE Low During Reset */
+#ifdef __ADSPBF52x__
+#define USBWE			0x0200		/* USB Wakeup From Hibernate */
+#else
+#define USBWE			0x0800		/* USB Wakeup From Hibernate */
+#endif
 
 #endif
