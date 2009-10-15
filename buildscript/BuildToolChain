@@ -42,6 +42,7 @@ PREREQ_HW_TESTS=" ping rsh rcp"
 PREREQ_HW_SIM_TESTS=" bc kill killall pstree runtest Xvfb"
 BINUTILS_VERSION=2.17
 GCC_VERSIONS=
+GCC_VERSIONS_DEFAULT=4.3
 NUM_JOBS=0
 SKIP_DEV_CHECKS=false
 WITHOUT_X=false
@@ -197,10 +198,10 @@ do
 # We don't document the -S option - it's for advanced users who know what
 # they are doing.  For maximum reproducibility, not using it is better.
              echo "Usage : $APP_NAME -s SOURCE [-b BUILD]
--B BINUTILS_VER  Binutils version (default 2.17).  Can be given once.
+-B BINUTILS_VER  Binutils version (default ${BINUTILS_VERSION}).  Can be given once.
 -b BUILD         Build directory (leave blank to use current dir)
 -C FILE          Use FILE as uClibc config file, rather than the default.
--c GCC_VERSION   GCC version (default 4.1).  Can be given multiple times.
+-c GCC_VERSION   GCC version (default ${GCC_VERSIONS_DEFAULT}).  Can be given multiple times.
 -d               Date Stamp all output files
 -D               Don't check libraries/headers -- assume all is OK
 -f               Add stack checking to all tests
@@ -430,19 +431,11 @@ if [ "${WITHOUT_X}" = "true" ] ; then
     echo "Disabling gdbtk (insight)"
 fi
 
-if [ -z "$GCC_VERSIONS" ]; then
-    GCC_VERSIONS=4.1
-fi
-printf "Building gcc versions $GCC_VERSIONS "
-
-if [ -z "$BFIN_LANGS" ] ; then 
-    # Don't set a default here ... let the build system
-    # figure out the defaults by loading all languages.
-    #BFIN_LANGS=" --enable-languages=c,c++"
-    echo
-else
-    echo $BFIN_LANGS
-fi
+# Don't set a default here ... let the build system
+# figure out the defaults by loading all languages.
+#BFIN_LANGS=" --enable-languages=c,c++"
+: ${GCC_VERSIONS:=${GCC_VERSIONS_DEFAULT}}
+printf "Building gcc versions $GCC_VERSIONS ${BFIN_LANGS}"
 
 ############ CHECK MAKE SET #####################################
 if [ ! "$MAKE" ] ; then
