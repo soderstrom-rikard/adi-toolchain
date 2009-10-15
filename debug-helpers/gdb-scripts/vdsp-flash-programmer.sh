@@ -26,7 +26,7 @@ cp "${drv}" "${tmp}"
 drv=${tmp}
 
 # GDB barfs if there is no .text section, so rename it #4337
-${cross}objcopy --rename-section L1_code=.text "${drv}"
+#${cross}objcopy --rename-section L1_code=.text "${drv}"
 # Filter out all unnessary noise to avoid conflicts between VDSP's
 # ELF implementation and the GNU implementation
 syms=`${cross}readelf -W -s "${drv}" | awk '($NF ~ /AFP_/ || ($5 == "GLOBAL" && $4 != "NOTYPE")) { print $NF }'`
