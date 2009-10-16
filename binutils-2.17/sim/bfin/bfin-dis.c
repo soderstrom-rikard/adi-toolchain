@@ -2992,7 +2992,14 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
   else if (sop == 0 && sopcde == 1)
     unhandled_instruction ("dregs = dregs << imm5 (V)");
   else if (sop == 1 && sopcde == 2)
-    unhandled_instruction ("dregs = dregs << imm6 (S)");
+    {
+      int count = imm6 (immag);
+      /* dregs = dregs << imm6 (S) */
+      if (count >= 0)
+        STORE (DREG (dst0), lshift (DREG (src1), count, 32, 1));
+      else
+        illegal_instruction ();
+    }
   else if (sop == 2 && sopcde == 2)
     {
       int count = imm6 (newimmag);

@@ -1,3 +1,8 @@
+2009-10-16  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/bfin-dis.c (decode_dsp32shiftimm_0): Implement
+	dregs = dregs << imm6 (S).
+
 2009-10-14  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/bfin-dis.c (signbits): Minus 8 for 40-bit operand.
