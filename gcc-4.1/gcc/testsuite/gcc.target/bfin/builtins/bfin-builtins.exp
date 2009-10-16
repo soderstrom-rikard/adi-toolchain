@@ -14,28 +14,31 @@
 # along with GCC; see the file COPYING3.  If not see
 # <http://www.gnu.org/licenses/>.
 
-# GCC testsuite that uses the `dg.exp' driver.
+# GCC testsuite that uses the `c-torture.exp' driver.
 
-# Exit immediately if this isn't a Blackfin target.
+if [info exists TORTURE_OPTIONS] {
+    set old_TORTURE_OPTIONS $TORTURE_OPTIONS
+} elseif [info exists old_TORTURE_OPTIONS] {
+    unset old_TORTURE_OPTIONS
+}
+
+set TORTURE_OPTIONS [list {} -O2]
+
+load_lib c-torture.exp
+load_lib target-supports.exp
+
 if ![istarget bfin-*-*] then {
   return
 }
 
-# Load support procs.
-load_lib gcc-dg.exp
-
-# If a testcase doesn't have special options, use these.
-global DEFAULT_CFLAGS
-if ![info exists DEFAULT_CFLAGS] then {
-    set DEFAULT_CFLAGS " -ansi -pedantic-errors"
+foreach src [lsort [glob -nocomplain $srcdir/$subdir/*.\[cS\]]] {
+    if {[runtest_file_p $runtests $src]} {
+	c-torture-execute $src
+    }
 }
 
-# Initialize 'dg'.
-dg-init
-
-# Main loop.
-dg-runtest [lsort [glob -nocomplain $srcdir/$subdir/*.\[cS\]]] \
-	"" $DEFAULT_CFLAGS
-
-# All done.
-dg-finish
+if [info exists old_TORTURE_OPTIONS] {
+    set TORTURE_OPTIONS $old_TORTURE_OPTIONS
+} else {
+    unset TORTURE_OPTIONS
+}
