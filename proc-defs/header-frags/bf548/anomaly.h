@@ -204,6 +204,8 @@
 #define ANOMALY_05000466 (1)
 /* Possible RX data corruption when control & data EP FIFOs are accessed via the core */
 #define ANOMALY_05000467 (1)
+/* Access to DDR-SDRAM causes system hang under certain PLL/VR settings */
+#define ANOMALY_05000474 (1)
 
 /* Anomalies that don't exist on this proc */
 #define ANOMALY_05000099 (0)
