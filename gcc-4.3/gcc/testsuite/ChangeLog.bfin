@@ -1,3 +1,30 @@
+2009-10-16  Jie Zhang  <jie.zhang@analog.com>
+
+	* gcc.target/bfin/builtins/bfin-builtins.exp: Use
+	c-torture.exp instead of dg.exp.
+	* gcc.target/bfin/builtins/norm16-1.c: Moved from
+	gcc.target/bfin/torture/.
+	* gcc.target/bfin/builtins/norm16-2.c: Likewise.
+	* gcc.target/bfin/builtins/norm16-3.c: Likewise.
+	* gcc.target/bfin/builtins/norm16-4.c: Likewise.
+	* gcc.target/bfin/builtins/norm16-5.c: Likewise.
+	* gcc.target/bfin/builtins/norm16-6.c: Likewise.
+	* gcc.target/bfin/builtins/norm16-7.c: Likewise.
+	* gcc.target/bfin/builtins/norm16-8.c: Likewise.
+	* gcc.target/bfin/builtins/norm32-1.c: Likewise.
+	* gcc.target/bfin/builtins/norm32-2.c: Likewise.
+	* gcc.target/bfin/builtins/norm32-3.c: Likewise.
+	* gcc.target/bfin/builtins/norm32-4.c: Likewise.
+	* gcc.target/bfin/builtins/norm32-5.c: Likewise.
+	* gcc.target/bfin/builtins/norm32-6.c: Likewise.
+	* gcc.target/bfin/builtins/norm32-7.c: Likewise.
+	* gcc.target/bfin/builtins/norm32-8.c: Likewise.
+	* gcc.target/bfin/builtins/norm32-9.c: Likewise.
+	* gcc.target/bfin/builtins/norm32-10.c: Likewise.
+	* gcc.target/bfin/builtins/norm32-11.c: Likewise.
+	* gcc.target/bfin/builtins/norm32-12.c: Likewise.
+	* gcc.target/bfin/torture/: Remove.
+
 2009-10-14  Jie Zhang  <jie.zhang@analog.com>
 
 	* gcc.target/bfin/builtins/bfin-builtins.exp: New.
