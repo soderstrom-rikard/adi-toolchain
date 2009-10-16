@@ -1,3 +1,9 @@
+2009-10-16  Jie Zhang  <jie.zhang@analog.com>
+
+	* simplify-rtx.c (simplify_const_unary_operation): Handle
+	SS_ABS.
+	* doc/rtl.texi: Document ss_abs.
+
 2009-10-14  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.md (ssashiftsi3): Use SImode for
