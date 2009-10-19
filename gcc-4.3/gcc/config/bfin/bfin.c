@@ -5589,6 +5589,7 @@ add_sched_insns_for_speculation (void)
     {
       if (JUMP_P (insn)
 	  && any_condjump_p (insn)
+	  && recog_memoized (insn) != CODE_FOR_loop_end
 	  && (cbranch_predicted_taken_p (insn)))
 	{
 	  rtx target = JUMP_LABEL (insn);

@@ -1,3 +1,8 @@
+2009-10-20  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (add_sched_insns_for_speculation): Don't add
+	insns for a jump target in a hardware loop.
+
 2009-10-16  Jie Zhang  <jie.zhang@analog.com>
 
 	* simplify-rtx.c (simplify_const_unary_operation): Handle
