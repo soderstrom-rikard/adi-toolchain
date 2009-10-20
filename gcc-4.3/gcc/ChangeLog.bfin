@@ -3,6 +3,11 @@
 	* config/bfin/bfin.c (add_sched_insns_for_speculation): Don't add
 	insns for a jump target in a hardware loop.
 
+	* config/bfin/bfin.md (plus_or_minus, pm_op, pm_optab): New code macro
+	definitions.
+	(<pm_optab>si_insn32): New 32 bit reg-reg add/subtract pattern.
+	(corresponding splitter): New.
+
 2009-10-16  Jie Zhang  <jie.zhang@analog.com>
 
 	* simplify-rtx.c (simplify_const_unary_operation): Handle
