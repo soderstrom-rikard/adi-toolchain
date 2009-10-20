@@ -6101,12 +6101,15 @@ bfin_init_builtins (void)
   tree short_ftype_short
     = build_function_type_list (short_integer_type_node, short_integer_type_node,
 				NULL_TREE);
-  tree short_ftype_int_int
-    = build_function_type_list (short_integer_type_node, integer_type_node,
-				integer_type_node, NULL_TREE);
+  tree short_ftype_short_short
+    = build_function_type_list (short_integer_type_node, short_integer_type_node,
+				short_integer_type_node, NULL_TREE);
   tree int_ftype_int_int
     = build_function_type_list (integer_type_node, integer_type_node,
 				integer_type_node, NULL_TREE);
+  tree int_ftype_int_short
+    = build_function_type_list (integer_type_node, integer_type_node,
+				short_integer_type_node, NULL_TREE);
   tree int_ftype_int
     = build_function_type_list (integer_type_node, integer_type_node,
 				NULL_TREE);
@@ -6125,12 +6128,12 @@ bfin_init_builtins (void)
   tree v2hi_ftype_v2hi_v2hi_v2hi
     = build_function_type_list (V2HI_type_node, V2HI_type_node,
 				V2HI_type_node, V2HI_type_node, NULL_TREE);
-  tree v2hi_ftype_int_int
-    = build_function_type_list (V2HI_type_node, integer_type_node,
-				integer_type_node, NULL_TREE);
-  tree v2hi_ftype_v2hi_int
+  tree v2hi_ftype_short_short
+    = build_function_type_list (V2HI_type_node, short_integer_type_node,
+				short_integer_type_node, NULL_TREE);
+  tree v2hi_ftype_v2hi_short
     = build_function_type_list (V2HI_type_node, V2HI_type_node,
-				integer_type_node, NULL_TREE);
+				short_integer_type_node, NULL_TREE);
   tree int_ftype_short_short
     = build_function_type_list (integer_type_node, short_integer_type_node,
 				short_integer_type_node, NULL_TREE);
@@ -6150,7 +6153,7 @@ bfin_init_builtins (void)
 
   def_builtin ("__builtin_bfin_ones", short_ftype_int, BFIN_BUILTIN_ONES);
 
-  def_builtin ("__builtin_bfin_compose_2x16", v2hi_ftype_int_int,
+  def_builtin ("__builtin_bfin_compose_2x16", v2hi_ftype_short_short,
 	       BFIN_BUILTIN_COMPOSE_2X16);
   def_builtin ("__builtin_bfin_extract_hi", short_ftype_v2hi,
 	       BFIN_BUILTIN_EXTRACTHI);
@@ -6179,18 +6182,18 @@ bfin_init_builtins (void)
   def_builtin ("__builtin_bfin_abs_fr2x16", v2hi_ftype_v2hi,
 	       BFIN_BUILTIN_ABS_2X16);
 
-  def_builtin ("__builtin_bfin_min_fr1x16", short_ftype_int_int,
+  def_builtin ("__builtin_bfin_min_fr1x16", short_ftype_short_short,
 	       BFIN_BUILTIN_MIN_1X16);
-  def_builtin ("__builtin_bfin_max_fr1x16", short_ftype_int_int,
+  def_builtin ("__builtin_bfin_max_fr1x16", short_ftype_short_short,
 	       BFIN_BUILTIN_MAX_1X16);
 
-  def_builtin ("__builtin_bfin_add_fr1x16", short_ftype_int_int,
+  def_builtin ("__builtin_bfin_add_fr1x16", short_ftype_short_short,
 	       BFIN_BUILTIN_SSADD_1X16);
-  def_builtin ("__builtin_bfin_sub_fr1x16", short_ftype_int_int,
+  def_builtin ("__builtin_bfin_sub_fr1x16", short_ftype_short_short,
 	       BFIN_BUILTIN_SSSUB_1X16);
-  def_builtin ("__builtin_bfin_mult_fr1x16", short_ftype_int_int,
+  def_builtin ("__builtin_bfin_mult_fr1x16", short_ftype_short_short,
 	       BFIN_BUILTIN_MULT_1X16);
-  def_builtin ("__builtin_bfin_multr_fr1x16", short_ftype_int_int,
+  def_builtin ("__builtin_bfin_multr_fr1x16", short_ftype_short_short,
 	       BFIN_BUILTIN_MULTR_1X16);
   def_builtin ("__builtin_bfin_negate_fr1x16", short_ftype_short,
 	       BFIN_BUILTIN_NEG_1X16);
@@ -6240,15 +6243,15 @@ bfin_init_builtins (void)
 	       BFIN_BUILTIN_MULT_1X32X32NS);
 
   /* Shifts.  */
-  def_builtin ("__builtin_bfin_shl_fr1x16", short_ftype_int_int,
+  def_builtin ("__builtin_bfin_shl_fr1x16", short_ftype_short_short,
 	       BFIN_BUILTIN_SSASHIFT_1X16);
-  def_builtin ("__builtin_bfin_shl_fr2x16", v2hi_ftype_v2hi_int,
+  def_builtin ("__builtin_bfin_shl_fr2x16", v2hi_ftype_v2hi_short,
 	       BFIN_BUILTIN_SSASHIFT_2X16);
-  def_builtin ("__builtin_bfin_lshl_fr1x16", short_ftype_int_int,
+  def_builtin ("__builtin_bfin_lshl_fr1x16", short_ftype_short_short,
 	       BFIN_BUILTIN_LSHIFT_1X16);
-  def_builtin ("__builtin_bfin_lshl_fr2x16", v2hi_ftype_v2hi_int,
+  def_builtin ("__builtin_bfin_lshl_fr2x16", v2hi_ftype_v2hi_short,
 	       BFIN_BUILTIN_LSHIFT_2X16);
-  def_builtin ("__builtin_bfin_shl_fr1x32", int_ftype_int_int,
+  def_builtin ("__builtin_bfin_shl_fr1x32", int_ftype_int_short,
 	       BFIN_BUILTIN_SSASHIFT_1X32);
 
   /* Complex numbers.  */

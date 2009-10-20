@@ -1,5 +1,19 @@
 2009-10-20  Jie Zhang  <jie.zhang@analog.com>
 
+	* config/bfin/bfin.c (bfin_init_builtins): Change the type of
+	__builtin_bfin_compose_2x16 to v2hi_ftype_short_short.
+	Change the types of __builtin_bfin_min_fr1x16,
+	__builtin_bfin_max_fr1x16, __builtin_bfin_add_fr1x16,
+	__builtin_bfin_sub_fr1x16, __builtin_bfin_mult_fr1x16,
+	__builtin_bfin_multr_fr1x16, __builtin_bfin_shl_fr1x16
+	and __builtin_bfin_lshl_fr1x16 to short_ftype_short_short.
+	Change the types of __builtin_bfin_shl_fr2x16
+	and __builtin_bfin_lshl_fr2x16 to v2hi_ftype_v2hi_short.
+	Change the type of __builtin_bfin_shl_fr1x32 to
+	int_ftype_int_short.
+
+2009-10-20  Jie Zhang  <jie.zhang@analog.com>
+
 	* config/bfin/bfin.c (builtin_description): Change
 	__builtin_bfin_abs_fr1x16 to use CODE_FOR_ssabshi2.
 	* config/bfin/bfin.md (ssabshi2): New pattern.
