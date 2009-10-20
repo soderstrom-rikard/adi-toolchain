@@ -1,3 +1,9 @@
+2009-10-20  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.c (builtin_description): Change
+	__builtin_bfin_abs_fr1x16 to use CODE_FOR_ssabshi2.
+	* config/bfin/bfin.md (ssabshi2): New pattern.
+
 2009-10-20  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.c (add_sched_insns_for_speculation): Don't add

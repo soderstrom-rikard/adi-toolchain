@@ -1535,6 +1535,13 @@
   "%0 = abs %1 (V)%!"
   [(set_attr "type" "dsp32")])
 
+(define_insn "ssabshi2"
+  [(set (match_operand:HI 0 "register_operand" "=d")
+	(ss_abs:HI (match_operand:HI 1 "register_operand" "d")))]
+  ""
+  "%0 = abs %1 (V)%!"
+  [(set_attr "type" "dsp32")])
+
 (define_insn "neghi2"
   [(set (match_operand:HI 0 "register_operand" "=d")
 	(neg:HI (match_operand:HI 1 "register_operand" "d")))]
