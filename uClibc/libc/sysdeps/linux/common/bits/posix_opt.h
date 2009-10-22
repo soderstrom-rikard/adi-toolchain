@@ -130,7 +130,9 @@
 #endif
 
 /* The `spawn' function family is supported.  */
+#if 0
 #define _POSIX_SPAWN	200112L
+#endif
 
 /* We have POSIX timers.  */
 #define _POSIX_TIMERS	200112L
