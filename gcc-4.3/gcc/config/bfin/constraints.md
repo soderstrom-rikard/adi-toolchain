@@ -126,20 +126,10 @@
   (and (match_code "const_int")
        (match_test "ival >= 0 && ival <= 7")))
 
-(define_constraint "Ks4"
-  "A signed 4 bit immediate."
-  (and (match_code "const_int")
-       (match_test "ival >= -8 && ival <= 7")))
-
 (define_constraint "Ku4"
   "An unsigned 4 bit immediate."
   (and (match_code "const_int")
        (match_test "ival >= 0 && ival <= 15")))
-
-(define_constraint "Ks5"
-  "A signed 5 bit immediate."
-  (and (match_code "const_int")
-       (match_test "ival >= -16 && ival <= 15")))
 
 (define_constraint "Ku5"
   "An unsigned 5 bit immediate."

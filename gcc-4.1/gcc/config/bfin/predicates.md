@@ -66,10 +66,13 @@
   (and (match_code "const_int")
        (match_test "INTVAL (op) == 3")))
 
-(define_predicate "vec_shift_operand"
-  (ior (and (match_code "const_int")
-	    (match_test "INTVAL (op) >= -16 && INTVAL (op) < 15"))
-       (match_operand 0 "register_operand")))
+(define_predicate "const_uimm4_operand"
+  (and (match_code "const_int")
+       (match_test "INTVAL (op) >= 0 && INTVAL (op) < 16")))
+
+(define_predicate "const_uimm5_operand"
+  (and (match_code "const_int")
+       (match_test "INTVAL (op) >= 0 && INTVAL (op) < 32")))
 
 ;; Like register_operand, but make sure that hard regs have a valid mode.
 (define_predicate "valid_reg_operand"

@@ -34,8 +34,8 @@
 ;
 ;     J   2**N       5bit imm scaled
 ;     Ks7 -64 .. 63  signed 7bit imm
-;     Ku5 0..31      unsigned 5bit imm
-;     Ks4 -8 .. 7    signed 4bit imm
+;     Ku5 0 .. 31    unsigned 5bit imm
+;     Ku4 0 .. 15    signed 4bit imm
 ;     Ks3 -4 .. 3    signed 3bit imm
 ;     Ku3 0 .. 7     unsigned 3bit imm
 ;     Pn  0, 1, 2    constants 0, 1 or 2, corresponding to n
@@ -140,7 +140,9 @@
    (UNSPEC_32BIT 11)
    (UNSPEC_NOP 12)
    (UNSPEC_ONES 13)
-   (UNSPEC_ATOMIC 14)])
+   (UNSPEC_ATOMIC 14)
+   (UNSPEC_ASHIFT 15)
+   (UNSPEC_LSHIFT 16)])
 
 (define_constants
   [(UNSPEC_VOLATILE_EH_RETURN 0)
@@ -4424,74 +4426,133 @@
 ;; Shifts.
 
 (define_insn "ssashiftv2hi3"
-  [(set (match_operand:V2HI 0 "register_operand" "=d,d,d")
-	(if_then_else:V2HI
-	 (lt (match_operand:HI 2 "vec_shift_operand" "d,Ku4,Ks4") (const_int 0))
-	 (ashiftrt:V2HI (match_operand:V2HI 1 "register_operand" "d,d,d")
-			(match_dup 2))
-	 (ss_ashift:V2HI (match_dup 1) (match_dup 2))))]
+  [(set (match_operand:V2HI 0 "register_operand" "=d")
+	(unspec:V2HI [(match_operand:V2HI 1 "register_operand" "d")
+		      (match_operand:HI 2 "register_operand" "d")] UNSPEC_ASHIFT))]
   ""
-  "@
-   %0 = ASHIFT %1 BY %h2 (V, S)%!
-   %0 = %1 << %2 (V,S)%!
-   %0 = %1 >>> %N2 (V,S)%!"
-  [(set_attr "type" "dsp32,dsp32shiftimm,dsp32shiftimm")])
+  "%0 = ASHIFT %1 BY %h2 (V, S)%!"
+  [(set_attr "type" "dsp32")])
+
+(define_insn "ssashiftv2hi3_imm"
+  [(set (match_operand:V2HI 0 "register_operand" "=d")
+	(ss_ashift:V2HI (match_operand:V2HI 1 "register_operand" "d")
+			(match_operand:HI 2 "const_uimm4_operand" "Ku4")))]
+  ""
+  "%0 = %1 << %2 (V,S)%!"
+  [(set_attr "type" "dsp32shiftimm")])
+
+(define_insn "ashiftv2hi3_imm"
+  [(set (match_operand:V2HI 0 "register_operand" "=d")
+	(ashift:V2HI (match_operand:V2HI 1 "register_operand" "d")
+		     (match_operand:HI 2 "const_uimm4_operand" "Ku4")))]
+  ""
+  "%0 = %1 << %2 (V)%!"
+  [(set_attr "type" "dsp32shiftimm")])
+
+(define_insn "ssashiftrtv2hi3"
+  [(set (match_operand:V2HI 0 "register_operand" "=d")
+	(ashiftrt:V2HI (match_operand:V2HI 1 "register_operand" "d")
+		       (match_operand:HI 2 "const_uimm4_operand" "Ku4")))]
+  ""
+  "%0 = %1 >>> %2 (V,S)%!"
+  [(set_attr "type" "dsp32shiftimm")])
 
 (define_insn "ssashifthi3"
-  [(set (match_operand:HI 0 "register_operand" "=d,d,d")
-	(if_then_else:HI
-	 (lt (match_operand:HI 2 "vec_shift_operand" "d,Ku4,Ks4") (const_int 0))
-	 (ashiftrt:HI (match_operand:HI 1 "register_operand" "d,d,d")
-		      (match_dup 2))
-	 (ss_ashift:HI (match_dup 1) (match_dup 2))))]
+  [(set (match_operand:HI 0 "register_operand" "=d")
+	(unspec:HI [(match_operand:HI 1 "register_operand" "d")
+		    (match_operand:HI 2 "register_operand" "d")] UNSPEC_ASHIFT))]
   ""
-  "@
-   %0 = ASHIFT %1 BY %h2 (V, S)%!
-   %0 = %1 << %2 (V,S)%!
-   %0 = %1 >>> %N2 (V,S)%!"
-  [(set_attr "type" "dsp32,dsp32shiftimm,dsp32shiftimm")])
+  "%0 = ASHIFT %1 BY %h2 (V, S)%!"
+  [(set_attr "type" "dsp32")])
+
+(define_insn "ssashifthi3_imm"
+  [(set (match_operand:HI 0 "register_operand" "=d")
+	(ss_ashift:HI (match_operand:HI 1 "register_operand" "d")
+		      (match_operand:HI 2 "const_uimm4_operand" "Ku4")))]
+  ""
+  "%0 = %1 << %2 (V,S)%!"
+  [(set_attr "type" "dsp32shiftimm")])
+
+(define_insn "ashifthi3_imm"
+  [(set (match_operand:HI 0 "register_operand" "=d")
+	(ashift:HI (match_operand:HI 1 "register_operand" "d")
+		   (match_operand:HI 2 "const_uimm4_operand" "Ku4")))]
+  ""
+  "%0 = %1 << %2 (V)%!"
+  [(set_attr "type" "dsp32shiftimm")])
+
+(define_insn "ssashiftrthi3"
+  [(set (match_operand:HI 0 "register_operand" "=d")
+	(ashiftrt:HI (match_operand:HI 1 "register_operand" "d")
+		     (match_operand:HI 2 "const_uimm4_operand" "Ku4")))]
+  ""
+  "%0 = %1 >>> %2 (V,S)%!"
+  [(set_attr "type" "dsp32shiftimm")])
 
 (define_insn "ssashiftsi3"
-  [(set (match_operand:SI 0 "register_operand" "=d,d,d")
-	(if_then_else:SI
-	 (lt (match_operand:HI 2 "reg_or_const_int_operand" "d,Ku5,Ks5") (const_int 0))
-	 (ashiftrt:SI (match_operand:SI 1 "register_operand" "d,d,d")
-		      (match_dup 2))
-	 (ss_ashift:SI (match_dup 1) (match_dup 2))))]
+  [(set (match_operand:SI 0 "register_operand" "=d")
+	(unspec:SI [(match_operand:SI 1 "register_operand" "d")
+		    (match_operand:HI 2 "register_operand" "d")] UNSPEC_ASHIFT))]
   ""
-  "@
-   %0 = ASHIFT %1 BY %h2 (S)%!
-   %0 = %1 << %2 (S)%!
-   %0 = %1 >>> %N2 (S)%!"
-  [(set_attr "type" "dsp32,dsp32shiftimm,dsp32shiftimm")])
+  "%0 = ASHIFT %1 BY %h2 (S)%!"
+  [(set_attr "type" "dsp32")])
+
+(define_insn "ssashiftsi3_imm"
+  [(set (match_operand:SI 0 "register_operand" "=d")
+	(ss_ashift:SI (match_operand:SI 1 "register_operand" "d")
+		      (match_operand:HI 2 "const_uimm5_operand" "Ku5")))]
+  ""
+  "%0 = %1 << %2 (S)%!"
+  [(set_attr "type" "dsp32shiftimm")])
+
+(define_insn "ashiftsi3_imm"
+  [(set (match_operand:SI 0 "register_operand" "=d")
+	(ashift:SI (match_operand:SI 1 "register_operand" "d")
+		   (match_operand:HI 2 "const_uimm5_operand" "Ku5")))]
+  ""
+  "%0 = %1 << %2%!"
+  [(set_attr "type" "dsp32shiftimm")])
+
+(define_insn "ssashiftrtsi3"
+  [(set (match_operand:SI 0 "register_operand" "=d")
+	(ashiftrt:SI (match_operand:SI 1 "register_operand" "d")
+		     (match_operand:HI 2 "const_uimm5_operand" "Ku5")))]
+  ""
+  "%0 = %1 >>> %2 (S)%!"
+  [(set_attr "type" "dsp32shiftimm")])
 
 (define_insn "lshiftv2hi3"
-  [(set (match_operand:V2HI 0 "register_operand" "=d,d,d")
-	(if_then_else:V2HI
-	 (lt (match_operand:HI 2 "vec_shift_operand" "d,Ku4,Ks4") (const_int 0))
-	 (lshiftrt:V2HI (match_operand:V2HI 1 "register_operand" "d,d,d")
-			(match_dup 2))
-	 (ashift:V2HI (match_dup 1) (match_dup 2))))]
+  [(set (match_operand:V2HI 0 "register_operand" "=d")
+	(unspec:V2HI [(match_operand:V2HI 1 "register_operand" "d")
+		      (match_operand:HI 2 "register_operand" "d")] UNSPEC_LSHIFT))]
   ""
-  "@
-   %0 = LSHIFT %1 BY %h2 (V)%!
-   %0 = %1 << %2 (V)%!
-   %0 = %1 >> %N2 (V)%!"
-  [(set_attr "type" "dsp32,dsp32shiftimm,dsp32shiftimm")])
+  "%0 = LSHIFT %1 BY %h2 (V)%!"
+  [(set_attr "type" "dsp32")])
+
+(define_insn "lshiftrtv2hi3"
+  [(set (match_operand:V2HI 0 "register_operand" "=d")
+	(lshiftrt:V2HI (match_operand:V2HI 1 "register_operand" "d")
+		       (match_operand:HI 2 "const_uimm4_operand" "Ku4")))]
+  ""
+  "%0 = %1 >> %2 (V)%!"
+  [(set_attr "type" "dsp32shiftimm")])
 
 (define_insn "lshifthi3"
-  [(set (match_operand:HI 0 "register_operand" "=d,d,d")
-	(if_then_else:HI
-	 (lt (match_operand:HI 2 "vec_shift_operand" "d,Ku4,Ks4") (const_int 0))
-	 (lshiftrt:HI (match_operand:HI 1 "register_operand" "d,d,d")
-		      (match_dup 2))
-	 (ashift:HI (match_dup 1) (match_dup 2))))]
+  [(set (match_operand:HI 0 "register_operand" "=d")
+	(unspec:HI [(match_operand:HI 1 "register_operand" "d")
+		    (match_operand:HI 2 "register_operand" "d")] UNSPEC_LSHIFT))]
   ""
-  "@
-   %0 = LSHIFT %1 BY %h2 (V)%!
-   %0 = %1 << %2 (V)%!
-   %0 = %1 >> %N2 (V)%!"
-  [(set_attr "type" "dsp32,dsp32shiftimm,dsp32shiftimm")])
+  "%0 = LSHIFT %1 BY %h2 (V)%!"
+  [(set_attr "type" "dsp32")])
+
+(define_insn "lshiftrthi3"
+  [(set (match_operand:HI 0 "register_operand" "=d")
+	(lshiftrt:HI (match_operand:HI 1 "register_operand" "d")
+		     (match_operand:HI 2 "const_uimm4_operand" "Ku4")))]
+  ""
+  "%0 = %1 >> %2 (V)%!"
+  [(set_attr "type" "dsp32shiftimm")])
+
 
 ;; Load without alignment exception (masking off low bits)
 

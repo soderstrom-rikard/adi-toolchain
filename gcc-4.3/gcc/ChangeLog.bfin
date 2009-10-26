@@ -1,3 +1,47 @@
+2009-10-26  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.c (print_operand): Remove 'N'.
+	(enum bfin_builtins): Add BFIN_BUILTIN_LSHIFTRT_1X16,
+	BFIN_BUILTIN_LSHIFTRT_2X16, BFIN_BUILTIN_SSASHIFTRT_1X16,
+	BFIN_BUILTIN_SSASHIFTRT_2X16 and BFIN_BUILTIN_SSASHIFTRT_1X32.
+	(bfin_init_builtins): Add __builtin_bfin_shr_fr1x16,
+	__builtin_bfin_shr_fr2x16, __builtin_bfin_shrl_fr1x16,
+	__builtin_bfin_shrl_fr2x16 and __builtin_bfin_shr_fr1x32.
+	(bdesc_2arg[]): Remove __builtin_bfin_shl_fr2x16,
+	__builtin_bfin_shl_fr1x16, __builtin_bfin_lshl_fr2x16,
+	__builtin_bfin_lshl_fr1x16 and __builtin_bfin_shl_fr1x32.
+	(bfin_expand_binop_builtin_1): New.
+	(bfin_expand_binop_builtin): Call bfin_expand_binop_builtin_1.
+	(bfin_expand_builtin): Hanle BFIN_BUILTIN_SSASHIFT_1X16,
+	BFIN_BUILTIN_SSASHIFT_2X16, BFIN_BUILTIN_SSASHIFT_1X32,
+	BFIN_BUILTIN_SSASHIFTRT_1X16, BFIN_BUILTIN_SSASHIFTRT_2X16,
+	BFIN_BUILTIN_SSASHIFTRT_1X32, BFIN_BUILTIN_LSHIFTRT_1X16,
+	BFIN_BUILTIN_LSHIFTRT_2X16, BFIN_BUILTIN_LSHIFT_1X16
+	and BFIN_BUILTIN_LSHIFT_2X16.
+	* config/bfin/bfin.md (UNSPEC_ASHIFT): New constant.
+	(UNSPEC_LSHIFT): New constant.
+	(ssashiftv2hi3): Use UNSPEC_ASHIFT.
+	(ssashiftv2hi3_imm): New.
+	(ashiftv2hi3_imm): New.
+	(ssashiftrtv2hi3): New.
+	(ssashifthi3): Use UNSPEC_ASHIFT.
+	(ssashifthi3_imm): New.
+	(ashifthi3_imm): New.
+	(ssashiftrthi3): New.
+	(ssashiftsi3): Use UNSPEC_ASHIFT.
+	(ssashiftsi3_imm): New.
+	(ashiftsi3_imm): New.
+	(ssashiftrtsi3): New.
+	(lshiftv2hi3): Use UNSPEC_LSHIFT.
+	(lshiftrtv2hi3): New.
+	(lshifthi3): Use UNSPEC_LSHIFT.
+	(lshiftrthi3): New.
+	* config/bfin/constraints.md (Ks4): Remove.
+	* config/bfin/predicates.md (vec_shift_operand): Remove.
+	(const_uimm4_operand): New.
+	(const_uimm5_operand): New.
+	* doc/md.texi (Machine Constraints Blackfin): Remove Ks4.
+
 2009-10-20  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.md (addsubv2hi3): Fix the order of the high

@@ -1330,7 +1330,6 @@ do {                                              \
 	: 0)						\
      : (STR)[1] == 's'					\
      ? ((STR)[2] == '3' ? CONST_3BIT_IMM_P (VALUE)	\
-	: (STR)[2] == '4' ? CONST_4BIT_IMM_P (VALUE)	\
 	: (STR)[2] == '7' ? CONST_7BIT_IMM_P (VALUE)	\
 	: (STR)[2] == 'h' ? CONST_16BIT_IMM_P (VALUE)	\
 	: 0)						\
@@ -1358,7 +1357,6 @@ do {                                              \
      J   2**N       5bit imm scaled
      Ks7 -64 .. 63  signed 7bit imm
      Ku5 0..31      unsigned 5bit imm
-     Ks4 -8 .. 7    signed 4bit imm
      Ks3 -4 .. 3    signed 3bit imm
      Ku3 0 .. 7     unsigned 3bit imm
      Pn  0, 1, 2    constants 0, 1 or 2, corresponding to n
