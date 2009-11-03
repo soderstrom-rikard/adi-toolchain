@@ -43,6 +43,9 @@ target remote localhost:2000
 # Load the Flash Driver
 load
 
+# get the mwl helper command
+source ${0%/*}/u-boot
+
 # Zero out the BSS(s)
 $(eval `${cross}readelf -l "${drv}" | awk '$1 == "LOAD" && $5 != $6 { print "echo mwl $(("$3"+"$5")) 0 $((("$6"-"$5")/4))" }'`)
 
