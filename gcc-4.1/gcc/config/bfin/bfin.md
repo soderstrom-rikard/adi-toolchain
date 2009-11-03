@@ -1015,7 +1015,10 @@
    (clobber (reg:CC REG_CC))]
   ""
 {
-  return "%2 = 0; %2 = %2 - %1; cc = ac0; cc = !cc; %2 = cc;\\n\\t%0 = -%1; %H0 = -%H1; %H0 = %H0 - %2;";
+  if (REGNO (operands[0]) < REGNO (operands[1]))
+    return "%2 = 0; %2 = %2 - %1; cc = ac0; cc = !cc; %2 = cc;\\n\\t%0 = -%1; %H0 = -%H1; %H0 = %H0 - %2;";
+  else
+    return "%2 = 0; %2 = %2 - %1; cc = ac0; cc = !cc; %2 = cc;\\n\\t%H0 = -%H1; %0 = -%1; %H0 = %H0 - %2;";
 }
   [(set_attr "length" "16")
    (set_attr "seq_insns" "multi")])
@@ -1024,7 +1027,13 @@
   [(set (match_operand:DI 0 "register_operand" "=d")
         (not:DI (match_operand:DI 1 "register_operand" "d")))]
   ""
-  "%0 = ~%1;\\n\\t%H0 = ~%H1;"
+{
+  if (REGNO (operands[0]) < REGNO (operands[1]))
+    return "%0 = ~%1;\\n\\t%H0 = ~%H1;";
+  else
+    return "%H0 = ~%H1;\\n\\t%0 = ~%1;";
+}
+
   [(set_attr "length" "4")
    (set_attr "seq_insns" "multi")])
 
