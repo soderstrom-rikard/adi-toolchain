@@ -212,6 +212,8 @@
 #define ANOMALY_05000474 (1)
 /* Core Hang With L2/L3 Configured in Writeback Cache Mode */
 #define ANOMALY_05000475 (1)
+/* TESTSET Instruction Cannot Be Interrupted */
+#define ANOMALY_05000477 (1)
 
 /* Anomalies that don't exist on this proc */
 #define ANOMALY_05000099 (0)
