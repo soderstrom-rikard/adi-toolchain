@@ -206,6 +206,8 @@
 #define ANOMALY_05000466 (1)
 /* Possible RX data corruption when control & data EP FIFOs are accessed via the core */
 #define ANOMALY_05000467 (1)
+/* Interrupted 32-Bit SPORT Data Register Access Results In Underflow */
+#define ANOMALY_05000473 (1)
 /* Access to DDR-SDRAM causes system hang under certain PLL/VR settings */
 #define ANOMALY_05000474 (1)
 
