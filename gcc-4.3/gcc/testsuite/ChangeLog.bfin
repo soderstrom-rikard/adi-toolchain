@@ -1,3 +1,10 @@
+2009-11-04  Jie Zhang  <jie.zhang@analog.com>
+
+	* gcc.target/bfin/l2.c: Pass processor types as a list to
+	dg-bfin-processors.
+	* gcc.target/bfin/bfin.exp (dg-bfin-processors): Escape
+	`[' and `]'.
+
 2009-11-02  Grace Pan  <grace.pan@analog.com>
 
 	* gcc.target/bfin/csync.c: New test.
