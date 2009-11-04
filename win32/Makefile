@@ -20,7 +20,7 @@ gnICE-drivers.zip: Prerequisites/CDM*.zip Prerequisites/gnICE/*
 	mv amd64 i386 *.inf *.cat ../ ; \
 	cd .. ; \
 	rm -rf CDM*/ ; \
-	patch -s -p0 < ftdi.patch ; \
+	patch --no-backup-if-mismatch -s -p0 < ftdi.patch ; \
 	rm -f ftdi.patch ; \
 	cd .. ; \
 	zip -r -q gnICE-drivers.zip gnICE-drivers
