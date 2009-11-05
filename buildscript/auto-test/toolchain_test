@@ -76,7 +76,7 @@ send_mail()
    if [ -n "$*" ] ; then 
    title=$1
    shift  
-   cat "$@" | mail -s "$title" $FROM        
+   cat "$@" | mail -s "$title"  -r $FROM  $NOTIFY       
    fi
 }
 
@@ -113,8 +113,13 @@ if [ -z $TOOLCHAIN_VERSION ] ; then
   TOOLCHAIN_VERSION=4.1
 fi
 
+if [ -z $UBOOT_SUBDIR ] ; then
+  UBOOT_SUBDIR=`ls -ltr $CHECKOUT/u-boot | grep u-boot-\[0-9.\]* | head -1 | awk '{print $8}'`
+fi
+
 if [ -z $BOARD_CONFIG ] ; then
   echo -e "\nFailed to get the target board info in toolchain-$TIMESTAMP. exit!\n"     
+  cp $TOOLCHAIN_SCRIPTS/reset_board_log   $BUILD/reset_board_log.start
   log_test_results 2
   copy_log
   $TOOLCHAIN_SCRIPTS/compare_toolchain_results  > $BUILD/compare_results
@@ -151,13 +156,13 @@ EOF
   cd $CHECKOUT/toolchain/buildscript
 
 # For branch building and testing, use -K kbuild_output and -t -T $TARGET_IP.
-# ./BuildToolChain -t -T $TARGET_IP -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -K $CHECKOUT/toolchain/kbuild_output  -u $CHECKOUT/u-boot  -c $TOOLCHAIN_VERSION  -D
+# ./BuildToolChain -t -T $TARGET_IP -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -K $CHECKOUT/toolchain/kbuild_output  -u $CHECKOUT/u-boot/$UBOOT_SUBDIR  -c $TOOLCHAIN_VERSION  -D
 
 # For branch testing, use -K kbuild_output.
-# ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -K $CHECKOUT/toolchain/kbuild_output  -u $CHECKOUT/u-boot  -c $TOOLCHAIN_VERSION  -D
+# ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -K $CHECKOUT/toolchain/kbuild_output  -u $CHECKOUT/u-boot/$UBOOT_SUBDIR  -c $TOOLCHAIN_VERSION  -D
 
 # For trunk testing, use -k $CHECKOUT/uclinux-dist/linux-2.6.x.
-  ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -k $CHECKOUT/uclinux-dist/linux-2.6.x  -u $CHECKOUT/u-boot  -c $TOOLCHAIN_VERSION -D 
+  ./BuildToolChain  -j 1 -w -s $CHECKOUT/toolchain -b $USER/temp -k $CHECKOUT/uclinux-dist/linux-2.6.x  -u $CHECKOUT/u-boot/$UBOOT_SUBDIR  -c $TOOLCHAIN_VERSION -D 
 
   if [ $? != 0 ] ; then
   echo -e "\nFailed to build the toolchain in toolchain-$TIMESTAMP . exit!\n"     
@@ -248,7 +253,7 @@ EOF
 
 
   cd $TOOLCHAIN_BUILDSCRIPT
-  cp /home/test/toolchain-regtest  .
+
   ./toolchain-regtest -s $CHECKOUT/toolchain -o $TEST_TOOLCHAIN_DIR/bfin -b $USER/temp/regtest_build$TOOLCHAIN_VERSION -t elf-sim  -a -L 
   #find $USER/temp/regtest_build$TOOLCHAIN_VERSION/.  -maxdepth 1 -type d -regex .*build\[-0-9.\]*  -exec mv {} {}-elf-sim \;
 
