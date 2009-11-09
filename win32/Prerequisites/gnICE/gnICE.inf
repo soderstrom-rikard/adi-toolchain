@@ -1,45 +1,117 @@
+;
+; gnICE/gnICE+ drivers
+; $Id:$
+;
+
 [Version]
 Signature   = "$Chicago$"
 Class       = %DeviceClassName%
 ClassGUID   = {89982A59-5EEA-45aa-AF97-52EC351018C2}
 Provider    = %manufacturer%
 CatalogFile = gnICE+.cat
-DriverVer   = 09/01/2009,1.0
+DriverVer   = 11/10/2009,2.0
 
 ; Install into the same place as the ADI USB ICEs
 [ClassInstall]
-Addreg=Class_AddReg
+Addreg = Class_AddReg
 [ClassInstall32]
-Addreg=Class_AddReg
+Addreg = Class_AddReg
 [Class_AddReg]
 HKR,,,,%DeviceClassName%
 HKR,,Icon,,"-5"
 
 [Manufacturer]
-%manufacturer% = Devices,nt
+%manufacturer% = Devices,NTX86,NTAMD64
 
+;
+; Devices
 ; We only have entries for the first interface on the composite JTAG device.
 ; The second interface (UART) is handled by the FTDI drivers.
-[Devices]
-%gnICE_JTAG%  = LIBUSB_FILTER, USB\VID_0456&PID_f000&MI_00
-%gnICE+_JTAG% = LIBUSB_FILTER, USB\VID_0456&PID_f001&MI_00
-[Devices.NT]
-%gnICE_JTAG%  = LIBUSB_FILTER, USB\VID_0456&PID_f000&MI_00
-%gnICE+_JTAG% = LIBUSB_FILTER, USB\VID_0456&PID_f001&MI_00
+;
 
-[LIBUSB_FILTER]
-[LIBUSB_FILTER.NT]
+;[Devices]
+;%gnICE_JTAG%  = LIBUSB_DEV, USB\VID_0456&PID_f000&MI_00
+;%gnICE+_JTAG% = LIBUSB_DEV, USB\VID_0456&PID_f001&MI_00
+[Devices.NTX86]
+%gnICE_JTAG%  = LIBUSB_DEV, USB\VID_0456&PID_f000&MI_00
+%gnICE+_JTAG% = LIBUSB_DEV, USB\VID_0456&PID_f001&MI_00
+[Devices.NTAMD64]
+%gnICE_JTAG%  = LIBUSB_DEV, USB\VID_0456&PID_f000&MI_00
+%gnICE+_JTAG% = LIBUSB_DEV, USB\VID_0456&PID_f001&MI_00
 
-; Services is required by driver framework, so duplicate the filter driver settings
-; but don't clobber them so that it always has preference
-[LIBUSB_FILTER.NT.Services]
-AddService = libusb0, 0x13a, libusb_add_service
-[libusb_add_service]
+;
+; Files
+;
+
+[SourceDisksNames]
+1 = "gnICE (Libusb-Win32) Driver Installation Disk",,
+
+[SourceDisksFiles]
+libusb0.sys = 1,i386
+libusb0.dll = 1,i386
+libusb0_x64.sys = 1,amd64
+libusb0_x64.dll = 1,amd64
+
+[DestinationDirs]
+libusb_files_sys = 10,system32\drivers
+libusb_files_sys_x64 = 10,system32\drivers
+libusb_files_dll = 10,system32
+libusb_files_dll_wow64 = 10,syswow64
+libusb_files_dll_x64 = 10,system32
+
+[libusb_files_sys]
+libusb0.sys
+
+[libusb_files_sys_x64]
+libusb0.sys,libusb0_x64.sys
+
+[libusb_files_dll]
+libusb0.dll
+
+[libusb_files_dll_wow64]
+libusb0.dll
+
+[libusb_files_dll_x64]
+libusb0.dll,libusb0_x64.dll
+
+;
+; Device Driver
+;
+
+[LIBUSB_DEV]
+
+[LIBUSB_DEV.NTX86]
+CopyFiles = libusb_files_sys, libusb_files_dll
+[LIBUSB_DEV.NTX86.HW]
+AddReg = libusb_add_reg_hw
+[LIBUSB_DEV.NTX86.Services]
+AddService = libusb0, 0x13a, libusb_add_service_x86
+[libusb_add_service_x86]
 DisplayName    = "LibUsb-Win32 - Kernel Driver"
 ServiceType    = 1
 StartType      = 3
 ErrorControl   = 0
 ServiceBinary  = %12%\libusb0.sys
+
+[LIBUSB_DEV.NTAMD64]
+CopyFiles = libusb_files_sys_x64, libusb_files_dll_wow64, libusb_files_dll_x64
+[LIBUSB_DEV.NTAMD64.HW]
+AddReg = libusb_add_reg_hw
+[LIBUSB_DEV.NTAMD64.Services]
+AddService = libusb0_x64, 0x13a, libusb_add_service_amd64
+[libusb_add_service_amd64]
+DisplayName    = "LibUsb-Win32 - Kernel Driver"
+ServiceType    = 1
+StartType      = 3
+ErrorControl   = 0
+ServiceBinary  = %12%\libusb0_x64.sys
+
+[libusb_add_reg_hw]
+HKR,,SurpriseRemovalOK, 0x00010001, 1
+
+;
+; Strings
+;
 
 [Strings]
 manufacturer    = "Analog Devices, Inc."
