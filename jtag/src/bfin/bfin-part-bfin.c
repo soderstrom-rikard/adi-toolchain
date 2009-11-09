@@ -142,6 +142,7 @@ bfin_part_init (part_t *part)
 void
 bfin_init ()
 {
+  part_init_register ("BF506", bfin_part_init);
   part_init_register ("BF518", bfin_part_init);
   part_init_register ("BF526", bfin_part_init);
   part_init_register ("BF527", bfin_part_init);
