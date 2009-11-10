@@ -1,0 +1,14 @@
+First you need the ADI certificate.  It has a SHA1 hash of:
+	B61F9B648BB7B0A397809567880A4E90168A1678
+With that and the cached verisign cross-certificate (MSCV-VSClass3.cer), you
+can sign drivers (code) using the batch files in this dir.
+
+The tools subdir is used to hold 'inf2cat' and 'signtool' which are part of the
+WDK.  Since MS doesn't allow these to be redistributed, you'll have to get them
+yourself from here:
+	http://www.microsoft.com/whdc/DevTools/WDK/WDKpkg.mspx
+
+The Makefile above has a target to create the dir of files you'll need to sign.
+
+Then simply run the inf2cat.bat to create the .cat files followed by the
+sign.bat to sign all the driver files.
