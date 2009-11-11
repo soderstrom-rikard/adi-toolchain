@@ -1,3 +1,7 @@
+---------------------
+--- Under Windows ---
+---------------------
+
 First you need the ADI certificate.  It has a SHA1 hash of:
 	B61F9B648BB7B0A397809567880A4E90168A1678
 With that and the cached verisign cross-certificate (MSCV-VSClass3.cer), you
@@ -12,3 +16,16 @@ The Makefile above has a target to create the dir of files you'll need to sign.
 
 Then simply run the inf2cat.bat to create the .cat files followed by the
 sign.bat to sign all the driver files.
+
+-------------------
+--- Under Linux ---
+-------------------
+
+Get the public/private ADI certs and put them in certs/adi.spc and certs/adi.pvk
+respectively.  Then you should be able to sign things with the Mono "signcode"
+tool (so first install the base mono package).
+
+Unfortunately, there doesn't seem to be a way [yet] for creating the .cat files
+in thte first place from the .inf.  While the 'inf2cat' tool is a .NET program
+and so can be run by Mono, it relies on the wintrust.dll for many of its
+functions and that is not a .NET assembly, nor is there a Mono version [yet].
