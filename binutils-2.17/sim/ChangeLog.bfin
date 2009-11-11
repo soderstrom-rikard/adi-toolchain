@@ -1,5 +1,10 @@
 2009-11-11  Jie Zhang  <jie.zhang@analog.com>
 
+	* bfin/bfin-dis.c (decode_dsp32alu_0): Take care of saturation
+	and all affected ASTAT flags for vector negate instruction.
+
+2009-11-11  Jie Zhang  <jie.zhang@analog.com>
+
 	* bfin/bfin-sim.h (ASTAT): Use "<<" instead of ">>".
 
 2009-10-16  Jie Zhang  <jie.zhang@analog.com>

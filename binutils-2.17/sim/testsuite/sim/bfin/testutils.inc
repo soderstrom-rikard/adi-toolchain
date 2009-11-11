@@ -29,6 +29,14 @@ __start:
 	.endm
 
 	.macro pass
+	CALL __pass;
+	.endm
+
+	.macro fail
+	CALL __fail;
+	.endm
+
+__pass:
 	P0.H = _params;
 	P0.L = _params;
 	R0 = 1 (X);
@@ -42,9 +50,8 @@ __start:
 	P0 = 5 (X);
 	EXCPT 0;
 	exit 0
-	.endm
 
-	.macro fail
+__fail:
 	P0.H = _params;
 	P0.L = _params;
 	R0 = 1 (X);
@@ -58,4 +65,3 @@ __start:
 	P0 = 5 (X);
 	EXCPT 0;
 	exit 1
-	.endm

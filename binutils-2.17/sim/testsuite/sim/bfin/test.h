@@ -1,0 +1,20 @@
+/* AZ AN AC0_COPY V_COPY CC AQ RND_MOD AC0 AC1 AV0 AV0S AV1 AV1S V VS */
+
+#define _AZ		(1 << 0)
+#define _AN		(1 << 1)
+#define _AC0_COPY	(1 << 2)
+#define _V_COPY		(1 << 3)
+#define _CC		(1 << 5)
+#define _AQ		(1 << 6)
+#define _RND_MOD	(1 << 8)
+#define _AC0		(1 << 12)
+#define _AC1		(1 << 13)
+#define _AV0		(1 << 16)
+#define _AV0S		(1 << 17)
+#define _AV1		(1 << 18)
+#define _AV1S		(1 << 19)
+#define _V		(1 << 24)
+#define _VS		(1 << 25)
+
+#define HI(x) (((x) >> 16) & 0xffff)
+#define LO(x) ((x) & 0xffff)

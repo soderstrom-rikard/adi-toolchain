@@ -1,3 +1,13 @@
+2009-11-11  Jie Zhang  <jie.zhang@analog.com>
+
+	* sim/bfin/vec-neg.S: New test.
+	* sim/bfin/vec-neg-2.S: New test.
+	* sim/bfin/vec-neg-3.S: New test.
+	* sim/bfin/test.h: New file.
+	* sim/bfin/testutils.inc: Turn pass and fail into functions.
+	* sim/bfin/allinsn.exp: Use loop instead of
+	listing each test.
+
 2008-08-27  Jie Zhang  <jie.zhang@analog.com>
 
 	* lib/sim-defs.exp (run_sim_test): Remove temporary .s file.

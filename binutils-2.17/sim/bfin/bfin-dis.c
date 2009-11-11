@@ -2500,9 +2500,37 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       /* Vector NEG.  */
       bu32 hi = (-(bs16)(DREG (src0) >> 16)) << 16;
       bu32 lo = (-(bs16)(DREG (src0) & 0xFFFF)) & 0xFFFF;
+
+      saved_state.v = 0;
+      saved_state.v_copy = 0;
+      saved_state.ac0 = 0;
+      saved_state.ac0_copy = 0;
+      saved_state.ac1 = 0;
+
+      if (hi == 0x80000000)
+	{
+	  hi = 0x7fff0000;
+	  saved_state.v = 1;
+	  saved_state.v_copy = 1;
+	  saved_state.vs = 1;
+	}
+      else if (hi == 0)
+	saved_state.ac1 = 1;
+
+      if (lo == 0x8000)
+	{
+	  lo = 0x7fff;
+	  saved_state.v = 1;
+	  saved_state.v_copy = 1;
+	  saved_state.vs = 1;
+	}
+      else if (lo == 0)
+	{
+	  saved_state.ac0 = 1;
+	  saved_state.ac0_copy = 1;
+	}
       DREG (dst0) = hi | lo;
       setflags_nz_2x16 (DREG (dst0));
-      saved_state.v = 0;
     }
   else if (aop == 3 && HL == 0 && aopcde == 14)
     unhandled_instruction ("A1 = - A1 , A0 = - A0");
