@@ -122,6 +122,12 @@ struct bfin_cpu
 
 struct bfin_cpu bfin_cpus[] =
 {
+  {"bf504", BFIN_CPU_BF504, 0x0000,
+   WA_SPECULATIVE_LOADS | WA_05000074},
+
+  {"bf506", BFIN_CPU_BF506, 0x0000,
+   WA_SPECULATIVE_LOADS | WA_05000074},
+
   {"bf512", BFIN_CPU_BF512, 0x0001,
    WA_SPECULATIVE_LOADS | WA_05000074},
   {"bf512", BFIN_CPU_BF512, 0x0000,

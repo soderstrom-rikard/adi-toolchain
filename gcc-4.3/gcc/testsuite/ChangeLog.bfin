@@ -1,3 +1,8 @@
+2009-11-10  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* gcc.target/bfin/mcpu-bf504.c: New test.
+	* gcc.target/bfin/mcpu-bf506.c: New test.
+
 2009-11-04  Jie Zhang  <jie.zhang@analog.com>
 
 	* gcc.target/bfin/l2.c: Pass processor types as a list to

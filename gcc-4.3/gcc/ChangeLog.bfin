@@ -1,3 +1,18 @@
+2009-11-09  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* doc/invoke.texi (Blackfin Options): -mcpu accepts bf504 and bf506.
+	* config/bfin/t-bfin-elf (MULTILIB_MATCHES): Select bf532-none for
+	bf504-none and bf506-none.
+	* config/bfin/t-bfin-linux (MULTILIB_MATCHES): Likewise.
+	* config/bfin/t-bfin-uclinux (MULTILIB_MATCHES): Likewise.
+	* config/bfin/bfin.c (bfin_cpus): Add bf504 and bf506.
+	* config/bfin/bfin.h (bfin_cpu_type): Add BFIN_CPU_BF504 and
+	BFIN_CPU_BF506.
+	(TARGET_CPU_CPP_BUILTINS): Define __ADSPBF504__ and __ADSPBF50x__ for
+	BFIN_CPU_BF504.  Define __ADSPBF506__ and __ADSPBF50x__ for
+	BFIN_CPU_BF506.
+	* config/bfin/elf.h (LIB_SPEC): Add bf504 and bf506.
+
 2009-10-26  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.c (print_operand): Remove 'N'.

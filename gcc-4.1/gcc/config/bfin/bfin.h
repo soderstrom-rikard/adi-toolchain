@@ -31,6 +31,8 @@
 typedef enum bfin_cpu_type
 {
   BFIN_CPU_UNKNOWN,
+  BFIN_CPU_BF504,
+  BFIN_CPU_BF506,
   BFIN_CPU_BF512,
   BFIN_CPU_BF514,
   BFIN_CPU_BF516,
@@ -128,6 +130,14 @@ extern int target_flags;
 						\
       switch (bfin_cpu_type)			\
 	{					\
+	case BFIN_CPU_BF504:			\
+	  builtin_define ("__ADSPBF504__");	\
+	  builtin_define ("__ADSPBF50x__");	\
+	  break;				\
+	case BFIN_CPU_BF506:			\
+	  builtin_define ("__ADSPBF506__");	\
+	  builtin_define ("__ADSPBF50x__");	\
+	  break;				\
 	case BFIN_CPU_BF512:			\
 	  builtin_define ("__ADSPBF512__");	\
 	  builtin_define ("__ADSPBF51x__");	\
