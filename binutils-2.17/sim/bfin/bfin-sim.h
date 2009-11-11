@@ -110,21 +110,21 @@ extern saved_state_type saved_state;
 #define V_BIT		24
 #define VS_BIT		25
 
-#define ASTAT		(saved_state.az >> AZ_BIT \
-			 | saved_state.an >> AN_BIT \
-			 | saved_state.ac0_copy >> AC0_COPY_BIT \
-			 | saved_state.v_copy >> V_COPY_BIT \
-			 | saved_state.cc >> CC_BIT \
-			 | saved_state.aq >> AQ_BIT \
-			 | saved_state.rnd_mod >> RND_MOD_BIT \
-			 | saved_state.ac0 >> AC0_BIT \
-			 | saved_state.ac1 >> AC1_BIT \
-			 | saved_state.av0 >> AV0_BIT \
-			 | saved_state.av0s >> AV0S_BIT \
-			 | saved_state.av1 >> AV1_BIT \
-			 | saved_state.av1s >> AV1S_BIT \
-			 | saved_state.v >> V_BIT \
-			 | saved_state.vs >> VS_BIT)
+#define ASTAT		(saved_state.az << AZ_BIT \
+			 | saved_state.an << AN_BIT \
+			 | saved_state.ac0_copy << AC0_COPY_BIT \
+			 | saved_state.v_copy << V_COPY_BIT \
+			 | saved_state.cc << CC_BIT \
+			 | saved_state.aq << AQ_BIT \
+			 | saved_state.rnd_mod << RND_MOD_BIT \
+			 | saved_state.ac0 << AC0_BIT \
+			 | saved_state.ac1 << AC1_BIT \
+			 | saved_state.av0 << AV0_BIT \
+			 | saved_state.av0s << AV0S_BIT \
+			 | saved_state.av1 << AV1_BIT \
+			 | saved_state.av1s << AV1S_BIT \
+			 | saved_state.v << V_BIT \
+			 | saved_state.vs << VS_BIT)
 
 #define SET_ASTAT(a)						\
   do								\
