@@ -1,3 +1,8 @@
+2009-11-11  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.c (bfin_expand_builtin): Copy op0 to
+	register for cmplx_mac and cmplx_msu builtins.
+
 2009-11-09  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* doc/invoke.texi (Blackfin Options): -mcpu accepts bf504 and bf506.
