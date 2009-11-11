@@ -17,7 +17,7 @@ gnICE-drivers.zip: Prerequisites/CDM*.zip Prerequisites/gnICE/*
 	cd gnICE-drivers ; \
 	unzip -q ../Prerequisites/CDM*.zip ; \
 	cd CDM*/ ; \
-	mv amd64 i386 *.inf *.cat ../ ; \
+	mv amd64 i386 *.inf ../ ; \
 	cd .. ; \
 	rm -rf CDM*/ ; \
 	tar xf ../Prerequisites/libusb-win32-device-bin-*.tar.gz ; \
@@ -29,6 +29,6 @@ gnICE-drivers.zip: Prerequisites/CDM*.zip Prerequisites/gnICE/*
 	rm -rf libusb-win32-device-bin-* ; \
 	patch --no-backup-if-mismatch -s -p0 < ftdi.patch ; \
 	rm -f ftdi.patch ; \
-	unix2dos -q *.inf *.xml ; \
+	sed -r -i '/(^|[^\r])$$/s:$$:\r:' *.inf *.xml ; \
 	cd .. ; \
 	zip -r -q gnICE-drivers.zip gnICE-drivers
