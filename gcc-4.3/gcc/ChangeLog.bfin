@@ -1,3 +1,8 @@
+2009-11-12  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.md (abssi2): Disable when flag_wrapv.
+	(abshi2): Likewise.
+
 2009-11-11  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.c (bfin_expand_builtin): Fix a typo for

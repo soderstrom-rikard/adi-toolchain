@@ -1462,7 +1462,7 @@
 (define_insn "abssi2"
   [(set (match_operand:SI 0 "register_operand" "=d")
 	(abs:SI (match_operand:SI 1 "register_operand" "d")))]
-  ""
+  "!flag_wrapv"
   "%0 = abs %1%!"
   [(set_attr "type" "dsp32")])
 
@@ -1533,7 +1533,7 @@
 (define_insn "abshi2"
   [(set (match_operand:HI 0 "register_operand" "=d")
 	(abs:HI (match_operand:HI 1 "register_operand" "d")))]
-  ""
+  "!flag_wrapv"
   "%0 = abs %1 (V)%!"
   [(set_attr "type" "dsp32")])
 
