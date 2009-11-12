@@ -1,5 +1,12 @@
 2009-11-12  Jie Zhang  <jie.zhang@analog.com>
 
+	* sim/bfin/abs.S: Fix comment.
+	* sim/bfin/abs-2.S: Fix comment.
+	* sim/bfin/abs-3.S: Fix comment.
+	* sim/bfin/abs-4.S: Fix comment.
+
+2009-11-12  Jie Zhang  <jie.zhang@analog.com>
+
 	* sim/bfin/abs.S: New test.
 	* sim/bfin/abs-2.S: New test.
 	* sim/bfin/abs-3.S: New test.

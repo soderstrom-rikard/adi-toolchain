@@ -1,4 +1,4 @@
-# Blackfin testcase for vector negate instruction
+# Blackfin testcase for ABS instruction
 # mach: bfin
 
 #include "test.h"
