@@ -2697,9 +2697,25 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       bu32 in = DREG (src0);
       bu32 hi = (in & 0x80000000 ? -(bs16)(in >> 16) : in >> 16) << 16;
       bu32 lo = (in & 0x8000 ? -(bs16)(in & 0xFFFF) : in) & 0xFFFF;
+
+      saved_state.v = 0;
+      saved_state.v_copy = 0;
+      if (hi == 0x80000000)
+	{
+	  hi = 0x7fff0000;
+	  saved_state.v = 1;
+	  saved_state.v_copy = 1;
+	  saved_state.vs = 1;
+	}
+      if (lo == 0x8000)
+	{
+	  lo = 0x7fff;
+	  saved_state.v = 1;
+	  saved_state.v_copy = 1;
+	  saved_state.vs = 1;
+	}
       DREG (dst0) = hi | lo;
       setflags_nz_2x16 (DREG (dst0));
-      saved_state.v = 0;
     }
   else if (aop == 1 && aopcde == 6)
     DREG (dst0) = min2x16 (DREG (src0), DREG (src1));

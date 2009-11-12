@@ -1,5 +1,11 @@
 2009-11-12  Jie Zhang  <jie.zhang@analog.com>
 
+	* sim/bfin/vec-abs.S: New test.
+	* sim/bfin/vec-abs-2.S: New test.
+	* sim/bfin/vec-abs-3.S: New test.
+
+2009-11-12  Jie Zhang  <jie.zhang@analog.com>
+
 	* sim/bfin/abs.S: Fix comment.
 	* sim/bfin/abs-2.S: Fix comment.
 	* sim/bfin/abs-3.S: Fix comment.
