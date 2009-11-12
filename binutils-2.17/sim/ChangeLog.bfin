@@ -1,3 +1,7 @@
+2009-11-12  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/bfin-dis.c (decode_dsp32alu_0): Fix ABS instruction.
+
 2009-11-11  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/bfin-dis.c (decode_dsp32alu_0): Take care of saturation

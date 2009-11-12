@@ -2662,9 +2662,19 @@ decode_dsp32alu_0 (bu16 iw0, bu16 iw1, bu32 pc)
       /* dregs = ABS dregs */
       if (val >> 31)
 	val = -val;
-      /* @@@ The manual is talking about saturation.  Check what the hardware
-	 does when it gets 0x80000000.  */
-      setflags_logical (val);
+      if (val == 0x80000000)
+	{
+	  val = 0x7fffffff;
+	  saved_state.v = 1;
+	  saved_state.vs = 1;
+	  saved_state.v_copy = 1;
+	}
+      else
+	{
+	  saved_state.v = 0;
+	  saved_state.v_copy = 0;
+	}
+      setflags_nz (val);
       DREG (dst0) = val;
     }
   else if (aop == 3 && aopcde == 7)
