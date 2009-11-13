@@ -174,9 +174,14 @@ define flerase_sector
 			printf "Sector %i is larger than available sectors %i\n", $arg0, $max
 		else
 			set $ss = (unsigned long *)AFP_SectorInfo
-			printf "Erasing %#x to %#x\n", $ss[$arg0 * 2], $ss[$arg0 * 2 + 1]
+			if $ss
+				printf "Erasing %#x to %#x\n", $ss[$arg0 * 2], $ss[$arg0 * 2 + 1]
+			else
+				printf "Erasing sector %i\n", $arg0
+			end
 			_flerase_sector $arg0
 		end
+		sanity_check_hwerr
 	else
 		help flerase_sector
 	end
@@ -188,19 +193,26 @@ end
 
 define _fl_addr_to_sector
 	set $$I = AFP_NumSectors
-	set $ss = (unsigned long *)AFP_SectorInfo
 
-	set $sector = -1
-	if $arg0 <= $ss[$$I * 2 - 1]
-		set $$i = 0
-		while $$i < $$I
-			set $$s = $ss[$$i * 2]
-			set $$e = $ss[$$i * 2 + 1]
-			if $arg0 >= $$s && $arg0 <= $$e
-				set $sector = $$i
-				loop_break
+	if 1
+		# faster to ask the hardware
+		flcmd 8 $arg0
+		set $sector = AFP_Sector
+	else
+		set $ss = (unsigned long *)AFP_SectorInfo
+
+		set $sector = -1
+		if $arg0 <= $ss[$$I * 2 - 1]
+			set $$i = 0
+			while $$i < $$I
+				set $$s = $ss[$$i * 2]
+				set $$e = $ss[$$i * 2 + 1]
+				if $arg0 >= $$s && $arg0 <= $$e
+					set $sector = $$i
+					loop_break
+				end
+				set $$i++
 			end
-			set $$i++
 		end
 	end
 end
@@ -238,6 +250,7 @@ define flwrite
 		end
 		printf "Writing %#x bytes to %#x from AFP_Buffer (%#x)\n", $l, $o, AFP_Buffer
 		_flwrite $o $l $s
+		sanity_check_hwerr
 	else
 		help flwrite
 	end
@@ -334,6 +347,7 @@ define flread
 	end
 	printf "Reading %#x bytes from %#x into AFP_Buffer (%#x)\n", $$flread_size, $o, AFP_Buffer
 	_flread $o $$flread_size $s
+	sanity_check_hwerr
 end
 document flread
 Usage: flread [offset=0] [length=64] [stride=1]
