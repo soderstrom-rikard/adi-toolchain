@@ -1366,7 +1366,26 @@ decode_ALU2op_0 (bu16 iw0)
       DREG (dst) = -val;
       setflags_nz (DREG (dst));
       if (val == 0x80000000)
-	saved_state.v = saved_state.vs = 1;
+	{
+	  saved_state.v = 1;
+	  saved_state.v_copy = 1;
+	  saved_state.vs = 1;
+	}
+      else
+	{
+	  saved_state.v = 0;
+	  saved_state.v_copy = 0;
+	}
+      if (val == 0x0)
+	{
+	  saved_state.ac0 = 1;
+	  saved_state.ac0_copy = 1;
+	}
+      else
+	{
+	  saved_state.ac0 = 0;
+	  saved_state.ac0_copy = 0;
+	}
       /* @@@ Documentation isn't entirely clear about av0 and av1.  */
     }
   else if (opc == 15)
