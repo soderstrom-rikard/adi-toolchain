@@ -39,6 +39,12 @@ cat << EOF > "${tmp}"
 
 # Connect to the target
 target remote localhost:2000
+# Do it again for BF54x (hardware error needs clearing)
+target remote localhost:2000
+
+# Grab all of our gdb helper commands
+source ${0%/*}/vdsp-flash-programmer
+sanity_check_hwerr
 
 # Load the Flash Driver
 load
@@ -48,21 +54,30 @@ source ${0%/*}/u-boot
 
 # Zero out the BSS(s)
 $(eval `${cross}readelf -l "${drv}" | awk '$1 == "LOAD" && $5 != $6 { print "echo mwl $(("$3"+"$5")) 0 $((("$6"-"$5")/4))" }'`)
+sanity_check_hwerr
 
 # Clear all breakpoints
 delete breakpoints
 
 # Halt on the canonical point
-hbreak AFP_BreakReady
+hbreak *(int *)&AFP_BreakReady
 commands
 	silent
 end
 
+# Use hardware tracing when possible
+#hbreak cpu_init_f
+#commands
+#	hwtrace_on
+#	sanity_check_hwerr
+#	continue
+#end
+#hbreak evt_default
+#sanity_check_hwerr
+
 # Let the driver initialize itself
 continue
-
-# Grab all of our gdb helper commands
-source ${0%/*}/vdsp-flash-programmer
+sanity_check_hwerr
 
 # Dump the initial Flash Driver and Flash state
 printf "\n"

@@ -1,3 +1,16 @@
+define sanity_check_hwerr
+	set $ILAT = *(unsigned long *)0xFFE0210C
+	if ($ILAT & 0x20)
+		printf "\n\tHWERR detected in ILAT ! 0x%X\n\n", $ILAT
+		abort-this-script
+	end
+	set $IPEND = *(unsigned long *)0xFFE02108
+	if ($IPEND & 0x20)
+		printf "\n\tHWERR detected in IPEND ! 0x%X\n\n", $IPEND
+		abort-this-script
+	end
+end
+
 define _percent
 	# base current max
 end
@@ -19,6 +32,7 @@ define fldrvinfo
 	printf                        " ManCode       : %#x\n", AFP_ManCode
 	printf                        " DevCode       : %#x\n", AFP_DevCode
 	printf                        " Error         : %#x\n", AFP_Error
+	sanity_check_hwerr
 end
 document fldrvinfo
 Usage: fldrvinfo
@@ -26,29 +40,43 @@ Display information about the Flash Driver currently loaded
 end
 
 define flinfo
-	set $ss = (unsigned long *)AFP_SectorInfo
-	printf "Flash layout: (%i bit, %i sectors, ", AFP_FlashWidth, AFP_NumSectors
-	set $size = $ss[AFP_NumSectors * 2 - 1]
-	if $size / 1024
-		if $size / 1024 / 1024
-			printf "%i MiB", $size / 1024 / 1024
-		else
-			printf "%i KiB", $size / 1024
-		end
+	if $argc > 0
+		set $$show_max = $arg0
 	else
-		printf "%i B", $size
+		set $$show_max = 100
 	end
-	printf ")"
 
-	set $s = 0
-	while $s < AFP_NumSectors
-		if ($s % 5) == 0
-			printf "\n %2i: ", $s
+	printf "Flash layout: (%i bit, %i sectors, ", AFP_FlashWidth, AFP_NumSectors
+	set $ss = (unsigned long *)AFP_SectorInfo
+	if $ss == 0
+		printf "\n\ttoo many sectors to handle at once ...\n"
+	else
+		set $size = $ss[AFP_NumSectors * 2 - 1]
+		if $size / 1024
+			if $size / 1024 / 1024
+				printf "%i MiB", $size / 1024 / 1024
+			else
+				printf "%i KiB", $size / 1024
+			end
+		else
+			printf "%i B", $size
 		end
-		printf "0x%08x ", $ss[$s * 2]
-		set $s++
+		printf ")"
+
+		if AFP_NumSectors < $$show_max
+			set $$show_max = AFP_NumSectors
+		end
+		set $s = 0
+		while $s < $$show_max
+			if ($s % 5) == 0
+				printf "\n %2i: ", $s
+			end
+			printf "0x%08x ", $ss[$s * 2]
+			set $s++
+		end
+		printf "\n"
 	end
-	printf "\n"
+	sanity_check_hwerr
 end
 document flinfo
 Usage: flinfo
