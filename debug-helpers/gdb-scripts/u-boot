@@ -2,6 +2,20 @@
 # Provide U-Boot-style functions in gdb
 #
 
+define uboot_jtag_load
+	set remotetimeout 300
+	load init.elf
+	continue
+	load u-boot
+	call memset(&_bss_start, 0, &_bss_end - &_bss_start)
+	continue
+end
+
+
+#
+# U-Boot style memory display functions
+#
+
 define md
 	if $argc == 2
 		x/64x$arg0 $arg1
@@ -137,11 +151,126 @@ document mwb
 Use 'help _mw'
 end
 
-define uboot_jtag_load
-	set remotetimeout 300
-	load init.elf
-	continue
-	load u-boot
-	call memset(&_bss_start, 0, &_bss_end - &_bss_start)
-	continue
+
+#
+# U-Boot style memory compare functions
+#
+
+define _cmp
+	set $$base  = (unsigned long)$arg0
+	set $$addr1 = $arg0
+	set $$addr2 = $arg1
+	set $$count = $arg2
+	while $$count-- > 0
+		if (*$$addr1 != *$$addr2)
+			printf "Data mismatch at %#x units (@%#x != @%#x)\n", $arg2, $$addr1, $$addr2
+			set $$count = -100
+		end
+		set $$addr1 += 1
+		set $$addr2 += 1
+	end
+	if $$count == -1
+		printf "Data matches for %#x units\n", $arg2
+	end
+	dont-repeat
+end
+document _cmp
+Usage: cmp[bwl] <address> <address> <count>
+Compare <count> <bytes|words|longs> between <address> and <address>.
+end
+
+define cmpb
+	if $argc == 3
+		set $$addr1 = (unsigned char *)$arg0
+		set $$addr2 = (unsigned char *)$arg1
+		_cmp $$addr1 $$addr2 $arg2
+	else
+		help _cmp
+	end
+end
+document cmpb
+Use 'help _cmp'
+end
+define cmpw
+	if $argc == 3
+		set $$addr1 = (unsigned short *)$arg0
+		set $$addr2 = (unsigned short *)$arg1
+		_cmp $$addr1 $$addr2 $arg2
+	else
+		help _cmp
+	end
+end
+document cmpw
+Use 'help _cmp'
+end
+define cmpl
+	if $argc == 3
+		set $$addr1 = (unsigned long *)$arg0
+		set $$addr2 = (unsigned long *)$arg1
+		_cmp $$addr1 $$addr2 $arg2
+	else
+		help _cmp
+	end
+end
+document cmpl
+Use 'help _cmp'
+end
+
+
+#
+# U-Boot style memory copy functions
+#
+
+define _cp
+	set $$src = $arg0
+	set $$dst = $arg1
+	set $$count = $arg2
+	while $$count-- > 0
+		set *$$dst = *$$src
+		set $$src += 1
+		set $$dst += 1
+	end
+	printf "Copied %#x units from %#x to %#x\n", $arg2, $arg0, $arg1
+	dont-repeat
+end
+document _cp
+Usage: cp[bwl] <src> <dst> <count>
+Copy <count> <bytes|words|longs> from <src> to <dst>.
+end
+
+define cpb
+	if $argc == 3
+		set $$addr1 = (unsigned char *)$arg0
+		set $$addr2 = (unsigned char *)$arg1
+		_cp $$addr1 $$addr2 $arg2
+	else
+		help _cp
+	end
+end
+document cpb
+Use 'help _cp'
+end
+define cpw
+	if $argc == 3
+		set $$addr1 = (unsigned short *)$arg0
+		set $$addr2 = (unsigned short *)$arg1
+		_cp $$addr1 $$addr2 $arg2
+	else
+		help _cp
+	end
+end
+document cpw
+Use 'help _cp'
+end
+define cpl
+	if $argc == 3
+		set $$addr1 = (unsigned long *)$arg0
+		set $$addr2 = (unsigned long *)$arg1
+		_cp $$addr1 $$addr2 $arg2
+	else
+		help _cp
+	end
+end
+document cpl
+Use 'help _cp'
 end
