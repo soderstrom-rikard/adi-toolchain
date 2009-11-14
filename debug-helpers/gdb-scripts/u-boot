@@ -89,7 +89,14 @@ end
 #
 
 define _mw
-	# dummy func for "document" to work
+	set $$addr  = $arg0
+	set $$val   = $arg1
+	set $$count = $arg2
+	while $$count-- > 0
+		set *$$addr = $$val
+		set $$addr += 1
+	end
+	dont-repeat
 end
 document _mw
 Usage: mw[bwl] <address> <value> <count>
@@ -98,13 +105,8 @@ end
 
 define mwl
 	if $argc == 3
-		set $$addr  = $arg0
-		set $$val   = $arg1
-		set $$count = $arg2
-		while $$count-- > 0
-			set *(unsigned long *)($$addr) = $$val
-			set $$addr += 4
-		end
+		set $$addr = (unsigned long *)$arg0
+		_mw $$addr $arg1 $arg2
 	else
 		help _mw
 	end
@@ -114,13 +116,8 @@ Use 'help _mw'
 end
 define mww
 	if $argc == 3
-		set $$addr  = $arg0
-		set $$val   = $arg1
-		set $$count = $arg2
-		while $$count-- > 0
-			set *(unsigned short *)($$addr) = $$val
-			set $$addr += 2
-		end
+		set $$addr = (unsigned short *)$arg0
+		_mw $$addr $arg1 $arg2
 	else
 		help _mw
 	end
@@ -130,13 +127,8 @@ Use 'help _mw'
 end
 define mwb
 	if $argc == 3
-		set $$addr  = $arg0
-		set $$val   = $arg1
-		set $$count = $arg2
-		while $$count-- > 0
-			set *(unsigned char *)($$addr) = $$val
-			set $$addr += 1
-		end
+		set $$addr = (unsigned char *)$arg0
+		_mw $$addr $arg1 $arg2
 	else
 		help _mw
 	end
