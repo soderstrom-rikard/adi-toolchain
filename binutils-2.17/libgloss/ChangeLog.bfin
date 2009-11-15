@@ -1,3 +1,8 @@
+2009-11-15  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* bfin/bf504.ld, bfin/bf506.ld: New.
+	* bfin/Makefile.in (BOARD_SCRIPTS): Add bf504.ld and bf506.ld.
+
 2009-07-15  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* bfin/include/cdefBF512.h, bfin/include/cdefBF514.h,
