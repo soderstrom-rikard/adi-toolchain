@@ -290,10 +290,16 @@ define flrestore
 
 		if $s == -1 || $e == -1
 			printf " Error parsing sectors!!\n"
+			abort-this-script
 		end
 
 		while $s <= $e
-			printf " Erasing sector %i (%i%%)\r", $s, (($s - $S) * 100) / ($e - $S)
+			if $e - $S
+				set $$per = (($s - $S) * 100) / ($e - $S)
+			else
+				set $$per = 100
+			end
+			printf " Erasing sector %i (%i%%)\r", $s, $$per
 			_flerase_sector $s
 			set $s++
 		end
