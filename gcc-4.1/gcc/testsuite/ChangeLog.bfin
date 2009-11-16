@@ -1,3 +1,28 @@
+2009-11-16  Grace Pan  <grace.pan@analog.com>
+
+	* gcc.target/bfin/builtins/cpmlx_mac_fr2x16-1.c: New test.
+	* gcc.target/bfin/builtins/cpmlx_mac_fr2x16-2.c: New test.
+	* gcc.target/bfin/builtins/cpmlx_msu_fr2x16-1.c: New test.
+	* gcc.target/bfin/builtins/cpmlx_msu_fr2x16-2.c: New test.
+	* gcc.target/bfin/builtins/cpmlx_mul_fr2x16-1.c: New test.
+	* gcc.target/bfin/builtins/cpmlx_mul_fr2x16-2.c: New test.
+	* gcc.target/bfin/builtins/dspaddsubsat_fr2x16-1.c: New test.
+	* gcc.target/bfin/builtins/dspaddsubsat_fr2x16-2.c: New test.
+	* gcc.target/bfin/builtins/dspsubaddsat_fr2x16-1.c: New test.
+	* gcc.target/bfin/builtins/dspsubaddsat_fr2x16-2.c: New test.
+	* gcc.target/bfin/builtins/lshl_fr1x16-1.c: New test.
+	* gcc.target/bfin/builtins/lshl_fr1x16-2.c: New test.
+	* gcc.target/bfin/builtins/lshl_fr2x16-1.c: New test.
+	* gcc.target/bfin/builtins/lshl_fr2x16-2.c: New test.
+	* gcc.target/bfin/builtins/mulhisihh_fr2x16-1.c: New test.
+	* gcc.target/bfin/builtins/mulhisihh_fr2x16-2.c: New test.
+	* gcc.target/bfin/builtins/mulhisihl_fr2x16-1.c: New test.
+	* gcc.target/bfin/builtins/mulhisihl_fr2x16-2.c: New test.
+	* gcc.target/bfin/builtins/mulhisilh_fr2x16-1.c: New test.
+	* gcc.target/bfin/builtins/mulhisilh_fr2x16-2.c: New test.
+	* gcc.target/bfin/builtins/mulhisill_fr2x16-1.c: New test.
+	* gcc.target/bfin/builtins/mulhisill_fr2x16-2.c: New test.
+
 2009-11-10  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* gcc.target/bfin/mcpu-bf504.c: New test.
