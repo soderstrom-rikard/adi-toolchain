@@ -822,60 +822,13 @@ namespace std
       __len = static_cast<int>(__w);
     }
 
-  // Forwarding functions to peel signed from unsigned integer types and
-  // either cast or compute the absolute value for the former, depending
-  // on __basefield.
-  template<typename _CharT>
-    inline int
-    __int_to_char(_CharT* __bufend, long __v, const _CharT* __lit,
-		  ios_base::fmtflags __flags)
-    {
-      unsigned long __ul = __v;
-      const ios_base::fmtflags __basefield = __flags & ios_base::basefield;
-      if (__builtin_expect(__basefield != ios_base::oct
-			   && __basefield != ios_base::hex, true))
-	__ul = __v < 0 ? -__v : __ul;
-      return __int_to_char(__bufend, __ul, __lit, __flags, false);
-    }
-
-  template<typename _CharT>
-    inline int
-    __int_to_char(_CharT* __bufend, unsigned long __v, const _CharT* __lit,
-		  ios_base::fmtflags __flags)
-    { return __int_to_char(__bufend, __v, __lit, __flags, false); }
-
-#ifdef _GLIBCXX_USE_LONG_LONG
-  template<typename _CharT>
-    inline int
-    __int_to_char(_CharT* __bufend, long long __v, const _CharT* __lit,
-		  ios_base::fmtflags __flags)
-    {
-      unsigned long long __ull = __v;
-      const ios_base::fmtflags __basefield = __flags & ios_base::basefield;
-      if (__builtin_expect(__basefield != ios_base::oct
-			   && __basefield != ios_base::hex, true))
-	__ull = __v < 0 ? -__v : __ull;
-      return __int_to_char(__bufend, __ull, __lit, __flags, false);
-    }
-
-  template<typename _CharT>
-    inline int
-    __int_to_char(_CharT* __bufend, unsigned long long __v, 
-		  const _CharT* __lit, ios_base::fmtflags __flags)
-    { return __int_to_char(__bufend, __v, __lit, __flags, false); }
-#endif
-
-  // N.B. The last argument is currently unused (see libstdc++/20914).
   template<typename _CharT, typename _ValueT>
     int
     __int_to_char(_CharT* __bufend, _ValueT __v, const _CharT* __lit,
-		  ios_base::fmtflags __flags, bool)
+		  ios_base::fmtflags __flags, bool __dec)
     {
-      const ios_base::fmtflags __basefield = __flags & ios_base::basefield;
       _CharT* __buf = __bufend;
-
-      if (__builtin_expect(__basefield != ios_base::oct
-			   && __basefield != ios_base::hex, true))
+      if (__builtin_expect(__dec, true))
 	{
 	  // Decimal.
 	  do
@@ -885,7 +838,7 @@ namespace std
 	    }
 	  while (__v != 0);
 	}
-      else if (__basefield == ios_base::oct)
+      else if ((__flags & ios_base::basefield) == ios_base::oct)
 	{
 	  // Octal.
 	  do
@@ -929,7 +882,8 @@ namespace std
       _M_insert_int(_OutIter __s, ios_base& __io, _CharT __fill,
 		    _ValueT __v) const
       {
-	typedef __numpunct_cache<_CharT>	        __cache_type;
+	typedef typename __to_unsigned_type<_ValueT>::__type __unsigned_type;
+	typedef __numpunct_cache<_CharT>	             __cache_type;
 	__use_cache<__cache_type> __uc;
 	const locale& __loc = __io._M_getloc();
 	const __cache_type* __lc = __uc(__loc);
@@ -943,7 +897,11 @@ namespace std
 
 	// [22.2.2.2.2] Stage 1, numeric conversion to character.
 	// Result is returned right-justified in the buffer.
-	int __len = __int_to_char(__cs + __ilen, __v, __lit, __flags);
+	const ios_base::fmtflags __basefield = __flags & ios_base::basefield;
+	const bool __dec = (__basefield != ios_base::oct
+			    && __basefield != ios_base::hex);
+	const __unsigned_type __u = (__v > 0 || !__dec) ? __v : -__v;
+ 	int __len = __int_to_char(__cs + __ilen, __u, __lit, __flags, __dec);
 	__cs += __ilen - __len;
 
 	// Add grouping, if necessary.
@@ -960,9 +918,7 @@ namespace std
 	  }
 
 	// Complete Stage 1, prepend numeric base or sign.
-	const ios_base::fmtflags __basefield = __flags & ios_base::basefield;
-	if (__builtin_expect(__basefield != ios_base::oct
-			     && __basefield != ios_base::hex, true))
+	if (__builtin_expect(__dec, true))
 	  {
 	    // Decimal.
 	    if (__v > 0)
