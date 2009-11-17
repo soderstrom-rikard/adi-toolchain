@@ -4,6 +4,7 @@
 	(hisi_string, hisi_part): Corresponding attributes.
 	(load<mode>_dreg, load<mode>_dreg_postinc,
 	load<mode>_dreg_postdec, loadsi_dreg_postmod): New patterns.
+	* config/bfin/constraints.md ("qZ"): Add for class IPREGS.
 
 2009-11-12  Jie Zhang  <jie.zhang@analog.com>
 
