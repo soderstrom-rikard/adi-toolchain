@@ -1,3 +1,10 @@
+2009-11-17  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (HISI): New mode_iterator.
+	(hisi_string, hisi_part): Corresponding attributes.
+	(load<mode>_dreg, load<mode>_dreg_postinc,
+	load<mode>_dreg_postdec, loadsi_dreg_postmod): New patterns.
+
 2009-11-12  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.md (abssi2): Disable when flag_wrapv.
