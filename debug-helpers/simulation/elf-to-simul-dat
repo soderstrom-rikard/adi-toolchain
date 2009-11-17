@@ -1,0 +1,50 @@
+#!/bin/sh
+
+file=$1
+for cross in elf uclinux linux-uclibc "" ; do
+	[ -z "${cross}" ] && break
+	cross=bfin-${cross}-
+	${cross}readelf --help >/dev/null && break
+done
+
+
+#
+# Create the symbols list
+#
+# no nead for this ?
+
+
+
+#
+# Transform into the .bin file
+#
+elf_to_bin() {
+	MA=$1
+	${cross}readelf -l "${file}" | \
+	awk '$1 == "LOAD" { print $2, $3, $4, $5, $6 }' | \
+	while read line ; do
+		set -- ${line}
+		offset=$1
+		vma=$2
+		lma=$3
+		filesiz=$4
+		memsiz=$5
+
+		[ "${MA}" = "vma" ] && ma=${vma} || ma=${lma}
+
+		# print the load address
+		printf "//@P%08X\n" "${ma}"
+
+		fmt="-A n -t x2 -v -w2"
+		# dump the file data
+		od -j ${offset} -N ${filesiz} ${fmt} "${file}"
+
+		# see if there is any zero padding
+		: $(( zero = ${memsiz} - ${filesiz} ))
+		if [ ${zero} -gt 0 ] ; then
+			od -N ${zero} ${fmt} /dev/zero
+		fi
+	done | sed 's:^ ::' | tr '[:lower:]' '[:upper:]'
+}
+elf_to_bin vma > "${file}.bin.vma"
+elf_to_bin lma > "${file}.bin.lma"
