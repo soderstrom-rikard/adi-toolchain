@@ -6,6 +6,8 @@ for cross in elf uclinux linux-uclibc "" ; do
 	cross=bfin-${cross}-
 	${cross}readelf --help >/dev/null && break
 done
+ldr=${cross}ldr
+readelf=${cross}readelf
 
 
 #
@@ -18,9 +20,36 @@ done
 #
 # Transform into the .bin file
 #
+
+# addr_to_bin(addr)
+addr_to_bin() {
+	printf "//@P%08X\n" "$1"
+}
+
+do_od() {
+	od -A n -t x2 -v -w2 "$@" | \
+		sed 's:^ ::' | \
+		tr '[:lower:]' '[:upper:]'
+}
+
+# file_to_bin(file, offset, length)
+file_to_bin() {
+	do_od -j $2 ${3+-N $3} "$1"
+}
+# zero_to_bin(length)
+zero_to_bin() {
+	set -- $(($1)) # accept hex values
+	[ $1 -eq 0 ] && return 0
+	do_od -N $1 /dev/zero
+}
+
+
+#
+# Transform ELFs
+#
 elf_to_bin() {
 	MA=$1
-	${cross}readelf -l "${file}" | \
+	${readelf} -l "${file}" | \
 	awk '$1 == "LOAD" { print $2, $3, $4, $5, $6 }' | \
 	while read line ; do
 		set -- ${line}
@@ -30,21 +59,69 @@ elf_to_bin() {
 		filesiz=$4
 		memsiz=$5
 
-		[ "${MA}" = "vma" ] && ma=${vma} || ma=${lma}
+		[ "${MA}" = "vma" ] && addr=${vma} || addr=${lma}
 
 		# print the load address
-		printf "//@P%08X\n" "${ma}"
+		addr_to_bin ${addr}
 
-		fmt="-A n -t x2 -v -w2"
 		# dump the file data
-		od -j ${offset} -N ${filesiz} ${fmt} "${file}"
+		file_to_bin "${file}" ${offset} ${filesiz}
 
-		# see if there is any zero padding
-		: $(( zero = ${memsiz} - ${filesiz} ))
-		if [ ${zero} -gt 0 ] ; then
-			od -N ${zero} ${fmt} /dev/zero
-		fi
-	done | sed 's:^ ::' | tr '[:lower:]' '[:upper:]'
+		# dump any zero padding (bss)
+		zero_to_bin $(( memsiz - filesiz ))
+	done
 }
-elf_to_bin vma > "${file}.bin.vma"
-elf_to_bin lma > "${file}.bin.lma"
+if file "${file}" | grep -qs 'ELF 32-bit LSB executable' ; then
+	echo "${file}: detected ELF; writing to ${file}.bin.{l,v}ma"
+	elf_to_bin vma > "${file}.bin.vma"
+	elf_to_bin lma > "${file}.bin.lma"
+	exit 0
+fi
+
+
+#
+# Transform LDRs
+#
+ldr_to_bin() {
+	${ldr} -qs "${file}" | \
+	awk '$1 == "Block" {
+		if ($0 ~ / ignore /) { next }
+		if ($0 ~ / fill /) { fill = $7 } else { fill = "" }
+		print $3, $5, $6, fill
+	}' | \
+	while read line ; do
+		set -- ${line}
+		offset=${1%:}
+		addr=$2
+		len=$3
+		fill=$4
+
+		# skip blocks with no contents
+		[ $((len)) -eq 0 ] && continue
+
+		# print the load address
+		addr_to_bin ${addr}
+
+		# is this a fill block ?
+		if [ -z "${fill}" ] ; then
+			file_to_bin "${file}" ${offset} ${len}
+		else
+			zero_to_bin ${len}
+		fi
+	done
+}
+if ${ldr} -qs "${file}" >/dev/null 2>&1 ; then
+	echo "${file}: detected LDR; writing to ${file}.bin"
+	ldr_to_bin "${file}" > "${file}.bin"
+	exit 0
+fi
+
+
+#
+# Transform Binaries?
+#
+echo "${file}: treating as raw binary; writing to ${file}.bin"
+(
+addr_to_bin ${2:-0}
+file_to_bin "${file}" 0
+) > "${file}.bin"
