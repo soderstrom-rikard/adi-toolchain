@@ -11,6 +11,13 @@
 	(bfin_init_builtins): Create circptr builtin.
 	(bfin_expand_builtin): Handle it.
 
+	* config/bfin/bfin.md (hisi_ext): New attribute for HISI
+	mode_iterator.
+	(load<mode>_dreg, load<mode>_dreg_postinc,
+	load<mode>_dreg_postdec): Use separate alternatives for IREGS
+	and PREGS and generate appropriate instructions for them.
+	* reload1.c (reload): Clear INSN_CODE for everything after reload.
+
 2009-11-17  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (HISI): New mode_iterator.

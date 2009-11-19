@@ -6909,6 +6909,7 @@ emit_output_reload_insns (struct insn_chain *chain, struct reload *rl,
 		  new_spill_reg_store[REGNO (rl->reg_rtx)] = p;
 	      }
 	  }
+	INSN_CODE (insn) = -1;
       }
 
   if (rl->when_needed == RELOAD_OTHER)

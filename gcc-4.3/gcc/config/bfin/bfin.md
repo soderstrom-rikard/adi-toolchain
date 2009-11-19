@@ -618,39 +618,40 @@
 (define_mode_iterator HISI [HI SI])
 (define_mode_attr hisi_string [(HI "W ") (SI "")])
 (define_mode_attr hisi_part [(HI ".L") (SI "")])
+(define_mode_attr hisi_ext [(HI " (Z)") (SI "")])
 
 (define_insn "load<mode>_dreg"
-  [(set (match_operand:HISI 0 "d_register_operand" "=d")
-	(mem:HISI (match_operand:SI 1 "register_operand" "qZ")))]
+  [(set (match_operand:HISI 0 "d_register_operand" "=d,d")
+	(mem:HISI (match_operand:SI 1 "register_operand" "b,qZ")))]
   "reload_completed"
-  "%0<hisi_part> = <hisi_string>[%1]%!"
+  "@
+   %0<hisi_part> = <hisi_string>[%1]%!
+   %0 = <hisi_string>[%1]<hisi_ext>%!"
   [(set_attr "type" "mcld")
    (set_attr "length" "2")
-   (set (attr "addrtype") (cond [(match_operand 1 "p_register_operand" "")
-				 (const_string "preg")]
-				(const_string "ireg")))])
+   (set_attr "addrtype" "ireg,preg")])
 
 (define_insn "load<mode>_dreg_postinc"
-  [(set (match_operand:HISI 0 "d_register_operand" "=d")
-	(mem:HISI (post_inc:SI (match_operand:SI 1 "register_operand" "qZ"))))]
+  [(set (match_operand:HISI 0 "d_register_operand" "=d,d")
+	(mem:HISI (post_inc:SI (match_operand:SI 1 "register_operand" "b,qZ"))))]
   "reload_completed"
-  "%0<hisi_part> = <hisi_string>[%1++]%!"
+  "@
+   %0<hisi_part> = <hisi_string>[%1++]%!
+   %0 = <hisi_string>[%1++]<hisi_ext>%!"
   [(set_attr "type" "mcld")
    (set_attr "length" "2")
-   (set (attr "addrtype") (cond [(match_operand 1 "p_register_operand" "")
-				 (const_string "preg")]
-				(const_string "ireg")))])
+   (set_attr "addrtype" "ireg,preg")])
 
 (define_insn "load<mode>_dreg_postdec"
-  [(set (match_operand:HISI 0 "d_register_operand" "=d")
-	(mem:HISI (post_dec:SI (match_operand:SI 1 "register_operand" "qZ"))))]
+  [(set (match_operand:HISI 0 "d_register_operand" "=d,d")
+	(mem:HISI (post_dec:SI (match_operand:SI 1 "register_operand" "b,qZ"))))]
   "reload_completed"
-  "%0<hisi_part> = <hisi_string>[%1--]%!"
+  "@
+   %0<hisi_part> = <hisi_string>[%1--]%!
+   %0 = <hisi_string>[%1--]<hisi_ext>%!"
   [(set_attr "type" "mcld")
    (set_attr "length" "2")
-   (set (attr "addrtype") (cond [(match_operand 1 "p_register_operand" "")
-				 (const_string "preg")]
-				(const_string "ireg")))])
+   (set_attr "addrtype" "ireg,preg")])
 
 (define_insn "loadsi_dreg_postmod"
   [(set (match_operand:SI 0 "d_register_operand" "=d,d")
