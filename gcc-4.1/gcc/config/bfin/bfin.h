@@ -810,6 +810,7 @@ enum reg_class
        : (STR)[1] == '6' ? D6REGS \
        : (STR)[1] == '7' ? D7REGS \
        : (STR)[1] == 'A' ? P0REGS \
+       : (STR)[1] == 'L' ? LREGS \
        : (STR)[1] == 'Z' ? IPREGS \
        : NO_REGS) : \
    NO_REGS)

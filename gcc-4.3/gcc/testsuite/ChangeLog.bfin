@@ -1,3 +1,7 @@
+2009-11-19  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* gcc.target/bfin/builtins/circptr.c: New test.
+
 2009-11-16  Grace Pan  <grace.pan@analog.com>
 
 	* gcc.target/bfin/builtins/cpmlx_mac_fr2x16-1.c: New test.

@@ -1,3 +1,16 @@
+2009-11-19  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.md (circptr): New pattern.
+	* config/bfin/bfin.h (REG_CLASS_FROM_CONSTRAINT): Add "qL".
+	* config/bfin/bfin.md (struct preg_use): New.
+	(reg_used_otherwise, puse): New static variables.
+	(mark_regs_unavailable, mark_stored_regs, my_loop_preheader_edge,
+	optimize_loop_addresses): New functions.
+	(bfin_optimize_loops_1): call optimize_loop_addresses.
+	(enum bfin_builtins): Add BFIN_CIRCPTR.
+	(bfin_init_builtins): Create circptr builtin.
+	(bfin_expand_builtin): Handle it.
+
 2009-11-17  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (HISI): New mode_iterator.
