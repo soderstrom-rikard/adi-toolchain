@@ -257,9 +257,53 @@ define show_ddr
 	printf "DDRCTL2: 0x%08x\n", *(unsigned long *)0xFFC00A28
 	printf "DDRCTL3: 0x%08x\n", *(unsigned long *)0xFFC00A2C
 	printf "DDRQUE:  0x%08x\n", *(unsigned long *)0xFFC00A30
-	printf "ERRADD:  0x%08x\n", *(unsigned long *)0xFFC00A34
-	printf "ERRMST:  0x%04x\n", *(unsigned short *)0xFFC00A38
-	printf "RSTCTL:  0x%04x\n", *(unsigned short *)0xFFC00A3C
+	printf "ERRADD:  "
+	output/a *(unsigned long *)0xFFC00A34
+	printf "\n"
+
+	set $$ERRMST = *(unsigned short *)0xFFC00A38
+	printf "ERRMST:  0x%04x     ( ", $$ERRMST
+	if ($$ERRMST & (1 << 7))
+		printf "core_merror "
+	end
+	if ($$ERRMST & (1 << 6))
+		printf "deb2_merror "
+	end
+	if ($$ERRMST & (1 << 5))
+		printf "deb1_merror "
+	end
+	if ($$ERRMST & (1 << 4))
+		printf "deb0_merror "
+	end
+	if ($$ERRMST & (1 << 3))
+		printf "core_error "
+	end
+	if ($$ERRMST & (1 << 2))
+		printf "deb2_error "
+	end
+	if ($$ERRMST & (1 << 1))
+		printf "deb1_error "
+	end
+	if ($$ERRMST & (1 << 0))
+		printf "deb0_error "
+	end
+	printf ")\n"
+
+	set $$RSTCTL = *(unsigned short *)0xFFC00A3C
+	printf "RSTCTL:  0x%04x     ( ", $$RSTCTL
+	if ($$RSTCTL & (1 << 4))
+		printf "srack "
+	end
+	if ($$RSTCTL & (1 << 3))
+		printf "srreq "
+	end
+	if (!($$RSTCTL & (1 << 1)))
+		printf "!!! ERROR: bit 1 needs to be 1, but it is 0 !!! "
+	end
+	if ($$RSTCTL & (1 << 0))
+		printf "ddr_sreset "
+	end
+	printf ")\n"
 end
 
 define show_ebiu
@@ -267,6 +311,17 @@ define show_ebiu
 	printf "EBIU_AMBCTL0: 0x%08x\n", *(unsigned long *)0xFFC00A04
 	printf "EBIU_AMBCTL1: 0x%08x\n", *(unsigned long *)0xFFC00A08
 	printf "EBIU_MBSCTL:  0x%08x\n", *(unsigned long *)0xFFC00A0C
+
+	set $$EBIU_ARBSTAT = *(unsigned long *)0xFFC00A10
+	printf "EBIU_ARBSTAT: 0x%08x ( ", $$EBIU_ARBSTAT
+	if ($$EBIU_ARBSTAT & (1 << 1))
+		printf "bgstat "
+	end
+	if ($$EBIU_ARBSTAT & (1 << 0))
+		printf "arbstat "
+	end
+	printf ")\n"
+
 	printf "EBIU_MODE:    0x%08x\n", *(unsigned long *)0xFFC00A14
 	printf "EBIU_FCTL:    0x%08x\n", *(unsigned long *)0xFFC00A18
 end
@@ -402,6 +457,55 @@ end
 define show_cplbs
 	show_icplbs
 	show_dcplbs
+end
+
+define _show_cplbstatus
+	set $$CPLB_STATUS     = *(unsigned long *)$arg0
+	printf " STATUS     = 0x%08x ( ", $$CPLB_STATUS
+	if ($$CPLB_STATUS & (1 << 19))
+		printf "illaddr "
+	end
+	if ($$CPLB_STATUS & (1 << 18))
+		printf "dag1 "
+	else
+		printf "dag0 "
+	end
+	if ($$CPLB_STATUS & (1 << 17))
+		printf "super "
+	else
+		printf "user "
+	end
+	if ($$CPLB_STATUS & (1 << 16))
+		printf "write "
+	else
+		printf "read "
+	end
+	set $$i = 15
+	while ($$i >= 0)
+		if ($$CPLB_STATUS & (1 << $$i))
+			printf "%i ", $$i
+		end
+		set $$i--
+	end
+	printf ")\n"
+
+	set $$CPLB_FAULT_ADDR = *(unsigned long *)$arg1
+	printf " FAULT_ADDR = "
+	output/a $$CPLB_FAULT_ADDR
+	printf "\n"
+end
+define show_icplbstatus
+	printf "ICPLB Status\n"
+	_show_cplbstatus 0xFFE01008 0xFFE0100C
+end
+define show_dcplbstatus
+	printf "DCPLB Status\n"
+	_show_cplbstatus 0xFFE00008 0xFFE0000C
+end
+define show_cplbstatus
+	seqstat
+	show_icplbstatus
+	show_dcplbstatus
 end
 
 define safe_regs
