@@ -515,6 +515,10 @@ define safe_regs
 	set $pc = $rets = $reti = $retx = $retn = $p0
 	set $lt0 = $lt1 = $lb0 = $lb1 = 1
 	set $lc0 = $lc1 = 0
+	set $i0 = $i1 = $i2 = $i3 = $r0
+	set $b0 = $b1 = $b2 = $b3 = $r0
+	set $l0 = $l1 = $l2 = $l3 = $r0
+	set $m0 = $m1 = $m2 = $m3 = $r0
 end
 
 define _show_dma
