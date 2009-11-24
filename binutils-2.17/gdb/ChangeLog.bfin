@@ -1,3 +1,9 @@
+2009-11-24  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* configure.ac (sysroot): Check exec_prefix set to '${prefix}'.
+	Latest upstream version already has a similar fix.
+	* configure: Regenerated.
+
 2009-10-14  Jie Zhang  <jie.zhang@analog.com>
 
 	Revert

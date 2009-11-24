@@ -1077,7 +1077,11 @@ AC_ARG_WITH(sysroot,
    test_prefix=$prefix
   fi
  else
-  test_prefix=$exec_prefix
+  if test "x$exec_prefix" = 'x${prefix}' ; then
+    test_prefix=$prefix
+  else
+    test_prefix=$exec_prefix
+  fi
  fi
  case ${TARGET_SYSTEM_ROOT} in
  "${test_prefix}"|"${test_prefix}/"*|\
