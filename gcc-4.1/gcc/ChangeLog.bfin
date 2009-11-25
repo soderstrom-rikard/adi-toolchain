@@ -1,3 +1,12 @@
+2009-11-25  Bernd Schmidt  <bernd.schmidt@analog.com>
+
+	* config/bfin/bfin.c (mark_live_in_loop): New function, broken out of
+	move_loop_constants.
+	(move_loop_constants): Call it.
+	(optimize_loop_addresses): Call it when making an I or M register live.
+	Insert insns on the right edge for loop exits, and mark I registers
+	live in the destination block of exit edges if necessary.
+
 2009-11-19  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (circptr): New pattern.

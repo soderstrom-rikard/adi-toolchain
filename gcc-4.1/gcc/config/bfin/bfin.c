@@ -3872,6 +3872,27 @@ length_for_loop (rtx insn)
   return length;
 }
 
+/* Mark a regno as live throughout a loop with basic blocks BODY, of
+   which there are NUM_NODES.  */
+static void
+mark_live_in_loop (basic_block *body, int num_nodes, unsigned regno)
+{
+  int j;
+  /* Update life information.  Mark the reg live at the start of
+     each loop node, and at the end of every block that reaches it.  */
+  for (j = 0; j < num_nodes; j++)
+    {
+      basic_block bb = body[j];
+      edge e;
+      edge_iterator ei;
+      FOR_EACH_EDGE (e, ei, bb->preds)
+	{
+	  SET_REGNO_REG_SET (e->src->il.rtl->global_live_at_end, regno);
+	  SET_REGNO_REG_SET (e->dest->il.rtl->global_live_at_start, regno);
+	}
+    }
+}
+
 /* Variables used by the optimize_loop_addresses pass.  */
 
 /* Nonzero for every reg which is unavailable for renaming.  */
@@ -4145,8 +4166,10 @@ optimize_loop_addresses (struct loop *loop, basic_block *body)
 	    goto out;
 	  mregno += REG_M0;
 	  mreg = gen_rtx_REG (Pmode, mregno);
+	  mark_live_in_loop (body, loop->num_nodes, mregno);
 	}
 
+      mark_live_in_loop (body, loop->num_nodes, iregno);
       for (j = 0; j < num_exits; j++)
 	{
 	  edge e = exit_edges[j];
@@ -4154,7 +4177,9 @@ optimize_loop_addresses (struct loop *loop, basic_block *body)
 			       REGNO (preg)))
 	    {
 	      set = gen_movsi (preg, ireg);
-	      insert_insn_on_edge (set, ph_edge);
+	      insert_insn_on_edge (set, e);
+	      SET_REGNO_REG_SET (e->dest->il.rtl->global_live_at_start,
+				 iregno);
 	    }
 	}
 
@@ -5178,19 +5203,7 @@ move_loop_constants (struct loop *loop, basic_block *body)
       insert_insn_on_edge (PATTERN (insn), ph_edge);
       delete_insn (insn);
 
-      /* Update life information.  Mark the reg live at the start of
-         each loop node, and at the end of every block that reaches it.  */
-      for (j = 0; j < loop->num_nodes; j++)
-	{
-	  basic_block bb = body[j];
-	  edge e;
-	  edge_iterator ei;
-	  FOR_EACH_EDGE (e, ei, bb->preds)
-	    {
-	      SET_REGNO_REG_SET (e->src->il.rtl->global_live_at_end, i);
-	      SET_REGNO_REG_SET (e->dest->il.rtl->global_live_at_start, i);
-	    }
-	}
+      mark_live_in_loop (body, loop->num_nodes, i);
     }
 }
 
