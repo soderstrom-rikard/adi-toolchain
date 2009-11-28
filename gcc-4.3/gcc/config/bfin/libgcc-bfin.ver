@@ -284,4 +284,7 @@ GCC_4.3.0 {
   ___bswapdi2
   ___emutls_get_address
   ___emutls_register_common
+  ___ffssi2
+  ___extendxftf2
+  ___trunctfxf2
 }

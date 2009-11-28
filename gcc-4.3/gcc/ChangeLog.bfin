@@ -1,3 +1,8 @@
+2009-11-28  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* config/bfin/libgcc-bfin.ver (GCC_4.3.0): Add ___ffssi2,
+	___extendxftf2, and ___trunctfxf2.
+
 2009-11-27  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	PR rtl/38582
