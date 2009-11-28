@@ -2240,15 +2240,17 @@ if [ $KERNEL_SOURCE ] ; then
         done
         echo_date "Make U-Boot"
         if [ "${CBUILD}" = "${CHOST}" ] ; then
-            unset HOSTCC
+            unset HOSTCC HOSTSTRIP
         else
             HOSTCC="${CHOST}-gcc"
+            HOSTSTRIP="${CHOST}-strip"
         fi
         run_cmd $MAKE \
             -C "$DIR_UBOOT" \
             O="$DIR_UBOOT_BUILD" \
             BIN_FILES-y="${UBOOT_TOOLS}" \
             SUBDIRS="tools" \
+            ${HOSTSTRIP+HOSTSTRIP=${HOSTSTRIP}} \
             ${HOSTCC+HOSTCC=${HOSTCC}} \
             tools
 
