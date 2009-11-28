@@ -25,9 +25,13 @@ Boston, MA 02110-1301, USA.  */
    This exception does not however invalidate any other reasons why
    the executable file might be covered by the GNU General Public License.  */
 
+#if defined(__ELF__) && defined(__linux__)
+.section .note.GNU-stack,"",%progbits
+#endif
+
+.text
 
 #ifdef L_divsi3
-.text
 .align 2
 .global ___divsi3;
 .type ___divsi3, STT_FUNC;

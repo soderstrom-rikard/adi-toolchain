@@ -3,6 +3,10 @@
 	* config/bfin/libgcc-bfin.ver (GCC_4.3.0): Add ___ffssi2,
 	___extendxftf2, and ___trunctfxf2.
 
+	* config/bfin/linux.h (TARGET_ASM_FILE_END): Define.
+	* config/bfin/uclinux.h (TARGET_ASM_FILE_END): Likewise.
+	* config/bfin/lib1funcs.asm: Add .section .note.GNU-stack.
+
 2009-11-27  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	PR rtl/38582
