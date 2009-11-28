@@ -7,6 +7,14 @@
 	* config/bfin/uclinux.h (TARGET_ASM_FILE_END): Likewise.
 	* config/bfin/lib1funcs.asm: Add .section .note.GNU-stack.
 
+	* config/bfin/bfin.c (bfin_adjust_cost): Move dest & src decls up.
+	(mark_stored_regs): Declare pat as const_rtc and unused.
+	(BB_AUX_INDEX): Cast to unsigned long.
+	(bfin_reorder_loops): Change index to unsigned long.
+	(forget_known_values, note_np_check_stores): Declare pat unused.
+	(bfin_optimize_loops_1): Declare dump_file unused.
+	(trapping_loads_p): Delete unused local pat variable.
+
 2009-11-27  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	PR rtl/38582
