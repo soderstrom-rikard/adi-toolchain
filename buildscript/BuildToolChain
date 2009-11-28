@@ -2032,6 +2032,7 @@ if [ $KERNEL_SOURCE ] ; then
 		echo '# LDSO_RUNPATH is not set' >>.config
 		echo 'HAVE_SHARED=y' >>.config
 		echo 'UCLIBC_BUILD_RELRO=y' >>.config
+		echo 'UCLIBC_BUILD_NOEXECSTACK=y' >>.config
 		echo 'UCLIBC_STATIC_LDCONFIG=y' >>.config
 		echo 'DOPIC=y' >>.config
 		echo 'LDSO_BASE_FILENAME="ld.so"' >>.config
