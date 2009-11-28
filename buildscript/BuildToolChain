@@ -1838,7 +1838,7 @@ run_tests ()
 
 build_uClibc()
 {
-    ARGS="V=1 CROSS=bfin-elf- DEVEL_PREFIX=/usr/ RUNTIME_PREFIX=/ ARCH_CFLAGS='$UCLIBC_CFLAGS'"
+    ARGS="V=1 CROSS=bfin-elf- DEVEL_PREFIX=/usr/ RUNTIME_PREFIX=/ ARCH_CFLAGS='$UCLIBC_CFLAGS -Wa,--noexecstack'"
 
     echo_date "Cleaning uClibc"
     run_cmd $MAKE clean $ARGS
