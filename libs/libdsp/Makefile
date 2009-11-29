@@ -290,7 +290,7 @@ LIBBFFASTFP_OBJS = $(LIBBFFASTFP_ASRCS:%.asm=%.o)
 LIBS = libbfdsp.a libbffastfp.a
 
 ARFLAGS = cru
-CFLAGS = $(MULTILIB_FLAGS) -O2 -D__NO_LIBRARY_ATTRIBUTES__ -I../include
+CFLAGS = $(MULTILIB_FLAGS) -O2 -Wa,--noexecstack -D__NO_LIBRARY_ATTRIBUTES__ -I../include
 
 all: $(LIBS)
 
