@@ -33,6 +33,9 @@
 	are processed.  Add new steps to keep track of hard register lifetimes
 	outside insn operands.
 
+	* combine.c (can_combine_p): Disallow cases where a hard reg dies in an
+	input that isn't contiguous with the rest of the insns.
+
 2009-11-30  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	PR rtl-opt/38582
