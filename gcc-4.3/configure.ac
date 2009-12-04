@@ -389,7 +389,7 @@ fi
 if test x$enable_libgomp = x ; then
     # Enable libgomp by default on hosted POSIX systems.
     case "${target}" in
-    *-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu)
+    *-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu | bfin*-*-uclinux*)
 	;;
     *-*-netbsd* | *-*-freebsd* | *-*-openbsd*)
 	;;

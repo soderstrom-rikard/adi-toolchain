@@ -1,3 +1,8 @@
+2009-12-04  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* configure.ac (enable_libgomp): Add bfin*-*-uclinux*.
+	* configure: Regenerate.
+
 2009-01-23  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* configure.ac (FLAGS_FOR_TARGET): Add -isystem for include-fixed in the
