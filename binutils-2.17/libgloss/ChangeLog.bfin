@@ -1,3 +1,8 @@
+2009-12-07  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/bf504.ld: Add dummy MEM_L2.
+	* bfin/bf506.ld: Likewise.
+
 2009-11-15  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* bfin/bf504.ld, bfin/bf506.ld: New.
