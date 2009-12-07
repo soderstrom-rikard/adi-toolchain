@@ -1,5 +1,9 @@
 2009-12-07  Jie Zhang  <jie.zhang@analog.com>
 
+	* data/analog/bf518/STEPPINGS: Add bf518 silicon revision 0.1.
+
+2009-12-07  Jie Zhang  <jie.zhang@analog.com>
+
 	* src/bus/bf518f_ezbrd.c: New file.
 	* src/bus/buses.c (bus_drivers[]): Add bf518f_ezbrd_bus and
 	bf51x_bus.
