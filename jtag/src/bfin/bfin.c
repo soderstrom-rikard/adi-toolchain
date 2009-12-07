@@ -149,6 +149,30 @@ bfin_set_scan (part_t *part, int scan)
 static void emuir_init_value (tap_register *r, uint64_t insn);
 
 int
+chain_scan_select_array (chain_t *chain, int *scan)
+{
+  int i;
+  int changed;
+
+  changed = 0;
+
+  for (i = 0; i < chain->parts->len; i++)
+    {
+      part_t *part = chain->parts->parts[i];
+
+      if (part_is_bypassed (chain, i))
+	changed += bfin_set_scan (part, BYPASS);
+      else
+	changed += bfin_set_scan (part, scan[i]);
+    }
+
+  if (changed)
+    chain_shift_instructions_mode (chain, 0, 1, EXITMODE_UPDATE);
+
+  return 0;
+}
+
+int
 chain_scan_select (chain_t *chain, int scan)
 {
   int i;
@@ -431,7 +455,7 @@ part_dbgstat_get (chain_t *chain, int n)
 }
 
 void
-chain_emupc_get (chain_t *chain)
+chain_emupc_get (chain_t *chain, int save)
 {
   part_t *part;
   tap_register *r;
@@ -449,11 +473,13 @@ chain_emupc_get (chain_t *chain)
 
       r = part->active_instruction->data_register->out;
       BFIN_PART_EMUPC (part) = register_value (r);
+      if (save)
+	BFIN_PART_EMUPC_ORIG (part) = BFIN_PART_EMUPC (part);
     }
 }
 
 uint32_t
-part_emupc_get (chain_t *chain, int n)
+part_emupc_get (chain_t *chain, int n, int save)
 {
   part_t *part;
   tap_register *r;
@@ -467,6 +493,8 @@ part_emupc_get (chain_t *chain, int n)
   part = chain->parts->parts[n];
   r = part->active_instruction->data_register->out;
   BFIN_PART_EMUPC (part) = register_value (r);
+  if (save)
+    BFIN_PART_EMUPC_ORIG (part) = BFIN_PART_EMUPC (part);
 
   return BFIN_PART_EMUPC (part);
 }
@@ -739,6 +767,39 @@ emuir_init_value (tap_register *r, uint64_t insn)
       else
 	  r->data[0] = r->data[1] = 1;
     }
+}
+
+/* FIXME: Assume all instructions length less than or equal to 32-bit.  */
+void
+chain_emuir_set (chain_t *chain, uint64_t *insn, int exit)
+{
+  int emuir_scan;
+  part_t *part;
+  tap_register *r;
+  int i;
+
+  assert (exit == EXITMODE_UPDATE || exit == EXITMODE_IDLE);
+
+  emuir_scan = EMUIR_SCAN;
+  chain_scan_select (chain, DBGCTL_SCAN);
+  chain_dbgctl_bit_set_emuirsz_32 (chain);
+  chain_shift_data_registers_mode (chain, 0, 1, EXITMODE_UPDATE);
+  chain_scan_select (chain, emuir_scan);
+
+  for (i = 0; i < chain->parts->len; i++)
+    {
+      assert ((insn[i] & 0xffffffff00000000ULL) == 0);
+
+      part = chain->parts->parts[i];
+      r = part->active_instruction->data_register->in;
+      emuir_init_value (r, insn[i]);
+      BFIN_PART_EMUIR_A (part) = insn[i];
+    }
+
+  chain_shift_data_registers_mode (chain, 0, 1, exit);
+
+  if (exit == EXITMODE_IDLE && bfin_wait_emuready)
+    chain_wait_emuready (chain);
 }
 
 void
@@ -1583,6 +1644,30 @@ software_reset (chain_t *chain)
 {
   chain_system_reset (chain);
   bfin_core_reset (chain);
+}
+
+void
+chain_emupc_reset (chain_t *chain, uint32_t *new_pc)
+{
+  uint32_t p0[chain->parts->len];
+  int i;
+
+  chain_register_get (chain, REG_P0, p0);
+
+  for (i = 0; i < chain->parts->len; i++)
+    {
+      part_t *part = chain->parts->parts[i];
+
+      if (part_is_bypassed (chain, i))
+	continue;
+
+      BFIN_PART_EMUPC (part) = new_pc[i];
+    }
+
+  chain_register_set (chain, REG_P0, new_pc);
+  chain_emuir_set_same (chain, gen_jump_reg (REG_P0), EXITMODE_IDLE);
+
+  chain_register_set (chain, REG_P0, p0);
 }
 
 uint32_t

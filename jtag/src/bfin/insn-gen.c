@@ -258,3 +258,14 @@ gen_prefetch_pm (enum core_regnum addr)
 {
   return gen_flush_insn (addr, 0, 1);
 }
+
+uint32_t
+gen_jump_reg (enum core_regnum addr)
+{
+  uint32_t insn;
+
+  insn = 0x0050;
+  insn |= addr & 0x7;
+
+  return insn;
+}

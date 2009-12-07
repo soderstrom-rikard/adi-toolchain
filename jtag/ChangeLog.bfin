@@ -1,3 +1,18 @@
+2009-12-07  Jie Zhang  <jie.zhang@analog.com>
+
+	* include/bfin.h (struct bfin_part_data): Add emupc_orig.
+	(BFIN_PART_EMUPC_ORIG): Define.
+	(chain_emupc_get): Add a new argument.
+	(part_emupc_get): Likewise.
+	(chain_emupc_reset): Declare.
+	(gen_jump_reg): Declare.
+	* src/bfin/bfin.c (chain_scan_select_array): New.
+	(chain_emupc_get): Add a new argument to save EMUPC.
+	(part_emupc_get): Likewise.
+	(chain_emuir_set): New.
+	(chain_emupc_reset): New.
+	* src/bfin/insn-gen.c (gen_jump_reg): New.
+
 2009-09-29  Jie Zhang  <jie.zhang@analog.com>
 
 	* include/bfin.h (struct bfin_part_data): Add bypass.

@@ -139,6 +139,7 @@ struct bfin_part_data
   uint64_t emudat_out;
   uint64_t emudat_in;
   uint32_t emupc;
+  uint32_t emupc_orig;
 };
 
 #define BFIN_PART_BYPASS(part)  (((struct bfin_part_data *)((part)->params->data))->bypass)
@@ -153,6 +154,7 @@ struct bfin_part_data
 #define BFIN_PART_EMUDAT_OUT(part)  (((struct bfin_part_data *)((part)->params->data))->emudat_out)
 #define BFIN_PART_EMUDAT_IN(part)  (((struct bfin_part_data *)((part)->params->data))->emudat_in)
 #define BFIN_PART_EMUPC(part)  (((struct bfin_part_data *)((part)->params->data))->emupc)
+#define BFIN_PART_EMUPC_ORIG(part)  (((struct bfin_part_data *)((part)->params->data))->emupc_orig)
 
 extern struct emu_oab bfin_emu_oab;
 
@@ -287,8 +289,8 @@ DECLARE_PART_DBGSTAT_BIT_IS (emudof)
 uint16_t part_dbgstat_emucause (chain_t *, int);
 void chain_dbgstat_get (chain_t *);
 void part_dbgstat_get (chain_t *, int);
-void chain_emupc_get (chain_t *);
-uint32_t part_emupc_get (chain_t *, int);
+void chain_emupc_get (chain_t *, int);
+uint32_t part_emupc_get (chain_t *, int, int);
 void chain_dbgstat_clear_ovfs (chain_t *);
 void part_dbgstat_clear_ovfs (chain_t *, int);
 void chain_wait_emuready (chain_t *);
@@ -329,6 +331,7 @@ void part_execute_instructions (chain_t *, int n, struct bfin_insn *);
 void chain_system_reset (chain_t *);
 void bfin_core_reset (chain_t *);
 void software_reset (chain_t *);
+void chain_emupc_reset (chain_t *, uint32_t *);
 uint32_t part_mmr_read_clobber_r0 (chain_t *, int, int32_t, int);
 void part_mmr_write_clobber_r0 (chain_t *, int, int32_t, uint32_t, int);
 uint32_t part_mmr_read (chain_t *, int, uint32_t, int);
@@ -363,5 +366,6 @@ uint32_t gen_flushinv (enum core_regnum addr);
 uint32_t gen_flushinv_pm (enum core_regnum addr);
 uint32_t gen_prefetch (enum core_regnum addr);
 uint32_t gen_prefetch_pm (enum core_regnum addr);
+uint32_t gen_jump_reg (enum core_regnum addr);
 
 #endif /* BFIN_H */
