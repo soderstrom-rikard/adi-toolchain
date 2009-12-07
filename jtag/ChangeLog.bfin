@@ -1,5 +1,18 @@
 2009-12-07  Jie Zhang  <jie.zhang@analog.com>
 
+	* src/bus/bf518f_ezbrd.c: New file.
+	* src/bus/buses.c (bus_drivers[]): Add bf518f_ezbrd_bus and
+	bf51x_bus.
+	* src/bus/buses.h (bf518f_ezbrd_bus): Declare.
+	(bf51x_bus): Declare.
+	* src/bus/Makefile.am (libbus_a_SOURCES): Add bf518f_ezbrd.c.
+	* src/bus/Makefile.in: Regenerate.
+	* configure.ac: Add bf518f_ezbrd and bf51x bus driver.
+	* configure: Regenerate.
+	* config.h.in: Regenerate.
+
+2009-12-07  Jie Zhang  <jie.zhang@analog.com>
+
 	* include/bfin.h (struct bfin_part_data): Add emupc_orig.
 	(BFIN_PART_EMUPC_ORIG): Define.
 	(chain_emupc_get): Add a new argument.

@@ -389,7 +389,8 @@ AC_DEFUN([CHECK_DRIVER], [
 # Enable bus drivers
 AC_DEFUN([DEF_ENABLE_BUSDRIVERS], [\
 au1500 avr32 bcm1250 \
-bf526_ezkit bf527_ezkit bf52x bf533_stamp bf533_ezkit bf537_stamp bf537_ezkit bf538f_ezkit bf53x \
+bf518f_ezbrd bf51x bf526_ezkit bf527_ezkit bf52x \
+bf533_stamp bf533_ezkit bf537_stamp bf537_ezkit bf538f_ezkit bf53x \
 bf548_ezkit bf561_ezkit bfin_core ejtag \
 fjmem ixp425 jopcyc h7202 lh7a400  mpc5200 mpc824x ppc405ep ppc440gx_ebc8 prototype pxa2x0 pxa27x \
 s3c4510 sa1110 sh7727 sh7750r sh7751r sharc_21065L slsup3 tx4925 zefant_xs3])
@@ -411,6 +412,8 @@ enabled_bus_drivers=''
 CHECK_DRIVER([$busdrivers], [enabled_bus_drivers], [au1500],        [ENABLE_BUS_AU1500])
 CHECK_DRIVER([$busdrivers], [enabled_bus_drivers], [avr32],         [ENABLE_BUS_AVR32])
 CHECK_DRIVER([$busdrivers], [enabled_bus_drivers], [bcm1250],       [ENABLE_BUS_BCM1250])
+CHECK_DRIVER([$busdrivers], [enabled_bus_drivers], [bf518f_ezbrd],  [ENABLE_BUS_BF518F_EZBRD])
+CHECK_DRIVER([$busdrivers], [enabled_bus_drivers], [bf51x],         [ENABLE_BUS_BF51X])
 CHECK_DRIVER([$busdrivers], [enabled_bus_drivers], [bf526_ezkit],   [ENABLE_BUS_BF526_EZKIT])
 CHECK_DRIVER([$busdrivers], [enabled_bus_drivers], [bf527_ezkit],   [ENABLE_BUS_BF527_EZKIT])
 CHECK_DRIVER([$busdrivers], [enabled_bus_drivers], [bf52x],         [ENABLE_BUS_BF52X])

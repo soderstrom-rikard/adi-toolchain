@@ -12,6 +12,12 @@
 /* define if bcm1250 is enabled */
 #undef ENABLE_BUS_BCM1250
 
+/* define if bf518f_ezbrd is enabled */
+#undef ENABLE_BUS_BF518F_EZBRD
+
+/* define if bf51x is enabled */
+#undef ENABLE_BUS_BF51X
+
 /* define if bf526_ezkit is enabled */
 #undef ENABLE_BUS_BF526_EZKIT
 
