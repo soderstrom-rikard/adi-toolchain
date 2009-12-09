@@ -6745,7 +6745,7 @@ bfin_expand_builtin (tree exp, rtx target ATTRIBUTE_UNUSED,
   tree arglist = TREE_OPERAND (exp, 1);
   unsigned int fcode = DECL_FUNCTION_CODE (fndecl);
   tree arg0, arg1, arg2, arg3;
-  rtx op0, op1, op2, op3, accvec, pat, tmp1, tmp2, a0reg, a1reg;
+  rtx op0, op1, op2, op3, accvec, pat, tmp1, tmp2, tmp3, a0reg, a1reg;
   enum machine_mode tmode, mode0;
 
   switch (fcode)
@@ -6907,19 +6907,34 @@ bfin_expand_builtin (tree exp, rtx target ATTRIBUTE_UNUSED,
       emit_move_insn (tmp2, gen_lowpart (SImode, op0));
       emit_insn (gen_movstricthi_1 (gen_lowpart (HImode, tmp2), const0_rtx));
       emit_insn (gen_load_accumulator_pair (accvec, tmp1, tmp2));
-      if (fcode == BFIN_BUILTIN_CPLX_MAC_16
-	  || fcode == BFIN_BUILTIN_CPLX_MSU_16)
-	emit_insn (gen_flag_macv2hi_parts_acconly (accvec, op1, op2, const0_rtx,
-						   const0_rtx, const0_rtx,
-						   const1_rtx, accvec, const0_rtx,
-						   const0_rtx,
-						   GEN_INT (MACFLAG_W32)));
+      if (fcode == BFIN_BUILTIN_CPLX_MAC_16)
+	{
+	  tmp1 = const0_rtx;
+	  tmp2 = const0_rtx;
+	  tmp3 = GEN_INT (MACFLAG_W32);
+	}
+      else if (fcode == BFIN_BUILTIN_CPLX_MSU_16)
+	{
+	  tmp1 = const1_rtx;
+	  tmp2 = const1_rtx;
+	  tmp3 = GEN_INT (MACFLAG_W32);
+	}
+      else if (fcode == BFIN_BUILTIN_CPLX_MAC_16_S40)
+	{
+	  tmp1 = const0_rtx;
+	  tmp2 = const0_rtx;
+	  tmp3 = GEN_INT (MACFLAG_NONE);
+	}
       else
-	emit_insn (gen_flag_macv2hi_parts_acconly (accvec, op1, op2, const0_rtx,
-						   const0_rtx, const0_rtx,
-						   const1_rtx, accvec, const0_rtx,
-						   const0_rtx,
-						   GEN_INT (MACFLAG_NONE)));
+	{
+	  tmp1 = const1_rtx;
+	  tmp2 = const1_rtx;
+	  tmp3 = GEN_INT (MACFLAG_NONE);
+	}
+      emit_insn (gen_flag_macv2hi_parts_acconly (accvec, op1, op2, const0_rtx,
+						 const0_rtx, const0_rtx,
+						 const1_rtx, accvec,
+						 tmp1, tmp2, tmp3));
       if (fcode == BFIN_BUILTIN_CPLX_MAC_16
 	  || fcode == BFIN_BUILTIN_CPLX_MAC_16_S40)
 	{
