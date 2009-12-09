@@ -1,0 +1,990 @@
+#!/usr/bin/expect
+log_file build_toolchain_kernel_log
+send_user "Starting build_toolchain_kernel.exp\n"
+
+set user /home/test/work/cruise
+set uclinux_path $user/checkouts/uclinux-dist
+set ttydev /dev/ttyS0
+set send_slow {1 0.1}
+set kernel_config normal
+
+
+send_user "The Env Path is: $env(PATH) "
+
+set board_type [lindex $argv 0]
+send_log "\n#### board_type is $board_type\n"
+
+if { $argc < 1} {
+    puts "Please input: board_type."
+    exit
+}
+
+if { $argc >= 2} {
+    set kernel_config      [lindex $argv 1]
+    send_log "\n#### kernel_config is $kernel_config\n"
+}
+
+if { $argc >= 3} {
+    set uclinux_path       [lindex $argv 2]
+    send_log "\n#### uclinux_path is $uclinux_path\n"
+}
+
+proc step { message } {
+    global step_sequence_number
+
+    puts "\n*******************************************************************"
+    puts "STEP $step_sequence_number: $message\n\n"
+    send_log "\n************** STEP $step_sequence_number: $message\n\n"
+    incr step_sequence_number
+}
+
+set step_sequence_number 1
+
+step "Config the ip address."
+
+cd $uclinux_path
+sleep 3
+set timeout 2
+spawn ex vendors/AnalogDevices/common/rc
+expect {
+    "Entering Ex mode*Normal mode." { }
+
+    "already exists!" {
+        send "e\r"
+        sleep 1
+    }
+}
+sleep 1
+send "/ifconfig eth0\r"
+while 1 {
+    expect {
+        "Pattern not found" { break }
+        -re "ifconfig eth0" {
+            send "d\r"
+            break
+        }
+        timeout { break }
+    }
+}
+expect ":"
+send "i\r"
+sleep 1
+send "ifconfig eth0 10.100.4.50;ifconfig\r"
+sleep 1
+send ".\r"
+expect ":"
+sleep 1
+
+send "/uptime\r"
+while 1 {
+    expect {
+        "Pattern not found" { break }
+        -re "uptime  " {
+            send "d\r"
+            break
+        }
+        timeout { break }
+    }
+}
+expect ":"
+send "i\r"
+sleep 1
+send "uptime  \r"
+sleep 1
+send ".\r"
+expect ":"
+sleep 1
+
+send "wq\r"
+expect eof
+
+
+step "Do separate pre-config."
+
+if { $kernel_config == "kgdb" } {
+
+cd $uclinux_path
+sleep 3
+ set timeout 2
+      spawn ex linux-2.6.x/arch/blackfin/kernel/kgdb.c
+      expect {
+         "Entering Ex mode*Normal mode." { }
+
+         "already exists!" {
+            send "e\r"
+            sleep 1
+         }
+      }
+      sleep 1
+      send "/CONFIG_BFIN_WDT\r"
+      expect {
+          "#ifdef CONFIG_BFIN_WDT" { send "d3\r" }
+           timeout {}
+       }
+      expect ":"
+      send "wq\r"
+      expect eof
+
+}
+
+
+step "Make config."
+
+cd $uclinux_path
+set timeout 300
+spawn make config
+
+while 1 {
+    expect {
+        -re "Vendor/Product Selection.* (\[0-9]+). AnalogDevices.*choice.*\\\[.*]" {
+            send "$expect_out(1,string)\r"
+        }
+
+        -re "AnalogDevices Products.* (\[0-9]+). $board_type.*choice.*\\\[.*]" {
+            send "$expect_out(1,string)\r"
+        }
+
+        -re "Default all settings.*lose changes.*DEFAULTS_OVERRIDE.*\\\[.*]" {
+            send "y\r"
+        }
+
+        -re "Customize Kernel Settings.*DEFAULTS_KERNEL.*\\\[.*]" {
+            send "y\r"
+        }
+
+        -re "Customize Application/Library Settings.*DEFAULTS_VENDOR.*\\\[.*]" {
+            send "y\r"
+        }
+
+        -nocase -re " \\\(.*\\\) \\\[\[^\r]*] (\[ymn])" {
+        }
+
+        -re " \\\(.*\\\) \\\[\[^\r]*] " {
+            send "\r"
+            sleep .01
+        }
+
+        -re "\[cC]hoice\\\[.*]:" {
+            send "\r"
+        }
+
+        eof {
+            send_user "End of configuration"
+            break
+        }
+        timeout {
+            send_user "\n\nFATAL ERROR: config prompt timeout in make config"
+            exit
+        }
+    }
+}
+
+
+step "Make kernel config"
+
+cd $uclinux_path
+set timeout 300
+set baud_rate_done_flag 0
+spawn make config
+
+#puts "Begin the interactive process of configuration"
+while 1 {
+    expect {
+        -re "Vendor/Product Selection.* (\[0-9]+). AnalogDevices.*choice.*\\\[.*]" {
+            send "$expect_out(1,string)\r"
+        }
+
+        -re "AnalogDevices Products.* (\[0-9]+). $board_type.*choice.*\\\[.*]" {
+            send "$expect_out(1,string)\r"
+        }
+
+        -re "Customize Kernel Settings.*DEFAULTS_KERNEL.*\\\[.*]" {
+            send "y\r"
+        }
+
+        -re "Customize Application/Library Settings.*DEFAULTS_VENDOR.*\\\[.*]" {
+            send "y\r"
+        }
+
+        -re "(.*) \\\[Y]" {
+            #don't select this option
+        }
+
+        -re "(.*) \\\[Y/\\\?]" {
+            #don't select this option
+        }
+
+#        -re "Silicon Rev.* (\[0-9]+).*choice.*\\\[.*]" {
+#            if { $board_type == "BF561-EZKIT" } {
+#                send -s "1\r"
+#            } else {
+#                send -s "\r"
+#            }
+#        }
+
+#     -re "Enable the memory protection unit.*MPU.*\\\[.*]" {
+#           if { $board_type == "BF537-STAMP" } {
+#                send -s "Y\r"
+#            } else {
+#                send -s "\r"
+#            }
+#      }
+
+        -re "Kernel support for FDPIC ELF binaries.*BINFMT_ELF_FDPIC.*\\\[.*]" {
+            send -s "Y\r"
+        }
+
+        -re "Kernel support for flat binaries.*BINFMT_FLAT.*\\\[.*]" {
+            send -s "Y\r"
+        }
+
+        -re "Enable shared FLAT support.*BINFMT_SHARED_FLAT.*\\\[.*]" {
+            if { $kernel_config == "shared_flat" } {
+                send -s "Y\r"
+            } else {
+                send -s "N\r"
+            }
+        }
+
+        -re "Binary format.*FLAT.*Sep-Data.*Shared-FLAT.*FDPIC.*\\\[.*]" {
+            if { $kernel_config == "shared_flat" } {
+                send -s "3\r"
+            } elseif { $kernel_config == "fdpic_lib" } {
+                send -s "4\r"
+            } else {
+                send -s "1\r"
+            }
+        }
+
+        -re "Kernel debugging.*DEBUG_KERNEL.*\\\[.*]" {
+            if { $kernel_config == "kgdb" } {
+                send -s "Y\r"
+            } else {
+                send -s "N\r"
+            }
+        }
+
+        -re "KGDB: kernel debugging with remote gdb.*KGDB.*\\\[.*]" {
+            if { $kernel_config == "kgdb" } {
+                send -s "Y\r"
+            } else {
+                send -s "N\r"
+            }
+        }
+
+        -re "KGDB: use kgdb over the serial console.*KGDB_SERIAL_CONSOLE.*\\\[.*]" {
+            if { $kernel_config == "kgdb" } {
+                send -s "Y\r"
+            } else {
+                send -s "N\r"
+            }
+        }
+
+        -re "Default bootloader kernel arguments.*CMDLINE_BOOL.*\\\[.*]" {
+            if { $kernel_config == "kgdb" } {
+                send -s "Y\r"
+            } else {
+                send -s "N\r"
+            }
+        }
+
+        -re "Initial kernel command string.*CMDLINE.*\\\[(.*)]" {
+            if { $kernel_config == "kgdb" } {
+                send -s "$expect_out(1,string) kgdboc=ttyBF1,57600n8\r"
+            } else {
+                send -s "\r"
+            }
+        }
+
+        -re "UART Mode.*DMA mode.*SERIAL_BFIN_DMA.*PIO mode.*SERIAL_BFIN_PIO.*choice\\\[.*]" {
+            if { $kernel_config == "kgdb" } {
+                send -s "2\r"
+            } else {
+                send -s "1\r"
+            }
+        }
+
+        -re "Enable UART0.*SERIAL_BFIN_UART0.*\\\[.*]" {
+            if { $kernel_config == "kgdb" } {
+                send -s "Y\r"
+            } else {
+                send -s "\r"
+            }
+        }
+
+        -re "Enable UART1.*SERIAL_BFIN_UART1.*\\\[.*]" {
+            if { $kernel_config == "kgdb" } {
+                send -s "Y\r"
+            } else {
+                send -s "\r"
+            }
+        }
+
+        -re "Symmetric multi-processing support.*SMP.*\\\[.*]" {
+            if { $board_type == "BF561-EZKIT" && $kernel_config == "smp" } {
+                send "Y\r"
+            } else {
+                send "N\r"
+            }
+        }
+
+        -re "Watchdog Timer Support.*WATCHDOG.*\\\[.*]" {
+            send -s "N\r"
+        }
+
+        -re "Blackfin On-Chip Watchdog Timer.*BFIN_WDT.*\\\[.*]" {
+            send -s "N\r"
+        }
+
+        -re "NAND Device Support.*MTD_NAND.*\\\[.*]" {
+            if { $board_type == "BF537-STAMP" } {
+                send "N\r"
+            } else {
+                send "\r"
+            }
+        }
+
+        -re "Distributed Switch Architecture support.*NET_DSA.*\\\[.*]" {
+            if { $board_type == "BF518F-EZBRD" } {
+                send -s "N\r"
+            } else {
+                send -s "\r"
+            }
+        }
+
+        -re "watchdogd.*USER_WATCHDOGD.*\\\[.*]" {
+            send -s "N\r"
+        }
+
+        -re "Virtual terminal.*VT.*\\\[.*]" {
+            send "N\r"
+        }
+
+        -re "Install ELF shared libraries.*INSTALL_ELF_SHARED_LIBS.*\\\[.*]" {
+            send -s "Y\r"
+        }
+
+        -re "Install FLAT shared libraries.*INSTALL_FLAT_SHARED_LIBS.*\\\[.*]" {
+            send -s "\r"
+        }
+
+        -re "e2fsck.*USER_E2FSPROGS_E2FSCK_E2FSCK.*\\\[.*]" {
+            send -s "N\r"
+        }
+
+        -re "mke2fs.*USER_E2FSPROGS_MISC_MKE2FS.*\\\[.*]" {
+            send -s "N\r"
+        }
+
+        "\\\(*) \\\[*]" {
+            sleep .05
+            send "\r"
+        }
+
+        -re "\[cC]hoice\\\[.*]:" {
+            send "\r"
+        }
+
+        eof {
+            send_user "End of configuration"
+            break
+        }
+        timeout {
+            send_user "\n\nFATAL ERROR: config prompt timeout in make config"
+            exit
+        }
+    }
+}
+
+
+#config for lib and app test
+if { $kernel_config == "flat_lib" || $kernel_config == "fdpic_lib" } {
+    step "Make config to enable all libs"
+    cd $uclinux_path
+    set timeout 300
+    spawn make config
+    while 1 {
+        expect {
+            -re "Vendor/Product Selection.* (\[0-9]+). AnalogDevices.*choice.*\\\[.*]" {
+                send "$expect_out(1,string)\r"
+            }
+
+            -re "AnalogDevices Products.* (\[0-9]+). $board_type.*choice.*\\\[.*]" {
+                send "$expect_out(1,string)\r"
+            }
+
+            -re "Customize Kernel Settings.*DEFAULTS_KERNEL.*\\\[.*]" {
+                send "n\r"
+            }
+
+            -re "Customize Application/Library Settings.*DEFAULTS_VENDOR.*\\\[.*]" {
+                send "y\r"
+            }
+
+            -re "(.*) \\\[Y]" {
+                #don't select this option
+            }
+
+            -re "(.*) \\\[Y/\\\?]" {
+                #don't select this option
+            }
+
+            -re "Build libnfnetlink.*LIB_NFNETLINK.*\\\[.*]" {
+                send "N\r"
+            }
+
+            -re "Build libnetfilter_conntrack.*LIB_NETFILTER_CONNTRACK.*\\\[.*]" {
+                send "N\r"
+            }
+
+            -re "Build libnetfilter_log.*LIB_NETFILTER_LOG.*\\\[.*]" {
+                send "N\r"
+            }
+
+            -re "Build libopenh323.*LIB_LIBOPENH323.*\\\[.*]" {
+                #depend on lib stlport, so disable it
+                send "N\r"
+            }
+
+            -re "Build pwlib.*LIB_PWLIB.*\\\[.*]" {
+                #depend on lib stlport, so disable it
+                send "N\r"
+            }
+
+            -re "  Build .*LIB_.*\\\[N/y.*]" {
+                #discard sub options of lib
+                send "\r"
+                sleep .05
+            }
+
+            -re "Build .*LIB_.*\\\[N/y.*]" {
+                send "Y\r"
+                sleep .05
+            }
+
+            "\\\(*) \\\[*]" {
+                sleep .01
+                send "\r"
+            }
+
+            -re "\[cC]hoice\\\[.*]:" {
+                send "\r"
+            }
+
+            eof {
+                send_user "End of configuration"
+                break
+            }
+
+            timeout {
+                send_user "\n\nFATAL ERROR: config prompt timeout in make config"
+                exit
+            }
+        }
+    }
+
+
+    step "Make config to disable some libs and enable some app"
+    cd $uclinux_path
+    set timeout 300
+    spawn make config
+    while 1 {
+        expect {
+            -re "Vendor/Product Selection.* (\[0-9]+). AnalogDevices.*choice.*\\\[.*]" {
+                send "$expect_out(1,string)\r"
+            }
+
+            -re "AnalogDevices Products.* (\[0-9]+). $board_type.*choice.*\\\[.*]" {
+                send "$expect_out(1,string)\r"
+            }
+
+            -re "Customize Kernel Settings.*DEFAULTS_KERNEL.*\\\[.*]" {
+                send "n\r"
+            }
+
+            -re "Customize Application/Library Settings.*DEFAULTS_VENDOR.*\\\[.*]" {
+                send "y\r"
+            }
+
+            -re "(.*) \\\[Y]" {
+                #don't select this option
+            }
+
+            -re "(.*) \\\[Y/\\\?]" {
+                #don't select this option
+            }
+
+#disable following libs as they may fail; also they are not used for blackfin
+            -re "Build classpath.*LIB_CLASSPATH.*\\\[.*]" {
+                send "N\r"
+            }
+
+            -re "Build libATM.*LIB_LIBATM.*\\\[.*]" {
+                send "N\r"
+            }
+
+            -re "Build boost.*LIB_BOOST.*\\\[.*]" {
+                send "N\r"
+            }
+
+            -re "Build libefence.*LIB_LIBEFENCE.*\\\[.*]" {
+                send "N\r"
+            }
+
+            -re "Build libffi.*LIB_LIBFFI.*\\\[.*]" {
+                send "N\r"
+            }
+
+            -re "Build libjudy.*LIB_LIBJUDY.*\\\[.*]" {
+                send "N\r"
+            }
+
+            -re "Build libldap.*LIB_LIBLDAP.*\\\[.*]" {
+                send "N\r"
+            }
+
+            -re "Build libnl.*LIB_LIBNL.*\\\[.*]" {
+                send "N\r"
+            }
+
+            -re "Build libPCRE.*LIB_LIBPCRE.*\\\[.*]" {
+                send "N\r"
+            }
+
+            -re "Build STLport.*LIB_STLPORT.*\\\[.*]" {
+                send "N\r"
+            }
+
+            -re "Build libtool.*LIB_LIBTOOL.*\\\[.*]" {
+                send "N\r"
+            }
+#disable above libs as they may fail; also they are not used for blackfin
+
+
+            -re "Build QT.*LIB_QT.*\\\[.*]" {
+                #disable lib qt due to bug 5131
+                send "N\r"
+            }
+
+#            -re "Build libsysfs.*LIB_LIBSYSFS.*\\\[.*]" {
+                #disable libsysfs for FDPIC due to bug 5182
+#                if { $kernel_config == "flat_lib" } {
+#                    send "Y\r"
+#                } else {
+#                    send "N\r"
+#                }
+#            }
+
+            -re "Build libaio.*LIB_LIBAIO.*\\\[.*]" {
+                #disable lib aio with flat format for bug 5187
+                if { $kernel_config == "fdpic_lib" } {
+                    send "Y\r"
+                } else {
+                    send "N\r"
+                }
+            }
+
+            -re "Build popt.*LIB_POPT.*\\\[.*]" {
+                #disable lib popt due to bug 5186
+                #if { $kernel_config == "fdpic_lib" } {
+                #    send "Y\r"
+                #} else {
+                    send "N\r"
+                #}
+            }
+
+            -re "Build bit vector.*LIB_BITVECTOR.*\\\[.*]" {
+                #disable lib bitvector for bug 5168
+                send "N\r"
+            }
+
+            -re "Build libPAM.*LIB_LIBPAM.*\\\[.*]" {
+                #disable lib pam due to bug 5185
+                #UCLIBC_HAS_SHADOW is not enable in toolchain, so can not build pam
+                send "N\r"
+            }
+
+            -re "Build mediastreamer.*LIB_MEDIASTREAMER.*\\\[.*]" {
+                #lib mediastreamer depends on lib ffmpeg, so only works with FDPIC
+                #disable lib mediastreamer due to bug 5184
+                #enable lib mediastreamer to verify bug 5184
+                if { $kernel_config == "fdpic_lib" } {
+                    send "Y\r"
+                } else {
+                    send "N\r"
+                }
+            }
+
+            -re "Build liblzma.*LIB_LIBLZMA.*\\\[.*]" {
+                #disable liblzma due to bug 5183
+                #enable it to verify bug
+                send "Y\r"
+            }
+
+            -re "Build ALSA lib.*LIB_ALSA_LIB.*\\\[.*]" {
+                #lib alsa only works with FDPIC
+                if { $kernel_config == "fdpic_lib" } {
+                    send "Y\r"
+                } else {
+                    send "N\r"
+                }
+            }
+
+            -re "Build ffmpeg.*LIB_FFMPEG.*\\\[.*]" {
+                #lib ffmpeg only works with FDPIC
+                if { $kernel_config == "fdpic_lib" } {
+                    send "Y\r"
+                } else {
+                    send "N\r"
+                }
+            }
+
+            -re "Build DirectFB.*LIB_DIRECTFB.*\\\[.*]" {
+                #lib directfb only works with FDPIC
+                if { $kernel_config == "fdpic_lib" } {
+                    send "Y\r"
+                } else {
+                    send "N\r"
+                }
+            }
+
+            -re "Build tslib.*LIB_TSLIB.*\\\[.*]" {
+                #tslib only works with FDPIC
+                if { $kernel_config == "fdpic_lib" } {
+                    send "Y\r"
+                } else {
+                    send "N\r"
+                }
+            }
+
+#config for Blackfin app
+            -re "EDN's DSP benchmark.*USER_EDN_BENCH.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "lmbench.*USER_LMBENCH.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "devtest.*USER_BLKFIN_APPS_DEVFBAPP_DEVTEST.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "devout.*USER_BLKFIN_APPS_DEVVOUT_DEVOUT.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "rsh.*USER_INETUTILS_RSH.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "rcp.*USER_INETUTILS_RCP.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "rshd.*USER_INETUTILS_RSHD.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "BF561 Core B support tools.*USER_BF561_COREBLD.*\\\[.*]" {
+                if { $board_type == "BF561-EZKIT" } {
+                    send "Y\r"
+                } else {
+                    send "N\r"
+                }
+            }
+
+            -re "pound SSL Wrapper.*USER_POUND.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "pngview.*USER_PNGVIEW.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "IrDA Tools.*USER_IRDA_TOOLS.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "ircp.*USER_IRCP.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "ALSA utils.*USER_ALSA_UTILS.*\\\[.*]" {
+                #depend on lib alsa; lib alsa only works with FDPIC
+                if { $kernel_config == "fdpic_lib" } {
+                    send "Y\r"
+                } else {
+                    send "N\r"
+                }
+            }
+
+            -re "FFmpeg and FFserver.*USER_FFMPEG_APPS.*\\\[.*]" {
+                #depend on lib ffmpeg; lib ffmpeg only works with FDPIC
+                if { $kernel_config == "fdpic_lib" } {
+                    send "Y\r"
+                } else {
+                    send "N\r"
+                }
+            }
+
+            -re "MPC.*USER_MPC.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "MPD.*USER_MPD.*\\\[.*]" {
+                #bug? disable it for fdpic
+                #on elf test machine build pass with net audio, which will enable MPD
+                #here we have more libs enabled, so mpd configuration is different, and it will fail
+                if { $kernel_config == "flat_lib" } {
+                    send "Y\r"
+                } else {
+                    send "N\r"
+                }
+            }
+
+            -re "MPlayer and mencode.*USER_MPLAYER.*\\\[.*]" {
+                #mplayer only supports fdpic format
+                if { $kernel_config == "fdpic_lib" } {
+                    send "Y\r"
+                } else {
+                    send "N\r"
+                }
+            }
+
+            -re "VLC.*USER_VLC.*\\\[.*]" {
+                #disable it for bug 5177
+                #depend on lib ffmpeg; lib ffmpeg only works with FDPIC
+                #if { $kernel_config == "fdpic_lib" } {
+                #    send "Y\r"
+                #} else {
+                    send "N\r"
+                #}
+            }
+
+            -re "usbutils.*USER_USBUTILS.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "Bluez-utils.*USER_BLUEZ.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "BFBLUET-EZEXT Boot Mode Utility.*USER_BFBLUET_EZEXT_UTIL.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "Bluetooth ALSA utility.*USER_BTSCO.*\\\[.*]" {
+                #depend on lib alsa; lib alsa only works with FDPIC
+                if { $kernel_config == "fdpic_lib" } {
+                    send "Y\r"
+                } else {
+                    send "N\r"
+                }
+            }
+
+            -re "pcmciautils.*USER_PCMCIAUTILS.*\\\[.*]" {
+                #depend on libsysfs; disable libsysfs for fdpic due to bug 5182
+                #enable pcmciautils to verify bug 5182
+#                if { $kernel_config == "flat_lib" } {
+                    send "Y\r"
+#                } else {
+#                    send "N\r"
+#                }
+            }
+
+            -re "dagrab.*USER_DAGRAB_DAGRAB.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "can4linux examples.*USER_CAN_EXAMPLES.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "SDL Examples.*USER_SDLEXAMPLES.*\\\[.*]" {
+                #depend on tslib; tslib only works with FDPIC
+                if { $kernel_config == "fdpic_lib" } {
+                    send "Y\r"
+                } else {
+                    send "N\r"
+                }
+            }
+
+            -re "DirectVNC.*USER_DIRECTVNC.*\\\[.*]" {
+                #depend on lib directfb; lib directfb only works with FDPIC
+                if { $kernel_config == "fdpic_lib" } {
+                    send "Y\r"
+                } else {
+                    send "N\r"
+                }
+            }
+
+            -re "DirectFB Examples.*USER_DIRECTFBEXAMPLES.*\\\[.*]" {
+                #depend on lib directfb; lib directfb only works with FDPIC
+                if { $kernel_config == "fdpic_lib" } {
+                    send "Y\r"
+                } else {
+                    send "N\r"
+                }
+            }
+
+            -re "curl.*USER_CURL_CURL.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "U-Boot Tools.*USER_UBOOT_TOOLS.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "I2C Tools.*USER_I2C_TOOLS.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "lsuio.*USER_LSUIO.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "nano.*USER_NANO.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "HS Conv driver and FPGA Tools.*USER_FPGA_HSCONV.*\\\[.*]" {
+                send "Y\r"
+            }
+
+            -re "USB Video Class Driver and Test Application.*USER_UVC_VIDEO.*\\\[.*]" {
+                #depend on tslib; tslib only works with FDPIC
+                #disable it for bug 5178
+                #enable it to verify bug 5178
+                if { $kernel_config == "fdpic_lib" } {
+                    send "Y\r"
+                } else {
+                    send "N\r"
+                }
+            }
+
+            -re "cpufrequtils.*USER_CPUFREQUTILS.*\\\[.*]" {
+                #disable cpufrequtils with fdpic format for bug 5168
+                #enable it to verify bug 5168
+                #if { $kernel_config == "flat_lib" } {
+                    send "Y\r"
+                #} else {
+                #    send "N\r"
+                #}
+            }
+
+            -re "pictureflow.*USER_PICTUREFLOW.*\\\[.*]" {
+                #depend on lib qt; disable pictureflow due to bug 5131
+                send "N\r"
+            }
+
+            -re "sercd.*USER_SERCD.*\\\[.*]" {
+                send "Y\r"
+            }
+
+#microwin
+            -re "MicroWindows.*USER_MICROWIN.*\\\[.*]" {
+                #depend on tslib; tslib only works with FDPIC
+                if { $kernel_config == "fdpic_lib" } {
+                    send "Y\r"
+                } else {
+                    send "N\r"
+                }
+            }
+
+            -re "Microwin.*USER_MICROWIN_MICROWIN.*\\\[.*]" {
+                #depend on tslib; tslib only works with FDPIC
+                if { $kernel_config == "fdpic_lib" } {
+                    send "Y\r"
+                } else {
+                    send "N\r"
+                }
+            }
+
+            -re "NanoX.*USER_MICROWIN_NANOX.*\\\[.*]" {
+                #depend on tslib; tslib only works with FDPIC
+                if { $kernel_config == "fdpic_lib" } {
+                    send "Y\r"
+                } else {
+                    send "N\r"
+                }
+            }
+
+#linphone
+            -re "Linphone, a SIP compatible VoIP phone.*USER_LINPHONE.*\\\[.*]" {
+                #depend on lib alsa; alsa lib only works with FDPIC
+                if { $kernel_config == "fdpic_lib" } {
+                    send "Y\r"
+                } else {
+                    send "N\r"
+                }
+            }
+
+            "\\\(*) \\\[*]" {
+                sleep .05
+                send "\r"
+            }
+
+            -re "\[cC]hoice\\\[.*]:" {
+                send "\r"
+            }
+
+            eof {
+                send_user "End of configuration"
+                break
+            }
+
+            timeout {
+                send_user "\n\nFATAL ERROR: config prompt timeout in make config"
+                exit
+            }
+        }
+    }
+}
+
+step "Make clean"
+
+cd $uclinux_path
+spawn make clean
+set timeout 1200
+set bfin_make_clean_status failure
+while 1 {
+    expect {
+        "Entering directory" { }
+        "Leaving directory" { set bfin_make_clean_status success }
+        "Error" {set bfin_make_clean_status failure }
+        "/bin/sh" { }
+        eof { break }
+        timeout { exit }
+    }
+}
+
+if { $bfin_make_clean_status == "failure" } {
+    send_user "ERROR: Error somewhere during make"
+}
+
+step "Make"
+
+cd $uclinux_path
+spawn make NON_SMP_BUILD=1
+set timeout 10800
+set bfin_make_status failure
+while 1 {
+    expect {
+        "Entering directory" { }
+        "Leaving directory" { set bfin_make_status success }
+        "Error" {set bfin_make_status failure }
+        "/bin/sh" { }
+        eof { break }
+        timeout { exit }
+    }
+}
+
+if { $bfin_make_status == "failure" } {
+    send_user "ERROR: Error somewhere during make"
+}
+
+
+log_file
+
+send_user "Ending build_toolchain_kernel.exp\n"

@@ -2,43 +2,22 @@
 
 ### If there are no detailed logs under test folder, then compare the test_results directly.
 
-toolchain_build=/home/test/work/cruise/test_scripts/toolchain/toolchain-build
-compare_result=0
-
 if [  $# -eq 1 ] ; then
   echo "Give wrong arguments. It could be 0,2,3."
+  exit 1
+fi 
+
+if [  $# -eq 0 ] ; then
+  toolchain_build=/home/test/work/cruise/test_scripts/toolchain/toolchain-build
+  LASTRUN=$toolchain_build/lastrun
+  THISRUN=$toolchain_build/thisrun
 fi    
-
-if [ -e $toolchain_build/thisrun/test_results ] && [ -e $toolchain_build/lastrun/test_results ] ; then 
-       thisrun_test_results=`cat $toolchain_build/thisrun/test_results | grep "exit=" | awk  'BEGIN { FS="[.=]" } {print $2 }'`
-       lastrun_test_results=`cat $toolchain_build/lastrun/test_results | grep "exit=" | awk  'BEGIN { FS="[.=]" } {print $2 }'`
-
-    if [ $thisrun_test_results -ge 2 ] ; then 
-       if [ $thisrun_test_results == $lastrun_test_results ] ; then
-           echo "test results are the same as last time!"
-           exit 0
-       else
-           echo "thisrun test results are $thisrun_test_results! lastrun test results are $lastrun_test_results."
-           exit 1    
-       fi
-   fi
-fi
-
 if [  $# -ge 2 ] ; then
-  SIM=${1%/}
-  HW=${2%/}
-  if [ ! -d $SIM ] ; then
-    echo "$SIM is not a dir"
-    exit 0
-  fi
-  if [ ! -d $HW ] ; then
-    echo "$HW is not a dir"
-    exit 1
-  fi
-else
-    echo "To compare logs needs their path!"
-    exit 1
-fi    
+  LASTRUN=${1%/}
+  LASTRUN=${LASTRUN%/*/*}
+  THISRUN=${2%/}
+  THISRUN=${THISRUN%/*/*}
+fi 
 
 if [  $# -ge 3 ] ; then
   COMPARE=$3
@@ -54,32 +33,75 @@ if [ ! -f $COMPARE ] ; then
   exit 1
 fi
 
-STA=${SIM%/*}
+if [ -e $LASTRUN/test_results ] && [ -e $THISRUN/test_results ] ; then 
+       lastrun_test_results=`cat $LASTRUN/test_results | grep "exit=" | awk  'BEGIN { FS="[.=]" } {print $2 }'`
+       thisrun_test_results=`cat $THISRUN/test_results | grep "exit=" | awk  'BEGIN { FS="[.=]" } {print $2 }'`
+
+    if [ $thisrun_test_results -ge 2 ] ; then 
+       if [ $thisrun_test_results == $lastrun_test_results ] ; then
+           echo "test results are the same as last time!"
+           exit 0
+       else
+           echo "thisrun test results are $thisrun_test_results! lastrun test results are $lastrun_test_results."
+           exit 1    
+       fi
+   fi
+fi
+
+if [  $# -eq 0 ] ; then
+  echo "Try to give more detailed parameter for $0 LASTRUN THISRUN (COMPARE)!"
+  exit 1 
+fi
+
+if [  $# -ge 2 ] ; then
+  LASTRUN_TYPE=${1%/}
+  THISRUN_TYPE=${2%/}
+fi 
+
+if [ $(ls $LASTRUN_TYPE | wc -l ) -eq 0 ] && [ $(ls $THISRUN_TYPE | wc -l ) -eq 0 ] ; then
+    echo "THISRUN_TYPE and LASTRUN_TYPE are both empty"
+    echo "LASTRUN_TYPE: $LASTRUN_TYPE "
+    echo "THISRUN_TYPE: $THISRUN_TYPE "
+    exit 0
+fi
+if [ $(ls $LASTRUN_TYPE | wc -l ) -gt 0 ] && [ $(ls $THISRUN_TYPE | wc -l ) -eq 0 ] ; then
+    echo "LASTRUN_TYPE: $LASTRUN_TYPE is existing"
+    echo "THISRUN_TYPE: $THISRUN_TYPE is empty."
+    exit 1
+fi
+if [ $(ls $LASTRUN_TYPE | wc -l ) -eq 0 ] && [ $(ls $THISRUN_TYPE | wc -l ) -gt 0 ] ; then
+    echo "LASTRUN_TYPE: $LASTRUN_TYPE is empty"
+    echo "THISRUN_TYPE: $THISRUN_TYPE is existing."
+    exit 0
+fi
+
+STA=${LASTRUN_TYPE%/*}
 STA=${STA%/*}
 STA_DIRNAME=`dirname $STA`
 STA_BASENAME=`basename $STA`
 
+compare_result=0
 
-echo  "##################   Comparing ${HW##*/}   ########################## "
+echo  "##################   Comparing ${THISRUN_TYPE##*/}   ########################## "
 cd $STA_DIRNAME ; ls -l $STA_BASENAME | awk '{print  $8 " : " $(10)  }'  
-echo  "First  column is : $SIM "
-echo  "Second column is : $HW "
+echo  "First  column is : $LASTRUN_TYPE "
+echo  "Second column is : $THISRUN_TYPE "
 echo
 
 FILES=`find $1 -name "*.sum" | sort`
 
-if [ $HW ] ; then
-  cd $HW
+if [ $THISRUN_TYPE ] ; then
+  cd $THISRUN_TYPE
   for FILE in $FILES 
   do
     FILE=${FILE##*/}
     echo "                       ******* $FILE ***********"
-    if [ ! -f $SIM/$FILE ] ; then
-        echo "$SIM/$FILE  doesn't exist!"
+    if [ ! -f $LASTRUN_TYPE/$FILE ] ; then
+        echo "$LASTRUN_TYPE/$FILE  doesn't exist!"
         continue
     fi
-    if [ ! -f $HW/$FILE ] ; then
-        echo "$HW/$FILE  doesn't exist!"
+    if [ ! -f $THISRUN_TYPE/$FILE ] ; then
+        echo "$THISRUN_TYPE/$FILE  doesn't exist!"
         continue
     fi
 
@@ -92,10 +114,10 @@ if [ $HW ] ; then
 
     typeset -i cnt=0
 
-    cd $SIM
+    cd $LASTRUN_TYPE
     START=`grep -n Summary $FILE | sed 's/:/ /' | awk '{print $1}'`
     if [ -z "$START" ] ; then
-        echo "$SIM/$FILE  doesn't have Summary!"
+        echo "$LASTRUN_TYPE/$FILE  doesn't have Summary!"
         compare_result=1
         continue
     fi
@@ -111,10 +133,10 @@ if [ $HW ] ; then
    # cat /tmp/tmp_file_123
     
     typeset -i cnt=0 
-    cd $HW
+    cd $THISRUN_TYPE
     START=`grep -n Summary $FILE | sed 's/:/ /' | awk '{print $1}'`
     if [ -z "$START" ] ; then
-        echo "$HW/$FILE  doesn't have Summary!"
+        echo "$THISRUN_TYPE/$FILE  doesn't have Summary!"
         compare_result=1
         continue
     fi
@@ -213,27 +235,27 @@ if [ $HW ] ; then
   do
     FILE=${FILE##*/}
 
-    if [ ! -f $SIM/$FILE ] ; then
-        echo "$SIM/$FILE  doesn't exist!"
+    if [ ! -f $LASTRUN_TYPE/$FILE ] ; then
+        echo "$LASTRUN_TYPE/$FILE  doesn't exist!"
         continue
     fi
-    if [ ! -f $HW/$FILE ] ; then
-        echo "$HW/$FILE  doesn't exist!"
+    if [ ! -f $THISRUN_TYPE/$FILE ] ; then
+        echo "$THISRUN_TYPE/$FILE  doesn't exist!"
         continue
     fi
 
-    RUN=`$COMPARE $SIM/$FILE $HW/$FILE | wc -c`
+    RUN=`$COMPARE $LASTRUN_TYPE/$FILE $THISRUN_TYPE/$FILE | wc -c`
     if [ "$RUN" -ne 0 ] ; then
         echo "#########################################"
         echo "#"
         echo "# Comparing $FILE"
         echo "#"
         echo "########################################"
-        $COMPARE $SIM/$FILE $HW/$FILE
+        $COMPARE $LASTRUN_TYPE/$FILE $THISRUN_TYPE/$FILE
     fi
   done
 else
-  cd $SIM
+  cd $LASTRUN_TYPE
   for FILE in $FILES 
   do
     FILE=${FILE##*/}
@@ -247,5 +269,6 @@ else
   done
 fi
 
+echo $compare_result
 exit $compare_result
 
