@@ -7,6 +7,7 @@ set uclinux_path $user/checkouts/uclinux-dist
 set ttydev /dev/ttyS0
 set send_slow {1 0.1}
 set kernel_config normal
+set allocator slab
 
 
 send_user "The Env Path is: $env(PATH) "
@@ -99,6 +100,29 @@ send "wq\r"
 expect eof
 
 
+step "Config the memory allocation policy."
+
+cd $uclinux_path
+sleep 3
+set timeout 2
+spawn /bin/sh
+while 1 { 
+send -s "svn info\r"
+expect {
+    "trunk" {
+     set allocator slob
+     break
+     }
+
+    "branches" {
+     break
+    }
+ 
+     timeout { break }
+}
+}
+send_log "The allocator is $allocator !"
+
 step "Do separate pre-config."
 
 if { $kernel_config == "kgdb" } {
@@ -154,6 +178,10 @@ while 1 {
 
         -re "Customize Application/Library Settings.*DEFAULTS_VENDOR.*\\\[.*]" {
             send "y\r"
+        }
+
+        -re "Atmel SD/MMC Driver \\\[.*]" {
+            send "M\r"
         }
 
         -nocase -re " \\\(.*\\\) \\\[\[^\r]*] (\[ymn])" {
@@ -213,6 +241,20 @@ while 1 {
         -re "(.*) \\\[Y/\\\?]" {
             #don't select this option
         }
+
+        -re "Choose SLAB allocator.*SLAB.*SLUB.*SLOB.*choice.*\\\[.*]" {
+            if { $allocator == "slab" } {
+                send "1\r"
+            } elseif { $allocator == "slob" } {
+                send "3\r"
+            } elseif { $allocator == "slub" } {
+                send "2\r"
+            } else {
+                send "\r"
+            }
+
+        }
+
 
 #        -re "Silicon Rev.* (\[0-9]+).*choice.*\\\[.*]" {
 #            if { $board_type == "BF561-EZKIT" } {
@@ -374,6 +416,10 @@ while 1 {
 
         -re "mke2fs.*USER_E2FSPROGS_MISC_MKE2FS.*\\\[.*]" {
             send -s "N\r"
+        }
+
+        -re "Atmel SD/MMC Driver \\\[.*]" {
+            send "M\r"
         }
 
         "\\\(*) \\\[*]" {

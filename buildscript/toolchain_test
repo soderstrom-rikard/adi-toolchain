@@ -163,8 +163,8 @@ EOF
   exit  
   fi
 
-#  TEST_TOOLCHAIN_DIR=$USER/temp
- TEST_TOOLCHAIN_DIR=/opt/uClinux
+  TEST_TOOLCHAIN_DIR=$USER/temp
+# TEST_TOOLCHAIN_DIR=/opt/uClinux
 
 
 if [ $BOARD_CONFIG != "NON_EXIST" ] ; then
@@ -224,7 +224,7 @@ fi
 sleep 20
 
 ######## Start testing here.
-
+  cd $TOOLCHAIN_SCRIPTS
   rm $TOOLCHAIN_SCRIPTS/reset_board_log
   $TOOLCHAIN_SCRIPTS/reset_board.exp uImage.$TARGET_KERNEL_CONFIG 1  >/dev/null  2>&1 &
   sleep 200
