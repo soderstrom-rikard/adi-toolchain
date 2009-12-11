@@ -45,7 +45,7 @@
 #define VSTAT			0x0080		/* Voltage Regulator Has Reached Programmed Voltage */
 
 /* VR_CTL Masks */
-#ifdef __ADSPBF52x__
+#if defined(__ADSPBF52x__) || defined(__ADSPBF51x__)
 #define FREQ_MASK		0x3000		/* Switching Oscillator Frequency For Regulator */
 #define FREQ_HIBERNATE		0x0000		/* Powerdown/Bypass On-Board Regulation */
 #define FREQ_1000		0x3000		/* Switching Frequency Is 1 MHz */
@@ -96,7 +96,7 @@
 #define ROTWE			0x2000		/* Rotary Counter Wakeup From Hibernate */
 #define CLKBUFOE		0x4000		/* CLKIN Buffer Output Enable */
 #define CKELOW			0x8000		/* Enable Drive CKE Low During Reset */
-#ifdef __ADSPBF52x__
+#if defined(__ADSPBF52x__) || defined(__ADSPBF51x__)
 #define USBWE			0x0200		/* USB Wakeup From Hibernate */
 #else
 #define USBWE			0x0800		/* USB Wakeup From Hibernate */
