@@ -110,7 +110,7 @@ while 1 {
 send -s "svn info\r"
 expect {
     "trunk" {
-     set allocator slob
+#     set allocator slob
      break
      }
 
@@ -240,6 +240,10 @@ while 1 {
 
         -re "(.*) \\\[Y/\\\?]" {
             #don't select this option
+        }
+
+       -re "Turn on mmap.*excess space trimming before booting.*NOMMU_INITIAL_TRIM_EXCESS.*\\\[.*]" {
+            send -s "0\r"
         }
 
         -re "Choose SLAB allocator.*SLAB.*SLUB.*SLOB.*choice.*\\\[.*]" {
