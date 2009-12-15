@@ -302,6 +302,10 @@ while 1 {
             }
         }
 
+        -re "ATA/ATAPI/MFM/RLL support.*IDE.*\\\[.*]" {
+            send "N\r"
+        }
+
         -re "Kernel debugging.*DEBUG_KERNEL.*\\\[.*]" {
             if { $kernel_config == "kgdb" } {
                 send -s "Y\r"
@@ -412,6 +416,22 @@ while 1 {
 
         -re "Install FLAT shared libraries.*INSTALL_FLAT_SHARED_LIBS.*\\\[.*]" {
             send -s "\r"
+        }
+
+        -re "inetutils.*USER_INETUTILS.*\\\[.*]" {
+            send -s "Y\r"
+        }
+
+        -re "rcp.*USER_INETUTILS_RCP.*\\\[.*]" {
+            send -s "Y\r"
+        }
+
+        -re "rsh.*USER_INETUTILS_RSH.*\\\[.*]" {
+            send -s "Y\r"
+        }
+
+        -re "rshd.*USER_INETUTILS_RSHD.*\\\[.*]" {
+            send -s "Y\r"
         }
 
         -re "e2fsck.*USER_E2FSPROGS_E2FSCK_E2FSCK.*\\\[.*]" {
