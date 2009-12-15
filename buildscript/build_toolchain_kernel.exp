@@ -164,7 +164,7 @@ while 1 {
             send "$expect_out(1,string)\r"
         }
 
-        -re "AnalogDevices Products.* (\[0-9]+). $board_type.*choice.*\\\[.*]" {
+        -re "AnalogDevices Products.* (\[0-9]+). $board_type .*choice.*\\\[.*]" {
             send "$expect_out(1,string)\r"
         }
 
@@ -222,7 +222,7 @@ while 1 {
             send "$expect_out(1,string)\r"
         }
 
-        -re "AnalogDevices Products.* (\[0-9]+). $board_type.*choice.*\\\[.*]" {
+        -re "AnalogDevices Products.* (\[0-9]+). $board_type .*choice.*\\\[.*]" {
             send "$expect_out(1,string)\r"
         }
 
@@ -459,7 +459,7 @@ if { $kernel_config == "flat_lib" || $kernel_config == "fdpic_lib" } {
                 send "$expect_out(1,string)\r"
             }
 
-            -re "AnalogDevices Products.* (\[0-9]+). $board_type.*choice.*\\\[.*]" {
+            -re "AnalogDevices Products.* (\[0-9]+). $board_type .*choice.*\\\[.*]" {
                 send "$expect_out(1,string)\r"
             }
 
@@ -544,7 +544,7 @@ if { $kernel_config == "flat_lib" || $kernel_config == "fdpic_lib" } {
                 send "$expect_out(1,string)\r"
             }
 
-            -re "AnalogDevices Products.* (\[0-9]+). $board_type.*choice.*\\\[.*]" {
+            -re "AnalogDevices Products.* (\[0-9]+). $board_type .*choice.*\\\[.*]" {
                 send "$expect_out(1,string)\r"
             }
 
