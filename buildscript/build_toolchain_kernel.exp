@@ -306,6 +306,11 @@ while 1 {
             send "N\r"
         }
 
+
+        -re "Serial ATA \\\(prod\\\) and Parallel ATA \\\(experimental\\\) drivers.*ATA.*\\\[.*]" {
+            send "N\r"
+        }
+
         -re "Kernel debugging.*DEBUG_KERNEL.*\\\[.*]" {
             if { $kernel_config == "kgdb" } {
                 send -s "Y\r"
