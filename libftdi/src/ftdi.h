@@ -35,17 +35,18 @@ enum ftdi_break_type { BREAK_OFF=0, BREAK_ON=1 };
 /** MPSSE bitbang modes */
 enum ftdi_mpsse_mode
 {
-    BITMODE_RESET  = 0x00,
-    BITMODE_BITBANG= 0x01,
-    BITMODE_MPSSE  = 0x02,
-    BITMODE_SYNCBB = 0x04,
-    BITMODE_MCU    = 0x08,
-    /* CPU-style fifo mode gets set via EEPROM */
-    BITMODE_OPTO   = 0x10,
-    BITMODE_CBUS   = 0x20
+    BITMODE_RESET  = 0x00,    /**< switch off bitbang mode, back to regular serial/FIFO */
+    BITMODE_BITBANG= 0x01,    /**< classical asynchronous bitbang mode, introduced with B-type chips */
+    BITMODE_MPSSE  = 0x02,    /**< MPSSE mode, available on 2232x chips */
+    BITMODE_SYNCBB = 0x04,    /**< synchronous bitbang mode, available on 2232x and R-type chips  */
+    BITMODE_MCU    = 0x08,    /**< MCU Host Bus Emulation mode, available on 2232x chips */
+                              /* CPU-style fifo mode gets set via EEPROM */
+    BITMODE_OPTO   = 0x10,    /**< Fast Opto-Isolated Serial Interface Mode, available on 2232x chips  */
+    BITMODE_CBUS   = 0x20,    /**< Bitbang on CBUS pins of R-type chips, configure in EEPROM before */
+    BITMODE_SYNCFF = 0x40,    /**< Single Channel Synchronous FIFO mode, available on 2232H chips */
 };
 
-/** Port interface for FT2232C */
+/** Port interface for chips with multiple interfaces */
 enum ftdi_interface
 {
     INTERFACE_ANY = 0,
@@ -147,6 +148,16 @@ enum ftdi_interface
    (taken from libusb) */
 #define FTDI_URB_USERCONTEXT_COOKIE ((void *)0x1)
 
+#ifdef __GNUC__
+    #define DEPRECATED(func) func __attribute__ ((deprecated))
+#elif defined(_MSC_VER)
+    #define DEPRECATED(func) __declspec(deprecated) func
+#else
+    #pragma message("WARNING: You need to implement DEPRECATED for this compiler")
+    #define DEPRECATED(func) func
+#endif
+
+
 /**
     \brief Main context structure for all libftdi functions.
 
@@ -179,6 +190,8 @@ struct ftdi_context
     unsigned int readbuffer_chunksize;
     /** write buffer chunk size */
     unsigned int writebuffer_chunksize;
+    /** maximum packet size. Needed for filtering modem status bytes every n packets. */
+    unsigned int max_packet_size;
 
     /* FTDI FT2232C requirecments */
     /** FT2232C interface number: 0 or 1 */
@@ -267,7 +280,7 @@ extern "C"
 #endif
 
     int ftdi_init(struct ftdi_context *ftdi);
-    struct ftdi_context *ftdi_new();
+    struct ftdi_context *ftdi_new(void);
     int ftdi_set_interface(struct ftdi_context *ftdi, enum ftdi_interface interface);
 
     void ftdi_deinit(struct ftdi_context *ftdi);
@@ -286,7 +299,10 @@ extern "C"
     int ftdi_usb_open(struct ftdi_context *ftdi, int vendor, int product);
     int ftdi_usb_open_desc(struct ftdi_context *ftdi, int vendor, int product,
                            const char* description, const char* serial);
+    int ftdi_usb_open_desc_index(struct ftdi_context *ftdi, int vendor, int product,
+                           const char* description, const char* serial, unsigned int index);
     int ftdi_usb_open_dev(struct ftdi_context *ftdi, struct usb_device *dev);
+    int ftdi_usb_open_string(struct ftdi_context *ftdi, const char* description);
 
     int ftdi_usb_close(struct ftdi_context *ftdi);
     int ftdi_usb_reset(struct ftdi_context *ftdi);
@@ -312,7 +328,7 @@ extern "C"
     int ftdi_write_data_async(struct ftdi_context *ftdi, unsigned char *buf, int size);
     void ftdi_async_complete(struct ftdi_context *ftdi, int wait_for_more);
 
-    int ftdi_enable_bitbang(struct ftdi_context *ftdi, unsigned char bitmask);
+    int DEPRECATED(ftdi_enable_bitbang(struct ftdi_context *ftdi, unsigned char bitmask));
     int ftdi_disable_bitbang(struct ftdi_context *ftdi);
     int ftdi_set_bitmode(struct ftdi_context *ftdi, unsigned char bitmask, unsigned char mode);
     int ftdi_read_pins(struct ftdi_context *ftdi, unsigned char *pins);
@@ -347,8 +363,11 @@ extern "C"
     int ftdi_write_eeprom(struct ftdi_context *ftdi, unsigned char *eeprom);
     int ftdi_erase_eeprom(struct ftdi_context *ftdi);
 
+    int ftdi_read_eeprom_location (struct ftdi_context *ftdi, int eeprom_addr, unsigned short *eeprom_val);
+    int ftdi_write_eeprom_location(struct ftdi_context *ftdi, int eeprom_addr, unsigned short eeprom_val);
+
     char *ftdi_get_error_string(struct ftdi_context *ftdi);
- 
+
 #ifdef __cplusplus
 }
 #endif

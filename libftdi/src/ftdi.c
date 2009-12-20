@@ -52,6 +52,28 @@
 
 
 /**
+    Internal function to close usb device pointer.
+    Sets ftdi->usb_dev to NULL.
+    \internal
+
+    \param ftdi pointer to ftdi_context
+
+    \retval  zero if all is fine, otherwise error code from usb_close()
+*/
+static int ftdi_usb_close_internal (struct ftdi_context *ftdi)
+{
+    int ret = 0;
+
+    if (ftdi->usb_dev)
+    {
+       ret = usb_close (ftdi->usb_dev);
+       ftdi->usb_dev = NULL;
+    }
+
+    return ret;
+}
+
+/**
     Initializes a ftdi_context.
 
     \param ftdi pointer to ftdi_context
@@ -71,18 +93,19 @@ int ftdi_init(struct ftdi_context *ftdi)
 
     ftdi->type = TYPE_BM;    /* chip type */
     ftdi->baudrate = -1;
-    ftdi->bitbang_enabled = 0;
+    ftdi->bitbang_enabled = 0;  /* 0: normal mode 1: any of the bitbang modes enabled */
 
     ftdi->readbuffer = NULL;
     ftdi->readbuffer_offset = 0;
     ftdi->readbuffer_remaining = 0;
     ftdi->writebuffer_chunksize = 4096;
+    ftdi->max_packet_size = 0;
 
     ftdi->interface = 0;
     ftdi->index = 0;
     ftdi->in_ep = 0x02;
     ftdi->out_ep = 0x81;
-    ftdi->bitbang_mode = 1; /* 1: Normal bitbang mode, 2: SPI bitbang mode */
+    ftdi->bitbang_mode = 1; /* when bitbang is enabled this holds the number of the mode  */
 
     ftdi->error_str = NULL;
 
@@ -110,7 +133,7 @@ int ftdi_init(struct ftdi_context *ftdi)
 
     \return a pointer to a new ftdi_context, or NULL on failure
 */
-struct ftdi_context *ftdi_new()
+struct ftdi_context *ftdi_new(void)
 {
     struct ftdi_context * ftdi = (struct ftdi_context *)malloc(sizeof(struct ftdi_context));
 
@@ -176,6 +199,8 @@ int ftdi_set_interface(struct ftdi_context *ftdi, enum ftdi_interface interface)
 */
 void ftdi_deinit(struct ftdi_context *ftdi)
 {
+    ftdi_usb_close_internal (ftdi);
+
     if (ftdi->async_usb_buffer != NULL)
     {
         free(ftdi->async_usb_buffer);
@@ -332,7 +357,7 @@ int ftdi_usb_get_strings(struct ftdi_context * ftdi, struct usb_device * dev,
     {
         if (usb_get_string_simple(ftdi->usb_dev, dev->descriptor.iManufacturer, manufacturer, mnf_len) <= 0)
         {
-            usb_close (ftdi->usb_dev);
+            ftdi_usb_close_internal (ftdi);
             ftdi_error_return(-7, usb_strerror());
         }
     }
@@ -341,7 +366,7 @@ int ftdi_usb_get_strings(struct ftdi_context * ftdi, struct usb_device * dev,
     {
         if (usb_get_string_simple(ftdi->usb_dev, dev->descriptor.iProduct, description, desc_len) <= 0)
         {
-            usb_close (ftdi->usb_dev);
+            ftdi_usb_close_internal (ftdi);
             ftdi_error_return(-8, usb_strerror());
         }
     }
@@ -350,19 +375,58 @@ int ftdi_usb_get_strings(struct ftdi_context * ftdi, struct usb_device * dev,
     {
         if (usb_get_string_simple(ftdi->usb_dev, dev->descriptor.iSerialNumber, serial, serial_len) <= 0)
         {
-            usb_close (ftdi->usb_dev);
+            ftdi_usb_close_internal (ftdi);
             ftdi_error_return(-9, usb_strerror());
         }
     }
 
-    if (usb_close (ftdi->usb_dev) != 0)
+    if (ftdi_usb_close_internal (ftdi) != 0)
         ftdi_error_return(-10, usb_strerror());
 
     return 0;
 }
 
 /**
-    Opens a ftdi device given by a usb_device.
+ * Internal function to determine the maximum packet size.
+ * \param ftdi pointer to ftdi_context
+ * \param dev libusb usb_dev to use
+ * \retval Maximum packet size for this device
+ */
+static unsigned int _ftdi_determine_max_packet_size(struct ftdi_context *ftdi, struct usb_device *dev)
+{
+    unsigned int packet_size;
+
+    // Determine maximum packet size. Init with default value.
+    // New hi-speed devices from FTDI use a packet size of 512 bytes
+    // but could be connected to a normal speed USB hub -> 64 bytes packet size.
+    if (ftdi->type == TYPE_2232H || ftdi->type == TYPE_4232H)
+        packet_size = 512;
+    else
+        packet_size = 64;
+
+    if (dev->descriptor.bNumConfigurations > 0 && dev->config)
+    {
+        struct usb_config_descriptor config = dev->config[0];
+
+        if (ftdi->interface < config.bNumInterfaces)
+        {
+            struct usb_interface interface = config.interface[ftdi->interface];
+            if (interface.num_altsetting > 0)
+            {
+                struct usb_interface_descriptor descriptor = interface.altsetting[0];
+                if (descriptor.bNumEndpoints > 0)
+                {
+                    packet_size = descriptor.endpoint[0].wMaxPacketSize;
+                }
+            }
+        }
+    }
+
+    return packet_size;
+}
+
+/**
+    Opens a ftdi device given by an usb_device.
 
     \param ftdi pointer to ftdi_context
     \param dev libusb usb_dev to use
@@ -377,6 +441,7 @@ int ftdi_usb_get_strings(struct ftdi_context * ftdi, struct usb_device * dev,
 int ftdi_usb_open_dev(struct ftdi_context *ftdi, struct usb_device *dev)
 {
     int detach_errno = 0;
+    int config_val = 1;
     if (!(ftdi->usb_dev = usb_open(dev)))
         ftdi_error_return(-4, "usb_open() failed");
 
@@ -392,27 +457,36 @@ int ftdi_usb_open_dev(struct ftdi_context *ftdi, struct usb_device *dev)
         detach_errno = errno;
 #endif
 
+#ifdef __WIN32__
     // set configuration (needed especially for windows)
     // tolerate EBUSY: one device with one configuration, but two interfaces
     //    and libftdi sessions to both interfaces (e.g. FT2232)
-    if (dev->descriptor.bNumConfigurations > 0 &&
-            usb_set_configuration(ftdi->usb_dev, dev->config[0].bConfigurationValue) &&
-            errno != EBUSY)
+
+    if (dev->descriptor.bNumConfigurations > 0)
     {
-        usb_close (ftdi->usb_dev);
-        if (detach_errno == EPERM)
+        // libusb-win32 on Windows 64 can return a null pointer for a valid device
+        if (dev->config)
+            config_val = dev->config[0].bConfigurationValue;
+
+        if (usb_set_configuration(ftdi->usb_dev, config_val) &&
+            errno != EBUSY)
         {
-            ftdi_error_return(-8, "inappropriate permissions on device!");
-        }
-        else
-        {
-            ftdi_error_return(-3, "unable to set usb configuration. Make sure ftdi_sio is unloaded!");
+            ftdi_usb_close_internal (ftdi);
+            if (detach_errno == EPERM)
+            {
+                ftdi_error_return(-8, "inappropriate permissions on device!");
+            }
+            else
+            {
+                ftdi_error_return(-3, "unable to set usb configuration. Make sure ftdi_sio is unloaded!");
+            }
         }
     }
+#endif
 
     if (usb_claim_interface(ftdi->usb_dev, ftdi->interface) != 0)
     {
-        usb_close (ftdi->usb_dev);
+        ftdi_usb_close_internal (ftdi);
         if (detach_errno == EPERM)
         {
             ftdi_error_return(-8, "inappropriate permissions on device!");
@@ -425,14 +499,8 @@ int ftdi_usb_open_dev(struct ftdi_context *ftdi, struct usb_device *dev)
 
     if (ftdi_usb_reset (ftdi) != 0)
     {
-        usb_close (ftdi->usb_dev);
+        ftdi_usb_close_internal (ftdi);
         ftdi_error_return(-6, "ftdi_usb_reset failed");
-    }
-
-    if (ftdi_set_baudrate (ftdi, 9600) != 0)
-    {
-        usb_close (ftdi->usb_dev);
-        ftdi_error_return(-7, "set baudrate failed");
     }
 
     // Try to guess chip type
@@ -462,6 +530,15 @@ int ftdi_usb_open_dev(struct ftdi_context *ftdi, struct usb_device *dev)
             break;
         default:
             break;
+    }
+
+    // Determine maximum packet size
+    ftdi->max_packet_size = _ftdi_determine_max_packet_size(ftdi, dev);
+
+    if (ftdi_set_baudrate (ftdi, 9600) != 0)
+    {
+        ftdi_usb_close_internal (ftdi);
+        ftdi_error_return(-7, "set baudrate failed");
     }
 
     ftdi_error_return(0, "all fine");
@@ -506,6 +583,35 @@ int ftdi_usb_open(struct ftdi_context *ftdi, int vendor, int product)
 int ftdi_usb_open_desc(struct ftdi_context *ftdi, int vendor, int product,
                        const char* description, const char* serial)
 {
+    return ftdi_usb_open_desc_index(ftdi,vendor,product,description,serial,0);
+}
+
+/**
+    Opens the index-th device with a given, vendor id, product id,
+    description and serial.
+
+    \param ftdi pointer to ftdi_context
+    \param vendor Vendor ID
+    \param product Product ID
+    \param description Description to search for. Use NULL if not needed.
+    \param serial Serial to search for. Use NULL if not needed.
+    \param index Number of matching device to open if there are more than one, starts with 0.
+
+    \retval  0: all fine
+    \retval -1: usb_find_busses() failed
+    \retval -2: usb_find_devices() failed
+    \retval -3: usb device not found
+    \retval -4: unable to open device
+    \retval -5: unable to claim device
+    \retval -6: reset failed
+    \retval -7: set baudrate failed
+    \retval -8: get product description failed
+    \retval -9: get serial number failed
+    \retval -10: unable to close device
+*/
+int ftdi_usb_open_desc_index(struct ftdi_context *ftdi, int vendor, int product,
+                       const char* description, const char* serial, unsigned int index)
+{
     struct usb_bus *bus;
     struct usb_device *dev;
     char string[256];
@@ -531,12 +637,12 @@ int ftdi_usb_open_desc(struct ftdi_context *ftdi, int vendor, int product,
                 {
                     if (usb_get_string_simple(ftdi->usb_dev, dev->descriptor.iProduct, string, sizeof(string)) <= 0)
                     {
-                        usb_close (ftdi->usb_dev);
+                        ftdi_usb_close_internal (ftdi);
                         ftdi_error_return(-8, "unable to fetch product description");
                     }
                     if (strncmp(string, description, sizeof(string)) != 0)
                     {
-                        if (usb_close (ftdi->usb_dev) != 0)
+                        if (ftdi_usb_close_internal (ftdi) != 0)
                             ftdi_error_return(-10, "unable to close device");
                         continue;
                     }
@@ -545,19 +651,25 @@ int ftdi_usb_open_desc(struct ftdi_context *ftdi, int vendor, int product,
                 {
                     if (usb_get_string_simple(ftdi->usb_dev, dev->descriptor.iSerialNumber, string, sizeof(string)) <= 0)
                     {
-                        usb_close (ftdi->usb_dev);
+                        ftdi_usb_close_internal (ftdi);
                         ftdi_error_return(-9, "unable to fetch serial number");
                     }
                     if (strncmp(string, serial, sizeof(string)) != 0)
                     {
-                        if (usb_close (ftdi->usb_dev) != 0)
+                        if (ftdi_usb_close_internal (ftdi) != 0)
                             ftdi_error_return(-10, "unable to close device");
                         continue;
                     }
                 }
 
-                if (usb_close (ftdi->usb_dev) != 0)
+                if (ftdi_usb_close_internal (ftdi) != 0)
                     ftdi_error_return(-10, "unable to close device");
+
+                if (index > 0)
+                {
+                    index--;
+                    continue;
+                }
 
                 return ftdi_usb_open_dev(ftdi, dev);
             }
@@ -566,6 +678,110 @@ int ftdi_usb_open_desc(struct ftdi_context *ftdi, int vendor, int product,
 
     // device not found
     ftdi_error_return(-3, "device not found");
+}
+
+/**
+    Opens the ftdi-device described by a description-string.
+    Intended to be used for parsing a device-description given as commandline argument.
+
+    \param ftdi pointer to ftdi_context
+    \param description NULL-terminated description-string, using this format:
+        \li <tt>d:\<devicenode></tt> path of bus and device-node (e.g. "003/001") within usb device tree (usually at /proc/bus/usb/)
+        \li <tt>i:\<vendor>:\<product></tt> first device with given vendor and product id, ids can be decimal, octal (preceded by "0") or hex (preceded by "0x")
+        \li <tt>i:\<vendor>:\<product>:\<index></tt> as above with index being the number of the device (starting with 0) if there are more than one
+        \li <tt>s:\<vendor>:\<product>:\<serial></tt> first device with given vendor id, product id and serial string
+
+    \note The description format may be extended in later versions.
+
+    \retval  0: all fine
+    \retval -1: usb_find_busses() failed
+    \retval -2: usb_find_devices() failed
+    \retval -3: usb device not found
+    \retval -4: unable to open device
+    \retval -5: unable to claim device
+    \retval -6: reset failed
+    \retval -7: set baudrate failed
+    \retval -8: get product description failed
+    \retval -9: get serial number failed
+    \retval -10: unable to close device
+    \retval -11: illegal description format
+*/
+int ftdi_usb_open_string(struct ftdi_context *ftdi, const char* description)
+{
+    if (description[0] == 0 || description[1] != ':')
+        ftdi_error_return(-11, "illegal description format");
+
+    if (description[0] == 'd')
+    {
+        struct usb_bus *bus;
+        struct usb_device *dev;
+        char dev_name[PATH_MAX+1];
+
+        usb_init();
+
+        if (usb_find_busses() < 0)
+            ftdi_error_return(-1, "usb_find_busses() failed");
+        if (usb_find_devices() < 0)
+            ftdi_error_return(-2, "usb_find_devices() failed");
+
+        for (bus = usb_get_busses(); bus; bus = bus->next)
+        {
+            for (dev = bus->devices; dev; dev = dev->next)
+            {
+                snprintf(dev_name, sizeof(dev_name), "%s/%s",bus->dirname,dev->filename);
+                if (strcmp(description+2,dev_name) == 0)
+                    return ftdi_usb_open_dev(ftdi, dev);
+            }
+        }
+
+        // device not found
+        ftdi_error_return(-3, "device not found");
+    }
+    else if (description[0] == 'i' || description[0] == 's')
+    {
+        unsigned int vendor;
+        unsigned int product;
+        unsigned int index=0;
+        const char *serial=NULL;
+        const char *startp, *endp;
+
+        errno=0;
+        startp=description+2;
+        vendor=strtoul((char*)startp,(char**)&endp,0);
+        if (*endp != ':' || endp == startp || errno != 0)
+            ftdi_error_return(-11, "illegal description format");
+
+        startp=endp+1;
+        product=strtoul((char*)startp,(char**)&endp,0);
+        if (endp == startp || errno != 0)
+            ftdi_error_return(-11, "illegal description format");
+
+        if (description[0] == 'i' && *endp != 0)
+        {
+            /* optional index field in i-mode */
+            if (*endp != ':')
+                ftdi_error_return(-11, "illegal description format");
+
+            startp=endp+1;
+            index=strtoul((char*)startp,(char**)&endp,0);
+            if (*endp != 0 || endp == startp || errno != 0)
+                ftdi_error_return(-11, "illegal description format");
+        }
+        if (description[0] == 's')
+        {
+            if (*endp != ':')
+                ftdi_error_return(-11, "illegal description format");
+
+            /* rest of the description is the serial */
+            serial=endp+1;
+        }
+
+        return ftdi_usb_open_desc_index(ftdi, vendor, product, NULL, serial, index);
+    }
+    else
+    {
+        ftdi_error_return(-11, "illegal description format");
+    }
 }
 
 /**
@@ -654,6 +870,8 @@ int ftdi_usb_purge_buffers(struct ftdi_context *ftdi)
     return 0;
 }
 
+
+
 /**
     Closes the ftdi device. Call ftdi_deinit() if you're cleaning up.
 
@@ -672,16 +890,17 @@ int ftdi_usb_close(struct ftdi_context *ftdi)
     ftdi_async_complete(ftdi,1);
 #endif
 
-    if (usb_release_interface(ftdi->usb_dev, ftdi->interface) != 0)
-        rtn = -1;
+    if (ftdi->usb_dev != NULL)
+        if (usb_release_interface(ftdi->usb_dev, ftdi->interface) != 0)
+            rtn = -1;
 
-    if (usb_close (ftdi->usb_dev) != 0)
+    if (ftdi_usb_close_internal (ftdi) != 0)
         rtn = -2;
 
     return rtn;
 }
 
-/*
+/**
     ftdi_convert_baudrate returns nearest supported baud rate to that requested.
     Function is only used internally
     \internal
@@ -794,7 +1013,7 @@ static int ftdi_convert_baudrate(int baudrate, struct ftdi_context *ftdi,
     }
     // Split into "value" and "index" values
     *value = (unsigned short)(encoded_divisor & 0xFFFF);
-    if (ftdi->type == TYPE_2232C)
+    if (ftdi->type == TYPE_2232C || ftdi->type == TYPE_2232H || ftdi->type == TYPE_4232H)
     {
         *index = (unsigned short)(encoded_divisor >> 8);
         *index &= 0xFF00;
@@ -969,6 +1188,9 @@ int ftdi_write_data(struct ftdi_context *ftdi, unsigned char *buf, int size)
 }
 
 #ifdef LIBFTDI_LINUX_ASYNC_MODE
+#ifdef USB_CLASS_PTP
+#error LIBFTDI_LINUX_ASYNC_MODE is not compatible with libusb-compat-0.1!
+#endif
 /* this is strongly dependent on libusb using the same struct layout. If libusb
    changes in some later version this may break horribly (this is for libusb 0.1.12) */
 struct usb_dev_handle
@@ -1221,19 +1443,15 @@ int ftdi_write_data_get_chunksize(struct ftdi_context *ftdi, unsigned int *chunk
     \retval  0: no data was available
     \retval >0: number of bytes read
 
-    \remark This function is not useful in bitbang mode.
-            Use ftdi_read_pins() to get the current state of the pins.
 */
 int ftdi_read_data(struct ftdi_context *ftdi, unsigned char *buf, int size)
 {
     int offset = 0, ret = 1, i, num_of_chunks, chunk_remains;
-    int packet_size;
+    int packet_size = ftdi->max_packet_size;
 
-    // New hi-speed devices from FTDI use a packet size of 512 bytes
-    if (ftdi->type == TYPE_2232H || ftdi->type == TYPE_4232H)
-        packet_size = 512;
-    else
-        packet_size = 64;
+    // Packet size sanity check (avoid division by zero)
+    if (packet_size == 0)
+        ftdi_error_return(-1, "max_packet_size is bogus (zero)");
 
     // everything we want is still in the readbuffer?
     if (size <= ftdi->readbuffer_remaining)
@@ -1381,7 +1599,7 @@ int ftdi_read_data_get_chunksize(struct ftdi_context *ftdi, unsigned int *chunks
 /**
     Enable bitbang mode.
 
-    For advanced bitbang modes of the FT2232C chip use ftdi_set_bitmode().
+    \deprecated use \ref ftdi_set_bitmode with mode BITMODE_BITBANG instead
 
     \param ftdi pointer to ftdi_context
     \param bitmask Bitmask to configure lines.
@@ -1425,12 +1643,12 @@ int ftdi_disable_bitbang(struct ftdi_context *ftdi)
 }
 
 /**
-    Enable advanced bitbang mode for FT2232C chips.
+    Enable/disable bitbang modes.
 
     \param ftdi pointer to ftdi_context
     \param bitmask Bitmask to configure lines.
            HIGH/ON value configures a line as output.
-    \param mode Bitbang mode: 1 for normal mode, 2 for SPI mode
+    \param mode Bitbang mode: use the values defined in \ref ftdi_mpsse_mode
 
     \retval  0: all fine
     \retval -1: can't enable bitbang mode
@@ -1442,15 +1660,15 @@ int ftdi_set_bitmode(struct ftdi_context *ftdi, unsigned char bitmask, unsigned 
     usb_val = bitmask; // low byte: bitmask
     usb_val |= (mode << 8);
     if (usb_control_msg(ftdi->usb_dev, FTDI_DEVICE_OUT_REQTYPE, SIO_SET_BITMODE_REQUEST, usb_val, ftdi->index, NULL, 0, ftdi->usb_write_timeout) != 0)
-        ftdi_error_return(-1, "unable to configure bitbang mode. Perhaps not a 2232C type chip?");
+        ftdi_error_return(-1, "unable to configure bitbang mode. Perhaps selected mode not supported on your chip?");
 
     ftdi->bitbang_mode = mode;
-    ftdi->bitbang_enabled = (mode == BITMODE_BITBANG || mode == BITMODE_SYNCBB)?1:0;
+    ftdi->bitbang_enabled = (mode == BITMODE_RESET) ? 0 : 1;
     return 0;
 }
 
 /**
-    Directly read pin state. Useful for bitbang mode.
+    Directly read pin state, circumventing the read buffer. Useful for bitbang mode.
 
     \param ftdi pointer to ftdi_context
     \param pins Pointer to store pins into
@@ -1941,7 +2159,7 @@ int ftdi_eeprom_build(struct ftdi_eeprom *eeprom, unsigned char *output)
    Decode binary EEPROM image into an ftdi_eeprom structure.
 
    \param eeprom Pointer to ftdi_eeprom which will be filled in.
-   \param output Buffer of \a size bytes of raw eeprom data
+   \param buf Buffer of \a size bytes of raw eeprom data
    \param size size size of eeprom data in bytes
 
    \retval 0: all fine
@@ -2104,6 +2322,24 @@ int ftdi_eeprom_decode(struct ftdi_eeprom *eeprom, unsigned char *buf, int size)
 }
 
 /**
+    Read eeprom location
+
+    \param ftdi pointer to ftdi_context
+    \param eeprom_addr Address of eeprom location to be read
+    \param eeprom_val Pointer to store read eeprom location
+
+    \retval  0: all fine
+    \retval -1: read failed
+*/
+int ftdi_read_eeprom_location (struct ftdi_context *ftdi, int eeprom_addr, unsigned short *eeprom_val)
+{
+    if (usb_control_msg(ftdi->usb_dev, FTDI_DEVICE_IN_REQTYPE, SIO_READ_EEPROM_REQUEST, 0, eeprom_addr, (char *)eeprom_val, 2, ftdi->usb_read_timeout) != 2)
+        ftdi_error_return(-1, "reading eeprom failed");
+
+    return 0;
+}
+
+/**
     Read eeprom
 
     \param ftdi pointer to ftdi_context
@@ -2202,6 +2438,26 @@ int ftdi_read_eeprom_getsize(struct ftdi_context *ftdi, unsigned char *eeprom, i
     while (size<=maxsize && memcmp(eeprom,&eeprom[size/2],size/2)!=0);
 
     return size/2;
+}
+
+/**
+    Write eeprom location
+
+    \param ftdi pointer to ftdi_context
+    \param eeprom_addr Address of eeprom location to be written
+    \param eeprom_val Value to be written
+
+    \retval  0: all fine
+    \retval -1: read failed
+*/
+int ftdi_write_eeprom_location(struct ftdi_context *ftdi, int eeprom_addr, unsigned short eeprom_val)
+{
+    if (usb_control_msg(ftdi->usb_dev, FTDI_DEVICE_OUT_REQTYPE,
+                                    SIO_WRITE_EEPROM_REQUEST, eeprom_val, eeprom_addr,
+                                    NULL, 0, ftdi->usb_write_timeout) != 0)
+        ftdi_error_return(-1, "unable to write eeprom");
+
+    return 0;
 }
 
 /**

@@ -1,3 +1,23 @@
+New in 0.17 - 2009-12-19
+------------------------
+* C++ wrapper: Reduced code duplication and small other changes (Intra2net)
+* Deprecated old ftdi_enable_bitbang() function (Intra2net)
+* New ftdi_usb_open_desc_index() function (Intra2net)
+* Added baud rate test example code (Intra2net)
+* New serial input example code (Jim Paris)
+* Fix modem status byte filtering for USB high speed chips (Intra2net and Jim Paris)
+* Add bitmode for synchronous fifo in FT2232H (Uwe Bonnes)
+* Fix usb_set_configuration() call on Windows 64 (NIL)
+* Fix usb index in ftdi_convert_baudrate() for FT2232H/FT4232H chips (Thimo Eichstaedt)
+* Set initial baudrate on correct interface instead of always the first one (Thimo Eichstaedt)
+* Call usb_set_configuration() on Windows only (Uwe Bonnes)
+* 64 bit and other buildsystem fixes (Uwe Bonnes)
+* Don't build --with-async-mode w/ libusb-compat-0.1 (Clifford Wolf)
+* Functions for read/write of a single eeprom location (Oleg Seiljus)
+* Protect against double close of usb device (Nathan Fraser)
+* Fix out-of-tree-build in python wrapper (Aurelien Jarno)
+* Autoconf and doxygen cleanup (Jim Paris)
+
 New in 0.16 - 2009-05-08
 ------------------------
 * C++ wrapper: Reopen the device after calling get_strings() in Context::open() (Marek Vavruša and Intra2net)

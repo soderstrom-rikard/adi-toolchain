@@ -16,6 +16,8 @@ bin_PROGRAMS = simple \
 	bitbang_ft2232 \
 	bitbang_cbus \
 	find_all \
+	serial_read \
+	baud_test \
 	$(examples_libftdipp)
 
 # Don't install the example files
@@ -27,6 +29,8 @@ bitbang2_SOURCES = bitbang2.c
 bitbang_ft2232_SOURCES = bitbang_ft2232.c
 bitbang_cbus_SOURCES = bitbang_cbus.c
 find_all_SOURCES = find_all.c
+serial_read_SOURCES = serial_read.c
+baud_test_SOURCES = baud_test.c
 
 if HAVE_LIBFTDIPP
 find_all_pp_SOURCES = find_all_pp.cpp
