@@ -2319,7 +2319,7 @@ if ! resume_check ldr-utils ; then
 
     echo_date "Configuring libftdi"
     run_cmd $DIR_LIBFTDI_SOURCE/configure --prefix="$DIR_LIBFTDI_BUILD/destdir" \
-        $BUILD_TARGET $HOST_TARGET --disable-shared --enable-static
+        $BUILD_TARGET $HOST_TARGET --disable-shared --enable-static --disable-libftdipp --disable-python-binding
 
     echo_date "Building libftdi"
     run_cmd $MAKE SUBDIRS=src
