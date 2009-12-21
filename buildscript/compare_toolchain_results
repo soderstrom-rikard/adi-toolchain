@@ -178,24 +178,29 @@ if [ $THISRUN_TYPE ] ; then
               fi
               continue
           else
-              # To deal with the line that appears in middle of one of the two comparing files. 
-              if [ "$RUN1" != "$RUN2" ] && test "$RUN1" && test "$RUN2" && [ "$RUN2" != "Summary for" ] ; then
-                 RUN3=`echo ${sim_file[$(( sim + 1 ))]} | awk '{print $3" "$4}'`
-                 RUN4=`echo ${hw_file[$(( hw + 1 ))]}   | awk '{print $3" "$4}'`
-                    #  echo 33{$RUN1}33{$RUN3}33
-                    #  echo 44{$RUN2}44{$RUN4}44
-                     if [ "$RUN1" = "$RUN4" ] ; then
-                      echo -n -e "\t\t\t\t\t\t${hw_file[$hw]}\t () \n"
-                      (( hw = hw + 1 ))
-                     elif [ "$RUN2" = "$RUN3" ] ; then
-                      echo -n -e "${sim_file[$sim]}\t\t\t\t\t\t\t () \n"
-                      (( sim = sim + 1 ))
-                     fi
-                     continue
-              fi 
-              # Here is the caculation of comparing.
+              RUN3=`echo ${sim_file[$(( sim + 1 ))]} | awk '{print $3" "$4}'`
+              RUN4=`echo ${hw_file[$(( hw + 1 ))]}   | awk '{print $3" "$4}'`
               RUN5=`echo ${sim_file[$sim]} | awk '{print $5}'`
               RUN6=`echo ${hw_file[$hw]}   | awk '{print $5}'`
+              # To deal with the line that appears in middle of one of the two comparing files. 
+              if [ "$RUN1" != "$RUN2" ] && test "$RUN1" && test "$RUN2" && [ "$RUN2" != "Summary for" ] ; then
+              # echo 33{$RUN1}33{$RUN3}33
+              # echo 44{$RUN2}44{$RUN4}44
+                if [ "$RUN2" = "$RUN3" ] ; then
+                    echo -n -e "${sim_file[$sim]}\t\t\t\t\t\t\t (-$RUN5) \n"
+                    (( sim = sim + 1 ))
+                elif [ "$RUN1" = "$RUN4" ] ; then
+                    echo -n -e "\t\t\t\t\t\t${hw_file[$hw]}\t ($RUN6) \n"
+                    (( hw = hw + 1 ))
+                else
+                    echo -n -e "${sim_file[$sim]}\t\t\t\t\t\t\t (-$RUN5) \n"
+                    echo -n -e "\t\t\t\t\t\t${hw_file[$hw]}\t ($RUN6) \n"
+                    (( sim = sim + 1 ))
+                    (( hw = hw + 1 ))
+                fi
+                continue
+              fi 
+              # Here is the caculation of comparing.
               if [ "$RUN5" != "bfin-uclinux" ] && [ "$RUN6" != "bfin-uclinux-fdpic/fdpic" ] && test "$RUN5" && test "$RUN6" ; then
               #echo 55{$RUN5}55
               #echo 66{$RUN6}66
