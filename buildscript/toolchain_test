@@ -12,6 +12,7 @@ FROM=grace.pan@analog.com
 NOTIFY=toolchain-test-notify@blackfin.uclinux.org
 COMPARE_LASTRUN_STATUS=0
 TEST_RESULTS=0
+BUILD_KERNEL=0
 MAIL_LIST=""
 
 #####  target board configs  #######
@@ -211,9 +212,10 @@ if [ $BOARD_CONFIG != "NON_EXIST" ] ; then
   
   else
           if  [ $config = "normal" ] ; then
+              BUILD_KERNEL=1 
               echo  "Build $config kernel fails in toolchain-$TIMESTAMP." >  /tmp/build_toolchain_kernel_log.tail
               grep -nr  "Error" $TOOLCHAIN_BUILDSCRIPT/build_toolchain_kernel_log  -A 20 -B 30 | dos2unix  >>  /tmp/build_toolchain_kernel_log.tail
-              MAIL_LIST="/tmp/build_toolchain_kernel_log.tail " 
+              MAIL_LIST="/tmp/build_toolchain_kernel_log.tail "
           fi
           
           echo  "uImage.$config fails to be built. Please check the log."           
@@ -287,7 +289,7 @@ sleep 20
   log_test_results $TEST_RESULTS
   copy_log
 
-  if [ $COMPARE_LASTRUN_STATUS -eq 1 ] ; then
+  if [ $COMPARE_LASTRUN_STATUS -eq 1 ] || [ $BUILD_KERNEL -eq 1 ] ; then
   send_mail "Fail in testing $TOOLCHAIN_VERSION toolchain on $BOARD_CONFIG ($HOST_IP)"  $BUILD/test_results  $MAIL_LIST 
   else
   send_mail "Better than lastrun in testing $TOOLCHAIN_VERSION toolchain on $BOARD_CONFIG ($HOST_IP)"  $BUILD/test_results 
