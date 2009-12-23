@@ -1,3 +1,8 @@
+2009-12-23  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/bfin-dis.c (decode_dsp32shiftimm_0): Support
+	An = An << uimm5. And limit value in An.x to 8 bits.
+
 2009-11-13  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/bfin-dis.c (decode_ALU2op_0): Correct set flags.

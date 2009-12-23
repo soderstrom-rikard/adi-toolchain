@@ -3011,10 +3011,9 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
     }
   else if (sop == 2 && sopcde == 3 && HLs == 1)
     unhandled_instruction ("A1 = ROT A1 BY imm6");
-  else if (sop == 0 && sopcde == 3 && bit8 == 0)
-    unhandled_instruction ("An = An << imm6");
   else if (sop == 0 && sopcde == 3 && bit8 == 1)
     {
+      /* An = An >>> uimm5 */
       /* Arithmetic shift, so shift in sign bit copies.  */
       bu64 acc = HLs ? get_extended_acc1 () : get_extended_acc0 ();
       acc >>= uimm5 (newimmag);
@@ -3025,37 +3024,41 @@ decode_dsp32shiftimm_0 (bu16 iw0, bu16 iw1, bu32 pc)
 	acc &= ~(-(1ULL << 39));
       if (HLs)
 	{
-	  STORE (A1XREG, acc >> 32);
+	  STORE (A1XREG, (acc >> 32) & 0xFF);
 	  STORE (A1WREG, acc & 0xFFFFFFFF);
 	}
       else
 	{
-	  STORE (A0XREG, acc >> 32);
+	  STORE (A0XREG, (acc >> 32) & 0xFF);
 	  STORE (A0WREG, acc & 0xFFFFFFFF);
 	}
     }
-  else if (sop == 1 && sopcde == 3)
+  else if ((sop == 0 && sopcde == 3 && bit8 == 0)
+	   || (sop == 1 && sopcde == 3))
     {
+      /* An = An << uimm5 */
+      /* An = An >> uimm5 */
       bu64 acc = HLs ? saved_state.a1x : saved_state.a0x;
       /* Logical shift, so shift in zeroes.  */
       acc &= 0xFF;
       acc <<= 32;
       acc |= HLs ? saved_state.a1w : saved_state.a0w;
 
-      acc >>= uimm5 (newimmag);
+      if (sop == 0)
+	acc <<= uimm5 (immag);
+      else
+	acc >>= uimm5 (newimmag);
       if (HLs)
 	{
-	  saved_state.a1x = acc >> 32;
+	  saved_state.a1x = (acc >> 32) & 0xFF;
 	  saved_state.a1w = acc;
 	}
       else
 	{
-	  saved_state.a0x = acc >> 32;
+	  saved_state.a0x = (acc >> 32) & 0xFF;
 	  saved_state.a0w = acc;
 	}
     }
-  else if (sop == 1 && sopcde == 3 && HLs == 1)
-    unhandled_instruction ("A1 = A1 >> imm6");
   else if (sop == 2 && sopcde == 3 && HLs == 0)
     unhandled_instruction ("A0 = ROT A0 BY imm6");
   else if (sop == 1 && sopcde == 1)
