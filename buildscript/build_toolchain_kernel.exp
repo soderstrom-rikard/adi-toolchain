@@ -387,6 +387,11 @@ while 1 {
             send -s "N\r"
         }
 
+        -re "USB support.*USB_SUPPORT.*\\\[.*]" {
+            send -s "N\r"
+        }
+
+
         -re "Blackfin On-Chip Watchdog Timer.*BFIN_WDT.*\\\[.*]" {
             send -s "N\r"
         }
