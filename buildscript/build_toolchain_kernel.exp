@@ -7,7 +7,7 @@ set uclinux_path $user/checkouts/uclinux-dist
 set ttydev /dev/ttyS0
 set send_slow {1 0.1}
 set kernel_config normal
-set allocator slab
+set allocator ""  
 
 
 send_user "The Env Path is: $env(PATH) "
@@ -28,6 +28,14 @@ if { $argc >= 2} {
 if { $argc >= 3} {
     set uclinux_path       [lindex $argv 2]
     send_log "\n#### uclinux_path is $uclinux_path\n"
+}
+
+if { $board_type == "BF561-EZKIT" } {
+    set revision 0.5
+} elseif { $board_type == "BF527-EZKIT" } {
+    set revision 0.2
+} else {
+    set revision default
 }
 
 proc step { message } {
@@ -259,14 +267,13 @@ while 1 {
 
         }
 
-
-#        -re "Silicon Rev.* (\[0-9]+).*choice.*\\\[.*]" {
-#            if { $board_type == "BF561-EZKIT" } {
-#                send -s "1\r"
-#            } else {
-#                send -s "\r"
-#            }
-#        }
+        -re "Silicon Rev.* (\[0-9]+). $revision.*choice.*\\\[.*]" {
+            if { $board_type == "BF561-EZKIT" || $board_type == "BF527-EZKIT" } {
+                send "$expect_out(1,string)\r"
+            } else {
+                send "\r"
+            }
+        }
 
 #     -re "Enable the memory protection unit.*MPU.*\\\[.*]" {
 #           if { $board_type == "BF537-STAMP" } {
