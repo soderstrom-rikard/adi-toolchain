@@ -29,6 +29,7 @@ if [ $# -gt 0 ] ; then
  fi
 fi
 
+cp $TOOLCHAIN_BUILDSCRIPT/reset_board.exp $TOOLCHAIN_SCRIPTS
 rm $TOOLCHAIN_SCRIPTS/reset_board_log  >/dev/null  2>&1
 $TOOLCHAIN_SCRIPTS/reset_board.exp uImage.$TARGET_KERNEL_CONFIG  >/dev/null  2>&1
 
