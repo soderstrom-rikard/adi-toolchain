@@ -7,6 +7,7 @@ set send_slow {1 0.1}
 set password "blackfin"
 set download_file uImage
 set wait_log 0
+set board_type ""
 
 cd /home/test/work/cruise/test_scripts/toolchain
 
@@ -176,25 +177,27 @@ while 1 {
 
 step "Match the prompt info."
 
-set timeout 50
+set timeout 30
     while 1 {
         expect {
-           -re "Board: ADI (BF\[0-9]{3}).*board.*Hit any key" {
-             set board_type $expect_out(1,string)
-             send_log "\nBoard type is $board_type.\n"
-             send "\r"
-             break
+           -re "Board: ADI (BF\[0-9]{3}).*board" {
+              set board_type $expect_out(1,string)
+              send_log "\nBoard type is $board_type.\n"
             }
 
-            " 2 " {
-             send "\r"
-             send "reset\r"
+            -re "Hit any key| \[0-5] " {
+              if { $board_type == "" } {
+              send "reset\r"
+              } else {
+              send "\r"
+              break
+              }
             }
 
             timeout {
-             send "\r"
-             send_user "u-boot miss the hit any key prompt\n"
-             break
+              send "\r"
+              send_user "u-boot miss the hit any key prompt\n"
+              break
             }
         }
     }
@@ -256,7 +259,7 @@ sleep 5
 send "\r"
 expect "root:/>"
 
-send -s "ls -l /bin/rcp\r"
+send -s "ls -l /bin/rcp /lib\r"
 while 1 {
    sleep 3
    expect {

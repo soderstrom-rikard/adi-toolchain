@@ -29,7 +29,6 @@ if [ $# -gt 0 ] ; then
  fi
 fi
 
-cp $TOOLCHAIN_BUILDSCRIPT/reset_board.exp $TOOLCHAIN_SCRIPTS
 rm $TOOLCHAIN_SCRIPTS/reset_board_log  >/dev/null  2>&1
 $TOOLCHAIN_SCRIPTS/reset_board.exp uImage.$TARGET_KERNEL_CONFIG  >/dev/null  2>&1
 
@@ -213,10 +212,10 @@ if [ $BOARD_CONFIG != "NON_EXIST" ] ; then
   
   else
           if  [ $config = "normal" ] ; then
-              BUILD_KERNEL=1 
               echo  "Build $config kernel fails in toolchain-$TIMESTAMP." >  /tmp/build_toolchain_kernel_log.tail
               grep -nr  "Error" $TOOLCHAIN_BUILDSCRIPT/build_toolchain_kernel_log  -A 20 -B 30 | dos2unix  >>  /tmp/build_toolchain_kernel_log.tail
               MAIL_LIST="/tmp/build_toolchain_kernel_log.tail "
+              BUILD_KERNEL=1 
           fi
           
           echo  "uImage.$config fails to be built. Please check the log."           
