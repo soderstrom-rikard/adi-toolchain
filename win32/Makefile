@@ -31,4 +31,5 @@ gnICE-drivers.zip: Prerequisites/CDM*.zip Prerequisites/gnICE/*
 	rm -f ftdi.patch ; \
 	sed -r -i '/(^|[^\r])$$/s:$$:\r:' *.inf *.xml ; \
 	cd .. ; \
+	Prerequisites/driver-signing/sign.sh >/dev/null || : ; \
 	zip -r -q gnICE-drivers.zip gnICE-drivers
