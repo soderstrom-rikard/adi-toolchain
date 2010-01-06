@@ -443,11 +443,8 @@ if [ ! "$MAKE" ] ; then
 fi
 if [ "$NUM_JOBS" -eq "0" ] ; then
 	NUM_JOBS=`grep -sc "^processor" /proc/cpuinfo`
-	if [ -n "$NUM_JOBS" ] ; then
-		NUM_JOBS=`expr $NUM_JOBS '*' 2`
-	else
-		NUM_JOBS=2
-	fi
+	: $(( NUM_JOBS *= 2 ))
+	[ ${NUM_JOBS} -eq 0 ] && NUM_JOBS=2
 fi
 export MAKEFLAGS="-j$NUM_JOBS $MAKEFLAGS"
 echo "Utilizing make: $MAKE $MAKEFLAGS"
