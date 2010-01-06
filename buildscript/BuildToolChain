@@ -975,7 +975,7 @@ die_with_log()
     # Create a single file so users can email it to us,
     # we sleep, so things can finish writing to the log file
     sleep 1
-    tar -jhcf $DIR_LOG/config.logs.tbz2 `find $DIR_BUILD -name "config.log"` $ACTUAL_LOGFILE
+    tar -jhcf "$DIR_LOG"/config.logs.tbz2 $(find "$DIR_BUILD" -name "config.log") "$ACTUAL_LOGFILE"
 
     if [ "$NUM_JOBS" -eq "1" ]; then
         echo "When reporting issue, we may ask for $DIR_LOG/config.logs.tbz2"
