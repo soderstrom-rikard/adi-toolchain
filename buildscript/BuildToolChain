@@ -994,12 +994,16 @@ log_it()
     eval "printf '###\n%s\n\n' '$*'" ${LOGFILE}
 }
 
-run_cmd()
+run_cmd_nodie()
 {
     log_it "$@"
     # since logfile might contain redirection, we need to `eval`
     # since args might contain whitespace, we need to requote
-    eval \($(requote "$@")\) ${LOGFILE} || die_with_log
+    eval \($(requote "$@")\) ${LOGFILE}
+}
+run_cmd()
+{
+	run_cmd_nodie "$@" || die_with_log
 }
 
 check_installed_files()
@@ -1430,15 +1434,13 @@ clean_hardware()
 {
     hardware=`echo $1 | grep -i hardware`
     if [ -n "$hardware" ] ; then
-        RUN=`rsh -l root $TARGET_IPADDR free`
-        (echo "echo -e '###\n$RUN\nCleaning\n' $LOGFILE" ) | sh
-        rsh -l root $TARGET_IPADDR "rm *" 2>/dev/null
-        rsh -l root $TARGET_IPADDR "rm /tmp/*" 2>/dev/null
-        RUN=`rsh -l root $TARGET_IPADDR free`
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        run_cmd_nodie rsh -l root $TARGET_IPADDR free
+        run_cmd_nodie rsh -l root $TARGET_IPADDR "rm *"
+        run_cmd_nodie rsh -l root $TARGET_IPADDR "rm /tmp/*"
+        run_cmd_nodie rsh -l root $TARGET_IPADDR free
 
         #we dump something onto the console so we can track which application caused a crash
-        rsh -l root $TARGET_IPADDR "echo > /dev/console; echo "testing $1 $2" > /dev/console"
+        run_cmd_nodie rsh -l root $TARGET_IPADDR "echo > /dev/console; echo testing $1 $2 > /dev/console"
     fi
 
 }
@@ -1746,40 +1748,34 @@ run_tests ()
     echo_date "Running tests on binutils"
 
     change_dir $DIR_BINUTILS_BUILD
-    RUN="$MAKE -k -j 1 maybe-check-binutils maybe-check-gas maybe-check-ld maybe-check-sim"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh &
+    run_cmd_nodie $MAKE -k -j 1 maybe-check-binutils maybe-check-gas maybe-check-ld maybe-check-sim &
     check_tests_OK $! binutils $1
 
     # make clean the gdb dir before testing since insight cannot run
     # in the build directory. :(
     change_dir $DIR_BINUTILS_BUILD/gdb
-    RUN="$MAKE clean"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh
+    run_cmd_nodie $MAKE clean
 
     # Get rid of old Xvfb & rsh processes, which might be lurking around from old runs
-    RUN=`ps aux | grep Xvfb | grep -v grep | wc -l`
-    if [ $RUN -gt 0 ] ; then
+    RUN="ps aux | grep Xvfb | grep -v grep"
+    if [ -n "`$RUN`" ] ; then
         echo "Found old Xvfb process, killing it"
-        RUN="ps aux | grep Xvfb | grep -v grep ; killall -9 Xvfb"
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        RUN="${RUN} ; killall -9 Xvfb"
+        log_it $RUN
         (echo "($RUN) $LOGFILE" ) | sh
     fi
-    RUN=`ps aux | grep rsh | grep -v grep | wc -l`
-    if [ $RUN -gt 0 ] ; then
+    RUN="ps aux | grep rsh | grep -v grep"
+    if [ -n "`$RUN`" ] ; then
         echo "Found old rsh process, killing it"
-        RUN="ps aux | grep rsh | grep -v grep ; killall -9 rsh"
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+        RUN="${RUN} ; killall -9 rsh"
+        log_it $RUN
         (echo "($RUN) $LOGFILE" ) | sh
     fi
 
     clean_hardware $2 gdb
     echo_date "Running tests on gdb"
 
-    RUN="$MAKE -k -j 1 check"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    (echo $RUN $LOGFILE ; ) | sh &
+    run_cmd_nodie $MAKE -k -j 1 check &
     check_tests_OK $! gdb $1
 
     change_dir $DIR_BINUTILS_BUILD
@@ -1792,17 +1788,13 @@ run_tests ()
 
         # start the tests
         echo_date "Running tests on gcc $GCC_VERSION"
-        RUN="$MAKE -k -j 1 check"
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo $RUN $LOGFILE ; ) | sh &
+        run_cmd_nodie $MAKE -k -j 1 check &
         check_tests_OK $! gcc $1
 
 	clean_hardware $2 libs
 	change_dir $DIR_GCC_BUILD
 	echo_date  "Running tests on libs"
-        RUN="$MAKE -k -j 1 check-target"
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-        (echo $RUN $LOGFILE ; ) | sh &
+        run_cmd_nodie $MAKE -k -j 1 check-target &
         check_tests_OK $! libraries $1
 
         copy_test_results $1 ${GCC_VERSION}
@@ -2131,9 +2123,7 @@ if [ $KERNEL_SOURCE ] ; then
     if ! resume_check uclibc.host-utils ; then
 
     echo_date  "Building uClibc host utils"
-    RUN="$MAKE -C utils hostutils $ARGS"
-    (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
-    if (echo $RUN $LOGFILE ; ) | sh ; then
+    if run_cmd_nodie $MAKE -C utils hostutils $ARGS ; then
         run_cmd mkdir -p $DIR_LINUX_OUTPUT/bin
         for RUN in ldconfig ldd ; do
             run_cmd cp utils/${RUN}.host $DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-${RUN}
@@ -2185,7 +2175,7 @@ if [ $KERNEL_SOURCE ] ; then
         # Remove all tools from build directory. Thus the installed ones
         # are tested. This way gcc will use ld wrapper provided by elf2flt.
         change_dir $DIR_BINUTILS_BUILD
-        ( echo "$MAKE clean " $LOGFILE ; ) | sh
+        run_cmd_nodie $MAKE clean
 
         run_tests $DIR_TEST_HW_RESULTS hardware-flat
     fi
@@ -2212,7 +2202,7 @@ if [ $KERNEL_SOURCE ] ; then
         # Remove all tools from build directory. Thus the installed ones
         # are tested. This way gcc will use ld wrapper provided by elf2flt.
         change_dir $DIR_BINUTILS_BUILD
-        ( echo "$MAKE clean " $LOGFILE ; ) | sh
+        run_cmd_nodie $MAKE clean
 
         run_tests $DIR_TEST_HW2_RESULTS hardware-fdpic
     fi
