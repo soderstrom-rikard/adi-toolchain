@@ -20,7 +20,6 @@
    Foundation, Inc., 51 Franklin Street, Fifth Floor,
    Boston, MA 02110-1301, USA.  */
 
-#include "sysdep.h"
 #include "gdb/callback.h"
 #include "gdb/remote-sim.h"
 #include "sim-config.h"

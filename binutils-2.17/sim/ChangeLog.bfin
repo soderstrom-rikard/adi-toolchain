@@ -1,3 +1,9 @@
+2010-01-07  Jie Zhang  <jie.zhang@analog.com>
+
+	* bfin/interp.c: Don't include "sysdep.h".
+	Include <stdio.h>, <stdlib.h> and <string.h>.
+	* bfin/bfin-sim.h: Don't include "sysdep.h".
+
 2009-12-23  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin/bfin-dis.c (decode_dsp32shiftimm_0): Support

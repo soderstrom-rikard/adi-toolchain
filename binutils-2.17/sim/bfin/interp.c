@@ -22,12 +22,14 @@
 
 #include "config.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <signal.h>
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
-#include "sysdep.h"
 #include "bfd.h"
 #include "gdb/callback.h"
 #include "gdb/signals.h"
