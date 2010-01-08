@@ -36,6 +36,7 @@ START=$(date +%s)
 #Uncomment only one of these
 #TIMESTAMP=`date +%Y-%b-%d-%H-%M` # is YYYY_MMM_DD_HH_MM
 TIMESTAMP=`date +%Y%m%d`       # is YYYY_MMM_DD
+unset DATE_STAMP
 
 PREREQ_FILE="autoconf automake awk /bin/sh bison cp echo flex gcc gettext grep ln m4 make makeinfo mkdir msgfmt mv rm sed tail wc which pkg-config"
 PREREQ_HW_TESTS=" ping rsh rcp"
@@ -588,11 +589,7 @@ if [ "x$CHECK_ON_SIMULATOR" != "x" -o "x$CHECK_ON_HARDWARE" != "x" ] ; then
 fi
 
 if [ -n "$CHECK_ON_SIMULATOR" ] ; then
-    if [ $DATE_STAMP ] ; then
-        DIR_TEST_SIM_RESULTS=$DIR_TEST_RESULTS/simulator-$TIMESTAMP
-    else
-        DIR_TEST_SIM_RESULTS=$DIR_TEST_RESULTS/simulator
-    fi
+    DIR_TEST_SIM_RESULTS=$DIR_TEST_RESULTS/simulator${DATE_STAMP+-${TIMESTAMP}}
     if [ ! -d $DIR_TEST_SIM_RESULTS ] ; then
         mkdir $DIR_TEST_SIM_RESULTS
     else
@@ -634,13 +631,8 @@ if [ $CHECK_ON_HARDWARE ] ; then
         ps aux | grep rsh | grep -v grep ; killall -9 rsh
     fi
 
-    if [ $DATE_STAMP ] ; then
-        DIR_TEST_HW_RESULTS=$DIR_TEST_RESULTS/hardware-flat-$TIMESTAMP
-        DIR_TEST_HW2_RESULTS=$DIR_TEST_RESULTS/hardware-fdpic-$TIMESTAMP
-    else
-        DIR_TEST_HW_RESULTS=$DIR_TEST_RESULTS/hardware-flat
-        DIR_TEST_HW2_RESULTS=$DIR_TEST_RESULTS/hardware-fdpic
-    fi
+    DIR_TEST_HW_RESULTS=$DIR_TEST_RESULTS/hardware-flat${DATE_STAMP+-${TIMESTAMP}}
+    DIR_TEST_HW2_RESULTS=$DIR_TEST_RESULTS/hardware-fdpic${DATE_STAMP+-${TIMESTAMP}}
     if [ ! -d $DIR_TEST_HW_RESULTS ] ; then
         mkdir $DIR_TEST_HW_RESULTS
     else
@@ -901,35 +893,20 @@ fi
 
 ###################### set up log file ###########################
 
-if [ $DATE_STAMP ] ; then
-    echo "Creating log file           $DIR_LOG/log.$TIMESTAMP"
-    if [ $VERBOSE ]; then
-        LOGFILE="| tee -a $DIR_LOG/log.$TIMESTAMP"
-        ACTUAL_LOGFILE=$DIR_LOG/log.$TIMESTAMP
-    else
-        if [ $WARN ] ; then
-            echo "*** Warnings going to $DIR_LOG/warn.$TIMESTAMP"
-            LOGFILE=">> $DIR_LOG/log.$TIMESTAMP 2>> $DIR_LOG/warn.$TIMESTAMP"
-            ACTUAL_LOGFILE=$DIR_LOG/warn.$TIMESTAMP
-        else
-            LOGFILE=">> $DIR_LOG/log.$TIMESTAMP 2>&1"
-            ACTUAL_LOGFILE=$DIR_LOG/log.$TIMESTAMP
-        fi
-    fi
+STDOUT_LOG="$DIR_LOG/log${DATE_STAMP+.${TIMESTAMP}}"
+STDERR_LOG="$DIR_LOG/warn${DATE_STAMP+.${TIMESTAMP}}"
+echo "Creating log file           ${STDOUT_LOG}"
+if [ $VERBOSE ]; then
+    LOGFILE="| tee -a ${STDOUT_LOG}"
+    ACTUAL_LOGFILE=${STDOUT_LOG}
 else
-    echo "Creating log file           $DIR_LOG/log"
-    if [ $VERBOSE ]; then
-        LOGFILE="| tee -a $DIR_LOG/log"
-        ACTUAL_LOGFILE=$DIR_LOG/log
+    if [ $WARN ] ; then
+        echo "*** Warnings going to $DIR_LOG/warn"
+        LOGFILE=">> ${STDOUT_LOG} 2>> ${STDERR_LOG}"
+        ACTUAL_LOGFILE=${STDERR_LOG}
     else
-        if [ $WARN ] ; then
-            echo "*** Warnings going to $DIR_LOG/warn"
-            LOGFILE=">> $DIR_LOG/log 2>> $DIR_LOG/warn"
-            ACTUAL_LOGFILE=$DIR_LOG/warn
-        else
-            LOGFILE=">> $DIR_LOG/log 2>&1"
-            ACTUAL_LOGFILE=$DIR_LOG/log
-        fi
+        LOGFILE=">> ${STDOUT_LOG} 2>&1"
+        ACTUAL_LOGFILE=${STDOUT_LOG}
     fi
 fi
 
