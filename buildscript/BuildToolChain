@@ -1804,7 +1804,7 @@ run_tests ()
 
 build_uClibc()
 {
-    ARGS="V=1 CROSS=bfin-elf- DEVEL_PREFIX=/usr/ RUNTIME_PREFIX=/ ARCH_CFLAGS='$UCLIBC_CFLAGS -Wa,--noexecstack'"
+    ARGS="V=1 CROSS=bfin-elf-"
 
     echo_date "Cleaning uClibc"
     run_cmd $MAKE clean $ARGS
@@ -1958,15 +1958,24 @@ if [ $KERNEL_SOURCE ] ; then
 
     ####################### Step 3 - build uClibc ################
 
-    change_dir $UCLIBC_SOURCE
+	do_opt() {
+		local opt="$1"
+		shift
+		log_it "uClibc config update: $*"
+		sed -i.tmp \
+			-e "/^\# ${opt} is not set/d" \
+			-e "/^${opt}=.*/d" \
+			.config
+		echo "$*" >> .config
+	}
+	set_opt() {
+		local opt="$1"
+		shift
+		do_opt ${opt} "${opt}=${*:-y}"
+	}
+	unset_opt() { do_opt ${opt} "# $1 is not set" ; }
 
-    if [ -n "$UCLIBC_CONFIG_FILE" ]; then
-      cp $UCLIBC_CONFIG_FILE .tmp.config.provided
-      mv -f .config .config.bk
-      cat .tmp.config.provided | grep -v '^\(# \|\)\(ARCH_HAS_NO_SHARED\|HAVE_NO_PIC\|DOPIC\|HAVE_SHARED\|TARGET_SUBARCH\|BUILD_UCLIBC_LDSO\|SUPPORT_LD_DEBUG\|FORCE_SHAREABLE_TEXT_SEGMENTS\|RUNTIME_\|DEVEL_\|MULTILIB\|KERNEL_HEADERS\|LDSO_RUNPATH\|SHARED_LIB_LOADER_PREFIX\|UCLIBC_EXTRA_CFLAGS\)' |grep -v UCLIBC_FORMAT_ >.config.in
-      echo 'RUNTIME_PREFIX="/"' >>.config.in
-      echo 'DEVEL_PREFIX="/usr/"' >>.config.in
-    fi
+    change_dir $UCLIBC_SOURCE
 
     MULTILIBS=`bfin-elf-gcc --print-multi-lib`
 
@@ -1984,116 +1993,69 @@ if [ $KERNEL_SOURCE ] ; then
 
 	echo_date "Configuring uClibc for ${dir}"
 
-	if echo "${flags}" | grep -q mfdpic; then
+	case ${flags} in
+	*mfdpic*)
+		uclibc_sysroot="$DIR_LINUX_OUTPUT/bfin-linux-uclibc"
+		uclibc_dir1=`echo ${dir} | sed -e 's/mfdpic//' -e 's|/$||'`
+		uclibc_dir2=
+		;;
+	*)
+		uclibc_sysroot="$DIR_uC_OUTPUT/bfin-uclinux"
+		uclibc_dir1=
+		uclibc_dir2=${dir}
+		;;
+	esac
 
-	    dir2=`echo ${dir} | sed -e 's/mfdpic//' -e 's|/$||'`
+	cp ${UCLIBC_CONFIG_FILE:-extra/Configs/Config.bfin.default} .config
+	set_opt KERNEL_HEADERS \"$DIR_KBUILD_OUTPUT/usr/include\"
+	set_opt MULTILIB \"${uclibc_dir2}\"
+	set_opt UCLIBC_EXTRA_CFLAGS \"${flags} ${UCLIBC_CFLAGS} -Wa,--noexecstack\"
+	set_opt RUNTIME_PREFIX \"/\"
+	set_opt DEVEL_PREFIX \"/usr/\"
 
-	    if [ -z "$UCLIBC_CONFIG_FILE" ]; then
-		cp extra/Configs/Config.bfinfdpic.default .config
-	    else
-		cp .config.in .config
-		echo 'FORCE_SHAREABLE_TEXT_SEGMENTS=y' >>.config
-		echo 'LDSO_LDD_SUPPORT=y' >>.config
-		echo 'LDSO_CACHE_SUPPORT=y' >>.config
-		echo '# LDSO_RUNPATH is not set' >>.config
-		echo 'HAVE_SHARED=y' >>.config
-		echo 'UCLIBC_BUILD_RELRO=y' >>.config
-		echo 'UCLIBC_BUILD_NOEXECSTACK=y' >>.config
-		echo 'UCLIBC_STATIC_LDCONFIG=y' >>.config
-		echo 'DOPIC=y' >>.config
-		echo 'LDSO_BASE_FILENAME="ld.so"' >>.config
-		echo 'SHARED_LIB_LOADER_PREFIX="/lib"' >>.config
-		echo 'SUPPORT_LD_DEBUG=y' >>.config
-	    fi
-	    echo 'UCLIBC_FORMAT_FDPIC_ELF=y' >>.config
-	    echo '# UCLIBC_FORMAT_FLAT is not set' >>.config
-	    echo '# UCLIBC_FORMAT_SHARED_FLAT is not set' >>.config
-	    echo '# UCLIBC_FORMAT_FLAT_SEP_DATA is not set' >>.config
-	    echo "KERNEL_HEADERS=\"$DIR_KBUILD_OUTPUT/usr/include\"" >>.config
-	    echo "MULTILIB=\"\"" >>.config
-	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
+	case ${flags} in
+	*mfdpic*)             uclibc_format="FDPIC_ELF" ;;
+	*msep-data*)          uclibc_format="FLAT_SEP_DATA" ;;
+	*mid-shared-library*) uclibc_format="SHARED_FLAT" ;;
+	*)                    uclibc_format="FLAT" ;;
+	esac
+	set_opt UCLIBC_FORMAT_${uclibc_format}
+	for format in FDPIC_ELF FLAT_SEP_DATA SHARED_FLAT FLAT ; do
+		[ "${format}" = "${uclibc_format}" ] && continue
+		unset_opt UCLIBC_FORMAT_${format}
+	done
 
-	    run_cmd $MAKE oldconfig CROSS=bfin-elf- </dev/null
+	unset_opt HAVE_NO_PIC
+	set_opt LDSO_BASE_FILENAME \"ld.so\"
+	set_opt SHARED_LIB_LOADER_PREFIX \"/lib\"
+	unset_opt LDSO_RUNPATH
+	for opt in \
+		BUILD_UCLIBC_LDSO \
+		DOPIC \
+		FORCE_SHAREABLE_TEXT_SEGMENTS \
+		HAVE_SHARED \
+		LDSO_CACHE_SUPPORT \
+		LDSO_LDD_SUPPORT \
+		UCLIBC_BUILD_NOEXECSTACK \
+		UCLIBC_BUILD_RELRO \
+		UCLIBC_STATIC_LDCONFIG
+	do
+		case ${flags} in
+		*mfdpic*) set_opt ${opt} ;;
+		*)      unset_opt ${opt} ;;
+		esac
+	done
 
-	    cp .config .config-used-for_${suffix}
-
-	    build_uClibc $DIR_LINUX_OUTPUT/bfin-linux-uclibc "${dir2}" ""
-
-	elif echo "${flags}" | grep -q msep-data; then   
-
-	    if [ -z "$UCLIBC_CONFIG_FILE" ]; then
-		cp extra/Configs/Config.bfin.default .config
-	    else
-		cp .config.in .config
-	    fi
-	    echo '# DOPIC is not set' >>.config
-	    echo 'UCLIBC_FORMAT_FLAT_SEP_DATA=y' >>.config
-	    echo '# UCLIBC_FORMAT_FDPIC_ELF is not set' >>.config
-	    echo '# UCLIBC_FORMAT_SHARED_FLAT is not set' >>.config
-	    echo '# UCLIBC_FORMAT_FLAT is not set' >>.config
-	    echo "KERNEL_HEADERS=\"$DIR_KBUILD_OUTPUT/usr/include\"" >>.config
-	    echo "MULTILIB=\"${dir}\"" >>.config
-	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
-
-	    run_cmd $MAKE oldconfig CROSS=bfin-elf- </dev/null
-
-	    cp .config .config-used-for_${suffix}
-
-	    build_uClibc $DIR_uC_OUTPUT/bfin-uclinux "" "${dir}"
-
-	elif echo "${flags}" | grep -q mid-shared-library; then
-
-	    if [ -z "$UCLIBC_CONFIG_FILE" ]; then
-		cp extra/Configs/Config.bfin.default .config
-	    else
-		cp .config.in .config
-	    fi
-	    echo '# DOPIC is not set' >>.config
-	    echo 'UCLIBC_FORMAT_SHARED_FLAT=y' >>.config
-	    echo '# UCLIBC_FORMAT_FDPIC_ELF is not set' >>.config
-	    echo '# UCLIBC_FORMAT_FLAT is not set' >>.config
-	    echo '# UCLIBC_FORMAT_FLAT_SEP_DATA is not set' >>.config
-	    echo "KERNEL_HEADERS=\"$DIR_KBUILD_OUTPUT/usr/include\"" >>.config
-	    echo "MULTILIB=\"${dir}\"" >>.config
-	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
-
-	    run_cmd $MAKE oldconfig CROSS=bfin-elf- </dev/null
-
-	    cp .config .config-used-for_${suffix}
-
-	    build_uClibc $DIR_uC_OUTPUT/bfin-uclinux "" "${dir}"
-
-	else
-
-	    # Vanila FLAT format
-	    if [ -z "$UCLIBC_CONFIG_FILE" ]; then
-		cp extra/Configs/Config.bfin.default .config
-	    else
-		cp .config.in .config
-	    fi
-	    echo '# DOPIC is not set' >>.config
-	    echo 'UCLIBC_FORMAT_FLAT=y' >>.config
-	    echo '# UCLIBC_FORMAT_FDPIC_ELF is not set' >>.config
-	    echo '# UCLIBC_FORMAT_SHARED_FLAT is not set' >>.config
-	    echo '# UCLIBC_FORMAT_FLAT_SEP_DATA is not set' >>.config
-	    echo "KERNEL_HEADERS=\"$DIR_KBUILD_OUTPUT/usr/include\"" >>.config
-	    echo "MULTILIB=\"${dir}\"" >>.config
-	    echo "UCLIBC_EXTRA_CFLAGS=\"${flags}\"" >>.config
-
-	    run_cmd $MAKE oldconfig CROSS=bfin-elf- </dev/null
-
-	    cp .config .config-used-for_${suffix}
-
-	    build_uClibc $DIR_uC_OUTPUT/bfin-uclinux "" "${dir}"
-
-	fi
+	run_cmd $MAKE oldconfig CROSS=bfin-elf- </dev/null
+	cp .config .config-used-for_${suffix}
+	build_uClibc "${uclibc_sysroot}" "${uclibc_dir1}" "${uclibc_dir2}"
 
 	resume_save
     done
 
     # update the kernel header path just to make rebuilding easier later on
     sed -i.tmp '/^KERNEL_HEADERS/s:=.*:="'"$DIR_uC_OUTPUT/bfin-uclinux/runtime/usr/include"'":' .config-used-for*
-    rm -f .config-used-for*.tmp
+    rm -f .config*.tmp
 
     ######################### Done with uClibc ###########################
 
