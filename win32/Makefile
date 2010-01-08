@@ -17,6 +17,7 @@ gnICE-drivers.zip: Prerequisites/CDM*.zip Prerequisites/gnICE/*
 	cd gnICE-drivers ; \
 	unzip -q ../Prerequisites/CDM*.zip ; \
 	cd CDM*/ ; \
+	rm -f */*.lib ; \
 	mv amd64 i386 *.inf ../ ; \
 	cd .. ; \
 	rm -rf CDM*/ ; \
