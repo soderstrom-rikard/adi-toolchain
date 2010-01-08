@@ -1949,7 +1949,7 @@ if [ $KERNEL_SOURCE ] ; then
 		KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT \
 		CROSS_COMPILE=bfin-elf- \
 		ARCH=blackfin
-	find "$DIR_KBUILD_OUTPUT/usr" -type f -name '.check.*' -print0 | xargs -0 rm -f
+	find "$DIR_KBUILD_OUTPUT/usr" -type f -name '.*' -exec rm {} +
 	change_dir ..
 
 	resume_save
