@@ -85,26 +85,21 @@ CopyFiles = libusb_files_sys, libusb_files_dll
 [LIBUSB_DEV.NTX86.HW]
 AddReg = libusb_add_reg_hw
 [LIBUSB_DEV.NTX86.Services]
-AddService = libusb0, 0x13a, libusb_add_service_x86
-[libusb_add_service_x86]
-DisplayName    = "LibUsb-Win32 - Kernel Driver"
-ServiceType    = 1
-StartType      = 3
-ErrorControl   = 0
-ServiceBinary  = %12%\libusb0.sys
+AddService = libusb0, 0x13a, libusb_add_service
 
 [LIBUSB_DEV.NTAMD64]
 CopyFiles = libusb_files_sys_x64, libusb_files_dll_wow64, libusb_files_dll_x64
 [LIBUSB_DEV.NTAMD64.HW]
 AddReg = libusb_add_reg_hw
 [LIBUSB_DEV.NTAMD64.Services]
-AddService = libusb0_x64, 0x13a, libusb_add_service_amd64
-[libusb_add_service_amd64]
+AddService = libusb0_x64, 0x13a, libusb_add_service
+
+[libusb_add_service]
 DisplayName    = "LibUsb-Win32 - Kernel Driver"
 ServiceType    = 1
 StartType      = 3
 ErrorControl   = 0
-ServiceBinary  = %12%\libusb0_x64.sys
+ServiceBinary  = %12%\libusb0.sys
 
 [libusb_add_reg_hw]
 HKR,,SurpriseRemovalOK, 0x00010001, 1
