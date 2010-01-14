@@ -5,6 +5,9 @@ send_user "Starting reset_board.exp\n"
 set ttydev /dev/ttyS0
 set send_slow {1 0.1}
 set password "blackfin"
+set sh_prompt "\[-@].*\[$>#]"
+set uboot_prompt "bfin>"
+set kernel_prompt "root:\[^>].*>"
 set download_file uImage
 set wait_log 0
 set board_type ""
@@ -12,12 +15,12 @@ set board_type ""
 cd /home/test/work/cruise/test_scripts/toolchain
 
 if { $argc >= 1} {
-   set download_file       [lindex $argv 0]
+   set download_file     [lindex $argv 0]
    send_log "\n#### download_file is $download_file\n"
 }
 
 if { $argc >= 2} {
-   set wait_log       [lindex $argv 1]
+   set wait_log          [lindex $argv 1]
    send_log "\n#### wait log is $wait_log \n"
 }
 
@@ -49,22 +52,22 @@ while 1 {
       }
 
       timeout {
-            puts "Fail . " 
-            break
+         puts "Fail . " 
+         break
          }
      }
 }
  
 while 1 {
    expect {
-      "#" {
+      -re "$sh_prompt" {
          puts "su success.\n"
          break
       }
 
       timeout {
-            puts "Fail su as root. "
-            break
+         puts "Fail su as root. "
+         break
          }
      }
 }
@@ -73,29 +76,29 @@ set su_id $spawn_id
 send -s "date +%Y.%m.%d-%H:%M\r"
 while 1 {
    expect {
-      -re "(\[0-9]{4}\\\.\[0-9]{2}\\\.\[0-9]{2}\\\-\[0-9]{2}:\[0-9]{2}).*#" {
-            set current_date $expect_out(1,string)
-            send_log "Date matched $current_date ."
-     break
+      -re "(\[0-9]{4}\\\.\[0-9]{2}\\\.\[0-9]{2}\\\-\[0-9]{2}:\[0-9]{2}).*$sh_prompt" {
+        set current_date $expect_out(1,string)
+        send_log "Date matched $current_date ."
+        break
       }
 
       timeout {
-            send_log "Failed date command."
-            break
-         }
-     }
+        send_log "Failed date command."
+        break
+      }
+   }
 }
 
 send -s "./reset_board 2\r"
 while 1 {
    expect {
-      "#" { 
-     break
+      -re "$sh_prompt" { 
+        break
       }
 
       timeout {
-            puts "Failed reset board." 
-            break
+        puts "Failed reset board." 
+        break
          }
      }
 }
@@ -127,18 +130,18 @@ spawn kermit
 set kermit_spawn_id $spawn_id
 
 while 1 {
-	expect {
-	        "Type ?" { }
-		"ermit>" { break }
-		"not found" {
-                   report "ERROR: Failed to start up kermit"
-                   all_done
-		}
-		timeout {
-                   report "ERROR: Time out starting up kermit"
-                   all_done
-		}
-	}
+    expect {
+         "Type ?" { }
+         "ermit>" { break }
+	 "not found" {
+            send_log "ERROR: Failed to start up kermit"
+            exit
+	  }
+	  timeout {
+            send_log "ERROR: Time out starting up kermit"
+            exit
+	  }
+    }
 }
 
 for {set i 0} {$i < $nkparams} {incr i} {
@@ -149,13 +152,13 @@ for {set i 0} {$i < $nkparams} {incr i} {
          "ermit>" { break }
 
          "\\?\[A-Z]" {
-            puts "ERROR: Failed to set up kermit parameters"
-          #  all_done
+            send_log "ERROR: Failed to set up kermit parameters"
+            exit
          }
 
          timeout {
-            puts "ERROR: Time out setting up kermit parameters"
-           # all_done
+            send_log "ERROR: Time out setting up kermit parameters"
+            exit
          }
       }
    }
@@ -169,7 +172,7 @@ while 1 {
       }
 
       timeout {
-         puts "\nERROR: Can't connect to serial port\n"
+         send_log "\nERROR: Can't connect to serial port\n"
          exit
       }
    }
@@ -178,7 +181,7 @@ while 1 {
 step "Match the prompt info."
 
 set timeout 30
-    while 1 {
+while 1 {
         expect {
            -re "Board: ADI (BF\[0-9]{3}).*board" {
               set board_type $expect_out(1,string)
@@ -200,7 +203,7 @@ set timeout 30
               break
             }
         }
-    }
+}
 
 if { $board_type == "BF537" || $board_type == "BF533" || $board_type == "BF561" || $board_type == "BF538" || $board_type == "BF518" } {
    set def_uart_port 0
@@ -210,31 +213,47 @@ if { $board_type == "BF537" || $board_type == "BF533" || $board_type == "BF561" 
    set def_uart_port 0
 }
 
-expect   ">" 
+expect   "$uboot_prompt" 
 send "\r"
-expect   ">"
+expect   "$uboot_prompt"
 send -s "set ipaddr 10.100.4.50; set serverip 10.100.4.174; set gatewayip 10.100.4.174 \r"
-expect   ">"
+expect   "$uboot_prompt"
 send -s "set bootargs root=/dev/mtdblock0 rw earlyprintk=serial,uart0,57600 panic=3 ip=10.100.4.50 console=tty0 console=ttyBF$def_uart_port,57600 \r"
-expect   ">"
+expect   "$uboot_prompt"
 send -s "set tftp_boot tftp 0x2000000 $download_file\\; run addip \\; bootm 0x2000000\r"
-expect   ">"
+expect   "$uboot_prompt"
 send -s "set bootcmd run tftp_boot\r"
-expect   ">"
+expect   "$uboot_prompt"
 send -s "save\r"
-expect   ">"
-send -s "run tftp_boot\r"
+set timeout 20
+while 1 {
+   expect {
+      "$uboot_prompt" {
+         break
+      }
 
- set timeout 180
-   while 1 {
+      timeout {
+         send "print\r"
+         send_log "\nERROR: Can't save variables to board\n"
+         break
+      }
+   }
+}
+expect   "$uboot_prompt" 
+send "\r"
+expect  "$uboot_prompt"
+
+send -s "run tftp_boot\r"
+set timeout 180
+while 1 {
       expect {
 
          -re "Kernel panic" {
-            report "kernel panic detected... trying to recover from it"
+            send_log "kernel panic detected... trying to recover from it"
             break
          }
 
-	  "root:/> " {
+	 -re "$kernel_prompt" {
             send_log "successful boot attempt"
             break
          }
@@ -249,28 +268,28 @@ send -s "run tftp_boot\r"
          }
 
          timeout {
-            puts "failed boot attempt"
+            send_log "failed boot attempt"
             break
          }
       }
-   }
+}
 
 sleep 5
 send "\r"
-expect "root:/>"
+expect -re "$kernel_prompt"
 
 send -s "ls -l /bin/rcp /lib\r"
 while 1 {
    sleep 3
    expect {
-      ">" {
-         puts "ls success.\n"
+      -re "$kernel_prompt" {
+         send_log "ls success.\n"
          break
       }
 
       timeout {
-            puts "Fail to ls. "
-            break
+         send_log "Fail to ls. "
+         break
          }
      }
 }
@@ -282,14 +301,14 @@ send -s "ifconfig eth0 10.100.4.50\r"
 while 1 {
    sleep 3
    expect {
-      ">" {
+      -re "$kernel_prompt" {
          send_log "ifconfig set success.\n"
          break
       }
 
       timeout {
          send_log "Fail to do ifconfig. "
-            break
+         break
          }
      }
 }
@@ -298,14 +317,14 @@ send -s "date $current_date\r"
 while 1 {
    sleep 3
    expect {
-      ">" {
+      -re "$kernel_prompt" {
          send_log "date set success.\n"
          break
       }
 
       timeout {
          send_log "Fail to do date. "
-            break
+         break
          }
      }
 }
