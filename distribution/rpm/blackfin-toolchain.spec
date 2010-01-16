@@ -176,16 +176,16 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gcov%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gdb%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-genext2fs
-%{prefix}/bfin-uclinux/bin/bfin-uclinux-gen_eth_addr
+%{prefix}/bfin-uclinux/bin/bfin-uclinux-gen_eth_addr%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gfortran%{EXEEXT}
-%if %{x_support}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gdbtui%{EXEEXT}
+%if %{x_support}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-insight%{EXEEXT}
 %endif
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-ldr%{EXEEXT}
-%{prefix}/bfin-uclinux/bin/bfin-uclinux-ld
+%{prefix}/bfin-uclinux/bin/bfin-uclinux-ld%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-ld.real%{EXEEXT}
-%{prefix}/bfin-uclinux/bin/bfin-uclinux-mkimage
+%{prefix}/bfin-uclinux/bin/bfin-uclinux-mkimage%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-nm%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-objcopy%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-objdump%{EXEEXT}
@@ -205,7 +205,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-uclinux/bfin-uclinux/bin/gcc%{EXEEXT}
 %{prefix}/bfin-uclinux/bfin-uclinux/bin/gfortran%{EXEEXT}
 %{prefix}/bfin-uclinux/bfin-uclinux/bin/objdump%{EXEEXT}
-%{prefix}/bfin-uclinux/bfin-uclinux/bin/ld
+%{prefix}/bfin-uclinux/bfin-uclinux/bin/ld%{EXEEXT}
 %{prefix}/bfin-uclinux/bfin-uclinux/bin/ld.real%{EXEEXT}
 %{prefix}/bfin-uclinux/bfin-uclinux/bin/nm%{EXEEXT}
 %{prefix}/bfin-uclinux/bfin-uclinux/bin/ranlib%{EXEEXT}
@@ -236,17 +236,17 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gcov%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gdb%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-genext2fs
-%{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gen_eth_addr
+%{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gen_eth_addr%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gfortran%{EXEEXT}
-%if %{x_support}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gdbtui%{EXEEXT}
+%if %{x_support}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-insight%{EXEEXT}
 %endif
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-ld%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-ldconfig
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-ldr%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-ldd
-%{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-mkimage
+%{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-mkimage%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-nm%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-objcopy%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-objdump%{EXEEXT}
@@ -296,11 +296,11 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-elf/bin/bfin-elf-gccbug
 %{prefix}/bfin-elf/bin/bfin-elf-gcov%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-gdb%{EXEEXT}
-%if %{x_support}
 %{prefix}/bfin-elf/bin/bfin-elf-gdbtui%{EXEEXT}
+%if %{x_support}
 %{prefix}/bfin-elf/bin/bfin-elf-insight%{EXEEXT}
 %endif
-%{prefix}/bfin-elf/bin/bfin-elf-ld
+%{prefix}/bfin-elf/bin/bfin-elf-ld%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-ld.real%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-ldr%{EXEEXT}
 %{prefix}/bfin-elf/bin/bfin-elf-nm%{EXEEXT}
@@ -323,7 +323,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-elf/bfin-elf/bin/flthdr%{EXEEXT}
 %{prefix}/bfin-elf/bfin-elf/bin/gcc%{EXEEXT}
 %{prefix}/bfin-elf/bfin-elf/bin/objdump%{EXEEXT}
-%{prefix}/bfin-elf/bfin-elf/bin/ld
+%{prefix}/bfin-elf/bfin-elf/bin/ld%{EXEEXT}
 %{prefix}/bfin-elf/bfin-elf/bin/ld.real%{EXEEXT}
 %{prefix}/bfin-elf/bfin-elf/bin/nm%{EXEEXT}
 %{prefix}/bfin-elf/bfin-elf/bin/ranlib%{EXEEXT}
