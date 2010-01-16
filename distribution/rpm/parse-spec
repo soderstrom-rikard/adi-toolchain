@@ -1,0 +1,110 @@
+#!/bin/bash
+#
+# This is a hacky script to parse a rpm .spec file when rpm is not
+# available.  Basically this is used to build OS X toolchains from
+# the .src.rpms ...
+#
+
+err() { echo "$*" 1>&2; exit 1; }
+tac() { sed -n '1!G;h;$p'; }
+cp() {
+	if [ "$1" = "-a" ] ; then
+		shift
+		`which cp` -RPp "$@"
+	else
+		`which cp` "$@"
+	fi
+}
+spec=${1:-`echo *.spec 2>/dev/null`}
+[[ -e ${spec} ]] || err "need a spec file"
+shift
+
+export RPM_BUILD_ROOT=${spec%/*}/rpm-build
+case ${RPM_BUILD_ROOT} in
+	./*) RPM_BUILD_ROOT=${PWD}/${RPM_BUILD_ROOT#./};;
+	/*)  ;;
+	*)   RPM_BUILD_ROOT=${PWD}/rpm-build;;
+esac
+
+steps="prep clean build install files"
+order=$(grep `printf -- '-e ^%%%s$ ' ${steps}` ${spec} | sed s:%::g)
+make_script() {
+	sed -n -e "/^%${1}$/,/^%${last}$/{s:^%${1}$:#/bin/bash:;p}" ${spec} \
+		| sed \
+			-e 's:%{:${:g' \
+			-e 's:%setup\>:do_setup:' \
+			-e 's:%patch:do_patch __:' \
+		| grep -v "^%${last}$" \
+		> .spec.$1.sh
+	last=$1
+}
+for step in `printf '%s\n' "${order}" | tac` ; do
+	make_script ${step}
+done
+
+eval "$( \
+	nil=; \
+	( \
+	awk '$0 ~ /^[^#]*:/ { system("printf " $1 " | tr [:upper:] [:lower:]"); $1 = ""; print }' ${spec} \
+		| sed -n -e '/^[[:alnum:]]*:/{s|^\([^:]*\):[[:space:]]*\(.*\)|\1="\2"|;p}' ; \
+	sed -n -e '/^%define/{s:^%define \([^ ]*\) \(.*\):\1="\2":;p}' ${spec} \
+	) | sed -e 's:%{:${:g' \
+)"
+
+dov() { echo "$@"; "$@"; }
+do_setup() {
+	echo do_setup: "$@"
+	cd ..
+	dov tar xf ${source}
+	while [ -n "$1" ] ; do
+		case $1 in
+		-b) shift; eval dov tar xf \${source$1};;
+		*)  err do_setup: unknown opt $1;;
+		esac
+		shift
+	done
+	cd ${name}-${version} || err
+}
+# the -P option is not supported
+do_patch() {
+	local p
+	eval p=\"\${patch${1#__}}\"
+	shift
+
+	local x has_p=false has_f=false has_s=false
+	for x in "$@" ; do
+		[[ $x == -p* ]] && has_p=true
+		[[ $x == -f ]] && has_f=true
+		[[ $x == -s ]] && has_s=true
+	done
+	${has_p} || set -- "$@" -p0
+	${has_f} || set -- "$@" -f
+	${has_s} || set -- "$@" -s
+	echo "do_patch: $patch $*"
+	patch "$@" < "$p" || err
+}
+
+if [ $# -eq 0 ] ; then
+	set -- ${steps%files}
+	echo "### cleaning build dirs"
+	rm -rf /opt/uClinux "${RPM_BUILD_ROOT}" ${name}-${version}
+fi
+mkdir -p ${RPM_BUILD_ROOT} ${name}-${version} || err
+cd "${name}-${version}" || err
+for step in "$@" ; do
+	sh=".spec.${step}.sh"
+	echo "### Running ${step}"
+	(. ../$sh) || err
+done
+
+if [[ " $* " == *" install "* ]] ; then
+	find "${RPM_BUILD_ROOT}" -perm +1 -type f -exec file {} + | \
+	while read line ; do
+		case ${line} in
+		*"Mach-O executable"*) strip "${line%%:*}" ;;
+		esac
+	done
+	osn=`sw_vers -productName | sed -e 's:Mac ::' -e 's: :_:g'`
+	osv=`sw_vers -productVersion`
+	tar cf ../${name}-${version}-${release}.${osn}-${osv}.`arch`.tar -C "${RPM_BUILD_ROOT}" ./
+fi
