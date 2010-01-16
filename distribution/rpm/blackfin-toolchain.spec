@@ -20,13 +20,10 @@ Source2:      binutils.tar.bz2
 Source3:      kbuild.tar.bz2
 Source4:      buildscript.tar.bz2
 Source5:      elf2flt.tar.bz2
-Source6:      genext2fs.tar.bz2
-Source7:      uboot.tar.bz2
-Source8:      libdsp.tar.bz2
-Source9:      cramfs-tools.tar.bz2
-Source10:      uClibc.tar.bz2
-Source11:     ldr-utils.tar.bz2
-Source12:     fdpichdr.tar.bz2
+Source6:      uboot.tar.bz2
+Source7:      libdsp.tar.bz2
+Source8:      uClibc.tar.bz2
+Source9:      ldr-utils.tar.bz2
 #Patch:        mkuboot.diff
 prefix: /opt/uClinux
 BuildRoot:    %{_tmppath}/%{name}-%{version}-build
@@ -96,7 +93,7 @@ based toolchain.
 %endif
 
 %prep
-%setup -b 1 -b 2 -b 3 -b 4 -b 5 -b 6 -b 7 -b 8 -b 9 -b 10 -b 11 -b 12
+%setup -b 1 -b 2 -b 3 -b 4 -b 5 -b 6 -b 7 -b 8 -b 9
 #%patch -p1
 cd ..
 
@@ -169,13 +166,10 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-flthdr%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-g++%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gcc%{EXEEXT}
-%{prefix}/bfin-uclinux/bin/bfin-uclinux-mkcramfs
-%{prefix}/bfin-uclinux/bin/bfin-uclinux-cramfsck
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-*-4.1.2%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gccbug
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gcov%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gdb%{EXEEXT}
-%{prefix}/bfin-uclinux/bin/bfin-uclinux-genext2fs
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gen_eth_addr%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gfortran%{EXEEXT}
 %{prefix}/bfin-uclinux/bin/bfin-uclinux-gdbtui%{EXEEXT}
@@ -229,13 +223,10 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-cpp%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-g++%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gcc%{EXEEXT}
-%{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-mkcramfs
-%{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-cramfsck
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-*-4.1.2%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gccbug
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gcov%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gdb%{EXEEXT}
-%{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-genext2fs
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gen_eth_addr%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gfortran%{EXEEXT}
 %{prefix}/bfin-linux-uclibc/bin/bfin-linux-uclibc-gdbtui%{EXEEXT}
