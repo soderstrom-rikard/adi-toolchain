@@ -1,3 +1,8 @@
+2010-01-20  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.c (bfin_expand_builtin): Treat
+	BFIN_BUILTIN_MULT_1X32X32NS as same as BFIN_BUILTIN_MULT_1X32X32.
+
 2009-12-09  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* config/bfin/bfin.md (bfin_adjust_cost): Give anti and output

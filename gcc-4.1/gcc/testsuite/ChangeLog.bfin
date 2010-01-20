@@ -1,3 +1,8 @@
+2010-01-20  Jie Zhang  <jie.zhang@analog.com>
+
+	* gcc.target/bfin/builtins/mult_fr1x32x32NS-1.c: New test.
+	* gcc.target/bfin/builtins/mult_fr1x32x32NS-2.c: New test.
+
 2009-12-09  Bernd Schmidt  <bernd.schmidt@analog.com>
 
 	* gcc.c-torture/compile/20091209-1.c: New test.

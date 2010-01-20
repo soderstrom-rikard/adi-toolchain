@@ -6890,39 +6890,16 @@ bfin_expand_builtin (tree exp, rtx target ATTRIBUTE_UNUSED,
 				      GEN_INT (MACFLAG_FU)));
       emit_insn (gen_lshrpdi3 (a1reg, a1reg, GEN_INT (16)));
 
-      if (fcode == BFIN_BUILTIN_MULT_1X32X32)
-	emit_insn (gen_flag_mul_macv2hi_parts_acconly (a0reg, a1reg, tmp1, tmp2,
-						       const1_rtx, const1_rtx,
-						       const1_rtx, const0_rtx, a1reg,
-						       const0_rtx, GEN_INT (MACFLAG_NONE),
-						       GEN_INT (MACFLAG_M)));
-      else
-	{
-	  /* For saturating multiplication, there's exactly one special case
-	     to be handled: multiplying the smallest negative value with
-	     itself.  Due to shift correction in fractional multiplies, this
-	     can overflow.  Iff this happens, OP2 will contain 1, which, when
-	     added in 32 bits to the smallest negative, wraps to the largest
-	     positive, which is the result we want.  */
-	  op2 = gen_reg_rtx (V2HImode);
-	  emit_insn (gen_packv2hi (op2, tmp1, tmp2, const0_rtx, const0_rtx));
-	  emit_insn (gen_movsibi (gen_rtx_REG (BImode, REG_CC),
-				  gen_lowpart (SImode, op2)));
-	  emit_insn (gen_flag_mul_macv2hi_parts_acconly_andcc0 (a0reg, a1reg, tmp1, tmp2,
-								const1_rtx, const1_rtx,
-								const1_rtx, const0_rtx, a1reg,
-								const0_rtx, GEN_INT (MACFLAG_NONE),
-								GEN_INT (MACFLAG_M)));
-	  op2 = gen_reg_rtx (SImode);
-	  emit_insn (gen_movbisi (op2, gen_rtx_REG (BImode, REG_CC)));
-	}
+      emit_insn (gen_flag_mul_macv2hi_parts_acconly (a0reg, a1reg, tmp1, tmp2,
+						     const1_rtx, const1_rtx,
+						     const1_rtx, const0_rtx, a1reg,
+						     const0_rtx, GEN_INT (MACFLAG_NONE),
+						     GEN_INT (MACFLAG_M)));
       emit_insn (gen_flag_machi_parts_acconly (a1reg, tmp2, tmp1,
 					       const1_rtx, const0_rtx,
 					       a1reg, const0_rtx, GEN_INT (MACFLAG_M)));
       emit_insn (gen_ashrpdi3 (a1reg, a1reg, GEN_INT (15)));
       emit_insn (gen_sum_of_accumulators (target, a0reg, a0reg, a1reg));
-      if (fcode == BFIN_BUILTIN_MULT_1X32X32NS)
-	emit_insn (gen_addsi3 (target, target, op2));
       return target;
 
     case BFIN_BUILTIN_CPLX_MUL_16:
