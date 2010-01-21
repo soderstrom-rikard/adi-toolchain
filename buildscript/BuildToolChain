@@ -1112,7 +1112,9 @@ build_gcc ()
         export PATH=$p:$PATH
     fi
 
-    run_cmd rm -f $DIR_GCC_SOURCE/newlib $DIR_GCC_SOURCE/libgloss
+    run_cmd rm -f $DIR_GCC_SOURCE/newlib $DIR_GCC_SOURCE/libgloss $DIR_GCC_SOURCE/mpfr $DIR_GCC_SOURCE/gmp
+    [ -e $DIR_GCC_SOURCE/../gmp  ] && run_cmd ../gmp  ln -snf $DIR_GCC_SOURCE/gmp
+    [ -e $DIR_GCC_SOURCE/../mpfr ] && run_cmd ../mpfr ln -snf $DIR_GCC_SOURCE/mpfr
     if [ $2 = "elf" ]; then
         echo_date "Linking newlib and libgloss"
         run_cmd ln -snf $DIR_BINUTILS_SOURCE/newlib $DIR_GCC_SOURCE/
@@ -1200,6 +1202,8 @@ build_gcc ()
         PATH=$save_PATH
         rm -rf "$DIR_GCC_BUILD/.bfin.path"
     fi
+
+    run_cmd rm -f $DIR_GCC_SOURCE/newlib $DIR_GCC_SOURCE/libgloss $DIR_GCC_SOURCE/mpfr $DIR_GCC_SOURCE/gmp
 
     resume_save
 }
