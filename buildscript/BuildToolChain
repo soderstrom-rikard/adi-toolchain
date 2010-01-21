@@ -2155,16 +2155,7 @@ if [ $KERNEL_SOURCE ] ; then
 
         echo_date "Cleaning U-Boot"
         run_cmd rm -rf "$DIR_UBOOT_BUILD"
-        run_cmd $MAKE -C "$DIR_UBOOT" distclean
 
-        UBOOT_TOOLS="mkimage${EXEEXT} gen_eth_addr${EXEEXT}"
-
-        # the actual config file here doesnt matter since we
-        # just want to build the mkimage and gen_eth_addr tools
-        run_cmd mkdir -p "$DIR_UBOOT_BUILD/include"
-        for x in config.h config.mk autoconf.mk.dep ; do
-            run_cmd touch "$DIR_UBOOT_BUILD"/include/$x
-        done
         echo_date "Make U-Boot"
         if [ "${CBUILD}" = "${CHOST}" ] ; then
             unset HOSTCC HOSTSTRIP
@@ -2175,8 +2166,7 @@ if [ $KERNEL_SOURCE ] ; then
         run_cmd $MAKE \
             -C "$DIR_UBOOT" \
             O="$DIR_UBOOT_BUILD" \
-            BIN_FILES-y="${UBOOT_TOOLS}" \
-            SUBDIRS="tools" \
+            CONFIG_CMD_NET=y \
             ${HOSTSTRIP+HOSTSTRIP=${HOSTSTRIP}} \
             ${HOSTCC+HOSTCC=${HOSTCC}} \
             tools
@@ -2184,7 +2174,7 @@ if [ $KERNEL_SOURCE ] ; then
         echo_date "Copying U-Boot Tools"
         check_installed_files u-boot "$DIR_UBOOT_BUILD/tools/" \
             mkimage gen_eth_addr
-        for RUN in ${UBOOT_TOOLS} ; do
+        for RUN in mkimage$EXEEXT gen_eth_addr$EXEEXT ; do
             run_cmd cp "$DIR_UBOOT_BUILD/tools/$RUN" "$DIR_uC_OUTPUT/bin/bfin-uclinux-$RUN"
             run_cmd cp "$DIR_UBOOT_BUILD/tools/$RUN" "$DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-$RUN"
         done
