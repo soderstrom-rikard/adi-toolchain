@@ -132,37 +132,66 @@ proc skip_gdbserver_tests { } {
 proc gdbserver_spawn { server_exec child_args } {
     global portnum
 
-    # Port id -- either specified in baseboard file, or managed here.
-    if [target_info exists gdb,socketport] {
-	set portnum [target_info gdb,socketport]
-    } else {
-	# Bump the port number to avoid conflicts with hung ports.
-	incr portnum
-    }
-
-    # Extract the local and remote host ids from the target board struct.
-    if [target_info exists sockethost] {
-	set debughost  [target_info sockethost]
-    } else {
-	set debughost "localhost:"
-    }
-
     # Extract the protocol
     if [target_info exists gdb_protocol] {
-	set protocol [target_info gdb_protocol]
+        set protocol [target_info gdb_protocol]
     } else {
-	set protocol "remote"
+        set protocol "remote"
+    }
+
+    if ![target_info exists use_serial_debug] {
+
+        # Port id -- either specified in baseboard file, or managed here.
+        if [target_info exists gdb,socketport] {
+            set portnum [target_info gdb,socketport]
+        } else {
+            # Bump the port number to avoid conflicts with hung ports.
+            incr portnum
+        }
+
+        # Extract the local and remote host ids from the target board struct.
+        if [target_info exists sockethost] {
+            set debughost  [target_info sockethost]
+        } else {
+            set debughost "localhost:"
+        }
+
+        # Export the host:port pair.
+        set gdbport $debughost$portnum
+        set debugport $gdbport
+
+    } else {
+
+        if [target_info exists gdb_serial] {
+            set serialport "[target_info gdb_serial]";
+        } elseif [target_info exists netport] {
+            set serialport "[target_info netport]"
+        } else {
+            set serialport "[target_info serial]"
+        }
+
+        if [target_info exists baud] {
+            set remotebaud [target_info baud]
+        } else {
+            set remotebaud 57600
+        }
+        if [target_info exists stty_prog] {
+            set STTY [target_info stty_prog]
+        } else {
+            set STTY stty
+        }
+        set gdbport [target_info gdbserver_serial]
+        set debugport $serialport
+
+        remote_spawn target "$STTY -F $gdbport ospeed $remotebaud ispeed $remotebaud"
     }
 
     set gdbserver [find_gdbserver]
 
-    # Export the host:port pair.
-    set gdbport $debughost$portnum
-
     # Fire off the debug agent.  This flavour of gdbserver takes as
     # arguments the port information, the name of the executable file to
     # be debugged, and any arguments.
-    set gdbserver_command "$gdbserver :$portnum $server_exec"
+    set gdbserver_command "$gdbserver $gdbport $server_exec"
     if { $child_args != "" } {
 	append gdbserver_command " $child_args"
     }
@@ -191,7 +220,7 @@ proc gdbserver_spawn { server_exec child_args } {
 	}
     }
 
-    return [list $protocol $gdbport]
+    return [list $protocol $debugport]
 }
 
 proc infer_host_exec { } {
