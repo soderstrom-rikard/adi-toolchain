@@ -79,7 +79,7 @@ LIBGOMP_TESTSUITE=
 NEWLIB_TESTSUITE=
 
 
-while getopts ab:B:dfH:hLo:O:pr:R:s:t:T:U:vw parameter
+while getopts ab:B:dfH:hLo:O:pr:R:s:St:T:U:vw parameter
 do
     case $parameter in
 	a)
@@ -139,6 +139,9 @@ do
                 echo "Invalid Source Path"
                 exit 1
             fi
+            ;;
+        S)
+            SERIAL_DEBUG_PORT=true
             ;;
         H)
             HOST_TARGET="--host=$OPTARG"
@@ -2231,6 +2234,18 @@ if [ ! -d $DIR_BUILD/boards ] ; then
     mkdir $DIR_BUILD/boards
 fi
 
+if [ $STACK_CHECKING ] ; then
+    STACK_CHECKING_SET="set_board_info cflags \" -mstack-check-l1 \""
+else
+    STACK_CHECKING_SET=""
+fi
+
+if [ $SERIAL_DEBUG_PORT ] ; then
+     SERIAL_DEBUG_PORT_SET="set_board_info use_serial_debug 1\nset GDBFLAGS \"-nx -b 57600\""
+else
+     SERIAL_DEBUG_PORT_SET=""
+fi
+
 if [ $TEST_TARGET_ELF_SIM ] ; then
     cp $DIR_BOARDS/bfin-sim.exp $DIR_BUILD/boards/bfin-sim.exp
 fi
@@ -2246,31 +2261,20 @@ EOF
 fi
 
 if [ $TEST_TARGET_UCLINUX ] ; then
-    if [ $STACK_CHECKING ] ; then
-        (cat $DIR_BOARDS/bfin-uclinux.exp.1; \
-            echo "set_board_info cflags \" -mstack-check-l1 \""; \
-            echo "set_board_info hostname $TARGET_IPADDR"; \
-            echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-uclinux.exp
-    else
         (cat $DIR_BOARDS/bfin-uclinux.exp.1; \
             echo "set_board_info hostname $TARGET_IPADDR"; \
-            echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-uclinux.exp
-    fi
+            echo "set_board_info sockethost $TARGET_IPADDR:"; \
+            echo "$STACK_CHECKING_SET"; \
+            echo -e "$SERIAL_DEBUG_PORT_SET") > $DIR_BUILD/boards/bfin-uclinux.exp
 fi
 
 if [ $TEST_TARGET_LINUX_UCLIBC ] ; then
-    if [ $STACK_CHECKING ] ; then
-        (cat $DIR_BOARDS/bfin-linux-uclibc.exp.1; \
-            echo "set_board_info cflags \" -mstack-check-l1 \""; \
-            echo "set_board_info multilib_flags \"-mcpu=$CPU_TYPE_REV\"";\
-             echo "set_board_info hostname $TARGET_IPADDR"; \
-            echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-linux-uclibc.exp
-    else
         (cat $DIR_BOARDS/bfin-linux-uclibc.exp.1; \
             echo "set_board_info multilib_flags \"-mcpu=$CPU_TYPE_REV\"";\
-             echo "set_board_info hostname $TARGET_IPADDR"; \
-            echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-linux-uclibc.exp
-    fi
+            echo "set_board_info hostname $TARGET_IPADDR"; \
+            echo "set_board_info sockethost $TARGET_IPADDR:"; \ 
+            echo "$STACK_CHECKING_SET"; \
+            echo -e "$SERIAL_DEBUG_PORT_SET") > $DIR_BUILD/boards/bfin-linux-uclibc.exp
 fi
 
 (cat $DIR_BOARDS/site.exp.1; \
