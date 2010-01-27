@@ -5237,7 +5237,7 @@ bfin_optimize_loops_1 (FILE *dump_file ATTRIBUTE_UNUSED)
 
   df_analyze ();
 
-  FOR_EACH_LOOP (li, loop, 0)
+  FOR_EACH_LOOP (li, loop, LI_FROM_INNERMOST)
     {
       basic_block *body = get_loop_body (loop);
 

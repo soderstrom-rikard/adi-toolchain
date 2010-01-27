@@ -1,3 +1,8 @@
+2010-01-27  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.c (bfin_optimize_loops_1): Process loops
+	from innermost.
+
 2010-01-20  Jie Zhang  <jie.zhang@analog.com>
 
 	* config/bfin/bfin.c (bfin_expand_builtin): Treat
