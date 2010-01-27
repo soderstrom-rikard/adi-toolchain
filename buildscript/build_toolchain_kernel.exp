@@ -381,6 +381,50 @@ while 1 {
                 send -s "\r"
             }
         }
+#Add configs for extra serial port to enable gdb debug through it. It is selected on no matter whether it is used.
+##################################################################################################################
+           -re "Blackfin serial port support.*SERIAL_BFIN.*\\\[.*]" {
+                send "Y\r"
+      }
+
+          -re "Console on Blackfin serial port.*SERIAL_BFIN_CONSOLE.*\\\[.*]" {
+                send "Y\r"
+      }
+
+          -re "UART Mode.*DMA mode.*SERIAL_BFIN_DMA.*PIO mode.*SERIAL_BFIN_PIO.*choice.*\\\[.*]" {
+                send "1\r"
+      }
+
+          -re "Enable UART0.*SERIAL_BFIN_UART0.*\\\[.*]" {
+            if { $board_type == "BF527-EZKIT" } {
+                send "Y\r"
+            } else {
+                send "\r"
+            }
+      }
+
+          -re "Enable UART1.*SERIAL_BFIN_UART1.*\\\[.*]" {
+            if { $board_type == "BF537-STAMP" } {
+                send "Y\r"
+            } else {
+                send "\r"
+            }
+      }
+
+          -re "Enable UART3.*SERIAL_BFIN_UART3.*\\\[.*]" {
+            if { $board_type == "BF548-EZKIT" } {
+                send "Y\r"
+            } else {
+                send "\r"
+            }
+      }
+
+          -re "NAND Device Support.*MTD_NAND.*\\\[.*]" {
+            if { $board_type == "BF537-STAMP" } {
+                send "N\r"
+            } 
+      }
+#####################################################################################################
 
         -re "Symmetric multi-processing support.*SMP.*\\\[.*]" {
             if { $board_type == "BF561-EZKIT" && $kernel_config == "smp" } {
