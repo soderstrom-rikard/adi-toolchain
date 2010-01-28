@@ -9,10 +9,15 @@ set_board_info compiler  "[find_gcc]"
 set_board_info ldflags ""
 set_board_info rsh_prog rsh
 set_board_info rcp_prog rcp
+set_board_info stty_prog stty
+set_board_info baud "57600"
 set_board_info protocol standard
 set_board_info username root
 set_board_info use_gdb_stub 1
 set_board_info noargs 1
+
+set_board_info gdbserver_serial /dev/ttyBF1
+set_board_info gdb_serial /dev/ttyUSB0
 
 # Path to the gdbserver executable, if required.
 set_board_info gdb_server_prog "gdbserver"
