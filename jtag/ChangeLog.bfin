@@ -1,3 +1,10 @@
+2010-01-28  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* src/cmd/bfin.c (bfin_one_insn_a_file): Delete.
+	(cmd_bfin_run): Delete one-insn-a-file parsing.  Count the semicolons
+	and use those as the instruction count.
+	(cmd_bfin_help): Delete mention of one-insn-a-file.
+
 2009-12-07  Jie Zhang  <jie.zhang@analog.com>
 
 	* data/analog/bf518/STEPPINGS: Add bf518 silicon revision 0.1.
