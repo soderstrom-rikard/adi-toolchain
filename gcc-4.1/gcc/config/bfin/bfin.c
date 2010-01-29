@@ -5213,7 +5213,6 @@ static void
 bfin_optimize_loops_1 (FILE *dump_file)
 {
   struct loops loops;
-  struct loop *loop;
   int i;
 
   if (current_function_calls_setjmp)
@@ -5222,14 +5221,13 @@ bfin_optimize_loops_1 (FILE *dump_file)
   if (flow_loops_find (&loops) <= 0)
     return;
 
-  /* Process the loops, innermost first.  */
-  loop = loops.tree_root;
-  while (loop->inner)
-    loop = loop->inner;
-
-  while (loop != loops.tree_root)
+  for (i = 1; i < loops.num; i++)
     {
       basic_block *body;
+      struct loop *loop = loops.parray[i];
+
+      if (!loop)
+	continue;
 
       body = get_loop_body (loop);
 
@@ -5237,15 +5235,6 @@ bfin_optimize_loops_1 (FILE *dump_file)
       optimize_loop_addresses (loop, body);
 
       free (body);
-
-      if (loop->next)
-	{
-	  loop = loop->next;
-	  while (loop->inner)
-	    loop = loop->inner;
-	}
-      else
-	loop = loop->outer;
     }
 
   commit_edge_insertions ();
