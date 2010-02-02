@@ -2272,7 +2272,7 @@ if [ $TEST_TARGET_LINUX_UCLIBC ] ; then
         (cat $DIR_BOARDS/bfin-linux-uclibc.exp.1; \
             echo "set_board_info multilib_flags \"-mcpu=$CPU_TYPE_REV\"";\
             echo "set_board_info hostname $TARGET_IPADDR"; \
-            echo "set_board_info sockethost $TARGET_IPADDR:"; \ 
+            echo "set_board_info sockethost $TARGET_IPADDR:"; \
             echo "$STACK_CHECKING_SET"; \
             echo -e "$SERIAL_DEBUG_PORT_SET") > $DIR_BUILD/boards/bfin-linux-uclibc.exp
 fi
