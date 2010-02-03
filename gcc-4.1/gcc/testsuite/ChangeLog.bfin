@@ -1,3 +1,7 @@
+2010-02-03  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* gcc.target/bfin/mcpu-bf592.c: New test.
+
 2010-01-20  Jie Zhang  <jie.zhang@analog.com>
 
 	* gcc.target/bfin/builtins/mult_fr1x32x32NS-1.c: New test.

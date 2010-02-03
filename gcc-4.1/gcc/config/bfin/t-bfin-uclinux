@@ -42,6 +42,7 @@ MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf548m-none
 MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf549-none
 MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf549m-none
 MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf561-none
+MULTILIB_MATCHES+=mcpu?bf532-none=mcpu?bf592-none
 
 # Assemble startup files.
 $(T)crtlibid.o: $(srcdir)/config/bfin/crtlibid.s $(GCC_PASSES)
