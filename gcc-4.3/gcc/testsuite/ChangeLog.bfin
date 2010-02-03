@@ -1,3 +1,7 @@
+2010-02-03  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* gcc.target/bfin/mcpu-bf592.c: New test.
+
 2010-01-26  Jie Zhang  <jie.zhang@analog.com>
 
 	* gcc.c-torture/execute/multi-ix.c: Disable the test if
