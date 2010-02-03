@@ -1,3 +1,9 @@
+2010-02-03  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* doc/c-bfin.texi (-mcpu): Add bf592.
+	* config/tc-bfin.c (bfin_cpu_type): Add BFIN_CPU_BF592.
+	(bfin_cpus[]): Add 0.0 for bf592.
+
 2009-11-09  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* doc/c-bfin.texi (-mcpu): Add bf504 and bf506.
