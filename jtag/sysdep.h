@@ -49,7 +49,9 @@
 #include <windows.h>
 #define geteuid() 0
 #define getuid() 0
+#ifndef HAVE_USLEEP
 #define usleep(x) Sleep(x/1E3)
+#endif
 /* Microsoft uses a different swprintf() than ISO C requires */
 #include <stdio.h>
 #define swprintf _snwprintf
