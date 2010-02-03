@@ -215,7 +215,8 @@ enum {
   LEAVE_NOP_NO
 };
 
-extern int bfin_wait_emuready;
+extern int bfin_check_emuready;
+extern int bfin_wait_clocks;
 
 /* From src/bfin/bfin.c */
 
@@ -293,13 +294,13 @@ void chain_emupc_get (chain_t *, int);
 uint32_t part_emupc_get (chain_t *, int, int);
 void chain_dbgstat_clear_ovfs (chain_t *);
 void part_dbgstat_clear_ovfs (chain_t *, int);
-void chain_wait_emuready (chain_t *);
+void chain_check_emuready (chain_t *);
 int part_sticky_in_reset (chain_t *, int);
 void chain_wait_in_reset (chain_t *);
 void part_wait_in_reset (chain_t *, int);
 void chain_wait_reset (chain_t *);
 void part_wait_reset (chain_t *, int);
-void part_wait_emuready (chain_t *, int);
+void part_check_emuready (chain_t *, int);
 void part_emudat_set (chain_t *, int, uint32_t, int);
 uint32_t part_emudat_get (chain_t *, int, int);
 void part_emudat_defer_get (chain_t *, int, int);

@@ -51,7 +51,8 @@ struct timespec { unsigned long tv_sec, tv_nsec; };
 #define nanosleep(req, rem) usleep((req)->tv_sec * 1000 * 1000 + (req)->tv_nsec / 1000)
 #endif
 
-int bfin_wait_emuready = 1;
+int bfin_check_emuready = 1;
+int bfin_wait_clocks = -1;
 
 static struct timespec bfin_emu_wait_ts = {0, 5000000};
 
@@ -540,13 +541,10 @@ part_dbgstat_clear_ovfs (chain_t *chain, int n)
 }
 
 void
-chain_wait_emuready (chain_t *chain)
+chain_check_emuready (chain_t *chain)
 {
   int emuready;
   int i;
-  int waited = 0;
-
-try_again:
 
   chain_dbgstat_get (chain);
   emuready = 1;
@@ -562,24 +560,13 @@ try_again:
 	}
     }
 
-  if (waited)
-    assert (emuready);
-
-  if (!emuready)
-    {
-      nanosleep (&bfin_emu_wait_ts, NULL);
-      waited = 1;
-      goto try_again;
-    }
+  assert (emuready);
 }
 
 void
-part_wait_emuready (chain_t *chain, int n)
+part_check_emuready (chain_t *chain, int n)
 {
   int emuready;
-  int waited = 0;
-
-try_again:
 
   part_dbgstat_get (chain, n);
   if (part_dbgstat_is_emuready (chain, n))
@@ -587,15 +574,7 @@ try_again:
   else
     emuready = 0;
 
-  if (waited)
-    assert (emuready);
-
-  if (!emuready)
-    {
-      nanosleep (&bfin_emu_wait_ts, NULL);
-      waited = 1;
-      goto try_again;
-    }
+  assert (emuready);
 }
 
 int
@@ -798,8 +777,8 @@ chain_emuir_set (chain_t *chain, uint64_t *insn, int exit)
 
   chain_shift_data_registers_mode (chain, 0, 1, exit);
 
-  if (exit == EXITMODE_IDLE && bfin_wait_emuready)
-    chain_wait_emuready (chain);
+  if (exit == EXITMODE_IDLE && bfin_check_emuready)
+    chain_check_emuready (chain);
 }
 
 void
@@ -844,8 +823,8 @@ chain_emuir_set_same (chain_t *chain, uint64_t insn, int exit)
 
   chain_shift_data_registers_mode (chain, 0, 1, exit);
 
-  if (exit == EXITMODE_IDLE && bfin_wait_emuready)
-    chain_wait_emuready (chain);
+  if (exit == EXITMODE_IDLE && bfin_check_emuready)
+    chain_check_emuready (chain);
 }
 
 void
@@ -933,8 +912,8 @@ part_emuir_set (chain_t *chain, int n, uint64_t insn, int exit)
 
   chain_shift_data_registers_mode (chain, 0, 1, exit);
 
-  if (exit == EXITMODE_IDLE && bfin_wait_emuready)
-    part_wait_emuready (chain, n);
+  if (exit == EXITMODE_IDLE && bfin_check_emuready)
+    part_check_emuready (chain, n);
 }
 
 void
@@ -992,8 +971,8 @@ chain_emuir_set_same_2 (chain_t *chain, uint64_t insn1, uint64_t insn2, int exit
     }
 
   chain_shift_data_registers_mode (chain, 0, 1, exit);
-  if (exit ==  EXITMODE_IDLE && bfin_wait_emuready)
-    chain_wait_emuready (chain);
+  if (exit ==  EXITMODE_IDLE && bfin_check_emuready)
+    chain_check_emuready (chain);
 }
 
 void
@@ -1095,8 +1074,8 @@ part_emuir_set_2 (chain_t *chain, int n, uint64_t insn1, uint64_t insn2, int exi
 
   chain_shift_data_registers_mode (chain, 0, 1, exit);
 
-  if (exit == EXITMODE_IDLE && bfin_wait_emuready)
-    part_wait_emuready (chain, n);
+  if (exit == EXITMODE_IDLE && bfin_check_emuready)
+    part_check_emuready (chain, n);
 }
 
 uint64_t
@@ -1135,6 +1114,7 @@ part_emudat_defer_get (chain_t *chain, int n, int exit)
     {
       assert (tap_state (chain) & TAPSTAT_IDLE);
       chain_defer_clock (chain, 0, 0, 1);
+      chain_wait_ready (chain);
     }
 
   if (part_scan_select (chain, n, EMUDAT_SCAN) < 0)
@@ -1217,8 +1197,7 @@ part_emudat_get (chain_t *chain, int n, int exit)
     {
       assert (tap_state (chain) & TAPSTAT_IDLE);
       chain_defer_clock (chain, 0, 0, 1);
-      if (bfin_wait_emuready)
-	part_wait_emuready (chain, n);
+      chain_wait_ready (chain);
     }
 
   if (part_scan_select (chain, n, EMUDAT_SCAN) < 0)
@@ -1250,8 +1229,8 @@ part_emudat_set (chain_t *chain, int n, uint32_t value, int exit)
   emudat_init_value (r, value);
   chain_shift_data_registers_mode (chain, 0, 1, exit);
 
-  if (exit == EXITMODE_IDLE && bfin_wait_emuready)
-    part_wait_emuready (chain, n);
+  if (exit == EXITMODE_IDLE && bfin_check_emuready)
+    part_check_emuready (chain, n);
 }
 
 /* Forward declarations */

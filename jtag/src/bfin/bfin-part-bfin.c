@@ -110,6 +110,48 @@ struct emu_oab bfin_emu_oab =
   0x0001, /* DBGSTAT_EMUDOF */
 };
 
+static void
+bfin_wait_ready (void *data)
+{
+  chain_t *chain = (chain_t *) data;
+
+  /* When CCLK is 62MHz and SCLK is 31MHz, which is the lowest frequency I
+     can set in bf537 stamp linux kernel, set the gnICE+ cable frequency to
+     15MHz (current default), --wait-clocks >= 12 is required.
+
+     When CCLK is 62MHz and SCLK is 31MHz, set the gnICE+ cable frequency to
+     30MHz, --wait-clocks >= 21 is required.
+
+     When CCLK is 62MHz and SCLK is 31MHz, set the gnICE+ cable frequency to
+     6MHz (default), --wait-clocks >= 5 is required.
+
+     When CCLK is 62MHz and SCLK is 31MHz, set the gnICE cable frequency to
+     6MHz (default), --wait-clocks >= 2 is required.  */
+
+  if (bfin_wait_clocks == -1)
+    {
+      cable_t *cable = chain->cable;
+      uint32_t frequency = cable->frequency;
+      const char *name = cable->driver->name;
+
+      if (strcmp (name, "gnICE+") == 0 && frequency == 15000000)
+	bfin_wait_clocks = 12;
+      else if (strcmp (name, "gnICE+") == 0 && frequency == 30000000)
+	bfin_wait_clocks = 21;
+      else if (strcmp (name, "gnICE+") == 0 && frequency == 6000000)
+	bfin_wait_clocks = 5;
+      else if (strcmp (name, "gnICE") == 0 && frequency == 6000000)
+	bfin_wait_clocks = 2;
+      else
+        {
+	  bfin_wait_clocks = 21;
+          printf ("Warning: untested cable or frequency, set wait_clocks to %d\n", bfin_wait_clocks);
+        }
+    }
+
+  chain_defer_clock (chain, 0, 0, bfin_wait_clocks);
+}
+
 void
 bfin_part_init (part_t *part)
 {
@@ -118,6 +160,7 @@ bfin_part_init (part_t *part)
   assert (part && part->params);
 
   part->params->free = free;
+  part->params->wait_ready = bfin_wait_ready;
   part->params->data = malloc (sizeof (struct bfin_part_data));
   EMU_OAB (part) = &bfin_emu_oab;
 

@@ -40,6 +40,7 @@ typedef struct part_params part_params_t;
 
 struct part_params {
 	void (*free) (void *);
+	void (*wait_ready) (void *);
 	void *data;
 };
 

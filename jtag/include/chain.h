@@ -58,6 +58,7 @@ void chain_shift_instructions_mode( chain_t *chain, int capture_output, int capt
 void chain_shift_data_registers( chain_t *chain, int capture_output );
 void chain_shift_data_registers_mode( chain_t *chain, int capture_output, int capture, int exit );
 void chain_flush( chain_t *chain );
+void chain_wait_ready( chain_t *chain );
 
 typedef struct {
 	chain_t **chains;

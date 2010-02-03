@@ -229,3 +229,15 @@ chain_flush( chain_t *chain )
 		cable_flush( chain->cable, COMPLETELY );
 }
 
+void
+chain_wait_ready( chain_t *chain )
+{
+        part_t *part;
+
+	if (!chain || !chain->parts)
+		return;
+
+        part = chain->parts->parts[chain->main_part];
+	if (part->params && part->params->wait_ready)
+		part->params->wait_ready (chain);
+}

@@ -1,3 +1,37 @@
+2010-02-03  Jie Zhang  <jie.zhang@analog.com>
+
+	* include/part.h (struct part_params): Add wait_ready.
+	* include/bfin.h (bfin_wait_emuready): Don't declare.
+	(bfin_check_emuready): Declare.
+	(bfin_wait_clocks): Declare.
+	(chain_wait_emuready): Don't declare.
+	(chain_check_emuready): Declare.
+	(part_wait_emuready): Don't declare.
+	(part_check_emuready): Declare.
+	* include/chain.h (chain_wait_ready): Declare.
+	* src/tap/chain.c (chain_wait_ready): New.
+	* src/tap/tap.c (tap_defer_shift_register): Call
+	chain_wait_ready if Run-Test/Idle.
+	* src/bfin/bfin-part-bfin.c (bfin_wait_ready): New.
+	(bfin_part_init): Init wait_ready.
+	* src/bfin/bfin.c (bfin_wait_emuready): Remove.
+	(bfin_check_emuready): Define.
+	(bfin_wait_clocks): Define.
+	(chain_wait_emuready): Remove.
+	(chain_check_emuready): New.
+	(part_wait_emuready): Remove.
+	(part_check_emuready): New.
+	(chain_emuir_set): Call chain_check_emuready instead of
+	chain_wait_emuready.
+	(chain_emuir_set_same): Likewise.
+	(part_emuir_set): Likewise.
+	(chain_emuir_set_same_2): Likewise.
+	(part_emuir_set_2): Likewise.
+	(part_emudat_set): Likewise.
+	(part_emudat_defer_get): Call chain_wait_ready when Run-Test/Idle.
+	(part_emudat_get): Likewise.
+	(part_emudat_set): Likewise.
+
 2010-01-28  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* src/cmd/bfin.c (bfin_one_insn_a_file): Delete.
