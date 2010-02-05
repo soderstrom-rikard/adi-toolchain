@@ -1,5 +1,9 @@
 2010-02-05  Mike Frysinger  <michael.frysinger@analog.com>
 
+	* sim/bfin/compare.s (_test): Rename from _testeq.
+
+2010-02-05  Mike Frysinger  <michael.frysinger@analog.com>
+
 	* sim/bfin/link.s: New test.
 	* sim/bfin/link-2.s: New test.
 
