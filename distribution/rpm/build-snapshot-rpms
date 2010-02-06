@@ -1,0 +1,48 @@
+#!/bin/sh
+
+set -e
+
+arg0=${0##*/}
+toolchain_dir=$1
+stamp=$2
+spec=${3:-snapshot.spec}
+
+if [ ! -d "${toolchain_dir}" ] || [ ! -e "${spec}" ] ; then
+	cat <<-EOF 1>&2
+		Generate RPMs from an already compiled toolchain tree
+
+		Usage: ${arg0} <toolchain dir> <date stamp> [rpm spec]
+
+		The toolchain dir should be the base output directory like so:
+		  <toolchain dir>
+		     |--  bfin-elf/
+		     |--  bfin-uclinux/
+		     \--  bfin-linux-uclibc/
+
+		If no spec is specified, it defaults to snapshot.spec.
+
+		The RPMs will be generated from these directories and placed into:
+		  <toolchain dir>/pkgs/
+
+		Example:
+		  ${arg0} /usr/local/src/blackfin/toolchains/ 20100205 snapshot.spec
+	EOF
+	exit 1
+fi
+
+mkdir -p BUILD/opt
+rm -f BUILD/opt/uClinux-SVN
+ln -s "${toolchain_dir}" BUILD/opt/uClinux-SVN
+
+for t in elf linux-uclibc uclinux ; do
+	d=$(echo *-${t})
+	echo "/opt/uClinux-SVN/${d}" > .filelist-rpm.${t}
+done
+
+rpmbuild \
+	--define="STAMP ${stamp}" \
+	-bb "${spec}"
+
+rm BUILD/opt/uClinux-SVN .filelist-rpm.*
+rmdir BUILD/opt
+rmdir BUILD
