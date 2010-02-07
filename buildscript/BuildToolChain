@@ -854,11 +854,11 @@ if [ ! -d $DIR_LIBFTDI_SOURCE ] ; then
     exit 1
 fi
 
-printf "Path to jtag                "
-DIR_JTAG_SOURCE=$DIR_SOURCE/jtag
-echo $DIR_JTAG_SOURCE
-if [ ! -d $DIR_JTAG_SOURCE ] ; then
-    echo "Can't find jtag source at $DIR_JTAG_SOURCE"
+printf "Path to urjtag              "
+DIR_URJTAG_SOURCE=$DIR_SOURCE/urjtag
+echo $DIR_URJTAG_SOURCE
+if [ ! -d $DIR_URJTAG_SOURCE ] ; then
+    echo "Can't find urjtag source at $DIR_URJTAG_SOURCE"
     exit 1
 fi
 
@@ -2222,7 +2222,7 @@ if ! resume_check ldr-utils ; then
     resume_save
     fi
 
-    ######################## jtag/gdbproxy #######################
+    ######################## urjtag/gdbproxy #######################
 
     if ! resume_check jtag-tools ; then
 
@@ -2251,26 +2251,27 @@ if ! resume_check ldr-utils ; then
     export LIBFTDI_CONFIG="$DIR_LIBFTDI_BUILD/destdir/bin/libftdi-config"
     fi
 
-    ### jtag
-    DIR_JTAG_BUILD=$DIR_BUILD/jtag
+    ### urjtag
+    DIR_URJTAG_BUILD=$DIR_BUILD/urjtag
 
-    change_dir $DIR_JTAG_SOURCE
+    change_dir $DIR_URJTAG_SOURCE
 
-    echo_date "Cleaning jtag"
+    echo_date "Cleaning urjtag"
     find . -print0 | xargs -0 touch -r . # fix autotool timestamps
     [ -e Makefile ] && run_cmd $MAKE distclean
     # generated files get out of sync with source files; force regen
     rm -f src/bsdl/bsdl_bison.[ch] src/bsdl/bsdl_flex.c \
           src/svf/svf_bison.[ch] src/svf/svf_flex.c
-    change_clean_dir "$DIR_JTAG_BUILD"
+    change_clean_dir "$DIR_URJTAG_BUILD"
 
-    echo_date "Configuring jtag"
-    run_cmd env $DIR_JTAG_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET --enable-relocatable
+    echo_date "Configuring urjtag"
+    run_cmd $DIR_URJTAG_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET \
+        --disable-shared --enable-static --enable-relocatable
 
-    echo_date "Building jtag"
+    echo_date "Building urjtag"
     run_cmd $MAKE
 
-    echo_date "Installing jtag"
+    echo_date "Installing urjtag"
     run_cmd $MAKE install DESTDIR=$DIR_ELF_OUTPUT   program_transform_name=s,^,bfin-,
     if [ $KERNEL_SOURCE ] ; then
         run_cmd $MAKE install DESTDIR=$DIR_uC_OUTPUT    program_transform_name=s,^,bfin-,
@@ -2289,7 +2290,7 @@ if ! resume_check ldr-utils ; then
 
     echo_date "Configuring gdbproxy"
     run_cmd env $DIR_GDBPROXY_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET \
-        --with-jtag-srcdir=$DIR_JTAG_SOURCE --with-jtag-builddir=$DIR_JTAG_BUILD --enable-relocatable
+        --with-jtag-srcdir=$DIR_URJTAG_SOURCE --with-jtag-builddir=$DIR_URJTAG_BUILD --enable-relocatable
 
     echo_date "Building gdbproxy"
     run_cmd $MAKE
@@ -2302,7 +2303,7 @@ if ! resume_check ldr-utils ; then
     fi
 
     change_dir $DIR_BUILD
-    rm -rf "$DIR_LIBFTDI_BUILD" "$DIR_JTAG_BUILD" "$DIR_GDBPROXY_BUILD"
+    run_cmd rm -rf "$DIR_LIBFTDI_BUILD" "$DIR_URJTAG_BUILD" "$DIR_GDBPROXY_BUILD"
 
     resume_save
 fi
