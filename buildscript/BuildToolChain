@@ -2010,7 +2010,7 @@ if [ $KERNEL_SOURCE ] ; then
 		;;
 	esac
 
-	cp ${UCLIBC_CONFIG_FILE:-extra/Configs/Config.bfin.default} .config
+	run_cmd cp ${UCLIBC_CONFIG_FILE:-extra/Configs/Config.bfin.default} .config
 	set_opt KERNEL_HEADERS \"$DIR_KBUILD_OUTPUT/usr/include\"
 	set_opt MULTILIB \"${uclibc_dir2}\"
 	set_opt UCLIBC_EXTRA_CFLAGS \"${flags} ${UCLIBC_CFLAGS} -Wa,--noexecstack\"
@@ -2051,7 +2051,7 @@ if [ $KERNEL_SOURCE ] ; then
 	done
 
 	run_cmd $MAKE oldconfig CROSS=bfin-elf- </dev/null
-	cp .config .config-used-for_${suffix}
+	run_cmd cp .config .config-used-for_${suffix}
 	build_uClibc "${uclibc_sysroot}" "${uclibc_dir1}" "${uclibc_dir2}"
 
 	resume_save
@@ -2059,7 +2059,7 @@ if [ $KERNEL_SOURCE ] ; then
 
     # update the kernel header path just to make rebuilding easier later on
     sed -i.tmp '/^KERNEL_HEADERS/s:=.*:="'"$DIR_uC_OUTPUT/bfin-uclinux/runtime/usr/include"'":' .config-used-for*
-    rm -f .config*.tmp
+    run_cmd rm -f .config*.tmp
 
     ######################### Done with uClibc ###########################
 
@@ -2217,14 +2217,14 @@ if ! resume_check ldr-utils ; then
     fi
 
     change_dir $DIR_LDR_UTILS_SOURCE
-    rm -rf "$DIR_LDR_UTILS_BUILD"
+    run_cmd rm -rf "$DIR_LDR_UTILS_BUILD"
 
     resume_save
-    fi
+fi
 
-    ######################## urjtag/gdbproxy #######################
+######################## urjtag/gdbproxy #######################
 
-    if ! resume_check jtag-tools ; then
+if ! resume_check jtag-tools ; then
 
     ### libftdi
     if ( check_lib usb-1.0 ) 2>/dev/null ; then
@@ -2260,7 +2260,7 @@ if ! resume_check ldr-utils ; then
     find . -print0 | xargs -0 touch -r . # fix autotool timestamps
     [ -e Makefile ] && run_cmd $MAKE distclean
     # generated files get out of sync with source files; force regen
-    rm -f src/bsdl/bsdl_bison.[ch] src/bsdl/bsdl_flex.c \
+    run_cmd rm -f src/bsdl/bsdl_bison.[ch] src/bsdl/bsdl_flex.c \
           src/svf/svf_bison.[ch] src/svf/svf_flex.c
     change_clean_dir "$DIR_URJTAG_BUILD"
 
@@ -2309,7 +2309,7 @@ if ! resume_check ldr-utils ; then
     resume_save
 fi
 
-    ######################## Done ################################
+######################## Done ################################
 
 
 
@@ -2356,7 +2356,7 @@ if [ -e $DIR_SOURCE/libs/Makefile ] ; then
 	# For file systems with low resolution timestamp, like ext2/3,
 	# sometimes, libbfdsp.a will not be updated correctly.
 	# Remove it instead of make clean can save much time.
-	rm $DIR_SOURCE/libs/libdsp/libbfdsp.a
+	run_cmd rm $DIR_SOURCE/libs/libdsp/libbfdsp.a
 
 	run_cmd $MAKE CROSS=bfin-elf- LIBC_HAS_NO_CMATH=1 MULTILIB_FLAGS="$flags"
 
