@@ -847,7 +847,7 @@ if [ ! -d $DIR_GDBPROXY_SOURCE ] ; then
 fi
 
 printf "Path to libftdi             "
-DIR_LIBFTDI_SOURCE=$DIR_SOURCE/libftdi
+DIR_LIBFTDI_SOURCE=$DIR_SOURCE/libftdi-1.0
 echo $DIR_LIBFTDI_SOURCE
 if [ ! -d $DIR_LIBFTDI_SOURCE ] ; then
     echo "Can't find libftdi source at $DIR_LIBFTDI_SOURCE"
@@ -2227,8 +2227,8 @@ if ! resume_check ldr-utils ; then
     if ! resume_check jtag-tools ; then
 
     ### libftdi
-    if ( check_lib usb && ! check_lib ftdi ) 2>/dev/null ; then
-    DIR_LIBFTDI_BUILD=$DIR_BUILD/libftdi
+    if ( check_lib usb-1.0 ) 2>/dev/null ; then
+    DIR_LIBFTDI_BUILD=$DIR_BUILD/libftdi-1.0
 
     change_dir $DIR_LIBFTDI_SOURCE
 
@@ -2239,7 +2239,7 @@ if ! resume_check ldr-utils ; then
 
     echo_date "Configuring libftdi"
     run_cmd $DIR_LIBFTDI_SOURCE/configure --prefix="$DIR_LIBFTDI_BUILD/destdir" \
-        $BUILD_TARGET $HOST_TARGET --disable-shared --enable-static --disable-libftdipp --disable-python-binding
+        $BUILD_TARGET $HOST_TARGET --disable-shared --enable-static --disable-libftdipp --disable-python-binding --with-async-mode
 
     echo_date "Building libftdi"
     run_cmd $MAKE SUBDIRS=src
@@ -2266,7 +2266,7 @@ if ! resume_check ldr-utils ; then
 
     echo_date "Configuring urjtag"
     run_cmd $DIR_URJTAG_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET \
-        --disable-shared --enable-static --enable-relocatable
+        --disable-shared --enable-static --enable-relocatable --with-libusb=1.0
 
     echo_date "Building urjtag"
     run_cmd $MAKE
