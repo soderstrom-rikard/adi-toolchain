@@ -1,3 +1,8 @@
+2010-02-08  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* bfin-tdep.c (bfin_sim_regno): Delete.
+	(bfin_gdbarch_init): Drop call to set_gdbarch_register_sim_regno().
+
 2009-11-24  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* configure.ac (sysroot): Check exec_prefix set to '${prefix}'.

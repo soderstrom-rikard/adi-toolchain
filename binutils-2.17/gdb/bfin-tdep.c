@@ -1112,22 +1112,6 @@ bfin_unwind_pc (struct gdbarch *gdbarch, struct frame_info *next_frame)
   return frame_unwind_register_unsigned (next_frame, PC_REGNUM);
 }
 
-static int
-bfin_sim_regno (int regno)
-{
-  switch (regno)
-    {
-    case SIM_BFIN_ASTAT_REGNUM:
-    case SIM_BFIN_TEXT_ADDR:
-    case SIM_BFIN_TEXT_END_ADDR:
-    case SIM_BFIN_DATA_ADDR:
-    case SIM_BFIN_IPEND_REGNUM:
-      return SIM_REGNO_DOES_NOT_EXIST;
-    default:
-      return regno;
-    }
-}
-
 CORE_ADDR
 bfin_frame_align (struct gdbarch *gdbarch, CORE_ADDR address)
 {
@@ -1214,7 +1198,6 @@ bfin_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   set_gdbarch_register_type (gdbarch, bfin_register_type);
   set_gdbarch_unwind_dummy_id (gdbarch, bfin_unwind_dummy_id);
   set_gdbarch_push_dummy_call (gdbarch, bfin_push_dummy_call);
-  set_gdbarch_register_sim_regno (gdbarch, bfin_sim_regno);
   set_gdbarch_believe_pcc_promotion (gdbarch, 1);
   set_gdbarch_return_value (gdbarch, bfin_return_value);
   set_gdbarch_extract_return_value (gdbarch, bfin_extract_return_value);
