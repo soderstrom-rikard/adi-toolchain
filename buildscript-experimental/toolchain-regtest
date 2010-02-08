@@ -360,8 +360,9 @@ do
 	    shift
 	    ;;
 	*)
-	    echo "Unknow argument $1"
+	    echo "Unknown argument $1"
 	    echo "Try \`$APP_NAME -h' for more information."
+	    exit 1
     esac
 done
 
