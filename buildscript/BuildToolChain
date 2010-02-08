@@ -2266,7 +2266,8 @@ if ! resume_check jtag-tools ; then
 
     echo_date "Configuring urjtag"
     run_cmd $DIR_URJTAG_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET \
-        --disable-shared --enable-static --enable-relocatable --with-libusb=1.0
+        --disable-shared --enable-static --enable-relocatable --with-libusb=1.0 \
+        --disable-silent-rules
 
     echo_date "Building urjtag"
     run_cmd $MAKE
@@ -2291,7 +2292,7 @@ if ! resume_check jtag-tools ; then
     echo_date "Configuring gdbproxy"
     run_cmd env $DIR_GDBPROXY_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET \
         --with-jtag-srcdir=$DIR_URJTAG_SOURCE --with-jtag-builddir=$DIR_URJTAG_BUILD \
-        --enable-relocatable --disable-silent-rules
+        --disable-silent-rules
 
     echo_date "Building gdbproxy"
     run_cmd $MAKE
