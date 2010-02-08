@@ -2218,9 +2218,9 @@ run_tests ()
             if [ -f $RESULTS2COMPARE/$2/$COMP ] ; then
                 echo "Comparing generated $COMP to master at $RESULTS2COMPARE/$2/$COMP"
                 $DIR_SOURCE/gcc-$GCC_VERSION/contrib/compare_tests \
-                    $FILE $RESULTS2COMPARE/$2/$COMP
+                    $RESULTS2COMPARE/$2/$COMP $FILE
             else
-                echo "Could not find $RESULTS2COMPARE/$2/$FILE to compare"
+                echo "Could not find $RESULTS2COMPARE/$2/$COMP to compare"
             fi
         fi
     done
