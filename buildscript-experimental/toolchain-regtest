@@ -2223,7 +2223,8 @@ run_tests ()
             COMP=`basename $FILE`
             if [ -f $RESULTS2COMPARE/$2/$COMP ] ; then
                 echo "Comparing generated $COMP to master at $RESULTS2COMPARE/$2/$COMP"
-                $DIR_SOURCE/gcc-$GCC_VERSION/contrib/compare_tests \
+                # If GCC_VERSION is not set, fall back to automatic search
+                `printf '%s\n' "$DIR_SOURCE"/gcc-${GCC_VERSION:-*}/contrib/compare_tests | tail -n 1` \
                     $RESULTS2COMPARE/$2/$COMP $FILE
             else
                 echo "Could not find $RESULTS2COMPARE/$2/$COMP to compare"
