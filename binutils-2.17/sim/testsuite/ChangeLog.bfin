@@ -1,5 +1,11 @@
 2010-02-09  Mike Frysinger  <michael.frysinger@analog.com>
 
+	* sim/bfin/testutils.inc (system_call, write): New macros.
+	(exit): Call system_call.
+	(__pass, __fail): Call write.
+
+2010-02-09  Mike Frysinger  <michael.frysinger@analog.com>
+
 	* sim/bfin/testutils.inc (_retval): Delete.
 	(exit): Use _params.
 

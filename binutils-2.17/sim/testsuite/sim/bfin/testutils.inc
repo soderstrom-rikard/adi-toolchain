@@ -16,14 +16,18 @@ _params:
 __start:
 	.endm
 
+	.macro system_call nr:req
+	P0 = \nr (X);
+	EXCPT 0;
+	.endm
+
 	.macro exit rc
 	P0.H = _params;
 	P0.L = _params;
 	R0 = \rc (X);
 	[P0] = R0;
 	R0 = P0;
-	P0 = 1 (X);
-	EXCPT 0;
+	system_call 1
 	.endm
 
 	.macro pass
@@ -34,32 +38,24 @@ __start:
 	CALL __fail;
 	.endm
 
-__pass:
+	.macro write fd:req, buf:req, count:req
 	P0.H = _params;
 	P0.L = _params;
-	R0 = 1 (X);
+	R0 = \fd (X);
 	[P0] = R0;
-	R0.H = _passmsg;
-	R0.L = _passmsg;
+	R0.H = \buf;
+	R0.L = \buf;
 	[P0 + 4] = R0;
-	R0 = 5 (X);
+	R0 = \count (X);
 	[P0 + 8] = R0;
 	R0 = P0;
-	P0 = 5 (X);
-	EXCPT 0;
+	system_call 5
+	.endm
+
+__pass:
+	write 1, _passmsg, 5
 	exit 0
 
 __fail:
-	P0.H = _params;
-	P0.L = _params;
-	R0 = 1 (X);
-	[P0] = R0;
-	R0.H = _failmsg;
-	R0.L = _failmsg;
-	[P0 + 4] = R0;
-	R0 = 5 (X);
-	[P0 + 8] = R0;
-	R0 = P0;
-	P0 = 5 (X);
-	EXCPT 0;
+	write 1, _failmsg, 5
 	exit 1
