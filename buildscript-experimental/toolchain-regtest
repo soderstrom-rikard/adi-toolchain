@@ -27,6 +27,7 @@
 APP_NAME=$0
 DIR_APP=$(cd $(dirname $APP_NAME) && pwd)
 DIR_BOARDS=$DIR_APP/boards/
+DIR_SOURCE=${DIR_APP%/*}
 APP_NAME=${APP_NAME#.}
 APP_NAME=${APP_NAME#/}
 START=$(date +%s)
