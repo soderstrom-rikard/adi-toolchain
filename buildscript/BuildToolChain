@@ -55,6 +55,12 @@ TEST_OPTS=
 TEST_SIM=
 TEST_HARDWARE=
 
+error()
+{
+	printf "$*\n" 1>&2
+	exit 1
+}
+
 while getopts b:B:c:C:dDfH:hj:k:K:l:m:o:O:pP:r:s:StT:u:U:vwX parameter
 do
     case $parameter in
@@ -94,8 +100,7 @@ do
                 DIR_SOURCE=$OPTARG
                 DIR_SOURCE=${DIR_SOURCE%/}
             else
-                echo "Invalid Source Path"
-                exit 1
+                error "Invalid Source Path"
             fi
             ;;
         l)
@@ -109,12 +114,10 @@ do
                     fi
                 done
                 if [ -z $BFIN_LANGS ] ; then
-                    echo  "Must Build C Compiler $OPTARG"
-                    exit 1
+                    error "Must Build C Compiler $OPTARG"
                 fi
             else
-                echo "Can't understand Language argument $OPTARG"
-                exit 1
+                error "Can't understand Language argument $OPTARG"
             fi
             ;;
         B)
@@ -133,24 +136,21 @@ do
         k)
             KERNEL_SOURCE=$OPTARG
             if [ ! -d $KERNEL_SOURCE/arch/blackfin ] ; then
-                echo "Can't find $KERNEL_SOURCE/arch/blackfin"
-                exit 1
+                error "Can't find $KERNEL_SOURCE/arch/blackfin"
             fi
             ;;
         K)
             KERNEL_SOURCE=$OPTARG
             DIR_KBUILD_OUTPUT=$OPTARG
             if [ ! -d $KERNEL_SOURCE/usr/include/linux ] ; then
-                echo "Can't find kernel headers"
-                exit 1
+                error "Can't find kernel headers"
             fi
             ;;
         u)
             if [ -f $OPTARG/tools/mkimage.c ] ; then
                 DIR_UBOOT=$OPTARG
             else
-                echo "Invalid U-Boot Path"
-                exit 1
+                error "Invalid U-Boot Path"
             fi
             ;;
         b)
@@ -220,8 +220,8 @@ echo "-v               Verbose
              exit 0
              ;;
         *)
-             echo "unknown option $parameter"
-             echo "Try \`$APP_NAME -h' for more information."
+             error "unknown option $parameter\n" \
+                   "Try \`$APP_NAME -h' for more information."
              exit 1
     esac
 done
@@ -246,6 +246,13 @@ resume_save()
 resume_clear()
 {
 	rm -f "$DIR_LOG"/.resume.*
+}
+
+notice()
+{
+	local notice="$1"
+	shift
+	printf "%-28s%s\n" "$notice: " "$*"
 }
 
 check_cc_options() {
@@ -388,8 +395,7 @@ for PREREQ in $PREREQ_FILE $MAKE
 do
     RUN=`which -a $PREREQ | wc -w`
     if [ $RUN -eq 0 ] ; then
-        echo "Cannot find $PREREQ"
-        exit 1
+        error "Cannot find $PREREQ"
     else if [ $RUN -gt 1 ] ; then
         printf "Found multiple versions of $PREREQ, using the one at "
         which $PREREQ
@@ -402,8 +408,7 @@ for flags in CFLAGS LDFLAGS CPPFLAGS CXXFLAGS
 do
     tmp=$(eval echo \$${flags})
     if [ ${#tmp} -ne 0 ] ; then
-      printf "\nSince the shell $flags is set, it will override the choices made by configure.\nThis is normally bad, and will cause problems.\n\n"
-      exit 1
+      error "\nSince the shell $flags is set, it will override the choices made by configure.\nThis is normally bad, and will cause problems.\n\n"
     fi
 done
 
@@ -418,7 +423,8 @@ fi
 # figure out the defaults by loading all languages.
 #BFIN_LANGS=" --enable-languages=c,c++"
 : ${GCC_VERSIONS:=${GCC_VERSIONS_DEFAULT}}
-printf "Building gcc versions $GCC_VERSIONS ${BFIN_LANGS}"
+notice "Building gcc versions" $GCC_VERSIONS
+notice "Building gcc languages" ${BFIN_LANGS:-all found}
 
 ############ CHECK MAKE SET #####################################
 if [ ! "$MAKE" ] ; then
@@ -430,7 +436,7 @@ if [ "$NUM_JOBS" -eq "0" ] ; then
 	[ ${NUM_JOBS} -eq 0 ] && NUM_JOBS=2
 fi
 export MAKEFLAGS="-j$NUM_JOBS $MAKEFLAGS"
-echo "Utilizing make: $MAKE $MAKEFLAGS"
+notice "Utilizing make" "$MAKE $MAKEFLAGS"
 
 ##### Check to make sure a old version of bfin-elf is not here
 ##### Unless we are cross-compiling our toolchain, then we need the
@@ -461,114 +467,90 @@ if [ -z "$CHOST" ] ; then
     NEW_PATH=$NEW_PATH:
     PATH=$NEW_PATH
 elif [ "$FOUND" = "0" ] ; then
-    echo "You need an existing Blackfin cross-compiler"
-    echo " in order to cross-compile a cross-compiler."
-    exit 1
+    error "You need an existing Blackfin cross-compiler\n" \
+          " in order to cross-compile a cross-compiler."
 else
     PATH=$ORG_PATH
     NEW_PATH=$ORG_PATH
 fi
 
-############ SOURCE MUST PROVIDED WITH COMMAND LINE ARGUMENT ###
-if [ ! $DIR_SOURCE ] ; then
-    echo "Usage : $APP_NAME -s SOURCE [-b BUILD]"
-    echo "                  -h for help"
-    exit 1
-fi
-
 ############ ABSOLUTE PATH TO SOURCE DIRECTORIES ################
 
-if [ -d /.$DIR_SOURCE ] ; then
-    printf "Toolchain source is at      "
-    echo $DIR_SOURCE
-else
-    echo "Invalid Toolchain Source Path"
-    echo $DIR_SOURCE
-    exit 1
-fi
+is_abs_dir()
+{
+	[ -d "/..$1" ]
+}
+check_abs_dir()
+{
+	local msg=$1
+	shift
+
+	local d
+	for d in "$@" ; do
+		if ! is_abs_dir "$d" ; then
+			error "Directory does not exist, or is not an absolute path:\n  -- ${d}"
+		fi
+	done
+
+	[ -n "${msg}" ] && notice "${msg}" "$@"
+	return 0
+}
+
+check_abs_dir "Toolchain source" "${DIR_SOURCE}"
 if [ $KERNEL_SOURCE ] ; then
-    if [ -d /.$KERNEL_SOURCE ] ; then
-        printf "Kernel source is at         "
-        echo $KERNEL_SOURCE
-    else
-        echo "Invalid Kernel Source Path"
-        echo $DIR_SOURCE
-        exit 1
-    fi
+	check_abs_dir "Kernel source" "${KERNEL_SOURCE}"
 fi
 
 ############ ABSOLUTE PATH TO BUILD DIRECTORIES ################
 
-if [ $DIR_BUILD ] ; then
-    if [ -d /.$DIR_BUILD ] ; then
-        printf "Build will be done in       "
-        echo $DIR_BUILD
-    else
-        mkdir -p $DIR_BUILD
-        if [ ! -d /.$DIR_BUILD ] ; then
-            echo "Invalid Build Path, must be relative to the root dir"
-            exit 1
-        fi
-    fi
-else
-    printf "Build will be done in       "
-    echo ${DIR_BUILD=`pwd`}
-fi
+: ${DIR_BUILD:=${PWD}}
+
+mkdir -p "${DIR_BUILD}"
+check_abs_dir "" "${DIR_BUILD}"
 
 mk_output_dir()
 {
-    printf "%-28s%s\n" "Path to $1 output dir " "$2"
-    if [ ! -d $2 ] ; then
-        mkdir -p $2
-        if [ ! -d /.$2 ] ; then
-            echo "Invalid output directory, must be relative to the root dir"
-            exit 1
-        fi
-    else
-        if [ ! -d /.$2 ] ; then
-            echo "Invalid Output Path, must be relative to the root dir"
-            exit 1
-        fi
+	notice "Path to $1 output dir" "$2"
 
-        if [ "x$3" = "x" ] && ! ${RESUME_BUILD} ; then
-            echo "$2 already exists - cleaning"
-            rm -rf $2/*
-        fi
-    fi
+	if [ ! -d "$2" ] ; then
+		mkdir -p "$2"
+		check_abs_dir "" "$2"
+	else
+		check_abs_dir "" "$2"
+
+		if [ "x$3" = "x" ] && ! ${RESUME_BUILD} ; then
+			echo "  directory already exists - cleaning"
+			rm -rf $2/*
+		fi
+	fi
 }
 
 ############ RELATIVE PATH TO SOURCE DIRECTORIES ################
 if [ ! $DIR_ELF_OUTPUT ] ; then
     DIR_ELF_OUTPUT=$DIR_BUILD/bfin-elf
 fi
-mk_output_dir "elf" $DIR_ELF_OUTPUT $SKIP_ELF
+mk_output_dir "ELF" $DIR_ELF_OUTPUT $SKIP_ELF
 
 DIR_LOG=$DIR_BUILD/logs
-if [ ! -d $DIR_LOG ] ; then
-    mkdir $DIR_LOG
-elif ! ${RESUME_BUILD} ; then
-    rm -rf $DIR_LOG/*
+mkdir -p "${DIR_LOG}"
+if ! ${RESUME_BUILD} ; then
+    rm -rf "${DIR_LOG}"/*
     resume_clear
 fi
 
 # make sure we arent running on a case insensitive filesystem
-cd $DIR_BUILD
+cd "${DIR_BUILD}"
 rm -rf .case.test .CASE.test
 echo case > .case.test
 case=$(cat .CASE.test 2>/dev/null)
 if [ "$case" = "case" ] ; then
-	echo "ERROR: you must use a case sensitive filesystem"
-	exit 1
+	error "you must use a case sensitive filesystem"
 fi
 rm -rf .case.test .CASE.test
 
-printf "Path to binutils dir        "
 DIR_BINUTILS_SOURCE=$DIR_SOURCE/binutils-$BINUTILS_VERSION
-echo $DIR_BINUTILS_SOURCE
-if [ ! -d $DIR_BINUTILS_SOURCE ] ; then
-    echo "Can't find binutils source at $DIR_BINUTILS_SOURCE"
-    exit 1
-fi
+check_abs_dir "Path to binutils" "${DIR_BINUTILS_SOURCE}"
+
 CBUILD=$($DIR_BINUTILS_SOURCE/config.guess)
 BUILD_TARGET="--build=${CBUILD}"
 : ${CHOST:=${CBUILD}}
@@ -586,34 +568,15 @@ esac
 BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-werror"
 
 for GCC_VER in $GCC_VERSIONS; do
-    printf "Path to gcc-${GCC_VER} dir         "
-    if [ -d $DIR_SOURCE/gcc-$GCC_VER ] ; then
-        echo $DIR_SOURCE/gcc-$GCC_VER
-    else
-        echo missing
-        exit 1
-    fi
+	check_abs_dir "Path to gcc-${GCC_VER}" "${DIR_SOURCE}/gcc-${GCC_VER}"
 done
 
-printf "Path to elf2flt dir         "
 DIR_ELF2FLT_SOURCE=$DIR_SOURCE/elf2flt
-echo $DIR_ELF2FLT_SOURCE
-if [ ! -d $DIR_ELF2FLT_SOURCE ] ; then
-    echo "Can't find elf2flt source at $DIR_ELF2FLT_SOURCE"
-    exit 1
-fi
+check_abs_dir "Path to elf2flt" "${DIR_ELF2FLT_SOURCE}"
 
-printf "Path to uClibc dir          "
 UCLIBC_SOURCE=$DIR_SOURCE/uClibc
-echo $UCLIBC_SOURCE
-if [ ! -d $UCLIBC_SOURCE ] ; then
-    echo "Can't find uClibc source at $UCLIBC_SOURCE"
-    exit 1
-fi
-
-if [ -z "$UCLIBC_CFLAGS" ] ; then
-    UCLIBC_CFLAGS='-g -O2'
-fi
+check_abs_dir "Path to uClibc" "${UCLIBC_SOURCE}"
+: ${UCLIBC_CFLAGS:=-g -O2}
 
 printf "    uClibc CFLAGS           "
 #We test (and warn) if any of the CFLAGS for uClibc don't work on the host compiler
@@ -628,64 +591,37 @@ do
 done
 echo
 
-printf "Path to ldr-utils           "
 DIR_LDR_UTILS_SOURCE=$DIR_SOURCE/ldr-utils
-echo $DIR_LDR_UTILS_SOURCE
-if [ ! -d $DIR_LDR_UTILS_SOURCE ] ; then
-    echo "Can't find ldr-utils source at $DIR_LDR_UTILS_SOURCE"
-    exit 1
-fi
+check_abs_dir "Path to ldr-utils" "${DIR_LDR_UTILS_SOURCE}"
 
-printf "Path to gdbproxy            "
 DIR_GDBPROXY_SOURCE=$DIR_SOURCE/gdbproxy
-echo $DIR_GDBPROXY_SOURCE
-if [ ! -d $DIR_GDBPROXY_SOURCE ] ; then
-    echo "Can't find gdbproxy source at $DIR_GDBPROXY_SOURCE"
-    exit 1
-fi
+check_abs_dir "Path to gdbproxy" "${DIR_GDBPROXY_SOURCE}"
 
-printf "Path to libftdi             "
 DIR_LIBFTDI_SOURCE=$DIR_SOURCE/libftdi-1.0
-echo $DIR_LIBFTDI_SOURCE
-if [ ! -d $DIR_LIBFTDI_SOURCE ] ; then
-    echo "Can't find libftdi source at $DIR_LIBFTDI_SOURCE"
-    exit 1
-fi
+check_abs_dir "Path to libftdi" "${DIR_LIBFTDI_SOURCE}"
 
-printf "Path to urjtag              "
 DIR_URJTAG_SOURCE=$DIR_SOURCE/urjtag
-echo $DIR_URJTAG_SOURCE
-if [ ! -d $DIR_URJTAG_SOURCE ] ; then
-    echo "Can't find urjtag source at $DIR_URJTAG_SOURCE"
-    exit 1
-fi
+check_abs_dir "Path to urjtag" "${DIR_URJTAG_SOURCE}"
 
 if [ $KERNEL_SOURCE ] ; then
     if [ ! $DIR_uC_OUTPUT ] ; then
         DIR_uC_OUTPUT=$DIR_BUILD/bfin-uclinux
         DIR_LINUX_OUTPUT=$DIR_BUILD/bfin-linux-uclibc
     fi
-    mk_output_dir "uClinux" $DIR_uC_OUTPUT ""
-    mk_output_dir "linux-uClibc" $DIR_LINUX_OUTPUT ""
+    mk_output_dir "FLAT" $DIR_uC_OUTPUT ""
+    mk_output_dir "FDPIC" $DIR_LINUX_OUTPUT ""
     if [ ! $DIR_KBUILD_OUTPUT ] ; then
         DIR_KBUILD_OUTPUT=$DIR_BUILD/kernel_build
         mk_output_dir "kernel" $DIR_KBUILD_OUTPUT ""
     fi
     if [ $DIR_UBOOT ] ; then
-      printf "Path to U-Boot Source       "
-      echo $DIR_UBOOT
+        check_abs_dir "Path to U-Boot" "${DIR_UBOOT}"
     else
-      echo "U-Boot Source not specified: addon utilties (like 'mkimage') will not be built"
+        echo "U-Boot Source not specified: addon utilties (like 'mkimage') will not be built"
     fi
-    if [ -z "$UCLIBC_CONFIG_FILE" ]; then
-      echo "Path to uClibc Config files $UCLIBC_SOURCE/extra/Configs/"
-    else
-      if [ -f $UCLIBC_CONFIG_FILE ]; then
-        echo "Path to uClibc config files $UCLIBC_CONFIG_FILE"
-      else
-        echo "Can't find uClibc config file at $UCLIBC_CONFIG_FILE"
-        exit 1
-      fi
+    notice "Path to uClibc config" "${UCLIBC_CONFIG_FILE:-$UCLIBC_SOURCE/extra/Configs/}"
+    if [ -n "$UCLIBC_CONFIG_FILE" ] && [ ! -f "${UCLIBC_CONFIG_FILE}" ] ; then
+        error "Can't find uClibc config file '$UCLIBC_CONFIG_FILE'"
     fi
 fi
 
@@ -693,7 +629,7 @@ fi
 
 STDOUT_LOG="$DIR_LOG/log${DATE_STAMP+.${TIMESTAMP}}"
 STDERR_LOG="$DIR_LOG/warn${DATE_STAMP+.${TIMESTAMP}}"
-echo "Creating log file           ${STDOUT_LOG}"
+notice "Creating log file" "${STDOUT_LOG}"
 if [ $VERBOSE ]; then
     LOGFILE="| tee -a ${STDOUT_LOG}"
     ACTUAL_LOGFILE=${STDOUT_LOG}
