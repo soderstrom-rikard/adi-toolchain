@@ -7,8 +7,6 @@ _failmsg:
 _passmsg:
 	.ascii "pass\n"
 	.align 4
-_retval:
-	.long 0
 _params:
 	.long 0
 	.long 0
@@ -19,8 +17,8 @@ __start:
 	.endm
 
 	.macro exit rc
-	P0.H = _retval;
-	P0.L = _retval;
+	P0.H = _params;
+	P0.L = _params;
 	R0 = \rc (X);
 	[P0] = R0;
 	R0 = P0;

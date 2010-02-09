@@ -1,3 +1,8 @@
+2010-02-09  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* sim/bfin/testutils.inc (_retval): Delete.
+	(exit): Use _params.
+
 2010-02-05  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* sim/bfin/compare.s (_test): Rename from _testeq.
