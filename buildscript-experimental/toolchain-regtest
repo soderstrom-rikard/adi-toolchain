@@ -641,9 +641,9 @@ fi
 
 if [ -n "$TEST_TARGET_ELF_SIM" ] ; then
     if [ $DATE_STAMP ] ; then
-        DIR_TEST_SIM_RESULTS=$DIR_TEST_RESULTS/simulator-$TIMESTAMP
+        DIR_TEST_SIM_RESULTS=$DIR_TEST_RESULTS/elf-sim-$TIMESTAMP
     else
-        DIR_TEST_SIM_RESULTS=$DIR_TEST_RESULTS/simulator
+        DIR_TEST_SIM_RESULTS=$DIR_TEST_RESULTS/elf-sim
     fi
     if [ ! -d $DIR_TEST_SIM_RESULTS ] ; then
         mkdir $DIR_TEST_SIM_RESULTS
@@ -653,15 +653,15 @@ if [ -n "$TEST_TARGET_ELF_SIM" ] ; then
     echo "  elf simulator:  $DIR_TEST_SIM_RESULTS"
 
     if [ -n "$RESULTS2COMPARE" ] ; then
-        if [ ! -d $RESULTS2COMPARE/simulator ] ; then
-            echo "Can't find simulator results in $RESULTS2COMPARE/simulator"
+        if [ ! -d $RESULTS2COMPARE/elf-sim ] ; then
+            echo "Can't find simulator results in $RESULTS2COMPARE/elf-sim"
             exit 1
         else
             if [ ! -d /.$RESULTS2COMPARE ] ; then
                 echo "Invalid results path, must be relative to the root dir"
                 exit 1
             fi
-            echo "    checking simulator results against $RESULTS2COMPARE/simulator"
+            echo "    checking simulator results against $RESULTS2COMPARE/elf-sim"
         fi
     fi
 fi
