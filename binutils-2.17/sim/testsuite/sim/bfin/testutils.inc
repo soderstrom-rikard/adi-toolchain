@@ -1,6 +1,10 @@
 # R0 and P0 are used as tmps, consider them call clobbered by these macros.
 
+# To build for hardware, use:
+# bfin-linux-uclibc-gcc -nostdlib -g -Wa,--defsym,BFIN_HOST=1 foo.s
+
 	.macro start
+.ifndef BFIN_HOST
 	.data
 _failmsg:
 	.ascii "fail\n"
@@ -12,6 +16,7 @@ _params:
 	.long 0
 	.long 0
 	.long 0
+.endif
 	.text
 	.global __start
 __start:
@@ -22,12 +27,14 @@ __start:
 	EXCPT 0;
 	.endm
 
-	.macro exit rc
+	.macro exit rc:req
+	R0 = \rc (X);
+.ifndef BFIN_HOST
 	P0.H = _params;
 	P0.L = _params;
-	R0 = \rc (X);
 	[P0] = R0;
 	R0 = P0;
+.endif
 	system_call 1
 	.endm
 
@@ -40,6 +47,7 @@ __start:
 	.endm
 
 	.macro write fd:req, buf:req, count:req
+.ifndef BFIN_HOST
 	P0.H = _params;
 	P0.L = _params;
 	R0 = \fd (X);
@@ -51,6 +59,7 @@ __start:
 	[P0 + 8] = R0;
 	R0 = P0;
 	system_call 5
+.endif
 	.endm
 
 __pass:

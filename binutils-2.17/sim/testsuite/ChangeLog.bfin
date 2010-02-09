@@ -1,5 +1,11 @@
 2010-02-09  Mike Frysinger  <michael.frysinger@analog.com>
 
+	* sim/bfin/Makefile, sim/bfin/run-tests.sh: New files.
+	* sim/bfin/testutils.inc (start): Disable storage when BFIN_HOST.
+	(exit, write): Skip _params when BFIN_HOST.
+
+2010-02-09  Mike Frysinger  <michael.frysinger@analog.com>
+
 	* sim/bfin/testutils.inc (_params): Increase by 4 bytes.
 
 2010-02-09  Mike Frysinger  <michael.frysinger@analog.com>
