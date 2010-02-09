@@ -69,3 +69,15 @@ __pass:
 __fail:
 	write 1, _failmsg, 5
 	exit 1
+
+	.macro imm32 reg:req, val:req
+	\reg\().L = ((\val) & 0xffff);
+	\reg\().H = (((\val) >> 16) & 0xffff);
+	.endm
+
+	.macro dmm32 reg:req, val:req
+	[--SP] = R0;
+	imm32 R0, \val
+	\reg = R0;
+	R0 = [SP++];
+	.endm
