@@ -28,7 +28,9 @@
 ###############################################################
 
 APP_NAME=$0
-DIR_BOARDS=$(cd $(dirname $APP_NAME) && pwd)/boards/
+DIR_APP=$(cd $(dirname $APP_NAME) && pwd)
+DIR_BOARDS=$DIR_APP/boards/
+DIR_SOURCE=${DIR_APP%/*}
 APP_NAME=${APP_NAME#.}
 APP_NAME=${APP_NAME#/}
 START=$(date +%s)
@@ -36,11 +38,9 @@ START=$(date +%s)
 #Uncomment only one of these
 #TIMESTAMP=`date +%Y-%b-%d-%H-%M` # is YYYY_MMM_DD_HH_MM
 TIMESTAMP=`date +%Y%m%d`       # is YYYY_MMM_DD
-unset DATE_STAMP
+unset DATE_STAMP VERBOSE WARN
 
 PREREQ_FILE="autoconf automake awk /bin/sh bison cp echo flex gcc gettext grep ln m4 make makeinfo mkdir msgfmt mv rm sed tail wc which pkg-config"
-PREREQ_HW_TESTS=" ping rsh rcp"
-PREREQ_HW_SIM_TESTS=" bc kill killall pstree runtest Xvfb"
 BINUTILS_VERSION=2.17
 GCC_VERSIONS=
 GCC_VERSIONS_DEFAULT=4.3
@@ -50,6 +50,10 @@ WITHOUT_X=false
 RESUME_BUILD=false
 CBUILD= # the system we are compiling on
 CHOST=  # the system the final compiler will run on
+
+TEST_OPTS=
+TEST_SIM=
+TEST_HARDWARE=
 
 while getopts b:B:c:C:dDfH:hj:k:K:l:m:o:O:pP:r:s:StT:u:U:vwX parameter
 do
@@ -75,28 +79,16 @@ do
             VERBOSE=1
             echo "Verbose output"
             ;;
-        t)
-            CHECK_ON_SIMULATOR=true
-            ;;
-        r)
-            if [ ! -d $OPTARG ] ; then
-                echo "Can't find old test results in $OPTARG"
-                exit 1
-            fi
-            RESULTS2COMPARE=$OPTARG
+        f|t|T|r)
+            case ${parameter} in
+                t) OPTARG="elf-sim";;
+                T) OPTARG="${OPTARG} -t uclinux -t linux-uclibc";;
+            esac
+            TEST_OPTS="${TEST_OPTS} -${parameter} ${OPTARG}"
             ;;
         S)
             SKIP_ELF=true
             ;;
-        T)
-            TARGET_IPADDR=`expr "$OPTARG" : "\([0-9]*\.[0-9]*\.[0-9]*\.[0-9]*\)"`
-            if [ "x$TARGET_IPADDR" = "x" ] ; then
-                echo "Target ip address in wrong format"
-                exit 1
-            fi
-            CHECK_ON_HARDWARE=true
-            ;;
-
         s)
             if [ -d $OPTARG ] ; then
                 DIR_SOURCE=$OPTARG
@@ -189,9 +181,6 @@ do
         X)
             WITHOUT_X=true
             ;;
-        f)
-            STACK_CHECKING=true
-            ;;
         U)
             UCLIBC_CFLAGS=$OPTARG
             ;;
@@ -260,11 +249,11 @@ resume_clear()
 }
 
 check_cc_options() {
-        if `${1} ${2} -S -o /dev/null -xc /dev/null > /dev/null 2>&1` ; then 
-                return 1
-        else
-                return 0
-        fi
+	if `${1} ${2} -S -o /dev/null -xc /dev/null > /dev/null 2>&1` ; then
+		return 1
+	else
+		return 0
+	fi
 }
 
 check_header() {
@@ -298,18 +287,18 @@ check_source_group() {
 
 	if [ -n "${pkg}" ] && [ ${fail} -eq 1 ] ; then
 		cat <<-EOF 1>&2
-		
+
 		You need to install some packages before building the toolchain.
-		
+
 		Your system lacks the development packages for:
 		    ${pkg}
-		
+
 		The headers you need:
 		    ${headers}
-		
+
 		The libs you need:
 		    ${libs}
-		
+
 		EOF
 		exit 1
 	fi
@@ -331,7 +320,7 @@ ${SKIP_DEV_CHECKS} || check_source_packages
 
 if [ -n "$CHECK_PRE" ] ; then
     echo "Check http://gcc.gnu.org/install/prerequisites.html for more information"
-    for file in $PREREQ_FILE $PREREQ_HW_TESTS $PREREQ_HW_SIM_TESTS
+    for file in $PREREQ_FILE
     do
         RUN=`which -a $file 2>/dev/null| wc -w`
         if [ $RUN -eq 0 ] ; then
@@ -395,13 +384,6 @@ if [ -n "$CHECK_PRE" ] ; then
     exit 0
 fi
 
-if [ -n "$CHECK_ON_HARDWARE" ] ; then
-    PREREQ_FILE=${PREREQ_FILE}${PREREQ_HW_TEST}
-fi
-if [ -n "$CHECK_ON_SIMULATOR" -o -n "$CHECK_ON_HARDWARE" ] ; then
-    PREREQ_FILE=${PREREQ_FILE}${PREREQ_HW_SIM_TESTS}
-fi
-
 for PREREQ in $PREREQ_FILE $MAKE
 do
     RUN=`which -a $PREREQ | wc -w`
@@ -416,7 +398,7 @@ do
 done
 
 # Check to make sure shell env vars are empty
-for flags in CFLAGS LDFLAGS CPPFLAGS CXXFLAGS 
+for flags in CFLAGS LDFLAGS CPPFLAGS CXXFLAGS
 do
     tmp=$(eval echo \$${flags})
     if [ ${#tmp} -ne 0 ] ; then
@@ -579,190 +561,6 @@ if [ "$case" = "case" ] ; then
 	exit 1
 fi
 rm -rf .case.test .CASE.test
-
-if [ "x$CHECK_ON_SIMULATOR" != "x" -o "x$CHECK_ON_HARDWARE" != "x" ] ; then
-    echo "Path for test results       "
-    DIR_TEST_RESULTS=$DIR_BUILD/tests
-    if [ ! -d $DIR_TEST_RESULTS ] ; then
-        mkdir $DIR_TEST_RESULTS
-    fi
-fi
-
-if [ -n "$CHECK_ON_SIMULATOR" ] ; then
-    DIR_TEST_SIM_RESULTS=$DIR_TEST_RESULTS/simulator${DATE_STAMP+-${TIMESTAMP}}
-    if [ ! -d $DIR_TEST_SIM_RESULTS ] ; then
-        mkdir $DIR_TEST_SIM_RESULTS
-    else
-        rm -rf $DIR_TEST_SIM_RESULTS/*
-    fi
-    echo "  on simulator: $DIR_TEST_SIM_RESULTS"
-    if [ -n "$RESULTS2COMPARE" ] ; then
-        if [ ! -d $RESULTS2COMPARE/simulator ] ; then
-            echo "Can't find simulator results in $RESULTS2COMPARE/simulator"
-            exit 1
-        else
-            if [ ! -d /.$RESULTS2COMPARE ] ; then
-                echo "Invalid results path, must be relative to the root dir"
-                exit 1
-            fi
-            echo "    checking simulator results against $RESULTS2COMPARE/simulator"
-        fi
-        for GCC_VERSION in $GCC_VERSIONS; do
-            if [ ! -f $DIR_SOURCE/gcc-$GCC_VERSION/contrib/compare_tests ] ; then
-                echo "Can't find $DIR_SOURCE/gcc-$GCC_VERSION/contrib/compare_tests"
-                exit 1
-            fi
-        done
-    fi
-fi
-
-if [ $CHECK_ON_HARDWARE ] ; then
-    # stop if there are any Xvfb or rsh processes, which might be lurking around from old runs
-    RUN=`ps aux | grep Xvfb | grep -v grep | wc -l`
-    if [ $RUN -gt 0 ] ; then
-        echo "Found $RUN old Xvfb process(s), before running, kill them"
-        echo " so the hardware tests don't get confused"
-        ps aux | grep Xvfb | grep -v grep ; killall -9 Xvfb
-    fi
-    RUN=`ps aux | grep rsh | grep -v grep | wc -l`
-    if [ $RUN -gt 0 ] ; then
-        echo "Found $RUN old rsh process(s), before running, kill them"
-        echo " so the hardware tests don't get confused"
-        ps aux | grep rsh | grep -v grep ; killall -9 rsh
-    fi
-
-    DIR_TEST_HW_RESULTS=$DIR_TEST_RESULTS/hardware-flat${DATE_STAMP+-${TIMESTAMP}}
-    DIR_TEST_HW2_RESULTS=$DIR_TEST_RESULTS/hardware-fdpic${DATE_STAMP+-${TIMESTAMP}}
-    if [ ! -d $DIR_TEST_HW_RESULTS ] ; then
-        mkdir $DIR_TEST_HW_RESULTS
-    else
-        rm -rf $DIR_TEST_HW_RESULTS/*
-    fi
-    if [ ! -d $DIR_TEST_HW2_RESULTS ] ; then
-        mkdir $DIR_TEST_HW2_RESULTS
-    else
-        rm -rf $DIR_TEST_HW2_RESULTS/*
-    fi
-    echo "  on hardware ($TARGET_IPADDR): $DIR_TEST_HW_RESULTS, $DIR_TEST_HW2_RESULTS"
-
-    # Check if target board is available using ping, rcp and rsh.
-    RUN=`ping -n -c 1 $TARGET_IPADDR | grep -i Unreachable`
-    if [ "x$RUN" != "x" ] ; then
-        echo "Could not ping $TARGET_IPADDR - check network settings"
-        exit 1
-    fi
-    RUN=`rsh -l root $TARGET_IPADDR /bin/ls / 2>/dev/null | wc -l`
-    if [ $RUN -eq 0 ] ; then
-        echo "Can't rsh to $TARGET_IPADDR, check rsh client on host, and inet on target"
-        exit 1
-    fi
-    RUN=`rcp root@$TARGET_IPADDR:/bin/gdbserver $DIR_TEST_HW_RESULTS/gdbserver`
-    if [ "x$RUN" != "x" ] ; then
-        echo "Check gdbserver is available on the target, and you can rcp"
-        exit 1
-    fi
-    if [ -f $DIR_TEST_HW_RESULTS/gdbserver ] ; then
-        FDPIC_TARGET=`file $DIR_TEST_HW_RESULTS/gdbserver | grep ELF | wc -l`
-        rm -f $DIR_TEST_HW_RESULTS/gdbserver
-    fi
-    RUN=`rsh -l root $TARGET_IPADDR "cat /proc/maps" | grep \/ | wc -l`
-    FDPIC_TARGET=`expr $FDPIC_TARGET + $RUN`
-    # Check if the tcp connections are recycled on both
-    # target and host, which is needed to prevent the rsh
-    # and rcp connection failures.
-
-    printf "    checking host   /proc/sys/net/ipv4/tcp_tw_recycle : "
-    RUN=`cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
-    if [ "x$RUN" = "x" ] ; then
-        echo "NOT exist"
-        echo "   Your host kernel does NOT support Sysctl"
-        exit 1
-    fi
-    if [ "x$RUN" = "x0" ] ; then
-        echo "0"
-        echo "   Please run \"echo 1 > /proc/sys/net/ipv4/tcp_tw_recycle\" as root"
-        exit 1
-    else
-        echo "1 - looks OK"
-    fi
-
-    printf "    checking target /proc/sys/net/ipv4/tcp_tw_recycle : "
-    RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
-    if [ "x$RUN" = "x" ] ; then
-        echo "NOT exist"
-        echo "   Please enable Sysctl when configure the kernel"
-        exit 1
-    fi
-    if [ "x$RUN" = "x0" ] ; then
-       printf "0. setting to 1 "
-       rsh -l root $TARGET_IPADDR echo 1 \> /proc/sys/net/ipv4/tcp_tw_recycle
-       RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
-       if [ "x$RUN" = "x0" ] ; then
-	   echo "Failure"
-           echo "Could not set target $TARGET_IPADDR /proc/sys/net/ipv4/tcp_tw_recycle to 1"
-           exit 1
-       else
-           echo "Sucess"
-       fi
-    else
-        echo "1 - looks OK"
-    fi
-
-    RUN=`rsh -l root $TARGET_IPADDR cat /proc/cpuinfo | grep vendor_id | head -1 | awk -F: '{print $2}' | sed 's/^ *//'`
-    if [ "$RUN" != "Analog Devices" ] ; then
-        echo "Target $TARGET_IPADDR doesn't appear to be a Blackfin - sorry"
-        exit 1
-    fi
-    CPU_TYPE_REV=`rsh -l root $TARGET_IPADDR cat /proc/cpuinfo | grep model | awk '{print $4}' | sed 's/ADSP-//' | sed 's/BF/bf/'`
-    RUN=`rsh -l root $TARGET_IPADDR cat /proc/cpuinfo | grep stepping | awk '{print $3}'`
-    CPU_TYPE_REV=${CPU_TYPE_REV}-0.${RUN}
-    echo "    Target $TARGET_IPADDR is $CPU_TYPE_REV, using that for testing multilib"
-
-    if [ -n "$RESULTS2COMPARE" ] ; then
-        if [ ! -d $RESULTS2COMPARE/hardware ] ; then
-            echo "Can't find hardware results in $RESULTS2COMPARE/hardware"
-            exit 1
-        else
-            echo "    checking hardware results against $RESULTS2COMPARE/hardware"
-        fi
-        for GCC_VERSION in $GCC_VERSIONS; do
-            if [ ! -f $DIR_SOURCE/gcc-$GCC_VERSION/contrib/compare_tests ] ; then
-                echo "Can't find $DIR_SOURCE/gcc-$GCC_VERSION/contrib/compare_tests"
-                exit 1
-            fi
-        done
-    fi
-    if [ $STACK_CHECKING ] ; then
-        echo "    Hardware tests will be compiled with optional stack overflow checking"
-    fi
-    if [ $FDPIC_TARGET -eq 0 ] ; then
-        echo "    Looks like flat userspace - I'll check /lib/*.so are the same when testing"
-    else
-	echo "    Your Target looks like it is running FDPIC userspace - I can't test on fdpic targets. Stopping"
-	exit 1
-    fi
-
-    RUN=`rsh -l root $TARGET_IPADDR "ps | grep syslog | grep -v grep | grep -v \"l 6\" | wc -l"`
-    if [ $RUN = 1 ] ; then
-        echo "    Board at ${TARGET_IPADDR} being set so syslog doesn't fill /var/log/messages"
-        rsh -l root $TARGET_IPADDR "sed -i 's/^slog.*$/slog:unknown:\/sbin\/syslogd -n -l 6/' /etc/inittab"
-        rsh -l root $TARGET_IPADDR "kill -HUP 1"
-    fi
-    rcp root@$TARGET_IPADDR:/var/log/messages $DIR_TEST_RESULTS/messages.boot
-    rsh -l root $TARGET_IPADDR "rm /var/log/messages"
-    rsh -l root $TARGET_IPADDR "touch /var/log/messages"
-    rsh -l root $TARGET_IPADDR "kill -HUP 1"
-
-    RUN=`rsh -l root $TARGET_IPADDR "ps" | grep -v " ps" | grep -v "/rshd" |
-        grep -v "\[" | grep -v telnetd | grep -v "/init" | grep -v " inetd" |
-        grep -v " PID " | grep -v "[ /]sh" | grep -v " /s*bin/.*d" | sed '/^[[:space:]]*$/d'`
-    if [ ${#RUN} -gt 0 ] ; then
-        echo " ** looks like random processes are running on the $TARGET_IPADDR already "
-        echo " ** ${RUN}"
-        echo " ** Aborting, since I get confused when this happens"
-        exit 1
-    fi
-fi
 
 printf "Path to binutils dir        "
 DIR_BINUTILS_SOURCE=$DIR_SOURCE/binutils-$BINUTILS_VERSION
@@ -1409,403 +1207,6 @@ install_all_target_libs()
 	done
 }
 
-# Some of the tests leave stuff all over the target file system,
-# by getting rid of it, we free up lots of memory.
-clean_hardware()
-{
-    hardware=`echo $1 | grep -i hardware`
-    if [ -n "$hardware" ] ; then
-        run_cmd_nodie rsh -l root $TARGET_IPADDR free
-        run_cmd_nodie rsh -l root $TARGET_IPADDR "rm *"
-        run_cmd_nodie rsh -l root $TARGET_IPADDR "rm /tmp/*"
-        run_cmd_nodie rsh -l root $TARGET_IPADDR free
-
-        #we dump something onto the console so we can track which application caused a crash
-        run_cmd_nodie rsh -l root $TARGET_IPADDR "echo > /dev/console; echo testing $1 $2 > /dev/console"
-    fi
-
-}
-
-copy_test_results()
-{
-    for SUM in `find ./ -name "*.sum"` ; do
-        SUM=${SUM%.sum}
-        name=${SUM##*/}
-        target=""
-        # This loop builds up the target filename. based on the path, 
-        # removing names that are pointless
-        for SUBDIR in `echo $SUM | sed -e 's:^\./::' -e 's:/testsuite/:/:' -e 's/\// /g'` ; do
-            case ${SUBDIR} in *${name}*) continue;; esac
-                target=${target}${SUBDIR}-
-        done
-        target=${target}${name}
-        cp ${SUM}.sum $1/${target}-${2}.sum
-        cp ${SUM}.log $1/${target}-${2}.log
-    done
-}
-
-# Get the target hardware ready for testing:
-#  - check we can access it
-#  - set syslogd & tcp_tw_recycle
-#  - copy over all the shared libs to the target /lib dir (for fdpic tests, and if flat userspace)
-# prepare_target test_target_dir
-prepare_target()
-{
-    hardware=`basename $1 | grep -i hardware`
-    if [ -n "$hardware" ] ; then
-        # Check if target board is available using ping
-        TIMEOUT=0
-        RUN=`ping -n -c 1 $TARGET_IPADDR | grep -i Unreachable`
-        while ([ "x$RUN" != "x" ] && [ $TIMEOUT -lt 5 ])
-        do
-            RUN=`ping -n -c 1 $TARGET_IPADDR | grep -i Unreachable`
-            TIMEOUT=`expr $TIMEOUT + 1`
-            sleep 60
-        done
-        if [ "x$RUN" != "x" ] ; then
-            echo "Could not ping $TARGET_IPADDR - check network settings"
-            exit 1
-        fi
-
-        # Just in case we caused the kernel under test to crash, let's do a sanity test
-        # make sure syslogd is set to not log rsh/rcp as it will fill /var/log/messages
-        RUN=`rsh -l root $TARGET_IPADDR "ps | grep syslog | grep -v grep | grep -v \"l 6\" | wc -l"`
-        if [ "$RUN" = "1" ] ; then
-            echo " ** Resetting syslogd"
-            rsh -l root $TARGET_IPADDR "sed -i 's/^slog.*$/slog:unknown:\/sbin\/syslogd -n -l 6/' /etc/inittab"
-            rsh -l root $TARGET_IPADDR "kill -HUP 1"
-            #we dump something onto the console so we can track things
-            rsh -l root $TARGET_IPADDR "echo > /dev/console; echo "Setting syslogd" > /dev/console"
-        fi
-
-        #  checking target /proc/sys/net/ipv4/tcp_tw_recycle
-        RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
-        if [ "$RUN" = "0" ] ; then
-            echo " ** Setting tcp_tw_recycle"
-            rsh -l root $TARGET_IPADDR echo 1 \> /proc/sys/net/ipv4/tcp_tw_recycle
-            #we dump something onto the console so we can track things
-            rsh -l root $TARGET_IPADDR "echo > /dev/console; echo "Setting tcp_tw_recycle" > /dev/console"
-        fi
-    fi
-
-    # Make sure all the shared libs are actually on the target, and are the same
-    # if we are testing on the hardware
-    RUN=`basename $1 | grep hardware-fdpic`
-    if ([ -n "$RUN" ] && [ $FDPIC_TARGET -eq 0 ]) ; then
-
-        for GCC_VERSION in $GCC_VERSIONS; do
-           GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
-           break
-        done
-
-        mkdir -p $GCC_BUILD/libs_for_target
-        rm -f $GCC_BUILD/libs_for_target/*
-        t=`$GCC_BUILD/gcc/xgcc -mcpu=${CPU_TYPE_REV} -print-file-name=libc.a`
-        t=`dirname $t`/../..
-        for FILE in $t/lib/*so*
-        do
-            if ([ -e $FILE ] && [ -h $FILE ]) ; then
-		#don't check sym links
-                LIB=`readlink $FILE`
-                FILE=`basename $FILE`
-                LIB=`basename $LIB`
-                rsh -l root ${TARGET_IPADDR} "cd /lib; ln -s $LIB $FILE"
-            else
-                if [ -f $FILE ] ; then
-                    LIB=`basename ${FILE}`
-                    bfin-linux-uclibc-strip $FILE -o $GCC_BUILD/libs_for_target/${LIB}
-                    BOARD_LIB=`rsh -l root ${TARGET_IPADDR} "md5sum /lib/${LIB} | awk '{print \\$1}'"`
-                    TEST_LIB=`md5sum $GCC_BUILD/libs_for_target/${LIB} | awk {print $1}`
-                    if [ "$BOARD_LIB" != "$TEST_LIB" ] ; then
-                        echo "Libs on board are different, aborting tests"
-                        echo "specifically ${LIB} and ${FILE}"
-                        exit 1
-                    fi
-                fi
-            fi
-        done
-        rm -rf $GCC_BUILD/libs_for_target
-    fi
-
-}
-# The basic idea is that if things are not progressing at least every 10 minutes
-# something is hung, and we should kill it, and tell the user what was stuck
-#
-check_tests_OK()
-{
-    PID=$1
-    HOST_THRESHOLD=7
-    TARGET_THRESHOLD=5
-    WAIT=1
-    WAIT_TARGET=1
-    HARDWARE=`printf "%s" "$3" | grep -i hardware`
-    # -n : numeric sort - kill the last process first
-    # -A : use ASCII, not UTF-8 or VT100
-    # -l : long lines (otherwise it cuts off at 132 char across
-    # -p : show pids of children
-    NEW=`pstree -n -A -l -p $PID`
-    # grep -v "\["     : remove kernel threads
-    # grep -v "/init"  : remove the init process
-    # grep -v " inetd" : remove initd
-    # grep -v "/rshd"  : remove rsh sesions
-    # grep -v " ps"    : remove ps processes (so we don't care about us running ps)
-    # grep -v " PID "  : remove the top line "  PID  Uid        VSZ Stat Command"
-    # grep -v "[ /]sh" : remove shell (sh and /bin/sh) processes 
-    # grep -v " /s*bin/.*d" : remove /bin/watchdogd /sbin/klogd /sbin/syslogd
-    # sed '/^[[:space:]]*$/d' : remove blank lines
-    if [ -n "$HARDWARE" ] ; then
-        NEW_TARGET=`rsh -l root $TARGET_IPADDR "ps" | grep -v " ps" | grep -v "/rshd" |
-            grep -v "\[" | grep -v telnetd | grep -v "/init" | grep -v " inetd" |
-            grep -v " PID " | grep -v "[ /]sh" | grep -v " /s*bin/.*d" | sed '/^[[:space:]]*$/d'`
-            if [ ${#NEW_TARGET} -gt 0 ] ; then
-               echo " ** looks like random processes are running on the hardware already "
-               echo " ** ${NEW_TARGET}"
-            fi
-    fi
-    KILL=99999
-    while [ 1 ]
-    do
-        OLD=$NEW
-        OLD_TARGET=$NEW_TARGET
-        NEW=`pstree -n -A -l -p $PID`
-        if [ -n "$HARDWARE" ] ; then
-            NEW_TARGET=`rsh -l root $TARGET_IPADDR "ps" 2>&1 | grep -v " ps" | grep -v "/rshd" |
-                grep -v "\[" | grep -v telnetd | grep -v "/init" | grep -v " inetd" | 
-                grep -v " PID " | grep -v "[ /]sh" | grep -v " /s*bin/.*d" | sed '/^[[:space:]]*$/d'`
-        fi
-
-        # Chedk on the Host - if the test is done - quit
-        if [ -z "$NEW" ] ; then
-            break;
-        fi
-
-        # Check on the Host - are we waiting?
-        if [ "$NEW" = "$OLD" ] ; then
-           WAIT=`expr $WAIT + 1`
-        else
-            if [ $WAIT -gt $HOST_THRESHOLD ] ; then
-                echo " ** killing process $KILL_PID, seemed to fix things"
-                echo " ** $KILL_PS"
-                if [ -n "$HARDWARE" ] ; then
-                    # make sure the board is not hung
-                    RUN=`rsh -l root $TARGET_IPADDR "ls /  1>/dev/null" 2>&1 | wc -l`
-                    if [ "$RUN" = "1" ] ; then
-                        echo "*** I think the board or networked died during testing - sorry "
-                        break
-                    fi
-                fi
-            fi
-            WAIT=1
-            KILL=99999
-        fi
-
-        # Check Hardware
-        if [ -n "$HARDWARE" ] ; then
-            if [ "$NEW_TARGET" = "$OLD_TARGET" ] ; then
-                WAIT_TARGET=`expr $WAIT_TARGET + 1`
-            else
-                if [ $WAIT_TARGET -gt $TARGET_THRESHOLD ] ; then
-                    echo " ** killing processes on board seemed to help"
-                fi
-                WAIT_TARGET=1
-            fi
-
-            if [ $WAIT_TARGET -gt $TARGET_THRESHOLD ] ; then
-                # This should catch no route to host, as well as connection refused
-                STUCK=`echo ${NEW_TARGET} | grep "^${TARGET_IPADDR}" | wc -l`
-                if [ $STUCK -gt 0 ] ; then
-                    echo " ** looks like the board has been dead for $TARGET_THRESHOLD minutes"
-                    break
-                fi
-                if [ ${#NEW_TARGET} -gt 0 ] ; then
-                    printf " ** looks like "
-                    for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $NF}')
-                    do
-                        printf "${TARGET_PID} "
-                    done
-                    echo "on the board is hung"
-                    for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $1}')
-                    do
-                       rsh -l root $TARGET_IPADDR "kill -9 ${TARGET_PID}"
-                    done
-                else
-                    # the board has been doing nothing for 7 minutes, so let's wait another 7
-                    WAIT_TARGET=1
-                fi
-            fi
-        fi
-
-        if [ $WAIT -gt $HOST_THRESHOLD ] ; then
-            KILL_PS=""
-            TREE=`pstree -n -A -l -p $PID | sed -e 's/-[-+]-/\n/g' -e 's/^[ \t]*//'`
-            NEW_KILL=`printf "$TREE" | wc -l`
-            if [ $NEW_KILL -lt $KILL ] ; then
-                # We add one, so when we subtract one below, it ends up being the correct number
-                KILL=`expr $NEW_KILL + 1`
-                echo " ** Testing $2 seems stuck, trying to kill some processes"
-            fi
-
-            # don't try to kill defunct processes - it is a waste of time
-            while [ -z "$KILL_PS" ]
-            do
-                KILL=`expr $KILL - 1`
-                if [ "$KILL" = "0" ] ; then
-                    echo "Test did not exit properly"
-                    exit 1
-                fi
-
-                KILL_PID=`echo "$TREE" | sed -n "${KILL}{p;q}" | awk -F\( '{print $NF}' | awk -F\) '{print $1}'`
-                KILL_PS=`ps $KILL_PID | grep -v "^[[:space:]]*PID" | grep -v " Z.*<defunct>"`
-            done
-
-            ps aux > $3/${2}.kill-${KILL_PID}
-            pstree -n -A -l -p $PID >> $3/${2}.kill-${KILL_PID}
-            if [ -n "$HARDWARE" ] ; then
-                rsh -l root $TARGET_IPADDR ps >> $3/${2}.kill-${KILL_PID}
-            fi
-            # if it is an rsh process on the host, it normally means a test is
-            # hung on the board, so let's kill that instead
-            RUN=`echo $KILL_PS | grep rsh`
-            if [ -n "$RUN" ] ; then
-                echo " ** This should never happen - board seems OK, but rsh process is stuck?"
-                if [ ${#NEW_TARGET} -gt 0 ] ; then
-                    printf " ** looks like "
-                    for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $NF}')
-                    do
-                        printf "${TARGET_PID} "
-                    done
-                    echo "on the board is hung"
-                    for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $1}')
-                    do
-                       rsh -l root $TARGET_IPADDR "kill -9 ${TARGET_PID}"
-                    done
-                else
-                    # The board just rebooted ?
-                    echo " ** I think I just caused the board to crash/reboot? This needs investigation."
-                    prepare_target $3 
-                    kill -9 $KILL_PID
-                fi
-            else
-                kill -9 $KILL_PID
-            fi
-        fi
-        sleep 60
-    done
-
-    # Tests are complete - so let's copy crashes to test directory
-    hardware=`echo $3 | grep -i hardware`
-    if [ -n "$hardware" ] ; then
-        RUN=`rsh -l root $TARGET_IPADDR ps | grep syslog | grep -v grep | wc -l`
-        if [ $RUN = 1 ] ; then
-            rcp root@$TARGET_IPADDR:/var/log/messages $3/$2.kernel_log
-            rsh -l root $TARGET_IPADDR "rm /var/log/messages"
-            rsh -l root $TARGET_IPADDR "touch /var/log/messages"
-            rsh -l root $TARGET_IPADDR "kill -HUP 1"
-        fi
-    fi
-
-    TREE=`pstree -n -A -l -p $PID | sed -e 's/-[-+]-/\n/g' -e 's/^[ \t]*//' -e '/^[[:space:]]*$/d' | awk -F "(" '{print $NF}' | awk -F ")" '{print $1}'`
-    if [ ${#TREE} -gt 0 ] ; then
-        echo " ** Aborting remaining tests"
-        echo $TREE
-        for KILL_PS in ${TREE}
-        do
-            RUN=`ps $KILL_PS | grep -v "^[[:space:]]*PID" | wc -l`
-            if [ $RUN -gt 0 ] ; then
-               ps $KILL_PS | grep -v "^[[:space:]]*PID"
-               kill $KILL_PS
-            fi
-        done
-    fi
-
-}
-
-# run_tests $directory_test_results_go_in name_of_test
-run_tests ()
-{
-    clean_hardware $2 binutils
-    prepare_target $2
-
-    echo_date "Running tests on binutils"
-
-    change_dir $DIR_BINUTILS_BUILD
-    run_cmd_nodie $MAKE -k -j 1 maybe-check-binutils maybe-check-gas maybe-check-ld maybe-check-sim &
-    check_tests_OK $! binutils $1
-
-    # make clean the gdb dir before testing since insight cannot run
-    # in the build directory. :(
-    change_dir $DIR_BINUTILS_BUILD/gdb
-    run_cmd_nodie $MAKE clean
-
-    # Get rid of old Xvfb & rsh processes, which might be lurking around from old runs
-    RUN="ps aux | grep Xvfb | grep -v grep"
-    if [ -n "`$RUN`" ] ; then
-        echo "Found old Xvfb process, killing it"
-        RUN="${RUN} ; killall -9 Xvfb"
-        log_it $RUN
-        (echo "($RUN) $LOGFILE" ) | sh
-    fi
-    RUN="ps aux | grep rsh | grep -v grep"
-    if [ -n "`$RUN`" ] ; then
-        echo "Found old rsh process, killing it"
-        RUN="${RUN} ; killall -9 rsh"
-        log_it $RUN
-        (echo "($RUN) $LOGFILE" ) | sh
-    fi
-
-    clean_hardware $2 gdb
-    echo_date "Running tests on gdb"
-
-    run_cmd_nodie $MAKE -k -j 1 check &
-    check_tests_OK $! gdb $1
-
-    change_dir $DIR_BINUTILS_BUILD
-    copy_test_results $1 $BINUTILS_VERSION
-
-    for GCC_VERSION in $GCC_VERSIONS; do
-        clean_hardware $2 gcc
-        DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
-        change_dir $DIR_GCC_BUILD/gcc
-
-        # start the tests
-        echo_date "Running tests on gcc $GCC_VERSION"
-        run_cmd_nodie $MAKE -k -j 1 check &
-        check_tests_OK $! gcc $1
-
-	clean_hardware $2 libs
-	change_dir $DIR_GCC_BUILD
-	echo_date  "Running tests on libs"
-        run_cmd_nodie $MAKE -k -j 1 check-target &
-        check_tests_OK $! libraries $1
-
-        copy_test_results $1 ${GCC_VERSION}
-    done
-    clean_hardware $2 done
-
-    echo_date "Done testing  - results"
-        
-    #we dump something onto the console so we can know the test is finished.
-    rsh -l root $TARGET_IPADDR "echo > /dev/console; echo "Done testing." > /dev/console"
-
-    for FILE in `find $1 -name "*${BINUTILS_VERSION}.sum" | sort; find $1 -name "*${GCC_VERSION}.sum" | sort`
-    do
-	echo
-	echo ${FILE##*/}
-        egrep "=== .*Sum.* ===|^# of" $FILE
-        if [ -n "$RESULTS2COMPARE" ] ; then
-            COMP=`basename $FILE`
-            if [ -f $RESULTS2COMPARE/$2/$COMP ] ; then
-                echo "Comparing generated $COMP to master at $RESULTS2COMPARE/$2/$COMP"
-                $DIR_SOURCE/gcc-$GCC_VERSION/contrib/compare_tests \
-                    $FILE $RESULTS2COMPARE/$2/$COMP
-            else
-                echo "Could not find $RESULTS2COMPARE/$2/$FILE to compare"
-            fi
-        fi
-    done
-    echo
-}
-
 build_uClibc()
 {
     ARGS="V=1 CROSS=bfin-elf-"
@@ -1849,43 +1250,6 @@ build_uClibc()
         crt1.o libc.a libcrypt.a libm.a libnsl.a libresolv.a libutil.a
 }
 
-###################### Setting up test  ##########################
-
-if [ "x$CHECK_ON_SIMULATOR" != "x" -o "x$CHECK_ON_HARDWARE" != "x" ] ; then
-    echo "Setting up site.exp"
-    if [ ! -d $DIR_BUILD/boards ] ; then
-        mkdir $DIR_BUILD/boards
-    fi
-    if [ $CHECK_ON_SIMULATOR ] ; then
-        cp $DIR_BOARDS/bfin-sim.exp $DIR_BUILD/boards/bfin-sim.exp
-    fi
-    if [ $CHECK_ON_HARDWARE ] ; then
-        if [ $STACK_CHECKING ] ; then
-            (cat $DIR_BOARDS/bfin-uclinux.exp.1; \
-             echo "set_board_info cflags \" -mstack-check-l1 \""; \
-             echo "set_board_info hostname $TARGET_IPADDR"; \
-             echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-uclinux.exp
-            (cat $DIR_BOARDS/bfin-linux-uclibc.exp.1; \
-             echo "set_board_info cflags \" -mstack-check-l1 \""; \
-             echo "set_board_info multilib_flags \"-mcpu=$CPU_TYPE_REV\"";\
-             echo "set_board_info hostname $TARGET_IPADDR"; \
-             echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-linux-uclibc.exp
-        else
-            (cat $DIR_BOARDS/bfin-uclinux.exp.1; \
-             echo "set_board_info hostname $TARGET_IPADDR"; \
-             echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-uclinux.exp
-            (cat $DIR_BOARDS/bfin-linux-uclibc.exp.1; \
-             echo "set_board_info multilib_flags \"-mcpu=$CPU_TYPE_REV\"";\
-             echo "set_board_info hostname $TARGET_IPADDR"; \
-             echo "set_board_info sockethost $TARGET_IPADDR:") > $DIR_BUILD/boards/bfin-linux-uclibc.exp
-        fi
-    fi
-    (cat $DIR_BOARDS/site.exp.1; \
-     echo "lappend boards_dir \"$DIR_BUILD/boards\""; \
-     cat $DIR_BOARDS/site.exp.2 ) > $DIR_BUILD/boards/site.exp
-    export DEJAGNU=$DIR_BUILD/boards/site.exp
-fi
-
 if [ "x$SKIP_ELF" = "x" ]; then
 
     ################ Step 1 - ELF Toolchain #########################
@@ -1898,11 +1262,6 @@ if [ "x$SKIP_ELF" = "x" ]; then
     done
 
     ########################### Step 2 - done ####################
-
-    if [ $CHECK_ON_SIMULATOR ] ; then
-	echo "*** Testing on simulator            "
-	run_tests $DIR_TEST_SIM_RESULTS simulator
-    fi
 fi
 
 for GCC_VERSION in $GCC_VERSIONS; do
@@ -2110,19 +1469,6 @@ if [ $KERNEL_SOURCE ] ; then
     done
     run_cmd rm -f $DIR_uC_OUTPUT/bfin-uclinux/sys-include
 
-    ####################### Test bfin-uclinux #######################
-
-    if [ $CHECK_ON_HARDWARE ] ; then
-        echo_date "Testing on hardware"
-
-        # Remove all tools from build directory. Thus the installed ones
-        # are tested. This way gcc will use ld wrapper provided by elf2flt.
-        change_dir $DIR_BINUTILS_BUILD
-        run_cmd_nodie $MAKE clean
-
-        run_tests $DIR_TEST_HW_RESULTS hardware-flat
-    fi
-
     ####################### Step 4a - build bfin-linux-uclibc ################
     build_binutils linux-uclibc $DIR_LINUX_OUTPUT
 
@@ -2136,19 +1482,6 @@ if [ $KERNEL_SOURCE ] ; then
     run_cmd rm -f $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
 
     install_all_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc
-
-    ##################### Test bfin-linux-uclibc #####################
-
-    if [ $CHECK_ON_HARDWARE ] ; then
-        echo_date "Testing linux-uclibc on hw"
-
-        # Remove all tools from build directory. Thus the installed ones
-        # are tested. This way gcc will use ld wrapper provided by elf2flt.
-        change_dir $DIR_BINUTILS_BUILD
-        run_cmd_nodie $MAKE clean
-
-        run_tests $DIR_TEST_HW2_RESULTS hardware-fdpic
-    fi
 
     ######################## U-Boot ##############################
 
@@ -2210,11 +1543,6 @@ if ! resume_check ldr-utils ; then
     run_cmd $MAKE install DESTDIR=$DIR_ELF_OUTPUT   program_transform_name=s,^,bfin-elf-,
     run_cmd $MAKE install DESTDIR=$DIR_uC_OUTPUT    program_transform_name=s,^,bfin-uclinux-,
     run_cmd $MAKE install DESTDIR=$DIR_LINUX_OUTPUT program_transform_name=s,^,bfin-linux-uclibc-,
-
-    if [ "$CHECK_ON_SIMULATOR" = "1" ] ; then
-        echo_date "Checking ldr-utils"
-        run_cmd $MAKE check
-    fi
 
     change_dir $DIR_LDR_UTILS_SOURCE
     run_cmd rm -rf "$DIR_LDR_UTILS_BUILD"
@@ -2405,5 +1733,17 @@ resume_clear
 printf "*** It took"
 print_stop_time
 echo " to complete"
+
+if [ -n "${TEST_OPTS}" ] ; then
+	cd "${DIR_BUILD}"
+	echo_date "Testing toolchains"
+	export PATH=${DIR_ELF_OUTPUT}:${DIR_uC_OUTPUT}:${DIR_LINUX_OUTPUT}:$PATH
+	set -- \
+	"${DIR_APP}"/toolchain-regtest ${TEST_OPTS} \
+		${DATE_STAMP:+-d} ${VERBOSE:+-v} ${WARN:+-w} \
+		-s "${DIR_SOURCE}"
+	log_it "$@"
+	"$@"
+fi
 
 echo_date "Done"
