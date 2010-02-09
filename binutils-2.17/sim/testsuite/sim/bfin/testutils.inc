@@ -11,6 +11,7 @@ _params:
 	.long 0
 	.long 0
 	.long 0
+	.long 0
 	.text
 	.global __start
 __start:
