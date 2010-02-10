@@ -63,6 +63,11 @@ check_source_packages() {
 }
 
 check_build_env() {
+	# These checks matter for cross-compiler bits only
+	if [ $SKIP_ELF ] && [ ! $KERNEL_SOURCE ] && [ $SKIP_TARGET_LIBS ] ; then
+		return 0
+	fi
+
 	# Check to make sure shell env vars are empty
 	for flags in CFLAGS LDFLAGS CPPFLAGS CXXFLAGS ; do
 		tmp=$(eval echo \$${flags})
