@@ -695,7 +695,8 @@ install_all_target_libs()
 build_uboot()
 {
 	local ver
-	ver=$(printf 'e:\n\t@echo $(U_BOOT_VERSION)\ninclude '$DIR_UBOOT'/Makefile\n' | ${MAKE} -f -)
+	# do the cd to avoid pwd warnings with `make`
+	ver=$(cd /; printf 'e:\n\t@echo $(U_BOOT_VERSION)\ninclude '$DIR_UBOOT'/Makefile\n' | ${MAKE} -f -)
 
 	echo_date "U-Boot: building helper tools (${ver})"
 	change_dir $DIR_UBOOT
@@ -998,11 +999,11 @@ build_ldr_utils()
 	build_autotooled_pkg "${DIR_LDR_UTILS_SOURCE}"
 
 	# backwards compat support
-	run_cmd ln -f "${DIR_ELF_OUTPUT}/bin/bfin-ldr" "${DIR_ELF_OUTPUT}/bin/bfin-elf-ldr"
-	if [ $KERNEL_SOURCE ] ; then
-		run_cmd ln -f "${DIR_uC_OUTPUT}/bin/bfin-ldr" "${DIR_uC_OUTPUT}/bin/bfin-uclinux-ldr"
-		run_cmd ln -f "${DIR_LINUX_OUTPUT}/bin/bfin-ldr" "${DIR_LINUX_OUTPUT}/bin/bfin-linux-uclibc-ldr"
-	fi
+	for x in elf:${DIR_ELF_OUTPUT} uclinux:${DIR_uC_OUTPUT} linux-uclibc:${DIR_LINUX_OUTPUT} ; do
+		t=${x%%:*}
+		d=${x##*:}
+		run_cmd ln -f "${d}/bin/bfin-ldr$EXEEXT" "${d}/bin/bfin-${t}-ldr$EXEEXT"
+	done
 }
 [ $SKIP_LDR ] || build_ldr_utils
 
