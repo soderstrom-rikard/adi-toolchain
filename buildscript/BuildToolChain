@@ -27,12 +27,10 @@
 #
 ###############################################################
 
-APP_NAME=$0
-DIR_APP=$(cd $(dirname $APP_NAME) && pwd)
-DIR_BOARDS=$DIR_APP/boards/
-DIR_SOURCE=${DIR_APP%/*}
-APP_NAME=${APP_NAME#.}
-APP_NAME=${APP_NAME#/}
+source "${0%/*}/lib/lib.sh" || exit 1
+
+DIR_BOARDS=${DIR_APP}/boards
+
 START=$(date +%s)
 
 #Uncomment only one of these
@@ -51,40 +49,58 @@ RESUME_BUILD=false
 CBUILD= # the system we are compiling on
 CHOST=  # the system the final compiler will run on
 
+unset SKIP_ELF SKIP_JTAG SKIP_LDR SKIP_TARGET_LIBS
+
 TEST_OPTS=
 TEST_SIM=
 TEST_HARDWARE=
 
-error()
-{
-	printf "$*\n" 1>&2
-	exit 1
+usage() {
+# We don't document the -S option - it's for advanced users who know what
+# they are doing.  For maximum reproducibility, not using it is better.
+cat <<-EOF
+Usage : $APP_NAME -s SOURCE [-b BUILD]
+-B BINUTILS_VER  Binutils version (default ${BINUTILS_VERSION}).  Can be given once.
+-b BUILD         Build directory (leave blank to use current dir)
+-C FILE          Use FILE as uClibc config file, rather than the default.
+-c GCC_VERSION   GCC version (default ${GCC_VERSIONS_DEFAULT}).  Can be given multiple times.
+-d               Date Stamp all output files
+-D               Don't check libraries/headers -- assume all is OK
+-f               Add stack checking to all tests
+-h               Help
+-H HOST          Build toolchain to run on HOST.
+-j NUM           Pass -j NUM to make (default is 2x num of CPUs)
+-K SOURCE        Kernel Header directory (may be specified instead of source)
+-k SOURCE        Kernel Source directory (builds bfin-uclinux-gcc)
+-l LANGS         Only build specified gcc languages.
+-m MAKE          Default make (leave blank to use system make)
+-O OUTPUT        Output directory (leave blank to use build dir)
+-o OUTPUT        Output directory prefix (leave blank to use build dir)
+-p               Check prerequisites
+-P STRING        Use STRING as the package version (instead of svn revision)
+-r RESULTS_DIR   Compare current tests to old results
+-s SOURCE        Toolchain Source directory (builds bfin-elf-gcc)
+-T TARGET_IPADDR Test components on hardware
+-t               Test components on simulator
+-u UBOOT_SOURCE  U-Boot Source directory
+-v               Verbose
+-w               Warnings to be sent to a different log file
+-X               Disable all graphical utilities
+EOF
+# -S PKG           Skip building package (elf:elf compiler, ldr:ldr-utils) - don't print this out
+# -U               uClibc CFLAGS - don't print this out
+exit ${1:-0}
 }
 
-while getopts b:B:c:C:dDfH:hj:k:K:l:m:o:O:pP:r:s:StT:u:U:vwX parameter
+while getopts b:B:c:C:dDfH:hj:k:K:l:m:o:O:pP:r:s:S:tT:u:U:vwX parameter
 do
     case $parameter in
-        p)
-            CHECK_PRE=true
-            ;;
-        m)
-            MAKE=$OPTARG
-            ;;
-        w)
-            WARN=1
-            echo "Warnings being set to seperate log file"
-            ;;
-        d)
-            DATE_STAMP=1
-            echo "Outputfiles being date stamped"
-            ;;
-        D)
-            SKIP_DEV_CHECKS=true
-            ;;
-        v)
-            VERBOSE=1
-            echo "Verbose output"
-            ;;
+        p)  CHECK_PRE=true ;;
+        m)  MAKE=$OPTARG ;;
+        w)  WARN=1 ;;
+        d)  DATE_STAMP=1 ;;
+        D)  SKIP_DEV_CHECKS=true ;;
+        v)  VERBOSE=1 ;;
         f|t|T|r)
             case ${parameter} in
                 t) OPTARG="elf-sim";;
@@ -93,16 +109,14 @@ do
             TEST_OPTS="${TEST_OPTS} -${parameter} ${OPTARG}"
             ;;
         S)
-            SKIP_ELF=true
+            case ${OPTARG} in
+                elf)   SKIP_ELF=true ;;
+                jtag)  SKIP_JTAG=true ;;
+                ldr)   SKIP_LDR=true ;;
+                tlibs) SKIP_TARGET_LIBS=true ;;
+            esac
             ;;
-        s)
-            if [ -d $OPTARG ] ; then
-                DIR_SOURCE=$OPTARG
-                DIR_SOURCE=${DIR_SOURCE%/}
-            else
-                error "Invalid Source Path"
-            fi
-            ;;
+        s)  DIR_SOURCE=${OPTARG%/} ;;
         l)
             TMP=`echo $OPTARG | grep c`
             if [ -n "$TMP" ] ; then
@@ -120,27 +134,12 @@ do
                 error "Can't understand Language argument $OPTARG"
             fi
             ;;
-        B)
-            BINUTILS_VERSION="$OPTARG"
-            ;;
-        P)
-            PKGVERSION="$OPTARG"
-            ;;
-
-        c)
-            GCC_VERSIONS="$GCC_VERSIONS $OPTARG"
-            ;;
-        H)
-            CHOST="$OPTARG"
-            ;;
-        k)
-            KERNEL_SOURCE=$OPTARG
-            if [ ! -d $KERNEL_SOURCE/arch/blackfin ] ; then
-                error "Can't find $KERNEL_SOURCE/arch/blackfin"
-            fi
-            ;;
-        K)
-            KERNEL_SOURCE=$OPTARG
+        B)  BINUTILS_VERSION=$OPTARG ;;
+        P)  PKGVERSION=$OPTARG ;;
+        c)  GCC_VERSIONS="$GCC_VERSIONS $OPTARG" ;;
+        H)  CHOST=$OPTARG ;;
+        k)  KERNEL_SOURCE=$OPTARG ;;
+        K)  KERNEL_SOURCE=$OPTARG
             DIR_KBUILD_OUTPUT=$OPTARG
             if [ ! -d $KERNEL_SOURCE/usr/include/linux ] ; then
                 error "Can't find kernel headers"
@@ -153,18 +152,8 @@ do
                 error "Invalid U-Boot Path"
             fi
             ;;
-        b)
-            if [ -d $OPTARG ] ; then
-                DIR_BUILD=$OPTARG
-                DIR_BUILD=${DIR_BUILD%/}
-            else
-                DIR_BUILD=$OPTARG
-                DIR_BUILD=${DIR_BUILD%/}
-            fi
-            ;;
-        C)
-            UCLIBC_CONFIG_FILE=$OPTARG
-            ;;
+        b)  DIR_BUILD=${OPTARG%/} ;;
+        C)  UCLIBC_CONFIG_FILE=$OPTARG ;;
         o)
             DIR_ELF_OUTPUT=$OPTARG-elf
             DIR_uC_OUTPUT=$OPTARG-uclinux
@@ -175,56 +164,20 @@ do
             DIR_uC_OUTPUT=$OPTARG
             DIR_LINUX_OUTPUT=$OPTARG
             ;;
-        j)
-            NUM_JOBS=$OPTARG
+        j)  NUM_JOBS=$OPTARG ;;
+        X)  WITHOUT_X=true ;;
+        U)  UCLIBC_CFLAGS=$OPTARG ;;
+        h)  usage ;;
+        *)  error "unknown option $parameter\n" \
+                  "Try \`$APP_NAME -h' for more information."
             ;;
-        X)
-            WITHOUT_X=true
-            ;;
-        U)
-            UCLIBC_CFLAGS=$OPTARG
-            ;;
-        h)
-# We don't document the -S option - it's for advanced users who know what
-# they are doing.  For maximum reproducibility, not using it is better.
-             echo "Usage : $APP_NAME -s SOURCE [-b BUILD]
--B BINUTILS_VER  Binutils version (default ${BINUTILS_VERSION}).  Can be given once.
--b BUILD         Build directory (leave blank to use current dir)
--C FILE          Use FILE as uClibc config file, rather than the default.
--c GCC_VERSION   GCC version (default ${GCC_VERSIONS_DEFAULT}).  Can be given multiple times.
--d               Date Stamp all output files
--D               Don't check libraries/headers -- assume all is OK
--f               Add stack checking to all tests
--h               Help
--H HOST          Build toolchain to run on HOST.
--j NUM           Pass -j NUM to make (default is 2x num of CPUs)
--K SOURCE        Kernel Header directory (may be specified instead of source)
--k SOURCE        Kernel Source directory    (builds bfin-uclinux-gcc)
--l LANGS         Only build specified gcc languages.
--m MAKE          Default make (leave blank to use system make)
--O OUTPUT        Output directory (leave blank to use build dir)
--o OUTPUT        Output directory prefix (leave blank to use build dir)
--p               Check prerequisites
--P STRING        Use STRING as the package version (instead of svn revision)
--r RESULTS_DIR   Compare current tests to old results
--s SOURCE        Toolchain Source directory (builds bfin-elf-gcc)"
-# -S               Skip building elf compiler - don't print this out
-echo "-T TARGET_IPADDR Test components on hardware
--t               Test components on simulator
--u SOURCE        Uboot Source directory"
-# -U               uClibc CFLAGS - don't print this out
-echo "-v               Verbose
--w               Warnings to be sent to a different log file
--X               Disable all graphical utilities
-"
-             exit 0
-             ;;
-        *)
-             error "unknown option $parameter\n" \
-                   "Try \`$APP_NAME -h' for more information."
-             exit 1
     esac
 done
+
+shift $((OPTIND - 1))
+if [ $# -ne 0 ] ; then
+	error "${APP_NAME}: takes no arguments, see --help"
+fi
 
 # binutils-2.20 and later don't include insight
 if [ "${BINUTILS_VERSION}" != "2.17" ] ; then
@@ -233,191 +186,29 @@ fi
 
 ############ Check and error if I can't find the things I need #
 
-resume_check()
-{
-	[ "${BTC_RESUME}" != "yesplease" ] && return 1
-	__RESUME_FILE="$DIR_LOG/.resume.$(echo $1 | tr '[/]' '_')"
-	[ -e "${__RESUME_FILE}" ]
-}
-resume_save()
-{
-	[ -n "${__RESUME_FILE}" ] && touch "${__RESUME_FILE}"
-}
-resume_clear()
-{
-	rm -f "$DIR_LOG"/.resume.*
-}
-
-notice()
-{
-	local notice="$1"
-	shift
-	printf "%-28s%s\n" "$notice: " "$*"
-}
-
 check_cc_options() {
 	if `${1} ${2} -S -o /dev/null -xc /dev/null > /dev/null 2>&1` ; then
-		return 1
-	else
 		return 0
+	else
+		return 1
 	fi
 }
 
-check_header() {
-	local header=$1
-	printf "#include <$header>\n" | gcc -E - >/dev/null
-}
-
-check_lib() {
-	local lib=$1 temp_file
-	# Old Linux installations keep X in /usr/X11R6.
-	temp_file=$(mktemp || echo "${TMPDIR-/tmp}/conftest.o")
-	echo "int main(){}" | gcc -x c - -L/usr/X11R6/lib -L/sw/lib -l${lib} -o ${temp_file} >/dev/null
-	local ret=$?
-	rm -f "${temp_file}"
-	return ${ret}
-}
-
-# check_group(package name, header list, library list)
-check_source_group() {
-	local pkg=$1
-	local h headers=$2
-	local l libs=$3
-	local fail=0
-
-	for h in ${headers} ; do
-		check_header ${h} || fail=1
-	done
-	for l in ${libs} ; do
-		check_lib ${l} || fail=1
-	done
-
-	if [ -n "${pkg}" ] && [ ${fail} -eq 1 ] ; then
-		cat <<-EOF 1>&2
-
-		You need to install some packages before building the toolchain.
-
-		Your system lacks the development packages for:
-		    ${pkg}
-
-		The headers you need:
-		    ${headers}
-
-		The libs you need:
-		    ${libs}
-
-		EOF
-		exit 1
-	fi
-
-	return ${fail}
-}
-
-check_source_packages() {
-	echo "Checking for development packages (skip checks with the -D option)"
-	check_source_group "zlib" "zlib.h" "z"
-	check_source_group "curses" "ncurses.h" "ncurses"
-	if ! check_source_group "" "X11/Xlib.h" "X11" ; then
-		echo "X development packages were not found, disabling gui packages such as insight" 1>&2
-		WITHOUT_X=true
-	fi
-}
-
+: ${MAKE:=make}
 ${SKIP_DEV_CHECKS} || check_source_packages
-
 if [ -n "$CHECK_PRE" ] ; then
-    echo "Check http://gcc.gnu.org/install/prerequisites.html for more information"
-    for file in $PREREQ_FILE
-    do
-        RUN=`which -a $file 2>/dev/null| wc -w`
-        if [ $RUN -eq 0 ] ; then
-            echo "!! $file: could not be found"
-            for tmp in $PREREQ_FILE
-            do
-                if [ "$file" = "$tmp" ]; then
-                    echo "!! you need to install package which includes ${file} before building the toolchain will be sucessful"
-                fi
-            done
-        else
-            tmp1=`echo $file | awk -F \/ '{print $NF}'`
-            RUN=`type $tmp1 | grep "shell builtin" | wc -l`
-            if [ $RUN -eq 1 ] ; then
-                echo "   $file seems to be a shell builtin"
-                continue
-            fi
-            for VER in --version -version -V
-            do
-                 tmp=`$file $VER < /dev/null 2>&1 | grep -ie "\<$tmp1\>" | grep -vi "option" | grep -vi "Usage" | grep -vi "\-v"`
-                 if [ -n "$tmp" ] ; then
-                     echo "  " $tmp
-                     break
-                 fi
-            done
-            if [ -n "$tmp" ] ; then
-                continue
-            fi
-
-            VER_ok=""
-            for VER in --version -version -V
-            do
-                if tmp=`$file $VER < /dev/null 2>&1` ; then
-                    VER_ok=$tmp
-                fi
-                tmp=$(echo "$tmp" | grep -ie "version " | grep -vi -e "option" -e "Usage" -e "\-v")
-                if [ -n "$tmp" ] ; then
-                    echo "  " $tmp
-                    break
-                fi
-            done
-            if [ -n "$tmp" ] ; then
-                continue
-            fi
-            file=$(which $file)
-            echo "** Looking up file $file for more info${VER_ok:+ ($VER_ok)}"
-            while [ -L "$file" ] ; do
-                printf " * "
-                file $file
-                lfile=$(readlink $file)
-                [ "${lfile#/}" = "${lfile}" ] \
-                    && file="${file%/*}/${lfile}" \
-                    || file="${lfile}"
-            done
-            printf " * "
-            file "${file}"
-        fi
-    done
-    echo "   SHELL = $SHELL"
-    echo "Done checking for prerequisites"
-    exit 0
+	check_prereqs_verbose ${PREREQ_FILE}
+	exit 0
+else
+	check_prereqs_short ${PREREQ_FILE} ${MAKE}
 fi
-
-for PREREQ in $PREREQ_FILE $MAKE
-do
-    RUN=`which -a $PREREQ | wc -w`
-    if [ $RUN -eq 0 ] ; then
-        error "Cannot find $PREREQ"
-    else if [ $RUN -gt 1 ] ; then
-        printf "Found multiple versions of $PREREQ, using the one at "
-        which $PREREQ
-        fi
-    fi
-done
-
-# Check to make sure shell env vars are empty
-for flags in CFLAGS LDFLAGS CPPFLAGS CXXFLAGS
-do
-    tmp=$(eval echo \$${flags})
-    if [ ${#tmp} -ne 0 ] ; then
-      error "\nSince the shell $flags is set, it will override the choices made by configure.\nThis is normally bad, and will cause problems.\n\n"
-    fi
-done
 
 ############ Done checking - lets get on to building ###################3
 
-if [ "${WITHOUT_X}" = "true" ] ; then
-    BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-gdbtk"
-    echo "Disabling gdbtk (insight)"
-fi
+chains=
+[ $SKIP_ELF ] || chains="${chains} bfin-elf"
+[ $KERNEL_SOURCE ] && chains="${chains} bfin-uclinux bfin-linux-uclibc"
+notice "Building toolchains" ${chains}
 
 # Don't set a default here ... let the build system
 # figure out the defaults by loading all languages.
@@ -427,10 +218,7 @@ notice "Building gcc versions" $GCC_VERSIONS
 notice "Building gcc languages" ${BFIN_LANGS:-all found}
 
 ############ CHECK MAKE SET #####################################
-if [ ! "$MAKE" ] ; then
-    MAKE=make
-fi
-if [ "$NUM_JOBS" -eq "0" ] ; then
+if [ "$NUM_JOBS" = "0" ] ; then
 	NUM_JOBS=`grep -sc "^processor" /proc/cpuinfo`
 	: $(( NUM_JOBS *= 2 ))
 	[ ${NUM_JOBS} -eq 0 ] && NUM_JOBS=2
@@ -438,118 +226,32 @@ fi
 export MAKEFLAGS="-j$NUM_JOBS $MAKEFLAGS"
 notice "Utilizing make" "$MAKE $MAKEFLAGS"
 
-##### Check to make sure a old version of bfin-elf is not here
-##### Unless we are cross-compiling our toolchain, then we need the
-##### old toolchain in our PATH ...
-ORG_PATH=$PATH
-NEW_PATH=""
-RUN=`echo $PATH | sed 's/:/ /g'`
-FOUND=0
-for SEARCH in $RUN
-do
-    if [ -d $SEARCH ] ; then
-        FIND=`find $SEARCH/ -maxdepth 1 -name bfin-elf-gcc -o -name bfin-uclinux-gcc -o -name bfin-linux-uclibc-gcc | wc -c`
-        if [ $FIND -gt 1 ] ; then
-            FOUND=1
-            if [ -z "$CHOST" ] ; then
-                echo "Removing $SEARCH from the PATH"
-            fi
-        else
-            if [ $NEW_PATH ] ; then
-                NEW_PATH=$NEW_PATH:$SEARCH
-            else
-                NEW_PATH=$SEARCH
-            fi
-        fi
-    fi
-done
-if [ -z "$CHOST" ] ; then
-    NEW_PATH=$NEW_PATH:
-    PATH=$NEW_PATH
-elif [ "$FOUND" = "0" ] ; then
-    error "You need an existing Blackfin cross-compiler\n" \
-          " in order to cross-compile a cross-compiler."
-else
-    PATH=$ORG_PATH
-    NEW_PATH=$ORG_PATH
-fi
+scrub_path
 
 ############ ABSOLUTE PATH TO SOURCE DIRECTORIES ################
 
-is_abs_dir()
-{
-	[ -d "/..$1" ]
-}
-check_abs_dir()
-{
-	local msg=$1
-	shift
-
-	local d
-	for d in "$@" ; do
-		if ! is_abs_dir "$d" ; then
-			error "Directory does not exist, or is not an absolute path:\n  -- ${d}"
-		fi
-	done
-
-	[ -n "${msg}" ] && notice "${msg}" "$@"
-	return 0
-}
-
 check_abs_dir "Toolchain source" "${DIR_SOURCE}"
 if [ $KERNEL_SOURCE ] ; then
-	check_abs_dir "Kernel source" "${KERNEL_SOURCE}"
+	check_abs_dir "Kernel source" "${KERNEL_SOURCE}/arch/blackfin"
 fi
-
-############ ABSOLUTE PATH TO BUILD DIRECTORIES ################
 
 : ${DIR_BUILD:=${PWD}}
 
 mkdir -p "${DIR_BUILD}"
 check_abs_dir "" "${DIR_BUILD}"
 
-mk_output_dir()
-{
-	notice "Path to $1 output dir" "$2"
-
-	if [ ! -d "$2" ] ; then
-		mkdir -p "$2"
-		check_abs_dir "" "$2"
-	else
-		check_abs_dir "" "$2"
-
-		if [ "x$3" = "x" ] && ! ${RESUME_BUILD} ; then
-			echo "  directory already exists - cleaning"
-			rm -rf $2/*
-		fi
-	fi
-}
-
-############ RELATIVE PATH TO SOURCE DIRECTORIES ################
-if [ ! $DIR_ELF_OUTPUT ] ; then
-    DIR_ELF_OUTPUT=$DIR_BUILD/bfin-elf
-fi
-mk_output_dir "ELF" $DIR_ELF_OUTPUT $SKIP_ELF
+: ${DIR_ELF_OUTPUT:=${DIR_BUILD}/bfin-elf}
+mk_output_dir "ELF" "${DIR_ELF_OUTPUT}" $SKIP_ELF
 
 DIR_LOG=$DIR_BUILD/logs
-mkdir -p "${DIR_LOG}"
-if ! ${RESUME_BUILD} ; then
-    rm -rf "${DIR_LOG}"/*
-    resume_clear
-fi
+mk_output_dir "logs" "${DIR_LOG}"
+${RESUME_BUILD} || resume_clear
 
 # make sure we arent running on a case insensitive filesystem
 cd "${DIR_BUILD}"
-rm -rf .case.test .CASE.test
-echo case > .case.test
-case=$(cat .CASE.test 2>/dev/null)
-if [ "$case" = "case" ] ; then
-	error "you must use a case sensitive filesystem"
-fi
-rm -rf .case.test .CASE.test
+check_fs_case
 
-DIR_BINUTILS_SOURCE=$DIR_SOURCE/binutils-$BINUTILS_VERSION
-check_abs_dir "Path to binutils" "${DIR_BINUTILS_SOURCE}"
+check_src_pkg binutils-${BINUTILS_VERSION} BINUTILS
 
 CBUILD=$($DIR_BINUTILS_SOURCE/config.guess)
 BUILD_TARGET="--build=${CBUILD}"
@@ -560,6 +262,9 @@ HOST_TARGET="--host=${CHOST}"
 # extraneous hosts ... it's been fixed in binutils-2.18, so
 # once we update to that, we should be able to re-enable NLS
 UCLIBC_HOSTUTILS="PASS"
+if [ "${WITHOUT_X}" = "true" ] ; then
+    BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-gdbtk"
+fi
 case ${CHOST} in
     *mingw*)  BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-nls"; UCLIBC_HOSTUTILS="XFAIL";;
     *darwin*) BINUTILS_EXTRA_CONF="${BINUTILS_EXTRA_CONF} --disable-nls"; UCLIBC_HOSTUTILS="XFAIL";;
@@ -571,43 +276,32 @@ for GCC_VER in $GCC_VERSIONS; do
 	check_abs_dir "Path to gcc-${GCC_VER}" "${DIR_SOURCE}/gcc-${GCC_VER}"
 done
 
-DIR_ELF2FLT_SOURCE=$DIR_SOURCE/elf2flt
-check_abs_dir "Path to elf2flt" "${DIR_ELF2FLT_SOURCE}"
+check_src_pkg elf2flt
 
-UCLIBC_SOURCE=$DIR_SOURCE/uClibc
-check_abs_dir "Path to uClibc" "${UCLIBC_SOURCE}"
+check_src_pkg uClibc
+if [ -n "${UCLIBC_CFLAGS}" ] ; then
+	printf "    uClibc CFLAGS           "
+	# We test (and warn) if any of the CFLAGS for uClibc
+	# don't work on the host compiler
+	for opt in $UCLIBC_CFLAGS ; do
+		printf " %s" "$opt"
+		if check_cc_options gcc $opt ; then
+			printf "(bfin only?)"
+		fi
+	done
+	echo
+fi
 : ${UCLIBC_CFLAGS:=-g -O2}
 
-printf "    uClibc CFLAGS           "
-#We test (and warn) if any of the CFLAGS for uClibc don't work on the host compiler
-for opt in $UCLIBC_CFLAGS
-do
-    check_cc_options gcc $opt
-    if [ "$?" -eq "1" ] ; then
-      printf "%s " "$opt"
-    else
-      printf "%s(bfin only?) " "$opt"
-    fi
-done
-echo
+check_src_pkg ldr-utils
+check_src_pkg libusb
+check_src_pkg libftdi-1.0 LIBFTDI
+check_src_pkg urjtag
+check_src_pkg gdbproxy
 
-DIR_LDR_UTILS_SOURCE=$DIR_SOURCE/ldr-utils
-check_abs_dir "Path to ldr-utils" "${DIR_LDR_UTILS_SOURCE}"
-
-DIR_GDBPROXY_SOURCE=$DIR_SOURCE/gdbproxy
-check_abs_dir "Path to gdbproxy" "${DIR_GDBPROXY_SOURCE}"
-
-DIR_LIBFTDI_SOURCE=$DIR_SOURCE/libftdi-1.0
-check_abs_dir "Path to libftdi" "${DIR_LIBFTDI_SOURCE}"
-
-DIR_URJTAG_SOURCE=$DIR_SOURCE/urjtag
-check_abs_dir "Path to urjtag" "${DIR_URJTAG_SOURCE}"
-
+: ${DIR_uC_OUTPUT:=${DIR_BUILD}/bfin-uclinux}
+: ${DIR_LINUX_OUTPUT:=${DIR_BUILD}/bfin-linux-uclibc}
 if [ $KERNEL_SOURCE ] ; then
-    if [ ! $DIR_uC_OUTPUT ] ; then
-        DIR_uC_OUTPUT=$DIR_BUILD/bfin-uclinux
-        DIR_LINUX_OUTPUT=$DIR_BUILD/bfin-linux-uclibc
-    fi
     mk_output_dir "FLAT" $DIR_uC_OUTPUT ""
     mk_output_dir "FDPIC" $DIR_LINUX_OUTPUT ""
     if [ ! $DIR_KBUILD_OUTPUT ] ; then
@@ -619,7 +313,7 @@ if [ $KERNEL_SOURCE ] ; then
     else
         echo "U-Boot Source not specified: addon utilties (like 'mkimage') will not be built"
     fi
-    notice "Path to uClibc config" "${UCLIBC_CONFIG_FILE:-$UCLIBC_SOURCE/extra/Configs/}"
+    notice "Path to uClibc config" "${UCLIBC_CONFIG_FILE:-$DIR_UCLIBC_SOURCE/extra/Configs/}"
     if [ -n "$UCLIBC_CONFIG_FILE" ] && [ ! -f "${UCLIBC_CONFIG_FILE}" ] ; then
         error "Can't find uClibc config file '$UCLIBC_CONFIG_FILE'"
     fi
@@ -644,11 +338,6 @@ else
     fi
 fi
 
-############ RELATIVE PATH TO BUILD DIR ################
-
-DIR_BINUTILS_BUILD=$DIR_BUILD/binutils_build
-DIR_ELF2FLT_BUILD=$DIR_BUILD/elf2flt_build
-
 # Add output dir so when building uclibc, it can find the toolchain
 export PATH=$NEW_PATH:/$DIR_ELF_OUTPUT/bin:/$DIR_uC_OUTPUT/bin:/$DIR_LINUX_OUTPUT/bin
 
@@ -656,290 +345,143 @@ export PATH=$NEW_PATH:/$DIR_ELF_OUTPUT/bin:/$DIR_uC_OUTPUT/bin:/$DIR_LINUX_OUTPU
 ############## DONOT CHANGE ANYTHING BELOW THIS LINE ############
 #################################################################
 
-# Some helpful functions
-requote() { printf "'%s' " "$@"; }
-
-print_stop_time()
+build_gcc()
 {
-	local END=$(date +%s)
-	local DIFF=$((END - START))
-	local h=$((DIFF / 3600))
-	local m=$(((DIFF % 3600) / 60))
-	local s=$((DIFF % 60))
-	[ ${h} -ne 0 ] && printf "${h}h"
-	[ ${m} -ne 0 ] && printf "${m}m"
-	[ ${s} -ne 0 ] && printf "${s}s"
-}
+	local ver="$1"
+	local target="bfin-$2"
+	local prefix="$3"
 
-die_with_log()
-{
-    [ -n "$*" ] && echo "$*"
-    echo "Please report an error to http://blackfin.uclinux.org/gf/project/toolchain"
-    printf " Build error " ; date
-    printf "  occurred "
-    print_stop_time
-    echo " into script"
+	resume_check ${target}.gcc-${ver} && return 0
 
-    # Create a single file so users can email it to us,
-    # we sleep, so things can finish writing to the log file
-    sleep 1
-    tar -jhcf "$DIR_LOG"/config.logs.tbz2 $(find "$DIR_BUILD" -name "config.log") "$ACTUAL_LOGFILE"
+	DIR_GCC_SOURCE=$DIR_SOURCE/gcc-${ver}
 
-    if [ "$NUM_JOBS" -eq "1" ]; then
-        echo "When reporting issue, we may ask for $DIR_LOG/config.logs.tbz2"
-        echo " Last logfile entries:"
-		tail "$ACTUAL_LOGFILE"
-    else
-        echo "Since the build was done in parallel, I'm not sure where the error"
-		echo "happened.  The best thing to do is re-run the BuildToolChain script"
-		echo "with the '-j 1' option.  The full log can be found here:"
-		echo "${ACTUAL_LOGFILE}"
-    fi
+	DIR_GCC_BUILD=$DIR_BUILD/gcc_build-${ver}
+	change_clean_dir $DIR_GCC_BUILD
 
-    exit 1
-}
-
-log_it()
-{
-    # Note: embedded single quotes will break this
-    eval "printf '###\n%s\n\n' '$*'" ${LOGFILE}
-}
-
-run_cmd_nodie()
-{
-    log_it "$@"
-    # since logfile might contain redirection, we need to `eval`
-    # since args might contain whitespace, we need to requote
-    eval \($(requote "$@")\) ${LOGFILE}
-}
-run_cmd()
-{
-	run_cmd_nodie "$@" || die_with_log
-}
-
-check_installed_files()
-{
-    local pkg=$1 ; shift
-    local pfx=$1 ; shift
-    local f
-    for f in "$@" ; do
-        f="${pfx}${f}${EXEEXT}"
-        if [ ! -f "${f}" ] ; then
-            die_with_log "${pkg} did not build properly : Missing ${f}"
-        fi
-    done
-}
-
-change_dir()
-{
-    log_it cd "$@"
-    cd "$@" || die_with_log
-}
-change_clean_dir()
-{
-    cd /
-    rm -rf "$@"
-    mkdir -p "$@"
-    change_dir "$@"
-}
-
-echo_date()
-{
-    # if we can fit the msg on one line, then do it.  else,
-    # try and split it on word boundaries.  if all else fails,
-    # give it its own line.
-    local recurse
-    case $1 in
-        -[rR]) recurse=$1; shift;;
-    esac
-    local date="$(date)"
-    local msg="$*"
-    local bytes_for_msg=$((${COLUMNS:-80} - ${#date} - 5))
-
-    if [ -n "${recurse}" ] || [ ${#msg} -le ${bytes_for_msg} ] ; then
-        local banner="***" full
-        if [ -n "${recurse}" ] ; then
-            [ ${#msg} -eq 0 ] && return 1
-            [ "${recurse}" = "-r" ] && banner="   " date=""
-        fi
-        [ ${#msg} -gt ${bytes_for_msg} ] && full=${msg} msg=""
-        if [ -n "${msg}" ] || [ "${recurse}" = "-R" ] ; then
-            printf "%s %-${bytes_for_msg}s %s\n" "${banner}" "${msg}" "${date}"
-        fi
-        [ -n "${full}" ] && echo "   " ${full}
-    else
-        local split word
-        recurse="-R"
-        for word in ${msg} ; do
-            if [ $((${#split} + ${#word})) -ge ${bytes_for_msg} ] ; then
-                echo_date ${recurse} ${split} && recurse="-r"
-                split=""
-            fi
-            split="${split} ${word}"
-        done
-        echo_date ${recurse} ${split}
-        recurse=""
-    fi
-
-    [ -z "${recurse}" ] && log_it "${msg}"
-    return 0
-}
-
-get_scm_ver()
-{
-	if [ -n "$PKGVERSION" ] ; then
-		echo "$PKGVERSION"
-		return 0
+	# When doing a canadian cross, we have to use the toolchain on the host.
+	# Since gcc is very picky about being compiled by another version, make
+	# sure we compile this version with the same version on the host.
+	if [ "${CBUILD}" != "${CHOST}" ] ; then
+		p=$DIR_GCC_BUILD/.bfin.path
+		mkdir $p
+		for t in gcc g++ c++ gfortran ; do
+			fullt=$(echo `which ${target}-$t`-${ver}.?)
+			if [ ! -x "$fullt" ] ; then
+				if [ "$t" = "gcc" ] ; then
+					die_with_log "You need to have gcc ${ver} installed in order to build it"
+				else
+					continue
+				fi
+			fi
+			printf '#!/bin/sh\nexec %s "$@"\n' "$fullt" > "$p/${target}-$t"
+			chmod a+rx $p/${target}-$t
+		done
+		save_PATH=$PATH
+		export PATH=$p:$PATH
 	fi
 
-	local src=$1 SCM_URL SCM_REV
-
-	if [ -d "$src/.svn" ] ; then
-		eval $(svn info "$src" 2>/dev/null | \
-			sed -n \
-				-e '/^URL:/s:.* .*/trunk/.*:SCM_URL=trunk:p' \
-				-e '/^URL:/s:.* .*/branches/toolchain_\(.*\)_branch/.*:SCM_URL=\1:p' \
-				-e '/^Last Changed Rev:/s:.* :SCM_REV=:p' \
-		)
-		[ -n "$SCM_REV" ] && SCM_REV="svn-${SCM_REV}"
-	elif [ -d "$src/../.git" ] ; then
-		eval $(cd "$src"; \
-			SCM_URL=$(git branch | awk '$1 == "*" { sub(/^[*][[:space:]]*/, ""); gsub(/[()]/, ""); gsub(/[[:space:]]/, "-"); print; }')
-			echo SCM_URL=${SCM_URL}
-			echo SCM_REV=$(git rev-parse --short --verify HEAD)
-		)
-		[ -n "$SCM_REV" ] && SCM_REV="git-${SCM_REV}"
+	echo_date "${target}: gcc: linking external packages"
+	run_cmd rm -f \
+		$DIR_GCC_SOURCE/newlib \
+		$DIR_GCC_SOURCE/libgloss \
+		$DIR_GCC_SOURCE/mpfr \
+		$DIR_GCC_SOURCE/gmp \
+		${prefix}/${target}/sys-include
+	run_cmd ln -s runtime/usr/include ${prefix}/${target}/sys-include
+	[ -e $DIR_GCC_SOURCE/../gmp  ] && run_cmd ln -snf ../gmp  $DIR_GCC_SOURCE/gmp
+	[ -e $DIR_GCC_SOURCE/../mpfr ] && run_cmd ln -snf ../mpfr $DIR_GCC_SOURCE/mpfr
+	if [ "${target}" = "bfin-elf" ]; then
+		run_cmd ln -snf $DIR_BINUTILS_SOURCE/newlib $DIR_GCC_SOURCE/
+		run_cmd ln -snf $DIR_BINUTILS_SOURCE/libgloss $DIR_GCC_SOURCE/
+		EXTRA_GCC_CONF="--enable-languages=c,c++"
+	else
+		EXTRA_GCC_CONF=""
 	fi
-	[ -n "$SCM_URL" ] && SCM_URL="-${SCM_URL}"
-	[ -n "$SCM_REV" ] && SCM_REV="/${SCM_REV}"
-	echo "ADI${SCM_URL}${SCM_REV}"
-}
 
-build_gcc ()
-{
-    resume_check bfin-$2.gcc-$1 && return 0
-
-    DIR_GCC_SOURCE=$DIR_SOURCE/gcc-$1
-
-    DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$1
-    change_clean_dir $DIR_GCC_BUILD
-
-    # When doing a canadian cross, we have to use the toolchain on the host.
-    # Since gcc is very picky about being compiled by another version, make
-    # sure we compile this version with the same version on the host.
-    if [ "${CBUILD}" != "${CHOST}" ] ; then
-        p=$DIR_GCC_BUILD/.bfin.path
-        mkdir $p
-        for t in gcc g++ c++ gfortran ; do
-            fullt=$(echo `which bfin-$2-$t`-$1.?)
-            if [ ! -x "$fullt" ] ; then
-                if [ "$t" = "gcc" ] ; then
-                    die_with_log "You need to have gcc $1 installed in order to build it"
-                else
-                    continue
-                fi
-            fi
-            printf '#!/bin/sh\nexec %s "$@"\n' "$fullt" > "$p/bfin-$2-$t"
-            chmod a+rx $p/bfin-$2-$t
-        done
-        save_PATH=$PATH
-        export PATH=$p:$PATH
-    fi
-
-    run_cmd rm -f $DIR_GCC_SOURCE/newlib $DIR_GCC_SOURCE/libgloss $DIR_GCC_SOURCE/mpfr $DIR_GCC_SOURCE/gmp
-    [ -e $DIR_GCC_SOURCE/../gmp  ] && run_cmd ln -snf ../gmp  $DIR_GCC_SOURCE/gmp
-    [ -e $DIR_GCC_SOURCE/../mpfr ] && run_cmd ln -snf ../mpfr $DIR_GCC_SOURCE/mpfr
-    if [ $2 = "elf" ]; then
-        echo_date "Linking newlib and libgloss"
-        run_cmd ln -snf $DIR_BINUTILS_SOURCE/newlib $DIR_GCC_SOURCE/
-        run_cmd ln -snf $DIR_BINUTILS_SOURCE/libgloss $DIR_GCC_SOURCE/
-        EXTRA_GCC_CONF="--enable-languages=c,c++"
-    else
-        EXTRA_GCC_CONF=""
-    fi
-
-    LOCALE="--enable-clocale=generic"
-    if [ $2 != "elf" ] && [ -n "$UCLIBC_CONFIG_FILE" ]; then
-	if grep -qs UCLIBC_HAS_LOCALE=y $UCLIBC_CONFIG_FILE; then
-	    LOCALE="--enable-clocale=uclibc"
+	LOCALE="--enable-clocale=generic"
+	if [ "${target}" != "bfin-elf" ] && [ -n "$UCLIBC_CONFIG_FILE" ]; then
+		if grep -qs UCLIBC_HAS_LOCALE=y $UCLIBC_CONFIG_FILE; then
+			LOCALE="--enable-clocale=uclibc"
+		fi
 	fi
-    fi
 
-    if [ -e $DIR_GCC_SOURCE/gcc/BASE-VER ] ; then
-        VERSION=`cat $DIR_GCC_SOURCE/gcc/BASE-VER`
-    else
-        VERSION=`grep version_string $DIR_GCC_SOURCE/gcc/version.c | sed 's/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
-    fi
+	if [ -e $DIR_GCC_SOURCE/gcc/BASE-VER ] ; then
+		VERSION=`cat $DIR_GCC_SOURCE/gcc/BASE-VER`
+	else
+		VERSION=`grep version_string $DIR_GCC_SOURCE/gcc/version.c | sed 's/.*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/'`
+	fi
 
-    echo_date "Configuring GCC ($1)"
-    RUN="$DIR_GCC_SOURCE/configure $BUILD_TARGET $HOST_TARGET --target=bfin-$2 \
-      --prefix=$3 $4 --disable-libstdcxx-pch $BFIN_LANGS $EXTRA_GCC_CONF \
-      --disable-symvers --disable-libssp --disable-libffi $LOCALE \
-      --enable-version-specific-runtime-libs --enable-__cxa_atexit \
-      --with-bugurl=URL:http://blackfin.uclinux.org/gf/project/toolchain/tracker \
-      --with-pkgversion=$(get_scm_ver $DIR_GCC_SOURCE)"
-    run_cmd $RUN
+	echo_date "${target}: gcc: configuring (${VERSION})"
+	run_cmd "${DIR_GCC_SOURCE}"/configure $BUILD_TARGET $HOST_TARGET --target=${target} \
+		--prefix=${prefix} $4 --disable-libstdcxx-pch $BFIN_LANGS $EXTRA_GCC_CONF \
+		--disable-symvers --disable-libssp --disable-libffi $LOCALE \
+		--enable-version-specific-runtime-libs --enable-__cxa_atexit \
+		--with-bugurl=URL:http://blackfin.uclinux.org/gf/project/toolchain/tracker \
+		--with-pkgversion=$(get_scm_ver $DIR_GCC_SOURCE)
 
-    echo_date "Building GCC"
-    run_cmd $MAKE
+	echo_date "${target}: gcc: building"
+	run_cmd $MAKE
 
-    eval `grep ^EXEEXT= $DIR_GCC_BUILD/gcc/config.log`
-    FILE="cc1 collect2 gcov xgcc"
-    if echo $BFIN_LANGS | grep -q c++ ; then
-        FILE="${FILE} cc1plus cpp g++"
-    fi
-    check_installed_files gcc "$DIR_GCC_BUILD/gcc/" $FILE
+	eval `grep ^EXEEXT= $DIR_GCC_BUILD/gcc/config.log`
+	FILE="cc1 collect2 gcov xgcc"
+	if echo $BFIN_LANGS | grep -q c++ ; then
+		FILE="${FILE} cc1plus cpp g++"
+	fi
+	check_installed_files gcc "$DIR_GCC_BUILD/gcc/" $FILE
 
-    echo_date "Installing GCC"
-    run_cmd $MAKE -j1 install
+	echo_date "${target}: gcc: installing"
+	run_cmd $MAKE -j1 install
 
-    # some basic sanity checks
-    FILE="addr2line ar as c++filt gcov nm objdump ld \
-          objcopy ranlib readelf size strings strip \
-          gdb run \
-          cpp gcc"
-    if echo $BFIN_LANGS | grep -q c++ ; then
-        FILE="${FILE} g++ c++"
-    fi
-    if [ "${WITHOUT_X}" = "false" ] ; then
-        FILE="${FILE} insight"
-    fi
-    check_installed_files toolchain "$3/bin/bfin-$2-" $FILE
+	# some basic sanity checks
+	FILE="addr2line ar as c++filt gcov nm objdump ld \
+	      objcopy ranlib readelf size strings strip \
+	      gdb run \
+	      cpp gcc"
+	if echo $BFIN_LANGS | grep -q c++ ; then
+		FILE="${FILE} g++ c++"
+	fi
+	if [ "${WITHOUT_X}" = "false" ] ; then
+		FILE="${FILE} insight"
+	fi
+	check_installed_files toolchain "${prefix}/bin/${target}-" $FILE
 
-    if [ -e $3/bin/bfin-$2-g++$EXEEXT ]; then
-        ln $3/bin/bfin-$2-g++$EXEEXT $3/bin/bfin-$2-g++-$VERSION$EXEEXT
-        ln $3/bin/bfin-$2-c++$EXEEXT $3/bin/bfin-$2-c++-$VERSION$EXEEXT
-    fi
-    if [ -e $3/bin/bfin-$2-gfortran$EXEEXT ]; then
-        ln $3/bin/bfin-$2-gfortran$EXEEXT $3/bin/bfin-$2-gfortran-$VERSION$EXEEXT
-    fi
+	if [ -e ${prefix}/bin/${target}-g++$EXEEXT ]; then
+		ln ${prefix}/bin/${target}-g++$EXEEXT ${prefix}/bin/${target}-g++-$VERSION$EXEEXT
+		ln ${prefix}/bin/${target}-c++$EXEEXT ${prefix}/bin/${target}-c++-$VERSION$EXEEXT
+	fi
+	if [ -e ${prefix}/bin/${target}-gfortran$EXEEXT ]; then
+		ln ${prefix}/bin/${target}-gfortran$EXEEXT ${prefix}/bin/${target}-gfortran-$VERSION$EXEEXT
+	fi
 
-    # make sure the tcl baggage that comes with insight doesnt pollute our PATH.
-    # note this isnt an issue as insight statically links in all of the TCL stuff
-    # it actually needs and does not use these binaries at runtime.
+	# make sure the tcl baggage that comes with insight doesnt pollute our PATH.
+	# note this isnt an issue as insight statically links in all of the TCL stuff
+	# it actually needs and does not use these binaries at runtime.
 	if ! ${WITHOUT_X} ; then
-        (
-        prefix=$3
-        cd "${prefix}"/bin     && rm -f tclsh* wish*
-        cd "${prefix}"/lib     && rm -f libitcl*.a libitk*.a libtcl*.a libtk*.a
-        cd "${prefix}"/include && rm -f itcl*.h itk*.h tcl*.h tk*.h
-        cd "${prefix}"/man     && rm -rf mann man1/tclsh.1 man1/wish.1
-        grep -sl Tcl/Tk man3/* | xargs rm -f
-        ) 2>/dev/null
-    fi
-    # scrub files we dont care about
-    run_cmd rm -f "$3"/lib*/libiberty.a "$3"/lib*/libbfin-*-sim.a
-    run_cmd rm -rf "$3"/libexec/gcc/*/*/install-tools/ "$3"/lib*/gcc/*/*/install-tools/mkheaders.conf
-    find "$3" -depth -type d -exec rmdir {} \; 2>/dev/null
+		(
+		cd "${prefix}"/bin     && rm -f tclsh* wish*
+		cd "${prefix}"/lib     && rm -f libitcl*.a libitk*.a libtcl*.a libtk*.a
+		cd "${prefix}"/include && rm -f itcl*.h itk*.h tcl*.h tk*.h
+		cd "${prefix}"/man     && rm -rf mann man1/tclsh.1 man1/wish.1
+		grep -sl Tcl/Tk man3/* | xargs rm -f
+		) 2>/dev/null
+	fi
+	# scrub files we dont care about
+	run_cmd rm -rf "${prefix}"/libexec/gcc/*/*/install-tools/ "${prefix}"/lib*/gcc/*/*/install-tools/mkheaders.conf
 
-    if [ "${CBUILD}" != "${CHOST}" ] ; then
-        PATH=$save_PATH
-        rm -rf "$DIR_GCC_BUILD/.bfin.path"
-    fi
+	if [ "${CBUILD}" != "${CHOST}" ] ; then
+		PATH=$save_PATH
+		rm -rf "$DIR_GCC_BUILD/.bfin.path"
+	fi
 
-    run_cmd rm -f $DIR_GCC_SOURCE/newlib $DIR_GCC_SOURCE/libgloss $DIR_GCC_SOURCE/mpfr $DIR_GCC_SOURCE/gmp
+	run_cmd rm -f \
+		$DIR_GCC_SOURCE/newlib \
+		$DIR_GCC_SOURCE/libgloss \
+		$DIR_GCC_SOURCE/mpfr \
+		$DIR_GCC_SOURCE/gmp \
+		${prefix}/${target}/sys-include
+	run_cmd rm -rf "$DIR_GCC_BUILD"
 
-    resume_save
+	resume_save
 }
 
 # Build up a set of binutils
@@ -949,6 +491,8 @@ build_binutils()
 {
 	local target="bfin-$1"
 	local prefix="$2"
+
+	DIR_BINUTILS_BUILD=$DIR_BUILD/binutils_build
 
 	resume_check ${target}.binutils && return 0
 
@@ -963,14 +507,14 @@ build_binutils()
 		*)        myconf="--with-sysroot=${prefix}/${target}/runtime";;
 	esac
 
-	echo_date "Configuring $1 Binutils & GDB"
+	echo_date "${target}: binutils/gdb: configuring (${BINUTILS_VERSION})"
 	run_cmd $DIR_BINUTILS_SOURCE/configure \
 		$BUILD_TARGET $HOST_TARGET --target=${target} \
 		--prefix=${prefix} ${myconf} $BINUTILS_EXTRA_CONF \
 		--with-bugurl=URL:http://blackfin.uclinux.org/gf/project/toolchain/tracker \
 		--with-pkgversion=$(get_scm_ver $DIR_BINUTILS_SOURCE)
 
-	echo_date "Building $1 Binutils & GDB"
+	echo_date "${target}: binutils/gdb: building"
 	run_cmd $MAKE all-binutils all-gas all-ld all-sim all-gdb
 
 	eval `grep ^EXEEXT= $DIR_BINUTILS_BUILD/binutils/config.log`
@@ -987,8 +531,11 @@ build_binutils()
 	check_installed_files gdb "$DIR_BINUTILS_BUILD/gdb/" ${FILE}
 
 	change_dir $DIR_BINUTILS_BUILD
-	echo_date "Installing $1 Binutils & GDB"
+	echo_date "${target}: binutils/gdb: installing"
 	run_cmd $MAKE install-binutils install-gas install-ld install-sim install-gdb
+
+	# need to leave build dir behind for elf2flt
+	[ "${target}" = "bfin-linux-uclibc" ] && run_cmd rm -rf "$DIR_BINUTILS_BUILD"
 
 	resume_save
 }
@@ -1000,7 +547,9 @@ build_elf2flt()
 
 	resume_check ${target}.elf2flt && return 0
 
-	echo_date "Building $1 elf2flt"
+	DIR_ELF2FLT_BUILD=$DIR_BUILD/elf2flt_build
+
+	echo_date "${target}: elf2flt: configuring"
 	change_clean_dir $DIR_ELF2FLT_BUILD
 	touch -r . $DIR_ELF2FLT_SOURCE/* # fix autotool timestamps
 
@@ -1016,19 +565,19 @@ build_elf2flt()
 		--with-binutils-include-dir=$DIR_BINUTILS_SOURCE/include \
 		--prefix=${prefix} --program-suffix= ${myconf}
 
-	echo_date "Make $1 elf2flt"
+	echo_date "${target}: elf2flt: building"
 	run_cmd $MAKE
 
 	eval `grep ^EXEEXT= $DIR_ELF2FLT_BUILD/config.log`
 	check_installed_files elf2flt "$DIR_ELF2FLT_BUILD/" elf2flt flthdr
 
-	echo_date "Installing $1 elf2flt"
+	echo_date "${target}: elf2flt: installing"
 	run_cmd $MAKE install
 
 	check_installed_files elf2flt "${prefix}/bin/${target}-" \
 		elf2flt flthdr
 
-	rm -rf $DIR_ELF2FLT_BUILD
+	run_cmd rm -rf "$DIR_ELF2FLT_BUILD" "$DIR_BINUTILS_BUILD"
 
 	resume_save
 }
@@ -1112,7 +661,7 @@ install_all_target_libs()
 				movit=false
 			fi
 		else
-			echo_date "Ins ${mdir}${lib} (${lver})"
+			echo_date "Installed ${mdir}${lib} (${lver})"
 		fi
 		if ${movit} ; then
 			run_cmd mv "${gccdir}/${otarg}" "${tdir}/${ntarg}"
@@ -1143,19 +692,80 @@ install_all_target_libs()
 	done
 }
 
-build_uClibc()
+build_uboot()
+{
+	local ver
+	ver=$(printf 'e:\n\t@echo $(U_BOOT_VERSION)\ninclude '$DIR_UBOOT'/Makefile\n' | ${MAKE} -f -)
+
+	echo_date "U-Boot: building helper tools (${ver})"
+	change_dir $DIR_UBOOT
+	DIR_UBOOT_BUILD="$DIR_BUILD/u-boot_build"
+
+	echo_date "U-Boot: cleaning"
+	run_cmd rm -rf "$DIR_UBOOT_BUILD"
+
+	echo_date "U-Boot: building"
+	if [ "${CBUILD}" = "${CHOST}" ] ; then
+		unset HOSTCC HOSTSTRIP
+	else
+		HOSTCC="${CHOST}-gcc"
+		HOSTSTRIP="${CHOST}-strip"
+	fi
+	run_cmd $MAKE \
+		-C "$DIR_UBOOT" \
+		O="$DIR_UBOOT_BUILD" \
+		CONFIG_CMD_NET=y \
+		${HOSTSTRIP+HOSTSTRIP=${HOSTSTRIP}} \
+		${HOSTCC+HOSTCC=${HOSTCC}} \
+		tools
+
+	echo_date "U-Boot: installing tools"
+	check_installed_files u-boot "$DIR_UBOOT_BUILD/tools/" \
+		mkimage gen_eth_addr
+	run_cmd mkdir -p "${DIR_uC_OUTPUT}/bin" "${DIR_LINUX_OUTPUT}/bin"
+	for RUN in mkimage$EXEEXT gen_eth_addr$EXEEXT ; do
+		run_cmd cp "$DIR_UBOOT_BUILD/tools/$RUN" "$DIR_uC_OUTPUT/bin/bfin-uclinux-$RUN"
+		run_cmd cp "$DIR_UBOOT_BUILD/tools/$RUN" "$DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-$RUN"
+	done
+
+	echo_date "U-Boot: cleaning"
+	run_cmd rm -rf "$DIR_UBOOT_BUILD"
+}
+
+build_kernel_headers()
+{
+	[ "$DIR_KBUILD_OUTPUT" = "$KERNEL_SOURCE" ] && return 0
+	resume_check linux-headers && return 0
+
+	echo_date "Configuring Linux Kernel"
+
+	change_dir $KERNEL_SOURCE
+	run_cmd \
+		$MAKE -j1 \
+		headers_check headers_install \
+		INSTALL_HDR_PATH=$DIR_KBUILD_OUTPUT/usr \
+		KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT \
+		CROSS_COMPILE=bfin-elf- \
+		ARCH=blackfin
+	find "$DIR_KBUILD_OUTPUT/usr" -type f -name '.*' -exec rm {} +
+	change_dir ..
+
+	resume_save
+}
+
+build_uClibc_core()
 {
     ARGS="V=1 CROSS=bfin-elf-"
 
-    echo_date "Cleaning uClibc"
+    echo_date "uClibc: cleaning"
     run_cmd $MAKE clean $ARGS
 
-    echo_date "Building uClibc"
+    echo_date "uClibc: building"
     if ! grep -qs UCLIBC_HAS_LOCALE=y .config ; then
         # sometimes uClibc dies on parallel build, so lets build it with -j1
         run_cmd $MAKE $ARGS -j 1
     else
-        echo_date "Building Locale"
+        echo_date "uClibc: building locale"
         run_cmd $MAKE headers $ARGS
 
         change_dir extra/locale
@@ -1176,7 +786,7 @@ build_uClibc()
         run_cmd $MAKE all $ARGS -j 1
     fi
 
-    echo_date "Installing uClibc"
+    echo_date "uClibc: installing"
     run_cmd $MAKE install DESTDIR=$1/runtime SUFFIX=$2 $ARGS
 
     # Need a way to look at uClibc make system , and see what libs
@@ -1186,76 +796,24 @@ build_uClibc()
         crt1.o libc.a libcrypt.a libm.a libnsl.a libresolv.a libutil.a
 }
 
-if [ "x$SKIP_ELF" = "x" ]; then
-
-    ################ Step 1 - ELF Toolchain #########################
-    build_binutils elf $DIR_ELF_OUTPUT
-
-    build_elf2flt elf $DIR_ELF_OUTPUT
-
-    for GCC_VERSION in $GCC_VERSIONS; do
-      build_gcc $GCC_VERSION elf $DIR_ELF_OUTPUT "--with-newlib"
-    done
-
-    ########################### Step 2 - done ####################
-fi
-
-for GCC_VERSION in $GCC_VERSIONS; do
-    DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
-    rm -rf $DIR_GCC_BUILD/*
-done
-
-# We cannot remove newlib symlink until the bfin-elf tests finishs.
-for GCC_VERSION in $GCC_VERSIONS; do
-  DIR_GCC_SOURCE=$DIR_SOURCE/gcc-$GCC_VERSION
-  if [ -h $DIR_GCC_SOURCE/newlib ] ; then
-      rm $DIR_GCC_SOURCE/newlib
-  fi
-done
-
-if [ "${CHOST}" = "${CBUILD}" ] ; then
-  printf "*** Checking uClibc CFLAGS:"
-  #We test (and fail) if any of the CFLAGS for uClibc don't work on the bfin-elf compiler
-  for opt in $UCLIBC_CFLAGS
-  do
-      check_cc_options $DIR_ELF_OUTPUT/bin/bfin-elf-gcc $opt
-      if [ "$?" -eq "0" ] ; then
-        printf "\n"
-        echo "I could not make option $opt work on the bfin-elf compiler, so I can't use it for uClibc"
-        printf "halting after "
-        print_stop_time
-        printf "\n"
-        exit
-      else
-        printf " $opt"
-      fi
-  done
-  printf " OK\n"
-fi
-
-####################### Done Step 1  #########################
-
-
-if [ $KERNEL_SOURCE ] ; then
-    if [ "$DIR_KBUILD_OUTPUT" != "$KERNEL_SOURCE" ] && ! resume_check linux-headers ; then
-	echo_date "Configuring Linux Kernel"
-
-	change_dir $KERNEL_SOURCE
-	run_cmd \
-		$MAKE -j1 \
-		headers_check headers_install \
-		INSTALL_HDR_PATH=$DIR_KBUILD_OUTPUT/usr \
-		KBUILD_OUTPUT=$DIR_KBUILD_OUTPUT \
-		CROSS_COMPILE=bfin-elf- \
-		ARCH=blackfin
-	find "$DIR_KBUILD_OUTPUT/usr" -type f -name '.*' -exec rm {} +
-	change_dir ..
-
-	resume_save
-    fi
-
-
-    ####################### Step 3 - build uClibc ################
+build_uclibc()
+{
+	if [ "${CHOST}" = "${CBUILD}" ] ; then
+		printf "*** Checking uClibc CFLAGS:"
+		# We test (and fail) if any of the CFLAGS for uClibc don't work on the bfin-elf compiler
+		for opt in $UCLIBC_CFLAGS ; do
+			if ! check_cc_options $DIR_ELF_OUTPUT/bin/bfin-elf-gcc $opt ; then
+				error \
+					"\n" \
+					"I could not make option $opt work on the bfin-elf compiler,\n" \
+					"so I can't use it for uClibc\n"
+					"halting after $(print_stop_time)"
+			else
+				printf " $opt"
+			fi
+		done
+		printf " OK\n"
+	fi
 
 	do_opt() {
 		local opt="$1"
@@ -1274,7 +832,7 @@ if [ $KERNEL_SOURCE ] ; then
 	}
 	unset_opt() { do_opt ${opt} "# $1 is not set" ; }
 
-    change_dir $UCLIBC_SOURCE
+    change_dir $DIR_UCLIBC_SOURCE
 
     MULTILIBS=`bfin-elf-gcc --print-multi-lib`
 
@@ -1290,7 +848,7 @@ if [ $KERNEL_SOURCE ] ; then
 
 	resume_check uclibc.${dir} && continue
 
-	echo_date "Configuring uClibc for ${dir}"
+	echo_date "uClibc: configuring for ${dir}"
 
 	case ${flags} in
 	*mfdpic*)
@@ -1347,7 +905,7 @@ if [ $KERNEL_SOURCE ] ; then
 
 	run_cmd $MAKE oldconfig CROSS=bfin-elf- </dev/null
 	run_cmd cp .config .config-used-for_${suffix}
-	build_uClibc "${uclibc_sysroot}" "${uclibc_dir1}" "${uclibc_dir2}"
+	build_uClibc_core "${uclibc_sysroot}" "${uclibc_dir1}" "${uclibc_dir2}"
 
 	resume_save
     done
@@ -1356,11 +914,9 @@ if [ $KERNEL_SOURCE ] ; then
     sed -i.tmp '/^KERNEL_HEADERS/s:=.*:="'"$DIR_uC_OUTPUT/bfin-uclinux/runtime/usr/include"'":' .config-used-for*
     run_cmd rm -f .config*.tmp
 
-    ######################### Done with uClibc ###########################
-
     if ! resume_check uclibc.host-utils ; then
 
-    echo_date  "Building uClibc host utils"
+    echo_date "uClibc: building host utils"
     if run_cmd_nodie $MAKE -C utils hostutils $ARGS ; then
         run_cmd mkdir -p $DIR_LINUX_OUTPUT/bin
         for RUN in ldconfig ldd ; do
@@ -1377,215 +933,138 @@ if [ $KERNEL_SOURCE ] ; then
     run_cmd cp -r $DIR_KBUILD_OUTPUT/usr $DIR_uC_OUTPUT/bfin-uclinux/runtime
     run_cmd cp -r $DIR_KBUILD_OUTPUT/usr $DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime
 
+    echo_date "uClibc: cleaning"
+    change_dir $DIR_UCLIBC_SOURCE
+    run_cmd $MAKE CROSS=bfin-elf- distclean
+
     if [ "$DIR_KBUILD_OUTPUT" != "$KERNEL_SOURCE" ]; then
         echo_date "Cleaning kernel"
         run_cmd rm -rf "$DIR_KBUILD_OUTPUT"
     fi
 
-    echo_date "Cleaning uClibc"
-    change_dir $UCLIBC_SOURCE
-    run_cmd $MAKE CROSS=bfin-elf- distclean
-
     resume_save
     fi
+}
 
-    ####################### Done Step 3  #########################
-
-    ####################### Step 4 - build bfin-uclinux ################
-    build_binutils uclinux $DIR_uC_OUTPUT
-
-    build_elf2flt uclinux $DIR_uC_OUTPUT
-
-    run_cmd rm -f $DIR_uC_OUTPUT/bfin-uclinux/sys-include
-    run_cmd ln -s runtime/usr/include $DIR_uC_OUTPUT/bfin-uclinux/sys-include
-    for GCC_VERSION in $GCC_VERSIONS; do
-      build_gcc $GCC_VERSION uclinux $DIR_uC_OUTPUT \
-          "--enable-threads=posix \
-           --with-sysroot=$DIR_uC_OUTPUT/bfin-uclinux/runtime"
-    done
-    run_cmd rm -f $DIR_uC_OUTPUT/bfin-uclinux/sys-include
-
-    ####################### Step 4a - build bfin-linux-uclibc ################
-    build_binutils linux-uclibc $DIR_LINUX_OUTPUT
-
-    run_cmd rm -f $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
-    run_cmd ln -s runtime/usr/include $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
-    for GCC_VERSION in $GCC_VERSIONS; do
-    	build_gcc $GCC_VERSION linux-uclibc $DIR_LINUX_OUTPUT \
-	  "--enable-threads=posix --enable-shared \
-	   --with-sysroot=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime"
-    done
-    run_cmd rm -f $DIR_LINUX_OUTPUT/bfin-linux-uclibc/sys-include
-
-    install_all_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc
-
-    ######################## U-Boot ##############################
-
-    if [ $DIR_UBOOT ] ; then
-        echo_date "Building U-Boot to get Tools"
-        change_dir $DIR_UBOOT
-        DIR_UBOOT_BUILD="$DIR_BUILD/u-boot_build"
-
-        echo_date "Cleaning U-Boot"
-        run_cmd rm -rf "$DIR_UBOOT_BUILD"
-
-        echo_date "Make U-Boot"
-        if [ "${CBUILD}" = "${CHOST}" ] ; then
-            unset HOSTCC HOSTSTRIP
-        else
-            HOSTCC="${CHOST}-gcc"
-            HOSTSTRIP="${CHOST}-strip"
-        fi
-        run_cmd $MAKE \
-            -C "$DIR_UBOOT" \
-            O="$DIR_UBOOT_BUILD" \
-            CONFIG_CMD_NET=y \
-            ${HOSTSTRIP+HOSTSTRIP=${HOSTSTRIP}} \
-            ${HOSTCC+HOSTCC=${HOSTCC}} \
-            tools
-
-        echo_date "Copying U-Boot Tools"
-        check_installed_files u-boot "$DIR_UBOOT_BUILD/tools/" \
-            mkimage gen_eth_addr
-        for RUN in mkimage$EXEEXT gen_eth_addr$EXEEXT ; do
-            run_cmd cp "$DIR_UBOOT_BUILD/tools/$RUN" "$DIR_uC_OUTPUT/bin/bfin-uclinux-$RUN"
-            run_cmd cp "$DIR_UBOOT_BUILD/tools/$RUN" "$DIR_LINUX_OUTPUT/bin/bfin-linux-uclibc-$RUN"
-        done
-
-        echo_date "Cleaning U-Boot"
-        run_cmd rm -rf "$DIR_UBOOT_BUILD"
-    fi
+#
+# First build up the ELF toolchain
+#
+if [ "x$SKIP_ELF" = "x" ]; then
+	build_binutils elf $DIR_ELF_OUTPUT
+	build_elf2flt elf $DIR_ELF_OUTPUT
+	for GCC_VER in $GCC_VERSIONS; do
+		build_gcc $GCC_VER elf "${DIR_ELF_OUTPUT}" \
+			"--with-newlib"
+	done
 fi
+
+#
+# Now build the FLAT/FDPIC toolchains
+#
+if [ $KERNEL_SOURCE ] ; then
+	# First the kernel headers and uClibc.  This builds
+	# all of the FLAT/FDPIC libs with the ELF compiler.
+	build_kernel_headers
+	build_uclibc
+
+	# Now the FLAT binutils/gcc
+	build_binutils uclinux $DIR_uC_OUTPUT
+	build_elf2flt uclinux $DIR_uC_OUTPUT
+	for GCC_VER in $GCC_VERSIONS ; do
+		build_gcc ${GCC_VER} uclinux "${DIR_uC_OUTPUT}" \
+			"--enable-threads=posix \
+			--with-sysroot=$DIR_uC_OUTPUT/bfin-uclinux/runtime"
+	done
+
+	# Now the FDPIC binutils/gcc
+	build_binutils linux-uclibc $DIR_LINUX_OUTPUT
+	for GCC_VER in $GCC_VERSIONS ; do
+		build_gcc $GCC_VER linux-uclibc "${DIR_LINUX_OUTPUT}" \
+		"--enable-threads=posix --enable-shared \
+		--with-sysroot=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime"
+	done
+	install_all_target_libs $DIR_LINUX_OUTPUT bfin-linux-uclibc
+fi
+
+# Finally do u-boot if wanted
+[ $DIR_UBOOT ] && build_uboot
+
+export PKG_CONFIG_PATH="${DIR_ELF_OUTPUT}/lib/pkgconfig${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}"
 
 ######################## ldr-utils ###########################
-if ! resume_check ldr-utils ; then
 
-    DIR_LDR_UTILS_BUILD=$DIR_BUILD/ldr-utils_build
+build_ldr_utils()
+{
+	build_autotooled_pkg "${DIR_LDR_UTILS_SOURCE}"
 
-    change_dir $DIR_LDR_UTILS_SOURCE
-
-    echo_date "Cleaning ldr-utils"
-    find . -print0 | xargs -0 touch -r . # fix autotool timestamps
-    run_cmd $MAKE clean
-    change_clean_dir "$DIR_LDR_UTILS_BUILD"
-
-    echo_date "Configuring ldr-utils"
-    run_cmd $DIR_LDR_UTILS_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET
-
-    echo_date "Building ldr-utils"
-    run_cmd $MAKE
-
-    echo_date "Installing ldr-utils"
-    run_cmd $MAKE install DESTDIR=$DIR_ELF_OUTPUT   program_transform_name=s,^,bfin-elf-,
-    run_cmd $MAKE install DESTDIR=$DIR_uC_OUTPUT    program_transform_name=s,^,bfin-uclinux-,
-    run_cmd $MAKE install DESTDIR=$DIR_LINUX_OUTPUT program_transform_name=s,^,bfin-linux-uclibc-,
-
-    change_dir $DIR_LDR_UTILS_SOURCE
-    run_cmd rm -rf "$DIR_LDR_UTILS_BUILD"
-
-    resume_save
-fi
+	# backwards compat support
+	run_cmd ln -f "${DIR_ELF_OUTPUT}/bin/bfin-ldr" "${DIR_ELF_OUTPUT}/bin/bfin-elf-ldr"
+	if [ $KERNEL_SOURCE ] ; then
+		run_cmd ln -f "${DIR_uC_OUTPUT}/bin/bfin-ldr" "${DIR_uC_OUTPUT}/bin/bfin-uclinux-ldr"
+		run_cmd ln -f "${DIR_LINUX_OUTPUT}/bin/bfin-ldr" "${DIR_LINUX_OUTPUT}/bin/bfin-linux-uclibc-ldr"
+	fi
+}
+[ $SKIP_LDR ] || build_ldr_utils
 
 ######################## urjtag/gdbproxy #######################
 
-if ! resume_check jtag-tools ; then
+build_libusb()
+{
+	KERNEL_SOURCE= \
+	build_autotooled_pkg "${DIR_LIBUSB_SOURCE}" \
+		--disable-shared --enable-static
+}
 
-    ### libftdi
-    if ( check_lib usb-1.0 ) 2>/dev/null ; then
-    DIR_LIBFTDI_BUILD=$DIR_BUILD/libftdi-1.0
+build_libftdi()
+{
+	at_make_args() { echo SUBDIRS=src; }
+	KERNEL_SOURCE= \
+	build_autotooled_pkg "${DIR_LIBFTDI_SOURCE}" \
+		--disable-shared --enable-static --disable-libftdipp \
+		--disable-python-binding --with-async-mode
+}
 
-    change_dir $DIR_LIBFTDI_SOURCE
+build_urjtag()
+{
+	at_clean() {
+		# generated files get out of sync with source files; force regen
+		run_cmd rm -f src/bsdl/bsdl_bison.[ch] src/bsdl/bsdl_flex.c \
+			src/svf/svf_bison.[ch] src/svf/svf_flex.c
+	}
 
-    echo_date "Cleaning libftdi"
-    find . -print0 | xargs -0 touch -r . # fix autotool timestamps
-    [ -e Makefile ] && run_cmd $MAKE distclean
-    change_clean_dir "$DIR_LIBFTDI_BUILD"
+	build_autotooled_pkg "${DIR_URJTAG_SOURCE}" \
+		--disable-shared --enable-static --enable-relocatable \
+		--with-libusb=1.0
+}
 
-    echo_date "Configuring libftdi"
-    run_cmd $DIR_LIBFTDI_SOURCE/configure --prefix="$DIR_LIBFTDI_BUILD/destdir" \
-        $BUILD_TARGET $HOST_TARGET --disable-shared --enable-static --disable-libftdipp --disable-python-binding --with-async-mode
+build_gdbproxy()
+{
+	build_autotooled_pkg "${DIR_GDBPROXY_SOURCE}"
+}
 
-    echo_date "Building libftdi"
-    run_cmd $MAKE SUBDIRS=src
-
-    echo_date "Installing libftdi"
-    run_cmd $MAKE SUBDIRS=src install
-
-    export PKG_CONFIG_PATH="$DIR_LIBFTDI_BUILD/destdir/lib/pkgconfig${PKG_CONFIG_PATH+:${PKG_CONFIG_PATH}}"
-    export LIBFTDI_CONFIG="$DIR_LIBFTDI_BUILD/destdir/bin/libftdi-config"
-    fi
-
-    ### urjtag
-    DIR_URJTAG_BUILD=$DIR_BUILD/urjtag
-
-    change_dir $DIR_URJTAG_SOURCE
-
-    echo_date "Cleaning urjtag"
-    find . -print0 | xargs -0 touch -r . # fix autotool timestamps
-    [ -e Makefile ] && run_cmd $MAKE distclean
-    # generated files get out of sync with source files; force regen
-    run_cmd rm -f src/bsdl/bsdl_bison.[ch] src/bsdl/bsdl_flex.c \
-          src/svf/svf_bison.[ch] src/svf/svf_flex.c
-    change_clean_dir "$DIR_URJTAG_BUILD"
-
-    echo_date "Configuring urjtag"
-    run_cmd $DIR_URJTAG_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET \
-        --disable-shared --enable-static --enable-relocatable --with-libusb=1.0 \
-        --disable-silent-rules
-
-    echo_date "Building urjtag"
-    run_cmd $MAKE
-
-    echo_date "Installing urjtag"
-    run_cmd $MAKE install DESTDIR=$DIR_ELF_OUTPUT   program_transform_name=s,^,bfin-,
-    if [ $KERNEL_SOURCE ] ; then
-        run_cmd $MAKE install DESTDIR=$DIR_uC_OUTPUT    program_transform_name=s,^,bfin-,
-        run_cmd $MAKE install DESTDIR=$DIR_LINUX_OUTPUT program_transform_name=s,^,bfin-,
-    fi
-
-    ### gdbproxy
-    DIR_GDBPROXY_BUILD=$DIR_BUILD/gdbproxy
-
-    change_dir $DIR_GDBPROXY_SOURCE
-
-    echo_date "Cleaning gdbproxy"
-    find . -print0 | xargs -0 touch -r . # fix autotool timestamps
-    [ -e Makefile ] && run_cmd $MAKE distclean
-    change_clean_dir "$DIR_GDBPROXY_BUILD"
-
-    echo_date "Configuring gdbproxy"
-    run_cmd env $DIR_GDBPROXY_SOURCE/configure --prefix=/ $BUILD_TARGET $HOST_TARGET \
-        --with-jtag-srcdir=$DIR_URJTAG_SOURCE --with-jtag-builddir=$DIR_URJTAG_BUILD \
-        --disable-silent-rules
-
-    echo_date "Building gdbproxy"
-    run_cmd $MAKE
-
-    echo_date "Installing gdbproxy"
-    run_cmd $MAKE install DESTDIR=$DIR_ELF_OUTPUT   program_transform_name=s,^,bfin-,
-    if [ $KERNEL_SOURCE ] ; then
-        run_cmd $MAKE install DESTDIR=$DIR_uC_OUTPUT    program_transform_name=s,^,bfin-,
-        run_cmd $MAKE install DESTDIR=$DIR_LINUX_OUTPUT program_transform_name=s,^,bfin-,
-    fi
-
-    change_dir $DIR_BUILD
-    run_cmd rm -rf "$DIR_LIBFTDI_BUILD" "$DIR_URJTAG_BUILD" "$DIR_GDBPROXY_BUILD"
-
-    resume_save
+if [ -z "${SKIP_JTAG}" ] ; then
+	build_libusb
+	build_libftdi
+	build_urjtag
+	build_gdbproxy
 fi
+
+# Now that we're done with the random libraries, punt them
+for d in "${DIR_ELF_OUTPUT}" "${DIR_uC_OUTPUT}" "${DIR_LINUX_OUTPUT}" ; do
+	run_cmd rm -rf \
+		"${d}"/lib*/pkgconfig \
+		"${d}"/lib*/lib*.a \
+		"${d}"/lib*/lib*.la \
+		"${d}"/include \
+		"${d}"/bin/*-config
+	find "${d}" -depth -type d -exec rmdir {} \; 2>/dev/null
+done
 
 ######################## Done ################################
 
-
-
-for GCC_VERSION in $GCC_VERSIONS; do
-    DIR_GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
-    rm -rf $DIR_GCC_BUILD/*
-done
-
 ########################### Target libs ########################
 
-if [ -e $DIR_SOURCE/libs/Makefile ] ; then
+if [ -z $SKIP_TARGET_LIBS ] && [ -e $DIR_SOURCE/libs/Makefile ] ; then
 
     change_dir $DIR_SOURCE/libs
 
@@ -1606,15 +1085,17 @@ if [ -e $DIR_SOURCE/libs/Makefile ] ; then
 	check_installed_files libdsp "$DIR_SOURCE/libs/libdsp/" \
 		libbfdsp.a libbffastfp.a
 
-	if echo "${dir}" | grep -q -v bf561; then
-	    if [ $KERNEL_SOURCE ] ; then
+	if [ $KERNEL_SOURCE ] && echo "${dir}" | grep -q -v bf561; then
 		if echo "${flags}" | grep -q mfdpic; then
-		    dir2=`echo ${dir} | sed -e 's/mfdpic//' -e 's|/$||'`
-		    run_cmd $MAKE CROSS=bfin-elf- install DESTDIR=$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime USR=/usr SUFFIX=/$dir2 MULTILIB=
+			suffix=/`echo ${dir} | sed -e 's/mfdpic//' -e 's|/$||'`
+			mlib=
+			destdir="$DIR_LINUX_OUTPUT/bfin-linux-uclibc"
 		else
-		    run_cmd $MAKE CROSS=bfin-elf- install DESTDIR=$DIR_uC_OUTPUT/bfin-uclinux/runtime USR=/usr SUFFIX= MULTILIB=/$dir
+			suffix=
+			mlib="/$dir"
+			destdir="$DIR_uC_OUTPUT/bfin-uclinux/runtime"
 		fi
-	    fi
+		run_cmd $MAKE CROSS=bfin-elf- install DESTDIR="${destdir}" USR=/usr SUFFIX="${suffix}" MULTILIB="${mlib}"
 	fi
 
 	# LIBC_HAS_NO_CMATH=1 will add several more files to libbfdsp.a.
@@ -1633,47 +1114,40 @@ fi
 
 ########################### Target binutils ########################
 
-if [ $KERNEL_SOURCE ] ; then
-	export PATH=$DIR_uC_OUTPUT/bin:$DIR_LINUX_OUTPUT/bin:$PATH
+build_target_binutils_libs()
+{
+	local target="bfin-$1" out="$2"
 
-	echo_date "Building target libbfd (flat)"
-	change_clean_dir $DIR_BINUTILS_BUILD
+	echo_date "${target}: target libbfd: building"
+	change_clean_dir "${DIR_BINUTILS_BUILD}"
 
-	run_cmd $DIR_BINUTILS_SOURCE/configure \
-		--target=bfin-uclinux --host=bfin-uclinux $BUILD_TARGET \
-		--prefix=$DIR_uC_OUTPUT/bfin-uclinux \
+	run_cmd "${DIR_BINUTILS_SOURCE}"/configure \
+		--target=${target} --host=${target} $BUILD_TARGET \
+		--prefix="${out}/${target}" \
 		--disable-nls --disable-shared --without-newlib
+
 	run_cmd $MAKE all-bfd all-opcodes all-libiberty
 
-	echo_date "Installing target libbfd"
+	echo_date "${target}: target libbfd: installing"
 	run_cmd $MAKE install-bfd install-opcodes install-libiberty
 
-	echo_date "Building target libbfd (fdpic)"
-	change_clean_dir $DIR_BINUTILS_BUILD
+	run_cmd rm -rf "${DIR_BINUTILS_BUILD}"
+}
 
-	run_cmd $DIR_BINUTILS_SOURCE/configure \
-		--target=bfin-linux-uclibc --host=bfin-linux-uclibc $BUILD_TARGET \
-		--prefix=$DIR_LINUX_OUTPUT/bfin-linux-uclibc \
-		--disable-nls --disable-shared --without-newlib
-	run_cmd $MAKE all-bfd all-opcodes all-intl all-libiberty
-
-	echo_date "Installing target libbfd"
-	run_cmd $MAKE install-bfd install-opcodes install-libiberty
-
-	change_dir ..
+if [ -z $SKIP_TARGET_LIBS ] && [ $KERNEL_SOURCE ] ; then
+	export PATH=$DIR_uC_OUTPUT/bin:$DIR_LINUX_OUTPUT/bin:$PATH
+	build_target_binutils_libs uclinux "${DIR_uC_OUTPUT}"
+	build_target_binutils_libs linux-uclibc "${DIR_LINUX_OUTPUT}"
 fi
-rm -rf $DIR_BINUTILS_BUILD
+
+change_dir "${DIR_BUILD}"
 
 resume_clear
 
-printf "*** It took"
-print_stop_time
-echo " to complete"
+echo_date "It took $(print_stop_time) to complete"
 
 if [ -n "${TEST_OPTS}" ] ; then
-	cd "${DIR_BUILD}"
 	echo_date "Testing toolchains"
-	export PATH=${DIR_ELF_OUTPUT}:${DIR_uC_OUTPUT}:${DIR_LINUX_OUTPUT}:$PATH
 	set -- \
 	"${DIR_APP}"/toolchain-regtest ${TEST_OPTS} \
 		${DATE_STAMP:+-d} ${VERBOSE:+-v} ${WARN:+-w} \
