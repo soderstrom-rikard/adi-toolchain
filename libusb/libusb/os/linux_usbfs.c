@@ -851,13 +851,10 @@ static int usbfs_scan_busdir(struct libusb_context *ctx,
 			continue;
 		}
 
-		r = enumerate_device(ctx, &discdevs, busnum, (uint8_t) devaddr, NULL);
-		if (r < 0)
-			goto out;
+		enumerate_device(ctx, &discdevs, busnum, (uint8_t) devaddr, NULL);
 	}
 
 	*_discdevs = discdevs;
-out:
 	closedir(dir);
 	return r;
 }
