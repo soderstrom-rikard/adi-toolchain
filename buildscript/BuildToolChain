@@ -1011,8 +1011,11 @@ build_ldr_utils()
 
 build_libusb()
 {
+	# upstream libusb hasn't merged the winusb branch yet
+	local sub
+	case ${CHOST} in *mingw*) sub="-winusb" ;; esac
 	KERNEL_SOURCE= \
-	build_autotooled_pkg "${DIR_LIBUSB_SOURCE}" \
+	build_autotooled_pkg "${DIR_LIBUSB_SOURCE}${sub}" \
 		--disable-shared --enable-static
 }
 
@@ -1044,6 +1047,8 @@ build_gdbproxy()
 }
 
 if [ -z "${SKIP_JTAG}" ] ; then
+	: ${PKG_CONFIG:=pkg-config --static}
+	export PKG_CONFIG
 	build_libusb
 	build_libftdi
 	build_urjtag
