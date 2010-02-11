@@ -80,7 +80,7 @@ LIBGOMP_TESTSUITE=
 NEWLIB_TESTSUITE=
 
 
-while getopts ab:B:dfH:hLo:O:pr:R:s:St:T:U:vw parameter
+while getopts ab:B:cdfH:hLo:O:pr:R:s:St:T:U:vw parameter
 do
     case $parameter in
 	a)
@@ -88,6 +88,9 @@ do
 	    ;;
         p)
             CHECK_PRE=true
+            ;;
+        c)
+            CHECK_LIB=true
             ;;
         R)
             RUNTEST=$OPTARG
@@ -2059,7 +2062,7 @@ prepare_target_solibs()
                     LIB=`basename ${FILE}`
                     $target_alias-strip $FILE -o $GCC_BUILD/libs_for_target/${LIB}
                     BOARD_LIB=`rsh -l root ${TARGET_IPADDR} "md5sum /lib/${LIB} | awk '{print \\$1}'"`
-                    TEST_LIB=`md5sum $GCC_BUILD/libs_for_target/${LIB} | awk {print $1}`
+                    TEST_LIB=`md5sum $GCC_BUILD/libs_for_target/${LIB} | awk '{print $1}'`
                     if [ "$BOARD_LIB" != "$TEST_LIB" ] ; then
                         echo "Libs on board are different, aborting tests"
                         echo "specifically ${LIB} and ${FILE}"
@@ -2084,7 +2087,7 @@ run_tests ()
 
     prepare_target $2
 
-    if [ $2 = "linux-uclibc" ] ; then
+    if [ $2 = "linux-uclibc" ] && [ -n "$CHECK_LIB" ] ; then
 	prepare_target_solibs
     fi
 
