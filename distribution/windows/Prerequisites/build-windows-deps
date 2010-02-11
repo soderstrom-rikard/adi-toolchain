@@ -10,6 +10,7 @@ FTDI_VER=0.17
 GMP_VER=4.3.2
 MPFR_VER=2.4.2
 PDCURSES_VER=3.4
+PTHREADS_VER=2-8-0
 READLINE_VER=6.1
 USB_VER=0.1.12.2
 ZLIB_VER=1.2.3
@@ -29,6 +30,8 @@ if [[ -z ${pfx} ]] ; then
 	[[ -d ${pfx}/usr ]] && pfx="${pfx}/usr"
 fi
 
+: ${MAKE:=make}
+make() { ( exec ${MAKE} "$@" ; ) ; }
 num_jobs=$(grep -sc "^processor" /proc/cpuinfo)
 num_jobs=$((num_jobs * 2))
 export MAKEFLAGS="-j${num_jobs} -s"
@@ -141,6 +144,12 @@ pdcurses() {
 	asroot install -m 644 ../curses.h ${pfx}/include/
 }
 
+pthreads() {
+	make clean GC CROSS=${chost}- LFLAGS=-lw32_32
+	asroot install -m 644 libpthreadGC2.a ${pfx}/lib/libpthread.a
+	asroot install -m 644 pthread.h semaphore.h sched.h ${pfx}/include/
+}
+
 hackftdi() {
 	sed -i '/^SUBDIRS/s:examples::' Makefile
 }
@@ -154,6 +163,7 @@ doit http://downloads.sourceforge.net/project/expat/expat/2.0.1/expat-${EXPAT_VE
 #win32_curses
 doit http://downloads.sourceforge.net/sourceforge/pdcurses/PDCurses-${PDCURSES_VER}.tar.gz pdcurses
 doit http://ftp.gnu.org/gnu/readline/readline-${READLINE_VER}.tar.gz
+doit ftp://sourceware.org/pub/pthreads-win32/pthreads-w32-${PTHREADS_VER}-release.tar.gz pthreads
 doit http://downloads.sourceforge.net/sourceforge/libusb-win32/libusb-win32-device-bin-${USB_VER}.tar.gz usb
 doit http://www.zlib.net/zlib-${ZLIB_VER}.tar.bz2 zlib
 # the toolchain buildscript will take care of this
