@@ -1,3 +1,26 @@
+2010-02-11  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* bfin/include/cdefBF504F.h, bfin/include/cdefBF504.h,
+	bfin/include/cdefBF506F.h, bfin/include/cdefBF50x_base.h,
+	bfin/include/cdefBF592-A.h, bfin/include/cdefBF59x_base.h,
+	bfin/include/defBF504F.h, bfin/include/defBF504.h,
+	bfin/include/defBF506F.h, bfin/include/defBF50x_base.h,
+	bfin/include/defBF592-A.h, bfin/include/defBF59x_base.h: New file.
+	* bfin/include/cdefBF51x_base.h, bfin/include/cdefBF52x_base.h,
+	bfin/include/cdefBF532.h, bfin/include/cdefBF534.h,
+	bfin/include/cdefBF542M.h, bfin/include/cdefBF544M.h,
+	bfin/include/cdefBF547M.h, bfin/include/cdefBF548M.h,
+	bfin/include/cdefBF549M.h, bfin/include/cdefBF561.h,
+	bfin/include/defBF51x_base.h, bfin/include/defBF52x_base.h,
+	bfin/include/defBF532.h, bfin/include/defBF534.h,
+	bfin/include/defBF539.h, bfin/include/defBF542M.h,
+	bfin/include/defBF544M.h, bfin/include/defBF547M.h,
+	bfin/include/defBF548M.h, bfin/include/defBF549M.h,
+	bfin/include/defBF54x_base.h, bfin/include/defBF561.h,
+	bfin/include/def_LPBlackfin.h, bfin/include/sys/_adi_platform.h,
+	bfin/include/sys/anomaly_macros_rtl.h, bfin/include/sys/mc_typedef.h,
+	bfin/include/sysreg.h: Update to Visual DSP 5.0 Update 8.
+
 2010-02-03  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* bfin/bf592.ld: New.

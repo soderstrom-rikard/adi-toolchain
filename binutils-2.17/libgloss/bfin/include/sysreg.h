@@ -10,10 +10,10 @@
  * they apply.
  */
 
-/* This file must be used with compiler version 8.0.6.4 */
+/* This file must be used with compiler version 8.0.8.1 */
 
 #ifdef __VERSIONNUM__
-#if __VERSIONNUM__ != 0x08000604
+#if __VERSIONNUM__ != 0x08000801
 #error The compiler version does not match the version of the sysreg.h include
 #endif
 #endif

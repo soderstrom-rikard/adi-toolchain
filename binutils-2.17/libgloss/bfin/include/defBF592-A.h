@@ -11,20 +11,19 @@
  */
 
 /*
-** cdefBF542M.h
+** This include file contains a list of macro "defines" to enable the programmer
+** to use symbolic names for the ADSP-BF592-A peripherals.
 **
-** Copyright (C) 2008-2009 Analog Devices Inc., All Rights Reserved.
-**
-************************************************************************************
-**
-** This file just maps to the cdef for BF542 unless anything
-** is required to change.
-**
-************************************************************************************/
+** Copyright (C) 2009 Analog Devices Inc., All Rights Reserved.
+*/
 
-#ifndef _CDEF_BF542M_H
-#define _CDEF_BF542M_H
+#ifndef _DEF_BF592A_H
+#define _DEF_BF592A_H
 
-#include <cdefBF542.h>
+/* include the core specific definitions */
+#include <def_LPBlackfin.h>
 
-#endif /* _CDEF_BF542M_H */
+/* include the family common definitions */
+#include <defBF59x_base.h>
+
+#endif /* _DEF_BF592A_H */
