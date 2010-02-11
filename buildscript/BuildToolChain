@@ -422,7 +422,7 @@ build_gcc()
 	echo_date "${target}: gcc: building"
 	run_cmd $MAKE
 
-	eval `grep ^EXEEXT= $DIR_GCC_BUILD/gcc/config.log`
+	get_exeext "${DIR_GCC_BUILD}"/gcc/config.log
 	FILE="cc1 collect2 gcov xgcc"
 	if echo $BFIN_LANGS | grep -q c++ ; then
 		FILE="${FILE} cc1plus cpp g++"
@@ -517,7 +517,7 @@ build_binutils()
 	echo_date "${target}: binutils/gdb: building"
 	run_cmd $MAKE all-binutils all-gas all-ld all-sim all-gdb
 
-	eval `grep ^EXEEXT= $DIR_BINUTILS_BUILD/binutils/config.log`
+	get_exeext "${DIR_BINUTILS_BUILD}"/binutils/config.log
 	check_installed_files binutils "$DIR_BINUTILS_BUILD/binutils/" \
 		addr2line ar cxxfilt nm-new objcopy objdump ranlib \
 		readelf size strings strip-new
@@ -568,7 +568,7 @@ build_elf2flt()
 	echo_date "${target}: elf2flt: building"
 	run_cmd $MAKE
 
-	eval `grep ^EXEEXT= $DIR_ELF2FLT_BUILD/config.log`
+	get_exeext "${DIR_ELF2FLT_BUILD}"/config.log
 	check_installed_files elf2flt "$DIR_ELF2FLT_BUILD/" elf2flt flthdr
 
 	echo_date "${target}: elf2flt: installing"

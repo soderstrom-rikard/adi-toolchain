@@ -1,3 +1,6 @@
+# give it the log file to rip out EXEEXT
+get_exeext() { eval `grep ^EXEEXT= "$@"`; }
+
 reset_autotool_hooks()
 {
 	at_clean() { :; }
@@ -33,6 +36,7 @@ build_autotooled_pkg()
 
 	echo_date "${pkg}: building"
 	run_cmd $MAKE $(at_make_args)
+	get_exeext "${build}"/config.log
 
 	echo_date "${pkg}: installing"
 	at_install() {
