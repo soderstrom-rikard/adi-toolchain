@@ -1,3 +1,14 @@
+2010-02-21  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/bfin/bfin.c (reg_used_otherwise): Don't define.
+	(REG_USED_OTHERWISE): Define.
+	(mark_regs_unavailable): Set reg_used_otherwise from
+	argument `data'.
+	(optimize_loop_addresses): Don't clobber registers used
+	by outer loop.
+	(bfin_optimize_loops_1): Free reg_used_otherwise for
+	each loop.
+
 2010-02-03  Mike Frysinger  <michael.frysinger@analog.com>
 
 	* doc/invoke.texi (Blackfin Options): -mcpu accepts bf592.

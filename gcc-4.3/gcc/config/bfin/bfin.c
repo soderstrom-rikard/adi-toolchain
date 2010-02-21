@@ -3892,7 +3892,7 @@ length_for_loop (rtx insn)
 /* Variables used by the optimize_loop_addresses pass.  */
 
 /* Nonzero for every reg which is unavailable for renaming.  */
-static int reg_used_otherwise[FIRST_PSEUDO_REGISTER];
+#define REG_USED_OTHERWISE(LOOP) ((int *) (LOOP)->aux)
 
 /* Describes the use of a PREG inside the loop.  */
 struct preg_use
@@ -3913,9 +3913,11 @@ struct preg_use puse[8];
 
 /* Called through for_each_rtx.  */
 static int
-mark_regs_unavailable (rtx *loc, void *data ATTRIBUTE_UNUSED)
+mark_regs_unavailable (rtx *loc, void *data)
 {
   rtx x = *loc;
+  int *reg_used_otherwise = (int *) data;
+
   if (x == NULL_RTX)
     return 0;
 
@@ -3969,10 +3971,23 @@ optimize_loop_addresses (struct loop *loop, basic_block *body)
   unsigned ix;
   int has_circptr = 0;
   int has_calls = 0;
+  struct loop *outer_loop;
+  int *reg_used_otherwise;
 
-  memset (reg_used_otherwise, 0, sizeof reg_used_otherwise);
   memset (puse, 0, sizeof puse);
   memset (stored, 0, sizeof stored);
+
+  loop->aux = xcalloc (FIRST_PSEUDO_REGISTER, sizeof (int));
+  reg_used_otherwise = REG_USED_OTHERWISE (loop);
+  outer_loop = loop_outer (loop);
+  if (outer_loop && outer_loop->num > 0)
+    {
+      int *outer_reg_used_otherwise = REG_USED_OTHERWISE (outer_loop);
+      for (ix = REG_I0; ix <= REG_I3; ix++)
+	reg_used_otherwise[ix] = outer_reg_used_otherwise[ix];
+      for (ix = REG_M0; ix <= REG_M3; ix++)
+	reg_used_otherwise[ix] = outer_reg_used_otherwise[ix];
+    }
 
   ph_edge = my_loop_preheader_edge (loop);
   if (ph_edge == NULL)
@@ -4071,7 +4086,7 @@ optimize_loop_addresses (struct loop *loop, basic_block *body)
 
 	  /* All success cases continue, so we drop through here if we can't
 	     handle the insn.  */
-	  for_each_rtx (&pat, mark_regs_unavailable, NULL);
+	  for_each_rtx (&pat, mark_regs_unavailable, reg_used_otherwise);
 	}
     }
 
@@ -5248,6 +5263,13 @@ bfin_optimize_loops_1 (FILE *dump_file ATTRIBUTE_UNUSED)
       optimize_loop_addresses (loop, body);
 
       free (body);
+    }
+
+  FOR_EACH_LOOP (li, loop, 0)
+    {
+      int *reg_used_otherwise = REG_USED_OTHERWISE (loop);
+      free (reg_used_otherwise);
+      loop->aux = NULL;
     }
 
   commit_edge_insertions ();
