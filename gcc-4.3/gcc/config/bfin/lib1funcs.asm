@@ -37,31 +37,89 @@ Boston, MA 02110-1301, USA.  */
 .type ___divsi3, STT_FUNC;
 
 ___divsi3:
-        [--SP]= RETS;
-	[--SP] = R7;
 
-	R2 = -R0;
-        CC = R0 < 0;
-	IF CC R0 = R2;
-	R7 = CC;
-
+.Lmain_branch:
+	R3 = R0 ^ R1;
+	R2 = - R0;
+	R0 = MAX(R0,R2);
 	R2 = -R1;
-        CC = R1 < 0;
-	IF CC R1 = R2;
-	R2 = CC;
-	R7 = R7 ^ R2;
+	R1 = MAX(R1,R2);
+	R2 = R0 >> 1;
+	CC = R2 < R1 (IU);
+	IF CC JUMP .LQ_has_only_one_bit;
 
-        CALL ___udivsi3;
+	P1 = R3;
+	R3 = R1>>1;
+	R3.L = SIGNBITS R3;
+	R1 = LSHIFT R1 BY R3.L;
+	R2 = R1 << 15;
+	CC = R2 == 0;
+	IF !CC JUMP .Luse_sfw_D_has_16bit_or_more;
 
-	CC = R7;
+	R2.L = SIGNBITS R0;
+	R0 = LSHIFT R0 BY R2.L;
+	R2.L = R3.L - R2.L (NS);
+	P2 = R2;
+	CC = R0 == R1;
+	IF CC JUMP .LN_is_MIN_D_is_1_bit_set;
+
+	R1 >>= 17;
+
+.Luse_divq_main_branch:
+	AQ = CC;
+
+	LOOP(lp_use_divq) LC0 = P2;
+	LOOP_BEGIN lp_use_divq;
+	DIVQ(R0, R1);
+	LOOP_END lp_use_divq;
+
+	R0 = EXTRACT(R0, R2.L) (Z);
 	R1 = -R0;
+	CC = P1<0;
 	IF CC R0 = R1;
+	RTS;
 
-	R7 = [SP++];
-        RETS = [SP++];
-        RTS;
+.LN_is_MIN_D_is_1_bit_set:
+	R0 = 1;
+	R0 = LSHIFT R0 BY R2.L;
+	R1 = -R0;
+	CC = P1 < 0;
+	IF CC R0 = R1;
+	RTS;
 
-.size ___divsi3, .-___divsi3
+.Luse_sfw_D_has_16bit_or_more:
+	R2 = R0 >> 1;
+	R2.L = SIGNBITS R2;
+	R3.H = R3.L - R2.L (NS);
+	R3 = R3 >>16;
+	P2 = R3;
+	R0 = LSHIFT R0 BY R2.L;
+	R0 = R0 - R1;
+	CC = !BITTST(R0, 31);
+	R1 >>>= 1;
+
+	LOOP(_use_sfw_loop) LC0 = P2;
+	LOOP_BEGIN _use_sfw_loop;
+	R0 = R0 + R1, R2 = R0 - R1;
+	IF CC R0 = R2;
+	R0 = ROT R0 BY 1;
+	LOOP_END _use_sfw_loop;
+
+	R0 = EXTRACT(R0, R3.L)(Z);
+	R0 = ROT R0 BY 1;
+	R1 = -R0;
+	CC = P1<0;
+	IF CC R0 = R1;
+	RTS;
+
+.LQ_has_only_one_bit:
+	CC = R1 <= R0 (IU);
+	R0 = CC;
+	R1 = -R0;
+	CC = R3<0;
+	IF CC R0 = R1;
+	RTS;
+	.size ___divsi3, .-___divsi3;
 #endif
 
 #ifdef L_modsi3	
@@ -90,28 +148,87 @@ ___modsi3:
 .type ___udivsi3, STT_FUNC;
 
 ___udivsi3:
-        P0 = 32;
-        LSETUP (0f, 1f) LC0 = P0;
-	/* upper half of dividend */
-        R3 = 0;
-0:
-	/* The first time round in the loop we shift in garbage, but since we
-	   perform 33 shifts, it doesn't matter.  */
-	R0 = ROT R0 BY 1;
-	R3 = ROT R3 BY 1;
-	R2 = R3 - R1;
-        CC = R3 < R1 (IU);
-1:
-	/* Last instruction of the loop.  */
-	IF ! CC R3 = R2;
+.Lmain_branch:
+	R2 = R0 >> 1;
+	CC = R2 < R1 (IU);
+	IF CC JUMP .LQ_has_only_one_bit;
 
-	/* Shift in the last bit.  */
-	R0 = ROT R0 BY 1;
-	/* R0 is the result, R3 contains the remainder.  */
-	R0 = ~ R0;
-        RTS;
+	R3 = R1 >> 1;
+	R3.L = SIGNBITS R3;
+	R1 = LSHIFT R1 BY R3.L;
+	R2 = R1 << 15;
+	CC = R2 == 0;
+	IF !CC JUMP .Luse_sfw_D_has_16bit_or_more;
 
-.size ___udivsi3, .-___udivsi3
+	CC = R0 < 0;
+	IF CC JUMP .LMSB_of_N_is_1;
+
+	R1.L = SIGNBITS R0;
+	R2.L = R3.L - R1.L (NS);
+	P2 = R2;
+	R0 = LSHIFT R0 BY R1.L;
+	R1 >>= 17;
+
+.Luse_divq_main_branch:
+	AQ = CC;
+
+	LOOP(lp_use_divq_when_MSB_of_N_is_0) LC0 = P2;
+	LOOP_BEGIN lp_use_divq_when_MSB_of_N_is_0;
+	DIVQ(R0, R1);
+	LOOP_END lp_use_divq_when_MSB_of_N_is_0;
+
+	R0 = EXTRACT(R0, R2.L) (Z);
+	RTS;
+
+.LMSB_of_N_is_1: 
+	R3 = R3.L (Z);
+	P2 = R3;
+	R0 = R0 - R1;
+	R1 >>= 17;
+
+.Luse_divq_when_MSB_of_N_is_1:
+	R2 = ~R0;
+	R2 = R2 >> 31;
+	CC = BITTST(R0, 31);
+	AQ = CC;
+
+	LOOP(lp_use_divq_MSB_of_N_is_1) LC0 = P2;
+	LOOP_BEGIN lp_use_divq_MSB_of_N_is_1;
+	DIVQ(R0, R1);
+	LOOP_END lp_use_divq_MSB_of_N_is_1;
+
+	R2 = LSHIFT R2 BY R3.L;
+	R0 = EXTRACT(R0, R3.L) (Z);
+	R0 = R0+R2;
+	RTS;
+
+.Luse_sfw_D_has_16bit_or_more:
+	R2 = R0>>1;
+	R2.L = SIGNBITS R2;
+	R3.H = R3.L - R2.L (NS);
+	R3 = R3 >> 16;
+	P2 = R3;
+	R0 = LSHIFT R0 BY R2.L;
+	R0 = R0 - R1;
+	CC = !BITTST(R0, 31);
+	R1 >>>= 1;
+
+	LOOP(_use_sfw_loop) LC0 = P2;
+	LOOP_BEGIN _use_sfw_loop;
+	R0 = R0 + R1, R2 = R0 - R1;
+	IF CC R0 = R2;
+	R0 = ROT R0 BY 1;
+	LOOP_END _use_sfw_loop;
+
+	R0 = EXTRACT(R0, R3.L)(Z);
+	R0 = ROT R0 BY 1;
+	RTS;
+
+.LQ_has_only_one_bit:
+	CC = R1 <= R0 (IU);
+	R0 = CC;
+	RTS;
+	.size ___udivsi3, .-___udivsi3;
 #endif
 
 #ifdef L_umodsi3
