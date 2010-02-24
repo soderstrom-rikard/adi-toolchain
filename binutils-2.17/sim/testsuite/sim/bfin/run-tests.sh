@@ -43,7 +43,7 @@ dorsh() {
 	#    - send stderr back to stdout and up
 	(exit \
 		$(rsh -l root $boardip \
-			'(/'$1') 2>&1; ret=$?; echo $ret 1>&2; [ $ret -eq 0 ] && rm -f /'$1 \
+			'(/tmp/'$1') 2>&1; ret=$?; echo $ret 1>&2; [ $ret -eq 0 ] && rm -f /tmp/'$1 \
 			3>&1 1>&2 2>&3) \
 		2>&1) 2>&1
 }
@@ -68,7 +68,7 @@ pf
 
 if ${run_host} ; then
 	printf 'Uploading tests to board "%s": ' "${boardip}"
-	rcp ${bins_host} root@${boardip}:/
+	rcp ${bins_host} root@${boardip}:/tmp/
 	pf
 fi
 
