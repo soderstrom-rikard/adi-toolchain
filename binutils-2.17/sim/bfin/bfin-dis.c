@@ -64,7 +64,7 @@ int n_stores;
 static __attribute__ ((noreturn)) void
 unhandled_instruction (char *insn)
 {
-  fprintf(stderr, "Unhandled instruction at 0x%08x\"%s\" ... aborting\n", PCREG, insn);
+  fprintf(stderr, "Unhandled %s instruction at 0x%08x ... aborting\n", insn, PCREG);
   raise (SIGILL);
   abort ();
 }
@@ -404,6 +404,56 @@ add_and_shift (bu32 a, bu32 b, int shift)
   saved_state.v = saved_state.v_internal;
   saved_state.vs |= saved_state.v;
   return v;
+}
+
+/* DIVS ( Dreg, Dreg ) ;
+ * Initialize for DIVQ. Set the AQ status bit based on the signs of
+ * the 32-bit dividend and the 16-bit divisor. Left shift the dividend
+ * one bit. Copy AQ into the dividend LSB.
+ */
+static bu32
+divs(bu32 pquo, bu16 divisor)
+{
+  short af = pquo >> 16;
+  short r;
+  int aq;
+
+  r = pquo >> 16;
+
+  aq = (r ^ divisor) >> 15;  // extract msb's and compute quotient bit
+  saved_state.aq = aq;           // update global quotient state
+
+  pquo <<= 1;
+  pquo |= aq;
+  pquo = pquo & 0x1FFFF | (r << 17);
+  return pquo;
+}
+
+/* DIVQ ( Dreg, Dreg ) ;
+ * Based on AQ status bit, either add or subtract the divisor from
+ * the dividend. Then set the AQ status bit based on the MSBs of the
+ * 32-bit dividend and the 16-bit divisor. Left shift the dividend one
+ * bit. Copy the logical inverse of AQ into the dividend LSB.
+ */
+static bu32
+divq(bu32 pquo, bu16 divisor)
+{
+  unsigned short af = pquo >> 16;
+  unsigned short r;
+  int aq;
+
+  if (saved_state.aq)
+    r = divisor + af;
+  else
+    r = af - divisor;
+
+  aq = (r ^ divisor)>>15;  // extract msb's and compute quotient bit
+  saved_state.aq = aq;         // update global quotient state
+
+  pquo <<= 1;
+  pquo |= !aq;
+  pquo = pquo & 0x1FFFF | (r << 17);
+  return pquo;
 }
 
 typedef enum
@@ -1332,9 +1382,9 @@ decode_ALU2op_0 (bu16 iw0)
     /* dregs = (dregs + dregs) << 2 */
     DREG (dst) = add_and_shift (DREG (dst), DREG (src), 2);
   else if (opc == 8)
-    unhandled_instruction ("DIVQ (dregs , dregs)");
+    DREG (dst) = divq(DREG (dst), (bu16)DREG (src));
   else if (opc == 9)
-    unhandled_instruction ("DIVS (dregs , dregs)");
+    DREG (dst) = divs(DREG (dst), (bu16)DREG (src));
   else if (opc == 10)
     {
       /* dregs = dregs_lo (X) */
