@@ -4,7 +4,10 @@ SRCS = $(wildcard *.[sS])
 SIM  = $(SRCS:=.x)
 HOST = $(SRCS:=.X)
 
-all: $(SIM) $(HOST)
+all: sim host
+
+sim: $(SIM)
+host: $(HOST)
 
 FLAGS = -nostdlib -g -o $@ $<
 
