@@ -1,11 +1,5 @@
 2010-02-21  Jie Zhang  <jie.zhang@analog.com>
 
-	From Guolin Pan  <guolin.pan@analog.com>
-	* config/bfin/lib1funcs.asm (___divsi3): Use a new implementation.
-	(___udivsi3): Likewise.
-
-2010-02-21  Jie Zhang  <jie.zhang@analog.com>
-
 	* config/bfin/bfin.c (reg_used_otherwise): Don't define.
 	(REG_USED_OTHERWISE): Define.
 	(mark_regs_unavailable): Set reg_used_otherwise from
