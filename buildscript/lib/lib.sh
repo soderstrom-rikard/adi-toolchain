@@ -2,6 +2,7 @@ if [ -z "${_BUILDTOOLCHAIN_SETUP_}" ] ; then
 
 APP_NAME=${0##*/}
 DIR_APP=$(cd "${0%/*}" && pwd)
+DIR_BOARDS=${DIR_APP}/boards
 
 # Assume default toolchain dir is up one directory from the build script helper
 DIR_SOURCE=${DIR_APP%/*}

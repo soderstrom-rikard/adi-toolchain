@@ -23,20 +23,15 @@
 #
 ###############################################################
 
+source "${0%/*}/lib/lib.sh" || exit 1
 
-APP_NAME=$0
-DIR_APP=$(cd $(dirname $APP_NAME) && pwd)
-DIR_BOARDS=$DIR_APP/boards/
-DIR_SOURCE=${DIR_APP%/*}
-APP_NAME=${APP_NAME#.}
-APP_NAME=${APP_NAME#/}
 START=$(date +%s)
 
 #Uncomment only one of these
 #TIMESTAMP=`date +%Y-%b-%d-%H-%M` # is YYYY_MMM_DD_HH_MM
 TIMESTAMP=`date +%Y%m%d`       # is YYYY_MMM_DD
 
-# PREREQ_FILE="autoconf automake awk /bin/sh bison cp echo flex gcc gettext grep ln m4 make makeinfo mkdir msgfmt mv rm sed tail wc which"
+PREREQ_FILE=""
 PREREQ_TESTS="bc kill killall pstree"
 PREREQ_HW_TESTS="ping rsh rcp"
 RUNTEST=runtest
@@ -79,106 +74,11 @@ LIBMUDFLAP_TESTSUITE=
 LIBGOMP_TESTSUITE=
 NEWLIB_TESTSUITE=
 
-
-while getopts ab:B:cdfH:hLo:O:pr:R:s:St:T:U:vw parameter
-do
-    case $parameter in
-	a)
-	    RUNTEST_FLAGS=-all
-	    ;;
-        p)
-            CHECK_PRE=true
-            ;;
-        c)
-            CHECK_LIB=true
-            ;;
-        R)
-            RUNTEST=$OPTARG
-            ;;
-        w)
-            WARN=1
-            echo "Warnings being set to seperate log file"
-            ;;
-        d)
-            DATE_STAMP=1
-            echo "Outputfiles being date stamped"
-            ;;
-        v)
-            VERBOSE=1
-            echo "Verbose output"
-            ;;
-        t)
-	    if [ "$OPTARG" = "elf-sim" ] ; then
-		TEST_TARGET_ELF_SIM=1
-	    elif [ "$OPTARG" = "elf-jtag" ] ; then
-		TEST_TARGET_ELF_JTAG=1
-	    elif [ "$OPTARG" = "uclinux" ] ; then
-		TEST_TARGET_UCLINUX=1
-	    elif [ "$OPTARG" = "linux-uclibc" ] ; then
-		TEST_TARGET_LINUX_UCLIBC=1
-	    else
-		echo "Invalid target $OPTARG"
-		exit 1
-	    fi
-            ;;
-        r)
-            if [ ! -d $OPTARG ] ; then
-                echo "Can't find old test results in $OPTARG"
-                exit 1
-            fi
-            RESULTS2COMPARE=$OPTARG
-            ;;
-        T)
-            TARGET_IPADDR=`expr "$OPTARG" : "\([0-9]*\.[0-9]*\.[0-9]*\.[0-9]*\)"`
-            if [ "x$TARGET_IPADDR" = "x" ] ; then
-                echo "Target ip address in wrong format"
-                exit 1
-            fi
-            ;;
-        s)
-            if [ -d $OPTARG ] ; then
-                DIR_SOURCE=$OPTARG
-                DIR_SOURCE=${DIR_SOURCE%/}
-            else
-                echo "Invalid Source Path"
-                exit 1
-            fi
-            ;;
-        S)
-            SERIAL_DEBUG_PORT=true
-            ;;
-        H)
-            HOST_TARGET="--host=$OPTARG"
-            ;;
-        b)
-            if [ -d $OPTARG ] ; then
-                DIR_BUILD=$OPTARG
-                DIR_BUILD=${DIR_BUILD%/}
-            else
-                DIR_BUILD=$OPTARG
-                DIR_BUILD=${DIR_BUILD%/}
-            fi
-            ;;
-        o)
-            DIR_ELF_OUTPUT=$OPTARG-elf
-            DIR_uC_OUTPUT=$OPTARG-uclinux
-            DIR_LINUX_OUTPUT=$OPTARG-linux-uclibc
-            ;;
-        O)
-            DIR_ELF_OUTPUT=$OPTARG
-            DIR_uC_OUTPUT=$OPTARG
-            DIR_LINUX_OUTPUT=$OPTARG
-            ;;
-        f)
-            STACK_CHECKING=true
-            ;;
-	L)
-	    LEGACY_RESULT=1
-	    ;;
-        h)
+usage() {
 # We don't document the -S option - it's for advanced users who know what
 # they are doing.  For maximum reproducibility, not using it is better.
-             echo "Usage : $APP_NAME -s SOURCE [OPTIONS] [binutils] [gas] [ld] [gdb]
+cat <<-EOF
+Usage : $APP_NAME -s SOURCE [OPTIONS] [binutils] [gas] [ld] [gdb]
 [gcc] [g++] [gfortran] [objc] [libstdc++] [libmudflap] [libgomp] [newlib]
 -a               Add --all to runtest
 -b BUILD         Build directory (leave blank to use current dir)
@@ -186,7 +86,7 @@ do
 -f               Add stack checking to all tests
 -h               Help
 -H HOST          ??? Build toolchain to run on HOST.
--L               Save test result files in legacy name		 
+-L               Save test result files in legacy name
 -O OUTPUT        Output directory (toolchain to be tested)
 -o OUTPUT        Output directory prefix (toolchain to be tested)
 -p               Check prerequisites
@@ -198,13 +98,59 @@ do
 -u SOURCE        Uboot Source directory
 -v               Verbose
 -w               Warnings to be sent to a different log file
-"
-             exit 0
-             ;;
-        *)
-             echo "Unknown option $parameter"
-             echo "Try \`$APP_NAME -h' for more information."
-             exit 1
+EOF
+exit ${1:-0}
+}
+
+while getopts ab:B:cdfH:hLo:O:pr:R:s:St:T:U:vw parameter
+do
+    case $parameter in
+        a)  RUNTEST_FLAGS=-all ;;
+        p)  CHECK_PRE=true ;;
+        c)  CHECK_LIB=true ;;
+        R)  RUNTEST=$OPTARG ;;
+        w)  WARN=1 ;;
+        d)  DATE_STAMP=1 ;;
+        v)  VERBOSE=1 ;;
+        t)
+            case $OPTARG in
+                elf-sim)      TEST_TARGET_ELF_SIM=1 ;;
+                elf-jtag)     TEST_TARGET_ELF_JTAG=1 ;;
+                uclinux)      TEST_TARGET_UCLINUX=1 ;;
+                linux-uclibc) TEST_TARGET_LINUX_UCLIBC=1 ;;
+                *)            error "Invalid target $OPTARG" ;;
+            esac
+            ;;
+        r)
+            [ ! -d $OPTARG ] && error "Can't find old test results in $OPTARG"
+            RESULTS2COMPARE=$OPTARG
+            ;;
+        T)
+            TARGET_IPADDR=`expr "$OPTARG" : "\([0-9]*\.[0-9]*\.[0-9]*\.[0-9]*\)"`
+            [ "x$TARGET_IPADDR" = "x" ] && error "Target ip address in wrong format"
+            ;;
+        s)  DIR_SOURCE=${OPTARG%/} ;;
+        S)  SERIAL_DEBUG_PORT=true ;;
+        H)
+            HOST_TARGET="--host=$OPTARG"
+            ;;
+        b)  DIR_BUILD=${OPTARG%/} ;;
+        o)
+            DIR_ELF_OUTPUT=$OPTARG-elf
+            DIR_uC_OUTPUT=$OPTARG-uclinux
+            DIR_LINUX_OUTPUT=$OPTARG-linux-uclibc
+            ;;
+        O)
+            DIR_ELF_OUTPUT=$OPTARG
+            DIR_uC_OUTPUT=$OPTARG
+            DIR_LINUX_OUTPUT=$OPTARG
+            ;;
+        f)  STACK_CHECKING=true ;;
+        L)  LEGACY_RESULT=1 ;;
+        h)  usage ;;
+        *)  error "unknown option $parameter\n" \
+                  "Try \`$APP_NAME -h' for more information."
+            ;;
     esac
 done
 
@@ -459,6 +405,8 @@ if [ $TEST_NEWLIB -eq 1 ] ; then
 fi
 echo ""
 
+[ $TEST_ALL -eq 1 ] && RESUME_BUILD=false || RESUME_BUILD=true
+
 # I'd like to echo host triplet and build triplet here.
 # But until now we have not checked validity of source paths.
 # Maybe we need put a copy of config.guess and config.sub
@@ -481,93 +429,10 @@ echo "Build: $BUILD_TRIPLET"
 
 # If we want to test a toolchain in a specified path, make sure
 # we will not test tools in other path.
-if [ $DIR_ELF_OUTPUT ] ; then
-    NEW_PATH=""
-    RUN=`echo $PATH | sed 's/:/ /g'`
-    FOUND=0
-    for SEARCH in $RUN
-    do
-	if [ -d $SEARCH ] ; then
-            FIND=`find $SEARCH/ -maxdepth 1 -name "bfin-elf-*" -o -name "bfin-uclinux-*" -o -name "bfin-linux-uclibc-*" | wc -c`
-            if [ $FIND -gt 1 ] ; then
-		FOUND=1
-		echo "Removing $SEARCH from the PATH"
-            else
-		if [ $NEW_PATH ] ; then
-                    NEW_PATH=$NEW_PATH:$SEARCH
-		else
-                    NEW_PATH=$SEARCH
-		fi
-            fi
-	fi
-    done
-
-    PATH=$NEW_PATH:$DIR_ELF_OUTPUT/bin:$DIR_uC_OUTPUT/bin:$DIR_LINUX_OUTPUT/bin
-    export PATH
-fi
+[ $DIR_ELF_OUTPUT ] && scrub_path
 
 ############ Check and error if I can't find the things I need #
 
-if [ -n "$CHECK_PRE" ] ; then
-    echo "Check http://gcc.gnu.org/install/prerequisites.html for more information"
-    for file in $RUNTEST $PREREQ_TESTS $PREREQ_HW_TESTS
-    do
-        RUN=`which -a $file 2>/dev/null| wc -w`
-        if [ $RUN -eq 0 ] ; then
-            echo "!! $file: could not be found"
-            for tmp in $PREREQ_FILE
-            do
-                if [ "$file" = "$tmp" ]; then
-                    echo "!! you need to install package which includes ${file} before building the toolchain will be sucessful"
-                fi
-            done
-        else
-            tmp1=`echo $file | awk -F \/ '{print $NF}'`
-            RUN=`type $tmp1 | grep "shell builtin" | wc -l`
-            if [ $RUN -eq 1 ] ; then
-                echo "   $file seems to be a shell builtin"
-                continue
-            fi
-            for VER in --version -version -V
-            do
-                 tmp=`$file $VER < /dev/null 2>&1 | grep -ie "\<$tmp1\>" | grep -vi "option" | grep -vi "Usage" | grep -vi "\-v"`
-                 if [ -n "$tmp" ] ; then
-                     echo "  " $tmp
-                     break
-                 fi
-            done
-            if [ -n "$tmp" ] ; then
-                continue
-            fi
-
-            for VER in --version -version -V
-            do
-                tmp=`$file $VER < /dev/null 2>&1 | grep -ie "version " | grep -vi "option" | grep -vi "Usage" | grep -vi "\-v"`
-                if [ -n "$tmp" ] ; then
-                    echo "  " $tmp
-                    break
-                fi
-            done
-            if [ -n "$tmp" ] ; then
-                continue
-            fi
-            echo "** Could not find version of `which $file`"
-            printf "** "
-            file `which $file`
-            RUN=$(file `which $file`| grep -i "symbolic link" | wc -l)
-            while [ "$RUN" -gt "0" ]
-            do
-                printf " * "
-                file=$(file `which $file` | awk  '{print $NF}' | sed 's/`//g' | sed "s/'//g")
-                file $file
-                RUN=$(file $file | grep -i "symbolic link" | wc -l)
-            done
-        fi
-    done
-    echo "   SHELL = $SHELL"
-    echo "Done checking for prerequisites"
-    exit 0
-fi
 
 PREREQ_FILE="${PREREQ_FILE} $RUNTEST ${PREREQ_TESTS}"
 
@@ -575,214 +440,87 @@ if [ -n "$TEST_TARGET_UCLINUX" -o -n "$TEST_TARGET_LINUX_UCLIBC" ] ; then
     PREREQ_FILE="${PREREQ_FILE} ${PREREQ_HW_TESTS}"
 fi
 
-for PREREQ in $PREREQ_FILE
-do
-    RUN=`which -a $PREREQ | wc -w`
-    if [ $RUN -eq 0 ] ; then
-        echo "Can not find $PREREQ"
-        exit 1
-    else if [ $RUN -gt 1 ] ; then
-        printf "Found multiple versions of $PREREQ, using the one at "
-        which $PREREQ
-        fi
-    fi
-done
+if [ -n "$CHECK_PRE" ] ; then
+	check_prereqs_verbose ${PREREQ_FILE}
+	exit 0
+else
+	check_prereqs_short ${PREREQ_FILE}
+fi
 
 ############ ABSOLUTE PATH TO SOURCE DIRECTORIES ################
 
-# Toolchain source must be provided with command line argument
-if [ ! $DIR_SOURCE ] ; then
-    echo "Usage : $APP_NAME -s SOURCE [-b BUILD]"
-    echo "                  -h for help"
-    exit 1
-fi
+check_abs_dir "Toolchain source" "${DIR_SOURCE}"
 
-if [ -d /.$DIR_SOURCE ] ; then
-    printf "Toolchain source is at      "
-    echo $DIR_SOURCE
-else
-    echo "Invalid Toolchain Source Path"
-    echo $DIR_SOURCE
-    exit 1
-fi
+: ${DIR_BUILD:=${PWD}}
 
-############ ABSOLUTE PATH TO BUILD DIRECTORIES ################
-
-if [ ! $DIR_BUILD ] ; then
-    DIR_BUILD=`pwd`
-elif [ ! -e $DIR_BUILD ] ; then
-    mkdir -p $DIR_BUILD
-fi
-if [ ! -d /.$DIR_BUILD ] ; then
-    echo "Invalid build path, must be relative to the root dir"
-    exit 1
-fi
-echo "Build will be done in       $DIR_BUILD"
+mkdir -p "${DIR_BUILD}"
+check_abs_dir "" "${DIR_BUILD}"
 
 # make sure we arent running on a case insensitive filesystem
-cd $DIR_BUILD
-rm -rf .case.test .CASE.test
-echo case > .case.test
-case=$(cat .CASE.test 2>/dev/null)
-if [ "$case" = "case" ] ; then
-	echo "ERROR: you must use a case sensitive filesystem"
-	exit 1
-fi
-rm -rf .case.test .CASE.test
+cd "${DIR_BUILD}"
+check_fs_case
 
 DIR_LOG=$DIR_BUILD/logs
-if [ ! -d $DIR_LOG ] ; then
-    mkdir $DIR_LOG
-fi
+mk_output_dir "logs" "${DIR_LOG}"
+
+DIR_TEST_RESULTS=$DIR_BUILD/tests
+mk_output_dir "tests" "${DIR_TEST_RESULTS}"
 
 ############ RELATIVE PATH TO RESULT DIRECTORIES ################
 
-echo "Path for test results       "
-DIR_TEST_RESULTS=$DIR_BUILD/tests
-if [ ! -d $DIR_TEST_RESULTS ] ; then
-    mkdir $DIR_TEST_RESULTS
-fi
-
 if [ -n "$TEST_TARGET_ELF_SIM" ] ; then
-    if [ $DATE_STAMP ] ; then
-        DIR_TEST_SIM_RESULTS=$DIR_TEST_RESULTS/elf-sim-$TIMESTAMP
-    else
-        DIR_TEST_SIM_RESULTS=$DIR_TEST_RESULTS/elf-sim
-    fi
-    if [ ! -d $DIR_TEST_SIM_RESULTS ] ; then
-        mkdir $DIR_TEST_SIM_RESULTS
-    elif [ $TEST_ALL -eq 1 ] ; then
-        rm -rf $DIR_TEST_SIM_RESULTS/*
-    fi
-    echo "  elf simulator:  $DIR_TEST_SIM_RESULTS"
-
-    if [ -n "$RESULTS2COMPARE" ] ; then
-        if [ ! -d $RESULTS2COMPARE/elf-sim ] ; then
-            echo "Can't find simulator results in $RESULTS2COMPARE/elf-sim"
-            exit 1
-        else
-            if [ ! -d /.$RESULTS2COMPARE ] ; then
-                echo "Invalid results path, must be relative to the root dir"
-                exit 1
-            fi
-            echo "    checking simulator results against $RESULTS2COMPARE/elf-sim"
-        fi
-    fi
+	DIR_TEST_SIM_RESULTS=$DIR_TEST_RESULTS/elf-sim${DATE_STAMP+-${TIMESTAMP}}
+	mk_output_dir "elf sim" "${DIR_TEST_SIM_RESULTS}"
+	if [ -n "${RESULTS2COMPARE}" ] ; then
+		check_abs_dir "${RESULTS2COMPARE}/elf-sim"
+		notice "Checking simulator results against" "${RESULTS2COMPARE}/elf-sim"
+	fi
 fi
 
 if [ -n "$TEST_TARGET_ELF_JTAG" ] ; then
-    if [ $DATE_STAMP ] ; then
-        DIR_TEST_JTAG_RESULTS=$DIR_TEST_RESULTS/jtag-$TIMESTAMP
-    else
-        DIR_TEST_JTAG_RESULTS=$DIR_TEST_RESULTS/jtag
-    fi
-    if [ ! -d $DIR_TEST_JTAG_RESULTS ] ; then
-        mkdir $DIR_TEST_JTAG_RESULTS
-    elif [ $TEST_ALL -eq 1 ] ; then
-        rm -rf $DIR_TEST_JTAG_RESULTS/*
-    fi
-    echo "  elf jtag:  $DIR_TEST_JTAG_RESULTS"
-
-    if [ -n "$RESULTS2COMPARE" ] ; then
-        if [ ! -d $RESULTS2COMPARE/jtag ] ; then
-            echo "Can't find jtag results in $RESULTS2COMPARE/jtag"
-            exit 1
-        else
-            if [ ! -d /.$RESULTS2COMPARE ] ; then
-                echo "Invalid results path, must be relative to the root dir"
-                exit 1
-            fi
-            echo "    checking jtag results against $RESULTS2COMPARE/jtag"
-        fi
-    fi
+	DIR_TEST_JTAG_RESULTS=$DIR_TEST_RESULTS/jtag${DATE_STAMP+-${TIMESTAMP}}
+	mk_output_dir "elf jtag" "${DIR_TEST_JTAG_RESULTS}"
+	if [ -n "${RESULTS2COMPARE}" ] ; then
+		check_abs_dir "${RESULTS2COMPARE}/jtag"
+		notice "Checking jtag results against" "${RESULTS2COMPARE}/jtag"
+	fi
 fi
 
 if [ -n "$TEST_TARGET_UCLINUX" ] ; then
-    if [ $DATE_STAMP ] ; then
-        DIR_TEST_HW_RESULTS=$DIR_TEST_RESULTS/hardware-flat-$TIMESTAMP
-    else
-        DIR_TEST_HW_RESULTS=$DIR_TEST_RESULTS/hardware-flat
-    fi
-    if [ ! -d $DIR_TEST_HW_RESULTS ] ; then
-        mkdir $DIR_TEST_HW_RESULTS
-    elif [ $TEST_ALL -eq 1 ] ; then
-        rm -rf $DIR_TEST_HW_RESULTS/*
-    fi
-    echo "  uclinux ($TARGET_IPADDR):  $DIR_TEST_HW_RESULTS"
-
-    if [ -n "$RESULTS2COMPARE" ] ; then
-        if [ ! -d $RESULTS2COMPARE/hardware-flat ] ; then
-            echo "Can't find uclinux results in $RESULTS2COMPARE/hardware-flat"
-            exit 1
-        else
-            if [ ! -d /.$RESULTS2COMPARE ] ; then
-                echo "Invalid results path, must be relative to the root dir"
-                exit 1
-            fi
-            echo "    checking uclinux results against $RESULTS2COMPARE/hardware-flat"
-        fi
-    fi
+	DIR_TEST_HW_RESULTS=$DIR_TEST_RESULTS/hardware-flat${DATE_STAMP+-${TIMESTAMP}}
+	mk_output_dir "uclinux ($TARGET_IPADDR)" "${DIR_TEST_HW_RESULTS}"
+	if [ -n "${RESULTS2COMPARE}" ] ; then
+		check_abs_dir "${RESULTS2COMPARE}/hardware-flat"
+		notice "Checking uclinux results against" "${RESULTS2COMPARE}/hardware-flat"
+	fi
 fi
 
 if [ -n "$TEST_TARGET_LINUX_UCLIBC" ] ; then
-    if [ $DATE_STAMP ] ; then
-        DIR_TEST_HW2_RESULTS=$DIR_TEST_RESULTS/hardware-fdpic-$TIMESTAMP
-    else
-        DIR_TEST_HW2_RESULTS=$DIR_TEST_RESULTS/hardware-fdpic
-    fi
-    if [ ! -d $DIR_TEST_HW2_RESULTS ] ; then
-        mkdir $DIR_TEST_HW2_RESULTS
-    elif [ $TEST_ALL -eq 1 ] ; then
-        rm -rf $DIR_TEST_HW2_RESULTS/*
-    fi
-    echo "  linux-uclibc ($TARGET_IPADDR):  $DIR_TEST_HW2_RESULTS"
-
-    if [ -n "$RESULTS2COMPARE" ] ; then
-        if [ ! -d $RESULTS2COMPARE/hardware-fdpic ] ; then
-            echo "Can't find uclinux-uclibc results in $RESULTS2COMPARE/hardware-fdpic"
-            exit 1
-        else
-            if [ ! -d /.$RESULTS2COMPARE ] ; then
-                echo "Invalid results path, must be relative to the root dir"
-                exit 1
-            fi
-            echo "    checking linux-uclibc results against $RESULTS2COMPARE/hardware-fdpic"
-        fi
-    fi
+	DIR_TEST_HW2_RESULTS=$DIR_TEST_RESULTS/hardware-fdpic${DATE_STAMP+-${TIMESTAMP}}
+	mk_output_dir "linux-uclibc ($TARGET_IPADDR)" "${DIR_TEST_HW2_RESULTS}"
+	if [ -n "${RESULTS2COMPARE}" ] ; then
+		check_abs_dir "${RESULTS2COMPARE}/hardware-fdpic"
+		notice "Checking linux-uclibc results against" "${RESULTS2COMPARE}/hardware-fdpic"
+	fi
 fi
 
 
 ###################### set up log file ###########################
 
-if [ $DATE_STAMP ] ; then
-    echo "Creating log file           $DIR_LOG/regtest.log.$TIMESTAMP"
-    if [ $VERBOSE ]; then
-        LOGFILE="| tee -a $DIR_LOG/regtest.log.$TIMESTAMP"
-        ACTUAL_LOGFILE=$DIR_LOG/regtest.log.$TIMESTAMP
-    else
-        if [ $WARN ] ; then
-            echo "*** Warnings going to $DIR_LOG/regtest.warn.$TIMESTAMP"
-            LOGFILE=">> $DIR_LOG/regtest.log.$TIMESTAMP 2>> $DIR_LOG/regtest.warn.$TIMESTAMP"
-            ACTUAL_LOGFILE=$DIR_LOG/regtest.warn.$TIMESTAMP
-        else
-            LOGFILE=">> $DIR_LOG/regtest.log.$TIMESTAMP 2>&1"
-            ACTUAL_LOGFILE=$DIR_LOG/regtest.log.$TIMESTAMP
-        fi
-    fi
+STDOUT_LOG="$DIR_LOG/log${DATE_STAMP+.${TIMESTAMP}}"
+STDERR_LOG="$DIR_LOG/warn${DATE_STAMP+.${TIMESTAMP}}"
+notice "Creating log file" "${STDOUT_LOG}"
+if [ $VERBOSE ]; then
+    LOGFILE="| tee -a ${STDOUT_LOG}"
+    ACTUAL_LOGFILE=${STDOUT_LOG}
 else
-    echo "Creating log file           $DIR_LOG/regtest.log"
-    if [ $VERBOSE ]; then
-        LOGFILE="| tee -a $DIR_LOG/regtest.log"
-        ACTUAL_LOGFILE=$DIR_LOG/regtest.log
+    if [ $WARN ] ; then
+        echo "*** Warnings going to $DIR_LOG/warn"
+        LOGFILE=">> ${STDOUT_LOG} 2>> ${STDERR_LOG}"
+        ACTUAL_LOGFILE=${STDERR_LOG}
     else
-        if [ $WARN ] ; then
-            echo "*** Warnings going to $DIR_LOG/regtest.warn"
-            LOGFILE=">> $DIR_LOG/regtest.log 2>> $DIR_LOG/regtest.warn"
-            ACTUAL_LOGFILE=$DIR_LOG/regtest.warn
-        else
-            LOGFILE=">> $DIR_LOG/regtest.log 2>&1"
-            ACTUAL_LOGFILE=$DIR_LOG/regtest.log
-        fi
+        LOGFILE=">> ${STDOUT_LOG} 2>&1"
+        ACTUAL_LOGFILE=${STDOUT_LOG}
     fi
 fi
 
@@ -903,111 +641,6 @@ fi
 
 
 ############ Done checking - lets get on to testing ###################
-
-# Some helpful functions
-
-print_stop_time ()
-{
-    END=$(date +%s)
-    DIFF=$(( $END - $START ))
-    hours=$(( $DIFF / 3600 ))
-    min=$(( ($DIFF - ( $hours * 3600 ) ) / 60))
-    sec=$(( $DIFF - $min * 60 - $hours * 3600))
-    if [ "$hours" -eq "0" ] ; then
-	printf " %02d:%02d " "$min" "$sec"
-    else
-	printf " %d:%02d:%02d " "$hours" "$min" "$sec"
-    fi
-}
-
-die_with_log ()
-{
-    echo "Please report an error to http://blackfin.uclinux.org/gf/project/toolchain"
-    printf " Build error " ; date
-    printf " Build error " ; date
-    printf "  occurred"
-    print_stop_time
-    echo "into script"
-
-    # Create a single file so users can email it to us,
-    # we sleep, so things can finish writing to the log file
-    sleep 1
-    tar -jhcf $DIR_LOG/config.logs.tbz2 `find $DIR_BUILD -name "config.log"` $ACTUAL_LOGFILE
-
-    echo "When reporting issue, we may ask for $DIR_LOG/config.logs.tbz2"
-    echo " Last logfile entries:"
-    tail -10 $ACTUAL_LOGFILE
-
-    exit 1
-}
-
-log_it()
-{
-    # Note: embedded single quotes will break this
-    eval "printf '###\n%s\n\n' '$*'" ${LOGFILE}
-}
-
-run_cmd()
-{
-    log_it "$@"
-    eval \("$@"\) ${LOGFILE} || die_with_log
-}
-
-change_dir()
-{
-    log_it cd "$@"
-    cd "$@" || die_with_log
-}
-
-echo_date()
-{
-    # if we can fit the msg on one line, then do it.  else,
-    # try and split it on word boundaries.  if all else fails,
-    # give it its own line.
-    local recurse
-    case $1 in
-        -[rR]) recurse=$1; shift;;
-    esac
-    local date="$(date)"
-    local msg="$*"
-    local bytes_for_msg=$((${COLUMNS:-80} - ${#date} - 5))
-
-    if [ -n "${recurse}" ] || [ ${#msg} -le ${bytes_for_msg} ] ; then
-        local banner="***" full
-        if [ -n "${recurse}" ] ; then
-            [ ${#msg} -eq 0 ] && return 1
-            [ "${recurse}" = "-r" ] && banner="   " date=""
-        fi
-        [ ${#msg} -gt ${bytes_for_msg} ] && full=${msg} msg=""
-        if [ -n "${msg}" ] || [ "${recurse}" = "-R" ] ; then
-            printf "%s %-${bytes_for_msg}s %s\n" "${banner}" "${msg}" "${date}"
-        fi
-        [ -n "${full}" ] && echo "   " ${full}
-    else
-        local split word
-        recurse="-R"
-        for word in ${msg} ; do
-            if [ $((${#split} + ${#word})) -ge ${bytes_for_msg} ] ; then
-                echo_date ${recurse} ${split} && recurse="-r"
-                split=""
-            fi
-            split="${split} ${word}"
-        done
-        echo_date ${recurse} ${split}
-        recurse=""
-    fi
-
-    [ -z "${recurse}" ] && (echo "echo -e '###\n${msg}\n' $LOGFILE" ) | sh
-    return 0
-}
-
-# $1 is the part 1
-# $2 is the part 2
-echo_2_parts ()
-{
-    printf "%-28s%s\n" "$1" "$2"
-}
-
 
 # Some of the tests leave stuff all over the target file system,
 # by getting rid of it, we free up lots of memory.
@@ -1340,7 +973,7 @@ detect_binutils()
     VERSION=`$tool --version 2>/dev/null | sed 1q | sed -e 's/GNU .* \([0-9][0-9.]*\).*/\1/'`
     if [ -z "$BINUTILS_VERSION" ] ; then
 	BINUTILS_VERSION=$VERSION
-	echo_2_parts "Binutils version" "$BINUTILS_VERSION"
+	notice "Binutils version" "$BINUTILS_VERSION"
 	DIR_BINUTILS_SOURCE=$DIR_SOURCE/binutils-$BINUTILS_VERSION
 	if [ ! -d $DIR_BINUTILS_SOURCE ] ; then
 	    echo "Can't find Binutils source at $DIR_BINUTILS_SOURCE"
@@ -1355,7 +988,7 @@ detect_binutils()
     TOOL_PATH=`dirname $tool`
     if [ -z "$BINUTILS_PATH" ] ; then
 	BINUTILS_PATH=$TOOL_PATH
-	echo_2_parts "Binutils path" "$BINUTILS_PATH"
+	notice "Binutils path" "$BINUTILS_PATH"
     elif [ "$BINUTILS_PATH" != "$TOOL_PATH" ] ; then
 	echo "ERROR: $target_alias-$1 path ($TOOL_PATH) is different"
 	return 1
@@ -1519,7 +1152,7 @@ detect_gdb()
     VERSION=`$tool --version 2>/dev/null | sed 1q | sed -e 's/GNU gdb \([0-9][0-9.]*\).*/\1/'`
     if [ -z "$GDB_VERSION" ] ; then
 	GDB_VERSION=$VERSION
-	echo_2_parts "GDB version" "$GDB_VERSION"
+	notice "GDB version" "$GDB_VERSION"
     elif [ "$GDB_VERSION" != "$VERSION" ] ; then
 	echo "ERROR: $TOOL version ($VERSION) is different"
 	return 1
@@ -1528,7 +1161,7 @@ detect_gdb()
     TOOL_PATH=`dirname $tool`
     if [ -z "$GDB_PATH" ] ; then
 	GDB_PATH=$TOOL_PATH
-	echo_2_parts "GDB path" "$GDB_PATH"
+	notice "GDB path" "$GDB_PATH"
     elif [ "$GDB_PATH" != "$TOOL_PATH" ] ; then
 	echo "ERROR: $target_alias-$1 path ($TOOL_PATH) is different"
 	return 1
@@ -1660,7 +1293,7 @@ detect_gcc()
     if [ -z "$GCC_VERSION" ] ; then
 	GCC_VERSION=$VERSION
 	GCC_VERSION_FULL=$VERSION_FULL
-	echo_2_parts "GCC version" "$GCC_VERSION_FULL"
+	notice "GCC version" "$GCC_VERSION_FULL"
 	DIR_GCC_SOURCE=$DIR_SOURCE/gcc-$GCC_VERSION
 	if [ ! -d $DIR_GCC_SOURCE ] ; then
 	    echo "Can't find GCC source at $DIR_GCC_SOURCE"
@@ -1675,7 +1308,7 @@ detect_gcc()
     TOOL_PATH=`dirname $tool`
     if [ -z "$GCC_PATH" ] ; then
 	GCC_PATH=$TOOL_PATH
-	echo_2_parts "GCC" "$GCC_PATH"
+	notice "GCC" "$GCC_PATH"
     elif [ "$GCC_PATH" != "$TOOL_PATH" ] ; then
 	echo "ERROR: $target_alias-$1 path ($TOOL_PATH) is different"
 	return 1
@@ -2209,7 +1842,7 @@ run_tests ()
         fi
     done
 
-    echo_date "Done testing  - results"
+    echo_date "Done testing - results"
 
     FILES=
     if [ $BINUTILS_VERSION ] ; then
@@ -2241,10 +1874,7 @@ run_tests ()
 
 ###################### Setting up test  ##########################
 
-echo "Setting up site.exp"
-if [ ! -d $DIR_BUILD/boards ] ; then
-    mkdir $DIR_BUILD/boards
-fi
+mk_output_dir "boards" "${DIR_BUILD}/boards" "don't clean"
 
 if [ $STACK_CHECKING ] ; then
     STACK_CHECKING_SET="set_board_info cflags \" -mstack-check-l1 \""
@@ -2259,7 +1889,9 @@ else
 fi
 
 if [ $TEST_TARGET_ELF_SIM ] ; then
-    cp $DIR_BOARDS/bfin-sim.exp $DIR_BUILD/boards/bfin-sim.exp
+    # avoid `cp` in case $DIR_BOARDS is $DIR_BUILD/boards
+    input=$(cat $DIR_BOARDS/bfin-sim.exp)
+    echo "${input}" > $DIR_BUILD/boards/bfin-sim.exp
 fi
 
 if [ $TEST_TARGET_ELF_JTAG ] ; then
@@ -2338,8 +1970,4 @@ fi
 #     run_cmd $MAKE check
 # fi
 
-echo_date "Done"
-
-printf "It took"
-print_stop_time
-echo " to complete"
+echo_date "It took $(print_stop_time) to complete"

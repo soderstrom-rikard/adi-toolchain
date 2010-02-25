@@ -29,8 +29,6 @@
 
 source "${0%/*}/lib/lib.sh" || exit 1
 
-DIR_BOARDS=${DIR_APP}/boards
-
 START=$(date +%s)
 
 #Uncomment only one of these
