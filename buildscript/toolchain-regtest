@@ -431,6 +431,10 @@ echo "Build: $BUILD_TRIPLET"
 # we will not test tools in other path.
 [ $DIR_ELF_OUTPUT ] && scrub_path
 
+PATH=$NEW_PATH:$DIR_ELF_OUTPUT/bin:$DIR_uC_OUTPUT/bin:$DIR_LINUX_OUTPUT/bin
+export PATH
+
+
 ############ Check and error if I can't find the things I need #
 
 
