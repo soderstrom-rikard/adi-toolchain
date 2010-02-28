@@ -226,11 +226,45 @@ notice "Utilizing make" "$MAKE $MAKEFLAGS"
 
 scrub_path
 
+############ FIND SOME DEFAULT PATHS ############################
+# Support the "normal" layout (what we document in examples):
+# svn/toolchain/...
+# svn/u-boot/...
+# svn/uclinux-dist/linux-2.6.x/...
+
+if [ -z "${KERNEL_SOURCE}" ] ; then
+	for p in \
+		../linux-kernel \
+		../../linux-kernel/trunk \
+		../uclinux-dist/linux-2.6.x \
+		../../uclinux-dist/trunk/linux-2.6.x
+	do
+		d="${DIR_SOURCE}/${p}"
+		if [ -d "${d}/arch/blackfin" ] ; then
+			KERNEL_SOURCE=${d}
+			break
+		fi
+	done
+fi
+
+if [ -z "${DIR_UBOOT}" ] ; then
+	for p in ../u-boot ../../u-boot/trunk ; do
+		d="${DIR_SOURCE}/${p}"
+		if [ -d "${d}" ] ; then
+			d=`ls -d "${d}"/u-boot-* | tail -1`
+			if [ -e "${d}/tools/mkimage.c" ] ; then
+				DIR_UBOOT=${d}
+				break
+			fi
+		fi
+	done
+fi
+
 ############ ABSOLUTE PATH TO SOURCE DIRECTORIES ################
 
 check_abs_dir "Toolchain source" "${DIR_SOURCE}"
 if [ $KERNEL_SOURCE ] ; then
-	check_abs_dir "Kernel source" "${KERNEL_SOURCE}/arch/blackfin"
+	check_abs_dir "Kernel source" "${KERNEL_SOURCE}"
 fi
 
 : ${DIR_BUILD:=${PWD}}
