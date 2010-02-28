@@ -88,37 +88,58 @@ print_stop_time()
 die_with_log()
 {
 	(
+	# save the tail before logging the backtrace
+	out=$(tail "$ACTUAL_LOGFILE")
+	dump_trace
+
 	[ -n "$*" ] && echo "$*"
 	echo "Please report an error to http://blackfin.uclinux.org/gf/project/toolchain"
-	printf " Build error " ; date
-	printf "  occurred "
-	print_stop_time
-	echo " into script"
+	echo " Build error at `date`"
+	echo "  occurred $(print_stop_time) into script"
 
 	# Create a single file so users can email it to us,
 	# we sleep, so things can finish writing to the log file
 	sleep 1
-	tar -jhcf "$DIR_LOG"/config.logs.tbz2 $(find "$DIR_BUILD" -name "config.log") "$ACTUAL_LOGFILE"
+	tout=$(tar -jhcf "$DIR_LOG"/config.logs.tbz2 $(find "$DIR_BUILD" -name "config.log") "$ACTUAL_LOGFILE" 2>&1)
+	pid=$!
 
-	if [ "$NUM_JOBS" -eq "1" ]; then
-		echo "When reporting issue, we may ask for $DIR_LOG/config.logs.tbz2"
+	echo "When reporting issue, we may ask for $DIR_LOG/config.logs.tbz2"
+	if [ ${NUM_JOBS:-1} -eq 1 ] ; then
 		echo " Last logfile entries:"
-		tail "$ACTUAL_LOGFILE"
 	else
 		echo "Since the build was done in parallel, I'm not sure where the error"
 		echo "happened.  The best thing to do is re-run the BuildToolChain script"
 		echo "with the '-j 1' option.  The full log can be found here:"
-		echo "${ACTUAL_LOGFILE}"
+		out=${ACTUAL_LOGFILE}
 	fi
+	echo "${out}"
+
+	wait ${pid}
 	) 1>&2
 
 	exit 1
 }
 
+_log_it()
+{
+	# try and handle double and single quotes
+	local fmt="$1"; shift
+	local o
+	o=`echo "$*" | sed -e 's:":\\\\":g'`
+	eval printf "\"${fmt}\"" "\"$o\"" ${LOGFILE}
+}
 log_it()
 {
-	# Note: embedded single quotes will break this
-	eval "printf '###\n%s\n\n' '$*'" ${LOGFILE}
+	_log_it '###\n%s\n\n' "$@"
+}
+log_echo()
+{
+	_log_it '%s\n' "$@"
+	echo "$*"
+}
+log_printf()
+{
+	log_echo "$(printf "$@")"
 }
 
 run_cmd_nodie()

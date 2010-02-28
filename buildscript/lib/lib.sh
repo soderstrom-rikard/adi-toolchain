@@ -12,6 +12,7 @@ _LIB_DIR=${DIR_APP}/lib
 . "${_LIB_DIR}/autotools.sh"
 . "${_LIB_DIR}/prereqs.sh"
 . "${_LIB_DIR}/resume.sh"
+. "${_LIB_DIR}/bash.sh"
 
 export _BUILDTOOLCHAIN_SETUP_=1
 
