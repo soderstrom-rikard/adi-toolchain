@@ -1,3 +1,7 @@
+#
+# All random utility functions live here
+#
+
 # write the message to stderr and exit
 error()
 {
@@ -18,14 +22,18 @@ notice()
 	printf "%-28s%s\n" "$notice: " "$*"
 }
 
+# does $1 exist in the $2... list ?
+has()
+{
+	local o="$1"; shift
+	case " $* " in *" $o "*) return 0;; *) return 1;; esac
+}
+
 # make sure the specified directory is an absolute path
 is_abs_dir()
 {
 	[ -n "$1" ] && [ -d "/..$1" ]
 }
-#
-# All random utility functions live here
-#
 
 # check a bunch of directories and abort if any of them are not absolute.
 # first argument is optional and will issue a `notice` if not empty.
@@ -172,10 +180,14 @@ change_dir()
 	log_it cd "$@"
 	cd "$@" || die_with_log
 }
-change_clean_dir()
+clean_dir()
 {
 	cd /
 	rm -rf "$@"
+}
+change_clean_dir()
+{
+	clean_dir "$@"
 	mkdir -p "$@"
 	change_dir "$@"
 }

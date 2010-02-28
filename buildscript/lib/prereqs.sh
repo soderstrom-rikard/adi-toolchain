@@ -78,7 +78,23 @@ check_build_env() {
 	done
 }
 
-check_prereqs_verbose() {
+detect_version()
+{
+	local flag ver prog p
+	prog=$1
+	p=${2:-${prog##*/}}
+	for flag in --version -version -V ; do
+		ver=`${prog} ${flag} </dev/null 2>&1 | grep -ie "\<${p}\>" | grep -vi -e option -e Usage -e -v`
+		if [ -n "${ver}" ] ; then
+			echo "${ver}"
+			return 0
+		fi
+	done
+	return 1
+}
+
+check_prereqs_verbose()
+{
 	echo "Check http://gcc.gnu.org/install/prerequisites.html for more information"
 	for file in "$@" ; do
 		RUN=`which -a $file 2>/dev/null| wc -w`
@@ -90,21 +106,14 @@ check_prereqs_verbose() {
 				fi
 			done
 		else
-			tmp1=`echo $file | awk -F \/ '{print $NF}'`
-			RUN=`type $tmp1 | grep "shell builtin" | wc -l`
+			RUN=`type ${file##*/} | grep "shell builtin" | wc -l`
 			if [ $RUN -eq 1 ] ; then
 				echo "   $file seems to be a shell builtin"
 				continue
 			fi
-			for VER in --version -version -V
-			do
-				 tmp=`$file $VER < /dev/null 2>&1 | grep -ie "\<$tmp1\>" | grep -vi "option" | grep -vi "Usage" | grep -vi "\-v"`
-				 if [ -n "$tmp" ] ; then
-					 echo "  " $tmp
-					 break
-				 fi
-			done
+			tmp=`detect_version "${file}"`
 			if [ -n "$tmp" ] ; then
+				echo "  " $tmp
 				continue
 			fi
 
@@ -174,34 +183,28 @@ scrub_path()
 	##### Check to make sure a old version of bfin-elf is not here
 	##### Unless we are cross-compiling our toolchain, then we need the
 	##### old toolchain in our PATH ...
-	ORG_PATH=$PATH
+	ORIG_PATH=$PATH
 	NEW_PATH=""
-	FOUND=0
-	for SEARCH in `echo $PATH | sed 's/:/ /g'` ; do
-		[ -d $SEARCH ] || continue
+	local FOUND=0 RUN p
+	for p in `echo $PATH | sed 's/:/ /g'` ; do
+		[ -d "$p" ] || continue
 
-		FIND=`find $SEARCH/ -maxdepth 1 -name bfin-elf-gcc -o -name bfin-uclinux-gcc -o -name bfin-linux-uclibc-gcc | wc -c`
-		if [ $FIND -gt 1 ] ; then
+		RUN=`find "$p/" -maxdepth 1 -name bfin-elf-gcc -o -name bfin-uclinux-gcc -o -name bfin-linux-uclibc-gcc`
+		if [ -n "${RUN}" ] ; then
 			FOUND=1
 			if [ -z "$CHOST" ] ; then
-				echo "Removing $SEARCH from the PATH"
+				echo "Removing $p from the PATH"
 			fi
 		else
-			if [ $NEW_PATH ] ; then
-				NEW_PATH=$NEW_PATH:$SEARCH
-			else
-				NEW_PATH=$SEARCH
-			fi
+			NEW_PATH=${NEW_PATH:+${NEW_PATH}:}$p
 		fi
 	done
 	if [ -z "$CHOST" ] ; then
-		NEW_PATH=$NEW_PATH:
 		PATH=$NEW_PATH
 	elif [ "$FOUND" = "0" ] ; then
 		error "You need an existing Blackfin cross-compiler\n" \
 		      " in order to cross-compile a cross-compiler."
 	else
-		PATH=$ORG_PATH
-		NEW_PATH=$ORG_PATH
+		NEW_PATH=$ORIG_PATH
 	fi
 }
