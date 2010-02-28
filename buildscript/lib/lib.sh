@@ -8,10 +8,10 @@ DIR_BOARDS=${DIR_APP}/boards
 DIR_SOURCE=${DIR_APP%/*}
 
 _LIB_DIR=${DIR_APP}/lib
-source "${_LIB_DIR}/funcs.sh"
-source "${_LIB_DIR}/autotools.sh"
-source "${_LIB_DIR}/prereqs.sh"
-source "${_LIB_DIR}/resume.sh"
+. "${_LIB_DIR}/funcs.sh"
+. "${_LIB_DIR}/autotools.sh"
+. "${_LIB_DIR}/prereqs.sh"
+. "${_LIB_DIR}/resume.sh"
 
 export _BUILDTOOLCHAIN_SETUP_=1
 
