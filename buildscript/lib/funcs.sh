@@ -39,7 +39,7 @@ is_abs_dir()
 # first argument is optional and will issue a `notice` if not empty.
 check_abs_dir()
 {
-	local msg=$1
+	local msg="$1"
 	shift
 
 	local d
