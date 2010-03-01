@@ -11,45 +11,85 @@
  *   MCU Host Bus Emulation Modes
  */
 
+#include <getopt.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include <ftdi.h>
 
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
+
 #define GNICE_VID 0x0456
-#define GNICE_PID 0xF000
-
-/* MPSSE only ACBUS */
-#define BIT_GNICE_nGPIO		2 /* ACBUS2 */
-#define BIT_GNICE_nLED		3 /* ACBUS3 */
-
-#define BITMASK_GNICE_nGPIO	(1 << BIT_GNICE_nGPIO)
-#define BITMASK_GNICE_nLED	(1 << BIT_GNICE_nLED)
+const int pids[] = {
+	0xF000,	/* gnICE */
+	0xF001, /* gnICE+ */
+};
 
 #ifdef WIN32
 # define usleep(x) Sleep((x) / 1000000 ? : 1)
 #endif
 
+const char *argv0;
+
+#define FLAGS "g:hl:s:"
+#define a_argument required_argument
+static struct option const long_opts[] = {
+	{"gpio",     a_argument, NULL, 'g'},
+	{"help",    no_argument, NULL, 'h'},
+	{"led",      a_argument, NULL, 'l'},
+	{"serial",   a_argument, NULL, 's'},
+};
+
+void usage(int exit_status)
+{
+	int i;
+	FILE *fp = exit_status ? stderr : stdout;
+	fprintf(fp, "Usage: %s [options]\n\nOptions: -[%s]\n", argv0, FLAGS);
+	for (i = 0; i < ARRAY_SIZE(long_opts); ++i)
+		fprintf(fp, "  -%c, --%s\n", long_opts[i].val, long_opts[i].name);
+	exit(exit_status);
+}
+
 int main(int argc, char *argv[])
 {
 	struct ftdi_context con;
 	unsigned char buf[3];
-	int f;
+	const char *desc;
+	int i, f, gpio, led, bitmask;
+
+	argv0 = argv[0];
+
+	gpio = 2;	/* ACBUS2 */
+	led = 3;	/* ACBUS3 */
+	desc = NULL;
+	while ((i = getopt_long(argc, argv, FLAGS, long_opts, NULL)) != -1) {
+		switch (i) {
+			case 'g': gpio = atoi(optarg); break;
+			case 'h': usage(0);
+			case 'l': led = atoi(optarg); break;
+			case 's': desc = optarg;
+			default:  usage(1);
+		}
+	}
+	bitmask = (1 << gpio) | (1 << led);
 
 	ftdi_init(&con);
 	ftdi_set_interface(&con, INTERFACE_A);
 
-	if (argc > 1) {
-		if (strcmp(argv[1], "--serial")) {
-			fprintf(stderr, "usage: %s [--serial USBSERIAL]\n",
-						 argv[0]);
-			exit(-1);
+	if (desc) {
+		for (i = 0; i < ARRAY_SIZE(pids); ++i) {
+			f = ftdi_usb_open_desc(&con, GNICE_VID, pids[i],
+					       NULL, argv[2]);
+			if (f >= 0)
+				break;
 		}
-
-		f = ftdi_usb_open_desc(&con, GNICE_VID, GNICE_PID,
-				       NULL, argv[2]);
-	} else
-		f = ftdi_usb_open(&con, GNICE_VID, GNICE_PID);
+	} else {
+		for (i = 0; i < ARRAY_SIZE(pids); ++i) {
+			f = ftdi_usb_open(&con, GNICE_VID, pids[i]);
+			if (f >= 0)
+				break;
+		}
+	}
 
 	if (f < 0 && f != -5) {
 		fprintf(stderr, "unable to open ftdi device: %d (%s)\n", f,
@@ -63,8 +103,8 @@ int main(int argc, char *argv[])
 
 	/* drive LED and RESET GPIO HIGH */
 	buf[0] = SET_BITS_HIGH;
-	buf[1] = BITMASK_GNICE_nGPIO | BITMASK_GNICE_nLED;	/* VAL */
-	buf[2] = BITMASK_GNICE_nGPIO | BITMASK_GNICE_nLED;	/* DIR */
+	buf[1] = bitmask;	/* VAL */
+	buf[2] = bitmask;	/* DIR */
 
 	f = ftdi_write_data(&con, buf, 3);
 	if (f < 0)
@@ -76,7 +116,7 @@ int main(int argc, char *argv[])
 	/* drive LED and RESET GPIO LOW */
 	buf[0] = SET_BITS_HIGH;
 	buf[1] = 0;
-	buf[2] = BITMASK_GNICE_nGPIO | BITMASK_GNICE_nLED;
+	buf[2] = bitmask;
 
 	f = ftdi_write_data(&con, buf, 3);
 	if (f < 0)
