@@ -28,8 +28,6 @@ PASS: bfin neg-3.S
 PASS: bfin neg.S
 PASS: bfin push-pop-multiple.s
 PASS: bfin push-pop.s
-PASS: bfin seqstat.s
-PASS: bfin syscfg.s
 PASS: bfin vec-abs-2.S
 PASS: bfin vec-abs-3.S
 PASS: bfin vec-abs.S
