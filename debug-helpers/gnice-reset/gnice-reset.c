@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 			case 'g': gpio = atoi(optarg); break;
 			case 'h': usage(0);
 			case 'l': led = atoi(optarg); break;
-			case 's': desc = optarg;
+			case 's': desc = optarg; break;
 			default:  usage(1);
 		}
 	}
