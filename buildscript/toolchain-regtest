@@ -291,7 +291,7 @@ DIR_LOG=$DIR_BUILD/logs
 mk_output_dir "logs" "${DIR_LOG}"
 
 DIR_TEST_RESULTS=$DIR_BUILD/tests
-mk_output_dir "tests" "${DIR_TEST_RESULTS}"
+mk_output_dir "tests" "${DIR_TEST_RESULTS}" "don't clean it"
 
 get_results_dir() { echo ${DIR_TEST_RESULTS}/$1${DATE_STAMP+-${TIMESTAMP}} ; }
 for tt in ${TEST_TARGETS} ; do
