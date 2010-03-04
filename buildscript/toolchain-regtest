@@ -298,7 +298,9 @@ for tt in ${TEST_TARGETS} ; do
 	results=$(get_results_dir ${tt})
 	mk_output_dir "${tt}" "${results}"
 	if [ -n "${RESULTS2COMPARE}" ] ; then
-		check_abs_dir "Previous ${tt} test logs" "${RESULTS2COMPARE}/${tt}"
+		d="${RESULTS2COMPARE}/${tt}"
+		is_abs_dir "${d}" && m=" (!!missing!!)" || m=
+		notice "Previous ${tt} test logs${m}" "${d}"
 	fi
 done
 
