@@ -14,6 +14,6 @@ _LIB_DIR=${DIR_APP}/lib
 . "${_LIB_DIR}/resume.sh"
 . "${_LIB_DIR}/bash.sh"
 
-export _BUILDTOOLCHAIN_SETUP_=1
+_BUILDTOOLCHAIN_SETUP_=1
 
 fi
