@@ -970,8 +970,13 @@ detect_gcc()
 test_common_gcc()
 {
 	detect_gcc ${3:-$1} || return 1
+	local default_test_src p
+	for p in "$4" "$1" "gcc" ; do
+		default_test_src="$DIR_GCC_SOURCE/$p/testsuite"
+		[ -d "${default_test_src}" ] && break
+	done
 	test_common $1 \
-		"$DIR_GCC_SOURCE/${4:-gcc}/testsuite" \
+		"${default_test_src}" \
 		"${GCC_VERSION%.?}" \
 		"$2"
 }
