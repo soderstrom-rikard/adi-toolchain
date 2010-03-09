@@ -1187,6 +1187,9 @@ run_tests()
 
 	echo_date "Done testing - results"
 
+	local summary="${result_dir}/summary"
+	(
+	echo Sumary is in: ${summary}
 	for new_sum in $(find "${result_dir}" -name '*.sum' | sort)
 	do
 		# clean up the log to make manual `diff` easier
@@ -1210,6 +1213,7 @@ run_tests()
 		fi
 	done
 	echo
+	) 2>&1 | tee "${summary}"
 }
 
 
