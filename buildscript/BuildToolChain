@@ -182,6 +182,12 @@ if [ "${BINUTILS_VERSION}" != "2.17" ] ; then
 	WITHOUT_X=true
 fi
 
+# Make sure root does not build things
+if [ "$(id -u)" -eq 0 ]; then
+	echo "you should not build the toolchain as the 'root' user"
+	sleep 30
+fi
+
 ############ Check and error if I can't find the things I need #
 
 check_cc_options() {
