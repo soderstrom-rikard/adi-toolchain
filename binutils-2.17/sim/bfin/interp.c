@@ -1,7 +1,7 @@
-/* Simulator for Analog Devices Blackfin processer.
+/* Simulator for Analog Devices Blackfin processers.
 
-   Copyright (C) 2005 Free Software Foundation, Inc.
-   Contributed by Analog Devices.
+   Copyright (C) 2005-2010 Free Software Foundation, Inc.
+   Contributed by Analog Devices, Inc.
 
    This file is part of simulators.
 
@@ -26,41 +26,81 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
 
-#include "bfd.h"
 #include "gdb/callback.h"
 #include "gdb/signals.h"
-#include "bfin-sim.h"
-#include "gdb/sim-bfin.h"
+#include "sim-main.h"
 #include "targ-vals.h"
-#include <math.h>
 
-#ifdef _WIN32
-#include <float.h>		/* Needed for _isnan().  */
-#define isnan _isnan
-#endif
-
-/* Define the rate at which the simulator should poll the host
-   for a quit. */
-#define POLL_QUIT_INTERVAL 0x60000
-
-saved_state_type saved_state;
+static void bfin_trap (SIM_CPU *);
 
 static char **prog_argv;
-static SIM_OPEN_KIND sim_kind;
-static char *myname;
-static int tracing = 0;
-static host_callback *callback;
 
-#if defined(__GO32__) || defined(_WIN32)
-int sim_memory_size = 19;
-#else
-int sim_memory_size = 24;
-#endif
+#define excp_to_sim_halt(reason, sigrc) \
+  sim_engine_halt (CPU_STATE (cpu), cpu, NULL, PCREG, reason, sigrc)
+void
+raise_exception (SIM_CPU *cpu, unsigned int excp)
+{
+  int sigrc = -1;
 
+  /* Ideally what would happen here for real hardware exceptions (not
+   * fake sim ones) is that:
+   *  - For service exceptions (excp <= 0x11):
+   *     RETX is the _next_ PC which can be tricky with jumps/hardware loops/...
+   *  - For error exceptions (excp > 0x11):
+   *     RETX is the _current_ PC (i.e. the one causing the exception)
+   *  - PC is loaded with EVT3 MMR
+   *  - ILAT/IPEND in CEC is updated depending on current IVG level
+   *  - the fault address MMRs get updated with data/instruction info
+   *  - Execution continues on in the EVT3 handler
+   */
+
+  if (excp <= 0x3f)
+    {
+      SEQSTATREG = (SEQSTATREG & ~(0x3f)) | excp;
+      /* XXX: this should go into ILATCH if in <=NMI.  */
+      SET_IPEND (1 << 3);
+    }
+
+  switch (excp)
+    {
+    case VEC_SYS:
+      bfin_trap (cpu);
+      break;
+
+    case VEC_SIM_EMUEXCPT:
+    case VEC_EXCPT01:	/* userspace gdb breakpoint */
+      sigrc = SIM_SIGTRAP;
+      break;
+
+    case VEC_SIM_HLT:	/* simulator wants to halt */
+      excp_to_sim_halt (sim_exited, 0);
+      break;
+
+    case VEC_UNDEF_I:	/* undefined instruction */
+      sigrc = SIM_SIGILL;
+      break;
+
+    case VEC_ILL_RES:	/* illegal supervisor resource */
+    case VEC_MISALI_I:	/* misaligned instruction */
+      sigrc = SIM_SIGBUS;
+      break;
+
+    case VEC_CPLB_M:
+    case VEC_CPLB_I_M:
+      sigrc = SIM_SIGSEGV;
+      break;
+
+    default:
+      fprintf (stderr, "Unhandled exception %#x at 0x%08x\n", excp, PCREG);
+      sigrc = SIM_SIGILL;
+      break;
+    }
+
+  if (sigrc != -1)
+    excp_to_sim_halt (sim_stopped, sigrc);
+  CLEAR_IPEND (1 << 3);
+}
 
 /* Count the number of arguments in an argv.  */
 static int
@@ -76,322 +116,286 @@ count_argc (char **argv)
   return i;
 }
 
-/* This function exists mainly for the purpose of setting a breakpoint to
-   catch simulated bus errors when running the simulator under GDB.  */
+/* Read/write functions for system call interface.  */
 
-void
-raise_exception (int x)
+static int
+syscall_read_mem (host_callback *cb, struct cb_syscall *sc,
+		  unsigned long taddr, char *buf, int bytes)
 {
-  saved_state.exception = x;
-}
+  SIM_DESC sd = (SIM_DESC) sc->p1;
+  SIM_CPU *cpu = (SIM_CPU *) sc->p2;
 
-void
-raise_buserror ()
-{
-  raise_exception (TARGET_SIGNAL_BUS);
+  return sim_core_read_buffer (sd, cpu, read_map, buf, taddr, bytes);
 }
 
 static int
-get_now ()
+syscall_write_mem (host_callback *cb, struct cb_syscall *sc,
+		  unsigned long taddr, const char *buf, int bytes)
 {
-  return time ((long *) 0);
-}
+  SIM_DESC sd = (SIM_DESC) sc->p1;
+  SIM_CPU *cpu = (SIM_CPU *) sc->p2;
 
-static int
-now_persec ()
-{
-  return 1;
+  return sim_core_write_buffer (sd, cpu, write_map, buf, taddr, bytes);
 }
 
 /* Simulate a monitor trap, put the result into r0 and errno into r1
    return offset by which to adjust pc.  */
 
-void
-bfin_trap ()
+static void
+bfin_trap (SIM_CPU *cpu)
 {
-  int sys = PREG (0);
-  bu32 args = DREG (0);
+  SIM_DESC sd = CPU_STATE (cpu);
+  char **argv = prog_argv /*STATE_PROG_ARGV (sd)*/;
+  host_callback *cb = STATE_CALLBACK (sd);
+  CB_SYSCALL sc;
 
-  switch (sys)
+  CB_SYSCALL_INIT (&sc);
+  sc.func = PREG (0);
+#if 0 /* this isnt the linux system call interface */
+  sc.arg1 = DREG (0);
+  sc.arg2 = DREG (1);
+  sc.arg3 = DREG (2);
+  sc.arg4 = DREG (3);
+  /*sc.arg5 = DREG (4);*/
+  /*sc.arg6 = DREG (5);*/
+#else
+  sc.arg1 = GET_LONG (DREG (0));
+  sc.arg2 = GET_LONG (DREG (0) + 4);
+  sc.arg3 = GET_LONG (DREG (0) + 8);
+  sc.arg4 = GET_LONG (DREG (0) + 12);
+#endif
+  sc.p1 = (PTR) sd;
+  sc.p2 = (PTR) cpu;
+  sc.read_mem = syscall_read_mem;
+  sc.write_mem = syscall_write_mem;
+
+  /* Common cb_syscall() handles most functions.  */
+  switch (sc.func)
     {
     case TARGET_SYS_exit:
-      saved_state.exception = TARGET_SIGNAL_QUIT;
-      DREG (0) = get_long (saved_state.memory, args);
-      return;
-    case TARGET_SYS_open:
-      {
-	char *arg0 = (char *)(saved_state.memory + get_long (saved_state.memory, args));
-	bu32 arg1 = get_long (saved_state.memory, args + 4);
-	bu32 arg2 = get_long (saved_state.memory, args + 8);
-	DREG (0) = callback->open (callback, arg0, arg1);
-      }
-      return;
-
-    case TARGET_SYS_write:
-      {
-	bu32 arg0 = get_long (saved_state.memory, args);
-	char *arg1 = (char *)(saved_state.memory + get_long (saved_state.memory, args + 4));
-	bu32 arg2 = get_long (saved_state.memory, args + 8);
-	DREG (0) = callback->write (callback, arg0, arg1, arg2);
-      }
-      return;
-
-    case TARGET_SYS_read:
-      {
-	bu32 arg0 = get_long (saved_state.memory, args);
-	char *arg1 = (char *)(saved_state.memory + get_long (saved_state.memory, args + 4));
-	bu32 arg2 = get_long (saved_state.memory, args + 8);
-	DREG (0) = callback->read (callback, arg0, arg1, arg2);
-      }
-      return;
-      
-    case TARGET_SYS_kill:
-      printf ("Killing with signal %d\n", get_long (saved_state.memory, args + 4));
-      raise (SIGABRT);
-
-    case TARGET_SYS_close:
-      DREG (0) = callback->close (callback, get_long (saved_state.memory, args));
-      return;
+      sim_engine_halt (sd, cpu, NULL, PCREG, sim_exited, sc.arg1);
 
     case TARGET_SYS_argc:
-      DREG (0) = count_argc (prog_argv);
+      sc.result = count_argc (argv);
       break;
     case TARGET_SYS_argnlen:
       {
-	bu32 arg0 = get_long (saved_state.memory, args);
-	if (arg0 < count_argc (prog_argv))
-	  DREG (0) = strlen (prog_argv[arg0]);
+	if (sc.arg1 < count_argc (argv))
+	  sc.result = strlen (argv[sc.arg1]);
 	else
-	  DREG (0) = -1;
+	  sc.result = -1;
       }
-      return;
+      break;
     case TARGET_SYS_argn:
       {
-	bu32 arg0 = get_long (saved_state.memory, args);
-	char *arg1 = (char *)(saved_state.memory + get_long (saved_state.memory, args + 4));
-	if (arg0 < count_argc (prog_argv))
+	if (sc.arg1 < count_argc (argv))
 	  {
-	    /* Include the termination byte.  */
-	    int i = strlen (prog_argv[arg0]) + 1;
-	    DREG (0) = get_long (saved_state.memory, args + 4);
-	    memcpy (arg1, prog_argv[arg0], i);
+	    char *argn = argv[sc.arg1];
+	    int len = strlen (argn);
+	    int written = sc.write_mem (cb, &sc, sc.arg2, argn, len + 1);
+	    if (written == len)
+	      sc.result = sc.arg2;
+	    else
+	      sc.result = -1;
 	  }
 	else
-	  DREG (0) = -1;
+	  sc.result = -1;
       }
-      return;
+      break;
 
-    case TARGET_SYS_time:
-      DREG (0) = get_now ();
-      return;
     default:
-      abort ();
+      cb_syscall (cb, &sc);
     }
+
+  DREG (0) = sc.result;
+  /*DREG (1) = sc.errcode;*/
 }
-
-void
-control_c (int sig)
-{
-  raise_exception (TARGET_SIGNAL_INT);
-}
-
-/* Set the memory size to the power of two provided. */
-
-void
-sim_size (int power)
-{
-  saved_state.msize = 1 << power;
-
-  sim_memory_size = power;
-
-  if (saved_state.memory)
-    free (saved_state.memory);
-
-  saved_state.memory =
-    (unsigned char *) calloc (64, saved_state.msize / 64);
-
-  if (!saved_state.memory)
-    {
-      fprintf (stderr,
-	       "Not enough VM for simulation of %d bytes of RAM\n",
-	       saved_state.msize);
-
-      saved_state.msize = 1;
-      saved_state.memory = (unsigned char *) calloc (1, 1);
-    }
-}
-
-static void
-init_pointers ()
-{
-  if (saved_state.msize != 1 << sim_memory_size)
-    sim_size (sim_memory_size);
-}
-
-#define MMASKB ((saved_state.msize -1) & ~0)
-
-int
-sim_stop (SIM_DESC sd)
-{
-  raise_exception (TARGET_SIGNAL_INT);
-  return 1;
-}
-
-/* Set by an instruction emulation function if we performed a jump.  */
-int did_jump;
 
 /* Execute a single instruction.  */
 
-static void
-step_once (SIM_DESC sd)
+static sim_cia
+step_once (SIM_CPU *cpu)
 {
   bu32 oldpc = PCREG;
 
-  if (tracing)
-    fprintf (stderr, "PC: %08x, insn: %04x\n", PCREG,
-	     get_word (saved_state.memory, PCREG));
+  if (oldpc & 0x1)
+    raise_exception (cpu, VEC_MISALI_I);
 
-  did_jump = 0;
-  interp_insn_bfin (PCREG);
+  BFIN_CPU_STATE.did_jump = false;
+  interp_insn_bfin (cpu, oldpc);
 
   /* @@@ Not sure how the hardware really behaves when the last insn
      of a loop is a jump.  */
-  if (!did_jump)
+  if (!BFIN_CPU_STATE.did_jump)
     {
       if (LC1REG && oldpc == LB1REG && --LC1REG)
 	PCREG = LT1REG;
       else if (LC0REG && oldpc == LB0REG && --LC0REG)
 	PCREG = LT0REG;
     }
+
+  return oldpc;
 }
 
 void
-sim_resume (SIM_DESC sd, int step, int siggnal)
+sim_engine_run (SIM_DESC sd,
+		int next_cpu_nr, /* ignore */
+		int nr_cpus, /* ignore */
+		int siggnal) /* ignore */
 {
-  register int insts = 0;
-
-  int tick_start = get_now ();
-  void (*prev) () = signal (SIGINT, control_c);
-  void (*prev_fpe) () = signal (SIGFPE, SIG_IGN);
-
-  init_pointers ();
-
-  /* clear exceptions else it will stop */
-  saved_state.exception = 0;
-
-  if(step)
+  sim_cia cia;
+  sim_cpu *cpu;
+  SIM_ASSERT (STATE_MAGIC (sd) == SIM_MAGIC_NUMBER);
+  cpu = STATE_CPU (sd, 0);
+  cia = CIA_GET (cpu);
+  while (1)
     {
-      while(step && saved_state.exception == 0)
+      cia = step_once (cpu);
+      /* process any events */
+      if (sim_events_tick (sd))
 	{
-	  /* not clear if this will be > 1. Potential problem area */
-	  step_once(sd);
-	  step--;
+	  /* XXX: a lot of things fail with this:
+	     - single stepping
+	     - stepping over break points
+	     - restarting the same instruction after an event
+	  CIA_SET (cpu, cia); */
+	  sim_events_process (sd);
 	}
-      /* Emulate a hardware single step ... raise an exception */
-      saved_state.exception = TARGET_SIGNAL_TRAP;
-    }
-  else
-    while (saved_state.exception == 0)
-      step_once(sd);
-
-  saved_state.ticks += get_now () - tick_start;
-  saved_state.insts += insts;
-
-  signal (SIGFPE, prev_fpe);
-  signal (SIGINT, prev);
-}
-
-int
-sim_write (SIM_DESC sd, SIM_ADDR addr, unsigned char *buffer, int size)
-{
-  int i;
-
-  init_pointers ();
-
-  for (i = 0; i < size; i++)
-    saved_state.memory[(MMASKB & (addr + i))] = buffer[i];
-
-  return size;
-}
-
-int
-sim_read (SIM_DESC sd, SIM_ADDR addr, unsigned char *buffer, int size)
-{
-  int i;
-
-  init_pointers ();
-
-  for (i = 0; i < size; i++)
-    buffer[i] = saved_state.memory[(MMASKB & (addr + i))];
-
-  return size;
-}
-
-int
-sim_trace (SIM_DESC sd)
-{
-  tracing = 1;
-  sim_resume (sd, 0, 0);
-  tracing = 0;
-  return 1;
-}
-
-void
-sim_stop_reason (SIM_DESC sd, enum sim_stop *reason, int *sigrc)
-{
-  if (saved_state.exception == TARGET_SIGNAL_QUIT)
-    {
-      *reason = sim_exited;
-      *sigrc = DREG (0);
-    }
-  else
-    {
-      *reason = sim_stopped;
-      *sigrc = saved_state.exception;
     }
 }
 
-void
-sim_info (SIM_DESC sd, int verbose)
-{
-  double timetaken = 
-    (double) saved_state.ticks / (double) now_persec ();
+/* Cover function of sim_state_free to free the cpu buffers as well.  */
 
-  callback->printf_filtered (callback, "\n\n# instructions executed  %10d\n", 
-			     saved_state.insts);
-  callback->printf_filtered (callback, "# real time taken        %10.4f\n",
-			     timetaken);
+static void
+free_state (SIM_DESC sd)
+{
+  if (STATE_MODULES (sd) != NULL)
+    sim_module_uninstall (sd);
+  sim_cpu_free_all (sd);
+  sim_state_free (sd);
+}
+
+/* Create an instance of the simulator.  */
+
+static void
+bfin_map_layout (SIM_DESC sd, SIM_CPU *cpu, size_t count,
+                 const struct bfin_memory_layout *mem)
+{
+  size_t idx;
+  for (idx = 0; idx < count; ++idx)
+    sim_core_attach (sd, NULL, 0, mem[idx].mask, 0, mem[idx].addr,
+                     mem[idx].len, 0, NULL, NULL);
 }
 
 static void
-parse_and_set_memory_size (char *str)
+bfin_initialize_cpu (SIM_DESC sd, SIM_CPU *cpu)
 {
-  int n;
+  size_t idx;
+  struct bfin_model_data *mdata;
+  address_word async;
 
-  n = strtol (str, NULL, 10);
-  if (n > 0 && n <= 24)
-    sim_memory_size = n;
-  else
-    callback->printf_filtered (callback,
-			"Bad memory size %d; must be 1 to 24, inclusive\n", n);
+  memset (&cpu->state, 0, sizeof (cpu->state));
+
+  mdata = CPU_MODEL_DATA (cpu);
+
+  /* These memory maps are supposed to be cpu-specific, but the common sim
+     code does not yet allow that (2nd arg is "cpu" rather than "NULL".  */
+  sim_core_attach (sd, NULL, 0, access_read_write, 0, BFIN_L1_SRAM_SCRATCH,
+                   BFIN_L1_SRAM_SCRATCH_SIZE, 0, NULL, NULL);
+
+  /* Map in the async banks.  */
+  async = BFIN_ASYNC_BASE;
+  for (idx = 0; idx < 4; ++idx)
+    {
+      sim_core_attach (sd, NULL, 0, access_read_write_exec_io, 0, async,
+                       mdata->async_bank_size, 0, NULL, NULL);
+      async += mdata->async_bank_size;
+    }
+
+  /* Map in the on-chip memory (bootrom/sram/etc...).  */
+  bfin_map_layout (sd, cpu, mdata->mem_count, mdata->mem);
+
+  /* Map in the on-chip MMRs.  */
+  bfin_map_layout (sd, cpu, mdata->core_mmrs_count, mdata->core_mmrs);
+
+  /* Initialize the CEC.  */
+  PUT_IMASK (0);
+  PUT_LONG (IPEND, 0x2);
+
+  /* Set default stack to top of scratch pad.  */
+  SPREG = BFIN_L1_SRAM_SCRATCH_END;
 }
 
 SIM_DESC
-sim_open (SIM_OPEN_KIND kind, host_callback *cb,
+sim_open (SIM_OPEN_KIND kind, host_callback *callback,
 	  struct bfd *abfd, char **argv)
 {
-  char **p;
+  char c;
+  int i;
+  SIM_DESC sd = sim_state_alloc (kind, callback);
 
-  sim_kind = kind;
-  myname = argv[0];
-  callback = cb;
+  /* The cpu data is kept in a separately allocated chunk of memory.  */
+  if (sim_cpu_alloc_all (sd, 1, /*cgen_cpu_max_extra_bytes ()*/0) != SIM_RC_OK)
+    {
+      free_state (sd);
+      return 0;
+    }
 
-  for (p = argv + 1; *p != NULL; ++p)
-    if (isdigit (**p))
-      parse_and_set_memory_size (*p);
+  if (sim_pre_argv_init (sd, argv[0]) != SIM_RC_OK)
+    {
+      free_state (sd);
+      return 0;
+    }
 
-  /* fudge our descriptor for now */
-  return (SIM_DESC) 1;
+  /* XXX: hack: gdb passes down "-E little", but sim layer hates it */
+  if (argv[1] && strcmp (argv[1], "-E") == 0)
+    argv[1] = NULL;
+
+  /* getopt will print the error message so we just have to exit if this fails.
+     FIXME: Hmmm...  in the case of gdb we need getopt to call
+     print_filtered.  */
+  if (sim_parse_args (sd, argv) != SIM_RC_OK)
+    {
+      free_state (sd);
+      return 0;
+    }
+
+  /* Allocate external memory if none specified by user.
+     Use address 4 here in case the user wanted address 0 unmapped.  */
+  if (sim_core_read_buffer (sd, NULL, read_map, &c, 4, 1) == 0)
+    sim_do_commandf (sd, "memory region 0,0x%lx", BFIN_DEFAULT_MEM_SIZE);
+
+  /* Check for/establish the a reference program image.  */
+  if (sim_analyze_program (sd,
+			   (STATE_PROG_ARGV (sd) != NULL
+			    ? *STATE_PROG_ARGV (sd)
+			    : NULL), abfd) != SIM_RC_OK)
+    {
+      free_state (sd);
+      return 0;
+    }
+
+  /* Establish any remaining configuration options.  */
+  if (sim_config (sd) != SIM_RC_OK)
+    {
+      free_state (sd);
+      return 0;
+    }
+
+  if (sim_post_argv_init (sd) != SIM_RC_OK)
+    {
+      free_state (sd);
+      return 0;
+    }
+
+  /* CPU specific initialization.  */
+  for (i = 0; i < MAX_NR_PROCESSORS; ++i)
+    {
+      SIM_CPU *cpu = STATE_CPU (sd, i);
+      bfin_initialize_cpu (sd, cpu);
+    }
+
+  return sd;
 }
 
 void
@@ -401,48 +405,21 @@ sim_close (SIM_DESC sd, int quitting)
 }
 
 SIM_RC
-sim_load (SIM_DESC sd, char *prog, bfd *abfd, int from_tty)
-{
-  extern bfd *sim_load_file (); /* ??? Don't know where this should live.  */
-  bfd *prog_bfd;
-
-  prog_bfd = sim_load_file (sd, myname, callback, prog, abfd,
-			    sim_kind == SIM_OPEN_DEBUG,
-			    0, sim_write);
-
-  /* Set the bfd machine type.  */
-  if (prog_bfd)
-    saved_state.bfd_mach = bfd_get_mach (prog_bfd);
-  else if (abfd)
-    saved_state.bfd_mach = bfd_get_mach (abfd);
-  else
-    saved_state.bfd_mach = 0;
-
-  if (prog_bfd == NULL)
-    return SIM_RC_FAIL;
-  if (abfd == NULL)
-    bfd_close (prog_bfd);
-  return SIM_RC_OK;
-}
-
-SIM_RC
-sim_create_inferior (SIM_DESC sd, struct bfd *prog_bfd,
+sim_create_inferior (SIM_DESC sd, struct bfd *abfd,
 		     char **argv, char **env)
 {
-  /* Clear the registers.  */
-  memset (&saved_state, 0,
-	  (char*) &saved_state.end_of_registers - (char*) &saved_state);
+  SIM_CPU *cpu = STATE_CPU (sd, 0);
+  SIM_ADDR addr;
 
   /* Set the PC.  */
-  if (prog_bfd != NULL)
-    saved_state.pc = bfd_get_start_address (prog_bfd);
-
-  SPREG = saved_state.msize;
-  /* Set the bfd machine type.  */
-  if (prog_bfd != NULL)
-    saved_state.bfd_mach = bfd_get_mach (prog_bfd);
+  if (abfd != NULL)
+    addr = bfd_get_start_address (abfd);
+  else
+    addr = 0;
+  sim_pc_set (cpu, addr);
 
   /* Record the program's arguments.  */
+  /* STATE_PROG_ARGV (sd) = argv; */
   prog_argv = argv;
 
   return SIM_RC_OK;
@@ -451,208 +428,6 @@ sim_create_inferior (SIM_DESC sd, struct bfd *prog_bfd,
 void
 sim_do_command (SIM_DESC sd, char *cmd)
 {
-  char *sms_cmd = "set-memory-size";
-  int cmdsize;
-
-  if (cmd == NULL || *cmd == '\0')
-    cmd = "help";
-
-  cmdsize = strlen (sms_cmd);
-  if (strncmp (cmd, sms_cmd, cmdsize) == 0 
-      && strchr (" \t", cmd[cmdsize]) != NULL)
-    parse_and_set_memory_size (cmd + cmdsize + 1);
-  else if (strcmp (cmd, "help") == 0)
-    {
-      (callback->printf_filtered) (callback, 
-				   "List of Blackfin simulator commands:\n\n");
-      (callback->printf_filtered) (callback, "help <n> -- Display this information\n");
-      (callback->printf_filtered) (callback, "set-memory-size <n> -- Set the number of address bits to use\n");
-      (callback->printf_filtered) (callback, "\n");
-    }
-  else
-    (callback->printf_filtered) (callback, "Error: \"%s\" is not a valid Blackfin simulator command.\n", cmd);
+  if (sim_args_command (sd, cmd) != SIM_RC_OK)
+    sim_io_eprintf (sd, "Unknown command `%s'\n", cmd);
 }
-
-void
-sim_set_callbacks (host_callback *p)
-{
-  callback = p;
-}
-
-static bu32
-bfin_extract_unsigned_integer (unsigned char *addr, int len)
-{
-  bu32 retval;
-  unsigned char * p;
-  unsigned char * startaddr = (unsigned char *)addr;
-  unsigned char * endaddr = startaddr + len;
- 
-  retval = 0;
-
-  for (p = endaddr; p > startaddr;)
-    retval = (retval << 8) | *--p;
- 
-  return retval;
-}
-
-static void
-bfin_store_unsigned_integer (unsigned char *addr, int len, bu32 val)
-{
-  unsigned char *p;
-  unsigned char *startaddr = addr;
-  unsigned char *endaddr = startaddr + len;
-
-  for (p = startaddr; p < endaddr;)
-    {
-      *p++ = val & 0xff;
-      val >>= 8;
-    }
-}
-
-int
-sim_fetch_register (SIM_DESC sd, int rn, unsigned char *memory, int length)
-{
-  bu32 value;
-
-  init_pointers ();
-
-  switch (rn)
-    {
-    case SIM_BFIN_R0_REGNUM : value = DREG(0); break;
-    case SIM_BFIN_R1_REGNUM : value = DREG(1); break;
-    case SIM_BFIN_R2_REGNUM : value = DREG(2); break;
-    case SIM_BFIN_R3_REGNUM : value = DREG(3); break;
-    case SIM_BFIN_R4_REGNUM : value = DREG(4); break;
-    case SIM_BFIN_R5_REGNUM : value = DREG(5); break;
-    case SIM_BFIN_R6_REGNUM : value = DREG(6); break;
-    case SIM_BFIN_R7_REGNUM : value = DREG(7); break;
-    case SIM_BFIN_P0_REGNUM : value = PREG(0); break;
-    case SIM_BFIN_P1_REGNUM : value = PREG(1); break;
-    case SIM_BFIN_P2_REGNUM : value = PREG(2); break;
-    case SIM_BFIN_P3_REGNUM : value = PREG(3); break;
-    case SIM_BFIN_P4_REGNUM : value = PREG(4); break;
-    case SIM_BFIN_P5_REGNUM : value = PREG(5); break;
-    case SIM_BFIN_SP_REGNUM : value = SPREG; break;
-    case SIM_BFIN_FP_REGNUM : value = FPREG; break;
-    case SIM_BFIN_I0_REGNUM : value = IREG(0); break;
-    case SIM_BFIN_I1_REGNUM : value = IREG(1); break;
-    case SIM_BFIN_I2_REGNUM : value = IREG(2); break;
-    case SIM_BFIN_I3_REGNUM : value = IREG(3); break;
-    case SIM_BFIN_M0_REGNUM : value = MREG(0); break;
-    case SIM_BFIN_M1_REGNUM : value = MREG(1); break;
-    case SIM_BFIN_M2_REGNUM : value = MREG(2); break;
-    case SIM_BFIN_M3_REGNUM : value = MREG(3); break;
-    case SIM_BFIN_B0_REGNUM : value = BREG(0); break;
-    case SIM_BFIN_B1_REGNUM : value = BREG(1); break;
-    case SIM_BFIN_B2_REGNUM : value = BREG(2); break;
-    case SIM_BFIN_B3_REGNUM : value = BREG(3); break;
-    case SIM_BFIN_L0_REGNUM : value = LREG(0); break;
-    case SIM_BFIN_L1_REGNUM : value = LREG(1); break;
-    case SIM_BFIN_L2_REGNUM : value = LREG(2); break;
-    case SIM_BFIN_L3_REGNUM : value = LREG(3); break;
-    case SIM_BFIN_ASTAT_REGNUM : value = ASTAT; break;
-    case SIM_BFIN_RETS_REGNUM : value = RETSREG; break;
-    case SIM_BFIN_A0_DOT_X_REGNUM : value = A0XREG; break;
-    case SIM_BFIN_AO_DOT_W_REGNUM : value = A0WREG; break;
-    case SIM_BFIN_A1_DOT_X_REGNUM : value = A1XREG; break;
-    case SIM_BFIN_A1_DOT_W_REGNUM : value = A1WREG; break;
-    case SIM_BFIN_LC0_REGNUM : value = LC0REG; break;
-    case SIM_BFIN_LT0_REGNUM : value = LT0REG; break;
-    case SIM_BFIN_LB0_REGNUM : value = LB0REG; break;
-    case SIM_BFIN_LC1_REGNUM : value = LC1REG; break;
-    case SIM_BFIN_LT1_REGNUM : value = LT1REG; break;
-    case SIM_BFIN_LB1_REGNUM : value = LB1REG; break;
-    case SIM_BFIN_CYCLES_REGNUM : value = CYCLESREG; break;
-    case SIM_BFIN_CYCLES2_REGNUM : value = CYCLES2REG; break;
-    case SIM_BFIN_USP_REGNUM : value = USPREG; break;
-    case SIM_BFIN_SEQSTAT_REGNUM : value = SEQSTATREG; break;
-    case SIM_BFIN_SYSCFG_REGNUM : value = SYSCFGREG; break;
-    case SIM_BFIN_RETI_REGNUM : value = RETIREG; break;
-    case SIM_BFIN_RETX_REGNUM : value = RETXREG; break;
-    case SIM_BFIN_RETN_REGNUM : value = RETNREG; break;
-    case SIM_BFIN_RETE_REGNUM : value = RETEREG; break;
-    case SIM_BFIN_PC_REGNUM : value = PCREG; break;
-    case SIM_BFIN_CC_REGNUM : value = CCREG; break;
-    default :
-      return 0; // will be an error in gdb
-      break;
-  }
-
-  bfin_store_unsigned_integer (memory, 4, value);
-
-  return -1; // disables size checking in gdb
-}
-
-int
-sim_store_register (SIM_DESC sd, int rn, unsigned char *memory, int length)
-{
-  bu32 value;
-
-  value = bfin_extract_unsigned_integer (memory, 4);
-
-  init_pointers ();
-  switch (rn)
-    {
-    case SIM_BFIN_R0_REGNUM : DREG(0) = value; break;
-    case SIM_BFIN_R1_REGNUM : DREG(1) = value; break;
-    case SIM_BFIN_R2_REGNUM : DREG(2) = value; break;
-    case SIM_BFIN_R3_REGNUM : DREG(3) = value; break;
-    case SIM_BFIN_R4_REGNUM : DREG(4) = value; break;
-    case SIM_BFIN_R5_REGNUM : DREG(5) = value; break;
-    case SIM_BFIN_R6_REGNUM : DREG(6) = value; break;
-    case SIM_BFIN_R7_REGNUM : DREG(7) = value; break;
-    case SIM_BFIN_P0_REGNUM : PREG(0) = value; break;
-    case SIM_BFIN_P1_REGNUM : PREG(1) = value; break;
-    case SIM_BFIN_P2_REGNUM : PREG(2) = value; break;
-    case SIM_BFIN_P3_REGNUM : PREG(3) = value; break;
-    case SIM_BFIN_P4_REGNUM : PREG(4) = value; break;
-    case SIM_BFIN_P5_REGNUM : PREG(5) = value; break;
-    case SIM_BFIN_SP_REGNUM : SPREG = value; break;
-    case SIM_BFIN_FP_REGNUM : FPREG = value; break;
-    case SIM_BFIN_I0_REGNUM : IREG(0) = value; break;
-    case SIM_BFIN_I1_REGNUM : IREG(1) = value; break;
-    case SIM_BFIN_I2_REGNUM : IREG(2) = value; break;
-    case SIM_BFIN_I3_REGNUM : IREG(3) = value; break;
-    case SIM_BFIN_M0_REGNUM : MREG(0) = value; break;
-    case SIM_BFIN_M1_REGNUM : MREG(1) = value; break;
-    case SIM_BFIN_M2_REGNUM : MREG(2) = value; break;
-    case SIM_BFIN_M3_REGNUM : MREG(3) = value; break;
-    case SIM_BFIN_B0_REGNUM : BREG(0) = value; break;
-    case SIM_BFIN_B1_REGNUM : BREG(1) = value; break;
-    case SIM_BFIN_B2_REGNUM : BREG(2) = value; break;
-    case SIM_BFIN_B3_REGNUM : BREG(3) = value; break;
-    case SIM_BFIN_L0_REGNUM : LREG(0) = value; break;
-    case SIM_BFIN_L1_REGNUM : LREG(1) = value; break;
-    case SIM_BFIN_L2_REGNUM : LREG(2) = value; break;
-    case SIM_BFIN_L3_REGNUM : LREG(3) = value; break;
-    case SIM_BFIN_ASTAT_REGNUM : SET_ASTAT (value); break;
-    case SIM_BFIN_RETS_REGNUM : RETSREG = value; break;
-    case SIM_BFIN_A0_DOT_X_REGNUM : A0XREG = value; break;
-    case SIM_BFIN_AO_DOT_W_REGNUM : A0WREG = value; break;
-    case SIM_BFIN_A1_DOT_X_REGNUM : A1XREG = value; break;
-    case SIM_BFIN_A1_DOT_W_REGNUM : A1WREG = value; break;
-    case SIM_BFIN_LC0_REGNUM : LC0REG = value; break;
-    case SIM_BFIN_LT0_REGNUM : LT0REG = value; break;
-    case SIM_BFIN_LB0_REGNUM : LB0REG = value; break;
-    case SIM_BFIN_LC1_REGNUM : LC1REG = value; break;
-    case SIM_BFIN_LT1_REGNUM : LT1REG = value; break;
-    case SIM_BFIN_LB1_REGNUM : LB1REG = value; break;
-    case SIM_BFIN_CYCLES_REGNUM : CYCLESREG = value; break;
-    case SIM_BFIN_CYCLES2_REGNUM : CYCLES2REG = value; break;
-    case SIM_BFIN_USP_REGNUM : USPREG = value; break;
-    case SIM_BFIN_SEQSTAT_REGNUM : SEQSTATREG = value; break;
-    case SIM_BFIN_SYSCFG_REGNUM : SYSCFGREG = value; break;
-    case SIM_BFIN_RETI_REGNUM : RETIREG = value; break;
-    case SIM_BFIN_RETX_REGNUM : RETXREG = value; break;
-    case SIM_BFIN_RETN_REGNUM : RETNREG = value; break;
-    case SIM_BFIN_RETE_REGNUM : RETEREG = value; break;
-    case SIM_BFIN_PC_REGNUM : PCREG = value; break;
-    case SIM_BFIN_CC_REGNUM : CCREG = value; break;
-    default :
-      return 0; // will be an error in gdb
-      break;
-  }
-
-  return -1; // disables size checking in gdb
-}
-

@@ -1,7 +1,7 @@
-/* Simulator for Analog Devices Blackfin processer.
+/* Simulator for Analog Devices Blackfin processers.
 
-   Copyright (C) 2005 Free Software Foundation, Inc.
-   Contributed by Analog Devices.
+   Copyright (C) 2005-2010 Free Software Foundation, Inc.
+   Contributed by Analog Devices, Inc.
 
    This file is part of simulators.
 
@@ -20,10 +20,10 @@
    Foundation, Inc., 51 Franklin Street, Fifth Floor,
    Boston, MA 02110-1301, USA.  */
 
-#include "gdb/callback.h"
-#include "gdb/remote-sim.h"
-#include "sim-config.h"
-#include "sim-types.h"
+#ifndef _BFIN_SIM_H_
+#define _BFIN_SIM_H_
+
+#include <stdbool.h>
 
 typedef unsigned8 bu8;
 typedef unsigned16 bu16;
@@ -34,7 +34,22 @@ typedef signed16 bs16;
 typedef signed32 bs32;
 typedef signed64 bs64;
 
-typedef struct
+/* For dealing with parallel instructions, we must avoid changing our register
+   file until all parallel insns have been simulated.  This queue of stores
+   can be used to delay a modification.
+   @@@ Should go and convert all 32 bit insns to use this.  */
+struct store {
+  bu32 *addr;
+  bu32 val;
+};
+#define STORE(X, Y) \
+  do { \
+    if (BFIN_CPU_STATE.n_stores == 20) abort (); \
+    BFIN_CPU_STATE.stores[BFIN_CPU_STATE.n_stores].addr = (bu32 *)&(X); \
+    BFIN_CPU_STATE.stores[BFIN_CPU_STATE.n_stores++].val = (Y); \
+  } while (0)
+
+struct bfin_cpu_state
 {
   bu32 dpregs[16], iregs[4], mregs[4], bregs[4], lregs[4], cycles[2];
   bu32 a0x, a0w, a1x, a1w;
@@ -46,52 +61,49 @@ typedef struct
   bu32 pc, rets, reti, retx, retn, rete;
   bu32 usp, seqstat, syscfg;
 
-  int ticks;
-  int insts;
+  /* Set by an instruction emulation function if we performed a jump.  */
+  bool did_jump;
 
-  int exception;
-
-  int end_of_registers;
-
-  int msize;
-  unsigned char *memory;
-  unsigned long bfd_mach;
-} saved_state_type;
-
-extern saved_state_type saved_state;
+  /* See notes above for struct store.  */
+  struct store stores[20];
+  int n_stores;
+};
 
 #define GREG(x,i)	DPREG ((x) | (i << 3))
-#define DPREG(x)	(saved_state.dpregs[x])
-#define DREG(x)		(saved_state.dpregs[x])
-#define PREG(x)		(saved_state.dpregs[x + 8])
+#define DPREG(x)	(BFIN_CPU_STATE.dpregs[x])
+#define DREG(x)		(BFIN_CPU_STATE.dpregs[x])
+#define PREG(x)		(BFIN_CPU_STATE.dpregs[x + 8])
 #define SPREG		PREG (6)
 #define FPREG		PREG (7)
-#define IREG(x)		(saved_state.iregs[x])
-#define MREG(x)		(saved_state.mregs[x])
-#define BREG(x)		(saved_state.bregs[x])
-#define LREG(x)		(saved_state.lregs[x])
-#define A0XREG		(saved_state.a0x)
-#define A0WREG		(saved_state.a0w)
-#define A1XREG		(saved_state.a1x)
-#define A1WREG		(saved_state.a1w)
-#define CCREG		(saved_state.cc)
-#define LC0REG		(saved_state.lc[0])
-#define LT0REG		(saved_state.lt[0])
-#define LB0REG		(saved_state.lb[0])
-#define LC1REG		(saved_state.lc[1])
-#define LT1REG		(saved_state.lt[1])
-#define LB1REG		(saved_state.lb[1])
-#define CYCLESREG	(saved_state.cycles[0])
-#define CYCLES2REG	(saved_state.cycles[1])
-#define USPREG		(saved_state.usp)
-#define SEQSTATREG	(saved_state.seqstat)
-#define SYSCFGREG	(saved_state.syscfg)
-#define RETSREG		(saved_state.rets)
-#define RETIREG		(saved_state.reti)
-#define RETXREG		(saved_state.retx)
-#define RETNREG		(saved_state.retn)
-#define RETEREG		(saved_state.rete)
-#define PCREG		(saved_state.pc)
+#define IREG(x)		(BFIN_CPU_STATE.iregs[x])
+#define MREG(x)		(BFIN_CPU_STATE.mregs[x])
+#define BREG(x)		(BFIN_CPU_STATE.bregs[x])
+#define LREG(x)		(BFIN_CPU_STATE.lregs[x])
+#define A0XREG		(BFIN_CPU_STATE.a0x)
+#define A0WREG		(BFIN_CPU_STATE.a0w)
+#define A1XREG		(BFIN_CPU_STATE.a1x)
+#define A1WREG		(BFIN_CPU_STATE.a1w)
+#define CCREG		(BFIN_CPU_STATE.cc)
+#define LCREG(x)	(BFIN_CPU_STATE.lc[x])
+#define LTREG(x)	(BFIN_CPU_STATE.lt[x])
+#define LBREG(x)	(BFIN_CPU_STATE.lb[x])
+#define LC0REG		LCREG(0)
+#define LT0REG		LTREG(0)
+#define LB0REG		LBREG(0)
+#define LC1REG		LCREG(1)
+#define LT1REG		LTREG(1)
+#define LB1REG		LBREG(1)
+#define CYCLESREG	(BFIN_CPU_STATE.cycles[0])
+#define CYCLES2REG	(BFIN_CPU_STATE.cycles[1])
+#define USPREG		(BFIN_CPU_STATE.usp)
+#define SEQSTATREG	(BFIN_CPU_STATE.seqstat)
+#define SYSCFGREG	(BFIN_CPU_STATE.syscfg)
+#define RETSREG		(BFIN_CPU_STATE.rets)
+#define RETIREG		(BFIN_CPU_STATE.reti)
+#define RETXREG		(BFIN_CPU_STATE.retx)
+#define RETNREG		(BFIN_CPU_STATE.retn)
+#define RETEREG		(BFIN_CPU_STATE.rete)
+#define PCREG		(BFIN_CPU_STATE.pc)
 
 #define AZ_BIT		0
 #define AN_BIT		1
@@ -109,79 +121,146 @@ extern saved_state_type saved_state;
 #define V_BIT		24
 #define VS_BIT		25
 
-#define ASTAT		(saved_state.az << AZ_BIT \
-			 | saved_state.an << AN_BIT \
-			 | saved_state.ac0_copy << AC0_COPY_BIT \
-			 | saved_state.v_copy << V_COPY_BIT \
-			 | saved_state.cc << CC_BIT \
-			 | saved_state.aq << AQ_BIT \
-			 | saved_state.rnd_mod << RND_MOD_BIT \
-			 | saved_state.ac0 << AC0_BIT \
-			 | saved_state.ac1 << AC1_BIT \
-			 | saved_state.av0 << AV0_BIT \
-			 | saved_state.av0s << AV0S_BIT \
-			 | saved_state.av1 << AV1_BIT \
-			 | saved_state.av1s << AV1S_BIT \
-			 | saved_state.v << V_BIT \
-			 | saved_state.vs << VS_BIT)
+#define ASTATREG(field) (BFIN_CPU_STATE.field)
+#define ASTAT_DEPOSIT(field, bit) (ASTATREG(field) << (bit))
+#define ASTAT \
+	(ASTAT_DEPOSIT(az,       AZ_BIT)       \
+	|ASTAT_DEPOSIT(an,       AN_BIT)       \
+	|ASTAT_DEPOSIT(ac0_copy, AC0_COPY_BIT) \
+	|ASTAT_DEPOSIT(v_copy,   V_COPY_BIT)   \
+	|ASTAT_DEPOSIT(cc,       CC_BIT)       \
+	|ASTAT_DEPOSIT(aq,       AQ_BIT)       \
+	|ASTAT_DEPOSIT(rnd_mod,  RND_MOD_BIT)  \
+	|ASTAT_DEPOSIT(ac0,      AC0_BIT)      \
+	|ASTAT_DEPOSIT(ac1,      AC1_BIT)      \
+	|ASTAT_DEPOSIT(av0,      AV0_BIT)      \
+	|ASTAT_DEPOSIT(av0s,     AV0S_BIT)     \
+	|ASTAT_DEPOSIT(av1,      AV1_BIT)      \
+	|ASTAT_DEPOSIT(av1s,     AV1S_BIT)     \
+	|ASTAT_DEPOSIT(v,        V_BIT)        \
+	|ASTAT_DEPOSIT(vs,       VS_BIT))
 
-#define SET_ASTAT(a)						\
-  do								\
-    {								\
-      saved_state.az = a >> AZ_BIT & 1;				\
-      saved_state.an = a >> AN_BIT & 1;				\
-      saved_state.ac0_copy = a >> AC0_COPY_BIT & 1;		\
-      saved_state.v_copy = a >> V_COPY_BIT & 1;			\
-      saved_state.cc = a >> CC_BIT & 1;				\
-      saved_state.aq = a >> AQ_BIT & 1;				\
-      saved_state.rnd_mod = a >> RND_MOD_BIT & 1;		\
-      saved_state.ac0 = a >> AC0_BIT & 1;			\
-      saved_state.ac1 = a >> AC1_BIT & 1;			\
-      saved_state.av0 = a >> AV0_BIT & 1;			\
-      saved_state.av0s = a >> AV0S_BIT & 1;			\
-      saved_state.av1 = a >> AV1_BIT & 1;			\
-      saved_state.av1s = a >> AV1S_BIT & 1;			\
-      saved_state.v = a >> V_BIT & 1;				\
-      saved_state.vs = a >> VS_BIT & 1;				\
-    }								\
+#define ASTAT_EXTRACT(a, bit)     (((a) >> bit) & 1)
+#define _SET_ASTAT(a, field, bit) (ASTATREG(field) = ASTAT_EXTRACT(a, bit))
+#define SET_ASTAT(a) \
+  do \
+    { \
+      _SET_ASTAT(a, az,       AZ_BIT); \
+      _SET_ASTAT(a, an,       AN_BIT); \
+      _SET_ASTAT(a, ac0_copy, AC0_COPY_BIT); \
+      _SET_ASTAT(a, v_copy,   V_COPY_BIT); \
+      _SET_ASTAT(a, cc,       CC_BIT); \
+      _SET_ASTAT(a, aq,       AQ_BIT); \
+      _SET_ASTAT(a, rnd_mod,  RND_MOD_BIT); \
+      _SET_ASTAT(a, ac0,      AC0_BIT); \
+      _SET_ASTAT(a, ac1,      AC1_BIT); \
+      _SET_ASTAT(a, av0,      AV0_BIT); \
+      _SET_ASTAT(a, av0s,     AV0S_BIT); \
+      _SET_ASTAT(a, av1,      AV1_BIT); \
+      _SET_ASTAT(a, av1s,     AV1S_BIT); \
+      _SET_ASTAT(a, v,        V_BIT); \
+      _SET_ASTAT(a, vs,       VS_BIT); \
+    } \
   while (0)
 
-extern int did_jump;
+#define __PUT_MEM(taddr, v, size) \
+do { \
+  bu##size __v = (v); \
+  int __cnt = sim_write (CPU_STATE(cpu), taddr, (void *)&__v, size / 8); \
+  if (__cnt != size / 8) \
+   { \
+     if (taddr >= BFIN_SYSTEM_MMR_BASE) \
+       /*raise_exception (cpu, VEC_ILL_RES)*/; \
+     else \
+       raise_exception (cpu, VEC_CPLB_I_M); \
+   } \
+} while (0)
+#define PUT_BYTE(taddr, v) __PUT_MEM(taddr, v, 8)
+#define PUT_WORD(taddr, v) __PUT_MEM(taddr, v, 16)
+#define PUT_LONG(taddr, v) __PUT_MEM(taddr, v, 32)
 
-static inline void put_byte (unsigned char *memory, bu32 addr, bu8 v)
-{
-  memory[addr] = v;
-}
+#define __GET_MEM(taddr, size) \
+({ \
+  bu##size __ret; \
+  int __cnt = sim_read (CPU_STATE(cpu), taddr, (void *)&__ret, size / 8); \
+  if (__cnt != size / 8) \
+   { \
+     if (taddr >= BFIN_SYSTEM_MMR_BASE) \
+       raise_exception (cpu, VEC_ILL_RES); \
+     else \
+       raise_exception (cpu, VEC_CPLB_I_M); \
+   } \
+  __ret; \
+})
+#define GET_BYTE(taddr) __GET_MEM(taddr, 8)
+#define GET_WORD(taddr) __GET_MEM(taddr, 16)
+#define GET_LONG(taddr) __GET_MEM(taddr, 32)
 
-static inline void put_word (unsigned char *memory, bu32 addr, bu16 v)
-{
-  memory[addr] = v;
-  memory[addr + 1] = v >> 8;
-}
+extern void interp_insn_bfin (SIM_CPU *, bu32);
 
-static inline void put_long (unsigned char *memory, bu32 addr, bu32 v)
-{
-  memory[addr] = v;
-  memory[addr + 1] = v >> 8;
-  memory[addr + 2] = v >> 16;
-  memory[addr + 3] = v >> 24;
-}
+#define VEC_SYS		(0)
+#define VEC_EXCPT01	(1)
+#define VEC_EXCPT02	(2)
+#define VEC_EXCPT03	(3)
+#define VEC_EXCPT04	(4)
+#define VEC_EXCPT05	(5)
+#define VEC_EXCPT06	(6)
+#define VEC_EXCPT07	(7)
+#define VEC_EXCPT08	(8)
+#define VEC_EXCPT09	(9)
+#define VEC_EXCPT10	(10)
+#define VEC_EXCPT11	(11)
+#define VEC_EXCPT12	(12)
+#define VEC_EXCPT13	(13)
+#define VEC_EXCPT14	(14)
+#define VEC_EXCPT15	(15)
+#define VEC_STEP	(16)
+#define VEC_OVFLOW	(17)
+#define VEC_UNDEF_I	(33)
+#define VEC_ILGAL_I	(34)
+#define VEC_CPLB_VL	(35)
+#define VEC_MISALI_D	(36)
+#define VEC_UNCOV	(37)
+#define VEC_CPLB_M	(38)
+#define VEC_CPLB_MHIT	(39)
+#define VEC_WATCH	(40)
+#define VEC_ISTRU_VL	(41)	/*ADSP-BF535 only (MH) */
+#define VEC_MISALI_I	(42)
+#define VEC_CPLB_I_VL	(43)
+#define VEC_CPLB_I_M	(44)
+#define VEC_CPLB_I_MHIT	(45)
+#define VEC_ILL_RES	(46)	/* including unvalid supervisor mode insn */
+/* The hardware reserves (63) for future use - we use it to tell our
+ * normal exception handling code we have a hardware error
+ */
+#define VEC_HWERR	(63)
+#define VEC_SIM_HLT	(64)
+#define VEC_SIM_EMUEXCPT	(65)
+extern void raise_exception (SIM_CPU *, unsigned int excp);
 
-static inline bu8 get_byte (unsigned char *memory, bu32 addr)
-{
-  return memory[addr];
-}
+/* Defines for Blackfin memory layouts.  */
+#define BFIN_ASYNC_BASE           0x20000000
+#define BFIN_SYSTEM_MMR_BASE      0xFFC00000
+#define BFIN_CORE_MMR_BASE        0xFFE00000
+#define BFIN_L1_SRAM_SCRATCH      0xFFB00000
+#define BFIN_L1_SRAM_SCRATCH_SIZE 0x1000
+#define BFIN_L1_SRAM_SCRATCH_END  (BFIN_L1_SRAM_SCRATCH + BFIN_L1_SRAM_SCRATCH_SIZE)
 
-static inline bu16 get_word (unsigned char *memory, bu32 addr)
-{
-  return (memory[addr] | (memory[addr + 1] << 8));
-}
+#define BFIN_L1_CACHE_BYTES       32
 
-static inline bu32 get_long (unsigned char *memory, bu32 addr)
-{
-  return (memory[addr] | (memory[addr + 1] << 8)
-	  | (memory[addr + 2] << 16) | (memory[addr + 3] << 24));
-}
+/* Core MMRs.  */
+#define IMASK              0xFFE02104   /* Interrupt Mask Register */
+#define IPEND              0xFFE02108   /* Interrupt Pending Register */
+#define ILAT               0xFFE0210C   /* Interrupt Latch Register */
 
-extern void interp_insn_bfin (bu32);
+/* Some events may never be unmasked.  */
+#define PUT_IMASK(val)   PUT_LONG (IMASK, (val) | 0x1f)
+#define CLEAR_IPEND(val) PUT_LONG (IPEND, GET_LONG (IPEND) & ~(val))
+#define SET_IPEND(val)   PUT_LONG (IPEND, GET_LONG (IPEND) |  (val))
 
+#define IS_SUPV() (GET_LONG (IPEND) & ~(1 << 4))
+#define IS_USER() (! IS_SUPV ())
+#define REQUIRE_SUPERVISOR() \
+  do { if (IS_USER ()) raise_exception (cpu, VEC_ILL_RES); } while (0)
+
+#endif

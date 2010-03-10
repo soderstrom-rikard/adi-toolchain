@@ -1,0 +1,15 @@
+SEQSTAT should be read only
+
+SYSCFG should throw away writes to reserved bits
+
+need to review ASTAT write behavior
+
+CYCLES should increment based on SYSCFG
+
+CYCLES2 pushing/reading should be shadowed
+
+create on-chip maps and default SP to scratch pad
+
+add support for tracing
+
+implement all unhandled_instruction locations
