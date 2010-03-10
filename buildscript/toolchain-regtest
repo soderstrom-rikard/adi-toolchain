@@ -1262,8 +1262,8 @@ cat <<EOF > $DIR_BUILD/boards/bfin-uclinux.exp
 $(cat $DIR_BOARDS/bfin-uclinux.exp.1)
 set_board_info hostname $TARGET_IPADDR
 set_board_info sockethost $TARGET_IPADDR:
-printf "$STACK_CHECKING_SET\n"
-printf "$SERIAL_DEBUG_PORT_SET\n"
+`printf "$STACK_CHECKING_SET\n"`
+`printf "$SERIAL_DEBUG_PORT_SET\n"`
 EOF
 
 #
@@ -1274,8 +1274,8 @@ $(cat $DIR_BOARDS/bfin-linux-uclibc.exp.1)
 set_board_info multilib_flags "-mcpu=$CPU_TYPE_REV"
 set_board_info hostname $TARGET_IPADDR
 set_board_info sockethost $TARGET_IPADDR:
-printf "$STACK_CHECKING_SET\n"
-printf "$SERIAL_DEBUG_PORT_SET\n"
+`printf "$STACK_CHECKING_SET\n"`
+`printf "$SERIAL_DEBUG_PORT_SET\n"`
 EOF
 
 #
