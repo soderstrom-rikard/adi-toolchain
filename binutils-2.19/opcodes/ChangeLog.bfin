@@ -1,3 +1,0 @@
-2009-01-14  Mike Frysinger  <michael.frysinger@analog.com>
-
-	* bfin-dis.c (OUTS): Use "%s" as format string.
