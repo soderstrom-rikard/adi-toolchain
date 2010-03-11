@@ -1193,7 +1193,7 @@ run_tests()
 	echo_date "Done testing - results"
 
 	local compare_summary="${result_dir}/compare_summary"
-        echo "### Old compare sumary is in: ${compare_summary}"  > ${compare_summary}
+	echo "### Old compare sumary is in: ${compare_summary}"  > ${compare_summary}
 
 	for new_sum in $(find "${result_dir}" -name '*.sum' | sort)
 	do
@@ -1207,11 +1207,11 @@ run_tests()
 		echo "### New: ${n} in ${new_sum%/*}"
 		egrep "=== .*Sum.* ===|^# of" $new_sum
 
-                (
+		(
 		if [ -n "$RESULTS2COMPARE" ] ; then
 			old_sum=$RESULTS2COMPARE/${test_target}/$n
 			if [ -f $old_sum ] ; then
-		                echo
+				echo
 				echo "### Compared with the old: ${old_sum##*/} in ${old_sum%/*}"
 				`printf '%s\n' "$DIR_SOURCE"/gcc-*/contrib/compare_tests | tail -n 1` \
 					"$old_sum" "$new_sum"
@@ -1219,10 +1219,9 @@ run_tests()
 				echo "Could not find $old_sum to compare"
 			fi
 		fi
-                ) >> "${compare_summary}" 2>&1
+		) >> "${compare_summary}" 2>&1
 	done
 	echo
-	
 }
 
 
