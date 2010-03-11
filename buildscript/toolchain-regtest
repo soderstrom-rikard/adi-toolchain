@@ -299,7 +299,7 @@ for tt in ${TEST_TARGETS} ; do
 	mk_output_dir "${tt}" "${results}"
 	if [ -n "${RESULTS2COMPARE}" ] ; then
 		d="${RESULTS2COMPARE}/${tt}"
-		is_abs_dir "${d}" && m=" (!!missing!!)" || m=
+		is_abs_dir "${d}" && m= || m=" (!!missing!!)" 
 		notice "Previous ${tt} test logs${m}" "${d}"
 	fi
 done
@@ -1192,9 +1192,9 @@ run_tests()
 
 	echo_date "Done testing - results"
 
-	local summary="${result_dir}/summary"
-	(
-	echo Sumary is in: ${summary}
+	local compare_summary="${result_dir}/compare_summary"
+        echo "### Old compare sumary is in: ${compare_summary}"  > ${compare_summary}
+
 	for new_sum in $(find "${result_dir}" -name '*.sum' | sort)
 	do
 		# clean up the log to make manual `diff` easier
@@ -1204,21 +1204,25 @@ run_tests()
 
 		n=${new_sum##*/}
 		echo
-		echo New: ${n} in ${new_sum%/*}
+		echo "### New: ${n} in ${new_sum%/*}"
 		egrep "=== .*Sum.* ===|^# of" $new_sum
+
+                (
 		if [ -n "$RESULTS2COMPARE" ] ; then
 			old_sum=$RESULTS2COMPARE/${test_target}/$n
 			if [ -f $old_sum ] ; then
-				echo "Old: ${old_sum##*/} in ${old_sum%/*}"
+		                echo
+				echo "### Compared with the old: ${old_sum##*/} in ${old_sum%/*}"
 				`printf '%s\n' "$DIR_SOURCE"/gcc-*/contrib/compare_tests | tail -n 1` \
 					"$old_sum" "$new_sum"
 			else
 				echo "Could not find $old_sum to compare"
 			fi
 		fi
+                ) >> "${compare_summary}" 2>&1
 	done
 	echo
-	) 2>&1 | tee "${summary}"
+	
 }
 
 
