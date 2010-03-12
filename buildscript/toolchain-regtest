@@ -57,11 +57,17 @@ _test_targets()
 test_targets_queue() { TEST_TARGETS="${TEST_TARGETS} `_test_targets $*`" ; }
 test_targets_has()
 {
-	local t
+	local t i
 	for t in `_test_targets "$@"` ; do
+            if [ "$@" = "LINUX" ] ; then
+                has ${t} ${TEST_TARGETS} && return 0
+                i=1
+            else
 		has ${t} ${TEST_TARGETS} || return 1
+                i=0
+            fi
 	done
-	return 0
+	return $i
 }
 
 VALID_TESTS="
