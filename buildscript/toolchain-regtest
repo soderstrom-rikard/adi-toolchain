@@ -779,7 +779,7 @@ detect()
 		return 1
 	fi
 
-	VERSION=`${tool} --version 2>&1 | awk '{print $NF; exit;}'`
+	VERSION=`${tool} --version 2>&1 | sed -e 's/([^)]*)//g' | awk '{print $NF; exit;}'`
 	if [ -z "${ver}" ] ; then
 		notice "$pkg version" "$VERSION"
 	elif [ "${ver}" != "$VERSION" ] ; then
