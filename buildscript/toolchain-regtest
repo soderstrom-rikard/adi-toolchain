@@ -57,15 +57,9 @@ _test_targets()
 test_targets_queue() { TEST_TARGETS="${TEST_TARGETS} `_test_targets $*`" ; }
 test_targets_has()
 {
-	local t i
+	local t i=1
 	for t in `_test_targets "$@"` ; do
-            if [ "$@" = "LINUX" ] ; then
-                has ${t} ${TEST_TARGETS} && return 0
-                i=1
-            else
-		has ${t} ${TEST_TARGETS} || return 1
-                i=0
-            fi
+		has ${t} ${TEST_TARGETS} && i=0
 	done
 	return $i
 }
