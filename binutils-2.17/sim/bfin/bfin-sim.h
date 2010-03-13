@@ -170,7 +170,7 @@ do { \
   if (__cnt != size / 8) \
    { \
      if (taddr >= BFIN_SYSTEM_MMR_BASE) \
-       /*raise_exception (cpu, VEC_ILL_RES)*/; \
+       raise_exception (cpu, VEC_ILL_RES); \
      else \
        raise_exception (cpu, VEC_CPLB_I_M); \
    } \
