@@ -323,7 +323,7 @@ bfin_initialize_cpu (SIM_DESC sd, SIM_CPU *cpu)
   PUT_LONG (IPEND, 0x2);
 
   /* Set default stack to top of scratch pad.  */
-  SPREG = BFIN_L1_SRAM_SCRATCH_END;
+  SPREG = BFIN_DEFAULT_MEM_SIZE;
 }
 
 SIM_DESC
