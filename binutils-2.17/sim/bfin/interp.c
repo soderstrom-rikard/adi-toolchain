@@ -30,77 +30,13 @@
 #include "gdb/callback.h"
 #include "gdb/signals.h"
 #include "sim-main.h"
+#include "sim-hw.h"
 #include "targ-vals.h"
 
-static void bfin_trap (SIM_CPU *);
+#include "dv-bfin_cec.h"
+#include "dv-bfin_evt.h"
 
 static char **prog_argv;
-
-#define excp_to_sim_halt(reason, sigrc) \
-  sim_engine_halt (CPU_STATE (cpu), cpu, NULL, PCREG, reason, sigrc)
-void
-raise_exception (SIM_CPU *cpu, unsigned int excp)
-{
-  int sigrc = -1;
-
-  /* Ideally what would happen here for real hardware exceptions (not
-   * fake sim ones) is that:
-   *  - For service exceptions (excp <= 0x11):
-   *     RETX is the _next_ PC which can be tricky with jumps/hardware loops/...
-   *  - For error exceptions (excp > 0x11):
-   *     RETX is the _current_ PC (i.e. the one causing the exception)
-   *  - PC is loaded with EVT3 MMR
-   *  - ILAT/IPEND in CEC is updated depending on current IVG level
-   *  - the fault address MMRs get updated with data/instruction info
-   *  - Execution continues on in the EVT3 handler
-   */
-
-  if (excp <= 0x3f)
-    {
-      SEQSTATREG = (SEQSTATREG & ~(0x3f)) | excp;
-      /* XXX: this should go into ILATCH if in <=NMI.  */
-      SET_IPEND (1 << 3);
-    }
-
-  switch (excp)
-    {
-    case VEC_SYS:
-      bfin_trap (cpu);
-      break;
-
-    case VEC_SIM_EMUEXCPT:
-    case VEC_EXCPT01:	/* userspace gdb breakpoint */
-      sigrc = SIM_SIGTRAP;
-      break;
-
-    case VEC_SIM_HLT:	/* simulator wants to halt */
-      excp_to_sim_halt (sim_exited, 0);
-      break;
-
-    case VEC_UNDEF_I:	/* undefined instruction */
-      sigrc = SIM_SIGILL;
-      break;
-
-    case VEC_ILL_RES:	/* illegal supervisor resource */
-    case VEC_MISALI_I:	/* misaligned instruction */
-      sigrc = SIM_SIGBUS;
-      break;
-
-    case VEC_CPLB_M:
-    case VEC_CPLB_I_M:
-      sigrc = SIM_SIGSEGV;
-      break;
-
-    default:
-      fprintf (stderr, "Unhandled exception %#x at 0x%08x\n", excp, PCREG);
-      sigrc = SIM_SIGILL;
-      break;
-    }
-
-  if (sigrc != -1)
-    excp_to_sim_halt (sim_stopped, sigrc);
-  CLEAR_IPEND (1 << 3);
-}
 
 /* Count the number of arguments in an argv.  */
 static int
@@ -141,7 +77,7 @@ syscall_write_mem (host_callback *cb, struct cb_syscall *sc,
 /* Simulate a monitor trap, put the result into r0 and errno into r1
    return offset by which to adjust pc.  */
 
-static void
+void
 bfin_trap (SIM_CPU *cpu)
 {
   SIM_DESC sd = CPU_STATE (cpu);
@@ -219,7 +155,13 @@ step_once (SIM_CPU *cpu)
   bu32 oldpc = PCREG;
 
   if (oldpc & 0x1)
-    raise_exception (cpu, VEC_MISALI_I);
+    cec_exception (cpu, VEC_MISALI_I);
+
+#if 0
+  /* XXX: Is this what happens on the hardware ?  */
+  if (cec_get_ivg (cpu) == EVT_EMU)
+    cec_return (cpu, EVT_EMU);
+#endif
 
   BFIN_CPU_STATE.did_jump = false;
   interp_insn_bfin (cpu, oldpc);
@@ -288,6 +230,15 @@ bfin_map_layout (SIM_DESC sd, SIM_CPU *cpu, size_t count,
 }
 
 static void
+bfin_hw_tree_init (SIM_DESC sd)
+{
+  /* STATE_ENVIRONMENT (sd) = OPERATING_ENVIRONMENT; */
+
+  sim_hw_parse (sd, "/core/bfin_evt/reg %#x %i", BFIN_COREMMR_EVT_BASE, 4 * 16);
+  sim_hw_parse (sd, "/core/bfin_cec/reg %#x %i", BFIN_COREMMR_IMASK, 4 * 4);
+}
+
+static void
 bfin_initialize_cpu (SIM_DESC sd, SIM_CPU *cpu)
 {
   size_t idx;
@@ -314,13 +265,6 @@ bfin_initialize_cpu (SIM_DESC sd, SIM_CPU *cpu)
 
   /* Map in the on-chip memory (bootrom/sram/etc...).  */
   bfin_map_layout (sd, cpu, mdata->mem_count, mdata->mem);
-
-  /* Map in the on-chip MMRs.  */
-  bfin_map_layout (sd, cpu, mdata->core_mmrs_count, mdata->core_mmrs);
-
-  /* Initialize the CEC.  */
-  PUT_IMASK (0);
-  PUT_LONG (IPEND, 0x2);
 
   /* Set default stack to top of scratch pad.  */
   SPREG = BFIN_DEFAULT_MEM_SIZE;
@@ -359,6 +303,9 @@ sim_open (SIM_OPEN_KIND kind, host_callback *callback,
       free_state (sd);
       return 0;
     }
+
+  /* Need to set up the tree now before the sim_post_argv_init().  */
+  bfin_hw_tree_init (sd);
 
   /* Allocate external memory if none specified by user.
      Use address 4 here in case the user wanted address 0 unmapped.  */

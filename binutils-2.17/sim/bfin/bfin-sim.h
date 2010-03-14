@@ -163,6 +163,10 @@ struct bfin_cpu_state
     } \
   while (0)
 
+#define SYSCFG_SSSTEP	(1 << 0)
+#define SYSCFG_CCEN		(2 << 0)
+#define SYSCFG_SNEN		(3 << 0)
+
 #define __PUT_MEM(taddr, v, size) \
 do { \
   bu##size __v = (v); \
@@ -170,9 +174,9 @@ do { \
   if (__cnt != size / 8) \
    { \
      if (taddr >= BFIN_SYSTEM_MMR_BASE) \
-       raise_exception (cpu, VEC_ILL_RES); \
+       cec_exception (cpu, VEC_ILL_RES); \
      else \
-       raise_exception (cpu, VEC_CPLB_I_M); \
+       cec_exception (cpu, VEC_CPLB_I_M); \
    } \
 } while (0)
 #define PUT_BYTE(taddr, v) __PUT_MEM(taddr, v, 8)
@@ -186,57 +190,18 @@ do { \
   if (__cnt != size / 8) \
    { \
      if (taddr >= BFIN_SYSTEM_MMR_BASE) \
-       raise_exception (cpu, VEC_ILL_RES); \
+       cec_exception (cpu, VEC_ILL_RES); \
      else \
-       raise_exception (cpu, VEC_CPLB_I_M); \
+       cec_exception (cpu, VEC_CPLB_I_M); \
    } \
   __ret; \
 })
+
 #define GET_BYTE(taddr) __GET_MEM(taddr, 8)
 #define GET_WORD(taddr) __GET_MEM(taddr, 16)
 #define GET_LONG(taddr) __GET_MEM(taddr, 32)
 
 extern void interp_insn_bfin (SIM_CPU *, bu32);
-
-#define VEC_SYS		(0)
-#define VEC_EXCPT01	(1)
-#define VEC_EXCPT02	(2)
-#define VEC_EXCPT03	(3)
-#define VEC_EXCPT04	(4)
-#define VEC_EXCPT05	(5)
-#define VEC_EXCPT06	(6)
-#define VEC_EXCPT07	(7)
-#define VEC_EXCPT08	(8)
-#define VEC_EXCPT09	(9)
-#define VEC_EXCPT10	(10)
-#define VEC_EXCPT11	(11)
-#define VEC_EXCPT12	(12)
-#define VEC_EXCPT13	(13)
-#define VEC_EXCPT14	(14)
-#define VEC_EXCPT15	(15)
-#define VEC_STEP	(16)
-#define VEC_OVFLOW	(17)
-#define VEC_UNDEF_I	(33)
-#define VEC_ILGAL_I	(34)
-#define VEC_CPLB_VL	(35)
-#define VEC_MISALI_D	(36)
-#define VEC_UNCOV	(37)
-#define VEC_CPLB_M	(38)
-#define VEC_CPLB_MHIT	(39)
-#define VEC_WATCH	(40)
-#define VEC_ISTRU_VL	(41)	/*ADSP-BF535 only (MH) */
-#define VEC_MISALI_I	(42)
-#define VEC_CPLB_I_VL	(43)
-#define VEC_CPLB_I_M	(44)
-#define VEC_CPLB_I_MHIT	(45)
-#define VEC_ILL_RES	(46)	/* including unvalid supervisor mode insn */
-/* The hardware reserves (63) for future use - we use it to tell our
- * normal exception handling code we have a hardware error
- */
-#define VEC_HWERR	(63)
-#define VEC_SIM_HLT	(64)
-#define VEC_SIM_EMUEXCPT	(65)
-extern void raise_exception (SIM_CPU *, unsigned int excp);
 
 /* Defines for Blackfin memory layouts.  */
 #define BFIN_ASYNC_BASE           0x20000000
@@ -247,20 +212,5 @@ extern void raise_exception (SIM_CPU *, unsigned int excp);
 #define BFIN_L1_SRAM_SCRATCH_END  (BFIN_L1_SRAM_SCRATCH + BFIN_L1_SRAM_SCRATCH_SIZE)
 
 #define BFIN_L1_CACHE_BYTES       32
-
-/* Core MMRs.  */
-#define IMASK              0xFFE02104   /* Interrupt Mask Register */
-#define IPEND              0xFFE02108   /* Interrupt Pending Register */
-#define ILAT               0xFFE0210C   /* Interrupt Latch Register */
-
-/* Some events may never be unmasked.  */
-#define PUT_IMASK(val)   PUT_LONG (IMASK, (val) | 0x1f)
-#define CLEAR_IPEND(val) PUT_LONG (IPEND, GET_LONG (IPEND) & ~(val))
-#define SET_IPEND(val)   PUT_LONG (IPEND, GET_LONG (IPEND) |  (val))
-
-#define IS_SUPV() (GET_LONG (IPEND) & ~(1 << 4))
-#define IS_USER() (! IS_SUPV ())
-#define REQUIRE_SUPERVISOR() \
-  do { if (IS_USER ()) raise_exception (cpu, VEC_ILL_RES); } while (0)
 
 #endif

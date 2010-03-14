@@ -28,6 +28,7 @@
 #include "gdb/signals.h"
 #include "opcode/bfin.h"
 #include "sim-main.h"
+#include "dv-bfin_cec.h"
 
 #define M_S2RND 1
 #define M_T     2
@@ -47,7 +48,7 @@ static __attribute__ ((noreturn)) void
 illegal_instruction (SIM_CPU *cpu)
 {
   while (1) /* avoid gcc warnings about returning */
-    raise_exception (cpu, VEC_UNDEF_I);
+    cec_exception (cpu, VEC_UNDEF_I);
 }
 
 static __attribute__ ((noreturn)) void
@@ -609,6 +610,7 @@ get_allreg (SIM_CPU *cpu, int grp, int reg)
       return 0;
     }
 }
+#define REQUIRE_SUPERVISOR() cec_get_ivg (cpu)
 static int
 reg_requires_sup (SIM_CPU *cpu, bu32 *whichreg)
 {
@@ -937,39 +939,17 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
     /* RTS */
     PCREG = RETSREG;
   else if (prgfunc == 1 && poprnd == 1)
-    {
-      /* RTI -- not valid in emulation, nmi, exception, or user.  */
-      bu32 ipend = GET_LONG (IPEND) & ~0xd;
-      if (! ipend)
-	raise_exception (cpu, VEC_ILL_RES);
-      PCREG = RETIREG;
-      PUT_LONG (IPEND, 1 << (ffs (ipend) - 1));
-      /* XXX: only allowed in supervisor, and touchs CEC */
-    }
+   /* RTI */
+   cec_return (cpu, -1);
   else if (prgfunc == 1 && poprnd == 2)
-    {
-      /* RTX -- only valid in exception.  */
-      if (! (GET_LONG (IPEND) & (1 << 3)))
-	raise_exception (cpu, VEC_ILL_RES);
-      PCREG = RETXREG;
-      CLEAR_IPEND (1 << 3);
-    }
+   /* RTX */
+   cec_return (cpu, IVG_EVX);
   else if (prgfunc == 1 && poprnd == 3)
-    {
-      /* RTN -- only valid in nmi.  */
-      if (! (GET_LONG (IPEND) & (1 << 2)))
-	raise_exception (cpu, VEC_ILL_RES);
-      PCREG = RETNREG;
-      CLEAR_IPEND (1 << 2);
-    }
+   /* RTN */
+   cec_return (cpu, IVG_NMI);
   else if (prgfunc == 1 && poprnd == 4)
-    {
-      /* RTE -- only valid in emulation mode.  */
-      if (! (GET_LONG (IPEND) & (1 << 0)))
-	raise_exception (cpu, VEC_ILL_RES);
-      PCREG = RETEREG;
-      CLEAR_IPEND (1 << 0);
-    }
+   /* RTE */
+   cec_return (cpu, IVG_EMU);
   else if (prgfunc == 2 && poprnd == 0)
     {
       /* IDLE */
@@ -987,26 +967,20 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
     {
       /* EMUEXCPT */
       PCREG += 2;
-      RETEREG = PCREG;
-      raise_exception (cpu, VEC_SIM_EMUEXCPT);
-      /* XXX: should update ILAT/IPEND in CEC */
+      cec_raise (cpu, IVG_EMU);
     }
   else if (prgfunc == 3)
     {
       /* CLI dregs */
       bu32 *whichreg = get_allreg (cpu, DREG_GRP, poprnd);
-      REQUIRE_SUPERVISOR ();
-      *whichreg = GET_LONG (IMASK);
-      PUT_IMASK (0);
+      *whichreg = cec_cli (cpu);
       PCREG += 2;
-      /* XXX: what about IPEND[4] ?  */
     }
   else if (prgfunc == 4)
     {
       /* STI dregs */
       bu32 *whichreg = get_allreg (cpu, DREG_GRP, poprnd);
-      REQUIRE_SUPERVISOR ();
-      PUT_IMASK (*whichreg);
+      cec_sti (cpu, *whichreg);
       PCREG += 2;
       /* XXX: what about IPEND[4] ?  */
     }
@@ -1039,16 +1013,15 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
   else if (prgfunc == 9)
     {
       /* RAISE */
-      REQUIRE_SUPERVISOR ();
-      unhandled_instruction (cpu, "RAISE uimm4");
-      /* XXX: should update ILAT/IPEND in CEC */
+      PCREG += 2;
+      cec_raise (cpu, uimm4 (poprnd));
     }
   else if (prgfunc == 10)
     {
       /* EXCPT uimm4 */
-      /* XXX: see comments in raise_exception() */
+      /* XXX: see comments in cec_exception() */
       PCREG += 2;
-      raise_exception (cpu, uimm4 (poprnd));
+      cec_exception (cpu, uimm4 (poprnd));
     }
   else if (prgfunc == 11)
     unhandled_instruction (cpu, "TESTSET");
@@ -1140,7 +1113,7 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
 	     and bit 1 is set (when handling nested interrupts).
 	     Also need to check behavior wrt SNEN in SYSCFG.  */
 	  if (whichreg == &RETIREG)
-	    CLEAR_IPEND (1 << 4);
+	    cec_pop_reti (cpu);
 	}
       SPREG += 4;
     }
@@ -1163,7 +1136,7 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
 	     and bit 1 is set (when handling nested interrupts).
 	     Also need to check behavior wrt SNEN in SYSCFG.  */
 	  if (whichreg == &RETIREG)
-	    SET_IPEND (1 << 4);
+	    cec_push_reti (cpu);
 	}
 
       PUT_LONG (SPREG, value);
@@ -3294,7 +3267,7 @@ decode_psedoDEBUG_0 (SIM_CPU *cpu, bu16 iw0)
   else if (reg == 4 && fn == 3)
     {
       /* HLT */
-      raise_exception (cpu, VEC_SIM_HLT);
+      cec_exception (cpu, VEC_SIM_HLT);
       DREG (0) = 0;
     }
   else if (reg == 5 && fn == 3)
@@ -3350,7 +3323,7 @@ decode_psedodbg_assert_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	{
 	  fprintf (stderr, "DBGA/DBGAL failed at 0x%x: is 0x%x, should be 0x%x\n",
 		  PCREG, *reg & 0xffff, expected);
-	  raise_exception (cpu, VEC_ILGAL_I);
+	  cec_exception (cpu, VEC_ILGAL_I);
 	  DREG (0) = 1;
 	}
     }
@@ -3362,7 +3335,7 @@ decode_psedodbg_assert_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	{
 	  fprintf (stderr, "DBGA/DBGAH failed at 0x%x: is 0x%x, should be 0x%x\n",
 		  PCREG, *reg >> 16, expected);
-	  raise_exception (cpu, VEC_ILGAL_I);
+	  cec_exception (cpu, VEC_ILGAL_I);
 	  DREG (0) = 1;
 	}
     }

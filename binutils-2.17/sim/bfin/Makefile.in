@@ -28,6 +28,7 @@ SIM_RUN_OBJS = nrun.o
 SIM_OBJS = \
 	$(SIM_NEW_COMMON_OBJS) \
 	bfin-dis.o \
+	devices.o \
 	interp.o \
 	machs.o \
 	sim-cpu.o \

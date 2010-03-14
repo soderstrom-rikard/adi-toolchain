@@ -23,11 +23,6 @@
 #ifndef _BFIN_MAIN_SIM_H_
 #define _BFIN_MAIN_SIM_H_
 
-#define WITH_TARGET_BYTE_ORDER LITTLE_ENDIAN
-#define WITH_ALIGNMENT STRICT_ALIGNMENT
-
-#define SIM_HAVE_MODEL
-
 #include "sim-basics.h"
 #include "sim-signal.h"
 
