@@ -7,7 +7,9 @@
 .ifndef BFIN_HOST
 	.data
 _failmsg:
-	.ascii "fail\n"
+	.ascii "fail at PC=0x"
+_rets:
+	.ascii "12345678\n"
 _passmsg:
 	.ascii "pass\n"
 	.align 4
@@ -16,10 +18,16 @@ _params:
 	.long 0
 	.long 0
 	.long 0
-.endif
+
 	.text
 	.global __start
 __start:
+.else
+.global ___uClibc_main;
+___uClibc_main:
+.global _main;
+_main:
+.endif
 	.endm
 
 	.macro system_call nr:req
@@ -67,7 +75,30 @@ __pass:
 	exit 0
 
 __fail:
+.ifndef BFIN_HOST
+	P0.H = _rets;
+	P0.L = _rets;
+	R0 = RETS;
+	R0 += -4;
+	P1 = 8;
+	R2 = '9';
+	LSETUP (1f, 3f) LC0 = P1;
+1:
+	R1 = R0;
+	R1 >>= 28;
+	R1 += 0x30;
+	CC = R2 < R1;
+	IF !CC jump 2f;
+	R1 += 7;
+2:
+	B[P0++] = R1;
+3:
+	R0 <<= 4;
+
+	write 1, _failmsg, 23
+.else
 	write 1, _failmsg, 5
+.endif
 	exit 1
 
 	.macro imm32 reg:req, val:req
@@ -81,3 +112,18 @@ __fail:
 	\reg = R0;
 	R0 = [SP++];
 	.endm
+
+.ifndef BFIN_HOST
+	.macro loadsym reg:req, sym:req
+	\reg\().L = \sym;
+	\reg\().H = \sym;
+	.endm
+.else
+	.macro loadsym reg:req, sym:req
+	[--SP] = R0;
+	R0 = [P3 + \sym\()@GOT17M4];
+	\reg = R0;
+	R0 = [SP++];
+	.endm
+.endif
+

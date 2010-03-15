@@ -9,9 +9,9 @@ all: sim host
 sim: $(SIM)
 host: $(HOST)
 
-FLAGS = -nostdlib -g -o $@ $<
+FLAGS = -g -o $@ $<
 
-DO_SIM = bfin-elf-gcc -msim $(FLAGS)
+DO_SIM = bfin-elf-gcc -msim $(FLAGS) -nostdlib
 %.s.x: %.s ; $(DO_SIM)
 %.S.x: %.S ; $(DO_SIM)
 
