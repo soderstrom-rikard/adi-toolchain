@@ -2953,7 +2953,8 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     {
       /* dregs = [LA]SHIFT dregs BY dregs_lo (opt_S) */
       bu32 v = DREG (src1);
-      bs32 shft = (bs16)DREG (src0);
+      /* LSHIFT uses sign extended low 6 bits of dregs_lo.  */
+      bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
       if (shft < 0)
 	{
 	  if (sop == 2)
