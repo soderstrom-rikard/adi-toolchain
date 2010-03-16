@@ -119,15 +119,10 @@ do
             [ ! -d $OPTARG ] && error "Can't find old test results in $OPTARG"
             RESULTS2COMPARE=$OPTARG
             ;;
-        T)
-            TARGET_IPADDR=`expr "$OPTARG" : "\([0-9]*\.[0-9]*\.[0-9]*\.[0-9]*\)"`
-            [ "x$TARGET_IPADDR" = "x" ] && error "Target ip address in wrong format"
-            ;;
+        T)  TARGET_IPADDR=$OPTARG ;;
         s)  DIR_SOURCE=${OPTARG%/} ;;
         S)  SERIAL_DEBUG_PORT=true ;;
-        H)
-            HOST_TARGET="--host=$OPTARG"
-            ;;
+        H)  HOST_TARGET="--host=$OPTARG" ;;
         b)  DIR_BUILD=${OPTARG%/} ;;
         o)
             DIR_ELF_OUTPUT=$OPTARG-elf
@@ -335,110 +330,117 @@ kill_procs()
 	fi
 }
 
+dorsh()
+{
+	# rsh sucks and does not pass up its exit status, so we have to:
+	#  on board:
+	#    - send all output to stdout
+	#    - send exit status to stderr
+	#  on host:
+	#    - swap stdout and stderr
+	#    - pass exit status to `exit`
+	#    - send stderr back to stdout and up
+	(exit \
+		$(rsh -l root ${TARGET_IPADDR} "$@" 3>&1 1>&2 2>&3) \
+		2>&1) 2>&1
+}
+run_rsh_nodie_stdout()
+{
+	log_it rsh -l root ${TARGET_IPADDR} "$@"
+	dorsh "$@"
+}
+run_rsh_nodie()
+{
+	eval \($(requote run_rsh_nodie_stdout "$@")\) ${LOGFILE}
+}
+run_rcp()
+{
+	set -- rcp root@${TARGET_IPADDR}:"$@"
+	run_cmd "$@"
+}
+log_on_board()
+{
+	run_rsh_nodie "echo >/dev/console; echo $* >/dev/console"
+}
+
 # stop if there are any Xvfb or rsh processes, which might be lurking around from old runs
 kill_procs Xvfb
 
 if test_targets_has LINUX ; then
-    # stop if there are any rsh processes, which might be lurking around from old runs
-    kill_procs rsh
+	# stop if there are any rsh processes, which might be lurking around from old runs
+	kill_procs rsh
 
-    # Check if target board is available using ping, rcp and rsh.
-    RUN=`ping -n -c 1 $TARGET_IPADDR | grep -i Unreachable`
-    if [ "x$RUN" != "x" ] ; then
-        echo "Could not ping $TARGET_IPADDR - check network settings"
-        exit 1
-    fi
-    RUN=`rsh -l root $TARGET_IPADDR /bin/ls / 2>/dev/null | wc -l`
-    if [ $RUN -eq 0 ] ; then
-        echo "Can't rsh to $TARGET_IPADDR, check rsh client on host, and inet on target"
-        exit 1
-    fi
-    RUN=`rcp root@$TARGET_IPADDR:/bin/gdbserver $DIR_TEST_RESULTS/gdbserver`
-    if [ "x$RUN" != "x" ] ; then
-        echo "Check gdbserver is available on the target, and you can rcp"
-        exit 1
-    fi
-    if [ -f $DIR_TEST_RESULTS/gdbserver ] ; then
-        FDPIC_TARGET=`file $DIR_TEST_RESULTS/gdbserver | grep ELF | wc -l`
-        rm -f $DIR_TEST_RESULTS/gdbserver
-    fi
-    RUN=`rsh -l root $TARGET_IPADDR "cat /proc/maps" | grep \/ | wc -l`
-    FDPIC_TARGET=`expr $FDPIC_TARGET + $RUN`
-    # Check if the tcp connections are recycled on both
-    # target and host, which is needed to prevent the rsh
-    # and rcp connection failures.
+	# Check if target board is available using ping, rcp and rsh.
+	run_cmd ping -n -c 1 ${TARGET_IPADDR}
+	if ! run_rsh_nodie ls / ; then
+		error "Can't rsh to $TARGET_IPADDR, check rsh client on host, and inetd/rshd on target"
+	fi
 
-    printf "    checking host   /proc/sys/net/ipv4/tcp_tw_recycle : "
-    RUN=`cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
-    if [ "x$RUN" = "x" ] ; then
-        echo "NOT exist"
-        echo "   Your host kernel does NOT support Sysctl"
-        exit 1
-    fi
-    if [ "x$RUN" = "x0" ] ; then
-        echo "0"
-        echo "   Please run \"echo 1 > /proc/sys/net/ipv4/tcp_tw_recycle\" as root"
-        exit 1
-    else
-        echo "1 - looks OK"
-    fi
+	# See if the board is running FDPIC or FLAT
+	run_rcp /bin/gdbserver "${DIR_TEST_RESULTS}"/gdbserver
+	FDPIC_TARGET=0
+	if file "${DIR_TEST_RESULTS}"/gdbserver | grep -q ELF ; then
+		FDPIC_TARGET=1
+	elif run_rsh_nodie_stdout cat /proc/maps | grep -q /lib/ ; then
+		FDPIC_TARGET=1
+	fi
+	run_cmd rm "${DIR_TEST_RESULTS}"/gdbserver
 
-    printf "    checking target /proc/sys/net/ipv4/tcp_tw_recycle : "
-    RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
-    if [ "x$RUN" = "x" ] ; then
-        echo "NOT exist"
-        echo "   Please enable Sysctl when configure the kernel"
-        exit 1
-    fi
-    if [ "x$RUN" = "x0" ] ; then
-       printf "0 - setting to 1 "
-       rsh -l root $TARGET_IPADDR echo 1 \> /proc/sys/net/ipv4/tcp_tw_recycle
-       RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
-       if [ "x$RUN" = "x0" ] ; then
-           echo "Failure"
-           echo "Could not set target $TARGET_IPADDR /proc/sys/net/ipv4/tcp_tw_recycle to 1"
-           exit 1
-       else
-           echo "Sucess"
-       fi
-    else
-        echo "1 - looks OK"
-    fi
+	# Check if the tcp connections are recycled on both target
+	# and host, which is needed to prevent the rsh and rcp
+	# connection failures when doing many many connections.
 
-    RUN=`rsh -l root $TARGET_IPADDR cat /proc/cpuinfo | grep vendor_id | head -1 | awk -F: '{print $2}' | sed 's/^ *//'`
-    if [ "$RUN" != "Analog Devices" ] ; then
-        echo "Target $TARGET_IPADDR doesn't appear to be a Blackfin - sorry"
-        exit 1
-    fi
-    CPU_TYPE_REV=`rsh -l root $TARGET_IPADDR cat /proc/cpuinfo | grep model | awk '{print $4}' | sed 's/ADSP-//' | sed 's/BF/bf/'`
-    RUN=`rsh -l root $TARGET_IPADDR cat /proc/cpuinfo | grep stepping | awk '{print $3}'`
-    CPU_TYPE_REV=${CPU_TYPE_REV}-0.${RUN}
-    echo "    Target $TARGET_IPADDR is $CPU_TYPE_REV, using that for testing multilib"
+	sysctl="/proc/sys/net/ipv4/tcp_tw_recycle"
 
-    if [ $STACK_CHECKING ] ; then
-        echo "    Hardware tests will be compiled with optional stack overflow checking"
-    fi
-    if test_targets_has linux-uclibc ; then
-        if [ $FDPIC_TARGET -eq 0 ] ; then
-            echo "    Looks like flat userspace - I'll check /lib/*.so are the same when testing"
-        else
-            echo "    Your Target looks like it is running FDPIC userspace - I can't test on fdpic targets. Stopping"
-            exit 1
-        fi
-    fi
+	notice "Checking host sysctl" "${sysctl}"
+	RUN=`cat ${sysctl} 2>/dev/null`
+	[ -z "$RUN"    ] && error "unable to read ${sysctl}; check host kernel settings"
+	[ "$RUN" = "0" ] && error "please run: sudo sh -c 'echo 1 > ${sysctl}'"
 
-    RUN=`rsh -l root $TARGET_IPADDR "ps | grep syslog | grep -v grep | grep -v \"l 6\" | wc -l"`
-    if [ $RUN = 1 ] ; then
-        echo "    Board at ${TARGET_IPADDR} being set so syslog doesn't fill /var/log/messages"
-        rsh -l root $TARGET_IPADDR "sed -i 's/^slog.*$/slog:unknown:\/sbin\/syslogd -n -l 6/' /etc/inittab"
-        rsh -l root $TARGET_IPADDR "kill -HUP 1"
-    fi
-    rcp root@$TARGET_IPADDR:/var/log/messages $DIR_TEST_RESULTS/messages.boot
-    rsh -l root $TARGET_IPADDR "rm /var/log/messages"
-    rsh -l root $TARGET_IPADDR "touch /var/log/messages"
-    rsh -l root $TARGET_IPADDR "kill -HUP 1"
+	notice "Checking target sysctl" "${sysctl}"
+	if ! RUN=`run_rsh_nodie_stdout cat ${sysctl}` ; then
+		error "unable to read ${sysctl}; check Blackfin kernel settings"
+	fi
+	if [ "$RUN" = "0" ] ; then
+		run_rsh_nodie "echo 1 > ${sysctl}"
+		RUN=`run_rsh_nodie_stdout cat ${sysctl}`
+		if [ "$RUN" != "1" ] ; then
+			error "could not set ${sysctl} to 1"
+		fi
+	fi
+
+	# Check out the target CPU
+	if ! RUN=`run_rsh_nodie_stdout cat /proc/cpuinfo` ; then
+		error "unable to read Blackfin /proc/cpuinfo"
+	fi
+	if ! echo "${RUN}" | grep -q '^vendor_id.*Analog Devices' ; then
+		error "board doesn't appear to be a Blackfin"
+	fi
+	CPU_TYPE=`echo "${RUN}" | awk '$1 == "model" { print $4; exit }' | tr '[:upper:]' '[:lower:]' | sed 's:adsp-::'`
+	CPU_REV=`echo "${RUN}" | awk '$1 == "stepping" { print $NF; exit }'`
+	CPU_TYPE_REV="${CPU_TYPE}-0.${CPU_REV}"
+	notice "Detected board cpu" "${CPU_TYPE_REV}"
+
+	if [ $STACK_CHECKING ] ; then
+		echo "    Hardware tests will be compiled with optional stack overflow checking"
+	fi
+	if test_targets_has linux-uclibc ; then
+		if [ $FDPIC_TARGET -eq 0 ] ; then
+			echo  "    Looks like flat userspace - I'll check /lib/*.so are the same when testing"
+		else
+			error "    Your Target looks like it is running FDPIC userspace - I can't test on fdpic targets. Stopping"
+		fi
+	fi
+
+	# Make sure syslog doesnt grab debug messages (kernel dumps)
+	run_rcp /var/log/messages "${DIR_TEST_RESULTS}"/messages.boot
+	run_rsh_nodie '> /var/log/messages'
+	if run_rsh_nodie_stdout ps | grep syslog | grep -q -v -e '-l 6' ; then
+		echo "    Board at '${TARGET_IPADDR}' being set so syslog doesn't fill /var/log/messages"
+		run_rsh_nodie sed -i "'/^slog:/s:$: -l 6:'" /etc/inittab
+	fi
+	run_rsh_nodie kill -HUP 1
 fi
-
 
 ############ Done checking - lets get on to testing ###################
 
@@ -454,19 +456,13 @@ get_tuple()
 # by getting rid of it, we free up lots of memory.
 clean_hardware()
 {
-    hardware=`echo $1 | grep -i linux`
-    if [ -n "$hardware" ] ; then
-        RUN=`rsh -l root $TARGET_IPADDR free`
-        (echo "echo -e '###\n$RUN\nCleaning\n' $LOGFILE" ) | sh
-        rsh -l root $TARGET_IPADDR "rm *" 2>/dev/null
-        rsh -l root $TARGET_IPADDR "rm /tmp/*" 2>/dev/null
-        RUN=`rsh -l root $TARGET_IPADDR free`
-        (echo "echo -e '###\n$RUN\n' $LOGFILE" ) | sh
+	# only clean targets running under Linux
+	case $1 in *linux*) ;; *) return 0 ;; esac
 
-        #we dump something onto the console so we can track which application caused a crash
-        rsh -l root $TARGET_IPADDR "echo > /dev/console; echo "testing $1 $2" > /dev/console"
-    fi
+	run_rsh_nodie 'free; find / /tmp/ -maxdepth 1 -type f -exec rm {} \; ; free'
 
+	# we dump something onto the console so we can track which application caused a crash
+	log_on_board testing $1 $2
 }
 
 copy_test_results()
@@ -491,277 +487,67 @@ copy_test_results()
 # prepare_target test_target_dir
 prepare_target()
 {
-    hardware=`basename $1 | grep -i linux`
-    if [ -n "$hardware" ] ; then
-        # Check if target board is available using ping
-        TIMEOUT=0
-        RUN=`ping -n -c 1 $TARGET_IPADDR | grep -i Unreachable`
-        while ([ "x$RUN" != "x" ] && [ $TIMEOUT -lt 5 ])
-        do
-            RUN=`ping -n -c 1 $TARGET_IPADDR | grep -i Unreachable`
-            TIMEOUT=`expr $TIMEOUT + 1`
-            sleep 60
-        done
-        if [ "x$RUN" != "x" ] ; then
-            echo "Could not ping $TARGET_IPADDR - check network settings"
-            exit 1
-        fi
+	# only clean targets running Linux
+	case $1 in *linux*) ;; *) return 0 ;; esac
 
-        # Just in case we caused the kernel under test to crash, let's do a sanity test
-        # make sure syslogd is set to not log rsh/rcp as it will fill /var/log/messages
-        RUN=`rsh -l root $TARGET_IPADDR "ps | grep syslog | grep -v grep | grep -v \"l 6\" | wc -l"`
-        if [ "$RUN" = "1" ] ; then
-            echo " ** Resetting syslogd"
-            rsh -l root $TARGET_IPADDR "sed -i 's/^slog.*$/slog:unknown:\/sbin\/syslogd -n -l 6/' /etc/inittab"
-            rsh -l root $TARGET_IPADDR "kill -HUP 1"
-            #we dump something onto the console so we can track things
-            rsh -l root $TARGET_IPADDR "echo > /dev/console; echo "Setting syslogd" > /dev/console"
-        fi
+	log_it "preparing target board for more tests"
 
-        #  checking target /proc/sys/net/ipv4/tcp_tw_recycle
-        RUN=`rsh -l root $TARGET_IPADDR cat /proc/sys/net/ipv4/tcp_tw_recycle 2>/dev/null`
-        if [ "$RUN" = "0" ] ; then
-            echo " ** Setting tcp_tw_recycle"
-            rsh -l root $TARGET_IPADDR echo 1 \> /proc/sys/net/ipv4/tcp_tw_recycle
-            #we dump something onto the console so we can track things
-            rsh -l root $TARGET_IPADDR "echo > /dev/console; echo "Setting tcp_tw_recycle" > /dev/console"
-        fi
-    fi
+	# Check if target board is available using ping
+	local count=1
+	while ! run_cmd ping -n -c 1 ${TARGET_IPADDR} ; do
+		: $(( count += 1 ))
+		[ ${count} -gt 10 ] && error "could not ping target board - check network settings"
+		sleep 30
+	done
+
+	# Just in case we caused the kernel under test to crash, let's do a sanity test
+	# make sure syslogd is set to not log rsh/rcp as it will fill /var/log/messages
+	if run_rsh_nodie_stdout ps | grep syslog | grep -q -v -e '-l 6' ; then
+		log_on_board "Setting syslogd"
+		run_rsh_nodie '> /var/log/messages'
+		run_rsh_nodie sed -i "'/^slog:/s:$: -l 6:'" /etc/inittab
+		run_rsh_nodie kill -HUP 1
+	fi
+
+	# see sysctl logic in initial code above
+	run_rsh_nodie "echo 1 > /proc/sys/net/ipv4/tcp_tw_recycle"
 }
 
 # A very light check_tests_OK, which only check if the target board is hung.
 # Let runtest timeout handle host side.
-
+# Note: we cannot write to the log file here as the tests are running parallel.
 check_tests_OK()
 {
-    PID=$1
-    THRESHOLD=3
-    TRY=0
-    HARDWARE=`printf "%s" "$3" | grep -i hardware`
-    if [ $HARDWARE ] ; then
-	while [ 1 ]
-	do
-            # Check on the Host - if the test is done - quit
-            ps -p $PID &>/dev/null
-            if [ $? = 1 ] ; then
-		break;
-            fi
+	local pid=$1
 
-	    # make sure the board is not hung
-            RUN=`rsh -l root $TARGET_IPADDR "ls /  1>/dev/null" 2>&1 | wc -l`
-            if [ "$RUN" = "1" ] ; then
-		TRY=`expr $TRY + 1`
-	    else
-		TRY=0
-            fi
+	case $3 in
+	*linux*)
+		local timeout=0 limit=3
+		while :; do
+			# Check on the Host - if the test is done - quit
+			if ! ps -p $pid >/dev/null 2>&1 ; then
+				return 0
+			fi
 
-            if [ $TRY -gt $THRESHOLD ] ; then
-		echo "*** I think the board or network died during testing - sorry "
-		echo "*** Kill the current testing"
-		kill $PID
-		break
-            fi
-	    sleep 5
-	done
-    else
-	wait
-    fi
-}
+			# make sure the board is not hung
+			if ! dorsh ls / >/dev/null 2>&1 ; then
+				: $(( timeout += 1 ))
+			else
+				timeout=0
+			fi
 
-# The basic idea is that if things are not progressing at least every 10 minutes
-# something is hung, and we should kill it, and tell the user what was stuck
-#
-check_tests_OK1()
-{
-    PID=$1
-    HOST_THRESHOLD=7
-    TARGET_THRESHOLD=5
-    WAIT=1
-    WAIT_TARGET=1
-    HARDWARE=`printf "%s" "$3" | grep -i hardware`
-    # -n : numeric sort - kill the last process first
-    # -A : use ASCII, not UTF-8 or VT100
-    # -l : long lines (otherwise it cuts off at 132 char across
-    # -p : show pids of children
-    NEW=`pstree -n -A -l -p $PID`
-    # grep -v "\["     : remove kernel threads
-    # grep -v "/init"  : remove the init process
-    # grep -v " inetd" : remove initd
-    # grep -v "/rshd"  : remove rsh sesions
-    # grep -v " ps"    : remove ps processes (so we don't care about us running ps)
-    # grep -v " PID "  : remove the top line "  PID  Uid        VSZ Stat Command"
-    # grep -v "[ /]sh" : remove shell (sh and /bin/sh) processes
-    # grep -v " /s*bin/.*d" : remove /bin/watchdogd /sbin/klogd /sbin/syslogd
-    # sed '/^[[:space:]]*$/d' : remove blank lines
-    if [ -n "$HARDWARE" ] ; then
-        NEW_TARGET=`rsh -l root $TARGET_IPADDR "ps" | grep -v " ps" | grep -v "/rshd" |
-            grep -v "\[" | grep -v telnetd | grep -v "/init" | grep -v " inetd" |
-            grep -v " PID " | grep -v "[ /]sh" | grep -v " /s*bin/.*d" | sed '/^[[:space:]]*$/d'`
-            STUCK=`printf "${NEW_TARGET}" | wc -c`
-            if [ $STUCK -gt 0 ] ; then
-               echo " ** looks like random processes are running on the hardware already "
-               echo " ** ${NEW_TARGET}"
-            fi
-    fi
-    KILL=99999
-    while [ 1 ]
-    do
-        OLD=$NEW
-        OLD_TARGET=$NEW_TARGET
-        NEW=`pstree -n -A -l -p $PID`
-        if [ -n "$HARDWARE" ] ; then
-            NEW_TARGET=`rsh -l root $TARGET_IPADDR "ps" 2>&1 | grep -v " ps" | grep -v "/rshd" |
-                grep -v "\[" | grep -v telnetd | grep -v "/init" | grep -v " inetd" |
-                grep -v " PID " | grep -v "[ /]sh" | grep -v " /s*bin/.*d" | sed '/^[[:space:]]*$/d'`
-        fi
+			if [ ${timeout} -gt ${limit} ] ; then
+				echo "*** I think the board or network died during testing - sorry "
+				echo "*** Kill the current testing"
+				run_cmd_nodie kill $pid
+				return 1
+			fi
+			sleep 5
+		done
+		;;
 
-        # Chedk on the Host - if the test is done - quit
-        if [ -z "$NEW" ] ; then
-            break;
-        fi
-
-        # Check on the Host - are we waiting?
-        if [ "$NEW" = "$OLD" ] ; then
-           WAIT=`expr $WAIT + 1`
-        else
-            if [ $WAIT -gt $HOST_THRESHOLD ] ; then
-                echo " ** killing process $KILL_PID, seemed to fix things"
-                echo " ** $KILL_PS"
-                if [ -n "$HARDWARE" ] ; then
-                    # make sure the board is not hung
-                    RUN=`rsh -l root $TARGET_IPADDR "ls /  1>/dev/null" 2>&1 | wc -l`
-                    if [ "$RUN" = "1" ] ; then
-                        echo "*** I think the board or networked died during testing - sorry "
-                        break
-                    fi
-                fi
-            fi
-            WAIT=1
-            KILL=99999
-        fi
-
-        # Check Hardware
-        if [ -n "$HARDWARE" ] ; then
-            if [ "$NEW_TARGET" = "$OLD_TARGET" ] ; then
-                WAIT_TARGET=`expr $WAIT_TARGET + 1`
-            else
-                if [ $WAIT_TARGET -gt $TARGET_THRESHOLD ] ; then
-                    echo " ** killing processes on board seemed to help"
-                fi
-                WAIT_TARGET=1
-            fi
-
-            if [ $WAIT_TARGET -gt $TARGET_THRESHOLD ] ; then
-                # This should catch no route to host, as well as connection refused
-                STUCK=`printf "${NEW_TARGET}" | grep "^${TARGET_IPADDR}" | wc -l`
-                if [ $STUCK -gt 0 ] ; then
-                    echo " ** looks like the board has been dead for $TARGET_THRESHOLD minutes"
-                    break
-                fi
-                STUCK=`printf "${NEW_TARGET}" | wc -c`
-                if [ $STUCK -gt 0 ] ; then
-                    printf " ** looks like "
-                    for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $NF}')
-                    do
-		        printf "${TARGET_PID} "
-                    done
-                    echo "on the board is hung"
-                    for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $1}')
-                    do
-                       rsh -l root $TARGET_IPADDR "kill -9 ${TARGET_PID}"
-                    done
-                else
-                    # the board has been doing nothing for 7 minutes, so let's wait another 7
-                    WAIT_TARGET=1
-                fi
-            fi
-        fi
-
-        if [ $WAIT -gt $HOST_THRESHOLD ] ; then
-            KILL_PS=""
-            TREE=`pstree -n -A -l -p $PID | sed -e 's/-[-+]-/\n/g' -e 's/^[ \t]*//'`
-            NEW_KILL=`printf "$TREE" | wc -l`
-            if [ $NEW_KILL -lt $KILL ] ; then
-                # We add one, so when we subtract one below, it ends up being the correct number
-                KILL=`expr $NEW_KILL + 1`
-                echo " ** Testing $2 seems stuck, trying to kill some processes"
-            fi
-
-            # don't try to kill defunct processes - it is a waste of time
-            while [ -z "$KILL_PS" ]
-            do
-                KILL=`expr $KILL - 1`
-                if [ "$KILL" = "0" ] ; then
-                    echo "Test did not exit properly"
-                    exit 1
-                fi
-
-                KILL_PID=`echo "$TREE" | sed -n "${KILL}{p;q}" | awk -F\( '{print $NF}' | awk -F\) '{print $1}'`
-                KILL_PS=`ps $KILL_PID | grep -v "^[[:space:]]*PID" | grep -v " Z.*<defunct>"`
-            done
-
-            ps aux > $3/${2}.kill-${KILL_PID}
-            pstree -n -A -l -p $PID >> $3/${2}.kill-${KILL_PID}
-            if [ -n "$HARDWARE" ] ; then
-                rsh -l root $TARGET_IPADDR ps >> $3/${2}.kill-${KILL_PID}
-            fi
-            # if it is an rsh process on the host, it normally means a test is
-            # hung on the board, so let's kill that instead
-            RUN=`echo $KILL_PS | grep rsh`
-            if [ -n "$RUN" ] ; then
-                echo " ** This should never happen - board seems OK, but rsh process is stuck?"
-                STUCK=`printf "${NEW_TARGET}" | wc -c`
-                if [ $STUCK -gt 0 ] ; then
-                    printf " ** looks like "
-                    for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $NF}')
-                    do
-                        printf "${TARGET_PID} "
-                    done
-                    echo "on the board is hung"
-                    for TARGET_PID in $(echo ${NEW_TARGET} | awk '{print $1}')
-                    do
-                       rsh -l root $TARGET_IPADDR "kill -9 ${TARGET_PID}"
-                    done
-                else
-                    # The board just rebooted ?
-                    echo " ** I think I just caused the board to crash/reboot? This needs investigation."
-                    prepare_target $3
-                    kill -9 $KILL_PID
-                fi
-            else
-                kill -9 $KILL_PID
-            fi
-        fi
-        sleep 60
-    done
-
-    # Tests are complete - so let's copy crashes to test directory
-    hardware=`echo $3 | grep -i hardware`
-    if [ -n "$hardware" ] ; then
-        RUN=`rsh -l root $TARGET_IPADDR ps | grep syslog | grep -v grep | wc -l`
-        if [ $RUN = 1 ] ; then
-            rcp root@$TARGET_IPADDR:/var/log/messages $3/$2.kernel_log
-            rsh -l root $TARGET_IPADDR "rm /var/log/messages"
-            rsh -l root $TARGET_IPADDR "touch /var/log/messages"
-            rsh -l root $TARGET_IPADDR "kill -HUP 1"
-        fi
-    fi
-
-    TREE=`pstree -n -A -l -p $PID | sed -e 's/-[-+]-/\n/g' -e 's/^[ \t]*//' -e '/^[[:space:]]*$/d' | awk -F "(" '{print $NF}' | awk -F ")" '{print $1}'`
-    TREE_LEN=`printf "$TREE" | wc -c`
-    if [ $TREE_LEN -gt 0 ] ; then
-        echo " ** Aborting remaining tests"
-        echo $TREE
-        for KILL_PS in ${TREE}
-        do
-            RUN=`ps $KILL_PS | grep -v "^[[:space:]]*PID" | wc -l`
-            if [ $RUN -gt 0 ] ; then
-               ps $KILL_PS | grep -v "^[[:space:]]*PID"
-               kill $KILL_PS
-            fi
-        done
-    fi
-
+	*) wait ;;
+	esac
 }
 
 detect()
@@ -813,6 +599,7 @@ make_site_exp()
 	set HOSTCC gcc
 	set HOSTCFLAGS ""
 	EOF
+	run_cmd cat "${test_output}"/site.exp
 }
 
 # test_common <pkg-name> <testsuite-src> <version> <result-dir>
@@ -1063,56 +850,52 @@ test_libmudflap()
 
 prepare_target_solibs()
 {
-    # Make sure all the shared libs are actually on the target and are
-    # the same if we are testing on the hardware.
+	# Make sure all the shared libs are actually on the target and are
+	# the same if we are testing on the hardware.
 
-    # TODO
-    #
-    # * Check if linux kernel has fdpic feature enabled.
-    # * Check if there are shared libraries installed on target. (Try
-    #   to run a minimal program to see if it can run on target.)
-    # * Check if the shared libraries on target are same as those in
-    #   toolchain. (We may need --build-id from latest GNU ld.)
+	# TODO
+	#
+	# * Check if linux kernel has fdpic feature enabled.
+	# * Check if there are shared libraries installed on target. (Try
+	#   to run a minimal program to see if it can run on target.)
+	# * Check if the shared libraries on target are same as those in
+	#   toolchain. (We may need --build-id from latest GNU ld.)
 
-    # Current only copy shared libraries from toolchain to target
-    # when safe. That means only a flat image can be used for testing
-    # linux-uclibc.
+	# Current only copy shared libraries from toolchain to target
+	# when safe. That means only a flat image can be used for testing
+	# linux-uclibc.
 
-    if [ $FDPIC_TARGET -eq 0 ] ; then
+	[ $FDPIC_TARGET -ne 0 ] && return 0
 
-        detect_gcc gcc || return 1
+	detect_gcc gcc || return 1
 
-        echo_date "Checking shared libraries on target"
+	echo_date "Checking shared libraries on target"
 
-        GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
-        mkdir -p $GCC_BUILD/libs_for_target
-        rm -f $GCC_BUILD/libs_for_target/*
-        t=`$target_alias-gcc -mcpu=${CPU_TYPE_REV} -print-file-name=libc.a`
-        t=`dirname $t`/../..
-        for FILE in $t/lib/*so*
-        do
-            if ([ -e $FILE ] && [ -h $FILE ]) ; then
-                # don't check sym links
-                LIB=`readlink $FILE`
-                FILE=`basename $FILE`
-                LIB=`basename $LIB`
-                rsh -l root ${TARGET_IPADDR} "cd /lib; ln -s $LIB $FILE"
-            else
-                if [ -f $FILE ] ; then
-                    LIB=`basename ${FILE}`
-                    $target_alias-strip $FILE -o $GCC_BUILD/libs_for_target/${LIB}
-                    BOARD_LIB=`rsh -l root ${TARGET_IPADDR} "md5sum /lib/${LIB} | awk '{print \\$1}'"`
-                    TEST_LIB=`md5sum $GCC_BUILD/libs_for_target/${LIB} | awk '{print $1}'`
-                    if [ "$BOARD_LIB" != "$TEST_LIB" ] ; then
-                        echo "Libs on board are different, aborting tests"
-                        echo "specifically ${LIB} and ${FILE}"
-                        exit 1
-                    fi
-                fi
-            fi
-        done
-        rm -rf $GCC_BUILD/libs_for_target
-    fi
+	GCC_BUILD=$DIR_BUILD/gcc_build-$GCC_VERSION
+	run_cmd mkdir -p $GCC_BUILD/libs_for_target
+	run_cmd rm -f $GCC_BUILD/libs_for_target/*
+	t=`$target_alias-gcc -mcpu=${CPU_TYPE_REV} -print-file-name=libc.a`
+	t=`dirname $t`/../..
+	for FILE in $t/lib/*so* ; do
+		if [ -e $FILE ] && [ -h $FILE ] ; then
+			# don't check sym links
+			LIB=`readlink $FILE`
+			FILE=`basename $FILE`
+			LIB=`basename $LIB`
+			run_rsh_nodie "ln -s $LIB /lib/$FILE"
+		else
+			if [ -f $FILE ] ; then
+				LIB=`basename ${FILE}`
+				run_cmd $target_alias-strip $FILE -o $GCC_BUILD/libs_for_target/${LIB}
+				BOARD_LIB=`run_rsh_nodie_stdout md5sum /lib/${LIB} | awk '{print $1}'`
+				TEST_LIB=`md5sum $GCC_BUILD/libs_for_target/${LIB} | awk '{print $1}'`
+				if [ "$BOARD_LIB" != "$TEST_LIB" ] ; then
+					error "Libs on board are different (${LIB} and ${FILE}), aborting tests"
+				fi
+			fi
+		fi
+	done
+	run_cmd rm -rf $GCC_BUILD/libs_for_target
 }
 
 # run_tests $directory_test_results_go_in name_of_test
