@@ -3382,27 +3382,27 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
     decode_ALU2op_0 (cpu, iw0);
   else if ((iw0 & 0xFE00) == 0x4400)
     decode_PTR2op_0 (cpu, iw0);
-  else if (((iw0 & 0xF800) == 0x4800))
+  else if ((iw0 & 0xF800) == 0x4800)
     decode_LOGI2op_0 (cpu, iw0);
-  else if (((iw0 & 0xF000) == 0x5000))
+  else if ((iw0 & 0xF000) == 0x5000)
     decode_COMP3op_0 (cpu, iw0);
-  else if (((iw0 & 0xF800) == 0x6000))
+  else if ((iw0 & 0xF800) == 0x6000)
     decode_COMPI2opD_0 (cpu, iw0);
-  else if (((iw0 & 0xF800) == 0x6800))
+  else if ((iw0 & 0xF800) == 0x6800)
     decode_COMPI2opP_0 (cpu, iw0);
-  else if (((iw0 & 0xF000) == 0x8000))
+  else if ((iw0 & 0xF000) == 0x8000)
     decode_LDSTpmod_0 (cpu, iw0);
-  else if (((iw0 & 0xFF60) == 0x9E60))
+  else if ((iw0 & 0xFF60) == 0x9E60)
     decode_dagMODim_0 (cpu, iw0);
-  else if (((iw0 & 0xFFF0) == 0x9F60))
+  else if ((iw0 & 0xFFF0) == 0x9F60)
     decode_dagMODik_0 (cpu, iw0);
-  else if (((iw0 & 0xFC00) == 0x9C00))
+  else if ((iw0 & 0xFC00) == 0x9C00)
     decode_dspLDST_0 (cpu, iw0);
-  else if (((iw0 & 0xF000) == 0x9000))
+  else if ((iw0 & 0xF000) == 0x9000)
     decode_LDST_0 (cpu, iw0);
-  else if (((iw0 & 0xFC00) == 0xB800))
+  else if ((iw0 & 0xFC00) == 0xB800)
     decode_LDSTiiFP_0 (cpu, iw0);
-  else if (((iw0 & 0xE000) == 0xA000))
+  else if ((iw0 & 0xE000) == 0xA000)
     decode_LDSTii_0 (cpu, iw0);
   else if (((iw0 & 0xFF80) == 0xE080) && ((iw1 & 0x0C00) == 0x0000))
     decode_LoopSetup_0 (cpu, iw0, iw1, pc);
@@ -3424,9 +3424,9 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
     decode_dsp32shift_0 (cpu, iw0, iw1, pc);
   else if (((iw0 & 0xF7E0) == 0xC680) && ((iw1 & 0x0000) == 0x0000))
     decode_dsp32shiftimm_0 (cpu, iw0, iw1, pc);
-  else if (((iw0 & 0xFF00) == 0xF800))
+  else if ((iw0 & 0xFF00) == 0xF800)
     decode_psedoDEBUG_0 (cpu, iw0);
-  else if (((iw0 & 0xFF00) == 0xF900))
+  else if ((iw0 & 0xFF00) == 0xF900)
     decode_psedoOChar_0 (cpu, iw0);
   else if (((iw0 & 0xFF00) == 0xF000) && ((iw1 & 0x0000) == 0x0000))
     decode_psedodbg_assert_0 (cpu, iw0, iw1);
