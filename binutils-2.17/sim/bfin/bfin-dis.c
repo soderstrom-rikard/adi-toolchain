@@ -2987,7 +2987,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       acc <<= 32;
       acc |= AWREG(sop);
       DREG (dst0) &= 0xFFFF0000;
-      DREG (dst0) |= signbits (acc, 40);
+      DREG (dst0) |= (signbits (acc, 40) & 0xFFFF);
     }
   else if (sop == 3 && sopcde == 6)
     unhandled_instruction (cpu, "dregs_lo = ONES dregs");
