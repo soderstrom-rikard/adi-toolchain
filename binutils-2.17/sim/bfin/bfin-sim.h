@@ -52,7 +52,7 @@ struct store {
 struct bfin_cpu_state
 {
   bu32 dpregs[16], iregs[4], mregs[4], bregs[4], lregs[4], cycles[2];
-  bu32 a0x, a0w, a1x, a1w;
+  bu32 ax[2], aw[2];
   bu32 lt[2], lc[2], lb[2];
   int ac0, ac0_copy, ac1, an, aq;
   int av0, av0s, av1, av1s, az, cc, v, v_copy, vs;
@@ -79,10 +79,12 @@ struct bfin_cpu_state
 #define MREG(x)		(BFIN_CPU_STATE.mregs[x])
 #define BREG(x)		(BFIN_CPU_STATE.bregs[x])
 #define LREG(x)		(BFIN_CPU_STATE.lregs[x])
-#define A0XREG		(BFIN_CPU_STATE.a0x)
-#define A0WREG		(BFIN_CPU_STATE.a0w)
-#define A1XREG		(BFIN_CPU_STATE.a1x)
-#define A1WREG		(BFIN_CPU_STATE.a1w)
+#define AXREG(x)	(BFIN_CPU_STATE.ax[x])
+#define AWREG(x)	(BFIN_CPU_STATE.aw[x])
+#define A0XREG		(BFIN_CPU_STATE.ax[0])
+#define A0WREG		(BFIN_CPU_STATE.aw[0])
+#define A1XREG		(BFIN_CPU_STATE.ax[1])
+#define A1WREG		(BFIN_CPU_STATE.aw[1])
 #define CCREG		(BFIN_CPU_STATE.cc)
 #define LCREG(x)	(BFIN_CPU_STATE.lc[x])
 #define LTREG(x)	(BFIN_CPU_STATE.lt[x])

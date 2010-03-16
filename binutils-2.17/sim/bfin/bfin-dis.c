@@ -2981,21 +2981,13 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       DREG (dst0) &= 0xFFFF0000;
       DREG (dst0) |= signbits (sv1 >> 16, 16);
     }
-  else if (sop == 0 && sopcde == 6)
+  else if ((sop == 0 || sop == 1) && sopcde == 6)
     {
-      bu64 acc0 = A0XREG;
-      acc0 <<= 32;
-      acc0 |= A0WREG;
+      bu64 acc = AXREG(sop);
+      acc <<= 32;
+      acc |= AWREG(sop);
       DREG (dst0) &= 0xFFFF0000;
-      DREG (dst0) |= signbits (acc0, 40);
-    }
-  else if (sop == 1 && sopcde == 6)
-    {
-      bu64 acc1 = A1XREG;
-      acc1 <<= 32;
-      acc1 |= A1WREG;
-      DREG (dst0) &= 0xFFFF0000;
-      DREG (dst0) |= signbits (acc1, 40);
+      DREG (dst0) |= signbits (acc, 40);
     }
   else if (sop == 3 && sopcde == 6)
     unhandled_instruction (cpu, "dregs_lo = ONES dregs");
