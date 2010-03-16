@@ -18,6 +18,19 @@ Usage: regs
 Display the common core registers in a compact format.
 end
 
+define all_regs
+	regs
+	printf " B0 : %08x   L0 : %08x   M0 : %08x   I0 : %08x\n", $b0, $l0, $m0, $i0
+	printf " B1 : %08x   L1 : %08x   M1 : %08x   I1 : %08x\n", $b1, $l1, $m1, $i1
+	printf " B2 : %08x   L2 : %08x   M2 : %08x   I2 : %08x\n", $b2, $l2, $m2, $i2
+	printf " B3 : %08x   L3 : %08x   M3 : %08x   I3 : %08x\n", $b3, $l3, $m3, $i3
+	printf "A0.w: %08x  A0.x: %08x  A1.w: %08x  A1.x: %08x\n", $a0w, $a0x, $a1w, $a1x
+end
+document all_regs
+Usage: all_regs
+Display all core registers in a compact format.
+end
+
 define seqstat
 	if $argc == 1
 		set $$seqstat = $arg0
