@@ -54,7 +54,18 @@ illegal_instruction (SIM_CPU *cpu)
 static __attribute__ ((noreturn)) void
 unhandled_instruction (SIM_CPU *cpu, char *insn)
 {
-  fprintf (stderr, "Unhandled instruction at 0x%08x: \"%s\" ... aborting\n", PCREG, insn);
+  bu16 iw0 = GET_WORD (PCREG);
+  bu16 iw1 = GET_WORD (PCREG + 2);
+  bu32 iw2 = ((bu32)iw0 << 16) | iw1;
+
+  fprintf(stderr, "Unhandled instruction at 0x%08x (%s opcode 0x", PCREG, insn);
+  if ((iw0 & 0xc000) == 0xc000)
+    fprintf(stderr, "%08x", iw2);
+  else
+     fprintf(stderr, "%04x", iw0);
+
+  fprintf(stderr, ") ... aborting\n");
+
   illegal_instruction (cpu);
 }
 
