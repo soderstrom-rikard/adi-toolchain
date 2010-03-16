@@ -3052,32 +3052,36 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       DREG (dst0) = x;
       setflags_logical (cpu, DREG (dst0));
     }
-  else if (sop == 2 && sopcde == 10)
+  else if ((sop == 2 || sop == 3) && sopcde == 10)
     {
       /* dregs = DEPOSIT (dregs, dregs) */
-      bu32 v = DREG (src0);
-      bu32 x = DREG (src1);
-      bu32 mask = (1 << (v & 0x1f)) - 1;
-      bu32 fgnd = (v >> 16) & mask;
-      int shft = ((v >> 8) & 0x1f);
+      /* dregs = DEPOSIT (dregs, dregs) (X) */
+      /* The first dregs is the "background" while the second dregs is the
+       * "foreground".  The fg reg is used to overlay the bg reg and is:
+       * | nnnn nnnn | nnnn nnnn | xxxp pppp | xxxL LLLL |
+       *  n = the fg bit field
+       *  p = bit position in bg reg to start LSB of fg field
+       *  L = number of fg bits to extract
+       * Using (X) sign-extends the fg bit field.
+       */
+      bu32 fg = DREG (src0);
+      bu32 bg = DREG (src1);
+      bu32 len = fg & 0x1f;
+      bu32 mask = (1 << len) - 1;
+      bu32 fgnd = (fg >> 16) & mask;
+      int shft = ((fg >> 8) & 0x1f);
+      if (len > 16)
+	illegal_instruction (cpu);
+      if (sop == 3)
+	{
+	  /* Sign extend the fg bit field.  */
+	  mask = -1;
+	  fgnd = ((bs32)(bs16)(fgnd << (16 - len))) >> (16 - len);
+	}
       fgnd <<= shft;
       mask <<= shft;
-      x &= ~mask;
-      DREG (dst0) = x | fgnd;
-      setflags_logical (cpu, DREG (dst0));
-    }
-  else if (sop == 3 && sopcde == 10)
-    {
-      /* dregs = DEPOSIT (dregs, dregs) */
-      bu32 v = DREG (src0);
-      bu32 x = DREG (src1);
-      bu32 mask = (1 << (v & 0x1f)) - 1;
-      bu32 fgnd = ((bs32)(bs16)(v >> 16)) & mask;
-      int shft = ((v >> 8) & 0x1f);
-      fgnd <<= shft;
-      mask <<= shft;
-      x &= ~mask;
-      DREG (dst0) = x | fgnd;
+      bg &= ~mask;
+      DREG (dst0) = bg | fgnd;
       setflags_logical (cpu, DREG (dst0));
     }
   else if (sop == 0 && sopcde == 11)
