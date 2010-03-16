@@ -127,3 +127,18 @@ __fail:
 	.endm
 .endif
 
+	.macro CHECKREG reg:req, val:req
+	DBGA (\reg\().L, ((\val) & 0xffff));
+	DBGA (\reg\().H, (((\val) >> 16) & 0xffff));
+	.endm
+
+	.macro init_r_regs val:req
+	r0 = \val;
+	r1 = \val;
+	r2 = \val;
+	r3 = \val;
+	r4 = \val;
+	r5 = \val;
+	r6 = \val;
+	r7 = \val;
+	.endm
