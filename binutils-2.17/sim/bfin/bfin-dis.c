@@ -93,12 +93,11 @@ dagadd (SIM_CPU *cpu, int dagno, bs32 modify)
   if (l)
     {
       if ((i + modify - b - l < 0 && modify > 0)
-	  || (i + modify - b >= 0 && modify < 0)
-	  || modify == 0)
+	  || (i + modify - b >= 0 && modify < 0))
 	val = i + modify;
-      else if (i + modify - b - l >= 0 && modify > 0)
+      else if (i + modify - b - l >= 0 && modify >= 0)
 	val = i + modify - l;
-      else if (i + modify - b < 0 && modify < 0)
+      else if (i + modify - b < 0 && modify <= 0)
 	val = i + modify + l;
     }
   else
