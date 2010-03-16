@@ -1,5 +1,6 @@
 # Blackfin testcase for signbits
 # mach: bfin
+# xfail: "need to implement (BREV) in sim" bfin-*
 
 	.include "testutils.inc"
 

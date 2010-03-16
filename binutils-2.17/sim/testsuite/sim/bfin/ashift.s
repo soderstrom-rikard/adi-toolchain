@@ -1,5 +1,6 @@
 # Blackfin testcase for ashift
 # mach: bfin
+# xfail: "need to implement ASHIFT in sim" bfin-*
 
 	.include "testutils.inc"
 
