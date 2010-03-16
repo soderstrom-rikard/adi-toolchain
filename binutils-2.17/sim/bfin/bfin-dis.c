@@ -1247,26 +1247,32 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
       bu32 result = srcop - dstop;
       int flgn = result >> 31;
       int overflow = (flgs ^ flgo) & (flgn ^ flgs);
+      int az = result == 0;
+      int ac0 = srcop < dstop;
 
-      ASTATREG (az) = result == 0;
-      ASTATREG (an) = flgn;
-      ASTATREG (ac0) = srcop < dstop;
+      /* Pointer compares only touch CC.  */
+      if (!G)
+	{
+	  ASTATREG (az) = az;
+	  ASTATREG (an) = flgn;
+	  ASTATREG (ac0) = ac0;
+	}
       switch (opc)
 	{
 	case 0: /* == */
-	  CCREG = ASTATREG (az);
+	  CCREG = az;
 	  break;
 	case 1: /* <, signed */
 	  CCREG = (flgn && !overflow) || (!flgn && overflow);
 	  break;
 	case 2: /* <=, signed */
-	  CCREG = (flgn && !overflow) || (!flgn && overflow) || ASTATREG (az);
+	  CCREG = (flgn && !overflow) || (!flgn && overflow) || az;
 	  break;
 	case 3: /* <, unsigned */
-	  CCREG = ASTATREG (ac0);
+	  CCREG = ac0;
 	  break;
 	case 4: /* <=, unsigned */
-	  CCREG = ASTATREG (ac0) | ASTATREG (az);
+	  CCREG = ac0 | az;
 	  break;
 	}
     }
