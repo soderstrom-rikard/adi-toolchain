@@ -36,8 +36,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <ctype.h>
 
-#define TRACE(x,y)
-
 
 struct hw_port_edge {
   int my_port;
