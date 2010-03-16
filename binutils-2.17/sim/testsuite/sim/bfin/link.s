@@ -5,8 +5,6 @@
 
 	start
 
-	.global _test
-_test:
 	/* give FP/RETS known/different values */
 	R7.H = 0xdead;
 	R7.L = 0x1234;

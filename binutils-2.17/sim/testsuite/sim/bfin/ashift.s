@@ -6,9 +6,8 @@
 
 	start
 
-	.global _test
-
-	/* 16-bit ashift and lshift uses a 6-bit signed  magnitude, which
+	/*
+	 * 16-bit ashift and lshift uses a 6-bit signed  magnitude, which
 	 * gives a range from -32 to 31.  In the case where the  magnitude
 	 * is -32, make sure the answer is correct.
 	 */

@@ -8,8 +8,6 @@
 
 	start
 
-	.global _test
-
 	loadsym P0, _buf0
 	loadsym P1, _buf1
 

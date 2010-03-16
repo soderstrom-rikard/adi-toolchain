@@ -5,8 +5,6 @@
 
 	start
 
-	.global _test
-
 	I0 = 0x1100 (X);
 	L0 = 0x10c0 (X);
 	M0 = 0 (X);

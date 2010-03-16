@@ -5,8 +5,6 @@
 
 	start
 
-	.global _test
-_test:
 	R0 = 0 (X);
 	R1 = 0 (X);
 	CC = R0 == R1;

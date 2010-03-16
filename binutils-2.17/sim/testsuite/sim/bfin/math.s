@@ -5,8 +5,6 @@
 
 	start
 
-	.global _test
-
 	R0 = 5;
 	R0 += -1;
 	R1 = 4;

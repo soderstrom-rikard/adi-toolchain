@@ -5,7 +5,6 @@
 
 	start
 
-	.global _test
 xx:
 	R0 = 1;
 	CALL red;

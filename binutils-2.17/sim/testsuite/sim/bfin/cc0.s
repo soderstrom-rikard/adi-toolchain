@@ -5,14 +5,12 @@
 
 	start
 
-	.global _test
-
 	# add 0x80000000 + 0x80000000
 	R1 = 1;
 	R1 <<= 31;
 	R0 = R1;
 	R0 = R0 + R1;
-	CC =  V ;    // check to see if av0 and ac get set
+	CC =  V;    // check to see if av0 and ac get set
 	CC &= AC0;
 	IF !CC JUMP art;
 	R1 = 0;

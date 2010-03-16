@@ -5,8 +5,6 @@
 
 	start
 
-	.global _test
-
 	.macro factorial num:req answer:req
 	R0 = \num (Z);
 	CALL _fact;

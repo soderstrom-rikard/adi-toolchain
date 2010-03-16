@@ -5,8 +5,6 @@
 
 	start
 
-	.global _test
-_test:
 	R0 = 0x123;
 	P0 = R0;
 	LSETUP (.L1, .L1) LC0 = P0;

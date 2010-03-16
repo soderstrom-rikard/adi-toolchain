@@ -5,8 +5,6 @@
 
 	start
 
-	.global _test
-_test:
 	/* Make sure size arg to LINK works */
 	R0 = SP;
 	LINK 0x20;

@@ -6,8 +6,6 @@
 
 	start
 
-	.global _test
-
 	M2 = -4 (X);
 	I2.H = 0x9000;
 	I2.L = 0;
