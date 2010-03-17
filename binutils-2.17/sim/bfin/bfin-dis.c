@@ -2599,46 +2599,34 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     unhandled_instruction (cpu, "dregs = BYTEOP2P (dregs_pair, dregs_pair) (RNDH,R)");
   else if (aop == 0 && aopcde == 22 && HL == 0)
     unhandled_instruction (cpu, "dregs = BYTEOP2P (dregs_pair, dregs_pair) (RNDL,aligndir)");
-  else if (aop == 0 && s == 0 && aopcde == 8)
+  else if ((aop == 0 || aop == 1) && s == 0 && aopcde == 8)
     {
-      /* A0 = 0 */
-      A0XREG = 0;
-      A0WREG = 0;
-    }
-  else if (aop == 1 && s == 0 && aopcde == 8)
-    {
-      /* A1 = 0 */
-      A1XREG = 0;
-      A1WREG = 0;
+      /* A0 = 0; */
+      /* A1 = 0; */
+      AXREG (aop) = 0;
+      AWREG (aop) = 0;
     }
   else if (aop == 2 && s == 0 && aopcde == 8)
     {
-      /* A1 = A0 = 0 */
+      /* A1 = A0 = 0; */
       A1XREG = A0XREG = 0;
       A1WREG = A0WREG = 0;
     }
-  else if (aop == 0 && s == 1 && aopcde == 8)
+  else if ((aop == 0 || aop == 1) && s == 1 && aopcde == 8)
     {
-      A0XREG = -(A0WREG >> 31);
-    }
-  else if (aop == 1 && s == 1 && aopcde == 8)
-    {
-      A1XREG = -(A1WREG >> 31);
+      AXREG (aop) = -(AWREG (aop) >> 31);
     }
   else if (aop == 2 && s == 1 && aopcde == 8)
     {
       A0XREG = -(A0WREG >> 31);
       A1XREG = -(A1WREG >> 31);
     }
-  else if (aop == 3 && s == 0 && aopcde == 8)
+  else if (aop == 3 && (s == 0 || s == 1) && aopcde == 8)
     {
-      A0XREG = A1XREG;
-      A0WREG = A1WREG;
-    }
-  else if (aop == 3 && s == 1 && aopcde == 8)
-    {
-      A1XREG = A0XREG;
-      A1WREG = A0WREG;
+      /* A0 = A1; */
+      /* A1 = A0; */
+      AXREG (s) = AXREG (!s);
+      AWREG (s) = AWREG (!s);
     }
   else if (aop == 3 && HL == 0 && aopcde == 16)
     unhandled_instruction (cpu, "A1 = ABS A1, A0 = ABS A0");
@@ -3001,9 +2989,9 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     }
   else if ((sop == 0 || sop == 1) && sopcde == 6)
     {
-      bu64 acc = AXREG(sop);
+      bu64 acc = AXREG (sop);
       acc <<= 32;
-      acc |= AWREG(sop);
+      acc |= AWREG (sop);
       DREG (dst0) &= 0xFFFF0000;
       DREG (dst0) |= (signbits (acc, 40) & 0xFFFF);
     }
