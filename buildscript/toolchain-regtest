@@ -437,7 +437,7 @@ if test_targets_has LINUX ; then
 	run_rsh_nodie '> /var/log/messages'
 	if run_rsh_nodie_stdout ps | grep syslog | grep -q -v -e '-l 6' ; then
 		echo "    Board at '${TARGET_IPADDR}' being set so syslog doesn't fill /var/log/messages"
-		run_rsh_nodie sed -i "'/^slog:/s:$: -l 6:'" /etc/inittab
+		run_rsh_nodie sed -i '"/^slog:/s:$: -l 6:"' /etc/inittab
 	fi
 	run_rsh_nodie kill -HUP 1
 fi
@@ -459,7 +459,7 @@ clean_hardware()
 	# only clean targets running under Linux
 	case $1 in *linux*) ;; *) return 0 ;; esac
 
-	run_rsh_nodie 'free; find / /tmp/ -maxdepth 1 -type f -exec rm {} \; ; free'
+	run_rsh_nodie 'free; find / /tmp/ -maxdepth 1 -type f -exec rm "{}" \; ; free'
 
 	# we dump something onto the console so we can track which application caused a crash
 	log_on_board testing $1 $2
