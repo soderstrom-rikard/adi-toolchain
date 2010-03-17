@@ -27,13 +27,13 @@
 
 static inline bu32 dv_load_4(const void *ptr)
 {
-	const char *c = ptr;
+	const unsigned char *c = ptr;
 	return (c[3] << 24) | (c[2] << 16) | (c[1] << 8) | (c[0]);
 }
 
 static inline void dv_store_4(void *ptr, bu32 val)
 {
-	char *c = ptr;
+	unsigned char *c = ptr;
 	c[3] = val >> 24;
 	c[2] = val >> 16;
 	c[1] = val >> 8;
