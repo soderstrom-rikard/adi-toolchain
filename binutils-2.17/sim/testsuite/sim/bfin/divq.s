@@ -1,9 +1,5 @@
-/********************************************************************
-*
-* This test tests out the DIVS and DIVQ instructions by impleneting a
-* quick signed divide function
-*
-*/
+# Blackfin testcase for divide instructions
+# mach: bfin
 
 #include "test.h"
 

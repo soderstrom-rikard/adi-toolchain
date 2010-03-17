@@ -1,8 +1,5 @@
-/********************************************************************
-*
-* This test tests out the Load instructions
-*
-*/
+# Blackfin testcase for register load instructions
+# mach: bfin
 
 #include "test.h"
 
