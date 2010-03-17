@@ -2645,19 +2645,41 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       AWREG (s) = AWREG (!s);
     }
   else if (aop == 3 && HL == 0 && aopcde == 16)
-    unhandled_instruction (cpu, "A1 = ABS A1, A0 = ABS A0");
+    {
+      /* A1 = ABS 1 , A0 = ABS A0 ; */
+      int i;
+      for (i = 0; i < 2; ++i)
+	{
+	  bu32 aw = AWREG (i);
+	  bu8 ax = AXREG (i);
+	  if (ax & 0x80)
+	    aw = -aw, ax = -ax;
+	  AWREG (i) = aw;
+	  AXREG (i) = ax;
+	}
+      /* XXX: what ASTAT flags need updating ?  */
+    }
   else if (aop == 0 && aopcde == 23 && HL == 1)
     unhandled_instruction (cpu, "dregs = BYTEOP3P (dregs_pair, dregs_pair) (HI,R)");
-  else if (aop == 1 && HL == 1 && aopcde == 16)
-    unhandled_instruction (cpu, "A1 = ABS A1");
-  else if (aop == 0 && HL == 1 && aopcde == 16)
-    unhandled_instruction (cpu, "A1 = ABS A0");
+  else if ((aop == 0 || aop == 1) && (HL == 0 || HL == 1) && aopcde == 16)
+    {
+      /* A0 = ABS A0; */
+      /* A0 = ABS A1; */
+      /* A1 = ABS A0; */
+      /* A1 = ABS A1; */
+      bu32 aw = AWREG (aop);
+      bu8 ax = AXREG (aop);
+      if (ax & 0x80)
+	aw = -aw, ax = -ax;
+      AWREG (HL) = aw;
+      AXREG (HL) = ax;
+
+      ASTATREG (az) = AWREG (HL) == 0 && AXREG (HL) == 0;
+      ASTATREG (an) = 0;
+      /* XXX: need to check AV[01] and AV[01]S */
+    }
   else if (HL == 0 && aop == 3 && aopcde == 12)
     unhandled_instruction (cpu, "dregs_lo = dregs (RND)");
-  else if (aop == 1 && HL == 0 && aopcde == 16)
-    unhandled_instruction (cpu, "A0 = ABS A1");
-  else if (aop == 0 && HL == 0 && aopcde == 16)
-    unhandled_instruction (cpu, "A0 = ABS A0");
   else if (aop == 3 && HL == 0 && aopcde == 15)
     {
       /* Vector NEG.  */
@@ -2696,19 +2718,46 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       setflags_nz_2x16 (cpu, DREG (dst0));
     }
   else if (aop == 3 && HL == 0 && aopcde == 14)
-    unhandled_instruction (cpu, "A1 = - A1 , A0 = - A0");
+    {
+      /* A1 = - A1 , A0 = - A0 ; */
+      AWREG (0) = -AWREG (0);
+      AXREG (0) = -AXREG (0);
+      AWREG (1) = -AWREG (1);
+      AXREG (1) = -AXREG (1);
+      /* XXX: what ASTAT flags need updating ?  */
+    }
   else if (HL == 1 && aop == 3 && aopcde == 12)
     unhandled_instruction (cpu, "dregs_hi = dregs (RND)");
   else if (aop == 0 && aopcde == 23 && HL == 0)
     unhandled_instruction (cpu, "dregs = BYTEOP3P (dregs_pair, dregs_pair) (LO,R)");
-  else if (aop == 0 && HL == 0 && aopcde == 14)
-    unhandled_instruction (cpu, "A0 = - A0");
-  else if (aop == 1 && HL == 0 && aopcde == 14)
-    unhandled_instruction (cpu, "A0 = - A1");
-  else if (aop == 0 && HL == 1 && aopcde == 14)
-    unhandled_instruction (cpu, "A1 = - A0");
-  else if (aop == 1 && HL == 1 && aopcde == 14)
-    unhandled_instruction (cpu, "A1 = - A1");
+  else if ((aop == 0 || aop == 1) && (HL == 0 || HL == 1) && aopcde == 14)
+    {
+      /* A0 = - A0; */
+      /* A0 = - A1; */
+      /* A1 = - A0; */
+      /* A1 = - A1; */
+      bu32 aw = AWREG (aop);
+      bu32 ax = AXREG (aop);
+      AWREG (HL) = -AWREG (aop);
+      AXREG (HL) = -AXREG (aop);
+
+      ASTATREG (az) = AWREG (HL) == 0 && AXREG (HL) == 0;
+      ASTATREG (an) = AXREG (HL) >> 7;
+      ASTATREG (ac0) = aw == 0 && ax == 0;
+      ASTATREG (ac0_copy) = ASTATREG (ac0);
+      if (HL == 0)
+	{
+	  ASTATREG (av0) = ax >> 7;
+	  if (ASTATREG (av0))
+	    ASTATREG (av0s) = 1;
+	}
+      else
+	{
+	  ASTATREG (av1) = ax >> 7;
+	  if (ASTATREG (av1))
+	    ASTATREG (av1s) = 1;
+	}
+    }
   else if (aop == 0 && aopcde == 12)
     unhandled_instruction (cpu, "dregs_hi=dregs_lo=SIGN(dregs_hi)*dregs_hi + SIGN(dregs_lo)*dregs_lo)");
   else if (aopcde == 0)
