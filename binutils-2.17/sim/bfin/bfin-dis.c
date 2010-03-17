@@ -183,8 +183,8 @@ static bu32
 lshift (SIM_CPU *cpu, bu32 val, int cnt, int size, int saturate)
 {
   int real_cnt = cnt > size ? size : cnt;
-  int mask_cnt = size - real_cnt;
   bu32 sgn = ~((val >> (size - 1)) - 1);
+  int mask_cnt = size - real_cnt - !sgn;
   bu32 masked;
   bu32 mask = ~0;
   if (mask_cnt > 16)
