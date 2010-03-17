@@ -49,3 +49,5 @@ INCLUDE = bfin-sim.h
 interp.o: interp.c targ-vals.h $(INCLUDE)
 bfin-dis.o: bfin-dis.c $(INCLUDE)
 machs.o: machs.c $(INCLUDE)
+dv-bfin_cec.o: dv-bfin_cec.c devices.h $(INCLUDE)
+dv-bfin_evt.o: dv-bfin_evt.c devices.h $(INCLUDE)
