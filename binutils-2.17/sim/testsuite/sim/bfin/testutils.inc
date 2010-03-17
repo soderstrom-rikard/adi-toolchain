@@ -95,7 +95,7 @@ __fail:
 3:
 	R0 <<= 4;
 
-	write 1, _failmsg, 23
+	write 1, _failmsg, 22
 .else
 	write 1, _failmsg, 5
 .endif
