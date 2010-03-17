@@ -341,7 +341,7 @@ dorsh()
 	#    - pass exit status to `exit`
 	#    - send stderr back to stdout and up
 	(exit \
-		$(rsh -l root ${TARGET_IPADDR} "$@" 3>&1 1>&2 2>&3) \
+		$(rsh -l root ${TARGET_IPADDR} "$@" 3>&1 1>&2 2>&3 </dev/null) \
 		2>&1) 2>&1
 }
 run_rsh_nodie_stdout()

@@ -155,7 +155,7 @@ run_cmd_nodie()
 	log_it "$@"
 	# since logfile might contain redirection, we need to `eval`
 	# since args might contain whitespace, we need to requote
-	eval \($(requote "$@")\) ${LOGFILE}
+	eval \($(requote "$@")\) ${LOGFILE} </dev/null
 }
 run_cmd()
 {
