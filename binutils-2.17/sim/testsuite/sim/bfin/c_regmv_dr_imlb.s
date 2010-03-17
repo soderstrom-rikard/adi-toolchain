@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_regmv_dr_imlb/c_regmv_dr_imlb.dsp
 // Spec Reference: regmv dreg-to-imlb
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

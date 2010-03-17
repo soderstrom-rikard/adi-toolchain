@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32mult_pair_m/c_dsp32mult_pair_m.dsp
 // Spec Reference: dsp32mult pair MUNOP
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

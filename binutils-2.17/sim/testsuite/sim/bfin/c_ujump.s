@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_ujump/c_ujump.dsp
 // Spec Reference: ujump
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

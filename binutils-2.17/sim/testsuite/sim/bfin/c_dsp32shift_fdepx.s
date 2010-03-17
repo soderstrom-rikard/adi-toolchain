@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32shift_fdepx/c_dsp32shift_fdepx.dsp
 // Spec Reference: dsp32shift fdep x
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

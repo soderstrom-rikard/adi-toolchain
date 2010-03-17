@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_loopsetup_nested_bot/c_loopsetup_nested_bot.dsp
 // Spec Reference: loopsetup nested same bottom
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

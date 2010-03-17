@@ -1,4 +1,5 @@
 //Original:/testcases/core/c_dsp32shiftim_lmix/c_dsp32shiftim_lmix.dsp
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

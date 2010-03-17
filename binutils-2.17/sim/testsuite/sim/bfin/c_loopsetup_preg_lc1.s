@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_loopsetup_preg_lc1/c_loopsetup_preg_lc1.dsp
 // Spec Reference: loopsetup preg lc1
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

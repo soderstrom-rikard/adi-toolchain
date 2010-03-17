@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32alu_awx/c_dsp32alu_awx.dsp
 // Spec Reference: dsp32alu awx
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

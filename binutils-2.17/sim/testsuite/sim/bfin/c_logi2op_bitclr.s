@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_logi2op_bitclr/c_logi2op_bitclr.dsp
 // Spec Reference: Logi2op functions: bitclr
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

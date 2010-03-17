@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_regmv_imlb_dr/c_regmv_imlb_dr.dsp
 // Spec Reference: regmv imlb to dr
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

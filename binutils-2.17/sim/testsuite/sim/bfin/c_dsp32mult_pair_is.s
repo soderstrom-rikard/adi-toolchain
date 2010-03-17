@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32mult_pair_is/c_dsp32mult_pair_is.dsp
 // Spec Reference: dsp32mult pair is
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

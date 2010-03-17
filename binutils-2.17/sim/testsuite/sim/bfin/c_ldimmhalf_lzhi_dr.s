@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_ldimmhalf_lzhi_dr/c_ldimmhalf_lzhi_dr.dsp
 // Spec Reference: ldimmhalf lz & hi dreg
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

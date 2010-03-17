@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32alu_max/c_dsp32alu_max.dsp
 // Spec Reference: dsp32alu dregs = max ( dregs, dregs)
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

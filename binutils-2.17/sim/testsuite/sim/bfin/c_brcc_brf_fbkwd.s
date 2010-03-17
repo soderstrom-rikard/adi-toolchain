@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_brcc_brf_fbkwd/c_brcc_brf_fbkwd.dsp
 // Spec Reference: brcc brf forward/backward
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

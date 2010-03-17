@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32mult_dr_m_iutsh/c_dsp32mult_dr_m_iutsh.dsp
 // Spec Reference: dsp32mult single dr munop iu tu is ih
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32shift_ahalf_lp/c_dsp32shift_ahalf_lp.dsp
 // Spec Reference: dsp32shift ashift half reg left positive
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

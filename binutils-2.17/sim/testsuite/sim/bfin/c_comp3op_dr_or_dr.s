@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_comp3op_dr_or_dr/c_comp3op_dr_or_dr.dsp
 // Spec Reference: comp3op dregs | dregs
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

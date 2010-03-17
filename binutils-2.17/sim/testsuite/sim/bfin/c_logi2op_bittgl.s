@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_logi2op_bittgl/c_logi2op_bittgl.dsp
 // Spec Reference: Logi2op functions: bittgl
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

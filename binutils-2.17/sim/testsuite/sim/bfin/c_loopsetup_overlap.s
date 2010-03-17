@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_loopsetup_overlap/c_loopsetup_overlap.dsp
 // Spec Reference: loopsetup overlap
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

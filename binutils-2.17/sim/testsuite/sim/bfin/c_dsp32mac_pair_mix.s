@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32mac_pair_mix/c_dsp32mac_pair_mix.dsp
 // Spec Reference: dsp32mac pair mix
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

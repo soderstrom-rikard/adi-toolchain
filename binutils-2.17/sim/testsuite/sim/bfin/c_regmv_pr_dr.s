@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_regmv_pr_dr/c_regmv_pr_dr.dsp
 // Spec Reference: regmv preg to dreg
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

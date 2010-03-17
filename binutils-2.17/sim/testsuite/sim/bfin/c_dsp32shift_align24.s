@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32shift_align24/c_dsp32shift_align24.dsp
 // Spec Reference: dsp32shift align24
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

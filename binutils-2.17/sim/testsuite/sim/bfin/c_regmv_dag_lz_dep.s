@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_regmv_dag_lz_dep/c_regmv_dag_lz_dep.dsp
 // Spec Reference: regmv dag lz dep forward
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

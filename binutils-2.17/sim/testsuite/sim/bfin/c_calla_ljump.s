@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_calla_ljump/c_calla_ljump.dsp
 // Spec Reference: progctrl calla ljump
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

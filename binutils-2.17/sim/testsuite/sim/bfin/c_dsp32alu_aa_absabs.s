@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32alu_aa_absabs/c_dsp32alu_aa_absabs.dsp
 // Spec Reference: dsp32alu a1, a0 = abs / abs a1, a0
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

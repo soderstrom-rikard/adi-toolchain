@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32shiftim_ahalf_rp/c_dsp32shiftim_ahalf_rp.dsp
 // Spec Reference: dspshiftimm dreg_lo(hi) = ashift (dreg_lo(hi) by imm5)
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

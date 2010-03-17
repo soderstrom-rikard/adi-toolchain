@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32alu_a0_pm_a1/c_dsp32alu_a0_pm_a1.dsp
 // Spec Reference: dsp32alu a0 += a1
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

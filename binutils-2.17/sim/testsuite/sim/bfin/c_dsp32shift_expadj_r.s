@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32shift_expadj_r/c_dsp32shift_expadj_r.dsp
 // Spec Reference: dsp32shift expadj r
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

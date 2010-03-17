@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_calla_subr/c_calla_subr.dsp
 // Spec Reference: progctrl calla subr
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

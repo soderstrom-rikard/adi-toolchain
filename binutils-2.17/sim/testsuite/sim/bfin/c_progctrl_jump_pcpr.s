@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_progctrl_jump_pcpr/c_progctrl_jump_pcpr.dsp
 // Spec Reference: progctrl jump pc+pr
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

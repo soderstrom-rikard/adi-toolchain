@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32mac_dr_a0/c_dsp32mac_dr_a0.dsp
 // Spec Reference: dsp32mac dr_a0
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

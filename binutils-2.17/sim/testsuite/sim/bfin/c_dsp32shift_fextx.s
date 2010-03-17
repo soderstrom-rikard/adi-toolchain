@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32shift_fextx/c_dsp32shift_fextx.dsp
 // Spec Reference: dsp32shift fext x
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32alu_r_negneg/c_dsp32alu_r_negneg.dsp
 // Spec Reference: dsp32alu dregs = neg / neg dregs
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

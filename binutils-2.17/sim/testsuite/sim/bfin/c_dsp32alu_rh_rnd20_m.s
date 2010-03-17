@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32alu_rh_rnd20_m/c_dsp32alu_rh_rnd20_m.dsp
 // Spec Reference: dsp32alu dreg (half)
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

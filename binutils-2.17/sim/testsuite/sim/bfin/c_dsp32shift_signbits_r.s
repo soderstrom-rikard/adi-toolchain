@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32shift_signbits_r/c_dsp32shift_signbits_r.dsp
 // Spec Reference: dsp32shift signbits dregs
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

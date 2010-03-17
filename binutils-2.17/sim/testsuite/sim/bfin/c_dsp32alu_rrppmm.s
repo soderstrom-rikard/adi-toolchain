@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32alu_rrppmm/c_dsp32alu_rrppmm.dsp
 // Spec Reference: dsp32alu (dreg, dreg) = +/+, -/- (dreg, dreg) amod0
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

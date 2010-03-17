@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_logi2op_bittst/c_logi2op_bittst.dsp
 // Spec Reference: Logi2op functions: bittst
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

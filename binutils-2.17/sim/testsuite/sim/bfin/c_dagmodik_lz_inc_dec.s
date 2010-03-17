@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dagmodik_lz_inc_dec/c_dagmodik_lz_inc_dec.dsp
 // Spec Reference: dagmodik L=0, I incremented & decremented
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_ccmv_ncc_dr_dr/c_ccmv_ncc_dr_dr.dsp
 // Spec Reference: ccmv !cc dreg = dreg
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

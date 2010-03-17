@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32alu_absabs/c_dsp32alu_absabs.dsp
 // Spec Reference: dsp32alu dregs = abs / abs ( dregs, dregs)
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32alu_min/c_dsp32alu_min.dsp
 // Spec Reference: dsp32alu dregs = min ( dregs, dregs)
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

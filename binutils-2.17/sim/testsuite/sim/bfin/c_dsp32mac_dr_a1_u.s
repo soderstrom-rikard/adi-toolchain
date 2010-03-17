@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32mac_dr_a1_u/c_dsp32mac_dr_a1_u.dsp
 // Spec Reference: dsp32mac dr_a1 u (unsigned fraction & unsigned int)
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

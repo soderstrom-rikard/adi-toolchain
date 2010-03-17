@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_alu2op_conv_toggle/c_alu2op_conv_toggle.dsp
 // Spec Reference: alu2op (~) toggle
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_progctrl_nop/c_progctrl_nop.dsp
 // Spec Reference: progctrl nop
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

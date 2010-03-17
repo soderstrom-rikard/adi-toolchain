@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32alu_a_neg_a/c_dsp32alu_a_neg_a.dsp
 // Spec Reference: dsp32alu a = neg a
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

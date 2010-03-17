@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_cc_flagdreg_mvbrsft/c_cc_flagdreg_mvbrsft.dsp
 // Spec Reference: cc: set (ccflag & cc2dreg) used (ccmv & brcc & dsp32sft)
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

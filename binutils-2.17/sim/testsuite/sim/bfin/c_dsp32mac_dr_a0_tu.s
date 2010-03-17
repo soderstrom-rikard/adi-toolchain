@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32mac_dr_a0_tu/c_dsp32mac_dr_a0_tu.dsp
 // Spec Reference: dsp32mac dr a0 tu (truncate unsigned fraction)
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

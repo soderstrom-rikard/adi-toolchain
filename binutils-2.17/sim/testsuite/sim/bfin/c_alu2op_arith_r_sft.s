@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_alu2op_arith_r_sft/c_alu2op_arith_r_sft.dsp
 // Spec Reference: alu2op arith right
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

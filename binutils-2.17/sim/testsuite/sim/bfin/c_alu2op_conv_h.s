@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_alu2op_conv_h/c_alu2op_conv_h.dsp
 // Spec Reference: alu2op convert h
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

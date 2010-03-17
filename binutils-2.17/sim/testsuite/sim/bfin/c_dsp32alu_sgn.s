@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32alu_sgn/c_dsp32alu_sgn.dsp
 // Spec Reference: dsp32alu dreg_lo(hi) = rnd dregs
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

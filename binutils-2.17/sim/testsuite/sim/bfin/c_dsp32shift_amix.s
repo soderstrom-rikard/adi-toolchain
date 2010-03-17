@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32shift_amix/c_dsp32shift_amix.dsp
 // Spec Reference: dsp32shift ashift mix
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

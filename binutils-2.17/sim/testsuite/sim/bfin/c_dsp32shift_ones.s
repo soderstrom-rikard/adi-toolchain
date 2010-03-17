@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32shift_ones/c_dsp32shift_ones.dsp
 // Spec Reference: dsp32shift ones
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

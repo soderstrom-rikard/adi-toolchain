@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_alu2op_divs/c_alu2op_divs.dsp
 // Spec Reference: alu2op divide s
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

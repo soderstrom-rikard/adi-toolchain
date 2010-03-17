@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dagmodik_lnz_imltbl/c_dagmodik_lnz_imltbl.dsp
 // Spec Reference: dagmodik l not zero & i+m < b
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

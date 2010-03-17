@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_compi2opd_dr_eq_i7_n/c_compi2opd_dr_eq_i7_n.dsp
 // Spec Reference: compi2opd dregs = imm7 negative
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

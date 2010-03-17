@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32alu_bytepack/c_dsp32alu_bytepack.dsp
 // Spec Reference: dsp32alu bytepack
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

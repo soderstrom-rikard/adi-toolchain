@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32shift_lmix/c_dsp32shift_lmix.dsp
 // Spec Reference: dsp32shift lshift: mix
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

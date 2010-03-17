@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_alu2op_conv_neg/c_alu2op_conv_neg.dsp
 // Spec Reference: alu2op (-) negative
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

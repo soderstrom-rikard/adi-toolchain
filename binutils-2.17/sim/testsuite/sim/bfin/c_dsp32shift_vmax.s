@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32shift_vmax/c_dsp32shift_vmax.dsp
 // Spec Reference: dsp32shift vmax
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

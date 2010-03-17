@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32alu_r_lh_a0pa1/c_dsp32alu_r_lh_a0pa1.dsp
 // Spec Reference: dsp32alu r(lh) = ( a0 += a1)
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

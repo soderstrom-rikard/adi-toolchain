@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_loopsetup_prelc/c_loopsetup_prelc.dsp
 // Spec Reference: loopsetup preload lc0 lc1
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

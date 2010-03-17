@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_cc2dreg/c_cc2dreg.dsp
 // Spec Reference: cc2dreg
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

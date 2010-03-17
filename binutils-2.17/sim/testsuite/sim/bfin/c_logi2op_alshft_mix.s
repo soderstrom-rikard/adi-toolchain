@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_logi2op_alshft_mix/c_logi2op_alshft_mix.dsp
 // Spec Reference: Logi2op >>>=, >>=, <<=
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

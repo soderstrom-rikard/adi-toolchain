@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_ccflag_pr_imm3/c_ccflag_pr_imm3.dsp
 // Spec Reference: ccflag pr-imm3
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

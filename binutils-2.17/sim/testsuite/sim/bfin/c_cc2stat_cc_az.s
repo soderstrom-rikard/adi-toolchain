@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_cc2stat_cc_az/c_cc2stat_cc_az.dsp
 // Spec Reference: cc2stat cc az
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

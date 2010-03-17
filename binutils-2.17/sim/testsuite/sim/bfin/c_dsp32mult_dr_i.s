@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32mult_dr_i/c_dsp32mult_dr_i.dsp
 // Spec Reference: dsp32mult single dr i
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

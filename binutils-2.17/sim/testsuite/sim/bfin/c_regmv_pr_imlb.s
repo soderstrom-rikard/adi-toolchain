@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_regmv_pr_imlb/c_regmv_pr_imlb.dsp
 // Spec Reference: regmv preg-to-imlb reg
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

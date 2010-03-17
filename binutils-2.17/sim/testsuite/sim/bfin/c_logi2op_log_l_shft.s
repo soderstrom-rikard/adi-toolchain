@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_logi2op_log_l_shft/c_logi2op_log_l_shft.dsp
 // Spec Reference: Logi2op <<=
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

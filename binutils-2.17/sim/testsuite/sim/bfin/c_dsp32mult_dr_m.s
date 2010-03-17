@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32mult_dr_m/c_dsp32mult_dr_m.dsp
 // Spec Reference: dsp32mult single dr (mix) MUNOP
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

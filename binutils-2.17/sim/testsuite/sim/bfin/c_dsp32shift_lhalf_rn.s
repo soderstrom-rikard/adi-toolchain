@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32shift_lhalf_rn/c_dsp32shift_lhalf_rn.dsp
 // Spec Reference: dsp32shift lshift
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

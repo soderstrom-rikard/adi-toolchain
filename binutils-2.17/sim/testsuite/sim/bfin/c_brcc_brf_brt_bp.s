@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_brcc_brf_brt_bp/c_brcc_brf_brt_bp.dsp
 // Spec Reference: brcc brfbrt
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

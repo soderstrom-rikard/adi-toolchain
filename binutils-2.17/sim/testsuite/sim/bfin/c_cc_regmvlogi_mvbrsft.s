@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_cc_regmvlogi_mvbrsft/c_cc_regmvlogi_mvbrsft.dsp
 // Spec Reference: cc: set (regmv & logi2op) used (ccmv & brcc & dsp32sft)
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

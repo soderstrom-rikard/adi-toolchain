@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_comp3op_dr_mix/c_comp3op_dr_mix.dsp
 // Spec Reference: comp3op dregs mix
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

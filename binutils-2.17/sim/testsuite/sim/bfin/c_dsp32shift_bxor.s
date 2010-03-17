@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32shift_bxor/c_dsp32shift_bxor.dsp
 // Spec Reference: dsp32shift bxor
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

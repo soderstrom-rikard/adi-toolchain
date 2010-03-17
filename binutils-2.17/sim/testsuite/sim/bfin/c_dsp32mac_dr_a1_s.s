@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32mac_dr_a1_s/c_dsp32mac_dr_a1_s.dsp
 // Spec Reference: dsp32mac dr_a1 s (scale by 2 signed fraction with round)
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

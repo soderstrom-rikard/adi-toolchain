@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_alu2op_shadd_1/c_alu2op_shadd_1.dsp
 // Spec Reference: alu2op shadd 1
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

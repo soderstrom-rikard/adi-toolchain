@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32alu_search/c_dsp32alu_search.dsp
 // Spec Reference: dsp32alu search
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"

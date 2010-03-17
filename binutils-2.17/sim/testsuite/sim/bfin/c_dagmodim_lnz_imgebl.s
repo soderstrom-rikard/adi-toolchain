@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dagmodim_lnz_imgebl/c_dagmodim_lnz_imgebl.dsp
 // Spec Reference: dagmodim l not zero & i+m >= b+l
+# mach: bfin
 
 #include "test.h"
 .include "testutils.inc"
