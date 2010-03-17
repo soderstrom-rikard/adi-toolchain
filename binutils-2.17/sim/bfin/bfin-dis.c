@@ -926,7 +926,7 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 	    acc = 0xFFFFFFFFFFull, sat = 1;
 	  break;
 	default:
-	  illegal_instruction (cpu);
+	  unhandled_instruction (cpu, "macfunc");
 	}
     }
 
@@ -2423,7 +2423,7 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       else
 	{
 	  if (res0 & 0xffff0000)
-	    illegal_instruction (cpu);
+	    unhandled_instruction (cpu, "dsp32mac0");
 	  DREG (dst) = (DREG (dst) & 0xFFFF0000) | res0;
 	}
     }
@@ -2435,7 +2435,7 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       else
 	{
 	  if (res1 & 0xffff0000)
-	    illegal_instruction (cpu);
+	    unhandled_instruction (cpu, "dsp32mac1");
 	  DREG (dst) = (DREG (dst) & 0xFFFF) | (res1 << 16);
 	}
     }
@@ -3197,7 +3197,7 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       else if (sop == 2)
 	result = lshift (cpu, in, immag, 16, 0);
       else
-	illegal_instruction (cpu);
+	unhandled_instruction (cpu, "dsp32shiftimm_0");
       v = DREG (dst0);
       if (HLs & 2)
 	STORE (DREG (dst0), (v & 0xFFFF) | (result << 16));
@@ -3269,7 +3269,7 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       if (count >= 0)
         STORE (DREG (dst0), lshift (cpu, DREG (src1), count, 32, 1));
       else
-        illegal_instruction (cpu);
+        unhandled_instruction (cpu, "dsp32shiftimm_0_1");
     }
   else if (sop == 2 && sopcde == 2)
     {
