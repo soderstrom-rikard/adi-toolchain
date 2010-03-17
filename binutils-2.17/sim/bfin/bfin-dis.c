@@ -447,6 +447,22 @@ divq (SIM_CPU *cpu, bu32 pquo, bu16 divisor)
   return pquo;
 }
 
+/* ONES ( Dreg ) ;
+ * Count the number of bits set to 1 in the 32bit value.
+ */
+static bu32
+ones (bu32 val)
+{
+  bu32 i;
+  bu32 ret;
+
+  ret = 0;
+  for (i = 0; i < 32; ++i)
+    ret += !!(val & (1 << i));
+
+  return ret;
+}
+
 typedef enum
 {
   c_0, c_1, c_4, c_2, c_uimm2, c_uimm3, c_imm3, c_pcrel4,
@@ -2996,7 +3012,12 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       DREG (dst0) |= (signbits (acc, 40) & 0xFFFF);
     }
   else if (sop == 3 && sopcde == 6)
-    unhandled_instruction (cpu, "dregs_lo = ONES dregs");
+    {
+      /* dregs_lo = ONES dreg; */
+      bu32 v = ones (DREG (src1));
+      DREG (dst0) &= 0xFFFF0000;
+      DREG (dst0) |= v;
+    }
   else if (sop == 0 && sopcde == 7)
     unhandled_instruction (cpu, "dregs_lo = EXPADJ (dregs, dregs_lo)");
   else if (sop == 1 && sopcde == 7)
