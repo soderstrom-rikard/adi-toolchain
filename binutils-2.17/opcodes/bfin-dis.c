@@ -62,7 +62,7 @@ typedef enum
 
 static struct
 {
-  char *name;
+  const char *name;
   int nbits;
   char reloc;
   char issigned;
@@ -124,7 +124,7 @@ static struct
 static char comment = 0;
 static char parallel = 0;
 
-static char *
+static const char *
 fmtconst (const_forms_t cf, TIword x, bfd_vma pc, disassemble_info * outf)
 {
   static char buf[60];
@@ -252,7 +252,7 @@ enum reg_class
   LIM_REG_CLASSES
 };
 
-static char *reg_names[] =
+static const char *reg_names[] =
 {
   "R0.L", "R1.L", "R2.L", "R3.L", "R4.L", "R5.L", "R6.L", "R7.L",
   "R0.H", "R1.H", "R2.H", "R3.H", "R4.H", "R5.H", "R6.H", "R7.H",
@@ -555,7 +555,7 @@ aligndir (int r0, disassemble_info *outf)
 static int
 decode_multfunc (int h0, int h1, int src0, int src1, disassemble_info * outf)
 {
-  char *s0, *s1;
+  const char *s0, *s1;
 
   if (h0)
     s0 = dregs_hi (src0);
@@ -576,8 +576,8 @@ decode_multfunc (int h0, int h1, int src0, int src1, disassemble_info * outf)
 static int
 decode_macfunc (int which, int op, int h0, int h1, int src0, int src1, disassemble_info * outf)
 {
-  char *a;
-  char *sop = "<unknown op>";
+  const char *a;
+  const char *sop = "<unknown op>";
 
   if (which)
     a = "A1";
