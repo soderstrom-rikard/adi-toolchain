@@ -128,3 +128,10 @@ cec_get_evt (SIM_CPU *cpu, int ivg)
 
   return EVT_STATE (cpu)->evt[ivg];
 }
+
+bu32
+cec_get_reset_evt (SIM_CPU *cpu)
+{
+  /* XXX: This should tail into the model to get via BMODE pins.  */
+  return 0xef000000;
+}

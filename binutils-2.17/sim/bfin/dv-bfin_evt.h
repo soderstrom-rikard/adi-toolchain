@@ -25,5 +25,6 @@
 
 extern void cec_set_evt (SIM_CPU *, int ivg, bu32 handler_addr);
 extern bu32 cec_get_evt (SIM_CPU *, int ivg);
+extern bu32 cec_get_reset_evt (SIM_CPU *);
 
 #endif

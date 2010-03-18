@@ -235,7 +235,7 @@ bfin_hw_tree_init (SIM_DESC sd)
   /* STATE_ENVIRONMENT (sd) = OPERATING_ENVIRONMENT; */
 
   sim_hw_parse (sd, "/core/bfin_evt/reg %#x %i", BFIN_COREMMR_EVT_BASE, 4 * 16);
-  sim_hw_parse (sd, "/core/bfin_cec/reg %#x %i", BFIN_COREMMR_IMASK, 4 * 4);
+  sim_hw_parse (sd, "/core/bfin_cec/reg %#x %i", BFIN_COREMMR_CEC_BASE, 4 * 5);
 }
 
 static void

@@ -27,7 +27,7 @@ struct bfin_cec
 {
   bu32 base;
   /* Order is important -- matches hardware MMR layout.  */
-  bu32 imask, ipend, ilat, iprio;
+  bu32 evt_override, imask, ipend, ilat, iprio;
 };
 #define mmr_offset(mmr) (offsetof(struct bfin_cec, mmr) - 4)
 
@@ -56,6 +56,9 @@ bfin_cec_io_write_buffer (struct hw *me, const void *source,
 
   switch (addr - cec->base)
     {
+    case mmr_offset(evt_override):
+      cec->evt_override = value;
+      break;
     case mmr_offset(imask):
       _cec_imask_write (cec, value);
       break;
@@ -80,7 +83,7 @@ bfin_cec_io_read_buffer (struct hw *me, void *dest,
 
   HW_TRACE ((me, "read 0x%08lx length %d", (long) addr, (int) nr_bytes));
 
-  value = &cec->imask + (addr - cec->base) / 4;
+  value = &cec->evt_override + (addr - cec->base) / 4;
   dv_store_4 (dest, *value);
 
   return nr_bytes;
@@ -319,7 +322,11 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 	  RETIREG = PCREG | (ivg == curr_ivg ? 1 : 0);
 	  break;
 	}
-	PCREG = cec_get_evt (cpu, ivg);
+	/* If EVT_OVERRIDE is in effect, use the reset address.  */
+	if ((cec->evt_override & 0x1ff) & (1 << ivg))
+	  PCREG = cec_get_reset_evt (cpu);
+	else
+	  PCREG = cec_get_evt (cpu, ivg);
     }
 }
 
