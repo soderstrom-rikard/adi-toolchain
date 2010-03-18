@@ -2436,7 +2436,7 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     illegal_instruction (cpu);
 
   if (((1 << mmod) & (P ? 0x313 : 0x1b57)) == 0)
-    illegal_instruction (cpu);
+    unhandled_instruction (cpu, "dsp32mac");
 
   if (w1 == 1 || op1 != 3)
     res1 = decode_macfunc (cpu, 1, op1, h01, h11, src0, src1, mmod, MM, P);
