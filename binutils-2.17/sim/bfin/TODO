@@ -13,3 +13,7 @@ create on-chip maps and default SP to scratch pad
 add support for tracing
 
 implement all unhandled_instruction locations
+
+how to model RETE and IVG0 bit in IPEND ...
+
+figure out when LB[01] has LSB set during CEC transitions ...
