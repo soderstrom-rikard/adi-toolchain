@@ -92,6 +92,33 @@ setflags_logical (SIM_CPU *cpu, bu32 val)
 }
 
 static int
+dagadd_brev(SIM_CPU *cpu, int dagno, bs32 modify)
+{
+  bs32 i, l, b, val;
+
+  i = IREG (dagno);
+  l = LREG (dagno);
+  b = BREG (dagno);
+  val = i;
+
+  if (l)
+    {
+      if ((i + modify - b - l < 0 && modify > 0)
+	  || (i + modify - b >= 0 && modify < 0))
+	val = i + modify;
+      else if (i + modify - b - l >= 0 && modify >= 0)
+	val = i + modify - l;
+      else if (i + modify - b < 0 && modify <= 0)
+	val = i + modify + l;
+    }
+  else
+    val = i + modify;
+
+  STORE (IREG (dagno), val);
+  return val;
+}
+
+static int
 dagadd (SIM_CPU *cpu, int dagno, bs32 modify)
 {
   bs32 i, l, b, val;
@@ -405,11 +432,8 @@ add_and_shift (SIM_CPU *cpu, bu32 a, bu32 b, int shift)
 static bu32
 divs (SIM_CPU *cpu, bu32 pquo, bu16 divisor)
 {
-  short af = pquo >> 16;
-  short r;
+  bu16 r = pquo >> 16;
   int aq;
-
-  r = pquo >> 16;
 
   aq = (r ^ divisor) >> 15;  /* extract msb's and compute quotient bit */
   ASTATREG (aq) = aq;         /* update global quotient state */
@@ -1450,7 +1474,10 @@ decode_REGMV_0 (SIM_CPU *cpu, bu16 iw0)
     {
       if (reg_requires_sup (cpu, dstreg))
 	REQUIRE_SUPERVISOR ();
-      *dstreg = value;
+      if(dstreg == &A1XREG || dstreg == &A0XREG)
+	*dstreg = value & 0xFF;
+      else
+	*dstreg = value;
     }
 
   PCREG += 2;
@@ -1836,7 +1863,8 @@ decode_dagMODim_0 (SIM_CPU *cpu, bu16 iw0)
   int op = ((iw0 >> 4) & 0x1);
 
   if (op == 0 && br == 1)
-    unhandled_instruction (cpu, "iregs += mregs (BREV)");
+    /*iregs += mregs (BREV) */
+    dagadd_brev (cpu, i, MREG (m));
   else if (op == 0)
     /* iregs += mregs */
     dagadd (cpu, i, MREG (m));
@@ -2607,10 +2635,26 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     }
   else if (aop == 3 && aopcde == 9 && s == 0)
     A1XREG = (bs32)(bs8)DREG (src0);
-  else if (aop == 3 && aopcde == 11 && s == 0)
-    unhandled_instruction (cpu, "A0 -= A1");
-  else if (aop == 3 && aopcde == 11 && s == 1)
-    unhandled_instruction (cpu, "A0 -= A1 (W32)");
+  else if (aop == 3 && aopcde == 11 && (s == 0 || s == 1))
+    { /* A0 -= A1 */
+      bu64 acc0 = get_extended_acc0 (cpu);
+      bu64 acc1 = get_extended_acc1 (cpu);
+
+      acc0 -= acc1;
+      if ((bs64)acc0 < -0x8000000000ll)
+        acc0 = -0x8000000000ull;
+      else if ((bs64)acc0 >= 0x7fffffffffll)
+        acc0 = 0x7fffffffffull;
+      STORE (A0XREG, (acc0 >> 32) & 0xff);
+      STORE (A0WREG, acc0 & 0xffffffff);
+      if (s == 1) {
+        /* A0 -= A1 (W32) */
+        if(acc0 & 0x8000000000)
+          STORE (A0XREG, 0x80);
+        else
+          STORE (A0XREG, 0x0);
+      }
+    }
   else if (aop == 3 && aopcde == 22 && HL == 1)
     unhandled_instruction (cpu, "dregs = BYTEOP2M (dregs_pair, dregs_pair) (TH,R)");
   else if (aop == 3 && aopcde == 22 && HL == 0)
@@ -2691,7 +2735,15 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       /* XXX: need to check AV[01] and AV[01]S */
     }
   else if (HL == 0 && aop == 3 && aopcde == 12)
-    unhandled_instruction (cpu, "dregs_lo = dregs (RND)");
+    {
+      /* dregs_lo = dregs (RND) */
+      bu32 val = (DREG(src0) & 0x7FFFFFFF);
+
+      val += 0x8000;
+
+      DREG(dst0) = (DREG(dst0) & 0xFFFF0000) | (val >> 16) | ((DREG(src0) & 0x80000000) >> 16);
+      /* XXX : ASTAT ? */
+    }
   else if (aop == 3 && HL == 0 && aopcde == 15)
     {
       /* Vector NEG.  */
@@ -2739,7 +2791,15 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       /* XXX: what ASTAT flags need updating ?  */
     }
   else if (HL == 1 && aop == 3 && aopcde == 12)
-    unhandled_instruction (cpu, "dregs_hi = dregs (RND)");
+    {
+      /* dregs_hi = dregs (RND) */
+      bu32 val = (DREG(src0) & 0x7FFFFFFF);
+
+      val += 0x8000;
+
+      DREG(dst0) = (DREG(dst0) & 0xFFFF) | (val & 0x7FFF0000) | (DREG(src0) & 0x80000000);
+      /* XXX: what ASTAT flags need updating ?  */
+    }
   else if (aop == 0 && aopcde == 23 && HL == 0)
     unhandled_instruction (cpu, "dregs = BYTEOP3P (dregs_pair, dregs_pair) (LO,R)");
   else if ((aop == 0 || aop == 1) && (HL == 0 || HL == 1) && aopcde == 14)
@@ -2820,6 +2880,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     unhandled_instruction (cpu, "dregs_hi = (A0 += A1)");
   else if ((aop == 0 || aop == 2) && aopcde == 11)
     {
+      /* A0 += A1 */
       bu64 acc0 = get_extended_acc0 (cpu);
       bu64 acc1 = get_extended_acc1 (cpu);
 
@@ -2831,7 +2892,12 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       STORE (A0XREG, (acc0 >> 32) & 0xff);
       STORE (A0WREG, acc0 & 0xffffffff);
       if (aop == 2 && s == 1)
-	unhandled_instruction (cpu, "A0 += A1 (W32)");
+      { /* A0 += A1 (W32) */
+	if(acc0 & 0x8000000000)
+	  STORE (A0XREG, 0x80);
+	else
+	  STORE (A0XREG, 0x0);
+      }
       if (aop == 0)
 	{
 	  if ((bs64)acc0 < -0x80000000ll)
@@ -3033,9 +3099,31 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	}
     }
   else if (sop == 3 && sopcde == 2)
-    unhandled_instruction (cpu, "dregs = ROT dregs BY dregs_lo");
+    {
+     /*dregs = ROT dregs BY dregs_lo */
+      int t = imm6 (DREG(src0) & 0xFFFF);
+
+      /* Reduce everything to rotate left.  */
+      if (t < 0)
+        t += 33;
+
+      if (t > 0)
+        {
+          int oldcc = CCREG;
+          bu32 srcval = DREG (src1);
+          bu32 result;
+          result = t == 32 ? 0 : srcval << t;
+          result |= t == 1 ? 0 : srcval >> (33 - t);
+          result |= oldcc << (t - 1);
+          STORE (DREG (dst0), result);
+          CCREG = (srcval >> (32 - t)) & 1;
+        }
+      else
+        STORE (DREG (dst0), DREG (src1));
+
+    }
   else if (sop == 2 && sopcde == 1)
-    unhandled_instruction (cpu, "dregs = SHIFT dregs BY dregs_lo (V)");
+    unhandled_instruction (cpu, "dregs = LSHIFT dregs BY dregs_lo (V)");
   else if (sopcde == 4)
     {
       bu32 sv0 = DREG (src0);
@@ -3398,14 +3486,21 @@ decode_psedodbg_assert_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   int regtest = ((iw0 >> 0) & 0x7);
   bu32 *reg = get_allreg (cpu, grp, regtest);
 
+  char *reg_names[] =
+{
+  "R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7",
+  "P0", "P1", "P2", "P3", "P4", "P5", "SP", "FP",
+};
+
+
   if (dbgop == 0 || dbgop == 2)
     {
       /* DBGA ( regs_lo , uimm16 ) */
       /* DBGAL ( regs , uimm16 ) */
       if ((*reg & 0xffff) != expected)
 	{
-	  fprintf (stderr, "DBGA/DBGAL failed at 0x%x: is 0x%x, should be 0x%x\n",
-		  PCREG, *reg & 0xffff, expected);
+	  fprintf (stderr, "FAIL at 0x%x: DBGA (%s.L, 0x%04x), actual value 0x%x\n",
+		  PCREG, reg_names[regtest + (grp * 8)], expected, *reg & 0xffff);
 	  cec_exception (cpu, VEC_ILGAL_I);
 	  DREG (0) = 1;
 	}
@@ -3416,8 +3511,8 @@ decode_psedodbg_assert_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       /* DBGAH ( regs , uimm16 ) */
       if ((*reg >> 16) != expected)
 	{
-	  fprintf (stderr, "DBGA/DBGAH failed at 0x%x: is 0x%x, should be 0x%x\n",
-		  PCREG, *reg >> 16, expected);
+	  fprintf (stderr, "FAIL at 0x%x: DBGA (%s.H, 0x%04x), actual value 0x%x\n",
+		  PCREG, reg_names[regtest + (grp * 8)], expected, *reg >> 16);
 	  cec_exception (cpu, VEC_ILGAL_I);
 	  DREG (0) = 1;
 	}
