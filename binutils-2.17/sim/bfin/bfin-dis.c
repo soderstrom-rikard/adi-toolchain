@@ -2860,7 +2860,21 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	DREG (dst0) = (t0 << 16) | t1;
     }
   else if (aop == 1 && aopcde == 12)
-    unhandled_instruction (cpu, "dregs = A1.L + A1.H , dregs = A0.L + A0.H");
+    {
+      /* dregs = A1.L + A1.H , dregs = A0.L + A0.H */
+       bu32 val0 = ((A0WREG & 0xFFFF0000) >> 16) + (A0WREG & 0xFFFF);
+       bu32 val1 = ((A1WREG & 0xFFFF0000) >> 16) + (A1WREG & 0xFFFF);
+
+       if (val0 & 0x8000)
+	val0 |= 0xFFFF0000;
+
+       if (val1 & 0x8000)
+	val1 |= 0xFFFF0000;
+
+       DREG (dst1) = val1;
+       DREG (dst0) = val0;
+       /* ASTAT ? */
+    }
   else if (HL == 0 && aopcde == 1)
     {
       if (aop == 0)
