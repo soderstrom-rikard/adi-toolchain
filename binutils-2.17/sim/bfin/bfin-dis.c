@@ -54,8 +54,8 @@ illegal_instruction (SIM_CPU *cpu)
 static __attribute__ ((noreturn)) void
 unhandled_instruction (SIM_CPU *cpu, char *insn)
 {
-  bu16 iw0 = GET_WORD (PCREG);
-  bu16 iw1 = GET_WORD (PCREG + 2);
+  bu16 iw0 = IFETCH (PCREG);
+  bu16 iw1 = IFETCH (PCREG + 2);
   bu32 iw2 = ((bu32)iw0 << 16) | iw1;
 
   fprintf(stderr, "Unhandled instruction at 0x%08x (%s opcode 0x", PCREG, insn);
@@ -3528,8 +3528,8 @@ decode_psedodbg_assert_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 static void
 _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
 {
-  bu16 iw0 = GET_WORD (pc);
-  bu16 iw1 = GET_WORD (pc + 2);
+  bu16 iw0 = IFETCH (pc);
+  bu16 iw1 = IFETCH (pc + 2);
 
   if ((iw0 & 0xf7ff) == 0xc003 && iw1 == 0x1800)
     {
@@ -3619,7 +3619,7 @@ void
 interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
 {
   int i;
-  bu16 iw0 = GET_WORD (pc);
+  bu16 iw0 = IFETCH (pc);
 
   int is_multiinsn = ((iw0 & 0xc000) == 0xc000 && (iw0 & BIT_MULTI_INS)
 		      && ((iw0 & 0xe800) != 0xe800 /* not linkage */));

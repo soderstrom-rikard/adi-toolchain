@@ -182,36 +182,46 @@ struct bfin_cpu_state
 #define __PUT_MEM(taddr, v, size) \
 do { \
   bu##size __v = (v); \
-  int __cnt = sim_write (CPU_STATE(cpu), taddr, (void *)&__v, size / 8); \
-  if (__cnt != size / 8) \
+  int __cnt, __bytes = size / 8; \
+  /* XXX: Common sim should be doing this ...  */ \
+  if (taddr & (__bytes - 1)) \
+    cec_exception (cpu, VEC_MISALI_D); \
+  __cnt = sim_write (CPU_STATE(cpu), taddr, (void *)&__v, __bytes); \
+  if (__cnt != __bytes) \
    { \
      if (taddr >= BFIN_SYSTEM_MMR_BASE) \
        cec_exception (cpu, VEC_ILL_RES); \
      else \
-       cec_exception (cpu, VEC_CPLB_I_M); \
+       cec_exception (cpu, VEC_CPLB_M); \
    } \
 } while (0)
 #define PUT_BYTE(taddr, v) __PUT_MEM(taddr, v, 8)
 #define PUT_WORD(taddr, v) __PUT_MEM(taddr, v, 16)
 #define PUT_LONG(taddr, v) __PUT_MEM(taddr, v, 32)
 
-#define __GET_MEM(taddr, size) \
+#define __GET_MEM(taddr, size, unaligned, cplb_miss) \
 ({ \
   bu##size __ret; \
-  int __cnt = sim_read (CPU_STATE(cpu), taddr, (void *)&__ret, size / 8); \
-  if (__cnt != size / 8) \
+  int __cnt, __bytes = size / 8; \
+  /* XXX: Common sim should be doing this ...  */ \
+  if (taddr & (__bytes - 1)) \
+    cec_exception (cpu, unaligned); \
+  __cnt = sim_read (CPU_STATE(cpu), taddr, (void *)&__ret, __bytes); \
+  if (__cnt != __bytes) \
    { \
      if (taddr >= BFIN_SYSTEM_MMR_BASE) \
        cec_exception (cpu, VEC_ILL_RES); \
      else \
-       cec_exception (cpu, VEC_CPLB_I_M); \
+       cec_exception (cpu, cplb_miss); \
    } \
   __ret; \
 })
+#define _GET_MEM(taddr, size) __GET_MEM(taddr, size, VEC_MISALI_D, VEC_CPLB_M)
+#define GET_BYTE(taddr) _GET_MEM(taddr, 8)
+#define GET_WORD(taddr) _GET_MEM(taddr, 16)
+#define GET_LONG(taddr) _GET_MEM(taddr, 32)
 
-#define GET_BYTE(taddr) __GET_MEM(taddr, 8)
-#define GET_WORD(taddr) __GET_MEM(taddr, 16)
-#define GET_LONG(taddr) __GET_MEM(taddr, 32)
+#define IFETCH(taddr) __GET_MEM(taddr, 16, VEC_MISALI_I, VEC_CPLB_I_M)
 
 extern void interp_insn_bfin (SIM_CPU *, bu32);
 
