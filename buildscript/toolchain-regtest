@@ -417,7 +417,7 @@ if test_targets_has LINUX ; then
 		error "board doesn't appear to be a Blackfin"
 	fi
 	CPU_TYPE=`echo "${RUN}" | awk '$1 == "model" { print $4; exit }' | tr '[:upper:]' '[:lower:]' | sed 's:adsp-::'`
-	CPU_REV=`echo "${RUN}" | awk '$1 == "stepping" { print $NF; exit }'`
+	CPU_REV=`echo "${RUN}" | awk '$1 == "stepping" { print $3; exit }'`
 	CPU_TYPE_REV="${CPU_TYPE}-0.${CPU_REV}"
 	notice "Detected board cpu" "${CPU_TYPE_REV}"
 
