@@ -1538,26 +1538,10 @@ decode_ALU2op_0 (SIM_CPU *cpu, bu16 iw0)
       DREG (dst) = -val;
       setflags_nz (cpu, DREG (dst));
       if (val == 0x80000000)
-	{
-	  ASTATREG (v) = 1;
-	  ASTATREG (v_copy) = 1;
-	  ASTATREG (vs) = 1;
-	}
+	ASTATREG (v) = ASTATREG (vs) = 1;
       else
-	{
-	  ASTATREG (v) = 0;
-	  ASTATREG (v_copy) = 0;
-	}
-      if (val == 0x0)
-	{
-	  ASTATREG (ac0) = 1;
-	  ASTATREG (ac0_copy) = 1;
-	}
-      else
-	{
-	  ASTATREG (ac0) = 0;
-	  ASTATREG (ac0_copy) = 0;
-	}
+	ASTATREG (v) = 0;
+      ASTATREG (ac0) = val == 0x0;
       /* @@@ Documentation isn't entirely clear about av0 and av1.  */
     }
   else if (opc == 15)
@@ -2744,16 +2728,13 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       bu32 lo = (-(bs16)(DREG (src0) & 0xFFFF)) & 0xFFFF;
 
       ASTATREG (v) = 0;
-      ASTATREG (v_copy) = 0;
       ASTATREG (ac0) = 0;
-      ASTATREG (ac0_copy) = 0;
       ASTATREG (ac1) = 0;
 
       if (hi == 0x80000000)
 	{
 	  hi = 0x7fff0000;
 	  ASTATREG (v) = 1;
-	  ASTATREG (v_copy) = 1;
 	  ASTATREG (vs) = 1;
 	}
       else if (hi == 0)
@@ -2763,14 +2744,10 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	{
 	  lo = 0x7fff;
 	  ASTATREG (v) = 1;
-	  ASTATREG (v_copy) = 1;
 	  ASTATREG (vs) = 1;
 	}
       else if (lo == 0)
-	{
-	  ASTATREG (ac0) = 1;
-	  ASTATREG (ac0_copy) = 1;
-	}
+	ASTATREG (ac0) = 1;
       DREG (dst0) = hi | lo;
       setflags_nz_2x16 (cpu, DREG (dst0));
     }
@@ -2809,7 +2786,6 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       ASTATREG (az) = AWREG (HL) == 0 && AXREG (HL) == 0;
       ASTATREG (an) = AXREG (HL) >> 7;
       ASTATREG (ac0) = aw == 0 && ax == 0;
-      ASTATREG (ac0_copy) = ASTATREG (ac0);
       if (HL == 0)
 	{
 	  ASTATREG (av0) = ax >> 7;
@@ -2964,12 +2940,10 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	  val = 0x7fffffff;
 	  ASTATREG (v) = 1;
 	  ASTATREG (vs) = 1;
-	  ASTATREG (v_copy) = 1;
 	}
       else
 	{
 	  ASTATREG (v) = 0;
-	  ASTATREG (v_copy) = 0;
 	}
       setflags_nz (cpu, val);
       DREG (dst0) = val;
@@ -2996,19 +2970,16 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       bu32 lo = (in & 0x8000 ? -(bs16)(in & 0xFFFF) : in) & 0xFFFF;
 
       ASTATREG (v) = 0;
-      ASTATREG (v_copy) = 0;
       if (hi == 0x80000000)
 	{
 	  hi = 0x7fff0000;
 	  ASTATREG (v) = 1;
-	  ASTATREG (v_copy) = 1;
 	  ASTATREG (vs) = 1;
 	}
       if (lo == 0x8000)
 	{
 	  lo = 0x7fff;
 	  ASTATREG (v) = 1;
-	  ASTATREG (v_copy) = 1;
 	  ASTATREG (vs) = 1;
 	}
       DREG (dst0) = hi | lo;
