@@ -2540,13 +2540,25 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   UNUSED int M = ((iw0 >> 11) & 0x1);
 
   if (aop == 0 && aopcde == 9 && HL == 0 && s == 0)
-    unhandled_instruction (cpu, "A0.L = dregs_lo");
+    {
+      /* A0.L = dregs_lo; */
+      A0WREG = REG_H_L (A0WREG, DREG (src0));
+    }
   else if (aop == 2 && aopcde == 9 && HL == 1 && s == 0)
-    unhandled_instruction (cpu, "A1.H = dregs_hi");
+    {
+      /* A1.H = dregs_hi; */
+      A1WREG = REG_H_L (DREG (src0), A1WREG);
+    }
   else if (aop == 2 && aopcde == 9 && HL == 0 && s == 0)
-    unhandled_instruction (cpu, "A1.L = dregs_lo");
+    {
+      /* A1.L = dregs_lo; */
+      A1WREG = REG_H_L (A1WREG, DREG (src0));
+    }
   else if (aop == 0 && aopcde == 9 && HL == 1 && s == 0)
-    unhandled_instruction (cpu, "A0.H = dregs_hi");
+    {
+      /* A0.H = dregs_hi; */
+      A0WREG = REG_H_L (DREG (src0), A0WREG);
+    }
   else if (x == 1 && HL == 1 && aop == 3 && aopcde == 5)
     unhandled_instruction (cpu, "dregs_hi = dregs - dregs (RND20)");
   else if (x == 1 && HL == 1 && aop == 2 && aopcde == 5)
