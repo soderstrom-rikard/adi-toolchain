@@ -3336,15 +3336,20 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     unhandled_instruction (cpu, "A0 = ROT A0 BY imm6");
   else if (sop == 1 && sopcde == 1)
     unhandled_instruction (cpu, "dregs = dregs >>> uimm5 (V,S)");
-  else if (sop == 2 && sopcde == 1)
+  else if (sop == 2 && sopcde == 1 && bit8 == 0)
    {
-     /* dregs = dregs >> uimm5 (V) */
      /* dregs = dregs << uimm5 (V) */
      int count = imm5(immag);
-     if (bit8)
-       DREG(dst0) = (DREG (src1) & 0xFFFF >> count) | ((DREG (src1) >> count ) & 0xFFFF0000);
-     else
+
        DREG(dst0) = ((DREG (src1) << count) & 0xFFFF) | ((DREG (src1) & 0xFFFF0000) << count);
+
+      /* ASTAT ? */
+    }
+  else if (sop == 2 && sopcde == 1 && bit8 == 1) {
+     /* dregs = dregs >> uimm5 (V) */
+     int count = imm5(newimmag);
+printf("count = %d\n", count);
+     DREG(dst0) = ((DREG (src1) & 0xFFFF) >> count) | ((DREG (src1) >> count) & 0xFFFF0000);
 
       /* ASTAT ? */
     }
