@@ -2,7 +2,6 @@
 // Spec Reference: dsp32shift bxor
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

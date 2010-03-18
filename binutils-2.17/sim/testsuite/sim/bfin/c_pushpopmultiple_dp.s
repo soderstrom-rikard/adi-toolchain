@@ -2,7 +2,6 @@
 // Spec Reference: pushpopmultiple dreg preg single group
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

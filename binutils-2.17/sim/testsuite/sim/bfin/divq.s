@@ -1,7 +1,6 @@
 # Blackfin testcase for divide instructions
 # mach: bfin
 
-#include "test.h"
 
 	.include "testutils.inc"
 

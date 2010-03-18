@@ -2,7 +2,6 @@
 // Spec Reference: dsp32shift lshift/lshift
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

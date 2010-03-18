@@ -1,7 +1,6 @@
 //Original:/testcases/core/c_dsp32shiftim_af_s/c_dsp32shiftim_af_s.dsp
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

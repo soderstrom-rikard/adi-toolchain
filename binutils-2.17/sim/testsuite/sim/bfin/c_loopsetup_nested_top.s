@@ -2,7 +2,6 @@
 // Spec Reference: loopsetup nested top
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

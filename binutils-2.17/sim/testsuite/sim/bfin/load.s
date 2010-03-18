@@ -1,7 +1,6 @@
 # Blackfin testcase for register load instructions
 # mach: bfin
 
-#include "test.h"
 
 	.include "testutils.inc"
 

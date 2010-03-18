@@ -2,7 +2,6 @@
 // Spec Reference: dsp32shift expadj / expadj r
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

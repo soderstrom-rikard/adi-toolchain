@@ -2,7 +2,6 @@
 // Spec Reference: dsp32mac dr_a1 u (unsigned fraction & unsigned int)
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

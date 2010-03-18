@@ -2,7 +2,6 @@
 // Spec Reference: regmv imlb to dr
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

@@ -2,7 +2,6 @@
 // Spec Reference: dspshiftimm dreg_lo(hi) = lshift (dreg_lo(hi) by imm5)
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

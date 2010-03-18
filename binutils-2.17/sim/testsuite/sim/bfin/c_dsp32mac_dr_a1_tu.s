@@ -2,7 +2,6 @@
 // Spec Reference: dsp32mac dr_a1 tu (truncate signed fraction)
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

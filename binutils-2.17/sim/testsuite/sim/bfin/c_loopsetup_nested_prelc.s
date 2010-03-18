@@ -2,7 +2,6 @@
 // Spec Reference: loopsetup nested preload lc0 lc1
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

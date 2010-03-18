@@ -2,7 +2,6 @@
 // Spec Reference: brcc brf brt no bp
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

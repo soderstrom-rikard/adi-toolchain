@@ -2,7 +2,6 @@
 // Spec Reference: cc: set (ccflag & cc2dreg) used (ccmv & brcc & dsp32sft)
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

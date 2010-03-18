@@ -2,7 +2,6 @@
 // Spec Reference: brcc brf forward/backward
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

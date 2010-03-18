@@ -2,7 +2,6 @@
 // Spec Reference: dsp32alu dregs = max ( dregs, dregs)
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

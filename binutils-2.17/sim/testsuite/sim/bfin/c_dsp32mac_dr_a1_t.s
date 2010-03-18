@@ -2,7 +2,6 @@
 // Spec Reference: dsp32mac dr a1 t (truncation)
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

@@ -2,7 +2,6 @@
 // Spec Reference: dsp32alu (dregs, dregs) = +/- (a, a) amod1
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

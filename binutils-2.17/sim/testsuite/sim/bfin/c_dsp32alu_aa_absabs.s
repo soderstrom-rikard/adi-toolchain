@@ -2,7 +2,6 @@
 // Spec Reference: dsp32alu a1, a0 = abs / abs a1, a0
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

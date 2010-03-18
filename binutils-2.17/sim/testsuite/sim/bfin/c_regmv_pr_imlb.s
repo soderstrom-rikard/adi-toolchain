@@ -2,7 +2,6 @@
 // Spec Reference: regmv preg-to-imlb reg
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

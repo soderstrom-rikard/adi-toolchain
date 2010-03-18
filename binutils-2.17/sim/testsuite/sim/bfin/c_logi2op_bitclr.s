@@ -2,7 +2,6 @@
 // Spec Reference: Logi2op functions: bitclr
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

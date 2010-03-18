@@ -2,7 +2,6 @@
 // Spec Reference: ccflag pr-imm3 (uu)
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

@@ -2,7 +2,6 @@
 // Spec Reference: dagmodik L=0, I incremented & decremented
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

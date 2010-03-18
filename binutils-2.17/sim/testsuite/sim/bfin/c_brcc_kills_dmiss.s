@@ -2,7 +2,6 @@
 // Spec Reference: brcc kills  data cache miss
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

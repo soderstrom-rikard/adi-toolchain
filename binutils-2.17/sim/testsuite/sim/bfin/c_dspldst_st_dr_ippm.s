@@ -2,7 +2,6 @@
 // Spec Reference: c_dspldst st_dr_ippm
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

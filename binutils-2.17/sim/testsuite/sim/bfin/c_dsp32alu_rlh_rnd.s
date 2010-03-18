@@ -2,7 +2,6 @@
 // Spec Reference: dsp32alu dreg_lo(hi) = rnd dregs
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

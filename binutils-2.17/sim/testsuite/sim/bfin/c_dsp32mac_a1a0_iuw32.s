@@ -2,7 +2,6 @@
 // Spec Reference: dsp32mac a1 a0 iuw32 MNOP
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

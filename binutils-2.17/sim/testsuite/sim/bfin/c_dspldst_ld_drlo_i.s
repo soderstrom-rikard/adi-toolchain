@@ -2,7 +2,6 @@
 // Spec Reference: c_dspldst ld_drlo_i
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

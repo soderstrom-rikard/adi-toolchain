@@ -2,7 +2,6 @@
 // Spec Reference: progctrl calla subr
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

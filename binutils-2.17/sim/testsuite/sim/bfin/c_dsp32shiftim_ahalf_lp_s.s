@@ -2,7 +2,6 @@
 // Spec Reference: dspshiftimm dreg_lo(hi) = ashift (dreg_lo(hi) by imm5) saturated
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

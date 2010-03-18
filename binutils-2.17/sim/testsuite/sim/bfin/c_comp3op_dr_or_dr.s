@@ -2,7 +2,6 @@
 // Spec Reference: comp3op dregs | dregs
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

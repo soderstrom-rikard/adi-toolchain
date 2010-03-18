@@ -2,7 +2,6 @@
 // Spec Reference: c_ldst ld d [p]
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

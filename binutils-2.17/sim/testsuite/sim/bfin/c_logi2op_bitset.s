@@ -2,7 +2,6 @@
 // Spec Reference: Logi2op
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

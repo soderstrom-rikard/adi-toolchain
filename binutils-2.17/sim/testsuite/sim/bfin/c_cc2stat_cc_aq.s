@@ -2,7 +2,6 @@
 // Spec Reference: cc2stat cc aq
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

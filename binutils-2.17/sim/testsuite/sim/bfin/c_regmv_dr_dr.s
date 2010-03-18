@@ -2,7 +2,6 @@
 // Spec Reference: regmv dreg-to-dreg
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

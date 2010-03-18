@@ -2,7 +2,6 @@
 // Spec Reference: loopsetup preg st & ld
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

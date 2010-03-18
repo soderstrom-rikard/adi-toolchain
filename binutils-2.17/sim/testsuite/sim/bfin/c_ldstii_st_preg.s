@@ -2,7 +2,6 @@
 // Spec Reference: c_ldstii store preg
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

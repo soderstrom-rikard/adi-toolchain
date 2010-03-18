@@ -2,7 +2,6 @@
 // Spec Reference: regmv dag lz dep forward
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

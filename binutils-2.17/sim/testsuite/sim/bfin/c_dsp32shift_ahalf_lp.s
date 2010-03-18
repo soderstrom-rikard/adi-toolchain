@@ -2,7 +2,6 @@
 // Spec Reference: dsp32shift ashift half reg left positive
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

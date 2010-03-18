@@ -2,7 +2,6 @@
 // Spec Reference: dsp32mac dr a0 iu (unsigned int)
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

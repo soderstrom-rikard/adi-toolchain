@@ -2,7 +2,6 @@
 // Spec Reference: c_dsp32alu_disalgnexcpt
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

@@ -1,7 +1,6 @@
 //Original:/testcases/seq/se_rets_hazard/se_rets_hazard.dsp
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

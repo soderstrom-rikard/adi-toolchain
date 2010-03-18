@@ -2,7 +2,6 @@
 // Spec Reference: dsp32mult pair is
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

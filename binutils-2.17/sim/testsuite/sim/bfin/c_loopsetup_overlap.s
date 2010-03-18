@@ -2,7 +2,6 @@
 // Spec Reference: loopsetup overlap
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

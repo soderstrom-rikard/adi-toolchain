@@ -2,7 +2,6 @@
 // Spec Reference: progctrl call (pr)
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

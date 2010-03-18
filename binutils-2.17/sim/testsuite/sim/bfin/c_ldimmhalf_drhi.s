@@ -2,7 +2,6 @@
 // Spec Reference: ldimmhalf dreg hi
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

@@ -2,7 +2,6 @@
 // Spec Reference: alu2op convert xh
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

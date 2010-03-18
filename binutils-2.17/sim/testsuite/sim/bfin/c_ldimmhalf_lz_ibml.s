@@ -1,7 +1,6 @@
 //Original:/testcases/core/c_ldimmhalf_lz_ibml/c_ldimmhalf_lz_ibml.dsp
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

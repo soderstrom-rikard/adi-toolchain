@@ -2,7 +2,6 @@
 // Spec Reference: comp3op dregs mix
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

@@ -1,7 +1,6 @@
 //Original:/testcases/core/c_dspldst_ld_dr_i/c_dspldst_ld_dr_i.dsp
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

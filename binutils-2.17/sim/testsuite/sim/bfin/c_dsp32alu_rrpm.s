@@ -2,7 +2,6 @@
 // Spec Reference: dsp32alu (dreg, dreg)
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

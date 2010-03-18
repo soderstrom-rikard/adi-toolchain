@@ -2,7 +2,6 @@
 // Spec Reference: compi2opd dregs += imm7 positive
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

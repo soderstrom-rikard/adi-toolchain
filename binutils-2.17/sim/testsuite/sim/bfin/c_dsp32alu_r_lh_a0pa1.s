@@ -2,7 +2,6 @@
 // Spec Reference: dsp32alu r(lh) = ( a0 += a1)
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

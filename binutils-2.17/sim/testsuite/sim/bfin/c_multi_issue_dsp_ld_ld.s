@@ -2,7 +2,6 @@
 // Spec Reference: dsp32mac and 2 loads
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

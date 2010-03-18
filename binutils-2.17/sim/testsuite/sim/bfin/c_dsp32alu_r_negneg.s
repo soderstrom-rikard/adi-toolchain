@@ -2,7 +2,6 @@
 // Spec Reference: dsp32alu dregs = neg / neg dregs
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

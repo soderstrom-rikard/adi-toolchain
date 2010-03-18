@@ -2,7 +2,6 @@
 // Spec Reference: dsp32mult single dr munop u
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

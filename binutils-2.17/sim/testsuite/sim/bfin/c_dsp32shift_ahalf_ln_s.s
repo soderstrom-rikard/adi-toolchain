@@ -2,7 +2,6 @@
 // Spec Reference: <a pointer to reference the section of the spec>
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

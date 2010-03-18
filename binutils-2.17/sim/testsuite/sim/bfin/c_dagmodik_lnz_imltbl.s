@@ -2,7 +2,6 @@
 // Spec Reference: dagmodik l not zero & i+m < b
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 
