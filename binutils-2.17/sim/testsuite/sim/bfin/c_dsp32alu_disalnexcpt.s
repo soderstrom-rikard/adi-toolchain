@@ -1,6 +1,7 @@
 //Original:/testcases/core/c_dsp32alu_disalnexcpt/c_dsp32alu_disalnexcpt.dsp
 // Spec Reference: c_dsp32alu_disalgnexcpt
 # mach: bfin
+# xfail: "need to implement DISALGNEXCPT in sim" bfin-*
 
 .include "testutils.inc"
 	start

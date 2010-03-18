@@ -1,6 +1,7 @@
 //Original:/testcases/core/c_dsp32alu_rrpm/c_dsp32alu_rrpm.dsp
 // Spec Reference: dsp32alu (dreg, dreg)
 # mach: bfin
+# xfail: "need to implement these instructions in sim" bfin-*
 
 .include "testutils.inc"
 	start

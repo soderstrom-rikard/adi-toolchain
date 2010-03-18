@@ -1,6 +1,7 @@
 //Original:/testcases/core/c_dagmodim_lz_inc_dec/c_dagmodim_lz_inc_dec.dsp
 // Spec Reference: dagmodim L=0, I incremented & decremented (by M)
 # mach: bfin
+# xfail: "need to implement IREG/MREG (BREV) in sim" bfin-*
 
 .include "testutils.inc"
 	start

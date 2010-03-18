@@ -1,6 +1,7 @@
 //Original:/testcases/core/c_dsp32alu_search/c_dsp32alu_search.dsp
 // Spec Reference: dsp32alu search
 # mach: bfin
+# xfail: "need to implement SEARCH in sim" bfin-*
 
 .include "testutils.inc"
 	start

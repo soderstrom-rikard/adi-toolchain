@@ -1,6 +1,7 @@
 //Original:/testcases/core/c_dsp32mac_dr_a0_ih/c_dsp32mac_dr_a0_ih.dsp
 // Spec Reference: dsp32mac dr a0 ih (integer mutiplication with high word extraction)
 # mach: bfin
+# xfail: "need to implement instructions in sim" bfin-*
 
 .include "testutils.inc"
 	start

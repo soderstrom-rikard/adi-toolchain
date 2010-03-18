@@ -1,6 +1,7 @@
 //Original:/testcases/core/c_dsp32alu_bytepack/c_dsp32alu_bytepack.dsp
 // Spec Reference: dsp32alu bytepack
 # mach: bfin
+# xfail: "need to implement BYTEPACK in sim" bfin-*
 
 .include "testutils.inc"
 	start

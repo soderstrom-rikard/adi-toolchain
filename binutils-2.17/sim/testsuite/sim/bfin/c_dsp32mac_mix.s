@@ -1,6 +1,7 @@
 //Original:/testcases/core/c_dsp32mac_mix/c_dsp32mac_mix.dsp
 // Spec Reference: dsp32mac mix
 # mach: bfin
+# xfail: "need to implement instructions in sim" bfin-*
 
 .include "testutils.inc"
 	start

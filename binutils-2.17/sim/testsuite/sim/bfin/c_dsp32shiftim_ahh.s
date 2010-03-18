@@ -1,5 +1,6 @@
 //Original:/testcases/core/c_dsp32shiftim_ahh/c_dsp32shiftim_ahh.dsp
 # mach: bfin
+# xfail: "need to implement shifts in sim" bfin-*
 
 .include "testutils.inc"
 	start

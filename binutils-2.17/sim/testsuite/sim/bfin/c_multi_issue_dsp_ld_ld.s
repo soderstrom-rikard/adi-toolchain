@@ -1,6 +1,7 @@
 //Original:/testcases/core/c_multi_issue_dsp_ld_ld/c_multi_issue_dsp_ld_ld.dsp
 // Spec Reference: dsp32mac and 2 loads
 # mach: bfin
+# xfail: "need to implement +|+/-|- in sim" bfin-*
 
 .include "testutils.inc"
 	start

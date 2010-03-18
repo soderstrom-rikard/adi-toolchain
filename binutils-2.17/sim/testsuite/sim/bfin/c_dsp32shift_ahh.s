@@ -1,6 +1,7 @@
 //Original:/testcases/core/c_dsp32shift_ahh/c_dsp32shift_ahh.dsp
 // Spec Reference: dsp32shift ashift/ashift
 # mach: bfin
+# xfail: "need to implement ASHIFT in sim" bfin-*
 
 .include "testutils.inc"
 	start

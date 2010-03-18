@@ -1,6 +1,7 @@
 //Original:/testcases/core/c_dsp32shift_expadj_l/c_dsp32shift_expadj_l.dsp
 // Spec Reference: dsp32shift expadj rl
 # mach: bfin
+# xfail: "need to implement EXPADJ in sim" bfin-*
 
 .include "testutils.inc"
 	start

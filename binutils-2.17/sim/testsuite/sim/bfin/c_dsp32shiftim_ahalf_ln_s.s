@@ -1,6 +1,7 @@
 //Original:/testcases/core/c_dsp32shiftim_ahalf_ln_s/c_dsp32shiftim_ahalf_ln_s.dsp
 // Spec Reference: dspshiftimm dreg_lo(hi) = ashift (dreg_lo(hi) by imm5) saturated
 # mach: bfin
+# xfail: "need to implement instructions in sim" bfin-*
 
 .include "testutils.inc"
 	start

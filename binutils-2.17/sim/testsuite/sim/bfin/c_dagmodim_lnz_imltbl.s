@@ -1,6 +1,7 @@
 //Original:/testcases/core/c_dagmodim_lnz_imltbl/c_dagmodim_lnz_imltbl.dsp
 // Spec Reference: dagmodim l not zero & i+m < b
 # mach: bfin
+# xfail: "need to implement IREG/MREG (BREV) in sim" bfin-*
 
 .include "testutils.inc"
 	start

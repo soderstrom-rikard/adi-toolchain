@@ -1,6 +1,7 @@
 //Original:/testcases/core/c_dsp32shift_ahalf_ln_s/c_dsp32shift_ahalf_ln_s.dsp
 // Spec Reference: <a pointer to reference the section of the spec>
 # mach: bfin
+# xfail: "need to implement ASHIFT in sim" bfin-*
 
 .include "testutils.inc"
 	start
