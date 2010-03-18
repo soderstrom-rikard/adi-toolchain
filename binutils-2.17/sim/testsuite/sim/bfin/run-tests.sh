@@ -59,17 +59,24 @@ dojtag() {
 	fi
 
 	cat <<-EOF > commands
-	target remote localhost:2000
-	load
-	b *_pass
-	commands
-	exit 0
-	end
-	b *_fail
-	commands
-	exit 1
-	end
-	c
+		target remote localhost:2000
+		load
+
+		b *_pass
+		commands
+		exit 0
+		end
+
+		b *_fail
+		commands
+		exit 1
+		end
+
+		# we're executing at EVT1, so this doesn't really help ...
+		set ((long *)0xFFE02000)[3] = _fail
+		set ((long *)0xFFE02000)[5] = _fail
+
+		c
 	EOF
 	bfin-elf-gdb -x commands "$1"
 	ret=$?
