@@ -1,7 +1,6 @@
 //Original:/testcases/core/c_dsp32alu_rr_lph_a1a0/c_dsp32alu_rr_lph_a1a0.dsp
 // Spec Reference: dsp32alu (dregs, dregs) = L + H, L + H (a1, a0)
 # mach: bfin
-# xfail: "need to implement these instructions in sim" bfin-*
 
 .include "testutils.inc"
 	start
