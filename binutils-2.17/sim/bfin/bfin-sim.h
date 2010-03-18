@@ -60,6 +60,7 @@ struct bfin_cpu_state
   int v_internal;
   bu32 pc, rets, reti, retx, retn, rete;
   bu32 usp, seqstat, syscfg;
+  bu32 emudat;
 
   /* Set by an instruction emulation function if we performed a jump.  */
   bool did_jump;
@@ -108,6 +109,7 @@ struct bfin_cpu_state
 #define RETNREG		(BFIN_CPU_STATE.retn)
 #define RETEREG		(BFIN_CPU_STATE.rete)
 #define PCREG		(BFIN_CPU_STATE.pc)
+#define EMUDAT		(BFIN_CPU_STATE.emudat)
 
 #define AZ_BIT		0
 #define AN_BIT		1

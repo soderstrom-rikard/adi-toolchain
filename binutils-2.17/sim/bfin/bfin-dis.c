@@ -656,6 +656,7 @@ get_allreg (SIM_CPU *cpu, int grp, int reg)
 	case 60: return &RETXREG;
 	case 61: return &RETNREG;
 	case 62: return &RETEREG;
+	case 63: return &EMUDAT;
 	}
       return 0;
     }
@@ -1151,9 +1152,6 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
       /* allregs = [SP++] */
       if (grp == 4 && reg == 6)
 	SET_ASTAT (value);
-      else if (whichreg == 0)
-	/* XXX: EMUDAT writes go to JTAG chain.  */
-	unhandled_instruction (cpu, "EMUDAT = [SP++]");
       else
 	{
 	  if (reg_requires_sup (cpu, whichreg))
@@ -1174,9 +1172,6 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
       SPREG -= 4;
       if (grp == 4 && reg == 6)
 	value = ASTAT;
-      else if (whichreg == 0)
-	/* XXX: EMUDAT reads come from JTAG chain.  */
-	unhandled_instruction (cpu, "[--SP] = EMUDAT");
       else
 	{
 	  if (reg_requires_sup (cpu, whichreg))
@@ -1456,8 +1451,6 @@ decode_REGMV_0 (SIM_CPU *cpu, bu16 iw0)
 
   if (gs == 4 && src == 6)
     value = ASTAT;
-  else if (srcreg == 0)
-    unhandled_instruction (cpu, "xxx = EMUDAT;");
   else
     {
       /* XXX: reads of CYCLES2 should come from shadow copy */
@@ -1468,8 +1461,6 @@ decode_REGMV_0 (SIM_CPU *cpu, bu16 iw0)
 
   if (gd == 4 && dst == 6)
     SET_ASTAT (value);
-  else if (dstreg == 0)
-    unhandled_instruction (cpu, "EMUDAT = xxx;");
   else
     {
       if (reg_requires_sup (cpu, dstreg))
@@ -3375,9 +3366,19 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   else if (sop == 1 && sopcde == 1)
     unhandled_instruction (cpu, "dregs = dregs >>> uimm5 (V,S)");
   else if (sop == 2 && sopcde == 1)
-    unhandled_instruction (cpu, "dregs = dregs >> uimm5 (V)");
+   {
+     /* dregs = dregs >> uimm5 (V) */
+     /* dregs = dregs << uimm5 (V) */
+     int count = imm5(immag);
+     if (bit8)
+       DREG(dst0) = (DREG (src1) & 0xFFFF >> count) | ((DREG (src1) >> count ) & 0xFFFF0000);
+     else
+       DREG(dst0) = ((DREG (src1) << count) & 0xFFFF) | ((DREG (src1) & 0xFFFF0000) << count);
+
+      /* ASTAT ? */
+    }
   else if (sop == 0 && sopcde == 1)
-    unhandled_instruction (cpu, "dregs = dregs << imm5 (V)");
+    unhandled_instruction (cpu, "dregs = dregs <<< imm5 (V)");
   else if (sop == 1 && sopcde == 2)
     {
       int count = imm6 (immag);
