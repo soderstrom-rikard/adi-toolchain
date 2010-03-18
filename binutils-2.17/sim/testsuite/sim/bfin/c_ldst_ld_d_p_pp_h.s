@@ -51,6 +51,7 @@
 	CHECKREG r6, 0x00000001;
 	R2 = W [ P5 ++ ] (Z);
 	R3 = W [ P1 ++ ] (Z);
+	R4 = W [ P2 ++ ] (Z);
 .ifndef BFIN_HOST
 	R5 = W [ P3 ++ ] (Z);
 .endif
@@ -59,8 +60,8 @@
 	CHECKREG r1, 0x00000001;
 	CHECKREG r2, 0x00000607;
 	CHECKREG r3, 0x00002627;
-.ifndef BFIN_HOST
 	CHECKREG r4, 0x00004647;
+.ifndef BFIN_HOST
 	CHECKREG r5, 0x00006667;
 .endif
 	CHECKREG r6, 0x00008687;
