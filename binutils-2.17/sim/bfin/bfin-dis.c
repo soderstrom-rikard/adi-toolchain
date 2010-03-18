@@ -3412,6 +3412,14 @@ printf("count = %d\n", count);
 }
 
 static void
+outc (char ch)
+{
+  printf ("%c", ch);
+  if (ch == '\n')
+    fflush (stdout);
+}
+
+static void
 decode_psedoDEBUG_0 (SIM_CPU *cpu, bu16 iw0)
 {
   /* psedoDEBUG
@@ -3441,7 +3449,10 @@ decode_psedoDEBUG_0 (SIM_CPU *cpu, bu16 iw0)
   else if (reg == 7 && fn == 3)
     unhandled_instruction (cpu, "DBG");
   else if (grp == 0 && fn == 2)
-    unhandled_instruction (cpu, "OUTC dregs");
+    {
+      /* OUTC dreg; */
+      outc (DREG (reg));
+    }
   else if (fn == 0)
     unhandled_instruction (cpu, "DBG allregs");
   else if (fn == 1)
@@ -3459,9 +3470,8 @@ decode_psedoOChar_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 1 | 1 | 1 | 1 | 1 | 0 | 0 | 1 |.ch............................|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
-  UNUSED int ch = ((iw0 >> 0) & 0xff);
-
-  unhandled_instruction (cpu, "OUTC uimm8");
+  int ch = ((iw0 >> 0) & 0xff);
+  outc (ch);
   PCREG += 2;
 }
 
