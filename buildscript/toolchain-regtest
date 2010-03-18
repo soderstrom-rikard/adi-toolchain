@@ -435,11 +435,13 @@ if test_targets_has LINUX ; then
 	# Make sure syslog doesnt grab debug messages (kernel dumps)
 	run_rcp /var/log/messages "${DIR_TEST_RESULTS}"/messages.boot
 	run_rsh_nodie '> /var/log/messages'
-	if run_rsh_nodie_stdout ps | grep syslog | grep -q -v -e '-l 6' ; then
+	if run_rsh_nodie_stdout ps | grep syslog | grep -q -v -e '-l 5' ; then
 		echo "    Board at '${TARGET_IPADDR}' being set so syslog doesn't fill /var/log/messages"
-		run_rsh_nodie sed -i '"/^slog:/s:$: -l 6:"' /etc/inittab
+		run_rsh_nodie sed -i '"/^slog:/s:$: -l 5:"' /etc/inittab
 	fi
 	run_rsh_nodie kill -HUP 1
+
+	run_rsh_nodie dmesg -n 5
 fi
 
 ############ Done checking - lets get on to testing ###################
@@ -502,10 +504,10 @@ prepare_target()
 
 	# Just in case we caused the kernel under test to crash, let's do a sanity test
 	# make sure syslogd is set to not log rsh/rcp as it will fill /var/log/messages
-	if run_rsh_nodie_stdout ps | grep syslog | grep -q -v -e '-l 6' ; then
+	if run_rsh_nodie_stdout ps | grep syslog | grep -q -v -e '-l 5' ; then
 		log_on_board "Setting syslogd"
 		run_rsh_nodie '> /var/log/messages'
-		run_rsh_nodie sed -i "'/^slog:/s:$: -l 6:'" /etc/inittab
+		run_rsh_nodie sed -i '"/^slog:/s:$: -l 5:"' /etc/inittab
 		run_rsh_nodie kill -HUP 1
 	fi
 
