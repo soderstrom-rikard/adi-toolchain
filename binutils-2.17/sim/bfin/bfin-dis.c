@@ -2623,13 +2623,15 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     }
   else if (aop == 0 && aopcde == 9 && s == 1)
     {
+      /* A0 = dregs */
       A0WREG = DREG (src0);
-      A0XREG = -(A1WREG >> 31);
+      A0XREG = -(A0WREG >> 31);
     }
   else if (aop == 1 && aopcde == 9 && s == 0)
     A0XREG = (bs32)(bs8)DREG (src0);
   else if (aop == 2 && aopcde == 9 && s == 1)
     {
+      /* A1 = dregs */
       A1WREG = DREG (src0);
       A1XREG = -(A1WREG >> 31);
     }
@@ -2702,7 +2704,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     }
   else if (aop == 3 && HL == 0 && aopcde == 16)
     {
-      /* A1 = ABS 1 , A0 = ABS A0 ; */
+      /* A1 = ABS A1 , A0 = ABS A0 ; */
       int i;
       for (i = 0; i < 2; ++i)
 	{
