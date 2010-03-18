@@ -1,6 +1,7 @@
 //Original:/testcases/core/c_dsp32mac_a1a0_iuw32/c_dsp32mac_a1a0_iuw32.dsp
 // Spec Reference: dsp32mac a1 a0 iuw32 MNOP
 # mach: bfin
+# xfail: "need to implement instructions in sim" bfin-*
 
 .include "testutils.inc"
 	start
