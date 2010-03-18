@@ -5,6 +5,9 @@
 .include "testutils.inc"
 	start
 
+	/* This test likes to assume the current [SP] is valid */
+	SP += -12;
+
 	imm32 r0, 0x00000000;
 	imm32 r1, 0x00000001;
 	imm32 r2, 0x00000002;
