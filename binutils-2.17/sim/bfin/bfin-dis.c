@@ -3201,7 +3201,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
      tmp_hi = signbits(src1_hi, 16);
      tmp_lo = signbits(src1_lo, 16);
      DREG (dst0) &= 0xFFFF0000;
-    
+
      if ((tmp_hi & 0xf) < (tmp_lo & 0xf))
        if ((tmp_hi&0xf) < (src0_lo & 0xf))
 	 DREG (dst0) |= tmp_hi;
