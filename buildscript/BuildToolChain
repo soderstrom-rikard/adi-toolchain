@@ -47,7 +47,7 @@ RESUME_BUILD=false
 CBUILD= # the system we are compiling on
 CHOST=  # the system the final compiler will run on
 
-unset SKIP_ELF SKIP_JTAG SKIP_LDR SKIP_TARGET_LIBS
+unset SKIP_ELF SKIP_JTAG SKIP_LDR SKIP_TARGET_LIBS SKIP_UBOOT SKIP_FLAT SKIP_FDPIC
 
 TEST_OPTS=
 TEST_SIM=
@@ -112,6 +112,10 @@ do
                 jtag)  SKIP_JTAG=true ;;
                 ldr)   SKIP_LDR=true ;;
                 tlibs) SKIP_TARGET_LIBS=true ;;
+                uboot) SKIP_UBOOT=true ;;
+                flat)  SKIP_FLAT=true ;;
+                fdpic) SKIP_FDPIC=true ;;
+                *)     error "invalid skip target '${OPTARG}'" ;;
             esac
             ;;
         s)  DIR_SOURCE=${OPTARG%/} ;;
@@ -210,8 +214,9 @@ fi
 ############ Done checking - lets get on to building ###################3
 
 chains=
-[ $SKIP_ELF ] || chains="${chains} bfin-elf"
-[ $KERNEL_SOURCE ] && chains="${chains} bfin-uclinux bfin-linux-uclibc"
+[ $SKIP_ELF   ] || chains="${chains} bfin-elf"
+[ $SKIP_FLAT  ] || chains="${chains} bfin-uclinux"
+[ $SKIP_FDPIC ] || chains="${chains} bfin-linux-uclibc"
 notice "Building toolchains" ${chains}
 
 # Don't set a default here ... let the build system
@@ -230,7 +235,7 @@ fi
 export MAKEFLAGS="-j$NUM_JOBS $MAKEFLAGS"
 notice "Utilizing make" "$MAKE $MAKEFLAGS"
 
-scrub_path
+[ $SKIP_ELF ] || scrub_path
 
 ############ FIND SOME DEFAULT PATHS ############################
 # Support the "normal" layout (what we document in examples):
@@ -252,6 +257,8 @@ if [ -z "${KERNEL_SOURCE}" ] ; then
 		fi
 	done
 fi
+[ ${SKIP_FLAT} ] && [ ${SKIP_FDPIC} ] && unset KERNEL_SOURCE
+[ -z "${KERNEL_SOURCE}" ] && SKIP_FLAT=true SKIP_FDPIC=true
 
 if [ -z "${DIR_UBOOT}" ] ; then
 	for p in ../u-boot ../../u-boot/trunk ; do
@@ -265,6 +272,8 @@ if [ -z "${DIR_UBOOT}" ] ; then
 		fi
 	done
 fi
+[ ${SKIP_UBOOT} ] && unset DIR_UBOOT
+[ -z "${DIR_UBOOT}" ] && SKIP_UBOOT=true
 
 ############ ABSOLUTE PATH TO SOURCE DIRECTORIES ################
 
@@ -338,23 +347,24 @@ check_src_pkg urjtag
 check_src_pkg gdbproxy
 
 : ${DIR_uC_OUTPUT:=${DIR_BUILD}/bfin-uclinux}
+mk_output_dir "FLAT" $DIR_uC_OUTPUT $SKIP_FLAT
+
 : ${DIR_LINUX_OUTPUT:=${DIR_BUILD}/bfin-linux-uclibc}
-if [ $KERNEL_SOURCE ] ; then
-    mk_output_dir "FLAT" $DIR_uC_OUTPUT ""
-    mk_output_dir "FDPIC" $DIR_LINUX_OUTPUT ""
-    if [ ! $DIR_KBUILD_OUTPUT ] ; then
-        DIR_KBUILD_OUTPUT=$DIR_BUILD/kernel_build
-        mk_output_dir "kernel" $DIR_KBUILD_OUTPUT ""
-    fi
-    if [ $DIR_UBOOT ] ; then
-        check_abs_dir "Path to U-Boot" "${DIR_UBOOT}"
-    else
-        echo "U-Boot Source not specified: addon utilties (like 'mkimage') will not be built"
-    fi
-    notice "Path to uClibc config" "${UCLIBC_CONFIG_FILE:-$DIR_UCLIBC_SOURCE/extra/Configs/}"
-    if [ -n "$UCLIBC_CONFIG_FILE" ] && [ ! -f "${UCLIBC_CONFIG_FILE}" ] ; then
-        error "Can't find uClibc config file '$UCLIBC_CONFIG_FILE'"
-    fi
+mk_output_dir "FDPIC" $DIR_LINUX_OUTPUT $SKIP_FDPIC
+
+if [ ! $DIR_KBUILD_OUTPUT ] ; then
+	DIR_KBUILD_OUTPUT=$DIR_BUILD/kernel_build
+	mk_output_dir "kernel" $DIR_KBUILD_OUTPUT ""
+fi
+
+if [ $SKIP_UBOOT ] ; then
+	echo "U-Boot Source not specified: addon utilties (like 'mkimage') will not be built"
+else
+	check_abs_dir "Path to U-Boot" "${DIR_UBOOT}"
+fi
+notice "Path to uClibc config" "${UCLIBC_CONFIG_FILE:-$DIR_UCLIBC_SOURCE/extra/Configs/}"
+if [ -n "$UCLIBC_CONFIG_FILE" ] && [ ! -f "${UCLIBC_CONFIG_FILE}" ] ; then
+	error "Can't find uClibc config file '$UCLIBC_CONFIG_FILE'"
 fi
 
 ###################### set up log file ###########################
@@ -377,7 +387,9 @@ else
 fi
 
 # Add output dir so when building uclibc, it can find the toolchain
-export PATH=$NEW_PATH:/$DIR_ELF_OUTPUT/bin:/$DIR_uC_OUTPUT/bin:/$DIR_LINUX_OUTPUT/bin
+if [ -n "${NEW_PATH}" ] ; then
+	export PATH=$NEW_PATH:/$DIR_ELF_OUTPUT/bin:/$DIR_uC_OUTPUT/bin:/$DIR_LINUX_OUTPUT/bin
+fi
 
 #################################################################
 ############## DONOT CHANGE ANYTHING BELOW THIS LINE ############
@@ -1000,12 +1012,14 @@ fi
 #
 # Now build the FLAT/FDPIC toolchains
 #
-if [ $KERNEL_SOURCE ] ; then
+if [ ! $SKIP_FLAT ] || [ ! $SKIP_FDPIC ] ; then
 	# First the kernel headers and uClibc.  This builds
 	# all of the FLAT/FDPIC libs with the ELF compiler.
 	build_kernel_headers
 	build_uclibc
+fi
 
+if [ ! $SKIP_FLAT ] ; then
 	# Now the FLAT binutils/gcc
 	build_binutils uclinux $DIR_uC_OUTPUT
 	build_elf2flt uclinux $DIR_uC_OUTPUT
@@ -1014,7 +1028,9 @@ if [ $KERNEL_SOURCE ] ; then
 			"--enable-threads=posix \
 			--with-sysroot=$DIR_uC_OUTPUT/bfin-uclinux/runtime"
 	done
+fi
 
+if [ ! $SKIP_FDPIC ] ; then
 	# Now the FDPIC binutils/gcc
 	build_binutils linux-uclibc $DIR_LINUX_OUTPUT
 	for GCC_VER in $GCC_VERSIONS ; do
@@ -1026,7 +1042,7 @@ if [ $KERNEL_SOURCE ] ; then
 fi
 
 # Finally do u-boot if wanted
-[ $DIR_UBOOT ] && build_uboot
+[ $SKIP_UBOOT ] || build_uboot
 
 export PKG_CONFIG_PATH="${DIR_ELF_OUTPUT}/lib/pkgconfig${PKG_CONFIG_PATH:+:${PKG_CONFIG_PATH}}"
 
@@ -1129,12 +1145,14 @@ if [ -z $SKIP_TARGET_LIBS ] && [ -e $DIR_SOURCE/libs/Makefile ] ; then
 	check_installed_files libdsp "$DIR_SOURCE/libs/libdsp/" \
 		libbfdsp.a libbffastfp.a
 
-	if [ $KERNEL_SOURCE ] && echo "${dir}" | grep -q -v bf561; then
+	if echo "${dir}" | grep -q -v bf561; then
 		if echo "${flags}" | grep -q mfdpic; then
+			[ $SKIP_FDPIC ] && continue
 			suffix=/`echo ${dir} | sed -e 's/mfdpic//' -e 's|/$||'`
 			mlib=
 			destdir="$DIR_LINUX_OUTPUT/bfin-linux-uclibc"
 		else
+			[ $SKIP_FLAT ] && continue
 			suffix=
 			mlib="/$dir"
 			destdir="$DIR_uC_OUTPUT/bfin-uclinux/runtime"
@@ -1178,10 +1196,10 @@ build_target_binutils_libs()
 	run_cmd rm -rf "${DIR_BINUTILS_BUILD}"
 }
 
-if [ -z $SKIP_TARGET_LIBS ] && [ $KERNEL_SOURCE ] ; then
+if [ ! $SKIP_TARGET_LIBS ] ; then
 	export PATH=$DIR_uC_OUTPUT/bin:$DIR_LINUX_OUTPUT/bin:$PATH
-	build_target_binutils_libs uclinux "${DIR_uC_OUTPUT}"
-	build_target_binutils_libs linux-uclibc "${DIR_LINUX_OUTPUT}"
+	[ $SKIP_FLAT  ] || build_target_binutils_libs uclinux "${DIR_uC_OUTPUT}"
+	[ $SKIP_FDPIC ] || build_target_binutils_libs linux-uclibc "${DIR_LINUX_OUTPUT}"
 fi
 
 change_dir "${DIR_BUILD}"
