@@ -101,6 +101,21 @@ __fail:
 .endif
 	exit 1
 
+	.macro outc_str ch:req, more:vararg
+	OUTC \ch;
+	.ifnb \more
+	outc_str \more
+	.endif
+	.endm
+	.macro dbg_pass
+	outc_str 'p', 'a', 's', 's', '\n'
+	HLT;
+	.endm
+	.macro dbg_fail
+	outc_str 'f', 'a', 'i', 'l', '\n'
+	ABORT;
+	.endm
+
 	.macro imm32 reg:req, val:req
 	\reg\().L = ((\val) & 0xffff);
 	\reg\().H = (((\val) >> 16) & 0xffff);

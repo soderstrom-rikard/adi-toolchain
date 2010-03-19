@@ -1,7 +1,6 @@
 # Blackfin testcase for the CEC
 # mach: bfin
 # sim: --environment operating
-# output: *
 
 	.include "testutils.inc"
 
@@ -316,11 +315,7 @@ CHECKREG r1, 0x00000fff;	/* XXX: original had 0xfe0 ??  */
 CHECKREG r2, 0x00008000;
 CHECKREG r3, 0x00003000;
 
-
-
-
-
-	HLT;
+	dbg_pass;
 
 // *********************************************************************
 

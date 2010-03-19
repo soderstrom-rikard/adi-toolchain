@@ -3,7 +3,6 @@
 // SEQSTAT.
 # mach: bfin
 # sim: --environment operating
-# output: *
 
 	.include "testutils.inc"
 
@@ -27,7 +26,7 @@ start_uspace:
 
 	DBGA ( R1.L , 0x1238 );
 
-	HLT;
+	dbg_pass;
 
 	// ihandler
 re:
@@ -47,4 +46,4 @@ re:
 
 _error:
 	DBGA ( R0.L , EXCPT_PROTVIOL );
-	.word 0xf8c3	/* ABORT */
+	dbg_fail;

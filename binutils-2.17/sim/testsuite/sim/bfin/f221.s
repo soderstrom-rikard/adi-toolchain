@@ -1,7 +1,6 @@
 # Blackfin testcase for the CEC (handling exceptions from usermode)
 # mach: bfin
 # sim: --environment operating
-# output: *
 
 	.include "testutils.inc"
 
@@ -31,22 +30,27 @@ UserCode:
 
 	// should except - r4 dep
 	// R4 = R4 >> 25 || W [ I3 ++ ] = R0.H || R4 = [ I3 ];
+.Lskip_start:
 	.rep 8
 	.byte 0xff
 	.endr
-
-_fail0:
-	.word 0xf8c3	/* ABORT */
+	dbg_fail;
+.Lskip_end:
 	NOP;
 	NOP;
 	NOP;
 	NOP;
 	NOP;
-	HLT;
+	dbg_pass;
 
 exception_handler:
 	// just skip over excepting instructions
 	R0 = RETX;
-	R0 += 10;
+	R1.L = .Lskip_start;
+	R1.H = .Lskip_start;
+	R2.L = .Lskip_end;
+	R2.H = .Lskip_end;
+	R2 = R2 - R1;
+	R0 = R0 + R2;
 	RETX = R0;
 	RTX;
