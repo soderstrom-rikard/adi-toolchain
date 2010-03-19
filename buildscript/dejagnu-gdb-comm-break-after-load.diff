@@ -2,7 +2,6 @@
 
 	* config/gdb-comm.exp (gdb_comm_load): Set breakpoints after load.
 
-
 diff --git a/config/gdb-comm.exp b/config/gdb-comm.exp
 index affa61a..f8a677f 100644
 --- a/config/gdb-comm.exp
