@@ -1,4 +1,4 @@
-Test Run By vapier on Wed Mar 17 04:37:36 2010
+Test Run By vapier on Fri Mar 19 17:03:23 2010
 Target is bfin-unknown-uclinux
 Host   is x86_64-unknown-linux-gnu
 
@@ -387,7 +387,28 @@ PASS: gdb.base/break.exp: breakpoint small function, optimized file
 PASS: gdb.base/break.exp: stub continue, optimized file
 PASS: gdb.base/break.exp: run until breakpoint set at small function, optimized file
 Running binutils-2.17/gdb/testsuite/gdb.base/call-ar-st.exp ...
-UNTESTED: gdb.base/call-ar-st.exp: skipping call-ar-st.exp because of noinferiorio.
+PASS: gdb.base/call-ar-st.exp: tbreakpoint line 1209
+PASS: gdb.base/call-ar-st.exp: run until breakpoint set at a line
+PASS: gdb.base/call-ar-st.exp: tbreakpoint line 1216
+PASS: gdb.base/call-ar-st.exp: tbreakpoint line 1220
+PASS: gdb.base/call-ar-st.exp: step inside print_all_arrays
+PASS: gdb.base/call-ar-st.exp: tbreakpoint line 1236
+PASS: gdb.base/call-ar-st.exp: tbreakpoint line 1241
+PASS: gdb.base/call-ar-st.exp: continue to 1241
+PASS: gdb.base/call-ar-st.exp: set breakpoint in sum_array_print
+PASS: gdb.base/call-ar-st.exp: check args of sum_array_print
+PASS: gdb.base/call-ar-st.exp: tbreakpoint line 1281
+PASS: gdb.base/call-ar-st.exp: print compute_with_small_structs(20)
+PASS: gdb.base/call-ar-st.exp: tbreakpoint line 1286
+PASS: gdb.base/call-ar-st.exp: continue to 1286
+PASS: gdb.base/call-ar-st.exp: tbreak in print_long_arg_list after stepping into memcpy
+PASS: gdb.base/call-ar-st.exp: step into print_long_arg_list
+PASS: gdb.base/call-ar-st.exp: tbreakpoint line 1300
+PASS: gdb.base/call-ar-st.exp: step into init_bit_flags_combo
+PASS: gdb.base/call-ar-st.exp: tbreakpoint line 1305
+PASS: gdb.base/call-ar-st.exp: continue to 1305
+PASS: gdb.base/call-ar-st.exp: tbreakpoint line 1311
+PASS: gdb.base/call-ar-st.exp: continue to 1311
 Running binutils-2.17/gdb/testsuite/gdb.base/call-rt-st.exp ...
 PASS: gdb.base/call-rt-st.exp: breakpoint loop_count
 PASS: gdb.base/call-rt-st.exp: continue to loop_count
@@ -5000,7 +5021,7 @@ PASS: gdb.base/sigbpt.exp: stepi bp before segv; pass SIGSEGV
 PASS: gdb.base/sigbpt.exp: stepi bp before segv; continue to keeper
 PASS: gdb.base/sigbpt.exp: stepi bp before segv; nopass SIGSEGV
 PASS: gdb.base/sigbpt.exp: stepi bp before segv; set breakpoint 0 of 1
-FAIL: gdb.base/sigbpt.exp: stepi bp before segv; stepi out of handler
+PASS: gdb.base/sigbpt.exp: stepi bp before segv; stepi out of handler
 PASS: gdb.base/sigbpt.exp: stepi bp before segv; clear breakpoint 0 of 1
 PASS: gdb.base/sigbpt.exp: rerun to main
 PASS: gdb.base/sigbpt.exp: stepi bp at segv; pass SIGSEGV
@@ -5015,7 +5036,7 @@ PASS: gdb.base/sigbpt.exp: stepi bp before and at segv; continue to keeper
 PASS: gdb.base/sigbpt.exp: stepi bp before and at segv; nopass SIGSEGV
 PASS: gdb.base/sigbpt.exp: stepi bp before and at segv; set breakpoint 0 of 2
 PASS: gdb.base/sigbpt.exp: stepi bp before and at segv; set breakpoint 1 of 2
-FAIL: gdb.base/sigbpt.exp: stepi bp before and at segv; stepi out of handler
+PASS: gdb.base/sigbpt.exp: stepi bp before and at segv; stepi out of handler (at breakpoint)
 PASS: gdb.base/sigbpt.exp: stepi bp before and at segv; clear breakpoint 0 of 2
 PASS: gdb.base/sigbpt.exp: stepi bp before and at segv; clear breakpoint 1 of 2
 PASS: gdb.base/sigbpt.exp: rerun to main
@@ -5032,8 +5053,8 @@ PASS: gdb.base/sigbpt.exp: cont bp after segv; continue to keeper
 PASS: gdb.base/sigbpt.exp: cont bp after segv; nopass SIGSEGV
 PASS: gdb.base/sigbpt.exp: cont bp after segv; set breakpoint 0  of 2
 PASS: gdb.base/sigbpt.exp: cont bp after segv; set breakpoint 1  of 2
-FAIL: gdb.base/sigbpt.exp: cont bp after segv; continue to breakpoint at fault
-FAIL: gdb.base/sigbpt.exp: cont bp after segv; stepi fault
+PASS: gdb.base/sigbpt.exp: cont bp after segv; continue to breakpoint at fault
+PASS: gdb.base/sigbpt.exp: cont bp after segv; stepi fault
 PASS: gdb.base/sigbpt.exp: cont bp after segv; clear breakpoint 0 of 2
 PASS: gdb.base/sigbpt.exp: cont bp after segv; clear breakpoint 1 of 2
 PASS: gdb.base/sigbpt.exp: rerun to main
@@ -9844,7 +9865,7 @@ FAIL: gdb.mi/mi2-syn-frame.exp: 403-exec-continue
 FAIL: gdb.mi/mi2-syn-frame.exp: list stack frames
 FAIL: gdb.mi/mi2-syn-frame.exp: insert breakpoint subroutine
 FAIL: gdb.mi/mi2-syn-frame.exp: evaluate expression have_a_very_merry_interrupt
-FAIL: gdb.mi/mi2-syn-frame.exp: list stack frames
+PASS: gdb.mi/mi2-syn-frame.exp: list stack frames
 PASS: gdb.mi/mi2-syn-frame.exp: 408-exec-continue
 PASS: gdb.mi/mi2-syn-frame.exp: list stack frames
 FAIL: gdb.mi/mi2-syn-frame.exp: call inferior function which raises exception
@@ -10773,12 +10794,12 @@ UNRESOLVED: gdb.trace/while-stepping.exp: Could not find gdb_c_test function
 
 		=== gdb Summary ===
 
-# of expected passes		10051
-# of unexpected failures	178
+# of expected passes		10078
+# of unexpected failures	173
 # of expected failures		41
 # of known failures		58
 # of unresolved testcases	11
-# of untested testcases		12
+# of untested testcases		11
 # of unsupported tests		18
 /usr/local/src/blackfin/toolchains/20100316/bfin-uclinux/bin/bfin-uclinux-gdb version  6.6 -nx
 
