@@ -1,0 +1,44 @@
+2010-01-19  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/gdb-comm.exp (gdb_comm_load): Set breakpoints after load.
+
+
+diff --git a/config/gdb-comm.exp b/config/gdb-comm.exp
+index affa61a..f8a677f 100644
+--- a/config/gdb-comm.exp
++++ b/config/gdb-comm.exp
+@@ -308,16 +308,6 @@ proc gdb_comm_load { dest prog args } {
+ 	}
+     }
+ 
+-    # Now set up breakpoints in exit, _exit, and abort.  These
+-    # are used to determine if a c-torture test passed or failed.  More
+-    # work would be necessary for things like the g++ testsuite which
+-    # use printf to indicate pass/fail status.
+-
+-    if { [gdb_comm_add_breakpoint _exit] != "" } {
+-	gdb_comm_add_breakpoint exit
+-    }
+-    gdb_comm_add_breakpoint abort
+-
+     set protocol [board_info $dest gdb_protocol]
+     if {[board_info $dest exists gdb_serial]} {
+ 	set targetname [board_info $dest gdb_serial]
+@@ -405,6 +395,16 @@ proc gdb_comm_load { dest prog args } {
+ 	}
+     }
+ 
++    # Now set up breakpoints in exit, _exit, and abort.  These
++    # are used to determine if a c-torture test passed or failed.  More
++    # work would be necessary for things like the g++ testsuite which
++    # use printf to indicate pass/fail status.
++
++    if { [gdb_comm_add_breakpoint _exit] != "" } {
++	gdb_comm_add_breakpoint exit
++    }
++    gdb_comm_add_breakpoint abort
++
+     set output ""
+     
+     # Now start up the program and look for our magic breakpoints.
+
