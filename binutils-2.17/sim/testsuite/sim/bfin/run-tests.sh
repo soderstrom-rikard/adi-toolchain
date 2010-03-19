@@ -138,7 +138,7 @@ fi
 
 ret=0
 for s in "$@" ; do
-	${run_sim}  && testit SIM  ${s}.x bfin-elf-run
+	${run_sim}  && testit SIM  ${s}.x bfin-elf-run `sed -n '/^# sim:/s|^[^:]*:||p' ${s}`
 	${run_jtag} && testit JTAG ${s}.x dojtag
 	${run_host} && testit HOST ${s}.X dorsh
 done
