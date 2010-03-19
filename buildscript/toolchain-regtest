@@ -919,8 +919,9 @@ run_tests()
 
 	prepare_target ${test_target}
 
-	tt="binutils gas ld sim gdb gcc g++ gfortran objc libstdc++"
+	tt="binutils gas ld gdb gcc g++ gfortran objc libstdc++"
 	case ${test_target} in
+		elf-sim)      tt="${tt} sim" ;;
 		elf-jtag)     tt="${tt} newlib" ;;
 		uclinux)      tt="${tt} libmudflap" ;;
 		linux-uclibc) tt="${tt} libmudflap libgomp"
