@@ -164,10 +164,14 @@ cec_exception (SIM_CPU *cpu, int excp)
    *  - Execution continues on in the EVT3 handler
    */
 
-  /* simulator wants to halt */
-  if (excp == VEC_SIM_HLT)
+  /* Handle simulator exceptions first.  */
+  switch (excp)
     {
+    case VEC_SIM_HLT:
       excp_to_sim_halt (sim_exited, 0);
+      return;
+    case VEC_SIM_ABORT:
+      excp_to_sim_halt (sim_exited, 1);
       return;
     }
 

@@ -44,11 +44,10 @@
 
 #define SIGNEXTEND(v, n) (((bs32)v << (HOST_LONG_WORD_SIZE - (n))) >> (HOST_LONG_WORD_SIZE - (n)))
 
-static __attribute__ ((noreturn)) void
+static void
 illegal_instruction (SIM_CPU *cpu)
 {
-  while (1) /* avoid gcc warnings about returning */
-    cec_exception (cpu, VEC_UNDEF_I);
+  cec_exception (cpu, VEC_UNDEF_I);
 }
 
 static __attribute__ ((noreturn)) void
@@ -66,7 +65,8 @@ unhandled_instruction (SIM_CPU *cpu, char *insn)
 
   fprintf(stderr, ") ... aborting\n");
 
-  illegal_instruction (cpu);
+  while (1)
+    illegal_instruction (cpu);
 }
 
 static void
@@ -3435,7 +3435,11 @@ decode_psedoDEBUG_0 (SIM_CPU *cpu, bu16 iw0)
   else if (reg == 1 && fn == 3)
     unhandled_instruction (cpu, "DBG A1");
   else if (reg == 3 && fn == 3)
-    unhandled_instruction (cpu, "ABORT");
+    {
+      /* ABORT */
+      cec_exception (cpu, VEC_SIM_ABORT);
+      DREG (0) = 1;
+    }
   else if (reg == 4 && fn == 3)
     {
       /* HLT */

@@ -107,7 +107,9 @@
  * normal exception handling code we have a hardware error
  */
 #define VEC_HWERR	63
-#define VEC_SIM_HLT	64
+#define VEC_SIM_BASE	64
+#define VEC_SIM_HLT	(VEC_SIM_BASE + 1)
+#define VEC_SIM_ABORT	(VEC_SIM_BASE + 2)
 extern void cec_exception (SIM_CPU *, int vec_excp);
 
 extern void cec_raise (SIM_CPU *, int ivg);
