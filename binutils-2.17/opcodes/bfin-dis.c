@@ -4568,6 +4568,21 @@ decode_pseudoDEBUG_0 (TIword iw0, disassemble_info *outf)
 }
 
 static int
+decode_pseudoOChar_0 (TIword iw0, disassemble_info *outf)
+{
+  /* psedoOChar
+     +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
+     | 1 | 1 | 1 | 1 | 1 | 0 | 0 | 1 |.ch............................|
+     +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
+  int ch = ((iw0 >> PseudoChr_ch_bits) & PseudoChr_ch_mask);
+
+  OUTS (outf, "OUTC ");
+  OUTS (outf, uimm8 (ch));
+
+  return 2;
+}
+
+static int
 decode_pseudodbg_assert_0 (TIword iw0, TIword iw1, disassemble_info *outf)
 {
   /* pseudodbg_assert
@@ -4707,10 +4722,8 @@ _print_insn_bfin (bfd_vma pc, disassemble_info *outf)
     rv = decode_dsp32shiftimm_0 (iw0, iw1, outf);
   else if ((iw0 & 0xff00) == 0xf800)
     rv = decode_pseudoDEBUG_0 (iw0, outf);
-#if 0
   else if ((iw0 & 0xFF00) == 0xF900)
-    rv = decode_pseudoOChar_0 (iw0, iw1, pc, outf);
-#endif
+    rv = decode_pseudoOChar_0 (iw0, outf);
   else if ((iw0 & 0xFF00) == 0xf000 && (iw1 & 0x0000) == 0x0000)
     rv = decode_pseudodbg_assert_0 (iw0, iw1, outf);
 
