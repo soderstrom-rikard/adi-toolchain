@@ -1,7 +1,6 @@
 //Original:/testcases/core/c_dsp32shift_lhh/c_dsp32shift_lhh.dsp
 // Spec Reference: dsp32shift lshift/lshift
 # mach: bfin
-# xfail: "need to implement LSHIFT in sim" bfin-*
 
 .include "testutils.inc"
 	start
