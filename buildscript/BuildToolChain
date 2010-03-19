@@ -1150,7 +1150,7 @@ if [ -z $SKIP_TARGET_LIBS ] && [ -e $DIR_SOURCE/libs/Makefile ] ; then
 			[ $SKIP_FDPIC ] && continue
 			suffix=/`echo ${dir} | sed -e 's/mfdpic//' -e 's|/$||'`
 			mlib=
-			destdir="$DIR_LINUX_OUTPUT/bfin-linux-uclibc"
+			destdir="$DIR_LINUX_OUTPUT/bfin-linux-uclibc/runtime"
 		else
 			[ $SKIP_FLAT ] && continue
 			suffix=
