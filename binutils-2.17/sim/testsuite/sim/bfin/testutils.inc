@@ -132,13 +132,37 @@ __fail:
 	DBGA (\reg\().H, (((\val) >> 16) & 0xffff));
 	.endm
 
+	.macro __init_regs reg:req, max:req, x:req, val:req
+	.ifle (\x - \max)
+	\reg\()\x = \val;
+	.endif
+	.endm
+	.macro _init_regs reg:req, max:req, val:req
+	__init_regs \reg, \max, 0, \val
+	__init_regs \reg, \max, 1, \val
+	__init_regs \reg, \max, 2, \val
+	__init_regs \reg, \max, 3, \val
+	__init_regs \reg, \max, 4, \val
+	__init_regs \reg, \max, 5, \val
+	__init_regs \reg, \max, 6, \val
+	__init_regs \reg, \max, 7, \val
+	.endm
+
 	.macro init_r_regs val:req
-	r0 = \val;
-	r1 = \val;
-	r2 = \val;
-	r3 = \val;
-	r4 = \val;
-	r5 = \val;
-	r6 = \val;
-	r7 = \val;
+	_init_regs R, 7, \val
+	.endm
+	.macro init_p_regs val:req
+	_init_regs P, 5, \val
+	.endm
+	.macro init_b_regs val:req
+	_init_regs B, 3, \val
+	.endm
+	.macro init_i_regs val:req
+	_init_regs I, 3, \val
+	.endm
+	.macro init_l_regs val:req
+	_init_regs L, 3, \val
+	.endm
+	.macro init_m_regs val:req
+	_init_regs M, 3, \val
 	.endm

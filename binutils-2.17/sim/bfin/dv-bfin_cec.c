@@ -31,7 +31,7 @@ struct bfin_cec
 };
 #define mmr_offset(mmr) (offsetof(struct bfin_cec, mmr) - 4)
 
-#define IS_SUPV() (cec->ipend & ~IVG_IRPTEN_B)
+#define IS_SUPV() (cec->ipend & ~(IVG_EMU_B | IVG_IRPTEN_B))
 #define IS_USER() (! IS_SUPV ())
 #define REQUIRE_SUPERVISOR() \
   do { if (IS_USER ()) cec_exception (cpu, VEC_ILL_RES); } while (0)
@@ -140,7 +140,10 @@ const struct hw_descriptor dv_bfin_cec_descriptor[] = {
   {NULL},
 };
 
+#define CEC_STATE(cpu) ((struct bfin_cec *) dv_get_state (cpu, "/core/bfin_cec"))
+
 extern void bfin_trap (SIM_CPU *);
+static void _cec_raise (SIM_CPU *, struct bfin_cec *, int);
 
 #define excp_to_sim_halt(reason, sigrc) \
   sim_engine_halt (CPU_STATE (cpu), cpu, NULL, PCREG, reason, sigrc)
@@ -161,12 +164,19 @@ cec_exception (SIM_CPU *cpu, int excp)
    *  - Execution continues on in the EVT3 handler
    */
 
+  /* simulator wants to halt */
+  if (excp == VEC_SIM_HLT)
+    {
+      excp_to_sim_halt (sim_exited, 0);
+      return;
+    }
+
   if (excp <= 0x3f)
     {
       SEQSTATREG = (SEQSTATREG & ~0x3f) | excp;
       if (STATE_ENVIRONMENT (CPU_STATE (cpu)) == OPERATING_ENVIRONMENT)
 	{
-	  cec_raise (cpu, IVG_EVX);
+	  _cec_raise (cpu, CEC_STATE (cpu), IVG_EVX);
 	  return;
 	}
     }
@@ -179,10 +189,6 @@ cec_exception (SIM_CPU *cpu, int excp)
 
     case VEC_EXCPT01:	/* userspace gdb breakpoint */
       sigrc = SIM_SIGTRAP;
-      break;
-
-    case VEC_SIM_HLT:	/* simulator wants to halt */
-      excp_to_sim_halt (sim_exited, 0);
       break;
 
     case VEC_UNDEF_I:	/* undefined instruction */
@@ -208,8 +214,6 @@ cec_exception (SIM_CPU *cpu, int excp)
   if (sigrc != -1)
     excp_to_sim_halt (sim_stopped, sigrc);
 }
-
-#define CEC_STATE(cpu) ((struct bfin_cec *) dv_get_state (cpu, "/core/bfin_cec"))
 
 bu32 cec_cli (SIM_CPU *cpu)
 {
@@ -244,6 +248,20 @@ cec_get_ivg (SIM_CPU *cpu)
 }
 
 static void
+cec_irpten_enable (struct bfin_cec *cec)
+{
+  /* Globally mask interrupts.  */
+  cec->ipend |= IVG_IRPTEN_B;
+}
+
+static void
+cec_irpten_disable (struct bfin_cec *cec)
+{
+  /* Clear global interrupt mask.  */
+  cec->ipend &= ~IVG_IRPTEN_B;
+}
+
+static void
 _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 {
   int curr_ivg = _cec_get_ivg (cec);
@@ -253,14 +271,14 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
   irpten = (cec->ipend & IVG_IRPTEN_B);
   snen = (SYSCFGREG & SYSCFG_SNEN);
 
+  if (curr_ivg == -1)
+    curr_ivg = IVG_USER;
+
   /* Just check for higher latched interrupts.  */
   if (ivg == -1)
     {
-      if (!irpten)
+      if (irpten)
 	return; /* All interrupts are masked anyways.  */
-
-      if (curr_ivg == -1)
-	curr_ivg = IVG_USER;
 
       ivg = __cec_get_ivg (cec, ilat);
       if (ivg < 0)
@@ -283,12 +301,17 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
     {
       /* Double fault ! :( */
       /* XXX: should there be some status registers we update ? */
-      sim_io_error (CPU_STATE (cpu), "%s: double fault ! :(", __func__);
+      sim_io_error (CPU_STATE (cpu), "%s: double fault at 0x%08x ! :(",
+		    __func__, PCREG);
       excp_to_sim_halt (sim_stopped, SIM_SIGABRT);
     }
-  else if (!irpten)
+  else if (irpten && curr_ivg != IVG_USER)
     {
-      /* Interrupts are masked.  */
+      /* Interrupts are globally masked.  */
+    }
+  else if (!(cec->imask & (1 << ivg)))
+    {
+      /* This interrupt is masked.  */
     }
   else if (ivg < curr_ivg || (snen && ivg == curr_ivg))
     {
@@ -327,6 +350,8 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 	  PCREG = cec_get_reset_evt (cpu);
 	else
 	  PCREG = cec_get_evt (cpu, ivg);
+	/* Enable the global interrupt mask upon interrupt entry.  */
+	cec_irpten_enable (cec);
     }
 }
 
@@ -403,6 +428,9 @@ cec_return (SIM_CPU *cpu, int ivg)
   else
     cec->ipend &= ~(1 << ivg);
 
+  /* Disable global interrupt mask to let any interrupt take over.  */
+  cec_irpten_disable (cec);
+
   /* Check for pending interrupts before we return to usermode.  */
   _cec_raise (cpu, cec, -1);
 }
@@ -411,7 +439,7 @@ void
 cec_push_reti (SIM_CPU *cpu)
 {
   struct bfin_cec *cec = CEC_STATE (cpu);
-  cec->ipend |= IVG_IRPTEN_B;
+  cec_irpten_disable (cec);
   /* Check for pending interrupts.  */
   _cec_raise (cpu, cec, -1);
 }
@@ -420,5 +448,5 @@ void
 cec_pop_reti (SIM_CPU *cpu)
 {
   struct bfin_cec *cec = CEC_STATE (cpu);
-  cec->ipend &= IVG_IRPTEN_B;
+  cec_irpten_enable (cec);
 }

@@ -14,6 +14,6 @@ SIM_AC_OPTION_ALIGNMENT(STRICT_ALIGNMENT,STRICT_ALIGNMENT)
 SIM_AC_OPTION_HOSTENDIAN
 SIM_AC_OPTION_DEFAULT_MODEL(bf537)
 SIM_AC_OPTION_ENVIRONMENT
-SIM_AC_OPTION_HARDWARE(yes,,bfin_cec bfin_evt) dnl ctimer pll sdram uart
+SIM_AC_OPTION_HARDWARE(yes,,bfin_cec bfin_evt) dnl ctimer tracebuffer pll sdram uart async
 
 SIM_AC_OUTPUT
