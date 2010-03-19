@@ -147,6 +147,9 @@ bfin_gen_pseudodbg (int fn, int reg, int grp);
 INSTR_T
 bfin_gen_pseudodbg_assert (int dbgop, REG_T regtest, int expected);
 
+INSTR_T
+bfin_gen_pseudochr (int ch);
+
 bfd_boolean
 bfin_resource_conflict (INSTR_T dsp32, INSTR_T dsp16_grp1, INSTR_T dsp16_grp2);
 
