@@ -2626,7 +2626,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       STORE (A0WREG, acc0 & 0xffffffff);
       if (s == 1) {
         /* A0 -= A1 (W32) */
-        if(acc0 & 0x8000000000)
+        if(acc0 & (bu64)0x8000000000)
           STORE (A0XREG, 0x80);
         else
           STORE (A0XREG, 0x0);
@@ -2876,7 +2876,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       STORE (A0WREG, acc0 & 0xffffffff);
       if (aop == 2 && s == 1)
       { /* A0 += A1 (W32) */
-	if(acc0 & 0x8000000000)
+	if(acc0 & (bu64)0x8000000000)
 	  STORE (A0XREG, 0x80);
 	else
 	  STORE (A0XREG, 0x0);
@@ -3034,14 +3034,33 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     unhandled_instruction (cpu, "dregs_hi = ASHIFT dregs_lo BY dregs_lo (S)");
   else if (HLs == 3 && sop == 1 && sopcde == 0)
     unhandled_instruction (cpu, "dregs_hi = ASHIFT dregs_hi BY dregs_lo (S)");
-  else if (HLs == 0 && sop == 2 && sopcde == 0)
-    unhandled_instruction (cpu, "dregs_lo = LSHIFT dregs_lo BY dregs_lo");
-  else if (HLs == 1 && sop == 2 && sopcde == 0)
-    unhandled_instruction (cpu, "dregs_lo = LSHIFT dregs_hi BY dregs_lo");
-  else if (HLs == 2 && sop == 2 && sopcde == 0)
-    unhandled_instruction (cpu, "dregs_hi = LSHIFT dregs_lo BY dregs_lo");
-  else if (HLs == 3 && sop == 2 && sopcde == 0)
-    unhandled_instruction (cpu, "dregs_hi = LSHIFT dregs_hi BY dregs_lo");
+  else if (sop == 2 && sopcde == 0)
+    {
+      /* HLs == 0  dregs_lo = LSHIFT dregs_lo BY dregs_lo
+       * HLs == 1  dregs_lo = LSHIFT dregs_hi BY dregs_lo
+       * HLs == 2  dregs_hi = LSHIFT dregs_lo BY dregs_lo
+       * HLs == 3  dregs_hi = LSHIFT dregs_hi BY dregs_lo
+       */
+      bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
+      bu16 val;
+
+      if ((HLs & 1) == 0)
+	val = (bu16)(DREG(src1) & 0xFFFF);
+      else
+	val = (bu16)((DREG(src1) & 0xFFFF0000) >> 16);
+
+      if (shft < 0)
+         val = val >> (-1 * shft);
+      else
+         val = val << shft;
+
+     if ((HLs & 2) == 0)
+	DREG(dst0) = DREG(dst0) & 0xFFFF0000 | val;
+     else
+	DREG(dst0) = DREG(dst0) & 0xFFFF | (val << 16);
+
+	/* XXX: ASTAT */
+    }
   else if (sop == 2 && sopcde == 3 && HLs == 1)
     unhandled_instruction (cpu, "A1 = ROT A1 BY dregs_lo");
   else if (sop == 0 && sopcde == 3 && HLs == 0)
@@ -3101,7 +3120,17 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 
     }
   else if (sop == 2 && sopcde == 1)
-    unhandled_instruction (cpu, "dregs = LSHIFT dregs BY dregs_lo (V)");
+    {
+      /* dregs = LSHIFT dregs BY dregs_lo (V) */
+      bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
+
+      if (shft < 0)
+        DREG(dst0) = ((DREG (src1) << (-1 * shft)) & 0xFFFF) | ((DREG (src1) & 0xFFFF0000) << (-1 *shft));
+      else
+	DREG(dst0) = ((DREG (src1) & 0xFFFF) >> shft) | ((DREG (src1) >> shft) & 0xFFFF0000);
+
+       /* ASTAT ? */
+    }
   else if (sopcde == 4)
     {
       bu32 sv0 = DREG (src0);
@@ -3146,13 +3175,75 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       DREG (dst0) |= v;
     }
   else if (sop == 0 && sopcde == 7)
-    unhandled_instruction (cpu, "dregs_lo = EXPADJ (dregs, dregs_lo)");
+   {
+      /* dregs_lo = EXPADJ (dregs, dregs_lo) */
+      bu16 sv1 = (bu16)signbits(DREG (src1), 32);
+      bu16 sv0 = (bu16)(DREG (src0) & 0xffff);
+
+      DREG (dst0) &= 0xFFFF0000;
+
+      if ((sv1 & 0x1f) < (sv0 & 0x1f))
+        DREG (dst0) |= sv1;
+      else
+        DREG (dst0) |= sv0;
+   }
   else if (sop == 1 && sopcde == 7)
-    unhandled_instruction (cpu, "dregs_lo = EXPADJ (dregs, dregs_lo) (V)");
+   {
+     /* dregs_lo = EXPADJ (dregs, dregs_lo) (V)
+      * Exponent adjust on two 16-bit inputs. Select smallest norm
+      * among 3 inputs
+      */
+     bs16 src1_hi = (DREG (src1) & 0xFFFF0000) >> 16;
+     bs16 src1_lo = (DREG (src1) & 0xFFFF);
+     bu16 src0_lo = (DREG (src0) & 0xFFFF);
+     bu16 tmp_hi, tmp_lo;
+
+     tmp_hi = signbits(src1_hi, 16);
+     tmp_lo = signbits(src1_lo, 16);
+     DREG (dst0) &= 0xFFFF0000;
+    
+     if ((tmp_hi & 0xf) < (tmp_lo & 0xf))
+       if ((tmp_hi&0xf) < (src0_lo & 0xf))
+	 DREG (dst0) |= tmp_hi;
+       else
+         DREG (dst0) |= src0_lo;
+    else
+      if ((tmp_lo&0xf)  < (src0_lo & 0xf))
+	DREG (dst0) |= tmp_lo;
+      else
+        DREG (dst0) |= src0_lo;
+   }
   else if (sop == 2 && sopcde == 7)
-    unhandled_instruction (cpu, "dregs_lo = EXPADJ (dregs_lo, dregs_lo)");
+   {
+    /* dregs_lo = EXPADJ (dregs_lo, dregs_lo)
+     * exponent adjust on single 16-bit register
+     */
+      bu16 tmp;
+      bu16 src0_lo = (bu16)(DREG (src0) & 0xFFFF);
+
+      tmp = signbits(DREG (src1) & 0xFFFF, 16);
+      DREG (dst0) &= 0xFFFF0000;
+
+      if ((tmp & 0xf) < (src0_lo & 0xf))
+        DREG (dst0) |= tmp;
+      else
+        DREG (dst0) |= src0_lo;
+
+   }
   else if (sop == 3 && sopcde == 7)
-    unhandled_instruction (cpu, "dregs_lo = EXPADJ (dregs_hi, dregs_lo)");
+    {
+      /* dregs_lo = EXPADJ (dregs_hi, dregs_lo) */
+      bu16 tmp;
+      bu16 src0_lo = (bu16)(DREG (src0) & 0xFFFF);
+
+      tmp = signbits((DREG (src1) & 0xFFFF0000) >> 16, 16);
+      DREG (dst0) &= 0xFFFF0000;
+
+      if ((tmp & 0xf) < (src0_lo & 0xf))
+        DREG (dst0) |= tmp;
+      else
+        DREG (dst0) |= src0_lo;
+    }
   else if (sop == 0 && sopcde == 8)
     unhandled_instruction (cpu, "BITMUX (dregs, dregs, A0) (ASR)");
   else if (sop == 1 && sopcde == 8)
@@ -3348,13 +3439,26 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   else if (sop == 2 && sopcde == 1 && bit8 == 1) {
      /* dregs = dregs >> uimm5 (V) */
      int count = imm5(newimmag);
-printf("count = %d\n", count);
      DREG(dst0) = ((DREG (src1) & 0xFFFF) >> count) | ((DREG (src1) >> count) & 0xFFFF0000);
 
       /* ASTAT ? */
     }
   else if (sop == 0 && sopcde == 1)
-    unhandled_instruction (cpu, "dregs = dregs <<< imm5 (V)");
+    {
+      /* dregs = dregs >>> imm5 (V)"); */
+      int i, count = uimm5 (newimmag);
+      bu32 val_l = 0, val_h = 0;
+
+      for (i = 0; i < count; i++) {
+        val_l |= (val_l | (DREG (src1) & 0x8000    )) >> 1;
+        val_h |= (val_h | (DREG (src1) & 0x80000000)) >> 1;
+      }
+      val_l |= DREG (src1) & 0x8000;
+      val_h |= DREG (src1) & 0x80000000;
+
+      DREG(dst0) = ((DREG (src1) & 0xFFFF) >> count) | ((DREG (src1) >> count) & 0xFFFF0000) | val_l | val_h;
+      /* XXX: ASTAT? */
+    }
   else if (sop == 1 && sopcde == 2)
     {
       int count = imm6 (immag);
