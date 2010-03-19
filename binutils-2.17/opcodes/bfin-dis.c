@@ -4548,7 +4548,7 @@ decode_pseudoDEBUG_0 (TIword iw0, disassemble_info *outf)
 
   else if (grp == 0 && fn == 2)
     {
-      OUTS (outf, "OUTC");
+      OUTS (outf, "OUTC ");
       OUTS (outf, dregs (reg));
     }
   else if (fn == 0)
