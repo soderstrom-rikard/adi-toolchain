@@ -190,7 +190,9 @@ while 1 {
 
             -re "Hit any key| \[0-5] " {
               if { $board_type == "" } {
-              send "reset\r"
+              send -s "\r"
+              expect "$uboot_prompt" 
+              send -s "reset\r"
               } else {
               send "\r"
               break
