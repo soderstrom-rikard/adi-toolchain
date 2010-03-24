@@ -188,12 +188,14 @@ do { \
     cec_exception (cpu, VEC_MISALI_D); \
   __cnt = sim_write (CPU_STATE(cpu), taddr, (void *)&__v, __bytes); \
   if (__cnt != __bytes) \
-   { \
-     if (taddr >= BFIN_SYSTEM_MMR_BASE) \
-       cec_exception (cpu, VEC_ILL_RES); \
-     else \
-       cec_exception (cpu, VEC_CPLB_M); \
-   } \
+    { \
+      if (taddr >= BFIN_SYSTEM_MMR_BASE) \
+	cec_exception (cpu, VEC_ILL_RES); \
+      else \
+	cec_exception (cpu, VEC_CPLB_M); \
+    } \
+  TRACE_CORE (cpu, "DBUS STORE %i bytes @ 0x%08x: 0x%0*x", \
+	      size / 8, taddr, size / 4, __v); \
 } while (0)
 #define PUT_BYTE(taddr, v) __PUT_MEM(taddr, v, 8)
 #define PUT_WORD(taddr, v) __PUT_MEM(taddr, v, 16)
@@ -208,12 +210,15 @@ do { \
     cec_exception (cpu, unaligned); \
   __cnt = sim_read (CPU_STATE(cpu), taddr, (void *)&__ret, __bytes); \
   if (__cnt != __bytes) \
-   { \
-     if (taddr >= BFIN_SYSTEM_MMR_BASE) \
-       cec_exception (cpu, VEC_ILL_RES); \
-     else \
-       cec_exception (cpu, cplb_miss); \
-   } \
+    { \
+      if (taddr >= BFIN_SYSTEM_MMR_BASE) \
+	cec_exception (cpu, VEC_ILL_RES); \
+      else \
+	cec_exception (cpu, cplb_miss); \
+    } \
+  TRACE_CORE (cpu, "%cBUS FETCH %i bytes @ 0x%08x: 0x%0*x", \
+	      unaligned == VEC_MISALI_D ? 'D' : 'I', \
+	      size / 8, taddr, size / 4, __ret); \
   __ret; \
 })
 #define _GET_MEM(taddr, size) __GET_MEM(taddr, size, VEC_MISALI_D, VEC_CPLB_M)

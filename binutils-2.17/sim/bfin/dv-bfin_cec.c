@@ -142,6 +142,15 @@ const struct hw_descriptor dv_bfin_cec_descriptor[] = {
 
 #define CEC_STATE(cpu) ((struct bfin_cec *) dv_get_state (cpu, "/core/bfin_cec"))
 
+#define __cec_get_ivg(cec, mmr) (ffs ((cec)->mmr & ~IVG_IRPTEN_B) - 1)
+#define _cec_get_ivg(cec) __cec_get_ivg (cec, ipend)
+
+int
+cec_get_ivg (SIM_CPU *cpu)
+{
+  return _cec_get_ivg (CEC_STATE (cpu));
+}
+
 extern void bfin_trap (SIM_CPU *);
 static void _cec_raise (SIM_CPU *, struct bfin_cec *, int);
 
@@ -151,6 +160,9 @@ void
 cec_exception (SIM_CPU *cpu, int excp)
 {
   int sigrc = -1;
+
+  TRACE_EVENTS (cpu, "processing exception %#x in EVT%i", excp,
+		cec_get_ivg (cpu));
 
   /* Ideally what would happen here for real hardware exceptions (not
    * fake sim ones) is that:
@@ -184,6 +196,8 @@ cec_exception (SIM_CPU *cpu, int excp)
 	  return;
 	}
     }
+
+  TRACE_EVENTS (cpu, "running virtual exception handler");
 
   switch (excp)
     {
@@ -229,39 +243,39 @@ bu32 cec_cli (SIM_CPU *cpu)
   /* XXX: what about IPEND[4] ?  */
   old_mask = cec->imask;
   _cec_imask_write (cec, 0);
+
+  TRACE_EVENTS (cpu, "CLI changed IMASK from %#x to %#x", old_mask, cec->imask);
+
   return old_mask;
 }
 
 void cec_sti (SIM_CPU *cpu, bu32 ints)
 {
   struct bfin_cec *cec = CEC_STATE (cpu);
+  bu32 old_mask;
 
   REQUIRE_SUPERVISOR ();
 
   /* XXX: what about IPEND[4] ?  */
+  old_mask = cec->imask;
   _cec_imask_write (cec, ints);
-}
 
-#define __cec_get_ivg(cec, mmr) (ffs ((cec)->mmr & ~IVG_IRPTEN_B) - 1)
-#define _cec_get_ivg(cec) __cec_get_ivg (cec, ipend)
-
-int
-cec_get_ivg (SIM_CPU *cpu)
-{
-  return _cec_get_ivg (CEC_STATE (cpu));
+  TRACE_EVENTS (cpu, "STI changed IMASK from %#x to %#x", old_mask, cec->imask);
 }
 
 static void
-cec_irpten_enable (struct bfin_cec *cec)
+cec_irpten_enable (SIM_CPU *cpu, struct bfin_cec *cec)
 {
   /* Globally mask interrupts.  */
+  TRACE_EVENTS (cpu, "setting IPEND[4] to globally mask interrupts");
   cec->ipend |= IVG_IRPTEN_B;
 }
 
 static void
-cec_irpten_disable (struct bfin_cec *cec)
+cec_irpten_disable (SIM_CPU *cpu, struct bfin_cec *cec)
 {
   /* Clear global interrupt mask.  */
+  TRACE_EVENTS (cpu, "clearing IPEND[4] to not globally mask interrupts");
   cec->ipend &= ~IVG_IRPTEN_B;
 }
 
@@ -271,6 +285,9 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
   int curr_ivg = _cec_get_ivg (cec);
   bool snen;
   bool irpten;
+
+  TRACE_EVENTS (cpu, "processing request for EVT%i while at EVT%i",
+		ivg, curr_ivg);
 
   irpten = (cec->ipend & IVG_IRPTEN_B);
   snen = (SYSCFGREG & SYSCFG_SNEN);
@@ -282,17 +299,17 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
   if (ivg == -1)
     {
       if (irpten)
-	return; /* All interrupts are masked anyways.  */
+	goto done; /* All interrupts are masked anyways.  */
 
       ivg = __cec_get_ivg (cec, ilat);
       if (ivg < 0)
-	return; /* Nothing latched.  */
+	goto done; /* Nothing latched.  */
 
       if (ivg > curr_ivg)
-	return; /* Nothing higher latched.  */
+	goto done; /* Nothing higher latched.  */
 
       if (!snen && ivg == curr_ivg)
-	return; /* Self nesting disabled.  */
+	goto done; /* Self nesting disabled.  */
 
       /* Still here, so fall through to raise to higher pending.  */
     }
@@ -320,9 +337,12 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
   else if (ivg < curr_ivg || (snen && ivg == curr_ivg))
     {
       /* Do transition! */
+      bu32 oldpc;
+
  process_int:
       cec->ipend |= (1 << ivg);
       cec->ilat &= ~(1 << ivg);
+
       switch (ivg)
 	{
 	case IVG_EMU:
@@ -349,14 +369,24 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 	  RETIREG = PCREG | (ivg == curr_ivg ? 1 : 0);
 	  break;
 	}
-	/* If EVT_OVERRIDE is in effect, use the reset address.  */
-	if ((cec->evt_override & 0x1ff) & (1 << ivg))
-	  PCREG = cec_get_reset_evt (cpu);
-	else
-	  PCREG = cec_get_evt (cpu, ivg);
-	/* Enable the global interrupt mask upon interrupt entry.  */
-	cec_irpten_enable (cec);
+
+      oldpc = PCREG;
+
+      /* If EVT_OVERRIDE is in effect, use the reset address.  */
+      if ((cec->evt_override & 0x1ff) & (1 << ivg))
+	PCREG = cec_get_reset_evt (cpu);
+      else
+	PCREG = cec_get_evt (cpu, ivg);
+
+      TRACE_BRANCH (cpu, "CEC changed PC (to EVT%i): %#x -> %#x",
+		    ivg, oldpc, PCREG);
+
+      /* Enable the global interrupt mask upon interrupt entry.  */
+      cec_irpten_enable (cpu, cec);
     }
+
+ done:
+  TRACE_EVENTS (cpu, "now at EVT%i", _cec_get_ivg (cec));
 }
 
 void
@@ -377,6 +407,7 @@ cec_return (SIM_CPU *cpu, int ivg)
 {
   struct bfin_cec *cec = CEC_STATE (cpu);
   int curr_ivg;
+  bu32 oldpc;
 
   /* XXX: This isn't entirely correct ...  */
   cec->ipend &= ~IVG_EMU_B;
@@ -385,10 +416,14 @@ cec_return (SIM_CPU *cpu, int ivg)
   if (ivg == -1)
     ivg = curr_ivg;
 
+  TRACE_EVENTS (cpu, "returning from EVT%i (should be EVT%i)", curr_ivg, ivg);
+
   if (ivg > IVG15 || ivg < 0)
     sim_io_error (CPU_STATE (cpu), "%s: ivg %i out of range !", __func__, ivg);
 
   REQUIRE_SUPERVISOR ();
+
+  oldpc = PCREG;
 
   switch (ivg)
     {
@@ -432,8 +467,11 @@ cec_return (SIM_CPU *cpu, int ivg)
   else
     cec->ipend &= ~(1 << ivg);
 
+  TRACE_BRANCH (cpu, "CEC changed PC (from EVT%i): %#x -> %#x",
+		ivg, oldpc, PCREG);
+
   /* Disable global interrupt mask to let any interrupt take over.  */
-  cec_irpten_disable (cec);
+  cec_irpten_disable (cpu, cec);
 
   /* Check for pending interrupts before we return to usermode.  */
   _cec_raise (cpu, cec, -1);
@@ -443,7 +481,8 @@ void
 cec_push_reti (SIM_CPU *cpu)
 {
   struct bfin_cec *cec = CEC_STATE (cpu);
-  cec_irpten_disable (cec);
+  TRACE_EVENTS (cpu, "pushing RETI");
+  cec_irpten_disable (cpu, cec);
   /* Check for pending interrupts.  */
   _cec_raise (cpu, cec, -1);
 }
@@ -452,5 +491,6 @@ void
 cec_pop_reti (SIM_CPU *cpu)
 {
   struct bfin_cec *cec = CEC_STATE (cpu);
-  cec_irpten_enable (cec);
+  TRACE_EVENTS (cpu, "popping RETI");
+  cec_irpten_enable (cpu, cec);
 }

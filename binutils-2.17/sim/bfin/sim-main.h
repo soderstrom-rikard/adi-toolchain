@@ -63,6 +63,19 @@ struct sim_state {
 #include "sim-options.h"
 #include "run-sim.h"
 
+#define MAYBE_TRACE(type, cpu, fmt, ...) \
+  do { \
+    if (TRACE_##type##_P (cpu)) \
+      trace_generic (CPU_STATE (cpu), cpu, TRACE_##type##_IDX, \
+		     fmt, ## __VA_ARGS__); \
+  } while (0)
+#define TRACE_INSN(cpu, fmt, ...) MAYBE_TRACE (INSN, cpu, fmt, ## __VA_ARGS__)
+#define TRACE_DECODE(cpu, fmt, ...) MAYBE_TRACE (DECODE, cpu, fmt, ## __VA_ARGS__)
+#define TRACE_EXTRACT(cpu, fmt, ...) MAYBE_TRACE (EXTRACT, cpu, fmt, ## __VA_ARGS__)
+#define TRACE_CORE(cpu, fmt, ...) MAYBE_TRACE (CORE, cpu, fmt, ## __VA_ARGS__)
+#define TRACE_EVENTS(cpu, fmt, ...) MAYBE_TRACE (EVENTS, cpu, fmt, ## __VA_ARGS__)
+#define TRACE_BRANCH(cpu, fmt, ...) MAYBE_TRACE (BRANCH, cpu, fmt, ## __VA_ARGS__)
+
 /* Default memory size.  */
 #define BFIN_DEFAULT_MEM_SIZE 0x1000000 /* 16M */
 

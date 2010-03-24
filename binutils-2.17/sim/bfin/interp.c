@@ -154,6 +154,10 @@ step_once (SIM_CPU *cpu)
 {
   bu32 oldpc = PCREG;
 
+  if (TRACE_ANY_P (cpu))
+    trace_prefix (CPU_STATE (cpu), cpu, NULL_CIA, oldpc, TRACE_LINENUM_P (cpu),
+		  NULL, 0, "");
+
   if (oldpc & 0x1)
     cec_exception (cpu, VEC_MISALI_I);
 
