@@ -206,7 +206,7 @@ lshiftrt (SIM_CPU *cpu, bu64 val, int cnt, int size)
     val >>= 16, real_cnt -= 16;
   val >>= real_cnt;
   switch (size)
-  {
+    {
     case 16:
       val &= 0xFFFF;
       break;
@@ -219,7 +219,7 @@ lshiftrt (SIM_CPU *cpu, bu64 val, int cnt, int size)
     default:
       illegal_instruction (cpu);
       break;
-  }
+    }
   ASTATREG (an) = val >> (size - 1);
   ASTATREG (az) = val == 0;
   ASTATREG (v) = 0;
@@ -269,27 +269,26 @@ lshift (SIM_CPU *cpu, bu64 val, int cnt, int size, bool saturate)
 	(sgn && !(new_val & (1 << mask_cnt)) );
 
   switch (size)
-   {
-      case 16:
-	if (saturate && (new_val & mask) ) 
-	  new_val = sgn == 0 ? 0x7fff : 0x8000;
+    {
+    case 16:
+      if (saturate && (new_val & mask)) 
+	new_val = sgn == 0 ? 0x7fff : 0x8000;
 	new_val &= 0xFFFF;
 	break;
-      case 32:
-	new_val &= 0xFFFFFFFF;
-	masked &= 0xFFFFFFFF;
-	if (saturate && ((sgn != masked) || (!sgn && new_val == 0)))
-	  new_val = sgn == 0 ? 0x7fffffff : 0x80000000;
-	break;
-      case 40:
-	new_val &= 0xFFFFFFFFFF;
-	masked  &= 0xFFFFFFFFFF;
-	break;
-      default:
-	illegal_instruction (cpu);
-	break;
-  }
-
+    case 32:
+      new_val &= 0xFFFFFFFF;
+      masked &= 0xFFFFFFFF;
+      if (saturate && ((sgn != masked) || (!sgn && new_val == 0)))
+	new_val = sgn == 0 ? 0x7fffffff : 0x80000000;
+      break;
+    case 40:
+      new_val &= 0xFFFFFFFFFF;
+      masked  &= 0xFFFFFFFFFF;
+      break;
+    default:
+      illegal_instruction (cpu);
+      break;
+    }
 
   ASTATREG (an) = new_val >> (size - 1);
   ASTATREG (az) = new_val == 0;
@@ -1106,7 +1105,8 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
       TRACE_INSN (cpu, "IDLE;");
       PCREG += 2;
       /* XXX: in supervisor mode, utilizes wake up sources
-         in user mode, it's a NOP */
+       * in user mode, it's a NOP
+       */
     }
   else if (prgfunc == 2 && poprnd == 3)
     {
@@ -1338,7 +1338,7 @@ decode_PushPopMultiple_0 (SIM_CPU *cpu, bu16 iw0)
   bu32 sp = SPREG;
 
   TRACE_EXTRACT (cpu, "%s: d:%i p:%i W:%i dr:%i pr:%i",
-		 __func__, d, p, W, dr, pr);
+		__func__, d, p, W, dr, pr);
 
   if ((d == 0 && p == 0)
       || (p && imm5 (pr) > 5))
@@ -1949,7 +1949,8 @@ decode_COMP3op_0 (SIM_CPU *cpu, bu16 iw0)
   else if (opc == 5)
     {
       /* If src0 == src1 this is disassembled as a shift by 1, but this
-         distinction doesn't matter for our purposes.  */
+       * distinction doesn't matter for our purposes.
+       */
       TRACE_INSN (cpu, "P%i = P%i + P%i;", dst, src0, src1);
       PREG (dst) = PREG (src0) + PREG (src1);
     }
@@ -3086,18 +3087,19 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 
       acc0 -= acc1;
       if ((bs64)acc0 < -0x8000000000ll)
-        acc0 = -0x8000000000ull;
+	acc0 = -0x8000000000ull;
       else if ((bs64)acc0 >= 0x7fffffffffll)
-        acc0 = 0x7fffffffffull;
+	acc0 = 0x7fffffffffull;
       STORE (A0XREG, (acc0 >> 32) & 0xff);
       STORE (A0WREG, acc0 & 0xffffffff);
-      if (s == 1) {
-        /* A0 -= A1 (W32) */
-        if (acc0 & (bu64)0x8000000000)
-          STORE (A0XREG, 0x80);
-        else
-          STORE (A0XREG, 0x0);
-      }
+      if (s == 1)
+	{
+	  /* A0 -= A1 (W32) */
+	  if (acc0 & (bu64)0x8000000000)
+	     STORE (A0XREG, 0x80);
+	  else
+	    STORE (A0XREG, 0x0);
+	}
     }
   else if (aop == 3 && aopcde == 22 && HL == 1)
     unhandled_instruction (cpu, "dregs = BYTEOP2M (dregs_pair, dregs_pair) (TH,R)");
@@ -3290,20 +3292,20 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     }
   else if (aop == 1 && aopcde == 12)
     {
-       bu32 val0 = ((A0WREG & 0xFFFF0000) >> 16) + (A0WREG & 0xFFFF);
-       bu32 val1 = ((A1WREG & 0xFFFF0000) >> 16) + (A1WREG & 0xFFFF);
+      bu32 val0 = ((A0WREG & 0xFFFF0000) >> 16) + (A0WREG & 0xFFFF);
+      bu32 val1 = ((A1WREG & 0xFFFF0000) >> 16) + (A1WREG & 0xFFFF);
 
-       TRACE_INSN (cpu, "R%i = A1.L + A1.H, R%i = A0.L + A0.H;", dst1, dst0);
+      TRACE_INSN (cpu, "R%i = A1.L + A1.H, R%i = A0.L + A0.H;", dst1, dst0);
 
-       if (val0 & 0x8000)
+      if (val0 & 0x8000)
 	val0 |= 0xFFFF0000;
 
-       if (val1 & 0x8000)
+      if (val1 & 0x8000)
 	val1 |= 0xFFFF0000;
 
-       DREG (dst0) = val0;
-       DREG (dst1) = val1;
-       /* ASTAT ? */
+      DREG (dst0) = val0;
+      DREG (dst1) = val1;
+      /* ASTAT ? */
     }
   else if (HL == 0 && aopcde == 1)
     {
@@ -3499,7 +3501,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   int HLs = ((iw1 >> 12) & 0x3);
 
   TRACE_EXTRACT (cpu, "%s: M:%i sopcde:%i sop:%i HLs:%i dst0:%i src0:%i src1:%i",
-                 __func__, M, sopcde, sop, HLs, dst0, src0, src1);
+		__func__, M, sopcde, sop, HLs, dst0, src0, src1);
 
   if ((sop == 0 || sop == 1) && sopcde == 0)
     {
@@ -3509,26 +3511,26 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
        * HLs == 3 : dregs_hi = ASHIFT dregs_hi BY dregs_lo
        * if sop == 1, then saturate, otherwise not
        */
-       bu16 val;
-       bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
+      bu16 val;
+      bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
 
-       if ((HLs & 1) == 0)
+      if ((HLs & 1) == 0)
 	val = (bu16)(DREG(src1) & 0xFFFF);
-       else
-         val = (bu16)((DREG(src1) & 0xFFFF0000) >> 16);
+      else
+	val = (bu16)((DREG(src1) & 0xFFFF0000) >> 16);
 
-       /*Positive shift magnitudes produce Logical Left shifts.
-        *Negative shift magnitudes produce Arithmetic Right shifts.
-        */
-       if (shft <= 0)
+      /* Positive shift magnitudes produce Logical Left shifts.
+       * Negative shift magnitudes produce Arithmetic Right shifts.
+       */
+      if (shft <= 0)
 	 val = ashiftrt(cpu, val, -shft, 16);
-       else
-          val = lshift(cpu, val, shft, 16, sop == 1);
+      else
+	val = lshift(cpu, val, shft, 16, sop == 1);
 
       if ((HLs & 2) == 0)
-         STORE (DREG(dst0), DREG(dst0) & 0xFFFF0000 | val);
+	STORE (DREG(dst0), DREG(dst0) & 0xFFFF0000 | val);
       else
-         STORE (DREG(dst0), DREG(dst0) & 0xFFFF | (val << 16));
+	STORE (DREG(dst0), DREG(dst0) & 0xFFFF | (val << 16));
     }
   else if (sop == 2 && sopcde == 0)
     {
@@ -3546,9 +3548,9 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	val = (bu16)((DREG(src1) & 0xFFFF0000) >> 16);
 
       if (shft < 0)
-         val = val >> (-1 * shft);
+	val = val >> (-1 * shft);
       else
-         val = val << shft;
+	val = val << shft;
 
      if ((HLs & 2) == 0)
 	DREG(dst0) = DREG(dst0) & 0xFFFF0000 | val;
@@ -3562,65 +3564,65 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       /* HLs == 1 : A1 = ROT A1 BY dregs_lo 
        * HLs == 0 : A0 = ROT A0 BY dregs_lo
        */
-    unhandled_instruction (cpu, "An = ROT An BY dregs_lo");
+      unhandled_instruction (cpu, "An = ROT An BY dregs_lo");
     }
   else if (sop == 0 && sopcde == 3 && (HLs == 0 || HLs == 1))
-   {
-     /* HLs == 0 : A0 = ASHIFT A0 BY dregs_lo
-      * HLs == 1 : A1 = ASHIFT A1 BY dregs_lo
-      */
-     bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
-     bu64 val;
+    {
+      /* HLs == 0 : A0 = ASHIFT A0 BY dregs_lo
+       * HLs == 1 : A1 = ASHIFT A1 BY dregs_lo
+       */
+      bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
+      bu64 val;
 
-     if (HLs)
-       val = get_extended_acc1 (cpu);
-     else
-       val = get_extended_acc0 (cpu);
+      if (HLs)
+	val = get_extended_acc1 (cpu);
+      else
+	val = get_extended_acc0 (cpu);
 
-     if (shft <= 0)
-       val = ashiftrt(cpu, val, -shft, 40);
-     else
-       val = lshift(cpu, val, shft, 40, 0);
+      if (shft <= 0)
+	val = ashiftrt(cpu, val, -shft, 40);
+      else
+	val = lshift(cpu, val, shft, 40, 0);
 
-     if (HLs)
-     {
-       STORE (A1XREG, (val >> 32) & 0xff);
-       STORE (A1WREG, (val & 0xffffffff));
+      if (HLs)
+	{
+	   STORE (A1XREG, (val >> 32) & 0xff);
+	   STORE (A1WREG, (val & 0xffffffff));
+	}
+      else
+	{
+	  STORE (A0XREG, (val >> 32) & 0xff);
+	  STORE (A0WREG, (val & 0xffffffff));
+	}
      }
-     else
-     {
-       STORE (A0XREG, (val >> 32) & 0xff);
-       STORE (A0WREG, (val & 0xffffffff));
-     }
-   }
   else if (sop == 1 && sopcde == 3 && (HLs == 0 || HLs == 1))
-   {
-     /* HLs == 0 : A0 = LSHIFT A0 BY dregs_lo
-      * HLs == 1 : A1 = LSHIFT A1 BY dregs_lo
-      */
-     bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
-     bu64 val;
+    {
+      /* HLs == 0 : A0 = LSHIFT A0 BY dregs_lo
+       * HLs == 1 : A1 = LSHIFT A1 BY dregs_lo
+       */
+      bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
+      bu64 val;
 
-     if (HLs)
-       val = get_extended_acc1 (cpu);
-     else
-       val = get_extended_acc0 (cpu);
+      if (HLs)
+	val = get_extended_acc1 (cpu);
+      else
+	val = get_extended_acc0 (cpu);
 
-     if (shft <= 0)
-       val = lshiftrt(cpu, val, -shft, 40);
-     else
-       val = lshift(cpu, val, shft, 40, 0);
+      if (shft <= 0)
+	val = lshiftrt(cpu, val, -shft, 40);
+      else
+	val = lshift(cpu, val, shft, 40, 0);
 
-    if (HLs)
-     {
-       STORE (A1XREG, (val >> 32) & 0xff);
-       STORE (A1WREG, (val & 0xffffffff));
-     }
-     else
-     {
-       STORE (A0XREG, (val >> 32) & 0xff);
-       STORE (A0WREG, (val & 0xffffffff));
-     }
+      if (HLs)
+	{
+	  STORE (A1XREG, (val >> 32) & 0xff);
+	  STORE (A1WREG, (val & 0xffffffff));
+	}
+      else
+	{
+	  STORE (A0XREG, (val >> 32) & 0xff);
+	  STORE (A0WREG, (val & 0xffffffff));
+	}
 
     }
   else if ((sop == 0 || sop == 1) && sopcde == 1)
@@ -3635,16 +3637,16 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       val1 = (bu16)((DREG(src1) & 0xFFFF0000) >> 16);
 
       if (shft <= 0)
-         {
-           val0 = ashiftrt(cpu, val0, -shft, 16);
-           val1 = ashiftrt(cpu, val1, -shft, 16);
-         }
-       else
-         {
-           val0 = lshift(cpu, val0, shft, 16, sop == 1);
-           val1 = lshift(cpu, val1, shft, 16, sop == 1);
-         }
-       STORE (DREG(dst0), (val1 << 16) | val0);
+	{
+	  val0 = ashiftrt(cpu, val0, -shft, 16);
+	  val1 = ashiftrt(cpu, val1, -shft, 16);
+	}
+      else
+	{
+	  val0 = lshift(cpu, val0, shft, 16, sop == 1);
+	  val1 = lshift(cpu, val1, shft, 16, sop == 1);
+	}
+      STORE (DREG(dst0), (val1 << 16) | val0);
     }
   else if ((sop == 0 || sop == 1 || sop == 2) && sopcde == 2)
     {
@@ -3671,21 +3673,21 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 
       /* Reduce everything to rotate left.  */
       if (t < 0)
-        t += 33;
+	t += 33;
 
       if (t > 0)
-        {
-          int oldcc = CCREG;
-          bu32 srcval = DREG (src1);
-          bu32 result;
-          result = t == 32 ? 0 : srcval << t;
-          result |= t == 1 ? 0 : srcval >> (33 - t);
-          result |= oldcc << (t - 1);
-          STORE (DREG (dst0), result);
-          CCREG = (srcval >> (32 - t)) & 1;
-        }
+	{
+	  int oldcc = CCREG;
+	  bu32 srcval = DREG (src1);
+	  bu32 result;
+	  result = t == 32 ? 0 : srcval << t;
+	  result |= t == 1 ? 0 : srcval >> (33 - t);
+	  result |= oldcc << (t - 1);
+	  STORE (DREG (dst0), result);
+	  CCREG = (srcval >> (32 - t)) & 1;
+	}
       else
-        STORE (DREG (dst0), DREG (src1));
+	STORE (DREG (dst0), DREG (src1));
 
     }
   else if (sop == 2 && sopcde == 1)
@@ -3699,16 +3701,16 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       val1 = (bu16)((DREG(src1) & 0xFFFF0000) >> 16);
 
       if (shft <= 0)
-         {
-           val0 = lshiftrt(cpu, val0, -shft, 16);
-           val1 = lshiftrt(cpu, val1, -shft, 16);
-         }
-       else
-         {
-           val0 = lshift(cpu, val0, shft, 16, 0);
-           val1 = lshift(cpu, val1, shft, 16, 0);
-         }
-       STORE (DREG(dst0), (val1 << 16) | val0);
+	{
+	  val0 = lshiftrt(cpu, val0, -shft, 16);
+	  val1 = lshiftrt(cpu, val1, -shft, 16);
+	}
+      else
+	{
+	  val0 = lshift(cpu, val0, shft, 16, 0);
+	  val1 = lshift(cpu, val1, shft, 16, 0);
+	}
+      STORE (DREG(dst0), (val1 << 16) | val0);
     }
   else if (sopcde == 4)
     {
@@ -3770,43 +3772,43 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       DREG (dst0) &= 0xFFFF0000;
 
       if ((sv1 & 0x1f) < (sv0 & 0x1f))
-        DREG (dst0) |= sv1;
+	DREG (dst0) |= sv1;
       else
-        DREG (dst0) |= sv0;
+	DREG (dst0) |= sv0;
    }
   else if (sop == 1 && sopcde == 7)
-   {
-     /*
-      * Exponent adjust on two 16-bit inputs. Select smallest norm
-      * among 3 inputs
-      */
-     bs16 src1_hi = (DREG (src1) & 0xFFFF0000) >> 16;
-     bs16 src1_lo = (DREG (src1) & 0xFFFF);
-     bu16 src0_lo = (DREG (src0) & 0xFFFF);
-     bu16 tmp_hi, tmp_lo;
+    {
+      /*
+       * Exponent adjust on two 16-bit inputs. Select smallest norm
+       * among 3 inputs
+       */
+      bs16 src1_hi = (DREG (src1) & 0xFFFF0000) >> 16;
+      bs16 src1_lo = (DREG (src1) & 0xFFFF);
+      bu16 src0_lo = (DREG (src0) & 0xFFFF);
+      bu16 tmp_hi, tmp_lo;
 
-     TRACE_INSN (cpu, "R%i.L = EXPADJ (R%i, R%i.L) (V);", dst0, src1, src0);
+      TRACE_INSN (cpu, "R%i.L = EXPADJ (R%i, R%i.L) (V);", dst0, src1, src0);
 
-     tmp_hi = signbits(src1_hi, 16);
-     tmp_lo = signbits(src1_lo, 16);
-     DREG (dst0) &= 0xFFFF0000;
+      tmp_hi = signbits(src1_hi, 16);
+      tmp_lo = signbits(src1_lo, 16);
+      DREG (dst0) &= 0xFFFF0000;
 
-     if ((tmp_hi & 0xf) < (tmp_lo & 0xf))
-       if ((tmp_hi&0xf) < (src0_lo & 0xf))
-	 DREG (dst0) |= tmp_hi;
-       else
-         DREG (dst0) |= src0_lo;
-    else
-      if ((tmp_lo&0xf)  < (src0_lo & 0xf))
-	DREG (dst0) |= tmp_lo;
+      if ((tmp_hi & 0xf) < (tmp_lo & 0xf))
+	if ((tmp_hi&0xf) < (src0_lo & 0xf))
+	  DREG (dst0) |= tmp_hi;
+	else
+	  DREG (dst0) |= src0_lo;
       else
-        DREG (dst0) |= src0_lo;
+	if ((tmp_lo&0xf)  < (src0_lo & 0xf))
+	  DREG (dst0) |= tmp_lo;
+	else
+	  DREG (dst0) |= src0_lo;
    }
   else if (sop == 2 && sopcde == 7)
-   {
-    /*
-     * exponent adjust on single 16-bit register
-     */
+    {
+      /*
+       * exponent adjust on single 16-bit register
+       */
       bu16 tmp;
       bu16 src0_lo = (bu16)(DREG (src0) & 0xFFFF);
 
@@ -3816,10 +3818,9 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       DREG (dst0) &= 0xFFFF0000;
 
       if ((tmp & 0xf) < (src0_lo & 0xf))
-        DREG (dst0) |= tmp;
+	DREG (dst0) |= tmp;
       else
-        DREG (dst0) |= src0_lo;
-
+	DREG (dst0) |= src0_lo;
    }
   else if (sop == 3 && sopcde == 7)
     {
@@ -3832,9 +3833,9 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       DREG (dst0) &= 0xFFFF0000;
 
       if ((tmp & 0xf) < (src0_lo & 0xf))
-        DREG (dst0) |= tmp;
+	DREG (dst0) |= tmp;
       else
-        DREG (dst0) |= src0_lo;
+	DREG (dst0) |= src0_lo;
     }
   else if (sop == 0 && sopcde == 8)
     unhandled_instruction (cpu, "BITMUX (dregs, dregs, A0) (ASR)");
@@ -3951,8 +3952,8 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       bu16 result;
       bu32 v;
       if (sop == 0)
-        /* dregs_hi/lo = dregs_hi/lo >>> imm4 */
-      /* XXX: TRACE_INSN (cpu, "???"); */
+	/* dregs_hi/lo = dregs_hi/lo >>> imm4 */
+	/* XXX: TRACE_INSN (cpu, "???"); */
 	result = ashiftrt (cpu, in, newimmag, 16);
       else if (sop == 1 && bit8== 0)
 	/*  dregs_hi/lo = dregs_hi/lo << imm4 (S) */
@@ -4391,7 +4392,8 @@ interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
     *BFIN_CPU_STATE.stores[i].addr = BFIN_CPU_STATE.stores[i].val;
 
   /* XXX: probably want to always show when an ASTAT bit is written, not
-          just changed ...  */
+   * just changed ...
+   */
   if (TRACE_CORE_P (cpu))
     {
 #define COMPARE_ASTAT(bit, BIT) \
