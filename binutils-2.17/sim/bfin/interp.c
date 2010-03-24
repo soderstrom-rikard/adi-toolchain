@@ -174,10 +174,17 @@ step_once (SIM_CPU *cpu)
      of a loop is a jump.  */
   if (!BFIN_CPU_STATE.did_jump)
     {
-      if (LC1REG && oldpc == LB1REG && --LC1REG)
-	PCREG = LT1REG;
-      else if (LC0REG && oldpc == LB0REG && --LC0REG)
-	PCREG = LT0REG;
+      int i;
+      for (i = 1; i >= 0; --i)
+	{
+	  if (LCREG(i) && oldpc == LBREG(i) && --LCREG(i))
+	    {
+	      PCREG = LTREG(i);
+	      TRACE_BRANCH (cpu, "Hardware loop %i to %#x (%#x iters left)", i,
+			    PCREG, LCREG(i));
+	      break;
+	    }
+	}
     }
 
   return oldpc;
