@@ -198,47 +198,103 @@ ashiftrt (SIM_CPU *cpu, bu32 val, int cnt, int size)
   return val;
 }
 
-static bu32
-lshiftrt (SIM_CPU *cpu, bu32 val, int cnt, int size)
+static bu64
+lshiftrt (SIM_CPU *cpu, bu64 val, int cnt, int size)
 {
   int real_cnt = cnt > size ? size : cnt;
   if (real_cnt > 16)
     val >>= 16, real_cnt -= 16;
   val >>= real_cnt;
+  switch (size)
+  {
+    case 16:
+      val &= 0xFFFF;
+      break;
+    case 32:
+      val &= 0xFFFFFFFF;
+      break;
+    case 40:
+      val &= 0xFFFFFFFFFF;
+      break;
+    default:
+      illegal_instruction (cpu);
+      break;
+  }
   ASTATREG (an) = val >> (size - 1);
   ASTATREG (az) = val == 0;
   ASTATREG (v) = 0;
   return val;
 }
 
-static bu32
-lshift (SIM_CPU *cpu, bu32 val, int cnt, int size, int saturate)
+static bu64
+lshift (SIM_CPU *cpu, bu64 val, int cnt, int size, bool saturate)
 {
-  int real_cnt = cnt > size ? size : cnt;
-  bu32 sgn = ~((val >> (size - 1)) - 1);
-  int mask_cnt = size - real_cnt - !sgn;
-  bu32 masked;
-  bu32 mask = ~0;
-  if (mask_cnt > 16)
-    mask <<= 16, sgn <<= 16, mask_cnt -= 16;
+  int i, j, real_cnt = cnt > size ? size : cnt;
+  bu64 sgn = ~((val >> (size - 1)) - 1);
+  int mask_cnt = size - 1; // - real_cnt
+  bu64 masked, new_val = val, tmp;
+  bu64 mask = ~0;
+
   mask <<= mask_cnt;
   sgn <<= mask_cnt;
   masked = val & mask;
 
   if (real_cnt > 16)
-    val <<= 16, real_cnt -= 16;
-  val <<= real_cnt;
-  if (saturate && sgn != masked)
+    new_val <<= 16, real_cnt -= 16;
+
+  new_val <<= real_cnt;
+
+  masked = new_val & mask;
+
+  /* If an operation would otherwise cause a positive value to overflow
+   * and become negative, instead, saturation limits the result to the
+   * maximum positive value for the size register being used.
+   *
+   * Conversely, if an operation would otherwise cause a negative value
+   * to overflow and become positive, saturation limits the result to the
+   * maximum negative value for the register size.
+   */
+  tmp = (new_val & mask);
+  tmp >>= mask_cnt;
+
+  j = !(tmp & 0x1);
+  for(i = 0; i <= real_cnt; i++)
     {
-      if (size == 32)
-	val = sgn == 0 ? 0x7fffffff : 0x80000000;
-      else
-	val = sgn == 0 ? 0x7fff : 0x8000;
+      if (tmp & 0x1 && ! (tmp & 0x2))
+	j++;
+      tmp >>= 1;
     }
-  ASTATREG (an) = val >> (size - 1);
-  ASTATREG (az) = val == 0;
+  saturate &= (j > 1) ||
+	(!sgn && (new_val & (1 << mask_cnt))) ||
+	(sgn && !(new_val & (1 << mask_cnt)) );
+
+  switch (size)
+   {
+      case 16:
+	if (saturate && (new_val & mask) ) 
+	  new_val = sgn == 0 ? 0x7fff : 0x8000;
+	new_val &= 0xFFFF;
+	break;
+      case 32:
+	new_val &= 0xFFFFFFFF;
+	masked &= 0xFFFFFFFF;
+	if (saturate && ((sgn != masked) || (!sgn && new_val == 0)))
+	  new_val = sgn == 0 ? 0x7fffffff : 0x80000000;
+	break;
+      case 40:
+	new_val &= 0xFFFFFFFFFF;
+	masked  &= 0xFFFFFFFFFF;
+	break;
+      default:
+	illegal_instruction (cpu);
+	break;
+  }
+
+
+  ASTATREG (an) = new_val >> (size - 1);
+  ASTATREG (az) = new_val == 0;
   ASTATREG (v) = 0;
-  return val;
+  return new_val;
 }
 
 static bu32
@@ -3443,24 +3499,37 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   int HLs = ((iw1 >> 12) & 0x3);
 
   TRACE_EXTRACT (cpu, "%s: M:%i sopcde:%i sop:%i HLs:%i dst0:%i src0:%i src1:%i",
-		 __func__, M, sopcde, sop, HLs, dst0, src0, src1);
+                 __func__, M, sopcde, sop, HLs, dst0, src0, src1);
 
-  if (HLs == 0 && sop == 0 && sopcde == 0)
-    unhandled_instruction (cpu, "dregs_lo = ASHIFT dregs_lo BY dregs_lo");
-  else if (HLs == 1 && sop == 0 && sopcde == 0)
-    unhandled_instruction (cpu, "dregs_lo = ASHIFT dregs_hi BY dregs_lo");
-  else if (HLs == 2 && sop == 0 && sopcde == 0)
-    unhandled_instruction (cpu, "dregs_hi = ASHIFT dregs_lo BY dregs_lo");
-  else if (HLs == 3 && sop == 0 && sopcde == 0)
-    unhandled_instruction (cpu, "dregs_hi = ASHIFT dregs_hi BY dregs_lo");
-  else if (HLs == 0 && sop == 1 && sopcde == 0)
-    unhandled_instruction (cpu, "dregs_lo = ASHIFT dregs_lo BY dregs_lo (S)");
-  else if (HLs == 1 && sop == 1 && sopcde == 0)
-    unhandled_instruction (cpu, "dregs_lo = ASHIFT dregs_hi BY dregs_lo (S)");
-  else if (HLs == 2 && sop == 1 && sopcde == 0)
-    unhandled_instruction (cpu, "dregs_hi = ASHIFT dregs_lo BY dregs_lo (S)");
-  else if (HLs == 3 && sop == 1 && sopcde == 0)
-    unhandled_instruction (cpu, "dregs_hi = ASHIFT dregs_hi BY dregs_lo (S)");
+  if ((sop == 0 || sop == 1) && sopcde == 0)
+    {
+      /* HLs == 0 : dregs_lo = ASHIFT dregs_lo BY dregs_lo
+       * HLs == 1 : dregs_lo = ASHIFT dregs_hi BY dregs_lo
+       * HLs == 2 : dregs_hi = ASHIFT dregs_lo BY dregs_lo
+       * HLs == 3 : dregs_hi = ASHIFT dregs_hi BY dregs_lo
+       * if sop == 1, then saturate, otherwise not
+       */
+       bu16 val;
+       bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
+
+       if ((HLs & 1) == 0)
+	val = (bu16)(DREG(src1) & 0xFFFF);
+       else
+         val = (bu16)((DREG(src1) & 0xFFFF0000) >> 16);
+
+       /*Positive shift magnitudes produce Logical Left shifts.
+        *Negative shift magnitudes produce Arithmetic Right shifts.
+        */
+       if (shft <= 0)
+	 val = ashiftrt(cpu, val, -shft, 16);
+       else
+          val = lshift(cpu, val, shft, 16, sop == 1);
+
+      if ((HLs & 2) == 0)
+         STORE (DREG(dst0), DREG(dst0) & 0xFFFF0000 | val);
+      else
+         STORE (DREG(dst0), DREG(dst0) & 0xFFFF | (val << 16));
+    }
   else if (sop == 2 && sopcde == 0)
     {
       /* HLs == 0  dregs_lo = LSHIFT dregs_lo BY dregs_lo
@@ -3489,38 +3558,110 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	/* XXX: ASTAT */
     }
   else if (sop == 2 && sopcde == 3 && HLs == 1)
-    unhandled_instruction (cpu, "A1 = ROT A1 BY dregs_lo");
-  else if (sop == 0 && sopcde == 3 && HLs == 0)
-    unhandled_instruction (cpu, "A0 = ASHIFT A0 BY dregs_lo");
-  else if (sop == 0 && sopcde == 3 && HLs == 1)
-    unhandled_instruction (cpu, "A1 = ASHIFT A1 BY dregs_lo");
-  else if (sop == 1 && sopcde == 3 && HLs == 0)
-    unhandled_instruction (cpu, "A0 = LSHIFT A0 BY dregs_lo");
-  else if (sop == 1 && sopcde == 3 && HLs == 1)
-    unhandled_instruction (cpu, "A1 = LSHIFT A1 BY dregs_lo");
-  else if (sop == 2 && sopcde == 3 && HLs == 0)
-    unhandled_instruction (cpu, "A0 = ROT A0 BY dregs_lo");
-  else if (sop == 1 && sopcde == 1)
-    unhandled_instruction (cpu, "dregs = ASHIFT dregs BY dregs_lo (V,S)");
-  else if (sop == 0 && sopcde == 1)
-    unhandled_instruction (cpu, "dregs = ASHIFT dregs BY dregs_lo (V)");
+    {
+      /* HLs == 1 : A1 = ROT A1 BY dregs_lo 
+       * HLs == 0 : A0 = ROT A0 BY dregs_lo
+       */
+    unhandled_instruction (cpu, "An = ROT An BY dregs_lo");
+    }
+  else if (sop == 0 && sopcde == 3 && (HLs == 0 || HLs == 1))
+   {
+     /* HLs == 0 : A0 = ASHIFT A0 BY dregs_lo
+      * HLs == 1 : A1 = ASHIFT A1 BY dregs_lo
+      */
+     bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
+     bu64 val;
+
+     if (HLs)
+       val = get_extended_acc1 (cpu);
+     else
+       val = get_extended_acc0 (cpu);
+
+     if (shft <= 0)
+       val = ashiftrt(cpu, val, -shft, 40);
+     else
+       val = lshift(cpu, val, shft, 40, 0);
+
+     if (HLs)
+     {
+       STORE (A1XREG, (val >> 32) & 0xff);
+       STORE (A1WREG, (val & 0xffffffff));
+     }
+     else
+     {
+       STORE (A0XREG, (val >> 32) & 0xff);
+       STORE (A0WREG, (val & 0xffffffff));
+     }
+   }
+  else if (sop == 1 && sopcde == 3 && (HLs == 0 || HLs == 1))
+   {
+     /* HLs == 0 : A0 = LSHIFT A0 BY dregs_lo
+      * HLs == 1 : A1 = LSHIFT A1 BY dregs_lo
+      */
+     bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
+     bu64 val;
+
+     if (HLs)
+       val = get_extended_acc1 (cpu);
+     else
+       val = get_extended_acc0 (cpu);
+
+     if (shft <= 0)
+       val = lshiftrt(cpu, val, -shft, 40);
+     else
+       val = lshift(cpu, val, shft, 40, 0);
+
+    if (HLs)
+     {
+       STORE (A1XREG, (val >> 32) & 0xff);
+       STORE (A1WREG, (val & 0xffffffff));
+     }
+     else
+     {
+       STORE (A0XREG, (val >> 32) & 0xff);
+       STORE (A0WREG, (val & 0xffffffff));
+     }
+
+    }
+  else if ((sop == 0 || sop == 1) && sopcde == 1)
+    {
+      /* sop == 0 : dregs = ASHIFT dregs BY dregs_lo (V)
+       * sop == 1 : dregs = ASHIFT dregs BY dregs_lo (V,S)
+       */
+      bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
+      bu16 val0, val1;
+
+      val0 = (bu16)DREG(src1) & 0xFFFF;
+      val1 = (bu16)((DREG(src1) & 0xFFFF0000) >> 16);
+
+      if (shft <= 0)
+         {
+           val0 = ashiftrt(cpu, val0, -shft, 16);
+           val1 = ashiftrt(cpu, val1, -shft, 16);
+         }
+       else
+         {
+           val0 = lshift(cpu, val0, shft, 16, sop == 1);
+           val1 = lshift(cpu, val1, shft, 16, sop == 1);
+         }
+       STORE (DREG(dst0), (val1 << 16) | val0);
+    }
   else if ((sop == 0 || sop == 1 || sop == 2) && sopcde == 2)
     {
       /* dregs = [LA]SHIFT dregs BY dregs_lo (opt_S) */
+      /* sop == 1 : opt_S */
       bu32 v = DREG (src1);
       /* LSHIFT uses sign extended low 6 bits of dregs_lo.  */
       bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
       if (shft < 0)
 	{
 	  if (sop == 2)
-	    DREG (dst0) = lshiftrt (cpu, v, -shft, 32);
+	    STORE (DREG (dst0), lshiftrt (cpu, v, -shft, 32));
 	  else
-	    DREG (dst0) = ashiftrt (cpu, v, -shft, 32);
+	    STORE (DREG (dst0), ashiftrt (cpu, v, -shft, 32));
 	}
       else
-	{
-	  DREG (dst0) = lshift (cpu, v, shft, 32, sop == 1);
-	}
+	  STORE (DREG (dst0), lshift (cpu, v, shft, 32, sop == 1));
     }
   else if (sop == 3 && sopcde == 2)
     {
@@ -3550,15 +3691,24 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   else if (sop == 2 && sopcde == 1)
     {
       bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
+      bu16 val0, val1;
 
       TRACE_INSN (cpu, "R%i = LSHIFT R%i BY R%i.L (V);", dst0, src1, src0);
 
-      if (shft < 0)
-        DREG(dst0) = ((DREG (src1) << (-1 * shft)) & 0xFFFF) | ((DREG (src1) & 0xFFFF0000) << (-1 *shft));
-      else
-	DREG(dst0) = ((DREG (src1) & 0xFFFF) >> shft) | ((DREG (src1) >> shft) & 0xFFFF0000);
+      val0 = (bu16)DREG(src1) & 0xFFFF;
+      val1 = (bu16)((DREG(src1) & 0xFFFF0000) >> 16);
 
-       /* ASTAT ? */
+      if (shft <= 0)
+         {
+           val0 = lshiftrt(cpu, val0, -shft, 16);
+           val1 = lshiftrt(cpu, val1, -shft, 16);
+         }
+       else
+         {
+           val0 = lshift(cpu, val0, shft, 16, 0);
+           val1 = lshift(cpu, val1, shft, 16, 0);
+         }
+       STORE (DREG(dst0), (val1 << 16) | val0);
     }
   else if (sopcde == 4)
     {
@@ -3800,14 +3950,21 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       bu16 in = DREG (src1) >> ((HLs & 1) ? 16 : 0);
       bu16 result;
       bu32 v;
+      if (sop == 0)
+        /* dregs_hi/lo = dregs_hi/lo >>> imm4 */
       /* XXX: TRACE_INSN (cpu, "???"); */
-      if (sop == 0 && bit8)
 	result = ashiftrt (cpu, in, newimmag, 16);
+      else if (sop == 1 && bit8== 0)
+	/*  dregs_hi/lo = dregs_hi/lo << imm4 (S) */
+	result = lshift (cpu, in, immag, 16, 1);
       else if (sop == 1 && bit8)
+	/* dregs_hi/lo = dregs_hi/lo >>> imm4 (S) */
 	result = lshift (cpu, in, immag, 16, 1);
       else if (sop == 2 && bit8)
+	/* dregs_hi/lo = dregs_hi/lo >> imm4 */
 	result = lshiftrt (cpu, in, newimmag, 16);
-      else if (sop == 2)
+      else if (sop == 2 && bit8 == 0)
+	/* dregs_hi/lo = dregs_hi/lo << imm4 */
 	result = lshift (cpu, in, immag, 16, 0);
       else
 	unhandled_instruction (cpu, "dsp32shiftimm_0");
@@ -3867,27 +4024,47 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     }
   else if (sop == 2 && sopcde == 3 && HLs == 0)
     unhandled_instruction (cpu, "A0 = ROT A0 BY imm6");
-  else if (sop == 1 && sopcde == 1)
-    unhandled_instruction (cpu, "dregs = dregs >>> uimm5 (V,S)");
-  else if (sop == 2 && sopcde == 1 && bit8 == 1)
+  else if (sop == 1 && sopcde == 1 && bit8 == 0)
     {
-      int count = imm5(newimmag);
+      /* dregs = dregs << uimm5 (V,S) */
+      int count = imm5(immag);
+      bu16 val0 = DREG (src1) >> 16;
+      bu16 val1 = DREG (src1) & 0xFFFF;
 
-      TRACE_INSN (cpu, "R%i = R%i >> %i (V);", dst0, src1, count);
+      val0 = lshift(cpu, val0, count, 16, 1);
+      val1 = lshift(cpu, val1, count, 16, 1);
 
-      DREG(dst0) = ((DREG (src1) & 0xFFFF) >> count) | ((DREG (src1) >> count) & 0xFFFF0000);
+      STORE (DREG (dst0), (val0 << 16) | val1);
+    }
+  else if (sop == 1 && sopcde == 1 && bit8 == 1)
+   {
+    /* dregs = dregs >>> uimm5 (V,S) */
+    unhandled_instruction (cpu, "dregs = dregs >>> uimm5 (V,S)");
+   }
+  else if (sop == 2 && sopcde == 1 && bit8 == 1) {
+     /* dregs = dregs >> uimm5 (V) */
+     int count = imm5(newimmag);
+     bu16 val0 = DREG (src1) & 0xFFFF;
+     bu16 val1 = DREG (src1) >> 16;
 
-      /* ASTAT ? */
+     TRACE_INSN (cpu, "R%i = R%i >> %i (V);", dst0, src1, count);
+     val0 = lshiftrt (cpu, val0, count, 16);
+     val1 = lshiftrt (cpu, val1, count, 16);
+
+     STORE (DREG(dst0) , val0 | (val1 << 16));
     }
   else if (sop == 2 && sopcde == 1 && bit8 == 0)
     {
+      /* dregs = dregs << uimm5 (V) */
       int count = imm5(immag);
+      bu16 val0 = DREG (src1) & 0xFFFF;
+      bu16 val1 = DREG (src1) >> 16;
 
       TRACE_INSN (cpu, "R%i = R%i << %i (V);", dst0, src1, count);
+      val0 = lshift (cpu, val0, count, 16, 0);
+      val1 = lshift (cpu, val1, count, 16, 0);
 
-      DREG(dst0) = ((DREG (src1) << count) & 0xFFFF) | ((DREG (src1) & 0xFFFF0000) << count);
-
-      /* ASTAT ? */
+      STORE (DREG(dst0) , val0 | (val1 << 16));
     }
   else if (sop == 0 && sopcde == 1)
     {
