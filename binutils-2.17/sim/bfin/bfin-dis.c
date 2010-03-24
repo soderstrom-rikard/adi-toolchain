@@ -1690,6 +1690,9 @@ decode_REGMV_0 (SIM_CPU *cpu, bu16 iw0)
       if (reg_requires_sup (cpu, srcreg))
 	REQUIRE_SUPERVISOR ();
       value = *srcreg;
+      /* sign extend if necessary */
+      if ((srcreg == &A1XREG || srcreg == &A0XREG) && (value & 0x80))
+	value |= 0xFFFFFF00;
     }
 
   if (gd == 4 && dst == 6)
