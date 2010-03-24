@@ -1,3 +1,11 @@
+2010-01-16  Mike Frysinger  <michael.frysinger@analog.com>
+
+	* bfin-dis.c (constant_formats): Add const to name member.
+	(fmtconst): Add const to return value.
+	(reg_names): Add const.
+	(decode_multfunc): Add const to s0 and s1.
+	(decode_macfunc): Add const to a and sop.
+
 2009-06-22  Jie Zhang  <jie.zhang@analog.com>
 
 	* bfin-dis.c (decode_statbits_bf532): Rename to ...
