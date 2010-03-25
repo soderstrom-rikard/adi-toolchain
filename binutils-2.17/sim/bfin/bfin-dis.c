@@ -979,13 +979,8 @@ static bu32
 decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 		int src1, int mmod, int MM, int fullword)
 {
-  bu32 *ax, *aw;
-  bu64 acc;
+  bu64 acc = which ? get_extended_acc1(cpu) : get_extended_acc0(cpu);
   int sat = 0;
-
-  ax = which ? &A1XREG : &A0XREG;
-  aw = which ? &A1WREG : &A0WREG;
-  acc = (((bu64)*ax << 32) | ((bu64)*aw)) & 0xFFFFFFFFFFull;
 
   /* Sign extend accumulator if necessary.  */
   if (mmod == 0 || mmod == M_T || mmod == M_IS || mmod == M_ISS2
