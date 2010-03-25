@@ -64,8 +64,11 @@ device_io_read_buffer (device *me, void *source, int space,
     return nr_bytes;
 
   if (bfin_mmr_check (cpu, dv_me, addr, nr_bytes))
-    return sim_cpu_hw_io_read_buffer (cpu, cia, dv_me, source, space,
-				      addr, nr_bytes);
+    if (cpu)
+      return sim_cpu_hw_io_read_buffer (cpu, cia, dv_me, source, space,
+					addr, nr_bytes);
+    else
+      return sim_hw_io_read_buffer (sd, me, source, space, addr, nr_bytes);
   else
     return 0;
 }
@@ -81,8 +84,11 @@ device_io_write_buffer (device *me, const void *source, int space,
     return nr_bytes;
 
   if (bfin_mmr_check (cpu, dv_me, addr, nr_bytes))
-    return sim_cpu_hw_io_write_buffer (cpu, cia, dv_me, source, space, \
-				       addr, nr_bytes);
+    if (cpu)
+      return sim_cpu_hw_io_write_buffer (cpu, cia, dv_me, source, space,
+					 addr, nr_bytes);
+    else
+      return sim_hw_io_read_buffer (sd, me, source, space, addr, nr_bytes);
   else
     return 0;
 }
