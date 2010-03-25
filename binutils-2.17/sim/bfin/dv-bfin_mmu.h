@@ -1,4 +1,4 @@
-/* Blackfin Event Vector Table (EVT) model.
+/* Blackfin Memory Management Unit (MMU) model.
 
    Copyright (C) 2010 Free Software Foundation, Inc.
    Contributed by Analog Devices, Inc.
@@ -18,14 +18,13 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef DV_BFIN_EVT_H
-#define DV_BFIN_EVT_H
+#ifndef DV_BFIN_MMU_H
+#define DV_BFIN_MMU_H
 
-#define BFIN_COREMMR_EVT_BASE	0xFFE02000
-#define BFIN_COREMMR_EVT_SIZE	(4 * 16)
+#define BFIN_COREMMR_MMU_BASE	0xFFE00000
+#define BFIN_COREMMR_MMU_SIZE	0x2000
 
-extern void cec_set_evt (SIM_CPU *, int ivg, bu32 handler_addr);
-extern bu32 cec_get_evt (SIM_CPU *, int ivg);
-extern bu32 cec_get_reset_evt (SIM_CPU *);
+void mmu_check_addr (SIM_CPU *, bu32 addr, bool write, bool inst, int size);
+void mmu_process_fault (SIM_CPU *, bu32 addr, bool write, bool inst, bool unaligned);
 
 #endif

@@ -182,51 +182,41 @@ struct bfin_cpu_state
 #define __PUT_MEM(taddr, v, size) \
 do { \
   bu##size __v = (v); \
+  bu32 __taddr = (taddr); \
   int __cnt, __bytes = size / 8; \
-  /* XXX: Common sim should be doing this ...  */ \
-  if (taddr & (__bytes - 1)) \
-    cec_exception (cpu, VEC_MISALI_D); \
-  __cnt = sim_write (CPU_STATE(cpu), taddr, (void *)&__v, __bytes); \
+  mmu_check_addr (cpu, __taddr, true, false, __bytes); \
+  __cnt = sim_core_write_buffer (CPU_STATE(cpu), cpu, write_map, \
+				 (void *)&__v, __taddr, __bytes); \
   if (__cnt != __bytes) \
-    { \
-      if (taddr >= BFIN_SYSTEM_MMR_BASE) \
-	cec_exception (cpu, VEC_ILL_RES); \
-      else \
-	cec_exception (cpu, VEC_CPLB_M); \
-    } \
+    mmu_process_fault (cpu, __taddr, true, false, false); \
   TRACE_CORE (cpu, "DBUS STORE %i bytes @ 0x%08x: 0x%0*x", \
-	      size / 8, taddr, size / 4, __v); \
+	      size / 8, __taddr, size / 4, __v); \
 } while (0)
 #define PUT_BYTE(taddr, v) __PUT_MEM(taddr, v, 8)
 #define PUT_WORD(taddr, v) __PUT_MEM(taddr, v, 16)
 #define PUT_LONG(taddr, v) __PUT_MEM(taddr, v, 32)
 
-#define __GET_MEM(taddr, size, unaligned, cplb_miss) \
+#define __GET_MEM(taddr, size, inst) \
 ({ \
   bu##size __ret; \
+  bu32 __taddr = (taddr); \
   int __cnt, __bytes = size / 8; \
-  /* XXX: Common sim should be doing this ...  */ \
-  if (taddr & (__bytes - 1)) \
-    cec_exception (cpu, unaligned); \
-  __cnt = sim_read (CPU_STATE(cpu), taddr, (void *)&__ret, __bytes); \
+  mmu_check_addr (cpu, __taddr, false, inst, __bytes); \
+  __cnt = sim_core_read_buffer (CPU_STATE(cpu), cpu, read_map, \
+				(void *)&__ret, __taddr, __bytes); \
   if (__cnt != __bytes) \
-    { \
-      if (taddr >= BFIN_SYSTEM_MMR_BASE) \
-	cec_exception (cpu, VEC_ILL_RES); \
-      else \
-	cec_exception (cpu, cplb_miss); \
-    } \
+    mmu_process_fault (cpu, __taddr, false, inst, false); \
   TRACE_CORE (cpu, "%cBUS FETCH %i bytes @ 0x%08x: 0x%0*x", \
-	      unaligned == VEC_MISALI_D ? 'D' : 'I', \
-	      size / 8, taddr, size / 4, __ret); \
+	      inst ? 'I' : 'D', \
+	      size / 8, __taddr, size / 4, __ret); \
   __ret; \
 })
-#define _GET_MEM(taddr, size) __GET_MEM(taddr, size, VEC_MISALI_D, VEC_CPLB_M)
+#define _GET_MEM(taddr, size) __GET_MEM(taddr, size, false)
 #define GET_BYTE(taddr) _GET_MEM(taddr, 8)
 #define GET_WORD(taddr) _GET_MEM(taddr, 16)
 #define GET_LONG(taddr) _GET_MEM(taddr, 32)
 
-#define IFETCH(taddr) __GET_MEM(taddr, 16, VEC_MISALI_I, VEC_CPLB_I_M)
+#define IFETCH(taddr) __GET_MEM(taddr, 16, true)
 
 extern void interp_insn_bfin (SIM_CPU *, bu32);
 

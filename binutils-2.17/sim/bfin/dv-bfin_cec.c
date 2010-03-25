@@ -26,10 +26,12 @@
 struct bfin_cec
 {
   bu32 base;
-  /* Order is important -- matches hardware MMR layout.  */
+
+  /* Order after here is important -- matches hardware MMR layout.  */
   bu32 evt_override, imask, ipend, ilat, iprio;
 };
-#define mmr_offset(mmr) (offsetof(struct bfin_cec, mmr) - 4)
+#define mmr_base()      offsetof(struct bfin_cec, evt_override)
+#define mmr_offset(mmr) (offsetof(struct bfin_cec, mmr) - mmr_base())
 
 #define IS_SUPV() (cec->ipend & ~(IVG_EMU_B | IVG_IRPTEN_B))
 #define IS_USER() (! IS_SUPV ())
@@ -108,8 +110,8 @@ attach_bfin_cec_regs (struct hw *me, struct bfin_cec *cec)
 				     &attach_space, &attach_address, me);
   hw_unit_size_to_attach_size (hw_parent (me), &reg.size, &attach_size, me);
 
-  if (attach_size != sizeof (*cec) - 4)
-    hw_abort (me, "\"reg\" size must be %#lx", sizeof (*cec) - 4);
+  if (attach_size != BFIN_COREMMR_CEC_SIZE)
+    hw_abort (me, "\"reg\" size must be %#x", BFIN_COREMMR_CEC_SIZE);
 
   hw_attach_address (hw_parent (me),
 		     0, attach_space, attach_address, attach_size, me);

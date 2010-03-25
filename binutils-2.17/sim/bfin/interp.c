@@ -33,8 +33,17 @@
 #include "sim-hw.h"
 #include "targ-vals.h"
 
+#include "devices.h"
 #include "dv-bfin_cec.h"
+#include "dv-bfin_ctimer.h"
+#include "dv-bfin_ebiu_amc.h"
+#include "dv-bfin_ebiu_sdc.h"
 #include "dv-bfin_evt.h"
+#include "dv-bfin_mmu.h"
+#include "dv-bfin_pll.h"
+#include "dv-bfin_sic.h"
+#include "dv-bfin_trace.h"
+#include "dv-bfin_uart.h"
 
 static char **prog_argv;
 
@@ -243,8 +252,17 @@ bfin_map_layout (SIM_DESC sd, SIM_CPU *cpu, size_t count,
 static void
 bfin_hw_tree_init (SIM_DESC sd)
 {
-  sim_hw_parse (sd, "/core/bfin_evt/reg %#x %i", BFIN_COREMMR_EVT_BASE, 4 * 16);
-  sim_hw_parse (sd, "/core/bfin_cec/reg %#x %i", BFIN_COREMMR_CEC_BASE, 4 * 5);
+  dv_bfin_hw_parse (sd, cec, CEC);
+  dv_bfin_hw_parse (sd, ctimer, CTIMER);
+  dv_bfin_hw_parse (sd, evt, EVT);
+  dv_bfin_hw_parse (sd, mmu, MMU);
+  dv_bfin_hw_parse (sd, trace, TRACE);
+
+  dv_bfin_hw_parse (sd, ebiu_amc, EBIU_AMC);
+  dv_bfin_hw_parse (sd, ebiu_sdc, EBIU_SDC);
+  dv_bfin_hw_parse (sd, pll, PLL);
+  dv_bfin_hw_parse (sd, sic, SIC);
+  dv_bfin_hw_parse (sd, uart, UART);
 }
 
 static void
@@ -263,6 +281,7 @@ bfin_initialize_cpu (SIM_DESC sd, SIM_CPU *cpu)
   sim_core_attach (sd, NULL, 0, access_read_write, 0, BFIN_L1_SRAM_SCRATCH,
                    BFIN_L1_SRAM_SCRATCH_SIZE, 0, NULL, NULL);
 
+#if 0
   /* Map in the async banks.  */
   async = BFIN_ASYNC_BASE;
   for (idx = 0; idx < 4; ++idx)
@@ -271,6 +290,7 @@ bfin_initialize_cpu (SIM_DESC sd, SIM_CPU *cpu)
                        mdata->async_bank_size, 0, NULL, NULL);
       async += mdata->async_bank_size;
     }
+#endif
 
   /* Map in the on-chip memory (bootrom/sram/etc...).  */
   bfin_map_layout (sd, cpu, mdata->mem_count, mdata->mem);

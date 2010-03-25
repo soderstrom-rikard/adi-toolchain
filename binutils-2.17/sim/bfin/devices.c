@@ -27,11 +27,11 @@ bfin_mmr_check (SIM_CPU *cpu, struct hw *me, address_word addr, unsigned nr_byte
 {
   if (addr >= BFIN_CORE_MMR_BASE)
     {
-      /* All Core MMRs are aligned 32bits */
+      /* All Core MMRs are aligned 32bits.  */
       if ((addr & 3) == 0 && nr_bytes == 4)
 	return true;
 
-      /* XXX: is this what hardware does ? */
+      /* XXX: is this what hardware does ?  */
       if (cpu)
 	cec_exception (cpu, VEC_ILL_RES);
       else
@@ -39,10 +39,8 @@ bfin_mmr_check (SIM_CPU *cpu, struct hw *me, address_word addr, unsigned nr_byte
     }
   else if (addr >= BFIN_SYSTEM_MMR_BASE)
     {
-      /* All System MMRs are aligned 16bits or 32bits */
-      if ((addr & 0x1) == 0 && nr_bytes == 2)
-	return true;
-      if ((addr & 0x3) == 0 && nr_bytes == 4)
+      /* All System MMRs are 32bit aligned, but can be 16bits or 32bits.  */
+      if ((addr & 0x3) == 0 && (nr_bytes == 2 || nr_bytes == 4))
 	return true;
 
       /* XXX: is this what hardware does ? */
@@ -66,7 +64,8 @@ device_io_read_buffer (device *me, void *source, int space,
     return nr_bytes;
 
   if (bfin_mmr_check (cpu, dv_me, addr, nr_bytes))
-    return hw_io_read_buffer (dv_me, source, space, addr, nr_bytes);
+    return sim_cpu_hw_io_read_buffer (cpu, cia, dv_me, source, space,
+				      addr, nr_bytes);
   else
     return 0;
 }
@@ -82,7 +81,8 @@ device_io_write_buffer (device *me, const void *source, int space,
     return nr_bytes;
 
   if (bfin_mmr_check (cpu, dv_me, addr, nr_bytes))
-    return hw_io_write_buffer (dv_me, source, space, addr, nr_bytes);
+    return sim_cpu_hw_io_write_buffer (cpu, cia, dv_me, source, space, \
+				       addr, nr_bytes);
   else
     return 0;
 }

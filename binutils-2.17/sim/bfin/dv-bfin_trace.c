@@ -1,4 +1,4 @@
-/* Blackfin Event Vector Table (EVT) model.
+/* Blackfin Trace (TBUF) model.
 
    Copyright (C) 2010 Free Software Foundation, Inc.
    Contributed by Analog Devices, Inc.
@@ -20,20 +20,28 @@
 
 #include "sim-main.h"
 #include "devices.h"
-#include "dv-bfin_cec.h"
-#include "dv-bfin_evt.h"
+#include "dv-bfin_trace.h"
 
-struct bfin_evt
+/* XXX: This is a stub implementation -- it always returns an empty trace.  */
+
+struct bfin_trace
 {
   bu32 base;
-  bu32 evt[16];
+  bu32 buffer[32];
+
+  /* Order after here is important -- matches hardware MMR layout.  */
+  bu32 tbufctl, tbufstat;
+  char _pad[0x100 - 0x8];
+  bu32 tbuf;
 };
+#define mmr_base()      offsetof(struct bfin_trace, tbufctl)
+#define mmr_offset(mmr) (offsetof(struct bfin_trace, mmr) - mmr_base())
 
 static unsigned
-bfin_evt_io_write_buffer (struct hw *me, const void *source,
+bfin_trace_io_write_buffer (struct hw *me, const void *source,
 			  int space, unsigned_word addr, unsigned nr_bytes)
 {
-  struct bfin_evt *evt = hw_data (me);
+  struct bfin_trace *trace = hw_data (me);
   bu32 value;
 
   value = dv_load_4 (source);
@@ -41,21 +49,44 @@ bfin_evt_io_write_buffer (struct hw *me, const void *source,
   HW_TRACE ((me, "write to 0x%08lx length %d with 0x%x", (long) addr,
 	     (int) nr_bytes, value));
 
-  evt->evt[(addr - evt->base) / 4] = value;
+  switch (addr - trace->base)
+    {
+    case mmr_offset(tbufctl):
+      trace->tbufctl = value;
+      break;
+    case mmr_offset(tbufstat):
+    case mmr_offset(tbuf):
+      /* Discard writes to these.  */
+      break;
+    default:
+      dv_bfin_invalid_mmr (me, addr, nr_bytes);
+      break;
+    }
 
   return nr_bytes;
 }
 
 static unsigned
-bfin_evt_io_read_buffer (struct hw *me, void *dest,
+bfin_trace_io_read_buffer (struct hw *me, void *dest,
 			 int space, unsigned_word addr, unsigned nr_bytes)
 {
-  struct bfin_evt *evt = hw_data (me);
+  struct bfin_trace *trace = hw_data (me);
   bu32 value;
 
   HW_TRACE ((me, "read 0x%08lx length %d", (long) addr, (int) nr_bytes));
 
-  value = evt->evt[(addr - evt->base) / 4];
+  switch (addr - trace->base)
+    {
+    case mmr_offset(tbufctl):
+      value = trace->tbufctl;
+    case mmr_offset(tbufstat):
+    case mmr_offset(tbuf):
+      value = 0;
+      break;
+    default:
+      dv_bfin_invalid_mmr (me, addr, nr_bytes);
+      break;
+    }
 
   dv_store_4 (dest, value);
 
@@ -63,7 +94,7 @@ bfin_evt_io_read_buffer (struct hw *me, void *dest,
 }
 
 static void
-attach_bfin_evt_regs (struct hw *me, struct bfin_evt *evt)
+attach_bfin_trace_regs (struct hw *me, struct bfin_trace *trace)
 {
   unsigned_word attach_address;
   int attach_space;
@@ -81,57 +112,30 @@ attach_bfin_evt_regs (struct hw *me, struct bfin_evt *evt)
 				     &attach_space, &attach_address, me);
   hw_unit_size_to_attach_size (hw_parent (me), &reg.size, &attach_size, me);
 
-  if (attach_size != BFIN_COREMMR_EVT_SIZE)
-    hw_abort (me, "\"reg\" size must be %#x", BFIN_COREMMR_EVT_SIZE);
+  if (attach_size != BFIN_COREMMR_TRACE_SIZE)
+    hw_abort (me, "\"reg\" size must be %#x", BFIN_COREMMR_TRACE_SIZE);
 
   hw_attach_address (hw_parent (me),
 		     0, attach_space, attach_address, attach_size, me);
 
-  evt->base = attach_address;
+  trace->base = attach_address;
 }
 
 static void
-bfin_evt_finish (struct hw *me)
+bfin_trace_finish (struct hw *me)
 {
-  struct bfin_evt *evt;
+  struct bfin_trace *trace;
 
-  evt = HW_ZALLOC (me, struct bfin_evt);
+  trace = HW_ZALLOC (me, struct bfin_trace);
 
-  set_hw_data (me, evt);
-  set_hw_io_read_buffer (me, bfin_evt_io_read_buffer);
-  set_hw_io_write_buffer (me, bfin_evt_io_write_buffer);
+  set_hw_data (me, trace);
+  set_hw_io_read_buffer (me, bfin_trace_io_read_buffer);
+  set_hw_io_write_buffer (me, bfin_trace_io_write_buffer);
 
-  attach_bfin_evt_regs (me, evt);
+  attach_bfin_trace_regs (me, trace);
 }
 
-const struct hw_descriptor dv_bfin_evt_descriptor[] = {
-  {"bfin_evt", bfin_evt_finish,},
+const struct hw_descriptor dv_bfin_trace_descriptor[] = {
+  {"bfin_trace", bfin_trace_finish,},
   {NULL},
 };
-
-#define EVT_STATE(cpu) ((struct bfin_evt *) dv_get_state (cpu, "/core/bfin_evt"))
-
-void
-cec_set_evt (SIM_CPU *cpu, int ivg, bu32 handler_addr)
-{
-  if (ivg > IVG15 || ivg < 0)
-    sim_io_error (CPU_STATE (cpu), "%s: ivg %i out of range !", __func__, ivg);
-
-  EVT_STATE (cpu)->evt[ivg] = handler_addr;
-}
-
-bu32
-cec_get_evt (SIM_CPU *cpu, int ivg)
-{
-  if (ivg > IVG15 || ivg < 0)
-    sim_io_error (CPU_STATE (cpu), "%s: ivg %i out of range !", __func__, ivg);
-
-  return EVT_STATE (cpu)->evt[ivg];
-}
-
-bu32
-cec_get_reset_evt (SIM_CPU *cpu)
-{
-  /* XXX: This should tail into the model to get via BMODE pins.  */
-  return 0xef000000;
-}

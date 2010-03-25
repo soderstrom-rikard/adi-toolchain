@@ -1,4 +1,5 @@
-/* Blackfin Event Vector Table (EVT) model.
+/* Blackfin External Bus Interface Unit (EBIU) Asynchronous Memory Controller
+   (AMC) model.
 
    Copyright (C) 2010 Free Software Foundation, Inc.
    Contributed by Analog Devices, Inc.
@@ -18,14 +19,12 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef DV_BFIN_EVT_H
-#define DV_BFIN_EVT_H
+#ifndef DV_BFIN_EBIU_AMC_H
+#define DV_BFIN_EBIU_AMC_H
 
-#define BFIN_COREMMR_EVT_BASE	0xFFE02000
-#define BFIN_COREMMR_EVT_SIZE	(4 * 16)
+#define BFIN_COREMMR_EBIU_AMC_BASE	0xFFC00A00
+#define BFIN_COREMMR_EBIU_AMC_SIZE	(4 * 3)
 
-extern void cec_set_evt (SIM_CPU *, int ivg, bu32 handler_addr);
-extern bu32 cec_get_evt (SIM_CPU *, int ivg);
-extern bu32 cec_get_reset_evt (SIM_CPU *);
+#define BF54X_COREMMR_EBIU_AMC_SIZE	(4 * 7)
 
 #endif

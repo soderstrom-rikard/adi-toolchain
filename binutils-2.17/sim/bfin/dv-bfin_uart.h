@@ -1,4 +1,4 @@
-/* Blackfin Event Vector Table (EVT) model.
+/* Blackfin UART model.
 
    Copyright (C) 2010 Free Software Foundation, Inc.
    Contributed by Analog Devices, Inc.
@@ -18,14 +18,19 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef DV_BFIN_EVT_H
-#define DV_BFIN_EVT_H
+#ifndef DV_BFIN_UART_H
+#define DV_BFIN_UART_H
 
-#define BFIN_COREMMR_EVT_BASE	0xFFE02000
-#define BFIN_COREMMR_EVT_SIZE	(4 * 16)
+/* XXX: This should be pushed into the model data.  */
+#define BFIN_COREMMR_UART_BASE	0xFFC00400
+#define BFIN_COREMMR_UART_SIZE	0x30
 
-extern void cec_set_evt (SIM_CPU *, int ivg, bu32 handler_addr);
-extern bu32 cec_get_evt (SIM_CPU *, int ivg);
-extern bu32 cec_get_reset_evt (SIM_CPU *);
+/* UART_LCR */
+#define DLAB (1 << 7)
+
+/* UART_LSR */
+#define TEMT (1 << 6)
+#define THRE (1 << 5)
+#define DR (1 << 0)
 
 #endif

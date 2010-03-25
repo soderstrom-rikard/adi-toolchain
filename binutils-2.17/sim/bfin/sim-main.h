@@ -63,6 +63,11 @@ struct sim_state {
 #include "sim-options.h"
 #include "run-sim.h"
 
+#undef MAX
+#undef MIN
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
 #define MAYBE_TRACE(type, cpu, fmt, ...) \
   do { \
     if (TRACE_##type##_P (cpu)) \
@@ -77,6 +82,6 @@ struct sim_state {
 #define TRACE_BRANCH(cpu, fmt, ...) MAYBE_TRACE (BRANCH, cpu, fmt, ## __VA_ARGS__)
 
 /* Default memory size.  */
-#define BFIN_DEFAULT_MEM_SIZE 0x1000000 /* 16M */
+#define BFIN_DEFAULT_MEM_SIZE (64 * 1024 * 1024)
 
 #endif

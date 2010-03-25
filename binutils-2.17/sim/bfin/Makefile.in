@@ -29,6 +29,7 @@ SIM_OBJS = \
 	$(SIM_NEW_COMMON_OBJS) \
 	bfin-dis.o \
 	devices.o \
+	dv-sockser.o \
 	interp.o \
 	machs.o \
 	sim-cpu.o \
@@ -46,8 +47,16 @@ INCLUDE = bfin-sim.h
 
 ## COMMON_POST_CONFIG_FRAG
 
-interp.o: interp.c targ-vals.h $(INCLUDE)
+interp.o: interp.c targ-vals.h devices.h $(INCLUDE)
 bfin-dis.o: bfin-dis.c $(INCLUDE)
 machs.o: machs.c $(INCLUDE)
 dv-bfin_cec.o: dv-bfin_cec.c devices.h $(INCLUDE)
+dv-bfin_ctimer.o: dv-bfin_ctimer.c devices.h $(INCLUDE)
+dv-bfin_ebiu_amc.o: dv-bfin_ebiu_amc.c devices.h $(INCLUDE)
+dv-bfin_ebiu_sdc.o: dv-bfin_ebiu_sdc.c devices.h $(INCLUDE)
 dv-bfin_evt.o: dv-bfin_evt.c devices.h $(INCLUDE)
+dv-bfin_mmu.o: dv-bfin_mmu.c devices.h $(INCLUDE)
+dv-bfin_pll.o: dv-bfin_pll.c devices.h $(INCLUDE)
+dv-bfin_sic.o: dv-bfin_sic.c devices.h $(INCLUDE)
+dv-bfin_trace.o: dv-bfin_trace.c devices.h $(INCLUDE)
+dv-bfin_uart.o: dv-bfin_uart.c devices.h $(INCLUDE)

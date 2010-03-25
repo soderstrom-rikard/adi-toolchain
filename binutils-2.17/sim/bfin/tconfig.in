@@ -6,5 +6,15 @@
 /* For MSPR support.  FIXME: revisit.  */
 #define WITH_DEVICES 1
 
+/* FIXME: This is unnecessarily necessary: */
+#include "ansidecl.h"
+#include "gdb/callback.h"
+#include "gdb/remote-sim.h"
+#include "sim-module.h"
+
+/* FIXME: Revisit.  */
+MODULE_INSTALL_FN dv_sockser_install;
+#define MODULE_LIST dv_sockser_install,
+
 /* ??? Temporary hack until model support unified.  */
 #define SIM_HAVE_MODEL
