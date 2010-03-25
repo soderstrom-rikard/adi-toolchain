@@ -51,7 +51,7 @@ struct store {
 
 struct bfin_cpu_state
 {
-  bu32 dpregs[16], iregs[4], mregs[4], bregs[4], lregs[4], cycles[2];
+  bu32 dpregs[16], iregs[4], mregs[4], bregs[4], lregs[4], cycles[3];
   bu32 ax[2], aw[2];
   bu32 lt[2], lc[2], lb[2];
   union {
@@ -66,7 +66,7 @@ struct bfin_cpu_state
   int v_internal;
   bu32 pc, rets, reti, retx, retn, rete;
   bu32 usp, seqstat, syscfg;
-  bu32 emudat;
+  bu32 emudat[2];
 
   /* Set by an instruction emulation function if we performed a jump.  */
   bool did_jump;
@@ -106,6 +106,7 @@ struct bfin_cpu_state
 #define LB1REG		LBREG(1)
 #define CYCLESREG	(BFIN_CPU_STATE.cycles[0])
 #define CYCLES2REG	(BFIN_CPU_STATE.cycles[1])
+#define CYCLES2SHDREG	(BFIN_CPU_STATE.cycles[2])
 #define USPREG		(BFIN_CPU_STATE.usp)
 #define SEQSTATREG	(BFIN_CPU_STATE.seqstat)
 #define SYSCFGREG	(BFIN_CPU_STATE.syscfg)
@@ -115,7 +116,8 @@ struct bfin_cpu_state
 #define RETNREG		(BFIN_CPU_STATE.retn)
 #define RETEREG		(BFIN_CPU_STATE.rete)
 #define PCREG		(BFIN_CPU_STATE.pc)
-#define EMUDAT		(BFIN_CPU_STATE.emudat)
+#define EMUDAT_INREG	(BFIN_CPU_STATE.emudat[0])
+#define EMUDAT_OUTREG	(BFIN_CPU_STATE.emudat[1])
 
 #define AZ_BIT		0
 #define AN_BIT		1

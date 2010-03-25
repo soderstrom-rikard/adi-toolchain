@@ -734,7 +734,7 @@ get_allreg (SIM_CPU *cpu, int grp, int reg)
 	case 60: return &RETXREG;
 	case 61: return &RETNREG;
 	case 62: return &RETEREG;
-	case 63: return &EMUDAT;
+	case 63: return &EMUDAT_INREG;
 	}
       return 0;
     }
@@ -742,43 +742,102 @@ get_allreg (SIM_CPU *cpu, int grp, int reg)
 
 #define REQUIRE_SUPERVISOR() cec_get_ivg (cpu)
 static int
-reg_requires_sup (SIM_CPU *cpu, bu32 *whichreg)
+reg_requires_sup (SIM_CPU *cpu, int grp, int reg)
 {
-  return (whichreg == &RETIREG ||
-	  whichreg == &RETXREG ||
-	  whichreg == &RETNREG ||
-	  whichreg == &RETEREG ||
-	  whichreg == &USPREG ||
-	  whichreg == &SEQSTATREG ||
-	  whichreg == &SYSCFGREG);
+  return grp == 7 && reg != 7;	/* XXX: EMUDAT safe to RW from user ?  */
+}
+
+static void
+reg_write (SIM_CPU *cpu, int grp, int reg, bu32 value)
+{
+  bu32 *whichreg;
+
+  if (reg_requires_sup (cpu, grp, reg))
+    REQUIRE_SUPERVISOR ();
+
+  /* ASTAT is special!  */
+  if (grp == 4 && reg == 6)
+    {
+      SET_ASTAT (value);
+      return;
+    }
+
+  whichreg = get_allreg (cpu, grp, reg);
+
+  if (whichreg == &CYCLES2REG)
+    /* Writes to CYCLES2 goes to the shadow.  */
+    whichreg = &CYCLES2SHDREG;
+  else if (whichreg == &SEQSTATREG)
+    /* Register is read only -- discard writes.  */
+    return;
+  else if (whichreg == &EMUDAT_INREG)
+    /* Writes to EMUDAT goes to the output.  */
+    whichreg = &EMUDAT_OUTREG;
+  else if (whichreg == &A0XREG || whichreg == &A1XREG)
+    value &= 0xFF;
+
+  TRACE_CORE (cpu, "wrote %s = %#x", get_allreg_name (grp, reg), value);
+
+  *whichreg = value;
+}
+
+static bu32
+reg_read (SIM_CPU *cpu, int grp, int reg)
+{
+  bu32 *whichreg;
+  bu32 value;
+
+  if (reg_requires_sup (cpu, grp, reg))
+    REQUIRE_SUPERVISOR ();
+
+  /* ASTAT is special!  */
+  if (grp == 4 && reg == 6)
+    return ASTAT;
+
+  whichreg = get_allreg (cpu, grp, reg);
+  value = *whichreg;
+
+  if (whichreg == &CYCLESREG)
+    /* Reads of CYCLES reloads CYCLES2 from the shadow.  */
+    CYCLES2REG = CYCLES2SHDREG;
+  else if ((whichreg == &A1XREG || whichreg == &A0XREG) && (value & 0x80))
+    /* sign extend if necessary */
+    value |= 0xFFFFFF00;
+
+  return value;
 }
 
 static bu64
-get_extended_acc0 (SIM_CPU *cpu)
+get_extended_cycles (SIM_CPU *cpu)
 {
-  bu64 acc0 = A0XREG;
-  /* Sign extend accumulator values before adding.  */
-  if (acc0 & 0x80)
-    acc0 |= -0x80;
-  else
-    acc0 &= 0xFF;
-  acc0 <<= 32;
-  acc0 |= A0WREG;
-  return acc0;
+  return ((bu64)CYCLES2SHDREG << 32) | CYCLESREG;
+}
+
+static void
+cycles_inc (SIM_CPU *cpu, bu32 inc)
+{
+  bu64 cycles;
+
+  if (!(SYSCFGREG & SYSCFG_CCEN))
+    return;
+
+  cycles = get_extended_cycles (cpu) + inc;
+  CYCLESREG = cycles;
+  CYCLES2SHDREG = cycles >> 32;
 }
 
 static bu64
-get_extended_acc1 (SIM_CPU *cpu)
+get_extended_acc (SIM_CPU *cpu, int which)
 {
-  bu64 acc1 = A1XREG;
+  bu64 acc = AXREG (which);
   /* Sign extend accumulator values before adding.  */
-  if (acc1 & 0x80)
-    acc1 |= -0x80;
+  if (acc & 0x80)
+    acc |= -0x80;
   else
-    acc1 &= 0xFF;
-  acc1 <<= 32;
-  acc1 |= A1WREG;
-  return acc1;
+    acc &= 0xFF;
+  acc <<= 32;
+  acc |= AWREG (which);
+  return acc;
 }
 
 /* Perform a multiplication of D registers SRC0 and SRC1, sign- or
@@ -979,7 +1038,7 @@ static bu32
 decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 		int src1, int mmod, int MM, int fullword)
 {
-  bu64 acc = which ? get_extended_acc1(cpu) : get_extended_acc0(cpu);
+  bu64 acc = get_extended_acc (cpu, which);
   int sat = 0;
 
   /* Sign extend accumulator if necessary.  */
@@ -1266,7 +1325,6 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
   int grp = ((iw0 >> 3) & 0x7);
   int reg = ((iw0 >> 0) & 0x7);
   int W = ((iw0 >> 6) & 0x1);
-  bu32 *whichreg = get_allreg (cpu, grp, reg);
   const char *reg_name = get_allreg_name (grp, reg);
 
   TRACE_EXTRACT (cpu, "%s: W:%i grp:%i reg:%i", __func__, W, grp, reg);
@@ -1277,19 +1335,9 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
       bu32 value = GET_LONG (SPREG);
       TRACE_INSN (cpu, "%s = [SP++];", reg_name);
       /* XXX: If SP triggers an exception, should it be updated ?  */
-      if (grp == 4 && reg == 6)
-	SET_ASTAT (value);
-      else
-	{
-	  if (reg_requires_sup (cpu, whichreg))
-	    REQUIRE_SUPERVISOR ();
-	  *whichreg = value;
-	  /* XXX: Need to check hardware with popped RETI value
-	     and bit 1 is set (when handling nested interrupts).
-	     Also need to check behavior wrt SNEN in SYSCFG.  */
-	  if (whichreg == &RETIREG)
-	    cec_pop_reti (cpu);
-	}
+      reg_write (cpu, grp, reg, value);
+      if (grp == 7 && reg == 3)
+	cec_pop_reti (cpu);
       SPREG += 4;
     }
   else
@@ -1298,19 +1346,9 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
       TRACE_INSN (cpu, "[--SP] = %s;", reg_name);
       /* XXX: If SP triggers an exception, should it be updated ?  */
       SPREG -= 4;
-      if (grp == 4 && reg == 6)
-	value = ASTAT;
-      else
-	{
-	  if (reg_requires_sup (cpu, whichreg))
-	    REQUIRE_SUPERVISOR ();
-	  value = *whichreg;
-	  /* XXX: Need to check hardware with popped RETI value
-	     and bit 1 is set (when handling nested interrupts).
-	     Also need to check behavior wrt SNEN in SYSCFG.  */
-	  if (whichreg == &RETIREG)
-	    cec_push_reti (cpu);
-	}
+      value = reg_read (cpu, grp, reg);
+      if (grp == 7 && reg == 3)
+	cec_push_reti (cpu);
 
       PUT_LONG (SPREG, value);
     }
@@ -1665,9 +1703,6 @@ decode_REGMV_0 (SIM_CPU *cpu, bu16 iw0)
   int gs = ((iw0 >> 6) & 0x7);
   int dst = ((iw0 >> 3) & 0x7);
   int gd = ((iw0 >> 9) & 0x7);
-  bu32 *srcreg = get_allreg (cpu, gs, src);
-  bu32 *dstreg = get_allreg (cpu, gd, dst);
-  bu32 value;
   const char *srcreg_name = get_allreg_name (gs, src);
   const char *dstreg_name = get_allreg_name (gd, dst);
 
@@ -1677,30 +1712,7 @@ decode_REGMV_0 (SIM_CPU *cpu, bu16 iw0)
 
   TRACE_INSN (cpu, "%s = %s;", dstreg_name, srcreg_name);
 
-  if (gs == 4 && src == 6)
-    value = ASTAT;
-  else
-    {
-      /* XXX: reads of CYCLES2 should come from shadow copy */
-      if (reg_requires_sup (cpu, srcreg))
-	REQUIRE_SUPERVISOR ();
-      value = *srcreg;
-      /* sign extend if necessary */
-      if ((srcreg == &A1XREG || srcreg == &A0XREG) && (value & 0x80))
-	value |= 0xFFFFFF00;
-    }
-
-  if (gd == 4 && dst == 6)
-    SET_ASTAT (value);
-  else
-    {
-      if (reg_requires_sup (cpu, dstreg))
-	REQUIRE_SUPERVISOR ();
-      if (dstreg == &A1XREG || dstreg == &A0XREG)
-	*dstreg = value & 0xFF;
-      else
-	*dstreg = value;
-    }
+  reg_write (cpu, gd, dst, reg_read (cpu, gs, src));
 
   PCREG += 2;
 }
@@ -3078,8 +3090,8 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     }
   else if (aop == 3 && aopcde == 11 && (s == 0 || s == 1))
     {
-      bu64 acc0 = get_extended_acc0 (cpu);
-      bu64 acc1 = get_extended_acc1 (cpu);
+      bu64 acc0 = get_extended_acc (cpu, 0);
+      bu64 acc1 = get_extended_acc (cpu, 1);
 
       TRACE_INSN (cpu, "A0 -= A1;");
 
@@ -3328,8 +3340,8 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     unhandled_instruction (cpu, "dregs_hi = (A0 += A1)");
   else if ((aop == 0 || aop == 2) && aopcde == 11)
     {
-      bu64 acc0 = get_extended_acc0 (cpu);
-      bu64 acc1 = get_extended_acc1 (cpu);
+      bu64 acc0 = get_extended_acc (cpu, 0);
+      bu64 acc1 = get_extended_acc (cpu, 1);
 
       TRACE_INSN (cpu, "A0 += A1;");
 
@@ -3572,26 +3584,16 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
       bu64 val;
 
-      if (HLs)
-	val = get_extended_acc1 (cpu);
-      else
-	val = get_extended_acc0 (cpu);
+      HLs = !!HLs;
+      val = get_extended_acc (cpu, HLs);
 
       if (shft <= 0)
 	val = ashiftrt(cpu, val, -shft, 40);
       else
 	val = lshift(cpu, val, shft, 40, 0);
 
-      if (HLs)
-	{
-	   STORE (A1XREG, (val >> 32) & 0xff);
-	   STORE (A1WREG, (val & 0xffffffff));
-	}
-      else
-	{
-	  STORE (A0XREG, (val >> 32) & 0xff);
-	  STORE (A0WREG, (val & 0xffffffff));
-	}
+      STORE (AXREG (HLs), (val >> 32) & 0xff);
+      STORE (AWREG (HLs), (val & 0xffffffff));
      }
   else if (sop == 1 && sopcde == 3 && (HLs == 0 || HLs == 1))
     {
@@ -3601,27 +3603,16 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
       bu64 val;
 
-      if (HLs)
-	val = get_extended_acc1 (cpu);
-      else
-	val = get_extended_acc0 (cpu);
+      HLs = !!HLs;
+      val = get_extended_acc (cpu, HLs);
 
       if (shft <= 0)
 	val = lshiftrt(cpu, val, -shft, 40);
       else
 	val = lshift(cpu, val, shft, 40, 0);
 
-      if (HLs)
-	{
-	  STORE (A1XREG, (val >> 32) & 0xff);
-	  STORE (A1WREG, (val & 0xffffffff));
-	}
-      else
-	{
-	  STORE (A0XREG, (val >> 32) & 0xff);
-	  STORE (A0WREG, (val & 0xffffffff));
-	}
-
+      STORE (AXREG (HLs), (val >> 32) & 0xff);
+      STORE (AWREG (HLs), (val & 0xffffffff));
     }
   else if ((sop == 0 || sop == 1) && sopcde == 1)
     {
@@ -3984,7 +3975,7 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 
       TRACE_INSN (cpu, "A%i = A%i >>> %i;", HLs, HLs, shift);
 
-      acc = HLs ? get_extended_acc1 (cpu) : get_extended_acc0 (cpu);
+      acc = get_extended_acc (cpu, HLs);
       acc >>= shift;
       /* Sign extend again.  */
       if (acc & (1ULL << 39))
@@ -4290,9 +4281,8 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc, int *is_multiinsn)
     {
       TRACE_INSN (cpu, "MNOP;");
       PCREG += 4;
-      return;
     }
-  if ((iw0 & 0xFF00) == 0x0000)
+  else if ((iw0 & 0xFF00) == 0x0000)
     decode_ProgCtrl_0 (cpu, iw0);
   else if ((iw0 & 0xFFC0) == 0x0240)
     decode_CaCTRL_0 (cpu, iw0);
@@ -4368,6 +4358,8 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc, int *is_multiinsn)
     decode_psedodbg_assert_0 (cpu, iw0, iw1);
   else
     illegal_instruction (cpu);
+
+  cycles_inc (cpu, 1);
 }
 
 void

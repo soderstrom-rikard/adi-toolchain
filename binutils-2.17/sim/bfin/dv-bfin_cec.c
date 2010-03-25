@@ -482,6 +482,9 @@ cec_return (SIM_CPU *cpu, int ivg)
 void
 cec_push_reti (SIM_CPU *cpu)
 {
+  /* XXX: Need to check hardware with popped RETI value
+     and bit 1 is set (when handling nested interrupts).
+     Also need to check behavior wrt SNEN in SYSCFG.  */
   struct bfin_cec *cec = CEC_STATE (cpu);
   TRACE_EVENTS (cpu, "pushing RETI");
   cec_irpten_disable (cpu, cec);
@@ -492,6 +495,9 @@ cec_push_reti (SIM_CPU *cpu)
 void
 cec_pop_reti (SIM_CPU *cpu)
 {
+  /* XXX: Need to check hardware with popped RETI value
+     and bit 1 is set (when handling nested interrupts).
+     Also need to check behavior wrt SNEN in SYSCFG.  */
   struct bfin_cec *cec = CEC_STATE (cpu);
   TRACE_EVENTS (cpu, "popping RETI");
   cec_irpten_enable (cpu, cec);

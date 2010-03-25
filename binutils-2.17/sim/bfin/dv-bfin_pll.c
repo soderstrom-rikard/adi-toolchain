@@ -158,6 +158,11 @@ bfin_pll_finish (struct hw *me)
   pll->vr_ctl = 0x40DB;
   pll->pll_stat = 0x00A2;
   pll->pll_lockcnt = 0x0200;
+
+  /* XXX: slow it down!  */
+//  pll->pll_div = 0x3f;
+//  pll->pll_ctl = 0x201;
+
   pll->chipid = 3;	/* XXX: incorrect.  */
 }
 
