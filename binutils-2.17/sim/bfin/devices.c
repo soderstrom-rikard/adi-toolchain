@@ -40,9 +40,9 @@ bfin_mmr_check (SIM_CPU *cpu, struct hw *me, address_word addr, unsigned nr_byte
   else if (addr >= BFIN_SYSTEM_MMR_BASE)
     {
       /* All System MMRs are aligned 16bits or 32bits */
-      if ((addr & 2) == 0 && nr_bytes == 2)
+      if ((addr & 0x1) == 0 && nr_bytes == 2)
 	return true;
-      if ((addr & 4) == 0 && nr_bytes == 4)
+      if ((addr & 0x3) == 0 && nr_bytes == 4)
 	return true;
 
       /* XXX: is this what hardware does ? */
