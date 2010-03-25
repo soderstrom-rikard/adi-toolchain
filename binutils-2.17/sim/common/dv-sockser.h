@@ -21,8 +21,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define DV_SOCKSER_H
 
 /* bits in result of dev_sockser_status */
-#define DV_SOCKSER_INPUT_EMPTY  1
-#define DV_SOCKSER_OUTPUT_EMPTY 2
+#define DV_SOCKSER_INPUT_EMPTY  0x1
+#define DV_SOCKSER_OUTPUT_EMPTY 0x2
+#define DV_SOCKSER_DISCONNECTED 0x4
 
 /* FIXME: later add a device ptr arg */
 extern int dv_sockser_status (SIM_DESC);
