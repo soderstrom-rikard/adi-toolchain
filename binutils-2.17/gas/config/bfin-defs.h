@@ -123,7 +123,10 @@ enum statusflags
 {
   S_AZ = 0,
   S_AN,
+  S_AC0_COPY,
+  S_V_COPY,
   S_AQ = 6,
+  S_RND_MOD = 8,
   S_AC0 = 12,
   S_AC1,
   S_AV0 = 16,
