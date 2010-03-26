@@ -23,8 +23,6 @@
 #include "devices.h"
 #include "dv-bfin_ebiu_amc.h"
 
-#include "regbits/ebiu.h"
-
 struct bfin_ebiu_amc
 {
   bu32 base, reg_size, bank_size;
