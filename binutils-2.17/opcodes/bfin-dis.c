@@ -4559,7 +4559,7 @@ decode_pseudoDEBUG_0 (TIword iw0, disassemble_info *outf)
     }
   else if (fn == 0)
     {
-      OUTS (outf, "DBG");
+      OUTS (outf, "DBG ");
       OUTS (outf, allregs (reg, grp));
     }
   else if (fn == 1)
