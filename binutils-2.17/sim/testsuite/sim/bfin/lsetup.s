@@ -51,7 +51,6 @@
 	r7 += -1;
 
 	R0 = 10 (Z);
-_burp:
 	CC = R7 == R0;
 	if CC jump 3f;
 	fail
