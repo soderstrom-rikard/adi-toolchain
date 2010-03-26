@@ -16,5 +16,8 @@
 #define _V		(1 << 24)
 #define _VS		(1 << 25)
 
+#define _SET		1
+#define _UNSET		0
+
 #define HI(x) (((x) >> 16) & 0xffff)
 #define LO(x) ((x) & 0xffff)
