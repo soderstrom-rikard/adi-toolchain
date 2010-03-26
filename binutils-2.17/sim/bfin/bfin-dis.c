@@ -1246,7 +1246,15 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
       cec_exception (cpu, excpt);
     }
   else if (prgfunc == 11)
-    unhandled_instruction (cpu, "TESTSET");
+    {
+      bu32 addr = PREG (poprnd);
+      bu32 byte;
+      TRACE_INSN (cpu, "TESTSET (P%i);", poprnd);
+      byte = GET_LONG (addr);
+      CCREG = ((byte & 0xff) == 0);
+      PUT_BYTE (addr, byte | 0x80);
+      PCREG += 2;
+    }
   else
     illegal_instruction (cpu);
 }
