@@ -3518,7 +3518,27 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	(((DREG (src1) >> 16) & 0xff) << 24);
     }
   else if (aop == 1 && aopcde == 24)
-    unhandled_instruction (cpu, "(dregs, dregs) = BYTEUNPACK dregs_pair aligndir");
+    {
+      int order, lo, hi;
+      bu64 comb_src;
+      bu8 bytea, byteb, bytec, byted;
+
+      TRACE_INSN (cpu, "(R%i, R%i) = BYTEUNPACK R%i:%i%s;",
+		  dst1, dst0, src0 + 1, src0, s ? " (R)" : "");
+
+      order = IREG (0) & 0x3;
+      if (s)
+	hi = src0, lo = src0 + 1;
+      else
+	hi = src0 + 1, lo = src0;
+      comb_src = (((bu64)DREG (hi)) << 32) | DREG (lo);
+      bytea = (comb_src >> (0 + 8 * order));
+      byteb = (comb_src >> (8 + 8 * order));
+      bytec = (comb_src >> (16 + 8 * order));
+      byted = (comb_src >> (24 + 8 * order));
+      DREG (dst0) = bytea | ((bu32)byteb << 16);
+      DREG (dst1) = bytec | ((bu32)byted << 16);
+    }
   else if (aopcde == 13)
     unhandled_instruction (cpu, "(dregs, dregs) = SEARCH dregs (searchmod)");
   else
