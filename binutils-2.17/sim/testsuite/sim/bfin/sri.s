@@ -1,6 +1,5 @@
 # Blackfin testcase for BITMUX
 # mach: bfin
-# xfail: "need to implement BITMUX in sim" bfin-*
 
 	.include "testutils.inc"
 

@@ -826,6 +826,12 @@ cycles_inc (SIM_CPU *cpu, bu32 inc)
 }
 
 static bu64
+get_unextended_acc (SIM_CPU *cpu, int which)
+{
+  return ((bu64)AXREG (which) << 32) | AWREG (which);
+}
+
+static bu64
 get_extended_acc (SIM_CPU *cpu, int which)
 {
   bu64 acc = AXREG (which);
@@ -3924,9 +3930,35 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	DREG (dst0) |= src0_lo;
     }
   else if (sop == 0 && sopcde == 8)
-    unhandled_instruction (cpu, "BITMUX (dregs, dregs, A0) (ASR)");
+    {
+      bu64 acc = get_unextended_acc (cpu, 0);
+
+      TRACE_INSN (cpu, "BITMUX (R%i, R%i, A0) (ASR);", src0, src1);
+
+      acc = (acc >> 2) |
+	(((bu64)DREG (src0) & 1) << 38) |
+	(((bu64)DREG (src1) & 1) << 39);
+      DREG (src0) >>= 1;
+      DREG (src1) >>= 1;
+
+      A0XREG = (acc >> 32) & 0xff;
+      A0WREG = acc;
+    }
   else if (sop == 1 && sopcde == 8)
-    unhandled_instruction (cpu, "BITMUX (dregs, dregs, A0) (ASL)");
+    {
+      bu64 acc = get_unextended_acc (cpu, 0);
+
+      TRACE_INSN (cpu, "BITMUX (R%i, R%i, A0) (ASL);", src0, src1);
+
+      acc = (acc << 2) |
+	((DREG (src0) >> 31) & 1) |
+	((DREG (src1) >> 30) & 2);
+      DREG (src0) <<= 1;
+      DREG (src1) <<= 1;
+
+      A0XREG = (acc >> 32) & 0xff;
+      A0WREG = acc;
+    }
   else if (sop == 0 && sopcde == 9)
     unhandled_instruction (cpu, "dregs_lo = VIT_MAX (dregs) (ASL)");
   else if (sop == 1 && sopcde == 9)
