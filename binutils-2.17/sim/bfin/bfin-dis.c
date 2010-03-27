@@ -3540,7 +3540,51 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       DREG (dst1) = bytec | ((bu32)byted << 16);
     }
   else if (aopcde == 13)
-    unhandled_instruction (cpu, "(dregs, dregs) = SEARCH dregs (searchmod)");
+    {
+      const char *searchmodes[] = { "GT", "GE", "LT", "LE" };
+      bool up_hi, up_lo;
+      bs16 a0_lo, a1_lo, src_hi, src_lo, dst_hi, dst_lo;
+
+      TRACE_INSN (cpu, "(R%i, R%i) = SEARCH R%i (%s);",
+		  dst1, dst0, src0, searchmodes[aop]);
+
+      up_hi = up_lo = false;
+      a0_lo = AWREG (0);
+      a1_lo = AWREG (1);
+      src_lo = DREG (src0);
+      src_hi = DREG (src0) >> 16;
+
+      switch (aop)
+	{
+	case 0:
+	  up_hi = (src_hi > a1_lo);
+	  up_lo = (src_lo > a0_lo);
+	  break;
+	case 1:
+	  up_hi = (src_hi >= a1_lo);
+	  up_lo = (src_lo >= a0_lo);
+	  break;
+	case 2:
+	  up_hi = (src_hi < a1_lo);
+	  up_lo = (src_lo < a0_lo);
+	  break;
+	case 3:
+	  up_hi = (src_hi <= a1_lo);
+	  up_lo = (src_lo <= a0_lo);
+	  break;
+	}
+
+      if (up_hi)
+	{
+	  AWREG (1) = REG_H_L (AWREG (1), src_hi);
+	  DREG (dst1) = PREG (0);
+	}
+      if (up_lo)
+	{
+	  AWREG (0) = REG_H_L (AWREG (0), src_lo);
+	  DREG (dst0) = PREG (0);
+	}
+    }
   else
     illegal_instruction (cpu);
 
