@@ -2,8 +2,8 @@
 // Spec Reference: dsp32shift bitmux
 # mach: bfin
 
-#include "test.h"
-.include "testutils.inc"
+	.include "testutils.inc"
+
 	start
 
 	A0 = 0;

@@ -1,7 +1,9 @@
+# Blackfin testcase for PREGS and BREV
 # mach: bfin
+# xfail: "need to implement (BREV) in sim" bfin-*
 
-#include "test.h"
-.include "testutils.inc"
+	.include "testutils.inc"
+
 	start
 
 // issue 129

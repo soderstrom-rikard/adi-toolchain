@@ -6,8 +6,8 @@
 //but the processor fails to acquire the lock.
 # mach: bfin
 
-#include "test.h"
-.include "testutils.inc"
+	.include "testutils.inc"
+
 	start
 
 	loadsym P0, datalabel;
