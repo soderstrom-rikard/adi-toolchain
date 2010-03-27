@@ -3509,7 +3509,14 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   else if (HL == 1 && aopcde == 1)
     unhandled_instruction (cpu, "dregs = dregs +|- dregs, dregs = dregs -|+ dregs (amod0, amod2)");
   else if (aop == 0 && aopcde == 24)
-    unhandled_instruction (cpu, "dregs = BYTEPACK (dregs, dregs)");
+    {
+      TRACE_INSN (cpu, "R%i = BYTEPACK (R%i, R%i);", dst0, src0, src1);
+      DREG (dst0) =
+	(((DREG (src0) >>  0) & 0xff) <<  0) |
+	(((DREG (src0) >> 16) & 0xff) <<  8) |
+	(((DREG (src1) >>  0) & 0xff) << 16) |
+	(((DREG (src1) >> 16) & 0xff) << 24);
+    }
   else if (aop == 1 && aopcde == 24)
     unhandled_instruction (cpu, "(dregs, dregs) = BYTEUNPACK dregs_pair aligndir");
   else if (aopcde == 13)
