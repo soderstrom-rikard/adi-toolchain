@@ -23,7 +23,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
 
 #include "gdb/signals.h"
 #include "opcode/bfin.h"
@@ -1479,12 +1478,31 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
 
   if (opc > 4)
     {
+      bs64 acc0 = get_extended_acc (cpu, 0);
+      bs64 acc1 = get_extended_acc (cpu, 1);
+      bs64 diff = acc0 - acc1;
+
       if (opc == 5 && I == 0 && G == 0)
-	unhandled_instruction (cpu, "CC = A0 == A1");
+	{
+	  TRACE_INSN (cpu, "CC = A0 == A1;");
+	  CCREG = acc0 == acc1;
+	}
       else if (opc == 6 && I == 0 && G == 0)
-	unhandled_instruction (cpu, "CC = A0 < A1");
+	{
+	  TRACE_INSN (cpu, "CC = A0 < A1");
+	  CCREG = acc0 < acc1;
+	}
       else if (opc == 7 && I == 0 && G == 0)
-	unhandled_instruction (cpu, "CC = A0 <= A1");
+	{
+	  TRACE_INSN (cpu, "CC = A0 <= A1");
+	  CCREG = acc0 <= acc1;
+	}
+      else
+	illegal_instruction (cpu);
+
+      ASTATREG (az) = (diff == 0);
+      ASTATREG (an) = (diff < 0);
+      ASTATREG (ac0) = (0); /* XXX: What is this ?  */
     }
   else
     {
