@@ -1248,10 +1248,10 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
   else if (prgfunc == 11)
     {
       bu32 addr = PREG (poprnd);
-      bu32 byte;
+      bu8 byte;
       TRACE_INSN (cpu, "TESTSET (P%i);", poprnd);
-      byte = GET_LONG (addr);
-      CCREG = ((byte & 0xff) == 0);
+      byte = GET_WORD (addr);
+      CCREG = (byte == 0);
       PUT_BYTE (addr, byte | 0x80);
       PCREG += 2;
     }
