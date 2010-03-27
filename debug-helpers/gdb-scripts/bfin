@@ -31,6 +31,60 @@ Usage: all_regs
 Display all core registers in a compact format.
 end
 
+define astat
+	printf "ASTAT: %#x ( ", $astat
+	if $astat & (1 << 25)
+		printf "VS "
+	end
+	if $astat & (1 << 24)
+		printf "V "
+	end
+	if $astat & (1 << 19)
+		printf "AV1S "
+	end
+	if $astat & (1 << 18)
+		printf "AV1 "
+	end
+	if $astat & (1 << 17)
+		printf "AV0S "
+	end
+	if $astat & (1 << 16)
+		printf "AV0 "
+	end
+	if $astat & (1 << 13)
+		printf "AC1 "
+	end
+	if $astat & (1 << 12)
+		printf "AC0 "
+	end
+	if $astat & (1 << 8)
+		printf "RND_MOD "
+	end
+	if $astat & (1 << 6)
+		printf "AQ "
+	end
+	if $astat & (1 << 5)
+		printf "CC "
+	end
+	if $astat & (1 << 3)
+		printf "V_COPY "
+	end
+	if $astat & (1 << 2)
+		printf "AC0_COPY "
+	end
+	if $astat & (1 << 1)
+		printf "AN "
+	end
+	if $astat & (1 << 0)
+		printf "AZ "
+	end
+	printf ")\n"
+	set $$inv = $astat & 0xfcf0ce90
+	if $$inv
+		printf "Invalid bits: %#x\n", $$inv
+	end
+end
+
 define seqstat
 	if $argc == 1
 		set $$seqstat = $arg0
