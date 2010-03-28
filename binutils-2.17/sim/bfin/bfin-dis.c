@@ -1547,7 +1547,7 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
 
       SET_ASTATREG (az, diff == 0);
       SET_ASTATREG (an, diff < 0);
-      SET_ASTATREG (ac0, 0); /* XXX: What is this ?  */
+      SET_ASTATREG (ac0, (bu40)acc1 <= (bu40)acc0);
     }
   else
     {
