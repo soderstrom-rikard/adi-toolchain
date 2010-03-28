@@ -95,6 +95,29 @@ setflags_logical (SIM_CPU *cpu, bu32 val)
   ASTATREG (v) = 0;
 }
 
+static bu32
+add_brev (SIM_CPU *cpu, bu32 addend1, bu32 addend2)
+{
+  bu32 mask, b, r;
+  int i, cy;
+
+  mask = 0x80000000;
+  r = 0;
+  cy = 0;
+
+  for (i = 31; i >= 0; --i)
+    {
+      b = ((addend1 & mask) >> i) + ((addend2 & mask) >> i);
+      b += cy;
+      cy = b >> 1;
+      b &= 1;
+      r |= b << i;
+      mask >>= 1;
+    }
+
+  return r;
+}
+
 static int
 dagadd_brev(SIM_CPU *cpu, int dagno, bs32 modify)
 {
@@ -1886,7 +1909,7 @@ decode_PTR2op_0 (SIM_CPU *cpu, bu16 iw0)
   else if (opc == 4)
     PREG (dst) = PREG (src) >> 1;
   else if (opc == 5)
-    unhandled_instruction (cpu, "pregs += pregs ( BREV )");
+    PREG (dst) = add_brev (cpu, PREG (dst), PREG (src));
   else if (opc == 6)
     PREG (dst) = (PREG (dst) + PREG (src)) << 1;
   else if (opc == 7)
@@ -2210,7 +2233,7 @@ decode_dagMODim_0 (SIM_CPU *cpu, bu16 iw0)
   if (op == 0 && br == 1)
     {
       TRACE_INSN (cpu, "I%i += M%i (BREV);", i, m);
-      dagadd_brev (cpu, i, MREG (m));
+      IREG (i) = add_brev (cpu, IREG (i), MREG (m));
     }
   else if (op == 0)
     {

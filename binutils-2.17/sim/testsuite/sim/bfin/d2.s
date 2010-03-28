@@ -1,6 +1,5 @@
 # Blackfin testcase for circular buffers and BREV
 # mach: bfin
-# xfail: "need to implement (BREV) in sim" bfin-*
 
 	.include "testutils.inc"
 

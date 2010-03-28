@@ -28,10 +28,12 @@
 typedef unsigned8 bu8;
 typedef unsigned16 bu16;
 typedef unsigned32 bu32;
+typedef unsigned64 bu40;
 typedef unsigned64 bu64;
 typedef signed8 bs8;
 typedef signed16 bs16;
 typedef signed32 bs32;
+typedef signed64 bs40;
 typedef signed64 bs64;
 
 /* For dealing with parallel instructions, we must avoid changing our register
