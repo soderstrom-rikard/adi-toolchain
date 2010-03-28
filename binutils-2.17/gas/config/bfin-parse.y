@@ -3579,7 +3579,7 @@ asm_1:
 	| DBG REG
 	{
 	  notethat ("pseudoDEBUG: DBG allregs\n");
-	  $$ = bfin_gen_pseudodbg (0, $2.regno & CODE_MASK, $2.regno & CLASS_MASK);
+	  $$ = bfin_gen_pseudodbg (0, $2.regno & CODE_MASK, ($2.regno & CLASS_MASK) >> 4);
 	}
 
 	| DBGCMPLX LPAREN REG RPAREN
@@ -3587,7 +3587,7 @@ asm_1:
 	  if (!IS_DREG ($3))
 	    return yyerror ("Dregs expected");
 	  notethat ("pseudoDEBUG: DBGCMPLX (dregs )\n");
-	  $$ = bfin_gen_pseudodbg (3, 6, $3.regno & CODE_MASK);
+	  $$ = bfin_gen_pseudodbg (3, 6, ($3.regno & CODE_MASK) >> 4);
 	}
 	
 	| DBGHALT
