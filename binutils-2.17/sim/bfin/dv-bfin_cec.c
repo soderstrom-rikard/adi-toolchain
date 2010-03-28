@@ -191,7 +191,7 @@ cec_exception (SIM_CPU *cpu, int excp)
 
   if (excp <= 0x3f)
     {
-      SEQSTATREG = (SEQSTATREG & ~0x3f) | excp;
+      SET_SEQSTATREG ((SEQSTATREG & ~0x3f) | excp);
       if (STATE_ENVIRONMENT (CPU_STATE (cpu)) == OPERATING_ENVIRONMENT)
 	{
 	  _cec_raise (cpu, CEC_STATE (cpu), IVG_EVX);
@@ -350,7 +350,7 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 	case IVG_EMU:
 	  /* Signal the JTAG ICE.  */
 	  /* XXX: what happens with 'raise 0' ?  */
-	  RETEREG = PCREG;
+	  SET_RETEREG (PCREG);
 	  excp_to_sim_halt (sim_stopped, SIM_SIGTRAP);
 	  break;
 	case IVG_RST:
@@ -358,17 +358,17 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 	  sim_io_error (CPU_STATE (cpu), "%s: raise 1 (core reset) not implemented", __func__);
 	  break;
 	case IVG_NMI:
-	  RETNREG = PCREG;
+	  SET_RETNREG (PCREG);
 	  break;
 	case IVG_EVX:
-	  RETXREG = PCREG;
+	  SET_RETXREG (PCREG);
 	  break;
 	case IVG_IRPTEN:
 	  /* XXX: what happens with 'raise 4' ?  */
 	  sim_io_error (CPU_STATE (cpu), "%s: what to do with 'raise 4' ?", __func__);
 	  break;
 	default:
-	  RETIREG = PCREG | (ivg == curr_ivg ? 1 : 0);
+	  SET_RETIREG (PCREG | (ivg == curr_ivg ? 1 : 0));
 	  break;
 	}
 
@@ -376,9 +376,9 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 
       /* If EVT_OVERRIDE is in effect, use the reset address.  */
       if ((cec->evt_override & 0x1ff) & (1 << ivg))
-	PCREG = cec_get_reset_evt (cpu);
+	SET_PCREG (cec_get_reset_evt (cpu));
       else
-	PCREG = cec_get_evt (cpu, ivg);
+	SET_PCREG (cec_get_evt (cpu, ivg));
 
       TRACE_BRANCH (cpu, "CEC changed PC (to EVT%i): %#x -> %#x",
 		    ivg, oldpc, PCREG);
@@ -434,28 +434,28 @@ cec_return (SIM_CPU *cpu, int ivg)
       /* XXX: What does the hardware do ?  */
       if (curr_ivg != IVG_EMU)
 	cec_exception (cpu, VEC_ILL_RES);
-      PCREG = RETEREG;
+      SET_PCREG (RETEREG);
       break;
     case IVG_NMI:
       /* RTN -- only valid in NMI.  */
       /* XXX: What does the hardware do ?  */
       if (curr_ivg != IVG_NMI)
 	cec_exception (cpu, VEC_ILL_RES);
-      PCREG = RETNREG;
+      SET_PCREG (RETNREG);
       break;
     case IVG_EVX:
       /* RTX -- only valid in exception.  */
       /* XXX: What does the hardware do ?  */
       if (curr_ivg != IVG_EVX)
 	cec_exception (cpu, VEC_ILL_RES);
-      PCREG = RETXREG;
+      SET_PCREG (RETXREG);
       break;
     default:
       /* RTI -- not valid in emulation, nmi, exception, or user.  */
       /* XXX: What does the hardware do ?  */
       if (curr_ivg < IVG_IVHW && curr_ivg != IVG_RST)
 	cec_exception (cpu, VEC_ILL_RES);
-      PCREG = RETIREG;
+      SET_PCREG (RETIREG);
       break;
     case IVG_IRPTEN:
       /* XXX: Is this even possible ?  */
@@ -465,6 +465,7 @@ cec_return (SIM_CPU *cpu, int ivg)
 
   /* XXX: Does this nested trick work on EMU/NMI/EVX ?  */
   if (PCREG & 1)
+    /* XXX: Delayed clear shows bad PCREG register trace above ?  */
     PCREG &= ~1;
   else
     cec->ipend &= ~(1 << ivg);

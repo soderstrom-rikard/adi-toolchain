@@ -81,6 +81,18 @@ struct sim_state {
 #define TRACE_EVENTS(cpu, fmt, ...) MAYBE_TRACE (EVENTS, cpu, fmt, ## __VA_ARGS__)
 #define TRACE_BRANCH(cpu, fmt, ...) MAYBE_TRACE (BRANCH, cpu, fmt, ## __VA_ARGS__)
 
+extern void trace_register PARAMS ((SIM_DESC sd,
+				    sim_cpu *cpu,
+				    const char *fmt,
+				    ...))
+     __attribute__((format (printf, 3, 4)));
+#define TRACE_REGISTER(cpu, fmt, ...) \
+  do { \
+    if (TRACE_CORE_P (cpu)) \
+      trace_register (CPU_STATE (cpu), cpu, fmt, ## __VA_ARGS__); \
+  } while (0)
+#define TRACE_REG(cpu, reg, val) TRACE_REGISTER (cpu, "wrote "#reg" = %#x", val)
+
 /* Default memory size.  */
 #define BFIN_DEFAULT_MEM_SIZE (64 * 1024 * 1024)
 

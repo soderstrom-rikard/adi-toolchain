@@ -136,16 +136,16 @@ bfin_get_reg (SIM_CPU *cpu, int rn)
     case SIM_BFIN_L2_REGNUM: return &LREG (2);
     case SIM_BFIN_L3_REGNUM: return &LREG (3);
     case SIM_BFIN_RETS_REGNUM: return &RETSREG;
-    case SIM_BFIN_A0_DOT_X_REGNUM: return &A0XREG;
-    case SIM_BFIN_AO_DOT_W_REGNUM: return &A0WREG;
-    case SIM_BFIN_A1_DOT_X_REGNUM: return &A1XREG;
-    case SIM_BFIN_A1_DOT_W_REGNUM: return &A1WREG;
-    case SIM_BFIN_LC0_REGNUM: return &LC0REG;
-    case SIM_BFIN_LT0_REGNUM: return &LT0REG;
-    case SIM_BFIN_LB0_REGNUM: return &LB0REG;
-    case SIM_BFIN_LC1_REGNUM: return &LC1REG;
-    case SIM_BFIN_LT1_REGNUM: return &LT1REG;
-    case SIM_BFIN_LB1_REGNUM: return &LB1REG;
+    case SIM_BFIN_A0_DOT_X_REGNUM: return &AXREG (0);
+    case SIM_BFIN_AO_DOT_W_REGNUM: return &AWREG (0);
+    case SIM_BFIN_A1_DOT_X_REGNUM: return &AXREG (1);
+    case SIM_BFIN_A1_DOT_W_REGNUM: return &AWREG (1);
+    case SIM_BFIN_LC0_REGNUM: return &LCREG (0);
+    case SIM_BFIN_LT0_REGNUM: return &LTREG (0);
+    case SIM_BFIN_LB0_REGNUM: return &LBREG (0);
+    case SIM_BFIN_LC1_REGNUM: return &LCREG (1);
+    case SIM_BFIN_LT1_REGNUM: return &LTREG (1);
+    case SIM_BFIN_LB1_REGNUM: return &LBREG (1);
     case SIM_BFIN_CYCLES_REGNUM: return &CYCLESREG;
     case SIM_BFIN_CYCLES2_REGNUM: return &CYCLES2REG;
     case SIM_BFIN_USP_REGNUM: return &USPREG;
@@ -189,11 +189,12 @@ bfin_reg_store (SIM_CPU *cpu, int rn, unsigned char *buf, int len)
   reg = bfin_get_reg (cpu, rn);
 
   if (reg)
+    /* XXX: Need register trace ?  */
     *reg = value;
   else if (rn == SIM_BFIN_ASTAT_REGNUM)
     SET_ASTAT (value);
   else if (rn == SIM_BFIN_CC_REGNUM)
-    CCREG = value;
+    SET_CCREG (value);
   else
     return 0; // will be an error in gdb
 
@@ -209,7 +210,7 @@ bfin_pc_get (SIM_CPU *cpu)
 static void
 bfin_pc_set (SIM_CPU *cpu, sim_cia newpc)
 {
-  PCREG = newpc;
+  SET_PCREG (newpc);
 }
 
 

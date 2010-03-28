@@ -76,23 +76,23 @@ unhandled_instruction (SIM_CPU *cpu, char *insn)
 static void
 setflags_nz (SIM_CPU *cpu, bu32 val)
 {
-  ASTATREG (az) = val == 0;
-  ASTATREG (an) = val >> 31;
+  SET_ASTATREG (az, val == 0);
+  SET_ASTATREG (an, val >> 31);
 }
 
 static void
 setflags_nz_2x16 (SIM_CPU *cpu, bu32 val)
 {
-  ASTATREG (an) = (bs16)val < 0 || (bs16)(val >> 16) < 0;
-  ASTATREG (az) = (bs16)val == 0 || (bs16)(val >> 16) == 0;
+  SET_ASTATREG (an, (bs16)val < 0 || (bs16)(val >> 16) < 0);
+  SET_ASTATREG (az, (bs16)val == 0 || (bs16)(val >> 16) == 0);
 }
 
 static void
 setflags_logical (SIM_CPU *cpu, bu32 val)
 {
   setflags_nz (cpu, val);
-  ASTATREG (ac0) = ASTATREG (ac0_copy) = 0;
-  ASTATREG (v) = ASTATREG (v_copy) = 0;
+  SET_ASTATREG (ac0, 0);
+  SET_ASTATREG (v, 0);
 }
 
 static bu32
@@ -186,10 +186,10 @@ ashiftrt (SIM_CPU *cpu, bu32 val, int cnt, int size)
     val >>= 16, real_cnt -= 16;
   val >>= real_cnt;
   val |= sgn;
-  ASTATREG (an) = val >> (size - 1);
-  ASTATREG (az) = val == 0;
+  SET_ASTATREG (an, val >> (size - 1));
+  SET_ASTATREG (az, val == 0);
   /* @@@ */
-  ASTATREG (v) = ASTATREG (v_copy) = 0;
+  SET_ASTATREG (v, 0);
   return val;
 }
 
@@ -215,9 +215,9 @@ lshiftrt (SIM_CPU *cpu, bu64 val, int cnt, int size)
       illegal_instruction (cpu);
       break;
     }
-  ASTATREG (an) = val >> (size - 1);
-  ASTATREG (az) = val == 0;
-  ASTATREG (v) = ASTATREG (v_copy) = 0;
+  SET_ASTATREG (an, val >> (size - 1));
+  SET_ASTATREG (az, val == 0);
+  SET_ASTATREG (v, 0);
   return val;
 }
 
@@ -285,9 +285,9 @@ lshift (SIM_CPU *cpu, bu64 val, int cnt, int size, bool saturate)
       break;
     }
 
-  ASTATREG (an) = new_val >> (size - 1);
-  ASTATREG (az) = new_val == 0;
-  ASTATREG (v) = ASTATREG (v_copy) = 0;
+  SET_ASTATREG (an, new_val >> (size - 1));
+  SET_ASTATREG (az, new_val == 0);
+  SET_ASTATREG (v, 0);;
   return new_val;
 }
 
@@ -305,13 +305,14 @@ add32 (SIM_CPU *cpu, bu32 a, bu32 b, int carry, int sat)
       /* Saturating insns are documented as not setting overflow.  */
       overflow = 0;
     }
-  ASTATREG (an) = flgn;
-  ASTATREG (vs) |= overflow;
-  ASTATREG (v) = ASTATREG (v_copy) = overflow;
+  SET_ASTATREG (an, flgn);
+  if (overflow)
+    SET_ASTATREG (vs, 1);
+  SET_ASTATREG (v, overflow);
   ASTATREG (v_internal) |= overflow;
-  ASTATREG (az) = v == 0;
+  SET_ASTATREG (az, v == 0);
   if (carry)
-    ASTATREG (ac0) = ASTATREG (ac0_copy) = ~a < b;
+    SET_ASTATREG (ac0, ~a < b);
   return v;
 }
 
@@ -329,13 +330,14 @@ sub32 (SIM_CPU *cpu, bu32 a, bu32 b, int carry, int sat)
       /* Saturating insns are documented as not setting overflow.  */
       overflow = 0;
     }
-  ASTATREG (an) = flgn;
-  ASTATREG (vs) |= overflow;
-  ASTATREG (v) = ASTATREG (v_copy) = overflow;
+  SET_ASTATREG (an, flgn);
+  if (overflow)
+    SET_ASTATREG (vs, 1);
+  SET_ASTATREG (v, overflow);
   ASTATREG (v_internal) |= overflow;
-  ASTATREG (az) = v == 0;
+  SET_ASTATREG (az, v == 0);
   if (carry)
-    ASTATREG (ac0) = ASTATREG (ac0_copy) = b <= a;
+    SET_ASTATREG (ac0, b <= a);
   return v;
 }
 
@@ -353,13 +355,17 @@ add16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int sat)
       /* Saturating insns are documented as not setting overflow.  */
       overflow = 0;
     }
-  ASTATREG (an) = flgn;
-  ASTATREG (vs) |= overflow;
-  ASTATREG (v) = ASTATREG (v_copy) = overflow;
+  SET_ASTATREG (an, flgn);
+  if (overflow)
+    SET_ASTATREG (vs, 1);
+  SET_ASTATREG (v, overflow);
   ASTATREG (v_internal) |= overflow;
-  ASTATREG (az) = v == 0;
+  SET_ASTATREG (az, v == 0);
   if (carry)
-    *carry = (bu16)~a < (bu16)b;
+    {
+      *carry = (bu16)~a < (bu16)b;
+      SET_ASTATREG (ac0, *carry);
+    }
   return v & 0xffff;
 }
 
@@ -377,13 +383,17 @@ sub16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int sat)
       /* Saturating insns are documented as not setting overflow.  */
       overflow = 0;
     }
-  ASTATREG (an) = flgn;
-  ASTATREG (vs) |= overflow;
-  ASTATREG (v) = ASTATREG (v_copy) = overflow;
+  SET_ASTATREG (an, flgn);
+  if (overflow)
+    SET_ASTATREG (vs, 1);
+  SET_ASTATREG (v, overflow);
   ASTATREG (v_internal) |= overflow;
-  ASTATREG (az) = v == 0;
+  SET_ASTATREG (az, v == 0);
   if (carry)
-    *carry = (bu16)b <= (bu16)a;
+    {
+      *carry = (bu16)b <= (bu16)a;
+      SET_ASTATREG (ac0, *carry);
+    }
   return v;
 }
 
@@ -420,7 +430,7 @@ min32 (SIM_CPU *cpu, bu32 a, bu32 b)
   if ((bs32)a > (bs32)b)
     val = b;
   setflags_nz (cpu, val);
-  ASTATREG (v) = ASTATREG (v_copy) = 0;
+  SET_ASTATREG (v, 0);
   return val;
 }
 
@@ -431,7 +441,7 @@ max32 (SIM_CPU *cpu, bu32 a, bu32 b)
   if ((bs32)a < (bs32)b)
     val = b;
   setflags_nz (cpu, val);
-  ASTATREG (v) = ASTATREG (v_copy) = 0;
+  SET_ASTATREG (v, 0);
   return val;
 }
 
@@ -444,7 +454,7 @@ min2x16 (SIM_CPU *cpu, bu32 a, bu32 b)
   if ((bs16)(a >> 16) > (bs16)(b >> 16))
     val = (val & 0xFFFF) | (b & 0xFFFF0000);
   setflags_nz_2x16 (cpu, val);
-  ASTATREG (v) = ASTATREG (v_copy) = 0;
+  SET_ASTATREG (v, 0);
   return val;
 }
 
@@ -457,7 +467,7 @@ max2x16 (SIM_CPU *cpu, bu32 a, bu32 b)
   if ((bs16)(a >> 16) < (bs16)(b >> 16))
     val = (val & 0xFFFF) | (b & 0xFFFF0000);
   setflags_nz_2x16 (cpu, val);
-  ASTATREG (v) = ASTATREG (v_copy) = 0;
+  SET_ASTATREG (v, 0);
   return val;
 }
 
@@ -474,8 +484,9 @@ add_and_shift (SIM_CPU *cpu, bu32 a, bu32 b, int shift)
 	ASTATREG (v_internal) = 1;
       v <<= 1;
     }
-  ASTATREG (v) = ASTATREG (v_copy) = ASTATREG (v_internal);
-  ASTATREG (vs) |= ASTATREG (v);
+  SET_ASTATREG (v, ASTATREG (v_internal));
+  if (ASTATREG (v))
+    SET_ASTATREG (vs, 1);
   return v;
 }
 
@@ -505,7 +516,7 @@ divs (SIM_CPU *cpu, bu32 pquo, bu16 divisor)
   int aq;
 
   aq = (r ^ divisor) >> 15;  /* extract msb's and compute quotient bit */
-  ASTATREG (aq) = aq;         /* update global quotient state */
+  SET_ASTATREG (aq, aq);     /* update global quotient state */
 
   pquo <<= 1;
   pquo |= aq;
@@ -532,7 +543,7 @@ divq (SIM_CPU *cpu, bu32 pquo, bu16 divisor)
     r = af - divisor;
 
   aq = (r ^ divisor) >> 15;  /* extract msb's and compute quotient bit */
-  ASTATREG (aq) = aq;         /* update global quotient state */
+  SET_ASTATREG (aq, aq);     /* update global quotient state */
 
   pquo <<= 1;
   pquo |= !aq;
@@ -723,17 +734,17 @@ get_allreg (SIM_CPU *cpu, int grp, int reg)
     default:
       switch (fullreg)
 	{
-	case 32: return &A0XREG;
-	case 33: return &A0WREG;
-	case 34: return &A1XREG;
-	case 35: return &A1WREG;
+	case 32: return &AXREG (0);
+	case 33: return &AWREG (0);
+	case 34: return &AXREG (1);
+	case 35: return &AWREG (1);
 	case 39: return &RETSREG;
-	case 48: return &LC0REG;
-	case 49: return &LT0REG;
-	case 50: return &LB0REG;
-	case 51: return &LC1REG;
-	case 52: return &LT1REG;
-	case 53: return &LB1REG;
+	case 48: return &LCREG (0);
+	case 49: return &LTREG (0);
+	case 50: return &LBREG (0);
+	case 51: return &LCREG (1);
+	case 52: return &LTREG (1);
+	case 53: return &LBREG (1);
 	case 54: return &CYCLESREG;
 	case 55: return &CYCLES2REG;
 	case 56: return &USPREG;
@@ -785,7 +796,7 @@ reg_write (SIM_CPU *cpu, int grp, int reg, bu32 value)
   else if (whichreg == &A0XREG || whichreg == &A1XREG)
     value &= 0xFF;
 
-  TRACE_CORE (cpu, "wrote %s = %#x", get_allreg_name (grp, reg), value);
+  TRACE_REGISTER (cpu, "wrote %s = %#x", get_allreg_name (grp, reg), value);
 
   *whichreg = value;
 }
@@ -808,7 +819,7 @@ reg_read (SIM_CPU *cpu, int grp, int reg)
 
   if (whichreg == &CYCLESREG)
     /* Reads of CYCLES reloads CYCLES2 from the shadow.  */
-    CYCLES2REG = CYCLES2SHDREG;
+    SET_CYCLES2REG (CYCLES2SHDREG);
   else if ((whichreg == &A1XREG || whichreg == &A0XREG) && (value & 0x80))
     /* sign extend if necessary */
     value |= 0xFFFFFF00;
@@ -826,13 +837,16 @@ static void
 cycles_inc (SIM_CPU *cpu, bu32 inc)
 {
   bu64 cycles;
+  bu32 cycles2;
 
   if (!(SYSCFGREG & SYSCFG_CCEN))
     return;
 
   cycles = get_extended_cycles (cpu) + inc;
-  CYCLESREG = cycles;
-  CYCLES2SHDREG = cycles >> 32;
+  SET_CYCLESREG (cycles);
+  cycles2 = cycles >> 32;
+  if (CYCLES2SHDREG != cycles2)
+    SET_CYCLES2SHDREG (cycles2);
 }
 
 static bu64
@@ -1137,14 +1151,14 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
   if (prgfunc == 0 && poprnd == 0)
     {
       TRACE_INSN (cpu, "NOP;");
-      PCREG += 2;
+      INC_PCREG (2);
     }
   else if (prgfunc == 1 && poprnd == 0)
     {
       bu32 newpc = RETSREG;
       TRACE_INSN (cpu, "RTS;");
       TRACE_BRANCH (cpu, "RTS to %#x", newpc);
-      PCREG = newpc;
+      SET_PCREG (newpc);
     }
   else if (prgfunc == 1 && poprnd == 1)
     {
@@ -1173,7 +1187,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
   else if (prgfunc == 2 && poprnd == 0)
     {
       TRACE_INSN (cpu, "IDLE;");
-      PCREG += 2;
+      INC_PCREG (2);
       /* XXX: in supervisor mode, utilizes wake up sources
        * in user mode, it's a NOP
        */
@@ -1182,18 +1196,18 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
     {
       TRACE_INSN (cpu, "CSYNC;");
       /* just NOP it */
-      PCREG += 2;
+      INC_PCREG (2);
     }
   else if (prgfunc == 2 && poprnd == 4)
     {
       TRACE_INSN (cpu, "SSYNC;");
       /* just NOP it */
-      PCREG += 2;
+      INC_PCREG (2);
     }
   else if (prgfunc == 2 && poprnd == 5)
     {
       TRACE_INSN (cpu, "EMUEXCPT;");
-      PCREG += 2;
+      INC_PCREG (2);
       cec_raise (cpu, IVG_EMU);
     }
   else if (prgfunc == 3)
@@ -1201,21 +1215,21 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
       bu32 *whichreg = get_allreg (cpu, DREG_GRP, poprnd);
       TRACE_INSN (cpu, "CLI R%i;", poprnd);
       *whichreg = cec_cli (cpu);
-      PCREG += 2;
+      INC_PCREG (2);
     }
   else if (prgfunc == 4)
     {
       bu32 *whichreg = get_allreg (cpu, DREG_GRP, poprnd);
       TRACE_INSN (cpu, "STI R%i;", poprnd);
       cec_sti (cpu, *whichreg);
-      PCREG += 2;
+      INC_PCREG (2);
     }
   else if (prgfunc == 5)
     {
       bu32 newpc = PREG (poprnd);
       TRACE_INSN (cpu, "JUMP (P%i);", poprnd);
       TRACE_BRANCH (cpu, "JUMP (Preg) to %#x", newpc);
-      PCREG = newpc;
+      SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
     }
   else if (prgfunc == 6)
@@ -1223,8 +1237,8 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
       bu32 newpc = PREG (poprnd);
       TRACE_INSN (cpu, "CALL (P%i);", poprnd);
       TRACE_BRANCH (cpu, "CALL (Preg) to %#x", newpc);
-      RETSREG = PCREG + 2;
-      PCREG = newpc;
+      SET_RETSREG (PCREG + 2);
+      SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
     }
   else if (prgfunc == 7)
@@ -1232,8 +1246,8 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
       bu32 newpc = PCREG + PREG (poprnd);
       TRACE_INSN (cpu, "CALL (PC + P%i);", poprnd);
       TRACE_BRANCH (cpu, "CALL (PC + Preg) to %#x", newpc);
-      RETSREG = PCREG + 2;
-      PCREG = newpc;
+      SET_RETSREG (PCREG + 2);
+      SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
     }
   else if (prgfunc == 8)
@@ -1241,7 +1255,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
       bu32 newpc = PCREG + PREG (poprnd);
       TRACE_INSN (cpu, "JUMP (PC + P%i);", poprnd);
       TRACE_BRANCH (cpu, "JUMP (PC + Preg) to %#x", newpc);
-      PCREG = newpc;
+      SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
     }
   else if (prgfunc == 9)
@@ -1249,7 +1263,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
       int raise = uimm4 (poprnd);
       TRACE_INSN (cpu, "RAISE %i;", raise);
       TRACE_BRANCH (cpu, "RAISE may change PC");
-      PCREG += 2;
+      INC_PCREG (2);
       cec_raise (cpu, raise);
     }
   else if (prgfunc == 10)
@@ -1258,7 +1272,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
       TRACE_INSN (cpu, "EXCPT %i;", excpt);
       TRACE_BRANCH (cpu, "EXCPT may change PC");
       /* XXX: see comments in cec_exception() */
-      PCREG += 2;
+      INC_PCREG (2);
       cec_exception (cpu, excpt);
     }
   else if (prgfunc == 11)
@@ -1267,9 +1281,9 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
       bu8 byte;
       TRACE_INSN (cpu, "TESTSET (P%i);", poprnd);
       byte = GET_WORD (addr);
-      CCREG = (byte == 0);
+      SET_CCREG (byte == 0);
       PUT_BYTE (addr, byte | 0x80);
-      PCREG += 2;
+      INC_PCREG (2);
     }
   else
     illegal_instruction (cpu);
@@ -1336,7 +1350,7 @@ decode_CaCTRL_0 (SIM_CPU *cpu, bu16 iw0)
   else
     illegal_instruction (cpu);
 
-  PCREG += 2;
+  INC_PCREG (2);
 }
 
 static void
@@ -1350,33 +1364,37 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
   int reg = ((iw0 >> 0) & 0x7);
   int W = ((iw0 >> 6) & 0x1);
   const char *reg_name = get_allreg_name (grp, reg);
+  bu32 value;
 
   TRACE_EXTRACT (cpu, "%s: W:%i grp:%i reg:%i", __func__, W, grp, reg);
   TRACE_DECODE (cpu, "%s: reg:%s", __func__, reg_name);
 
   if (W == 0)
     {
-      bu32 value = GET_LONG (SPREG);
       TRACE_INSN (cpu, "%s = [SP++];", reg_name);
+
       /* XXX: If SP triggers an exception, should it be updated ?  */
+      value = GET_LONG (SPREG);
       reg_write (cpu, grp, reg, value);
       if (grp == 7 && reg == 3)
 	cec_pop_reti (cpu);
-      SPREG += 4;
+
+      SET_SPREG (SPREG + 4);
     }
   else
     {
-      bu32 value;
       TRACE_INSN (cpu, "[--SP] = %s;", reg_name);
+
       /* XXX: If SP triggers an exception, should it be updated ?  */
-      SPREG -= 4;
+      SET_SPREG (SPREG - 4);
       value = reg_read (cpu, grp, reg);
       if (grp == 7 && reg == 3)
 	cec_push_reti (cpu);
 
       PUT_LONG (SPREG, value);
     }
-  PCREG += 2;
+
+  INC_PCREG (2);
 }
 
 static void
@@ -1434,19 +1452,19 @@ decode_PushPopMultiple_0 (SIM_CPU *cpu, bu16 iw0)
       if (p)
 	for (i = 5; i >= pr; i--)
 	  {
-	    PREG (i) = GET_LONG (sp);
+	    SET_PREG (i, GET_LONG (sp));
 	    sp += 4;
 	  }
       if (d)
 	for (i = 7; i >= dr; i--)
 	  {
-	    DREG (i) = GET_LONG (sp);
+	    SET_DREG (i, GET_LONG (sp));
 	    sp += 4;
 	  }
     }
-  SPREG = sp;
+  SET_SPREG (sp);
 
-  PCREG += 2;
+  INC_PCREG (2);
 }
 
 static void
@@ -1471,9 +1489,10 @@ decode_ccMV_0 (SIM_CPU *cpu, bu16 iw0)
 	      get_allreg_name (s, src));
 
   if (cond)
+    /* XXX: Missing register trace.  */
     GREG (dst, d) = GREG (src, s);
 
-  PCREG += 2;
+  INC_PCREG (2);
 }
 
 static void
@@ -1501,24 +1520,24 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
       if (opc == 5 && I == 0 && G == 0)
 	{
 	  TRACE_INSN (cpu, "CC = A0 == A1;");
-	  CCREG = acc0 == acc1;
+	  SET_CCREG (acc0 == acc1);
 	}
       else if (opc == 6 && I == 0 && G == 0)
 	{
 	  TRACE_INSN (cpu, "CC = A0 < A1");
-	  CCREG = acc0 < acc1;
+	  SET_CCREG (acc0 < acc1);
 	}
       else if (opc == 7 && I == 0 && G == 0)
 	{
 	  TRACE_INSN (cpu, "CC = A0 <= A1");
-	  CCREG = acc0 <= acc1;
+	  SET_CCREG (acc0 <= acc1);
 	}
       else
 	illegal_instruction (cpu);
 
-      ASTATREG (az) = (diff == 0);
-      ASTATREG (an) = (diff < 0);
-      ASTATREG (ac0) = ASTATREG (ac0_copy) = (0); /* XXX: What is this ?  */
+      SET_ASTATREG (az, diff == 0);
+      SET_ASTATREG (an, diff < 0);
+      SET_ASTATREG (ac0, 0); /* XXX: What is this ?  */
     }
   else
     {
@@ -1533,39 +1552,33 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
       int flgo = dstop >> 31;
 
       bu32 result = srcop - dstop;
+      int cc;
       int flgn = result >> 31;
       int overflow = (flgs ^ flgo) & (flgn ^ flgs);
       int az = result == 0;
       int ac0 = srcop < dstop;
 
-      /* Pointer compares only touch CC.  */
-      if (!G)
-	{
-	  ASTATREG (az) = az;
-	  ASTATREG (an) = flgn;
-	  ASTATREG (ac0) = ASTATREG (ac0_copy) = ac0;
-	}
       switch (opc)
 	{
 	case 0:
 	  op = "==";
-	  CCREG = az;
+	  cc = az;
 	  break;
 	case 1:	/* signed */
 	  op = "<";
-	  CCREG = (flgn && !overflow) || (!flgn && overflow);
+	  cc = (flgn && !overflow) || (!flgn && overflow);
 	  break;
 	case 2:	/* signed */
 	  op = "<=";
-	  CCREG = (flgn && !overflow) || (!flgn && overflow) || az;
+	  cc = (flgn && !overflow) || (!flgn && overflow) || az;
 	  break;
 	case 3:	/* unsigned */
 	  op = "<";
-	  CCREG = ac0;
+	  cc = ac0;
 	  break;
 	case 4:	/* unsigned */
 	  op = "<=";
-	  CCREG = ac0 | az;
+	  cc = ac0 | az;
 	  break;
 	}
 
@@ -1573,9 +1586,18 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
 	TRACE_INSN (cpu, "CC = %c%i %s %#x%s;", s, x, op, dstop, sign);
       else
 	TRACE_INSN (cpu, "CC = %c%i %s %c%i%s;", s, x, op, d, y, sign);
+
+      SET_CCREG (cc);
+      /* Pointer compares only touch CC.  */
+      if (!G)
+	{
+	  SET_ASTATREG (az, az);
+	  SET_ASTATREG (an, flgn);
+	  SET_ASTATREG (ac0, ac0);
+	}
     }
 
-  PCREG += 2;
+  INC_PCREG (2);
 }
 
 static void
@@ -1593,21 +1615,22 @@ decode_CC2dreg_0 (SIM_CPU *cpu, bu16 iw0)
   if (op == 0)
     {
       TRACE_INSN (cpu, "R%i = CC;", reg);
-      DREG (reg) = CCREG;
+      SET_DREG (reg, CCREG);
     }
   else if (op == 1)
     {
       TRACE_INSN (cpu, "CC = R%i;", reg);
-      CCREG = DREG (reg) != 0;
+      SET_CCREG (DREG (reg) != 0);
     }
   else if (op == 3)
     {
       TRACE_INSN (cpu, "CC = !CC;");
-      CCREG = !CCREG;
+      SET_CCREG (!CCREG);
     }
   else
     illegal_instruction (cpu);
-  PCREG += 2;
+
+  INC_PCREG (2);
 }
 
 static void
@@ -1666,10 +1689,10 @@ decode_CC2stat_0 (SIM_CPU *cpu, bu16 iw0)
   if (D == 0)
     switch (op)
       {
-      case 0: CCREG  = *pval; break;
-      case 1: CCREG |= *pval; break;
-      case 2: CCREG &= *pval; break;
-      case 3: CCREG ^= *pval; break;
+      case 0: SET_CCREG (*pval); break;
+      case 1: SET_CCREG (CCREG | *pval); break;
+      case 2: SET_CCREG (CCREG & *pval); break;
+      case 3: SET_CCREG (CCREG ^ *pval); break;
       }
   else
     switch (op)
@@ -1679,7 +1702,8 @@ decode_CC2stat_0 (SIM_CPU *cpu, bu16 iw0)
       case 2: *pval &= CCREG; break;
       case 3: *pval ^= CCREG; break;
       }
-  PCREG += 2;
+
+  INC_PCREG (2);
 }
 
 static void
@@ -1706,11 +1730,11 @@ decode_BRCC_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       bu32 newpc = PCREG + pcrel;
       TRACE_BRANCH (cpu, "Conditional JUMP to %#x", newpc);
-      PCREG = newpc;
+      SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
     }
   else
-    PCREG += 2;
+    INC_PCREG (2);
 }
 
 static void
@@ -1730,7 +1754,7 @@ decode_UJUMP_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   TRACE_INSN (cpu, "JUMP.S %#x;", pcrel);
   TRACE_BRANCH (cpu, "JUMP.S to %#x", newpc);
 
-  PCREG = newpc;
+  SET_PCREG (newpc);
   BFIN_CPU_STATE.did_jump = true;
 }
 
@@ -1756,7 +1780,7 @@ decode_REGMV_0 (SIM_CPU *cpu, bu16 iw0)
 
   reg_write (cpu, gd, dst, reg_read (cpu, gs, src));
 
-  PCREG += 2;
+  INC_PCREG (2);
 }
 
 static void
@@ -1775,87 +1799,89 @@ decode_ALU2op_0 (SIM_CPU *cpu, bu16 iw0)
   if (opc == 0)
     {
       TRACE_INSN (cpu, "R%i >>>= R%i;", dst, src);
-      DREG (dst) = ashiftrt (cpu, DREG (dst), DREG (src), 32);
+      SET_DREG (dst, ashiftrt (cpu, DREG (dst), DREG (src), 32));
     }
   else if (opc == 1)
     {
       TRACE_INSN (cpu, "R%i >>= R%i;", dst, src);
-      DREG (dst) = lshiftrt (cpu, DREG (dst), DREG (src), 32);
+      SET_DREG (dst, lshiftrt (cpu, DREG (dst), DREG (src), 32));
     }
   else if (opc == 2)
     {
       TRACE_INSN (cpu, "R%i <<= R%i;", dst, src);
-      DREG (dst) = lshift (cpu, DREG (dst), DREG (src), 32, 0);
+      SET_DREG (dst, lshift (cpu, DREG (dst), DREG (src), 32, 0));
     }
   else if (opc == 3)
     {
       TRACE_INSN (cpu, "R%i *= R%i;", dst, src);
-      DREG (dst) *= DREG (src);
+      SET_DREG (dst, DREG (dst) * DREG (src));
     }
   else if (opc == 4)
     {
       TRACE_INSN (cpu, "R%i = (R%i + R%i) << 1;", dst, dst, src);
-      DREG (dst) = add_and_shift (cpu, DREG (dst), DREG (src), 1);
+      SET_DREG (dst, add_and_shift (cpu, DREG (dst), DREG (src), 1));
     }
   else if (opc == 5)
     {
       TRACE_INSN (cpu, "R%i = (R%i + R%i) << 2;", dst, dst, src);
-      DREG (dst) = add_and_shift (cpu, DREG (dst), DREG (src), 2);
+      SET_DREG (dst, add_and_shift (cpu, DREG (dst), DREG (src), 2));
     }
   else if (opc == 8)
     {
       TRACE_INSN (cpu, "DIVQ ( R%i, R%i );", dst, src);
-      DREG (dst) = divq (cpu, DREG (dst), (bu16)DREG (src));
+      SET_DREG (dst, divq (cpu, DREG (dst), (bu16)DREG (src)));
     }
   else if (opc == 9)
     {
       TRACE_INSN (cpu, "DIVS ( R%i, R%i );", dst, src);
-      DREG (dst) = divs (cpu, DREG (dst), (bu16)DREG (src));
+      SET_DREG (dst, divs (cpu, DREG (dst), (bu16)DREG (src)));
     }
   else if (opc == 10)
     {
       TRACE_INSN (cpu, "R%i = R%i.L (X);", dst, src);
-      DREG (dst) = (bs32) (bs16) DREG (src);
+      SET_DREG (dst, (bs32) (bs16) DREG (src));
       setflags_logical (cpu, DREG (dst));
     }
   else if (opc == 11)
     {
       TRACE_INSN (cpu, "R%i = R%i.L (Z);", dst, src);
-      DREG (dst) = (bu32) (bu16) DREG (src);
+      SET_DREG (dst, (bu32) (bu16) DREG (src));
       setflags_logical (cpu, DREG (dst));
     }
   else if (opc == 12)
     {
       TRACE_INSN (cpu, "R%i = R%i.B (X);", dst, src);
-      DREG (dst) = (bs32) (bs8) DREG (src);
+      SET_DREG (dst, (bs32) (bs8) DREG (src));
       setflags_logical (cpu, DREG (dst));
     }
   else if (opc == 13)
     {
       TRACE_INSN (cpu, "R%i = R%i.B (Z);", dst, src);
-      DREG (dst) = (bu32) (bu8) DREG (src);
+      SET_DREG (dst, (bu32) (bu8) DREG (src));
       setflags_logical (cpu, DREG (dst));
     }
   else if (opc == 14)
     {
       TRACE_INSN (cpu, "R%i = - R%i.B;", dst, src);
       bu32 val = DREG (src);
-      DREG (dst) = -val;
+      SET_DREG (dst, -val);
       setflags_nz (cpu, DREG (dst));
-      ASTATREG (v) = ASTATREG (v_copy) = (val == 0x80000000);
-      ASTATREG (vs) |= ASTATREG (v);
-      ASTATREG (ac0) = ASTATREG (ac0_copy) = (val == 0x0);
+      SET_ASTATREG (v, val == 0x80000000);
+      if (ASTATREG (v))
+	SET_ASTATREG (vs, 1);
+      SET_ASTATREG (ac0, val == 0x0);
       /* @@@ Documentation isn't entirely clear about av0 and av1.  */
     }
   else if (opc == 15)
     {
       TRACE_INSN (cpu, "R%i = ~ R%i.B;", dst, src);
-      DREG (dst) = ~DREG (src);
+      SET_DREG (dst, ~DREG (src));
       setflags_logical (cpu, DREG (dst));
     }
   else
     illegal_instruction (cpu);
-  PCREG += 2;
+
+  INC_PCREG (2);
 }
 
 static void
@@ -1874,42 +1900,42 @@ decode_PTR2op_0 (SIM_CPU *cpu, bu16 iw0)
   if (opc == 0)
     {
       TRACE_INSN (cpu, "P%i -= P%i", dst, src);
-      PREG (dst) -= PREG (src);
+      SET_PREG (dst, PREG (dst) - PREG (src));
     }
   else if (opc == 1)
     {
       TRACE_INSN (cpu, "P%i = P%i << 2", dst, src);
-      PREG (dst) = PREG (src) << 2;
+      SET_PREG (dst, PREG (src) << 2);
     }
   else if (opc == 3)
     {
       TRACE_INSN (cpu, "P%i = P%i >> 2", dst, src);
-      PREG (dst) = PREG (src) >> 2;
+      SET_PREG (dst, PREG (src) >> 2);
     }
   else if (opc == 4)
     {
       TRACE_INSN (cpu, "P%i = P%i >> 1", dst, src);
-      PREG (dst) = PREG (src) >> 1;
+      SET_PREG (dst, PREG (src) >> 1);
     }
   else if (opc == 5)
     {
       TRACE_INSN (cpu, "P%i += P%i (BREV)", dst, src);
-      PREG (dst) = add_brev (cpu, PREG (dst), PREG (src));
+      SET_PREG (dst, add_brev (cpu, PREG (dst), PREG (src)));
     }
   else if (opc == 6)
     {
       TRACE_INSN (cpu, "P%i = (P%i + P%i) << 1", dst, dst, src);
-      PREG (dst) = (PREG (dst) + PREG (src)) << 1;
+      SET_PREG (dst, (PREG (dst) + PREG (src)) << 1);
     }
   else if (opc == 7)
     {
       TRACE_INSN (cpu, "P%i = (P%i + P%i) << 2", dst, dst, src);
-      PREG (dst) = (PREG (dst) + PREG (src)) << 2;
+      SET_PREG (dst, (PREG (dst) + PREG (src)) << 2);
     }
   else
     illegal_instruction (cpu);
 
-  PCREG += 2;
+  INC_PCREG (2);
 }
 
 static void
@@ -1930,48 +1956,48 @@ decode_LOGI2op_0 (SIM_CPU *cpu, bu16 iw0)
   if (opc == 0)
     {
       TRACE_INSN (cpu, "CC = ! BITTST (R%i, %i);", dst, uimm);
-      CCREG = (~DREG (dst) >> uimm) & 1;
+      SET_CCREG ((~DREG (dst) >> uimm) & 1);
     }
   else if (opc == 1)
     {
       TRACE_INSN (cpu, "CC = BITTST (R%i, %i);", dst, uimm);
-      CCREG = (DREG (dst) >> uimm) & 1;
+      SET_CCREG ((DREG (dst) >> uimm) & 1);
     }
   else if (opc == 2)
     {
       TRACE_INSN (cpu, "BITSET (R%i, %i);", dst, uimm);
-      DREG (dst) |= 1 << uimm;
+      SET_DREG (dst, DREG (dst) | (1 << uimm));
       setflags_logical (cpu, DREG (dst));
     }
   else if (opc == 3)
     {
       TRACE_INSN (cpu, "BITTGL (R%i, %i);", dst, uimm);
-      DREG (dst) ^= 1 << uimm;
+      SET_DREG (dst, DREG (dst) ^ (1 << uimm));
       setflags_logical (cpu, DREG (dst));
     }
   else if (opc == 4)
     {
       TRACE_INSN (cpu, "BITCLR (R%i, %i);", dst, uimm);
-      DREG (dst) &= ~(1 << uimm);
+      SET_DREG (dst, DREG (dst) & ~(1 << uimm));
       setflags_logical (cpu, DREG (dst));
     }
   else if (opc == 5)
     {
       TRACE_INSN (cpu, "R%i >>>= %i;", dst, uimm);
-      DREG (dst) = ashiftrt (cpu, DREG (dst), uimm, 32);
+      SET_DREG (dst, ashiftrt (cpu, DREG (dst), uimm, 32));
     }
   else if (opc == 6)
     {
       TRACE_INSN (cpu, "R%i >>= %i;", dst, uimm);
-      DREG (dst) = lshiftrt (cpu, DREG (dst), uimm, 32);
+      SET_DREG (dst, lshiftrt (cpu, DREG (dst), uimm, 32));
     }
   else if (opc == 7)
     {
       TRACE_INSN (cpu, "R%i <<= %i;", dst, uimm);
-      DREG (dst) = lshift (cpu, DREG (dst), uimm, 32, 0);
+      SET_DREG (dst, lshift (cpu, DREG (dst), uimm, 32, 0));
     }
 
-  PCREG += 2;
+  INC_PCREG (2);
 }
 
 static void
@@ -1992,29 +2018,29 @@ decode_COMP3op_0 (SIM_CPU *cpu, bu16 iw0)
   if (opc == 0)
     {
       TRACE_INSN (cpu, "R%i = R%i + R%i;", dst, src0, src1);
-      DREG (dst) = add32 (cpu, DREG (src0), DREG (src1), 1, 0);
+      SET_DREG (dst, add32 (cpu, DREG (src0), DREG (src1), 1, 0));
     }
   else if (opc == 1)
     {
       TRACE_INSN (cpu, "R%i = R%i - R%i;", dst, src0, src1);
-      DREG (dst) = sub32 (cpu, DREG (src0), DREG (src1), 1, 0);
+      SET_DREG (dst, sub32 (cpu, DREG (src0), DREG (src1), 1, 0));
     }
   else if (opc == 2)
     {
       TRACE_INSN (cpu, "R%i = R%i & R%i;", dst, src0, src1);
-      DREG (dst) = DREG (src0) & DREG (src1);
+      SET_DREG (dst, DREG (src0) & DREG (src1));
       setflags_logical (cpu, DREG (dst));
     }
   else if (opc == 3)
     {
       TRACE_INSN (cpu, "R%i = R%i | R%i;", dst, src0, src1);
-      DREG (dst) = DREG (src0) | DREG (src1);
+      SET_DREG (dst, DREG (src0) | DREG (src1));
       setflags_logical (cpu, DREG (dst));
     }
   else if (opc == 4)
     {
       TRACE_INSN (cpu, "R%i = R%i ^ R%i;", dst, src0, src1);
-      DREG (dst) = DREG (src0) ^ DREG (src1);
+      SET_DREG (dst, DREG (src0) ^ DREG (src1));
       setflags_logical (cpu, DREG (dst));
     }
   else if (opc == 5)
@@ -2023,20 +2049,20 @@ decode_COMP3op_0 (SIM_CPU *cpu, bu16 iw0)
        * distinction doesn't matter for our purposes.
        */
       TRACE_INSN (cpu, "P%i = P%i + P%i;", dst, src0, src1);
-      PREG (dst) = PREG (src0) + PREG (src1);
+      SET_PREG (dst, PREG (src0) + PREG (src1));
     }
   else if (opc == 6)
     {
       TRACE_INSN (cpu, "P%i = P%i + P%i << 0x1;", dst, src0, src1);
-      PREG (dst) = PREG (src0) + (PREG (src1) << 1);
+      SET_PREG (dst, PREG (src0) + (PREG (src1) << 1));
     }
   else if (opc == 7)
     {
       TRACE_INSN (cpu, "P%i = P%i + P%i << 0x2;", dst, src0, src1);
-      PREG (dst) = PREG (src0) + (PREG (src1) << 2);
+      SET_PREG (dst, PREG (src0) + (PREG (src1) << 2));
     }
 
-  PCREG += 2;
+  INC_PCREG (2);
 }
 
 static void
@@ -2057,15 +2083,15 @@ decode_COMPI2opD_0 (SIM_CPU *cpu, bu16 iw0)
   if (op == 0)
     {
       TRACE_INSN (cpu, "R%i = 0x%x (X);", dst, imm);
-      DREG (dst) = imm;
+      SET_DREG (dst, imm);
     }
   else if (op == 1)
     {
       TRACE_INSN (cpu, "R%i += 0x%x;", dst, imm);
-      DREG (dst) = add32 (cpu, DREG (dst), imm, 1, 0);
+      SET_DREG (dst, add32 (cpu, DREG (dst), imm, 1, 0));
     }
 
-  PCREG += 2;
+  INC_PCREG (2);
 }
 
 static void
@@ -2086,15 +2112,15 @@ decode_COMPI2opP_0 (SIM_CPU *cpu, bu16 iw0)
   if (op == 0)
     {
       TRACE_INSN (cpu, "P%i = %i;", dst, imm);
-      PREG (dst) = imm;
+      SET_PREG (dst, imm);
     }
   else if (op == 1)
     {
       TRACE_INSN (cpu, "P%i += %i;", dst, imm);
-      PREG (dst) += imm;
+      SET_PREG (dst, PREG (dst) + imm);
     }
 
-  PCREG += 2;
+  INC_PCREG (2);
 }
 
 static void
@@ -2205,7 +2231,7 @@ decode_LDSTpmod_0 (SIM_CPU *cpu, bu16 iw0)
   else
     illegal_instruction (cpu);
 
-  PCREG += 2;
+  INC_PCREG (2);
 }
 
 static void
@@ -2225,7 +2251,7 @@ decode_dagMODim_0 (SIM_CPU *cpu, bu16 iw0)
   if (op == 0 && br == 1)
     {
       TRACE_INSN (cpu, "I%i += M%i (BREV);", i, m);
-      IREG (i) = add_brev (cpu, IREG (i), MREG (m));
+      SET_IREG (i, add_brev (cpu, IREG (i), MREG (m)));
     }
   else if (op == 0)
     {
@@ -2240,7 +2266,7 @@ decode_dagMODim_0 (SIM_CPU *cpu, bu16 iw0)
   else
     illegal_instruction (cpu);
 
-  PCREG += 2;
+  INC_PCREG (2);
 }
 
 static void
@@ -2278,7 +2304,7 @@ decode_dagMODik_0 (SIM_CPU *cpu, bu16 iw0)
   else
     illegal_instruction (cpu);
 
-  PCREG += 2;
+  INC_PCREG (2);
 }
 
 static void
@@ -2434,7 +2460,7 @@ decode_dspLDST_0 (SIM_CPU *cpu, bu16 iw0)
   else
     illegal_instruction (cpu);
 
-  PCREG += 2;
+  INC_PCREG (2);
 }
 
 static void
@@ -2467,38 +2493,33 @@ decode_LDST_0 (SIM_CPU *cpu, bu16 iw0)
       if (sz == 0 && Z == 0)
 	{
 	  TRACE_INSN (cpu, "R%i = [P%i%s];", reg, ptr, post);
-	  DREG (reg) = GET_LONG (PREG (ptr));
+	  SET_DREG (reg, GET_LONG (PREG (ptr)));
 	}
       else if (sz == 0 && Z == 1)
 	{
 	  TRACE_INSN (cpu, "P%i = [P%i%s];", reg, ptr, post);
-	  PREG (reg) = GET_LONG (PREG (ptr));
+	  SET_PREG (reg, GET_LONG (PREG (ptr)));
 	}
       else if (sz == 1 && Z == 0)
 	{
 	  TRACE_INSN (cpu, "R%i = W[P%i%s] (Z);", reg, ptr, post);
-	  DREG (reg) = GET_WORD (PREG (ptr));
+	  SET_DREG (reg, GET_WORD (PREG (ptr)));
 	}
       else if (sz == 1 && Z == 1)
 	{
 	  TRACE_INSN (cpu, "R%i = W[P%i%s] (X);", reg, ptr, post);
-	  DREG (reg) = (bs32) (bs16) GET_WORD (PREG (ptr));
+	  SET_DREG (reg, (bs32) (bs16) GET_WORD (PREG (ptr)));
 	}
       else if (sz == 2 && Z == 0)
 	{
 	  TRACE_INSN (cpu, "R%i = B[P%i%s] (Z);", reg, ptr, post);
-	  DREG (reg) = GET_BYTE (PREG (ptr));
+	  SET_DREG (reg, GET_BYTE (PREG (ptr)));
 	}
       else if (sz == 2 && Z == 1)
 	{
 	  TRACE_INSN (cpu, "R%i = B[P%i%s] (X);", reg, ptr, post);
-	  DREG (reg) = (bs32) (bs8) GET_BYTE (PREG (ptr));
+	  SET_DREG (reg, (bs32) (bs8) GET_BYTE (PREG (ptr)));
 	}
-
-      if (aop == 0)
-	PREG (ptr) += sz == 0 ? 4 : sz == 1 ? 2 : 1;
-      if (aop == 1)
-	PREG (ptr) -= sz == 0 ? 4 : sz == 1 ? 2 : 1;
     }
   else
     {
@@ -2525,14 +2546,14 @@ decode_LDST_0 (SIM_CPU *cpu, bu16 iw0)
 	  TRACE_INSN (cpu, "B[P%i%s] = R%i;", ptr, post, reg);
 	  PUT_BYTE (PREG (ptr), DREG (reg));
 	}
-
-      if (aop == 0)
-	PREG (ptr) += sz == 0 ? 4 : sz == 1 ? 2 : 1;
-      if (aop == 1)
-	PREG (ptr) -= sz == 0 ? 4 : sz == 1 ? 2 : 1;
     }
 
-  PCREG += 2;
+  if (aop == 0)
+    SET_PREG (ptr, PREG (ptr) + (sz == 0 ? 4 : sz == 1 ? 2 : 1));
+  if (aop == 1)
+    SET_PREG (ptr, PREG (ptr) - (sz == 0 ? 4 : sz == 1 ? 2 : 1));
+
+  INC_PCREG (2);
 }
 
 static void
@@ -2554,6 +2575,7 @@ decode_LDSTiiFP_0 (SIM_CPU *cpu, bu16 iw0)
   if (W == 0)
     {
       TRACE_INSN (cpu, "%s = [FP + %#x];", get_allreg_name (0, reg), imm);
+      /* XXX: Missing register trace.  */
       DPREG (reg) = GET_LONG (ea);
     }
   else
@@ -2562,7 +2584,7 @@ decode_LDSTiiFP_0 (SIM_CPU *cpu, bu16 iw0)
       PUT_LONG (ea, DPREG (reg));
     }
 
-  PCREG += 2;
+  INC_PCREG (2);
 }
 
 static void
@@ -2592,22 +2614,22 @@ decode_LDSTii_0 (SIM_CPU *cpu, bu16 iw0)
       if (op == 0)
 	{
 	  TRACE_INSN (cpu, "R%i = [P%i + %#x];", reg, ptr, imm);
-	  DREG (reg) = GET_LONG (ea);
+	  SET_DREG (reg, GET_LONG (ea));
 	}
       else if (op == 1)
 	{
 	  TRACE_INSN (cpu, "R%i = W[P%i + %#x] (Z);", reg, ptr, imm);
-	  DREG (reg) = GET_WORD (ea);
+	  SET_DREG (reg, GET_WORD (ea));
 	}
       else if (op == 2)
 	{
 	  TRACE_INSN (cpu, "R%i = W[P%i + %#x] (X);", reg, ptr, imm);
-	  DREG (reg) = (bs32) (bs16) GET_WORD (ea);
+	  SET_DREG (reg, (bs32) (bs16) GET_WORD (ea));
 	}
       else if (op == 3)
 	{
 	  TRACE_INSN (cpu, "P%i = [P%i + %#x];", reg, ptr, imm);
-	  PREG (reg) = GET_LONG (ea);
+	  SET_PREG (reg, GET_LONG (ea));
 	}
     }
   else
@@ -2629,7 +2651,7 @@ decode_LDSTii_0 (SIM_CPU *cpu, bu16 iw0)
 	}
     }
 
-  PCREG += 2;
+  INC_PCREG (2);
 }
 
 static void
@@ -2660,19 +2682,19 @@ decode_LoopSetup_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   else if (rop == 1)
     {
       TRACE_INSN (cpu, "LSETUP (%#x, %#x) LC%i = P%i;", spcrel, epcrel, c, reg);
-      LCREG (c) = PREG (reg);
+      SET_LCREG (c, PREG (reg));
     }
   else if (rop == 3)
     {
       TRACE_INSN (cpu, "LSETUP (%#x, %#x) LC%i = P%i >> 1;", spcrel, epcrel, c, reg);
-      LCREG (c) = PREG (reg) >> 1;
+      SET_LCREG (c, PREG (reg) >> 1);
     }
   else
     illegal_instruction (cpu);
-  LTREG (c) = PCREG + spcrel;
-  LBREG (c) = PCREG + epcrel;
+  SET_LTREG (c, PCREG + spcrel);
+  SET_LBREG (c, PCREG + epcrel);
 
-  PCREG += 4;
+  INC_PCREG (4);
 }
 
 static void
@@ -2727,8 +2749,9 @@ decode_LDIMMhalf_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     }
   else
     illegal_instruction (cpu);
+  TRACE_REGISTER (cpu, "wrote %s = %#x", reg_name, *pval);
 
-  PCREG += 4;
+  INC_PCREG (4);
 }
 
 static void
@@ -2753,12 +2776,12 @@ decode_CALLa_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   if (S == 1)
     {
       TRACE_BRANCH (cpu, "CALL to %#x", newpc);
-      RETSREG = PCREG + 4;
+      SET_RETSREG (PCREG + 4);
     }
   else
     TRACE_BRANCH (cpu, "JUMP.L to %#x", newpc);
 
-  PCREG += pcrel;
+  INC_PCREG (pcrel);
 }
 
 static void
@@ -2791,32 +2814,32 @@ decode_LDSTidxI_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       if (sz == 0 && Z == 0)
 	{
 	  TRACE_INSN (cpu, "R%i = [P%i + %#x];", reg, ptr, imm_16s4);
-	  DREG (reg) = GET_LONG (PREG (ptr) + imm_16s4);
+	  SET_DREG (reg, GET_LONG (PREG (ptr) + imm_16s4));
 	}
       else if (sz == 0 && Z == 1)
 	{
 	  TRACE_INSN (cpu, "P%i = [P%i + %#x];", reg, ptr, imm_16s4);
-	  PREG (reg) = GET_LONG (PREG (ptr) + imm_16s4);
+	  SET_PREG (reg, GET_LONG (PREG (ptr) + imm_16s4));
 	}
       else if (sz == 1 && Z == 0)
 	{
 	  TRACE_INSN (cpu, "R%i = W[P%i + %#x] (Z);", reg, ptr, imm_16s2);
-	  DREG (reg) = GET_WORD (PREG (ptr) + imm_16s2);
+	  SET_DREG (reg, GET_WORD (PREG (ptr) + imm_16s2));
 	}
       else if (sz == 1 && Z == 1)
 	{
 	  TRACE_INSN (cpu, "R%i = W[P%i + %#x] (X);", reg, ptr, imm_16s2);
-	  DREG (reg) = (bs32) (bs16) GET_WORD (PREG (ptr) + imm_16s2);
+	  SET_DREG (reg, (bs32) (bs16) GET_WORD (PREG (ptr) + imm_16s2));
 	}
       else if (sz == 2 && Z == 0)
 	{
 	  TRACE_INSN (cpu, "R%i = B[P%i + %#x] (Z);", reg, ptr, imm_16);
-	  DREG (reg) = GET_BYTE (PREG (ptr) + imm_16);
+	  SET_DREG (reg, GET_BYTE (PREG (ptr) + imm_16));
 	}
       else if (sz == 2 && Z == 1)
 	{
 	  TRACE_INSN (cpu, "R%i = B[P%i + %#x] (X);", reg, ptr, imm_16);
-	  DREG (reg) = (bs32) (bs8) GET_BYTE (PREG (ptr) + imm_16);
+	  SET_DREG (reg, (bs32) (bs8) GET_BYTE (PREG (ptr) + imm_16));
 	}
     }
   else
@@ -2849,7 +2872,8 @@ decode_LDSTidxI_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	  PUT_BYTE (PREG (ptr) + imm_16, DREG (reg));
 	}
     }
-  PCREG += 4;
+
+  INC_PCREG (4);
 }
 
 static void
@@ -2874,22 +2898,23 @@ decode_linkage_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       PUT_LONG (sp, RETSREG);
       sp -= 4;
       PUT_LONG (sp, FPREG);
-      FPREG = sp;
+      SET_FPREG (sp);
       sp -= size;
-      SPREG = sp;
+      SET_SPREG (sp);
     }
   else
     {
       /* Restore SP from FP.  */
       bu32 sp = FPREG;
       TRACE_INSN (cpu, "UNLINK;");
-      FPREG = GET_LONG (sp);
+      SET_FPREG (GET_LONG (sp));
       sp += 4;
-      RETSREG = GET_LONG (sp);
+      SET_RETSREG (GET_LONG (sp));
       sp += 4;
-      SPREG = sp;
+      SET_SPREG (sp);
     }
-  PCREG += 4;
+
+  INC_PCREG (4);
 }
 
 static void
@@ -2942,28 +2967,28 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   if (w0)
     {
       if (P)
-	DREG (dst) = res0;
+	SET_DREG (dst, res0);
       else
 	{
 	  if (res0 & 0xffff0000)
 	    unhandled_instruction (cpu, "dsp32mac0");
-	  DREG (dst) = (DREG (dst) & 0xFFFF0000) | res0;
+	  SET_DREG (dst, (DREG (dst) & 0xFFFF0000) | res0);
 	}
     }
 
   if (w1)
     {
       if (P)
-	DREG (dst + 1) = res1;
+	SET_DREG (dst + 1, res1);
       else
 	{
 	  if (res1 & 0xffff0000)
 	    unhandled_instruction (cpu, "dsp32mac1");
-	  DREG (dst) = (DREG (dst) & 0xFFFF) | (res1 << 16);
+	  SET_DREG (dst, (DREG (dst) & 0xFFFF) | (res1 << 16));
 	}
     }
 
-  PCREG += 4;
+  INC_PCREG (4);
 }
 
 static void
@@ -3024,28 +3049,28 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   if (w0)
     {
       if (P)
-	DREG (dst) = res0;
+	SET_DREG (dst, res0);
       else
 	{
 	  if (res0 & 0xFFFF0000)
 	    illegal_instruction (cpu);
-	  DREG (dst) = (DREG (dst) & 0xFFFF0000) | res0;
+	  SET_DREG (dst, (DREG (dst) & 0xFFFF0000) | res0);
 	}
     }
 
   if (w1)
     {
       if (P)
-	DREG (dst + 1) = res1;
+	SET_DREG (dst + 1, res1);
       else
 	{
 	  if (res1 & 0xFFFF0000)
 	    illegal_instruction (cpu);
-	  DREG (dst) = (DREG (dst) & 0xFFFF) | (res1 << 16);
+	  SET_DREG (dst, (DREG (dst) & 0xFFFF) | (res1 << 16));
 	}
     }
 
-  PCREG += 4;
+  INC_PCREG (4);
 }
 
 static void
@@ -3074,22 +3099,22 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   if (aop == 0 && aopcde == 9 && HL == 0 && s == 0)
     {
       TRACE_INSN (cpu, "A0.L = R%i.L;", src0);
-      A0WREG = REG_H_L (A0WREG, DREG (src0));
+      SET_AWREG (0, REG_H_L (AWREG (0), DREG (src0)));
     }
   else if (aop == 2 && aopcde == 9 && HL == 1 && s == 0)
     {
       TRACE_INSN (cpu, "A1.H = R%i.H;", src0);
-      A1WREG = REG_H_L (DREG (src0), A1WREG);
+      SET_AWREG (1, REG_H_L (DREG (src0), AWREG (1)));
     }
   else if (aop == 2 && aopcde == 9 && HL == 0 && s == 0)
     {
       TRACE_INSN (cpu, "A1.L = R%i.L;", src0);
-      A1WREG = REG_H_L (A1WREG, DREG (src0));
+      SET_AWREG (1, REG_H_L (AWREG (1), DREG (src0)));
     }
   else if (aop == 0 && aopcde == 9 && HL == 1 && s == 0)
     {
       TRACE_INSN (cpu, "A0.H = R%i.H;", src0);
-      A0WREG = REG_H_L (DREG (src0), A0WREG);
+      SET_AWREG (0, REG_H_L (DREG (src0), AWREG (0)));
     }
   else if (x == 1 && HL == 1 && aop == 3 && aopcde == 5)
     unhandled_instruction (cpu, "dregs_hi = dregs - dregs (RND20)");
@@ -3109,9 +3134,16 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     unhandled_instruction (cpu, "dregs_hi = dregs - dregs (RND12)");
   else if (aopcde == 2 || aopcde == 3)
     {
-      bu32 s1 = DREG (src0);
-      bu32 s2 = DREG (src1);
-      bu16 val;
+      bu32 s1, s2, val;
+
+      TRACE_INSN (cpu, "R%i.%c = R%i.%c %c R%i.%c;",
+		  dst0, HL ? 'H' : 'L',
+		  src0, aop & 2 ? 'L' : 'H',
+		  aopcde == 2 ? '+' : '-',
+		  src1, aop & 1 ? 'L' : 'H');
+
+      s1 = DREG (src0);
+      s2 = DREG (src1);
       if (aop & 1)
 	s2 >>= 16;
       if (aop & 2)
@@ -3120,33 +3152,31 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	val = add16 (cpu, s1, s2, &ASTATREG (ac0), s);
       else
 	val = sub16 (cpu, s1, s2, &ASTATREG (ac0), s);
-      ASTATREG (ac0_copy) = ASTATREG (ac0);
+
       if (HL)
-	DREG (dst0) = (DREG (dst0) & 0xFFFF) | (val << 16);
+	SET_DREG_H (dst0, val << 16);
       else
-	DREG (dst0) = (DREG (dst0) & 0xFFFF0000) | val;
+	SET_DREG_L (dst0, val);
     }
   else if (aop == 0 && aopcde == 9 && s == 1)
     {
       TRACE_INSN (cpu, "A0 = R%i;", src0);
-      A0WREG = DREG (src0);
-      A0XREG = -(A0WREG >> 31);
+      SET_AREG32 (0, DREG (src0));
     }
   else if (aop == 1 && aopcde == 9 && s == 0)
     {
       TRACE_INSN (cpu, "A0.X = R%i.L;", src0);
-      A0XREG = (bs32)(bs8)DREG (src0);
+      SET_AXREG (0, (bs32)(bs8)DREG (src0));
     }
   else if (aop == 2 && aopcde == 9 && s == 1)
     {
       TRACE_INSN (cpu, "A1 = R%i;", src0);
-      A1WREG = DREG (src0);
-      A1XREG = -(A1WREG >> 31);
+      SET_AREG32 (1, DREG (src0));
     }
   else if (aop == 3 && aopcde == 9 && s == 0)
     {
       TRACE_INSN (cpu, "A1.X = R%i.L;", src0);
-      A1XREG = (bs32)(bs8)DREG (src0);
+      SET_AXREG (1, (bs32)(bs8)DREG (src0));
     }
   else if (aop == 3 && aopcde == 11 && (s == 0 || s == 1))
     {
@@ -3190,31 +3220,30 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   else if ((aop == 0 || aop == 1) && s == 0 && aopcde == 8)
     {
       TRACE_INSN (cpu, "A%i = 0;", aop);
-      AXREG (aop) = 0;
-      AWREG (aop) = 0;
+      SET_AREG (aop, 0);
     }
   else if (aop == 2 && s == 0 && aopcde == 8)
     {
       TRACE_INSN (cpu, "A1 = A0 = 0;");
-      A1XREG = A0XREG = 0;
-      A1WREG = A0WREG = 0;
+      SET_AREG (0, 0);
+      SET_AREG (1, 0);
     }
   else if ((aop == 0 || aop == 1) && s == 1 && aopcde == 8)
     {
       TRACE_INSN (cpu, "A%i = A%i (S);", aop, aop);
-      AXREG (aop) = -(AWREG (aop) >> 31);
+      SET_AXREG (aop, -(AWREG (aop) >> 31));
     }
   else if (aop == 2 && s == 1 && aopcde == 8)
     {
       TRACE_INSN (cpu, "A1 = A1 (S) , A0 = A0 (S);");
-      A0XREG = -(A0WREG >> 31);
-      A1XREG = -(A1WREG >> 31);
+      SET_AXREG (0, -(AWREG (0) >> 31));
+      SET_AXREG (1, -(AWREG (1) >> 31));
     }
   else if (aop == 3 && (s == 0 || s == 1) && aopcde == 8)
     {
       TRACE_INSN (cpu, "A%i = A%i;", s, !s);
-      AXREG (s) = AXREG (!s);
-      AWREG (s) = AWREG (!s);
+      SET_AXREG (s, AXREG (!s));
+      SET_AWREG (s, AWREG (!s));
     }
   else if (aop == 3 && HL == 0 && aopcde == 16)
     {
@@ -3226,8 +3255,8 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	  bu8 ax = AXREG (i);
 	  if (ax & 0x80)
 	    aw = -aw, ax = -ax;
-	  AWREG (i) = aw;
-	  AXREG (i) = ax;
+	  SET_AWREG (i, aw);
+	  SET_AXREG (i, ax);
 	}
       /* XXX: what ASTAT flags need updating ?  */
     }
@@ -3240,11 +3269,11 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       TRACE_INSN (cpu, "A%i = ABS A%i;", HL, aop);
       if (ax & 0x80)
 	aw = -aw, ax = -ax;
-      AWREG (HL) = aw;
-      AXREG (HL) = ax;
+      SET_AWREG (HL, aw);
+      SET_AXREG (HL, ax);
 
-      ASTATREG (az) = AWREG (HL) == 0 && AXREG (HL) == 0;
-      ASTATREG (an) = 0;
+      SET_ASTATREG (az, AWREG (HL) == 0 && AXREG (HL) == 0);
+      SET_ASTATREG (an, 0);
       /* XXX: need to check AV[01] and AV[01]S */
     }
   else if (HL == 0 && aop == 3 && aopcde == 12)
@@ -3254,47 +3283,44 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 
       val += 0x8000;
 
-      DREG (dst0) = (DREG (dst0) & 0xFFFF0000) |
-		    (val >> 16) |
-		    ((DREG (src0) & 0x80000000) >> 16);
+      SET_DREG (dst0, (DREG (dst0) & 0xFFFF0000) |
+		      (val >> 16) |
+		      ((DREG (src0) & 0x80000000) >> 16));
       /* XXX: ASTAT ? */
     }
   else if (aop == 3 && HL == 0 && aopcde == 15)
     {
       bu32 hi = (-(bs16)(DREG (src0) >> 16)) << 16;
       bu32 lo = (-(bs16)(DREG (src0) & 0xFFFF)) & 0xFFFF;
+      int v, ac0, ac1;
 
       TRACE_INSN (cpu, "R%i = -R%i (V);", dst0, src0);
 
-      ASTATREG (v) = 0;
-      ASTATREG (v_copy) = 0;
-      ASTATREG (ac0) = 0;
-      ASTATREG (ac0_copy) = 0;
-      ASTATREG (ac1) = 0;
+      v = ac0 = ac1 = 0;
 
       if (hi == 0x80000000)
 	{
 	  hi = 0x7fff0000;
-	  ASTATREG (v) = 1;
-	  ASTATREG (v_copy) = 1;
-	  ASTATREG (vs) = 1;
+	  v = 1;
 	}
       else if (hi == 0)
-	ASTATREG (ac1) = 1;
+	ac1 = 1;
 
       if (lo == 0x8000)
 	{
 	  lo = 0x7fff;
-	  ASTATREG (v) = 1;
-	  ASTATREG (v_copy) = 1;
-	  ASTATREG (vs) = 1;
+	  v = 1;
 	}
       else if (lo == 0)
-	{
-	  ASTATREG (ac0) = 1;
-	  ASTATREG (ac0_copy) = 1;
-	}
-      DREG (dst0) = hi | lo;
+	ac0 = 1;
+
+      SET_DREG (dst0, hi | lo);
+
+      SET_ASTATREG (v, v);
+      if (v)
+	SET_ASTATREG (vs, 1);
+      SET_ASTATREG (ac0, ac0);
+      SET_ASTATREG (ac1, ac1);
       setflags_nz_2x16 (cpu, DREG (dst0));
     }
   else if (aop == 3 && HL == 0 && aopcde == 14)
@@ -3313,9 +3339,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 
       val += 0x8000;
 
-      DREG (dst0) = (DREG (dst0) & 0xFFFF) |
-		    (val & 0x7FFF0000) |
-		    (DREG (src0) & 0x80000000);
+      SET_DREG (dst0, (DREG (dst0) & 0xFFFF) |
+		      (val & 0x7FFF0000) |
+		      (DREG (src0) & 0x80000000));
       /* XXX: what ASTAT flags need updating ?  */
     }
   else if (aop == 0 && aopcde == 23 && HL == 0)
@@ -3328,21 +3354,20 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       AWREG (HL) = -AWREG (aop);
       AXREG (HL) = -AXREG (aop);
 
-      ASTATREG (az) = AWREG (HL) == 0 && AXREG (HL) == 0;
-      ASTATREG (an) = AXREG (HL) >> 7;
-      ASTATREG (ac0) = aw == 0 && ax == 0;
-      ASTATREG (ac0_copy) = ASTATREG (ac0);
+      SET_ASTATREG (az, AWREG (HL) == 0 && AXREG (HL) == 0);
+      SET_ASTATREG (an, AXREG (HL) >> 7);
+      SET_ASTATREG (ac0, aw == 0 && ax == 0);
       if (HL == 0)
 	{
-	  ASTATREG (av0) = ax >> 7;
+	  SET_ASTATREG (av0, ax >> 7);
 	  if (ASTATREG (av0))
-	    ASTATREG (av0s) = 1;
+	    SET_ASTATREG (av0s, 1);
 	}
       else
 	{
-	  ASTATREG (av1) = ax >> 7;
+	  SET_ASTATREG (av1, ax >> 7);
 	  if (ASTATREG (av1))
-	    ASTATREG (av1s) = 1;
+	    SET_ASTATREG (av1s, 1);
 	}
     }
   else if (aop == 0 && aopcde == 12)
@@ -3365,13 +3390,12 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	t1 = sub16 (cpu, s0l, s1l, &ASTATREG (ac0), s);
       else
 	t1 = add16 (cpu, s0l, s1l, &ASTATREG (ac0), s);
-      ASTATREG (ac0_copy) = ASTATREG (ac0);
       t0 &= 0xFFFF;
       t1 &= 0xFFFF;
       if (x)
-	DREG (dst0) = (t1 << 16) | t0;
+	SET_DREG (dst0, (t1 << 16) | t0);
       else
-	DREG (dst0) = (t0 << 16) | t1;
+	SET_DREG (dst0, (t0 << 16) | t1);
     }
   else if (aop == 1 && aopcde == 12)
     {
@@ -3386,8 +3410,8 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       if (val1 & 0x8000)
 	val1 |= 0xFFFF0000;
 
-      DREG (dst0) = val0;
-      DREG (dst1) = val1;
+      SET_DREG (dst0, val0);
+      SET_DREG (dst1, val1);
       /* ASTAT ? */
     }
   else if (HL == 0 && aopcde == 1)
@@ -3445,18 +3469,18 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   else if ((aop == 0 || aop == 1) && aopcde == 10)
     {
       TRACE_INSN (cpu, "R%i = A%i.x;", dst0, aop);
-      DREG (dst0) &= 0xFFFF0000;
-      DREG (dst0) |= AXREG(aop) & 0xFFFF;
+      SET_DREG (dst0, (DREG (dst0) & 0xFFFF0000) |
+		      (AXREG (aop) & 0xFFFF));
     }
   else if (aop == 0 && aopcde == 4)
     {
       TRACE_INSN (cpu, "R%i = R%i + R%i;", dst0, src0, src1);
-      DREG (dst0) = add32 (cpu, DREG (src0), DREG (src1), 1, s);
+      SET_DREG (dst0, add32 (cpu, DREG (src0), DREG (src1), 1, s));
     }
   else if (aop == 1 && aopcde == 4)
     {
       TRACE_INSN (cpu, "R%i = R%i - R%i;", dst0, src0, src1);
-      DREG (dst0) = sub32 (cpu, DREG (src0), DREG (src1), 1, s);
+      SET_DREG (dst0, sub32 (cpu, DREG (src0), DREG (src1), 1, s));
     }
   else if (aop == 2 && aopcde == 4)
     unhandled_instruction (cpu, "dregs = dregs + dregs , dregs = dregs - dregs amod1");
@@ -3479,94 +3503,96 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   else if (aop == 1 && aopcde == 7)
     {
       TRACE_INSN (cpu, "R%i = MIN (R%i, R%i);", dst0, src0, src1);
-      DREG (dst0) = min32 (cpu, DREG (src0), DREG (src1));
+      SET_DREG (dst0, min32 (cpu, DREG (src0), DREG (src1)));
     }
   else if (aop == 0 && aopcde == 7)
     {
       TRACE_INSN (cpu, "R%i = MAX (R%i, R%i);", dst0, src0, src1);
-      DREG (dst0) = max32 (cpu, DREG (src0), DREG (src1));
+      SET_DREG (dst0, max32 (cpu, DREG (src0), DREG (src1)));
     }
   else if (aop == 2 && aopcde == 7)
     {
       bu32 val = DREG (src0);
+      int v;
+
       TRACE_INSN (cpu, "R%i = ABS R%i;", dst0, src0);
+
       if (val >> 31)
 	val = -val;
-      if (val == 0x80000000)
-	{
-	  val = 0x7fffffff;
-	  ASTATREG (v) = 1;
-	  ASTATREG (vs) = 1;
-	  ASTATREG (v_copy) = 1;
-	}
-      else
-	{
-	  ASTATREG (v) = 0;
-	  ASTATREG (v_copy) = 0;
-	}
+      v = (val == 0x80000000);
+      if (v)
+	val = 0x7fffffff;
+      SET_DREG (dst0, val);
+
+      SET_ASTATREG (v, v);
+      if (v)
+	SET_ASTATREG (vs, 1);
       setflags_nz (cpu, val);
-      DREG (dst0) = val;
     }
   else if (aop == 3 && aopcde == 7)
     {
       bu32 val = DREG (src0);
+
       TRACE_INSN (cpu, "R%i = - R%i (opt_sat);", dst0, src0);
-      ASTATREG (v) = ASTATREG (v_copy) = (val == 0x8000);
-      ASTATREG (vs) |= ASTATREG (v);
+
       if (val == 0x80000000)
 	val = 0x7fffffff;
       else
 	val = -val;
+      SET_DREG (dst0, val);
+
+      SET_ASTATREG (v, val == 0x8000);
+      if (ASTATREG (v))
+	SET_ASTATREG (vs, 1);
       setflags_logical (cpu, val);
-      DREG (dst0) = val;
     }
   else if (aop == 2 && aopcde == 6)
     {
       bu32 in = DREG (src0);
       bu32 hi = (in & 0x80000000 ? -(bs16)(in >> 16) : in >> 16) << 16;
       bu32 lo = (in & 0x8000 ? -(bs16)(in & 0xFFFF) : in) & 0xFFFF;
+      int v;
 
       TRACE_INSN (cpu, "R%i = ABS R%i (V);", dst0, src0);
 
-      ASTATREG (v) = 0;
-      ASTATREG (v_copy) = 0;
+      v = 0;
       if (hi == 0x80000000)
 	{
 	  hi = 0x7fff0000;
-	  ASTATREG (v) = 1;
-	  ASTATREG (v_copy) = 1;
-	  ASTATREG (vs) = 1;
+	  v = 1;
 	}
       if (lo == 0x8000)
 	{
 	  lo = 0x7fff;
-	  ASTATREG (v) = 1;
-	  ASTATREG (v_copy) = 1;
-	  ASTATREG (vs) = 1;
+	  v = 1;
 	}
-      DREG (dst0) = hi | lo;
+      SET_DREG (dst0, hi | lo);
+
+      SET_ASTATREG (v, v);
+      if (v)
+	SET_ASTATREG (vs, 1);
       setflags_nz_2x16 (cpu, DREG (dst0));
     }
   else if (aop == 1 && aopcde == 6)
     {
       TRACE_INSN (cpu, "R%i = MIN (R%i, R%i);", dst0, src0, src1);
-      DREG (dst0) = min2x16 (cpu, DREG (src0), DREG (src1));
+      SET_DREG (dst0, min2x16 (cpu, DREG (src0), DREG (src1)));
     }
   else if (aop == 0 && aopcde == 6)
     {
       TRACE_INSN (cpu, "R%i = MAX (R%i, R%i);", dst0, src0, src1);
-      DREG (dst0) = max2x16 (cpu, DREG (src0), DREG (src1));
+      SET_DREG (dst0, max2x16 (cpu, DREG (src0), DREG (src1)));
     }
   else if (HL == 1 && aopcde == 1)
     unhandled_instruction (cpu, "dregs = dregs +|- dregs, dregs = dregs -|+ dregs (amod0, amod2)");
   else if (aop == 0 && aopcde == 24)
     {
       TRACE_INSN (cpu, "R%i = BYTEPACK (R%i, R%i);", dst0, src0, src1);
-      DREG (dst0) =
+      SET_DREG (dst0,
 	(((DREG (src0) >>  0) & 0xff) <<  0) |
 	(((DREG (src0) >> 16) & 0xff) <<  8) |
 	(((DREG (src1) >>  0) & 0xff) << 16) |
-	(((DREG (src1) >> 16) & 0xff) << 24);
+	(((DREG (src1) >> 16) & 0xff) << 24));
     }
   else if (aop == 1 && aopcde == 24)
     {
@@ -3587,8 +3613,8 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       byteb = (comb_src >> (8 + 8 * order));
       bytec = (comb_src >> (16 + 8 * order));
       byted = (comb_src >> (24 + 8 * order));
-      DREG (dst0) = bytea | ((bu32)byteb << 16);
-      DREG (dst1) = bytec | ((bu32)byted << 16);
+      SET_DREG (dst0, bytea | ((bu32)byteb << 16));
+      SET_DREG (dst1, bytec | ((bu32)byted << 16));
     }
   else if (aopcde == 13)
     {
@@ -3627,19 +3653,19 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 
       if (up_hi)
 	{
-	  AWREG (1) = REG_H_L (AWREG (1), src_hi);
-	  DREG (dst1) = PREG (0);
+	  SET_AWREG (1, REG_H_L (AWREG (1), src_hi));
+	  SET_DREG (dst1, PREG (0));
 	}
       if (up_lo)
 	{
-	  AWREG (0) = REG_H_L (AWREG (0), src_lo);
-	  DREG (dst0) = PREG (0);
+	  SET_AWREG (0, REG_H_L (AWREG (0), src_lo));
+	  SET_DREG (dst0, PREG (0));
 	}
     }
   else
     illegal_instruction (cpu);
 
-  PCREG += 4;
+  INC_PCREG (4);
 }
 
 static void
@@ -3663,14 +3689,13 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 
   if ((sop == 0 || sop == 1) && sopcde == 0)
     {
-      /* HLs == 0 : dregs_lo = ASHIFT dregs_lo BY dregs_lo
-       * HLs == 1 : dregs_lo = ASHIFT dregs_hi BY dregs_lo
-       * HLs == 2 : dregs_hi = ASHIFT dregs_lo BY dregs_lo
-       * HLs == 3 : dregs_hi = ASHIFT dregs_hi BY dregs_lo
-       * if sop == 1, then saturate, otherwise not
-       */
       bu16 val;
       bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
+
+      TRACE_INSN (cpu, "R%i.%c = ASHIFT R%i.%c BY R%i.L%s;",
+		  dst0, HLs < 2 ? 'L' : 'H',
+		  src1, HLs & 1 ? 'H' : 'L',
+		  src0, sop == 1 ? " (S)" : "");
 
       if ((HLs & 1) == 0)
 	val = (bu16)(DREG (src1) & 0xFFFF);
@@ -3692,13 +3717,12 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     }
   else if (sop == 2 && sopcde == 0)
     {
-      /* HLs == 0  dregs_lo = LSHIFT dregs_lo BY dregs_lo
-       * HLs == 1  dregs_lo = LSHIFT dregs_hi BY dregs_lo
-       * HLs == 2  dregs_hi = LSHIFT dregs_lo BY dregs_lo
-       * HLs == 3  dregs_hi = LSHIFT dregs_hi BY dregs_lo
-       */
       bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
       bu16 val;
+
+      TRACE_INSN (cpu, "R%i.%c = LSHIFT R%i.%c BY R%i.L;",
+		  dst0, HLs < 2 ? 'L' : 'H',
+		  src1, HLs & 1 ? 'H' : 'L', src0);
 
       if ((HLs & 1) == 0)
 	val = (bu16)(DREG (src1) & 0xFFFF);
@@ -3711,9 +3735,9 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	val = val << shft;
 
       if ((HLs & 2) == 0)
-	DREG (dst0) = DREG (dst0) & 0xFFFF0000 | val;
+	SET_DREG (dst0, DREG (dst0) & 0xFFFF0000 | val);
       else
-	DREG (dst0) = DREG (dst0) & 0xFFFF | (val << 16);
+	SET_DREG (dst0, DREG (dst0) & 0xFFFF | (val << 16));
 
       /* XXX: ASTAT */
     }
@@ -3726,13 +3750,11 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     }
   else if (sop == 0 && sopcde == 3 && (HLs == 0 || HLs == 1))
     {
-      /* HLs == 0 : A0 = ASHIFT A0 BY dregs_lo
-       * HLs == 1 : A1 = ASHIFT A1 BY dregs_lo
-       */
       bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
       bu64 val;
 
       HLs = !!HLs;
+      TRACE_INSN (cpu, "A%i = ASHIFT A%i BY R%i.L;", HLs, HLs, src0);
       val = get_extended_acc (cpu, HLs);
 
       if (shft <= 0)
@@ -3745,13 +3767,11 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     }
   else if (sop == 1 && sopcde == 3 && (HLs == 0 || HLs == 1))
     {
-      /* HLs == 0 : A0 = LSHIFT A0 BY dregs_lo
-       * HLs == 1 : A1 = LSHIFT A1 BY dregs_lo
-       */
       bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
       bu64 val;
 
       HLs = !!HLs;
+      TRACE_INSN (cpu, "A%i = LSHIFT A%i BY R%i.L;", HLs, HLs, src0);
       val = get_extended_acc (cpu, HLs);
 
       if (shft <= 0)
@@ -3764,11 +3784,11 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     }
   else if ((sop == 0 || sop == 1) && sopcde == 1)
     {
-      /* sop == 0 : dregs = ASHIFT dregs BY dregs_lo (V)
-       * sop == 1 : dregs = ASHIFT dregs BY dregs_lo (V,S)
-       */
       bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
       bu16 val0, val1;
+
+      TRACE_INSN (cpu, "R%i = ASHIFT R%i BY R%i.L (V%s);",
+		  dst0, src1, src0, sop == 1 ? ",S" : "");
 
       val0 = (bu16)DREG (src1) & 0xFFFF;
       val1 = (bu16)((DREG (src1) & 0xFFFF0000) >> 16);
@@ -3792,6 +3812,11 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       bu32 v = DREG (src1);
       /* LSHIFT uses sign extended low 6 bits of dregs_lo.  */
       bs32 shft = (bs8)(DREG (src0) << 2) >> 2;
+
+      TRACE_INSN (cpu, "R%i = %cSHIFT R%i BY R%i.L%s;", dst0,
+		  shft && sop != 2 ? 'A' : 'L', src1, src0,
+		  sop == 1 ? " (S)" : "");
+
       if (shft < 0)
 	{
 	  if (sop == 2)
@@ -3821,7 +3846,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	  result |= t == 1 ? 0 : srcval >> (33 - t);
 	  result |= oldcc << (t - 1);
 	  STORE (DREG (dst0), result);
-	  CCREG = (srcval >> (32 - t)) & 1;
+	  SET_CCREG ((srcval >> (32 - t)) & 1);
 	}
       else
 	STORE (DREG (dst0), DREG (src1));
@@ -3860,28 +3885,25 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	sv0 >>= 16;
       if (sop & 2)
 	sv1 >>= 16;
-      DREG (dst0) = (sv1 << 16) | (sv0 & 0xFFFF);
+      SET_DREG (dst0, (sv1 << 16) | (sv0 & 0xFFFF));
     }
   else if (sop == 0 && sopcde == 5)
     {
       bu32 sv1 = DREG (src1);
       TRACE_INSN (cpu, "R%i.L = SIGNBITS R%i;", dst0, src1);
-      DREG (dst0) &= 0xFFFF0000;
-      DREG (dst0) |= signbits (sv1, 32);
+      SET_DREG_L (dst0, signbits (sv1, 32));
     }
   else if (sop == 1 && sopcde == 5)
     {
       bu32 sv1 = DREG (src1);
       TRACE_INSN (cpu, "R%i.L = SIGNBITS R%i.L;", dst0, src1);
-      DREG (dst0) &= 0xFFFF0000;
-      DREG (dst0) |= signbits (sv1, 16);
+      SET_DREG_L (dst0, signbits (sv1, 16));
     }
   else if (sop == 2 && sopcde == 5)
     {
       bu32 sv1 = DREG (src1);
       TRACE_INSN (cpu, "R%i.L = SIGNBITS R%i.H;", dst0, src1);
-      DREG (dst0) &= 0xFFFF0000;
-      DREG (dst0) |= signbits (sv1 >> 16, 16);
+      SET_DREG_L (dst0, signbits (sv1 >> 16, 16));
     }
   else if ((sop == 0 || sop == 1) && sopcde == 6)
     {
@@ -3889,15 +3911,13 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       TRACE_INSN (cpu, "R%i.L = SIGNBITS A%i;", dst0, sop);
       acc <<= 32;
       acc |= AWREG (sop);
-      DREG (dst0) &= 0xFFFF0000;
-      DREG (dst0) |= (signbits (acc, 40) & 0xFFFF);
+      SET_DREG_L (dst0, signbits (acc, 40) & 0xFFFF);
     }
   else if (sop == 3 && sopcde == 6)
     {
       bu32 v = ones (DREG (src1));
       TRACE_INSN (cpu, "R%i.L = ONES R%i;", dst0, src1);
-      DREG (dst0) &= 0xFFFF0000;
-      DREG (dst0) |= v;
+      SET_DREG_L (dst0, v);
     }
   else if (sop == 0 && sopcde == 7)
     {
@@ -3906,12 +3926,10 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 
       TRACE_INSN (cpu, "R%i.L = EXPADJ (R%i, R%i.L);", dst0, src1, src0);
 
-      DREG (dst0) &= 0xFFFF0000;
-
       if ((sv1 & 0x1f) < (sv0 & 0x1f))
-	DREG (dst0) |= sv1;
+	SET_DREG_L (dst0, sv1);
       else
-	DREG (dst0) |= sv0;
+	SET_DREG_L (dst0, sv0);
     }
   else if (sop == 1 && sopcde == 7)
     {
@@ -3928,18 +3946,17 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 
       tmp_hi = signbits(src1_hi, 16);
       tmp_lo = signbits(src1_lo, 16);
-      DREG (dst0) &= 0xFFFF0000;
 
       if ((tmp_hi & 0xf) < (tmp_lo & 0xf))
 	if ((tmp_hi & 0xf) < (src0_lo & 0xf))
-	  DREG (dst0) |= tmp_hi;
+	  SET_DREG_L (dst0, tmp_hi);
 	else
-	  DREG (dst0) |= src0_lo;
+	  SET_DREG_L (dst0, src0_lo);
       else
-	if ((tmp_lo & 0xf)  < (src0_lo & 0xf))
-	  DREG (dst0) |= tmp_lo;
+	if ((tmp_lo & 0xf) < (src0_lo & 0xf))
+	  SET_DREG_L (dst0, tmp_lo);
 	else
-	  DREG (dst0) |= src0_lo;
+	  SET_DREG_L (dst0, src0_lo);
     }
   else if (sop == 2 && sopcde == 7)
     {
@@ -3952,12 +3969,11 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       TRACE_INSN (cpu, "R%i.L = EXPADJ (R%i.L, R%i.L);", dst0, src1, src0);
 
       tmp = signbits(DREG (src1) & 0xFFFF, 16);
-      DREG (dst0) &= 0xFFFF0000;
 
       if ((tmp & 0xf) < (src0_lo & 0xf))
-	DREG (dst0) |= tmp;
+	SET_DREG_L (dst0, tmp);
       else
-	DREG (dst0) |= src0_lo;
+	SET_DREG_L (dst0, src0_lo);
     }
   else if (sop == 3 && sopcde == 7)
     {
@@ -3967,42 +3983,45 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       TRACE_INSN (cpu, "R%i.L = EXPADJ (R%i.H, R%i.L);", dst0, src1, src0);
 
       tmp = signbits((DREG (src1) & 0xFFFF0000) >> 16, 16);
-      DREG (dst0) &= 0xFFFF0000;
 
       if ((tmp & 0xf) < (src0_lo & 0xf))
-	DREG (dst0) |= tmp;
+	SET_DREG_L (dst0, tmp);
       else
-	DREG (dst0) |= src0_lo;
+	SET_DREG_L (dst0, src0_lo);
     }
   else if (sop == 0 && sopcde == 8)
     {
       bu64 acc = get_unextended_acc (cpu, 0);
+      bu32 s0, s1;
 
       TRACE_INSN (cpu, "BITMUX (R%i, R%i, A0) (ASR);", src0, src1);
 
+      s0 = DREG (src0);
+      s1 = DREG (src1);
       acc = (acc >> 2) |
-	(((bu64)DREG (src0) & 1) << 38) |
-	(((bu64)DREG (src1) & 1) << 39);
-      DREG (src0) >>= 1;
-      DREG (src1) >>= 1;
+	(((bu64)s0 & 1) << 38) |
+	(((bu64)s1 & 1) << 39);
+      SET_DREG (src0, s0 >> 1);
+      SET_DREG (src1, s1 >> 1);
 
-      A0XREG = (acc >> 32) & 0xff;
-      A0WREG = acc;
+      SET_AREG (0, acc);
     }
   else if (sop == 1 && sopcde == 8)
     {
       bu64 acc = get_unextended_acc (cpu, 0);
+      bu32 s0, s1;
 
       TRACE_INSN (cpu, "BITMUX (R%i, R%i, A0) (ASL);", src0, src1);
 
+      s0 = DREG (src0);
+      s1 = DREG (src1);
       acc = (acc << 2) |
-	((DREG (src0) >> 31) & 1) |
-	((DREG (src1) >> 30) & 2);
-      DREG (src0) <<= 1;
-      DREG (src1) <<= 1;
+	((s0 >> 31) & 1) |
+	((s1 >> 30) & 2);
+      SET_DREG (src0, s0 << 1);
+      SET_DREG (src1, s1 << 1);
 
-      A0XREG = (acc >> 32) & 0xff;
-      A0WREG = acc;
+      SET_AREG (0, acc);
     }
   else if (sop == 0 && sopcde == 9)
     unhandled_instruction (cpu, "dregs_lo = VIT_MAX (dregs) (ASL)");
@@ -4019,7 +4038,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       bu32 mask = (1 << (v & 0x1f)) - 1;
       TRACE_INSN (cpu, "R%i = EXTRACT (R%i, R%i.L) (Z);", dst0, src1, src0);
       x >>= ((v >> 8) & 0x1f);
-      DREG (dst0) = x & mask;
+      SET_DREG (dst0, x & mask);
       setflags_logical (cpu, DREG (dst0));
     }
   else if (sop == 1 && sopcde == 10)
@@ -4033,7 +4052,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       x &= mask;
       if (x & sgn)
 	x |= ~mask;
-      DREG (dst0) = x;
+      SET_DREG (dst0, x);
       setflags_logical (cpu, DREG (dst0));
     }
   else if ((sop == 2 || sop == 3) && sopcde == 10)
@@ -4065,7 +4084,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       fgnd <<= shft;
       mask <<= shft;
       bg &= ~mask;
-      DREG (dst0) = bg | fgnd;
+      SET_DREG (dst0, bg | fgnd);
       setflags_logical (cpu, DREG (dst0));
     }
   else if (sop == 0 && sopcde == 11)
@@ -4075,10 +4094,9 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       TRACE_INSN (cpu, "R%i.L = CC = BXORSHIFT (A0, R%i);", dst0, src0);
 
       acc0 <<= 1;
-      CCREG = xor_reduce (acc0, DREG (src0));
-      DREG (dst0) = REG_H_L (DREG (dst0), CCREG);
-      A0XREG = (acc0 >> 32) & 0xff;
-      A0WREG = acc0;
+      SET_CCREG (xor_reduce (acc0, DREG (src0)));
+      SET_DREG (dst0, REG_H_L (DREG (dst0), CCREG));
+      SET_AREG (0, acc0);
     }
   else if (sop == 1 && sopcde == 11)
     {
@@ -4086,8 +4104,8 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 
       TRACE_INSN (cpu, "R%i.L = CC = BXOR (A0, R%i);", dst0, src0);
 
-      CCREG = xor_reduce (acc0, DREG (src0));
-      DREG (dst0) = REG_H_L (DREG (dst0), CCREG);
+      SET_CCREG (xor_reduce (acc0, DREG (src0)));
+      SET_DREG (dst0, REG_H_L (DREG (dst0), CCREG));
     }
   else if (sop == 0 && sopcde == 12)
     {
@@ -4097,8 +4115,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       TRACE_INSN (cpu, "A0 = BXORSHIFT (A0, A1, CC);");
 
       acc0 = (acc0 << 1) | (CCREG ^ xor_reduce (acc0, acc1));
-      A0XREG = (acc0 >> 32) & 0xff;
-      A0WREG = acc0;
+      SET_AREG (0, acc0);
     }
   else if (sop == 1 && sopcde == 12)
     {
@@ -4107,20 +4124,20 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 
       TRACE_INSN (cpu, "R%i.L = CC = BXOR (A0, A1, CC);", dst0);
 
-      CCREG ^= xor_reduce (acc0, acc1);
+      SET_CCREG (CCREG ^ xor_reduce (acc0, acc1));
       acc0 = (acc0 << 1) | CCREG;
-      DREG (dst0) = REG_H_L (DREG (dst0), CCREG);
+      SET_DREG (dst0, REG_H_L (DREG (dst0), CCREG));
     }
   else if ((sop == 0 || sop == 1 || sop == 2) && sopcde == 13)
     {
       int shift = (sop + 1) * 8;
       TRACE_INSN (cpu, "R%i = ALIGN%i (R%i, R%i);", dst0, shift, src1, src0);
-      DREG (dst0) = (DREG (src1) << (32 - shift)) | (DREG (src0) >> shift);
+      SET_DREG (dst0, (DREG (src1) << (32 - shift)) | (DREG (src0) >> shift));
     }
   else
     illegal_instruction (cpu);
 
-  PCREG += 4;
+  INC_PCREG (4);
 }
 
 static void
@@ -4218,8 +4235,7 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       else
 	acc >>= shiftdn;
 
-      AXREG (HLs) = (acc >> 32) & 0xFF;
-      AWREG (HLs) = acc;
+      SET_AREG (HLs, acc);
     }
   else if (sop == 2 && sopcde == 3 && HLs == 0)
     unhandled_instruction (cpu, "A0 = ROT A0 BY imm6");
@@ -4281,9 +4297,9 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       val_l |= DREG (src1) & 0x8000;
       val_h |= DREG (src1) & 0x80000000;
 
-      DREG (dst0) = ((DREG (src1) & 0xFFFF) >> count) |
-		    ((DREG (src1) >> count) & 0xFFFF0000) |
-		    val_l | val_h;
+      SET_DREG (dst0, ((DREG (src1) & 0xFFFF) >> count) |
+		      ((DREG (src1) >> count) & 0xFFFF0000) |
+		      val_l | val_h);
 
       /* XXX: ASTAT? */
     }
@@ -4328,7 +4344,7 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	  result |= t == 1 ? 0 : srcval >> (33 - t);
 	  result |= oldcc << (t - 1);
 	  STORE (DREG (dst0), result);
-	  CCREG = (srcval >> (32 - t)) & 1;
+	  SET_CCREG ((srcval >> (32 - t)) & 1);
 	}
       else
 	STORE (DREG (dst0), DREG (src1));
@@ -4347,7 +4363,7 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   else
     illegal_instruction (cpu);
 
-  PCREG += 4;
+  INC_PCREG (4);
 }
 
 static void
@@ -4379,13 +4395,13 @@ decode_psedoDEBUG_0 (SIM_CPU *cpu, bu16 iw0)
     {
       TRACE_INSN (cpu, "ABORT;");
       cec_exception (cpu, VEC_SIM_ABORT);
-      DREG (0) = 1;
+      SET_DREG (0, 1);
     }
   else if (reg == 4 && fn == 3)
     {
       TRACE_INSN (cpu, "HLT;");
       cec_exception (cpu, VEC_SIM_HLT);
-      DREG (0) = 0;
+      SET_DREG (0, 0);
     }
   else if (reg == 5 && fn == 3)
     unhandled_instruction (cpu, "DBGHALT");
@@ -4405,7 +4421,7 @@ decode_psedoDEBUG_0 (SIM_CPU *cpu, bu16 iw0)
   else
     illegal_instruction (cpu);
 
-  PCREG += 2;
+  INC_PCREG (2);
 }
 
 static void
@@ -4422,7 +4438,7 @@ decode_psedoOChar_0 (SIM_CPU *cpu, bu16 iw0)
 
   outc (ch);
 
-  PCREG += 2;
+  INC_PCREG (2);
 }
 
 static void
@@ -4466,10 +4482,10 @@ decode_psedodbg_assert_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       fprintf (stderr, "FAIL at 0x%x: %s (%s%s, 0x%04x), actual value 0x%x\n",
 	       PCREG, dbg_name, reg_name, dbg_appd, expected, actual);
       cec_exception (cpu, VEC_ILGAL_I);
-      DREG (0) = 1;
+      SET_DREG (0, 1);
     }
 
-  PCREG += 4;
+  INC_PCREG (4);
 }
 
 static void
@@ -4492,7 +4508,7 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc, int *is_multiinsn)
   if ((iw0 & 0xf7ff) == 0xc003 && iw1 == 0x1800)
     {
       TRACE_INSN (cpu, "MNOP;");
-      PCREG += 4;
+      INC_PCREG (4);
     }
   else if ((iw0 & 0xFF00) == 0x0000)
     decode_ProgCtrl_0 (cpu, iw0);
@@ -4578,7 +4594,6 @@ void
 interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
 {
   int i, is_multiinsn;
-  bu32 old_astat = ASTAT;
 
   BFIN_CPU_STATE.n_stores = 0;
 
@@ -4591,28 +4606,6 @@ interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
       _interp_insn_bfin (cpu, pc + 6, &is_multiinsn);
     }
   for (i = 0; i < BFIN_CPU_STATE.n_stores; i++)
+    /* XXX: This is missing register tracing.  */
     *BFIN_CPU_STATE.stores[i].addr = BFIN_CPU_STATE.stores[i].val;
-
-  /* XXX: probably want to always show when an ASTAT bit is written, not
-   * just changed ...
-   */
-  if (TRACE_CORE_P (cpu))
-    {
-#define COMPARE_ASTAT(bit, BIT) \
-  if (ASTAT_EXTRACT (old_astat, BIT##_BIT) != ASTATREG (bit)) \
-    TRACE_CORE (cpu, "ASTAT["#BIT"] changed to %i", ASTATREG (bit))
-      COMPARE_ASTAT (az, AZ);
-      COMPARE_ASTAT (an, AN);
-      COMPARE_ASTAT (cc, CC);
-      COMPARE_ASTAT (aq, AQ);
-      COMPARE_ASTAT (rnd_mod, RND_MOD);
-      COMPARE_ASTAT (ac0, AC0);
-      COMPARE_ASTAT (ac1, AC1);
-      COMPARE_ASTAT (av0, AV0);
-      COMPARE_ASTAT (av0s, AV0S);
-      COMPARE_ASTAT (av1, AV1);
-      COMPARE_ASTAT (av1s, AV1S);
-      COMPARE_ASTAT (v, V);
-      COMPARE_ASTAT (vs, VS);
-    }
 }

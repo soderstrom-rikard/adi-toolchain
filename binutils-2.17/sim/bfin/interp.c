@@ -152,8 +152,24 @@ bfin_trap (SIM_CPU *cpu)
       cb_syscall (cb, &sc);
     }
 
-  DREG (0) = sc.result;
-  /*DREG (1) = sc.errcode;*/
+  SET_DREG (0, sc.result);
+  /*SET_DREG (1, sc.errcode);*/
+}
+
+void
+trace_register (SIM_DESC sd,
+		sim_cpu *cpu,
+		const char *fmt,
+		...)
+{
+  va_list ap;
+  trace_printf (sd, cpu, "%s %s",
+		"reg:     ",
+		TRACE_PREFIX (CPU_TRACE_DATA (cpu)));
+  va_start (ap, fmt);
+  trace_vprintf (sd, cpu, fmt, ap);
+  va_end (ap);
+  trace_printf (sd, cpu, "\n");
 }
 
 /* Execute a single instruction.  */
@@ -186,11 +202,11 @@ step_once (SIM_CPU *cpu)
       int i;
       for (i = 1; i >= 0; --i)
 	{
-	  if (LCREG(i) && oldpc == LBREG(i) && --LCREG(i))
+	  if (LCREG (i) && oldpc == LBREG (i) && --LCREG (i))
 	    {
-	      PCREG = LTREG(i);
-	      TRACE_BRANCH (cpu, "Hardware loop %i to %#x (%#x iters left)", i,
-			    PCREG, LCREG(i));
+	      SET_PCREG (LTREG (i));
+	      TRACE_BRANCH (cpu, "Hardware loop %i to %#x (%#x iters left)",
+			    i, PCREG, LCREG (i));
 	      break;
 	    }
 	}
@@ -296,10 +312,10 @@ bfin_initialize_cpu (SIM_DESC sd, SIM_CPU *cpu)
   bfin_map_layout (sd, cpu, mdata->mem_count, mdata->mem);
 
   /* Set default stack to top of scratch pad.  */
-  SPREG = BFIN_DEFAULT_MEM_SIZE;
+  SET_SPREG (BFIN_DEFAULT_MEM_SIZE);
 
   /* This is what the hardware likes.  */
-  SYSCFGREG = 0x30;
+  SET_SYSCFGREG (0x30);
 }
 
 SIM_DESC

@@ -86,20 +86,14 @@ struct bfin_cpu_state
 #define LREG(x)		(BFIN_CPU_STATE.lregs[x])
 #define AXREG(x)	(BFIN_CPU_STATE.ax[x])
 #define AWREG(x)	(BFIN_CPU_STATE.aw[x])
-#define A0XREG		(BFIN_CPU_STATE.ax[0])
-#define A0WREG		(BFIN_CPU_STATE.aw[0])
-#define A1XREG		(BFIN_CPU_STATE.ax[1])
-#define A1WREG		(BFIN_CPU_STATE.aw[1])
+#define A0XREG		AXREG (0)
+#define A0WREG		AWREG (0)
+#define A1XREG		AXREG (1)
+#define A1WREG		AWREG (1)
 #define CCREG		(BFIN_CPU_STATE.cc)
 #define LCREG(x)	(BFIN_CPU_STATE.lc[x])
 #define LTREG(x)	(BFIN_CPU_STATE.lt[x])
 #define LBREG(x)	(BFIN_CPU_STATE.lb[x])
-#define LC0REG		LCREG(0)
-#define LT0REG		LTREG(0)
-#define LB0REG		LBREG(0)
-#define LC1REG		LCREG(1)
-#define LT1REG		LTREG(1)
-#define LB1REG		LBREG(1)
 #define CYCLESREG	(BFIN_CPU_STATE.cycles[0])
 #define CYCLES2REG	(BFIN_CPU_STATE.cycles[1])
 #define CYCLES2SHDREG	(BFIN_CPU_STATE.cycles[2])
@@ -114,6 +108,79 @@ struct bfin_cpu_state
 #define PCREG		(BFIN_CPU_STATE.pc)
 #define EMUDAT_INREG	(BFIN_CPU_STATE.emudat[0])
 #define EMUDAT_OUTREG	(BFIN_CPU_STATE.emudat[1])
+
+#define _SET_CORE32REG_IDX(reg, p, x, val) \
+  do \
+    { \
+      bu32 __v = (val); \
+      TRACE_REGISTER (cpu, "wrote "#p"%i = %#x", x, __v); \
+      reg = __v; \
+    } \
+  while (0)
+#define SET_DREG(x, val) _SET_CORE32REG_IDX (DREG (x), R, x, val)
+#define SET_PREG(x, val) _SET_CORE32REG_IDX (PREG (x), P, x, val)
+#define SET_IREG(x, val) _SET_CORE32REG_IDX (IREG (x), I, x, val)
+#define SET_MREG(x, val) _SET_CORE32REG_IDX (MREG (x), M, x, val)
+#define SET_BREG(x, val) _SET_CORE32REG_IDX (BREG (x), B, x, val)
+#define SET_LREG(x, val) _SET_CORE32REG_IDX (LREG (x), L, x, val)
+#define SET_LCREG(x, val) _SET_CORE32REG_IDX (LCREG (x), LC, x, val)
+#define SET_LTREG(x, val) _SET_CORE32REG_IDX (LTREG (x), LT, x, val)
+#define SET_LBREG(x, val) _SET_CORE32REG_IDX (LBREG (x), LB, x, val)
+
+#define SET_DREG_L_H(x, l, h) SET_DREG (x, REG_H_L (h, l))
+#define SET_DREG_L(x, l) SET_DREG (x, REG_H_L (DREG (x), l))
+#define SET_DREG_H(x, h) SET_DREG (x, REG_H_L (h, DREG (x)))
+
+#define _SET_CORE32REG_ALU(reg, p, x, val) \
+  do \
+    { \
+      bu32 __v = (val); \
+      TRACE_REGISTER (cpu, "wrote A%i"#p" = %#x", x, __v); \
+      reg = __v; \
+    } \
+  while (0)
+#define SET_AXREG(x, val) _SET_CORE32REG_ALU (AXREG (x), X, x, val)
+#define SET_AWREG(x, val) _SET_CORE32REG_ALU (AWREG (x), W, x, val)
+
+#define SET_AREG(x, val) \
+  do \
+    { \
+      bu40 __a = (val); \
+      SET_AXREG (x, (__a >> 32) & 0xff); \
+      SET_AWREG (x, __a); \
+    } \
+  while (0)
+#define SET_AREG32(x, val) \
+  do \
+    { \
+      SET_AWREG (x, val); \
+      SET_AXREG (x, -(AWREG (x) >> 31)); \
+    } \
+  while (0)
+
+#define _SET_CORE32REG(reg, val) \
+  do \
+    { \
+      bu32 __v = (val); \
+      TRACE_REGISTER (cpu, "wrote "#reg" = %#x", __v); \
+      reg##REG = __v; \
+    } \
+  while (0)
+#define SET_FPREG(val) _SET_CORE32REG (FP, val)
+#define SET_SPREG(val) _SET_CORE32REG (SP, val)
+#define SET_CYCLESREG(val) _SET_CORE32REG (CYCLES, val)
+#define SET_CYCLES2REG(val) _SET_CORE32REG (CYCLES2, val)
+#define SET_CYCLES2SHDREG(val) _SET_CORE32REG (CYCLES2SHD, val)
+#define SET_USP(val) _SET_CORE32REG (USP, val)
+#define SET_SEQSTATREG(val) _SET_CORE32REG (SEQSTAT, val)
+#define SET_SYSCFGREG(val) _SET_CORE32REG (SYSCFG, val)
+#define SET_RETSREG(val) _SET_CORE32REG (RETS, val)
+#define SET_RETIREG(val) _SET_CORE32REG (RETI, val)
+#define SET_RETXREG(val) _SET_CORE32REG (RETX, val)
+#define SET_RETNREG(val) _SET_CORE32REG (RETN, val)
+#define SET_RETEREG(val) _SET_CORE32REG (RETE, val)
+#define SET_PCREG(val) _SET_CORE32REG (PC, val)
+#define INC_PCREG(val) _SET_CORE32REG (PC, PCREG + (val))
 
 #define AZ_BIT		0
 #define AN_BIT		1
@@ -155,6 +222,7 @@ struct bfin_cpu_state
 #define SET_ASTAT(a) \
   do \
     { \
+      TRACE_REGISTER (cpu, "wrote ASTAT = %#x", a); \
       _SET_ASTAT(a, az,       AZ_BIT); \
       _SET_ASTAT(a, an,       AN_BIT); \
       _SET_ASTAT(a, ac0_copy, AC0_COPY_BIT); \
@@ -172,10 +240,23 @@ struct bfin_cpu_state
       _SET_ASTAT(a, vs,       VS_BIT); \
     } \
   while (0)
+#define SET_ASTATREG(field, val) \
+  do \
+    { \
+      int __v = (val); \
+      TRACE_REGISTER (cpu, "wrote ASTAT["#field"] = %i", __v); \
+      ASTATREG (field) = __v; \
+      if (&ASTATREG (field) == &ASTATREG (ac0)) \
+	ASTATREG (ac0_copy) = __v; \
+      else if (&ASTATREG (field) == &ASTATREG (v)) \
+	ASTATREG (v_copy) = __v; \
+    } \
+  while (0)
+#define SET_CCREG(val) SET_ASTATREG (cc, val)
 
 #define SYSCFG_SSSTEP	(1 << 0)
-#define SYSCFG_CCEN		(2 << 0)
-#define SYSCFG_SNEN		(3 << 0)
+#define SYSCFG_CCEN	(2 << 0)
+#define SYSCFG_SNEN	(3 << 0)
 
 #define __PUT_MEM(taddr, v, size) \
 do { \
