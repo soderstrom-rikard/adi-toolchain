@@ -1901,19 +1901,40 @@ decode_PTR2op_0 (SIM_CPU *cpu, bu16 iw0)
   TRACE_EXTRACT (cpu, "%s: opc:%i src:%i dst:%i", __func__, opc, src, dst);
 
   if (opc == 0)
-    PREG (dst) -= PREG (src);
+    {
+      TRACE_INSN (cpu, "P%i -= P%i", dst, src);
+      PREG (dst) -= PREG (src);
+    }
   else if (opc == 1)
-    PREG (dst) = PREG (src) << 2;
+    {
+      TRACE_INSN (cpu, "P%i = P%i << 2", dst, src);
+      PREG (dst) = PREG (src) << 2;
+    }
   else if (opc == 3)
-    PREG (dst) = PREG (src) >> 2;
+    {
+      TRACE_INSN (cpu, "P%i = P%i >> 2", dst, src);
+      PREG (dst) = PREG (src) >> 2;
+    }
   else if (opc == 4)
-    PREG (dst) = PREG (src) >> 1;
+    {
+      TRACE_INSN (cpu, "P%i = P%i >> 1", dst, src);
+      PREG (dst) = PREG (src) >> 1;
+    }
   else if (opc == 5)
-    PREG (dst) = add_brev (cpu, PREG (dst), PREG (src));
+    {
+      TRACE_INSN (cpu, "P%i += P%i (BREV)", dst, src);
+      PREG (dst) = add_brev (cpu, PREG (dst), PREG (src));
+    }
   else if (opc == 6)
-    PREG (dst) = (PREG (dst) + PREG (src)) << 1;
+    {
+      TRACE_INSN (cpu, "P%i = (P%i + P%i) << 1", dst, dst, src);
+      PREG (dst) = (PREG (dst) + PREG (src)) << 1;
+    }
   else if (opc == 7)
-    PREG (dst) = (PREG (dst) + PREG (src)) << 2;
+    {
+      TRACE_INSN (cpu, "P%i = (P%i + P%i) << 2", dst, dst, src);
+      PREG (dst) = (PREG (dst) + PREG (src)) << 2;
+    }
   else
     illegal_instruction (cpu);
 
