@@ -1,7 +1,6 @@
 //Original:/testcases/core/c_dsp32shift_bxor/c_dsp32shift_bxor.dsp
 // Spec Reference: dsp32shift bxor
 # mach: bfin
-# xfail: "need to implement BXORSHIFT in sim" bfin-*
 
 .include "testutils.inc"
 	start

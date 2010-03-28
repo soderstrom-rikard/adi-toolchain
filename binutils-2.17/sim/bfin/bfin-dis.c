@@ -483,6 +483,20 @@ add_and_shift (SIM_CPU *cpu, bu32 a, bu32 b, int shift)
   return v;
 }
 
+static bu32
+xor_reduce (bu64 acc0, bu64 acc1)
+{
+  int i;
+  bu32 v = 0;
+  for (i = 0; i < 40; ++i)
+    {
+      v ^= (acc0 & acc1 & 1);
+      acc0 >>= 1;
+      acc1 >>= 1;
+    }
+  return v;
+}
+
 /* DIVS ( Dreg, Dreg ) ;
  * Initialize for DIVQ. Set the AQ status bit based on the signs of
  * the 32-bit dividend and the 16-bit divisor. Left shift the dividend
@@ -4024,13 +4038,48 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       setflags_logical (cpu, DREG (dst0));
     }
   else if (sop == 0 && sopcde == 11)
-    unhandled_instruction (cpu, "dregs_lo = CC = BXORSHIFT (A0, dregs)");
+    {
+      bu64 acc0 = get_unextended_acc (cpu, 0);
+
+      TRACE_INSN (cpu, "R%i.L = CC = BXORSHIFT (A0, R%i);", dst0, src0);
+
+      acc0 <<= 1;
+      CCREG = xor_reduce (acc0, DREG (src0));
+      DREG (dst0) = REG_H_L (DREG (dst0), CCREG);
+      A0XREG = (acc0 >> 32) & 0xff;
+      A0WREG = acc0;
+    }
   else if (sop == 1 && sopcde == 11)
-    unhandled_instruction (cpu, "dregs_lo = CC = BXOR (A0, dregs)");
+    {
+      bu64 acc0 = get_unextended_acc (cpu, 0);
+
+      TRACE_INSN (cpu, "R%i.L = CC = BXOR (A0, R%i);", dst0, src0);
+
+      CCREG = xor_reduce (acc0, DREG (src0));
+      DREG (dst0) = REG_H_L (DREG (dst0), CCREG);
+    }
   else if (sop == 0 && sopcde == 12)
-    unhandled_instruction (cpu, "A0 = BXORSHIFT (A0, A1, CC)");
+    {
+      bu64 acc0 = get_unextended_acc (cpu, 0);
+      bu64 acc1 = get_unextended_acc (cpu, 1);
+
+      TRACE_INSN (cpu, "A0 = BXORSHIFT (A0, A1, CC);");
+
+      acc0 = (acc0 << 1) | (CCREG ^ xor_reduce (acc0, acc1));
+      A0XREG = (acc0 >> 32) & 0xff;
+      A0WREG = acc0;
+    }
   else if (sop == 1 && sopcde == 12)
-    unhandled_instruction (cpu, "dregs_lo = CC = BXOR (A0, A1, CC)");
+    {
+      bu64 acc0 = get_unextended_acc (cpu, 0);
+      bu64 acc1 = get_unextended_acc (cpu, 1);
+
+      TRACE_INSN (cpu, "R%i.L = CC = BXOR (A0, A1, CC);", dst0);
+
+      CCREG ^= xor_reduce (acc0, acc1);
+      acc0 = (acc0 << 1) | CCREG;
+      DREG (dst0) = REG_H_L (DREG (dst0), CCREG);
+    }
   else if ((sop == 0 || sop == 1 || sop == 2) && sopcde == 13)
     {
       int shift = (sop + 1) * 8;
