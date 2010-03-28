@@ -296,14 +296,16 @@ lshift (SIM_CPU *cpu, bu64 val, int cnt, int size, bool saturate)
 static bu32
 add32 (SIM_CPU *cpu, bu32 a, bu32 b, int carry, int sat)
 {
-  int flgs = a >> 31;
-  int flgo = b >> 31;
+  int flgs = (a >> 31) & 1;
+  int flgo = (b >> 31) & 1;
   bu32 v = a + b;
-  int flgn = v >> 31;
+  int flgn = (v >> 31) & 1;
   int overflow = (flgs ^ flgn) & (flgo ^ flgn);
   if (sat && overflow)
     {
-      v = flgn ? 0x7fffffff : 0x80000000;
+      v = (bu32)1 << 31;
+      if (flgn)
+	v -= 1;
       /* Saturating insns are documented as not setting overflow.  */
       overflow = 0;
     }
@@ -321,14 +323,16 @@ add32 (SIM_CPU *cpu, bu32 a, bu32 b, int carry, int sat)
 static bu32
 sub32 (SIM_CPU *cpu, bu32 a, bu32 b, int carry, int sat)
 {
-  int flgs = a >> 31;
-  int flgo = b >> 31;
+  int flgs = (a >> 31) & 1;
+  int flgo = (b >> 31) & 1;
   bu32 v = a - b;
-  int flgn = v >> 31;
+  int flgn = (v >> 31) & 1;
   int overflow = (flgs ^ flgo) & (flgn ^ flgs);
   if (sat && overflow)
     {
-      v = flgn ? 0x7fffffff : 0x80000000;
+      v = (bu32)1 << 31;
+      if (flgn)
+	v -= 1;
       /* Saturating insns are documented as not setting overflow.  */
       overflow = 0;
     }
@@ -353,7 +357,9 @@ add16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int sat)
   int overflow = (flgs ^ flgn) & (flgo ^ flgn);
   if (sat && overflow)
     {
-      v = flgn ? 0x7fff : 0x8000;
+      v = 1 << 15;
+      if (flgn)
+	v -= 1;
       /* Saturating insns are documented as not setting overflow.  */
       overflow = 0;
     }
@@ -381,7 +387,9 @@ sub16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int sat)
   int overflow = (flgs ^ flgo) & (flgn ^ flgs);
   if (sat && overflow)
     {
-      v = flgn ? 0x7fff : 0x8000;
+      v = 1 << 15;
+      if (flgn)
+	v -= 1;
       /* Saturating insns are documented as not setting overflow.  */
       overflow = 0;
     }
