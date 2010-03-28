@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "gdb/signals.h"
 #include "opcode/bfin.h"
@@ -52,6 +53,7 @@ illegal_instruction (SIM_CPU *cpu)
 static __attribute__ ((noreturn)) void
 unhandled_instruction (SIM_CPU *cpu, char *insn)
 {
+  SIM_DESC sd = CPU_STATE (cpu);
   bu16 iw0, iw1;
   bu32 iw2;
 
@@ -61,13 +63,13 @@ unhandled_instruction (SIM_CPU *cpu, char *insn)
   iw1 = IFETCH (PCREG + 2);
   iw2 = ((bu32)iw0 << 16) | iw1;
 
-  fprintf (stderr, "Unhandled instruction at 0x%08x (%s opcode 0x", PCREG, insn);
+  sim_io_eprintf (sd, "Unhandled instruction at 0x%08x (%s opcode 0x", PCREG, insn);
   if ((iw0 & 0xc000) == 0xc000)
-    fprintf (stderr, "%08x", iw2);
+    sim_io_eprintf (sd, "%08x", iw2);
   else
-     fprintf (stderr, "%04x", iw0);
+    sim_io_eprintf (sd, "%04x", iw0);
 
-  fprintf (stderr, ") ... aborting\n");
+  sim_io_eprintf (sd, ") ... aborting\n");
 
   while (1)
     illegal_instruction (cpu);
@@ -4367,11 +4369,12 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-outc (char ch)
+outc (SIM_CPU *cpu, char ch)
 {
-  printf ("%c", ch);
+  SIM_DESC sd = CPU_STATE (cpu);
+  sim_io_printf (sd, "%c", ch);
   if (ch == '\n')
-    fflush (stdout);
+    sim_io_flush_stdout (sd);
 }
 
 static void
@@ -4381,16 +4384,19 @@ decode_psedoDEBUG_0 (SIM_CPU *cpu, bu16 iw0)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 1 | 1 | 1 | 1 | 1 | 0 | 0 | 0 |.fn....|.grp.......|.reg.......|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
+  SIM_DESC sd = CPU_STATE (cpu);
   int grp = ((iw0 >> 3) & 0x7);
   int fn = ((iw0 >> 6) & 0x3);
   int reg = ((iw0 >> 0) & 0x7);
 
   TRACE_EXTRACT (cpu, "%s: fn:%i grp:%i reg:%i", __func__, fn, grp, reg);
 
-  if (reg == 0 && fn == 3)
-    unhandled_instruction (cpu, "DBG A0");
-  else if (reg == 1 && fn == 3)
-    unhandled_instruction (cpu, "DBG A1");
+  if ((reg == 0 || reg == 1) && fn == 3)
+    {
+      TRACE_INSN (cpu, "DBG A%i;", reg);
+      sim_io_printf (sd, "DBG : A%i = %#"PRIx64"\n", reg,
+		     get_extended_acc (cpu, reg));
+    }
   else if (reg == 3 && fn == 3)
     {
       TRACE_INSN (cpu, "ABORT;");
@@ -4412,12 +4418,14 @@ decode_psedoDEBUG_0 (SIM_CPU *cpu, bu16 iw0)
   else if (grp == 0 && fn == 2)
     {
       TRACE_INSN (cpu, "OUTC R%i;", reg);
-      outc (DREG (reg));
+      outc (cpu, DREG (reg));
     }
   else if (fn == 0)
     {
-      TRACE_INSN (cpu, "DBG %s;", get_allreg_name (grp, reg));
-      printf("DBG : %s = %08x\n", get_allreg_name (grp, reg), reg_read (cpu, grp, reg));
+      const char *reg_name = get_allreg_name (grp, reg);
+      TRACE_INSN (cpu, "DBG %s;", reg_name);
+      sim_io_printf (sd, "DBG : %s = 0x%08x\n", reg_name,
+		     reg_read (cpu, grp, reg));
     }
   else if (fn == 1)
     unhandled_instruction (cpu, "PRNT allregs");
@@ -4439,7 +4447,7 @@ decode_psedoOChar_0 (SIM_CPU *cpu, bu16 iw0)
   TRACE_EXTRACT (cpu, "%s: ch:%#x", __func__, ch);
   TRACE_INSN (cpu, "OUTC %#x;", ch);
 
-  outc (ch);
+  outc (cpu, ch);
 
   INC_PCREG (2);
 }
@@ -4452,6 +4460,7 @@ decode_psedodbg_assert_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
      | 1 | 1 | 1 | 1 | 0 | - | - | - | dbgop |.grp.......|.regtest...|
      |.expected......................................................|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
+  SIM_DESC sd = CPU_STATE (cpu);
   bu16 actual;
   bu16 expected = ((iw1 >> 0) & 0xffff);
   int dbgop = ((iw0 >> 6) & 0x3);
@@ -4482,8 +4491,8 @@ decode_psedodbg_assert_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   TRACE_INSN (cpu, "%s (%s%s, 0x%x);", dbg_name, reg_name, dbg_appd, expected);
   if (actual != expected)
     {
-      fprintf (stderr, "FAIL at 0x%x: %s (%s%s, 0x%04x), actual value 0x%x\n",
-	       PCREG, dbg_name, reg_name, dbg_appd, expected, actual);
+      sim_io_printf (sd, "FAIL at 0x%x: %s (%s%s, 0x%04x), actual value 0x%x\n",
+		     PCREG, dbg_name, reg_name, dbg_appd, expected, actual);
       cec_exception (cpu, VEC_ILGAL_I);
       SET_DREG (0, 1);
     }
