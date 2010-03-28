@@ -22,8 +22,6 @@
 #include "devices.h"
 #include "dv-bfin_ebiu_sdc.h"
 
-#include "regbits/ebiu.h"
-
 struct bfin_ebiu_sdc
 {
   bu32 base, reg_size, bank_size;
