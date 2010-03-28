@@ -289,7 +289,7 @@ lshift (SIM_CPU *cpu, bu64 val, int cnt, int size, bool saturate)
 
   SET_ASTATREG (an, new_val >> (size - 1));
   SET_ASTATREG (az, new_val == 0);
-  SET_ASTATREG (v, 0);;
+  SET_ASTATREG (v, 0);
   return new_val;
 }
 
@@ -2285,22 +2285,22 @@ decode_dagMODik_0 (SIM_CPU *cpu, bu16 iw0)
 
   if (op == 0)
     {
-      TRACE_INSN (cpu, "I%i += 2;;", i);
+      TRACE_INSN (cpu, "I%i += 2;", i);
       dagadd (cpu, i, 2);
     }
   else if (op == 1)
     {
-      TRACE_INSN (cpu, "I%i -= 2;;", i);
+      TRACE_INSN (cpu, "I%i -= 2;", i);
       dagsub (cpu, i, 2);
     }
   else if (op == 2)
     {
-      TRACE_INSN (cpu, "I%i += 4;;", i);
+      TRACE_INSN (cpu, "I%i += 4;", i);
       dagadd (cpu, i, 4);
     }
   else if (op == 3)
     {
-      TRACE_INSN (cpu, "I%i -= 4;;", i);
+      TRACE_INSN (cpu, "I%i -= 4;", i);
       dagsub (cpu, i, 4);
     }
   else
