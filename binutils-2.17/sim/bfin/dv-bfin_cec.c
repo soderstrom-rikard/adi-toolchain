@@ -161,6 +161,7 @@ static void _cec_raise (SIM_CPU *, struct bfin_cec *, int);
 void
 cec_exception (SIM_CPU *cpu, int excp)
 {
+  SIM_DESC sd = CPU_STATE (cpu);
   int sigrc = -1;
 
   TRACE_EVENTS (cpu, "processing exception %#x in EVT%i", excp,
@@ -192,7 +193,7 @@ cec_exception (SIM_CPU *cpu, int excp)
   if (excp <= 0x3f)
     {
       SET_SEQSTATREG ((SEQSTATREG & ~0x3f) | excp);
-      if (STATE_ENVIRONMENT (CPU_STATE (cpu)) == OPERATING_ENVIRONMENT)
+      if (STATE_ENVIRONMENT (sd) == OPERATING_ENVIRONMENT)
 	{
 	  _cec_raise (cpu, CEC_STATE (cpu), IVG_EVX);
 	  return;
@@ -226,7 +227,7 @@ cec_exception (SIM_CPU *cpu, int excp)
       break;
 
     default:
-      fprintf (stderr, "Unhandled exception %#x at 0x%08x\n", excp, PCREG);
+      sim_io_eprintf (sd, "Unhandled exception %#x at 0x%08x\n", excp, PCREG);
       sigrc = SIM_SIGILL;
       break;
     }
@@ -284,6 +285,7 @@ cec_irpten_disable (SIM_CPU *cpu, struct bfin_cec *cec)
 static void
 _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 {
+  SIM_DESC sd = CPU_STATE (cpu);
   int curr_ivg = _cec_get_ivg (cec);
   bool snen;
   bool irpten;
@@ -324,8 +326,7 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
     {
       /* Double fault ! :( */
       /* XXX: should there be some status registers we update ? */
-      sim_io_error (CPU_STATE (cpu), "%s: double fault at 0x%08x ! :(",
-		    __func__, PCREG);
+      sim_io_error (sd, "%s: double fault at 0x%08x ! :(", __func__, PCREG);
       excp_to_sim_halt (sim_stopped, SIM_SIGABRT);
     }
   else if (irpten && curr_ivg != IVG_USER)
@@ -355,7 +356,7 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 	  break;
 	case IVG_RST:
 	  /* XXX: this should reset the core.  */
-	  sim_io_error (CPU_STATE (cpu), "%s: raise 1 (core reset) not implemented", __func__);
+	  sim_io_error (sd, "%s: raise 1 (core reset) not implemented", __func__);
 	  break;
 	case IVG_NMI:
 	  SET_RETNREG (PCREG);
@@ -365,7 +366,7 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 	  break;
 	case IVG_IRPTEN:
 	  /* XXX: what happens with 'raise 4' ?  */
-	  sim_io_error (CPU_STATE (cpu), "%s: what to do with 'raise 4' ?", __func__);
+	  sim_io_error (sd, "%s: what to do with 'raise 4' ?", __func__);
 	  break;
 	default:
 	  SET_RETIREG (PCREG | (ivg == curr_ivg ? 1 : 0));
