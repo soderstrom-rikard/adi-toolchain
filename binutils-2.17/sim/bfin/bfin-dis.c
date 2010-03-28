@@ -4415,7 +4415,10 @@ decode_psedoDEBUG_0 (SIM_CPU *cpu, bu16 iw0)
       outc (DREG (reg));
     }
   else if (fn == 0)
-    unhandled_instruction (cpu, "DBG allregs");
+    {
+      TRACE_INSN (cpu, "DBG %s;", get_allreg_name (grp, reg));
+      printf("DBG : %s = %08x\n", get_allreg_name (grp, reg), reg_read (cpu, grp, reg));
+    }
   else if (fn == 1)
     unhandled_instruction (cpu, "PRNT allregs");
   else
