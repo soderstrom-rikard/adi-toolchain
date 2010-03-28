@@ -91,8 +91,8 @@ static void
 setflags_logical (SIM_CPU *cpu, bu32 val)
 {
   setflags_nz (cpu, val);
-  ASTATREG (ac0) = 0;
-  ASTATREG (v) = 0;
+  ASTATREG (ac0) = ASTATREG (ac0_copy) = 0;
+  ASTATREG (v) = ASTATREG (v_copy) = 0;
 }
 
 static bu32
@@ -216,7 +216,7 @@ ashiftrt (SIM_CPU *cpu, bu32 val, int cnt, int size)
   ASTATREG (an) = val >> (size - 1);
   ASTATREG (az) = val == 0;
   /* @@@ */
-  ASTATREG (v) = 0;
+  ASTATREG (v) = ASTATREG (v_copy) = 0;
   return val;
 }
 
@@ -244,7 +244,7 @@ lshiftrt (SIM_CPU *cpu, bu64 val, int cnt, int size)
     }
   ASTATREG (an) = val >> (size - 1);
   ASTATREG (az) = val == 0;
-  ASTATREG (v) = 0;
+  ASTATREG (v) = ASTATREG (v_copy) = 0;
   return val;
 }
 
@@ -314,7 +314,7 @@ lshift (SIM_CPU *cpu, bu64 val, int cnt, int size, bool saturate)
 
   ASTATREG (an) = new_val >> (size - 1);
   ASTATREG (az) = new_val == 0;
-  ASTATREG (v) = 0;
+  ASTATREG (v) = ASTATREG (v_copy) = 0;
   return new_val;
 }
 
@@ -334,11 +334,11 @@ add32 (SIM_CPU *cpu, bu32 a, bu32 b, int carry, int sat)
     }
   ASTATREG (an) = flgn;
   ASTATREG (vs) |= overflow;
-  ASTATREG (v) = overflow;
+  ASTATREG (v) = ASTATREG (v_copy) = overflow;
   ASTATREG (v_internal) |= overflow;
   ASTATREG (az) = v == 0;
   if (carry)
-    ASTATREG (ac0) = ~a < b;
+    ASTATREG (ac0) = ASTATREG (ac0_copy) = ~a < b;
   return v;
 }
 
@@ -358,11 +358,11 @@ sub32 (SIM_CPU *cpu, bu32 a, bu32 b, int carry, int sat)
     }
   ASTATREG (an) = flgn;
   ASTATREG (vs) |= overflow;
-  ASTATREG (v) = overflow;
+  ASTATREG (v) = ASTATREG (v_copy) = overflow;
   ASTATREG (v_internal) |= overflow;
   ASTATREG (az) = v == 0;
   if (carry)
-    ASTATREG (ac0) = b <= a;
+    ASTATREG (ac0) = ASTATREG (ac0_copy) = b <= a;
   return v;
 }
 
@@ -382,7 +382,7 @@ add16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int sat)
     }
   ASTATREG (an) = flgn;
   ASTATREG (vs) |= overflow;
-  ASTATREG (v) = overflow;
+  ASTATREG (v) = ASTATREG (v_copy) = overflow;
   ASTATREG (v_internal) |= overflow;
   ASTATREG (az) = v == 0;
   if (carry)
@@ -406,7 +406,7 @@ sub16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int sat)
     }
   ASTATREG (an) = flgn;
   ASTATREG (vs) |= overflow;
-  ASTATREG (v) = overflow;
+  ASTATREG (v) = ASTATREG (v_copy) = overflow;
   ASTATREG (v_internal) |= overflow;
   ASTATREG (az) = v == 0;
   if (carry)
@@ -447,7 +447,7 @@ min32 (SIM_CPU *cpu, bu32 a, bu32 b)
   if ((bs32)a > (bs32)b)
     val = b;
   setflags_nz (cpu, val);
-  ASTATREG (v) = 0;
+  ASTATREG (v) = ASTATREG (v_copy) = 0;
   return val;
 }
 
@@ -458,7 +458,7 @@ max32 (SIM_CPU *cpu, bu32 a, bu32 b)
   if ((bs32)a < (bs32)b)
     val = b;
   setflags_nz (cpu, val);
-  ASTATREG (v) = 0;
+  ASTATREG (v) = ASTATREG (v_copy) = 0;
   return val;
 }
 
@@ -471,7 +471,7 @@ min2x16 (SIM_CPU *cpu, bu32 a, bu32 b)
   if ((bs16)(a >> 16) > (bs16)(b >> 16))
     val = (val & 0xFFFF) | (b & 0xFFFF0000);
   setflags_nz_2x16 (cpu, val);
-  ASTATREG (v) = 0;
+  ASTATREG (v) = ASTATREG (v_copy) = 0;
   return val;
 }
 
@@ -484,7 +484,7 @@ max2x16 (SIM_CPU *cpu, bu32 a, bu32 b)
   if ((bs16)(a >> 16) < (bs16)(b >> 16))
     val = (val & 0xFFFF) | (b & 0xFFFF0000);
   setflags_nz_2x16 (cpu, val);
-  ASTATREG (v) = 0;
+  ASTATREG (v) = ASTATREG (v_copy) = 0;
   return val;
 }
 
@@ -501,7 +501,7 @@ add_and_shift (SIM_CPU *cpu, bu32 a, bu32 b, int shift)
 	ASTATREG (v_internal) = 1;
       v <<= 1;
     }
-  ASTATREG (v) = ASTATREG (v_internal);
+  ASTATREG (v) = ASTATREG (v_copy) = ASTATREG (v_internal);
   ASTATREG (vs) |= ASTATREG (v);
   return v;
 }
@@ -1545,7 +1545,7 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
 
       ASTATREG (az) = (diff == 0);
       ASTATREG (an) = (diff < 0);
-      ASTATREG (ac0) = (0); /* XXX: What is this ?  */
+      ASTATREG (ac0) = ASTATREG (ac0_copy) = (0); /* XXX: What is this ?  */
     }
   else
     {
@@ -1570,7 +1570,7 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
 	{
 	  ASTATREG (az) = az;
 	  ASTATREG (an) = flgn;
-	  ASTATREG (ac0) = ac0;
+	  ASTATREG (ac0) = ASTATREG (ac0_copy) = ac0;
 	}
       switch (opc)
 	{
@@ -1869,11 +1869,9 @@ decode_ALU2op_0 (SIM_CPU *cpu, bu16 iw0)
       bu32 val = DREG (src);
       DREG (dst) = -val;
       setflags_nz (cpu, DREG (dst));
-      if (val == 0x80000000)
-	ASTATREG (v) = ASTATREG (vs) = 1;
-      else
-	ASTATREG (v) = 0;
-      ASTATREG (ac0) = val == 0x0;
+      ASTATREG (v) = ASTATREG (v_copy) = (val == 0x80000000);
+      ASTATREG (vs) |= ASTATREG (v);
+      ASTATREG (ac0) = ASTATREG (ac0_copy) = (val == 0x0);
       /* @@@ Documentation isn't entirely clear about av0 and av1.  */
     }
   else if (opc == 15)
@@ -3151,6 +3149,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	val = add16 (cpu, s1, s2, &ASTATREG (ac0), s);
       else
 	val = sub16 (cpu, s1, s2, &ASTATREG (ac0), s);
+      ASTATREG (ac0_copy) = ASTATREG (ac0);
       if (HL)
 	DREG (dst0) = (DREG (dst0) & 0xFFFF) | (val << 16);
       else
@@ -3295,13 +3294,16 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       TRACE_INSN (cpu, "R%i = -R%i (V);", dst0, src0);
 
       ASTATREG (v) = 0;
+      ASTATREG (v_copy) = 0;
       ASTATREG (ac0) = 0;
+      ASTATREG (ac0_copy) = 0;
       ASTATREG (ac1) = 0;
 
       if (hi == 0x80000000)
 	{
 	  hi = 0x7fff0000;
 	  ASTATREG (v) = 1;
+	  ASTATREG (v_copy) = 1;
 	  ASTATREG (vs) = 1;
 	}
       else if (hi == 0)
@@ -3311,10 +3313,14 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	{
 	  lo = 0x7fff;
 	  ASTATREG (v) = 1;
+	  ASTATREG (v_copy) = 1;
 	  ASTATREG (vs) = 1;
 	}
       else if (lo == 0)
-	ASTATREG (ac0) = 1;
+	{
+	  ASTATREG (ac0) = 1;
+	  ASTATREG (ac0_copy) = 1;
+	}
       DREG (dst0) = hi | lo;
       setflags_nz_2x16 (cpu, DREG (dst0));
     }
@@ -3350,6 +3356,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       ASTATREG (az) = AWREG (HL) == 0 && AXREG (HL) == 0;
       ASTATREG (an) = AXREG (HL) >> 7;
       ASTATREG (ac0) = aw == 0 && ax == 0;
+      ASTATREG (ac0_copy) = ASTATREG (ac0);
       if (HL == 0)
 	{
 	  ASTATREG (av0) = ax >> 7;
@@ -3383,6 +3390,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	t1 = sub16 (cpu, s0l, s1l, &ASTATREG (ac0), s);
       else
 	t1 = add16 (cpu, s0l, s1l, &ASTATREG (ac0), s);
+      ASTATREG (ac0_copy) = ASTATREG (ac0);
       t0 &= 0xFFFF;
       t1 &= 0xFFFF;
       if (x)
@@ -3514,10 +3522,12 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	  val = 0x7fffffff;
 	  ASTATREG (v) = 1;
 	  ASTATREG (vs) = 1;
+	  ASTATREG (v_copy) = 1;
 	}
       else
 	{
 	  ASTATREG (v) = 0;
+	  ASTATREG (v_copy) = 0;
 	}
       setflags_nz (cpu, val);
       DREG (dst0) = val;
@@ -3526,9 +3536,8 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     {
       bu32 val = DREG (src0);
       TRACE_INSN (cpu, "R%i = - R%i (opt_sat);", dst0, src0);
-      ASTATREG (v) = val == 0x8000;
-      if (ASTATREG (v))
-	ASTATREG (vs) = 1;
+      ASTATREG (v) = ASTATREG (v_copy) = (val == 0x8000);
+      ASTATREG (vs) |= ASTATREG (v);
       if (val == 0x80000000)
 	val = 0x7fffffff;
       else
@@ -3545,16 +3554,19 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       TRACE_INSN (cpu, "R%i = ABS R%i (V);", dst0, src0);
 
       ASTATREG (v) = 0;
+      ASTATREG (v_copy) = 0;
       if (hi == 0x80000000)
 	{
 	  hi = 0x7fff0000;
 	  ASTATREG (v) = 1;
+	  ASTATREG (v_copy) = 1;
 	  ASTATREG (vs) = 1;
 	}
       if (lo == 0x8000)
 	{
 	  lo = 0x7fff;
 	  ASTATREG (v) = 1;
+	  ASTATREG (v_copy) = 1;
 	  ASTATREG (vs) = 1;
 	}
       DREG (dst0) = hi | lo;

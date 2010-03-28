@@ -56,14 +56,8 @@ struct bfin_cpu_state
   bu32 dpregs[16], iregs[4], mregs[4], bregs[4], lregs[4], cycles[3];
   bu32 ax[2], aw[2];
   bu32 lt[2], lc[2], lb[2];
-  union {
-    int ac0, ac0_copy;
-  };
-  int ac1, an, aq;
-  int av0, av0s, av1, av1s, az, cc, vs;
-  union {
-    int v, v_copy;
-  };
+  int ac0, ac0_copy, ac1, an, aq;
+  int av0, av0s, av1, av1s, az, cc, v, v_copy, vs;
   int rnd_mod;
   int v_internal;
   bu32 pc, rets, reti, retx, retn, rete;
