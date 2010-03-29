@@ -822,6 +822,9 @@ reg_write (SIM_CPU *cpu, int grp, int reg, bu32 value)
   else if (whichreg == &EMUDAT_INREG)
     /* Writes to EMUDAT goes to the output.  */
     whichreg = &EMUDAT_OUTREG;
+  else if (whichreg == &LTREG (0) || whichreg == &LTREG (1))
+    /* Writes to LT clears LSB automatically.  */
+    value &= ~0x1;
   else if (whichreg == &A0XREG || whichreg == &A1XREG)
     value &= 0xFF;
 
