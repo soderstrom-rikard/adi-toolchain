@@ -97,8 +97,11 @@ testit() {
 	(pf "${out}")
         if [ $?  -ne 0 ] ; then
 	  if [ "${name}" == "SIM" ] ; then
-	    printf 'FAIL at line '
-	    bfin-elf-addr2line -e ${x} $(echo ${out} | awk '{print $3}' | sed 's/://') | awk -F ":" '{print $NF}'
+	    tmp=`echo ${out} | awk '{print $3}' | sed 's/://' | awk -F ":" '{print $NF}'`
+	    if [ -n "${tmp}" ] ; then
+	      printf 'FAIL at line '
+	      bfin-elf-addr2line -e ${x} $(echo ${out} | awk '{print $3}' | sed 's/://') | awk -F ":" '{print $NF}'
+	    fi
 	  elif [ "${name}" == "HOST" ] ; then
             rsh_out=`rsh -l root $boardip '/bin/dmesg -c | /bin/grep -e DBGA -e "FAULT "'`
 	    tmp=`echo ${rsh_out} |  sed 's:\].*$::' | awk '{print $NF}' | awk -F ":" '{print $NF}'`
@@ -137,15 +140,17 @@ pf() {
 
 [ $# -eq 0 ] && set -- *.[Ss]
 bins_hw=$( (${run_sim} || ${run_jtag}) && printf '%s.x ' "$@")
-for files in $@
-do
-	tmp=`grep -e CYCLES -e TESTSET -e CLI -e STI -e RTX -e RTI -e SEQSTAT $files -l`
-	if [ -z "${tmp}" ] ; then
-		bins_host=`echo "${bins_host} ${files}.X"`
-	else
-		echo "skipping ${files}, since it isn't userspace friendly"
-	fi
-done
+if ${run_host} ; then
+	for files in $@
+	do
+		tmp=`grep -e CYCLES -e TESTSET -e CLI -e STI -e RTX -e RTI -e SEQSTAT $files -l`
+		if [ -z "${tmp}" ] ; then
+			bins_host=`echo "${bins_host} ${files}.X"`
+		else
+			echo "skipping ${files}, since it isn't userspace friendly"
+		fi
+	done
+fi
 if [ -n "${bins_hw}" ] ; then
 	bins_all="${bins_hw}"
 fi
