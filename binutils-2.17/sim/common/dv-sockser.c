@@ -244,7 +244,7 @@ connected_p (SIM_DESC sd)
   struct timeval tv;
   fd_set readfds;
   struct sockaddr sockaddr;
-  int addrlen;
+  socklen_t addrlen;
 
   if (sockser_listen_fd == -1)
     return 0;
