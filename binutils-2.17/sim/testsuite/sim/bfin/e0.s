@@ -7,7 +7,7 @@
 	.include "testutils.inc"
 
 	start
-
+.ifndef BFIN_HOST
 	imm32 p0, 0xFFE02000;	/* EVT0 */
 	P1 = re (Z);		// load a pointer to ihandler interrupt 1
 	P1.H = re;
@@ -47,3 +47,5 @@ re:
 _error:
 	DBGA ( R0.L , EXCPT_PROTVIOL );
 	dbg_fail;
+
+.endif

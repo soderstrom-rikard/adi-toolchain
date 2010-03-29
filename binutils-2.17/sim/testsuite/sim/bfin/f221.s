@@ -5,7 +5,7 @@
 	.include "testutils.inc"
 
 	start
-
+.ifndef BFIN_HOST
 	// load address of exception handler
 	imm32 p0, 0xFFE02000;	/* EVT0 */
 	R0 = exception_handler (Z);
@@ -54,3 +54,4 @@ exception_handler:
 	R0 = R0 + R2;
 	RETX = R0;
 	RTX;
+.endif
