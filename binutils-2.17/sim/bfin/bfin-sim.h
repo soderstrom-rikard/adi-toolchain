@@ -242,7 +242,7 @@ struct bfin_cpu_state
 #define SET_ASTATREG(field, val) \
   do \
     { \
-      int __v = (val); \
+      int __v = !!(val); \
       TRACE_REGISTER (cpu, "wrote ASTAT["#field"] = %i", __v); \
       ASTATREG (field) = __v; \
       if (&ASTATREG (field) == &ASTATREG (ac0)) \
