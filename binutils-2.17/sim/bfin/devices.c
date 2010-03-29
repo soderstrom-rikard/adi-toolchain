@@ -19,6 +19,7 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "sim-main.h"
+#include "sim-hw.h"
 #include "hw-device.h"
 #include "dv-bfin_cec.h"
 
@@ -65,10 +66,13 @@ device_io_read_buffer (device *me, void *source, int space,
 
   if (bfin_mmr_check (cpu, dv_me, addr, nr_bytes))
     if (cpu)
-      return sim_cpu_hw_io_read_buffer (cpu, cia, dv_me, source, space,
-					addr, nr_bytes);
+      {
+	sim_cpu_hw_io_read_buffer (cpu, cia, dv_me, source, space,
+				   addr, nr_bytes);
+	return nr_bytes;
+      }
     else
-      return sim_hw_io_read_buffer (sd, me, source, space, addr, nr_bytes);
+      return sim_hw_io_read_buffer (sd, dv_me, source, space, addr, nr_bytes);
   else
     return 0;
 }
@@ -85,10 +89,13 @@ device_io_write_buffer (device *me, const void *source, int space,
 
   if (bfin_mmr_check (cpu, dv_me, addr, nr_bytes))
     if (cpu)
-      return sim_cpu_hw_io_write_buffer (cpu, cia, dv_me, source, space,
-					 addr, nr_bytes);
+      {
+	sim_cpu_hw_io_write_buffer (cpu, cia, dv_me, source, space,
+				    addr, nr_bytes);
+	return nr_bytes;
+      }
     else
-      return sim_hw_io_read_buffer (sd, me, source, space, addr, nr_bytes);
+      return sim_hw_io_write_buffer (sd, dv_me, source, space, addr, nr_bytes);
   else
     return 0;
 }

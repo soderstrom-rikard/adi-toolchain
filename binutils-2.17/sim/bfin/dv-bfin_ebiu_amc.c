@@ -65,7 +65,7 @@ bfin_ebiu_amc_write_amgctl (struct hw *me, struct bfin_ebiu_amc *amc,
 
 static unsigned
 bfin_ebiu_amc_io_write_buffer (struct hw *me, const void *source,
-			       int space, unsigned_word addr, unsigned nr_bytes)
+			       int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_ebiu_amc *amc = hw_data (me);
   bu32 value;
@@ -111,7 +111,7 @@ bfin_ebiu_amc_io_write_buffer (struct hw *me, const void *source,
 
 static unsigned
 bfin_ebiu_amc_io_read_buffer (struct hw *me, void *dest,
-			      int space, unsigned_word addr, unsigned nr_bytes)
+			      int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_ebiu_amc *amc = hw_data (me);
   bu32 mmr_off;
@@ -151,7 +151,7 @@ bfin_ebiu_amc_io_read_buffer (struct hw *me, void *dest,
 static void
 attach_bfin_ebiu_amc_regs (struct hw *me, struct bfin_ebiu_amc *amc)
 {
-  unsigned_word attach_address;
+  address_word attach_address;
   int attach_space;
   unsigned attach_size;
   reg_property_spec reg;

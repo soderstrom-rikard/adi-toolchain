@@ -34,7 +34,7 @@ struct bfin_ctimer
 
 static unsigned
 bfin_ctimer_io_write_buffer (struct hw *me, const void *source,
-			  int space, unsigned_word addr, unsigned nr_bytes)
+			  int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_ctimer *ctimer = hw_data (me);
   bu32 mmr_off;
@@ -63,7 +63,7 @@ bfin_ctimer_io_write_buffer (struct hw *me, const void *source,
 
 static unsigned
 bfin_ctimer_io_read_buffer (struct hw *me, void *dest,
-			 int space, unsigned_word addr, unsigned nr_bytes)
+			 int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_ctimer *ctimer = hw_data (me);
   bu32 mmr_off;
@@ -82,7 +82,7 @@ bfin_ctimer_io_read_buffer (struct hw *me, void *dest,
 static void
 attach_bfin_ctimer_regs (struct hw *me, struct bfin_ctimer *ctimer)
 {
-  unsigned_word attach_address;
+  address_word attach_address;
   int attach_space;
   unsigned attach_size;
   reg_property_spec reg;

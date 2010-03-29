@@ -41,7 +41,7 @@ struct bfin_pll
 
 static unsigned
 bfin_pll_io_write_buffer (struct hw *me, const void *source,
-			  int space, unsigned_word addr, unsigned nr_bytes)
+			  int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_pll *pll = hw_data (me);
   bu32 mmr_off;
@@ -81,7 +81,7 @@ bfin_pll_io_write_buffer (struct hw *me, const void *source,
 
 static unsigned
 bfin_pll_io_read_buffer (struct hw *me, void *dest,
-			 int space, unsigned_word addr, unsigned nr_bytes)
+			 int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_pll *pll = hw_data (me);
   bu32 mmr_off;
@@ -113,7 +113,7 @@ bfin_pll_io_read_buffer (struct hw *me, void *dest,
 static void
 attach_bfin_pll_regs (struct hw *me, struct bfin_pll *pll)
 {
-  unsigned_word attach_address;
+  address_word attach_address;
   int attach_space;
   unsigned attach_size;
   reg_property_spec reg;

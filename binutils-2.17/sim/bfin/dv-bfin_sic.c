@@ -35,7 +35,7 @@ struct bfin_sic
 
 static unsigned
 bfin_sic_io_write_buffer (struct hw *me, const void *source,
-			  int space, unsigned_word addr, unsigned nr_bytes)
+			  int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_sic *sic = hw_data (me);
   bu32 mmr_off;
@@ -57,7 +57,7 @@ bfin_sic_io_write_buffer (struct hw *me, const void *source,
 
 static unsigned
 bfin_sic_io_read_buffer (struct hw *me, void *dest,
-			 int space, unsigned_word addr, unsigned nr_bytes)
+			 int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_sic *sic = hw_data (me);
   bu32 mmr_off;
@@ -84,7 +84,7 @@ bfin_sic_io_read_buffer (struct hw *me, void *dest,
 static void
 attach_bfin_sic_regs (struct hw *me, struct bfin_sic *sic)
 {
-  unsigned_word attach_address;
+  address_word attach_address;
   int attach_space;
   unsigned attach_size;
   reg_property_spec reg;

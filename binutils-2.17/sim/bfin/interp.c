@@ -284,9 +284,7 @@ bfin_hw_tree_init (SIM_DESC sd)
 static void
 bfin_initialize_cpu (SIM_DESC sd, SIM_CPU *cpu)
 {
-  size_t idx;
   struct bfin_model_data *mdata;
-  address_word async;
 
   memset (&cpu->state, 0, sizeof (cpu->state));
 
@@ -295,18 +293,7 @@ bfin_initialize_cpu (SIM_DESC sd, SIM_CPU *cpu)
   /* These memory maps are supposed to be cpu-specific, but the common sim
      code does not yet allow that (2nd arg is "cpu" rather than "NULL".  */
   sim_core_attach (sd, NULL, 0, access_read_write, 0, BFIN_L1_SRAM_SCRATCH,
-                   BFIN_L1_SRAM_SCRATCH_SIZE, 0, NULL, NULL);
-
-#if 0
-  /* Map in the async banks.  */
-  async = BFIN_ASYNC_BASE;
-  for (idx = 0; idx < 4; ++idx)
-    {
-      sim_core_attach (sd, NULL, 0, access_read_write_exec_io, 0, async,
-                       mdata->async_bank_size, 0, NULL, NULL);
-      async += mdata->async_bank_size;
-    }
-#endif
+		   BFIN_L1_SRAM_SCRATCH_SIZE, 0, NULL, NULL);
 
   /* Map in the on-chip memory (bootrom/sram/etc...).  */
   bfin_map_layout (sd, cpu, mdata->mem_count, mdata->mem);

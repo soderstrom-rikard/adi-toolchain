@@ -60,7 +60,7 @@ struct bfin_mmu
 
 static unsigned
 bfin_mmu_io_write_buffer (struct hw *me, const void *source,
-			  int space, unsigned_word addr, unsigned nr_bytes)
+			  int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_mmu *mmu = hw_data (me);
   bu32 mmr_off;
@@ -110,7 +110,7 @@ bfin_mmu_io_write_buffer (struct hw *me, const void *source,
 
 static unsigned
 bfin_mmu_io_read_buffer (struct hw *me, void *dest,
-			 int space, unsigned_word addr, unsigned nr_bytes)
+			 int space, address_word addr, unsigned nr_bytes)
 {
   struct bfin_mmu *mmu = hw_data (me);
   bu32 mmr_off;
@@ -155,7 +155,7 @@ bfin_mmu_io_read_buffer (struct hw *me, void *dest,
 static void
 attach_bfin_mmu_regs (struct hw *me, struct bfin_mmu *mmu)
 {
-  unsigned_word attach_address;
+  address_word attach_address;
   int attach_space;
   unsigned attach_size;
   reg_property_spec reg;
