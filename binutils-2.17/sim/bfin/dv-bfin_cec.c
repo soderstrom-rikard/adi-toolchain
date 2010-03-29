@@ -355,7 +355,7 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 
   if (ivg == IVG_EMU || ivg == IVG_RST)
     goto process_int;
-  if (ivg <= IVG_EVX && curr_ivg <= IVG_EVX)
+  if (ivg <= IVG_EVX && curr_ivg <= IVG_EVX && ivg >= curr_ivg)
     {
       /* Double fault ! :( */
       /* XXX: should there be some status registers we update ? */
