@@ -85,12 +85,42 @@ dojtag() {
 }
 
 testit() {
-	local name=$1 x=$2 out
+
+	local name=$1 x=$2 y=`echo $2 | sed 's:\.[xX]$::'` out rsh_out
 	shift; shift
+        local fail=`grep xfail ${y}`
+	if [ "${name}" == "HOST" -a ! -f $x ] ; then
+		return;
+        fi
 	printf '%-5s %-40s' ${name} ${x}
-	out=`"$@" ${x}`
+	out=`"$@" ${x} 2>&1`
 	(pf "${out}")
-	: $(( ret += $? ))
+        if [ $?  -ne 0 ] ; then
+	  if [ "${name}" == "SIM" ] ; then
+	    printf 'FAIL at line '
+	    bfin-elf-addr2line -e ${x} $(echo ${out} | awk '{print $3}' | sed 's/://') | awk -F ":" '{print $NF}'
+	  elif [ "${name}" == "HOST" ] ; then
+            rsh_out=`rsh -l root $boardip '/bin/dmesg -c | /bin/grep -e DBGA -e "FAULT "'`
+	    tmp=`echo ${rsh_out} |  sed 's:\].*$::' | awk '{print $NF}' | awk -F ":" '{print $NF}'`
+	    if [ -n "${tmp}" ] ; then
+	       echo "${rsh_out}"
+               printf 'FAIL at line '
+	       bfin-elf-addr2line -e ${x} $(echo ${rsh_out} |  sed 's:\].*$::' | awk '{print $NF}') | awk -F ":" '{print $NF}'
+	    fi
+	  fi
+	  ret=$(( ret + 1 ))
+          if [ -z "${fail}" ] ; then
+            unexpected_fail=$(( unexpected_fail + 1 ))
+            echo "!!!Expected Pass, but fail"
+          fi
+        else
+          if [ ! -z "${fail}" ] ; then
+            unexpected_pass=$(( unexpected_pass + 1 ))
+            echo !!!Expected fail, but pass
+          else
+	    expected_pass=$(( expected_pass + 1 ))
+          fi
+        fi
 }
 
 pf() {
@@ -107,8 +137,26 @@ pf() {
 
 [ $# -eq 0 ] && set -- *.[Ss]
 bins_hw=$( (${run_sim} || ${run_jtag}) && printf '%s.x ' "$@")
-bins_host=$(${run_host} && printf '%s.X ' "$@")
-bins_all="${bins_hw} ${bins_host}"
+for files in $@
+do
+	tmp=`grep -e CYCLES -e TESTSET -e CLI -e STI -e RTX -e RTI -e SEQSTAT $files -l`
+	if [ -z "${tmp}" ] ; then
+		bins_host=`echo "${bins_host} ${files}.X"`
+	else
+		echo "skipping ${files}, since it isn't userspace friendly"
+	fi
+done
+if [ -n "${bins_hw}" ] ; then
+	bins_all="${bins_hw}"
+fi
+
+if [ -n "${bins_host}" ] ; then
+	bins_all="${bins_all} ${bins_host}"
+fi
+
+if [ -z "${bins_all}" ] ; then
+	exit
+fi
 
 printf 'Compiling tests: '
 ${MAKE} -s -j ${bins_all}
@@ -134,9 +182,13 @@ if ${run_host} ; then
 	printf 'Uploading tests to board "%s": ' "${boardip}"
 	rcp ${bins_host} root@${boardip}:/tmp/
 	pf
+	rsh -l root $boardip '/bin/dmesg -c' > /dev/null
 fi
 
 ret=0
+unexpected_fail=0
+unexpected_pass=0
+expected_pass=0
 for s in "$@" ; do
 	${run_sim}  && testit SIM  ${s}.x bfin-elf-run `sed -n '/^# sim:/s|^[^:]*:||p' ${s}`
 	${run_jtag} && testit JTAG ${s}.x dojtag
@@ -149,5 +201,16 @@ if [ ${ret} -eq 0 ] ; then
 	${MAKE} -s clean &
 	exit 0
 else
+	echo number of failures ${ret}
+        if [ ${unexpected_pass} -gt 0 ] ; then
+		echo "Unexpected passes: ${unexpected_pass}"
+        fi
+	if [ ${unexpected_fail} -gt 0 ] ; then
+		echo "Unexpected fails: ${unexpected_fail}"
+	fi
+	if [ ${expected_pass} -gt 0 ] ; then
+		echo "passes : ${expected_pass}"
+	fi
 	exit 1
 fi
+
