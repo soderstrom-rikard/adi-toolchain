@@ -1,4 +1,4 @@
-# Blackfin testcase for SEQSTAT register
+# Blackfin testcase for SYSCFG register
 # mach: bfin
 
 	.include "testutils.inc"
