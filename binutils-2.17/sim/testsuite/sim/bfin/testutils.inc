@@ -181,3 +181,9 @@ __fail:
 	.macro init_m_regs val:req
 	_init_regs M, 3, \val
 	.endm
+
+	// the test framework needs things to be quiet, so don't
+	// print things out by default.
+	.macro _DBG reg:req
+	//DBG \reg;
+	.endm
