@@ -21,3 +21,16 @@
 
 #define HI(x) (((x) >> 16) & 0xffff)
 #define LO(x) ((x) & 0xffff)
+
+#define LD32_LABEL(reg, sym) loadsym reg sym
+#define LD32(reg, val) imm32 reg, val
+#define CHECKREG(reg, val) CHECKREG reg, val
+
+#define EVT0         0xFFE02000
+#define EVT1         (EVT0 + 4 * 1)
+#define EVT2         (EVT0 + 4 * 2)
+#define EVT3         (EVT0 + 4 * 3)
+#define EVT4         (EVT0 + 4 * 4)
+#define EVT5         (EVT0 + 4 * 5)
+#define EVT6         (EVT0 + 4 * 6)
+#define EVT_OVERRIDE 0xFFE02100

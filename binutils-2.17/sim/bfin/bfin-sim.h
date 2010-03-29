@@ -169,7 +169,7 @@ struct bfin_cpu_state
 #define SET_CYCLESREG(val) _SET_CORE32REG (CYCLES, val)
 #define SET_CYCLES2REG(val) _SET_CORE32REG (CYCLES2, val)
 #define SET_CYCLES2SHDREG(val) _SET_CORE32REG (CYCLES2SHD, val)
-#define SET_USP(val) _SET_CORE32REG (USP, val)
+#define SET_USPREG(val) _SET_CORE32REG (USP, val)
 #define SET_SEQSTATREG(val) _SET_CORE32REG (SEQSTAT, val)
 #define SET_SYSCFGREG(val) _SET_CORE32REG (SYSCFG, val)
 #define SET_RETSREG(val) _SET_CORE32REG (RETS, val)
