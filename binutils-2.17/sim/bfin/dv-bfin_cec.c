@@ -421,6 +421,16 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
       cec_irpten_enable (cpu, cec);
     }
 
+  /* When going from user to super, we set LSB in LB regs to avoid
+     misbehavior and/or malicious code.  */
+  if (curr_ivg == IVG_USER)
+    {
+      int i;
+      for (i = 0; i < 2; ++i)
+	if (!(LBREG (i) & 1))
+	  SET_LBREG (i, LBREG (i) | 1);
+    }
+
  done:
   TRACE_EVENTS (cpu, "now at EVT%i", _cec_get_ivg (cec));
 }
@@ -509,6 +519,16 @@ cec_return (SIM_CPU *cpu, int ivg)
 
   /* Disable global interrupt mask to let any interrupt take over.  */
   cec_irpten_disable (cpu, cec);
+
+  /* When going from super to user, we clear LSB in LB regs in case
+     it was set on the transition up.  */
+  if (_cec_get_ivg (cec) == -1)
+    {
+      int i;
+      for (i = 0; i < 2; ++i)
+	if (LBREG (i) & 1)
+	  SET_LBREG (i, LBREG (i) & ~1);
+    }
 
   /* Check for pending interrupts before we return to usermode.  */
   _cec_raise (cpu, cec, -1);
