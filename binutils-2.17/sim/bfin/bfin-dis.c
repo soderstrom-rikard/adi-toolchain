@@ -1222,16 +1222,14 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
     }
   else if (prgfunc == 3)
     {
-      bu32 *whichreg = get_allreg (cpu, DREG_GRP, poprnd);
       TRACE_INSN (cpu, "CLI R%i;", poprnd);
-      *whichreg = cec_cli (cpu);
+      SET_DREG (poprnd, cec_cli (cpu));
       INC_PCREG (2);
     }
   else if (prgfunc == 4)
     {
-      bu32 *whichreg = get_allreg (cpu, DREG_GRP, poprnd);
       TRACE_INSN (cpu, "STI R%i;", poprnd);
-      cec_sti (cpu, *whichreg);
+      cec_sti (cpu, DREG (poprnd));
       INC_PCREG (2);
     }
   else if (prgfunc == 5)
@@ -1309,10 +1307,9 @@ decode_CaCTRL_0 (SIM_CPU *cpu, bu16 iw0)
   int a = ((iw0 >> 5) & 0x1);
   int reg = ((iw0 >> 0) & 0x7);
   int op = ((iw0 >> 3) & 0x3);
-  bu32 *whichreg = get_allreg (cpu, PREG_GRP, reg);
+  bu32 preg = PREG (reg);
 
   TRACE_EXTRACT (cpu, "%s: a:%i op:%i reg:%i", __func__, a, op, reg);
-  TRACE_DECODE (cpu, "reg:%s", get_allreg_name (PREG_GRP, reg));
 
   /* No cache simulation, so these are (mostly) all NOPs.
      XXX: The hardware takes care of masking to cache lines, but need
@@ -1323,7 +1320,7 @@ decode_CaCTRL_0 (SIM_CPU *cpu, bu16 iw0)
     {
       TRACE_INSN (cpu, "PREFETCH [P%i];", reg);
       /* implicit read which may trigger CPLB miss.  */
-      GET_BYTE (*whichreg);
+      GET_BYTE (preg);
     }
   else if (a == 0 && op == 1)
     {
@@ -1340,25 +1337,24 @@ decode_CaCTRL_0 (SIM_CPU *cpu, bu16 iw0)
   else if (a == 1 && op == 0)
     {
       TRACE_INSN (cpu, "PREFETCH [P%i++];", reg);
-      *whichreg += BFIN_L1_CACHE_BYTES;
     }
   else if (a == 1 && op == 1)
     {
       TRACE_INSN (cpu, "FLUSHINV [P%i++];", reg);
-      *whichreg += BFIN_L1_CACHE_BYTES;
     }
   else if (a == 1 && op == 2)
     {
       TRACE_INSN (cpu, "FLUSH [P%i++];", reg);
-      *whichreg += BFIN_L1_CACHE_BYTES;
     }
   else if (a == 1 && op == 3)
     {
       TRACE_INSN (cpu, "IFLUSH [P%i++];", reg);
-      *whichreg += BFIN_L1_CACHE_BYTES;
     }
   else
     illegal_instruction (cpu);
+
+  if (a == 1)
+    SET_PREG (reg, preg + BFIN_L1_CACHE_BYTES);
 
   INC_PCREG (2);
 }
@@ -1499,8 +1495,7 @@ decode_ccMV_0 (SIM_CPU *cpu, bu16 iw0)
 	      get_allreg_name (s, src));
 
   if (cond)
-    /* XXX: Missing register trace.  */
-    GREG (dst, d) = GREG (src, s);
+    reg_write (cpu, d, dst, reg_read (cpu, s, src));
 
   INC_PCREG (2);
 }
@@ -2585,13 +2580,12 @@ decode_LDSTiiFP_0 (SIM_CPU *cpu, bu16 iw0)
   if (W == 0)
     {
       TRACE_INSN (cpu, "%s = [FP + %#x];", get_allreg_name (0, reg), imm);
-      /* XXX: Missing register trace.  */
-      DPREG (reg) = GET_LONG (ea);
+      reg_write (cpu, 0, reg, GET_LONG (ea));
     }
   else
     {
       TRACE_INSN (cpu, "[FP + %#x] = %s;", imm, get_allreg_name (0, reg));
-      PUT_LONG (ea, DPREG (reg));
+      PUT_LONG (ea, reg_read (cpu, 0, reg));
     }
 
   INC_PCREG (2);
@@ -2721,13 +2715,11 @@ decode_LDIMMhalf_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   int S = ((iw0 >> 5) & 0x1);
   int hword = ((iw1 >> 0) & 0xffff);
   int reg = ((iw0 >> 0) & 0x7);
-  bu32 *pval = get_allreg (cpu, grp, reg);
   bu32 val;
   const char *reg_name = get_allreg_name (grp, reg);
 
   TRACE_EXTRACT (cpu, "%s: Z:%i H:%i S:%i grp:%i reg:%i hword:%#x",
 		 __func__, Z, H, S, grp, reg, hword);
-  TRACE_DECODE (cpu, "%s: reg:%s", __func__, reg_name);
 
   /* XXX: writing RET{I,X,N,E}, USP, SEQSTAT, SYSCFG requires supervisor mode. */
 
@@ -2735,31 +2727,28 @@ decode_LDIMMhalf_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     {
       val = imm16 (hword);
       TRACE_INSN (cpu, "%s = 0x%x (X);", reg_name, val);
-      *pval = val;
     }
   else if (H == 0 && S == 0 && Z == 1)
     {
       val = luimm16 (hword);
       TRACE_INSN (cpu, "%s = 0x%x (Z);", reg_name, val);
-      *pval = val;
     }
   else if (H == 0 && S == 0 && Z == 0)
     {
       val = luimm16 (hword);
       TRACE_INSN (cpu, "%s.L = 0x%x;", reg_name, val);
-      *pval &= 0xFFFF0000;
-      *pval |= val;
+      val = REG_H_L (reg_read (cpu, grp, reg), val);
     }
   else if (H == 1 && S == 0 && Z == 0)
     {
       val = luimm16 (hword);
       TRACE_INSN (cpu, "%s.H = 0x%x;", reg_name, val);
-      *pval &= 0xFFFF;
-      *pval |= luimm16 (hword) << 16;
+      val = REG_H_L (val << 16, reg_read (cpu, grp, reg));
     }
   else
     illegal_instruction (cpu);
-  TRACE_REGISTER (cpu, "wrote %s = %#x", reg_name, *pval);
+
+  reg_write (cpu, grp, reg, val);
 
   INC_PCREG (4);
 }
@@ -4474,7 +4463,7 @@ decode_psedodbg_assert_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   int dbgop = ((iw0 >> 6) & 0x3);
   int grp = ((iw0 >> 3) & 0x7);
   int regtest = ((iw0 >> 0) & 0x7);
-  bu32 *reg = get_allreg (cpu, grp, regtest);
+  bu32 val = reg_read (cpu, grp, regtest);
   const char *reg_name = get_allreg_name (grp, regtest);
   const char *dbg_name, *dbg_appd;
 
@@ -4485,13 +4474,13 @@ decode_psedodbg_assert_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     {
       dbg_name = dbgop == 0 ? "DBGA" : "DBGAL";
       dbg_appd = dbgop == 0 ? ".L" : "";
-      actual = *reg & 0xffff;
+      actual = val;
     }
   else if (dbgop == 1 || dbgop == 3)
     {
       dbg_name = dbgop == 1 ? "DBGA" : "DBGAH";
       dbg_appd = dbgop == 1 ? ".H" : "";
-      actual = *reg >> 16;
+      actual = val >> 16;
     }
   else
     illegal_instruction (cpu);

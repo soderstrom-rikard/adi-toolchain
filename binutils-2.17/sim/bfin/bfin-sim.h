@@ -74,8 +74,6 @@ struct bfin_cpu_state
 
 #define REG_H_L(h, l)	(((h) & 0xffff0000) | ((l) & 0x0000ffff))
 
-#define GREG(x,i)	DPREG ((x) | (i << 3))
-#define DPREG(x)	(BFIN_CPU_STATE.dpregs[x])
 #define DREG(x)		(BFIN_CPU_STATE.dpregs[x])
 #define PREG(x)		(BFIN_CPU_STATE.dpregs[x + 8])
 #define SPREG		PREG (6)
