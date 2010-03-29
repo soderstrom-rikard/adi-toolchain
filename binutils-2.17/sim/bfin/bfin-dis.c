@@ -29,6 +29,7 @@
 #include "opcode/bfin.h"
 #include "sim-main.h"
 #include "dv-bfin_cec.h"
+#include "dv-bfin_mmu.h"
 
 #define M_S2RND 1
 #define M_T     2
@@ -51,7 +52,7 @@ illegal_instruction (SIM_CPU *cpu)
 }
 
 static __attribute__ ((noreturn)) void
-unhandled_instruction (SIM_CPU *cpu, char *insn)
+unhandled_instruction (SIM_CPU *cpu, const char *insn)
 {
   SIM_DESC sd = CPU_STATE (cpu);
   bu16 iw0, iw1;
@@ -530,7 +531,7 @@ divs (SIM_CPU *cpu, bu32 pquo, bu16 divisor)
 
   pquo <<= 1;
   pquo |= aq;
-  pquo = pquo & 0x1FFFF | (r << 17);
+  pquo = (pquo & 0x1FFFF) | (r << 17);
   return pquo;
 }
 
@@ -557,7 +558,7 @@ divq (SIM_CPU *cpu, bu32 pquo, bu16 divisor)
 
   pquo <<= 1;
   pquo |= !aq;
-  pquo = pquo & 0x1FFFF | (r << 17);
+  pquo = (pquo & 0x1FFFF) | (r << 17);
   return pquo;
 }
 
@@ -788,12 +789,11 @@ reg_set_sp (SIM_CPU *cpu, bu32 sp)
     SET_SPREG (sp);
 }
 
-static int
+static void
 reg_check_sup (SIM_CPU *cpu, int grp, int reg)
 {
   /* XXX: EMUDAT safe to RW from user ?  */
-  int req = (grp == 7 && reg != 7);
-  if (req)
+  if (grp == 7 && reg != 7)
     cec_require_supervisor (cpu);
 }
 
@@ -3082,7 +3082,7 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	{
 	  if (res0 & 0xFFFF0000)
 	    illegal_instruction (cpu);
-	  SET_DREG (dst, (DREG (dst) & 0xFFFF0000) | res0);
+	  SET_DREG (dst, REG_H_L (DREG (dst), res0));
 	}
     }
 
@@ -3094,7 +3094,7 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	{
 	  if (res1 & 0xFFFF0000)
 	    illegal_instruction (cpu);
-	  SET_DREG (dst, (DREG (dst) & 0xFFFF) | (res1 << 16));
+	  SET_DREG (dst, REG_H_L (res1 << 16, DREG (dst)));
 	}
     }
 
@@ -3648,7 +3648,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     {
       const char *searchmodes[] = { "GT", "GE", "LT", "LE" };
       bool up_hi, up_lo;
-      bs16 a0_lo, a1_lo, src_hi, src_lo, dst_hi, dst_lo;
+      bs16 a0_lo, a1_lo, src_hi, src_lo;
 
       TRACE_INSN (cpu, "(R%i, R%i) = SEARCH R%i (%s);",
 		  dst1, dst0, src0, searchmodes[aop]);
@@ -3739,9 +3739,9 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	val = lshift (cpu, val, shft, 16, sop == 1);
 
       if ((HLs & 2) == 0)
-	STORE (DREG (dst0), DREG (dst0) & 0xFFFF0000 | val);
+	STORE (DREG (dst0), REG_H_L (DREG (dst0), val));
       else
-	STORE (DREG (dst0), DREG (dst0) & 0xFFFF | (val << 16));
+	STORE (DREG (dst0), REG_H_L (val << 16, DREG (dst0)));
     }
   else if (sop == 2 && sopcde == 0)
     {
@@ -3763,9 +3763,9 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	val = val << shft;
 
       if ((HLs & 2) == 0)
-	SET_DREG (dst0, DREG (dst0) & 0xFFFF0000 | val);
+	SET_DREG (dst0, REG_H_L (DREG (dst0), val));
       else
-	SET_DREG (dst0, DREG (dst0) & 0xFFFF | (val << 16));
+	SET_DREG (dst0, REG_H_L (val << 16, DREG (dst0)));
 
       /* XXX: ASTAT */
     }
