@@ -25,7 +25,6 @@
 #include <string.h>
 #include <inttypes.h>
 
-#include "gdb/signals.h"
 #include "opcode/bfin.h"
 #include "sim-main.h"
 #include "dv-bfin_cec.h"
