@@ -33,11 +33,6 @@ struct bfin_cec
 #define mmr_base()      offsetof(struct bfin_cec, evt_override)
 #define mmr_offset(mmr) (offsetof(struct bfin_cec, mmr) - mmr_base())
 
-#define IS_SUPV() (cec->ipend & ~(IVG_EMU_B | IVG_IRPTEN_B))
-#define IS_USER() (! IS_SUPV ())
-#define REQUIRE_SUPERVISOR() \
-  do { if (IS_USER ()) cec_exception (cpu, VEC_ILL_RES); } while (0)
-
 static void
 _cec_imask_write (struct bfin_cec *cec, bu32 value)
 {
@@ -153,6 +148,44 @@ cec_get_ivg (SIM_CPU *cpu)
   return _cec_get_ivg (CEC_STATE (cpu));
 }
 
+static bool
+_cec_is_supervisor_mode (struct bfin_cec *cec)
+{
+  return (cec->ipend & ~(IVG_EMU_B | IVG_IRPTEN_B));
+}
+bool
+cec_is_supervisor_mode (SIM_CPU *cpu)
+{
+  if (STATE_ENVIRONMENT (CPU_STATE (cpu)) == OPERATING_ENVIRONMENT)
+    return _cec_is_supervisor_mode (CEC_STATE (cpu));
+  else
+    return true;
+}
+static bool
+_cec_is_user_mode (struct bfin_cec *cec)
+{
+  return !_cec_is_supervisor_mode (cec);
+}
+bool
+cec_is_user_mode (SIM_CPU *cpu)
+{
+  if (STATE_ENVIRONMENT (CPU_STATE (cpu)) == OPERATING_ENVIRONMENT)
+    return !cec_is_supervisor_mode (cpu);
+  else
+    return false;
+}
+static void
+_cec_require_supervisor (SIM_CPU *cpu, struct bfin_cec *cec)
+{
+  if (_cec_is_user_mode (cec))
+    cec_exception (cpu, VEC_ILL_RES);
+}
+void
+cec_require_supervisor (SIM_CPU *cpu)
+{
+  _cec_require_supervisor (cpu, CEC_STATE (cpu));
+}
+
 extern void bfin_trap (SIM_CPU *);
 static void _cec_raise (SIM_CPU *, struct bfin_cec *, int);
 
@@ -241,7 +274,7 @@ bu32 cec_cli (SIM_CPU *cpu)
   struct bfin_cec *cec = CEC_STATE (cpu);
   bu32 old_mask;
 
-  REQUIRE_SUPERVISOR ();
+  _cec_require_supervisor (cpu, cec);
 
   /* XXX: what about IPEND[4] ?  */
   old_mask = cec->imask;
@@ -257,7 +290,7 @@ void cec_sti (SIM_CPU *cpu, bu32 ints)
   struct bfin_cec *cec = CEC_STATE (cpu);
   bu32 old_mask;
 
-  REQUIRE_SUPERVISOR ();
+  _cec_require_supervisor (cpu, cec);
 
   /* XXX: what about IPEND[4] ?  */
   old_mask = cec->imask;
@@ -400,7 +433,7 @@ cec_raise (SIM_CPU *cpu, int ivg)
   if (ivg > IVG15 || ivg < -1)
     sim_io_error (CPU_STATE (cpu), "%s: ivg %i out of range !", __func__, ivg);
 
-  REQUIRE_SUPERVISOR ();
+  _cec_require_supervisor (cpu, cec);
 
   _cec_raise (cpu, cec, ivg);
 }
@@ -424,7 +457,7 @@ cec_return (SIM_CPU *cpu, int ivg)
   if (ivg > IVG15 || ivg < 0)
     sim_io_error (CPU_STATE (cpu), "%s: ivg %i out of range !", __func__, ivg);
 
-  REQUIRE_SUPERVISOR ();
+  _cec_require_supervisor (cpu, cec);
 
   oldpc = PCREG;
 

@@ -119,6 +119,9 @@ extern void cec_raise (SIM_CPU *, int ivg);
 extern void cec_return (SIM_CPU *, int ivg);
 
 extern int cec_get_ivg (SIM_CPU *);
+extern bool cec_is_supervisor_mode (SIM_CPU *);
+extern bool cec_is_user_mode (SIM_CPU *);
+extern void cec_require_supervisor (SIM_CPU *);
 
 extern bu32 cec_cli (SIM_CPU *);
 extern void cec_sti (SIM_CPU *, bu32 ints);
