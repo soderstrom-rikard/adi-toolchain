@@ -42,7 +42,7 @@
 
 #define HOST_LONG_WORD_SIZE (sizeof(long)*8)
 
-#define SIGNEXTEND(v, n) (((bs32)v << (HOST_LONG_WORD_SIZE - (n))) >> (HOST_LONG_WORD_SIZE - (n)))
+#define SIGNEXTEND(v, n) (((bs32)(v) << (HOST_LONG_WORD_SIZE - (n))) >> (HOST_LONG_WORD_SIZE - (n)))
 
 static void
 illegal_instruction (SIM_CPU *cpu)
@@ -3425,9 +3425,36 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	}
       /* XXX: what ASTAT flags need updating ?  */
     }
-  else if (aop == 0 && aopcde == 23 && HL == 1)
-    unhandled_instruction (cpu, "dregs = BYTEOP3P (dregs_pair, dregs_pair) (HI,R)");
-  else if ((aop == 0 || aop == 1) && (HL == 0 || HL == 1) && aopcde == 16)
+  else if (aop == 0 && aopcde == 23)
+    {
+      bu32 s0, s0L, s0H, s1, s1L, s1H;
+      bs32 tmp0, tmp1;
+
+      TRACE_INSN (cpu, "R%i = BYTEOP3P (R%i:%i, R%i:%i) (%s%s);", dst0,
+		  src0 + 1, src0, src1 + 1, src1, HL ? "HI" : "LO",
+		  s ? ", R" : "");
+
+      s0L = DREG (src0);
+      s0H = DREG (src0 + 1);
+      s1L = DREG (src1);
+      s1H = DREG (src1 + 1);
+      if (s)
+	{
+	  s0 = algn (cpu, s0H, s0L, IREG (0) & 3);
+	  s1 = algn (cpu, s1H, s1L, IREG (1) & 3);
+	}
+      else
+	{
+	  s0 = algn (cpu, s0L, s0H, IREG (0) & 3);
+	  s1 = algn (cpu, s1L, s1H, IREG (1) & 3);
+	}
+
+      tmp0 = (bs32)(bs16)(s0 >>  0) + ((s1 >> ( 0 + (8 * !HL))) & 0xff);
+      tmp1 = (bs32)(bs16)(s0 >> 16) + ((s1 >> (16 + (8 * !HL))) & 0xff);
+      SET_DREG (dst0, (CLAMP (tmp0, 0, 255) << ( 0 + (8 * HL))) |
+		      (CLAMP (tmp1, 0, 255) << (16 + (8 * HL))));
+    }
+  else if ((aop == 0 || aop == 1) && aopcde == 16)
     {
       bu32 aw = AWREG (aop);
       bu8 ax = AXREG (aop);
@@ -3509,8 +3536,6 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 		      (DREG (src0) & 0x80000000));
       /* XXX: what ASTAT flags need updating ?  */
     }
-  else if (aop == 0 && aopcde == 23 && HL == 0)
-    unhandled_instruction (cpu, "dregs = BYTEOP3P (dregs_pair, dregs_pair) (LO,R)");
   else if ((aop == 0 || aop == 1) && (HL == 0 || HL == 1) && aopcde == 14)
     {
       bu32 aw = AWREG (aop);
