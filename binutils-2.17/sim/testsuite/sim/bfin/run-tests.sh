@@ -86,7 +86,7 @@ dojtag() {
 
 testit() {
 
-	local name=$1 x=$2 y=`echo $2 | sed 's:\.[xX]$::'` out rsh_out
+	local name=$1 x=$2 y=`echo $2 | sed 's:\.[xX]$::'` out rsh_out addr
 	shift; shift
         local fail=`grep xfail ${y}`
 	if [ "${name}" == "HOST" -a ! -f $x ] ; then
@@ -97,18 +97,23 @@ testit() {
 	(pf "${out}")
         if [ $?  -ne 0 ] ; then
 	  if [ "${name}" == "SIM" ] ; then
-	    tmp=`echo ${out} | awk '{print $3}' | sed 's/://' | awk -F ":" '{print $NF}'`
-	    if [ -n "${tmp}" ] ; then
-	      printf 'FAIL at line '
-	      bfin-elf-addr2line -e ${x} $(echo ${out} | awk '{print $3}' | sed 's/://') | awk -F ":" '{print $NF}'
-	    fi
+	    tmp=`echo ${out} | awk '{print $3}' | sed 's/://'`
+	    tmp1=`expr index "${out}" "program stopped with signal 4"`
+	    if [ ${tmp1} -eq 1 ] ; then
+	       printf 'illegal instruction\n'
+	    else if [ -n "${tmp}" ] ; then
+	        printf 'FAIL at line '
+                addr=`echo $out | sed 's:^[A-Za-z ]*::' | sed 's:^0x[0-9][0-9] ::' | sed 's:^[A-Za-z ]*::' | awk '{print $1}'`
+	        bfin-elf-addr2line -e ${x} ${addr} | awk -F "/" '{print $NF}'
+	      fi
+            fi
 	  elif [ "${name}" == "HOST" ] ; then
             rsh_out=`rsh -l root $boardip '/bin/dmesg -c | /bin/grep -e DBGA -e "FAULT "'`
 	    tmp=`echo ${rsh_out} |  sed 's:\].*$::' | awk '{print $NF}' | awk -F ":" '{print $NF}'`
 	    if [ -n "${tmp}" ] ; then
 	       echo "${rsh_out}"
                printf 'FAIL at line '
-	       bfin-elf-addr2line -e ${x} $(echo ${rsh_out} |  sed 's:\].*$::' | awk '{print $NF}') | awk -F ":" '{print $NF}'
+	       bfin-elf-addr2line -e ${x} $(echo ${rsh_out} |  sed 's:\].*$::' | awk '{print $NF}') | awk -F "/" '{print $NF}'
 	    fi
 	  fi
 	  ret=$(( ret + 1 ))
