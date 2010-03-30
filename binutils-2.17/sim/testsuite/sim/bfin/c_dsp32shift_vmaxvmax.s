@@ -1,7 +1,6 @@
 //Original:/testcases/core/c_dsp32shift_vmaxvmax/c_dsp32shift_vmaxvmax.dsp
 // Spec Reference: dsp32shift vmax / vmax
 # mach: bfin
-# xfail: "need to implement VIT_MAX in sim" bfin-*
 
 .include "testutils.inc"
 	start

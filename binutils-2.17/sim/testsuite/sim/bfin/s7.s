@@ -1,8 +1,6 @@
 //  Test  r4 = VMAX/VMAX (r5,r1)  A0>>2;
 # mach: bfin
-# xfail: "need to implement dregs = VIT_MAX (dregs, dregs) (ASR) in sim" bfin-*
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

@@ -1,9 +1,7 @@
 //  Test  rl4 = VMAX r5  A0<<1;
 //  Test  rl4 = VMAX r5  A0>>1;
 # mach: bfin
-# xfail: "need to implement dregs_lo = VIT_MAX (dregs) (ASL) in sim" bfin-*
 
-#include "test.h"
 .include "testutils.inc"
 	start
 
