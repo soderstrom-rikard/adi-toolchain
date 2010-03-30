@@ -3736,7 +3736,34 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 		(((((s0 >> 24) & 0xff) + ((s1 >> 24) & 0xff) + !aop) >> 1) << 24));
     }
   else if (aop == 0 && aopcde == 21)
-    unhandled_instruction (cpu, "(dregs, dregs) = BYTEOP16P (dregs_pair, dregs_pair) aligndir");
+    {
+      bu32 s0, s0L, s0H, s1, s1L, s1H;
+
+      TRACE_INSN (cpu, "(R%i, R%i) = BYTEOP16P (R%i:%i, R%i:%i)%s;", dst1, dst0,
+		  src0 + 1, src0, src1 + 1, src1, s ? " (R)" : "");
+
+      s0L = DREG (src0);
+      s0H = DREG (src0 + 1);
+      s1L = DREG (src1);
+      s1H = DREG (src1 + 1);
+      if (s)
+	{
+	  s0 = algn (cpu, s0H, s0L, IREG (0) & 3);
+	  s1 = algn (cpu, s1H, s1L, IREG (1) & 3);
+	}
+      else
+	{
+	  s0 = algn (cpu, s0L, s0H, IREG (0) & 3);
+	  s1 = algn (cpu, s1L, s1H, IREG (1) & 3);
+	}
+
+      SET_DREG (dst0,
+		(((s0 >>  0) & 0xff) + ((s1 >>  0) & 0xff) <<  0) |
+		(((s0 >>  8) & 0xff) + ((s1 >>  8) & 0xff) << 16));
+      SET_DREG (dst1,
+		(((s0 >> 16) & 0xff) + ((s1 >> 16) & 0xff) <<  0) |
+		(((s0 >> 24) & 0xff) + ((s1 >> 24) & 0xff) << 16));
+    }
   else if (aop == 1 && aopcde == 21)
     unhandled_instruction (cpu, "(dregs, dregs) = BYTEOP16M (dregs_pair, dregs_pair) aligndir");
   else if (aop == 1 && aopcde == 7)
