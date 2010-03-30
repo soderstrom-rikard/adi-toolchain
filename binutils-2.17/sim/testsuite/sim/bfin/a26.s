@@ -1,6 +1,5 @@
 //  Test ALU  SEARCH instruction
 # mach: bfin
-# xfail: "need to implement (dregs, dregs) = SEARCH dregs (searchmod) in sim" bfin-*
 
 .include "testutils.inc"
 	start
@@ -71,4 +70,3 @@ _fail:
 	.data
 foo:
 	.space (0x100)
-
