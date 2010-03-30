@@ -139,7 +139,7 @@ const pseudo_typeS md_pseudo_table[] = {
 };
 
 /* Characters that are used to denote comments and line separators. */
-const char comment_chars[] = "";
+const char comment_chars[] = "#";
 const char line_comment_chars[] = "#";
 const char line_separator_chars[] = ";";
 
