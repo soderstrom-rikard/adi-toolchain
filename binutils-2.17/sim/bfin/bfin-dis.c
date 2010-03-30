@@ -4324,14 +4324,70 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 
       SET_AREG (0, acc);
     }
-  else if (sop == 0 && sopcde == 9)
-    unhandled_instruction (cpu, "dregs_lo = VIT_MAX (dregs) (ASL)");
-  else if (sop == 1 && sopcde == 9)
-    unhandled_instruction (cpu, "dregs_lo = VIT_MAX (dregs) (ASR)");
-  else if (sop == 2 && sopcde == 9)
-    unhandled_instruction (cpu, "dregs = VIT_MAX (dregs, dregs) (ASL)");
-  else if (sop == 3 && sopcde == 9)
-    unhandled_instruction (cpu, "dregs = VIT_MAX (dregs, dregs) (ASR)");
+  else if ((sop == 0 || sop == 1) && sopcde == 9)
+    {
+      bs40 acc0 = get_extended_acc (cpu, 0);
+      bs16 sL, sH, out;
+
+      TRACE_INSN (cpu, "R%i.L = VIT_MAX (R%i) (AS%c);",
+		  dst0, src1, sop & 1 ? 'R' : 'L');
+
+      sL = DREG (src1);
+      sH = DREG (src1) >> 16;
+
+      if (sop & 1)
+	acc0 >>= 1;
+      else
+	acc0 <<= 1;
+
+      if (((sH - sL) & 0x8000) == 0)
+	{
+	  out = sH;
+	  acc0 |= (sop & 1) ? 0x80000000 : 1;
+	}
+      else
+	out = sL;
+
+      SET_AREG (0, acc0);
+      SET_DREG (dst0, REG_H_L (DREG (dst0), out));
+    }
+  else if ((sop == 2 || sop == 3) && sopcde == 9)
+    {
+      bs40 acc0 = get_extended_acc (cpu, 0);
+      bs16 s0L, s0H, s1L, s1H, out0, out1;
+
+      TRACE_INSN (cpu, "R%i = VIT_MAX (R%i, R%i) (AS%c);",
+		  dst0, src1, src0, sop & 1 ? 'R' : 'L');
+
+      s0L = DREG (src0);
+      s0H = DREG (src0) >> 16;
+      s1L = DREG (src1);
+      s1H = DREG (src1) >> 16;
+
+      if (sop & 1)
+	acc0 >>= 2;
+      else
+	acc0 <<= 2;
+
+      if (((s0H - s0L) & 0x8000) == 0)
+	{
+	  out0 = s0H;
+	  acc0 |= (sop & 1) ? 0x40000000 : 2;
+	}
+      else
+	out0 = s0L;
+
+      if (((s1H - s1L) & 0x8000) == 0)
+	{
+	  out1 = s1H;
+	  acc0 |= (sop & 1) ? 0x80000000 : 1;
+	}
+      else
+	out1 = s1L;
+
+      SET_AREG (0, acc0);
+      SET_DREG (dst0, (out1 << 16) | out0);
+    }
   else if (sop == 0 && sopcde == 10)
     {
       bu32 v = DREG (src0);
