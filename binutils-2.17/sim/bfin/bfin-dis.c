@@ -294,6 +294,15 @@ lshift (SIM_CPU *cpu, bu64 val, int cnt, int size, bool saturate)
 }
 
 static bu32
+algn (SIM_CPU *cpu, bu32 l, bu32 h, bu32 aln)
+{
+  if (aln == 0)
+    return l;
+  else
+    return (l >> (8 * aln)) | (h << (32 - 8 * aln));
+}
+
+static bu32
 add32 (SIM_CPU *cpu, bu32 a, bu32 b, int carry, int sat)
 {
   int flgs = (a >> 31) & 1;
@@ -3624,10 +3633,35 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     unhandled_instruction (cpu, "SAA (dregs_pair, dregs_pair) aligndir");
   else if (aop == 3 && aopcde == 18)
     unhandled_instruction (cpu, "DISALGNEXCPT");
-  else if (aop == 0 && aopcde == 20)
-    unhandled_instruction (cpu, "dregs = BYTEOP1P (dregs_pair, dregs_pair) aligndir");
-  else if (aop == 1 && aopcde == 20)
-    unhandled_instruction (cpu, "dregs = BYTEOP1P (dregs_pair, dregs_pair) (T, R)");
+  else if ((aop == 0 || aop == 1) && aopcde == 20)
+    {
+      bu32 s0, s0L, s0H, s1, s1L, s1H;
+      const char * const opts[] = { "", " (R)", " (T)", " (T, R)" };
+
+      TRACE_INSN (cpu, "R%i = BYTEOP1P (R%i:%i, R%i:%i)%s;", dst0,
+		  src0 + 1, src0, src1 + 1, src1, opts[s + (aop << 1)]);
+
+      s0L = DREG (src0);
+      s0H = DREG (src0 + 1);
+      s1L = DREG (src1);
+      s1H = DREG (src1 + 1);
+      if (s)
+	{
+	  s0 = algn (cpu, s0H, s0L, IREG (0) & 3);
+	  s1 = algn (cpu, s1H, s1L, IREG (1) & 3);
+	}
+      else
+	{
+	  s0 = algn (cpu, s0L, s0H, IREG (0) & 3);
+	  s1 = algn (cpu, s1L, s1H, IREG (1) & 3);
+	}
+
+      SET_DREG (dst0,
+		(((((s0 >>  0) & 0xff) + ((s1 >>  0) & 0xff) + !aop) >> 1) <<  0) |
+		(((((s0 >>  8) & 0xff) + ((s1 >>  8) & 0xff) + !aop) >> 1) <<  8) |
+		(((((s0 >> 16) & 0xff) + ((s1 >> 16) & 0xff) + !aop) >> 1) << 16) |
+		(((((s0 >> 24) & 0xff) + ((s1 >> 24) & 0xff) + !aop) >> 1) << 24));
+    }
   else if (aop == 0 && aopcde == 21)
     unhandled_instruction (cpu, "(dregs, dregs) = BYTEOP16P (dregs_pair, dregs_pair) aligndir");
   else if (aop == 1 && aopcde == 21)
