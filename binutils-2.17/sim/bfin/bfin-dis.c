@@ -3946,12 +3946,12 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 
       if (up_hi)
 	{
-	  SET_AWREG (1, REG_H_L (AWREG (1), src_hi));
+	  SET_AREG (1, src_hi);
 	  SET_DREG (dst1, PREG (0));
 	}
       if (up_lo)
 	{
-	  SET_AWREG (0, REG_H_L (AWREG (0), src_lo));
+	  SET_AREG (0, src_lo);
 	  SET_DREG (dst0, PREG (0));
 	}
     }
