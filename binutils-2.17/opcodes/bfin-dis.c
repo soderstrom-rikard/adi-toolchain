@@ -51,6 +51,9 @@ typedef long TIword;
 
 typedef unsigned int bu32;
 
+static char comment = 0;
+static char parallel = 0;
+
 typedef enum
 {
   c_0, c_1, c_4, c_2, c_uimm2, c_uimm3, c_imm3, c_pcrel4,
@@ -60,20 +63,20 @@ typedef enum
   c_uimm16s4d, c_uimm16, c_pcrel24, c_uimm32, c_imm32, c_huimm32, c_huimm32e,
 } const_forms_t;
 
-static struct
+static const struct
 {
   const char *name;
-  int nbits;
-  char reloc;
-  char issigned;
-  char pcrel;
-  char scale;
-  char offset;
-  char negative;
-  char positive;
-  char decimal;
-  char leading;
-  char exact;
+  const int nbits;
+  const char reloc;
+  const char issigned;
+  const char pcrel;
+  const char scale;
+  const char offset;
+  const char negative;
+  const char positive;
+  const char decimal;
+  const char leading;
+  const char exact;
 } constant_formats[] =
 {
   { "0",          0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -121,11 +124,8 @@ static struct
   { "huimm32e",  32, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 };
 
-static char comment = 0;
-static char parallel = 0;
-
 static const char *
-fmtconst (const_forms_t cf, TIword x, bfd_vma pc, disassemble_info * outf)
+fmtconst (const_forms_t cf, TIword x, bfd_vma pc, disassemble_info *outf)
 {
   static char buf[60];
 
