@@ -4200,13 +4200,13 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       bu32 fg = DREG (src0);
       bu32 bg = DREG (src1);
       bu32 len = fg & 0x1f;
-      bu32 mask = (1 << len) - 1;
+      bu32 mask = (1 << MIN (16, len)) - 1;
       bu32 fgnd = (fg >> 16) & mask;
       int shft = ((fg >> 8) & 0x1f);
+
       TRACE_INSN (cpu, "R%i = DEPOSIT (R%i, R%i)%s;", dst0, src1, src0,
 		  sop == 3 ? " (X)" : "");
-      if (len > 16)
-	illegal_instruction (cpu);
+
       if (sop == 3)
 	{
 	  /* Sign extend the fg bit field.  */
@@ -4216,6 +4216,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       fgnd <<= shft;
       mask <<= shft;
       bg &= ~mask;
+
       SET_DREG (dst0, bg | fgnd);
       setflags_logical (cpu, DREG (dst0));
     }
