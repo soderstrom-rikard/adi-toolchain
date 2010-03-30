@@ -4386,7 +4386,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	out1 = s1L;
 
       SET_AREG (0, acc0);
-      SET_DREG (dst0, (out1 << 16) | out0);
+      SET_DREG (dst0, REG_H_L (out1 << 16, out0));
     }
   else if (sop == 0 && sopcde == 10)
     {
