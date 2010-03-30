@@ -4432,24 +4432,19 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     }
   else if (sop == 0 && sopcde == 1)
     {
-      int i, count = uimm5 (newimmag);
-      bu32 val_l = 0, val_h = 0;
+      int count = uimm5 (newimmag);
+      bu16 val0 = DREG (src1) & 0xFFFF;
+      bu16 val1 = DREG (src1) >> 16;
+      bu32 astat;
 
       TRACE_INSN (cpu, "R%i = R%i >>> %i (V);", dst0, src1, count);
 
-      for (i = 0; i < count; i++)
-	{
-	  val_l |= (val_l | (DREG (src1) & 0x8000    )) >> 1;
-	  val_h |= (val_h | (DREG (src1) & 0x80000000)) >> 1;
-	}
-      val_l |= DREG (src1) & 0x8000;
-      val_h |= DREG (src1) & 0x80000000;
+      val0 = ashiftrt (cpu, val0, count, 16);
+      astat = ASTAT;
+      val1 = ashiftrt (cpu, val1, count, 16);
+      SET_ASTAT (ASTAT | astat);
 
-      SET_DREG (dst0, ((DREG (src1) & 0xFFFF) >> count) |
-		      ((DREG (src1) >> count) & 0xFFFF0000) |
-		      val_l | val_h);
-
-      /* XXX: ASTAT? */
+      STORE (DREG (dst0), REG_H_L (val1 << 16, val0));
     }
   else if (sop == 1 && sopcde == 2)
     {
