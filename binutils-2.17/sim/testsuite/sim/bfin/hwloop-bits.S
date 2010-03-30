@@ -33,7 +33,6 @@
 
 	start
 
-emuexcpt;
 	imm32 P0, EVT3;
 	loadsym R0, exception;
 	[P0] = R0;
