@@ -2,7 +2,6 @@
 //  Test  rl3 = lshift (rh0 by 7);
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

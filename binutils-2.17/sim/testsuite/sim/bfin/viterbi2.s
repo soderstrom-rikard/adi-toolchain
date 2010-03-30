@@ -17,7 +17,6 @@
 // by adding and subtracting the values of the symbol according to the
 // transition of a branch.
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

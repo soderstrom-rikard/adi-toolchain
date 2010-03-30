@@ -1,7 +1,6 @@
 # mach: bfin
 # xfail: "need to implement An = ROT An BY dregs_lo in sim" bfin-*
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

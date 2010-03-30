@@ -2,7 +2,6 @@
 // then restore registers with pop instruction.
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

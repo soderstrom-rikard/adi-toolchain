@@ -22,7 +22,6 @@
 // in order to accept an input, one simply needs to rotate the
 // input sequence via CC prior to applying the XOR reduction.
 
-#include "test.h"
 .include "testutils.inc"
 	start
 
