@@ -27,7 +27,7 @@ SIM_RUN_OBJS = nrun.o
 
 SIM_OBJS = \
 	$(SIM_NEW_COMMON_OBJS) \
-	bfin-dis.o \
+	bfin-sim.o \
 	devices.o \
 	dv-sockser.o \
 	interp.o \
@@ -48,7 +48,7 @@ INCLUDE = bfin-sim.h
 ## COMMON_POST_CONFIG_FRAG
 
 interp.o: interp.c targ-vals.h devices.h $(INCLUDE)
-bfin-dis.o: bfin-dis.c $(INCLUDE)
+bfin-sim.o: bfin-sim.c $(INCLUDE)
 machs.o: machs.c $(INCLUDE)
 dv-bfin_cec.o: dv-bfin_cec.c devices.h $(INCLUDE)
 dv-bfin_ctimer.o: dv-bfin_ctimer.c devices.h $(INCLUDE)
