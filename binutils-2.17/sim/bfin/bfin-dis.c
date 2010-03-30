@@ -4034,7 +4034,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 
       /* XXX: ASTAT */
     }
-  else if (sop == 2 && sopcde == 3 && HLs == 1)
+  else if (sop == 2 && sopcde == 3 && (HLs == 1 || HLs == 0))
     {
       /* HLs == 1 : A1 = ROT A1 BY dregs_lo
        * HLs == 0 : A0 = ROT A0 BY dregs_lo
