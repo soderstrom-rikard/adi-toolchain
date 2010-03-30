@@ -65,8 +65,10 @@ struct sim_state {
 
 #undef MAX
 #undef MIN
+#undef CLAMP
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define CLAMP(a, b, c) MIN (MAX (a, b), c)
 
 #define MAYBE_TRACE(type, cpu, fmt, ...) \
   do { \
