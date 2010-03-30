@@ -1,4 +1,4 @@
-# mach : bfin
+# mach: bfin
 
 .include "testutils.inc"
 	start
