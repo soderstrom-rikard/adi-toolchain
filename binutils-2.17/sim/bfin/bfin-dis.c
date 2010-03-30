@@ -4374,11 +4374,11 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     unhandled_instruction (cpu, "A0 = ROT A0 BY imm6");
   else if (sop == 1 && sopcde == 1 && bit8 == 0)
     {
-      /* dregs = dregs << uimm5 (V,S) */
       int count = imm5 (immag);
       bu16 val0 = DREG (src1) >> 16;
       bu16 val1 = DREG (src1) & 0xFFFF;
 
+      TRACE_INSN (cpu, "R%i = R%i << %i (V,S);", dst0, src1, count);
       val0 = lshift (cpu, val0, count, 16, 1);
       val1 = lshift (cpu, val1, count, 16, 1);
 
@@ -4391,7 +4391,6 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     }
   else if (sop == 2 && sopcde == 1 && bit8 == 1)
     {
-      /* dregs = dregs >> uimm5 (V) */
       int count = imm5 (newimmag);
       bu16 val0 = DREG (src1) & 0xFFFF;
       bu16 val1 = DREG (src1) >> 16;
@@ -4404,7 +4403,6 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     }
   else if (sop == 2 && sopcde == 1 && bit8 == 0)
     {
-      /* dregs = dregs << uimm5 (V) */
       int count = imm5 (immag);
       bu16 val0 = DREG (src1) & 0xFFFF;
       bu16 val1 = DREG (src1) >> 16;
