@@ -580,12 +580,10 @@ ones (bu32 val)
 typedef enum
 {
   c_0, c_1, c_4, c_2, c_uimm2, c_uimm3, c_imm3, c_pcrel4,
-  c_imm4, c_uimm4s4, c_uimm4, c_uimm4s2, c_negimm5s4, c_imm5, c_uimm5, c_imm6,
-  c_imm7, c_imm8, c_uimm8, c_pcrel8, c_uimm8s4, c_pcrel8s4, c_lppcrel10,
-    c_pcrel10,
-  c_pcrel12, c_imm16s4, c_luimm16, c_imm16, c_huimm16, c_rimm16, c_imm16s2,
-    c_uimm16s4,
-  c_uimm16, c_pcrel24,
+  c_imm4, c_uimm4s4, c_uimm4s4d, c_uimm4, c_uimm4s2, c_negimm5s4, c_imm5, c_imm5d, c_uimm5, c_imm6,
+  c_imm7, c_imm7d, c_imm8, c_uimm8, c_pcrel8, c_uimm8s4, c_pcrel8s4, c_lppcrel10, c_pcrel10,
+  c_pcrel12, c_imm16s4, c_luimm16, c_imm16, c_imm16d, c_huimm16, c_rimm16, c_imm16s2, c_uimm16s4,
+  c_uimm16s4d, c_uimm16, c_pcrel24, c_uimm32, c_imm32, c_huimm32, c_huimm32e,
 } const_forms_t;
 
 static const struct
@@ -599,46 +597,120 @@ static const struct
   const char offset;
   const char negative;
   const char positive;
+  const char decimal;
+  const char leading;
+  const char exact;
 } constant_formats[] =
 {
-  { "0", 0, 0, 1, 0, 0, 0, 0, 0},
-  { "1", 0, 0, 1, 0, 0, 0, 0, 0},
-  { "4", 0, 0, 1, 0, 0, 0, 0, 0},
-  { "2", 0, 0, 1, 0, 0, 0, 0, 0},
-  { "uimm2", 2, 0, 0, 0, 0, 0, 0, 0},
-  { "uimm3", 3, 0, 0, 0, 0, 0, 0, 0},
-  { "imm3", 3, 0, 1, 0, 0, 0, 0, 0},
-  { "pcrel4", 4, 1, 0, 1, 1, 0, 0, 0},
-  { "imm4", 4, 0, 1, 0, 0, 0, 0, 0},
-  { "uimm4s4", 4, 0, 0, 0, 2, 0, 0, 1},
-  { "uimm4", 4, 0, 0, 0, 0, 0, 0, 0},
-  { "uimm4s2", 4, 0, 0, 0, 1, 0, 0, 1},
-  { "negimm5s4", 5, 0, 1, 0, 2, 0, 1, 0},
-  { "imm5", 5, 0, 1, 0, 0, 0, 0, 0},
-  { "uimm5", 5, 0, 0, 0, 0, 0, 0, 0},
-  { "imm6", 6, 0, 1, 0, 0, 0, 0, 0},
-  { "imm7", 7, 0, 1, 0, 0, 0, 0, 0},
-  { "imm8", 8, 0, 1, 0, 0, 0, 0, 0},
-  { "uimm8", 8, 0, 0, 0, 0, 0, 0, 0},
-  { "pcrel8", 8, 1, 0, 1, 1, 0, 0, 0},
-  { "uimm8s4", 8, 0, 0, 0, 2, 0, 0, 0},
-  { "pcrel8s4", 8, 1, 1, 1, 2, 0, 0, 0},
-  { "lppcrel10", 10, 1, 0, 1, 1, 0, 0, 0},
-  { "pcrel10", 10, 1, 1, 1, 1, 0, 0, 0},
-  { "pcrel12", 12, 1, 1, 1, 1, 0, 0, 0},
-  { "imm16s4", 16, 0, 1, 0, 2, 0, 0, 0},
-  { "luimm16", 16, 1, 0, 0, 0, 0, 0, 0},
-  { "imm16", 16, 0, 1, 0, 0, 0, 0, 0},
-  { "huimm16", 16, 1, 0, 0, 0, 0, 0, 0},
-  { "rimm16", 16, 1, 1, 0, 0, 0, 0, 0},
-  { "imm16s2", 16, 0, 1, 0, 1, 0, 0, 0},
-  { "uimm16s4", 16, 0, 0, 0, 2, 0, 0, 0},
-  { "uimm16", 16, 0, 0, 0, 0, 0, 0, 0},
-  { "pcrel24", 24, 1, 1, 1, 1, 0, 0, 0},
+  { "0",          0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "1",          0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "4",          0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "2",          0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "uimm2",      2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "uimm3",      3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "imm3",       3, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "pcrel4",     4, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0},
+  { "imm4",       4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "uimm4s4",    4, 0, 0, 0, 2, 0, 0, 1, 0, 0, 0},
+  { "uimm4s4d",   4, 0, 0, 0, 2, 0, 0, 1, 1, 0, 0},
+  { "uimm4",      4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "uimm4s2",    4, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0},
+  { "negimm5s4",  5, 0, 1, 0, 2, 0, 1, 0, 0, 0, 0},
+  { "imm5",       5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "imm5d",      5, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0},
+  { "uimm5",      5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "imm6",       6, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "imm7",       7, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "imm7d",      7, 0, 1, 0, 0, 0, 0, 0, 1, 3, 0},
+  { "imm8",       8, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "uimm8",      8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "pcrel8",     8, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0},
+  { "uimm8s4",    8, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0},
+  { "pcrel8s4",   8, 1, 1, 1, 2, 0, 0, 0, 0, 0, 0},
+  { "lppcrel10", 10, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0},
+  { "pcrel10",   10, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
+  { "pcrel12",   12, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
+  { "imm16s4",   16, 0, 1, 0, 2, 0, 0, 0, 0, 0, 0},
+  { "luimm16",   16, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "imm16",     16, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "imm16d",    16, 0, 1, 0, 0, 0, 0, 0, 1, 3, 0},
+  { "huimm16",   16, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "rimm16",    16, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "imm16s2",   16, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0},
+  { "uimm16s4",  16, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0},
+  { "uimm16s4d", 16, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0},
+  { "uimm16",    16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "pcrel24",   24, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
+  { "uimm32",    32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "imm32",     32, 0, 1, 0, 0, 0, 0, 0, 1, 3, 0},
+  { "huimm32",   32, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  { "huimm32e",  32, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 };
 
+static const char *
+fmtconst_str (const_forms_t cf, bs32 x, bu32 pc)
+{
+  static char buf[60];
+
+  if (constant_formats[cf].reloc)
+    {
+      bfd_vma ea = (((constant_formats[cf].pcrel ? SIGNEXTEND (x, constant_formats[cf].nbits)
+		      : x) + constant_formats[cf].offset) << constant_formats[cf].scale);
+      if (constant_formats[cf].pcrel)
+	ea += pc;
+     /*if (outf->symbol_at_address_func (ea, outf) || !constant_formats[cf].exact)
+       {
+	  outf->print_address_func (ea, outf);
+	  return "";
+       }
+     else*/
+       {
+	  sprintf (buf, "%x", x);
+	  return buf;
+       }
+    }
+
+  /* Negative constants have an implied sign bit.  */
+  if (constant_formats[cf].negative)
+    {
+      int nb = constant_formats[cf].nbits + 1;
+
+      x = x | (1 << constant_formats[cf].nbits);
+      x = SIGNEXTEND (x, nb);
+    }
+  else
+    x = constant_formats[cf].issigned ? SIGNEXTEND (x, constant_formats[cf].nbits) : x;
+
+  if (constant_formats[cf].offset)
+    x += constant_formats[cf].offset;
+
+  if (constant_formats[cf].scale)
+    x <<= constant_formats[cf].scale;
+
+  if (constant_formats[cf].decimal)
+    {
+      if (constant_formats[cf].leading)
+	{
+	  char ps[10];
+	  sprintf (ps, "%%%ii", constant_formats[cf].leading);
+	  sprintf (buf, ps, x);
+	}
+      else
+	sprintf (buf, "%i", x);
+    }
+  else
+    {
+      if (constant_formats[cf].issigned && x < 0)
+	sprintf (buf, "-0x%x", abs (x));
+      else
+	sprintf (buf, "0x%x", x);
+    }
+
+  return buf;
+}
+
 static bu32
-fmtconst (const_forms_t cf, bu32 x, bu32 pc)
+fmtconst_val (const_forms_t cf, bu32 x, bu32 pc)
 {
   if (0 && constant_formats[cf].reloc)
     {
@@ -668,36 +740,59 @@ fmtconst (const_forms_t cf, bu32 x, bu32 pc)
   return x;
 }
 
-#define uimm16s4(x) fmtconst(c_uimm16s4, x, 0)
-#define pcrel4(x) fmtconst(c_pcrel4, x, pc)
-#define pcrel8(x) fmtconst(c_pcrel8, x, pc)
-#define pcrel8s4(x) fmtconst(c_pcrel8s4, x, pc)
-#define pcrel10(x) fmtconst(c_pcrel10, x, pc)
-#define pcrel12(x) fmtconst(c_pcrel12, x, pc)
-#define negimm5s4(x) fmtconst(c_negimm5s4, x, 0)
-#define rimm16(x) fmtconst(c_rimm16, x, 0)
-#define huimm16(x) fmtconst(c_huimm16, x, 0)
-#define imm16(x) fmtconst(c_imm16, x, 0)
-#define uimm2(x) fmtconst(c_uimm2, x, 0)
-#define uimm3(x) fmtconst(c_uimm3, x, 0)
-#define luimm16(x) fmtconst(c_luimm16, x, 0)
-#define uimm4(x) fmtconst(c_uimm4, x, 0)
-#define uimm5(x) fmtconst(c_uimm5, x, 0)
-#define imm16s2(x) fmtconst(c_imm16s2, x, 0)
-#define uimm8(x) fmtconst(c_uimm8, x, 0)
-#define imm16s4(x) fmtconst(c_imm16s4, x, 0)
-#define uimm4s2(x) fmtconst(c_uimm4s2, x, 0)
-#define uimm4s4(x) fmtconst(c_uimm4s4, x, 0)
-#define lppcrel10(x) fmtconst(c_lppcrel10, x, pc)
-#define imm3(x) fmtconst(c_imm3, x, 0)
-#define imm4(x) fmtconst(c_imm4, x, 0)
-#define uimm8s4(x) fmtconst(c_uimm8s4, x, 0)
-#define imm5(x) fmtconst(c_imm5, x, 0)
-#define imm6(x) fmtconst(c_imm6, x, 0)
-#define imm7(x) fmtconst(c_imm7, x, 0)
-#define imm8(x) fmtconst(c_imm8, x, 0)
-#define pcrel24(x) fmtconst(c_pcrel24, x, pc)
-#define uimm16(x) fmtconst(c_uimm16, x, 0)
+#define uimm16s4(x)	fmtconst_val (c_uimm16s4, x, 0)
+#define uimm16s4_str(x)	fmtconst_str (c_uimm16s4, x, 0)
+#define uimm16s4d(x)	fmtconst_val (c_uimm16s4d, x, 0)
+#define pcrel4(x)	fmtconst_val (c_pcrel4, x, pc)
+#define pcrel8(x)	fmtconst_val (c_pcrel8, x, pc)
+#define pcrel8s4(x)	fmtconst_val (c_pcrel8s4, x, pc)
+#define pcrel10(x)	fmtconst_val (c_pcrel10, x, pc)
+#define pcrel12(x)	fmtconst_val (c_pcrel12, x, pc)
+#define negimm5s4(x)	fmtconst_val (c_negimm5s4, x, 0)
+#define negimm5s4_str(x)	fmtconst_str (c_negimm5s4, x, 0)
+#define rimm16(x)	fmtconst_val (c_rimm16, x, 0)
+#define huimm16(x)	fmtconst_val (c_huimm16, x, 0)
+#define imm16(x)	fmtconst_val (c_imm16, x, 0)
+#define imm16_str(x)	fmtconst_str (c_imm16, x, 0)
+#define imm16d(x)	fmtconst_val (c_imm16d, x, 0)
+#define uimm2(x)	fmtconst_val (c_uimm2, x, 0)
+#define uimm3(x)	fmtconst_val (c_uimm3, x, 0)
+#define uimm3_str(x)	fmtconst_str (c_uimm3, x, 0)
+#define luimm16(x)	fmtconst_val (c_luimm16, x, 0)
+#define luimm16_str(x)	fmtconst_str (c_luimm16, x, 0)
+#define uimm4(x)	fmtconst_val (c_uimm4, x, 0)
+#define uimm4_str(x)	fmtconst_str (c_uimm4, x, 0)
+#define uimm5(x)	fmtconst_val (c_uimm5, x, 0)
+#define uimm5_str(x)	fmtconst_str (c_uimm5, x, 0)
+#define imm16s2(x)	fmtconst_val (c_imm16s2, x, 0)
+#define imm16s2_str(x)	fmtconst_str (c_imm16s2, x, 0)
+#define uimm8(x)	fmtconst_val (c_uimm8, x, 0)
+#define imm16s4(x)	fmtconst_val (c_imm16s4, x, 0)
+#define imm16s4_str(x)	fmtconst_str (c_imm16s4, x, 0)
+#define uimm4s2(x)	fmtconst_val (c_uimm4s2, x, 0)
+#define uimm4s2_str(x)	fmtconst_str (c_uimm4s2, x, 0)
+#define uimm4s4(x)	fmtconst_val (c_uimm4s4, x, 0)
+#define uimm4s4_str(x)	fmtconst_str (c_uimm4s4, x, 0)
+#define uimm4s4d(x)	fmtconst_val (c_uimm4s4d, x, 0)
+#define lppcrel10(x)	fmtconst_val (c_lppcrel10, x, pc)
+#define imm3(x)		fmtconst_val (c_imm3, x, 0)
+#define imm3_str(x)	fmtconst_str (c_imm3, x, 0)
+#define imm4(x)		fmtconst_val (c_imm4, x, 0)
+#define uimm8s4(x)	fmtconst_val (c_uimm8s4, x, 0)
+#define imm5(x)		fmtconst_val (c_imm5, x, 0)
+#define imm5d(x)	fmtconst_val (c_imm5d, x, 0)
+#define imm6(x)		fmtconst_val (c_imm6, x, 0)
+#define imm7(x)		fmtconst_val (c_imm7, x, 0)
+#define imm7_str(x)	fmtconst_str (c_imm7, x, 0)
+#define imm7d(x)	fmtconst_val (c_imm7d, x, 0)
+#define imm8(x)		fmtconst_val (c_imm8, x, 0)
+#define pcrel24(x)	fmtconst_val (c_pcrel24, x, pc)
+#define pcrel24_str(x)	fmtconst_str (c_pcrel24, x, pc)
+#define uimm16(x)	fmtconst_val (c_uimm16, x, 0)
+#define uimm32(x)	fmtconst_val (c_uimm32, x, 0)
+#define imm32(x)	fmtconst_val (c_imm32, x, 0)
+#define huimm32(x)	fmtconst_val (c_huimm32, x, 0)
+#define huimm32e(x)	fmtconst_val (c_huimm32e, x, 0)
 
 /* Table C-4. Core Register Encoding Map */
 const char * const greg_names[] =
@@ -1295,7 +1390,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
   else if (prgfunc == 9)
     {
       int raise = uimm4 (poprnd);
-      TRACE_INSN (cpu, "RAISE %i;", raise);
+      TRACE_INSN (cpu, "RAISE %s;", uimm4_str (raise));
       TRACE_BRANCH (cpu, "RAISE may change PC");
       INC_PCREG (2);
       cec_raise (cpu, raise);
@@ -1303,7 +1398,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
   else if (prgfunc == 10)
     {
       int excpt = uimm4 (poprnd);
-      TRACE_INSN (cpu, "EXCPT %i;", excpt);
+      TRACE_INSN (cpu, "EXCPT %s;", uimm4_str (excpt));
       TRACE_BRANCH (cpu, "EXCPT may change PC");
       /* XXX: see comments in cec_exception() */
       INC_PCREG (2);
@@ -1616,7 +1711,8 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
 	}
 
       if (I)
-	TRACE_INSN (cpu, "CC = %c%i %s %#x%s;", s, x, op, dstop, sign);
+	TRACE_INSN (cpu, "CC = %c%i %s %s%s;", s, x, op,
+		    issigned ? imm3_str (y) : uimm3_str (y), sign);
       else
 	TRACE_INSN (cpu, "CC = %c%i %s %c%i%s;", s, x, op, d, y, sign);
 
@@ -1982,51 +2078,52 @@ decode_LOGI2op_0 (SIM_CPU *cpu, bu16 iw0)
   int opc = ((iw0 >> 8) & 0x7);
   int dst = ((iw0 >> 0) & 0x7);
   int uimm = uimm5 (src);
+  const char *uimm_str = uimm5_str (uimm);
 
   TRACE_EXTRACT (cpu, "%s: opc:%i src:%i dst:%i", __func__, opc, src, dst);
   TRACE_DECODE (cpu, "%s: uimm5:%#x", __func__, uimm);
 
   if (opc == 0)
     {
-      TRACE_INSN (cpu, "CC = ! BITTST (R%i, %i);", dst, uimm);
+      TRACE_INSN (cpu, "CC = ! BITTST (R%i, %s);", dst, uimm_str);
       SET_CCREG ((~DREG (dst) >> uimm) & 1);
     }
   else if (opc == 1)
     {
-      TRACE_INSN (cpu, "CC = BITTST (R%i, %i);", dst, uimm);
+      TRACE_INSN (cpu, "CC = BITTST (R%i, %s);", dst, uimm_str);
       SET_CCREG ((DREG (dst) >> uimm) & 1);
     }
   else if (opc == 2)
     {
-      TRACE_INSN (cpu, "BITSET (R%i, %i);", dst, uimm);
+      TRACE_INSN (cpu, "BITSET (R%i, %s);", dst, uimm_str);
       SET_DREG (dst, DREG (dst) | (1 << uimm));
       setflags_logical (cpu, DREG (dst));
     }
   else if (opc == 3)
     {
-      TRACE_INSN (cpu, "BITTGL (R%i, %i);", dst, uimm);
+      TRACE_INSN (cpu, "BITTGL (R%i, %s);", dst, uimm_str);
       SET_DREG (dst, DREG (dst) ^ (1 << uimm));
       setflags_logical (cpu, DREG (dst));
     }
   else if (opc == 4)
     {
-      TRACE_INSN (cpu, "BITCLR (R%i, %i);", dst, uimm);
+      TRACE_INSN (cpu, "BITCLR (R%i, %s);", dst, uimm_str);
       SET_DREG (dst, DREG (dst) & ~(1 << uimm));
       setflags_logical (cpu, DREG (dst));
     }
   else if (opc == 5)
     {
-      TRACE_INSN (cpu, "R%i >>>= %i;", dst, uimm);
+      TRACE_INSN (cpu, "R%i >>>= %s;", dst, uimm_str);
       SET_DREG (dst, ashiftrt (cpu, DREG (dst), uimm, 32));
     }
   else if (opc == 6)
     {
-      TRACE_INSN (cpu, "R%i >>= %i;", dst, uimm);
+      TRACE_INSN (cpu, "R%i >>= %s;", dst, uimm_str);
       SET_DREG (dst, lshiftrt (cpu, DREG (dst), uimm, 32));
     }
   else if (opc == 7)
     {
-      TRACE_INSN (cpu, "R%i <<= %i;", dst, uimm);
+      TRACE_INSN (cpu, "R%i <<= %s;", dst, uimm_str);
       SET_DREG (dst, lshift (cpu, DREG (dst), uimm, 32, 0));
     }
 
@@ -2115,12 +2212,12 @@ decode_COMPI2opD_0 (SIM_CPU *cpu, bu16 iw0)
 
   if (op == 0)
     {
-      TRACE_INSN (cpu, "R%i = 0x%x (X);", dst, imm);
+      TRACE_INSN (cpu, "R%i = %s (X);", dst, imm7_str (imm));
       SET_DREG (dst, imm);
     }
   else if (op == 1)
     {
-      TRACE_INSN (cpu, "R%i += 0x%x;", dst, imm);
+      TRACE_INSN (cpu, "R%i += %s;", dst, imm7_str (imm));
       SET_DREG (dst, add32 (cpu, DREG (dst), imm, 1, 0));
     }
 
@@ -2144,12 +2241,12 @@ decode_COMPI2opP_0 (SIM_CPU *cpu, bu16 iw0)
 
   if (op == 0)
     {
-      TRACE_INSN (cpu, "P%i = %i;", dst, imm);
+      TRACE_INSN (cpu, "P%i = %s;", dst, imm7_str (imm));
       SET_PREG (dst, imm);
     }
   else if (op == 1)
     {
-      TRACE_INSN (cpu, "P%i += %i;", dst, imm);
+      TRACE_INSN (cpu, "P%i += %s;", dst, imm7_str (imm));
       SET_PREG (dst, PREG (dst) + imm);
     }
 
@@ -2601,18 +2698,19 @@ decode_LDSTiiFP_0 (SIM_CPU *cpu, bu16 iw0)
   int W = ((iw0 >> 9) & 0x1);
   bu32 imm = negimm5s4 (offset);
   bu32 ea = FPREG + imm;
+  const char *imm_str = negimm5s4_str (offset);
 
   TRACE_EXTRACT (cpu, "%s: W:%i offset:%#x reg:%i", __func__, W, offset, reg);
   TRACE_DECODE (cpu, "%s: negimm5s4:%#x", __func__, imm);
 
   if (W == 0)
     {
-      TRACE_INSN (cpu, "%s = [FP + %#x];", get_allreg_name (0, reg), imm);
+      TRACE_INSN (cpu, "%s = [FP + %s];", get_allreg_name (0, reg), imm_str);
       reg_write (cpu, 0, reg, GET_LONG (ea));
     }
   else
     {
-      TRACE_INSN (cpu, "[FP + %#x] = %s;", imm, get_allreg_name (0, reg));
+      TRACE_INSN (cpu, "[FP + %s] = %s;", imm_str, get_allreg_name (0, reg));
       PUT_LONG (ea, reg_read (cpu, 0, reg));
     }
 
@@ -2631,11 +2729,18 @@ decode_LDSTii_0 (SIM_CPU *cpu, bu16 iw0)
   int offset = ((iw0 >> 6) & 0xf);
   int op = ((iw0 >> 10) & 0x3);
   int W = ((iw0 >> 12) & 0x1);
-  bu32 imm = (op == 0 || op == 3 ? uimm4s4 (offset) : uimm4s2 (offset));
-  bu32 ea = PREG (ptr) + imm;
+  bu32 imm, ea;
+  const char *imm_str;
 
   TRACE_EXTRACT (cpu, "%s: W:%i op:%i offset:%#x ptr:%i reg:%i",
 		 __func__, W, op, offset, ptr, reg);
+
+  if (op == 0 || op == 3)
+    imm = uimm4s4 (offset), imm_str = uimm4s4_str (offset);
+  else
+    imm = uimm4s2 (offset), imm_str = uimm4s2_str (offset);
+  ea = PREG (ptr) + imm;
+
   TRACE_DECODE (cpu, "%s: uimm4s4/uimm4s2:%#x", __func__, imm);
 
   if (W == 1 && op == 2)
@@ -2645,22 +2750,22 @@ decode_LDSTii_0 (SIM_CPU *cpu, bu16 iw0)
     {
       if (op == 0)
 	{
-	  TRACE_INSN (cpu, "R%i = [P%i + %#x];", reg, ptr, imm);
+	  TRACE_INSN (cpu, "R%i = [P%i + %s];", reg, ptr, imm_str);
 	  SET_DREG (reg, GET_LONG (ea));
 	}
       else if (op == 1)
 	{
-	  TRACE_INSN (cpu, "R%i = W[P%i + %#x] (Z);", reg, ptr, imm);
+	  TRACE_INSN (cpu, "R%i = W[P%i + %s] (Z);", reg, ptr, imm_str);
 	  SET_DREG (reg, GET_WORD (ea));
 	}
       else if (op == 2)
 	{
-	  TRACE_INSN (cpu, "R%i = W[P%i + %#x] (X);", reg, ptr, imm);
+	  TRACE_INSN (cpu, "R%i = W[P%i + %s] (X);", reg, ptr, imm_str);
 	  SET_DREG (reg, (bs32) (bs16) GET_WORD (ea));
 	}
       else if (op == 3)
 	{
-	  TRACE_INSN (cpu, "P%i = [P%i + %#x];", reg, ptr, imm);
+	  TRACE_INSN (cpu, "P%i = [P%i + %s];", reg, ptr, imm_str);
 	  SET_PREG (reg, GET_LONG (ea));
 	}
     }
@@ -2668,17 +2773,17 @@ decode_LDSTii_0 (SIM_CPU *cpu, bu16 iw0)
     {
       if (op == 0)
 	{
-	  TRACE_INSN (cpu, "[P%i + %#x] = R%i;", ptr, imm, reg);
+	  TRACE_INSN (cpu, "[P%i + %s] = R%i;", ptr, imm_str, reg);
 	  PUT_LONG (ea, DREG (reg));
 	}
       else if (op == 1)
 	{
-	  TRACE_INSN (cpu, "W[P%i + %#x] = R%i;", ptr, imm, reg);
+	  TRACE_INSN (cpu, "W[P%i + %s] = R%i;", ptr, imm_str, reg);
 	  PUT_WORD (ea, DREG (reg));
 	}
       else if (op == 3)
 	{
-	  TRACE_INSN (cpu, "[P%i + %#x] = P%i;", ptr, imm, reg);
+	  TRACE_INSN (cpu, "[P%i + %s] = P%i;", ptr, imm_str, reg);
 	  PUT_LONG (ea, PREG (reg));
 	}
     }
@@ -2744,33 +2849,35 @@ decode_LDIMMhalf_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   int hword = ((iw1 >> 0) & 0xffff);
   int reg = ((iw0 >> 0) & 0x7);
   bu32 val;
+  const char *val_str;
   const char *reg_name = get_allreg_name (grp, reg);
 
   TRACE_EXTRACT (cpu, "%s: Z:%i H:%i S:%i grp:%i reg:%i hword:%#x",
 		 __func__, Z, H, S, grp, reg, hword);
 
+  if (S == 1)
+    val = imm16 (hword), val_str = imm16_str (hword);
+  else
+    val = luimm16 (hword), val_str = luimm16_str (hword);
+
   /* XXX: writing RET{I,X,N,E}, USP, SEQSTAT, SYSCFG requires supervisor mode. */
 
   if (H == 0 && S == 1 && Z == 0)
     {
-      val = imm16 (hword);
-      TRACE_INSN (cpu, "%s = 0x%x (X);", reg_name, val);
+      TRACE_INSN (cpu, "%s = %s (X);", reg_name, val_str);
     }
   else if (H == 0 && S == 0 && Z == 1)
     {
-      val = luimm16 (hword);
-      TRACE_INSN (cpu, "%s = 0x%x (Z);", reg_name, val);
+      TRACE_INSN (cpu, "%s = %s (Z);", reg_name, val_str);
     }
   else if (H == 0 && S == 0 && Z == 0)
     {
-      val = luimm16 (hword);
-      TRACE_INSN (cpu, "%s.L = 0x%x;", reg_name, val);
+      TRACE_INSN (cpu, "%s.L = %s;", reg_name, val_str);
       val = REG_H_L (reg_read (cpu, grp, reg), val);
     }
   else if (H == 1 && S == 0 && Z == 0)
     {
-      val = luimm16 (hword);
-      TRACE_INSN (cpu, "%s.H = 0x%x;", reg_name, val);
+      TRACE_INSN (cpu, "%s.H = %s;", reg_name, val_str);
       val = REG_H_L (val << 16, reg_read (cpu, grp, reg));
     }
   else
@@ -2825,6 +2932,12 @@ decode_LDSTidxI_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   int ptr = ((iw0 >> 3) & 0x7);
   int offset = ((iw1 >> 0) & 0xffff);
   int W = ((iw0 >> 9) & 0x1);
+  bu32 imm_16s4 = imm16s4 (offset);
+  bu32 imm_16s2 = imm16s2 (offset);
+  bu32 imm_16 = imm16 (offset);
+  const char *imm_16s4_str = imm16s4_str (offset);
+  const char *imm_16s2_str = imm16s2_str (offset);
+  const char *imm_16_str = imm16_str (offset);
 
   TRACE_EXTRACT (cpu, "%s: W:%i Z:%i sz:%i ptr:%i reg:%i offset:%#x",
 		 __func__, W, Z, sz, ptr, reg, offset);
@@ -2834,68 +2947,60 @@ decode_LDSTidxI_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 
   if (W == 0)
     {
-      bu32 imm_16s4 = imm16s4 (offset);
-      bu32 imm_16s2 = imm16s2 (offset);
-      bu32 imm_16 = imm16 (offset);
-
       if (sz == 0 && Z == 0)
 	{
-	  TRACE_INSN (cpu, "R%i = [P%i + %#x];", reg, ptr, imm_16s4);
+	  TRACE_INSN (cpu, "R%i = [P%i + %s];", reg, ptr, imm_16s4_str);
 	  SET_DREG (reg, GET_LONG (PREG (ptr) + imm_16s4));
 	}
       else if (sz == 0 && Z == 1)
 	{
-	  TRACE_INSN (cpu, "P%i = [P%i + %#x];", reg, ptr, imm_16s4);
+	  TRACE_INSN (cpu, "P%i = [P%i + %s];", reg, ptr, imm_16s4_str);
 	  SET_PREG (reg, GET_LONG (PREG (ptr) + imm_16s4));
 	}
       else if (sz == 1 && Z == 0)
 	{
-	  TRACE_INSN (cpu, "R%i = W[P%i + %#x] (Z);", reg, ptr, imm_16s2);
+	  TRACE_INSN (cpu, "R%i = W[P%i + %s] (Z);", reg, ptr, imm_16s2_str);
 	  SET_DREG (reg, GET_WORD (PREG (ptr) + imm_16s2));
 	}
       else if (sz == 1 && Z == 1)
 	{
-	  TRACE_INSN (cpu, "R%i = W[P%i + %#x] (X);", reg, ptr, imm_16s2);
+	  TRACE_INSN (cpu, "R%i = W[P%i + %s] (X);", reg, ptr, imm_16s2_str);
 	  SET_DREG (reg, (bs32) (bs16) GET_WORD (PREG (ptr) + imm_16s2));
 	}
       else if (sz == 2 && Z == 0)
 	{
-	  TRACE_INSN (cpu, "R%i = B[P%i + %#x] (Z);", reg, ptr, imm_16);
+	  TRACE_INSN (cpu, "R%i = B[P%i + %s] (Z);", reg, ptr, imm_16_str);
 	  SET_DREG (reg, GET_BYTE (PREG (ptr) + imm_16));
 	}
       else if (sz == 2 && Z == 1)
 	{
-	  TRACE_INSN (cpu, "R%i = B[P%i + %#x] (X);", reg, ptr, imm_16);
+	  TRACE_INSN (cpu, "R%i = B[P%i + %s] (X);", reg, ptr, imm_16_str);
 	  SET_DREG (reg, (bs32) (bs8) GET_BYTE (PREG (ptr) + imm_16));
 	}
     }
   else
     {
-      bu32 imm_16s4 = imm16s4 (offset);
-      bu32 imm_16s2 = imm16s2 (offset);
-      bu32 imm_16 = imm16 (offset);
-
       if (sz != 0 && Z != 0)
 	illegal_instruction (cpu);
 
       if (sz == 0 && Z == 0)
 	{
-	  TRACE_INSN (cpu, "[P%i + %#x] = R%i;", ptr, imm_16s4, reg);
+	  TRACE_INSN (cpu, "[P%i + %s] = R%i;", ptr, imm_16s4_str, reg);
 	  PUT_LONG (PREG (ptr) + imm_16s4, DREG (reg));
 	}
       else if (sz == 0 && Z == 1)
 	{
-	  TRACE_INSN (cpu, "[P%i + %#x] = P%i;", ptr, imm_16s4, reg);
+	  TRACE_INSN (cpu, "[P%i + %s] = P%i;", ptr, imm_16s4_str, reg);
 	  PUT_LONG (PREG (ptr) + imm_16s4, PREG (reg));
 	}
       else if (sz == 1 && Z == 0)
 	{
-	  TRACE_INSN (cpu, "W[P%i + %#x] = R%i;", ptr, imm_16s2, reg);
+	  TRACE_INSN (cpu, "W[P%i + %s] = R%i;", ptr, imm_16s2_str, reg);
 	  PUT_WORD (PREG (ptr) + imm_16s2, DREG (reg));
 	}
       else if (sz == 2 && Z == 0)
 	{
-	  TRACE_INSN (cpu, "B[P%i + %#x] = R%i;", ptr, imm_16, reg);
+	  TRACE_INSN (cpu, "B[P%i + %s] = R%i;", ptr, imm_16_str, reg);
 	  PUT_BYTE (PREG (ptr) + imm_16, DREG (reg));
 	}
     }
@@ -2921,7 +3026,7 @@ decode_linkage_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     {
       int size = uimm16s4 (framesize);
       sp = reg_get_sp (cpu);
-      TRACE_INSN (cpu, "LINK %#x;", size);
+      TRACE_INSN (cpu, "LINK %s;", uimm16s4_str (framesize));
       sp -= 4;
       PUT_LONG (sp, RETSREG);
       sp -= 4;
@@ -4516,7 +4621,7 @@ decode_psedodbg_assert_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   TRACE_INSN (cpu, "%s (%s%s, 0x%x);", dbg_name, reg_name, dbg_appd, expected);
   if (actual != expected)
     {
-      sim_io_printf (sd, "FAIL at 0x%x: %s (%s%s, 0x%04x), actual value 0x%x\n",
+      sim_io_printf (sd, "FAIL at %#x: %s (%s%s, 0x%04x), actual value %#x\n",
 		     PCREG, dbg_name, reg_name, dbg_appd, expected, actual);
       cec_exception (cpu, VEC_ILGAL_I);
       SET_DREG (0, 1);
