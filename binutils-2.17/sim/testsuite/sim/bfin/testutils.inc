@@ -5,9 +5,9 @@
 
 	.macro start
 	.text
-	# Pad to make sure "jump to 0" always fails
+	# Pad with EMUEXCPT to make sure "jump to 0" always fails
 	.rep 0x10
-	.word 0x0025	# EMUEXCPT;
+	.word 0x0025
 	.endr
 
 	.global __pass
