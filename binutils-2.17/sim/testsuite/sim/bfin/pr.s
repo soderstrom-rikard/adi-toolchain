@@ -16,6 +16,7 @@
 	I0 = R4;
 
 	r0 = 0x22;
+	loadsym P1, bar;
 
 	[i0] = r0;
 	[i1] = r0;
@@ -77,3 +78,5 @@ _fail:
 foo:
 	.space (0x100);
 
+bar:
+	.space (0x1000);
