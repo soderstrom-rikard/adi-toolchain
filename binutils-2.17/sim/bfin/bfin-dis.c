@@ -3350,14 +3350,38 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     unhandled_instruction (cpu, "dregs = BYTEOP2M (dregs_pair, dregs_pair) (RNDH,R)");
   else if (aop == 2 && aopcde == 22 && HL == 0)
     unhandled_instruction (cpu, "dregs = BYTEOP2M (dregs_pair, dregs_pair) (RNDL,R)");
-  else if (aop == 1 && aopcde == 22 && HL == 1)
-    unhandled_instruction (cpu, "dregs = BYTEOP2P (dregs_pair, dregs_pair) (TH ,R)");
-  else if (aop == 1 && aopcde == 22 && HL == 0)
-    unhandled_instruction (cpu, "dregs = BYTEOP2P (dregs_pair, dregs_pair) (TL ,R)");
-  else if (aop == 0 && aopcde == 22 && HL == 1)
-    unhandled_instruction (cpu, "dregs = BYTEOP2P (dregs_pair, dregs_pair) (RNDH,R)");
-  else if (aop == 0 && aopcde == 22 && HL == 0)
-    unhandled_instruction (cpu, "dregs = BYTEOP2P (dregs_pair, dregs_pair) (RNDL,aligndir)");
+  else if ((aop == 0 || aop == 1) && aopcde == 22)
+    {
+      bu32 s0, s0L, s0H, s1, s1L, s1H;
+      bu32 tmp0, tmp1, i;
+      const char * const opts[] = { "rndl", "rndh", "tl", "th" };
+
+      TRACE_INSN (cpu, "R%i = BYTEOP2P (R%i:%i, R%i:%i) (%s%s);", dst0,
+		  src0 + 1, src0, src1 + 1, src1, opts[HL + (aop << 1)],
+		  s ? ", r" : "");
+
+      s0L = DREG (src0);
+      s0H = DREG (src0 + 1);
+      s1L = DREG (src1);
+      s1H = DREG (src1 + 1);
+      if (s)
+	{
+	  s0 = algn (cpu, s0H, s0L, IREG (0) & 3);
+	  s1 = algn (cpu, s1H, s1L, IREG (0) & 3);
+	}
+      else
+	{
+	  s0 = algn (cpu, s0L, s0H, IREG (0) & 3);
+	  s1 = algn (cpu, s1L, s1H, IREG (0) & 3);
+	}
+
+      i = !aop * 2;
+      tmp0 = ((((s1 >>  8) & 0xff) + ((s1 >>  0) & 0xff) +
+	       ((s0 >>  8) & 0xff) + ((s0 >>  0) & 0xff) + i) >> 2) & 0xff;
+      tmp1 = ((((s1 >> 24) & 0xff) + ((s1 >> 16) & 0xff) +
+	       ((s0 >> 24) & 0xff) + ((s0 >> 16) & 0xff) + i) >> 2) & 0xff;
+      SET_DREG (dst0, (tmp1 << 16 + (HL * 8)) | (tmp0 << (HL * 8)));
+    }
   else if ((aop == 0 || aop == 1) && s == 0 && aopcde == 8)
     {
       TRACE_INSN (cpu, "A%i = 0;", aop);

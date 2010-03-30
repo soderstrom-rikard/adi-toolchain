@@ -5,29 +5,23 @@
 
 	start
 
+	.macro check_it res:req
+	imm32 R7, \res
+	CC = R6 == R7;
+	IF !CC JUMP 1f;
+	.endm
 	.macro test_byteop1p i0:req, i1:req, res:req, resT:req, resR:req, resTR:req
 	dmm32 I0, \i0
 	dmm32 I1, \i1
 
 	R6 = BYTEOP1P (R1:0, R3:2);
-	imm32 R7, \res
-	CC = R6 == R7;
-	IF !CC JUMP 1f;
-
+	check_it \res
 	R6 = BYTEOP1P (R1:0, R3:2) (T);
-	imm32 R7, \resT
-	CC = R6 == R7;
-	IF !CC JUMP 1f;
-
+	check_it \resT
 	R6 = BYTEOP1P (R1:0, R3:2) (R);
-	imm32 R7, \resR
-	CC = R6 == R7;
-	IF !CC JUMP 1f;
-
+	check_it \resR
 	R6 = BYTEOP1P (R1:0, R3:2) (T, R);
-	imm32 R7, \resTR
-	CC = R6 == R7;
-	IF !CC JUMP 1f;
+	check_it \resTR
 
 	jump 2f;
 1:	fail
