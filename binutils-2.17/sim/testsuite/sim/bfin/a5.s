@@ -6,7 +6,6 @@
 //   rH4= L-H (r2,r3) S;
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

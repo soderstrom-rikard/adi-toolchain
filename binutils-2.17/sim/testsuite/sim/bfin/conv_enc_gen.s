@@ -55,7 +55,6 @@
 // The resulting execution speed would be roughly twice as fast,
 // since there is no need to rotate output bit via CC.
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

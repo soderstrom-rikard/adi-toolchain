@@ -2,7 +2,6 @@
 //  SCALE in SIGNED FRACTIONAL mode
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

@@ -2,7 +2,6 @@
 # mach: bfin
 # xfail: "need to implement (dregs, dregs) = SEARCH dregs (searchmod) in sim" bfin-*
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

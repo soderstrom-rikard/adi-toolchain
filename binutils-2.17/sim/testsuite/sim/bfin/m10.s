@@ -4,7 +4,6 @@
 //  ROUND/TRUNCATE in UNSIGNED FRACTIONAL mode
 //  test ops: "+="
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

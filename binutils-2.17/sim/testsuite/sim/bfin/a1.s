@@ -1,7 +1,6 @@
 // check the imm7 bit constants bounds
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

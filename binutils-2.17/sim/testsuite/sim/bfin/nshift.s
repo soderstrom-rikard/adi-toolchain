@@ -1,7 +1,6 @@
 // ACP 5.18: Shifter uses wrong shift value
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

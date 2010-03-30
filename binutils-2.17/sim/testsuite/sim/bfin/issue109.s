@@ -3,7 +3,6 @@
 //range from -32 to 31. test the boundary.
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

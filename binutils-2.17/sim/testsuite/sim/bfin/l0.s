@@ -1,7 +1,6 @@
 // simple test to ensure that we can load data from memory.
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

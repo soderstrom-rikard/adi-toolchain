@@ -2,7 +2,6 @@
 //  Test dual 16 bit MAX, MIN, ABS instructions
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

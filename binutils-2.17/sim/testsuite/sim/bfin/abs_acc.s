@@ -1,7 +1,6 @@
 // ACP 5.7 ABS(A1) sets AV0
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

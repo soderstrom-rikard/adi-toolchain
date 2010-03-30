@@ -2,7 +2,6 @@
 //  SIGNED FRACTIONAL and SIGNED INT mode into register PAIR with SCALE
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

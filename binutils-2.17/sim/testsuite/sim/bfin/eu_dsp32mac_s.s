@@ -1,7 +1,6 @@
 // Check MAC with scaling
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

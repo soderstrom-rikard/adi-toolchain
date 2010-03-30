@@ -1,6 +1,5 @@
 # mach : bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

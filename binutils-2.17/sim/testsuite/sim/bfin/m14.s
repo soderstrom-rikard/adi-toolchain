@@ -2,7 +2,6 @@
 //  UNSIGNED FRACTIONAL and SIGNED INT mode into register PAIR
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

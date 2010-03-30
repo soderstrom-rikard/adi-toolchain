@@ -1,7 +1,6 @@
 //  Test  r4 = ROT    (r2 by r3);
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

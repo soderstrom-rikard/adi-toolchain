@@ -3,7 +3,6 @@
 //  RL5 = EXPADJ R4 BY RL2;
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

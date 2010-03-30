@@ -1,7 +1,6 @@
 //  Test ALU  NEG accumulators
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

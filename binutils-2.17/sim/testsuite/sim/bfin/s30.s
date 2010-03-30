@@ -1,7 +1,6 @@
 //  Test signbits40
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

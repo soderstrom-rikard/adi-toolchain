@@ -6,7 +6,6 @@
 //  r4 = ~ r2;
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

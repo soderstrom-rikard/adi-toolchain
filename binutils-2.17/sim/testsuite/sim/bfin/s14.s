@@ -3,7 +3,6 @@
 //  Test  r4 = LSHIFT (r2 by rl3);
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

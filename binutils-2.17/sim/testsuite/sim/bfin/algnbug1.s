@@ -1,7 +1,6 @@
 # mach: bfin
 # xfail: "need to implement DISALGNEXCPT in sim" bfin-*
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

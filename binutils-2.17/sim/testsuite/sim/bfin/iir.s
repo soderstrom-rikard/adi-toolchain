@@ -139,7 +139,6 @@
 // array: one to load (I0) and one to store (I2). This is required since
 // the load of iteration i+1 is hoisted above the store of iteration i.
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

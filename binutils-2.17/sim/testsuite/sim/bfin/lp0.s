@@ -1,7 +1,6 @@
 // Assert that loops can have coincidental loop ends.
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 

@@ -1,7 +1,6 @@
 //  test RND setting AZ
 # mach: bfin
 
-#include "test.h"
 .include "testutils.inc"
 	start
 
