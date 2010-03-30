@@ -4,6 +4,45 @@
 # bfin-linux-uclibc-gcc -nostdlib -g -Wa,--defsym,BFIN_HOST=1 foo.s
 
 	.macro start
+	.text
+	# Pad to make sure "jump to 0" always fails
+	.rep 0x10
+	.word 0x0025	# EMUEXCPT;
+	.endr
+
+	.global __pass
+__pass:
+	write 1, _passmsg, 5
+	exit 0
+
+	.global __fail
+__fail:
+.ifndef BFIN_HOST
+	P0.H = _rets;
+	P0.L = _rets;
+	R0 = RETS;
+	R0 += -4;
+	P1 = 8;
+	R2 = '9';
+	LSETUP (1f, 3f) LC0 = P1;
+1:
+	R1 = R0;
+	R1 >>= 28;
+	R1 += 0x30;
+	CC = R2 < R1;
+	IF !CC jump 2f;
+	R1 += 7;
+2:
+	B[P0++] = R1;
+3:
+	R0 <<= 4;
+
+	write 1, _failmsg, 22
+.else
+	write 1, _failmsg, 5
+.endif
+	exit 1
+
 .ifndef BFIN_HOST
 	.data
 _failmsg:
@@ -69,37 +108,6 @@ _main:
 	system_call 5
 .endif
 	.endm
-
-__pass:
-	write 1, _passmsg, 5
-	exit 0
-
-__fail:
-.ifndef BFIN_HOST
-	P0.H = _rets;
-	P0.L = _rets;
-	R0 = RETS;
-	R0 += -4;
-	P1 = 8;
-	R2 = '9';
-	LSETUP (1f, 3f) LC0 = P1;
-1:
-	R1 = R0;
-	R1 >>= 28;
-	R1 += 0x30;
-	CC = R2 < R1;
-	IF !CC jump 2f;
-	R1 += 7;
-2:
-	B[P0++] = R1;
-3:
-	R0 <<= 4;
-
-	write 1, _failmsg, 22
-.else
-	write 1, _failmsg, 5
-.endif
-	exit 1
 
 	.macro outc_str ch:req, more:vararg
 	OUTC \ch;
