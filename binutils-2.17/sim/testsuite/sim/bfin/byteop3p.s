@@ -9,7 +9,6 @@
 	imm32 R7, \res
 	CC = R6 == R7;
 	IF !CC JUMP 1f;
-#DBG R6;
 	.endm
 	.macro test_byteop3p i0:req, i1:req, resL:req, resH:req, resLR:req, resHR:req
 	dmm32 I0, \i0
