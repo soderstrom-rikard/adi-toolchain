@@ -3292,11 +3292,11 @@ decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, " = BYTEOP2M (");
       OUTS (outf, dregs (src0 + 1));
       OUTS (outf, ":");
-      OUTS (outf, imm5 (src0));
+      OUTS (outf, imm5d (src0));
       OUTS (outf, ", ");
       OUTS (outf, dregs (src1 + 1));
       OUTS (outf, ":");
-      OUTS (outf, imm5 (src1));
+      OUTS (outf, imm5d (src1));
       OUTS (outf, ") (TH");
       if (s == 1)
 	OUTS (outf, ", R)");
@@ -3309,11 +3309,11 @@ decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, " = BYTEOP2M (");
       OUTS (outf, dregs (src0 + 1));
       OUTS (outf, ":");
-      OUTS (outf, imm5 (src0));
+      OUTS (outf, imm5d (src0));
       OUTS (outf, ", ");
       OUTS (outf, dregs (src1 + 1));
       OUTS (outf, ":");
-      OUTS (outf, imm5 (src1));
+      OUTS (outf, imm5d (src1));
       OUTS (outf, ") (TL");
       if (s == 1)
 	OUTS (outf, ", R)");
@@ -3326,11 +3326,11 @@ decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, " = BYTEOP2M (");
       OUTS (outf, dregs (src0 + 1));
       OUTS (outf, ":");
-      OUTS (outf, imm5 (src0));
+      OUTS (outf, imm5d (src0));
       OUTS (outf, ", ");
       OUTS (outf, dregs (src1 + 1));
       OUTS (outf, ":");
-      OUTS (outf, imm5 (src1));
+      OUTS (outf, imm5d (src1));
       OUTS (outf, ") (RNDH");
       if (s == 1)
 	OUTS (outf, ", R)");
@@ -3343,11 +3343,11 @@ decode_dsp32alu_0 (TIword iw0, TIword iw1, disassemble_info *outf)
       OUTS (outf, " = BYTEOP2M (");
       OUTS (outf, dregs (src0 + 1));
       OUTS (outf, ":");
-      OUTS (outf, imm5 (src0));
+      OUTS (outf, imm5d (src0));
       OUTS (outf, ", ");
       OUTS (outf, dregs (src1 + 1));
       OUTS (outf, ":");
-      OUTS (outf, imm5 (src1));
+      OUTS (outf, imm5d (src1));
       OUTS (outf, ") (RNDL");
       if (s == 1)
 	OUTS (outf, ", R)");
