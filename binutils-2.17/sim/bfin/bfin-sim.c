@@ -821,8 +821,6 @@ get_allreg_name (int grp, int reg)
   return greg_names[(grp << 3) | reg];
 }
 
-#define DREG_GRP 0
-#define PREG_GRP 2
 static bu32 *
 get_allreg (SIM_CPU *cpu, int grp, int reg)
 {
@@ -872,6 +870,32 @@ get_allreg (SIM_CPU *cpu, int grp, int reg)
 	}
       return 0;
     }
+}
+
+static const char *
+get_store_name (SIM_CPU *cpu, bu32 *p)
+{
+  if (p >= &DREG (0) && p <= &CYCLESREG)
+    return greg_names[p - &DREG (0)];
+  else if (p == &AXREG (0))
+    return greg_names[4 * 8 + 0];
+  else if (p == &AWREG (0))
+    return greg_names[4 * 8 + 1];
+  else if (p == &AXREG (1))
+    return greg_names[4 * 8 + 2];
+  else if (p == &AWREG (1))
+    return greg_names[4 * 8 + 3];
+  else if (p == &ASTATREG (av0))
+    return "ASTAT[av0]";
+  else if (p == &ASTATREG (av0s))
+    return "ASTAT[av0s]";
+  else if (p == &ASTATREG (av1))
+    return "ASTAT[av1]";
+  else if (p == &ASTATREG (av1s))
+    return "ASTAT[av1s]";
+  else
+    /* XXX: Worry about this when we start to STORE() it.  */
+    abort ();
 }
 
 static bu32
@@ -928,7 +952,7 @@ reg_write (SIM_CPU *cpu, int grp, int reg, bu32 value)
   else if (whichreg == &LTREG (0) || whichreg == &LTREG (1))
     /* Writes to LT clears LSB automatically.  */
     value &= ~0x1;
-  else if (whichreg == &A0XREG || whichreg == &A1XREG)
+  else if (whichreg == &AXREG (0) || whichreg == &AXREG (1))
     value &= 0xFF;
 
   TRACE_REGISTER (cpu, "wrote %s = %#x", get_allreg_name (grp, reg), value);
@@ -957,7 +981,7 @@ reg_read (SIM_CPU *cpu, int grp, int reg)
   if (whichreg == &CYCLESREG)
     /* Reads of CYCLES reloads CYCLES2 from the shadow.  */
     SET_CYCLES2REG (CYCLES2SHDREG);
-  else if ((whichreg == &A1XREG || whichreg == &A0XREG) && (value & 0x80))
+  else if ((whichreg == &AXREG (1) || whichreg == &AXREG (0)) && (value & 0x80))
     /* sign extend if necessary */
     value |= 0xFFFFFF00;
 
@@ -1260,15 +1284,15 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
 
   if (which)
     {
-      STORE (A1XREG, (acc >> 32) & 0xff);
-      STORE (A1WREG, acc & 0xffffffff);
+      STORE (AXREG (1), (acc >> 32) & 0xff);
+      STORE (AWREG (1), acc & 0xffffffff);
       STORE (ASTATREG (av1), sat);
       STORE (ASTATREG (av1s), ASTATREG (av1s) | sat);
     }
   else
     {
-      STORE (A0XREG, (acc >> 32) & 0xff);
-      STORE (A0WREG, acc & 0xffffffff);
+      STORE (AXREG (0), (acc >> 32) & 0xff);
+      STORE (AWREG (0), acc & 0xffffffff);
       STORE (ASTATREG (av0), sat);
       STORE (ASTATREG (av0s), ASTATREG (av0s) | sat);
     }
@@ -3294,15 +3318,15 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	acc0 = -0x8000000000ull;
       else if ((bs64)acc0 >= 0x7fffffffffll)
 	acc0 = 0x7fffffffffull;
-      STORE (A0XREG, (acc0 >> 32) & 0xff);
-      STORE (A0WREG, acc0 & 0xffffffff);
+      STORE (AXREG (0), (acc0 >> 32) & 0xff);
+      STORE (AWREG (0), acc0 & 0xffffffff);
       if (s == 1)
 	{
 	  /* A0 -= A1 (W32) */
 	  if (acc0 & (bu64)0x8000000000)
-	    STORE (A0XREG, 0x80);
+	    STORE (AXREG (0), 0x80);
 	  else
-	    STORE (A0XREG, 0x0);
+	    STORE (AXREG (0), 0x0);
 	}
     }
   else if ((aop == 2 || aop == 3) && aopcde == 22)
@@ -3576,8 +3600,8 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     }
   else if (aop == 1 && aopcde == 12)
     {
-      bu32 val0 = ((A0WREG & 0xFFFF0000) >> 16) + (A0WREG & 0xFFFF);
-      bu32 val1 = ((A1WREG & 0xFFFF0000) >> 16) + (A1WREG & 0xFFFF);
+      bu32 val0 = ((AWREG (0) & 0xFFFF0000) >> 16) + (AWREG (0) & 0xFFFF);
+      bu32 val1 = ((AWREG (1) & 0xFFFF0000) >> 16) + (AWREG (1) & 0xFFFF);
 
       TRACE_INSN (cpu, "R%i = A1.L + A1.H, R%i = A0.L + A0.H;", dst1, dst0);
 
@@ -3624,14 +3648,14 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	acc0 = -0x8000000000ull;
       else if ((bs64)acc0 >= 0x7fffffffffll)
 	acc0 = 0x7fffffffffull;
-      STORE (A0XREG, (acc0 >> 32) & 0xff);
-      STORE (A0WREG, acc0 & 0xffffffff);
+      STORE (AXREG (0), (acc0 >> 32) & 0xff);
+      STORE (AWREG (0), acc0 & 0xffffffff);
       if (aop == 2 && s == 1)
 	{ /* A0 += A1 (W32) */
 	  if (acc0 & (bu64)0x8000000000)
-	    STORE (A0XREG, 0x80);
+	    STORE (AXREG (0), 0x80);
 	  else
-	    STORE (A0XREG, 0x0);
+	    STORE (AXREG (0), 0x0);
 	}
       if (aop == 0)
 	{
@@ -4932,8 +4956,12 @@ interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
       _interp_insn_bfin (cpu, pc + 6);
     }
   for (i = 0; i < BFIN_CPU_STATE.n_stores; i++)
-    /* XXX: This is missing register tracing.  */
-    *BFIN_CPU_STATE.stores[i].addr = BFIN_CPU_STATE.stores[i].val;
+    {
+      /* XXX: This is missing register tracing.  */
+      bu32 *addr = BFIN_CPU_STATE.stores[i].addr;
+      *addr = BFIN_CPU_STATE.stores[i].val;
+      TRACE_REGISTER (cpu, "wrote %s = %#x", get_store_name (cpu, addr), *addr);
+    }
 
   return insn_len;
 }

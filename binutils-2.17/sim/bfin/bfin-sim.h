@@ -48,7 +48,7 @@ struct store {
 #define STORE(X, Y) \
   do { \
     if (BFIN_CPU_STATE.n_stores == 20) abort (); \
-    BFIN_CPU_STATE.stores[BFIN_CPU_STATE.n_stores].addr = (bu32 *)&(X); \
+    BFIN_CPU_STATE.stores[BFIN_CPU_STATE.n_stores].addr = &(X); \
     BFIN_CPU_STATE.stores[BFIN_CPU_STATE.n_stores++].val = (Y); \
   } while (0)
 
@@ -57,13 +57,13 @@ struct bfin_cpu_state
   bu32 dpregs[16], iregs[4], mregs[4], bregs[4], lregs[4], cycles[3];
   bu32 ax[2], aw[2];
   bu32 lt[2], lc[2], lb[2];
-  int ac0, ac0_copy, ac1, an, aq;
-  int av0, av0s, av1, av1s, az, cc, v, v_copy, vs;
-  int rnd_mod;
-  int v_internal;
-  bu32 pc, rets, reti, retx, retn, rete;
-  bu32 usp, seqstat, syscfg;
-  bu32 emudat[2];
+  bu32 usp, seqstat, syscfg, rets, reti, retx, retn, rete;
+  bu32 pc, emudat[2];
+  /* These ASTAT flags need not be bu32, but it makes pointers easier.  */
+  bu32 ac0, ac0_copy, ac1, an, aq;
+  bu32 av0, av0s, av1, av1s, az, cc, v, v_copy, vs;
+  bu32 rnd_mod;
+  bu32 v_internal;
 
   /* Set by an instruction emulation function if we performed a jump.  */
   bool did_jump;
@@ -88,10 +88,6 @@ struct bfin_cpu_state
 #define LREG(x)		(BFIN_CPU_STATE.lregs[x])
 #define AXREG(x)	(BFIN_CPU_STATE.ax[x])
 #define AWREG(x)	(BFIN_CPU_STATE.aw[x])
-#define A0XREG		AXREG (0)
-#define A0WREG		AWREG (0)
-#define A1XREG		AXREG (1)
-#define A1WREG		AWREG (1)
 #define CCREG		(BFIN_CPU_STATE.cc)
 #define LCREG(x)	(BFIN_CPU_STATE.lc[x])
 #define LTREG(x)	(BFIN_CPU_STATE.lt[x])
