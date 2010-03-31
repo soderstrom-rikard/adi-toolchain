@@ -726,7 +726,7 @@ fmtconst_str (const_forms_t cf, bs32 x, bu32 pc)
        }
      else*/
        {
-	  sprintf (buf, "%x", x);
+	  sprintf (buf, "%#x", x);
 	  return buf;
        }
     }
@@ -2076,8 +2076,8 @@ decode_ALU2op_0 (SIM_CPU *cpu, bu16 iw0)
     }
   else if (opc == 14)
     {
-      TRACE_INSN (cpu, "R%i = - R%i.B;", dst, src);
       bu32 val = DREG (src);
+      TRACE_INSN (cpu, "R%i = - R%i.B;", dst, src);
       SET_DREG (dst, -val);
       setflags_nz (cpu, DREG (dst));
       SET_ASTATREG (v, val == 0x80000000);
@@ -3142,6 +3142,8 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   if (((1 << mmod) & (P ? 0x313 : 0x1b57)) == 0)
     unhandled_instruction (cpu, "dsp32mac");
 
+  /* XXX: Missing TRACE_INSN.  */
+
   if (w1 == 1 || op1 != 3)
     res1 = decode_macfunc (cpu, 1, op1, h01, h11, src0, src1, mmod, MM, P);
 
@@ -3156,7 +3158,7 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	{
 	  if (res0 & 0xffff0000)
 	    unhandled_instruction (cpu, "dsp32mac0");
-	  SET_DREG (dst, (DREG (dst) & 0xFFFF0000) | res0);
+	  SET_DREG_L (dst, res0);
 	}
     }
 
@@ -3168,7 +3170,7 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	{
 	  if (res1 & 0xffff0000)
 	    unhandled_instruction (cpu, "dsp32mac1");
-	  SET_DREG (dst, (DREG (dst) & 0xFFFF) | (res1 << 16));
+	  SET_DREG_H (dst, res1 << 16);
 	}
     }
 }
@@ -3209,6 +3211,8 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     illegal_instruction (cpu);
   if (((1 << mmod) & (P ? 0x313 : 0x1b57)) == 0)
     illegal_instruction (cpu);
+
+  /* XXX: Missing TRACE_INSN.  */
 
   if (w1)
     {
@@ -3411,7 +3415,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	       ((s0 >>  8) & 0xff) - ((s0 >>  0) & 0xff) + i) >> 2) & 0xff;
       tmp1 = ((((s1 >> 24) & 0xff) + ((s1 >> 16) & 0xff) -
 	       ((s0 >> 24) & 0xff) - ((s0 >> 16) & 0xff) + i) >> 2) & 0xff;
-      SET_DREG (dst0, (tmp1 << 16 + (HL * 8)) | (tmp0 << (HL * 8)));
+      SET_DREG (dst0, (tmp1 << (16 + (HL * 8))) | (tmp0 << (HL * 8)));
     }
   else if ((aop == 0 || aop == 1) && aopcde == 22)
     {
@@ -3443,7 +3447,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	       ((s0 >>  8) & 0xff) + ((s0 >>  0) & 0xff) + i) >> 2) & 0xff;
       tmp1 = ((((s1 >> 24) & 0xff) + ((s1 >> 16) & 0xff) +
 	       ((s0 >> 24) & 0xff) + ((s0 >> 16) & 0xff) + i) >> 2) & 0xff;
-      SET_DREG (dst0, (tmp1 << 16 + (HL * 8)) | (tmp0 << (HL * 8)));
+      SET_DREG (dst0, (tmp1 << (16 + (HL * 8))) | (tmp0 << (HL * 8)));
     }
   else if ((aop == 0 || aop == 1) && s == 0 && aopcde == 8)
     {
@@ -3796,11 +3800,11 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	}
 
       SET_DREG (dst0,
-		(((s0 >>  0) & 0xff) + ((s1 >>  0) & 0xff) <<  0) |
-		(((s0 >>  8) & 0xff) + ((s1 >>  8) & 0xff) << 16));
+		((((s0 >>  0) & 0xff) + ((s1 >>  0) & 0xff)) <<  0) |
+		((((s0 >>  8) & 0xff) + ((s1 >>  8) & 0xff)) << 16));
       SET_DREG (dst1,
-		(((s0 >> 16) & 0xff) + ((s1 >> 16) & 0xff) <<  0) |
-		(((s0 >> 24) & 0xff) + ((s1 >> 24) & 0xff) << 16));
+		((((s0 >> 16) & 0xff) + ((s1 >> 16) & 0xff)) <<  0) |
+		((((s0 >> 24) & 0xff) + ((s1 >> 24) & 0xff)) << 16));
     }
   else if (aop == 1 && aopcde == 21)
     {
@@ -3825,11 +3829,11 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	}
 
       SET_DREG (dst0,
-		((((s0 >>  0) & 0xff) - ((s1 >>  0) & 0xff) <<  0) & 0xffff) |
-		(((s0 >>  8) & 0xff) - ((s1 >>  8) & 0xff) << 16));
+		(((((s0 >>  0) & 0xff) - ((s1 >>  0) & 0xff)) <<  0) & 0xffff) |
+		(((((s0 >>  8) & 0xff) - ((s1 >>  8) & 0xff)) << 16)));
       SET_DREG (dst1,
-		((((s0 >> 16) & 0xff) - ((s1 >> 16) & 0xff) <<  0) & 0xffff) |
-		(((s0 >> 24) & 0xff) - ((s1 >> 24) & 0xff) << 16));
+		(((((s0 >> 16) & 0xff) - ((s1 >> 16) & 0xff)) <<  0) & 0xffff) |
+		(((((s0 >> 24) & 0xff) - ((s1 >> 24) & 0xff)) << 16)));
     }
   else if (aop == 1 && aopcde == 7)
     {
