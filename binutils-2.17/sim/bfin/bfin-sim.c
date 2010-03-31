@@ -98,7 +98,7 @@ setflags_logical (SIM_CPU *cpu, bu32 val)
 }
 
 static bu32
-add_brev (SIM_CPU *cpu, bu32 addend1, bu32 addend2)
+add_brev (bu32 addend1, bu32 addend2)
 {
   bu32 mask, b, r;
   int i, cy;
@@ -346,7 +346,7 @@ lshift (SIM_CPU *cpu, bu64 val, int cnt, int size, bool saturate)
 }
 
 static bu32
-algn (SIM_CPU *cpu, bu32 l, bu32 h, bu32 aln)
+algn (bu32 l, bu32 h, bu32 aln)
 {
   if (aln == 0)
     return l;
@@ -2132,7 +2132,7 @@ decode_PTR2op_0 (SIM_CPU *cpu, bu16 iw0)
   else if (opc == 5)
     {
       TRACE_INSN (cpu, "P%i += P%i (BREV)", dst, src);
-      SET_PREG (dst, add_brev (cpu, PREG (dst), PREG (src)));
+      SET_PREG (dst, add_brev (PREG (dst), PREG (src)));
     }
   else if (opc == 6)
     {
@@ -2452,7 +2452,7 @@ decode_dagMODim_0 (SIM_CPU *cpu, bu16 iw0)
   if (op == 0 && br == 1)
     {
       TRACE_INSN (cpu, "I%i += M%i (BREV);", i, m);
-      SET_IREG (i, add_brev (cpu, IREG (i), MREG (m)));
+      SET_IREG (i, add_brev (IREG (i), MREG (m)));
     }
   else if (op == 0)
     {
@@ -2892,7 +2892,7 @@ decode_LoopSetup_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_LDIMMhalf_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
+decode_LDIMMhalf_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 {
   /* LDIMMhalf
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -2975,7 +2975,7 @@ decode_CALLa_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_LDSTidxI_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
+decode_LDSTidxI_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 {
   /* LDSTidxI
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -3102,7 +3102,7 @@ decode_linkage_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 }
 
 static void
-decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
+decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 {
   /* dsp32mac
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -3174,7 +3174,7 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
+decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 {
   /* dsp32mult
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -3254,7 +3254,7 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
+decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 {
   /* dsp32alu
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -3397,13 +3397,13 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       s1H = DREG (src1 + 1);
       if (s)
 	{
-	  s0 = algn (cpu, s0H, s0L, IREG (0) & 3);
-	  s1 = algn (cpu, s1H, s1L, IREG (0) & 3);
+	  s0 = algn (s0H, s0L, IREG (0) & 3);
+	  s1 = algn (s1H, s1L, IREG (0) & 3);
 	}
       else
 	{
-	  s0 = algn (cpu, s0L, s0H, IREG (0) & 3);
-	  s1 = algn (cpu, s1L, s1H, IREG (0) & 3);
+	  s0 = algn (s0L, s0H, IREG (0) & 3);
+	  s1 = algn (s1L, s1H, IREG (0) & 3);
 	}
 
       i = !aop * 2;
@@ -3429,13 +3429,13 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       s1H = DREG (src1 + 1);
       if (s)
 	{
-	  s0 = algn (cpu, s0H, s0L, IREG (0) & 3);
-	  s1 = algn (cpu, s1H, s1L, IREG (0) & 3);
+	  s0 = algn (s0H, s0L, IREG (0) & 3);
+	  s1 = algn (s1H, s1L, IREG (0) & 3);
 	}
       else
 	{
-	  s0 = algn (cpu, s0L, s0H, IREG (0) & 3);
-	  s1 = algn (cpu, s1L, s1H, IREG (0) & 3);
+	  s0 = algn (s0L, s0H, IREG (0) & 3);
+	  s1 = algn (s1L, s1H, IREG (0) & 3);
 	}
 
       i = !aop * 2;
@@ -3503,13 +3503,13 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       s1H = DREG (src1 + 1);
       if (s)
 	{
-	  s0 = algn (cpu, s0H, s0L, IREG (0) & 3);
-	  s1 = algn (cpu, s1H, s1L, IREG (1) & 3);
+	  s0 = algn (s0H, s0L, IREG (0) & 3);
+	  s1 = algn (s1H, s1L, IREG (1) & 3);
 	}
       else
 	{
-	  s0 = algn (cpu, s0L, s0H, IREG (0) & 3);
-	  s1 = algn (cpu, s1L, s1H, IREG (1) & 3);
+	  s0 = algn (s0L, s0H, IREG (0) & 3);
+	  s1 = algn (s1L, s1H, IREG (1) & 3);
 	}
 
       tmp0 = (bs32)(bs16)(s0 >>  0) + ((s1 >> ( 0 + (8 * !HL))) & 0xff);
@@ -3758,13 +3758,13 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       s1H = DREG (src1 + 1);
       if (s)
 	{
-	  s0 = algn (cpu, s0H, s0L, IREG (0) & 3);
-	  s1 = algn (cpu, s1H, s1L, IREG (1) & 3);
+	  s0 = algn (s0H, s0L, IREG (0) & 3);
+	  s1 = algn (s1H, s1L, IREG (1) & 3);
 	}
       else
 	{
-	  s0 = algn (cpu, s0L, s0H, IREG (0) & 3);
-	  s1 = algn (cpu, s1L, s1H, IREG (1) & 3);
+	  s0 = algn (s0L, s0H, IREG (0) & 3);
+	  s1 = algn (s1L, s1H, IREG (1) & 3);
 	}
 
       SET_DREG (dst0,
@@ -3786,13 +3786,13 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       s1H = DREG (src1 + 1);
       if (s)
 	{
-	  s0 = algn (cpu, s0H, s0L, IREG (0) & 3);
-	  s1 = algn (cpu, s1H, s1L, IREG (1) & 3);
+	  s0 = algn (s0H, s0L, IREG (0) & 3);
+	  s1 = algn (s1H, s1L, IREG (1) & 3);
 	}
       else
 	{
-	  s0 = algn (cpu, s0L, s0H, IREG (0) & 3);
-	  s1 = algn (cpu, s1L, s1H, IREG (1) & 3);
+	  s0 = algn (s0L, s0H, IREG (0) & 3);
+	  s1 = algn (s1L, s1H, IREG (1) & 3);
 	}
 
       SET_DREG (dst0,
@@ -3815,13 +3815,13 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
       s1H = DREG (src1 + 1);
       if (s)
 	{
-	  s0 = algn (cpu, s0H, s0L, IREG (0) & 3);
-	  s1 = algn (cpu, s1H, s1L, IREG (1) & 3);
+	  s0 = algn (s0H, s0L, IREG (0) & 3);
+	  s1 = algn (s1H, s1L, IREG (1) & 3);
 	}
       else
 	{
-	  s0 = algn (cpu, s0L, s0H, IREG (0) & 3);
-	  s1 = algn (cpu, s1L, s1H, IREG (1) & 3);
+	  s0 = algn (s0L, s0H, IREG (0) & 3);
+	  s1 = algn (s1L, s1H, IREG (1) & 3);
 	}
 
       SET_DREG (dst0,
@@ -3998,7 +3998,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
+decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 {
   /* dsp32shift
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -4533,7 +4533,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 }
 
 static void
-decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
+decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 {
   /* dsp32shiftimm
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -4960,23 +4960,23 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
   else if (((iw0 & 0xFF80) == 0xE080) && ((iw1 & 0x0C00) == 0x0000))
     decode_LoopSetup_0 (cpu, iw0, iw1, pc);
   else if (((iw0 & 0xFF00) == 0xE100) && ((iw1 & 0x0000) == 0x0000))
-    decode_LDIMMhalf_0 (cpu, iw0, iw1, pc);
+    decode_LDIMMhalf_0 (cpu, iw0, iw1);
   else if (((iw0 & 0xFE00) == 0xE200) && ((iw1 & 0x0000) == 0x0000))
     decode_CALLa_0 (cpu, iw0, iw1, pc);
   else if (((iw0 & 0xFC00) == 0xE400) && ((iw1 & 0x0000) == 0x0000))
-    decode_LDSTidxI_0 (cpu, iw0, iw1, pc);
+    decode_LDSTidxI_0 (cpu, iw0, iw1);
   else if (((iw0 & 0xFFFE) == 0xE800) && ((iw1 & 0x0000) == 0x0000))
     decode_linkage_0 (cpu, iw0, iw1);
   else if (((iw0 & 0xF600) == 0xC000) && ((iw1 & 0x0000) == 0x0000))
-    decode_dsp32mac_0 (cpu, iw0, iw1, pc);
+    decode_dsp32mac_0 (cpu, iw0, iw1);
   else if (((iw0 & 0xF600) == 0xC200) && ((iw1 & 0x0000) == 0x0000))
-    decode_dsp32mult_0 (cpu, iw0, iw1, pc);
+    decode_dsp32mult_0 (cpu, iw0, iw1);
   else if (((iw0 & 0xF7C0) == 0xC400) && ((iw1 & 0x0000) == 0x0000))
-    decode_dsp32alu_0 (cpu, iw0, iw1, pc);
+    decode_dsp32alu_0 (cpu, iw0, iw1);
   else if (((iw0 & 0xF7E0) == 0xC600) && ((iw1 & 0x01C0) == 0x0000))
-    decode_dsp32shift_0 (cpu, iw0, iw1, pc);
+    decode_dsp32shift_0 (cpu, iw0, iw1);
   else if (((iw0 & 0xF7E0) == 0xC680) && ((iw1 & 0x0000) == 0x0000))
-    decode_dsp32shiftimm_0 (cpu, iw0, iw1, pc);
+    decode_dsp32shiftimm_0 (cpu, iw0, iw1);
   else if ((iw0 & 0xFF00) == 0xF800)
     decode_psedoDEBUG_0 (cpu, iw0), insn_len = 2;
   else if ((iw0 & 0xFF00) == 0xF900)
