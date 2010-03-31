@@ -76,3 +76,5 @@ a:
 	.dw 8
 	.dw 9
 	.dw 0xa
+
+	.space (0x100);
