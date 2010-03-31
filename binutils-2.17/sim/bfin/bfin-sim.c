@@ -3452,7 +3452,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bu64 acc0 = get_extended_acc (cpu, 0);
       bu64 acc1 = get_extended_acc (cpu, 1);
 
-      TRACE_INSN (cpu, "A0 -= A1;");
+      TRACE_INSN (cpu, "A0 -= A1%s;", s ? " (W32)" : "");
 
       acc0 -= acc1;
       if ((bs64)acc0 < -0x8000000000ll)
