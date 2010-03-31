@@ -93,7 +93,7 @@ _gptab:
 	.dw 0x500
 	.dw 0x600
 
-	.data
+	.space (0x100)
 a:
 	.dw 1
 	.dw 2
