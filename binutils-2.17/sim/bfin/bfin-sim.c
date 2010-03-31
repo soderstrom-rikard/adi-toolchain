@@ -3300,7 +3300,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	{
 	  /* A0 -= A1 (W32) */
 	  if (acc0 & (bu64)0x8000000000)
-	     STORE (A0XREG, 0x80);
+	    STORE (A0XREG, 0x80);
 	  else
 	    STORE (A0XREG, 0x0);
 	}
@@ -3938,7 +3938,7 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   int HLs = ((iw1 >> 12) & 0x3);
 
   TRACE_EXTRACT (cpu, "%s: M:%i sopcde:%i sop:%i HLs:%i dst0:%i src0:%i src1:%i",
-		__func__, M, sopcde, sop, HLs, dst0, src0, src1);
+		 __func__, M, sopcde, sop, HLs, dst0, src0, src1);
 
   if ((sop == 0 || sop == 1) && sopcde == 0)
     {
