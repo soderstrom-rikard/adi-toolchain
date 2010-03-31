@@ -1,13 +1,9 @@
 //Original:/testcases/core/c_dsp32alu_rh_rnd20_m/c_dsp32alu_rh_rnd20_m.dsp
 // Spec Reference: dsp32alu dreg (half)
 # mach: bfin
-# xfail: "need to implement (RND20) in sim" bfin-*
 
 .include "testutils.inc"
 	start
-
-
-
 
 imm32 r0, 0xa5678911;
 imm32 r1, 0x2a89ab1d;
@@ -258,8 +254,6 @@ CHECKREG r4, 0xFC9D891B;
 CHECKREG r5, 0xF996DB1D;
 CHECKREG r6, 0xF7F9D515;
 CHECKREG r7, 0x08057D77;
-
-
 
 pass
 

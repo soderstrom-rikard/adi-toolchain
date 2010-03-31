@@ -1,5 +1,4 @@
 # mach: bfin
-# xfail: "need to implement dregs_hi = dregs - dregs (RND20) in sim" bfin-*
 
 .include "testutils.inc"
 	start
