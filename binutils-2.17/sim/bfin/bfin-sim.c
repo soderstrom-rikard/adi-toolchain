@@ -3300,22 +3300,108 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       TRACE_INSN (cpu, "A0.H = R%i.H;", src0);
       SET_AWREG (0, REG_H_L (DREG (src0), AWREG (0)));
     }
-  else if (x == 1 && HL == 1 && aop == 3 && aopcde == 5)
-    unhandled_instruction (cpu, "dregs_hi = dregs - dregs (RND20)");
-  else if (x == 1 && HL == 1 && aop == 2 && aopcde == 5)
-    unhandled_instruction (cpu, "dregs_hi = dregs + dregs (RND20)");
-  else if (x == 0 && HL == 0 && aop == 1 && aopcde == 5)
-    unhandled_instruction (cpu, "dregs_lo = dregs - dregs (RND12)");
-  else if (x == 0 && HL == 0 && aop == 0 && aopcde == 5)
-    unhandled_instruction (cpu, "dregs_lo = dregs + dregs (RND12)");
-  else if (x == 1 && HL == 0 && aop == 3 && aopcde == 5)
-    unhandled_instruction (cpu, "dregs_lo = dregs - dregs (RND20)");
-  else if (x == 0 && HL == 1 && aop == 0 && aopcde == 5)
-    unhandled_instruction (cpu, "dregs_hi = dregs + dregs (RND12)");
-  else if (x == 1 && HL == 0 && aop == 2 && aopcde == 5)
-    unhandled_instruction (cpu, "dregs_lo = dregs + dregs (RND20)");
-  else if (x == 0 && HL == 1 && aop == 1 && aopcde == 5)
-    unhandled_instruction (cpu, "dregs_hi = dregs - dregs (RND12)");
+  else if ((aop == 1 || aop == 0) && aopcde == 5)
+    {
+      bs32 val0 = DREG(src0);
+      bs32 val1 = DREG(src1);
+      bs32 res;
+      bs32 signRes;
+      bs32 ovX, sBit1,sBit2,sBitRes1,sBitRes2;
+
+      TRACE_INSN (cpu, "R%i.%s = R%i %s R%i (RND12)", dst0, HL ? "L" : "H",
+	src0, aop & 0x1 ? "-" : "+", src1);
+
+      /* If subtract, just invert and add one */
+      if (aop & 0x1)
+	val1= ~val1 + 1;
+
+      /* Get the sign bits, since we need them later */
+      sBit1 = (val0 & 0x80000000) ? 1:0;
+      sBit2 = (val1 & 0x80000000) ? 1:0;
+
+      res = val0 + val1;
+
+      sBitRes1 = (res & 0x80000000) ? 1:0;
+      /* Round to the 12th bit */
+      res += 0x0800;
+      sBitRes2 = (res & 0x80000000) ? 1:0;
+
+      signRes = res;
+      signRes >>= 27;
+
+      /* Overflow if
+       * pos + pos = neg
+       * neg + neg = pos
+       * positive_res + positive_round = neg
+       * shift and upper 4 bits where not the same
+       */
+      if ((!(sBit1 ^ sBit2) && (sBit1 ^ sBitRes1)) ||
+		(!sBit1 && !sBit2 && sBitRes2) ||
+		((signRes != 0) && (signRes != -1)))
+	{
+	  // Both X1 and X2 Neg res is neg overflow
+	  if(sBit1 && sBit2)
+	    res = 0x80000000;
+	  // Both X1 and X2 Pos res is pos overflow
+	  else if(!sBit1 && !sBit2)
+	    res = 0x7FFFFFFF;
+	  // Pos+Neg or Neg+Pos take the sign of the result
+	  else if(sBitRes1)
+	    res = 0x80000000;
+	  else 
+	    res = 0x7FFFFFFF;
+
+	  ovX = 1;
+	}
+      else
+	{
+	  // Shift up now after overflow detection
+	  ovX = 0;
+	  res <<= 4;
+	}
+
+      res >>= 16;
+
+      if (HL)
+	STORE(DREG(dst0), (DREG(dst0) & 0xFFFF) | (res << 16 ));
+      else
+	STORE(DREG(dst0), (DREG(dst0) & 0xFFFF0000) | res);
+
+      SET_ASTATREG (az, res == 0);
+      SET_ASTATREG (an, res & 0x8000);
+      SET_ASTATREG (v, ovX);
+      SET_ASTATREG (vs, ovX);
+    }
+  else if ((aop == 2 || aop == 3) && aopcde == 5)
+    {
+      bs32 val0 = DREG(src0);
+      bs32 val1 = DREG(src1);
+      bs32 res;
+
+      TRACE_INSN (cpu, "R%i.%s = R%i %s R%i (RND20)", dst0, HL ? "L" : "H",
+	src0, aop & 0x1 ? "-" : "+", src1);
+
+      /* If subtract, just invert and add one */
+      if (aop & 0x1)
+        val1= ~val1 + 1;
+
+      res = (val0 >> 4) + (val1 >> 4) + (((val0 & 0xf) + (val1 & 0xf)) >> 4);
+      res += 0x8000;
+      /* Don't sign extend during the shift */
+      res = ((bu32)res >> 16);
+
+      /* Don't worry about overflows, since we are shifting right */
+
+      if (HL)
+	STORE(DREG(dst0), (DREG(dst0) & 0xFFFF) | (res << 16 ));
+      else
+	STORE(DREG(dst0), (DREG(dst0) & 0xFFFF0000) | res);
+
+      SET_ASTATREG (az, res == 0);
+      SET_ASTATREG (an, res & 0x8000);
+      SET_ASTATREG (v, 0);
+
+    }
   else if (aopcde == 2 || aopcde == 3)
     {
       bu32 s1, s2, val;
