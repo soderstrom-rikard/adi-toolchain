@@ -3810,8 +3810,8 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
     }
   else if ((aop == 0 || aop == 1) && aopcde == 10)
     {
-      TRACE_INSN (cpu, "R%i = A%i.X;", dst0, aop);
-      SET_DREG (dst0, (bs8)AXREG (aop));
+      TRACE_INSN (cpu, "R%i.L = A%i.X;", dst0, aop);
+      SET_DREG_L (dst0, (bs8)AXREG (aop));
     }
   else if (aop == 0 && aopcde == 4)
     {
