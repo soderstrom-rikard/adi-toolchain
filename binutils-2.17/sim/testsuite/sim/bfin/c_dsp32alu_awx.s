@@ -1,7 +1,6 @@
 //Original:/testcases/core/c_dsp32alu_awx/c_dsp32alu_awx.dsp
 // Spec Reference: dsp32alu awx
 # mach: bfin
-# xfail: "need to implement A0 += A1 in sim" bfin-*
 
 .include "testutils.inc"
 	start

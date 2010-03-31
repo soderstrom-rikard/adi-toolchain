@@ -1,5 +1,4 @@
 # mach: bfin
-# xfail: "need to implement dregs_lo = (A0 += A1) in sim" bfin-*
 
 // GENERIC BIQUAD:
 // ---------------

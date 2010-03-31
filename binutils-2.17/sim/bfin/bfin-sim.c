@@ -1151,6 +1151,16 @@ decode_multfunc (SIM_CPU *cpu, int h0, int h1, int src0, int src1, int mmod,
   return val1;
 }
 
+static bu40
+saturate_s40 (bu64 val)
+{
+  if ((bs64)val < -((bs64)1 << 39))
+    val = -((bs64)1 << 39);
+  else if ((bs64)val >= ((bs64)1 << 39) - 1)
+    val = ((bu64)1 << 39) - 1;
+  return val;
+}
+
 static bu32
 saturate_s32 (bu64 val)
 {
@@ -3773,40 +3783,39 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 	unhandled_instruction (cpu,
 	  "dregs = dregs +|+ dregs, dregs = dregs -|- dregs (amod0, amod2)");
     }
-  else if (aop == 1 && HL == 0 && aopcde == 11)
-    unhandled_instruction (cpu, "dregs_lo = (A0 += A1)");
-  else if (aop == 1 && HL == 1 && aopcde == 11)
-    unhandled_instruction (cpu, "dregs_hi = (A0 += A1)");
-  else if ((aop == 0 || aop == 2) && aopcde == 11)
+  else if ((aop == 0 || aop == 1 || aop == 2) && aopcde == 11)
     {
       bu64 acc0 = get_extended_acc (cpu, 0);
       bu64 acc1 = get_extended_acc (cpu, 1);
 
-      TRACE_INSN (cpu, "A0 += A1;");
+      if (aop == 0)
+	TRACE_INSN (cpu, "R%i = (A0 += A1);", dst0);
+      else if (aop == 1)
+	TRACE_INSN (cpu, "R%i.%c = (A0 += A1);", dst0, HL ? 'H' : 'L');
+      else
+	TRACE_INSN (cpu, "A0 += A1%s;", s ? " (W32)" : "");
 
       acc0 += acc1;
-      if ((bs64)acc0 < -0x8000000000ll)
-	acc0 = -0x8000000000ull;
-      else if ((bs64)acc0 >= 0x7fffffffffll)
-	acc0 = 0x7fffffffffull;
-      STORE (AXREG (0), (acc0 >> 32) & 0xff);
-      STORE (AWREG (0), acc0 & 0xffffffff);
-      if (aop == 2 && s == 1)
-	{ /* A0 += A1 (W32) */
+      acc0 = saturate_s40 (acc0);
+      STORE (AXREG (0), acc0 >> 32);
+      STORE (AWREG (0), acc0);
+      if (aop == 2 && s == 1)	/* A0 += A1 (W32) */
+	{
 	  if (acc0 & (bu64)0x8000000000)
 	    STORE (AXREG (0), 0x80);
 	  else
 	    STORE (AXREG (0), 0x0);
 	}
-      if (aop == 0)
+      else if (aop == 1)	/* Dregs_lo = A0 += A1 */
 	{
-	  if ((bs64)acc0 < -0x80000000ll)
-	    STORE (DREG (dst0), 0x80000000);
-	  else if ((bs64)acc0 > 0x7fffffff)
-	    STORE (DREG (dst0), 0x7fffffff);
+	  bu32 val = saturate_s32 (rnd16 (acc0) << 16);
+	  if (HL)
+	    STORE (DREG (dst0), REG_H_L (val, DREG (dst0)));
 	  else
-	    STORE (DREG (dst0), acc0);
+	    STORE (DREG (dst0), REG_H_L (DREG (dst0), val >> 16));
 	}
+      else if (aop == 0)	/* Dregs = A0 += A1 */
+	STORE (DREG (dst0), saturate_s32 (acc0));
     }
   else if ((aop == 0 || aop == 1) && aopcde == 10)
     {
