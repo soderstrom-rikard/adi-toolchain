@@ -2874,7 +2874,7 @@ decode_CALLa_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 1 | 1 | 1 | 0 | 0 | 0 | 1 |.S.|.msw...........................|
      |.lsw...........................................................|
-     +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+   */
+     +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
   int S = ((iw0 >> 8) & 0x1);
   int lsw = ((iw1 >> 0) & 0xffff);
   int msw = ((iw0 >> 0) & 0xff);
@@ -3103,7 +3103,7 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   /* dsp32mult
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
      | 1 | 1 | 0 | 0 |.M.| 0 | 1 |.mmod..........|.MM|.P.|.w1|.op1...|
-     |.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1......|
+     |.h01|.h11|.w0|.op0...|.h00|.h10|.dst.......|.src0......|.src1..|
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
   int op1 = ((iw0 >> 0) & 0x3);
   int w1 = ((iw0 >> 2) & 0x1);
@@ -3270,7 +3270,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   else if (aop == 1 && aopcde == 9 && s == 0)
     {
       TRACE_INSN (cpu, "A0.X = R%i.L;", src0);
-      SET_AXREG (0, (bs32)(bs8)DREG (src0));
+      SET_AXREG (0, (bs8)DREG (src0));
     }
   else if (aop == 2 && aopcde == 9 && s == 1)
     {
@@ -3280,7 +3280,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   else if (aop == 3 && aopcde == 9 && s == 0)
     {
       TRACE_INSN (cpu, "A1.X = R%i.L;", src0);
-      SET_AXREG (1, (bs32)(bs8)DREG (src0));
+      SET_AXREG (1, (bs8)DREG (src0));
     }
   else if (aop == 3 && aopcde == 11 && (s == 0 || s == 1))
     {
@@ -3645,9 +3645,8 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     }
   else if ((aop == 0 || aop == 1) && aopcde == 10)
     {
-      TRACE_INSN (cpu, "R%i = A%i.x;", dst0, aop);
-      SET_DREG (dst0, (DREG (dst0) & 0xFFFF0000) |
-		      (AXREG (aop) & 0xFFFF));
+      TRACE_INSN (cpu, "R%i = A%i.X;", dst0, aop);
+      SET_DREG (dst0, (bs8)AXREG (aop));
     }
   else if (aop == 0 && aopcde == 4)
     {
