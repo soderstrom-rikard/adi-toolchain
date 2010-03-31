@@ -3680,10 +3680,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   else if (aop == 3 && HL == 0 && aopcde == 14)
     {
       TRACE_INSN (cpu, "A1 = - A1 , A0 = - A0;");
-      AWREG (0) = -AWREG (0);
-      AXREG (0) = -AXREG (0);
-      AWREG (1) = -AWREG (1);
-      AXREG (1) = -AXREG (1);
+
+      SET_AREG (0, saturate_s40 (-get_extended_acc (cpu, 0)));
+      SET_AREG (1, saturate_s40 (-get_extended_acc (cpu, 1)));
       /* XXX: what ASTAT flags need updating ?  */
     }
   else if (HL == 1 && aop == 3 && aopcde == 12)
@@ -3696,28 +3695,30 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       SET_DREG (dst0, (DREG (dst0) & 0xFFFF) |
 		      (val & 0x7FFF0000) |
 		      (DREG (src0) & 0x80000000));
+
       /* XXX: what ASTAT flags need updating ?  */
     }
   else if ((aop == 0 || aop == 1) && (HL == 0 || HL == 1) && aopcde == 14)
     {
-      bu32 aw = AWREG (aop);
-      bu32 ax = AXREG (aop);
-      TRACE_INSN (cpu, "A%i = - A%i;", HL, aop);
-      AWREG (HL) = -AWREG (aop);
-      AXREG (HL) = -AXREG (aop);
+      bs40 src_acc = get_extended_acc (cpu, aop);
 
+      TRACE_INSN (cpu, "A%i = - A%i %#lx %#lx;", HL, aop, src_acc, -src_acc);
+
+      SET_AREG (HL, saturate_s40 (-src_acc));
+
+      /* XXX: Are these ASTAT flags correct ?  */
       SET_ASTATREG (az, AWREG (HL) == 0 && AXREG (HL) == 0);
       SET_ASTATREG (an, AXREG (HL) >> 7);
-      SET_ASTATREG (ac0, aw == 0 && ax == 0);
+      SET_ASTATREG (ac0, src_acc == 0);
       if (HL == 0)
 	{
-	  SET_ASTATREG (av0, ax >> 7);
+	  SET_ASTATREG (av0, src_acc < 0);
 	  if (ASTATREG (av0))
 	    SET_ASTATREG (av0s, 1);
 	}
       else
 	{
-	  SET_ASTATREG (av1, ax >> 7);
+	  SET_ASTATREG (av1, src_acc < 0);
 	  if (ASTATREG (av1))
 	    SET_ASTATREG (av1s, 1);
 	}
