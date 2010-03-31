@@ -199,7 +199,7 @@ bfin_mmu_finish (struct hw *me)
 
 const struct hw_descriptor dv_bfin_mmu_descriptor[] = {
   {"bfin_mmu", bfin_mmu_finish,},
-  {NULL},
+  {NULL, NULL},
 };
 
 #define MMU_STATE(cpu) ((struct bfin_mmu *) dv_get_state (cpu, "/core/bfin_mmu"))

@@ -106,7 +106,7 @@ bfin_evt_finish (struct hw *me)
 
 const struct hw_descriptor dv_bfin_evt_descriptor[] = {
   {"bfin_evt", bfin_evt_finish,},
-  {NULL},
+  {NULL, NULL},
 };
 
 #define EVT_STATE(cpu) ((struct bfin_evt *) dv_get_state (cpu, "/core/bfin_evt"))

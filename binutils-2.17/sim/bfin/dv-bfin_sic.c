@@ -127,5 +127,5 @@ bfin_sic_finish (struct hw *me)
 
 const struct hw_descriptor dv_bfin_sic_descriptor[] = {
   {"bfin_sic", bfin_sic_finish,},
-  {NULL},
+  {NULL, NULL},
 };

@@ -168,5 +168,5 @@ bfin_pll_finish (struct hw *me)
 
 const struct hw_descriptor dv_bfin_pll_descriptor[] = {
   {"bfin_pll", bfin_pll_finish,},
-  {NULL},
+  {NULL, NULL},
 };

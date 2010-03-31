@@ -137,5 +137,5 @@ bfin_trace_finish (struct hw *me)
 
 const struct hw_descriptor dv_bfin_trace_descriptor[] = {
   {"bfin_trace", bfin_trace_finish,},
-  {NULL},
+  {NULL, NULL},
 };

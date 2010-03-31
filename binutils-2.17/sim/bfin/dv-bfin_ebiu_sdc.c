@@ -170,5 +170,5 @@ bfin_ebiu_sdc_finish (struct hw *me)
 
 const struct hw_descriptor dv_bfin_ebiu_sdc_descriptor[] = {
   {"bfin_ebiu_sdc", bfin_ebiu_sdc_finish,},
-  {NULL},
+  {NULL, NULL},
 };

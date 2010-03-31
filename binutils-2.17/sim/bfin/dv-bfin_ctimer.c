@@ -125,5 +125,5 @@ bfin_ctimer_finish (struct hw *me)
 
 const struct hw_descriptor dv_bfin_ctimer_descriptor[] = {
   {"bfin_ctimer", bfin_ctimer_finish,},
-  {NULL},
+  {NULL, NULL},
 };

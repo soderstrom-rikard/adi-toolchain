@@ -205,5 +205,5 @@ bfin_ebiu_amc_finish (struct hw *me)
 
 const struct hw_descriptor dv_bfin_ebiu_amc_descriptor[] = {
   {"bfin_ebiu_amc", bfin_ebiu_amc_finish,},
-  {NULL},
+  {NULL, NULL},
 };

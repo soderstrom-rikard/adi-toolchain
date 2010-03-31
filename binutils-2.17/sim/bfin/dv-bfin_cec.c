@@ -134,7 +134,7 @@ bfin_cec_finish (struct hw *me)
 
 const struct hw_descriptor dv_bfin_cec_descriptor[] = {
   {"bfin_cec", bfin_cec_finish,},
-  {NULL},
+  {NULL, NULL},
 };
 
 #define CEC_STATE(cpu) ((struct bfin_cec *) dv_get_state (cpu, "/core/bfin_cec"))
