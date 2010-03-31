@@ -67,6 +67,9 @@ struct bfin_cpu_state
 
   /* Set by an instruction emulation function if we performed a jump.  */
   bool did_jump;
+  /* Set by an instruction emulation function if we changed flow.  Not
+     the same as jumping (think RTS rather than JUMP).  */
+  bool flow_change;
 
   /* See notes above for struct store.  */
   struct store stores[20];

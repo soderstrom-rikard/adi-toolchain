@@ -193,6 +193,7 @@ step_once (SIM_CPU *cpu)
 #endif
 
   BFIN_CPU_STATE.did_jump = false;
+  BFIN_CPU_STATE.flow_change = false;
   interp_insn_bfin (cpu, oldpc);
 
   /* @@@ Not sure how the hardware really behaves when the last insn

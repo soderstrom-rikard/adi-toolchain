@@ -1289,60 +1289,58 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
   TRACE_EXTRACT (cpu, "%s: poprnd:%i prgfunc:%i", __func__, poprnd, prgfunc);
 
   if (prgfunc == 0 && poprnd == 0)
-    {
-      TRACE_INSN (cpu, "NOP;");
-      INC_PCREG (2);
-    }
+    TRACE_INSN (cpu, "NOP;");
   else if (prgfunc == 1 && poprnd == 0)
     {
       bu32 newpc = RETSREG;
       TRACE_INSN (cpu, "RTS;");
       TRACE_BRANCH (cpu, "RTS to %#x", newpc);
       SET_PCREG (newpc);
+      BFIN_CPU_STATE.flow_change = true;
     }
   else if (prgfunc == 1 && poprnd == 1)
     {
       TRACE_INSN (cpu, "RTI;");
       TRACE_BRANCH (cpu, "RTI may change PC");
       cec_return (cpu, -1);
+      BFIN_CPU_STATE.flow_change = true;
     }
   else if (prgfunc == 1 && poprnd == 2)
     {
       TRACE_INSN (cpu, "RTX;");
       TRACE_BRANCH (cpu, "RTX may change PC");
       cec_return (cpu, IVG_EVX);
+      BFIN_CPU_STATE.flow_change = true;
     }
   else if (prgfunc == 1 && poprnd == 3)
     {
       TRACE_INSN (cpu, "RTN;");
       TRACE_BRANCH (cpu, "RTN may change PC");
       cec_return (cpu, IVG_NMI);
+      BFIN_CPU_STATE.flow_change = true;
     }
   else if (prgfunc == 1 && poprnd == 4)
     {
       TRACE_INSN (cpu, "RTE;");
       TRACE_BRANCH (cpu, "RTE may change PC");
       cec_return (cpu, IVG_EMU);
+      BFIN_CPU_STATE.flow_change = true;
     }
   else if (prgfunc == 2 && poprnd == 0)
     {
-      TRACE_INSN (cpu, "IDLE;");
-      INC_PCREG (2);
       /* XXX: in supervisor mode, utilizes wake up sources
-       * in user mode, it's a NOP
-       */
+       * in user mode, it's a NOP ...  */
+      TRACE_INSN (cpu, "IDLE;");
     }
   else if (prgfunc == 2 && poprnd == 3)
     {
-      TRACE_INSN (cpu, "CSYNC;");
       /* just NOP it */
-      INC_PCREG (2);
+      TRACE_INSN (cpu, "CSYNC;");
     }
   else if (prgfunc == 2 && poprnd == 4)
     {
-      TRACE_INSN (cpu, "SSYNC;");
       /* just NOP it */
-      INC_PCREG (2);
+      TRACE_INSN (cpu, "SSYNC;");
     }
   else if (prgfunc == 2 && poprnd == 5)
     {
@@ -1354,13 +1352,11 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
     {
       TRACE_INSN (cpu, "CLI R%i;", poprnd);
       SET_DREG (poprnd, cec_cli (cpu));
-      INC_PCREG (2);
     }
   else if (prgfunc == 4)
     {
       TRACE_INSN (cpu, "STI R%i;", poprnd);
       cec_sti (cpu, DREG (poprnd));
-      INC_PCREG (2);
     }
   else if (prgfunc == 5)
     {
@@ -1401,7 +1397,6 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
       int raise = uimm4 (poprnd);
       TRACE_INSN (cpu, "RAISE %s;", uimm4_str (raise));
       TRACE_BRANCH (cpu, "RAISE may change PC");
-      INC_PCREG (2);
       cec_raise (cpu, raise);
     }
   else if (prgfunc == 10)
@@ -1410,7 +1405,6 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
       TRACE_INSN (cpu, "EXCPT %s;", uimm4_str (excpt));
       TRACE_BRANCH (cpu, "EXCPT may change PC");
       /* XXX: see comments in cec_exception() */
-      INC_PCREG (2);
       cec_exception (cpu, excpt);
     }
   else if (prgfunc == 11)
@@ -1421,7 +1415,6 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
       byte = GET_WORD (addr);
       SET_CCREG (byte == 0);
       PUT_BYTE (addr, byte | 0x80);
-      INC_PCREG (2);
     }
   else
     illegal_instruction (cpu);
@@ -1485,8 +1478,6 @@ decode_CaCTRL_0 (SIM_CPU *cpu, bu16 iw0)
 
   if (a == 1)
     SET_PREG (reg, preg + BFIN_L1_CACHE_BYTES);
-
-  INC_PCREG (2);
 }
 
 static void
@@ -1531,8 +1522,6 @@ decode_PushPopReg_0 (SIM_CPU *cpu, bu16 iw0)
       PUT_LONG (sp, value);
     }
   reg_set_sp (cpu, sp);
-
-  INC_PCREG (2);
 }
 
 static void
@@ -1601,8 +1590,6 @@ decode_PushPopMultiple_0 (SIM_CPU *cpu, bu16 iw0)
 	  }
     }
   reg_set_sp (cpu, sp);
-
-  INC_PCREG (2);
 }
 
 static void
@@ -1628,8 +1615,6 @@ decode_ccMV_0 (SIM_CPU *cpu, bu16 iw0)
 
   if (cond)
     reg_write (cpu, d, dst, reg_read (cpu, s, src));
-
-  INC_PCREG (2);
 }
 
 static void
@@ -1734,8 +1719,6 @@ decode_CCflag_0 (SIM_CPU *cpu, bu16 iw0)
 	  SET_ASTATREG (ac0, ac0);
 	}
     }
-
-  INC_PCREG (2);
 }
 
 static void
@@ -1767,8 +1750,6 @@ decode_CC2dreg_0 (SIM_CPU *cpu, bu16 iw0)
     }
   else
     illegal_instruction (cpu);
-
-  INC_PCREG (2);
 }
 
 static void
@@ -1840,8 +1821,6 @@ decode_CC2stat_0 (SIM_CPU *cpu, bu16 iw0)
       case 2: *pval &= CCREG; break;
       case 3: *pval ^= CCREG; break;
       }
-
-  INC_PCREG (2);
 }
 
 static void
@@ -1871,8 +1850,6 @@ decode_BRCC_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
       SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
     }
-  else
-    INC_PCREG (2);
 }
 
 static void
@@ -1917,8 +1894,6 @@ decode_REGMV_0 (SIM_CPU *cpu, bu16 iw0)
   TRACE_INSN (cpu, "%s = %s;", dstreg_name, srcreg_name);
 
   reg_write (cpu, gd, dst, reg_read (cpu, gs, src));
-
-  INC_PCREG (2);
 }
 
 static void
@@ -2018,8 +1993,6 @@ decode_ALU2op_0 (SIM_CPU *cpu, bu16 iw0)
     }
   else
     illegal_instruction (cpu);
-
-  INC_PCREG (2);
 }
 
 static void
@@ -2072,8 +2045,6 @@ decode_PTR2op_0 (SIM_CPU *cpu, bu16 iw0)
     }
   else
     illegal_instruction (cpu);
-
-  INC_PCREG (2);
 }
 
 static void
@@ -2135,8 +2106,6 @@ decode_LOGI2op_0 (SIM_CPU *cpu, bu16 iw0)
       TRACE_INSN (cpu, "R%i <<= %s;", dst, uimm_str);
       SET_DREG (dst, lshift (cpu, DREG (dst), uimm, 32, 0));
     }
-
-  INC_PCREG (2);
 }
 
 static void
@@ -2200,8 +2169,6 @@ decode_COMP3op_0 (SIM_CPU *cpu, bu16 iw0)
       TRACE_INSN (cpu, "P%i = P%i + P%i << 0x2;", dst, src0, src1);
       SET_PREG (dst, PREG (src0) + (PREG (src1) << 2));
     }
-
-  INC_PCREG (2);
 }
 
 static void
@@ -2229,8 +2196,6 @@ decode_COMPI2opD_0 (SIM_CPU *cpu, bu16 iw0)
       TRACE_INSN (cpu, "R%i += %s;", dst, imm7_str (imm));
       SET_DREG (dst, add32 (cpu, DREG (dst), imm, 1, 0));
     }
-
-  INC_PCREG (2);
 }
 
 static void
@@ -2258,8 +2223,6 @@ decode_COMPI2opP_0 (SIM_CPU *cpu, bu16 iw0)
       TRACE_INSN (cpu, "P%i += %s;", dst, imm7_str (imm));
       SET_PREG (dst, PREG (dst) + imm);
     }
-
-  INC_PCREG (2);
 }
 
 static void
@@ -2369,8 +2332,6 @@ decode_LDSTpmod_0 (SIM_CPU *cpu, bu16 iw0)
     }
   else
     illegal_instruction (cpu);
-
-  INC_PCREG (2);
 }
 
 static void
@@ -2404,8 +2365,6 @@ decode_dagMODim_0 (SIM_CPU *cpu, bu16 iw0)
     }
   else
     illegal_instruction (cpu);
-
-  INC_PCREG (2);
 }
 
 static void
@@ -2442,8 +2401,6 @@ decode_dagMODik_0 (SIM_CPU *cpu, bu16 iw0)
     }
   else
     illegal_instruction (cpu);
-
-  INC_PCREG (2);
 }
 
 static void
@@ -2598,8 +2555,6 @@ decode_dspLDST_0 (SIM_CPU *cpu, bu16 iw0)
     }
   else
     illegal_instruction (cpu);
-
-  INC_PCREG (2);
 }
 
 static void
@@ -2691,8 +2646,6 @@ decode_LDST_0 (SIM_CPU *cpu, bu16 iw0)
     SET_PREG (ptr, PREG (ptr) + (sz == 0 ? 4 : sz == 1 ? 2 : 1));
   if (aop == 1)
     SET_PREG (ptr, PREG (ptr) - (sz == 0 ? 4 : sz == 1 ? 2 : 1));
-
-  INC_PCREG (2);
 }
 
 static void
@@ -2722,8 +2675,6 @@ decode_LDSTiiFP_0 (SIM_CPU *cpu, bu16 iw0)
       TRACE_INSN (cpu, "[FP + %s] = %s;", imm_str, get_allreg_name (0, reg));
       PUT_LONG (ea, reg_read (cpu, 0, reg));
     }
-
-  INC_PCREG (2);
 }
 
 static void
@@ -2796,8 +2747,6 @@ decode_LDSTii_0 (SIM_CPU *cpu, bu16 iw0)
 	  PUT_LONG (ea, PREG (reg));
 	}
     }
-
-  INC_PCREG (2);
 }
 
 static void
@@ -2839,8 +2788,6 @@ decode_LoopSetup_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     illegal_instruction (cpu);
   SET_LTREG (c, PCREG + spcrel);
   SET_LBREG (c, PCREG + epcrel);
-
-  INC_PCREG (4);
 }
 
 static void
@@ -2893,8 +2840,6 @@ decode_LDIMMhalf_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     illegal_instruction (cpu);
 
   reg_write (cpu, grp, reg, val);
-
-  INC_PCREG (4);
 }
 
 static void
@@ -2925,6 +2870,7 @@ decode_CALLa_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     TRACE_BRANCH (cpu, "JUMP.L to %#x", newpc);
 
   INC_PCREG (pcrel);
+  BFIN_CPU_STATE.did_jump = true;
 }
 
 static void
@@ -3013,8 +2959,6 @@ decode_LDSTidxI_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	  PUT_BYTE (PREG (ptr) + imm_16, DREG (reg));
 	}
     }
-
-  INC_PCREG (4);
 }
 
 static void
@@ -3054,8 +2998,6 @@ decode_linkage_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       sp += 4;
     }
   reg_set_sp (cpu, sp);
-
-  INC_PCREG (4);
 }
 
 static void
@@ -3128,8 +3070,6 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	  SET_DREG (dst, (DREG (dst) & 0xFFFF) | (res1 << 16));
 	}
     }
-
-  INC_PCREG (4);
 }
 
 static void
@@ -3210,8 +3150,6 @@ decode_dsp32mult_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 	  SET_DREG (dst, REG_H_L (res1 << 16, DREG (dst)));
 	}
     }
-
-  INC_PCREG (4);
 }
 
 static void
@@ -3957,8 +3895,6 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     }
   else
     illegal_instruction (cpu);
-
-  INC_PCREG (4);
 }
 
 static void
@@ -4494,8 +4430,6 @@ decode_dsp32shift_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     }
   else
     illegal_instruction (cpu);
-
-  INC_PCREG (4);
 }
 
 static void
@@ -4722,8 +4656,6 @@ decode_dsp32shiftimm_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     }
   else
     illegal_instruction (cpu);
-
-  INC_PCREG (4);
 }
 
 static void
@@ -4789,8 +4721,6 @@ decode_psedoDEBUG_0 (SIM_CPU *cpu, bu16 iw0)
     unhandled_instruction (cpu, "PRNT allregs");
   else
     illegal_instruction (cpu);
-
-  INC_PCREG (2);
 }
 
 static void
@@ -4806,8 +4736,6 @@ decode_psedoOChar_0 (SIM_CPU *cpu, bu16 iw0)
   TRACE_INSN (cpu, "OUTC %#x;", ch);
 
   outc (cpu, ch);
-
-  INC_PCREG (2);
 }
 
 static void
@@ -4854,32 +4782,33 @@ decode_psedodbg_assert_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       cec_exception (cpu, VEC_ILGAL_I);
       SET_DREG (0, 1);
     }
-
-  INC_PCREG (4);
 }
 
-static void
-_interp_insn_bfin (SIM_CPU *cpu, bu32 pc, int *is_multiinsn)
+static bu32
+_interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
 {
-  bu16 iw0 = IFETCH (pc), iw1;
+  bu32 insn_len;
+  bu16 iw0, iw1;
 
+  iw0 = IFETCH (pc);
   if ((iw0 & 0xc000) == 0xc000)
     {
       iw1 = IFETCH (pc + 2);
-      TRACE_EXTRACT (cpu, "%s: iw0:%#x iw1:%#x", __func__, iw0, iw1);
+      if ((iw0 & BIT_MULTI_INS) && (iw0 & 0xe800) != 0xe800 /* not linkage */)
+	insn_len = 8;
+      else
+	insn_len = 4;
+      TRACE_EXTRACT (cpu, "%s: iw0:%#x iw1:%#x insn_len:%i", __func__,
+		     iw0, iw1, insn_len);
     }
   else
-    TRACE_EXTRACT (cpu, "%s: iw0:%#x", __func__, iw0);
-
-  *is_multiinsn = ((iw0 & 0xc000) == 0xc000 && (iw0 & BIT_MULTI_INS)
-		   && ((iw0 & 0xe800) != 0xe800 /* not linkage */));
-  TRACE_DECODE (cpu, "%s: is_multiinsn:%i", __func__, *is_multiinsn);
+    {
+      insn_len = 2;
+      TRACE_EXTRACT (cpu, "%s: iw0:%#x", __func__, iw0);
+    }
 
   if ((iw0 & 0xf7ff) == 0xc003 && iw1 == 0x1800)
-    {
-      TRACE_INSN (cpu, "MNOP;");
-      INC_PCREG (4);
-    }
+    TRACE_INSN (cpu, "MNOP;");
   else if ((iw0 & 0xFF00) == 0x0000)
     decode_ProgCtrl_0 (cpu, iw0);
   else if ((iw0 & 0xFFC0) == 0x0240)
@@ -4949,33 +4878,39 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc, int *is_multiinsn)
   else if (((iw0 & 0xF7E0) == 0xC680) && ((iw1 & 0x0000) == 0x0000))
     decode_dsp32shiftimm_0 (cpu, iw0, iw1, pc);
   else if ((iw0 & 0xFF00) == 0xF800)
-    decode_psedoDEBUG_0 (cpu, iw0);
+    decode_psedoDEBUG_0 (cpu, iw0), insn_len = 2;
   else if ((iw0 & 0xFF00) == 0xF900)
-    decode_psedoOChar_0 (cpu, iw0);
+    decode_psedoOChar_0 (cpu, iw0), insn_len = 2;
   else if (((iw0 & 0xFF00) == 0xF000) && ((iw1 & 0x0000) == 0x0000))
     decode_psedodbg_assert_0 (cpu, iw0, iw1);
   else
     illegal_instruction (cpu);
 
   cycles_inc (cpu, 1);
+
+  return insn_len;
 }
 
 void
 interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
 {
-  int i, is_multiinsn;
+  int i;
+  bu32 insn_len;
 
   BFIN_CPU_STATE.n_stores = 0;
 
-  _interp_insn_bfin (cpu, pc, &is_multiinsn);
+  insn_len = _interp_insn_bfin (cpu, pc);
 
   /* Proper display of multiple issue instructions.  */
-  if (is_multiinsn)
+  if (insn_len == 8)
     {
-      _interp_insn_bfin (cpu, pc + 4, &is_multiinsn);
-      _interp_insn_bfin (cpu, pc + 6, &is_multiinsn);
+      _interp_insn_bfin (cpu, pc + 4);
+      _interp_insn_bfin (cpu, pc + 6);
     }
   for (i = 0; i < BFIN_CPU_STATE.n_stores; i++)
     /* XXX: This is missing register tracing.  */
     *BFIN_CPU_STATE.stores[i].addr = BFIN_CPU_STATE.stores[i].val;
+
+  if (!BFIN_CPU_STATE.did_jump && !BFIN_CPU_STATE.flow_change)
+    INC_PCREG (insn_len);
 }

@@ -228,6 +228,8 @@ cec_exception (SIM_CPU *cpu, int excp)
       SET_SEQSTATREG ((SEQSTATREG & ~0x3f) | excp);
       if (STATE_ENVIRONMENT (sd) == OPERATING_ENVIRONMENT)
 	{
+	  if (excp < 0x10)
+	    INC_PCREG (2);
 	  _cec_raise (cpu, CEC_STATE (cpu), IVG_EVX);
 	  return;
 	}
@@ -416,6 +418,7 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
 
       TRACE_BRANCH (cpu, "CEC changed PC (to EVT%i): %#x -> %#x",
 		    ivg, oldpc, PCREG);
+      BFIN_CPU_STATE.flow_change = true;
 
       /* Enable the global interrupt mask upon interrupt entry.  */
       cec_irpten_enable (cpu, cec);
@@ -516,6 +519,7 @@ cec_return (SIM_CPU *cpu, int ivg)
 
   TRACE_BRANCH (cpu, "CEC changed PC (from EVT%i): %#x -> %#x",
 		ivg, oldpc, PCREG);
+  BFIN_CPU_STATE.flow_change = true;
 
   /* Disable global interrupt mask to let any interrupt take over.  */
   cec_irpten_disable (cpu, cec);
