@@ -177,7 +177,7 @@ trace_register (SIM_DESC sd,
 static sim_cia
 step_once (SIM_CPU *cpu)
 {
-  bu32 oldpc = PCREG;
+  bu32 insn_len, oldpc = PCREG;
 
   if (TRACE_ANY_P (cpu))
     trace_prefix (CPU_STATE (cpu), cpu, NULL_CIA, oldpc, TRACE_LINENUM_P (cpu),
@@ -194,24 +194,13 @@ step_once (SIM_CPU *cpu)
 
   BFIN_CPU_STATE.did_jump = false;
   BFIN_CPU_STATE.flow_change = false;
-  interp_insn_bfin (cpu, oldpc);
 
-  /* @@@ Not sure how the hardware really behaves when the last insn
-     of a loop is a jump.  */
-  if (!BFIN_CPU_STATE.did_jump)
-    {
-      int i;
-      for (i = 1; i >= 0; --i)
-	{
-	  if (LCREG (i) && oldpc == LBREG (i) && --LCREG (i))
-	    {
-	      SET_PCREG (LTREG (i));
-	      TRACE_BRANCH (cpu, "Hardware loop %i to %#x (%#x iters left)",
-			    i, PCREG, LCREG (i));
-	      break;
-	    }
-	}
-    }
+  insn_len = interp_insn_bfin (cpu, oldpc);
+
+  /* Only process the hwloop if we didn't arrive here out of order.
+     i.e. We jumped to this address, so we need to execute it.  */
+  if (!BFIN_CPU_STATE.did_jump && !BFIN_CPU_STATE.flow_change)
+    SET_PCREG (hwloop_get_next_pc (cpu, oldpc, insn_len));
 
   return oldpc;
 }

@@ -1276,8 +1276,29 @@ decode_macfunc (SIM_CPU *cpu, int which, int op, int h0, int h1, int src0,
   return extract_mult (cpu, acc, mmod, fullword);
 }
 
+bu32
+hwloop_get_next_pc (SIM_CPU *cpu, bu32 pc, bu32 insn_len)
+{
+  int i;
+
+  /* If our PC has reached the bottom of a hardware loop,
+     move back up to the top of the hardware loop.  */
+  for (i = 1; i >= 0; --i)
+    if (LCREG (i) && pc == LBREG (i))
+      {
+	SET_LCREG (i, LCREG (i) - 1);
+	if (LCREG (i))
+	  {
+	    TRACE_BRANCH (cpu, "Hardware loop %i to %#x", i, LTREG (i));
+	    return LTREG (i);
+	  }
+      }
+
+  return pc + insn_len;
+}
+
 static void
-decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
+decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
 {
   /* ProgCtrl
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -1345,7 +1366,9 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
   else if (prgfunc == 2 && poprnd == 5)
     {
       TRACE_INSN (cpu, "EMUEXCPT;");
-      INC_PCREG (2);
+      /* XXX: Since this goes async, we touch this directly.
+         Not entirely sure this is correct ...  */
+      SET_PCREG (pc + 2);
       cec_raise (cpu, IVG_EMU);
     }
   else if (prgfunc == 3)
@@ -1371,22 +1394,24 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0)
       bu32 newpc = PREG (poprnd);
       TRACE_INSN (cpu, "CALL (P%i);", poprnd);
       TRACE_BRANCH (cpu, "CALL (Preg) to %#x", newpc);
-      SET_RETSREG (PCREG + 2);
+      /* If we're at the end of a hardware loop, RETS is going to be
+         the top of the loop rather than the next instruction.  */
+      SET_RETSREG (hwloop_get_next_pc (cpu, pc, 2));
       SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
     }
   else if (prgfunc == 7)
     {
-      bu32 newpc = PCREG + PREG (poprnd);
+      bu32 newpc = pc + PREG (poprnd);
       TRACE_INSN (cpu, "CALL (PC + P%i);", poprnd);
       TRACE_BRANCH (cpu, "CALL (PC + Preg) to %#x", newpc);
-      SET_RETSREG (PCREG + 2);
+      SET_RETSREG (hwloop_get_next_pc (cpu, pc, 2));
       SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
     }
   else if (prgfunc == 8)
     {
-      bu32 newpc = PCREG + PREG (poprnd);
+      bu32 newpc = pc + PREG (poprnd);
       TRACE_INSN (cpu, "JUMP (PC + P%i);", poprnd);
       TRACE_BRANCH (cpu, "JUMP (PC + Preg) to %#x", newpc);
       SET_PCREG (newpc);
@@ -1845,7 +1870,7 @@ decode_BRCC_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
 	      pcrel, B ? " (bp)" : "");
   if (cond)
     {
-      bu32 newpc = PCREG + pcrel;
+      bu32 newpc = pc + pcrel;
       TRACE_BRANCH (cpu, "Conditional JUMP to %#x", newpc);
       SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
@@ -1861,7 +1886,7 @@ decode_UJUMP_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+  */
   int offset = ((iw0 >> 0) & 0xfff);
   int pcrel = pcrel12 (offset);
-  bu32 newpc = PCREG + pcrel;
+  bu32 newpc = pc + pcrel;
 
   TRACE_EXTRACT (cpu, "%s: offset:%#x", __func__, offset);
   TRACE_DECODE (cpu, "%s: pcrel12:%#x", __func__, pcrel);
@@ -2786,8 +2811,8 @@ decode_LoopSetup_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
     }
   else
     illegal_instruction (cpu);
-  SET_LTREG (c, PCREG + spcrel);
-  SET_LBREG (c, PCREG + epcrel);
+  SET_LTREG (c, pc + spcrel);
+  SET_LBREG (c, pc + epcrel);
 }
 
 static void
@@ -2854,7 +2879,7 @@ decode_CALLa_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   int lsw = ((iw1 >> 0) & 0xffff);
   int msw = ((iw0 >> 0) & 0xff);
   int pcrel = pcrel24 (((msw) << 16) | (lsw));
-  bu32 newpc = PCREG + pcrel;
+  bu32 newpc = pc + pcrel;
 
   TRACE_EXTRACT (cpu, "%s: S:%i msw:%#x lsw:%#x", __func__, S, msw, lsw);
   TRACE_DECODE (cpu, "%s: pcrel24:%#x", __func__, pcrel);
@@ -2864,12 +2889,12 @@ decode_CALLa_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
   if (S == 1)
     {
       TRACE_BRANCH (cpu, "CALL to %#x", newpc);
-      SET_RETSREG (PCREG + 4);
+      SET_RETSREG (hwloop_get_next_pc (cpu, pc, 4));
     }
   else
     TRACE_BRANCH (cpu, "JUMP.L to %#x", newpc);
 
-  INC_PCREG (pcrel);
+  SET_PCREG (newpc);
   BFIN_CPU_STATE.did_jump = true;
 }
 
@@ -4739,7 +4764,7 @@ decode_psedoOChar_0 (SIM_CPU *cpu, bu16 iw0)
 }
 
 static void
-decode_psedodbg_assert_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
+decode_psedodbg_assert_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 {
   /* psedodbg_assert
      +---+---+---+---|---+---+---+---|---+---+---+---|---+---+---+---+
@@ -4778,7 +4803,7 @@ decode_psedodbg_assert_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   if (actual != expected)
     {
       sim_io_printf (sd, "FAIL at %#x: %s (%s%s, 0x%04x), actual value %#x\n",
-		     PCREG, dbg_name, reg_name, dbg_appd, expected, actual);
+		     pc, dbg_name, reg_name, dbg_appd, expected, actual);
       cec_exception (cpu, VEC_ILGAL_I);
       SET_DREG (0, 1);
     }
@@ -4810,7 +4835,7 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
   if ((iw0 & 0xf7ff) == 0xc003 && iw1 == 0x1800)
     TRACE_INSN (cpu, "MNOP;");
   else if ((iw0 & 0xFF00) == 0x0000)
-    decode_ProgCtrl_0 (cpu, iw0);
+    decode_ProgCtrl_0 (cpu, iw0, pc);
   else if ((iw0 & 0xFFC0) == 0x0240)
     decode_CaCTRL_0 (cpu, iw0);
   else if ((iw0 & 0xFF80) == 0x0100)
@@ -4882,7 +4907,7 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
   else if ((iw0 & 0xFF00) == 0xF900)
     decode_psedoOChar_0 (cpu, iw0), insn_len = 2;
   else if (((iw0 & 0xFF00) == 0xF000) && ((iw1 & 0x0000) == 0x0000))
-    decode_psedodbg_assert_0 (cpu, iw0, iw1);
+    decode_psedodbg_assert_0 (cpu, iw0, iw1, pc);
   else
     illegal_instruction (cpu);
 
@@ -4891,7 +4916,7 @@ _interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
   return insn_len;
 }
 
-void
+bu32
 interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
 {
   int i;
@@ -4911,6 +4936,5 @@ interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
     /* XXX: This is missing register tracing.  */
     *BFIN_CPU_STATE.stores[i].addr = BFIN_CPU_STATE.stores[i].val;
 
-  if (!BFIN_CPU_STATE.did_jump && !BFIN_CPU_STATE.flow_change)
-    INC_PCREG (insn_len);
+  return insn_len;
 }
