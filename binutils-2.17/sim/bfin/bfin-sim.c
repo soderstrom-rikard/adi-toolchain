@@ -120,59 +120,111 @@ add_brev (SIM_CPU *cpu, bu32 addend1, bu32 addend2)
   return r;
 }
 
-static int
-dagadd (SIM_CPU *cpu, int dagno, bs32 modify)
+/* This is a bit crazy, but we want to simulate the hardware behavior exactly
+   rather than worry about the circular buffers being used correctly.  Which
+   isn't to say there isn't room for improvement here, just that we want to
+   be conservative.  See also dagsub().  */
+static bu32
+dagadd (SIM_CPU *cpu, int dagno, bs32 M)
 {
-  bs32 i, l, b, val;
+  bu64 i = IREG (dagno);
+  bu64 l = LREG (dagno);
+  bu64 b = BREG (dagno);
+  bu64 m = (bu32)M;
 
-  i = IREG (dagno);
-  l = LREG (dagno);
-  b = BREG (dagno);
-  val = i;
+  bu64 LB, IM, IML;
+  bu32 im32, iml32, lb32, res;
+  bu64 msb, car;
 
-  if (l)
+  /* A naïve implementation that mostly works:
+  res = i + m;
+  if (l && res >= b + l)
+    res -= l;
+  STORE (IREG (dagno), res);
+   */
+
+  msb = (bu64)1 << 31;
+  car = (bu64)1 << 32;
+
+  IM = i + m;
+  im32 = IM;
+  LB = l + b;
+  lb32 = LB;
+
+  if (M < 0)
     {
-      if ((i + modify - b - l < 0 && modify > 0)
-	  || (i + modify - b >= 0 && modify < 0))
-	val = i + modify;
-      else if (i + modify - b - l >= 0 && modify >= 0)
-	val = i + modify - l;
-      else if (i + modify - b < 0 && modify <= 0)
-	val = i + modify + l;
+      IML = i + m + l;
+      iml32 = IML;
+      if ((i & msb) || (IM & car))
+	res = (im32 < b) ? iml32 : im32;
+      else
+	res = (im32 < b) ? im32 : iml32;
     }
   else
-    val = i + modify;
+    {
+      IML = i + m - l;
+      iml32 = IML;
+      if ((IM & car) == (LB & car))
+	res = (im32 < lb32) ? im32 : iml32;
+      else
+	res = (im32 < lb32) ? iml32 : im32;
+    }
 
-  STORE (IREG (dagno), val);
-  return val;
+  STORE (IREG (dagno), res);
+  return res;
 }
 
-static int
-dagsub (SIM_CPU *cpu, int dagno, bs32 modify)
+/* See dagadd() notes above.  */
+static bu32
+dagsub (SIM_CPU *cpu, int dagno, bs32 M)
 {
-  bs32 i, l, b, val;
+  bu64 i = IREG (dagno);
+  bu64 l = LREG (dagno);
+  bu64 b = BREG (dagno);
+  bu64 m = (bu32)M;
 
-  i = IREG (dagno);
-  l = LREG (dagno);
-  b = BREG (dagno);
-  val = i;
+  bu64 mbar = (bu32)(~m + 1);
+  bu64 LB, IM, IML;
+  bu32 b32, im32, iml32, lb32, res;
+  bu64 msb, car;
 
-  if (l)
+  /* A naïve implementation that mostly works:
+  res = i - m;
+  if (l && newi < b)
+    newi += l;
+  STORE (IREG (dagno), newi);
+   */
+
+  msb = (bu64)1 << 31;
+  car = (bu64)1 << 32;
+
+  IM = i + mbar;
+  im32 = IM;
+  LB = l + b;
+  lb32 = LB;
+
+  if (M < 0)
     {
-      if ((i - modify - b - l < 0 && modify < 0)
-	  || (i - modify - b >= 0 && modify > 0)
-	  || modify == 0)
-	val = i - modify;
-      else if (i - modify - b - l >= 0 && modify < 0)
-	val = i - modify - l;
-      else if (i - modify - b < 0 && modify > 0)
-	val = i - modify + l;
+      IML = i + mbar - l;
+      iml32 = IML;
+      if (!!((i & msb) && (IM & car)) == !!(LB & car))
+	res = (im32 < lb32) ? im32 : iml32;
+      else
+	res = (im32 < lb32) ? iml32 : im32;
     }
   else
-    val = i - modify;
+    {
+      IML = i + mbar + l;
+      iml32 = IML;
+      b32 = b;
+      if (M == 0 || IM & car)
+	res = (im32 < b32) ? iml32 : im32;
+      else
+	res = (im32 < b32) ? im32 : iml32;
+    }
 
-  STORE (IREG (dagno), val);
-  return val;
+  STORE (IREG (dagno), res);
+  return res;
 }
 
 static bu32
