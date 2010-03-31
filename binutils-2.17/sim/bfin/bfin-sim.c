@@ -715,7 +715,7 @@ fmtconst_str (const_forms_t cf, bs32 x, bu32 pc)
 
   if (constant_formats[cf].reloc)
     {
-      bfd_vma ea = (((constant_formats[cf].pcrel ? SIGNEXTEND (x, constant_formats[cf].nbits)
+      bu32 ea = (((constant_formats[cf].pcrel ? SIGNEXTEND (x, constant_formats[cf].nbits)
 		      : x) + constant_formats[cf].offset) << constant_formats[cf].scale);
       if (constant_formats[cf].pcrel)
 	ea += pc;
@@ -3306,25 +3306,25 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bs32 val1 = DREG(src1);
       bs32 res;
       bs32 signRes;
-      bs32 ovX, sBit1,sBit2,sBitRes1,sBitRes2;
+      bs32 ovX, sBit1, sBit2, sBitRes1, sBitRes2;
 
       TRACE_INSN (cpu, "R%i.%s = R%i %s R%i (RND12)", dst0, HL ? "L" : "H",
-	src0, aop & 0x1 ? "-" : "+", src1);
+		  src0, aop & 0x1 ? "-" : "+", src1);
 
       /* If subtract, just invert and add one */
       if (aop & 0x1)
 	val1= ~val1 + 1;
 
       /* Get the sign bits, since we need them later */
-      sBit1 = (val0 & 0x80000000) ? 1:0;
-      sBit2 = (val1 & 0x80000000) ? 1:0;
+      sBit1 = !!(val0 & 0x80000000);
+      sBit2 = !!(val1 & 0x80000000);
 
       res = val0 + val1;
 
-      sBitRes1 = (res & 0x80000000) ? 1:0;
+      sBitRes1 = !!(res & 0x80000000);
       /* Round to the 12th bit */
       res += 0x0800;
-      sBitRes2 = (res & 0x80000000) ? 1:0;
+      sBitRes2 = !!(res & 0x80000000);
 
       signRes = res;
       signRes >>= 27;
@@ -3336,26 +3336,26 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
        * shift and upper 4 bits where not the same
        */
       if ((!(sBit1 ^ sBit2) && (sBit1 ^ sBitRes1)) ||
-		(!sBit1 && !sBit2 && sBitRes2) ||
-		((signRes != 0) && (signRes != -1)))
+	  (!sBit1 && !sBit2 && sBitRes2) ||
+	  ((signRes != 0) && (signRes != -1)))
 	{
-	  // Both X1 and X2 Neg res is neg overflow
-	  if(sBit1 && sBit2)
+	  /* Both X1 and X2 Neg res is neg overflow */
+	  if (sBit1 && sBit2)
 	    res = 0x80000000;
-	  // Both X1 and X2 Pos res is pos overflow
-	  else if(!sBit1 && !sBit2)
+	  /* Both X1 and X2 Pos res is pos overflow */
+	  else if (!sBit1 && !sBit2)
 	    res = 0x7FFFFFFF;
-	  // Pos+Neg or Neg+Pos take the sign of the result
-	  else if(sBitRes1)
+	  /* Pos+Neg or Neg+Pos take the sign of the result */
+	  else if (sBitRes1)
 	    res = 0x80000000;
-	  else 
+	  else
 	    res = 0x7FFFFFFF;
 
 	  ovX = 1;
 	}
       else
 	{
-	  // Shift up now after overflow detection
+	  /* Shift up now after overflow detection */
 	  ovX = 0;
 	  res <<= 4;
 	}
@@ -3363,9 +3363,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       res >>= 16;
 
       if (HL)
-	STORE(DREG(dst0), (DREG(dst0) & 0xFFFF) | (res << 16 ));
+	STORE(DREG(dst0), REG_H_L (res << 16, DREG(dst0)));
       else
-	STORE(DREG(dst0), (DREG(dst0) & 0xFFFF0000) | res);
+	STORE(DREG(dst0), REG_H_L (DREG(dst0), res));
 
       SET_ASTATREG (az, res == 0);
       SET_ASTATREG (an, res & 0x8000);
@@ -3379,7 +3379,7 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bs32 res;
 
       TRACE_INSN (cpu, "R%i.%s = R%i %s R%i (RND20)", dst0, HL ? "L" : "H",
-	src0, aop & 0x1 ? "-" : "+", src1);
+		  src0, aop & 0x1 ? "-" : "+", src1);
 
       /* If subtract, just invert and add one */
       if (aop & 0x1)
@@ -3393,14 +3393,13 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       /* Don't worry about overflows, since we are shifting right */
 
       if (HL)
-	STORE(DREG(dst0), (DREG(dst0) & 0xFFFF) | (res << 16 ));
+	STORE(DREG(dst0), REG_H_L (res << 16, DREG(dst0)));
       else
-	STORE(DREG(dst0), (DREG(dst0) & 0xFFFF0000) | res);
+	STORE(DREG(dst0), REG_H_L (DREG(dst0), res));
 
       SET_ASTATREG (az, res == 0);
       SET_ASTATREG (an, res & 0x8000);
       SET_ASTATREG (v, 0);
-
     }
   else if (aopcde == 2 || aopcde == 3)
     {
