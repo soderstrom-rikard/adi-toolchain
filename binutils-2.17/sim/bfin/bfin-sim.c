@@ -833,6 +833,33 @@ subsub16 (SIM_CPU *cpu, bu32 a, bu32 b, int sat, int x)
 }
 
 static bu32
+addsub16 (SIM_CPU *cpu, bu32 a, bu32 b, int sat, int x)
+{
+  int c0 = 0, c1 = 0;
+  bu32 x0, x1;
+  x0 = add16 (cpu, (a >> 16) & 0xffff, (b >> 16) & 0xffff, &c0, sat) & 0xffff;
+  x1 = sub16 (cpu, a & 0xffff, b & 0xffff, &c1, sat) & 0xffff;
+  if (x == 0)
+    return (x0 << 16) | x1;
+  else
+    return (x1 << 16) | x0;
+}
+
+static bu32
+subadd16 (SIM_CPU *cpu, bu32 a, bu32 b, int sat, int x)
+{
+  int c0 = 0, c1 = 0;
+  bu32 x0, x1;
+  x0 = sub16 (cpu, (a >> 16) & 0xffff, (b >> 16) & 0xffff, &c0, sat) & 0xffff;
+  x1 = add16 (cpu, a & 0xffff, b & 0xffff, &c1, sat) & 0xffff;
+  if (x == 0)
+    return (x0 << 16) | x1;
+  else
+    return (x1 << 16) | x0;
+}
+
+
+static bu32
 min32 (SIM_CPU *cpu, bu32 a, bu32 b)
 {
   int val = a;
@@ -3857,13 +3884,21 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       TRACE_INSN (cpu, "R%i = R%i %s R%i, R%i = R%i %s R%i %s;",
 		  dst1, src0, HL ? "+|-" : "+|+", src1, dst0, src0, HL ? "-|+" : "-|-", src1,
 		  amod0amod2_names[aop * 4 + x * 2 + s]);
-      if (aop == 0 && HL == 0)
+      if (aop == 0)
 	{
 	  /* dregs = dregs +|+ dregs, dregs = dregs -|- dregs (amod0) */
 	  bu32 d0, d1;
 
-	  d1 = addadd16 (cpu, DREG (src0), DREG (src1), s, 0);
-	  d0 = subsub16 (cpu, DREG (src0), DREG (src1), s, x);
+	  if (HL == 0)
+	    {
+	      d1 = addadd16 (cpu, DREG (src0), DREG (src1), s, 0);
+	      d0 = subsub16 (cpu, DREG (src0), DREG (src1), s, x);
+	    }
+	  else
+	    {
+	      d1 = addsub16 (cpu, DREG (src0), DREG (src1), s, 0);
+	      d0 = subadd16 (cpu, DREG (src0), DREG (src1), s, x);
+	    }
 	  STORE (DREG (dst0), d0);
 	  STORE (DREG (dst1), d1);
 	}
