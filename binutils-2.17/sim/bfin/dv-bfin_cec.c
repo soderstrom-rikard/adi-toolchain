@@ -424,6 +424,9 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
       cec_irpten_enable (cpu, cec);
     }
 
+  /* When moving between states, don't let internal states bleed through */
+  DIS_ALGN_EXPT &= ~1;
+
   /* When going from user to super, we set LSB in LB regs to avoid
      misbehavior and/or malicious code.  */
   if (curr_ivg == IVG_USER)

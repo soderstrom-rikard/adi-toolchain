@@ -2563,6 +2563,8 @@ decode_dspLDST_0 (SIM_CPU *cpu, bu16 iw0)
     {
       TRACE_INSN (cpu, "R%i = [I%i++];", reg, i);
       addr = IREG (i);
+      if (DIS_ALGN_EXPT & 0x1)
+	addr &= ~3;
       dagadd (cpu, i, 4);
       STORE (DREG (reg), GET_LONG (addr));
     }
@@ -2584,6 +2586,8 @@ decode_dspLDST_0 (SIM_CPU *cpu, bu16 iw0)
     {
       TRACE_INSN (cpu, "R%i = [I%i--];", reg, i);
       addr = IREG (i);
+      if (DIS_ALGN_EXPT & 0x1)
+	addr &= ~3;
       dagsub (cpu, i, 4);
       STORE (DREG (reg), GET_LONG (addr));
     }
@@ -2605,6 +2609,8 @@ decode_dspLDST_0 (SIM_CPU *cpu, bu16 iw0)
     {
       TRACE_INSN (cpu, "R%i = [I%i];", reg, i);
       addr = IREG (i);
+      if (DIS_ALGN_EXPT & 0x1)
+	addr &= ~3;
       STORE (DREG (reg), GET_LONG (addr));
     }
   else if (aop == 2 && W == 0 && m == 1)
@@ -2683,6 +2689,8 @@ decode_dspLDST_0 (SIM_CPU *cpu, bu16 iw0)
     {
       TRACE_INSN (cpu, "R%i = [I%i ++ M%i];", reg, i, m);
       addr = IREG (i);
+      if (DIS_ALGN_EXPT & 0x1)
+	addr &= ~3;
       dagadd (cpu, i, MREG (m));
       STORE (DREG (reg), GET_LONG (addr));
     }
@@ -3895,7 +3903,10 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   else if (aop == 0 && aopcde == 18)
     unhandled_instruction (cpu, "SAA (dregs_pair, dregs_pair) aligndir");
   else if (aop == 3 && aopcde == 18)
-    unhandled_instruction (cpu, "DISALGNEXCPT");
+    {
+      TRACE_INSN (cpu, "DISALGNEXCPT");
+      DIS_ALGN_EXPT |= 1;
+    }
   else if ((aop == 0 || aop == 1) && aopcde == 20)
     {
       bu32 s0, s0L, s0H, s1, s1L, s1H;
@@ -5153,6 +5164,8 @@ interp_insn_bfin (SIM_CPU *cpu, bu32 pc)
   bu32 insn_len;
 
   BFIN_CPU_STATE.n_stores = 0;
+
+  DIS_ALGN_EXPT &= ~1;
 
   insn_len = _interp_insn_bfin (cpu, pc);
 

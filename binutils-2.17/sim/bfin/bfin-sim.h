@@ -67,6 +67,9 @@ struct bfin_cpu_state
      the same as jumping (think RTS rather than JUMP).  */
   bool flow_change;
 
+  /* Needed for supporting the DISALGNEXCPT instruction */
+  int dis_algn_expt;
+
   /* See notes above for struct store.  */
   struct store stores[20];
   int n_stores;
@@ -102,6 +105,7 @@ struct bfin_cpu_state
 #define PCREG		(BFIN_CPU_STATE.pc)
 #define EMUDAT_INREG	(BFIN_CPU_STATE.emudat[0])
 #define EMUDAT_OUTREG	(BFIN_CPU_STATE.emudat[1])
+#define DIS_ALGN_EXPT	(BFIN_CPU_STATE.dis_algn_expt)
 
 #define _SET_CORE32REG_IDX(reg, p, x, val) \
   do \
