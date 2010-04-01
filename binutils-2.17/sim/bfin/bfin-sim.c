@@ -3205,6 +3205,7 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   int h01 = ((iw1 >> 15) & 0x1);
 
   bu32 res0, res1;
+  bu32 res = DREG(dst);
 
   TRACE_EXTRACT (cpu, "%s: M:%i mmod:%i MM:%i P:%i w1:%i op1:%i h01:%i h11:%i "
 		      "w0:%i op0:%i h00:%i h10:%i dst:%i src0:%i src1:%i",
@@ -3231,26 +3232,29 @@ decode_dsp32mac_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
   if (w0)
     {
       if (P)
-	SET_DREG (dst, res0);
+	STORE (DREG(dst), res0);
       else
 	{
 	  if (res0 & 0xffff0000)
 	    unhandled_instruction (cpu, "dsp32mac0");
-	  SET_DREG_L (dst, res0);
+	  res = REG_H_L(res, res0);
 	}
     }
 
   if (w1)
     {
       if (P)
-	SET_DREG (dst + 1, res1);
+	STORE (DREG(dst + 1), res1);
       else
 	{
 	  if (res1 & 0xffff0000)
 	    unhandled_instruction (cpu, "dsp32mac1");
-	  SET_DREG_H (dst, res1 << 16);
+	  res = REG_H_L(res1 << 16, res);
 	}
     }
+
+   if (!P && (w0 || w1))
+    STORE (DREG(dst), res);
 }
 
 static void
