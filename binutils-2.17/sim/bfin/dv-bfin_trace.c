@@ -20,14 +20,31 @@
 
 #include "sim-main.h"
 #include "devices.h"
+#include "dv-bfin_cec.h"
 #include "dv-bfin_trace.h"
 
-/* XXX: This is a stub implementation -- it always returns an empty trace.  */
+/* Note: The circular buffering here might look a little buggy wrt mid-reads
+         and consuming the top entry, but this is simulating hardware behavior.
+         The hardware is simple, dumb, and fast.  Don't write dumb Blackfin
+         software and you won't have a problem.  */
 
+/* The hardware is limited to 16 entries and defines TBUFCTL.  Let's extend it ;).  */
+#ifndef SIM_BFIN_TRACE_DEPTH
+#define SIM_BFIN_TRACE_DEPTH 10
+#endif
+#define SIM_BFIN_TRACE_LEN (1 << SIM_BFIN_TRACE_DEPTH)
+#define SIM_BFIN_TRACE_LEN_MASK (SIM_BFIN_TRACE_LEN - 1)
+
+struct bfin_trace_entry
+{
+  bu32 src, dst;
+};
 struct bfin_trace
 {
   bu32 base;
-  bu32 buffer[32];
+  struct bfin_trace_entry buffer[SIM_BFIN_TRACE_LEN];
+  int top, bottom;
+  bool mid;
 
   /* Order after here is important -- matches hardware MMR layout.  */
   bu32 tbufctl, tbufstat;
@@ -36,6 +53,16 @@ struct bfin_trace
 };
 #define mmr_base()      offsetof(struct bfin_trace, tbufctl)
 #define mmr_offset(mmr) (offsetof(struct bfin_trace, mmr) - mmr_base())
+
+/* Ugh, circular buffers.  */
+#define TBUF_LEN(t) ((t)->top - (t)->bottom)
+#define TBUF_IDX(i) ((i) & SIM_BFIN_TRACE_LEN_MASK)
+/* TOP is the next slot to fill.  */
+#define TBUF_TOP(t) (&(t)->buffer[TBUF_IDX ((t)->top)])
+/* LAST is the latest valid slot.  */
+#define TBUF_LAST(t) (&(t)->buffer[TBUF_IDX ((t)->top - 1)])
+/* LAST_LAST is the second-to-last valid slot.  */
+#define TBUF_LAST_LAST(t) (&(t)->buffer[TBUF_IDX ((t)->top - 2)])
 
 static unsigned
 bfin_trace_io_write_buffer (struct hw *me, const void *source,
@@ -79,10 +106,35 @@ bfin_trace_io_read_buffer (struct hw *me, void *dest,
     {
     case mmr_offset(tbufctl):
       value = trace->tbufctl;
-    case mmr_offset(tbufstat):
-    case mmr_offset(tbuf):
-      value = 0;
       break;
+    case mmr_offset(tbufstat):
+      /* Hardware is limited to 16 entries, so to stay compatible with
+         software, limit the value to 16.  For software algorithms that
+         keep reading while (TBUFSTAT != 0), they'll get all of it.  */
+      value = MIN (TBUF_LEN (trace), 16);
+      break;
+    case mmr_offset(tbuf):
+      {
+	struct bfin_trace_entry *e;
+
+	if (TBUF_LEN (trace) == 0)
+	  {
+	    value = 0;
+	    break;
+	  }
+
+	e = TBUF_LAST (trace);
+	if (trace->mid)
+	  {
+	    value = e->src;
+	    --trace->top;
+	  }
+	else
+	  value = e->dst;
+	trace->mid = !trace->mid;
+
+	break;
+      }
     default:
       dv_bfin_invalid_mmr (me, addr, nr_bytes);
       break;
@@ -139,3 +191,65 @@ const struct hw_descriptor dv_bfin_trace_descriptor[] = {
   {"bfin_trace", bfin_trace_finish,},
   {NULL, NULL},
 };
+
+#define TRACE_STATE(cpu) ((struct bfin_trace *) dv_get_state (cpu, "/core/bfin_trace"))
+
+/* This is not re-entrant, but neither is the cpu state, so this shouldn't
+   be a big deal ...  */
+void bfin_trace_queue (SIM_CPU *cpu, bu32 src_pc, bu32 dst_pc, int hwloop)
+{
+  struct bfin_trace *trace = TRACE_STATE (cpu);
+  struct bfin_trace_entry *e;
+  int len;
+
+  /* Only queue if powered.  */
+  if (!(trace->tbufctl & TBUFPWR))
+    return;
+
+  /* Only queue if enabled.  */
+  if (!(trace->tbufctl & TBUFEN))
+    return;
+
+  /* Are we full ?  */
+  len = TBUF_LEN (trace);
+  if (len == SIM_BFIN_TRACE_LEN)
+    {
+      if (trace->tbufctl & TBUFOVF)
+	{
+	  cec_exception (cpu, VEC_OVFLOW);
+	  return;
+	}
+
+      /* Overwrite next entry.  */
+      ++trace->bottom;
+    }
+
+  /* One level compression.  */
+  if (len >= 1 && (trace->tbufctl & TBUFCMPLP))
+    {
+      e = TBUF_LAST (trace);
+      if (src_pc == (e->src & ~1) && dst_pc == (e->dst & ~1))
+	{
+	  /* Hardware sets LSB when level is compressed.  */
+	  e->dst |= 1;
+	  return;
+	}
+    }
+
+  /* Two level compression.  */
+  if (len >= 2 && (trace->tbufctl & TBUFCMPLP_DOUBLE))
+    {
+      e = TBUF_LAST_LAST (trace);
+      if (src_pc == (e->src & ~1) && dst_pc == (e->dst & ~1))
+	{
+	  /* Hardware sets LSB when level is compressed.  */
+	  e->src |= 1;
+	  return;
+	}
+    }
+
+  e = TBUF_TOP (trace);
+  e->dst = dst_pc;
+  e->src = src_pc;
+  ++trace->top;
+}

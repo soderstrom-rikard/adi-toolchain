@@ -1441,7 +1441,7 @@ hwloop_get_next_pc (SIM_CPU *cpu, bu32 pc, bu32 insn_len)
 	SET_LCREG (i, LCREG (i) - 1);
 	if (LCREG (i))
 	  {
-	    TRACE_BRANCH (cpu, "Hardware loop %i to %#x", i, LTREG (i));
+	    TRACE_BRANCH (cpu, pc, LTREG (i), i, "Hardware loop %i", i);
 	    return LTREG (i);
 	  }
       }
@@ -1467,35 +1467,31 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       bu32 newpc = RETSREG;
       TRACE_INSN (cpu, "RTS;");
-      TRACE_BRANCH (cpu, "RTS to %#x", newpc);
+      TRACE_BRANCH (cpu, pc, newpc, -1, "RTS");
       SET_PCREG (newpc);
       BFIN_CPU_STATE.flow_change = true;
     }
   else if (prgfunc == 1 && poprnd == 1)
     {
       TRACE_INSN (cpu, "RTI;");
-      TRACE_BRANCH (cpu, "RTI may change PC");
       cec_return (cpu, -1);
       BFIN_CPU_STATE.flow_change = true;
     }
   else if (prgfunc == 1 && poprnd == 2)
     {
       TRACE_INSN (cpu, "RTX;");
-      TRACE_BRANCH (cpu, "RTX may change PC");
       cec_return (cpu, IVG_EVX);
       BFIN_CPU_STATE.flow_change = true;
     }
   else if (prgfunc == 1 && poprnd == 3)
     {
       TRACE_INSN (cpu, "RTN;");
-      TRACE_BRANCH (cpu, "RTN may change PC");
       cec_return (cpu, IVG_NMI);
       BFIN_CPU_STATE.flow_change = true;
     }
   else if (prgfunc == 1 && poprnd == 4)
     {
       TRACE_INSN (cpu, "RTE;");
-      TRACE_BRANCH (cpu, "RTE may change PC");
       cec_return (cpu, IVG_EMU);
       BFIN_CPU_STATE.flow_change = true;
     }
@@ -1537,7 +1533,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       bu32 newpc = PREG (poprnd);
       TRACE_INSN (cpu, "JUMP (P%i);", poprnd);
-      TRACE_BRANCH (cpu, "JUMP (Preg) to %#x", newpc);
+      TRACE_BRANCH (cpu, pc, newpc, -1, "JUMP (Preg)");
       SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
     }
@@ -1545,7 +1541,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       bu32 newpc = PREG (poprnd);
       TRACE_INSN (cpu, "CALL (P%i);", poprnd);
-      TRACE_BRANCH (cpu, "CALL (Preg) to %#x", newpc);
+      TRACE_BRANCH (cpu, pc, newpc, -1, "CALL (Preg)");
       /* If we're at the end of a hardware loop, RETS is going to be
          the top of the loop rather than the next instruction.  */
       SET_RETSREG (hwloop_get_next_pc (cpu, pc, 2));
@@ -1556,7 +1552,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       bu32 newpc = pc + PREG (poprnd);
       TRACE_INSN (cpu, "CALL (PC + P%i);", poprnd);
-      TRACE_BRANCH (cpu, "CALL (PC + Preg) to %#x", newpc);
+      TRACE_BRANCH (cpu, pc, newpc, -1, "CALL (PC + Preg)");
       SET_RETSREG (hwloop_get_next_pc (cpu, pc, 2));
       SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
@@ -1565,7 +1561,7 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       bu32 newpc = pc + PREG (poprnd);
       TRACE_INSN (cpu, "JUMP (PC + P%i);", poprnd);
-      TRACE_BRANCH (cpu, "JUMP (PC + Preg) to %#x", newpc);
+      TRACE_BRANCH (cpu, pc, newpc, -1, "JUMP (PC + Preg)");
       SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
     }
@@ -1573,14 +1569,12 @@ decode_ProgCtrl_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
     {
       int raise = uimm4 (poprnd);
       TRACE_INSN (cpu, "RAISE %s;", uimm4_str (raise));
-      TRACE_BRANCH (cpu, "RAISE may change PC");
       cec_raise (cpu, raise);
     }
   else if (prgfunc == 10)
     {
       int excpt = uimm4 (poprnd);
       TRACE_INSN (cpu, "EXCPT %s;", uimm4_str (excpt));
-      TRACE_BRANCH (cpu, "EXCPT may change PC");
       /* XXX: see comments in cec_exception() */
       cec_exception (cpu, excpt);
     }
@@ -2023,7 +2017,7 @@ decode_BRCC_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   if (cond)
     {
       bu32 newpc = pc + pcrel;
-      TRACE_BRANCH (cpu, "Conditional JUMP to %#x", newpc);
+      TRACE_BRANCH (cpu, pc, newpc, -1, "Conditional JUMP");
       SET_PCREG (newpc);
       BFIN_CPU_STATE.did_jump = true;
     }
@@ -2044,7 +2038,7 @@ decode_UJUMP_0 (SIM_CPU *cpu, bu16 iw0, bu32 pc)
   TRACE_DECODE (cpu, "%s: pcrel12:%#x", __func__, pcrel);
 
   TRACE_INSN (cpu, "JUMP.S %#x;", pcrel);
-  TRACE_BRANCH (cpu, "JUMP.S to %#x", newpc);
+  TRACE_BRANCH (cpu, pc, newpc, -1, "JUMP.S");
 
   SET_PCREG (newpc);
   BFIN_CPU_STATE.did_jump = true;
@@ -3048,11 +3042,11 @@ decode_CALLa_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1, bu32 pc)
 
   if (S == 1)
     {
-      TRACE_BRANCH (cpu, "CALL to %#x", newpc);
+      TRACE_BRANCH (cpu, pc, newpc, -1, "CALL");
       SET_RETSREG (hwloop_get_next_pc (cpu, pc, 4));
     }
   else
-    TRACE_BRANCH (cpu, "JUMP.L to %#x", newpc);
+    TRACE_BRANCH (cpu, pc, newpc, -1, "JUMP.L");
 
   SET_PCREG (newpc);
   BFIN_CPU_STATE.did_jump = true;

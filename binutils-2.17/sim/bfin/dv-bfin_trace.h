@@ -24,4 +24,14 @@
 #define BFIN_COREMMR_TRACE_BASE	0xFFE06000
 #define BFIN_COREMMR_TRACE_SIZE	(4 * 65)
 
+/* TBUFCTL Masks */
+#define TBUFPWR			0x0001
+#define TBUFEN			0x0002
+#define TBUFOVF			0x0004
+#define TBUFCMPLP_SINGLE	0x0008
+#define TBUFCMPLP_DOUBLE	0x0010
+#define TBUFCMPLP		(TBUFCMPLP_SINGLE | TBUFCMPLP_DOUBLE)
+
+void bfin_trace_queue (SIM_CPU *, bu32 src_pc, bu32 dst_pc, int hwloop);
+
 #endif

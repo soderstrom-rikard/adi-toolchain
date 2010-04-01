@@ -62,6 +62,7 @@ struct sim_state {
 #include "sim-engine.h"
 #include "sim-options.h"
 #include "run-sim.h"
+#include "dv-bfin_trace.h"
 
 #undef MAX
 #undef MIN
@@ -81,7 +82,12 @@ struct sim_state {
 #define TRACE_EXTRACT(cpu, fmt, ...) MAYBE_TRACE (EXTRACT, cpu, fmt, ## __VA_ARGS__)
 #define TRACE_CORE(cpu, fmt, ...) MAYBE_TRACE (CORE, cpu, fmt, ## __VA_ARGS__)
 #define TRACE_EVENTS(cpu, fmt, ...) MAYBE_TRACE (EVENTS, cpu, fmt, ## __VA_ARGS__)
-#define TRACE_BRANCH(cpu, fmt, ...) MAYBE_TRACE (BRANCH, cpu, fmt, ## __VA_ARGS__)
+#define TRACE_BRANCH(cpu, oldpc, newpc, hwloop, fmt, ...) \
+  do { \
+    MAYBE_TRACE (BRANCH, cpu, fmt " to %#x", ## __VA_ARGS__, newpc); \
+    if (STATE_ENVIRONMENT (CPU_STATE (cpu)) == OPERATING_ENVIRONMENT) \
+      bfin_trace_queue (cpu, oldpc, newpc, hwloop); \
+  } while (0)
 
 extern void trace_register PARAMS ((SIM_DESC sd,
 				    sim_cpu *cpu,

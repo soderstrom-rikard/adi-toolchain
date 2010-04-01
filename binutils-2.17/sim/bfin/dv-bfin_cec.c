@@ -425,8 +425,7 @@ _cec_raise (SIM_CPU *cpu, struct bfin_cec *cec, int ivg)
       else
 	SET_PCREG (cec_get_evt (cpu, ivg));
 
-      TRACE_BRANCH (cpu, "CEC changed PC (to EVT%i): %#x -> %#x",
-		    ivg, oldpc, PCREG);
+      TRACE_BRANCH (cpu, oldpc, PCREG, -1, "CEC changed PC (to EVT%i):", ivg);
       BFIN_CPU_STATE.flow_change = true;
 
       /* Enable the global interrupt mask upon interrupt entry.  */
@@ -529,8 +528,7 @@ cec_return (SIM_CPU *cpu, int ivg)
   else
     cec->ipend &= ~(1 << ivg);
 
-  TRACE_BRANCH (cpu, "CEC changed PC (from EVT%i): %#x -> %#x",
-		ivg, oldpc, PCREG);
+  TRACE_BRANCH (cpu, oldpc, PCREG, -1, "CEC changed PC (from EVT%i)", ivg);
   BFIN_CPU_STATE.flow_change = true;
 
   /* Disable global interrupt mask to let any interrupt take over.  */
