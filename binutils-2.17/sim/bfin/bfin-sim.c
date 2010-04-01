@@ -747,7 +747,7 @@ sub32 (SIM_CPU *cpu, bu32 a, bu32 b, int carry, int sat)
 }
 
 static bu32
-add16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int sat)
+add16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int sat, int scale)
 {
   int flgs = (a >> 15) & 1;
   int flgo = (b >> 15) & 1;
@@ -777,7 +777,7 @@ add16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int sat)
 }
 
 static bu32
-sub16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int sat)
+sub16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int sat, int scale)
 {
   int flgs = (a >> 15) & 1;
   int flgo = (b >> 15) & 1;
@@ -807,12 +807,12 @@ sub16 (SIM_CPU *cpu, bu32 a, bu32 b, int *carry, int sat)
 }
 
 static bu32
-addadd16 (SIM_CPU *cpu, bu32 a, bu32 b, int sat, int x)
+addadd16 (SIM_CPU *cpu, bu32 a, bu32 b, int sat, int scale, int x)
 {
   int c0 = 0, c1 = 0;
   bu32 x0, x1;
-  x0 = add16 (cpu, (a >> 16) & 0xffff, (b >> 16) & 0xffff, &c0, sat) & 0xffff;
-  x1 = add16 (cpu, a & 0xffff, b & 0xffff, &c1, sat) & 0xffff;
+  x0 = add16 (cpu, (a >> 16) & 0xffff, (b >> 16) & 0xffff, &c0, sat, scale) & 0xffff;
+  x1 = add16 (cpu, a & 0xffff, b & 0xffff, &c1, sat, scale) & 0xffff;
   if (x == 0)
     return (x0 << 16) | x1;
   else
@@ -820,12 +820,12 @@ addadd16 (SIM_CPU *cpu, bu32 a, bu32 b, int sat, int x)
 }
 
 static bu32
-subsub16 (SIM_CPU *cpu, bu32 a, bu32 b, int sat, int x)
+subsub16 (SIM_CPU *cpu, bu32 a, bu32 b, int sat, int scale, int x)
 {
   int c0 = 0, c1 = 0;
   bu32 x0, x1;
-  x0 = sub16 (cpu, (a >> 16) & 0xffff, (b >> 16) & 0xffff, &c0, sat) & 0xffff;
-  x1 = sub16 (cpu, a & 0xffff, b & 0xffff, &c1, sat) & 0xffff;
+  x0 = sub16 (cpu, (a >> 16) & 0xffff, (b >> 16) & 0xffff, &c0, sat, scale) & 0xffff;
+  x1 = sub16 (cpu, a & 0xffff, b & 0xffff, &c1, sat, scale) & 0xffff;
   if (x == 0)
     return (x0 << 16) | x1;
   else
@@ -833,12 +833,12 @@ subsub16 (SIM_CPU *cpu, bu32 a, bu32 b, int sat, int x)
 }
 
 static bu32
-addsub16 (SIM_CPU *cpu, bu32 a, bu32 b, int sat, int x)
+addsub16 (SIM_CPU *cpu, bu32 a, bu32 b, int sat, int scale, int x)
 {
   int c0 = 0, c1 = 0;
   bu32 x0, x1;
-  x0 = add16 (cpu, (a >> 16) & 0xffff, (b >> 16) & 0xffff, &c0, sat) & 0xffff;
-  x1 = sub16 (cpu, a & 0xffff, b & 0xffff, &c1, sat) & 0xffff;
+  x0 = add16 (cpu, (a >> 16) & 0xffff, (b >> 16) & 0xffff, &c0, sat, scale) & 0xffff;
+  x1 = sub16 (cpu, a & 0xffff, b & 0xffff, &c1, sat, scale) & 0xffff;
   if (x == 0)
     return (x0 << 16) | x1;
   else
@@ -846,12 +846,12 @@ addsub16 (SIM_CPU *cpu, bu32 a, bu32 b, int sat, int x)
 }
 
 static bu32
-subadd16 (SIM_CPU *cpu, bu32 a, bu32 b, int sat, int x)
+subadd16 (SIM_CPU *cpu, bu32 a, bu32 b, int sat, int scale, int x)
 {
   int c0 = 0, c1 = 0;
   bu32 x0, x1;
-  x0 = sub16 (cpu, (a >> 16) & 0xffff, (b >> 16) & 0xffff, &c0, sat) & 0xffff;
-  x1 = add16 (cpu, a & 0xffff, b & 0xffff, &c1, sat) & 0xffff;
+  x0 = sub16 (cpu, (a >> 16) & 0xffff, (b >> 16) & 0xffff, &c0, sat, scale) & 0xffff;
+  x1 = add16 (cpu, a & 0xffff, b & 0xffff, &c1, sat, scale) & 0xffff;
   if (x == 0)
     return (x0 << 16) | x1;
   else
@@ -3502,9 +3502,9 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       if (aop & 2)
 	s1 >>= 16;
       if (aopcde == 2)
-	val = add16 (cpu, s1, s2, &ASTATREG (ac0), s);
+	val = add16 (cpu, s1, s2, &ASTATREG (ac0), s, 0);
       else
-	val = sub16 (cpu, s1, s2, &ASTATREG (ac0), s);
+	val = sub16 (cpu, s1, s2, &ASTATREG (ac0), s, 0);
 
       if (HL)
 	SET_DREG_H (dst0, val << 16);
@@ -3848,13 +3848,13 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
       bu32 t0, t1;
       TRACE_INSN (cpu, "R%i = R%i +-|+- R%i (amod0);", dst0, src0, src1);
       if (aop & 2)
-	t0 = sub16 (cpu, s0h, s1h, &ASTATREG (ac1), s);
+	t0 = sub16 (cpu, s0h, s1h, &ASTATREG (ac1), s, 0);
       else
-	t0 = add16 (cpu, s0h, s1h, &ASTATREG (ac1), s);
+	t0 = add16 (cpu, s0h, s1h, &ASTATREG (ac1), s, 0);
       if (aop & 1)
-	t1 = sub16 (cpu, s0l, s1l, &ASTATREG (ac0), s);
+	t1 = sub16 (cpu, s0l, s1l, &ASTATREG (ac0), s, 0);
       else
-	t1 = add16 (cpu, s0l, s1l, &ASTATREG (ac0), s);
+	t1 = add16 (cpu, s0l, s1l, &ASTATREG (ac0), s, 0);
       t0 &= 0xFFFF;
       t1 &= 0xFFFF;
       if (x)
@@ -3891,13 +3891,13 @@ decode_dsp32alu_0 (SIM_CPU *cpu, bu16 iw0, bu16 iw1)
 
 	  if (HL == 0)
 	    {
-	      d1 = addadd16 (cpu, DREG (src0), DREG (src1), s, 0);
-	      d0 = subsub16 (cpu, DREG (src0), DREG (src1), s, x);
+	      d1 = addadd16 (cpu, DREG (src0), DREG (src1), s, aop, 0);
+	      d0 = subsub16 (cpu, DREG (src0), DREG (src1), s, aop, x);
 	    }
 	  else
 	    {
-	      d1 = addsub16 (cpu, DREG (src0), DREG (src1), s, 0);
-	      d0 = subadd16 (cpu, DREG (src0), DREG (src1), s, x);
+	      d1 = addsub16 (cpu, DREG (src0), DREG (src1), s, aop, 0);
+	      d0 = subadd16 (cpu, DREG (src0), DREG (src1), s, aop, x);
 	    }
 	  STORE (DREG (dst0), d0);
 	  STORE (DREG (dst1), d1);
