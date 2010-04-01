@@ -30,7 +30,7 @@
 
 /* The hardware is limited to 16 entries and defines TBUFCTL.  Let's extend it ;).  */
 #ifndef SIM_BFIN_TRACE_DEPTH
-#define SIM_BFIN_TRACE_DEPTH 10
+#define SIM_BFIN_TRACE_DEPTH 6
 #endif
 #define SIM_BFIN_TRACE_LEN (1 << SIM_BFIN_TRACE_DEPTH)
 #define SIM_BFIN_TRACE_LEN_MASK (SIM_BFIN_TRACE_LEN - 1)
@@ -200,7 +200,7 @@ void bfin_trace_queue (SIM_CPU *cpu, bu32 src_pc, bu32 dst_pc, int hwloop)
 {
   struct bfin_trace *trace = TRACE_STATE (cpu);
   struct bfin_trace_entry *e;
-  int len;
+  int len, ivg;
 
   /* Only queue if powered.  */
   if (!(trace->tbufctl & TBUFPWR))
@@ -208,6 +208,24 @@ void bfin_trace_queue (SIM_CPU *cpu, bu32 src_pc, bu32 dst_pc, int hwloop)
 
   /* Only queue if enabled.  */
   if (!(trace->tbufctl & TBUFEN))
+    return;
+
+  /* Ignore hardware loops.
+     XXX: This is what the hardware does, but an option to ignore
+     could be useful for debugging ...  */
+  if (hwloop >= 0)
+    return;
+
+  /* Only queue if at right level.  */
+  ivg = cec_get_ivg (cpu);
+  if (ivg == IVG_RST)
+    /* XXX: This is what the hardware does, but an option to ignore
+            could be useful for debugging ...  */
+    return;
+  if (ivg <= IVG_EVX && (trace->tbufctl & TBUFOVF))
+    /* XXX: This is what the hardware does, but an option to ignore
+            could be useful for debugging ... just don't throw an
+            exception when full and in EVT{0..3}.  */
     return;
 
   /* Are we full ?  */
