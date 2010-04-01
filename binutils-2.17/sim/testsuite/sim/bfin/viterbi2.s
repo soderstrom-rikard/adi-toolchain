@@ -1,5 +1,4 @@
 # mach: bfin
-# xfail: "need to implement dregs_hi=dregs_lo=SIGN(dregs_hi)*dregs_hi + SIGN(dregs_lo)*dregs_lo in sim" bfin-*
 
 // The assembly program uses two instructions to speed the decoder inner loop:
 //     R6= VMAX/VMAX (R5, R4) A0>>2;

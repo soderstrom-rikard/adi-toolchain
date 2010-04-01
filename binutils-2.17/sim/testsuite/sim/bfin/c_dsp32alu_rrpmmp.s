@@ -1,7 +1,6 @@
 //Original:/testcases/core/c_dsp32alu_rrpmmp/c_dsp32alu_rrpmmp.dsp
 // Spec Reference: dsp32alu (dreg, dreg) = +/-, -/+ (dreg, dreg) amod0
 # mach: bfin
-# xfail: "need to implement these instructions in sim" bfin-*
 
 .include "testutils.inc"
 	start
